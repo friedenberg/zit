@@ -72,7 +72,7 @@ func (c ExecAction) RunWithQuery(
 
 	if err = u.StoreObjekten().Zettel().Query(
 		zids,
-		func(z sku.SkuLikePtr) (err error) {
+		func(z *sku.Transacted) (err error) {
 			return hinweisen.Add(z.GetKennungLike())
 		},
 	); err != nil {

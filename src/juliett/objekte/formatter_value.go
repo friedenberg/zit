@@ -69,12 +69,12 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	out io.Writer,
 	af schnittstellen.AkteReaderFactory,
 	k Konfig,
-	logFunc schnittstellen.FuncIter[sku.SkuLikePtr],
-	cliFmt schnittstellen.StringFormatWriter[sku.SkuLikePtr],
-) schnittstellen.FuncIter[sku.SkuLikePtr] {
+	logFunc schnittstellen.FuncIter[*sku.Transacted],
+	cliFmt schnittstellen.StringFormatWriter[*sku.Transacted],
+) schnittstellen.FuncIter[*sku.Transacted] {
 	switch fv.string {
 	case "etiketten-implicit":
-		return func(tl sku.SkuLikePtr) (err error) {
+		return func(tl *sku.Transacted) (err error) {
 			esImp := tl.GetMetadateiPtr().Verzeichnisse.GetImplicitEtiketten()
 			// TODO-P3 determine if empty sets should be printed or not
 
@@ -90,7 +90,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "etiketten":
-		return func(tl sku.SkuLikePtr) (err error) {
+		return func(tl *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(
 				out,
 				iter.StringCommaSeparated[kennung.Etikett](
@@ -104,7 +104,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			return
 		}
 	case "bezeichnung":
-		return func(tl sku.SkuLikePtr) (err error) {
+		return func(tl *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(out, tl.GetMetadatei().Bezeichnung); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -121,7 +121,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		fMetadateiOnly := metadatei.MakeTextFormatterMetadateiOnly(af, nil)
 		fAkteOnly := metadatei.MakeTextFormatterExcludeMetadatei(af, nil)
 
-		return func(tl sku.SkuLikePtr) (err error) {
+		return func(tl *sku.Transacted) (err error) {
 			if gattung.Konfig.EqualsGattung(tl.GetGattung()) {
 				_, err = fAkteOnly.FormatMetadatei(out, tl)
 			} else if k.IsInlineTyp(tl.GetTyp()) {
@@ -139,7 +139,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			IncludeTai: true,
 		}
 
-		return func(tl sku.SkuLikePtr) (err error) {
+		return func(tl *sku.Transacted) (err error) {
 			if _, err = f.FormatPersistentMetadatei(out, tl, o); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -149,7 +149,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "kennung-akte-sha":
-		return func(tl sku.SkuLikePtr) (err error) {
+		return func(tl *sku.Transacted) (err error) {
 			errors.TodoP3("convert into an option")
 
 			sh := tl.GetAkteSha()
@@ -172,13 +172,13 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "kennung":
-		return func(e sku.SkuLikePtr) (err error) {
+		return func(e *sku.Transacted) (err error) {
 			_, err = fmt.Fprintln(out, e.GetSkuLike().GetKennungLike())
 			return
 		}
 
 	case "sku-metadatei-sans-tai":
-		return func(e sku.SkuLikePtr) (err error) {
+		return func(e *sku.Transacted) (err error) {
 			_, err = fmt.Fprintln(
 				out,
 				sku_fmt.StringMetadateiSansTai(e.GetSkuLike()),
@@ -187,7 +187,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "sku-metadatei":
-		return func(e sku.SkuLikePtr) (err error) {
+		return func(e *sku.Transacted) (err error) {
 			_, err = fmt.Fprintln(
 				out,
 				sku_fmt.StringMetadatei(e.GetSkuLike()),
@@ -196,19 +196,19 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "sku":
-		return func(e sku.SkuLikePtr) (err error) {
+		return func(e *sku.Transacted) (err error) {
 			_, err = fmt.Fprintln(out, sku_fmt.String(e.GetSkuLike()))
 			return
 		}
 
 	case "metadatei":
-		return func(e sku.SkuLikePtr) (err error) {
+		return func(e *sku.Transacted) (err error) {
 			_, err = fmt.Fprintf(out, "%#v\n", e.GetMetadatei())
 			return
 		}
 
 	case "debug":
-		return func(e sku.SkuLikePtr) (err error) {
+		return func(e *sku.Transacted) (err error) {
 			_, err = fmt.Fprintf(out, "%#v\n", e)
 			return
 		}
@@ -230,7 +230,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	case "json":
 		enc := json.NewEncoder(out)
 
-		return func(o sku.SkuLikePtr) (err error) {
+		return func(o *sku.Transacted) (err error) {
 			if err = enc.Encode(o); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -240,7 +240,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "akte":
-		return func(o sku.SkuLikePtr) (err error) {
+		return func(o *sku.Transacted) (err error) {
 			var r sha.ReadCloser
 
 			if r, err = af.AkteReader(o.GetAkteSha()); err != nil {
@@ -259,7 +259,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "text-sku-prefix":
-		return func(o sku.SkuLikePtr) (err error) {
+		return func(o *sku.Transacted) (err error) {
 			var r sha.ReadCloser
 
 			if r, err = af.AkteReader(o.GetAkteSha()); err != nil {
@@ -278,7 +278,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "akte-sku-prefix":
-		return func(o sku.SkuLikePtr) (err error) {
+		return func(o *sku.Transacted) (err error) {
 			var r sha.ReadCloser
 
 			if r, err = af.AkteReader(o.GetAkteSha()); err != nil {
@@ -310,7 +310,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			objekte_format.Options{},
 		)
 
-		return func(o sku.SkuLikePtr) (err error) {
+		return func(o *sku.Transacted) (err error) {
 			if _, err = be.Print(o); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -326,7 +326,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			objekte_format.Options{IncludeTai: true},
 		)
 
-		return func(o sku.SkuLikePtr) (err error) {
+		return func(o *sku.Transacted) (err error) {
 			if _, err = f.Print(o); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -345,7 +345,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			},
 		)
 
-		return func(o sku.SkuLikePtr) (err error) {
+		return func(o *sku.Transacted) (err error) {
 			if _, err = f.Print(o); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -355,7 +355,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "akte-sha":
-		return func(o sku.SkuLikePtr) (err error) {
+		return func(o *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(out, o.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -365,7 +365,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 	}
 
-	return func(e sku.SkuLikePtr) (err error) {
+	return func(e *sku.Transacted) (err error) {
 		return MakeErrUnsupportedFormatterValue(fv.string, e.GetGattung())
 	}
 }

@@ -14,10 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
-type KastenTransactedReader = objekte_store.TransactedReader[
-	*kennung.Kasten,
-	sku.SkuLikePtr,
-]
+type KastenTransactedReader = objekte_store.TransactedReader
 
 type kastenStore struct {
 	*store_util.CommonStore[
@@ -123,13 +120,9 @@ func (s kastenStore) UpdateOne(t *sku.Transacted) (err error) {
 
 // TODO-P3
 func (s kastenStore) ReadAllSchwanzen(
-	f schnittstellen.FuncIter[sku.SkuLikePtr],
+	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	if err = s.StoreUtil.GetKonfig().Kisten.EachPtr(
-		func(e *sku.Transacted) (err error) {
-			return f(e)
-		},
-	); err != nil {
+	if err = s.StoreUtil.GetKonfig().Kisten.EachPtr(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -138,9 +131,9 @@ func (s kastenStore) ReadAllSchwanzen(
 }
 
 func (s kastenStore) ReadAll(
-	f schnittstellen.FuncIter[sku.SkuLikePtr],
+	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	eachSku := func(sk sku.SkuLikePtr) (err error) {
+	eachSku := func(sk *sku.Transacted) (err error) {
 		if sk.GetGattung() != gattung.Kasten {
 			return
 		}

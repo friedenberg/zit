@@ -42,7 +42,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		errors.Err().Print("ignoring arguments")
 	}
 
-	var f schnittstellen.FuncIter[sku.SkuLikePtr]
+	var f schnittstellen.FuncIter[*sku.Transacted]
 
 	objekteFormatterValue := objekte.FormatterValue{}
 
@@ -69,7 +69,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 func (c Last) runWithBestandsaufnahm(
 	u *umwelt.Umwelt,
-	f schnittstellen.FuncIter[sku.SkuLikePtr],
+	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	s := u.StoreObjekten()
 

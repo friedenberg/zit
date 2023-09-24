@@ -51,7 +51,7 @@ func (c CommitOrganizeFile) Run(
 
 	if err = store.Query(
 		ms,
-		func(tl sku.SkuLikePtr) (err error) {
+		func(tl *sku.Transacted) (err error) {
 			var change changes.Change
 			ok := false
 			sk := tl.GetSkuLike().MutableClone()

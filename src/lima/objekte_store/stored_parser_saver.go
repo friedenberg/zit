@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/juliett/objekte"
@@ -17,8 +16,6 @@ import (
 type StoredParseSaver[
 	O objekte.Akte[O],
 	OPtr objekte.AktePtr[O],
-	K kennung.KennungLike[K],
-	KPtr kennung.KennungLikePtr[K],
 ] interface {
 	ParseSaveStored(
 		sem sku.ExternalMaybe,
@@ -29,8 +26,6 @@ type StoredParseSaver[
 type storedParserSaver[
 	O objekte.Akte[O],
 	OPtr objekte.AktePtr[O],
-	K kennung.KennungLike[K],
-	KPtr kennung.KennungLikePtr[K],
 ] struct {
 	awf        schnittstellen.AkteWriterFactory
 	akteParser objekte.AkteParser[OPtr]
@@ -39,15 +34,13 @@ type storedParserSaver[
 func MakeStoredParseSaver[
 	O objekte.Akte[O],
 	OPtr objekte.AktePtr[O],
-	K kennung.KennungLike[K],
-	KPtr kennung.KennungLikePtr[K],
 ](
 	owf schnittstellen.ObjekteIOFactory,
 	awf schnittstellen.AkteIOFactory,
 	akteParser objekte.AkteParser[OPtr],
 	pmf objekte_format.Format,
 	op objekte_format.Options,
-) storedParserSaver[O, OPtr, K, KPtr] {
+) storedParserSaver[O, OPtr] {
 	if akteParser == nil {
 		akteParser = objekte.MakeNopAkteParseSaver[O, OPtr](awf)
 	}
@@ -56,13 +49,13 @@ func MakeStoredParseSaver[
 		panic("persisted_metadatei_format.Format was nil")
 	}
 
-	return storedParserSaver[O, OPtr, K, KPtr]{
+	return storedParserSaver[O, OPtr]{
 		awf:        awf,
 		akteParser: akteParser,
 	}
 }
 
-func (h storedParserSaver[O, OPtr, K, KPtr]) ParseSaveStored(
+func (h storedParserSaver[O, OPtr]) ParseSaveStored(
 	sem sku.ExternalMaybe,
 	t *sku.External,
 ) (o OPtr, err error) {
@@ -113,7 +106,7 @@ func (h storedParserSaver[O, OPtr, K, KPtr]) ParseSaveStored(
 	return
 }
 
-func (h storedParserSaver[O, OPtr, K, KPtr]) readAkte(
+func (h storedParserSaver[O, OPtr]) readAkte(
 	r sha.ReadCloser,
 	o OPtr,
 ) (sh schnittstellen.ShaLike, n int64, err error) {

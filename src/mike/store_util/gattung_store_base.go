@@ -26,14 +26,12 @@ type GattungStoreLike interface {
 type CommonStoreBase[
 	O objekte.Akte[O],
 	OPtr objekte.AktePtr[O],
-	K kennung.KennungLike[K],
-	KPtr kennung.KennungLikePtr[K],
 ] struct {
 	schnittstellen.GattungGetter
 
 	schnittstellen.ObjekteIOFactory
 
-	delegate CommonStoreDelegate[O, OPtr, K, KPtr]
+	delegate CommonStoreDelegate
 
 	StoreUtil
 
@@ -42,18 +40,15 @@ type CommonStoreBase[
 		*sku.Transacted,
 	]
 
-	objekte_store.TransactedInflator[O, OPtr, K, KPtr]
+	objekte_store.TransactedInflator
 
 	objekte_store.AkteTextSaver[O, OPtr]
 
-	objekte_store.StoredParseSaver[O, OPtr, K, KPtr]
+	objekte_store.StoredParseSaver[O, OPtr]
 
-	objekte_store.TransactedReader[
-		KPtr,
-		sku.SkuLikePtr,
-	]
+	objekte_store.TransactedReader
 
-	objekte_store.LogWriter[sku.SkuLikePtr]
+	objekte_store.LogWriter[*sku.Transacted]
 
 	persistentMetadateiFormat objekte_format.Format
 
@@ -67,15 +62,12 @@ func MakeCommonStoreBase[
 	KPtr kennung.KennungLikePtr[K],
 ](
 	gg schnittstellen.GattungGetter,
-	delegate CommonStoreDelegate[O, OPtr, K, KPtr],
+	delegate CommonStoreDelegate,
 	sa StoreUtil,
-	tr objekte_store.TransactedReader[
-		KPtr,
-		sku.SkuLikePtr,
-	],
+	tr objekte_store.TransactedReader,
 	pmf objekte_format.Format,
 	akteFormat objekte.AkteFormat[O, OPtr],
-) (s *CommonStoreBase[O, OPtr, K, KPtr], err error) {
+) (s *CommonStoreBase[O, OPtr], err error) {
 	// type T objekte.Transacted[O, OPtr, K, KPtr, ]
 	// type TPtr *objekte.Transacted[O, OPtr, K, KPtr, ]
 
@@ -90,7 +82,7 @@ func MakeCommonStoreBase[
 
 	of := sa.ObjekteReaderWriterFactory(gg)
 
-	s = &CommonStoreBase[O, OPtr, K, KPtr]{
+	s = &CommonStoreBase[O, OPtr]{
 		GattungGetter:    gg,
 		ObjekteIOFactory: of,
 		delegate:         delegate,
@@ -100,8 +92,6 @@ func MakeCommonStoreBase[
 		TransactedInflator: objekte_store.MakeTransactedInflator[
 			O,
 			OPtr,
-			K,
-			KPtr,
 		](
 			sa.GetStoreVersion(),
 			of,
@@ -127,23 +117,20 @@ func MakeCommonStoreBase[
 	return
 }
 
-func (s *CommonStoreBase[O, OPtr, K, KPtr]) SetLogWriter(
-	lw objekte_store.LogWriter[sku.SkuLikePtr],
+func (s *CommonStoreBase[O, OPtr]) SetLogWriter(
+	lw objekte_store.LogWriter[*sku.Transacted],
 ) {
 	s.LogWriter = lw
 }
 
-func (s *CommonStoreBase[O, OPtr, K, KPtr]) Query(
+func (s *CommonStoreBase[O, OPtr]) Query(
 	m matcher.MatcherSigil,
-	f schnittstellen.FuncIter[sku.SkuLikePtr],
+	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	return objekte_store.QueryMethodForMatcher[
-		KPtr,
-		sku.SkuLikePtr,
-	](s, m, f)
+	return objekte_store.QueryMethodForMatcher(s, m, f)
 }
 
-func (s *CommonStoreBase[O, OPtr, K, KPtr]) ReindexOne(
+func (s *CommonStoreBase[O, OPtr]) ReindexOne(
 	sk sku.SkuLike,
 ) (o matcher.Matchable, err error) {
 	var t *sku.Transacted
@@ -177,7 +164,7 @@ func (s *CommonStoreBase[O, OPtr, K, KPtr]) ReindexOne(
 	return
 }
 
-func (s *CommonStoreBase[O, OPtr, K, KPtr]) Inherit(
+func (s *CommonStoreBase[O, OPtr]) Inherit(
 	t *sku.Transacted,
 ) (err error) {
 	if t == nil {
@@ -205,7 +192,7 @@ func (s *CommonStoreBase[O, OPtr, K, KPtr]) Inherit(
 	return
 }
 
-func (s *CommonStoreBase[O, OPtr, K, KPtr]) GetInheritor(
+func (s *CommonStoreBase[O, OPtr]) GetInheritor(
 	orf schnittstellen.ObjekteReaderFactory,
 	arf schnittstellen.AkteReaderFactory,
 	pmf objekte_format.Format,
@@ -218,8 +205,6 @@ func (s *CommonStoreBase[O, OPtr, K, KPtr]) GetInheritor(
 	inflator := objekte_store.MakeTransactedInflator[
 		O,
 		OPtr,
-		K,
-		KPtr,
 	](
 		s.StoreUtil.GetStoreVersion(),
 		schnittstellen.MakeBespokeObjekteReadWriterFactory(orf, s),
@@ -244,7 +229,7 @@ func (s *CommonStoreBase[O, OPtr, K, KPtr]) GetInheritor(
 	)
 }
 
-func (s *CommonStoreBase[O, OPtr, K, KPtr]) GetAkte(
+func (s *CommonStoreBase[O, OPtr]) GetAkte(
 	sh schnittstellen.ShaLike,
 ) (a OPtr, err error) {
 	var ar schnittstellen.ShaReadCloser
@@ -275,6 +260,6 @@ func (s *CommonStoreBase[O, OPtr, K, KPtr]) GetAkte(
 	return
 }
 
-func (s *CommonStoreBase[O, OPtr, K, KPtr]) PutAkte(a OPtr) {
+func (s *CommonStoreBase[O, OPtr]) PutAkte(a OPtr) {
 	// TODO-P2 implement pool
 }

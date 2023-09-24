@@ -219,7 +219,7 @@ func (c Add) openAktenIfNecessary(
 
 	if checkoutResults, err = u.StoreWorkingDirectory().Checkout(
 		options,
-		func(z sku.SkuLikePtr) (err error) {
+		func(z *sku.Transacted) (err error) {
 			if !hs.ContainsKey(z.GetKennungLike().String()) {
 				return iter.MakeErrStopIteration()
 			}

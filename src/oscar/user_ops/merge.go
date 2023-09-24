@@ -22,7 +22,7 @@ func (op Merge) Run(skus sku.TransactedHeap) (err error) {
 
 	if err = op.StoreObjekten().Query(
 		q,
-		func(sk sku.SkuLikePtr) (err error) {
+		func(sk *sku.Transacted) (err error) {
 			peeked, ok := skus.Peek()
 
 			if !ok {

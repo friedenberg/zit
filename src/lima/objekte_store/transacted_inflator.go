@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/juliett/objekte"
@@ -25,12 +24,7 @@ type AkteStorer[A any] interface {
 }
 
 // TODO-P1 split into ObjekteInflator
-type TransactedInflator[
-	A objekte.Akte[A],
-	APtr objekte.AktePtr[A],
-	K kennung.KennungLike[K],
-	KPtr kennung.KennungLikePtr[K],
-] interface {
+type TransactedInflator interface {
 	InflateFromSkuLike(
 		sku.SkuLike,
 	) (*sku.Transacted, error)
@@ -41,8 +35,6 @@ type TransactedInflator[
 type transactedInflator[
 	A objekte.Akte[A],
 	APtr objekte.AktePtr[A],
-	K kennung.KennungLike[K],
-	KPtr kennung.KennungLikePtr[K],
 ] struct {
 	storeVersion              schnittstellen.StoreVersion
 	of                        schnittstellen.ObjekteIOFactory
@@ -59,8 +51,6 @@ type transactedInflator[
 func MakeTransactedInflator[
 	A objekte.Akte[A],
 	APtr objekte.AktePtr[A],
-	K kennung.KennungLike[K],
-	KPtr kennung.KennungLikePtr[K],
 ](
 	sv schnittstellen.StoreVersion,
 	of schnittstellen.ObjekteIOFactory,
@@ -72,8 +62,8 @@ func MakeTransactedInflator[
 		sku.Transacted,
 		*sku.Transacted,
 	],
-) *transactedInflator[A, APtr, K, KPtr] {
-	return &transactedInflator[A, APtr, K, KPtr]{
+) *transactedInflator[A, APtr] {
+	return &transactedInflator[A, APtr]{
 		storeVersion:              sv,
 		of:                        of,
 		af:                        af,
@@ -84,7 +74,7 @@ func MakeTransactedInflator[
 	}
 }
 
-func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSkuLike(
+func (h *transactedInflator[A, APtr]) InflateFromSkuLike(
 	o sku.SkuLike,
 ) (t *sku.Transacted, err error) {
 	if h.pool == nil {
@@ -137,7 +127,7 @@ func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSkuLike(
 	return
 }
 
-func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSku(
+func (h *transactedInflator[A, APtr]) InflateFromSku(
 	o sku.SkuLike,
 ) (t *sku.Transacted, err error) {
 	if h.pool == nil {
@@ -172,7 +162,7 @@ func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSku(
 	return
 }
 
-func (h *transactedInflator[A, APtr, K, KPtr]) StoreAkte(
+func (h *transactedInflator[A, APtr]) StoreAkte(
 	t *sku.Transacted,
 ) (err error) {
 	var aw sha.WriteCloser
@@ -194,7 +184,7 @@ func (h *transactedInflator[A, APtr, K, KPtr]) StoreAkte(
 	return
 }
 
-func (h *transactedInflator[A, APtr, K, KPtr]) StoreObjekte(
+func (h *transactedInflator[A, APtr]) StoreObjekte(
 	t *sku.Transacted,
 ) (err error) {
 	if h.storeVersion.GetInt() >= 3 {
@@ -225,7 +215,7 @@ func (h *transactedInflator[A, APtr, K, KPtr]) StoreObjekte(
 	return
 }
 
-func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSkuAndStore(
+func (h *transactedInflator[A, APtr]) InflateFromSkuAndStore(
 	o sku.SkuLike,
 ) (err error) {
 	var t *sku.Transacted
@@ -243,7 +233,7 @@ func (h *transactedInflator[A, APtr, K, KPtr]) InflateFromSkuAndStore(
 	return
 }
 
-func (h *transactedInflator[A, APtr, K, KPtr]) readObjekte(
+func (h *transactedInflator[A, APtr]) readObjekte(
 	sk sku.SkuLike,
 	t *sku.Transacted,
 ) (err error) {
@@ -287,7 +277,7 @@ func (h *transactedInflator[A, APtr, K, KPtr]) readObjekte(
 	return
 }
 
-func (h *transactedInflator[A, APtr, K, KPtr]) readAkte(
+func (h *transactedInflator[A, APtr]) readAkte(
 	t *sku.Transacted,
 	a APtr,
 ) (err error) {

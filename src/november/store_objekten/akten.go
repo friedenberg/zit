@@ -62,7 +62,7 @@ func (s Store) ReadAllMatchingAkten(
 	observed := collections_value.MakeMutableValueSet[kennung.FD](nil)
 
 	if err = s.Zettel().ReadAll(
-		func(z sku.SkuLikePtr) (err error) {
+		func(z *sku.Transacted) (err error) {
 			fd, ok := fds.Get(z.GetAkteSha().String())
 
 			if !ok {

@@ -40,7 +40,7 @@ func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
 	return
 }
 
-func (s MutableMatchSet) Match(z sku.SkuLikePtr) (err error) {
+func (s MutableMatchSet) Match(z *sku.Transacted) (err error) {
 	kStored := z.GetObjekteSha().String()
 	kAkte := z.GetAkteSha().String()
 

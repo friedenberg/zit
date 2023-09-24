@@ -24,10 +24,10 @@ import (
 type Store interface {
 	AkteTextSaver
 	Create(*Akte) error
-	objekte_store.LastReader[*sku.Transacted]
+	objekte_store.LastReader
 	ReadOne(schnittstellen.Stringer) (*sku.Transacted, error)
-	objekte_store.AllReader[*sku.Transacted]
-	ReadAllSkus(schnittstellen.FuncIter[sku.SkuLikePtr]) error
+	objekte_store.AllReader
+	ReadAllSkus(schnittstellen.FuncIter[*sku.Transacted]) error
 	schnittstellen.AkteGetter[*Akte]
 }
 
@@ -370,7 +370,7 @@ func (s *store) ReadAll(
 
 // TODO-P3 support streaming instead of reading into heaps
 func (s *store) ReadAllSkus(
-	f schnittstellen.FuncIter[sku.SkuLikePtr],
+	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	if err = s.ReadAll(
 		func(t *sku.Transacted) (err error) {
@@ -381,11 +381,7 @@ func (s *store) ReadAllSkus(
 				return
 			}
 
-			if err = a.Skus.EachPtr(
-				func(sk2 *sku.Transacted) (err error) {
-					return f(sk2)
-				},
-			); err != nil {
+			if err = a.Skus.EachPtr(f); err != nil {
 				err = errors.Wrapf(
 					err,
 					"Bestandsaufnahme: %s",

@@ -26,7 +26,7 @@ func (s *Store) CheckoutQuery(
 ) (err error) {
 	if err = s.storeObjekten.Query(
 		ms,
-		func(t sku.SkuLikePtr) (err error) {
+		func(t *sku.Transacted) (err error) {
 			var co *sku.CheckedOut
 
 			if co, err = s.checkoutOneGeneric(options, t); err != nil {
@@ -46,16 +46,16 @@ func (s *Store) CheckoutQuery(
 
 func (s *Store) Checkout(
 	options store_util.CheckoutOptions,
-	ztw schnittstellen.FuncIter[sku.SkuLikePtr],
+	ztw schnittstellen.FuncIter[*sku.Transacted],
 ) (zcs schnittstellen.MutableSetLike[*sku.CheckedOut], err error) {
 	zcs = collections_value.MakeMutableValueSet[*sku.CheckedOut](nil)
-	zts := collections_value.MakeMutableValueSet[sku.SkuLikePtr](nil)
+	zts := sku.MakeTransactedMutableSet()
 
 	if err = s.storeObjekten.Zettel().ReadAllSchwanzen(
 		iter.MakeChain(
 			zettel.MakeWriterKonfig(s.erworben, s.storeObjekten.Typ()),
 			ztw,
-			func(sk sku.SkuLikePtr) (err error) {
+			func(sk *sku.Transacted) (err error) {
 				var z sku.Transacted
 
 				if err = z.SetFromSkuLike(sk); err != nil {
@@ -63,7 +63,7 @@ func (s *Store) Checkout(
 					return
 				}
 
-				return zts.Add(&z)
+				return zts.AddPtr(&z)
 			},
 		),
 	); err != nil {
@@ -71,8 +71,8 @@ func (s *Store) Checkout(
 		return
 	}
 
-	if err = zts.Each(
-		func(zt sku.SkuLikePtr) (err error) {
+	if err = zts.EachPtr(
+		func(zt *sku.Transacted) (err error) {
 			var zc *sku.CheckedOut
 
 			if zc, err = s.CheckoutOneZettel(options, zt); err != nil {

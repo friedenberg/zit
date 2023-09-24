@@ -7,22 +7,15 @@ import (
 	"github.com/friedenberg/zit/src/india/matcher"
 )
 
-type TransactedLogger[
-	T any,
-] interface {
+type TransactedLogger interface {
 	SetLogWriter(LogWriter[sku.SkuLikePtr])
 }
 
-type LastReader[
-	V any,
-] interface {
-	ReadLast() (V, error)
+type LastReader interface {
+	ReadLast() (*sku.Transacted, error)
 }
 
-type OneReader[
-	K any,
-	V any,
-] interface {
+type OneReader interface {
 	ReadOne(schnittstellen.StringerGattungGetter) (*sku.Transacted, error)
 }
 
@@ -33,40 +26,27 @@ type ExternalReader[
 	ReadOneExternal(E, T) (*sku.External, error)
 }
 
-type AllReader[
-	V any,
-] interface {
-	ReadAll(schnittstellen.FuncIter[V]) error
+type AllReader interface {
+	ReadAll(schnittstellen.FuncIter[*sku.Transacted]) error
 }
 
-type SchwanzenReader[
-	V any,
-] interface {
-	ReadAllSchwanzen(schnittstellen.FuncIter[V]) error
+type SchwanzenReader interface {
+	ReadAllSchwanzen(schnittstellen.FuncIter[*sku.Transacted]) error
 }
 
-type Reader[
-	K any,
-	V any,
-] interface {
-	OneReader[K, V]
-	SchwanzenReader[V]
+type Reader interface {
+	OneReader
+	SchwanzenReader
 }
 
-type TransactedReader[
-	K any,
-	V any,
-] interface {
-	Reader[K, V]
-	AllReader[V]
+type TransactedReader interface {
+	Reader
+	AllReader
 }
 
-type Querier[
-	K any,
-	V any,
-] interface {
-	TransactedReader[K, V]
-	Query(matcher.MatcherSigil, schnittstellen.FuncIter[V]) error
+type Querier interface {
+	TransactedReader
+	Query(matcher.MatcherSigil, schnittstellen.FuncIter[*sku.Transacted]) error
 }
 
 type Creator[

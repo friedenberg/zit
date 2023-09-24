@@ -38,12 +38,12 @@ func (f *FormatterValue) FuncFormatter(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
 	agp schnittstellen.AkteGetterPutter[*typ_akte.V0],
-) schnittstellen.FuncIter[sku.SkuLikePtr] {
+) schnittstellen.FuncIter[*sku.Transacted] {
 	switch f.string {
 	case "action-names":
 		f := typ_akte.MakeFormatterActionNames()
 
-		return func(o sku.SkuLikePtr) (err error) {
+		return func(o *sku.Transacted) (err error) {
 			var akte *typ_akte.V0
 
 			if akte, err = agp.GetAkte(o.GetAkteSha()); err != nil {
@@ -64,7 +64,7 @@ func (f *FormatterValue) FuncFormatter(
 	case "vim-syntax-type":
 		f := typ_akte.MakeFormatterVimSyntaxType()
 
-		return func(o sku.SkuLikePtr) (err error) {
+		return func(o *sku.Transacted) (err error) {
 			var akte *typ_akte.V0
 
 			if akte, err = agp.GetAkte(o.GetAkteSha()); err != nil {
@@ -83,7 +83,7 @@ func (f *FormatterValue) FuncFormatter(
 		}
 
 	default:
-		return func(_ sku.SkuLikePtr) (err error) {
+		return func(_ *sku.Transacted) (err error) {
 			err = objekte.MakeErrUnsupportedFormatterValue(
 				f.string,
 				gattung.Typ,

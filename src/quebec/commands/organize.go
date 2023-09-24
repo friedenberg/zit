@@ -106,7 +106,7 @@ func (c *Organize) RunWithQuery(
 
 	if err = u.StoreObjekten().Query(
 		ms,
-		func(tl sku.SkuLikePtr) (err error) {
+		func(tl *sku.Transacted) (err error) {
 			mwk := tl.GetSkuLike().MutableClone()
 
 			// TODO-P1 determine if this is necessary

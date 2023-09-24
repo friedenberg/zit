@@ -42,7 +42,7 @@ type Store struct {
 
 	CreateOrUpdator CreateOrUpdator
 
-	objekte_store.LogWriter[sku.SkuLikePtr]
+	objekte_store.LogWriter[*sku.Transacted]
 
 	// Gattungen
 	gattungStores     map[schnittstellen.GattungLike]store_util.GattungStoreLike
@@ -183,7 +183,7 @@ func Make(
 }
 
 func (s *Store) SetLogWriter(
-	lw objekte_store.LogWriter[sku.SkuLikePtr],
+	lw objekte_store.LogWriter[*sku.Transacted],
 ) {
 	s.LogWriter = lw
 	s.zettelStore.SetLogWriter(lw)
@@ -275,7 +275,7 @@ func (s *Store) UpdateManyMetadatei(
 
 func (s *Store) Query(
 	ms matcher.Query,
-	f schnittstellen.FuncIter[sku.SkuLikePtr],
+	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	if err = ms.All(
 		func(g gattung.Gattung, matcher matcher.MatcherSigil) (err error) {
@@ -302,8 +302,8 @@ func (s *Store) Query(
 
 func (s *Store) GetReindexFunc(
 	ti kennung_index.KennungIndex[kennung.Typ, *kennung.Typ],
-) func(sku.SkuLikePtr) error {
-	return func(sk sku.SkuLikePtr) (err error) {
+) func(*sku.Transacted) error {
+	return func(sk *sku.Transacted) (err error) {
 		var st store_util.Reindexer
 		ok := false
 
@@ -453,7 +453,6 @@ func (s *Store) Reindex() (err error) {
 
 		return
 	}
-
 	s.isReindexing = true
 	defer func() {
 		s.isReindexing = false

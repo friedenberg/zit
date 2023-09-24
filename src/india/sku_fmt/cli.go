@@ -67,7 +67,7 @@ func MakeCliFormat(
 
 func (f *cli) WriteStringFormat(
 	sw io.StringWriter,
-	o sku.SkuLikePtr,
+	o *sku.Transacted,
 ) (n int64, err error) {
 	var n1 int
 

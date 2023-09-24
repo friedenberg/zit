@@ -22,12 +22,7 @@ type Reindexer interface {
 	ReindexOne(sku.SkuLike) (matcher.Matchable, error)
 }
 
-type CommonStoreDelegate[
-	O objekte.Akte[O],
-	OPtr objekte.AktePtr[O],
-	K kennung.KennungLike[K],
-	KPtr kennung.KennungLikePtr[K],
-] interface {
+type CommonStoreDelegate interface {
 	AddOne(*sku.Transacted) error
 	UpdateOne(*sku.Transacted) error
 }
@@ -38,9 +33,9 @@ type CommonStore[
 	K kennung.KennungLike[K],
 	KPtr kennung.KennungLikePtr[K],
 ] struct {
-	CommonStoreBase[O, OPtr, K, KPtr]
+	CommonStoreBase[O, OPtr]
 	AkteFormat objekte.AkteFormat[O, OPtr]
-	objekte_store.StoredParseSaver[O, OPtr, K, KPtr]
+	objekte_store.StoredParseSaver[O, OPtr]
 	objekte_store.CreateOrUpdater[
 		OPtr,
 		KPtr,
@@ -56,12 +51,9 @@ func MakeCommonStore[
 	KPtr kennung.KennungLikePtr[K],
 ](
 	gg schnittstellen.GattungGetter,
-	delegate CommonStoreDelegate[O, OPtr, K, KPtr],
+	delegate CommonStoreDelegate,
 	sa StoreUtil,
-	tr objekte_store.TransactedReader[
-		KPtr,
-		sku.SkuLikePtr,
-	],
+	tr objekte_store.TransactedReader,
 	akteFormat objekte.AkteFormat[O, OPtr],
 ) (s *CommonStore[O, OPtr, K, KPtr], err error) {
 	// pool := collections.MakePool[
@@ -98,7 +90,7 @@ func MakeCommonStore[
 	]{
 		CommonStoreBase: *csb,
 		AkteFormat:      akteFormat,
-		StoredParseSaver: objekte_store.MakeStoredParseSaver[O, OPtr, K, KPtr](
+		StoredParseSaver: objekte_store.MakeStoredParseSaver[O, OPtr](
 			of,
 			sa,
 			akteFormat,

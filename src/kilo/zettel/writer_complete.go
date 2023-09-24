@@ -48,7 +48,7 @@ func MakeWriterComplete(w io.Writer) WriterComplete {
 }
 
 func (w *WriterComplete) WriteZettelVerzeichnisse(
-	z sku.SkuLikePtr,
+	z *sku.Transacted,
 ) (err error) {
 	if z.GetKennungLike().String() == "/" {
 		err = errors.New("empty sku")

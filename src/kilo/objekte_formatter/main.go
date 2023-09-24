@@ -14,32 +14,19 @@ import (
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
-type funcFormat = schnittstellen.FuncIter[sku.SkuLikePtr]
+type funcFormat = schnittstellen.FuncIter[*sku.Transacted]
 
 type FormatterFactory interface {
 	MakeFormatterObjekte(
 		out io.Writer,
 		af schnittstellen.AkteIOFactory,
 		k konfig.Compiled,
-		logFunc schnittstellen.FuncIter[sku.SkuLikePtr],
+		logFunc schnittstellen.FuncIter[*sku.Transacted],
 	) funcFormat
 }
 
 type formatter struct {
 	formatters map[gattung.Gattung]funcFormat
-}
-
-func makeFuncFormatter[T matcher.Matchable](
-	f schnittstellen.FuncIter[T],
-) funcFormat {
-	return func(e sku.SkuLikePtr) (err error) {
-		if e1, ok := e.(T); ok {
-			return f(e1)
-		}
-
-		var e1 T
-		return errors.Errorf("could not convert %T into %T", e, e1)
-	}
 }
 
 type Formatter interface {
@@ -73,7 +60,7 @@ func MakeFormatter(
 			tagp,
 		)
 
-		f.formatters[gattung.Zettel] = makeFuncFormatter(zvf)
+		f.formatters[gattung.Zettel] = zvf
 	}
 
 	if _, ok := ms.Get(gattung.Typ); ok {
@@ -145,7 +132,7 @@ func MakeFormatter(
 }
 
 func (f formatter) MakeFormatFunc() funcFormat {
-	return func(tl sku.SkuLikePtr) (err error) {
+	return func(tl *sku.Transacted) (err error) {
 		g := gattung.Must(tl.GetGattung())
 
 		if f1, ok := f.formatters[g]; ok {

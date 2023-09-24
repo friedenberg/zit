@@ -31,7 +31,7 @@ type createOrUpdate[
 	ls                        schnittstellen.LockSmith
 	of                        schnittstellen.ObjekteWriterFactory
 	af                        schnittstellen.AkteWriterFactory
-	reader                    TransactedReader[T3, sku.SkuLikePtr]
+	reader                    TransactedReader
 	delegate                  CreateOrUpdateDelegate[*sku.Transacted]
 	matchableAdder            matcher.MatchableAdder
 	persistentMetadateiFormat objekte_format.Format
@@ -49,7 +49,7 @@ func MakeCreateOrUpdate[
 	ls schnittstellen.LockSmith,
 	of schnittstellen.ObjekteWriterFactory,
 	af schnittstellen.AkteWriterFactory,
-	reader TransactedReader[T3, sku.SkuLikePtr],
+	reader TransactedReader,
 	delegate CreateOrUpdateDelegate[*sku.Transacted],
 	ma matcher.MatchableAdder,
 	pmf objekte_format.Format,

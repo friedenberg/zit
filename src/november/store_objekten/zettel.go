@@ -177,23 +177,15 @@ func (s zettelStore) ReadOne(
 }
 
 func (i *zettelStore) ReadAllSchwanzen(
-	w schnittstellen.FuncIter[sku.SkuLikePtr],
+	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	return i.verzeichnisseSchwanzen.ReadMany(
-		func(z *sku.Transacted) (err error) {
-			return w(z)
-		},
-	)
+	return i.verzeichnisseSchwanzen.ReadMany(w)
 }
 
 func (i *zettelStore) ReadAll(
-	w schnittstellen.FuncIter[sku.SkuLikePtr],
+	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	return i.verzeichnisseAll.ReadMany(
-		func(z *sku.Transacted) (err error) {
-			return w(z)
-		},
-	)
+	return i.verzeichnisseAll.ReadMany(w)
 }
 
 func (s *zettelStore) Create(
@@ -262,7 +254,7 @@ func (s *zettelStore) UpdateManyMetadatei(
 	}
 
 	if err = s.ReadAllSchwanzen(
-		func(zt sku.SkuLikePtr) (err error) {
+		func(zt *sku.Transacted) (err error) {
 			ke := zt.GetKennungLike()
 
 			if !gattung.Must(ke.GetGattung()).Equals(gattung.Zettel) {

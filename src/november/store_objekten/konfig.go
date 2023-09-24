@@ -166,9 +166,9 @@ func (s konfigStore) Update(
 }
 
 func (i *konfigStore) ReadAllSchwanzen(
-	w schnittstellen.FuncIter[sku.SkuLikePtr],
+	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	var k sku.SkuLikePtr
+	var k *sku.Transacted
 
 	if k, err = i.ReadOne(&kennung.Konfig{}); err != nil {
 		err = errors.Wrap(err)
@@ -184,9 +184,9 @@ func (i *konfigStore) ReadAllSchwanzen(
 }
 
 func (s *konfigStore) ReadAll(
-	w schnittstellen.FuncIter[sku.SkuLikePtr],
+	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	eachSku := func(sk sku.SkuLikePtr) (err error) {
+	eachSku := func(sk *sku.Transacted) (err error) {
 		if sk.GetGattung() != gattung.Konfig {
 			return
 		}

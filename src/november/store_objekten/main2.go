@@ -153,7 +153,7 @@ func (s *Store) ReadOne(
 
 func (s *Store) ReadAllSchwanzen(
 	gs gattungen.Set,
-	f schnittstellen.FuncIter[sku.SkuLikePtr],
+	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	if err = iter2.Parallel(
 		gs,
@@ -176,7 +176,7 @@ func (s *Store) ReadAllSchwanzen(
 
 func (s *Store) ReadAll(
 	gs gattungen.Set,
-	f schnittstellen.FuncIter[sku.SkuLikePtr],
+	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	if err = iter2.Parallel(
 		gs,

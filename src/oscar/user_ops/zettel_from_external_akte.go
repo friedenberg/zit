@@ -63,7 +63,7 @@ func (c ZettelFromExternalAkte) Run(
 		if err = c.StoreObjekten().Zettel().ReadAll(
 			iter.MakeChain(
 				matcher.Match,
-				func(sk sku.SkuLikePtr) (err error) {
+				func(sk *sku.Transacted) (err error) {
 					z := &sku.Transacted{}
 
 					if err = z.SetFromSkuLike(sk); err != nil {

@@ -71,15 +71,8 @@ func (s *Store) ReadFiles(
 	if err = s.storeObjekten.Query(
 		ms,
 		iter.MakeChain(
-			func(e sku.SkuLikePtr) (err error) {
+			func(et *sku.Transacted) (err error) {
 				var col *sku.CheckedOut
-
-				et, ok := e.(*sku.Transacted)
-
-				if !ok {
-					err = errors.Errorf("wrong type: %T", e)
-					return
-				}
 
 				et1 := sku.GetTransactedPool().Get()
 

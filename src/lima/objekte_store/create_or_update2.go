@@ -18,7 +18,7 @@ type createOrUpdate2 struct {
 	clock                     kennung.Clock
 	ls                        schnittstellen.LockSmith
 	af                        schnittstellen.AkteWriterFactory
-	reader                    OneReader[*kennung.Kennung2, *sku.Transacted]
+	reader                    OneReader
 	delegate                  CreateOrUpdateDelegate[*sku.Transacted]
 	matchableAdder            matcher.MatchableAdder
 	persistentMetadateiFormat objekte_format.Format
@@ -31,7 +31,7 @@ func MakeCreateOrUpdate2(
 	clock kennung.Clock,
 	ls schnittstellen.LockSmith,
 	af schnittstellen.AkteWriterFactory,
-	reader OneReader[*kennung.Kennung2, *sku.Transacted],
+	reader OneReader,
 	delegate CreateOrUpdateDelegate[*sku.Transacted],
 	ma matcher.MatchableAdder,
 	pmf objekte_format.Format,

@@ -3,6 +3,7 @@ package objekte_store
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 )
 
@@ -14,10 +15,10 @@ type Query interface {
 	// ContainsMatchable(kennung.Matchable) bool
 }
 
-func QueryMethodForMatcher[K any, T matcher.Matchable](
-	reader Querier[K, T],
+func QueryMethodForMatcher(
+	reader Querier,
 	m matcher.MatcherSigil,
-	f schnittstellen.FuncIter[T],
+	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	out := reader.ReadAllSchwanzen
 
@@ -27,7 +28,7 @@ func QueryMethodForMatcher[K any, T matcher.Matchable](
 
 	return out(
 		iter.MakeChain(
-			matcher.MakeMatcherFuncIter[T](m),
+			matcher.MakeMatcherFuncIter[*sku.Transacted](m),
 			f,
 		),
 	)

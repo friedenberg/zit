@@ -55,7 +55,7 @@ func (u *Umwelt) StringFormatWriterEtiketten(
 	return kennung_fmt.MakeEtikettenCliFormat()
 }
 
-func (u *Umwelt) StringFormatWriterSkuLikePtr() schnittstellen.StringFormatWriter[sku.SkuLikePtr] {
+func (u *Umwelt) StringFormatWriterSkuLikePtr() schnittstellen.StringFormatWriter[*sku.Transacted] {
 	co := u.FormatColorOptions()
 
 	return sku_fmt.MakeCliFormat(
@@ -68,7 +68,7 @@ func (u *Umwelt) StringFormatWriterSkuLikePtr() schnittstellen.StringFormatWrite
 	)
 }
 
-func (u *Umwelt) StringFormatWriterSkuLikePtrShort() schnittstellen.StringFormatWriter[sku.SkuLikePtr] {
+func (u *Umwelt) StringFormatWriterSkuLikePtrShort() schnittstellen.StringFormatWriter[*sku.Transacted] {
 	co := string_format_writer.ColorOptions{
 		OffEntirely: true,
 	}
@@ -82,25 +82,25 @@ func (u *Umwelt) StringFormatWriterSkuLikePtrShort() schnittstellen.StringFormat
 	)
 }
 
-func (u *Umwelt) PrinterSkuLikePtr() schnittstellen.FuncIter[sku.SkuLikePtr] {
+func (u *Umwelt) PrinterSkuLikePtr() schnittstellen.FuncIter[*sku.Transacted] {
 	sw := u.StringFormatWriterSkuLikePtr()
 
-	return string_format_writer.MakeDelim[sku.SkuLikePtr](
+	return string_format_writer.MakeDelim[*sku.Transacted](
 		"\n",
 		u.Out(),
 		sw,
 	)
 }
 
-func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[sku.SkuLikePtr] {
+func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[*sku.Transacted] {
 	sw := u.StringFormatWriterSkuLikePtr()
 
-	return string_format_writer.MakeDelim[sku.SkuLikePtr](
+	return string_format_writer.MakeDelim[*sku.Transacted](
 		"\n",
 		u.Out(),
-		string_format_writer.MakeFunc[sku.SkuLikePtr](
-			func(w io.StringWriter, o sku.SkuLikePtr) (n int64, err error) {
-				return sw.WriteStringFormat(w, o.GetSkuLikePtr())
+		string_format_writer.MakeFunc[*sku.Transacted](
+			func(w io.StringWriter, o *sku.Transacted) (n int64, err error) {
+				return sw.WriteStringFormat(w, o)
 			},
 		),
 	)

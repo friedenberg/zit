@@ -14,10 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
-type EtikettTransactedReader = objekte_store.TransactedReader[
-	*kennung.Etikett,
-	sku.SkuLikePtr,
-]
+type EtikettTransactedReader = objekte_store.TransactedReader
 
 type etikettStore struct {
 	*store_util.CommonStore[
@@ -149,13 +146,9 @@ func (s etikettStore) ReadOne(
 }
 
 func (s etikettStore) ReadAllSchwanzen(
-	f schnittstellen.FuncIter[sku.SkuLikePtr],
+	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	if err = s.StoreUtil.GetKonfig().EachEtikett(
-		func(e *sku.Transacted) (err error) {
-			return f(e)
-		},
-	); err != nil {
+	if err = s.StoreUtil.GetKonfig().EachEtikett(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -164,9 +157,9 @@ func (s etikettStore) ReadAllSchwanzen(
 }
 
 func (s etikettStore) ReadAll(
-	f schnittstellen.FuncIter[sku.SkuLikePtr],
+	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	eachSku := func(o sku.SkuLikePtr) (err error) {
+	eachSku := func(o *sku.Transacted) (err error) {
 		if o.GetGattung() != gattung.Etikett {
 			return
 		}

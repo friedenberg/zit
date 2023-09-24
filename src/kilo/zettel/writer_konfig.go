@@ -15,15 +15,15 @@ import (
 func MakeWriterKonfig(
 	k konfig.Compiled,
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
-) schnittstellen.FuncIter[sku.SkuLikePtr] {
+) schnittstellen.FuncIter[*sku.Transacted] {
 	errors.TodoP1("switch to sigils")
 	errors.TodoP3("add efficient parsing of hiding tags")
 
 	if k.IncludeHidden {
-		return collections.MakeWriterNoop[sku.SkuLikePtr]()
+		return collections.MakeWriterNoop[*sku.Transacted]()
 	}
 
-	return func(z sku.SkuLikePtr) (err error) {
+	return func(z *sku.Transacted) (err error) {
 		if err = z.GetMetadatei().Etiketten.Each(
 			func(e kennung.Etikett) (err error) {
 				p := e.String()

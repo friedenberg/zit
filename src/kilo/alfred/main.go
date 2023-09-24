@@ -48,7 +48,7 @@ func New(
 	return
 }
 
-func (w *Writer) WriteZettelVerzeichnisse(z sku.SkuLikePtr) (err error) {
+func (w *Writer) WriteZettelVerzeichnisse(z *sku.Transacted) (err error) {
 	item := w.zettelToItem(z, w.Abbr)
 	w.alfredWriter.WriteItem(item)
 
