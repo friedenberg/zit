@@ -24,15 +24,13 @@ type CommonStoreBase[
 
 	StoreUtil
 
-	objekte_store.TransactedInflator
-
 	objekte_store.AkteTextSaver[O, OPtr]
 
 	objekte_store.StoredParseSaver[O, OPtr]
 
 	objekte_store.TransactedReader
 
-	objekte_store.LogWriter[*sku.Transacted]
+	objekte_store.LogWriter
 
 	persistentMetadateiFormat objekte_format.Format
 
@@ -59,18 +57,6 @@ func MakeCommonStoreBase[
 		delegate:      delegate,
 		StoreUtil:     sa,
 		akteFormat:    akteFormat,
-		TransactedInflator: objekte_store.MakeTransactedInflator[
-			O,
-			OPtr,
-		](
-			sa.GetStoreVersion(),
-			sa,
-			objekte_format.FormatForVersion(
-				sa.GetStoreVersion(),
-			),
-			objekte_format.Options{IncludeTai: true},
-			akteFormat,
-		),
 		AkteTextSaver: objekte_store.MakeAkteTextSaver[
 			O,
 			OPtr,
@@ -86,7 +72,7 @@ func MakeCommonStoreBase[
 }
 
 func (s *CommonStoreBase[O, OPtr]) SetLogWriter(
-	lw objekte_store.LogWriter[*sku.Transacted],
+	lw objekte_store.LogWriter,
 ) {
 	s.LogWriter = lw
 }

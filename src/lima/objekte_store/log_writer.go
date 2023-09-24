@@ -1,14 +1,17 @@
 package objekte_store
 
-import "github.com/friedenberg/zit/src/alfa/schnittstellen"
+import (
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/hotel/sku"
+)
 
-type LogWriter[
-	T any,
-] struct {
-	New, Updated, Unchanged, Archived schnittstellen.FuncIter[T]
+type LogWriter struct {
+	New, Updated, Unchanged, Archived schnittstellen.FuncIter[*sku.Transacted]
 }
 
-func (l LogWriter[T]) NewOrUpdated(err error) schnittstellen.FuncIter[T] {
+func (l LogWriter) NewOrUpdated(
+	err error,
+) schnittstellen.FuncIter[*sku.Transacted] {
 	if IsNotFound(err) {
 		return l.New
 	} else {

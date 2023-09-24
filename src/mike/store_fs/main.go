@@ -13,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/kilo/konfig"
 	"github.com/friedenberg/zit/src/lima/cwd"
-	"github.com/friedenberg/zit/src/lima/objekte_store"
 	"github.com/friedenberg/zit/src/november/store_objekten"
 )
 
@@ -58,16 +57,46 @@ func (s Store) Flush() (err error) {
 	return
 }
 
+func (s *Store) readOneExternal(
+	fs *cwd.CwdFiles,
+	sk2 *sku.Transacted,
+) (co *sku.CheckedOut, err error) {
+	// TODO-P3 pool
+	co = &sku.CheckedOut{
+		Internal: *sk2,
+	}
+
+	ok := false
+
+	var e *sku.ExternalMaybe
+
+	if e, ok = fs.Get(sk2.Kennung); !ok {
+		err = iter.MakeErrStopIteration()
+		return
+	}
+
+	var e2 *sku.External
+
+	if e2, err = s.storeObjekten.ReadOneExternal(e, sk2); err != nil {
+		if errors.IsNotExist(err) {
+			err = iter.MakeErrStopIteration()
+		} else {
+			err = errors.Wrapf(err, "Cwd: %#v", e)
+		}
+
+		return
+	}
+
+	co.External = *e2
+
+	return
+}
+
 func (s *Store) ReadFiles(
 	fs *cwd.CwdFiles,
 	ms matcher.Query,
 	f schnittstellen.FuncIter[*sku.CheckedOut],
 ) (err error) {
-	emgr := objekte_store.MakeExternalMaybeGetterReader2(
-		fs.Get,
-		s.storeObjekten,
-	)
-
 	if err = s.storeObjekten.Query(
 		ms,
 		iter.MakeChain(
@@ -81,7 +110,7 @@ func (s *Store) ReadFiles(
 					return
 				}
 
-				if col, err = emgr.ReadOne(et1); err != nil {
+				if col, err = s.readOneExternal(fs, et1); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

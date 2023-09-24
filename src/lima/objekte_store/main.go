@@ -10,7 +10,7 @@ import (
 
 type (
 	TransactedLogger interface {
-		SetLogWriter(LogWriter[*sku.Transacted])
+		SetLogWriter(LogWriter)
 	}
 
 	LastReader interface {

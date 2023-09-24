@@ -42,7 +42,7 @@ type Store struct {
 
 	CreateOrUpdator CreateOrUpdator
 
-	objekte_store.LogWriter[*sku.Transacted]
+	objekte_store.LogWriter
 
 	// Gattungen
 	gattungStores     map[schnittstellen.GattungLike]store_util.GattungStoreLike
@@ -183,7 +183,7 @@ func Make(
 }
 
 func (s *Store) SetLogWriter(
-	lw objekte_store.LogWriter[*sku.Transacted],
+	lw objekte_store.LogWriter,
 ) {
 	s.LogWriter = lw
 	s.zettelStore.SetLogWriter(lw)
