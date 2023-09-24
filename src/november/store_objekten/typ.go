@@ -21,8 +21,6 @@ type typStore struct {
 	*store_util.CommonStore[
 		typ_akte.V0,
 		*typ_akte.V0,
-		kennung.Typ,
-		*kennung.Typ,
 	]
 }
 
@@ -34,8 +32,6 @@ func makeTypStore(
 	s.CommonStore, err = store_util.MakeCommonStore[
 		typ_akte.V0,
 		*typ_akte.V0,
-		kennung.Typ,
-		*kennung.Typ,
 	](
 		gattung.Typ,
 		s,

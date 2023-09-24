@@ -20,8 +20,6 @@ type etikettStore struct {
 	*store_util.CommonStore[
 		etikett_akte.V0,
 		*etikett_akte.V0,
-		kennung.Etikett,
-		*kennung.Etikett,
 	]
 }
 
@@ -33,8 +31,6 @@ func makeEtikettStore(
 	s.CommonStore, err = store_util.MakeCommonStore[
 		etikett_akte.V0,
 		*etikett_akte.V0,
-		kennung.Etikett,
-		*kennung.Etikett,
 	](
 		gattung.Etikett,
 		s,

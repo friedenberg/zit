@@ -20,8 +20,6 @@ type kastenStore struct {
 	*store_util.CommonStore[
 		kasten_akte.V0,
 		*kasten_akte.V0,
-		kennung.Kasten,
-		*kennung.Kasten,
 	]
 }
 
@@ -33,8 +31,6 @@ func makeKastenStore(
 	s.CommonStore, err = store_util.MakeCommonStore[
 		kasten_akte.V0,
 		*kasten_akte.V0,
-		kennung.Kasten,
-		*kennung.Kasten,
 	](
 		gattung.Kasten,
 		s,

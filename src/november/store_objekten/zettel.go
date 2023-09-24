@@ -25,8 +25,6 @@ type zettelStore struct {
 	*store_util.CommonStore[
 		zettel.Objekte,
 		*zettel.Objekte,
-		kennung.Hinweis,
-		*kennung.Hinweis,
 	]
 
 	protoZettel zettel.ProtoZettel
@@ -49,8 +47,6 @@ func makeZettelStore(
 	s.CommonStore, err = store_util.MakeCommonStore[
 		zettel.Objekte,
 		*zettel.Objekte,
-		kennung.Hinweis,
-		*kennung.Hinweis,
 	](
 		gattung.Zettel,
 		s,

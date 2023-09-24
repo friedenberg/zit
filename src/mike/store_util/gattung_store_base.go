@@ -4,7 +4,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/toml"
-	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
@@ -49,8 +48,6 @@ type CommonStoreBase[
 func MakeCommonStoreBase[
 	O objekte.Akte[O],
 	OPtr objekte.AktePtr[O],
-	K kennung.KennungLike[K],
-	KPtr kennung.KennungLikePtr[K],
 ](
 	gg schnittstellen.GattungGetter,
 	delegate CommonStoreDelegate,
@@ -59,9 +56,6 @@ func MakeCommonStoreBase[
 	pmf objekte_format.Format,
 	akteFormat objekte.AkteFormat[O, OPtr],
 ) (s *CommonStoreBase[O, OPtr], err error) {
-	// type T objekte.Transacted[O, OPtr, K, KPtr, ]
-	// type TPtr *objekte.Transacted[O, OPtr, K, KPtr, ]
-
 	if delegate == nil {
 		panic("delegate was nil")
 	}

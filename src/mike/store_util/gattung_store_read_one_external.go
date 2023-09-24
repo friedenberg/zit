@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
-func (s *CommonStore[O, OPtr, K, KPtr]) ReadOneExternal(
+func (s *CommonStore[O, OPtr]) ReadOneExternal(
 	em sku.ExternalMaybe,
 	t sku.SkuLikePtr,
 ) (e *sku.External, err error) {
