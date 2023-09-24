@@ -63,18 +63,13 @@ func makeEtikettStore(
 		return
 	}
 
-	s.CommonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate[
-		etikett_akte.V0,
-		*etikett_akte.V0,
-		kennung.Etikett,
-		*kennung.Etikett,
-	](
+	s.CommonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
 		sa,
 		sa.GetLockSmith(),
 		sa.ObjekteReaderWriterFactory(gattung.Etikett),
 		sa,
 		EtikettTransactedReader(s),
-		objekte_store.CreateOrUpdateDelegate[*sku.Transacted]{
+		objekte_store.CreateOrUpdateDelegate{
 			New: func(t *sku.Transacted) (err error) {
 				if err = newOrUpdated(t); err != nil {
 					err = errors.Wrap(err)

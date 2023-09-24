@@ -167,7 +167,7 @@ func Make(
 		s.GetLockSmith(),
 		s,
 		s,
-		objekte_store.CreateOrUpdateDelegate[*sku.Transacted]{
+		objekte_store.CreateOrUpdateDelegate{
 			New:       s.onNew,
 			Updated:   s.onUpdated,
 			Unchanged: s.onUnchanged,

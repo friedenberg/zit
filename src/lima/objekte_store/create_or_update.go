@@ -11,56 +11,45 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/konfig"
 )
 
-type CreateOrUpdateDelegate[T any] struct {
-	New       schnittstellen.FuncIter[T]
-	Updated   schnittstellen.FuncIter[T]
-	Unchanged schnittstellen.FuncIter[T]
+type CreateOrUpdateDelegate struct {
+	New       schnittstellen.FuncIter[*sku.Transacted]
+	Updated   schnittstellen.FuncIter[*sku.Transacted]
+	Unchanged schnittstellen.FuncIter[*sku.Transacted]
 }
 
-type createOrUpdate[
-	T objekte.Akte[T],
-	T1 objekte.AktePtr[T],
-	T2 kennung.KennungLike[T2],
-	T3 kennung.KennungLikePtr[T2],
-] struct {
+type createOrUpdate struct {
 	clock                     kennung.Clock
 	ls                        schnittstellen.LockSmith
 	of                        schnittstellen.ObjekteWriterFactory
 	af                        schnittstellen.AkteWriterFactory
 	reader                    TransactedReader
-	delegate                  CreateOrUpdateDelegate[*sku.Transacted]
+	delegate                  CreateOrUpdateDelegate
 	matchableAdder            matcher.MatchableAdder
 	persistentMetadateiFormat objekte_format.Format
 	options                   objekte_format.Options
 	kg                        konfig.Getter
 }
 
-func MakeCreateOrUpdate[
-	T objekte.Akte[T],
-	T1 objekte.AktePtr[T],
-	T2 kennung.KennungLike[T2],
-	T3 kennung.KennungLikePtr[T2],
-](
+func MakeCreateOrUpdate(
 	clock kennung.Clock,
 	ls schnittstellen.LockSmith,
 	of schnittstellen.ObjekteWriterFactory,
 	af schnittstellen.AkteWriterFactory,
 	reader TransactedReader,
-	delegate CreateOrUpdateDelegate[*sku.Transacted],
+	delegate CreateOrUpdateDelegate,
 	ma matcher.MatchableAdder,
 	pmf objekte_format.Format,
 	op objekte_format.Options,
 	kg konfig.Getter,
-) (cou *createOrUpdate[T, T1, T2, T3]) {
+) (cou *createOrUpdate) {
 	if pmf == nil {
 		panic("nil persisted_metadatei_format.Format")
 	}
 
-	return &createOrUpdate[T, T1, T2, T3]{
+	return &createOrUpdate{
 		clock:                     clock,
 		ls:                        ls,
 		of:                        of,
@@ -73,7 +62,7 @@ func MakeCreateOrUpdate[
 	}
 }
 
-func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
+func (cou createOrUpdate) CreateOrUpdateCheckedOut(
 	co *sku.CheckedOut,
 ) (transactedPtr *sku.Transacted, err error) {
 	kennungPtr := co.External.Kennung
@@ -145,9 +134,9 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateCheckedOut(
 	return
 }
 
-func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
+func (cou createOrUpdate) CreateOrUpdate(
 	mg metadatei.Getter,
-	kennungPtr T3,
+	kennungPtr kennung.Kennung,
 ) (transactedPtr *sku.Transacted, err error) {
 	if !cou.ls.IsAcquired() {
 		err = ErrLockRequired{
@@ -251,9 +240,9 @@ func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdate(
 	return
 }
 
-func (cou createOrUpdate[T, T1, T2, T3]) CreateOrUpdateAkte(
+func (cou createOrUpdate) CreateOrUpdateAkte(
 	mg metadatei.Getter,
-	kennungPtr T3,
+	kennungPtr kennung.Kennung,
 	sh schnittstellen.ShaLike,
 ) (transactedPtr *sku.Transacted, err error) {
 	if !cou.ls.IsAcquired() {

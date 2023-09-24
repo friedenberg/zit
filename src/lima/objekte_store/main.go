@@ -2,6 +2,7 @@ package objekte_store
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
@@ -75,17 +76,12 @@ type UpdaterManyMetadatei interface {
 	) error
 }
 
-type CreateOrUpdater[
-	O any,
-	K any,
-	V any,
-	CO any,
-] interface {
+type CreateOrUpdater interface {
 	CreateOrUpdateAkte(
 		metadatei.Getter,
-		K,
+		kennung.Kennung,
 		schnittstellen.ShaLike,
-	) (V, error)
-	CreateOrUpdate(metadatei.Getter, K) (V, error)
-	CreateOrUpdateCheckedOut(CO) (V, error)
+	) (*sku.Transacted, error)
+	CreateOrUpdate(metadatei.Getter, kennung.Kennung) (*sku.Transacted, error)
+	CreateOrUpdateCheckedOut(*sku.CheckedOut) (*sku.Transacted, error)
 }

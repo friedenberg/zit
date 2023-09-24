@@ -64,18 +64,13 @@ func makeTypStore(
 		return
 	}
 
-	s.CommonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate[
-		typ_akte.V0,
-		*typ_akte.V0,
-		kennung.Typ,
-		*kennung.Typ,
-	](
+	s.CommonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
 		sa,
 		sa.GetLockSmith(),
 		s.CommonStore,
 		sa,
 		TypTransactedReader(s),
-		objekte_store.CreateOrUpdateDelegate[*sku.Transacted]{
+		objekte_store.CreateOrUpdateDelegate{
 			New: func(t *sku.Transacted) (err error) {
 				if err = newOrUpdated(t); err != nil {
 					err = errors.Wrap(err)

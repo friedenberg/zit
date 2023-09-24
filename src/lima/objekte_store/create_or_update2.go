@@ -19,7 +19,7 @@ type createOrUpdate2 struct {
 	ls                        schnittstellen.LockSmith
 	af                        schnittstellen.AkteWriterFactory
 	reader                    OneReader
-	delegate                  CreateOrUpdateDelegate[*sku.Transacted]
+	delegate                  CreateOrUpdateDelegate
 	matchableAdder            matcher.MatchableAdder
 	persistentMetadateiFormat objekte_format.Format
 	options                   objekte_format.Options
@@ -32,7 +32,7 @@ func MakeCreateOrUpdate2(
 	ls schnittstellen.LockSmith,
 	af schnittstellen.AkteWriterFactory,
 	reader OneReader,
-	delegate CreateOrUpdateDelegate[*sku.Transacted],
+	delegate CreateOrUpdateDelegate,
 	ma matcher.MatchableAdder,
 	pmf objekte_format.Format,
 	op objekte_format.Options,

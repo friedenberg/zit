@@ -63,18 +63,13 @@ func makeKastenStore(
 		return
 	}
 
-	s.CommonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate[
-		kasten_akte.V0,
-		*kasten_akte.V0,
-		kennung.Kasten,
-		*kennung.Kasten,
-	](
+	s.CommonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
 		sa,
 		sa.GetLockSmith(),
 		sa.ObjekteReaderWriterFactory(gattung.Kasten),
 		sa,
 		KastenTransactedReader(s),
-		objekte_store.CreateOrUpdateDelegate[*sku.Transacted]{
+		objekte_store.CreateOrUpdateDelegate{
 			New: func(t *sku.Transacted) (err error) {
 				if err = newOrUpdated(t); err != nil {
 					err = errors.Wrap(err)

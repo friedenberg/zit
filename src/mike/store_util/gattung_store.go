@@ -36,12 +36,7 @@ type CommonStore[
 	CommonStoreBase[O, OPtr]
 	AkteFormat objekte.AkteFormat[O, OPtr]
 	objekte_store.StoredParseSaver[O, OPtr]
-	objekte_store.CreateOrUpdater[
-		OPtr,
-		KPtr,
-		*sku.Transacted,
-		*sku.CheckedOut,
-	]
+	objekte_store.CreateOrUpdater
 }
 
 func MakeCommonStore[
