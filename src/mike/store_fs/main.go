@@ -78,7 +78,7 @@ func (s *Store) readOneExternal(
 
 	var e2 *sku.External
 
-	if e2, err = s.storeObjekten.ReadOneExternal(e, sk2); err != nil {
+	if e2, err = s.ReadOneExternal(e, sk2); err != nil {
 		if errors.IsNotExist(err) {
 			err = iter.MakeErrStopIteration()
 		} else {
@@ -96,9 +96,10 @@ func (s *Store) readOneExternal(
 func (s *Store) ReadFiles(
 	fs *cwd.CwdFiles,
 	ms matcher.Query,
+	fq func(matcher.Query, schnittstellen.FuncIter[*sku.Transacted]) error,
 	f schnittstellen.FuncIter[*sku.CheckedOut],
 ) (err error) {
-	if err = s.storeObjekten.Query(
+	if err = fq(
 		ms,
 		iter.MakeChain(
 			func(et *sku.Transacted) (err error) {

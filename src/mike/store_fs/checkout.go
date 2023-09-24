@@ -1,6 +1,9 @@
 package store_fs
 
 import (
+	"fmt"
+	"path"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
@@ -128,6 +131,23 @@ func (s Store) shouldCheckOut(
 	return
 }
 
+func (s *Store) FileExtensionForGattung(
+	gg schnittstellen.GattungGetter,
+) string {
+	return s.GetKonfig().FileExtensions.GetFileExtensionForGattung(gg)
+}
+
+func (s *Store) PathForTransacted(tl *sku.Transacted) string {
+	return path.Join(
+		s.Cwd(),
+		fmt.Sprintf(
+			"%s.%s",
+			tl.Kennung,
+			s.FileExtensionForGattung(tl),
+		),
+	)
+}
+
 func (s Store) filenameForTransacted(
 	options store_util.CheckoutOptions,
 	sz *sku.Transacted,
@@ -146,13 +166,10 @@ func (s Store) filenameForTransacted(
 			return
 		}
 
-		filename = originalFilename + s.GetKonfig().GetZettelFileExtension()
+		filename = s.PathForTransacted(sz)
 
 	default:
-		originalFilename = sz.GetKennungLike().String() + "." + s.GetKonfig().FileExtensions.GetFileExtensionForGattung(
-			sz.GetKennungLike(),
-		)
-
+		originalFilename = s.PathForTransacted(sz)
 		filename = originalFilename
 	}
 
