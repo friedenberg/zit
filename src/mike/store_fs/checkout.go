@@ -29,17 +29,10 @@ func (s *Store) CheckoutQuery(
 		func(t *sku.Transacted) (err error) {
 			var cop *sku.CheckedOut
 
-			if t.GetGattung() == gattung.Zettel {
-				cop, err = s.CheckoutOneZettel(
-					store_util.CheckoutOptions(options),
-					t,
-				)
-			} else {
-				cop, err = s.storeObjekten.CheckoutOne(
-					store_util.CheckoutOptions(options),
-					t,
-				)
-			}
+			cop, err = s.CheckoutOne(
+				store_util.CheckoutOptions(options),
+				t,
+			)
 
 			if err != nil {
 				err = errors.Wrap(err)
@@ -94,7 +87,7 @@ func (s *Store) Checkout(
 		func(zt *sku.Transacted) (err error) {
 			var zc *sku.CheckedOut
 
-			if zc, err = s.CheckoutOneZettel(options, zt); err != nil {
+			if zc, err = s.CheckoutOne(options, zt); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -124,10 +117,6 @@ func (s Store) shouldCheckOut(
 		ok = true
 	}
 
-	if cz.State == checked_out_state.StateEmpty {
-		ok = true
-	}
-
 	if cz.Internal.GetMetadatei().Equals(
 		cz.External.GetMetadatei(),
 	) {
@@ -137,7 +126,7 @@ func (s Store) shouldCheckOut(
 	return
 }
 
-func (s Store) filenameForZettelTransacted(
+func (s Store) filenameForTransacted(
 	options store_util.CheckoutOptions,
 	sz *sku.Transacted,
 ) (originalFilename string, filename string, err error) {
@@ -168,7 +157,7 @@ func (s Store) filenameForZettelTransacted(
 	return
 }
 
-func (s *Store) CheckoutOneZettel(
+func (s *Store) CheckoutOne(
 	options store_util.CheckoutOptions,
 	sz *sku.Transacted,
 ) (cz *sku.CheckedOut, err error) {
@@ -181,7 +170,7 @@ func (s *Store) CheckoutOneZettel(
 
 	var originalFilename, filename string
 
-	if originalFilename, filename, err = s.filenameForZettelTransacted(options, sz); err != nil {
+	if originalFilename, filename, err = s.filenameForTransacted(options, sz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

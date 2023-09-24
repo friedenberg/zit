@@ -82,7 +82,7 @@ func (c WriteNewZettels) runOneAlreadyLocked(
 		// TODO-P4 separate creation and checkout into two ops to allow for
 		// optimistic
 		// unlocking
-		if result, err = c.StoreWorkingDirectory().CheckoutOneZettel(
+		if result, err = c.StoreWorkingDirectory().CheckoutOne(
 			c.CheckoutOptions,
 			&result.Internal,
 		); err != nil {
