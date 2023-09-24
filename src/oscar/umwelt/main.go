@@ -196,7 +196,6 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		u.storeUtil,
 		u.Sonnenaufgang(),
 		u.standort,
-		u.storeObjekten,
 	); err != nil {
 		errors.Log().Print(err)
 		err = errors.Wrap(err)

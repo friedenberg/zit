@@ -13,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/mike/store_util"
-	"github.com/friedenberg/zit/src/november/store_objekten"
 )
 
 type Store struct {
@@ -22,8 +21,6 @@ type Store struct {
 	sonnenaufgang kennung.Time
 	standort.Standort
 
-	storeObjekten *store_objekten.Store
-
 	checkedOutLogPrinter schnittstellen.FuncIter[*sku.CheckedOut]
 }
 
@@ -31,13 +28,11 @@ func New(
 	su store_util.StoreUtil,
 	t kennung.Time,
 	st standort.Standort,
-	storeObjekten *store_objekten.Store,
 ) (s *Store, err error) {
 	s = &Store{
 		StoreUtil:     su,
 		sonnenaufgang: t,
 		Standort:      st,
-		storeObjekten: storeObjekten,
 	}
 
 	return
@@ -140,7 +135,7 @@ func (s *Store) ReadFiles(
 			func(il *sku.ExternalMaybe) (err error) {
 				k := il.GetKennungLike()
 
-				if err = s.storeObjekten.GetAbbrStore().Exists(k); err == nil {
+				if err = s.GetAbbrStore().Exists(k); err == nil {
 					err = iter.MakeErrStopIteration()
 					return
 				}
@@ -150,7 +145,7 @@ func (s *Store) ReadFiles(
 				tco := &sku.CheckedOut{}
 				var tcoe *sku.External
 
-				if tcoe, err = s.storeObjekten.ReadOneExternal(
+				if tcoe, err = s.ReadOneExternal(
 					il,
 					nil,
 				); err != nil {
