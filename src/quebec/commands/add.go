@@ -94,7 +94,7 @@ func (c Add) RunWithCwdQuery(
 		Dedupe:      c.Dedupe,
 	}
 
-	var zettelsFromAkteResults zettel.MutableSet
+	var zettelsFromAkteResults sku.TransactedMutableSet
 
 	if zettelsFromAkteResults, err = zettelsFromAkteOp.Run(ms); err != nil {
 		err = errors.Wrap(err)
@@ -115,7 +115,7 @@ func (c Add) RunWithCwdQuery(
 	// otFlags.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
 	otFlags.RootEtiketten = c.Metadatei.Etiketten
 	mwk := objekte_collections.MakeMutableSetMetadateiWithKennung()
-	zettelsFromAkteResults.Each(
+	zettelsFromAkteResults.EachPtr(
 		func(z *sku.Transacted) (err error) {
 			return mwk.Add(z.GetSkuLike())
 		},
@@ -195,7 +195,7 @@ func (c Add) RunWithCwdQuery(
 
 func (c Add) openAktenIfNecessary(
 	u *umwelt.Umwelt,
-	zettels zettel.MutableSet,
+	zettels sku.TransactedMutableSet,
 	cwd cwd.CwdFiles,
 ) (err error) {
 	if !c.OpenAkten && c.CheckoutAktenAndRun == "" {
@@ -204,7 +204,7 @@ func (c Add) openAktenIfNecessary(
 
 	hs := collections_value.MakeMutableValueSet[values.String](nil)
 
-	zettels.Each(
+	zettels.EachPtr(
 		func(z *sku.Transacted) (err error) {
 			return hs.Add(values.MakeString(z.GetKennung().String()))
 		},

@@ -26,12 +26,6 @@ func (tk TransactedUniqueKeyer) GetKey(sz *sku.Transacted) string {
 	)
 }
 
-func MakeMutableSetUnique(c int) MutableSet {
-	return collections_value.MakeMutableValueSet[*sku.Transacted](
-		TransactedUniqueKeyer{},
-	)
-}
-
 type TransactedHinweisKeyer struct{}
 
 func (tk TransactedHinweisKeyer) GetKey(sz *sku.Transacted) string {

@@ -8,13 +8,12 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
-	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
 type verzeichnisseSchwanzen struct {
-	headers [store_verzeichnisse.PageCount]*zettel.Schwanzen
+	headers [store_verzeichnisse.PageCount]*sku.Schwanzen
 	tagp    schnittstellen.AkteGetterPutter[*typ_akte.V0]
 	*store_verzeichnisse.Zettelen
 	su store_util.StoreUtil
@@ -31,7 +30,7 @@ func makeVerzeichnisseSchwanzen(
 	}
 
 	for i := range s.headers {
-		s.headers[i] = zettel.MakeSchwanzen(sa.GetKennungIndex(), s.applyKonfig)
+		s.headers[i] = sku.MakeSchwanzen(sa.GetKennungIndex(), s.applyKonfig)
 	}
 
 	s.Zettelen, err = store_verzeichnisse.MakeZettelen(

@@ -1,4 +1,4 @@
-package zettel
+package sku_fmt
 
 import (
 	"bufio"

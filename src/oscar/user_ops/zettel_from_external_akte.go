@@ -27,7 +27,7 @@ type ZettelFromExternalAkte struct {
 
 func (c ZettelFromExternalAkte) Run(
 	ms matcher.Query,
-) (results zettel.MutableSet, err error) {
+) (results sku.TransactedMutableSet, err error) {
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -38,7 +38,7 @@ func (c ZettelFromExternalAkte) Run(
 	toCreate := objekte_collections.MakeMutableSetUniqueAkte()
 	toDelete := objekte_collections.MakeMutableSetUniqueFD()
 
-	results = zettel.MakeMutableSetHinweis(0)
+	results = sku.MakeTransactedMutableSet()
 
 	fds := iter.SortedValues(ms.GetCwdFDs())
 
@@ -71,7 +71,7 @@ func (c ZettelFromExternalAkte) Run(
 						return
 					}
 
-					return results.Add(z)
+					return results.AddPtr(z)
 				},
 			),
 		); err != nil {
@@ -80,7 +80,7 @@ func (c ZettelFromExternalAkte) Run(
 		}
 	}
 
-	if err = results.Each(
+	if err = results.EachPtr(
 		func(z *sku.Transacted) (err error) {
 			if c.ProtoZettel.Apply(z) {
 				if z, err = c.StoreObjekten().Zettel().Update(
@@ -130,7 +130,7 @@ func (c ZettelFromExternalAkte) Run(
 			}
 		}
 
-		results.Add(tz)
+		results.AddPtr(tz)
 	}
 
 	if err != nil {
