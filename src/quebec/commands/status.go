@@ -46,7 +46,7 @@ func (c Status) RunWithCwdQuery(
 		possible,
 		objekte.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().Query),
 		iter.MakeChain(
-			objekte.MakeFilterFromMetaSet(ms),
+			matcher.MakeFilterFromQuery(ms),
 			func(co *sku.CheckedOut) (err error) {
 				if err = pcol(co); err != nil {
 					err = errors.Wrap(err)

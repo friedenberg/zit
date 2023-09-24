@@ -62,7 +62,7 @@ func (c Diff) RunWithCwdQuery(
 		cwdFiles,
 		objekte.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().Query),
 		iter.MakeChain(
-			objekte.MakeFilterFromMetaSet(ms),
+			matcher.MakeFilterFromQuery(ms),
 			func(co *sku.CheckedOut) (err error) {
 				wg := iter.MakeErrorWaitGroup()
 

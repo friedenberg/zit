@@ -15,8 +15,8 @@ type GattungStoreLike interface {
 }
 
 type CommonStoreBase[
-	O objekte.Akte[O],
-	OPtr objekte.AktePtr[O],
+	O schnittstellen.Akte[O],
+	OPtr schnittstellen.AktePtr[O],
 ] struct {
 	schnittstellen.GattungGetter
 
@@ -38,8 +38,8 @@ type CommonStoreBase[
 }
 
 func MakeCommonStoreBase[
-	O objekte.Akte[O],
-	OPtr objekte.AktePtr[O],
+	O schnittstellen.Akte[O],
+	OPtr schnittstellen.AktePtr[O],
 ](
 	gg schnittstellen.GattungGetter,
 	delegate CommonStoreDelegate,

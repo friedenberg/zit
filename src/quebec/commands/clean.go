@@ -61,7 +61,7 @@ func (c Clean) RunWithCwdQuery(
 		possible,
 		objekte.MakeFuncReaderTransactedLikePtr(ms, s.StoreObjekten().Query),
 		iter.MakeChain(
-			objekte.MakeFilterFromMetaSet(ms),
+			matcher.MakeFilterFromQuery(ms),
 			func(co *sku.CheckedOut) (err error) {
 				if co.State != checked_out_state.StateExistsAndSame && !c.force {
 					return

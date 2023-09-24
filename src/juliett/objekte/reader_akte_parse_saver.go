@@ -9,16 +9,16 @@ import (
 )
 
 type readerAkteParseSaver[
-	O Akte[O],
-	OPtr AktePtr[O],
+	O schnittstellen.Akte[O],
+	OPtr schnittstellen.AktePtr[O],
 ] struct {
 	awf    schnittstellen.AkteWriterFactory
 	parser AkteParser[OPtr]
 }
 
 func MakeReaderAkteParseSaver[
-	O Akte[O],
-	OPtr AktePtr[O],
+	O schnittstellen.Akte[O],
+	OPtr schnittstellen.AktePtr[O],
 ](
 	awf schnittstellen.AkteWriterFactory,
 	parser AkteParser[OPtr],

@@ -9,15 +9,15 @@ import (
 )
 
 type nopAkteParseSaver[
-	O Akte[O],
-	OPtr AktePtr[O],
+	O schnittstellen.Akte[O],
+	OPtr schnittstellen.AktePtr[O],
 ] struct {
 	awf schnittstellen.AkteWriterFactory
 }
 
 func MakeNopAkteParseSaver[
-	O Akte[O],
-	OPtr AktePtr[O],
+	O schnittstellen.Akte[O],
+	OPtr schnittstellen.AktePtr[O],
 ](awf schnittstellen.AkteWriterFactory,
 ) nopAkteParseSaver[O, OPtr] {
 	return nopAkteParseSaver[O, OPtr]{

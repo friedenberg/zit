@@ -14,8 +14,8 @@ import (
 )
 
 type StoredParseSaver[
-	O objekte.Akte[O],
-	OPtr objekte.AktePtr[O],
+	O schnittstellen.Akte[O],
+	OPtr schnittstellen.AktePtr[O],
 ] interface {
 	ParseSaveStored(
 		sem sku.ExternalMaybe,
@@ -24,16 +24,16 @@ type StoredParseSaver[
 }
 
 type storedParserSaver[
-	O objekte.Akte[O],
-	OPtr objekte.AktePtr[O],
+	O schnittstellen.Akte[O],
+	OPtr schnittstellen.AktePtr[O],
 ] struct {
 	awf        schnittstellen.AkteWriterFactory
 	akteParser objekte.AkteParser[OPtr]
 }
 
 func MakeStoredParseSaver[
-	O objekte.Akte[O],
-	OPtr objekte.AktePtr[O],
+	O schnittstellen.Akte[O],
+	OPtr schnittstellen.AktePtr[O],
 ](
 	owf schnittstellen.ObjekteIOFactory,
 	awf schnittstellen.AkteIOFactory,

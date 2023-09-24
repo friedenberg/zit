@@ -207,7 +207,7 @@ func (s *common) CheckoutOne(
 			return
 		}
 
-		var cze objekte.ExternalLikePtr
+		var cze *sku.External
 
 		if cze, err = s.ReadOneExternal(
 			e,
@@ -217,11 +217,7 @@ func (s *common) CheckoutOne(
 			return
 		}
 
-		if err = cz.External.SetFromSkuLike(cze); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
+		cz.External = *cze
 		cz.DetermineState(true)
 
 		if !s.shouldCheckOut(options, cz) {

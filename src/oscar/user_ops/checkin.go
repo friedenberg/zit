@@ -33,7 +33,7 @@ func (c Checkin) Run(
 		pz,
 		objekte.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().Query),
 		iter.MakeChain(
-			objekte.MakeFilterFromMetaSet(ms),
+			matcher.MakeFilterFromQuery(ms),
 			func(co *sku.CheckedOut) (err error) {
 				if _, err = u.StoreObjekten().CreateOrUpdator.CreateOrUpdateCheckedOut(
 					co,

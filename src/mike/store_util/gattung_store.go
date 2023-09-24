@@ -21,8 +21,8 @@ type CommonStoreDelegate interface {
 }
 
 type CommonStore[
-	O objekte.Akte[O],
-	OPtr objekte.AktePtr[O],
+	O schnittstellen.Akte[O],
+	OPtr schnittstellen.AktePtr[O],
 ] struct {
 	CommonStoreBase[O, OPtr]
 	AkteFormat objekte.AkteFormat[O, OPtr]
@@ -31,8 +31,8 @@ type CommonStore[
 }
 
 func MakeCommonStore[
-	O objekte.Akte[O],
-	OPtr objekte.AktePtr[O],
+	O schnittstellen.Akte[O],
+	OPtr schnittstellen.AktePtr[O],
 ](
 	gg schnittstellen.GattungGetter,
 	delegate CommonStoreDelegate,

@@ -9,8 +9,8 @@ import (
 )
 
 type akteFormat[
-	O objekte.Akte[O],
-	OPtr objekte.AktePtr[O],
+	O schnittstellen.Akte[O],
+	OPtr schnittstellen.AktePtr[O],
 ] struct {
 	objekte.AkteParser[OPtr]
 	objekte.AkteParseSaver[OPtr]
@@ -19,8 +19,8 @@ type akteFormat[
 }
 
 func MakeAkteFormat[
-	O objekte.Akte[O],
-	OPtr objekte.AktePtr[O],
+	O schnittstellen.Akte[O],
+	OPtr schnittstellen.AktePtr[O],
 ](
 	akteParser objekte.AkteParser[OPtr],
 	parsedAkteFormatter objekte.ParsedAkteFormatter[O],

@@ -5,10 +5,11 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/toml"
 )
 
-type ParsedAkteTomlFormatter[O Akte[O]] struct{}
+type ParsedAkteTomlFormatter[O schnittstellen.Akte[O]] struct{}
 
 func (_ ParsedAkteTomlFormatter[O]) FormatParsedAkte(
 	w1 io.Writer,
