@@ -11,7 +11,7 @@ import (
 func (s *Store) FileExtensionForGattung(
 	gg schnittstellen.GattungGetter,
 ) string {
-	return s.erworben.FileExtensions.GetFileExtensionForGattung(gg)
+	return s.GetKonfig().FileExtensions.GetFileExtensionForGattung(gg)
 }
 
 func (s *Store) PathForTransactedLike(tl sku.SkuLike) string {

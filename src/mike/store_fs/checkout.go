@@ -67,7 +67,7 @@ func (s *Store) Checkout(
 
 	if err = s.storeObjekten.Zettel().ReadAllSchwanzen(
 		iter.MakeChain(
-			zettel.MakeWriterKonfig(s.erworben, s.storeObjekten.Typ()),
+			zettel.MakeWriterKonfig(s.GetKonfig(), s.storeObjekten.Typ()),
 			ztw,
 			func(sk *sku.Transacted) (err error) {
 				var z sku.Transacted
@@ -146,10 +146,10 @@ func (s Store) filenameForTransacted(
 			return
 		}
 
-		filename = originalFilename + s.erworben.GetZettelFileExtension()
+		filename = originalFilename + s.GetKonfig().GetZettelFileExtension()
 
 	default:
-		originalFilename = sz.GetKennungLike().String() + "." + s.erworben.FileExtensions.GetFileExtensionForGattung(
+		originalFilename = sz.GetKennungLike().String() + "." + s.GetKonfig().FileExtensions.GetFileExtensionForGattung(
 			sz.GetKennungLike(),
 		)
 
@@ -212,7 +212,7 @@ func (s *Store) CheckoutOne(
 		}
 	}
 
-	inlineAkte := s.erworben.IsInlineTyp(sz.GetTyp())
+	inlineAkte := s.GetKonfig().IsInlineTyp(sz.GetTyp())
 
 	cz.State = checked_out_state.StateJustCheckedOut
 
@@ -229,7 +229,7 @@ func (s *Store) CheckoutOne(
 		options.CheckoutMode.IncludesAkte() {
 		t := sz.GetTyp()
 
-		fe := s.erworben.TypenToExtensions[t.String()]
+		fe := s.GetKonfig().TypenToExtensions[t.String()]
 
 		if fe == "" {
 			fe = t.String()
@@ -240,7 +240,7 @@ func (s *Store) CheckoutOne(
 
 	e := objekte_collections.MakeFileEncoder(
 		s.storeObjekten,
-		s.erworben,
+		s.GetKonfig(),
 	)
 
 	if err = e.Encode(&cz.External); err != nil {

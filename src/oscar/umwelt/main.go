@@ -193,8 +193,8 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 
 	errors.Log().Print("initing checkout store")
 	if u.storeWorkingDirectory, err = store_fs.New(
+		u.storeUtil,
 		u.Sonnenaufgang(),
-		u.Konfig(),
 		u.standort,
 		u.storeObjekten,
 	); err != nil {
