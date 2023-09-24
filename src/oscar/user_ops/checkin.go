@@ -31,8 +31,7 @@ func (c Checkin) Run(
 
 	if err = u.StoreWorkingDirectory().ReadFiles(
 		pz,
-		ms,
-		u.StoreObjekten().Query,
+		objekte.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().Query),
 		iter.MakeChain(
 			objekte.MakeFilterFromMetaSet(ms),
 			func(co *sku.CheckedOut) (err error) {

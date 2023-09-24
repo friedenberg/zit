@@ -59,8 +59,7 @@ func (c Clean) RunWithCwdQuery(
 
 	if err = s.StoreWorkingDirectory().ReadFiles(
 		possible,
-		ms,
-		s.StoreObjekten().Query,
+		objekte.MakeFuncReaderTransactedLikePtr(ms, s.StoreObjekten().Query),
 		iter.MakeChain(
 			objekte.MakeFilterFromMetaSet(ms),
 			func(co *sku.CheckedOut) (err error) {

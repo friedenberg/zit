@@ -49,7 +49,7 @@ type Store struct {
 	reindexers        map[schnittstellen.GattungLike]store_util.Reindexer
 	flushers          map[schnittstellen.GattungLike]errors.Flusher
 	readers           map[schnittstellen.GattungLike]objekte.FuncReaderTransactedLikePtr
-	queriers          map[schnittstellen.GattungLike]objekte.FuncQuerierTransactedLikePtr
+	queriers          map[schnittstellen.GattungLike]objekte.FuncSigilTransactedLikePtr
 	transactedReaders map[schnittstellen.GattungLike]objekte.FuncReaderTransactedLikePtr
 	metadateiUpdaters map[schnittstellen.GattungLike]objekte_store.UpdaterManyMetadatei
 
@@ -102,7 +102,7 @@ func Make(
 	}
 
 	errors.TodoP1("implement for other gattung")
-	s.queriers = map[schnittstellen.GattungLike]objekte.FuncQuerierTransactedLikePtr{
+	s.queriers = map[schnittstellen.GattungLike]objekte.FuncSigilTransactedLikePtr{
 		gattung.Zettel:  s.zettelStore.Query,
 		gattung.Typ:     s.typStore.Query,
 		gattung.Etikett: s.etikettStore.Query,

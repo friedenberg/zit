@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/matcher"
+	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/mike/store_util"
 	"github.com/friedenberg/zit/src/november/store_objekten"
@@ -95,12 +95,10 @@ func (s *Store) readOneExternal(
 
 func (s *Store) ReadFiles(
 	fs *cwd.CwdFiles,
-	ms matcher.Query,
-	fq func(matcher.Query, schnittstellen.FuncIter[*sku.Transacted]) error,
+	fq objekte.FuncReaderTransactedLikePtr,
 	f schnittstellen.FuncIter[*sku.CheckedOut],
 ) (err error) {
 	if err = fq(
-		ms,
 		iter.MakeChain(
 			func(et *sku.Transacted) (err error) {
 				var col *sku.CheckedOut

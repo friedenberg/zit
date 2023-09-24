@@ -12,9 +12,9 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
+	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/zettel"
@@ -24,11 +24,10 @@ import (
 
 func (s *Store) CheckoutQuery(
 	options store_util.CheckoutOptions,
-	ms matcher.Query,
+	fq objekte.FuncReaderTransactedLikePtr,
 	f schnittstellen.FuncIter[*sku.CheckedOut],
 ) (err error) {
-	if err = s.storeObjekten.Query(
-		ms,
+	if err = fq(
 		func(t *sku.Transacted) (err error) {
 			var cop *sku.CheckedOut
 
@@ -63,14 +62,16 @@ func (s *Store) CheckoutQuery(
 // just a matcher
 func (s *Store) Checkout(
 	options store_util.CheckoutOptions,
+	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
+	fq objekte.FuncReaderTransactedLikePtr,
 	ztw schnittstellen.FuncIter[*sku.Transacted],
 ) (zcs schnittstellen.MutableSetLike[*sku.CheckedOut], err error) {
 	zcs = collections_value.MakeMutableValueSet[*sku.CheckedOut](nil)
 	zts := sku.MakeTransactedMutableSet()
 
-	if err = s.storeObjekten.Zettel().ReadAllSchwanzen(
+	if err = fq(
 		iter.MakeChain(
-			zettel.MakeWriterKonfig(s.GetKonfig(), s.storeObjekten.Typ()),
+			zettel.MakeWriterKonfig(s.GetKonfig(), tagp),
 			ztw,
 			func(sk *sku.Transacted) (err error) {
 				var z sku.Transacted
@@ -209,7 +210,7 @@ func (s *Store) CheckoutOne(
 
 		var cze objekte.ExternalLikePtr
 
-		if cze, err = s.storeObjekten.ReadOneExternal(
+		if cze, err = s.ReadOneExternal(
 			e,
 			sz,
 		); err != nil {
@@ -255,10 +256,7 @@ func (s *Store) CheckoutOne(
 		cz.External.GetFDsPtr().Akte.Path = originalFilename + "." + fe
 	}
 
-	e := objekte_collections.MakeFileEncoder(
-		s.storeObjekten,
-		s.GetKonfig(),
-	)
+	e := objekte_collections.MakeFileEncoder(s, s.GetKonfig())
 
 	if err = e.Encode(&cz.External); err != nil {
 		err = errors.Wrap(err)
