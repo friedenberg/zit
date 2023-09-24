@@ -36,9 +36,11 @@ func makeEtikettStore(
 		sa,
 		s,
 		objekte_store.MakeAkteFormat[etikett_akte.V0, *etikett_akte.V0](
-			objekte.MakeTextParserIgnoreTomlErrors[etikett_akte.V0](sa),
+			objekte.MakeTextParserIgnoreTomlErrors[etikett_akte.V0](
+				sa.GetStandort(),
+			),
 			objekte.ParsedAkteTomlFormatter[etikett_akte.V0]{},
-			sa,
+			sa.GetStandort(),
 		),
 	)
 
@@ -60,8 +62,8 @@ func makeEtikettStore(
 
 	s.CommonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
 		sa,
-		sa.GetLockSmith(),
-		sa,
+		sa.GetStandort().GetLockSmith(),
+		sa.GetStandort(),
 		EtikettTransactedReader(s),
 		objekte_store.CreateOrUpdateDelegate{
 			New: func(t *sku.Transacted) (err error) {

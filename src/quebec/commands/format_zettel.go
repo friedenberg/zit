@@ -74,7 +74,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if cwdFiles, err = cwd.MakeCwdFilesAll(
 		u.Konfig(),
 		u.Standort().Cwd(),
-		u.StoreObjekten(),
+		u.Standort(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -165,12 +165,12 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	if c.Mode.IncludesObjekte() {
 		format = metadatei.MakeTextFormatterMetadateiInlineAkte(
-			u.StoreObjekten(),
+			u.Standort(),
 			akteFormatter,
 		)
 	} else {
 		format = metadatei.MakeTextFormatterExcludeMetadatei(
-			u.StoreObjekten(),
+			u.Standort(),
 			akteFormatter,
 		)
 	}

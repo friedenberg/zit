@@ -48,12 +48,12 @@ func (c Diff) RunWithCwdQuery(
 	cwdFiles *cwd.CwdFiles,
 ) (err error) {
 	fInline := metadatei.MakeTextFormatterMetadateiInlineAkte(
-		u.StoreObjekten(),
+		u.Standort(),
 		nil,
 	)
 
 	fMetadatei := metadatei.MakeTextFormatterMetadateiOnly(
-		u.StoreObjekten(),
+		u.Standort(),
 		nil,
 	)
 
@@ -108,7 +108,7 @@ func (c Diff) RunWithCwdQuery(
 					externalFD = el.GetObjekteFD()
 
 				case internalInline && externalInline:
-					wg.Do(c.makeDoAkte(wLeft, u.StoreObjekten(), il.GetAkteSha()))
+					wg.Do(c.makeDoAkte(wLeft, u.Standort(), il.GetAkteSha()))
 					wg.Do(c.makeDoFD(wRight, el.GetAkteFD()))
 					externalFD = el.GetAkteFD()
 

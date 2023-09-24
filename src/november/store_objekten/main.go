@@ -163,8 +163,8 @@ func Make(
 
 	s.CreateOrUpdator = objekte_store.MakeCreateOrUpdate2(
 		s,
-		s.GetLockSmith(),
-		s,
+		s.GetStandort().GetLockSmith(),
+		s.GetStandort(),
 		s,
 		objekte_store.CreateOrUpdateDelegate{
 			New:       s.onNew,
@@ -213,7 +213,7 @@ func (s *Store) Kasten() *kastenStore {
 }
 
 func (s Store) Flush() (err error) {
-	if !s.GetLockSmith().IsAcquired() {
+	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
 			Operation: "flush",
 		}
@@ -429,7 +429,7 @@ func (s *Store) AddMatchable(m matcher.Matchable) (err error) {
 
 // TODO-P2 add support for quiet reindexing
 func (s *Store) Reindex() (err error) {
-	if !s.GetLockSmith().IsAcquired() {
+	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
 			Operation: "reindex",
 		}

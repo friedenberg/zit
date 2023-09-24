@@ -6,12 +6,12 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/kilo/zettel"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 type ErrAkteExists struct {
 	Akte sha.Sha
-	zettel.MutableSet
+	sku.TransactedMutableSet
 }
 
 func (e ErrAkteExists) Is(target error) bool {
@@ -23,7 +23,7 @@ func (e ErrAkteExists) Error() string {
 	return fmt.Sprintf(
 		"zettelen already exist with akte:\n%s\n%v",
 		e.Akte,
-		e.MutableSet,
+		e.TransactedMutableSet,
 	)
 }
 

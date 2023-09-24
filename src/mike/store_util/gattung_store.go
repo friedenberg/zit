@@ -44,15 +44,13 @@ func MakeCommonStore[
 		panic("delegate was nil")
 	}
 
-	of := sa.ObjekteReaderWriterFactory(gg)
-
 	csb, err := MakeCommonStoreBase[O, OPtr](
 		gg,
 		delegate,
 		sa,
 		tr,
 		objekte_format.FormatForVersion(
-			sa.GetStoreVersion(),
+			sa.GetStandort().GetKonfig().GetStoreVersion(),
 		),
 		akteFormat,
 	)
@@ -68,8 +66,7 @@ func MakeCommonStore[
 		CommonStoreBase: *csb,
 		AkteFormat:      akteFormat,
 		StoredParseSaver: objekte_store.MakeStoredParseSaver[O, OPtr](
-			of,
-			sa,
+			sa.GetStandort(),
 			akteFormat,
 			sa.GetPersistentMetadateiFormat(),
 			objekte_format.Options{IncludeTai: true},
@@ -82,7 +79,7 @@ func MakeCommonStore[
 func (s *CommonStore[O, OPtr]) UpdateManyMetadatei(
 	incoming sku.TransactedSet,
 ) (err error) {
-	if !s.StoreUtil.GetLockSmith().IsAcquired() {
+	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
 			Operation: "update many metadatei",
 		}

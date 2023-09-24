@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/charlie/tridex"
+	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/india/matcher"
 )
@@ -37,9 +38,9 @@ type indexAbbrEncodableTridexes struct {
 }
 
 type indexAbbr struct {
-	lock sync.Locker
-	once *sync.Once
-	StoreUtilVerzeichnisse
+	lock     sync.Locker
+	once     *sync.Once
+	standort standort.Standort
 
 	path string
 
@@ -50,14 +51,14 @@ type indexAbbr struct {
 }
 
 func newIndexAbbr(
-	suv StoreUtilVerzeichnisse,
+	standort standort.Standort,
 	p string,
 ) (i *indexAbbr, err error) {
 	i = &indexAbbr{
-		lock:                   &sync.Mutex{},
-		once:                   &sync.Once{},
-		path:                   p,
-		StoreUtilVerzeichnisse: suv,
+		lock:     &sync.Mutex{},
+		once:     &sync.Once{},
+		path:     p,
+		standort: standort,
 		indexAbbrEncodableTridexes: indexAbbrEncodableTridexes{
 			Shas: indexNotHinweis[sha.Sha, *sha.Sha]{
 				Kennungen: tridex.Make(),
@@ -98,7 +99,7 @@ func (i *indexAbbr) Flush() (err error) {
 
 	var w1 io.WriteCloser
 
-	if w1, err = i.WriteCloserVerzeichnisse(i.path); err != nil {
+	if w1, err = i.standort.WriteCloserVerzeichnisse(i.path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -132,7 +133,7 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 
 			var r1 io.ReadCloser
 
-			if r1, err = i.ReadCloserVerzeichnisse(i.path); err != nil {
+			if r1, err = i.standort.ReadCloserVerzeichnisse(i.path); err != nil {
 				if errors.IsNotExist(err) {
 					err = nil
 				} else {

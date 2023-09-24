@@ -72,7 +72,7 @@ func (c CatObjekte) akten(
 			func(sb sha.Sha) (err error) {
 				var r io.ReadCloser
 
-				if r, err = u.StoreObjekten().AkteReader(sb); err != nil {
+				if r, err = u.Standort().AkteReader(sb); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

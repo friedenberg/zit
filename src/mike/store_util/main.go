@@ -1,43 +1,28 @@
 package store_util
 
 import (
-	"bytes"
-	"io/ioutil"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/id"
-	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/delta/typ_akte"
-	"github.com/friedenberg/zit/src/echo/age_io"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/kilo/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/kilo/konfig"
 	"github.com/friedenberg/zit/src/lima/cwd"
+	"github.com/friedenberg/zit/src/mike/bestandsaufnahme"
 )
-
-type StoreUtilVerzeichnisse interface {
-	GetStoreVersion() schnittstellen.StoreVersion
-	standort.Getter
-	konfig.Getter
-	schnittstellen.VerzeichnisseFactory
-}
 
 type StoreUtil interface {
 	FlushBestandsaufnahme() error
 	errors.Flusher
-	StoreUtilVerzeichnisse
-	schnittstellen.LockSmithGetter
+	standort.Getter
+	konfig.Getter
 	konfig.PtrGetter
-	schnittstellen.AkteIOFactory
 	kennung.Clock
 
 	ExternalReader
@@ -55,10 +40,6 @@ type StoreUtil interface {
 	objekte_format.Getter
 
 	SetCheckedOutLogWriter(zelw schnittstellen.FuncIter[*sku.CheckedOut])
-
-	ObjekteReaderWriterFactory(
-		schnittstellen.GattungGetter,
-	) schnittstellen.ObjekteIOFactory
 
 	CheckoutQuery(
 		options CheckoutOptions,
@@ -87,8 +68,6 @@ type StoreUtil interface {
 
 // TODO-P3 move to own package
 type common struct {
-	LockSmith                 schnittstellen.LockSmith
-	Age                       age.Age
 	konfig                    *konfig.Compiled
 	standort                  standort.Standort
 	bestandsaufnahmeAkte      bestandsaufnahme.Akte
@@ -109,16 +88,12 @@ type common struct {
 }
 
 func MakeStoreUtil(
-	lockSmith schnittstellen.LockSmith,
-	a age.Age,
 	k *konfig.Compiled,
 	st standort.Standort,
 	pmf objekte_format.Format,
 	t kennung.Time,
 ) (c *common, err error) {
 	c = &common{
-		LockSmith:                 lockSmith,
-		Age:                       a,
 		konfig:                    k,
 		standort:                  st,
 		persistentMetadateiFormat: pmf,
@@ -126,12 +101,12 @@ func MakeStoreUtil(
 	}
 
 	c.metadateiTextParser = metadatei.MakeTextParser(
-		c,
+		c.standort,
 		nil, // TODO-P1 make akteFormatter
 	)
 
 	c.typenIndex = kennung_index.MakeIndex2[kennung.Typ](
-		c,
+		c.standort,
 		st.DirVerzeichnisse("TypenIndexV0"),
 	)
 
@@ -140,7 +115,7 @@ func MakeStoreUtil(
 	}
 
 	if c.Abbr, err = newIndexAbbr(
-		c,
+		c.standort,
 		st.DirVerzeichnisse("Abbr"),
 	); err != nil {
 		err = errors.Wrapf(err, "failed to init abbr index")
@@ -149,11 +124,11 @@ func MakeStoreUtil(
 
 	if c.bestandsaufnahmeStore, err = bestandsaufnahme.MakeStore(
 		c.GetStandort(),
-		c.GetLockSmith(),
+		c.GetStandort().GetLockSmith(),
 		c.konfig.GetStoreVersion(),
-		c,
-		c.ObjekteReaderWriterFactory(gattung.Bestandsaufnahme),
-		c,
+		c.standort,
+		c.standort.ObjekteReaderWriterFactory(gattung.Bestandsaufnahme),
+		c.standort,
 		pmf,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -163,7 +138,7 @@ func MakeStoreUtil(
 	if c.kennungIndex, err = kennung_index.MakeIndex(
 		c.GetKonfig(),
 		c.GetStandort(),
-		c,
+		c.GetStandort(),
 	); err != nil {
 		err = errors.Wrapf(err, "failed to init zettel index")
 		return
@@ -176,14 +151,6 @@ func (s *common) SetCheckedOutLogWriter(
 	zelw schnittstellen.FuncIter[*sku.CheckedOut],
 ) {
 	s.checkedOutLogPrinter = zelw
-}
-
-func (s common) GetStoreVersion() schnittstellen.StoreVersion {
-	return s.konfig.StoreVersion
-}
-
-func (s common) GetLockSmith() schnittstellen.LockSmith {
-	return s.LockSmith
 }
 
 func (s common) GetPersistentMetadateiFormat() objekte_format.Format {
@@ -253,171 +220,4 @@ func (s common) GetKonfigPtr() *konfig.Compiled {
 
 func (s *common) SetMatchableAdder(ma matcher.MatchableAdder) {
 	s.MatchableAdder = ma
-}
-
-func (s common) objekteReader(
-	g schnittstellen.GattungGetter,
-	sh sha.ShaLike,
-) (rc sha.ReadCloser, err error) {
-	var p string
-
-	if p, err = s.GetStandort().DirObjektenGattung(
-		s.konfig.GetStoreVersion(),
-		g,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	o := age_io.FileReadOptions{
-		Age:             s.Age,
-		Path:            id.Path(sh.GetShaLike(), p),
-		CompressionType: s.GetKonfig().CompressionType,
-	}
-
-	if rc, err = age_io.NewFileReader(o); err != nil {
-		err = errors.Wrapf(err, "Gattung: %s", g.GetGattung())
-		err = errors.Wrapf(err, "Sha: %s", sh.GetShaLike())
-		return
-	}
-
-	return
-}
-
-func (s common) objekteWriter(
-	g schnittstellen.GattungGetter,
-) (wc sha.WriteCloser, err error) {
-	var p string
-
-	if p, err = s.GetStandort().DirObjektenGattung(
-		s.konfig.GetStoreVersion(),
-		g,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	o := age_io.MoveOptions{
-		Age:                      s.Age,
-		FinalPath:                p,
-		GenerateFinalPathFromSha: true,
-		LockFile:                 s.GetKonfig().LockInternalFiles,
-		CompressionType:          s.GetKonfig().CompressionType,
-	}
-
-	if wc, err = age_io.NewMover(s.GetStandort(), o); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s common) ReadCloserObjekten(p string) (sha.ReadCloser, error) {
-	o := age_io.FileReadOptions{
-		Age:             s.Age,
-		Path:            p,
-		CompressionType: s.GetKonfig().CompressionType,
-	}
-
-	return age_io.NewFileReader(o)
-}
-
-func (s common) ReadCloserVerzeichnisse(p string) (sha.ReadCloser, error) {
-	o := age_io.FileReadOptions{
-		Age:             s.Age,
-		Path:            p,
-		CompressionType: s.GetKonfig().CompressionType,
-	}
-
-	return age_io.NewFileReader(o)
-}
-
-func (s common) WriteCloserObjekten(p string) (w sha.WriteCloser, err error) {
-	return age_io.NewMover(
-		s.GetStandort(),
-		age_io.MoveOptions{
-			Age:             s.Age,
-			FinalPath:       p,
-			LockFile:        s.GetKonfig().LockInternalFiles,
-			CompressionType: s.GetKonfig().CompressionType,
-		},
-	)
-}
-
-func (s common) WriteCloserVerzeichnisse(
-	p string,
-) (w sha.WriteCloser, err error) {
-	return age_io.NewMover(
-		s.GetStandort(),
-		age_io.MoveOptions{
-			Age:             s.Age,
-			FinalPath:       p,
-			LockFile:        false,
-			CompressionType: s.GetKonfig().CompressionType,
-		},
-	)
-}
-
-func (s common) AkteWriter() (w sha.WriteCloser, err error) {
-	var outer age_io.Writer
-
-	var p string
-
-	if p, err = s.standort.DirObjektenGattung(
-		s.konfig.GetStoreVersion(),
-		gattung.Akte,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	mo := age_io.MoveOptions{
-		Age:                      s.Age,
-		FinalPath:                p,
-		GenerateFinalPathFromSha: true,
-		LockFile:                 s.GetKonfig().LockInternalFiles,
-		CompressionType:          s.GetKonfig().CompressionType,
-	}
-
-	if outer, err = age_io.NewMover(s.GetStandort(), mo); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	w = outer
-
-	return
-}
-
-func (s common) AkteReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
-	if sh.GetShaLike().IsNull() {
-		r = sha.MakeNopReadCloser(ioutil.NopCloser(bytes.NewReader(nil)))
-		return
-	}
-
-	var p string
-
-	if p, err = s.standort.DirObjektenGattung(
-		s.konfig.GetStoreVersion(),
-		gattung.Akte,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	p = id.Path(sh.GetShaLike(), p)
-
-	o := age_io.FileReadOptions{
-		Age:             s.Age,
-		Path:            p,
-		CompressionType: s.GetKonfig().CompressionType,
-	}
-
-	if r, err = age_io.NewFileReader(o); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }

@@ -101,11 +101,11 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	f := metadatei.TextFormat{
 		TextFormatter: metadatei.MakeTextFormatterMetadateiInlineAkte(
-			u.StoreObjekten(),
+			u.Standort(),
 			nil,
 		),
 		TextParser: metadatei.MakeTextParser(
-			u.StoreObjekten(),
+			u.Standort(),
 			nil,
 		),
 	}
@@ -131,7 +131,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			if cwdFiles, err = cwd.MakeCwdFilesAll(
 				u.Konfig(),
 				u.Standort().Cwd(),
-				u.StoreObjekten(),
+				u.Standort(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -216,7 +216,7 @@ func (c New) writeNewZettels(
 	if cwdFiles, err = cwd.MakeCwdFilesAll(
 		u.Konfig(),
 		u.Standort().Cwd(),
-		u.StoreObjekten(),
+		u.Standort(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -264,7 +264,7 @@ func (c New) editZettels(
 	if cwdFiles, err = cwd.MakeCwdFilesExactly(
 		u.Konfig(),
 		u.Standort().Cwd(),
-		u.StoreObjekten(),
+		u.Standort(),
 		filesZettelen...,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -299,7 +299,7 @@ func (c New) editZettels(
 	if cwdFiles, err = cwd.MakeCwdFilesExactly(
 		u.Konfig(),
 		u.Standort().Cwd(),
-		u.StoreObjekten(),
+		u.Standort(),
 		filesZettelen...,
 	); err != nil {
 		err = errors.Wrap(err)

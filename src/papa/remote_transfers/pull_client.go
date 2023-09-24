@@ -234,7 +234,7 @@ func (c client) AkteReader(
 
 	var ow sha.WriteCloser
 
-	if ow, err = c.umwelt.StoreObjekten().AkteWriter(); err != nil {
+	if ow, err = c.umwelt.Standort().AkteWriter(); err != nil {
 		if c.stage.ShouldIgnoreConnectionError(err) {
 			err = nil
 		} else {

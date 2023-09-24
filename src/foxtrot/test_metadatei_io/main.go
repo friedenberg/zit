@@ -7,7 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/echo/age_io"
+	"github.com/friedenberg/zit/src/delta/standort"
 )
 
 type AkteIOFactory struct {
@@ -38,11 +38,11 @@ func (aw AkteIOFactory) AkteReader(
 
 func (aw *AkteIOFactory) AkteWriter() (sha.WriteCloser, error) {
 	aw.currentBuffer = bytes.NewBuffer(nil)
-	wo := age_io.WriteOptions{
+	wo := standort.WriteOptions{
 		Writer: aw.currentBuffer,
 	}
 
-	return age_io.NewWriter(wo)
+	return standort.NewWriter(wo)
 }
 
 func (aw AkteIOFactory) CurrentBufferString() string {

@@ -36,9 +36,11 @@ func makeKastenStore(
 		sa,
 		s,
 		objekte_store.MakeAkteFormat[kasten_akte.V0, *kasten_akte.V0](
-			objekte.MakeTextParserIgnoreTomlErrors[kasten_akte.V0](sa),
+			objekte.MakeTextParserIgnoreTomlErrors[kasten_akte.V0](
+				sa.GetStandort(),
+			),
 			objekte.ParsedAkteTomlFormatter[kasten_akte.V0]{},
-			sa,
+			sa.GetStandort(),
 		),
 	)
 
@@ -60,8 +62,8 @@ func makeKastenStore(
 
 	s.CommonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
 		sa,
-		sa.GetLockSmith(),
-		sa,
+		sa.GetStandort().GetLockSmith(),
+		sa.GetStandort(),
 		KastenTransactedReader(s),
 		objekte_store.CreateOrUpdateDelegate{
 			New: func(t *sku.Transacted) (err error) {

@@ -2,12 +2,12 @@ package store_util
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/kilo/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
+	"github.com/friedenberg/zit/src/mike/bestandsaufnahme"
 )
 
 func (s *common) FlushBestandsaufnahme() (err error) {
-	if !s.GetLockSmith().IsAcquired() {
+	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
 			Operation: "flush",
 		}

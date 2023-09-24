@@ -1,20 +1,34 @@
 package standort
 
 import (
+	"encoding/gob"
 	"os"
 	"path/filepath"
 
+	"github.com/friedenberg/zit/src/alfa/angeboren"
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/charlie/age"
+	"github.com/friedenberg/zit/src/charlie/file_lock"
 )
 
-type Standort struct {
-	cwd      string
-	basePath string
-	execPath string
+type Getter interface {
+	GetStandort() Standort
 }
 
-func Make(o Options) (s Standort, err error) {
+type Standort struct {
+	cwd       string
+	basePath  string
+	execPath  string
+	lockSmith schnittstellen.LockSmith
+	age       *age.Age
+	angeboren angeboren.Konfig
+}
+
+func Make(
+	o Options,
+) (s Standort, err error) {
 	errors.TodoP3("add 'touched' which can get deleted / cleaned")
 	if err = o.Validate(); err != nil {
 		err = errors.Wrap(err)
@@ -29,12 +43,65 @@ func Make(o Options) (s Standort, err error) {
 		return
 	}
 
+	s.lockSmith = file_lock.New(s.DirZit("Lock"))
+
 	if s.execPath, err = os.Executable(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
+	{
+		fa := s.FileAge()
+
+		if files.Exists(fa) {
+			if s.age, err = age.MakeFromIdentityFile(fa); err != nil {
+				errors.Wrap(err)
+				return
+			}
+		} else {
+			s.age = &age.Age{}
+		}
+	}
+
+	if err = s.loadKonfigAngeboren(); err != nil {
+		errors.Wrap(err)
+		return
+	}
+
 	return
+}
+
+func (s Standort) GetKonfig() angeboren.Konfig {
+	return s.angeboren
+}
+
+func (s *Standort) loadKonfigAngeboren() (err error) {
+	var f *os.File
+
+	if f, err = files.OpenExclusiveReadOnly(s.FileKonfigAngeboren()); err != nil {
+		if errors.IsNotExist(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	defer errors.Deferred(&err, f.Close)
+
+	dec := gob.NewDecoder(f)
+
+	if err = dec.Decode(&s.angeboren); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s Standort) GetLockSmith() schnittstellen.LockSmith {
+	return s.lockSmith
 }
 
 func (s Standort) Cwd() string {

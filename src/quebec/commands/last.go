@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/juliett/objekte"
-	"github.com/friedenberg/zit/src/kilo/bestandsaufnahme"
+	"github.com/friedenberg/zit/src/mike/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
@@ -53,7 +53,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	f = objekteFormatterValue.MakeFormatterObjekte(
 		u.Out(),
-		u.StoreObjekten(),
+		u.Standort(),
 		u.Konfig(),
 		u.PrinterTransactedLike(),
 		u.StringFormatWriterSkuLikePtrShort(),

@@ -78,7 +78,7 @@ func (op PullServer) akteReaderForSha(
 
 	var or io.ReadCloser
 
-	if or, err = op.umwelt.StoreObjekten().AkteReader(sh); err != nil {
+	if or, err = op.umwelt.Standort().AkteReader(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -113,7 +113,7 @@ func (op PullServer) objekteReaderForSku(
 
 	errors.Log().Printf("received request: %#v", msg)
 
-	orf := op.umwelt.StoreObjekten().ObjekteReaderWriterFactory(msg.Gattung)
+	orf := op.umwelt.Standort().ObjekteReaderWriterFactory(msg.Gattung)
 
 	var or io.ReadCloser
 

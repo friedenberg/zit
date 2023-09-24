@@ -32,9 +32,11 @@ func makeKonfigStore(
 ) (s *konfigStore, err error) {
 	s = &konfigStore{
 		akteFormat: objekte_store.MakeAkteFormat[erworben.Akte, *erworben.Akte](
-			objekte.MakeTextParserIgnoreTomlErrors[erworben.Akte](sa),
+			objekte.MakeTextParserIgnoreTomlErrors[erworben.Akte](
+				sa.GetStandort(),
+			),
 			objekte.ParsedAkteTomlFormatter[erworben.Akte]{},
-			sa,
+			sa.GetStandort(),
 		),
 	}
 
@@ -74,7 +76,7 @@ func (s konfigStore) UpdateOne(t *erworben.Transacted) (err error) {
 func (s konfigStore) Update(
 	sh schnittstellen.ShaLike,
 ) (kt *erworben.Transacted, err error) {
-	if !s.StoreUtil.GetLockSmith().IsAcquired() {
+	if !s.StoreUtil.GetStandort().GetLockSmith().IsAcquired() {
 		err = errors.Wrap(
 			objekte_store.ErrLockRequired{Operation: "update konfig"},
 		)

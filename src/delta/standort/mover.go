@@ -1,4 +1,4 @@
-package age_io
+package standort
 
 import (
 	"os"
@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/standort"
 )
 
 type Mover struct {
@@ -21,7 +20,7 @@ type Mover struct {
 	errorOnAttemptedOverwrite bool
 }
 
-func NewMover(s standort.Standort, o MoveOptions) (m *Mover, err error) {
+func (s Standort) NewMover(o MoveOptions) (m *Mover, err error) {
 	m = &Mover{
 		lockFile:                  o.LockFile,
 		errorOnAttemptedOverwrite: o.ErrorOnAttemptedOverwrite,

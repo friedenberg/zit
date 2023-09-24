@@ -184,7 +184,7 @@ func (c *ZettelFromExternalAkte) zettelForAkte(
 
 	var akteWriter sha.WriteCloser
 
-	if akteWriter, err = c.StoreObjekten().AkteWriter(); err != nil {
+	if akteWriter, err = c.Standort().AkteWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

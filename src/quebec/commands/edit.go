@@ -136,7 +136,7 @@ func (c Edit) RunWithCwdQuery(
 	if cwdFiles, err = cwd.MakeCwdFilesExactly(
 		u.Konfig(),
 		u.Standort().Cwd(),
-		u.StoreObjekten(),
+		u.Standort(),
 		filez...,
 	); err != nil {
 		err = errors.Wrap(err)

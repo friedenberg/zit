@@ -85,7 +85,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	for i, p := range pairs {
 		var ow sha.WriteCloser
 
-		if ow, err = u.StoreObjekten().AkteWriter(); err != nil {
+		if ow, err = u.Standort().AkteWriter(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

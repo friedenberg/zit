@@ -70,7 +70,7 @@ func makeZettelStore(
 	if s.verzeichnisseAll, err = store_verzeichnisse.MakeZettelen(
 		s.StoreUtil.GetKonfig(),
 		s.StoreUtil.GetStandort().DirVerzeichnisseZettelenNeue(),
-		s.StoreUtil,
+		s.GetStandort(),
 		p,
 		nil,
 	); err != nil {
@@ -108,7 +108,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 ) (err error) {
 	errors.Log().Print("writing to index")
 
-	if !s.StoreUtil.GetLockSmith().IsAcquired() {
+	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
 			Operation: "write named zettel to index",
 		}
@@ -185,7 +185,7 @@ func (i *zettelStore) ReadAll(
 func (s *zettelStore) Create(
 	mg metadatei.Getter,
 ) (tz *sku.Transacted, err error) {
-	if !s.StoreUtil.GetLockSmith().IsAcquired() {
+	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
 			Operation: "create",
 		}
@@ -239,7 +239,7 @@ func (s *zettelStore) Create(
 func (s *zettelStore) UpdateManyMetadatei(
 	incoming sku.TransactedSet,
 ) (err error) {
-	if !s.StoreUtil.GetLockSmith().IsAcquired() {
+	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
 			Operation: "update many metadatei",
 		}
@@ -306,7 +306,7 @@ func (s *zettelStore) UpdateCheckedOut(
 ) (t *sku.Transacted, err error) {
 	errors.TodoP2("support dry run")
 
-	if !s.StoreUtil.GetLockSmith().IsAcquired() {
+	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
 			Operation: "update",
 		}
@@ -363,7 +363,7 @@ func (s *zettelStore) Update(
 		return
 	}
 
-	if !s.StoreUtil.GetLockSmith().IsAcquired() {
+	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
 			Operation: "update",
 		}

@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/age"
-	"github.com/friedenberg/zit/src/charlie/file_lock"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/pool"
 	"github.com/friedenberg/zit/src/delta/gattungen"
@@ -42,7 +41,6 @@ type Umwelt struct {
 	konfig      konfig.Compiled
 
 	storesInitialized bool
-	lock              *file_lock.Lock
 	storeUtil         store_util.StoreUtil
 	storeObjekten     *store_objekten.Store
 	age               *age.Age
@@ -128,19 +126,6 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	}
 
 	{
-		fa := u.standort.FileAge()
-
-		if files.Exists(fa) {
-			if u.age, err = age.MakeFromIdentityFile(fa); err != nil {
-				errors.Wrap(err)
-				return
-			}
-		} else {
-			u.age = &age.Age{}
-		}
-	}
-
-	{
 		var k *konfig.Compiled
 
 		if k, err = konfig.Make(
@@ -159,7 +144,6 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	}
 
 	u.konfig.ApplyPrintOptionsKonfig(u.konfig.Akte.PrintOptions)
-	u.lock = file_lock.New(u.standort.DirZit("Lock"))
 
 	// for _, rb := range u.konfig.Transacted.Objekte.Akte.Recipients {
 	// 	if err = u.age.AddBech32PivYubikeyEC256(rb); err != nil {
@@ -171,8 +155,6 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	log.Log().Printf("store version: %s", u.Konfig().GetStoreVersion())
 
 	if u.storeUtil, err = store_util.MakeStoreUtil(
-		u.lock,
-		*u.age,
 		u.KonfigPtr(),
 		u.standort,
 		objekte_format.FormatForVersion(u.Konfig().GetStoreVersion()),

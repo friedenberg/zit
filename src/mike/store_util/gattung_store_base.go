@@ -61,7 +61,7 @@ func MakeCommonStoreBase[
 			O,
 			OPtr,
 		](
-			sa,
+			sa.GetStandort(),
 			akteFormat,
 		),
 		TransactedReader:          tr,
@@ -111,7 +111,7 @@ func (s *CommonStoreBase[O, OPtr]) GetAkte(
 ) (a OPtr, err error) {
 	var ar schnittstellen.ShaReadCloser
 
-	if ar, err = s.StoreUtil.AkteReader(sh); err != nil {
+	if ar, err = s.StoreUtil.GetStandort().AkteReader(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

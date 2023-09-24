@@ -58,7 +58,7 @@ func (c Show) runGenericObjekteFormatterValue(
 	f := iter.MakeSyncSerializer(
 		objekteFormatterValue.MakeFormatterObjekte(
 			u.Out(),
-			u.StoreObjekten(),
+			u.Standort(),
 			u.Konfig(),
 			u.PrinterTransactedLike(),
 			u.StringFormatWriterSkuLikePtrShort(),
@@ -88,7 +88,7 @@ func (c Show) RunWithQuery(u *umwelt.Umwelt, ms matcher.Query) (err error) {
 		ms,
 		c.Format,
 		u.Out(),
-		u.StoreObjekten(),
+		u.Standort(),
 		u.Konfig(),
 		u.StoreObjekten().Typ(),
 	); err != nil {

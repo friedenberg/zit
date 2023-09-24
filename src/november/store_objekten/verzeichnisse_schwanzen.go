@@ -36,7 +36,7 @@ func makeVerzeichnisseSchwanzen(
 	s.Zettelen, err = store_verzeichnisse.MakeZettelen(
 		s.su.GetKonfig(),
 		s.su.GetStandort().DirVerzeichnisseZettelenNeueSchwanzen(),
-		s.su,
+		sa.GetStandort(),
 		p,
 		s,
 	)

@@ -102,7 +102,7 @@ func (s *common) ReadOneExternalAkte(
 
 	var aw sha.WriteCloser
 
-	if aw, err = s.AkteWriter(); err != nil {
+	if aw, err = s.standort.AkteWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

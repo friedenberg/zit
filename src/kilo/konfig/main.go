@@ -114,10 +114,7 @@ func Make(
 
 	c.Reset()
 
-	if err = c.loadKonfigAngeboren(s); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	c.angeboren = s.GetKonfig()
 
 	if err = c.loadKonfigErworben(s); err != nil {
 		if errors.IsNotExist(err) {
@@ -126,31 +123,6 @@ func Make(
 			err = errors.Wrap(err)
 		}
 
-		return
-	}
-
-	return
-}
-
-func (kc *Compiled) loadKonfigAngeboren(s standort.Standort) (err error) {
-	var f *os.File
-
-	if f, err = files.OpenExclusiveReadOnly(s.FileKonfigAngeboren()); err != nil {
-		if errors.IsNotExist(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-		}
-
-		return
-	}
-
-	defer errors.Deferred(&err, f.Close)
-
-	dec := gob.NewDecoder(f)
-
-	if err = dec.Decode(&kc.angeboren); err != nil {
-		err = errors.Wrap(err)
 		return
 	}
 

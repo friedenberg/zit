@@ -1,16 +1,16 @@
-package store_util
+package standort
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
-func (s common) ObjekteReaderFactory(
+func (s Standort) ObjekteReaderFactory(
 	g schnittstellen.GattungGetter,
 ) schnittstellen.ObjekteReaderFactory {
 	return s.ObjekteReaderWriterFactory(g)
 }
 
-func (s common) ObjekteReaderWriterFactory(
+func (s Standort) ObjekteReaderWriterFactory(
 	g schnittstellen.GattungGetter,
 ) schnittstellen.ObjekteIOFactory {
 	return schnittstellen.MakeBespokeObjekteReadWriterFactory(

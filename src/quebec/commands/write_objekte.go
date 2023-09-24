@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/echo/age_io"
+	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
@@ -54,7 +54,7 @@ func (c WriteObjekte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			chCancel,
 			chError,
 			wg,
-			u.StoreObjekten(),
+			u.Standort(),
 			a,
 		)
 	}
@@ -109,7 +109,7 @@ func (c WriteObjekte) doOne(
 
 	defer errors.DeferredChan(chError, rc.Close)
 
-	var wc age_io.Writer
+	var wc standort.Writer
 
 	if wc, err = arf.AkteWriter(); err != nil {
 		err = errors.Wrap(err)

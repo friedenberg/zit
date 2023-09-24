@@ -35,7 +35,6 @@ func MakeStoredParseSaver[
 	O schnittstellen.Akte[O],
 	OPtr schnittstellen.AktePtr[O],
 ](
-	owf schnittstellen.ObjekteIOFactory,
 	awf schnittstellen.AkteIOFactory,
 	akteParser objekte.AkteParser[OPtr],
 	pmf objekte_format.Format,

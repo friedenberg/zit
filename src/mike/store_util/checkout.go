@@ -251,7 +251,7 @@ func (s *common) CheckoutOne(
 		cz.External.GetFDsPtr().Akte.Path = originalFilename + "." + fe
 	}
 
-	e := objekte_collections.MakeFileEncoder(s, s.GetKonfig())
+	e := objekte_collections.MakeFileEncoder(s.standort, s.GetKonfig())
 
 	if err = e.Encode(&cz.External); err != nil {
 		err = errors.Wrap(err)

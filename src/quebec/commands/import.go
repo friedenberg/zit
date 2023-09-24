@@ -9,14 +9,14 @@ import (
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/echo/age_io"
+	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/sku_fmt"
-	"github.com/friedenberg/zit/src/kilo/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/kilo/zettel"
+	"github.com/friedenberg/zit/src/mike/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
 )
@@ -76,13 +76,13 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	// setup besty reader
 	{
-		o := age_io.FileReadOptions{
+		o := standort.FileReadOptions{
 			Age:             *ag,
 			Path:            c.Bestandsaufnahme,
 			CompressionType: c.CompressionType,
 		}
 
-		if rc, err = age_io.NewFileReader(o); err != nil {
+		if rc, err = standort.NewFileReader(o); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -164,7 +164,7 @@ func (c Import) importAkteIfNecessary(
 
 	p := id.Path(akteSha, c.Akten)
 
-	o := age_io.FileReadOptions{
+	o := standort.FileReadOptions{
 		Age:             *ag,
 		Path:            p,
 		CompressionType: c.CompressionType,
@@ -172,7 +172,7 @@ func (c Import) importAkteIfNecessary(
 
 	var rc sha.ReadCloser
 
-	if rc, err = age_io.NewFileReader(o); err != nil {
+	if rc, err = standort.NewFileReader(o); err != nil {
 		if errors.IsNotExist(err) {
 			err = errors.TodoRecoverable(
 				"make recoverable: sku missing akte: %s",
@@ -189,7 +189,7 @@ func (c Import) importAkteIfNecessary(
 
 	var aw sha.WriteCloser
 
-	if aw, err = u.StoreObjekten().AkteWriter(); err != nil {
+	if aw, err = u.Standort().AkteWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

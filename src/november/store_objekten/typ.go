@@ -37,9 +37,11 @@ func makeTypStore(
 		sa,
 		s,
 		objekte_store.MakeAkteFormat[typ_akte.V0, *typ_akte.V0](
-			objekte.MakeTextParserIgnoreTomlErrors[typ_akte.V0](sa),
+			objekte.MakeTextParserIgnoreTomlErrors[typ_akte.V0](
+				sa.GetStandort(),
+			),
 			objekte.ParsedAkteTomlFormatter[typ_akte.V0]{},
-			sa,
+			sa.GetStandort(),
 		),
 	)
 
@@ -61,8 +63,8 @@ func makeTypStore(
 
 	s.CommonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
 		sa,
-		sa.GetLockSmith(),
-		sa,
+		sa.GetStandort().GetLockSmith(),
+		sa.GetStandort(),
 		TypTransactedReader(s),
 		objekte_store.CreateOrUpdateDelegate{
 			New: func(t *sku.Transacted) (err error) {

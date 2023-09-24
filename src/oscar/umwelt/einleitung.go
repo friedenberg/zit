@@ -189,7 +189,7 @@ func writeDefaultErworben(
 
 	var aw sha.WriteCloser
 
-	if aw, err = u.StoreObjekten().AkteWriter(); err != nil {
+	if aw, err = u.Standort().AkteWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

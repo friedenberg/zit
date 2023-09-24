@@ -107,7 +107,7 @@ func (c EditKonfig) editOnlyEtiketten(
 
 	var aw schnittstellen.ShaWriteCloser
 
-	if aw, err = u.StoreObjekten().AkteWriter(); err != nil {
+	if aw, err = u.Standort().AkteWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -207,7 +207,7 @@ func (c EditKonfig) readTempKonfigFile(
 
 	var aw schnittstellen.ShaWriteCloser
 
-	if aw, err = u.StoreObjekten().AkteWriter(); err != nil {
+	if aw, err = u.Standort().AkteWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
