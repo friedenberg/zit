@@ -15,15 +15,15 @@ import (
 	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
-	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/cwd"
 )
 
 func (s *common) CheckoutQuery(
 	options CheckoutOptions,
-	fq objekte.FuncReaderTransactedLikePtr,
+	fq matcher.FuncReaderTransactedLikePtr,
 	f schnittstellen.FuncIter[*sku.CheckedOut],
 ) (err error) {
 	if err = fq(
@@ -62,7 +62,7 @@ func (s *common) CheckoutQuery(
 func (s *common) Checkout(
 	options CheckoutOptions,
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
-	fq objekte.FuncReaderTransactedLikePtr,
+	fq matcher.FuncReaderTransactedLikePtr,
 	ztw schnittstellen.FuncIter[*sku.Transacted],
 ) (zcs schnittstellen.MutableSetLike[*sku.CheckedOut], err error) {
 	zcs = collections_value.MakeMutableValueSet[*sku.CheckedOut](nil)

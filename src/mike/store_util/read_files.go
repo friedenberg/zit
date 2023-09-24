@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/juliett/objekte"
+	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/lima/cwd"
 )
 
@@ -47,7 +47,7 @@ func (s *common) readOneExternal(
 
 func (s *common) ReadFiles(
 	fs *cwd.CwdFiles,
-	fq objekte.FuncReaderTransactedLikePtr,
+	fq matcher.FuncReaderTransactedLikePtr,
 	f schnittstellen.FuncIter[*sku.CheckedOut],
 ) (err error) {
 	if err = fq(

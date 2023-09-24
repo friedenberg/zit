@@ -21,7 +21,6 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
@@ -60,7 +59,7 @@ func (c Diff) RunWithCwdQuery(
 
 	if err = u.StoreObjekten().ReadFiles(
 		cwdFiles,
-		objekte.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().Query),
+		matcher.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().Query),
 		iter.MakeChain(
 			matcher.MakeFilterFromQuery(ms),
 			func(co *sku.CheckedOut) (err error) {

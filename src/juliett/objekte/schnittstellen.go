@@ -5,7 +5,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/india/matcher"
 )
 
@@ -37,10 +36,5 @@ type (
 		ParsedAkteFormatter[T]
 		AkteParser[TPtr]
 		// AkteParseSaver[TPtr]
-	}
-
-	VerzeichnissePtr[T any, T1 schnittstellen.Akte[T1]] interface {
-		schnittstellen.Resetable[T]
-		ResetWithObjekteMetadateiGetter(T1, metadatei.Getter)
 	}
 )

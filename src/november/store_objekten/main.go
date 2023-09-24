@@ -14,7 +14,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/objekte_store"
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
@@ -48,9 +47,9 @@ type Store struct {
 	gattungStores     map[schnittstellen.GattungLike]store_util.GattungStoreLike
 	reindexers        map[schnittstellen.GattungLike]store_util.Reindexer
 	flushers          map[schnittstellen.GattungLike]errors.Flusher
-	readers           map[schnittstellen.GattungLike]objekte.FuncReaderTransactedLikePtr
-	queriers          map[schnittstellen.GattungLike]objekte.FuncSigilTransactedLikePtr
-	transactedReaders map[schnittstellen.GattungLike]objekte.FuncReaderTransactedLikePtr
+	readers           map[schnittstellen.GattungLike]matcher.FuncReaderTransactedLikePtr
+	queriers          map[schnittstellen.GattungLike]matcher.FuncSigilTransactedLikePtr
+	transactedReaders map[schnittstellen.GattungLike]matcher.FuncReaderTransactedLikePtr
 	metadateiUpdaters map[schnittstellen.GattungLike]objekte_store.UpdaterManyMetadatei
 
 	isReindexing bool
@@ -102,7 +101,7 @@ func Make(
 	}
 
 	errors.TodoP1("implement for other gattung")
-	s.queriers = map[schnittstellen.GattungLike]objekte.FuncSigilTransactedLikePtr{
+	s.queriers = map[schnittstellen.GattungLike]matcher.FuncSigilTransactedLikePtr{
 		gattung.Zettel:  s.zettelStore.Query,
 		gattung.Typ:     s.typStore.Query,
 		gattung.Etikett: s.etikettStore.Query,
@@ -114,7 +113,7 @@ func Make(
 		// ),
 	}
 
-	s.readers = map[schnittstellen.GattungLike]objekte.FuncReaderTransactedLikePtr{
+	s.readers = map[schnittstellen.GattungLike]matcher.FuncReaderTransactedLikePtr{
 		gattung.Zettel:  s.zettelStore.ReadAllSchwanzen,
 		gattung.Typ:     s.typStore.ReadAllSchwanzen,
 		gattung.Etikett: s.etikettStore.ReadAllSchwanzen,
@@ -126,7 +125,7 @@ func Make(
 		// ),
 	}
 
-	s.transactedReaders = map[schnittstellen.GattungLike]objekte.FuncReaderTransactedLikePtr{
+	s.transactedReaders = map[schnittstellen.GattungLike]matcher.FuncReaderTransactedLikePtr{
 		gattung.Zettel:  s.zettelStore.ReadAll,
 		gattung.Typ:     s.typStore.ReadAll,
 		gattung.Etikett: s.etikettStore.ReadAll,

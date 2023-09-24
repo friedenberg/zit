@@ -13,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 	"github.com/friedenberg/zit/src/oscar/user_ops"
@@ -59,7 +58,7 @@ func (c Clean) RunWithCwdQuery(
 
 	if err = s.StoreObjekten().ReadFiles(
 		possible,
-		objekte.MakeFuncReaderTransactedLikePtr(ms, s.StoreObjekten().Query),
+		matcher.MakeFuncReaderTransactedLikePtr(ms, s.StoreObjekten().Query),
 		iter.MakeChain(
 			matcher.MakeFilterFromQuery(ms),
 			func(co *sku.CheckedOut) (err error) {

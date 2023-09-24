@@ -19,7 +19,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/kilo/konfig"
 	"github.com/friedenberg/zit/src/lima/cwd"
@@ -63,20 +62,20 @@ type StoreUtil interface {
 
 	CheckoutQuery(
 		options CheckoutOptions,
-		fq objekte.FuncReaderTransactedLikePtr,
+		fq matcher.FuncReaderTransactedLikePtr,
 		f schnittstellen.FuncIter[*sku.CheckedOut],
 	) (err error)
 
 	Checkout(
 		options CheckoutOptions,
 		tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
-		fq objekte.FuncReaderTransactedLikePtr,
+		fq matcher.FuncReaderTransactedLikePtr,
 		ztw schnittstellen.FuncIter[*sku.Transacted],
 	) (zcs schnittstellen.MutableSetLike[*sku.CheckedOut], err error)
 
 	ReadFiles(
 		fs *cwd.CwdFiles,
-		fq objekte.FuncReaderTransactedLikePtr,
+		fq matcher.FuncReaderTransactedLikePtr,
 		f schnittstellen.FuncIter[*sku.CheckedOut],
 	) (err error)
 

@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/checked_out"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
 	"github.com/friedenberg/zit/src/kilo/zettel"
@@ -297,9 +296,8 @@ func (s *zettelStore) UpdateManyMetadatei(
 }
 
 func (s *zettelStore) updateExternal(
-	co objekte.ExternalLike,
+	ze *sku.External,
 ) (tl *sku.Transacted, err error) {
-	ze := co.(*sku.External)
 	return s.Update(ze.GetMetadatei(), &ze.Kennung)
 }
 
