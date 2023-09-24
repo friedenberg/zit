@@ -14,7 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
-	"github.com/friedenberg/zit/src/oscar/user_ops"
+	"github.com/friedenberg/zit/src/papa/user_ops"
 )
 
 type EditKonfig struct {

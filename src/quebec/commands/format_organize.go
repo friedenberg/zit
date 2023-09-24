@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
-	"github.com/friedenberg/zit/src/oscar/user_ops"
+	"github.com/friedenberg/zit/src/papa/user_ops"
 )
 
 type FormatOrganize struct {

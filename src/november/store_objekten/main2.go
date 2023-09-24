@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/lima/objekte_store"
+	"github.com/friedenberg/zit/src/kilo/objekte_store"
 )
 
 func (s *Store) onNewOrUpdated(

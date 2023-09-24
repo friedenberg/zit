@@ -7,7 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/lima/cwd"
+	"github.com/friedenberg/zit/src/kilo/cwd"
 )
 
 func (s *common) readOneExternal(

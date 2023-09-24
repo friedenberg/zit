@@ -4,8 +4,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/oscar/remote_conn"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
+	"github.com/friedenberg/zit/src/papa/remote_conn"
 )
 
 type Server struct {

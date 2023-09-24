@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
-	"github.com/friedenberg/zit/src/lima/cwd"
+	"github.com/friedenberg/zit/src/kilo/cwd"
 )
 
 type CheckoutOptions struct {

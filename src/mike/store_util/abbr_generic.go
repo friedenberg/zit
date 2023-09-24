@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/lima/objekte_store"
+	"github.com/friedenberg/zit/src/kilo/objekte_store"
 )
 
 type AbbrStorePresenceGeneric[V any] interface {

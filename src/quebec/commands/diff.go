@@ -21,7 +21,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/lima/cwd"
+	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 

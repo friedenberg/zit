@@ -17,8 +17,8 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
+	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/lima/cwd"
 )
 
 func (s *common) CheckoutQuery(

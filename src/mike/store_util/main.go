@@ -13,8 +13,8 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/juliett/konfig"
-	"github.com/friedenberg/zit/src/lima/cwd"
-	"github.com/friedenberg/zit/src/mike/bestandsaufnahme"
+	"github.com/friedenberg/zit/src/kilo/cwd"
+	"github.com/friedenberg/zit/src/lima/bestandsaufnahme"
 )
 
 type StoreUtil interface {

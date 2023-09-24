@@ -2,8 +2,8 @@ package store_util
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/lima/objekte_store"
-	"github.com/friedenberg/zit/src/mike/bestandsaufnahme"
+	"github.com/friedenberg/zit/src/kilo/objekte_store"
+	"github.com/friedenberg/zit/src/lima/bestandsaufnahme"
 )
 
 func (s *common) FlushBestandsaufnahme() (err error) {

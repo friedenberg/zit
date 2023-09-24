@@ -16,11 +16,11 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
+	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/lima/cwd"
 	"github.com/friedenberg/zit/src/mike/store_util"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
-	"github.com/friedenberg/zit/src/oscar/user_ops"
+	"github.com/friedenberg/zit/src/papa/user_ops"
 )
 
 type New struct {

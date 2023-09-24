@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/juliett/objekte"
-	"github.com/friedenberg/zit/src/mike/bestandsaufnahme"
+	"github.com/friedenberg/zit/src/lima/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 

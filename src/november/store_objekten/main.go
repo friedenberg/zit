@@ -14,7 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/lima/objekte_store"
+	"github.com/friedenberg/zit/src/kilo/objekte_store"
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
 

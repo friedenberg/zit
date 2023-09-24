@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/oscar/remote_conn"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
+	"github.com/friedenberg/zit/src/papa/remote_conn"
 	"github.com/friedenberg/zit/src/papa/remote_transfers"
 )
 
