@@ -4,7 +4,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/delta/etikett_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -15,10 +14,7 @@ import (
 type EtikettTransactedReader = objekte_store.TransactedReader
 
 type etikettStore struct {
-	*store_util.CommonStore[
-		etikett_akte.V0,
-		*etikett_akte.V0,
-	]
+	*store_util.CommonStore
 }
 
 func makeEtikettStore(
@@ -26,10 +22,7 @@ func makeEtikettStore(
 ) (s *etikettStore, err error) {
 	s = &etikettStore{}
 
-	s.CommonStore, err = store_util.MakeCommonStore[
-		etikett_akte.V0,
-		*etikett_akte.V0,
-	](
+	s.CommonStore, err = store_util.MakeCommonStore(
 		gattung.Etikett,
 		s,
 		sa,

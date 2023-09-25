@@ -19,10 +19,7 @@ import (
 )
 
 type zettelStore struct {
-	*store_util.CommonStore[
-		zettel.Objekte,
-		*zettel.Objekte,
-	]
+	*store_util.CommonStore
 
 	protoZettel zettel.ProtoZettel
 
@@ -41,10 +38,7 @@ func makeZettelStore(
 		tagp:        tagp,
 	}
 
-	s.CommonStore, err = store_util.MakeCommonStore[
-		zettel.Objekte,
-		*zettel.Objekte,
-	](
+	s.CommonStore, err = store_util.MakeCommonStore(
 		gattung.Zettel,
 		s,
 		sa,

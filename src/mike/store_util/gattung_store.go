@@ -19,23 +19,17 @@ type CommonStoreDelegate interface {
 	UpdateOne(*sku.Transacted) error
 }
 
-type CommonStore[
-	O schnittstellen.Akte[O],
-	OPtr schnittstellen.AktePtr[O],
-] struct {
+type CommonStore struct {
 	CommonStoreBase
 	objekte_store.CreateOrUpdater
 }
 
-func MakeCommonStore[
-	O schnittstellen.Akte[O],
-	OPtr schnittstellen.AktePtr[O],
-](
+func MakeCommonStore(
 	gg schnittstellen.GattungGetter,
 	delegate CommonStoreDelegate,
 	sa StoreUtil,
 	tr objekte_store.TransactedReader,
-) (s *CommonStore[O, OPtr], err error) {
+) (s *CommonStore, err error) {
 	if delegate == nil {
 		panic("delegate was nil")
 	}
@@ -54,17 +48,14 @@ func MakeCommonStore[
 		return
 	}
 
-	s = &CommonStore[
-		O,
-		OPtr,
-	]{
+	s = &CommonStore{
 		CommonStoreBase: *csb,
 	}
 
 	return
 }
 
-func (s *CommonStore[O, OPtr]) UpdateManyMetadatei(
+func (s *CommonStore) UpdateManyMetadatei(
 	incoming sku.TransactedSet,
 ) (err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {

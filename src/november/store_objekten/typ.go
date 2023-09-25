@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -16,10 +15,7 @@ import (
 type TypTransactedReader = objekte_store.TransactedReader
 
 type typStore struct {
-	*store_util.CommonStore[
-		typ_akte.V0,
-		*typ_akte.V0,
-	]
+	*store_util.CommonStore
 }
 
 func makeTypStore(
@@ -27,10 +23,7 @@ func makeTypStore(
 ) (s *typStore, err error) {
 	s = &typStore{}
 
-	s.CommonStore, err = store_util.MakeCommonStore[
-		typ_akte.V0,
-		*typ_akte.V0,
-	](
+	s.CommonStore, err = store_util.MakeCommonStore(
 		gattung.Typ,
 		s,
 		sa,

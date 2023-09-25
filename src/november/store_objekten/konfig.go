@@ -15,10 +15,7 @@ import (
 )
 
 type konfigStore struct {
-	*store_util.CommonStore[
-		erworben.Akte,
-		*erworben.Akte,
-	]
+	*store_util.CommonStore
 
 	akteFormat objekte.AkteFormat[erworben.Akte, *erworben.Akte]
 }
@@ -40,10 +37,7 @@ func makeKonfigStore(
 		),
 	}
 
-	s.CommonStore, err = store_util.MakeCommonStore[
-		erworben.Akte,
-		*erworben.Akte,
-	](
+	s.CommonStore, err = store_util.MakeCommonStore(
 		gattung.Konfig,
 		s,
 		sa,
