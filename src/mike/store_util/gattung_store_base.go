@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
 )
 
@@ -14,10 +13,7 @@ type GattungStoreLike interface {
 	Reindexer
 }
 
-type CommonStoreBase[
-	O schnittstellen.Akte[O],
-	OPtr schnittstellen.AktePtr[O],
-] struct {
+type CommonStoreBase struct {
 	schnittstellen.GattungGetter
 	StoreUtil
 
@@ -26,32 +22,23 @@ type CommonStoreBase[
 	objekte_store.TransactedReader
 	objekte_store.LogWriter
 	persistentMetadateiFormat objekte_format.Format
-
-	// objekte_store.AkteTextSaver[O, OPtr]
-	// objekte_store.StoredParseSaver[O, OPtr]
-	akteFormat objekte.AkteFormat[O, OPtr]
 }
 
-func MakeCommonStoreBase[
-	O schnittstellen.Akte[O],
-	OPtr schnittstellen.AktePtr[O],
-](
+func MakeCommonStoreBase(
 	gg schnittstellen.GattungGetter,
 	delegate CommonStoreDelegate,
 	sa StoreUtil,
 	tr objekte_store.TransactedReader,
 	pmf objekte_format.Format,
-	akteFormat objekte.AkteFormat[O, OPtr],
-) (s *CommonStoreBase[O, OPtr], err error) {
+) (s *CommonStoreBase, err error) {
 	if delegate == nil {
 		panic("delegate was nil")
 	}
 
-	s = &CommonStoreBase[O, OPtr]{
+	s = &CommonStoreBase{
 		GattungGetter:             gg,
 		delegate:                  delegate,
 		StoreUtil:                 sa,
-		akteFormat:                akteFormat,
 		TransactedReader:          tr,
 		persistentMetadateiFormat: pmf,
 	}
@@ -59,20 +46,20 @@ func MakeCommonStoreBase[
 	return
 }
 
-func (s *CommonStoreBase[O, OPtr]) SetLogWriter(
+func (s *CommonStoreBase) SetLogWriter(
 	lw objekte_store.LogWriter,
 ) {
 	s.LogWriter = lw
 }
 
-func (s *CommonStoreBase[O, OPtr]) Query(
+func (s *CommonStoreBase) Query(
 	m matcher.MatcherSigil,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return objekte_store.QueryMethodForMatcher(s, m, f)
 }
 
-func (s *CommonStoreBase[O, OPtr]) ReindexOne(
+func (s *CommonStoreBase) ReindexOne(
 	t *sku.Transacted,
 ) (o matcher.Matchable, err error) {
 	o = t

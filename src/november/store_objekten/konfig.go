@@ -48,7 +48,6 @@ func makeKonfigStore(
 		s,
 		sa,
 		s,
-		s.akteFormat,
 	)
 
 	if err != nil {

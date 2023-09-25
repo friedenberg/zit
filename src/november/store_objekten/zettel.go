@@ -49,7 +49,6 @@ func makeZettelStore(
 		s,
 		sa,
 		s,
-		nil,
 	)
 
 	if err != nil {

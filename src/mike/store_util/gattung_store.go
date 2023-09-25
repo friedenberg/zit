@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
 )
 
@@ -24,9 +23,7 @@ type CommonStore[
 	O schnittstellen.Akte[O],
 	OPtr schnittstellen.AktePtr[O],
 ] struct {
-	CommonStoreBase[O, OPtr]
-	AkteFormat objekte.AkteFormat[O, OPtr]
-	objekte_store.StoredParseSaver[O, OPtr]
+	CommonStoreBase
 	objekte_store.CreateOrUpdater
 }
 
@@ -38,13 +35,12 @@ func MakeCommonStore[
 	delegate CommonStoreDelegate,
 	sa StoreUtil,
 	tr objekte_store.TransactedReader,
-	akteFormat objekte.AkteFormat[O, OPtr],
 ) (s *CommonStore[O, OPtr], err error) {
 	if delegate == nil {
 		panic("delegate was nil")
 	}
 
-	csb, err := MakeCommonStoreBase[O, OPtr](
+	csb, err := MakeCommonStoreBase(
 		gg,
 		delegate,
 		sa,
@@ -52,7 +48,6 @@ func MakeCommonStore[
 		objekte_format.FormatForVersion(
 			sa.GetStandort().GetKonfig().GetStoreVersion(),
 		),
-		akteFormat,
 	)
 	if err != nil {
 		err = errors.Wrap(err)
@@ -64,13 +59,6 @@ func MakeCommonStore[
 		OPtr,
 	]{
 		CommonStoreBase: *csb,
-		AkteFormat:      akteFormat,
-		StoredParseSaver: objekte_store.MakeStoredParseSaver[O, OPtr](
-			sa.GetStandort(),
-			akteFormat,
-			sa.GetPersistentMetadateiFormat(),
-			objekte_format.Options{IncludeTai: true},
-		),
 	}
 
 	return

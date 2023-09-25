@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
@@ -36,13 +35,6 @@ func makeTypStore(
 		s,
 		sa,
 		s,
-		objekte_store.MakeAkteFormat[typ_akte.V0, *typ_akte.V0](
-			objekte.MakeTextParserIgnoreTomlErrors[typ_akte.V0](
-				sa.GetStandort(),
-			),
-			objekte.ParsedAkteTomlFormatter[typ_akte.V0]{},
-			sa.GetStandort(),
-		),
 	)
 
 	if err != nil {
