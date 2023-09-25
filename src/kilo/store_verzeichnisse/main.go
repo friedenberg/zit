@@ -21,7 +21,6 @@ const (
 type Zettelen struct {
 	erworben konfig.Compiled
 	path     string
-	pool     schnittstellen.Pool[sku.Transacted, *sku.Transacted]
 	schnittstellen.VerzeichnisseFactory
 	pages [PageCount]*Page
 }
@@ -35,21 +34,18 @@ func MakeZettelen(
 	k konfig.Compiled,
 	dir string,
 	f schnittstellen.VerzeichnisseFactory,
-	p schnittstellen.Pool[sku.Transacted, *sku.Transacted],
 	fff PageDelegateGetter,
 ) (i *Zettelen, err error) {
 	i = &Zettelen{
 		erworben:             k,
 		path:                 dir,
 		VerzeichnisseFactory: f,
-		pool:                 p,
 	}
 
 	for n := range i.pages {
 		i.pages[n] = makeZettelenPage(
 			f,
 			i.PageIdForIndex(n),
-			p,
 			fff,
 			// k.UseBestandsaufnahmeForVerzeichnisse,
 			true,
@@ -57,11 +53,6 @@ func MakeZettelen(
 	}
 
 	return
-}
-
-func (i Zettelen) Pool() schnittstellen.Pool[sku.Transacted, *sku.Transacted] {
-	errors.TodoP4("rename to GetPool")
-	return i.pool
 }
 
 func (i Zettelen) PageIdForIndex(n int) (pid pageId) {
@@ -126,7 +117,7 @@ func (i *Zettelen) AddVerzeichnisse(
 		return
 	}
 
-	z := i.pool.Get()
+	z := sku.GetTransactedPool().Get()
 
 	if err = z.SetFromSkuLike(tz); err != nil {
 		err = errors.Wrap(err)
@@ -170,7 +161,7 @@ func (i *Zettelen) ReadMany(
 	}
 
 	w := pool.MakePooledChain[sku.Transacted](
-		i.pool,
+		sku.GetTransactedPool(),
 		ws...,
 	)
 

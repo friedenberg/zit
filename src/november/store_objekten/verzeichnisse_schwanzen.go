@@ -2,9 +2,7 @@ package store_objekten
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
@@ -14,19 +12,15 @@ import (
 
 type verzeichnisseSchwanzen struct {
 	headers [store_verzeichnisse.PageCount]*sku.Schwanzen
-	tagp    schnittstellen.AkteGetterPutter[*typ_akte.V0]
 	*store_verzeichnisse.Zettelen
 	su store_util.StoreUtil
 }
 
 func makeVerzeichnisseSchwanzen(
 	sa store_util.StoreUtil,
-	p schnittstellen.Pool[sku.Transacted, *sku.Transacted],
-	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) (s *verzeichnisseSchwanzen, err error) {
 	s = &verzeichnisseSchwanzen{
-		su:   sa,
-		tagp: tagp,
+		su: sa,
 	}
 
 	for i := range s.headers {
@@ -37,7 +31,6 @@ func makeVerzeichnisseSchwanzen(
 		s.su.GetKonfig(),
 		s.su.GetStandort().DirVerzeichnisseZettelenNeueSchwanzen(),
 		sa.GetStandort(),
-		p,
 		s,
 	)
 
@@ -110,7 +103,7 @@ func (s *verzeichnisseSchwanzen) applyKonfig(
 		return
 	}
 
-	s.su.GetKonfig().ApplyToMetadatei(z, s.tagp)
+	s.su.GetKonfig().ApplyToMetadatei(z, s.su.GetAkten().GetTypV0())
 
 	return
 }

@@ -72,7 +72,7 @@ func Make(
 		return
 	}
 
-	if s.zettelStore, err = makeZettelStore(s.StoreUtil, p, s.GetAkten().GetTypV0()); err != nil {
+	if s.zettelStore, err = makeZettelStore(s.StoreUtil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -23,7 +23,6 @@ type Page struct {
 	lock *sync.Mutex
 	pageId
 	schnittstellen.VerzeichnisseFactory
-	pool        schnittstellen.Pool[sku.Transacted, *sku.Transacted]
 	added       sku.TransactedHeap
 	addFilter   schnittstellen.FuncIter[*sku.Transacted]
 	flushFilter schnittstellen.FuncIter[*sku.Transacted]
@@ -33,7 +32,6 @@ type Page struct {
 
 func makeZettelenPage(
 	iof schnittstellen.VerzeichnisseFactory, pid pageId,
-	pool schnittstellen.Pool[sku.Transacted, *sku.Transacted],
 	fff PageDelegateGetter,
 	useBestandsaufnahmeForVerzeichnisse bool,
 ) (p *Page) {
@@ -52,13 +50,12 @@ func makeZettelenPage(
 		lock:                                &sync.Mutex{},
 		VerzeichnisseFactory:                iof,
 		pageId:                              pid,
-		pool:                                pool,
 		added:                               sku.MakeTransactedHeap(),
 		flushFilter:                         flushFilter,
 		addFilter:                           addFilter,
 	}
 
-	p.added.SetPool(p.pool)
+	p.added.SetPool(sku.GetTransactedPool())
 
 	return
 }
@@ -215,7 +212,7 @@ func (zp *Page) copy(
 		dec := gob.NewDecoder(r)
 
 		getOneSku = func() (sk sku.SkuLikePtr, err error) {
-			tz := zp.pool.Get()
+			tz := sku.GetTransactedPool().Get()
 			err = dec.Decode(tz)
 			sk = tz
 			return

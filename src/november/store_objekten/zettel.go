@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -25,17 +24,13 @@ type zettelStore struct {
 
 	verzeichnisseSchwanzen *verzeichnisseSchwanzen
 	verzeichnisseAll       *store_verzeichnisse.Zettelen
-	tagp                   schnittstellen.AkteGetterPutter[*typ_akte.V0]
 }
 
 func makeZettelStore(
 	sa store_util.StoreUtil,
-	p schnittstellen.Pool[sku.Transacted, *sku.Transacted],
-	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) (s *zettelStore, err error) {
 	s = &zettelStore{
 		protoZettel: zettel.MakeProtoZettel(sa.GetKonfig()),
-		tagp:        tagp,
 	}
 
 	s.CommonStore, err = store_util.MakeCommonStore(
@@ -52,8 +47,6 @@ func makeZettelStore(
 
 	if s.verzeichnisseSchwanzen, err = makeVerzeichnisseSchwanzen(
 		s.StoreUtil,
-		p,
-		tagp,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -63,7 +56,6 @@ func makeZettelStore(
 		s.StoreUtil.GetKonfig(),
 		s.StoreUtil.GetStandort().DirVerzeichnisseZettelenNeue(),
 		s.GetStandort(),
-		p,
 		nil,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -110,7 +102,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 
 	errors.Log().Printf("writing zettel to index: %s", tz)
 
-	s.GetKonfig().ApplyToMetadatei(tz, s.tagp)
+	s.GetKonfig().ApplyToMetadatei(tz, s.GetAkten().GetTypV0())
 
 	if err = s.verzeichnisseSchwanzen.AddVerzeichnisse(tz, tz.GetKennungLike().String()); err != nil {
 		err = errors.Wrap(err)
@@ -193,7 +185,12 @@ func (s *zettelStore) Create(
 	m := mg.GetMetadatei()
 	s.protoZettel.Apply(&m)
 
-	if err = s.StoreUtil.GetKonfig().ApplyToNewMetadatei(&m, s.tagp); err != nil {
+	err = s.StoreUtil.GetKonfig().ApplyToNewMetadatei(
+		&m,
+		s.GetAkten().GetTypV0(),
+	)
+
+	if err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -309,7 +306,12 @@ func (s *zettelStore) UpdateCheckedOut(
 	m := co.External.GetMetadatei()
 	m.ResetWith(m)
 
-	if err = s.StoreUtil.GetKonfig().ApplyToNewMetadatei(&m, s.tagp); err != nil {
+	err = s.StoreUtil.GetKonfig().ApplyToNewMetadatei(
+		&m,
+		s.GetAkten().GetTypV0(),
+	)
+
+	if err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -395,7 +397,12 @@ func (s *zettelStore) updateLockedWithMutter(
 
 	m := mg.GetMetadatei()
 
-	if err = s.StoreUtil.GetKonfig().ApplyToNewMetadatei(&m, s.tagp); err != nil {
+	err = s.StoreUtil.GetKonfig().ApplyToNewMetadatei(
+		&m,
+		s.GetAkten().GetTypV0(),
+	)
+
+	if err != nil {
 		err = errors.Wrap(err)
 		return
 	}
