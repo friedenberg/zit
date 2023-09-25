@@ -64,12 +64,12 @@ func (s konfigStore) Flush() (err error) {
 }
 
 func (s konfigStore) AddOne(t *erworben.Transacted) (err error) {
-	s.StoreUtil.GetKonfigPtr().SetTransacted(t, s)
+	s.StoreUtil.GetKonfigPtr().SetTransacted(t, s.GetAkten().GetKonfigV0())
 	return
 }
 
 func (s konfigStore) UpdateOne(t *erworben.Transacted) (err error) {
-	s.StoreUtil.GetKonfigPtr().SetTransacted(t, s)
+	s.StoreUtil.GetKonfigPtr().SetTransacted(t, s.GetAkten().GetKonfigV0())
 	return
 }
 
@@ -132,7 +132,7 @@ func (s konfigStore) Update(
 
 	s.StoreUtil.CommitUpdatedTransacted(kt)
 
-	if err = s.StoreUtil.GetKonfigPtr().SetTransacted(kt, s); err != nil {
+	if err = s.StoreUtil.GetKonfigPtr().SetTransacted(kt, s.GetAkten().GetKonfigV0()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

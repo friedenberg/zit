@@ -90,7 +90,7 @@ func (c Show) RunWithQuery(u *umwelt.Umwelt, ms matcher.Query) (err error) {
 		u.Out(),
 		u.Standort(),
 		u.Konfig(),
-		u.StoreObjekten().Typ(),
+		u.StoreObjekten().GetAkten().GetTypV0(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

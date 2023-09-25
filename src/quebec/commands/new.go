@@ -144,7 +144,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 			if zsc, err = u.StoreObjekten().Checkout(
 				options,
-				u.StoreObjekten().Typ(),
+				u.StoreObjekten().GetAkten().GetTypV0(),
 				u.StoreObjekten().Zettel().ReadAllSchwanzen,
 				func(sk *sku.Transacted) (err error) {
 					if zts.ContainsKey(sk.GetKennungLike().String()) {

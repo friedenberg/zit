@@ -14,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/juliett/konfig"
 	"github.com/friedenberg/zit/src/kilo/cwd"
+	"github.com/friedenberg/zit/src/lima/akten"
 	"github.com/friedenberg/zit/src/lima/bestandsaufnahme"
 )
 
@@ -33,6 +34,7 @@ type StoreUtil interface {
 	GetAbbrStore() AbbrStore
 	GetKennungIndex() kennung_index.Index
 	GetTypenIndex() (kennung_index.KennungIndex[kennung.Typ, *kennung.Typ], error)
+	GetAkten() *akten.Akten
 
 	SetMatchableAdder(matcher.MatchableAdder)
 	matcher.MatchableAdder
@@ -70,6 +72,7 @@ type StoreUtil interface {
 type common struct {
 	konfig                    *konfig.Compiled
 	standort                  standort.Standort
+	akten                     *akten.Akten
 	bestandsaufnahmeAkte      bestandsaufnahme.Akte
 	Abbr                      AbbrStore
 	persistentMetadateiFormat objekte_format.Format
@@ -96,6 +99,7 @@ func MakeStoreUtil(
 	c = &common{
 		konfig:                    k,
 		standort:                  st,
+		akten:                     akten.Make(st),
 		persistentMetadateiFormat: pmf,
 		sonnenaufgang:             t,
 	}
@@ -151,6 +155,10 @@ func (s *common) SetCheckedOutLogWriter(
 	zelw schnittstellen.FuncIter[*sku.CheckedOut],
 ) {
 	s.checkedOutLogPrinter = zelw
+}
+
+func (s common) GetAkten() *akten.Akten {
+	return s.akten
 }
 
 func (s common) GetPersistentMetadateiFormat() objekte_format.Format {

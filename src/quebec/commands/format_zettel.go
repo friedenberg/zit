@@ -121,7 +121,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var typAkte *typ_akte.V0
 
-	if typAkte, err = u.StoreObjekten().Typ().GetAkte(typKonfig.GetAkteSha()); err != nil {
+	if typAkte, err = u.StoreObjekten().GetAkten().GetTypV0().GetAkte(typKonfig.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -175,7 +175,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		)
 	}
 
-	if err = u.Konfig().ApplyToNewMetadatei(zt, u.StoreObjekten().Typ()); err != nil {
+	if err = u.Konfig().ApplyToNewMetadatei(zt, u.StoreObjekten().GetAkten().GetTypV0()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

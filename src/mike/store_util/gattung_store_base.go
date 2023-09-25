@@ -19,21 +19,16 @@ type CommonStoreBase[
 	OPtr schnittstellen.AktePtr[O],
 ] struct {
 	schnittstellen.GattungGetter
+	StoreUtil
 
 	delegate CommonStoreDelegate
 
-	StoreUtil
-
-	objekte_store.AkteTextSaver[O, OPtr]
-
-	objekte_store.StoredParseSaver[O, OPtr]
-
 	objekte_store.TransactedReader
-
 	objekte_store.LogWriter
-
 	persistentMetadateiFormat objekte_format.Format
 
+	// objekte_store.AkteTextSaver[O, OPtr]
+	// objekte_store.StoredParseSaver[O, OPtr]
 	akteFormat objekte.AkteFormat[O, OPtr]
 }
 
@@ -53,17 +48,10 @@ func MakeCommonStoreBase[
 	}
 
 	s = &CommonStoreBase[O, OPtr]{
-		GattungGetter: gg,
-		delegate:      delegate,
-		StoreUtil:     sa,
-		akteFormat:    akteFormat,
-		AkteTextSaver: objekte_store.MakeAkteTextSaver[
-			O,
-			OPtr,
-		](
-			sa.GetStandort(),
-			akteFormat,
-		),
+		GattungGetter:             gg,
+		delegate:                  delegate,
+		StoreUtil:                 sa,
+		akteFormat:                akteFormat,
 		TransactedReader:          tr,
 		persistentMetadateiFormat: pmf,
 	}
@@ -104,39 +92,4 @@ func (s *CommonStoreBase[O, OPtr]) ReindexOne(
 	}
 
 	return
-}
-
-func (s *CommonStoreBase[O, OPtr]) GetAkte(
-	sh schnittstellen.ShaLike,
-) (a OPtr, err error) {
-	var ar schnittstellen.ShaReadCloser
-
-	if ar, err = s.StoreUtil.GetStandort().AkteReader(sh); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, ar)
-
-	var a1 O
-	a = OPtr(&a1)
-	a.Reset()
-
-	if _, err = s.akteFormat.ParseAkte(ar, a); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	actual := ar.GetShaLike()
-
-	if !actual.EqualsSha(sh) {
-		err = errors.Errorf("expected sha %s but got %s", sh, actual)
-		return
-	}
-
-	return
-}
-
-func (s *CommonStoreBase[O, OPtr]) PutAkte(a OPtr) {
-	// TODO-P2 implement pool
 }

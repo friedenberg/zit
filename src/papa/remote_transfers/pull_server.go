@@ -153,7 +153,10 @@ func (op PullServer) skusForFilter(
 	if err = op.umwelt.StoreObjekten().Query(
 		msg.MetaSet,
 		iter.MakeChain(
-			zettel.MakeWriterKonfig(op.umwelt.Konfig(), op.umwelt.StoreObjekten().Typ()),
+			zettel.MakeWriterKonfig(
+				op.umwelt.Konfig(),
+				op.umwelt.StoreObjekten().GetAkten().GetTypV0(),
+			),
 			func(sk *sku.Transacted) (err error) {
 				if err = d.Send(sk); err != nil {
 					err = errors.Wrap(err)
