@@ -115,7 +115,7 @@ func (s *common) ReadFiles(
 					return
 				}
 
-				tco.Internal = tcoe.Transacted
+				tco.Internal.Kennung = tcoe.Kennung
 				tco.External = *tcoe
 				tco.State = checked_out_state.StateUntracked
 

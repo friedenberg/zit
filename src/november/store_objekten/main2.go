@@ -111,7 +111,7 @@ func (s *Store) ReadOne(
 		}
 
 		ok := false
-		*sk, ok = s.StoreUtil.GetKonfig().GetEtikett(e)
+		sk, ok = s.StoreUtil.GetKonfig().GetEtikett(e)
 
 		if !ok {
 			sk = nil

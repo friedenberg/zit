@@ -26,6 +26,7 @@ func (s *konfigStore) GetAkteFormat() objekte.AkteFormat[erworben.Akte, *erworbe
 
 func makeKonfigStore(
 	sa store_util.StoreUtil,
+	cou objekte_store.CreateOrUpdater,
 ) (s *konfigStore, err error) {
 	s = &konfigStore{
 		akteFormat: objekte_store.MakeAkteFormat[erworben.Akte, *erworben.Akte](
@@ -42,6 +43,7 @@ func makeKonfigStore(
 		s,
 		sa,
 		s,
+		cou,
 	)
 
 	if err != nil {

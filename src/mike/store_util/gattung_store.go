@@ -21,7 +21,7 @@ type CommonStoreDelegate interface {
 
 type CommonStore struct {
 	CommonStoreBase
-	objekte_store.CreateOrUpdater
+	cou objekte_store.CreateOrUpdater
 }
 
 func MakeCommonStore(
@@ -29,6 +29,7 @@ func MakeCommonStore(
 	delegate CommonStoreDelegate,
 	sa StoreUtil,
 	tr objekte_store.TransactedReader,
+	cou objekte_store.CreateOrUpdater,
 ) (s *CommonStore, err error) {
 	if delegate == nil {
 		panic("delegate was nil")
@@ -50,6 +51,7 @@ func MakeCommonStore(
 
 	s = &CommonStore{
 		CommonStoreBase: *csb,
+		cou:             cou,
 	}
 
 	return
@@ -72,7 +74,7 @@ func (s *CommonStore) UpdateManyMetadatei(
 				return
 			}
 
-			if _, err = s.CreateOrUpdater.CreateOrUpdate(
+			if _, err = s.cou.CreateOrUpdate(
 				mwk,
 				mwk.Kennung,
 			); err != nil {

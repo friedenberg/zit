@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -18,19 +17,8 @@ import (
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
-type CreateOrUpdator interface {
-	CreateOrUpdateCheckedOut(
-		co *sku.CheckedOut,
-	) (transactedPtr *sku.Transacted, err error)
-
-	CreateOrUpdateAkte(
-		mg metadatei.Getter,
-		kennungPtr *kennung.Kennung2,
-		sh schnittstellen.ShaLike,
-	) (transactedPtr *sku.Transacted, err error)
-}
-
 type Store struct {
+	options objekte_format.Options
 	store_util.StoreUtil
 
 	zettelStore  *zettelStore
@@ -39,7 +27,7 @@ type Store struct {
 	konfigStore  *konfigStore
 	kastenStore  *kastenStore
 
-	CreateOrUpdator CreateOrUpdator
+	CreateOrUpdator objekte_store.CreateOrUpdater
 
 	objekte_store.LogWriter
 
@@ -62,32 +50,49 @@ func Make(
 ) (s *Store, err error) {
 	s = &Store{
 		lock:      &sync.Mutex{},
+		options:   objekte_format.Options{IncludeTai: true},
 		StoreUtil: su,
 	}
 
+	s.CreateOrUpdator = objekte_store.MakeCreateOrUpdate(
+		s,
+		s.GetStandort().GetLockSmith(),
+		s.GetStandort(),
+		s,
+		objekte_store.CreateOrUpdateDelegate{
+			New:       s.onNew,
+			Updated:   s.onUpdated,
+			Unchanged: s.onUnchanged,
+		},
+		s,
+		s.GetPersistentMetadateiFormat(),
+		s.options,
+		s.StoreUtil,
+	)
+
 	su.SetMatchableAdder(s)
 
-	if s.typStore, err = makeTypStore(s.StoreUtil); err != nil {
+	if s.typStore, err = makeTypStore(s.StoreUtil, s.CreateOrUpdator); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if s.zettelStore, err = makeZettelStore(s.StoreUtil); err != nil {
+	if s.zettelStore, err = makeZettelStore(s.StoreUtil, s.CreateOrUpdator); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if s.etikettStore, err = makeEtikettStore(s.StoreUtil); err != nil {
+	if s.etikettStore, err = makeEtikettStore(s.StoreUtil, s.CreateOrUpdator); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if s.konfigStore, err = makeKonfigStore(s.StoreUtil); err != nil {
+	if s.konfigStore, err = makeKonfigStore(s.StoreUtil, s.CreateOrUpdator); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if s.kastenStore, err = makeKastenStore(s.StoreUtil); err != nil {
+	if s.kastenStore, err = makeKastenStore(s.StoreUtil, s.CreateOrUpdator); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -160,23 +165,6 @@ func Make(
 		gattung.Kasten:  s.kastenStore,
 		// gattung.Konfig:  s.konfigStore,
 	}
-
-	s.CreateOrUpdator = objekte_store.MakeCreateOrUpdate2(
-		s,
-		s.GetStandort().GetLockSmith(),
-		s.GetStandort(),
-		s,
-		objekte_store.CreateOrUpdateDelegate{
-			New:       s.onNew,
-			Updated:   s.onUpdated,
-			Unchanged: s.onUnchanged,
-		},
-		s,
-		s.GetPersistentMetadateiFormat(),
-		objekte_format.Options{IncludeTai: true},
-		s.StoreUtil,
-		sku.GetTransactedPool(),
-	)
 
 	return
 }
@@ -318,23 +306,69 @@ func (s *Store) GetReindexFunc(
 	}
 }
 
+func (s *Store) createEtikettOrTyp(k *kennung.Kennung2) (err error) {
+	switch k.GetGattung() {
+	default:
+		err = gattung.MakeErrUnsupportedGattung(k.GetGattung())
+		return
+
+	case gattung.Typ, gattung.Etikett:
+		break
+	}
+
+	t := sku.GetTransactedPool().Get()
+	defer sku.GetTransactedPool().Put(t)
+
+	t.Kennung = *k
+
+	err = sku.CalculateAndSetSha(
+		t,
+		s.GetPersistentMetadateiFormat(),
+		s.options,
+	)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.addMatchableCommon(t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.onNew(t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s *Store) addTyp(
+	t kennung.Typ,
+) (err error) {
+	if err = s.GetAbbrStore().Typen().Exists(t); err == nil {
+		return
+	}
+
+	err = nil
+
+	if err = s.createEtikettOrTyp(&kennung.Kennung2{KennungPtr: &t}); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) addTypAndExpanded(
 	t kennung.Typ,
 ) (err error) {
 	typenExpanded := kennung.ExpandOneSlice(&t, kennung.ExpanderRight)
 
 	for _, t := range typenExpanded {
-		if err = s.GetAbbrStore().Typen().Exists(t); err == nil {
-			continue
-		}
-
-		err = nil
-
-		todo.Change("support inheritance")
-		if _, err = s.typStore.CreateOrUpdate(
-			nil,
-			&t,
-		); err != nil {
+		if err = s.addTyp(t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -344,22 +378,29 @@ func (s *Store) addTyp(
 }
 
 func (s *Store) addEtikett(
+	e1 kennung.Etikett,
+) (err error) {
+	if err = s.GetAbbrStore().Etiketten().Exists(e1); err == nil {
+		return
+	}
+
+	err = nil
+
+	if err = s.createEtikettOrTyp(&kennung.Kennung2{KennungPtr: &e1}); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) addEtikettAndExpanded(
 	e kennung.Etikett,
 ) (err error) {
 	etikettenExpanded := kennung.ExpandOneSlice(&e, kennung.ExpanderRight)
 
 	for _, e1 := range etikettenExpanded {
-		if err = s.GetAbbrStore().Etiketten().Exists(e1); err == nil {
-			continue
-		}
-
-		err = nil
-
-		todo.Change("support inheritance")
-		if _, err = s.Etikett().CreateOrUpdate(
-			nil,
-			&e1,
-		); err != nil {
+		if err = s.addEtikett(e1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -371,17 +412,9 @@ func (s *Store) addEtikett(
 func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 	m matcher.Matchable,
 ) (err error) {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
-	// // TODO-P2 support other true gattung
-	// if !gattung.Zettel.EqualsAny(m.GetGattung()) {
-	// 	return
-	// }
-
 	t := m.GetTyp()
 
-	if err = s.addTyp(t); err != nil {
+	if err = s.addTypAndExpanded(t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -389,7 +422,7 @@ func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 	es := iter.SortedValues[kennung.Etikett](m.GetMetadatei().GetEtiketten())
 
 	for _, e := range es {
-		if err = s.addEtikett(e); err != nil {
+		if err = s.addEtikettAndExpanded(e); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -399,11 +432,23 @@ func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 }
 
 func (s *Store) AddMatchable(m matcher.Matchable) (err error) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	if err = s.addMatchableTypAndEtikettenIfNecessary(m); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
+	if err = s.addMatchableCommon(m); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) addMatchableCommon(m matcher.Matchable) (err error) {
 	t := m.GetTyp()
 
 	if !t.IsEmpty() {
@@ -413,6 +458,7 @@ func (s *Store) AddMatchable(m matcher.Matchable) (err error) {
 			err = errors.Wrap(err)
 			return
 		}
+
 		if err = ti.StoreOne(m.GetTyp()); err != nil {
 			err = errors.Wrap(err)
 			return

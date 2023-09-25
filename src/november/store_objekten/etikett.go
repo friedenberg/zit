@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
 	"github.com/friedenberg/zit/src/mike/store_util"
@@ -19,6 +18,7 @@ type etikettStore struct {
 
 func makeEtikettStore(
 	sa store_util.StoreUtil,
+	cou objekte_store.CreateOrUpdater,
 ) (s *etikettStore, err error) {
 	s = &etikettStore{}
 
@@ -27,55 +27,13 @@ func makeEtikettStore(
 		s,
 		sa,
 		s,
+		cou,
 	)
 
 	if err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	newOrUpdated := func(t *sku.Transacted) (err error) {
-		s.StoreUtil.CommitUpdatedTransacted(t)
-
-		if err = s.StoreUtil.GetKonfigPtr().AddEtikett(t); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-
-	s.CommonStore.CreateOrUpdater = objekte_store.MakeCreateOrUpdate(
-		sa,
-		sa.GetStandort().GetLockSmith(),
-		sa.GetStandort(),
-		EtikettTransactedReader(s),
-		objekte_store.CreateOrUpdateDelegate{
-			New: func(t *sku.Transacted) (err error) {
-				if err = newOrUpdated(t); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				return s.LogWriter.New(t)
-			},
-			Updated: func(t *sku.Transacted) (err error) {
-				if err = newOrUpdated(t); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				return s.LogWriter.Updated(t)
-			},
-			Unchanged: func(t *sku.Transacted) (err error) {
-				return s.LogWriter.Unchanged(t)
-			},
-		},
-		sa.GetAbbrStore(),
-		sa.GetPersistentMetadateiFormat(),
-		objekte_format.Options{IncludeTai: true},
-		sa,
-	)
 
 	return
 }

@@ -204,6 +204,9 @@ func (i *indexAbbr) AddMatchable(o matcher.Matchable) (err error) {
 }
 
 func (i *indexAbbr) Exists(k kennung.Kennung) (err error) {
+	i.lock.Lock()
+	defer i.lock.Unlock()
+
 	switch kt := k.(type) {
 	case kennung.Hinweis:
 		err = i.Hinweis().Exists(kt)

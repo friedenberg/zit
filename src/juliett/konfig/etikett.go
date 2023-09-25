@@ -162,7 +162,7 @@ func (c *compiled) applyExpandedEtikett(ct *sku.Transacted) {
 
 func (kc compiled) GetEtikett(
 	k kennung.Etikett,
-) (ct sku.Transacted, ok bool) {
+) (ct *sku.Transacted, ok bool) {
 	expandedActual := kc.GetSortedEtikettenExpanded(k.String())
 
 	if len(expandedActual) > 0 {
@@ -175,7 +175,7 @@ func (kc compiled) GetEtikett(
 
 func (c compiled) GetSortedEtikettenExpanded(
 	v string,
-) (expandedActual []sku.Transacted) {
+) (expandedActual []*sku.Transacted) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
@@ -184,17 +184,24 @@ func (c compiled) GetSortedEtikettenExpanded(
 		expandedMaybe,
 	)
 	typExpander.Expand(sa, v)
-	expandedActual = make([]sku.Transacted, 0)
+	expandedActual = make([]*sku.Transacted, 0)
 
 	expandedMaybe.Each(
 		func(v values.String) (err error) {
-			ct, ok := c.Etiketten.Get(v.String())
+			ct, ok := c.Etiketten.GetPtr(v.String())
 
 			if !ok {
 				return
 			}
 
-			expandedActual = append(expandedActual, ct.Transacted)
+			ct1 := sku.GetTransactedPool().Get()
+
+			if err = ct1.SetFromSkuLike(ct.Transacted); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			expandedActual = append(expandedActual, ct1)
 
 			return
 		},

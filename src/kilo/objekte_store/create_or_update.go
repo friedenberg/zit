@@ -71,17 +71,14 @@ func (cou createOrUpdate) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	transactedPtr = &sku.Transacted{
-		Metadatei: metadatei.Metadatei{
-			Tai: cou.clock.GetTai(),
-		},
-	}
+	transactedPtr = sku.GetTransactedPool().Get()
 
-	if err = transactedPtr.Kennung.SetWithKennung(kennungPtr); err != nil {
+	if err = transactedPtr.SetFromSkuLike(&co.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
+	transactedPtr.Metadatei.Tai = cou.clock.GetTai()
 	transactedPtr.SetAkteSha(co.External.GetAkteSha())
 
 	err = sku.CalculateAndSetSha(
@@ -154,9 +151,8 @@ func (cou createOrUpdate) CreateOrUpdate(
 
 	m.Tai = cou.clock.GetTai()
 
-	transactedPtr = &sku.Transacted{
-		Metadatei: m,
-	}
+	transactedPtr = sku.GetTransactedPool().Get()
+	transactedPtr.Metadatei = m
 
 	if err = transactedPtr.Kennung.SetWithKennung(kennungPtr); err != nil {
 		err = errors.Wrap(err)

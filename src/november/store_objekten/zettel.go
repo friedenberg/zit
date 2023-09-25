@@ -28,6 +28,7 @@ type zettelStore struct {
 
 func makeZettelStore(
 	sa store_util.StoreUtil,
+	cou objekte_store.CreateOrUpdater,
 ) (s *zettelStore, err error) {
 	s = &zettelStore{
 		protoZettel: zettel.MakeProtoZettel(sa.GetKonfig()),
@@ -38,6 +39,7 @@ func makeZettelStore(
 		s,
 		sa,
 		s,
+		cou,
 	)
 
 	if err != nil {
