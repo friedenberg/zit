@@ -14,6 +14,7 @@ var (
 	transactedKeyerKennung schnittstellen.StringKeyerPtr[Transacted, *Transacted]
 	TransactedSetEmpty     TransactedSet
 	TransactedLessor       schnittstellen.Lessor2[Transacted, *Transacted]
+	TransactedReseter      resetter
 )
 
 func init() {

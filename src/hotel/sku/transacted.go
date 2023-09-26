@@ -143,12 +143,7 @@ func (a *Transacted) SetKennungLike(kl kennung.Kennung) (err error) {
 func (a *Transacted) Reset() {
 	a.Kopf.Reset()
 	a.ObjekteSha.Reset()
-
-	// TODO-P2 remove in favor of kennung pkg
-	if a.Kennung.KennungPtr != nil {
-		a.Kennung.Reset()
-	}
-
+	a.Kennung.KennungPtr = nil
 	a.Metadatei.Reset()
 	a.TransactionIndex.Reset()
 }

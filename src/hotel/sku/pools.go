@@ -13,7 +13,7 @@ var (
 func init() {
 	poolTransacted = pool.MakePool[Transacted, *Transacted](
 		nil,
-		nil,
+		TransactedReseter.Reset,
 	)
 
 	poolExternal = pool.MakePool[External, *External](
