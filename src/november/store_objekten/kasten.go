@@ -10,8 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
-type KastenTransactedReader = objekte_store.TransactedReader
-
 type kastenStore struct {
 	*store_util.CommonStore
 }

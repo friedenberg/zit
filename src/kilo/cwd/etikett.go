@@ -29,7 +29,7 @@ func (c *CwdFiles) tryEtikett(fi os.FileInfo, dir string) (err error) {
 
 	t, _ := c.Etiketten.Get(h.String())
 
-	t.Kennung = &h
+	t.Kennung = kennung.Kennung2{KennungPtr: &h}
 	t.FDs.Objekte = fd
 	return c.Etiketten.Add(t)
 }

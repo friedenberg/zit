@@ -11,8 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
-type TypTransactedReader = objekte_store.TransactedReader
-
 type typStore struct {
 	*store_util.CommonStore
 }

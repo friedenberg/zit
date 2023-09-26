@@ -90,9 +90,7 @@ func (s *common) ReadFiles(
 	if err = fs.EachCreatableMatchable(
 		iter.MakeChain(
 			func(il *sku.ExternalMaybe) (err error) {
-				k := il.GetKennungLike()
-
-				if err = s.GetAbbrStore().Exists(k); err == nil {
+				if err = s.GetAbbrStore().Exists(&il.Kennung); err == nil {
 					err = iter.MakeErrStopIteration()
 					return
 				}

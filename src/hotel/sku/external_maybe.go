@@ -6,7 +6,7 @@ import (
 )
 
 type ExternalMaybe struct {
-	Kennung kennung.KennungPtr
+	Kennung kennung.Kennung2
 	FDs     ExternalFDs
 }
 
@@ -35,7 +35,7 @@ func (e ExternalMaybe) GetKennungLike() kennung.Kennung {
 }
 
 func (e *ExternalMaybe) GetKennungLikePtr() kennung.KennungPtr {
-	return e.Kennung
+	return &e.Kennung
 }
 
 func (e ExternalMaybe) GetFDs() ExternalFDs {

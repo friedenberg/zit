@@ -29,7 +29,7 @@ func (c *CwdFiles) tryTyp(fi os.FileInfo, dir string) (err error) {
 
 	t, _ := c.Typen.Get(h.String())
 
-	t.Kennung = &h
+	t.Kennung = kennung.Kennung2{KennungPtr: &h}
 	t.FDs.Objekte = fd
 	return c.Typen.Add(t)
 }
