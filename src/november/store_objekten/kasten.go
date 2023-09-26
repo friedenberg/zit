@@ -11,7 +11,7 @@ import (
 )
 
 type kastenStore struct {
-	*store_util.CommonStore
+	*store_util.CommonStoreBase
 }
 
 func makeKastenStore(
@@ -20,11 +20,10 @@ func makeKastenStore(
 ) (s *kastenStore, err error) {
 	s = &kastenStore{}
 
-	s.CommonStore, err = store_util.MakeCommonStore(
+	s.CommonStoreBase, err = store_util.MakeCommonStoreBase(
 		gattung.Kasten,
 		sa,
 		s,
-		cou,
 	)
 
 	if err != nil {

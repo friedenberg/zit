@@ -71,12 +71,6 @@ type (
 		UpdateCheckedOut(*sku.CheckedOut) (*sku.Transacted, error)
 	}
 
-	UpdaterManyMetadatei interface {
-		UpdateManyMetadatei(
-			sku.TransactedSet,
-		) error
-	}
-
 	CreateOrUpdater interface {
 		CreateOrUpdateAkte(
 			metadatei.Getter,

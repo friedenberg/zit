@@ -18,7 +18,8 @@ import (
 )
 
 type zettelStore struct {
-	*store_util.CommonStore
+	*store_util.CommonStoreBase
+	objekte_store.LogWriter
 
 	protoZettel zettel.ProtoZettel
 
@@ -34,11 +35,10 @@ func makeZettelStore(
 		protoZettel: zettel.MakeProtoZettel(sa.GetKonfig()),
 	}
 
-	s.CommonStore, err = store_util.MakeCommonStore(
+	s.CommonStoreBase, err = store_util.MakeCommonStoreBase(
 		gattung.Zettel,
 		sa,
 		s,
-		cou,
 	)
 
 	if err != nil {

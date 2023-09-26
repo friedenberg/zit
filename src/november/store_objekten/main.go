@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
@@ -33,12 +32,10 @@ type Store struct {
 
 	// Gattungen
 	gattungStores     map[schnittstellen.GattungLike]store_util.GattungStoreLike
-	reindexers        map[schnittstellen.GattungLike]store_util.Reindexer
 	flushers          map[schnittstellen.GattungLike]errors.Flusher
 	readers           map[schnittstellen.GattungLike]matcher.FuncReaderTransactedLikePtr
 	queriers          map[schnittstellen.GattungLike]matcher.FuncSigilTransactedLikePtr
 	transactedReaders map[schnittstellen.GattungLike]matcher.FuncReaderTransactedLikePtr
-	metadateiUpdaters map[schnittstellen.GattungLike]objekte_store.UpdaterManyMetadatei
 
 	isReindexing bool
 	lock         sync.Locker
@@ -150,22 +147,6 @@ func Make(
 		}
 	}
 
-	s.reindexers = make(map[schnittstellen.GattungLike]store_util.Reindexer)
-
-	for g, gs := range s.gattungStores {
-		if gs1, ok := gs.(store_util.Reindexer); ok {
-			s.reindexers[g] = gs1
-		}
-	}
-
-	s.metadateiUpdaters = map[schnittstellen.GattungLike]objekte_store.UpdaterManyMetadatei{
-		gattung.Zettel:  s.zettelStore,
-		gattung.Typ:     s.typStore,
-		gattung.Etikett: s.etikettStore,
-		gattung.Kasten:  s.kastenStore,
-		// gattung.Konfig:  s.konfigStore,
-	}
-
 	return
 }
 
@@ -173,11 +154,8 @@ func (s *Store) SetLogWriter(
 	lw objekte_store.LogWriter,
 ) {
 	s.LogWriter = lw
-	s.zettelStore.SetLogWriter(lw)
-	s.konfigStore.SetLogWriter(lw)
-	s.typStore.SetLogWriter(lw)
-	s.etikettStore.SetLogWriter(lw)
-	s.kastenStore.SetLogWriter(lw)
+	s.zettelStore.LogWriter = lw
+	s.konfigStore.LogWriter = lw
 }
 
 func (s *Store) Zettel() *zettelStore {
@@ -233,12 +211,30 @@ func (s *Store) UpdateManyMetadatei(
 	incoming sku.TransactedSet,
 ) (err error) {
 	s.GetKonfigPtr().SetHasChanges(true)
-	todo.Optimize() // parallelize
-	for _, umm := range s.metadateiUpdaters {
-		if err = umm.UpdateManyMetadatei(incoming); err != nil {
-			err = errors.Wrap(err)
-			return
+
+	if !s.GetStandort().GetLockSmith().IsAcquired() {
+		err = objekte_store.ErrLockRequired{
+			Operation: "update many metadatei",
 		}
+
+		return
+	}
+
+	if err = incoming.EachPtr(
+		func(mwk *sku.Transacted) (err error) {
+			if _, err = s.CreateOrUpdator.CreateOrUpdate(
+				mwk,
+				mwk.Kennung,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

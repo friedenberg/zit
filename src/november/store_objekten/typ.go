@@ -12,7 +12,7 @@ import (
 )
 
 type typStore struct {
-	*store_util.CommonStore
+	*store_util.CommonStoreBase
 }
 
 func makeTypStore(
@@ -21,11 +21,10 @@ func makeTypStore(
 ) (s *typStore, err error) {
 	s = &typStore{}
 
-	s.CommonStore, err = store_util.MakeCommonStore(
+	s.CommonStoreBase, err = store_util.MakeCommonStoreBase(
 		gattung.Typ,
 		sa,
 		s,
-		cou,
 	)
 
 	if err != nil {

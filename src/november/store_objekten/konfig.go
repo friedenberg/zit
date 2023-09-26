@@ -14,9 +14,10 @@ import (
 )
 
 type konfigStore struct {
-	*store_util.CommonStore
+	*store_util.CommonStoreBase
 
 	akteFormat objekte.AkteFormat[erworben.Akte, *erworben.Akte]
+	objekte_store.LogWriter
 }
 
 func (s *konfigStore) GetAkteFormat() objekte.AkteFormat[erworben.Akte, *erworben.Akte] {
@@ -37,11 +38,10 @@ func makeKonfigStore(
 		),
 	}
 
-	s.CommonStore, err = store_util.MakeCommonStore(
+	s.CommonStoreBase, err = store_util.MakeCommonStoreBase(
 		gattung.Konfig,
 		sa,
 		s,
-		cou,
 	)
 
 	if err != nil {

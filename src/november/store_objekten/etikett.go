@@ -11,7 +11,7 @@ import (
 )
 
 type etikettStore struct {
-	*store_util.CommonStore
+	*store_util.CommonStoreBase
 }
 
 func makeEtikettStore(
@@ -20,11 +20,10 @@ func makeEtikettStore(
 ) (s *etikettStore, err error) {
 	s = &etikettStore{}
 
-	s.CommonStore, err = store_util.MakeCommonStore(
+	s.CommonStoreBase, err = store_util.MakeCommonStoreBase(
 		gattung.Etikett,
 		sa,
 		s,
-		cou,
 	)
 
 	if err != nil {
