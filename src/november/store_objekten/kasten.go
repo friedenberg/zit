@@ -22,7 +22,6 @@ func makeKastenStore(
 
 	s.CommonStore, err = store_util.MakeCommonStore(
 		gattung.Kasten,
-		s,
 		sa,
 		s,
 		cou,
@@ -33,20 +32,6 @@ func makeKastenStore(
 		return
 	}
 
-	return
-}
-
-func (s kastenStore) Flush() (err error) {
-	return
-}
-
-func (s kastenStore) AddOne(t *sku.Transacted) (err error) {
-	s.StoreUtil.GetKonfigPtr().AddKasten(t)
-	return
-}
-
-func (s kastenStore) UpdateOne(t *sku.Transacted) (err error) {
-	s.StoreUtil.GetKonfigPtr().AddKasten(t)
 	return
 }
 

@@ -23,7 +23,6 @@ func makeTypStore(
 
 	s.CommonStore, err = store_util.MakeCommonStore(
 		gattung.Typ,
-		s,
 		sa,
 		s,
 		cou,
@@ -34,22 +33,6 @@ func makeTypStore(
 		return
 	}
 
-	return
-}
-
-func (s typStore) Flush() (err error) {
-	return
-}
-
-func (s typStore) AddOne(t *sku.Transacted) (err error) {
-	s.StoreUtil.GetKonfigPtr().AddTyp(t)
-	return
-}
-
-func (s typStore) UpdateOne(t *sku.Transacted) (err error) {
-	log.Log().Printf("adding one: %s", t.GetSkuLike())
-	s.StoreUtil.GetKonfigPtr().AddTyp(t)
-	log.Log().Printf("done adding one: %s", t.GetSkuLike())
 	return
 }
 

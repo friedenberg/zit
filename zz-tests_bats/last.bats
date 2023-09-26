@@ -48,7 +48,7 @@ function last_after_typ_mutate { # @test
 
 	run bash -c 'find .zit/Objekten2/Bestandsaufnahmen -type f | wc -l | tr -d " "'
 	assert_success
-	assert_output '3'
+	assert_output '2'
 
 	run_zit last -format Bestandsaufnahme-sans-tai
 	assert_success

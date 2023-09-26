@@ -30,6 +30,8 @@ func (s *common) FlushBestandsaufnahme() (err error) {
 		}
 	}
 
+	s.bestandsaufnahmeAkte.Reset()
+
 	errors.Log().Printf("done saving Bestandsaufnahme")
 
 	return

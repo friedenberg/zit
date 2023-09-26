@@ -188,7 +188,6 @@ function show_simple_typ_history { # @test
 	run_zit show -format log +t
 	assert_output_unsorted - <<-EOM
 		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
-		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
 	EOM
 }
 
@@ -217,7 +216,6 @@ function show_simple_etikett_history { # @test
 function show_konfig { # @test
 	run_zit show -format log +konfig
 	assert_output_unsorted - <<-EOM
-		[konfig@$(get_konfig_sha)]
 		[konfig@$(get_konfig_sha)]
 	EOM
 
@@ -257,9 +255,7 @@ function show_history_all { # @test
 		Etikett tag-2 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 		Etikett tag-3 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 		Etikett tag-4 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-		Konfig konfig $(get_konfig_sha)
-		Konfig konfig $(get_konfig_sha)
-		Typ md 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
+		Konfig konfig 4c003f789b20dab6662ab3bc4450ac18f50ae9436345e5202219e58668d9d4f1
 		Typ md 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
 		Zettel one/dos 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md tag-3 tag-4 "wow ok again"
 		Zettel one/uno 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-4 "wow the first"

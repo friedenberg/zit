@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
-	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
 	"github.com/friedenberg/zit/src/mike/store_util"
@@ -40,7 +39,6 @@ func makeKonfigStore(
 
 	s.CommonStore, err = store_util.MakeCommonStore(
 		gattung.Konfig,
-		s,
 		sa,
 		s,
 		cou,
@@ -51,20 +49,6 @@ func makeKonfigStore(
 		return
 	}
 
-	return
-}
-
-func (s konfigStore) Flush() (err error) {
-	return
-}
-
-func (s konfigStore) AddOne(t *erworben.Transacted) (err error) {
-	s.StoreUtil.GetKonfigPtr().SetTransacted(t, s.GetAkten().GetKonfigV0())
-	return
-}
-
-func (s konfigStore) UpdateOne(t *erworben.Transacted) (err error) {
-	s.StoreUtil.GetKonfigPtr().SetTransacted(t, s.GetAkten().GetKonfigV0())
 	return
 }
 
@@ -223,21 +207,6 @@ func (s konfigStore) ReadOne(
 			return
 		}
 	}
-
-	return
-}
-
-func (s *konfigStore) ReindexOne(
-	te *sku.Transacted,
-) (o matcher.Matchable, err error) {
-	o = te
-
-	if err = s.UpdateOne(te); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	s.LogWriter.Updated(te)
 
 	return
 }

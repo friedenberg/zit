@@ -271,41 +271,6 @@ func (s *Store) Query(
 	return
 }
 
-func (s *Store) GetReindexFunc(
-	ti kennung_index.KennungIndex[kennung.Typ, *kennung.Typ],
-) func(*sku.Transacted) error {
-	return func(sk *sku.Transacted) (err error) {
-		var st store_util.Reindexer
-		ok := false
-
-		g := sk.GetGattung()
-
-		if st, ok = s.reindexers[g]; !ok {
-			err = gattung.MakeErrUnsupportedGattung(g)
-			return
-		}
-
-		var o matcher.Matchable
-
-		if o, err = st.ReindexOne(sk); err != nil {
-			err = errors.Wrapf(err, "Sku %s", sk)
-			return
-		}
-
-		if err = ti.StoreOne(o.GetTyp()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = s.GetAbbrStore().AddMatchable(o); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-}
-
 func (s *Store) createEtikettOrTyp(k *kennung.Kennung2) (err error) {
 	switch k.GetGattung() {
 	default:
@@ -473,26 +438,41 @@ func (s *Store) addMatchableCommon(m matcher.Matchable) (err error) {
 	return
 }
 
-// TODO-P2 add support for quiet reindexing
-func (s *Store) Reindex() (err error) {
-	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte_store.ErrLockRequired{
-			Operation: "reindex",
+func (s *Store) GetReindexFunc(
+	ti kennung_index.KennungIndex[kennung.Typ, *kennung.Typ],
+) func(*sku.Transacted) error {
+	return func(sk *sku.Transacted) (err error) {
+		errExists := s.StoreUtil.GetAbbrStore().Exists(&sk.Kennung)
+
+		if err = s.LogWriter.NewOrUpdated(errExists)(sk); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = s.onNewOrUpdatedCommit(sk, false); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = ti.StoreOne(sk.GetTyp()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = s.GetAbbrStore().AddMatchable(sk); err != nil {
+			err = errors.Wrap(err)
+			return
 		}
 
 		return
 	}
-	s.isReindexing = true
-	defer func() {
-		s.isReindexing = false
-	}()
+}
 
+func (s *Store) resetReindexCommon() (ti kennung_index.KennungIndex[kennung.Typ, *kennung.Typ], err error) {
 	if err = s.StoreUtil.GetStandort().ResetVerzeichnisse(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	var ti kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
 
 	if ti, err = s.StoreUtil.GetTypenIndex(); err != nil {
 		err = errors.Wrap(err)
@@ -509,9 +489,56 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
+	return
+}
+
+// TODO-P2 add support for quiet reindexing
+func (s *Store) Reindex() (err error) {
+	if !s.GetStandort().GetLockSmith().IsAcquired() {
+		err = objekte_store.ErrLockRequired{
+			Operation: "reindex",
+		}
+
+		return
+	}
+
+	s.isReindexing = true
+	defer func() {
+		s.isReindexing = false
+	}()
+
+	var ti kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
+
+	if ti, err = s.resetReindexCommon(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	f1 := s.GetReindexFunc(ti)
 
 	if err = s.GetBestandsaufnahmeStore().ReadAllSkus(f1); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) Reset() (err error) {
+	if !s.GetStandort().GetLockSmith().IsAcquired() {
+		err = objekte_store.ErrLockRequired{
+			Operation: "reset",
+		}
+
+		return
+	}
+
+	s.isReindexing = true
+	defer func() {
+		s.isReindexing = false
+	}()
+
+	if _, err = s.resetReindexCommon(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

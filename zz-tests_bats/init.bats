@@ -7,6 +7,42 @@ setup() {
 	export output
 }
 
+function init_and_reindex { # @test
+	wd="$(mktemp -d)"
+	cd "$wd" || exit 1
+
+	expected="$(mktemp)"
+	cat - >"$expected" <<-EOM
+		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+		[konfig@$(get_konfig_sha)]
+	EOM
+
+	run_zit_init_disable_age
+	assert_output_unsorted - <"$expected"
+
+	run test -f .zit/KonfigAngeboren
+	assert_success
+
+	run_zit show -format log :konfig
+	assert_success
+	assert_output - <<-EOM
+		[konfig@$(get_konfig_sha)]
+	EOM
+
+	cat - >"$expected" <<-EOM
+		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+		[konfig@$(get_konfig_sha)]
+	EOM
+
+	run_zit reindex
+	assert_success
+	assert_output_unsorted - <"$expected"
+
+	run_zit reindex
+	assert_success
+	assert_output_unsorted - <"$expected"
+}
+
 function init_and_deinit { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
@@ -14,8 +50,6 @@ function init_and_deinit { # @test
 	run_zit_init_disable_age
 	assert_output_unsorted - <<-EOM
 		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
-		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
-		[konfig@$(get_konfig_sha)]
 		[konfig@$(get_konfig_sha)]
 	EOM
 

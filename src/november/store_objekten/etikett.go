@@ -22,7 +22,6 @@ func makeEtikettStore(
 
 	s.CommonStore, err = store_util.MakeCommonStore(
 		gattung.Etikett,
-		s,
 		sa,
 		s,
 		cou,
@@ -33,20 +32,6 @@ func makeEtikettStore(
 		return
 	}
 
-	return
-}
-
-func (s etikettStore) Flush() (err error) {
-	return
-}
-
-func (s etikettStore) AddOne(t *sku.Transacted) (err error) {
-	s.StoreUtil.GetKonfigPtr().AddEtikett(t)
-	return
-}
-
-func (s etikettStore) UpdateOne(t *sku.Transacted) (err error) {
-	s.StoreUtil.GetKonfigPtr().AddEtikett(t)
 	return
 }
 

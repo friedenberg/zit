@@ -36,7 +36,6 @@ func makeZettelStore(
 
 	s.CommonStore, err = store_util.MakeCommonStore(
 		gattung.Zettel,
-		s,
 		sa,
 		s,
 		cou,
@@ -79,14 +78,6 @@ func (s *zettelStore) Flush() (err error) {
 	}
 
 	return
-}
-
-func (s *zettelStore) AddOne(t *sku.Transacted) (err error) {
-	return s.writeNamedZettelToIndex(t)
-}
-
-func (s *zettelStore) UpdateOne(t *sku.Transacted) (err error) {
-	return s.writeNamedZettelToIndex(t)
 }
 
 func (s *zettelStore) writeNamedZettelToIndex(

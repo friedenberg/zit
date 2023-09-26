@@ -5,18 +5,12 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
 )
 
 type Reindexer interface {
 	// updateExternal(objekte.External) error
-	ReindexOne(*sku.Transacted) (matcher.Matchable, error)
-}
-
-type CommonStoreDelegate interface {
-	AddOne(*sku.Transacted) error
-	UpdateOne(*sku.Transacted) error
+	// ReindexOne(*sku.Transacted) (matcher.Matchable, error)
 }
 
 type CommonStore struct {
@@ -26,18 +20,12 @@ type CommonStore struct {
 
 func MakeCommonStore(
 	gg schnittstellen.GattungGetter,
-	delegate CommonStoreDelegate,
 	sa StoreUtil,
 	tr objekte_store.TransactedReader,
 	cou objekte_store.CreateOrUpdater,
 ) (s *CommonStore, err error) {
-	if delegate == nil {
-		panic("delegate was nil")
-	}
-
 	csb, err := MakeCommonStoreBase(
 		gg,
-		delegate,
 		sa,
 		tr,
 		objekte_format.FormatForVersion(

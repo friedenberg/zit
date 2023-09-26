@@ -1,7 +1,6 @@
 package store_util
 
 import (
-	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -17,8 +16,6 @@ type CommonStoreBase struct {
 	schnittstellen.GattungGetter
 	StoreUtil
 
-	delegate CommonStoreDelegate
-
 	objekte_store.TransactedReader
 	objekte_store.LogWriter
 	persistentMetadateiFormat objekte_format.Format
@@ -26,18 +23,12 @@ type CommonStoreBase struct {
 
 func MakeCommonStoreBase(
 	gg schnittstellen.GattungGetter,
-	delegate CommonStoreDelegate,
 	sa StoreUtil,
 	tr objekte_store.TransactedReader,
 	pmf objekte_format.Format,
 ) (s *CommonStoreBase, err error) {
-	if delegate == nil {
-		panic("delegate was nil")
-	}
-
 	s = &CommonStoreBase{
 		GattungGetter:             gg,
-		delegate:                  delegate,
 		StoreUtil:                 sa,
 		TransactedReader:          tr,
 		persistentMetadateiFormat: pmf,
@@ -57,26 +48,4 @@ func (s *CommonStoreBase) Query(
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return objekte_store.QueryMethodForMatcher(s, m, f)
-}
-
-func (s *CommonStoreBase) ReindexOne(
-	t *sku.Transacted,
-) (o matcher.Matchable, err error) {
-	o = t
-
-	if t.IsNew() {
-		s.LogWriter.New(t)
-		if err = s.delegate.AddOne(t); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		s.LogWriter.Updated(t)
-		if err = s.delegate.UpdateOne(t); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
 }

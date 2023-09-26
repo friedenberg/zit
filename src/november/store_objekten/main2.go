@@ -14,11 +14,26 @@ import (
 func (s *Store) onNewOrUpdated(
 	t *sku.Transacted,
 ) (err error) {
-	s.StoreUtil.CommitUpdatedTransacted(t)
+	return s.onNewOrUpdatedCommit(t, true)
+}
+
+func (s *Store) onNewOrUpdatedCommit(
+	t *sku.Transacted,
+	commit bool,
+) (err error) {
+	if commit {
+		s.StoreUtil.CommitUpdatedTransacted(t)
+	}
 
 	g := gattung.Must(t.Kennung.GetGattung())
 
 	switch g {
+	case gattung.Konfig:
+		if err = s.StoreUtil.GetKonfigPtr().SetTransacted(t, s.GetAkten().GetKonfigV0()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 	case gattung.Typ:
 		if err = s.StoreUtil.GetKonfigPtr().AddTyp(t); err != nil {
 			err = errors.Wrap(err)
