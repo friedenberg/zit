@@ -34,6 +34,12 @@ func (s *Store) onNewOrUpdatedCommit(
 			return
 		}
 
+	case gattung.Kasten:
+		if err = s.StoreUtil.GetKonfigPtr().AddKasten(t); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 	case gattung.Typ:
 		if err = s.StoreUtil.GetKonfigPtr().AddTyp(t); err != nil {
 			err = errors.Wrap(err)
@@ -143,7 +149,10 @@ func (s *Store) ReadOne(
 		sk = s.StoreUtil.GetKonfig().GetKasten(k)
 
 	case gattung.Konfig:
-		fallthrough
+		if sk, err = s.konfigStore.ReadOne(kennung.Konfig{}); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 	default:
 		err = errors.Errorf("unsupported kennung %T -> %q", k1, k1)
