@@ -16,7 +16,7 @@ import (
 
 func makeObj(
 	options erworben_cli_print_options.PrintOptions,
-	named sku.SkuLike,
+	named sku.SkuLikePtr,
 	expanders kennung.Abbr,
 ) (z obj, err error) {
 	errors.TodoP4("add bez in a better way")

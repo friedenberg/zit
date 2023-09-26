@@ -14,11 +14,7 @@ func init() {
 }
 
 type (
-	Getter interface {
-		GetSkuLike() SkuLike
-	}
-
-	SkuLike interface {
+	skuLike interface {
 		schnittstellen.ValueLike
 		schnittstellen.GattungGetter
 		metadatei.Getter
@@ -30,16 +26,10 @@ type (
 		GetObjekteSha() schnittstellen.ShaLike
 		GetAkteSha() schnittstellen.ShaLike
 		GetKey() string
-
-		EqualsSkuLike(SkuLike) bool
-		ImmutableClone() SkuLike
-		MutableClone() SkuLikePtr
-
-		GetSkuLike() SkuLike
 	}
 
 	SkuLikePtr interface {
-		SkuLike
+		skuLike
 
 		metadatei.GetterPtr
 		metadatei.Setter
@@ -47,13 +37,13 @@ type (
 		SetAkteSha(schnittstellen.ShaLike)
 		SetObjekteSha(schnittstellen.ShaLike)
 
+		EqualsSkuLikePtr(SkuLikePtr) bool
+
 		SetTai(kennung.Tai)
 		SetKennungLike(kennung.Kennung) error
 		GetKennungLikePtr() kennung.KennungPtr
-		SetFromSkuLike(SkuLike) error
+		SetFromSkuLike(SkuLikePtr) error
 		Reset()
-
-		GetSkuLikePtr() SkuLikePtr
 	}
 
 	SkuLikeExternalPtr interface {

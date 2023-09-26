@@ -190,7 +190,7 @@ func (s konfigStore) ReadOne(
 
 	tt = sku.GetTransactedPool().Get()
 
-	if err = tt.SetFromSkuLike(tt1); err != nil {
+	if err = tt.SetFromSkuLike(&tt1); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

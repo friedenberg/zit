@@ -86,7 +86,7 @@ func (matcher *matcherLua) ContainsMatchable(matchable Matchable) bool {
 	s.Push(f)
 
 	sku_fmt.Lua(
-		matchable.GetSkuLike(),
+		matchable,
 		matcher.kennungIndex,
 		s.LState,
 		s.LTable,

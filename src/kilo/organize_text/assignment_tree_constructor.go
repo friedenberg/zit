@@ -49,7 +49,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 ) (err error) {
 	if groupingEtiketten.Len() == 0 {
 		err = prefixSet.EachZettel(
-			func(e kennung.Etikett, tz sku.SkuLike) (err error) {
+			func(e kennung.Etikett, tz sku.SkuLikePtr) (err error) {
 				var z obj
 
 				if z, err = makeObj(atc.Options.PrintOptions, tz, atc.Expanders); err != nil {
@@ -74,7 +74,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 	segments := prefixSet.Subset(groupingEtiketten[0])
 
 	err = segments.Ungrouped.Each(
-		func(tz sku.SkuLike) (err error) {
+		func(tz sku.SkuLikePtr) (err error) {
 			var z obj
 
 			if z, err = makeObj(atc.Options.PrintOptions, tz, atc.Expanders); err != nil {

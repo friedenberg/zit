@@ -29,7 +29,7 @@ func (op Merge) Run(skus sku.TransactedHeap) (err error) {
 				return iter.MakeErrStopIteration()
 			}
 
-			if peeked.EqualsSkuLike(sk) {
+			if peeked.EqualsSkuLikePtr(sk) {
 				skus.Pop()
 				return
 			}

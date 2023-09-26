@@ -82,11 +82,11 @@ func (_ lessor) LessPtr(a, b *Transacted) bool {
 type equaler struct{}
 
 func (_ equaler) Equals(a, b Transacted) bool {
-	return a.EqualsSkuLike(b)
+	panic("not supported")
 }
 
 func (_ equaler) EqualsPtr(a, b *Transacted) bool {
-	return a.EqualsSkuLike(b)
+	return a.EqualsSkuLikePtr(b)
 }
 
 type resetter struct{}
@@ -102,7 +102,7 @@ func (_ resetter) ResetWith(a *Transacted, b Transacted) {
 func (_ resetter) ResetWithPtr(a *Transacted, b *Transacted) {
 	a.Kopf = b.Kopf
 	a.ObjekteSha = b.ObjekteSha
-	errors.PanicIfError(a.Kennung.ResetWithKennung(b.Kennung))
+	errors.PanicIfError(a.Kennung.ResetWithKennung(&b.Kennung))
 	a.Metadatei.ResetWith(b.Metadatei)
 	a.TransactionIndex.SetInt(b.TransactionIndex.Int())
 }

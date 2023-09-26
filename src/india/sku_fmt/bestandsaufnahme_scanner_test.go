@@ -64,7 +64,7 @@ func TestOne(t1 *testing.T) {
 	op := objekte_format.Options{}
 
 	scanner := MakeFormatBestandsaufnahmeScanner(zstd.NewReader(b), f, op)
-	var sk sku.SkuLike
+	var sk sku.SkuLikePtr
 
 	if !scanner.Scan() {
 		t.Fatalf("expected ok scan")

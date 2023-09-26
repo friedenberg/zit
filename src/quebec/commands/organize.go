@@ -107,7 +107,12 @@ func (c *Organize) RunWithQuery(
 	if err = u.StoreObjekten().Query(
 		ms,
 		func(tl *sku.Transacted) (err error) {
-			mwk := tl.GetSkuLike().MutableClone()
+			mwk := sku.GetTransactedPool().Get()
+
+			if err = mwk.SetFromSkuLike(tl); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 
 			// TODO-P1 determine if this is necessary
 			var h kennung.Hinweis

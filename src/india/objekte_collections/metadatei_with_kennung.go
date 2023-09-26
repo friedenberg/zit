@@ -6,11 +6,11 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
-type MutableSetMetadateiWithKennung = schnittstellen.MutableSetLike[sku.SkuLike]
+type MutableSetMetadateiWithKennung = schnittstellen.MutableSetLike[sku.SkuLikePtr]
 
 type SkuGetKeyKeyer struct{}
 
-func (kk SkuGetKeyKeyer) GetKey(mwk sku.SkuLike) string {
+func (kk SkuGetKeyKeyer) GetKey(mwk sku.SkuLikePtr) string {
 	if mwk == nil {
 		return ""
 	}
@@ -20,7 +20,7 @@ func (kk SkuGetKeyKeyer) GetKey(mwk sku.SkuLike) string {
 
 type KennungKeyer struct{}
 
-func (kk KennungKeyer) GetKey(mwk sku.SkuLike) string {
+func (kk KennungKeyer) GetKey(mwk sku.SkuLikePtr) string {
 	if mwk == nil {
 		return ""
 	}
@@ -29,7 +29,7 @@ func (kk KennungKeyer) GetKey(mwk sku.SkuLike) string {
 }
 
 func MakeMutableSetMetadateiWithKennung() MutableSetMetadateiWithKennung {
-	return collections_value.MakeMutableValueSet[sku.SkuLike](
+	return collections_value.MakeMutableValueSet[sku.SkuLikePtr](
 		SkuGetKeyKeyer{},
 	)
 }

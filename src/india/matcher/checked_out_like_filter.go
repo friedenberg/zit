@@ -16,7 +16,7 @@ func MakeFilterFromQuery(
 	}
 
 	return func(col *sku.CheckedOut) (err error) {
-		g := gattung.Must(col.Internal.GetSkuLike().GetGattung())
+		g := gattung.Must(col.Internal.GetGattung())
 
 		var matcher Matcher
 		ok := false

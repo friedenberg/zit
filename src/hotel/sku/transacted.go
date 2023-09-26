@@ -19,7 +19,7 @@ type Transacted struct {
 	Kopf             kennung.Tai
 }
 
-func (t *Transacted) SetFromSkuLike(sk SkuLike) (err error) {
+func (t *Transacted) SetFromSkuLike(sk SkuLikePtr) (err error) {
 	err = t.Kennung.SetWithGattung(
 		sk.GetKennungLike().String(),
 		sk.GetGattung(),
@@ -70,14 +70,6 @@ func MakeSkuLike2(
 	return
 }
 
-func (a Transacted) ImmutableClone() SkuLike {
-	return a
-}
-
-func (a Transacted) MutableClone() SkuLikePtr {
-	return &a
-}
-
 func (a Transacted) String() string {
 	return fmt.Sprintf(
 		"%s %s %s",
@@ -85,10 +77,6 @@ func (a Transacted) String() string {
 		a.ObjekteSha,
 		a.Metadatei.AkteSha,
 	)
-}
-
-func (a Transacted) GetSkuLike() SkuLike {
-	return a
 }
 
 func (a *Transacted) GetSkuLikePtr() SkuLikePtr {
@@ -195,7 +183,7 @@ func (a Transacted) Less(b Transacted) (ok bool) {
 	return
 }
 
-func (a Transacted) EqualsSkuLike(b SkuLike) bool {
+func (a Transacted) EqualsSkuLikePtr(b SkuLikePtr) bool {
 	return values.Equals(a, b) || values.EqualsPtr(a, b)
 }
 

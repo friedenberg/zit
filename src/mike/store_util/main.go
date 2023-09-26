@@ -27,7 +27,7 @@ type StoreUtil interface {
 	kennung.Clock
 
 	ExternalReader
-	CommitTransacted(sku.SkuLike) error
+	CommitTransacted(sku.SkuLikePtr) error
 	CommitUpdatedTransacted(sku.SkuLikePtr) error
 
 	GetBestandsaufnahmeStore() bestandsaufnahme.Store
@@ -182,7 +182,7 @@ func (s *common) CommitUpdatedTransacted(
 	return s.CommitTransacted(t)
 }
 
-func (s *common) CommitTransacted(t sku.SkuLike) (err error) {
+func (s *common) CommitTransacted(t sku.SkuLikePtr) (err error) {
 	sk := sku.GetTransactedPool().Get()
 
 	if err = sk.SetFromSkuLike(t); err != nil {

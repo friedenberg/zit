@@ -161,7 +161,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			if _, err = fmt.Fprintf(
 				out,
 				"%s %s\n",
-				tl.GetSkuLike().GetKennungLike(),
+				tl.Kennung,
 				sh,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -173,7 +173,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 
 	case "kennung":
 		return func(e *sku.Transacted) (err error) {
-			_, err = fmt.Fprintln(out, e.GetSkuLike().GetKennungLike())
+			_, err = fmt.Fprintln(out, e.Kennung)
 			return
 		}
 
@@ -181,7 +181,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		return func(e *sku.Transacted) (err error) {
 			_, err = fmt.Fprintln(
 				out,
-				sku_fmt.StringMetadateiSansTai(e.GetSkuLike()),
+				sku_fmt.StringMetadateiSansTai(e),
 			)
 			return
 		}
@@ -190,14 +190,14 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		return func(e *sku.Transacted) (err error) {
 			_, err = fmt.Fprintln(
 				out,
-				sku_fmt.StringMetadatei(e.GetSkuLike()),
+				sku_fmt.StringMetadatei(e),
 			)
 			return
 		}
 
 	case "sku":
 		return func(e *sku.Transacted) (err error) {
-			_, err = fmt.Fprintln(out, sku_fmt.String(e.GetSkuLike()))
+			_, err = fmt.Fprintln(out, sku_fmt.String(e))
 			return
 		}
 

@@ -8,7 +8,7 @@ import (
 
 type KeyerSkuLikeUnique struct{}
 
-func (k KeyerSkuLikeUnique) GetKey(o sku.SkuLike) string {
+func (k KeyerSkuLikeUnique) GetKey(o sku.SkuLikePtr) string {
 	if o == nil {
 		return ""
 	}
@@ -23,7 +23,7 @@ func (k KeyerSkuLikeUnique) GetKey(o sku.SkuLike) string {
 	)
 }
 
-func String(o sku.SkuLike) (str string) {
+func String(o sku.SkuLikePtr) (str string) {
 	str = fmt.Sprintf(
 		"%s %s %s %s %s",
 		o.GetTai(),

@@ -68,14 +68,14 @@ func (op Server) GetNeededSkus(
 ) (err error) {
 	defer errors.DeferredCloser(&err, d)
 
-	var in []sku.SkuLike
+	var in []sku.SkuLikePtr
 
 	if err = d.Receive(&in); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	out := make([]sku.SkuLike, 0)
+	out := make([]sku.SkuLikePtr, 0)
 
 	for _, sk := range in {
 		// TODO-P2 support other Gattung

@@ -196,7 +196,7 @@ func (c compiled) GetSortedEtikettenExpanded(
 
 			ct1 := sku.GetTransactedPool().Get()
 
-			if err = ct1.SetFromSkuLike(ct.Transacted); err != nil {
+			if err = ct1.SetFromSkuLike(&ct.Transacted); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

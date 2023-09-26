@@ -11,6 +11,11 @@ type Stringer interface {
 	String() string
 }
 
+type StringerSetter interface {
+	Stringer
+	Setter
+}
+
 type StringerPtr[T any] interface {
 	Stringer
 	Ptr[T]

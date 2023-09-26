@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
-func StringMetadateiSansTai(o sku.SkuLike) (str string) {
+func StringMetadateiSansTai(o sku.SkuLikePtr) (str string) {
 	sb := &strings.Builder{}
 
 	sb.WriteString(o.GetGattung().GetGattungString())

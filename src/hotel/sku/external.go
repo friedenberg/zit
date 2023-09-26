@@ -17,7 +17,7 @@ type External struct {
 	FDs ExternalFDs
 }
 
-func (t *External) SetFromSkuLike(sk SkuLike) (err error) {
+func (t *External) SetFromSkuLike(sk SkuLikePtr) (err error) {
 	switch skt := sk.(type) {
 	case SkuLikeExternalPtr:
 		t.FDs = skt.GetFDs()
@@ -125,7 +125,7 @@ func (a External) EqualsAny(b any) (ok bool) {
 	return values.Equals(a, b)
 }
 
-func (a External) EqualsSkuLike(b SkuLike) (ok bool) {
+func (a External) EqualsSkuLikePtr(b SkuLikePtr) (ok bool) {
 	return values.Equals(a, b)
 }
 

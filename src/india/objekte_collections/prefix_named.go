@@ -27,7 +27,7 @@ func (s SetPrefixVerzeichnisse) Len() int {
 }
 
 // this splits on right-expanded
-func (s *SetPrefixVerzeichnisse) Add(z sku.SkuLike) (err error) {
+func (s *SetPrefixVerzeichnisse) Add(z sku.SkuLikePtr) (err error) {
 	es := kennung.Expanded(
 		z.GetMetadatei().GetEtiketten(),
 		kennung.ExpanderRight,
@@ -51,7 +51,7 @@ func (a SetPrefixVerzeichnisse) Subtract(
 
 	for e, aSet := range a.innerMap {
 		aSet.Each(
-			func(z sku.SkuLike) (err error) {
+			func(z sku.SkuLikePtr) (err error) {
 				if b.Contains(z) {
 					return
 				}
@@ -68,7 +68,7 @@ func (a SetPrefixVerzeichnisse) Subtract(
 
 func (s *SetPrefixVerzeichnisse) addPair(
 	e kennung.Etikett,
-	z sku.SkuLike,
+	z sku.SkuLikePtr,
 ) {
 	s.count += 1
 
@@ -101,12 +101,12 @@ func (a SetPrefixVerzeichnisse) Each(
 }
 
 func (a SetPrefixVerzeichnisse) EachZettel(
-	f func(kennung.Etikett, sku.SkuLike) error,
+	f func(kennung.Etikett, sku.SkuLikePtr) error,
 ) error {
 	return a.Each(
 		func(e kennung.Etikett, st MutableSetMetadateiWithKennung) (err error) {
 			err = st.Each(
-				func(z sku.SkuLike) (err error) {
+				func(z sku.SkuLikePtr) (err error) {
 					err = f(e, z)
 					return
 				},

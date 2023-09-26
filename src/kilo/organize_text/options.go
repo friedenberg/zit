@@ -29,7 +29,7 @@ type Options struct {
 	Typ               kennung.Typ
 	GroupingEtiketten kennung.Slice
 	ExtraEtiketten    kennung.EtikettSet
-	Transacted        schnittstellen.SetLike[sku.SkuLike]
+	Transacted        schnittstellen.SetLike[sku.SkuLikePtr]
 
 	Expanders kennung.Abbr
 
