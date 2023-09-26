@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/tridex"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/india/matcher"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 // TODO-P4 make generic
@@ -24,7 +24,7 @@ type AbbrStore interface {
 	Etiketten() AbbrStoreGeneric[kennung.Etikett]
 	Typen() AbbrStoreGeneric[kennung.Typ]
 
-	AddMatchable(matcher.Matchable) error
+	AddMatchable(*sku.Transacted) error
 
 	errors.Flusher
 }
@@ -162,7 +162,7 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 	return
 }
 
-func (i *indexAbbr) AddMatchable(o matcher.Matchable) (err error) {
+func (i *indexAbbr) AddMatchable(o *sku.Transacted) (err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return

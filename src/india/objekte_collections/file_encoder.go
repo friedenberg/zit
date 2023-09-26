@@ -62,7 +62,7 @@ func (e *fileEncoder) openOrCreate(p string) (f *os.File, err error) {
 }
 
 func (e *fileEncoder) EncodeObjekte(
-	z sku.SkuLikeExternalPtr,
+	z *sku.External,
 	objektePath string,
 	aktePath string,
 ) (err error) {
@@ -186,7 +186,7 @@ func (e *fileEncoder) EncodeObjekte(
 }
 
 func (e *fileEncoder) Encode(
-	z sku.SkuLikeExternalPtr,
+	z *sku.External,
 ) (err error) {
 	return e.EncodeObjekte(
 		z,

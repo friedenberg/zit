@@ -20,7 +20,7 @@ func (k KeyerFDSha) GetKey(fd kennung.FD) string {
 
 func (s Store) ReadAllMatchingAkten(
 	akten schnittstellen.SetLike[kennung.FD],
-	f func(kennung.FD, sku.SkuLikePtr) error,
+	f func(kennung.FD, *sku.Transacted) error,
 ) (err error) {
 	fds := collections_value.MakeMutableValueSet[kennung.FD](
 		KeyerFDSha{},

@@ -115,7 +115,7 @@ func (c CreateFromPaths) Run(
 	)
 
 	if err = toCreate.Each(
-		func(z sku.SkuLikeExternalPtr) (err error) {
+		func(z *sku.External) (err error) {
 			if z.GetMetadatei().IsEmpty() {
 				return
 			}
@@ -132,7 +132,7 @@ func (c CreateFromPaths) Run(
 			}
 
 			if err = cz.External.Transacted.SetFromSkuLike(zt); err != nil {
-				err = errors.Wrapf(err, "Sku: %q", sku_fmt.String(z))
+				err = errors.Wrapf(err, "Sku: %q", sku_fmt.String(&z.Transacted))
 				return
 			}
 
@@ -171,7 +171,7 @@ func (c CreateFromPaths) Run(
 	}
 
 	if err = toDelete.Each(
-		func(z sku.SkuLikeExternalPtr) (err error) {
+		func(z *sku.External) (err error) {
 			// TODO-P2 move to checkout store
 			if err = os.Remove(z.GetObjekteFD().Path); err != nil {
 				err = errors.Wrap(err)

@@ -63,7 +63,7 @@ func (c Status) RunWithCwdQuery(
 
 	if err = u.StoreObjekten().ReadAllMatchingAkten(
 		possible.UnsureAkten,
-		func(fd kennung.FD, z sku.SkuLikePtr) (err error) {
+		func(fd kennung.FD, z *sku.Transacted) (err error) {
 			if z == nil {
 				err = u.PrinterFileNotRecognized()(&fd)
 			} else {

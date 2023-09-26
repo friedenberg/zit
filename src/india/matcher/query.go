@@ -14,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 func init() {
@@ -40,7 +41,7 @@ func (s setWithSigil) String() string {
 	return fmt.Sprintf("%s%s", s.Matcher, s.Sigil)
 }
 
-func (s setWithSigil) ContainsMatchable(m Matchable) bool {
+func (s setWithSigil) ContainsMatchable(m *sku.Transacted) bool {
 	return s.Matcher.ContainsMatchable(m)
 }
 
@@ -504,7 +505,7 @@ func (ms query) GetTypen() schnittstellen.SetLike[kennung.Typ] {
 	return es
 }
 
-func (s query) ContainsMatchable(m Matchable) bool {
+func (s query) ContainsMatchable(m *sku.Transacted) bool {
 	todo.Implement()
 	return false
 }

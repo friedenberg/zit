@@ -8,10 +8,10 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
-type SetPrefixNamed map[kennung.Etikett]schnittstellen.MutableSetLike[sku.SkuLikePtr]
+type SetPrefixNamed map[kennung.Etikett]schnittstellen.MutableSetLike[*sku.Transacted]
 
 type SetPrefixNamedSegments struct {
-	Ungrouped schnittstellen.MutableSetLike[sku.SkuLikePtr]
+	Ungrouped schnittstellen.MutableSetLike[*sku.Transacted]
 	Grouped   *SetPrefixNamed
 }
 
@@ -21,14 +21,14 @@ func NewSetPrefixNamed() *SetPrefixNamed {
 	return &s
 }
 
-func makeMutableZettelLikeSet() schnittstellen.MutableSetLike[sku.SkuLikePtr] {
-	return collections_value.MakeMutableSet[sku.SkuLikePtr](
+func makeMutableZettelLikeSet() schnittstellen.MutableSetLike[*sku.Transacted] {
+	return collections_value.MakeMutableSet[*sku.Transacted](
 		KennungKeyer{},
 	)
 }
 
 // this splits on right-expanded
-func (s *SetPrefixNamed) Add(z sku.SkuLikePtr) {
+func (s *SetPrefixNamed) Add(z *sku.Transacted) {
 	es := kennung.Expanded(
 		z.GetMetadatei().GetEtiketten(),
 		kennung.ExpanderRight,
@@ -41,7 +41,7 @@ func (s *SetPrefixNamed) Add(z sku.SkuLikePtr) {
 
 func (s *SetPrefixNamed) addPair(
 	e kennung.Etikett,
-	z sku.SkuLikePtr,
+	z *sku.Transacted,
 ) {
 	existing, ok := (*s)[e]
 
@@ -62,7 +62,7 @@ func (a SetPrefixNamed) Subset(e kennung.Etikett) (out SetPrefixNamedSegments) {
 
 	for _, zSet := range a {
 		zSet.Each(
-			func(z sku.SkuLikePtr) (err error) {
+			func(z *sku.Transacted) (err error) {
 				intersection := kennung.IntersectPrefixes(
 					z.GetMetadatei().GetEtiketten(),
 					kennung.MakeEtikettSet(e),
@@ -87,12 +87,12 @@ func (a SetPrefixNamed) Subset(e kennung.Etikett) (out SetPrefixNamedSegments) {
 	return
 }
 
-func (s SetPrefixNamed) ToSetNamed() (out schnittstellen.MutableSetLike[sku.SkuLikePtr]) {
+func (s SetPrefixNamed) ToSetNamed() (out schnittstellen.MutableSetLike[*sku.Transacted]) {
 	out = makeMutableZettelLikeSet()
 
 	for _, zs := range s {
 		zs.Each(
-			func(z sku.SkuLikePtr) (err error) {
+			func(z *sku.Transacted) (err error) {
 				out.Add(z)
 
 				return
@@ -115,7 +115,7 @@ func (a SetPrefixVerzeichnisse) Subset(
 		}
 
 		zSet.Each(
-			func(z sku.SkuLikePtr) (err error) {
+			func(z *sku.Transacted) (err error) {
 				intersection := kennung.IntersectPrefixes(
 					z.GetMetadatei().Etiketten,
 					kennung.MakeEtikettSet(e),

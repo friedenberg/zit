@@ -6,11 +6,11 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
-type MutableSet = schnittstellen.MutableSetLike[sku.SkuLikeExternalPtr]
+type MutableSet = schnittstellen.MutableSetLike[*sku.External]
 
 type KeyerHinweis struct{}
 
-func (k KeyerHinweis) GetKey(z sku.SkuLikeExternalPtr) string {
+func (k KeyerHinweis) GetKey(z *sku.External) string {
 	if z == nil {
 		return ""
 	}
@@ -18,15 +18,15 @@ func (k KeyerHinweis) GetKey(z sku.SkuLikeExternalPtr) string {
 	return z.GetKennungLike().String()
 }
 
-func MakeMutableSetUniqueHinweis(zs ...sku.SkuLikeExternalPtr) MutableSet {
-	return collections_value.MakeMutableValueSet[sku.SkuLikeExternalPtr](
+func MakeMutableSetUniqueHinweis(zs ...*sku.External) MutableSet {
+	return collections_value.MakeMutableValueSet[*sku.External](
 		KeyerHinweis{},
 		zs...)
 }
 
 type KeyerFD struct{}
 
-func (k KeyerFD) GetKey(z sku.SkuLikeExternalPtr) string {
+func (k KeyerFD) GetKey(z *sku.External) string {
 	if z == nil {
 		return ""
 	}
@@ -34,15 +34,15 @@ func (k KeyerFD) GetKey(z sku.SkuLikeExternalPtr) string {
 	return z.String()
 }
 
-func MakeMutableSetUniqueFD(zs ...sku.SkuLikeExternalPtr) MutableSet {
-	return collections_value.MakeMutableValueSet[sku.SkuLikeExternalPtr](
+func MakeMutableSetUniqueFD(zs ...*sku.External) MutableSet {
+	return collections_value.MakeMutableValueSet[*sku.External](
 		KeyerFD{},
 		zs...)
 }
 
 type KeyerStored struct{}
 
-func (k KeyerStored) GetKey(z sku.SkuLikeExternalPtr) string {
+func (k KeyerStored) GetKey(z *sku.External) string {
 	if z == nil {
 		return ""
 	}
@@ -54,15 +54,15 @@ func (k KeyerStored) GetKey(z sku.SkuLikeExternalPtr) string {
 	return z.GetObjekteSha().String()
 }
 
-func MakeMutableSetUniqueStored(zs ...sku.SkuLikeExternalPtr) MutableSet {
-	return collections_value.MakeMutableValueSet[sku.SkuLikeExternalPtr](
+func MakeMutableSetUniqueStored(zs ...*sku.External) MutableSet {
+	return collections_value.MakeMutableValueSet[*sku.External](
 		KeyerStored{},
 		zs...)
 }
 
 type KeyerAkte struct{}
 
-func (k KeyerAkte) GetKey(z sku.SkuLikeExternalPtr) string {
+func (k KeyerAkte) GetKey(z *sku.External) string {
 	if z == nil {
 		return ""
 	}
@@ -76,8 +76,8 @@ func (k KeyerAkte) GetKey(z sku.SkuLikeExternalPtr) string {
 	return sh.String()
 }
 
-func MakeMutableSetUniqueAkte(zs ...sku.SkuLikeExternalPtr) MutableSet {
-	return collections_value.MakeMutableValueSet[sku.SkuLikeExternalPtr](
+func MakeMutableSetUniqueAkte(zs ...*sku.External) MutableSet {
+	return collections_value.MakeMutableValueSet[*sku.External](
 		KeyerAkte{},
 		zs...)
 }

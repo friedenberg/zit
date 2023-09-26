@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/pool"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/sku_fmt"
 	lua "github.com/yuin/gopher-lua"
 	lua_ast "github.com/yuin/gopher-lua/ast"
@@ -78,7 +79,7 @@ func (m *matcherLua) String() string {
 	// return sb.String()
 }
 
-func (matcher *matcherLua) ContainsMatchable(matchable Matchable) bool {
+func (matcher *matcherLua) ContainsMatchable(matchable *sku.Transacted) bool {
 	s := matcher.statePool.Get()
 	defer matcher.statePool.Put(s)
 

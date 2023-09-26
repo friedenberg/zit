@@ -114,7 +114,7 @@ func (atc Factory) makeChildren(
 		prefixSet.ToSet().Each(used.Add)
 
 		err = prefixSet.EachZettel(
-			func(e kennung.Etikett, tz sku.SkuLikePtr) (err error) {
+			func(e kennung.Etikett, tz *sku.Transacted) (err error) {
 				var z obj
 
 				if z, err = makeObj(atc.Options.PrintOptions, tz, atc.Expanders); err != nil {
@@ -139,7 +139,7 @@ func (atc Factory) makeChildren(
 	segments := prefixSet.Subset(groupingEtiketten[0])
 
 	err = segments.Ungrouped.Each(
-		func(tz sku.SkuLikePtr) (err error) {
+		func(tz *sku.Transacted) (err error) {
 			var z obj
 
 			if z, err = makeObj(atc.Options.PrintOptions, tz, atc.Expanders); err != nil {

@@ -183,7 +183,7 @@ func (zp *Page) copy(
 
 	r := bufio.NewReader(r1)
 
-	var getOneSku func() (sku.SkuLikePtr, error)
+	var getOneSku func() (*sku.Transacted, error)
 
 	if zp.useBestandsaufnahmeForVerzeichnisse {
 		dec := sku_fmt.MakeFormatBestandsaufnahmeScanner(
@@ -195,7 +195,7 @@ func (zp *Page) copy(
 			},
 		)
 
-		getOneSku = func() (sk sku.SkuLikePtr, err error) {
+		getOneSku = func() (sk *sku.Transacted, err error) {
 			if !dec.Scan() {
 				if err = dec.Error(); err == nil {
 					err = io.EOF
@@ -211,7 +211,7 @@ func (zp *Page) copy(
 	} else {
 		dec := gob.NewDecoder(r)
 
-		getOneSku = func() (sk sku.SkuLikePtr, err error) {
+		getOneSku = func() (sk *sku.Transacted, err error) {
 			tz := sku.GetTransactedPool().Get()
 			err = dec.Decode(tz)
 			sk = tz
@@ -224,22 +224,13 @@ func (zp *Page) copy(
 
 	if err = added.MergeStream(
 		func() (tz *sku.Transacted, err error) {
-			var sk sku.SkuLikePtr
-
-			if sk, err = getOneSku(); err != nil {
+			if tz, err = getOneSku(); err != nil {
 				if errors.IsEOF(err) {
 					err = collections.MakeErrStopIteration()
 				} else {
 					err = errors.Wrapf(err, "Page: %s", zp.pageId.path)
 				}
 
-				return
-			}
-
-			ok := false
-
-			if tz, ok = sk.(*sku.Transacted); !ok {
-				err = errors.Errorf("expected %T but got %T, err: %s", tz, sk, err)
 				return
 			}
 

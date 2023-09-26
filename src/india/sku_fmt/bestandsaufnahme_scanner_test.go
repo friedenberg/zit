@@ -64,37 +64,20 @@ func TestOne(t1 *testing.T) {
 	op := objekte_format.Options{}
 
 	scanner := MakeFormatBestandsaufnahmeScanner(zstd.NewReader(b), f, op)
-	var sk sku.SkuLikePtr
 
 	if !scanner.Scan() {
 		t.Fatalf("expected ok scan")
 	}
 
-	sk = scanner.GetTransacted()
+	_ = scanner.GetTransacted()
 	t.AssertNoError(scanner.Error())
-
-	{
-		sk1, ok := sk.(*sku.Transacted)
-
-		if !ok {
-			t.Errorf("expected %T but got %T", sk1, sk)
-		}
-	}
 
 	if !scanner.Scan() {
 		t.Fatalf("expected ok scan")
 	}
 
-	sk = scanner.GetTransacted()
+	_ = scanner.GetTransacted()
 	t.AssertNoError(scanner.Error())
-
-	{
-		sk1, ok := sk.(*sku.Transacted)
-
-		if !ok {
-			t.Errorf("expected %T but got %T", sk1, sk)
-		}
-	}
 
 	if scanner.Scan() {
 		t.Fatalf("expected end scan")

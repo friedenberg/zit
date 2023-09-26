@@ -371,7 +371,7 @@ func (s *Store) addEtikettAndExpanded(
 }
 
 func (s *Store) addMatchableTypAndEtikettenIfNecessary(
-	m matcher.Matchable,
+	m *sku.Transacted,
 ) (err error) {
 	t := m.GetTyp()
 
@@ -392,7 +392,7 @@ func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 	return
 }
 
-func (s *Store) AddMatchable(m matcher.Matchable) (err error) {
+func (s *Store) AddMatchable(m *sku.Transacted) (err error) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
@@ -409,7 +409,7 @@ func (s *Store) AddMatchable(m matcher.Matchable) (err error) {
 	return
 }
 
-func (s *Store) addMatchableCommon(m matcher.Matchable) (err error) {
+func (s *Store) addMatchableCommon(m *sku.Transacted) (err error) {
 	t := m.GetTyp()
 
 	if !t.IsEmpty() {

@@ -26,7 +26,7 @@ func MakeFilterFromQuery(
 			return
 		}
 
-		if !matcher.ContainsMatchable(&col.External) {
+		if !matcher.ContainsMatchable(&col.External.Transacted) {
 			err = iter.MakeErrStopIteration()
 			return
 		}

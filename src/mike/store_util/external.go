@@ -14,23 +14,23 @@ import (
 type ExternalReader interface {
 	ReadOneExternal(
 		em *sku.ExternalMaybe,
-		t sku.SkuLikePtr,
+		t *sku.Transacted,
 	) (e *sku.External, err error)
 
 	ReadOneExternalObjekte(
-		e sku.SkuLikeExternalPtr,
-		t sku.SkuLikePtr,
+		e *sku.External,
+		t *sku.Transacted,
 	) (err error)
 
 	ReadOneExternalAkte(
-		e sku.SkuLikeExternalPtr,
-		t sku.SkuLikePtr,
+		e *sku.External,
+		t *sku.Transacted,
 	) (err error)
 }
 
 func (s *common) ReadOneExternal(
 	em *sku.ExternalMaybe,
-	t sku.SkuLikePtr,
+	t *sku.Transacted,
 ) (e *sku.External, err error) {
 	var m checkout_mode.Mode
 
@@ -46,7 +46,7 @@ func (s *common) ReadOneExternal(
 		return
 	}
 
-	var t1 sku.SkuLikePtr
+	var t1 *sku.Transacted
 
 	if t != nil {
 		t1 = t
@@ -70,8 +70,8 @@ func (s *common) ReadOneExternal(
 }
 
 func (s *common) ReadOneExternalObjekte(
-	e sku.SkuLikeExternalPtr,
-	t sku.SkuLikePtr,
+	e *sku.External,
+	t *sku.Transacted,
 ) (err error) {
 	var f *os.File
 
@@ -95,8 +95,8 @@ func (s *common) ReadOneExternalObjekte(
 }
 
 func (s *common) ReadOneExternalAkte(
-	e sku.SkuLikeExternalPtr,
-	t sku.SkuLikePtr,
+	e *sku.External,
+	t *sku.Transacted,
 ) (err error) {
 	e.SetMetadatei(t.GetMetadatei())
 

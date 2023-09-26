@@ -124,7 +124,7 @@ func (fv *FormatterValue) FuncFormatter(
 
 	case "typ-vim-syntax-type":
 		return func(o *sku.Transacted) (err error) {
-			var t sku.SkuLikePtr
+			var t *sku.Transacted
 
 			if t = k.GetApproximatedTyp(
 				o.GetTyp(),

@@ -6,7 +6,7 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
-func Lua(o sku.SkuLikePtr, ki kennung.Index, l *lua.LState, t *lua.LTable) {
+func Lua(o *sku.Transacted, ki kennung.Index, l *lua.LState, t *lua.LTable) {
 	l.SetField(t, "Kennung", lua.LString(o.GetKennungLike().String()))
 	l.SetField(t, "Gattung", lua.LString(o.GetGattung().GetGattungString()))
 	l.SetField(t, "Typ", lua.LString(o.GetTyp().String()))

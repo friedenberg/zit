@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
 	"github.com/friedenberg/zit/src/kilo/zettel"
@@ -506,7 +505,7 @@ func (s *zettelStore) Inherit(tz *sku.Transacted) (err error) {
 
 func (s *zettelStore) ReindexOne(
 	tz *sku.Transacted,
-) (o matcher.Matchable, err error) {
+) (o *sku.Transacted, err error) {
 	o = tz
 
 	var h kennung.Hinweis

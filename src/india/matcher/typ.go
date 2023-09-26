@@ -3,11 +3,12 @@ package matcher
 import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 type Typ kennung.Typ
 
-func (t Typ) ContainsMatchableExactly(m Matchable) bool {
+func (t Typ) ContainsMatchableExactly(m *sku.Transacted) bool {
 	g := gattung.Make(m.GetGattung())
 
 	switch g {

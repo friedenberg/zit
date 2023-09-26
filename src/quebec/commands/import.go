@@ -153,7 +153,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 func (c Import) importAkteIfNecessary(
 	u *umwelt.Umwelt,
-	sk sku.SkuLikePtr,
+	sk *sku.Transacted,
 	ag *age.Age,
 ) (err error) {
 	akteSha := sk.GetAkteSha()

@@ -398,15 +398,11 @@ func (kc compiled) GetKasten(k kennung.Kasten) (ct *sku.Transacted) {
 }
 
 func (k *compiled) SetTransacted(
-	kt1 sku.SkuLikePtr,
+	kt1 *sku.Transacted,
 	kag schnittstellen.AkteGetter[*erworben.Akte],
 ) (err error) {
 	kt := sku.GetTransactedPool().Get()
-
-	if err = kt.SetFromSkuLike(kt1); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	*kt = *kt1
 
 	if !k.Sku.Less(*kt) {
 		return
@@ -428,18 +424,14 @@ func (k *compiled) SetTransacted(
 }
 
 func (k *compiled) AddKasten(
-	c sku.SkuLikePtr,
+	c *sku.Transacted,
 ) (err error) {
 	k.lock.Lock()
 	defer k.lock.Unlock()
 	k.hasChanges = true
 
 	b := sku.GetTransactedPool().Get()
-
-	if err = b.SetFromSkuLike(c); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	*b = *c
 
 	err = iter2.AddPtrOrReplaceIfGreater[sku.Transacted, *sku.Transacted](
 		k.Kisten,
@@ -456,12 +448,15 @@ func (k *compiled) AddKasten(
 }
 
 func (k *compiled) AddTyp(
-	b *sku.Transacted,
+	b1 *sku.Transacted,
 ) (err error) {
-	if err = gattung.Typ.AssertGattung(b); err != nil {
+	if err = gattung.Typ.AssertGattung(b1); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	b := sku.GetTransactedPool().Get()
+	*b = *b1
 
 	k.lock.Lock()
 	defer k.lock.Unlock()

@@ -136,7 +136,7 @@ func (fs CwdFiles) String() (out string) {
 	return
 }
 
-func (fs CwdFiles) ContainsMatchable(m matcher.Matchable) bool {
+func (fs CwdFiles) ContainsMatchable(m *sku.Transacted) bool {
 	g := gattung.Must(m)
 
 	switch g {

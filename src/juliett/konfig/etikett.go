@@ -126,16 +126,12 @@ func (k *compiled) AccumulateImplicitEtiketten(
 }
 
 func (k *compiled) AddEtikett2(
-	b1 sku.SkuLikePtr,
+	b1 *sku.Transacted,
 ) (err error) {
-	var e sku.Transacted
+	e := sku.GetTransactedPool().Get()
+	*e = *b1
 
-	if err = e.SetFromSkuLike(b1); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return k.AddEtikett(&e)
+	return k.AddEtikett(e)
 }
 
 func (k *compiled) AddEtikett(

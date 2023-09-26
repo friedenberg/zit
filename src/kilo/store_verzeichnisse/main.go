@@ -100,7 +100,7 @@ func (i *Zettelen) Flush() (err error) {
 }
 
 func (i *Zettelen) AddVerzeichnisse(
-	tz sku.SkuLikePtr,
+	tz *sku.Transacted,
 	v string,
 ) (err error) {
 	var n int

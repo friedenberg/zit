@@ -15,13 +15,13 @@ type Matchable interface {
 	schnittstellen.ValueLike
 	schnittstellen.Stored
 
-	sku.SkuLikePtr
+	*sku.Transacted
 }
 
 type MatchableGetter interface {
-	GetMatchable() Matchable
+	GetMatchable() *sku.Transacted
 }
 
 type MatchableAdder interface {
-	AddMatchable(Matchable) error
+	AddMatchable(*sku.Transacted) error
 }

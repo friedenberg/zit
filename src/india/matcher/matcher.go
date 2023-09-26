@@ -35,7 +35,7 @@ func init() {
 }
 
 type Matcher interface {
-	ContainsMatchable(Matchable) bool
+	ContainsMatchable(*sku.Transacted) bool
 	schnittstellen.Stringer
 	MatcherLen() int
 	Each(schnittstellen.FuncIter[Matcher]) error
@@ -58,7 +58,7 @@ type MatcherKennungSansGattungWrapper interface {
 
 type MatcherExact interface {
 	Matcher
-	ContainsMatchableExactly(Matchable) bool
+	ContainsMatchableExactly(*sku.Transacted) bool
 }
 
 type MatcherImplicit interface {
@@ -165,7 +165,7 @@ func (_ matcherAlways) String() string {
 	return "ALWAYS"
 }
 
-func (_ matcherAlways) ContainsMatchable(_ Matchable) bool {
+func (_ matcherAlways) ContainsMatchable(_ *sku.Transacted) bool {
 	return true
 }
 
@@ -194,7 +194,7 @@ func (_ matcherNever) String() string {
 	return "NEVER"
 }
 
-func (_ matcherNever) ContainsMatchable(_ Matchable) bool {
+func (_ matcherNever) ContainsMatchable(_ *sku.Transacted) bool {
 	return false
 }
 
@@ -253,7 +253,7 @@ func (matcher matcherAnd) String() string {
 	return sb.String()
 }
 
-func (matcher matcherAnd) ContainsMatchable(matchable Matchable) bool {
+func (matcher matcherAnd) ContainsMatchable(matchable *sku.Transacted) bool {
 	if len(matcher.Children) == 0 {
 		return matcher.MatchOnEmpty
 	}
@@ -334,7 +334,7 @@ func (matcher matcherOr) String() (out string) {
 	return
 }
 
-func (matcher matcherOr) ContainsMatchable(matchable Matchable) bool {
+func (matcher matcherOr) ContainsMatchable(matchable *sku.Transacted) bool {
 	if len(matcher.Children) == 0 {
 		return matcher.MatchOnEmpty
 	}
@@ -406,7 +406,9 @@ func (matcher matcherContains) String() string {
 	return kennung.FormattedString(matcher.Kennung)
 }
 
-func (matcher matcherContains) ContainsMatchable(matchable Matchable) bool {
+func (matcher matcherContains) ContainsMatchable(
+	matchable *sku.Transacted,
+) bool {
 	if !KennungContainsMatchable(matcher.Kennung, matchable, matcher.index) {
 		return false
 	}
@@ -452,7 +454,7 @@ func (matcher matcherContainsExactly) String() string {
 }
 
 func (matcher matcherContainsExactly) ContainsMatchable(
-	matchable Matchable,
+	matchable *sku.Transacted,
 ) bool {
 	return KennungContainsExactlyMatchable(matcher.Kennung, matchable)
 }
@@ -493,7 +495,7 @@ func (matcher matcherNegate) String() string {
 	return string(QueryNegationOperator) + matcher.Child.String()
 }
 
-func (matcher matcherNegate) ContainsMatchable(matchable Matchable) bool {
+func (matcher matcherNegate) ContainsMatchable(matchable *sku.Transacted) bool {
 	ok := !matcher.Child.ContainsMatchable(matchable)
 
 	return ok
@@ -540,7 +542,9 @@ func (matcher matcherImplicit) String() string {
 	// return ""
 }
 
-func (matcher matcherImplicit) ContainsMatchable(matchable Matchable) bool {
+func (matcher matcherImplicit) ContainsMatchable(
+	matchable *sku.Transacted,
+) bool {
 	return matcher.Child.ContainsMatchable(matchable)
 }
 
@@ -605,7 +609,9 @@ func (m matcherGattung) String() string {
 	return sb.String()
 }
 
-func (matcher matcherGattung) ContainsMatchable(matchable Matchable) bool {
+func (matcher matcherGattung) ContainsMatchable(
+	matchable *sku.Transacted,
+) bool {
 	g := gattung.Make(matchable.GetGattung())
 
 	m, ok := matcher.Children[g]
@@ -683,7 +689,9 @@ func (m *matcherWithSigil) Add(child Matcher) (err error) {
 	return
 }
 
-func (matcher matcherWithSigil) ContainsMatchable(matchable Matchable) bool {
+func (matcher matcherWithSigil) ContainsMatchable(
+	matchable *sku.Transacted,
+) bool {
 	if matcher.Matcher == nil {
 		return true
 	}
@@ -695,7 +703,9 @@ func (matcher matcherWithSigil) Each(f schnittstellen.FuncIter[Matcher]) error {
 	return f(matcher.Matcher)
 }
 
-func MakeMatcherFuncIter[T Matchable](m Matcher) schnittstellen.FuncIter[T] {
+func MakeMatcherFuncIter[T *sku.Transacted](
+	m Matcher,
+) schnittstellen.FuncIter[T] {
 	return func(e T) (err error) {
 		if !m.ContainsMatchable(e) {
 			err = iter.MakeErrStopIteration()

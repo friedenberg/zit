@@ -80,7 +80,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var zt sku.SkuLikePtr
+	var zt *sku.Transacted
 
 	if zt, err = u.StoreObjekten().ReadOne(&h); err != nil {
 		err = errors.Wrap(err)
@@ -88,7 +88,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if e, ok := cwdFiles.GetZettel(&h); ok {
-		var ze sku.SkuLikeExternalPtr
+		var ze *sku.External
 
 		ze, err = u.StoreObjekten().ReadOneExternal(e, zt)
 

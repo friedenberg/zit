@@ -1,6 +1,9 @@
 package matcher
 
-import "github.com/friedenberg/zit/src/alfa/schnittstellen"
+import (
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/hotel/sku"
+)
 
 type archiviert struct{}
 
@@ -16,7 +19,7 @@ func (m archiviert) String() string {
 	return ""
 }
 
-func (matcher archiviert) ContainsMatchable(matchable Matchable) bool {
+func (matcher archiviert) ContainsMatchable(matchable *sku.Transacted) bool {
 	if !matchable.GetMetadatei().Verzeichnisse.Archiviert.Bool() {
 		return false
 	}

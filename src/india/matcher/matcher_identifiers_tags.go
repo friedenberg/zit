@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 type ImplicitEtikettenGetter interface {
@@ -63,7 +64,7 @@ func (s *matcherExactlyThisOrAllOfThese) Add(m Matcher) (err error) {
 	return s.Matcher.Add(m)
 }
 
-func (s matcherExactlyThisOrAllOfThese) ContainsMatchable(m Matchable) bool {
+func (s matcherExactlyThisOrAllOfThese) ContainsMatchable(m *sku.Transacted) bool {
 	ok := s.Matcher.ContainsMatchable(m)
 	// log.Debug().Printf("%q -> %t -> %q", s.Matcher, ok, m)
 	return ok

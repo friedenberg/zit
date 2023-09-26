@@ -141,7 +141,7 @@ func (c ZettelFromExternalAkte) Run(
 	dp := c.Umwelt.PrinterFDDeleted()
 
 	err = toDelete.Each(
-		func(z sku.SkuLikeExternalPtr) (err error) {
+		func(z *sku.External) (err error) {
 			// TODO-P4 move to checkout store
 			if err = os.Remove(z.GetAkteFD().Path); err != nil {
 				err = errors.Wrap(err)

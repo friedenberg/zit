@@ -160,7 +160,7 @@ func (c EditKonfig) editInVim(
 func (c EditKonfig) makeTempKonfigFile(
 	u *umwelt.Umwelt,
 ) (p string, err error) {
-	var k sku.SkuLikePtr
+	var k *sku.Transacted
 
 	if k, err = u.StoreObjekten().ReadOne(&kennung.Konfig{}); err != nil {
 		err = errors.Wrap(err)

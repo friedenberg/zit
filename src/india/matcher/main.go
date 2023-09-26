@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 func MakeMatcher(
@@ -107,7 +108,7 @@ func SetQueryKennung(
 
 func KennungContainsExactlyMatchable(
 	k kennung.KennungSansGattung,
-	m Matchable,
+	m *sku.Transacted,
 ) bool {
 	switch kt := k.(type) {
 	case kennung.EtikettLike:
@@ -137,7 +138,7 @@ func KennungContainsExactlyMatchable(
 
 func KennungContainsMatchable(
 	k kennung.KennungSansGattung,
-	m Matchable,
+	m *sku.Transacted,
 	ki kennung.Index,
 ) bool {
 	me := m.GetMetadatei()

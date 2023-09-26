@@ -11,7 +11,7 @@ import (
 )
 
 func (w *Writer) zettelToItem(
-	z sku.SkuLikePtr,
+	z *sku.Transacted,
 	ha func(kennung.Hinweis) (string, error),
 ) (a *alfred.Item) {
 	a = w.alfredWriter.Get()

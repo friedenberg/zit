@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 func init() {
@@ -77,7 +78,7 @@ func (m *matcherSigil) Add(child Matcher) (err error) {
 	return
 }
 
-func (matcher matcherSigil) ContainsMatchable(matchable Matchable) bool {
+func (matcher matcherSigil) ContainsMatchable(matchable *sku.Transacted) bool {
 	if matcher.MatchOnMissing {
 		if !matcher.Sigil.Contains(matcher.MatchSigil) {
 			return true
@@ -147,7 +148,7 @@ func (m *matcherExcludeHidden) AddSigil(v kennung.Sigil) {
 }
 
 func (pred matcherExcludeHidden) ContainsMatchable(
-	val Matchable,
+	val *sku.Transacted,
 ) bool {
 	if pred.Sigil.IncludesHidden() {
 		return true

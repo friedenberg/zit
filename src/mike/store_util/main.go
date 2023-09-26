@@ -27,8 +27,8 @@ type StoreUtil interface {
 	kennung.Clock
 
 	ExternalReader
-	CommitTransacted(sku.SkuLikePtr) error
-	CommitUpdatedTransacted(sku.SkuLikePtr) error
+	CommitTransacted(*sku.Transacted) error
+	CommitUpdatedTransacted(*sku.Transacted) error
 
 	GetBestandsaufnahmeStore() bestandsaufnahme.Store
 	GetAbbrStore() AbbrStore
@@ -174,7 +174,7 @@ func (s common) GetTai() kennung.Tai {
 }
 
 func (s *common) CommitUpdatedTransacted(
-	t sku.SkuLikePtr,
+	t *sku.Transacted,
 ) (err error) {
 	ta := kennung.NowTai()
 	t.SetTai(ta)
@@ -182,13 +182,9 @@ func (s *common) CommitUpdatedTransacted(
 	return s.CommitTransacted(t)
 }
 
-func (s *common) CommitTransacted(t sku.SkuLikePtr) (err error) {
+func (s *common) CommitTransacted(t *sku.Transacted) (err error) {
 	sk := sku.GetTransactedPool().Get()
-
-	if err = sk.SetFromSkuLike(t); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	*sk = *t
 
 	if err = s.bestandsaufnahmeAkte.Skus.Add(sk); err != nil {
 		err = errors.Wrap(err)

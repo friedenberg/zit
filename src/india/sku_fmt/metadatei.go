@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
-func StringMetadatei(o sku.SkuLikePtr) (str string) {
+func StringMetadatei(o *sku.Transacted) (str string) {
 	sb := &strings.Builder{}
 
 	sb.WriteString(o.GetTai().String())
