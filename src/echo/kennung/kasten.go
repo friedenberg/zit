@@ -118,19 +118,3 @@ func (t *Kasten) UnmarshalBinary(text []byte) (err error) {
 
 	return
 }
-
-func (t Kasten) KennungSansGattungClone() KennungSansGattung {
-	return t
-}
-
-func (t Kasten) KennungSansGattungPtrClone() KennungSansGattungPtr {
-	return &t
-}
-
-func (t Kasten) KennungClone() Kennung {
-	return t
-}
-
-func (t Kasten) KennungPtrClone() KennungPtr {
-	return &t
-}

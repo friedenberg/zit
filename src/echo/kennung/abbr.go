@@ -72,9 +72,9 @@ func (a Abbr) AbbreviateHinweisOnly(
 		return
 	}
 
-	outPtr := in.KennungPtrClone()
+	outPtr := &Kennung2{}
 
-	if err = outPtr.Set(abbr); err != nil {
+	if err = outPtr.SetWithGattung(abbr, in); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -118,9 +118,9 @@ func (a Abbr) AbbreviateKennung(
 		return
 	}
 
-	outPtr := in.KennungPtrClone()
+	outPtr := &Kennung2{}
 
-	if err = outPtr.Set(abbr); err != nil {
+	if err = outPtr.SetWithGattung(abbr, in); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

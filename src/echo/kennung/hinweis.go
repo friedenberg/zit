@@ -229,19 +229,3 @@ func (t *Hinweis) UnmarshalBinary(text []byte) (err error) {
 
 	return
 }
-
-func (t Hinweis) KennungSansGattungClone() KennungSansGattung {
-	return t
-}
-
-func (t Hinweis) KennungSansGattungPtrClone() KennungSansGattungPtr {
-	return &t
-}
-
-func (t Hinweis) KennungClone() Kennung {
-	return t
-}
-
-func (t Hinweis) KennungPtrClone() KennungPtr {
-	return &t
-}

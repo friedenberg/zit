@@ -23,7 +23,7 @@ func (h *Kennung2) SetWithKennung(
 
 func (h *Kennung2) SetWithGattung(
 	v string,
-	g schnittstellen.GattungLike,
+	g schnittstellen.GattungGetter,
 ) (err error) {
 	h.KennungPtr, err = MakeWithGattung(g, v)
 	return

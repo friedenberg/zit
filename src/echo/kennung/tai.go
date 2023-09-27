@@ -61,22 +61,6 @@ func (t Tai) GetGattung() schnittstellen.GattungLike {
 	return gattung.Bestandsaufnahme
 }
 
-func (t Tai) KennungSansGattungClone() KennungSansGattung {
-	return t
-}
-
-func (t Tai) KennungSansGattungPtrClone() KennungSansGattungPtr {
-	return &t
-}
-
-func (t Tai) KennungClone() Kennung {
-	return t
-}
-
-func (t Tai) KennungPtrClone() KennungPtr {
-	return &t
-}
-
 func (t Tai) Parts() [3]string {
 	a := strings.TrimRight(fmt.Sprintf("%018d", t.tai.Asec), "0")
 

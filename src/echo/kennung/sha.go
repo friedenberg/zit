@@ -139,19 +139,3 @@ func (t *Sha) UnmarshalBinary(text []byte) (err error) {
 
 	return
 }
-
-func (t Sha) KennungClone() Kennung {
-	return t
-}
-
-func (t Sha) KennungPtrClone() KennungPtr {
-	return &t
-}
-
-func (t Sha) KennungSansGattungClone() KennungSansGattung {
-	return t
-}
-
-func (t Sha) KennungSansGattungPtrClone() KennungSansGattungPtr {
-	return &t
-}

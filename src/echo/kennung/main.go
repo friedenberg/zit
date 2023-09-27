@@ -19,15 +19,11 @@ type QueryPrefixer interface {
 type KennungSansGattung interface {
 	schnittstellen.Stringer
 	Parts() [3]string
-	KennungSansGattungClone() KennungSansGattung
-	KennungSansGattungPtrClone() KennungSansGattungPtr
 }
 
 type Kennung interface {
 	KennungSansGattung
 	schnittstellen.GattungGetter
-	KennungClone() Kennung
-	KennungPtrClone() KennungPtr
 }
 
 type KennungSansGattungPtr interface {
@@ -39,7 +35,6 @@ type KennungSansGattungPtr interface {
 type KennungPtr interface {
 	Kennung
 	KennungSansGattungPtr
-	KennungPtrClone() KennungPtr
 }
 
 type KennungLike[T any] interface {

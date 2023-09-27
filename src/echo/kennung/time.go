@@ -67,14 +67,6 @@ func (t Time) GetGattung() schnittstellen.GattungLike {
 	return gattung.Unknown
 }
 
-// func (t Time) KennungClone() Kennung {
-// 	return t
-// }
-
-// func (t Time) KennungPtrClone() KennungPtr {
-// 	return &t
-// }
-
 func (t Time) String() string {
 	return strconv.FormatInt(t.Unix(), 10)
 }

@@ -143,19 +143,3 @@ func (t *Etikett) UnmarshalBinary(text []byte) (err error) {
 
 	return
 }
-
-func (t Etikett) KennungSansGattungClone() KennungSansGattung {
-	return t
-}
-
-func (t Etikett) KennungSansGattungPtrClone() KennungSansGattungPtr {
-	return &t
-}
-
-func (t Etikett) KennungClone() Kennung {
-	return t
-}
-
-func (t Etikett) KennungPtrClone() KennungPtr {
-	return &t
-}
