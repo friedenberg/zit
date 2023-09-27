@@ -1,7 +1,6 @@
 package objekte_format
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"strings"
@@ -22,7 +21,10 @@ func (f v4) FormatPersistentMetadatei(
 	c FormatterContext,
 	o Options,
 ) (n int64, err error) {
-	w := bufio.NewWriter(w1)
+	w := ohio.GetPoolBufioWriter().Get()
+	defer ohio.GetPoolBufioWriter().Put(w)
+
+	w.Reset(w1)
 	defer errors.DeferredFlusher(&err, w)
 
 	m := c.GetMetadatei()

@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/master";
     utils.url = "github:numtide/flake-utils";
 
     gomod2nix = {
@@ -19,7 +19,7 @@
             inherit system;
             overlays = [
               (final: prev: {
-                go = prev.go_1_20;
+                go = prev.go_1_21;
                 # buildGoModule = prev.buildGo118Module;
               })
               gomod2nix.overlays.default

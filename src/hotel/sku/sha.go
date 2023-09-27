@@ -1,11 +1,8 @@
 package sku
 
 import (
-	"strings"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 )
@@ -41,8 +38,7 @@ func CalculateAndSetSha(
 	format objekte_format.Formatter,
 	o objekte_format.Options,
 ) (err error) {
-	var sb strings.Builder
-	w := sha.MakeWriter(&sb)
+	w := sha.MakeWriter(nil)
 
 	if _, err = format.FormatPersistentMetadatei(w, sk, o); err != nil {
 		err = errors.Wrap(err)
@@ -50,7 +46,6 @@ func CalculateAndSetSha(
 	}
 
 	sh := w.GetShaLike()
-	log.Log().Printf("%q -> %q", sh, sb.String())
 	sk.SetObjekteSha(sh)
 
 	return
