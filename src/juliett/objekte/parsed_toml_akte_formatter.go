@@ -9,11 +9,11 @@ import (
 	"github.com/friedenberg/zit/src/alfa/toml"
 )
 
-type ParsedAkteTomlFormatter[O schnittstellen.Akte[O]] struct{}
+type ParsedAkteTomlFormatter[O schnittstellen.Akte[O], OPtr schnittstellen.AktePtr[O]] struct{}
 
-func (_ ParsedAkteTomlFormatter[O]) FormatParsedAkte(
+func (_ ParsedAkteTomlFormatter[O, OPtr]) FormatParsedAkte(
 	w1 io.Writer,
-	t O,
+	t OPtr,
 ) (n int64, err error) {
 	w := bufio.NewWriter(w1)
 	defer errors.DeferredFlusher(&err, w)

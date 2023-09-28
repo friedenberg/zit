@@ -13,7 +13,7 @@ type readerAkteParseSaver[
 	OPtr schnittstellen.AktePtr[O],
 ] struct {
 	awf    schnittstellen.AkteWriterFactory
-	parser AkteParser[OPtr]
+	parser AkteParser[O, OPtr]
 }
 
 func MakeReaderAkteParseSaver[
@@ -21,7 +21,7 @@ func MakeReaderAkteParseSaver[
 	OPtr schnittstellen.AktePtr[O],
 ](
 	awf schnittstellen.AkteWriterFactory,
-	parser AkteParser[OPtr],
+	parser AkteParser[O, OPtr],
 ) readerAkteParseSaver[O, OPtr] {
 	return readerAkteParseSaver[O, OPtr]{
 		awf:    awf,

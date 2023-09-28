@@ -48,27 +48,27 @@ func Make(
 
 	su.SetMatchableAdder(s)
 
-	if s.typStore, err = makeTypStore(s.StoreUtil, s); err != nil {
+	if s.typStore, err = makeTypStore(s.StoreUtil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if s.zettelStore, err = makeZettelStore(s.StoreUtil, s); err != nil {
+	if s.zettelStore, err = makeZettelStore(s.StoreUtil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if s.etikettStore, err = makeEtikettStore(s.StoreUtil, s); err != nil {
+	if s.etikettStore, err = makeEtikettStore(s.StoreUtil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if s.konfigStore, err = makeKonfigStore(s.StoreUtil, s); err != nil {
+	if s.konfigStore, err = makeKonfigStore(s.StoreUtil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if s.kastenStore, err = makeKastenStore(s.StoreUtil, s); err != nil {
+	if s.kastenStore, err = makeKastenStore(s.StoreUtil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

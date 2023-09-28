@@ -52,13 +52,13 @@ func (f formatAkte2) ParseAkte(
 	return
 }
 
-func (f formatAkte2) Format(w io.Writer, o Akte) (n int64, err error) {
+func (f formatAkte2) Format(w io.Writer, o *Akte) (n int64, err error) {
 	return f.FormatParsedAkte(w, o)
 }
 
 func (f formatAkte2) FormatParsedAkte(
 	w io.Writer,
-	o Akte,
+	o *Akte,
 ) (n int64, err error) {
 	bw := bufio.NewWriter(w)
 	defer errors.DeferredFlusher(&err, bw)

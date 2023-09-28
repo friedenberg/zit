@@ -28,7 +28,7 @@ type storedParserSaver[
 	OPtr schnittstellen.AktePtr[O],
 ] struct {
 	awf        schnittstellen.AkteWriterFactory
-	akteParser objekte.AkteParser[OPtr]
+	akteParser objekte.AkteParser[O, OPtr]
 }
 
 func MakeStoredParseSaver[
@@ -36,7 +36,7 @@ func MakeStoredParseSaver[
 	OPtr schnittstellen.AktePtr[O],
 ](
 	awf schnittstellen.AkteIOFactory,
-	akteParser objekte.AkteParser[OPtr],
+	akteParser objekte.AkteParser[O, OPtr],
 	pmf objekte_format.Format,
 	op objekte_format.Options,
 ) storedParserSaver[O, OPtr] {

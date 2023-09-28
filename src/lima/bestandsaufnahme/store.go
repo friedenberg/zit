@@ -22,7 +22,7 @@ import (
 )
 
 type Store interface {
-	AkteTextSaver
+	objekte_store.AkteTextSaver[Akte, *Akte]
 	Create(*Akte) error
 	objekte_store.LastReader
 	ReadOne(schnittstellen.Stringer) (*sku.Transacted, error)
@@ -31,19 +31,14 @@ type Store interface {
 	schnittstellen.AkteGetter[*Akte]
 }
 
-type AkteTextSaver = objekte_store.AkteTextSaver[
-	Akte,
-	*Akte,
-]
-
 type AkteFormat = objekte.AkteFormat[
 	Akte,
 	*Akte,
 ]
 
 type akteFormat interface {
-	FormatParsedAkte(io.Writer, Akte) (n int64, err error)
-	objekte.AkteParser[*Akte]
+	FormatParsedAkte(io.Writer, *Akte) (n int64, err error)
+	objekte.AkteParser[Akte, *Akte]
 }
 
 type store struct {
@@ -56,7 +51,7 @@ type store struct {
 	persistentMetadateiFormat objekte_format.Format
 	options                   objekte_format.Options
 	formatAkte                akteFormat
-	AkteTextSaver
+	objekte_store.AkteTextSaver[Akte, *Akte]
 }
 
 func MakeStore(
@@ -83,11 +78,11 @@ func MakeStore(
 		persistentMetadateiFormat: pmf,
 		options:                   op,
 		formatAkte:                fa,
-		AkteTextSaver: objekte_store.MakeAkteTextSaver[
+		AkteTextSaver: objekte_store.MakeAkteStore[
 			Akte,
 			*Akte,
 		](
-			af,
+			standort,
 			objekte_store.MakeAkteFormat[Akte, *Akte](
 				objekte.MakeReaderAkteParseSaver[Akte, *Akte](af, fa),
 				fa,
@@ -115,7 +110,7 @@ func (s *store) Create(o *Akte) (err error) {
 
 	var sh schnittstellen.ShaLike
 
-	if sh, _, err = s.SaveAkteText(*o); err != nil {
+	if sh, _, err = s.SaveAkteText(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

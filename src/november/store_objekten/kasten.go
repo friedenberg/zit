@@ -16,7 +16,6 @@ type kastenStore struct {
 
 func makeKastenStore(
 	sa store_util.StoreUtil,
-	cou objekte_store.CreateOrUpdater,
 ) (s *kastenStore, err error) {
 	s = &kastenStore{}
 

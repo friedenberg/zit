@@ -15,7 +15,7 @@ type Store[
 	A schnittstellen.Akte[A],
 	APtr schnittstellen.AktePtr[A],
 ] interface {
-	objekte_store.AkteTextSaver[A, APtr]
+	SaveAkteText(APtr) (schnittstellen.ShaLike, int64, error)
 	objekte_store.StoredParseSaver[A, APtr]
 	objekte.AkteFormat[A, APtr]
 	schnittstellen.AkteGetterPutter[APtr]
@@ -38,7 +38,7 @@ func Make(
 				objekte.MakeTextParserIgnoreTomlErrors[etikett_akte.V0](
 					st,
 				),
-				objekte.ParsedAkteTomlFormatter[etikett_akte.V0]{},
+				objekte.ParsedAkteTomlFormatter[etikett_akte.V0, *etikett_akte.V0]{},
 				st,
 			),
 		),
@@ -48,7 +48,7 @@ func Make(
 				objekte.MakeTextParserIgnoreTomlErrors[kasten_akte.V0](
 					st,
 				),
-				objekte.ParsedAkteTomlFormatter[kasten_akte.V0]{},
+				objekte.ParsedAkteTomlFormatter[kasten_akte.V0, *kasten_akte.V0]{},
 				st,
 			),
 		),
@@ -58,7 +58,7 @@ func Make(
 				objekte.MakeTextParserIgnoreTomlErrors[erworben.Akte](
 					st,
 				),
-				objekte.ParsedAkteTomlFormatter[erworben.Akte]{},
+				objekte.ParsedAkteTomlFormatter[erworben.Akte, *erworben.Akte]{},
 				st,
 			),
 		),
@@ -68,7 +68,7 @@ func Make(
 				objekte.MakeTextParserIgnoreTomlErrors[typ_akte.V0](
 					st,
 				),
-				objekte.ParsedAkteTomlFormatter[typ_akte.V0]{},
+				objekte.ParsedAkteTomlFormatter[typ_akte.V0, *typ_akte.V0]{},
 				st,
 			),
 		),

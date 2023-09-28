@@ -17,7 +17,6 @@ type typStore struct {
 
 func makeTypStore(
 	sa store_util.StoreUtil,
-	cou objekte_store.CreateOrUpdater,
 ) (s *typStore, err error) {
 	s = &typStore{}
 

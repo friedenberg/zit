@@ -19,22 +19,21 @@ type (
 		FormatSavedAkte(io.Writer, schnittstellen.ShaLike) (int64, error)
 	}
 
-	ParsedAkteFormatter[T any] interface {
-		FormatParsedAkte(io.Writer, T) (int64, error)
+	ParsedAkteFormatter[T any, TPtr schnittstellen.Ptr[T]] interface {
+		FormatParsedAkte(io.Writer, TPtr) (int64, error)
 	}
 
-	AkteParseSaver[T any] interface {
-		ParseSaveAkte(io.Reader, T) (schnittstellen.ShaLike, int64, error)
+	AkteParseSaver[T any, TPtr schnittstellen.Ptr[T]] interface {
+		ParseSaveAkte(io.Reader, TPtr) (schnittstellen.ShaLike, int64, error)
 	}
 
-	AkteParser[T any] interface {
-		ParseAkte(io.Reader, T) (int64, error)
+	AkteParser[T any, TPtr schnittstellen.Ptr[T]] interface {
+		ParseAkte(io.Reader, TPtr) (int64, error)
 	}
 
 	AkteFormat[T any, TPtr schnittstellen.Ptr[T]] interface {
 		SavedAkteFormatter
-		ParsedAkteFormatter[T]
-		AkteParser[TPtr]
-		// AkteParseSaver[TPtr]
+		ParsedAkteFormatter[T, TPtr]
+		AkteParser[T, TPtr]
 	}
 )

@@ -9,10 +9,6 @@ import (
 )
 
 type (
-	TransactedLogger interface {
-		SetLogWriter(LogWriter)
-	}
-
 	LastReader interface {
 		ReadLast() (*sku.Transacted, error)
 	}
@@ -54,23 +50,6 @@ type (
 		) error
 	}
 
-	Creator[
-		V any,
-	] interface {
-		Create(metadatei.Getter) (V, error)
-	}
-
-	Updater[
-		K any,
-		V any,
-	] interface {
-		Update(metadatei.Getter, K) (V, error)
-	}
-
-	CheckedOutUpdater interface {
-		UpdateCheckedOut(*sku.CheckedOut) (*sku.Transacted, error)
-	}
-
 	CreateOrUpdater interface {
 		CreateOrUpdateAkte(
 			metadatei.Getter,
@@ -82,5 +61,12 @@ type (
 			kennung.Kennung,
 		) (*sku.Transacted, error)
 		CreateOrUpdateCheckedOut(*sku.CheckedOut) (*sku.Transacted, error)
+	}
+
+	AkteTextSaver[
+		T schnittstellen.Akte[T],
+		T1 schnittstellen.AktePtr[T],
+	] interface {
+		SaveAkteText(T1) (schnittstellen.ShaLike, int64, error)
 	}
 )

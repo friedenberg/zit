@@ -16,7 +16,6 @@ type etikettStore struct {
 
 func makeEtikettStore(
 	sa store_util.StoreUtil,
-	cou objekte_store.CreateOrUpdater,
 ) (s *etikettStore, err error) {
 	s = &etikettStore{}
 

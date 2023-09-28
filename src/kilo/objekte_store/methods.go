@@ -7,14 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/india/matcher"
 )
 
-type Query interface {
-	schnittstellen.GattungGetter
-	IncludesSchwanzen() bool
-	IncludesHistory() bool
-	IncludesCwd()
-	// ContainsMatchable(kennung.Matchable) bool
-}
-
 func QueryMethodForMatcher(
 	reader Querier,
 	m matcher.MatcherSigil,

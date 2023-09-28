@@ -116,7 +116,7 @@ func (c EditKonfig) editOnlyEtiketten(
 
 	f := u.StoreObjekten().Konfig().GetAkteFormat()
 
-	if _, err = f.FormatParsedAkte(aw, newKonfig); err != nil {
+	if _, err = f.FormatParsedAkte(aw, &newKonfig); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
