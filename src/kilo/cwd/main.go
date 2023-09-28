@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
@@ -21,7 +22,7 @@ import (
 
 type CwdFiles struct {
 	akteWriterFactory schnittstellen.AkteWriterFactory
-	erworben          konfig.Compiled
+	erworben          *konfig.Compiled
 	dir               string
 	// TODO-P4 make private
 	Zettelen  schnittstellen.MutableSetPtrLike[Zettel, *Zettel]
@@ -275,14 +276,13 @@ func (fs CwdFiles) ZettelFiles() (out []string, err error) {
 }
 
 func makeCwdFiles(
-	erworben konfig.Compiled,
-	dir string,
-	awf schnittstellen.AkteWriterFactory,
-) (fs CwdFiles) {
-	fs = CwdFiles{
-		akteWriterFactory: awf,
+	erworben *konfig.Compiled,
+	st standort.Standort,
+) (fs *CwdFiles) {
+	fs = &CwdFiles{
+		akteWriterFactory: st,
 		erworben:          erworben,
-		dir:               dir,
+		dir:               st.Cwd(),
 		Kisten: collections_ptr.MakeMutableValueSet[Kasten, *Kasten](
 			nil,
 		),
@@ -303,22 +303,20 @@ func makeCwdFiles(
 }
 
 func MakeCwdFilesAll(
-	k konfig.Compiled,
-	dir string,
-	awf schnittstellen.AkteWriterFactory,
-) (fs CwdFiles, err error) {
-	fs = makeCwdFiles(k, dir, awf)
+	k *konfig.Compiled,
+	st standort.Standort,
+) (fs *CwdFiles, err error) {
+	fs = makeCwdFiles(k, st)
 	err = fs.readAll()
 	return
 }
 
 func MakeCwdFilesExactly(
-	k konfig.Compiled,
-	dir string,
-	awf schnittstellen.AkteWriterFactory,
+	k *konfig.Compiled,
+	st standort.Standort,
 	files ...string,
-) (fs CwdFiles, err error) {
-	fs = makeCwdFiles(k, dir, awf)
+) (fs *CwdFiles, err error) {
+	fs = makeCwdFiles(k, st)
 	err = fs.readInputFiles(files...)
 	return
 }

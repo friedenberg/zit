@@ -103,25 +103,17 @@ func (c commandWithCwdQuery) Complete(
 }
 
 func (c commandWithCwdQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	var cwdFiles cwd.CwdFiles
-
-	if cwdFiles, err = cwd.MakeCwdFilesAll(
-		u.Konfig(),
-		u.Standort().Cwd(),
-		u.Standort(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	ids := u.MakeMetaIdSetWithoutExcludedHidden(cwdFiles, c.DefaultGattungen())
+	ids := u.MakeMetaIdSetWithoutExcludedHidden(
+		u.StoreUtil().GetCwdFiles(),
+		c.DefaultGattungen(),
+	)
 
 	if err = ids.SetMany(args...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = c.RunWithCwdQuery(u, ids, &cwdFiles); err != nil {
+	if err = c.RunWithCwdQuery(u, ids, u.StoreUtil().GetCwdFiles()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

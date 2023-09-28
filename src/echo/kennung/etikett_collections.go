@@ -19,6 +19,10 @@ func init() {
 }
 
 func MakeEtikettSet(es ...Etikett) (s EtikettSet) {
+	if len(es) == 0 && EtikettSetEmpty != nil {
+		return EtikettSetEmpty
+	}
+
 	return EtikettSet(
 		collections_ptr.MakeValueSetValue[Etikett, *Etikett](nil, es...),
 	)

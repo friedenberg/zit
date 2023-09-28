@@ -69,11 +69,10 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var cwdFiles cwd.CwdFiles
+	var cwdFiles *cwd.CwdFiles
 
 	if cwdFiles, err = cwd.MakeCwdFilesAll(
-		u.Konfig(),
-		u.Standort().Cwd(),
+		u.KonfigPtr(),
 		u.Standort(),
 	); err != nil {
 		err = errors.Wrap(err)

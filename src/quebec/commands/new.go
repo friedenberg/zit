@@ -126,11 +126,10 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 
 		if c.Edit {
-			var cwdFiles cwd.CwdFiles
+			var cwdFiles *cwd.CwdFiles
 
 			if cwdFiles, err = cwd.MakeCwdFilesAll(
-				u.Konfig(),
-				u.Standort().Cwd(),
+				u.KonfigPtr(),
 				u.Standort(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -211,11 +210,10 @@ func (c New) readExistingFilesAsZettels(
 func (c New) writeNewZettels(
 	u *umwelt.Umwelt,
 ) (zsc schnittstellen.MutableSetLike[*sku.CheckedOut], err error) {
-	var cwdFiles cwd.CwdFiles
+	var cwdFiles *cwd.CwdFiles
 
 	if cwdFiles, err = cwd.MakeCwdFilesAll(
-		u.Konfig(),
-		u.Standort().Cwd(),
+		u.KonfigPtr(),
 		u.Standort(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -259,11 +257,10 @@ func (c New) editZettels(
 		return
 	}
 
-	var cwdFiles cwd.CwdFiles
+	var cwdFiles *cwd.CwdFiles
 
 	if cwdFiles, err = cwd.MakeCwdFilesExactly(
-		u.Konfig(),
-		u.Standort().Cwd(),
+		u.KonfigPtr(),
 		u.Standort(),
 		filesZettelen...,
 	); err != nil {
@@ -297,8 +294,7 @@ func (c New) editZettels(
 	}
 
 	if cwdFiles, err = cwd.MakeCwdFilesExactly(
-		u.Konfig(),
-		u.Standort().Cwd(),
+		u.KonfigPtr(),
 		u.Standort(),
 		filesZettelen...,
 	); err != nil {
@@ -308,7 +304,7 @@ func (c New) editZettels(
 
 	checkinOp := user_ops.Checkin{}
 
-	if err = checkinOp.Run(u, ms, &cwdFiles); err != nil {
+	if err = checkinOp.Run(u, ms, cwdFiles); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

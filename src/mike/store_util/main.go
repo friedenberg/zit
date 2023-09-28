@@ -43,6 +43,11 @@ type StoreUtil interface {
 
 	SetCheckedOutLogWriter(zelw schnittstellen.FuncIter[*sku.CheckedOut])
 
+	ReadOneExternalFS(
+		*cwd.CwdFiles,
+		*sku.Transacted,
+	) (*sku.CheckedOut, error)
+
 	CheckoutQuery(
 		options CheckoutOptions,
 		fq matcher.FuncReaderTransactedLikePtr,
@@ -66,14 +71,19 @@ type StoreUtil interface {
 		options CheckoutOptions,
 		sz *sku.Transacted,
 	) (cz *sku.CheckedOut, err error)
+
+	GetCwdFiles() *cwd.CwdFiles
+	GetObjekteFormatOptions() objekte_format.Options
 }
 
 // TODO-P3 move to own package
 type common struct {
 	konfig                    *konfig.Compiled
 	standort                  standort.Standort
+	cwdFiles                  *cwd.CwdFiles
 	akten                     *akten.Akten
 	bestandsaufnahmeAkte      bestandsaufnahme.Akte
+	options                   objekte_format.Options
 	Abbr                      AbbrStore
 	persistentMetadateiFormat objekte_format.Format
 
@@ -101,7 +111,16 @@ func MakeStoreUtil(
 		standort:                  st,
 		akten:                     akten.Make(st),
 		persistentMetadateiFormat: pmf,
+		options:                   objekte_format.Options{IncludeTai: true},
 		sonnenaufgang:             t,
+	}
+
+	if c.cwdFiles, err = cwd.MakeCwdFilesAll(
+		k,
+		st,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	c.metadateiTextParser = metadatei.MakeTextParser(
@@ -157,8 +176,16 @@ func (s *common) SetCheckedOutLogWriter(
 	s.checkedOutLogPrinter = zelw
 }
 
-func (s common) GetAkten() *akten.Akten {
+func (s *common) GetAkten() *akten.Akten {
 	return s.akten
+}
+
+func (s *common) GetCwdFiles() *cwd.CwdFiles {
+	return s.cwdFiles
+}
+
+func (s *common) GetObjekteFormatOptions() objekte_format.Options {
+	return s.options
 }
 
 func (s common) GetPersistentMetadateiFormat() objekte_format.Format {

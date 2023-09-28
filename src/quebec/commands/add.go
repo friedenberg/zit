@@ -101,7 +101,7 @@ func (c Add) RunWithCwdQuery(
 		return
 	}
 
-	if err = c.openAktenIfNecessary(u, zettelsFromAkteResults, *pz); err != nil {
+	if err = c.openAktenIfNecessary(u, zettelsFromAkteResults, pz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -196,7 +196,7 @@ func (c Add) RunWithCwdQuery(
 func (c Add) openAktenIfNecessary(
 	u *umwelt.Umwelt,
 	zettels sku.TransactedMutableSet,
-	cwd cwd.CwdFiles,
+	cwd *cwd.CwdFiles,
 ) (err error) {
 	if !c.OpenAkten && c.CheckoutAktenAndRun == "" {
 		return

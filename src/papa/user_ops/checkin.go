@@ -34,7 +34,7 @@ func (c Checkin) Run(
 		iter.MakeChain(
 			matcher.MakeFilterFromQuery(ms),
 			func(co *sku.CheckedOut) (err error) {
-				if _, err = u.StoreObjekten().CreateOrUpdator.CreateOrUpdateCheckedOut(
+				if _, err = u.StoreObjekten().CreateOrUpdateCheckedOut(
 					co,
 				); err != nil {
 					err = errors.Wrap(err)

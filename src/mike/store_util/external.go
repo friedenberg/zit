@@ -91,6 +91,11 @@ func (s *common) ReadOneExternalObjekte(
 		return
 	}
 
+	if err = sku.CalculateAndSetSha(e, s.persistentMetadateiFormat, s.options); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
@@ -127,6 +132,11 @@ func (s *common) ReadOneExternalAkte(
 
 	sh := sha.Make(aw.GetShaLike())
 	e.GetMetadateiPtr().AkteSha = sh
+
+	if err = sku.CalculateAndSetSha(e, s.persistentMetadateiFormat, s.options); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

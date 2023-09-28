@@ -21,11 +21,11 @@ type (
 		ReadOne(schnittstellen.StringerGattungGetter) (*sku.Transacted, error)
 	}
 
-	ExternalReader[
-		E any,
-		T any,
-	] interface {
-		ReadOneExternal(E, T) (*sku.External, error)
+	ExternalReader interface {
+		ReadOneExternal(
+			*sku.ExternalMaybe,
+			*sku.Transacted,
+		) (*sku.External, error)
 	}
 
 	AllReader interface {

@@ -40,11 +40,10 @@ func (c Checkout) RunWithQuery(
 	u *umwelt.Umwelt,
 	ms matcher.Query,
 ) (err error) {
-	var cwdFiles cwd.CwdFiles
+	var cwdFiles *cwd.CwdFiles
 
 	if cwdFiles, err = cwd.MakeCwdFilesAll(
-		u.Konfig(),
-		u.Standort().Cwd(),
+		u.KonfigPtr(),
 		u.Standort(),
 	); err != nil {
 		err = errors.Wrap(err)

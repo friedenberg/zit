@@ -1,4 +1,4 @@
-package objekte_store
+package store_objekten
 
 import (
 	"fmt"
@@ -7,10 +7,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/juliett/konfig"
+	"github.com/friedenberg/zit/src/kilo/objekte_store"
 )
 
 type CreateOrUpdateDelegate struct {
@@ -19,52 +17,13 @@ type CreateOrUpdateDelegate struct {
 	Unchanged schnittstellen.FuncIter[*sku.Transacted]
 }
 
-type createOrUpdate struct {
-	clock                     kennung.Clock
-	ls                        schnittstellen.LockSmith
-	af                        schnittstellen.AkteWriterFactory
-	reader                    OneReader
-	delegate                  CreateOrUpdateDelegate
-	matchableAdder            matcher.MatchableAdder
-	persistentMetadateiFormat objekte_format.Format
-	options                   objekte_format.Options
-	kg                        konfig.Getter
-}
-
-func MakeCreateOrUpdate(
-	clock kennung.Clock,
-	ls schnittstellen.LockSmith,
-	af schnittstellen.AkteWriterFactory,
-	reader OneReader,
-	delegate CreateOrUpdateDelegate,
-	ma matcher.MatchableAdder,
-	pmf objekte_format.Format,
-	op objekte_format.Options,
-	kg konfig.Getter,
-) (cou *createOrUpdate) {
-	if pmf == nil {
-		panic("nil persisted_metadatei_format.Format")
-	}
-
-	return &createOrUpdate{
-		clock:                     clock,
-		ls:                        ls,
-		af:                        af,
-		reader:                    reader,
-		delegate:                  delegate,
-		matchableAdder:            ma,
-		persistentMetadateiFormat: pmf,
-		options:                   op,
-	}
-}
-
-func (cou createOrUpdate) CreateOrUpdateCheckedOut(
+func (s *Store) CreateOrUpdateCheckedOut(
 	co *sku.CheckedOut,
 ) (transactedPtr *sku.Transacted, err error) {
 	kennungPtr := co.External.Kennung
 
-	if !cou.ls.IsAcquired() {
-		err = ErrLockRequired{
+	if !s.GetStandort().GetLockSmith().IsAcquired() {
+		err = objekte_store.ErrLockRequired{
 			Operation: fmt.Sprintf("create or update %s", kennungPtr),
 		}
 
@@ -78,13 +37,13 @@ func (cou createOrUpdate) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	transactedPtr.Metadatei.Tai = cou.clock.GetTai()
+	transactedPtr.Metadatei.Tai = s.GetTai()
 	transactedPtr.SetAkteSha(co.External.GetAkteSha())
 
 	err = sku.CalculateAndSetSha(
 		transactedPtr,
-		cou.persistentMetadateiFormat,
-		cou.options,
+		s.GetPersistentMetadateiFormat(),
+		s.GetObjekteFormatOptions(),
 	)
 
 	if err != nil {
@@ -96,7 +55,7 @@ func (cou createOrUpdate) CreateOrUpdateCheckedOut(
 	if transactedPtr.Metadatei.EqualsSansTai(co.Internal.Metadatei) {
 		transactedPtr = &co.Internal
 
-		if err = cou.delegate.Unchanged(transactedPtr); err != nil {
+		if err = s.onUnchanged(transactedPtr); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -104,12 +63,12 @@ func (cou createOrUpdate) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	if err = cou.matchableAdder.AddMatchable(transactedPtr); err != nil {
+	if err = s.AddMatchable(transactedPtr); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = cou.delegate.Updated(transactedPtr); err != nil {
+	if err = s.onUpdated(transactedPtr); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -117,12 +76,12 @@ func (cou createOrUpdate) CreateOrUpdateCheckedOut(
 	return
 }
 
-func (cou createOrUpdate) CreateOrUpdate(
+func (s *Store) CreateOrUpdate(
 	mg metadatei.Getter,
 	kennungPtr kennung.Kennung,
 ) (transactedPtr *sku.Transacted, err error) {
-	if !cou.ls.IsAcquired() {
-		err = ErrLockRequired{
+	if !s.GetStandort().GetLockSmith().IsAcquired() {
+		err = objekte_store.ErrLockRequired{
 			Operation: fmt.Sprintf(
 				"create or update %s",
 				kennungPtr.GetGattung(),
@@ -134,8 +93,8 @@ func (cou createOrUpdate) CreateOrUpdate(
 
 	var mutter *sku.Transacted
 
-	if mutter, err = cou.reader.ReadOne(kennungPtr); err != nil {
-		if errors.Is(err, ErrNotFound{}) {
+	if mutter, err = s.ReadOne(kennungPtr); err != nil {
+		if errors.Is(err, objekte_store.ErrNotFound{}) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -149,7 +108,7 @@ func (cou createOrUpdate) CreateOrUpdate(
 		m = mg.GetMetadatei()
 	}
 
-	m.Tai = cou.clock.GetTai()
+	m.Tai = s.GetTai()
 
 	transactedPtr = sku.GetTransactedPool().Get()
 	transactedPtr.Metadatei = m
@@ -168,8 +127,8 @@ func (cou createOrUpdate) CreateOrUpdate(
 
 	err = sku.CalculateAndSetSha(
 		transactedPtr,
-		cou.persistentMetadateiFormat,
-		cou.options,
+		s.GetPersistentMetadateiFormat(),
+		s.GetObjekteFormatOptions(),
 	)
 
 	if err != nil {
@@ -185,7 +144,7 @@ func (cou createOrUpdate) CreateOrUpdate(
 			return
 		}
 
-		if err = cou.delegate.Unchanged(transactedPtr); err != nil {
+		if err = s.onUnchanged(transactedPtr); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -193,18 +152,31 @@ func (cou createOrUpdate) CreateOrUpdate(
 		return
 	}
 
-	if err = cou.matchableAdder.AddMatchable(transactedPtr); err != nil {
+	var checkedOut *sku.CheckedOut
+
+	if checkedOut, err = s.ReadOneExternalFS(s.GetCwdFiles(), mutter); err == nil {
+		diff := checkedOut.External.Metadatei.EqualsSansTai(
+			checkedOut.Internal.Metadatei,
+		)
+
+		if !diff {
+			// TODO-P2 check out new state
+		}
+	}
+	err = nil
+
+	if err = s.AddMatchable(transactedPtr); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if mutter == nil {
-		if err = cou.delegate.New(transactedPtr); err != nil {
+		if err = s.onNew(transactedPtr); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if err = cou.delegate.Updated(transactedPtr); err != nil {
+		if err = s.onUpdated(transactedPtr); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -213,13 +185,13 @@ func (cou createOrUpdate) CreateOrUpdate(
 	return
 }
 
-func (cou createOrUpdate) CreateOrUpdateAkte(
+func (s *Store) CreateOrUpdateAkte(
 	mg metadatei.Getter,
 	kennungPtr kennung.Kennung,
 	sh schnittstellen.ShaLike,
 ) (transactedPtr *sku.Transacted, err error) {
-	if !cou.ls.IsAcquired() {
-		err = ErrLockRequired{
+	if !s.GetStandort().GetLockSmith().IsAcquired() {
+		err = objekte_store.ErrLockRequired{
 			Operation: fmt.Sprintf(
 				"create or update %s",
 				kennungPtr.GetGattung(),
@@ -231,8 +203,8 @@ func (cou createOrUpdate) CreateOrUpdateAkte(
 
 	var mutter *sku.Transacted
 
-	if mutter, err = cou.reader.ReadOne(kennungPtr); err != nil {
-		if errors.Is(err, ErrNotFound{}) {
+	if mutter, err = s.ReadOne(kennungPtr); err != nil {
+		if errors.Is(err, objekte_store.ErrNotFound{}) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -246,7 +218,7 @@ func (cou createOrUpdate) CreateOrUpdateAkte(
 		m = mg.GetMetadatei()
 	}
 
-	m.Tai = cou.clock.GetTai()
+	m.Tai = s.GetTai()
 
 	transactedPtr = sku.GetTransactedPool().Get()
 	transactedPtr.Metadatei = m
@@ -267,8 +239,8 @@ func (cou createOrUpdate) CreateOrUpdateAkte(
 
 	err = sku.CalculateAndSetSha(
 		transactedPtr,
-		cou.persistentMetadateiFormat,
-		cou.options,
+		s.GetPersistentMetadateiFormat(),
+		s.GetObjekteFormatOptions(),
 	)
 
 	if err != nil {
@@ -284,7 +256,7 @@ func (cou createOrUpdate) CreateOrUpdateAkte(
 			return
 		}
 
-		if err = cou.delegate.Unchanged(transactedPtr); err != nil {
+		if err = s.onUnchanged(transactedPtr); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -292,18 +264,18 @@ func (cou createOrUpdate) CreateOrUpdateAkte(
 		return
 	}
 
-	if err = cou.matchableAdder.AddMatchable(transactedPtr); err != nil {
+	if err = s.AddMatchable(transactedPtr); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if mutter == nil {
-		if err = cou.delegate.New(transactedPtr); err != nil {
+		if err = s.onNew(transactedPtr); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if err = cou.delegate.Updated(transactedPtr); err != nil {
+		if err = s.onUpdated(transactedPtr); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

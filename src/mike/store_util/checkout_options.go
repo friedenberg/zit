@@ -8,7 +8,7 @@ import (
 )
 
 type CheckoutOptions struct {
-	Cwd          cwd.CwdFiles
+	Cwd          *cwd.CwdFiles
 	Force        bool
 	CheckoutMode checkout_mode.Mode
 }

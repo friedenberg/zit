@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/kilo/cwd"
 )
 
-func (s *common) readOneExternal(
+func (s *common) ReadOneExternalFS(
 	fs *cwd.CwdFiles,
 	sk2 *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
@@ -62,7 +62,7 @@ func (s *common) ReadFiles(
 					return
 				}
 
-				if col, err = s.readOneExternal(fs, et1); err != nil {
+				if col, err = s.ReadOneExternalFS(fs, et1); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

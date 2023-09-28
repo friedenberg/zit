@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
-	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
@@ -17,7 +16,6 @@ import (
 )
 
 type Store struct {
-	options objekte_format.Options
 	store_util.StoreUtil
 
 	zettelStore  *zettelStore
@@ -25,8 +23,6 @@ type Store struct {
 	etikettStore *etikettStore
 	konfigStore  *konfigStore
 	kastenStore  *kastenStore
-
-	CreateOrUpdator objekte_store.CreateOrUpdater
 
 	objekte_store.LogWriter
 
@@ -47,49 +43,32 @@ func Make(
 ) (s *Store, err error) {
 	s = &Store{
 		lock:      &sync.Mutex{},
-		options:   objekte_format.Options{IncludeTai: true},
 		StoreUtil: su,
 	}
 
-	s.CreateOrUpdator = objekte_store.MakeCreateOrUpdate(
-		s,
-		s.GetStandort().GetLockSmith(),
-		s.GetStandort(),
-		s,
-		objekte_store.CreateOrUpdateDelegate{
-			New:       s.onNew,
-			Updated:   s.onUpdated,
-			Unchanged: s.onUnchanged,
-		},
-		s,
-		s.GetPersistentMetadateiFormat(),
-		s.options,
-		s.StoreUtil,
-	)
-
 	su.SetMatchableAdder(s)
 
-	if s.typStore, err = makeTypStore(s.StoreUtil, s.CreateOrUpdator); err != nil {
+	if s.typStore, err = makeTypStore(s.StoreUtil, s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if s.zettelStore, err = makeZettelStore(s.StoreUtil, s.CreateOrUpdator); err != nil {
+	if s.zettelStore, err = makeZettelStore(s.StoreUtil, s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if s.etikettStore, err = makeEtikettStore(s.StoreUtil, s.CreateOrUpdator); err != nil {
+	if s.etikettStore, err = makeEtikettStore(s.StoreUtil, s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if s.konfigStore, err = makeKonfigStore(s.StoreUtil, s.CreateOrUpdator); err != nil {
+	if s.konfigStore, err = makeKonfigStore(s.StoreUtil, s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if s.kastenStore, err = makeKastenStore(s.StoreUtil, s.CreateOrUpdator); err != nil {
+	if s.kastenStore, err = makeKastenStore(s.StoreUtil, s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -210,6 +189,7 @@ func (s Store) Flush() (err error) {
 func (s *Store) UpdateManyMetadatei(
 	incoming sku.TransactedSet,
 ) (err error) {
+	// TODO-P2 only set has changes if an etikett, typ, or kasten has changes
 	s.GetKonfigPtr().SetHasChanges(true)
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
@@ -222,7 +202,7 @@ func (s *Store) UpdateManyMetadatei(
 
 	if err = incoming.EachPtr(
 		func(mwk *sku.Transacted) (err error) {
-			if _, err = s.CreateOrUpdator.CreateOrUpdate(
+			if _, err = s.CreateOrUpdate(
 				mwk,
 				mwk.Kennung,
 			); err != nil {
@@ -285,7 +265,7 @@ func (s *Store) createEtikettOrTyp(k *kennung.Kennung2) (err error) {
 	err = sku.CalculateAndSetSha(
 		t,
 		s.GetPersistentMetadateiFormat(),
-		s.options,
+		s.GetObjekteFormatOptions(),
 	)
 
 	if err != nil {
