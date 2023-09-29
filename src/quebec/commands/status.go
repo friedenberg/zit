@@ -12,16 +12,15 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
 type Status struct{}
 
 func init() {
-	registerCommandWithCwdQuery(
+	registerCommandWithQuery(
 		"status",
-		func(f *flag.FlagSet) CommandWithCwdQuery {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Status{}
 
 			return c
@@ -33,15 +32,13 @@ func (c Status) DefaultGattungen() gattungen.Set {
 	return gattungen.MakeSet(gattung.TrueGattung()...)
 }
 
-func (c Status) RunWithCwdQuery(
+func (c Status) RunWithQuery(
 	u *umwelt.Umwelt,
 	ms matcher.Query,
-	possible *cwd.CwdFiles,
 ) (err error) {
 	pcol := u.PrinterCheckedOutLike()
 
 	if err = u.StoreObjekten().ReadFiles(
-		possible,
 		matcher.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().Query),
 		iter.MakeChain(
 			matcher.MakeFilterFromQuery(ms),
@@ -62,7 +59,7 @@ func (c Status) RunWithCwdQuery(
 	p := u.PrinterCheckedOutLike()
 
 	if err = u.StoreObjekten().ReadAllMatchingAkten(
-		possible.UnsureAkten,
+		u.StoreUtil().GetCwdFiles().UnsureAkten,
 		func(fd kennung.FD, z *sku.Transacted) (err error) {
 			if z == nil {
 				err = u.PrinterFileNotRecognized()(&fd)

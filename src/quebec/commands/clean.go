@@ -13,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 	"github.com/friedenberg/zit/src/papa/user_ops"
 )
@@ -23,9 +22,9 @@ type Clean struct {
 }
 
 func init() {
-	registerCommandWithCwdQuery(
+	registerCommandWithQuery(
 		"clean",
-		func(f *flag.FlagSet) CommandWithCwdQuery {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Clean{}
 
 			f.BoolVar(
@@ -44,20 +43,18 @@ func (c Clean) DefaultGattungen() gattungen.Set {
 	return gattungen.MakeSet(gattung.TrueGattung()...)
 }
 
-func (c Clean) RunWithCwdQuery(
+func (c Clean) RunWithQuery(
 	s *umwelt.Umwelt,
 	ms matcher.Query,
-	possible *cwd.CwdFiles,
 ) (err error) {
 	fds := collections_ptr.MakeMutableValueSet[kennung.FD, *kennung.FD](nil)
 	l := &sync.Mutex{}
 
-	for _, d := range possible.EmptyDirectories {
+	for _, d := range s.StoreUtil().GetCwdFiles().EmptyDirectories {
 		fds.Add(d)
 	}
 
 	if err = s.StoreObjekten().ReadFiles(
-		possible,
 		matcher.MakeFuncReaderTransactedLikePtr(ms, s.StoreObjekten().Query),
 		iter.MakeChain(
 			matcher.MakeFilterFromQuery(ms),

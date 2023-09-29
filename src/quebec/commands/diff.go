@@ -21,16 +21,15 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
 type Diff struct{}
 
 func init() {
-	registerCommandWithCwdQuery(
+	registerCommandWithQuery(
 		"diff",
-		func(f *flag.FlagSet) CommandWithCwdQuery {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Diff{}
 
 			return c
@@ -42,10 +41,9 @@ func (c Diff) DefaultGattungen() gattungen.Set {
 	return gattungen.MakeSet(gattung.TrueGattung()...)
 }
 
-func (c Diff) RunWithCwdQuery(
+func (c Diff) RunWithQuery(
 	u *umwelt.Umwelt,
 	ms matcher.Query,
-	cwdFiles *cwd.CwdFiles,
 ) (err error) {
 	fInline := metadatei.MakeTextFormatterMetadateiInlineAkte(
 		u.Standort(),
@@ -58,7 +56,6 @@ func (c Diff) RunWithCwdQuery(
 	)
 
 	if err = u.StoreObjekten().ReadFiles(
-		cwdFiles,
 		matcher.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().Query),
 		iter.MakeChain(
 			matcher.MakeFilterFromQuery(ms),

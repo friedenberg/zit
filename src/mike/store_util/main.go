@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
+	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/juliett/konfig"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/lima/akten"
@@ -35,6 +36,7 @@ type StoreUtil interface {
 	GetKennungIndex() kennung_index.Index
 	GetTypenIndex() (kennung_index.KennungIndex[kennung.Typ, *kennung.Typ], error)
 	GetAkten() *akten.Akten
+	GetFileEncoder() objekte_collections.FileEncoder
 
 	SetMatchableAdder(matcher.MatchableAdder)
 	matcher.MatchableAdder
@@ -43,10 +45,7 @@ type StoreUtil interface {
 
 	SetCheckedOutLogWriter(zelw schnittstellen.FuncIter[*sku.CheckedOut])
 
-	ReadOneExternalFS(
-		*cwd.CwdFiles,
-		*sku.Transacted,
-	) (*sku.CheckedOut, error)
+	ReadOneExternalFS(*sku.Transacted) (*sku.CheckedOut, error)
 
 	CheckoutQuery(
 		options CheckoutOptions,
@@ -62,7 +61,6 @@ type StoreUtil interface {
 	) (zcs schnittstellen.MutableSetLike[*sku.CheckedOut], err error)
 
 	ReadFiles(
-		fs *cwd.CwdFiles,
 		fq matcher.FuncReaderTransactedLikePtr,
 		f schnittstellen.FuncIter[*sku.CheckedOut],
 	) (err error)
@@ -86,6 +84,7 @@ type common struct {
 	options                   objekte_format.Options
 	Abbr                      AbbrStore
 	persistentMetadateiFormat objekte_format.Format
+	fileEncoder               objekte_collections.FileEncoder
 
 	sonnenaufgang kennung.Time
 
@@ -113,6 +112,7 @@ func MakeStoreUtil(
 		persistentMetadateiFormat: pmf,
 		options:                   objekte_format.Options{IncludeTai: true},
 		sonnenaufgang:             t,
+		fileEncoder:               objekte_collections.MakeFileEncoder(st, k),
 	}
 
 	if c.cwdFiles, err = cwd.MakeCwdFilesAll(
@@ -178,6 +178,10 @@ func (s *common) SetCheckedOutLogWriter(
 
 func (s *common) GetAkten() *akten.Akten {
 	return s.akten
+}
+
+func (s *common) GetFileEncoder() objekte_collections.FileEncoder {
+	return s.fileEncoder
 }
 
 func (s *common) GetCwdFiles() *cwd.CwdFiles {

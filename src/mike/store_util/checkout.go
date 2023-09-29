@@ -16,7 +16,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 )
@@ -198,7 +197,7 @@ func (s *common) CheckoutOne(
 		var e *cwd.Zettel
 		ok := false
 
-		if e, ok = options.Cwd.Get(sz.GetKennungLikePtr()); !ok {
+		if e, ok = s.cwdFiles.Get(sz.GetKennungLikePtr()); !ok {
 			err = errors.Errorf(
 				"file at %s not recognized as zettel: %s",
 				filename,
@@ -251,9 +250,7 @@ func (s *common) CheckoutOne(
 		cz.External.GetFDsPtr().Akte.Path = originalFilename + "." + fe
 	}
 
-	e := objekte_collections.MakeFileEncoder(s.standort, s.GetKonfig())
-
-	if err = e.Encode(&cz.External); err != nil {
+	if err = s.fileEncoder.Encode(&cz.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

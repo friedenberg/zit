@@ -70,7 +70,6 @@ func (c Edit) RunWithCwdQuery(
 	pz *cwd.CwdFiles,
 ) (err error) {
 	options := store_util.CheckoutOptions{
-		Cwd:          pz,
 		CheckoutMode: c.CheckoutMode,
 	}
 
@@ -131,22 +130,11 @@ func (c Edit) RunWithCwdQuery(
 	filez := append([]string{}, objektenFiles...)
 	filez = append(filez, aktenFiles...)
 
-	var cwdFiles *cwd.CwdFiles
-
-	if cwdFiles, err = cwd.MakeCwdFilesExactly(
-		u.KonfigPtr(),
-		u.Standort(),
-		filez...,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	op := user_ops.Checkin{
 		Delete: c.Delete,
 	}
 
-	if err = op.Run(u, ms, cwdFiles); err != nil {
+	if err = op.Run(u, ms); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

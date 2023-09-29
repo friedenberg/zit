@@ -211,7 +211,6 @@ func (c Add) openAktenIfNecessary(
 	)
 
 	options := store_util.CheckoutOptions{
-		Cwd:          cwd,
 		CheckoutMode: checkout_mode.ModeAkteOnly,
 	}
 

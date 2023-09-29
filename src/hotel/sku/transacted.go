@@ -39,13 +39,12 @@ func (t *Transacted) SetFromSkuLike(sk SkuLikePtr) (err error) {
 	return
 }
 
-func MakeSkuLikeSansObjekteSha2(
+func MakeSkuLikeSansObjekteSha(
 	m metadatei.Metadatei,
 	k kennung.Kennung,
 ) (sk *Transacted, err error) {
-	sk = &Transacted{
-		Metadatei: m,
-	}
+	sk = GetTransactedPool().Get()
+	sk.Metadatei = m
 
 	if err = sk.Kennung.SetWithKennung(k); err != nil {
 		err = errors.Wrap(err)
@@ -60,7 +59,7 @@ func MakeSkuLike2(
 	k kennung.KennungPtr,
 	os sha.Sha,
 ) (sk SkuLikePtr, err error) {
-	if sk, err = MakeSkuLikeSansObjekteSha2(m, k); err != nil {
+	if sk, err = MakeSkuLikeSansObjekteSha(m, k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

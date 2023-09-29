@@ -19,7 +19,7 @@ func MakeValueSetString[
 	s.E = make(map[string]T, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyer[T]{}.RegisterGob()
+		keyer = iter.StringerKeyer[T]{}
 	}
 
 	s.K = keyer
@@ -47,7 +47,7 @@ func MakeValueSetValue[T schnittstellen.Stringer](
 	s.E = make(map[string]T, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyer[T]{}.RegisterGob()
+		keyer = iter.StringerKeyer[T]{}
 	}
 
 	s.K = keyer
@@ -68,7 +68,7 @@ func MakeValueSet[T schnittstellen.Stringer](
 	s.E = make(map[string]T, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyer[T]{}.RegisterGob()
+		keyer = iter.StringerKeyer[T]{}
 	}
 
 	s.K = keyer
@@ -131,7 +131,7 @@ func MakeMutableValueSetValue[T schnittstellen.Stringer](
 	s.E = make(map[string]T, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyer[T]{}.RegisterGob()
+		keyer = iter.StringerKeyer[T]{}
 	}
 
 	s.K = keyer
@@ -152,7 +152,7 @@ func MakeMutableValueSet[T schnittstellen.Stringer](
 	s.E = make(map[string]T, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyer[T]{}.RegisterGob()
+		keyer = iter.StringerKeyer[T]{}
 	}
 
 	s.K = keyer

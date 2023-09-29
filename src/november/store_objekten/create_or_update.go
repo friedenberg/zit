@@ -154,7 +154,7 @@ func (s *Store) CreateOrUpdate(
 
 	var checkedOut *sku.CheckedOut
 
-	if checkedOut, err = s.ReadOneExternalFS(s.GetCwdFiles(), mutter); err == nil {
+	if checkedOut, err = s.ReadOneExternalFS(mutter); err == nil {
 		diff := checkedOut.External.Metadatei.EqualsSansTai(
 			checkedOut.Internal.Metadatei,
 		)

@@ -7,7 +7,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/ohio"
@@ -29,8 +28,7 @@ func (f v4) FormatPersistentMetadatei(
 
 	m := c.GetMetadatei()
 
-	var sb strings.Builder
-	mh := sha.MakeWriter(&sb)
+	mh := sha.MakeWriter(nil)
 	mw := io.MultiWriter(w, mh)
 	var n1 int
 
@@ -265,8 +263,7 @@ func (f v4) ParsePersistentMetadatei(
 		val     string
 	)
 
-	sb := &strings.Builder{}
-	mh := sha.MakeWriter(sb)
+	mh := sha.MakeWriter(nil)
 
 	for {
 		key, val, err = dr.ReadOneKeyValue(" ")
@@ -415,9 +412,7 @@ func (f v4) ParsePersistentMetadatei(
 			continue
 		}
 
-		hs := fmt.Sprintf("%s %s\n", key, val)
-
-		if _, err = io.WriteString(mh, hs); err != nil {
+		if _, err = ohio.WriteKeySpaceValueNewline(mh, key, val); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -440,7 +435,6 @@ func (f v4) ParsePersistentMetadatei(
 	}
 
 	actual := mh.GetShaLike()
-	log.Log().Printf("%q -> %q", actual, sb.String())
 
 	// if m.Verzeichnisse.Sha.IsNull() {
 	m.Verzeichnisse.Sha = sha.Make(actual)

@@ -13,6 +13,10 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
+type FileEncoder interface {
+	Encode(z *sku.External) (err error)
+}
+
 type fileEncoder struct {
 	mode int
 	perm os.FileMode
@@ -23,9 +27,9 @@ type fileEncoder struct {
 func MakeFileEncoder(
 	arf schnittstellen.AkteIOFactory,
 	ic kennung.InlineTypChecker,
-) fileEncoder {
-	return fileEncoder{
-		mode: os.O_WRONLY | os.O_CREATE | os.O_EXCL | os.O_APPEND,
+) *fileEncoder {
+	return &fileEncoder{
+		mode: os.O_WRONLY | os.O_CREATE | os.O_TRUNC,
 		perm: 0o666,
 		arf:  arf,
 		ic:   ic,
@@ -37,7 +41,7 @@ func MakeFileEncoderJustOpen(
 	ic kennung.InlineTypChecker,
 ) fileEncoder {
 	return fileEncoder{
-		mode: os.O_WRONLY | os.O_EXCL | os.O_APPEND,
+		mode: os.O_WRONLY | os.O_TRUNC,
 		perm: 0o666,
 		arf:  arf,
 		ic:   ic,
@@ -46,7 +50,10 @@ func MakeFileEncoderJustOpen(
 
 func (e *fileEncoder) openOrCreate(p string) (f *os.File, err error) {
 	if f, err = files.OpenFile(p, e.mode, e.perm); err != nil {
+		err = errors.Wrapf(err, "Mode: %d, Perm: %d", e.mode, e.perm)
+
 		if errors.IsExist(err) {
+			// err = nil
 			var err2 error
 
 			if f, err2 = files.OpenExclusiveReadOnly(p); err2 != nil {
@@ -55,6 +62,7 @@ func (e *fileEncoder) openOrCreate(p string) (f *os.File, err error) {
 		} else {
 			err = errors.Wrap(err)
 		}
+
 		return
 	}
 

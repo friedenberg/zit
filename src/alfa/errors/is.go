@@ -71,6 +71,10 @@ func IsTooManyOpenFiles(err error) bool {
 }
 
 func IsEOF(err error) bool {
+	if err == nil {
+		return false
+	}
+
 	return Is(err, io.EOF)
 }
 

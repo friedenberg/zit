@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
@@ -20,7 +19,6 @@ type Checkin struct {
 func (c Checkin) Run(
 	u *umwelt.Umwelt,
 	ms matcher.Query,
-	pz *cwd.CwdFiles,
 ) (err error) {
 	fds := collections_ptr.MakeMutableValueSet[kennung.FD, *kennung.FD](nil)
 	l := &sync.Mutex{}
@@ -29,7 +27,6 @@ func (c Checkin) Run(
 	defer errors.Deferred(&err, u.Unlock)
 
 	if err = u.StoreObjekten().ReadFiles(
-		pz,
 		matcher.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().Query),
 		iter.MakeChain(
 			matcher.MakeFilterFromQuery(ms),

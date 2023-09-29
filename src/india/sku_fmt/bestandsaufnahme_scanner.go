@@ -86,9 +86,9 @@ func (f *bestandsaufnahmeScanner) Scan() (ok bool) {
 		f.afterFirst = true
 	}
 
-	var h sku.Transacted
+	f.lastSku = sku.GetTransactedPool().Get()
 
-	n1, f.err = f.format.ParsePersistentMetadatei(f.br, &h, f.options)
+	n1, f.err = f.format.ParsePersistentMetadatei(f.br, f.lastSku, f.options)
 	f.lastN += n1
 
 	if errors.IsEOF(f.err) {
@@ -96,23 +96,11 @@ func (f *bestandsaufnahmeScanner) Scan() (ok bool) {
 		return
 	} else if f.err != nil {
 		f.err = errors.Wrapf(f.err, "Bytes: %d", n1)
-		f.err = errors.Wrapf(f.err, "Holder: %v", h)
+		f.err = errors.Wrapf(f.err, "Holder: %v", f.lastSku)
 		return
 	}
 
-	if f.lastSku, f.err = sku.MakeSkuLikeSansObjekteSha2(
-		h.Metadatei,
-		h.Kennung,
-	); f.err != nil {
-		f.err = errors.Wrapf(f.err, "Bytes: %d", n1)
-		f.err = errors.Wrapf(f.err, "Sku: %v", h)
-		return
-	}
-
-	if f.err = sku.CalculateAndSetSha(f.lastSku, f.format, f.options.SansVerzeichnisse()); f.err != nil {
-		f.err = errors.Wrap(f.err)
-		return
-	}
+	f.lastSku.SetObjekteSha(f.lastSku.Metadatei.Verzeichnisse.Sha)
 
 	n2, f.err = f.br.ReadBoundary()
 	f.lastN += int64(n2)

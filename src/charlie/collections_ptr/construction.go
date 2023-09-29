@@ -16,7 +16,7 @@ func MakeValueSetString[
 	s.E = make(map[string]TPtr, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyerPtr[T, TPtr]{}.RegisterGob()
+		keyer = iter.StringerKeyerPtr[T, TPtr]{}
 	}
 
 	s.K = keyer
@@ -46,7 +46,7 @@ func MakeValueSetValue[
 	s.E = make(map[string]TPtr, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyerPtr[T, TPtr]{}.RegisterGob()
+		keyer = iter.StringerKeyerPtr[T, TPtr]{}
 	}
 
 	s.K = keyer
@@ -69,7 +69,7 @@ func MakeValueSet[
 	s.E = make(map[string]TPtr, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyerPtr[T, TPtr]{}.RegisterGob()
+		keyer = iter.StringerKeyerPtr[T, TPtr]{}
 	}
 
 	s.K = keyer
@@ -132,7 +132,7 @@ func MakeMutableValueSetValue[
 	s.E = make(map[string]TPtr, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyerPtr[T, TPtr]{}.RegisterGob()
+		keyer = iter.StringerKeyerPtr[T, TPtr]{}
 	}
 
 	s.K = keyer
@@ -155,7 +155,7 @@ func MakeMutableValueSet[
 	s.E = make(map[string]TPtr, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyerPtr[T, TPtr]{}.RegisterGob()
+		keyer = iter.StringerKeyerPtr[T, TPtr]{}
 	}
 
 	s.K = keyer

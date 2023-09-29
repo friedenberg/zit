@@ -41,6 +41,9 @@ func init() {
 			nil,
 		),
 	)
+
+	gob.Register(iter.StringerKeyer[values.String]{})
+	gob.Register(iter.StringerKeyerPtr[kennung.Typ, *kennung.Typ]{})
 }
 
 type angeboren = pkg_angeboren.Konfig

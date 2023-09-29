@@ -48,7 +48,7 @@ func (c Checkin) RunWithCwdQuery(
 		Delete: c.Delete,
 	}
 
-	if err = op.Run(u, ms, pz); err != nil {
+	if err = op.Run(u, ms); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

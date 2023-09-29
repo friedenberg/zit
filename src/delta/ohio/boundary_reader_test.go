@@ -170,7 +170,6 @@ func TestBoundaryReaderSandwich2(t1 *testing.T) {
 	readBoundary(false)
 
 	for i := 0; i < 3; i++ {
-		t.Logf("%d", i)
 		b := strings.Builder{}
 
 		var n int64
@@ -306,9 +305,6 @@ content
 	actual := b.String()
 	expected := "content\ncontent\ncontent\n"
 
-	t.Logf("%q", string(sut.(*boundaryReader).buffer.buffer))
-	t.Logf("%q", sut.(*boundaryReader).state)
-
 	if actual != expected {
 		t.Errorf("expected %q but got %q", expected, actual)
 	}
@@ -351,8 +347,6 @@ func TestBigMac(t1 *testing.T) {
 	i := 0
 
 	for {
-		t.Logf("i: %d", i)
-
 		n, err = io.Copy(io.Discard, sut)
 
 		if n == 0 {

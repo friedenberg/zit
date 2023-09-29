@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/mike/store_util"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
@@ -40,18 +39,6 @@ func (c Checkout) RunWithQuery(
 	u *umwelt.Umwelt,
 	ms matcher.Query,
 ) (err error) {
-	var cwdFiles *cwd.CwdFiles
-
-	if cwdFiles, err = cwd.MakeCwdFilesAll(
-		u.KonfigPtr(),
-		u.Standort(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	c.CheckoutOptions.Cwd = cwdFiles
-
 	if err = u.StoreObjekten().CheckoutQuery(
 		c.CheckoutOptions,
 		matcher.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().Query),

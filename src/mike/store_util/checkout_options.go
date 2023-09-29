@@ -4,11 +4,9 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
-	"github.com/friedenberg/zit/src/kilo/cwd"
 )
 
 type CheckoutOptions struct {
-	Cwd          *cwd.CwdFiles
 	Force        bool
 	CheckoutMode checkout_mode.Mode
 }

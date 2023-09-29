@@ -7,11 +7,9 @@ import (
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/kilo/cwd"
 )
 
 func (s *common) ReadOneExternalFS(
-	fs *cwd.CwdFiles,
 	sk2 *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
 	// TODO-P3 pool
@@ -23,7 +21,7 @@ func (s *common) ReadOneExternalFS(
 
 	var e *sku.ExternalMaybe
 
-	if e, ok = fs.Get(sk2.Kennung); !ok {
+	if e, ok = s.cwdFiles.Get(sk2.Kennung); !ok {
 		err = iter.MakeErrStopIteration()
 		return
 	}
@@ -41,12 +39,12 @@ func (s *common) ReadOneExternalFS(
 	}
 
 	co.External = *e2
+	co.DetermineState(false)
 
 	return
 }
 
 func (s *common) ReadFiles(
-	fs *cwd.CwdFiles,
 	fq matcher.FuncReaderTransactedLikePtr,
 	f schnittstellen.FuncIter[*sku.CheckedOut],
 ) (err error) {
@@ -62,7 +60,7 @@ func (s *common) ReadFiles(
 					return
 				}
 
-				if col, err = s.ReadOneExternalFS(fs, et1); err != nil {
+				if col, err = s.ReadOneExternalFS(et1); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -87,7 +85,7 @@ func (s *common) ReadFiles(
 		return
 	}
 
-	if err = fs.EachCreatableMatchable(
+	if err = s.cwdFiles.EachCreatableMatchable(
 		iter.MakeChain(
 			func(il *sku.ExternalMaybe) (err error) {
 				if err = s.GetAbbrStore().Exists(&il.Kennung); err == nil {

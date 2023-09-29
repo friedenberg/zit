@@ -1,6 +1,7 @@
 package zettel
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -45,7 +46,7 @@ func MakeWriterKonfig(
 		t := k.GetApproximatedTyp(z.GetTyp()).ApproximatedOrActual()
 
 		if t == nil {
-			panic("typ was nil")
+			panic(fmt.Sprintf("typ was nil: %s", z.GetTyp()))
 		}
 
 		if tagp == nil {

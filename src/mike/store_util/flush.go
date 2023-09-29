@@ -1,7 +1,11 @@
 package store_util
 
 import (
+	"encoding/gob"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
 	"github.com/friedenberg/zit/src/lima/bestandsaufnahme"
 )
@@ -38,6 +42,7 @@ func (s *common) FlushBestandsaufnahme() (err error) {
 }
 
 func (c *common) Flush() (err error) {
+	gob.Register(iter.StringerKeyerPtr[kennung.Typ, *kennung.Typ]{})
 	if err = c.typenIndex.Flush(); err != nil {
 		err = errors.Wrapf(err, "failed to flush typen index")
 		return

@@ -16,7 +16,6 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
-	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/store_util"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
@@ -126,18 +125,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 
 		if c.Edit {
-			var cwdFiles *cwd.CwdFiles
-
-			if cwdFiles, err = cwd.MakeCwdFilesAll(
-				u.KonfigPtr(),
-				u.Standort(),
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
 			options := store_util.CheckoutOptions{
-				Cwd:          cwdFiles,
 				CheckoutMode: checkout_mode.ModeObjekteAndAkte,
 			}
 
@@ -210,22 +198,9 @@ func (c New) readExistingFilesAsZettels(
 func (c New) writeNewZettels(
 	u *umwelt.Umwelt,
 ) (zsc schnittstellen.MutableSetLike[*sku.CheckedOut], err error) {
-	var cwdFiles *cwd.CwdFiles
-
-	if cwdFiles, err = cwd.MakeCwdFilesAll(
-		u.KonfigPtr(),
-		u.Standort(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	emptyOp := user_ops.WriteNewZettels{
 		Umwelt:   u,
 		CheckOut: c.Edit,
-		CheckoutOptions: store_util.CheckoutOptions{
-			Cwd: cwdFiles,
-		},
 	}
 
 	mes := c.Metadatei.Etiketten.CloneMutableSetPtrLike()
@@ -257,17 +232,6 @@ func (c New) editZettels(
 		return
 	}
 
-	var cwdFiles *cwd.CwdFiles
-
-	if cwdFiles, err = cwd.MakeCwdFilesExactly(
-		u.KonfigPtr(),
-		u.Standort(),
-		filesZettelen...,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	openVimOp := user_ops.OpenVim{
 		Options: vim_cli_options_builder.New().
 			WithCursorLocation(2, 3).
@@ -276,14 +240,7 @@ func (c New) editZettels(
 			Build(),
 	}
 
-	var fs []string
-
-	if fs, err = cwdFiles.ZettelFiles(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if _, err = openVimOp.Run(u, fs...); err != nil {
+	if _, err = openVimOp.Run(u, filesZettelen...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -293,18 +250,9 @@ func (c New) editZettels(
 		return
 	}
 
-	if cwdFiles, err = cwd.MakeCwdFilesExactly(
-		u.KonfigPtr(),
-		u.Standort(),
-		filesZettelen...,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	checkinOp := user_ops.Checkin{}
 
-	if err = checkinOp.Run(u, ms, cwdFiles); err != nil {
+	if err = checkinOp.Run(u, ms); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
