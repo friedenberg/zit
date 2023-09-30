@@ -34,8 +34,18 @@ type CwdFiles struct {
 	EmptyDirectories []kennung.FD
 }
 
-func (fs *CwdFiles) MarkUnsureAkten(fd kennung.FD) {
-	fs.UnsureAkten.Add(fd)
+func (fs *CwdFiles) MarkUnsureAkten(fd kennung.FD) (err error) {
+	if fd, err = MakeFileFromFD(fd, fs.akteWriterFactory); err != nil {
+		err = errors.Wrapf(err, "%q", fd)
+		return
+	}
+
+	if err = fs.UnsureAkten.Add(fd); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (fs CwdFiles) EachCreatableMatchable(

@@ -121,6 +121,11 @@ func FDFromPath(p string) (fd FD, err error) {
 		return
 	}
 
+	if p == "." {
+		err = errors.Errorf("'.' not supported")
+		return
+	}
+
 	var fi os.FileInfo
 
 	if fi, err = os.Stat(p); err != nil {
@@ -172,6 +177,13 @@ func FileInfo(fi os.FileInfo, dir string) (fd FD, err error) {
 }
 
 func (fd *FD) Set(v string) (err error) {
+	v = strings.TrimSpace(v)
+
+	if v == "." {
+		err = errors.Errorf("'.' not supported")
+		return
+	}
+
 	var fi os.FileInfo
 
 	if fi, err = os.Stat(v); err != nil {

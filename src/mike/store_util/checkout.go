@@ -12,12 +12,10 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
-	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/kilo/cwd"
-	"github.com/friedenberg/zit/src/kilo/zettel"
 )
 
 func (s *common) CheckoutQuery(
@@ -60,7 +58,6 @@ func (s *common) CheckoutQuery(
 // just a matcher
 func (s *common) Checkout(
 	options CheckoutOptions,
-	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 	fq matcher.FuncReaderTransactedLikePtr,
 	ztw schnittstellen.FuncIter[*sku.Transacted],
 ) (zcs schnittstellen.MutableSetLike[*sku.CheckedOut], err error) {
@@ -69,7 +66,7 @@ func (s *common) Checkout(
 
 	if err = fq(
 		iter.MakeChain(
-			zettel.MakeWriterKonfig(s.GetKonfig(), tagp),
+			// zettel.MakeWriterKonfig(s.GetKonfig(), s.GetAkten().GetTypV0()),
 			ztw,
 			func(sk *sku.Transacted) (err error) {
 				var z sku.Transacted

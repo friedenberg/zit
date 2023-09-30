@@ -42,7 +42,6 @@ func (c CommitOrganizeFile) Run(
 	toUpdate := sku.MakeTransactedMutableSet()
 
 	ms := c.Umwelt.MakeMetaIdSetWithoutExcludedHidden(
-		nil,
 		gattungen.MakeSet(gattung.TrueGattung()...),
 	)
 	errors.TodoP1("create query without syntax")

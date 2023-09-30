@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 	"github.com/friedenberg/zit/src/papa/remote_push"
 )
@@ -56,7 +55,6 @@ func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	ids := u.MakeMetaIdSetWithExcludedHidden(
-		matcher.MakeMatcherCwdNop(matcher.MakeMatcherAlways()),
 		nil,
 	)
 

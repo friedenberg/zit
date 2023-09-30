@@ -56,6 +56,11 @@ func (c Status) RunWithQuery(
 		return
 	}
 
+	if err = ms.GetExplicitCwdFDs().Each(u.StoreUtil().GetCwdFiles().MarkUnsureAkten); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	p := u.PrinterCheckedOutLike()
 
 	if err = u.StoreObjekten().ReadAllMatchingAkten(
@@ -63,31 +68,36 @@ func (c Status) RunWithQuery(
 		func(fd kennung.FD, z *sku.Transacted) (err error) {
 			if z == nil {
 				err = u.PrinterFileNotRecognized()(&fd)
-			} else {
-				os := sha.Make(z.GetObjekteSha())
-				as := sha.Make(z.GetAkteSha())
+				return
+			}
 
-				fr := &sku.CheckedOut{
-					State: checked_out_state.StateRecognized,
-				}
+			os := sha.Make(z.GetObjekteSha())
+			as := sha.Make(z.GetAkteSha())
 
-				if err = fr.Internal.SetFromSkuLike(z); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+			fr := sku.GetCheckedOutPool().Get()
+			defer sku.GetCheckedOutPool().Put(fr)
 
-				if err = fr.External.SetFromSkuLike(z); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+			fr.State = checked_out_state.StateRecognized
 
-				fr.External.FDs = sku.ExternalFDs{
-					Akte: fd,
-				}
-				fr.External.SetAkteSha(as)
-				fr.External.ObjekteSha = os
+			if err = fr.Internal.SetFromSkuLike(z); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 
-				err = p(fr)
+			if err = fr.External.SetFromSkuLike(z); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			fr.External.FDs = sku.ExternalFDs{
+				Akte: fd,
+			}
+			fr.External.SetAkteSha(as)
+			fr.External.ObjekteSha = os
+
+			if err = p(fr); err != nil {
+				err = errors.Wrap(err)
+				return
 			}
 
 			return

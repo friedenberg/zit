@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/standort"
-	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
@@ -55,7 +54,6 @@ type StoreUtil interface {
 
 	Checkout(
 		options CheckoutOptions,
-		tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 		fq matcher.FuncReaderTransactedLikePtr,
 		ztw schnittstellen.FuncIter[*sku.Transacted],
 	) (zcs schnittstellen.MutableSetLike[*sku.CheckedOut], err error)

@@ -222,7 +222,6 @@ func (u *Umwelt) MakeKennungExpanders() (out kennung.Abbr) {
 }
 
 func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
-	cwd matcher.MatcherCwd,
 	dg gattungen.Set,
 ) matcher.Query {
 	if dg == nil {
@@ -235,7 +234,7 @@ func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
 
 	return matcher.MakeQuery(
 		u.Konfig(),
-		cwd,
+		u.StoreUtil().GetCwdFiles(),
 		u.MakeKennungExpanders(),
 		exc,
 		u.Konfig().FileExtensions,
@@ -250,7 +249,7 @@ func (u *Umwelt) MakeQueryAll() matcher.Query {
 
 	return matcher.MakeQueryAll(
 		u.Konfig(),
-		nil,
+		u.StoreUtil().GetCwdFiles(),
 		u.MakeKennungExpanders(),
 		nil,
 		u.Konfig().FileExtensions,
@@ -260,7 +259,6 @@ func (u *Umwelt) MakeQueryAll() matcher.Query {
 }
 
 func (u *Umwelt) MakeMetaIdSetWithoutExcludedHidden(
-	cwd matcher.MatcherCwd,
 	dg gattungen.Set,
 ) matcher.Query {
 	if dg == nil {
@@ -271,7 +269,7 @@ func (u *Umwelt) MakeMetaIdSetWithoutExcludedHidden(
 
 	return matcher.MakeQuery(
 		u.Konfig(),
-		cwd,
+		u.StoreUtil().GetCwdFiles(),
 		u.MakeKennungExpanders(),
 		nil,
 		u.Konfig().FileExtensions,

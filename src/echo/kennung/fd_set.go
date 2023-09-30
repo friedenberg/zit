@@ -1,6 +1,7 @@
 package kennung
 
 import (
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 )
@@ -34,8 +35,24 @@ func FDSetAddPairs[T FDPairGetter](
 ) (err error) {
 	return in.Each(
 		func(e T) (err error) {
-			out.Add(e.GetObjekteFD())
-			out.Add(e.GetAkteFD())
+			ofd := e.GetObjekteFD()
+
+			if !ofd.IsEmpty() {
+				if err = out.Add(ofd); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
+			ofd = e.GetAkteFD()
+
+			if !ofd.IsEmpty() {
+				if err = out.Add(ofd); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
 			return
 		},
 	)

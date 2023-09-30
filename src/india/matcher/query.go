@@ -25,6 +25,7 @@ func init() {
 type Query interface {
 	Get(g gattung.Gattung) (s MatcherSigil, ok bool)
 	GetCwdFDs() schnittstellen.SetLike[kennung.FD]
+	GetExplicitCwdFDs() schnittstellen.SetLike[kennung.FD]
 	GetEtiketten() kennung.EtikettSet
 	GetTypen() schnittstellen.SetLike[kennung.Typ]
 	Set(string) error
@@ -244,6 +245,7 @@ func (ms *query) set(v string) (err error) {
 
 	if before == "" && after == "" && sigil.IncludesCwd() {
 		ms.dotOperatorActive = true
+		// return
 	}
 
 	if err = gs.Each(
@@ -438,6 +440,10 @@ func (ms query) Get(g gattung.Gattung) (s MatcherSigil, ok bool) {
 	)
 
 	return
+}
+
+func (ms query) GetExplicitCwdFDs() schnittstellen.SetLike[kennung.FD] {
+	return ms.FDs
 }
 
 func (ms query) GetCwdFDs() schnittstellen.SetLike[kennung.FD] {

@@ -104,7 +104,6 @@ func (c commandWithCwdQuery) Complete(
 
 func (c commandWithCwdQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	ids := u.MakeMetaIdSetWithoutExcludedHidden(
-		u.StoreUtil().GetCwdFiles(),
 		c.DefaultGattungen(),
 	)
 

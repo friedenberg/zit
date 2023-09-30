@@ -1,97 +1,85 @@
 package commands
 
-import (
-	"flag"
+// type Clone struct {
+// 	Einleitung umwelt.Einleitung
+// }
 
-	"github.com/friedenberg/zit/src/alfa/angeboren"
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
-	"github.com/friedenberg/zit/src/papa/remote_transfers"
-)
+// func init() {
+// 	registerCommandSansUmwelt(
+// 		"clone",
+// 		func(f *flag.FlagSet) Command {
+// 			c := &Clone{
+// 				Einleitung: umwelt.Einleitung{
+// 					Angeboren: angeboren.Default(),
+// 				},
+// 			}
 
-type Clone struct {
-	Einleitung umwelt.Einleitung
-}
+// 			c.Einleitung.AddToFlagSet(f)
 
-func init() {
-	registerCommandSansUmwelt(
-		"clone",
-		func(f *flag.FlagSet) Command {
-			c := &Clone{
-				Einleitung: umwelt.Einleitung{
-					Angeboren: angeboren.Default(),
-				},
-			}
+// 			return c
+// 		},
+// 	)
+// }
 
-			c.Einleitung.AddToFlagSet(f)
+// func (c Clone) CompletionGattung() gattungen.Set {
+// 	return gattungen.MakeSet(
+// 		gattung.Etikett,
+// 		gattung.Zettel,
+// 		gattung.Typ,
+// 		gattung.Kasten,
+// 	)
+// }
 
-			return c
-		},
-	)
-}
+// func (c Clone) Run(u *umwelt.Umwelt, args ...string) (err error) {
+// 	if len(args) == 0 {
+// 		err = errors.Normalf("must specify kasten to pull from")
+// 		return
+// 	}
 
-func (c Clone) CompletionGattung() gattungen.Set {
-	return gattungen.MakeSet(
-		gattung.Etikett,
-		gattung.Zettel,
-		gattung.Typ,
-		gattung.Kasten,
-	)
-}
+// 	from := args[0]
 
-func (c Clone) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	if len(args) == 0 {
-		err = errors.Normalf("must specify kasten to pull from")
-		return
-	}
+// 	if len(args) > 1 {
+// 		args = args[1:]
+// 	} else {
+// 		err = errors.Normalf("Nothing to clone.")
+// 		return
+// 	}
 
-	from := args[0]
+// 	if err = u.Einleitung(c.Einleitung); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	if len(args) > 1 {
-		args = args[1:]
-	} else {
-		err = errors.Normalf("Nothing to clone.")
-		return
-	}
+// 	ids := u.MakeMetaIdSetWithExcludedHidden(
+// 		matcher.MakeMatcherCwdNop(matcher.MakeMatcherAlways()),
+// 		c.CompletionGattung(),
+// 	)
 
-	if err = u.Einleitung(c.Einleitung); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	if err = ids.SetMany(args...); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	ids := u.MakeMetaIdSetWithExcludedHidden(
-		matcher.MakeMatcherCwdNop(matcher.MakeMatcherAlways()),
-		c.CompletionGattung(),
-	)
+// 	if err = u.Lock(); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	if err = ids.SetMany(args...); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	defer errors.Deferred(&err, u.Unlock)
 
-	if err = u.Lock(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	var client remote_transfers.PullClient
 
-	defer errors.Deferred(&err, u.Unlock)
+// 	if client, err = remote_transfers.MakePullClient(u, from); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	var client remote_transfers.PullClient
+// 	defer errors.DeferredCloser(&err, client)
 
-	if client, err = remote_transfers.MakePullClient(u, from); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	if err = client.PullSkus(ids); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	defer errors.DeferredCloser(&err, client)
-
-	if err = client.PullSkus(ids); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
+// 	return
+// }

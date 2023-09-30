@@ -102,7 +102,7 @@ func (c commandWithQuery) Complete(
 }
 
 func (c commandWithQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	ids := u.MakeMetaIdSetWithExcludedHidden(nil, c.DefaultGattungen())
+	ids := u.MakeMetaIdSetWithExcludedHidden(c.DefaultGattungen())
 
 	if err = ids.SetMany(args...); err != nil {
 		err = errors.Wrap(err)

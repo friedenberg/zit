@@ -8,6 +8,7 @@ import (
 var (
 	poolTransacted schnittstellen.Pool[Transacted, *Transacted]
 	poolExternal   schnittstellen.Pool[External, *External]
+	poolCheckedOut schnittstellen.Pool[CheckedOut, *CheckedOut]
 )
 
 func init() {
@@ -20,6 +21,11 @@ func init() {
 		nil,
 		nil,
 	)
+
+	poolCheckedOut = pool.MakePool[CheckedOut, *CheckedOut](
+		nil,
+		nil,
+	)
 }
 
 func GetTransactedPool() schnittstellen.Pool[Transacted, *Transacted] {
@@ -28,4 +34,8 @@ func GetTransactedPool() schnittstellen.Pool[Transacted, *Transacted] {
 
 func GetExternalPool() schnittstellen.Pool[External, *External] {
 	return poolExternal
+}
+
+func GetCheckedOutPool() schnittstellen.Pool[CheckedOut, *CheckedOut] {
+	return poolCheckedOut
 }

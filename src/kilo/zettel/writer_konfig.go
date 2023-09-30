@@ -1,11 +1,11 @@
 package zettel
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -46,7 +46,8 @@ func MakeWriterKonfig(
 		t := k.GetApproximatedTyp(z.GetTyp()).ApproximatedOrActual()
 
 		if t == nil {
-			panic(fmt.Sprintf("typ was nil: %s", z.GetTyp()))
+			log.Err().Printf("empty typ: %s", z.Kennung)
+			return
 		}
 
 		if tagp == nil {

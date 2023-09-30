@@ -14,25 +14,11 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
-func MakeFile(
-	dir string,
-	p string,
+func MakeFileFromFD(
+	fd kennung.FD,
 	awf schnittstellen.AkteWriterFactory,
 ) (ut kennung.FD, err error) {
-	todo.Remove()
-	ut = kennung.FD{}
-
-	p = path.Join(dir, p)
-
-	if err = ut.Set(p); err != nil {
-		err = errors.Wrapf(err, "path: %q", p)
-		return
-	}
-
-	if ut.Path, err = filepath.Rel(dir, ut.Path); err != nil {
-		err = errors.Wrapf(err, "path: %q", ut.Path)
-		return
-	}
+	ut = fd
 
 	var f *os.File
 
@@ -58,6 +44,34 @@ func MakeFile(
 	}
 
 	ut.Sha = sha.Make(aw.GetShaLike())
+
+	return
+}
+
+func MakeFile(
+	dir string,
+	p string,
+	awf schnittstellen.AkteWriterFactory,
+) (ut kennung.FD, err error) {
+	todo.Remove()
+	ut = kennung.FD{}
+
+	p = path.Join(dir, p)
+
+	if err = ut.Set(p); err != nil {
+		err = errors.Wrapf(err, "path: %q", p)
+		return
+	}
+
+	if ut.Path, err = filepath.Rel(dir, ut.Path); err != nil {
+		err = errors.Wrapf(err, "path: %q", ut.Path)
+		return
+	}
+
+	if ut, err = MakeFileFromFD(ut, awf); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

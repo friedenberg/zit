@@ -5,9 +5,11 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -18,7 +20,8 @@ import (
 )
 
 type Clean struct {
-	force bool
+	force             bool
+	includeRecognized bool
 }
 
 func init() {
@@ -31,7 +34,14 @@ func init() {
 				&c.force,
 				"force",
 				false,
-				"remove objekten in working directory even if they have changes",
+				"remove Objekten in working directory even if they have changes",
+			)
+
+			f.BoolVar(
+				&c.includeRecognized,
+				"recognized",
+				false,
+				"remove Akten in working directory or args that are recognized",
 			)
 
 			return c
@@ -44,18 +54,18 @@ func (c Clean) DefaultGattungen() gattungen.Set {
 }
 
 func (c Clean) RunWithQuery(
-	s *umwelt.Umwelt,
+	u *umwelt.Umwelt,
 	ms matcher.Query,
 ) (err error) {
 	fds := collections_ptr.MakeMutableValueSet[kennung.FD, *kennung.FD](nil)
 	l := &sync.Mutex{}
 
-	for _, d := range s.StoreUtil().GetCwdFiles().EmptyDirectories {
+	for _, d := range u.StoreUtil().GetCwdFiles().EmptyDirectories {
 		fds.Add(d)
 	}
 
-	if err = s.StoreObjekten().ReadFiles(
-		matcher.MakeFuncReaderTransactedLikePtr(ms, s.StoreObjekten().Query),
+	if err = u.StoreObjekten().ReadFiles(
+		matcher.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().Query),
 		iter.MakeChain(
 			matcher.MakeFilterFromQuery(ms),
 			func(co *sku.CheckedOut) (err error) {
@@ -79,11 +89,85 @@ func (c Clean) RunWithQuery(
 		return
 	}
 
+	if err = c.markUnsureAktenForRemovalIfNecessary(u, ms, fds.Add); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	deleteOp := user_ops.DeleteCheckout{
-		Umwelt: s,
+		Umwelt: u,
 	}
 
 	if err = deleteOp.Run(fds); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (c Clean) markUnsureAktenForRemovalIfNecessary(
+	u *umwelt.Umwelt,
+	q matcher.Query,
+	add schnittstellen.FuncIter[kennung.FD],
+) (err error) {
+	if !c.includeRecognized {
+		return
+	}
+
+	if err = q.GetExplicitCwdFDs().Each(u.StoreUtil().GetCwdFiles().MarkUnsureAkten); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	p := u.PrinterCheckedOutLike()
+
+	if err = u.StoreObjekten().ReadAllMatchingAkten(
+		u.StoreUtil().GetCwdFiles().UnsureAkten,
+		func(fd kennung.FD, z *sku.Transacted) (err error) {
+			if z == nil {
+				err = u.PrinterFileNotRecognized()(&fd)
+				return
+			}
+
+			os := sha.Make(z.GetObjekteSha())
+			as := sha.Make(z.GetAkteSha())
+
+			fr := sku.GetCheckedOutPool().Get()
+			defer sku.GetCheckedOutPool().Put(fr)
+
+			fr.State = checked_out_state.StateRecognized
+
+			if err = fr.Internal.SetFromSkuLike(z); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = fr.External.SetFromSkuLike(z); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			fr.External.FDs = sku.ExternalFDs{
+				Akte: fd,
+			}
+
+			fr.External.SetAkteSha(as)
+			fr.External.ObjekteSha = os
+
+			if err = p(fr); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = add(fd); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
