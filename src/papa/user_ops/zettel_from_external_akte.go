@@ -6,7 +6,9 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -40,21 +42,45 @@ func (c ZettelFromExternalAkte) Run(
 
 	results = sku.MakeTransactedMutableSet()
 
-	fds := iter.SortedValues(ms.GetCwdFDs())
+	fds := collections_value.MakeMutableSet[kennung.FD](
+		kennung.FDKeyerSha{},
+	)
 
-	for _, fd := range fds {
-		var z *sku.External
-
-		if z, err = c.zettelForAkte(fd); err != nil {
+	for _, fd := range iter.SortedValues[kennung.FD](ms.GetCwdFDs()) {
+		if err = c.processOneFD(fd, fds.Add); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+	}
 
-		toCreate.Add(z)
+	if err = fds.Each(
+		func(fd kennung.FD) (err error) {
+			var z *sku.External
 
-		if c.Delete {
-			toDelete.Add(z)
-		}
+			if z, err = c.zettelForAkte(fd); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = toCreate.Add(z); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if !c.Delete {
+				return
+			}
+
+			if err = toDelete.Add(z); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if c.Dedupe {
@@ -160,22 +186,13 @@ func (c ZettelFromExternalAkte) Run(
 	return
 }
 
-func (c *ZettelFromExternalAkte) zettelForAkte(
-	akteFD kennung.FD,
-) (z *sku.External, err error) {
-	z = &sku.External{
-		FDs: sku.ExternalFDs{
-			Akte: akteFD,
-		},
-	}
-
-	z.Transacted.Kennung.KennungPtr = &kennung.Hinweis{}
-
+func (c *ZettelFromExternalAkte) processOneFD(
+	fd kennung.FD,
+	add schnittstellen.FuncIter[kennung.FD],
+) (err error) {
 	var r io.Reader
 
-	errors.Log().Print("running")
-
-	if r, err = c.Filter.Run(akteFD.Path); err != nil {
+	if r, err = c.Filter.Run(fd.Path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -189,15 +206,33 @@ func (c *ZettelFromExternalAkte) zettelForAkte(
 		return
 	}
 
+	defer errors.DeferredCloser(&err, akteWriter)
+
 	if _, err = io.Copy(akteWriter, r); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = akteWriter.Close(); err != nil {
+	fd.Sha = sha.Make(akteWriter.GetShaLike())
+
+	if err = add(fd); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	return
+}
+
+func (c *ZettelFromExternalAkte) zettelForAkte(
+	akteFD kennung.FD,
+) (z *sku.External, err error) {
+	z = &sku.External{
+		FDs: sku.ExternalFDs{
+			Akte: akteFD,
+		},
+	}
+
+	z.Transacted.Kennung.KennungPtr = &kennung.Hinweis{}
 
 	z.GetMetadateiPtr().Reset()
 
@@ -206,7 +241,7 @@ func (c *ZettelFromExternalAkte) zettelForAkte(
 		return
 	}
 
-	z.SetAkteSha(akteWriter.GetShaLike())
+	z.SetAkteSha(akteFD.Sha)
 
 	return
 }

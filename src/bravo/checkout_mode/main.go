@@ -38,6 +38,10 @@ func (m *Mode) Set(v string) (err error) {
 	v = strings.ToLower(strings.TrimSpace(v))
 
 	switch v {
+	case "objekte-only":
+		fallthrough
+	case "objekte":
+		fallthrough
 	case "zettel":
 		fallthrough
 	case "zettel-only":

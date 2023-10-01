@@ -47,6 +47,90 @@ function add { # @test
 	EOM
 }
 
+function add_with_dupe_added { # @test
+	run_zit_init_disable_age
+
+	f=to_add.md
+	{
+		echo test file
+	} >"$f"
+
+	f2=to_add2.md
+	{
+		echo test file
+	} >"$f2"
+
+	run_zit add \
+		-dedupe \
+		-delete \
+		-etiketten zz-inbox-2022-11-14 \
+		"$f" "$f2"
+
+	assert_success
+	assert_output - <<-EOM
+		[-zz@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-zz-inbox@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-zz-inbox-2022@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-zz-inbox-2022-11@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-zz-inbox-2022-11-14@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add2" zz-inbox-2022-11-14]
+		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add2" zz-inbox-2022-11-14]
+		          deleted [to_add2.md]
+	EOM
+
+	run_zit show -format text one/uno
+	assert_success
+	assert_output - <<-EOM
+		---
+		# to_add2
+		- zz-inbox-2022-11-14
+		! md
+		---
+
+		test file
+	EOM
+}
+
+function add_not_md { # @test
+	skip
+	run_zit_init_disable_age
+
+	f=to_add.pdf
+	{
+		echo test file
+	} >"$f"
+
+	run_zit add \
+		-delete \
+		-etiketten zz-inbox-2022-11-14 \
+		-each-akte "echo" \
+		"$f"
+
+	assert_success
+	assert_output - <<-EOM
+		[-zz@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-zz-inbox@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-zz-inbox-2022@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-zz-inbox-2022-11@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-zz-inbox-2022-11-14@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add" zz-inbox-2022-11-14]
+		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add" zz-inbox-2022-11-14]
+		          deleted [to_add.md]
+	EOM
+
+	run_zit show -format text one/uno
+	assert_success
+	assert_output - <<-EOM
+		---
+		# to_add
+		- zz-inbox-2022-11-14
+		! md
+		---
+
+		test file
+	EOM
+}
+
 function add_1 { # @test
 	run_zit_init_disable_age
 

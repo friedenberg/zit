@@ -114,7 +114,7 @@ func (fv *FormatterValue) FuncFormatter(
 
 	case "typ":
 		return func(o *sku.Transacted) (err error) {
-			if _, err = io.WriteString(out, o.GetTyp().String()); err != nil {
+			if _, err = fmt.Fprintln(out, o.GetTyp().String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

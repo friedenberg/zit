@@ -3,6 +3,7 @@ package store_util
 import (
 	"fmt"
 	"path"
+	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -64,6 +65,8 @@ func (s *common) Checkout(
 	zcs = collections_value.MakeMutableValueSet[*sku.CheckedOut](nil)
 	zts := sku.MakeTransactedMutableSet()
 
+	var l sync.Mutex
+
 	if err = fq(
 		iter.MakeChain(
 			// zettel.MakeWriterKonfig(s.GetKonfig(), s.GetAkten().GetTypV0()),
@@ -76,7 +79,15 @@ func (s *common) Checkout(
 					return
 				}
 
-				return zts.AddPtr(&z)
+				l.Lock()
+				defer l.Unlock()
+
+				if err = zts.AddPtr(&z); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
 			},
 		),
 	); err != nil {

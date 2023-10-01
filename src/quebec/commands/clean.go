@@ -121,6 +121,7 @@ func (c Clean) markUnsureAktenForRemovalIfNecessary(
 	}
 
 	p := u.PrinterCheckedOutLike()
+	var l sync.Mutex
 
 	if err = u.StoreObjekten().ReadAllMatchingAkten(
 		u.StoreUtil().GetCwdFiles().UnsureAkten,
@@ -159,6 +160,9 @@ func (c Clean) markUnsureAktenForRemovalIfNecessary(
 				err = errors.Wrap(err)
 				return
 			}
+
+			l.Lock()
+			defer l.Unlock()
 
 			if err = add(fd); err != nil {
 				err = errors.Wrap(err)

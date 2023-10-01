@@ -1,6 +1,8 @@
 package store_objekten
 
 import (
+	"sync"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
@@ -60,6 +62,7 @@ func (s Store) ReadAllMatchingAkten(
 	}
 
 	observed := collections_value.MakeMutableValueSet[kennung.FD](nil)
+	var l sync.Mutex
 
 	if err = s.Zettel().ReadAll(
 		func(z *sku.Transacted) (err error) {
@@ -73,6 +76,9 @@ func (s Store) ReadAllMatchingAkten(
 				err = errors.Wrap(err)
 				return
 			}
+
+			l.Lock()
+			defer l.Unlock()
 
 			return observed.Add(fd)
 		},
