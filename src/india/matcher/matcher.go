@@ -182,19 +182,19 @@ func MakeMatcherNever() Matcher {
 
 type matcherNever struct{}
 
-func (_ matcherNever) MatcherLen() int {
+func (matcherNever) MatcherLen() int {
 	return 0
 }
 
-func (_ matcherNever) Each(_ schnittstellen.FuncIter[Matcher]) error {
+func (matcherNever) Each(_ schnittstellen.FuncIter[Matcher]) error {
 	return nil
 }
 
-func (_ matcherNever) String() string {
+func (matcherNever) String() string {
 	return "NEVER"
 }
 
-func (_ matcherNever) ContainsMatchable(_ *sku.Transacted) bool {
+func (matcherNever) ContainsMatchable(_ *sku.Transacted) bool {
 	return false
 }
 

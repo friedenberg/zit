@@ -1,16 +1,15 @@
 package objekte_collections
 
 import (
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 func ToSliceFilesAkten(
-	s schnittstellen.SetLike[*sku.CheckedOut],
+	s sku.CheckedOutSet,
 ) (out []string, err error) {
-	return iter.DerivedValues[*sku.CheckedOut, string](
+	return iter.DerivedValuesPtr[sku.CheckedOut, *sku.CheckedOut, string](
 		s,
 		func(z *sku.CheckedOut) (e string, err error) {
 			e = z.External.GetAkteFD().Path
@@ -26,9 +25,9 @@ func ToSliceFilesAkten(
 }
 
 func ToSliceFilesZettelen(
-	s schnittstellen.SetLike[*sku.CheckedOut],
+	s sku.CheckedOutSet,
 ) (out []string, err error) {
-	return iter.DerivedValues[*sku.CheckedOut, string](
+	return iter.DerivedValuesPtr[sku.CheckedOut, *sku.CheckedOut, string](
 		s,
 		func(z *sku.CheckedOut) (e string, err error) {
 			e = z.External.GetObjekteFD().Path

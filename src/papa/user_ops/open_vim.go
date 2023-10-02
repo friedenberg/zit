@@ -2,7 +2,7 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/charlie/exec_editor"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
@@ -29,7 +29,7 @@ func (c OpenVim) Run(
 		return
 	}
 
-	if err = files.OpenVimWithArgs(vimArgs, args...); err != nil {
+	if err = exec_editor.OpenVimWithArgs(vimArgs, args...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -61,7 +61,7 @@ func FormatForVersion(v schnittstellen.StoreVersion) Format {
 		return v2{}
 
 	case 3:
-    fallthrough
+		fallthrough
 		// return v3{}
 
 	default:

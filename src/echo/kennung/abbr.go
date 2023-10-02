@@ -56,25 +56,26 @@ func (a Abbr) AbbreviateHinweisOnly(
 ) (out Kennung, err error) {
 	var getAbbr func(Kennung) (string, error)
 
-	switch in.(type) {
-	case Hinweis, *Hinweis:
-		getAbbr = a.Hinweis.AbbreviateKennung
+	var h Hinweis
 
-	default:
+	if err = h.Set(in.String()); err != nil {
+		err = nil
 		out = in
 		return
 	}
 
+	getAbbr = a.Hinweis.AbbreviateKennung
+
 	var abbr string
 
-	if abbr, err = getAbbr(in); err != nil {
+	if abbr, err = getAbbr(h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	outPtr := &Kennung2{}
 
-	if err = outPtr.SetWithGattung(abbr, in); err != nil {
+	if err = outPtr.SetWithGattung(abbr, h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

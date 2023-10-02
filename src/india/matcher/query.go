@@ -31,40 +31,41 @@ type Query interface {
 	Set(string) error
 	SetMany(...string) error
 	All(f func(gattung.Gattung, MatcherSigil) error) error
+	Matcher
 }
 
-type setWithSigil struct {
-	Matcher MatcherExactlyThisOrAllOfThese
-	Sigil   kennung.Sigil
-}
+func MakeQueryFromCheckedOutSet(
+	cos sku.CheckedOutSet,
+) (q Query, err error) {
+	gs := make(map[gattung.Gattung]setWithSigil)
 
-func (s setWithSigil) String() string {
-	return fmt.Sprintf("%s%s", s.Matcher, s.Sigil)
-}
+	if err = cos.EachPtr(
+		func(co *sku.CheckedOut) (err error) {
+			m := MakeMatcherContainsExactly(co.Internal.Kennung)
 
-func (s setWithSigil) ContainsMatchable(m *sku.Transacted) bool {
-	return s.Matcher.ContainsMatchable(m)
-}
+			var s setWithSigil
+			ok := false
 
-func (s setWithSigil) GetSigil() kennung.Sigil {
-	return s.Sigil
-}
+			if s, ok = gs[gattung.Must(co.Internal.GetGattung())]; !ok {
+				s.Matcher = MakeMatcherExactlyThisOrAllOfThese()
+			}
 
-type query struct {
-	konfig                  schnittstellen.Konfig
-	implicitEtikettenGetter ImplicitEtikettenGetter
-	fileExtensionGetter     schnittstellen.FileExtensionGetter
-	expanders               kennung.Abbr
+			s.Matcher.AddExactlyThis(m)
 
-	cwd    MatcherCwd
-	Hidden Matcher
-	index  kennung.Index
+			gs[gattung.Must(co.Internal.GetGattung())] = s
 
-	DefaultGattungen gattungen.Set
-	Gattung          map[gattung.Gattung]setWithSigil
-	FDs              schnittstellen.MutableSetLike[kennung.FD]
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	dotOperatorActive bool
+	q = &query{
+		Gattung: gs,
+	}
+
+	return
 }
 
 func MakeQuery(
@@ -114,6 +115,48 @@ func MakeQueryAll(
 		Gattung:                 make(map[gattung.Gattung]setWithSigil),
 		index:                   ki,
 	}
+}
+
+type setWithSigil struct {
+	Matcher MatcherExactlyThisOrAllOfThese
+	Sigil   kennung.Sigil
+}
+
+func (s setWithSigil) String() string {
+	return fmt.Sprintf("%s%s", s.Matcher, s.Sigil)
+}
+
+func (s setWithSigil) ContainsMatchable(m *sku.Transacted) bool {
+	return s.Matcher.ContainsMatchable(m)
+}
+
+func (s setWithSigil) GetSigil() kennung.Sigil {
+	return s.Sigil
+}
+
+type query struct {
+	konfig                  schnittstellen.Konfig
+	implicitEtikettenGetter ImplicitEtikettenGetter
+	fileExtensionGetter     schnittstellen.FileExtensionGetter
+	expanders               kennung.Abbr
+
+	cwd    MatcherCwd
+	Hidden Matcher
+	index  kennung.Index
+
+	DefaultGattungen gattungen.Set
+	Gattung          map[gattung.Gattung]setWithSigil
+	FDs              schnittstellen.MutableSetLike[kennung.FD]
+
+	dotOperatorActive bool
+}
+
+func (q query) MatcherLen() int {
+	return 0
+}
+
+func (q query) Each(f schnittstellen.FuncIter[Matcher]) (err error) {
+	return todo.Implement()
 }
 
 func (s query) String() string {
@@ -512,8 +555,16 @@ func (ms query) GetTypen() schnittstellen.SetLike[kennung.Typ] {
 }
 
 func (s query) ContainsMatchable(m *sku.Transacted) bool {
-	todo.Implement()
-	return false
+	g := gattung.Must(m.GetGattung())
+
+	var matcher Matcher
+	ok := false
+
+	if matcher, ok = s.Get(g); !ok {
+		return false
+	}
+
+	return matcher.ContainsMatchable(m)
 }
 
 // Runs in parallel

@@ -9,7 +9,8 @@ func AddOrReplaceIfGreater[T interface {
 	schnittstellen.Stringer
 	schnittstellen.ValueLike
 	schnittstellen.Lessor[T]
-}](c schnittstellen.MutableSetLike[T], b T) (err error) {
+}](c schnittstellen.MutableSetLike[T], b T,
+) (err error) {
 	a, ok := c.Get(c.Key(b))
 
 	if !ok || a.Less(b) {
@@ -216,6 +217,38 @@ func DerivedValues[E any, F any](
 
 	if err = c.Each(
 		func(e E) (err error) {
+			var e1 F
+
+			if e1, err = f(e); err != nil {
+				if IsStopIteration(err) {
+					err = nil
+				} else {
+					err = errors.Wrap(err)
+				}
+
+				return
+			}
+
+			out = append(out, e1)
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func DerivedValuesPtr[E any, EPtr schnittstellen.Ptr[E], F any](
+	c schnittstellen.SetPtrLike[E, EPtr],
+	f schnittstellen.FuncTransform[EPtr, F],
+) (out []F, err error) {
+	out = make([]F, 0, c.Len())
+
+	if err = c.EachPtr(
+		func(e EPtr) (err error) {
 			var e1 F
 
 			if e1, err = f(e); err != nil {

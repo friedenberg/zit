@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/charlie/collections_value"
+	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -61,8 +61,8 @@ func (s *common) Checkout(
 	options CheckoutOptions,
 	fq matcher.FuncReaderTransactedLikePtr,
 	ztw schnittstellen.FuncIter[*sku.Transacted],
-) (zcs schnittstellen.MutableSetLike[*sku.CheckedOut], err error) {
-	zcs = collections_value.MakeMutableValueSet[*sku.CheckedOut](nil)
+) (zcs sku.CheckedOutMutableSet, err error) {
+	zcs = collections_ptr.MakeMutableValueSet[sku.CheckedOut, *sku.CheckedOut](nil)
 	zts := sku.MakeTransactedMutableSet()
 
 	var l sync.Mutex
@@ -104,7 +104,7 @@ func (s *common) Checkout(
 				return
 			}
 
-			zcs.Add(zc)
+			zcs.AddPtr(zc)
 
 			return
 		},

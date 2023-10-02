@@ -2,8 +2,7 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections_value"
+	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/store_util"
@@ -19,7 +18,7 @@ type WriteNewZettels struct {
 func (c WriteNewZettels) RunMany(
 	z zettel.ProtoZettel,
 	count int,
-) (results schnittstellen.MutableSetLike[*sku.CheckedOut], err error) {
+) (results sku.CheckedOutMutableSet, err error) {
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -27,7 +26,7 @@ func (c WriteNewZettels) RunMany(
 
 	defer errors.Deferred(&err, c.Unlock)
 
-	results = collections_value.MakeMutableValueSet[*sku.CheckedOut](
+	results = collections_ptr.MakeMutableValueSet[sku.CheckedOut, *sku.CheckedOut](
 		nil,
 	)
 
@@ -40,7 +39,7 @@ func (c WriteNewZettels) RunMany(
 			return
 		}
 
-		results.Add(cz)
+		results.AddPtr(cz)
 	}
 
 	return

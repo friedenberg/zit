@@ -56,7 +56,7 @@ type StoreUtil interface {
 		options CheckoutOptions,
 		fq matcher.FuncReaderTransactedLikePtr,
 		ztw schnittstellen.FuncIter[*sku.Transacted],
-	) (zcs schnittstellen.MutableSetLike[*sku.CheckedOut], err error)
+	) (zcs sku.CheckedOutMutableSet, err error)
 
 	ReadFiles(
 		fq matcher.FuncReaderTransactedLikePtr,

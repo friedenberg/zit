@@ -32,6 +32,8 @@ type (
 	TransactedSet        = schnittstellen.SetPtrLike[Transacted, *Transacted]
 	TransactedMutableSet = schnittstellen.MutableSetPtrLike[Transacted, *Transacted]
 	TransactedHeap       = heap.Heap[Transacted, *Transacted]
+	CheckedOutSet        = schnittstellen.SetPtrLike[CheckedOut, *CheckedOut]
+	CheckedOutMutableSet = schnittstellen.MutableSetPtrLike[CheckedOut, *CheckedOut]
 )
 
 func MakeTransactedHeap() TransactedHeap {

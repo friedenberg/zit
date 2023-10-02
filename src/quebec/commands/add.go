@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/files"
@@ -214,7 +213,7 @@ func (c Add) openAktenIfNecessary(
 		CheckoutMode: checkout_mode.ModeAkteOnly,
 	}
 
-	var checkoutResults schnittstellen.MutableSetLike[*sku.CheckedOut]
+	var checkoutResults sku.CheckedOutMutableSet
 
 	if checkoutResults, err = u.StoreObjekten().Checkout(
 		options,

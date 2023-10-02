@@ -54,19 +54,20 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 	lw := format.NewLineWriter()
 
-	kopf, scwhanz := ot.assignment.MaxKopfUndSchwanz()
+	kopf, scwhanz := ot.MaxKopfUndSchwanz()
 
-	l := ot.assignment.MaxLen()
+	l := ot.MaxLen()
+
+	omit := ot.UseMetadateiHeader && ot.HasMetadateiContent()
 
 	aw := assignmentLineWriter{
-		LineWriter:          lw,
-		maxDepth:            ot.assignment.MaxDepth(),
-		maxKopf:             kopf,
-		maxSchwanz:          scwhanz,
-		maxLen:              l,
-		RightAlignedIndents: ot.UseRightAlignedIndents,
-		OmitLeadingEmptyLine: ot.Options.UseMetadateiHeader &&
-			ot.Metadatei.HasMetadateiContent(),
+		LineWriter:           lw,
+		maxDepth:             ot.MaxDepth(),
+		maxKopf:              kopf,
+		maxSchwanz:           scwhanz,
+		maxLen:               l,
+		RightAlignedIndents:  ot.UseRightAlignedIndents,
+		OmitLeadingEmptyLine: omit,
 	}
 
 	if err = aw.write(ot.assignment); err != nil {
@@ -78,7 +79,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		Akte: lw,
 	}
 
-	if ot.Options.UseMetadateiHeader {
+	if ot.UseMetadateiHeader {
 		mw.Metadatei = ot.Metadatei
 	}
 

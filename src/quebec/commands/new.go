@@ -4,14 +4,10 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
-	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/script_value"
-	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
@@ -109,7 +105,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		),
 	}
 
-	var zsc schnittstellen.MutableSetLike[*sku.CheckedOut]
+	var zsc sku.CheckedOutMutableSet
 
 	if len(args) == 0 {
 		if zsc, err = c.writeNewZettels(u); err != nil {
@@ -148,19 +144,8 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if c.Edit {
-		ms := u.MakeMetaIdSetWithoutExcludedHidden(
-			gattungen.MakeSet(gattung.Zettel),
-		)
-
-		todo.Refactor("make this more stable by not using string query")
-		if err = ms.Set(".zettel"); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
 		if err = c.editZettels(
 			u,
-			ms,
 			zsc,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -195,7 +180,7 @@ func (c New) readExistingFilesAsZettels(
 
 func (c New) writeNewZettels(
 	u *umwelt.Umwelt,
-) (zsc schnittstellen.MutableSetLike[*sku.CheckedOut], err error) {
+) (zsc sku.CheckedOutMutableSet, err error) {
 	emptyOp := user_ops.WriteNewZettels{
 		Umwelt:   u,
 		CheckOut: c.Edit,
@@ -215,8 +200,7 @@ func (c New) writeNewZettels(
 
 func (c New) editZettels(
 	u *umwelt.Umwelt,
-	ms matcher.Query,
-	zsc schnittstellen.MutableSetLike[*sku.CheckedOut],
+	zsc sku.CheckedOutMutableSet,
 ) (err error) {
 	if !c.Edit {
 		errors.Log().Print("edit set to false, not editing")
@@ -249,6 +233,13 @@ func (c New) editZettels(
 	}
 
 	checkinOp := user_ops.Checkin{}
+
+	var ms matcher.Query
+
+	if ms, err = matcher.MakeQueryFromCheckedOutSet(zsc); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = checkinOp.Run(u, ms); err != nil {
 		err = errors.Wrap(err)

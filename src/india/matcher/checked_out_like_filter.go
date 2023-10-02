@@ -4,7 +4,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
@@ -16,17 +15,7 @@ func MakeFilterFromQuery(
 	}
 
 	return func(col *sku.CheckedOut) (err error) {
-		g := gattung.Must(col.Internal.GetGattung())
-
-		var matcher Matcher
-		ok := false
-
-		if matcher, ok = ms.Get(g); !ok {
-			err = iter.MakeErrStopIteration()
-			return
-		}
-
-		if !matcher.ContainsMatchable(&col.External.Transacted) {
+		if !ms.ContainsMatchable(&col.External.Transacted) {
 			err = iter.MakeErrStopIteration()
 			return
 		}
