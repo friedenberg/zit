@@ -41,7 +41,7 @@ function! ZitAction()
     return
   endif
 
-  call popup_menu(
+  call popup#menu(
         \ items,
         \ #{ title: "Run a Zettel-Typ-Specific Action", 
         \ callback: 'ZitActionItemPicked', 
@@ -141,7 +141,7 @@ function! ZitPreview()
     return
   endif
 
-  call popup_menu(
+  call popup#menu(
         \ items,
         \ #{ title: "Preview format", 
         \ callback: 'ZitPreviewMenuItemPicked', 
@@ -174,7 +174,7 @@ function! ZitCopy()
     return
   endif
 
-  call popup_menu(
+  call popup#menu(
         \ items,
         \ #{ title: "Copy format", 
         \ callback: 'ZitCopyMenuItemPicked', 
