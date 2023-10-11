@@ -22,6 +22,11 @@ type ExternalReader interface {
 		t *sku.Transacted,
 	) (err error)
 
+	ReadOneExternalObjekteReader(
+		r io.Reader,
+		e *sku.External,
+	) (err error)
+
 	ReadOneExternalAkte(
 		e *sku.External,
 		t *sku.Transacted,
@@ -73,6 +78,10 @@ func (s *common) ReadOneExternalObjekte(
 	e *sku.External,
 	t *sku.Transacted,
 ) (err error) {
+	if t != nil {
+		e.GetMetadateiPtr().ResetWith(t.GetMetadatei())
+	}
+
 	var f *os.File
 
 	if f, err = files.Open(e.GetObjekteFD().Path); err != nil {
@@ -82,12 +91,20 @@ func (s *common) ReadOneExternalObjekte(
 
 	defer errors.DeferredCloser(&err, f)
 
-	if t != nil {
-		e.GetMetadateiPtr().ResetWith(t.GetMetadatei())
+	if err = s.ReadOneExternalObjekteReader(f, e); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
-	if _, err = s.metadateiTextParser.ParseMetadatei(f, e); err != nil {
-		err = errors.Wrapf(err, "%s", f.Name())
+	return
+}
+
+func (s *common) ReadOneExternalObjekteReader(
+	r io.Reader,
+	e *sku.External,
+) (err error) {
+	if _, err = s.metadateiTextParser.ParseMetadatei(r, e); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

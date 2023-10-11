@@ -7,8 +7,10 @@ import (
 )
 
 type CheckoutOptions struct {
-	Force        bool
-	CheckoutMode checkout_mode.Mode
+	Force             bool
+	UseTempDir        bool
+	ForceInlineAkte bool
+	CheckoutMode      checkout_mode.Mode
 }
 
 func (c *CheckoutOptions) AddToFlagSet(f *flag.FlagSet) {

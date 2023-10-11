@@ -2,13 +2,16 @@ package store_objekten
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
+	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
 type CreateOrUpdateDelegate struct {
@@ -155,14 +158,71 @@ func (s *Store) CreateOrUpdate(
 	var checkedOut *sku.CheckedOut
 
 	if checkedOut, err = s.ReadOneExternalFS(mutter); err == nil {
-		diff := checkedOut.External.Metadatei.EqualsSansTai(
+		defer sku.GetCheckedOutPool().Put(checkedOut)
+
+		mutterEqualsExternal := checkedOut.External.Metadatei.EqualsSansTai(
 			checkedOut.Internal.Metadatei,
 		)
 
-		if !diff {
-			// TODO-P2 check out new state
+		var mode checkout_mode.Mode
+
+		if mode, err = checkedOut.External.GetCheckoutMode(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		op := store_util.CheckoutOptions{
+			CheckoutMode: mode,
+			Force:        true,
+		}
+
+		if mutterEqualsExternal {
+			if checkedOut, err = s.CheckoutOne(op, transactedPtr); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			sku.GetCheckedOutPool().Put(checkedOut)
+		} else {
+			transactedPtrCopy := sku.GetTransactedPool().Get()
+			defer sku.GetTransactedPool().Put(transactedPtrCopy)
+
+			if err = transactedPtrCopy.SetFromSkuLike(transactedPtr); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			tm := toMerge{
+				left:   transactedPtrCopy,
+				middle: &checkedOut.Internal,
+				right:  &checkedOut.External.Transacted,
+			}
+
+			var merged sku.ExternalFDs
+
+			if merged, err = s.merge(tm); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = os.Rename(
+				merged.Objekte.Path,
+				checkedOut.External.FDs.Objekte.Path,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			// if checkedOut, err = s.CheckoutOne(op, &merged.Transacted); err != nil {
+			// 	err = errors.Wrap(err)
+			// 	return
+			// }
+
+			// sku.GetCheckedOutPool().Put(checkedOut)
+			// sku.GetExternalPool().Put(merged)
 		}
 	}
+
 	err = nil
 
 	if err = s.AddMatchable(transactedPtr); err != nil {

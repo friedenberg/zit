@@ -74,35 +74,35 @@ func (sk KennungKeyer[T, TPtr]) GetKeyPtr(e TPtr) string {
 
 type lessor struct{}
 
-func (_ lessor) Less(a, b Transacted) bool {
+func (lessor) Less(a, b Transacted) bool {
 	return a.GetTai().Less(b.GetTai())
 }
 
-func (_ lessor) LessPtr(a, b *Transacted) bool {
+func (lessor) LessPtr(a, b *Transacted) bool {
 	return a.GetTai().Less(b.GetTai())
 }
 
 type equaler struct{}
 
-func (_ equaler) Equals(a, b Transacted) bool {
+func (equaler) Equals(a, b Transacted) bool {
 	panic("not supported")
 }
 
-func (_ equaler) EqualsPtr(a, b *Transacted) bool {
+func (equaler) EqualsPtr(a, b *Transacted) bool {
 	return a.EqualsSkuLikePtr(b)
 }
 
 type resetter struct{}
 
-func (_ resetter) Reset(a *Transacted) {
+func (resetter) Reset(a *Transacted) {
 	a.Reset()
 }
 
-func (_ resetter) ResetWith(a *Transacted, b Transacted) {
+func (resetter) ResetWith(a *Transacted, b Transacted) {
 	a = &b
 }
 
-func (_ resetter) ResetWithPtr(a *Transacted, b *Transacted) {
+func (resetter) ResetWithPtr(a *Transacted, b *Transacted) {
 	a.Kopf = b.Kopf
 	a.ObjekteSha = b.ObjekteSha
 	errors.PanicIfError(a.Kennung.ResetWithKennung(&b.Kennung))

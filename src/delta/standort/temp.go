@@ -12,6 +12,7 @@ import (
 )
 
 func (s Standort) ResetTemp() (err error) {
+	// TODO-P2 add flag to prevent temp file deletion
 	if err = os.RemoveAll(s.DirTempLocal()); err != nil {
 		err = errors.Wrapf(err, "failed to remove temp local")
 		return

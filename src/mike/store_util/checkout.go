@@ -2,6 +2,7 @@ package store_util
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"sync"
 
@@ -120,7 +121,7 @@ func (s common) shouldCheckOut(
 	options CheckoutOptions,
 	cz *sku.CheckedOut,
 ) (ok bool) {
-	if options.Force == true {
+	if options.Force {
 		ok = true
 		return
 	}
@@ -144,9 +145,9 @@ func (s *common) FileExtensionForGattung(
 	return s.GetKonfig().FileExtensions.GetFileExtensionForGattung(gg)
 }
 
-func (s *common) PathForTransacted(tl *sku.Transacted) string {
+func (s *common) PathForTransacted(dir string, tl *sku.Transacted) string {
 	return path.Join(
-		s.standort.Cwd(),
+		dir,
 		fmt.Sprintf(
 			"%s.%s",
 			tl.Kennung,
@@ -159,6 +160,24 @@ func (s common) filenameForTransacted(
 	options CheckoutOptions,
 	sz *sku.Transacted,
 ) (originalFilename string, filename string, err error) {
+	dir := s.standort.Cwd()
+
+	if options.UseTempDir {
+		var f *os.File
+
+		if f, err = s.standort.FileTempLocal(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer errors.DeferredCloser(&err, f)
+
+		originalFilename = f.Name()
+		filename = f.Name()
+
+		return
+	}
+
 	switch sz.GetGattung() {
 	case gattung.Zettel:
 		var h kennung.Hinweis
@@ -168,15 +187,15 @@ func (s common) filenameForTransacted(
 			return
 		}
 
-		if originalFilename, err = id.MakeDirIfNecessary(h, s.standort.Cwd()); err != nil {
+		if originalFilename, err = id.MakeDirIfNecessary(h, dir); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		filename = s.PathForTransacted(sz)
+		filename = s.PathForTransacted(dir, sz)
 
 	default:
-		originalFilename = s.PathForTransacted(sz)
+		originalFilename = s.PathForTransacted(dir, sz)
 		filename = originalFilename
 	}
 
@@ -211,6 +230,7 @@ func (s *common) CheckoutOne(
 				filename,
 				sz,
 			)
+
 			return
 		}
 
@@ -245,7 +265,7 @@ func (s *common) CheckoutOne(
 		cz.External.GetFDsPtr().Objekte.Path = filename
 	}
 
-	if (!inlineAkte || !options.CheckoutMode.IncludesObjekte()) &&
+	if ((!inlineAkte || !options.CheckoutMode.IncludesObjekte()) && !options.ForceInlineAkte) &&
 		options.CheckoutMode.IncludesAkte() {
 		t := sz.GetTyp()
 
