@@ -37,6 +37,10 @@ func (s *common) ReadOneExternal(
 	em *sku.ExternalMaybe,
 	t *sku.Transacted,
 ) (e *sku.External, err error) {
+	if err = em.FDs.ConflictMarkerError(); err != nil {
+		return
+	}
+
 	var m checkout_mode.Mode
 
 	if m, err = em.GetFDs().GetCheckoutMode(); err != nil {

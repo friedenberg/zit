@@ -30,7 +30,7 @@ type CwdFiles struct {
 	Kisten    schnittstellen.MutableSetPtrLike[Kasten, *Kasten]
 	Etiketten schnittstellen.MutableSetPtrLike[Etikett, *Etikett]
 	// TODO-P4 make set
-	UnsureAkten      schnittstellen.MutableSetPtrLike[kennung.FD, *kennung.FD]
+	UnsureAkten      kennung.MutableFDSet
 	EmptyDirectories []kennung.FD
 }
 
@@ -167,7 +167,7 @@ func (fs CwdFiles) ContainsMatchable(m *sku.Transacted) bool {
 	return true
 }
 
-func (fs CwdFiles) GetCwdFDs() schnittstellen.SetLike[kennung.FD] {
+func (fs CwdFiles) GetCwdFDs() kennung.FDSet {
 	fds := kennung.MakeMutableFDSet()
 
 	kennung.FDSetAddPairs[Zettel](fs.Zettelen, fds)

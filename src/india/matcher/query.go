@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/bravo/todo"
-	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -24,8 +23,8 @@ func init() {
 // TODO-P3 rename to QueryGattungGroup
 type Query interface {
 	Get(g gattung.Gattung) (s MatcherSigil, ok bool)
-	GetCwdFDs() schnittstellen.SetLike[kennung.FD]
-	GetExplicitCwdFDs() schnittstellen.SetLike[kennung.FD]
+	GetCwdFDs() kennung.FDSet
+	GetExplicitCwdFDs() kennung.FDSet
 	GetEtiketten() kennung.EtikettSet
 	GetTypen() schnittstellen.SetLike[kennung.Typ]
 	Set(string) error
@@ -87,10 +86,8 @@ func MakeQuery(
 		Hidden:                  hidden,
 		DefaultGattungen:        dg.CloneMutableSetLike(),
 		Gattung:                 make(map[gattung.Gattung]setWithSigil),
-		FDs: collections_value.MakeMutableValueSet[kennung.FD](
-			nil,
-		),
-		index: ki,
+		FDs:                     kennung.MakeMutableFDSet(),
+		index:                   ki,
 	}
 }
 
@@ -146,7 +143,7 @@ type query struct {
 
 	DefaultGattungen gattungen.Set
 	Gattung          map[gattung.Gattung]setWithSigil
-	FDs              schnittstellen.MutableSetLike[kennung.FD]
+	FDs              kennung.MutableFDSet
 
 	dotOperatorActive bool
 }
@@ -485,11 +482,11 @@ func (ms query) Get(g gattung.Gattung) (s MatcherSigil, ok bool) {
 	return
 }
 
-func (ms query) GetExplicitCwdFDs() schnittstellen.SetLike[kennung.FD] {
+func (ms query) GetExplicitCwdFDs() kennung.FDSet {
 	return ms.FDs
 }
 
-func (ms query) GetCwdFDs() schnittstellen.SetLike[kennung.FD] {
+func (ms query) GetCwdFDs() kennung.FDSet {
 	if ms.dotOperatorActive {
 		return ms.cwd.GetCwdFDs()
 	} else {

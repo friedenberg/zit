@@ -201,8 +201,17 @@ func (s *Store) CreateOrUpdate(
 			var merged sku.ExternalFDs
 
 			if merged, err = s.merge(tm); err != nil {
-				err = errors.Wrap(err)
-				return
+				var errMergeConflict ErrMergeConflict
+
+				if errors.As(err, &errMergeConflict) {
+					if err = checkedOut.External.FDs.MakeConflictMarker(); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+				} else {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 
 			if err = os.Rename(

@@ -31,6 +31,16 @@ func (s *common) ReadOneExternalFS(
 	if e2, err = s.ReadOneExternal(e, sk2); err != nil {
 		if errors.IsNotExist(err) {
 			err = iter.MakeErrStopIteration()
+		} else if errors.Is(err, sku.ErrExternalHasConflictMarker) {
+			co.State = checked_out_state.StateConflicted
+			co.External.FDs = e.FDs
+
+			if err = co.External.Kennung.SetWithKennung(sk2.Kennung); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
 		} else {
 			err = errors.Wrapf(err, "Cwd: %#v", e)
 		}
@@ -70,7 +80,9 @@ func (s *common) ReadFiles(
 					return
 				}
 
-				col.DetermineState(false)
+				if col.State == checked_out_state.StateUnknown {
+					col.DetermineState(false)
+				}
 
 				if err = f(col); err != nil {
 					err = errors.Wrap(err)

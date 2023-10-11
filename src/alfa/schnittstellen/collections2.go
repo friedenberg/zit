@@ -20,5 +20,5 @@ type MutableSetPtrLike[T any, TPtr Ptr[T]] interface {
 	SetPtrLike[T, TPtr]
 	MutableSetLike[T]
 	AddPtr(TPtr) error
-  DelPtr(TPtr) error
+	DelPtr(TPtr) error
 }

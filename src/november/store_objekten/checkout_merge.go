@@ -7,7 +7,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
-	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/mike/store_util"
@@ -194,10 +193,16 @@ func (s *Store) runDiff3(left, middle, right kennung.FD) (path string, err error
 
 	if err = cmd.Wait(); err != nil {
 		if cmd.ProcessState.ExitCode() == 1 {
-			todo.Change("return non-zero exit code")
-			err = nil
+			err = ErrMergeConflict{
+				ExternalFDs: sku.ExternalFDs{
+					Objekte: kennung.FD{
+						Path: f.Name(),
+					},
+				},
+			}
 		} else {
 			err = errors.Wrap(err)
+			return
 		}
 	}
 

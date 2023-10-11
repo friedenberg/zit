@@ -18,6 +18,7 @@ const (
 	StringArchived       = "archived"
 	StringUnchanged      = "unchanged"
 	StringUntracked      = "untracked"
+	StringConflicted     = "conflicted"
 	StringRecognized     = "recognized"
 	StringCheckedOut     = "checked out"
 	StringWouldDelete    = "would delete"

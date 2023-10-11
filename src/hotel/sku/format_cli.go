@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/charlie/string_format_writer"
+	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
@@ -112,6 +113,18 @@ func (f *cli) WriteStringFormat(
 			err = errors.Wrap(err)
 			return
 		}
+	}
+
+	if colp.State == checked_out_state.StateConflicted {
+		n1, err = sw.WriteString("]")
+		n += int64(n1)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
 	}
 
 	n1, err = sw.WriteString("@")
