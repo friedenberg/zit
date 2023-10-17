@@ -14,7 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/sku_fmt"
+	to_merge "github.com/friedenberg/zit/src/india/sku_fmt"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
@@ -176,7 +176,7 @@ func (c Import) importAkteIfNecessary(
 		if errors.IsNotExist(err) {
 			err = errors.TodoRecoverable(
 				"make recoverable: sku missing akte: %s",
-				sku_fmt.String(sk),
+				to_merge.String(sk),
 			)
 		} else {
 			err = errors.Wrap(err)
@@ -199,7 +199,7 @@ func (c Import) importAkteIfNecessary(
 	var n int64
 
 	if n, err = io.Copy(aw, rc); err != nil {
-		errors.TodoRecoverable("%s: Sku: %s", err, sku_fmt.String(sk))
+		errors.TodoRecoverable("%s: Sku: %s", err, to_merge.String(sk))
 		err = nil
 		return
 	}
@@ -209,7 +209,7 @@ func (c Import) importAkteIfNecessary(
 	if !shaRc.EqualsSha(akteSha) {
 		errors.TodoRecoverable(
 			"sku akte mismatch: %s while akten had %s",
-			sku_fmt.String(sk),
+			to_merge.String(sk),
 			shaRc,
 		)
 	}

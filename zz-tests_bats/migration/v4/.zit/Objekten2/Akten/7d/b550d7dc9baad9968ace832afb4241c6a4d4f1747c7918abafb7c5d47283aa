@@ -21,3 +21,6 @@ print-empty-shas = false
 [cli-output.abbreviations]
 hinweisen = false
 shas = false
+
+[tools]
+merge = ['vimdiff']

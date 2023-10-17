@@ -71,19 +71,21 @@ func boolVarWithMask(
 	m *bool,
 	desc string,
 ) {
-	f.Func(name, desc, func(value string) (err error) {
-		var bv values.Bool
+	f.Func(name,
+		desc,
+		func(value string) (err error) {
+			var bv values.Bool
 
-		*m = true
+			*m = true
 
-		if err = bv.Set(value); err != nil {
+			if err = bv.Set(value); err != nil {
+				return
+			}
+
+			*v = bv.Bool()
+
 			return
-		}
-
-		*v = bv.Bool()
-
-		return
-	},
+		},
 	)
 }
 

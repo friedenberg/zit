@@ -8,13 +8,13 @@ import (
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/charlie/checkout_options"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/kilo/cwd"
-	"github.com/friedenberg/zit/src/mike/store_util"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 	"github.com/friedenberg/zit/src/papa/user_ops"
 )
@@ -69,7 +69,7 @@ func (c Edit) RunWithCwdQuery(
 	ms matcher.Query,
 	pz *cwd.CwdFiles,
 ) (err error) {
-	options := store_util.CheckoutOptions{
+	options := checkout_options.Options{
 		CheckoutMode: c.CheckoutMode,
 	}
 

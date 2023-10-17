@@ -1,4 +1,4 @@
-package sku_fmt
+package to_merge
 
 import (
 	"io"
@@ -19,6 +19,7 @@ type bestandsaufnahmePrinter struct {
 
 type FormatBestandsaufnahmePrinter interface {
 	Print(objekte_format.FormatterContext) (int64, error)
+	PrintMany(...objekte_format.FormatterContext) (int64, error)
 }
 
 func MakeFormatBestandsaufnahmePrinter(
@@ -49,6 +50,23 @@ func (f bestandsaufnahmePrinter) printFirstBoundary() (n int64, err error) {
 			n, err = f.printBoundary()
 		},
 	)
+
+	return
+}
+
+func (f bestandsaufnahmePrinter) PrintMany(
+	tlps ...objekte_format.FormatterContext,
+) (n int64, err error) {
+	for _, tlp := range tlps {
+		var n1 int64
+		n1, err = f.Print(tlp)
+		n += n1
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 
 	return
 }

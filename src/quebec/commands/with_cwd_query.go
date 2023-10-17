@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/india/sku_fmt"
+	to_merge "github.com/friedenberg/zit/src/india/sku_fmt"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
@@ -43,7 +43,7 @@ func (c commandWithCwdQuery) Complete(
 
 	if cg.Contains(gattung.Zettel) {
 		func() {
-			zw := sku_fmt.MakeWriterComplete(os.Stdout)
+			zw := to_merge.MakeWriterComplete(os.Stdout)
 			defer errors.Deferred(&err, zw.Close)
 
 			w := zw.WriteZettelVerzeichnisse

@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
+	"github.com/friedenberg/zit/src/bravo/erworben_tools"
 	"github.com/friedenberg/zit/src/charlie/debug"
 )
 
@@ -25,6 +26,7 @@ type Cli struct {
 	UseRightAlignedIndentsInOrganize bool
 
 	PrintOptions, maskPrintOptions erworben_cli_print_options.PrintOptions
+	ToolOptions                    erworben_tools.Tools
 }
 
 func (c *Cli) AddToFlags(f *flag.FlagSet) {
@@ -59,6 +61,7 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	)
 
 	c.PrintOptions.AddToFlags(f, &c.maskPrintOptions)
+	c.ToolOptions.AddToFlags(f)
 }
 
 func DefaultCli() (c Cli) {

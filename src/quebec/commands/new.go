@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
+	"github.com/friedenberg/zit/src/charlie/checkout_options"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
@@ -13,7 +14,6 @@ import (
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/mike/store_util"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 	"github.com/friedenberg/zit/src/papa/user_ops"
 )
@@ -121,7 +121,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 
 		if c.Edit {
-			options := store_util.CheckoutOptions{
+			options := checkout_options.Options{
 				CheckoutMode: checkout_mode.ModeObjekteAndAkte,
 			}
 

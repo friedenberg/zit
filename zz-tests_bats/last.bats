@@ -24,7 +24,7 @@ function last_after_init { # @test
 		---
 		---
 		Akte 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
-		Akte 4c003f789b20dab6662ab3bc4450ac18f50ae9436345e5202219e58668d9d4f1
+		Akte 7db550d7dc9baad9968ace832afb4241c6a4d4f1747c7918abafb7c5d47283aa
 		Gattung Konfig
 		Gattung Typ
 		Kennung konfig

@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/kennung_fmt"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/sku_fmt"
+	to_merge "github.com/friedenberg/zit/src/india/sku_fmt"
 )
 
 func (u *Umwelt) FormatColorOptions() (o string_format_writer.ColorOptions) {
@@ -58,7 +58,7 @@ func (u *Umwelt) StringFormatWriterEtiketten(
 func (u *Umwelt) StringFormatWriterSkuLikePtr() schnittstellen.StringFormatWriter[*sku.Transacted] {
 	co := u.FormatColorOptions()
 
-	return sku_fmt.MakeCliFormat(
+	return to_merge.MakeCliFormat(
 		u.konfig.PrintOptions,
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterKennung(co),
@@ -73,7 +73,7 @@ func (u *Umwelt) StringFormatWriterSkuLikePtrShort() schnittstellen.StringFormat
 		OffEntirely: true,
 	}
 
-	return sku_fmt.MakeCliFormatShort(
+	return to_merge.MakeCliFormatShort(
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterKennung(co),
 		u.StringFormatWriterTyp(co),

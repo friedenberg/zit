@@ -282,7 +282,6 @@ function organize_simple_checkedout_merge_conflict { # @test
 		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !txt2 "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
 
-	# run cat one/dos.zettel
 	run_zit status one/dos.zettel
 	assert_success
 	assert_output - <<-EOM
@@ -294,7 +293,7 @@ function organize_hides_hidden_etiketten_from_organize { # @test
 	run_zit edit-konfig -hide-etikett zz-archive
 	assert_success
 	assert_output - <<-EOM
-		[konfig@35da752c7ceead39d66575354cde7fce1fbc2b13c8c55e1902c6519b33837635]
+		[konfig@fe896c4866d664069670bf022e00931bf1c60f653763f7d2244cac1190d7d3e1]
 	EOM
 
 	to_add="$(mktemp)"

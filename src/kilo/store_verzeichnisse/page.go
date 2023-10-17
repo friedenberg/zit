@@ -14,7 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/sku_fmt"
+	to_merge "github.com/friedenberg/zit/src/india/sku_fmt"
 )
 
 type Page struct {
@@ -186,7 +186,7 @@ func (zp *Page) copy(
 	var getOneSku func() (*sku.Transacted, error)
 
 	if zp.useBestandsaufnahmeForVerzeichnisse {
-		dec := sku_fmt.MakeFormatBestandsaufnahmeScanner(
+		dec := to_merge.MakeFormatBestandsaufnahmeScanner(
 			r,
 			objekte_format.Default(),
 			objekte_format.Options{
@@ -249,7 +249,7 @@ func (zp *Page) getFuncWriteOne(
 	w io.Writer,
 ) schnittstellen.FuncIter[*sku.Transacted] {
 	if zp.useBestandsaufnahmeForVerzeichnisse {
-		enc := sku_fmt.MakeFormatBestandsaufnahmePrinter(
+		enc := to_merge.MakeFormatBestandsaufnahmePrinter(
 			w,
 			objekte_format.Default(),
 			objekte_format.Options{

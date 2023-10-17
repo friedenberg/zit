@@ -16,7 +16,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/sku_fmt"
+	to_merge "github.com/friedenberg/zit/src/india/sku_fmt"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
 )
@@ -410,7 +410,7 @@ func (s *store) ReadAllSkus2(
 
 			defer errors.DeferredCloser(&err, r)
 
-			dec := sku_fmt.MakeFormatBestandsaufnahmeScanner(
+			dec := to_merge.MakeFormatBestandsaufnahmeScanner(
 				r,
 				s.persistentMetadateiFormat,
 				s.options,

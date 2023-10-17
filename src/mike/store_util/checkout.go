@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/charlie/checkout_options"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
@@ -21,7 +22,7 @@ import (
 )
 
 func (s *common) CheckoutQuery(
-	options CheckoutOptions,
+	options checkout_options.Options,
 	fq matcher.FuncReaderTransactedLikePtr,
 	f schnittstellen.FuncIter[*sku.CheckedOut],
 ) (err error) {
@@ -30,7 +31,7 @@ func (s *common) CheckoutQuery(
 			var cop *sku.CheckedOut
 
 			cop, err = s.CheckoutOne(
-				CheckoutOptions(options),
+				checkout_options.Options(options),
 				t,
 			)
 
@@ -59,7 +60,7 @@ func (s *common) CheckoutQuery(
 // TODO-P2 combine with CheckoutQuery once all matcher Query is simplified into
 // just a matcher
 func (s *common) Checkout(
-	options CheckoutOptions,
+	options checkout_options.Options,
 	fq matcher.FuncReaderTransactedLikePtr,
 	ztw schnittstellen.FuncIter[*sku.Transacted],
 ) (zcs sku.CheckedOutMutableSet, err error) {
@@ -118,7 +119,7 @@ func (s *common) Checkout(
 }
 
 func (s common) shouldCheckOut(
-	options CheckoutOptions,
+	options checkout_options.Options,
 	cz *sku.CheckedOut,
 ) (ok bool) {
 	if options.Force {
@@ -157,12 +158,13 @@ func (s *common) PathForTransacted(dir string, tl *sku.Transacted) string {
 }
 
 func (s common) filenameForTransacted(
-	options CheckoutOptions,
+	options checkout_options.Options,
 	sz *sku.Transacted,
 ) (originalFilename string, filename string, err error) {
 	dir := s.standort.Cwd()
 
-	if options.UseTempDir {
+	switch options.Path {
+	case checkout_options.PathTempLocal:
 		var f *os.File
 
 		if f, err = s.standort.FileTempLocal(); err != nil {
@@ -176,6 +178,7 @@ func (s common) filenameForTransacted(
 		filename = f.Name()
 
 		return
+	default:
 	}
 
 	switch sz.GetGattung() {
@@ -203,7 +206,7 @@ func (s common) filenameForTransacted(
 }
 
 func (s *common) CheckoutOne(
-	options CheckoutOptions,
+	options checkout_options.Options,
 	sz *sku.Transacted,
 ) (cz *sku.CheckedOut, err error) {
 	cz = &sku.CheckedOut{}
@@ -236,19 +239,25 @@ func (s *common) CheckoutOne(
 
 		var cze *sku.External
 
-		if cze, err = s.ReadOneExternal(
+		cze, err = s.ReadOneExternal(
 			e,
 			sz,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		)
 
-		cz.External = *cze
-		cz.DetermineState(true)
+		if err != nil {
+			if errors.Is(err, sku.ErrExternalHasConflictMarker) && options.AllowConflicted {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
+		} else {
+			cz.External = *cze
+			cz.DetermineState(true)
 
-		if !s.shouldCheckOut(options, cz) {
-			return
+			if !s.shouldCheckOut(options, cz) {
+				return
+			}
 		}
 	}
 

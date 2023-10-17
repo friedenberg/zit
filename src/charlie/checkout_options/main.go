@@ -1,4 +1,4 @@
-package store_util
+package checkout_options
 
 import (
 	"flag"
@@ -6,14 +6,15 @@ import (
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 )
 
-type CheckoutOptions struct {
+type Options struct {
 	Force           bool
-	UseTempDir      bool
+	Path            Path
 	ForceInlineAkte bool
 	CheckoutMode    checkout_mode.Mode
+	AllowConflicted bool
 }
 
-func (c *CheckoutOptions) AddToFlagSet(f *flag.FlagSet) {
+func (c *Options) AddToFlagSet(f *flag.FlagSet) {
 	f.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
 	f.BoolVar(
 		&c.Force,

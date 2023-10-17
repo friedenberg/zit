@@ -2,17 +2,17 @@ package user_ops
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/checkout_options"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/mike/store_util"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
 type WriteNewZettels struct {
 	*umwelt.Umwelt
-	CheckOut bool
-	store_util.CheckoutOptions
+	CheckOut        bool
+	CheckoutOptions checkout_options.Options
 }
 
 func (c WriteNewZettels) RunMany(

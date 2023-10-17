@@ -16,7 +16,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/sku_fmt"
+	to_merge "github.com/friedenberg/zit/src/india/sku_fmt"
 )
 
 type FormatterValue struct {
@@ -181,7 +181,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		return func(e *sku.Transacted) (err error) {
 			_, err = fmt.Fprintln(
 				out,
-				sku_fmt.StringMetadateiSansTai(e),
+				to_merge.StringMetadateiSansTai(e),
 			)
 			return
 		}
@@ -190,14 +190,14 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		return func(e *sku.Transacted) (err error) {
 			_, err = fmt.Fprintln(
 				out,
-				sku_fmt.StringMetadatei(e),
+				to_merge.StringMetadatei(e),
 			)
 			return
 		}
 
 	case "sku":
 		return func(e *sku.Transacted) (err error) {
-			_, err = fmt.Fprintln(out, sku_fmt.String(e))
+			_, err = fmt.Fprintln(out, to_merge.String(e))
 			return
 		}
 
@@ -304,7 +304,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "bestandsaufnahme-sans-tai":
-		be := sku_fmt.MakeFormatBestandsaufnahmePrinter(
+		be := to_merge.MakeFormatBestandsaufnahmePrinter(
 			out,
 			objekte_format.Default(),
 			objekte_format.Options{},
@@ -320,7 +320,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "bestandsaufnahme":
-		f := sku_fmt.MakeFormatBestandsaufnahmePrinter(
+		f := to_merge.MakeFormatBestandsaufnahmePrinter(
 			out,
 			objekte_format.Default(),
 			objekte_format.Options{IncludeTai: true},
@@ -336,7 +336,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "bestandsaufnahme-verzeichnisse":
-		f := sku_fmt.MakeFormatBestandsaufnahmePrinter(
+		f := to_merge.MakeFormatBestandsaufnahmePrinter(
 			out,
 			objekte_format.Default(),
 			objekte_format.Options{

@@ -3,6 +3,7 @@ package store_util
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/checkout_options"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -47,13 +48,13 @@ type StoreUtil interface {
 	ReadOneExternalFS(*sku.Transacted) (*sku.CheckedOut, error)
 
 	CheckoutQuery(
-		options CheckoutOptions,
+		options checkout_options.Options,
 		fq matcher.FuncReaderTransactedLikePtr,
 		f schnittstellen.FuncIter[*sku.CheckedOut],
 	) (err error)
 
 	Checkout(
-		options CheckoutOptions,
+		options checkout_options.Options,
 		fq matcher.FuncReaderTransactedLikePtr,
 		ztw schnittstellen.FuncIter[*sku.Transacted],
 	) (zcs sku.CheckedOutMutableSet, err error)
@@ -64,7 +65,7 @@ type StoreUtil interface {
 	) (err error)
 
 	CheckoutOne(
-		options CheckoutOptions,
+		options checkout_options.Options,
 		sz *sku.Transacted,
 	) (cz *sku.CheckedOut, err error)
 

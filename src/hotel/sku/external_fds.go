@@ -2,7 +2,6 @@ package sku
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
@@ -32,17 +31,8 @@ func (a ExternalFDs) Equals(b ExternalFDs) bool {
 	return true
 }
 
-func (e ExternalFDs) MakeConflictMarker() (err error) {
-	markerPath := fmt.Sprintf("%s.conflict", e.Objekte.Path)
-
-	var f *os.File
-
-	if f, err = files.Create(markerPath); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, f)
+func (e ExternalFDs) MakeConflictMarker() (path string) {
+	path = fmt.Sprintf("%s.conflict", e.Objekte.Path)
 
 	return
 }

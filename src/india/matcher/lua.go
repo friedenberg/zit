@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/pool"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/sku_fmt"
+	to_merge "github.com/friedenberg/zit/src/india/sku_fmt"
 	lua "github.com/yuin/gopher-lua"
 	lua_ast "github.com/yuin/gopher-lua/ast"
 	lua_parse "github.com/yuin/gopher-lua/parse"
@@ -86,7 +86,7 @@ func (matcher *matcherLua) ContainsMatchable(matchable *sku.Transacted) bool {
 	f := s.GetGlobal("contains_matchable")
 	s.Push(f)
 
-	sku_fmt.Lua(
+	to_merge.Lua(
 		matchable,
 		matcher.kennungIndex,
 		s.LState,

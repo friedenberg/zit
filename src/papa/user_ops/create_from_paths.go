@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
-	"github.com/friedenberg/zit/src/india/sku_fmt"
+	to_merge "github.com/friedenberg/zit/src/india/sku_fmt"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
@@ -132,7 +132,7 @@ func (c CreateFromPaths) Run(
 			}
 
 			if err = cz.External.Transacted.SetFromSkuLike(zt); err != nil {
-				err = errors.Wrapf(err, "Sku: %q", sku_fmt.String(&z.Transacted))
+				err = errors.Wrapf(err, "Sku: %q", to_merge.String(&z.Transacted))
 				return
 			}
 

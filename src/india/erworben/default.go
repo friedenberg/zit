@@ -1,6 +1,9 @@
 package erworben
 
-import "github.com/friedenberg/zit/src/echo/kennung"
+import (
+	"github.com/friedenberg/zit/src/bravo/erworben_tools"
+	"github.com/friedenberg/zit/src/echo/kennung"
+)
 
 func Default(defaultTyp kennung.Typ) (k Akte) {
 	k = Akte{
@@ -14,6 +17,11 @@ func Default(defaultTyp kennung.Typ) (k Akte) {
 			Organize: "md",
 			Etikett:  "etikett",
 			Kasten:   "kasten",
+		},
+		Tools: erworben_tools.Tools{
+			Merge: []string{
+				"vimdiff",
+			},
 		},
 	}
 

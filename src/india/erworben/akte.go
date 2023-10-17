@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/erworben_tools"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/script_config"
@@ -23,10 +24,11 @@ type Akte struct {
 	RemoteScripts   map[string]script_config.RemoteScript   `toml:"remote-scripts"`
 	Actions         map[string]script_config.ScriptConfig   `toml:"actions,omitempty"`
 	PrintOptions    erworben_cli_print_options.PrintOptions `toml:"cli-output"`
+	Tools           erworben_tools.Tools                    `toml:"tools"`
 	Filters         map[string]string                       `toml:"filters"`
 }
 
-func (_ Akte) GetGattung() schnittstellen.GattungLike {
+func (Akte) GetGattung() schnittstellen.GattungLike {
 	return gattung.Konfig
 }
 

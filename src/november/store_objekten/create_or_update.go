@@ -7,11 +7,12 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
+	"github.com/friedenberg/zit/src/charlie/checkout_options"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/juliett/to_merge"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
-	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
 type CreateOrUpdateDelegate struct {
@@ -171,7 +172,7 @@ func (s *Store) CreateOrUpdate(
 			return
 		}
 
-		op := store_util.CheckoutOptions{
+		op := checkout_options.Options{
 			CheckoutMode: mode,
 			Force:        true,
 		}
@@ -192,19 +193,24 @@ func (s *Store) CreateOrUpdate(
 				return
 			}
 
-			tm := toMerge{
-				left:   transactedPtrCopy,
-				middle: &checkedOut.Internal,
-				right:  &checkedOut.External.Transacted,
+			tm := to_merge.Sku{
+				Left:   transactedPtrCopy,
+				Middle: &checkedOut.Internal,
+				Right:  &checkedOut.External.Transacted,
 			}
 
 			var merged sku.ExternalFDs
 
 			if merged, err = s.merge(tm); err != nil {
-				var errMergeConflict ErrMergeConflict
+				var errMergeConflict to_merge.ErrMergeConflict
 
 				if errors.As(err, &errMergeConflict) {
-					if err = checkedOut.External.FDs.MakeConflictMarker(); err != nil {
+					if err = tm.WriteConflictMarker(
+						s.GetStandort(),
+						s.GetKonfig().GetStoreVersion(),
+						s.GetObjekteFormatOptions(),
+						checkedOut.External.FDs.MakeConflictMarker(),
+					); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
@@ -212,14 +218,14 @@ func (s *Store) CreateOrUpdate(
 					err = errors.Wrap(err)
 					return
 				}
-			}
-
-			if err = os.Rename(
-				merged.Objekte.Path,
-				checkedOut.External.FDs.Objekte.Path,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
+			} else {
+				if err = os.Rename(
+					merged.Objekte.Path,
+					checkedOut.External.FDs.Objekte.Path,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 
 			// if checkedOut, err = s.CheckoutOne(op, &merged.Transacted); err != nil {
