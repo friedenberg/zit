@@ -125,8 +125,6 @@ func (br *boundaryReader) resetRemainingContentIfNecessary() {
 	case boundaryReaderStateCompleteBoundaryInBuffer:
 		// noop
 	}
-
-	return
 }
 
 func (br *boundaryReader) ReadBoundary() (n int, err error) {

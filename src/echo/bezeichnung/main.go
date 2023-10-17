@@ -5,7 +5,6 @@ import (
 )
 
 type Bezeichnung struct {
-	// TODO-P1 remove wasSet
 	wasSet bool
 	value  string
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/age"
+	"github.com/friedenberg/zit/src/charlie/debug"
 	"github.com/friedenberg/zit/src/charlie/file_lock"
 )
 
@@ -24,6 +25,7 @@ type Standort struct {
 	lockSmith schnittstellen.LockSmith
 	age       *age.Age
 	angeboren angeboren.Konfig
+	debug     debug.Options
 }
 
 func Make(
@@ -36,6 +38,7 @@ func Make(
 	}
 
 	s.basePath = o.BasePath
+	s.debug = o.Debug
 	s.cwd = o.cwd
 
 	if ok := files.Exists(s.DirZit()); !ok {

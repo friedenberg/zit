@@ -156,89 +156,10 @@ func (s *Store) CreateOrUpdate(
 		return
 	}
 
-	var checkedOut *sku.CheckedOut
-
-	if checkedOut, err = s.ReadOneExternalFS(mutter); err == nil {
-		defer sku.GetCheckedOutPool().Put(checkedOut)
-
-		mutterEqualsExternal := checkedOut.External.Metadatei.EqualsSansTai(
-			checkedOut.Internal.Metadatei,
-		)
-
-		var mode checkout_mode.Mode
-
-		if mode, err = checkedOut.External.GetCheckoutMode(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		op := checkout_options.Options{
-			CheckoutMode: mode,
-			Force:        true,
-		}
-
-		if mutterEqualsExternal {
-			if checkedOut, err = s.CheckoutOne(op, transactedPtr); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			sku.GetCheckedOutPool().Put(checkedOut)
-		} else {
-			transactedPtrCopy := sku.GetTransactedPool().Get()
-			defer sku.GetTransactedPool().Put(transactedPtrCopy)
-
-			if err = transactedPtrCopy.SetFromSkuLike(transactedPtr); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			tm := to_merge.Sku{
-				Left:   transactedPtrCopy,
-				Middle: &checkedOut.Internal,
-				Right:  &checkedOut.External.Transacted,
-			}
-
-			var merged sku.ExternalFDs
-
-			if merged, err = s.merge(tm); err != nil {
-				var errMergeConflict to_merge.ErrMergeConflict
-
-				if errors.As(err, &errMergeConflict) {
-					if err = tm.WriteConflictMarker(
-						s.GetStandort(),
-						s.GetKonfig().GetStoreVersion(),
-						s.GetObjekteFormatOptions(),
-						checkedOut.External.FDs.MakeConflictMarker(),
-					); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-				} else {
-					err = errors.Wrap(err)
-					return
-				}
-			} else {
-				if err = os.Rename(
-					merged.Objekte.Path,
-					checkedOut.External.FDs.Objekte.Path,
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-
-			// if checkedOut, err = s.CheckoutOne(op, &merged.Transacted); err != nil {
-			// 	err = errors.Wrap(err)
-			// 	return
-			// }
-
-			// sku.GetCheckedOutPool().Put(checkedOut)
-			// sku.GetExternalPool().Put(merged)
-		}
+	if err = s.readExternalAndMergeIfNecessary(transactedPtr, mutter); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
-
-	err = nil
 
 	if err = s.AddMatchable(transactedPtr); err != nil {
 		err = errors.Wrap(err)
@@ -255,6 +176,87 @@ func (s *Store) CreateOrUpdate(
 			err = errors.Wrap(err)
 			return
 		}
+	}
+
+	return
+}
+
+func (s *Store) readExternalAndMergeIfNecessary(
+	transactedPtr, mutter *sku.Transacted,
+) (err error) {
+	var co *sku.CheckedOut
+
+	if co, err = s.ReadOneExternalFS(mutter); err != nil {
+		err = nil
+		return
+	}
+
+	defer sku.GetCheckedOutPool().Put(co)
+
+	mutterEqualsExternal := co.InternalAndExternalEqualsSansTai()
+
+	var mode checkout_mode.Mode
+
+	if mode, err = co.External.GetCheckoutMode(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	op := checkout_options.Options{
+		CheckoutMode: mode,
+		Force:        true,
+	}
+
+	if mutterEqualsExternal {
+		if co, err = s.CheckoutOne(op, transactedPtr); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		sku.GetCheckedOutPool().Put(co)
+
+		return
+	}
+
+	transactedPtrCopy := sku.GetTransactedPool().Get()
+	defer sku.GetTransactedPool().Put(transactedPtrCopy)
+
+	if err = transactedPtrCopy.SetFromSkuLike(transactedPtr); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	tm := to_merge.Sku{
+		Left:   transactedPtrCopy,
+		Middle: &co.Internal,
+		Right:  &co.External.Transacted,
+	}
+
+	var merged sku.ExternalFDs
+
+	if merged, err = s.merge(tm); err != nil {
+		if errors.Is(err, to_merge.ErrMergeConflict{}) {
+			if err = tm.WriteConflictMarker(
+				s.GetStandort(),
+				s.GetKonfig().GetStoreVersion(),
+				s.GetObjekteFormatOptions(),
+				co.External.FDs.MakeConflictMarker(),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if err = os.Rename(
+		merged.Objekte.Path,
+		co.External.FDs.Objekte.Path,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

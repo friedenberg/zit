@@ -102,6 +102,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 
 		standortOptions := standort.Options{
 			BasePath: u.erworbenCli.BasePath,
+			Debug:    u.erworbenCli.Debug,
 		}
 
 		if standortOptions.BasePath == "" {

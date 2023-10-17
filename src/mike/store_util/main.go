@@ -152,6 +152,7 @@ func MakeStoreUtil(
 		c.standort.ObjekteReaderWriterFactory(gattung.Bestandsaufnahme),
 		c.standort,
 		pmf,
+		c,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

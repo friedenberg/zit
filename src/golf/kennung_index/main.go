@@ -64,12 +64,6 @@ type index struct {
 	hinweisIndex   hinweis_index.HinweisIndex
 }
 
-// TODO-P1 remove
-type row struct {
-	kennung.Etikett
-	count int64
-}
-
 func MakeIndex(
 	k schnittstellen.Konfig,
 	s standort.Standort,

@@ -12,6 +12,12 @@ type CheckedOut struct {
 	State    checked_out_state.State
 }
 
+func (c *CheckedOut) InternalAndExternalEqualsSansTai() bool {
+	return c.External.Metadatei.EqualsSansTai(
+		c.Internal.Metadatei,
+	)
+}
+
 func (c *CheckedOut) DetermineState(justCheckedOut bool) {
 	if c.Internal.GetObjekteSha().IsNull() {
 		c.State = checked_out_state.StateUntracked

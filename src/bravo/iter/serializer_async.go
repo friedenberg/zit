@@ -21,9 +21,7 @@ func MakeAsyncSerializer[T any](
 		}()
 
 		for e := range chE {
-			// TODO-P1 what how error
-			err := wf(e)
-			if err != nil {
+			if err := wf(e); err != nil {
 				chError <- err
 			}
 		}
@@ -46,9 +44,7 @@ func (s AsyncSerializer[T]) Do(e T) (err error) {
 }
 
 func (s AsyncSerializer[T]) Wait() (err error) {
-	select {
-	case err = <-s.chError:
-	}
+	err = <-s.chError
 
 	close(s.chE)
 	<-s.chDone

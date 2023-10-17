@@ -8,11 +8,15 @@ import (
 )
 
 type Options struct {
-	Trace, PProfCPU, PProfHeap, GCDisabled bool
+	Trace, PProfCPU, PProfHeap, GCDisabled, NoTempDirCleanup bool
 }
 
 func (o Options) String() string {
 	sb := string_builder_joined.Make(",")
+
+	if o.NoTempDirCleanup {
+		sb.WriteString("no-tempdir-cleanup")
+	}
 
 	if o.GCDisabled {
 		sb.WriteString("gc_disabled")
@@ -55,6 +59,9 @@ func (o *Options) Set(v string) (err error) {
 
 		case "trace":
 			o.Trace = true
+
+		case "no-tempdir-cleanup":
+			o.NoTempDirCleanup = true
 
 		case "true":
 			fallthrough

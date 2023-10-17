@@ -73,12 +73,18 @@ func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {
 	f.Var(
 		fes,
 		"etiketten",
-		"the Etiketten to use for created or updated Zettelen",
+		"the Etiketten to use for created or updated Objekte",
 	)
 
 	m.Etiketten = mes
 
-	// TODO-P1 add typ
+	f.Func(
+		"typ",
+		"the Typ for the created or updated Objekte",
+		func(v string) (err error) {
+			return m.Typ.Set(v)
+		},
+	)
 }
 
 func (z Metadatei) UserInputIsEmpty() bool {

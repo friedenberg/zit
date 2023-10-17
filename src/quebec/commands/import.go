@@ -18,7 +18,6 @@ import (
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
-	"github.com/friedenberg/zit/src/papa/user_ops"
 )
 
 type Import struct {
@@ -106,17 +105,10 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	op := user_ops.Merge{Umwelt: u}
+	u.Lock()
+	defer u.Unlock()
 
-	if err = op.Run(besty.Skus); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	op.Lock()
-	defer op.Unlock()
-
-	if err = op.StoreObjekten().GetBestandsaufnahmeStore().Create(besty); err != nil {
+	if err = u.StoreObjekten().GetBestandsaufnahmeStore().Create(besty); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

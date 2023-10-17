@@ -88,16 +88,6 @@ type AdderCustom[E any] interface {
 	AddCustomKey(E, func(E) string) error
 }
 
-// TODO-P1 remove
-type Eacher[E any] interface {
-	Each(FuncIter[E]) error
-}
-
-// TODO-P1 remove
-type EachPtrer[E any] interface {
-	EachPtr(FuncIter[*E]) error
-}
-
 type ValueSet[T flag.Value, TPtr ValuePtr[T]] interface {
 	Strings() []string
 	SetLike[T]

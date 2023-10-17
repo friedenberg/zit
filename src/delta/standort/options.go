@@ -4,10 +4,12 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/debug"
 )
 
 type Options struct {
 	BasePath string
+	Debug    debug.Options
 	cwd      string
 }
 

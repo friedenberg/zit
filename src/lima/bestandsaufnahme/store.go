@@ -47,6 +47,7 @@ type store struct {
 	sv                        schnittstellen.StoreVersion
 	of                        schnittstellen.ObjekteIOFactory
 	af                        schnittstellen.AkteIOFactory
+	clock                     kennung.Clock
 	pool                      schnittstellen.Pool[Akte, *Akte]
 	persistentMetadateiFormat objekte_format.Format
 	options                   objekte_format.Options
@@ -62,6 +63,7 @@ func MakeStore(
 	of schnittstellen.ObjekteIOFactory,
 	af schnittstellen.AkteIOFactory,
 	pmf objekte_format.Format,
+	clock kennung.Clock,
 ) (s *store, err error) {
 	p := pool.MakePoolWithReset[Akte]()
 
@@ -75,6 +77,7 @@ func MakeStore(
 		of:                        of,
 		af:                        af,
 		pool:                      p,
+		clock:                     clock,
 		persistentMetadateiFormat: pmf,
 		options:                   op,
 		formatAkte:                fa,
@@ -118,8 +121,7 @@ func (s *store) Create(o *Akte) (err error) {
 	t := &sku.Transacted{}
 	t.Reset()
 	t.SetAkteSha(sh)
-	// TODO-P2 switch to clock
-	tai := kennung.NowTai()
+	tai := s.clock.GetTai()
 
 	t.Kennung.KennungPtr = &tai
 	t.SetTai(tai)

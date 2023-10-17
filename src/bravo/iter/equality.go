@@ -27,6 +27,7 @@ func SetEquals[T any](
 			return
 		},
 	)
+
 	if err != nil {
 		return false
 	}
