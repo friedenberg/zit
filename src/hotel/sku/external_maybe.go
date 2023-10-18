@@ -2,6 +2,7 @@ package sku
 
 import (
 	"github.com/friedenberg/zit/src/bravo/values"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
@@ -42,10 +43,10 @@ func (e ExternalMaybe) GetFDs() ExternalFDs {
 	return e.FDs
 }
 
-func (e ExternalMaybe) GetObjekteFD() kennung.FD {
+func (e ExternalMaybe) GetObjekteFD() fd.FD {
 	return e.FDs.Objekte
 }
 
-func (e ExternalMaybe) GetAkteFD() kennung.FD {
+func (e ExternalMaybe) GetAkteFD() fd.FD {
 	return e.FDs.Akte
 }

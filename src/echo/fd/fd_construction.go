@@ -1,4 +1,4 @@
-package kennung
+package fd
 
 import (
 	"io"
@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/delta/thyme"
 )
 
 func FDFromDir(
@@ -125,7 +126,7 @@ func File(f *os.File) (fd FD, err error) {
 func FileInfo(fi os.FileInfo, dir string) (fd FD, err error) {
 	fd = FD{
 		isDir:   fi.IsDir(),
-		ModTime: Tyme(fi.ModTime()),
+		ModTime: thyme.Tyme(fi.ModTime()),
 	}
 
 	if fd.path, err = filepath.Abs(path.Join(dir, fi.Name())); err != nil {

@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/checkout_options"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/kilo/cwd"
@@ -73,8 +73,8 @@ func (c Edit) RunWithCwdQuery(
 		CheckoutMode: c.CheckoutMode,
 	}
 
-	akten := kennung.MakeMutableFDSet()
-	objekten := kennung.MakeMutableFDSet()
+	akten := fd.MakeMutableSet()
+	objekten := fd.MakeMutableSet()
 
 	if err = u.StoreObjekten().CheckoutQuery(
 		options,
@@ -97,8 +97,8 @@ func (c Edit) RunWithCwdQuery(
 		return
 	}
 
-	objektenFiles := iter.Strings[kennung.FD](objekten)
-	aktenFiles := iter.Strings[kennung.FD](akten)
+	objektenFiles := iter.Strings[fd.FD](objekten)
+	aktenFiles := iter.Strings[fd.FD](akten)
 
 	if err = (user_ops.OpenFiles{}).Run(u, aktenFiles...); err != nil {
 		err = errors.Wrap(err)

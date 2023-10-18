@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/string_format_writer"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/kennung_fmt"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -106,7 +107,7 @@ func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[*sku.Transacted
 	)
 }
 
-func (u *Umwelt) PrinterFileNotRecognized() schnittstellen.FuncIter[*kennung.FD] {
+func (u *Umwelt) PrinterFileNotRecognized() schnittstellen.FuncIter[*fd.FD] {
 	p := kennung_fmt.MakeFileNotRecognizedStringWriterFormat(
 		kennung_fmt.MakeFDCliFormat(
 			u.FormatColorOptions(),
@@ -115,14 +116,14 @@ func (u *Umwelt) PrinterFileNotRecognized() schnittstellen.FuncIter[*kennung.FD]
 		u.StringFormatWriterShaLike(u.FormatColorOptions()),
 	)
 
-	return string_format_writer.MakeDelim[*kennung.FD](
+	return string_format_writer.MakeDelim[*fd.FD](
 		"\n",
 		u.Out(),
 		p,
 	)
 }
 
-func (u *Umwelt) PrinterFDDeleted() schnittstellen.FuncIter[*kennung.FD] {
+func (u *Umwelt) PrinterFDDeleted() schnittstellen.FuncIter[*fd.FD] {
 	p := kennung_fmt.MakeFDDeletedStringWriterFormat(
 		u.Konfig().DryRun,
 		kennung_fmt.MakeFDCliFormat(
@@ -131,7 +132,7 @@ func (u *Umwelt) PrinterFDDeleted() schnittstellen.FuncIter[*kennung.FD] {
 		),
 	)
 
-	return string_format_writer.MakeDelim[*kennung.FD](
+	return string_format_writer.MakeDelim[*fd.FD](
 		"\n",
 		u.Out(),
 		p,

@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
@@ -29,7 +29,7 @@ func (e ErrAkteExists) Error() string {
 
 type ErrExternalAkteExtensionMismatch struct {
 	Expected string
-	Actual   kennung.FD
+	Actual   fd.FD
 }
 
 func (e ErrExternalAkteExtensionMismatch) Is(target error) bool {

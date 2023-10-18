@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/ohio"
+	"github.com/friedenberg/zit/src/delta/thyme"
 )
 
 type tai = chai.TAI
@@ -34,22 +35,22 @@ func NowTai() Tai {
 	}
 }
 
-func TaiFromTime(t1 Time) (t2 Tai) {
+func TaiFromTime(t1 thyme.Time) (t2 Tai) {
 	t2 = TaiFromTimeWithIndex(t1, 0)
 	return
 }
 
-func TaiFromTimeWithIndex(t1 Time, n int) (t2 Tai) {
+func TaiFromTimeWithIndex(t1 thyme.Time, n int) (t2 Tai) {
 	t2.wasSet = true
-	t2.tai = chai.FromTime(t1.time)
+	t2.tai = chai.FromTime(t1.GetTime())
 	t2.tai.Asec += int64(n * chai.Attosecond)
 
 	return
 }
 
-func (t Tai) AsTime() (t1 Time) {
+func (t Tai) AsTime() (t1 thyme.Time) {
 	if t.wasSet && !t.tai.Eq(tai{}) {
-		t1 = Time{time: t.tai.AsTime().Local()}
+		t1 = thyme.Tyme(t.tai.AsTime().Local())
 	} else {
 		panic("empty tai")
 	}

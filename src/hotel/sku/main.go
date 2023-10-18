@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
@@ -51,10 +52,10 @@ type (
 
 		GetFDs() ExternalFDs
 		GetFDsPtr() *ExternalFDs
-		GetAkteFD() kennung.FD
+		GetAkteFD() fd.FD
 		GetAktePath() string
 
-		GetObjekteFD() kennung.FD
+		GetObjekteFD() fd.FD
 
 		ResetWithExternalMaybe(b ExternalMaybe) (err error)
 	}

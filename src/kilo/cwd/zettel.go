@@ -4,6 +4,7 @@ import (
 	"path"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
@@ -11,16 +12,16 @@ import (
 type Zettel = sku.ExternalMaybe
 
 func (c *CwdFiles) tryZettel(d string, a string, p string) (err error) {
-	var fd kennung.FD
+	var f fd.FD
 
-	if fd, err = kennung.FDFromPath(p); err != nil {
+	if f, err = fd.FDFromPath(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	var h kennung.Hinweis
 
-	if h, err = fd.GetHinweis(); err != nil {
+	if h, err = kennung.GetHinweis(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

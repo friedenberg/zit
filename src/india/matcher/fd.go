@@ -4,14 +4,15 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
-type FD kennung.FD
+type FD fd.FD
 
-func (fd FD) String() string {
-	return kennung.FD(fd).String()
+func (f FD) String() string {
+	return fd.FD(f).String()
 }
 
 func (_ FD) Each(_ schnittstellen.FuncIter[Matcher]) error {
@@ -26,14 +27,14 @@ func (fd FD) ContainsMatchableExactly(m *sku.Transacted) (ok bool) {
 	return fd.ContainsMatchable(m)
 }
 
-func (fd FD) ContainsMatchable(m *sku.Transacted) (ok bool) {
+func (f FD) ContainsMatchable(m *sku.Transacted) (ok bool) {
 	il := m.GetKennungLike()
 
 	switch il.GetGattung() {
 	case gattung.Zettel:
 		var h kennung.Hinweis
 
-		if h, ok = kennung.FD(fd).AsHinweis(); !ok {
+		if h, ok = kennung.AsHinweis(fd.FD(f)); !ok {
 			return false
 		}
 

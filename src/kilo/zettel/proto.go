@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/todo"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/juliett/konfig"
@@ -97,7 +98,7 @@ func (pz ProtoZettel) Apply(ml metadatei.MetadateiLike) (ok bool) {
 
 func (pz ProtoZettel) ApplyWithAkteFD(
 	ml metadatei.MetadateiLike,
-	akteFD kennung.FD,
+	akteFD fd.FD,
 ) (err error) {
 	z := ml.GetMetadatei()
 

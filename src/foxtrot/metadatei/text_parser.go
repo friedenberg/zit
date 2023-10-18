@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_config"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/ohio"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/echo/format"
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
@@ -51,7 +52,7 @@ func (f textParser) ParseMetadatei(
 		c.SetAkteSha(m.AkteSha)
 	}()
 
-	var akteFD kennung.FD
+	var akteFD fd.FD
 
 	lr := format.MakeLineReaderConsumeEmpty(
 		ohio.MakeLineReaderIterate(
@@ -120,7 +121,7 @@ func (f textParser) ParseMetadatei(
 
 		return
 	} else if !akteFD.Sha.IsNull() {
-		if afs, ok := c.(kennung.AkteFDSetter); ok {
+		if afs, ok := c.(fd.AkteFDSetter); ok {
 			afs.SetAkteFD(akteFD)
 		}
 
@@ -150,7 +151,7 @@ func (f textParser) ParseMetadatei(
 func (f textParser) readTyp(
 	m *Metadatei,
 	desc string,
-	akteFD *kennung.FD,
+	akteFD *fd.FD,
 ) (err error) {
 	if desc == "" {
 		return
@@ -167,7 +168,7 @@ func (f textParser) readTyp(
 			return
 		}
 
-		if *akteFD, err = kennung.FDFromPathWithAkteWriterFactory(
+		if *akteFD, err = fd.FDFromPathWithAkteWriterFactory(
 			desc,
 			f.awf,
 		); err != nil {

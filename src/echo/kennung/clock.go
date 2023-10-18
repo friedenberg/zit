@@ -1,6 +1,8 @@
 package kennung
 
+import "github.com/friedenberg/zit/src/delta/thyme"
+
 type Clock interface {
-	GetTime() Time
+	GetTime() thyme.Time
 	GetTai() Tai
 }

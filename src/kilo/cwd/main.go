@@ -14,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/standort"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
@@ -30,11 +31,11 @@ type CwdFiles struct {
 	Kisten    schnittstellen.MutableSetPtrLike[Kasten, *Kasten]
 	Etiketten schnittstellen.MutableSetPtrLike[Etikett, *Etikett]
 	// TODO-P4 make set
-	UnsureAkten      kennung.MutableFDSet
-	EmptyDirectories []kennung.FD
+	UnsureAkten      fd.MutableSet
+	EmptyDirectories []fd.FD
 }
 
-func (fs *CwdFiles) MarkUnsureAkten(fd kennung.FD) (err error) {
+func (fs *CwdFiles) MarkUnsureAkten(fd fd.FD) (err error) {
 	if fd, err = MakeFileFromFD(fd, fs.akteWriterFactory); err != nil {
 		err = errors.Wrapf(err, "%q", fd)
 		return
@@ -136,7 +137,7 @@ func (fs CwdFiles) String() (out string) {
 	)
 
 	fs.UnsureAkten.Each(
-		func(z kennung.FD) (err error) {
+		func(z fd.FD) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
@@ -167,12 +168,12 @@ func (fs CwdFiles) ContainsMatchable(m *sku.Transacted) bool {
 	return true
 }
 
-func (fs CwdFiles) GetCwdFDs() kennung.FDSet {
-	fds := kennung.MakeMutableFDSet()
+func (fs CwdFiles) GetCwdFDs() fd.Set {
+	fds := fd.MakeMutableSet()
 
-	kennung.FDSetAddPairs[Zettel](fs.Zettelen, fds)
-	kennung.FDSetAddPairs[Typ](fs.Typen, fds)
-	kennung.FDSetAddPairs[Etikett](fs.Etiketten, fds)
+	fd.SetAddPairs[Zettel](fs.Zettelen, fds)
+	fd.SetAddPairs[Typ](fs.Typen, fds)
+	fd.SetAddPairs[Etikett](fs.Etiketten, fds)
 	fs.UnsureAkten.Each(fds.Add)
 
 	return fds
@@ -303,10 +304,10 @@ func makeCwdFiles(
 		Etiketten: collections_ptr.MakeMutableValueSet[Etikett, *Etikett](
 			nil,
 		),
-		UnsureAkten: collections_ptr.MakeMutableValueSet[kennung.FD, *kennung.FD](
+		UnsureAkten: collections_ptr.MakeMutableValueSet[fd.FD, *fd.FD](
 			nil,
 		),
-		EmptyDirectories: make([]kennung.FD, 0),
+		EmptyDirectories: make([]fd.FD, 0),
 	}
 
 	return
@@ -397,9 +398,9 @@ func (fs *CwdFiles) readAll() (err error) {
 			return
 		}
 
-		var fd kennung.FD
+		var f fd.FD
 
-		if fd, err = kennung.FileInfo(fi, fs.dir); err != nil {
+		if f, err = fd.FileInfo(fi, fs.dir); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -413,7 +414,7 @@ func (fs *CwdFiles) readAll() (err error) {
 			}
 
 			if len(dirs2) == 0 {
-				fs.EmptyDirectories = append(fs.EmptyDirectories, fd)
+				fs.EmptyDirectories = append(fs.EmptyDirectories, f)
 			}
 
 			for _, a := range dirs2 {
@@ -496,7 +497,7 @@ func (fs *CwdFiles) readFirstLevelFile(a string) (err error) {
 		}
 
 	default:
-		var ut kennung.FD
+		var ut fd.FD
 
 		if ut, err = MakeFile(fs.dir, a, fs.akteWriterFactory); err != nil {
 			err = errors.Wrap(err)

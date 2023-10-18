@@ -17,7 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
@@ -90,7 +90,7 @@ func (c Diff) RunWithQuery(
 				internalInline := u.Konfig().IsInlineTyp(il.GetTyp())
 				externalInline := u.Konfig().IsInlineTyp(el.GetTyp())
 
-				var externalFD kennung.FD
+				var externalFD fd.FD
 
 				switch {
 				case mode.IncludesObjekte():
@@ -224,7 +224,7 @@ func (c Diff) makeDoAkte(
 
 func (c Diff) makeDoFD(
 	w io.WriteCloser,
-	fd kennung.FD,
+	fd fd.FD,
 ) schnittstellen.FuncError {
 	return func() (err error) {
 		defer errors.DeferredCloser(&err, w)

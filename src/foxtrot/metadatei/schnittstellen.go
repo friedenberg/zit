@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/echo/fd"
 )
 
 type (
@@ -31,7 +31,7 @@ type (
 	}
 
 	AktePathSetter interface {
-		SetAkteFD(kennung.FD) error
+		SetAkteFD(fd.FD) error
 	}
 
 	PersistentFormatterContext interface {

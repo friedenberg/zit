@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/string_format_writer"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
@@ -24,7 +25,7 @@ type cli struct {
 	rightAlignedWriter            schnittstellen.StringFormatWriter[string]
 	shaStringFormatWriter         schnittstellen.StringFormatWriter[schnittstellen.ShaLike]
 	kennungStringFormatWriter     schnittstellen.StringFormatWriter[kennung.KennungPtr]
-	fdStringFormatWriter          schnittstellen.StringFormatWriter[*kennung.FD]
+	fdStringFormatWriter          schnittstellen.StringFormatWriter[*fd.FD]
 	typStringFormatWriter         schnittstellen.StringFormatWriter[*kennung.Typ]
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung]
 	etikettenStringFormatWriter   schnittstellen.StringFormatWriter[kennung.EtikettSet]
@@ -33,7 +34,7 @@ type cli struct {
 func MakeCliFormat(
 	options CliOptions,
 	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],
-	fdStringFormatWriter schnittstellen.StringFormatWriter[*kennung.FD],
+	fdStringFormatWriter schnittstellen.StringFormatWriter[*fd.FD],
 	kennungStringFormatWriter schnittstellen.StringFormatWriter[kennung.KennungPtr],
 	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],

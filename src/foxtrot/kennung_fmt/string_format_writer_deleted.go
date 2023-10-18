@@ -6,18 +6,18 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/string_format_writer"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/echo/fd"
 )
 
 type fdDeletedStringWriterFormat struct {
 	dryRun               bool
 	rightAlignedWriter   schnittstellen.StringFormatWriter[string]
-	fdStringFormatWriter schnittstellen.StringFormatWriter[*kennung.FD]
+	fdStringFormatWriter schnittstellen.StringFormatWriter[*fd.FD]
 }
 
 func MakeFDDeletedStringWriterFormat(
 	dryRun bool,
-	fdStringFormatWriter schnittstellen.StringFormatWriter[*kennung.FD],
+	fdStringFormatWriter schnittstellen.StringFormatWriter[*fd.FD],
 ) *fdDeletedStringWriterFormat {
 	return &fdDeletedStringWriterFormat{
 		dryRun:               dryRun,
@@ -28,7 +28,7 @@ func MakeFDDeletedStringWriterFormat(
 
 func (f *fdDeletedStringWriterFormat) WriteStringFormat(
 	sw io.StringWriter,
-	fd *kennung.FD,
+	fd *fd.FD,
 ) (n int64, err error) {
 	var (
 		n1 int

@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
@@ -65,7 +65,7 @@ func (c Status) RunWithQuery(
 
 	if err = u.StoreObjekten().ReadAllMatchingAkten(
 		u.StoreUtil().GetCwdFiles().UnsureAkten,
-		func(fd kennung.FD, z *sku.Transacted) (err error) {
+		func(fd fd.FD, z *sku.Transacted) (err error) {
 			if z == nil {
 				err = u.PrinterFileNotRecognized()(&fd)
 				return

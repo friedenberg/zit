@@ -1,4 +1,4 @@
-package kennung
+package thyme
 
 import (
 	"crypto/sha256"
@@ -50,13 +50,17 @@ func Tyme(t tyme.Time) Time {
 
 func TimeWithIndex(t1 Time, n int) (t2 Time) {
 	t2 = t1
-	t2.time.Add(tyme.Nanosecond * tyme.Duration(n))
+	t2.Add(tyme.Nanosecond * tyme.Duration(n))
 
 	return
 }
 
+func (t Time) GetTime() time {
+	return t.time
+}
+
 func (t *Time) MoveForwardIota() {
-	t.time = t.time.Add(tyme.Second)
+	t.time = t.Add(tyme.Second)
 }
 
 // func (t Time) Format(f string) string {

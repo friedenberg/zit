@@ -6,17 +6,17 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/string_format_writer"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/echo/fd"
 )
 
 type fileNotRecognizedStringWriterFormat struct {
 	rightAlignedWriter    schnittstellen.StringFormatWriter[string]
 	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike]
-	fdStringFormatWriter  schnittstellen.StringFormatWriter[*kennung.FD]
+	fdStringFormatWriter  schnittstellen.StringFormatWriter[*fd.FD]
 }
 
 func MakeFileNotRecognizedStringWriterFormat(
-	fdStringFormatWriter schnittstellen.StringFormatWriter[*kennung.FD],
+	fdStringFormatWriter schnittstellen.StringFormatWriter[*fd.FD],
 	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],
 ) *fileNotRecognizedStringWriterFormat {
 	return &fileNotRecognizedStringWriterFormat{
@@ -28,7 +28,7 @@ func MakeFileNotRecognizedStringWriterFormat(
 
 func (f *fileNotRecognizedStringWriterFormat) WriteStringFormat(
 	sw io.StringWriter,
-	fd *kennung.FD,
+	fd *fd.FD,
 ) (n int64, err error) {
 	var (
 		n1 int

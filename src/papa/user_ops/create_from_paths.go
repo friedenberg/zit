@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/script_value"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -209,7 +210,7 @@ func (c *CreateFromPaths) zettelsFromPath(
 
 	defer errors.DeferredCloser(&err, &c.Filter)
 
-	var fd kennung.FD
+	var fd fd.FD
 
 	if err = fd.SetPath(p); err != nil {
 		err = errors.Wrap(err)

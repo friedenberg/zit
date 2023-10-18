@@ -7,12 +7,12 @@ import (
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/echo/fd"
 )
 
 type ExternalFDs struct {
-	Objekte kennung.FD
-	Akte    kennung.FD
+	Objekte fd.FD
+	Akte    fd.FD
 }
 
 func (a ExternalFDs) EqualsAny(b any) bool {
@@ -37,7 +37,7 @@ func (e ExternalFDs) MakeConflictMarker() (path string) {
 	return
 }
 
-func (e ExternalFDs) conflictMarkerExists(fd *kennung.FD) (ok bool) {
+func (e ExternalFDs) conflictMarkerExists(fd *fd.FD) (ok bool) {
 	if files.Exists(fmt.Sprintf("%s.conflict", fd)) {
 		ok = true
 	}

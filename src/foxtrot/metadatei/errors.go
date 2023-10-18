@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/echo/fd"
 )
 
 type ErrHasInlineAkteAndFilePath struct {
-	AkteFD    kennung.FD
+	AkteFD    fd.FD
 	InlineSha sha.Sha
 }
 

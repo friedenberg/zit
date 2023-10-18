@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/pool"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/standort"
+	"github.com/friedenberg/zit/src/delta/thyme"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -26,7 +27,7 @@ import (
 )
 
 type Umwelt struct {
-	sonnenaufgang kennung.Time
+	sonnenaufgang thyme.Time
 
 	in  *os.File
 	out *os.File
@@ -86,7 +87,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		return
 	}
 
-	u.sonnenaufgang = kennung.Now()
+	u.sonnenaufgang = thyme.Now()
 
 	errors.TodoP4("find a better place for this")
 	{

@@ -6,6 +6,7 @@ import (
 	tyme "time"
 
 	"github.com/friedenberg/zit/src/bravo/test_logz"
+	"github.com/friedenberg/zit/src/delta/thyme"
 )
 
 func TestTaiSet(t1 *testing.T) {
@@ -71,7 +72,7 @@ func TestTaiWithIndex(t1 *testing.T) {
 	u := int64(1673549470)
 
 	sut := TaiFromTimeWithIndex(
-		Time{time: tyme.Unix(u, 0)},
+		thyme.Tyme(tyme.Unix(u, 0)),
 		1,
 	)
 

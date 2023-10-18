@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
@@ -85,7 +86,7 @@ func (a *External) GetFDsPtr() *ExternalFDs {
 	return &a.FDs
 }
 
-func (a External) GetAkteFD() kennung.FD {
+func (a External) GetAkteFD() fd.FD {
 	return a.FDs.Akte
 }
 
@@ -93,7 +94,7 @@ func (a External) GetAktePath() string {
 	return a.FDs.Akte.GetPath()
 }
 
-func (a External) GetObjekteFD() kennung.FD {
+func (a External) GetObjekteFD() fd.FD {
 	return a.FDs.Objekte
 }
 

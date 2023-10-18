@@ -1,4 +1,4 @@
-package kennung
+package fd
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -11,25 +11,25 @@ func init() {
 }
 
 type (
-	FDSet        = schnittstellen.SetLike[FD]
-	MutableFDSet = schnittstellen.MutableSetLike[FD]
+	Set        = schnittstellen.SetLike[FD]
+	MutableSet = schnittstellen.MutableSetLike[FD]
 )
 
-func MakeFDSet(ts ...FD) FDSet {
+func MakeSet(ts ...FD) Set {
 	return collections_value.MakeValueSet[FD](
 		nil,
 		ts...,
 	)
 }
 
-func MakeMutableFDSet(ts ...FD) MutableFDSet {
+func MakeMutableSet(ts ...FD) MutableSet {
 	return collections_value.MakeMutableValueSet[FD](
 		nil,
 		ts...,
 	)
 }
 
-func FDSetAddPairs[T FDPairGetter](
+func SetAddPairs[T FDPairGetter](
 	in schnittstellen.SetLike[T],
 	out schnittstellen.MutableSetLike[FD],
 ) (err error) {

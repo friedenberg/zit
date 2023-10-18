@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/charlie/checkout_options"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/juliett/to_merge"
 )
@@ -80,7 +80,7 @@ func (s *Store) merge(tm to_merge.Sku) (merged sku.ExternalFDs, err error) {
 	return
 }
 
-func (s *Store) runDiff3(left, middle, right kennung.FD) (path string, err error) {
+func (s *Store) runDiff3(left, middle, right fd.FD) (path string, err error) {
 	cmd := exec.Command(
 		"diff3",
 		"--text",

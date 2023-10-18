@@ -10,13 +10,13 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/echo/fd"
 )
 
 func MakeFileFromFD(
-	fd kennung.FD,
+	fd fd.FD,
 	awf schnittstellen.AkteWriterFactory,
-) (ut kennung.FD, err error) {
+) (ut fd.FD, err error) {
 	ut = fd
 
 	var f *os.File
@@ -51,9 +51,9 @@ func MakeFile(
 	dir string,
 	p string,
 	awf schnittstellen.AkteWriterFactory,
-) (ut kennung.FD, err error) {
+) (ut fd.FD, err error) {
 	todo.Remove()
-	ut = kennung.FD{}
+	ut = fd.FD{}
 
 	p = path.Join(dir, p)
 

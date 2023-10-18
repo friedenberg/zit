@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
@@ -18,7 +18,7 @@ type DeleteCheckout struct {
 }
 
 func (c DeleteCheckout) Run(
-	fs schnittstellen.IterablePtr[kennung.FD, *kennung.FD],
+	fs schnittstellen.IterablePtr[fd.FD, *fd.FD],
 ) (err error) {
 	p := c.PrinterFDDeleted()
 
@@ -29,7 +29,7 @@ func (c DeleteCheckout) Run(
 	dirs := collections_value.MakeMutableValueSet[values.String](nil)
 
 	if err = fs.EachPtr(
-		func(fd *kennung.FD) (err error) {
+		func(fd *fd.FD) (err error) {
 			path := fd.String()
 
 			if path == "." {
@@ -94,14 +94,14 @@ func (c DeleteCheckout) Run(
 				return
 			}
 
-			var fd kennung.FD
+			var f fd.FD
 
-			if fd, err = kennung.FDFromDir(d.String()); err != nil {
+			if f, err = fd.FDFromDir(d.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			return p(&fd)
+			return p(&f)
 		},
 	); err != nil {
 		err = errors.Wrap(err)

@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
@@ -42,11 +43,11 @@ func (c ZettelFromExternalAkte) Run(
 
 	results = sku.MakeTransactedMutableSet()
 
-	fds := collections_value.MakeMutableSet[kennung.FD](
-		kennung.FDKeyerSha{},
+	fds := collections_value.MakeMutableSet[fd.FD](
+		fd.FDKeyerSha{},
 	)
 
-	for _, fd := range iter.SortedValues[kennung.FD](ms.GetCwdFDs()) {
+	for _, fd := range iter.SortedValues[fd.FD](ms.GetCwdFDs()) {
 		if err = c.processOneFD(fd, fds.Add); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -54,7 +55,7 @@ func (c ZettelFromExternalAkte) Run(
 	}
 
 	if err = fds.Each(
-		func(fd kennung.FD) (err error) {
+		func(fd fd.FD) (err error) {
 			var z *sku.External
 
 			if z, err = c.zettelForAkte(fd); err != nil {
@@ -187,8 +188,8 @@ func (c ZettelFromExternalAkte) Run(
 }
 
 func (c *ZettelFromExternalAkte) processOneFD(
-	fd kennung.FD,
-	add schnittstellen.FuncIter[kennung.FD],
+	fd fd.FD,
+	add schnittstellen.FuncIter[fd.FD],
 ) (err error) {
 	var r io.Reader
 
@@ -224,7 +225,7 @@ func (c *ZettelFromExternalAkte) processOneFD(
 }
 
 func (c *ZettelFromExternalAkte) zettelForAkte(
-	akteFD kennung.FD,
+	akteFD fd.FD,
 ) (z *sku.External, err error) {
 	z = &sku.External{
 		FDs: sku.ExternalFDs{

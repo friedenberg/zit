@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
+	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
@@ -23,8 +24,8 @@ func init() {
 // TODO-P3 rename to QueryGattungGroup
 type Query interface {
 	Get(g gattung.Gattung) (s MatcherSigil, ok bool)
-	GetCwdFDs() kennung.FDSet
-	GetExplicitCwdFDs() kennung.FDSet
+	GetCwdFDs() fd.Set
+	GetExplicitCwdFDs() fd.Set
 	GetEtiketten() kennung.EtikettSet
 	GetTypen() schnittstellen.SetLike[kennung.Typ]
 	Set(string) error
@@ -86,7 +87,7 @@ func MakeQuery(
 		Hidden:                  hidden,
 		DefaultGattungen:        dg.CloneMutableSetLike(),
 		Gattung:                 make(map[gattung.Gattung]setWithSigil),
-		FDs:                     kennung.MakeMutableFDSet(),
+		FDs:                     fd.MakeMutableSet(),
 		index:                   ki,
 	}
 }
@@ -143,7 +144,7 @@ type query struct {
 
 	DefaultGattungen gattungen.Set
 	Gattung          map[gattung.Gattung]setWithSigil
-	FDs              kennung.MutableFDSet
+	FDs              fd.MutableSet
 
 	dotOperatorActive bool
 }
@@ -193,7 +194,7 @@ func (s *query) SetMany(vs ...string) (err error) {
 
 	for _, v := range vs {
 		if err = s.set(v); err != nil {
-			var fd kennung.FD
+			var fd fd.FD
 
 			if err1 := fd.Set(v); err1 == nil {
 				if err = s.FDs.Add(fd); err != nil {
@@ -265,7 +266,7 @@ func (ms *query) set(v string) (err error) {
 			if gattung.IsErrUnrecognizedGattung(err) {
 				err = nil
 
-				if err = iter.AddString[kennung.FD, *kennung.FD](
+				if err = iter.AddString[fd.FD, *fd.FD](
 					ms.FDs,
 					v,
 				); err != nil {
@@ -305,10 +306,10 @@ func (ms *query) set(v string) (err error) {
 			case ids.Sigil.IncludesCwd():
 				fp := fmt.Sprintf("%s.%s", before, after)
 
-				var fd kennung.FD
+				var f fd.FD
 
-				if fd, err = kennung.FDFromPath(fp); err == nil {
-					ids.Matcher.AddExactlyThis(FD(fd))
+				if f, err = fd.FDFromPath(fp); err == nil {
+					ids.Matcher.AddExactlyThis(FD(f))
 					break
 				}
 
@@ -358,7 +359,7 @@ func tryAddMatcher(
 	{
 		var m Matcher
 
-		if m, _, _, err = MakeMatcher(&kennung.FD{}, v, nil, ki, k); err == nil {
+		if m, _, _, err = MakeMatcher(&fd.FD{}, v, nil, ki, k); err == nil {
 			return s.AddExactlyThis(m)
 		}
 	}
@@ -482,11 +483,11 @@ func (ms query) Get(g gattung.Gattung) (s MatcherSigil, ok bool) {
 	return
 }
 
-func (ms query) GetExplicitCwdFDs() kennung.FDSet {
+func (ms query) GetExplicitCwdFDs() fd.Set {
 	return ms.FDs
 }
 
-func (ms query) GetCwdFDs() kennung.FDSet {
+func (ms query) GetCwdFDs() fd.Set {
 	if ms.dotOperatorActive {
 		return ms.cwd.GetCwdFDs()
 	} else {

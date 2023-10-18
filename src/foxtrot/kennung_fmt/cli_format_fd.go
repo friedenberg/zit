@@ -6,7 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/string_format_writer"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/echo/fd"
 )
 
 type fdCliFormat struct {
@@ -28,7 +28,7 @@ func MakeFDCliFormat(
 
 func (f *fdCliFormat) WriteStringFormat(
 	w io.StringWriter,
-	k *kennung.FD,
+	k *fd.FD,
 ) (n int64, err error) {
 	// TODO-P2 add abbreviation
 

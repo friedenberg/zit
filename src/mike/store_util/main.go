@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/checkout_options"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/standort"
+	"github.com/friedenberg/zit/src/delta/thyme"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
@@ -85,7 +86,7 @@ type common struct {
 	persistentMetadateiFormat objekte_format.Format
 	fileEncoder               objekte_collections.FileEncoder
 
-	sonnenaufgang kennung.Time
+	sonnenaufgang thyme.Time
 
 	checkedOutLogPrinter schnittstellen.FuncIter[*sku.CheckedOut]
 
@@ -102,7 +103,7 @@ func MakeStoreUtil(
 	k *konfig.Compiled,
 	st standort.Standort,
 	pmf objekte_format.Format,
-	t kennung.Time,
+	t thyme.Time,
 ) (c *common, err error) {
 	c = &common{
 		konfig:                    k,
@@ -196,8 +197,8 @@ func (s common) GetPersistentMetadateiFormat() objekte_format.Format {
 	return s.persistentMetadateiFormat
 }
 
-func (s common) GetTime() kennung.Time {
-	return kennung.Now()
+func (s common) GetTime() thyme.Time {
+	return thyme.Now()
 }
 
 func (s common) GetTai() kennung.Tai {

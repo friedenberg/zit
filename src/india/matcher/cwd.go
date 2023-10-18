@@ -1,20 +1,20 @@
 package matcher
 
 import (
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/echo/fd"
 )
 
 type MatcherCwd interface {
 	Matcher
-	GetCwdFDs() kennung.FDSet
+	GetCwdFDs() fd.Set
 }
 
 type matcherCwdNop struct {
 	Matcher
 }
 
-func (_ matcherCwdNop) GetCwdFDs() kennung.FDSet {
-	return kennung.MakeFDSet()
+func (_ matcherCwdNop) GetCwdFDs() fd.Set {
+	return fd.MakeSet()
 }
 
 func MakeMatcherCwdNop(m Matcher) MatcherCwd {

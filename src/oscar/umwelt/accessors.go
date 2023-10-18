@@ -5,14 +5,14 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/delta/standort"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/delta/thyme"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/juliett/konfig"
 	"github.com/friedenberg/zit/src/mike/store_util"
 	"github.com/friedenberg/zit/src/november/store_objekten"
 )
 
-func (u *Umwelt) Sonnenaufgang() kennung.Time {
+func (u *Umwelt) Sonnenaufgang() thyme.Time {
 	return u.sonnenaufgang
 }
 
