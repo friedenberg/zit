@@ -61,7 +61,7 @@ func (h storedParserSaver[O, OPtr]) ParseSaveStored(
 	var f *os.File
 
 	errors.TodoP2("support akte")
-	if f, err = files.OpenExclusiveReadOnly(sem.FDs.Objekte.Path); err != nil {
+	if f, err = files.OpenExclusiveReadOnly(sem.FDs.Objekte.GetPath()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

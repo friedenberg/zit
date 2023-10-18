@@ -271,7 +271,10 @@ func (s *common) CheckoutOne(
 	}
 
 	if options.CheckoutMode.IncludesObjekte() {
-		cz.External.GetFDsPtr().Objekte.Path = filename
+		if err = cz.External.GetFDsPtr().Objekte.SetPath(filename); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if ((!inlineAkte || !options.CheckoutMode.IncludesObjekte()) && !options.ForceInlineAkte) &&
@@ -284,7 +287,10 @@ func (s *common) CheckoutOne(
 			fe = t.String()
 		}
 
-		cz.External.GetFDsPtr().Akte.Path = originalFilename + "." + fe
+		if err = cz.External.GetFDsPtr().Akte.SetPath(originalFilename + "." + fe); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if err = s.fileEncoder.Encode(&cz.External); err != nil {

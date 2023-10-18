@@ -4,7 +4,6 @@ import (
 	"io"
 	"os"
 	"path"
-	"path/filepath"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -22,7 +21,7 @@ func MakeFileFromFD(
 
 	var f *os.File
 
-	if f, err = files.OpenExclusiveReadOnly(ut.Path); err != nil {
+	if f, err = files.OpenExclusiveReadOnly(ut.GetPath()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -63,8 +62,8 @@ func MakeFile(
 		return
 	}
 
-	if ut.Path, err = filepath.Rel(dir, ut.Path); err != nil {
-		err = errors.Wrapf(err, "path: %q", ut.Path)
+	if err = ut.SetPathRel(ut.GetPath(), dir); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

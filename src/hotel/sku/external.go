@@ -90,7 +90,7 @@ func (a External) GetAkteFD() kennung.FD {
 }
 
 func (a External) GetAktePath() string {
-	return a.FDs.Akte.Path
+	return a.FDs.Akte.GetPath()
 }
 
 func (a External) GetObjekteFD() kennung.FD {

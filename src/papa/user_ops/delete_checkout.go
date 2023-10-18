@@ -41,8 +41,8 @@ func (c DeleteCheckout) Run(
 			}
 
 			func() {
-				if fd.IsDir && fd.Path != c.Standort().Cwd() {
-					dirs.Add(values.MakeString(fd.Path))
+				if fd.IsDir() && fd.GetPath() != c.Standort().Cwd() {
+					dirs.Add(values.MakeString(fd.GetPath()))
 					return
 				}
 
@@ -94,7 +94,14 @@ func (c DeleteCheckout) Run(
 				return
 			}
 
-			return p(&kennung.FD{Path: d.String(), IsDir: true})
+			var fd kennung.FD
+
+			if fd, err = kennung.FDFromDir(d.String()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return p(&fd)
 		},
 	); err != nil {
 		err = errors.Wrap(err)

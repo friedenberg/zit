@@ -121,7 +121,7 @@ func (c Diff) RunWithQuery(
 					strings.ToLower(il.GetGattung().GetGattungString()),
 				)
 
-				externalLabel := u.Standort().Rel(externalFD.Path)
+				externalLabel := u.Standort().Rel(externalFD.GetPath())
 
 				todo.Change("disambiguate internal and external, and objekte / akte")
 				cmd := exec.Command(
@@ -231,7 +231,7 @@ func (c Diff) makeDoFD(
 
 		var f *os.File
 
-		if f, err = files.OpenExclusiveReadOnly(fd.Path); err != nil {
+		if f, err = files.OpenExclusiveReadOnly(fd.GetPath()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

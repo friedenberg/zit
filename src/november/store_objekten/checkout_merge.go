@@ -52,11 +52,18 @@ func (s *Store) merge(tm to_merge.Sku) (merged sku.ExternalFDs, err error) {
 		return
 	}
 
-	if merged.Objekte.Path, err = s.runDiff3(
+	var p string
+
+	if p, err = s.runDiff3(
 		leftCO.External.FDs.Objekte,
 		middleCO.External.FDs.Objekte,
 		rightCO.External.FDs.Objekte,
 	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = merged.Objekte.SetPath(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -81,9 +88,9 @@ func (s *Store) runDiff3(left, middle, right kennung.FD) (path string, err error
 		"--label=left",
 		"--label=middle",
 		"--label=right",
-		left.Path,
-		middle.Path,
-		right.Path,
+		left.GetPath(),
+		middle.GetPath(),
+		right.GetPath(),
 	)
 
 	var out io.ReadCloser
@@ -130,13 +137,7 @@ func (s *Store) runDiff3(left, middle, right kennung.FD) (path string, err error
 
 	if err = cmd.Wait(); err != nil {
 		if cmd.ProcessState.ExitCode() == 1 {
-			err = to_merge.ErrMergeConflict{
-				ExternalFDs: sku.ExternalFDs{
-					Objekte: kennung.FD{
-						Path: f.Name(),
-					},
-				},
-			}
+			err = errors.Wrap(to_merge.ErrMergeConflict{})
 		} else {
 			err = errors.Wrap(err)
 			return
@@ -201,9 +202,9 @@ func (s *Store) RunMergeTool(
 
 	cmdStrings = append(
 		cmdStrings,
-		leftCO.External.FDs.Objekte.Path,
-		middleCO.External.FDs.Objekte.Path,
-		rightCO.External.FDs.Objekte.Path,
+		leftCO.External.FDs.Objekte.GetPath(),
+		middleCO.External.FDs.Objekte.GetPath(),
+		rightCO.External.FDs.Objekte.GetPath(),
 		tmpPath,
 	)
 
@@ -218,9 +219,9 @@ func (s *Store) RunMergeTool(
 	cmd.Stderr = os.Stderr
 
 	cmd.Env = []string{
-		fmt.Sprintf("LOCAL=%s", leftCO.External.FDs.Objekte.Path),
-		fmt.Sprintf("BASE=%s", middleCO.External.FDs.Objekte.Path),
-		fmt.Sprintf("REMOTE=%s", rightCO.External.FDs.Objekte.Path),
+		fmt.Sprintf("LOCAL=%s", leftCO.External.FDs.Objekte.GetPath()),
+		fmt.Sprintf("BASE=%s", middleCO.External.FDs.Objekte.GetPath()),
+		fmt.Sprintf("REMOTE=%s", rightCO.External.FDs.Objekte.GetPath()),
 		fmt.Sprintf("MERGED=%s", tmpPath),
 	}
 

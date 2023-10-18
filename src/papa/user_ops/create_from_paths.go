@@ -173,12 +173,12 @@ func (c CreateFromPaths) Run(
 	if err = toDelete.Each(
 		func(z *sku.External) (err error) {
 			// TODO-P2 move to checkout store
-			if err = os.Remove(z.GetObjekteFD().Path); err != nil {
+			if err = os.Remove(z.GetObjekteFD().GetPath()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			pathRel := c.Standort().RelToCwdOrSame(z.GetObjekteFD().Path)
+			pathRel := c.Standort().RelToCwdOrSame(z.GetObjekteFD().GetPath())
 
 			// TODO-P2 move to printer
 			errors.Out().Printf("[%s] (deleted)", pathRel)
@@ -209,11 +209,16 @@ func (c *CreateFromPaths) zettelsFromPath(
 
 	defer errors.DeferredCloser(&err, &c.Filter)
 
+	var fd kennung.FD
+
+	if err = fd.SetPath(p); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	ze := sku.GetExternalPool().Get()
 	ze.FDs = sku.ExternalFDs{
-		Objekte: kennung.FD{
-			Path: p,
-		},
+		Objekte: fd,
 	}
 
 	ze.Kennung.KennungPtr = &kennung.Hinweis{}

@@ -169,7 +169,7 @@ func (c ZettelFromExternalAkte) Run(
 	err = toDelete.Each(
 		func(z *sku.External) (err error) {
 			// TODO-P4 move to checkout store
-			if err = os.Remove(z.GetAkteFD().Path); err != nil {
+			if err = os.Remove(z.GetAkteFD().GetPath()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -192,7 +192,7 @@ func (c *ZettelFromExternalAkte) processOneFD(
 ) (err error) {
 	var r io.Reader
 
-	if r, err = c.Filter.Run(fd.Path); err != nil {
+	if r, err = c.Filter.Run(fd.GetPath()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

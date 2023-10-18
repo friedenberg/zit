@@ -198,7 +198,7 @@ func (e *fileEncoder) Encode(
 ) (err error) {
 	return e.EncodeObjekte(
 		z,
-		z.GetObjekteFD().Path,
-		z.GetAkteFD().Path,
+		z.GetObjekteFD().GetPath(),
+		z.GetAkteFD().GetPath(),
 	)
 }

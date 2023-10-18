@@ -88,7 +88,7 @@ func (s *common) ReadOneExternalObjekte(
 
 	var f *os.File
 
-	if f, err = files.Open(e.GetObjekteFD().Path); err != nil {
+	if f, err = files.Open(e.GetObjekteFD().GetPath()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -138,7 +138,7 @@ func (s *common) ReadOneExternalAkte(
 	var f *os.File
 
 	if f, err = files.OpenExclusiveReadOnly(
-		e.GetAkteFD().Path,
+		e.GetAkteFD().GetPath(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

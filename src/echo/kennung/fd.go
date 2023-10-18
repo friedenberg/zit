@@ -1,15 +1,12 @@
 package kennung
 
 import (
-	"io"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/sha"
 )
@@ -35,8 +32,8 @@ type (
 
 type FD struct {
 	// TODO-P2 make all of these private and expose as methods
-	IsDir   bool
-	Path    string
+	isDir   bool
+	path    string
 	ModTime Time
 	Sha     sha.Sha
 }
@@ -46,7 +43,7 @@ func (a FD) EqualsAny(b any) bool {
 }
 
 func (a FD) Equals(b FD) bool {
-	if a.Path != b.Path {
+	if a.path != b.path {
 		return false
 	}
 
@@ -59,121 +56,6 @@ func (a FD) Equals(b FD) bool {
 	}
 
 	return true
-}
-
-func FDFromPathWithAkteWriterFactory(
-	p string,
-	awf schnittstellen.AkteWriterFactory,
-) (fd FD, err error) {
-	if p == "" {
-		err = errors.Errorf("empty path")
-		return
-	}
-
-	if awf == nil {
-		panic("schnittstellen.AkteWriterFactory is nil")
-	}
-
-	var f *os.File
-
-	if f, err = files.OpenExclusiveReadOnly(p); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, f)
-
-	var akteWriter sha.WriteCloser
-
-	if akteWriter, err = awf.AkteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, akteWriter)
-
-	if _, err = io.Copy(akteWriter, f); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var fi os.FileInfo
-
-	if fi, err = f.Stat(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if fd, err = FileInfo(fi, path.Dir(p)); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	fd.Path = p
-	fd.Sha = sha.Make(akteWriter.GetShaLike())
-
-	return
-}
-
-func FDFromPath(p string) (fd FD, err error) {
-	if p == "" {
-		err = errors.Errorf("nil file desriptor")
-		return
-	}
-
-	if p == "." {
-		err = errors.Errorf("'.' not supported")
-		return
-	}
-
-	var fi os.FileInfo
-
-	if fi, err = os.Stat(p); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if fd, err = FileInfo(fi, path.Dir(p)); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func File(f *os.File) (fd FD, err error) {
-	if f == nil {
-		err = errors.Errorf("nil file desriptor")
-		return
-	}
-
-	var fi os.FileInfo
-
-	if fi, err = f.Stat(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if fd, err = FileInfo(fi, path.Dir(f.Name())); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func FileInfo(fi os.FileInfo, dir string) (fd FD, err error) {
-	fd = FD{
-		IsDir:   fi.IsDir(),
-		ModTime: Tyme(fi.ModTime()),
-	}
-
-	if fd.Path, err = filepath.Abs(path.Join(dir, fi.Name())); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }
 
 func (fd *FD) Set(v string) (err error) {
@@ -225,9 +107,9 @@ func (fd *FD) Set(v string) (err error) {
 // }
 
 func (f FD) String() string {
-	p := filepath.Clean(f.Path)
+	p := filepath.Clean(f.path)
 
-	if f.IsDir {
+	if f.isDir {
 		return p + string(filepath.Separator)
 	} else {
 		return p
@@ -235,21 +117,21 @@ func (f FD) String() string {
 }
 
 func (e FD) Ext() string {
-	return path.Ext(e.Path)
+	return path.Ext(e.path)
 }
 
 func (e FD) ExtSansDot() string {
-	return strings.TrimPrefix(path.Ext(e.Path), ".")
+	return strings.TrimPrefix(path.Ext(e.path), ".")
 }
 
 func (e FD) FileNameSansExt() string {
-	base := filepath.Base(e.Path)
+	base := filepath.Base(e.path)
 	ext := e.Ext()
 	return base[:len(base)-len(ext)]
 }
 
 func (f FD) IsEmpty() bool {
-	if f.Path == "" {
+	if f.path == "" {
 		return true
 	}
 
@@ -283,7 +165,7 @@ func (f FD) AsHinweis() (h Hinweis, ok bool) {
 }
 
 func (f FD) GetHinweis() (h Hinweis, err error) {
-	parts := strings.Split(f.Path, string(filepath.Separator))
+	parts := strings.Split(f.path, string(filepath.Separator))
 
 	switch len(parts) {
 	case 0, 1:
@@ -315,9 +197,31 @@ func (fd FD) Parts() [3]string {
 	return [3]string{"", "", fd.String()}
 }
 
+func (fd FD) GetPath() string {
+	return fd.path
+}
+
+func (fd *FD) SetPath(p string) (err error) {
+	fd.path = p
+	return
+}
+
+func (fd *FD) SetPathRel(p, dir string) (err error) {
+	if p, err = filepath.Rel(dir, p); err != nil {
+		err = errors.Wrapf(err, "path: %q", p)
+		return
+	}
+
+	return fd.SetPath(p)
+}
+
+func (fd FD) IsDir() bool {
+	return fd.isDir
+}
+
 func (fd *FD) Reset() {
-	fd.IsDir = false
-	fd.Path = ""
+	fd.isDir = false
+	fd.path = ""
 	fd.ModTime.Reset()
 	fd.Sha.Reset()
 }

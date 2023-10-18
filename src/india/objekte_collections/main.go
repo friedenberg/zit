@@ -12,7 +12,7 @@ func ToSliceFilesAkten(
 	return iter.DerivedValuesPtr[sku.CheckedOut, *sku.CheckedOut, string](
 		s,
 		func(z *sku.CheckedOut) (e string, err error) {
-			e = z.External.GetAkteFD().Path
+			e = z.External.GetAkteFD().GetPath()
 
 			if e == "" {
 				err = collections.MakeErrStopIteration()
@@ -30,7 +30,7 @@ func ToSliceFilesZettelen(
 	return iter.DerivedValuesPtr[sku.CheckedOut, *sku.CheckedOut, string](
 		s,
 		func(z *sku.CheckedOut) (e string, err error) {
-			e = z.External.GetObjekteFD().Path
+			e = z.External.GetObjekteFD().GetPath()
 
 			if e == "" {
 				err = collections.MakeErrStopIteration()

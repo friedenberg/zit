@@ -2,11 +2,11 @@ package store_objekten
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/checkout_options"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
@@ -234,29 +234,31 @@ func (s *Store) readExternalAndMergeIfNecessary(
 
 	var merged sku.ExternalFDs
 
-	if merged, err = s.merge(tm); err != nil {
-		if errors.Is(err, to_merge.ErrMergeConflict{}) {
-			if err = tm.WriteConflictMarker(
-				s.GetStandort(),
-				s.GetKonfig().GetStoreVersion(),
-				s.GetObjekteFormatOptions(),
-				co.External.FDs.MakeConflictMarker(),
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		} else {
+	merged, err = s.merge(tm)
+
+	switch {
+	case errors.Is(err, to_merge.ErrMergeConflict{}):
+		if err = tm.WriteConflictMarker(
+			s.GetStandort(),
+			s.GetKonfig().GetStoreVersion(),
+			s.GetObjekteFormatOptions(),
+			co.External.FDs.MakeConflictMarker(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-	}
 
-	if err = os.Rename(
-		merged.Objekte.Path,
-		co.External.FDs.Objekte.Path,
-	); err != nil {
+	case err != nil:
 		err = errors.Wrap(err)
 		return
+
+	default:
+		src := merged.Objekte.GetPath()
+		dst := co.External.FDs.Objekte.GetPath()
+
+		if err = files.Rename(src, dst); err != nil {
+			return
+		}
 	}
 
 	return

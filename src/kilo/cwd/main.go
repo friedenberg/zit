@@ -277,7 +277,7 @@ func (fs CwdFiles) ZettelFiles() (out []string, err error) {
 	out, err = iter.DerivedValues[Zettel, string](
 		fs.Zettelen,
 		func(z Zettel) (p string, err error) {
-			p = z.GetObjekteFD().Path
+			p = z.GetObjekteFD().GetPath()
 			return
 		},
 	)

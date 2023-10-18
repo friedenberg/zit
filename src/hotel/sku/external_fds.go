@@ -32,7 +32,7 @@ func (a ExternalFDs) Equals(b ExternalFDs) bool {
 }
 
 func (e ExternalFDs) MakeConflictMarker() (path string) {
-	path = fmt.Sprintf("%s.conflict", e.Objekte.Path)
+	path = fmt.Sprintf("%s.conflict", e.Objekte.GetPath())
 
 	return
 }
