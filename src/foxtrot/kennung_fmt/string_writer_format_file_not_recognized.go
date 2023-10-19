@@ -64,7 +64,7 @@ func (f *fileNotRecognizedStringWriterFormat) WriteStringFormat(
 		return
 	}
 
-	n2, err = f.shaStringFormatWriter.WriteStringFormat(sw, fd.Sha)
+	n2, err = f.shaStringFormatWriter.WriteStringFormat(sw, fd.GetShaLike())
 	n += n2
 
 	if err != nil {

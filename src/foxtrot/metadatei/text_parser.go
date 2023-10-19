@@ -113,19 +113,19 @@ func (f textParser) ParseMetadatei(
 
 	inlineAkteSha := sha.Make(akteWriter.GetShaLike())
 
-	if !m.AkteSha.IsNull() && !akteFD.Sha.IsNull() {
+	if !m.AkteSha.IsNull() && !akteFD.GetShaLike().IsNull() {
 		err = errors.Wrap(ErrHasInlineAkteAndFilePath{
 			AkteFD:    akteFD,
 			InlineSha: inlineAkteSha,
 		})
 
 		return
-	} else if !akteFD.Sha.IsNull() {
+	} else if !akteFD.GetShaLike().IsNull() {
 		if afs, ok := c.(fd.AkteFDSetter); ok {
 			afs.SetAkteFD(akteFD)
 		}
 
-		m.AkteSha = akteFD.Sha
+		m.AkteSha = sha.Make(akteFD.GetShaLike())
 	}
 
 	switch {

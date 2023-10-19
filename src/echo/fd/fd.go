@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/thyme"
@@ -35,8 +36,9 @@ type FD struct {
 	// TODO-P2 make all of these private and expose as methods
 	isDir   bool
 	path    string
-	ModTime thyme.Time
-	Sha     sha.Sha
+	modTime thyme.Time
+	sha     sha.Sha
+	state   State
 }
 
 func (a FD) EqualsAny(b any) bool {
@@ -48,11 +50,11 @@ func (a FD) Equals(b FD) bool {
 		return false
 	}
 
-	if !a.ModTime.Equals(b.ModTime) {
+	if !a.modTime.Equals(b.modTime) {
 		return false
 	}
 
-	if !a.Sha.Equals(b.Sha) {
+	if !a.sha.Equals(b.sha) {
 		return false
 	}
 
@@ -169,9 +171,22 @@ func (fd FD) IsDir() bool {
 	return fd.isDir
 }
 
+func (fd *FD) SetShaLike(v schnittstellen.ShaLike) {
+	fd.sha = sha.Make(v)
+}
+
+func (fd FD) GetShaLike() schnittstellen.ShaLike {
+	return fd.sha
+}
+
+func (fd FD) GetState() State {
+	return fd.state
+}
+
 func (fd *FD) Reset() {
+	fd.state = StateUnknown
 	fd.isDir = false
 	fd.path = ""
-	fd.ModTime.Reset()
-	fd.Sha.Reset()
+	fd.modTime.Reset()
+	fd.sha.Reset()
 }

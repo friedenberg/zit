@@ -17,7 +17,7 @@ import (
 type KeyerFDSha struct{}
 
 func (k KeyerFDSha) GetKey(fd fd.FD) string {
-	return fd.Sha.String()
+	return fd.GetShaLike().String()
 }
 
 func (s Store) ReadAllMatchingAkten(
@@ -41,11 +41,11 @@ func (s Store) ReadAllMatchingAkten(
 	if err = akten.Each(
 		iter.MakeChain(
 			func(fd fd.FD) (err error) {
-				if fd.Sha.IsNull() {
+				if fd.GetShaLike().IsNull() {
 					return iter.MakeErrStopIteration()
 				}
 
-				p := id.Path(fd.Sha, pa)
+				p := id.Path(fd.GetShaLike(), pa)
 
 				if !files.Exists(p) {
 					return iter.MakeErrStopIteration()

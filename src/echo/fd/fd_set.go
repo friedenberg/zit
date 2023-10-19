@@ -58,8 +58,8 @@ func SetAddPairs[T FDPairGetter](
 	)
 }
 
-type FDKeyerSha struct{}
+type KeyerSha struct{}
 
-func (_ FDKeyerSha) GetKey(fd FD) string {
-	return fd.Sha.String()
+func (KeyerSha) GetKey(fd FD) string {
+	return fd.sha.String()
 }

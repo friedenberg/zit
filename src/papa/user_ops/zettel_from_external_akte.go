@@ -44,7 +44,7 @@ func (c ZettelFromExternalAkte) Run(
 	results = sku.MakeTransactedMutableSet()
 
 	fds := collections_value.MakeMutableSet[fd.FD](
-		fd.FDKeyerSha{},
+		fd.KeyerSha{},
 	)
 
 	for _, fd := range iter.SortedValues[fd.FD](ms.GetCwdFDs()) {
@@ -214,7 +214,7 @@ func (c *ZettelFromExternalAkte) processOneFD(
 		return
 	}
 
-	fd.Sha = sha.Make(akteWriter.GetShaLike())
+	fd.SetShaLike(akteWriter.GetShaLike())
 
 	if err = add(fd); err != nil {
 		err = errors.Wrap(err)
@@ -242,7 +242,7 @@ func (c *ZettelFromExternalAkte) zettelForAkte(
 		return
 	}
 
-	z.SetAkteSha(akteFD.Sha)
+	z.SetAkteSha(akteFD.GetShaLike())
 
 	return
 }

@@ -35,13 +35,13 @@ type CwdFiles struct {
 	EmptyDirectories []fd.FD
 }
 
-func (fs *CwdFiles) MarkUnsureAkten(fd fd.FD) (err error) {
-	if fd, err = MakeFileFromFD(fd, fs.akteWriterFactory); err != nil {
-		err = errors.Wrapf(err, "%q", fd)
+func (fs *CwdFiles) MarkUnsureAkten(f fd.FD) (err error) {
+	if f, err = fd.MakeFileFromFD(f, fs.akteWriterFactory); err != nil {
+		err = errors.Wrapf(err, "%q", f)
 		return
 	}
 
-	if err = fs.UnsureAkten.Add(fd); err != nil {
+	if err = fs.UnsureAkten.Add(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -499,7 +499,7 @@ func (fs *CwdFiles) readFirstLevelFile(a string) (err error) {
 	default:
 		var ut fd.FD
 
-		if ut, err = MakeFile(fs.dir, a, fs.akteWriterFactory); err != nil {
+		if ut, err = fd.MakeFile(fs.dir, a, fs.akteWriterFactory); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

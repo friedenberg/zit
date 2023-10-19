@@ -69,7 +69,7 @@ func (a External) GetAkteSha() schnittstellen.ShaLike {
 func (a *External) SetAkteSha(v schnittstellen.ShaLike) {
 	sh := sha.Make(v)
 	a.Metadatei.AkteSha = sh
-	a.FDs.Akte.Sha = sh
+	a.FDs.Akte.SetShaLike(v)
 }
 
 func (a *External) AsTransacted() (b Transacted) {

@@ -16,7 +16,7 @@ func (e ErrHasInlineAkteAndFilePath) Error() string {
 	return fmt.Sprintf(
 		"text has inline akte and file: \nexternal path: %s\nexternal sha: %s\ninline sha: %s",
 		e.AkteFD.GetPath(),
-		e.AkteFD.Sha,
+		e.AkteFD.GetShaLike(),
 		e.InlineSha,
 	)
 }
