@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/delta/collections_delta"
+	"github.com/friedenberg/zit/srx/bravo/expansion"
 )
 
 func TestNormalize(t *testing.T) {
@@ -148,7 +149,7 @@ func TestExpandedRight(t *testing.T) {
 		MustEtikett("zz-archive-task-done"),
 	)
 
-	ex := Expanded(s, ExpanderRight)
+	ex := Expanded(s, expansion.ExpanderRight)
 
 	expected := []string{
 		"project",

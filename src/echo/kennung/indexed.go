@@ -5,6 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/tridex"
+	"github.com/friedenberg/zit/srx/bravo/expansion"
 )
 
 type IndexedLike[
@@ -32,8 +33,8 @@ func MakeIndexed[
 
 func (i *IndexedLike[T, TPtr]) ResetWithKennung(k T) {
 	i.Kennung = k
-	i.ExpandedAll = ExpandOne[T, TPtr](&k, ExpanderAll)
-	i.ExpandedRight = ExpandOne[T, TPtr](&k, ExpanderRight)
+	i.ExpandedAll = ExpandOne[T, TPtr](&k, expansion.ExpanderAll)
+	i.ExpandedRight = ExpandOne[T, TPtr](&k, expansion.ExpanderRight)
 	i.Tridex = tridex.Make(iter.SortedStrings[T](i.ExpandedRight)...)
 }
 

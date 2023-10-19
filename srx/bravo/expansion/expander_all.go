@@ -1,4 +1,4 @@
-package kennung
+package expansion
 
 import (
 	"regexp"

@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/srx/bravo/expansion"
 )
 
 type Refiner struct {
@@ -259,7 +260,7 @@ func (a Refiner) childPrefixes(node *assignment) (out []etikettBag) {
 	}
 
 	for _, c := range node.children {
-		expanded := kennung.Expanded(c.etiketten, kennung.ExpanderRight)
+		expanded := kennung.Expanded(c.etiketten, expansion.ExpanderRight)
 
 		expanded.Each(
 			func(e kennung.Etikett) (err error) {

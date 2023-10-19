@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/srx/bravo/expansion"
 )
 
 func (k compiled) ApplyToMetadatei(
@@ -16,7 +17,7 @@ func (k compiled) ApplyToMetadatei(
 	mp := ml.GetMetadateiPtr()
 	mp.Verzeichnisse.ExpandedEtiketten = kennung.ExpandMany[kennung.Etikett](
 		mp.GetEtiketten(),
-		kennung.ExpanderRight,
+		expansion.ExpanderRight,
 	)
 
 	ie := kennung.MakeEtikettMutableSet()

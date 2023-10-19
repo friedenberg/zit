@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/srx/bravo/expansion"
 )
 
 type SetPrefixNamed map[kennung.Etikett]schnittstellen.MutableSetLike[*sku.Transacted]
@@ -31,7 +32,7 @@ func makeMutableZettelLikeSet() schnittstellen.MutableSetLike[*sku.Transacted] {
 func (s *SetPrefixNamed) Add(z *sku.Transacted) {
 	es := kennung.Expanded(
 		z.GetMetadatei().GetEtiketten(),
-		kennung.ExpanderRight,
+		expansion.ExpanderRight,
 	)
 
 	for _, e := range es.Elements() {

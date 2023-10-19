@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/srx/bravo/expansion"
 )
 
 type QueryPrefixer interface {
@@ -413,7 +414,7 @@ func WithRemovedCommonPrefixes(s EtikettSet) (s2 EtikettSet) {
 
 func expandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 	k TPtr,
-	ex Expander,
+	ex expansion.Expander,
 	acc schnittstellen.Adder[T],
 ) {
 	f := iter.MakeFuncSetString[T, TPtr](acc)
@@ -422,12 +423,12 @@ func expandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 
 func ExpandOneSlice[T KennungLike[T], TPtr KennungLikePtr[T]](
 	k TPtr,
-	exes ...Expander,
+	exes ...expansion.Expander,
 ) (out []T) {
 	s1 := collections_value.MakeMutableValueSet[T](nil)
 
 	if len(exes) == 0 {
-		exes = []Expander{ExpanderAll}
+		exes = []expansion.Expander{expansion.ExpanderAll}
 	}
 
 	for _, ex := range exes {
@@ -446,12 +447,12 @@ func ExpandOneSlice[T KennungLike[T], TPtr KennungLikePtr[T]](
 
 func ExpandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 	k TPtr,
-	exes ...Expander,
+	exes ...expansion.Expander,
 ) (out schnittstellen.SetPtrLike[T, TPtr]) {
 	s1 := collections_ptr.MakeMutableValueSetValue[T, TPtr](nil)
 
 	if len(exes) == 0 {
-		exes = []Expander{ExpanderAll}
+		exes = []expansion.Expander{expansion.ExpanderAll}
 	}
 
 	for _, ex := range exes {
@@ -465,7 +466,7 @@ func ExpandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 
 func ExpandMany[T KennungLike[T], TPtr KennungLikePtr[T]](
 	ks schnittstellen.SetPtrLike[T, TPtr],
-	ex Expander,
+	ex expansion.Expander,
 ) (out schnittstellen.SetPtrLike[T, TPtr]) {
 	s1 := collections_ptr.MakeMutableValueSetValue[T, TPtr](nil)
 
@@ -482,12 +483,12 @@ func ExpandMany[T KennungLike[T], TPtr KennungLikePtr[T]](
 	return
 }
 
-func Expanded(s EtikettSet, ex Expander) (out EtikettSet) {
+func Expanded(s EtikettSet, ex expansion.Expander) (out EtikettSet) {
 	return ExpandMany[Etikett, *Etikett](s, ex)
 }
 
 func AddNormalized(es EtikettMutableSet, e *Etikett) {
-	ExpandOne(e, ExpanderRight).Each(es.Add)
+	ExpandOne(e, expansion.ExpanderRight).Each(es.Add)
 	es.AddPtr(e)
 
 	c := es.CloneSetPtrLike()

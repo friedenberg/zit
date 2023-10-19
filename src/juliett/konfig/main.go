@@ -23,12 +23,13 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
+	"github.com/friedenberg/zit/srx/bravo/expansion"
 )
 
-var typExpander kennung.Expander
+var typExpander expansion.Expander
 
 func init() {
-	typExpander = kennung.MakeExpanderRight(`-`)
+	typExpander = expansion.MakeExpanderRight(`-`)
 
 	gob.Register(
 		collections_value.MakeMutableValueSet[values.String](

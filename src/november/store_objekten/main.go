@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
 	"github.com/friedenberg/zit/src/mike/store_util"
+	"github.com/friedenberg/zit/srx/bravo/expansion"
 )
 
 type Store struct {
@@ -306,7 +307,7 @@ func (s *Store) addTyp(
 func (s *Store) addTypAndExpanded(
 	t kennung.Typ,
 ) (err error) {
-	typenExpanded := kennung.ExpandOneSlice(&t, kennung.ExpanderRight)
+	typenExpanded := kennung.ExpandOneSlice(&t, expansion.ExpanderRight)
 
 	for _, t := range typenExpanded {
 		if err = s.addTyp(t); err != nil {
@@ -338,7 +339,7 @@ func (s *Store) addEtikett(
 func (s *Store) addEtikettAndExpanded(
 	e kennung.Etikett,
 ) (err error) {
-	etikettenExpanded := kennung.ExpandOneSlice(&e, kennung.ExpanderRight)
+	etikettenExpanded := kennung.ExpandOneSlice(&e, expansion.ExpanderRight)
 
 	for _, e1 := range etikettenExpanded {
 		if err = s.addEtikett(e1); err != nil {

@@ -5,6 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/srx/bravo/expansion"
 )
 
 type SetPrefixVerzeichnisse struct {
@@ -30,7 +31,7 @@ func (s SetPrefixVerzeichnisse) Len() int {
 func (s *SetPrefixVerzeichnisse) Add(z *sku.Transacted) (err error) {
 	es := kennung.Expanded(
 		z.GetMetadatei().GetEtiketten(),
-		kennung.ExpanderRight,
+		expansion.ExpanderRight,
 	)
 
 	if es.Len() == 0 {
