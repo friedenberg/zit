@@ -233,7 +233,10 @@ func (c *ZettelFromExternalAkte) zettelForAkte(
 		},
 	}
 
-	z.Transacted.Kennung.KennungPtr = &kennung.Hinweis{}
+	if err = z.Transacted.Kennung.SetWithKennung(&kennung.Hinweis{}); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	z.GetMetadateiPtr().Reset()
 

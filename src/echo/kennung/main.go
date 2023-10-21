@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/srx/bravo/expansion"
 )
 
@@ -71,67 +70,17 @@ type Index struct {
 	Etiketten func(*Etikett) (*IndexedLike[Etikett, *Etikett], error)
 }
 
-func MakeWithGattung(
-	gg schnittstellen.GattungGetter,
-	v string,
-) (k KennungPtr, err error) {
-	switch gattung.Make(gg.GetGattung()) {
-	case gattung.Zettel:
-		var h Hinweis
-
-		if err = h.Set(v); err == nil {
-			k = &h
-			return
-		}
-
-	case gattung.Etikett:
-		var e Etikett
-
-		if err = e.Set(v); err == nil {
-			k = &e
-			return
-		}
-
-	case gattung.Typ:
-		var t Typ
-
-		if err = t.Set(v); err == nil {
-			k = &t
-			return
-		}
-
-	case gattung.Kasten:
-		var ka Kasten
-
-		if err = ka.Set(v); err == nil {
-			k = &ka
-			return
-		}
-
-	case gattung.Konfig:
-		var h Konfig
-
-		if err = h.Set(v); err == nil {
-			k = &h
-			return
-		}
-
-	case gattung.Bestandsaufnahme:
-		var h Tai
-
-		if err = h.Set(v); err == nil {
-			k = &h
-			return
-		}
-	}
-
-	err = errors.Errorf("%q is not a valid Kennung", v)
-
-	return
-}
-
 func Make(v string) (k KennungPtr, err error) {
 	{
+		var h Konfig
+
+		if err = h.Set(v); err == nil {
+			k = &h
+			return
+		}
+	}
+
+	{
 		var e Etikett
 
 		if err = e.Set(v); err == nil {
@@ -160,15 +109,6 @@ func Make(v string) (k KennungPtr, err error) {
 
 	{
 		var h Hinweis
-
-		if err = h.Set(v); err == nil {
-			k = &h
-			return
-		}
-	}
-
-	{
-		var h Konfig
 
 		if err = h.Set(v); err == nil {
 			k = &h

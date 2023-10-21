@@ -10,7 +10,7 @@ import (
 )
 
 type AbbrStorePresenceGeneric[V any] interface {
-	Exists(V) error
+	Exists([3]string) error
 }
 
 type AbbrStoreGeneric[V any] interface {
@@ -54,19 +54,19 @@ func (ih *indexHinweis) Add(h kennung.Hinweis) (err error) {
 	return
 }
 
-func (ih *indexHinweis) Exists(h kennung.Hinweis) (err error) {
+func (ih *indexHinweis) Exists(parts [3]string) (err error) {
 	if err = ih.readFunc(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if !ih.Kopfen.ContainsExpansion(h.Kopf()) {
-		err = objekte_store.ErrNotFound{Id: h}
+	if !ih.Kopfen.ContainsExpansion(parts[0]) {
+		err = objekte_store.ErrNotFound{}
 		return
 	}
 
-	if !ih.Schwanzen.ContainsExpansion(h.Schwanz()) {
-		err = objekte_store.ErrNotFound{Id: h}
+	if !ih.Schwanzen.ContainsExpansion(parts[2]) {
+		err = objekte_store.ErrNotFound{}
 		return
 	}
 
@@ -161,14 +161,14 @@ func (ih *indexNotHinweis[K, KPtr]) Add(k K) (err error) {
 	return
 }
 
-func (ih *indexNotHinweis[K, KPtr]) Exists(k K) (err error) {
+func (ih *indexNotHinweis[K, KPtr]) Exists(parts [3]string) (err error) {
 	if err = ih.readFunc(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if !ih.Kennungen.ContainsExpansion(k.String()) {
-		err = objekte_store.ErrNotFound{Id: k}
+	if !ih.Kennungen.ContainsExpansion(parts[2]) {
+		err = objekte_store.ErrNotFound{}
 		return
 	}
 

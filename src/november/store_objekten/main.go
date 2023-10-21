@@ -40,7 +40,6 @@ type Store struct {
 
 func Make(
 	su store_util.StoreUtil,
-	p schnittstellen.Pool[sku.Transacted, *sku.Transacted],
 ) (s *Store, err error) {
 	s = &Store{
 		lock:      &sync.Mutex{},
@@ -290,13 +289,20 @@ func (s *Store) createEtikettOrTyp(k *kennung.Kennung2) (err error) {
 func (s *Store) addTyp(
 	t kennung.Typ,
 ) (err error) {
-	if err = s.GetAbbrStore().Typen().Exists(t); err == nil {
+	if err = s.GetAbbrStore().Typen().Exists(t.Parts()); err == nil {
 		return
 	}
 
 	err = nil
 
-	if err = s.createEtikettOrTyp(&kennung.Kennung2{KennungPtr: &t}); err != nil {
+	var k kennung.Kennung2
+
+	if err = k.SetWithKennung(t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.createEtikettOrTyp(&k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -322,13 +328,20 @@ func (s *Store) addTypAndExpanded(
 func (s *Store) addEtikett(
 	e1 kennung.Etikett,
 ) (err error) {
-	if err = s.GetAbbrStore().Etiketten().Exists(e1); err == nil {
+	if err = s.GetAbbrStore().Etiketten().Exists(e1.Parts()); err == nil {
 		return
 	}
 
 	err = nil
 
-	if err = s.createEtikettOrTyp(&kennung.Kennung2{KennungPtr: &e1}); err != nil {
+	var k kennung.Kennung2
+
+	if err = k.SetWithKennung(e1); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.createEtikettOrTyp(&k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

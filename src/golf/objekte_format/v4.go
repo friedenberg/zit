@@ -251,7 +251,7 @@ func (f v4) ParsePersistentMetadatei(
 
 	var (
 		g gattung.Gattung
-		k kennung.Kennung
+		k kennung.Kennung2
 	)
 
 	dr := ohio.MakeDelimReader('\n', r1)
@@ -325,7 +325,7 @@ func (f v4) ParsePersistentMetadatei(
 			}
 
 		case "Kennung":
-			if k, err = kennung.MakeWithGattung(g, val); err != nil {
+			if err = k.SetWithGattung(val, g); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

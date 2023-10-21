@@ -468,8 +468,12 @@ func (s *zettelStore) writeObjekte(
 	}
 
 	tz = &sku.Transacted{
-		Kennung:   kennung.Kennung2{KennungPtr: &h},
 		Metadatei: m,
+	}
+
+	if err = tz.Kennung.SetWithKennung(h); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
@@ -487,7 +491,7 @@ func (s *zettelStore) Inherit(tz *sku.Transacted) (err error) {
 		return
 	}
 
-	errExists := s.StoreUtil.GetAbbrStore().Hinweis().Exists(h)
+	errExists := s.StoreUtil.GetAbbrStore().Hinweis().Exists(h.Parts())
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)
@@ -514,7 +518,7 @@ func (s *zettelStore) ReindexOne(
 		return
 	}
 
-	errExists := s.StoreUtil.GetAbbrStore().Hinweis().Exists(h)
+	errExists := s.StoreUtil.GetAbbrStore().Hinweis().Exists(h.Parts())
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)

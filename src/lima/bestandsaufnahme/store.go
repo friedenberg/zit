@@ -123,7 +123,11 @@ func (s *store) Create(o *Akte) (err error) {
 	t.SetAkteSha(sh)
 	tai := s.clock.GetTai()
 
-	t.Kennung.KennungPtr = &tai
+	if err = t.Kennung.SetWithKennung(tai); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	t.SetTai(tai)
 
 	var w sha.WriteCloser

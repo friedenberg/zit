@@ -155,7 +155,7 @@ func (s *Store) ReadOne(
 		}
 
 	default:
-		err = errors.Errorf("unsupported kennung %T -> %q", k1, k1)
+		err = errors.Errorf("unsupported gattung: %q -> %q", k1.GetGattung(), k1)
 		return
 	}
 

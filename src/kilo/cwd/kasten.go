@@ -30,7 +30,12 @@ func (c *CwdFiles) tryKasten(fi os.FileInfo, dir string) (err error) {
 
 	t, _ := c.Kisten.Get(h.String())
 
-	t.Kennung = kennung.Kennung2{KennungPtr: &h}
+	if err = t.Kennung.SetWithKennung(h); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	t.FDs.Objekte = f
+
 	return c.Kisten.Add(t)
 }

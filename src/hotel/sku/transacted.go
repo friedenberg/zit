@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/values"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
@@ -142,7 +143,7 @@ func (a *Transacted) SetKennungLike(kl kennung.Kennung) (err error) {
 func (a *Transacted) Reset() {
 	a.Kopf.Reset()
 	a.ObjekteSha.Reset()
-	a.Kennung.KennungPtr = nil
+	a.Kennung.SetGattung(gattung.Unknown)
 	a.Metadatei.Reset()
 	a.TransactionIndex.Reset()
 }

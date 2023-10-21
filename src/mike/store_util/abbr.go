@@ -207,20 +207,20 @@ func (i *indexAbbr) Exists(k *kennung.Kennung2) (err error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
-	switch kt := k.KennungPtr.(type) {
-	case *kennung.Hinweis:
-		err = i.Hinweis().Exists(*kt)
+	switch k.GetGattung() {
+	case gattung.Zettel:
+		err = i.Hinweis().Exists(k.Parts())
 
-	case *kennung.Typ:
-		err = i.Typen().Exists(*kt)
+	case gattung.Typ:
+		err = i.Typen().Exists(k.Parts())
 
-	case *kennung.Etikett:
-		err = i.Etiketten().Exists(*kt)
+	case gattung.Etikett:
+		err = i.Etiketten().Exists(k.Parts())
 
-	case *kennung.Kasten:
-		err = i.Kisten().Exists(*kt)
+	case gattung.Kasten:
+		err = i.Kisten().Exists(k.Parts())
 
-	case *kennung.Konfig:
+	case gattung.Konfig:
 		// konfig always exists
 		return
 

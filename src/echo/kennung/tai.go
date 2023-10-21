@@ -69,7 +69,7 @@ func (t Tai) Parts() [3]string {
 		a = "0"
 	}
 
-	return [3]string{strconv.FormatInt(t.tai.Sec, 10), a}
+	return [3]string{strconv.FormatInt(t.tai.Sec, 10), ".", a}
 }
 
 func (t Tai) String() string {

@@ -135,9 +135,14 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 
 	// var defaultTypTransacted *typ.Transacted
 
-	if _, err = u.StoreObjekten().ReadOne(
-		&kennung.Kennung2{KennungPtr: &defaultTypKennung},
-	); err != nil {
+	var k kennung.Kennung2
+
+	if err = k.SetWithKennung(defaultTypKennung); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, err = u.StoreObjekten().ReadOne(k); err != nil {
 		err = nil
 
 		var sh schnittstellen.ShaLike
@@ -149,9 +154,16 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 			return
 		}
 
+		var k kennung.Kennung2
+
+		if err = k.SetWithKennung(defaultTypKennung); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		if _, err = u.StoreObjekten().CreateOrUpdateAkte(
 			nil,
-			&kennung.Kennung2{KennungPtr: &defaultTypKennung},
+			k,
 			sh,
 		); err != nil {
 			err = errors.Wrap(err)

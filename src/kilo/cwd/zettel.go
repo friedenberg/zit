@@ -27,7 +27,11 @@ func (c *CwdFiles) tryZettel(d string, a string, p string) (err error) {
 	}
 
 	t, _ := c.Zettelen.Get(h.String())
-	t.Kennung = kennung.Kennung2{KennungPtr: &h}
+
+	if err = t.Kennung.SetWithKennung(h); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if path.Ext(a) == c.erworben.GetZettelFileExtension() {
 		if err = t.FDs.Objekte.SetPath(p); err != nil {

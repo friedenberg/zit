@@ -5,18 +5,15 @@ import (
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/age"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/charlie/pool"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/delta/thyme"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
-	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/juliett/konfig"
@@ -45,17 +42,14 @@ type Umwelt struct {
 	storeUtil         store_util.StoreUtil
 	storeObjekten     *store_objekten.Store
 	age               *age.Age
-
-	zettelVerzeichnissePool schnittstellen.Pool[sku.Transacted, *sku.Transacted]
 }
 
 func Make(kCli erworben.Cli, options Options) (u *Umwelt, err error) {
 	u = &Umwelt{
-		in:                      os.Stdin,
-		out:                     os.Stdout,
-		err:                     os.Stderr,
-		zettelVerzeichnissePool: pool.MakePoolWithReset[sku.Transacted, *sku.Transacted](),
-		erworbenCli:             kCli,
+		in:          os.Stdin,
+		out:         os.Stdout,
+		err:         os.Stderr,
+		erworbenCli: kCli,
 	}
 
 	u.konfig.Reset()
@@ -168,7 +162,6 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 
 	if u.storeObjekten, err = store_objekten.Make(
 		u.storeUtil,
-		u.zettelVerzeichnissePool,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize zettel meta store")
 		return

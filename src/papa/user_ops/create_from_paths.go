@@ -156,8 +156,11 @@ func (c CreateFromPaths) Run(
 			// TODO-P4 get matches
 			cz.DetermineState(true)
 
-			zv := &sku.Transacted{
-				Kennung: kennung.Kennung2{KennungPtr: &kennung.Hinweis{}},
+			zv := &sku.Transacted{}
+
+			if err = zv.Kennung.SetWithKennung(&kennung.Hinweis{}); err != nil {
+				err = errors.Wrap(err)
+				return
 			}
 
 			zv.ResetWith(cz.Internal)
@@ -222,7 +225,10 @@ func (c *CreateFromPaths) zettelsFromPath(
 		Objekte: fd,
 	}
 
-	ze.Kennung.KennungPtr = &kennung.Hinweis{}
+	if err = ze.Kennung.SetWithKennung(&kennung.Hinweis{}); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if _, err = c.TextParser.ParseMetadatei(r, ze); err != nil {
 		err = errors.Wrap(err)
