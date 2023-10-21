@@ -30,7 +30,7 @@ func (u *Umwelt) StringFormatWriterShaLike(
 
 func (u *Umwelt) StringFormatWriterKennung(
 	co string_format_writer.ColorOptions,
-) schnittstellen.StringFormatWriter[kennung.KennungPtr] {
+) schnittstellen.StringFormatWriter[kennung.Kennung2] {
 	return kennung_fmt.MakeKennungCliFormat(
 		u.konfig.PrintOptions,
 		co,

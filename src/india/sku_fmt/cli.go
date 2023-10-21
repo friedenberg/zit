@@ -20,7 +20,7 @@ type cli struct {
 	writeEtiketten   bool
 
 	shaStringFormatWriter         schnittstellen.StringFormatWriter[schnittstellen.ShaLike]
-	kennungStringFormatWriter     schnittstellen.StringFormatWriter[kennung.KennungPtr]
+	kennungStringFormatWriter     schnittstellen.StringFormatWriter[kennung.Kennung2]
 	typStringFormatWriter         schnittstellen.StringFormatWriter[*kennung.Typ]
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung]
 	etikettenStringFormatWriter   schnittstellen.StringFormatWriter[kennung.EtikettSet]
@@ -28,7 +28,7 @@ type cli struct {
 
 func MakeCliFormatShort(
 	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],
-	kennungStringFormatWriter schnittstellen.StringFormatWriter[kennung.KennungPtr],
+	kennungStringFormatWriter schnittstellen.StringFormatWriter[kennung.Kennung2],
 	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],
 	etikettenStringFormatWriter schnittstellen.StringFormatWriter[kennung.EtikettSet],
@@ -48,7 +48,7 @@ func MakeCliFormatShort(
 func MakeCliFormat(
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],
-	kennungStringFormatWriter schnittstellen.StringFormatWriter[kennung.KennungPtr],
+	kennungStringFormatWriter schnittstellen.StringFormatWriter[kennung.Kennung2],
 	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],
 	etikettenStringFormatWriter schnittstellen.StringFormatWriter[kennung.EtikettSet],
@@ -103,7 +103,7 @@ func (f *cli) WriteStringFormat(
 	var n2 int64
 	n2, err = f.kennungStringFormatWriter.WriteStringFormat(
 		sw,
-		o.GetKennungLikePtr(),
+		o.Kennung,
 	)
 	n += n2
 

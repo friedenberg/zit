@@ -107,7 +107,7 @@ func (a *assignment) addToCompareMap(
 
 	a.named.Each(
 		func(z obj) (err error) {
-			if z.Kennung == nil {
+			if z.Kennung.String() == "" {
 				panic(fmt.Sprintf("%s: Kennung is nil", z))
 			}
 

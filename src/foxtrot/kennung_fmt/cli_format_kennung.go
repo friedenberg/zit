@@ -34,10 +34,8 @@ func MakeKennungCliFormat(
 
 func (f *kennungCliFormat) WriteStringFormat(
 	w io.StringWriter,
-	k1 kennung.KennungPtr,
+	k kennung.Kennung2,
 ) (n int64, err error) {
-	k := kennung.Kennung(k1)
-
 	if f.options.Abbreviations.Hinweisen {
 		if k, err = f.abbr.AbbreviateHinweisOnly(k); err != nil {
 			err = errors.Wrap(err)

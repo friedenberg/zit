@@ -13,7 +13,7 @@ type Kennung2 struct {
 	parts [3]string
 }
 
-func MustKennung2(kp KennungPtr) (k Kennung2) {
+func MustKennung2(kp Kennung) (k Kennung2) {
 	err := k.SetWithKennung(kp)
 	errors.PanicIfError(err)
 	return
@@ -31,12 +31,12 @@ func (k2 Kennung2) String() string {
 	var sb strings.Builder
 
 	switch k2.g {
-	case gattung.Zettel, gattung.Bestandsaufnahme:
+	case gattung.Zettel, gattung.Bestandsaufnahme, gattung.Kasten:
 		sb.WriteString(k2.parts[0])
 		sb.WriteString(k2.parts[1])
 		sb.WriteString(k2.parts[2])
 
-	case gattung.Etikett, gattung.Typ, gattung.Kasten, gattung.Konfig:
+	case gattung.Etikett, gattung.Typ, gattung.Konfig:
 		sb.WriteString(k2.parts[2])
 
 	default:

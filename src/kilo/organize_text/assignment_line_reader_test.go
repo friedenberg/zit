@@ -19,14 +19,16 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func makeHinweis(t *testing.T, v string) (h kennung.Hinweis) {
+func makeHinweis(t *testing.T, v string) (k kennung.Kennung2) {
 	var err error
+
+	var h kennung.Hinweis
 
 	if err = h.Set(v); err != nil {
 		t.Fatalf("%s", err)
 	}
 
-	return
+	return kennung.MustKennung2(h)
 }
 
 func makeBez(t *testing.T, v string) (b bezeichnung.Bezeichnung) {

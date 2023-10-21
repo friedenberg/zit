@@ -21,7 +21,7 @@ func makeObj(
 ) (z obj, err error) {
 	errors.TodoP4("add bez in a better way")
 	z = obj{
-		Kennung:     named.GetKennungLike(),
+		Kennung:     named.Kennung,
 		Bezeichnung: bezeichnung.Make(named.GetMetadatei().Description()),
 	}
 
@@ -38,7 +38,7 @@ func makeObj(
 }
 
 type obj struct {
-	Kennung     kennung.Kennung
+	Kennung     kennung.Kennung2
 	Bezeichnung bezeichnung.Bezeichnung
 	IsNew       bool
 }
@@ -107,7 +107,7 @@ func (z *obj) setExistingObj(
 		return
 	}
 
-	if z.Kennung, err = kennung.Make(
+	if err = z.Kennung.Set(
 		strings.TrimSpace(remaining[:idx]),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -165,13 +165,13 @@ func sortObjSet(
 
 	sort.Slice(out, func(i, j int) bool {
 		switch {
-		case out[i].Kennung != nil && out[j].Kennung != nil:
+		case out[i].Kennung.String() != "" && out[j].Kennung.String() != "":
 			return out[i].Kennung.String() < out[j].Kennung.String()
 
-		case out[i].Kennung == nil:
+		case out[i].Kennung.String() == "":
 			return true
 
-		case out[j].Kennung == nil:
+		case out[j].Kennung.String() == "":
 			return false
 
 		default:

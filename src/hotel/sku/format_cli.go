@@ -24,7 +24,7 @@ type cli struct {
 
 	rightAlignedWriter            schnittstellen.StringFormatWriter[string]
 	shaStringFormatWriter         schnittstellen.StringFormatWriter[schnittstellen.ShaLike]
-	kennungStringFormatWriter     schnittstellen.StringFormatWriter[kennung.KennungPtr]
+	kennungStringFormatWriter     schnittstellen.StringFormatWriter[kennung.Kennung2]
 	fdStringFormatWriter          schnittstellen.StringFormatWriter[*fd.FD]
 	typStringFormatWriter         schnittstellen.StringFormatWriter[*kennung.Typ]
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung]
@@ -35,7 +35,7 @@ func MakeCliFormat(
 	options CliOptions,
 	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],
 	fdStringFormatWriter schnittstellen.StringFormatWriter[*fd.FD],
-	kennungStringFormatWriter schnittstellen.StringFormatWriter[kennung.KennungPtr],
+	kennungStringFormatWriter schnittstellen.StringFormatWriter[kennung.Kennung2],
 	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],
 	etikettenStringFormatWriter schnittstellen.StringFormatWriter[kennung.EtikettSet],
@@ -95,7 +95,7 @@ func (f *cli) WriteStringFormat(
 	if m == checkout_mode.ModeAkteOnly {
 		n2, err = f.kennungStringFormatWriter.WriteStringFormat(
 			sw,
-			o.GetKennungLikePtr(),
+			o.Kennung,
 		)
 		n += n2
 
