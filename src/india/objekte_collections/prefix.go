@@ -31,13 +31,23 @@ func makeMutableZettelLikeSet() schnittstellen.MutableSetLike[*sku.Transacted] {
 // this splits on right-expanded
 func (s *SetPrefixNamed) Add(z *sku.Transacted) {
 	es := kennung.Expanded(
-		z.GetMetadatei().GetEtiketten(),
+		z.Metadatei.Verzeichnisse.GetImplicitEtiketten(),
 		expansion.ExpanderRight,
+	).CloneMutableSetPtrLike()
+
+	var err error
+
+	err = z.Metadatei.Verzeichnisse.GetExpandedEtiketten().EachPtr(es.AddPtr)
+	errors.PanicIfError(err)
+
+	err = es.Each(
+		func(e kennung.Etikett) (err error) {
+			s.addPair(e, z)
+			return
+		},
 	)
 
-	for _, e := range es.Elements() {
-		s.addPair(e, z)
-	}
+	errors.PanicIfError(err)
 }
 
 func (s *SetPrefixNamed) addPair(
@@ -54,6 +64,22 @@ func (s *SetPrefixNamed) addPair(
 	(*s)[e] = existing
 }
 
+func allEtiketten(z *sku.Transacted) (es kennung.EtikettMutableSet, err error) {
+	es = kennung.MakeEtikettMutableSet()
+
+	if err = z.Metadatei.Verzeichnisse.GetImplicitEtiketten().EachPtr(es.AddPtr); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = z.Metadatei.GetEtiketten().EachPtr(es.AddPtr); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 // for all of the zettels, check for intersections with the passed in
 // etikett, and if there is a prefix match, group it out the output set segments
 // appropriately
@@ -64,8 +90,15 @@ func (a SetPrefixNamed) Subset(e kennung.Etikett) (out SetPrefixNamedSegments) {
 	for _, zSet := range a {
 		zSet.Each(
 			func(z *sku.Transacted) (err error) {
+				var es kennung.EtikettSet
+
+				if es, err = allEtiketten(z); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
 				intersection := kennung.IntersectPrefixes(
-					z.GetMetadatei().GetEtiketten(),
+					es,
 					kennung.MakeEtikettSet(e),
 				)
 
@@ -117,8 +150,15 @@ func (a SetPrefixVerzeichnisse) Subset(
 
 		zSet.Each(
 			func(z *sku.Transacted) (err error) {
+				var es kennung.EtikettSet
+
+				if es, err = allEtiketten(z); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
 				intersection := kennung.IntersectPrefixes(
-					z.GetMetadatei().Etiketten,
+					es,
 					kennung.MakeEtikettSet(e),
 				)
 
