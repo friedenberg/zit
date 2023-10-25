@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/charlie/checkout_options"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -127,7 +128,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 			if zsc, err = u.StoreObjekten().Checkout(
 				options,
-				u.StoreObjekten().Zettel().ReadAllSchwanzen,
+				u.StoreObjekten().MakeReadAllSchwanzen(gattung.Zettel),
 				func(sk *sku.Transacted) (err error) {
 					if zts.ContainsKey(sk.GetKennungLike().String()) {
 						err = collections.MakeErrStopIteration()

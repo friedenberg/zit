@@ -135,18 +135,6 @@ func (s zettelStore) ReadOne(
 	return
 }
 
-func (i *zettelStore) ReadAllSchwanzen(
-	w schnittstellen.FuncIter[*sku.Transacted],
-) (err error) {
-	return i.verzeichnisseSchwanzen.ReadMany(w)
-}
-
-func (i *zettelStore) ReadAll(
-	w schnittstellen.FuncIter[*sku.Transacted],
-) (err error) {
-	return i.verzeichnisseAll.ReadMany(w)
-}
-
 func (s *zettelStore) Create(
 	mg metadatei.Getter,
 ) (tz *sku.Transacted, err error) {
@@ -217,7 +205,7 @@ func (s *zettelStore) UpdateManyMetadatei(
 		return
 	}
 
-	if err = s.ReadAllSchwanzen(
+	if err = s.verzeichnisseSchwanzen.ReadMany(
 		func(zt *sku.Transacted) (err error) {
 			ke := zt.GetKennungLike()
 

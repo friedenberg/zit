@@ -217,7 +217,7 @@ func (c Add) openAktenIfNecessary(
 
 	if checkoutResults, err = u.StoreObjekten().Checkout(
 		options,
-		u.StoreObjekten().Zettel().ReadAllSchwanzen,
+		u.StoreObjekten().MakeReadAllSchwanzen(gattung.Zettel),
 		func(z *sku.Transacted) (err error) {
 			if !hs.ContainsKey(z.GetKennungLike().String()) {
 				return iter.MakeErrStopIteration()

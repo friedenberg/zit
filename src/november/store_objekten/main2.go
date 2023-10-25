@@ -175,6 +175,14 @@ func (s *Store) ReadOne(
 	return
 }
 
+func (s *Store) MakeReadAllSchwanzen(
+	gs ...gattung.Gattung,
+) func(schnittstellen.FuncIter[*sku.Transacted]) error {
+	return func(f schnittstellen.FuncIter[*sku.Transacted]) (err error) {
+		return s.ReadAllSchwanzen(gattungen.MakeSet(gs...), f)
+	}
+}
+
 func (s *Store) ReadAllSchwanzen(
 	gs gattungen.Set,
 	f schnittstellen.FuncIter[*sku.Transacted],

@@ -3,7 +3,6 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -97,48 +96,6 @@ func (s konfigStore) Update(
 	}
 
 	if err = s.LogWriter.Updated(kt); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (i *konfigStore) ReadAllSchwanzen(
-	w schnittstellen.FuncIter[*sku.Transacted],
-) (err error) {
-	var k *sku.Transacted
-
-	if k, err = i.ReadOne(&kennung.Konfig{}); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = w(k); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *konfigStore) ReadAll(
-	w schnittstellen.FuncIter[*sku.Transacted],
-) (err error) {
-	eachSku := func(sk *sku.Transacted) (err error) {
-		if sk.GetGattung() != gattung.Konfig {
-			return
-		}
-
-		if err = w(sk); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-
-	if err = s.StoreUtil.GetBestandsaufnahmeStore().ReadAllSkus(eachSku); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

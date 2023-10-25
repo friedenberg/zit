@@ -7,7 +7,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/script_value"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
@@ -70,7 +72,8 @@ func (c CreateFromPaths) Run(
 	if c.Dedupe {
 		matcher := objekte_collections.MakeMutableMatchSet(toCreate)
 
-		if err = c.StoreObjekten().Zettel().ReadAll(
+		if err = c.StoreObjekten().ReadAll(
+			gattungen.MakeSet(gattung.Zettel),
 			iter.MakeChain(
 				matcher.Match,
 				func(sk *sku.Transacted) (err error) {

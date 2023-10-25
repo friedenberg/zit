@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
@@ -58,7 +59,8 @@ func (s Store) ReadAllMatchingAkten(
 	observed := collections_value.MakeMutableValueSet[fd.FD](nil)
 	var l sync.Mutex
 
-	if err = s.Zettel().ReadAll(
+	if err = s.ReadAll(
+		gattungen.MakeSet(gattung.TrueGattung()...),
 		func(z *sku.Transacted) (err error) {
 			fd, ok := fds.Get(z.GetAkteSha().String())
 

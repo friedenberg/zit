@@ -47,7 +47,10 @@ func (c commandWithQuery) Complete(
 
 			w := zw.WriteZettelVerzeichnisse
 
-			if err = u.StoreObjekten().Zettel().ReadAllSchwanzen(w); err != nil {
+			if err = u.StoreObjekten().ReadAllSchwanzen(
+				gattungen.MakeSet(gattung.Zettel),
+				w,
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
