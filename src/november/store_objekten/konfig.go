@@ -24,23 +24,6 @@ func (s *konfigStore) GetAkteFormat() objekte.AkteFormat[erworben.Akte, *erworbe
 	return s.akteFormat
 }
 
-func makeKonfigStore(
-	sa store_util.StoreUtil,
-) (s *konfigStore, err error) {
-	s = &konfigStore{
-		akteFormat: objekte_store.MakeAkteFormat[erworben.Akte, *erworben.Akte](
-			objekte.MakeTextParserIgnoreTomlErrors[erworben.Akte](
-				sa.GetStandort(),
-			),
-			objekte.ParsedAkteTomlFormatter[erworben.Akte, *erworben.Akte]{},
-			sa.GetStandort(),
-		),
-		StoreUtil: sa,
-	}
-
-	return
-}
-
 func (s konfigStore) Update(
 	sh schnittstellen.ShaLike,
 ) (kt *erworben.Transacted, err error) {

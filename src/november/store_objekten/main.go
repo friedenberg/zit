@@ -10,7 +10,9 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/india/matcher"
+	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
 	"github.com/friedenberg/zit/src/mike/store_util"
 	"github.com/friedenberg/zit/srx/bravo/expansion"
@@ -20,10 +22,10 @@ type Store struct {
 	store_util.StoreUtil
 
 	zettelStore  *zettelStore
-	typStore     *typStore
-	etikettStore *etikettStore
-	konfigStore  *konfigStore
-	kastenStore  *kastenStore
+	typStore     typStore
+	etikettStore etikettStore
+	konfigStore  konfigStore
+	kastenStore  kastenStore
 
 	objekte_store.LogWriter
 
@@ -47,30 +49,25 @@ func Make(
 
 	su.SetMatchableAdder(s)
 
-	if s.typStore, err = makeTypStore(s.StoreUtil); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if s.zettelStore, err = makeZettelStore(s.StoreUtil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if s.etikettStore, err = makeEtikettStore(s.StoreUtil); err != nil {
-		err = errors.Wrap(err)
-		return
+	s.konfigStore = konfigStore{
+		akteFormat: objekte_store.MakeAkteFormat[erworben.Akte, *erworben.Akte](
+			objekte.MakeTextParserIgnoreTomlErrors[erworben.Akte](
+				s.GetStandort(),
+			),
+			objekte.ParsedAkteTomlFormatter[erworben.Akte, *erworben.Akte]{},
+			s.GetStandort(),
+		),
+		StoreUtil: s.StoreUtil,
 	}
 
-	if s.konfigStore, err = makeKonfigStore(s.StoreUtil); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if s.kastenStore, err = makeKastenStore(s.StoreUtil); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	s.typStore.StoreUtil = s.StoreUtil
+	s.etikettStore.StoreUtil = s.StoreUtil
+	s.kastenStore.StoreUtil = s.StoreUtil
 
 	errors.TodoP1("implement for other gattung")
 	s.queriers = map[schnittstellen.GattungLike]objekte_store.TransactedReader{
@@ -78,7 +75,7 @@ func Make(
 		gattung.Typ:     s.typStore,
 		gattung.Etikett: s.etikettStore,
 		gattung.Kasten:  s.kastenStore,
-		gattung.Konfig:  s.konfigStore,
+		gattung.Konfig:  &s.konfigStore,
 	}
 
 	s.readers = map[schnittstellen.GattungLike]matcher.FuncReaderTransactedLikePtr{
@@ -129,19 +126,19 @@ func (s *Store) Zettel() *zettelStore {
 }
 
 func (s *Store) Typ() *typStore {
-	return s.typStore
+	return &s.typStore
 }
 
 func (s *Store) Etikett() *etikettStore {
-	return s.etikettStore
+	return &s.etikettStore
 }
 
 func (s *Store) Konfig() *konfigStore {
-	return s.konfigStore
+	return &s.konfigStore
 }
 
 func (s *Store) Kasten() *kastenStore {
-	return s.kastenStore
+	return &s.kastenStore
 }
 
 func (s Store) Flush() (err error) {

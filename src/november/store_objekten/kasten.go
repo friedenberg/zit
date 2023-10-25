@@ -14,16 +14,6 @@ type kastenStore struct {
 	store_util.StoreUtil
 }
 
-func makeKastenStore(
-	sa store_util.StoreUtil,
-) (s *kastenStore, err error) {
-	s = &kastenStore{
-		StoreUtil: sa,
-	}
-
-	return
-}
-
 // TODO-P3
 func (s kastenStore) ReadAllSchwanzen(
 	f schnittstellen.FuncIter[*sku.Transacted],

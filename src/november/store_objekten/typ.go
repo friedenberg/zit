@@ -15,16 +15,6 @@ type typStore struct {
 	store_util.StoreUtil
 }
 
-func makeTypStore(
-	sa store_util.StoreUtil,
-) (s *typStore, err error) {
-	s = &typStore{}
-
-	s.StoreUtil = sa
-
-	return
-}
-
 // TODO-P3
 func (s typStore) ReadAllSchwanzen(
 	f schnittstellen.FuncIter[*sku.Transacted],

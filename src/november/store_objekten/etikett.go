@@ -14,16 +14,6 @@ type etikettStore struct {
 	store_util.StoreUtil
 }
 
-func makeEtikettStore(
-	sa store_util.StoreUtil,
-) (s *etikettStore, err error) {
-	s = &etikettStore{
-		StoreUtil: sa,
-	}
-
-	return
-}
-
 func (s etikettStore) ReadOne(
 	k schnittstellen.StringerGattungGetter,
 ) (tt *sku.Transacted, err error) {
