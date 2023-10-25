@@ -3,6 +3,7 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/iter2"
 	"github.com/friedenberg/zit/src/delta/gattungen"
@@ -181,13 +182,46 @@ func (s *Store) ReadAllSchwanzen(
 	if err = iter2.Parallel(
 		gs,
 		func(g gattung.Gattung) (err error) {
-			r, ok := s.readers[g]
+			switch g {
+			case gattung.Typ:
+				if err = s.StoreUtil.GetKonfig().Typen.EachPtr(f); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 
-			if !ok {
-				return
+			case gattung.Etikett:
+				if err = s.StoreUtil.GetKonfig().EachEtikett(f); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+			case gattung.Kasten:
+				if err = s.GetKonfig().Kisten.EachPtr(f); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+			case gattung.Konfig:
+				var k *sku.Transacted
+
+				if k, err = s.konfigStore.ReadOne(&kennung.Konfig{}); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if err = f(k); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+			case gattung.Zettel:
+				return s.zettelStore.verzeichnisseSchwanzen.ReadMany(f)
+
+			default:
+				err = todo.Implement()
 			}
 
-			return r(f)
+			return
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -201,21 +235,5 @@ func (s *Store) ReadAll(
 	gs gattungen.Set,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	if err = iter2.Parallel(
-		gs,
-		func(g gattung.Gattung) (err error) {
-			r, ok := s.transactedReaders[g]
-
-			if !ok {
-				return
-			}
-
-			return r(f)
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
+	return s.ReadAllGattungen(gs, f)
 }

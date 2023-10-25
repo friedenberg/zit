@@ -31,6 +31,7 @@ type Query interface {
 	Set(string) error
 	SetMany(...string) error
 	All(f func(gattung.Gattung, MatcherSigil) error) error
+	GetGattungen() gattungen.Set
 	Matcher
 }
 
@@ -563,6 +564,16 @@ func (s query) ContainsMatchable(m *sku.Transacted) bool {
 	}
 
 	return matcher.ContainsMatchable(m)
+}
+
+func (ms query) GetGattungen() gattungen.Set {
+	gs := make([]gattung.Gattung, 0, len(ms.Gattung))
+
+	for g, _ := range ms.Gattung {
+		gs = append(gs, g)
+	}
+
+	return gattungen.MakeSet(gs...)
 }
 
 // Runs in parallel

@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -30,10 +31,7 @@ type Store struct {
 	objekte_store.LogWriter
 
 	// Gattungen
-	flushers          map[schnittstellen.GattungLike]errors.Flusher
-	readers           map[schnittstellen.GattungLike]matcher.FuncReaderTransactedLikePtr
-	queriers          map[schnittstellen.GattungLike]objekte_store.TransactedReader
-	transactedReaders map[schnittstellen.GattungLike]matcher.FuncReaderTransactedLikePtr
+	flushers map[schnittstellen.GattungLike]errors.Flusher
 
 	isReindexing bool
 	lock         sync.Locker
@@ -70,37 +68,6 @@ func Make(
 	s.kastenStore.StoreUtil = s.StoreUtil
 
 	errors.TodoP1("implement for other gattung")
-	s.queriers = map[schnittstellen.GattungLike]objekte_store.TransactedReader{
-		gattung.Zettel:  s.zettelStore,
-		gattung.Typ:     s.typStore,
-		gattung.Etikett: s.etikettStore,
-		gattung.Kasten:  s.kastenStore,
-		gattung.Konfig:  &s.konfigStore,
-	}
-
-	s.readers = map[schnittstellen.GattungLike]matcher.FuncReaderTransactedLikePtr{
-		gattung.Zettel:  s.zettelStore.ReadAllSchwanzen,
-		gattung.Typ:     s.typStore.ReadAllSchwanzen,
-		gattung.Etikett: s.etikettStore.ReadAllSchwanzen,
-		gattung.Kasten:  s.kastenStore.ReadAllSchwanzen,
-		gattung.Konfig:  s.konfigStore.ReadAllSchwanzen,
-		// gattung.Bestandsaufnahme:
-		// objekte.MakeApplyTransactedLikePtr[*bestandsaufnahme.Objekte](
-		// 	s.bestandsaufnahmeStore.ReadAll,
-		// ),
-	}
-
-	s.transactedReaders = map[schnittstellen.GattungLike]matcher.FuncReaderTransactedLikePtr{
-		gattung.Zettel:  s.zettelStore.ReadAll,
-		gattung.Typ:     s.typStore.ReadAll,
-		gattung.Etikett: s.etikettStore.ReadAll,
-		gattung.Kasten:  s.kastenStore.ReadAll,
-		gattung.Konfig:  s.konfigStore.ReadAll,
-		// gattung.Bestandsaufnahme:
-		// objekte.MakeApplyTransactedLikePtr[*bestandsaufnahme.Objekte](
-		// 	s.bestandsaufnahmeStore.ReadAll,
-		// ),
-	}
 
 	s.flushers = map[schnittstellen.GattungLike]errors.Flusher{
 		gattung.Zettel:  s.zettelStore,
@@ -208,27 +175,59 @@ func (s *Store) Query(
 	ms matcher.Query,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	if err = ms.All(
-		func(g gattung.Gattung, matcher matcher.MatcherSigil) (err error) {
-			r, ok := s.queriers[g]
+	gsWithHistory := gattungen.MakeMutableSet()
+	gsWithoutHistory := gattungen.MakeMutableSet()
+
+	if err = ms.GetGattungen().Each(
+		func(g gattung.Gattung) (err error) {
+			m, ok := ms.Get(g)
 
 			if !ok {
 				return
 			}
 
-			if err = objekte_store.QueryMethodForMatcher(r, matcher, f); err != nil {
-				err = errors.Wrap(err)
-				return
+			if m.GetSigil().IncludesHistory() {
+				return gsWithHistory.Add(g)
+			} else {
+				return gsWithoutHistory.Add(g)
 			}
-
-			return
 		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	return
+	wg := iter.MakeErrorWaitGroup()
+
+	f1 := func(z *sku.Transacted) (err error) {
+		g := gattung.Must(z.GetGattung())
+		m, ok := ms.Get(g)
+
+		if !ok {
+			err = errors.Errorf("expected query to have gattung %q", g)
+			return
+		}
+
+		if !m.ContainsMatchable(z) {
+			return
+		}
+
+		return f(z)
+	}
+
+	wg.Do(
+		func() error {
+			return s.ReadAllSchwanzen(gsWithoutHistory, f1)
+		},
+	)
+
+	wg.Do(
+		func() error {
+			return s.ReadAll(gsWithHistory, f1)
+		},
+	)
+
+	return wg.GetError()
 }
 
 func (s *Store) createEtikettOrTyp(k *kennung.Kennung2) (err error) {

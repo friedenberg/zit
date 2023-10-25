@@ -5,6 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/checkout_options"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/delta/thyme"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -38,6 +39,16 @@ type StoreUtil interface {
 	GetTypenIndex() (kennung_index.KennungIndex[kennung.Typ, *kennung.Typ], error)
 	GetAkten() *akten.Akten
 	GetFileEncoder() objekte_collections.FileEncoder
+
+	ReadAllGattung(
+		g gattung.Gattung,
+		f schnittstellen.FuncIter[*sku.Transacted],
+	) (err error)
+
+	ReadAllGattungen(
+		g gattungen.Set,
+		f schnittstellen.FuncIter[*sku.Transacted],
+	) (err error)
 
 	SetMatchableAdder(matcher.MatchableAdder)
 	matcher.MatchableAdder

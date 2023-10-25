@@ -1,0 +1,59 @@
+package store_util
+
+import (
+	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/gattungen"
+	"github.com/friedenberg/zit/src/hotel/sku"
+)
+
+func (s *common) ReadAllGattung(
+	g gattung.Gattung,
+	f schnittstellen.FuncIter[*sku.Transacted],
+) (err error) {
+	eachSku := func(sk *sku.Transacted) (err error) {
+		if sk.GetGattung() != g {
+			return
+		}
+
+		if err = f(sk); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+
+	if err = s.GetBestandsaufnahmeStore().ReadAllSkus(eachSku); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *common) ReadAllGattungen(
+	g gattungen.Set,
+	f schnittstellen.FuncIter[*sku.Transacted],
+) (err error) {
+	eachSku := func(sk *sku.Transacted) (err error) {
+		if !g.ContainsKey(sk.GetGattung().GetGattungString()) {
+			return
+		}
+
+		if err = f(sk); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+
+	if err = s.GetBestandsaufnahmeStore().ReadAllSkus(eachSku); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
