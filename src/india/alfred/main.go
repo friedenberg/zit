@@ -5,22 +5,26 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/alfred"
+	"github.com/friedenberg/zit/src/bravo/todo"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 type Writer struct {
-	alfredWriter *alfred.Writer
-	kennungIndex kennung_index.Index
-	typenIndex   kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
-	Abbr         func(kennung.Hinweis) (string, error)
+	alfredWriter   *alfred.Writer
+	kennungIndex   kennung_index.Index
+	typenIndex     kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
+	etikettenIndex kennung_index.EtikettIndex
+	Abbr           func(kennung.Hinweis) (string, error)
 }
 
 func New(
 	out io.Writer,
 	kennungIndex kennung_index.Index,
 	typenIndex kennung_index.KennungIndex[kennung.Typ, *kennung.Typ],
+	etikettenIndex kennung_index.EtikettIndex,
 	ha func(kennung.Hinweis) (string, error),
 ) (w *Writer, err error) {
 	var aw *alfred.Writer
@@ -39,27 +43,40 @@ func New(
 	}
 
 	w = &Writer{
-		Abbr:         ha,
-		kennungIndex: kennungIndex,
-		typenIndex:   typenIndex,
-		alfredWriter: aw,
+		Abbr:           ha,
+		kennungIndex:   kennungIndex,
+		typenIndex:     typenIndex,
+		etikettenIndex: etikettenIndex,
+		alfredWriter:   aw,
 	}
 
 	return
 }
 
-func (w *Writer) WriteZettelVerzeichnisse(z *sku.Transacted) (err error) {
-	item := w.zettelToItem(z, w.Abbr)
+func (w *Writer) PrintOne(z *sku.Transacted) (err error) {
+	var item *alfred.Item
+	g := z.GetGattung()
+
+	switch g {
+	case gattung.Zettel:
+		item = w.zettelToItem(z, w.Abbr)
+
+	case gattung.Etikett:
+		var e kennung.Etikett
+
+		if err = e.Set(z.Kennung.String()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		item = w.etikettToItem(&e)
+
+	default:
+		err = todo.Implement()
+	}
+
 	w.alfredWriter.WriteItem(item)
 
-	return
-}
-
-func (w *Writer) WriteEtikett(
-	e kennung.IndexedLike[kennung.Etikett, *kennung.Etikett],
-) (n int64, err error) {
-	item := w.etikettToItem(e)
-	w.alfredWriter.WriteItem(item)
 	return
 }
 

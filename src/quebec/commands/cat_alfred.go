@@ -5,7 +5,6 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -67,6 +66,7 @@ func (c CatAlfred) RunWithQuery(
 		wo,
 		u.StoreObjekten().GetKennungIndex(),
 		ti,
+		u.StoreObjekten().GetKennungIndex(),
 		u.StoreObjekten().GetAbbrStore().Hinweis().Abbreviate,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -75,57 +75,9 @@ func (c CatAlfred) RunWithQuery(
 
 	defer errors.DeferredCloser(&err, aw)
 
-	if err = ms.All(
-		func(g gattung.Gattung, m matcher.MatcherSigil) (err error) {
-			switch g {
-			case gattung.Etikett:
-				c.catEtiketten(u, m, aw)
-
-			case gattung.Zettel:
-				c.catZettelen(u, m, aw)
-
-			case gattung.Typ:
-				todo.Implement()
-			}
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (c CatAlfred) catEtiketten(
-	u *umwelt.Umwelt,
-	m matcher.Matcher,
-	aw *alfred.Writer,
-) {
-	var err error
-
-	if err = u.StoreObjekten().GetKennungIndex().EachSchwanzen(
-		func(e kennung.IndexedLike[kennung.Etikett, *kennung.Etikett]) (err error) {
-			_, err = aw.WriteEtikett(e)
-			return
-		},
-	); err != nil {
-		aw.WriteError(err)
-		return
-	}
-}
-
-func (c CatAlfred) catZettelen(
-	u *umwelt.Umwelt,
-	m matcher.MatcherSigil,
-	aw *alfred.Writer,
-) {
-	var err error
-
-	if err = u.StoreObjekten().Zettel().Query(
-		m,
-		aw.WriteZettelVerzeichnisse,
+	if err = u.StoreObjekten().ReadAllSchwanzen(
+		gattungen.MakeSet(gattung.TrueGattung()...),
+		aw.PrintOne,
 	); err != nil {
 		aw.WriteError(err)
 		return

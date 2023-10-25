@@ -62,16 +62,10 @@ func (c ExecAction) RunWithQuery(
 		return
 	}
 
-	zids, ok := ms.Get(gattung.Zettel)
-
-	if !ok {
-		return
-	}
-
 	hinweisen := collections_value.MakeMutableValueSet[kennung.Kennung](nil)
 
-	if err = u.StoreObjekten().Zettel().Query(
-		zids,
+	if err = u.StoreObjekten().Query(
+		ms,
 		func(z *sku.Transacted) (err error) {
 			return hinweisen.Add(z.GetKennungLike())
 		},

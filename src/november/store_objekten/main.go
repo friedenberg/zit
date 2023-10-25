@@ -31,7 +31,7 @@ type Store struct {
 	gattungStores     map[schnittstellen.GattungLike]store_util.GattungStoreLike
 	flushers          map[schnittstellen.GattungLike]errors.Flusher
 	readers           map[schnittstellen.GattungLike]matcher.FuncReaderTransactedLikePtr
-	queriers          map[schnittstellen.GattungLike]matcher.FuncSigilTransactedLikePtr
+	queriers          map[schnittstellen.GattungLike]objekte_store.TransactedReader
 	transactedReaders map[schnittstellen.GattungLike]matcher.FuncReaderTransactedLikePtr
 
 	isReindexing bool
@@ -82,16 +82,12 @@ func Make(
 	}
 
 	errors.TodoP1("implement for other gattung")
-	s.queriers = map[schnittstellen.GattungLike]matcher.FuncSigilTransactedLikePtr{
-		gattung.Zettel:  s.zettelStore.Query,
-		gattung.Typ:     s.typStore.Query,
-		gattung.Etikett: s.etikettStore.Query,
-		gattung.Kasten:  s.kastenStore.Query,
-		gattung.Konfig:  s.konfigStore.Query,
-		// gattung.Bestandsaufnahme:
-		// objekte.MakeApplyTransactedLikePtr[*bestandsaufnahme.Objekte](
-		// 	s.bestandsaufnahmeStore.ReadAll,
-		// ),
+	s.queriers = map[schnittstellen.GattungLike]objekte_store.TransactedReader{
+		gattung.Zettel:  s.zettelStore,
+		gattung.Typ:     s.typStore,
+		gattung.Etikett: s.etikettStore,
+		gattung.Kasten:  s.kastenStore,
+		gattung.Konfig:  s.konfigStore,
 	}
 
 	s.readers = map[schnittstellen.GattungLike]matcher.FuncReaderTransactedLikePtr{
@@ -232,7 +228,7 @@ func (s *Store) Query(
 				return
 			}
 
-			if err = r(matcher, f); err != nil {
+			if err = objekte_store.QueryMethodForMatcher(r, matcher, f); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

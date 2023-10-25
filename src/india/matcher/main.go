@@ -114,7 +114,7 @@ func KennungContainsExactlyMatchable(
 	case kennung.EtikettLike:
 		es := m.GetMetadatei().GetEtiketten()
 
-		if es.ContainsKey(kt.GetEtikett().String()) {
+		if es.ContainsKey(kt.String()) {
 			return true
 		}
 

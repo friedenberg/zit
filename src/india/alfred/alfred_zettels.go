@@ -97,11 +97,13 @@ func (w *Writer) zettelToItem(
 }
 
 func (w *Writer) etikettToItem(
-	ei kennung.IndexedLike[kennung.Etikett, *kennung.Etikett],
+	e *kennung.Etikett,
 ) (a *alfred.Item) {
+	ei, err := w.etikettenIndex.GetEtikett(e)
+	errors.PanicIfError(err)
+
 	a = w.alfredWriter.Get()
 
-	e := ei.GetKennung()
 	a.Title = "@" + e.String()
 	a.Subtitle = fmt.Sprintf("%d", ei.GetSchwanzenCount())
 
@@ -110,7 +112,7 @@ func (w *Writer) etikettToItem(
 	mb := alfred.NewMatchBuilder()
 
 	mb.AddMatches(a.Title)
-	mb.AddMatches(iter.Strings[kennung.Etikett](kennung.ExpandOne(&e))...)
+	mb.AddMatches(iter.Strings[kennung.Etikett](kennung.ExpandOne(e))...)
 
 	a.Match = mb.String()
 

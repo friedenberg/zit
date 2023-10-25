@@ -14,18 +14,12 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
-type KeyerFDSha struct{}
-
-func (k KeyerFDSha) GetKey(fd fd.FD) string {
-	return fd.GetShaLike().String()
-}
-
 func (s Store) ReadAllMatchingAkten(
 	akten schnittstellen.SetLike[fd.FD],
 	f func(fd.FD, *sku.Transacted) error,
 ) (err error) {
 	fds := collections_value.MakeMutableValueSet[fd.FD](
-		KeyerFDSha{},
+		fd.KeyerSha{},
 	)
 
 	var pa string

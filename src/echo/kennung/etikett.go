@@ -17,6 +17,7 @@ func init() {
 type EtikettLike interface {
 	GetEtikett() Etikett
 	GetEtikettPtr() *Etikett
+	schnittstellen.StringerGattungGetter
 }
 
 const EtikettRegexString = `^[-a-z0-9_]+$`

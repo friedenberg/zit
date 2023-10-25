@@ -8,7 +8,7 @@ import (
 )
 
 func QueryMethodForMatcher(
-	reader Querier,
+	reader TransactedReader,
 	m matcher.MatcherSigil,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
