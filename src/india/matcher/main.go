@@ -146,7 +146,7 @@ func KennungContainsMatchable(
 
 	switch kt := k.(type) {
 	case kennung.EtikettLike:
-		s := kt.GetEtikett().String()
+		s := kt.String()
 
 		if me.GetEtiketten().ContainsKey(s) {
 			return true

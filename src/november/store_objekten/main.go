@@ -28,7 +28,6 @@ type Store struct {
 	objekte_store.LogWriter
 
 	// Gattungen
-	gattungStores     map[schnittstellen.GattungLike]store_util.GattungStoreLike
 	flushers          map[schnittstellen.GattungLike]errors.Flusher
 	readers           map[schnittstellen.GattungLike]matcher.FuncReaderTransactedLikePtr
 	queriers          map[schnittstellen.GattungLike]objekte_store.TransactedReader
@@ -73,14 +72,6 @@ func Make(
 		return
 	}
 
-	s.gattungStores = map[schnittstellen.GattungLike]store_util.GattungStoreLike{
-		gattung.Zettel:  s.zettelStore,
-		gattung.Typ:     s.typStore,
-		gattung.Etikett: s.etikettStore,
-		gattung.Konfig:  s.konfigStore,
-		gattung.Kasten:  s.kastenStore,
-	}
-
 	errors.TodoP1("implement for other gattung")
 	s.queriers = map[schnittstellen.GattungLike]objekte_store.TransactedReader{
 		gattung.Zettel:  s.zettelStore,
@@ -114,12 +105,12 @@ func Make(
 		// ),
 	}
 
-	s.flushers = make(map[schnittstellen.GattungLike]errors.Flusher)
-
-	for g, gs := range s.gattungStores {
-		if fl, ok := gs.(errors.Flusher); ok {
-			s.flushers[g] = fl
-		}
+	s.flushers = map[schnittstellen.GattungLike]errors.Flusher{
+		gattung.Zettel:  s.zettelStore,
+		gattung.Typ:     s.typStore,
+		gattung.Etikett: s.etikettStore,
+		gattung.Kasten:  s.kastenStore,
+		gattung.Konfig:  s.konfigStore,
 	}
 
 	return

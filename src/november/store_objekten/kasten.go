@@ -11,23 +11,14 @@ import (
 )
 
 type kastenStore struct {
-	*store_util.CommonStoreBase
+	store_util.StoreUtil
 }
 
 func makeKastenStore(
 	sa store_util.StoreUtil,
 ) (s *kastenStore, err error) {
-	s = &kastenStore{}
-
-	s.CommonStoreBase, err = store_util.MakeCommonStoreBase(
-		gattung.Kasten,
-		sa,
-		s,
-	)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
+	s = &kastenStore{
+		StoreUtil: sa,
 	}
 
 	return
@@ -37,7 +28,7 @@ func makeKastenStore(
 func (s kastenStore) ReadAllSchwanzen(
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	if err = s.StoreUtil.GetKonfig().Kisten.EachPtr(f); err != nil {
+	if err = s.GetKonfig().Kisten.EachPtr(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

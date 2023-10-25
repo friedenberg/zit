@@ -11,23 +11,14 @@ import (
 )
 
 type etikettStore struct {
-	*store_util.CommonStoreBase
+	store_util.StoreUtil
 }
 
 func makeEtikettStore(
 	sa store_util.StoreUtil,
 ) (s *etikettStore, err error) {
-	s = &etikettStore{}
-
-	s.CommonStoreBase, err = store_util.MakeCommonStoreBase(
-		gattung.Etikett,
-		sa,
-		s,
-	)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
+	s = &etikettStore{
+		StoreUtil: sa,
 	}
 
 	return

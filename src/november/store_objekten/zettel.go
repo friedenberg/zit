@@ -17,7 +17,7 @@ import (
 )
 
 type zettelStore struct {
-	*store_util.CommonStoreBase
+	store_util.StoreUtil
 	objekte_store.LogWriter
 
 	protoZettel zettel.ProtoZettel
@@ -31,17 +31,7 @@ func makeZettelStore(
 ) (s *zettelStore, err error) {
 	s = &zettelStore{
 		protoZettel: zettel.MakeProtoZettel(sa.GetKonfig()),
-	}
-
-	s.CommonStoreBase, err = store_util.MakeCommonStoreBase(
-		gattung.Zettel,
-		sa,
-		s,
-	)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
+		StoreUtil:   sa,
 	}
 
 	if s.verzeichnisseSchwanzen, err = makeVerzeichnisseSchwanzen(

@@ -14,7 +14,7 @@ import (
 )
 
 type konfigStore struct {
-	*store_util.CommonStoreBase
+	store_util.StoreUtil
 
 	akteFormat objekte.AkteFormat[erworben.Akte, *erworben.Akte]
 	objekte_store.LogWriter
@@ -35,17 +35,7 @@ func makeKonfigStore(
 			objekte.ParsedAkteTomlFormatter[erworben.Akte, *erworben.Akte]{},
 			sa.GetStandort(),
 		),
-	}
-
-	s.CommonStoreBase, err = store_util.MakeCommonStoreBase(
-		gattung.Konfig,
-		sa,
-		s,
-	)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
+		StoreUtil: sa,
 	}
 
 	return
@@ -80,7 +70,7 @@ func (s konfigStore) Update(
 		return
 	}
 
-	kt.SetTai(s.StoreUtil.GetTai())
+	kt.SetTai(s.GetTai())
 	kt.SetAkteSha(sh)
 
 	// TODO-P3 refactor into reusable
@@ -88,7 +78,7 @@ func (s konfigStore) Update(
 		kt.Metadatei.Verzeichnisse.Mutter = mutter.GetMetadatei().Verzeichnisse.Sha
 	}
 
-	err = sku.CalculateAndSetSha(kt, s.StoreUtil.GetPersistentMetadateiFormat(),
+	err = sku.CalculateAndSetSha(kt, s.GetPersistentMetadateiFormat(),
 		objekte_format.Options{IncludeTai: true},
 	)
 
@@ -103,7 +93,7 @@ func (s konfigStore) Update(
 			return
 		}
 
-		if err = s.LogWriter.Unchanged(kt); err != nil {
+		if err = s.Unchanged(kt); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
