@@ -22,11 +22,8 @@ import (
 type Store struct {
 	store_util.StoreUtil
 
-	zettelStore  *zettelStore
-	typStore     typStore
-	etikettStore etikettStore
-	konfigStore  konfigStore
-	kastenStore  kastenStore
+	zettelStore *zettelStore
+	konfigStore konfigStore
 
 	objekte_store.LogWriter
 
@@ -52,29 +49,21 @@ func Make(
 		return
 	}
 
-	s.konfigStore = konfigStore{
-		akteFormat: objekte_store.MakeAkteFormat[erworben.Akte, *erworben.Akte](
-			objekte.MakeTextParserIgnoreTomlErrors[erworben.Akte](
-				s.GetStandort(),
-			),
-			objekte.ParsedAkteTomlFormatter[erworben.Akte, *erworben.Akte]{},
+	s.konfigStore.akteFormat = objekte_store.MakeAkteFormat[erworben.Akte, *erworben.Akte](
+		objekte.MakeTextParserIgnoreTomlErrors[erworben.Akte](
 			s.GetStandort(),
 		),
-		StoreUtil: s.StoreUtil,
-	}
+		objekte.ParsedAkteTomlFormatter[erworben.Akte, *erworben.Akte]{},
+		s.GetStandort(),
+	)
 
-	s.typStore.StoreUtil = s.StoreUtil
-	s.etikettStore.StoreUtil = s.StoreUtil
-	s.kastenStore.StoreUtil = s.StoreUtil
+	s.konfigStore.StoreUtil = s.StoreUtil
 
 	errors.TodoP1("implement for other gattung")
 
 	s.flushers = map[schnittstellen.GattungLike]errors.Flusher{
-		gattung.Zettel:  s.zettelStore,
-		gattung.Typ:     s.typStore,
-		gattung.Etikett: s.etikettStore,
-		gattung.Kasten:  s.kastenStore,
-		gattung.Konfig:  s.konfigStore,
+		gattung.Zettel: s.zettelStore,
+		gattung.Konfig: s.konfigStore,
 	}
 
 	return
@@ -92,20 +81,8 @@ func (s *Store) Zettel() *zettelStore {
 	return s.zettelStore
 }
 
-func (s *Store) Typ() *typStore {
-	return &s.typStore
-}
-
-func (s *Store) Etikett() *etikettStore {
-	return &s.etikettStore
-}
-
 func (s *Store) Konfig() *konfigStore {
 	return &s.konfigStore
-}
-
-func (s *Store) Kasten() *kastenStore {
-	return &s.kastenStore
 }
 
 func (s Store) Flush() (err error) {
@@ -417,7 +394,7 @@ func (s *Store) GetReindexFunc(
 	return func(sk *sku.Transacted) (err error) {
 		errExists := s.StoreUtil.GetAbbrStore().Exists(&sk.Kennung)
 
-		if err = s.LogWriter.NewOrUpdated(errExists)(sk); err != nil {
+		if err = s.NewOrUpdated(errExists)(sk); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -447,7 +424,7 @@ func (s *Store) resetReindexCommon() (ti kennung_index.KennungIndex[kennung.Typ,
 		return
 	}
 
-	if ti, err = s.StoreUtil.GetTypenIndex(); err != nil {
+	if ti, err = s.GetTypenIndex(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

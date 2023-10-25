@@ -83,19 +83,19 @@ func (s konfigStore) Update(
 		return
 	}
 
-	s.StoreUtil.CommitUpdatedTransacted(kt)
+	s.CommitUpdatedTransacted(kt)
 
 	if err = s.StoreUtil.GetKonfigPtr().SetTransacted(kt, s.GetAkten().GetKonfigV0()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.StoreUtil.AddMatchable(kt); err != nil {
+	if err = s.AddMatchable(kt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.LogWriter.Updated(kt); err != nil {
+	if err = s.Updated(kt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -130,7 +130,7 @@ func (s konfigStore) ReadOne(
 	if !tt.GetTai().IsEmpty() {
 		err = sku.CalculateAndSetSha(
 			tt,
-			s.StoreUtil.GetPersistentMetadateiFormat(),
+			s.GetPersistentMetadateiFormat(),
 			objekte_format.Options{IncludeTai: true},
 		)
 

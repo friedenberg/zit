@@ -23,7 +23,7 @@ func (s *Store) onNewOrUpdatedCommit(
 	commit bool,
 ) (err error) {
 	if commit {
-		s.StoreUtil.CommitUpdatedTransacted(t)
+		s.CommitUpdatedTransacted(t)
 	}
 
 	g := gattung.Must(t.Kennung.GetGattung())
@@ -75,7 +75,7 @@ func (s *Store) onNew(
 		return
 	}
 
-	return s.LogWriter.New(t)
+	return s.New(t)
 }
 
 func (s *Store) onUpdated(
@@ -86,13 +86,13 @@ func (s *Store) onUpdated(
 		return
 	}
 
-	return s.LogWriter.Updated(t)
+	return s.Updated(t)
 }
 
 func (s *Store) onUnchanged(
 	t *sku.Transacted,
 ) (err error) {
-	return s.LogWriter.Unchanged(t)
+	return s.Unchanged(t)
 }
 
 func (s *Store) ReadOne(
@@ -192,7 +192,7 @@ func (s *Store) ReadAllSchwanzen(
 		func(g gattung.Gattung) (err error) {
 			switch g {
 			case gattung.Typ:
-				if err = s.StoreUtil.GetKonfig().Typen.EachPtr(f); err != nil {
+				if err = s.GetKonfig().Typen.EachPtr(f); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

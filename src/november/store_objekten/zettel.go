@@ -42,7 +42,7 @@ func makeZettelStore(
 	}
 
 	if s.verzeichnisseAll, err = store_verzeichnisse.MakeZettelen(
-		s.StoreUtil.GetKonfig(),
+		s.GetKonfig(),
 		s.StoreUtil.GetStandort().DirVerzeichnisseZettelenNeue(),
 		s.GetStandort(),
 		nil,
@@ -290,7 +290,7 @@ func (s *zettelStore) UpdateCheckedOut(
 	if co.External.Metadatei.EqualsSansTai(co.Internal.Metadatei) {
 		t = &co.Internal
 
-		if err = s.LogWriter.Unchanged(t); err != nil {
+		if err = s.Unchanged(t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -387,7 +387,7 @@ func (s *zettelStore) updateLockedWithMutter(
 			return
 		}
 
-		if err = s.LogWriter.Unchanged(tz); err != nil {
+		if err = s.Unchanged(tz); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -407,19 +407,19 @@ func (s *zettelStore) commitIndexMatchUpdate(
 	tz *sku.Transacted,
 	addEtikettenToIndex bool,
 ) (err error) {
-	s.StoreUtil.CommitUpdatedTransacted(tz)
+	s.CommitUpdatedTransacted(tz)
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.StoreUtil.AddMatchable(tz); err != nil {
+	if err = s.AddMatchable(tz); err != nil {
 		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz)
 		return
 	}
 
-	if err = s.LogWriter.Updated(tz); err != nil {
+	if err = s.Updated(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -436,7 +436,7 @@ func (s *zettelStore) writeObjekte(
 	}
 
 	m := mg.GetMetadatei()
-	m.Tai = s.StoreUtil.GetTai()
+	m.Tai = s.GetTai()
 
 	var h kennung.Hinweis
 
@@ -460,7 +460,7 @@ func (s *zettelStore) writeObjekte(
 func (s *zettelStore) Inherit(tz *sku.Transacted) (err error) {
 	errors.Log().Printf("inheriting %s", tz)
 
-	s.StoreUtil.CommitTransacted(tz)
+	s.CommitTransacted(tz)
 
 	var h kennung.Hinweis
 
@@ -476,7 +476,7 @@ func (s *zettelStore) Inherit(tz *sku.Transacted) (err error) {
 		return
 	}
 
-	if err = s.LogWriter.NewOrUpdated(errExists)(tz); err != nil {
+	if err = s.NewOrUpdated(errExists)(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -508,7 +508,7 @@ func (s *zettelStore) ReindexOne(
 		return
 	}
 
-	if err = s.LogWriter.NewOrUpdated(errExists)(tz); err != nil {
+	if err = s.NewOrUpdated(errExists)(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

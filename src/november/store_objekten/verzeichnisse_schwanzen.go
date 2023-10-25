@@ -56,7 +56,7 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 ) (found *sku.Transacted, err error) {
 	var n int
 
-	if n, err = s.Zettelen.PageForKennung(h); err != nil {
+	if n, err = s.PageForKennung(h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -78,7 +78,7 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 
 	var p *store_verzeichnisse.Page
 
-	if p, err = s.Zettelen.GetPage(n); err != nil {
+	if p, err = s.GetPage(n); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
