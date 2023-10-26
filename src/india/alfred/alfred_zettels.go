@@ -100,9 +100,12 @@ func (w *Writer) etikettToItem(
 	e *kennung.Etikett,
 ) (a *alfred.Item) {
 	ei, err := w.etikettenIndex.GetEtikett(e)
-	errors.PanicIfError(err)
-
 	a = w.alfredWriter.Get()
+
+	if err != nil {
+		a.Title = err.Error()
+		return
+	}
 
 	a.Title = "@" + e.String()
 	a.Subtitle = fmt.Sprintf("%d", ei.GetSchwanzenCount())

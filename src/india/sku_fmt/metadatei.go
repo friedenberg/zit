@@ -1,4 +1,4 @@
-package to_merge
+package sku_fmt
 
 import (
 	"strings"

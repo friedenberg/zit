@@ -72,6 +72,10 @@ func (w *Writer) setAfterFirstWrite() {
 }
 
 func (w *Writer) writeItem(i *Item) (err error) {
+	if i == nil {
+		panic("item was nil")
+	}
+
 	defer w.setAfterFirstWrite()
 	defer w.Put(i)
 

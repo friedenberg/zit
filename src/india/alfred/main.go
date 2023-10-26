@@ -1,15 +1,16 @@
 package alfred
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/alfred"
-	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/india/sku_fmt"
 )
 
 type Writer struct {
@@ -72,7 +73,9 @@ func (w *Writer) PrintOne(z *sku.Transacted) (err error) {
 		item = w.etikettToItem(&e)
 
 	default:
-		err = todo.Implement()
+		item = w.alfredWriter.Get()
+		item.Title = fmt.Sprintf("not implemented for gattung: %q", g)
+		item.Subtitle = fmt.Sprintf("%s", sku_fmt.String(z))
 	}
 
 	w.alfredWriter.WriteItem(item)

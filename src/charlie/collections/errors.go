@@ -1,6 +1,8 @@
 package collections
 
 import (
+	"fmt"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/iter"
 )
@@ -10,10 +12,10 @@ var (
 	MakeErrStopIteration = iter.MakeErrStopIteration
 )
 
-type ErrNotFound struct{}
+type ErrNotFound string
 
 func (e ErrNotFound) Error() string {
-	return "not found"
+	return fmt.Sprintf("not found: %q", string(e))
 }
 
 func (e ErrNotFound) Is(target error) (ok bool) {

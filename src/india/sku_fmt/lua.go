@@ -1,4 +1,4 @@
-package to_merge
+package sku_fmt
 
 import (
 	"github.com/friedenberg/zit/src/echo/kennung"

@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"io"
+	"strconv"
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -242,7 +243,7 @@ func (i *index2[T, TPtr]) GetInt(in int) (id T, err error) {
 	id1, ok = i.IntsToKennungen[in]
 
 	if !ok {
-		err = errors.Wrap(collections.ErrNotFound{})
+		err = errors.Wrap(collections.ErrNotFound(strconv.Itoa(in)))
 		return
 	}
 
@@ -266,7 +267,7 @@ func (i *index2[T, TPtr]) Get(
 	id, ok = i.Kennungen[k.String()]
 
 	if !ok {
-		err = errors.Wrap(collections.ErrNotFound{})
+		err = errors.Wrap(collections.ErrNotFound(k.String()))
 		return
 	}
 
