@@ -75,8 +75,8 @@ func (c CatAlfred) RunWithQuery(
 
 	defer errors.DeferredCloser(&err, aw)
 
-	if err = u.StoreObjekten().ReadAllSchwanzen(
-		gattungen.MakeSet(gattung.TrueGattung()...),
+	if err = u.StoreObjekten().Query(
+    ms,
 		aw.PrintOne,
 	); err != nil {
 		aw.WriteError(err)

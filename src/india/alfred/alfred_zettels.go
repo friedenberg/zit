@@ -103,12 +103,13 @@ func (w *Writer) etikettToItem(
 	a = w.alfredWriter.Get()
 
 	if err != nil {
-		a.Title = err.Error()
+		a.Subtitle = err.Error()
 		return
+	} else {
+		a.Subtitle = fmt.Sprintf("%d", ei.GetSchwanzenCount())
 	}
 
 	a.Title = "@" + e.String()
-	a.Subtitle = fmt.Sprintf("%d", ei.GetSchwanzenCount())
 
 	a.Arg = e.String()
 

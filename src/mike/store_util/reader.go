@@ -37,6 +37,10 @@ func (s *common) ReadAllGattungen(
 	g gattungen.Set,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
+	if g.Len() == 0 {
+		return
+	}
+
 	eachSku := func(sk *sku.Transacted) (err error) {
 		if !g.ContainsKey(sk.GetGattung().GetGattungString()) {
 			return
