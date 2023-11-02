@@ -2,6 +2,7 @@ package ohio
 
 import (
 	"bufio"
+	"bytes"
 	"io"
 	"strings"
 
@@ -83,6 +84,34 @@ func (lr *delimReader) Reset() {
 	lr.eof = false
 }
 
+func (lr *delimReader) ReadOneBytes() (str []byte, err error) {
+	if lr.eof {
+		err = io.EOF
+		return
+	}
+
+	var rawLine []byte
+
+	rawLine, err = lr.Reader.ReadSlice(lr.delim)
+	lr.lastReadN = len(rawLine)
+	lr.n += int64(lr.lastReadN)
+
+	if err != nil && err != io.EOF {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err == io.EOF {
+		lr.eof = true
+	}
+
+	str = bytes.TrimSuffix(rawLine, []byte{lr.delim})
+
+	lr.segments++
+
+	return
+}
+
 // Not safe for parallel use
 func (lr *delimReader) ReadOneString() (str string, err error) {
 	if lr.eof {
@@ -96,12 +125,12 @@ func (lr *delimReader) ReadOneString() (str string, err error) {
 	lr.lastReadN = len(rawLine)
 	lr.n += int64(lr.lastReadN)
 
-	if err != nil && !errors.IsEOF(err) {
+	if err != nil && err != io.EOF {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if errors.IsEOF(err) {
+	if err == io.EOF {
 		lr.eof = true
 	}
 
@@ -123,7 +152,7 @@ func (lr *delimReader) ReadOneKeyValue(
 
 	str, err := lr.ReadOneString()
 	if err != nil {
-		if errors.IsEOF(err) {
+		if err == io.EOF {
 			lr.eof = true
 		} else {
 			err = errors.Wrap(err)
@@ -133,6 +162,44 @@ func (lr *delimReader) ReadOneKeyValue(
 	}
 
 	loc := strings.Index(str, sep)
+
+	if loc == -1 {
+		log.Log().Printf("N: %d, lastReadN: %d", lr.N(), lr.lastReadN)
+		err = errors.Errorf(
+			"expected at least one %q, but found none: %q",
+			sep,
+			str,
+		)
+		return
+	}
+
+	key = str[:loc]
+	val = str[loc+1:]
+
+	return
+}
+
+func (lr *delimReader) ReadOneKeyValueBytes(
+	sep byte,
+) (key, val []byte, err error) {
+	if lr.eof {
+		err = io.EOF
+		return
+	}
+
+	str, err := lr.ReadOneBytes()
+
+	if err != nil {
+		if err == io.EOF {
+			lr.eof = true
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	loc := bytes.IndexByte(str, sep)
 
 	if loc == -1 {
 		log.Log().Printf("N: %d, lastReadN: %d", lr.N(), lr.lastReadN)

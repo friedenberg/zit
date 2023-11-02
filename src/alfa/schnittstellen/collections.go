@@ -68,9 +68,13 @@ type PoolablePtr[T any] interface {
 	// Resetable[T]
 }
 
+type PoolValue[T any] interface {
+	Get() T
+	Put(i T) (err error)
+}
+
 type Pool[T Poolable[T], TPtr PoolablePtr[T]] interface {
-	Get() TPtr
-	Put(i TPtr) (err error)
+	PoolValue[TPtr]
 }
 
 //  __     __    _              ____       _

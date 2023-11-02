@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/heap"
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
@@ -95,11 +96,19 @@ func (equaler) EqualsPtr(a, b *Transacted) bool {
 type resetter struct{}
 
 func (resetter) Reset(a *Transacted) {
-	a.Reset()
+	a.Kopf.Reset()
+	a.ObjekteSha.Reset()
+	a.Kennung.SetGattung(gattung.Unknown)
+	a.Metadatei.Reset()
+	a.TransactionIndex.Reset()
 }
 
-func (resetter) ResetWith(a *Transacted, b Transacted) {
-	a = &b
+func (r resetter) ResetWith(a *Transacted, b Transacted) {
+	a.Kopf = b.Kopf
+	a.ObjekteSha = b.ObjekteSha
+	a.Kennung.ResetWithKennung(b.Kennung)
+	a.Metadatei.ResetWith(b.Metadatei)
+	a.TransactionIndex.SetInt(b.TransactionIndex.Int())
 }
 
 func (resetter) ResetWithPtr(a *Transacted, b *Transacted) {

@@ -89,6 +89,10 @@ func (e Etikett) String() string {
 	return e.value
 }
 
+func (e Etikett) Bytes() []byte {
+	return []byte(e.value)
+}
+
 func (e Etikett) Parts() [3]string {
 	v := e.value
 

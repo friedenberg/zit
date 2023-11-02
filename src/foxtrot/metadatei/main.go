@@ -203,29 +203,11 @@ func (pz Metadatei) Equals(z1 Metadatei) bool {
 }
 
 func (z *Metadatei) Reset() {
-	z.AkteSha.Reset()
-	z.Bezeichnung.Reset()
-	z.Etiketten = kennung.MakeEtikettSet()
-	z.Verzeichnisse.Reset()
-	z.Typ = kennung.Typ{}
-	// z.Gattung = gattung.Unknown
-	z.Tai.Reset()
+	Resetter.Reset(z)
 }
 
 func (z *Metadatei) ResetWith(z1 Metadatei) {
-	z.AkteSha = z1.AkteSha
-	z.Bezeichnung = z1.Bezeichnung
-
-	if z1.Etiketten == nil {
-		z.Etiketten = kennung.MakeEtikettSet()
-	} else {
-		z.Etiketten = z1.Etiketten.CloneSetPtrLike()
-	}
-
-	z.Verzeichnisse.ResetWith(&z1.Verzeichnisse)
-
-	z.Typ = z1.Typ
-	z.Tai = z1.Tai
+	Resetter.ResetWith(z, z1)
 }
 
 func (z Metadatei) Description() (d string) {

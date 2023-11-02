@@ -75,7 +75,7 @@ func (br *boundaryReader) setState(s boundaryReaderState) {
 func (br *boundaryReader) fillBuffer() (n int, err error) {
 	n, err = br.buffer.FillWith(br.reader)
 
-	if err != nil && !errors.IsEOF(err) {
+	if err != nil && err != io.EOF {
 		return
 	}
 
@@ -152,7 +152,7 @@ func (br *boundaryReader) ReadBoundary() (n int, err error) {
 		var n1 int
 		n1, err = br.fillBuffer()
 
-		if errors.IsEOF(err) && n1 > 0 || br.buffer.Len() > 0 {
+		if err == io.EOF && n1 > 0 || br.buffer.Len() > 0 {
 			// the buffer has more content, so try a boundary read again
 			err = nil
 		} else if err != nil {
@@ -166,7 +166,7 @@ func (br *boundaryReader) ReadBoundary() (n int, err error) {
 		var n1 int
 		n1, err = br.fillBuffer()
 
-		if errors.IsEOF(err) && n1 > 0 && br.buffer.Len() > 0 {
+		if err == io.EOF && n1 > 0 && br.buffer.Len() > 0 {
 			// the buffer has more content, so try a boundary read again
 			err = nil
 		} else if err != nil {
@@ -201,13 +201,13 @@ func (br *boundaryReader) Read(p []byte) (n int, err error) {
 		n, err = br.buffer.Read(p)
 		br.remainingContent -= n
 
-		if err == nil || !errors.IsEOF(err) {
+		if err == nil || err != io.EOF {
 			return
 		}
 
 		_, err = br.fillBuffer()
 
-		if errors.IsEOF(err) {
+		if err == io.EOF {
 			err = nil
 		} else if err != nil {
 			return
@@ -221,7 +221,7 @@ func (br *boundaryReader) Read(p []byte) (n int, err error) {
 		n, err = br.buffer.Read(p)
 
 		if err != nil {
-			if errors.IsEOF(err) {
+			if err == io.EOF {
 				err = errors.Errorf("unexpected EOF")
 			} else {
 				err = errors.Wrap(err)
@@ -235,7 +235,7 @@ func (br *boundaryReader) Read(p []byte) (n int, err error) {
 		if br.remainingContent <= 0 {
 			_, err = br.fillBuffer()
 
-			if err != nil && !errors.IsEOF(err) {
+			if err != nil && err != io.EOF {
 				return
 			}
 		}
@@ -248,11 +248,11 @@ func (br *boundaryReader) Read(p []byte) (n int, err error) {
 		n, err = br.buffer.Read(p)
 		br.remainingContent -= n
 
-		if errors.IsEOF(err) {
+		if err == io.EOF {
 			_, err = br.fillBuffer()
 		}
 
-		if errors.IsEOF(err) {
+		if err == io.EOF {
 			err = nil
 		} else if err != nil {
 			panic(fmt.Sprintf("invalid state: %q", err))

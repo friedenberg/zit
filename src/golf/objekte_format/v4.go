@@ -1,6 +1,7 @@
 package objekte_format
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"strings"
@@ -30,10 +31,13 @@ func (f v4) FormatPersistentMetadatei(
 
 	mh := sha.MakeWriter(nil)
 	mw := io.MultiWriter(w, mh)
-	var n1 int
+	var (
+		n1 int
+		n2 int64
+	)
 
 	if !m.AkteSha.IsNull() {
-		n1, err = ohio.WriteKeySpaceValueNewline(
+		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,
 			gattung.Akte.String(),
 			m.AkteSha.String(),
@@ -53,7 +57,7 @@ func (f v4) FormatPersistentMetadatei(
 			continue
 		}
 
-		n1, err = ohio.WriteKeySpaceValueNewline(
+		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,
 			gattung.Bezeichnung.String(),
 			line,
@@ -69,7 +73,7 @@ func (f v4) FormatPersistentMetadatei(
 	es := m.GetEtiketten()
 
 	for _, e := range iter.SortedValues[kennung.Etikett](es) {
-		n1, err = ohio.WriteKeySpaceValueNewline(
+		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,
 			gattung.Etikett.String(),
 			e.String(),
@@ -82,7 +86,7 @@ func (f v4) FormatPersistentMetadatei(
 		}
 	}
 
-	n1, err = ohio.WriteKeySpaceValueNewline(
+	n1, err = ohio.WriteKeySpaceValueNewlineString(
 		w,
 		"Gattung",
 		c.GetKennungLike().GetGattung().GetGattungString(),
@@ -94,7 +98,7 @@ func (f v4) FormatPersistentMetadatei(
 		return
 	}
 
-	n1, err = ohio.WriteKeySpaceValueNewline(
+	n1, err = ohio.WriteKeySpaceValueNewlineString(
 		w,
 		"Kennung",
 		c.GetKennungLike().String(),
@@ -107,7 +111,7 @@ func (f v4) FormatPersistentMetadatei(
 	}
 
 	if o.IncludeTai {
-		n1, err = ohio.WriteKeySpaceValueNewline(
+		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,
 			"Tai",
 			m.Tai.String(),
@@ -121,7 +125,7 @@ func (f v4) FormatPersistentMetadatei(
 	}
 
 	if !m.Typ.IsEmpty() {
-		n1, err = ohio.WriteKeySpaceValueNewline(
+		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,
 			gattung.Typ.String(),
 			m.GetTyp().String(),
@@ -136,7 +140,7 @@ func (f v4) FormatPersistentMetadatei(
 
 	if o.IncludeVerzeichnisse {
 		if m.Verzeichnisse.Archiviert.Bool() {
-			n1, err = ohio.WriteKeySpaceValueNewline(
+			n1, err = ohio.WriteKeySpaceValueNewlineString(
 				w,
 				"Verzeichnisse-Archiviert",
 				m.Verzeichnisse.Archiviert.String(),
@@ -155,7 +159,7 @@ func (f v4) FormatPersistentMetadatei(
 				gattung.Etikett.String(),
 			)
 			for _, e := range iter.SortedValues[kennung.Etikett](m.Verzeichnisse.ExpandedEtiketten) {
-				n1, err = ohio.WriteKeySpaceValueNewline(
+				n1, err = ohio.WriteKeySpaceValueNewlineString(
 					w,
 					k,
 					e.String(),
@@ -176,12 +180,12 @@ func (f v4) FormatPersistentMetadatei(
 			)
 
 			for _, e := range iter.SortedValues[kennung.Etikett](m.Verzeichnisse.ImplicitEtiketten) {
-				n1, err = ohio.WriteKeySpaceValueNewline(
+				n2, err = ohio.WriteKeySpaceValueNewline(
 					w,
 					k,
-					e.String(),
+					e.Bytes(),
 				)
-				n += int64(n1)
+				n += int64(n2)
 
 				if err != nil {
 					err = errors.Wrap(err)
@@ -191,7 +195,7 @@ func (f v4) FormatPersistentMetadatei(
 		}
 
 		if !m.Verzeichnisse.Mutter.IsNull() {
-			n1, err = ohio.WriteKeySpaceValueNewline(
+			n1, err = ohio.WriteKeySpaceValueNewlineString(
 				mw,
 				"Verzeichnisse-Mutter",
 				m.Verzeichnisse.Mutter.String(),
@@ -218,7 +222,7 @@ func (f v4) FormatPersistentMetadatei(
 		// 	return
 		// }
 
-		n1, err = ohio.WriteKeySpaceValueNewline(
+		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			w,
 			"Verzeichnisse-Sha",
 			actual.String(),
@@ -258,15 +262,15 @@ func (f v4) ParsePersistentMetadatei(
 	defer ohio.PutDelimReader(dr)
 
 	var (
-		lastKey string
-		key     string
-		val     string
+		lastKey []byte
+		key     []byte
+		val     []byte
 	)
 
 	mh := sha.MakeWriter(nil)
 
 	for {
-		key, val, err = dr.ReadOneKeyValue(" ")
+		key, val, err = dr.ReadOneKeyValueBytes(' ')
 
 		if err != nil {
 			if errors.IsEOF(err) {
@@ -278,54 +282,58 @@ func (f v4) ParsePersistentMetadatei(
 			}
 		}
 
-		if key == "" {
+		if len(key) == 0 {
 			err = errors.Errorf("empty key at line %d", dr.Segments())
 			return
 		}
 
-		if lastKey != "" && lastKey > key {
+		if len(lastKey) >= 0 && bytes.Compare(lastKey, key) == 1 {
 			err = errors.Errorf("keys not sorted")
 			return
 		}
 
 		writeMetadateiHashString := false
 
-		switch key {
-		case "Akte":
-			if err = m.AkteSha.Set(val); err != nil {
+		// this cast in an iff costs nothing, vs a switch: https://github.com/golang/go/issues/24937
+		if string(key) == "Akte" {
+			if err = m.AkteSha.Set(string(val)); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 			writeMetadateiHashString = true
 
-		case "Bezeichnung":
-			if err = m.Bezeichnung.Set(val); err != nil {
+		} else if string(key) == "Bezeichnung" {
+			if err = m.Bezeichnung.Set(string(val)); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 			writeMetadateiHashString = true
 
-		case "Etikett":
-			if err = iter.AddString[kennung.Etikett, *kennung.Etikett](
-				etiketten,
-				val,
-			); err != nil {
+		} else if string(key) == "Etikett" {
+			e := kennung.GetEtikettPool().Get()
+
+			if err = e.Set(string(val)); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = etiketten.AddPtr(e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 			writeMetadateiHashString = true
 
-		case "Gattung":
-			if err = g.Set(val); err != nil {
+		} else if string(key) == "Gattung" {
+			if err = g.Set(string(val)); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-		case "Kennung":
-			if err = k.SetWithGattung(val, g); err != nil {
+		} else if string(key) == "Kennung" {
+			if err = k.SetWithGattung(string(val), g); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -335,29 +343,29 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-		case "Tai":
-			if err = m.Tai.Set(val); err != nil {
+		} else if string(key) == "Tai" {
+			if err = m.Tai.Set(string(val)); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 			writeMetadateiHashString = true
 
-		case "Typ":
-			if err = m.Typ.Set(val); err != nil {
+		} else if string(key) == "Typ" {
+			if err = m.Typ.Set(string(val)); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 			writeMetadateiHashString = true
 
-		case "Verzeichnisse-Archiviert":
-			if err = m.Verzeichnisse.Archiviert.Set(val); err != nil {
+		} else if string(key) == "Verzeichnisse-Archiviert" {
+			if err = m.Verzeichnisse.Archiviert.Set(string(val)); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-		case "Verzeichnisse-Etikett-Implicit":
+		} else if string(key) == "Verzeichnisse-Etikett-Implicit" {
 			if !o.IncludeVerzeichnisse {
 				err = errors.Errorf(
 					"format specifies not to include Verzeichnisse but found %q",
@@ -368,13 +376,13 @@ func (f v4) ParsePersistentMetadatei(
 
 			if err = iter.AddString[kennung.Etikett, *kennung.Etikett](
 				etikettenImplicit,
-				val,
+				string(val),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-		case "Verzeichnisse-Etikett-Expanded":
+		} else if string(key) == "Verzeichnisse-Etikett-Expanded" {
 			if !o.IncludeVerzeichnisse {
 				err = errors.Errorf(
 					"format specifies not to include Verzeichnisse but found %q",
@@ -385,22 +393,22 @@ func (f v4) ParsePersistentMetadatei(
 
 			if err = iter.AddString[kennung.Etikett, *kennung.Etikett](
 				etikettenExpanded,
-				val,
+				string(val),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-		case "Verzeichnisse-Mutter":
-			if err = m.Verzeichnisse.Mutter.Set(val); err != nil {
+		} else if string(key) == "Verzeichnisse-Mutter" {
+			if err = m.Verzeichnisse.Mutter.Set(string(val)); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 			writeMetadateiHashString = true
 
-		case "Verzeichnisse-Sha":
-			if err = m.Verzeichnisse.Sha.Set(val); err != nil {
+		} else if string(key) == "Verzeichnisse-Sha" {
+			if err = m.Verzeichnisse.Sha.Set(string(val)); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -412,7 +420,7 @@ func (f v4) ParsePersistentMetadatei(
 			continue
 		}
 
-		if _, err = ohio.WriteKeySpaceValueNewline(mh, key, val); err != nil {
+		if _, err = ohio.WriteKeySpaceValueNewline(mh, string(key), val); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
