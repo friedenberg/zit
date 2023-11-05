@@ -25,7 +25,7 @@ func MakeWriterKonfig(
 	}
 
 	return func(z *sku.Transacted) (err error) {
-		if err = z.GetMetadatei().Etiketten.Each(
+		if err = z.Metadatei.GetEtiketten().Each(
 			func(e kennung.Etikett) (err error) {
 				p := e.String()
 

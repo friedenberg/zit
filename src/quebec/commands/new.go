@@ -187,9 +187,7 @@ func (c New) writeNewZettels(
 		CheckOut: c.Edit,
 	}
 
-	mes := c.Metadatei.Etiketten.CloneMutableSetPtrLike()
-	u.Konfig().DefaultEtiketten.Each(mes.Add)
-	c.Metadatei.Etiketten = mes.CloneSetPtrLike()
+	u.Konfig().DefaultEtiketten.EachPtr(c.Metadatei.AddEtikettPtr)
 
 	if zsc, err = emptyOp.RunMany(c.ProtoZettel, c.Count); err != nil {
 		err = errors.Wrap(err)

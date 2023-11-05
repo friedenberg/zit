@@ -111,7 +111,7 @@ func (e *Etikett) Set(v string) (err error) {
 		return
 	}
 
-	if !EtikettRegex.Match([]byte(v)) {
+	if !EtikettRegex.MatchString(v) {
 		err = errors.Errorf("not a valid etikett: '%s'", v)
 		return
 	}

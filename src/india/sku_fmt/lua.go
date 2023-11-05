@@ -18,7 +18,7 @@ func Lua(o *sku.Transacted, ki kennung.Index, l *lua.LState, t *lua.LTable) {
 		return
 	}
 
-	o.GetMetadatei().GetEtiketten().EachPtr(
+	o.Metadatei.GetEtiketten().EachPtr(
 		func(e *kennung.Etikett) (err error) {
 			// indexed, err := ki.Etiketten(e)
 

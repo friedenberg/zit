@@ -112,7 +112,7 @@ func (c Add) RunWithCwdQuery(
 	otFlags := organize_text.MakeFlags()
 	u.ApplyToOrganizeOptions(&otFlags.Options)
 	// otFlags.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
-	otFlags.RootEtiketten = c.Metadatei.Etiketten
+	otFlags.RootEtiketten = c.Metadatei.GetEtiketten()
 	mwk := objekte_collections.MakeMutableSetMetadateiWithKennung()
 	zettelsFromAkteResults.EachPtr(
 		func(z *sku.Transacted) (err error) {

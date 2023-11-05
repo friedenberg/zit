@@ -37,10 +37,8 @@ func (f v3) FormatPersistentMetadatei(
 		w.WriteKeySpaceValue(gattung.Bezeichnung, line)
 	}
 
-	if m.Etiketten != nil {
-		for _, e := range iter.SortedValues[kennung.Etikett](m.Etiketten) {
-			w.WriteKeySpaceValue(gattung.Etikett, e)
-		}
+	for _, e := range iter.SortedValues[kennung.Etikett](m.GetEtiketten()) {
+		w.WriteKeySpaceValue(gattung.Etikett, e)
 	}
 
 	w.WriteKeySpaceValue("Gattung", c.GetKennungLike().GetGattung())
@@ -62,22 +60,22 @@ func (f v3) FormatPersistentMetadatei(
 			)
 		}
 
-		if m.Verzeichnisse.ExpandedEtiketten != nil {
+		if m.Verzeichnisse.GetExpandedEtiketten() != nil {
 			k := fmt.Sprintf(
 				"Verzeichnisse-%s-Expanded",
 				gattung.Etikett.String(),
 			)
-			for _, e := range iter.SortedValues[kennung.Etikett](m.Verzeichnisse.ExpandedEtiketten) {
+			for _, e := range iter.SortedValues[kennung.Etikett](m.Verzeichnisse.GetExpandedEtiketten()) {
 				w.WriteKeySpaceValue(k, e)
 			}
 		}
 
-		if m.Verzeichnisse.ImplicitEtiketten != nil {
+		if m.Verzeichnisse.GetImplicitEtiketten() != nil {
 			k := fmt.Sprintf(
 				"Verzeichnisse-%s-Implicit",
 				gattung.Etikett.String(),
 			)
-			for _, e := range iter.SortedValues[kennung.Etikett](m.Verzeichnisse.ImplicitEtiketten) {
+			for _, e := range iter.SortedValues[kennung.Etikett](m.Verzeichnisse.GetImplicitEtiketten()) {
 				w.WriteKeySpaceValue(k, e)
 			}
 		}
@@ -246,11 +244,11 @@ func (f v3) ParsePersistentMetadatei(
 		return
 	}
 
-	m.Etiketten = etiketten
+	m.SetEtiketten(etiketten)
 
 	if o.IncludeVerzeichnisse {
-		m.Verzeichnisse.ImplicitEtiketten = etikettenImplicit
-		m.Verzeichnisse.ExpandedEtiketten = etikettenExpanded
+		m.Verzeichnisse.SetImplicitEtiketten(etikettenImplicit)
+		m.Verzeichnisse.SetExpandedEtiketten(etikettenExpanded)
 	}
 
 	c.SetMetadatei(m)

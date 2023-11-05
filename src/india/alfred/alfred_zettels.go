@@ -19,7 +19,7 @@ func (w *Writer) zettelToItem(
 	a.Title = z.GetMetadatei().Bezeichnung.String()
 
 	es := iter.StringCommaSeparated[kennung.Etikett](
-		z.GetMetadatei().Etiketten,
+		z.Metadatei.GetEtiketten(),
 	)
 
 	if a.Title == "" {
@@ -41,7 +41,7 @@ func (w *Writer) zettelToItem(
 	mb.AddMatches(parts[2])
 	mb.AddMatches(z.GetMetadatei().Bezeichnung.String())
 	mb.AddMatches(z.GetTyp().String())
-	z.GetMetadatei().Etiketten.Each(
+	z.Metadatei.GetEtiketten().Each(
 		func(e kennung.Etikett) (err error) {
 			ei, err := w.kennungIndex.GetEtikett(&e)
 			if err != nil {

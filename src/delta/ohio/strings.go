@@ -3,6 +3,7 @@ package ohio
 import (
 	"bytes"
 	"io"
+	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
@@ -21,11 +22,12 @@ func WriteKeySpaceValueNewline(
 
 	var (
 		n1 int64
-		b  *bytes.Buffer
+		sr *strings.Reader
+		br *bytes.Reader
 	)
 
-	b = bytes.NewBufferString(key)
-	n1, err = b.WriteTo(w)
+	sr = strings.NewReader(key)
+	n1, err = sr.WriteTo(w)
 	n += n1
 
 	if err != nil {
@@ -33,9 +35,9 @@ func WriteKeySpaceValueNewline(
 		return
 	}
 
-	b = bytes.NewBufferString(" ")
+	sr = strings.NewReader(" ")
 
-	n1, err = b.WriteTo(w)
+	n1, err = sr.WriteTo(w)
 	n += n1
 
 	if err != nil {
@@ -43,9 +45,9 @@ func WriteKeySpaceValueNewline(
 		return
 	}
 
-	b = bytes.NewBuffer(value)
+	br = bytes.NewReader(value)
 
-	n1, err = b.WriteTo(w)
+	n1, err = br.WriteTo(w)
 	n += n1
 
 	if err != nil {
@@ -53,9 +55,9 @@ func WriteKeySpaceValueNewline(
 		return
 	}
 
-	b = bytes.NewBufferString("\n")
+	sr = strings.NewReader("\n")
 
-	n1, err = b.WriteTo(w)
+	n1, err = sr.WriteTo(w)
 	n += n1
 
 	if err != nil {

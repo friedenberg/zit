@@ -99,7 +99,7 @@ func (k *compiled) AccumulateImplicitEtiketten(
 		return
 	}
 
-	if err = ek.Transacted.GetMetadatei().GetEtiketten().Each(
+	if err = ek.Transacted.Metadatei.GetEtiketten().Each(
 		func(e1 kennung.Etikett) (err error) {
 			if k.ImplicitEtiketten.Contains(e1, e) {
 				return

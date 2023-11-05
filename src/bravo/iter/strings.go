@@ -4,28 +4,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
-
-func AddString[E any, EPtr schnittstellen.SetterPtr[E]](
-	c schnittstellen.Adder[E],
-	v string,
-) (err error) {
-	var e E
-
-	if err = EPtr(&e).Set(v); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = c.Add(e); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
 
 func SortedValuesBy[E any](
 	c schnittstellen.SetLike[E],

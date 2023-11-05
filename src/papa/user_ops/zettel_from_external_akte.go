@@ -113,7 +113,7 @@ func (c ZettelFromExternalAkte) Run(
 	if err = results.EachPtr(
 		func(z *sku.Transacted) (err error) {
 			if c.ProtoZettel.Apply(z) {
-				if z, err = c.StoreObjekten().Zettel().Update(
+				if _, err = c.StoreObjekten().Zettel().Update(
 					z,
 					&z.Kennung,
 				); err != nil {
@@ -230,18 +230,15 @@ func (c *ZettelFromExternalAkte) processOneFD(
 func (c *ZettelFromExternalAkte) zettelForAkte(
 	akteFD fd.FD,
 ) (z *sku.External, err error) {
-	z = &sku.External{
-		FDs: sku.ExternalFDs{
-			Akte: akteFD,
-		},
+	z = sku.GetExternalPool().Get()
+	z.FDs = sku.ExternalFDs{
+		Akte: akteFD,
 	}
 
 	if err = z.Transacted.Kennung.SetWithKennung(&kennung.Hinweis{}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	z.GetMetadateiPtr().Reset()
 
 	if err = c.ProtoZettel.ApplyWithAkteFD(z, akteFD); err != nil {
 		err = errors.Wrap(err)

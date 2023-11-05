@@ -2,6 +2,7 @@ package kennung
 
 import (
 	"fmt"
+	"io"
 	"math"
 	"strconv"
 	"strings"
@@ -107,7 +108,7 @@ func (t *Tai) Set(v string) (err error) {
 
 			val = strings.TrimSpace(val)
 
-			if val == "" {
+			if len(val) == 0 {
 				break
 			}
 
@@ -118,7 +119,7 @@ func (t *Tai) Set(v string) (err error) {
 
 		case 1:
 			if err != nil {
-				if errors.IsEOF(err) {
+				if err == io.EOF {
 					err = nil
 				} else {
 					err = errors.Wrap(err)
@@ -143,7 +144,7 @@ func (t *Tai) Set(v string) (err error) {
 			t.tai.Asec = pre * int64(math.Pow10(18-len(val)))
 
 		default:
-			if errors.IsEOF(err) {
+			if err == io.EOF {
 				err = nil
 			} else {
 				err = errors.Errorf("expected no more elements but got %s", val)

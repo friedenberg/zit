@@ -43,13 +43,14 @@ func TestReadWithoutAkte(t1 *testing.T) {
 
 	expected := metadatei.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
-		Etiketten: makeEtiketten(t,
-			"tag1",
-			"tag2",
-			"tag3",
-		),
-		Typ: makeAkteExt(t, "md"),
+		Typ:         makeAkteExt(t, "md"),
 	}
+
+	expected.SetEtiketten(makeEtiketten(t,
+		"tag1",
+		"tag2",
+		"tag3",
+	))
 
 	if !actual.Equals(expected) {
 		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)
@@ -82,13 +83,14 @@ func TestReadWithoutAkteWithMultilineBezeichnung(t1 *testing.T) {
 
 	expected := metadatei.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title\ncontinues"),
-		Etiketten: makeEtiketten(t,
-			"tag1",
-			"tag2",
-			"tag3",
-		),
-		Typ: makeAkteExt(t, "md"),
+		Typ:         makeAkteExt(t, "md"),
 	}
+
+	expected.SetEtiketten(makeEtiketten(t,
+		"tag1",
+		"tag2",
+		"tag3",
+	))
 
 	if !actual.Equals(expected) {
 		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)
@@ -130,13 +132,14 @@ the body
 			"036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064",
 		),
 		Bezeichnung: bezeichnung.Make("the title"),
-		Etiketten: makeEtiketten(t,
-			"tag1",
-			"tag2",
-			"tag3",
-		),
-		Typ: makeAkteExt(t, "md"),
+		Typ:         makeAkteExt(t, "md"),
 	}
+
+	expected.SetEtiketten(makeEtiketten(t,
+		"tag1",
+		"tag2",
+		"tag3",
+	))
 
 	if !actual.Equals(expected) {
 		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)

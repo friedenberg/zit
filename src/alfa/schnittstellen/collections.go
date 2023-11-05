@@ -88,6 +88,10 @@ type Adder[E any] interface {
 	Add(E) error
 }
 
+type AdderPtr[E any, EPtr Ptr[E]] interface {
+	AddPtr(EPtr) error
+}
+
 type AdderCustom[E any] interface {
 	AddCustomKey(E, func(E) string) error
 }

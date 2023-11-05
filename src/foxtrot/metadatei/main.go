@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/etikett_rule"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
@@ -37,7 +38,7 @@ type Metadatei struct {
 	// Domain
 	AkteSha       sha.Sha
 	Bezeichnung   bezeichnung.Bezeichnung
-	Etiketten     kennung.EtikettSet
+	Etiketten     kennung.EtikettMutableSet // public for gob, but should be private
 	Verzeichnisse Verzeichnisse
 	// Gattung     gattung.Gattung
 	Typ kennung.Typ
@@ -63,11 +64,9 @@ func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {
 		"the Bezeichnung to use for created or updated Zettelen",
 	)
 
-	mes := m.GetEtiketten().CloneMutableSetPtrLike()
-
 	fes := collections_ptr.MakeFlagCommasFromExisting[kennung.Etikett](
 		collections_ptr.SetterPolicyAppend,
-		mes,
+		m.GetEtikettenMutable(),
 	)
 
 	f.Var(
@@ -75,8 +74,6 @@ func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {
 		"etiketten",
 		"the Etiketten to use for created or updated Objekte",
 	)
-
-	m.Etiketten = mes
 
 	f.Func(
 		"typ",
@@ -123,10 +120,6 @@ func (z *Metadatei) SetBezeichnung(b bezeichnung.Bezeichnung) {
 	z.Bezeichnung = b
 }
 
-func (z *Metadatei) SetEtiketten(e kennung.EtikettSet) {
-	z.Etiketten = e
-}
-
 func (z *Metadatei) SetTyp(t kennung.Typ) {
 	z.Typ = t
 }
@@ -139,12 +132,44 @@ func (z *Metadatei) GetBezeichnungPtr() *bezeichnung.Bezeichnung {
 	return &z.Bezeichnung
 }
 
-func (z Metadatei) GetEtiketten() kennung.EtikettSet {
+func (z *Metadatei) GetEtiketten() kennung.EtikettSet {
+	return z.GetEtikettenMutable()
+}
+
+func (z *Metadatei) GetEtikettenMutable() kennung.EtikettMutableSet {
 	if z.Etiketten == nil {
-		return kennung.MakeEtikettSet()
+		z.Etiketten = kennung.MakeEtikettMutableSet()
 	}
 
 	return z.Etiketten
+}
+
+func (z *Metadatei) AddEtikettPtr(e *kennung.Etikett) (err error) {
+	return iter.AddClonePool[kennung.Etikett, *kennung.Etikett](
+		z.GetEtikettenMutable(),
+		kennung.GetEtikettPool(),
+		kennung.EtikettResetter,
+		e,
+	)
+}
+
+func (z *Metadatei) SetEtiketten(e kennung.EtikettSet) {
+	es := z.GetEtikettenMutable()
+	iter.ResetMutableSetWithPool(es, kennung.GetEtikettPool())
+
+	if e == nil {
+		return
+	}
+
+	errors.PanicIfError(
+		e.EachPtr(
+			iter.MakeAddClonePoolFunc[kennung.Etikett, *kennung.Etikett](
+				es,
+				kennung.GetEtikettPool(),
+				kennung.EtikettResetter,
+			),
+		),
+	)
 }
 
 func (z *Metadatei) SetAkteSha(sh schnittstellen.ShaLike) {
@@ -172,14 +197,7 @@ func (pz Metadatei) EqualsSansTai(z1 Metadatei) bool {
 		return false
 	}
 
-	switch {
-	case pz.Etiketten == nil && z1.Etiketten == nil:
-	// pass
-	case pz.Etiketten == nil:
-		return z1.Etiketten.Len() == 0
-	case z1.Etiketten == nil:
-		return pz.Etiketten.Len() == 0
-	case !iter.SetEquals[kennung.Etikett](pz.Etiketten, z1.Etiketten):
+	if !iter.SetEquals[kennung.Etikett](pz.GetEtiketten(), z1.GetEtiketten()) {
 		return false
 	}
 
@@ -214,7 +232,7 @@ func (z Metadatei) Description() (d string) {
 	d = z.Bezeichnung.String()
 
 	if strings.TrimSpace(d) == "" {
-		d = iter.StringCommaSeparated[kennung.Etikett](z.Etiketten)
+		d = iter.StringCommaSeparated[kennung.Etikett](z.GetEtiketten())
 	}
 
 	return
@@ -224,7 +242,7 @@ func (z *Metadatei) ApplyGoldenChild(
 	e kennung.Etikett,
 	mode etikett_rule.RuleGoldenChild,
 ) (err error) {
-	if z.Etiketten.Len() == 0 {
+	if z.GetEtiketten().Len() == 0 {
 		return
 	}
 
@@ -233,7 +251,8 @@ func (z *Metadatei) ApplyGoldenChild(
 		return
 	}
 
-	mes := z.Etiketten.CloneMutableSetPtrLike()
+	// TODO-P1 remove clone
+	mes := z.GetEtiketten().CloneMutableSetPtrLike()
 
 	prefixes := kennung.Withdraw(mes, e).Elements()
 
@@ -254,7 +273,7 @@ func (z *Metadatei) ApplyGoldenChild(
 	sort.Slice(prefixes, sortFunc)
 
 	mes.Add(prefixes[0])
-	z.Etiketten = mes.CloneSetPtrLike()
+	z.SetEtiketten(mes)
 
 	return
 }

@@ -1,7 +1,6 @@
 package sha
 
 import (
-	"crypto/sha256"
 	"hash"
 	"io"
 
@@ -10,13 +9,15 @@ import (
 )
 
 type writer struct {
-	c io.Closer
-	w io.Writer
-	h hash.Hash
+	closed bool
+	c      io.Closer
+	w      io.Writer
+	h      hash.Hash
+	sh     Sha
 }
 
 func MakeWriter(in io.Writer) (out *writer) {
-	h := sha256.New()
+	h := shaPool.Get()
 
 	if in == nil {
 		in = io.Discard
@@ -48,6 +49,8 @@ func (w *writer) Write(p []byte) (n int, err error) {
 }
 
 func (w *writer) Close() (err error) {
+	w.closed = true
+
 	if w.c == nil {
 		return
 	}
@@ -57,11 +60,23 @@ func (w *writer) Close() (err error) {
 		return
 	}
 
+	w.setShaLikeIfNecessary()
+
 	return
 }
 
+func (w *writer) setShaLikeIfNecessary() {
+	if !w.closed {
+		w.sh = FromHash(w.h)
+
+		shaPool.Put(w.h)
+		w.h = nil
+	}
+}
+
 func (w *writer) GetShaLike() (s schnittstellen.ShaLike) {
-	s = FromHash(w.h)
+	w.setShaLikeIfNecessary()
+	s = w.sh
 
 	return
 }

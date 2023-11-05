@@ -78,13 +78,14 @@ func TestWriteWithoutAkte(t1 *testing.T) {
 
 	z := metadatei.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
-		Etiketten: makeEtiketten(t,
-			"tag1",
-			"tag2",
-			"tag3",
-		),
-		Typ: makeAkteExt(t, "md"),
+		Typ:         makeAkteExt(t, "md"),
 	}
+
+	z.SetEtiketten(makeEtiketten(t,
+		"tag1",
+		"tag2",
+		"tag3",
+	))
 
 	af := test_metadatei_io.FixtureFactoryReadWriteCloser(
 		map[string]string{
@@ -118,13 +119,14 @@ func TestWriteWithInlineAkte(t1 *testing.T) {
 
 	z := metadatei.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
-		Etiketten: makeEtiketten(t,
-			"tag1",
-			"tag2",
-			"tag3",
-		),
-		Typ: makeAkteExt(t, "md"),
+		Typ:         makeAkteExt(t, "md"),
 	}
+
+	z.SetEtiketten(makeEtiketten(t,
+		"tag1",
+		"tag2",
+		"tag3",
+	))
 
 	af := test_metadatei_io.FixtureFactoryReadWriteCloser(
 		map[string]string{

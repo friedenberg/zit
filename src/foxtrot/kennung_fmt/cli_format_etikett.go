@@ -23,6 +23,10 @@ func (f *etikettenCliFormat) WriteStringFormat(
 	w io.StringWriter,
 	k kennung.EtikettSet,
 ) (n int64, err error) {
+	if k.Len() == 0 {
+		return
+	}
+
 	v := iter.StringDelimiterSeparated[kennung.Etikett](k, " ")
 
 	return f.stringFormatWriter.WriteStringFormat(w, v)

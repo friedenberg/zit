@@ -94,7 +94,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			if _, err = fmt.Fprintln(
 				out,
 				iter.StringCommaSeparated[kennung.Etikett](
-					tl.GetMetadatei().GetEtiketten(),
+					tl.Metadatei.GetEtiketten(),
 				),
 			); err != nil {
 				err = errors.Wrap(err)

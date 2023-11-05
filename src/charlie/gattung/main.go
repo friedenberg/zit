@@ -192,20 +192,20 @@ func (g Gattung) String() string {
 }
 
 func hasPrefixOrEquals(v, p string) bool {
-	return strings.HasPrefix(v, p) || v == p
+	return strings.HasPrefix(v, p) || strings.EqualFold(v, p)
 }
 
 func (g *Gattung) Set(v string) (err error) {
-	v = strings.TrimSpace(strings.ToLower(v))
+	v = strings.TrimSpace(v)
 
 	switch {
-	case v == "akte":
+	case strings.EqualFold(v, "akte"):
 		*g = Akte
 
 	case hasPrefixOrEquals("typ", v):
 		*g = Typ
 
-	case v == "aktetyp":
+	case strings.EqualFold(v, "aktetyp"):
 		*g = Typ
 
 	case hasPrefixOrEquals("etikett", v):
@@ -214,19 +214,19 @@ func (g *Gattung) Set(v string) (err error) {
 	case hasPrefixOrEquals("zettel", v):
 		*g = Zettel
 
-	case v == "bezeichnung":
+	case strings.EqualFold(v, "bezeichnung"):
 		*g = Bezeichnung
 
-	case v == "hinweis":
+	case strings.EqualFold("hinweis", v):
 		*g = Hinweis
 
-	case v == "transaktion":
+	case strings.EqualFold("transaktion", v):
 		*g = Transaktion
 
-	case v == "konfig":
+	case strings.EqualFold("konfig", v):
 		*g = Konfig
 
-	case v == "kennung":
+	case strings.EqualFold("kennung", v):
 		*g = Kennung
 
 	case hasPrefixOrEquals("bestandsaufnahme", v):

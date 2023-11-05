@@ -79,13 +79,14 @@ func TestEqualitySelf(t1 *testing.T) {
 
 	text := metadatei.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
-		Etiketten: makeEtiketten(t,
-			"tag1",
-			"tag2",
-			"tag3",
-		).CloneSetPtrLike(),
-		Typ: makeAkteExt(t, "text"),
+		Typ:         makeAkteExt(t, "text"),
 	}
+
+	text.SetEtiketten(makeEtiketten(t,
+		"tag1",
+		"tag2",
+		"tag3",
+	))
 
 	if !text.Equals(text) {
 		t.Fatalf("expected %v to equal itself", text)
@@ -97,23 +98,25 @@ func TestEqualityNotSelf(t1 *testing.T) {
 
 	text := metadatei.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
-		Etiketten: makeEtiketten(t,
-			"tag1",
-			"tag2",
-			"tag3",
-		).CloneSetPtrLike(),
-		Typ: makeAkteExt(t, "text"),
+		Typ:         makeAkteExt(t, "text"),
 	}
+
+	text.SetEtiketten(makeEtiketten(t,
+		"tag1",
+		"tag2",
+		"tag3",
+	))
 
 	text1 := metadatei.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
-		Etiketten: makeEtiketten(t,
-			"tag1",
-			"tag2",
-			"tag3",
-		).CloneSetPtrLike(),
-		Typ: makeAkteExt(t, "text"),
+		Typ:         makeAkteExt(t, "text"),
 	}
+
+	text1.SetEtiketten(makeEtiketten(t,
+		"tag1",
+		"tag2",
+		"tag3",
+	))
 
 	if !text.Equals(text1) {
 		t.Fatalf("expected %v to equal %v", text, text1)

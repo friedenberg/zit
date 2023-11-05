@@ -42,9 +42,7 @@ func (s SetKeyToMetadatei) AddEtikett(h string, e kennung.Etikett) {
 		m.Reset()
 	}
 
-	mes := m.Etiketten.CloneMutableSetPtrLike()
-	kennung.AddNormalized(mes, &e)
-	m.Etiketten = mes
+	kennung.AddNormalized(m.GetEtikettenMutable(), &e)
 	s[h] = m
 }
 
@@ -58,7 +56,7 @@ func (s SetKeyToMetadatei) ContainsEtikett(
 		return
 	}
 
-	ok = m.Etiketten.Contains(e)
+	ok = m.GetEtiketten().Contains(e)
 
 	return
 }

@@ -23,9 +23,9 @@ func (ip ItemPool) Get() *Item {
 }
 
 func (ip ItemPool) Put(i *Item) {
-  if i == nil {
-    panic("item was nil")
-  }
+	if i == nil {
+		panic("item was nil")
+	}
 
 	i.Reset()
 	ip.inner.Put(i)

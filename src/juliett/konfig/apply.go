@@ -15,10 +15,10 @@ func (k compiled) ApplyToMetadatei(
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) (err error) {
 	mp := ml.GetMetadateiPtr()
-	mp.Verzeichnisse.ExpandedEtiketten = kennung.ExpandMany[kennung.Etikett](
+	mp.Verzeichnisse.SetExpandedEtiketten(kennung.ExpandMany[kennung.Etikett](
 		mp.GetEtiketten(),
 		expansion.ExpanderRight,
-	)
+	))
 
 	ie := kennung.MakeEtikettMutableSet()
 
@@ -42,7 +42,7 @@ func (k compiled) ApplyToMetadatei(
 		typKonfig.GetEtiketten().EachPtr(addImpEts)
 	}
 
-	mp.Verzeichnisse.ImplicitEtiketten = ie
+	mp.Verzeichnisse.SetImplicitEtiketten(ie)
 
 	checkFunc := func(e *kennung.Etikett) bool {
 		return k.EtikettenHidden.ContainsKey(k.EtikettenHidden.KeyPtr(e))
@@ -50,15 +50,15 @@ func (k compiled) ApplyToMetadatei(
 
 	mp.Verzeichnisse.Archiviert.SetBool(
 		iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
-			mp.Etiketten,
+			mp.GetEtiketten(),
 			checkFunc,
 		) ||
 			iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
-				mp.Verzeichnisse.ExpandedEtiketten,
+				mp.Verzeichnisse.GetExpandedEtiketten(),
 				checkFunc,
 			) ||
 			iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
-				mp.Verzeichnisse.ImplicitEtiketten,
+				mp.Verzeichnisse.GetImplicitEtiketten(),
 				checkFunc,
 			),
 	)
@@ -79,8 +79,8 @@ func (k compiled) ApplyToNewMetadatei(
 	}()
 
 	t := m.GetTyp()
-	normalized := kennung.WithRemovedCommonPrefixes(m.Etiketten)
-	m.Etiketten = normalized
+	normalized := kennung.WithRemovedCommonPrefixes(m.GetEtiketten())
+	m.SetEtiketten(normalized)
 
 	tk := k.GetApproximatedTyp(t)
 

@@ -153,12 +153,12 @@ func (f v4) FormatPersistentMetadatei(
 			}
 		}
 
-		if m.Verzeichnisse.ExpandedEtiketten != nil {
+		if m.Verzeichnisse.GetExpandedEtiketten().Len() > 0 {
 			k := fmt.Sprintf(
 				"Verzeichnisse-%s-Expanded",
 				gattung.Etikett.String(),
 			)
-			for _, e := range iter.SortedValues[kennung.Etikett](m.Verzeichnisse.ExpandedEtiketten) {
+			for _, e := range iter.SortedValues[kennung.Etikett](m.Verzeichnisse.GetExpandedEtiketten()) {
 				n1, err = ohio.WriteKeySpaceValueNewlineString(
 					w,
 					k,
@@ -173,13 +173,13 @@ func (f v4) FormatPersistentMetadatei(
 			}
 		}
 
-		if m.Verzeichnisse.ImplicitEtiketten != nil {
+		if m.Verzeichnisse.GetImplicitEtiketten().Len() > 0 {
 			k := fmt.Sprintf(
 				"Verzeichnisse-%s-Implicit",
 				gattung.Etikett.String(),
 			)
 
-			for _, e := range iter.SortedValues[kennung.Etikett](m.Verzeichnisse.ImplicitEtiketten) {
+			for _, e := range iter.SortedValues[kennung.Etikett](m.Verzeichnisse.GetImplicitEtiketten()) {
 				n2, err = ohio.WriteKeySpaceValueNewline(
 					w,
 					k,
@@ -244,14 +244,6 @@ func (f v4) ParsePersistentMetadatei(
 	o Options,
 ) (n int64, err error) {
 	m := c.GetMetadatei()
-
-	etiketten := kennung.MakeEtikettMutableSet()
-	var etikettenExpanded, etikettenImplicit kennung.EtikettMutableSet
-
-	if o.IncludeVerzeichnisse {
-		etikettenExpanded = kennung.MakeEtikettMutableSet()
-		etikettenImplicit = kennung.MakeEtikettMutableSet()
-	}
 
 	var (
 		g gattung.Gattung
@@ -319,7 +311,7 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-			if err = etiketten.AddPtr(e); err != nil {
+			if err = m.AddEtikettPtr(e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -374,10 +366,14 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-			if err = iter.AddString[kennung.Etikett, *kennung.Etikett](
-				etikettenImplicit,
-				string(val),
-			); err != nil {
+			e := kennung.GetEtikettPool().Get()
+
+			if err = e.Set(string(val)); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = m.Verzeichnisse.GetImplicitEtikettenMutable().AddPtr(e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -391,14 +387,17 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-			if err = iter.AddString[kennung.Etikett, *kennung.Etikett](
-				etikettenExpanded,
-				string(val),
-			); err != nil {
+			e := kennung.GetEtikettPool().Get()
+
+			if err = e.Set(string(val)); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
+			if err = m.Verzeichnisse.GetExpandedEtikettenMutable().AddPtr(e); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		} else if string(key) == "Verzeichnisse-Mutter" {
 			if err = m.Verzeichnisse.Mutter.Set(string(val)); err != nil {
 				err = errors.Wrap(err)
@@ -433,13 +432,6 @@ func (f v4) ParsePersistentMetadatei(
 	if n == 0 {
 		err = io.EOF
 		return
-	}
-
-	m.Etiketten = etiketten
-
-	if o.IncludeVerzeichnisse {
-		m.Verzeichnisse.ImplicitEtiketten = etikettenImplicit
-		m.Verzeichnisse.ExpandedEtiketten = etikettenExpanded
 	}
 
 	actual := mh.GetShaLike()

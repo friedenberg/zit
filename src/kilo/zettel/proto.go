@@ -20,18 +20,11 @@ func MakeProtoZettel(k konfig.Compiled) (p ProtoZettel) {
 
 	p.Metadatei.Typ = k.GetErworben().Defaults.Typ
 
-	todo.Decide("should this be set to default etiketten?")
-	p.Metadatei.Etiketten = kennung.MakeEtikettSet()
-
 	return
 }
 
 func MakeEmptyProtoZettel() ProtoZettel {
-	return ProtoZettel{
-		Metadatei: metadatei.Metadatei{
-			Etiketten: kennung.MakeEtikettSet(),
-		},
-	}
+	return ProtoZettel{}
 }
 
 func (pz *ProtoZettel) AddToFlagSet(f *flag.FlagSet) {
@@ -58,9 +51,8 @@ func (pz ProtoZettel) Equals(z metadatei.Metadatei) (ok bool) {
 func (pz ProtoZettel) Make() (z *metadatei.Metadatei) {
 	todo.Change("add typ")
 	todo.Change("add Bezeichnung")
-	z = &metadatei.Metadatei{
-		Etiketten: kennung.MakeEtikettSet(),
-	}
+	//TODO-P2 use pool
+	z = &metadatei.Metadatei{}
 
 	pz.Apply(z)
 
@@ -83,13 +75,11 @@ func (pz ProtoZettel) Apply(ml metadatei.MetadateiLike) (ok bool) {
 		z.Bezeichnung = pz.Metadatei.Bezeichnung
 	}
 
-	if pz.Metadatei.Etiketten.Len() > 0 {
+	if pz.Metadatei.GetEtiketten().Len() > 0 {
 		ok = true
 	}
 
-	mes := z.Etiketten.CloneMutableSetPtrLike()
-	pz.Metadatei.Etiketten.Each(mes.Add)
-	z.Etiketten = mes.CloneSetPtrLike()
+	errors.PanicIfError(pz.Metadatei.GetEtiketten().EachPtr(z.AddEtikettPtr))
 
 	ml.SetMetadatei(z)
 
@@ -130,9 +120,7 @@ func (pz ProtoZettel) ApplyWithAkteFD(
 		return
 	}
 
-	mes := z.Etiketten.CloneMutableSetPtrLike()
-	pz.Metadatei.Etiketten.Each(mes.Add)
-	z.Etiketten = mes.CloneSetPtrLike()
+	errors.PanicIfError(pz.Metadatei.GetEtiketten().EachPtr(z.AddEtikettPtr))
 
 	ml.SetMetadatei(z)
 

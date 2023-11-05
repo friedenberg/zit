@@ -76,7 +76,7 @@ func (c CatAlfred) RunWithQuery(
 	defer errors.DeferredCloser(&err, aw)
 
 	if err = u.StoreObjekten().Query(
-    ms,
+		ms,
 		aw.PrintOne,
 	); err != nil {
 		aw.WriteError(err)

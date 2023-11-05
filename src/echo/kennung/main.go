@@ -427,9 +427,10 @@ func Expanded(s EtikettSet, ex expansion.Expander) (out EtikettSet) {
 	return ExpandMany[Etikett, *Etikett](s, ex)
 }
 
+// TODO-P2 rename to AddNormalizedEtikett
 func AddNormalized(es EtikettMutableSet, e *Etikett) {
 	ExpandOne(e, expansion.ExpanderRight).Each(es.Add)
-	es.AddPtr(e)
+	errors.PanicIfError(iter.AddClonePool[Etikett, *Etikett](es, GetEtikettPool(), EtikettResetter, e))
 
 	c := es.CloneSetPtrLike()
 	es.Reset()

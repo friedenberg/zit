@@ -23,7 +23,7 @@ func MakeCliFormatExcludeTyp(
 		if m.Bezeichnung.IsEmpty() {
 			lastWriter = format.MakeWriter(
 				ef,
-				schnittstellen.SetLike[kennung.Etikett](m.Etiketten),
+				schnittstellen.SetLike[kennung.Etikett](m.GetEtiketten()),
 			)
 		} else if !m.Bezeichnung.IsEmpty() {
 			lastWriter = format.MakeWriter(bf, m.Bezeichnung)
@@ -51,7 +51,7 @@ func MakeCliFormatIncludeTyp(
 		if m.Bezeichnung.IsEmpty() {
 			lastWriter = format.MakeWriter(
 				ef,
-				schnittstellen.SetLike[kennung.Etikett](m.Etiketten),
+				schnittstellen.SetLike[kennung.Etikett](m.GetEtiketten()),
 			)
 		} else if !m.Bezeichnung.IsEmpty() {
 			lastWriter = format.MakeWriter(bf, m.Bezeichnung)

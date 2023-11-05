@@ -1,6 +1,8 @@
 package metadatei
 
 import (
+	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -8,40 +10,54 @@ import (
 
 type Verzeichnisse struct {
 	Archiviert        values.Bool
-	ExpandedEtiketten kennung.EtikettSet
-	ImplicitEtiketten kennung.EtikettSet
-	Mutter            sha.Sha // sha of parent Metadatei
-	Sha               sha.Sha // sha of Metadatei
+	ExpandedEtiketten kennung.EtikettMutableSet //public for gob, but should be private
+	ImplicitEtiketten kennung.EtikettMutableSet //public for gob, but should be private
+	Mutter            sha.Sha                   // sha of parent Metadatei
+	Sha               sha.Sha                   // sha of Metadatei
 }
 
 func (v *Verzeichnisse) GetExpandedEtiketten() kennung.EtikettSet {
+	return v.GetExpandedEtikettenMutable()
+}
+
+func (v *Verzeichnisse) GetExpandedEtikettenMutable() kennung.EtikettMutableSet {
 	if v.ExpandedEtiketten == nil {
-		return kennung.EtikettSetEmpty
+		v.ExpandedEtiketten = kennung.MakeEtikettMutableSet()
 	}
 
 	return v.ExpandedEtiketten
 }
 
+func (v *Verzeichnisse) SetExpandedEtiketten(e kennung.EtikettSet) {
+	es := v.GetExpandedEtikettenMutable()
+	iter.ResetMutableSetWithPool(es, kennung.GetEtikettPool())
+
+	if e == nil {
+		return
+	}
+
+	errors.PanicIfError(e.Each(es.Add))
+}
+
 func (v *Verzeichnisse) GetImplicitEtiketten() kennung.EtikettSet {
+	return v.GetImplicitEtikettenMutable()
+}
+
+func (v *Verzeichnisse) GetImplicitEtikettenMutable() kennung.EtikettMutableSet {
 	if v.ImplicitEtiketten == nil {
-		return kennung.EtikettSetEmpty
+		v.ImplicitEtiketten = kennung.MakeEtikettMutableSet()
 	}
 
 	return v.ImplicitEtiketten
 }
 
-func (v *Verzeichnisse) Reset() {
-	v.Archiviert.Reset()
-	v.ImplicitEtiketten = kennung.EtikettSetEmpty
-	v.ExpandedEtiketten = kennung.EtikettSetEmpty
-	v.Mutter.Reset()
-	v.Sha.Reset()
-}
+func (v *Verzeichnisse) SetImplicitEtiketten(e kennung.EtikettSet) {
+	es := v.GetImplicitEtikettenMutable()
+	iter.ResetMutableSetWithPool(es, kennung.GetEtikettPool())
 
-func (a *Verzeichnisse) ResetWith(b *Verzeichnisse) {
-	a.Archiviert.ResetWith(b.Archiviert)
-	a.ImplicitEtiketten = b.ImplicitEtiketten
-	a.ExpandedEtiketten = b.ExpandedEtiketten
-	a.Mutter = b.Mutter
-	a.Sha = b.Sha
+	if e == nil {
+		return
+	}
+
+	errors.PanicIfError(e.Each(es.Add))
 }

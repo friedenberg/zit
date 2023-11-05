@@ -30,10 +30,8 @@ func (f v2) FormatPersistentMetadatei(
 	w.WriteFormat("%s %s", gattung.Typ, m.GetTyp())
 	w.WriteFormat("%s %s", gattung.Bezeichnung, m.Bezeichnung)
 
-	if m.Etiketten != nil {
-		for _, e := range iter.SortedValues[kennung.Etikett](m.Etiketten) {
-			w.WriteFormat("%s %s", gattung.Etikett, e)
-		}
+	for _, e := range iter.SortedValues[kennung.Etikett](m.GetEtiketten()) {
+		w.WriteFormat("%s %s", gattung.Etikett, e)
 	}
 
 	if n, err = w.WriteTo(w1); err != nil {
@@ -81,7 +79,7 @@ func (f v2) ParsePersistentMetadatei(
 		return
 	}
 
-	m.Etiketten = etiketten
+	m.SetEtiketten(etiketten)
 
 	c.SetMetadatei(m)
 
