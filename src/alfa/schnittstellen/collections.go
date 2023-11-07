@@ -22,7 +22,6 @@ type SetLike[T any] interface {
 	Get(string) (T, bool)
 	Contains(T) bool
 	EachKey(FuncIterKey) error
-	Elements() []T // TODO-P2 remove in favor of collection method
 
 	CloneSetLike() SetLike[T]
 	CloneMutableSetLike() MutableSetLike[T]

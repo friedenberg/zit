@@ -129,7 +129,7 @@ func (c ZettelFromExternalAkte) Run(
 		return
 	}
 
-	sortedToCreated := toCreate.Elements()
+	sortedToCreated := iter.Elements[*sku.External](toCreate)
 
 	sort.Slice(
 		sortedToCreated,

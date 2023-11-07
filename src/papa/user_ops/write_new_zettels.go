@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/checkout_options"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
@@ -62,10 +63,11 @@ func (c WriteNewZettels) runOneAlreadyLocked(
 	pz zettel.ProtoZettel,
 ) (result *sku.CheckedOut, err error) {
 	z := pz.Make()
+  defer metadatei.GetPool().Put(z)
 
 	var zt *sku.Transacted
 
-	if zt, err = c.StoreObjekten().Zettel().Create(*z); err != nil {
+	if zt, err = c.StoreObjekten().Zettel().Create(z); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

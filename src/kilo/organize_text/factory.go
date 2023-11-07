@@ -38,7 +38,7 @@ func (atc *Factory) makeWithMetadatei() (ot *Text, err error) {
 	prefixSet := objekte_collections.MakeSetPrefixVerzeichnisse(0)
 	atc.Transacted.Each(prefixSet.Add)
 
-	for _, e := range atc.ExtraEtiketten.Elements() {
+	for _, e := range iter.Elements[kennung.Etikett](atc.ExtraEtiketten) {
 		ee := newAssignment(ot.Depth() + 1)
 		ee.etiketten = kennung.MakeEtikettSet(e)
 		ot.assignment.addChild(ee)

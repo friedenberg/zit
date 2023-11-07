@@ -279,10 +279,10 @@ func HasParentPrefix(a, b Etikett) (has bool) {
 func IntersectPrefixes(s1 EtikettSet, s2 EtikettSet) (s3 EtikettSet) {
 	s4 := MakeEtikettMutableSet()
 
-	for _, e1 := range s2.Elements() {
+	for _, e1 := range iter.Elements[Etikett](s2) {
 		didAdd := false
 
-		for _, e := range s1.Elements() {
+		for _, e := range iter.Elements[Etikett](s1) {
 			if strings.HasPrefix(e.String(), e1.String()) {
 				didAdd = true
 				s4.Add(e)
@@ -303,7 +303,7 @@ func IntersectPrefixes(s1 EtikettSet, s2 EtikettSet) (s3 EtikettSet) {
 func SubtractPrefix(s1 EtikettSet, e Etikett) (s2 EtikettSet) {
 	s3 := MakeEtikettMutableSet()
 
-	for _, e1 := range s1.Elements() {
+	for _, e1 := range iter.Elements[Etikett](s1) {
 		e2, _ := LeftSubtract(e1, e)
 
 		if e2.String() == "" {
@@ -438,7 +438,7 @@ func AddNormalized(es EtikettMutableSet, e *Etikett) {
 }
 
 func RemovePrefixes(es EtikettMutableSet, needle Etikett) {
-	for _, haystack := range es.Elements() {
+	for _, haystack := range iter.Elements[Etikett](es) {
 		// TODO-P2 make more efficient
 		if strings.HasPrefix(haystack.String(), needle.String()) {
 			es.Del(haystack)
@@ -449,7 +449,7 @@ func RemovePrefixes(es EtikettMutableSet, needle Etikett) {
 func Withdraw(s1 EtikettMutableSet, e Etikett) (s2 EtikettSet) {
 	s3 := MakeEtikettMutableSet()
 
-	for _, e1 := range s1.Elements() {
+	for _, e1 := range iter.Elements[Etikett](s1) {
 		if Contains(e1, e) {
 			s3.Add(e1)
 		}

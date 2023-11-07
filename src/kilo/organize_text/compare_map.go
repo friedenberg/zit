@@ -116,7 +116,7 @@ func (a *assignment) addToCompareMap(
 				out.Named.AddEtikett(fk, e)
 			}
 
-			for _, e := range m.EtikettSet.Elements() {
+			for _, e := range iter.Elements[kennung.Etikett](m.EtikettSet) {
 				errors.TodoP4("add typ")
 				out.Named.AddEtikett(fk, e)
 			}
@@ -133,7 +133,7 @@ func (a *assignment) addToCompareMap(
 				out.Unnamed.AddEtikett(z.Bezeichnung.String(), e)
 			}
 
-			for _, e := range m.EtikettSet.Elements() {
+			for _, e := range iter.Elements[kennung.Etikett](m.EtikettSet) {
 				errors.TodoP4("add typ")
 				out.Unnamed.AddEtikett(z.Bezeichnung.String(), e)
 			}

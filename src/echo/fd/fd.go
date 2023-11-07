@@ -33,7 +33,6 @@ type (
 )
 
 type FD struct {
-	// TODO-P2 make all of these private and expose as methods
 	isDir   bool
 	path    string
 	modTime thyme.Time

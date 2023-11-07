@@ -48,14 +48,6 @@ func (a String) Less(b String) bool {
 	return a.string < b.string
 }
 
-func (a String) EqualsAny(b any) bool {
-	return Equals(a, b)
-}
-
-func (a String) Equals(b String) bool {
-	return a.string == b.string
-}
-
 func (a String) WasSet() bool {
 	return a.wasSet
 }

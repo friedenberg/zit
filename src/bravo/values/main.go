@@ -13,8 +13,6 @@ func Equals[T schnittstellen.Equatable[T]](a T, b any) bool {
 		}
 	}
 
-	// TODO-P1 determine how to move off of Equals
-
 	return false
 }
 

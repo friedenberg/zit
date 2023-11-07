@@ -129,45 +129,45 @@ func NopAkteFactory() schnittstellen.AkteIOFactory {
 }
 
 func (_ nopAkteFactory) AkteWriter() (WriteCloser, error) {
-	return MakeNopWriter(), nil
+	return MakeWriter(nil), nil
 }
 
 func (_ nopAkteFactory) AkteReader(s ShaLike) (ReadCloser, error) {
 	return MakeNopReadCloser(io.NopCloser(bytes.NewBuffer(nil))), nil
 }
 
-// TODO-P2 remove and replace with sha.writer
-type nopWriter struct {
-	hash hash.Hash
-}
+// // TODO-P2 remove and replace with sha.writer
+// type nopWriter struct {
+// 	hash hash.Hash
+// }
 
-func MakeNopWriter() (w *nopWriter) {
-	w = &nopWriter{
-		hash: sha256.New(),
-	}
+// func MakeNopWriter() (w *nopWriter) {
+// 	w = &nopWriter{
+// 		hash: sha256.New(),
+// 	}
 
-	return
-}
+// 	return
+// }
 
-func (w *nopWriter) ReadFrom(r io.Reader) (n int64, err error) {
-	if n, err = io.Copy(w.hash, r); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// func (w *nopWriter) ReadFrom(r io.Reader) (n int64, err error) {
+// 	if n, err = io.Copy(w.hash, r); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	return
-}
+// 	return
+// }
 
-func (w *nopWriter) Write(p []byte) (n int, err error) {
-	return w.hash.Write(p)
-}
+// func (w *nopWriter) Write(p []byte) (n int, err error) {
+// 	return w.hash.Write(p)
+// }
 
-func (w *nopWriter) Close() (err error) {
-	return
-}
+// func (w *nopWriter) Close() (err error) {
+// 	return
+// }
 
-func (w *nopWriter) GetShaLike() (s schnittstellen.ShaLike) {
-	s = FromHash(w.hash)
+// func (w *nopWriter) GetShaLike() (s schnittstellen.ShaLike) {
+// 	s = FromHash(w.hash)
 
-	return
-}
+// 	return
+// }

@@ -51,8 +51,7 @@ func (pz ProtoZettel) Equals(z metadatei.Metadatei) (ok bool) {
 func (pz ProtoZettel) Make() (z *metadatei.Metadatei) {
 	todo.Change("add typ")
 	todo.Change("add Bezeichnung")
-	//TODO-P2 use pool
-	z = &metadatei.Metadatei{}
+	z = metadatei.GetPool().Get()
 
 	pz.Apply(z)
 

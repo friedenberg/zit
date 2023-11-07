@@ -11,7 +11,7 @@ func SortedValuesBy[E any](
 	c schnittstellen.SetLike[E],
 	sf func(E, E) bool,
 ) (out []E) {
-	out = c.Elements()
+	out = Elements[E](c)
 
 	sort.Slice(out, func(i, j int) bool { return sf(out[i], out[j]) })
 
@@ -21,7 +21,7 @@ func SortedValuesBy[E any](
 func SortedValues[E schnittstellen.Value[E]](
 	c schnittstellen.SetLike[E],
 ) (out []E) {
-	out = c.Elements()
+	out = Elements[E](c)
 
 	sort.Slice(
 		out,

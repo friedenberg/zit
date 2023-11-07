@@ -32,7 +32,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 	}
 
 	{
-		ac := len(sut.Elements())
+		ac := sut.Len()
 
 		if ac != 3 {
 			t.Fatalf("expected len 3 but got %d", ac)

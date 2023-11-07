@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -161,7 +162,7 @@ func (z *obj) setNewObj(v string) (err error) {
 func sortObjSet(
 	s schnittstellen.MutableSetLike[obj],
 ) (out []obj) {
-	out = s.Elements()
+	out = iter.Elements[obj](s)
 
 	sort.Slice(out, func(i, j int) bool {
 		switch {

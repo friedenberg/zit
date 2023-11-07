@@ -47,10 +47,6 @@ func (sv Bool) String() string {
 	return fmt.Sprintf("%t", sv.Value)
 }
 
-func (a Bool) EqualsAny(b any) bool {
-	return Equals(a, b)
-}
-
 func (a Bool) Equals(b Bool) bool {
 	return a.Value == b.Value && a.wasSet && b.wasSet
 }

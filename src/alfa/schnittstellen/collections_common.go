@@ -32,6 +32,7 @@ type StringAdder interface {
 type Iterable[T any] interface {
 	Any() T // TODO-P2 remove in favor of collection method?
 	Each(FuncIter[T]) error
+	Lenner
 }
 
 type IterablePtr[T any, TPtr Ptr[T]] interface {

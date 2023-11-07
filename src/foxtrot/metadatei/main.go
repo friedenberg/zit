@@ -251,10 +251,9 @@ func (z *Metadatei) ApplyGoldenChild(
 		return
 	}
 
-	// TODO-P1 remove clone
-	mes := z.GetEtiketten().CloneMutableSetPtrLike()
+	mes := z.GetEtikettenMutable()
 
-	prefixes := kennung.Withdraw(mes, e).Elements()
+	prefixes := iter.Elements[kennung.Etikett](kennung.Withdraw(mes, e))
 
 	if len(prefixes) == 0 {
 		return
@@ -273,7 +272,6 @@ func (z *Metadatei) ApplyGoldenChild(
 	sort.Slice(prefixes, sortFunc)
 
 	mes.Add(prefixes[0])
-	z.SetEtiketten(mes)
 
 	return
 }

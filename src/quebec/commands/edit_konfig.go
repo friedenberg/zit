@@ -103,7 +103,7 @@ func (c EditKonfig) editOnlyEtiketten(
 	// TODO-P3 validate etiketten to unhide
 	c.UnhideEtiketten.Each(hiddenEtiketten.Del)
 
-	newKonfig.HiddenEtiketten = hiddenEtiketten.Elements()
+	newKonfig.HiddenEtiketten = iter.Elements[kennung.Etikett](hiddenEtiketten)
 
 	var aw schnittstellen.ShaWriteCloser
 

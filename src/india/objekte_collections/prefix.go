@@ -3,6 +3,7 @@ package objekte_collections
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -106,7 +107,7 @@ func (a SetPrefixNamed) Subset(e kennung.Etikett) (out SetPrefixNamedSegments) {
 					intersection.Any().Equals(e)
 
 				if intersection.Len() > 0 && !exactMatch {
-					for _, e2 := range intersection.Elements() {
+					for _, e2 := range iter.Elements[kennung.Etikett](intersection) {
 						out.Grouped.addPair(e2, z)
 					}
 				} else {
@@ -166,7 +167,7 @@ func (a SetPrefixVerzeichnisse) Subset(
 					intersection.Any().Equals(e)
 
 				if intersection.Len() > 0 && !exactMatch {
-					for _, e2 := range intersection.Elements() {
+					for _, e2 := range iter.Elements[kennung.Etikett](intersection) {
 						out.Grouped.addPair(e2, z)
 					}
 				} else {

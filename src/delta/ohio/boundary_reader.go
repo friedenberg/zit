@@ -33,7 +33,6 @@ const (
 )
 
 func MakeBoundaryReader(r io.Reader, boundary string) BoundaryReader {
-	// TODO-P1 perf allow for optimized buffer size
 	d := 0
 
 	if len(boundary) > ringBufferDefaultSize {
@@ -54,7 +53,6 @@ func MakeBoundaryReaderPageSize(
 	boundary string,
 	size int,
 ) BoundaryReader {
-	// TODO-P1 perf allow for optimized buffer size
 	if len(boundary) > ringBufferDefaultSize {
 		size = len(boundary)
 	}

@@ -104,17 +104,23 @@ func ChangesFrom(
 
 		c.allB.Add(values.MakeString(h))
 
-		for _, e1 := range es1.GetEtiketten().Elements() {
-			if a.Named.ContainsEtikett(h, e1) {
-				// zettel had etikett previously
-			} else {
-				change.added.Add(e1)
-			}
+		if err = es1.GetEtiketten().Each(
+			func(e1 kennung.Etikett) (err error) {
+				if a.Named.ContainsEtikett(h, e1) {
+					// zettel had etikett previously
+				} else {
+					change.added.Add(e1)
+				}
 
-			if es2, ok := a.Named[h]; ok {
-				es2.GetEtikettenMutable().Del(e1)
-				a.Named[h] = es2
-			}
+				if es2, ok := a.Named[h]; ok {
+					es2.GetEtikettenMutable().Del(e1)
+					a.Named[h] = es2
+				}
+
+				return
+			},
+		); err != nil {
+			return
 		}
 
 		c.existing.Add(change)
@@ -132,13 +138,19 @@ func ChangesFrom(
 			}
 		}
 
-		for _, e1 := range es.GetEtiketten().Elements() {
-			if e1.String() == "" {
-				err = errors.Errorf("empty etikett for %s", h)
-				return
-			}
+		if err = es.GetEtiketten().Each(
+			func(e1 kennung.Etikett) (err error) {
+				if e1.String() == "" {
+					err = errors.Errorf("empty etikett for %s", h)
+					return
+				}
 
-			change.removed.Add(e1)
+				change.removed.Add(e1)
+
+				return
+			},
+		); err != nil {
+			return
 		}
 
 		c.existing.Add(change)
