@@ -62,7 +62,7 @@ func (c Mergetool) RunWithQuery(
 	defer errors.Deferred(&err, u.Unlock)
 
 	if len(p) == 0 {
-		//TODO-P2 return status 1
+		// TODO-P2 return status 1
 		errors.Err().Printf("nothing to merge")
 		return
 	}

@@ -75,3 +75,23 @@ function format_simple { # @test
 		last time but new
 	EOM
 }
+
+function show_simple_one_zettel_binary { # @test
+	echo "binary file" >file.bin
+	run_zit add -delete file.bin
+	assert_success
+	assert_output_unsorted - <<-EOM
+		          deleted [file.bin]
+		[!bin@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[two/uno@b20c8fea8cb3e467783c5cdadf0707124cac5db72f9a6c3abba79fa0a42df627 !bin "file"]
+	EOM
+
+	run_zit format-zettel two/uno
+	assert_success
+	assert_output - <<-EOM
+		---
+		# file
+		! b20c8fea8cb3e467783c5cdadf0707124cac5db72f9a6c3abba79fa0a42df627.bin
+		---
+	EOM
+}

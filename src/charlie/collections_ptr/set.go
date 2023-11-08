@@ -84,16 +84,6 @@ func (s Set[T, TPtr]) EachKey(wf schnittstellen.FuncIterKey) (err error) {
 	return
 }
 
-func (s Set[T, TPtr]) Elements() (out []T) {
-	out = make([]T, 0, s.Len())
-
-	for _, v := range s.E {
-		out = append(out, *v)
-	}
-
-	return
-}
-
 func (s Set[T, TPtr]) Add(v T) (err error) {
 	s.E[s.Key(v)] = TPtr(&v)
 	return

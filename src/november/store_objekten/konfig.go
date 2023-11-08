@@ -25,7 +25,7 @@ func (s *konfigStore) GetAkteFormat() objekte.AkteFormat[erworben.Akte, *erworbe
 
 func (s konfigStore) Update(
 	sh schnittstellen.ShaLike,
-) (kt *erworben.Transacted, err error) {
+) (kt *sku.Transacted, err error) {
 	if !s.StoreUtil.GetStandort().GetLockSmith().IsAcquired() {
 		err = errors.Wrap(
 			objekte_store.ErrLockRequired{Operation: "update konfig"},
@@ -45,7 +45,7 @@ func (s konfigStore) Update(
 		}
 	}
 
-	kt = &erworben.Transacted{}
+	kt = sku.GetTransactedPool().Get()
 
 	if err = kt.Kennung.SetWithKennung(&kennung.Konfig{}); err != nil {
 		err = errors.Wrap(err)

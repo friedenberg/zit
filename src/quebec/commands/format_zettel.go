@@ -8,8 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/script_config"
 	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/cwd"
 	"github.com/friedenberg/zit/src/november/store_objekten"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
@@ -160,26 +160,14 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		// return
 	}
 
-	var format metadatei.TextFormatter
-
-	if c.Mode.IncludesObjekte() {
-		format = metadatei.MakeTextFormatterMetadateiInlineAkte(
-			u.Standort(),
-			akteFormatter,
-		)
-	} else {
-		format = metadatei.MakeTextFormatterExcludeMetadatei(
-			u.Standort(),
-			akteFormatter,
-		)
-	}
+	f := objekte.MakeTextFormatterWithAkteFormatter(u.Standort(), u.Konfig(), akteFormatter)
 
 	if err = u.Konfig().ApplyToNewMetadatei(zt, u.StoreObjekten().GetAkten().GetTypV0()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if _, err = format.FormatMetadatei(u.Out(), zt); err != nil {
+	if _, err = f.WriteStringFormat(u.Out(), zt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

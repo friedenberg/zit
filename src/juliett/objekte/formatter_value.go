@@ -13,7 +13,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/ohio"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	to_merge "github.com/friedenberg/zit/src/india/sku_fmt"
@@ -114,22 +113,13 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "text":
-		fMetadateiAndAkte := metadatei.MakeTextFormatterMetadateiInlineAkte(
+		f := MakeTextFormatter(
 			af,
-			nil,
+			k,
 		)
-		fMetadateiOnly := metadatei.MakeTextFormatterMetadateiOnly(af, nil)
-		fAkteOnly := metadatei.MakeTextFormatterExcludeMetadatei(af, nil)
 
 		return func(tl *sku.Transacted) (err error) {
-			if gattung.Konfig.EqualsGattung(tl.GetGattung()) {
-				_, err = fAkteOnly.FormatMetadatei(out, tl)
-			} else if k.IsInlineTyp(tl.GetTyp()) {
-				_, err = fMetadateiAndAkte.FormatMetadatei(out, tl)
-			} else {
-				_, err = fMetadateiOnly.FormatMetadatei(out, tl)
-			}
-
+			_, err = f.WriteStringFormat(out, tl)
 			return
 		}
 

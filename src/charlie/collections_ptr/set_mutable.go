@@ -92,16 +92,6 @@ func (s MutableSet[T, TPtr]) AddPtr(v TPtr) (err error) {
 	return
 }
 
-func (s MutableSet[T, TPtr]) Elements() (out []T) {
-	out = make([]T, 0, s.Len())
-
-	for _, v := range s.E {
-		out = append(out, *v)
-	}
-
-	return
-}
-
 func (s MutableSet[T, TPtr]) EachKey(
 	wf schnittstellen.FuncIterKey,
 ) (err error) {
