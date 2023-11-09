@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
-	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -48,33 +47,6 @@ func (s *Store) writeNamedZettelToIndex(
 			err = errors.Wrapf(err, "failed to write zettel to index: %s", tz)
 			return
 		}
-	}
-
-	return
-}
-
-func (s Store) readOneZettel(
-	i schnittstellen.StringerGattungGetter,
-) (tz *sku.Transacted, err error) {
-	var h kennung.Hinweis
-
-	if err = h.Set(i.String()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var tz1 *sku.Transacted
-
-	if tz1, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(h); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	tz = sku.GetTransactedPool().Get()
-
-	if err = tz.SetFromSkuLike(tz1); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	return
@@ -123,7 +95,7 @@ func (s *Store) Create(
 		return
 	}
 
-	if tz, err = s.writeObjekte(
+	if tz, err = s.makeSku(
 		m,
 		ken,
 	); err != nil {
@@ -131,127 +103,7 @@ func (s *Store) Create(
 		return
 	}
 
-	if err = s.commitIndexMatchUpdate(tz, true); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) updateManyMetadateiZettelen(
-	incoming sku.TransactedSet,
-) (err error) {
-	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte_store.ErrLockRequired{
-			Operation: "update many metadatei",
-		}
-
-		return
-	}
-
-	if err = s.verzeichnisseSchwanzen.ReadMany(
-		func(zt *sku.Transacted) (err error) {
-			ke := zt.GetKennungLike()
-
-			if !gattung.Must(ke.GetGattung()).Equals(gattung.Zettel) {
-				return
-			}
-
-			k := kennung.FormattedString(ke)
-
-			var mwk *sku.Transacted
-			ok := false
-
-			if mwk, ok = incoming.GetPtr(k); !ok {
-				return
-			}
-
-			mwkClone := sku.GetTransactedPool().Get()
-
-			if err = mwkClone.SetFromSkuLike(mwk); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			m := mwkClone.GetMetadateiPtr()
-			m.AkteSha = sha.Make(zt.GetAkteSha())
-
-			mwk = mwkClone
-
-			if _, err = s.updateLockedWithMutter(
-				mwk,
-				ke,
-				zt,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) updateExternal(
-	ze *sku.External,
-) (tl *sku.Transacted, err error) {
-	return s.Update(ze.GetMetadatei(), &ze.Kennung)
-}
-
-func (s *Store) UpdateCheckedOut(
-	co *sku.CheckedOut,
-) (t *sku.Transacted, err error) {
-	errors.TodoP2("support dry run")
-
-	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte_store.ErrLockRequired{
-			Operation: "update",
-		}
-
-		return
-	}
-
-	m := co.External.GetMetadatei()
-	metadatei.Resetter.ResetWithPtr(&m, &m)
-
-	err = s.StoreUtil.GetKonfig().ApplyToNewMetadatei(
-		&m,
-		s.GetAkten().GetTypV0(),
-	)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	co.External.SetMetadatei(m)
-
-	if co.External.Metadatei.EqualsSansTai(co.Internal.Metadatei) {
-		t = &co.Internal
-
-		if err = s.Unchanged(t); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-
-	if t, err = s.writeObjekte(
-		co.External.GetMetadatei(),
-		co.External.Kennung,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.commitIndexMatchUpdate(t, false); err != nil {
+	if err = s.commitIndexMatchUpdate(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -288,23 +140,6 @@ func (s *Store) Update(
 		return
 	}
 
-	if tz, err = s.updateLockedWithMutter(
-		mg,
-		&h,
-		mutter,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) updateLockedWithMutter(
-	mg metadatei.Getter,
-	h kennung.Kennung,
-	mutter *sku.Transacted,
-) (tz *sku.Transacted, err error) {
 	if mutter == nil {
 		panic("mutter was nil")
 	}
@@ -321,7 +156,7 @@ func (s *Store) updateLockedWithMutter(
 		return
 	}
 
-	if tz, err = s.writeObjekte(m, h); err != nil {
+	if tz, err = s.makeSku(m, h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -340,7 +175,7 @@ func (s *Store) updateLockedWithMutter(
 		return
 	}
 
-	if err = s.commitIndexMatchUpdate(tz, false); err != nil {
+	if err = s.commitIndexMatchUpdate(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -350,7 +185,6 @@ func (s *Store) updateLockedWithMutter(
 
 func (s *Store) commitIndexMatchUpdate(
 	tz *sku.Transacted,
-	addEtikettenToIndex bool,
 ) (err error) {
 	s.CommitUpdatedTransacted(tz)
 
@@ -372,7 +206,7 @@ func (s *Store) commitIndexMatchUpdate(
 	return
 }
 
-func (s *Store) writeObjekte(
+func (s *Store) makeSku(
 	mg metadatei.Getter,
 	k kennung.Kennung,
 ) (tz *sku.Transacted, err error) {
@@ -381,22 +215,19 @@ func (s *Store) writeObjekte(
 	}
 
 	m := mg.GetMetadatei()
-	m.Tai = s.GetTai()
+	tz = sku.GetTransactedPool().Get()
+	tz.Metadatei = m
 
-	var h kennung.Hinweis
-
-	if err = h.Set(k.String()); err != nil {
+	if err = tz.Kennung.SetWithKennung(k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	tz = &sku.Transacted{
-		Metadatei: m,
-	}
-
-	if err = tz.Kennung.SetWithKennung(h); err != nil {
-		err = errors.Wrap(err)
-		return
+	if tz.Kennung.GetGattung() != gattung.Zettel {
+		err = gattung.ErrWrongType{
+			ExpectedType: gattung.Zettel,
+			ActualType:   gattung.Must(tz.Kennung.GetGattung()),
+		}
 	}
 
 	return
@@ -418,38 +249,6 @@ func (s *Store) Inherit(tz *sku.Transacted) (err error) {
 
 	if err = s.writeNamedZettelToIndex(tz); err != nil {
 		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.NewOrUpdated(errExists)(tz); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) ReindexOne(
-	tz *sku.Transacted,
-) (o *sku.Transacted, err error) {
-	o = tz
-
-	var h kennung.Hinweis
-
-	if err = h.Set(tz.GetKennung().String()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	errExists := s.StoreUtil.GetAbbrStore().Hinweis().Exists(h.Parts())
-
-	if err = s.writeNamedZettelToIndex(tz); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.StoreUtil.GetAbbrStore().AddMatchable(tz); err != nil {
-		err = errors.Wrapf(err, "failed to write zettel to index: %s", tz)
 		return
 	}
 
