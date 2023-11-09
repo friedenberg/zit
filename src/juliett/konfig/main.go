@@ -3,14 +3,12 @@ package konfig
 import (
 	"encoding/gob"
 	"fmt"
-	"os"
 	"sort"
 	"sync"
 
 	pkg_angeboren "github.com/friedenberg/zit/src/alfa/angeboren"
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/bravo/values"
@@ -133,37 +131,6 @@ func Make(
 	return
 }
 
-func (kc *Compiled) loadKonfigErworben(s standort.Standort) (err error) {
-	var f *os.File
-
-	p := s.FileKonfigCompiled()
-
-	if kc.angeboren.UseKonfigErworbenFile {
-		p = s.FileKonfigErworben()
-	}
-
-	if f, err = files.Open(p); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.Deferred(&err, f.Close)
-
-	dec := gob.NewDecoder(f)
-
-	if err = dec.Decode(&kc.compiled); err != nil {
-		if errors.IsEOF(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-		}
-
-		return
-	}
-
-	return
-}
-
 func (kc Compiled) HasChanges() bool {
 	kc.lock.Lock()
 	defer kc.lock.Unlock()
@@ -204,8 +171,8 @@ func (kc *compiled) recompile(
 	{
 		kc.ImplicitEtiketten = make(implicitEtikettenMap)
 
-		if err = kc.Etiketten.Each(
-			func(ke ketikett) (err error) {
+		if err = kc.Etiketten.EachPtr(
+			func(ke *ketikett) (err error) {
 				var e kennung.Etikett
 
 				if err = e.Set(ke.Transacted.GetKennung().String()); err != nil {
@@ -214,6 +181,11 @@ func (kc *compiled) recompile(
 				}
 
 				if err = kc.AccumulateImplicitEtiketten(e); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if err = kc.ApplyToSku(&ke.Transacted, tagp); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -267,49 +239,14 @@ func (kc *compiled) recompile(
 				inlineTypen.Add(values.MakeString(ct.Kennung.String()))
 			}
 
-			// kc.applyExpandedTyp(*ct)
+			if err = kc.ApplyToSku(ct, tagp); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 
 			return
 		},
 	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (kc *Compiled) Flush(
-	s standort.Standort,
-	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
-) (err error) {
-	if !kc.hasChanges || kc.DryRun {
-		return
-	}
-
-	if err = kc.recompile(tagp); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	p := s.FileKonfigCompiled()
-
-	if kc.angeboren.UseKonfigErworbenFile {
-		p = s.FileKonfigErworben()
-	}
-
-	var f *os.File
-
-	if f, err = files.OpenExclusiveWriteOnlyTruncate(p); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, f)
-
-	dec := gob.NewEncoder(f)
-
-	if err = dec.Encode(kc.compiled); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

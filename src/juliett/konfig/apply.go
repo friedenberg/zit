@@ -16,7 +16,7 @@ func (k compiled) ApplyToSku(
 	sk *sku.Transacted,
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) (err error) {
-	mp := sk.GetMetadateiPtr()
+	mp := &sk.Metadatei
 
 	mp.Verzeichnisse.SetExpandedEtiketten(kennung.ExpandMany[kennung.Etikett](
 		mp.GetEtiketten(),

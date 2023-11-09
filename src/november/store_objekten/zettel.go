@@ -232,30 +232,3 @@ func (s *Store) makeSku(
 
 	return
 }
-
-func (s *Store) Inherit(tz *sku.Transacted) (err error) {
-	errors.Log().Printf("inheriting %s", tz)
-
-	s.CommitTransacted(tz)
-
-	var h kennung.Hinweis
-
-	if err = h.Set(tz.GetKennung().String()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	errExists := s.StoreUtil.GetAbbrStore().Hinweis().Exists(h.Parts())
-
-	if err = s.writeNamedZettelToIndex(tz); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.NewOrUpdated(errExists)(tz); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}

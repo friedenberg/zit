@@ -251,7 +251,7 @@ func (s *Store) createEtikettOrTyp(k *kennung.Kennung2) (err error) {
 		return
 	}
 
-	if err = s.onNew(t); err != nil {
+	if err = s.handleNew(t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -412,7 +412,7 @@ func (s *Store) GetReindexFunc(
 			return
 		}
 
-		if err = s.onNewOrUpdatedCommit(sk, false); err != nil {
+		if err = s.handleNewOrUpdatedCommit(sk, false); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

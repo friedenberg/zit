@@ -59,7 +59,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	if transactedPtr.Metadatei.EqualsSansTai(co.Internal.Metadatei) {
 		transactedPtr = &co.Internal
 
-		if err = s.onUnchanged(transactedPtr); err != nil {
+		if err = s.handleUnchanged(transactedPtr); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -72,7 +72,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	if err = s.onUpdated(transactedPtr); err != nil {
+	if err = s.handleUpdated(transactedPtr); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -148,7 +148,7 @@ func (s *Store) CreateOrUpdate(
 			return
 		}
 
-		if err = s.onUnchanged(transactedPtr); err != nil {
+		if err = s.handleUnchanged(transactedPtr); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -167,12 +167,12 @@ func (s *Store) CreateOrUpdate(
 	}
 
 	if mutter == nil {
-		if err = s.onNew(transactedPtr); err != nil {
+		if err = s.handleNew(transactedPtr); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if err = s.onUpdated(transactedPtr); err != nil {
+		if err = s.handleUpdated(transactedPtr); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -335,7 +335,7 @@ func (s *Store) CreateOrUpdateAkte(
 			return
 		}
 
-		if err = s.onUnchanged(transactedPtr); err != nil {
+		if err = s.handleUnchanged(transactedPtr); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -349,12 +349,12 @@ func (s *Store) CreateOrUpdateAkte(
 	}
 
 	if mutter == nil {
-		if err = s.onNew(transactedPtr); err != nil {
+		if err = s.handleNew(transactedPtr); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if err = s.onUpdated(transactedPtr); err != nil {
+		if err = s.handleUpdated(transactedPtr); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

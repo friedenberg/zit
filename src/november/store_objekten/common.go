@@ -12,13 +12,14 @@ import (
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
 )
 
-func (s *Store) onNewOrUpdated(
+func (s *Store) handleNewOrUpdated(
 	t *sku.Transacted,
 ) (err error) {
-	return s.onNewOrUpdatedCommit(t, true)
+	return s.handleNewOrUpdatedCommit(t, true)
 }
 
-func (s *Store) onNewOrUpdatedCommit(
+// true is new or updated, false is reindexed
+func (s *Store) handleNewOrUpdatedCommit(
 	t *sku.Transacted,
 	commit bool,
 ) (err error) {
@@ -67,10 +68,10 @@ func (s *Store) onNewOrUpdatedCommit(
 	return
 }
 
-func (s *Store) onNew(
+func (s *Store) handleNew(
 	t *sku.Transacted,
 ) (err error) {
-	if err = s.onNewOrUpdated(t); err != nil {
+	if err = s.handleNewOrUpdated(t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -78,10 +79,10 @@ func (s *Store) onNew(
 	return s.New(t)
 }
 
-func (s *Store) onUpdated(
+func (s *Store) handleUpdated(
 	t *sku.Transacted,
 ) (err error) {
-	if err = s.onNewOrUpdated(t); err != nil {
+	if err = s.handleNewOrUpdated(t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -89,7 +90,7 @@ func (s *Store) onUpdated(
 	return s.Updated(t)
 }
 
-func (s *Store) onUnchanged(
+func (s *Store) handleUnchanged(
 	t *sku.Transacted,
 ) (err error) {
 	return s.Unchanged(t)

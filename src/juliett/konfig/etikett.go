@@ -150,9 +150,6 @@ func (k *compiled) AddEtikett(
 	return
 }
 
-func (c *compiled) applyExpandedEtikett(ct *sku.Transacted) {
-}
-
 func (kc compiled) GetEtikett(
 	k kennung.Etikett,
 ) (ct *sku.Transacted, ok bool) {
