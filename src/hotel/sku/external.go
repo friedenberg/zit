@@ -101,13 +101,13 @@ func (a External) GetObjekteFD() fd.FD {
 func (a *External) Reset() {
 	a.ObjekteSha.Reset()
 	a.Kennung.Reset()
-	a.Metadatei.Reset()
+	metadatei.Resetter.Reset(&a.Metadatei)
 }
 
 func (a *External) ResetWith(b *External) {
 	a.ObjekteSha.ResetWith(b.ObjekteSha)
 	a.Kennung.ResetWithKennung(b.Kennung)
-	a.Metadatei.ResetWith(b.GetMetadatei())
+	metadatei.Resetter.ResetWithPtr(&a.Metadatei, &b.Metadatei)
 }
 
 func (a *External) ResetWithExternalMaybe(
@@ -116,7 +116,7 @@ func (a *External) ResetWithExternalMaybe(
 	k := b.GetKennungLike()
 	a.Kennung.ResetWithKennung(k)
 	a.ObjekteSha.Reset()
-	a.Metadatei.Reset()
+	metadatei.Resetter.Reset(&a.Metadatei)
 	a.FDs = b.GetFDs()
 
 	return

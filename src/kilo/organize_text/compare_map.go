@@ -28,7 +28,7 @@ func (s SetKeyToMetadatei) Add(h string) {
 	ok := false
 
 	if m, ok = s[h]; !ok {
-		m.Reset()
+		metadatei.Resetter.Reset(&m)
 	}
 
 	s[h] = m
@@ -39,7 +39,7 @@ func (s SetKeyToMetadatei) AddEtikett(h string, e kennung.Etikett) {
 	ok := false
 
 	if m, ok = s[h]; !ok {
-		m.Reset()
+		metadatei.Resetter.Reset(&m)
 	}
 
 	kennung.AddNormalized(m.GetEtikettenMutable(), &e)

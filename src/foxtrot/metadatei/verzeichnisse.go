@@ -10,8 +10,8 @@ import (
 
 type Verzeichnisse struct {
 	Archiviert        values.Bool
-	ExpandedEtiketten kennung.EtikettMutableSet //public for gob, but should be private
-	ImplicitEtiketten kennung.EtikettMutableSet //public for gob, but should be private
+	ExpandedEtiketten kennung.EtikettMutableSet // public for gob, but should be private
+	ImplicitEtiketten kennung.EtikettMutableSet // public for gob, but should be private
 	Mutter            sha.Sha                   // sha of parent Metadatei
 	Sha               sha.Sha                   // sha of Metadatei
 }

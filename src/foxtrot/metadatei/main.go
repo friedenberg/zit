@@ -220,14 +220,6 @@ func (pz Metadatei) Equals(z1 Metadatei) bool {
 	return true
 }
 
-func (z *Metadatei) Reset() {
-	Resetter.Reset(z)
-}
-
-func (z *Metadatei) ResetWith(z1 Metadatei) {
-	Resetter.ResetWith(z, z1)
-}
-
 func (z Metadatei) Description() (d string) {
 	d = z.Bezeichnung.String()
 

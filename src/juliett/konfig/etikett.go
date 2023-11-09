@@ -125,15 +125,6 @@ func (k *compiled) AccumulateImplicitEtiketten(
 	return
 }
 
-func (k *compiled) AddEtikett2(
-	b1 *sku.Transacted,
-) (err error) {
-	e := sku.GetTransactedPool().Get()
-	*e = *b1
-
-	return k.AddEtikett(e)
-}
-
 func (k *compiled) AddEtikett(
 	b1 *sku.Transacted,
 ) (err error) {
@@ -141,8 +132,14 @@ func (k *compiled) AddEtikett(
 	defer k.lock.Unlock()
 	k.hasChanges = true
 
+	b2 := sku.GetTransactedPool().Get()
+
+	if err = b2.SetFromSkuLike(b1); err != nil {
+		return
+	}
+
 	b := ketikett{
-		Transacted: *b1,
+		Transacted: *b2,
 	}
 
 	if err = iter.AddOrReplaceIfGreater[ketikett](k.Etiketten, b); err != nil {

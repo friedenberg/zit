@@ -83,7 +83,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 
 	errors.Log().Printf("writing zettel to index: %s", tz)
 
-	s.GetKonfig().ApplyToMetadatei(tz, s.GetAkten().GetTypV0())
+	s.GetKonfig().ApplyToSku(tz, s.GetAkten().GetTypV0())
 
 	if err = s.verzeichnisseSchwanzen.AddVerzeichnisse(tz, tz.GetKennungLike().String()); err != nil {
 		err = errors.Wrap(err)
@@ -273,7 +273,7 @@ func (s *zettelStore) UpdateCheckedOut(
 	}
 
 	m := co.External.GetMetadatei()
-	m.ResetWith(m)
+	metadatei.Resetter.ResetWithPtr(&m, &m)
 
 	err = s.StoreUtil.GetKonfig().ApplyToNewMetadatei(
 		&m,

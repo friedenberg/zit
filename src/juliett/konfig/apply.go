@@ -4,21 +4,45 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/srx/bravo/expansion"
 )
 
-func (k compiled) ApplyToMetadatei(
-	ml metadatei.MetadateiLike,
+func (k compiled) ApplyToSku(
+	sk *sku.Transacted,
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) (err error) {
-	mp := ml.GetMetadateiPtr()
+	mp := sk.GetMetadateiPtr()
+
 	mp.Verzeichnisse.SetExpandedEtiketten(kennung.ExpandMany[kennung.Etikett](
 		mp.GetEtiketten(),
 		expansion.ExpanderRight,
 	))
+
+	isEtikett := gattung.Must(sk.GetGattung()) == gattung.Etikett
+
+	var etikett kennung.Etikett
+
+	if isEtikett {
+		err = etikett.Set(sk.Kennung.String())
+
+		if err != nil {
+			return
+		}
+	}
+
+	if isEtikett {
+		kennung.ExpandOne[kennung.Etikett](
+			&etikett,
+			expansion.ExpanderRight,
+		).EachPtr(
+			mp.Verzeichnisse.GetExpandedEtikettenMutable().AddPtr,
+		)
+	}
 
 	ie := kennung.MakeEtikettMutableSet()
 
@@ -48,11 +72,22 @@ func (k compiled) ApplyToMetadatei(
 		return k.EtikettenHidden.ContainsKey(k.EtikettenHidden.KeyPtr(e))
 	}
 
-	mp.Verzeichnisse.Archiviert.SetBool(
+	ees := sk.Metadatei.Verzeichnisse.GetExpandedEtiketten()
+
+	isHiddenEtikett := isEtikett &&
 		iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
-			mp.GetEtiketten(),
-			checkFunc,
-		) ||
+			k.EtikettenHidden,
+			func(e *kennung.Etikett) bool {
+				return ees.ContainsKey(ees.KeyPtr(e))
+			},
+		)
+
+	mp.Verzeichnisse.Archiviert.SetBool(
+		isHiddenEtikett ||
+			iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
+				mp.GetEtiketten(),
+				checkFunc,
+			) ||
 			iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
 				mp.Verzeichnisse.GetExpandedEtiketten(),
 				checkFunc,

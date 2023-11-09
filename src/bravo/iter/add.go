@@ -88,7 +88,9 @@ func AddOrReplaceIfGreater[T interface {
 	schnittstellen.Stringer
 	schnittstellen.ValueLike
 	schnittstellen.Lessor[T]
-}](c schnittstellen.MutableSetLike[T], b T,
+}](
+	c schnittstellen.MutableSetLike[T],
+	b T,
 ) (err error) {
 	a, ok := c.Get(c.Key(b))
 

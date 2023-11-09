@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
@@ -83,7 +84,7 @@ func (s *common) ReadOneExternalObjekte(
 	t *sku.Transacted,
 ) (err error) {
 	if t != nil {
-		e.GetMetadateiPtr().ResetWith(t.GetMetadatei())
+		metadatei.Resetter.ResetWithPtr(e.GetMetadateiPtr(), t.GetMetadateiPtr())
 	}
 
 	var f *os.File

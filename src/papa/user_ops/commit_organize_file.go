@@ -41,7 +41,7 @@ func (c CommitOrganizeFile) Run(
 	l := sync.Mutex{}
 	toUpdate := sku.MakeTransactedMutableSet()
 
-	ms := c.Umwelt.MakeMetaIdSetWithoutExcludedHidden(
+	ms := c.MakeMetaIdSetWithoutExcludedHidden(
 		gattungen.MakeSet(gattung.TrueGattung()...),
 	)
 	errors.TodoP1("create query without syntax")
@@ -110,7 +110,7 @@ func (c CommitOrganizeFile) Run(
 			}
 
 			if kennung.IsEmpty(m.GetTyp()) {
-				m.Typ = c.Konfig().Akte.Defaults.Typ
+				m.Typ = c.Konfig().Defaults.Typ
 			}
 
 			if c.Konfig().DryRun {

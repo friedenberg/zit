@@ -3,10 +3,8 @@ package sku
 import (
 	"encoding/gob"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/heap"
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
@@ -15,7 +13,6 @@ var (
 	transactedKeyerKennung schnittstellen.StringKeyerPtr[Transacted, *Transacted]
 	TransactedSetEmpty     TransactedSet
 	TransactedLessor       schnittstellen.Lessor2[Transacted, *Transacted]
-	TransactedReseter      resetter
 )
 
 func init() {
@@ -91,30 +88,4 @@ func (equaler) Equals(a, b Transacted) bool {
 
 func (equaler) EqualsPtr(a, b *Transacted) bool {
 	return a.EqualsSkuLikePtr(b)
-}
-
-type resetter struct{}
-
-func (resetter) Reset(a *Transacted) {
-	a.Kopf.Reset()
-	a.ObjekteSha.Reset()
-	a.Kennung.SetGattung(gattung.Unknown)
-	a.Metadatei.Reset()
-	a.TransactionIndex.Reset()
-}
-
-func (r resetter) ResetWith(a *Transacted, b Transacted) {
-	a.Kopf = b.Kopf
-	a.ObjekteSha = b.ObjekteSha
-	a.Kennung.ResetWithKennung(b.Kennung)
-	a.Metadatei.ResetWith(b.Metadatei)
-	a.TransactionIndex.SetInt(b.TransactionIndex.Int())
-}
-
-func (resetter) ResetWithPtr(a *Transacted, b *Transacted) {
-	a.Kopf = b.Kopf
-	a.ObjekteSha = b.ObjekteSha
-	errors.PanicIfError(a.Kennung.ResetWithKennung(&b.Kennung))
-	a.Metadatei.ResetWith(b.Metadatei)
-	a.TransactionIndex.SetInt(b.TransactionIndex.Int())
 }

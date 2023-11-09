@@ -40,7 +40,7 @@ func (f textParser) ParseMetadatei(
 	c TextParserContext,
 ) (n int64, err error) {
 	m := c.GetMetadatei()
-	m.Reset()
+	Resetter.Reset(&m)
 
 	etiketten := kennung.MakeEtikettMutableSet()
 

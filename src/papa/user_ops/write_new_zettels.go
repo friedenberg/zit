@@ -63,7 +63,7 @@ func (c WriteNewZettels) runOneAlreadyLocked(
 	pz zettel.ProtoZettel,
 ) (result *sku.CheckedOut, err error) {
 	z := pz.Make()
-  defer metadatei.GetPool().Put(z)
+	defer metadatei.GetPool().Put(z)
 
 	var zt *sku.Transacted
 

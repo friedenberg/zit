@@ -18,28 +18,32 @@ func (resetter) Reset(z *Metadatei) {
 	z.Tai.Reset()
 }
 
-func (resetter) ResetWith(z *Metadatei, z1 Metadatei) {
-	z.AkteSha = z1.AkteSha
-	z.Bezeichnung = z1.Bezeichnung
+func (r resetter) ResetWith(a *Metadatei, b Metadatei) {
+	r.ResetWithPtr(a, &b)
+}
 
-	z.SetEtiketten(z1.Etiketten)
+func (resetter) ResetWithPtr(a *Metadatei, b *Metadatei) {
+	a.AkteSha = b.AkteSha
+	a.Bezeichnung = b.Bezeichnung
 
-	ResetterVerzeichnisse.ResetWith(&z.Verzeichnisse, &z1.Verzeichnisse)
+	a.SetEtiketten(b.Etiketten)
 
-	z.Typ = z1.Typ
-	z.Tai = z1.Tai
+	ResetterVerzeichnisse.ResetWith(&a.Verzeichnisse, &b.Verzeichnisse)
+
+	a.Typ = b.Typ
+	a.Tai = b.Tai
 }
 
 var ResetterVerzeichnisse resetterVerzeichnisse
 
 type resetterVerzeichnisse struct{}
 
-func (resetterVerzeichnisse) Reset(v *Verzeichnisse) {
-	v.Archiviert.Reset()
-	v.SetExpandedEtiketten(nil)
-	v.SetImplicitEtiketten(nil)
-	v.Mutter.Reset()
-	v.Sha.Reset()
+func (resetterVerzeichnisse) Reset(a *Verzeichnisse) {
+	a.Archiviert.Reset()
+	a.SetExpandedEtiketten(nil)
+	a.SetImplicitEtiketten(nil)
+	a.Mutter.Reset()
+	a.Sha.Reset()
 }
 
 func (resetterVerzeichnisse) ResetWith(a, b *Verzeichnisse) {
