@@ -118,7 +118,7 @@ func (c CommitOrganizeFile) Run(
 				return
 			}
 
-			if _, err = store.Zettel().Create(m); err != nil {
+			if _, err = store.Create(m); err != nil {
 				err = errors.Errorf("failed to create zettel: %s", err)
 				return
 			}

@@ -147,7 +147,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	defer errors.Deferred(&err, u.Unlock)
 
 	for _, z := range zettels {
-		if z, err = u.StoreObjekten().Zettel().Update(
+		if z, err = u.StoreObjekten().Update(
 			z,
 			z.GetKennungLike(),
 		); err != nil {

@@ -15,6 +15,8 @@ import (
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
+	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
+	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/store_util"
 	"github.com/friedenberg/zit/srx/bravo/expansion"
 )
@@ -22,13 +24,12 @@ import (
 type Store struct {
 	store_util.StoreUtil
 
-	zettelStore *zettelStore
-	konfigStore konfigStore
+	protoZettel            zettel.ProtoZettel
+	verzeichnisseSchwanzen *verzeichnisseSchwanzen
+	verzeichnisseAll       *store_verzeichnisse.Zettelen
+	konfigStore            konfigStore
 
 	objekte_store.LogWriter
-
-	// Gattungen
-	flushers map[schnittstellen.GattungLike]errors.Flusher
 
 	isReindexing bool
 	lock         sync.Locker
@@ -44,7 +45,21 @@ func Make(
 
 	su.SetMatchableAdder(s)
 
-	if s.zettelStore, err = makeZettelStore(s.StoreUtil); err != nil {
+	s.protoZettel = zettel.MakeProtoZettel(su.GetKonfig())
+
+	if s.verzeichnisseSchwanzen, err = makeVerzeichnisseSchwanzen(
+		s.StoreUtil,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if s.verzeichnisseAll, err = store_verzeichnisse.MakeZettelen(
+		s.GetKonfig(),
+		s.StoreUtil.GetStandort().DirVerzeichnisseZettelenNeue(),
+		s.GetStandort(),
+		nil,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -61,11 +76,6 @@ func Make(
 
 	errors.TodoP1("implement for other gattung")
 
-	s.flushers = map[schnittstellen.GattungLike]errors.Flusher{
-		gattung.Zettel: s.zettelStore,
-		gattung.Konfig: s.konfigStore,
-	}
-
 	return
 }
 
@@ -73,12 +83,7 @@ func (s *Store) SetLogWriter(
 	lw objekte_store.LogWriter,
 ) {
 	s.LogWriter = lw
-	s.zettelStore.LogWriter = lw
 	s.konfigStore.LogWriter = lw
-}
-
-func (s *Store) Zettel() *zettelStore {
-	return s.zettelStore
 }
 
 func (s *Store) Konfig() *konfigStore {
@@ -98,11 +103,19 @@ func (s Store) Flush() (err error) {
 		return
 	}
 
-	for _, fl := range s.flushers {
-		if err = fl.Flush(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = s.verzeichnisseSchwanzen.Flush(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.verzeichnisseAll.Flush(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.StoreUtil.Flush(); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if err = s.GetAbbrStore().Flush(); err != nil {

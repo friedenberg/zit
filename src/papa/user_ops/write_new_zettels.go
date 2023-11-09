@@ -67,7 +67,7 @@ func (c WriteNewZettels) runOneAlreadyLocked(
 
 	var zt *sku.Transacted
 
-	if zt, err = c.StoreObjekten().Zettel().Create(z); err != nil {
+	if zt, err = c.StoreObjekten().Create(z); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

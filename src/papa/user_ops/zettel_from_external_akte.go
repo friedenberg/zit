@@ -113,7 +113,7 @@ func (c ZettelFromExternalAkte) Run(
 	if err = results.EachPtr(
 		func(z *sku.Transacted) (err error) {
 			if c.ProtoZettel.Apply(z) {
-				if _, err = c.StoreObjekten().Zettel().Update(
+				if _, err = c.StoreObjekten().Update(
 					z,
 					&z.Kennung,
 				); err != nil {
@@ -145,13 +145,13 @@ func (c ZettelFromExternalAkte) Run(
 
 		var tz *sku.Transacted
 
-		if tz, err = c.StoreObjekten().Zettel().Create(z); err != nil {
+		if tz, err = c.StoreObjekten().Create(z); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		if c.ProtoZettel.Apply(tz) {
-			if tz, err = c.StoreObjekten().Zettel().Update(
+			if tz, err = c.StoreObjekten().Update(
 				tz,
 				&tz.Kennung,
 			); err != nil {

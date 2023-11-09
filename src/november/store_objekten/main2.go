@@ -54,7 +54,7 @@ func (s *Store) onNewOrUpdatedCommit(
 		}
 
 	case gattung.Zettel:
-		if err = s.zettelStore.writeNamedZettelToIndex(t); err != nil {
+		if err = s.writeNamedZettelToIndex(t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -109,7 +109,7 @@ func (s *Store) ReadOne(
 			return
 		}
 
-		if sk, err = s.zettelStore.verzeichnisseSchwanzen.ReadHinweisSchwanzen(h); err != nil {
+		if sk, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(h); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -223,7 +223,7 @@ func (s *Store) ReadAllSchwanzen(
 				}
 
 			case gattung.Zettel:
-				return s.zettelStore.verzeichnisseSchwanzen.ReadMany(f)
+				return s.verzeichnisseSchwanzen.ReadMany(f)
 
 			default:
 				err = todo.Implement()

@@ -11,64 +11,9 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
-	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
-	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
-type zettelStore struct {
-	store_util.StoreUtil
-	objekte_store.LogWriter
-
-	protoZettel zettel.ProtoZettel
-
-	verzeichnisseSchwanzen *verzeichnisseSchwanzen
-	verzeichnisseAll       *store_verzeichnisse.Zettelen
-}
-
-func makeZettelStore(
-	sa store_util.StoreUtil,
-) (s *zettelStore, err error) {
-	s = &zettelStore{
-		protoZettel: zettel.MakeProtoZettel(sa.GetKonfig()),
-		StoreUtil:   sa,
-	}
-
-	if s.verzeichnisseSchwanzen, err = makeVerzeichnisseSchwanzen(
-		s.StoreUtil,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if s.verzeichnisseAll, err = store_verzeichnisse.MakeZettelen(
-		s.GetKonfig(),
-		s.StoreUtil.GetStandort().DirVerzeichnisseZettelenNeue(),
-		s.GetStandort(),
-		nil,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *zettelStore) Flush() (err error) {
-	if err = s.verzeichnisseSchwanzen.Flush(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.verzeichnisseAll.Flush(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *zettelStore) writeNamedZettelToIndex(
+func (s *Store) writeNamedZettelToIndex(
 	tz *sku.Transacted,
 ) (err error) {
 	errors.Log().Print("writing to index")
@@ -108,7 +53,7 @@ func (s *zettelStore) writeNamedZettelToIndex(
 	return
 }
 
-func (s zettelStore) ReadOne(
+func (s Store) readOneZettel(
 	i schnittstellen.StringerGattungGetter,
 ) (tz *sku.Transacted, err error) {
 	var h kennung.Hinweis
@@ -135,7 +80,7 @@ func (s zettelStore) ReadOne(
 	return
 }
 
-func (s *zettelStore) Create(
+func (s *Store) Create(
 	mg metadatei.Getter,
 ) (tz *sku.Transacted, err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
@@ -194,7 +139,7 @@ func (s *zettelStore) Create(
 	return
 }
 
-func (s *zettelStore) UpdateManyMetadatei(
+func (s *Store) updateManyMetadateiZettelen(
 	incoming sku.TransactedSet,
 ) (err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
@@ -253,13 +198,13 @@ func (s *zettelStore) UpdateManyMetadatei(
 	return
 }
 
-func (s *zettelStore) updateExternal(
+func (s *Store) updateExternal(
 	ze *sku.External,
 ) (tl *sku.Transacted, err error) {
 	return s.Update(ze.GetMetadatei(), &ze.Kennung)
 }
 
-func (s *zettelStore) UpdateCheckedOut(
+func (s *Store) UpdateCheckedOut(
 	co *sku.CheckedOut,
 ) (t *sku.Transacted, err error) {
 	errors.TodoP2("support dry run")
@@ -314,7 +259,7 @@ func (s *zettelStore) UpdateCheckedOut(
 	return
 }
 
-func (s *zettelStore) Update(
+func (s *Store) Update(
 	mg metadatei.Getter,
 	k schnittstellen.Stringer,
 ) (tz *sku.Transacted, err error) {
@@ -355,7 +300,7 @@ func (s *zettelStore) Update(
 	return
 }
 
-func (s *zettelStore) updateLockedWithMutter(
+func (s *Store) updateLockedWithMutter(
 	mg metadatei.Getter,
 	h kennung.Kennung,
 	mutter *sku.Transacted,
@@ -403,7 +348,7 @@ func (s *zettelStore) updateLockedWithMutter(
 	return
 }
 
-func (s *zettelStore) commitIndexMatchUpdate(
+func (s *Store) commitIndexMatchUpdate(
 	tz *sku.Transacted,
 	addEtikettenToIndex bool,
 ) (err error) {
@@ -427,7 +372,7 @@ func (s *zettelStore) commitIndexMatchUpdate(
 	return
 }
 
-func (s *zettelStore) writeObjekte(
+func (s *Store) writeObjekte(
 	mg metadatei.Getter,
 	k kennung.Kennung,
 ) (tz *sku.Transacted, err error) {
@@ -457,7 +402,7 @@ func (s *zettelStore) writeObjekte(
 	return
 }
 
-func (s *zettelStore) Inherit(tz *sku.Transacted) (err error) {
+func (s *Store) Inherit(tz *sku.Transacted) (err error) {
 	errors.Log().Printf("inheriting %s", tz)
 
 	s.CommitTransacted(tz)
@@ -484,7 +429,7 @@ func (s *zettelStore) Inherit(tz *sku.Transacted) (err error) {
 	return
 }
 
-func (s *zettelStore) ReindexOne(
+func (s *Store) ReindexOne(
 	tz *sku.Transacted,
 ) (o *sku.Transacted, err error) {
 	o = tz
