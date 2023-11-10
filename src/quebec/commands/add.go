@@ -109,10 +109,9 @@ func (c Add) RunWithCwdQuery(
 		return
 	}
 
-	otFlags := organize_text.MakeFlags()
+	otFlags := organize_text.MakeFlagsWithMetadatei(c.Metadatei)
 	u.ApplyToOrganizeOptions(&otFlags.Options)
 	// otFlags.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
-	otFlags.RootEtiketten = c.Metadatei.GetEtiketten()
 	mwk := objekte_collections.MakeMutableSetMetadateiWithKennung()
 	zettelsFromAkteResults.EachPtr(
 		func(z *sku.Transacted) (err error) {
@@ -123,7 +122,7 @@ func (c Add) RunWithCwdQuery(
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Umwelt:  u,
-		Options: otFlags.GetOptions(u.Konfig().PrintOptions),
+		Options: otFlags.GetOptions(u.Konfig().PrintOptions, ms),
 	}
 
 	var createOrganizeFileResults *organize_text.Text
@@ -168,7 +167,7 @@ func (c Add) RunWithCwdQuery(
 		Umwelt: u,
 	}
 
-	if ot2, err = readOrganizeTextOp.RunWithFile(f.Name()); err != nil {
+	if ot2, err = readOrganizeTextOp.RunWithFile(f.Name(), ms); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

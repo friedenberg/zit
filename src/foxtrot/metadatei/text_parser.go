@@ -42,12 +42,9 @@ func (f textParser) ParseMetadatei(
 	m := c.GetMetadatei()
 	Resetter.Reset(&m)
 
-	etiketten := kennung.MakeEtikettMutableSet()
-
 	var n1 int64
 
 	defer func() {
-		m.SetEtiketten(etiketten)
 		c.SetMetadatei(m)
 		c.SetAkteSha(m.AkteSha)
 	}()
@@ -59,11 +56,14 @@ func (f textParser) ParseMetadatei(
 			ohio.MakeLineReaderKeyValues(
 				map[string]schnittstellen.FuncSetString{
 					"#": m.Bezeichnung.Set,
-					"%": ohio.MakeLineReaderNop(),
+					"%": func(v string) (err error) {
+						m.Comments = append(m.Comments, v)
+						return
+					},
 					"-": iter.MakeFuncSetString[
 						kennung.Etikett,
 						*kennung.Etikett,
-					](etiketten),
+					](m.GetEtikettenMutable()),
 					"!": func(v string) (err error) {
 						return f.readTyp(&m, v, &akteFD)
 					},

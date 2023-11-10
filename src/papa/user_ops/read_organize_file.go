@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
@@ -17,6 +18,7 @@ type ReadOrganizeFile struct {
 
 func (c ReadOrganizeFile) RunWithFile(
 	p string,
+	q matcher.Query,
 ) (ot *organize_text.Text, err error) {
 	var f *os.File
 
@@ -28,17 +30,19 @@ func (c ReadOrganizeFile) RunWithFile(
 	defer files.Close(f)
 
 	c.Reader = f
-	ot, err = c.Run()
+	ot, err = c.Run(q)
 	c.Reader = nil
 
 	return
 }
 
-func (c ReadOrganizeFile) Run() (ot *organize_text.Text, err error) {
+func (c ReadOrganizeFile) Run(q matcher.Query) (ot *organize_text.Text, err error) {
 	otFlags := organize_text.MakeFlags()
 	c.Umwelt.ApplyToOrganizeOptions(&otFlags.Options)
 
-	if ot, err = organize_text.New(otFlags.GetOptions(c.Umwelt.Konfig().PrintOptions)); err != nil {
+	if ot, err = organize_text.New(
+		otFlags.GetOptions(c.Umwelt.Konfig().PrintOptions, q),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

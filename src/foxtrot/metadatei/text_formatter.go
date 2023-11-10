@@ -32,6 +32,7 @@ func MakeTextFormatterMetadateiAktePath(
 			common.writeBoundary,
 			common.writeCommonMetadateiFormat,
 			common.writePathTyp,
+			common.writeComments,
 			common.writeBoundary,
 		},
 	}
@@ -56,6 +57,7 @@ func MakeTextFormatterMetadateiOnly(
 			common.writeBoundary,
 			common.writeCommonMetadateiFormat,
 			common.writeShaTyp,
+			common.writeComments,
 			common.writeBoundary,
 		},
 	}
@@ -80,6 +82,7 @@ func MakeTextFormatterMetadateiInlineAkte(
 			common.writeBoundary,
 			common.writeCommonMetadateiFormat,
 			common.writeTyp,
+			common.writeComments,
 			common.writeBoundary,
 			common.writeNewLine,
 			common.writeAkte,

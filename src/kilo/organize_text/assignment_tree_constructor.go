@@ -18,7 +18,7 @@ func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment, err er
 	roots = make([]*assignment, 0, 1+atc.ExtraEtiketten.Len())
 
 	root := newAssignment(0)
-	root.etiketten = atc.RootEtiketten
+	root.etiketten = atc.rootEtiketten
 	roots = append(roots, root)
 
 	prefixSet := objekte_collections.MakeSetPrefixVerzeichnisse(0)

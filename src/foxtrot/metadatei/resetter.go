@@ -11,6 +11,7 @@ type resetter struct{}
 func (resetter) Reset(z *Metadatei) {
 	z.AkteSha.Reset()
 	z.Bezeichnung.Reset()
+	z.Comments = z.Comments[:0]
 	z.SetEtiketten(nil)
 	ResetterVerzeichnisse.Reset(&z.Verzeichnisse)
 	z.Typ = kennung.Typ{}
@@ -25,6 +26,8 @@ func (r resetter) ResetWith(a *Metadatei, b Metadatei) {
 func (resetter) ResetWithPtr(a *Metadatei, b *Metadatei) {
 	a.AkteSha = b.AkteSha
 	a.Bezeichnung = b.Bezeichnung
+	a.Comments = a.Comments[:0]
+	a.Comments = append(a.Comments, b.Comments...)
 
 	a.SetEtiketten(b.Etiketten)
 

@@ -8,7 +8,9 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/juliett/konfig"
 )
@@ -25,7 +27,7 @@ type Options struct {
 
 	Konfig konfig.Compiled
 
-	RootEtiketten     kennung.EtikettSet
+	rootEtiketten     kennung.EtikettSet
 	Typ               kennung.Typ
 	GroupingEtiketten kennung.Slice
 	ExtraEtiketten    kennung.EtikettSet
@@ -49,6 +51,22 @@ func MakeFlags() Flags {
 		),
 
 		Options: Options{
+			wasMade:           true,
+			GroupingEtiketten: kennung.MakeSlice(),
+			Transacted:        objekte_collections.MakeMutableSetMetadateiWithKennung(),
+		},
+	}
+}
+
+func MakeFlagsWithMetadatei(m metadatei.Metadatei) Flags {
+	return Flags{
+		once: &sync.Once{},
+		ExtraEtiketten: collections_ptr.MakeFlagCommas[kennung.Etikett](
+			collections_ptr.SetterPolicyAppend,
+		),
+
+		Options: Options{
+			rootEtiketten:     m.GetEtiketten(),
 			wasMade:           true,
 			GroupingEtiketten: kennung.MakeSlice(),
 			Transacted:        objekte_collections.MakeMutableSetMetadateiWithKennung(),
@@ -86,6 +104,7 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 
 func (o *Flags) GetOptions(
 	printOptions erworben_cli_print_options.PrintOptions,
+	q matcher.Query,
 ) Options {
 	o.once.Do(
 		func() {
@@ -93,7 +112,11 @@ func (o *Flags) GetOptions(
 		},
 	)
 
-	o.Options.PrintOptions = printOptions
+	if q != nil {
+		o.rootEtiketten = q.GetEtiketten()
+	}
+
+	o.PrintOptions = printOptions
 
 	return o.Options
 }

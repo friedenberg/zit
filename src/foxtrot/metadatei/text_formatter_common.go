@@ -21,6 +21,38 @@ type textFormatterCommon struct {
 	doNotWriteEmptyBezeichnung bool
 }
 
+func (f textFormatterCommon) writeComments(
+	w1 io.Writer,
+	c TextFormatterContext,
+) (n int64, err error) {
+	n1 := 0
+
+	for _, c := range c.GetMetadatei().Comments {
+		n1, err = io.WriteString(w1, "% ")
+		n += int64(n1)
+
+		if err != nil {
+			return
+		}
+
+		n1, err = io.WriteString(w1, c)
+		n += int64(n1)
+
+		if err != nil {
+			return
+		}
+
+		n1, err = io.WriteString(w1, "\n")
+		n += int64(n1)
+
+		if err != nil {
+			return
+		}
+	}
+
+	return
+}
+
 func (f textFormatterCommon) writeBoundary(
 	w1 io.Writer,
 	_ TextFormatterContext,

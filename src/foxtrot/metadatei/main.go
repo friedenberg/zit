@@ -38,11 +38,11 @@ type Metadatei struct {
 	// Domain
 	AkteSha       sha.Sha
 	Bezeichnung   bezeichnung.Bezeichnung
+	Comments      []string
 	Etiketten     kennung.EtikettMutableSet // public for gob, but should be private
 	Verzeichnisse Verzeichnisse
-	// Gattung     gattung.Gattung
-	Typ kennung.Typ
-	Tai kennung.Tai
+	Typ           kennung.Typ
+	Tai           kennung.Tai
 }
 
 func (m Metadatei) GetMetadatei() Metadatei {

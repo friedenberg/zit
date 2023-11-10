@@ -79,10 +79,9 @@ func (c *Organize) RunWithQuery(
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Umwelt:  u,
-		Options: c.Flags.GetOptions(u.Konfig().PrintOptions),
+		Options: c.Flags.GetOptions(u.Konfig().PrintOptions, ms),
 	}
 
-	createOrganizeFileOp.RootEtiketten = ms.GetEtiketten()
 
 	typen := ms.GetTypen()
 
@@ -175,7 +174,7 @@ func (c *Organize) RunWithQuery(
 			Reader: os.Stdin,
 		}
 
-		if ot2, err = readOrganizeTextOp.Run(); err != nil {
+		if ot2, err = readOrganizeTextOp.Run(ms); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -227,7 +226,7 @@ func (c *Organize) RunWithQuery(
 
 		var ot2 *organize_text.Text
 
-		if ot2, err = c.readFromVim(u, f.Name(), createOrganizeFileResults); err != nil {
+		if ot2, err = c.readFromVim(u, f.Name(), createOrganizeFileResults, ms); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -265,6 +264,7 @@ func (c Organize) readFromVim(
 	u *umwelt.Umwelt,
 	f string,
 	results *organize_text.Text,
+	q matcher.Query,
 ) (ot *organize_text.Text, err error) {
 	openVimOp := user_ops.OpenVim{
 		Options: vim_cli_options_builder.New().
@@ -281,10 +281,10 @@ func (c Organize) readFromVim(
 		Umwelt: u,
 	}
 
-	if ot, err = readOrganizeTextOp.RunWithFile(f); err != nil {
+	if ot, err = readOrganizeTextOp.RunWithFile(f, q); err != nil {
 		if c.handleReadChangesError(err) {
 			err = nil
-			ot, err = c.readFromVim(u, f, results)
+			ot, err = c.readFromVim(u, f, results, q)
 		} else {
 			errors.Err().Printf("aborting organize")
 			return

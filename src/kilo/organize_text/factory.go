@@ -32,7 +32,7 @@ func (atc *Factory) makeWithMetadatei() (ot *Text, err error) {
 
 	ot.assignment.isRoot = true
 
-	ot.Metadatei.EtikettSet = atc.Options.RootEtiketten
+	ot.Metadatei.EtikettSet = atc.Options.rootEtiketten
 	ot.Metadatei.Typ = atc.Options.Typ
 
 	prefixSet := objekte_collections.MakeSetPrefixVerzeichnisse(0)
