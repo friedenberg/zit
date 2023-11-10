@@ -158,15 +158,15 @@ func (kc *Compiled) SetCli(k erworben.Cli) {
 }
 
 func (kc *Compiled) SetCliFromCommander(k erworben.Cli) {
-	oldBasePath := kc.cli.BasePath
+	oldBasePath := kc.BasePath
 	kc.cli = k
-	kc.cli.BasePath = oldBasePath
+	kc.BasePath = oldBasePath
 }
 
-func (kc *compiled) recompile(
+func (kc *Compiled) recompile(
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) (err error) {
-	kc.DefaultEtiketten = kennung.MakeEtikettSet(kc.Akte.Defaults.Etiketten...)
+	kc.DefaultEtiketten = kennung.MakeEtikettSet(kc.Defaults.Etiketten...)
 
 	{
 		kc.ImplicitEtiketten = make(implicitEtikettenMap)
@@ -204,7 +204,7 @@ func (kc *compiled) recompile(
 
 	{
 		kc.EtikettenHidden = kennung.MakeEtikettSet(
-			kc.Akte.HiddenEtiketten...,
+			kc.HiddenEtiketten...,
 		)
 	}
 
@@ -416,7 +416,4 @@ func (k *compiled) AddTyp(
 	}
 
 	return
-}
-
-func (c *compiled) applyExpandedTyp(ct sku.Transacted) {
 }

@@ -45,7 +45,9 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"akte-sha",
 		"debug",
 		"etiketten",
+		"etiketten-all",
 		"etiketten-implicit",
+		"etiketten-expanded",
 		"json",
 		"log",
 		"sku",
@@ -72,6 +74,39 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	cliFmt schnittstellen.StringFormatWriter[*sku.Transacted],
 ) schnittstellen.FuncIter[*sku.Transacted] {
 	switch fv.string {
+	case "etiketten-all":
+		return func(tl *sku.Transacted) (err error) {
+			esImp := tl.GetMetadateiPtr().Verzeichnisse.GetExpandedEtiketten()
+			esEx := tl.GetMetadateiPtr().Verzeichnisse.GetImplicitEtiketten()
+			// TODO-P3 determine if empty sets should be printed or not
+
+			if _, err = fmt.Fprintln(
+				out,
+				iter.StringCommaSeparated[kennung.Etikett](esImp, esEx),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+	case "etiketten-expanded":
+		return func(tl *sku.Transacted) (err error) {
+			esImp := tl.GetMetadateiPtr().Verzeichnisse.GetExpandedEtiketten()
+			// TODO-P3 determine if empty sets should be printed or not
+
+			if _, err = fmt.Fprintln(
+				out,
+				iter.StringCommaSeparated[kennung.Etikett](esImp),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
 	case "etiketten-implicit":
 		return func(tl *sku.Transacted) (err error) {
 			esImp := tl.GetMetadateiPtr().Verzeichnisse.GetImplicitEtiketten()

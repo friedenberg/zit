@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/srx/bravo/expansion"
 )
 
 func init() {
@@ -45,8 +46,8 @@ func (iem implicitEtikettenMap) Set(to, imp kennung.Etikett) (err error) {
 }
 
 type ketikett struct {
-	Transacted        sku.Transacted
-	ImplicitEtiketten kennung.EtikettMutableSet
+	Transacted sku.Transacted
+	Computed   bool
 }
 
 func (a ketikett) Less(b ketikett) bool {
@@ -63,8 +64,8 @@ func (a ketikett) Equals(b ketikett) bool {
 	}
 
 	if !iter.SetEqualsPtr[kennung.Etikett, *kennung.Etikett](
-		a.ImplicitEtiketten,
-		b.ImplicitEtiketten,
+		a.Transacted.Metadatei.Verzeichnisse.GetImplicitEtiketten(),
+		b.Transacted.Metadatei.Verzeichnisse.GetImplicitEtiketten(),
 	) {
 		return false
 	}
@@ -96,6 +97,42 @@ func (k *compiled) AccumulateImplicitEtiketten(
 	ek, ok := k.Etiketten.Get(e.String())
 
 	if !ok {
+		return
+	}
+
+	ees := kennung.MakeEtikettMutableSet()
+
+	kennung.ExpandOne[kennung.Etikett](
+		&e,
+		expansion.ExpanderRight,
+	).EachPtr(
+		ees.AddPtr,
+	)
+
+	if err = ees.Each(
+		func(e1 kennung.Etikett) (err error) {
+			if e1.Equals(e) {
+				return
+			}
+
+			if err = k.AccumulateImplicitEtiketten(e1); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = k.GetImplicitEtiketten(&e1).Each(
+				func(e2 kennung.Etikett) (err error) {
+					return k.ImplicitEtiketten.Set(e, e2)
+				},
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

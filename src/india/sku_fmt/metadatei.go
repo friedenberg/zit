@@ -37,8 +37,8 @@ func StringMetadatei(o *sku.Transacted) (str string) {
 		sb.WriteString(" ")
 		sb.WriteString(
 			iter.StringDelimiterSeparated[kennung.Etikett](
-				m.GetEtiketten(),
 				" ",
+				m.GetEtiketten(),
 			),
 		)
 	}

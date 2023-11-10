@@ -27,7 +27,7 @@ func (f *etikettenCliFormat) WriteStringFormat(
 		return
 	}
 
-	v := iter.StringDelimiterSeparated[kennung.Etikett](k, " ")
+	v := iter.StringDelimiterSeparated[kennung.Etikett](" ", k)
 
 	return f.stringFormatWriter.WriteStringFormat(w, v)
 }

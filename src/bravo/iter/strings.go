@@ -4,6 +4,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
@@ -32,24 +33,33 @@ func SortedValues[E schnittstellen.Value[E]](
 }
 
 func Strings[E schnittstellen.Stringer](
-	c schnittstellen.SetLike[E],
+	cs ...schnittstellen.SetLike[E],
 ) (out []string) {
-	out = make([]string, 0, c.Len())
+	l := 0
+	for _, c := range cs {
+		l += c.Len()
+	}
 
-	c.Each(
-		func(e E) (err error) {
-			out = append(out, e.String())
-			return
-		},
-	)
+	out = make([]string, 0, l)
+
+	for _, c := range cs {
+		err := c.Each(
+			func(e E) (err error) {
+				out = append(out, e.String())
+				return
+			},
+		)
+
+		errors.PanicIfError(err)
+	}
 
 	return
 }
 
 func SortedStrings[E schnittstellen.Stringer](
-	c schnittstellen.SetLike[E],
+	cs ...schnittstellen.SetLike[E],
 ) (out []string) {
-	out = Strings(c)
+	out = Strings(cs...)
 
 	sort.Strings(out)
 
@@ -57,14 +67,14 @@ func SortedStrings[E schnittstellen.Stringer](
 }
 
 func StringDelimiterSeparated[E schnittstellen.Value[E]](
-	c schnittstellen.SetLike[E],
 	d string,
+	cs ...schnittstellen.SetLike[E],
 ) string {
-	if c == nil {
+	sorted := SortedStrings[E](cs...)
+
+	if len(sorted) == 0 {
 		return ""
 	}
-
-	sorted := SortedStrings[E](c)
 
 	sb := &strings.Builder{}
 	first := true
@@ -83,9 +93,9 @@ func StringDelimiterSeparated[E schnittstellen.Value[E]](
 }
 
 func StringCommaSeparated[E schnittstellen.Value[E]](
-	c schnittstellen.SetLike[E],
+	cs ...schnittstellen.SetLike[E],
 ) string {
-	return StringDelimiterSeparated(c, ", ")
+	return StringDelimiterSeparated(", ", cs...)
 }
 
 func ReverseSortable(s sort.Interface) {

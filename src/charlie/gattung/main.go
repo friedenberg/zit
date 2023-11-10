@@ -101,6 +101,16 @@ func (g Gattung) GetGattungString() string {
 	return g.String()
 }
 
+func (g Gattung) HasParents() bool {
+	switch g {
+	case Typ, Etikett, Kasten:
+		return true
+
+	default:
+		return false
+	}
+}
+
 func (g Gattung) IsTrueGattung() bool {
 	switch g {
 	case Typ, Etikett, Zettel, Konfig, Kasten:

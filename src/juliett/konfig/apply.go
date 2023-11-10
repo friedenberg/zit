@@ -12,7 +12,7 @@ import (
 	"github.com/friedenberg/zit/srx/bravo/expansion"
 )
 
-func (k compiled) ApplyToSku(
+func (k *Compiled) ApplyToSku(
 	sk *sku.Transacted,
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) (err error) {
@@ -23,7 +23,12 @@ func (k compiled) ApplyToSku(
 		expansion.ExpanderRight,
 	))
 
-	isEtikett := gattung.Must(sk.GetGattung()) == gattung.Etikett
+	g := gattung.Must(sk.GetGattung())
+	isEtikett := g == gattung.Etikett
+
+	if g.HasParents() {
+		k.SetHasChanges(true)
+	}
 
 	var etikett kennung.Etikett
 
