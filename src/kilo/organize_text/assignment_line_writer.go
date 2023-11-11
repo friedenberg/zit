@@ -5,9 +5,11 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/echo/format"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 type assignmentLineWriter struct {
@@ -17,6 +19,7 @@ type assignmentLineWriter struct {
 	maxDepth            int
 	maxKopf, maxSchwanz int
 	maxLen              int
+	stringFormatWriter  schnittstellen.StringFormatWriter[*sku.Transacted]
 }
 
 func (av assignmentLineWriter) write(a *assignment) (err error) {
@@ -58,11 +61,16 @@ func (av assignmentLineWriter) writeNormal(a *assignment) (err error) {
 	}
 
 	for _, z := range sortObjSet(a.named) {
-		if z.Sku.Metadatei.Bezeichnung.IsEmpty() {
-			av.WriteLines(fmt.Sprintf("%s- [%s]", tab_prefix, z.Sku.Kennung))
-		} else {
-			av.WriteLines(fmt.Sprintf("%s- [%s] %s", tab_prefix, z.Sku.Kennung, z.Sku.Metadatei.Bezeichnung))
+		var sb strings.Builder
+
+		sb.WriteString(tab_prefix)
+
+		if _, err = av.stringFormatWriter.WriteStringFormat(&sb, &z.Sku); err != nil {
+			err = errors.Wrap(err)
+			return
 		}
+
+		av.WriteStringers(&sb)
 	}
 
 	if a.named.Len() > 0 || a.unnamed.Len() > 0 {
@@ -123,13 +131,14 @@ func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 	}
 
 	for _, z := range sortObjSet(a.named) {
-		h := kennung.Aligned(z.Sku.Kennung, av.maxKopf, av.maxSchwanz)
+		var sb strings.Builder
 
-		if z.Sku.Metadatei.Bezeichnung.IsEmpty() {
-			av.WriteLines(fmt.Sprintf("- [%s]", h))
-		} else {
-			av.WriteLines(fmt.Sprintf("- [%s] %s", h, z.Sku.Metadatei.Bezeichnung))
+		if _, err = av.stringFormatWriter.WriteStringFormat(&sb, &z.Sku); err != nil {
+			err = errors.Wrap(err)
+			return
 		}
+
+		av.WriteStringers(&sb)
 	}
 
 	if a.named.Len() > 0 || a.unnamed.Len() > 0 {

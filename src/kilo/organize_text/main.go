@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/echo/format"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/india/sku_fmt"
 )
 
 type Text struct {
@@ -54,7 +55,7 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 	lw := format.NewLineWriter()
 
-	kopf, scwhanz := ot.MaxKopfUndSchwanz()
+	kopf, schwanz := ot.MaxKopfUndSchwanz()
 
 	l := ot.MaxLen()
 
@@ -64,10 +65,11 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		LineWriter:           lw,
 		maxDepth:             ot.MaxDepth(),
 		maxKopf:              kopf,
-		maxSchwanz:           scwhanz,
+		maxSchwanz:           schwanz,
 		maxLen:               l,
 		RightAlignedIndents:  ot.UseRightAlignedIndents,
 		OmitLeadingEmptyLine: omit,
+		stringFormatWriter:   sku_fmt.MakeOrganizeFormat(kopf, schwanz),
 	}
 
 	if err = aw.write(ot.assignment); err != nil {
@@ -80,7 +82,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 	}
 
 	if ot.UseMetadateiHeader {
-		ot.Metadatei.Matchers = ot.commentMatchers
+		ot.Matchers = ot.commentMatchers
 		mw.Metadatei = ot.Metadatei
 	}
 
