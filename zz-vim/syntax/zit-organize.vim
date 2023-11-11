@@ -3,6 +3,9 @@
 "   finish
 " endif
 
+let m = expand("<sfile>:h") . "/zit-metadatei.vim"
+exec "source " . m
+
 syn match zitEtikett /\v[^#,]+/ contained contains=@NoSpell
 syn match zitEtikettPrefix /\v#+/ contained
 syn region zitEtikettRegion start=/\v^\s*#+ / end=/$/ oneline

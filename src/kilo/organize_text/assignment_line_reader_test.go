@@ -11,6 +11,8 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 func TestMain(m *testing.M) {
@@ -39,6 +41,17 @@ func makeBez(t *testing.T, v string) (b bezeichnung.Bezeichnung) {
 	}
 
 	return
+}
+
+func makeObjWithHinAndBez(t *testing.T, hin string, bez string) obj {
+	return obj{
+		Sku: sku.Transacted{
+			Kennung: makeHinweis(t, hin),
+			Metadatei: metadatei.Metadatei{
+				Bezeichnung: makeBez(t, bez),
+			},
+		},
+	}
 }
 
 func TestAssignmentLineReaderOneHeadingNoZettels(t1 *testing.T) {
@@ -113,15 +126,8 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 
 	{
 		expected := collections_value.MakeMutableValueSet[obj](nil)
-		expected.Add(obj{
-			Kennung:     makeHinweis(t, "one/wow"),
-			Bezeichnung: makeBez(t, "uno"),
-		})
-
-		expected.Add(obj{
-			Kennung:     makeHinweis(t, "dos/wow"),
-			Bezeichnung: makeBez(t, "two/wow"),
-		})
+		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
+		expected.Add(makeObjWithHinAndBez(t, "dos/wow", "two/wow"))
 
 		actual := sub.root.children[0].named
 
@@ -195,15 +201,8 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 
 	{
 		expected := collections_value.MakeMutableValueSet[obj](nil)
-		expected.Add(obj{
-			Kennung:     makeHinweis(t1, "one/wow"),
-			Bezeichnung: makeBez(t1, "uno"),
-		})
-
-		expected.Add(obj{
-			Kennung:     makeHinweis(t1, "dos/wow"),
-			Bezeichnung: makeBez(t1, "two/wow"),
-		})
+		expected.Add(makeObjWithHinAndBez(t.T, "one/wow", "uno"))
+		expected.Add(makeObjWithHinAndBez(t.T, "dos/wow", "two/wow"))
 
 		actual := sub.root.children[0].children[0].named
 
@@ -292,15 +291,8 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 
 	{
 		expected := collections_value.MakeMutableValueSet[obj](nil)
-		expected.Add(obj{
-			Kennung:     makeHinweis(t, "one/wow"),
-			Bezeichnung: makeBez(t, "uno"),
-		})
-
-		expected.Add(obj{
-			Kennung:     makeHinweis(t, "dos/wow"),
-			Bezeichnung: makeBez(t, "two/wow"),
-		})
+		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
+		expected.Add(makeObjWithHinAndBez(t, "dos/wow", "two/wow"))
 
 		actual := sub.root.children[0].named
 
@@ -311,15 +303,8 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 
 	{
 		expected := collections_value.MakeMutableValueSet[obj](nil)
-		expected.Add(obj{
-			Kennung:     makeHinweis(t, "one/wow"),
-			Bezeichnung: makeBez(t, "uno"),
-		})
-
-		expected.Add(obj{
-			Kennung:     makeHinweis(t, "dos/wow"),
-			Bezeichnung: makeBez(t, "two/wow"),
-		})
+		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
+		expected.Add(makeObjWithHinAndBez(t, "dos/wow", "two/wow"))
 
 		actual := sub.root.children[1].named
 
@@ -387,15 +372,8 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 
 	{
 		expected := collections_value.MakeMutableValueSet[obj](nil)
-		expected.Add(obj{
-			Kennung:     makeHinweis(t, "four/wow"),
-			Bezeichnung: makeBez(t, "quatro"),
-		})
-
-		expected.Add(obj{
-			Kennung:     makeHinweis(t, "three/wow"),
-			Bezeichnung: makeBez(t, "tres"),
-		})
+		expected.Add(makeObjWithHinAndBez(t, "four/wow", "quatro"))
+		expected.Add(makeObjWithHinAndBez(t, "three/wow", "tres"))
 
 		actual := sub.root.children[0].named
 
@@ -406,15 +384,8 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 
 	{
 		expected := collections_value.MakeMutableValueSet[obj](nil)
-		expected.Add(obj{
-			Kennung:     makeHinweis(t, "one/wow"),
-			Bezeichnung: makeBez(t, "uno"),
-		})
-
-		expected.Add(obj{
-			Kennung:     makeHinweis(t, "dos/wow"),
-			Bezeichnung: makeBez(t, "two/wow"),
-		})
+		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
+		expected.Add(makeObjWithHinAndBez(t, "dos/wow", "two/wow"))
 
 		actual := sub.root.children[1].named
 
@@ -467,15 +438,8 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// - [two/wow] dos/wow
 	{
 		expected := collections_value.MakeMutableValueSet[obj](nil)
-		expected.Add(obj{
-			Kennung:     makeHinweis(t, "one/wow"),
-			Bezeichnung: makeBez(t, "uno"),
-		})
-
-		expected.Add(obj{
-			Kennung:     makeHinweis(t, "two/wow"),
-			Bezeichnung: makeBez(t, "dos/wow"),
-		})
+		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
+		expected.Add(makeObjWithHinAndBez(t, "two/wow", "dos/wow"))
 
 		actual := sub.root.children[0].named
 
@@ -514,10 +478,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// - [three/wow] tres
 	{
 		expected := collections_value.MakeMutableValueSet[obj](nil)
-		expected.Add(obj{
-			Kennung:     makeHinweis(t, "three/wow"),
-			Bezeichnung: makeBez(t, "tres"),
-		})
+		expected.Add(makeObjWithHinAndBez(t, "three/wow", "tres"))
 
 		actual := sub.root.children[0].children[0].children[0].named
 
@@ -530,10 +491,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// - [four/wow] quatro
 	{
 		expected := collections_value.MakeMutableValueSet[obj](nil)
-		expected.Add(obj{
-			Kennung:     makeHinweis(t, "four/wow"),
-			Bezeichnung: makeBez(t, "quatro"),
-		})
+		expected.Add(makeObjWithHinAndBez(t, "four/wow", "quatro"))
 
 		actual := sub.root.children[0].children[0].named
 
@@ -548,14 +506,8 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// `
 	{
 		expected := collections_value.MakeMutableValueSet[obj](nil)
-		expected.Add(obj{
-			Kennung:     makeHinweis(t, "five/wow"),
-			Bezeichnung: makeBez(t, "cinco"),
-		})
-		expected.Add(obj{
-			Kennung:     makeHinweis(t, "six/wow"),
-			Bezeichnung: makeBez(t, "seis"),
-		})
+		expected.Add(makeObjWithHinAndBez(t, "five/wow", "cinco"))
+		expected.Add(makeObjWithHinAndBez(t, "six/wow", "seis"))
 
 		actual := sub.root.children[0].children[1].named
 

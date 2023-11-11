@@ -105,11 +105,11 @@ func (a *assignment) addToCompareMap(
 
 	a.named.Each(
 		func(z obj) (err error) {
-			if z.Kennung.String() == "" {
+			if z.Sku.Kennung.String() == "" {
 				panic(fmt.Sprintf("%s: Kennung is nil", z))
 			}
 
-			fk := kennung.FormattedString(z.Kennung)
+			fk := kennung.FormattedString(z.Sku.Kennung)
 			out.Named.Add(fk)
 
 			for _, e := range iter.SortedValues[kennung.Etikett](es) {
@@ -127,15 +127,15 @@ func (a *assignment) addToCompareMap(
 
 	a.unnamed.Each(
 		func(z obj) (err error) {
-			out.Unnamed.Add(z.Bezeichnung.String())
+			out.Unnamed.Add(z.Sku.Metadatei.Bezeichnung.String())
 
 			for _, e := range iter.SortedValues[kennung.Etikett](es) {
-				out.Unnamed.AddEtikett(z.Bezeichnung.String(), e)
+				out.Unnamed.AddEtikett(z.Sku.Metadatei.Bezeichnung.String(), e)
 			}
 
 			for _, e := range iter.Elements[kennung.Etikett](m.EtikettSet) {
 				errors.TodoP4("add typ")
-				out.Unnamed.AddEtikett(z.Bezeichnung.String(), e)
+				out.Unnamed.AddEtikett(z.Sku.Metadatei.Bezeichnung.String(), e)
 			}
 
 			return

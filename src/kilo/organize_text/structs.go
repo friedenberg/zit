@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
@@ -22,13 +21,12 @@ func makeObj(
 ) (z obj, err error) {
 	errors.TodoP4("add bez in a better way")
 	z = obj{
-		Kennung:     named.Kennung,
-		Bezeichnung: bezeichnung.Make(named.GetMetadatei().Description()),
+    Sku: *named,
 	}
 
 	if options.Abbreviations.Hinweisen {
-		if z.Kennung, err = expanders.AbbreviateHinweisOnly(
-			z.Kennung,
+		if z.Sku.Kennung, err = expanders.AbbreviateHinweisOnly(
+			z.Sku.Kennung,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -39,13 +37,12 @@ func makeObj(
 }
 
 type obj struct {
-	Kennung     kennung.Kennung2
-	Bezeichnung bezeichnung.Bezeichnung
-	IsNew       bool
+	Sku   sku.Transacted
+	IsNew bool
 }
 
 func (a obj) Len() int {
-	return len(a.Kennung.String())
+	return len(a.Sku.Kennung.String())
 }
 
 func (a obj) LenKopfUndSchwanz() (int, int) {
@@ -55,7 +52,7 @@ func (a obj) LenKopfUndSchwanz() (int, int) {
 }
 
 func (a obj) KopfUndSchwanz() (kopf, schwanz string) {
-	parts := a.Kennung.Parts()
+	parts := a.Sku.Kennung.Parts()
 	kopf = parts[0]
 	schwanz = parts[2]
 
@@ -67,11 +64,11 @@ func (a obj) EqualsAny(b any) bool {
 }
 
 func (a obj) Equals(b obj) bool {
-	if a.Kennung.String() != b.Kennung.String() {
+	if a.Sku.Kennung.String() != b.Sku.Kennung.String() {
 		return false
 	}
 
-	if !a.Bezeichnung.Equals(b.Bezeichnung) {
+	if !a.Sku.Metadatei.Bezeichnung.Equals(b.Sku.Metadatei.Bezeichnung) {
 		return false
 	}
 
@@ -79,7 +76,7 @@ func (a obj) Equals(b obj) bool {
 }
 
 func (z obj) String() string {
-	return fmt.Sprintf("- [%s] %s", z.Kennung, z.Bezeichnung)
+	return fmt.Sprintf("- [%s] %s", z.Sku.Kennung, z.Sku.Metadatei.Bezeichnung)
 }
 
 func (z *obj) setExistingObj(
@@ -108,7 +105,7 @@ func (z *obj) setExistingObj(
 		return
 	}
 
-	if err = z.Kennung.Set(
+	if err = z.Sku.Kennung.Set(
 		strings.TrimSpace(remaining[:idx]),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -116,8 +113,8 @@ func (z *obj) setExistingObj(
 	}
 
 	if options.Abbreviations.Hinweisen {
-		if z.Kennung, err = ex.AbbreviateHinweisOnly(
-			z.Kennung,
+		if z.Sku.Kennung, err = ex.AbbreviateHinweisOnly(
+			z.Sku.Kennung,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -131,7 +128,7 @@ func (z *obj) setExistingObj(
 
 	remaining = remaining[idx+2:]
 
-	if err = z.Bezeichnung.Set(remaining); err != nil {
+	if err = z.Sku.Metadatei.Bezeichnung.Set(remaining); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -149,7 +146,7 @@ func (z *obj) setNewObj(v string) (err error) {
 
 	remaining = remaining[2:]
 
-	if err = z.Bezeichnung.Set(remaining); err != nil {
+	if err = z.Sku.Metadatei.Bezeichnung.Set(remaining); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -166,17 +163,17 @@ func sortObjSet(
 
 	sort.Slice(out, func(i, j int) bool {
 		switch {
-		case out[i].Kennung.String() != "" && out[j].Kennung.String() != "":
-			return out[i].Kennung.String() < out[j].Kennung.String()
+		case out[i].Sku.Kennung.String() != "" && out[j].Sku.Kennung.String() != "":
+			return out[i].Sku.Kennung.String() < out[j].Sku.Kennung.String()
 
-		case out[i].Kennung.String() == "":
+		case out[i].Sku.Kennung.String() == "":
 			return true
 
-		case out[j].Kennung.String() == "":
+    case out[j].Sku.Kennung.String() == "":
 			return false
 
 		default:
-			return out[i].Bezeichnung.String() < out[j].Bezeichnung.String()
+			return out[i].Sku.Metadatei.Bezeichnung.String() < out[j].Sku.Metadatei.Bezeichnung.String()
 		}
 	})
 
