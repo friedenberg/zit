@@ -52,14 +52,18 @@ func MakeMatcher(
 		}
 	}
 
-	if isExact {
-		m = MakeMatcherContainsExactly(k)
-	} else {
-		m = MakeMatcherContains(k, ki)
-	}
+	switch {
+	case isNegated && isExact:
+		m = MakeMatcherNegate(MakeMatcherContainsExactly(k))
 
-	if isNegated {
-		m = MakeMatcherNegate(m)
+	case isExact:
+		m = MakeMatcherContainsExactly(k)
+
+	case isNegated:
+		m = MakeMatcherNegate(MakeMatcherContains(k, ki))
+
+	default:
+		m = MakeMatcherContains(k, ki)
 	}
 
 	// m = MakeMatcherAnd(

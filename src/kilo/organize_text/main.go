@@ -80,6 +80,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 	}
 
 	if ot.UseMetadateiHeader {
+		ot.Metadatei.Matchers = ot.commentMatchers
 		mw.Metadatei = ot.Metadatei
 	}
 

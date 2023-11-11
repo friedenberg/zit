@@ -79,7 +79,7 @@ func (c *Organize) RunWithQuery(
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Umwelt:  u,
-		Options: c.Flags.GetOptions(u.Konfig().PrintOptions, ms),
+    Options: c.GetOptions(u.Konfig().PrintOptions, ms),
 	}
 
 

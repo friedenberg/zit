@@ -25,7 +25,7 @@ const (
 func init() {
 	gob.Register(&matcherAnd{})
 	gob.Register(&matcherOr{})
-	gob.Register(&matcherNegate{})
+	gob.Register(&Negate{})
 	gob.Register(&matcherNever{})
 	gob.Register(&matcherAlways{})
 	gob.Register(&matcherContainsExactly{})
@@ -87,12 +87,39 @@ func LenMatchers(
 	return
 }
 
+func IsNotMatcherNegate(m Matcher) bool {
+	ok := true
+
+	switch m.(type) {
+	case Negate, *Negate:
+		ok = false
+	}
+
+	return ok
+}
+
+func IsMatcherNegate(m Matcher) bool {
+	ok := false
+
+	switch m.(type) {
+	case Negate, *Negate:
+		ok = true
+	}
+
+	return ok
+}
+
 func VisitAllMatcherKennungSansGattungWrappers(
 	f schnittstellen.FuncIter[MatcherKennungSansGattungWrapper],
+	ex func(Matcher) bool,
 	matchers ...Matcher,
 ) (err error) {
 	return VisitAllMatchers(
 		func(m Matcher) (err error) {
+			if ex != nil && ex(m) {
+				return iter.MakeErrStopIteration()
+			}
+
 			if _, ok := m.(MatcherImplicit); ok {
 				return iter.MakeErrStopIteration()
 			}
@@ -467,14 +494,14 @@ func (matcher matcherContainsExactly) ContainsMatchable(
 //              |___/
 
 func MakeMatcherNegate(m Matcher) MatcherParentPtr {
-	return &matcherNegate{Child: m}
+	return &Negate{Child: m}
 }
 
-type matcherNegate struct {
+type Negate struct {
 	Child Matcher
 }
 
-func (matcher matcherNegate) MatcherLen() int {
+func (matcher Negate) MatcherLen() int {
 	if matcher.Child == nil {
 		return 0
 	}
@@ -482,12 +509,12 @@ func (matcher matcherNegate) MatcherLen() int {
 	return 1
 }
 
-func (matcher *matcherNegate) Add(m Matcher) error {
+func (matcher *Negate) Add(m Matcher) error {
 	matcher.Child = m
 	return nil
 }
 
-func (matcher matcherNegate) String() string {
+func (matcher Negate) String() string {
 	if matcher.Child == nil {
 		return ""
 	}
@@ -495,13 +522,13 @@ func (matcher matcherNegate) String() string {
 	return string(QueryNegationOperator) + matcher.Child.String()
 }
 
-func (matcher matcherNegate) ContainsMatchable(matchable *sku.Transacted) bool {
+func (matcher Negate) ContainsMatchable(matchable *sku.Transacted) bool {
 	ok := !matcher.Child.ContainsMatchable(matchable)
 
 	return ok
 }
 
-func (matcher matcherNegate) Each(f schnittstellen.FuncIter[Matcher]) error {
+func (matcher Negate) Each(f schnittstellen.FuncIter[Matcher]) error {
 	return f(matcher.Child)
 }
 

@@ -76,20 +76,18 @@ func MakeQuery(
 	hidden Matcher,
 	feg schnittstellen.FileExtensionGetter,
 	dg gattungen.Set,
-	implicitEtikettenGetter ImplicitEtikettenGetter,
 	ki kennung.Index,
 ) Query {
 	return &query{
-		konfig:                  k,
-		implicitEtikettenGetter: implicitEtikettenGetter,
-		cwd:                     cwd,
-		fileExtensionGetter:     feg,
-		expanders:               ex,
-		Hidden:                  hidden,
-		DefaultGattungen:        dg.CloneMutableSetLike(),
-		Gattung:                 make(map[gattung.Gattung]setWithSigil),
-		FDs:                     fd.MakeMutableSet(),
-		index:                   ki,
+		konfig:              k,
+		cwd:                 cwd,
+		fileExtensionGetter: feg,
+		expanders:           ex,
+		Hidden:              hidden,
+		DefaultGattungen:    dg.CloneMutableSetLike(),
+		Gattung:             make(map[gattung.Gattung]setWithSigil),
+		FDs:                 fd.MakeMutableSet(),
+		index:               ki,
 	}
 }
 
@@ -99,20 +97,18 @@ func MakeQueryAll(
 	ex kennung.Abbr,
 	hidden Matcher,
 	feg schnittstellen.FileExtensionGetter,
-	implicitEtikettenGetter ImplicitEtikettenGetter,
 	ki kennung.Index,
 ) Query {
 	errors.TodoP2("support allowed sigils")
 	return &query{
-		konfig:                  k,
-		implicitEtikettenGetter: implicitEtikettenGetter,
-		cwd:                     cwd,
-		fileExtensionGetter:     feg,
-		expanders:               ex,
-		Hidden:                  hidden,
-		DefaultGattungen:        gattungen.MakeSet(gattung.TrueGattung()...),
-		Gattung:                 make(map[gattung.Gattung]setWithSigil),
-		index:                   ki,
+		konfig:              k,
+		cwd:                 cwd,
+		fileExtensionGetter: feg,
+		expanders:           ex,
+		Hidden:              hidden,
+		DefaultGattungen:    gattungen.MakeSet(gattung.TrueGattung()...),
+		Gattung:             make(map[gattung.Gattung]setWithSigil),
+		index:               ki,
 	}
 }
 
@@ -134,10 +130,9 @@ func (s setWithSigil) GetSigil() kennung.Sigil {
 }
 
 type query struct {
-	konfig                  schnittstellen.Konfig
-	implicitEtikettenGetter ImplicitEtikettenGetter
-	fileExtensionGetter     schnittstellen.FileExtensionGetter
-	expanders               kennung.Abbr
+	konfig              schnittstellen.Konfig
+	fileExtensionGetter schnittstellen.FileExtensionGetter
+	expanders           kennung.Abbr
 
 	cwd    MatcherCwd
 	Hidden Matcher
@@ -155,7 +150,13 @@ func (q query) MatcherLen() int {
 }
 
 func (q query) Each(f schnittstellen.FuncIter[Matcher]) (err error) {
-	return todo.Implement()
+	for _, s := range q.Gattung {
+		if err = f(s.Matcher); err != nil {
+			return
+		}
+	}
+
+	return
 }
 
 func (s query) String() string {
@@ -323,7 +324,6 @@ func (ms *query) set(v string) (err error) {
 					ms.konfig,
 					ids.Matcher,
 					ms.expanders,
-					ms.implicitEtikettenGetter,
 					ms.index,
 					before,
 				); err != nil {
@@ -353,7 +353,6 @@ func tryAddMatcher(
 	k schnittstellen.Konfig,
 	s MatcherExactlyThisOrAllOfThese,
 	expanders kennung.Abbr,
-	implicitEtikettenGetter ImplicitEtikettenGetter,
 	ki kennung.Index,
 	v string,
 ) (err error) {
@@ -406,37 +405,16 @@ func tryAddMatcher(
 		)
 
 		if m, isNegated, _, err = MakeMatcher(&e, v, nil, ki, k); err == nil {
-			if implicitEtikettenGetter == nil {
-				return s.AddAllOfThese(m)
+			mo := MakeMatcherOrDoNotMatchOnEmpty()
+
+			if isNegated {
+				mo = MakeMatcherAnd()
+			}
+
+			if isNegated {
+				return s.AddAllOfThese(MakeMatcherAnd(m, MakeMatcherImplicit(mo)))
 			} else {
-				impl := implicitEtikettenGetter.GetImplicitEtiketten(&e)
-
-				mo := MakeMatcherOrDoNotMatchOnEmpty()
-
-				if isNegated {
-					mo = MakeMatcherAnd()
-				}
-
-				if err = impl.Each(
-					func(e kennung.Etikett) (err error) {
-						me := Matcher(MakeMatcherContainsExactly(e))
-
-						if isNegated {
-							me = MakeMatcherNegate(me)
-						}
-
-						return mo.Add(me)
-					},
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				if isNegated {
-					return s.AddAllOfThese(MakeMatcherAnd(m, MakeMatcherImplicit(mo)))
-				} else {
-					return s.AddAllOfThese(MakeMatcherOr(m, MakeMatcherImplicit(mo)))
-				}
+				return s.AddAllOfThese(MakeMatcherOr(m, MakeMatcherImplicit(mo)))
 			}
 		}
 	}
@@ -510,6 +488,7 @@ func (ms query) GetEtiketten() kennung.EtikettSet {
 
 				return es.AddPtr(e.GetEtikettPtr())
 			},
+			IsMatcherNegate,
 			// TODO-P1 modify sigil matcher to allow child traversal
 			s.Matcher,
 		)
@@ -545,6 +524,16 @@ func (ms query) GetTypen() schnittstellen.SetLike[kennung.Typ] {
 
 				return es.AddPtr(e.GetTypPtr())
 			},
+			func(m Matcher) bool {
+				ok := false
+
+				switch m.(type) {
+				case Negate, *Negate:
+					ok = true
+				}
+
+				return ok
+			},
 			// TODO-P1 modify sigil matcher to allow child traversal
 			s.Matcher,
 		)
@@ -569,7 +558,7 @@ func (s query) ContainsMatchable(m *sku.Transacted) bool {
 func (ms query) GetGattungen() gattungen.Set {
 	gs := make([]gattung.Gattung, 0, len(ms.Gattung))
 
-	for g, _ := range ms.Gattung {
+	for g := range ms.Gattung {
 		gs = append(gs, g)
 	}
 

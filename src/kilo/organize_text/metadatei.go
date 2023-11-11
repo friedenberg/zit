@@ -10,11 +10,13 @@ import (
 	"github.com/friedenberg/zit/src/delta/ohio"
 	"github.com/friedenberg/zit/src/echo/format"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/india/matcher"
 )
 
 type Metadatei struct {
 	kennung.EtikettSet
-	Typ kennung.Typ
+	Matchers schnittstellen.SetLike[matcher.Matcher]
+	Typ      kennung.Typ
 }
 
 func (m Metadatei) HasMetadateiContent() bool {
@@ -71,6 +73,12 @@ func (m Metadatei) WriteTo(w1 io.Writer) (n int64, err error) {
 
 	if tString != "" {
 		w.WriteFormat("! %s", tString)
+	}
+
+	if m.Matchers != nil {
+		for _, c := range iter.SortedStrings[matcher.Matcher](m.Matchers) {
+			w.WriteFormat("%% %s", c)
+		}
 	}
 
 	return w.WriteTo(w1)

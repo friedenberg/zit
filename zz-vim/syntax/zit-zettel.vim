@@ -62,7 +62,8 @@ syn region zitMetadateiAkteRegion start=/\v^! / end=/$/ oneline contained contai
 
 " highlight default link zitLinePrefixRoot Special
 highlight default link zitMetadatei Normal
-highlight default link zitMetadateiBezeichnung Title
+" highlight default link zitMetadateiBezeichnung Title
+highlight default link zitMetadateiBezeichnung Comment
 highlight default link zitMetadateiEtikett Constant
 highlight default link zitMetadateiAkteBase Underlined
 highlight default link zitMetadateiAkteExt Type

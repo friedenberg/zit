@@ -234,7 +234,6 @@ func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
 		exc,
 		u.Konfig().FileExtensions,
 		dg,
-		u.Konfig(),
 		i,
 	)
 }
@@ -248,7 +247,6 @@ func (u *Umwelt) MakeQueryAll() matcher.Query {
 		u.MakeKennungExpanders(),
 		nil,
 		u.Konfig().FileExtensions,
-		u.Konfig(),
 		i,
 	)
 }
@@ -269,7 +267,6 @@ func (u *Umwelt) MakeMetaIdSetWithoutExcludedHidden(
 		nil,
 		u.Konfig().FileExtensions,
 		dg,
-		u.Konfig(),
 		i,
 	)
 }

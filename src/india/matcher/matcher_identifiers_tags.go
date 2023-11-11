@@ -93,6 +93,16 @@ func (s matcherExactlyThisOrAllOfThese) GetHinweisen() schnittstellen.SetLike[ke
 
 			return hins.Add(*h)
 		},
+		func(m Matcher) bool {
+			ok := false
+
+			switch m.(type) {
+			case Negate, *Negate:
+				ok = true
+			}
+
+			return ok
+		},
 		s.MatcherExactlyThis,
 	)
 

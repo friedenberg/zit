@@ -4,9 +4,11 @@ import (
 	"flag"
 	"sync"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -27,6 +29,7 @@ type Options struct {
 
 	Konfig konfig.Compiled
 
+	commentMatchers   schnittstellen.SetLike[matcher.Matcher]
 	rootEtiketten     kennung.EtikettSet
 	Typ               kennung.Typ
 	GroupingEtiketten kennung.Slice
@@ -114,6 +117,29 @@ func (o *Flags) GetOptions(
 
 	if q != nil {
 		o.rootEtiketten = q.GetEtiketten()
+
+		ks := collections_value.MakeMutableValueSet[matcher.Matcher](nil)
+
+		if err := matcher.VisitAllMatchers(
+			func(m matcher.Matcher) (err error) {
+				switch m1 := m.(type) {
+				case matcher.Negate:
+					return ks.Add(m1)
+
+				case *matcher.Negate:
+					return ks.Add(m1)
+
+				default:
+					return
+				}
+			},
+			// TODO-P1 modify sigil matcher to allow child traversal
+			q,
+		); err != nil {
+			errors.PanicIfError(err)
+		}
+
+		o.commentMatchers = ks
 	}
 
 	o.PrintOptions = printOptions
