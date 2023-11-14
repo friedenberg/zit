@@ -26,9 +26,7 @@ func TestRingBufferEmpty(t1 *testing.T) {
 			t.Errorf("expected %d but got %d", 4, n)
 		}
 
-		if err != nil {
-			t.Errorf("expected no error but got %s", err)
-		}
+		t.AssertNoError(err)
 
 		{
 			expected := 4
@@ -48,17 +46,13 @@ func TestRingBufferEmpty(t1 *testing.T) {
 		}
 	}
 
-	// {
-	// 	start, end := sut.Find([]byte("t"))
+	{
+		offset, _ := sut.PeekReadable().Find(FindBoundary([]byte("t")))
 
-	// 	if start != 0 {
-	// 		t.Errorf("expected %d but got %d", 0, start)
-	// 	}
-
-	// 	if end != 0 {
-	// 		t.Errorf("expected %d but got %d", 0, end)
-	// 	}
-	// }
+		if offset != 0 {
+			t.Errorf("expected %d but got %d", 0, offset)
+		}
+	}
 
 	// {
 	// 	start, end := sut.Find([]byte("test"))

@@ -79,9 +79,8 @@ func (c *Organize) RunWithQuery(
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Umwelt:  u,
-    Options: c.GetOptions(u.Konfig().PrintOptions, ms),
+		Options: c.GetOptions(u.Konfig().PrintOptions, ms, u.StringFormatWriterSkuLikePtr()),
 	}
-
 
 	typen := ms.GetTypen()
 

@@ -10,16 +10,14 @@ import (
 
 type organize struct {
 	maxKopf, maxSchwanz int
-	omitNewLine         bool
 }
 
 func MakeOrganizeFormat(
 	maxKopf, maxSchwanz int,
 ) *organize {
 	return &organize{
-		maxKopf:     maxKopf,
-		maxSchwanz:  maxSchwanz,
-		omitNewLine: true,
+		maxKopf:    maxKopf,
+		maxSchwanz: maxSchwanz,
 	}
 }
 
@@ -65,16 +63,6 @@ func (f *organize) WriteStringFormat(
 		}
 
 		n1, err = sw.WriteString(o.Metadatei.Description())
-		n += int64(n1)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if !f.omitNewLine {
-		n1, err = sw.WriteString("\n")
 		n += int64(n1)
 
 		if err != nil {

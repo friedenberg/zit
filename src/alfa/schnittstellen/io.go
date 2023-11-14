@@ -1,6 +1,9 @@
 package schnittstellen
 
-import "io"
+import (
+	"bufio"
+	"io"
+)
 
 type FuncReader func(io.Reader) (int64, error)
 
@@ -22,6 +25,10 @@ type (
 
 	FuncWriter              func(io.Writer) (int64, error)
 	FuncWriterFormat[T any] func(io.Writer, T) (int64, error)
+
+	StringFormatReader[T any] interface {
+		ReadStringFormat(*bufio.Reader, T) (int64, error)
+	}
 
 	StringFormatWriter[T any] interface {
 		WriteStringFormat(io.StringWriter, T) (int64, error)

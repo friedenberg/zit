@@ -21,16 +21,12 @@ type boundaryReader struct {
 	state            boundaryReaderState
 }
 
-//go:generate stringer -type=boundaryReaderState
-type boundaryReaderState int
-
-const (
-	boundaryReaderStateEmpty = boundaryReaderState(iota)
-	boundaryReaderStateNeedsBoundary
-	boundaryReaderStateOnlyContent
-	boundaryReaderStatePartialBoundaryInBuffer
-	boundaryReaderStateCompleteBoundaryInBuffer
-)
+func (br *boundaryReader) Reset(r io.Reader) {
+	br.reader.Reset(r)
+	br.remainingContent = 0
+	br.buffer.Reset()
+	br.state = boundaryReaderStateEmpty
+}
 
 func MakeBoundaryReader(r io.Reader, boundary string) BoundaryReader {
 	d := 0
@@ -89,7 +85,9 @@ func (br *boundaryReader) resetRemainingContentIfNecessary() {
 
 	case boundaryReaderStatePartialBoundaryInBuffer,
 		boundaryReaderStateOnlyContent:
-		untilBoundary, partial := br.buffer.Find(br.boundary)
+		untilBoundary, partial := br.buffer.PeekReadable().Find(
+			FindBoundary(br.boundary),
+		)
 
 		switch {
 		case untilBoundary > br.buffer.Len():
@@ -147,10 +145,10 @@ func (br *boundaryReader) ReadBoundary() (n int, err error) {
 	case n == len(br.boundary):
 		br.setState(boundaryReaderStatePartialBoundaryInBuffer)
 
-		var n1 int
-		n1, err = br.fillBuffer()
+		var bytesReadFromRingBuffer int
+		bytesReadFromRingBuffer, err = br.fillBuffer()
 
-		if err == io.EOF && n1 > 0 || br.buffer.Len() > 0 {
+		if err == io.EOF && bytesReadFromRingBuffer > 0 || br.buffer.Len() > 0 {
 			// the buffer has more content, so try a boundary read again
 			err = nil
 		} else if err != nil {

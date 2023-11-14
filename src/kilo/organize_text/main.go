@@ -61,6 +61,12 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 
 	omit := ot.UseMetadateiHeader && ot.HasMetadateiContent()
 
+	sfw := ot.StringFormatWriter
+
+	if sfw == nil || true {
+		sfw = sku_fmt.MakeOrganizeFormat(kopf, schwanz)
+	}
+
 	aw := assignmentLineWriter{
 		LineWriter:           lw,
 		maxDepth:             ot.MaxDepth(),
@@ -69,7 +75,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		maxLen:               l,
 		RightAlignedIndents:  ot.UseRightAlignedIndents,
 		OmitLeadingEmptyLine: omit,
-		stringFormatWriter:   sku_fmt.MakeOrganizeFormat(kopf, schwanz),
+		stringFormatWriter:   sfw,
 	}
 
 	if err = aw.write(ot.assignment); err != nil {

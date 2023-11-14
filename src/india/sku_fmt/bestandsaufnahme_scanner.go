@@ -47,20 +47,20 @@ type bestandsaufnahmeScanner struct {
 	lastN   int64
 }
 
-func (f *bestandsaufnahmeScanner) Error() error {
-	if errors.IsEOF(f.err) {
+func (scanner *bestandsaufnahmeScanner) Error() error {
+	if errors.IsEOF(scanner.err) {
 		return nil
 	}
 
-	return f.err
+	return scanner.err
 }
 
-func (f *bestandsaufnahmeScanner) GetTransacted() *sku.Transacted {
-	return f.lastSku
+func (scanner *bestandsaufnahmeScanner) GetTransacted() *sku.Transacted {
+	return scanner.lastSku
 }
 
-func (f *bestandsaufnahmeScanner) Scan() (ok bool) {
-	if f.err != nil {
+func (scanner *bestandsaufnahmeScanner) Scan() (ok bool) {
+	if scanner.err != nil {
 		return
 	}
 
@@ -69,44 +69,44 @@ func (f *bestandsaufnahmeScanner) Scan() (ok bool) {
 		n2 int
 	)
 
-	f.lastN = 0
-	f.lastSku = nil
+	scanner.lastN = 0
+	scanner.lastSku = nil
 
-	if !f.afterFirst {
-		n2, f.err = f.br.ReadBoundary()
-		f.lastN += int64(n2)
+	if !scanner.afterFirst {
+		n2, scanner.err = scanner.br.ReadBoundary()
+		scanner.lastN += int64(n2)
 
-		if errors.IsEOF(f.err) {
+		if errors.IsEOF(scanner.err) {
 			return
-		} else if f.err != nil {
-			f.err = errors.Wrap(f.err)
+		} else if scanner.err != nil {
+			scanner.err = errors.Wrap(scanner.err)
 			return
 		}
 
-		f.afterFirst = true
+		scanner.afterFirst = true
 	}
 
-	f.lastSku = sku.GetTransactedPool().Get()
+	scanner.lastSku = sku.GetTransactedPool().Get()
 
-	n1, f.err = f.format.ParsePersistentMetadatei(f.br, f.lastSku, f.options)
-	f.lastN += n1
+	n1, scanner.err = scanner.format.ParsePersistentMetadatei(scanner.br, scanner.lastSku, scanner.options)
+	scanner.lastN += n1
 
-	if errors.IsEOF(f.err) {
-		f.err = errors.Errorf("unexpected eof")
+	if errors.IsEOF(scanner.err) {
+		scanner.err = errors.Errorf("unexpected eof")
 		return
-	} else if f.err != nil {
-		f.err = errors.Wrapf(f.err, "Bytes: %d", n1)
-		f.err = errors.Wrapf(f.err, "Holder: %v", f.lastSku)
+	} else if scanner.err != nil {
+		scanner.err = errors.Wrapf(scanner.err, "Bytes: %d", n1)
+		scanner.err = errors.Wrapf(scanner.err, "Holder: %v", scanner.lastSku)
 		return
 	}
 
-	f.lastSku.SetObjekteSha(f.lastSku.Metadatei.Verzeichnisse.Sha)
+	scanner.lastSku.SetObjekteSha(scanner.lastSku.Metadatei.Verzeichnisse.Sha)
 
-	n2, f.err = f.br.ReadBoundary()
-	f.lastN += int64(n2)
+	n2, scanner.err = scanner.br.ReadBoundary()
+	scanner.lastN += int64(n2)
 
-	if f.err != nil && !errors.IsEOF(f.err) {
-		f.err = errors.Wrap(f.err)
+	if scanner.err != nil && !errors.IsEOF(scanner.err) {
+		scanner.err = errors.Wrap(scanner.err)
 		return
 	}
 

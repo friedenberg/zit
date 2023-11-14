@@ -43,7 +43,8 @@ type Options struct {
 	UseRefiner             bool
 	UseMetadateiHeader     bool
 
-	PrintOptions erworben_cli_print_options.PrintOptions
+	PrintOptions       erworben_cli_print_options.PrintOptions
+	StringFormatWriter schnittstellen.StringFormatWriter[*sku.Transacted]
 }
 
 func MakeFlags() Flags {
@@ -108,12 +109,15 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 func (o *Flags) GetOptions(
 	printOptions erworben_cli_print_options.PrintOptions,
 	q matcher.Query,
+	stringFormatWriter schnittstellen.StringFormatWriter[*sku.Transacted],
 ) Options {
 	o.once.Do(
 		func() {
 			o.Options.ExtraEtiketten = o.ExtraEtiketten.GetSetPtrLike()
 		},
 	)
+
+	o.StringFormatWriter = stringFormatWriter
 
 	if q != nil {
 		o.rootEtiketten = q.GetEtiketten()
