@@ -50,6 +50,7 @@ func TestBoundaryReaderContainsBoundary(t1 *testing.T) {
 	n1, err = sut.ReadBoundary()
 
 	if !errors.IsEOF(err) {
+		t.Logf("%#v", sut.(*boundaryReader).buffer)
 		t.Errorf("expected %q but got %q", io.EOF, err)
 	}
 

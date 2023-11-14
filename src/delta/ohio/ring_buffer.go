@@ -22,6 +22,10 @@ func MakeRingBuffer(n int) *RingBuffer {
 	}
 }
 
+// func (rb *RingBuffer) String() string {
+
+// }
+
 func (rb *RingBuffer) Reset() {
 	rb.n = 0
 	rb.r = 0
@@ -188,6 +192,7 @@ func (rb *RingBuffer) FillWith(r io.Reader) (n int, err error) {
 	rb.w += n1
 	n += n1
 	rb.n += n1
+
 	if err != nil {
 		return
 	}
@@ -213,66 +218,21 @@ func (rb *RingBuffer) FillWith(r io.Reader) (n int, err error) {
 	return
 }
 
-func (rb *RingBuffer) PeekMatchAdvance(m []byte) (n int, eof bool) {
-	shouldAdvance := true
+func (rb *RingBuffer) advance(n int) {
+	rb.r += n
 
-	if rb.Len() < len(m) {
-		shouldAdvance = false
-		eof = true
+	if rb.r > len(rb.buffer) {
+		rb.r -= len(rb.buffer)
 	}
 
-	n = rb.peekMatchAdvance(m, shouldAdvance)
-
-	return
+	rb.n -= n
 }
 
-func (rb *RingBuffer) PeekMatch(m []byte) (n int) {
-	return rb.peekMatchAdvance(m, false)
-}
+func (rb *RingBuffer) FindFromStartAndAdvance(m []byte) (length int, partial bool) {
+	length, partial = rb.PeekReadable().FindFromStart(FindBoundary(m))
 
-func (rb *RingBuffer) peekMatchAdvance(m []byte, shouldAdvance bool) (n int) {
-	r := rb.r
-
-	rs := rb.PeekReadable()
-
-	for _, v := range rs[0] {
-		if n == len(m) {
-			break
-		}
-
-		if m[n] != v {
-			return
-		}
-
-		n++
-		r++
-	}
-
-	// if len(second) > 0 {
-	// 	r = 0
-	// }
-
-	for _, v := range rs[1] {
-		if n == len(m) {
-			break
-		}
-
-		if m[n] != v {
-			return
-		}
-
-		n++
-		r++
-	}
-
-	if shouldAdvance && n == len(m) {
-		rb.r += n
-
-		if rb.r > len(rb.buffer) {
-			rb.r -= len(rb.buffer)
-		}
-
-		rb.n -= n
+	if !partial {
+		rb.advance(length)
 	}
 
 	return

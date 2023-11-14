@@ -85,8 +85,8 @@ func (br *boundaryReader) resetRemainingContentIfNecessary() {
 
 	case boundaryReaderStatePartialBoundaryInBuffer,
 		boundaryReaderStateOnlyContent:
-		untilBoundary, partial := br.buffer.PeekReadable().Find(
-			FindBoundary(br.boundary),
+		untilBoundary, _, partial := br.buffer.PeekReadable().FindAnywhere(
+      FindBoundary(br.boundary),
 		)
 
 		switch {
@@ -123,7 +123,7 @@ func (br *boundaryReader) resetRemainingContentIfNecessary() {
 	}
 }
 
-func (br *boundaryReader) ReadBoundary() (n int, err error) {
+func (br *boundaryReader) ReadBoundary() (length int, err error) {
 	switch br.state {
 	default:
 		panic(ErrInvalidBoundaryReaderState)
@@ -138,11 +138,11 @@ func (br *boundaryReader) ReadBoundary() (n int, err error) {
 		// noop
 	}
 
-	eof := false
-	n, eof = br.buffer.PeekMatchAdvance(br.boundary)
+	partial := false
+	length, partial = br.buffer.FindFromStartAndAdvance(br.boundary)
 
 	switch {
-	case n == len(br.boundary):
+	case length == len(br.boundary):
 		br.setState(boundaryReaderStatePartialBoundaryInBuffer)
 
 		var bytesReadFromRingBuffer int
@@ -158,7 +158,7 @@ func (br *boundaryReader) ReadBoundary() (n int, err error) {
 
 		return
 
-	case n == br.buffer.Len() && eof:
+	case (length == br.buffer.Len() && partial) || br.buffer.Len() == 0:
 		var n1 int
 		n1, err = br.fillBuffer()
 
@@ -173,7 +173,7 @@ func (br *boundaryReader) ReadBoundary() (n int, err error) {
 		// read more and try again
 		return br.ReadBoundary()
 
-	case n < len(br.boundary):
+	case length < len(br.boundary):
 		fallthrough
 
 	default:

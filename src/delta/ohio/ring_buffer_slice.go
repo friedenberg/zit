@@ -26,7 +26,20 @@ func (rs RingSlice) Len() int {
 	return len(rs.First()) + len(rs.Second())
 }
 
-func (rs RingSlice) Find(ff FindFunc) (offset int, eof bool) {
+func (rs RingSlice) FindFromStart(ff FindFunc) (length int, partial bool) {
+	var offset int
+
+	offset, length, partial = ff(rs)
+
+	if offset > 0 {
+		length = 0
+		partial = false
+	}
+
+	return
+}
+
+func (rs RingSlice) FindAnywhere(ff FindFunc) (offset, length int, partial bool) {
 	if rs.Len() == 0 {
 		return
 	}
@@ -36,29 +49,28 @@ func (rs RingSlice) Find(ff FindFunc) (offset int, eof bool) {
 
 // rs is the data to search. Negative offset means not found. 0 or positive
 // offset means found at that index. Partial means the sequence is not complete.
-type FindFunc func(rs RingSlice) (offset int, partial bool)
+type FindFunc func(rs RingSlice) (offset, length int, partial bool)
 
-func FindBoundary(m []byte) FindFunc {
-	return func(rs RingSlice) (offset int, partial bool) {
+func FindBoundary(boundary []byte) FindFunc {
+	return func(rs RingSlice) (offset, length int, partial bool) {
 		offset = -1
 
-		if len(m) == 0 {
+		if len(boundary) == 0 {
 			return
 		}
 
-		i := 0
 		j := 0
 		lastWasMatch := false
 
 		for _, v := range rs.First() {
-			if m[i] != v {
+			if boundary[length] != v {
 				lastWasMatch = false
-				i = 0
+				length = 0
 			} else {
 				lastWasMatch = true
-				i++
+				length++
 
-				if i == len(m) {
+				if length == len(boundary) {
 					break
 				}
 			}
@@ -66,16 +78,16 @@ func FindBoundary(m []byte) FindFunc {
 			j++
 		}
 
-		if i < len(m) {
+		if length < len(boundary) {
 			for _, v := range rs.Second() {
-				if m[i] != v {
+				if boundary[length] != v {
 					lastWasMatch = false
-					i = 0
+					length = 0
 				} else {
 					lastWasMatch = true
-					i++
+					length++
 
-					if i == len(m) {
+					if length == len(boundary) {
 						break
 					}
 				}
@@ -85,23 +97,21 @@ func FindBoundary(m []byte) FindFunc {
 		}
 
 		switch {
-		case i == len(m) && !lastWasMatch:
+		case length == len(boundary) && !lastWasMatch:
 			panic("last was not match but match was read completely")
 
-		case i > len(m) && lastWasMatch:
+		case length > len(boundary) && lastWasMatch:
 			panic("last was match but i is greater than length of m")
-			// log.Debug().Printf("no boundary???")
-			// offset = j
 
-		case i == len(m) && lastWasMatch:
+		case length == len(boundary) && lastWasMatch:
 			if j == 0 {
 				j += 1
 			}
 
-			offset = j - i
+			offset = j - length
 
-		case i < len(m)-1 && lastWasMatch:
-			offset = j - i
+		case length < len(boundary) && lastWasMatch:
+			offset = j - length
 			partial = true
 
 		default:
@@ -110,8 +120,3 @@ func FindBoundary(m []byte) FindFunc {
 		return
 	}
 }
-
-// example sequence:
-// [text "quoted text []"]
-// [text "quoted text []"]
-// ^     ^            ^

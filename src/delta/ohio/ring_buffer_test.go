@@ -39,18 +39,28 @@ func TestRingBufferEmpty(t1 *testing.T) {
 	}
 
 	{
-		n := sut.PeekMatch([]byte("tes"))
+		length, partial := sut.PeekReadable().FindFromStart(
+			FindBoundary([]byte("tes")),
+		)
 
-		if n != 3 {
-			t.Errorf("expected %d but got %d", 3, n)
+		if length != 3 {
+			t.Errorf("expected %d but got %d", 3, length)
+		}
+
+		if partial {
+			t.Errorf("expected false partial but got true")
 		}
 	}
 
 	{
-		offset, _ := sut.PeekReadable().Find(FindBoundary([]byte("t")))
+		offset, length, _ := sut.PeekReadable().FindAnywhere(FindBoundary([]byte("t")))
 
 		if offset != 0 {
 			t.Errorf("expected %d but got %d", 0, offset)
+		}
+
+		if length != 1 {
+			t.Errorf("expected %d but got %d", 1, length)
 		}
 	}
 
@@ -67,18 +77,34 @@ func TestRingBufferEmpty(t1 *testing.T) {
 	// }
 
 	{
-		n := sut.PeekMatch([]byte("test"))
+		length, partial := sut.PeekReadable().FindFromStart(
+			FindBoundary([]byte("test")),
+		)
 
-		if n != 4 {
-			t.Errorf("expected %d but got %d", 4, n)
+		if length != 4 {
+			t.Errorf("expected %d but got %d", 4, length)
+		}
+
+		if partial {
+			t.Errorf("expected false partial but got true")
 		}
 	}
 
 	{
-		n := sut.PeekMatch([]byte("testy"))
+		offset, length, partial := sut.PeekReadable().FindAnywhere(
+			FindBoundary([]byte("testy")),
+		)
 
-		if n != 4 {
-			t.Errorf("expected %d but got %d", 4, n)
+		if offset != 0 {
+			t.Errorf("expected %d but got %d", 0, offset)
+		}
+
+		if length != 4 {
+			t.Errorf("expected %d but got %d", 4, length)
+		}
+
+		if !partial {
+			t.Errorf("expected true partial but got false")
 		}
 	}
 
@@ -111,6 +137,59 @@ func TestRingBufferEmpty(t1 *testing.T) {
 	// 		t.Errorf("expected end %d but got %d", -1, end)
 	// 	}
 	// }
+}
+
+func TestRingBufferEmptyFindFromStartAndAdvance(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+	sut := MakeRingBuffer(10)
+
+	{
+		actual := sut.Len()
+
+		if sut.Len() != 0 {
+			t.Errorf("expected %d but got %d", 0, actual)
+		}
+	}
+
+	{
+		n, err := sut.Write([]byte("test"))
+
+		if n != 4 {
+			t.Errorf("expected %d but got %d", 4, n)
+		}
+
+		t.AssertNoError(err)
+
+		{
+			expected := 4
+			actual := sut.Len()
+
+			if expected != actual {
+				t.Errorf("expected %d but got %d", expected, actual)
+			}
+		}
+	}
+
+	{
+		length, partial := sut.FindFromStartAndAdvance(
+			[]byte("tes"),
+		)
+
+		if length != 3 {
+			t.Errorf("expected %d but got %d", 3, length)
+		}
+
+		if partial {
+			t.Errorf("expected false partial but got true")
+		}
+
+		expected := 1
+		actual := sut.Len()
+
+		if expected != actual {
+			t.Errorf("expected %d but got %d", expected, actual)
+		}
+	}
 }
 
 func TestRingBufferEmptyTooBig(t1 *testing.T) {
