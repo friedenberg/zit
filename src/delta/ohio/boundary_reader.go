@@ -15,7 +15,7 @@ type BoundaryReader interface {
 
 type boundaryReader struct {
 	reader           *bufio.Reader
-	boundary         []byte
+	ff               FindFunc
 	remainingContent int
 	buffer           *RingBuffer
 	state            boundaryReaderState
@@ -38,9 +38,9 @@ func MakeBoundaryReader(r io.Reader, boundary string) BoundaryReader {
 	b := MakeRingBuffer(d)
 
 	return &boundaryReader{
-		reader:   bufio.NewReader(r),
-		boundary: []byte(boundary),
-		buffer:   b,
+		reader: bufio.NewReader(r),
+		buffer: b,
+		ff:     FindBoundary([]byte(boundary)),
 	}
 }
 
@@ -56,9 +56,9 @@ func MakeBoundaryReaderPageSize(
 	b := MakeRingBuffer(size)
 
 	return &boundaryReader{
-		reader:   bufio.NewReader(r),
-		boundary: []byte(boundary),
-		buffer:   b,
+		reader: bufio.NewReader(r),
+		buffer: b,
+		ff:     FindBoundary([]byte(boundary)),
 	}
 }
 
@@ -85,9 +85,7 @@ func (br *boundaryReader) resetRemainingContentIfNecessary() {
 
 	case boundaryReaderStatePartialBoundaryInBuffer,
 		boundaryReaderStateOnlyContent:
-		untilBoundary, _, partial := br.buffer.PeekReadable().FindAnywhere(
-      FindBoundary(br.boundary),
-		)
+		untilBoundary, _, partial := br.buffer.PeekReadable().FindAnywhere(br.ff)
 
 		switch {
 		case untilBoundary > br.buffer.Len():
@@ -139,10 +137,10 @@ func (br *boundaryReader) ReadBoundary() (length int, err error) {
 	}
 
 	partial := false
-	length, partial = br.buffer.FindFromStartAndAdvance(br.boundary)
+	length, partial = br.buffer.FindFromStartAndAdvance(br.ff)
 
 	switch {
-	case length == len(br.boundary):
+	case length != 0 && !partial:
 		br.setState(boundaryReaderStatePartialBoundaryInBuffer)
 
 		var bytesReadFromRingBuffer int
@@ -173,7 +171,7 @@ func (br *boundaryReader) ReadBoundary() (length int, err error) {
 		// read more and try again
 		return br.ReadBoundary()
 
-	case length < len(br.boundary):
+	case partial:
 		fallthrough
 
 	default:

@@ -228,8 +228,8 @@ func (rb *RingBuffer) advance(n int) {
 	rb.n -= n
 }
 
-func (rb *RingBuffer) FindFromStartAndAdvance(m []byte) (length int, partial bool) {
-	length, partial = rb.PeekReadable().FindFromStart(FindBoundary(m))
+func (rb *RingBuffer) FindFromStartAndAdvance(ff FindFunc) (length int, partial bool) {
+	length, partial = rb.PeekReadable().FindFromStart(ff)
 
 	if !partial {
 		rb.advance(length)

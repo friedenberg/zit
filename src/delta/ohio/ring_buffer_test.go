@@ -172,7 +172,7 @@ func TestRingBufferEmptyFindFromStartAndAdvance(t1 *testing.T) {
 
 	{
 		length, partial := sut.FindFromStartAndAdvance(
-			[]byte("tes"),
+      FindBoundary([]byte("tes")),
 		)
 
 		if length != 3 {
