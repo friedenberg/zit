@@ -1,4 +1,4 @@
-package ohio
+package ohio_boundary_reader
 
 //go:generate stringer -type=boundaryReaderState
 type boundaryReaderState int

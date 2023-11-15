@@ -1,4 +1,4 @@
-package ohio
+package ohio_boundary_reader
 
 import (
 	"bufio"
@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/ohio_ring_buffer"
 )
 
 type BoundaryReader interface {
@@ -15,9 +16,9 @@ type BoundaryReader interface {
 
 type boundaryReader struct {
 	reader           *bufio.Reader
-	ff               FindFunc
+	ff               ohio_ring_buffer.FindFunc
 	remainingContent int
-	buffer           *RingBuffer
+	buffer           *ohio_ring_buffer.RingBuffer
 	state            boundaryReaderState
 }
 
@@ -31,16 +32,16 @@ func (br *boundaryReader) Reset(r io.Reader) {
 func MakeBoundaryReader(r io.Reader, boundary string) BoundaryReader {
 	d := 0
 
-	if len(boundary) > ringBufferDefaultSize {
+	if len(boundary) > ohio_ring_buffer.RingBufferDefaultSize {
 		d = len(boundary)
 	}
 
-	b := MakeRingBuffer(d)
+	b := ohio_ring_buffer.MakeRingBuffer(d)
 
 	return &boundaryReader{
 		reader: bufio.NewReader(r),
 		buffer: b,
-		ff:     FindBoundary([]byte(boundary)),
+		ff:     ohio_ring_buffer.FindBoundary([]byte(boundary)),
 	}
 }
 
@@ -49,16 +50,16 @@ func MakeBoundaryReaderPageSize(
 	boundary string,
 	size int,
 ) BoundaryReader {
-	if len(boundary) > ringBufferDefaultSize {
+	if len(boundary) > ohio_ring_buffer.RingBufferDefaultSize {
 		size = len(boundary)
 	}
 
-	b := MakeRingBuffer(size)
+	b := ohio_ring_buffer.MakeRingBuffer(size)
 
 	return &boundaryReader{
 		reader: bufio.NewReader(r),
 		buffer: b,
-		ff:     FindBoundary([]byte(boundary)),
+		ff:     ohio_ring_buffer.FindBoundary([]byte(boundary)),
 	}
 }
 

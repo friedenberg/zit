@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/delta/ohio"
+	"github.com/friedenberg/zit/src/delta/ohio_boundary_reader"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
@@ -24,7 +24,7 @@ func MakeFormatBestandsaufnahmeScanner(
 	op objekte_format.Options,
 ) FormatBestandsaufnahmeScanner {
 	return &bestandsaufnahmeScanner{
-		br:      ohio.MakeBoundaryReader(in, metadatei.Boundary+"\n"),
+		br:      ohio_boundary_reader.MakeBoundaryReader(in, metadatei.Boundary+"\n"),
 		format:  of,
 		options: op,
 		es:      kennung.MakeEtikettMutableSet(),
@@ -32,7 +32,7 @@ func MakeFormatBestandsaufnahmeScanner(
 }
 
 type bestandsaufnahmeScanner struct {
-	br         ohio.BoundaryReader
+	br         ohio_boundary_reader.BoundaryReader
 	format     objekte_format.Format
 	options    objekte_format.Options
 	afterFirst bool

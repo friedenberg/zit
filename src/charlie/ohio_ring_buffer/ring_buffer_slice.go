@@ -1,4 +1,4 @@
-package ohio
+package ohio_ring_buffer
 
 import (
 	"fmt"

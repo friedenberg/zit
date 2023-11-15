@@ -1,4 +1,4 @@
-package ohio
+package ohio_boundary_reader
 
 import (
 	"bytes"

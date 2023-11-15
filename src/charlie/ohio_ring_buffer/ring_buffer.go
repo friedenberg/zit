@@ -1,11 +1,11 @@
-package ohio
+package ohio_ring_buffer
 
 import (
 	"fmt"
 	"io"
 )
 
-const ringBufferDefaultSize = 4096
+const RingBufferDefaultSize = 4096
 
 type RingBuffer struct {
 	n, r, w int
@@ -14,7 +14,7 @@ type RingBuffer struct {
 
 func MakeRingBuffer(n int) *RingBuffer {
 	if n == 0 {
-		n = ringBufferDefaultSize
+		n = RingBufferDefaultSize
 	}
 
 	return &RingBuffer{
