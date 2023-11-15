@@ -10,6 +10,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
@@ -30,7 +31,7 @@ type Page struct {
 	State
 }
 
-func makeZettelenPage(
+func makePage(
 	iof schnittstellen.VerzeichnisseFactory, pid pageId,
 	fff PageDelegateGetter,
 	useBestandsaufnahmeForVerzeichnisse bool,
@@ -129,6 +130,13 @@ func (zp *Page) Flush() (err error) {
 	errors.Log().Printf("flushing page: %s", zp.path)
 
 	var w io.WriteCloser
+
+	// If the cache file does not exist and we have nothing to add, short circuit
+	// the flush. This condition occurs on the initial init when the konfig is
+	// changed but there are no zettels yet.
+	if !files.Exists(zp.path) && zp.added.Len() == 0 {
+		return
+	}
 
 	if w, err = zp.WriteCloserVerzeichnisse(zp.path); err != nil {
 		err = errors.Wrap(err)

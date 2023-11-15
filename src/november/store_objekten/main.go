@@ -26,7 +26,7 @@ type Store struct {
 
 	protoZettel            zettel.ProtoZettel
 	verzeichnisseSchwanzen *verzeichnisseSchwanzen
-	verzeichnisseAll       *store_verzeichnisse.Zettelen
+	verzeichnisseAll       *store_verzeichnisse.Store
 	konfigStore            konfigStore
 
 	objekte_store.LogWriter
@@ -54,7 +54,7 @@ func Make(
 		return
 	}
 
-	if s.verzeichnisseAll, err = store_verzeichnisse.MakeZettelen(
+	if s.verzeichnisseAll, err = store_verzeichnisse.MakeStore(
 		s.GetKonfig(),
 		s.StoreUtil.GetStandort().DirVerzeichnisseZettelenNeue(),
 		s.GetStandort(),
@@ -101,6 +101,10 @@ func (s Store) Flush() (err error) {
 
 	if s.GetKonfig().DryRun {
 		return
+	}
+
+	if s.GetKonfig().HasChanges() {
+		s.verzeichnisseSchwanzen.SetNeedsFlush()
 	}
 
 	if err = s.verzeichnisseSchwanzen.Flush(); err != nil {

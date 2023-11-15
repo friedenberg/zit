@@ -12,12 +12,12 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
-func (i Zettelen) PageForKennung(h kennung.Kennung) (n int, err error) {
+func (i Store) PageForKennung(h kennung.Kennung) (n int, err error) {
 	s := sha.FromStringer(h)
 	return i.PageForSha(s)
 }
 
-func (i Zettelen) PageForString(s string) (n int, err error) {
+func (i Store) PageForString(s string) (n int, err error) {
 	sr := strings.NewReader(s)
 	hash := sha256.New()
 
@@ -30,7 +30,7 @@ func (i Zettelen) PageForString(s string) (n int, err error) {
 	return i.PageForSha(sh)
 }
 
-func (i Zettelen) PageForSha(s schnittstellen.ShaLike) (n int, err error) {
+func (i Store) PageForSha(s schnittstellen.ShaLike) (n int, err error) {
 	var n1 int64
 	ss := s.String()[:DigitWidth]
 

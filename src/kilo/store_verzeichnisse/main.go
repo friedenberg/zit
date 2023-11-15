@@ -18,7 +18,7 @@ const (
 	PageCount  = 1 << (DigitWidth * 4)
 )
 
-type Zettelen struct {
+type Store struct {
 	erworben konfig.Compiled
 	path     string
 	schnittstellen.VerzeichnisseFactory
@@ -30,20 +30,20 @@ type pageId struct {
 	path  string
 }
 
-func MakeZettelen(
+func MakeStore(
 	k konfig.Compiled,
 	dir string,
 	f schnittstellen.VerzeichnisseFactory,
 	fff PageDelegateGetter,
-) (i *Zettelen, err error) {
-	i = &Zettelen{
+) (i *Store, err error) {
+	i = &Store{
 		erworben:             k,
 		path:                 dir,
 		VerzeichnisseFactory: f,
 	}
 
 	for n := range i.pages {
-		i.pages[n] = makeZettelenPage(
+		i.pages[n] = makePage(
 			f,
 			i.PageIdForIndex(n),
 			fff,
@@ -55,13 +55,13 @@ func MakeZettelen(
 	return
 }
 
-func (i Zettelen) PageIdForIndex(n int) (pid pageId) {
+func (i Store) PageIdForIndex(n int) (pid pageId) {
 	pid.index = n
 	pid.path = filepath.Join(i.path, fmt.Sprintf("%x", n))
 	return
 }
 
-func (i Zettelen) GetPage(n int) (p *Page, err error) {
+func (i Store) GetPage(n int) (p *Page, err error) {
 	switch {
 	case n > PageCount:
 		fallthrough
@@ -80,13 +80,13 @@ func (i Zettelen) GetPage(n int) (p *Page, err error) {
 	return
 }
 
-func (i *Zettelen) SetNeedsFlush() {
+func (i *Store) SetNeedsFlush() {
 	for _, p := range i.pages {
 		p.State = StateChanged
 	}
 }
 
-func (i *Zettelen) Flush() (err error) {
+func (i *Store) Flush() (err error) {
 	errors.Log().Print("flushing")
 
 	for _, p := range i.pages {
@@ -99,7 +99,7 @@ func (i *Zettelen) Flush() (err error) {
 	return
 }
 
-func (i *Zettelen) AddVerzeichnisse(
+func (i *Store) AddVerzeichnisse(
 	tz *sku.Transacted,
 	v string,
 ) (err error) {
@@ -132,7 +132,7 @@ func (i *Zettelen) AddVerzeichnisse(
 	return
 }
 
-func (i *Zettelen) GetPageIndexKeyValue(
+func (i *Store) GetPageIndexKeyValue(
 	zt sku.Transacted,
 ) (key string, value string) {
 	key = zt.Kennung.String()
@@ -140,7 +140,7 @@ func (i *Zettelen) GetPageIndexKeyValue(
 	return
 }
 
-func (i *Zettelen) ReadMany(
+func (i *Store) ReadMany(
 	ws ...schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	errors.TodoP3("switch to single writer and force callers to make chains")
