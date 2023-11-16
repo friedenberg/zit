@@ -42,14 +42,17 @@ type Umwelt struct {
 	storeUtil         store_util.StoreUtil
 	storeObjekten     *store_objekten.Store
 	age               *age.Age
+
+	matcherArchiviert matcher.Archiviert
 }
 
 func Make(kCli erworben.Cli, options Options) (u *Umwelt, err error) {
 	u = &Umwelt{
-		in:          os.Stdin,
-		out:         os.Stdout,
-		err:         os.Stderr,
-		erworbenCli: kCli,
+		in:                os.Stdin,
+		out:               os.Stdout,
+		err:               os.Stderr,
+		erworbenCli:       kCli,
+		matcherArchiviert: matcher.MakeArchiviert(),
 	}
 
 	u.konfig.Reset()
@@ -190,14 +193,28 @@ func (u Umwelt) Flush() error {
 	return u.age.Close()
 }
 
+func (u Umwelt) PrintMatchedArchiviertIfNecessary() {
+	if !u.Konfig().PrintOptions.PrintMatchedArchiviert {
+		return
+	}
+
+	c := u.GetMatcherArchiviert().Count()
+
+	if c == 0 {
+		return
+	}
+
+	errors.Err().Printf("%d archived objekten matched", c)
+}
+
 func (u *Umwelt) MakeKennungIndex() kennung.Index {
 	return kennung.Index{
 		Etiketten: u.StoreObjekten().GetKennungIndex().GetEtikett,
 	}
 }
 
-func (u *Umwelt) MakeKennungHidden() matcher.Matcher {
-	return matcher.MakeArchiviert()
+func (u *Umwelt) GetMatcherArchiviert() matcher.Archiviert {
+	return u.matcherArchiviert
 }
 
 func (u *Umwelt) MakeKennungExpanders() (out kennung.Abbr) {
@@ -223,7 +240,7 @@ func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
 		dg = gattungen.MakeSet(gattung.Zettel)
 	}
 
-	exc := u.MakeKennungHidden()
+	exc := u.GetMatcherArchiviert()
 
 	i := u.MakeKennungIndex()
 

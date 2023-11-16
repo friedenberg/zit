@@ -240,6 +240,7 @@ function show_konfig { # @test
 		print-time = false
 		print-etiketten-always = false
 		print-empty-shas = false
+		print-matched-archiviert = false
 
 		[cli-output.abbreviations]
 		hinweisen = false
@@ -258,7 +259,7 @@ function show_history_all { # @test
 		Etikett tag-2 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 		Etikett tag-3 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 		Etikett tag-4 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-		Konfig konfig 7db550d7dc9baad9968ace832afb4241c6a4d4f1747c7918abafb7c5d47283aa
+		Konfig konfig $(get_konfig_sha)
 		Typ md 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
 		Zettel one/dos 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md tag-3 tag-4 "wow ok again"
 		Zettel one/uno 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-4 "wow the first"

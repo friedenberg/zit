@@ -17,6 +17,7 @@ print-include-bezeichnungen = false
 print-time = false
 print-etiketten-always = false
 print-empty-shas = false
+print-matched-archiviert = false
 
 [cli-output.abbreviations]
 hinweisen = false

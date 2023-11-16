@@ -1,13 +1,22 @@
 package matcher
 
 import (
+	"sync/atomic"
+
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
-type archiviert struct{}
+type Archiviert interface {
+	Matcher
+	Count() int64
+}
 
-func MakeArchiviert() Matcher {
+type archiviert struct {
+	count int64
+}
+
+func MakeArchiviert() Archiviert {
 	return &archiviert{}
 }
 
@@ -19,8 +28,13 @@ func (m archiviert) String() string {
 	return ""
 }
 
-func (matcher archiviert) ContainsMatchable(matchable *sku.Transacted) bool {
+func (m archiviert) Count() int64 {
+	return m.count
+}
+
+func (matcher *archiviert) ContainsMatchable(matchable *sku.Transacted) bool {
 	if !matchable.GetMetadatei().Verzeichnisse.Archiviert.Bool() {
+		atomic.AddInt64(&matcher.count, 1)
 		return false
 	}
 

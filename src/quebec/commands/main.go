@@ -93,6 +93,7 @@ func Run(args []string) (exitStatus int) {
 		}
 	}
 
+	defer u.PrintMatchedArchiviertIfNecessary()
 	defer errors.DeferredFlusher(&err, u)
 
 	switch {

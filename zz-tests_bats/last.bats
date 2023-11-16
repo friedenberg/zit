@@ -24,7 +24,7 @@ function last_after_init { # @test
 		---
 		---
 		Akte 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
-		Akte 7db550d7dc9baad9968ace832afb4241c6a4d4f1747c7918abafb7c5d47283aa
+		Akte $(get_konfig_sha)
 		Gattung Konfig
 		Gattung Typ
 		Kennung konfig
