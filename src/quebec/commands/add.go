@@ -121,8 +121,12 @@ func (c Add) RunWithCwdQuery(
 	otFlags.Transacted = mwk
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
-		Umwelt:  u,
-		Options: otFlags.GetOptions(u.Konfig().PrintOptions, ms, u.StringFormatWriterSkuLikePtr()),
+		Umwelt: u,
+		Options: otFlags.GetOptions(
+			u.Konfig().PrintOptions,
+			ms,
+			u.StringFormatWriterSkuLikePtr(),
+		),
 	}
 
 	var createOrganizeFileResults *organize_text.Text
