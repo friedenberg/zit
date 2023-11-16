@@ -59,19 +59,25 @@ func (c CommitOrganizeFile) Run(
 				return
 			}
 
-			k := sk.GetKennungLike()
+			k := kennung.FormattedString(sk.Kennung)
 
-			if change, ok = cs.GetExisting().Get(kennung.FormattedString(k)); !ok {
+			if change, ok = cs.GetExisting().Get(k); !ok {
 				return
 			}
 
-			if sameTyp && change.IsEmpty() {
+			bezChange, didBezChange := cs.GetModified().Get(k)
+
+			if sameTyp && change.IsEmpty() && !didBezChange {
 				return
 			}
 
 			m := sk.GetMetadatei()
 			change.GetRemoved().EachPtr(m.GetEtikettenMutable().DelPtr)
 			change.GetAdded().EachPtr(m.AddEtikettPtr)
+
+			if didBezChange {
+				m.Bezeichnung = bezChange.Bezeichnung
+			}
 
 			if !sameTyp {
 				m.Typ = b.Metadatei.Typ

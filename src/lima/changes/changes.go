@@ -11,15 +11,21 @@ import (
 )
 
 type Changes interface {
+	GetModified() schnittstellen.SetLike[ChangeBezeichnung]
 	GetExisting() schnittstellen.SetLike[Change]
 	GetAdded() schnittstellen.SetLike[Change]
 	GetAllBKeys() schnittstellen.SetLike[values.String]
 }
 
 type changes struct {
+	modified schnittstellen.MutableSetLike[ChangeBezeichnung]
 	existing schnittstellen.MutableSetLike[Change]
 	added    schnittstellen.MutableSetLike[Change]
 	allB     schnittstellen.MutableSetLike[values.String]
+}
+
+func (c changes) GetModified() schnittstellen.SetLike[ChangeBezeichnung] {
+	return c.modified
 }
 
 func (c changes) GetExisting() schnittstellen.SetLike[Change] {
@@ -87,6 +93,9 @@ func ChangesFrom(
 		return
 	}
 
+	c.modified = collections_ptr.MakeMutableSet[ChangeBezeichnung, *ChangeBezeichnung](
+		ChangeBezeichnungKeyer{},
+	)
 	c.existing = collections_ptr.MakeMutableValueSet[Change, *Change](
 		ChangeKeyer{},
 	)
@@ -96,6 +105,12 @@ func ChangesFrom(
 	c.allB = collections_value.MakeMutableValueSet[values.String](nil)
 
 	for h, es1 := range b.Named {
+		if es2, ok := a.Named[h]; ok {
+			if es2.Bezeichnung.String() != es1.Bezeichnung.String() {
+				c.modified.Add(ChangeBezeichnung{Kennung: h, Bezeichnung: es1.Bezeichnung})
+			}
+		}
+
 		change := Change{
 			Key:     h,
 			added:   kennung.MakeEtikettMutableSet(),

@@ -390,7 +390,6 @@ function organize_with_typ_commit { # @test
 }
 
 function modify_bezeichnung { # @test
-	skip
 	run_zit organize -mode commit-directly :z,e,t <<-EOM
 
 		- [   !md   ]
@@ -404,7 +403,7 @@ function modify_bezeichnung { # @test
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt "wow ok again was modified too" tag-3 tag-4]
-		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !txt "wow the first was modified" tag-3 tag-4]
+		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again was modified" tag-3 tag-4]
+		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first was modified too" tag-3 tag-4]
 	EOM
 }

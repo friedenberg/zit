@@ -6,6 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
@@ -23,26 +24,37 @@ func (m SetKeyToMetadatei) String() string {
 	return sb.String()
 }
 
-func (s SetKeyToMetadatei) Add(h string) {
+func (s SetKeyToMetadatei) Add(h string, b bezeichnung.Bezeichnung) {
 	var m metadatei.Metadatei
 	ok := false
 
 	if m, ok = s[h]; !ok {
 		metadatei.Resetter.Reset(&m)
+		m.Bezeichnung = b
 	}
 
 	s[h] = m
 }
 
-func (s SetKeyToMetadatei) AddEtikett(h string, e kennung.Etikett) {
+func (s SetKeyToMetadatei) AddEtikett(
+	h string,
+	e kennung.Etikett,
+	b bezeichnung.Bezeichnung,
+) {
 	var m metadatei.Metadatei
 	ok := false
 
 	if m, ok = s[h]; !ok {
 		metadatei.Resetter.Reset(&m)
+		m.Bezeichnung = b
+	}
+
+	if !bezeichnung.Equaler.Equals(m.Bezeichnung, b) {
+		panic("bezeichnung changes")
 	}
 
 	kennung.AddNormalized(m.GetEtikettenMutable(), &e)
+
 	s[h] = m
 }
 
@@ -62,10 +74,8 @@ func (s SetKeyToMetadatei) ContainsEtikett(
 }
 
 type CompareMap struct {
-	// etikett to hinweis
-	Named SetKeyToMetadatei
-	// etikett to bezeichnung
-	Unnamed SetKeyToMetadatei
+	Named   SetKeyToMetadatei // etikett to hinweis
+	Unnamed SetKeyToMetadatei // etikett to bezeichnung
 }
 
 func (in *Text) ToCompareMap() (out CompareMap, err error) {
@@ -110,15 +120,15 @@ func (a *assignment) addToCompareMap(
 			}
 
 			fk := kennung.FormattedString(z.Sku.Kennung)
-			out.Named.Add(fk)
+			out.Named.Add(fk, z.Sku.Metadatei.Bezeichnung)
 
 			for _, e := range iter.SortedValues[kennung.Etikett](es) {
-				out.Named.AddEtikett(fk, e)
+				out.Named.AddEtikett(fk, e, z.Sku.Metadatei.Bezeichnung)
 			}
 
 			for _, e := range iter.Elements[kennung.Etikett](m.EtikettSet) {
 				errors.TodoP4("add typ")
-				out.Named.AddEtikett(fk, e)
+				out.Named.AddEtikett(fk, e, z.Sku.Metadatei.Bezeichnung)
 			}
 
 			return
@@ -127,15 +137,15 @@ func (a *assignment) addToCompareMap(
 
 	a.unnamed.Each(
 		func(z obj) (err error) {
-			out.Unnamed.Add(z.Sku.Metadatei.Bezeichnung.String())
+			out.Unnamed.Add(z.Sku.Metadatei.Bezeichnung.String(), z.Sku.Metadatei.Bezeichnung)
 
 			for _, e := range iter.SortedValues[kennung.Etikett](es) {
-				out.Unnamed.AddEtikett(z.Sku.Metadatei.Bezeichnung.String(), e)
+				out.Unnamed.AddEtikett(z.Sku.Metadatei.Bezeichnung.String(), e, z.Sku.Metadatei.Bezeichnung)
 			}
 
 			for _, e := range iter.Elements[kennung.Etikett](m.EtikettSet) {
 				errors.TodoP4("add typ")
-				out.Unnamed.AddEtikett(z.Sku.Metadatei.Bezeichnung.String(), e)
+				out.Unnamed.AddEtikett(z.Sku.Metadatei.Bezeichnung.String(), e, z.Sku.Metadatei.Bezeichnung)
 			}
 
 			return
