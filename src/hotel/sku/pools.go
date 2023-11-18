@@ -14,7 +14,7 @@ var (
 func init() {
 	poolTransacted = pool.MakePool[Transacted, *Transacted](
 		nil,
-		TransactedReseter.Reset,
+		TransactedResetter.Reset,
 	)
 
 	poolExternal = pool.MakePool[External, *External](

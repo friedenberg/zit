@@ -27,7 +27,7 @@ func (c Checkin) Run(
 	defer errors.Deferred(&err, u.Unlock)
 
 	if err = u.StoreObjekten().ReadFiles(
-		matcher.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().Query),
+		matcher.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().QueryWithoutCwd),
 		iter.MakeChain(
 			matcher.MakeFilterFromQuery(ms),
 			func(co *sku.CheckedOut) (err error) {

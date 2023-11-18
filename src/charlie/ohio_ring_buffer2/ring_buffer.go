@@ -10,7 +10,6 @@ const RingBufferDefaultSize = 4096
 type RingBuffer struct {
 	dataLength              int
 	readLength, writeLength int64
-	lastFindIdx             int64
 	rIdx, wIdx              int
 	data                    []byte
 }
@@ -33,7 +32,6 @@ func (rb *RingBuffer) Reset() {
 	rb.dataLength = 0
 	rb.readLength = 0
 	rb.writeLength = 0
-	rb.lastFindIdx = 0
 	rb.rIdx = 0
 	rb.wIdx = 0
 

@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
-	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -18,9 +17,9 @@ type External struct {
 	FDs ExternalFDs
 }
 
-func (t *External) SetFromSkuLike(sk SkuLikePtr) (err error) {
+func (t *External) SetFromSkuLike(sk SkuLike) (err error) {
 	switch skt := sk.(type) {
-	case SkuLikeExternalPtr:
+	case SkuExternalLike:
 		t.FDs = skt.GetFDs()
 	}
 
@@ -46,10 +45,6 @@ func (a *External) GetMetadateiPtr() *metadatei.Metadatei {
 
 func (a External) GetGattung() schnittstellen.GattungLike {
 	return a.Kennung.GetGattung()
-}
-
-func (a External) GetKennungLike() kennung.Kennung {
-	return a.Kennung
 }
 
 func (a External) String() string {
@@ -98,20 +93,8 @@ func (a External) GetObjekteFD() fd.FD {
 	return a.FDs.Objekte
 }
 
-func (a *External) Reset() {
-	a.ObjekteSha.Reset()
-	a.Kennung.Reset()
-	metadatei.Resetter.Reset(&a.Metadatei)
-}
-
-func (a *External) ResetWith(b *External) {
-	a.ObjekteSha.ResetWith(b.ObjekteSha)
-	a.Kennung.ResetWithKennung(b.Kennung)
-	metadatei.Resetter.ResetWithPtr(&a.Metadatei, &b.Metadatei)
-}
-
 func (a *External) ResetWithExternalMaybe(
-	b ExternalMaybe,
+	b *ExternalMaybe,
 ) (err error) {
 	k := b.GetKennungLike()
 	a.Kennung.ResetWithKennung(k)
@@ -122,20 +105,12 @@ func (a *External) ResetWithExternalMaybe(
 	return
 }
 
-func (a External) EqualsAny(b any) (ok bool) {
-	return values.Equals(a, b)
-}
-
-func (a External) EqualsSkuLikePtr(b SkuLikePtr) (ok bool) {
-	return values.Equals(a, b)
-}
-
-func (a External) Equals(b External) (ok bool) {
-	if !kennung.Equals(a.GetKennung(), b.GetKennung()) {
+func (a External) EqualsSkuLikePtr(b SkuLike) (ok bool) {
+	if !kennung.Equals(a.GetKennung(), b.GetKennungLike()) {
 		return
 	}
 
-	if !a.ObjekteSha.Equals(b.ObjekteSha) {
+	if !a.ObjekteSha.EqualsSha(b.GetObjekteSha()) {
 		return
 	}
 
@@ -164,4 +139,24 @@ func (e External) GetCheckoutMode() (m checkout_mode.Mode, err error) {
 	}
 
 	return
+}
+
+type lessorExternal struct{}
+
+func (lessorExternal) Less(a, b External) bool {
+	panic("not supported")
+}
+
+func (lessorExternal) LessPtr(a, b *External) bool {
+	return a.GetTai().Less(b.GetTai())
+}
+
+type equalerExternal struct{}
+
+func (equalerExternal) Equals(a, b External) bool {
+	panic("not supported")
+}
+
+func (equalerExternal) EqualsPtr(a, b *External) bool {
+	return a.EqualsSkuLikePtr(b)
 }

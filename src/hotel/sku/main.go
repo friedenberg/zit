@@ -15,7 +15,7 @@ func init() {
 }
 
 type (
-	skuLike interface {
+	SkuLike interface {
 		schnittstellen.ValueLike
 		schnittstellen.GattungGetter
 		metadatei.Getter
@@ -27,10 +27,6 @@ type (
 		GetObjekteSha() schnittstellen.ShaLike
 		GetAkteSha() schnittstellen.ShaLike
 		GetKey() string
-	}
-
-	SkuLikePtr interface {
-		skuLike
 
 		metadatei.GetterPtr
 		metadatei.Setter
@@ -38,17 +34,15 @@ type (
 		SetAkteSha(schnittstellen.ShaLike)
 		SetObjekteSha(schnittstellen.ShaLike)
 
-		EqualsSkuLikePtr(SkuLikePtr) bool
+		EqualsSkuLikePtr(SkuLike) bool
 
 		SetTai(kennung.Tai)
 		SetKennungLike(kennung.Kennung) error
-		GetKennungLikePtr() kennung.KennungPtr
-		SetFromSkuLike(SkuLikePtr) error
-		Reset()
+		SetFromSkuLike(SkuLike) error
 	}
 
-	SkuLikeExternalPtr interface {
-		SkuLikePtr
+	SkuExternalLike interface {
+		SkuLike
 
 		GetFDs() ExternalFDs
 		GetFDsPtr() *ExternalFDs

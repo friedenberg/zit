@@ -165,9 +165,24 @@ func (s *Store) UpdateManyMetadatei(
 	return
 }
 
-func (s *Store) Query(
+func (s *Store) QueryWithoutCwd(
 	ms matcher.Query,
 	f schnittstellen.FuncIter[*sku.Transacted],
+) (err error) {
+	return s.query(ms, f, false)
+}
+
+func (s *Store) QueryWithCwd(
+	ms matcher.Query,
+	f schnittstellen.FuncIter[*sku.Transacted],
+) (err error) {
+	return s.query(ms, f, true)
+}
+
+func (s *Store) query(
+	ms matcher.Query,
+	f schnittstellen.FuncIter[*sku.Transacted],
+	includeCwd bool,
 ) (err error) {
 	gsWithHistory := gattungen.MakeMutableSet()
 	gsWithoutHistory := gattungen.MakeMutableSet()
@@ -200,6 +215,24 @@ func (s *Store) Query(
 		if !ok {
 			err = errors.Errorf("expected query to have gattung %q", g)
 			return
+		}
+
+		if includeCwd && m.GetSigil().IncludesCwd() {
+			var e *sku.ExternalMaybe
+
+			if e, ok = s.GetCwdFiles().Get(z.Kennung); ok {
+				var e2 *sku.External
+
+				if e2, err = s.ReadOneExternal(e, z); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if err = z.SetFromSkuLike(&e2.Transacted); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
 		}
 
 		if !m.ContainsMatchable(z) {

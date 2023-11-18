@@ -51,7 +51,7 @@ type ketikett struct {
 }
 
 func (a ketikett) Less(b ketikett) bool {
-	return a.Transacted.Less(b.Transacted)
+	return sku.TransactedLessor.Less(a.Transacted, b.Transacted)
 }
 
 func (a ketikett) EqualsAny(b any) bool {

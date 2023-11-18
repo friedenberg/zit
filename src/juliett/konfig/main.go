@@ -342,12 +342,12 @@ func (k *compiled) SetTransacted(
 	kt1 *sku.Transacted,
 	kag schnittstellen.AkteGetter[*erworben.Akte],
 ) (err error) {
-	kt := sku.GetTransactedPool().Get()
-	*kt = *kt1
-
-	if !k.Sku.Less(*kt) {
+	if !sku.TransactedLessor.LessPtr(&k.Sku, kt1) {
 		return
 	}
+
+	kt := sku.GetTransactedPool().Get()
+	*kt = *kt1
 
 	k.hasChanges = true
 	k.Sku = *kt

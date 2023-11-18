@@ -10,6 +10,10 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
+type MatchableAdder interface {
+	AddMatchable(*sku.Transacted) error
+}
+
 func MakeMatcher(
 	k kennung.KennungSansGattungPtr,
 	v string,
@@ -131,7 +135,7 @@ func KennungContainsExactlyMatchable(
 		// nop
 	}
 
-	idl := m.GetKennungLikePtr()
+	idl := m.Kennung
 
 	if !kennung.ContainsExactly(idl, k) {
 		return false
@@ -181,7 +185,7 @@ func KennungContainsMatchable(
 		panic(fmt.Sprintf("unhandled type: %T", kt))
 	}
 
-	idl := m.GetKennungLikePtr()
+	idl := m.Kennung
 
 	if !kennung.Contains(idl, k) {
 		return false

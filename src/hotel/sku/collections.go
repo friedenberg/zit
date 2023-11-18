@@ -12,7 +12,7 @@ import (
 var (
 	transactedKeyerKennung schnittstellen.StringKeyerPtr[Transacted, *Transacted]
 	TransactedSetEmpty     TransactedSet
-	TransactedLessor       schnittstellen.Lessor2[Transacted, *Transacted]
+	TransactedLessor       transactedLessor
 )
 
 func init() {
@@ -22,8 +22,6 @@ func init() {
 	TransactedSetEmpty = MakeTransactedSet()
 	gob.Register(TransactedSetEmpty)
 	gob.Register(MakeTransactedMutableSet())
-
-	TransactedLessor = &lessor{}
 }
 
 type (
@@ -35,7 +33,7 @@ type (
 )
 
 func MakeTransactedHeap() TransactedHeap {
-	return heap.Make[Transacted, *Transacted](equaler{}, lessor{}, resetter{})
+	return heap.Make[Transacted, *Transacted](transactedEqualer{}, transactedLessor{}, transactedResetter{})
 }
 
 func MakeTransactedSet() TransactedSet {
@@ -68,24 +66,4 @@ func (sk KennungKeyer[T, TPtr]) GetKeyPtr(e TPtr) string {
 	}
 
 	return e.GetKennungLike().String()
-}
-
-type lessor struct{}
-
-func (lessor) Less(a, b Transacted) bool {
-	return a.GetTai().Less(b.GetTai())
-}
-
-func (lessor) LessPtr(a, b *Transacted) bool {
-	return a.GetTai().Less(b.GetTai())
-}
-
-type equaler struct{}
-
-func (equaler) Equals(a, b Transacted) bool {
-	panic("not supported")
-}
-
-func (equaler) EqualsPtr(a, b *Transacted) bool {
-	return a.EqualsSkuLikePtr(b)
 }

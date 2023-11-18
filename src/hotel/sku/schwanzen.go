@@ -39,7 +39,7 @@ func (zws *Schwanzen) Less(zt *Transacted) (ok bool) {
 	case !ok:
 		fallthrough
 
-	case zt.Less(t):
+	case TransactedLessor.LessPtr(zt, &t):
 		ok = true
 	}
 
@@ -70,7 +70,7 @@ func (zws *Schwanzen) Set(z *Transacted, flush bool) (ok bool) {
 	case !found:
 		fallthrough
 
-	case t1.Less(*z):
+	case TransactedLessor.LessPtr(&t1, z):
 		zws.hinweisen[h.String()] = *z
 		ok = true
 

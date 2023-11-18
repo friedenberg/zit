@@ -47,7 +47,7 @@ func (c CommitOrganizeFile) Run(
 	errors.TodoP1("create query without syntax")
 	ms.Set(":z,e,t")
 
-	if err = store.Query(
+	if err = store.QueryWithCwd(
 		ms,
 		func(tl *sku.Transacted) (err error) {
 			var change changes.Change

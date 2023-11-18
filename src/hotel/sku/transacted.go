@@ -19,7 +19,7 @@ type Transacted struct {
 	Kopf             kennung.Tai
 }
 
-func (t *Transacted) SetFromSkuLike(sk SkuLikePtr) (err error) {
+func (t *Transacted) SetFromSkuLike(sk SkuLike) (err error) {
 	err = t.Kennung.SetWithGattung(
 		sk.GetKennungLike().String(),
 		sk.GetGattung(),
@@ -58,7 +58,7 @@ func MakeSkuLike2(
 	m metadatei.Metadatei,
 	k kennung.KennungPtr,
 	os sha.Sha,
-) (sk SkuLikePtr, err error) {
+) (sk SkuLike, err error) {
 	if sk, err = MakeSkuLikeSansObjekteSha(m, k); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -78,7 +78,7 @@ func (a Transacted) String() string {
 	)
 }
 
-func (a *Transacted) GetSkuLikePtr() SkuLikePtr {
+func (a *Transacted) GetSkuLikePtr() SkuLike {
 	return a
 }
 
@@ -126,10 +126,6 @@ func (a Transacted) GetKennungLike() kennung.Kennung {
 	return a.Kennung
 }
 
-func (a *Transacted) GetKennungLikePtr() kennung.KennungPtr {
-	return &a.Kennung
-}
-
 func (a *Transacted) SetKennungLike(kl kennung.Kennung) (err error) {
 	if err = a.Kennung.SetWithKennung(kl); err != nil {
 		err = errors.Wrap(err)
@@ -139,34 +135,7 @@ func (a *Transacted) SetKennungLike(kl kennung.Kennung) (err error) {
 	return
 }
 
-func (a *Transacted) Reset() {
-	TransactedReseter.Reset(a)
-}
-
-func (a *Transacted) ResetWith(b Transacted) {
-	TransactedReseter.ResetWith(a, b)
-}
-
-func (a *Transacted) ResetWithPtr(b *Transacted) {
-	TransactedReseter.ResetWithPtr(a, b)
-}
-
-func (a Transacted) Less(b Transacted) (ok bool) {
-	if a.GetTai().Less(b.GetTai()) {
-		ok = true
-		return
-	}
-
-	// if a.GetTai().Equals(b.GetTai()) &&
-	// 	a.TransactionIndex.Less(b.TransactionIndex) {
-	// 	ok = true
-	// 	return
-	// }
-
-	return
-}
-
-func (a Transacted) EqualsSkuLikePtr(b SkuLikePtr) bool {
+func (a Transacted) EqualsSkuLikePtr(b SkuLike) bool {
 	return values.Equals(a, b) || values.EqualsPtr(a, b)
 }
 
@@ -225,4 +194,24 @@ func (s Transacted) GetTransactionIndex() values.Int {
 
 func (o Transacted) GetKey() string {
 	return kennung.FormattedString(o.GetKennung())
+}
+
+type transactedLessor struct{}
+
+func (transactedLessor) Less(a, b Transacted) bool {
+	return a.GetTai().Less(b.GetTai())
+}
+
+func (transactedLessor) LessPtr(a, b *Transacted) bool {
+	return a.GetTai().Less(b.GetTai())
+}
+
+type transactedEqualer struct{}
+
+func (transactedEqualer) Equals(a, b Transacted) bool {
+	panic("not supported")
+}
+
+func (transactedEqualer) EqualsPtr(a, b *Transacted) bool {
+	return a.EqualsSkuLikePtr(b)
 }

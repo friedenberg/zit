@@ -79,17 +79,14 @@ func (m *matcherSigil) Add(child Matcher) (err error) {
 }
 
 func (matcher matcherSigil) ContainsMatchable(matchable *sku.Transacted) bool {
-	if matcher.MatchOnMissing {
-		if !matcher.Sigil.Contains(matcher.MatchSigil) {
-			return true
-		}
-	} else {
-		if matcher.Sigil.Contains(matcher.MatchSigil) {
-			return true
-		}
-	}
+	switch {
+	case matcher.MatchOnMissing && !matcher.Contains(matcher.MatchSigil):
+		fallthrough
 
-	if matcher.Matcher == nil {
+	case matcher.Contains(matcher.MatchSigil):
+		fallthrough
+
+	case matcher.Matcher == nil:
 		return true
 	}
 

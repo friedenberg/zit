@@ -71,7 +71,7 @@ func MakeQueryFromCheckedOutSet(
 
 func MakeQuery(
 	k schnittstellen.Konfig,
-	cwd MatcherCwd,
+	cwd matcherCwd,
 	ex kennung.Abbr,
 	hidden Matcher,
 	feg schnittstellen.FileExtensionGetter,
@@ -93,7 +93,7 @@ func MakeQuery(
 
 func MakeQueryAll(
 	k schnittstellen.Konfig,
-	cwd MatcherCwd,
+	cwd matcherCwd,
 	ex kennung.Abbr,
 	hidden Matcher,
 	feg schnittstellen.FileExtensionGetter,
@@ -134,7 +134,7 @@ type query struct {
 	fileExtensionGetter schnittstellen.FileExtensionGetter
 	expanders           kennung.Abbr
 
-	cwd    MatcherCwd
+	cwd    matcherCwd
 	Hidden Matcher
 	index  kennung.Index
 

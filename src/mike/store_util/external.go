@@ -8,6 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/delta/thyme"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
@@ -51,7 +53,7 @@ func (s *common) ReadOneExternal(
 
 	e = &sku.External{}
 
-	if err = e.ResetWithExternalMaybe(*em); err != nil {
+	if err = e.ResetWithExternalMaybe(em); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -152,6 +154,14 @@ func (s *common) ReadOneExternalAkte(
 		return
 	}
 
+	var fStat os.FileInfo
+
+	if fStat, err = f.Stat(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	e.Metadatei.Tai = kennung.TaiFromTime(thyme.Tyme(fStat.ModTime()))
 	sh := sha.Make(aw.GetShaLike())
 	e.GetMetadateiPtr().AkteSha = sh
 

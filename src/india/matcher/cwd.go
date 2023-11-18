@@ -4,7 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/fd"
 )
 
-type MatcherCwd interface {
+type matcherCwd interface {
 	Matcher
 	GetCwdFDs() fd.Set
 }
@@ -17,6 +17,6 @@ func (_ matcherCwdNop) GetCwdFDs() fd.Set {
 	return fd.MakeSet()
 }
 
-func MakeMatcherCwdNop(m Matcher) MatcherCwd {
+func MakeMatcherCwdNop(m Matcher) matcherCwd {
 	return matcherCwdNop{Matcher: m}
 }

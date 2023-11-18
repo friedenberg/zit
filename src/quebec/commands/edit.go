@@ -78,7 +78,7 @@ func (c Edit) RunWithCwdQuery(
 
 	if err = u.StoreObjekten().CheckoutQuery(
 		options,
-		matcher.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().Query),
+		matcher.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().QueryWithCwd),
 		func(co *sku.CheckedOut) (err error) {
 			e := co.External
 

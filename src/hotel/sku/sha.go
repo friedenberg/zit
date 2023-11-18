@@ -8,7 +8,7 @@ import (
 )
 
 func CalculateAndConfirmSha(
-	sk SkuLikePtr,
+	sk SkuLike,
 	format objekte_format.Formatter,
 	o objekte_format.Options,
 	sh schnittstellen.ShaLike,
@@ -34,7 +34,7 @@ func CalculateAndConfirmSha(
 }
 
 func CalculateAndSetSha(
-	sk SkuLikePtr,
+	sk SkuLike,
 	format objekte_format.Formatter,
 	o objekte_format.Options,
 ) (err error) {
@@ -52,7 +52,7 @@ func CalculateAndSetSha(
 }
 
 func ReadFromSha(
-	sk SkuLikePtr,
+	sk SkuLike,
 	orf schnittstellen.ObjekteReaderFactory,
 	format objekte_format.Format,
 	o objekte_format.Options,

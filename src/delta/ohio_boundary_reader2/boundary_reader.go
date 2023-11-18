@@ -18,6 +18,7 @@ type boundaryReader struct {
 	reader           *bufio.Reader
 	ff               ohio_ring_buffer2.FindFunc
 	remainingContent int
+	lastFindIndex    int64
 	buffer           *ohio_ring_buffer2.RingBuffer
 	state            boundaryReaderState
 }

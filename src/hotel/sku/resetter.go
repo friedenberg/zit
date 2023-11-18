@@ -6,11 +6,11 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
-var TransactedReseter resetter
+var TransactedResetter transactedResetter
 
-type resetter struct{}
+type transactedResetter struct{}
 
-func (resetter) Reset(a *Transacted) {
+func (transactedResetter) Reset(a *Transacted) {
 	a.Kopf.Reset()
 	a.ObjekteSha.Reset()
 	a.Kennung.SetGattung(gattung.Unknown)
@@ -18,7 +18,7 @@ func (resetter) Reset(a *Transacted) {
 	a.TransactionIndex.Reset()
 }
 
-func (r resetter) ResetWith(a *Transacted, b Transacted) {
+func (r transactedResetter) ResetWith(a *Transacted, b Transacted) {
 	a.Kopf = b.Kopf
 	a.ObjekteSha = b.ObjekteSha
 	a.Kennung.ResetWithKennung(b.Kennung)
@@ -26,7 +26,7 @@ func (r resetter) ResetWith(a *Transacted, b Transacted) {
 	a.TransactionIndex.SetInt(b.TransactionIndex.Int())
 }
 
-func (resetter) ResetWithPtr(a *Transacted, b *Transacted) {
+func (transactedResetter) ResetWithPtr(a *Transacted, b *Transacted) {
 	a.Kopf = b.Kopf
 	a.ObjekteSha = b.ObjekteSha
 	errors.PanicIfError(a.Kennung.ResetWithKennung(&b.Kennung))

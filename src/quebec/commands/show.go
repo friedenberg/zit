@@ -65,7 +65,7 @@ func (c Show) runGenericObjekteFormatterValue(
 		),
 	)
 
-	if err = u.StoreObjekten().Query(ms, f); err != nil {
+	if err = u.StoreObjekten().QueryWithCwd(ms, f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -96,7 +96,7 @@ func (c Show) RunWithQuery(u *umwelt.Umwelt, ms matcher.Query) (err error) {
 		return
 	}
 
-	if err = u.StoreObjekten().Query(
+	if err = u.StoreObjekten().QueryWithCwd(
 		ms,
 		iter.MakeSyncSerializer(
 			f.MakeFormatFunc(),
