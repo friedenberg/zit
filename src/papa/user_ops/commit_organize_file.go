@@ -100,7 +100,50 @@ func (c CommitOrganizeFile) Run(
 		return
 	}
 
-	if err = cs.GetAdded().Each(
+	if err = cs.GetAddedNamed().Each(
+		func(change changes.Change) (err error) {
+			var k kennung.Kennung2
+
+			if err = k.Set(change.Key); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			m := metadatei.Metadatei{
+				Typ: b.Metadatei.Typ,
+			}
+
+			m.SetEtiketten(change.GetAdded())
+
+			// TODO-P2 add support for setting bez
+			// if err = m.Bezeichnung.Set(bez); err != nil {
+			// 	err = errors.Wrap(err)
+			// 	return
+			// }
+
+			// TODO-P2 determine appropriate typ for named
+			// if kennung.IsEmpty(m.GetTyp()) {
+			// 	m.Typ = c.Konfig().Defaults.Typ
+			// }
+
+			if c.Konfig().DryRun {
+				errors.Out().Printf("[%s] (would create)", k)
+				return
+			}
+
+			if _, err = store.CreateOrUpdate(m, k); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = cs.GetAddedUnnamed().Each(
 		func(change changes.Change) (err error) {
 			bez := change.Key
 
@@ -135,7 +178,7 @@ func (c CommitOrganizeFile) Run(
 		return
 	}
 
-	if toUpdate.Len() == 0 && cs.GetAdded().Len() == 0 {
+	if toUpdate.Len() == 0 && cs.GetAddedUnnamed().Len() == 0 && cs.GetAddedNamed().Len() == 0 {
 		errors.Err().Print("no changes")
 		return
 	}

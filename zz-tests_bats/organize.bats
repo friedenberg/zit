@@ -407,3 +407,16 @@ function modify_bezeichnung { # @test
 		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first was modified too" tag-3 tag-4]
 	EOM
 }
+
+function add_named { # @test
+	run_zit organize -mode commit-directly <<-EOM
+		# with-tag
+		- [-added_tag]
+	EOM
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[-added_tag@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 with-tag]
+		[-with-tag@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-with@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+	EOM
+}

@@ -7,21 +7,24 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 )
 
 type Changes interface {
 	GetModified() schnittstellen.SetLike[ChangeBezeichnung]
 	GetExisting() schnittstellen.SetLike[Change]
-	GetAdded() schnittstellen.SetLike[Change]
+	GetAddedUnnamed() schnittstellen.SetLike[Change]
+	GetAddedNamed() schnittstellen.SetLike[Change]
 	GetAllBKeys() schnittstellen.SetLike[values.String]
 }
 
 type changes struct {
-	modified schnittstellen.MutableSetLike[ChangeBezeichnung]
-	existing schnittstellen.MutableSetLike[Change]
-	added    schnittstellen.MutableSetLike[Change]
-	allB     schnittstellen.MutableSetLike[values.String]
+	modified     schnittstellen.MutableSetLike[ChangeBezeichnung]
+	existing     schnittstellen.MutableSetLike[Change]
+	addedUnnamed schnittstellen.MutableSetLike[Change]
+	addedNamed   schnittstellen.MutableSetLike[Change]
+	allB         schnittstellen.MutableSetLike[values.String]
 }
 
 func (c changes) GetModified() schnittstellen.SetLike[ChangeBezeichnung] {
@@ -32,8 +35,12 @@ func (c changes) GetExisting() schnittstellen.SetLike[Change] {
 	return c.existing
 }
 
-func (c changes) GetAdded() schnittstellen.SetLike[Change] {
-	return c.added
+func (c changes) GetAddedUnnamed() schnittstellen.SetLike[Change] {
+	return c.addedUnnamed
+}
+
+func (c changes) GetAddedNamed() schnittstellen.SetLike[Change] {
+	return c.addedNamed
 }
 
 func (c changes) GetAllBKeys() schnittstellen.SetLike[values.String] {
@@ -57,7 +64,9 @@ func makeCompareMapFromOrganizeTextAndExpander(
 	}
 
 	for h, v := range preExpansion.Named {
-		if h1, err := hinweis_expander(h); err == nil {
+		var h1 schnittstellen.Stringer
+
+		if h1, err = hinweis_expander(h); err == nil {
 			h = h1.String()
 		}
 
@@ -99,13 +108,21 @@ func ChangesFrom(
 	c.existing = collections_ptr.MakeMutableValueSet[Change, *Change](
 		ChangeKeyer{},
 	)
-	c.added = collections_ptr.MakeMutableValueSet[Change, *Change](
+	c.addedUnnamed = collections_ptr.MakeMutableValueSet[Change, *Change](
+		ChangeKeyer{},
+	)
+	c.addedNamed = collections_ptr.MakeMutableValueSet[Change, *Change](
 		ChangeKeyer{},
 	)
 	c.allB = collections_value.MakeMutableValueSet[values.String](nil)
 
 	for h, es1 := range b.Named {
-		if es2, ok := a.Named[h]; ok {
+		var (
+			existsInA bool
+			es2       metadatei.Metadatei
+		)
+
+		if es2, existsInA = a.Named[h]; existsInA {
 			if es2.Bezeichnung.String() != es1.Bezeichnung.String() {
 				c.modified.Add(ChangeBezeichnung{Kennung: h, Bezeichnung: es1.Bezeichnung})
 			}
@@ -138,7 +155,11 @@ func ChangesFrom(
 			return
 		}
 
-		c.existing.Add(change)
+		if existsInA {
+			c.existing.Add(change)
+		} else {
+			c.addedNamed.Add(change)
+		}
 	}
 
 	for h, es := range a.Named {
@@ -179,7 +200,7 @@ func ChangesFrom(
 		}
 
 		es.GetEtiketten().Each(change.added.Add)
-		c.added.Add(change)
+		c.addedUnnamed.Add(change)
 	}
 
 	return

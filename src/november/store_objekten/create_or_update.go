@@ -184,6 +184,10 @@ func (s *Store) CreateOrUpdate(
 func (s *Store) readExternalAndMergeIfNecessary(
 	transactedPtr, mutter *sku.Transacted,
 ) (err error) {
+  if mutter == nil {
+    return
+  }
+
 	var co *sku.CheckedOut
 
 	if co, err = s.ReadOneExternalFS(mutter); err != nil {
