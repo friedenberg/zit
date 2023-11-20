@@ -56,7 +56,7 @@ func (atc *Factory) makeWithMetadatei() (ot *Text, err error) {
 	}
 
 	if _, err = atc.makeChildren(ot.assignment, prefixSet, atc.GroupingEtiketten); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Assignment: %#v", ot.assignment)
 		return
 	}
 
@@ -181,11 +181,13 @@ func (atc Factory) makeChildren(
 					child := newAssignment(intermediate.Depth() + 1)
 
 					var ls kennung.Etikett
+					b := groupingEtiketten[0]
 
-					if ls, err = kennung.LeftSubtract(
-						e,
-						groupingEtiketten[0],
-					); err != nil {
+					if e.Equals(b) {
+						return
+					}
+
+					if ls, err = kennung.LeftSubtract(e, b); err != nil {
 						err = errors.Wrap(err)
 						return
 					}

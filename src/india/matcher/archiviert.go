@@ -9,11 +9,12 @@ import (
 
 type Archiviert interface {
 	Matcher
+	CountArchiviert() int64
 	Count() int64
 }
 
 type archiviert struct {
-	count int64
+	count, countArchiviert int64
 }
 
 func MakeArchiviert() Archiviert {
@@ -32,11 +33,17 @@ func (m archiviert) Count() int64 {
 	return m.count
 }
 
+func (m archiviert) CountArchiviert() int64 {
+	return m.countArchiviert
+}
+
 func (matcher *archiviert) ContainsMatchable(matchable *sku.Transacted) bool {
 	if !matchable.GetMetadatei().Verzeichnisse.Archiviert.Bool() {
-		atomic.AddInt64(&matcher.count, 1)
+		atomic.AddInt64(&matcher.countArchiviert, 1)
 		return false
 	}
+
+	atomic.AddInt64(&matcher.count, 1)
 
 	return true
 }

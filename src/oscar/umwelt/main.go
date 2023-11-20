@@ -199,8 +199,9 @@ func (u Umwelt) PrintMatchedArchiviertIfNecessary() {
 	}
 
 	c := u.GetMatcherArchiviert().Count()
+	ca := u.GetMatcherArchiviert().CountArchiviert()
 
-	if c == 0 {
+	if c != 0 || ca == 0 {
 		return
 	}
 
