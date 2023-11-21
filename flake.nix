@@ -1,6 +1,7 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/master";
+    nixpkgs-master.url = "github:NixOS/nixpkgs/master";
     utils.url = "github:numtide/flake-utils";
 
     gomod2nix = {
@@ -9,12 +10,12 @@
     };
   };
 
-  outputs = { self, nixpkgs, utils, gomod2nix }:
+  outputs = { self, nixpkgs, nixpkgs-master, utils, gomod2nix }:
     (utils.lib.eachDefaultSystem
       (system:
         let
 
-          pkgs = import nixpkgs {
+          pkgs = import nixpkgs-master {
             inherit system;
             overlays = [
               (final: prev: {
