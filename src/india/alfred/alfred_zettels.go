@@ -102,10 +102,7 @@ func (w *Writer) etikettToItem(
 	ei, err := w.etikettenIndex.GetEtikett(e)
 	a = w.alfredWriter.Get()
 
-	if err != nil {
-		a.Subtitle = err.Error()
-		return
-	} else {
+	if err == nil {
 		a.Subtitle = fmt.Sprintf("%d", ei.GetSchwanzenCount())
 	}
 

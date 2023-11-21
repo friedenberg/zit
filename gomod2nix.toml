@@ -4,12 +4,21 @@ schema = 3
   [mod."filippo.io/age"]
     version = "v1.1.1"
     hash = "sha256-LRxxJQLQkzoCNYGS/XBixVmYXoZ1mPHKvFicPGXYLcw="
+  [mod."github.com/DataDog/zstd"]
+    version = "v1.5.5"
+    hash = "sha256-tSw0aq0pPyroZtQYYb9lWOtPVNaQOt8skYQ4TMXGvAQ="
   [mod."github.com/brandondube/tai"]
     version = "v0.1.0"
     hash = "sha256-o32wvMW6waT/vJJkpjiCGxBNBUsqeAvnARhbsikRk50="
+  [mod."github.com/google/shlex"]
+    version = "v0.0.0-20191202100458-e7afc7fbc510"
+    hash = "sha256-1f392pCmS7AXVKXIC1SvKlYtK/rvW47F5CCkGT2G6JM="
   [mod."github.com/pelletier/go-toml/v2"]
     version = "v2.0.8"
     hash = "sha256-wWxswr/lTq+McYbScmJM1ECKQ6eNJ5m44SM7TmrHThM="
+  [mod."github.com/yuin/gopher-lua"]
+    version = "v1.1.0"
+    hash = "sha256-BA4g/UxHfh/V9njC+LX2cx9Am41ialabxZkMyP2HfjA="
   [mod."golang.org/x/crypto"]
     version = "v0.4.0"
     hash = "sha256-PvHIbuooDItiNyQEi8kKgybkc0o95B0aeMd9awVGFCY="
