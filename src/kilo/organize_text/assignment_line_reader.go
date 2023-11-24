@@ -76,7 +76,7 @@ func (ar *assignmentLineReader) readOne(l line) (err error) {
 		return ar.readOneHeading(l)
 
 	case '-':
-		err = ar.readOneZettel(l)
+		err = ar.readOneObj(l)
 		// logz.Print(len(ar.currentAssignment.named))
 		return err
 
@@ -267,7 +267,7 @@ func (ar *assignmentLineReader) readOneHeadingGreaterDepth(
 	return
 }
 
-func (ar *assignmentLineReader) readOneZettel(l line) (err error) {
+func (ar *assignmentLineReader) readOneObj(l line) (err error) {
 	// logz.Print("reading one zettel", l)
 
 	var z obj

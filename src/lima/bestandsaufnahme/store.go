@@ -119,7 +119,7 @@ func (s *store) Create(o *Akte) (err error) {
 	}
 
 	t := &sku.Transacted{}
-  sku.TransactedResetter.Reset(t)
+	sku.TransactedResetter.Reset(t)
 	t.SetAkteSha(sh)
 	tai := s.clock.GetTai()
 
@@ -196,7 +196,7 @@ func (s *store) ReadOne(
 
 	defer errors.DeferredCloser(&err, or)
 
-  o = sku.GetTransactedPool().Get()
+	o = sku.GetTransactedPool().Get()
 
 	if _, err = s.persistentMetadateiFormat.ParsePersistentMetadatei(
 		or,
@@ -302,7 +302,7 @@ func (s *store) ReadLast() (max *sku.Transacted, err error) {
 			defer l.Unlock()
 
 			if sku.TransactedLessor.LessPtr(&maxSku, b) {
-        sku.TransactedResetter.ResetWithPtr(&maxSku, b)
+				sku.TransactedResetter.ResetWithPtr(&maxSku, b)
 				return
 			}
 

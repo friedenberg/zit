@@ -8,17 +8,25 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
+type KennungAlignedFormat interface {
+	SetMaxKopf(m int)
+	SetMaxSchwanz(m int)
+}
+
 type organize struct {
 	maxKopf, maxSchwanz int
 }
 
-func MakeOrganizeFormat(
-	maxKopf, maxSchwanz int,
-) *organize {
-	return &organize{
-		maxKopf:    maxKopf,
-		maxSchwanz: maxSchwanz,
-	}
+func MakeOrganizeFormat() *organize {
+	return &organize{}
+}
+
+func (f *organize) SetMaxKopf(m int) {
+	f.maxKopf = m
+}
+
+func (f *organize) SetMaxSchwanz(m int) {
+	f.maxSchwanz = m
 }
 
 func (f *organize) WriteStringFormat(
@@ -27,7 +35,7 @@ func (f *organize) WriteStringFormat(
 ) (n int64, err error) {
 	var n1 int
 
-	n1, err = sw.WriteString("- [")
+	n1, err = sw.WriteString("[")
 	n += int64(n1)
 
 	if err != nil {
@@ -36,7 +44,6 @@ func (f *organize) WriteStringFormat(
 	}
 
 	h := kennung.Aligned(o.Kennung, f.maxKopf, f.maxSchwanz)
-
 	n1, err = sw.WriteString(h)
 	n += int64(n1)
 

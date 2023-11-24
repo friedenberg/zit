@@ -9,12 +9,14 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/echo/format"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 type assignmentLineWriter struct {
 	RightAlignedIndents  bool
 	OmitLeadingEmptyLine bool
+	Metadatei            metadatei.Metadatei
 	*format.LineWriter
 	maxDepth            int
 	maxKopf, maxSchwanz int
@@ -60,12 +62,19 @@ func (av assignmentLineWriter) writeNormal(a *assignment) (err error) {
 		)
 	}
 
+	cursor := sku.GetTransactedPool().Get()
+	defer sku.GetTransactedPool().Put(cursor)
+
 	for _, z := range sortObjSet(a.named) {
 		var sb strings.Builder
 
 		sb.WriteString(tab_prefix)
+		sb.WriteString("- ")
 
-		if _, err = av.stringFormatWriter.WriteStringFormat(&sb, &z.Sku); err != nil {
+		sku.TransactedResetter.ResetWithPtr(cursor, &z.Sku)
+		cursor.Metadatei.Subtract(&av.Metadatei)
+
+		if _, err = av.stringFormatWriter.WriteStringFormat(&sb, cursor); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -130,10 +139,17 @@ func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 		)
 	}
 
+	cursor := sku.GetTransactedPool().Get()
+	defer sku.GetTransactedPool().Put(cursor)
+
 	for _, z := range sortObjSet(a.named) {
 		var sb strings.Builder
 
-		if _, err = av.stringFormatWriter.WriteStringFormat(&sb, &z.Sku); err != nil {
+		sb.WriteString("- ")
+		sku.TransactedResetter.ResetWithPtr(cursor, &z.Sku)
+		cursor.Metadatei.Subtract(&av.Metadatei)
+
+		if _, err = av.stringFormatWriter.WriteStringFormat(&sb, cursor); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

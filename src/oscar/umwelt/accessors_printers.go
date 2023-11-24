@@ -56,16 +56,37 @@ func (u *Umwelt) StringFormatWriterEtiketten(
 	return kennung_fmt.MakeEtikettenCliFormat()
 }
 
-func (u *Umwelt) StringFormatWriterSkuLikePtr() schnittstellen.StringFormatWriter[*sku.Transacted] {
+func (u *Umwelt) StringFormatWriterSkuLikePtrForOrganize() schnittstellen.StringFormatWriter[*sku.Transacted] {
 	co := u.FormatColorOptions()
+	co.OffEntirely = true
 
-	return sku_fmt.MakeCliFormat(
+	if !u.Konfig().NewOrganize {
+		return sku_fmt.MakeOrganizeFormat()
+	}
+
+	return sku_fmt.MakeOrganizeNewFormat(
 		u.konfig.PrintOptions,
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterKennung(co),
 		u.StringFormatWriterTyp(co),
 		u.StringFormatWriterBezeichnung(co),
 		u.StringFormatWriterEtiketten(co),
+	)
+}
+
+func (u *Umwelt) StringFormatWriterSkuLikePtr(co *string_format_writer.ColorOptions) schnittstellen.StringFormatWriter[*sku.Transacted] {
+	if co == nil {
+		co1 := u.FormatColorOptions()
+		co = &co1
+	}
+
+	return sku_fmt.MakeCliFormat(
+		u.konfig.PrintOptions,
+		u.StringFormatWriterShaLike(*co),
+		u.StringFormatWriterKennung(*co),
+		u.StringFormatWriterTyp(*co),
+		u.StringFormatWriterBezeichnung(*co),
+		u.StringFormatWriterEtiketten(*co),
 	)
 }
 
@@ -84,7 +105,7 @@ func (u *Umwelt) StringFormatWriterSkuLikePtrShort() schnittstellen.StringFormat
 }
 
 func (u *Umwelt) PrinterSkuLikePtr() schnittstellen.FuncIter[*sku.Transacted] {
-	sw := u.StringFormatWriterSkuLikePtr()
+	sw := u.StringFormatWriterSkuLikePtr(nil)
 
 	return string_format_writer.MakeDelim[*sku.Transacted](
 		"\n",
@@ -94,7 +115,7 @@ func (u *Umwelt) PrinterSkuLikePtr() schnittstellen.FuncIter[*sku.Transacted] {
 }
 
 func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[*sku.Transacted] {
-	sw := u.StringFormatWriterSkuLikePtr()
+	sw := u.StringFormatWriterSkuLikePtr(nil)
 
 	return string_format_writer.MakeDelim[*sku.Transacted](
 		"\n",

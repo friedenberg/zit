@@ -69,7 +69,7 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 		}
 
 		found = sku.GetTransactedPool().Get()
-    sku.TransactedResetter.ResetWithPtr(found, zv)
+		sku.TransactedResetter.ResetWithPtr(found, zv)
 
 		err = collections.MakeErrStopIteration()
 

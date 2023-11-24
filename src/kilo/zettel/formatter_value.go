@@ -7,6 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/alfa/toml"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/typ_akte"
@@ -201,12 +202,7 @@ func (fv *FormatterValue) FuncFormatter(
 	case "toml":
 		errors.TodoP3("limit to only zettels supporting toml")
 		return func(o *sku.Transacted) (err error) {
-			if _, err = io.WriteString(
-				out, fmt.Sprintf("['%s']\n", o.GetKennung()),
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+			var a map[string]interface{}
 
 			var r sha.ReadCloser
 
@@ -217,7 +213,24 @@ func (fv *FormatterValue) FuncFormatter(
 
 			defer errors.Deferred(&err, r.Close)
 
-			if _, err = io.Copy(out, r); err != nil {
+			d := toml.NewDecoder(r)
+
+			if err = d.Decode(&a); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			a["description"] = o.Metadatei.Bezeichnung.String()
+			a["identifier"] = o.Kennung.String()
+
+			e := toml.NewEncoder(out)
+
+			if err = e.Encode(&a); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if _, err = out.Write([]byte("\x00")); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

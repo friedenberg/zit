@@ -63,8 +63,9 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 
 	sfw := ot.StringFormatWriter
 
-	if sfw == nil || true {
-		sfw = sku_fmt.MakeOrganizeFormat(kopf, schwanz)
+	if aligned, ok := sfw.(sku_fmt.KennungAlignedFormat); ok {
+		aligned.SetMaxKopf(kopf)
+		aligned.SetMaxSchwanz(schwanz)
 	}
 
 	aw := assignmentLineWriter{
@@ -73,6 +74,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		maxKopf:              kopf,
 		maxSchwanz:           schwanz,
 		maxLen:               l,
+		Metadatei:            ot.AsMetadatei(),
 		RightAlignedIndents:  ot.UseRightAlignedIndents,
 		OmitLeadingEmptyLine: omit,
 		stringFormatWriter:   sfw,

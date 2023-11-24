@@ -230,6 +230,21 @@ func (z Metadatei) Description() (d string) {
 	return
 }
 
+func (a *Metadatei) Subtract(
+	b *Metadatei,
+) {
+	if a.Typ.String() == b.Typ.String() {
+		a.Typ = kennung.Typ{}
+	}
+
+	err := b.GetEtiketten().EachPtr(
+		func(e *kennung.Etikett) (err error) {
+			return a.Etiketten.DelPtr(e)
+		},
+	)
+	errors.PanicIfError(err)
+}
+
 func (z *Metadatei) ApplyGoldenChild(
 	e kennung.Etikett,
 	mode etikett_rule.RuleGoldenChild,

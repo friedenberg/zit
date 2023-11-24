@@ -21,7 +21,7 @@ func makeObj(
 ) (z obj, err error) {
 	errors.TodoP4("add bez in a better way")
 	z = obj{
-    Sku: *named,
+		Sku: *named,
 	}
 
 	if options.Abbreviations.Hinweisen {
@@ -105,9 +105,13 @@ func (z *obj) setExistingObj(
 		return
 	}
 
-	if err = z.Sku.Kennung.Set(
-		strings.TrimSpace(remaining[:idx]),
-	); err != nil {
+	remainingKennung := strings.TrimSpace(remaining[:idx])
+
+	if idxSpace := strings.Index(remainingKennung, " "); idxSpace != -1 {
+		remainingKennung = remainingKennung[:idxSpace]
+	}
+
+	if err = z.Sku.Kennung.Set(remainingKennung); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -169,7 +173,7 @@ func sortObjSet(
 		case out[i].Sku.Kennung.String() == "":
 			return true
 
-    case out[j].Sku.Kennung.String() == "":
+		case out[j].Sku.Kennung.String() == "":
 			return false
 
 		default:

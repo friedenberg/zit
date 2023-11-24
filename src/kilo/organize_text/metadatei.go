@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/ohio"
 	"github.com/friedenberg/zit/src/echo/format"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/india/matcher"
 )
 
@@ -17,6 +18,12 @@ type Metadatei struct {
 	kennung.EtikettSet
 	Matchers schnittstellen.SetLike[matcher.Matcher]
 	Typ      kennung.Typ
+}
+
+func (m Metadatei) AsMetadatei() (m1 metadatei.Metadatei) {
+	m1.Typ = m.Typ
+	m1.SetEtiketten(m.EtikettSet)
+	return
 }
 
 func (m Metadatei) HasMetadateiContent() bool {

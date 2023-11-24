@@ -241,6 +241,7 @@ function show_konfig { # @test
 		print-etiketten-always = false
 		print-empty-shas = false
 		print-matched-archiviert = false
+		print-shas = false
 
 		[cli-output.abbreviations]
 		hinweisen = false

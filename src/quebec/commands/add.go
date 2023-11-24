@@ -125,7 +125,7 @@ func (c Add) RunWithCwdQuery(
 		Options: otFlags.GetOptions(
 			u.Konfig().PrintOptions,
 			ms,
-			u.StringFormatWriterSkuLikePtr(),
+			u.StringFormatWriterSkuLikePtrForOrganize(),
 		),
 	}
 

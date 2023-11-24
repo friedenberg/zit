@@ -184,9 +184,9 @@ func (s *Store) CreateOrUpdate(
 func (s *Store) readExternalAndMergeIfNecessary(
 	transactedPtr, mutter *sku.Transacted,
 ) (err error) {
-  if mutter == nil {
-    return
-  }
+	if mutter == nil {
+		return
+	}
 
 	var co *sku.CheckedOut
 

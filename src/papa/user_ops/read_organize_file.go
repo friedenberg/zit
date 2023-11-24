@@ -41,7 +41,7 @@ func (c ReadOrganizeFile) Run(q matcher.Query) (ot *organize_text.Text, err erro
 	c.Umwelt.ApplyToOrganizeOptions(&otFlags.Options)
 
 	if ot, err = organize_text.New(
-		otFlags.GetOptions(c.Umwelt.Konfig().PrintOptions, q, c.StringFormatWriterSkuLikePtr()),
+		otFlags.GetOptions(c.Umwelt.Konfig().PrintOptions, q, c.StringFormatWriterSkuLikePtrForOrganize()),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
