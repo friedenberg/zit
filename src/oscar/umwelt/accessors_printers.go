@@ -56,7 +56,7 @@ func (u *Umwelt) StringFormatWriterEtiketten(
 	return kennung_fmt.MakeEtikettenCliFormat()
 }
 
-func (u *Umwelt) StringFormatWriterSkuLikePtrForOrganize() schnittstellen.StringFormatWriter[*sku.Transacted] {
+func (u *Umwelt) StringFormatWriterSkuLikePtrForOrganize() schnittstellen.StringFormatReadWriter[*sku.Transacted] {
 	co := u.FormatColorOptions()
 	co.OffEntirely = true
 

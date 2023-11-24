@@ -29,6 +29,13 @@ func (f *organize) SetMaxSchwanz(m int) {
 	f.maxSchwanz = m
 }
 
+func (f *organize) ReadStringFormat(
+	sw io.Reader,
+	o *sku.Transacted,
+) (n int64, err error) {
+  return
+}
+
 func (f *organize) WriteStringFormat(
 	sw io.StringWriter,
 	o *sku.Transacted,

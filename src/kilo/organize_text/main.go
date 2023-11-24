@@ -61,7 +61,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 
 	omit := ot.UseMetadateiHeader && ot.HasMetadateiContent()
 
-	sfw := ot.StringFormatWriter
+	sfw := ot.StringFormatReadWriter
 
 	if aligned, ok := sfw.(sku_fmt.KennungAlignedFormat); ok {
 		aligned.SetMaxKopf(kopf)
