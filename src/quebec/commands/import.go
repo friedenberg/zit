@@ -1,212 +1,192 @@
 package commands
 
-import (
-	"flag"
-	"io"
+// type Import struct {
+// 	Bestandsaufnahme string
+// 	Akten            string
+// 	AgeIdentity      string
+// 	CompressionType  angeboren.CompressionType
+// 	Proto            zettel.ProtoZettel
+// }
 
-	"github.com/friedenberg/zit/src/alfa/angeboren"
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/id"
-	"github.com/friedenberg/zit/src/charlie/age"
-	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/standort"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/golf/kennung_index"
-	"github.com/friedenberg/zit/src/golf/objekte_format"
-	"github.com/friedenberg/zit/src/hotel/sku"
-	to_merge "github.com/friedenberg/zit/src/india/sku_fmt"
-	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/lima/bestandsaufnahme"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
-)
+// func init() {
+// 	registerCommand(
+// 		"import",
+// 		func(f *flag.FlagSet) Command {
+// 			c := &Import{
+// 				Proto:           zettel.MakeEmptyProtoZettel(),
+// 				CompressionType: angeboren.CompressionTypeDefault,
+// 			}
 
-type Import struct {
-	Bestandsaufnahme string
-	Akten            string
-	AgeIdentity      string
-	CompressionType  angeboren.CompressionType
-	Proto            zettel.ProtoZettel
-}
+// 			f.StringVar(&c.Bestandsaufnahme, "bestandsaufnahme", "", "")
+// 			f.StringVar(&c.Akten, "akten", "", "")
+// 			f.StringVar(&c.AgeIdentity, "age-identity", "", "")
+// 			c.CompressionType.AddToFlagSet(f)
 
-func init() {
-	registerCommand(
-		"import",
-		func(f *flag.FlagSet) Command {
-			c := &Import{
-				Proto:           zettel.MakeEmptyProtoZettel(),
-				CompressionType: angeboren.CompressionTypeDefault,
-			}
+// 			c.Proto.AddToFlagSet(f)
 
-			f.StringVar(&c.Bestandsaufnahme, "bestandsaufnahme", "", "")
-			f.StringVar(&c.Akten, "akten", "", "")
-			f.StringVar(&c.AgeIdentity, "age-identity", "", "")
-			c.CompressionType.AddToFlagSet(f)
+// 			return c
+// 		},
+// 	)
+// }
 
-			c.Proto.AddToFlagSet(f)
+// func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
+// 	if c.Bestandsaufnahme == "" {
+// 		err = errors.Errorf("empty Bestandsaufnahme")
+// 		return
+// 	}
 
-			return c
-		},
-	)
-}
+// 	if c.Akten == "" {
+// 		err = errors.Errorf("empty Akten")
+// 		return
+// 	}
 
-func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	if c.Bestandsaufnahme == "" {
-		err = errors.Errorf("empty Bestandsaufnahme")
-		return
-	}
+// 	var ag *age.Age
 
-	if c.Akten == "" {
-		err = errors.Errorf("empty Akten")
-		return
-	}
+// 	if ag, err = age.MakeFromIdentity(c.AgeIdentity); err != nil {
+// 		err = errors.Wrapf(err, "age-identity: %q", c.AgeIdentity)
+// 		return
+// 	}
 
-	var ag *age.Age
+// 	ofo := objekte_format.Options{IncludeTai: true, IncludeVerzeichnisse: true}
 
-	if ag, err = age.MakeFromIdentity(c.AgeIdentity); err != nil {
-		err = errors.Wrapf(err, "age-identity: %q", c.AgeIdentity)
-		return
-	}
+// 	bf := bestandsaufnahme.MakeAkteFormat(u.Konfig().GetStoreVersion(), ofo)
 
-	ofo := objekte_format.Options{IncludeTai: true, IncludeVerzeichnisse: true}
+// 	var rc io.ReadCloser
 
-	bf := bestandsaufnahme.MakeAkteFormat(u.Konfig().GetStoreVersion(), ofo)
+// 	// setup besty reader
+// 	{
+// 		o := standort.FileReadOptions{
+// 			Age:             *ag,
+// 			Path:            c.Bestandsaufnahme,
+// 			CompressionType: c.CompressionType,
+// 		}
 
-	var rc io.ReadCloser
+// 		if rc, err = standort.NewFileReader(o); err != nil {
+// 			err = errors.Wrap(err)
+// 			return
+// 		}
 
-	// setup besty reader
-	{
-		o := standort.FileReadOptions{
-			Age:             *ag,
-			Path:            c.Bestandsaufnahme,
-			CompressionType: c.CompressionType,
-		}
+// 		defer errors.DeferredCloser(&err, rc)
+// 	}
 
-		if rc, err = standort.NewFileReader(o); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+// 	// scanner := sku_formats.MakeFormatBestandsaufnahmeScanner(
+// 	// 	rc,
+// 	// 	objekte_format.FormatForVersion(u.Konfig().GetStoreVersion()),
+// 	// 	ofo,
+// 	// )
 
-		defer errors.DeferredCloser(&err, rc)
-	}
+// 	// for scanner.Scan() {
+// 	// }
 
-	// scanner := sku_formats.MakeFormatBestandsaufnahmeScanner(
-	// 	rc,
-	// 	objekte_format.FormatForVersion(u.Konfig().GetStoreVersion()),
-	// 	ofo,
-	// )
+// 	besty := bestandsaufnahme.MakeAkte()
 
-	// for scanner.Scan() {
-	// }
+// 	if _, err = bf.ParseAkte(rc, besty); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	besty := bestandsaufnahme.MakeAkte()
+// 	u.Lock()
+// 	defer u.Unlock()
 
-	if _, err = bf.ParseAkte(rc, besty); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	if err = u.StoreObjekten().GetBestandsaufnahmeStore().Create(besty); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	u.Lock()
-	defer u.Unlock()
+// 	var ti kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
 
-	if err = u.StoreObjekten().GetBestandsaufnahmeStore().Create(besty); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	if ti, err = u.StoreObjekten().GetTypenIndex(); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	var ti kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
+// 	f1 := u.StoreObjekten().GetReindexFunc(ti)
 
-	if ti, err = u.StoreObjekten().GetTypenIndex(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	for {
+// 		sk, ok := besty.Skus.Pop()
 
-	f1 := u.StoreObjekten().GetReindexFunc(ti)
+// 		if !ok {
+// 			break
+// 		}
 
-	for {
-		sk, ok := besty.Skus.Pop()
+// 		if err = c.importAkteIfNecessary(u, sk, ag); err != nil {
+// 			err = errors.Wrap(err)
+// 			return
+// 		}
 
-		if !ok {
-			break
-		}
+// 		if err = f1(sk); err != nil {
+// 			err = errors.Wrapf(err, "Sku: %s", sk)
+// 			return
+// 		}
+// 	}
 
-		if err = c.importAkteIfNecessary(u, sk, ag); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+// 	return
+// }
 
-		if err = f1(sk); err != nil {
-			err = errors.Wrapf(err, "Sku: %s", sk)
-			return
-		}
-	}
+// func (c Import) importAkteIfNecessary(
+// 	u *umwelt.Umwelt,
+// 	sk *sku.Transacted,
+// 	ag *age.Age,
+// ) (err error) {
+// 	akteSha := sk.GetAkteSha()
 
-	return
-}
+// 	if u.Standort().HasAkte(u.Konfig().GetStoreVersion(), akteSha) {
+// 		return
+// 	}
 
-func (c Import) importAkteIfNecessary(
-	u *umwelt.Umwelt,
-	sk *sku.Transacted,
-	ag *age.Age,
-) (err error) {
-	akteSha := sk.GetAkteSha()
+// 	p := id.Path(akteSha, c.Akten)
 
-	if u.Standort().HasAkte(u.Konfig().GetStoreVersion(), akteSha) {
-		return
-	}
+// 	o := standort.FileReadOptions{
+// 		Age:             *ag,
+// 		Path:            p,
+// 		CompressionType: c.CompressionType,
+// 	}
 
-	p := id.Path(akteSha, c.Akten)
+// 	var rc sha.ReadCloser
 
-	o := standort.FileReadOptions{
-		Age:             *ag,
-		Path:            p,
-		CompressionType: c.CompressionType,
-	}
+// 	if rc, err = standort.NewFileReader(o); err != nil {
+// 		if errors.IsNotExist(err) {
+// 			err = errors.TodoRecoverable(
+// 				"make recoverable: sku missing akte: %s",
+// 				sku_fmt.String(sk),
+// 			)
+// 		} else {
+// 			err = errors.Wrap(err)
+// 		}
 
-	var rc sha.ReadCloser
+// 		return
+// 	}
 
-	if rc, err = standort.NewFileReader(o); err != nil {
-		if errors.IsNotExist(err) {
-			err = errors.TodoRecoverable(
-				"make recoverable: sku missing akte: %s",
-				to_merge.String(sk),
-			)
-		} else {
-			err = errors.Wrap(err)
-		}
+// 	defer errors.DeferredCloser(&err, rc)
 
-		return
-	}
+// 	var aw sha.WriteCloser
 
-	defer errors.DeferredCloser(&err, rc)
+// 	if aw, err = u.Standort().AkteWriter(); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	var aw sha.WriteCloser
+// 	defer errors.DeferredCloser(&err, aw)
 
-	if aw, err = u.Standort().AkteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	var n int64
 
-	defer errors.DeferredCloser(&err, aw)
+// 	if n, err = io.Copy(aw, rc); err != nil {
+// 		errors.TodoRecoverable("%s: Sku: %s", err, sku_fmt.String(sk))
+// 		err = nil
+// 		return
+// 	}
 
-	var n int64
+// 	shaRc := rc.GetShaLike()
 
-	if n, err = io.Copy(aw, rc); err != nil {
-		errors.TodoRecoverable("%s: Sku: %s", err, to_merge.String(sk))
-		err = nil
-		return
-	}
+// 	if !shaRc.EqualsSha(akteSha) {
+// 		errors.TodoRecoverable(
+// 			"sku akte mismatch: %s while akten had %s",
+// 			sku_fmt.String(sk),
+// 			shaRc,
+// 		)
+// 	}
 
-	shaRc := rc.GetShaLike()
+// 	errors.Err().Printf("copied Akte %s (%d bytes)", akteSha, n)
 
-	if !shaRc.EqualsSha(akteSha) {
-		errors.TodoRecoverable(
-			"sku akte mismatch: %s while akten had %s",
-			to_merge.String(sk),
-			shaRc,
-		)
-	}
-
-	errors.Err().Printf("copied Akte %s (%d bytes)", akteSha, n)
-
-	return
-}
+// 	return
+// }

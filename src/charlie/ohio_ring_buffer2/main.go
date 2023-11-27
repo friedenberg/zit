@@ -8,19 +8,21 @@ import (
 const RingBufferDefaultSize = 4096
 
 type RingBuffer struct {
+	reader                  io.Reader
 	dataLength              int
 	readLength, writeLength int64
 	rIdx, wIdx              int
 	data                    []byte
 }
 
-func MakeRingBuffer(n int) *RingBuffer {
+func MakeRingBuffer(r io.Reader, n int) *RingBuffer {
 	if n == 0 {
 		n = RingBufferDefaultSize
 	}
 
 	return &RingBuffer{
-		data: make([]byte, n),
+		reader: r,
+		data:   make([]byte, n),
 	}
 }
 
@@ -28,7 +30,8 @@ func MakeRingBuffer(n int) *RingBuffer {
 
 // }
 
-func (rb *RingBuffer) Reset() {
+func (rb *RingBuffer) Reset(r io.Reader) {
+	rb.reader = r
 	rb.dataLength = 0
 	rb.readLength = 0
 	rb.writeLength = 0
@@ -40,7 +43,34 @@ func (rb *RingBuffer) Reset() {
 	}
 }
 
-func (rb *RingBuffer) PeekWriteable() (rs RingSlice) {
+func (rb *RingBuffer) ReadLength() int64 {
+	return rb.readLength
+}
+
+func (rb *RingBuffer) Unread(toUnread int) (actuallyUnread int) {
+	if rb.wIdx < rb.rIdx {
+		maxToUnread := rb.rIdx - rb.wIdx
+		actuallyUnread = min(maxToUnread, toUnread)
+		rb.rIdx -= actuallyUnread
+	} else {
+		actuallyUnread = min(toUnread, rb.rIdx)
+		rb.rIdx -= actuallyUnread
+
+		if actuallyUnread < toUnread && rb.rIdx == 0 {
+			toUnread -= actuallyUnread
+			last := rb.Cap() - 1
+			toUnread = min(toUnread, last-rb.wIdx)
+			rb.rIdx = last - toUnread
+			actuallyUnread += toUnread
+		}
+	}
+
+	rb.readLength -= int64(actuallyUnread)
+
+	return
+}
+
+func (rb *RingBuffer) PeekWriteable() (rs Slice) {
 	if rb.Len() == len(rb.data) {
 		return
 	}
@@ -69,7 +99,7 @@ func (rb *RingBuffer) PeekWriteable() (rs RingSlice) {
 	return
 }
 
-func (rb *RingBuffer) PeekReadable() (rs RingSlice) {
+func (rb *RingBuffer) PeekReadable() (rs Slice) {
 	if rb.Len() == 0 {
 		return
 	}
@@ -85,7 +115,7 @@ func (rb *RingBuffer) PeekReadable() (rs RingSlice) {
 
 	rCap := rs.Len()
 
-	if rCap > rb.Len() {
+	if rCap > rb.Len() && false {
 		panic(
 			fmt.Sprintf(
 				"rcap was %d but buffer len was %d and len was %d and n was %d and r was %d and w was %d",
@@ -97,6 +127,19 @@ func (rb *RingBuffer) PeekReadable() (rs RingSlice) {
 				rb.wIdx,
 			),
 		)
+	}
+
+	return
+}
+
+func (rb *RingBuffer) PeekUnreadable() (rs Slice) {
+	switch {
+	case rb.wIdx < rb.rIdx:
+		rs.data[0] = rb.data[rb.wIdx:rb.rIdx]
+
+	case rb.rIdx < rb.wIdx:
+		rs.data[0] = rb.data[:rb.rIdx]
+		rs.data[1] = rb.data[rb.wIdx:]
 	}
 
 	return
@@ -150,8 +193,15 @@ func (rb *RingBuffer) Write(p []byte) (n int, err error) {
 
 func (rb *RingBuffer) Read(p []byte) (n int, err error) {
 	if rb.Len() == 0 {
-		err = io.EOF
-		return
+		var f int64
+
+		if f, err = rb.Fill(); err != nil {
+			return
+		}
+
+		if f == 0 && err == io.EOF {
+			return
+		}
 	}
 
 	rs := rb.PeekReadable()
@@ -190,49 +240,35 @@ func (rb *RingBuffer) Read(p []byte) (n int, err error) {
 	return
 }
 
-func (rb *RingBuffer) FillWith(r io.Reader) (n int, err error) {
-	if rb.Len() == len(rb.data) {
-		err = io.EOF
-		return
+func (rb *RingBuffer) Fill() (n int64, err error) {
+	if rb.reader == nil {
+		panic("nil reader")
 	}
 
 	rs := rb.PeekWriteable()
 
-	var n1 int
+	for i := 100; i > 0; i-- {
+		n, err = rs.ReadFrom(rb.reader)
+		rb.dataLength += int(n)
+		rb.writeLength += n
 
-	n1, err = r.Read(rs.First())
-	rb.wIdx += n1
-	n += n1
-	rb.dataLength += n1
-	rb.writeLength += int64(n1)
+		if int(n) <= len(rs.First()) {
+			rb.wIdx += int(n)
+		} else {
+			rb.wIdx = int(n) - len(rs.First())
+		}
 
-	if err != nil {
-		return
+		if err != nil || n > 0 {
+			return
+		}
 	}
 
-	if rb.Len() == len(rb.data) {
-		err = io.EOF
-		return
-	}
-
-	n1, err = r.Read(rs.Second())
-	n += n1
-	rb.dataLength += n1
-	rb.writeLength += int64(n1)
-
-	if n1 > 0 {
-		rb.wIdx = n1
-	}
-
-	if rb.Len() == len(rb.data) {
-		err = io.EOF
-		return
-	}
+	err = io.ErrNoProgress
 
 	return
 }
 
-func (rb *RingBuffer) advanceRead(n int) {
+func (rb *RingBuffer) AdvanceRead(n int) {
 	rb.rIdx += n
 	rb.readLength += int64(n)
 
@@ -241,6 +277,24 @@ func (rb *RingBuffer) advanceRead(n int) {
 	}
 
 	rb.dataLength -= n
+}
+
+func (rb *RingBuffer) PeekUpto(b byte) (readable Slice, ok bool, err error) {
+	readable, ok = rb.PeekReadable().Upto(b)
+
+	if ok {
+		return
+	}
+
+	_, err = rb.Fill()
+
+	if err != io.EOF && err != nil {
+		return
+	}
+
+	readable, ok = rb.PeekReadable().Upto(b)
+
+	return
 }
 
 func (rb *RingBuffer) FindNext(ff FindFunc) (offset, length int, partial bool) {
@@ -260,7 +314,7 @@ func (rb *RingBuffer) FindFromStartAndAdvance(ff FindFunc) (length int, partial 
 	length, partial = rb.PeekReadable().findFromStart(ff)
 
 	if !partial {
-		rb.advanceRead(length)
+		rb.AdvanceRead(length)
 	}
 
 	return

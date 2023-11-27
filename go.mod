@@ -1,6 +1,6 @@
 module github.com/friedenberg/zit
 
-go 1.19
+go 1.21
 
 require (
 	filippo.io/age v1.1.1

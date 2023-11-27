@@ -26,7 +26,7 @@ type boundaryReader struct {
 func (br *boundaryReader) Reset(r io.Reader) {
 	br.reader.Reset(r)
 	br.remainingContent = 0
-	br.buffer.Reset()
+	br.buffer.Reset(r)
 	br.state = boundaryReaderStateEmpty
 }
 
@@ -37,7 +37,7 @@ func MakeBoundaryReader(r io.Reader, boundary string) BoundaryReader {
 		d = len(boundary)
 	}
 
-	b := ohio_ring_buffer2.MakeRingBuffer(d)
+	b := ohio_ring_buffer2.MakeRingBuffer(r, d)
 
 	return &boundaryReader{
 		reader: bufio.NewReader(r),
@@ -55,7 +55,7 @@ func MakeBoundaryReaderPageSize(
 		size = len(boundary)
 	}
 
-	b := ohio_ring_buffer2.MakeRingBuffer(size)
+	b := ohio_ring_buffer2.MakeRingBuffer(r, size)
 
 	return &boundaryReader{
 		reader: bufio.NewReader(r),
@@ -68,8 +68,8 @@ func (br *boundaryReader) setState(s boundaryReaderState) {
 	br.state = s
 }
 
-func (br *boundaryReader) fillBuffer() (n int, err error) {
-	n, err = br.buffer.FillWith(br.reader)
+func (br *boundaryReader) fillBuffer() (n int64, err error) {
+	n, err = br.buffer.Fill()
 
 	if err != nil && err != io.EOF {
 		return
@@ -145,7 +145,7 @@ func (br *boundaryReader) ReadBoundary() (length int, err error) {
 	case length != 0 && !partial:
 		br.setState(boundaryReaderStatePartialBoundaryInBuffer)
 
-		var bytesReadFromRingBuffer int
+		var bytesReadFromRingBuffer int64
 		bytesReadFromRingBuffer, err = br.fillBuffer()
 
 		if err == io.EOF && bytesReadFromRingBuffer > 0 || br.buffer.Len() > 0 {
@@ -159,7 +159,7 @@ func (br *boundaryReader) ReadBoundary() (length int, err error) {
 		return
 
 	case (length == br.buffer.Len() && partial) || br.buffer.Len() == 0:
-		var n1 int
+		var n1 int64
 		n1, err = br.fillBuffer()
 
 		if err == io.EOF && n1 > 0 && br.buffer.Len() > 0 {

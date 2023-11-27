@@ -187,15 +187,11 @@ func (zp *Page) copy(
 		}
 	}
 
-	defer errors.DeferredCloser(&err, r1)
-
-	r := bufio.NewReader(r1)
-
 	var getOneSku func() (*sku.Transacted, error)
 
 	if zp.useBestandsaufnahmeForVerzeichnisse {
 		dec := to_merge.MakeFormatBestandsaufnahmeScanner(
-			r,
+			r1,
 			objekte_format.Default(),
 			objekte_format.Options{
 				IncludeTai:           true,
@@ -217,7 +213,7 @@ func (zp *Page) copy(
 			return
 		}
 	} else {
-		dec := gob.NewDecoder(r)
+		dec := gob.NewDecoder(r1)
 
 		getOneSku = func() (sk *sku.Transacted, err error) {
 			tz := sku.GetTransactedPool().Get()

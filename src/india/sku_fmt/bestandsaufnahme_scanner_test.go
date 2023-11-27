@@ -66,6 +66,7 @@ func TestOne(t1 *testing.T) {
 	scanner := MakeFormatBestandsaufnahmeScanner(zstd.NewReader(b), f, op)
 
 	if !scanner.Scan() {
+		t.Logf("scan error: %q", scanner.Error())
 		t.Fatalf("expected ok scan")
 	}
 
@@ -606,3 +607,4 @@ Typ toml-bookmark
 ---
 `
 }
+

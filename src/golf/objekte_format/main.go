@@ -3,7 +3,9 @@ package objekte_format
 import (
 	"io"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/ohio_ring_buffer2"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
@@ -29,7 +31,7 @@ type (
 
 	Parser interface {
 		ParsePersistentMetadatei(
-			io.Reader,
+			*ohio_ring_buffer2.RingBuffer,
 			ParserContext,
 			Options,
 		) (int64, error)
@@ -49,23 +51,16 @@ func Default() Format {
 	return v4{}
 }
 
-func FormatForVersion(v schnittstellen.StoreVersion) Format {
-	switch v.GetInt() {
-	case 0:
-		return v0{}
+func FormatForVersion(sv schnittstellen.StoreVersion) Format {
+	v := sv.GetInt()
 
-	case 1:
-		return v1{}
-
-	case 2:
-		return v2{}
-
-	case 3:
-		fallthrough
-		// return v3{}
+	switch {
+	case v >= 4:
+		return v4{}
 
 	default:
-		return v4{}
+		panic(errors.Errorf("unsupported version: %q", sv))
+
 	}
 }
 

@@ -10,22 +10,11 @@ import (
 	"github.com/friedenberg/zit/src/alfa/etikett_rule"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
-
-var BoundaryStringValue values.String
-
-const (
-	Boundary = "---"
-)
-
-func init() {
-	BoundaryStringValue = values.MakeString(Boundary)
-}
 
 type MetadateiWriterTo interface {
 	io.WriterTo

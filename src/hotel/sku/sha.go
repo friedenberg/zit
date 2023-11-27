@@ -1,8 +1,12 @@
 package sku
 
 import (
+	"io"
+	"strings"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/ohio_ring_buffer2"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 )
@@ -19,10 +23,15 @@ func CalculateAndConfirmSha(
 	}
 
 	if !sk.GetObjekteSha().EqualsSha(sh) {
+		var sb strings.Builder
+
+		errors.PanicIfError(calculateAndSetSha(sk, format, o, &sb))
+
 		err = errors.Errorf(
-			"expected sha %q but got %q",
+			"expected sha %q but got %q: used %q",
 			sh,
 			sk.GetObjekteSha(),
+			sb.String(),
 		)
 
 		err = errors.Wrapf(err, "Format: %T", format)
@@ -38,7 +47,16 @@ func CalculateAndSetSha(
 	format objekte_format.Formatter,
 	o objekte_format.Options,
 ) (err error) {
-	w := sha.MakeWriter(nil)
+	return calculateAndSetSha(sk, format, o, nil)
+}
+
+func calculateAndSetSha(
+	sk SkuLike,
+	format objekte_format.Formatter,
+	o objekte_format.Options,
+	w1 io.Writer,
+) (err error) {
+	w := sha.MakeWriter(w1)
 
 	if _, err = format.FormatPersistentMetadatei(w, sk, o); err != nil {
 		err = errors.Wrap(err)
@@ -68,7 +86,11 @@ func ReadFromSha(
 
 	defer errors.DeferredCloser(&err, or)
 
-	if _, err = format.ParsePersistentMetadatei(or, sk, o); err != nil {
+	if _, err = format.ParsePersistentMetadatei(
+		ohio_ring_buffer2.MakeRingBuffer(or, 0),
+		sk,
+		o,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

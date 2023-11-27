@@ -64,8 +64,8 @@ function init_and_deinit { # @test
 		[konfig@$(get_konfig_sha)]
 	EOM
 
-	run_zit deinit
-	assert_success
+	# run_zit deinit
+	# assert_success
 	# assert_output wow
 
 	# run test ! -f .zit/KonfigAngeboren

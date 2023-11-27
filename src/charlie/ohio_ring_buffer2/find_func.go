@@ -2,10 +2,10 @@ package ohio_ring_buffer2
 
 // rs is the data to search. Negative offset means not found. 0 or positive
 // offset means found at that index. Partial means the sequence is not complete.
-type FindFunc func(rs RingSlice) (offset, length int, partial bool)
+type FindFunc func(rs Slice) (offset, length int, partial bool)
 
 func FindBoundary(boundary []byte) FindFunc {
-	return func(rs RingSlice) (offset, length int, partial bool) {
+	return func(rs Slice) (offset, length int, partial bool) {
 		offset = -1
 
 		if len(boundary) == 0 {

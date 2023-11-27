@@ -15,11 +15,50 @@ func WriteKeySpaceValueNewlineString(
 	return WriteStrings(w, key, " ", value, "\n")
 }
 
+func WriteKeySpaceValueNewlineWritersTo(
+	w io.Writer,
+	key, value io.WriterTo,
+) (n int64, err error) {
+	var (
+		n1 int64
+		n2 int
+	)
+
+	n1, err = key.WriteTo(w)
+	n += n1
+
+	if err != nil {
+		return
+	}
+
+	n2, err = w.Write([]byte{' '})
+	n += int64(n2)
+
+	if err != nil {
+		return
+	}
+
+	n1, err = value.WriteTo(w)
+	n += n1
+
+	if err != nil {
+		return
+	}
+
+	n2, err = w.Write([]byte{'\n'})
+	n += int64(n2)
+
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 func WriteKeySpaceValueNewline(
 	w io.Writer,
 	key string, value []byte,
 ) (n int64, err error) {
-
 	var (
 		n1 int64
 		sr *strings.Reader

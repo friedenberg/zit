@@ -3,6 +3,7 @@ package bestandsaufnahme
 import (
 	"fmt"
 	"io"
+	"strings"
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -10,13 +11,14 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/charlie/ohio_ring_buffer2"
 	"github.com/friedenberg/zit/src/charlie/pool"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	to_merge "github.com/friedenberg/zit/src/india/sku_fmt"
+	"github.com/friedenberg/zit/src/india/sku_fmt"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
 )
@@ -196,60 +198,51 @@ func (s *store) ReadOne(
 
 	defer errors.DeferredCloser(&err, or)
 
+	var sb strings.Builder
+	mr := io.TeeReader(or, &sb)
+
+	var n int64
+	n, o, err = s.readOneFromReader(mr)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	switch s.sv.GetInt() {
+	case 0, 1, 2, 3:
+		panic("unsupported version")
+
+	default:
+		err = sku.CalculateAndConfirmSha(
+			o,
+			s.persistentMetadateiFormat,
+			s.options,
+			sh,
+		)
+
+		if err != nil {
+			err = errors.Wrapf(err, "Sku: %q, Read: %q, N: %d", o, sb.String(), n)
+			return
+		}
+	}
+
+	return
+}
+
+func (s *store) readOneFromReader(
+	r io.Reader,
+) (n int64, o *sku.Transacted, err error) {
 	o = sku.GetTransactedPool().Get()
 
-	if _, err = s.persistentMetadateiFormat.ParsePersistentMetadatei(
-		or,
+	if n, err = s.persistentMetadateiFormat.ParsePersistentMetadatei(
+		ohio_ring_buffer2.MakeRingBuffer(r, 0),
 		o,
 		s.options,
 	); err != nil {
 		if errors.IsEOF(err) {
 			err = nil
 		} else {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	op := s.options
-
-	switch s.sv.GetInt() {
-	case 0, 1, 2:
-		o.SetObjekteSha(sh)
-
-	case 3:
-		err = sku.CalculateAndConfirmSha(
-			o,
-			s.persistentMetadateiFormat,
-			op,
-			sh,
-		)
-
-		if err != nil {
-			op.IncludeTai = false
-
-			err = sku.CalculateAndConfirmSha(
-				o,
-				s.persistentMetadateiFormat,
-				op,
-				sh,
-			)
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
-	default:
-		err = sku.CalculateAndConfirmSha(
-			o,
-			s.persistentMetadateiFormat,
-			op,
-			sh,
-		)
-
-		if err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -415,7 +408,7 @@ func (s *store) ReadAllSkus2(
 
 			defer errors.DeferredCloser(&err, r)
 
-			dec := to_merge.MakeFormatBestandsaufnahmeScanner(
+			dec := sku_fmt.MakeFormatBestandsaufnahmeScanner(
 				r,
 				s.persistentMetadateiFormat,
 				s.options,

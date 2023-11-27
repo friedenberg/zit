@@ -35,6 +35,8 @@ func (f formatAkte2) ParseAkte(
 		f.options,
 	)
 
+	dec.SetDebug()
+
 	for dec.Scan() {
 		sk := dec.GetTransacted()
 
