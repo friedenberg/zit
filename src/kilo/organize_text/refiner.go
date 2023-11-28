@@ -252,7 +252,7 @@ type etikettBag struct {
 }
 
 func (a Refiner) childPrefixes(node *assignment) (out []etikettBag) {
-	m := make(map[kennung.Etikett][]*assignment)
+	m := make(map[string][]*assignment)
 	out = make([]etikettBag, 0, len(node.children))
 
 	if node.etiketten.Len() == 0 {
@@ -271,13 +271,13 @@ func (a Refiner) childPrefixes(node *assignment) (out []etikettBag) {
 				var n []*assignment
 				ok := false
 
-				if n, ok = m[e]; !ok {
+				if n, ok = m[e.String()]; !ok {
 					n = make([]*assignment, 0)
 				}
 
 				n = append(n, c)
 
-				m[e] = n
+				m[e.String()] = n
 
 				return
 			},
@@ -286,7 +286,11 @@ func (a Refiner) childPrefixes(node *assignment) (out []etikettBag) {
 
 	for e, n := range m {
 		if len(n) > 1 {
-			out = append(out, etikettBag{Etikett: e, assignments: n})
+      var e1 kennung.Etikett
+
+      errors.PanicIfError(e1.Set(e))
+
+			out = append(out, etikettBag{Etikett: e1, assignments: n})
 		}
 	}
 

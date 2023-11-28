@@ -18,10 +18,10 @@ func init() {
 	collections_ptr.RegisterGobValue[ketikett, *ketikett](nil)
 }
 
-type implicitEtikettenMap map[kennung.Etikett]kennung.EtikettMutableSet
+type implicitEtikettenMap map[string]kennung.EtikettMutableSet
 
 func (iem implicitEtikettenMap) Contains(to, imp kennung.Etikett) bool {
-	s, ok := iem[to]
+	s, ok := iem[to.String()]
 
 	if !ok || s == nil {
 		return false
@@ -35,11 +35,11 @@ func (iem implicitEtikettenMap) Contains(to, imp kennung.Etikett) bool {
 }
 
 func (iem implicitEtikettenMap) Set(to, imp kennung.Etikett) (err error) {
-	s, ok := iem[to]
+	s, ok := iem[to.String()]
 
 	if !ok {
 		s = kennung.MakeEtikettMutableSet()
-		iem[to] = s
+		iem[to.String()] = s
 	}
 
 	return s.Add(imp)
@@ -248,7 +248,7 @@ func (c compiled) GetSortedEtikettenExpanded(
 func (c compiled) GetImplicitEtiketten(
 	e *kennung.Etikett,
 ) kennung.EtikettSet {
-	s, ok := c.ImplicitEtiketten[*e]
+	s, ok := c.ImplicitEtiketten[e.String()]
 
 	if !ok || s == nil {
 		return kennung.MakeEtikettSet()

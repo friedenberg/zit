@@ -79,6 +79,4 @@ func GetEtikettMapPtrPool() schnittstellen.PoolValue[map[string]*Etikett] {
 	return etikettPtrMapPool
 }
 
-var (
-	etikettMapPool schnittstellen.PoolValue[map[string]Etikett]
-)
+var etikettMapPool schnittstellen.PoolValue[map[string]Etikett]

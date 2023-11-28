@@ -10,7 +10,7 @@ import (
 
 type SetPrefixVerzeichnisse struct {
 	count    int
-	innerMap map[kennung.Etikett]MutableSetMetadateiWithKennung
+	innerMap map[string]MutableSetMetadateiWithKennung
 }
 
 type SetPrefixVerzeichnisseSegments struct {
@@ -19,7 +19,7 @@ type SetPrefixVerzeichnisseSegments struct {
 }
 
 func MakeSetPrefixVerzeichnisse(c int) (s SetPrefixVerzeichnisse) {
-	s.innerMap = make(map[kennung.Etikett]MutableSetMetadateiWithKennung, c)
+	s.innerMap = make(map[string]MutableSetMetadateiWithKennung, c)
 	return s
 }
 
@@ -45,7 +45,7 @@ func (s *SetPrefixVerzeichnisse) Add(z *sku.Transacted) (err error) {
 
 	if err = es.Each(
 		func(e kennung.Etikett) (err error) {
-			s.addPair(e, z)
+			s.addPair(e.String(), z)
 			return
 		},
 	); err != nil {
@@ -79,7 +79,7 @@ func (a SetPrefixVerzeichnisse) Subtract(
 }
 
 func (s *SetPrefixVerzeichnisse) addPair(
-	e kennung.Etikett,
+	e string,
 	z *sku.Transacted,
 ) {
 	s.count += 1
@@ -98,7 +98,13 @@ func (a SetPrefixVerzeichnisse) Each(
 	f func(kennung.Etikett, MutableSetMetadateiWithKennung) error,
 ) (err error) {
 	for e, ssz := range a.innerMap {
-		if err = f(e, ssz); err != nil {
+		var e1 kennung.Etikett
+
+		if e != "" {
+			e1 = kennung.MustEtikett(e)
+		}
+
+		if err = f(e1, ssz); err != nil {
 			if iter.IsStopIteration(err) {
 				err = nil
 			} else {

@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/srx/bravo/expansion"
 )
 
-type SetPrefixNamed map[kennung.Etikett]schnittstellen.MutableSetLike[*sku.Transacted]
+type SetPrefixNamed map[string]schnittstellen.MutableSetLike[*sku.Transacted]
 
 type SetPrefixNamedSegments struct {
 	Ungrouped schnittstellen.MutableSetLike[*sku.Transacted]
@@ -55,14 +55,14 @@ func (s *SetPrefixNamed) addPair(
 	e kennung.Etikett,
 	z *sku.Transacted,
 ) {
-	existing, ok := (*s)[e]
+	existing, ok := (*s)[e.String()]
 
 	if !ok {
 		existing = makeMutableZettelLikeSet()
 	}
 
 	existing.Add(z)
-	(*s)[e] = existing
+	(*s)[e.String()] = existing
 }
 
 func allEtiketten(z *sku.Transacted) (es kennung.EtikettMutableSet, err error) {
@@ -145,7 +145,7 @@ func (a SetPrefixVerzeichnisse) Subset(
 	out.Grouped = MakeSetPrefixVerzeichnisse(len(a.innerMap))
 
 	for e1, zSet := range a.innerMap {
-		if e1.String() == "" {
+		if e1 == "" {
 			continue
 		}
 
@@ -168,7 +168,7 @@ func (a SetPrefixVerzeichnisse) Subset(
 
 				if intersection.Len() > 0 && !exactMatch {
 					for _, e2 := range iter.Elements[kennung.Etikett](intersection) {
-						out.Grouped.addPair(e2, z)
+						out.Grouped.addPair(e2.String(), z)
 					}
 				} else {
 					out.Ungrouped.Add(z)

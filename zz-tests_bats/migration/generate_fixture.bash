@@ -1,4 +1,4 @@
-#! /bin/bash -e
+#! /bin/bash -ex
 
 dir_base="$(realpath "$(dirname "$0")")"
 zit="$(realpath build/zit)"
@@ -26,6 +26,8 @@ pushd "$d"
 this is the body aiiiiight
 EOM
 
+[ "$(zit show -format etiketten one/uno)" = "tag-1, tag-2" ]
+
 "$zit" new -predictable-hinweisen -edit=false - <<EOM
 ---
 # wow ok again
@@ -36,6 +38,8 @@ EOM
 
 not another one
 EOM
+
+[ "$(zit show -format etiketten one/dos)" = "tag-3, tag-4" ]
 
 "$zit" checkout one/uno
 cat >one/uno.zettel <<EOM
@@ -50,3 +54,5 @@ last time
 EOM
 
 "$zit" checkin -delete one/uno.zettel
+
+[ "$(zit show -format etiketten one/uno)" = "tag-3, tag-4" ]
