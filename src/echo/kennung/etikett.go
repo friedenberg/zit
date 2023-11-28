@@ -51,24 +51,12 @@ func (e Etikett) GetQueryPrefix() string {
 	return "-"
 }
 
-func (e *Etikett) GetEtikett() Etikett {
-	return *e
-}
-
-func (e *Etikett) GetEtikettPtr() *Etikett {
-	return e
-}
-
 func (e Etikett) GetGattung() schnittstellen.GattungLike {
 	return gattung.Etikett
 }
 
-func (e *Etikett) ResetWith(e1 Etikett) {
-	*e = e1
-}
-
 func (e *Etikett) Reset() {
-	e.value = ""
+	EtikettResetter.Reset(e)
 }
 
 func (a Etikett) EqualsAny(b any) bool {
@@ -88,7 +76,7 @@ func (e Etikett) Bytes() []byte {
 }
 
 func (e Etikett) Parts() [3]string {
-	v := e.value
+	v := e.String()
 
 	if strings.HasPrefix(v, "-") {
 		v = v[1:]
