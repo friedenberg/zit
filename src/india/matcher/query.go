@@ -480,13 +480,16 @@ func (ms query) GetEtiketten() kennung.EtikettSet {
 	for _, s := range ms.Gattung {
 		VisitAllMatcherKennungSansGattungWrappers(
 			func(m MatcherKennungSansGattungWrapper) (err error) {
-				e, ok := m.GetKennung().(kennung.EtikettLike)
+				switch et := m.GetKennung().(type) {
+				case kennung.Etikett:
+					return es.AddPtr(&et)
 
-				if !ok {
+				case *kennung.Etikett:
+					return es.AddPtr(et)
+
+				default:
 					return
 				}
-
-				return es.AddPtr(e.GetEtikettPtr())
 			},
 			IsMatcherNegate,
 			// TODO-P1 modify sigil matcher to allow child traversal

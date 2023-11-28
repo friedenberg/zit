@@ -14,12 +14,6 @@ func init() {
 	register(Etikett{})
 }
 
-type EtikettLike interface {
-	GetEtikett() Etikett
-	GetEtikettPtr() *Etikett
-	schnittstellen.StringerGattungGetter
-}
-
 const EtikettRegexString = `^[-a-z0-9_]+$`
 
 var EtikettRegex *regexp.Regexp

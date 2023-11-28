@@ -119,7 +119,7 @@ func KennungContainsExactlyMatchable(
 	m *sku.Transacted,
 ) bool {
 	switch kt := k.(type) {
-	case kennung.EtikettLike:
+	case kennung.Etikett, *kennung.Etikett:
 		es := m.Metadatei.GetEtiketten()
 
 		if es.ContainsKey(kt.String()) {
@@ -153,7 +153,7 @@ func KennungContainsMatchable(
 	// log.Debug().Printf("%q -> %q", k, m.GetKennungLikePtr())
 
 	switch kt := k.(type) {
-	case kennung.EtikettLike:
+	case kennung.Etikett, *kennung.Etikett:
 		s := kt.String()
 
 		if me.GetEtiketten().ContainsKey(s) {
