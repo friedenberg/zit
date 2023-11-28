@@ -30,7 +30,7 @@ type (
 	}
 
 	StringFormatWriter[T any] interface {
-		WriteStringFormat(io.StringWriter, T) (int64, error)
+		WriteStringFormat(WriterAndStringWriter, T) (int64, error)
 	}
 
 	StringFormatReadWriter[T any] interface {
@@ -38,5 +38,5 @@ type (
 		StringFormatWriter[T]
 	}
 
-	FuncStringWriterFormat[T any] func(io.StringWriter, T) (int64, error)
+	FuncStringWriterFormat[T any] func(WriterAndStringWriter, T) (int64, error)
 )

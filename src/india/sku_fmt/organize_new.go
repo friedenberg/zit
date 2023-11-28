@@ -16,7 +16,7 @@ type organizeNew struct {
 	options erworben_cli_print_options.PrintOptions
 
 	shaStringFormatWriter         schnittstellen.StringFormatWriter[schnittstellen.ShaLike]
-	kennungStringFormatWriter     schnittstellen.StringFormatWriter[kennung.Kennung2]
+	kennungStringFormatWriter     schnittstellen.StringFormatWriter[*kennung.Kennung2]
 	typStringFormatWriter         schnittstellen.StringFormatWriter[*kennung.Typ]
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung]
 	etikettenStringFormatWriter   schnittstellen.StringFormatWriter[kennung.EtikettSet]
@@ -27,7 +27,7 @@ type organizeNew struct {
 func MakeOrganizeNewFormat(
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],
-	kennungStringFormatWriter schnittstellen.StringFormatWriter[kennung.Kennung2],
+	kennungStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Kennung2],
 	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],
 	etikettenStringFormatWriter schnittstellen.StringFormatWriter[kennung.EtikettSet],
@@ -61,7 +61,7 @@ func (f *organizeNew) ReadStringFormat(
 }
 
 func (f *organizeNew) WriteStringFormat(
-	sw io.StringWriter,
+	sw schnittstellen.WriterAndStringWriter,
 	o *sku.Transacted,
 ) (n int64, err error) {
 	var n1 int

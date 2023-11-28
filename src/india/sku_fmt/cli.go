@@ -1,8 +1,6 @@
 package sku_fmt
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -20,7 +18,7 @@ type cli struct {
 	writeEtiketten   bool
 
 	shaStringFormatWriter         schnittstellen.StringFormatWriter[schnittstellen.ShaLike]
-	kennungStringFormatWriter     schnittstellen.StringFormatWriter[kennung.Kennung2]
+	kennungStringFormatWriter     schnittstellen.StringFormatWriter[*kennung.Kennung2]
 	typStringFormatWriter         schnittstellen.StringFormatWriter[*kennung.Typ]
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung]
 	etikettenStringFormatWriter   schnittstellen.StringFormatWriter[kennung.EtikettSet]
@@ -28,7 +26,7 @@ type cli struct {
 
 func MakeCliFormatShort(
 	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],
-	kennungStringFormatWriter schnittstellen.StringFormatWriter[kennung.Kennung2],
+	kennungStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Kennung2],
 	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],
 	etikettenStringFormatWriter schnittstellen.StringFormatWriter[kennung.EtikettSet],
@@ -48,7 +46,7 @@ func MakeCliFormatShort(
 func MakeCliFormat(
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],
-	kennungStringFormatWriter schnittstellen.StringFormatWriter[kennung.Kennung2],
+	kennungStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Kennung2],
 	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],
 	etikettenStringFormatWriter schnittstellen.StringFormatWriter[kennung.EtikettSet],
@@ -67,7 +65,7 @@ func MakeCliFormat(
 }
 
 func (f *cli) WriteStringFormat(
-	sw io.StringWriter,
+	sw schnittstellen.WriterAndStringWriter,
 	o *sku.Transacted,
 ) (n int64, err error) {
 	var n1 int
@@ -103,7 +101,7 @@ func (f *cli) WriteStringFormat(
 	var n2 int64
 	n2, err = f.kennungStringFormatWriter.WriteStringFormat(
 		sw,
-		o.Kennung,
+		&o.Kennung,
 	)
 	n += n2
 

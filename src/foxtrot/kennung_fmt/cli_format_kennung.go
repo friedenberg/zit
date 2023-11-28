@@ -1,8 +1,6 @@
 package kennung_fmt
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -33,21 +31,25 @@ func MakeKennungCliFormat(
 }
 
 func (f *kennungCliFormat) WriteStringFormat(
-	w io.StringWriter,
-	k kennung.Kennung2,
+	w schnittstellen.WriterAndStringWriter,
+	k *kennung.Kennung2,
 ) (n int64, err error) {
 	if f.options.Abbreviations.Hinweisen {
-		if k, err = f.abbr.AbbreviateHinweisOnly(k); err != nil {
+		k1 := kennung.GetKennungPool().Get()
+		defer kennung.GetKennungPool().Put(k1)
+		k1.ResetWithKennungPtr(k)
+
+		if err = f.abbr.AbbreviateHinweisOnly(k1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	parts := k.Parts()
+	parts := k.PartsStrings()
 
 	var n1 int64
 
-	n1, err = f.stringFormatWriter.WriteStringFormat(w, parts[0])
+	n1, err = parts[0].WriteToStringWriter(w)
 	n += n1
 
 	if err != nil {
@@ -56,7 +58,7 @@ func (f *kennungCliFormat) WriteStringFormat(
 	}
 
 	var n2 int
-	n2, err = w.WriteString(parts[1])
+	n1, err = parts[1].WriteToStringWriter(w)
 	n += int64(n2)
 
 	if err != nil {
@@ -64,7 +66,7 @@ func (f *kennungCliFormat) WriteStringFormat(
 		return
 	}
 
-	n1, err = f.stringFormatWriter.WriteStringFormat(w, parts[2])
+	n1, err = parts[2].WriteToStringWriter(w)
 	n += n1
 
 	if err != nil {

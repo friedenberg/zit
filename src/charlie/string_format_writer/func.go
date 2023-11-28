@@ -1,8 +1,6 @@
 package string_format_writer
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
@@ -15,7 +13,7 @@ func MakeFunc[T any](
 type funk[T any] schnittstellen.FuncStringWriterFormat[T]
 
 func (f funk[T]) WriteStringFormat(
-	w io.StringWriter,
+	w schnittstellen.WriterAndStringWriter,
 	e T,
 ) (int64, error) {
 	return schnittstellen.FuncStringWriterFormat[T](f)(w, e)

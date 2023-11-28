@@ -1,9 +1,11 @@
 package objekte_format
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/ohio_ring_buffer2"
 	"github.com/friedenberg/zit/src/charlie/sha"
@@ -31,6 +33,14 @@ var (
 	keyVerzeichnisseSha             = []byte("Verzeichnisse-Sha")
 )
 
+var (
+	errV4ExpectedNewline           = errors.New("expected newline")
+	errV4ExpectedSpaceSeparatedKey = errors.New("expected space separated key")
+	errV4EmptyKey                  = errors.New("empty key")
+	errV4KeysNotSorted             = errors.New("keys not sorted")
+	errV4InvalidKey                = errors.New("invalid key")
+)
+
 func (f v4) ParsePersistentMetadatei(
 	r *ohio_ring_buffer2.RingBuffer,
 	c ParserContext,
@@ -40,13 +50,13 @@ func (f v4) ParsePersistentMetadatei(
 
 	var (
 		g gattung.Gattung
-		k kennung.Kennung2
+		k *kennung.Kennung2
 	)
 
 	var (
-		lastKey        []byte
-		line, key, val ohio_ring_buffer2.Slice
-		ok             bool
+		lastKey, valBuffer catgut.String
+		line, key, val     ohio_ring_buffer2.Slice
+		ok                 bool
 	)
 
 	mh := sha.MakeWriter(nil)
@@ -60,7 +70,7 @@ func (f v4) ParsePersistentMetadatei(
 		}
 
 		if !ok && err != io.EOF {
-			err = errors.Errorf("expected a newline terminated string %q", line)
+			err = errV4ExpectedNewline
 			return
 		}
 
@@ -71,24 +81,33 @@ func (f v4) ParsePersistentMetadatei(
 		key, val, ok = line.Cut(' ')
 
 		if !ok {
-			err = errors.Errorf("expected space-separated key-value but got %q", line)
+			err = errV4ExpectedSpaceSeparatedKey
 			break
 		}
 
 		if key.Len() == 0 {
-			err = errors.Errorf("empty key at line %d", lineNo)
+			err = errV4EmptyKey
 			break
 		}
 
-		if len(lastKey) > 0 && key.Compare(lastKey) == 1 {
-			err = errors.Errorf("keys not sorted: last: %q, current: %q", lastKey, key)
+		if lastKey.Len() > 0 && key.Compare(lastKey.Bytes()) == 1 {
+			err = errV4KeysNotSorted
 			break
+		}
+
+		{
+			valBuffer.Reset()
+			n, err := val.WriteTo(&valBuffer)
+
+			if n != int64(val.Len()) || err != nil {
+				panic(fmt.Sprintf("failed to write val to valBuffer. N: %d, Err: %s", n, err))
+			}
 		}
 
 		writeMetadateiHashString := false
 
 		if key.Equal(keyAkte) {
-			if err = m.AkteSha.Set(val.String()); err != nil {
+			if err = m.AkteSha.SetBytes(valBuffer.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -124,6 +143,9 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 		} else if key.Equal(keyKennung) {
+			k = kennung.GetKennungPool().Get()
+			defer kennung.GetKennungPool().Put(k)
+
 			if err = k.SetWithGattung(val.String(), g); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -210,7 +232,7 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 		} else {
-			err = errors.Errorf("not a valid key: %q", key)
+			err = errV4InvalidKey
 			break
 		}
 
@@ -218,7 +240,20 @@ func (f v4) ParsePersistentMetadatei(
 		thisN := int64(key.Len() + 1 + val.Len() + 1)
 		n += thisN
 
-		lastKey = []byte(key.String())
+		{
+			lastKey.Reset()
+			n, err := key.WriteTo(&lastKey)
+
+			if n != int64(key.Len()) || err != nil {
+				panic(
+					fmt.Sprintf(
+						"failed to write everything to lastKey. N: %d, err: %s",
+						n,
+						err,
+					),
+				)
+			}
+		}
 
 		lineNo++
 

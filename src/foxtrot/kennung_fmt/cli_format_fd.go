@@ -1,8 +1,6 @@
 package kennung_fmt
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/string_format_writer"
@@ -27,7 +25,7 @@ func MakeFDCliFormat(
 }
 
 func (f *fdCliFormat) WriteStringFormat(
-	w io.StringWriter,
+	w schnittstellen.WriterAndStringWriter,
 	k *fd.FD,
 ) (n int64, err error) {
 	// TODO-P2 add abbreviation

@@ -1,8 +1,6 @@
 package umwelt
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/string_format_writer"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
@@ -30,7 +28,7 @@ func (u *Umwelt) StringFormatWriterShaLike(
 
 func (u *Umwelt) StringFormatWriterKennung(
 	co string_format_writer.ColorOptions,
-) schnittstellen.StringFormatWriter[kennung.Kennung2] {
+) schnittstellen.StringFormatWriter[*kennung.Kennung2] {
 	return kennung_fmt.MakeKennungCliFormat(
 		u.konfig.PrintOptions,
 		co,
@@ -121,7 +119,7 @@ func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[*sku.Transacted
 		"\n",
 		u.Out(),
 		string_format_writer.MakeFunc[*sku.Transacted](
-			func(w io.StringWriter, o *sku.Transacted) (n int64, err error) {
+			func(w schnittstellen.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
 				return sw.WriteStringFormat(w, o)
 			},
 		),

@@ -1,8 +1,6 @@
 package sku
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
@@ -24,7 +22,7 @@ type cli struct {
 
 	rightAlignedWriter            schnittstellen.StringFormatWriter[string]
 	shaStringFormatWriter         schnittstellen.StringFormatWriter[schnittstellen.ShaLike]
-	kennungStringFormatWriter     schnittstellen.StringFormatWriter[kennung.Kennung2]
+	kennungStringFormatWriter     schnittstellen.StringFormatWriter[*kennung.Kennung2]
 	fdStringFormatWriter          schnittstellen.StringFormatWriter[*fd.FD]
 	typStringFormatWriter         schnittstellen.StringFormatWriter[*kennung.Typ]
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung]
@@ -35,7 +33,7 @@ func MakeCliFormat(
 	options CliOptions,
 	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],
 	fdStringFormatWriter schnittstellen.StringFormatWriter[*fd.FD],
-	kennungStringFormatWriter schnittstellen.StringFormatWriter[kennung.Kennung2],
+	kennungStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Kennung2],
 	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],
 	etikettenStringFormatWriter schnittstellen.StringFormatWriter[kennung.EtikettSet],
@@ -56,7 +54,7 @@ func MakeCliFormat(
 }
 
 func (f *cli) WriteStringFormat(
-	sw io.StringWriter,
+	sw schnittstellen.WriterAndStringWriter,
 	colp *CheckedOut,
 ) (n int64, err error) {
 	var (
@@ -95,7 +93,7 @@ func (f *cli) WriteStringFormat(
 	if m == checkout_mode.ModeAkteOnly {
 		n2, err = f.kennungStringFormatWriter.WriteStringFormat(
 			sw,
-			o.Kennung,
+			&o.Kennung,
 		)
 		n += n2
 

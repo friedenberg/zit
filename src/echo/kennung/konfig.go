@@ -1,6 +1,7 @@
 package kennung
 
 import (
+	"bytes"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -11,6 +12,16 @@ import (
 
 func init() {
 	register(Konfig{})
+}
+
+var konfigBytes = []byte("konfig")
+
+func ErrOnKonfigBytes(b []byte) (err error) {
+	if bytes.Equal(b, konfigBytes) {
+		return errors.Errorf("cannot be %q", "konfig")
+	}
+
+	return nil
 }
 
 func ErrOnKonfig(v string) (err error) {

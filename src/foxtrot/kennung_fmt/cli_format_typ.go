@@ -1,8 +1,6 @@
 package kennung_fmt
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/string_format_writer"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -23,7 +21,7 @@ func MakeTypCliFormat(co string_format_writer.ColorOptions) *typCliFormat {
 }
 
 func (f *typCliFormat) WriteStringFormat(
-	w io.StringWriter,
+	w schnittstellen.WriterAndStringWriter,
 	k *kennung.Typ,
 ) (n int64, err error) {
 	v := k.String()

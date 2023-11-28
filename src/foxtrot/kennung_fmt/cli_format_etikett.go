@@ -1,8 +1,6 @@
 package kennung_fmt
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/string_format_writer"
@@ -20,7 +18,7 @@ func MakeEtikettenCliFormat() *etikettenCliFormat {
 }
 
 func (f *etikettenCliFormat) WriteStringFormat(
-	w io.StringWriter,
+	w schnittstellen.WriterAndStringWriter,
 	k kennung.EtikettSet,
 ) (n int64, err error) {
 	if k.Len() == 0 {

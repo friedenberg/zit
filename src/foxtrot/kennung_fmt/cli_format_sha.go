@@ -1,8 +1,6 @@
 package kennung_fmt
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -35,7 +33,7 @@ func MakeShaCliFormat(
 }
 
 func (f *shaCliFormat) WriteStringFormat(
-	w io.StringWriter,
+	w schnittstellen.WriterAndStringWriter,
 	s schnittstellen.ShaLike,
 ) (n int64, err error) {
 	v := s.String()

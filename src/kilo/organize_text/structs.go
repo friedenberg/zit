@@ -25,8 +25,8 @@ func makeObj(
 	}
 
 	if options.Abbreviations.Hinweisen {
-		if z.Sku.Kennung, err = expanders.AbbreviateHinweisOnly(
-			z.Sku.Kennung,
+		if err = expanders.AbbreviateHinweisOnly(
+			&z.Sku.Kennung,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -117,8 +117,8 @@ func (z *obj) setExistingObj(
 	}
 
 	if options.Abbreviations.Hinweisen {
-		if z.Sku.Kennung, err = ex.AbbreviateHinweisOnly(
-			z.Sku.Kennung,
+		if err = ex.AbbreviateHinweisOnly(
+			&z.Sku.Kennung,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

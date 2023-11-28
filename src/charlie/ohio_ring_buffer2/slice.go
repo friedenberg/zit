@@ -48,11 +48,20 @@ func (rs Slice) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 func (rs Slice) Bytes() []byte {
-	var b bytes.Buffer
-	b.Grow(rs.Len())
-	b.Write(rs.First())
-	b.Write(rs.Second())
-	return b.Bytes()
+	switch {
+	case len(rs.First()) == rs.Len():
+		return rs.First()
+
+	case len(rs.Second()) == rs.Len():
+		return rs.Second()
+
+	default:
+		var b bytes.Buffer
+		b.Grow(rs.Len())
+		b.Write(rs.First())
+		b.Write(rs.Second())
+		return b.Bytes()
+	}
 }
 
 func (rs Slice) String() string {
@@ -93,7 +102,7 @@ func (rs Slice) Compare(b []byte) (c int) {
 	}
 
 	if len(b) > len(rs.First()) && c == 0 {
-		c = bytes.Compare(b[len(rs.Second()):], rs.Second())
+		c = bytes.Compare(b[len(rs.First()):], rs.Second())
 	}
 
 	return

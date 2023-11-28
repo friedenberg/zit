@@ -20,6 +20,15 @@ func (v *Verzeichnisse) GetExpandedEtiketten() kennung.EtikettSet {
 	return v.GetExpandedEtikettenMutable()
 }
 
+func (v *Verzeichnisse) AddEtikettExpandedPtr(e *kennung.Etikett) (err error) {
+	return iter.AddClonePool[kennung.Etikett, *kennung.Etikett](
+		v.GetExpandedEtikettenMutable(),
+		kennung.GetEtikettPool(),
+		kennung.EtikettResetter,
+		e,
+	)
+}
+
 func (v *Verzeichnisse) GetExpandedEtikettenMutable() kennung.EtikettMutableSet {
 	if v.ExpandedEtiketten == nil {
 		v.ExpandedEtiketten = kennung.MakeEtikettMutableSet()
@@ -41,6 +50,15 @@ func (v *Verzeichnisse) SetExpandedEtiketten(e kennung.EtikettSet) {
 
 func (v *Verzeichnisse) GetImplicitEtiketten() kennung.EtikettSet {
 	return v.GetImplicitEtikettenMutable()
+}
+
+func (v *Verzeichnisse) AddEtikettImplicitPtr(e *kennung.Etikett) (err error) {
+	return iter.AddClonePool[kennung.Etikett, *kennung.Etikett](
+		v.GetImplicitEtikettenMutable(),
+		kennung.GetEtikettPool(),
+		kennung.EtikettResetter,
+		e,
+	)
 }
 
 func (v *Verzeichnisse) GetImplicitEtikettenMutable() kennung.EtikettMutableSet {

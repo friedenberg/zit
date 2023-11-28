@@ -52,15 +52,14 @@ func (ao abbrOne[V, VPtr]) AbbreviateKennung(
 }
 
 func (a Abbr) AbbreviateHinweisOnly(
-	in Kennung2,
-) (out Kennung2, err error) {
+	in *Kennung2,
+) (err error) {
 	var getAbbr func(Kennung) (string, error)
 
 	var h Hinweis
 
 	if err = h.Set(in.String()); err != nil {
 		err = nil
-		out = in
 		return
 	}
 
@@ -73,7 +72,7 @@ func (a Abbr) AbbreviateHinweisOnly(
 		return
 	}
 
-	if err = out.SetWithGattung(abbr, h); err != nil {
+	if err = in.SetWithGattung(abbr, h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

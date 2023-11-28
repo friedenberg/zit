@@ -1,8 +1,6 @@
 package string_format_writer
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
@@ -29,7 +27,7 @@ func MakeColor[T any](
 }
 
 func (f *color[T]) WriteStringFormat(
-	sw io.StringWriter,
+	sw schnittstellen.WriterAndStringWriter,
 	e T,
 ) (n int64, err error) {
 	if f.options.OffEntirely {

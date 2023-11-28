@@ -29,7 +29,7 @@ func (s Standort) MakeRelativePathStringFormatWriter() schnittstellen.StringForm
 type relativePathStringFormatWriter Standort
 
 func (f relativePathStringFormatWriter) WriteStringFormat(
-	w io.StringWriter,
+	w schnittstellen.WriterAndStringWriter,
 	p string,
 ) (n int64, err error) {
 	var n1 int

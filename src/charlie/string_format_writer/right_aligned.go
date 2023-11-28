@@ -1,7 +1,6 @@
 package string_format_writer
 
 import (
-	"io"
 	"strings"
 	"unicode/utf8"
 
@@ -16,7 +15,7 @@ func MakeRightAligned() schnittstellen.StringFormatWriter[string] {
 type rightAligned struct{}
 
 func (f rightAligned) WriteStringFormat(
-	w io.StringWriter,
+	w schnittstellen.WriterAndStringWriter,
 	v string,
 ) (n int64, err error) {
 	diff := LenStringMax + 1 - utf8.RuneCountInString(v)

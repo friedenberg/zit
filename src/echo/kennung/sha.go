@@ -92,6 +92,10 @@ func (a Sha) EqualsSha(b schnittstellen.ShaLike) bool {
 	return a.value.EqualsSha(b)
 }
 
+func (t Sha) GetShaBytes() []byte {
+	return t.value.GetShaBytes()
+}
+
 func (t Sha) GetShaString() string {
 	return t.value.GetShaString()
 }

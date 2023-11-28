@@ -1,8 +1,6 @@
 package string_format_writer
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
@@ -14,7 +12,7 @@ func MakeString[T ~string]() schnittstellen.StringFormatWriter[T] {
 }
 
 func (f *streeng[T]) WriteStringFormat(
-	sw io.StringWriter,
+	sw schnittstellen.WriterAndStringWriter,
 	e T,
 ) (n int64, err error) {
 	var n1 int

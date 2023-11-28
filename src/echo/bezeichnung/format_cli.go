@@ -1,8 +1,6 @@
 package bezeichnung
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/string_format_writer"
 )
@@ -24,7 +22,7 @@ func MakeCliFormat2(
 }
 
 func (f *bezeichnungCliFormat) WriteStringFormat(
-	w io.StringWriter,
+	w schnittstellen.WriterAndStringWriter,
 	k *Bezeichnung,
 ) (n int64, err error) {
 	v := k.value

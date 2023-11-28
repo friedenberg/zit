@@ -1,8 +1,6 @@
 package string_format_writer
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
@@ -20,7 +18,7 @@ type bracketWrapped[T any] struct {
 }
 
 func (f bracketWrapped[T]) WriteStringFormat(
-	w io.StringWriter,
+	w schnittstellen.WriterAndStringWriter,
 	e T,
 ) (n int64, err error) {
 	var (

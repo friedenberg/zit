@@ -1,8 +1,6 @@
 package string_format_writer
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
@@ -24,7 +22,7 @@ type indentedHeader struct {
 }
 
 func (f indentedHeader) WriteStringFormat(
-	w io.StringWriter,
+	w schnittstellen.WriterAndStringWriter,
 	v string,
 ) (n int64, err error) {
 	// n1 int

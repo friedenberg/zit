@@ -55,7 +55,7 @@ func FormatForVersion(sv schnittstellen.StoreVersion) Format {
 	v := sv.GetInt()
 
 	switch {
-	case v >= 4:
+	case v >= 3:
 		return v4{}
 
 	default:

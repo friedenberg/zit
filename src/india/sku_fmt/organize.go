@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
@@ -33,11 +34,11 @@ func (f *organize) ReadStringFormat(
 	sw io.Reader,
 	o *sku.Transacted,
 ) (n int64, err error) {
-  return
+	return
 }
 
 func (f *organize) WriteStringFormat(
-	sw io.StringWriter,
+	sw schnittstellen.WriterAndStringWriter,
 	o *sku.Transacted,
 ) (n int64, err error) {
 	var n1 int

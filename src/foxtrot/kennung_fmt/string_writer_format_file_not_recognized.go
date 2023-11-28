@@ -1,8 +1,6 @@
 package kennung_fmt
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/string_format_writer"
@@ -27,7 +25,7 @@ func MakeFileNotRecognizedStringWriterFormat(
 }
 
 func (f *fileNotRecognizedStringWriterFormat) WriteStringFormat(
-	sw io.StringWriter,
+	sw schnittstellen.WriterAndStringWriter,
 	fd *fd.FD,
 ) (n int64, err error) {
 	var (

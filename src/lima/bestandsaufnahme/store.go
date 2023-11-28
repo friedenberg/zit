@@ -210,16 +210,33 @@ func (s *store) ReadOne(
 	}
 
 	switch s.sv.GetInt() {
-	case 0, 1, 2, 3:
+	case 0, 1, 2:
 		panic("unsupported version")
 
 	default:
+		op := s.options
 		err = sku.CalculateAndConfirmSha(
 			o,
 			s.persistentMetadateiFormat,
-			s.options,
+			op,
 			sh,
 		)
+
+		if err != nil {
+			op.IncludeTai = false
+
+			err = sku.CalculateAndConfirmSha(
+				o,
+				s.persistentMetadateiFormat,
+				op,
+				sh,
+			)
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
 
 		if err != nil {
 			err = errors.Wrapf(err, "Sku: %q, Read: %q, N: %d", o, sb.String(), n)
