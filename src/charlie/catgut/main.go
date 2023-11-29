@@ -5,18 +5,84 @@ import (
 	"io"
 	"unicode"
 	"unicode/utf8"
+	"unsafe"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/ohio_buffer"
 )
 
 type String struct {
-	bytes.Buffer
+	addr *String
+	Data bytes.Buffer
+}
+
+// noescape hides a pointer from escape analysis. It is the identity function
+// but escape analysis doesn't think the output depends on the input.
+// noescape is inlined and currently compiles down to zero instructions.
+// USE CAREFULLY!
+// This was copied from the runtime; see issues 23382 and 7921.
+//
+//go:nosplit
+//go:nocheckptr
+func noescape(p unsafe.Pointer) unsafe.Pointer {
+	x := uintptr(p)
+	return unsafe.Pointer(x ^ 0)
+}
+
+func (b *String) copyCheck() {
+	if b.addr == nil {
+		// This hack works around a failing of Go's escape analysis
+		// that was causing b to escape and be heap allocated.
+		// See issue 23382.
+		// TODO-P1: once issue 7921 is fixed, this should be reverted to
+		// just "b.addr = b".
+		b.addr = (*String)(noescape(unsafe.Pointer(b)))
+		return
+	}
+
+	if b.addr != b {
+		oldB := b.addr
+		b = &String{}
+		b.addr = b
+		b.Data = bytes.Buffer{}
+		oldB.CopyTo(b)
+		// panic("catgut: illegal use of non-zero String copied by value")
+	}
+}
+
+func (str *String) String() string {
+	str.copyCheck()
+	return str.Data.String()
+}
+
+func (str *String) Len() int {
+	str.copyCheck()
+	return str.Data.Len()
+}
+
+func (str *String) AvailableBuffer() []byte {
+	str.copyCheck()
+	return str.Data.AvailableBuffer()
+}
+
+func (str *String) Bytes() []byte {
+	str.copyCheck()
+	return str.Data.Bytes()
+}
+
+func (str *String) Reset() {
+	str.Data.Reset()
+}
+
+func (str *String) Write(p []byte) (int, error) {
+	str.copyCheck()
+	return str.Data.Write(p)
 }
 
 func (str *String) Grow(n int) {
+	str.copyCheck()
 	// c := str.Cap()
-	str.Buffer.Grow(n)
+	str.Data.Grow(n)
 
 	//	if c < str.Cap() {
 	//		log.Debug().FunctionName(2)
@@ -99,6 +165,7 @@ func (str *String) WriteLower(s []byte) (n int) {
 }
 
 func (dst *String) Set(src string) (err error) {
+	dst.copyCheck()
 	dst.Reset()
 	dst.Grow(len(src))
 

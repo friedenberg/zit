@@ -193,7 +193,7 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-			if err = m.Verzeichnisse.GetImplicitEtikettenMutable().AddPtr(e); err != nil {
+			if err = m.Verzeichnisse.AddEtikettImplicitPtr(e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -214,7 +214,7 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-			if err = m.Verzeichnisse.GetExpandedEtikettenMutable().AddPtr(e); err != nil {
+			if err = m.Verzeichnisse.AddEtikettExpandedPtr(e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

@@ -68,7 +68,8 @@ func init() {
 				"filter",
 				"a script to run for each file to transform it the standard zettel format",
 			)
-			c.ProtoZettel.AddToFlagSet(f)
+
+			c.AddToFlagSet(f)
 
 			return c
 		},

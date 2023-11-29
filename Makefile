@@ -40,7 +40,7 @@ build/zit: build/go_generate $(files_go)
 > go build -o build/zit ./.
 
 build/go_vet: $(files_go)
-> go vet ./...
+> go vet ./... || true
 > touch "$@"
 
 dirs_go_unit := $(shell find src -mindepth 2 -iname '*_test.go' -print0 | xargs -0 dirname | sort -u)

@@ -36,13 +36,22 @@ func Strings[E schnittstellen.Stringer](
 	cs ...schnittstellen.SetLike[E],
 ) (out []string) {
 	l := 0
+
 	for _, c := range cs {
+		if c == nil {
+			continue
+		}
+
 		l += c.Len()
 	}
 
 	out = make([]string, 0, l)
 
 	for _, c := range cs {
+		if c == nil {
+			continue
+		}
+
 		err := c.Each(
 			func(e E) (err error) {
 				out = append(out, e.String())
@@ -70,6 +79,10 @@ func StringDelimiterSeparated[E schnittstellen.Value[E]](
 	d string,
 	cs ...schnittstellen.SetLike[E],
 ) string {
+	if cs == nil {
+		return ""
+	}
+
 	sorted := SortedStrings[E](cs...)
 
 	if len(sorted) == 0 {
