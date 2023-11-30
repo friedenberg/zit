@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/srx/bravo/expansion"
 )
 
 func (w *Writer) zettelToItem(
@@ -62,14 +63,13 @@ func (w *Writer) zettelToItem(
 
 	t := z.GetTyp()
 
-	if ti, err := w.typenIndex.Get(&t); err == nil {
-		ti.GetExpandedAll().Each(
-			func(t kennung.Typ) (err error) {
-				mb.AddMatches(t.String())
-				return
-			},
-		)
-	}
+	expansion.ExpanderAll.Expand(
+		func(v string) (err error) {
+			mb.AddMatches(v)
+      return
+		},
+		t.String(),
+	)
 
 	// if ha != nil {
 	// 	var h hinweis.Hinweis

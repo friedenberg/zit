@@ -423,6 +423,16 @@ func ExpandMany[T KennungLike[T], TPtr KennungLikePtr[T]](
 	return
 }
 
+func ExpandOneTo[T KennungLike[T], TPtr KennungLikePtr[T]](
+	k TPtr,
+	ex expansion.Expander,
+	s1 schnittstellen.FuncSetString,
+) (out schnittstellen.SetPtrLike[T, TPtr]) {
+	ex.Expand(s1, k.String())
+
+	return
+}
+
 func Expanded(s EtikettSet, ex expansion.Expander) (out EtikettSet) {
 	return ExpandMany[Etikett, *Etikett](s, ex)
 }

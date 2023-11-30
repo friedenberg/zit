@@ -28,18 +28,16 @@ func (ex expanderRight) Expand(
 		return
 	}
 
-	hyphens := ex.delimiter.FindAllIndex([]byte(s), -1)
+	delim := ex.delimiter.FindAllIndex([]byte(s), -1)
 
-	if hyphens == nil {
+	if delim == nil {
 		return
 	}
 
-	for _, loc := range hyphens {
+	for _, loc := range delim {
 		locStart := loc[0]
 		t1 := s[0:locStart]
 
 		sa(t1)
 	}
-
-	return
 }

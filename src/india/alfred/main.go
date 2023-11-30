@@ -16,7 +16,6 @@ import (
 type Writer struct {
 	alfredWriter   *alfred.Writer
 	kennungIndex   kennung_index.Index
-	typenIndex     kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
 	etikettenIndex kennung_index.EtikettIndex
 	Abbr           func(kennung.Hinweis) (string, error)
 }
@@ -24,7 +23,6 @@ type Writer struct {
 func New(
 	out io.Writer,
 	kennungIndex kennung_index.Index,
-	typenIndex kennung_index.KennungIndex[kennung.Typ, *kennung.Typ],
 	etikettenIndex kennung_index.EtikettIndex,
 	ha func(kennung.Hinweis) (string, error),
 ) (w *Writer, err error) {
@@ -39,14 +37,9 @@ func New(
 		panic("kennungIndex was nil")
 	}
 
-	if typenIndex == nil {
-		panic("typenIndex was nil")
-	}
-
 	w = &Writer{
 		Abbr:           ha,
 		kennungIndex:   kennungIndex,
-		typenIndex:     typenIndex,
 		etikettenIndex: etikettenIndex,
 		alfredWriter:   aw,
 	}
