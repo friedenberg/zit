@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/india/matcher"
@@ -414,20 +413,9 @@ func (s *Store) AddMatchable(m *sku.Transacted) (err error) {
 }
 
 func (s *Store) addMatchableCommon(m *sku.Transacted) (err error) {
-	t := m.GetTyp()
-
-	if !t.IsEmpty() {
-		var ti kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
-
-		if ti, err = s.GetTypenIndex(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = ti.StoreOne(m.GetTyp()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = s.AddTypToIndex(&m.Metadatei.Typ); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if err = s.GetAbbrStore().AddMatchable(m); err != nil {
@@ -438,9 +426,7 @@ func (s *Store) addMatchableCommon(m *sku.Transacted) (err error) {
 	return
 }
 
-func (s *Store) GetReindexFunc(
-	ti kennung_index.KennungIndex[kennung.Typ, *kennung.Typ],
-) func(*sku.Transacted) error {
+func (s *Store) GetReindexFunc() func(*sku.Transacted) error {
 	return func(sk *sku.Transacted) (err error) {
 		errExists := s.StoreUtil.GetAbbrStore().Exists(&sk.Kennung)
 
@@ -454,7 +440,7 @@ func (s *Store) GetReindexFunc(
 			return
 		}
 
-		if err = ti.StoreOne(sk.GetTyp()); err != nil {
+		if err = s.AddTypToIndex(&sk.Metadatei.Typ); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -468,28 +454,18 @@ func (s *Store) GetReindexFunc(
 	}
 }
 
-func (s *Store) resetReindexCommon() (ti kennung_index.KennungIndex[kennung.Typ, *kennung.Typ], err error) {
+func (s *Store) resetReindexCommon() (err error) {
 	if err = s.StoreUtil.GetStandort().ResetVerzeichnisse(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if ti, err = s.GetTypenIndex(); err != nil {
+	if err = s.ResetIndexes(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = ti.Reset(); err != nil {
-		err = errors.Wrapf(err, "failed to reset etiketten index")
-		return
-	}
-
-	if err = s.StoreUtil.GetKennungIndex().Reset(); err != nil {
-		err = errors.Wrapf(err, "failed to reset index kennung")
-		return
-	}
-
-	return
+  return
 }
 
 // TODO-P2 add support for quiet reindexing
@@ -507,14 +483,12 @@ func (s *Store) Reindex() (err error) {
 		s.isReindexing = false
 	}()
 
-	var ti kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
-
-	if ti, err = s.resetReindexCommon(); err != nil {
+	if err = s.resetReindexCommon(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	f1 := s.GetReindexFunc(ti)
+	f1 := s.GetReindexFunc()
 
 	if err = s.GetBestandsaufnahmeStore().ReadAllSkus(f1); err != nil {
 		err = errors.Wrap(err)
@@ -538,7 +512,7 @@ func (s *Store) Reset() (err error) {
 		s.isReindexing = false
 	}()
 
-	if _, err = s.resetReindexCommon(); err != nil {
+	if err = s.resetReindexCommon(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

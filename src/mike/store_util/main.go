@@ -36,7 +36,8 @@ type StoreUtil interface {
 	GetBestandsaufnahmeStore() bestandsaufnahme.Store
 	GetAbbrStore() AbbrStore
 	GetKennungIndex() kennung_index.Index
-	GetTypenIndex() (kennung_index.KennungIndex[kennung.Typ, *kennung.Typ], error)
+	ResetIndexes() (err error)
+	AddTypToIndex(t *kennung.Typ) (err error)
 	GetAkten() *akten.Akten
 	GetFileEncoder() objekte_collections.FileEncoder
 
@@ -249,8 +250,35 @@ func (s *common) GetKennungIndex() kennung_index.Index {
 	return s.kennungIndex
 }
 
-func (s *common) GetTypenIndex() (kennung_index.KennungIndex[kennung.Typ, *kennung.Typ], error) {
-	return s.typenIndex, nil
+func (s *common) ResetIndexes() (err error) {
+	if err = s.typenIndex.Reset(); err != nil {
+		err = errors.Wrapf(err, "failed to reset etiketten index")
+		return
+	}
+
+	if err = s.kennungIndex.Reset(); err != nil {
+		err = errors.Wrapf(err, "failed to reset index kennung")
+		return
+	}
+
+	return
+}
+
+func (s *common) AddTypToIndex(t *kennung.Typ) (err error) {
+	if t == nil {
+		return
+	}
+
+	if t.IsEmpty() {
+		return
+	}
+
+	if err = s.typenIndex.StoreOne(*t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (s common) GetStandort() standort.Standort {
