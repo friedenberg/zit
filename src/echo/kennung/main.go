@@ -50,25 +50,7 @@ type KennungLikePtr[T KennungLike[T]] interface {
 	schnittstellen.SetterPtr[T]
 }
 
-// type IndexedLike[
-// 	T KennungSansGattung,
-// 	TPtr interface {
-// 		schnittstellen.Ptr[T]
-// 		KennungSansGattungPtr
-// 	},
-// ] interface {
-// 	GetInt() int
-// 	GetKennung() T
-// 	GetSchwanzenCount() int
-// 	GetCount() int
-// 	GetTridex() schnittstellen.Tridex
-// 	GetExpandedRight() schnittstellen.SetPtrLike[T, TPtr]
-// 	GetExpandedAll() schnittstellen.SetPtrLike[T, TPtr]
-// }
-
-type Index struct {
-	Etiketten func(*Etikett) (*IndexedLike[Etikett, *Etikett], error)
-}
+type Index struct{}
 
 func Make(v string) (k KennungPtr, err error) {
 	{

@@ -31,11 +31,11 @@ func (t *External) SetFromSkuLike(sk SkuLike) (err error) {
 	return
 }
 
-func (a External) GetKennung() kennung.Kennung {
+func (a *External) GetKennung() kennung.Kennung {
 	return a.Kennung
 }
 
-func (a External) GetMetadatei() metadatei.Metadatei {
+func (a *External) GetMetadatei() metadatei.Metadatei {
 	return a.Metadatei
 }
 
@@ -43,11 +43,11 @@ func (a *External) GetMetadateiPtr() *metadatei.Metadatei {
 	return &a.Metadatei
 }
 
-func (a External) GetGattung() schnittstellen.GattungLike {
+func (a *External) GetGattung() schnittstellen.GattungLike {
 	return a.Kennung.GetGattung()
 }
 
-func (a External) String() string {
+func (a *External) String() string {
 	return fmt.Sprintf(
 		". %s %s %s %s",
 		a.GetGattung(),
@@ -57,7 +57,7 @@ func (a External) String() string {
 	)
 }
 
-func (a External) GetAkteSha() schnittstellen.ShaLike {
+func (a *External) GetAkteSha() schnittstellen.ShaLike {
 	return a.Metadatei.AkteSha
 }
 
@@ -73,23 +73,23 @@ func (a *External) AsTransacted() (b Transacted) {
 	return
 }
 
-func (a External) GetFDs() ExternalFDs {
-	return a.FDs
+func (a *External) GetFDs() *ExternalFDs {
+	return &a.FDs
 }
 
 func (a *External) GetFDsPtr() *ExternalFDs {
 	return &a.FDs
 }
 
-func (a External) GetAkteFD() fd.FD {
+func (a *External) GetAkteFD() fd.FD {
 	return a.FDs.Akte
 }
 
-func (a External) GetAktePath() string {
+func (a *External) GetAktePath() string {
 	return a.FDs.Akte.GetPath()
 }
 
-func (a External) GetObjekteFD() fd.FD {
+func (a *External) GetObjekteFD() fd.FD {
 	return a.FDs.Objekte
 }
 
@@ -100,12 +100,12 @@ func (a *External) ResetWithExternalMaybe(
 	a.Kennung.ResetWithKennung(k)
 	a.ObjekteSha.Reset()
 	metadatei.Resetter.Reset(&a.Metadatei)
-	a.FDs = b.GetFDs()
+	a.FDs.ResetWith(b.GetFDs())
 
 	return
 }
 
-func (a External) EqualsSkuLikePtr(b SkuLike) (ok bool) {
+func (a *External) EqualsSkuLikePtr(b SkuLike) (ok bool) {
 	if !kennung.Equals(a.GetKennung(), b.GetKennungLike()) {
 		return
 	}
@@ -117,11 +117,11 @@ func (a External) EqualsSkuLikePtr(b SkuLike) (ok bool) {
 	return true
 }
 
-func (o External) GetKey() string {
+func (o *External) GetKey() string {
 	return fmt.Sprintf("%s.%s", o.GetGattung(), o.GetKennung())
 }
 
-func (e External) GetCheckoutMode() (m checkout_mode.Mode, err error) {
+func (e *External) GetCheckoutMode() (m checkout_mode.Mode, err error) {
 	switch {
 	case !e.FDs.Objekte.IsEmpty() && !e.FDs.Akte.IsEmpty():
 		m = checkout_mode.ModeObjekteAndAkte

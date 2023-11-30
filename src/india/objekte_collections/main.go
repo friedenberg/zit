@@ -9,7 +9,7 @@ import (
 func ToSliceFilesAkten(
 	s sku.CheckedOutSet,
 ) (out []string, err error) {
-	return iter.DerivedValuesPtr[sku.CheckedOut, *sku.CheckedOut, string](
+	return iter.DerivedValues[*sku.CheckedOut, string](
 		s,
 		func(z *sku.CheckedOut) (e string, err error) {
 			e = z.External.GetAkteFD().GetPath()
@@ -27,7 +27,7 @@ func ToSliceFilesAkten(
 func ToSliceFilesZettelen(
 	s sku.CheckedOutSet,
 ) (out []string, err error) {
-	return iter.DerivedValuesPtr[sku.CheckedOut, *sku.CheckedOut, string](
+	return iter.DerivedValues[*sku.CheckedOut, string](
 		s,
 		func(z *sku.CheckedOut) (e string, err error) {
 			e = z.External.GetObjekteFD().GetPath()

@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/fd"
@@ -26,10 +27,10 @@ type CwdFiles struct {
 	erworben          *konfig.Compiled
 	dir               string
 	// TODO-P4 make private
-	Zettelen  schnittstellen.MutableSetPtrLike[Zettel, *Zettel]
-	Typen     schnittstellen.MutableSetPtrLike[Typ, *Typ]
-	Kisten    schnittstellen.MutableSetPtrLike[Kasten, *Kasten]
-	Etiketten schnittstellen.MutableSetPtrLike[Etikett, *Etikett]
+	Zettelen  schnittstellen.MutableSetLike[*Zettel]
+	Typen     schnittstellen.MutableSetLike[*Typ]
+	Kisten    schnittstellen.MutableSetLike[*Kasten]
+	Etiketten schnittstellen.MutableSetLike[*Etikett]
 	// TODO-P4 make set
 	UnsureAkten      fd.MutableSet
 	EmptyDirectories []fd.FD
@@ -54,7 +55,7 @@ func (fs CwdFiles) EachCreatableMatchable(
 ) (err error) {
 	todo.Parallelize()
 
-	if err = fs.Typen.EachPtr(
+	if err = fs.Typen.Each(
 		func(e *Typ) (err error) {
 			return m(e)
 		},
@@ -63,7 +64,7 @@ func (fs CwdFiles) EachCreatableMatchable(
 		return
 	}
 
-	if err = fs.Etiketten.EachPtr(
+	if err = fs.Etiketten.Each(
 		func(e *Etikett) (err error) {
 			return m(e)
 		},
@@ -72,7 +73,7 @@ func (fs CwdFiles) EachCreatableMatchable(
 		return
 	}
 
-	if err = fs.Kisten.EachPtr(
+	if err = fs.Kisten.Each(
 		func(e *Kasten) (err error) {
 			return m(e)
 		},
@@ -113,25 +114,25 @@ func (fs CwdFiles) String() (out string) {
 	}
 
 	fs.Zettelen.Each(
-		func(z Zettel) (err error) {
+		func(z *Zettel) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
 
 	fs.Typen.Each(
-		func(z Typ) (err error) {
+		func(z *Typ) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
 
 	fs.Etiketten.Each(
-		func(z Etikett) (err error) {
+		func(z *Etikett) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
 
 	fs.Kisten.Each(
-		func(z Kasten) (err error) {
+		func(z *Kasten) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
@@ -171,9 +172,9 @@ func (fs CwdFiles) ContainsMatchable(m *sku.Transacted) bool {
 func (fs CwdFiles) GetCwdFDs() fd.Set {
 	fds := fd.MakeMutableSet()
 
-	fd.SetAddPairs[Zettel](fs.Zettelen, fds)
-	fd.SetAddPairs[Typ](fs.Typen, fds)
-	fd.SetAddPairs[Etikett](fs.Etiketten, fds)
+	fd.SetAddPairs[*Zettel](fs.Zettelen, fds)
+	fd.SetAddPairs[*Typ](fs.Typen, fds)
+	fd.SetAddPairs[*Etikett](fs.Etiketten, fds)
 	fs.UnsureAkten.Each(fds.Add)
 
 	return fds
@@ -182,28 +183,28 @@ func (fs CwdFiles) GetCwdFDs() fd.Set {
 func (fs CwdFiles) GetZettel(
 	h *kennung.Hinweis,
 ) (z *Zettel, ok bool) {
-	z, ok = fs.Zettelen.GetPtr(h.String())
+	z, ok = fs.Zettelen.Get(h.String())
 	return
 }
 
 func (fs CwdFiles) GetKasten(
 	h *kennung.Kasten,
 ) (z *Kasten, ok bool) {
-	z, ok = fs.Kisten.GetPtr(h.String())
+	z, ok = fs.Kisten.Get(h.String())
 	return
 }
 
 func (fs CwdFiles) GetEtikett(
 	k *kennung.Etikett,
 ) (e *Etikett, ok bool) {
-	e, ok = fs.Etiketten.GetPtr(k.String())
+	e, ok = fs.Etiketten.Get(k.String())
 	return
 }
 
 func (fs CwdFiles) GetTyp(
 	k *kennung.Typ,
 ) (t *Typ, ok bool) {
-	t, ok = fs.Typen.GetPtr(k.String())
+	t, ok = fs.Typen.Get(k.String())
 	return
 }
 
@@ -214,16 +215,16 @@ func (fs CwdFiles) Get(
 
 	switch g {
 	case gattung.Kasten:
-		return fs.Kisten.GetPtr(k.String())
+		return fs.Kisten.Get(k.String())
 
 	case gattung.Zettel:
-		return fs.Zettelen.GetPtr(k.String())
+		return fs.Zettelen.Get(k.String())
 
 	case gattung.Typ:
-		return fs.Typen.GetPtr(k.String())
+		return fs.Typen.Get(k.String())
 
 	case gattung.Etikett:
-		return fs.Etiketten.GetPtr(k.String())
+		return fs.Etiketten.Get(k.String())
 
 	case gattung.Konfig:
 		// TODO-P3
@@ -235,38 +236,38 @@ func (fs CwdFiles) Get(
 }
 
 func (fs CwdFiles) All(
-	f schnittstellen.FuncIter[sku.ExternalMaybe],
+	f schnittstellen.FuncIter[*sku.ExternalMaybe],
 ) (err error) {
 	wg := iter.MakeErrorWaitGroup()
 
-	iter.ErrorWaitGroupApply[Zettel](
+	iter.ErrorWaitGroupApply[*Zettel](
 		wg,
 		fs.Zettelen,
-		func(e Zettel) (err error) {
+		func(e *Zettel) (err error) {
 			return f(e)
 		},
 	)
 
-	iter.ErrorWaitGroupApply[Typ](
+	iter.ErrorWaitGroupApply[*Typ](
 		wg,
 		fs.Typen,
-		func(e Typ) (err error) {
+		func(e *Typ) (err error) {
 			return f(e)
 		},
 	)
 
-	iter.ErrorWaitGroupApply[Kasten](
+	iter.ErrorWaitGroupApply[*Kasten](
 		wg,
 		fs.Kisten,
-		func(e Kasten) (err error) {
+		func(e *Kasten) (err error) {
 			return f(e)
 		},
 	)
 
-	iter.ErrorWaitGroupApply[Etikett](
+	iter.ErrorWaitGroupApply[*Etikett](
 		wg,
 		fs.Etiketten,
-		func(e Etikett) (err error) {
+		func(e *Etikett) (err error) {
 			return f(e)
 		},
 	)
@@ -275,9 +276,9 @@ func (fs CwdFiles) All(
 }
 
 func (fs CwdFiles) ZettelFiles() (out []string, err error) {
-	out, err = iter.DerivedValues[Zettel, string](
+	out, err = iter.DerivedValues[*Zettel, string](
 		fs.Zettelen,
-		func(z Zettel) (p string, err error) {
+		func(z *Zettel) (p string, err error) {
 			p = z.GetObjekteFD().GetPath()
 			return
 		},
@@ -294,14 +295,14 @@ func makeCwdFiles(
 		akteWriterFactory: st,
 		erworben:          erworben,
 		dir:               st.Cwd(),
-		Kisten: collections_ptr.MakeMutableValueSet[Kasten, *Kasten](
+		Kisten: collections_value.MakeMutableValueSet[*Kasten](
 			nil,
 		),
-		Typen: collections_ptr.MakeMutableValueSet[Typ, *Typ](nil),
-		Zettelen: collections_ptr.MakeMutableValueSet[Zettel, *Zettel](
+		Typen: collections_value.MakeMutableValueSet[*Typ](nil),
+		Zettelen: collections_value.MakeMutableValueSet[*Zettel](
 			nil,
 		),
-		Etiketten: collections_ptr.MakeMutableValueSet[Etikett, *Etikett](
+		Etiketten: collections_value.MakeMutableValueSet[*Etikett](
 			nil,
 		),
 		UnsureAkten: collections_ptr.MakeMutableValueSet[fd.FD, *fd.FD](

@@ -189,3 +189,11 @@ func (fd *FD) Reset() {
 	fd.modTime.Reset()
 	fd.sha.Reset()
 }
+
+func (dst *FD) ResetWith(src *FD) {
+	dst.state = src.state
+	dst.isDir = src.isDir
+	dst.path = src.path
+	dst.modTime = src.modTime
+	dst.sha.SetBytes(src.sha.GetShaBytes())
+}

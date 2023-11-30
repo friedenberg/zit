@@ -7,22 +7,18 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/golf/kennung_index"
 )
-
-type etikettIndex interface {
-	Add(kennung.EtikettSet) error
-	AddEtikettSet(kennung.EtikettSet, kennung.EtikettSet) error
-}
 
 type Schwanzen struct {
 	lock         *sync.RWMutex
 	hinweisen    map[string]Transacted
-	etikettIndex etikettIndex
+	etikettIndex kennung_index.EtikettIndexMutation
 	funcFlush    schnittstellen.FuncIter[*Transacted]
 }
 
 func MakeSchwanzen(
-	ei etikettIndex,
+	ei kennung_index.EtikettIndexMutation,
 	funcFlush schnittstellen.FuncIter[*Transacted],
 ) *Schwanzen {
 	return &Schwanzen{

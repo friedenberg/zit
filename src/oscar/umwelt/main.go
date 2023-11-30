@@ -209,9 +209,7 @@ func (u Umwelt) PrintMatchedArchiviertIfNecessary() {
 }
 
 func (u *Umwelt) MakeKennungIndex() kennung.Index {
-	return kennung.Index{
-		Etiketten: u.StoreObjekten().GetKennungIndex().GetEtikett,
-	}
+	return kennung.Index{}
 }
 
 func (u *Umwelt) GetMatcherArchiviert() matcher.Archiviert {

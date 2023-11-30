@@ -62,8 +62,8 @@ func (c Diff) RunWithQuery(
 			func(co *sku.CheckedOut) (err error) {
 				wg := iter.MakeErrorWaitGroup()
 
-				il := co.Internal
-				el := co.External
+				il := &co.Internal
+				el := &co.External
 
 				var mode checkout_mode.Mode
 

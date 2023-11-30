@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/echo/fd"
 )
 
@@ -15,11 +14,12 @@ type ExternalFDs struct {
 	Akte    fd.FD
 }
 
-func (a ExternalFDs) EqualsAny(b any) bool {
-	return values.Equals(a, b)
+func (dst *ExternalFDs) ResetWith(src *ExternalFDs) {
+  dst.Objekte.ResetWith(&src.Objekte)
+  dst.Akte.ResetWith(&src.Akte)
 }
 
-func (a ExternalFDs) Equals(b ExternalFDs) bool {
+func (a *ExternalFDs) Equals(b *ExternalFDs) bool {
 	if !a.Objekte.Equals(b.Objekte) {
 		return false
 	}
@@ -31,13 +31,13 @@ func (a ExternalFDs) Equals(b ExternalFDs) bool {
 	return true
 }
 
-func (e ExternalFDs) MakeConflictMarker() (path string) {
+func (e *ExternalFDs) MakeConflictMarker() (path string) {
 	path = fmt.Sprintf("%s.conflict", e.Objekte.GetPath())
 
 	return
 }
 
-func (e ExternalFDs) conflictMarkerExists(fd *fd.FD) (ok bool) {
+func (e *ExternalFDs) conflictMarkerExists(fd *fd.FD) (ok bool) {
 	if files.Exists(fmt.Sprintf("%s.conflict", fd)) {
 		ok = true
 	}
@@ -57,7 +57,7 @@ func (e *ExternalFDs) ConflictMarkerError() (err error) {
 	return
 }
 
-func (e ExternalFDs) GetCheckoutMode() (m checkout_mode.Mode, err error) {
+func (e *ExternalFDs) GetCheckoutMode() (m checkout_mode.Mode, err error) {
 	switch {
 	case !e.Objekte.IsEmpty() && !e.Akte.IsEmpty():
 		m = checkout_mode.ModeObjekteAndAkte

@@ -3,7 +3,7 @@ package user_ops
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/checkout_options"
-	"github.com/friedenberg/zit/src/charlie/collections_ptr"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/kilo/zettel"
@@ -27,7 +27,7 @@ func (c WriteNewZettels) RunMany(
 
 	defer errors.Deferred(&err, c.Unlock)
 
-	results = collections_ptr.MakeMutableValueSet[sku.CheckedOut, *sku.CheckedOut](
+	results = collections_value.MakeMutableValueSet[*sku.CheckedOut](
 		nil,
 	)
 
@@ -40,7 +40,7 @@ func (c WriteNewZettels) RunMany(
 			return
 		}
 
-		results.AddPtr(cz)
+		results.Add(cz)
 	}
 
 	return

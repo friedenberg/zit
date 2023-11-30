@@ -8,20 +8,17 @@ import (
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/sku_fmt"
 )
 
 type Writer struct {
 	alfredWriter *alfred.Writer
-	kennungIndex kennung_index.Index
 	Abbr         func(kennung.Hinweis) (string, error)
 }
 
 func New(
 	out io.Writer,
-	kennungIndex kennung_index.Index,
 	ha func(kennung.Hinweis) (string, error),
 ) (w *Writer, err error) {
 	var aw *alfred.Writer
@@ -31,13 +28,8 @@ func New(
 		return
 	}
 
-	if kennungIndex == nil {
-		panic("kennungIndex was nil")
-	}
-
 	w = &Writer{
 		Abbr:         ha,
-		kennungIndex: kennungIndex,
 		alfredWriter: aw,
 	}
 

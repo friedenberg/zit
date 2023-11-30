@@ -31,15 +31,17 @@ type KennungIndex[
 	Flush() error
 }
 
+type EtikettIndexMutation interface {
+	AddEtikettSet(to kennung.EtikettSet, from kennung.EtikettSet) (err error)
+	Add(s kennung.EtikettSet) (err error)
+}
+
 type EtikettIndex interface {
-	Each(
-		schnittstellen.FuncIter[kennung.IndexedEtikett],
-	) error
+	EtikettIndexMutation
+
 	EachSchwanzen(
 		schnittstellen.FuncIter[kennung.IndexedEtikett],
 	) error
-	AddEtikettSet(to kennung.EtikettSet, from kennung.EtikettSet) (err error)
-	Add(s kennung.EtikettSet) (err error)
 	GetEtikett(
 		*kennung.Etikett,
 	) (*kennung.IndexedLike[kennung.Etikett, *kennung.Etikett], error)

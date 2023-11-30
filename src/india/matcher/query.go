@@ -40,7 +40,7 @@ func MakeQueryFromCheckedOutSet(
 ) (q Query, err error) {
 	gs := make(map[gattung.Gattung]setWithSigil)
 
-	if err = cos.EachPtr(
+	if err = cos.Each(
 		func(co *sku.CheckedOut) (err error) {
 			m := MakeMatcherContainsExactly(co.Internal.Kennung)
 

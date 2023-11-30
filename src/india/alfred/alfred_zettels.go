@@ -3,7 +3,6 @@ package alfred
 import (
 	"fmt"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/alfred"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -46,17 +45,12 @@ func (w *Writer) zettelToItem(
 	mb.AddMatches(z.GetTyp().String())
 	z.Metadatei.GetEtiketten().Each(
 		func(e kennung.Etikett) (err error) {
-			ei, err := w.kennungIndex.GetEtikett(&e)
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			ei.GetExpandedAll().Each(
-				func(e kennung.Etikett) (err error) {
-					mb.AddMatches(e.String())
+			expansion.ExpanderAll.Expand(
+				func(v string) (err error) {
+					mb.AddMatches(v)
 					return
 				},
+				e.String(),
 			)
 
 			return
