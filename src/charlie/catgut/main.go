@@ -175,6 +175,14 @@ func (dst *String) Set(src string) (err error) {
 	return
 }
 
+func (dst *String) ReadFromBuffer(src *bytes.Buffer) (err error) {
+	dst.Reset()
+	dst.Grow(src.Len())
+	var n int
+	n, err = dst.Write(append(dst.AvailableBuffer(), src.Bytes()...))
+	return ohio_buffer.MakeErrLength(int64(src.Len()), int64(n), err)
+}
+
 func (src *String) CopyTo(dst *String) (err error) {
 	dst.Reset()
 	dst.Grow(src.Len())
@@ -197,4 +205,8 @@ func (src *String) WriteToStringWriter(
 	w schnittstellen.WriterAndStringWriter,
 ) (n int64, err error) {
 	return src.WriteTo(w)
+}
+
+func (src *String) MarshalText() ([]byte, error) {
+	return src.Bytes(), nil
 }

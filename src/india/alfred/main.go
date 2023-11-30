@@ -14,16 +14,14 @@ import (
 )
 
 type Writer struct {
-	alfredWriter   *alfred.Writer
-	kennungIndex   kennung_index.Index
-	etikettenIndex kennung_index.EtikettIndex
-	Abbr           func(kennung.Hinweis) (string, error)
+	alfredWriter *alfred.Writer
+	kennungIndex kennung_index.Index
+	Abbr         func(kennung.Hinweis) (string, error)
 }
 
 func New(
 	out io.Writer,
 	kennungIndex kennung_index.Index,
-	etikettenIndex kennung_index.EtikettIndex,
 	ha func(kennung.Hinweis) (string, error),
 ) (w *Writer, err error) {
 	var aw *alfred.Writer
@@ -38,10 +36,9 @@ func New(
 	}
 
 	w = &Writer{
-		Abbr:           ha,
-		kennungIndex:   kennungIndex,
-		etikettenIndex: etikettenIndex,
-		alfredWriter:   aw,
+		Abbr:         ha,
+		kennungIndex: kennungIndex,
+		alfredWriter: aw,
 	}
 
 	return

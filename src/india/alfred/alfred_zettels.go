@@ -17,29 +17,31 @@ func (w *Writer) zettelToItem(
 ) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
-	a.Title = z.GetMetadatei().Bezeichnung.String()
+	a.Title = z.Metadatei.Bezeichnung.String()
 
 	es := iter.StringCommaSeparated[kennung.Etikett](
 		z.Metadatei.GetEtiketten(),
 	)
 
+	k := &z.Kennung
+	ks := k.StringFromPtr()
+
 	if a.Title == "" {
-		a.Title = z.GetKennungLike().String()
-		a.Subtitle = fmt.Sprintf("%s", es)
+		a.Title = ks
+		a.Subtitle = es
 	} else {
-		a.Subtitle = fmt.Sprintf("%s: %s", z.GetKennungLike().String(), es)
+		a.Subtitle = fmt.Sprintf("%s: %s", ks, es)
 	}
 
-	a.Arg = z.GetKennungLike().String()
+	a.Arg = ks
 
-	mb := alfred.NewMatchBuilder()
+	mb := alfred.GetPoolMatchBuilder().Get()
+	defer alfred.GetPoolMatchBuilder().Put(mb)
+	parts := k.PartsStrings()
 
-	k := z.GetKennungLike()
-	parts := k.Parts()
-
-	mb.AddMatches(k.String())
-	mb.AddMatches(parts[0])
-	mb.AddMatches(parts[2])
+	mb.AddMatches(ks)
+	mb.AddMatchBytes(parts[0].Bytes())
+	mb.AddMatchBytes(parts[2].Bytes())
 	mb.AddMatches(z.GetMetadatei().Bezeichnung.String())
 	mb.AddMatches(z.GetTyp().String())
 	z.Metadatei.GetEtiketten().Each(
@@ -66,7 +68,7 @@ func (w *Writer) zettelToItem(
 	expansion.ExpanderAll.Expand(
 		func(v string) (err error) {
 			mb.AddMatches(v)
-      return
+			return
 		},
 		t.String(),
 	)
@@ -84,14 +86,14 @@ func (w *Writer) zettelToItem(
 	// 	mb.AddMatches(h.Schwanz())
 	// }
 
-	a.Match = mb.String()
+	a.Match.Write(mb.Bytes())
 
 	// if len(a.Match) > 100 {
 	// 	a.Match = a.Match[:100]
 	// }
 
-	a.Text.Copy = k.String()
-	a.Uid = "zit://" + k.String()
+	a.Text.Copy = ks
+	a.Uid = "zit://" + ks
 
 	return
 }
@@ -99,23 +101,19 @@ func (w *Writer) zettelToItem(
 func (w *Writer) etikettToItem(
 	e *kennung.Etikett,
 ) (a *alfred.Item) {
-	ei, err := w.etikettenIndex.GetEtikett(e)
 	a = w.alfredWriter.Get()
-
-	if err == nil {
-		a.Subtitle = fmt.Sprintf("%d", ei.GetSchwanzenCount())
-	}
 
 	a.Title = "@" + e.String()
 
 	a.Arg = e.String()
 
-	mb := alfred.NewMatchBuilder()
+	mb := alfred.GetPoolMatchBuilder().Get()
+	defer alfred.GetPoolMatchBuilder().Put(mb)
 
 	mb.AddMatches(a.Title)
 	mb.AddMatches(iter.Strings[kennung.Etikett](kennung.ExpandOne(e))...)
 
-	a.Match = mb.String()
+	a.Match.ReadFromBuffer(&mb.Buffer)
 
 	a.Text.Copy = e.String()
 	a.Uid = "zit://" + e.String()
@@ -140,13 +138,14 @@ func (w *Writer) hinweisToItem(e kennung.Hinweis) (a *alfred.Item) {
 
 	a.Arg = e.String()
 
-	mb := alfred.NewMatchBuilder()
+	mb := alfred.GetPoolMatchBuilder().Get()
+	defer alfred.GetPoolMatchBuilder().Put(mb)
 
 	mb.AddMatch(e.String())
 	mb.AddMatch(e.Kopf())
 	mb.AddMatch(e.Schwanz())
 
-	a.Match = mb.String()
+	a.Match.ReadFromBuffer(&mb.Buffer)
 
 	a.Text.Copy = e.String()
 	a.Uid = "zit://" + e.String()

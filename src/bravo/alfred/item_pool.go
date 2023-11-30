@@ -2,6 +2,8 @@ package alfred
 
 import (
 	"sync"
+
+	"github.com/friedenberg/zit/src/charlie/catgut"
 )
 
 type ItemPool struct {
@@ -12,7 +14,9 @@ func MakeItemPool() ItemPool {
 	return ItemPool{
 		inner: &sync.Pool{
 			New: func() interface{} {
-				return &Item{}
+				return &Item{
+					Match: &catgut.String{},
+				}
 			},
 		},
 	}

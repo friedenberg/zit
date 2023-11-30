@@ -1,34 +1,62 @@
 package alfred
 
 import (
+	"bytes"
 	"strings"
+
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/pool"
 )
 
-type MatchBuilder struct {
-	sb *strings.Builder
+var poolMatchBuilder schnittstellen.Pool[MatchBuilder, *MatchBuilder]
+
+func init() {
+	poolMatchBuilder = pool.MakePool[MatchBuilder, *MatchBuilder](
+		NewMatchBuilder,
+		func(mb *MatchBuilder) {
+			mb.Buffer.Reset()
+		},
+	)
 }
 
-func NewMatchBuilder() MatchBuilder {
-	return MatchBuilder{
-		sb: &strings.Builder{},
+func GetPoolMatchBuilder() schnittstellen.Pool[MatchBuilder, *MatchBuilder] {
+	return poolMatchBuilder
+}
+
+type MatchBuilder struct {
+	bytes.Buffer
+}
+
+func NewMatchBuilder() *MatchBuilder {
+	return &MatchBuilder{}
+}
+
+var sliceBytesUnderscore = []byte("_")
+
+func (mb *MatchBuilder) AddMatchBytes(s []byte) {
+	s1 := bytes.Split(s, sliceBytesUnderscore)
+
+	for _, s2 := range s1 {
+		mb.Write(s2)
+		mb.WriteRune(' ')
 	}
 }
 
-func (mb MatchBuilder) AddMatch(s string) {
+func (mb *MatchBuilder) AddMatch(s string) {
 	s1 := strings.Split(s, "_")
 
 	for _, s2 := range s1 {
-		mb.sb.WriteString(s2)
-		mb.sb.WriteString(" ")
+		mb.WriteString(s2)
+		mb.WriteString(" ")
 	}
 }
 
-func (mb MatchBuilder) AddMatches(s ...string) {
+func (mb *MatchBuilder) AddMatches(s ...string) {
 	for _, v := range s {
 		mb.AddMatch(v)
 	}
 }
 
-func (mb MatchBuilder) String() string {
-	return mb.sb.String()
+func (mb *MatchBuilder) Bytes() []byte {
+	return mb.Buffer.Bytes()
 }

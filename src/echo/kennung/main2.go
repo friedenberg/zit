@@ -44,7 +44,7 @@ func (k2 *Kennung2) SetGattung(g schnittstellen.GattungGetter) {
 	}
 }
 
-func (k2 Kennung2) String() string {
+func (k2 *Kennung2) StringFromPtr() string {
 	var sb strings.Builder
 
 	switch k2.g {
@@ -63,6 +63,10 @@ func (k2 Kennung2) String() string {
 	return sb.String()
 }
 
+func (k2 Kennung2) String() string {
+	return k2.StringFromPtr()
+}
+
 func (k2 *Kennung2) Reset() {
 	k2.g = gattung.Unknown
 	k2.parts[0].Reset()
@@ -70,11 +74,11 @@ func (k2 *Kennung2) Reset() {
 	k2.parts[2].Reset()
 }
 
-func (k2 Kennung2) PartsStrings() [3]catgut.String {
-	return [3]catgut.String{
-		k2.parts[0],
-		k2.parts[1],
-		k2.parts[2],
+func (k2 *Kennung2) PartsStrings() [3]*catgut.String {
+	return [3]*catgut.String{
+		&k2.parts[0],
+		&k2.parts[1],
+		&k2.parts[2],
 	}
 }
 
