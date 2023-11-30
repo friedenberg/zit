@@ -67,7 +67,7 @@ func (a heapPrivate[T, TPtr]) Sorted() (b heapPrivate[T, TPtr]) {
 }
 
 func Make[T Element, TPtr ElementPtr[T]](
-	equaler schnittstellen.Equaler[T, TPtr],
+	equaler schnittstellen.Equaler1[TPtr],
 	lessor schnittstellen.Lessor3[TPtr],
 	resetter schnittstellen.Resetter2[T, TPtr],
 ) Heap[T, TPtr] {
@@ -84,7 +84,7 @@ func Make[T Element, TPtr ElementPtr[T]](
 }
 
 func MakeHeapFromSlice[T Element, TPtr ElementPtr[T]](
-	equaler schnittstellen.Equaler[T, TPtr],
+	equaler schnittstellen.Equaler1[TPtr],
 	lessor schnittstellen.Lessor3[TPtr],
 	resetter schnittstellen.Resetter2[T, TPtr],
 	s []TPtr,
@@ -109,7 +109,7 @@ type Heap[T Element, TPtr ElementPtr[T]] struct {
 	p       schnittstellen.Pool[T, TPtr]
 	l       *sync.Mutex
 	h       heapPrivate[T, TPtr]
-	equaler schnittstellen.Equaler[T, TPtr]
+	equaler schnittstellen.Equaler1[TPtr]
 	s       int
 }
 
@@ -121,7 +121,7 @@ func (h *Heap[T, TPtr]) SetPool(p schnittstellen.Pool[T, TPtr]) {
 	h.p = p
 }
 
-func (h *Heap[T, TPtr]) GetEqualer() schnittstellen.Equaler[T, TPtr] {
+func (h *Heap[T, TPtr]) GetEqualer() schnittstellen.Equaler1[TPtr] {
 	return h.equaler
 }
 
@@ -239,7 +239,7 @@ func (a Heap[T, TPtr]) Equals(b Heap[T, TPtr]) bool {
 	}
 
 	for i, av := range a.h.Elements {
-		if b.equaler.EqualsPtr(b.h.Elements[i], av) {
+		if b.equaler.Equals(b.h.Elements[i], av) {
 			return false
 		}
 	}
@@ -326,7 +326,7 @@ func (a *Heap[T, TPtr]) MergeStream(
 			case !ok:
 				break LOOP
 
-			case a.equaler.EqualsPtr(peeked, e):
+			case a.equaler.Equals(peeked, e):
 				a.Pop()
 				continue LOOP
 
@@ -371,7 +371,7 @@ func (a *Heap[T, TPtr]) MergeStream(
 
 		if last == nil {
 			last = popped
-		} else if a.equaler.EqualsPtr(popped, last) {
+		} else if a.equaler.Equals(popped, last) {
 			continue
 		} else if a.h.Lessor.Less(popped, last) {
 			err = errors.Errorf(

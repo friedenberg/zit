@@ -53,7 +53,7 @@ type kennungGetter interface {
 }
 
 type KennungKeyer[
-	T kennungGetter,
+	T any,
 	TPtr interface {
 		schnittstellen.Ptr[T]
 		kennungGetter
@@ -61,13 +61,5 @@ type KennungKeyer[
 ] struct{}
 
 func (sk KennungKeyer[T, TPtr]) GetKey(e TPtr) string {
-	return e.GetKennungLike().String()
-}
-
-func (sk KennungKeyer[T, TPtr]) GetKeyPtr(e TPtr) string {
-	if e == nil {
-		return ""
-	}
-
 	return e.GetKennungLike().String()
 }

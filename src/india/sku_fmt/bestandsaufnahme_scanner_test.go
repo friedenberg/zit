@@ -23,7 +23,7 @@ func TestOne(t1 *testing.T) {
 
 	printer := MakeFormatBestandsaufnahmePrinter(w, f, o)
 
-	n, err := printer.Print(sku.Transacted{
+	n, err := printer.Print(&sku.Transacted{
 		Kennung: kennung.MustKennung2(kennung.MustHinweis("one/uno")),
 	})
 
@@ -41,7 +41,7 @@ func TestOne(t1 *testing.T) {
 		}
 	}
 
-	n, err = printer.Print(sku.Transacted{
+  n, err = printer.Print(&sku.Transacted{
 		Kennung: kennung.MustKennung2(kennung.MustHinweis("two/dos")),
 	})
 

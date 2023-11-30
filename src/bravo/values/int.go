@@ -8,7 +8,7 @@ import (
 
 type IntEqualer struct{}
 
-func (_ IntEqualer) Equals(a, b Int) bool {
+func (_ IntEqualer) Equals(a, b *Int) bool {
 	return a.Int() == b.Int()
 }
 

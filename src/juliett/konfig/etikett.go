@@ -58,7 +58,7 @@ func (a ketikett) EqualsAny(b any) bool {
 }
 
 func (a ketikett) Equals(b ketikett) bool {
-	if !a.Transacted.Equals(b.Transacted) {
+	if !a.Transacted.Equals(&b.Transacted) {
 		return false
 	}
 

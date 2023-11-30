@@ -56,15 +56,15 @@ func (a *Transacted) GetSkuLikePtr() SkuLike {
 	return a
 }
 
-func (a Transacted) GetEtiketten() kennung.EtikettSet {
+func (a *Transacted) GetEtiketten() kennung.EtikettSet {
 	return a.Metadatei.GetEtiketten()
 }
 
-func (a Transacted) GetTyp() kennung.Typ {
+func (a *Transacted) GetTyp() kennung.Typ {
 	return a.Metadatei.Typ
 }
 
-func (a Transacted) GetMetadatei() metadatei.Metadatei {
+func (a *Transacted) GetMetadatei() metadatei.Metadatei {
 	return a.Metadatei
 }
 
@@ -76,11 +76,11 @@ func (a *Transacted) SetMetadatei(m metadatei.Metadatei) {
 	a.Metadatei = m
 }
 
-func (a Transacted) GetTai() kennung.Tai {
+func (a *Transacted) GetTai() kennung.Tai {
 	return a.GetMetadatei().GetTai()
 }
 
-func (a Transacted) GetKopf() kennung.Tai {
+func (a *Transacted) GetKopf() kennung.Tai {
 	return a.Kopf
 }
 
@@ -88,7 +88,7 @@ func (a *Transacted) SetTai(t kennung.Tai) {
 	a.GetMetadateiPtr().Tai = t
 }
 
-func (a Transacted) GetKennung() kennung.Kennung {
+func (a *Transacted) GetKennung() kennung.Kennung {
 	return a.Kennung
 }
 
@@ -96,7 +96,7 @@ func (a *Transacted) GetKennungPtr() kennung.KennungPtr {
 	return &a.Kennung
 }
 
-func (a Transacted) GetKennungLike() kennung.Kennung {
+func (a *Transacted) GetKennungLike() kennung.Kennung {
 	return a.Kennung
 }
 
@@ -109,15 +109,15 @@ func (a *Transacted) SetKennungLike(kl kennung.Kennung) (err error) {
 	return
 }
 
-func (a Transacted) EqualsSkuLikePtr(b SkuLike) bool {
+func (a *Transacted) EqualsSkuLikePtr(b SkuLike) bool {
 	return values.Equals(a, b) || values.EqualsPtr(a, b)
 }
 
-func (a Transacted) EqualsAny(b any) (ok bool) {
+func (a *Transacted) EqualsAny(b any) (ok bool) {
 	return values.Equals(a, b)
 }
 
-func (a Transacted) Equals(b Transacted) (ok bool) {
+func (a *Transacted) Equals(b *Transacted) (ok bool) {
 	if !a.TransactionIndex.Equals(b.TransactionIndex) {
 		return
 	}
@@ -138,7 +138,7 @@ func (a Transacted) Equals(b Transacted) (ok bool) {
 	return true
 }
 
-func (s Transacted) GetGattung() schnittstellen.GattungLike {
+func (s *Transacted) GetGattung() schnittstellen.GattungLike {
 	return s.Kennung.GetGattung()
 }
 
@@ -150,11 +150,11 @@ func (s *Transacted) SetObjekteSha(v schnittstellen.ShaLike) {
 	s.ObjekteSha = sha.Make(v)
 }
 
-func (s Transacted) GetObjekteSha() schnittstellen.ShaLike {
+func (s *Transacted) GetObjekteSha() schnittstellen.ShaLike {
 	return s.ObjekteSha
 }
 
-func (s Transacted) GetAkteSha() schnittstellen.ShaLike {
+func (s *Transacted) GetAkteSha() schnittstellen.ShaLike {
 	return s.Metadatei.AkteSha
 }
 
@@ -162,11 +162,11 @@ func (s *Transacted) SetAkteSha(sh schnittstellen.ShaLike) {
 	s.Metadatei.AkteSha = sha.Make(sh)
 }
 
-func (s Transacted) GetTransactionIndex() values.Int {
+func (s *Transacted) GetTransactionIndex() values.Int {
 	return s.TransactionIndex
 }
 
-func (o Transacted) GetKey() string {
+func (o *Transacted) GetKey() string {
 	return kennung.FormattedString(o.GetKennung())
 }
 
@@ -182,8 +182,8 @@ func (transactedLessor) LessPtr(a, b *Transacted) bool {
 
 type transactedEqualer struct{}
 
-func (transactedEqualer) Equals(a, b Transacted) bool {
-	panic("not supported")
+func (transactedEqualer) Equals(a, b *Transacted) bool {
+  return a.Equals(b)
 }
 
 func (transactedEqualer) EqualsPtr(a, b *Transacted) bool {
