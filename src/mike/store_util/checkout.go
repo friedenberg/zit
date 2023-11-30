@@ -84,7 +84,7 @@ func (s *common) Checkout(
 				l.Lock()
 				defer l.Unlock()
 
-				if err = zts.AddPtr(&z); err != nil {
+				if err = zts.Add(&z); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -97,7 +97,7 @@ func (s *common) Checkout(
 		return
 	}
 
-	if err = zts.EachPtr(
+	if err = zts.Each(
 		func(zt *sku.Transacted) (err error) {
 			var zc *sku.CheckedOut
 

@@ -144,7 +144,7 @@ func (s *Store) UpdateManyMetadatei(
 		return
 	}
 
-	if err = incoming.EachPtr(
+	if err = incoming.Each(
 		func(mwk *sku.Transacted) (err error) {
 			if _, err = s.CreateOrUpdate(
 				mwk,

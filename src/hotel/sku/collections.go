@@ -4,13 +4,13 @@ import (
 	"encoding/gob"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections_ptr"
+	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/delta/heap"
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
 var (
-	transactedKeyerKennung schnittstellen.StringKeyerPtr[Transacted, *Transacted]
+	transactedKeyerKennung schnittstellen.StringKeyer[*Transacted]
 	TransactedSetEmpty     TransactedSet
 	TransactedLessor       transactedLessor
 )
@@ -25,23 +25,27 @@ func init() {
 }
 
 type (
-	TransactedSet        = schnittstellen.SetPtrLike[Transacted, *Transacted]
-	TransactedMutableSet = schnittstellen.MutableSetPtrLike[Transacted, *Transacted]
+	TransactedSet        = schnittstellen.SetLike[*Transacted]
+	TransactedMutableSet = schnittstellen.MutableSetLike[*Transacted]
 	TransactedHeap       = heap.Heap[Transacted, *Transacted]
 	CheckedOutSet        = schnittstellen.SetLike[*CheckedOut]
 	CheckedOutMutableSet = schnittstellen.MutableSetLike[*CheckedOut]
 )
 
 func MakeTransactedHeap() TransactedHeap {
-	return heap.Make[Transacted, *Transacted](transactedEqualer{}, transactedLessor{}, transactedResetter{})
+	return heap.Make[Transacted, *Transacted](
+		transactedEqualer{},
+		transactedLessor{},
+		transactedResetter{},
+	)
 }
 
 func MakeTransactedSet() TransactedSet {
-	return collections_ptr.MakeValueSet(transactedKeyerKennung)
+	return collections_value.MakeValueSet(transactedKeyerKennung)
 }
 
 func MakeTransactedMutableSet() TransactedMutableSet {
-	return collections_ptr.MakeMutableValueSet(transactedKeyerKennung)
+	return collections_value.MakeMutableValueSet(transactedKeyerKennung)
 }
 
 type kennungGetter interface {
@@ -56,7 +60,7 @@ type KennungKeyer[
 	},
 ] struct{}
 
-func (sk KennungKeyer[T, TPtr]) GetKey(e T) string {
+func (sk KennungKeyer[T, TPtr]) GetKey(e TPtr) string {
 	return e.GetKennungLike().String()
 }
 

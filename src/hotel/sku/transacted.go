@@ -39,37 +39,11 @@ func (t *Transacted) SetFromSkuLike(sk SkuLike) (err error) {
 	return
 }
 
-func MakeSkuLikeSansObjekteSha(
-	m metadatei.Metadatei,
-	k kennung.Kennung,
-) (sk *Transacted, err error) {
-	sk = GetTransactedPool().Get()
-	sk.Metadatei = m
-
-	if err = sk.Kennung.SetWithKennung(k); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
+func (a *Transacted) Less(b *Transacted) bool {
+	return a.GetTai().Less(b.GetTai())
 }
 
-func MakeSkuLike2(
-	m metadatei.Metadatei,
-	k kennung.KennungPtr,
-	os sha.Sha,
-) (sk SkuLike, err error) {
-	if sk, err = MakeSkuLikeSansObjekteSha(m, k); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	sk.SetObjekteSha(os)
-
-	return
-}
-
-func (a Transacted) String() string {
+func (a *Transacted) String() string {
 	return fmt.Sprintf(
 		"%s %s %s",
 		a.Kennung,
@@ -198,7 +172,7 @@ func (o Transacted) GetKey() string {
 
 type transactedLessor struct{}
 
-func (transactedLessor) Less(a, b Transacted) bool {
+func (transactedLessor) Less(a, b *Transacted) bool {
 	return a.GetTai().Less(b.GetTai())
 }
 

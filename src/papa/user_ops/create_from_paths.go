@@ -84,7 +84,7 @@ func (c CreateFromPaths) Run(
 						return
 					}
 
-					return results.AddPtr(&z)
+					return results.Add(&z)
 				},
 			),
 		); err != nil {
@@ -98,7 +98,7 @@ func (c CreateFromPaths) Run(
 		return
 	}
 
-	err = results.EachPtr(
+	err = results.Each(
 		func(z *sku.Transacted) (err error) {
 			if c.ProtoZettel.Apply(z) {
 				var zt *sku.Transacted
@@ -168,7 +168,7 @@ func (c CreateFromPaths) Run(
 
 			sku.TransactedResetter.ResetWithPtr(zv, &cz.Internal)
 
-			results.AddPtr(zv)
+			results.Add(zv)
 
 			return
 		},

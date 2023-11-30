@@ -28,7 +28,11 @@ func (c *CwdFiles) tryTyp(fi os.FileInfo, dir string) (err error) {
 		return
 	}
 
-	t, _ := c.Typen.Get(h.String())
+	t, ok := c.Typen.Get(h.String())
+
+  if !ok {
+    t = &sku.ExternalMaybe{}
+  }
 
 	if err = t.Kennung.SetWithKennung(h); err != nil {
 		err = errors.Wrap(err)

@@ -113,7 +113,7 @@ func (c Add) RunWithCwdQuery(
 	u.ApplyToOrganizeOptions(&otFlags.Options)
 	// otFlags.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
 	mwk := objekte_collections.MakeMutableSetMetadateiWithKennung()
-	zettelsFromAkteResults.EachPtr(
+	zettelsFromAkteResults.Each(
 		func(z *sku.Transacted) (err error) {
 			return mwk.Add(z)
 		},
@@ -206,7 +206,7 @@ func (c Add) openAktenIfNecessary(
 
 	hs := collections_value.MakeMutableValueSet[values.String](nil)
 
-	zettels.EachPtr(
+	zettels.Each(
 		func(z *sku.Transacted) (err error) {
 			return hs.Add(values.MakeString(z.GetKennung().String()))
 		},

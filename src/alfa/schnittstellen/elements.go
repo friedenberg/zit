@@ -46,9 +46,13 @@ type Lessor[T any] interface {
 	Less(T) bool
 }
 
+type Lessor3[T any] interface {
+	Less(T, T) bool
+}
+
 // TODO-P2 rename
 type Lessor2[T any, TPtr Ptr[T]] interface {
-	Less(T, T) bool
+	Lessor3[T]
 	LessPtr(TPtr, TPtr) bool
 }
 

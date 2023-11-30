@@ -12,10 +12,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/charlie/iter2"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -56,7 +54,7 @@ type Compiled struct {
 func (a *compiled) Reset() {
 	a.lock = &sync.Mutex{}
 	a.EtikettenHidden = kennung.MakeEtikettSet()
-	a.Etiketten = collections_ptr.MakeMutableValueSet[ketikett, *ketikett](nil)
+	a.Etiketten = collections_value.MakeMutableValueSet[*ketikett](nil)
 	a.InlineTypen = collections_value.MakeMutableValueSet[values.String](
 		nil,
 	)
@@ -88,7 +86,7 @@ type compiled struct {
 	EtikettenHidden             kennung.EtikettSet
 	EtikettenHiddenStringsSlice []string
 	DefaultEtiketten            kennung.EtikettSet
-	Etiketten                   schnittstellen.MutableSetPtrLike[ketikett, *ketikett]
+	Etiketten                   schnittstellen.MutableSetLike[*ketikett]
 	ImplicitEtiketten           implicitEtikettenMap
 
 	// Typen
@@ -171,7 +169,7 @@ func (kc *Compiled) recompile(
 	{
 		kc.ImplicitEtiketten = make(implicitEtikettenMap)
 
-		if err = kc.Etiketten.EachPtr(
+		if err = kc.Etiketten.Each(
 			func(ke *ketikett) (err error) {
 				var e kennung.Etikett
 
@@ -214,7 +212,7 @@ func (kc *Compiled) recompile(
 		kc.InlineTypen = inlineTypen.CloneSetLike()
 	}()
 
-	if err = kc.Typen.EachPtr(
+	if err = kc.Typen.Each(
 		func(ct *sku.Transacted) (err error) {
 			var ta *typ_akte.V0
 
@@ -277,7 +275,7 @@ func (c compiled) GetSortedTypenExpanded(
 			c.lock.Lock()
 			defer c.lock.Unlock()
 
-			ct, ok := c.Typen.GetPtr(v.String())
+			ct, ok := c.Typen.Get(v.String())
 
 			if !ok {
 				return
@@ -330,7 +328,7 @@ func (kc compiled) GetApproximatedTyp(
 }
 
 func (kc compiled) GetKasten(k kennung.Kasten) (ct *sku.Transacted) {
-	if ct1, ok := kc.Kisten.GetPtr(k.String()); ok {
+	if ct1, ok := kc.Kisten.Get(k.String()); ok {
 		ct = sku.GetTransactedPool().Get()
 		errors.PanicIfError(ct.SetFromSkuLike(ct1))
 	}
@@ -374,9 +372,8 @@ func (k *compiled) AddKasten(
 	b := sku.GetTransactedPool().Get()
 	*b = *c
 
-	err = iter2.AddPtrOrReplaceIfGreater[sku.Transacted, *sku.Transacted](
+	err = iter.AddOrReplaceIfGreater[*sku.Transacted](
 		k.Kisten,
-		sku.TransactedLessor,
 		b,
 	)
 
@@ -404,9 +401,8 @@ func (k *compiled) AddTyp(
 
 	k.hasChanges = true
 
-	err = iter2.AddPtrOrReplaceIfGreater[sku.Transacted, *sku.Transacted](
+	err = iter.AddOrReplaceIfGreater[*sku.Transacted](
 		k.Typen,
-		sku.TransactedLessor,
 		b,
 	)
 

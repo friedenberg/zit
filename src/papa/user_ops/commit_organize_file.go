@@ -88,7 +88,7 @@ func (c CommitOrganizeFile) Run(
 			l.Lock()
 			defer l.Unlock()
 
-			if err = toUpdate.AddPtr(sk); err != nil {
+			if err = toUpdate.Add(sk); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

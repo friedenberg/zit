@@ -101,7 +101,7 @@ func (c ZettelFromExternalAkte) Run(
 						return
 					}
 
-					return results.AddPtr(z)
+					return results.Add(z)
 				},
 			),
 		); err != nil {
@@ -110,7 +110,7 @@ func (c ZettelFromExternalAkte) Run(
 		}
 	}
 
-	if err = results.EachPtr(
+	if err = results.Each(
 		func(z *sku.Transacted) (err error) {
 			if c.ProtoZettel.Apply(z) {
 				if _, err = c.StoreObjekten().Update(
@@ -160,7 +160,7 @@ func (c ZettelFromExternalAkte) Run(
 			}
 		}
 
-		results.AddPtr(tz)
+		results.Add(tz)
 	}
 
 	if err != nil {

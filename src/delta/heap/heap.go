@@ -18,7 +18,7 @@ type ElementPtr[T Element] interface {
 }
 
 type heapPrivate[T Element, TPtr ElementPtr[T]] struct {
-	Lessor   schnittstellen.Lessor2[T, TPtr]
+	Lessor   schnittstellen.Lessor3[TPtr]
 	Resetter schnittstellen.Resetter2[T, TPtr]
 	Elements []TPtr
 }
@@ -28,7 +28,7 @@ func (h heapPrivate[T, TPtr]) Len() int {
 }
 
 func (h heapPrivate[T, TPtr]) Less(i, j int) (ok bool) {
-	ok = h.Lessor.LessPtr(h.Elements[i], h.Elements[j])
+	ok = h.Lessor.Less(h.Elements[i], h.Elements[j])
 	return
 }
 
@@ -68,7 +68,7 @@ func (a heapPrivate[T, TPtr]) Sorted() (b heapPrivate[T, TPtr]) {
 
 func Make[T Element, TPtr ElementPtr[T]](
 	equaler schnittstellen.Equaler[T, TPtr],
-	lessor schnittstellen.Lessor2[T, TPtr],
+	lessor schnittstellen.Lessor3[TPtr],
 	resetter schnittstellen.Resetter2[T, TPtr],
 ) Heap[T, TPtr] {
 	return Heap[T, TPtr]{
@@ -85,7 +85,7 @@ func Make[T Element, TPtr ElementPtr[T]](
 
 func MakeHeapFromSlice[T Element, TPtr ElementPtr[T]](
 	equaler schnittstellen.Equaler[T, TPtr],
-	lessor schnittstellen.Lessor2[T, TPtr],
+	lessor schnittstellen.Lessor3[TPtr],
 	resetter schnittstellen.Resetter2[T, TPtr],
 	s []TPtr,
 ) Heap[T, TPtr] {
@@ -125,7 +125,7 @@ func (h *Heap[T, TPtr]) GetEqualer() schnittstellen.Equaler[T, TPtr] {
 	return h.equaler
 }
 
-func (h *Heap[T, TPtr]) GetLessor() schnittstellen.Lessor2[T, TPtr] {
+func (h *Heap[T, TPtr]) GetLessor() schnittstellen.Lessor3[TPtr] {
 	return h.h.Lessor
 }
 
@@ -330,7 +330,7 @@ func (a *Heap[T, TPtr]) MergeStream(
 				a.Pop()
 				continue LOOP
 
-			case !a.h.Lessor.LessPtr(peeked, e):
+			case !a.h.Lessor.Less(peeked, e):
 				break LOOP
 
 			default:
@@ -373,7 +373,7 @@ func (a *Heap[T, TPtr]) MergeStream(
 			last = popped
 		} else if a.equaler.EqualsPtr(popped, last) {
 			continue
-		} else if a.h.Lessor.LessPtr(popped, last) {
+		} else if a.h.Lessor.Less(popped, last) {
 			err = errors.Errorf(
 				"last is greater than current! last: %v, current: %v",
 				last,

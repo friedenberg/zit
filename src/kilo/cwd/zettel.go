@@ -26,7 +26,11 @@ func (c *CwdFiles) tryZettel(d string, a string, p string) (err error) {
 		return
 	}
 
-	t, _ := c.Zettelen.Get(h.String())
+	t, ok := c.Zettelen.Get(h.String())
+
+  if !ok {
+    t = &sku.ExternalMaybe{}
+  }
 
 	if err = t.Kennung.SetWithKennung(h); err != nil {
 		err = errors.Wrap(err)

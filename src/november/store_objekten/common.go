@@ -193,7 +193,7 @@ func (s *Store) ReadAllSchwanzen(
 		func(g gattung.Gattung) (err error) {
 			switch g {
 			case gattung.Typ:
-				if err = s.GetKonfig().Typen.EachPtr(f); err != nil {
+				if err = s.GetKonfig().Typen.Each(f); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -205,7 +205,7 @@ func (s *Store) ReadAllSchwanzen(
 				}
 
 			case gattung.Kasten:
-				if err = s.GetKonfig().Kisten.EachPtr(f); err != nil {
+				if err = s.GetKonfig().Kisten.Each(f); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

@@ -18,7 +18,7 @@ func (_ IntEqualer) EqualsPtr(a, b *Int) bool {
 
 type IntLessor struct{}
 
-func (_ IntLessor) Less(a, b Int) bool {
+func (_ IntLessor) Less(a, b *Int) bool {
 	return a.Int() < b.Int()
 }
 

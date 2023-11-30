@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -15,7 +14,7 @@ import (
 )
 
 func init() {
-	collections_ptr.RegisterGobValue[ketikett, *ketikett](nil)
+	collections_value.RegisterGobValue[*ketikett](nil)
 }
 
 type implicitEtikettenMap map[string]kennung.EtikettMutableSet
@@ -50,8 +49,8 @@ type ketikett struct {
 	Computed   bool
 }
 
-func (a ketikett) Less(b ketikett) bool {
-	return sku.TransactedLessor.Less(a.Transacted, b.Transacted)
+func (a *ketikett) Less(b *ketikett) bool {
+	return sku.TransactedLessor.Less(&a.Transacted, &b.Transacted)
 }
 
 func (a ketikett) EqualsAny(b any) bool {
@@ -85,7 +84,7 @@ func (k compiled) EachEtikett(
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return k.Etiketten.Each(
-		func(ek ketikett) (err error) {
+		func(ek *ketikett) (err error) {
 			return f(&ek.Transacted)
 		},
 	)
@@ -179,7 +178,7 @@ func (k *compiled) AddEtikett(
 		Transacted: *b2,
 	}
 
-	if err = iter.AddOrReplaceIfGreater[ketikett](k.Etiketten, b); err != nil {
+	if err = iter.AddOrReplaceIfGreater[*ketikett](k.Etiketten, &b); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -215,7 +214,7 @@ func (c compiled) GetSortedEtikettenExpanded(
 
 	expandedMaybe.Each(
 		func(v values.String) (err error) {
-			ct, ok := c.Etiketten.GetPtr(v.String())
+			ct, ok := c.Etiketten.Get(v.String())
 
 			if !ok {
 				return

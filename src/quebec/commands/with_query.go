@@ -80,7 +80,7 @@ func (c commandWithQuery) Complete(
 	}
 
 	if cg.Contains(gattung.Typ) {
-		if err = u.Konfig().Typen.EachPtr(
+		if err = u.Konfig().Typen.Each(
 			func(tt *sku.Transacted) (err error) {
 				if err = errors.Out().Printf("%s\tTyp", tt.GetKennung()); err != nil {
 					err = errors.IsAsNilOrWrapf(
