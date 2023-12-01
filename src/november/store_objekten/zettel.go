@@ -68,11 +68,11 @@ func (s *Store) Create(
 	// 	return
 	// }
 
-	m := mg.GetMetadatei()
-	s.protoZettel.Apply(&m)
+	m := mg.GetMetadateiPtr()
+	s.protoZettel.Apply(m)
 
 	err = s.StoreUtil.GetKonfig().ApplyToNewMetadatei(
-		&m,
+		m,
 		s.GetAkten().GetTypV0(),
 	)
 
@@ -144,10 +144,10 @@ func (s *Store) Update(
 		panic("mutter was nil")
 	}
 
-	m := mg.GetMetadatei()
+	m := mg.GetMetadateiPtr()
 
 	err = s.StoreUtil.GetKonfig().ApplyToNewMetadatei(
-		&m,
+		m,
 		s.GetAkten().GetTypV0(),
 	)
 
@@ -161,7 +161,7 @@ func (s *Store) Update(
 		return
 	}
 
-	if tz.Metadatei.EqualsSansTai(mutter.GetMetadatei()) {
+	if tz.Metadatei.EqualsSansTai(mutter.GetMetadateiPtr()) {
 		if err = tz.SetFromSkuLike(mutter); err != nil {
 			err = errors.Wrap(err)
 			return

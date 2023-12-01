@@ -77,7 +77,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 func TestEqualitySelf(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	text := metadatei.Metadatei{
+	text := &metadatei.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
 		Typ:         makeAkteExt(t, "text"),
 	}
@@ -107,7 +107,7 @@ func TestEqualityNotSelf(t1 *testing.T) {
 		"tag3",
 	))
 
-	text1 := metadatei.Metadatei{
+	text1 := &metadatei.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
 		Typ:         makeAkteExt(t, "text"),
 	}

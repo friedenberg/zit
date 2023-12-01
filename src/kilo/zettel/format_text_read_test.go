@@ -41,7 +41,7 @@ func TestReadWithoutAkte(t1 *testing.T) {
 `,
 	)
 
-	expected := metadatei.Metadatei{
+	expected := &metadatei.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
 		Typ:         makeAkteExt(t, "md"),
 	}
@@ -81,7 +81,7 @@ func TestReadWithoutAkteWithMultilineBezeichnung(t1 *testing.T) {
 `,
 	)
 
-	expected := metadatei.Metadatei{
+	expected := &metadatei.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title\ncontinues"),
 		Typ:         makeAkteExt(t, "md"),
 	}
@@ -127,7 +127,7 @@ the body
 `,
 	)
 
-	expected := metadatei.Metadatei{
+	expected := &metadatei.Metadatei{
 		AkteSha: sha.Must(
 			"036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064",
 		),

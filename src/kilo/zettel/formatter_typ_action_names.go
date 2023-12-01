@@ -35,7 +35,7 @@ func (e formatterTypActionNames) Format(
 ) (n int64, err error) {
 	e1 := typ_akte.MakeFormatterActionNames()
 
-	ct := e.erworben.GetApproximatedTyp(z.GetMetadatei().GetTyp())
+	ct := e.erworben.GetApproximatedTyp(z.Metadatei.GetTyp())
 	t := ct.ApproximatedOrActual()
 
 	if t == nil {

@@ -69,7 +69,7 @@ func (s konfigStore) Update(
 		return
 	}
 
-	if mutter != nil && kt.Metadatei.EqualsSansTai(mutter.GetMetadatei()) {
+	if mutter != nil && kt.Metadatei.EqualsSansTai(&mutter.Metadatei) {
 		if err = kt.SetFromSkuLike(mutter); err != nil {
 			err = errors.Wrap(err)
 			return

@@ -31,7 +31,7 @@ func (pz *ProtoZettel) AddToFlagSet(f *flag.FlagSet) {
 	pz.Metadatei.AddToFlagSet(f)
 }
 
-func (pz ProtoZettel) Equals(z metadatei.Metadatei) (ok bool) {
+func (pz ProtoZettel) Equals(z *metadatei.Metadatei) (ok bool) {
 	var okTyp, okMet bool
 
 	if !kennung.IsEmpty(pz.Metadatei.Typ) &&

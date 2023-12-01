@@ -109,7 +109,7 @@ func (c CommitOrganizeFile) Run(
 				return
 			}
 
-			m := metadatei.Metadatei{
+			m := &metadatei.Metadatei{
 				Typ: b.Metadatei.Typ,
 			}
 
@@ -147,7 +147,7 @@ func (c CommitOrganizeFile) Run(
 		func(change changes.Change) (err error) {
 			bez := change.Key
 
-			m := metadatei.Metadatei{
+			m := &metadatei.Metadatei{
 				Typ: b.Metadatei.Typ,
 			}
 

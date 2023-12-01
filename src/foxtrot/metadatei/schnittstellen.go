@@ -10,10 +10,10 @@ import (
 type (
 	Getter interface {
 		GetMetadatei() Metadatei
+		GetMetadateiPtr() *Metadatei
 	}
 
 	GetterPtr interface {
-		GetMetadateiPtr() *Metadatei
 	}
 
 	Setter interface {
@@ -22,7 +22,6 @@ type (
 
 	MetadateiLike interface {
 		Getter
-		GetterPtr
 		Setter
 	}
 

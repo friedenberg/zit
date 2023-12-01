@@ -77,7 +77,7 @@ func (a *Transacted) SetMetadatei(m metadatei.Metadatei) {
 }
 
 func (a *Transacted) GetTai() kennung.Tai {
-	return a.GetMetadatei().GetTai()
+	return a.Metadatei.GetTai()
 }
 
 func (a *Transacted) GetKopf() kennung.Tai {
@@ -131,7 +131,7 @@ func (a *Transacted) Equals(b *Transacted) (ok bool) {
 	// 	return
 	// }
 
-	if !a.Metadatei.Equals(b.Metadatei) {
+	if !a.Metadatei.Equals(&b.Metadatei) {
 		return
 	}
 

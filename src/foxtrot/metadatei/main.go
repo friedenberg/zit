@@ -34,8 +34,8 @@ type Metadatei struct {
 	Tai           kennung.Tai
 }
 
-func (m Metadatei) GetMetadatei() Metadatei {
-	return m
+func (m *Metadatei) GetMetadatei() Metadatei {
+	return *m
 }
 
 func (m *Metadatei) GetMetadateiPtr() *Metadatei {
@@ -73,7 +73,7 @@ func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {
 	)
 }
 
-func (z Metadatei) UserInputIsEmpty() bool {
+func (z *Metadatei) UserInputIsEmpty() bool {
 	if !z.Bezeichnung.IsEmpty() {
 		return false
 	}
@@ -89,7 +89,7 @@ func (z Metadatei) UserInputIsEmpty() bool {
 	return true
 }
 
-func (z Metadatei) IsEmpty() bool {
+func (z *Metadatei) IsEmpty() bool {
 	if !z.AkteSha.IsNull() {
 		return false
 	}
@@ -113,7 +113,7 @@ func (z *Metadatei) SetTyp(t kennung.Typ) {
 	z.Typ = t
 }
 
-func (z Metadatei) GetBezeichnung() bezeichnung.Bezeichnung {
+func (z *Metadatei) GetBezeichnung() bezeichnung.Bezeichnung {
 	return z.Bezeichnung
 }
 
@@ -165,7 +165,7 @@ func (z *Metadatei) SetAkteSha(sh schnittstellen.ShaLike) {
 	z.AkteSha = sha.Make(sh)
 }
 
-func (z Metadatei) GetTyp() kennung.Typ {
+func (z *Metadatei) GetTyp() kennung.Typ {
 	return z.Typ
 }
 
@@ -173,11 +173,11 @@ func (z *Metadatei) GetTypPtr() *kennung.Typ {
 	return &z.Typ
 }
 
-func (z Metadatei) GetTai() kennung.Tai {
+func (z *Metadatei) GetTai() kennung.Tai {
 	return z.Tai
 }
 
-func (pz Metadatei) EqualsSansTai(z1 Metadatei) bool {
+func (pz *Metadatei) EqualsSansTai(z1 *Metadatei) bool {
 	if !pz.AkteSha.Equals(z1.AkteSha) {
 		return false
 	}
@@ -197,7 +197,7 @@ func (pz Metadatei) EqualsSansTai(z1 Metadatei) bool {
 	return true
 }
 
-func (pz Metadatei) Equals(z1 Metadatei) bool {
+func (pz *Metadatei) Equals(z1 *Metadatei) bool {
 	if !pz.EqualsSansTai(z1) {
 		return false
 	}
@@ -209,7 +209,7 @@ func (pz Metadatei) Equals(z1 Metadatei) bool {
 	return true
 }
 
-func (z Metadatei) Description() (d string) {
+func (z *Metadatei) Description() (d string) {
 	d = z.Bezeichnung.String()
 
 	if strings.TrimSpace(d) == "" {

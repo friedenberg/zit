@@ -139,7 +139,7 @@ func (c ZettelFromExternalAkte) Run(
 	)
 
 	for _, z := range sortedToCreated {
-		if z.GetMetadatei().IsEmpty() {
+		if z.Metadatei.IsEmpty() {
 			return
 		}
 

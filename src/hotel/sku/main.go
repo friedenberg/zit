@@ -28,7 +28,7 @@ type (
 		GetAkteSha() schnittstellen.ShaLike
 		GetKey() string
 
-		metadatei.GetterPtr
+		metadatei.Getter
 		metadatei.Setter
 
 		SetAkteSha(schnittstellen.ShaLike)

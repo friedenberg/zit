@@ -120,7 +120,7 @@ func (c CreateFromPaths) Run(
 
 	if err = toCreate.Each(
 		func(z *sku.External) (err error) {
-			if z.GetMetadatei().IsEmpty() {
+			if z.Metadatei.IsEmpty() {
 				return
 			}
 

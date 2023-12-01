@@ -131,8 +131,8 @@ func (s common) shouldCheckOut(
 		ok = true
 	}
 
-	if cz.Internal.GetMetadatei().Equals(
-		cz.External.GetMetadatei(),
+	if cz.Internal.Metadatei.Equals(
+		&cz.External.Metadatei,
 	) {
 		return
 	}

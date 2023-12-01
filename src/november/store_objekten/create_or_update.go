@@ -56,7 +56,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	}
 
 	// TODO-P2: determine why Metadatei.Etiketten can be nil
-	if transactedPtr.Metadatei.EqualsSansTai(co.Internal.Metadatei) {
+	if transactedPtr.Metadatei.EqualsSansTai(&co.Internal.Metadatei) {
 		transactedPtr = &co.Internal
 
 		if err = s.handleUnchanged(transactedPtr); err != nil {
@@ -142,7 +142,7 @@ func (s *Store) CreateOrUpdate(
 
 	if mutter != nil &&
 		kennung.Equals(transactedPtr.GetKennung(), mutter.GetKennungLike()) &&
-		transactedPtr.Metadatei.EqualsSansTai(mutter.GetMetadatei()) {
+		transactedPtr.Metadatei.EqualsSansTai(&mutter.Metadatei) {
 		if err = transactedPtr.SetFromSkuLike(mutter); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -333,7 +333,7 @@ func (s *Store) CreateOrUpdateAkte(
 
 	if mutter != nil &&
 		kennung.Equals(transactedPtr.GetKennung(), mutter.GetKennungLike()) &&
-		transactedPtr.Metadatei.EqualsSansTai(mutter.GetMetadatei()) {
+		transactedPtr.Metadatei.EqualsSansTai(&mutter.Metadatei) {
 		if err = transactedPtr.SetFromSkuLike(mutter); err != nil {
 			err = errors.Wrap(err)
 			return

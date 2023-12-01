@@ -14,14 +14,14 @@ type CheckedOut struct {
 
 func (c *CheckedOut) InternalAndExternalEqualsSansTai() bool {
 	return c.External.Metadatei.EqualsSansTai(
-		c.Internal.Metadatei,
+		&c.Internal.Metadatei,
 	)
 }
 
 func (c *CheckedOut) DetermineState(justCheckedOut bool) {
 	if c.Internal.GetObjekteSha().IsNull() {
 		c.State = checked_out_state.StateUntracked
-	} else if c.Internal.GetMetadatei().EqualsSansTai(c.External.GetMetadatei()) {
+	} else if c.Internal.Metadatei.EqualsSansTai(&c.External.Metadatei) {
 		if justCheckedOut {
 			c.State = checked_out_state.StateJustCheckedOut
 		} else {

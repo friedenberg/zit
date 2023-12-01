@@ -74,7 +74,7 @@ func (zws *Schwanzen) Set(z *Transacted, flush bool) (ok bool) {
 		zws.hinweisen[h.String()] = *z
 		ok = true
 
-	case t1.Metadatei.EqualsSansTai(z.Metadatei):
+	case t1.Metadatei.EqualsSansTai(&z.Metadatei):
 		zws.etikettIndex.Add(z.Metadatei.GetEtiketten())
 		ok = flush && t1.GetTai().Equals(z.GetTai())
 
