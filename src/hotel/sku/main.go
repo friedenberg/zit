@@ -29,7 +29,6 @@ type (
 		GetKey() string
 
 		metadatei.Getter
-		metadatei.Setter
 
 		SetAkteSha(schnittstellen.ShaLike)
 		SetObjekteSha(schnittstellen.ShaLike)

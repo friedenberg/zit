@@ -143,7 +143,7 @@ func (f *cli) WriteStringFormat(
 	}
 
 	if f.writeTyp {
-		t := o.GetMetadateiPtr().GetTypPtr()
+		t := o.GetMetadatei().GetTypPtr()
 
 		if len(t.String()) > 0 {
 			n1, err = sw.WriteString(" !")
@@ -166,7 +166,7 @@ func (f *cli) WriteStringFormat(
 
 	didWriteBezeichnung := false
 	if f.writeBezeichnung {
-		b := o.GetMetadateiPtr().GetBezeichnungPtr()
+		b := o.GetMetadatei().GetBezeichnungPtr()
 
 		if !b.IsEmpty() {
 			didWriteBezeichnung = true
@@ -198,7 +198,7 @@ func (f *cli) WriteStringFormat(
 	}
 
 	if f.writeEtiketten && !didWriteBezeichnung {
-		b := o.GetMetadateiPtr().GetEtiketten()
+		b := o.GetMetadatei().GetEtiketten()
 
 		if b.Len() > 0 {
 			n1, err = sw.WriteString(" ")

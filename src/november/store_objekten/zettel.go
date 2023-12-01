@@ -68,7 +68,7 @@ func (s *Store) Create(
 	// 	return
 	// }
 
-	m := mg.GetMetadateiPtr()
+	m := mg.GetMetadatei()
 	s.protoZettel.Apply(m)
 
 	err = s.StoreUtil.GetKonfig().ApplyToNewMetadatei(
@@ -144,7 +144,7 @@ func (s *Store) Update(
 		panic("mutter was nil")
 	}
 
-	m := mg.GetMetadateiPtr()
+	m := mg.GetMetadatei()
 
 	err = s.StoreUtil.GetKonfig().ApplyToNewMetadatei(
 		m,
@@ -161,7 +161,7 @@ func (s *Store) Update(
 		return
 	}
 
-	if tz.Metadatei.EqualsSansTai(mutter.GetMetadateiPtr()) {
+	if tz.Metadatei.EqualsSansTai(mutter.GetMetadatei()) {
 		if err = tz.SetFromSkuLike(mutter); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -216,7 +216,7 @@ func (s *Store) makeSku(
 
 	m := mg.GetMetadatei()
 	tz = sku.GetTransactedPool().Get()
-	tz.Metadatei = m
+  metadatei.Resetter.ResetWithPtr(&tz.Metadatei, m)
 
 	if err = tz.Kennung.SetWithKennung(k); err != nil {
 		err = errors.Wrap(err)

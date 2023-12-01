@@ -30,11 +30,13 @@ func (s SetPrefixVerzeichnisse) Len() int {
 // this splits on right-expanded
 func (s *SetPrefixVerzeichnisse) Add(z *sku.Transacted) (err error) {
 	es := kennung.Expanded(
-		z.GetMetadateiPtr().Verzeichnisse.GetImplicitEtiketten(),
+		z.GetMetadatei().Verzeichnisse.GetImplicitEtiketten(),
 		expansion.ExpanderRight,
 	).CloneMutableSetPtrLike()
 
-	if err = z.GetMetadateiPtr().Verzeichnisse.GetExpandedEtiketten().EachPtr(es.AddPtr); err != nil {
+	if err = z.GetMetadatei().Verzeichnisse.GetExpandedEtiketten().EachPtr(
+    es.AddPtr,
+  ); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -42,7 +42,7 @@ func readFormat(
 	f metadatei.TextFormat,
 	af *test_metadatei_io.AkteIOFactory,
 	contents string,
-) (z metadatei.Metadatei, a string) {
+) (z *metadatei.Metadatei, a string) {
 	var zt sku.Transacted
 
 	t := t1.Skip(1)

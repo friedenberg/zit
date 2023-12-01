@@ -9,20 +9,15 @@ import (
 
 type (
 	Getter interface {
-		GetMetadatei() Metadatei
-		GetMetadateiPtr() *Metadatei
-	}
-
-	GetterPtr interface {
+		GetMetadatei() *Metadatei
 	}
 
 	Setter interface {
-		SetMetadatei(Metadatei)
+		SetMetadatei(*Metadatei)
 	}
 
 	MetadateiLike interface {
 		Getter
-		Setter
 	}
 
 	AktePathGetter interface {
@@ -39,7 +34,6 @@ type (
 
 	PersistentParserContext interface {
 		Getter
-		Setter
 	}
 
 	TextFormatterContext interface {

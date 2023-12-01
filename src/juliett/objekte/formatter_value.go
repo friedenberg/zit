@@ -76,8 +76,8 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	switch fv.string {
 	case "etiketten-all":
 		return func(tl *sku.Transacted) (err error) {
-			esImp := tl.GetMetadateiPtr().Verzeichnisse.GetExpandedEtiketten()
-			esEx := tl.GetMetadateiPtr().Verzeichnisse.GetImplicitEtiketten()
+			esImp := tl.GetMetadatei().Verzeichnisse.GetExpandedEtiketten()
+			esEx := tl.GetMetadatei().Verzeichnisse.GetImplicitEtiketten()
 			// TODO-P3 determine if empty sets should be printed or not
 
 			if _, err = fmt.Fprintln(
@@ -93,7 +93,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 
 	case "etiketten-expanded":
 		return func(tl *sku.Transacted) (err error) {
-			esImp := tl.GetMetadateiPtr().Verzeichnisse.GetExpandedEtiketten()
+			esImp := tl.GetMetadatei().Verzeichnisse.GetExpandedEtiketten()
 			// TODO-P3 determine if empty sets should be printed or not
 
 			if _, err = fmt.Fprintln(
@@ -109,7 +109,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 
 	case "etiketten-implicit":
 		return func(tl *sku.Transacted) (err error) {
-			esImp := tl.GetMetadateiPtr().Verzeichnisse.GetImplicitEtiketten()
+			esImp := tl.GetMetadatei().Verzeichnisse.GetImplicitEtiketten()
 			// TODO-P3 determine if empty sets should be printed or not
 
 			if _, err = fmt.Fprintln(

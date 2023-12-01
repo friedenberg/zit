@@ -86,7 +86,7 @@ func (s *common) ReadOneExternalObjekte(
 	t *sku.Transacted,
 ) (err error) {
 	if t != nil {
-		metadatei.Resetter.ResetWithPtr(e.GetMetadateiPtr(), t.GetMetadateiPtr())
+		metadatei.Resetter.ResetWithPtr(e.GetMetadatei(), t.GetMetadatei())
 	}
 
 	var f *os.File
@@ -115,7 +115,11 @@ func (s *common) ReadOneExternalObjekteReader(
 		return
 	}
 
-	if err = sku.CalculateAndSetSha(e, s.persistentMetadateiFormat, s.options); err != nil {
+	if err = sku.CalculateAndSetSha(
+    e,
+    s.persistentMetadateiFormat,
+    s.options,
+  ); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -127,7 +131,7 @@ func (s *common) ReadOneExternalAkte(
 	e *sku.External,
 	t *sku.Transacted,
 ) (err error) {
-	e.SetMetadatei(t.GetMetadatei())
+  metadatei.Resetter.ResetWithPtr(&e.Metadatei, t.GetMetadatei())
 
 	var aw sha.WriteCloser
 
@@ -163,7 +167,7 @@ func (s *common) ReadOneExternalAkte(
 
 	e.Metadatei.Tai = kennung.TaiFromTime(thyme.Tyme(fStat.ModTime()))
 	sh := sha.Make(aw.GetShaLike())
-	e.GetMetadateiPtr().AkteSha = sh
+	e.GetMetadatei().AkteSha = sh
 
 	if err = sku.CalculateAndSetSha(e, s.persistentMetadateiFormat, s.options); err != nil {
 		err = errors.Wrap(err)

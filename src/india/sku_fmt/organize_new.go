@@ -131,7 +131,7 @@ func (f *organizeNew) WriteStringFormat(
 		}
 	}
 
-	t := o.GetMetadateiPtr().GetTypPtr()
+	t := o.GetMetadatei().GetTypPtr()
 
 	if len(t.String()) > 0 {
 		n1, err = sw.WriteString(" !")
@@ -151,10 +151,10 @@ func (f *organizeNew) WriteStringFormat(
 		}
 	}
 
-	b := o.GetMetadateiPtr().GetBezeichnungPtr()
+	b := o.GetMetadatei().GetBezeichnungPtr()
 
 	if f.options.PrintEtikettenAlways {
-		b := o.GetMetadateiPtr().GetEtiketten()
+		b := o.GetMetadatei().GetEtiketten()
 
 		if b.Len() > 0 {
 			n1, err = sw.WriteString(" ")

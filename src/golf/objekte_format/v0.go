@@ -85,7 +85,5 @@ func (f v0) ParsePersistentMetadatei(
 
 	m.SetEtiketten(etiketten)
 
-	c.SetMetadatei(m)
-
 	return
 }

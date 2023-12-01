@@ -112,12 +112,6 @@ func (k compiled) ApplyToNewMetadatei(
 ) (err error) {
 	m := ml.GetMetadatei()
 
-	defer func() {
-		if err == nil {
-			ml.SetMetadatei(m)
-		}
-	}()
-
 	t := m.GetTyp()
 	normalized := kennung.WithRemovedCommonPrefixes(m.GetEtiketten())
 	m.SetEtiketten(normalized)

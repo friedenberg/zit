@@ -80,8 +80,6 @@ func (pz ProtoZettel) Apply(ml metadatei.MetadateiLike) (ok bool) {
 
 	errors.PanicIfError(pz.Metadatei.GetEtiketten().EachPtr(z.AddEtikettPtr))
 
-	ml.SetMetadatei(z)
-
 	return
 }
 
@@ -120,8 +118,6 @@ func (pz ProtoZettel) ApplyWithAkteFD(
 	}
 
 	errors.PanicIfError(pz.Metadatei.GetEtiketten().EachPtr(z.AddEtikettPtr))
-
-	ml.SetMetadatei(z)
 
 	return
 }

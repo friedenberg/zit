@@ -40,12 +40,11 @@ func (f textParser) ParseMetadatei(
 	c TextParserContext,
 ) (n int64, err error) {
 	m := c.GetMetadatei()
-	Resetter.Reset(&m)
+	Resetter.Reset(m)
 
 	var n1 int64
 
 	defer func() {
-		c.SetMetadatei(m)
 		c.SetAkteSha(m.AkteSha)
 	}()
 
@@ -65,7 +64,7 @@ func (f textParser) ParseMetadatei(
 						*kennung.Etikett,
 					](m.GetEtikettenMutable()),
 					"!": func(v string) (err error) {
-						return f.readTyp(&m, v, &akteFD)
+						return f.readTyp(m, v, &akteFD)
 					},
 				},
 			),

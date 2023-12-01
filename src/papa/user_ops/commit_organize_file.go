@@ -83,8 +83,6 @@ func (c CommitOrganizeFile) Run(
 				m.Typ = b.Metadatei.Typ
 			}
 
-			sk.SetMetadatei(m)
-
 			l.Lock()
 			defer l.Unlock()
 

@@ -106,16 +106,19 @@ func (s *Store) CreateOrUpdate(
 		}
 	}
 
-	var m metadatei.Metadatei
+	var m *metadatei.Metadatei
 
 	if mg != nil {
 		m = mg.GetMetadatei()
-	}
+	} else {
+    m = metadatei.GetPool().Get()
+    defer metadatei.GetPool().Put(m)
+  }
 
 	m.Tai = s.GetTai()
 
 	transactedPtr = sku.GetTransactedPool().Get()
-	transactedPtr.Metadatei = m
+	metadatei.Resetter.ResetWithPtr(&transactedPtr.Metadatei, m)
 
 	if err = transactedPtr.Kennung.SetWithKennung(kennungPtr); err != nil {
 		err = errors.Wrap(err)
@@ -295,16 +298,19 @@ func (s *Store) CreateOrUpdateAkte(
 		}
 	}
 
-	var m metadatei.Metadatei
+	var m *metadatei.Metadatei
 
 	if mg != nil {
 		m = mg.GetMetadatei()
-	}
+	} else {
+    m = metadatei.GetPool().Get()
+    defer metadatei.GetPool().Put(m)
+  }
 
 	m.Tai = s.GetTai()
 
 	transactedPtr = sku.GetTransactedPool().Get()
-	transactedPtr.Metadatei = m
+  metadatei.Resetter.ResetWithPtr(&transactedPtr.Metadatei, m)
 
 	if err = transactedPtr.Kennung.SetWithKennung(kennungPtr); err != nil {
 		err = errors.Wrap(err)

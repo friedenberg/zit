@@ -34,16 +34,12 @@ type Metadatei struct {
 	Tai           kennung.Tai
 }
 
-func (m *Metadatei) GetMetadatei() Metadatei {
-	return *m
+func (m *Metadatei) GetMetadatei() *Metadatei {
+	return m
 }
 
 func (m *Metadatei) GetMetadateiPtr() *Metadatei {
 	return m
-}
-
-func (a *Metadatei) SetMetadatei(b Metadatei) {
-	*a = b
 }
 
 func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {

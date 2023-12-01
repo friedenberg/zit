@@ -97,9 +97,9 @@ func (tm *Sku) MergeEtiketten() (err error) {
 
 	ets := same.CloneSetPtrLike()
 
-	tm.Left.GetMetadateiPtr().SetEtiketten(ets)
-	tm.Middle.GetMetadateiPtr().SetEtiketten(ets)
-	tm.Right.GetMetadateiPtr().SetEtiketten(ets)
+	tm.Left.GetMetadatei().SetEtiketten(ets)
+	tm.Middle.GetMetadatei().SetEtiketten(ets)
+	tm.Right.GetMetadatei().SetEtiketten(ets)
 
 	return
 }

@@ -297,7 +297,5 @@ func (f v4) ParsePersistentMetadatei(
 	// 	return
 	// }
 
-	c.SetMetadatei(m)
-
 	return
 }

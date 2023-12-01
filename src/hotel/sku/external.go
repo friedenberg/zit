@@ -35,11 +35,7 @@ func (a *External) GetKennung() kennung.Kennung {
 	return a.Kennung
 }
 
-func (a *External) GetMetadatei() metadatei.Metadatei {
-	return a.Metadatei
-}
-
-func (a *External) GetMetadateiPtr() *metadatei.Metadatei {
+func (a *External) GetMetadatei() *metadatei.Metadatei {
 	return &a.Metadatei
 }
 

@@ -31,8 +31,8 @@ func (t *Transacted) SetFromSkuLike(sk SkuLike) (err error) {
 	}
 
 	t.ObjekteSha = sha.Make(sk.GetObjekteSha())
-	metadatei.Resetter.ResetWithPtr(&t.Metadatei, sk.GetMetadateiPtr())
-	t.GetMetadateiPtr().Tai = sk.GetTai()
+	metadatei.Resetter.ResetWithPtr(&t.Metadatei, sk.GetMetadatei())
+	t.GetMetadatei().Tai = sk.GetTai()
 
 	t.Kopf = sk.GetTai()
 
@@ -64,16 +64,8 @@ func (a *Transacted) GetTyp() kennung.Typ {
 	return a.Metadatei.Typ
 }
 
-func (a *Transacted) GetMetadatei() metadatei.Metadatei {
-	return a.Metadatei
-}
-
-func (a *Transacted) GetMetadateiPtr() *metadatei.Metadatei {
+func (a *Transacted) GetMetadatei() *metadatei.Metadatei {
 	return &a.Metadatei
-}
-
-func (a *Transacted) SetMetadatei(m metadatei.Metadatei) {
-	a.Metadatei = m
 }
 
 func (a *Transacted) GetTai() kennung.Tai {
@@ -85,7 +77,7 @@ func (a *Transacted) GetKopf() kennung.Tai {
 }
 
 func (a *Transacted) SetTai(t kennung.Tai) {
-	a.GetMetadateiPtr().Tai = t
+	a.GetMetadatei().Tai = t
 }
 
 func (a *Transacted) GetKennung() kennung.Kennung {
