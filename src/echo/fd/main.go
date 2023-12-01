@@ -264,5 +264,5 @@ func (dst *FD) ResetWith(src *FD) {
 	dst.isDir = src.isDir
 	dst.path = src.path
 	dst.modTime = src.modTime
-	errors.PanicIfError(dst.sha.Set(src.sha.GetShaString()))
+	errors.PanicIfError(dst.sha.SetShaLike(src.sha))
 }

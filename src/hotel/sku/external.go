@@ -83,7 +83,7 @@ func (a *External) GetAkteFD() *fd.FD {
 
 func (a *External) SetAkteFD(v *fd.FD) {
 	a.FDs.Akte.ResetWith(v)
-	a.Metadatei.AkteSha.Set(v.GetShaLike().GetShaString())
+	a.Metadatei.AkteSha.SetShaLike(v.GetShaLike())
 }
 
 func (a *External) GetAktePath() string {

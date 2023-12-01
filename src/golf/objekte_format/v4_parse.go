@@ -107,7 +107,7 @@ func (f v4) ParsePersistentMetadatei(
 		writeMetadateiHashString := false
 
 		if key.Equal(keyAkte) {
-			if err = m.AkteSha.SetBytes(valBuffer.Bytes()); err != nil {
+			if err = m.AkteSha.SetHexBytes(valBuffer.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -219,7 +219,7 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 		} else if key.Equal(keyVerzeichnisseMutter) {
-			if err = m.Verzeichnisse.Mutter.Set(val.String()); err != nil {
+			if err = m.Verzeichnisse.Mutter.SetHexBytes(val.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

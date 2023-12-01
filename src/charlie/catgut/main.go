@@ -164,6 +164,17 @@ func (str *String) WriteLower(s []byte) (n int) {
 	return str.Map(unicode.ToLower, s)
 }
 
+func (dst *String) SetBytes(src []byte) (err error) {
+	dst.copyCheck()
+	dst.Reset()
+	dst.Grow(len(src))
+
+	b := append(dst.AvailableBuffer(), src...)
+	dst.Write(b)
+
+	return
+}
+
 func (dst *String) Set(src string) (err error) {
 	dst.copyCheck()
 	dst.Reset()
