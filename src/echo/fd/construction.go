@@ -4,19 +4,18 @@ import (
 	"io"
 	"os"
 	"path"
-	"path/filepath"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/thyme"
 )
 
 func FDFromDir(
 	p string,
-) (fd FD, err error) {
+) (fd *FD, err error) {
+	fd = &FD{}
 	fd.isDir = true
 	fd.path = p
 
@@ -26,7 +25,7 @@ func FDFromDir(
 func FDFromPathWithAkteWriterFactory(
 	p string,
 	awf schnittstellen.AkteWriterFactory,
-) (fd FD, err error) {
+) (fd *FD, err error) {
 	if p == "" {
 		err = errors.Errorf("empty path")
 		return
@@ -36,48 +35,17 @@ func FDFromPathWithAkteWriterFactory(
 		panic("schnittstellen.AkteWriterFactory is nil")
 	}
 
-	var f *os.File
+	fd = &FD{}
 
-	if f, err = files.OpenExclusiveReadOnly(p); err != nil {
+	if err = fd.SetWithAkteWriterFactory(p, awf); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	defer errors.DeferredCloser(&err, f)
-
-	var akteWriter sha.WriteCloser
-
-	if akteWriter, err = awf.AkteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, akteWriter)
-
-	if _, err = io.Copy(akteWriter, f); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var fi os.FileInfo
-
-	if fi, err = f.Stat(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if fd, err = FileInfo(fi, path.Dir(p)); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	fd.path = p
-	fd.sha = sha.Make(akteWriter.GetShaLike())
 
 	return
 }
 
-func FDFromPath(p string) (fd FD, err error) {
+func FDFromPath(p string) (fd *FD, err error) {
 	if p == "" {
 		err = errors.Errorf("nil file desriptor")
 		return
@@ -103,7 +71,7 @@ func FDFromPath(p string) (fd FD, err error) {
 	return
 }
 
-func File(f *os.File) (fd FD, err error) {
+func File(f *os.File) (fd *FD, err error) {
 	if f == nil {
 		err = errors.Errorf("nil file desriptor")
 		return
@@ -124,25 +92,18 @@ func File(f *os.File) (fd FD, err error) {
 	return
 }
 
-func FileInfo(fi os.FileInfo, dir string) (fd FD, err error) {
-	fd = FD{
-		isDir:   fi.IsDir(),
-		modTime: thyme.Tyme(fi.ModTime()),
-	}
-
-	if fd.path, err = filepath.Abs(path.Join(dir, fi.Name())); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
+func FileInfo(fi os.FileInfo, dir string) (fd *FD, err error) {
+	fd = &FD{}
+	err = fd.SetFileInfo(fi, dir)
 	return
 }
 
 func MakeFileFromFD(
-	fd FD,
+	fd *FD,
 	awf schnittstellen.AkteWriterFactory,
-) (ut FD, err error) {
-	ut = fd
+) (ut *FD, err error) {
+	ut = &FD{}
+	ut.ResetWith(fd)
 
 	var f *os.File
 
@@ -176,9 +137,9 @@ func MakeFile(
 	dir string,
 	p string,
 	awf schnittstellen.AkteWriterFactory,
-) (ut FD, err error) {
+) (ut *FD, err error) {
 	todo.Remove()
-	ut = FD{}
+	ut = &FD{}
 
 	p = path.Join(dir, p)
 

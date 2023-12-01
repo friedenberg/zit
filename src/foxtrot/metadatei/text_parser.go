@@ -121,7 +121,7 @@ func (f textParser) ParseMetadatei(
 		return
 	} else if !akteFD.GetShaLike().IsNull() {
 		if afs, ok := c.(fd.AkteFDSetter); ok {
-			afs.SetAkteFD(akteFD)
+			afs.SetAkteFD(&akteFD)
 		}
 
 		m.AkteSha = sha.Make(akteFD.GetShaLike())
@@ -167,7 +167,7 @@ func (f textParser) readTyp(
 			return
 		}
 
-		if *akteFD, err = fd.FDFromPathWithAkteWriterFactory(
+		if err = akteFD.SetWithAkteWriterFactory(
 			desc,
 			f.awf,
 		); err != nil {

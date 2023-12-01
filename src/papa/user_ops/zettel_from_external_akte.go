@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/script_value"
 	"github.com/friedenberg/zit/src/charlie/sha"
@@ -45,11 +44,9 @@ func (c ZettelFromExternalAkte) Run(
 
 	results = sku.MakeTransactedMutableSet()
 
-	fds := collections_value.MakeMutableSet[fd.FD](
-		fd.KeyerSha{},
-	)
+	fds := fd.MakeMutableSetSha()
 
-	for _, fd := range iter.SortedValues[fd.FD](ms.GetCwdFDs()) {
+	for _, fd := range iter.SortedValues[*fd.FD](ms.GetCwdFDs()) {
 		if err = c.processOneFD(fd, fds.Add); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -57,7 +54,7 @@ func (c ZettelFromExternalAkte) Run(
 	}
 
 	if err = fds.Each(
-		func(fd fd.FD) (err error) {
+		func(fd *fd.FD) (err error) {
 			var z *sku.External
 
 			if z, err = c.zettelForAkte(fd); err != nil {
@@ -191,8 +188,8 @@ func (c ZettelFromExternalAkte) Run(
 }
 
 func (c *ZettelFromExternalAkte) processOneFD(
-	fd fd.FD,
-	add schnittstellen.FuncIter[fd.FD],
+	fd *fd.FD,
+	add schnittstellen.FuncIter[*fd.FD],
 ) (err error) {
 	var r io.Reader
 
@@ -228,12 +225,11 @@ func (c *ZettelFromExternalAkte) processOneFD(
 }
 
 func (c *ZettelFromExternalAkte) zettelForAkte(
-	akteFD fd.FD,
+	akteFD *fd.FD,
 ) (z *sku.External, err error) {
 	z = sku.GetExternalPool().Get()
-	z.FDs = sku.ExternalFDs{
-		Akte: akteFD,
-	}
+
+	z.FDs.Akte.ResetWith(akteFD)
 
 	if err = z.Transacted.Kennung.SetWithKennung(&kennung.Hinweis{}); err != nil {
 		err = errors.Wrap(err)

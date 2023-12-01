@@ -20,11 +20,11 @@ func (dst *ExternalFDs) ResetWith(src *ExternalFDs) {
 }
 
 func (a *ExternalFDs) Equals(b *ExternalFDs) bool {
-	if !a.Objekte.Equals(b.Objekte) {
+	if !a.Objekte.Equals(&b.Objekte) {
 		return false
 	}
 
-	if !a.Akte.Equals(b.Akte) {
+	if !a.Akte.Equals(&b.Akte) {
 		return false
 	}
 

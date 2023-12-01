@@ -12,7 +12,7 @@ import (
 type Zettel = sku.ExternalMaybe
 
 func (c *CwdFiles) tryZettel(d string, a string, p string) (err error) {
-	var f fd.FD
+	var f *fd.FD
 
 	if f, err = fd.FDFromPath(p); err != nil {
 		err = errors.Wrap(err)

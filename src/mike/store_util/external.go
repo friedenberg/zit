@@ -76,6 +76,9 @@ func (s *common) ReadOneExternal(
 			err = errors.Wrap(err)
 			return
 		}
+
+	default:
+		panic(checkout_mode.MakeErrInvalidCheckoutModeMode(m))
 	}
 
 	return
@@ -116,10 +119,10 @@ func (s *common) ReadOneExternalObjekteReader(
 	}
 
 	if err = sku.CalculateAndSetSha(
-    e,
-    s.persistentMetadateiFormat,
-    s.options,
-  ); err != nil {
+		e,
+		s.persistentMetadateiFormat,
+		s.options,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -131,7 +134,7 @@ func (s *common) ReadOneExternalAkte(
 	e *sku.External,
 	t *sku.Transacted,
 ) (err error) {
-  metadatei.Resetter.ResetWithPtr(&e.Metadatei, t.GetMetadatei())
+	metadatei.Resetter.ResetWithPtr(&e.Metadatei, t.GetMetadatei())
 
 	var aw sha.WriteCloser
 
@@ -169,7 +172,11 @@ func (s *common) ReadOneExternalAkte(
 	sh := sha.Make(aw.GetShaLike())
 	e.GetMetadatei().AkteSha = sh
 
-	if err = sku.CalculateAndSetSha(e, s.persistentMetadateiFormat, s.options); err != nil {
+	if err = sku.CalculateAndSetSha(
+		e,
+		s.persistentMetadateiFormat,
+		s.options,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

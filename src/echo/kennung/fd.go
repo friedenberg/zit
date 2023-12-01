@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/fd"
 )
 
-func GetIdLike(f fd.FD) (il Kennung, err error) {
+func GetIdLike(f *fd.FD) (il Kennung, err error) {
 	var h Hinweis
 
 	if h, err = GetHinweis(f); err == nil {
@@ -24,14 +24,14 @@ func GetIdLike(f fd.FD) (il Kennung, err error) {
 	return
 }
 
-func AsHinweis(f fd.FD) (h Hinweis, ok bool) {
+func AsHinweis(f *fd.FD) (h Hinweis, ok bool) {
 	var err error
 	h, err = GetHinweis(f)
 	ok = err == nil
 	return
 }
 
-func GetHinweis(f fd.FD) (h Hinweis, err error) {
+func GetHinweis(f *fd.FD) (h Hinweis, err error) {
 	parts := strings.Split(f.GetPath(), string(filepath.Separator))
 
 	switch len(parts) {

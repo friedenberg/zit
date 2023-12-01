@@ -97,8 +97,8 @@ func (c Edit) RunWithCwdQuery(
 		return
 	}
 
-	objektenFiles := iter.Strings[fd.FD](objekten)
-	aktenFiles := iter.Strings[fd.FD](akten)
+	objektenFiles := iter.Strings[*fd.FD](objekten)
+	aktenFiles := iter.Strings[*fd.FD](akten)
 
 	if err = (user_ops.OpenFiles{}).Run(u, aktenFiles...); err != nil {
 		err = errors.Wrap(err)

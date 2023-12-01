@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/todo"
-	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/standort"
@@ -33,10 +32,10 @@ type CwdFiles struct {
 	Etiketten schnittstellen.MutableSetLike[*Etikett]
 	// TODO-P4 make set
 	UnsureAkten      fd.MutableSet
-	EmptyDirectories []fd.FD
+	EmptyDirectories []*fd.FD
 }
 
-func (fs *CwdFiles) MarkUnsureAkten(f fd.FD) (err error) {
+func (fs *CwdFiles) MarkUnsureAkten(f *fd.FD) (err error) {
 	if f, err = fd.MakeFileFromFD(f, fs.akteWriterFactory); err != nil {
 		err = errors.Wrapf(err, "%q", f)
 		return
@@ -138,7 +137,7 @@ func (fs CwdFiles) String() (out string) {
 	)
 
 	fs.UnsureAkten.Each(
-		func(z fd.FD) (err error) {
+		func(z *fd.FD) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
@@ -305,10 +304,10 @@ func makeCwdFiles(
 		Etiketten: collections_value.MakeMutableValueSet[*Etikett](
 			nil,
 		),
-		UnsureAkten: collections_ptr.MakeMutableValueSet[fd.FD, *fd.FD](
+		UnsureAkten: collections_value.MakeMutableValueSet[*fd.FD](
 			nil,
 		),
-		EmptyDirectories: make([]fd.FD, 0),
+		EmptyDirectories: make([]*fd.FD, 0),
 	}
 
 	return
@@ -399,7 +398,7 @@ func (fs *CwdFiles) readAll() (err error) {
 			return
 		}
 
-		var f fd.FD
+		var f *fd.FD
 
 		if f, err = fd.FileInfo(fi, fs.dir); err != nil {
 			err = errors.Wrap(err)
@@ -498,7 +497,7 @@ func (fs *CwdFiles) readFirstLevelFile(a string) (err error) {
 		}
 
 	default:
-		var ut fd.FD
+		var ut *fd.FD
 
 		if ut, err = fd.MakeFile(fs.dir, a, fs.akteWriterFactory); err != nil {
 			err = errors.Wrap(err)

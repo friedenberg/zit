@@ -65,9 +65,9 @@ func (c Status) RunWithQuery(
 
 	if err = u.StoreObjekten().ReadAllMatchingAkten(
 		u.StoreUtil().GetCwdFiles().UnsureAkten,
-		func(fd fd.FD, z *sku.Transacted) (err error) {
+		func(fd *fd.FD, z *sku.Transacted) (err error) {
 			if z == nil {
-				err = u.PrinterFileNotRecognized()(&fd)
+				err = u.PrinterFileNotRecognized()(fd)
 				return
 			}
 
@@ -89,9 +89,7 @@ func (c Status) RunWithQuery(
 				return
 			}
 
-			fr.External.FDs = sku.ExternalFDs{
-				Akte: fd,
-			}
+      fr.External.FDs.Akte.ResetWith(fd)
 			fr.External.SetAkteSha(as)
 			fr.External.ObjekteSha = os
 

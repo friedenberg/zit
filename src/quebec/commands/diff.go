@@ -90,7 +90,7 @@ func (c Diff) RunWithQuery(
 				internalInline := u.Konfig().IsInlineTyp(il.GetTyp())
 				externalInline := u.Konfig().IsInlineTyp(el.GetTyp())
 
-				var externalFD fd.FD
+				var externalFD *fd.FD
 
 				switch {
 				case mode.IncludesObjekte():
@@ -224,7 +224,7 @@ func (c Diff) makeDoAkte(
 
 func (c Diff) makeDoFD(
 	w io.WriteCloser,
-	fd fd.FD,
+	fd *fd.FD,
 ) schnittstellen.FuncError {
 	return func() (err error) {
 		defer errors.DeferredCloser(&err, w)

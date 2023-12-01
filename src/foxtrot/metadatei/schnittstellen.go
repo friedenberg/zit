@@ -25,7 +25,7 @@ type (
 	}
 
 	AktePathSetter interface {
-		SetAkteFD(fd.FD) error
+		SetAkteFD(*fd.FD) error
 	}
 
 	PersistentFormatterContext interface {

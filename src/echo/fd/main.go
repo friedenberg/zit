@@ -1,6 +1,7 @@
 package fd
 
 import (
+	"io"
 	"os"
 	"path"
 	"path/filepath"
@@ -8,6 +9,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/thyme"
@@ -15,11 +17,11 @@ import (
 
 type (
 	ObjekteFDGetter interface {
-		GetObjekteFD() FD
+		GetObjekteFD() *FD
 	}
 
 	AkteFDGetter interface {
-		GetAkteFD() FD
+		GetAkteFD() *FD
 	}
 
 	FDPairGetter interface {
@@ -28,7 +30,7 @@ type (
 	}
 
 	AkteFDSetter interface {
-		SetAkteFD(FD)
+		SetAkteFD(*FD)
 	}
 )
 
@@ -40,11 +42,11 @@ type FD struct {
 	state   State
 }
 
-func (a FD) EqualsAny(b any) bool {
+func (a *FD) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a FD) Equals(b FD) bool {
+func (a *FD) Equals(b *FD) bool {
 	if a.path != b.path {
 		return false
 	}
@@ -58,6 +60,73 @@ func (a FD) Equals(b FD) bool {
 	}
 
 	return true
+}
+
+func (fd *FD) SetWithAkteWriterFactory(
+	p string,
+	awf schnittstellen.AkteWriterFactory,
+) (err error) {
+	if p == "" {
+		err = errors.Errorf("empty path")
+		return
+	}
+
+	if awf == nil {
+		panic("schnittstellen.AkteWriterFactory is nil")
+	}
+
+	var f *os.File
+
+	if f, err = files.OpenExclusiveReadOnly(p); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, f)
+
+	var akteWriter sha.WriteCloser
+
+	if akteWriter, err = awf.AkteWriter(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, akteWriter)
+
+	if _, err = io.Copy(akteWriter, f); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var fi os.FileInfo
+
+	if fi, err = f.Stat(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = fd.SetFileInfo(fi, path.Dir(p)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	fd.path = p
+	fd.sha = sha.Make(akteWriter.GetShaLike())
+
+	return
+}
+
+func (f *FD) SetFileInfo(fi os.FileInfo, dir string) (err error) {
+	f.Reset()
+	f.isDir = fi.IsDir()
+	f.modTime = thyme.Tyme(fi.ModTime())
+
+	if f.path, err = filepath.Abs(path.Join(dir, fi.Name())); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (fd *FD) Set(v string) (err error) {
@@ -75,7 +144,7 @@ func (fd *FD) Set(v string) (err error) {
 		return
 	}
 
-	if *fd, err = FileInfo(fi, path.Dir(v)); err != nil {
+	if err = fd.SetFileInfo(fi, path.Dir(v)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -195,5 +264,5 @@ func (dst *FD) ResetWith(src *FD) {
 	dst.isDir = src.isDir
 	dst.path = src.path
 	dst.modTime = src.modTime
-	dst.sha.SetBytes(src.sha.GetShaBytes())
+	errors.PanicIfError(dst.sha.Set(src.sha.GetShaString()))
 }

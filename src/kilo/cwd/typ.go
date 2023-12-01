@@ -14,7 +14,7 @@ type Typ = sku.ExternalMaybe
 
 func (c *CwdFiles) tryTyp(fi os.FileInfo, dir string) (err error) {
 	var h kennung.Typ
-	var f fd.FD
+	var f *fd.FD
 
 	if f, err = fd.FileInfo(fi, dir); err != nil {
 		err = errors.Wrap(err)
@@ -30,16 +30,16 @@ func (c *CwdFiles) tryTyp(fi os.FileInfo, dir string) (err error) {
 
 	t, ok := c.Typen.Get(h.String())
 
-  if !ok {
-    t = &sku.ExternalMaybe{}
-  }
+	if !ok {
+		t = &sku.ExternalMaybe{}
+	}
 
 	if err = t.Kennung.SetWithKennung(h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	t.FDs.Objekte = f
+	t.FDs.Objekte.ResetWith(f)
 
 	return c.Typen.Add(t)
 }

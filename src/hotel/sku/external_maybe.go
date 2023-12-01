@@ -38,10 +38,10 @@ func (e *ExternalMaybe) GetFDs() *ExternalFDs {
 	return &e.FDs
 }
 
-func (e *ExternalMaybe) GetObjekteFD() fd.FD {
-	return e.FDs.Objekte
+func (e *ExternalMaybe) GetObjekteFD() *fd.FD {
+	return &e.FDs.Objekte
 }
 
-func (e *ExternalMaybe) GetAkteFD() fd.FD {
-	return e.FDs.Akte
+func (e *ExternalMaybe) GetAkteFD() *fd.FD {
+	return &e.FDs.Akte
 }

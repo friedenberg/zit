@@ -85,7 +85,7 @@ func (pz ProtoZettel) Apply(ml metadatei.MetadateiLike) (ok bool) {
 
 func (pz ProtoZettel) ApplyWithAkteFD(
 	ml metadatei.MetadateiLike,
-	akteFD fd.FD,
+	akteFD *fd.FD,
 ) (err error) {
 	z := ml.GetMetadatei()
 

@@ -5,7 +5,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
@@ -20,7 +19,7 @@ func (c Checkin) Run(
 	u *umwelt.Umwelt,
 	ms matcher.Query,
 ) (err error) {
-	fds := collections_ptr.MakeMutableValueSet[fd.FD, *fd.FD](nil)
+	fds := fd.MakeMutableSet()
 	l := &sync.Mutex{}
 
 	u.Lock()

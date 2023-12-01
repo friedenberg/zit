@@ -14,7 +14,7 @@ type Kasten = sku.ExternalMaybe
 
 func (c *CwdFiles) tryKasten(fi os.FileInfo, dir string) (err error) {
 	var h kennung.Kasten
-	var f fd.FD
+	var f *fd.FD
 
 	if f, err = fd.FileInfo(fi, dir); err != nil {
 		err = errors.Wrap(err)
@@ -39,7 +39,7 @@ func (c *CwdFiles) tryKasten(fi os.FileInfo, dir string) (err error) {
 		return
 	}
 
-	t.FDs.Objekte = f
+	t.FDs.Objekte.ResetWith(f)
 
 	return c.Kisten.Add(t)
 }

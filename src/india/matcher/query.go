@@ -199,7 +199,7 @@ func (s *query) SetMany(vs ...string) (err error) {
 			var fd fd.FD
 
 			if err1 := fd.Set(v); err1 == nil {
-				if err = s.FDs.Add(fd); err != nil {
+				if err = s.FDs.Add(&fd); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -268,10 +268,14 @@ func (ms *query) set(v string) (err error) {
 			if gattung.IsErrUnrecognizedGattung(err) {
 				err = nil
 
-				if err = iter.AddString[fd.FD, *fd.FD](
-					ms.FDs,
-					v,
-				); err != nil {
+				var f fd.FD
+
+				if err = f.Set(v); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if err = ms.FDs.Add(&f); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -308,10 +312,10 @@ func (ms *query) set(v string) (err error) {
 			case ids.Sigil.IncludesCwd():
 				fp := fmt.Sprintf("%s.%s", before, after)
 
-				var f fd.FD
+				var f *fd.FD
 
 				if f, err = fd.FDFromPath(fp); err == nil {
-					ids.Matcher.AddExactlyThis(FD(f))
+					ids.Matcher.AddExactlyThis(FD{FD: f})
 					break
 				}
 

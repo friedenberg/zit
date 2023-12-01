@@ -4,11 +4,9 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/fd"
@@ -16,12 +14,10 @@ import (
 )
 
 func (s Store) ReadAllMatchingAkten(
-	akten schnittstellen.SetLike[fd.FD],
-	f func(fd.FD, *sku.Transacted) error,
+	akten fd.Set,
+	f func(*fd.FD, *sku.Transacted) error,
 ) (err error) {
-	fds := collections_value.MakeMutableValueSet[fd.FD](
-		fd.KeyerSha{},
-	)
+	fds := fd.MakeMutableSetSha()
 
 	var pa string
 
@@ -35,7 +31,7 @@ func (s Store) ReadAllMatchingAkten(
 
 	if err = akten.Each(
 		iter.MakeChain(
-			func(fd fd.FD) (err error) {
+			func(fd *fd.FD) (err error) {
 				if fd.GetShaLike().IsNull() {
 					return iter.MakeErrStopIteration()
 				}
@@ -56,7 +52,7 @@ func (s Store) ReadAllMatchingAkten(
 		return
 	}
 
-	observed := collections_value.MakeMutableValueSet[fd.FD](nil)
+	observed := fd.MakeMutableSet()
 	var l sync.Mutex
 
 	if err = s.ReadAll(
@@ -84,7 +80,7 @@ func (s Store) ReadAllMatchingAkten(
 	}
 
 	if err = fds.Each(
-		func(fd fd.FD) (err error) {
+		func(fd *fd.FD) (err error) {
 			if observed.Contains(fd) {
 				return
 			}

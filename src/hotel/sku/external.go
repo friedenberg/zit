@@ -77,16 +77,21 @@ func (a *External) GetFDsPtr() *ExternalFDs {
 	return &a.FDs
 }
 
-func (a *External) GetAkteFD() fd.FD {
-	return a.FDs.Akte
+func (a *External) GetAkteFD() *fd.FD {
+	return &a.FDs.Akte
+}
+
+func (a *External) SetAkteFD(v *fd.FD) {
+	a.FDs.Akte.ResetWith(v)
+	a.Metadatei.AkteSha.Set(v.GetShaLike().GetShaString())
 }
 
 func (a *External) GetAktePath() string {
 	return a.FDs.Akte.GetPath()
 }
 
-func (a *External) GetObjekteFD() fd.FD {
-	return a.FDs.Objekte
+func (a *External) GetObjekteFD() *fd.FD {
+	return &a.FDs.Objekte
 }
 
 func (a *External) ResetWithExternalMaybe(

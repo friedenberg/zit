@@ -9,10 +9,12 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
-type FD fd.FD
+type FD struct {
+	*fd.FD
+}
 
 func (f FD) String() string {
-	return fd.FD(f).String()
+	return f.FD.String()
 }
 
 func (_ FD) Each(_ schnittstellen.FuncIter[Matcher]) error {
@@ -34,7 +36,7 @@ func (f FD) ContainsMatchable(m *sku.Transacted) (ok bool) {
 	case gattung.Zettel:
 		var h kennung.Hinweis
 
-		if h, ok = kennung.AsHinweis(fd.FD(f)); !ok {
+		if h, ok = kennung.AsHinweis(f.FD); !ok {
 			return false
 		}
 

@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
@@ -57,7 +56,7 @@ func (c Clean) RunWithQuery(
 	u *umwelt.Umwelt,
 	ms matcher.Query,
 ) (err error) {
-	fds := collections_ptr.MakeMutableValueSet[fd.FD, *fd.FD](nil)
+	fds := fd.MakeMutableSet()
 	l := &sync.Mutex{}
 
 	for _, d := range u.StoreUtil().GetCwdFiles().EmptyDirectories {
@@ -109,7 +108,7 @@ func (c Clean) RunWithQuery(
 func (c Clean) markUnsureAktenForRemovalIfNecessary(
 	u *umwelt.Umwelt,
 	q matcher.Query,
-	add schnittstellen.FuncIter[fd.FD],
+	add schnittstellen.FuncIter[*fd.FD],
 ) (err error) {
 	if !c.includeRecognized {
 		return
@@ -125,9 +124,9 @@ func (c Clean) markUnsureAktenForRemovalIfNecessary(
 
 	if err = u.StoreObjekten().ReadAllMatchingAkten(
 		u.StoreUtil().GetCwdFiles().UnsureAkten,
-		func(fd fd.FD, z *sku.Transacted) (err error) {
+		func(fd *fd.FD, z *sku.Transacted) (err error) {
 			if z == nil {
-				err = u.PrinterFileNotRecognized()(&fd)
+				err = u.PrinterFileNotRecognized()(fd)
 				return
 			}
 
@@ -149,10 +148,7 @@ func (c Clean) markUnsureAktenForRemovalIfNecessary(
 				return
 			}
 
-			fr.External.FDs = sku.ExternalFDs{
-				Akte: fd,
-			}
-
+			fr.External.FDs.Akte.ResetWith(fd)
 			fr.External.SetAkteSha(as)
 			fr.External.ObjekteSha = os
 
