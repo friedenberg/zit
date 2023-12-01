@@ -21,6 +21,12 @@ type StringerPtr[T any] interface {
 	Ptr[T]
 }
 
+type StringerSetterPtr[T any] interface {
+	Stringer
+	Setter
+	Ptr[T]
+}
+
 type StringLenner interface {
 	Stringer
 	Lenner

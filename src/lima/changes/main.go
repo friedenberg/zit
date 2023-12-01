@@ -49,7 +49,7 @@ func (c changes) GetAllBKeys() schnittstellen.SetLike[values.String] {
 
 func makeCompareMapFromOrganizeTextAndExpander(
 	in *organize_text.Text,
-	hinweis_expander func(string) (kennung.Hinweis, error),
+	hinweis_expander func(string) (*kennung.Hinweis, error),
 ) (out organize_text.CompareMap, err error) {
 	var preExpansion organize_text.CompareMap
 
@@ -80,7 +80,7 @@ func makeCompareMapFromOrganizeTextAndExpander(
 
 func ChangesFrom(
 	a1, b1 *organize_text.Text,
-	hinweis_expander func(string) (kennung.Hinweis, error),
+	hinweis_expander func(string) (*kennung.Hinweis, error),
 ) (c1 Changes, err error) {
 	var c changes
 	c1 = &c

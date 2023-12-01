@@ -30,7 +30,7 @@ func TestMakeKopfUndScwhanz(t1 *testing.T) {
 	k := "ceroplastes"
 	s := "midtown"
 
-	var sut Hinweis
+	var sut *Hinweis
 	var err error
 
 	if sut, err = MakeHinweisKopfUndSchwanz(k, s); err != nil {
@@ -50,7 +50,7 @@ func TestGob(t1 *testing.T) {
 	k := "ceroplastes"
 	s := "midtown"
 
-	var sut Hinweis
+	var sut *Hinweis
 	var err error
 
 	if sut, err = MakeHinweisKopfUndSchwanz(k, s); err != nil {

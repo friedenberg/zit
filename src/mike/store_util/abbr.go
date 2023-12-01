@@ -18,11 +18,11 @@ import (
 // TODO-P4 make generic
 type AbbrStore interface {
 	Exists(k *kennung.Kennung2) (err error)
-	Hinweis() AbbrStoreGeneric[kennung.Hinweis]
-	Kisten() AbbrStoreGeneric[kennung.Kasten]
-	Shas() AbbrStoreGeneric[sha.Sha]
-	Etiketten() AbbrStoreGeneric[kennung.Etikett]
-	Typen() AbbrStoreGeneric[kennung.Typ]
+	Hinweis() AbbrStoreGeneric[kennung.Hinweis, *kennung.Hinweis]
+	Kisten() AbbrStoreGeneric[kennung.Kasten, *kennung.Kasten]
+	Shas() AbbrStoreGeneric[sha.Sha, *sha.Sha]
+	Etiketten() AbbrStoreGeneric[kennung.Etikett, *kennung.Etikett]
+	Typen() AbbrStoreGeneric[kennung.Typ, *kennung.Typ]
 
 	AddMatchable(*sku.Transacted) error
 
@@ -231,31 +231,31 @@ func (i *indexAbbr) Exists(k *kennung.Kennung2) (err error) {
 	return
 }
 
-func (i *indexAbbr) Hinweis() (asg AbbrStoreGeneric[kennung.Hinweis]) {
+func (i *indexAbbr) Hinweis() (asg AbbrStoreGeneric[kennung.Hinweis, *kennung.Hinweis]) {
 	asg = &i.indexAbbrEncodableTridexes.Hinweis
 
 	return
 }
 
-func (i *indexAbbr) Kisten() (asg AbbrStoreGeneric[kennung.Kasten]) {
+func (i *indexAbbr) Kisten() (asg AbbrStoreGeneric[kennung.Kasten, *kennung.Kasten]) {
 	asg = &i.indexAbbrEncodableTridexes.Kisten
 
 	return
 }
 
-func (i *indexAbbr) Shas() (asg AbbrStoreGeneric[sha.Sha]) {
+func (i *indexAbbr) Shas() (asg AbbrStoreGeneric[sha.Sha, *sha.Sha]) {
 	asg = &i.indexAbbrEncodableTridexes.Shas
 
 	return
 }
 
-func (i *indexAbbr) Etiketten() (asg AbbrStoreGeneric[kennung.Etikett]) {
+func (i *indexAbbr) Etiketten() (asg AbbrStoreGeneric[kennung.Etikett, *kennung.Etikett]) {
 	asg = &i.indexAbbrEncodableTridexes.Etiketten
 
 	return
 }
 
-func (i *indexAbbr) Typen() (asg AbbrStoreGeneric[kennung.Typ]) {
+func (i *indexAbbr) Typen() (asg AbbrStoreGeneric[kennung.Typ, *kennung.Typ]) {
 	asg = &i.indexAbbrEncodableTridexes.Typen
 
 	return

@@ -224,7 +224,7 @@ func (i *oldIndex) AddHinweis(k1 kennung.Kennung) (err error) {
 	return
 }
 
-func (i *oldIndex) CreateHinweis() (h kennung.Hinweis, err error) {
+func (i *oldIndex) CreateHinweis() (h *kennung.Hinweis, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -282,7 +282,7 @@ func (i *oldIndex) CreateHinweis() (h kennung.Hinweis, err error) {
 
 func (i *oldIndex) makeHinweisButDontStore(
 	j int,
-) (h kennung.Hinweis, err error) {
+) (h *kennung.Hinweis, err error) {
 	k := &coordinates.Kennung{}
 	k.SetInt(coordinates.Int(j))
 
@@ -300,7 +300,7 @@ func (i *oldIndex) makeHinweisButDontStore(
 	return
 }
 
-func (i *oldIndex) PeekHinweisen(m int) (hs []kennung.Hinweis, err error) {
+func (i *oldIndex) PeekHinweisen(m int) (hs []*kennung.Hinweis, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -310,14 +310,14 @@ func (i *oldIndex) PeekHinweisen(m int) (hs []kennung.Hinweis, err error) {
 		m = len(i.AvailableKennung)
 	}
 
-	hs = make([]kennung.Hinweis, 0, m)
+	hs = make([]*kennung.Hinweis, 0, m)
 	j := 0
 
 	for n := range i.AvailableKennung {
 		k := &coordinates.Kennung{}
 		k.SetInt(coordinates.Int(n))
 
-		var h kennung.Hinweis
+		var h *kennung.Hinweis
 
 		if h, err = i.makeHinweisButDontStore(n); err != nil {
 			err = errors.Wrap(err)

@@ -8,7 +8,7 @@ import (
 type Abbr struct {
 	Sha struct {
 		Expand     func(string) (string, error)
-		Abbreviate func(sha.Sha) (string, error)
+		Abbreviate func(*sha.Sha) (string, error)
 	}
 	Etikett abbrOne[Etikett, *Etikett]
 	Typ     abbrOne[Typ, *Typ]
@@ -18,7 +18,7 @@ type Abbr struct {
 
 type abbrOne[V KennungLike[V], VPtr KennungLikePtr[V]] struct {
 	Expand     func(string) (string, error)
-	Abbreviate func(V) (string, error)
+	Abbreviate func(VPtr) (string, error)
 }
 
 func (ao abbrOne[V, VPtr]) AbbreviateKennung(
@@ -43,7 +43,7 @@ func (ao abbrOne[V, VPtr]) AbbreviateKennung(
 		return
 	}
 
-	if v, err = ao.Abbreviate(ka1); err != nil {
+	if v, err = ao.Abbreviate(&ka1); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

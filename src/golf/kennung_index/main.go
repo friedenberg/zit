@@ -161,7 +161,7 @@ func (i *index) AddHinweis(k kennung.Kennung) (err error) {
 	return
 }
 
-func (i *index) CreateHinweis() (h kennung.Hinweis, err error) {
+func (i *index) CreateHinweis() (h *kennung.Hinweis, err error) {
 	if h, err = i.hinweisIndex.CreateHinweis(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -170,7 +170,7 @@ func (i *index) CreateHinweis() (h kennung.Hinweis, err error) {
 	return
 }
 
-func (i *index) PeekHinweisen(n int) (hs []kennung.Hinweis, err error) {
+func (i *index) PeekHinweisen(n int) (hs []*kennung.Hinweis, err error) {
 	if hs, err = i.hinweisIndex.PeekHinweisen(n); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -12,7 +12,7 @@ import (
 
 func (w *Writer) zettelToItem(
 	z *sku.Transacted,
-	ha func(kennung.Hinweis) (string, error),
+	ha func(*kennung.Hinweis) (string, error),
 ) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 

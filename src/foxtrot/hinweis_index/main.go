@@ -10,14 +10,14 @@ import (
 
 type HinweisStore interface {
 	schnittstellen.Flusher
-	CreateHinweis() (kennung.Hinweis, error)
+	CreateHinweis() (*kennung.Hinweis, error)
 }
 
 type HinweisIndex interface {
 	HinweisStore
 	schnittstellen.ResetterWithError
 	AddHinweis(kennung.Kennung) error
-	PeekHinweisen(int) ([]kennung.Hinweis, error)
+	PeekHinweisen(int) ([]*kennung.Hinweis, error)
 }
 
 func MakeIndex(

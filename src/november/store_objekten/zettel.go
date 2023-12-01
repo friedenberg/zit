@@ -39,7 +39,7 @@ func (s *Store) writeNamedZettelToIndex(
 		return
 	}
 
-	if err = s.StoreUtil.GetKennungIndex().AddHinweis(tz.GetKennungLike()); err != nil {
+	if err = s.StoreUtil.GetKennungIndex().AddHinweis(&tz.Kennung); err != nil {
 		if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 			errors.Log().Printf("kennung does not contain value: %s", err)
 			err = nil
@@ -88,7 +88,7 @@ func (s *Store) Create(
 	// 	return
 	// }
 
-	var ken kennung.Hinweis
+	var ken *kennung.Hinweis
 
 	if ken, err = s.StoreUtil.GetKennungIndex().CreateHinweis(); err != nil {
 		err = errors.Wrap(err)

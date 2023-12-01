@@ -113,7 +113,8 @@ func (c *Organize) RunWithQuery(
 			}
 
 			// TODO-P1 determine if this is necessary
-			var h kennung.Hinweis
+			var h *kennung.Hinweis
+      h = &kennung.Hinweis{}
 
 			if err = h.Set(mwk.GetKennungLike().String()); err == nil {
 				if h, err = u.StoreObjekten().GetAbbrStore().Hinweis().ExpandString(

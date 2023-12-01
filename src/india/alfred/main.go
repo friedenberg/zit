@@ -14,12 +14,12 @@ import (
 
 type Writer struct {
 	alfredWriter *alfred.Writer
-	Abbr         func(kennung.Hinweis) (string, error)
+	Abbr         func(*kennung.Hinweis) (string, error)
 }
 
 func New(
 	out io.Writer,
-	ha func(kennung.Hinweis) (string, error),
+	ha func(*kennung.Hinweis) (string, error),
 ) (w *Writer, err error) {
 	var aw *alfred.Writer
 

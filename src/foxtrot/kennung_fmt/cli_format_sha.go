@@ -9,14 +9,14 @@ import (
 )
 
 type shaCliFormat struct {
-	abbr               func(sha.Sha) (string, error)
+	abbr               func(*sha.Sha) (string, error)
 	stringFormatWriter schnittstellen.StringFormatWriter[string]
 }
 
 func MakeShaCliFormat(
 	options erworben_cli_print_options.PrintOptions,
 	co string_format_writer.ColorOptions,
-	abbr func(sha.Sha) (string, error),
+	abbr func(*sha.Sha) (string, error),
 ) *shaCliFormat {
 	if !options.Abbreviations.Shas {
 		abbr = nil
@@ -41,7 +41,9 @@ func (f *shaCliFormat) WriteStringFormat(
 	if f.abbr != nil {
 		var v1 string
 
-		if v1, err = f.abbr(sha.Make(s)); err != nil {
+    sh := sha.Make(s)
+
+		if v1, err = f.abbr(&sh); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

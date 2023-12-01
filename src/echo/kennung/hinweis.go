@@ -34,7 +34,7 @@ func NewHinweis(
 	i coordinates.Int,
 	pl Provider,
 	pr Provider,
-) (h Hinweis, err error) {
+) (h *Hinweis, err error) {
 	k := coordinates.Kennung{}
 	k.SetInt(i)
 
@@ -53,7 +53,7 @@ func NewHinweis(
 	return MakeHinweisKopfUndSchwanz(l, r)
 }
 
-func MakeHinweisKopfUndSchwanz(kopf, schwanz string) (h Hinweis, err error) {
+func MakeHinweisKopfUndSchwanz(kopf, schwanz string) (h *Hinweis, err error) {
 	kopf = strings.TrimSpace(kopf)
 	schwanz = strings.TrimSpace(schwanz)
 
@@ -76,6 +76,8 @@ func MakeHinweisKopfUndSchwanz(kopf, schwanz string) (h Hinweis, err error) {
 	}
 
 	hs := fmt.Sprintf("%s/%s", kopf, schwanz)
+
+	h = &Hinweis{}
 
 	if err = h.Set(hs); err != nil {
 		err = errors.Errorf("failed to set hinweis: %s", err)
