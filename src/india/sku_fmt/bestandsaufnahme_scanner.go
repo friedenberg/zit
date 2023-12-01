@@ -112,7 +112,7 @@ func (scanner *bestandsaufnahmeScanner) Scan() (ok bool) {
 		}
 	}
 
-	scanner.lastSku.SetObjekteSha(scanner.lastSku.Metadatei.Verzeichnisse.Sha)
+	scanner.lastSku.SetObjekteSha(&scanner.lastSku.Metadatei.Verzeichnisse.Sha)
 
 	oldErr := scanner.err
 

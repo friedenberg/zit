@@ -3,8 +3,8 @@ package zettel
 import (
 	"testing"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
-	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/foxtrot/test_metadatei_io"
@@ -128,12 +128,13 @@ the body
 	)
 
 	expected := &metadatei.Metadatei{
-		AkteSha: sha.Must(
-			"036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064",
-		),
 		Bezeichnung: bezeichnung.Make("the title"),
 		Typ:         makeAkteExt(t, "md"),
 	}
+
+	errors.PanicIfError(expected.AkteSha.Set(
+		"036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064",
+	))
 
 	expected.SetEtiketten(makeEtiketten(t,
 		"tag1",

@@ -125,7 +125,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			zettels[i].SetAkteSha(ow.GetShaLike())
 
 		case shaError == nil:
-			zettels[i].SetAkteSha(as)
+			zettels[i].SetAkteSha(&as)
 
 		default:
 			err = errors.Errorf("argument is neither sha nor path")

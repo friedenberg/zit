@@ -18,15 +18,22 @@ func MakeHashWriter() (h hash.Hash) {
 }
 
 func Make(s schnittstellen.ShaLike) Sha {
-	return s.(Sha)
+	switch st := s.(type) {
+	case Sha:
+		return st
+
+	case *Sha:
+		return *st
+
+	default:
+		panic(fmt.Sprintf("wrong type: %T", st))
+	}
 }
 
 func Must(v string) (s Sha) {
 	s = Sha{}
 
-	if err := s.Set(v); err != nil {
-		panic(errors.Wrap(err))
-	}
+	errors.PanicIfError(s.Set(v))
 
 	return
 }

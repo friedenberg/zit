@@ -67,7 +67,7 @@ func (w *writer) Close() (err error) {
 
 func (w *writer) setShaLikeIfNecessary() {
 	if !w.closed {
-		w.sh = FromHash(w.h)
+		errors.PanicIfError(w.sh.SetFromHash(w.h))
 
 		shaPool.Put(w.h)
 		w.h = nil
@@ -76,7 +76,7 @@ func (w *writer) setShaLikeIfNecessary() {
 
 func (w *writer) GetShaLike() (s schnittstellen.ShaLike) {
 	w.setShaLikeIfNecessary()
-	s = w.sh
+	s = &w.sh
 
 	return
 }

@@ -227,7 +227,7 @@ func (f v4) ParsePersistentMetadatei(
 			writeMetadateiHashString = true
 
 		} else if key.Equal(keyVerzeichnisseSha) {
-			if err = m.Verzeichnisse.Sha.Set(val.String()); err != nil {
+			if err = m.Verzeichnisse.Sha.SetHexBytes(val.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -286,7 +286,11 @@ func (f v4) ParsePersistentMetadatei(
 	actual := mh.GetShaLike()
 
 	// if m.Verzeichnisse.Sha.IsNull() {
-	m.Verzeichnisse.Sha = sha.Make(actual)
+  if err = m.Verzeichnisse.Sha.SetShaLike(actual); err != nil {
+    err = errors.Wrap(err)
+    return
+  }
+
 	// } else if !m.Verzeichnisse.Sha.EqualsSha(actual) &&
 	// o.IncludeVerzeichnisse {
 	// 	err = errors.Errorf(

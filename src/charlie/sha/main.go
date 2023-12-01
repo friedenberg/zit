@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
+	"hash"
 	"path"
 	"strings"
 
@@ -59,8 +60,15 @@ func (s Sha) Sha() Sha {
 	return s
 }
 
-func (dst *Sha) SetShaLike(src schnittstellen.ShaLike) (err error) {
-	err = dst.data.SetBytes(src.GetShaBytes())
+func (dst *Sha) SetFromHash(h hash.Hash) (err error) {
+	dst.Reset()
+	b := h.Sum(dst.data.AvailableBuffer())
+	dst.data.Write(b)
+	return
+}
+
+func (dst *Sha) SetShaLike(src ShaLike) (err error) {
+	err = dst.data.SetBytes(src.GetShaLike().GetShaBytes())
 	return
 }
 

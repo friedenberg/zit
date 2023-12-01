@@ -177,7 +177,7 @@ func (fd *FD) Set(v string) (err error) {
 // 	return fmt.Sprintf("[%s %s]", ut.Path, ut.Sha)
 // }
 
-func (f FD) String() string {
+func (f *FD) String() string {
 	p := filepath.Clean(f.path)
 
 	if f.isDir {
@@ -187,21 +187,21 @@ func (f FD) String() string {
 	}
 }
 
-func (e FD) Ext() string {
+func (e *FD) Ext() string {
 	return path.Ext(e.path)
 }
 
-func (e FD) ExtSansDot() string {
+func (e *FD) ExtSansDot() string {
 	return strings.TrimPrefix(path.Ext(e.path), ".")
 }
 
-func (e FD) FileNameSansExt() string {
+func (e *FD) FileNameSansExt() string {
 	base := filepath.Base(e.path)
 	ext := e.Ext()
 	return base[:len(base)-len(ext)]
 }
 
-func (f FD) IsEmpty() bool {
+func (f *FD) IsEmpty() bool {
 	if f.path == "" {
 		return true
 	}
@@ -213,11 +213,11 @@ func (f FD) IsEmpty() bool {
 	return false
 }
 
-func (fd FD) Parts() [3]string {
+func (fd *FD) Parts() [3]string {
 	return [3]string{"", "", fd.String()}
 }
 
-func (fd FD) GetPath() string {
+func (fd *FD) GetPath() string {
 	return fd.path
 }
 
