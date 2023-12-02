@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
-	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
@@ -58,8 +57,7 @@ func (a *External) GetAkteSha() schnittstellen.ShaLike {
 }
 
 func (a *External) SetAkteSha(v schnittstellen.ShaLike) {
-	sh := sha.Make(v)
-	a.Metadatei.AkteSha = sh
+	a.Metadatei.AkteSha.SetShaLike(v)
 	a.FDs.Akte.SetShaLike(v)
 }
 

@@ -37,5 +37,5 @@ func (c *CheckedOut) DetermineState(justCheckedOut bool) {
 }
 
 func (a *CheckedOut) String() string {
-	return fmt.Sprintf("%s %s", a.Internal, a.External)
+	return fmt.Sprintf("%s %s", &a.Internal, &a.External)
 }
