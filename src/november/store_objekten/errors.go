@@ -22,8 +22,8 @@ func (e ErrAkteExists) Is(target error) bool {
 func (e ErrAkteExists) Error() string {
 	return fmt.Sprintf(
 		"zettelen already exist with akte:\n%s\n%v",
-		e.Akte,
-		e.TransactedMutableSet,
+		&e.Akte,
+		&e.TransactedMutableSet,
 	)
 }
 
@@ -40,8 +40,8 @@ func (e ErrExternalAkteExtensionMismatch) Is(target error) bool {
 func (e ErrExternalAkteExtensionMismatch) Error() string {
 	return fmt.Sprintf(
 		"expected extension %q but got %q",
-		e.Expected,
-		e.Actual,
+		&e.Expected,
+		&e.Actual,
 	)
 }
 

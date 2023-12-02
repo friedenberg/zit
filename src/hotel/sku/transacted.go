@@ -151,7 +151,7 @@ func (s *Transacted) GetAkteSha() schnittstellen.ShaLike {
 }
 
 func (s *Transacted) SetAkteSha(sh schnittstellen.ShaLike) {
-	s.Metadatei.AkteSha = sha.Make(sh)
+	s.Metadatei.AkteSha.SetShaLike(sh)
 }
 
 func (s *Transacted) GetTransactionIndex() values.Int {
@@ -175,7 +175,7 @@ func (transactedLessor) LessPtr(a, b *Transacted) bool {
 type transactedEqualer struct{}
 
 func (transactedEqualer) Equals(a, b *Transacted) bool {
-  return a.Equals(b)
+	return a.Equals(b)
 }
 
 func (transactedEqualer) EqualsPtr(a, b *Transacted) bool {

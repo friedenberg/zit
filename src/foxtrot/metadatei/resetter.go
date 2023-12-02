@@ -1,6 +1,7 @@
 package metadatei
 
 import (
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
@@ -24,7 +25,7 @@ func (r resetter) ResetWith(a *Metadatei, b Metadatei) {
 }
 
 func (resetter) ResetWithPtr(a *Metadatei, b *Metadatei) {
-	a.AkteSha = b.AkteSha
+	errors.PanicIfError(a.AkteSha.SetShaLike(b.AkteSha))
 	a.Bezeichnung = b.Bezeichnung
 	a.Comments = a.Comments[:0]
 	a.Comments = append(a.Comments, b.Comments...)
