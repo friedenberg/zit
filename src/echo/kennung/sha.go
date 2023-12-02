@@ -53,12 +53,12 @@ func (a *Sha) ResetWith(b Sha) {
 	a.value = b.value
 }
 
-func (a Sha) EqualsAny(b any) bool {
+func (a *Sha) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a Sha) Equals(b Sha) bool {
-	return a.value.Equals(b.value)
+func (a *Sha) Equals(b *Sha) bool {
+	return a.value.Equals(&b.value)
 }
 
 func (e Sha) GetGattung() schnittstellen.GattungLike {

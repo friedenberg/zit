@@ -31,13 +31,17 @@ func (c CatObjekte) Run(
 	u *umwelt.Umwelt,
 	args ...string,
 ) (err error) {
-	shas := collections_value.MakeMutableValueSet[sha.Sha](nil)
+	shas := collections_value.MakeMutableValueSet[*sha.Sha](nil)
 
 	for _, v := range args {
-		if err = iter.AddString[sha.Sha](
-			shas,
-			v,
-		); err != nil {
+		var sh sha.Sha
+
+		if err = sh.Set(v); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = shas.Add(&sh); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -69,7 +73,7 @@ func (c CatObjekte) akten(
 		gattung.Akte,
 		iter.MakeChain(
 			collections.WriterContainer(shas, collections.MakeErrStopIteration()),
-			func(sb sha.Sha) (err error) {
+			func(sb *sha.Sha) (err error) {
 				var r io.ReadCloser
 
 				if r, err = u.Standort().AkteReader(sb); err != nil {

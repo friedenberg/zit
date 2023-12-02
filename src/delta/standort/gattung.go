@@ -131,10 +131,10 @@ func (s Standort) ReadAllLevel2Files(
 
 func (s Standort) ReadAllShas(
 	p string,
-	w schnittstellen.FuncIter[sha.Sha],
+	w schnittstellen.FuncIter[*sha.Sha],
 ) (err error) {
 	wf := func(p string) (err error) {
-		var sh sha.Sha
+		var sh *sha.Sha
 
 		if sh, err = sha.MakeShaFromPath(p); err != nil {
 			err = errors.Wrapf(err, "Path: %s", p)
@@ -160,7 +160,7 @@ func (s Standort) ReadAllShas(
 func (s Standort) ReadAllShasForGattung(
 	sv schnittstellen.StoreVersion,
 	g schnittstellen.GattungGetter,
-	w schnittstellen.FuncIter[sha.Sha],
+	w schnittstellen.FuncIter[*sha.Sha],
 ) (err error) {
 	var p string
 

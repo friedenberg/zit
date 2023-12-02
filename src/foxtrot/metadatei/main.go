@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/etikett_rule"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
@@ -175,8 +174,7 @@ func (z *Metadatei) GetTai() kennung.Tai {
 }
 
 func (pz *Metadatei) EqualsSansTai(z1 *Metadatei) bool {
-  log.Log().Printf("%s %t %s", pz.AkteSha, pz.AkteSha.Equals(z1.AkteSha), z1.AkteSha)
-	if !pz.AkteSha.Equals(z1.AkteSha) {
+	if !pz.AkteSha.EqualsSha(&z1.AkteSha) {
 		return false
 	}
 

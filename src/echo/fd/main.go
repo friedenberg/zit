@@ -55,7 +55,7 @@ func (a *FD) Equals(b *FD) bool {
 		return false
 	}
 
-	if !a.sha.Equals(b.sha) {
+	if !a.sha.Equals(&b.sha) {
 		return false
 	}
 

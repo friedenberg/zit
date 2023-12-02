@@ -40,7 +40,7 @@ func (e *ErrExternalAkteExtensionMismatch) Is(target error) bool {
 func (e *ErrExternalAkteExtensionMismatch) Error() string {
 	return fmt.Sprintf(
 		"expected extension %q but got %q",
-		&e.Expected,
+		e.Expected,
 		&e.Actual,
 	)
 }

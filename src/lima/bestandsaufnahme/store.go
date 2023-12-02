@@ -164,7 +164,7 @@ func (s *store) Create(o *Akte) (err error) {
 }
 
 func (s *store) readOnePath(p string) (o *sku.Transacted, err error) {
-	var sh sha.Sha
+	var sh *sha.Sha
 
 	if sh, err = sha.MakeShaFromPath(p); err != nil {
 		err = errors.Wrap(err)

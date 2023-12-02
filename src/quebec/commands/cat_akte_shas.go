@@ -34,7 +34,7 @@ func (c CatAkteShas) Run(u *umwelt.Umwelt, _ ...string) (err error) {
 	if err = u.Standort().ReadAllShasForGattung(
 		u.Konfig().GetStoreVersion(),
 		gattung.Akte,
-		func(s sha.Sha) (err error) {
+		func(s *sha.Sha) (err error) {
 			_, err = fmt.Fprintln(u.Out(), s)
 			return
 		},

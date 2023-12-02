@@ -149,7 +149,7 @@ func (s Sha) Schwanz() string {
 	return s.String()[2:]
 }
 
-func (a Sha) EqualsAny(b any) bool {
+func (a *Sha) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
@@ -157,7 +157,7 @@ func (a Sha) EqualsSha(b schnittstellen.ShaLike) bool {
 	return a.GetShaString() == b.GetShaString()
 }
 
-func (a Sha) Equals(b Sha) bool {
+func (a *Sha) Equals(b *Sha) bool {
 	return a.GetShaString() == b.GetShaString()
 }
 

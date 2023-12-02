@@ -114,11 +114,11 @@ func (f textParser) ParseMetadatei(
 
 	if !m.AkteSha.IsNull() && !akteFD.GetShaLike().IsNull() {
 		err = errors.Wrap(
-      MakeErrHasInlineAkteAndFilePath(
-        &akteFD,
-        &inlineAkteSha,
-      ),
-    )
+			MakeErrHasInlineAkteAndFilePath(
+				&akteFD,
+				inlineAkteSha,
+			),
+		)
 
 		return
 	} else if !akteFD.GetShaLike().IsNull() {
@@ -138,12 +138,12 @@ func (f textParser) ParseMetadatei(
 
 	case !m.AkteSha.IsNull() && !inlineAkteSha.IsNull() &&
 		!m.AkteSha.Equals(inlineAkteSha):
-    err = errors.Wrap(
-      MakeErrHasInlineAkteAndMetadateiSha(
-        &inlineAkteSha,
-        &m.AkteSha,
-      ),
-    )
+		err = errors.Wrap(
+			MakeErrHasInlineAkteAndMetadateiSha(
+				inlineAkteSha,
+				&m.AkteSha,
+			),
+		)
 
 		return
 	}

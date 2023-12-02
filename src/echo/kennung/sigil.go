@@ -142,6 +142,6 @@ func (i *Sigil) Set(v string) (err error) {
 	return
 }
 
-func (i Sigil) GetSha() sha.Sha {
+func (i Sigil) GetSha() *sha.Sha {
 	return sha.FromString(i.String())
 }

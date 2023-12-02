@@ -17,29 +17,26 @@ func MakeHashWriter() (h hash.Hash) {
 	return
 }
 
-func Make(s schnittstellen.ShaLike) Sha {
+func Make(s schnittstellen.ShaLike) *Sha {
 	switch st := s.(type) {
-	case Sha:
-		return st
-
 	case *Sha:
-		return *st
+		return st
 
 	default:
 		panic(fmt.Sprintf("wrong type: %T", st))
 	}
 }
 
-func Must(v string) (s Sha) {
-	s = Sha{}
+func Must(v string) (s *Sha) {
+	s = &Sha{}
 
 	errors.PanicIfError(s.Set(v))
 
 	return
 }
 
-func MakeSha(v string) (s Sha, err error) {
-	s = Sha{}
+func MakeSha(v string) (s *Sha, err error) {
+	s = &Sha{}
 
 	if err = s.Set(v); err != nil {
 		err = errors.Wrap(err)
@@ -48,7 +45,7 @@ func MakeSha(v string) (s Sha, err error) {
 	return
 }
 
-func MakeShaFromPath(p string) (s Sha, err error) {
+func MakeShaFromPath(p string) (s *Sha, err error) {
 	schwanz := filepath.Base(p)
 	kopf := filepath.Base(filepath.Dir(p))
 
@@ -74,11 +71,11 @@ func MakeShaFromPath(p string) (s Sha, err error) {
 	return
 }
 
-func FromFormatString(f string, vs ...interface{}) Sha {
+func FromFormatString(f string, vs ...interface{}) *Sha {
 	return FromString(fmt.Sprintf(f, vs...))
 }
 
-func FromString(s string) Sha {
+func FromString(s string) *Sha {
 	hash := sha256.New()
 	sr := strings.NewReader(s)
 
@@ -89,12 +86,12 @@ func FromString(s string) Sha {
 	return FromHash(hash)
 }
 
-func FromStringer(v schnittstellen.Stringer) Sha {
+func FromStringer(v schnittstellen.Stringer) *Sha {
 	return FromString(v.String())
 }
 
-func FromHash(h hash.Hash) (s Sha) {
-	s = Sha{}
+func FromHash(h hash.Hash) (s *Sha) {
+	s = &Sha{}
 	s.Reset()
 
 	b := h.Sum(s.data.AvailableBuffer())

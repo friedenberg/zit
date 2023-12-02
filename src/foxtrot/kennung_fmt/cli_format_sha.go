@@ -43,7 +43,7 @@ func (f *shaCliFormat) WriteStringFormat(
 
     sh := sha.Make(s)
 
-		if v1, err = f.abbr(&sh); err != nil {
+		if v1, err = f.abbr(sh); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
