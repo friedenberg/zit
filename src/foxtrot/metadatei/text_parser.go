@@ -144,12 +144,6 @@ func (f textParser) ParseMetadatei(
 		// 	return
 		// }
 
-		// TODO-P1 for some reason, there is a bug if the below approach is used
-		// if err = m.AkteSha.SetShaLike(inlineAkteSha); err != nil {
-		// 	err = errors.Wrap(err)
-		// 	return
-		// }
-
 	case !m.AkteSha.IsNull() && inlineAkteSha.IsNull():
 		// noop
 

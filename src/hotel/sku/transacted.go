@@ -30,7 +30,7 @@ func (t *Transacted) SetFromSkuLike(sk SkuLike) (err error) {
 		return
 	}
 
-	t.ObjekteSha = sha.Make(sk.GetObjekteSha())
+	t.ObjekteSha.SetShaLike(sk.GetObjekteSha())
 	metadatei.Resetter.ResetWithPtr(&t.Metadatei, sk.GetMetadatei())
 	t.GetMetadatei().Tai = sk.GetTai()
 
@@ -139,7 +139,7 @@ func (s *Transacted) IsNew() bool {
 }
 
 func (s *Transacted) SetObjekteSha(v schnittstellen.ShaLike) {
-	s.ObjekteSha = sha.Make(v)
+	s.ObjekteSha.SetShaLike(v)
 }
 
 func (s *Transacted) GetObjekteSha() schnittstellen.ShaLike {
