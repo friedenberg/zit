@@ -2,6 +2,7 @@ package catgut
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"unicode"
 	"unicode/utf8"
@@ -170,7 +171,12 @@ func (dst *String) SetBytes(src []byte) (err error) {
 	dst.Grow(len(src))
 
 	b := append(dst.AvailableBuffer(), src...)
-	dst.Write(b)
+	var n int
+	n, err = dst.Write(b)
+
+	if n != len(src) {
+		panic(fmt.Sprintf("tried to write %d but only wrote %d", len(src), n))
+	}
 
 	return
 }
