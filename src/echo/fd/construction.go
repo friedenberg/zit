@@ -128,7 +128,7 @@ func MakeFileFromFD(
 		return
 	}
 
-	ut.sha = sha.Make(aw.GetShaLike())
+	ut.sha.SetShaLike(aw)
 
 	return
 }

@@ -111,7 +111,7 @@ func (fd *FD) SetWithAkteWriterFactory(
 	}
 
 	fd.path = p
-	fd.sha = sha.Make(akteWriter.GetShaLike())
+	fd.sha.SetShaLike(akteWriter)
 
 	return
 }
@@ -240,7 +240,7 @@ func (fd FD) IsDir() bool {
 }
 
 func (fd *FD) SetShaLike(v schnittstellen.ShaLike) {
-	fd.sha = sha.Make(v)
+	fd.sha.SetShaLike(v)
 }
 
 func (fd FD) GetShaLike() schnittstellen.ShaLike {
