@@ -3,6 +3,7 @@ package standort
 import (
 	"fmt"
 
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/sha"
 )
 
@@ -18,6 +19,15 @@ func (e ErrNotInZitDir) ShouldShowStackTrace() bool {
 
 func (e ErrNotInZitDir) Is(target error) (ok bool) {
 	_, ok = target.(ErrNotInZitDir)
+	return
+}
+
+func MakeErrAlreadyExists(
+  sh schnittstellen.ShaLike,
+  path string,
+) (err *ErrAlreadyExists) {
+	err = &ErrAlreadyExists{Path: path}
+	err.Sha.SetShaLike(sh)
 	return
 }
 

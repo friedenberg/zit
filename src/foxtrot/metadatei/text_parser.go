@@ -113,10 +113,12 @@ func (f textParser) ParseMetadatei(
 	inlineAkteSha := sha.Make(akteWriter.GetShaLike())
 
 	if !m.AkteSha.IsNull() && !akteFD.GetShaLike().IsNull() {
-		err = errors.Wrap(ErrHasInlineAkteAndFilePath{
-			AkteFD:    akteFD,
-			InlineSha: inlineAkteSha,
-		})
+		err = errors.Wrap(
+      MakeErrHasInlineAkteAndFilePath(
+        &akteFD,
+        &inlineAkteSha,
+      ),
+    )
 
 		return
 	} else if !akteFD.GetShaLike().IsNull() {
@@ -129,30 +131,19 @@ func (f textParser) ParseMetadatei(
 
 	switch {
 	case m.AkteSha.IsNull() && !inlineAkteSha.IsNull():
-		var tmp sha.Sha
-
-		if err = tmp.SetShaLike(inlineAkteSha); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		m.AkteSha = inlineAkteSha
-
-		// TODO-P1 for some reason, there is a bug if the below approach is used
-		// if err = m.AkteSha.SetShaLike(inlineAkteSha); err != nil {
-		// 	err = errors.Wrap(err)
-		// 	return
-		// }
+		m.AkteSha.SetShaLike(inlineAkteSha)
 
 	case !m.AkteSha.IsNull() && inlineAkteSha.IsNull():
 		// noop
 
 	case !m.AkteSha.IsNull() && !inlineAkteSha.IsNull() &&
 		!m.AkteSha.Equals(inlineAkteSha):
-		err = errors.Wrap(ErrHasInlineAkteAndMetadateiSha{
-			InlineSha:    inlineAkteSha,
-			MetadateiSha: m.AkteSha,
-		})
+    err = errors.Wrap(
+      MakeErrHasInlineAkteAndMetadateiSha(
+        &inlineAkteSha,
+        &m.AkteSha,
+      ),
+    )
 
 		return
 	}

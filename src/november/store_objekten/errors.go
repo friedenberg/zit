@@ -32,12 +32,12 @@ type ErrExternalAkteExtensionMismatch struct {
 	Actual   fd.FD
 }
 
-func (e ErrExternalAkteExtensionMismatch) Is(target error) bool {
-	_, ok := target.(ErrExternalAkteExtensionMismatch)
+func (e *ErrExternalAkteExtensionMismatch) Is(target error) bool {
+	_, ok := target.(*ErrExternalAkteExtensionMismatch)
 	return ok
 }
 
-func (e ErrExternalAkteExtensionMismatch) Error() string {
+func (e *ErrExternalAkteExtensionMismatch) Error() string {
 	return fmt.Sprintf(
 		"expected extension %q but got %q",
 		&e.Expected,
@@ -46,5 +46,5 @@ func (e ErrExternalAkteExtensionMismatch) Error() string {
 }
 
 func IsErrExternalAkteExtensionMismatch(err error) bool {
-	return errors.Is(err, ErrExternalAkteExtensionMismatch{})
+	return errors.Is(err, &ErrExternalAkteExtensionMismatch{})
 }

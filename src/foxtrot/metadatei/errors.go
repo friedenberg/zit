@@ -7,6 +7,16 @@ import (
 	"github.com/friedenberg/zit/src/echo/fd"
 )
 
+func MakeErrHasInlineAkteAndFilePath(
+	akteFD *fd.FD,
+	sh *sha.Sha,
+) (err *ErrHasInlineAkteAndFilePath) {
+	err = &ErrHasInlineAkteAndFilePath{}
+	err.AkteFD.ResetWith(akteFD)
+	err.InlineSha.SetShaLike(sh)
+	return
+}
+
 type ErrHasInlineAkteAndFilePath struct {
 	AkteFD    fd.FD
 	InlineSha sha.Sha
@@ -19,6 +29,15 @@ func (e ErrHasInlineAkteAndFilePath) Error() string {
 		e.AkteFD.GetShaLike(),
 		e.InlineSha,
 	)
+}
+
+func MakeErrHasInlineAkteAndMetadateiSha(
+	inline, metadatei  *sha.Sha,
+) (err *ErrHasInlineAkteAndMetadateiSha) {
+	err = &ErrHasInlineAkteAndMetadateiSha{}
+	err.MetadateiSha.SetShaLike(metadatei)
+	err.InlineSha.SetShaLike(inline)
+	return
 }
 
 type ErrHasInlineAkteAndMetadateiSha struct {

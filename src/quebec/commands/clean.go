@@ -150,7 +150,7 @@ func (c Clean) markUnsureAktenForRemovalIfNecessary(
 
 			fr.External.FDs.Akte.ResetWith(fd)
 			fr.External.SetAkteSha(as)
-			fr.External.ObjekteSha = os
+			fr.External.ObjekteSha.SetShaLike(os)
 
 			if err = p(fr); err != nil {
 				err = errors.Wrap(err)

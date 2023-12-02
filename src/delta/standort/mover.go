@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/log"
-	"github.com/friedenberg/zit/src/charlie/sha"
 )
 
 type Mover struct {
@@ -106,10 +105,7 @@ func (m *Mover) Close() (err error) {
 	if err = os.Rename(p, m.objektePath); err != nil {
 		if files.Exists(m.objektePath) {
 			if m.errorOnAttemptedOverwrite {
-				err = ErrAlreadyExists{
-					Sha:  sha.Make(sh),
-					Path: m.objektePath,
-				}
+				err = MakeErrAlreadyExists(sh, m.objektePath)
 			} else {
 				err = nil
 			}
