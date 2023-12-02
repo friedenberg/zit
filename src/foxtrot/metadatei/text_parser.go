@@ -124,7 +124,7 @@ func (f textParser) ParseMetadatei(
 			afs.SetAkteFD(&akteFD)
 		}
 
-		m.AkteSha = sha.Make(akteFD.GetShaLike())
+		m.AkteSha.SetShaLike(akteFD.GetShaLike())
 	}
 
 	switch {
