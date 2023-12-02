@@ -158,7 +158,7 @@ func (z *Metadatei) SetEtiketten(e kennung.EtikettSet) {
 }
 
 func (z *Metadatei) SetAkteSha(sh schnittstellen.ShaLike) {
-	z.AkteSha = sha.Make(sh)
+	z.AkteSha.SetShaLike(sh)
 }
 
 func (z *Metadatei) GetTyp() kennung.Typ {
