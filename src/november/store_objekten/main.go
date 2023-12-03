@@ -148,7 +148,7 @@ func (s *Store) UpdateManyMetadatei(
 		func(mwk *sku.Transacted) (err error) {
 			if _, err = s.CreateOrUpdate(
 				mwk,
-				mwk.Kennung,
+				&mwk.Kennung,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -219,7 +219,7 @@ func (s *Store) query(
 		if includeCwd && m.GetSigil().IncludesCwd() {
 			var e *sku.ExternalMaybe
 
-			if e, ok = s.GetCwdFiles().Get(z.Kennung); ok {
+			if e, ok = s.GetCwdFiles().Get(&z.Kennung); ok {
 				var e2 *sku.External
 
 				if e2, err = s.ReadOneExternal(e, z); err != nil {
@@ -269,7 +269,10 @@ func (s *Store) createEtikettOrTyp(k *kennung.Kennung2) (err error) {
 	t := sku.GetTransactedPool().Get()
 	defer sku.GetTransactedPool().Put(t)
 
-	t.Kennung = *k
+	if err = t.Kennung.SetWithKennung(k); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	err = sku.CalculateAndSetSha(
 		t,
@@ -465,7 +468,7 @@ func (s *Store) resetReindexCommon() (err error) {
 		return
 	}
 
-  return
+	return
 }
 
 // TODO-P2 add support for quiet reindexing

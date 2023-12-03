@@ -24,7 +24,7 @@ type CreateOrUpdateDelegate struct {
 func (s *Store) CreateOrUpdateCheckedOut(
 	co *sku.CheckedOut,
 ) (transactedPtr *sku.Transacted, err error) {
-	kennungPtr := co.External.Kennung
+	kennungPtr := &co.External.Kennung
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
@@ -144,7 +144,7 @@ func (s *Store) CreateOrUpdate(
 	}
 
 	if mutter != nil &&
-		kennung.Equals(transactedPtr.GetKennung(), mutter.GetKennungLike()) &&
+		kennung.Equals(transactedPtr.GetKennung(), mutter.GetKennung()) &&
 		transactedPtr.Metadatei.EqualsSansTai(&mutter.Metadatei) {
 		if err = transactedPtr.SetFromSkuLike(mutter); err != nil {
 			err = errors.Wrap(err)
@@ -338,7 +338,7 @@ func (s *Store) CreateOrUpdateAkte(
 	}
 
 	if mutter != nil &&
-		kennung.Equals(transactedPtr.GetKennung(), mutter.GetKennungLike()) &&
+		kennung.Equals(transactedPtr.GetKennung(), mutter.GetKennung()) &&
 		transactedPtr.Metadatei.EqualsSansTai(&mutter.Metadatei) {
 		if err = transactedPtr.SetFromSkuLike(mutter); err != nil {
 			err = errors.Wrap(err)

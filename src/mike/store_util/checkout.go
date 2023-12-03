@@ -230,7 +230,7 @@ func (s *common) CheckoutOne(
 		var e *cwd.Zettel
 		ok := false
 
-		if e, ok = s.cwdFiles.Get(sz.Kennung); !ok {
+		if e, ok = s.cwdFiles.Get(&sz.Kennung); !ok {
 			err = errors.Errorf(
 				"file at %s not recognized as zettel: %s",
 				filename,

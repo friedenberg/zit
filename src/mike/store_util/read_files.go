@@ -21,7 +21,7 @@ func (s *common) ReadOneExternalFS(
 
 	var e *sku.ExternalMaybe
 
-	if e, ok = s.cwdFiles.Get(sk2.Kennung); !ok {
+	if e, ok = s.cwdFiles.Get(&sk2.Kennung); !ok {
 		err = iter.MakeErrStopIteration()
 		return
 	}
