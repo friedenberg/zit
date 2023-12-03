@@ -19,6 +19,10 @@ type Transacted struct {
 	Kopf             kennung.Tai
 }
 
+func (t *Transacted) GetSkuLike() SkuLike {
+  return t
+}
+
 func (t *Transacted) SetFromSkuLike(sk SkuLike) (err error) {
 	if err = t.Kennung.SetWithKennung(sk.GetKennung()); err != nil {
 		err = errors.Wrap(err)

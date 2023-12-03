@@ -39,18 +39,20 @@ type (
 		SetTai(kennung.Tai)
 		SetKennungLike(kennung.Kennung) error
 		SetFromSkuLike(SkuLike) error
+
+		GetSkuLike() SkuLike
 	}
 
 	SkuExternalLike interface {
 		SkuLike
 
-		GetFDs() ExternalFDs
-		GetFDsPtr() *ExternalFDs
-		GetAkteFD() fd.FD
+		GetExternalSkuLike() SkuExternalLike
+
+		GetFDs() *ExternalFDs
+		GetAkteFD() *fd.FD
+		GetObjekteFD() *fd.FD
 		GetAktePath() string
 
-		GetObjekteFD() fd.FD
-
-		ResetWithExternalMaybe(b ExternalMaybe) (err error)
+		ResetWithExternalMaybe(b *ExternalMaybe) (err error)
 	}
 )

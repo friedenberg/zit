@@ -255,7 +255,11 @@ func (s *common) CheckoutOne(
 				return
 			}
 		} else {
-			cz.External = *cze
+			if cz.External.SetFromSkuLike(cze); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
 			cz.DetermineState(true)
 
 			if !s.shouldCheckOut(options, cz) {

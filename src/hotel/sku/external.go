@@ -16,10 +16,14 @@ type External struct {
 	FDs ExternalFDs
 }
 
+func (t *External) GetExternalSkuLike() SkuExternalLike {
+	return t
+}
+
 func (t *External) SetFromSkuLike(sk SkuLike) (err error) {
 	switch skt := sk.(type) {
 	case SkuExternalLike:
-		t.FDs = skt.GetFDs()
+		t.FDs.ResetWith(skt.GetFDs())
 	}
 
 	if err = t.Transacted.SetFromSkuLike(sk); err != nil {
