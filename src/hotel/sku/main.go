@@ -24,6 +24,7 @@ type (
 		GetTai() kennung.Tai
 		GetTyp() kennung.Typ
 		GetKennungLike() kennung.Kennung
+		GetKennung() kennung.Kennung
 		GetObjekteSha() schnittstellen.ShaLike
 		GetAkteSha() schnittstellen.ShaLike
 		GetKey() string

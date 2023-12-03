@@ -27,7 +27,7 @@ func (a *ExternalMaybe) Equals(b ExternalMaybe) bool {
 }
 
 func (e *ExternalMaybe) GetKennungLike() kennung.Kennung {
-	return e.Kennung
+	return &e.Kennung
 }
 
 func (e *ExternalMaybe) GetKennungLikePtr() kennung.KennungPtr {

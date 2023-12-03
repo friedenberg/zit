@@ -135,7 +135,7 @@ func KennungContainsExactlyMatchable(
 		// nop
 	}
 
-	idl := m.Kennung
+	idl := &m.Kennung
 
 	if !kennung.ContainsExactly(idl, k) {
 		return false
@@ -185,7 +185,7 @@ func KennungContainsMatchable(
 		panic(fmt.Sprintf("unhandled type: %T", kt))
 	}
 
-	idl := m.Kennung
+	idl := &m.Kennung
 
 	if !kennung.Contains(idl, k) {
 		return false

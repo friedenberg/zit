@@ -42,7 +42,7 @@ func MakeQueryFromCheckedOutSet(
 
 	if err = cos.Each(
 		func(co *sku.CheckedOut) (err error) {
-			m := MakeMatcherContainsExactly(co.Internal.Kennung)
+			m := MakeMatcherContainsExactly(&co.Internal.Kennung)
 
 			var s setWithSigil
 			ok := false

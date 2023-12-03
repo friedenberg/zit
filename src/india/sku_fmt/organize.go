@@ -51,7 +51,7 @@ func (f *organize) WriteStringFormat(
 		return
 	}
 
-	h := kennung.Aligned(o.Kennung, f.maxKopf, f.maxSchwanz)
+	h := kennung.Aligned(&o.Kennung, f.maxKopf, f.maxSchwanz)
 	n1, err = sw.WriteString(h)
 	n += int64(n1)
 

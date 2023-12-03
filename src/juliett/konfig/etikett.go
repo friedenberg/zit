@@ -168,14 +168,11 @@ func (k *compiled) AddEtikett(
 	defer k.lock.Unlock()
 	k.hasChanges = true
 
-	b2 := sku.GetTransactedPool().Get()
+	var b ketikett
 
-	if err = b2.SetFromSkuLike(b1); err != nil {
+	if err = b.Transacted.SetFromSkuLike(b1); err != nil {
+		err = errors.Wrap(err)
 		return
-	}
-
-	b := ketikett{
-		Transacted: *b2,
 	}
 
 	if err = iter.AddOrReplaceIfGreater[*ketikett](k.Etiketten, &b); err != nil {

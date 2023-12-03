@@ -20,12 +20,7 @@ type Transacted struct {
 }
 
 func (t *Transacted) SetFromSkuLike(sk SkuLike) (err error) {
-	err = t.Kennung.SetWithGattung(
-		sk.GetKennungLike().String(),
-		sk.GetGattung(),
-	)
-
-	if err != nil {
+	if err = t.Kennung.SetWithKennung(sk.GetKennung()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -46,9 +41,9 @@ func (a *Transacted) Less(b *Transacted) bool {
 func (a *Transacted) String() string {
 	return fmt.Sprintf(
 		"%s %s %s",
-		a.Kennung,
-		a.ObjekteSha,
-		a.Metadatei.AkteSha,
+		&a.Kennung,
+		&a.ObjekteSha,
+		&a.Metadatei.AkteSha,
 	)
 }
 
@@ -143,11 +138,11 @@ func (s *Transacted) SetObjekteSha(v schnittstellen.ShaLike) {
 }
 
 func (s *Transacted) GetObjekteSha() schnittstellen.ShaLike {
-	return s.ObjekteSha
+	return &s.ObjekteSha
 }
 
 func (s *Transacted) GetAkteSha() schnittstellen.ShaLike {
-	return s.Metadatei.AkteSha
+	return &s.Metadatei.AkteSha
 }
 
 func (s *Transacted) SetAkteSha(sh schnittstellen.ShaLike) {

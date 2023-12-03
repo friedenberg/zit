@@ -18,17 +18,9 @@ func (transactedResetter) Reset(a *Transacted) {
 	a.TransactionIndex.Reset()
 }
 
-func (r transactedResetter) ResetWith(a *Transacted, b Transacted) {
-	a.Kopf = b.Kopf
-	a.ObjekteSha = b.ObjekteSha
-	a.Kennung.ResetWithKennung(b.Kennung)
-	metadatei.Resetter.ResetWith(&a.Metadatei, b.Metadatei)
-	a.TransactionIndex.SetInt(b.TransactionIndex.Int())
-}
-
 func (transactedResetter) ResetWithPtr(a *Transacted, b *Transacted) {
 	a.Kopf = b.Kopf
-	a.ObjekteSha = b.ObjekteSha
+	errors.PanicIfError(a.ObjekteSha.SetShaLike(&b.ObjekteSha))
 	errors.PanicIfError(a.Kennung.ResetWithKennung(&b.Kennung))
 	metadatei.Resetter.ResetWithPtr(&a.Metadatei, &b.Metadatei)
 	a.TransactionIndex.SetInt(b.TransactionIndex.Int())

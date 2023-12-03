@@ -47,13 +47,13 @@ func (a *External) String() string {
 		". %s %s %s %s",
 		a.GetGattung(),
 		a.GetKennung(),
-		a.ObjekteSha,
+		&a.ObjekteSha,
 		a.GetAkteSha(),
 	)
 }
 
 func (a *External) GetAkteSha() schnittstellen.ShaLike {
-	return a.Metadatei.AkteSha
+	return &a.Metadatei.AkteSha
 }
 
 func (a *External) SetAkteSha(v schnittstellen.ShaLike) {

@@ -23,9 +23,10 @@ func TestOne(t1 *testing.T) {
 
 	printer := MakeFormatBestandsaufnahmePrinter(w, f, o)
 
-	n, err := printer.Print(&sku.Transacted{
-		Kennung: kennung.MustKennung2(kennung.MustHinweis("one/uno")),
-	})
+  sk := &sku.Transacted{}
+  t.AssertNoError(sk.Kennung.SetWithKennung(kennung.MustHinweis("one/uno")))
+
+	n, err := printer.Print(sk)
 
 	{
 		expected := int64(47)
@@ -41,9 +42,9 @@ func TestOne(t1 *testing.T) {
 		}
 	}
 
-  n, err = printer.Print(&sku.Transacted{
-		Kennung: kennung.MustKennung2(kennung.MustHinweis("two/dos")),
-	})
+  sk = &sku.Transacted{}
+  t.AssertNoError(sk.Kennung.SetWithKennung(kennung.MustHinweis("two/dos")))
+  n, err = printer.Print(sk)
 
 	{
 		expected := int64(43)

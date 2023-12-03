@@ -50,7 +50,7 @@ func MakeFileEncoderJustOpen(
 
 func (e *fileEncoder) openOrCreate(p string) (f *os.File, err error) {
 	if f, err = files.OpenFile(p, e.mode, e.perm); err != nil {
-		err = errors.Wrapf(err, "Mode: %d, Perm: %d", e.mode, e.perm)
+		err = errors.Wrap(err)
 
 		if errors.IsExist(err) {
 			// err = nil
