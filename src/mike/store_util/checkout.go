@@ -151,7 +151,7 @@ func (s *common) PathForTransacted(dir string, tl *sku.Transacted) string {
 		dir,
 		fmt.Sprintf(
 			"%s.%s",
-			tl.Kennung,
+			&tl.Kennung,
 			s.FileExtensionForGattung(tl),
 		),
 	)
@@ -185,7 +185,7 @@ func (s common) filenameForTransacted(
 	case gattung.Zettel:
 		var h kennung.Hinweis
 
-		if err = h.Set(sz.GetKennungLike().String()); err != nil {
+		if err = h.Set(sz.GetKennung().String()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -218,7 +218,10 @@ func (s *common) CheckoutOne(
 
 	var originalFilename, filename string
 
-	if originalFilename, filename, err = s.filenameForTransacted(options, sz); err != nil {
+	if originalFilename, filename, err = s.filenameForTransacted(
+		options,
+		sz,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -277,7 +280,8 @@ func (s *common) CheckoutOne(
 		}
 	}
 
-	if ((!inlineAkte || !options.CheckoutMode.IncludesObjekte()) && !options.ForceInlineAkte) &&
+	if ((!inlineAkte || !options.CheckoutMode.IncludesObjekte()) &&
+		!options.ForceInlineAkte) &&
 		options.CheckoutMode.IncludesAkte() {
 		t := sz.GetTyp()
 
@@ -287,7 +291,9 @@ func (s *common) CheckoutOne(
 			fe = t.String()
 		}
 
-		if err = cz.External.GetFDsPtr().Akte.SetPath(originalFilename + "." + fe); err != nil {
+		if err = cz.External.GetFDsPtr().Akte.SetPath(
+			originalFilename + "." + fe,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

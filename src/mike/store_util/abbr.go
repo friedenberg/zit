@@ -172,7 +172,7 @@ func (i *indexAbbr) AddMatchable(o *sku.Transacted) (err error) {
 
 	i.indexAbbrEncodableTridexes.Shas.Kennungen.Add(o.GetAkteSha().String())
 
-	ks := o.GetKennungLike().String()
+	ks := o.GetKennung().String()
 
 	switch o.GetGattung() {
 	case gattung.Zettel:

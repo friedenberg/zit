@@ -228,7 +228,11 @@ func (s *common) CommitUpdatedTransacted(
 
 func (s *common) CommitTransacted(t *sku.Transacted) (err error) {
 	sk := sku.GetTransactedPool().Get()
-	*sk = *t
+
+	if err = sk.SetFromSkuLike(t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = s.bestandsaufnahmeAkte.Skus.Add(sk); err != nil {
 		err = errors.Wrap(err)

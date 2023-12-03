@@ -216,9 +216,8 @@ func (zp *Page) copy(
 		dec := gob.NewDecoder(r1)
 
 		getOneSku = func() (sk *sku.Transacted, err error) {
-			tz := sku.GetTransactedPool().Get()
-			err = dec.Decode(tz)
-			sk = tz
+			sk = sku.GetTransactedPool().Get()
+			err = dec.Decode(sk)
 			return
 		}
 	}

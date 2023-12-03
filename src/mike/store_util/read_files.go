@@ -35,7 +35,7 @@ func (s *common) ReadOneExternalFS(
 			co.State = checked_out_state.StateConflicted
 			co.External.FDs = e.FDs
 
-			if err = co.External.Kennung.SetWithKennung(sk2.Kennung); err != nil {
+			if err = co.External.Kennung.SetWithKennung(&sk2.Kennung); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

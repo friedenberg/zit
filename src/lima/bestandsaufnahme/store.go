@@ -229,7 +229,7 @@ func (s *store) ReadOne(
 				o,
 				s.persistentMetadateiFormat,
 				op,
-				sh,
+				&sh,
 			)
 
 			if err != nil {
@@ -395,7 +395,7 @@ func (s *store) ReadAllSkus(
 				err = errors.Wrapf(
 					err,
 					"Bestandsaufnahme: %s",
-					t.GetKennungLike(),
+					t.GetKennung(),
 				)
 
 				return
