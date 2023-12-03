@@ -248,7 +248,10 @@ func (s *Store) RunMergeTool(
 	co := sku.GetCheckedOutPool().Get()
 	defer sku.GetCheckedOutPool().Put(co)
 
-	co.External = *e
+	if err = co.External.SetFromSkuLike(e); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if _, err = s.CreateOrUpdateCheckedOut(co); err != nil {
 		err = errors.Wrap(err)

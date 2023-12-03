@@ -48,7 +48,11 @@ func (s *common) ReadOneExternalFS(
 		return
 	}
 
-	co.External = *e2
+	if err = co.External.SetFromSkuLike(e2); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	co.DetermineState(false)
 
 	return
@@ -123,8 +127,8 @@ func (s *common) ReadFiles(
 					return
 				}
 
-				tco.Internal.Kennung = tcoe.Kennung
-				tco.External = *tcoe
+				tco.Internal.Kennung.ResetWithKennung(&tcoe.Kennung)
+				tco.External.SetFromSkuLike(tcoe)
 				tco.State = checked_out_state.StateUntracked
 
 				if err = f(tco); err != nil {
