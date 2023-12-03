@@ -205,6 +205,10 @@ func (pz *Metadatei) Equals(z1 *Metadatei) bool {
 	return true
 }
 
+func (z *Metadatei) String() (d string) {
+	return z.Description()
+}
+
 func (z *Metadatei) Description() (d string) {
 	d = z.Bezeichnung.String()
 

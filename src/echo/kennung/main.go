@@ -53,6 +53,11 @@ type KennungLikePtr[T KennungLike[T]] interface {
 type Index struct{}
 
 func Make(v string) (k KennungPtr, err error) {
+  if v == "" {
+    k = &Kennung2{}
+    return
+  }
+
 	{
 		var h Konfig
 

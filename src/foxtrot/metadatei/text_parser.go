@@ -45,7 +45,7 @@ func (f textParser) ParseMetadatei(
 	var n1 int64
 
 	defer func() {
-		c.SetAkteSha(m.AkteSha)
+		c.SetAkteSha(&m.AkteSha)
 	}()
 
 	var akteFD fd.FD
@@ -216,14 +216,10 @@ func (f textParser) setAkteSha(
 	m *Metadatei,
 	maybeSha string,
 ) (err error) {
-	var sh sha.Sha
-
-	if err = sh.Set(maybeSha); err != nil {
+	if err = m.AkteSha.Set(maybeSha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	m.AkteSha = sh
 
 	return
 }

@@ -27,7 +27,7 @@ func (f v0) FormatPersistentMetadatei(
 		w.WriteFormat("Tai %s", m.Tai)
 	}
 
-	w.WriteFormat("%s %s", gattung.Akte, m.AkteSha)
+	w.WriteFormat("%s %s", gattung.Akte, &m.AkteSha)
 	w.WriteFormat("%s %s", gattung.Typ, m.GetTyp())
 	w.WriteFormat("%s %s", gattung.Bezeichnung, m.Bezeichnung)
 

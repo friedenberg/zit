@@ -22,12 +22,12 @@ type ErrHasInlineAkteAndFilePath struct {
 	InlineSha sha.Sha
 }
 
-func (e ErrHasInlineAkteAndFilePath) Error() string {
+func (e *ErrHasInlineAkteAndFilePath) Error() string {
 	return fmt.Sprintf(
 		"text has inline akte and file: \nexternal path: %s\nexternal sha: %s\ninline sha: %s",
 		e.AkteFD.GetPath(),
 		e.AkteFD.GetShaLike(),
-		e.InlineSha,
+		&e.InlineSha,
 	)
 }
 
@@ -45,10 +45,10 @@ type ErrHasInlineAkteAndMetadateiSha struct {
 	MetadateiSha sha.Sha
 }
 
-func (e ErrHasInlineAkteAndMetadateiSha) Error() string {
+func (e *ErrHasInlineAkteAndMetadateiSha) Error() string {
 	return fmt.Sprintf(
 		"text has inline akte and metadatei sha: \ninline sha: %s\n metadatei sha: %s",
-		e.InlineSha,
-		e.MetadateiSha,
+		&e.InlineSha,
+		&e.MetadateiSha,
 	)
 }

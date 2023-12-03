@@ -93,6 +93,7 @@ func OpenFile(name string, flag int, perm os.FileMode) (f *os.File, err error) {
 	openFilesGuardInstance.Lock()
 
 	if f, err = os.OpenFile(name, flag, perm); err != nil {
+		err = errors.Wrapf(err, "Mode: %d, Perm: %d", flag, perm)
 		openFilesGuardInstance.Unlock()
 	}
 

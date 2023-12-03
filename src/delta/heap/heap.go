@@ -193,8 +193,6 @@ func (h *Heap[T, TPtr]) Restore() {
 	h.s = 0
 
 	iter.ReverseSortable(&h.h)
-
-	return
 }
 
 func (h *Heap[T, TPtr]) PopError() (sk TPtr, err error) {

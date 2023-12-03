@@ -37,7 +37,13 @@ func (f *kennungCliFormat) WriteStringFormat(
 	if f.options.Abbreviations.Hinweisen {
 		k1 := kennung.GetKennungPool().Get()
 		defer kennung.GetKennungPool().Put(k1)
-		k1.ResetWithKennungPtr(k)
+
+		if err = k1.ResetWithKennung(k); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		k = k1
 
 		if err = f.abbr.AbbreviateHinweisOnly(k1); err != nil {
 			err = errors.Wrap(err)

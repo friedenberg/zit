@@ -25,7 +25,7 @@ func (r resetter) ResetWith(a *Metadatei, b Metadatei) {
 }
 
 func (resetter) ResetWithPtr(a *Metadatei, b *Metadatei) {
-	errors.PanicIfError(a.AkteSha.SetShaLike(b.AkteSha))
+	errors.PanicIfError(a.AkteSha.SetShaLike(&b.AkteSha))
 	a.Bezeichnung = b.Bezeichnung
 	a.Comments = a.Comments[:0]
 	a.Comments = append(a.Comments, b.Comments...)
@@ -54,6 +54,6 @@ func (resetterVerzeichnisse) ResetWith(a, b *Verzeichnisse) {
 	a.Archiviert.ResetWith(b.Archiviert)
 	a.SetExpandedEtiketten(b.GetExpandedEtiketten())
 	a.SetImplicitEtiketten(b.GetImplicitEtiketten())
-	a.Mutter = b.Mutter
-	a.Sha = b.Sha
+	errors.PanicIfError(a.Mutter.SetShaLike(&b.Mutter))
+	errors.PanicIfError(a.Sha.SetShaLike(&b.Sha))
 }
