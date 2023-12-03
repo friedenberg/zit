@@ -32,7 +32,7 @@ func MakeWriterComplete(w io.Writer) WriterComplete {
 	go func(s *WriterComplete) {
 		for z := range s.chTransacted {
 			errors.TodoP4("handle write errors")
-			s.wBuf.WriteString(z.GetKennungLike().String())
+			s.wBuf.WriteString(z.GetKennung().String())
 			s.wBuf.WriteString("\tZettel: !")
 			s.wBuf.WriteString(z.GetTyp().String())
 			s.wBuf.WriteString(" ")
@@ -50,7 +50,7 @@ func MakeWriterComplete(w io.Writer) WriterComplete {
 func (w *WriterComplete) WriteZettelVerzeichnisse(
 	z *sku.Transacted,
 ) (err error) {
-	if z.GetKennungLike().String() == "/" {
+	if z.GetKennung().String() == "/" {
 		err = errors.New("empty sku")
 		return
 	}

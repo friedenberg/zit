@@ -88,7 +88,7 @@ func (f v4) FormatPersistentMetadatei(
 	n1, err = ohio.WriteKeySpaceValueNewlineString(
 		w,
 		"Gattung",
-		c.GetKennungLike().GetGattung().GetGattungString(),
+		c.GetKennung().GetGattung().GetGattungString(),
 	)
 	n += int64(n1)
 
@@ -100,7 +100,7 @@ func (f v4) FormatPersistentMetadatei(
 	n1, err = ohio.WriteKeySpaceValueNewlineString(
 		w,
 		"Kennung",
-		c.GetKennungLike().String(),
+		c.GetKennung().String(),
 	)
 	n += int64(n1)
 

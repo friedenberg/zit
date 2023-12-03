@@ -153,16 +153,16 @@ func (fs CwdFiles) ContainsMatchable(m *sku.Transacted) bool {
 
 	switch g {
 	case gattung.Zettel:
-		return fs.Zettelen.ContainsKey(m.GetKennungLike().String())
+		return fs.Zettelen.ContainsKey(m.GetKennung().String())
 
 	case gattung.Typ:
-		return fs.Typen.ContainsKey(m.GetKennungLike().String())
+		return fs.Typen.ContainsKey(m.GetKennung().String())
 
 	case gattung.Etikett:
-		return fs.Etiketten.ContainsKey(m.GetKennungLike().String())
+		return fs.Etiketten.ContainsKey(m.GetKennung().String())
 
 	case gattung.Kasten:
-		return fs.Kisten.ContainsKey(m.GetKennungLike().String())
+		return fs.Kisten.ContainsKey(m.GetKennung().String())
 	}
 
 	return true

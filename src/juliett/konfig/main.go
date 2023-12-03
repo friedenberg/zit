@@ -344,11 +344,12 @@ func (k *compiled) SetTransacted(
 		return
 	}
 
-	kt := sku.GetTransactedPool().Get()
-	*kt = *kt1
-
 	k.hasChanges = true
-	k.Sku = *kt
+
+	if err = k.Sku.SetFromSkuLike(kt1); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	var a *erworben.Akte
 
@@ -370,7 +371,11 @@ func (k *compiled) AddKasten(
 	k.hasChanges = true
 
 	b := sku.GetTransactedPool().Get()
-	*b = *c
+
+  if err = b.SetFromSkuLike(c); err != nil {
+    err = errors.Wrap(err)
+    return
+  }
 
 	err = iter.AddOrReplaceIfGreater[*sku.Transacted](
 		k.Kisten,
@@ -394,7 +399,11 @@ func (k *compiled) AddTyp(
 	}
 
 	b := sku.GetTransactedPool().Get()
-	*b = *b1
+
+	if err = b.SetFromSkuLike(b1); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	k.lock.Lock()
 	defer k.lock.Unlock()

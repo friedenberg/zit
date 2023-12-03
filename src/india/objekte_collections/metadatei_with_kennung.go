@@ -25,7 +25,7 @@ func (kk KennungKeyer) GetKey(mwk *sku.Transacted) string {
 		return ""
 	}
 
-	return mwk.GetKennungLike().String()
+	return mwk.GetKennung().String()
 }
 
 func MakeMutableSetMetadateiWithKennung() MutableSetMetadateiWithKennung {

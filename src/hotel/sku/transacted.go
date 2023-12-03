@@ -76,15 +76,11 @@ func (a *Transacted) SetTai(t kennung.Tai) {
 }
 
 func (a *Transacted) GetKennung() kennung.Kennung {
-	return a.Kennung
-}
-
-func (a *Transacted) GetKennungPtr() kennung.KennungPtr {
 	return &a.Kennung
 }
 
 func (a *Transacted) GetKennungLike() kennung.Kennung {
-	return a.Kennung
+	return &a.Kennung
 }
 
 func (a *Transacted) SetKennungLike(kl kennung.Kennung) (err error) {

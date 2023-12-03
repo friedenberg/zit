@@ -14,6 +14,7 @@ type (
 	FormatterContext interface {
 		metadatei.PersistentFormatterContext
 		GetKennungLike() kennung.Kennung
+		GetKennung() kennung.Kennung
 	}
 
 	ParserContext interface {

@@ -31,7 +31,7 @@ func (t *External) SetFromSkuLike(sk SkuLike) (err error) {
 }
 
 func (a *External) GetKennung() kennung.Kennung {
-	return a.Kennung
+	return &a.Kennung
 }
 
 func (a *External) GetMetadatei() *metadatei.Metadatei {
@@ -105,7 +105,7 @@ func (a *External) ResetWithExternalMaybe(
 }
 
 func (a *External) EqualsSkuLikePtr(b SkuLike) (ok bool) {
-	if !kennung.Equals(a.GetKennung(), b.GetKennungLike()) {
+	if !kennung.Equals(a.GetKennung(), b.GetKennung()) {
 		return
 	}
 

@@ -186,7 +186,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			if _, err = fmt.Fprintf(
 				out,
 				"%s %s\n",
-				tl.Kennung,
+				&tl.Kennung,
 				sh,
 			); err != nil {
 				err = errors.Wrap(err)

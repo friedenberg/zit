@@ -24,7 +24,7 @@ func (t Typ) ContainsMatchableExactly(m *sku.Transacted) bool {
 		return true
 	}
 
-	t2, ok := m.GetKennungLike().(kennung.Typ)
+	t2, ok := m.GetKennung().(kennung.Typ)
 
 	if !ok {
 		return false

@@ -49,7 +49,7 @@ func MakeTransactedMutableSet() TransactedMutableSet {
 }
 
 type kennungGetter interface {
-	GetKennungLike() kennung.Kennung
+	GetKennung() kennung.Kennung
 }
 
 type KennungKeyer[
@@ -61,5 +61,5 @@ type KennungKeyer[
 ] struct{}
 
 func (sk KennungKeyer[T, TPtr]) GetKey(e TPtr) string {
-	return e.GetKennungLike().String()
+	return e.GetKennung().String()
 }

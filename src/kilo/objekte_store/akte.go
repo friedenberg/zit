@@ -79,12 +79,12 @@ func (h *AkteStore[A, APtr]) SaveAkteText(
 
 	defer errors.DeferredCloser(&err, w)
 
-	if n, err = h.AkteFormat.FormatParsedAkte(w, o); err != nil {
+	if n, err = h.FormatParsedAkte(w, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	sh = sha.Make(w.GetShaLike())
+	sh = w.GetShaLike()
 
 	return
 }

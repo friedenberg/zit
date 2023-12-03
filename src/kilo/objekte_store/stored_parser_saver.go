@@ -68,7 +68,7 @@ func (h storedParserSaver[O, OPtr]) ParseSaveStored(
 
 	t.FDs = sem.FDs
 
-	if err = t.Kennung.SetWithKennung(sem.Kennung); err != nil {
+	if err = t.Kennung.SetWithKennung(&sem.Kennung); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

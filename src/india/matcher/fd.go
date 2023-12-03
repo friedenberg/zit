@@ -30,7 +30,7 @@ func (fd FD) ContainsMatchableExactly(m *sku.Transacted) (ok bool) {
 }
 
 func (f FD) ContainsMatchable(m *sku.Transacted) (ok bool) {
-	il := m.GetKennungLike()
+	il := m.GetKennung()
 
 	switch il.GetGattung() {
 	case gattung.Zettel:

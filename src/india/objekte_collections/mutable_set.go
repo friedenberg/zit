@@ -15,7 +15,7 @@ func (k KeyerHinweis) GetKey(z *sku.External) string {
 		return ""
 	}
 
-	return z.GetKennungLike().String()
+	return z.GetKennung().String()
 }
 
 func MakeMutableSetUniqueHinweis(zs ...*sku.External) MutableSet {

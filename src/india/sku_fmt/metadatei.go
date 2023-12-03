@@ -17,7 +17,7 @@ func StringMetadatei(o *sku.Transacted) (str string) {
 	sb.WriteString(o.GetGattung().GetGattungString())
 
 	sb.WriteString(" ")
-	sb.WriteString(o.GetKennungLike().String())
+	sb.WriteString(o.GetKennung().String())
 
 	sb.WriteString(" ")
 	sb.WriteString(o.GetAkteSha().String())
