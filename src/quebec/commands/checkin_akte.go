@@ -148,7 +148,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	for _, z := range zettels {
 		if z, err = u.StoreObjekten().Update(
 			z,
-			z.GetKennungLike(),
+			z.GetKennung(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

@@ -27,14 +27,20 @@ func (s *Store) writeNamedZettelToIndex(
 
 	errors.Log().Printf("writing zettel to index: %s", tz)
 
-	s.GetKonfigPtr().ApplyToSku(tz, s.GetAkten().GetTypV0())
+	s.GetKonfig().ApplyToSku(tz, s.GetAkten().GetTypV0())
 
-	if err = s.verzeichnisseSchwanzen.AddVerzeichnisse(tz, tz.GetKennungLike().String()); err != nil {
+	if err = s.verzeichnisseSchwanzen.AddVerzeichnisse(
+		tz,
+		tz.GetKennung().String(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.verzeichnisseAll.AddVerzeichnisse(tz, tz.GetKennungLike().String()); err != nil {
+	if err = s.verzeichnisseAll.AddVerzeichnisse(
+    tz,
+    tz.GetKennung().String(),
+  ); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -216,7 +222,7 @@ func (s *Store) makeSku(
 
 	m := mg.GetMetadatei()
 	tz = sku.GetTransactedPool().Get()
-  metadatei.Resetter.ResetWithPtr(&tz.Metadatei, m)
+	metadatei.Resetter.ResetWithPtr(&tz.Metadatei, m)
 
 	if err = tz.Kennung.SetWithKennung(k); err != nil {
 		err = errors.Wrap(err)

@@ -149,7 +149,7 @@ func (ih *indexHinweis) Abbreviate(h *kennung.Hinweis) (v string, err error) {
 }
 
 type indexNotHinweis[
-	K schnittstellen.Stringer,
+	K any,
 	KPtr schnittstellen.StringerSetterPtr[K],
 ] struct {
 	readFunc  func() error

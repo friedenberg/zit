@@ -122,7 +122,7 @@ func (atc Factory) makeChildren(
 					return
 				}
 
-				parent.named.Add(z)
+				parent.named.Add(&z)
 
 				return
 			},
@@ -147,7 +147,8 @@ func (atc Factory) makeChildren(
 				return
 			}
 
-			parent.named.Add(z)
+			parent.named.Add(&z)
+
 			return
 		},
 	)

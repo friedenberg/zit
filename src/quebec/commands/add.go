@@ -222,7 +222,7 @@ func (c Add) openAktenIfNecessary(
 		options,
 		u.StoreObjekten().MakeReadAllSchwanzen(gattung.Zettel),
 		func(z *sku.Transacted) (err error) {
-			if !hs.ContainsKey(z.GetKennungLike().String()) {
+			if !hs.ContainsKey(z.GetKennung().String()) {
 				return iter.MakeErrStopIteration()
 			}
 

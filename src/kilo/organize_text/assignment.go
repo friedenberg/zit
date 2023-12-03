@@ -14,8 +14,8 @@ type assignment struct {
 	isRoot    bool
 	depth     int
 	etiketten kennung.EtikettSet
-	named     schnittstellen.MutableSetLike[obj]
-	unnamed   schnittstellen.MutableSetLike[obj]
+	named     schnittstellen.MutableSetLike[*obj]
+	unnamed   schnittstellen.MutableSetLike[*obj]
 	children  []*assignment
 	parent    *assignment
 }
@@ -24,8 +24,8 @@ func newAssignment(d int) *assignment {
 	return &assignment{
 		depth:     d,
 		etiketten: kennung.MakeEtikettSet(),
-		named:     collections_value.MakeMutableValueSet[obj](nil),
-		unnamed:   collections_value.MakeMutableValueSet[obj](nil),
+		named:     collections_value.MakeMutableValueSet[*obj](nil),
+		unnamed:   collections_value.MakeMutableValueSet[*obj](nil),
 		children:  make([]*assignment, 0),
 	}
 }
@@ -64,7 +64,7 @@ func (a assignment) AlignmentSpacing() int {
 
 func (a assignment) MaxLen() (m int) {
 	a.named.Each(
-		func(z obj) (err error) {
+		func(z *obj) (err error) {
 			oM := z.Len()
 
 			if oM > m {
@@ -88,7 +88,7 @@ func (a assignment) MaxLen() (m int) {
 
 func (a assignment) MaxKopfUndSchwanz() (kopf, schwanz int) {
 	a.named.Each(
-		func(z obj) (err error) {
+		func(z *obj) (err error) {
 			oKopf, oSchwanz := z.LenKopfUndSchwanz()
 
 			if oKopf > kopf {

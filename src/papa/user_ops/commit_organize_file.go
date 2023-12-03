@@ -59,7 +59,7 @@ func (c CommitOrganizeFile) Run(
 				return
 			}
 
-			k := kennung.FormattedString(sk.Kennung)
+			k := kennung.FormattedString(&sk.Kennung)
 
 			if change, ok = cs.GetExisting().Get(k); !ok {
 				return
@@ -129,7 +129,7 @@ func (c CommitOrganizeFile) Run(
 				return
 			}
 
-			if _, err = store.CreateOrUpdate(m, k); err != nil {
+			if _, err = store.CreateOrUpdate(m, &k); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

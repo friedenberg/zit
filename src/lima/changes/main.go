@@ -119,7 +119,7 @@ func ChangesFrom(
 	for h, es1 := range b.Named {
 		var (
 			existsInA bool
-			es2       metadatei.Metadatei
+			es2       *metadatei.Metadatei
 		)
 
 		if es2, existsInA = a.Named[h]; existsInA {

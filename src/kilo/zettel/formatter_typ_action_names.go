@@ -12,13 +12,13 @@ import (
 )
 
 type formatterTypActionNames struct {
-	erworben             konfig.Compiled
+	erworben             *konfig.Compiled
 	includeKonfigActions bool
 	typAkteGetterPutter  schnittstellen.AkteGetterPutter[*typ_akte.V0]
 }
 
 func MakeFormatterTypActionNames(
-	erworben konfig.Compiled,
+	erworben *konfig.Compiled,
 	includeKonfigActions bool,
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) *formatterTypActionNames {

@@ -26,11 +26,12 @@ func GetKennungPool() schnittstellen.Pool[Kennung2, *Kennung2] {
 }
 
 type Kennung2 struct {
-	g     gattung.Gattung
-	parts [3]catgut.String
+	g                   gattung.Gattung
+	left, middle, right catgut.String
 }
 
-func MustKennung2(kp Kennung) (k Kennung2) {
+func MustKennung2(kp Kennung) (k *Kennung2) {
+	k = &Kennung2{}
 	err := k.SetWithKennung(kp)
 	errors.PanicIfError(err)
 	return
@@ -49,12 +50,12 @@ func (k2 *Kennung2) StringFromPtr() string {
 
 	switch k2.g {
 	case gattung.Zettel, gattung.Bestandsaufnahme, gattung.Kasten:
-		sb.Write(k2.parts[0].Bytes())
-		sb.Write(k2.parts[1].Bytes())
-		sb.Write(k2.parts[2].Bytes())
+		sb.Write(k2.left.Bytes())
+		sb.Write(k2.middle.Bytes())
+		sb.Write(k2.right.Bytes())
 
 	case gattung.Etikett, gattung.Typ, gattung.Konfig:
-		sb.Write(k2.parts[2].Bytes())
+		sb.Write(k2.right.Bytes())
 
 	default:
 		sb.WriteString("unknown")
@@ -63,34 +64,34 @@ func (k2 *Kennung2) StringFromPtr() string {
 	return sb.String()
 }
 
-func (k2 Kennung2) String() string {
+func (k2 *Kennung2) String() string {
 	return k2.StringFromPtr()
 }
 
 func (k2 *Kennung2) Reset() {
 	k2.g = gattung.Unknown
-	k2.parts[0].Reset()
-	k2.parts[1].Reset()
-	k2.parts[2].Reset()
+	k2.left.Reset()
+	k2.middle.Reset()
+	k2.right.Reset()
 }
 
 func (k2 *Kennung2) PartsStrings() [3]*catgut.String {
 	return [3]*catgut.String{
-		&k2.parts[0],
-		&k2.parts[1],
-		&k2.parts[2],
+		&k2.left,
+		&k2.middle,
+		&k2.right,
 	}
 }
 
-func (k2 Kennung2) Parts() [3]string {
+func (k2 *Kennung2) Parts() [3]string {
 	return [3]string{
-		k2.parts[0].String(),
-		k2.parts[1].String(),
-		k2.parts[2].String(),
+		k2.left.String(),
+		k2.middle.String(),
+		k2.right.String(),
 	}
 }
 
-func (k2 Kennung2) GetGattung() schnittstellen.GattungLike {
+func (k2 *Kennung2) GetGattung() schnittstellen.GattungLike {
 	return k2.g
 }
 
@@ -106,44 +107,31 @@ func (h *Kennung2) SetWithKennung(
 	k Kennung,
 ) (err error) {
 	switch kt := k.(type) {
-	case Kennung2:
-		if err = kt.parts[0].CopyTo(&h.parts[0]); err != nil {
-			return
-		}
-
-		if err = kt.parts[1].CopyTo(&h.parts[1]); err != nil {
-			return
-		}
-
-		if err = kt.parts[2].CopyTo(&h.parts[2]); err != nil {
-			return
-		}
-
 	case *Kennung2:
-		if err = kt.parts[0].CopyTo(&h.parts[0]); err != nil {
+		if err = kt.left.CopyTo(&h.left); err != nil {
 			return
 		}
 
-		if err = kt.parts[1].CopyTo(&h.parts[1]); err != nil {
+		if err = kt.middle.CopyTo(&h.middle); err != nil {
 			return
 		}
 
-		if err = kt.parts[2].CopyTo(&h.parts[2]); err != nil {
+		if err = kt.right.CopyTo(&h.right); err != nil {
 			return
 		}
 
 	default:
 		p := k.Parts()
 
-		if err = h.parts[0].Set(p[0]); err != nil {
+		if err = h.left.Set(p[0]); err != nil {
 			return
 		}
 
-		if err = h.parts[1].Set(p[1]); err != nil {
+		if err = h.middle.Set(p[1]); err != nil {
 			return
 		}
 
-		if err = h.parts[2].Set(p[2]); err != nil {
+		if err = h.right.Set(p[2]); err != nil {
 			return
 		}
 	}
@@ -214,11 +202,7 @@ func (a *Kennung2) ResetWithKennung(b Kennung) (err error) {
 	return a.SetWithKennung(b)
 }
 
-func (a *Kennung2) ResetWithKennungPtr(b KennungPtr) (err error) {
-	return a.SetWithKennung(b)
-}
-
-func (t Kennung2) MarshalText() (text []byte, err error) {
+func (t *Kennung2) MarshalText() (text []byte, err error) {
 	text = []byte(FormattedString(t))
 	return
 }
@@ -232,11 +216,11 @@ func (t *Kennung2) UnmarshalText(text []byte) (err error) {
 	return
 }
 
-func (t Kennung2) MarshalBinary() (text []byte, err error) {
-	if t.g == gattung.Unknown {
-		err = gattung.ErrEmptyKennung{}
-		return
-	}
+func (t *Kennung2) MarshalBinary() (text []byte, err error) {
+	// if t.g == gattung.Unknown {
+	// 	err = errors.Wrapf(gattung.ErrEmptyKennung{}, "Kennung: %s", t)
+	// 	return
+	// }
 
 	text = []byte(FormattedString(t))
 

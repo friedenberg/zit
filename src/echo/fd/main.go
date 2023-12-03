@@ -235,7 +235,7 @@ func (fd *FD) SetPathRel(p, dir string) (err error) {
 	return fd.SetPath(p)
 }
 
-func (fd FD) IsDir() bool {
+func (fd *FD) IsDir() bool {
 	return fd.isDir
 }
 
@@ -243,11 +243,11 @@ func (fd *FD) SetShaLike(v schnittstellen.ShaLike) {
 	fd.sha.SetShaLike(v)
 }
 
-func (fd FD) GetShaLike() schnittstellen.ShaLike {
-	return fd.sha
+func (fd *FD) GetShaLike() schnittstellen.ShaLike {
+	return &fd.sha
 }
 
-func (fd FD) GetState() State {
+func (fd *FD) GetState() State {
 	return fd.state
 }
 

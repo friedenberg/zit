@@ -134,7 +134,7 @@ func (s *Store) UpdateManyMetadatei(
 	incoming sku.TransactedSet,
 ) (err error) {
 	// TODO-P2 only set has changes if an etikett, typ, or kasten has changes
-	s.GetKonfigPtr().SetHasChanges(true)
+	s.GetKonfig().SetHasChanges(true)
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{

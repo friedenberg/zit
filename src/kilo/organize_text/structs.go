@@ -75,8 +75,8 @@ func (a obj) Equals(b obj) bool {
 	return true
 }
 
-func (z obj) String() string {
-	return fmt.Sprintf("- [%s] %s", z.Sku.Kennung, z.Sku.Metadatei.Bezeichnung)
+func (z *obj) String() string {
+	return fmt.Sprintf("- [%s] %s", &z.Sku.Kennung, &z.Sku.Metadatei.Bezeichnung)
 }
 
 func (z *obj) setExistingObj(
@@ -161,9 +161,9 @@ func (z *obj) setNewObj(v string) (err error) {
 }
 
 func sortObjSet(
-	s schnittstellen.MutableSetLike[obj],
-) (out []obj) {
-	out = iter.Elements[obj](s)
+	s schnittstellen.MutableSetLike[*obj],
+) (out []*obj) {
+	out = iter.Elements[*obj](s)
 
 	sort.Slice(out, func(i, j int) bool {
 		switch {

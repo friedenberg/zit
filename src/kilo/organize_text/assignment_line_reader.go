@@ -274,7 +274,7 @@ func (ar *assignmentLineReader) readOneObj(l line) (err error) {
 
 	if err = z.setExistingObj(ar.options.PrintOptions, l.String(), ar.ex); err == nil {
 		// logz.Print("added to named zettels")
-		ar.currentAssignment.named.Add(z)
+		ar.currentAssignment.named.Add(&z)
 		// logz.Print(len(ar.currentAssignment.named))
 		return
 	}
@@ -293,7 +293,7 @@ func (ar *assignmentLineReader) readOneObj(l line) (err error) {
 
 	if err = nz.setNewObj(l.String()); err == nil {
 		// logz.Print("added to unnamed zettels")
-		ar.currentAssignment.unnamed.Add(nz)
+		ar.currentAssignment.unnamed.Add(&nz)
 		return
 	}
 

@@ -12,7 +12,7 @@ import (
 
 type Schwanzen struct {
 	lock         *sync.RWMutex
-	hinweisen    map[string]Transacted
+	hinweisen    map[string]*Transacted
 	etikettIndex kennung_index.EtikettIndexMutation
 	funcFlush    schnittstellen.FuncIter[*Transacted]
 }
@@ -23,7 +23,7 @@ func MakeSchwanzen(
 ) *Schwanzen {
 	return &Schwanzen{
 		lock:         &sync.RWMutex{},
-		hinweisen:    make(map[string]Transacted),
+		hinweisen:    make(map[string]*Transacted),
 		etikettIndex: ei,
 		funcFlush:    funcFlush,
 	}
@@ -39,7 +39,7 @@ func (zws *Schwanzen) Less(zt *Transacted) (ok bool) {
 	case !ok:
 		fallthrough
 
-	case TransactedLessor.LessPtr(zt, &t):
+	case TransactedLessor.LessPtr(zt, t):
 		ok = true
 	}
 
@@ -70,8 +70,8 @@ func (zws *Schwanzen) Set(z *Transacted, flush bool) (ok bool) {
 	case !found:
 		fallthrough
 
-	case TransactedLessor.LessPtr(&t1, z):
-		zws.hinweisen[h.String()] = *z
+	case TransactedLessor.LessPtr(t1, z):
+		zws.hinweisen[h.String()] = z
 		ok = true
 
 	case t1.Metadatei.EqualsSansTai(&z.Metadatei):

@@ -26,7 +26,6 @@ type StoreUtil interface {
 	errors.Flusher
 	standort.Getter
 	konfig.Getter
-	konfig.PtrGetter
 	kennung.Clock
 
 	ExternalReader
@@ -289,11 +288,7 @@ func (s common) GetStandort() standort.Standort {
 	return s.standort
 }
 
-func (s common) GetKonfig() konfig.Compiled {
-	return *s.konfig
-}
-
-func (s common) GetKonfigPtr() *konfig.Compiled {
+func (s common) GetKonfig() *konfig.Compiled {
 	return s.konfig
 }
 

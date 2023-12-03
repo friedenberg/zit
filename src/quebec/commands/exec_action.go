@@ -67,7 +67,7 @@ func (c ExecAction) RunWithQuery(
 	if err = u.StoreObjekten().QueryWithCwd(
 		ms,
 		func(z *sku.Transacted) (err error) {
-			return hinweisen.Add(z.GetKennungLike())
+			return hinweisen.Add(z.GetKennung())
 		},
 	); err != nil {
 		err = errors.Wrap(err)

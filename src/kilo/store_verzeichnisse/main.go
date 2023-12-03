@@ -19,7 +19,7 @@ const (
 )
 
 type Store struct {
-	erworben konfig.Compiled
+	erworben *konfig.Compiled
 	path     string
 	schnittstellen.VerzeichnisseFactory
 	pages [PageCount]*Page
@@ -31,7 +31,7 @@ type pageId struct {
 }
 
 func MakeStore(
-	k konfig.Compiled,
+	k *konfig.Compiled,
 	dir string,
 	f schnittstellen.VerzeichnisseFactory,
 	fff PageDelegateGetter,

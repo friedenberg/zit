@@ -15,11 +15,7 @@ func (u *Umwelt) Sonnenaufgang() thyme.Time {
 	return u.sonnenaufgang
 }
 
-func (u *Umwelt) Konfig() konfig.Compiled {
-	return u.konfig
-}
-
-func (u *Umwelt) KonfigPtr() *konfig.Compiled {
+func (u *Umwelt) Konfig() *konfig.Compiled {
 	return &u.konfig
 }
 

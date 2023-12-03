@@ -38,7 +38,7 @@ func MakeFormatter(
 	v string,
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
-	k konfig.Compiled,
+	k *konfig.Compiled,
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) (fo Formatter, err error) {
 	f := formatter{

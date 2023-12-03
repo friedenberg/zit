@@ -117,7 +117,7 @@ func (c Diff) RunWithQuery(
 
 				internalLabel := fmt.Sprintf(
 					"%s:%s",
-					il.GetKennungLike(),
+					il.GetKennung(),
 					strings.ToLower(il.GetGattung().GetGattungString()),
 				)
 

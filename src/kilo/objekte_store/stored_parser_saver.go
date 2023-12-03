@@ -55,7 +55,7 @@ func MakeStoredParseSaver[
 }
 
 func (h storedParserSaver[O, OPtr]) ParseSaveStored(
-	sem sku.ExternalMaybe,
+	sem *sku.ExternalMaybe,
 	t *sku.External,
 ) (o OPtr, err error) {
 	var f *os.File

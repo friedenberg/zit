@@ -31,25 +31,28 @@ func (s *Store) handleNewOrUpdatedCommit(
 
 	switch g {
 	case gattung.Konfig:
-		if err = s.StoreUtil.GetKonfigPtr().SetTransacted(t, s.GetAkten().GetKonfigV0()); err != nil {
+		if err = s.StoreUtil.GetKonfig().SetTransacted(
+      t,
+      s.GetAkten().GetKonfigV0(),
+    ); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case gattung.Kasten:
-		if err = s.StoreUtil.GetKonfigPtr().AddKasten(t); err != nil {
+		if err = s.StoreUtil.GetKonfig().AddKasten(t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case gattung.Typ:
-		if err = s.StoreUtil.GetKonfigPtr().AddTyp(t); err != nil {
+		if err = s.StoreUtil.GetKonfig().AddTyp(t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case gattung.Etikett:
-		if err = s.StoreUtil.GetKonfigPtr().AddEtikett(t); err != nil {
+		if err = s.StoreUtil.GetKonfig().AddEtikett(t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

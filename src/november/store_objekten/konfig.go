@@ -57,7 +57,12 @@ func (s konfigStore) Update(
 
 	// TODO-P3 refactor into reusable
 	if mutter != nil {
-		kt.Metadatei.Verzeichnisse.Mutter = mutter.GetMetadatei().Verzeichnisse.Sha
+		if err = kt.Metadatei.Verzeichnisse.Mutter.SetShaLike(
+			&mutter.GetMetadatei().Verzeichnisse.Sha,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	err = sku.CalculateAndSetSha(kt, s.GetPersistentMetadateiFormat(),
@@ -85,7 +90,10 @@ func (s konfigStore) Update(
 
 	s.CommitUpdatedTransacted(kt)
 
-	if err = s.StoreUtil.GetKonfigPtr().SetTransacted(kt, s.GetAkten().GetKonfigV0()); err != nil {
+	if err = s.StoreUtil.GetKonfig().SetTransacted(
+		kt,
+		s.GetAkten().GetKonfigV0(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -113,7 +121,7 @@ func (s konfigStore) ReadOne(
 		return
 	}
 
-	tt1 := s.StoreUtil.GetKonfig().Sku
+	tt1 := &s.StoreUtil.GetKonfig().Sku
 
 	if tt1.GetTai().IsEmpty() {
 		err = errors.Wrap(objekte_store.ErrNotFound{Id: k1})
@@ -122,7 +130,7 @@ func (s konfigStore) ReadOne(
 
 	tt = sku.GetTransactedPool().Get()
 
-	if err = tt.SetFromSkuLike(&tt1); err != nil {
+	if err = tt.SetFromSkuLike(tt1); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

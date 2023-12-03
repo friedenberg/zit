@@ -101,17 +101,13 @@ func (c CreateFromPaths) Run(
 	err = results.Each(
 		func(z *sku.Transacted) (err error) {
 			if c.ProtoZettel.Apply(z) {
-				var zt *sku.Transacted
-
-				if zt, err = c.StoreObjekten().Update(
+				if _, err = c.StoreObjekten().Update(
 					z,
 					&z.Kennung,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
-
-				z = zt
 			}
 
 			return
@@ -140,7 +136,10 @@ func (c CreateFromPaths) Run(
 				return
 			}
 
-			cz.Internal = *zt
+			if err = cz.Internal.SetFromSkuLike(zt); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 
 			if c.ProtoZettel.Apply(&cz.Internal) {
 				if zt, err = c.StoreObjekten().Update(
@@ -153,7 +152,10 @@ func (c CreateFromPaths) Run(
 					return
 				}
 
-				cz.Internal = *zt
+				if err = cz.Internal.SetFromSkuLike(zt); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 
 			// TODO-P4 get matches

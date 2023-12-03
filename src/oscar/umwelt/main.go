@@ -124,22 +124,16 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		}
 	}
 
-	{
-		var k *konfig.Compiled
-
-		if k, err = konfig.Make(
-			u.standort,
-			u.erworbenCli,
-		); err != nil {
-			if options.GetAllowKonfigReadError() {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
+	if err = u.konfig.Initialize(
+		u.standort,
+		u.erworbenCli,
+	); err != nil {
+		if options.GetAllowKonfigReadError() {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
 		}
-
-		u.konfig = *k
 	}
 
 	u.konfig.ApplyPrintOptionsKonfig(u.konfig.Akte.PrintOptions)
@@ -154,7 +148,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	log.Log().Printf("store version: %s", u.Konfig().GetStoreVersion())
 
 	if u.storeUtil, err = store_util.MakeStoreUtil(
-		u.KonfigPtr(),
+		u.Konfig(),
 		u.standort,
 		objekte_format.FormatForVersion(u.Konfig().GetStoreVersion()),
 		u.sonnenaufgang,

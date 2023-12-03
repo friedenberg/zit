@@ -92,7 +92,7 @@ func MakeStageSoldier(u *umwelt.Umwelt) (
 	}
 
 	s.mainDialogue = el.Dialogue
-	u.KonfigPtr().SetCliFromCommander(el.MessageHiCommander.CliKonfig)
+	u.Konfig().SetCliFromCommander(el.MessageHiCommander.CliKonfig)
 	errors.Log().Printf("set konfig")
 
 	if err = u.Reset(); err != nil {

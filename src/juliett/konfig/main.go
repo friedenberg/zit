@@ -52,6 +52,9 @@ type Compiled struct {
 }
 
 func (a *compiled) Reset() {
+	a.ExtensionsToTypen =  make(map[string]string)
+	a.TypenToExtensions = make(map[string]string)
+
 	a.lock = &sync.Mutex{}
 	a.EtikettenHidden = kennung.MakeEtikettSet()
 	a.Etiketten = collections_value.MakeMutableValueSet[*ketikett](nil)
@@ -100,20 +103,12 @@ type compiled struct {
 	Kisten sku.TransactedMutableSet
 }
 
-func Make(
+func (c *Compiled) Initialize(
 	s standort.Standort,
 	kcli erworben.Cli,
-) (c *Compiled, err error) {
-	c = &Compiled{
-		cli: kcli,
-		compiled: compiled{
-			ExtensionsToTypen: make(map[string]string),
-			TypenToExtensions: make(map[string]string),
-		},
-	}
-
+) (err error) {
+	c.cli = kcli
 	c.Reset()
-
 	c.angeboren = s.GetKonfig()
 
 	if err = c.loadKonfigErworben(s); err != nil {
@@ -129,7 +124,7 @@ func Make(
 	return
 }
 
-func (kc Compiled) HasChanges() bool {
+func (kc *Compiled) HasChanges() bool {
 	kc.lock.Lock()
 	defer kc.lock.Unlock()
 
@@ -143,11 +138,11 @@ func (kc *Compiled) SetHasChanges(v bool) {
 	kc.hasChanges = true
 }
 
-func (kc Compiled) GetAngeboren() schnittstellen.Angeboren {
+func (kc *Compiled) GetAngeboren() schnittstellen.Angeboren {
 	return kc.angeboren
 }
 
-func (kc Compiled) Cli() erworben.Cli {
+func (kc *Compiled) Cli() erworben.Cli {
 	return kc.cli
 }
 
@@ -252,12 +247,12 @@ func (kc *Compiled) recompile(
 	return
 }
 
-func (c compiled) GetZettelFileExtension() string {
+func (c *compiled) GetZettelFileExtension() string {
 	return fmt.Sprintf(".%s", c.FileExtensions.Zettel)
 }
 
 // TODO-P3 merge all the below
-func (c compiled) GetSortedTypenExpanded(
+func (c *compiled) GetSortedTypenExpanded(
 	v string,
 ) (expandedActual []*sku.Transacted) {
 	expandedMaybe := collections_value.MakeMutableValueSet[values.String](nil)
@@ -298,7 +293,7 @@ func (c compiled) GetSortedTypenExpanded(
 	return
 }
 
-func (kc compiled) IsInlineTyp(k kennung.Typ) (isInline bool) {
+func (kc *compiled) IsInlineTyp(k kennung.Typ) (isInline bool) {
 	todo.Change("fix this horrible hack")
 	if k.IsEmpty() {
 		return true
@@ -311,7 +306,7 @@ func (kc compiled) IsInlineTyp(k kennung.Typ) (isInline bool) {
 
 // Returns the exactly matching Typ, or if it doesn't exist, returns the parent
 // Typ or nil. (Parent Typ for `md-gdoc` would be `md`.)
-func (kc compiled) GetApproximatedTyp(
+func (kc *compiled) GetApproximatedTyp(
 	k kennung.Kennung,
 ) (ct ApproximatedTyp) {
 	expandedActual := kc.GetSortedTypenExpanded(k.String())
@@ -327,7 +322,7 @@ func (kc compiled) GetApproximatedTyp(
 	return
 }
 
-func (kc compiled) GetKasten(k kennung.Kasten) (ct *sku.Transacted) {
+func (kc *compiled) GetKasten(k kennung.Kasten) (ct *sku.Transacted) {
 	if ct1, ok := kc.Kisten.Get(k.String()); ok {
 		ct = sku.GetTransactedPool().Get()
 		errors.PanicIfError(ct.SetFromSkuLike(ct1))

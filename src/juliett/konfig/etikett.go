@@ -53,11 +53,11 @@ func (a *ketikett) Less(b *ketikett) bool {
 	return sku.TransactedLessor.Less(&a.Transacted, &b.Transacted)
 }
 
-func (a ketikett) EqualsAny(b any) bool {
+func (a *ketikett) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a ketikett) Equals(b ketikett) bool {
+func (a *ketikett) Equals(b *ketikett) bool {
 	if !a.Transacted.Equals(&b.Transacted) {
 		return false
 	}
@@ -76,11 +76,11 @@ func (e *ketikett) Set(v string) (err error) {
 	return (&e.Transacted.Kennung).Set(v)
 }
 
-func (e ketikett) String() string {
-	return e.Transacted.GetKennungLike().String()
+func (e *ketikett) String() string {
+	return e.Transacted.GetKennung().String()
 }
 
-func (k compiled) EachEtikett(
+func (k *compiled) EachEtikett(
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return k.Etiketten.Each(
@@ -183,7 +183,7 @@ func (k *compiled) AddEtikett(
 	return
 }
 
-func (kc compiled) GetEtikett(
+func (kc *compiled) GetEtikett(
 	k kennung.Etikett,
 ) (ct *sku.Transacted, ok bool) {
 	expandedActual := kc.GetSortedEtikettenExpanded(k.String())
@@ -196,7 +196,7 @@ func (kc compiled) GetEtikett(
 	return
 }
 
-func (c compiled) GetSortedEtikettenExpanded(
+func (c *compiled) GetSortedEtikettenExpanded(
 	v string,
 ) (expandedActual []*sku.Transacted) {
 	c.lock.Lock()
@@ -241,7 +241,7 @@ func (c compiled) GetSortedEtikettenExpanded(
 	return
 }
 
-func (c compiled) GetImplicitEtiketten(
+func (c *compiled) GetImplicitEtiketten(
 	e *kennung.Etikett,
 ) kennung.EtikettSet {
 	s, ok := c.ImplicitEtiketten[e.String()]

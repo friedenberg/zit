@@ -116,7 +116,7 @@ func (c *Organize) RunWithQuery(
 			var h *kennung.Hinweis
       h = &kennung.Hinweis{}
 
-			if err = h.Set(mwk.GetKennungLike().String()); err == nil {
+			if err = h.Set(mwk.GetKennung().String()); err == nil {
 				if h, err = u.StoreObjekten().GetAbbrStore().Hinweis().ExpandString(
 					h.String(),
 				); err != nil {

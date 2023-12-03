@@ -142,7 +142,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 		return
 	}
 
-	if _, err = u.StoreObjekten().ReadOne(k); err != nil {
+	if _, err = u.StoreObjekten().ReadOne(&k); err != nil {
 		err = nil
 
 		var sh schnittstellen.ShaLike
@@ -163,7 +163,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 
 		if _, err = u.StoreObjekten().CreateOrUpdateAkte(
 			nil,
-			k,
+			&k,
 			sh,
 		); err != nil {
 			err = errors.Wrap(err)

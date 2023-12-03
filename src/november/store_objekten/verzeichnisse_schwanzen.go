@@ -103,7 +103,7 @@ func (s *verzeichnisseSchwanzen) applyKonfig(
 		return
 	}
 
-	s.su.GetKonfigPtr().ApplyToSku(z, s.su.GetAkten().GetTypV0())
+	s.su.GetKonfig().ApplyToSku(z, s.su.GetAkten().GetTypV0())
 
 	return
 }

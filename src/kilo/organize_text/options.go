@@ -27,7 +27,7 @@ type Flags struct {
 type Options struct {
 	wasMade bool
 
-	Konfig konfig.Compiled
+	Konfig *konfig.Compiled
 
 	commentMatchers   schnittstellen.SetLike[matcher.Matcher]
 	rootEtiketten     kennung.EtikettSet

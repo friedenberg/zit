@@ -11,12 +11,12 @@ import (
 )
 
 type formatterTypFormatterUTIGroups struct {
-	erworben            konfig.Compiled
+	erworben            *konfig.Compiled
 	typAkteGetterPutter schnittstellen.AkteGetterPutter[*typ_akte.V0]
 }
 
 func MakeFormatterTypFormatterUTIGroups(
-	erworben konfig.Compiled,
+	erworben *konfig.Compiled,
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) *formatterTypFormatterUTIGroups {
 	return &formatterTypFormatterUTIGroups{

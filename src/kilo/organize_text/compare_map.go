@@ -12,7 +12,7 @@ import (
 )
 
 // TODO-P4 make generic
-type SetKeyToMetadatei map[string]metadatei.Metadatei
+type SetKeyToMetadatei map[string]*metadatei.Metadatei
 
 func (m SetKeyToMetadatei) String() string {
 	sb := &strings.Builder{}
@@ -25,11 +25,12 @@ func (m SetKeyToMetadatei) String() string {
 }
 
 func (s SetKeyToMetadatei) Add(h string, b bezeichnung.Bezeichnung) {
-	var m metadatei.Metadatei
+	var m *metadatei.Metadatei
 	ok := false
 
 	if m, ok = s[h]; !ok {
-		metadatei.Resetter.Reset(&m)
+    m = &metadatei.Metadatei{}
+		metadatei.Resetter.Reset(m)
 		m.Bezeichnung = b
 	}
 
@@ -41,11 +42,11 @@ func (s SetKeyToMetadatei) AddEtikett(
 	e kennung.Etikett,
 	b bezeichnung.Bezeichnung,
 ) {
-	var m metadatei.Metadatei
+	var m *metadatei.Metadatei
 	ok := false
 
 	if m, ok = s[h]; !ok {
-		metadatei.Resetter.Reset(&m)
+		metadatei.Resetter.Reset(m)
 		m.Bezeichnung = b
 	}
 
@@ -62,7 +63,7 @@ func (s SetKeyToMetadatei) ContainsEtikett(
 	h string,
 	e kennung.Etikett,
 ) (ok bool) {
-	var m metadatei.Metadatei
+	var m *metadatei.Metadatei
 
 	if m, ok = s[h]; !ok {
 		return
@@ -84,7 +85,7 @@ func (in *Text) ToCompareMap() (out CompareMap, err error) {
 		Unnamed: make(SetKeyToMetadatei),
 	}
 
-	if err = in.assignment.addToCompareMap(
+	if err = in.addToCompareMap(
 		in.Metadatei,
 		kennung.MakeEtikettSet(),
 		&out,
@@ -114,7 +115,7 @@ func (a *assignment) addToCompareMap(
 	es = mes.CloneSetPtrLike()
 
 	a.named.Each(
-		func(z obj) (err error) {
+		func(z *obj) (err error) {
 			if z.Sku.Kennung.String() == "" {
 				panic(fmt.Sprintf("%s: Kennung is nil", z))
 			}
@@ -136,7 +137,7 @@ func (a *assignment) addToCompareMap(
 	)
 
 	a.unnamed.Each(
-		func(z obj) (err error) {
+		func(z *obj) (err error) {
 			out.Unnamed.Add(z.Sku.Metadatei.Bezeichnung.String(), z.Sku.Metadatei.Bezeichnung)
 
 			for _, e := range iter.SortedValues[kennung.Etikett](es) {

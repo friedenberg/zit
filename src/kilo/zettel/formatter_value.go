@@ -54,7 +54,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 func (fv *FormatterValue) FuncFormatterVerzeichnisse(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
-	k konfig.Compiled,
+	k *konfig.Compiled,
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) schnittstellen.FuncIter[*sku.Transacted] {
 	return fv.FuncFormatter(
@@ -68,7 +68,7 @@ func (fv *FormatterValue) FuncFormatterVerzeichnisse(
 func (fv *FormatterValue) FuncFormatter(
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,
-	k konfig.Compiled,
+	k *konfig.Compiled,
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) schnittstellen.FuncIter[*sku.Transacted] {
 	errors.TodoP2("convert to verzeichnisse")

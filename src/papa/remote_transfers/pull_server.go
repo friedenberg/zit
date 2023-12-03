@@ -77,7 +77,7 @@ func (op PullServer) akteReaderForSha(
 
 	var or io.ReadCloser
 
-	if or, err = op.umwelt.Standort().AkteReader(sh); err != nil {
+	if or, err = op.umwelt.Standort().AkteReader(&sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -117,7 +117,7 @@ func (op PullServer) objekteReaderForSku(
 	var or io.ReadCloser
 
 	if or, err = orf.ObjekteReader(
-		msg.Sha,
+		&msg.Sha,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

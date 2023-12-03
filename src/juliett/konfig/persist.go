@@ -72,7 +72,7 @@ func (kc *Compiled) Flush(
 
 	dec := gob.NewEncoder(f)
 
-	if err = dec.Encode(kc.compiled); err != nil {
+	if err = dec.Encode(&kc.compiled); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
