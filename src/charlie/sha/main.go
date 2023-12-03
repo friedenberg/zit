@@ -36,7 +36,7 @@ type Sha struct {
 	data catgut.String
 }
 
-func (s Sha) GetShaBytes() []byte {
+func (s *Sha) GetShaBytes() []byte {
 	if s.IsNull() {
 		return shaNull.data.Bytes()
 	} else {
@@ -44,7 +44,7 @@ func (s Sha) GetShaBytes() []byte {
 	}
 }
 
-func (s Sha) GetShaString() string {
+func (s *Sha) GetShaString() string {
 	if s.IsNull() {
 		return fmt.Sprintf("%x", shaNull.data.Bytes())
 	} else {
@@ -52,11 +52,11 @@ func (s Sha) GetShaString() string {
 	}
 }
 
-func (s Sha) String() string {
+func (s *Sha) String() string {
 	return s.GetShaString()
 }
 
-func (s Sha) Sha() Sha {
+func (s *Sha) Sha() *Sha {
 	return s
 }
 
@@ -125,11 +125,11 @@ func (s *Sha) Set(v string) (err error) {
 	return
 }
 
-func (s Sha) GetShaLike() schnittstellen.ShaLike {
+func (s *Sha) GetShaLike() schnittstellen.ShaLike {
 	return s
 }
 
-func (s Sha) IsNull() bool {
+func (s *Sha) IsNull() bool {
 	if s.data.Len() == 0 {
 		return true
 	}
@@ -141,11 +141,11 @@ func (s Sha) IsNull() bool {
 	return false
 }
 
-func (s Sha) Kopf() string {
+func (s *Sha) Kopf() string {
 	return s.String()[0:2]
 }
 
-func (s Sha) Schwanz() string {
+func (s *Sha) Schwanz() string {
 	return s.String()[2:]
 }
 
@@ -153,7 +153,7 @@ func (a *Sha) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a Sha) EqualsSha(b schnittstellen.ShaLike) bool {
+func (a *Sha) EqualsSha(b schnittstellen.ShaLike) bool {
 	return a.GetShaString() == b.GetShaString()
 }
 
@@ -178,14 +178,14 @@ func (a *Sha) ResetWithShaLike(b schnittstellen.ShaLike) {
 	a.data.Write(b.GetShaBytes())
 }
 
-func (s Sha) Path(pc ...string) string {
+func (s *Sha) Path(pc ...string) string {
 	pc = append(pc, s.Kopf())
 	pc = append(pc, s.Schwanz())
 
 	return path.Join(pc...)
 }
 
-func (s Sha) MarshalBinary() (text []byte, err error) {
+func (s *Sha) MarshalBinary() (text []byte, err error) {
 	text = []byte(s.String())
 
 	return
@@ -199,7 +199,7 @@ func (s *Sha) UnmarshalBinary(text []byte) (err error) {
 	return
 }
 
-func (s Sha) MarshalText() (text []byte, err error) {
+func (s *Sha) MarshalText() (text []byte, err error) {
 	text = []byte(s.String())
 
 	return

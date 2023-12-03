@@ -4,7 +4,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
@@ -12,34 +11,34 @@ import (
 )
 
 type Changes interface {
-	GetModified() schnittstellen.SetLike[ChangeBezeichnung]
-	GetExisting() schnittstellen.SetLike[Change]
-	GetAddedUnnamed() schnittstellen.SetLike[Change]
-	GetAddedNamed() schnittstellen.SetLike[Change]
+	GetModified() schnittstellen.SetLike[*ChangeBezeichnung]
+	GetExisting() schnittstellen.SetLike[*Change]
+	GetAddedUnnamed() schnittstellen.SetLike[*Change]
+	GetAddedNamed() schnittstellen.SetLike[*Change]
 	GetAllBKeys() schnittstellen.SetLike[values.String]
 }
 
 type changes struct {
-	modified     schnittstellen.MutableSetLike[ChangeBezeichnung]
-	existing     schnittstellen.MutableSetLike[Change]
-	addedUnnamed schnittstellen.MutableSetLike[Change]
-	addedNamed   schnittstellen.MutableSetLike[Change]
+	modified     schnittstellen.MutableSetLike[*ChangeBezeichnung]
+	existing     schnittstellen.MutableSetLike[*Change]
+	addedUnnamed schnittstellen.MutableSetLike[*Change]
+	addedNamed   schnittstellen.MutableSetLike[*Change]
 	allB         schnittstellen.MutableSetLike[values.String]
 }
 
-func (c changes) GetModified() schnittstellen.SetLike[ChangeBezeichnung] {
+func (c changes) GetModified() schnittstellen.SetLike[*ChangeBezeichnung] {
 	return c.modified
 }
 
-func (c changes) GetExisting() schnittstellen.SetLike[Change] {
+func (c changes) GetExisting() schnittstellen.SetLike[*Change] {
 	return c.existing
 }
 
-func (c changes) GetAddedUnnamed() schnittstellen.SetLike[Change] {
+func (c changes) GetAddedUnnamed() schnittstellen.SetLike[*Change] {
 	return c.addedUnnamed
 }
 
-func (c changes) GetAddedNamed() schnittstellen.SetLike[Change] {
+func (c changes) GetAddedNamed() schnittstellen.SetLike[*Change] {
 	return c.addedNamed
 }
 
@@ -102,16 +101,16 @@ func ChangesFrom(
 		return
 	}
 
-	c.modified = collections_ptr.MakeMutableSet[ChangeBezeichnung, *ChangeBezeichnung](
+	c.modified = collections_value.MakeMutableSet[*ChangeBezeichnung](
 		ChangeBezeichnungKeyer{},
 	)
-	c.existing = collections_ptr.MakeMutableValueSet[Change, *Change](
+	c.existing = collections_value.MakeMutableValueSet[*Change](
 		ChangeKeyer{},
 	)
-	c.addedUnnamed = collections_ptr.MakeMutableValueSet[Change, *Change](
+	c.addedUnnamed = collections_value.MakeMutableValueSet[*Change](
 		ChangeKeyer{},
 	)
-	c.addedNamed = collections_ptr.MakeMutableValueSet[Change, *Change](
+	c.addedNamed = collections_value.MakeMutableValueSet[*Change](
 		ChangeKeyer{},
 	)
 	c.allB = collections_value.MakeMutableValueSet[values.String](nil)
@@ -124,7 +123,7 @@ func ChangesFrom(
 
 		if es2, existsInA = a.Named[h]; existsInA {
 			if es2.Bezeichnung.String() != es1.Bezeichnung.String() {
-				c.modified.Add(ChangeBezeichnung{Kennung: h, Bezeichnung: es1.Bezeichnung})
+				c.modified.Add(&ChangeBezeichnung{Kennung: h, Bezeichnung: es1.Bezeichnung})
 			}
 		}
 
@@ -156,18 +155,18 @@ func ChangesFrom(
 		}
 
 		if existsInA {
-			c.existing.Add(change)
+			c.existing.Add(&change)
 		} else {
-			c.addedNamed.Add(change)
+			c.addedNamed.Add(&change)
 		}
 	}
 
 	for h, es := range a.Named {
-		var change Change
+		var change *Change
 		ok := false
 
 		if change, ok = c.existing.Get(h); !ok {
-			change = Change{
+			change = &Change{
 				Key:     h,
 				added:   kennung.MakeEtikettMutableSet(),
 				removed: kennung.MakeEtikettMutableSet(),
@@ -200,7 +199,7 @@ func ChangesFrom(
 		}
 
 		es.GetEtiketten().Each(change.added.Add)
-		c.addedUnnamed.Add(change)
+		c.addedUnnamed.Add(&change)
 	}
 
 	return

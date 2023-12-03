@@ -119,7 +119,7 @@ func (nrc nopReadCloser) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 func (nrc nopReadCloser) GetShaLike() schnittstellen.ShaLike {
-	return Sha{}
+	return &Sha{}
 }
 
 type nopAkteFactory struct{}

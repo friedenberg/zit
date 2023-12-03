@@ -6,11 +6,7 @@ import (
 
 type ChangeBezeichnungKeyer struct{}
 
-func (ChangeBezeichnungKeyer) GetKey(c ChangeBezeichnung) string {
-	return c.Kennung
-}
-
-func (ChangeBezeichnungKeyer) GetKeyPtr(c *ChangeBezeichnung) string {
+func (ChangeBezeichnungKeyer) GetKey(c *ChangeBezeichnung) string {
 	return c.Kennung
 }
 

@@ -50,7 +50,7 @@ func (c CommitOrganizeFile) Run(
 	if err = store.QueryWithCwd(
 		ms,
 		func(tl *sku.Transacted) (err error) {
-			var change changes.Change
+			var change *changes.Change
 			ok := false
 			sk := sku.GetTransactedPool().Get()
 
@@ -99,7 +99,7 @@ func (c CommitOrganizeFile) Run(
 	}
 
 	if err = cs.GetAddedNamed().Each(
-		func(change changes.Change) (err error) {
+		func(change *changes.Change) (err error) {
 			var k kennung.Kennung2
 
 			if err = k.Set(change.Key); err != nil {
@@ -142,7 +142,7 @@ func (c CommitOrganizeFile) Run(
 	}
 
 	if err = cs.GetAddedUnnamed().Each(
-		func(change changes.Change) (err error) {
+		func(change *changes.Change) (err error) {
 			bez := change.Key
 
 			m := &metadatei.Metadatei{
