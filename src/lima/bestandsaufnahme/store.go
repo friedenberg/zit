@@ -154,7 +154,7 @@ func (s *store) Create(o *Akte) (err error) {
 
 	log.Log().Printf(
 		"saving Bestandsaufnahme with tai: %s -> %s",
-		t.GetKennungLike().GetGattung(),
+		t.GetKennung().GetGattung(),
 		sh,
 	)
 
@@ -191,7 +191,7 @@ func (s *store) ReadOne(
 
 	var or sha.ReadCloser
 
-	if or, err = s.of.ObjekteReader(sh); err != nil {
+	if or, err = s.of.ObjekteReader(&sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -219,7 +219,7 @@ func (s *store) ReadOne(
 			o,
 			s.persistentMetadateiFormat,
 			op,
-			sh,
+			&sh,
 		)
 
 		if err != nil {

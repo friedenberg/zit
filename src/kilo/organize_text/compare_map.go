@@ -119,7 +119,7 @@ func (a *assignment) addToCompareMap(
 				panic(fmt.Sprintf("%s: Kennung is nil", z))
 			}
 
-			fk := kennung.FormattedString(z.Sku.Kennung)
+			fk := kennung.FormattedString(&z.Sku.Kennung)
 			out.Named.Add(fk, z.Sku.Metadatei.Bezeichnung)
 
 			for _, e := range iter.SortedValues[kennung.Etikett](es) {

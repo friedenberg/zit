@@ -136,7 +136,7 @@ func (i *Store) GetPageIndexKeyValue(
 	zt sku.Transacted,
 ) (key string, value string) {
 	key = zt.Kennung.String()
-	value = fmt.Sprintf("%s.%s", zt.GetTai(), zt.ObjekteSha)
+	value = fmt.Sprintf("%s.%s", zt.GetTai(), &zt.ObjekteSha)
 	return
 }
 

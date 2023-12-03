@@ -244,7 +244,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 	merged, err = s.merge(tm)
 
 	switch {
-	case errors.Is(err, to_merge.ErrMergeConflict{}):
+	case errors.Is(err, &to_merge.ErrMergeConflict{}):
 		if err = tm.WriteConflictMarker(
 			s.GetStandort(),
 			s.GetKonfig().GetStoreVersion(),

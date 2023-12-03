@@ -137,7 +137,7 @@ func (s *Store) runDiff3(left, middle, right fd.FD) (path string, err error) {
 
 	if err = cmd.Wait(); err != nil {
 		if cmd.ProcessState.ExitCode() == 1 {
-			err = errors.Wrap(to_merge.ErrMergeConflict{})
+			err = errors.Wrap(to_merge.MakeErrMergeConflict(nil))
 		} else {
 			err = errors.Wrap(err)
 			return

@@ -60,7 +60,9 @@ func writeFormat(
 		t.Fatalf("%s", err)
 	}
 
-	m.AkteSha = akteSha
+	if err = m.AkteSha.SetShaLike(&akteSha); err != nil {
+		t.Fatalf("%s", err)
+	}
 
 	sb := &strings.Builder{}
 
