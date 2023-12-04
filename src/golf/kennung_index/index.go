@@ -27,7 +27,7 @@ type index2[
 	hasChanges      bool
 	lock            *sync.RWMutex
 	IntsToKennungen map[int]TPtr
-	Kennungen       map[string]*kennung.IndexedLike[T, TPtr]
+	Kennungen       map[string]*kennung.IndexedLike
 }
 
 func MakeIndex2[
@@ -43,7 +43,7 @@ func MakeIndex2[
 		readOnce:        &sync.Once{},
 		lock:            &sync.RWMutex{},
 		IntsToKennungen: make(map[int]TPtr),
-		Kennungen:       make(map[string]*kennung.IndexedLike[T, TPtr]),
+		Kennungen:       make(map[string]*kennung.IndexedLike),
 	}
 
 	return
@@ -60,7 +60,7 @@ func (i *index2[T, TPtr]) Reset() error {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
-	i.Kennungen = make(map[string]*kennung.IndexedLike[T, TPtr])
+	i.Kennungen = make(map[string]*kennung.IndexedLike)
 	i.IntsToKennungen = make(map[int]TPtr)
 	i.readOnce = &sync.Once{}
 	i.hasChanges = false
@@ -165,7 +165,7 @@ func (i *index2[T, TPtr]) ReadFrom(r1 io.Reader) (n int64, err error) {
 }
 
 func (i *index2[T, TPtr]) Each(
-	f schnittstellen.FuncIter[kennung.IndexedLike[T, TPtr]],
+	f schnittstellen.FuncIter[kennung.IndexedLike],
 ) (err error) {
 	if err = i.ReadIfNecessary(); err != nil {
 		err = errors.Wrap(err)
@@ -188,7 +188,7 @@ func (i *index2[T, TPtr]) Each(
 }
 
 func (i *index2[T, TPtr]) EachSchwanzen(
-	f schnittstellen.FuncIter[kennung.IndexedLike[T, TPtr]],
+	f schnittstellen.FuncIter[*kennung.IndexedLike],
 ) (err error) {
 	if err = i.ReadIfNecessary(); err != nil {
 		err = errors.Wrap(err)
@@ -200,7 +200,7 @@ func (i *index2[T, TPtr]) EachSchwanzen(
 			continue
 		}
 
-		if err = f(*id); err != nil {
+		if err = f(id); err != nil {
 			if iter.IsStopIteration(err) {
 				err = nil
 			} else {
@@ -214,13 +214,13 @@ func (i *index2[T, TPtr]) EachSchwanzen(
 	return
 }
 
-func (i *index2[T, TPtr]) GetAll() (out []T, err error) {
+func (i *index2[T, TPtr]) GetAll() (out []kennung.Kennung, err error) {
 	if err = i.ReadIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	out = make([]T, 0, len(i.Kennungen))
+	out = make([]kennung.Kennung, 0, len(i.Kennungen))
 
 	for _, ki := range i.Kennungen {
 		out = append(out, ki.GetKennung())
@@ -254,7 +254,7 @@ func (i *index2[T, TPtr]) GetInt(in int) (id T, err error) {
 
 func (i *index2[T, TPtr]) Get(
 	k TPtr,
-) (id *kennung.IndexedLike[T, TPtr], err error) {
+) (id *kennung.IndexedLike, err error) {
 	if err = i.ReadIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -347,7 +347,7 @@ func (i *index2[T, TPtr]) storeOne(k T) (err error) {
 	id, ok := i.Kennungen[k.String()]
 
 	if !ok {
-		id = &kennung.IndexedLike[T, TPtr]{}
+		id = &kennung.IndexedLike{}
 		id.ResetWithKennung(k)
 	}
 

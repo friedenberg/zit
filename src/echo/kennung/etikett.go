@@ -26,7 +26,7 @@ type Etikett struct {
 	value string
 }
 
-type IndexedEtikett = IndexedLike[Etikett, *Etikett]
+type IndexedEtikett = IndexedLike
 
 func MustEtikett(v string) (e Etikett) {
 	var err error

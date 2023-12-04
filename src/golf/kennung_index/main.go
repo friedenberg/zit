@@ -17,12 +17,12 @@ type KennungIndex[
 	TPtr kennung.KennungLikePtr[T],
 ] interface {
 	GetInt(int) (T, error)
-	Get(*T) (*kennung.IndexedLike[T, TPtr], error)
+	Get(*T) (*kennung.IndexedLike, error)
 	HasChanges() bool
 	Reset() error
-	GetAll() ([]T, error)
-	Each(schnittstellen.FuncIter[kennung.IndexedLike[T, TPtr]]) error
-	EachSchwanzen(schnittstellen.FuncIter[kennung.IndexedLike[T, TPtr]]) error
+	GetAll() ([]kennung.Kennung, error)
+	Each(schnittstellen.FuncIter[kennung.IndexedLike]) error
+	EachSchwanzen(schnittstellen.FuncIter[*kennung.IndexedLike]) error
 	StoreDelta(schnittstellen.Delta[T]) (err error)
 	StoreMany(schnittstellen.SetLike[T]) (err error)
 	StoreOne(T) (err error)
@@ -40,11 +40,11 @@ type EtikettIndex interface {
 	EtikettIndexMutation
 
 	EachSchwanzen(
-		schnittstellen.FuncIter[kennung.IndexedEtikett],
+		schnittstellen.FuncIter[*kennung.IndexedEtikett],
 	) error
 	GetEtikett(
 		*kennung.Etikett,
-	) (*kennung.IndexedLike[kennung.Etikett, *kennung.Etikett], error)
+	) (*kennung.IndexedLike, error)
 }
 
 type Index interface {
@@ -118,7 +118,7 @@ func (i *index) AddEtikettSet(
 
 func (i *index) GetEtikett(
 	k *kennung.Etikett,
-) (id *kennung.IndexedLike[kennung.Etikett, *kennung.Etikett], err error) {
+) (id *kennung.IndexedLike, err error) {
 	return i.etikettenIndex.Get(k)
 }
 
@@ -127,13 +127,13 @@ func (i *index) Add(s kennung.EtikettSet) (err error) {
 }
 
 func (i *index) Each(
-	f schnittstellen.FuncIter[kennung.IndexedLike[kennung.Etikett, *kennung.Etikett]],
+	f schnittstellen.FuncIter[kennung.IndexedLike],
 ) (err error) {
 	return i.etikettenIndex.Each(f)
 }
 
 func (i *index) EachSchwanzen(
-	f schnittstellen.FuncIter[kennung.IndexedLike[kennung.Etikett, *kennung.Etikett]],
+	f schnittstellen.FuncIter[*kennung.IndexedLike],
 ) (err error) {
 	return i.etikettenIndex.EachSchwanzen(f)
 }
