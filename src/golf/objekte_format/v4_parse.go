@@ -5,9 +5,9 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/charlie/ohio_ring_buffer2"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/ohio"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -42,7 +42,7 @@ var (
 )
 
 func (f v4) ParsePersistentMetadatei(
-	r schnittstellen.RingBuffer,
+	r *ohio_ring_buffer2.RingBuffer,
 	c ParserContext,
 	o Options,
 ) (n int64, err error) {
@@ -55,7 +55,7 @@ func (f v4) ParsePersistentMetadatei(
 
 	var (
 		lastKey, valBuffer catgut.String
-		line, key, val     schnittstellen.BufferSlice
+		line, key, val     ohio_ring_buffer2.Slice
 		ok                 bool
 	)
 
@@ -63,7 +63,7 @@ func (f v4) ParsePersistentMetadatei(
 	lineNo := 0
 
 	for {
-		line, ok, err = r.PeekReadableSliceUpto('\n')
+		line, ok, err = r.PeekUpto('\n')
 
 		if err != nil && err != io.EOF {
 			break
@@ -78,7 +78,7 @@ func (f v4) ParsePersistentMetadatei(
 			break
 		}
 
-		key, val, ok = line.CutBufferSlice(' ')
+		key, val, ok = line.Cut(' ')
 
 		if !ok {
 			err = errV4ExpectedSpaceSeparatedKey

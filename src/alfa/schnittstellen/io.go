@@ -25,26 +25,8 @@ type (
 	FuncWriter              func(io.Writer) (int64, error)
 	FuncWriterFormat[T any] func(io.Writer, T) (int64, error)
 
-	BufferSlice interface {
-		Len() int
-		CutBufferSlice(delim byte) (before, after BufferSlice, ok bool)
-		Compare([]byte) int
-		Equal([]byte) bool
-		io.WriterTo
-		io.ReaderFrom
-		Stringer
-		Bytes() []byte
-	}
-
-	RingBuffer interface {
-		GetRingBuffer() RingBuffer
-		PeekReadableSlice() BufferSlice
-		PeekReadableSliceUpto(b byte) (readable BufferSlice, ok bool, err error)
-		AdvanceRead(n int)
-	}
-
 	StringFormatReader[T any] interface {
-		ReadStringFormat(RingBuffer, T) (int64, error)
+		ReadStringFormat(io.Reader, T) (int64, error)
 	}
 
 	StringFormatWriter[T any] interface {

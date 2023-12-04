@@ -3,8 +3,6 @@ package ohio_ring_buffer2
 import (
 	"fmt"
 	"io"
-
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
 const RingBufferDefaultSize = 4096
@@ -27,14 +25,6 @@ type RingBuffer struct {
 	rIdx, wIdx              int
 	data                    []byte
 }
-
-func (rb *RingBuffer) GetRingBuffer() schnittstellen.RingBuffer {
-	return rb
-}
-
-// func (rb *RingBuffer) String() string {
-
-// }
 
 func (rb *RingBuffer) Reset(r io.Reader) {
 	rb.reader = r
@@ -103,10 +93,6 @@ func (rb *RingBuffer) PeekWriteable() (rs Slice) {
 	}
 
 	return
-}
-
-func (rb *RingBuffer) PeekReadableSlice() schnittstellen.BufferSlice {
-	return rb.PeekReadable()
 }
 
 func (rb *RingBuffer) PeekReadable() (rs Slice) {
@@ -287,12 +273,6 @@ func (rb *RingBuffer) AdvanceRead(n int) {
 	}
 
 	rb.dataLength -= n
-}
-
-func (rb *RingBuffer) PeekReadableSliceUpto(
-  b byte,
-) (readable schnittstellen.BufferSlice, ok bool, err error) {
-  return rb.PeekUpto(b)
 }
 
 func (rb *RingBuffer) PeekUpto(b byte) (readable Slice, ok bool, err error) {

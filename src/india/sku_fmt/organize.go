@@ -1,6 +1,8 @@
 package sku_fmt
 
 import (
+	"io"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -29,7 +31,7 @@ func (f *organize) SetMaxSchwanz(m int) {
 }
 
 func (f *organize) ReadStringFormat(
-	sw schnittstellen.RingBuffer,
+	sw io.Reader,
 	o *sku.Transacted,
 ) (n int64, err error) {
 	return

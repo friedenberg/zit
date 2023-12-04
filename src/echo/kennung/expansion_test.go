@@ -3,9 +3,9 @@ package kennung
 import (
 	"testing"
 
+	"github.com/friedenberg/zit/src/bravo/expansion"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
-	"github.com/friedenberg/zit/srx/bravo/expansion"
 )
 
 func stringSliceEquals(a, b []string) bool {

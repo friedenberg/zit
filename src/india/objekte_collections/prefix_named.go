@@ -5,7 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/srx/bravo/expansion"
+	"github.com/friedenberg/zit/src/bravo/expansion"
 )
 
 type SetPrefixVerzeichnisse struct {

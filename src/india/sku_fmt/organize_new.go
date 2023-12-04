@@ -1,6 +1,8 @@
 package sku_fmt
 
 import (
+	"io"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -196,7 +198,7 @@ func (f *organizeNew) WriteStringFormat(
 }
 
 func (f *organizeNew) ReadStringFormat(
-	rb schnittstellen.RingBuffer,
+	rb io.Reader,
 	o *sku.Transacted,
 ) (n int64, err error) {
 	return
