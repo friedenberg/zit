@@ -18,8 +18,10 @@ func makeObj(
 	options erworben_cli_print_options.PrintOptions,
 	named *sku.Transacted,
 	expanders kennung.Abbr,
-) (z obj, err error) {
+) (z *obj, err error) {
 	errors.TodoP4("add bez in a better way")
+
+  z = &obj{}
 
 	if err = z.Sku.SetFromSkuLike(named); err != nil {
 		err = errors.Wrap(err)
@@ -43,17 +45,17 @@ type obj struct {
 	IsNew bool
 }
 
-func (a obj) Len() int {
+func (a *obj) Len() int {
 	return len(a.Sku.Kennung.String())
 }
 
-func (a obj) LenKopfUndSchwanz() (int, int) {
+func (a *obj) LenKopfUndSchwanz() (int, int) {
 	kopf, schwanz := a.KopfUndSchwanz()
 
 	return len(kopf), len(schwanz)
 }
 
-func (a obj) KopfUndSchwanz() (kopf, schwanz string) {
+func (a *obj) KopfUndSchwanz() (kopf, schwanz string) {
 	parts := a.Sku.Kennung.Parts()
 	kopf = parts[0]
 	schwanz = parts[2]
@@ -61,11 +63,11 @@ func (a obj) KopfUndSchwanz() (kopf, schwanz string) {
 	return
 }
 
-func (a obj) EqualsAny(b any) bool {
+func (a *obj) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a obj) Equals(b obj) bool {
+func (a *obj) Equals(b *obj) bool {
 	if a.Sku.Kennung.String() != b.Sku.Kennung.String() {
 		return false
 	}

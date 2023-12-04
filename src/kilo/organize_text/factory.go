@@ -115,14 +115,18 @@ func (atc Factory) makeChildren(
 
 		err = prefixSet.EachZettel(
 			func(e kennung.Etikett, tz *sku.Transacted) (err error) {
-				var z obj
+				var z *obj
 
-				if z, err = makeObj(atc.Options.PrintOptions, tz, atc.Expanders); err != nil {
+				if z, err = makeObj(
+          atc.Options.PrintOptions,
+          tz,
+          atc.Expanders,
+        ); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 
-				parent.named.Add(&z)
+				parent.named.Add(z)
 
 				return
 			},
@@ -140,14 +144,18 @@ func (atc Factory) makeChildren(
 
 	err = segments.Ungrouped.Each(
 		func(tz *sku.Transacted) (err error) {
-			var z obj
+			var z *obj
 
-			if z, err = makeObj(atc.Options.PrintOptions, tz, atc.Expanders); err != nil {
+			if z, err = makeObj(
+        atc.Options.PrintOptions,
+        tz,
+        atc.Expanders,
+      ); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			parent.named.Add(&z)
+			parent.named.Add(z)
 
 			return
 		},
