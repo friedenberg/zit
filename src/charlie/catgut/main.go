@@ -8,6 +8,7 @@ import (
 	"unicode/utf8"
 	"unsafe"
 
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/ohio_buffer"
@@ -16,6 +17,18 @@ import (
 type String struct {
 	addr *String
 	Data bytes.Buffer
+}
+
+func MakeFromString(v string) (s *String) {
+	s = GetPool().Get()
+	errors.PanicIfError(s.Set(v))
+	return
+}
+
+func MakeFromBytes(b []byte) (s *String) {
+	s = GetPool().Get()
+	errors.PanicIfError(s.SetBytes(b))
+	return s
 }
 
 // noescape hides a pointer from escape analysis. It is the identity function

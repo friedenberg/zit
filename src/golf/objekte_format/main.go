@@ -5,7 +5,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/ohio_ring_buffer2"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
@@ -31,7 +30,7 @@ type (
 
 	Parser interface {
 		ParsePersistentMetadatei(
-			*ohio_ring_buffer2.RingBuffer,
+			schnittstellen.RingBuffer,
 			ParserContext,
 			Options,
 		) (int64, error)

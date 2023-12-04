@@ -157,7 +157,9 @@ func (f v4) FormatPersistentMetadatei(
 				"Verzeichnisse-%s-Expanded",
 				gattung.Etikett.String(),
 			)
-			for _, e := range iter.SortedValues[kennung.Etikett](m.Verzeichnisse.GetExpandedEtiketten()) {
+			for _, e := range iter.SortedValues[kennung.Etikett](
+				m.Verzeichnisse.GetExpandedEtiketten(),
+			) {
 				n1, err = ohio.WriteKeySpaceValueNewlineString(
 					w,
 					k,
@@ -178,7 +180,9 @@ func (f v4) FormatPersistentMetadatei(
 				gattung.Etikett.String(),
 			)
 
-			for _, e := range iter.SortedValues[kennung.Etikett](m.Verzeichnisse.GetImplicitEtiketten()) {
+			for _, e := range iter.SortedValues[kennung.Etikett](
+				m.Verzeichnisse.GetImplicitEtiketten(),
+			) {
 				n2, err = ohio.WriteKeySpaceValueNewline(
 					w,
 					k,

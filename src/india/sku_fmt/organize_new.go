@@ -1,8 +1,6 @@
 package sku_fmt
 
 import (
-	"io"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -51,13 +49,6 @@ func (f *organizeNew) SetMaxKopf(m int) {
 
 func (f *organizeNew) SetMaxSchwanz(m int) {
 	f.maxSchwanz = m
-}
-
-func (f *organizeNew) ReadStringFormat(
-	sw io.Reader,
-	o *sku.Transacted,
-) (n int64, err error) {
-	return
 }
 
 func (f *organizeNew) WriteStringFormat(
@@ -201,5 +192,12 @@ func (f *organizeNew) WriteStringFormat(
 		}
 	}
 
+	return
+}
+
+func (f *organizeNew) ReadStringFormat(
+	rb schnittstellen.RingBuffer,
+	o *sku.Transacted,
+) (n int64, err error) {
 	return
 }

@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"io"
 	"strings"
+
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
 type Slice struct {
@@ -126,6 +128,12 @@ func (rs Slice) IsEmpty() bool {
 
 func (rs Slice) Len() int {
 	return len(rs.First()) + len(rs.Second())
+}
+
+func (rs Slice) CutBufferSlice(
+	b byte,
+) (before, after schnittstellen.BufferSlice, ok bool) {
+	return rs.Cut(b)
 }
 
 func (rs Slice) Cut(b byte) (before, after Slice, ok bool) {
