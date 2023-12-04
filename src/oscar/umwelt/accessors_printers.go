@@ -59,7 +59,10 @@ func (u *Umwelt) StringFormatWriterSkuLikePtrForOrganize() schnittstellen.String
 	co.OffEntirely = true
 
 	if !u.Konfig().NewOrganize {
-		return sku_fmt.MakeOrganizeFormat()
+		return sku_fmt.MakeOrganizeFormat(
+			u.MakeKennungExpanders(),
+			u.konfig.PrintOptions,
+		)
 	}
 
 	return sku_fmt.MakeOrganizeNewFormat(

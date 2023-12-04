@@ -3,7 +3,6 @@ package organize_text
 import (
 	"fmt"
 	"sort"
-	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
@@ -21,7 +20,7 @@ func makeObj(
 ) (z *obj, err error) {
 	errors.TodoP4("add bez in a better way")
 
-  z = &obj{}
+	z = &obj{}
 
 	if err = z.Sku.SetFromSkuLike(named); err != nil {
 		err = errors.Wrap(err)
@@ -81,67 +80,6 @@ func (a *obj) Equals(b *obj) bool {
 
 func (z *obj) String() string {
 	return fmt.Sprintf("- [%s] %s", &z.Sku.Kennung, &z.Sku.Metadatei.Bezeichnung)
-}
-
-func (z *obj) setExistingObj(
-	options erworben_cli_print_options.PrintOptions,
-	v string,
-	ex kennung.Abbr,
-) (err error) {
-	remaining := v
-
-	if len(remaining) < 3 {
-		err = errors.Errorf("expected at least 3 characters")
-		return
-	}
-
-	if remaining[:3] != "- [" {
-		err = errors.Errorf("expected '- [', but got '%s'", remaining[:3])
-		return
-	}
-
-	remaining = remaining[3:]
-
-	idx := -1
-
-	if idx = strings.Index(remaining, "]"); idx == -1 {
-		err = errors.Errorf("expected ']' after hinweis, but not found")
-		return
-	}
-
-	remainingKennung := strings.TrimSpace(remaining[:idx])
-
-	if idxSpace := strings.Index(remainingKennung, " "); idxSpace != -1 {
-		remainingKennung = remainingKennung[:idxSpace]
-	}
-
-	if err = z.Sku.Kennung.Set(remainingKennung); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if options.Abbreviations.Hinweisen {
-		if err = ex.AbbreviateHinweisOnly(
-			&z.Sku.Kennung,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	// no bezeichnung
-	if idx+2 > len(remaining)-1 {
-		return
-	}
-
-	remaining = remaining[idx+2:]
-
-	if err = z.Sku.Metadatei.Bezeichnung.Set(remaining); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }
 
 func (z *obj) setNewObj(v string) (err error) {

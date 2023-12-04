@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
@@ -13,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/india/sku_fmt"
 )
 
 func TestMain(m *testing.M) {
@@ -57,13 +59,22 @@ func makeObjWithHinAndBez(t *testing.T, hin string, bez string) (o *obj) {
 	return
 }
 
+func makeAssignmentLineReader() assignmentLineReader {
+	return assignmentLineReader{
+		stringFormatReader: sku_fmt.MakeOrganizeFormat(
+			kennung.Abbr{},
+			erworben_cli_print_options.PrintOptions{},
+		),
+	}
+}
+
 func TestAssignmentLineReaderOneHeadingNoZettels(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 	input := `# wow
     `
 
 	sr := strings.NewReader(input)
-	sub := assignmentLineReader{}
+	sub := makeAssignmentLineReader()
 
 	n, err := sub.ReadFrom(sr)
 
@@ -103,7 +114,7 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
     `
 
 	sr := strings.NewReader(input)
-	sub := assignmentLineReader{}
+	sub := makeAssignmentLineReader()
 
 	n, err := sub.ReadFrom(sr)
 
@@ -155,7 +166,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
     `
 
 	sr := strings.NewReader(input)
-	sub := assignmentLineReader{}
+	sub := makeAssignmentLineReader()
 
 	n, err := sub.ReadFrom(sr)
 
@@ -238,7 +249,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
     `
 
 	sr := strings.NewReader(input)
-	sub := assignmentLineReader{}
+	sub := makeAssignmentLineReader()
 
 	n, err := sub.ReadFrom(sr)
 
@@ -336,7 +347,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
     `
 
 	sr := strings.NewReader(input)
-	sub := assignmentLineReader{}
+	sub := makeAssignmentLineReader()
 
 	n, err := sub.ReadFrom(sr)
 
@@ -415,7 +426,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
     `
 
 	sr := strings.NewReader(input)
-	sub := assignmentLineReader{}
+	sub := makeAssignmentLineReader()
 
 	n, err := sub.ReadFrom(sr)
 

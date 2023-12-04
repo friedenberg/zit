@@ -6,16 +6,18 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 type assignmentLineReader struct {
-	options           Options
-	lineNo            int
-	root              *assignment
-	currentAssignment *assignment
-	ex                kennung.Abbr
+	options            Options
+	lineNo             int
+	root               *assignment
+	currentAssignment  *assignment
+	stringFormatReader schnittstellen.StringFormatReader[*sku.Transacted]
 }
 
 func (ar *assignmentLineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
@@ -272,7 +274,10 @@ func (ar *assignmentLineReader) readOneObj(l line) (err error) {
 
 	var z obj
 
-	if err = z.setExistingObj(ar.options.PrintOptions, l.String(), ar.ex); err == nil {
+	if _, err = ar.stringFormatReader.ReadStringFormat(
+		strings.NewReader(l.String()),
+		&z.Sku,
+	); err == nil {
 		// logz.Print("added to named zettels")
 		ar.currentAssignment.named.Add(&z)
 		// logz.Print(len(ar.currentAssignment.named))
