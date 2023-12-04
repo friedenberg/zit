@@ -51,7 +51,7 @@ func (s *common) ReadOneExternal(
 		return
 	}
 
-	e = &sku.External{}
+  e = sku.GetExternalPool().Get()
 
 	if err = e.ResetWithExternalMaybe(em); err != nil {
 		err = errors.Wrap(err)

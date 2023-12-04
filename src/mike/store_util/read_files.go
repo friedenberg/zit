@@ -12,9 +12,11 @@ import (
 func (s *common) ReadOneExternalFS(
 	sk2 *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
-	// TODO-P3 pool
-	co = &sku.CheckedOut{
-		Internal: *sk2,
+	co = sku.GetCheckedOutPool().Get()
+
+	if err = co.Internal.SetFromSkuLike(sk2); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	ok := false

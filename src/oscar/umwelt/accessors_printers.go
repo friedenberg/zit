@@ -72,7 +72,9 @@ func (u *Umwelt) StringFormatWriterSkuLikePtrForOrganize() schnittstellen.String
 	)
 }
 
-func (u *Umwelt) StringFormatWriterSkuLikePtr(co *string_format_writer.ColorOptions) schnittstellen.StringFormatWriter[*sku.Transacted] {
+func (u *Umwelt) StringFormatWriterSkuLikePtr(
+	co *string_format_writer.ColorOptions,
+) schnittstellen.StringFormatWriter[*sku.Transacted] {
 	if co == nil {
 		co1 := u.FormatColorOptions()
 		co = &co1

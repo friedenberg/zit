@@ -73,7 +73,7 @@ func (f *cli) WriteStringFormat(
 		return
 	}
 
-	o := colp.External
+	o := &colp.External
 	fds := o.GetFDsPtr()
 	n1, err = sw.WriteString("[")
 	n += int64(n1)

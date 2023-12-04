@@ -20,7 +20,7 @@ type Transacted struct {
 }
 
 func (t *Transacted) GetSkuLike() SkuLike {
-  return t
+	return t
 }
 
 func (t *Transacted) SetFromSkuLike(sk SkuLike) (err error) {

@@ -9,6 +9,7 @@ import (
 	"unsafe"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/ohio_buffer"
 )
 
@@ -30,6 +31,11 @@ func noescape(p unsafe.Pointer) unsafe.Pointer {
 	return unsafe.Pointer(x ^ 0)
 }
 
+const (
+	configPanicOnCopy    = false
+	configDebugCopyCheck = false
+)
+
 func (b *String) copyCheck() {
 	if b.addr == nil {
 		// This hack works around a failing of Go's escape analysis
@@ -37,17 +43,28 @@ func (b *String) copyCheck() {
 		// See issue 23382.
 		// TODO-P1: once issue 7921 is fixed, this should be reverted to
 		// just "b.addr = b".
+		if configDebugCopyCheck {
+			log.Log().Caller(6, "saved addr: %d", unsafe.Pointer(b))
+		}
 		b.addr = (*String)(noescape(unsafe.Pointer(b)))
 		return
 	}
 
 	if b.addr != b {
-		oldB := b.addr
-		b = &String{}
-		b.addr = b
-		b.Data = bytes.Buffer{}
-		oldB.CopyTo(b)
-		// panic("catgut: illegal use of non-zero String copied by value")
+		if configPanicOnCopy {
+			panic(
+				fmt.Sprintf(
+					"catgut: illegal use of non-zero String copied by value: %d",
+					unsafe.Pointer(b.addr),
+				),
+			)
+		} else {
+			oldB := b.addr
+			b = &String{}
+			b.addr = b
+			b.Data = bytes.Buffer{}
+			oldB.CopyTo(b)
+		}
 	}
 }
 

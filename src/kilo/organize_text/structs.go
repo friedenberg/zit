@@ -20,8 +20,10 @@ func makeObj(
 	expanders kennung.Abbr,
 ) (z obj, err error) {
 	errors.TodoP4("add bez in a better way")
-	z = obj{
-		Sku: *named,
+
+	if err = z.Sku.SetFromSkuLike(named); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if options.Abbreviations.Hinweisen {
