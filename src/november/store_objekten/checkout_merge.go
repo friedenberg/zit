@@ -233,7 +233,10 @@ func (s *Store) RunMergeTool(
 	e := sku.GetExternalPool().Get()
 	defer sku.GetExternalPool().Put(e)
 
-	*e = leftCO.External
+	if err = e.SetFromSkuLike(&leftCO.External); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = s.ReadOneExternalObjekteReader(f, e); err != nil {
 		err = errors.Wrap(err)

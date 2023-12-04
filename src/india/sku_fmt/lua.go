@@ -31,6 +31,4 @@ func Lua(o *sku.Transacted, ki kennung.Index, l *lua.LState, t *lua.LTable) {
 	)
 
 	l.SetField(t, "Etiketten", etiketten)
-
-	return
 }

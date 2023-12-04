@@ -20,14 +20,12 @@ func TestMatcherLuaFalse(t1 *testing.T) {
 		t.Errorf("expected no error but got %w", err)
 	}
 
-	var k kennung.Kennung2
+	sk := &sku.Transacted{}
 
-	if err = k.SetWithKennung(&kennung.Etikett{}); err != nil {
+	if err = sk.Kennung.SetWithKennung(&kennung.Etikett{}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	sk := &sku.Transacted{Kennung: k}
 
 	if m.ContainsMatchable(sk) {
 		t.Errorf("woops")
@@ -45,14 +43,12 @@ func TestMatcherLuaTrue(t1 *testing.T) {
 		t.Errorf("expected no error but got %w", err)
 	}
 
-	var k kennung.Kennung2
+	sk := &sku.Transacted{}
 
-	if err = k.SetWithKennung(&kennung.Etikett{}); err != nil {
+	if err = sk.Kennung.SetWithKennung(&kennung.Etikett{}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	sk := &sku.Transacted{Kennung: k}
 
 	if !m.ContainsMatchable(sk) {
 		t.Errorf("woops")
