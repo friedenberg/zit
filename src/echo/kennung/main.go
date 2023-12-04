@@ -6,10 +6,10 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/expansion"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
-	"github.com/friedenberg/zit/srx/bravo/expansion"
 )
 
 type QueryPrefixer interface {
@@ -53,10 +53,10 @@ type KennungLikePtr[T KennungLike[T]] interface {
 type Index struct{}
 
 func Make(v string) (k KennungPtr, err error) {
-  if v == "" {
-    k = &Kennung2{}
-    return
-  }
+	if v == "" {
+		k = &Kennung2{}
+		return
+	}
 
 	{
 		var h Konfig

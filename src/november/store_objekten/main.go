@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/expansion"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
@@ -17,7 +18,6 @@ import (
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/store_util"
-	"github.com/friedenberg/zit/srx/bravo/expansion"
 )
 
 type Store struct {

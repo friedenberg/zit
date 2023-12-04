@@ -4,9 +4,9 @@ import (
 	"sort"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/expansion"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/srx/bravo/expansion"
 )
 
 type Refiner struct {
@@ -286,9 +286,9 @@ func (a Refiner) childPrefixes(node *assignment) (out []etikettBag) {
 
 	for e, n := range m {
 		if len(n) > 1 {
-      var e1 kennung.Etikett
+			var e1 kennung.Etikett
 
-      errors.PanicIfError(e1.Set(e))
+			errors.PanicIfError(e1.Set(e))
 
 			out = append(out, etikettBag{Etikett: e1, assignments: n})
 		}
