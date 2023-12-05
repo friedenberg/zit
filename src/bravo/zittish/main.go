@@ -1,6 +1,13 @@
 package zittish
 
-import "unicode/utf8"
+import (
+	"bufio"
+	"io"
+	"strings"
+	"unicode/utf8"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
+)
 
 var mapMatcherOperators = map[rune]bool{
 	' ': true,
@@ -50,4 +57,40 @@ func SplitMatcher(
 	}
 
 	return 0, nil, nil
+}
+
+func GetTokensFromReader(r io.Reader) (out []string, err error) {
+	scanner := bufio.NewScanner(r)
+
+	scanner.Split(SplitMatcher)
+
+	for scanner.Scan() {
+		out = append(out, scanner.Text())
+	}
+
+	if err = scanner.Err(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func GetTokensFromStrings(vs ...string) (out []string, err error) {
+	for i, v := range vs {
+		if i > 0 {
+			out = append(out, " ")
+		}
+
+		var more []string
+
+		if more, err = GetTokensFromReader(strings.NewReader(v)); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		out = append(out, more...)
+	}
+
+	return
 }

@@ -11,14 +11,13 @@ import (
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
 
-// TODO-P4 make generic
 type SetKeyToMetadatei map[string]*metadatei.Metadatei
 
 func (m SetKeyToMetadatei) String() string {
 	sb := &strings.Builder{}
 
 	for h, es := range m {
-		sb.WriteString(fmt.Sprintf("%s: %s\n", h, es))
+		fmt.Fprintf(sb, "%s: %s\n", h, es)
 	}
 
 	return sb.String()
@@ -138,15 +137,26 @@ func (a *assignment) addToCompareMap(
 
 	a.unnamed.Each(
 		func(z *obj) (err error) {
-			out.Unnamed.Add(z.Sku.Metadatei.Bezeichnung.String(), z.Sku.Metadatei.Bezeichnung)
+			out.Unnamed.Add(
+        z.Sku.Metadatei.Bezeichnung.String(),
+        z.Sku.Metadatei.Bezeichnung,
+      )
 
 			for _, e := range iter.SortedValues[kennung.Etikett](es) {
-				out.Unnamed.AddEtikett(z.Sku.Metadatei.Bezeichnung.String(), e, z.Sku.Metadatei.Bezeichnung)
+				out.Unnamed.AddEtikett(
+					z.Sku.Metadatei.Bezeichnung.String(),
+					e,
+					z.Sku.Metadatei.Bezeichnung,
+				)
 			}
 
 			for _, e := range iter.Elements[kennung.Etikett](m.EtikettSet) {
 				errors.TodoP4("add typ")
-				out.Unnamed.AddEtikett(z.Sku.Metadatei.Bezeichnung.String(), e, z.Sku.Metadatei.Bezeichnung)
+				out.Unnamed.AddEtikett(
+					z.Sku.Metadatei.Bezeichnung.String(),
+					e,
+					z.Sku.Metadatei.Bezeichnung,
+				)
 			}
 
 			return

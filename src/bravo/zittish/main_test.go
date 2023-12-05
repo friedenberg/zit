@@ -80,6 +80,18 @@ func TestZittish(t1 *testing.T) {
 				"spaces",
 			},
 		},
+		{
+			input: "[uno/dos !pdf zz-inbox]",
+			expected: []string{
+				"[",
+				"uno/dos",
+				" ",
+				"!pdf",
+				" ",
+				"zz-inbox",
+				"]",
+			},
+		},
 	}
 
 	for _, tc := range testCases {

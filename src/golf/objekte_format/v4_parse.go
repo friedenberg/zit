@@ -24,6 +24,7 @@ var (
 	keyEtikett                      = catgut.MakeFromString("Etikett")
 	keyGattung                      = catgut.MakeFromString("Gattung")
 	keyKennung                      = catgut.MakeFromString("Kennung")
+	keyKomment                      = catgut.MakeFromString("Komment")
 	keyTai                          = catgut.MakeFromString("Tai")
 	keyTyp                          = catgut.MakeFromString("Typ")
 	keyVerzeichnisseArchiviert      = catgut.MakeFromString("Verzeichnisse-Archiviert")
@@ -54,9 +55,11 @@ func (f v4) ParsePersistentMetadatei(
 	)
 
 	var (
-		lastKey, valBuffer catgut.String
-		line, key, val     ohio_ring_buffer2.Slice
-		ok                 bool
+		lastKey, valBuffer       catgut.String
+		line, key, val           ohio_ring_buffer2.Slice
+		ok                       bool
+		writeMetadateiHashString bool
+		ignoreOrder              bool
 	)
 
 	mh := sha.MakeWriter(nil)
@@ -104,9 +107,8 @@ func (f v4) ParsePersistentMetadatei(
 			}
 		}
 
-		writeMetadateiHashString := false
-
-		if key.Equal(keyAkte.Bytes()) {
+		switch {
+		case key.Equal(keyAkte.Bytes()):
 			if err = m.AkteSha.SetHexBytes(valBuffer.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -114,7 +116,7 @@ func (f v4) ParsePersistentMetadatei(
 
 			writeMetadateiHashString = true
 
-		} else if key.Equal(keyBezeichnung.Bytes()) {
+		case key.Equal(keyBezeichnung.Bytes()):
 			if err = m.Bezeichnung.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -122,7 +124,7 @@ func (f v4) ParsePersistentMetadatei(
 
 			writeMetadateiHashString = true
 
-		} else if key.Equal(keyEtikett.Bytes()) {
+		case key.Equal(keyEtikett.Bytes()):
 			e := kennung.GetEtikettPool().Get()
 
 			if err = e.Set(val.String()); err != nil {
@@ -137,12 +139,13 @@ func (f v4) ParsePersistentMetadatei(
 
 			writeMetadateiHashString = true
 
-		} else if key.Equal(keyGattung.Bytes()) {
+		case key.Equal(keyGattung.Bytes()):
 			if err = g.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
-		} else if key.Equal(keyKennung.Bytes()) {
+
+		case key.Equal(keyKennung.Bytes()):
 			k = kennung.GetKennungPool().Get()
 			defer kennung.GetKennungPool().Put(k)
 
@@ -156,7 +159,7 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-		} else if key.Equal(keyTai.Bytes()) {
+		case key.Equal(keyTai.Bytes()):
 			if err = m.Tai.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -164,7 +167,7 @@ func (f v4) ParsePersistentMetadatei(
 
 			writeMetadateiHashString = true
 
-		} else if key.Equal(keyTyp.Bytes()) {
+		case key.Equal(keyTyp.Bytes()):
 			if err = m.Typ.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -172,12 +175,13 @@ func (f v4) ParsePersistentMetadatei(
 
 			writeMetadateiHashString = true
 
-		} else if key.Equal(keyVerzeichnisseArchiviert.Bytes()) {
+		case key.Equal(keyVerzeichnisseArchiviert.Bytes()):
 			if err = m.Verzeichnisse.Archiviert.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
-		} else if key.Equal(keyVerzeichnisseEtikettImplicit.Bytes()) {
+
+		case key.Equal(keyVerzeichnisseEtikettImplicit.Bytes()):
 			if !o.IncludeVerzeichnisse {
 				err = errors.Errorf(
 					"format specifies not to include Verzeichnisse but found %q",
@@ -198,7 +202,7 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-		} else if key.Equal(keyVerzeichnisseEtikettExpanded.Bytes()) {
+		case key.Equal(keyVerzeichnisseEtikettExpanded.Bytes()):
 			if !o.IncludeVerzeichnisse {
 				err = errors.Errorf(
 					"format specifies not to include Verzeichnisse but found %q",
@@ -218,7 +222,8 @@ func (f v4) ParsePersistentMetadatei(
 				err = errors.Wrap(err)
 				return
 			}
-		} else if key.Equal(keyVerzeichnisseMutter.Bytes()) {
+
+		case key.Equal(keyVerzeichnisseMutter.Bytes()):
 			if err = m.Verzeichnisse.Mutter.SetHexBytes(val.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -226,23 +231,26 @@ func (f v4) ParsePersistentMetadatei(
 
 			writeMetadateiHashString = true
 
-		} else if key.Equal(keyVerzeichnisseSha.Bytes()) {
+		case key.Equal(keyVerzeichnisseSha.Bytes()):
 			if err = m.Verzeichnisse.Sha.SetHexBytes(val.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
-		} else {
+
+		case key.Equal(keyKomment.Bytes()):
+			ignoreOrder = true
+
+		default:
 			err = errV4InvalidKey
-			break
 		}
 
 		// Key Space Value Newline
 		thisN := int64(key.Len() + 1 + val.Len() + 1)
 		n += thisN
 
-		{
+		if !ignoreOrder {
 			lastKey.Reset()
-			n, err := key.WriteTo(&lastKey)
+			n, err = key.WriteTo(&lastKey)
 
 			if n != int64(key.Len()) || err != nil {
 				panic(
@@ -259,20 +267,19 @@ func (f v4) ParsePersistentMetadatei(
 
 		r.AdvanceRead(int(thisN))
 
-		if !writeMetadateiHashString {
-			continue
-		}
-
-		if _, err = ohio.WriteKeySpaceValueNewlineWritersTo(
-			mh,
-			key,
-			val,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
+		if writeMetadateiHashString {
+			if _, err = ohio.WriteKeySpaceValueNewlineWritersTo(
+				mh,
+				key,
+				val,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 
 		writeMetadateiHashString = false
+		ignoreOrder = false
 	}
 
 	if n == 0 {

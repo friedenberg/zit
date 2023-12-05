@@ -1,13 +1,15 @@
 package sku_fmt
 
 import (
+	"bufio"
 	"io"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/catgut"
+	"github.com/friedenberg/zit/src/bravo/zittish"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/thyme"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -205,43 +207,138 @@ func (f *organizeNew) ReadStringFormat(
 	rb io.Reader,
 	o *sku.Transacted,
 ) (n int64, err error) {
-	cg := catgut.GetPool().Get()
+	scanner := bufio.NewScanner(rb)
 
-	if _, err = io.Copy(cg, rb); err != nil {
+	scanner.Split(zittish.SplitMatcher)
+
+	tokens := make([]string, 0)
+
+	beforeHyphen := false
+
+	for scanner.Scan() {
+		t := scanner.Text()
+
+		if t == " " && beforeHyphen {
+			continue
+		}
+
+		tokens = append(tokens, scanner.Text())
+	}
+
+	if err = scanner.Err(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	remaining := cg.String()
-
-	if len(remaining) < 3 {
-		err = errors.Errorf("expected at least 3 characters")
+	if len(tokens) < 1 {
+		err = errors.Errorf("no tokens")
 		return
 	}
 
-	if remaining[:3] != "- [" {
-		err = errors.Errorf("expected '- [', but got '%s'", remaining[:3])
+	if tokens[0] != "-" {
+		err = errors.Errorf("expected %q at beginning but to got %q", "-", tokens[0])
 		return
 	}
 
-	remaining = remaining[3:]
+	tokens = tokens[1:]
 
-	idx := -1
-
-	if idx = strings.Index(remaining, "]"); idx == -1 {
-		err = errors.Errorf("expected ']' after hinweis, but not found")
-		return
-	}
-
-	remainingKennung := strings.TrimSpace(remaining[:idx])
-
-	if idxSpace := strings.Index(remainingKennung, " "); idxSpace != -1 {
-		remainingKennung = remainingKennung[:idxSpace]
-	}
-
-	if err = o.Kennung.Set(remainingKennung); err != nil {
+	if tokens, err = f.readStringFormatWithinBrackets(tokens, o); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	remaining := strings.Join(tokens, "")
+
+	if err = o.Metadatei.Bezeichnung.Set(remaining); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (f *organizeNew) readStringFormatWithinBrackets(
+	tokens []string,
+	o *sku.Transacted,
+) (remainingTokens []string, err error) {
+	remainingTokens = tokens
+
+	state := 0
+	var k kennung.Kennung2
+	var i int
+	var t string
+
+LOOP:
+	for i, t = range tokens {
+		if t == " " {
+			continue
+		}
+
+		switch state {
+		case 0:
+			if t != "[" {
+				return
+			}
+
+			state++
+
+		case 1:
+			if err = o.Kennung.Set(t); err != nil {
+				o.Kennung.Reset()
+				return
+			}
+
+			state++
+
+		case 2:
+			if t == "]" {
+				break LOOP
+			} else {
+				if err = k.Set(t); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				g := k.GetGattung()
+
+				switch g {
+				case gattung.Typ:
+					if err = o.Metadatei.Typ.Set(k.String()); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+				case gattung.Etikett:
+					var e kennung.Etikett
+
+					if err = e.Set(k.String()); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+					if err = o.Metadatei.AddEtikettPtr(&e); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+				default:
+					err = gattung.MakeErrUnsupportedGattung(k.GetGattung())
+					return
+				}
+
+				k.Reset()
+			}
+
+		default:
+			err = errors.Errorf("invalid state: %d", state)
+			return
+		}
+	}
+
+	if len(remainingTokens) > i {
+		remainingTokens = tokens[i+1:]
+	} else {
+		remainingTokens = nil
 	}
 
 	if f.options.Abbreviations.Hinweisen {
@@ -251,18 +348,6 @@ func (f *organizeNew) ReadStringFormat(
 			err = errors.Wrap(err)
 			return
 		}
-	}
-
-	// no bezeichnung
-	if idx+2 > len(remaining)-1 {
-		return
-	}
-
-	remaining = remaining[idx+2:]
-
-	if err = o.Metadatei.Bezeichnung.Set(remaining); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	return

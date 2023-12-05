@@ -1,9 +1,6 @@
 package matcher
 
 import (
-	"bufio"
-	"strings"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/zittish"
@@ -64,33 +61,10 @@ func (mb *MatcherBuilder) WithImplicitEtikettenGetter(
 	return mb
 }
 
-func getTokens(vs ...string) (out []string, err error) {
-	for i, v := range vs {
-		if i > 0 {
-			out = append(out, " ")
-		}
-
-		scanner := bufio.NewScanner(strings.NewReader(v))
-
-		scanner.Split(zittish.SplitMatcher)
-
-		for scanner.Scan() {
-			out = append(out, scanner.Text())
-		}
-
-		if err = scanner.Err(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
 func (mb MatcherBuilder) Build(vs ...string) (m Matcher, err error) {
 	var els []string
 
-	if els, err = getTokens(vs...); err != nil {
+	if els, err = zittish.GetTokensFromStrings(vs...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
