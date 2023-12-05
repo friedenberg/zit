@@ -64,6 +64,10 @@ func (k2 *Kennung2) StringFromPtr() string {
 	return sb.String()
 }
 
+func (k2 *Kennung2) IsEmpty() bool {
+	return k2.left.Len() == 0 && k2.middle.Len() == 0 && k2.right.Len() == 0
+}
+
 func (k2 *Kennung2) String() string {
 	return k2.StringFromPtr()
 }

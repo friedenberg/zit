@@ -3,27 +3,14 @@ package matcher
 import (
 	"bufio"
 	"strings"
-	"unicode/utf8"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/zittish"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
-
-var mapMatcherOperators = map[rune]bool{
-	' ': true,
-	',': true,
-	'{': true,
-	'}': true,
-	'[': true,
-	']': true,
-	':': true,
-	'+': true,
-	'.': true,
-	'?': true,
-}
 
 type MatcherBuilder struct {
 	implicitEtikettenGetter ImplicitEtikettenGetter
@@ -77,43 +64,6 @@ func (mb *MatcherBuilder) WithImplicitEtikettenGetter(
 	return mb
 }
 
-func IsMatcherOperator(r rune) (ok bool) {
-	_, ok = mapMatcherOperators[r]
-	return
-}
-
-func SplitMatcher(
-	data []byte,
-	atEOF bool,
-) (advance int, token []byte, err error) {
-	for width, i := 0, 0; i < len(data); i += width {
-		var r rune
-
-		r, width = utf8.DecodeRune(data[i:])
-
-		wasSplitRune := IsMatcherOperator(r)
-
-		switch {
-		case !wasSplitRune:
-			continue
-
-		case wasSplitRune && i == 0:
-			return width, data[:width], nil
-
-		default:
-			return i, data[:i], nil
-		}
-	}
-
-	// If we're at EOF, we have a final, non-empty, non-terminated word.  Return
-	// it.
-	if atEOF && len(data) > 0 {
-		return len(data), data[0:], nil
-	}
-
-	return 0, nil, nil
-}
-
 func getTokens(vs ...string) (out []string, err error) {
 	for i, v := range vs {
 		if i > 0 {
@@ -122,7 +72,7 @@ func getTokens(vs ...string) (out []string, err error) {
 
 		scanner := bufio.NewScanner(strings.NewReader(v))
 
-		scanner.Split(SplitMatcher)
+		scanner.Split(zittish.SplitMatcher)
 
 		for scanner.Scan() {
 			out = append(out, scanner.Text())
@@ -146,7 +96,7 @@ func (mb MatcherBuilder) Build(vs ...string) (m Matcher, err error) {
 	}
 
 	for _, el := range els {
-		if len(el) == 1 && IsMatcherOperator([]rune(el)[0]) {
+		if len(el) == 1 && zittish.IsMatcherOperator([]rune(el)[0]) {
 		} else {
 		}
 	}

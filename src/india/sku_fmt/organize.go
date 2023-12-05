@@ -1,13 +1,14 @@
 package sku_fmt
 
 import (
+	"bufio"
 	"io"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/catgut"
+	"github.com/friedenberg/zit/src/bravo/zittish"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
@@ -39,73 +40,6 @@ func (f *organize) SetMaxKopf(m int) {
 
 func (f *organize) SetMaxSchwanz(m int) {
 	f.maxSchwanz = m
-}
-
-func (f *organize) ReadStringFormat(
-	rb io.Reader,
-	o *sku.Transacted,
-) (n int64, err error) {
-	cg := catgut.GetPool().Get()
-
-	if _, err = io.Copy(cg, rb); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	remaining := cg.String()
-
-	if len(remaining) < 3 {
-		err = errors.Errorf("expected at least 3 characters")
-		return
-	}
-
-	if remaining[:3] != "- [" {
-		err = errors.Errorf("expected '- [', but got '%s'", remaining[:3])
-		return
-	}
-
-	remaining = remaining[3:]
-
-	idx := -1
-
-	if idx = strings.Index(remaining, "]"); idx == -1 {
-		err = errors.Errorf("expected ']' after hinweis, but not found")
-		return
-	}
-
-	remainingKennung := strings.TrimSpace(remaining[:idx])
-
-	if idxSpace := strings.Index(remainingKennung, " "); idxSpace != -1 {
-		remainingKennung = remainingKennung[:idxSpace]
-	}
-
-	if err = o.Kennung.Set(remainingKennung); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if f.options.Abbreviations.Hinweisen {
-		if err = f.ex.AbbreviateHinweisOnly(
-			&o.Kennung,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	// no bezeichnung
-	if idx+2 > len(remaining)-1 {
-		return
-	}
-
-	remaining = remaining[idx+2:]
-
-	if err = o.Metadatei.Bezeichnung.Set(remaining); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }
 
 func (f *organize) WriteStringFormat(
@@ -153,6 +87,122 @@ func (f *organize) WriteStringFormat(
 
 		if err != nil {
 			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (f *organize) ReadStringFormat(
+	rb io.Reader,
+	o *sku.Transacted,
+) (n int64, err error) {
+	scanner := bufio.NewScanner(rb)
+
+	scanner.Split(zittish.SplitMatcher)
+
+	tokens := make([]string, 0)
+
+	beforeHyphen := false
+
+	for scanner.Scan() {
+		t := scanner.Text()
+
+		if t == " " && beforeHyphen {
+			continue
+		}
+
+		tokens = append(tokens, scanner.Text())
+	}
+
+	if err = scanner.Err(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if len(tokens) < 1 {
+		err = errors.Errorf("no tokens")
+		return
+	}
+
+	if tokens[0] != "-" {
+		err = errors.Errorf("expected %q at beginning but to got %q", "-", tokens[0])
+		return
+	}
+
+	tokens = tokens[1:]
+
+	if tokens, err = f.readStringFormatWithKennung(tokens, o); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	remaining := strings.Join(tokens, "")
+
+	if err = o.Metadatei.Bezeichnung.Set(remaining); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (f *organize) readStringFormatWithKennung(
+	tokens []string,
+	o *sku.Transacted,
+) (remainingTokens []string, err error) {
+	remainingTokens = tokens
+
+	state := 0
+
+LOOP:
+	for i, t := range tokens {
+		if t == " " {
+			continue
+		}
+
+		switch state {
+		case 0:
+			if t != "[" {
+				return
+			}
+
+			state++
+
+		case 1:
+			if err = o.Kennung.Set(t); err != nil {
+				o.Kennung.Reset()
+				return
+			}
+
+			state++
+
+		case 2:
+			if t != "]" {
+				o.Kennung.Reset()
+				return
+			}
+
+			if len(remainingTokens) > i {
+				remainingTokens = tokens[i+1:]
+			} else {
+				remainingTokens = nil
+			}
+
+			if f.options.Abbreviations.Hinweisen {
+				if err = f.ex.AbbreviateHinweisOnly(
+					&o.Kennung,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
+			break LOOP
+
+		default:
+			err = errors.Errorf("invalid state: %d", state)
 			return
 		}
 	}

@@ -46,7 +46,7 @@ func noescape(p unsafe.Pointer) unsafe.Pointer {
 
 const (
 	configPanicOnCopy    = true
-	configDebugCopyCheck = true
+	configDebugCopyCheck = false
 )
 
 func (b *String) copyCheck() {

@@ -29,7 +29,7 @@ func (s SetKeyToMetadatei) Add(h string, b bezeichnung.Bezeichnung) {
 	ok := false
 
 	if m, ok = s[h]; !ok {
-    m = &metadatei.Metadatei{}
+		m = &metadatei.Metadatei{}
 		metadatei.Resetter.Reset(m)
 		m.Bezeichnung = b
 	}
@@ -51,7 +51,7 @@ func (s SetKeyToMetadatei) AddEtikett(
 	}
 
 	if !bezeichnung.Equaler.Equals(m.Bezeichnung, b) {
-		panic("bezeichnung changes")
+		panic(fmt.Sprintf("bezeichnung changes: %q != %q", m.Bezeichnung, b))
 	}
 
 	kennung.AddNormalized(m.GetEtikettenMutable(), &e)

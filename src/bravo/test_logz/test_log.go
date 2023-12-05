@@ -63,7 +63,7 @@ func (t T) Fatalf(format string, args ...interface{}) {
 
 // TODO-P3 move to AssertNotEqual
 func (t T) NotEqual(a, b any) {
-	format := "\nexpected: %v\n  actual: %v"
+	format := "\nexpected: %q\n  actual: %q"
 	t.errorf(1, format, a, b)
 }
 

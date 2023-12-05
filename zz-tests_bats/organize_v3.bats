@@ -443,7 +443,11 @@ function organize_v3_commits_organize_one_etiketten_group_by_two_new_zettels { #
 		echo "- [two/uno] 3"
 	} >"$expected_organize"
 
-	run_zit organize "${cmd_def_organize_v3[@]}" -mode commit-directly -group-by priority,w task <"$expected_organize"
+	run_zit organize \
+		"${cmd_def_organize_v3[@]}" \
+		-mode commit-directly \
+		-group-by priority,w \
+		task <"$expected_organize"
 	assert_success
 
 	to_add="$(mktemp)"

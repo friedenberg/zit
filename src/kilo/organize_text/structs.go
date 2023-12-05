@@ -40,8 +40,7 @@ func makeObj(
 }
 
 type obj struct {
-	Sku   sku.Transacted
-	IsNew bool
+	Sku sku.Transacted
 }
 
 func (a *obj) Len() int {
@@ -96,8 +95,6 @@ func (z *obj) setNewObj(v string) (err error) {
 		err = errors.Wrap(err)
 		return
 	}
-
-	z.IsNew = true
 
 	return
 }

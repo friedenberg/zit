@@ -277,14 +277,7 @@ func (ar *assignmentLineReader) readOneObj(l line) (err error) {
 	if _, err = ar.stringFormatReader.ReadStringFormat(
 		strings.NewReader(l.String()),
 		&z.Sku,
-	); err == nil {
-		// logz.Print("added to named zettels")
-		ar.currentAssignment.named.Add(&z)
-		// logz.Print(len(ar.currentAssignment.named))
-		return
-	}
-
-	if len(l.String()) < 2 && l.String()[:2] != "- " {
+	); err != nil {
 		err = ErrorRead{
 			error:  err,
 			line:   ar.lineNo,
@@ -294,20 +287,10 @@ func (ar *assignmentLineReader) readOneObj(l line) (err error) {
 		return
 	}
 
-	var nz obj
-
-	if err = nz.setNewObj(l.String()); err == nil {
-		// logz.Print("added to unnamed zettels")
-		ar.currentAssignment.unnamed.Add(&nz)
-		return
-	}
-
-	// logz.Print("failed to read zettel")
-
-	err = ErrorRead{
-		error:  err,
-		line:   ar.lineNo,
-		column: 2,
+	if z.Sku.Kennung.IsEmpty() {
+		ar.currentAssignment.unnamed.Add(&z)
+	} else {
+		ar.currentAssignment.named.Add(&z)
 	}
 
 	return
