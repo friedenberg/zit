@@ -85,6 +85,7 @@ func (in *Text) ToCompareMap() (out CompareMap, err error) {
 	}
 
 	if err = in.addToCompareMap(
+		in,
 		in.Metadatei,
 		kennung.MakeEtikettSet(),
 		&out,
@@ -97,6 +98,7 @@ func (in *Text) ToCompareMap() (out CompareMap, err error) {
 }
 
 func (a *assignment) addToCompareMap(
+	ot *Text,
 	m Metadatei,
 	es kennung.EtikettSet,
 	out *CompareMap,
@@ -131,6 +133,18 @@ func (a *assignment) addToCompareMap(
 				out.Named.AddEtikett(fk, e, z.Sku.Metadatei.Bezeichnung)
 			}
 
+			if ot.Konfig.NewOrganize {
+				if err = z.Sku.Metadatei.GetEtiketten().EachPtr(
+					func(e *kennung.Etikett) (err error) {
+						out.Named.AddEtikett(fk, *e, z.Sku.Metadatei.Bezeichnung)
+						return
+					},
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
 			return
 		},
 	); err != nil {
@@ -162,6 +176,23 @@ func (a *assignment) addToCompareMap(
 				)
 			}
 
+			if ot.Konfig.NewOrganize {
+				if err = z.Sku.Metadatei.GetEtiketten().EachPtr(
+					func(e *kennung.Etikett) (err error) {
+						out.Named.AddEtikett(
+							z.Sku.Metadatei.Bezeichnung.String(),
+							*e,
+							z.Sku.Metadatei.Bezeichnung,
+						)
+
+						return
+					},
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
 			return
 		},
 	); err != nil {
@@ -170,7 +201,7 @@ func (a *assignment) addToCompareMap(
 	}
 
 	for _, c := range a.children {
-		if err = c.addToCompareMap(m, es, out); err != nil {
+		if err = c.addToCompareMap(ot, m, es, out); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
