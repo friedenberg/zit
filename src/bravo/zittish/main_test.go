@@ -1,12 +1,12 @@
 package zittish
 
 import (
-	"bufio"
 	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/friedenberg/zit/src/bravo/test_logz"
+	"github.com/friedenberg/zit/src/charlie/catgut"
 )
 
 func TestZittish(t1 *testing.T) {
@@ -95,21 +95,32 @@ func TestZittish(t1 *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		scanner := bufio.NewScanner(strings.NewReader(tc.input))
+		scanner := catgut.NewScanner(
+			catgut.MakeRingBuffer(strings.NewReader(tc.input), 0),
+		)
 
 		scanner.Split(SplitMatcher)
 
-		actual := make([]string, 0)
+		actual := make([]*catgut.String, 0)
 
 		for scanner.Scan() {
-			actual = append(actual, scanner.Text())
+			t1 := catgut.Make(scanner.Text())
+			actual = append(actual, t1)
 		}
 
 		if err := scanner.Err(); err != nil {
 			t.AssertNoError(err)
 		}
 
-		if !reflect.DeepEqual(tc.expected, actual) {
+		expected := make([]*catgut.String, len(tc.expected))
+
+		for i, v := range tc.expected {
+			expected[i] = catgut.MakeFromString(v)
+		}
+
+		t.Logf("%q", expected)
+
+		if !reflect.DeepEqual(expected, actual) {
 			t.NotEqual(tc.expected, actual)
 		}
 	}

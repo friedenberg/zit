@@ -1,9 +1,6 @@
 package sku_fmt
 
 import (
-	"bufio"
-	"strings"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -98,22 +95,22 @@ func (f *organize) ReadStringFormat(
 	rb *catgut.RingBuffer,
 	o *sku.Transacted,
 ) (n int64, err error) {
-	scanner := bufio.NewScanner(rb)
+	scanner := catgut.NewScanner(rb)
 
 	scanner.Split(zittish.SplitMatcher)
 
-	tokens := make([]string, 0)
+	tokens := make([]*catgut.String, 0)
 
 	beforeHyphen := false
 
 	for scanner.Scan() {
 		t := scanner.Text()
 
-		if t == " " && beforeHyphen {
+		if t.EqualsString(" ") && beforeHyphen {
 			continue
 		}
 
-		tokens = append(tokens, scanner.Text())
+		tokens = append(tokens, catgut.Make(t))
 	}
 
 	if err = scanner.Err(); err != nil {
@@ -126,7 +123,7 @@ func (f *organize) ReadStringFormat(
 		return
 	}
 
-	if tokens[0] != "-" {
+	if !tokens[0].EqualsString("-") {
 		err = errors.Errorf("expected %q at beginning but to got %q", "-", tokens[0])
 		return
 	}
@@ -138,9 +135,12 @@ func (f *organize) ReadStringFormat(
 		return
 	}
 
-	remaining := strings.Join(tokens, "")
+	remaining := catgut.GetPool().Get()
+	defer catgut.GetPool().Put(remaining)
 
-	if err = o.Metadatei.Bezeichnung.Set(remaining); err != nil {
+	remaining.Append(tokens...)
+
+	if err = o.Metadatei.Bezeichnung.TodoSetManyCatgutStrings(remaining); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -149,29 +149,29 @@ func (f *organize) ReadStringFormat(
 }
 
 func (f *organize) readStringFormatWithKennung(
-	tokens []string,
+	tokens []*catgut.String,
 	o *sku.Transacted,
-) (remainingTokens []string, err error) {
+) (remainingTokens []*catgut.String, err error) {
 	remainingTokens = tokens
 
 	state := 0
 
 LOOP:
 	for i, t := range tokens {
-		if t == " " {
+		if t.EqualsString(" ") {
 			continue
 		}
 
 		switch state {
 		case 0:
-			if t != "[" {
+			if !t.EqualsString("[") {
 				return
 			}
 
 			state++
 
 		case 1:
-			if err = o.Kennung.Set(t); err != nil {
+			if err = o.Kennung.TodoSetBytes(t); err != nil {
 				o.Kennung.Reset()
 				return
 			}
@@ -179,10 +179,12 @@ LOOP:
 			state++
 
 		case 2:
-			if t != "]" {
+			if !t.EqualsString("]") {
 				o.Kennung.Reset()
 				return
 			}
+
+			catgut.GetPool().PutMany(tokens[:i+1]...)
 
 			if len(remainingTokens) > i {
 				remainingTokens = tokens[i+1:]

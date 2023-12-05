@@ -31,6 +31,12 @@ func MakeFromBytes(b []byte) (s *String) {
 	return s
 }
 
+func Make(b *String) (a *String) {
+	a = GetPool().Get()
+	errors.PanicIfError(a.SetBytes(b.Bytes()))
+	return
+}
+
 // noescape hides a pointer from escape analysis. It is the identity function
 // but escape analysis doesn't think the output depends on the input.
 // noescape is inlined and currently compiles down to zero instructions.

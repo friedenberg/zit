@@ -53,6 +53,17 @@ func (ip poolWithReset[T, TPtr]) Get() TPtr {
 	return ip.inner.Get().(TPtr)
 }
 
+func (ip poolWithReset[T, TPtr]) PutMany(is ...TPtr) (err error) {
+	for _, i := range is {
+		if err = ip.Put(i); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
 func (ip poolWithReset[T, TPtr]) Put(i TPtr) (err error) {
 	if i == nil {
 		return

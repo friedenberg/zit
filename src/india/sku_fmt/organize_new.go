@@ -219,10 +219,7 @@ func (f *organizeNew) ReadStringFormat(
 			continue
 		}
 
-		t1 := catgut.GetPool().Get()
-		t1.Append(t)
-
-		tokens = append(tokens, t1)
+		tokens = append(tokens, catgut.Make(t))
 	}
 
 	if err = scanner.Err(); err != nil {
@@ -276,7 +273,7 @@ LOOP:
 
 		switch state {
 		case 0:
-			if t.EqualsString("[") {
+			if !t.EqualsString("[") {
 				return
 			}
 
@@ -335,16 +332,12 @@ LOOP:
 		}
 	}
 
-	toRepool := remainingTokens[:i+1]
+	catgut.GetPool().PutMany(tokens[:i+1]...)
 
 	if len(remainingTokens) > i {
 		remainingTokens = tokens[i+1:]
 	} else {
 		remainingTokens = nil
-	}
-
-	for _, v := range toRepool {
-		catgut.GetPool().Put(v)
 	}
 
 	if f.options.Abbreviations.Hinweisen {

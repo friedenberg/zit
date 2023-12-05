@@ -16,3 +16,7 @@ func (ip fakePool[T, TPtr]) Get() TPtr {
 func (ip fakePool[T, TPtr]) Put(i TPtr) (err error) {
 	return
 }
+
+func (ip fakePool[T, TPtr]) PutMany(is ...TPtr) (err error) {
+	return
+}

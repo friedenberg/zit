@@ -74,6 +74,7 @@ type PoolValue[T any] interface {
 
 type Pool[T Poolable[T], TPtr PoolablePtr[T]] interface {
 	PoolValue[TPtr]
+	PutMany(...TPtr) error
 }
 
 //  __     __    _              ____       _
