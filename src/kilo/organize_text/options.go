@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -44,7 +45,7 @@ type Options struct {
 	UseMetadateiHeader     bool
 
 	PrintOptions           erworben_cli_print_options.PrintOptions
-	StringFormatReadWriter schnittstellen.StringFormatReadWriter[*sku.Transacted]
+	StringFormatReadWriter catgut.StringFormatReadWriter[*sku.Transacted]
 }
 
 func MakeFlags() Flags {
@@ -109,7 +110,7 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 func (o *Flags) GetOptions(
 	printOptions erworben_cli_print_options.PrintOptions,
 	q matcher.Query,
-	stringFormatReadWriter schnittstellen.StringFormatReadWriter[*sku.Transacted],
+	stringFormatReadWriter catgut.StringFormatReadWriter[*sku.Transacted],
 ) Options {
 	o.once.Do(
 		func() {

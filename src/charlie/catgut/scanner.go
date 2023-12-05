@@ -23,17 +23,17 @@ import (
 // control over error handling or large tokens, or must run sequential scans
 // on a reader, should use bufio.Reader instead.
 type Scanner struct {
-	r            io.Reader // The reader provided by the client.
-	split        SplitFunc // The function to split the tokens.
-	maxTokenSize int       // Maximum size of a token; modified by tests.
-	token        String    // Last token returned by split.
-	buf          []byte    // Buffer used as argument to split.
-	start        int       // First non-processed byte in buf.
-	end          int       // End of data in buf.
-	err          error     // Sticky error.
-	empties      int       // Count of successive empty tokens.
-	scanCalled   bool      // Scan has been called; buffer is in use.
-	done         bool      // Scan has finished.
+	r            *RingBuffer // The reader provided by the client.
+	split        SplitFunc   // The function to split the tokens.
+	maxTokenSize int         // Maximum size of a token; modified by tests.
+	token        String      // Last token returned by split.
+	buf          []byte      // Buffer used as argument to split.
+	start        int         // First non-processed byte in buf.
+	end          int         // End of data in buf.
+	err          error       // Sticky error.
+	empties      int         // Count of successive empty tokens.
+	scanCalled   bool        // Scan has been called; buffer is in use.
+	done         bool        // Scan has finished.
 }
 
 // SplitFunc is the signature of the split function used to tokenize the
@@ -66,7 +66,7 @@ const (
 
 // NewScanner returns a new Scanner to read from r.
 // The split function defaults to ScanLines.
-func NewScanner(r io.Reader) *Scanner {
+func NewScanner(r *RingBuffer) *Scanner {
 	return &Scanner{
 		r:            r,
 		split:        bufio.ScanLines,

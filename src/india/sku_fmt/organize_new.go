@@ -2,13 +2,13 @@ package sku_fmt
 
 import (
 	"bufio"
-	"io"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/zittish"
+	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/thyme"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
@@ -204,7 +204,7 @@ func (f *organizeNew) WriteStringFormat(
 }
 
 func (f *organizeNew) ReadStringFormat(
-	rb io.Reader,
+	rb *catgut.RingBuffer,
 	o *sku.Transacted,
 ) (n int64, err error) {
 	scanner := bufio.NewScanner(rb)

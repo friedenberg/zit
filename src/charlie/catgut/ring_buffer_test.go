@@ -2,10 +2,33 @@ package catgut
 
 import (
 	"bytes"
+	"io"
+	"strings"
 	"testing"
 
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 )
+
+func TestRingBufferReader(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+	expected := "all that content"
+	sut := MakeRingBuffer(strings.NewReader(expected), 0)
+
+	var sb strings.Builder
+
+	n, err := io.Copy(&sb, sut)
+	t.AssertNoError(err)
+
+	if n != int64(len(expected)) {
+		t.Errorf("expected %d but got %d", len(expected), n)
+	}
+
+	actual := sb.String()
+
+	if actual != expected {
+		t.NotEqual(expected, actual)
+	}
+}
 
 func TestRingBufferEmpty(t1 *testing.T) {
 	t := test_logz.T{T: t1}

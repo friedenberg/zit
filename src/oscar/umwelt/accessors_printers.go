@@ -2,6 +2,7 @@ package umwelt
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/string_format_writer"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/fd"
@@ -54,7 +55,7 @@ func (u *Umwelt) StringFormatWriterEtiketten(
 	return kennung_fmt.MakeEtikettenCliFormat()
 }
 
-func (u *Umwelt) StringFormatWriterSkuLikePtrForOrganize() schnittstellen.StringFormatReadWriter[*sku.Transacted] {
+func (u *Umwelt) StringFormatWriterSkuLikePtrForOrganize() catgut.StringFormatReadWriter[*sku.Transacted] {
 	co := u.FormatColorOptions()
 	co.OffEntirely = true
 

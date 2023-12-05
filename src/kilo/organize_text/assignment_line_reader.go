@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -17,7 +17,7 @@ type assignmentLineReader struct {
 	lineNo             int
 	root               *assignment
 	currentAssignment  *assignment
-	stringFormatReader schnittstellen.StringFormatReader[*sku.Transacted]
+	stringFormatReader catgut.StringFormatReader[*sku.Transacted]
 }
 
 func (ar *assignmentLineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
@@ -275,7 +275,7 @@ func (ar *assignmentLineReader) readOneObj(l line) (err error) {
 	var z obj
 
 	if _, err = ar.stringFormatReader.ReadStringFormat(
-		strings.NewReader(l.String()),
+		catgut.MakeRingBuffer(strings.NewReader(l.String()), 0),
 		&z.Sku,
 	); err != nil {
 		err = ErrorRead{

@@ -191,11 +191,13 @@ func (rb *RingBuffer) Read(p []byte) (n int, err error) {
 	if rb.Len() == 0 {
 		var f int64
 
-		if f, err = rb.Fill(); err != nil {
-			return
-		}
+		f, err = rb.Fill()
 
-		if f == 0 && err == io.EOF {
+		switch {
+		case err == io.EOF && f == 0:
+			return
+
+		case err != nil && err != io.EOF:
 			return
 		}
 	}
