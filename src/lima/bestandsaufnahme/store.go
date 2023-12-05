@@ -11,8 +11,8 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/bravo/pool"
+	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/charlie/ohio_ring_buffer2"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -253,7 +253,7 @@ func (s *store) readOneFromReader(
 	o = sku.GetTransactedPool().Get()
 
 	if n, err = s.persistentMetadateiFormat.ParsePersistentMetadatei(
-		ohio_ring_buffer2.MakeRingBuffer(r, 0),
+		catgut.MakeRingBuffer(r, 0),
 		o,
 		s.options,
 	); err != nil {

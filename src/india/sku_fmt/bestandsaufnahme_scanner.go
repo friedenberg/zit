@@ -4,8 +4,8 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/charlie/ohio_ring_buffer2"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
@@ -25,7 +25,7 @@ func MakeFormatBestandsaufnahmeScanner(
 	op objekte_format.Options,
 ) FormatBestandsaufnahmeScanner {
 	return &bestandsaufnahmeScanner{
-		ringBuffer: ohio_ring_buffer2.MakeRingBuffer(in, 0),
+		ringBuffer: catgut.MakeRingBuffer(in, 0),
 		format:     of,
 		options:    op,
 		es:         kennung.MakeEtikettMutableSet(),
@@ -33,7 +33,7 @@ func MakeFormatBestandsaufnahmeScanner(
 }
 
 type bestandsaufnahmeScanner struct {
-	ringBuffer *ohio_ring_buffer2.RingBuffer
+	ringBuffer *catgut.RingBuffer
 	format     objekte_format.Format
 	options    objekte_format.Options
 	afterFirst bool

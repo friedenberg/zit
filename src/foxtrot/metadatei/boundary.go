@@ -5,7 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/ohio_ring_buffer2"
+	"github.com/friedenberg/zit/src/charlie/catgut"
 )
 
 var (
@@ -23,9 +23,9 @@ func init() {
 
 var errBoundaryInvalid = errors.New("boundary invalid")
 
-func ReadBoundary(r *ohio_ring_buffer2.RingBuffer) (n int, err error) {
+func ReadBoundary(r *catgut.RingBuffer) (n int, err error) {
 	var (
-		readable ohio_ring_buffer2.Slice
+		readable catgut.Slice
 		ok       bool
 	)
 

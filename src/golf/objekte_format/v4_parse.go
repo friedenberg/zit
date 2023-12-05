@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/charlie/ohio_ring_buffer2"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/ohio"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -43,7 +42,7 @@ var (
 )
 
 func (f v4) ParsePersistentMetadatei(
-	r *ohio_ring_buffer2.RingBuffer,
+	r *catgut.RingBuffer,
 	c ParserContext,
 	o Options,
 ) (n int64, err error) {
@@ -56,7 +55,7 @@ func (f v4) ParsePersistentMetadatei(
 
 	var (
 		lastKey, valBuffer       catgut.String
-		line, key, val           ohio_ring_buffer2.Slice
+		line, key, val           catgut.Slice
 		ok                       bool
 		writeMetadateiHashString bool
 		ignoreOrder              bool

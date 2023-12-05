@@ -6,7 +6,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/ohio_ring_buffer2"
+	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 )
@@ -87,7 +87,7 @@ func ReadFromSha(
 	defer errors.DeferredCloser(&err, or)
 
 	if _, err = format.ParsePersistentMetadatei(
-		ohio_ring_buffer2.MakeRingBuffer(or, 0),
+		catgut.MakeRingBuffer(or, 0),
 		sk,
 		o,
 	); err != nil {
