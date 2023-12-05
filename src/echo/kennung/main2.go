@@ -169,6 +169,10 @@ func (h *Kennung2) SetWithGattung(
 	return h.Set(v)
 }
 
+func (h *Kennung2) TodoSetBytes(v *catgut.String) (err error) {
+	return h.Set(v.String())
+}
+
 func (h *Kennung2) Set(v string) (err error) {
 	var k Kennung
 

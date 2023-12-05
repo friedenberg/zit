@@ -2,6 +2,9 @@ package bezeichnung
 
 import (
 	"strings"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/catgut"
 )
 
 type Bezeichnung struct {
@@ -18,6 +21,19 @@ func Make(v string) Bezeichnung {
 
 func (b Bezeichnung) String() string {
 	return b.value
+}
+
+func (b *Bezeichnung) TodoSetManyCatgutStrings(
+	vs ...*catgut.String,
+) (err error) {
+	var s catgut.String
+
+	if _, err = s.Append(vs...); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return b.Set(s.String())
 }
 
 func (b *Bezeichnung) Set(v string) (err error) {

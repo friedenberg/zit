@@ -85,6 +85,10 @@ func (t Typ) Parts() [3]string {
 	return [3]string{"", "!", t.value}
 }
 
+func (e *Typ) TodoSetFromKennung2(v *Kennung2) (err error) {
+	return e.Set(v.String())
+}
+
 func (e *Typ) Set(v string) (err error) {
 	v = strings.ToLower(strings.TrimSpace(strings.Trim(v, ".! ")))
 

@@ -91,6 +91,18 @@ func (str *String) Len() int {
 	return str.Data.Len()
 }
 
+func (a *String) Equals(b *String) bool {
+	return bytes.Equal(a.Bytes(), b.Bytes())
+}
+
+func (a *String) EqualsString(b string) bool {
+	return string(a.Bytes()) == b
+}
+
+func (a *String) EqualsBytes(b []byte) bool {
+	return bytes.Equal(a.Bytes(), b)
+}
+
 func (str *String) AvailableBuffer() []byte {
 	str.copyCheck()
 	return str.Data.AvailableBuffer()
@@ -108,6 +120,22 @@ func (str *String) Reset() {
 func (str *String) Write(p []byte) (int, error) {
 	str.copyCheck()
 	return str.Data.Write(p)
+}
+
+func (str *String) Append(vs ...*String) (n int, err error) {
+	var n1 int
+
+	for _, v := range vs {
+		n1, err = str.Write(v.Bytes())
+		n += n1
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
 }
 
 func (str *String) Grow(n int) {

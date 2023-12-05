@@ -1,9 +1,6 @@
 package sku_fmt
 
 import (
-	"bufio"
-	"strings"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -207,22 +204,25 @@ func (f *organizeNew) ReadStringFormat(
 	rb *catgut.RingBuffer,
 	o *sku.Transacted,
 ) (n int64, err error) {
-	scanner := bufio.NewScanner(rb)
+	scanner := catgut.NewScanner(rb)
 
 	scanner.Split(zittish.SplitMatcher)
 
-	tokens := make([]string, 0)
+	tokens := make([]*catgut.String, 0)
 
 	beforeHyphen := false
 
 	for scanner.Scan() {
 		t := scanner.Text()
 
-		if t == " " && beforeHyphen {
+		if t.EqualsString(" ") && beforeHyphen {
 			continue
 		}
 
-		tokens = append(tokens, scanner.Text())
+		t1 := catgut.GetPool().Get()
+		t1.Append(t)
+
+		tokens = append(tokens, t1)
 	}
 
 	if err = scanner.Err(); err != nil {
@@ -235,7 +235,7 @@ func (f *organizeNew) ReadStringFormat(
 		return
 	}
 
-	if tokens[0] != "-" {
+	if !tokens[0].EqualsString("-") {
 		err = errors.Errorf("expected %q at beginning but to got %q", "-", tokens[0])
 		return
 	}
@@ -247,9 +247,9 @@ func (f *organizeNew) ReadStringFormat(
 		return
 	}
 
-	remaining := strings.Join(tokens, "")
-
-	if err = o.Metadatei.Bezeichnung.Set(remaining); err != nil {
+	if err = o.Metadatei.Bezeichnung.TodoSetManyCatgutStrings(
+		tokens...,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -258,32 +258,32 @@ func (f *organizeNew) ReadStringFormat(
 }
 
 func (f *organizeNew) readStringFormatWithinBrackets(
-	tokens []string,
+	tokens []*catgut.String,
 	o *sku.Transacted,
-) (remainingTokens []string, err error) {
+) (remainingTokens []*catgut.String, err error) {
 	remainingTokens = tokens
 
 	state := 0
 	var k kennung.Kennung2
 	var i int
-	var t string
+	var t *catgut.String
 
 LOOP:
 	for i, t = range tokens {
-		if t == " " {
+		if t.EqualsString(" ") {
 			continue
 		}
 
 		switch state {
 		case 0:
-			if t != "[" {
+			if t.EqualsString("[") {
 				return
 			}
 
 			state++
 
 		case 1:
-			if err = o.Kennung.Set(t); err != nil {
+			if err = o.Kennung.TodoSetBytes(t); err != nil {
 				o.Kennung.Reset()
 				return
 			}
@@ -291,10 +291,10 @@ LOOP:
 			state++
 
 		case 2:
-			if t == "]" {
+			if t.EqualsString("]") {
 				break LOOP
 			} else {
-				if err = k.Set(t); err != nil {
+				if err = k.TodoSetBytes(t); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -303,7 +303,7 @@ LOOP:
 
 				switch g {
 				case gattung.Typ:
-					if err = o.Metadatei.Typ.Set(k.String()); err != nil {
+					if err = o.Metadatei.Typ.TodoSetFromKennung2(&k); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
@@ -311,7 +311,7 @@ LOOP:
 				case gattung.Etikett:
 					var e kennung.Etikett
 
-					if err = e.Set(k.String()); err != nil {
+					if err = e.TodoSetFromKennung2(&k); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
@@ -335,10 +335,16 @@ LOOP:
 		}
 	}
 
+	toRepool := remainingTokens[:i+1]
+
 	if len(remainingTokens) > i {
 		remainingTokens = tokens[i+1:]
 	} else {
 		remainingTokens = nil
+	}
+
+	for _, v := range toRepool {
+		catgut.GetPool().Put(v)
 	}
 
 	if f.options.Abbreviations.Hinweisen {

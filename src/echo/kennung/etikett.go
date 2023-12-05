@@ -85,6 +85,10 @@ func (e Etikett) Parts() [3]string {
 	return [3]string{"", "-", v}
 }
 
+func (e *Etikett) TodoSetFromKennung2(v *Kennung2) (err error) {
+	return e.Set(v.String())
+}
+
 func (e *Etikett) Set(v string) (err error) {
 	v = strings.ToLower(strings.TrimSpace(v))
 
