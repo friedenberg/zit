@@ -113,7 +113,7 @@ func (a *assignment) addToCompareMap(
 	es1.Each(mes.Add)
 	es = mes.CloneSetPtrLike()
 
-	a.named.Each(
+	if err = a.named.Each(
 		func(z *obj) (err error) {
 			if z.Sku.Kennung.String() == "" {
 				panic(fmt.Sprintf("%s: Kennung is nil", z))
@@ -133,14 +133,17 @@ func (a *assignment) addToCompareMap(
 
 			return
 		},
-	)
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	a.unnamed.Each(
+	if err = a.unnamed.Each(
 		func(z *obj) (err error) {
 			out.Unnamed.Add(
-        z.Sku.Metadatei.Bezeichnung.String(),
-        z.Sku.Metadatei.Bezeichnung,
-      )
+				z.Sku.Metadatei.Bezeichnung.String(),
+				z.Sku.Metadatei.Bezeichnung,
+			)
 
 			for _, e := range iter.SortedValues[kennung.Etikett](es) {
 				out.Unnamed.AddEtikett(
@@ -161,7 +164,10 @@ func (a *assignment) addToCompareMap(
 
 			return
 		},
-	)
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	for _, c := range a.children {
 		if err = c.addToCompareMap(m, es, out); err != nil {

@@ -68,6 +68,21 @@ func (k2 *Kennung2) IsEmpty() bool {
 	return k2.left.Len() == 0 && k2.middle.Len() == 0 && k2.right.Len() == 0
 }
 
+func (k2 *Kennung2) Len() int {
+	return k2.left.Len() + k2.middle.Len() + k2.right.Len()
+}
+
+func (k2 *Kennung2) KopfUndSchwanz() (kopf, schwanz string) {
+	kopf = k2.left.String()
+	schwanz = k2.right.String()
+
+	return
+}
+
+func (k2 *Kennung2) LenKopfUndSchwanz() (int, int) {
+	return k2.left.Len(), k2.right.Len()
+}
+
 func (k2 *Kennung2) String() string {
 	return k2.StringFromPtr()
 }

@@ -65,7 +65,7 @@ func (a assignment) AlignmentSpacing() int {
 func (a assignment) MaxLen() (m int) {
 	a.named.Each(
 		func(z *obj) (err error) {
-			oM := z.Len()
+			oM := z.Sku.Kennung.Len()
 
 			if oM > m {
 				m = oM
@@ -89,7 +89,7 @@ func (a assignment) MaxLen() (m int) {
 func (a assignment) MaxKopfUndSchwanz() (kopf, schwanz int) {
 	a.named.Each(
 		func(z *obj) (err error) {
-			oKopf, oSchwanz := z.LenKopfUndSchwanz()
+			oKopf, oSchwanz := z.Sku.Kennung.LenKopfUndSchwanz()
 
 			if oKopf > kopf {
 				kopf = oKopf
