@@ -38,9 +38,9 @@ func (s *Store) writeNamedZettelToIndex(
 	}
 
 	if err = s.verzeichnisseAll.AddVerzeichnisse(
-    tz,
-    tz.GetKennung().String(),
-  ); err != nil {
+		tz,
+		tz.GetKennung().String(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

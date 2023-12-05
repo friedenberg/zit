@@ -2,7 +2,7 @@ package catgut
 
 import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/pool"
+	"github.com/friedenberg/zit/src/bravo/pool"
 )
 
 var p schnittstellen.Pool[String, *String]

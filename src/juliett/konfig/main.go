@@ -9,6 +9,7 @@ import (
 	pkg_angeboren "github.com/friedenberg/zit/src/alfa/angeboren"
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/expansion"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/bravo/values"
@@ -19,7 +20,6 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
-	"github.com/friedenberg/zit/src/bravo/expansion"
 )
 
 var typExpander expansion.Expander
@@ -52,7 +52,7 @@ type Compiled struct {
 }
 
 func (a *compiled) Reset() {
-	a.ExtensionsToTypen =  make(map[string]string)
+	a.ExtensionsToTypen = make(map[string]string)
 	a.TypenToExtensions = make(map[string]string)
 
 	a.lock = &sync.Mutex{}
@@ -367,10 +367,10 @@ func (k *compiled) AddKasten(
 
 	b := sku.GetTransactedPool().Get()
 
-  if err = b.SetFromSkuLike(c); err != nil {
-    err = errors.Wrap(err)
-    return
-  }
+	if err = b.SetFromSkuLike(c); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	err = iter.AddOrReplaceIfGreater[*sku.Transacted](
 		k.Kisten,

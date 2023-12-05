@@ -30,9 +30,9 @@ func (c *CwdFiles) tryEtikett(fi os.FileInfo, dir string) (err error) {
 
 	t, ok := c.Etiketten.Get(h.String())
 
-  if !ok {
-    t = &sku.ExternalMaybe{}
-  }
+	if !ok {
+		t = &sku.ExternalMaybe{}
+	}
 
 	if err = t.Kennung.SetWithKennung(h); err != nil {
 		err = errors.Wrap(err)

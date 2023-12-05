@@ -5,7 +5,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/iter"
 )
 
 type poolWithReset[T any, TPtr schnittstellen.Resetable[T]] struct {
@@ -34,7 +33,7 @@ func (p poolWithReset[T, TPtr]) Apply(f schnittstellen.FuncIter[T], e T) (err er
 		err = nil
 		return
 
-	case iter.IsStopIteration(err):
+	case errors.IsStopIteration(err):
 		err = nil
 		p.Put(&e)
 

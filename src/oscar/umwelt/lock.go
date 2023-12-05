@@ -29,9 +29,9 @@ func (u *Umwelt) Unlock() (err error) {
 		}
 
 		if err = u.Konfig().Flush(
-      u.Standort(),
-      u.StoreObjekten().GetAkten().GetTypV0(),
-    ); err != nil {
+			u.Standort(),
+			u.StoreObjekten().GetAkten().GetTypV0(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

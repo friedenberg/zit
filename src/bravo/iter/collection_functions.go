@@ -37,42 +37,42 @@ func CheckAnyPtr[
 	err := c.EachPtr(
 		func(e TPtr) (err error) {
 			if f(e) {
-				err = errTrue
+				err = errors.ErrTrue
 			}
 
 			return
 		},
 	)
 
-	return IsErrTrue(err)
+	return errors.IsErrTrue(err)
 }
 
 func CheckAny[T any](c schnittstellen.Collection[T], f func(T) bool) bool {
 	err := c.Each(
 		func(e T) (err error) {
 			if f(e) {
-				err = errTrue
+				err = errors.ErrTrue
 			}
 
 			return
 		},
 	)
 
-	return IsErrTrue(err)
+	return errors.IsErrTrue(err)
 }
 
 func All[T any](c schnittstellen.Collection[T], f func(T) bool) bool {
 	err := c.Each(
 		func(e T) (err error) {
 			if !f(e) {
-				err = errFalse
+				err = errors.ErrFalse
 			}
 
 			return
 		},
 	)
 
-	return !IsErrFalse(err)
+	return !errors.IsErrFalse(err)
 }
 
 func MakeFuncSetString[

@@ -32,7 +32,7 @@ func (e *ErrHasInlineAkteAndFilePath) Error() string {
 }
 
 func MakeErrHasInlineAkteAndMetadateiSha(
-	inline, metadatei  *sha.Sha,
+	inline, metadatei *sha.Sha,
 ) (err *ErrHasInlineAkteAndMetadateiSha) {
 	err = &ErrHasInlineAkteAndMetadateiSha{}
 	err.MetadateiSha.SetShaLike(metadatei)

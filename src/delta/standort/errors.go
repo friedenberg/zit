@@ -23,8 +23,8 @@ func (e ErrNotInZitDir) Is(target error) (ok bool) {
 }
 
 func MakeErrAlreadyExists(
-  sh schnittstellen.ShaLike,
-  path string,
+	sh schnittstellen.ShaLike,
+	path string,
 ) (err *ErrAlreadyExists) {
 	err = &ErrAlreadyExists{Path: path}
 	err.Sha.SetShaLike(sh)

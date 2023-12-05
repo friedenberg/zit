@@ -238,7 +238,7 @@ func (src *String) CopyTo(dst *String) (err error) {
 
 	n, err = dst.Write(src.Bytes())
 
-	return ohio_buffer.MakeErrLength(int64(src.Len()), int64(n), err)
+	return MakeErrLength(int64(src.Len()), int64(n), err)
 }
 
 func (src *String) WriteTo(w io.Writer) (n int64, err error) {

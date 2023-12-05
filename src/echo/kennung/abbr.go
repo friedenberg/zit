@@ -34,9 +34,9 @@ func (ao abbrOne[V, VPtr]) AbbreviateKennung(
 	switch ka := k.(type) {
 	case VPtr:
 		if err = VPtr(&ka1).Set(ka.String()); err != nil {
-      err = errors.Wrap(err)
-      return
-    }
+			err = errors.Wrap(err)
+			return
+		}
 
 	case V:
 		ka1 = ka

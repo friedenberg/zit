@@ -1,6 +1,9 @@
 package iter
 
-import "github.com/friedenberg/zit/src/alfa/schnittstellen"
+import (
+	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+)
 
 func SetEquals[T any](
 	a, b schnittstellen.SetLike[T],
@@ -20,14 +23,13 @@ func SetEquals[T any](
 	err := a.Each(
 		func(e T) (err error) {
 			if ok := b.Contains(e); !ok {
-				err = errFalse
+				err = errors.ErrFalse
 				return
 			}
 
 			return
 		},
 	)
-
 	if err != nil {
 		return false
 	}
@@ -55,7 +57,7 @@ func SetEqualsPtr[T any, TPtr schnittstellen.Ptr[T]](
 			k := b.KeyPtr(e)
 
 			if ok := b.ContainsKey(k); !ok {
-				err = errFalse
+				err = errors.ErrFalse
 				return
 			}
 

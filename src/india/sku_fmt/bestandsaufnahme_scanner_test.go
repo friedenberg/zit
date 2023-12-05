@@ -23,8 +23,8 @@ func TestOne(t1 *testing.T) {
 
 	printer := MakeFormatBestandsaufnahmePrinter(w, f, o)
 
-  sk := &sku.Transacted{}
-  t.AssertNoError(sk.Kennung.SetWithKennung(kennung.MustHinweis("one/uno")))
+	sk := &sku.Transacted{}
+	t.AssertNoError(sk.Kennung.SetWithKennung(kennung.MustHinweis("one/uno")))
 
 	n, err := printer.Print(sk)
 
@@ -42,9 +42,9 @@ func TestOne(t1 *testing.T) {
 		}
 	}
 
-  sk = &sku.Transacted{}
-  t.AssertNoError(sk.Kennung.SetWithKennung(kennung.MustHinweis("two/dos")))
-  n, err = printer.Print(sk)
+	sk = &sku.Transacted{}
+	t.AssertNoError(sk.Kennung.SetWithKennung(kennung.MustHinweis("two/dos")))
+	n, err = printer.Print(sk)
 
 	{
 		expected := int64(43)
@@ -608,4 +608,3 @@ Typ toml-bookmark
 ---
 `
 }
-

@@ -222,8 +222,8 @@ func (ih *indexNotHinweis[K, KPtr]) Expand(
 		ex = abbr.String()
 	}
 
-  var k K
-  exp = &k
+	var k K
+	exp = &k
 
 	if err = exp.Set(ex); err != nil {
 		err = errors.Wrap(err)

@@ -5,7 +5,7 @@ import (
 	"hash"
 
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/pool"
+	"github.com/friedenberg/zit/src/bravo/pool"
 )
 
 var (

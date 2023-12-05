@@ -2,10 +2,10 @@ package objekte_collections
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/expansion"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/bravo/expansion"
 )
 
 type SetPrefixVerzeichnisse struct {
@@ -35,8 +35,8 @@ func (s *SetPrefixVerzeichnisse) Add(z *sku.Transacted) (err error) {
 	).CloneMutableSetPtrLike()
 
 	if err = z.GetMetadatei().Verzeichnisse.GetExpandedEtiketten().EachPtr(
-    es.AddPtr,
-  ); err != nil {
+		es.AddPtr,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

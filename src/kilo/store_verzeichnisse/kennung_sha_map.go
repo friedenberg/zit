@@ -26,12 +26,12 @@ func (ksm KennungShaMap) ModifyMutter(z *sku.Transacted) (err error) {
 
 func (ksm KennungShaMap) SaveSha(z *sku.Transacted) (err error) {
 	k := z.GetKennung()
-  var sh sha.Sha
+	var sh sha.Sha
 
-  if err = sh.SetShaLike(&z.GetMetadatei().Verzeichnisse.Sha); err != nil {
-    err = errors.Wrap(err)
-    return
-  }
+	if err = sh.SetShaLike(&z.GetMetadatei().Verzeichnisse.Sha); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	ksm[k.String()] = &sh
 

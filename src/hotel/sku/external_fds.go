@@ -15,8 +15,8 @@ type ExternalFDs struct {
 }
 
 func (dst *ExternalFDs) ResetWith(src *ExternalFDs) {
-  dst.Objekte.ResetWith(&src.Objekte)
-  dst.Akte.ResetWith(&src.Akte)
+	dst.Objekte.ResetWith(&src.Objekte)
+	dst.Akte.ResetWith(&src.Akte)
 }
 
 func (a *ExternalFDs) Equals(b *ExternalFDs) bool {

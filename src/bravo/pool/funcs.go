@@ -3,7 +3,6 @@ package pool
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/iter"
 )
 
 func MakeWriterDoNotRepool[T any]() schnittstellen.FuncIter[*T] {
@@ -29,7 +28,7 @@ func MakePooledChain[T schnittstellen.Poolable[T], TPtr schnittstellen.PoolableP
 				err = nil
 				return
 
-			case iter.IsStopIteration(err):
+			case errors.IsStopIteration(err):
 				err = nil
 				p.Put(e)
 				return

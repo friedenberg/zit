@@ -32,9 +32,9 @@ func (s *Store) handleNewOrUpdatedCommit(
 	switch g {
 	case gattung.Konfig:
 		if err = s.StoreUtil.GetKonfig().SetTransacted(
-      t,
-      s.GetAkten().GetKonfigV0(),
-    ); err != nil {
+			t,
+			s.GetAkten().GetKonfigV0(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
