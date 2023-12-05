@@ -38,6 +38,7 @@ func makeObj(
 	return
 }
 
+// TODO-P1 migrate obj to sku.Transacted
 type obj struct {
 	Sku sku.Transacted
 }

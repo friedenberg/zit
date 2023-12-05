@@ -4,14 +4,15 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/string_format_writer"
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
 type kennungCliFormat struct {
-	options            erworben_cli_print_options.PrintOptions
-	stringFormatWriter schnittstellen.StringFormatWriter[string]
-	abbr               kennung.Abbr
+	options              erworben_cli_print_options.PrintOptions
+	sfwColor, sfwNoColor schnittstellen.StringFormatWriter[*catgut.String]
+	abbr                 kennung.Abbr
 }
 
 func MakeKennungCliFormat(
@@ -21,12 +22,13 @@ func MakeKennungCliFormat(
 ) *kennungCliFormat {
 	return &kennungCliFormat{
 		options: options,
-		stringFormatWriter: string_format_writer.MakeColor[string](
+		sfwColor: string_format_writer.MakeColor[*catgut.String](
 			co,
-			string_format_writer.MakeString[string](),
+			catgut.StringFormatWriter,
 			string_format_writer.ColorTypePointer,
 		),
-		abbr: abbr,
+		sfwNoColor: catgut.StringFormatWriter,
+		abbr:       abbr,
 	}
 }
 
@@ -55,7 +57,7 @@ func (f *kennungCliFormat) WriteStringFormat(
 
 	var n1 int64
 
-	n1, err = parts[0].WriteToStringWriter(w)
+	n1, err = f.sfwColor.WriteStringFormat(w, parts[0])
 	n += n1
 
 	if err != nil {
@@ -63,16 +65,15 @@ func (f *kennungCliFormat) WriteStringFormat(
 		return
 	}
 
-	var n2 int
-	n1, err = parts[1].WriteToStringWriter(w)
-	n += int64(n2)
+	n1, err = f.sfwNoColor.WriteStringFormat(w, parts[1])
+	n += int64(n1)
 
 	if err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	n1, err = parts[2].WriteToStringWriter(w)
+	n1, err = f.sfwColor.WriteStringFormat(w, parts[2])
 	n += n1
 
 	if err != nil {
