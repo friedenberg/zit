@@ -11,14 +11,14 @@ teardown() {
 	rm_from_version
 }
 
-cmd_def_organize_v3=(
+cmd_def_organize_v5=(
 	-prefix-joints=true
 	-metadatei-header=false
 	-refine=true
-  -new-organize=false
+  -new-organize=true
 )
 
-function organize_v3_outputs_organize_one_etikett { # @test
+function organize_v5_outputs_organize_one_etikett { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -50,15 +50,15 @@ function organize_v3_outputs_organize_one_etikett { # @test
 		echo
 		echo "          # ok"
 		echo
-		echo "- [one/uno] wow"
+		echo "- [one/uno !md] wow"
 	} >"$expected_organize"
 
-	run_zit organize "${cmd_def_organize_v3[@]}" -mode output-only ok
+	run_zit organize "${cmd_def_organize_v5[@]}" -mode output-only ok
 	assert_success
 	assert_output "$(cat "$expected_organize")"
 }
 
-function organize_v3_outputs_organize_two_etiketten { # @test
+function organize_v5_outputs_organize_two_etiketten { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -88,10 +88,10 @@ function organize_v3_outputs_organize_two_etiketten { # @test
 		echo
 		echo "          # brown, ok"
 		echo
-		echo "- [one/uno] wow"
+		echo "- [one/uno !md] wow"
 	} >"$expected_organize"
 
-	run_zit organize "${cmd_def_organize_v3[@]}" -mode output-only ok brown
+	run_zit organize "${cmd_def_organize_v5[@]}" -mode output-only ok brown
 	assert_success
 	assert_output "$(cat "$expected_organize")"
 
@@ -103,7 +103,7 @@ function organize_v3_outputs_organize_two_etiketten { # @test
 		echo
 	} >"$expected_organize"
 
-	run_zit organize "${cmd_def_organize_v3[@]}" -mode commit-directly ok brown <"$expected_organize"
+	run_zit organize "${cmd_def_organize_v5[@]}" -mode commit-directly ok brown <"$expected_organize"
 	assert_success
 	assert_output - <<-EOM
 		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" ok]
@@ -123,7 +123,7 @@ function organize_v3_outputs_organize_two_etiketten { # @test
 	assert_output "$(cat "$expected_zettel")"
 }
 
-function organize_v3_outputs_organize_one_etiketten_group_by_one { # @test
+function organize_v5_outputs_organize_one_etiketten_group_by_one { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -160,19 +160,19 @@ function organize_v3_outputs_organize_one_etiketten_group_by_one { # @test
 		echo
 		echo "        ###         -1"
 		echo
-		echo "- [one/uno] wow"
+		echo "- [one/uno !md] wow"
 		echo
 		echo "        ###         -2"
 		echo
-		echo "- [one/uno] wow"
+		echo "- [one/uno !md] wow"
 	} >"$expected_organize"
 
-	run_zit organize "${cmd_def_organize_v3[@]}" -mode output-only -group-by priority task
+	run_zit organize "${cmd_def_organize_v5[@]}" -mode output-only -group-by priority task
 	assert_success
 	assert_output "$(cat "$expected_organize")"
 }
 
-function organize_v3_outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
+function organize_v5_outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -224,19 +224,19 @@ function organize_v3_outputs_organize_two_zettels_one_etiketten_group_by_one { #
 		echo
 		echo "        ###         -1"
 		echo
-		echo "- [one/uno] one/uno"
+		echo "- [one/uno !md] one/uno"
 		echo
 		echo "        ###         -2"
 		echo
-		echo "- [one/dos] two/dos"
+		echo "- [one/dos !md] two/dos"
 	} >"$expected_organize"
 
-	run_zit organize "${cmd_def_organize_v3[@]}" -mode output-only -group-by priority task
+	run_zit organize "${cmd_def_organize_v5[@]}" -mode output-only -group-by priority task
 	assert_success
 	assert_output "$(cat "$expected_organize")"
 }
 
-function organize_v3_commits_organize_one_etiketten_group_by_two { # @test
+function organize_v5_commits_organize_one_etiketten_group_by_two { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -306,7 +306,7 @@ function organize_v3_commits_organize_one_etiketten_group_by_two { # @test
 		echo "- [two/uno] 3"
 	} >"$expected_organize"
 
-	run_zit organize "${cmd_def_organize_v3[@]}" -mode commit-directly -group-by priority,w task <"$expected_organize"
+	run_zit organize "${cmd_def_organize_v5[@]}" -mode commit-directly -group-by priority,w task <"$expected_organize"
 	assert_success
 
 	to_add="$(mktemp)"
@@ -339,7 +339,7 @@ function organize_v3_commits_organize_one_etiketten_group_by_two { # @test
 	assert_output "$(cat "$to_add")"
 }
 
-function organize_v3_commits_organize_one_etiketten_group_by_two_new_zettels { # @test
+function organize_v5_commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -445,7 +445,7 @@ function organize_v3_commits_organize_one_etiketten_group_by_two_new_zettels { #
 	} >"$expected_organize"
 
 	run_zit organize \
-		"${cmd_def_organize_v3[@]}" \
+		"${cmd_def_organize_v5[@]}" \
 		-mode commit-directly \
 		-group-by priority,w \
 		task <"$expected_organize"
@@ -502,7 +502,7 @@ function organize_v3_commits_organize_one_etiketten_group_by_two_new_zettels { #
 	# assert_output "$(cat "$expected")"
 }
 
-function organize_v3_commits_no_changes { # @test
+function organize_v5_commits_no_changes { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -586,8 +586,8 @@ function organize_v3_commits_no_changes { # @test
 		echo
 	} >"$expected_organize"
 
-	# run_zit organize "${cmd_def_organize_v3[@]}" -prefix-joints=false -mode output-only -group-by priority,w task
-	run_zit organize "${cmd_def_organize_v3[@]}" -mode commit-directly -group-by priority,w task <"$expected_organize"
+	# run_zit organize "${cmd_def_organize_v5[@]}" -prefix-joints=false -mode output-only -group-by priority,w task
+	run_zit organize "${cmd_def_organize_v5[@]}" -mode commit-directly -group-by priority,w task <"$expected_organize"
 	assert_success
 	# assert_output "$(cat "$expected_organize")"
 	assert_output "no changes"
@@ -605,7 +605,7 @@ function organize_v3_commits_no_changes { # @test
 	assert_output "$(cat "$three")"
 }
 
-function organize_v3_commits_dependent_leaf { # @test
+function organize_v5_commits_dependent_leaf { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -667,7 +667,7 @@ function organize_v3_commits_dependent_leaf { # @test
 		echo "###"
 	} >"$expected_organize"
 
-	run_zit organize "${cmd_def_organize_v3[@]}" -verbose -mode commit-directly -group-by priority,w task <"$expected_organize"
+	run_zit organize "${cmd_def_organize_v5[@]}" -verbose -mode commit-directly -group-by priority,w task <"$expected_organize"
 	assert_success
 
 	one="$(mktemp)"
@@ -716,7 +716,7 @@ function organize_v3_commits_dependent_leaf { # @test
 	assert_output "$(cat "$three")"
 }
 
-function organize_v3_zettels_in_correct_places { # @test
+function organize_v5_zettels_in_correct_places { # @test
 	cd "$BATS_TEST_TMPDIR" || exit 1
 	run_zit_init_disable_age
 
@@ -730,7 +730,7 @@ function organize_v3_zettels_in_correct_places { # @test
 
 	run_zit new -edit=false "$one"
 
-	run_zit organize "${cmd_def_organize_v3[@]}" \
+	run_zit organize "${cmd_def_organize_v5[@]}" \
 		-mode output-only -group-by inventory \
 		inventory-pipe_shelves-atheist_shoes_box-jabra_yellow_box_2
 	assert_success
@@ -743,11 +743,11 @@ function organize_v3_zettels_in_correct_places { # @test
 
 		        ###          -pipe_shelves-atheist_shoes_box-jabra_yellow_box_2
 
-		- [one/uno] jabra coral usb_a-to-usb_c cable
+		- [one/uno !md] jabra coral usb_a-to-usb_c cable
 	EOM
 }
 
-function organize_v3_etiketten_correct { # @test
+function organize_v5_etiketten_correct { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
@@ -762,7 +762,7 @@ function organize_v3_etiketten_correct { # @test
 		echo "- zettel bez"
 	} >"$first_organize"
 
-	run_zit organize "${cmd_def_organize_v3[@]}" -mode commit-directly <"$first_organize"
+	run_zit organize "${cmd_def_organize_v5[@]}" -mode commit-directly <"$first_organize"
 	assert_success
 
 	expected_etiketten="$(mktemp)"

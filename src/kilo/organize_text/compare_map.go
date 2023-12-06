@@ -136,6 +136,10 @@ func (a *assignment) addToCompareMap(
 			if ot.Konfig.NewOrganize {
 				if err = z.Sku.Metadatei.GetEtiketten().EachPtr(
 					func(e *kennung.Etikett) (err error) {
+						if a.Contains(e) {
+							return
+						}
+
 						out.Named.AddEtikett(fk, *e, z.Sku.Metadatei.Bezeichnung)
 						return
 					},
@@ -179,6 +183,10 @@ func (a *assignment) addToCompareMap(
 			if ot.Konfig.NewOrganize {
 				if err = z.Sku.Metadatei.GetEtiketten().EachPtr(
 					func(e *kennung.Etikett) (err error) {
+						if a.Contains(e) {
+							return
+						}
+
 						out.Named.AddEtikett(
 							z.Sku.Metadatei.Bezeichnung.String(),
 							*e,

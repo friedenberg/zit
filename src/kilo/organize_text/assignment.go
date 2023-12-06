@@ -144,8 +144,8 @@ func (a *assignment) addChild(c *assignment) {
 }
 
 func (a *assignment) parentOrRoot() (p *assignment) {
-	switch {
-	case a.parent == nil:
+	switch a.parent {
+	case nil:
 		return a
 
 	default:
@@ -282,4 +282,46 @@ func (a *assignment) expandedEtiketten() (es kennung.EtikettSet, err error) {
 	}
 
 	return
+}
+
+func (a *assignment) SubtractFromSet(es kennung.EtikettMutableSet) (err error) {
+	if err = a.etiketten.EachPtr(
+		func(e *kennung.Etikett) (err error) {
+			if err = es.EachPtr(
+				func(e1 *kennung.Etikett) (err error) {
+					if !kennung.Contains(e1, e) {
+						return
+					}
+
+					return es.DelPtr(e1)
+				},
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return es.DelPtr(e)
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if a.parent == nil {
+		return
+	}
+
+	return a.parent.SubtractFromSet(es)
+}
+
+func (a *assignment) Contains(e *kennung.Etikett) bool {
+	if a.etiketten.ContainsKey(e.String()) {
+		return true
+	}
+
+	if a.parent == nil {
+		return false
+	}
+
+	return a.parent.Contains(e)
 }

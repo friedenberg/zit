@@ -11,6 +11,12 @@ teardown() {
 	rm_from_version
 }
 
+cmd_def_organize=(
+	-prefix-joints=true
+	-refine=true
+  -new-organize=false
+)
+
 cat_organize() (
 	cat - <<-EOM
 
@@ -51,6 +57,6 @@ function outputs_organize_one_etikett { # @test
 	cd "$BATS_TEST_TMPDIR" || exit 1
 	run_zit_init_disable_age
 
-	run_zit format-organize -prefix-joints=true -refine=true <(cat_organize)
+	run_zit format-organize "${cmd_def_organize[@]}" <(cat_organize)
 	assert_output "$(cat_organize)"
 }
