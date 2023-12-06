@@ -20,6 +20,22 @@ func MakeErrLength(expected, actual int64, err error) error {
 	}
 }
 
+func (a errLength) Is(b error) (ok bool) {
+	_, ok = b.(errLength)
+	return
+}
+
 func (e errLength) Error() string {
 	return fmt.Sprintf("expected %d but got %d. error: %s", e.expected, e.actual, e.err)
+}
+
+type errInvalidSliceRange [2]int
+
+func (a errInvalidSliceRange) Is(b error) (ok bool) {
+	_, ok = b.(errInvalidSliceRange)
+	return
+}
+
+func (e errInvalidSliceRange) Error() string {
+	return fmt.Sprintf("invalid slice range: (%d, %d)", e[0], e[1])
 }

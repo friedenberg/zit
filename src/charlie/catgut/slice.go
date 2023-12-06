@@ -11,6 +11,38 @@ type Slice struct {
 	data  [2][]byte
 }
 
+func (a Slice) Slice(left, right int) (b Slice) {
+	lastIdx := a.Len() - 1
+
+	if left < 0 || right < 0 || right < left || left > lastIdx || right > lastIdx {
+		panic(errInvalidSliceRange{left, right})
+	}
+
+	b.start = a.start + int64(left)
+
+	lenFirst := len(a.First())
+
+	switch {
+	case right < lenFirst-1:
+		b.data[0] = a.data[0][left:right]
+
+	case left > lenFirst-1:
+		b.data[0] = a.data[1][left-lenFirst : right-lenFirst]
+
+	default:
+		b.data[0] = a.data[0][left:]
+		b.data[1] = a.data[1][:right-lenFirst]
+	}
+
+	return
+}
+
+func (rs Slice) Overlap() (o [6]byte) {
+	copy(o[:3], rs.First()[len(rs.First())-2:])
+	copy(o[3:], rs.Second()[3:])
+	return
+}
+
 func (rs Slice) ReadFrom(r io.Reader) (n int64, err error) {
 	var n1 int
 
