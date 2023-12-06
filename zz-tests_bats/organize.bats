@@ -26,8 +26,8 @@ function organize_simple { # @test
 		- [   -tag-2]
 		- [   -tag-3]
 		- [   -tag-4]
-		- [one/dos  ] wow ok again
-		- [one/uno  ] wow the first
+		- [one/dos   !md tag-3 tag-4] wow ok again
+		- [one/uno   !md tag-3 tag-4] wow the first
 	EOM
 }
 
@@ -43,8 +43,8 @@ function organize_simple_commit { # @test
 		- [   -tag-2]
 		- [   -tag-3]
 		- [   -tag-4]
-		- [one/dos  ] wow ok again
-		- [one/uno  ] wow the first
+		- [one/dos   !md tag-3 tag-4] wow ok again
+		- [one/uno   !md tag-3 tag-4] wow the first
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -92,8 +92,8 @@ function organize_simple_checkedout_matchesmutter { # @test
 		- [   -tag-2]
 		- [   -tag-3]
 		- [   -tag-4]
-		- [one/dos  ] wow ok again
-		- [one/uno  ] wow the first
+		- [one/dos   !md tag-3 tag-4] wow ok again
+		- [one/uno   !md tag-3 tag-4] wow the first
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -159,8 +159,8 @@ function organize_simple_checkedout_merge_no_conflict { # @test
 		- [   -tag-2]
 		- [   -tag-3]
 		- [   -tag-4]
-		- [one/dos  ] wow ok again
-		- [one/uno  ] wow the first
+		- [one/dos   !md tag-3 tag-4] wow ok again
+		- [one/uno   !md tag-3 tag-4] wow the first
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -247,8 +247,8 @@ function organize_simple_checkedout_merge_conflict { # @test
 		- [   -tag-2]
 		- [   -tag-3]
 		- [   -tag-4]
-		- [one/dos  ] wow ok again
-		- [one/uno  ] wow the first
+		- [one/dos   !md tag-3 tag-4] wow ok again
+		- [one/uno   !md tag-3 tag-4] wow the first
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -366,8 +366,8 @@ function organize_with_typ_output { # @test
 		! md
 		---
 
-		- [one/dos] wow ok again
-		- [one/uno] wow the first
+		- [one/dos tag-3 tag-4] wow ok again
+		- [one/uno tag-3 tag-4] wow the first
 	EOM
 }
 
@@ -377,8 +377,8 @@ function organize_with_typ_commit { # @test
 		! txt
 		---
 
-		- [one/dos] wow ok again
-		- [one/uno] wow the first
+		- [one/dos tag-3 tag-4] wow ok again
+		- [one/uno tag-3 tag-4] wow the first
 	EOM
 
 	assert_success
@@ -398,8 +398,8 @@ function modify_bezeichnung { # @test
 		- [   -tag-2]
 		- [   -tag-3]
 		- [   -tag-4]
-		- [one/dos  ] wow ok again was modified
-		- [one/uno  ] wow the first was modified too
+		- [one/dos   !md tag-3 tag-4] wow ok again was modified
+		- [one/uno   !md tag-3 tag-4] wow the first was modified too
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM

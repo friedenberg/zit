@@ -45,7 +45,7 @@ function mergetool_conflict_one { # @test
 		---
 
 		# new-etikett-for-all
-		- [one/dos  ] wow ok again
+		- [one/dos  tag-3 tag-4] wow ok again
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM

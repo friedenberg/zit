@@ -63,7 +63,7 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	f.BoolVar(
 		&c.NewOrganize,
 		"new-organize",
-		false,
+		true,
 		"use the new CLI-like organize syntax",
 	)
 
