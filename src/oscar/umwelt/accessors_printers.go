@@ -44,9 +44,10 @@ func (u *Umwelt) StringFormatWriterTyp(
 }
 
 func (u *Umwelt) StringFormatWriterBezeichnung(
+	truncate bezeichnung.CliFormatTruncation,
 	co string_format_writer.ColorOptions,
 ) schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung] {
-	return bezeichnung.MakeCliFormat2(co)
+	return bezeichnung.MakeCliFormat2(truncate, co)
 }
 
 func (u *Umwelt) StringFormatWriterEtiketten(
@@ -71,7 +72,7 @@ func (u *Umwelt) StringFormatWriterSkuLikePtrForOrganize() catgut.StringFormatRe
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterKennung(co),
 		u.StringFormatWriterTyp(co),
-		u.StringFormatWriterBezeichnung(co),
+		u.StringFormatWriterBezeichnung(bezeichnung.CliFormatTruncationNone, co),
 		u.StringFormatWriterEtiketten(co),
 	)
 }
@@ -89,7 +90,10 @@ func (u *Umwelt) StringFormatWriterSkuLikePtr(
 		u.StringFormatWriterShaLike(*co),
 		u.StringFormatWriterKennung(*co),
 		u.StringFormatWriterTyp(*co),
-		u.StringFormatWriterBezeichnung(*co),
+		u.StringFormatWriterBezeichnung(
+			bezeichnung.CliFormatTruncation66CharEllipsis,
+			*co,
+		),
 		u.StringFormatWriterEtiketten(*co),
 	)
 }
@@ -103,7 +107,10 @@ func (u *Umwelt) StringFormatWriterSkuLikePtrShort() schnittstellen.StringFormat
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterKennung(co),
 		u.StringFormatWriterTyp(co),
-		u.StringFormatWriterBezeichnung(co),
+		u.StringFormatWriterBezeichnung(
+      bezeichnung.CliFormatTruncation66CharEllipsis,
+      co,
+    ),
 		u.StringFormatWriterEtiketten(co),
 	)
 }
@@ -184,7 +191,10 @@ func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[*sku.CheckedOut
 		),
 		u.StringFormatWriterKennung(co),
 		u.StringFormatWriterTyp(co),
-		u.StringFormatWriterBezeichnung(co),
+		u.StringFormatWriterBezeichnung(
+      bezeichnung.CliFormatTruncation66CharEllipsis,
+      co,
+    ),
 		u.StringFormatWriterEtiketten(co),
 	)
 

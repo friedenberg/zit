@@ -6,13 +6,16 @@ import (
 )
 
 type bezeichnungCliFormat struct {
+	truncate           CliFormatTruncation
 	stringFormatWriter schnittstellen.StringFormatWriter[string]
 }
 
 func MakeCliFormat2(
+	truncate CliFormatTruncation,
 	co string_format_writer.ColorOptions,
 ) *bezeichnungCliFormat {
 	return &bezeichnungCliFormat{
+		truncate: truncate,
 		stringFormatWriter: string_format_writer.MakeColor[string](
 			co,
 			string_format_writer.MakeString[string](),
@@ -27,8 +30,7 @@ func (f *bezeichnungCliFormat) WriteStringFormat(
 ) (n int64, err error) {
 	v := k.value
 
-	switch {
-	case len(v) > 66:
+	if f.truncate == CliFormatTruncation66CharEllipsis && len(v) > 66 {
 		v = v[:66] + "…"
 	}
 

@@ -120,7 +120,9 @@ func (s *store) Create(o *Akte) (err error) {
 		return
 	}
 
-	t := &sku.Transacted{}
+	t := sku.GetTransactedPool().Get()
+	defer sku.GetTransactedPool().Put(t)
+
 	sku.TransactedResetter.Reset(t)
 	t.SetAkteSha(sh)
 	tai := s.clock.GetTai()
