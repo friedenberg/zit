@@ -16,7 +16,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/standort"
-	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
@@ -124,20 +123,6 @@ func (c *Compiled) Initialize(
 	return
 }
 
-func (kc *Compiled) HasChanges() bool {
-	kc.lock.Lock()
-	defer kc.lock.Unlock()
-
-	return kc.hasChanges
-}
-
-func (kc *Compiled) SetHasChanges(v bool) {
-	kc.lock.Lock()
-	defer kc.lock.Unlock()
-
-	kc.hasChanges = true
-}
-
 func (kc *Compiled) GetAngeboren() schnittstellen.Angeboren {
 	return kc.angeboren
 }
@@ -154,97 +139,6 @@ func (kc *Compiled) SetCliFromCommander(k erworben.Cli) {
 	oldBasePath := kc.BasePath
 	kc.cli = k
 	kc.BasePath = oldBasePath
-}
-
-func (kc *Compiled) recompile(
-	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
-) (err error) {
-	kc.DefaultEtiketten = kennung.MakeEtikettSet(kc.Defaults.Etiketten...)
-
-	{
-		kc.ImplicitEtiketten = make(implicitEtikettenMap)
-
-		if err = kc.Etiketten.Each(
-			func(ke *ketikett) (err error) {
-				var e kennung.Etikett
-
-				if err = e.Set(ke.Transacted.GetKennung().String()); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				if err = kc.AccumulateImplicitEtiketten(e); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				if err = kc.ApplyToSku(&ke.Transacted); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				return
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		sort.Slice(kc.EtikettenHiddenStringsSlice, func(i, j int) bool {
-			return kc.EtikettenHiddenStringsSlice[i] < kc.EtikettenHiddenStringsSlice[j]
-		})
-	}
-
-	{
-		kc.EtikettenHidden = kennung.MakeEtikettSet(
-			kc.HiddenEtiketten...,
-		)
-	}
-
-	inlineTypen := collections_value.MakeMutableValueSet[values.String](nil)
-
-	defer func() {
-		kc.InlineTypen = inlineTypen.CloneSetLike()
-	}()
-
-	if err = kc.Typen.Each(
-		func(ct *sku.Transacted) (err error) {
-			var ta *typ_akte.V0
-
-			if ta, err = tagp.GetAkte(ct.GetAkteSha()); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			defer tagp.PutAkte(ta)
-
-			fe := ta.FileExtension
-
-			if fe == "" {
-				fe = ct.GetKennung().String()
-			}
-
-			// TODO-P2 enforce uniqueness
-			kc.ExtensionsToTypen[fe] = ct.GetKennung().String()
-			kc.TypenToExtensions[ct.GetKennung().String()] = fe
-
-			if ta.InlineAkte {
-				inlineTypen.Add(values.MakeString(ct.Kennung.String()))
-			}
-
-			if err = kc.ApplyToSku(ct); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }
 
 func (c *compiled) GetZettelFileExtension() string {

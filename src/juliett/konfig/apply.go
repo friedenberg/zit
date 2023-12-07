@@ -48,6 +48,23 @@ func (k *Compiled) ApplyToSku(
 		)
 	}
 
+	if err = k.addImplicitEtiketten(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = k.setArchiviert(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (k *Compiled) addImplicitEtiketten(
+	sk *sku.Transacted,
+) (err error) {
+	mp := &sk.Metadatei
 	ie := kennung.MakeEtikettMutableSet()
 
 	addImpEts := func(e *kennung.Etikett) (err error) {
@@ -72,11 +89,18 @@ func (k *Compiled) ApplyToSku(
 
 	mp.Verzeichnisse.SetImplicitEtiketten(ie)
 
-	checkFunc := func(e *kennung.Etikett) bool {
-		return k.EtikettenHidden.ContainsKey(k.EtikettenHidden.KeyPtr(e))
-	}
+	return
+}
 
-	ees := sk.Metadatei.Verzeichnisse.GetExpandedEtiketten()
+func (k *Compiled) setArchiviert(
+	sk *sku.Transacted,
+) (err error) {
+	mp := &sk.Metadatei
+
+	g := gattung.Must(sk.GetGattung())
+	isEtikett := g == gattung.Etikett
+
+	ees := mp.Verzeichnisse.GetExpandedEtiketten()
 
 	isHiddenEtikett := isEtikett &&
 		iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
@@ -86,21 +110,38 @@ func (k *Compiled) ApplyToSku(
 			},
 		)
 
-	mp.Verzeichnisse.Archiviert.SetBool(
-		isHiddenEtikett ||
-			iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
-				mp.GetEtiketten(),
-				checkFunc,
-			) ||
-			iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
-				mp.Verzeichnisse.GetExpandedEtiketten(),
-				checkFunc,
-			) ||
-			iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
-				mp.Verzeichnisse.GetImplicitEtiketten(),
-				checkFunc,
-			),
-	)
+	if isHiddenEtikett {
+		mp.Verzeichnisse.Archiviert.SetBool(true)
+		return
+	}
+
+	checkFunc := func(e *kennung.Etikett) bool {
+		return k.EtikettenHidden.ContainsKey(k.EtikettenHidden.KeyPtr(e))
+	}
+
+	if iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
+		mp.GetEtiketten(),
+		checkFunc,
+	) {
+		mp.Verzeichnisse.Archiviert.SetBool(true)
+		return
+	}
+
+	if iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
+		mp.Verzeichnisse.GetExpandedEtiketten(),
+		checkFunc,
+	) {
+		mp.Verzeichnisse.Archiviert.SetBool(true)
+		return
+	}
+
+	if iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
+		mp.Verzeichnisse.GetImplicitEtiketten(),
+		checkFunc,
+	) {
+		mp.Verzeichnisse.Archiviert.SetBool(true)
+		return
+	}
 
 	return
 }
