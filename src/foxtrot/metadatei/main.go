@@ -2,6 +2,7 @@ package metadatei
 
 import (
 	"flag"
+	"fmt"
 	"io"
 	"sort"
 	"strings"
@@ -270,4 +271,8 @@ func (z *Metadatei) ApplyGoldenChild(
 	mes.Add(prefixes[0])
 
 	return
+}
+
+func (mp *Metadatei) AddComment(f string, vals ...interface{}) {
+	mp.Comments = append(mp.Comments, fmt.Sprintf(f, vals...))
 }

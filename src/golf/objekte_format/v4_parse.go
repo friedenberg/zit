@@ -238,6 +238,7 @@ func (f v4) ParsePersistentMetadatei(
 
 		case key.Equal(keyKomment.Bytes()):
 			ignoreOrder = true
+			m.Comments = append(m.Comments, val.String())
 
 		default:
 			err = errV4InvalidKey

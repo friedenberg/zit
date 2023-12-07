@@ -109,6 +109,20 @@ func (f v4) FormatPersistentMetadatei(
 		return
 	}
 
+	for _, k := range m.Comments {
+		n1, err = ohio.WriteKeySpaceValueNewlineString(
+			mw,
+			"Komment",
+			k,
+		)
+		n += int64(n1)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	if o.IncludeTai {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,

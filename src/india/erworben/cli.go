@@ -67,6 +67,13 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 		"use the new CLI-like organize syntax",
 	)
 
+	f.BoolVar(
+		&c.PrintOptions.ZittishNewlines,
+		"zittish-newlines",
+		false,
+		"add extra newlines to zittish to improve readability",
+	)
+
 	c.PrintOptions.AddToFlags(f, &c.maskPrintOptions)
 	c.ToolOptions.AddToFlags(f)
 }

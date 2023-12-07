@@ -20,6 +20,7 @@ type PrintOptions struct {
 	PrintEmptyShas            bool          `toml:"print-empty-shas"`
 	PrintMatchedArchiviert    bool          `toml:"print-matched-archiviert"`
 	PrintShas                 bool          `toml:"print-shas"`
+	ZittishNewlines           bool          `toml:"-"`
 }
 
 func (a *PrintOptions) Merge(b PrintOptions, mask PrintOptions) {
