@@ -27,7 +27,7 @@ func (s *Store) writeNamedZettelToIndex(
 
 	errors.Log().Printf("writing zettel to index: %s", tz)
 
-	s.GetKonfig().ApplyToSku(tz, s.GetAkten().GetTypV0())
+	s.GetKonfig().ApplyToSku(tz)
 
 	if err = s.verzeichnisseSchwanzen.AddVerzeichnisse(
 		tz,

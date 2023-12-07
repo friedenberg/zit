@@ -178,7 +178,7 @@ func (kc *Compiled) recompile(
 					return
 				}
 
-				if err = kc.ApplyToSku(&ke.Transacted, tagp); err != nil {
+				if err = kc.ApplyToSku(&ke.Transacted); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -232,7 +232,7 @@ func (kc *Compiled) recompile(
 				inlineTypen.Add(values.MakeString(ct.Kennung.String()))
 			}
 
-			if err = kc.ApplyToSku(ct, tagp); err != nil {
+			if err = kc.ApplyToSku(ct); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

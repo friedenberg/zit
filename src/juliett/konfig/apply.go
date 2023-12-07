@@ -14,7 +14,6 @@ import (
 
 func (k *Compiled) ApplyToSku(
 	sk *sku.Transacted,
-	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) (err error) {
 	mp := &sk.Metadatei
 
