@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/string_format_writer"
 	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
@@ -26,7 +27,7 @@ type cli struct {
 	fdStringFormatWriter          schnittstellen.StringFormatWriter[*fd.FD]
 	typStringFormatWriter         schnittstellen.StringFormatWriter[*kennung.Typ]
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung]
-	etikettenStringFormatWriter   schnittstellen.StringFormatWriter[kennung.EtikettSet]
+	etikettenStringFormatWriter   schnittstellen.StringFormatWriter[*kennung.Etikett]
 }
 
 func MakeCliFormat(
@@ -36,7 +37,7 @@ func MakeCliFormat(
 	kennungStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Kennung2],
 	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],
-	etikettenStringFormatWriter schnittstellen.StringFormatWriter[kennung.EtikettSet],
+	etikettenStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Etikett],
 ) *cli {
 	return &cli{
 		options:                       options,
@@ -200,7 +201,7 @@ func (f *cli) WriteStringFormat(
 	if f.writeEtiketten && !didWriteBezeichnung {
 		b := o.GetMetadatei().GetEtiketten()
 
-		if b.Len() > 0 {
+		for _, v := range iter.SortedValues[kennung.Etikett](b) {
 			n1, err = sw.WriteString(" ")
 			n += int64(n1)
 
@@ -209,7 +210,7 @@ func (f *cli) WriteStringFormat(
 				return
 			}
 
-			n2, err = f.etikettenStringFormatWriter.WriteStringFormat(sw, b)
+			n2, err = f.etikettenStringFormatWriter.WriteStringFormat(sw, &v)
 			n += n2
 
 			if err != nil {

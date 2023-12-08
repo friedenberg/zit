@@ -44,6 +44,7 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 		true,
 		"include checked-out Objekten in the working directory",
 	)
+
 	f.BoolVar(
 		&c.IncludeHidden,
 		"include-hidden",
@@ -52,7 +53,9 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	)
 
 	f.BoolVar(&c.AllowMissingHinweis, "allow-missing-hinweis", false, "")
+
 	f.BoolVar(&c.CheckoutCacheEnabled, "checkout-cache-enabled", false, "")
+
 	f.BoolVar(
 		&c.PredictableHinweisen,
 		"predictable-hinweisen",
@@ -67,15 +70,15 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 		"use the new CLI-like organize syntax",
 	)
 
+	c.PrintOptions.AddToFlags(f, &c.maskPrintOptions)
+	c.ToolOptions.AddToFlags(f)
+
 	f.BoolVar(
 		&c.PrintOptions.ZittishNewlines,
 		"zittish-newlines",
 		false,
 		"add extra newlines to zittish to improve readability",
 	)
-
-	c.PrintOptions.AddToFlags(f, &c.maskPrintOptions)
-	c.ToolOptions.AddToFlags(f)
 }
 
 func DefaultCli() (c Cli) {

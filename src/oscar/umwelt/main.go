@@ -1,7 +1,7 @@
 package umwelt
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -91,7 +91,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		if u.erworbenCli.Verbose {
 			errors.SetVerbose()
 		} else {
-			log.SetOutput(ioutil.Discard)
+			log.SetOutput(io.Discard)
 		}
 
 		if u.erworbenCli.Todo {

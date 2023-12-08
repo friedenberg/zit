@@ -59,6 +59,8 @@ func (a *PrintOptions) Merge(b PrintOptions, mask PrintOptions) {
 	if mask.PrintShas {
 		a.PrintShas = b.PrintShas
 	}
+
+  a.ZittishNewlines = b.ZittishNewlines
 }
 
 func Default() PrintOptions {

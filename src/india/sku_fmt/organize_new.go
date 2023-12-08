@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/thyme"
@@ -20,7 +21,7 @@ type organizeNew struct {
 	kennungStringFormatWriter     schnittstellen.StringFormatWriter[*kennung.Kennung2]
 	typStringFormatWriter         schnittstellen.StringFormatWriter[*kennung.Typ]
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung]
-	etikettenStringFormatWriter   schnittstellen.StringFormatWriter[kennung.EtikettSet]
+	etikettenStringFormatWriter   schnittstellen.StringFormatWriter[*kennung.Etikett]
 
 	ex kennung.Abbr
 
@@ -33,7 +34,7 @@ func MakeOrganizeNewFormat(
 	kennungStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Kennung2],
 	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],
-	etikettenStringFormatWriter schnittstellen.StringFormatWriter[kennung.EtikettSet],
+	etikettenStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Etikett],
 ) *organizeNew {
 	options.PrintTime = false
 	options.PrintShas = false
@@ -152,7 +153,7 @@ func (f *organizeNew) WriteStringFormat(
 	if f.options.PrintEtikettenAlways {
 		b := o.GetMetadatei().GetEtiketten()
 
-		if b.Len() > 0 {
+		for _, v := range iter.SortedValues[kennung.Etikett](b) {
 			n1, err = sw.WriteString(" ")
 			n += int64(n1)
 
@@ -161,7 +162,7 @@ func (f *organizeNew) WriteStringFormat(
 				return
 			}
 
-			n2, err = f.etikettenStringFormatWriter.WriteStringFormat(sw, b)
+			n2, err = f.etikettenStringFormatWriter.WriteStringFormat(sw, &v)
 			n += n2
 
 			if err != nil {

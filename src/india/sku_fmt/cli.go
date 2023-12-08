@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/string_format_writer"
 	"github.com/friedenberg/zit/src/delta/thyme"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
@@ -13,6 +14,7 @@ import (
 
 type cli struct {
 	options erworben_cli_print_options.PrintOptions
+	prefix  string
 
 	writeTyp         bool
 	writeBezeichnung bool
@@ -22,7 +24,7 @@ type cli struct {
 	kennungStringFormatWriter     schnittstellen.StringFormatWriter[*kennung.Kennung2]
 	typStringFormatWriter         schnittstellen.StringFormatWriter[*kennung.Typ]
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung]
-	etikettenStringFormatWriter   schnittstellen.StringFormatWriter[kennung.EtikettSet]
+	etikettenStringFormatWriter   schnittstellen.StringFormatWriter[*kennung.Etikett]
 }
 
 func MakeCliFormatShort(
@@ -30,7 +32,7 @@ func MakeCliFormatShort(
 	kennungStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Kennung2],
 	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],
-	etikettenStringFormatWriter schnittstellen.StringFormatWriter[kennung.EtikettSet],
+	etikettenStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Etikett],
 ) *cli {
 	return &cli{
 		writeTyp:                      false,
@@ -50,10 +52,13 @@ func MakeCliFormat(
 	kennungStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Kennung2],
 	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],
-	etikettenStringFormatWriter schnittstellen.StringFormatWriter[kennung.EtikettSet],
+	etikettenStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Etikett],
 ) *cli {
 	return &cli{
-		options:                       options,
+		options: options,
+		prefix: string_format_writer.StringPrefixFromOptions(
+			options,
+		),
 		writeTyp:                      true,
 		writeBezeichnung:              true,
 		writeEtiketten:                true,
@@ -135,7 +140,15 @@ func (f *cli) WriteStringFormat(
 		t := o.GetMetadatei().GetTypPtr()
 
 		if len(t.String()) > 0 {
-			n1, err = sw.WriteString(" !")
+			n1, err = sw.WriteString(f.prefix)
+			n += int64(n1)
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			n1, err = sw.WriteString("!")
 			n += int64(n1)
 
 			if err != nil {
@@ -160,7 +173,15 @@ func (f *cli) WriteStringFormat(
 		if !b.IsEmpty() {
 			didWriteBezeichnung = true
 
-			n1, err = sw.WriteString(" \"")
+			n1, err = sw.WriteString(f.prefix)
+			n += int64(n1)
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			n1, err = sw.WriteString("\"")
 			n += int64(n1)
 
 			if err != nil {
@@ -219,25 +240,22 @@ func (f *cli) writeStringFormatEtiketten(
 	var n1 int
 	var n2 int64
 
-	if f.options.ZittishNewlines {
-		n1, err = sw.WriteString("\n  " + string_format_writer.StringIndent)
+	for _, v := range iter.SortedValues[kennung.Etikett](b) {
+		n1, err = sw.WriteString(f.prefix)
 		n += int64(n1)
-	} else {
-		n1, err = sw.WriteString(" ")
-		n += int64(n1)
-	}
 
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	n2, err = f.etikettenStringFormatWriter.WriteStringFormat(sw, b)
-	n += n2
+		n2, err = f.etikettenStringFormatWriter.WriteStringFormat(sw, &v)
+		n += n2
 
-	if err != nil {
-		err = errors.Wrap(err)
-		return
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

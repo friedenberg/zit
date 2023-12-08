@@ -52,7 +52,7 @@ func (u *Umwelt) StringFormatWriterBezeichnung(
 
 func (u *Umwelt) StringFormatWriterEtiketten(
 	co string_format_writer.ColorOptions,
-) schnittstellen.StringFormatWriter[kennung.EtikettSet] {
+) schnittstellen.StringFormatWriter[*kennung.Etikett] {
 	return kennung_fmt.MakeEtikettenCliFormat()
 }
 
@@ -108,9 +108,9 @@ func (u *Umwelt) StringFormatWriterSkuLikePtrShort() schnittstellen.StringFormat
 		u.StringFormatWriterKennung(co),
 		u.StringFormatWriterTyp(co),
 		u.StringFormatWriterBezeichnung(
-      bezeichnung.CliFormatTruncation66CharEllipsis,
-      co,
-    ),
+			bezeichnung.CliFormatTruncation66CharEllipsis,
+			co,
+		),
 		u.StringFormatWriterEtiketten(co),
 	)
 }
@@ -192,9 +192,9 @@ func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[*sku.CheckedOut
 		u.StringFormatWriterKennung(co),
 		u.StringFormatWriterTyp(co),
 		u.StringFormatWriterBezeichnung(
-      bezeichnung.CliFormatTruncation66CharEllipsis,
-      co,
-    ),
+			bezeichnung.CliFormatTruncation66CharEllipsis,
+			co,
+		),
 		u.StringFormatWriterEtiketten(co),
 	)
 
