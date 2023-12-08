@@ -266,6 +266,17 @@ func (rb *RingBuffer) Fill() (n int64, err error) {
 	return
 }
 
+func (rb *RingBuffer) SlideAndFill() (n int64, err error) {
+	rb.data = append(rb.data, rb.PeekReadable().Second()...)
+	copy(rb.data, rb.data[rb.rIdx:])
+	rb.wIdx = rb.rIdx
+	rb.rIdx = 0
+
+	n, err = rb.Fill()
+
+	return
+}
+
 func (rb *RingBuffer) AdvanceRead(n int) {
 	rb.rIdx += n
 	rb.readLength += int64(n)
@@ -275,6 +286,48 @@ func (rb *RingBuffer) AdvanceRead(n int) {
 	}
 
 	rb.dataLength -= n
+}
+
+func (rb *RingBuffer) AdvanceToFirstMatch(
+	mf func(rune) bool,
+) (match []byte, ok bool, err error) {
+	readable := rb.PeekReadable()
+	var scanner *SliceRuneScanner
+	scanner, err = MakeSliceRuneScanner(readable)
+
+	if err != nil {
+		return
+	}
+
+	offset := 0
+	startedMatch := false
+
+LOOP:
+	for {
+		r, w, okScan := scanner.Scan()
+
+		if !okScan {
+			if err = scanner.Error(); err != nil {
+				return
+			}
+		}
+
+		offset += w
+		currentMatch := mf(r)
+
+		switch {
+		case currentMatch:
+			match = rb.data[rb.rIdx : rb.rIdx+offset]
+			startedMatch = true
+
+		case !currentMatch && !startedMatch:
+			break LOOP
+		}
+	}
+
+	rb.AdvanceRead(offset)
+
+	return
 }
 
 func (rb *RingBuffer) PeekUpto(b byte) (readable Slice, ok bool, err error) {

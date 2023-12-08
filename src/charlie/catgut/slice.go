@@ -38,8 +38,13 @@ func (a Slice) Slice(left, right int) (b Slice) {
 }
 
 func (rs Slice) Overlap() (o [6]byte) {
+	if len(rs.Second()) == 0 {
+		return
+	}
+
 	copy(o[:3], rs.First()[len(rs.First())-2:])
 	copy(o[3:], rs.Second()[3:])
+
 	return
 }
 

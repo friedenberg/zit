@@ -1,6 +1,12 @@
 package catgut
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
+)
+
+var ErrBufferEmpty = errors.New("buffer empty")
 
 type errLength struct {
 	expected, actual int64
