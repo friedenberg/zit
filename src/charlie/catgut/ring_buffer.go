@@ -330,7 +330,27 @@ LOOP:
 	return
 }
 
-func (rb *RingBuffer) PeekUpto(b byte) (readable Slice, ok bool, err error) {
+func (rb *RingBuffer) PeekUpto2(b byte) (readable Slice, err error) {
+	ok := false
+	readable, ok = rb.PeekReadable().Upto2(b)
+
+	if ok {
+		return
+	}
+
+	_, err = rb.Fill()
+
+	if err != io.EOF && err != nil {
+		return
+	}
+
+	readable, _ = rb.PeekReadable().Upto(b)
+
+	return
+}
+
+func (rb *RingBuffer) PeekUpto(b byte) (readable Slice, err error) {
+	ok := false
 	readable, ok = rb.PeekReadable().Upto(b)
 
 	if ok {
@@ -343,7 +363,7 @@ func (rb *RingBuffer) PeekUpto(b byte) (readable Slice, ok bool, err error) {
 		return
 	}
 
-	readable, ok = rb.PeekReadable().Upto(b)
+	readable, _ = rb.PeekReadable().Upto(b)
 
 	return
 }

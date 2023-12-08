@@ -110,6 +110,10 @@ func (rs Slice) String() string {
 }
 
 func (rs Slice) Equal(b []byte) bool {
+	if len(b) < rs.Len() {
+		return false
+	}
+
 	c := 0
 
 	for _, v := range rs.First() {
@@ -241,6 +245,42 @@ func (rs Slice) Upto(b byte) (s Slice, ok bool) {
 				data: [2][]byte{
 					rs.First(),
 					rs.Second()[:i],
+				},
+			}
+
+			ok = true
+
+			return
+		}
+	}
+
+	return
+}
+
+func (rs Slice) Upto2(b byte) (s Slice, ok bool) {
+	for i, v := range rs.First() {
+		if v == b {
+			s = Slice{
+				start: rs.start,
+				data: [2][]byte{
+					rs.First()[:i+1],
+					nil,
+				},
+			}
+
+			ok = true
+
+			return
+		}
+	}
+
+	for i, v := range rs.Second() {
+		if v == b {
+			s = Slice{
+				start: rs.start,
+				data: [2][]byte{
+					rs.First(),
+					rs.Second()[:i+1],
 				},
 			}
 

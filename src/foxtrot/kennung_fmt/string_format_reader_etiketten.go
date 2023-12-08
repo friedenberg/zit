@@ -24,11 +24,7 @@ func (f *etikettenReader) ReadStringFormat(
 		k,
 	)
 
-	readable, ok, err := rb.PeekUpto('\n')
-
-	if !ok {
-		return
-	}
+	readable, err := rb.PeekUpto('\n')
 
 	if err = flag.Set(readable.String()); err != nil {
 		errors.Wrap(err)

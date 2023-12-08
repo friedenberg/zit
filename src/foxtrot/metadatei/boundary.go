@@ -8,13 +8,13 @@ import (
 	"github.com/friedenberg/zit/src/charlie/catgut"
 )
 
-var (
-	BoundaryStringValue values.String
-	boundaryBytes       = []byte{'-', '-', '-'}
-)
-
 const (
 	Boundary = "---"
+)
+
+var (
+	BoundaryStringValue values.String
+	boundaryBytes       = []byte(Boundary)
 )
 
 func init() {
@@ -24,20 +24,13 @@ func init() {
 var errBoundaryInvalid = errors.New("boundary invalid")
 
 func ReadBoundary(r *catgut.RingBuffer) (n int, err error) {
-	var (
-		readable catgut.Slice
-		ok       bool
-	)
+	var readable catgut.Slice
 
-	readable, ok, err = r.PeekUpto('\n')
+	readable, err = r.PeekUpto('\n')
 
-	if !ok {
-		if r.PeekReadable().Len() == 0 {
-			err = io.EOF
-		} else {
-			err = errBoundaryInvalid
-		}
-
+	if err != nil && err != io.EOF {
+		return
+	} else if r.PeekReadable().Len() == 0 && err == io.EOF {
 		return
 	}
 

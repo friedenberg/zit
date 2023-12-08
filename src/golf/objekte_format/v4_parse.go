@@ -65,15 +65,10 @@ func (f v4) ParsePersistentMetadatei(
 	lineNo := 0
 
 	for {
-		line, ok, err = r.PeekUpto('\n')
+		line, err = r.PeekUpto('\n')
 
 		if err != nil && err != io.EOF {
 			break
-		}
-
-		if !ok && err != io.EOF {
-			err = errV4ExpectedNewline
-			return
 		}
 
 		if line.Len() == 0 {
