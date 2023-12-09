@@ -344,7 +344,15 @@ func (rb *RingBuffer) PeekUpto2(b byte) (readable Slice, err error) {
 		return
 	}
 
-	readable, _ = rb.PeekReadable().Upto(b)
+	readable, _ = rb.PeekReadable().Upto2(b)
+
+	if err == io.EOF {
+		if readable.Len() == 0 {
+			readable = rb.PeekReadable()
+		} else {
+			err = nil
+		}
+	}
 
 	return
 }

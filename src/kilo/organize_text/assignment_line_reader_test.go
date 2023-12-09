@@ -82,7 +82,7 @@ func TestAssignmentLineReaderOneHeadingNoZettels(t1 *testing.T) {
 		t.Errorf("expected read amount to be greater than 0")
 	}
 
-  t.AssertNoError(err)
+	t.AssertNoError(err)
 
 	{
 		expected := kennung.MakeEtikettSet(kennung.MustEtikett("wow"))

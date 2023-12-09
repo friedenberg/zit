@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -28,6 +29,7 @@ func (ar *assignmentLineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 	for {
 		var sl catgut.Slice
 		sl, err = r.PeekUpto2('\n')
+    log.Debug().Printf("%q, %q, %d", sl, err, sl.Len())
 		n += int64(sl.Len())
 
 		if err == io.EOF && sl.Len() <= 1 {
@@ -45,35 +47,34 @@ func (ar *assignmentLineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 		s = strings.TrimSpace(s)
 		slen := len(s)
 
-		if slen >= 1 {
-			var l line
+		if slen < 1 {
+			continue
+		}
 
-			if err = l.Set(s); err != nil {
-				err = ErrorRead{
-					error: err,
-					line:  ar.lineNo,
-				}
+		var l line
+
+		if err = l.Set(s); err != nil {
+			err = ErrorRead{
+				error: err,
+				line:  ar.lineNo,
+			}
+		}
+
+		if err = ar.readOne(l); err != nil {
+			err = ErrorRead{
+				error: err,
+				line:  ar.lineNo,
 			}
 
-			if err = ar.readOne(l); err != nil {
-				err = ErrorRead{
-					error: err,
-					line:  ar.lineNo,
-				}
-
-				return
-			}
+			return
 		}
 
 		r.AdvanceRead(sl.Len())
 		ar.lineNo++
 
-		if err == io.EOF {
-			err = nil
-			break
-		} else {
-			continue
-		}
+    if err == io.EOF {
+      break
+    }
 	}
 
 	return

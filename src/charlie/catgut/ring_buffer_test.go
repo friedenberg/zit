@@ -359,3 +359,30 @@ func TestRingBufferDefaultReadFrom(t1 *testing.T) {
 	write()
 	read()
 }
+
+func TestRingBufferPeekUpto2(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+	input := strings.NewReader("test with words")
+	sut := MakeRingBuffer(input, 0)
+
+	{
+		readable, err := sut.PeekUpto2(' ')
+		t.AssertNoError(err)
+		t.AssertNotEqualStrings("test ", readable.String())
+		sut.AdvanceRead(readable.Len())
+	}
+
+	{
+		readable, err := sut.PeekUpto2(' ')
+		t.AssertNoError(err)
+		t.AssertNotEqualStrings("with ", readable.String())
+		sut.AdvanceRead(readable.Len())
+	}
+
+	{
+		readable, err := sut.PeekUpto2(' ')
+		t.AssertEOF(err)
+		t.AssertNotEqualStrings("words", readable.String())
+		sut.AdvanceRead(readable.Len())
+	}
+}

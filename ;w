@@ -26,54 +26,46 @@ func (ar *assignmentLineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 	ar.currentAssignment = ar.root
 
 	for {
-		var sl catgut.Slice
-		sl, err = r.PeekUpto2('\n')
-		n += int64(sl.Len())
-
-		if err == io.EOF && sl.Len() <= 1 {
-			err = nil
-			break
-		}
-
-		if err != nil && err != io.EOF {
-			err = errors.Wrap(err)
-			return
-		}
-
-		s := sl.String()
-
-		s = strings.TrimSpace(s)
-		slen := len(s)
-
-		if slen >= 1 {
-			var l line
-
-			if err = l.Set(s); err != nil {
-				err = ErrorRead{
-					error: err,
-					line:  ar.lineNo,
-				}
-			}
-
-			if err = ar.readOne(l); err != nil {
-				err = ErrorRead{
-					error: err,
-					line:  ar.lineNo,
-				}
-
-				return
-			}
-		}
-
-		r.AdvanceRead(sl.Len())
-		ar.lineNo++
+		var s *catgut.String
+		s, err = r.PeekUpto2('\n')
 
 		if err == io.EOF {
 			err = nil
 			break
-		} else {
+		}
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		n += int64(len(s))
+
+		s = strings.TrimSpace(s)
+		slen := len(s)
+
+		if slen < 1 {
 			continue
 		}
+
+		var l line
+
+		if err = l.Set(s); err != nil {
+			err = ErrorRead{
+				error: err,
+				line:  ar.lineNo,
+			}
+		}
+
+		if err = ar.readOne(l); err != nil {
+			err = ErrorRead{
+				error: err,
+				line:  ar.lineNo,
+			}
+			return
+		}
+
+		ar.lineNo++
 	}
 
 	return
