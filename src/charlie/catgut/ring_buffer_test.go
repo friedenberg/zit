@@ -5,7 +5,9 @@ import (
 	"io"
 	"strings"
 	"testing"
+	"unicode"
 
+	"github.com/friedenberg/zit/src/alfa/unicorn"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
 )
 
@@ -368,21 +370,53 @@ func TestRingBufferPeekUpto2(t1 *testing.T) {
 	{
 		readable, err := sut.PeekUpto2(' ')
 		t.AssertNoError(err)
-		t.AssertNotEqualStrings("test ", readable.String())
+		t.AssertEqualStrings("test ", readable.String())
 		sut.AdvanceRead(readable.Len())
 	}
 
 	{
 		readable, err := sut.PeekUpto2(' ')
 		t.AssertNoError(err)
-		t.AssertNotEqualStrings("with ", readable.String())
+		t.AssertEqualStrings("with ", readable.String())
 		sut.AdvanceRead(readable.Len())
 	}
 
 	{
 		readable, err := sut.PeekUpto2(' ')
 		t.AssertEOF(err)
-		t.AssertNotEqualStrings("words", readable.String())
+		t.AssertEqualStrings("words", readable.String())
 		sut.AdvanceRead(readable.Len())
 	}
+}
+
+func TestRingBufferAdvanceToFirstMatch(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+	input := strings.NewReader(" test with words")
+	sut := MakeRingBuffer(input, 0)
+
+	{
+		readable, err := sut.AdvanceToFirstMatch(unicorn.Not(unicode.IsSpace))
+		t.AssertErrorEquals(ErrBufferEmpty, err)
+		t.AssertEqualStrings("", string(readable))
+	}
+
+  sut.Fill()
+
+  {
+		readable, err := sut.AdvanceToFirstMatch(unicorn.Not(unicode.IsSpace))
+		t.AssertNoError(err)
+		t.AssertEqualStrings("test", string(readable))
+  }
+
+  {
+		readable, err := sut.AdvanceToFirstMatch(unicorn.Not(unicode.IsSpace))
+		t.AssertNoError(err)
+		t.AssertEqualStrings("with", string(readable))
+  }
+
+  {
+		readable, err := sut.AdvanceToFirstMatch(unicorn.Not(unicode.IsSpace))
+		t.AssertErrorEquals(ErrBufferEmpty, err)
+		t.AssertEqualStrings("words", string(readable))
+  }
 }

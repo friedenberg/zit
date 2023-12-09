@@ -290,7 +290,7 @@ func (rb *RingBuffer) AdvanceRead(n int) {
 
 func (rb *RingBuffer) AdvanceToFirstMatch(
 	mf func(rune) bool,
-) (match []byte, ok bool, err error) {
+) (match []byte, err error) {
 	readable := rb.PeekReadable()
 	var scanner *SliceRuneScanner
 	scanner, err = MakeSliceRuneScanner(readable)
@@ -301,6 +301,7 @@ func (rb *RingBuffer) AdvanceToFirstMatch(
 
 	offset := 0
 	startedMatch := false
+	startMatchOffset := -1
 
 LOOP:
 	for {
@@ -317,10 +318,14 @@ LOOP:
 
 		switch {
 		case currentMatch:
-			match = rb.data[rb.rIdx : rb.rIdx+offset]
+			if startMatchOffset < 0 {
+				startMatchOffset = offset - w
+			}
+
+			match = rb.data[rb.rIdx+startMatchOffset : rb.rIdx+offset]
 			startedMatch = true
 
-		case !currentMatch && !startedMatch:
+		case !currentMatch && startedMatch:
 			break LOOP
 		}
 	}

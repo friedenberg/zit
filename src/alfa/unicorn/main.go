@@ -2,7 +2,7 @@ package unicorn
 
 import "unicode/utf8"
 
-func Negate(f func(rune) bool) func(rune) bool {
+func Not(f func(rune) bool) func(rune) bool {
 	return func(r rune) bool {
 		return !f(r)
 	}

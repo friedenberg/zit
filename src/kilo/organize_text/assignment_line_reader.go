@@ -55,7 +55,7 @@ func (ar *assignmentLineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 				}
 			}
 
-			if err = ar.readOne(l); err != nil {
+			if err = ar.readOne(r, l); err != nil {
 				err = ErrorRead{
 					error: err,
 					line:  ar.lineNo,
@@ -79,7 +79,10 @@ func (ar *assignmentLineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 	return
 }
 
-func (ar *assignmentLineReader) readOne(l line) (err error) {
+func (ar *assignmentLineReader) readOne(
+	rb *catgut.RingBuffer,
+	l line,
+) (err error) {
 	switch l.PrefixRune() {
 	case '#':
 		return ar.readOneHeading(l)
