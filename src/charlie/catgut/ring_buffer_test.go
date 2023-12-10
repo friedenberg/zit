@@ -368,21 +368,21 @@ func TestRingBufferPeekUpto2(t1 *testing.T) {
 	sut := MakeRingBuffer(input, 0)
 
 	{
-		readable, err := sut.PeekUpto2(' ')
+		readable, err := sut.PeekUptoAndIncluding(' ')
 		t.AssertNoError(err)
 		t.AssertEqualStrings("test ", readable.String())
 		sut.AdvanceRead(readable.Len())
 	}
 
 	{
-		readable, err := sut.PeekUpto2(' ')
+		readable, err := sut.PeekUptoAndIncluding(' ')
 		t.AssertNoError(err)
 		t.AssertEqualStrings("with ", readable.String())
 		sut.AdvanceRead(readable.Len())
 	}
 
 	{
-		readable, err := sut.PeekUpto2(' ')
+		readable, err := sut.PeekUptoAndIncluding(' ')
 		t.AssertEOF(err)
 		t.AssertEqualStrings("words", readable.String())
 		sut.AdvanceRead(readable.Len())
@@ -392,7 +392,8 @@ func TestRingBufferPeekUpto2(t1 *testing.T) {
 func TestRingBufferAdvanceToFirstMatch(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 	input := strings.NewReader(" test with words")
-	sut := MakeRingBuffer(input, 0)
+	rb := MakeRingBuffer(input, 0)
+	sut := MakeRingBufferScanner(rb)
 
 	{
 		readable, err := sut.AdvanceToFirstMatch(unicorn.Not(unicode.IsSpace))
@@ -400,23 +401,32 @@ func TestRingBufferAdvanceToFirstMatch(t1 *testing.T) {
 		t.AssertEqualStrings("", string(readable))
 	}
 
-  sut.Fill()
+	rb.Fill()
 
-  {
+	{
 		readable, err := sut.AdvanceToFirstMatch(unicorn.Not(unicode.IsSpace))
 		t.AssertNoError(err)
 		t.AssertEqualStrings("test", string(readable))
-  }
+		t.AssertEqualStrings(" with words", rb.PeekReadable().String())
+	}
 
-  {
+	{
 		readable, err := sut.AdvanceToFirstMatch(unicorn.Not(unicode.IsSpace))
 		t.AssertNoError(err)
 		t.AssertEqualStrings("with", string(readable))
-  }
+		t.AssertEqualStrings(" words", rb.PeekReadable().String())
+	}
 
-  {
+	{
 		readable, err := sut.AdvanceToFirstMatch(unicorn.Not(unicode.IsSpace))
 		t.AssertErrorEquals(ErrBufferEmpty, err)
 		t.AssertEqualStrings("words", string(readable))
-  }
+		t.AssertEqualStrings("", rb.PeekReadable().String())
+	}
+
+	{
+		readable, err := sut.AdvanceToFirstMatch(unicorn.Not(unicode.IsSpace))
+		t.AssertErrorEquals(ErrBufferEmpty, err)
+		t.AssertEqualStrings("", string(readable))
+	}
 }

@@ -2,12 +2,13 @@ package organize_text
 
 import (
 	"io"
-	"strings"
+	"unicode"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/unicorn"
 	"github.com/friedenberg/zit/src/charlie/catgut"
-	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/kennung_fmt"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
@@ -21,18 +22,31 @@ type assignmentLineReader struct {
 
 func (ar *assignmentLineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 	r := catgut.MakeRingBuffer(r1, 0)
+	rbs := catgut.MakeRingBufferScanner(r)
 
 	ar.root = newAssignment(0)
 	ar.currentAssignment = ar.root
 
 	for {
-		var sl catgut.Slice
-		sl, err = r.PeekUpto2('\n')
-		n += int64(sl.Len())
+		var sl []byte
+		sl, err = rbs.AdvanceToFirstMatch(unicorn.Not(unicode.IsSpace))
+		n += int64(len(sl))
 
-		if err == io.EOF && sl.Len() <= 1 {
+		if err == io.EOF && len(sl) <= 1 {
 			err = nil
 			break
+		}
+
+		if err == catgut.ErrBufferEmpty {
+			var n1 int64
+			n1, err = r.Fill()
+
+			if n1 == 0 && err == io.EOF {
+				err = nil
+				break
+			} else {
+				continue
+			}
 		}
 
 		if err != nil && err != io.EOF {
@@ -40,32 +54,35 @@ func (ar *assignmentLineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 			return
 		}
 
-		s := sl.String()
-
-		s = strings.TrimSpace(s)
-		slen := len(s)
+		slen := len(sl)
 
 		if slen >= 1 {
-			var l line
+			pr := sl[0]
 
-			if err = l.Set(s); err != nil {
-				err = ErrorRead{
-					error: err,
-					line:  ar.lineNo,
+			switch pr {
+			case '#':
+				if err = ar.readOneHeading(r, sl); err != nil {
+					err = errors.Wrap(err)
+					return
 				}
-			}
 
-			if err = ar.readOne(r, l); err != nil {
+			case '-':
+				if err = ar.readOneObj(r); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+			default:
 				err = ErrorRead{
-					error: err,
-					line:  ar.lineNo,
+					error:  errors.Errorf("unsupported verb %q", pr),
+					line:   ar.lineNo,
+					column: 0,
 				}
 
 				return
 			}
 		}
 
-		r.AdvanceRead(sl.Len())
 		ar.lineNo++
 
 		if err == io.EOF {
@@ -79,61 +96,19 @@ func (ar *assignmentLineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 	return
 }
 
-func (ar *assignmentLineReader) readOne(
+func (ar *assignmentLineReader) readOneHeading(
 	rb *catgut.RingBuffer,
-	l line,
+	match []byte,
 ) (err error) {
-	switch l.PrefixRune() {
-	case '#':
-		return ar.readOneHeading(l)
-
-	case '-':
-		err = ar.readOneObj(l)
-		// logz.Print(len(ar.currentAssignment.named))
-		return err
-
-	default:
-		err = ErrorRead{
-			error:  errors.Errorf("unsupported verb %q, %q", l.PrefixRune(), l),
-			line:   ar.lineNo,
-			column: 0,
-		}
-
-		return
-	}
-}
-
-func (ar *assignmentLineReader) readOneHeading(l line) (err error) {
-	var depth int
-
-	// logz.Print("getting depth count")
-
-	if depth, err = l.Depth('#'); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	depth := unicorn.CountRune(match, '#')
 
 	currentEtiketten := kennung.MakeMutableEtikettSet()
 
-	flag := collections_ptr.MakeFlagCommasFromExisting(
-		collections_ptr.SetterPolicyAppend,
-		currentEtiketten,
-	)
+	reader := kennung_fmt.MakeEtikettenReader()
 
-	if l.value != "" {
-		if err = flag.Set(l.value); err != nil {
-			err = ErrorRead{
-				error:  err,
-				line:   ar.lineNo,
-				column: 2,
-			}
-
-			return
-		}
-
-		errors.Log().Print(flag.String())
-		errors.Log().Print(l.value)
-		errors.Log().Print(currentEtiketten.Len())
+	if _, err = reader.ReadStringFormat(rb, currentEtiketten); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	var newAssignment *assignment
@@ -279,15 +254,12 @@ func (ar *assignmentLineReader) readOneHeadingGreaterDepth(
 	return
 }
 
-func (ar *assignmentLineReader) readOneObj(l line) (err error) {
+func (ar *assignmentLineReader) readOneObj(r *catgut.RingBuffer) (err error) {
 	// logz.Print("reading one zettel", l)
 
 	var z obj
 
-	if _, err = ar.stringFormatReader.ReadStringFormat(
-		catgut.MakeRingBuffer(strings.NewReader(l.String()), 0),
-		&z.Sku,
-	); err != nil {
+	if _, err = ar.stringFormatReader.ReadStringFormat(r, &z.Sku); err != nil {
 		err = ErrorRead{
 			error:  err,
 			line:   ar.lineNo,

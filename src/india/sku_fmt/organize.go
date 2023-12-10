@@ -1,6 +1,8 @@
 package sku_fmt
 
 import (
+	"io"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -95,40 +97,41 @@ func (f *organize) ReadStringFormat(
 	rb *catgut.RingBuffer,
 	o *sku.Transacted,
 ) (n int64, err error) {
-	scanner := catgut.NewScanner(rb)
+	var sl catgut.Slice
+	sl, err = rb.PeekUptoAndIncluding('\n')
 
-	scanner.Split(zittish.SplitMatcher)
+	if err != nil {
+		return
+	}
 
+	rr := catgut.MakeSliceRuneScanner(sl)
 	tokens := make([]*catgut.String, 0)
 
 	beforeHyphen := false
 
-	for scanner.Scan() {
-		t := scanner.Text()
+	for {
+		token := catgut.GetPool().Get()
+		err = zittish.NextToken(rr, token)
 
-		if t.EqualsString(" ") && beforeHyphen {
+		if err == io.EOF {
+			err = nil
+			break
+		} else if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if token.EqualsString(" ") && beforeHyphen {
 			continue
 		}
 
-		tokens = append(tokens, catgut.Make(t))
-	}
-
-	if err = scanner.Err(); err != nil {
-		err = errors.Wrap(err)
-		return
+		tokens = append(tokens, token)
 	}
 
 	if len(tokens) < 1 {
 		err = errors.Errorf("no tokens")
 		return
 	}
-
-	if !tokens[0].EqualsString("-") {
-		err = errors.Errorf("expected %q at beginning but to got %q", "-", tokens[0])
-		return
-	}
-
-	tokens = tokens[1:]
 
 	if tokens, err = f.readStringFormatWithKennung(tokens, o); err != nil {
 		err = errors.Wrap(err)
@@ -140,10 +143,14 @@ func (f *organize) ReadStringFormat(
 
 	remaining.Append(tokens...)
 
-	if err = o.Metadatei.Bezeichnung.TodoSetManyCatgutStrings(remaining); err != nil {
+	if err = o.Metadatei.Bezeichnung.TodoSetManyCatgutStrings(
+		remaining,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	rb.AdvanceRead(sl.Len())
 
 	return
 }

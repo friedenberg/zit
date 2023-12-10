@@ -25,8 +25,7 @@ func TestSliceRuneScannerValid(t1 *testing.T) {
 			func(t2 *testing.T) {
 				t := test_logz.T{T: t2}
 
-				sut, err := MakeSliceRuneScanner(expected)
-				t.AssertNoError(err)
+				sut := MakeSliceRuneScanner(expected)
 
 				for _, rEx := range []rune(expected.String()) {
 					widthEx := utf8.RuneLen(rEx)
@@ -43,6 +42,9 @@ func TestSliceRuneScannerValid(t1 *testing.T) {
 					if width != widthEx {
 						t.Errorf("expected %d but got %d", widthEx, width)
 					}
+
+					t.AssertNoError(sut.UnreadRune())
+					sut.ReadRune()
 				}
 
 				_, _, ok := sut.Scan()
@@ -70,8 +72,7 @@ func TestSliceRuneScannerInvalid(t1 *testing.T) {
 			func(t2 *testing.T) {
 				t := test_logz.T{T: t2}
 
-				sut, err := MakeSliceRuneScanner(expected)
-				t.AssertNoError(err)
+				sut := MakeSliceRuneScanner(expected)
 
 				_, _, ok := sut.Scan()
 

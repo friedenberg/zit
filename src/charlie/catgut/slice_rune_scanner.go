@@ -1,30 +1,29 @@
 package catgut
 
 import (
+	"io"
 	"unicode/utf8"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
-type SliceRuneScanner struct {
-	slice               Slice
-	locFirst, locSecond int
-	overlap             [6]byte // three bytes from first, three bytes from second
-	err                 error
-}
-
-var errSliceTooSmall = errors.New("slice too small")
-
-func MakeSliceRuneScanner(slice Slice) (s *SliceRuneScanner, err error) {
-	if slice.Len() < 8 && len(slice.Second()) < 4 && len(slice.Second()) > 0 {
-		err = errors.Wrap(errSliceTooSmall)
-		return
-	}
-
+func MakeSliceRuneScanner(slice Slice) (s *SliceRuneScanner) {
 	s = &SliceRuneScanner{}
 	s.ResetWith(slice)
 
 	return
+}
+
+type SliceRuneScanner struct {
+	slice                       Slice
+	locFirst, locSecond         int
+	overlap                     [6]byte // three bytes from first, three bytes from second
+	err                         error
+	lastLocFirst, lastLocSecond int
+}
+
+func (s *SliceRuneScanner) Offset() int {
+	return s.locFirst + s.locSecond
 }
 
 func (s *SliceRuneScanner) Reset() {
@@ -32,6 +31,8 @@ func (s *SliceRuneScanner) Reset() {
 	s.overlap = [6]byte{}
 	s.locFirst = 0
 	s.locSecond = 0
+	s.lastLocFirst = 0
+	s.lastLocSecond = 0
 	s.err = nil
 }
 
@@ -40,7 +41,26 @@ func (s *SliceRuneScanner) ResetWith(slice Slice) {
 	s.overlap = slice.Overlap()
 	s.locFirst = 0
 	s.locSecond = 0
+	s.lastLocFirst = 0
+	s.lastLocSecond = 0
 	s.err = nil
+}
+
+func (s *SliceRuneScanner) UnreadRune() (err error) {
+	if s.locFirst <= 0 {
+		err = errors.New("at beginning of slice")
+		return
+	}
+
+	if s.lastLocFirst == s.locFirst && s.lastLocSecond == s.locSecond {
+		err = errors.New("nothing to unread")
+		return
+	}
+
+	s.locFirst = s.lastLocFirst
+	s.locSecond = s.lastLocSecond
+
+	return
 }
 
 var errInvalidRune = errors.New("invalid rune")
@@ -81,21 +101,31 @@ func (s *SliceRuneScanner) Scan() (r rune, width int, ok bool) {
 
 	case firstRemaining >= 4:
 		r, width = utf8.DecodeRune(s.slice.First()[s.locFirst:])
+		s.lastLocFirst = s.locFirst
 		s.locFirst += width
 		idxChanged = true
 
 	case firstRemaining > 0 && len(s.slice.Second()) > 0:
 		r, width = utf8.DecodeRune(s.overlap[firstRemaining-3:])
+		s.lastLocFirst = s.locFirst
 		s.locFirst += width
+		diff := width - firstRemaining
+
+		if diff > 0 {
+			s.lastLocSecond = s.locSecond
+			s.locSecond += diff
+		}
+
 		idxChanged = true
 
 	case len(s.slice.Second())-s.locSecond > 0:
 		r, width = utf8.DecodeRune(s.slice.Second()[s.locSecond:])
+		s.lastLocSecond = s.locSecond
 		s.locSecond += width
 		idxChanged = true
 
 	default:
-		s.err = ErrBufferEmpty
+		s.err = io.EOF
 		return
 	}
 

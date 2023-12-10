@@ -153,6 +153,14 @@ func (rs Slice) Start() int64 {
 	return rs.start
 }
 
+func (rs Slice) LenFirst() int {
+	return len(rs.data[0])
+}
+
+func (rs Slice) LenSecond() int {
+	return len(rs.data[1])
+}
+
 func (rs Slice) First() []byte {
 	return rs.data[0]
 }

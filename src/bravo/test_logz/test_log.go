@@ -68,6 +68,8 @@ func (t T) NotEqual(a, b any) {
 }
 
 func (t T) AssertEqualStrings(a, b string) {
+  t.Helper()
+
 	if a == b {
 		return
 	}
@@ -77,7 +79,7 @@ func (t T) AssertEqualStrings(a, b string) {
 }
 
 func (t T) AssertNoError(err error) {
-	t.T.Helper()
+	t.Helper()
 
 	if err != nil {
 		t.fatalf(1, "expected no error but got %q", err)
@@ -85,10 +87,10 @@ func (t T) AssertNoError(err error) {
 }
 
 func (t T) AssertEOF(err error) {
-	t.T.Helper()
+	t.Helper()
 
 	if !errors.IsEOF(err) {
-		t.fatalf(1, "expected EOF but got none")
+		t.fatalf(1, "expected EOF but got %q", err)
 	}
 }
 

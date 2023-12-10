@@ -7,9 +7,11 @@ import (
 	"unicode/utf8"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/catgut"
 )
 
 var mapMatcherOperators = map[rune]bool{
+	'\n': true,
 	' ': true,
 	',': true,
 	'{': true,
@@ -25,6 +27,43 @@ var mapMatcherOperators = map[rune]bool{
 func IsMatcherOperator(r rune) (ok bool) {
 	_, ok = mapMatcherOperators[r]
 	return
+}
+
+func NextToken(
+	rr io.RuneScanner,
+	token *catgut.String,
+) (err error) {
+	afterFirst := false
+
+	for {
+		var r rune
+		r, _, err = rr.ReadRune()
+
+		if err != nil {
+			if token.Len() > 0 && err == io.EOF {
+				err = nil
+			}
+
+			return
+		}
+
+		wasSplitRune := IsMatcherOperator(r)
+
+		switch {
+		case wasSplitRune && !afterFirst:
+			token.WriteRune(r)
+			return
+
+		case !wasSplitRune:
+			token.WriteRune(r)
+			afterFirst = true
+			continue
+
+		default:
+			err = rr.UnreadRune()
+			return
+		}
+	}
 }
 
 func SplitMatcher(

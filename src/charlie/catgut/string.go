@@ -229,6 +229,13 @@ func (str *String) WriteLower(s []byte) (n int) {
 	return str.Map(unicode.ToLower, s)
 }
 
+func (dst *String) WriteRune(r rune) (int, error) {
+	dst.Grow(utf8.RuneLen(r))
+	b := dst.Data.AvailableBuffer()
+	b = utf8.AppendRune(b, r)
+	return dst.Data.Write(b)
+}
+
 func (dst *String) SetBytes(src []byte) (err error) {
 	dst.copyCheck()
 	dst.Reset()

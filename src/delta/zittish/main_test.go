@@ -1,6 +1,7 @@
 package zittish
 
 import (
+	"io"
 	"reflect"
 	"strings"
 	"testing"
@@ -9,15 +10,13 @@ import (
 	"github.com/friedenberg/zit/src/charlie/catgut"
 )
 
-func TestZittish(t1 *testing.T) {
-	t := test_logz.T{T: t1}
+type testCase struct {
+	input    string
+	expected []string
+}
 
-	type testCase struct {
-		input    string
-		expected []string
-	}
-
-	testCases := []testCase{
+func getTestCases() []testCase {
+	return []testCase{
 		{
 			input: "testing:e,t,k",
 			expected: []string{
@@ -93,8 +92,12 @@ func TestZittish(t1 *testing.T) {
 			},
 		},
 	}
+}
 
-	for _, tc := range testCases {
+func TestZittish(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
+	for _, tc := range getTestCases() {
 		scanner := catgut.NewScanner(
 			catgut.MakeRingBuffer(strings.NewReader(tc.input), 0),
 		)
@@ -118,9 +121,40 @@ func TestZittish(t1 *testing.T) {
 			expected[i] = catgut.MakeFromString(v)
 		}
 
-		t.Logf("%q", expected)
+		// t.Logf("%q", expected)
 
 		if !reflect.DeepEqual(expected, actual) {
+			t.NotEqual(tc.expected, actual)
+		}
+	}
+}
+
+func TestZittishRuneReader(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
+	for _, tc := range getTestCases() {
+		rr := strings.NewReader(tc.input)
+
+		actual := make([]string, 0)
+
+		for {
+			var token catgut.String
+			err := NextToken(rr, &token)
+			str := token.String()
+
+			if err == nil && str == "" {
+				t.Fatalf("expected non empty string")
+			}
+
+			if err == io.EOF {
+				break
+			} else {
+				actual = append(actual, str)
+				t.AssertNoError(err)
+			}
+		}
+
+		if !reflect.DeepEqual(tc.expected, actual) {
 			t.NotEqual(tc.expected, actual)
 		}
 	}

@@ -1,6 +1,8 @@
 package kennung_fmt
 
 import (
+	"io"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
@@ -24,12 +26,24 @@ func (f *etikettenReader) ReadStringFormat(
 		k,
 	)
 
-	readable, err := rb.PeekUpto('\n')
+	var readable catgut.Slice
+
+	if readable, err = rb.PeekUptoAndIncluding('\n'); err != nil && err != io.EOF {
+		errors.Wrap(err)
+		return
+	}
+
+	if readable.Len() == 1 {
+		return
+	}
 
 	if err = flag.Set(readable.String()); err != nil {
 		errors.Wrap(err)
 		return
 	}
+
+	n = int64(readable.Len())
+	rb.AdvanceRead(readable.Len())
 
 	return
 }
