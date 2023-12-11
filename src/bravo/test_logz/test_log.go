@@ -67,6 +67,11 @@ func (t T) NotEqual(a, b any) {
 	t.errorf(1, format, a, b)
 }
 
+func (t T) AssertEqual(a, b any) {
+	format := "\nexpected: %q\n  actual: %q"
+	t.errorf(1, format, a, b)
+}
+
 func (t T) AssertEqualStrings(a, b string) {
   t.Helper()
 

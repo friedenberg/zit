@@ -16,10 +16,12 @@ func MakeSliceRuneScanner(slice Slice) (s *SliceRuneScanner) {
 
 type SliceRuneScanner struct {
 	slice                       Slice
-	locFirst, locSecond         int
 	overlap                     [6]byte // three bytes from first, three bytes from second
-	err                         error
+	overlapFirst, overlapSecond int
+
+	locFirst, locSecond         int
 	lastLocFirst, lastLocSecond int
+	err                         error
 }
 
 func (s *SliceRuneScanner) Offset() int {
@@ -29,6 +31,8 @@ func (s *SliceRuneScanner) Offset() int {
 func (s *SliceRuneScanner) Reset() {
 	s.slice = Slice{}
 	s.overlap = [6]byte{}
+	s.overlapFirst = 0
+	s.overlapSecond = 0
 	s.locFirst = 0
 	s.locSecond = 0
 	s.lastLocFirst = 0
@@ -38,7 +42,7 @@ func (s *SliceRuneScanner) Reset() {
 
 func (s *SliceRuneScanner) ResetWith(slice Slice) {
 	s.slice = slice
-	s.overlap = slice.Overlap()
+	s.overlap, s.overlapFirst, s.overlapSecond = slice.Overlap()
 	s.locFirst = 0
 	s.locSecond = 0
 	s.lastLocFirst = 0
@@ -94,33 +98,28 @@ func (s *SliceRuneScanner) Scan() (r rune, width int, ok bool) {
 	firstRemaining := len(s.slice.First()) - s.locFirst
 
 	idxChanged := false
+	lastLocFirst := s.locFirst
+	lastLocSecond := s.locSecond
 
 	switch {
-	case firstRemaining > 0 && len(s.slice.Second()) == 0:
-		fallthrough
+	case firstRemaining > 0:
+		if firstRemaining <= s.overlapFirst {
+			r, width = utf8.DecodeRune(s.overlap[s.overlapFirst-firstRemaining:])
+			s.locFirst += width
+			diff := width - firstRemaining
 
-	case firstRemaining >= 4:
-		r, width = utf8.DecodeRune(s.slice.First()[s.locFirst:])
-		s.lastLocFirst = s.locFirst
-		s.locFirst += width
-		idxChanged = true
-
-	case firstRemaining > 0 && len(s.slice.Second()) > 0:
-		r, width = utf8.DecodeRune(s.overlap[firstRemaining-3:])
-		s.lastLocFirst = s.locFirst
-		s.locFirst += width
-		diff := width - firstRemaining
-
-		if diff > 0 {
-			s.lastLocSecond = s.locSecond
-			s.locSecond += diff
+			if diff > 0 {
+				s.locSecond += diff
+			}
+		} else {
+			r, width = utf8.DecodeRune(s.slice.First()[s.locFirst:])
+			s.locFirst += width
 		}
 
 		idxChanged = true
 
 	case len(s.slice.Second())-s.locSecond > 0:
 		r, width = utf8.DecodeRune(s.slice.Second()[s.locSecond:])
-		s.lastLocSecond = s.locSecond
 		s.locSecond += width
 		idxChanged = true
 
@@ -133,6 +132,11 @@ func (s *SliceRuneScanner) Scan() (r rune, width int, ok bool) {
 		s.err = errInvalidRune
 		return
 	}
+
+  if idxChanged {
+    s.lastLocFirst = lastLocFirst
+    s.lastLocSecond = lastLocSecond
+  }
 
 	ok = idxChanged
 

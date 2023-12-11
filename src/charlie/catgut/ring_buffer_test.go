@@ -430,3 +430,36 @@ func TestRingBufferAdvanceToFirstMatch(t1 *testing.T) {
 		t.AssertEqualStrings("", string(readable))
 	}
 }
+
+func TestRingBufferAdvanceToFirstMatchLong(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+	var sb strings.Builder
+
+	for i := 0; i < 5000; i += 2 {
+		sb.WriteString(" x")
+	}
+
+	input := strings.NewReader(sb.String())
+	rb := MakeRingBuffer(input, 0)
+	sut := MakeRingBufferScanner(rb)
+
+	rb.Fill()
+
+	for i := 0; i < 5000; i += 2 {
+		readable, err := sut.AdvanceToFirstMatch(unicorn.Not(unicode.IsSpace))
+
+		if err == ErrBufferEmpty {
+			rb.Fill()
+			continue
+		}
+
+		t.AssertNoError(err)
+		t.AssertEqualStrings("x", string(readable))
+	}
+
+	{
+		readable, err := sut.AdvanceToFirstMatch(unicorn.Not(unicode.IsSpace))
+		t.AssertErrorEquals(ErrBufferEmpty, err)
+		t.AssertEqualStrings("", string(readable))
+	}
+}

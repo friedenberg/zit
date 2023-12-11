@@ -2,6 +2,8 @@ package catgut
 
 import (
 	"io"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
 type RingBufferScanner struct {
@@ -15,6 +17,8 @@ func MakeRingBufferScanner(rb *RingBuffer) *RingBufferScanner {
 	}
 }
 
+var ErrNoMatch = errors.New("no match")
+
 func (s *RingBufferScanner) AdvanceToFirstMatch(
 	mf func(rune) bool,
 ) (match []byte, err error) {
@@ -25,50 +29,50 @@ func (s *RingBufferScanner) AdvanceToFirstMatch(
 		return
 	}
 
-	offset := 0
-	startedMatch := false
-	endedMatch := false
 	startMatchOffset := -1
+
+	var n int
+	var r rune
+	var w int
+	var ok bool
 
 LOOP:
 	for {
-		r, w, okScan := s.sliceScanner.Scan()
+		r, w, ok = s.sliceScanner.Scan()
 
-		if !okScan {
+		if !ok {
 			if err = s.sliceScanner.Error(); err != nil {
 				if err == io.EOF {
 					err = ErrBufferEmpty
 				}
 			}
+
+			break
 		}
 
-		offset += w
 		currentMatch := mf(r)
 
 		switch {
 		case currentMatch:
 			if startMatchOffset < 0 {
-				startMatchOffset = offset - w
+				startMatchOffset = n
 			}
 
-			match = s.rb.data[s.rb.rIdx+startMatchOffset : s.rb.rIdx+offset]
-			startedMatch = true
-
-		case !currentMatch && startedMatch:
-			endedMatch = true
+		case !currentMatch && startMatchOffset >= 0:
 			break LOOP
 		}
 
-		if !okScan {
-			break
-		}
+		n += w
 	}
 
-	if endedMatch {
-		offset--
+	if startMatchOffset == -1 {
+		s.rb.AdvanceRead(n)
+		err = ErrNoMatch
+		return
 	}
 
-	s.rb.AdvanceRead(offset)
+	match = s.rb.PeekReadable().Slice(startMatchOffset, n).Bytes()
+	s.rb.AdvanceRead(n)
 
 	return
 }

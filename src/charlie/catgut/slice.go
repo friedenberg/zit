@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"io"
 	"strings"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
 type Slice struct {
@@ -12,7 +14,7 @@ type Slice struct {
 }
 
 func (a Slice) Slice(left, right int) (b Slice) {
-	lastIdx := a.Len() - 1
+	lastIdx := a.Len()
 
 	if left < 0 || right < 0 || right < left || left > lastIdx || right > lastIdx {
 		panic(errInvalidSliceRange{left, right})
@@ -23,10 +25,10 @@ func (a Slice) Slice(left, right int) (b Slice) {
 	lenFirst := len(a.First())
 
 	switch {
-	case right < lenFirst-1:
+	case right < lenFirst:
 		b.data[0] = a.data[0][left:right]
 
-	case left > lenFirst-1:
+	case left > lenFirst:
 		b.data[0] = a.data[1][left-lenFirst : right-lenFirst]
 
 	default:
@@ -37,13 +39,21 @@ func (a Slice) Slice(left, right int) (b Slice) {
 	return
 }
 
-func (rs Slice) Overlap() (o [6]byte) {
-	if len(rs.Second()) == 0 {
-		return
+func (rs Slice) Overlap() (o [6]byte, first, second int) {
+	firstEnd := rs.First()
+
+	if len(firstEnd) > 3 {
+		firstEnd = firstEnd[len(firstEnd)-3:]
 	}
 
-	copy(o[:3], rs.First()[len(rs.First())-2:])
-	copy(o[3:], rs.Second()[3:])
+	secondEnd := rs.Second()
+
+	if len(secondEnd) > 3 {
+		secondEnd = secondEnd[:3]
+	}
+
+	first = copy(o[:3], firstEnd)
+	second = copy(o[first:], secondEnd)
 
 	return
 }
@@ -82,6 +92,26 @@ func (rs Slice) WriteTo(w io.Writer) (n int64, err error) {
 	n += int64(n1)
 
 	return
+}
+
+func (rs Slice) BytesBetween(left, right int) []byte {
+	if left > right {
+		panic(errors.New("left greater than right"))
+	}
+
+	switch {
+	case right < len(rs.data[0]):
+		return rs.data[0][left:right]
+
+	case left >= len(rs.data[0]):
+		return rs.data[1][left-len(rs.data[0]) : right-len(rs.data[0])]
+
+	default:
+		b := make([]byte, right-left)
+		n := copy(b, rs.data[0][left:])
+		copy(b[n:], rs.data[1][:right-len(rs.data)])
+		return rs.data[1][left-len(rs.data[0]) : right-len(rs.data[0])]
+	}
 }
 
 func (rs Slice) Bytes() []byte {

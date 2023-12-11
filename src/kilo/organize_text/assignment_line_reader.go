@@ -37,7 +37,7 @@ func (ar *assignmentLineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 			break
 		}
 
-		if err == catgut.ErrBufferEmpty {
+		if err == catgut.ErrBufferEmpty || err == catgut.ErrNoMatch {
 			var n1 int64
 			n1, err = r.Fill()
 

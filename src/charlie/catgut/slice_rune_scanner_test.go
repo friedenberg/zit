@@ -15,6 +15,24 @@ func testSliceRuneScannerDataValid() []Slice {
 		{
 			data: [2][]byte{[]byte("\u2318")},
 		},
+		{
+			data: [2][]byte{
+				[]byte("xxx\xe2\x8c"),
+				[]byte("\x98"),
+			},
+		},
+		{
+			data: [2][]byte{
+				[]byte("123456"),
+				[]byte("abcdef"),
+			},
+		},
+		{
+			data: [2][]byte{
+				[]byte("123"),
+				[]byte("456"),
+			},
+		},
 	}
 }
 
@@ -27,7 +45,7 @@ func TestSliceRuneScannerValid(t1 *testing.T) {
 
 				sut := MakeSliceRuneScanner(expected)
 
-				for _, rEx := range []rune(expected.String()) {
+				for _, rEx := range expected.String() {
 					widthEx := utf8.RuneLen(rEx)
 					r, width, ok := sut.Scan()
 
