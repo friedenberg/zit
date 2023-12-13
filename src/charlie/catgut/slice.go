@@ -8,9 +8,34 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
+type SliceBytes struct {
+	Slice
+	Bytes []byte
+}
+
 type Slice struct {
 	start int64
 	data  [2][]byte
+}
+
+func (a Slice) SliceBytes() SliceBytes {
+	return SliceBytes{
+		Slice: a,
+		Bytes: a.Bytes(),
+	}
+}
+
+func (a Slice) FirstByte() byte {
+	switch {
+	case a.LenFirst() > 0:
+		return a.First()[0]
+
+	case a.LenSecond() > 0:
+		return a.Second()[0]
+
+	default:
+		panic("FirstByte called on empty slice")
+	}
 }
 
 func (a Slice) Slice(left, right int) (b Slice) {

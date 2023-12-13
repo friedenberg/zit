@@ -12,16 +12,16 @@ import (
 
 var mapMatcherOperators = map[rune]bool{
 	'\n': true,
-	' ': true,
-	',': true,
-	'{': true,
-	'}': true,
-	'[': true,
-	']': true,
-	':': true,
-	'+': true,
-	'.': true,
-	'?': true,
+	' ':  true,
+	',':  true,
+	'{':  true,
+	'}':  true,
+	'[':  true,
+	']':  true,
+	':':  true,
+	'+':  true,
+	'.':  true,
+	'?':  true,
 }
 
 func IsMatcherOperator(r rune) (ok bool) {
@@ -60,7 +60,10 @@ func NextToken(
 			continue
 
 		default:
-			err = rr.UnreadRune()
+			if err = rr.UnreadRune(); err != nil {
+				err = errors.Wrapf(err, "%c", r)
+			}
+
 			return
 		}
 	}

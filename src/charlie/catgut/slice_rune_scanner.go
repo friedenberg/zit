@@ -28,6 +28,10 @@ func (s *SliceRuneScanner) Offset() int {
 	return s.locFirst + s.locSecond
 }
 
+func (s *SliceRuneScanner) Remaining() int {
+	return s.slice.Len() - (s.locFirst + s.locSecond)
+}
+
 func (s *SliceRuneScanner) Reset() {
 	s.slice = Slice{}
 	s.overlap = [6]byte{}
@@ -40,9 +44,13 @@ func (s *SliceRuneScanner) Reset() {
 	s.err = nil
 }
 
-func (s *SliceRuneScanner) ResetWith(slice Slice) {
+func (s *SliceRuneScanner) ResetSliceOnly(slice Slice) {
 	s.slice = slice
 	s.overlap, s.overlapFirst, s.overlapSecond = slice.Overlap()
+}
+
+func (s *SliceRuneScanner) ResetWith(slice Slice) {
+	s.ResetSliceOnly(slice)
 	s.locFirst = 0
 	s.locSecond = 0
 	s.lastLocFirst = 0
@@ -51,13 +59,13 @@ func (s *SliceRuneScanner) ResetWith(slice Slice) {
 }
 
 func (s *SliceRuneScanner) UnreadRune() (err error) {
-	if s.locFirst <= 0 {
-		err = errors.New("at beginning of slice")
+	if s.locFirst <= 0 && s.locSecond <= 0 {
+		err = errors.Errorf("nothing to unread")
 		return
 	}
 
 	if s.lastLocFirst == s.locFirst && s.lastLocSecond == s.locSecond {
-		err = errors.New("nothing to unread")
+		err = errors.New("already unread")
 		return
 	}
 
@@ -133,10 +141,10 @@ func (s *SliceRuneScanner) Scan() (r rune, width int, ok bool) {
 		return
 	}
 
-  if idxChanged {
-    s.lastLocFirst = lastLocFirst
-    s.lastLocSecond = lastLocSecond
-  }
+	if idxChanged {
+		s.lastLocFirst = lastLocFirst
+		s.lastLocSecond = lastLocSecond
+	}
 
 	ok = idxChanged
 

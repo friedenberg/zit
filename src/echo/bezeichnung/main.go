@@ -36,6 +36,10 @@ func (b *Bezeichnung) TodoSetManyCatgutStrings(
 	return b.Set(s.String())
 }
 
+func (b *Bezeichnung) TodoSetSlice( v catgut.Slice,) (err error) {
+	return b.Set(v.String())
+}
+
 func (b *Bezeichnung) Set(v string) (err error) {
 	b.wasSet = true
 

@@ -207,51 +207,25 @@ func (f *organizeNew) ReadStringFormat(
 	rb *catgut.RingBuffer,
 	o *sku.Transacted,
 ) (n int64, err error) {
+	if err = f.readStringFormatWithinBrackets(rb, o); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	var sl catgut.Slice
+
 	sl, err = rb.PeekUptoAndIncluding('\n')
 
 	if err != nil {
 		return
 	}
 
-	rr := catgut.MakeSliceRuneScanner(sl)
-	tokens := make([]*catgut.String, 0)
-
-	beforeHyphen := false
-
-	for {
-		token := catgut.GetPool().Get()
-		err = zittish.NextToken(rr, token)
-
-		if err == io.EOF {
-			err = nil
-			break
-		} else if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if token.EqualsString(" ") && beforeHyphen {
-			continue
-		}
-
-		tokens = append(tokens, token)
-	}
-
-	if len(tokens) < 1 {
-		err = errors.Errorf("no tokens")
-		return
-	}
-
-	if tokens, err = f.readStringFormatWithinBrackets(tokens, o); err != nil {
+	if err = o.Metadatei.Bezeichnung.TodoSetSlice(sl); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = o.Metadatei.Bezeichnung.TodoSetManyCatgutStrings(
-		tokens...,
-	); err != nil {
-		err = errors.Wrap(err)
+	if err != nil {
 		return
 	}
 
@@ -261,19 +235,33 @@ func (f *organizeNew) ReadStringFormat(
 }
 
 func (f *organizeNew) readStringFormatWithinBrackets(
-	tokens []*catgut.String,
+	rb *catgut.RingBuffer,
 	o *sku.Transacted,
-) (remainingTokens []*catgut.String, err error) {
-	remainingTokens = tokens
+) (err error) {
+	rr := catgut.MakeRingBufferRuneScanner(rb)
 
 	state := 0
 	var k kennung.Kennung2
-	var i int
-	var t *catgut.String
+	var t catgut.String
+	var eof bool
+	var n int
 
 LOOP:
-	for i, t = range tokens {
-		if t.EqualsString(" ") {
+	for !eof {
+		t.Reset()
+		err = zittish.NextToken(rr, &t)
+
+		if err == io.EOF {
+			err = nil
+			eof = true
+		} else if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		n += t.Len()
+
+		if t.EqualsString(" ") || t.EqualsString("\n") {
 			continue
 		}
 
@@ -286,7 +274,7 @@ LOOP:
 			state++
 
 		case 1:
-			if err = o.Kennung.TodoSetBytes(t); err != nil {
+			if err = o.Kennung.TodoSetBytes(&t); err != nil {
 				o.Kennung.Reset()
 				return
 			}
@@ -297,8 +285,8 @@ LOOP:
 			if t.EqualsString("]") {
 				break LOOP
 			} else {
-				if err = k.TodoSetBytes(t); err != nil {
-					err = errors.Wrap(err)
+				if err = k.TodoSetBytes(&t); err != nil {
+					err = errors.Wrapf(err, "Readable: %q", rb.PeekReadable())
 					return
 				}
 
@@ -338,14 +326,6 @@ LOOP:
 		}
 	}
 
-	catgut.GetPool().PutMany(tokens[:i+1]...)
-
-	if len(remainingTokens) > i {
-		remainingTokens = tokens[i+1:]
-	} else {
-		remainingTokens = nil
-	}
-
 	if f.options.Abbreviations.Hinweisen {
 		if err = f.ex.AbbreviateHinweisOnly(
 			&o.Kennung,
@@ -354,6 +334,8 @@ LOOP:
 			return
 		}
 	}
+
+	rb.AdvanceRead(n)
 
 	return
 }

@@ -396,38 +396,42 @@ func TestRingBufferAdvanceToFirstMatch(t1 *testing.T) {
 	sut := MakeRingBufferScanner(rb)
 
 	{
-		readable, err := sut.AdvanceToFirstMatch(unicorn.Not(unicode.IsSpace))
+		readable, _, err := sut.FirstMatch(unicorn.Not(unicode.IsSpace))
 		t.AssertErrorEquals(ErrBufferEmpty, err)
-		t.AssertEqualStrings("", string(readable))
+		t.AssertEqualStrings("", readable.String())
 	}
 
 	rb.Fill()
 
 	{
-		readable, err := sut.AdvanceToFirstMatch(unicorn.Not(unicode.IsSpace))
+		match, offsetPlusMatch, err := sut.FirstMatch(unicorn.Not(unicode.IsSpace))
 		t.AssertNoError(err)
-		t.AssertEqualStrings("test", string(readable))
+		t.AssertEqualStrings("test", match.String())
+		rb.AdvanceRead(offsetPlusMatch)
 		t.AssertEqualStrings(" with words", rb.PeekReadable().String())
 	}
 
 	{
-		readable, err := sut.AdvanceToFirstMatch(unicorn.Not(unicode.IsSpace))
+		match, offsetPlusMatch, err := sut.FirstMatch(unicorn.Not(unicode.IsSpace))
 		t.AssertNoError(err)
-		t.AssertEqualStrings("with", string(readable))
+		t.AssertEqualStrings("with", match.String())
+		rb.AdvanceRead(offsetPlusMatch)
 		t.AssertEqualStrings(" words", rb.PeekReadable().String())
 	}
 
 	{
-		readable, err := sut.AdvanceToFirstMatch(unicorn.Not(unicode.IsSpace))
+		match, offsetPlusMatch, err := sut.FirstMatch(unicorn.Not(unicode.IsSpace))
 		t.AssertErrorEquals(ErrBufferEmpty, err)
-		t.AssertEqualStrings("words", string(readable))
+		t.AssertEqualStrings("words", match.String())
+		rb.AdvanceRead(offsetPlusMatch)
 		t.AssertEqualStrings("", rb.PeekReadable().String())
 	}
 
 	{
-		readable, err := sut.AdvanceToFirstMatch(unicorn.Not(unicode.IsSpace))
+		readable, offsetPlusMatch, err := sut.FirstMatch(unicorn.Not(unicode.IsSpace))
 		t.AssertErrorEquals(ErrBufferEmpty, err)
-		t.AssertEqualStrings("", string(readable))
+		rb.AdvanceRead(offsetPlusMatch)
+		t.AssertEqualStrings("", readable.String())
 	}
 }
 
@@ -446,7 +450,7 @@ func TestRingBufferAdvanceToFirstMatchLong(t1 *testing.T) {
 	rb.Fill()
 
 	for i := 0; i < 5000; i += 2 {
-		readable, err := sut.AdvanceToFirstMatch(unicorn.Not(unicode.IsSpace))
+		readable, offsetPlusMatch, err := sut.FirstMatch(unicorn.Not(unicode.IsSpace))
 
 		if err == ErrBufferEmpty {
 			rb.Fill()
@@ -454,12 +458,7 @@ func TestRingBufferAdvanceToFirstMatchLong(t1 *testing.T) {
 		}
 
 		t.AssertNoError(err)
-		t.AssertEqualStrings("x", string(readable))
-	}
-
-	{
-		readable, err := sut.AdvanceToFirstMatch(unicorn.Not(unicode.IsSpace))
-		t.AssertErrorEquals(ErrBufferEmpty, err)
-		t.AssertEqualStrings("", string(readable))
+		rb.AdvanceRead(offsetPlusMatch)
+		t.AssertEqualStrings("x", readable.String())
 	}
 }

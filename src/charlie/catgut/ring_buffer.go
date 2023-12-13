@@ -43,29 +43,6 @@ func (rb *RingBuffer) ReadLength() int64 {
 	return rb.readLength
 }
 
-func (rb *RingBuffer) Unread(toUnread int) (actuallyUnread int) {
-	if rb.wIdx < rb.rIdx {
-		maxToUnread := rb.rIdx - rb.wIdx
-		actuallyUnread = min(maxToUnread, toUnread)
-		rb.rIdx -= actuallyUnread
-	} else {
-		actuallyUnread = min(toUnread, rb.rIdx)
-		rb.rIdx -= actuallyUnread
-
-		if actuallyUnread < toUnread && rb.rIdx == 0 {
-			toUnread -= actuallyUnread
-			last := rb.Cap() - 1
-			toUnread = min(toUnread, last-rb.wIdx)
-			rb.rIdx = last - toUnread
-			actuallyUnread += toUnread
-		}
-	}
-
-	rb.readLength -= int64(actuallyUnread)
-
-	return
-}
-
 func (rb *RingBuffer) PeekWriteable() (rs Slice) {
 	if rb.Len() == len(rb.data) {
 		return
@@ -286,6 +263,29 @@ func (rb *RingBuffer) AdvanceRead(n int) {
 	}
 
 	rb.dataLength -= n
+}
+
+func (rb *RingBuffer) Unread(toUnread int) (actuallyUnread int) {
+	if rb.wIdx < rb.rIdx {
+		maxToUnread := rb.rIdx - rb.wIdx
+		actuallyUnread = min(maxToUnread, toUnread)
+		rb.rIdx -= actuallyUnread
+	} else {
+		actuallyUnread = min(toUnread, rb.rIdx)
+		rb.rIdx -= actuallyUnread
+
+		if actuallyUnread < toUnread && rb.rIdx == 0 {
+			toUnread -= actuallyUnread
+			last := rb.Cap() - 1
+			toUnread = min(toUnread, last-rb.wIdx)
+			rb.rIdx = last - toUnread
+			actuallyUnread += toUnread
+		}
+	}
+
+	rb.readLength -= int64(actuallyUnread)
+
+	return
 }
 
 func (rb *RingBuffer) PeekUptoAndIncluding(b byte) (readable Slice, err error) {

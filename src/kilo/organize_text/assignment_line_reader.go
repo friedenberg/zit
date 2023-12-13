@@ -27,24 +27,28 @@ func (ar *assignmentLineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 	ar.root = newAssignment(0)
 	ar.currentAssignment = ar.root
 
+LOOP:
 	for {
-		var sl []byte
-		sl, err = rbs.AdvanceToFirstMatch(unicorn.Not(unicode.IsSpace))
-		n += int64(len(sl))
+		var sl catgut.Slice
+		var offsetPlusMatch int
 
-		if err == io.EOF && len(sl) <= 1 {
+		sl, offsetPlusMatch, err = rbs.FirstMatch(unicorn.Not(unicode.IsSpace))
+
+		if err == io.EOF && sl.Len() == 0 {
 			err = nil
 			break
 		}
 
-		if err == catgut.ErrBufferEmpty || err == catgut.ErrNoMatch {
+		switch err {
+		case catgut.ErrBufferEmpty, catgut.ErrNoMatch:
 			var n1 int64
 			n1, err = r.Fill()
 
 			if n1 == 0 && err == io.EOF {
 				err = nil
-				break
+				break LOOP
 			} else {
+				err = nil
 				continue
 			}
 		}
@@ -54,14 +58,18 @@ func (ar *assignmentLineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 			return
 		}
 
-		slen := len(sl)
+		r.AdvanceRead(offsetPlusMatch)
+		n += int64(sl.Len())
+		sb := sl.SliceBytes()
+
+		slen := sl.Len()
 
 		if slen >= 1 {
-			pr := sl[0]
+			pr := sl.FirstByte()
 
 			switch pr {
 			case '#':
-				if err = ar.readOneHeading(r, sl); err != nil {
+				if err = ar.readOneHeading(r, sb); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -73,12 +81,7 @@ func (ar *assignmentLineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 				}
 
 			default:
-				err = ErrorRead{
-					error:  errors.Errorf("unsupported verb %q", pr),
-					line:   ar.lineNo,
-					column: 0,
-				}
-
+				err = errors.Errorf("unsupported verb. slice: %q", sl)
 				return
 			}
 		}
@@ -98,9 +101,9 @@ func (ar *assignmentLineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
 
 func (ar *assignmentLineReader) readOneHeading(
 	rb *catgut.RingBuffer,
-	match []byte,
+	match catgut.SliceBytes,
 ) (err error) {
-	depth := unicorn.CountRune(match, '#')
+	depth := unicorn.CountRune(match.Bytes, '#')
 
 	currentEtiketten := kennung.MakeMutableEtikettSet()
 

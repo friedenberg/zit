@@ -19,9 +19,9 @@ func MakeRingBufferScanner(rb *RingBuffer) *RingBufferScanner {
 
 var ErrNoMatch = errors.New("no match")
 
-func (s *RingBufferScanner) AdvanceToFirstMatch(
+func (s *RingBufferScanner) FirstMatch(
 	mf func(rune) bool,
-) (match []byte, err error) {
+) (match Slice, offsetPlusMatch int, err error) {
 	s.sliceScanner.ResetWith(s.rb.PeekReadable())
 
 	if s.rb.PeekReadable().Len() == 0 {
@@ -31,7 +31,6 @@ func (s *RingBufferScanner) AdvanceToFirstMatch(
 
 	startMatchOffset := -1
 
-	var n int
 	var r rune
 	var w int
 	var ok bool
@@ -55,24 +54,23 @@ LOOP:
 		switch {
 		case currentMatch:
 			if startMatchOffset < 0 {
-				startMatchOffset = n
+				startMatchOffset = offsetPlusMatch
 			}
 
 		case !currentMatch && startMatchOffset >= 0:
 			break LOOP
 		}
 
-		n += w
+		offsetPlusMatch += w
 	}
 
 	if startMatchOffset == -1 {
-		s.rb.AdvanceRead(n)
+		s.rb.AdvanceRead(offsetPlusMatch)
 		err = ErrNoMatch
 		return
 	}
 
-	match = s.rb.PeekReadable().Slice(startMatchOffset, n).Bytes()
-	s.rb.AdvanceRead(n)
+	match = s.rb.PeekReadable().Slice(startMatchOffset, offsetPlusMatch)
 
 	return
 }
