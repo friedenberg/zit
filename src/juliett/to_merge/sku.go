@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	to_merge "github.com/friedenberg/zit/src/india/sku_fmt"
+	"github.com/friedenberg/zit/src/india/sku_fmt"
 )
 
 type Sku struct {
@@ -119,7 +119,7 @@ func (tm *Sku) ReadConflictMarker(
 
 	br := bufio.NewReader(f)
 
-	s := to_merge.MakeFormatBestandsaufnahmeScanner(
+	s := sku_fmt.MakeFormatBestandsaufnahmeScanner(
 		br,
 		objekte_format.FormatForVersion(sv),
 		op,
@@ -174,7 +174,7 @@ func (tm Sku) WriteConflictMarker(
 	bw := bufio.NewWriter(f)
 	defer errors.DeferredFlusher(&err, bw)
 
-	p := to_merge.MakeFormatBestandsaufnahmePrinter(
+	p := sku_fmt.MakeFormatBestandsaufnahmePrinter(
 		bw,
 		objekte_format.FormatForVersion(sv),
 		op,

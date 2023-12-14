@@ -13,8 +13,7 @@ import (
 )
 
 type KennungAlignedFormat interface {
-	SetMaxKopf(m int)
-	SetMaxSchwanz(m int)
+	SetMaxKopfUndSchwanz(kop, schwanz int)
 }
 
 type organize struct {
@@ -33,12 +32,9 @@ func MakeOrganizeFormat(
 	}
 }
 
-func (f *organize) SetMaxKopf(m int) {
-	f.maxKopf = m
-}
-
-func (f *organize) SetMaxSchwanz(m int) {
-	f.maxSchwanz = m
+func (f *organize) SetMaxKopfUndSchwanz(k, s int) {
+	f.maxKopf = k
+	f.maxSchwanz = s
 }
 
 func (f *organize) WriteStringFormat(

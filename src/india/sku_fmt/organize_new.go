@@ -1,7 +1,9 @@
 package sku_fmt
 
 import (
+	"fmt"
 	"io"
+	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
@@ -28,6 +30,7 @@ type organizeNew struct {
 	ex kennung.Abbr
 
 	maxKopf, maxSchwanz int
+	padding             string
 }
 
 func MakeOrganizeNewFormat(
@@ -51,12 +54,10 @@ func MakeOrganizeNewFormat(
 	}
 }
 
-func (f *organizeNew) SetMaxKopf(m int) {
-	f.maxKopf = m
-}
-
-func (f *organizeNew) SetMaxSchwanz(m int) {
-	f.maxSchwanz = m
+func (f *organizeNew) SetMaxKopfUndSchwanz(k, s int) {
+	f.maxKopf = k
+	f.maxSchwanz = s
+	f.padding = strings.Repeat(" ", 5+k+s)
 }
 
 func (f *organizeNew) WriteStringFormat(
@@ -156,7 +157,12 @@ func (f *organizeNew) WriteStringFormat(
 		b := o.GetMetadatei().GetEtiketten()
 
 		for _, v := range iter.SortedValues[kennung.Etikett](b) {
-			n1, err = sw.WriteString(" ")
+			if f.options.ZittishNewlines {
+				n1, err = fmt.Fprintf(sw, "\n%s", f.padding)
+			} else {
+				n1, err = sw.WriteString(" ")
+			}
+
 			n += int64(n1)
 
 			if err != nil {
@@ -174,7 +180,12 @@ func (f *organizeNew) WriteStringFormat(
 		}
 	}
 
-	n1, err = sw.WriteString("]")
+	if f.options.ZittishNewlines {
+		n1, err = fmt.Fprintf(sw, "\n%s]", f.padding)
+	} else {
+		n1, err = sw.WriteString("]")
+	}
+
 	n += int64(n1)
 
 	if err != nil {

@@ -20,7 +20,7 @@ function mergetool_none { # @test
 	assert_output "nothing to merge"
 }
 
-function mergetool_conflict_one { # @test
+function mergetool_conflict_base {
 	run_zit checkout one/dos
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -69,16 +69,66 @@ function mergetool_conflict_one { # @test
 	assert_output - <<-EOM
 		       conflicted [one/dos.zettel]
 	EOM
+}
 
-	run_zit merge-tool -merge-tool "bash -c 'echo merged >\"\$MERGED\"'" .
+function mergetool_conflict_one_local { # @test
+	mergetool_conflict_base
+
+	run_zit merge-tool -merge-tool "/bin/bash -c 'cat \$LOCAL >\"\$MERGED\"'" .
 	assert_success
 	assert_output - <<-EOM
-		[one/dos@72d8264b97bee169d1844d054282694b68be7e91c8bd5d616540adf63ae7d4af]
+		[-get_this_shit_merged@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again" get_this_shit_merged new-etikett-for-all tag-3 tag-4]
+	EOM
+
+	run_zit show -format akte one/dos
+	assert_success
+	assert_output - <<-EOM
+		not another one
+	EOM
+
+	run_zit status .
+	assert_success
+	assert_output - <<-EOM
+		          changed [one/dos.zettel@9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again"]
 	EOM
 
 	run_zit last
 	assert_success
 	assert_output - <<-EOM
-		[one/dos@72d8264b97bee169d1844d054282694b68be7e91c8bd5d616540adf63ae7d4af]
+		[-get_this_shit_merged@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again" get_this_shit_merged new-etikett-for-all tag-3 tag-4]
+	EOM
+}
+
+function mergetool_conflict_one_remote { # @test
+	mergetool_conflict_base
+
+	run_zit merge-tool -merge-tool "/bin/bash -c 'cat \$REMOTE >\"\$MERGED\"'" .
+	assert_success
+	assert_output - <<-EOM
+		[!txt@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-get_this_shit_merged@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/dos@9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged new-etikett-for-all tag-3 tag-4]
+	EOM
+
+	run_zit show -format akte one/dos
+	assert_success
+	assert_output - <<-EOM
+		not another one, conflict time
+	EOM
+
+	run_zit status .
+	assert_success
+	assert_output - <<-EOM
+		          changed [one/dos.zettel@9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again"]
+	EOM
+
+	run_zit last
+	assert_success
+	assert_output - <<-EOM
+		[!txt@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[-get_this_shit_merged@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/dos@9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged new-etikett-for-all tag-3 tag-4]
 	EOM
 }

@@ -158,6 +158,7 @@ func (s *Store) RunMergeTool(
 	op := checkout_options.Options{
 		CheckoutMode:    checkout_mode.ModeObjekteAndAkte,
 		AllowConflicted: true,
+		Path:            checkout_options.PathTempLocal,
 	}
 
 	if !inlineAkte {

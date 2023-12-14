@@ -8,7 +8,7 @@ exec "source " . m
 
 syn match zitEtikett /\v[^#,]+/ contained contains=@NoSpell
 syn match zitEtikettPrefix /\v#+/ contained
-syn region zitEtikettRegion start=/\v^\s*#+ / end=/$/ oneline
+syn region zitEtikettRegion start=/\v^\s*#+ / end=/$/
       \ contains=zitEtikett,zitEtikettPrefix
 
 syn match zitZettelHinweis /\v\w+/ contained contains=@NoSpell
@@ -17,11 +17,11 @@ syn match zitZettelPrefix /\v^\s*- / contained
 " don't include the newline because this is within a region
 syn match zitZettelBezeichnung /\v.*/ contained contains=@NoSpell
 
-syn region zitZettelHinweisRegion start=/\v\[/ end=/]/ oneline contained
+syn region zitZettelHinweisRegion start=/\v\[/ end=/]/
       \ contains=zitZettelHinweis,zitZettelHinweisSeparator
       \ nextgroup=zitZettelBezeichnung
 
-syn region zitZettelRegion start=/\v^\s*- / end=/$/ oneline
+syn region zitZettelRegion start=/\v^\s*- / end=/$/
       \ contains=zitZettelHinweisRegion ",zitZettelBezeichnung
 
 highlight default link zitEtikett Title

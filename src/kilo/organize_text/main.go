@@ -64,8 +64,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 	sfw := ot.StringFormatReadWriter
 
 	if aligned, ok := sfw.(sku_fmt.KennungAlignedFormat); ok {
-		aligned.SetMaxKopf(kopf)
-		aligned.SetMaxSchwanz(schwanz)
+		aligned.SetMaxKopfUndSchwanz(kopf, schwanz)
 	}
 
 	aw := assignmentLineWriter{
