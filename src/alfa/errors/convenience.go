@@ -33,9 +33,6 @@ func Split(err error) (out []error) {
 	case *multi:
 		out = e.Errors()
 
-	case multi:
-		out = e.Errors()
-
 	default:
 		out = []error{err}
 	}

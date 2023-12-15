@@ -119,7 +119,7 @@ func (scanner *bestandsaufnahmeScanner) Scan() (ok bool) {
 	n2, scanner.err = metadatei.ReadBoundary(scanner.ringBuffer)
 	scanner.lastN += int64(n2)
 
-	if scanner.err != nil && !errors.IsEOF(scanner.err) {
+	if errors.IsNotNilAndNotEOF(scanner.err) {
 		scanner.err = errors.Wrap(errors.MakeMulti(scanner.err, oldErr))
 		return
 	} else if scanner.err == io.EOF {

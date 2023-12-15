@@ -1,6 +1,7 @@
 package kennung
 
 import (
+	"io"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -81,6 +82,36 @@ func (k2 *Kennung2) KopfUndSchwanz() (kopf, schwanz string) {
 
 func (k2 *Kennung2) LenKopfUndSchwanz() (int, int) {
 	return k2.left.Len(), k2.right.Len()
+}
+
+func (src *Kennung2) WriteTo(w io.Writer) (n int64, err error) {
+	var n1 int64
+
+  n1, err = src.left.WriteTo(w)
+  n += n1
+
+  if err != nil {
+    err = errors.Wrap(err)
+    return
+  }
+
+  n1, err = src.middle.WriteTo(w)
+  n += n1
+
+  if err != nil {
+    err = errors.Wrap(err)
+    return
+  }
+
+  n1, err = src.right.WriteTo(w)
+  n += n1
+
+  if err != nil {
+    err = errors.Wrap(err)
+    return
+  }
+
+	return
 }
 
 func (k2 *Kennung2) String() string {

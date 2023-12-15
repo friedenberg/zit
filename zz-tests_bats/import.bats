@@ -15,7 +15,6 @@ teardown() {
 }
 
 function import { # @test
-	skip
 	(
 		mkdir inner
 		pushd inner || exit 1
@@ -24,14 +23,18 @@ function import { # @test
 
 	run_zit show -format bestandsaufnahme-verzeichnisse +:z
 	assert_success
-	echo -n "$output" >besties
+	echo "$output" >besties
 
 	besties="$(realpath besties)"
 	akten="$(realpath .zit/Objekten2/Akten)"
 
 	pushd inner || exit 1
 
-	run_zit import -bestandsaufnahme "$besties" -akten "$akten" -compression-type none
+	run_zit import \
+		-bestandsaufnahme "$besties" \
+		-akten "$akten" \
+		-compression-type none
+
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
@@ -50,7 +53,6 @@ function import { # @test
 }
 
 function import_twice_no_dupes_one_zettel { # @test
-	skip
 	(
 		mkdir inner
 		pushd inner || exit 1
@@ -59,7 +61,7 @@ function import_twice_no_dupes_one_zettel { # @test
 
 	run_zit show -format bestandsaufnahme-verzeichnisse one/uno+
 	assert_success
-	echo -n "$output" >besties
+	echo "$output" >besties
 
 	besties="$(realpath besties)"
 	akten="$(realpath .zit/Objekten2/Akten)"
@@ -107,7 +109,6 @@ function import_conflict { # @test
 
 	pushd inner || exit 1
 
-	run_zit_init
 	run_zit new -edit=false - <<-EOM
 		---
 		# get out of here!

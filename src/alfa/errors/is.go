@@ -70,6 +70,14 @@ func IsTooManyOpenFiles(err error) bool {
 	return e.Error() == "too many open files"
 }
 
+func IsNotNilAndNotEOF(err error) bool {
+	if err == nil || err == io.EOF {
+		return false
+	}
+
+	return true
+}
+
 func IsEOF(err error) bool {
 	if err == nil {
 		return false

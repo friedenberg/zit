@@ -15,7 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	to_merge "github.com/friedenberg/zit/src/india/sku_fmt"
+	"github.com/friedenberg/zit/src/india/sku_fmt"
 )
 
 type FormatterValue struct {
@@ -48,6 +48,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"etiketten-all",
 		"etiketten-implicit",
 		"etiketten-expanded",
+		"typ",
 		"json",
 		"log",
 		"sku",
@@ -198,7 +199,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 
 	case "kennung":
 		return func(e *sku.Transacted) (err error) {
-			_, err = fmt.Fprintln(out, e.Kennung)
+			_, err = e.Kennung.WriteTo(out)
 			return
 		}
 
@@ -206,7 +207,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		return func(e *sku.Transacted) (err error) {
 			_, err = fmt.Fprintln(
 				out,
-				to_merge.StringMetadateiSansTai(e),
+				sku_fmt.StringMetadateiSansTai(e),
 			)
 			return
 		}
@@ -215,14 +216,14 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		return func(e *sku.Transacted) (err error) {
 			_, err = fmt.Fprintln(
 				out,
-				to_merge.StringMetadatei(e),
+				sku_fmt.StringMetadatei(e),
 			)
 			return
 		}
 
 	case "sku":
 		return func(e *sku.Transacted) (err error) {
-			_, err = fmt.Fprintln(out, to_merge.String(e))
+			_, err = fmt.Fprintln(out, sku_fmt.String(e))
 			return
 		}
 
@@ -329,7 +330,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "bestandsaufnahme-sans-tai":
-		be := to_merge.MakeFormatBestandsaufnahmePrinter(
+		be := sku_fmt.MakeFormatBestandsaufnahmePrinter(
 			out,
 			objekte_format.Default(),
 			objekte_format.Options{},
@@ -345,7 +346,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "bestandsaufnahme":
-		f := to_merge.MakeFormatBestandsaufnahmePrinter(
+		f := sku_fmt.MakeFormatBestandsaufnahmePrinter(
 			out,
 			objekte_format.Default(),
 			objekte_format.Options{IncludeTai: true},
@@ -361,7 +362,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "bestandsaufnahme-verzeichnisse":
-		f := to_merge.MakeFormatBestandsaufnahmePrinter(
+		f := sku_fmt.MakeFormatBestandsaufnahmePrinter(
 			out,
 			objekte_format.Default(),
 			objekte_format.Options{
@@ -382,6 +383,16 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	case "akte-sha":
 		return func(o *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(out, o.GetAkteSha()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+	case "typ":
+		return func(o *sku.Transacted) (err error) {
+			if _, err = fmt.Fprintln(out, o.GetTyp().String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

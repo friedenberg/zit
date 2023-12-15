@@ -10,6 +10,8 @@ type Multi interface {
 	error
 	Add(error)
 	Empty() bool
+	Reset()
+	GetMultiError() Multi
 }
 
 type multi struct {
@@ -44,23 +46,31 @@ func MakeMulti(errs ...error) (em *multi) {
 // 	}
 // }
 
-func (e multi) ChanOnErr() <-chan struct{} {
+func (e *multi) ChanOnErr() <-chan struct{} {
 	return e.chOnErr
 }
 
-func (e multi) Len() int {
+func (e *multi) GetMultiError() Multi {
+	return e
+}
+
+func (e *multi) Reset() {
+	e.slice = e.slice[:0]
+}
+
+func (e *multi) Len() int {
 	e.lock.Lock()
 	defer e.lock.Unlock()
 
 	return len(e.slice)
 }
 
-func (e multi) Empty() (ok bool) {
+func (e *multi) Empty() (ok bool) {
 	ok = e.Len() == 0
 	return
 }
 
-func (e *multi) merge(err multi) {
+func (e *multi) merge(err *multi) {
 	e.lock.Lock()
 
 	l := len(e.slice)
@@ -80,17 +90,12 @@ func (e *multi) Add(err error) {
 	}
 
 	if e == nil {
-		// panic("trying to add to nil multi error")
-		e = MakeMulti(err)
-		return
+		panic("trying to add to nil multi error")
 	}
 
 	switch e1 := Unwrap(err).(type) {
-	case multi:
-		e.merge(e1)
-
 	case *multi:
-		e.merge(*e1)
+		e.merge(e1)
 
 	default:
 		e.lock.Lock()
@@ -107,7 +112,7 @@ func (e *multi) Add(err error) {
 	}
 }
 
-func (e multi) Is(target error) (ok bool) {
+func (e *multi) Is(target error) (ok bool) {
 	for _, err := range e.Errors() {
 		if ok = Is(err, target); ok {
 			return
@@ -117,7 +122,7 @@ func (e multi) Is(target error) (ok bool) {
 	return
 }
 
-func (e multi) Errors() (out []error) {
+func (e *multi) Errors() (out []error) {
 	e.lock.Lock()
 	defer e.lock.Unlock()
 
@@ -127,7 +132,7 @@ func (e multi) Errors() (out []error) {
 	return
 }
 
-func (e multi) Error() string {
+func (e *multi) Error() string {
 	e.lock.Lock()
 	defer e.lock.Unlock()
 

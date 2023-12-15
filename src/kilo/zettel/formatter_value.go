@@ -113,16 +113,6 @@ func (fv *FormatterValue) FuncFormatter(
 			return
 		}
 
-	case "typ":
-		return func(o *sku.Transacted) (err error) {
-			if _, err = fmt.Fprintln(out, o.GetTyp().String()); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		}
-
 	case "typ-vim-syntax-type":
 		return func(o *sku.Transacted) (err error) {
 			var t *sku.Transacted

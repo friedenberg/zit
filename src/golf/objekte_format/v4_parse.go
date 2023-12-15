@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
@@ -33,14 +34,6 @@ var (
 	keyVerzeichnisseSha             = catgut.MakeFromString("Verzeichnisse-Sha")
 )
 
-var (
-	errV4ExpectedNewline           = errors.New("expected newline")
-	errV4ExpectedSpaceSeparatedKey = errors.New("expected space separated key")
-	errV4EmptyKey                  = errors.New("empty key")
-	errV4KeysNotSorted             = errors.New("keys not sorted")
-	errV4InvalidKey                = errors.New("invalid key")
-)
-
 func (f v4) ParsePersistentMetadatei(
 	r *catgut.RingBuffer,
 	c ParserContext,
@@ -66,8 +59,9 @@ func (f v4) ParsePersistentMetadatei(
 
 	for {
 		line, err = r.PeekUpto('\n')
+		log.Log().Printf("%s", line)
 
-		if err != nil && err != io.EOF {
+		if errors.IsNotNilAndNotEOF(err) {
 			break
 		}
 
@@ -78,17 +72,17 @@ func (f v4) ParsePersistentMetadatei(
 		key, val, ok = line.Cut(' ')
 
 		if !ok {
-			err = errV4ExpectedSpaceSeparatedKey
+			err = makeErrWithBytes(errV4ExpectedSpaceSeparatedKey, line.Bytes())
 			break
 		}
 
 		if key.Len() == 0 {
-			err = errV4EmptyKey
+			err = makeErrWithBytes(errV4EmptyKey, line.Bytes())
 			break
 		}
 
 		if lastKey.Len() > 0 && key.Compare(lastKey.Bytes()) == 1 {
-			err = errV4KeysNotSorted
+			err = makeErrWithBytes(errV4KeysNotSorted, line.Bytes())
 			break
 		}
 
