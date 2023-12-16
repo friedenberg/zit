@@ -17,6 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/juliett/konfig"
 	"github.com/friedenberg/zit/src/kilo/cwd"
+	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
 	"github.com/friedenberg/zit/src/lima/akten"
 	"github.com/friedenberg/zit/src/lima/bestandsaufnahme"
 )
@@ -24,8 +25,6 @@ import (
 type StoreUtil interface {
 	FlushBestandsaufnahme() error
 	errors.Flusher
-	standort.Getter
-	konfig.Getter
 	kennung.Clock
 
 	ExternalReader
@@ -34,13 +33,10 @@ type StoreUtil interface {
 	CalculateAndSetShaTransacted(sk *sku.Transacted) (err error)
 	CalculateAndSetShaSkuLike(sk sku.SkuLike) (err error)
 
-	GetBestandsaufnahmeStore() bestandsaufnahme.Store
-	GetAbbrStore() AbbrStore
-	GetKennungIndex() kennung_index.Index
+	accessors
+
 	ResetIndexes() (err error)
 	AddTypToIndex(t *kennung.Typ) (err error)
-	GetAkten() *akten.Akten
-	GetFileEncoder() objekte_collections.FileEncoder
 
 	ReadAllGattung(
 		g gattung.Gattung,
@@ -54,8 +50,6 @@ type StoreUtil interface {
 
 	SetMatchableAdder(matcher.MatchableAdder)
 	matcher.MatchableAdder
-
-	objekte_format.Getter
 
 	SetCheckedOutLogWriter(zelw schnittstellen.FuncIter[*sku.CheckedOut])
 
@@ -82,9 +76,6 @@ type StoreUtil interface {
 		options checkout_options.Options,
 		sz *sku.Transacted,
 	) (cz *sku.CheckedOut, err error)
-
-	GetCwdFiles() *cwd.CwdFiles
-	GetObjekteFormatOptions() objekte_format.Options
 }
 
 // TODO-P3 move to own package
@@ -98,6 +89,9 @@ type common struct {
 	Abbr                      AbbrStore
 	persistentMetadateiFormat objekte_format.Format
 	fileEncoder               objekte_collections.FileEncoder
+
+	verzeichnisseSchwanzen *VerzeichnisseSchwanzen
+	verzeichnisseAll       *store_verzeichnisse.Store
 
 	sonnenaufgang thyme.Time
 
@@ -190,34 +184,6 @@ func (s *common) SetCheckedOutLogWriter(
 	s.checkedOutLogPrinter = zelw
 }
 
-func (s *common) GetAkten() *akten.Akten {
-	return s.akten
-}
-
-func (s *common) GetFileEncoder() objekte_collections.FileEncoder {
-	return s.fileEncoder
-}
-
-func (s *common) GetCwdFiles() *cwd.CwdFiles {
-	return s.cwdFiles
-}
-
-func (s *common) GetObjekteFormatOptions() objekte_format.Options {
-	return s.options
-}
-
-func (s common) GetPersistentMetadateiFormat() objekte_format.Format {
-	return s.persistentMetadateiFormat
-}
-
-func (s common) GetTime() thyme.Time {
-	return thyme.Now()
-}
-
-func (s common) GetTai() kennung.Tai {
-	return kennung.NowTai()
-}
-
 func (s *common) CommitUpdatedTransacted(
 	t *sku.Transacted,
 ) (err error) {
@@ -241,18 +207,6 @@ func (s *common) CommitTransacted(t *sku.Transacted) (err error) {
 	}
 
 	return
-}
-
-func (s *common) GetBestandsaufnahmeStore() bestandsaufnahme.Store {
-	return s.bestandsaufnahmeStore
-}
-
-func (s *common) GetAbbrStore() AbbrStore {
-	return s.Abbr
-}
-
-func (s *common) GetKennungIndex() kennung_index.Index {
-	return s.kennungIndex
 }
 
 func (s *common) ResetIndexes() (err error) {
@@ -284,14 +238,6 @@ func (s *common) AddTypToIndex(t *kennung.Typ) (err error) {
 	}
 
 	return
-}
-
-func (s common) GetStandort() standort.Standort {
-	return s.standort
-}
-
-func (s common) GetKonfig() *konfig.Compiled {
-	return s.konfig
 }
 
 func (s *common) SetMatchableAdder(ma matcher.MatchableAdder) {
