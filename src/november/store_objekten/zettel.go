@@ -151,7 +151,6 @@ func (s *Store) commitIndexMatchUpdate(
 	if err = iter.Chain(
 		tz,
 		s.handleNewOrUpdated,
-		s.AddMatchable,
 		s.Updated,
 	); err != nil {
 		err = errors.Wrap(err)

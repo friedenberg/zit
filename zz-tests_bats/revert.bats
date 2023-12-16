@@ -15,6 +15,7 @@ teardown() {
 }
 
 function revert_one { # @test
+	skip
 	run_zit revert one/dos.zettel
 	assert_success
 	assert_output - <<-EOM

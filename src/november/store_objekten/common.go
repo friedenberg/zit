@@ -15,7 +15,13 @@ import (
 func (s *Store) handleNewOrUpdated(
 	t *sku.Transacted,
 ) (err error) {
-	return s.handleNewOrUpdatedCommit(t, true)
+	return iter.Chain(
+		t,
+		func(t *sku.Transacted) error {
+			return s.handleNewOrUpdatedCommit(t, true)
+		},
+		s.AddMatchable,
+	)
 }
 
 // true is new or updated, false is reindexed

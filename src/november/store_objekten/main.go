@@ -343,8 +343,8 @@ func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 }
 
 func (s *Store) AddMatchable(m *sku.Transacted) (err error) {
-	s.lock.Lock()
-	defer s.lock.Unlock()
+	// s.lock.Lock()
+	// defer s.lock.Unlock()
 
 	if err = s.addMatchableTypAndEtikettenIfNecessary(m); err != nil {
 		err = errors.Wrap(err)

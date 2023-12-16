@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/checkout_options"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
@@ -67,12 +68,11 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	if err = s.AddMatchable(transactedPtr); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.handleUpdated(transactedPtr); err != nil {
+	if err = iter.Chain(
+		transactedPtr,
+		s.AddMatchable,
+		s.handleUpdated,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -164,21 +164,9 @@ func (s *Store) CreateOrUpdate(
 		return
 	}
 
-	if err = s.AddMatchable(transactedPtr); err != nil {
+	if err = s.addMatchableAndHandleNewOrUpdated(transactedPtr, mutter); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	if mutter == nil {
-		if err = s.handleNew(transactedPtr); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		if err = s.handleUpdated(transactedPtr); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
 	}
 
 	return
@@ -353,21 +341,30 @@ func (s *Store) CreateOrUpdateAkte(
 		return
 	}
 
-	if err = s.AddMatchable(transactedPtr); err != nil {
+	if err = s.addMatchableAndHandleNewOrUpdated(transactedPtr, mutter); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if mutter == nil {
-		if err = s.handleNew(transactedPtr); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		if err = s.handleUpdated(transactedPtr); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	return
+}
+
+func (s *Store) addMatchableAndHandleNewOrUpdated(
+	sk, mutter *sku.Transacted,
+) (err error) {
+	if err = iter.Chain(
+		sk,
+		s.AddMatchable,
+		func(t1 *sku.Transacted) error {
+			if mutter == nil {
+				return s.handleNew(t1)
+			} else {
+				return s.handleUpdated(t1)
+			}
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
