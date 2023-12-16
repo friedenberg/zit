@@ -3,9 +3,8 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/todo"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/charlie/iter2"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -65,6 +64,13 @@ func (s *Store) handleNewOrUpdatedCommit(
 
 	default:
 		err = gattung.MakeErrUnsupportedGattung(g)
+		return
+	}
+
+	if err = s.AddVerzeichnisse(
+		t,
+	); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -191,56 +197,19 @@ func (s *Store) ReadAllSchwanzen(
 	gs gattungen.Set,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	if err = iter2.Parallel(
-		gs,
-		func(g gattung.Gattung) (err error) {
-			switch g {
-			case gattung.Typ:
-				if err = s.GetKonfig().Typen.Each(f); err != nil {
-					err = errors.Wrap(err)
+	return s.GetVerzeichnisseSchwanzen().ReadMany(
+		iter.MakeChain(
+			func(sk *sku.Transacted) (err error) {
+				if !gs.Contains(gattung.Must(sk.Kennung.GetGattung())) {
+					err = iter.MakeErrStopIteration()
 					return
 				}
 
-			case gattung.Etikett:
-				if err = s.StoreUtil.GetKonfig().EachEtikett(f); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-			case gattung.Kasten:
-				if err = s.GetKonfig().Kisten.Each(f); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-			case gattung.Konfig:
-				var k *sku.Transacted
-
-				if k, err = s.konfigStore.ReadOne(&kennung.Konfig{}); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				if err = f(k); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-			case gattung.Zettel:
-				return s.GetVerzeichnisseSchwanzen().ReadMany(f)
-
-			default:
-				err = todo.Implement()
-			}
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
+				return
+			},
+			f,
+		),
+	)
 }
 
 func (s *Store) ReadAll(

@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -101,6 +102,8 @@ func (zp *Page) Add(z *sku.Transacted) (err error) {
 	zp.added.Add(z)
 	zp.State = StateChanged
 
+	log.Log().Printf("added %s", z.Kennung.String())
+
 	return
 }
 
@@ -115,7 +118,7 @@ func (zp *Page) Flush() (err error) {
 		return
 	}
 
-	// errors.Log().Printf("flushing page: %s", zp.path)
+	errors.Log().Printf("flushing page: %s", zp.path)
 
 	var w io.WriteCloser
 

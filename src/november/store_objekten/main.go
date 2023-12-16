@@ -157,7 +157,6 @@ func (s *Store) query(
 		m, ok := ms.Get(g)
 
 		if !ok {
-			err = errors.Errorf("expected query to have gattung %q", g)
 			return
 		}
 
@@ -402,20 +401,6 @@ func (s *Store) GetReindexFunc() func(*sku.Transacted) error {
 	}
 }
 
-func (s *Store) resetReindexCommon() (err error) {
-	if err = s.StoreUtil.GetStandort().ResetVerzeichnisse(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.ResetIndexes(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 // TODO-P2 add support for quiet reindexing
 func (s *Store) Reindex() (err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
@@ -431,7 +416,7 @@ func (s *Store) Reindex() (err error) {
 		s.isReindexing = false
 	}()
 
-	if err = s.resetReindexCommon(); err != nil {
+	if err = s.StoreUtil.GetStandort().ResetVerzeichnisse(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -460,7 +445,7 @@ func (s *Store) Reset() (err error) {
 		s.isReindexing = false
 	}()
 
-	if err = s.resetReindexCommon(); err != nil {
+	if err = s.ResetIndexes(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

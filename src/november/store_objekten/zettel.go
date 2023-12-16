@@ -37,22 +37,6 @@ func (s *Store) writeNamedZettelToIndex(
 	// 	return
 	// }
 
-	if err = s.GetVerzeichnisseSchwanzen().AddVerzeichnisse(
-		tz,
-		tz.GetKennung().String(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.GetVerzeichnisseAll().AddVerzeichnisse(
-		tz,
-		tz.GetKennung().String(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if err = s.StoreUtil.GetKennungIndex().AddHinweis(&tz.Kennung); err != nil {
 		if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 			errors.Log().Printf("kennung does not contain value: %s", err)
@@ -200,9 +184,7 @@ func (s *Store) Update(
 func (s *Store) commitIndexMatchUpdate(
 	tz *sku.Transacted,
 ) (err error) {
-	s.CommitUpdatedTransacted(tz)
-
-	if err = s.writeNamedZettelToIndex(tz); err != nil {
+	if err = s.handleNewOrUpdated(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -3,6 +3,7 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -88,25 +89,16 @@ func (s konfigStore) Update(
 		return
 	}
 
-	s.CommitUpdatedTransacted(kt)
-
-	if err = s.StoreUtil.GetKonfig().SetTransacted(
-		kt,
-		s.GetAkten().GetKonfigV0(),
-	); err != nil {
+  if err = iter.Chain(
+    kt,
+    s.AddVerzeichnisse,
+    s.CommitUpdatedTransacted,
+    s.AddMatchable,
+    s.Updated,
+  ); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	if err = s.AddMatchable(kt); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.Updated(kt); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+  }
 
 	return
 }

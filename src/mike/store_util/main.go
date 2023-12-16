@@ -28,6 +28,7 @@ type StoreUtil interface {
 	kennung.Clock
 
 	ExternalReader
+	AddVerzeichnisse(*sku.Transacted) error
 	CommitTransacted(*sku.Transacted) error
 	CommitUpdatedTransacted(*sku.Transacted) error
 	CalculateAndSetShaTransacted(sk *sku.Transacted) (err error)
@@ -201,6 +202,26 @@ func (s *common) SetCheckedOutLogWriter(
 	s.checkedOutLogPrinter = zelw
 }
 
+func (s *common) AddVerzeichnisse(t *sku.Transacted) (err error) {
+	if err = s.verzeichnisseSchwanzen.AddVerzeichnisse(
+		t,
+		t.GetKennung().String(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.verzeichnisseAll.AddVerzeichnisse(
+		t,
+		t.GetKennung().String(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s *common) CommitUpdatedTransacted(
 	t *sku.Transacted,
 ) (err error) {
@@ -212,6 +233,16 @@ func (s *common) CommitUpdatedTransacted(
 
 func (s *common) CommitTransacted(t *sku.Transacted) (err error) {
 	sk := sku.GetTransactedPool().Get()
+
+	if t.GetGattung() == gattung.Konfig {
+		if err = s.konfig.SetTransacted(
+			t,
+			s.GetAkten().GetKonfigV0(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 
 	if err = sk.SetFromSkuLike(t); err != nil {
 		err = errors.Wrap(err)

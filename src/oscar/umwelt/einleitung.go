@@ -100,6 +100,11 @@ func (u *Umwelt) Einleitung(e Einleitung) (err error) {
 		return
 	}
 
+	if err = u.Standort().ResetVerzeichnisse(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	errors.TodoP2("determine if this should be an Einleitung option")
 	if err = initDefaultTypAndKonfig(u); err != nil {
 		err = errors.Wrap(err)
@@ -142,7 +147,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 		return
 	}
 
-	if _, err = u.StoreObjekten().ReadOne(&k); err != nil {
+	{
 		err = nil
 
 		var sh schnittstellen.ShaLike
