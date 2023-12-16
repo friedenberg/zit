@@ -17,10 +17,10 @@ func (s *Store) handleNewOrUpdated(
 ) (err error) {
 	return iter.Chain(
 		t,
+		s.AddMatchable,
 		func(t *sku.Transacted) error {
 			return s.handleNewOrUpdatedCommit(t, true)
 		},
-		s.AddMatchable,
 	)
 }
 

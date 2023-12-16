@@ -1,8 +1,6 @@
 package store_objekten
 
 import (
-	"sync"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/expansion"
@@ -27,14 +25,12 @@ type Store struct {
 	objekte_store.LogWriter
 
 	isReindexing bool
-	lock         sync.Locker
 }
 
 func Make(
 	su store_util.StoreUtil,
 ) (s *Store, err error) {
 	s = &Store{
-		lock:      &sync.Mutex{},
 		StoreUtil: su,
 	}
 

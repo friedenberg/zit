@@ -70,7 +70,6 @@ func (s *Store) CreateOrUpdateCheckedOut(
 
 	if err = iter.Chain(
 		transactedPtr,
-		s.AddMatchable,
 		s.handleUpdated,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -354,7 +353,6 @@ func (s *Store) addMatchableAndHandleNewOrUpdated(
 ) (err error) {
 	if err = iter.Chain(
 		sk,
-		s.AddMatchable,
 		func(t1 *sku.Transacted) error {
 			if mutter == nil {
 				return s.handleNew(t1)

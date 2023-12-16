@@ -62,7 +62,7 @@ func (c Revert) RunWithQuery(u *umwelt.Umwelt, ms matcher.Query) (err error) {
 
 			kinderToMutter[sh.String()] = mu.String()
 
-			log.Debug().Printf("%s -> %s", sh, mu)
+			log.Err().Printf("%s -> %s", sh, mu)
 
 			return
 		},

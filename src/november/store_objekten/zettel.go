@@ -3,7 +3,6 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -63,8 +62,7 @@ func (s *Store) Create(
 		return
 	}
 
-	// create
-	if err = s.commitIndexMatchUpdate(tz); err != nil {
+	if err = s.handleUpdated(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -136,23 +134,7 @@ func (s *Store) Update(
 		return
 	}
 
-	// update
-	if err = s.commitIndexMatchUpdate(tz); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) commitIndexMatchUpdate(
-	tz *sku.Transacted,
-) (err error) {
-	if err = iter.Chain(
-		tz,
-		s.handleNewOrUpdated,
-		s.Updated,
-	); err != nil {
+	if err = s.handleUpdated(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
