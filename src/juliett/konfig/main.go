@@ -19,6 +19,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
+	"github.com/friedenberg/zit/src/lima/akten"
 )
 
 var typExpander expansion.Expander
@@ -274,6 +275,30 @@ func (k *compiled) AddKasten(
 	if err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	return
+}
+
+func (k *compiled) AddTransacted(
+	a *sku.Transacted,
+	ak *akten.Akten,
+) (err error) {
+	switch a.Kennung.GetGattung() {
+	case gattung.Typ:
+		return k.AddTyp(a)
+
+	case gattung.Etikett:
+		return k.AddEtikett(a)
+
+	case gattung.Kasten:
+		return k.AddKasten(a)
+
+	case gattung.Konfig:
+		return k.SetTransacted(
+			a,
+			ak.GetKonfigV0(),
+		)
 	}
 
 	return

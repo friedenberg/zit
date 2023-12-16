@@ -23,6 +23,12 @@ func (t *Transacted) GetSkuLike() SkuLike {
 	return t
 }
 
+func (a *Transacted) SetFromTransacted(b *Transacted) (err error) {
+	TransactedResetter.ResetWithPtr(a, b)
+
+	return
+}
+
 func (t *Transacted) SetFromSkuLike(sk SkuLike) (err error) {
 	if err = t.Kennung.SetWithKennung(sk.GetKennung()); err != nil {
 		err = errors.Wrap(err)

@@ -5,50 +5,11 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
 )
-
-func (s *Store) writeNamedZettelToIndex(
-	tz *sku.Transacted,
-) (err error) {
-	errors.Log().Print("writing to index")
-
-	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte_store.ErrLockRequired{
-			Operation: "write named zettel to index",
-		}
-
-		return
-	}
-
-	errors.Log().Printf("writing zettel to index: %s", tz)
-
-	if err = s.GetKonfig().ApplyToSku(tz); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	// if err = s.CalculateAndSetShaTransacted(tz); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
-
-	if err = s.StoreUtil.GetKennungIndex().AddHinweis(&tz.Kennung); err != nil {
-		if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
-			errors.Log().Printf("kennung does not contain value: %s", err)
-			err = nil
-		} else {
-			err = errors.Wrapf(err, "failed to write zettel to index: %s", tz)
-			return
-		}
-	}
-
-	return
-}
 
 func (s *Store) Create(
 	mg metadatei.Getter,

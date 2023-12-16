@@ -51,14 +51,14 @@ func (c Revert) RunWithQuery(u *umwelt.Umwelt, ms matcher.Query) (err error) {
 	if err = u.StoreObjekten().QueryWithCwd(
 		ms,
 		func(z *sku.Transacted) (err error) {
-			mu := z.Metadatei.Verzeichnisse.Mutter
+			mu := &z.Metadatei.Verzeichnisse.Mutter
 
 			if mu.IsNull() {
 				log.Err().Printf("%s has null mutter, cannot revert", z)
 				return
 			}
 
-			sh := z.Metadatei.Verzeichnisse.Sha
+			sh := &z.Metadatei.Verzeichnisse.Sha
 
 			kinderToMutter[sh.String()] = mu.String()
 

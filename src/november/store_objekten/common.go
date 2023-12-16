@@ -5,6 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -57,9 +58,35 @@ func (s *Store) handleNewOrUpdatedCommit(
 		}
 
 	case gattung.Zettel:
-		if err = s.writeNamedZettelToIndex(t); err != nil {
+		errors.Log().Print("writing to index")
+		if !s.GetStandort().GetLockSmith().IsAcquired() {
+			err = objekte_store.ErrLockRequired{
+				Operation: "write named zettel to index",
+			}
+
+			return
+		}
+
+		errors.Log().Printf("writing zettel to index: %s", t)
+
+		if err = s.GetKonfig().ApplyToSku(t); err != nil {
 			err = errors.Wrap(err)
 			return
+		}
+
+		// if err = s.CalculateAndSetShaTransacted(tz); err != nil {
+		// 	err = errors.Wrap(err)
+		// 	return
+		// }
+
+		if err = s.StoreUtil.GetKennungIndex().AddHinweis(&t.Kennung); err != nil {
+			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
+				errors.Log().Printf("kennung does not contain value: %s", err)
+				err = nil
+			} else {
+				err = errors.Wrapf(err, "failed to write zettel to index: %s", t)
+				return
+			}
 		}
 
 	default:
