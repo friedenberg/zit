@@ -31,6 +31,8 @@ type StoreUtil interface {
 	ExternalReader
 	CommitTransacted(*sku.Transacted) error
 	CommitUpdatedTransacted(*sku.Transacted) error
+	CalculateAndSetShaTransacted(sk *sku.Transacted) (err error)
+	CalculateAndSetShaSkuLike(sk sku.SkuLike) (err error)
 
 	GetBestandsaufnahmeStore() bestandsaufnahme.Store
 	GetAbbrStore() AbbrStore

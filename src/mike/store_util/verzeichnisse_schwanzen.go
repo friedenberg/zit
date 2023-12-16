@@ -1,4 +1,4 @@
-package store_objekten
+package store_util
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -7,19 +7,18 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
-	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
-type verzeichnisseSchwanzen struct {
+type VerzeichnisseSchwanzen struct {
 	headers [store_verzeichnisse.PageCount]*sku.Schwanzen
 	*store_verzeichnisse.Store
-	su store_util.StoreUtil
+	su StoreUtil
 }
 
-func makeVerzeichnisseSchwanzen(
-	sa store_util.StoreUtil,
-) (s *verzeichnisseSchwanzen, err error) {
-	s = &verzeichnisseSchwanzen{
+func MakeVerzeichnisseSchwanzen(
+	sa StoreUtil,
+) (s *VerzeichnisseSchwanzen, err error) {
+	s = &VerzeichnisseSchwanzen{
 		su: sa,
 	}
 
@@ -37,7 +36,7 @@ func makeVerzeichnisseSchwanzen(
 	return
 }
 
-func (s *verzeichnisseSchwanzen) Flush() (err error) {
+func (s *VerzeichnisseSchwanzen) Flush() (err error) {
 	if err = s.Store.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -51,7 +50,7 @@ func (s *verzeichnisseSchwanzen) Flush() (err error) {
 	return
 }
 
-func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
+func (s *VerzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	h kennung.Kennung,
 ) (found *sku.Transacted, err error) {
 	var n int
@@ -96,7 +95,7 @@ func (s *verzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	return
 }
 
-func (s *verzeichnisseSchwanzen) applyKonfig(
+func (s *VerzeichnisseSchwanzen) applyKonfig(
 	z *sku.Transacted,
 ) (err error) {
 	if !s.su.GetKonfig().HasChanges() {
@@ -108,7 +107,7 @@ func (s *verzeichnisseSchwanzen) applyKonfig(
 	return
 }
 
-func (s *verzeichnisseSchwanzen) GetVerzeichnissePageDelegate(
+func (s *VerzeichnisseSchwanzen) GetVerzeichnissePageDelegate(
 	n int,
 ) store_verzeichnisse.PageDelegate {
 	return s.headers[n]

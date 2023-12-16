@@ -7,6 +7,30 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
+func Chain[T any](e T, wfs ...schnittstellen.FuncIter[T]) (err error) {
+	for _, w := range wfs {
+		if w == nil {
+			continue
+		}
+
+		err = w(e)
+
+		switch {
+		case err == nil:
+			continue
+
+		case IsStopIteration(err):
+			err = nil
+			return
+
+		default:
+			return
+		}
+	}
+
+	return
+}
+
 func MakeChain[T any](wfs ...schnittstellen.FuncIter[T]) schnittstellen.FuncIter[T] {
 	return func(e T) (err error) {
 		for _, w := range wfs {
@@ -25,7 +49,6 @@ func MakeChain[T any](wfs ...schnittstellen.FuncIter[T]) schnittstellen.FuncIter
 				return
 
 			default:
-				err = errors.Wrap(err)
 				return
 			}
 		}

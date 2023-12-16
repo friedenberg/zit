@@ -118,10 +118,8 @@ func (s *common) ReadOneExternalObjekteReader(
 		return
 	}
 
-	if err = sku.CalculateAndSetSha(
+	if err = s.CalculateAndSetShaSkuLike(
 		e,
-		s.persistentMetadateiFormat,
-		s.options,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

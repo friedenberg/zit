@@ -24,7 +24,7 @@ type Store struct {
 	store_util.StoreUtil
 
 	protoZettel            zettel.ProtoZettel
-	verzeichnisseSchwanzen *verzeichnisseSchwanzen
+	verzeichnisseSchwanzen *store_util.VerzeichnisseSchwanzen
 	verzeichnisseAll       *store_verzeichnisse.Store
 	konfigStore            konfigStore
 
@@ -46,7 +46,7 @@ func Make(
 
 	s.protoZettel = zettel.MakeProtoZettel(su.GetKonfig())
 
-	if s.verzeichnisseSchwanzen, err = makeVerzeichnisseSchwanzen(
+	if s.verzeichnisseSchwanzen, err = store_util.MakeVerzeichnisseSchwanzen(
 		s.StoreUtil,
 	); err != nil {
 		err = errors.Wrap(err)

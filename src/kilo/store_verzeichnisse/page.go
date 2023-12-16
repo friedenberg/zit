@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"encoding/gob"
 	"io"
-	"io/ioutil"
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -27,6 +26,7 @@ type Page struct {
 	added       sku.TransactedHeap
 	addFilter   schnittstellen.FuncIter[*sku.Transacted]
 	flushFilter schnittstellen.FuncIter[*sku.Transacted]
+	delegate    PageDelegate
 
 	State
 }
@@ -36,24 +36,21 @@ func makePage(
 	fff PageDelegateGetter,
 	useBestandsaufnahmeForVerzeichnisse bool,
 ) (p *Page) {
-	flushFilter := collections.MakeWriterNoop[*sku.Transacted]()
-	addFilter := collections.MakeWriterNoop[*sku.Transacted]()
-
-	if fff != nil {
-		d := fff.GetVerzeichnissePageDelegate(pid.index)
-
-		addFilter = d.ShouldAddVerzeichnisse
-		flushFilter = d.ShouldFlushVerzeichnisse
-	}
-
 	p = &Page{
 		useBestandsaufnahmeForVerzeichnisse: useBestandsaufnahmeForVerzeichnisse,
 		lock:                                &sync.Mutex{},
 		VerzeichnisseFactory:                iof,
 		pageId:                              pid,
 		added:                               sku.MakeTransactedHeap(),
-		flushFilter:                         flushFilter,
-		addFilter:                           addFilter,
+		addFilter:                           collections.MakeWriterNoop[*sku.Transacted](),
+		flushFilter:                         collections.MakeWriterNoop[*sku.Transacted](),
+	}
+
+	if fff != nil {
+		p.delegate = fff.GetVerzeichnissePageDelegate(pid.index)
+
+		p.addFilter = p.delegate.ShouldAddVerzeichnisse
+		p.flushFilter = p.delegate.ShouldFlushVerzeichnisse
 	}
 
 	p.added.SetPool(sku.GetTransactedPool())
@@ -61,18 +58,12 @@ func makePage(
 	return
 }
 
-func (zp *Page) doTryLock() (ok bool) {
-	ok = zp.lock.TryLock()
-
-	if ok {
-	} else {
+func (zp *Page) doTryLock() (err error) {
+	if ok := zp.lock.TryLock(); !ok {
+		err = MakeErrConcurrentPageAccess()
 	}
 
 	return
-}
-
-func (zp *Page) doLock() {
-	zp.lock.Lock()
 }
 
 func (zp *Page) doUnlock() {
@@ -114,10 +105,7 @@ func (zp *Page) Add(z *sku.Transacted) (err error) {
 }
 
 func (zp *Page) Flush() (err error) {
-	acquired := zp.doTryLock()
-
-	if !acquired {
-		err = MakeErrConcurrentPageAccess()
+	if err = zp.doTryLock(); err != nil {
 		return
 	}
 
@@ -179,7 +167,7 @@ func (zp *Page) copy(
 
 	if r1, err = zp.ReadCloserVerzeichnisse(zp.path); err != nil {
 		if errors.IsNotExist(err) {
-			r1 = ioutil.NopCloser(bytes.NewReader(nil))
+			r1 = io.NopCloser(bytes.NewReader(nil))
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -300,10 +288,7 @@ func (zp *Page) writeTo(w1 io.Writer) (err error) {
 func (zp *Page) Copy(
 	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	acquired := zp.doTryLock()
-
-	if !acquired {
-		err = MakeErrConcurrentPageAccess()
+	if err = zp.doTryLock(); err != nil {
 		return
 	}
 
@@ -313,10 +298,7 @@ func (zp *Page) Copy(
 }
 
 func (zp *Page) WriteTo(w1 io.Writer) (n int64, err error) {
-	acquired := zp.doTryLock()
-
-	if !acquired {
-		err = MakeErrConcurrentPageAccess()
+	if err = zp.doTryLock(); err != nil {
 		return
 	}
 

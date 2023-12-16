@@ -10,7 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/india/sku_fmt"
 )
 
-type formatAkte2 struct {
+type formatAkte struct {
 	objekteFormat objekte_format.Format
 	options       objekte_format.Options
 }
@@ -18,14 +18,14 @@ type formatAkte2 struct {
 func MakeAkteFormat(
 	sv schnittstellen.StoreVersion,
 	op objekte_format.Options,
-) formatAkte2 {
-	return formatAkte2{
+) formatAkte {
+	return formatAkte{
 		objekteFormat: objekte_format.FormatForVersion(sv),
 		options:       op,
 	}
 }
 
-func (f formatAkte2) ParseAkte(
+func (f formatAkte) ParseAkte(
 	r io.Reader,
 	o *Akte,
 ) (n int64, err error) {
@@ -54,11 +54,11 @@ func (f formatAkte2) ParseAkte(
 	return
 }
 
-func (f formatAkte2) Format(w io.Writer, o *Akte) (n int64, err error) {
+func (f formatAkte) Format(w io.Writer, o *Akte) (n int64, err error) {
 	return f.FormatParsedAkte(w, o)
 }
 
-func (f formatAkte2) FormatParsedAkte(
+func (f formatAkte) FormatParsedAkte(
 	w io.Writer,
 	o *Akte,
 ) (n int64, err error) {

@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	DigitWidth = 2
+	DigitWidth = 1
 	PageCount  = 1 << (DigitWidth * 4)
 )
 

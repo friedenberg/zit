@@ -3,19 +3,21 @@ package commands
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/src/bravo/todo"
+	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/gattungen"
+	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
-type Revert struct {
-	Type gattung.Gattung
-}
+type Revert struct{}
 
 func init() {
-	registerCommand(
+	registerCommandWithQuery(
 		"revert",
-		func(f *flag.FlagSet) Command {
+		func(_ *flag.FlagSet) CommandWithQuery {
 			c := &Revert{}
 
 			return c
@@ -23,47 +25,51 @@ func init() {
 	)
 }
 
-func (c Revert) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	return todo.Implement()
-	// timestamps := ids.Timestamps.ImmutableClone()
-	// var transaktion *transaktion.Transaktion
+func (c Revert) CompletionGattung() gattungen.Set {
+	return gattungen.MakeSet(
+		gattung.Zettel,
+		gattung.Etikett,
+		gattung.Typ,
+		gattung.Bestandsaufnahme,
+		gattung.Kasten,
+	)
+}
 
-	// s := u.StoreObjekten()
+func (c Revert) DefaultGattungen() gattungen.Set {
+	return gattungen.MakeSet(
+		gattung.Zettel,
+		gattung.Etikett,
+		gattung.Typ,
+		// gattung.Bestandsaufnahme,
+		gattung.Kasten,
+	)
+}
 
-	// if timestamps.Len() == 1 {
-	// 	if transaktion, err = s.GetTransaktionStore().ReadTransaktion(
-	// 		timestamps.Any(),
-	// 	); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return
-	// 	}
-	// } else {
-	// 	if transaktion, err = s.GetTransaktionStore().ReadLastTransaktion(); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return
-	// 	}
+func (c Revert) RunWithQuery(u *umwelt.Umwelt, ms matcher.Query) (err error) {
+	kinderToMutter := make(map[string]string)
 
-	// 	errors.Out().Printf(
-	// 		"ignoring arguments and using last transkation: %s",
-	// 		transaktion.Time,
-	// 	)
-	// }
+	if err = u.StoreObjekten().QueryWithCwd(
+		ms,
+		func(z *sku.Transacted) (err error) {
+			mu := z.Metadatei.Verzeichnisse.Mutter
 
-	// if err = u.Lock(); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
+			if mu.IsNull() {
+				log.Err().Printf("%s has null mutter, cannot revert", z)
+				return
+			}
 
-	// defer errors.Deferred(&err, u.Unlock)
+			sh := z.Metadatei.Verzeichnisse.Sha
 
-	// var zts zettel.MutableSet
+			kinderToMutter[sh.String()] = mu.String()
 
-	// if zts, err = s.RevertTransaktion(transaktion); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
+			log.Debug().Printf("%s -> %s", sh, mu)
 
-	// zts.Each(u.PrinterZettelTransactedDelta())
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	// return
+	return
 }
