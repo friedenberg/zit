@@ -11,7 +11,6 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/cwd"
-	"github.com/friedenberg/zit/src/november/store_objekten"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
@@ -92,9 +91,6 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		ze, err = u.StoreObjekten().ReadOneExternal(e, zt)
 
 		switch {
-		case store_objekten.IsErrExternalAkteExtensionMismatch(err):
-			err = nil
-
 		case err != nil:
 			err = errors.Wrap(err)
 			return
