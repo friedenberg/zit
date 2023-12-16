@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/expansion"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
@@ -149,27 +148,7 @@ func (s *Store) query(
 	f schnittstellen.FuncIter[*sku.Transacted],
 	includeCwd bool,
 ) (err error) {
-	gsWithHistory := gattungen.MakeMutableSet()
-	gsWithoutHistory := gattungen.MakeMutableSet()
-
-	if err = ms.GetGattungen().Each(
-		func(g gattung.Gattung) (err error) {
-			m, ok := ms.Get(g)
-
-			if !ok {
-				return
-			}
-
-			if m.GetSigil().IncludesHistory() {
-				return gsWithHistory.Add(g)
-			} else {
-				return gsWithoutHistory.Add(g)
-			}
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	gsWithoutHistory, gsWithHistory := ms.SplitGattungenByHistory()
 
 	wg := iter.MakeErrorWaitGroup()
 

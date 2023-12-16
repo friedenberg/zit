@@ -32,6 +32,7 @@ type Query interface {
 	SetMany(...string) error
 	All(f func(gattung.Gattung, MatcherSigil) error) error
 	GetGattungen() gattungen.Set
+	SplitGattungenByHistory() (scwhanz, all gattungen.MutableSet)
 	Matcher
 }
 
@@ -602,6 +603,31 @@ func (ms query) All(f func(gattung.Gattung, MatcherSigil) error) (err error) {
 	for i := 0; i < len(ms.Gattung); i++ {
 		err = errors.Join(err, <-chErr)
 	}
+
+	return
+}
+
+func (ms query) SplitGattungenByHistory() (schwanz, all gattungen.MutableSet) {
+	all = gattungen.MakeMutableSet()
+	schwanz = gattungen.MakeMutableSet()
+
+	err := ms.GetGattungen().Each(
+		func(g gattung.Gattung) (err error) {
+			m, ok := ms.Get(g)
+
+			if !ok {
+				return
+			}
+
+			if m.GetSigil().IncludesHistory() {
+				return all.Add(g)
+			} else {
+				return schwanz.Add(g)
+			}
+		},
+	)
+
+	errors.PanicIfError(err)
 
 	return
 }
