@@ -2,7 +2,6 @@ package store_util
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
@@ -47,14 +46,12 @@ func (s *common) CommitUpdatedTransacted(
 func (s *common) CommitTransacted(t *sku.Transacted) (err error) {
 	sk := sku.GetTransactedPool().Get()
 
-	if t.GetGattung() == gattung.Konfig {
-		if err = s.konfig.SetTransacted(
-			t,
-			s.GetAkten().GetKonfigV0(),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = s.konfig.AddTransacted(
+		t,
+		s.GetAkten(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if err = sk.SetFromSkuLike(t); err != nil {

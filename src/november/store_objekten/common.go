@@ -23,6 +23,14 @@ func (s *Store) handleNewOrUpdatedCommit(
 	t *sku.Transacted,
 	commit bool,
 ) (err error) {
+	if !s.GetStandort().GetLockSmith().IsAcquired() {
+		err = objekte_store.ErrLockRequired{
+			Operation: "write named zettel to index",
+		}
+
+		return
+	}
+
 	if commit {
 		s.CommitUpdatedTransacted(t)
 	}
@@ -46,17 +54,6 @@ func (s *Store) handleNewOrUpdatedCommit(
 		}
 
 	case gattung.Zettel:
-		errors.Log().Print("writing to index")
-		if !s.GetStandort().GetLockSmith().IsAcquired() {
-			err = objekte_store.ErrLockRequired{
-				Operation: "write named zettel to index",
-			}
-
-			return
-		}
-
-		errors.Log().Printf("writing zettel to index: %s", t)
-
 		if err = s.GetKonfig().ApplyToSku(t); err != nil {
 			err = errors.Wrap(err)
 			return
