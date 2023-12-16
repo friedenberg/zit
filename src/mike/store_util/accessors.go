@@ -46,15 +46,15 @@ func (s *common) GetObjekteFormatOptions() objekte_format.Options {
 	return s.options
 }
 
-func (s common) GetPersistentMetadateiFormat() objekte_format.Format {
+func (s *common) GetPersistentMetadateiFormat() objekte_format.Format {
 	return s.persistentMetadateiFormat
 }
 
-func (s common) GetTime() thyme.Time {
+func (s *common) GetTime() thyme.Time {
 	return thyme.Now()
 }
 
-func (s common) GetTai() kennung.Tai {
+func (s *common) GetTai() kennung.Tai {
 	return kennung.NowTai()
 }
 
@@ -70,18 +70,18 @@ func (s *common) GetKennungIndex() kennung_index.Index {
 	return s.kennungIndex
 }
 
-func (s common) GetStandort() standort.Standort {
+func (s *common) GetStandort() standort.Standort {
 	return s.standort
 }
 
-func (s common) GetKonfig() *konfig.Compiled {
+func (s *common) GetKonfig() *konfig.Compiled {
 	return s.konfig
 }
 
-func (s common) GetVerzeichnisseSchwanzen() *VerzeichnisseSchwanzen {
+func (s *common) GetVerzeichnisseSchwanzen() *VerzeichnisseSchwanzen {
 	return s.verzeichnisseSchwanzen
 }
 
-func (s common) GetVerzeichnisseAll() *store_verzeichnisse.Store {
+func (s *common) GetVerzeichnisseAll() *store_verzeichnisse.Store {
 	return s.verzeichnisseAll
 }

@@ -115,7 +115,7 @@ func (zp *Page) Flush() (err error) {
 		return
 	}
 
-	errors.Log().Printf("flushing page: %s", zp.path)
+	// errors.Log().Printf("flushing page: %s", zp.path)
 
 	var w io.WriteCloser
 
@@ -155,7 +155,7 @@ func (zp *Page) Flush() (err error) {
 
 	zp.added.Reset()
 
-	errors.Log().Printf("flushed page: %s", zp.path)
+	// errors.Log().Printf("flushed page: %s", zp.path)
 
 	return
 }

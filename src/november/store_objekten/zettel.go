@@ -27,9 +27,17 @@ func (s *Store) writeNamedZettelToIndex(
 
 	errors.Log().Printf("writing zettel to index: %s", tz)
 
-	s.GetKonfig().ApplyToSku(tz)
+	if err = s.GetKonfig().ApplyToSku(tz); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	if err = s.verzeichnisseSchwanzen.AddVerzeichnisse(
+	// if err = s.CalculateAndSetShaTransacted(tz); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
+
+	if err = s.GetVerzeichnisseSchwanzen().AddVerzeichnisse(
 		tz,
 		tz.GetKennung().String(),
 	); err != nil {
@@ -37,7 +45,7 @@ func (s *Store) writeNamedZettelToIndex(
 		return
 	}
 
-	if err = s.verzeichnisseAll.AddVerzeichnisse(
+	if err = s.GetVerzeichnisseAll().AddVerzeichnisse(
 		tz,
 		tz.GetKennung().String(),
 	); err != nil {
@@ -139,7 +147,7 @@ func (s *Store) Update(
 
 	var mutter *sku.Transacted
 
-	if mutter, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(
+	if mutter, err = s.GetVerzeichnisseSchwanzen().ReadHinweisSchwanzen(
 		h,
 	); err != nil {
 		err = errors.Wrap(err)

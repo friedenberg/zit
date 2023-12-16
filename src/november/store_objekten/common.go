@@ -113,7 +113,7 @@ func (s *Store) ReadOne(
 			return
 		}
 
-		if sk, err = s.verzeichnisseSchwanzen.ReadHinweisSchwanzen(h); err != nil {
+		if sk, err = s.GetVerzeichnisseSchwanzen().ReadHinweisSchwanzen(h); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -227,7 +227,7 @@ func (s *Store) ReadAllSchwanzen(
 				}
 
 			case gattung.Zettel:
-				return s.verzeichnisseSchwanzen.ReadMany(f)
+				return s.GetVerzeichnisseSchwanzen().ReadMany(f)
 
 			default:
 				err = todo.Implement()

@@ -5,7 +5,6 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
@@ -59,7 +58,6 @@ func (f v4) ParsePersistentMetadatei(
 
 	for {
 		line, err = r.PeekUpto('\n')
-		log.Log().Printf("%s", line)
 
 		if errors.IsNotNilAndNotEOF(err) {
 			break

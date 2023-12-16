@@ -355,6 +355,8 @@ func (i *index2[T, TPtr]) storeOne(k T) (err error) {
 	id.SchwanzenCount += 1
 	id.Count += 1
 
+	log.Log().Printf("new SchwanzenCount: %s -> %d", k, id.SchwanzenCount)
+
 	i.Kennungen[k.String()] = id
 
 	return

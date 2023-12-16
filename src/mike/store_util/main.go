@@ -175,6 +175,23 @@ func MakeStoreUtil(
 		return
 	}
 
+	if c.verzeichnisseSchwanzen, err = MakeVerzeichnisseSchwanzen(
+		c,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if c.verzeichnisseAll, err = store_verzeichnisse.MakeStore(
+		c.GetKonfig(),
+		c.GetStandort().DirVerzeichnisseZettelenNeue(),
+		c.GetStandort(),
+		nil,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 

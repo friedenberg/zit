@@ -42,7 +42,26 @@ func (s *common) FlushBestandsaufnahme() (err error) {
 }
 
 func (c *common) Flush() (err error) {
+	if c.konfig.DryRun {
+		return
+	}
+
 	gob.Register(iter.StringerKeyerPtr[kennung.Typ, *kennung.Typ]{})
+
+	if c.GetKonfig().HasChanges() {
+		c.verzeichnisseSchwanzen.SetNeedsFlush()
+	}
+
+	if err = c.verzeichnisseSchwanzen.Flush(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = c.verzeichnisseAll.Flush(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = c.typenIndex.Flush(); err != nil {
 		err = errors.Wrapf(err, "failed to flush typen index")
 		return

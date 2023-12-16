@@ -15,7 +15,6 @@ import (
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
-	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/mike/store_util"
 )
@@ -23,10 +22,8 @@ import (
 type Store struct {
 	store_util.StoreUtil
 
-	protoZettel            zettel.ProtoZettel
-	verzeichnisseSchwanzen *store_util.VerzeichnisseSchwanzen
-	verzeichnisseAll       *store_verzeichnisse.Store
-	konfigStore            konfigStore
+	protoZettel zettel.ProtoZettel
+	konfigStore konfigStore
 
 	objekte_store.LogWriter
 
@@ -45,23 +42,6 @@ func Make(
 	su.SetMatchableAdder(s)
 
 	s.protoZettel = zettel.MakeProtoZettel(su.GetKonfig())
-
-	if s.verzeichnisseSchwanzen, err = store_util.MakeVerzeichnisseSchwanzen(
-		s.StoreUtil,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if s.verzeichnisseAll, err = store_verzeichnisse.MakeStore(
-		s.GetKonfig(),
-		s.StoreUtil.GetStandort().DirVerzeichnisseZettelenNeue(),
-		s.GetStandort(),
-		nil,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	s.konfigStore.akteFormat = objekte_store.MakeAkteFormat[erworben.Akte, *erworben.Akte](
 		objekte.MakeTextParserIgnoreTomlErrors[erworben.Akte](
@@ -99,20 +79,6 @@ func (s Store) Flush() (err error) {
 	}
 
 	if s.GetKonfig().DryRun {
-		return
-	}
-
-	if s.GetKonfig().HasChanges() {
-		s.verzeichnisseSchwanzen.SetNeedsFlush()
-	}
-
-	if err = s.verzeichnisseSchwanzen.Flush(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.verzeichnisseAll.Flush(); err != nil {
-		err = errors.Wrap(err)
 		return
 	}
 
