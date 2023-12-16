@@ -28,12 +28,8 @@ type StoreUtil interface {
 	kennung.Clock
 
 	ExternalReader
-	AddVerzeichnisse(*sku.Transacted) error
-	CommitTransacted(*sku.Transacted) error
-	CommitUpdatedTransacted(*sku.Transacted) error
-	CalculateAndSetShaTransacted(sk *sku.Transacted) (err error)
-	CalculateAndSetShaSkuLike(sk sku.SkuLike) (err error)
 
+	mutators
 	accessors
 
 	ResetIndexes() (err error)
@@ -202,61 +198,6 @@ func (s *common) SetCheckedOutLogWriter(
 	s.checkedOutLogPrinter = zelw
 }
 
-func (s *common) AddVerzeichnisse(t *sku.Transacted) (err error) {
-	if err = s.verzeichnisseSchwanzen.AddVerzeichnisse(
-		t,
-		t.GetKennung().String(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.verzeichnisseAll.AddVerzeichnisse(
-		t,
-		t.GetKennung().String(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *common) CommitUpdatedTransacted(
-	t *sku.Transacted,
-) (err error) {
-	ta := kennung.NowTai()
-	t.SetTai(ta)
-
-	return s.CommitTransacted(t)
-}
-
-func (s *common) CommitTransacted(t *sku.Transacted) (err error) {
-	sk := sku.GetTransactedPool().Get()
-
-	if t.GetGattung() == gattung.Konfig {
-		if err = s.konfig.SetTransacted(
-			t,
-			s.GetAkten().GetKonfigV0(),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if err = sk.SetFromSkuLike(t); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.bestandsaufnahmeAkte.Skus.Add(sk); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (s *common) ResetIndexes() (err error) {
 	if err = s.typenIndex.Reset(); err != nil {
 		err = errors.Wrapf(err, "failed to reset etiketten index")
@@ -265,23 +206,6 @@ func (s *common) ResetIndexes() (err error) {
 
 	if err = s.kennungIndex.Reset(); err != nil {
 		err = errors.Wrapf(err, "failed to reset index kennung")
-		return
-	}
-
-	return
-}
-
-func (s *common) AddTypToIndex(t *kennung.Typ) (err error) {
-	if t == nil {
-		return
-	}
-
-	if t.IsEmpty() {
-		return
-	}
-
-	if err = s.typenIndex.StoreOne(*t); err != nil {
-		err = errors.Wrap(err)
 		return
 	}
 
