@@ -62,7 +62,7 @@ func (s *Store) Create(
 		return
 	}
 
-	if err = s.handleUpdated(tz); err != nil {
+	if err = s.handleNew(tz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -116,6 +116,13 @@ func (s *Store) Update(
 	}
 
 	if tz, err = s.makeSku(m, h); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	mu := &mutter.Metadatei.Verzeichnisse.Sha
+
+	if err = tz.Metadatei.Verzeichnisse.Mutter.SetShaLike(mu); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

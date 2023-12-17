@@ -61,7 +61,6 @@ func MakeStore(
 	standort standort.Standort,
 	ls schnittstellen.LockSmith,
 	sv schnittstellen.StoreVersion,
-	orfg schnittstellen.ObjekteReaderFactoryGetter,
 	of schnittstellen.ObjekteIOFactory,
 	af schnittstellen.AkteIOFactory,
 	pmf objekte_format.Format,

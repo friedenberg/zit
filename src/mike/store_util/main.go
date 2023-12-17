@@ -153,7 +153,6 @@ func MakeStoreUtil(
 		c.GetStandort(),
 		c.GetStandort().GetLockSmith(),
 		c.konfig.GetStoreVersion(),
-		c.standort,
 		c.standort.ObjekteReaderWriterFactory(gattung.Bestandsaufnahme),
 		c.standort,
 		pmf,

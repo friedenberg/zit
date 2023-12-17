@@ -60,15 +60,16 @@ func makePage(
 }
 
 func (zp *Page) doTryLock() (err error) {
-	if ok := zp.lock.TryLock(); !ok {
-		err = MakeErrConcurrentPageAccess()
-	}
+  return
+	// if ok := zp.lock.TryLock(); !ok {
+	// 	err = MakeErrConcurrentPageAccess()
+	// }
 
-	return
+	// return
 }
 
 func (zp *Page) doUnlock() {
-	zp.lock.Unlock()
+	// zp.lock.Unlock()
 }
 
 func (zp *Page) Add(z *sku.Transacted) (err error) {
@@ -222,7 +223,7 @@ func (zp *Page) copy(
 				if errors.IsEOF(err) {
 					err = collections.MakeErrStopIteration()
 				} else {
-					err = errors.Wrapf(err, "Page: %s", zp.pageId.path)
+					err = errors.Wrapf(err, "Page: %s", zp.path)
 				}
 
 				return

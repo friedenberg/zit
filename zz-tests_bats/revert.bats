@@ -14,13 +14,26 @@ teardown() {
 	rm_from_version "$version"
 }
 
-function revert_one { # @test
-	skip
-	run_zit revert one/dos.zettel
+function revert_one_zettel { # @test
+	run_zit revert one/uno
 	assert_success
 	assert_output - <<-EOM
-		[-etikett@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-etikett-one@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/uno@d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "wildly different" etikett-one]
+		[one/uno@3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
+	EOM
+}
+
+function revert_all_zettels { # @test
+	run_zit revert :z
+	assert_success
+	assert_output - <<-EOM
+		[one/uno@3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
+	EOM
+}
+
+function revert_last { # @test
+	run_zit revert -last
+	assert_success
+	assert_output - <<-EOM
+		[one/uno@3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
 	EOM
 }

@@ -68,6 +68,25 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		return
 	}
 
+	var mutter *sku.Transacted
+
+	if mutter, err = s.ReadOne(kennungPtr); err != nil {
+		if errors.Is(err, objekte_store.ErrNotFound{}) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		mu := &mutter.Metadatei.Verzeichnisse.Sha
+		if err = transactedPtr.Metadatei.Verzeichnisse.Mutter.SetShaLike(
+			mu,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	if err = iter.Chain(
 		transactedPtr,
 		s.handleUpdated,
@@ -126,6 +145,14 @@ func (s *Store) CreateOrUpdate(
 
 	if mutter != nil {
 		transactedPtr.Kopf = mutter.GetKopf()
+		mu := &mutter.Metadatei.Verzeichnisse.Sha
+
+		if err = transactedPtr.Metadatei.Verzeichnisse.Mutter.SetShaLike(
+			mu,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	} else {
 		errors.TodoP4("determine if this is necessary any more")
 		// transactedPtr.Sku.Kopf = s.common.GetTransaktion().Time
@@ -308,6 +335,15 @@ func (s *Store) CreateOrUpdateAkte(
 
 	if mutter != nil {
 		transactedPtr.Kopf = mutter.GetKopf()
+
+		mu := &mutter.Metadatei.Verzeichnisse.Sha
+
+		if err = transactedPtr.Metadatei.Verzeichnisse.Mutter.SetShaLike(
+			mu,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	} else {
 		errors.TodoP4("determine if this is necessary any more")
 		// transactedPtr.Sku.Kopf = s.common.GetTransaktion().Time

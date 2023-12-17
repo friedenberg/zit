@@ -210,19 +210,19 @@ func (f v4) FormatPersistentMetadatei(
 				}
 			}
 		}
+	}
 
-		if !m.Verzeichnisse.Mutter.IsNull() {
-			n1, err = ohio.WriteKeySpaceValueNewlineString(
-				mw,
-				"Verzeichnisse-Mutter",
-				m.Verzeichnisse.Mutter.String(),
-			)
-			n += int64(n1)
+	if !m.Verzeichnisse.Mutter.IsNull() {
+		n1, err = ohio.WriteKeySpaceValueNewlineString(
+			mw,
+			"Verzeichnisse-Mutter",
+			m.Verzeichnisse.Mutter.String(),
+		)
+		n += int64(n1)
 
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+		if err != nil {
+			err = errors.Wrap(err)
+			return
 		}
 
 		actual := mh.GetShaLike()
@@ -244,6 +244,7 @@ func (f v4) FormatPersistentMetadatei(
 			"Verzeichnisse-Sha",
 			actual.String(),
 		)
+
 		n += int64(n1)
 
 		if err != nil {
