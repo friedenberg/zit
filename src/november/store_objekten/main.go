@@ -23,8 +23,6 @@ type Store struct {
 	konfigStore konfigStore
 
 	objekte_store.LogWriter
-
-	isReindexing bool
 }
 
 func Make(
@@ -407,10 +405,10 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	s.isReindexing = true
-	defer func() {
-		s.isReindexing = false
-	}()
+	if err = s.ResetIndexes(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = s.StoreUtil.GetStandort().ResetVerzeichnisse(); err != nil {
 		err = errors.Wrap(err)
@@ -420,28 +418,6 @@ func (s *Store) Reindex() (err error) {
 	f1 := s.GetReindexFunc()
 
 	if err = s.GetBestandsaufnahmeStore().ReadAllSkus(f1); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) Reset() (err error) {
-	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte_store.ErrLockRequired{
-			Operation: "reset",
-		}
-
-		return
-	}
-
-	s.isReindexing = true
-	defer func() {
-		s.isReindexing = false
-	}()
-
-	if err = s.ResetIndexes(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -119,7 +119,7 @@ func (u *Umwelt) Einleitung(e Einleitung) (err error) {
 
 		defer errors.Deferred(&err, u.Unlock)
 
-		if err = u.StoreObjekten().Reset(); err != nil {
+		if err = u.StoreUtil().ResetIndexes(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

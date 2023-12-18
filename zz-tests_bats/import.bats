@@ -102,7 +102,7 @@ function import_conflict { # @test
 
 	run_zit show -format bestandsaufnahme-verzeichnisse one/uno+
 	assert_success
-	echo -n "$output" >besties
+	echo "$output" >besties
 
 	besties="$(realpath besties)"
 	akten="$(realpath .zit/Objekten2/Akten)"
@@ -133,7 +133,7 @@ function import_conflict { # @test
 		copied Akte 3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 (27 bytes)
 	EOM
 
-	run_zit import -verbose -bestandsaufnahme "$besties" -akten "$akten" -compression-type none
+	run_zit import -bestandsaufnahme "$besties" -akten "$akten" -compression-type none
 	assert_failure
 	assert_output_unsorted - <<-EOM
 		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]

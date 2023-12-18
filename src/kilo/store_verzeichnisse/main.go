@@ -88,15 +88,13 @@ func (i *Store) SetNeedsFlush() {
 
 func (i *Store) Flush() (err error) {
 	errors.Log().Print("flushing")
+	wg := iter.MakeErrorWaitGroup()
 
 	for _, p := range i.pages {
-		if err = p.Flush(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		wg.Do(p.Flush)
 	}
 
-	return
+	return wg.GetError()
 }
 
 func (i *Store) AddVerzeichnisse(
@@ -129,14 +127,6 @@ func (i *Store) AddVerzeichnisse(
 		return
 	}
 
-	return
-}
-
-func (i *Store) GetPageIndexKeyValue(
-	zt sku.Transacted,
-) (key string, value string) {
-	key = zt.Kennung.String()
-	value = fmt.Sprintf("%s.%s", zt.GetTai(), &zt.ObjekteSha)
 	return
 }
 
@@ -174,10 +164,7 @@ func (i *Store) ReadMany(
 				openFileCh <- struct{}{}
 			}(openFileCh)
 
-			for {
-				if isDone() {
-					break
-				}
+			for !isDone() {
 
 				var err1 error
 

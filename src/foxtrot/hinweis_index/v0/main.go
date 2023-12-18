@@ -6,7 +6,6 @@ import (
 	"io"
 	"math/rand"
 	"sync"
-	"time"
 
 	"github.com/friedenberg/zit/src/alfa/coordinates"
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -23,7 +22,7 @@ type encodedKennung struct {
 type oldIndex struct {
 	su schnittstellen.VerzeichnisseFactory
 
-	lock *sync.RWMutex
+	lock sync.Mutex
 	path string
 
 	encodedKennung
@@ -42,7 +41,6 @@ func MakeIndex(
 	su schnittstellen.VerzeichnisseFactory,
 ) (i *oldIndex, err error) {
 	i = &oldIndex{
-		lock:               &sync.RWMutex{},
 		path:               s.FileVerzeichnisseKennung(),
 		nonRandomSelection: k.UsePredictableHinweisen(),
 		su:                 su,
@@ -65,15 +63,13 @@ func MakeIndex(
 }
 
 func (i *oldIndex) Flush() (err error) {
-	i.lock.RLock()
+	i.lock.Lock()
+	defer i.lock.Unlock()
 
 	if !i.hasChanges {
 		errors.Log().Print("no changes")
-		i.lock.RUnlock()
 		return
 	}
-
-	i.lock.RUnlock()
 
 	var w1 io.WriteCloser
 
@@ -82,11 +78,11 @@ func (i *oldIndex) Flush() (err error) {
 		return
 	}
 
-	defer errors.Deferred(&err, w1.Close)
+	defer errors.DeferredCloser(&err, w1)
 
 	w := bufio.NewWriter(w1)
 
-	defer errors.Deferred(&err, w.Flush)
+	defer errors.DeferredFlusher(&err, w)
 
 	enc := gob.NewEncoder(w)
 
@@ -99,17 +95,12 @@ func (i *oldIndex) Flush() (err error) {
 }
 
 func (i *oldIndex) readIfNecessary() (err error) {
-	i.lock.RLock()
-
-	if i.didRead {
-		i.lock.RUnlock()
-		return
-	}
-
-	i.lock.RUnlock()
-
 	i.lock.Lock()
 	defer i.lock.Unlock()
+
+	if i.didRead {
+		return
+	}
 
 	errors.Log().Print("reading")
 
@@ -142,6 +133,9 @@ func (i *oldIndex) readIfNecessary() (err error) {
 }
 
 func (i *oldIndex) Reset() (err error) {
+	i.lock.Lock()
+	defer i.lock.Unlock()
+
 	lMax := i.oldHinweisenStore.Left().Len() - 1
 	rMax := i.oldHinweisenStore.Right().Len() - 1
 
@@ -235,8 +229,6 @@ func (i *oldIndex) CreateHinweis() (h *kennung.Hinweis, err error) {
 		return
 	}
 
-	rand.Seed(time.Now().UnixNano())
-
 	if len(i.AvailableKennung) == 0 {
 		err = errors.Wrap(hinweisen.ErrHinweisenExhausted{})
 		return
@@ -301,6 +293,9 @@ func (i *oldIndex) makeHinweisButDontStore(
 }
 
 func (i *oldIndex) PeekHinweisen(m int) (hs []*kennung.Hinweis, err error) {
+	i.lock.Lock()
+	defer i.lock.Unlock()
+
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return

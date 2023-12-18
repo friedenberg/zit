@@ -12,7 +12,7 @@ type Reindex struct{}
 func init() {
 	registerCommand(
 		"reindex",
-		func(f *flag.FlagSet) Command {
+		func(_ *flag.FlagSet) Command {
 			c := &Reindex{}
 
 			return c
