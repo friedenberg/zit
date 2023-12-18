@@ -1,13 +1,11 @@
 package objekte_format
 
 import (
-	"fmt"
 	"io"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/ohio"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -38,7 +36,7 @@ func (f v4) FormatPersistentMetadatei(
 	if !m.Akte.IsNull() {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,
-			gattung.Akte.String(),
+			keyAkte.String(),
 			m.Akte.String(),
 		)
 		n += int64(n1)
@@ -58,7 +56,7 @@ func (f v4) FormatPersistentMetadatei(
 
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,
-			gattung.Bezeichnung.String(),
+			keyBezeichnung.String(),
 			line,
 		)
 		n += int64(n1)
@@ -74,7 +72,7 @@ func (f v4) FormatPersistentMetadatei(
 	for _, e := range iter.SortedValues[kennung.Etikett](es) {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,
-			gattung.Etikett.String(),
+			keyEtikett.String(),
 			e.String(),
 		)
 		n += int64(n1)
@@ -87,7 +85,7 @@ func (f v4) FormatPersistentMetadatei(
 
 	n1, err = ohio.WriteKeySpaceValueNewlineString(
 		w,
-		"Gattung",
+		keyGattung.String(),
 		c.GetKennung().GetGattung().GetGattungString(),
 	)
 	n += int64(n1)
@@ -99,7 +97,7 @@ func (f v4) FormatPersistentMetadatei(
 
 	n1, err = ohio.WriteKeySpaceValueNewlineString(
 		w,
-		"Kennung",
+		keyKennung.String(),
 		c.GetKennung().String(),
 	)
 	n += int64(n1)
@@ -112,7 +110,7 @@ func (f v4) FormatPersistentMetadatei(
 	for _, k := range m.Comments {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,
-			"Komment",
+			keyKomment.String(),
 			k,
 		)
 		n += int64(n1)
@@ -126,7 +124,7 @@ func (f v4) FormatPersistentMetadatei(
 	if o.IncludeTai {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,
-			"Tai",
+			keyTai.String(),
 			m.Tai.String(),
 		)
 		n += int64(n1)
@@ -140,7 +138,7 @@ func (f v4) FormatPersistentMetadatei(
 	if !m.Typ.IsEmpty() {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,
-			gattung.Typ.String(),
+			keyTyp.String(),
 			m.GetTyp().String(),
 		)
 		n += int64(n1)
@@ -155,7 +153,7 @@ func (f v4) FormatPersistentMetadatei(
 		if m.Verzeichnisse.Archiviert.Bool() {
 			n1, err = ohio.WriteKeySpaceValueNewlineString(
 				w,
-				"Verzeichnisse-Archiviert",
+				keyVerzeichnisseArchiviert.String(),
 				m.Verzeichnisse.Archiviert.String(),
 			)
 			n += int64(n1)
@@ -167,10 +165,8 @@ func (f v4) FormatPersistentMetadatei(
 		}
 
 		if m.Verzeichnisse.GetExpandedEtiketten().Len() > 0 {
-			k := fmt.Sprintf(
-				"Verzeichnisse-%s-Expanded",
-				gattung.Etikett.String(),
-			)
+			k := keyVerzeichnisseEtikettExpanded.String()
+
 			for _, e := range iter.SortedValues[kennung.Etikett](
 				m.Verzeichnisse.GetExpandedEtiketten(),
 			) {
@@ -189,10 +185,7 @@ func (f v4) FormatPersistentMetadatei(
 		}
 
 		if m.Verzeichnisse.GetImplicitEtiketten().Len() > 0 {
-			k := fmt.Sprintf(
-				"Verzeichnisse-%s-Implicit",
-				gattung.Etikett.String(),
-			)
+			k := keyVerzeichnisseEtikettImplicit.String()
 
 			for _, e := range iter.SortedValues[kennung.Etikett](
 				m.Verzeichnisse.GetImplicitEtiketten(),
@@ -212,11 +205,11 @@ func (f v4) FormatPersistentMetadatei(
 		}
 	}
 
-	if !m.Verzeichnisse.Mutter.IsNull() {
+	if !m.Mutter.IsNull() {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,
-			"Verzeichnisse-Mutter",
-			m.Verzeichnisse.Mutter.String(),
+			keyMutter.String(),
+			m.Mutter.String(),
 		)
 		n += int64(n1)
 
@@ -241,7 +234,7 @@ func (f v4) FormatPersistentMetadatei(
 
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			w,
-			"Verzeichnisse-Sha",
+			keySha.String(),
 			actual.String(),
 		)
 

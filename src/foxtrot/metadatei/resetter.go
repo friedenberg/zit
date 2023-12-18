@@ -19,6 +19,7 @@ func (resetter) Reset(z *Metadatei) {
 	// z.Gattung = gattung.Unknown
 	z.Tai.Reset()
 	z.Sha.Reset()
+	z.Mutter.Reset()
 }
 
 func (r resetter) ResetWith(a *Metadatei, b Metadatei) {
@@ -39,6 +40,7 @@ func (resetter) ResetWithPtr(a *Metadatei, b *Metadatei) {
 	a.Tai = b.Tai
 
 	errors.PanicIfError(a.Sha.SetShaLike(&b.Sha))
+	errors.PanicIfError(a.Mutter.SetShaLike(&b.Mutter))
 }
 
 var ResetterVerzeichnisse resetterVerzeichnisse
@@ -49,12 +51,10 @@ func (resetterVerzeichnisse) Reset(a *Verzeichnisse) {
 	a.Archiviert.Reset()
 	a.SetExpandedEtiketten(nil)
 	a.SetImplicitEtiketten(nil)
-	a.Mutter.Reset()
 }
 
 func (resetterVerzeichnisse) ResetWith(a, b *Verzeichnisse) {
 	a.Archiviert.ResetWith(b.Archiviert)
 	a.SetExpandedEtiketten(b.GetExpandedEtiketten())
 	a.SetImplicitEtiketten(b.GetImplicitEtiketten())
-	errors.PanicIfError(a.Mutter.SetShaLike(&b.Mutter))
 }

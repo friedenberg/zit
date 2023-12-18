@@ -17,22 +17,6 @@ type key struct {
 	includeInSha bool
 }
 
-var (
-	keyAkte                         = catgut.MakeFromString("Akte")
-	keyBezeichnung                  = catgut.MakeFromString("Bezeichnung")
-	keyEtikett                      = catgut.MakeFromString("Etikett")
-	keyGattung                      = catgut.MakeFromString("Gattung")
-	keyKennung                      = catgut.MakeFromString("Kennung")
-	keyKomment                      = catgut.MakeFromString("Komment")
-	keyTai                          = catgut.MakeFromString("Tai")
-	keyTyp                          = catgut.MakeFromString("Typ")
-	keyVerzeichnisseArchiviert      = catgut.MakeFromString("Verzeichnisse-Archiviert")
-	keyVerzeichnisseEtikettImplicit = catgut.MakeFromString("Verzeichnisse-Etikett-Implicit")
-	keyVerzeichnisseEtikettExpanded = catgut.MakeFromString("Verzeichnisse-Etikett-Expanded")
-	keyVerzeichnisseMutter          = catgut.MakeFromString("Verzeichnisse-Mutter")
-	keyVerzeichnisseSha             = catgut.MakeFromString("Verzeichnisse-Sha")
-)
-
 func (f v4) ParsePersistentMetadatei(
 	r *catgut.RingBuffer,
 	c ParserContext,
@@ -46,11 +30,10 @@ func (f v4) ParsePersistentMetadatei(
 	)
 
 	var (
-		lastKey, valBuffer       catgut.String
+		valBuffer                catgut.String
 		line, key, val           catgut.Slice
 		ok                       bool
 		writeMetadateiHashString bool
-		ignoreOrder              bool
 	)
 
 	mh := sha.MakeWriter(nil)
@@ -76,11 +59,6 @@ func (f v4) ParsePersistentMetadatei(
 
 		if key.Len() == 0 {
 			err = makeErrWithBytes(errV4EmptyKey, line.Bytes())
-			break
-		}
-
-		if lastKey.Len() > 0 && key.Compare(lastKey.Bytes()) == 1 {
-			err = makeErrWithBytes(errV4KeysNotSorted, line.Bytes())
 			break
 		}
 
@@ -209,22 +187,21 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-		case key.Equal(keyVerzeichnisseMutter.Bytes()):
-			if err = m.Verzeichnisse.Mutter.SetHexBytes(val.Bytes()); err != nil {
+		case key.Equal(keyMutter.Bytes()):
+			if err = m.Mutter.SetHexBytes(val.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 			writeMetadateiHashString = true
 
-		case key.Equal(keyVerzeichnisseSha.Bytes()):
+		case key.Equal(keySha.Bytes()):
 			if err = m.Sha.SetHexBytes(val.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 		case key.Equal(keyKomment.Bytes()):
-			ignoreOrder = true
 			m.Comments = append(m.Comments, val.String())
 
 		default:
@@ -234,21 +211,6 @@ func (f v4) ParsePersistentMetadatei(
 		// Key Space Value Newline
 		thisN := int64(key.Len() + 1 + val.Len() + 1)
 		n += thisN
-
-		if !ignoreOrder {
-			lastKey.Reset()
-			n, err = key.WriteTo(&lastKey)
-
-			if n != int64(key.Len()) || err != nil {
-				panic(
-					fmt.Sprintf(
-						"failed to write everything to lastKey. N: %d, err: %s",
-						n,
-						err,
-					),
-				)
-			}
-		}
 
 		lineNo++
 
@@ -266,7 +228,6 @@ func (f v4) ParsePersistentMetadatei(
 		}
 
 		writeMetadateiHashString = false
-		ignoreOrder = false
 	}
 
 	if n == 0 {

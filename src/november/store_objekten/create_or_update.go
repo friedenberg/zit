@@ -79,7 +79,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		}
 	} else {
 		mu := &mutter.Metadatei.Sha
-		if err = transactedPtr.Metadatei.Verzeichnisse.Mutter.SetShaLike(
+		if err = transactedPtr.Metadatei.Mutter.SetShaLike(
 			mu,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -147,7 +147,7 @@ func (s *Store) CreateOrUpdate(
 		transactedPtr.Kopf = mutter.GetKopf()
 		mu := &mutter.Metadatei.Sha
 
-		if err = transactedPtr.Metadatei.Verzeichnisse.Mutter.SetShaLike(
+		if err = transactedPtr.Metadatei.Mutter.SetShaLike(
 			mu,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -338,7 +338,7 @@ func (s *Store) CreateOrUpdateAkte(
 
 		mu := &mutter.Metadatei.Sha
 
-		if err = transactedPtr.Metadatei.Verzeichnisse.Mutter.SetShaLike(
+		if err = transactedPtr.Metadatei.Mutter.SetShaLike(
 			mu,
 		); err != nil {
 			err = errors.Wrap(err)

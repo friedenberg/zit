@@ -4,7 +4,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
@@ -12,7 +11,6 @@ type Verzeichnisse struct {
 	Archiviert        values.Bool
 	ExpandedEtiketten kennung.EtikettMutableSet // public for gob, but should be private
 	ImplicitEtiketten kennung.EtikettMutableSet // public for gob, but should be private
-	Mutter            sha.Sha                   // sha of parent Metadatei
 }
 
 func (v *Verzeichnisse) GetExpandedEtiketten() kennung.EtikettSet {

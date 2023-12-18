@@ -136,7 +136,7 @@ func (s *Transacted) GetGattung() schnittstellen.GattungLike {
 }
 
 func (s *Transacted) IsNew() bool {
-	return s.Metadatei.Verzeichnisse.Mutter.IsNull()
+	return s.Metadatei.Mutter.IsNull()
 }
 
 func (s *Transacted) SetObjekteSha(v schnittstellen.ShaLike) {

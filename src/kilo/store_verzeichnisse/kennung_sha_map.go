@@ -16,7 +16,7 @@ func (ksm KennungShaMap) ModifyMutter(z *sku.Transacted) (err error) {
 		return
 	}
 
-	if err = z.GetMetadatei().Verzeichnisse.Mutter.SetShaLike(old); err != nil {
+	if err = z.GetMetadatei().Mutter.SetShaLike(old); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

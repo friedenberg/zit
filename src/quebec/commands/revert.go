@@ -114,7 +114,7 @@ func (c Revert) addOneMutterToKennung(
 	z *sku.Transacted,
 	mutterToKennung map[string]string,
 ) (err error) {
-	mu := &z.Metadatei.Verzeichnisse.Mutter
+	mu := &z.Metadatei.Mutter
 
 	if mu.IsNull() {
 		// log.Err().Printf("%s has null mutter, cannot revert", z)

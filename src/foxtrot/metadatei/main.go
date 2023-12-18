@@ -33,6 +33,7 @@ type Metadatei struct {
 	Tai         kennung.Tai
 
 	Sha           sha.Sha // sha of Metadatei
+	Mutter        sha.Sha // sha of parent Metadatei
 	Comments      []string
 	Verzeichnisse Verzeichnisse
 }
