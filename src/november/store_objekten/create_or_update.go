@@ -136,7 +136,7 @@ func (s *Store) CreateOrUpdate(
 	m.Tai = s.GetTai()
 
 	transactedPtr = sku.GetTransactedPool().Get()
-	metadatei.Resetter.ResetWithPtr(&transactedPtr.Metadatei, m)
+	metadatei.Resetter.ResetWith(&transactedPtr.Metadatei, m)
 
 	if err = transactedPtr.Kennung.SetWithKennung(kennungPtr); err != nil {
 		err = errors.Wrap(err)
@@ -324,7 +324,7 @@ func (s *Store) CreateOrUpdateAkte(
 	m.Tai = s.GetTai()
 
 	transactedPtr = sku.GetTransactedPool().Get()
-	metadatei.Resetter.ResetWithPtr(&transactedPtr.Metadatei, m)
+	metadatei.Resetter.ResetWith(&transactedPtr.Metadatei, m)
 
 	if err = transactedPtr.Kennung.SetWithKennung(kennungPtr); err != nil {
 		err = errors.Wrap(err)

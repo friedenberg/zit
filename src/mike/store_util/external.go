@@ -89,7 +89,7 @@ func (s *common) ReadOneExternalObjekte(
 	t *sku.Transacted,
 ) (err error) {
 	if t != nil {
-		metadatei.Resetter.ResetWithPtr(e.GetMetadatei(), t.GetMetadatei())
+		metadatei.Resetter.ResetWith(e.GetMetadatei(), t.GetMetadatei())
 	}
 
 	var f *os.File
@@ -132,7 +132,7 @@ func (s *common) ReadOneExternalAkte(
 	e *sku.External,
 	t *sku.Transacted,
 ) (err error) {
-	metadatei.Resetter.ResetWithPtr(&e.Metadatei, t.GetMetadatei())
+	metadatei.Resetter.ResetWith(&e.Metadatei, t.GetMetadatei())
 
 	var aw sha.WriteCloser
 

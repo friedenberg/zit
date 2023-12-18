@@ -22,11 +22,7 @@ func (resetter) Reset(z *Metadatei) {
 	z.Mutter.Reset()
 }
 
-func (r resetter) ResetWith(a *Metadatei, b Metadatei) {
-	r.ResetWithPtr(a, &b)
-}
-
-func (resetter) ResetWithPtr(a *Metadatei, b *Metadatei) {
+func (resetter) ResetWith(a *Metadatei, b *Metadatei) {
 	errors.PanicIfError(a.Akte.SetShaLike(&b.Akte))
 	a.Bezeichnung = b.Bezeichnung
 	a.Comments = a.Comments[:0]

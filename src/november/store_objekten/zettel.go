@@ -159,7 +159,7 @@ func (s *Store) makeSku(
 
 	m := mg.GetMetadatei()
 	tz = sku.GetTransactedPool().Get()
-	metadatei.Resetter.ResetWithPtr(&tz.Metadatei, m)
+	metadatei.Resetter.ResetWith(&tz.Metadatei, m)
 
 	if err = tz.Kennung.SetWithKennung(k); err != nil {
 		err = errors.Wrap(err)

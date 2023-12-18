@@ -32,17 +32,14 @@ type Metadatei struct {
 	Typ         kennung.Typ
 	Tai         kennung.Tai
 
-	Sha           sha.Sha // sha of Metadatei
-	Mutter        sha.Sha // sha of parent Metadatei
+	Sha    sha.Sha // sha of Metadatei
+	Mutter sha.Sha // sha of parent Metadatei
+
 	Comments      []string
 	Verzeichnisse Verzeichnisse
 }
 
 func (m *Metadatei) GetMetadatei() *Metadatei {
-	return m
-}
-
-func (m *Metadatei) GetMetadateiPtr() *Metadatei {
 	return m
 }
 

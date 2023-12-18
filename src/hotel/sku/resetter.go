@@ -22,6 +22,6 @@ func (transactedResetter) ResetWithPtr(a *Transacted, b *Transacted) {
 	a.Kopf = b.Kopf
 	errors.PanicIfError(a.ObjekteSha.SetShaLike(&b.ObjekteSha))
 	errors.PanicIfError(a.Kennung.ResetWithKennung(&b.Kennung))
-	metadatei.Resetter.ResetWithPtr(&a.Metadatei, &b.Metadatei)
+	metadatei.Resetter.ResetWith(&a.Metadatei, &b.Metadatei)
 	a.TransactionIndex.SetInt(b.TransactionIndex.Int())
 }

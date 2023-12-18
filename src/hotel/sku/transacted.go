@@ -36,7 +36,7 @@ func (t *Transacted) SetFromSkuLike(sk SkuLike) (err error) {
 	}
 
 	t.ObjekteSha.SetShaLike(sk.GetObjekteSha())
-	metadatei.Resetter.ResetWithPtr(&t.Metadatei, sk.GetMetadatei())
+	metadatei.Resetter.ResetWith(&t.Metadatei, sk.GetMetadatei())
 	t.GetMetadatei().Tai = sk.GetTai()
 
 	t.Kopf = sk.GetTai()
