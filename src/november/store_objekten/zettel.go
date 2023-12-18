@@ -120,7 +120,7 @@ func (s *Store) Update(
 		return
 	}
 
-	mu := &mutter.Metadatei.Verzeichnisse.Sha
+	mu := &mutter.Metadatei.Sha
 
 	if err = tz.Metadatei.Verzeichnisse.Mutter.SetShaLike(mu); err != nil {
 		err = errors.Wrap(err)

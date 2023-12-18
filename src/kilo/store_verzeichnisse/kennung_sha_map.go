@@ -28,7 +28,7 @@ func (ksm KennungShaMap) SaveSha(z *sku.Transacted) (err error) {
 	k := z.GetKennung()
 	var sh sha.Sha
 
-	if err = sh.SetShaLike(&z.GetMetadatei().Verzeichnisse.Sha); err != nil {
+	if err = sh.SetShaLike(&z.GetMetadatei().Sha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

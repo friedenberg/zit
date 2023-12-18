@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"encoding/gob"
 	"io"
-	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -21,7 +20,6 @@ import (
 type Page struct {
 	useBestandsaufnahmeForVerzeichnisse bool
 
-	lock *sync.Mutex
 	pageId
 	schnittstellen.VerzeichnisseFactory
 	added       sku.TransactedHeap
@@ -39,7 +37,6 @@ func makePage(
 ) (p *Page) {
 	p = &Page{
 		useBestandsaufnahmeForVerzeichnisse: useBestandsaufnahmeForVerzeichnisse,
-		lock:                                &sync.Mutex{},
 		VerzeichnisseFactory:                iof,
 		pageId:                              pid,
 		added:                               sku.MakeTransactedHeap(),
@@ -59,23 +56,9 @@ func makePage(
 	return
 }
 
-func (zp *Page) doTryLock() (err error) {
-  return
-	// if ok := zp.lock.TryLock(); !ok {
-	// 	err = MakeErrConcurrentPageAccess()
-	// }
-
-	// return
-}
-
-func (zp *Page) doUnlock() {
-	// zp.lock.Unlock()
-}
-
 func (zp *Page) Add(z *sku.Transacted) (err error) {
 	if z == nil {
-		err = errors.Errorf("trying to add nil zettel")
-		return
+		panic("trying to add nil zettel")
 	}
 
 	if err = zp.addFilter(z); err != nil {
@@ -89,17 +72,6 @@ func (zp *Page) Add(z *sku.Transacted) (err error) {
 		return
 	}
 
-	// do not lock as checking operations perform additions while reading from
-	// indexes
-	// acquired := zp.doTryLock()
-
-	// if !acquired {
-	// 	err = MakeErrConcurrentPageAccess()
-	// 	return
-	// }
-
-	// defer zp.doUnlock()
-
 	zp.added.Add(z)
 	zp.State = StateChanged
 
@@ -109,12 +81,6 @@ func (zp *Page) Add(z *sku.Transacted) (err error) {
 }
 
 func (zp *Page) Flush() (err error) {
-	if err = zp.doTryLock(); err != nil {
-		return
-	}
-
-	defer zp.doUnlock()
-
 	if zp.State < StateChanged {
 		return
 	}
@@ -292,22 +258,10 @@ func (zp *Page) writeTo(w1 io.Writer) (err error) {
 func (zp *Page) Copy(
 	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	if err = zp.doTryLock(); err != nil {
-		return
-	}
-
-	defer zp.doUnlock()
-
 	return zp.copy(w)
 }
 
 func (zp *Page) WriteTo(w1 io.Writer) (n int64, err error) {
-	if err = zp.doTryLock(); err != nil {
-		return
-	}
-
-	defer zp.doUnlock()
-
 	err = zp.writeTo(w1)
 
 	return

@@ -109,7 +109,7 @@ func (f textFormatterCommon) writeShaTyp(
 	c TextFormatterContext,
 ) (n int64, err error) {
 	m := c.GetMetadatei()
-	return ohio.WriteLine(w1, fmt.Sprintf("! %s.%s", &m.AkteSha, m.Typ))
+	return ohio.WriteLine(w1, fmt.Sprintf("! %s.%s", &m.Akte, m.Typ))
 }
 
 func (f textFormatterCommon) writePathTyp(
@@ -135,7 +135,7 @@ func (f textFormatterCommon) writeAkte(
 	var ar io.ReadCloser
 	m := c.GetMetadatei()
 
-	if ar, err = f.akteFactory.AkteReader(&m.AkteSha); err != nil {
+	if ar, err = f.akteFactory.AkteReader(&m.Akte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

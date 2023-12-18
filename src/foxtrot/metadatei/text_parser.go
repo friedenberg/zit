@@ -45,7 +45,7 @@ func (f textParser) ParseMetadatei(
 	var n1 int64
 
 	defer func() {
-		c.SetAkteSha(&m.AkteSha)
+		c.SetAkteSha(&m.Akte)
 	}()
 
 	var akteFD fd.FD
@@ -112,7 +112,7 @@ func (f textParser) ParseMetadatei(
 
 	inlineAkteSha := sha.Make(akteWriter.GetShaLike())
 
-	if !m.AkteSha.IsNull() && !akteFD.GetShaLike().IsNull() {
+	if !m.Akte.IsNull() && !akteFD.GetShaLike().IsNull() {
 		err = errors.Wrap(
 			MakeErrHasInlineAkteAndFilePath(
 				&akteFD,
@@ -126,22 +126,22 @@ func (f textParser) ParseMetadatei(
 			afs.SetAkteFD(&akteFD)
 		}
 
-		m.AkteSha.SetShaLike(akteFD.GetShaLike())
+		m.Akte.SetShaLike(akteFD.GetShaLike())
 	}
 
 	switch {
-	case m.AkteSha.IsNull() && !inlineAkteSha.IsNull():
-		m.AkteSha.SetShaLike(inlineAkteSha)
+	case m.Akte.IsNull() && !inlineAkteSha.IsNull():
+		m.Akte.SetShaLike(inlineAkteSha)
 
-	case !m.AkteSha.IsNull() && inlineAkteSha.IsNull():
+	case !m.Akte.IsNull() && inlineAkteSha.IsNull():
 		// noop
 
-	case !m.AkteSha.IsNull() && !inlineAkteSha.IsNull() &&
-		!m.AkteSha.Equals(inlineAkteSha):
+	case !m.Akte.IsNull() && !inlineAkteSha.IsNull() &&
+		!m.Akte.Equals(inlineAkteSha):
 		err = errors.Wrap(
 			MakeErrHasInlineAkteAndMetadateiSha(
 				inlineAkteSha,
-				&m.AkteSha,
+				&m.Akte,
 			),
 		)
 
@@ -216,7 +216,7 @@ func (f textParser) setAkteSha(
 	m *Metadatei,
 	maybeSha string,
 ) (err error) {
-	if err = m.AkteSha.Set(maybeSha); err != nil {
+	if err = m.Akte.Set(maybeSha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -53,7 +53,7 @@ func (a *Transacted) String() string {
 		"%s %s %s",
 		&a.Kennung,
 		&a.ObjekteSha,
-		&a.Metadatei.AkteSha,
+		&a.Metadatei.Akte,
 	)
 }
 
@@ -148,11 +148,11 @@ func (s *Transacted) GetObjekteSha() schnittstellen.ShaLike {
 }
 
 func (s *Transacted) GetAkteSha() schnittstellen.ShaLike {
-	return &s.Metadatei.AkteSha
+	return &s.Metadatei.Akte
 }
 
 func (s *Transacted) SetAkteSha(sh schnittstellen.ShaLike) {
-	s.Metadatei.AkteSha.SetShaLike(sh)
+	s.Metadatei.Akte.SetShaLike(sh)
 }
 
 func (s *Transacted) GetTransactionIndex() values.Int {

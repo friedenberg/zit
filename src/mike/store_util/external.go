@@ -167,7 +167,7 @@ func (s *common) ReadOneExternalAkte(
 	}
 
 	e.Metadatei.Tai = kennung.TaiFromTime(thyme.Tyme(fStat.ModTime()))
-	e.GetMetadatei().AkteSha.SetShaLike(aw)
+	e.GetMetadatei().Akte.SetShaLike(aw)
 
 	if err = sku.CalculateAndSetSha(
 		e,

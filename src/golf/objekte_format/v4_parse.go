@@ -95,7 +95,7 @@ func (f v4) ParsePersistentMetadatei(
 
 		switch {
 		case key.Equal(keyAkte.Bytes()):
-			if err = m.AkteSha.SetHexBytes(valBuffer.Bytes()); err != nil {
+			if err = m.Akte.SetHexBytes(valBuffer.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -218,7 +218,7 @@ func (f v4) ParsePersistentMetadatei(
 			writeMetadateiHashString = true
 
 		case key.Equal(keyVerzeichnisseSha.Bytes()):
-			if err = m.Verzeichnisse.Sha.SetHexBytes(val.Bytes()); err != nil {
+			if err = m.Sha.SetHexBytes(val.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -280,7 +280,7 @@ func (f v4) ParsePersistentMetadatei(
 	actual := mh.GetShaLike()
 
 	// if m.Verzeichnisse.Sha.IsNull() {
-	if err = m.Verzeichnisse.Sha.SetShaLike(actual); err != nil {
+	if err = m.Sha.SetShaLike(actual); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

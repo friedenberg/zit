@@ -35,11 +35,11 @@ func (f v4) FormatPersistentMetadatei(
 		n2 int64
 	)
 
-	if !m.AkteSha.IsNull() {
+	if !m.Akte.IsNull() {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,
 			gattung.Akte.String(),
-			m.AkteSha.String(),
+			m.Akte.String(),
 		)
 		n += int64(n1)
 

@@ -26,13 +26,15 @@ type Metadatei struct {
 	// StoreVersion values.Int
 	// Kasten
 	// Domain
-	AkteSha       sha.Sha
-	Bezeichnung   bezeichnung.Bezeichnung
+	Akte        sha.Sha
+	Bezeichnung bezeichnung.Bezeichnung
+	Etiketten   kennung.EtikettMutableSet // public for gob, but should be private
+	Typ         kennung.Typ
+	Tai         kennung.Tai
+
+	Sha           sha.Sha // sha of Metadatei
 	Comments      []string
-	Etiketten     kennung.EtikettMutableSet // public for gob, but should be private
 	Verzeichnisse Verzeichnisse
-	Typ           kennung.Typ
-	Tai           kennung.Tai
 }
 
 func (m *Metadatei) GetMetadatei() *Metadatei {
@@ -87,7 +89,7 @@ func (z *Metadatei) UserInputIsEmpty() bool {
 }
 
 func (z *Metadatei) IsEmpty() bool {
-	if !z.AkteSha.IsNull() {
+	if !z.Akte.IsNull() {
 		return false
 	}
 
@@ -159,7 +161,7 @@ func (z *Metadatei) SetEtiketten(e kennung.EtikettSet) {
 }
 
 func (z *Metadatei) SetAkteSha(sh schnittstellen.ShaLike) {
-	z.AkteSha.SetShaLike(sh)
+	z.Akte.SetShaLike(sh)
 }
 
 func (z *Metadatei) GetTyp() kennung.Typ {
@@ -175,7 +177,7 @@ func (z *Metadatei) GetTai() kennung.Tai {
 }
 
 func (pz *Metadatei) EqualsSansTai(z1 *Metadatei) bool {
-	if !pz.AkteSha.EqualsSha(&z1.AkteSha) {
+	if !pz.Akte.EqualsSha(&z1.Akte) {
 		return false
 	}
 

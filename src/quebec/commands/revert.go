@@ -69,7 +69,7 @@ func (c Revert) RunWithQuery(u *umwelt.Umwelt, ms matcher.Query) (err error) {
 	if err = u.StoreObjekten().ReadAll(
 		gattungen.MakeSet(gattung.TrueGattung()...),
 		func(z *sku.Transacted) (err error) {
-			ms := z.Metadatei.Verzeichnisse.Sha.String()
+			ms := z.Metadatei.Sha.String()
 
 			kin, ok := mutterToKennung[ms]
 

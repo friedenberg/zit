@@ -27,7 +27,7 @@ func (f v0) FormatPersistentMetadatei(
 		w.WriteFormat("Tai %s", m.Tai)
 	}
 
-	w.WriteFormat("%s %s", gattung.Akte, &m.AkteSha)
+	w.WriteFormat("%s %s", gattung.Akte, &m.Akte)
 	w.WriteFormat("%s %s", gattung.Typ, m.GetTyp())
 	w.WriteFormat("%s %s", gattung.Bezeichnung, m.Bezeichnung)
 
@@ -68,7 +68,7 @@ func (f v0) ParsePersistentMetadatei(
 			ohio.MakeLineReaderKeyValues(
 				map[string]schnittstellen.FuncSetString{
 					"Tai":                        m.Tai.Set,
-					gattung.Akte.String():        m.AkteSha.Set,
+					gattung.Akte.String():        m.Akte.Set,
 					gattung.Typ.String():         typLineReader,
 					gattung.AkteTyp.String():     typLineReader,
 					gattung.Bezeichnung.String(): m.Bezeichnung.Set,

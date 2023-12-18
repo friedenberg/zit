@@ -57,11 +57,11 @@ func (a *External) String() string {
 }
 
 func (a *External) GetAkteSha() schnittstellen.ShaLike {
-	return &a.Metadatei.AkteSha
+	return &a.Metadatei.Akte
 }
 
 func (a *External) SetAkteSha(v schnittstellen.ShaLike) {
-	a.Metadatei.AkteSha.SetShaLike(v)
+	a.Metadatei.Akte.SetShaLike(v)
 	a.FDs.Akte.SetShaLike(v)
 }
 
@@ -85,7 +85,7 @@ func (a *External) GetAkteFD() *fd.FD {
 
 func (a *External) SetAkteFD(v *fd.FD) {
 	a.FDs.Akte.ResetWith(v)
-	a.Metadatei.AkteSha.SetShaLike(v.GetShaLike())
+	a.Metadatei.Akte.SetShaLike(v.GetShaLike())
 }
 
 func (a *External) GetAktePath() string {

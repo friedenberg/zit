@@ -59,7 +59,7 @@ func (s konfigStore) Update(
 	// TODO-P3 refactor into reusable
 	if mutter != nil {
 		if err = kt.Metadatei.Verzeichnisse.Mutter.SetShaLike(
-			&mutter.GetMetadatei().Verzeichnisse.Sha,
+			&mutter.GetMetadatei().Sha,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

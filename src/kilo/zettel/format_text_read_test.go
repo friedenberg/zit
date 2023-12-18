@@ -132,7 +132,7 @@ the body
 		Typ:         makeAkteExt(t, "md"),
 	}
 
-	errors.PanicIfError(expected.AkteSha.Set(
+	errors.PanicIfError(expected.Akte.Set(
 		"036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064",
 	))
 

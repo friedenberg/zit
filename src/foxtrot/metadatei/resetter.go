@@ -10,7 +10,7 @@ var Resetter resetter
 type resetter struct{}
 
 func (resetter) Reset(z *Metadatei) {
-	z.AkteSha.Reset()
+	z.Akte.Reset()
 	z.Bezeichnung.Reset()
 	z.Comments = z.Comments[:0]
 	z.SetEtiketten(nil)
@@ -18,6 +18,7 @@ func (resetter) Reset(z *Metadatei) {
 	z.Typ = kennung.Typ{}
 	// z.Gattung = gattung.Unknown
 	z.Tai.Reset()
+	z.Sha.Reset()
 }
 
 func (r resetter) ResetWith(a *Metadatei, b Metadatei) {
@@ -25,7 +26,7 @@ func (r resetter) ResetWith(a *Metadatei, b Metadatei) {
 }
 
 func (resetter) ResetWithPtr(a *Metadatei, b *Metadatei) {
-	errors.PanicIfError(a.AkteSha.SetShaLike(&b.AkteSha))
+	errors.PanicIfError(a.Akte.SetShaLike(&b.Akte))
 	a.Bezeichnung = b.Bezeichnung
 	a.Comments = a.Comments[:0]
 	a.Comments = append(a.Comments, b.Comments...)
@@ -36,6 +37,8 @@ func (resetter) ResetWithPtr(a *Metadatei, b *Metadatei) {
 
 	a.Typ = b.Typ
 	a.Tai = b.Tai
+
+	errors.PanicIfError(a.Sha.SetShaLike(&b.Sha))
 }
 
 var ResetterVerzeichnisse resetterVerzeichnisse
@@ -47,7 +50,6 @@ func (resetterVerzeichnisse) Reset(a *Verzeichnisse) {
 	a.SetExpandedEtiketten(nil)
 	a.SetImplicitEtiketten(nil)
 	a.Mutter.Reset()
-	a.Sha.Reset()
 }
 
 func (resetterVerzeichnisse) ResetWith(a, b *Verzeichnisse) {
@@ -55,5 +57,4 @@ func (resetterVerzeichnisse) ResetWith(a, b *Verzeichnisse) {
 	a.SetExpandedEtiketten(b.GetExpandedEtiketten())
 	a.SetImplicitEtiketten(b.GetImplicitEtiketten())
 	errors.PanicIfError(a.Mutter.SetShaLike(&b.Mutter))
-	errors.PanicIfError(a.Sha.SetShaLike(&b.Sha))
 }

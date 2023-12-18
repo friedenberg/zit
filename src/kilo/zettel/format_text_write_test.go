@@ -60,7 +60,7 @@ func writeFormat(
 		t.Fatalf("%s", err)
 	}
 
-	if err = m.AkteSha.SetShaLike(&akteSha); err != nil {
+	if err = m.Akte.SetShaLike(&akteSha); err != nil {
 		t.Fatalf("%s", err)
 	}
 
