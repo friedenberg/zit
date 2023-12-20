@@ -94,8 +94,7 @@ func FromHash(h hash.Hash) (s *Sha) {
 	s = &Sha{}
 	s.Reset()
 
-	b := h.Sum(s.data.AvailableBuffer())
-	s.data.Write(b)
+	h.Sum(s.data[:0])
 
 	return
 }

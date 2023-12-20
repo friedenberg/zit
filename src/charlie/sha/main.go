@@ -12,7 +12,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/catgut"
 )
 
 const (
@@ -34,23 +33,22 @@ type PathComponents interface {
 type ShaLike = schnittstellen.ShaGetter
 
 type Sha struct {
-	// TODO-P1 switch to bytes
-	data catgut.String
+	data *[ByteSize]byte
 }
 
 func (s *Sha) GetShaBytes() []byte {
-	if s == nil || s.IsNull() {
-		return shaNull.data.Bytes()
+	if s.IsNull() {
+		return shaNull.data[:]
 	} else {
-		return s.data.Bytes()
+		return s.data[:]
 	}
 }
 
 func (s *Sha) GetShaString() string {
-	if s.IsNull() {
-		return fmt.Sprintf("%x", shaNull.data.Bytes())
+	if s == nil || s.IsNull() {
+		return fmt.Sprintf("%x", shaNull.data[:])
 	} else {
-		return fmt.Sprintf("%x", s.data.Bytes())
+		return fmt.Sprintf("%x", s.data[:])
 	}
 }
 
@@ -63,14 +61,20 @@ func (s *Sha) Sha() *Sha {
 }
 
 func (dst *Sha) SetFromHash(h hash.Hash) (err error) {
-	dst.Reset()
-	b := h.Sum(dst.data.AvailableBuffer())
-	dst.data.Write(b)
+  dst.allocDataIfNecessary()
+	b := h.Sum(dst.data[:0])
+	err = makeErrLength(ByteSize, len(b))
 	return
 }
 
 func (dst *Sha) SetShaLike(src ShaLike) (err error) {
-	err = dst.data.SetBytes(src.GetShaLike().GetShaBytes())
+  dst.allocDataIfNecessary()
+
+	err = makeErrLength(
+		ByteSize,
+		copy(dst.data[:], src.GetShaLike().GetShaBytes()),
+	)
+
 	return
 }
 
@@ -91,12 +95,11 @@ func (src *Sha) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 func (s *Sha) ReadFrom(r io.Reader) (n int64, err error) {
-	s.Reset()
+  s.allocDataIfNecessary()
 
 	var n1 int
 
-	b := s.data.AvailableBuffer()[:ByteSize]
-	n1, err = r.Read(b)
+	n1, err = r.Read(s.data[:])
 
 	if n1 == 0 && err == io.EOF {
 		return
@@ -108,14 +111,13 @@ func (s *Sha) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	n1, err = s.data.Write(b)
 	n = int64(n1)
 
 	return
 }
 
 func (s *Sha) SetHexBytes(b []byte) (err error) {
-	s.Reset()
+  s.allocDataIfNecessary()
 
 	b = bytes.TrimSpace(b)
 
@@ -123,22 +125,18 @@ func (s *Sha) SetHexBytes(b []byte) (err error) {
 		return
 	}
 
-	b1 := s.data.AvailableBuffer()
-
 	var n int
 
-	if b1, n, err = hexDecode(b1, b); err != nil {
+	if _, n, err = hexDecode(s.data[:0], b); err != nil {
 		err = errors.Wrapf(err, "N: %d, Data: %q", n, b)
 		return
 	}
-
-	s.data.Write(b1)
 
 	return
 }
 
 func (s *Sha) Set(v string) (err error) {
-	s.Reset()
+  s.allocDataIfNecessary()
 
 	v1 := strings.TrimSpace(v)
 
@@ -149,11 +147,11 @@ func (s *Sha) Set(v string) (err error) {
 		return
 	}
 
-	if err = makeErrLength(ByteSize, len(b)); err != nil {
+	n := copy(s.data[:], b)
+
+	if err = makeErrLength(ByteSize, n); err != nil {
 		return
 	}
-
-	s.data.Write(b)
 
 	return
 }
@@ -163,11 +161,11 @@ func (s *Sha) GetShaLike() schnittstellen.ShaLike {
 }
 
 func (s *Sha) IsNull() bool {
-	if s.data.Len() == 0 {
+	if s == nil || s.data == nil {
 		return true
 	}
 
-	if bytes.Equal(s.data.Bytes(), shaNull.data.Bytes()) {
+	if bytes.Equal(s.data[:], shaNull.data[:]) {
 		return true
 	}
 
@@ -194,21 +192,27 @@ func (a *Sha) Equals(b *Sha) bool {
 	return a.GetShaString() == b.GetShaString()
 }
 
+
+func (s *Sha) allocDataIfNecessary() {
+  if s.data != nil {
+    return
+  }
+
+	s.data = &[ByteSize]byte{}
+}
+
 func (s *Sha) Reset() {
-	s.data.Reset()
-	s.data.Grow(ByteSize)
+  s.allocDataIfNecessary()
+	s.ResetWith(&shaNull)
 }
 
 func (a *Sha) ResetWith(b *Sha) {
-	a.data.Reset()
-	a.data.Grow(ByteSize)
-	errors.PanicIfError(b.data.CopyTo(&a.data))
+  a.allocDataIfNecessary()
+	copy(a.data[:], b.data[:])
 }
 
 func (a *Sha) ResetWithShaLike(b schnittstellen.ShaLike) {
-	a.data.Reset()
-	a.data.Grow(ByteSize)
-	a.data.Write(b.GetShaBytes())
+	copy(a.data[:], b.GetShaBytes())
 }
 
 func (s *Sha) Path(pc ...string) string {
