@@ -15,11 +15,25 @@ var formats = map[string][]*catgut.String{
 	"MetadateiPlusMutter": {keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai, keyMutter},
 }
 
-func (e *ennui) getShasForMetadatei(m *Metadatei) (shas []*sha.Sha, err error) {
+func (e *ennui) getShasForMetadatei(m *Metadatei) (shas map[string]*sha.Sha, err error) {
+	shas = make(map[string]*sha.Sha, len(formats))
+
 	for k, f1 := range formats {
 		f := format{
 			key:  k,
 			keys: f1,
+		}
+
+		switch k {
+		case "Akte", "AkteTyp":
+			if m.Akte.IsNull() {
+				continue
+			}
+
+		case "AkteBez":
+			if m.Akte.IsNull() && m.Bezeichnung.IsEmpty() {
+				continue
+			}
 		}
 
 		sw := sha.MakeWriter(nil)
@@ -38,7 +52,8 @@ func (e *ennui) getShasForMetadatei(m *Metadatei) (shas []*sha.Sha, err error) {
 			return
 		}
 
-		shas = append(shas, &sh)
+    // log.Debug().Printf("%s: %s", k, &sh)
+		shas[k] = &sh
 	}
 
 	return

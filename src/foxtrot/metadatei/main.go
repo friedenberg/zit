@@ -174,12 +174,12 @@ func (z *Metadatei) GetTai() kennung.Tai {
 	return z.Tai
 }
 
-// TODO remove
+// TODO-P2 remove
 func (pz *Metadatei) EqualsSansTai(z1 *Metadatei) bool {
 	return EqualerSansTai.Equals(pz, z1)
 }
 
-// TODO remove
+// TODO-P2 remove
 func (pz *Metadatei) Equals(z1 *Metadatei) bool {
 	return Equaler.Equals(pz, z1)
 }

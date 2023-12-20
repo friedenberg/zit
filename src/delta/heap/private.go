@@ -53,6 +53,8 @@ func (h *heapPrivate[T, TPtr]) discardDupes() {
 		h.Len() > 0 &&
 		h.equaler.Equals(h.lastPopped, h.Elements[0]) {
 		heap.Pop(h)
+		// d := heap.Pop(h)
+		// log.Debug().Printf("discarded: %s", d)
 	}
 }
 

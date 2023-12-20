@@ -2,6 +2,7 @@ package ennui
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"sync"
@@ -109,7 +110,7 @@ func (e *ennui) Add(m *Metadatei, sh *sha.Sha) (err error) {
 	e.Lock()
 	defer e.Unlock()
 
-	var shas []*sha.Sha
+	var shas map[string]*sha.Sha
 
 	if shas, err = e.getShasForMetadatei(m); err != nil {
 		err = errors.Wrap(err)
@@ -140,7 +141,7 @@ func (e *ennui) GetRowCount() (n int64, err error) {
 }
 
 func (e *ennui) Read(m *Metadatei, h *heap.Heap[Sha, *Sha]) (err error) {
-	var shas []*sha.Sha
+	var shas map[string]*sha.Sha
 
 	if shas, err = e.getShasForMetadatei(m); err != nil {
 		err = errors.Wrap(err)
@@ -150,22 +151,74 @@ func (e *ennui) Read(m *Metadatei, h *heap.Heap[Sha, *Sha]) (err error) {
 	e.Lock()
 	defer e.Unlock()
 
-	for _, s := range shas {
-		if err = e.seekToFirst(s); err != nil {
-			err = errors.Wrap(err)
-			return
+	me := errors.MakeMulti()
+
+	for k, s := range shas {
+		if err = e.seekToFirstBinarySearch(s); err != nil {
+			me.Add(errors.Wrapf(err, "Key: %s", k))
+			err = nil
+			continue
 		}
 
 		if err = e.collectShas(s, h); err != nil {
-			err = errors.Wrap(err)
-			return
+			me.Add(errors.Wrapf(err, "Key: %s", k))
+			err = nil
+			continue
 		}
+	}
+
+	if me.Len() > 0 {
+		err = me
 	}
 
 	return
 }
 
-func (e *ennui) seekToFirst(shMet *sha.Sha) (err error) {
+func (e *ennui) seekToFirstLinearSearch(shMet *sha.Sha) (err error) {
+	if e.f == nil {
+		err = collections.ErrNotFound("fd nil: " + shMet.String())
+		return
+	}
+
+	var rowCount int64
+	shMid := &sha.Sha{}
+
+	if rowCount, err = e.GetRowCount(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	for mid := int64(0); mid < rowCount; mid++ {
+		// var loc int64
+
+		if _, err = e.f.Seek(mid*RowSize, io.SeekStart); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if _, err = shMid.ReadFrom(e.f); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if bytes.Equal(shMet.GetShaBytes(), shMid.GetShaBytes()) {
+			// log.Debug().Printf("%d", loc)
+
+			if _, err = e.f.Seek(mid*RowSize, io.SeekStart); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+	}
+
+	err = collections.ErrNotFound(shMet.String())
+
+	return
+}
+
+func (e *ennui) seekToFirstBinarySearch(shMet *sha.Sha) (err error) {
 	if e.f == nil {
 		err = collections.ErrNotFound("fd nil: " + shMet.String())
 		return
@@ -182,9 +235,13 @@ func (e *ennui) seekToFirst(shMet *sha.Sha) (err error) {
 	}
 
 	hi = rowCount - 1
+	loops := 0
 
 	for low <= hi {
+		loops++
 		mid = (hi + low) / 2
+
+		// var loc int64
 
 		if _, err = e.f.Seek(mid*RowSize, io.SeekStart); err != nil {
 			err = errors.Wrap(err)
@@ -197,6 +254,16 @@ func (e *ennui) seekToFirst(shMet *sha.Sha) (err error) {
 		}
 
 		cmp := bytes.Compare(shMet.GetShaBytes(), shMid.GetShaBytes())
+		// log.Debug().Printf("%s", shMid)
+		// log.Debug().Printf(
+		// 	"Lo: %d, Mid: %d, Hi: %d, Loc: %d, Max: %d, cmp: %d",
+		// 	low,
+		// 	mid,
+		// 	hi,
+		// 	loc,
+		// 	rowCount,
+		// 	cmp,
+		// )
 
 		switch cmp {
 		case -1:
@@ -223,7 +290,7 @@ func (e *ennui) seekToFirst(shMet *sha.Sha) (err error) {
 		}
 	}
 
-	err = collections.ErrNotFound(shMet.String())
+	err = collections.ErrNotFound(fmt.Sprintf("%d: %s", loops, shMet.String()))
 
 	return
 }
@@ -302,6 +369,7 @@ func (e *ennui) Flush() (err error) {
 			return
 		},
 		func(tz *row) (err error) {
+			// log.Debug().Printf("%s", &tz[0])
 			_, err = tz.WriteTo(ft)
 			return
 		},
