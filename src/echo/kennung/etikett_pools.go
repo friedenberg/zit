@@ -15,11 +15,7 @@ func (etikettResetter) Reset(e *Etikett) {
 	e.value = ""
 }
 
-func (etikettResetter) ResetWith(a *Etikett, b Etikett) {
-	a.value = b.value
-}
-
-func (etikettResetter) ResetWithPtr(a, b *Etikett) {
+func (etikettResetter) ResetWith(a, b *Etikett) {
 	a.value = b.value
 }
 

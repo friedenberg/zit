@@ -71,7 +71,7 @@ func (av assignmentLineWriter) writeNormal(a *assignment) (err error) {
 		sb.WriteString(tab_prefix)
 		sb.WriteString("- ")
 
-		sku.TransactedResetter.ResetWithPtr(cursor, &z.Sku)
+		sku.TransactedResetter.ResetWith(cursor, &z.Sku)
 		cursor.Metadatei.Subtract(&av.Metadatei)
 
 		if _, err = av.stringFormatWriter.WriteStringFormat(&sb, cursor); err != nil {
@@ -146,7 +146,7 @@ func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 		var sb strings.Builder
 
 		sb.WriteString("- ")
-		sku.TransactedResetter.ResetWithPtr(cursor, &z.Sku)
+		sku.TransactedResetter.ResetWith(cursor, &z.Sku)
 		cursor.Metadatei.Subtract(&av.Metadatei)
 
 		if err = a.SubtractFromSet(

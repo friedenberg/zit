@@ -85,7 +85,7 @@ func (a *Akte) Reset() {
 	a.Filters = make(map[string]string)
 }
 
-func (a *Akte) ResetWith(b Akte) {
+func (a *Akte) ResetWith(b *Akte) {
 	a.FileExtensions.Reset()
 
 	a.Defaults.Typ = b.Defaults.Typ

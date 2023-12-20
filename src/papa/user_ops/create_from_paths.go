@@ -168,7 +168,7 @@ func (c CreateFromPaths) Run(
 				return
 			}
 
-			sku.TransactedResetter.ResetWithPtr(zv, &cz.Internal)
+			sku.TransactedResetter.ResetWith(zv, &cz.Internal)
 
 			results.Add(zv)
 

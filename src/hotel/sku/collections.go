@@ -32,7 +32,7 @@ type (
 	CheckedOutMutableSet = schnittstellen.MutableSetLike[*CheckedOut]
 )
 
-func MakeTransactedHeap() TransactedHeap {
+func MakeTransactedHeap() *TransactedHeap {
 	return heap.Make[Transacted, *Transacted](
 		transactedEqualer{},
 		transactedLessor{},

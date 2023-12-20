@@ -26,7 +26,7 @@ func AddClonePool[E any, EPtr schnittstellen.Ptr[E]](
 	b EPtr,
 ) (err error) {
 	a := p.Get()
-	r.ResetWithPtr(a, b)
+	r.ResetWith(a, b)
 	return s.AddPtr(a)
 }
 

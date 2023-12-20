@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/thyme"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/golf/ennui"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -101,6 +102,8 @@ type common struct {
 
 	matcher.MatchableAdder
 	typenIndex kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
+
+	ennui ennui.Ennui
 }
 
 func MakeStoreUtil(
@@ -184,6 +187,11 @@ func MakeStoreUtil(
 		c.GetStandort(),
 		nil,
 	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if c.ennui, err = ennui.Make(c.GetStandort()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

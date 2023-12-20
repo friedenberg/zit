@@ -22,7 +22,7 @@ type Page struct {
 
 	pageId
 	schnittstellen.VerzeichnisseFactory
-	added       sku.TransactedHeap
+	added       *sku.TransactedHeap
 	addFilter   schnittstellen.FuncIter[*sku.Transacted]
 	flushFilter schnittstellen.FuncIter[*sku.Transacted]
 	delegate    PageDelegate

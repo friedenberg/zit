@@ -41,6 +41,9 @@ func Make(
 				objekte.ParsedAkteTomlFormatter[etikett_akte.V0, *etikett_akte.V0]{},
 				st,
 			),
+			func(a *etikett_akte.V0) {
+				a.Reset()
+			},
 		),
 		kasten_v0: objekte_store.MakeAkteStore[kasten_akte.V0, *kasten_akte.V0](
 			st,
@@ -51,6 +54,9 @@ func Make(
 				objekte.ParsedAkteTomlFormatter[kasten_akte.V0, *kasten_akte.V0]{},
 				st,
 			),
+			func(a *kasten_akte.V0) {
+				a.Reset()
+			},
 		),
 		konfig_v0: objekte_store.MakeAkteStore[erworben.Akte, *erworben.Akte](
 			st,
@@ -61,6 +67,9 @@ func Make(
 				objekte.ParsedAkteTomlFormatter[erworben.Akte, *erworben.Akte]{},
 				st,
 			),
+			func(a *erworben.Akte) {
+				a.Reset()
+			},
 		),
 		typ_v0: objekte_store.MakeAkteStore[typ_akte.V0, *typ_akte.V0](
 			st,
@@ -71,6 +80,9 @@ func Make(
 				objekte.ParsedAkteTomlFormatter[typ_akte.V0, *typ_akte.V0]{},
 				st,
 			),
+			func(a *typ_akte.V0) {
+				a.Reset()
+			},
 		),
 	}
 }

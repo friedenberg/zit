@@ -12,7 +12,7 @@ func (s *common) ReadAllGattung(
 	g gattung.Gattung,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	eachSku := func(sk *sku.Transacted) (err error) {
+	eachSku := func(besty, sk *sku.Transacted) (err error) {
 		if sk.GetGattung() != g {
 			return
 		}
@@ -41,7 +41,7 @@ func (s *common) ReadAllGattungen(
 		return
 	}
 
-	eachSku := func(sk *sku.Transacted) (err error) {
+	eachSku := func(besty, sk *sku.Transacted) (err error) {
 		if !g.ContainsKey(sk.GetGattung().GetGattungString()) {
 			return
 		}

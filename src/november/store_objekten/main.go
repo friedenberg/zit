@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/expansion"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
@@ -367,32 +368,41 @@ func (s *Store) addMatchableCommon(m *sku.Transacted) (err error) {
 	return
 }
 
-func (s *Store) GetReindexFunc() func(*sku.Transacted) error {
-	return func(sk *sku.Transacted) (err error) {
-		errExists := s.StoreUtil.GetAbbrStore().Exists(&sk.Kennung)
+func (s *Store) ReindexOne(besty, sk *sku.Transacted) (err error) {
+	errExists := s.StoreUtil.GetAbbrStore().Exists(&sk.Kennung)
 
-		if err = s.NewOrUpdated(errExists)(sk); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = s.handleNewOrUpdatedCommit(sk, false); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = s.AddTypToIndex(&sk.Metadatei.Typ); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = s.GetAbbrStore().AddMatchable(sk); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
+	if err = s.NewOrUpdated(errExists)(sk); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
+
+	if err = s.handleNewOrUpdatedCommit(sk, false); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.AddTypToIndex(&sk.Metadatei.Typ); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.GetAbbrStore().AddMatchable(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var bSha *sha.Sha
+
+	if besty != nil {
+		bSha = &besty.Metadatei.Sha
+	}
+
+	if err = s.GetEnnui().Add(sk.GetMetadatei(), bSha); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 // TODO-P2 add support for quiet reindexing
@@ -415,7 +425,7 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	f1 := s.GetReindexFunc()
+	f1 := s.ReindexOne
 
 	if err = s.GetBestandsaufnahmeStore().ReadAllSkus(f1); err != nil {
 		err = errors.Wrap(err)

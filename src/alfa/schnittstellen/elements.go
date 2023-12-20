@@ -69,5 +69,5 @@ type Equaler[T any, TPtr Ptr[T]] interface {
 
 type Resetter2[T any, TPtr Ptr[T]] interface {
 	Reset(TPtr)
-	ResetWithPtr(TPtr, TPtr)
+	ResetWith(TPtr, TPtr)
 }

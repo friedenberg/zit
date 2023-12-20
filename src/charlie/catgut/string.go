@@ -114,6 +114,11 @@ func (str *String) AvailableBuffer() []byte {
 	return str.Data.AvailableBuffer()
 }
 
+func (str *String) Available() int {
+	str.copyCheck()
+	return str.Data.Available()
+}
+
 func (str *String) Bytes() []byte {
 	str.copyCheck()
 	return str.Data.Bytes()
@@ -269,6 +274,11 @@ func (dst *String) ReadFromBuffer(src *bytes.Buffer) (err error) {
 	var n int
 	n, err = dst.Write(append(dst.AvailableBuffer(), src.Bytes()...))
 	return ohio_buffer.MakeErrLength(int64(src.Len()), int64(n), err)
+}
+
+func (dst *String) ReadFrom(r io.Reader) (n int64, err error) {
+	dst.Reset()
+	return dst.Data.ReadFrom(r)
 }
 
 func (src *String) CopyTo(dst *String) (err error) {

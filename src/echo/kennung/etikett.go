@@ -90,7 +90,7 @@ func (e *Etikett) TodoSetFromKennung2(v *Kennung2) (err error) {
 }
 
 func (e *Etikett) Set(v string) (err error) {
-  v1 := v
+	v1 := v
 	v = strings.ToLower(strings.TrimSpace(v))
 
 	if err = ErrOnKonfig(v); err != nil {

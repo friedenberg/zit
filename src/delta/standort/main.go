@@ -216,6 +216,10 @@ func (s Standort) FileVerzeichnisseKennung() string {
 	return s.DirVerzeichnisse("Kennung")
 }
 
+func (s Standort) FileVerzeichnisseEnnui() string {
+	return s.DirVerzeichnisse("Ennui")
+}
+
 func (s Standort) FileVerzeichnisseHinweis() string {
 	return s.DirVerzeichnisse("Hinweis")
 }

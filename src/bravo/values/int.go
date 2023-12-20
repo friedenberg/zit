@@ -32,11 +32,7 @@ func (_ IntResetter) Reset(a *Int) {
 	*a = 0
 }
 
-func (_ IntResetter) ResetWith(a *Int, b Int) {
-	*a = b
-}
-
-func (_ IntResetter) ResetWithPtr(a *Int, b *Int) {
+func (_ IntResetter) ResetWith(a *Int, b *Int) {
 	*a = *b
 }
 

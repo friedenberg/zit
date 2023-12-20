@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"hash"
+	"io"
 	"path"
 	"strings"
 
@@ -33,11 +34,12 @@ type PathComponents interface {
 type ShaLike = schnittstellen.ShaGetter
 
 type Sha struct {
+	// TODO-P1 switch to bytes
 	data catgut.String
 }
 
 func (s *Sha) GetShaBytes() []byte {
-	if s.IsNull() {
+	if s == nil || s.IsNull() {
 		return shaNull.data.Bytes()
 	} else {
 		return s.data.Bytes()
@@ -77,6 +79,37 @@ func (s *Sha) SetParts(a, b string) (err error) {
 		err = errors.Wrap(err)
 		return
 	}
+
+	return
+}
+
+func (src *Sha) WriteTo(w io.Writer) (n int64, err error) {
+	var n1 int
+	n1, err = w.Write(src.GetShaBytes())
+	n = int64(n1)
+	return
+}
+
+func (s *Sha) ReadFrom(r io.Reader) (n int64, err error) {
+	s.Reset()
+
+	var n1 int
+
+	b := s.data.AvailableBuffer()[:ByteSize]
+	n1, err = r.Read(b)
+
+	if n1 == 0 && err == io.EOF {
+		return
+	} else if n1 != ByteSize && n1 != 0 {
+		err = errors.Errorf("expected to read %d bytes but only read %d", ByteSize, n1)
+		return
+	} else if errors.IsNotNilAndNotEOF(err) {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n1, err = s.data.Write(b)
+	n = int64(n1)
 
 	return
 }
@@ -166,7 +199,7 @@ func (s *Sha) Reset() {
 	s.data.Grow(ByteSize)
 }
 
-func (a *Sha) ResetWith(b Sha) {
+func (a *Sha) ResetWith(b *Sha) {
 	a.data.Reset()
 	a.data.Grow(ByteSize)
 	errors.PanicIfError(b.data.CopyTo(&a.data))

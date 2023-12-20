@@ -64,6 +64,11 @@ func (s *common) CommitTransacted(t *sku.Transacted) (err error) {
 		return
 	}
 
+	if err = s.ennui.Add(t.GetMetadatei(), nil); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 

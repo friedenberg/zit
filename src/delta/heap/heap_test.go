@@ -133,6 +133,43 @@ func Test3Sorted(t1 *testing.T) {
 	}
 }
 
+func TestDupes(t1 *testing.T) {
+	t1.Skip()
+	t := test_logz.T{T: t1}
+
+	els := []*values.Int{
+		values.MakeInt(1),
+		values.MakeInt(0),
+		values.MakeInt(3),
+		values.MakeInt(3),
+		values.MakeInt(4),
+		values.MakeInt(2),
+	}
+
+	eql := values.IntEqualer{}
+
+	sut := MakeHeapFromSlice[values.Int, *values.Int](
+		eql,
+		values.IntLessor{},
+		values.IntResetter{},
+		els,
+	)
+
+	sorted := sut.Sorted()
+
+	expected := []*values.Int{
+		values.MakeInt(0),
+		values.MakeInt(1),
+		values.MakeInt(2),
+		values.MakeInt(3),
+		values.MakeInt(4),
+	}
+
+	if !reflect.DeepEqual([]*values.Int(sorted), expected) {
+		t.Fatalf("expected %s but got %s", expected, sorted)
+	}
+}
+
 func TestMerge(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 

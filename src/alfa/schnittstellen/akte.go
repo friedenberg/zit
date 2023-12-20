@@ -1,14 +1,11 @@
 package schnittstellen
 
 type (
-	Akte[T any] interface {
-		GattungGetter
-		Equatable[T]
-	}
+	Akte[T any] interface{}
 
 	AktePtr[T any] interface {
+		GattungGetter
 		Akte[T]
-		Resetable[T]
 		Ptr[T]
 	}
 )

@@ -25,11 +25,11 @@ import (
 
 type Store interface {
 	objekte_store.AkteTextSaver[Akte, *Akte]
-	Create(*Akte) error
+	Create(*Akte) (*sku.Transacted, error)
 	objekte_store.LastReader
 	ReadOne(schnittstellen.Stringer) (*sku.Transacted, error)
 	objekte_store.AllReader
-	ReadAllSkus(schnittstellen.FuncIter[*sku.Transacted]) error
+	ReadAllSkus(func(besty, sk *sku.Transacted) error) error
 	schnittstellen.AkteGetter[*Akte]
 }
 
@@ -66,7 +66,7 @@ func MakeStore(
 	pmf objekte_format.Format,
 	clock kennung.Clock,
 ) (s *store, err error) {
-	p := pool.MakePoolWithReset[Akte]()
+	p := pool.MakePool[Akte](nil, func(a *Akte) { Resetter.Reset(a) })
 
 	op := objekte_format.Options{IncludeTai: true}
 	fa := MakeAkteFormat(sv, op)
@@ -92,13 +92,14 @@ func MakeStore(
 				fa,
 				af,
 			),
+			Resetter.Reset,
 		),
 	}
 
 	return
 }
 
-func (s *store) Create(o *Akte) (err error) {
+func (s *store) Create(o *Akte) (t *sku.Transacted, err error) {
 	if !s.ls.IsAcquired() {
 		err = objekte_store.ErrLockRequired{
 			Operation: "create bestandsaufnahme",
@@ -119,7 +120,7 @@ func (s *store) Create(o *Akte) (err error) {
 		return
 	}
 
-	t := sku.GetTransactedPool().Get()
+	t = sku.GetTransactedPool().Get()
 	defer sku.GetTransactedPool().Put(t)
 
 	sku.TransactedResetter.Reset(t)
@@ -313,7 +314,7 @@ func (s *store) ReadLast() (max *sku.Transacted, err error) {
 			defer l.Unlock()
 
 			if sku.TransactedLessor.LessPtr(&maxSku, b) {
-				sku.TransactedResetter.ResetWithPtr(&maxSku, b)
+				sku.TransactedResetter.ResetWith(&maxSku, b)
 				return
 			}
 
@@ -381,7 +382,7 @@ func (s *store) ReadAll(
 
 // TODO-P3 support streaming instead of reading into heaps
 func (s *store) ReadAllSkus(
-	f schnittstellen.FuncIter[*sku.Transacted],
+	f func(besty, sk *sku.Transacted) error,
 ) (err error) {
 	if err = s.ReadAll(
 		func(t *sku.Transacted) (err error) {
@@ -392,7 +393,11 @@ func (s *store) ReadAllSkus(
 				return
 			}
 
-			if err = a.Skus.EachPtr(f); err != nil {
+			if err = a.Skus.EachPtr(
+				func(sk *sku.Transacted) (err error) {
+					return f(t, sk)
+				},
+			); err != nil {
 				err = errors.Wrapf(
 					err,
 					"Bestandsaufnahme: %s",

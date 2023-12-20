@@ -62,8 +62,22 @@ func (c Show) runGenericObjekteFormatterValue(
 			u.Konfig(),
 			u.PrinterTransactedLike(),
 			u.StringFormatWriterSkuLikePtrShort(),
+			u.StoreUtil().GetEnnui().Read,
 		),
 	)
+
+	// f := func(z *sku.Transacted) (err error) {
+	// 	var shas []*sha.Sha
+
+	// 	if shas, err = u.StoreUtil().GetEnnui().Get(z.GetMetadatei()); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return
+	// 	}
+
+	// 	log.Debug().Printf("%s", shas)
+
+	// 	return
+	// }
 
 	if err = u.StoreObjekten().QueryWithCwd(ms, f); err != nil {
 		err = errors.Wrap(err)
@@ -98,9 +112,7 @@ func (c Show) RunWithQuery(u *umwelt.Umwelt, ms matcher.Query) (err error) {
 
 	if err = u.StoreObjekten().QueryWithCwd(
 		ms,
-		iter.MakeSyncSerializer(
-			f.MakeFormatFunc(),
-		),
+		iter.MakeSyncSerializer(f.MakeFormatFunc()),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

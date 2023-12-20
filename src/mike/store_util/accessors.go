@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/delta/thyme"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/golf/ennui"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
@@ -23,6 +24,7 @@ type accessors interface {
 	GetAkten() *akten.Akten
 	GetBestandsaufnahmeStore() bestandsaufnahme.Store
 	GetCwdFiles() *cwd.CwdFiles
+	GetEnnui() ennui.Ennui
 	GetFileEncoder() objekte_collections.FileEncoder
 	GetKennungIndex() kennung_index.Index
 	GetObjekteFormatOptions() objekte_format.Options
@@ -32,6 +34,10 @@ type accessors interface {
 
 func (s *common) GetAkten() *akten.Akten {
 	return s.akten
+}
+
+func (s *common) GetEnnui() ennui.Ennui {
+	return s.ennui
 }
 
 func (s *common) GetFileEncoder() objekte_collections.FileEncoder {

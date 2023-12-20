@@ -89,16 +89,16 @@ func (s konfigStore) Update(
 		return
 	}
 
-  if err = iter.Chain(
-    kt,
-    s.AddVerzeichnisse,
-    s.CommitUpdatedTransacted,
-    s.AddMatchable,
-    s.Updated,
-  ); err != nil {
+	if err = iter.Chain(
+		kt,
+		s.AddVerzeichnisse,
+		s.CommitUpdatedTransacted,
+		s.AddMatchable,
+		s.Updated,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
-  }
+	}
 
 	return
 }

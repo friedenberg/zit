@@ -24,7 +24,7 @@ func (t *Transacted) GetSkuLike() SkuLike {
 }
 
 func (a *Transacted) SetFromTransacted(b *Transacted) (err error) {
-	TransactedResetter.ResetWithPtr(a, b)
+	TransactedResetter.ResetWith(a, b)
 
 	return
 }

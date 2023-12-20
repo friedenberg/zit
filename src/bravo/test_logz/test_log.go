@@ -73,7 +73,7 @@ func (t T) AssertEqual(a, b any) {
 }
 
 func (t T) AssertEqualStrings(a, b string) {
-  t.Helper()
+	t.Helper()
 
 	if a == b {
 		return

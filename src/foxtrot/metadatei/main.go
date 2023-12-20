@@ -174,36 +174,14 @@ func (z *Metadatei) GetTai() kennung.Tai {
 	return z.Tai
 }
 
+// TODO remove
 func (pz *Metadatei) EqualsSansTai(z1 *Metadatei) bool {
-	if !pz.Akte.EqualsSha(&z1.Akte) {
-		return false
-	}
-
-	if !pz.Typ.Equals(z1.Typ) {
-		return false
-	}
-
-	if !iter.SetEquals[kennung.Etikett](pz.GetEtiketten(), z1.GetEtiketten()) {
-		return false
-	}
-
-	if !pz.Bezeichnung.Equals(z1.Bezeichnung) {
-		return false
-	}
-
-	return true
+	return EqualerSansTai.Equals(pz, z1)
 }
 
+// TODO remove
 func (pz *Metadatei) Equals(z1 *Metadatei) bool {
-	if !pz.EqualsSansTai(z1) {
-		return false
-	}
-
-	if !pz.Tai.Equals(z1.Tai) {
-		return false
-	}
-
-	return true
+	return Equaler.Equals(pz, z1)
 }
 
 func (z *Metadatei) String() (d string) {

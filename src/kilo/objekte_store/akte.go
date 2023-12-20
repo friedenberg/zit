@@ -15,6 +15,7 @@ type AkteStore[
 	standort standort.Standort
 	StoredParseSaver[A, APtr]
 	objekte.AkteFormat[A, APtr]
+	resetFunc func(APtr)
 }
 
 func MakeAkteStore[
@@ -23,10 +24,12 @@ func MakeAkteStore[
 ](
 	st standort.Standort,
 	akteFormat objekte.AkteFormat[A, APtr],
+	resetFunc func(APtr),
 ) (s *AkteStore[A, APtr]) {
 	s = &AkteStore[A, APtr]{
 		standort:   st,
 		AkteFormat: akteFormat,
+		resetFunc:  resetFunc,
 	}
 
 	return
@@ -46,7 +49,7 @@ func (s *AkteStore[A, APtr]) GetAkte(
 
 	var a1 A
 	a = APtr(&a1)
-	a.Reset()
+	s.resetFunc(a)
 
 	if _, err = s.ParseAkte(ar, a); err != nil {
 		err = errors.Wrap(err)

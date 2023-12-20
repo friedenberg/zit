@@ -18,7 +18,7 @@ func (transactedResetter) Reset(a *Transacted) {
 	a.TransactionIndex.Reset()
 }
 
-func (transactedResetter) ResetWithPtr(a *Transacted, b *Transacted) {
+func (transactedResetter) ResetWith(a *Transacted, b *Transacted) {
 	a.Kopf = b.Kopf
 	errors.PanicIfError(a.ObjekteSha.SetShaLike(&b.ObjekteSha))
 	errors.PanicIfError(a.Kennung.ResetWithKennung(&b.Kennung))

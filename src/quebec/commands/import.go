@@ -106,12 +106,12 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	u.Lock()
 	defer u.Unlock()
 
-	if err = u.StoreObjekten().GetBestandsaufnahmeStore().Create(besty); err != nil {
+	if _, err = u.StoreObjekten().GetBestandsaufnahmeStore().Create(besty); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	f1 := u.StoreObjekten().GetReindexFunc()
+	f1 := u.StoreObjekten().ReindexOne
 
 	for {
 		sk, ok := besty.Skus.Pop()
@@ -125,7 +125,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 
-		if err = f1(sk); err != nil {
+		if err = f1(nil, sk); err != nil {
 			err = errors.Wrapf(err, "Sku: %s", sk)
 			return
 		}
