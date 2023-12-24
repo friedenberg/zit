@@ -311,8 +311,9 @@ func TestRingBufferDefault(t1 *testing.T) {
 }
 
 func TestRingBufferDefaultReadFrom(t1 *testing.T) {
-	t1.Skip()
 	t := test_logz.T{T: t1}
+	t.SkipTest()
+
 	one_5 := bytes.NewBuffer(make([]byte, 2730))
 	sut := MakeRingBuffer(one_5, 0)
 

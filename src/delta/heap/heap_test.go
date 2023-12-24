@@ -134,8 +134,8 @@ func Test3Sorted(t1 *testing.T) {
 }
 
 func TestDupes(t1 *testing.T) {
-	t1.Skip()
 	t := test_logz.T{T: t1}
+	t.SkipTest()
 
 	els := []*values.Int{
 		values.MakeInt(1),

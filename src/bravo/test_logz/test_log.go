@@ -23,6 +23,11 @@ type T struct {
 	skip int
 }
 
+func (t T) SkipTest(args ...any) {
+	t.log(1, args...)
+	t.SkipNow()
+}
+
 func (t T) Skip(skip int) T {
 	return T{
 		T:    t.T,
@@ -30,11 +35,18 @@ func (t T) Skip(skip int) T {
 	}
 }
 
+func (t T) log(skip int, args ...interface{}) {
+	errors.SetTesting()
+	si, _ := MakeStackInfo(t.skip + 1 + skip)
+	args = append([]interface{}{si}, args...)
+	fmt.Fprintln(os.Stderr, args)
+}
+
 func (t T) logf(skip int, format string, args ...interface{}) {
 	errors.SetTesting()
 	si, _ := MakeStackInfo(t.skip + 1 + skip)
 	args = append([]interface{}{si}, args...)
-	os.Stderr.WriteString(fmt.Sprintf("%s"+format+"\n", args...))
+	fmt.Fprintf(os.Stderr, "%s"+format+"\n", args)
 }
 
 func (t T) errorf(skip int, format string, args ...interface{}) {
