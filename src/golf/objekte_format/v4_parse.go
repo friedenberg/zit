@@ -53,7 +53,7 @@ func (f v4) ParsePersistentMetadatei(
 		key, val, ok = line.Cut(' ')
 
 		if !ok {
-			err = makeErrWithBytes(errV4ExpectedSpaceSeparatedKey, line.Bytes())
+			err = makeErrWithBytes(ErrV4ExpectedSpaceSeparatedKey, line.Bytes())
 			break
 		}
 

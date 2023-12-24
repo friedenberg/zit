@@ -8,7 +8,7 @@ import (
 
 var (
 	errV4ExpectedNewline           = errors.New("expected newline")
-	errV4ExpectedSpaceSeparatedKey = errors.New("expected space separated key")
+	ErrV4ExpectedSpaceSeparatedKey = errors.New("expected space separated key")
 	errV4EmptyKey                  = errors.New("empty key")
 	errV4KeysNotSorted             = errors.New("keys not sorted")
 	errV4InvalidKey                = errors.New("invalid key")

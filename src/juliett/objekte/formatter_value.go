@@ -11,10 +11,9 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/heap"
 	"github.com/friedenberg/zit/src/delta/ohio"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/golf/ennui"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/sku_fmt"
@@ -76,9 +75,15 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	k Konfig,
 	logFunc schnittstellen.FuncIter[*sku.Transacted],
 	cliFmt schnittstellen.StringFormatWriter[*sku.Transacted],
-	ennuiShaGetter func(*metadatei.Metadatei, *heap.Heap[sha.Sha, *sha.Sha]) error,
+	enn ennui.Ennui,
 ) schnittstellen.FuncIter[*sku.Transacted] {
 	switch fv.string {
+	case "sha":
+		return func(tl *sku.Transacted) (err error) {
+			_, err = fmt.Fprintln(out, &tl.Metadatei.Sha)
+			return
+		}
+
 	case "etiketten-all":
 		return func(tl *sku.Transacted) (err error) {
 			esImp := tl.GetMetadatei().Verzeichnisse.GetExpandedEtiketten()
@@ -349,33 +354,33 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			return
 		}
 
-	case "bestandsaufnahme-shas":
-		h := heap.Make[sha.Sha, *sha.Sha](
-			sha.Equaler,
-			sha.Lessor,
-			sha.Resetter,
-		)
+	// case "bestandsaufnahme-shas":
+	// 	h := heap.Make[sha.Sha, *sha.Sha](
+	// 		sha.Equaler,
+	// 		sha.Lessor,
+	// 		sha.Resetter,
+	// 	)
 
-		return func(z *sku.Transacted) (err error) {
-			if err = ennuiShaGetter(z.GetMetadatei(), h); err != nil {
-				err = errors.Wrapf(err, "Kennung: %s", &z.Kennung)
-				return
-			}
+	// 	return func(z *sku.Transacted) (err error) {
+	// 		if err = ennuiShaGetter(z.GetMetadatei(), h); err != nil {
+	// 			err = errors.Wrapf(err, "Kennung: %s", &z.Kennung)
+	// 			return
+	// 		}
 
-			for {
-				sh, ok := h.Pop()
+	// 		for {
+	// 			sh, ok := h.Pop()
 
-				if !ok {
-					break
-				}
+	// 			if !ok {
+	// 				break
+	// 			}
 
-				fmt.Fprintf(out, "%s\n", sh)
-			}
+	// 			fmt.Fprintf(out, "%s\n", sh)
+	// 		}
 
-			h.Reset()
+	// 		h.Reset()
 
-			return
-		}
+	// 		return
+	// 	}
 
 	case "bestandsaufnahme":
 		f := sku_fmt.MakeFormatBestandsaufnahmePrinter(

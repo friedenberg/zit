@@ -24,10 +24,12 @@ import (
 )
 
 type Store interface {
+	GetStore() Store
 	objekte_store.AkteTextSaver[Akte, *Akte]
 	Create(*Akte) (*sku.Transacted, error)
 	objekte_store.LastReader
 	ReadOne(schnittstellen.Stringer) (*sku.Transacted, error)
+	ReadOneSku(besty, sk *sha.Sha) (*sku.Transacted, error)
 	objekte_store.AllReader
 	ReadAllSkus(func(besty, sk *sku.Transacted) error) error
 	schnittstellen.AkteGetter[*Akte]
@@ -97,6 +99,10 @@ func MakeStore(
 	}
 
 	return
+}
+
+func (s *store) GetStore() Store {
+	return s
 }
 
 func (s *store) Create(o *Akte) (t *sku.Transacted, err error) {
@@ -174,6 +180,49 @@ func (s *store) readOnePath(p string) (o *sku.Transacted, err error) {
 	}
 
 	if o, err = s.ReadOne(sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *store) ReadOneSku(besty, sh *sha.Sha) (o *sku.Transacted, err error) {
+	var bestySku *sku.Transacted
+
+	if bestySku, err = s.ReadOne(besty); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var ar schnittstellen.ShaReadCloser
+
+	if ar, err = s.af.AkteReader(&bestySku.Metadatei.Akte); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, ar)
+
+	dec := sku_fmt.MakeFormatBestandsaufnahmeScanner(
+		ar,
+		s.persistentMetadateiFormat,
+		s.options,
+	)
+
+	for dec.Scan() {
+		o = dec.GetTransacted()
+
+		if !o.Metadatei.Sha.Equals(sh) {
+			continue
+		}
+
+		return
+	}
+
+	o = nil
+
+	if err = dec.Error(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

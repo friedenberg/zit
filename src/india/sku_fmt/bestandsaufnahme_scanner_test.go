@@ -3,11 +3,13 @@ package sku_fmt
 import (
 	"bytes"
 	"io"
+	"sort"
 	"strings"
 	"testing"
 
 	"github.com/DataDog/zstd"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
+	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -113,7 +115,6 @@ func TestBigMac(t1 *testing.T) {
 	i := 0
 
 	for scanner.Scan() {
-		t.Logf("i: %d", i)
 		sk := scanner.GetTransacted()
 
 		if sk == nil {
@@ -129,6 +130,77 @@ func TestBigMac(t1 *testing.T) {
 
 	if i != expected {
 		t.Errorf("expected %d entries but got %d", expected, i)
+	}
+}
+
+func TestOffsets(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
+	dataRaw := getRawData()
+
+	f := objekte_format.Default()
+	op := objekte_format.Options{IncludeTai: true}
+
+	scanner := MakeFormatBestandsaufnahmeScanner(
+		strings.NewReader(dataRaw),
+		f,
+		op,
+	)
+
+	skus := make([]*sku.Transacted, 0)
+
+	for scanner.Scan() {
+		sk := scanner.GetTransacted()
+		sk2 := &sku.Transacted{}
+		t.AssertNoError(sk2.SetFromSkuLike(sk))
+		skus = append(skus, sk2)
+	}
+
+	t.AssertNoError(scanner.Error())
+
+	lookup := make(map[int64]*sku.Transacted)
+	var b bytes.Buffer
+
+	printer := MakeFormatBestandsaufnahmePrinter(&b, f, op)
+
+	sk := &sku.Transacted{}
+	t.AssertNoError(sk.Kennung.SetWithKennung(kennung.MustHinweis("one/uno")))
+
+	for _, s := range skus {
+		off := printer.Offset()
+		_, err := printer.Print(s)
+		t.AssertNoError(err)
+		lookup[off] = s
+	}
+
+	bs := bytes.NewReader(b.Bytes())
+	rb := catgut.MakeRingBuffer(bs, 0)
+
+	sortedLookup := make([]int, 0, len(lookup))
+
+	for off := range lookup {
+		sortedLookup = append(sortedLookup, int(off))
+	}
+
+	sort.IntSlice(sortedLookup).Sort()
+
+	for _, off := range sortedLookup {
+		s := lookup[int64(off)]
+		t.Logf("at %d", off)
+		_, err := rb.Seek(int64(off), io.SeekStart)
+		if err != io.EOF {
+			t.AssertNoError(err)
+		}
+		// re := rb.PeekReadable().String()
+
+		sk = &sku.Transacted{}
+		_, err = f.ParsePersistentMetadatei(rb, sk, op)
+		// t.AssertErrorEquals(objekte_format.ErrV4ExpectedSpaceSeparatedKey, err)
+
+		if !s.Equals(sk) {
+			// t.Logf("\n%s", re)
+			t.Errorf("expected %s but got %s", s, sk)
+		}
 	}
 }
 

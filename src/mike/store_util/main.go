@@ -3,13 +3,13 @@ package store_util
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/checkout_options"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/delta/thyme"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/golf/ennui"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -92,8 +92,6 @@ type common struct {
 
 	matcher.MatchableAdder
 	typenIndex kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
-
-	ennui ennui.Ennui
 }
 
 func MakeStoreUtil(
@@ -181,11 +179,6 @@ func MakeStoreUtil(
 		return
 	}
 
-	if c.ennui, err = ennui.Make(c.GetStandort()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	return
 }
 
@@ -203,6 +196,11 @@ func (s *common) ResetIndexes() (err error) {
 
 	if err = s.kennungIndex.Reset(); err != nil {
 		err = errors.Wrapf(err, "failed to reset index kennung")
+		return
+	}
+
+	if err = files.RemoveIfExists(s.standort.FileVerzeichnisseEnnui()); err != nil {
+		err = errors.Wrapf(err, "failed to reset ennui")
 		return
 	}
 

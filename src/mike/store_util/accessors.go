@@ -37,7 +37,7 @@ func (s *common) GetAkten() *akten.Akten {
 }
 
 func (s *common) GetEnnui() ennui.Ennui {
-	return s.ennui
+	return nil
 }
 
 func (s *common) GetFileEncoder() objekte_collections.FileEncoder {
