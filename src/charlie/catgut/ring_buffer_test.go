@@ -383,8 +383,8 @@ func TestRingBufferPeekUpto2(t1 *testing.T) {
 
 	{
 		readable, err := sut.PeekUptoAndIncluding(' ')
-		t.AssertEOF(err)
-		t.AssertEqualStrings("words", readable.String())
+		t.AssertErrorEquals(err, ErrNotFound)
+		t.AssertEqualStrings("words", sut.PeekReadable().String())
 		sut.AdvanceRead(readable.Len())
 	}
 }

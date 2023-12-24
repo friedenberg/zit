@@ -84,20 +84,22 @@ func (rs Slice) Overlap() (o [6]byte, first, second int) {
 }
 
 func (rs Slice) ReadFrom(r io.Reader) (n int64, err error) {
-	var n1 int
+	var loc int
 
-	n1, err = r.Read(rs.First())
-	n += int64(n1)
-
-	if err != nil {
-		return
+	for n < int64(rs.LenFirst()) {
+		loc, err = r.Read(rs.First()[n:])
+		n += int64(loc)
+		if err != nil {
+			return
+		}
 	}
 
-	n1, err = r.Read(rs.Second())
-	n += int64(n1)
-
-	if err != nil {
-		return
+	for n < int64(rs.LenSecond()-rs.LenFirst()) {
+		loc, err = r.Read(rs.Second()[n-int64(rs.LenFirst()):])
+		n += int64(loc)
+		if err != nil {
+			return
+		}
 	}
 
 	return

@@ -94,23 +94,23 @@ func (f *organize) ReadStringFormat(
 	o *sku.Transacted,
 ) (n int64, err error) {
 	if err = f.readStringFormatWithKennung(rb, o); err != nil {
-		err = errors.Wrap(err)
-		return
+		if err == catgut.ErrNotFound {
+			err = nil
+		} else {
+			err = errors.WrapExcept(err, io.EOF, catgut.ErrBufferEmpty)
+			return
+		}
 	}
 
 	var sl catgut.Slice
-	sl, err = rb.PeekUptoAndIncluding('\n')
 
-	if err != nil {
+	if sl, err = rb.PeekUptoAndIncluding('\n'); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
 	if err = o.Metadatei.Bezeichnung.TodoSetSlice(sl); err != nil {
 		err = errors.Wrap(err)
-		return
-	}
-
-	if err != nil {
 		return
 	}
 
@@ -128,7 +128,14 @@ func (f *organize) readStringFormatWithKennung(
 	eof := false
 	var t catgut.String
 
-	rr := catgut.MakeRingBufferRuneScanner(rb)
+	var sl catgut.Slice
+
+	if sl, err = rb.PeekUptoAndIncluding(']'); err != nil {
+		err = errors.WrapExcept(err, catgut.ErrNotFound)
+		return
+	}
+
+	rr := catgut.MakeSliceRuneScanner(sl)
 
 LOOP:
 	for !eof {
@@ -159,6 +166,7 @@ LOOP:
 
 		case 1:
 			if err = o.Kennung.TodoSetBytes(&t); err != nil {
+				err = errors.Wrapf(err, "Readable: len: %d, cap %d, 1:%q, 2:%q", rb.Len(), rb.Cap(), string(rb.PeekReadable().First()), string(rb.PeekReadable().Second()))
 				o.Kennung.Reset()
 				return
 			}
@@ -188,7 +196,7 @@ LOOP:
 		}
 	}
 
-	rb.AdvanceRead(n)
+	rb.AdvanceRead(sl.Len())
 
 	return
 }

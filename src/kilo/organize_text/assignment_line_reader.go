@@ -76,8 +76,12 @@ LOOP:
 
 			case '-':
 				if err = ar.readOneObj(r); err != nil {
-					err = errors.Wrap(err)
-					return
+					if err == io.EOF {
+            err = nil
+					} else {
+						err = errors.Wrap(err)
+						return
+					}
 				}
 
 			default:

@@ -3,6 +3,8 @@ package catgut
 import (
 	"fmt"
 	"io"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
 const RingBufferDefaultSize = 4096
@@ -82,8 +84,8 @@ func (rb *RingBuffer) PeekReadable() (rs Slice) {
 	if rb.rIdx < rb.wIdx {
 		rs.data[0] = rb.data[rb.rIdx:rb.wIdx]
 	} else {
-		rs.data[1] = rb.data[:rb.wIdx]
 		rs.data[0] = rb.data[rb.rIdx:]
+		rs.data[1] = rb.data[:rb.wIdx]
 	}
 
 	rCap := rs.Len()
@@ -227,7 +229,7 @@ func (rb *RingBuffer) Fill() (n int64, err error) {
 		rb.dataLength += int(n)
 		rb.writeLength += n
 
-		if int(n) <= len(rs.First()) {
+		if int(n) <= rs.LenFirst() {
 			rb.wIdx += int(n)
 		} else {
 			rb.wIdx = int(n) - len(rs.First())
@@ -243,16 +245,16 @@ func (rb *RingBuffer) Fill() (n int64, err error) {
 	return
 }
 
-func (rb *RingBuffer) SlideAndFill() (n int64, err error) {
-	rb.data = append(rb.data, rb.PeekReadable().Second()...)
-	copy(rb.data, rb.data[rb.rIdx:])
-	rb.wIdx = rb.rIdx
-	rb.rIdx = 0
+// func (rb *RingBuffer) SlideAndFill() (n int64, err error) {
+// 	rb.data = append(rb.data, rb.PeekReadable().Second()...)
+// 	copy(rb.data, rb.data[rb.rIdx:])
+// 	rb.wIdx = rb.rIdx
+// 	rb.rIdx = 0
 
-	n, err = rb.Fill()
+// 	n, err = rb.Fill()
 
-	return
-}
+// 	return
+// }
 
 func (rb *RingBuffer) AdvanceRead(n int) {
 	rb.rIdx += n
@@ -288,6 +290,8 @@ func (rb *RingBuffer) Unread(toUnread int) (actuallyUnread int) {
 	return
 }
 
+var ErrNotFound = errors.New("not found")
+
 func (rb *RingBuffer) PeekUptoAndIncluding(b byte) (readable Slice, err error) {
 	ok := false
 	readable, ok = rb.PeekReadable().Upto2(b)
@@ -298,24 +302,19 @@ func (rb *RingBuffer) PeekUptoAndIncluding(b byte) (readable Slice, err error) {
 
 	_, err = rb.Fill()
 
-	if err != io.EOF && err != nil {
+	if errors.IsNotNilAndNotEOF(err) {
 		return
 	}
 
-	readable, _ = rb.PeekReadable().Upto2(b)
+	err = nil
+	readable, ok = rb.PeekReadable().Upto2(b)
 
-	if err == io.EOF {
-		if readable.Len() == 0 {
-			readable = rb.PeekReadable()
-		} else {
-			err = nil
-		}
+	if !ok {
+		err = ErrNotFound
+		return
 	}
 
 	return
-}
-
-func (rb *RingBuffer) ReadTokensUpto(b byte) {
 }
 
 func (rb *RingBuffer) PeekUpto(b byte) (readable Slice, err error) {
