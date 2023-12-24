@@ -71,9 +71,7 @@ func (f formatAkte) FormatParsedAkte(
 		f.options,
 	)
 
-	defer func() {
-		o.Skus.Restore()
-	}()
+	defer o.Skus.Restore()
 
 	var n1 int64
 

@@ -61,14 +61,14 @@ func (s *Sha) Sha() *Sha {
 }
 
 func (dst *Sha) SetFromHash(h hash.Hash) (err error) {
-  dst.allocDataIfNecessary()
+	dst.allocDataIfNecessary()
 	b := h.Sum(dst.data[:0])
 	err = makeErrLength(ByteSize, len(b))
 	return
 }
 
 func (dst *Sha) SetShaLike(src ShaLike) (err error) {
-  dst.allocDataIfNecessary()
+	dst.allocDataIfNecessary()
 
 	err = makeErrLength(
 		ByteSize,
@@ -95,7 +95,7 @@ func (src *Sha) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 func (s *Sha) ReadFrom(r io.Reader) (n int64, err error) {
-  s.allocDataIfNecessary()
+	s.allocDataIfNecessary()
 
 	var n1 int
 
@@ -117,7 +117,7 @@ func (s *Sha) ReadFrom(r io.Reader) (n int64, err error) {
 }
 
 func (s *Sha) SetHexBytes(b []byte) (err error) {
-  s.allocDataIfNecessary()
+	s.allocDataIfNecessary()
 
 	b = bytes.TrimSpace(b)
 
@@ -136,7 +136,7 @@ func (s *Sha) SetHexBytes(b []byte) (err error) {
 }
 
 func (s *Sha) Set(v string) (err error) {
-  s.allocDataIfNecessary()
+	s.allocDataIfNecessary()
 
 	v1 := strings.TrimSpace(v)
 
@@ -192,22 +192,21 @@ func (a *Sha) Equals(b *Sha) bool {
 	return a.GetShaString() == b.GetShaString()
 }
 
-
 func (s *Sha) allocDataIfNecessary() {
-  if s.data != nil {
-    return
-  }
+	if s.data != nil {
+		return
+	}
 
 	s.data = &[ByteSize]byte{}
 }
 
 func (s *Sha) Reset() {
-  s.allocDataIfNecessary()
+	s.allocDataIfNecessary()
 	s.ResetWith(&shaNull)
 }
 
 func (a *Sha) ResetWith(b *Sha) {
-  a.allocDataIfNecessary()
+	a.allocDataIfNecessary()
 	copy(a.data[:], b.data[:])
 }
 

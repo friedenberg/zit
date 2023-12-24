@@ -217,6 +217,9 @@ func (f v4) FormatPersistentMetadatei(
 			err = errors.Wrap(err)
 			return
 		}
+	}
+
+	if o.PrintFinalSha {
 
 		actual := mh.GetShaLike()
 		// TODO-P1 set value

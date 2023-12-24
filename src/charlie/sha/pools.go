@@ -9,10 +9,13 @@ import (
 	"github.com/friedenberg/zit/src/bravo/pool"
 )
 
-var shaPool schnittstellen.PoolValue[hash.Hash]
+var (
+	hash256Pool schnittstellen.PoolValue[hash.Hash]
+	shaPool     schnittstellen.Pool[Sha, *Sha]
+)
 
 func init() {
-	shaPool = pool.MakePoolValue[hash.Hash](
+	hash256Pool = pool.MakePoolValue[hash.Hash](
 		func() hash.Hash {
 			return sha256.New()
 		},
@@ -20,6 +23,16 @@ func init() {
 			h.Reset()
 		},
 	)
+	shaPool = pool.MakePool[Sha, *Sha](
+		nil,
+		func(sh *Sha) {
+			sh.Reset()
+		},
+	)
+}
+
+func GetPool() schnittstellen.Pool[Sha, *Sha] {
+	return shaPool
 }
 
 var Resetter resetter

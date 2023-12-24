@@ -234,5 +234,5 @@ func (s *Store) ReadAll(
 	gs gattungen.Set,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	return s.ReadAllGattungen(gs, f)
+	return s.ReadAllGattungenFromVerzeichnisse(gs, f)
 }

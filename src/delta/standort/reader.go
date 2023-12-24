@@ -40,6 +40,17 @@ func NewReader(o ReadOptions) (r *reader, err error) {
 	return
 }
 
+func (r *reader) Seek(offset int64, whence int) (actual int64, err error) {
+	seeker, ok := r.rAge.(io.Seeker)
+
+	if !ok {
+		err = errors.Errorf("seeking not supported")
+		return
+	}
+
+	return seeker.Seek(offset, whence)
+}
+
 func (r *reader) WriteTo(w io.Writer) (n int64, err error) {
 	return io.Copy(w, r.tee)
 }

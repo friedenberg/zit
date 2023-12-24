@@ -8,6 +8,16 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
 
+func RemoveIfExists(p string) (err error) {
+	err = os.Remove(p)
+
+	if errors.IsNotExist(err) {
+		err = nil
+	}
+
+	return
+}
+
 func DeleteFilesAndDirsSet(
 	fs schnittstellen.SetLike[schnittstellen.Stringer],
 ) (err error) {

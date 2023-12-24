@@ -28,6 +28,38 @@ type RingBuffer struct {
 	data                    []byte
 }
 
+func (rb *RingBuffer) Seek(offset int64, whence int) (actual int64, err error) {
+	seeker, ok := rb.reader.(io.Seeker)
+
+	if !ok {
+		err = errors.Errorf("seeking not supported")
+		return
+	}
+
+	if actual, err = seeker.Seek(offset, whence); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	rb.dataLength = 0
+	rb.readLength = actual
+	rb.writeLength = actual
+	rb.rIdx = 0
+	rb.wIdx = 0
+
+	if _, err = rb.Fill(); err != nil {
+		if err == io.EOF {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	return
+}
+
 func (rb *RingBuffer) Reset(r io.Reader) {
 	rb.reader = r
 	rb.dataLength = 0
@@ -294,7 +326,7 @@ var ErrNotFound = errors.New("not found")
 
 func (rb *RingBuffer) PeekUptoAndIncluding(b byte) (readable Slice, err error) {
 	ok := false
-	readable, ok = rb.PeekReadable().Upto2(b)
+	readable, ok = rb.PeekReadable().SliceUptoAndIncluding(b)
 
 	if ok {
 		return
@@ -307,7 +339,7 @@ func (rb *RingBuffer) PeekUptoAndIncluding(b byte) (readable Slice, err error) {
 	}
 
 	err = nil
-	readable, ok = rb.PeekReadable().Upto2(b)
+	readable, ok = rb.PeekReadable().SliceUptoAndIncluding(b)
 
 	if !ok {
 		err = ErrNotFound
@@ -319,7 +351,7 @@ func (rb *RingBuffer) PeekUptoAndIncluding(b byte) (readable Slice, err error) {
 
 func (rb *RingBuffer) PeekUpto(b byte) (readable Slice, err error) {
 	ok := false
-	readable, ok = rb.PeekReadable().Upto(b)
+	readable, ok = rb.PeekReadable().SliceUptoButExcluding(b)
 
 	if ok {
 		return
@@ -331,7 +363,7 @@ func (rb *RingBuffer) PeekUpto(b byte) (readable Slice, err error) {
 		return
 	}
 
-	readable, _ = rb.PeekReadable().Upto(b)
+	readable, _ = rb.PeekReadable().SliceUptoButExcluding(b)
 
 	return
 }

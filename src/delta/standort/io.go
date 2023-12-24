@@ -2,7 +2,7 @@ package standort
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -146,7 +146,7 @@ func (s Standort) AkteWriter() (w sha.WriteCloser, err error) {
 
 func (s Standort) AkteReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
 	if sh.GetShaLike().IsNull() {
-		r = sha.MakeNopReadCloser(ioutil.NopCloser(bytes.NewReader(nil)))
+		r = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
 		return
 	}
 

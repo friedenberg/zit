@@ -100,19 +100,19 @@ func (t T) AssertEOF(err error) {
 }
 
 func (t T) AssertErrorEquals(expected, actual error) {
-	t.T.Helper()
+	t.Helper()
 
 	if actual == nil {
 		t.fatalf(1, "expected %q error but got none", expected)
 	}
 
-	if actual != expected {
+	if !errors.Is(actual, expected) {
 		t.fatalf(1, "expected %q error but got %q", expected, actual)
 	}
 }
 
 func (t T) AssertError(err error) {
-	t.T.Helper()
+	t.Helper()
 
 	if err == nil {
 		t.fatalf(1, "expected an error but got none")

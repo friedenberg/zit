@@ -286,7 +286,7 @@ func (rs Slice) Cut(b byte) (before, after Slice, ok bool) {
 	return
 }
 
-func (rs Slice) Upto(b byte) (s Slice, ok bool) {
+func (rs Slice) SliceUptoButExcluding(b byte) (s Slice, ok bool) {
 	for i, v := range rs.First() {
 		if v == b {
 			s = Slice{
@@ -322,7 +322,7 @@ func (rs Slice) Upto(b byte) (s Slice, ok bool) {
 	return
 }
 
-func (rs Slice) Upto2(b byte) (s Slice, ok bool) {
+func (rs Slice) SliceUptoAndIncluding(b byte) (s Slice, ok bool) {
 	for i, v := range rs.First() {
 		if v == b {
 			s = Slice{

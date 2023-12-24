@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/expansion"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
@@ -387,17 +386,6 @@ func (s *Store) ReindexOne(besty, sk *sku.Transacted) (err error) {
 	}
 
 	if err = s.GetAbbrStore().AddMatchable(sk); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var bSha *sha.Sha
-
-	if besty != nil {
-		bSha = &besty.Metadatei.Sha
-	}
-
-	if err = s.GetEnnui().Add(sk.GetMetadatei(), bSha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

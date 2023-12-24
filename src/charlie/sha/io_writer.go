@@ -17,7 +17,7 @@ type writer struct {
 }
 
 func MakeWriter(in io.Writer) (out *writer) {
-	h := shaPool.Get()
+	h := hash256Pool.Get()
 
 	if in == nil {
 		in = io.Discard
@@ -69,7 +69,7 @@ func (w *writer) setShaLikeIfNecessary() {
 	if !w.closed {
 		errors.PanicIfError(w.sh.SetFromHash(w.h))
 
-		shaPool.Put(w.h)
+		hash256Pool.Put(w.h)
 		w.h = nil
 	}
 }
