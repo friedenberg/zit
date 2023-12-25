@@ -8,7 +8,7 @@ import (
 
 type KennungShaMap map[string]*sha.Sha
 
-func (ksm KennungShaMap) ModifyMutter(z *sku.Transacted) (err error) {
+func (ksm KennungShaMap) ReadMutter(z *sku.Transacted) (err error) {
 	k := z.GetKennung()
 	old, ok := ksm[k.String()]
 

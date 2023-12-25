@@ -27,9 +27,9 @@ func MakeVerzeichnisseSchwanzen(
 	}
 
 	s.Store, err = store_verzeichnisse.MakeStore(
+		sa.GetStandort(),
 		s.su.GetKonfig(),
 		s.su.GetStandort().DirVerzeichnisseZettelenNeueSchwanzen(),
-		sa.GetStandort(),
 		s,
 	)
 
@@ -53,7 +53,7 @@ func (s *VerzeichnisseSchwanzen) Flush() (err error) {
 func (s *VerzeichnisseSchwanzen) ReadHinweisSchwanzen(
 	h kennung.Kennung,
 ) (found *sku.Transacted, err error) {
-	var n int
+	var n uint8
 
 	if n, err = s.PageForKennung(h); err != nil {
 		err = errors.Wrap(err)
@@ -108,7 +108,7 @@ func (s *VerzeichnisseSchwanzen) applyKonfig(
 }
 
 func (s *VerzeichnisseSchwanzen) GetVerzeichnissePageDelegate(
-	n int,
+	n uint8,
 ) store_verzeichnisse.PageDelegate {
 	return s.headers[n]
 }

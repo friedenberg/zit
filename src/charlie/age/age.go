@@ -87,15 +87,23 @@ func MakeFromIdentityString(contents string) (a *Age, err error) {
 // 	return
 // }
 
-func (a Age) Recipients() []Recipient {
+func (a *Age) Recipients() []Recipient {
+  if a == nil {
+    return nil
+  }
+
 	return a.recipients
 }
 
-func (a Age) Identities() []Identity {
+func (a *Age) Identities() []Identity {
+  if a == nil {
+    return nil
+  }
+
 	return a.identities
 }
 
-func (a Age) Decrypt(src io.Reader) (out io.Reader, err error) {
+func (a *Age) Decrypt(src io.Reader) (out io.Reader, err error) {
 	i := a.Identities()
 
 	switch len(i) {
@@ -113,7 +121,7 @@ func (a Age) Decrypt(src io.Reader) (out io.Reader, err error) {
 	return
 }
 
-func (a Age) Encrypt(dst io.Writer) (out io.WriteCloser, err error) {
+func (a *Age) Encrypt(dst io.Writer) (out io.WriteCloser, err error) {
 	r := a.Recipients()
 
 	switch len(r) {

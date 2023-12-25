@@ -170,9 +170,9 @@ func MakeStoreUtil(
 	}
 
 	if c.verzeichnisseAll, err = store_verzeichnisse.MakeStore(
+		c.GetStandort(),
 		c.GetKonfig(),
 		c.GetStandort().DirVerzeichnisseZettelenNeue(),
-		c.GetStandort(),
 		nil,
 	); err != nil {
 		err = errors.Wrap(err)

@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/ohio"
@@ -33,6 +34,10 @@ func (f *FormatterValue) Set(v string) (err error) {
 	switch v1 {
 	case
 		// TODO-P3 add toml
+		"sha",
+		"mutter",
+		"mutter-sha",
+		"bestandsaufnahme-sha",
 		"bestandsaufnahme-shas",
 		"bestandsaufnahme",
 		"bestandsaufnahme-sans-tai",
@@ -76,6 +81,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	logFunc schnittstellen.FuncIter[*sku.Transacted],
 	cliFmt schnittstellen.StringFormatWriter[*sku.Transacted],
 	enn ennui.Ennui,
+	rob func(string, *sku.Transacted) (*sku.Transacted, error),
 ) schnittstellen.FuncIter[*sku.Transacted] {
 	switch fv.string {
 	case "sha":
@@ -354,33 +360,56 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			return
 		}
 
-	// case "bestandsaufnahme-shas":
-	// 	h := heap.Make[sha.Sha, *sha.Sha](
-	// 		sha.Equaler,
-	// 		sha.Lessor,
-	// 		sha.Resetter,
-	// 	)
+	case "mutter-sha":
+		return func(z *sku.Transacted) (err error) {
+			_, err = fmt.Fprintln(out, &z.Metadatei.Mutter)
+			return
+		}
 
-	// 	return func(z *sku.Transacted) (err error) {
-	// 		if err = ennuiShaGetter(z.GetMetadatei(), h); err != nil {
-	// 			err = errors.Wrapf(err, "Kennung: %s", &z.Kennung)
-	// 			return
-	// 		}
+	case "mutter":
+		return func(z *sku.Transacted) (err error) {
+			if z.Metadatei.Mutter.IsNull() {
+				return
+			}
 
-	// 		for {
-	// 			sh, ok := h.Pop()
+			if z, err = rob("Metadatei", z); err != nil {
+				log.Debug().Printf("%s", err)
+				err = nil
+				return
+			}
 
-	// 			if !ok {
-	// 				break
-	// 			}
+			return logFunc(z)
+		}
 
-	// 			fmt.Fprintf(out, "%s\n", sh)
-	// 		}
+	case "bestandsaufnahme-sha":
+		return func(z *sku.Transacted) (err error) {
+			// var loc ennui.Loc
 
-	// 		h.Reset()
+			// if loc, err = enn.ReadOne("MetadateiPlusMutter", z.GetMetadatei()); err != nil {
+			// 	err = errors.Wrapf(err, "Kennung: %s", &z.Kennung)
+			// 	return
+			// }
 
-	// 		return
-	// 	}
+			// fmt.Fprintf(out, "%s\n", loc)
+
+			return
+		}
+
+	case "bestandsaufnahme-shas":
+		return func(z *sku.Transacted) (err error) {
+			// if err = enn.ReadAll(z.GetMetadatei(), &locs); err != nil {
+			// 	err = errors.Wrapf(err, "Kennung: %s", &z.Kennung)
+			// 	return
+			// }
+
+			// for _, loc := range locs {
+			// 	fmt.Fprintf(out, "%d %d\n", loc.Page, loc.Offset)
+			// }
+
+			// locs = locs[:0]
+
+			return
+		}
 
 	case "bestandsaufnahme":
 		f := sku_fmt.MakeFormatBestandsaufnahmePrinter(

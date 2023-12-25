@@ -22,6 +22,7 @@ type ShaGetter interface {
 }
 
 type ShaReadCloser interface {
+  io.Seeker
 	io.WriterTo
 	io.ReadCloser
 	GetShaLike() ShaLike

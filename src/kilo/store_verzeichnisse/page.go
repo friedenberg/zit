@@ -3,7 +3,6 @@ package store_verzeichnisse
 import (
 	"bufio"
 	"bytes"
-	"encoding/gob"
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -12,20 +11,20 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/golf/ennui"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/sku_fmt"
 )
 
 type Page struct {
-	useBestandsaufnahmeForVerzeichnisse bool
-
 	pageId
 	schnittstellen.VerzeichnisseFactory
 	added       *sku.TransactedHeap
 	addFilter   schnittstellen.FuncIter[*sku.Transacted]
 	flushFilter schnittstellen.FuncIter[*sku.Transacted]
 	delegate    PageDelegate
+	ennui       ennui.Ennui
 
 	State
 }
@@ -33,15 +32,15 @@ type Page struct {
 func makePage(
 	iof schnittstellen.VerzeichnisseFactory, pid pageId,
 	fff PageDelegateGetter,
-	useBestandsaufnahmeForVerzeichnisse bool,
+	e ennui.Ennui,
 ) (p *Page) {
 	p = &Page{
-		useBestandsaufnahmeForVerzeichnisse: useBestandsaufnahmeForVerzeichnisse,
-		VerzeichnisseFactory:                iof,
-		pageId:                              pid,
-		added:                               sku.MakeTransactedHeap(),
-		addFilter:                           collections.MakeWriterNoop[*sku.Transacted](),
-		flushFilter:                         collections.MakeWriterNoop[*sku.Transacted](),
+		VerzeichnisseFactory: iof,
+		pageId:               pid,
+		added:                sku.MakeTransactedHeap(),
+		addFilter:            collections.MakeWriterNoop[*sku.Transacted](),
+		flushFilter:          collections.MakeWriterNoop[*sku.Transacted](),
+		ennui:                e,
 	}
 
 	if fff != nil {
@@ -113,7 +112,7 @@ func (zp *Page) Flush() (err error) {
 
 	c := iter.MakeChain(
 		zp.flushFilter,
-		m.ModifyMutter,
+		m.ReadMutter,
 		writeOne,
 		m.SaveSha,
 	)
@@ -147,37 +146,24 @@ func (zp *Page) copy(
 
 	var getOneSku func() (*sku.Transacted, error)
 
-	if zp.useBestandsaufnahmeForVerzeichnisse {
-		dec := sku_fmt.MakeFormatBestandsaufnahmeScanner(
-			r1,
-			objekte_format.Default(),
-			objekte_format.Options{
-				IncludeTai:           true,
-				IncludeVerzeichnisse: true,
-			},
-		)
+	dec := sku_fmt.MakeFormatBestandsaufnahmeScanner(
+		r1,
+		objekte_format.Default(),
+		options,
+	)
 
-		getOneSku = func() (sk *sku.Transacted, err error) {
-			if !dec.Scan() {
-				if err = dec.Error(); err == nil {
-					err = io.EOF
-				}
-
-				return
+	getOneSku = func() (sk *sku.Transacted, err error) {
+		if !dec.Scan() {
+			if err = dec.Error(); err == nil {
+				err = io.EOF
 			}
 
-			sk = dec.GetTransacted()
-
 			return
 		}
-	} else {
-		dec := gob.NewDecoder(r1)
 
-		getOneSku = func() (sk *sku.Transacted, err error) {
-			sk = sku.GetTransactedPool().Get()
-			err = dec.Decode(sk)
-			return
-		}
+		sk = dec.GetTransacted()
+
+		return
 	}
 
 	errors.TodoP3("determine performance of this")
@@ -209,35 +195,30 @@ func (zp *Page) copy(
 func (zp *Page) getFuncWriteOne(
 	w io.Writer,
 ) schnittstellen.FuncIter[*sku.Transacted] {
-	if zp.useBestandsaufnahmeForVerzeichnisse {
-		enc := sku_fmt.MakeFormatBestandsaufnahmePrinter(
-			w,
-			objekte_format.Default(),
-			objekte_format.Options{
-				IncludeTai:           true,
-				IncludeVerzeichnisse: true,
-			},
-		)
+	enc := sku_fmt.MakeFormatBestandsaufnahmePrinter(
+		w,
+		objekte_format.Default(),
+		options,
+	)
 
-		return func(z *sku.Transacted) (err error) {
-			if _, err = enc.Print(z); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+	return func(z *sku.Transacted) (err error) {
+		offset := enc.Offset()
 
+		if _, err = enc.Print(z); err != nil {
+			err = errors.Wrap(err)
 			return
 		}
-	} else {
-		enc := gob.NewEncoder(w)
 
-		return func(z *sku.Transacted) (err error) {
-			if err = enc.Encode(z); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+		if err = zp.ennui.Add(
+			z.GetMetadatei(),
+			zp.index,
+			uint64(offset),
+		); err != nil {
+			err = errors.Wrap(err)
 			return
 		}
+
+		return
 	}
 }
 

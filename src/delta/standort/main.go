@@ -74,6 +74,18 @@ func Make(
 	return
 }
 
+func (a Standort) SansAge() (b Standort) {
+	b = a
+	b.age = nil
+	return
+}
+
+func (a Standort) SansCompression() (b Standort) {
+	b = a
+	b.angeboren.CompressionType = angeboren.CompressionTypeNone
+	return
+}
+
 func (s Standort) GetKonfig() angeboren.Konfig {
 	return s.angeboren
 }

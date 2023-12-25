@@ -3,6 +3,7 @@ package store_verzeichnisse
 import (
 	"crypto/sha256"
 	"io"
+	"math"
 	"strconv"
 	"strings"
 
@@ -12,12 +13,12 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
-func (i Store) PageForKennung(h kennung.Kennung) (n int, err error) {
+func (i Store) PageForKennung(h kennung.Kennung) (n uint8, err error) {
 	s := sha.FromStringer(h)
 	return i.PageForSha(s)
 }
 
-func (i Store) PageForString(s string) (n int, err error) {
+func (i Store) PageForString(s string) (n uint8, err error) {
 	sr := strings.NewReader(s)
 	hash := sha256.New()
 
@@ -30,7 +31,7 @@ func (i Store) PageForString(s string) (n int, err error) {
 	return i.PageForSha(sh)
 }
 
-func (i Store) PageForSha(s schnittstellen.ShaLike) (n int, err error) {
+func (i Store) PageForSha(s schnittstellen.ShaLike) (n uint8, err error) {
 	var n1 int64
 	ss := s.String()[:DigitWidth]
 
@@ -39,7 +40,12 @@ func (i Store) PageForSha(s schnittstellen.ShaLike) (n int, err error) {
 		return
 	}
 
-	n = int(n1)
+	if n1 > math.MaxUint8 {
+		err = errors.Errorf("page out of bounds: %d", n1)
+		return
+	}
+
+	n = uint8(n1)
 
 	return
 }

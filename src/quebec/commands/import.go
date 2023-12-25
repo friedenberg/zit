@@ -74,7 +74,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	// setup besty reader
 	{
 		o := standort.FileReadOptions{
-			Age:             *ag,
+			Age:             ag,
 			Path:            c.Bestandsaufnahme,
 			CompressionType: c.CompressionType,
 		}
@@ -148,7 +148,7 @@ func (c Import) importAkteIfNecessary(
 	p := id.Path(akteSha, c.Akten)
 
 	o := standort.FileReadOptions{
-		Age:             *ag,
+		Age:             ag,
 		Path:            p,
 		CompressionType: c.CompressionType,
 	}

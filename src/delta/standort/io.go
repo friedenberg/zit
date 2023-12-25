@@ -26,7 +26,7 @@ func (s Standort) objekteReader(
 	}
 
 	o := FileReadOptions{
-		Age:             *s.age,
+		Age:             s.age,
 		Path:            id.Path(sh.GetShaLike(), p),
 		CompressionType: s.angeboren.CompressionType,
 	}
@@ -54,7 +54,7 @@ func (s Standort) objekteWriter(
 	}
 
 	o := MoveOptions{
-		Age:                      *s.age,
+		Age:                      s.age,
 		FinalPath:                p,
 		GenerateFinalPathFromSha: true,
 		LockFile:                 s.angeboren.LockInternalFiles,
@@ -71,7 +71,7 @@ func (s Standort) objekteWriter(
 
 func (s Standort) ReadCloserObjekten(p string) (sha.ReadCloser, error) {
 	o := FileReadOptions{
-		Age:             *s.age,
+		Age:             s.age,
 		Path:            p,
 		CompressionType: s.angeboren.CompressionType,
 	}
@@ -81,7 +81,7 @@ func (s Standort) ReadCloserObjekten(p string) (sha.ReadCloser, error) {
 
 func (s Standort) ReadCloserVerzeichnisse(p string) (sha.ReadCloser, error) {
 	o := FileReadOptions{
-		Age:             *s.age,
+		Age:             s.age,
 		Path:            p,
 		CompressionType: s.angeboren.CompressionType,
 	}
@@ -92,7 +92,7 @@ func (s Standort) ReadCloserVerzeichnisse(p string) (sha.ReadCloser, error) {
 func (s Standort) WriteCloserObjekten(p string) (w sha.WriteCloser, err error) {
 	return s.NewMover(
 		MoveOptions{
-			Age:             *s.age,
+			Age:             s.age,
 			FinalPath:       p,
 			LockFile:        s.angeboren.LockInternalFiles,
 			CompressionType: s.angeboren.CompressionType,
@@ -105,7 +105,7 @@ func (s Standort) WriteCloserVerzeichnisse(
 ) (w sha.WriteCloser, err error) {
 	return s.NewMover(
 		MoveOptions{
-			Age:             *s.age,
+			Age:             s.age,
 			FinalPath:       p,
 			LockFile:        false,
 			CompressionType: s.angeboren.CompressionType,
@@ -127,7 +127,7 @@ func (s Standort) AkteWriter() (w sha.WriteCloser, err error) {
 	}
 
 	mo := MoveOptions{
-		Age:                      *s.age,
+		Age:                      s.age,
 		FinalPath:                p,
 		GenerateFinalPathFromSha: true,
 		LockFile:                 s.angeboren.LockInternalFiles,
@@ -163,7 +163,7 @@ func (s Standort) AkteReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
 	p = id.Path(sh.GetShaLike(), p)
 
 	o := FileReadOptions{
-		Age:             *s.age,
+		Age:             s.age,
 		Path:            p,
 		CompressionType: s.angeboren.CompressionType,
 	}

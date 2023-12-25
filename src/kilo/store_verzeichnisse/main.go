@@ -2,81 +2,169 @@ package store_verzeichnisse
 
 import (
 	"fmt"
+	"io"
+	"os"
 	"path/filepath"
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/pool"
+	"github.com/friedenberg/zit/src/charlie/catgut"
+	"github.com/friedenberg/zit/src/delta/standort"
+	"github.com/friedenberg/zit/src/golf/ennui"
+	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/juliett/konfig"
 )
+
+type State int
+
+const (
+	StateUnread = State(iota)
+	StateChanged
+)
+
+type PageDelegate interface {
+	ShouldAddVerzeichnisse(*sku.Transacted) error
+	ShouldFlushVerzeichnisse(*sku.Transacted) error
+}
+
+type PageDelegateGetter interface {
+	GetVerzeichnissePageDelegate(uint8) PageDelegate
+}
 
 const (
 	DigitWidth = 1
 	PageCount  = 1 << (DigitWidth * 4)
 )
 
+var options objekte_format.Options
+
+func init() {
+	options = objekte_format.Options{
+		IncludeTai:           true,
+		IncludeVerzeichnisse: true,
+		PrintFinalSha:        true,
+	}
+}
+
 type Store struct {
 	erworben *konfig.Compiled
 	path     string
 	schnittstellen.VerzeichnisseFactory
 	pages [PageCount]*Page
+	ennui ennui.Ennui
 }
 
 type pageId struct {
-	index int
+	index uint8
 	path  string
 }
 
 func MakeStore(
+	s standort.Standort,
 	k *konfig.Compiled,
 	dir string,
-	f schnittstellen.VerzeichnisseFactory,
 	fff PageDelegateGetter,
 ) (i *Store, err error) {
 	i = &Store{
 		erworben:             k,
 		path:                 dir,
-		VerzeichnisseFactory: f,
+		VerzeichnisseFactory: s,
+	}
+
+	if i.ennui, err = ennui.Make(s, dir); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	for n := range i.pages {
 		i.pages[n] = makePage(
-			f,
-			i.PageIdForIndex(n),
+			s.SansAge().SansCompression(),
+			i.PageIdForIndex(uint8(n)),
 			fff,
-			// k.UseBestandsaufnahmeForVerzeichnisse,
-			true,
+			i.ennui,
 		)
 	}
 
 	return
 }
 
-func (i Store) PageIdForIndex(n int) (pid pageId) {
+func (i Store) PageIdForIndex(n uint8) (pid pageId) {
 	pid.index = n
 	pid.path = filepath.Join(i.path, fmt.Sprintf("%x", n))
 	return
 }
 
-func (i Store) GetPage(n int) (p *Page, err error) {
-	switch {
-	case n > PageCount:
-		fallthrough
+func (i *Store) ReadOne(k string, sk *sku.Transacted) (out *sku.Transacted, err error) {
+	var loc ennui.Loc
 
-	case n < 0:
-		err = errors.Errorf(
-			"expected page between 0 and %d, but got %d",
-			PageCount-1,
-			n,
-		)
+	if loc, err = i.ennui.ReadOne(k, sk.GetMetadatei()); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	p = i.pages[n]
+	return i.readLoc(loc)
+}
 
+func (i *Store) readLoc(loc ennui.Loc) (sk *sku.Transacted, err error) {
+	p := i.pages[loc.Page]
+
+	var f *os.File
+
+	if f, err = files.OpenFile(
+		p.path,
+		os.O_RDONLY,
+		0o666,
+	); err != nil {
+		if errors.IsNotExist(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	defer errors.DeferredCloser(&err, f)
+
+	if _, err = f.Seek(int64(loc.Offset), io.SeekStart); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	rb := catgut.MakeRingBuffer(f, 0)
+
+	sk = sku.GetTransactedPool().Get()
+
+	fo := objekte_format.Default()
+
+	if _, err = fo.ParsePersistentMetadatei(
+		rb,
+		sk,
+		options,
+	); err != nil {
+		err = errors.Wrapf(
+			err,
+			"Loc: %d, Readable: %s",
+			loc.Offset,
+			rb.PeekReadable().String()[:100],
+		)
+
+		return
+	}
+
+	return
+}
+
+// func (i *Store) ReadMany(string, *metadatei.Metadatei, *[]Loc) error {}
+// func (i *Store) ReadAll(*metadatei.Metadatei, *[]Loc) error          {}
+
+func (i Store) GetPage(n uint8) (p *Page, err error) {
+	p = i.pages[n]
 	return
 }
 
@@ -90,6 +178,8 @@ func (i *Store) Flush() (err error) {
 	errors.Log().Print("flushing")
 	wg := iter.MakeErrorWaitGroup()
 
+	wg.Do(i.ennui.Flush)
+
 	for _, p := range i.pages {
 		wg.Do(p.Flush)
 	}
@@ -101,7 +191,7 @@ func (i *Store) AddVerzeichnisse(
 	tz *sku.Transacted,
 	v string,
 ) (err error) {
-	var n int
+	var n uint8
 
 	if n, err = i.PageForString(v); err != nil {
 		err = errors.Wrap(err)

@@ -32,7 +32,7 @@ func Test1(t *testing.T) {
 	var w *writer
 
 	o := WriteOptions{
-		Age:    *age,
+		Age:    age,
 		Writer: out,
 	}
 
@@ -52,7 +52,7 @@ func Test1(t *testing.T) {
 	var r *reader
 
 	ro := ReadOptions{
-		Age:    *age,
+		Age:    age,
 		Reader: in,
 	}
 

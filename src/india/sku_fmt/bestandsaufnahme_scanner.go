@@ -100,6 +100,7 @@ func (scanner *bestandsaufnahmeScanner) Scan() (ok bool) {
 		scanner.options,
 	)
 
+
 	scanner.lastN += n1
 
 	if n1 == 0 {
