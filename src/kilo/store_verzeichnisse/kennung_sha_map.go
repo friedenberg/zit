@@ -10,9 +10,9 @@ type KennungShaMap map[string]*sha.Sha
 
 func (ksm KennungShaMap) ReadMutter(z *sku.Transacted) (err error) {
 	k := z.GetKennung()
-	old, ok := ksm[k.String()]
+	old := ksm[k.String()]
 
-	if !ok {
+	if old.IsNull() {
 		return
 	}
 

@@ -31,7 +31,7 @@ type StoreUtil interface {
 
 	mutators
 	accessors
-  reader
+	reader
 
 	ResetIndexes() (err error)
 	AddTypToIndex(t *kennung.Typ) (err error)
@@ -78,8 +78,7 @@ type common struct {
 	persistentMetadateiFormat objekte_format.Format
 	fileEncoder               objekte_collections.FileEncoder
 
-	verzeichnisseSchwanzen *VerzeichnisseSchwanzen
-	verzeichnisseAll       *store_verzeichnisse.Store
+	verzeichnisse *store_verzeichnisse.Store
 
 	sonnenaufgang thyme.Time
 
@@ -162,18 +161,11 @@ func MakeStoreUtil(
 		return
 	}
 
-	if c.verzeichnisseSchwanzen, err = MakeVerzeichnisseSchwanzen(
-		c,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if c.verzeichnisseAll, err = store_verzeichnisse.MakeStore(
+	if c.verzeichnisse, err = store_verzeichnisse.MakeStore(
 		c.GetStandort(),
 		c.GetKonfig(),
-		c.GetStandort().DirVerzeichnisseZettelenNeue(),
-		nil,
+		c.GetStandort().DirVerzeichnisseObjekten(),
+		c.GetKennungIndex(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

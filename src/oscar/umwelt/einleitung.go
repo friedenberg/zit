@@ -184,7 +184,9 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 			return
 		}
 
-		if _, err = u.StoreObjekten().Konfig().Update(
+		if _, err = u.StoreObjekten().CreateOrUpdateAkte(
+			nil,
+			&kennung.Konfig{},
 			sh,
 		); err != nil {
 			err = errors.Wrap(err)

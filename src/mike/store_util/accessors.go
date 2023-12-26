@@ -28,8 +28,7 @@ type accessors interface {
 	GetFileEncoder() objekte_collections.FileEncoder
 	GetKennungIndex() kennung_index.Index
 	GetObjekteFormatOptions() objekte_format.Options
-	GetVerzeichnisseAll() *store_verzeichnisse.Store
-	GetVerzeichnisseSchwanzen() *VerzeichnisseSchwanzen
+	GetVerzeichnisse() *store_verzeichnisse.Store
 }
 
 func (s *common) GetAkten() *akten.Akten {
@@ -84,10 +83,6 @@ func (s *common) GetKonfig() *konfig.Compiled {
 	return s.konfig
 }
 
-func (s *common) GetVerzeichnisseSchwanzen() *VerzeichnisseSchwanzen {
-	return s.verzeichnisseSchwanzen
-}
-
-func (s *common) GetVerzeichnisseAll() *store_verzeichnisse.Store {
-	return s.verzeichnisseAll
+func (s *common) GetVerzeichnisse() *store_verzeichnisse.Store {
+	return s.verzeichnisse
 }

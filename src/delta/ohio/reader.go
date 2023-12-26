@@ -1,11 +1,26 @@
 package ohio
 
 import (
+	"io"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 )
+
+func ReadAllOrDieTrying(r io.Reader, b []byte) (n int, err error) {
+	var acc int
+
+	for n < len(b) {
+    acc, err = r.Read(b[n:])
+		n += acc
+		if err != nil {
+			return
+		}
+	}
+
+	return
+}
 
 func MakeLineReaderIterateStrict(
 	rffs ...schnittstellen.FuncSetString,

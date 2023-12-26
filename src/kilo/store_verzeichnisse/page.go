@@ -29,30 +29,36 @@ type Page struct {
 	State
 }
 
-func makePage(
-	iof schnittstellen.VerzeichnisseFactory, pid pageId,
-	fff PageDelegateGetter,
+func (p *Page) initialize(
+	iof schnittstellen.VerzeichnisseFactory,
+	pid pageId,
 	e ennui.Ennui,
-) (p *Page) {
-	p = &Page{
-		VerzeichnisseFactory: iof,
-		pageId:               pid,
-		added:                sku.MakeTransactedHeap(),
-		addFilter:            collections.MakeWriterNoop[*sku.Transacted](),
-		flushFilter:          collections.MakeWriterNoop[*sku.Transacted](),
-		ennui:                e,
-	}
-
-	if fff != nil {
-		p.delegate = fff.GetVerzeichnissePageDelegate(pid.index)
-
-		p.addFilter = p.delegate.ShouldAddVerzeichnisse
-		p.flushFilter = p.delegate.ShouldFlushVerzeichnisse
-	}
+) {
+	p.VerzeichnisseFactory = iof
+	p.pageId = pid
+	p.added = sku.MakeTransactedHeap()
+	p.addFilter = collections.MakeWriterNoop[*sku.Transacted]()
+	p.flushFilter = collections.MakeWriterNoop[*sku.Transacted]()
+	p.ennui = e
 
 	p.added.SetPool(sku.GetTransactedPool())
+}
 
-	return
+func (p *Page) initializeWithSchwanzen(
+	iof schnittstellen.VerzeichnisseFactory,
+	pid pageId,
+	d PageDelegate,
+) {
+	p.initialize(iof, pid, nil)
+
+	if d == nil {
+		return
+	}
+
+	p.delegate = d
+
+	p.addFilter = p.delegate.ShouldAddVerzeichnisse
+	p.flushFilter = p.delegate.ShouldFlushVerzeichnisse
 }
 
 func (zp *Page) Add(z *sku.Transacted) (err error) {
@@ -60,7 +66,14 @@ func (zp *Page) Add(z *sku.Transacted) (err error) {
 		panic("trying to add nil zettel")
 	}
 
-	if err = zp.addFilter(z); err != nil {
+	z1 := sku.GetTransactedPool().Get()
+
+	if err = z1.SetFromSkuLike(z); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = zp.addFilter(z1); err != nil {
 		if iter.IsStopIteration(err) {
 			errors.Log().Printf("eliding %s", z.Kennung)
 			err = nil
@@ -71,16 +84,17 @@ func (zp *Page) Add(z *sku.Transacted) (err error) {
 		return
 	}
 
-	zp.added.Add(z)
+	zp.added.Add(z1)
 	zp.State = StateChanged
 
-	log.Log().Printf("added %s", z.Kennung.String())
+	log.Log().Printf("added %s", z1.Kennung.String())
 
 	return
 }
 
-func (zp *Page) Flush() (err error) {
+func (zp *Page) Flush(m KennungShaMap) (err error) {
 	if zp.State < StateChanged {
+		errors.Log().Printf("not flushing page: %s", zp.path)
 		return
 	}
 
@@ -105,8 +119,6 @@ func (zp *Page) Flush() (err error) {
 	w1 := bufio.NewWriter(w)
 
 	defer errors.DeferredFlusher(&err, w1)
-
-	m := make(KennungShaMap)
 
 	writeOne := zp.getFuncWriteOne(w1)
 
@@ -206,6 +218,10 @@ func (zp *Page) getFuncWriteOne(
 
 		if _, err = enc.Print(z); err != nil {
 			err = errors.Wrap(err)
+			return
+		}
+
+		if zp.ennui == nil {
 			return
 		}
 

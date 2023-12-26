@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/values"
+	"github.com/friedenberg/zit/src/delta/ohio"
 )
 
 const (
@@ -89,7 +90,7 @@ func (s *Sha) SetParts(a, b string) (err error) {
 
 func (src *Sha) WriteTo(w io.Writer) (n int64, err error) {
 	var n1 int
-	n1, err = w.Write(src.GetShaBytes())
+	n1, err = ohio.WriteAllOrDieTrying(w, src.GetShaBytes())
 	n = int64(n1)
 	return
 }
@@ -98,20 +99,18 @@ func (s *Sha) ReadFrom(r io.Reader) (n int64, err error) {
 	s.allocDataIfNecessary()
 
 	var n1 int
+	n1, err = ohio.ReadAllOrDieTrying(r, s.data[:])
+	n += int64(n1)
 
-	n1, err = r.Read(s.data[:])
-
-	if n1 == 0 && err == io.EOF {
+	if n == 0 && err == io.EOF {
 		return
-	} else if n1 != ByteSize && n1 != 0 {
-		err = errors.Errorf("expected to read %d bytes but only read %d", ByteSize, n1)
+	} else if n != ByteSize && n != 0 {
+		err = errors.Errorf("expected to read %d bytes but only read %d", ByteSize, n)
 		return
 	} else if errors.IsNotNilAndNotEOF(err) {
 		err = errors.Wrap(err)
 		return
 	}
-
-	n = int64(n1)
 
 	return
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/delta/ohio"
 )
 
 const RowSize = sha.ByteSize + 1 + binary.MaxVarintLen64
@@ -20,8 +21,25 @@ type row struct {
 	offset int64Bytes
 }
 
+func (r *row) getOffset() uint64 {
+	o, _ := binary.Uvarint(r.offset[:])
+	return o
+}
+
+func (r *row) getPage() uint8 {
+	return uint8(r.page[0])
+}
+
+func (r *row) setOffset(v uint64) {
+	binary.PutUvarint(r.offset[:], v)
+
+	if v != r.getOffset() {
+		panic(fmt.Sprintf("expected %d but got %d", v, r.getOffset()))
+	}
+}
+
 func (r *row) String() string {
-	return fmt.Sprintf("%s %d", &r.sha, r.page)
+	return fmt.Sprintf("%d@%d -> %s", uint8(r.page[0]), r.getOffset(), &r.sha)
 }
 
 func (current *row) ReadFrom(r io.Reader) (n int64, err error) {
@@ -32,23 +50,33 @@ func (current *row) ReadFrom(r io.Reader) (n int64, err error) {
 	n += n1
 
 	if err != nil {
-		err = errors.Wrap(err)
+		err = errors.WrapExcept(err, io.EOF)
 		return
 	}
 
-	n2, err = r.Read(current.page[:])
+	n2, err = ohio.ReadAllOrDieTrying(r, current.page[:])
 	n += int64(n2)
 
 	if err != nil {
-		err = errors.Wrap(err)
+		err = errors.WrapExcept(err, io.EOF)
 		return
 	}
 
-	n2, err = r.Read(current.offset[:])
+	if current.getPage() > 16 {
+		err = errors.Errorf("page too big: %s", current)
+		return
+	}
+
+	n2, err = ohio.ReadAllOrDieTrying(r, current.offset[:])
 	n += int64(n2)
 
 	if err != nil {
-		err = errors.Wrap(err)
+		err = errors.WrapExcept(err, io.EOF)
+		return
+	}
+
+	if n != RowSize {
+		err = errors.Errorf("expected to read %d but read %d", RowSize, n)
 		return
 	}
 
@@ -67,7 +95,7 @@ func (r *row) WriteTo(w io.Writer) (n int64, err error) {
 		return
 	}
 
-	n2, err = w.Write(r.page[:])
+	n2, err = ohio.WriteAllOrDieTrying(w, r.page[:])
 	n += int64(n2)
 
 	if err != nil {
@@ -75,11 +103,16 @@ func (r *row) WriteTo(w io.Writer) (n int64, err error) {
 		return
 	}
 
-	n2, err = w.Write(r.offset[:])
+	n2, err = ohio.WriteAllOrDieTrying(w, r.offset[:])
 	n += int64(n2)
 
 	if err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	if n != RowSize {
+		err = errors.Errorf("expected to write %d but read %d", RowSize, n)
 		return
 	}
 

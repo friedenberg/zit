@@ -15,15 +15,7 @@ type mutators interface {
 }
 
 func (s *common) AddVerzeichnisse(t *sku.Transacted) (err error) {
-	if err = s.verzeichnisseSchwanzen.AddVerzeichnisse(
-		t,
-		t.GetKennung().String(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.verzeichnisseAll.AddVerzeichnisse(
+	if err = s.verzeichnisse.Add(
 		t,
 		t.GetKennung().String(),
 	); err != nil {

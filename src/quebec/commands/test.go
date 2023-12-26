@@ -11,7 +11,7 @@ type Test struct{}
 func init() {
 	registerCommand(
 		"test",
-		func(f *flag.FlagSet) Command {
+		func(_ *flag.FlagSet) Command {
 			c := &Test{}
 
 			return c
@@ -20,5 +20,5 @@ func init() {
 }
 
 func (c Test) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	return
+	return u.StoreUtil().GetVerzeichnisse().GetEnnui().PrintAll()
 }

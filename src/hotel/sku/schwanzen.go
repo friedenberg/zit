@@ -11,7 +11,7 @@ import (
 )
 
 type Schwanzen struct {
-	lock         *sync.RWMutex
+	lock         sync.RWMutex
 	hinweisen    map[string]*Transacted
 	etikettIndex kennung_index.EtikettIndexMutation
 	funcFlush    schnittstellen.FuncIter[*Transacted]
@@ -20,13 +20,19 @@ type Schwanzen struct {
 func MakeSchwanzen(
 	ei kennung_index.EtikettIndexMutation,
 	funcFlush schnittstellen.FuncIter[*Transacted],
-) *Schwanzen {
-	return &Schwanzen{
-		lock:         &sync.RWMutex{},
-		hinweisen:    make(map[string]*Transacted),
-		etikettIndex: ei,
-		funcFlush:    funcFlush,
-	}
+) (s *Schwanzen) {
+	s = &Schwanzen{}
+	s.Initialize(ei, funcFlush)
+  return
+}
+
+func (s *Schwanzen) Initialize(
+	ei kennung_index.EtikettIndexMutation,
+	funcFlush schnittstellen.FuncIter[*Transacted],
+) {
+	s.hinweisen = make(map[string]*Transacted)
+	s.etikettIndex = ei
+	s.funcFlush = funcFlush
 }
 
 func (zws *Schwanzen) Less(zt *Transacted) (ok bool) {

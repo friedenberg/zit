@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/ohio"
@@ -373,7 +372,6 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			}
 
 			if z, err = rob("Metadatei", z); err != nil {
-				log.Debug().Printf("%s", err)
 				err = nil
 				return
 			}

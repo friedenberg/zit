@@ -4,12 +4,53 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/todo"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
 )
+
+func (s *Store) ReadHinweisSchwanzen(
+	h kennung.Kennung,
+) (found *sku.Transacted, err error) {
+	var n uint8
+
+	if n, err = s.GetVerzeichnisse().PageForKennung(h); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	errors.Log().Printf("searching page %d", n)
+
+	w := func(zv *sku.Transacted) (err error) {
+		if !kennung.Equals(zv.GetKennung(), h) {
+			return
+		}
+
+		found = sku.GetTransactedPool().Get()
+		sku.TransactedResetter.ResetWith(found, zv)
+
+		err = collections.MakeErrStopIteration()
+
+		return
+	}
+
+	p := s.GetVerzeichnisse().GetPagePair(n)
+
+	if err = p.Schwanzen.Copy(w); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if found == nil {
+		err = objekte_store.ErrNotFound{Id: h}
+		return
+	}
+
+	return
+}
 
 func (s *Store) Create(
 	mg metadatei.Getter,
@@ -92,7 +133,7 @@ func (s *Store) Update(
 
 	var mutter *sku.Transacted
 
-	if mutter, err = s.GetVerzeichnisseSchwanzen().ReadHinweisSchwanzen(
+	if mutter, err = s.ReadHinweisSchwanzen(
 		h,
 	); err != nil {
 		err = errors.Wrap(err)

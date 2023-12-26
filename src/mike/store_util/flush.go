@@ -50,13 +50,12 @@ func (c *common) Flush() (err error) {
 	gob.Register(iter.StringerKeyerPtr[kennung.Typ, *kennung.Typ]{})
 
 	if c.GetKonfig().HasChanges() {
-		c.verzeichnisseSchwanzen.SetNeedsFlush()
+		c.verzeichnisse.SetNeedsFlush()
 	}
 
 	wg := iter.MakeErrorWaitGroup()
 
-	wg.Do(c.verzeichnisseAll.Flush)
-	wg.Do(c.verzeichnisseSchwanzen.Flush)
+	wg.Do(c.verzeichnisse.Flush)
 	wg.Do(c.typenIndex.Flush)
 	wg.Do(c.kennungIndex.Flush)
 	wg.Do(c.Abbr.Flush)

@@ -16,6 +16,18 @@ func Wrap(in error) (err error) {
 	return
 }
 
+func WrapExceptAsNil(in error, except ...error) (err error) {
+	for _, e := range except {
+		if in == e {
+			return nil
+		}
+	}
+
+	se, _ := newStackWrapError(1)
+	err = wrapf(se, in, "")
+	return
+}
+
 func WrapExcept(in error, except ...error) (err error) {
 	for _, e := range except {
 		if in == e {

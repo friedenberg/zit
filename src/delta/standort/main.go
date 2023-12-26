@@ -200,16 +200,8 @@ func (s Standort) DirVerlorenUndGefunden() string {
 	return s.DirZit("Verloren+Gefunden")
 }
 
-func (s Standort) FileVerzeichnisseZettelenSchwanzen() string {
-	return s.DirVerzeichnisse("ZettelenSchwanzen")
-}
-
-func (s Standort) DirVerzeichnisseZettelenNeue() string {
-	return s.DirVerzeichnisse("ZettelenNeue")
-}
-
-func (s Standort) DirVerzeichnisseZettelenNeueSchwanzen() string {
-	return s.DirVerzeichnisse("ZettelenNeueSchwanzen")
+func (s Standort) DirVerzeichnisseObjekten() string {
+	return s.DirVerzeichnisse("Objekten")
 }
 
 func (s Standort) DirVerzeichnisseAkten() string {
@@ -251,12 +243,7 @@ func (s Standort) ResetVerzeichnisse() (err error) {
 		return
 	}
 
-	if err = os.MkdirAll(s.DirVerzeichnisseZettelenNeue(), os.ModeDir|0o755); err != nil {
-		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
-		return
-	}
-
-	if err = os.MkdirAll(s.DirVerzeichnisseZettelenNeueSchwanzen(), os.ModeDir|0o755); err != nil {
+	if err = os.MkdirAll(s.DirVerzeichnisseObjekten(), os.ModeDir|0o755); err != nil {
 		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
 		return
 	}

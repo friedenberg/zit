@@ -137,7 +137,7 @@ func (s *Store) ReadOne(
 			return
 		}
 
-		if sk, err = s.GetVerzeichnisseSchwanzen().ReadHinweisSchwanzen(h); err != nil {
+		if sk, err = s.ReadHinweisSchwanzen(h); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -215,7 +215,7 @@ func (s *Store) ReadAllSchwanzen(
 	gs gattungen.Set,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	return s.GetVerzeichnisseSchwanzen().ReadMany(
+	return s.GetVerzeichnisse().ReadSchwanzen(
 		iter.MakeChain(
 			func(sk *sku.Transacted) (err error) {
 				if !gs.Contains(gattung.Must(sk.Kennung.GetGattung())) {

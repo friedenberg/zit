@@ -34,7 +34,7 @@ func (s *common) ReadAllGattungFromBestandsaufnahme(
 	g gattung.Gattung,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	eachSku := func(besty, sk *sku.Transacted) (err error) {
+	eachSku := func(_, sk *sku.Transacted) (err error) {
 		if sk.GetGattung() != g {
 			return
 		}
@@ -101,7 +101,7 @@ func (s *common) ReadAllGattungFromVerzeichnisse(
 		return
 	}
 
-	if err = s.verzeichnisseAll.ReadMany(eachSku); err != nil {
+	if err = s.verzeichnisse.ReadAll(eachSku); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -130,12 +130,10 @@ func (s *common) ReadAllGattungenFromVerzeichnisse(
 		return
 	}
 
-	if err = s.verzeichnisseAll.ReadMany(eachSku); err != nil {
+	if err = s.verzeichnisse.ReadAll(eachSku); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	return
 
 	return
 }

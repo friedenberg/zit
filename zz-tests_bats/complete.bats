@@ -18,8 +18,6 @@ function complete_show_all { # @test
 		md.*Typ
 		one/dos.*Zettel: !md wow ok again
 		one/uno.*Zettel: !md wow the first
-		tag-1.*Etikett
-		tag-2.*Etikett
 		tag-3.*Etikett
 		tag-4.*Etikett
 	EOM

@@ -43,7 +43,7 @@ build/go_vet: $(files_go)
 > go vet ./... || true
 > touch "$@"
 
-dirs_go_unit := $(shell find src -mindepth 2 -iname '*_test.go' -print0 | xargs -0 dirname | sort -u)
+dirs_go_unit := $(shell find src -mindepth 2 -iname '*_test.go' -print0 | sort -u)
 
 cmd_test_unit_runner := $(HOME)/.vim/ftplugin/go-test.bash
 

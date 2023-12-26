@@ -31,6 +31,21 @@ func Chain[T any](e T, wfs ...schnittstellen.FuncIter[T]) (err error) {
 	return
 }
 
+func MakeChainDebug[T any](wfs ...schnittstellen.FuncIter[T]) schnittstellen.FuncIter[T] {
+	for i := range wfs {
+		old := wfs[i]
+		wfs[i] = func(e T) (err error) {
+			if err = old(e); err != nil {
+				panic(err)
+			}
+
+			return
+		}
+	}
+
+	return MakeChain(wfs...)
+}
+
 func MakeChain[T any](wfs ...schnittstellen.FuncIter[T]) schnittstellen.FuncIter[T] {
 	return func(e T) (err error) {
 		for _, w := range wfs {

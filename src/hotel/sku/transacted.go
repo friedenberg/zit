@@ -57,6 +57,30 @@ func (a *Transacted) String() string {
 	)
 }
 
+func (a *Transacted) StringKennungTai() string {
+	return fmt.Sprintf(
+		"%s@%s",
+		&a.Kennung,
+		a.GetTai(),
+	)
+}
+
+func (a *Transacted) StringKennungSha() string {
+	return fmt.Sprintf(
+		"%s@%s",
+		&a.Kennung,
+		&a.GetMetadatei().Sha,
+	)
+}
+
+func (a *Transacted) StringKennungMutter() string {
+	return fmt.Sprintf(
+		"%s^@%s",
+		&a.Kennung,
+		&a.GetMetadatei().Mutter,
+	)
+}
+
 func (a *Transacted) GetSkuLikePtr() SkuLike {
 	return a
 }
