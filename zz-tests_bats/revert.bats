@@ -15,7 +15,6 @@ teardown() {
 }
 
 function revert_one_zettel { # @test
-	skip
 	run_zit revert one/uno
 	assert_success
 	assert_output - <<-EOM
@@ -24,7 +23,6 @@ function revert_one_zettel { # @test
 }
 
 function revert_all_zettels { # @test
-	skip
 	run_zit revert :z
 	assert_success
 	assert_output - <<-EOM
@@ -33,7 +31,6 @@ function revert_all_zettels { # @test
 }
 
 function revert_last { # @test
-	skip
 	run_zit revert -last
 	assert_success
 	assert_output - <<-EOM

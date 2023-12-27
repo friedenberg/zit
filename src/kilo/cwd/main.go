@@ -237,7 +237,7 @@ func (fs CwdFiles) Get(
 func (fs CwdFiles) All(
 	f schnittstellen.FuncIter[*sku.ExternalMaybe],
 ) (err error) {
-	wg := iter.MakeErrorWaitGroup()
+	wg := iter.MakeErrorWaitGroupParallel()
 
 	iter.ErrorWaitGroupApply[*Zettel](
 		wg,

@@ -1,7 +1,6 @@
 package sku
 
 import (
-	"io"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -25,7 +24,7 @@ func CalculateAndConfirmSha(
 	if !sk.GetObjekteSha().EqualsSha(sh) {
 		var sb strings.Builder
 
-		errors.PanicIfError(calculateAndSetSha(sk, format, o, &sb))
+		errors.PanicIfError(calculateAndSetSha(sk))
 
 		err = errors.Errorf(
 			"expected sha %q but got %q: used %q",
@@ -47,24 +46,37 @@ func CalculateAndSetSha(
 	format objekte_format.Formatter,
 	o objekte_format.Options,
 ) (err error) {
-	return calculateAndSetSha(sk, format, o, nil)
+	return calculateAndSetSha(sk)
 }
 
 func calculateAndSetSha(
 	sk SkuLike,
-	format objekte_format.Formatter,
-	o objekte_format.Options,
-	w1 io.Writer,
 ) (err error) {
-	w := sha.MakeWriter(w1)
+	var shaFormat objekte_format.FormatGeneric
 
-	if _, err = format.FormatPersistentMetadatei(w, sk, o); err != nil {
+	if shaFormat, err = objekte_format.FormatForKeyError("MetadateiPlusMutter"); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	sh := w.GetShaLike()
-	sk.SetObjekteSha(sh)
+	var actual *sha.Sha
+
+	if actual, err = objekte_format.GetShaForMetadatei(
+		shaFormat,
+		sk.GetMetadatei(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer sha.GetPool().Put(actual)
+
+	if err = sk.GetMetadatei().Sha.SetShaLike(actual); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	sk.SetObjekteSha(actual)
 
 	return
 }

@@ -60,7 +60,7 @@ func (c Diff) RunWithQuery(
 		iter.MakeChain(
 			matcher.MakeFilterFromQuery(ms),
 			func(co *sku.CheckedOut) (err error) {
-				wg := iter.MakeErrorWaitGroup()
+				wg := iter.MakeErrorWaitGroupParallel()
 
 				il := &co.Internal
 				el := &co.External

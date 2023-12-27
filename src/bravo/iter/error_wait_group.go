@@ -13,8 +13,8 @@ type ErrorWaitGroup interface {
 	GetError() error
 }
 
-func MakeErrorWaitGroup() ErrorWaitGroup {
-	wg := &errorWaitGroup{
+func MakeErrorWaitGroupParallel() ErrorWaitGroup {
+	wg := &errorWaitGroupParallel{
 		lock:    &sync.Mutex{},
 		inner:   &sync.WaitGroup{},
 		err:     errors.MakeMulti(),
@@ -24,7 +24,7 @@ func MakeErrorWaitGroup() ErrorWaitGroup {
 	return wg
 }
 
-type errorWaitGroup struct {
+type errorWaitGroupParallel struct {
 	lock    *sync.Mutex
 	inner   *sync.WaitGroup
 	err     errors.Multi
@@ -33,7 +33,7 @@ type errorWaitGroup struct {
 	isDone bool
 }
 
-func (wg *errorWaitGroup) GetError() (err error) {
+func (wg *errorWaitGroupParallel) GetError() (err error) {
 	wg.wait()
 
 	me := errors.MakeMulti(wg.err)
@@ -75,7 +75,7 @@ func ErrorWaitGroupApply[T any](
 	return
 }
 
-func (wg *errorWaitGroup) Do(f schnittstellen.FuncError) (d bool) {
+func (wg *errorWaitGroupParallel) Do(f schnittstellen.FuncError) (d bool) {
 	wg.lock.Lock()
 
 	if wg.isDone {
@@ -94,7 +94,7 @@ func (wg *errorWaitGroup) Do(f schnittstellen.FuncError) (d bool) {
 	return true
 }
 
-func (wg *errorWaitGroup) DoAfter(f schnittstellen.FuncError) {
+func (wg *errorWaitGroupParallel) DoAfter(f schnittstellen.FuncError) {
 	wg.lock.Lock()
 	defer wg.lock.Unlock()
 
@@ -103,7 +103,7 @@ func (wg *errorWaitGroup) DoAfter(f schnittstellen.FuncError) {
 	return
 }
 
-func (wg *errorWaitGroup) doneWith(err error) {
+func (wg *errorWaitGroupParallel) doneWith(err error) {
 	wg.inner.Done()
 
 	if err != nil {
@@ -111,7 +111,7 @@ func (wg *errorWaitGroup) doneWith(err error) {
 	}
 }
 
-func (wg *errorWaitGroup) wait() {
+func (wg *errorWaitGroupParallel) wait() {
 	wg.inner.Wait()
 
 	wg.lock.Lock()

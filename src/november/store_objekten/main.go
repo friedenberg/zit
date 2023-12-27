@@ -6,6 +6,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/expansion"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
@@ -123,6 +124,38 @@ func (s *Store) UpdateManyMetadatei(
 	return
 }
 
+func (s *Store) SetTransactedTo(
+	k *kennung.Kennung2,
+	sh *sha.Sha,
+) (err error) {
+	if !s.GetStandort().GetLockSmith().IsAcquired() {
+		err = objekte_store.ErrLockRequired{
+			Operation: "update many metadatei",
+		}
+
+		return
+	}
+
+	var mutter *sku.Transacted
+
+	if mutter, err = s.GetVerzeichnisse().ReadOne(sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer sku.GetTransactedPool().Put(mutter)
+
+	if _, err = s.CreateOrUpdate(
+		&mutter.Metadatei,
+		k,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s *Store) QueryWithoutCwd(
 	ms matcher.Query,
 	f schnittstellen.FuncIter[*sku.Transacted],
@@ -144,7 +177,7 @@ func (s *Store) query(
 ) (err error) {
 	gsWithoutHistory, gsWithHistory := ms.SplitGattungenByHistory()
 
-	wg := iter.MakeErrorWaitGroup()
+	wg := iter.MakeErrorWaitGroupParallel()
 
 	f1 := func(z *sku.Transacted) (err error) {
 		g := gattung.Must(z.GetGattung())

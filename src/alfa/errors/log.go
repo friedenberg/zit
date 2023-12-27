@@ -1,7 +1,7 @@
 package errors
 
 import (
-	"io/ioutil"
+	"io"
 	log_package "log"
 	"os"
 )
@@ -37,7 +37,7 @@ func init() {
 		log_package.Panic(err)
 	}
 
-	log_package.SetOutput(ioutil.Discard)
+	log_package.SetOutput(io.Discard)
 }
 
 func SetVerbose() {

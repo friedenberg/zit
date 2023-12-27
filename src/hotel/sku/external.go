@@ -51,7 +51,7 @@ func (a *External) String() string {
 		". %s %s %s %s",
 		a.GetGattung(),
 		a.GetKennung(),
-		&a.ObjekteSha,
+		a.GetObjekteSha(),
 		a.GetAkteSha(),
 	)
 }
@@ -60,9 +60,18 @@ func (a *External) GetAkteSha() schnittstellen.ShaLike {
 	return &a.Metadatei.Akte
 }
 
-func (a *External) SetAkteSha(v schnittstellen.ShaLike) {
-	a.Metadatei.Akte.SetShaLike(v)
-	a.FDs.Akte.SetShaLike(v)
+func (a *External) SetAkteSha(v schnittstellen.ShaLike) (err error) {
+	if err = a.Metadatei.Akte.SetShaLike(v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = a.FDs.Akte.SetShaLike(v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (a *External) AsTransacted() (b Transacted) {
@@ -101,7 +110,6 @@ func (a *External) ResetWithExternalMaybe(
 ) (err error) {
 	k := b.GetKennungLike()
 	a.Kennung.ResetWithKennung(k)
-	a.ObjekteSha.Reset()
 	metadatei.Resetter.Reset(&a.Metadatei)
 	a.FDs.ResetWith(b.GetFDs())
 
@@ -113,7 +121,7 @@ func (a *External) EqualsSkuLikePtr(b SkuLike) (ok bool) {
 		return
 	}
 
-	if !a.ObjekteSha.EqualsSha(b.GetObjekteSha()) {
+	if !a.GetObjekteSha().EqualsSha(b.GetObjekteSha()) {
 		return
 	}
 

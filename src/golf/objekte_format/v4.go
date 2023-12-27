@@ -121,7 +121,7 @@ func (f v4) FormatPersistentMetadatei(
 		}
 	}
 
-	if o.IncludeTai {
+	if o.Tai {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,
 			keyTai.String(),
@@ -149,7 +149,7 @@ func (f v4) FormatPersistentMetadatei(
 		}
 	}
 
-	if o.IncludeVerzeichnisse {
+	if o.Verzeichnisse {
 		if m.Verzeichnisse.Archiviert.Bool() {
 			n1, err = ohio.WriteKeySpaceValueNewlineString(
 				w,
@@ -205,7 +205,7 @@ func (f v4) FormatPersistentMetadatei(
 		}
 	}
 
-	if !m.Mutter.IsNull() {
+	if !m.Mutter.IsNull() && !o.ExcludeMutter {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,
 			keyMutter.String(),

@@ -3,7 +3,6 @@ package bestandsaufnahme
 import (
 	"fmt"
 	"io"
-	"strings"
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -70,7 +69,7 @@ func MakeStore(
 ) (s *store, err error) {
 	p := pool.MakePool[Akte](nil, func(a *Akte) { Resetter.Reset(a) })
 
-	op := objekte_format.Options{IncludeTai: true}
+	op := objekte_format.Options{Tai: true}
 	fa := MakeAkteFormat(sv, op)
 
 	s = &store{
@@ -152,7 +151,7 @@ func (s *store) Create(o *Akte) (t *sku.Transacted, err error) {
 	if _, err = s.persistentMetadateiFormat.FormatPersistentMetadatei(
 		w,
 		t,
-		objekte_format.Options{IncludeTai: true},
+		objekte_format.Options{Tai: true},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -180,6 +179,11 @@ func (s *store) readOnePath(p string) (o *sku.Transacted, err error) {
 	}
 
 	if o, err = s.ReadOne(sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = sku.CalculateAndSetSha(o, nil, objekte_format.Options{}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -249,50 +253,11 @@ func (s *store) ReadOne(
 
 	defer errors.DeferredCloser(&err, or)
 
-	var sb strings.Builder
-	mr := io.TeeReader(or, &sb)
-
-	var n int64
-	n, o, err = s.readOneFromReader(mr)
+	_, o, err = s.readOneFromReader(or)
 
 	if err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	switch s.sv.GetInt() {
-	case 0, 1, 2:
-		panic("unsupported version")
-
-	default:
-		op := s.options
-		err = sku.CalculateAndConfirmSha(
-			o,
-			s.persistentMetadateiFormat,
-			op,
-			&sh,
-		)
-
-		if err != nil {
-			op.IncludeTai = false
-
-			err = sku.CalculateAndConfirmSha(
-				o,
-				s.persistentMetadateiFormat,
-				op,
-				&sh,
-			)
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
-		if err != nil {
-			err = errors.Wrapf(err, "Sku: %q, Read: %q, N: %d", o, sb.String(), n)
-			return
-		}
 	}
 
 	return
@@ -319,7 +284,7 @@ func (s *store) readOneFromReader(
 	return
 }
 
-func (s *store) GetAkte(akteSha schnittstellen.ShaLike) (a *Akte, err error) {
+func (s *store) populateAkte(akteSha schnittstellen.ShaLike, a *Akte) (err error) {
 	var ar schnittstellen.ShaReadCloser
 
 	if ar, err = s.af.AkteReader(akteSha); err != nil {
@@ -330,8 +295,6 @@ func (s *store) GetAkte(akteSha schnittstellen.ShaLike) (a *Akte, err error) {
 	defer errors.DeferredCloser(&err, ar)
 
 	sw := sha.MakeWriter(nil)
-
-	a = MakeAkte()
 
 	if _, err = s.formatAkte.ParseAkte(io.TeeReader(ar, sw), a); err != nil {
 		err = errors.Wrap(err)
@@ -349,6 +312,12 @@ func (s *store) GetAkte(akteSha schnittstellen.ShaLike) (a *Akte, err error) {
 		return
 	}
 
+	return
+}
+
+func (s *store) GetAkte(akteSha schnittstellen.ShaLike) (a *Akte, err error) {
+	a = MakeAkte()
+	err = s.populateAkte(akteSha, a)
 	return
 }
 
@@ -374,10 +343,7 @@ func (s *store) ReadLast() (max *sku.Transacted, err error) {
 		return
 	}
 
-	if max, err = s.ReadOne(maxSku.GetObjekteSha()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	max = &maxSku
 
 	if max.GetObjekteSha().IsNull() {
 		panic(

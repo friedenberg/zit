@@ -25,7 +25,8 @@ type (
 
 	Ennui interface {
 		GetEnnui() Ennui
-		Add(*metadatei.Metadatei, uint8, uint64) error
+		AddMetadatei(*metadatei.Metadatei, uint8, uint64) error
+		AddSha(*sha.Sha, uint8, uint64) error
 		ReadOneSha(sh *Sha) (loc Loc, err error)
 		ReadOneKey(string, *metadatei.Metadatei) (Loc, error)
 		ReadManyKeys(string, *metadatei.Metadatei, *[]Loc) error
@@ -94,7 +95,7 @@ func (e *ennui) GetEnnui() Ennui {
 	return e
 }
 
-func (e *ennui) Add(m *Metadatei, page uint8, offset uint64) (err error) {
+func (e *ennui) AddMetadatei(m *Metadatei, page uint8, offset uint64) (err error) {
 	e.Lock()
 	defer e.Unlock()
 
@@ -106,16 +107,41 @@ func (e *ennui) Add(m *Metadatei, page uint8, offset uint64) (err error) {
 	}
 
 	for _, s := range shas {
-		if s.IsNull() {
-			continue
+		if err = e.addSha(s, page, offset); err != nil {
+			err = errors.Wrap(err)
+			return
 		}
-
-		r := &row{}
-		r.sha.SetShaLike(s)
-		r.page[0] = page
-		r.setOffset(offset)
-		e.added.Push(r)
 	}
+
+	return
+}
+
+func (e *ennui) AddSha(sh *Sha, page uint8, offset uint64) (err error) {
+	if sh.IsNull() {
+		return
+	}
+
+	e.Lock()
+	defer e.Unlock()
+
+	return e.addSha(sh, page, offset)
+}
+
+func (e *ennui) addSha(sh *Sha, page uint8, offset uint64) (err error) {
+	if sh.IsNull() {
+		return
+	}
+
+	r := &row{}
+
+	if err = r.sha.SetShaLike(sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	r.page[0] = page
+	r.setOffset(offset)
+	e.added.Push(r)
 
 	return
 }

@@ -53,7 +53,7 @@ func (c *common) Flush() (err error) {
 		c.verzeichnisse.SetNeedsFlush()
 	}
 
-	wg := iter.MakeErrorWaitGroup()
+	wg := iter.MakeErrorWaitGroupParallel()
 
 	wg.Do(c.verzeichnisse.Flush)
 	wg.Do(c.typenIndex.Flush)

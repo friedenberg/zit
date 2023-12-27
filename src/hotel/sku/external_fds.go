@@ -14,6 +14,10 @@ type ExternalFDs struct {
 	Akte    fd.FD
 }
 
+// func (dst *ExternalFDs) String() string {
+//   panic("")
+// }
+
 func (dst *ExternalFDs) ResetWith(src *ExternalFDs) {
 	dst.Objekte.ResetWith(&src.Objekte)
 	dst.Akte.ResetWith(&src.Akte)

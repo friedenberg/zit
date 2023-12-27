@@ -92,7 +92,7 @@ func (c Status) RunWithQuery(
 			fr.External.FDs.Akte.ResetWith(fd)
 			fr.External.SetAkteSha(as)
 
-			if err = fr.External.ObjekteSha.SetShaLike(os); err != nil {
+			if err = fr.External.SetObjekteSha(os); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

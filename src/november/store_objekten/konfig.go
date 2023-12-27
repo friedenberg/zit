@@ -67,7 +67,7 @@ func (s konfigStore) Update(
 	}
 
 	err = sku.CalculateAndSetSha(kt, s.GetPersistentMetadateiFormat(),
-		objekte_format.Options{IncludeTai: true},
+		objekte_format.Options{Tai: true},
 	)
 
 	if err != nil {
@@ -131,7 +131,7 @@ func (s konfigStore) ReadOne(
 		err = sku.CalculateAndSetSha(
 			tt,
 			s.GetPersistentMetadateiFormat(),
-			objekte_format.Options{IncludeTai: true},
+			objekte_format.Options{Tai: true},
 		)
 
 		if err != nil {

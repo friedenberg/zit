@@ -50,7 +50,7 @@ function last_after_typ_mutate { # @test
 	assert_success
 	assert_output '2'
 
-	run_zit last -format Bestandsaufnahme-sans-tai
+	run_zit last -format bestandsaufnahme-sans-tai
 	assert_success
 	assert_output - <<-EOM
 		---

@@ -80,7 +80,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	logFunc schnittstellen.FuncIter[*sku.Transacted],
 	cliFmt schnittstellen.StringFormatWriter[*sku.Transacted],
 	enn ennui.Ennui,
-	rob func(string, *sku.Transacted) (*sku.Transacted, error),
+	rob func(*sha.Sha) (*sku.Transacted, error),
 ) schnittstellen.FuncIter[*sku.Transacted] {
 	switch fv.string {
 	case "sha":
@@ -176,7 +176,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	case "objekte":
 		f := objekte_format.FormatForVersion(k.GetStoreVersion())
 		o := objekte_format.Options{
-			IncludeTai: true,
+			Tai: true,
 		}
 
 		return func(tl *sku.Transacted) (err error) {
@@ -347,7 +347,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		be := sku_fmt.MakeFormatBestandsaufnahmePrinter(
 			out,
 			objekte_format.Default(),
-			objekte_format.Options{},
+			objekte_format.Options{ExcludeMutter: true},
 		)
 
 		return func(o *sku.Transacted) (err error) {
@@ -371,7 +371,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 				return
 			}
 
-			if z, err = rob("Metadatei", z); err != nil {
+			if z, err = rob(&z.GetMetadatei().Mutter); err != nil {
 				err = nil
 				return
 			}
@@ -413,7 +413,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		f := sku_fmt.MakeFormatBestandsaufnahmePrinter(
 			out,
 			objekte_format.Default(),
-			objekte_format.Options{IncludeTai: true},
+			objekte_format.Options{Tai: true},
 		)
 
 		return func(o *sku.Transacted) (err error) {
@@ -430,8 +430,8 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			out,
 			objekte_format.Default(),
 			objekte_format.Options{
-				IncludeTai:           true,
-				IncludeVerzeichnisse: true,
+				Tai:           true,
+				Verzeichnisse: true,
 			},
 		)
 

@@ -104,7 +104,7 @@ func MakeStoreUtil(
 		standort:                  st,
 		akten:                     akten.Make(st),
 		persistentMetadateiFormat: pmf,
-		options:                   objekte_format.Options{IncludeTai: true},
+		options:                   objekte_format.Options{Tai: true},
 		sonnenaufgang:             t,
 		fileEncoder:               objekte_collections.MakeFileEncoder(st, k),
 	}

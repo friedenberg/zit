@@ -43,11 +43,11 @@ type FormatGeneric struct {
 }
 
 var FormatsGeneric = map[string][]*catgut.String{
-	"Akte":                {keyAkte},
-	"AkteBez":             {keyAkte, keyBezeichnung},
-	"AkteTyp":             {keyAkte, keyTyp},
-	"MetadateiSansTai":    {keyAkte, keyBezeichnung, keyEtikett, keyTyp},
-	"Metadatei":           {keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai},
+	// "Akte":                {keyAkte},
+	// "AkteBez":             {keyAkte, keyBezeichnung},
+	// "AkteTyp":             {keyAkte, keyTyp},
+	// "MetadateiSansTai":    {keyAkte, keyBezeichnung, keyEtikett, keyTyp},
+	// "Metadatei":           {keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai},
 	"MetadateiPlusMutter": {keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai, keyMutter},
 }
 
@@ -97,20 +97,17 @@ func (f FormatGeneric) printKey(
 	m *Metadatei,
 	key *catgut.String,
 ) (n int64, err error) {
-	var (
-		n1 int
-		n2 int64
-	)
+	var n1 int
 
 	switch key {
 	case keyAkte:
 		if !m.Akte.IsNull() {
-			n2, err = catgut.WriteKeySpaceValueNewline(
+			n1, err = ohio.WriteKeySpaceValueNewlineString(
 				w,
-				keyAkte,
-				&m.Akte,
+				keyAkte.String(),
+				m.Sha.String(),
 			)
-			n += int64(n2)
+			n += int64(n1)
 
 			if err != nil {
 				err = errors.Wrap(err)
@@ -226,7 +223,8 @@ func GetShaForMetadatei(f FormatGeneric, m *Metadatei) (sh *Sha, err error) {
 		}
 	}
 
-	sw := sha.MakeWriter(nil)
+	var sb strings.Builder
+	sw := sha.MakeWriter(&sb)
 
 	_, err = f.printKeys(sw, m)
 

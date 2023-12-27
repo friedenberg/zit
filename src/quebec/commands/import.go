@@ -65,7 +65,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	ofo := objekte_format.Options{IncludeTai: true, IncludeVerzeichnisse: true}
+	ofo := objekte_format.Options{Tai: true, Verzeichnisse: true}
 
 	bf := bestandsaufnahme.MakeAkteFormat(u.Konfig().GetStoreVersion(), ofo)
 

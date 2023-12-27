@@ -30,8 +30,8 @@ type (
 
 		metadatei.Getter
 
-		SetAkteSha(schnittstellen.ShaLike)
-		SetObjekteSha(schnittstellen.ShaLike)
+		SetAkteSha(schnittstellen.ShaLike) error
+		SetObjekteSha(schnittstellen.ShaLike) error
 
 		EqualsSkuLikePtr(SkuLike) bool
 

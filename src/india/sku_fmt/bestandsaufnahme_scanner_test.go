@@ -20,7 +20,7 @@ func TestOne(t1 *testing.T) {
 
 	b := new(bytes.Buffer)
 	f := objekte_format.Default()
-	o := objekte_format.Options{IncludeTai: true}
+	o := objekte_format.Options{Tai: true}
 	w := zstd.NewWriter(b)
 
 	printer := MakeFormatBestandsaufnahmePrinter(w, f, o)
@@ -139,7 +139,7 @@ func TestOffsets(t1 *testing.T) {
 	dataRaw := getRawData()
 
 	f := objekte_format.Default()
-	op := objekte_format.Options{IncludeTai: true}
+	op := objekte_format.Options{Tai: true}
 
 	scanner := MakeFormatBestandsaufnahmeScanner(
 		strings.NewReader(dataRaw),

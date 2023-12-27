@@ -43,7 +43,7 @@ type (
 
 	TextParserContext interface {
 		PersistentParserContext
-		SetAkteSha(schnittstellen.ShaLike)
+		SetAkteSha(schnittstellen.ShaLike) error
 	}
 
 	TextFormatOutput struct {

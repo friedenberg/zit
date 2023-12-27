@@ -1,12 +1,13 @@
 package objekte_format
 
 type Options struct {
-	IncludeTai           bool
-	IncludeVerzeichnisse bool
-	PrintFinalSha        bool
+	Tai           bool
+	ExcludeMutter bool
+	Verzeichnisse bool
+	PrintFinalSha bool
 }
 
 func (o Options) SansVerzeichnisse() Options {
-	o.IncludeVerzeichnisse = false
+	o.Verzeichnisse = false
 	return o
 }

@@ -48,8 +48,8 @@ var options objekte_format.Options
 
 func init() {
 	options = objekte_format.Options{
-		IncludeTai:           true,
-		IncludeVerzeichnisse: true,
+		Tai:           true,
+		Verzeichnisse: true,
 		PrintFinalSha:        true,
 	}
 }
@@ -114,7 +114,7 @@ func (i *Store) PageIdForIndex(n uint8, isSchwanz bool) (pid pageId) {
 }
 
 func (i *Store) GetEnnui() ennui.Ennui {
-  return i.ennui
+	return i.ennui
 }
 
 func (i *Store) ReadOne(sh *sha.Sha) (out *sku.Transacted, err error) {
@@ -176,12 +176,16 @@ func (i *Store) readLoc(loc ennui.Loc) (sk *sku.Transacted, err error) {
 		sk,
 		options,
 	); err != nil {
-		err = errors.Wrapf(
-			err,
-			"Loc: %d, Readable: %s",
-			loc.Offset,
-			rb.PeekReadable().String()[:100],
-		)
+		if err == objekte_format.ErrV4ExpectedSpaceSeparatedKey {
+			err = nil
+		} else {
+			err = errors.Wrapf(
+				err,
+				"Loc: %d, Readable: %s",
+				loc.Offset,
+				rb.PeekReadable().String()[:100],
+			)
+		}
 
 		return
 	}
@@ -206,7 +210,7 @@ func (i *Store) SetNeedsFlush() {
 
 func (i *Store) Flush() (err error) {
 	errors.Log().Print("flushing")
-	wg := iter.MakeErrorWaitGroup()
+	wg := iter.MakeErrorWaitGroupParallel()
 
 	wg.Do(i.ennui.Flush)
 
@@ -230,12 +234,7 @@ func (i *Store) Add(
 
 	p := i.GetPagePair(n)
 
-	if err = p.All.Add(z); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = p.Schwanzen.Add(z); err != nil {
+	if err = p.Add(z); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

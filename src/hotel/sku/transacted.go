@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 )
@@ -14,7 +13,6 @@ import (
 type Transacted struct {
 	Kennung          kennung.Kennung2
 	Metadatei        metadatei.Metadatei
-	ObjekteSha       sha.Sha
 	TransactionIndex values.Int
 	Kopf             kennung.Tai
 }
@@ -35,7 +33,11 @@ func (t *Transacted) SetFromSkuLike(sk SkuLike) (err error) {
 		return
 	}
 
-	t.ObjekteSha.SetShaLike(sk.GetObjekteSha())
+  if err = t.SetObjekteSha(sk.GetObjekteSha()); err != nil {
+		err = errors.Wrap(err)
+		return
+  }
+
 	metadatei.Resetter.ResetWith(&t.Metadatei, sk.GetMetadatei())
 	t.GetMetadatei().Tai = sk.GetTai()
 
@@ -52,8 +54,8 @@ func (a *Transacted) String() string {
 	return fmt.Sprintf(
 		"%s %s %s",
 		&a.Kennung,
-		&a.ObjekteSha,
-		&a.Metadatei.Akte,
+		a.GetObjekteSha(),
+		a.GetAkteSha(),
 	)
 }
 
@@ -163,20 +165,20 @@ func (s *Transacted) IsNew() bool {
 	return s.Metadatei.Mutter.IsNull()
 }
 
-func (s *Transacted) SetObjekteSha(v schnittstellen.ShaLike) {
-	s.ObjekteSha.SetShaLike(v)
+func (s *Transacted) SetObjekteSha(v schnittstellen.ShaLike) (err error) {
+	return s.GetMetadatei().Sha.SetShaLike(v)
 }
 
 func (s *Transacted) GetObjekteSha() schnittstellen.ShaLike {
-	return &s.ObjekteSha
+	return &s.GetMetadatei().Sha
 }
 
 func (s *Transacted) GetAkteSha() schnittstellen.ShaLike {
 	return &s.Metadatei.Akte
 }
 
-func (s *Transacted) SetAkteSha(sh schnittstellen.ShaLike) {
-	s.Metadatei.Akte.SetShaLike(sh)
+func (s *Transacted) SetAkteSha(sh schnittstellen.ShaLike) error {
+	return s.Metadatei.Akte.SetShaLike(sh)
 }
 
 func (s *Transacted) GetTransactionIndex() values.Int {

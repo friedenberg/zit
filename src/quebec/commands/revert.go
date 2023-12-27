@@ -5,7 +5,9 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/gattungen"
+	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/lima/bestandsaufnahme"
@@ -49,49 +51,23 @@ func (c Revert) DefaultGattungen() gattungen.Set {
 	)
 }
 
+type revertMutterToKennungTuple struct {
+	*kennung.Kennung2
+	*sha.Sha
+}
+
 func (c Revert) RunWithQuery(u *umwelt.Umwelt, ms matcher.Query) (err error) {
-	var mutterToKennung map[string]string
+	var mutterToKennung []revertMutterToKennungTuple
 
 	switch {
 	case c.Last:
-		mutterToKennung, err = c.mutterToKennungFromLast(u)
+		mutterToKennung, err = c.muttersFromLast(u)
 
 	default:
-		mutterToKennung, err = c.mutterToKennungFromQuery(u, ms)
+		mutterToKennung, err = c.muttersFromQuery(u, ms)
 	}
 
 	if err != nil {
-		return
-	}
-
-	mutters := sku.MakeTransactedMutableSet()
-
-	if err = u.StoreObjekten().ReadAll(
-		gattungen.MakeSet(gattung.TrueGattung()...),
-		func(z *sku.Transacted) (err error) {
-			ms := z.Metadatei.Sha.String()
-
-			kin, ok := mutterToKennung[ms]
-
-			if !ok {
-				return
-			}
-
-			if kin != z.Kennung.String() {
-				return
-			}
-
-			mu := sku.GetTransactedPool().Get()
-
-			if err = mu.SetFromTransacted(z); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return mutters.Add(mu)
-		},
-	); err != nil {
-		err = errors.Wrap(err)
 		return
 	}
 
@@ -102,17 +78,19 @@ func (c Revert) RunWithQuery(u *umwelt.Umwelt, ms matcher.Query) (err error) {
 
 	defer errors.Deferred(&err, u.Unlock)
 
-	if err = u.StoreObjekten().UpdateManyMetadatei(mutters); err != nil {
-		err = errors.Wrap(err)
-		return
+	for _, rt := range mutterToKennung {
+		if err = u.StoreObjekten().SetTransactedTo(rt.Kennung2, rt.Sha); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
 }
 
-func (c Revert) addOneMutterToKennung(
+func (c Revert) addOneMutter(
 	z *sku.Transacted,
-	mutterToKennung map[string]string,
+	mutters *[]revertMutterToKennungTuple,
 ) (err error) {
 	mu := &z.Metadatei.Mutter
 
@@ -121,21 +99,38 @@ func (c Revert) addOneMutterToKennung(
 		return
 	}
 
-	mutterToKennung[mu.String()] = z.Kennung.String()
+	var k kennung.Kennung2
+
+	if err = k.SetWithKennung(z.GetKennung()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var sh sha.Sha
+
+	if err = sh.SetShaLike(mu); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	*mutters = append(*mutters, revertMutterToKennungTuple{
+		Kennung2: &k,
+		Sha:      &sh,
+	})
 
 	return
 }
 
-func (c Revert) mutterToKennungFromQuery(
+func (c Revert) muttersFromQuery(
 	u *umwelt.Umwelt,
 	ms matcher.Query,
-) (mutterToKennung map[string]string, err error) {
-	mutterToKennung = make(map[string]string)
+) (mutterToKennung []revertMutterToKennungTuple, err error) {
+	mutterToKennung = make([]revertMutterToKennungTuple, 0)
 
 	if err = u.StoreObjekten().QueryWithoutCwd(
 		ms,
 		func(z *sku.Transacted) (err error) {
-			return c.addOneMutterToKennung(z, mutterToKennung)
+			return c.addOneMutter(z, &mutterToKennung)
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -145,11 +140,9 @@ func (c Revert) mutterToKennungFromQuery(
 	return
 }
 
-func (c Revert) mutterToKennungFromLast(
+func (c Revert) muttersFromLast(
 	u *umwelt.Umwelt,
-) (mutterToKennung map[string]string, err error) {
-	mutterToKennung = make(map[string]string)
-
+) (mutterToKennung []revertMutterToKennungTuple, err error) {
 	s := u.StoreObjekten()
 
 	var b *sku.Transacted
@@ -166,9 +159,11 @@ func (c Revert) mutterToKennungFromLast(
 		return
 	}
 
+	mutterToKennung = make([]revertMutterToKennungTuple, 0, a.Skus.Len())
+
 	if err = a.Skus.EachPtr(
 		func(sk *sku.Transacted) (err error) {
-			return c.addOneMutterToKennung(sk, mutterToKennung)
+			return c.addOneMutter(sk, &mutterToKennung)
 		},
 	); err != nil {
 		err = errors.Wrap(err)

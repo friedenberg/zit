@@ -12,6 +12,7 @@ type Multi interface {
 	Empty() bool
 	Reset()
 	GetMultiError() Multi
+	GetError() error
 }
 
 type multi struct {
@@ -48,6 +49,17 @@ func MakeMulti(errs ...error) (em *multi) {
 
 func (e *multi) ChanOnErr() <-chan struct{} {
 	return e.chOnErr
+}
+
+func (e *multi) GetError() error {
+	e.lock.Lock()
+	defer e.lock.Unlock()
+
+	if len(e.slice) > 0 {
+		return e
+	}
+
+	return nil
 }
 
 func (e *multi) GetMultiError() Multi {

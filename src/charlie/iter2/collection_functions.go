@@ -24,7 +24,7 @@ func Parallel[T any](
 	c schnittstellen.SetLike[T],
 	f schnittstellen.FuncIter[T],
 ) (err error) {
-	eg := iter.MakeErrorWaitGroup()
+	eg := iter.MakeErrorWaitGroupParallel()
 
 	if err = c.Each(
 		func(e T) (err error) {

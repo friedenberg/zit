@@ -15,7 +15,11 @@ var (
 )
 
 func makeErrWithBytes(err error, bs []byte) error {
-	return errors.WrapN(1, errWithBytes{error: err, bytes: bs})
+	if errors.IsVerbose() {
+		return errors.WrapN(1, errWithBytes{error: err, bytes: bs})
+	}
+
+	return err
 }
 
 type errWithBytes struct {

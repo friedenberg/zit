@@ -66,14 +66,7 @@ func (zp *Page) Add(z *sku.Transacted) (err error) {
 		panic("trying to add nil zettel")
 	}
 
-	z1 := sku.GetTransactedPool().Get()
-
-	if err = z1.SetFromSkuLike(z); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = zp.addFilter(z1); err != nil {
+	if err = zp.addFilter(z); err != nil {
 		if iter.IsStopIteration(err) {
 			errors.Log().Printf("eliding %s", z.Kennung)
 			err = nil
@@ -84,10 +77,10 @@ func (zp *Page) Add(z *sku.Transacted) (err error) {
 		return
 	}
 
-	zp.added.Add(z1)
+	zp.added.Add(z)
 	zp.State = StateChanged
 
-	log.Log().Printf("added %s", z1.Kennung.String())
+	log.Log().Printf("added %s", z.Kennung.String())
 
 	return
 }
@@ -225,8 +218,8 @@ func (zp *Page) getFuncWriteOne(
 			return
 		}
 
-		if err = zp.ennui.Add(
-			z.GetMetadatei(),
+		if err = zp.ennui.AddSha(
+			&z.GetMetadatei().Sha,
 			zp.index,
 			uint64(offset),
 		); err != nil {

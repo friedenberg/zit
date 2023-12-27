@@ -239,8 +239,8 @@ func (fd *FD) IsDir() bool {
 	return fd.isDir
 }
 
-func (fd *FD) SetShaLike(v schnittstellen.ShaLike) {
-	fd.sha.SetShaLike(v)
+func (fd *FD) SetShaLike(v schnittstellen.ShaLike) (err error) {
+	return fd.sha.SetShaLike(v)
 }
 
 func (fd *FD) GetShaLike() schnittstellen.ShaLike {

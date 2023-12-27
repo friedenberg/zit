@@ -7,8 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/ohio"
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
@@ -30,13 +28,11 @@ func (f v4) ParsePersistentMetadatei(
 	)
 
 	var (
-		valBuffer                catgut.String
-		line, key, val           catgut.Slice
-		ok                       bool
-		writeMetadateiHashString bool
+		valBuffer      catgut.String
+		line, key, val catgut.Slice
+		ok             bool
 	)
 
-	mh := sha.MakeWriter(nil)
 	lineNo := 0
 
 	for {
@@ -78,15 +74,11 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-			writeMetadateiHashString = true
-
 		case key.Equal(keyBezeichnung.Bytes()):
 			if err = m.Bezeichnung.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
-
-			writeMetadateiHashString = true
 
 		case key.Equal(keyEtikett.Bytes()):
 			e := kennung.GetEtikettPool().Get()
@@ -100,8 +92,6 @@ func (f v4) ParsePersistentMetadatei(
 				err = errors.Wrap(err)
 				return
 			}
-
-			writeMetadateiHashString = true
 
 		case key.Equal(keyGattung.Bytes()):
 			if err = g.Set(val.String()); err != nil {
@@ -129,15 +119,11 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-			writeMetadateiHashString = true
-
 		case key.Equal(keyTyp.Bytes()):
 			if err = m.Typ.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
-
-			writeMetadateiHashString = true
 
 		case key.Equal(keyVerzeichnisseArchiviert.Bytes()):
 			if err = m.Verzeichnisse.Archiviert.Set(val.String()); err != nil {
@@ -146,7 +132,7 @@ func (f v4) ParsePersistentMetadatei(
 			}
 
 		case key.Equal(keyVerzeichnisseEtikettImplicit.Bytes()):
-			if !o.IncludeVerzeichnisse {
+			if !o.Verzeichnisse {
 				err = errors.Errorf(
 					"format specifies not to include Verzeichnisse but found %q",
 					key,
@@ -167,7 +153,7 @@ func (f v4) ParsePersistentMetadatei(
 			}
 
 		case key.Equal(keyVerzeichnisseEtikettExpanded.Bytes()):
-			if !o.IncludeVerzeichnisse {
+			if !o.Verzeichnisse {
 				err = errors.Errorf(
 					"format specifies not to include Verzeichnisse but found %q",
 					key,
@@ -193,8 +179,6 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-			writeMetadateiHashString = true
-
 		case key.Equal(keySha.Bytes()):
 			if err = m.Sha.SetHexBytes(val.Bytes()); err != nil {
 				err = errors.Wrap(err)
@@ -215,19 +199,6 @@ func (f v4) ParsePersistentMetadatei(
 		lineNo++
 
 		r.AdvanceRead(int(thisN))
-
-		if writeMetadateiHashString {
-			if _, err = ohio.WriteKeySpaceValueNewlineWritersTo(
-				mh,
-				key,
-				val,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
-		writeMetadateiHashString = false
 	}
 
 	if n == 0 {
@@ -238,14 +209,7 @@ func (f v4) ParsePersistentMetadatei(
 		return
 	}
 
-	actual := mh.GetShaLike()
-
 	// if m.Verzeichnisse.Sha.IsNull() {
-	if err = m.Sha.SetShaLike(actual); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	// } else if !m.Verzeichnisse.Sha.EqualsSha(actual) &&
 	// o.IncludeVerzeichnisse {
 	// 	err = errors.Errorf(
