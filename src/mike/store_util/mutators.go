@@ -64,14 +64,14 @@ func (s *common) CalculateAndSetShaTransacted(sk *sku.Transacted) (err error) {
 }
 
 func (s *common) CalculateAndSetShaSkuLike(sk sku.SkuLike) (err error) {
-	if err = sku.CalculateAndSetSha(
-		sk,
-		s.persistentMetadateiFormat,
-		s.options,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	// if err = sku.CalculateAndSetSha(
+	// 	sk,
+	// 	s.persistentMetadateiFormat,
+	// 	s.options,
+	// ); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
 	return
 }

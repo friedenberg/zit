@@ -50,7 +50,7 @@ func init() {
 	options = objekte_format.Options{
 		Tai:           true,
 		Verzeichnisse: true,
-		PrintFinalSha:        true,
+		PrintFinalSha: true,
 	}
 }
 
@@ -101,15 +101,15 @@ func (s *Store) applyKonfig(z *sku.Transacted) error {
 	return s.erworben.ApplyToSku(z)
 }
 
-func (i *Store) PageIdForIndex(n uint8, isSchwanz bool) (pid pageId) {
+func (i *Store) PageIdForIndexAll(n uint8) (pid pageId) {
 	pid.index = n
+	pid.path = filepath.Join(i.path, fmt.Sprintf("All-%x", n))
+	return
+}
 
-	if isSchwanz {
-		pid.path = filepath.Join(i.path, fmt.Sprintf("Schwanz-%x", n))
-	} else {
-		pid.path = filepath.Join(i.path, fmt.Sprintf("All-%x", n))
-	}
-
+func (i *Store) PageIdForIndexSchwanz(n uint8) (pid pageId) {
+	pid.index = n
+	pid.path = filepath.Join(i.path, fmt.Sprintf("Schwanz-%x", n))
 	return
 }
 

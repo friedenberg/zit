@@ -7,6 +7,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/ohio"
@@ -48,6 +49,7 @@ var FormatsGeneric = map[string][]*catgut.String{
 	// "AkteTyp":             {keyAkte, keyTyp},
 	// "MetadateiSansTai":    {keyAkte, keyBezeichnung, keyEtikett, keyTyp},
 	// "Metadatei":           {keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai},
+	"Metadatei":           {keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai},
 	"MetadateiPlusMutter": {keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai, keyMutter},
 }
 
@@ -73,14 +75,14 @@ func FormatForKey(k string) FormatGeneric {
 	return f
 }
 
-func (f FormatGeneric) printKeys(
+func (f FormatGeneric) WriteMetadateiTo(
 	w io.Writer,
 	m *Metadatei,
 ) (n int64, err error) {
 	var n1 int64
 
 	for _, k := range f.keys {
-		n1, err = f.printKey(w, m, k)
+		n1, err = WriteMetadateiKeyTo(w, m, k)
 		n += n1
 
 		if err != nil {
@@ -92,7 +94,7 @@ func (f FormatGeneric) printKeys(
 	return
 }
 
-func (f FormatGeneric) printKey(
+func WriteMetadateiKeyTo(
 	w io.Writer,
 	m *Metadatei,
 	key *catgut.String,
@@ -105,7 +107,7 @@ func (f FormatGeneric) printKey(
 			n1, err = ohio.WriteKeySpaceValueNewlineString(
 				w,
 				keyAkte.String(),
-				m.Sha.String(),
+				m.Akte.String(),
 			)
 			n += int64(n1)
 
@@ -223,10 +225,18 @@ func GetShaForMetadatei(f FormatGeneric, m *Metadatei) (sh *Sha, err error) {
 		}
 	}
 
-	var sb strings.Builder
-	sw := sha.MakeWriter(&sb)
+	if m.GetTai().IsEmpty() {
+		err = errEmptyTai
+		return
+	}
 
-	_, err = f.printKeys(sw, m)
+	return getShaForMetadatei(f, m)
+}
+
+func getShaForMetadatei(f FormatGeneric, m *Metadatei) (sh *Sha, err error) {
+	sw := sha.MakeWriter(nil)
+
+	_, err = f.WriteMetadateiTo(sw, m)
 
 	if err != nil {
 		err = errors.Wrap(err)
@@ -239,6 +249,29 @@ func GetShaForMetadatei(f FormatGeneric, m *Metadatei) (sh *Sha, err error) {
 		err = errors.Wrap(err)
 		return
 	}
+
+	return
+}
+
+func getShaForMetadateiDebug(f FormatGeneric, m *Metadatei) (sh *Sha, err error) {
+	var sb strings.Builder
+	sw := sha.MakeWriter(&sb)
+
+	_, err = f.WriteMetadateiTo(sw, m)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	sh = &Sha{}
+
+	if err = sh.SetShaLike(sw); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	log.Debug().Caller(2, "%s:%s -> %s", f.key, sh, &sb)
 
 	return
 }

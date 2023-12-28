@@ -32,6 +32,7 @@ type (
 
 		SetAkteSha(schnittstellen.ShaLike) error
 		SetObjekteSha(schnittstellen.ShaLike) error
+		CalculateObjekteSha() (err error)
 
 		EqualsSkuLikePtr(SkuLike) bool
 

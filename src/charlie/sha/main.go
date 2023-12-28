@@ -61,6 +61,56 @@ func (s *Sha) Sha() *Sha {
 	return s
 }
 
+func (src *Sha) WriteTo(w io.Writer) (n int64, err error) {
+	var n1 int
+	n1, err = ohio.WriteAllOrDieTrying(w, src.GetShaBytes())
+	n = int64(n1)
+	return
+}
+
+func (s *Sha) GetShaLike() schnittstellen.ShaLike {
+	return s
+}
+
+func (s *Sha) IsNull() bool {
+	if s == nil || s.data == nil {
+		return true
+	}
+
+	if bytes.Equal(s.data[:], shaNull.data[:]) {
+		return true
+	}
+
+	return false
+}
+
+func (s *Sha) Kopf() string {
+	return s.String()[0:2]
+}
+
+func (s *Sha) Schwanz() string {
+	return s.String()[2:]
+}
+
+func (a *Sha) EqualsAny(b any) bool {
+	return values.Equals(a, b)
+}
+
+func (a *Sha) EqualsSha(b schnittstellen.ShaLike) bool {
+	return a.GetShaString() == b.GetShaString()
+}
+
+func (a *Sha) Equals(b *Sha) bool {
+	return a.GetShaString() == b.GetShaString()
+}
+
+//  __        __    _ _   _
+//  \ \      / / __(_) |_(_)_ __   __ _
+//   \ \ /\ / / '__| | __| | '_ \ / _` |
+//    \ V  V /| |  | | |_| | | | | (_| |
+//     \_/\_/ |_|  |_|\__|_|_| |_|\__, |
+//                                |___/
+
 func (dst *Sha) SetFromHash(h hash.Hash) (err error) {
 	dst.allocDataIfNecessary()
 	b := h.Sum(dst.data[:0])
@@ -76,6 +126,10 @@ func (dst *Sha) SetShaLike(src ShaLike) (err error) {
 		copy(dst.data[:], src.GetShaLike().GetShaBytes()),
 	)
 
+	// if dst.String() == "f32cf7f2b1b8b7688c78dec4eb3c3675fcdc3aeaaf4c1305f3bdaf7fc0252e02" {
+	// 	panic("found")
+	// }
+
 	return
 }
 
@@ -85,13 +139,6 @@ func (s *Sha) SetParts(a, b string) (err error) {
 		return
 	}
 
-	return
-}
-
-func (src *Sha) WriteTo(w io.Writer) (n int64, err error) {
-	var n1 int
-	n1, err = ohio.WriteAllOrDieTrying(w, src.GetShaBytes())
-	n = int64(n1)
 	return
 }
 
@@ -153,42 +200,6 @@ func (s *Sha) Set(v string) (err error) {
 	}
 
 	return
-}
-
-func (s *Sha) GetShaLike() schnittstellen.ShaLike {
-	return s
-}
-
-func (s *Sha) IsNull() bool {
-	if s == nil || s.data == nil {
-		return true
-	}
-
-	if bytes.Equal(s.data[:], shaNull.data[:]) {
-		return true
-	}
-
-	return false
-}
-
-func (s *Sha) Kopf() string {
-	return s.String()[0:2]
-}
-
-func (s *Sha) Schwanz() string {
-	return s.String()[2:]
-}
-
-func (a *Sha) EqualsAny(b any) bool {
-	return values.Equals(a, b)
-}
-
-func (a *Sha) EqualsSha(b schnittstellen.ShaLike) bool {
-	return a.GetShaString() == b.GetShaString()
-}
-
-func (a *Sha) Equals(b *Sha) bool {
-	return a.GetShaString() == b.GetShaString()
 }
 
 func (s *Sha) allocDataIfNecessary() {

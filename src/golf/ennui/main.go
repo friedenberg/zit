@@ -470,7 +470,7 @@ func (e *ennui) PrintAll() (err error) {
 			return
 		}
 
-		log.Err().Printf("%s", &current)
+		log.Out().Printf("%s", &current)
 	}
 }
 

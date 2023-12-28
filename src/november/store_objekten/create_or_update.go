@@ -42,16 +42,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	transactedPtr.Metadatei.Tai = s.GetTai()
-	transactedPtr.SetAkteSha(co.External.GetAkteSha())
-
-	err = sku.CalculateAndSetSha(
-		transactedPtr,
-		s.GetPersistentMetadateiFormat(),
-		s.GetObjekteFormatOptions(),
-	)
-
-	if err != nil {
+	if err = transactedPtr.SetAkteSha(co.External.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

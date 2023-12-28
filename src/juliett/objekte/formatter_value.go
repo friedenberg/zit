@@ -43,11 +43,13 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"bestandsaufnahme-verzeichnisse",
 		"objekte",
 		"kennung",
+		"kennung-sha",
 		"kennung-akte-sha",
 		"bezeichnung",
 		"akte",
 		"akte-sku-prefix",
 		"metadatei",
+		"metadatei-plus-mutter",
 		"akte-sha",
 		"debug",
 		"etiketten",
@@ -188,6 +190,20 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			return
 		}
 
+	case "kennung-sha":
+		return func(tl *sku.Transacted) (err error) {
+			if _, err = fmt.Fprintf(
+				out,
+				"%s@%s\n",
+				&tl.Kennung,
+				tl.GetObjekteSha(),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
 	case "kennung-akte-sha":
 		return func(tl *sku.Transacted) (err error) {
 			errors.TodoP3("convert into an option")
@@ -242,8 +258,20 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "metadatei":
+		f, err := objekte_format.FormatForKeyError("Metadatei")
+		errors.PanicIfError(err)
+
 		return func(e *sku.Transacted) (err error) {
-			_, err = fmt.Fprintf(out, "%#v\n", e.GetMetadatei())
+			_, err = f.WriteMetadateiTo(out, e.GetMetadatei())
+			return
+		}
+
+	case "metadatei-plus-mutter":
+		f, err := objekte_format.FormatForKeyError("MetadateiPlusMutter")
+		errors.PanicIfError(err)
+
+		return func(e *sku.Transacted) (err error) {
+			_, err = f.WriteMetadateiTo(out, e.GetMetadatei())
 			return
 		}
 

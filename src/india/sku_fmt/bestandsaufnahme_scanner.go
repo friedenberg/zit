@@ -100,7 +100,6 @@ func (scanner *bestandsaufnahmeScanner) Scan() (ok bool) {
 		scanner.options,
 	)
 
-
 	scanner.lastN += n1
 
 	if n1 == 0 {
@@ -112,8 +111,6 @@ func (scanner *bestandsaufnahmeScanner) Scan() (ok bool) {
 			return
 		}
 	}
-
-	scanner.lastSku.SetObjekteSha(&scanner.lastSku.Metadatei.Sha)
 
 	oldErr := scanner.err
 

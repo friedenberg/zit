@@ -71,12 +71,10 @@ func calculateAndSetSha(
 
 	defer sha.GetPool().Put(actual)
 
-	if err = sk.GetMetadatei().Sha.SetShaLike(actual); err != nil {
+	if err = sk.SetObjekteSha(actual); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	sk.SetObjekteSha(actual)
 
 	return
 }

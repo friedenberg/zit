@@ -64,23 +64,29 @@ func (t Tai) GetGattung() schnittstellen.GattungLike {
 }
 
 func (t Tai) Parts() [3]string {
-	a := strings.TrimRight(fmt.Sprintf("%018d", t.tai.Asec), "0")
+	a := strings.TrimRight(fmt.Sprintf("%018d", t.Asec), "0")
 
 	if a == "" {
 		a = "0"
 	}
 
-	return [3]string{strconv.FormatInt(t.tai.Sec, 10), ".", a}
+	return [3]string{strconv.FormatInt(t.Sec, 10), ".", a}
 }
 
-func (t Tai) String() string {
-	a := strings.TrimRight(fmt.Sprintf("%018d", t.tai.Asec), "0")
+func (t Tai) String() (v string) {
+	a := strings.TrimRight(fmt.Sprintf("%018d", t.Asec), "0")
 
 	if a == "" {
 		a = "0"
 	}
 
-	return fmt.Sprintf("%s.%s", strconv.FormatInt(t.tai.Sec, 10), a)
+	v = fmt.Sprintf("%s.%s", strconv.FormatInt(t.Sec, 10), a)
+
+	// if v == "0.0" {
+	// 	panic("empty tai")
+	// }
+
+	return
 }
 
 func (t Tai) Format(v string) string {

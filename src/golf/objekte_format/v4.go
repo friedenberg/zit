@@ -220,7 +220,6 @@ func (f v4) FormatPersistentMetadatei(
 	}
 
 	if o.PrintFinalSha {
-
 		actual := mh.GetShaLike()
 		// TODO-P1 set value
 

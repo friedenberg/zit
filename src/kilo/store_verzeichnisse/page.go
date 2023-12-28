@@ -218,8 +218,8 @@ func (zp *Page) getFuncWriteOne(
 			return
 		}
 
-		if err = zp.ennui.AddSha(
-			&z.GetMetadatei().Sha,
+		if err = zp.ennui.AddMetadatei(
+			z.GetMetadatei(),
 			zp.index,
 			uint64(offset),
 		); err != nil {

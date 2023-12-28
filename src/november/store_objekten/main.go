@@ -245,11 +245,11 @@ func (s *Store) createEtikettOrTyp(k *kennung.Kennung2) (err error) {
 		return
 	}
 
-	err = sku.CalculateAndSetSha(
-		t,
-		s.GetPersistentMetadateiFormat(),
-		s.GetObjekteFormatOptions(),
-	)
+// 	err = sku.CalculateAndSetSha(
+// 		t,
+// 		s.GetPersistentMetadateiFormat(),
+// 		s.GetObjekteFormatOptions(),
+// 	)
 
 	if err != nil {
 		err = errors.Wrap(err)

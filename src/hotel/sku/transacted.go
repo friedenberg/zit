@@ -33,10 +33,10 @@ func (t *Transacted) SetFromSkuLike(sk SkuLike) (err error) {
 		return
 	}
 
-  if err = t.SetObjekteSha(sk.GetObjekteSha()); err != nil {
+	if err = t.SetObjekteSha(sk.GetObjekteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
-  }
+	}
 
 	metadatei.Resetter.ResetWith(&t.Metadatei, sk.GetMetadatei())
 	t.GetMetadatei().Tai = sk.GetTai()
@@ -108,7 +108,9 @@ func (a *Transacted) GetKopf() kennung.Tai {
 }
 
 func (a *Transacted) SetTai(t kennung.Tai) {
+	// log.Debug().Caller(6, "before: %s", a.StringKennungTai())
 	a.GetMetadatei().Tai = t
+	// log.Debug().Caller(6, "after: %s", a.StringKennungTai())
 }
 
 func (a *Transacted) GetKennung() kennung.Kennung {
@@ -163,6 +165,10 @@ func (s *Transacted) GetGattung() schnittstellen.GattungLike {
 
 func (s *Transacted) IsNew() bool {
 	return s.Metadatei.Mutter.IsNull()
+}
+
+func (s *Transacted) CalculateObjekteSha() (err error) {
+	return calculateAndSetSha(s)
 }
 
 func (s *Transacted) SetObjekteSha(v schnittstellen.ShaLike) (err error) {

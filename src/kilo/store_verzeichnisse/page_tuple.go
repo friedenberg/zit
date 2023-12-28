@@ -5,7 +5,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
-	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
@@ -20,19 +19,20 @@ func (pt *PageTuple) initialize(
 	i *Store,
 	ki kennung_index.Index,
 ) {
+	modifiedStandort := i.standort.SansAge().SansCompression()
 	pt.N = n
 
 	pt.All.initialize(
-		i.standort.SansAge().SansCompression(),
-		i.PageIdForIndex(n, false),
+		modifiedStandort,
+		i.PageIdForIndexAll(n),
 		i.ennui,
 	)
 
 	pt.SchwanzenFilter.Initialize(ki, i.applyKonfig)
 
 	pt.Schwanzen.initializeWithSchwanzen(
-		i.standort.SansAge().SansCompression(),
-		i.PageIdForIndex(uint8(n), true),
+		modifiedStandort,
+		i.PageIdForIndexSchwanz(uint8(n)),
 		&pt.SchwanzenFilter,
 	)
 }
@@ -43,11 +43,6 @@ func (pt *PageTuple) Add(
 	z := sku.GetTransactedPool().Get()
 
 	if err = z.SetFromSkuLike(z1); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = sku.CalculateAndSetSha(z, nil, objekte_format.Options{}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -104,11 +99,14 @@ func (ksm KennungShaMap) ReadMutter(z *sku.Transacted) (err error) {
 	k := z.GetKennung()
 	old := ksm[k.String()]
 
-	if old.Mutter.IsNull() {
-		return
+	if !old.Mutter.IsNull() {
+		if err = z.GetMetadatei().Mutter.SetShaLike(old.Mutter); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
-	if err = z.GetMetadatei().Mutter.SetShaLike(old.Mutter); err != nil {
+	if err = z.CalculateObjekteSha(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
