@@ -3,7 +3,6 @@ package store_objekten
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -16,7 +15,7 @@ func (s *Store) GetKonfigAkteFormat() objekte.AkteFormat[erworben.Akte, *erworbe
 	return s.konfigAkteFormat
 }
 
-func (s Store) UpdateKonfig(
+func (s *Store) UpdateKonfig(
 	sh schnittstellen.ShaLike,
 ) (kt *sku.Transacted, err error) {
 	if !s.StoreUtil.GetStandort().GetLockSmith().IsAcquired() {
@@ -81,19 +80,8 @@ func (s Store) UpdateKonfig(
 		return
 	}
 
-	// if err = s.handleUpdated
-	// 	kt,
-	// ); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
-
-	if err = iter.Chain(
+	if err = s.handleUpdated(
 		kt,
-		s.AddVerzeichnisse,
-		s.CommitUpdatedTransacted,
-		s.AddMatchable,
-		s.Updated,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -102,7 +90,7 @@ func (s Store) UpdateKonfig(
 	return
 }
 
-func (s Store) ReadOneKonfig(
+func (s *Store) ReadOneKonfig(
 	k schnittstellen.StringerGattungGetter,
 ) (tt *sku.Transacted, err error) {
 	var k1 kennung.Konfig
