@@ -101,7 +101,7 @@ func (c CreateFromPaths) Run(
 	err = results.Each(
 		func(z *sku.Transacted) (err error) {
 			if c.ProtoZettel.Apply(z) {
-				if _, err = c.StoreObjekten().Update(
+				if _, err = c.StoreObjekten().CreateOrUpdate(
 					z,
 					&z.Kennung,
 				); err != nil {
@@ -142,7 +142,7 @@ func (c CreateFromPaths) Run(
 			}
 
 			if c.ProtoZettel.Apply(&cz.Internal) {
-				if zt, err = c.StoreObjekten().Update(
+				if zt, err = c.StoreObjekten().CreateOrUpdate(
 					&cz.Internal,
 					&cz.Internal.Kennung,
 				); err != nil {
