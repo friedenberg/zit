@@ -111,10 +111,7 @@ func (s *Store) UpdateManyMetadatei(
 
 	if err = incoming.Each(
 		func(mwk *sku.Transacted) (err error) {
-			if _, err = s.CreateOrUpdate(
-				mwk,
-				&mwk.Kennung,
-			); err != nil {
+			if _, err = s.CreateOrUpdateTransacted(mwk); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

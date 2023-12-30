@@ -78,15 +78,18 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		}
 	}
 
-	if err = iter.Chain(
-		transactedPtr,
-		s.handleUpdated,
-	); err != nil {
+	if err = s.handleUpdated(transactedPtr); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	return
+}
+
+func (s *Store) CreateOrUpdateTransacted(
+	in *sku.Transacted,
+) (out *sku.Transacted, err error) {
+	return s.CreateOrUpdate(in, in.GetKennung())
 }
 
 func (s *Store) CreateOrUpdate(
