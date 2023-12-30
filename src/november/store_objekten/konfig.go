@@ -27,7 +27,7 @@ func (s *Store) UpdateKonfig(
 
 	var mutter *sku.Transacted
 
-	if mutter, err = s.ReadOneKonfig(&kennung.Konfig{}); err != nil {
+	if mutter, err = s.ReadOne(&kennung.Konfig{}); err != nil {
 		if errors.Is(err, objekte_store.ErrNotFound{}) {
 			mutter = nil
 			err = nil
@@ -85,46 +85,6 @@ func (s *Store) UpdateKonfig(
 	); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	return
-}
-
-func (s *Store) ReadOneKonfig(
-	k schnittstellen.StringerGattungGetter,
-) (tt *sku.Transacted, err error) {
-	var k1 kennung.Konfig
-
-	if err = k1.Set(k.String()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	tt1 := &s.StoreUtil.GetKonfig().Sku
-
-	if tt1.GetTai().IsEmpty() {
-		err = errors.Wrap(objekte_store.ErrNotFound{Id: k1})
-		return
-	}
-
-	tt = sku.GetTransactedPool().Get()
-
-	if err = tt.SetFromSkuLike(tt1); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if !tt.GetTai().IsEmpty() {
-		err = sku.CalculateAndSetSha(
-			tt,
-			s.GetPersistentMetadateiFormat(),
-			objekte_format.Options{Tai: true},
-		)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
 	}
 
 	return
