@@ -58,6 +58,16 @@ func (s *Store) GetKonfigAkteFormat() objekte.AkteFormat[erworben.Akte, *erworbe
 	return s.konfigAkteFormat
 }
 
+func (s *Store) UpdateKonfig(
+	sh schnittstellen.ShaLike,
+) (kt *sku.Transacted, err error) {
+	return s.CreateOrUpdateAkte(
+		nil,
+		&kennung.Konfig{},
+		sh,
+	)
+}
+
 func (s Store) Flush() (err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{

@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/delta/gattungen"
@@ -137,7 +138,7 @@ func (s *Store) ReadOne(
 			return
 		}
 
-		if sk, err = s.ReadHinweisSchwanzen(h); err != nil {
+		if sk, err = s.readHinweis(h); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -206,6 +207,46 @@ func (s *Store) ReadOne(
 
 	if err = sk1.SetFromSkuLike(sk); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) readHinweis(
+	h kennung.Kennung,
+) (found *sku.Transacted, err error) {
+	var n uint8
+
+	if n, err = s.GetVerzeichnisse().PageForKennung(h); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	errors.Log().Printf("searching page %d", n)
+
+	w := func(zv *sku.Transacted) (err error) {
+		if !kennung.Equals(zv.GetKennung(), h) {
+			return
+		}
+
+		found = sku.GetTransactedPool().Get()
+		sku.TransactedResetter.ResetWith(found, zv)
+
+		err = collections.MakeErrStopIteration()
+
+		return
+	}
+
+	p := s.GetVerzeichnisse().GetPagePair(n)
+
+	if err = p.Copy(kennung.SigilSchwanzen, w); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if found == nil {
+		err = objekte_store.ErrNotFound{Id: h}
 		return
 	}
 
