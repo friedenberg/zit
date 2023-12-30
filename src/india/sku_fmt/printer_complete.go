@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/pool"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
@@ -33,10 +34,18 @@ func MakeWriterComplete(w io.Writer) WriterComplete {
 		for z := range s.chTransacted {
 			errors.TodoP4("handle write errors")
 			s.wBuf.WriteString(z.GetKennung().String())
-			s.wBuf.WriteString("\tZettel: !")
-			s.wBuf.WriteString(z.GetTyp().String())
-			s.wBuf.WriteString(" ")
-			s.wBuf.WriteString(z.GetMetadatei().Bezeichnung.String())
+			s.wBuf.WriteByte('\t')
+
+			g := z.GetKennung().GetGattung()
+			s.wBuf.WriteString(z.GetKennung().GetGattung().String())
+
+			if g == gattung.Zettel {
+				s.wBuf.WriteString(": !")
+				s.wBuf.WriteString(z.GetTyp().String())
+				s.wBuf.WriteString(" ")
+				s.wBuf.WriteString(z.GetMetadatei().Bezeichnung.String())
+			}
+
 			s.wBuf.WriteString("\n")
 			w1.pool.Put(z)
 		}

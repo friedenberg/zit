@@ -1,6 +1,7 @@
 package kennung
 
 import (
+	"io"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -8,17 +9,20 @@ import (
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/delta/ohio"
 )
 
-type Sigil int
+type Sigil byte
 
 const (
-	SigilSchwanzen = Sigil(iota)
-	SigilHistory   = Sigil(1 << iota)
+	SigilUnknown   = Sigil(iota)
+	SigilSchwanzen = Sigil(1 << iota)
+	SigilHistory
 	SigilCwd
 	SigilHidden
 
 	SigilMax = SigilHidden
+	SigilAll = Sigil(^byte(0))
 )
 
 var (
@@ -62,7 +66,6 @@ func (a Sigil) Equals(b Sigil) bool {
 
 func (a *Sigil) Reset() {
 	*a = SigilSchwanzen
-	return
 }
 
 func (a *Sigil) ResetWith(b Sigil) {
@@ -128,7 +131,7 @@ func (i *Sigil) Set(v string) (err error) {
 	v = strings.TrimSpace(v)
 	v = strings.ToLower(v)
 
-	els := []rune(v)
+	els := v
 
 	for _, v1 := range els {
 		if _, ok := mapRuneToSigil[v1]; ok {
@@ -144,4 +147,29 @@ func (i *Sigil) Set(v string) (err error) {
 
 func (i Sigil) GetSha() *sha.Sha {
 	return sha.FromString(i.String())
+}
+
+func (i Sigil) Byte() byte {
+	return byte(i)
+}
+
+func (i Sigil) ReadByte() (byte, error) {
+	return byte(i), nil
+}
+
+func (i *Sigil) ReadFrom(r io.Reader) (n int64, err error) {
+	var b [1]byte
+
+	var n1 int
+	n1, err = ohio.ReadAllOrDieTrying(r, b[:])
+	n = int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	*i = Sigil(b[0])
+
+	return
 }

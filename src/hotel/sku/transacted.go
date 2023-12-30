@@ -6,8 +6,10 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/values"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/golf/objekte_format"
 )
 
 type Transacted struct {
@@ -168,7 +170,31 @@ func (s *Transacted) IsNew() bool {
 }
 
 func (s *Transacted) CalculateObjekteSha() (err error) {
-	return calculateAndSetSha(s)
+	var shaFormat objekte_format.FormatGeneric
+
+	if shaFormat, err = objekte_format.FormatForKeyError("MetadateiPlusMutter"); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var actual *sha.Sha
+
+	if actual, err = objekte_format.GetShaForMetadatei(
+		shaFormat,
+		s.GetMetadatei(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer sha.GetPool().Put(actual)
+
+	if err = s.SetObjekteSha(actual); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (s *Transacted) SetObjekteSha(v schnittstellen.ShaLike) (err error) {

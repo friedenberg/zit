@@ -31,6 +31,7 @@ type ShaReadCloser interface {
 type ShaWriteCloser interface {
 	io.ReaderFrom
 	io.WriteCloser
+  // io.WriterAt
 	GetShaLike() ShaLike
 }
 

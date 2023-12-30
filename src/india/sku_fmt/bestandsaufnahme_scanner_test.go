@@ -186,7 +186,7 @@ func TestOffsets(t1 *testing.T) {
 
 	for _, off := range sortedLookup {
 		s := lookup[int64(off)]
-		t.Logf("at %d", off)
+		// t.Logf("at %d", off)
 		_, err := rb.Seek(int64(off), io.SeekStart)
 		if err != io.EOF {
 			t.AssertNoError(err)

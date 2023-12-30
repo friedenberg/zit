@@ -21,8 +21,8 @@ type row struct {
 	offset int64Bytes
 }
 
-func (r *row) getOffset() uint64 {
-	o, _ := binary.Uvarint(r.offset[:])
+func (r *row) getOffset() int64 {
+	o, _ := binary.Varint(r.offset[:])
 	return o
 }
 
@@ -30,8 +30,8 @@ func (r *row) getPage() uint8 {
 	return uint8(r.page[0])
 }
 
-func (r *row) setOffset(v uint64) {
-	binary.PutUvarint(r.offset[:], v)
+func (r *row) setOffset(v int64) {
+	binary.PutVarint(r.offset[:], v)
 
 	if v != r.getOffset() {
 		panic(fmt.Sprintf("expected %d but got %d", v, r.getOffset()))

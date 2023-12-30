@@ -46,7 +46,7 @@ func (t T) logf(skip int, format string, args ...interface{}) {
 	errors.SetTesting()
 	si, _ := MakeStackInfo(t.skip + 1 + skip)
 	args = append([]interface{}{si}, args...)
-	fmt.Fprintf(os.Stderr, "%s"+format+"\n", args)
+	fmt.Fprintf(os.Stderr, "%s"+format+"\n", args...)
 }
 
 func (t T) errorf(skip int, format string, args ...interface{}) {

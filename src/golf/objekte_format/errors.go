@@ -17,4 +17,4 @@ func (err errInvalidGenericFormat) Is(target error) bool {
 	return ok
 }
 
-var errEmptyTai = errors.New("empty tai")
+var ErrEmptyTai = errors.New("empty tai")

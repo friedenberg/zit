@@ -21,14 +21,16 @@ type (
 )
 
 var (
-	keyAkte        = catgut.MakeFromString("Akte")
-	keyBezeichnung = catgut.MakeFromString("Bezeichnung")
-	keyEtikett     = catgut.MakeFromString("Etikett")
-	keyGattung     = catgut.MakeFromString("Gattung")
-	keyKennung     = catgut.MakeFromString("Kennung")
-	keyKomment     = catgut.MakeFromString("Komment")
-	keyTai         = catgut.MakeFromString("Tai")
-	keyTyp         = catgut.MakeFromString("Typ")
+	keyContentLength = catgut.MakeFromString("ContentLength")
+	keyAkte          = catgut.MakeFromString("Akte")
+	keyBezeichnung   = catgut.MakeFromString("Bezeichnung")
+	keyEtikett       = catgut.MakeFromString("Etikett")
+	keyGattung       = catgut.MakeFromString("Gattung")
+	keyKennung       = catgut.MakeFromString("Kennung")
+	keyKomment       = catgut.MakeFromString("Komment")
+	keySigil         = catgut.MakeFromString("Sigil")
+	keyTai           = catgut.MakeFromString("Tai")
+	keyTyp           = catgut.MakeFromString("Typ")
 
 	keyMutter = catgut.MakeFromString("zzMutter")
 	keySha    = catgut.MakeFromString("zzSha")
@@ -226,7 +228,7 @@ func GetShaForMetadatei(f FormatGeneric, m *Metadatei) (sh *Sha, err error) {
 	}
 
 	if m.GetTai().IsEmpty() {
-		err = errEmptyTai
+		err = ErrEmptyTai
 		return
 	}
 

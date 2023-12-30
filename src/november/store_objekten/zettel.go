@@ -39,7 +39,7 @@ func (s *Store) ReadHinweisSchwanzen(
 
 	p := s.GetVerzeichnisse().GetPagePair(n)
 
-	if err = p.Schwanzen.Copy(w); err != nil {
+	if err = p.Copy(kennung.SigilSchwanzen, w); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

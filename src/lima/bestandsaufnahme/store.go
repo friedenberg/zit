@@ -183,8 +183,26 @@ func (s *store) readOnePath(p string) (o *sku.Transacted, err error) {
 		return
 	}
 
-	if err = sku.CalculateAndSetSha(o, nil, objekte_format.Options{}); err != nil {
-		err = errors.Wrap(err)
+	if err = o.CalculateObjekteSha(); err != nil {
+		if errors.Is(err, objekte_format.ErrEmptyTai) {
+			var t kennung.Tai
+			err1 := t.Set(o.Kennung.String())
+
+			if err1 != nil {
+				err = errors.Wrapf(err, "%#v", o)
+				return
+			}
+
+			o.SetTai(t)
+
+			if err = o.CalculateObjekteSha(); err != nil {
+				err = errors.Wrapf(err, "%#v", o)
+				return
+			}
+		} else {
+			err = errors.Wrapf(err, "%#v", o)
+		}
+
 		return
 	}
 

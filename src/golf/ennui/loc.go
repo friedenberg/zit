@@ -10,7 +10,7 @@ import (
 
 type Loc struct {
 	Page   uint8
-	Offset uint64
+	Offset int64
 }
 
 func (l *Loc) String() string {
@@ -38,7 +38,7 @@ func (l *Loc) ReadFrom(r io.Reader) (n int64, err error) {
 
 	var n1 int
 	l.Page = page[0]
-	l.Offset, n1 = binary.Uvarint(offset[:])
+	l.Offset, n1 = binary.Varint(offset[:])
 
 	if n1 <= 0 {
 		err = errors.Errorf("not a valid uint64")

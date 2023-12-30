@@ -11,7 +11,6 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/heap"
@@ -25,8 +24,8 @@ type (
 
 	Ennui interface {
 		GetEnnui() Ennui
-		AddMetadatei(*metadatei.Metadatei, uint8, uint64) error
-		AddSha(*sha.Sha, uint8, uint64) error
+		AddMetadatei(*metadatei.Metadatei, uint8, int64) error
+		AddSha(*sha.Sha, uint8, int64) error
 		ReadOneSha(sh *Sha) (loc Loc, err error)
 		ReadOneKey(string, *metadatei.Metadatei) (Loc, error)
 		ReadManyKeys(string, *metadatei.Metadatei, *[]Loc) error
@@ -95,7 +94,7 @@ func (e *ennui) GetEnnui() Ennui {
 	return e
 }
 
-func (e *ennui) AddMetadatei(m *Metadatei, page uint8, offset uint64) (err error) {
+func (e *ennui) AddMetadatei(m *Metadatei, page uint8, offset int64) (err error) {
 	e.Lock()
 	defer e.Unlock()
 
@@ -116,7 +115,7 @@ func (e *ennui) AddMetadatei(m *Metadatei, page uint8, offset uint64) (err error
 	return
 }
 
-func (e *ennui) AddSha(sh *Sha, page uint8, offset uint64) (err error) {
+func (e *ennui) AddSha(sh *Sha, page uint8, offset int64) (err error) {
 	if sh.IsNull() {
 		return
 	}
@@ -127,7 +126,7 @@ func (e *ennui) AddSha(sh *Sha, page uint8, offset uint64) (err error) {
 	return e.addSha(sh, page, offset)
 }
 
-func (e *ennui) addSha(sh *Sha, page uint8, offset uint64) (err error) {
+func (e *ennui) addSha(sh *Sha, page uint8, offset int64) (err error) {
 	if sh.IsNull() {
 		return
 	}
@@ -469,8 +468,6 @@ func (e *ennui) PrintAll() (err error) {
 			err = errors.WrapExceptAsNil(err, io.EOF)
 			return
 		}
-
-		log.Out().Printf("%s", &current)
 	}
 }
 

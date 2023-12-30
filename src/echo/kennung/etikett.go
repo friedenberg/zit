@@ -28,6 +28,18 @@ type Etikett struct {
 
 type IndexedEtikett = IndexedLike
 
+func MustEtikettPtr(v string) (e *Etikett) {
+  e = &Etikett{}
+
+	var err error
+
+	if err = e.Set(v); err != nil {
+		errors.PanicIfError(err)
+	}
+
+	return
+}
+
 func MustEtikett(v string) (e Etikett) {
 	var err error
 

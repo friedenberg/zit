@@ -104,11 +104,10 @@ func (f *cli) WriteStringFormat(
 		return
 	}
 
+	k := &o.Kennung
+
 	var n2 int64
-	n2, err = f.kennungStringFormatWriter.WriteStringFormat(
-		sw,
-		&o.Kennung,
-	)
+	n2, err = f.kennungStringFormatWriter.WriteStringFormat(sw, k)
 	n += n2
 
 	if err != nil {

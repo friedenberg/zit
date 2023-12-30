@@ -12,7 +12,7 @@ func ReadAllOrDieTrying(r io.Reader, b []byte) (n int, err error) {
 	var acc int
 
 	for n < len(b) {
-    acc, err = r.Read(b[n:])
+		acc, err = r.Read(b[n:])
 		n += acc
 		if err != nil {
 			return

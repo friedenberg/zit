@@ -3,7 +3,6 @@ package errors
 import (
 	"errors"
 	"fmt"
-	"io"
 	"os"
 )
 
@@ -59,69 +58,6 @@ func Join(es ...error) error {
 		} else {
 			return err
 		}
-	}
-}
-
-func DeferredFlusher(
-	err *error,
-	f Flusher,
-) {
-	if err1 := f.Flush(); err1 != nil {
-		if err == nil {
-			panic(err)
-		} else {
-			*err = Join(*err, err1)
-		}
-	}
-}
-
-func DeferredCloser(
-	err *error,
-	c io.Closer,
-) {
-	if err1 := c.Close(); err1 != nil {
-		if err == nil {
-			panic(err)
-		} else {
-			*err = Join(*err, err1)
-		}
-	}
-}
-
-func Deferred(
-	err *error,
-	ef func() error,
-) {
-	if err1 := ef(); err1 != nil {
-		if err == nil {
-			panic(err)
-		} else {
-			*err = Join(*err, err1)
-		}
-	}
-}
-
-func DeferredChanError(
-	err *error,
-	ch <-chan error,
-) {
-	var err1 error
-
-	select {
-	case err1 = <-ch:
-	}
-
-	if err1 != nil {
-		*err = Join(*err, err1)
-	}
-}
-
-func DeferredChan(
-	ch chan<- error,
-	f func() error,
-) {
-	if err := f(); err != nil {
-		ch <- err
 	}
 }
 

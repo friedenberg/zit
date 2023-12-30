@@ -13,6 +13,7 @@ var (
 	transactedKeyerKennung schnittstellen.StringKeyer[*Transacted]
 	TransactedSetEmpty     TransactedSet
 	TransactedLessor       transactedLessor
+	TransactedEqualer      transactedEqualer
 )
 
 func init() {
@@ -33,11 +34,15 @@ type (
 )
 
 func MakeTransactedHeap() *TransactedHeap {
-	return heap.Make[Transacted, *Transacted](
+	h := heap.Make[Transacted, *Transacted](
 		transactedEqualer{},
 		transactedLessor{},
 		transactedResetter{},
 	)
+
+	h.SetPool(GetTransactedPool())
+
+	return h
 }
 
 func MakeTransactedSet() TransactedSet {

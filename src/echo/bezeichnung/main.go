@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/catgut"
 )
 
+// TODO-P1 move to catgut.String
 type Bezeichnung struct {
 	wasSet bool
 	value  string

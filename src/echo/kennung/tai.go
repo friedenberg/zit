@@ -1,6 +1,7 @@
 package kennung
 
 import (
+	"encoding/binary"
 	"fmt"
 	"io"
 	"math"
@@ -44,13 +45,13 @@ func TaiFromTime(t1 thyme.Time) (t2 Tai) {
 func TaiFromTimeWithIndex(t1 thyme.Time, n int) (t2 Tai) {
 	t2.wasSet = true
 	t2.tai = chai.FromTime(t1.GetTime())
-	t2.tai.Asec += int64(n * chai.Attosecond)
+	t2.Asec += int64(n * chai.Attosecond)
 
 	return
 }
 
 func (t Tai) AsTime() (t1 thyme.Time) {
-	if t.wasSet && !t.tai.Eq(tai{}) {
+	if t.wasSet && !t.Eq(tai{}) {
 		t1 = thyme.Tyme(t.tai.AsTime().Local())
 	} else {
 		panic("empty tai")
@@ -118,7 +119,7 @@ func (t *Tai) Set(v string) (err error) {
 				break
 			}
 
-			if t.tai.Sec, err = strconv.ParseInt(val, 10, 64); err != nil {
+			if t.Sec, err = strconv.ParseInt(val, 10, 64); err != nil {
 				err = errors.Wrapf(err, "failed to parse Sec time: %s", v)
 				return
 			}
@@ -147,7 +148,7 @@ func (t *Tai) Set(v string) (err error) {
 				return
 			}
 
-			t.tai.Asec = pre * int64(math.Pow10(18-len(val)))
+			t.Asec = pre * int64(math.Pow10(18-len(val)))
 
 		default:
 			if err == io.EOF {
@@ -175,7 +176,7 @@ func (t *Tai) Set(v string) (err error) {
 // }
 
 func (t Tai) IsZero() (ok bool) {
-	ok = (t.tai.Sec == 0 && t.tai.Asec == 0) || !t.wasSet
+	ok = (t.Sec == 0 && t.Asec == 0) || !t.wasSet
 	return
 }
 
@@ -185,15 +186,44 @@ func (t Tai) IsEmpty() (ok bool) {
 }
 
 func (t *Tai) Reset() {
-	t.tai.Sec = 0
-	t.tai.Asec = 0
+	t.Sec = 0
+	t.Asec = 0
 	t.wasSet = false
 }
 
 func (t *Tai) ResetWith(b Tai) {
-	t.tai.Sec = b.tai.Sec
-	t.tai.Asec = b.tai.Asec
+	t.Sec = b.Sec
+	t.Asec = b.Asec
 	t.wasSet = b.wasSet
+}
+
+func (t Tai) WriteTo(w io.Writer) (n int64, err error) {
+	b := make([]byte, binary.MaxVarintLen64*2)
+	binary.PutVarint(b[:binary.MaxVarintLen64], t.Sec)
+	binary.PutVarint(b[binary.MaxVarintLen64:], t.Asec)
+	var n1 int
+	n1, err = ohio.WriteAllOrDieTrying(w, b)
+	n += int64(n1)
+	return
+}
+
+func (t *Tai) ReadFrom(r io.Reader) (n int64, err error) {
+	b := make([]byte, binary.MaxVarintLen64*2)
+
+	var n1 int
+	n1, err = ohio.ReadAllOrDieTrying(r, b)
+	n += int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	t.wasSet = true
+	t.Sec, _ = binary.Varint(b[:binary.MaxVarintLen64])
+	t.Asec, _ = binary.Varint(b[binary.MaxVarintLen64:])
+
+	return
 }
 
 func (t Tai) MarshalText() (text []byte, err error) {
@@ -230,7 +260,7 @@ func (a Tai) EqualsAny(b any) bool {
 }
 
 func (t Tai) Equals(t1 Tai) bool {
-	if !t.tai.Eq(t1.tai) {
+	if !t.Eq(t1.tai) {
 		return false
 	}
 
@@ -238,5 +268,5 @@ func (t Tai) Equals(t1 Tai) bool {
 }
 
 func (t Tai) Less(t1 Tai) bool {
-	return t.tai.Before(t1.tai)
+	return t.Before(t1.tai)
 }

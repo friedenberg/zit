@@ -1,10 +1,8 @@
 package store_verzeichnisse
 
 import (
-	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -12,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/pool"
-	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -20,6 +17,7 @@ import (
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/india/sku_fmt"
 	"github.com/friedenberg/zit/src/juliett/konfig"
 )
 
@@ -63,11 +61,6 @@ type Store struct {
 	ennui ennui.Ennui
 }
 
-type pageId struct {
-	index uint8
-	path  string
-}
-
 func MakeStore(
 	s standort.Standort,
 	k *konfig.Compiled,
@@ -87,7 +80,7 @@ func MakeStore(
 	}
 
 	for n := range i.pages {
-		i.pages[n].initialize(uint8(n), i, ki)
+		i.pages[n].initialize(PageId{Dir: dir, Index: uint8(n)}, i, ki)
 	}
 
 	return
@@ -99,18 +92,6 @@ func (s *Store) applyKonfig(z *sku.Transacted) error {
 	}
 
 	return s.erworben.ApplyToSku(z)
-}
-
-func (i *Store) PageIdForIndexAll(n uint8) (pid pageId) {
-	pid.index = n
-	pid.path = filepath.Join(i.path, fmt.Sprintf("All-%x", n))
-	return
-}
-
-func (i *Store) PageIdForIndexSchwanz(n uint8) (pid pageId) {
-	pid.index = n
-	pid.path = filepath.Join(i.path, fmt.Sprintf("Schwanz-%x", n))
-	return
 }
 
 func (i *Store) GetEnnui() ennui.Ennui {
@@ -140,52 +121,50 @@ func (i *Store) ReadOneKey(k string, sk *sku.Transacted) (out *sku.Transacted, e
 }
 
 func (i *Store) readLoc(loc ennui.Loc) (sk *sku.Transacted, err error) {
-	p := &i.pages[loc.Page].All
+	p := &i.pages[loc.Page]
 
 	var f *os.File
 
 	if f, err = files.OpenFile(
-		p.path,
+		p.Path(),
 		os.O_RDONLY,
 		0o666,
 	); err != nil {
-		if errors.IsNotExist(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-		}
-
+		err = errors.Wrap(err)
 		return
 	}
 
 	defer errors.DeferredCloser(&err, f)
 
-	if _, err = f.Seek(int64(loc.Offset), io.SeekStart); err != nil {
-		err = errors.Wrap(err)
+	var n int64
+
+	if n, err = f.Seek(int64(loc.Offset), io.SeekStart); err != nil {
+		err = errors.Wrapf(
+			err,
+			"Page: %d, Expected Offset: %d, Actual Offset: %d",
+			loc.Page,
+			n,
+			loc.Offset,
+		)
+
 		return
 	}
 
-	rb := catgut.MakeRingBuffer(f, 0)
+	coder := sku_fmt.Binary{Sigil: kennung.SigilAll}
 
 	sk = sku.GetTransactedPool().Get()
 
-	fo := objekte_format.Default()
+	if _, err = coder.ReadFormatExactly(f, sk); err != nil {
+		sku.GetTransactedPool().Put(sk)
+		sk = nil
 
-	if _, err = fo.ParsePersistentMetadatei(
-		rb,
-		sk,
-		options,
-	); err != nil {
-		if err == objekte_format.ErrV4ExpectedSpaceSeparatedKey {
-			err = nil
-		} else {
-			err = errors.Wrapf(
-				err,
-				"Loc: %d, Readable: %s",
-				loc.Offset,
-				rb.PeekReadable().String()[:100],
-			)
-		}
+		err = errors.Wrapf(
+			err,
+			"Page: %d, Expected Offset: %d, Actual Offset: %d",
+			loc.Page,
+			n,
+			loc.Offset,
+		)
 
 		return
 	}
@@ -203,8 +182,7 @@ func (i *Store) GetPagePair(n uint8) (p *PageTuple) {
 
 func (i *Store) SetNeedsFlush() {
 	for n := range i.pages {
-		i.pages[n].All.State = StateChanged
-		i.pages[n].Schwanzen.State = StateChanged
+		i.pages[n].SetNeedsFlush()
 	}
 }
 
@@ -234,7 +212,7 @@ func (i *Store) Add(
 
 	p := i.GetPagePair(n)
 
-	if err = p.Add(z); err != nil {
+	if err = p.add(z); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -271,7 +249,7 @@ func (i *Store) readFrom(
 	for n := range i.pages {
 		wg.Add(1)
 
-		go func(n int, p *Page, openFileCh chan struct{}) {
+		go func(n int, p *PageTuple, openFileCh chan struct{}) {
 			defer wg.Done()
 			defer func(c chan<- struct{}) {
 				openFileCh <- struct{}{}
@@ -281,7 +259,7 @@ func (i *Store) readFrom(
 
 				var err1 error
 
-				if err1 = p.Copy(w); err1 != nil {
+				if err1 = p.Copy(s, w); err1 != nil {
 					if isDone() {
 						break
 					}
@@ -302,7 +280,7 @@ func (i *Store) readFrom(
 
 				break
 			}
-		}(n, i.pages[n].PageForSigil(s), ch)
+		}(n, &i.pages[n], ch)
 	}
 
 	wg.Wait()

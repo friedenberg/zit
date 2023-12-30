@@ -1,43 +1,74 @@
 package store_verzeichnisse
 
 import (
+	"bufio"
+	"bytes"
+	"fmt"
+	"io"
+	"path/filepath"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/golf/ennui"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/hotel/sku"
+	"github.com/friedenberg/zit/src/india/sku_fmt"
+	"github.com/friedenberg/zit/src/juliett/konfig"
 )
 
+type PageId struct {
+	Index uint8
+	Dir   string
+}
+
+func (pid *PageId) PathForSigil(s kennung.Sigil) string {
+	if s.IncludesHistory() {
+		return pid.PathForAll()
+	} else {
+		return pid.PathForSchwanz()
+	}
+}
+
+func (pid *PageId) PathForAll() string {
+	return filepath.Join(pid.Dir, fmt.Sprintf("All-%x", pid.Index))
+}
+
+func (pid *PageId) PathForSchwanz() string {
+	return filepath.Join(pid.Dir, fmt.Sprintf("Schwanz-%x", pid.Index))
+}
+
+func (pid *PageId) Path() string {
+	return filepath.Join(pid.Dir, fmt.Sprintf("%x", pid.Index))
+}
+
 type PageTuple struct {
-	N               uint8
-	All, Schwanzen  Page
-	SchwanzenFilter sku.Schwanzen
+	PageId
+	// All, Schwanzen  Page
+	ennui        ennui.Ennui
+	added        *sku.TransactedHeap
+	hasChanges   bool
+	standort     standort.Standort
+	konfig       *konfig.Compiled
+	etikettIndex kennung_index.EtikettIndexMutation
 }
 
 func (pt *PageTuple) initialize(
-	n uint8,
+	pid PageId,
 	i *Store,
 	ki kennung_index.Index,
 ) {
-	modifiedStandort := i.standort.SansAge().SansCompression()
-	pt.N = n
-
-	pt.All.initialize(
-		modifiedStandort,
-		i.PageIdForIndexAll(n),
-		i.ennui,
-	)
-
-	pt.SchwanzenFilter.Initialize(ki, i.applyKonfig)
-
-	pt.Schwanzen.initializeWithSchwanzen(
-		modifiedStandort,
-		i.PageIdForIndexSchwanz(uint8(n)),
-		&pt.SchwanzenFilter,
-	)
+	pt.standort = i.standort.SansAge().SansCompression()
+	pt.PageId = pid
+	pt.added = sku.MakeTransactedHeap()
+	pt.etikettIndex = ki
+	pt.ennui = i.ennui
+	pt.konfig = i.erworben
 }
 
-func (pt *PageTuple) Add(
+func (pt *PageTuple) add(
 	z1 *sku.Transacted,
 ) (err error) {
 	z := sku.GetTransactedPool().Get()
@@ -47,66 +78,58 @@ func (pt *PageTuple) Add(
 		return
 	}
 
-	if err = pt.All.Add(z); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = pt.Schwanzen.Add(z); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	pt.added.Add(z)
+	pt.hasChanges = true
 
 	return
-}
-
-func (pt *PageTuple) PageForSigil(s kennung.Sigil) *Page {
-	if s.IncludesHistory() {
-		return &pt.All
-	} else {
-		return &pt.Schwanzen
-	}
 }
 
 func (pt *PageTuple) SetNeedsFlush() {
-	pt.All.State = StateChanged
-	pt.Schwanzen.State = StateChanged
+	pt.hasChanges = true
 }
 
-func (pt *PageTuple) Flush() (err error) {
-	m := make(KennungShaMap)
+func (pt *PageTuple) Copy(
+	s kennung.Sigil,
+	w schnittstellen.FuncIter[*sku.Transacted],
+) (err error) {
+	var r io.ReadCloser
 
-	if err = pt.All.Flush(m); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = pt.Schwanzen.Flush(m); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-type ShaTuple struct {
-	Sha, Mutter *sha.Sha
-}
-
-type KennungShaMap map[string]ShaTuple
-
-func (ksm KennungShaMap) ReadMutter(z *sku.Transacted) (err error) {
-	k := z.GetKennung()
-	old := ksm[k.String()]
-
-	if !old.Mutter.IsNull() {
-		if err = z.GetMetadatei().Mutter.SetShaLike(old.Mutter); err != nil {
+	if r, err = pt.standort.ReadCloserVerzeichnisse(pt.Path()); err != nil {
+		if errors.IsNotExist(err) {
+			r = io.NopCloser(bytes.NewReader(nil))
+			err = nil
+		} else {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	if err = z.CalculateObjekteSha(); err != nil {
+	br := bufio.NewReader(r)
+
+	dec := sku_fmt.Binary{Sigil: s}
+
+	errors.TodoP3("determine performance of this")
+	added := pt.added.Copy()
+
+	if err = added.MergeStream(
+		func() (tz *sku.Transacted, err error) {
+			tz = sku.GetTransactedPool().Get()
+			_, err = dec.ReadFormatAndMatchSigil(br, tz)
+
+			if err != nil {
+				if errors.IsEOF(err) {
+					err = collections.MakeErrStopIteration()
+				} else {
+					err = errors.Wrap(err)
+				}
+
+				return
+			}
+
+			return
+		},
+		w,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -114,19 +137,10 @@ func (ksm KennungShaMap) ReadMutter(z *sku.Transacted) (err error) {
 	return
 }
 
-func (ksm KennungShaMap) SaveSha(z *sku.Transacted) (err error) {
-	k := z.GetKennung()
-	var sh sha.Sha
-
-	if err = sh.SetShaLike(&z.GetMetadatei().Sha); err != nil {
-		err = errors.Wrap(err)
-		return
+func (pt *PageTuple) Flush() error {
+	pw := pageWriter{
+		PageTuple: pt,
 	}
 
-	old := ksm[k.String()]
-	old.Mutter = old.Sha
-	old.Sha = &sh
-	ksm[k.String()] = old
-
-	return
+	return pw.flush()
 }

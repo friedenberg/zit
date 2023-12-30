@@ -400,6 +400,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			}
 
 			if z, err = rob(&z.GetMetadatei().Mutter); err != nil {
+        fmt.Fprintln(out, err)
 				err = nil
 				return
 			}

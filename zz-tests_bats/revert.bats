@@ -31,7 +31,6 @@ function revert_all_zettels { # @test
 }
 
 function revert_last { # @test
-	skip
 	run_zit revert -last
 	assert_success
 	assert_output - <<-EOM

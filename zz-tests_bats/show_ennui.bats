@@ -15,10 +15,9 @@ teardown() {
 }
 
 function format_mutter_sha_one { # @test
-	skip
 	run_zit show -format sha one/uno+
 	assert_success
-	sha="$(echo -n "$output" | tail -n1)"
+	sha="$(echo -n "$output" | head -n1)"
 
 	run_zit show -format mutter-sha one/uno.zettel
 	assert_success

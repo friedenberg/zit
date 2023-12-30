@@ -2,15 +2,11 @@ package commands
 
 import (
 	"os"
-	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	to_merge "github.com/friedenberg/zit/src/india/sku_fmt"
+	"github.com/friedenberg/zit/src/india/sku_fmt"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
@@ -40,65 +36,17 @@ func (c commandWithQuery) Complete(
 
 	cg := cgg.CompletionGattung()
 
-	if cg.Contains(gattung.Zettel) {
-		func() {
-			zw := to_merge.MakeWriterComplete(os.Stdout)
-			defer errors.Deferred(&err, zw.Close)
+	zw := sku_fmt.MakeWriterComplete(os.Stdout)
+	defer errors.DeferredCloser(&err, &zw)
 
-			w := zw.WriteZettelVerzeichnisse
+	w := zw.WriteZettelVerzeichnisse
 
-			if err = u.StoreObjekten().ReadAllSchwanzen(
-				gattungen.MakeSet(gattung.Zettel),
-				w,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}()
-	}
-
-	if cg.Contains(gattung.Etikett) {
-		if err = u.StoreObjekten().GetKennungIndex().EachSchwanzen(
-			func(e *kennung.IndexedLike) (err error) {
-				if err = errors.Out().Printf("%s\tEtikett", e.GetKennung().String()); err != nil {
-					err = errors.IsAsNilOrWrapf(
-						err,
-						syscall.EPIPE,
-						"Etikett: %s",
-						e.GetKennung(),
-					)
-
-					return
-				}
-
-				return
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if cg.Contains(gattung.Typ) {
-		if err = u.Konfig().Typen.Each(
-			func(tt *sku.Transacted) (err error) {
-				if err = errors.Out().Printf("%s\tTyp", tt.GetKennung()); err != nil {
-					err = errors.IsAsNilOrWrapf(
-						err,
-						syscall.EPIPE,
-						"Typ: %s",
-						tt.GetKennung(),
-					)
-
-					return
-				}
-
-				return
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = u.StoreObjekten().ReadAllSchwanzen(
+		cg,
+		w,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
