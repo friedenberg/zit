@@ -50,10 +50,12 @@ func Make(
 	return
 }
 
-func (s *Store) SetLogWriter(
-	lw objekte_store.LogWriter,
-) {
+func (s *Store) SetLogWriter(lw objekte_store.LogWriter) {
 	s.LogWriter = lw
+}
+
+func (s *Store) GetKonfigAkteFormat() objekte.AkteFormat[erworben.Akte, *erworben.Akte] {
+	return s.konfigAkteFormat
 }
 
 func (s Store) Flush() (err error) {
