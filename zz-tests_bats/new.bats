@@ -16,28 +16,9 @@ teardown() {
 
 function new_empty_no_edit { # @test
 	run_zit new -edit=false
-	assert_success
+	assert_failure
 	assert_output - <<-EOM
-		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md]
-	EOM
-
-	run_zit last -format bestandsaufnahme-sans-tai
-	assert_success
-	assert_output - <<-EOM
-		---
-		Gattung Zettel
-		Kennung two/uno
-		Typ md
-		---
-	EOM
-
-	run_zit show -format text two/uno
-	assert_success
-	assert_output - <<-EOM
-		---
-		# 
-		! md
-		---
+		zettel is empty
 	EOM
 }
 

@@ -2,7 +2,6 @@ package store_objekten
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/gattung"
@@ -63,20 +62,23 @@ func (s *Store) Create(
 		return
 	}
 
-	// if in.IsEmpty() || s.protoZettel.Equals(in) {
-	// 	err = errors.Normalf("zettel is empty")
-	// 	return
-	// }
+	if mg.GetMetadatei().IsEmpty() {
+		err = errors.Normalf("zettel is empty")
+		return
+	}
+
+	if s.protoZettel.Equals(mg.GetMetadatei()) {
+		err = errors.Normalf("zettel matches protozettel")
+		return
+	}
 
 	m := mg.GetMetadatei()
 	s.protoZettel.Apply(m)
 
-	err = s.StoreUtil.GetKonfig().ApplyToNewMetadatei(
+	if err = s.StoreUtil.GetKonfig().ApplyToNewMetadatei(
 		m,
 		s.GetAkten().GetTypV0(),
-	)
-
-	if err != nil {
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -113,8 +115,9 @@ func (s *Store) Create(
 
 func (s *Store) Update(
 	mg metadatei.Getter,
-	k schnittstellen.Stringer,
+	k kennung.Kennung,
 ) (tz *sku.Transacted, err error) {
+	return s.CreateOrUpdate(mg, k)
 	errors.TodoP2("support dry run")
 	var h kennung.Hinweis
 
