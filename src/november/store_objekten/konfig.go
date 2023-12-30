@@ -12,6 +12,12 @@ import (
 func (s *Store) UpdateKonfig(
 	sh schnittstellen.ShaLike,
 ) (kt *sku.Transacted, err error) {
+	return s.CreateOrUpdateAkte(
+		nil,
+		&kennung.Konfig{},
+		sh,
+	)
+
 	if !s.StoreUtil.GetStandort().GetLockSmith().IsAcquired() {
 		err = errors.Wrap(
 			objekte_store.ErrLockRequired{Operation: "update konfig"},
