@@ -203,7 +203,7 @@ func writeDefaultErworben(
 ) (sh schnittstellen.ShaLike, err error) {
 	defaultKonfig := erworben.Default(dt)
 
-	f := u.StoreObjekten().Konfig().GetAkteFormat()
+	f := u.StoreObjekten().GetKonfigAkteFormat()
 
 	var aw sha.WriteCloser
 

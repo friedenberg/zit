@@ -20,8 +20,8 @@ import (
 type Store struct {
 	store_util.StoreUtil
 
-	protoZettel zettel.ProtoZettel
-	konfigStore konfigStore
+	protoZettel      zettel.ProtoZettel
+	konfigAkteFormat objekte.AkteFormat[erworben.Akte, *erworben.Akte]
 
 	objekte_store.LogWriter
 }
@@ -37,15 +37,13 @@ func Make(
 
 	s.protoZettel = zettel.MakeProtoZettel(su.GetKonfig())
 
-	s.konfigStore.akteFormat = objekte_store.MakeAkteFormat[erworben.Akte, *erworben.Akte](
+	s.konfigAkteFormat = objekte_store.MakeAkteFormat[erworben.Akte, *erworben.Akte](
 		objekte.MakeTextParserIgnoreTomlErrors[erworben.Akte](
 			s.GetStandort(),
 		),
 		objekte.ParsedAkteTomlFormatter[erworben.Akte, *erworben.Akte]{},
 		s.GetStandort(),
 	)
-
-	s.konfigStore.StoreUtil = s.StoreUtil
 
 	errors.TodoP1("implement for other gattung")
 
@@ -56,11 +54,6 @@ func (s *Store) SetLogWriter(
 	lw objekte_store.LogWriter,
 ) {
 	s.LogWriter = lw
-	s.konfigStore.LogWriter = lw
-}
-
-func (s *Store) Konfig() *konfigStore {
-	return &s.konfigStore
 }
 
 func (s Store) Flush() (err error) {
@@ -245,11 +238,11 @@ func (s *Store) createEtikettOrTyp(k *kennung.Kennung2) (err error) {
 		return
 	}
 
-// 	err = sku.CalculateAndSetSha(
-// 		t,
-// 		s.GetPersistentMetadateiFormat(),
-// 		s.GetObjekteFormatOptions(),
-// 	)
+	// 	err = sku.CalculateAndSetSha(
+	// 		t,
+	// 		s.GetPersistentMetadateiFormat(),
+	// 		s.GetObjekteFormatOptions(),
+	// 	)
 
 	if err != nil {
 		err = errors.Wrap(err)

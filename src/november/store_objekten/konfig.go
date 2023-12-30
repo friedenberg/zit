@@ -10,21 +10,13 @@ import (
 	"github.com/friedenberg/zit/src/india/erworben"
 	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
-	"github.com/friedenberg/zit/src/mike/store_util"
 )
 
-type konfigStore struct {
-	store_util.StoreUtil
-
-	akteFormat objekte.AkteFormat[erworben.Akte, *erworben.Akte]
-	objekte_store.LogWriter
+func (s *Store) GetKonfigAkteFormat() objekte.AkteFormat[erworben.Akte, *erworben.Akte] {
+	return s.konfigAkteFormat
 }
 
-func (s *konfigStore) GetAkteFormat() objekte.AkteFormat[erworben.Akte, *erworben.Akte] {
-	return s.akteFormat
-}
-
-func (s konfigStore) Update(
+func (s Store) UpdateKonfig(
 	sh schnittstellen.ShaLike,
 ) (kt *sku.Transacted, err error) {
 	if !s.StoreUtil.GetStandort().GetLockSmith().IsAcquired() {
@@ -36,7 +28,7 @@ func (s konfigStore) Update(
 
 	var mutter *sku.Transacted
 
-	if mutter, err = s.ReadOne(&kennung.Konfig{}); err != nil {
+	if mutter, err = s.ReadOneKonfig(&kennung.Konfig{}); err != nil {
 		if errors.Is(err, objekte_store.ErrNotFound{}) {
 			mutter = nil
 			err = nil
@@ -89,6 +81,13 @@ func (s konfigStore) Update(
 		return
 	}
 
+	// if err = s.handleUpdated
+	// 	kt,
+	// ); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
+
 	if err = iter.Chain(
 		kt,
 		s.AddVerzeichnisse,
@@ -103,7 +102,7 @@ func (s konfigStore) Update(
 	return
 }
 
-func (s konfigStore) ReadOne(
+func (s Store) ReadOneKonfig(
 	k schnittstellen.StringerGattungGetter,
 ) (tt *sku.Transacted, err error) {
 	var k1 kennung.Konfig

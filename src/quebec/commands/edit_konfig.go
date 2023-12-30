@@ -82,7 +82,7 @@ func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	defer errors.Deferred(&err, u.Unlock)
 
-	if _, err = u.StoreObjekten().Konfig().Update(sh); err != nil {
+	if _, err = u.StoreObjekten().UpdateKonfig(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -114,7 +114,7 @@ func (c EditKonfig) editOnlyEtiketten(
 
 	defer errors.DeferredCloser(&err, aw)
 
-	f := u.StoreObjekten().Konfig().GetAkteFormat()
+	f := u.StoreObjekten().GetKonfigAkteFormat()
 
 	if _, err = f.FormatParsedAkte(aw, &newKonfig); err != nil {
 		err = errors.Wrap(err)
@@ -178,7 +178,7 @@ func (c EditKonfig) makeTempKonfigFile(
 
 	p = f.Name()
 
-	format := u.StoreObjekten().Konfig().GetAkteFormat()
+	format := u.StoreObjekten().GetKonfigAkteFormat()
 
 	if _, err = format.FormatSavedAkte(f, k.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
@@ -201,7 +201,7 @@ func (c EditKonfig) readTempKonfigFile(
 
 	defer errors.DeferredCloser(&err, f)
 
-	format := u.StoreObjekten().Konfig().GetAkteFormat()
+	format := u.StoreObjekten().GetKonfigAkteFormat()
 
 	var k erworben.Akte
 

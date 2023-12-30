@@ -178,7 +178,7 @@ func (s *Store) ReadOne(
 		sk = s.StoreUtil.GetKonfig().GetKasten(k)
 
 	case gattung.Konfig:
-		if sk, err = s.konfigStore.ReadOne(kennung.Konfig{}); err != nil {
+		if sk, err = s.ReadOneKonfig(kennung.Konfig{}); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
