@@ -228,6 +228,7 @@ func (a *Heap[T, TPtr]) MergeStream(
 				break LOOP
 
 			case a.h.equaler.Equals(peeked, e):
+        e = peeked
 				a.Pop()
 				continue LOOP
 

@@ -47,12 +47,12 @@ func (pid *PageId) Path() string {
 type PageTuple struct {
 	PageId
 	// All, Schwanzen  Page
-	ennui        ennui.Ennui
-	added        *sku.TransactedHeap
-	hasChanges   bool
-	standort     standort.Standort
-	konfig       *konfig.Compiled
-	etikettIndex kennung_index.EtikettIndexMutation
+	ennuiShas, ennuiKennung ennui.Ennui
+	added                   *sku.TransactedHeap
+	hasChanges              bool
+	standort                standort.Standort
+	konfig                  *konfig.Compiled
+	etikettIndex            kennung_index.EtikettIndexMutation
 }
 
 func (pt *PageTuple) initialize(
@@ -64,7 +64,8 @@ func (pt *PageTuple) initialize(
 	pt.PageId = pid
 	pt.added = sku.MakeTransactedHeap()
 	pt.etikettIndex = ki
-	pt.ennui = i.ennui
+	pt.ennuiShas = i.ennuiShas
+	pt.ennuiKennung = i.ennuiKennung
 	pt.konfig = i.erworben
 }
 

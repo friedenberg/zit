@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -216,37 +217,16 @@ func (s *Store) ReadOne(
 func (s *Store) readHinweis(
 	h kennung.Kennung,
 ) (found *sku.Transacted, err error) {
-	var n uint8
+	sh := sha.FromString(h.String())
+	defer sha.GetPool().Put(sh)
 
-	if n, err = s.GetVerzeichnisse().PageForKennung(h); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	errors.Log().Printf("searching page %d", n)
-
-	w := func(zv *sku.Transacted) (err error) {
-		if !kennung.Equals(zv.GetKennung(), h) {
-			return
+	if found, err = s.GetVerzeichnisse().ReadOneKennung(sh); err != nil {
+		if errors.Is(err, collections.ErrNotFound("")) {
+			err = objekte_store.ErrNotFound{Id: h}
+		} else {
+			err = errors.Wrap(err)
 		}
 
-		found = sku.GetTransactedPool().Get()
-		sku.TransactedResetter.ResetWith(found, zv)
-
-		err = collections.MakeErrStopIteration()
-
-		return
-	}
-
-	p := s.GetVerzeichnisse().GetPagePair(n)
-
-	if err = p.Copy(kennung.SigilSchwanzen, w); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if found == nil {
-		err = objekte_store.ErrNotFound{Id: h}
 		return
 	}
 

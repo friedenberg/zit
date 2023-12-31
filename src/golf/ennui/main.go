@@ -2,15 +2,14 @@ package ennui
 
 import (
 	"bufio"
-	"bytes"
-	"fmt"
 	"io"
 	"os"
-	"path"
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/heap"
@@ -24,8 +23,8 @@ type (
 
 	Ennui interface {
 		GetEnnui() Ennui
-		AddMetadatei(*metadatei.Metadatei, uint8, int64) error
-		AddSha(*sha.Sha, uint8, int64) error
+		AddMetadatei(*metadatei.Metadatei, Loc) error
+		AddSha(*sha.Sha, Loc) error
 		ReadOneSha(sh *Sha) (loc Loc, err error)
 		ReadOneKey(string, *metadatei.Metadatei) (Loc, error)
 		ReadManyKeys(string, *metadatei.Metadatei, *[]Loc) error
@@ -39,23 +38,38 @@ type Metadatei = metadatei.Metadatei
 
 type ennui struct {
 	sync.Mutex
-	f        *os.File
-	br       bufio.Reader
-	added    *heap.Heap[row, *row]
-	standort standort.Standort
-	dir      string
+	f          *os.File
+	br         bufio.Reader
+	added      *heap.Heap[row, *row]
+	standort   standort.Standort
+	searchFunc func(*sha.Sha) (err error)
+	path       string
 }
 
-func Make(s standort.Standort, dir string) (e *ennui, err error) {
+func MakePermitDuplicates(s standort.Standort, path string) (e *ennui, err error) {
+	return make(rowEqualerComplete{}, s, path)
+}
+
+func MakeNoDuplicates(s standort.Standort, path string) (e *ennui, err error) {
+	return make(rowEqualerShaOnly{}, s, path)
+}
+
+func make(
+	equaler schnittstellen.Equaler1[*row],
+	s standort.Standort,
+	path string,
+) (e *ennui, err error) {
 	e = &ennui{
 		added: heap.Make(
-			rowEqualer{},
+			equaler,
 			rowLessor{},
 			rowResetter{},
 		),
 		standort: s,
-		dir:      dir,
+		path:     path,
 	}
+
+	e.searchFunc = e.seekToFirstBinarySearch
 
 	if err = e.open(); err != nil {
 		err = errors.Wrap(err)
@@ -74,7 +88,7 @@ func (e *ennui) open() (err error) {
 	}
 
 	if e.f, err = files.OpenFile(
-		path.Join(e.dir, "Ennui"),
+		e.path,
 		os.O_RDONLY,
 		0o666,
 	); err != nil {
@@ -94,7 +108,7 @@ func (e *ennui) GetEnnui() Ennui {
 	return e
 }
 
-func (e *ennui) AddMetadatei(m *Metadatei, page uint8, offset int64) (err error) {
+func (e *ennui) AddMetadatei(m *Metadatei, loc Loc) (err error) {
 	e.Lock()
 	defer e.Unlock()
 
@@ -106,7 +120,7 @@ func (e *ennui) AddMetadatei(m *Metadatei, page uint8, offset int64) (err error)
 	}
 
 	for _, s := range shas {
-		if err = e.addSha(s, page, offset); err != nil {
+		if err = e.addSha(s, loc); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -115,7 +129,7 @@ func (e *ennui) AddMetadatei(m *Metadatei, page uint8, offset int64) (err error)
 	return
 }
 
-func (e *ennui) AddSha(sh *Sha, page uint8, offset int64) (err error) {
+func (e *ennui) AddSha(sh *Sha, loc Loc) (err error) {
 	if sh.IsNull() {
 		return
 	}
@@ -123,23 +137,23 @@ func (e *ennui) AddSha(sh *Sha, page uint8, offset int64) (err error) {
 	e.Lock()
 	defer e.Unlock()
 
-	return e.addSha(sh, page, offset)
+	return e.addSha(sh, loc)
 }
 
-func (e *ennui) addSha(sh *Sha, page uint8, offset int64) (err error) {
+func (e *ennui) addSha(sh *Sha, loc Loc) (err error) {
 	if sh.IsNull() {
 		return
 	}
 
-	r := &row{}
+	r := &row{
+		Loc: loc,
+	}
 
 	if err = r.sha.SetShaLike(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	r.page[0] = page
-	r.setOffset(offset)
 	e.added.Push(r)
 
 	return
@@ -162,7 +176,7 @@ func (e *ennui) ReadOneSha(sh *Sha) (loc Loc, err error) {
 	e.Lock()
 	defer e.Unlock()
 
-	if err = e.seekToFirstBinarySearch(sh); err != nil {
+	if err = e.searchFunc(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -222,7 +236,7 @@ func (e *ennui) ReadManyKeys(
 	e.Lock()
 	defer e.Unlock()
 
-	if err = e.seekToFirstBinarySearch(sh); err != nil {
+	if err = e.searchFunc(sh); err != nil {
 		err = errors.Wrapf(err, "Key: %s", kf)
 		return
 	}
@@ -249,7 +263,7 @@ func (e *ennui) ReadAll(m *metadatei.Metadatei, h *[]Loc) (err error) {
 	me := errors.MakeMulti()
 
 	for k, s := range shas {
-		if err = e.seekToFirstBinarySearch(s); err != nil {
+		if err = e.searchFunc(s); err != nil {
 			me.Add(errors.Wrapf(err, "Key: %s", k))
 			err = nil
 			continue
@@ -265,127 +279,6 @@ func (e *ennui) ReadAll(m *metadatei.Metadatei, h *[]Loc) (err error) {
 	if me.Len() > 0 {
 		err = me
 	}
-
-	return
-}
-
-func (e *ennui) seekToFirstLinearSearch(shMet *sha.Sha) (err error) {
-	if e.f == nil {
-		err = collections.ErrNotFound("fd nil: " + shMet.String())
-		return
-	}
-
-	var rowCount int64
-	shMid := &sha.Sha{}
-
-	if rowCount, err = e.GetRowCount(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	for mid := int64(0); mid < rowCount; mid++ {
-		// var loc int64
-
-		if _, err = e.f.Seek(mid*RowSize, io.SeekStart); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if _, err = shMid.ReadFrom(e.f); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if bytes.Equal(shMet.GetShaBytes(), shMid.GetShaBytes()) {
-			// log.Debug().Printf("%d", loc)
-
-			if _, err = e.f.Seek(mid*RowSize, io.SeekStart); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		}
-	}
-
-	err = collections.ErrNotFound(shMet.String())
-
-	return
-}
-
-func (e *ennui) seekToFirstBinarySearch(shMet *sha.Sha) (err error) {
-	if e.f == nil {
-		err = collections.ErrNotFound("fd nil: " + shMet.String())
-		return
-	}
-
-	var low, mid, hi int64
-	shMid := &sha.Sha{}
-
-	var rowCount int64
-
-	if rowCount, err = e.GetRowCount(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	hi = rowCount - 1
-	loops := 0
-
-	for low <= hi {
-		loops++
-		mid = (hi + low) / 2
-
-		// var loc int64
-
-		if _, err = e.f.Seek(mid*RowSize, io.SeekStart); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if _, err = shMid.ReadFrom(e.f); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		cmp := bytes.Compare(shMet.GetShaBytes(), shMid.GetShaBytes())
-		// log.Debug().Printf("%s", shMid)
-		// log.Debug().Printf(
-		// 	"Lo: %d, Mid: %d, Hi: %d, Loc: %d, Max: %d, cmp: %d",
-		// 	low,
-		// 	mid,
-		// 	hi,
-		// 	loc,
-		// 	rowCount,
-		// 	cmp,
-		// )
-
-		switch cmp {
-		case -1:
-			if low == hi-1 {
-				low = hi
-			} else {
-				hi = mid - 1
-			}
-
-		case 0:
-			// found
-			if _, err = e.f.Seek(mid*RowSize, io.SeekStart); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-
-		case 1:
-			low = mid + 1
-
-		default:
-			panic("not possible")
-		}
-	}
-
-	err = collections.ErrNotFound(fmt.Sprintf("%d: %s", loops, shMet.String()))
 
 	return
 }
@@ -468,6 +361,8 @@ func (e *ennui) PrintAll() (err error) {
 			err = errors.WrapExceptAsNil(err, io.EOF)
 			return
 		}
+
+		log.Out().Printf("%s", &current)
 	}
 }
 
@@ -536,7 +431,7 @@ func (e *ennui) Flush() (err error) {
 
 	if err = os.Rename(
 		ft.Name(),
-		path.Join(e.dir, "Ennui"),
+		e.path,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

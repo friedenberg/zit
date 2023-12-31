@@ -139,9 +139,8 @@ func (c CreateFromPaths) Run(
 			}
 
 			if c.ProtoZettel.Apply(&cz.Internal) {
-				if zt, err = c.StoreObjekten().CreateOrUpdate(
+				if zt, err = c.StoreObjekten().CreateOrUpdateTransacted(
 					&cz.Internal,
-					&cz.Internal.Kennung,
 				); err != nil {
 					// TODO-P2 add file for error handling
 					c.handleStoreError(cz, "", err)

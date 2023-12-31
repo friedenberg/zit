@@ -28,7 +28,7 @@ func Make(s schnittstellen.ShaLike) *Sha {
 }
 
 func Must(v string) (s *Sha) {
-	s = &Sha{}
+	s = shaPool.Get()
 
 	errors.PanicIfError(s.Set(v))
 
@@ -36,7 +36,7 @@ func Must(v string) (s *Sha) {
 }
 
 func MakeSha(v string) (s *Sha, err error) {
-	s = &Sha{}
+	s = shaPool.Get()
 
 	if err = s.Set(v); err != nil {
 		err = errors.Wrap(err)
@@ -76,7 +76,9 @@ func FromFormatString(f string, vs ...interface{}) *Sha {
 }
 
 func FromString(s string) *Sha {
-	hash := sha256.New()
+	hash := hash256Pool.Get()
+	defer hash256Pool.Put(hash)
+
 	sr := strings.NewReader(s)
 
 	if _, err := io.Copy(hash, sr); err != nil {
@@ -91,7 +93,7 @@ func FromStringer(v schnittstellen.Stringer) *Sha {
 }
 
 func FromHash(h hash.Hash) (s *Sha) {
-	s = &Sha{}
+	s = shaPool.Get()
 	s.Reset()
 
 	h.Sum(s.data[:0])

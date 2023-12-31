@@ -183,7 +183,7 @@ func (c Revert) muttersFromLast(
 				return
 			}
 
-			if sk, err = u.StoreUtil().GetVerzeichnisse().ReadOne(sh); err != nil {
+			if sk, err = u.StoreUtil().GetVerzeichnisse().ReadOneShas(sh); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

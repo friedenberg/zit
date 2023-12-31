@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/ohio"
 	"github.com/friedenberg/zit/src/delta/schlussel"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/golf/ennui"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
@@ -44,33 +45,45 @@ type Binary struct {
 //  |_| \_\___|\__,_|\__,_|
 //
 
-func (bf *Binary) ReadFormatExactly(r io.Reader, sk *sku.Transacted) (n int64, err error) {
+func (bf *Binary) ReadFormatExactly(
+	r io.ReaderAt,
+	loc ennui.Loc,
+	sk *sku.Transacted,
+) (n int64, err error) {
 	bf.BinaryField.Reset()
 	bf.Buffer.Reset()
 
 	var n1 int
 	var n2 int64
 
-	n1, err = ohio.ReadAllOrDieTrying(r, bf.ContentLength[:])
+	b := make([]byte, loc.ContentLength)
+
+	n1, err = r.ReadAt(b, loc.Offset)
 	n += int64(n1)
-
-	if err != nil {
-		err = errors.WrapExcept(err, io.EOF)
-		return
-	}
-
-	var contentLength64 int64
-	_, contentLength64, err = bf.GetContentLength()
 
 	if err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	bf.R = r
-	bf.N = contentLength64
+	buf := bytes.NewBuffer(b)
 
-	n2, _, err = bf.readSigil(sk)
+	n1, err = ohio.ReadAllOrDieTrying(buf, bf.ContentLength[:])
+	n += int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	_, _, err = bf.GetContentLength()
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n2, _, err = bf.readSigil(sk, buf)
 	n += n2
 
 	if err != nil {
@@ -78,8 +91,8 @@ func (bf *Binary) ReadFormatExactly(r io.Reader, sk *sku.Transacted) (n int64, e
 		return
 	}
 
-	for bf.N > 0 {
-		n2, err = bf.BinaryField.ReadFrom(&bf.LimitedReader)
+	for buf.Len() > 0 {
+		n2, err = bf.BinaryField.ReadFrom(buf)
 		n += n2
 
 		if err != nil {
@@ -96,7 +109,10 @@ func (bf *Binary) ReadFormatExactly(r io.Reader, sk *sku.Transacted) (n int64, e
 	return
 }
 
-func (bf *Binary) ReadFormatAndMatchSigil(r io.Reader, sk *sku.Transacted) (n int64, err error) {
+func (bf *Binary) ReadFormatAndMatchSigil(
+	r io.Reader,
+	sk *sku.Transacted,
+) (n int64, err error) {
 	bf.BinaryField.Reset()
 	bf.Buffer.Reset()
 
@@ -124,7 +140,7 @@ func (bf *Binary) ReadFormatAndMatchSigil(r io.Reader, sk *sku.Transacted) (n in
 		bf.R = r
 		bf.N = contentLength64
 
-		n2, sigil, err = bf.readSigil(sk)
+		n2, sigil, err = bf.readSigil(sk, &bf.LimitedReader)
 		n += n2
 
 		if err != nil {
@@ -165,8 +181,9 @@ var errExpectedSigil = errors.New("expected sigil")
 
 func (bf *Binary) readSigil(
 	sk *sku.Transacted,
+	r io.Reader,
 ) (n int64, sigil kennung.Sigil, err error) {
-	n, err = bf.BinaryField.ReadFrom(&bf.LimitedReader)
+	n, err = bf.BinaryField.ReadFrom(r)
 
 	if err != nil {
 		err = errors.Wrap(err)

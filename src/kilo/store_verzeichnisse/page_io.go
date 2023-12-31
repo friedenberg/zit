@@ -9,13 +9,14 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/golf/ennui"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/sku_fmt"
 )
 
 type ShaTuple struct {
-	Sha, Mutter *sha.Sha
-	Offset      int64
+	Sha, Mutter           *sha.Sha
+	Offset, ContentLength int64
 	kennung.Sigil
 }
 
@@ -64,14 +65,17 @@ func (pw *pageWriter) writeOne(
 
 	pw.etikettIndex.Add(z.Metadatei.GetEtiketten())
 
-	if pw.ennui == nil {
+	if pw.ennuiShas == nil {
 		return
 	}
 
-	if err = pw.ennui.AddMetadatei(
+	if err = pw.ennuiShas.AddMetadatei(
 		z.GetMetadatei(),
-		pw.Index,
-		pw.offsetLast,
+		ennui.Loc{
+			Page:          pw.Index,
+			Offset:        pw.offsetLast,
+			ContentLength: n,
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -95,6 +99,7 @@ func (pw *pageWriter) SaveSha(z *sku.Transacted) (err error) {
 	old.Mutter = old.Sha
 	old.Sha = &sh
 	old.Offset = pw.offsetLast
+	old.ContentLength = pw.offset - pw.offsetLast
 	old.Sigil = kennung.SigilHistory
 
 	if z.Metadatei.Verzeichnisse.Archiviert.Bool() {
@@ -162,7 +167,7 @@ func (pw *pageWriter) flush() (err error) {
 
 	var n int
 
-	for _, st := range pw.kennungShaMap {
+	for ks, st := range pw.kennungShaMap {
 		st.Add(kennung.SigilSchwanzen)
 
 		// 2 uint8 + offset + 2 uint8 + Schlussel
@@ -175,6 +180,20 @@ func (pw *pageWriter) flush() (err error) {
 
 		if n != 1 {
 			panic(errors.Errorf("expected 1 byte but wrote %d", n))
+		}
+
+		shK := sha.FromString(ks)
+
+		if err = pw.ennuiKennung.AddSha(
+			shK,
+			ennui.Loc{
+				Page:          pw.Index,
+				Offset:        st.Offset,
+				ContentLength: st.ContentLength,
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
 		}
 	}
 

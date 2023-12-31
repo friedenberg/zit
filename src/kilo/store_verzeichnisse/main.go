@@ -1,8 +1,8 @@
 package store_verzeichnisse
 
 import (
-	"io"
 	"os"
+	"path"
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -57,8 +57,8 @@ type Store struct {
 	erworben *konfig.Compiled
 	path     string
 	schnittstellen.VerzeichnisseFactory
-	pages [PageCount]PageTuple
-	ennui ennui.Ennui
+	pages                   [PageCount]PageTuple
+	ennuiShas, ennuiKennung ennui.Ennui
 }
 
 func MakeStore(
@@ -74,7 +74,18 @@ func MakeStore(
 		VerzeichnisseFactory: s,
 	}
 
-	if i.ennui, err = ennui.Make(s, dir); err != nil {
+	if i.ennuiShas, err = ennui.MakePermitDuplicates(
+		s,
+		path.Join(dir, "EnnuiShas"),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if i.ennuiKennung, err = ennui.MakeNoDuplicates(
+		s,
+		path.Join(dir, "EnnuiKennung"),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -95,13 +106,24 @@ func (s *Store) applyKonfig(z *sku.Transacted) error {
 }
 
 func (i *Store) GetEnnui() ennui.Ennui {
-	return i.ennui
+	return i.ennuiShas
 }
 
-func (i *Store) ReadOne(sh *sha.Sha) (out *sku.Transacted, err error) {
+func (i *Store) ReadOneShas(sh *sha.Sha) (out *sku.Transacted, err error) {
 	var loc ennui.Loc
 
-	if loc, err = i.ennui.ReadOneSha(sh); err != nil {
+	if loc, err = i.ennuiShas.ReadOneSha(sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return i.readLoc(loc)
+}
+
+func (i *Store) ReadOneKennung(sh *sha.Sha) (out *sku.Transacted, err error) {
+	var loc ennui.Loc
+
+	if loc, err = i.ennuiKennung.ReadOneSha(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -112,7 +134,7 @@ func (i *Store) ReadOne(sh *sha.Sha) (out *sku.Transacted, err error) {
 func (i *Store) ReadOneKey(k string, sk *sku.Transacted) (out *sku.Transacted, err error) {
 	var loc ennui.Loc
 
-	if loc, err = i.ennui.ReadOneKey(k, sk.GetMetadatei()); err != nil {
+	if loc, err = i.ennuiShas.ReadOneKey(k, sk.GetMetadatei()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -136,36 +158,14 @@ func (i *Store) readLoc(loc ennui.Loc) (sk *sku.Transacted, err error) {
 
 	defer errors.DeferredCloser(&err, f)
 
-	var n int64
-
-	if n, err = f.Seek(int64(loc.Offset), io.SeekStart); err != nil {
-		err = errors.Wrapf(
-			err,
-			"Page: %d, Expected Offset: %d, Actual Offset: %d",
-			loc.Page,
-			n,
-			loc.Offset,
-		)
-
-		return
-	}
-
 	coder := sku_fmt.Binary{Sigil: kennung.SigilAll}
 
 	sk = sku.GetTransactedPool().Get()
 
-	if _, err = coder.ReadFormatExactly(f, sk); err != nil {
+	if _, err = coder.ReadFormatExactly(f, loc, sk); err != nil {
 		sku.GetTransactedPool().Put(sk)
 		sk = nil
-
-		err = errors.Wrapf(
-			err,
-			"Page: %d, Expected Offset: %d, Actual Offset: %d",
-			loc.Page,
-			n,
-			loc.Offset,
-		)
-
+		err = errors.Wrapf(err, "%s", loc)
 		return
 	}
 
@@ -190,11 +190,12 @@ func (i *Store) Flush() (err error) {
 	errors.Log().Print("flushing")
 	wg := iter.MakeErrorWaitGroupParallel()
 
-	wg.Do(i.ennui.Flush)
-
 	for n := range i.pages {
 		wg.Do(i.pages[n].Flush)
 	}
+
+	wg.DoAfter(i.ennuiShas.Flush)
+	wg.DoAfter(i.ennuiKennung.Flush)
 
 	return wg.GetError()
 }
