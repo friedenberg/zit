@@ -68,7 +68,7 @@ func (h *Heap[T, TPtr]) PopAndSave() (sk TPtr, ok bool) {
 	h.l.Lock()
 	defer h.l.Unlock()
 
-	h.h.discardDupes()
+	// h.h.discardDupes()
 
 	if h.h.Len() == 0 {
 		return
@@ -113,7 +113,7 @@ func (h *Heap[T, TPtr]) Pop() (sk TPtr, ok bool) {
 	h.l.Lock()
 	defer h.l.Unlock()
 
-	h.h.discardDupes()
+	// h.h.discardDupes()
 
 	if h.h.Len() == 0 {
 		return
@@ -228,17 +228,27 @@ func (a *Heap[T, TPtr]) MergeStream(
 				break LOOP
 
 			case a.h.equaler.Equals(peeked, e):
-        e = peeked
+				e = peeked
 				a.Pop()
 				continue LOOP
 
-			case !a.h.Lessor.Less(peeked, e):
+			case a.h.Lessor.Less(e, peeked):
 				break LOOP
 
 			default:
 			}
 
 			popped, _ := a.PopAndSave()
+
+			if !a.h.equaler.Equals(peeked, popped) {
+				err = errors.Errorf(
+					"popped not equal to peeked: %s != %s",
+					popped,
+					peeked,
+				)
+
+				return
+			}
 
 			if popped == nil {
 				break

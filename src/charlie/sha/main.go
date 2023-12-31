@@ -142,6 +142,26 @@ func (s *Sha) SetParts(a, b string) (err error) {
 	return
 }
 
+func (s *Sha) ReadAtFrom(r io.ReaderAt, start int64) (n int64, err error) {
+	s.allocDataIfNecessary()
+
+	var n1 int
+	n1, err = r.ReadAt(s.data[:], start)
+	n += int64(n1)
+
+	if n == 0 && err == io.EOF {
+		return
+	} else if n != ByteSize && n != 0 {
+		err = errors.Errorf("expected to read %d bytes but only read %d", ByteSize, n)
+		return
+	} else if errors.IsNotNilAndNotEOF(err) {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s *Sha) ReadFrom(r io.Reader) (n int64, err error) {
 	s.allocDataIfNecessary()
 

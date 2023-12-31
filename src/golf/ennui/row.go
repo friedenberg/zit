@@ -19,11 +19,15 @@ type row struct {
 	Loc
 }
 
+func (r *row) IsEmpty() bool {
+	return r.Loc.IsEmpty() && r.sha.IsNull()
+}
+
 func (r *row) String() string {
 	return fmt.Sprintf(
-		"%s -> %s",
+		"%s %s",
 		&r.Loc,
-		&r.sha,
+		r.sha.GetShaString()[:4],
 	)
 }
 

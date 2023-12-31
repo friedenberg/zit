@@ -3,20 +3,19 @@ package ennui
 import (
 	"bytes"
 	"fmt"
-	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/sha"
 )
 
-func (e *ennui) seekToFirstBinarySearch(shMet *sha.Sha) (err error) {
+func (e *ennui) seekToFirstBinarySearch(shMet *sha.Sha) (mid int64, err error) {
 	if e.f == nil {
 		err = collections.ErrNotFound("fd nil: " + shMet.String())
 		return
 	}
 
-	var low, mid, hi int64
+	var low, hi int64
 	shMid := &sha.Sha{}
 
 	var rowCount int64
@@ -35,12 +34,7 @@ func (e *ennui) seekToFirstBinarySearch(shMet *sha.Sha) (err error) {
 
 		// var loc int64
 
-		if _, err = e.f.Seek(mid*RowSize, io.SeekStart); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if _, err = shMid.ReadFrom(e.f); err != nil {
+		if _, err = shMid.ReadAtFrom(e.f, mid*RowSize); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -57,11 +51,6 @@ func (e *ennui) seekToFirstBinarySearch(shMet *sha.Sha) (err error) {
 
 		case 0:
 			// found
-			if _, err = e.f.Seek(mid*RowSize, io.SeekStart); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
 			return
 
 		case 1:
@@ -77,7 +66,7 @@ func (e *ennui) seekToFirstBinarySearch(shMet *sha.Sha) (err error) {
 	return
 }
 
-func (e *ennui) seekToFirstLinearSearch(shMet *sha.Sha) (err error) {
+func (e *ennui) seekToFirstLinearSearch(shMet *sha.Sha) (loc int64, err error) {
 	if e.f == nil {
 		err = collections.ErrNotFound("fd nil: " + shMet.String())
 		return
@@ -91,26 +80,25 @@ func (e *ennui) seekToFirstLinearSearch(shMet *sha.Sha) (err error) {
 		return
 	}
 
-	for loc := int64(0); loc <= rowCount; loc++ {
+	e.br.Reset(e.f)
+	buf := bytes.NewBuffer(make([]byte, RowSize))
+	buf.Reset()
+
+	for loc = int64(0); loc <= rowCount; loc++ {
 		// var loc int64
 
-		if _, err = e.f.Seek(loc*RowSize, io.SeekStart); err != nil {
+		if _, err = buf.ReadFrom(&e.br); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if _, err = shMid.ReadFrom(e.f); err != nil {
+		if _, err = shMid.ReadFrom(buf); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		if bytes.Equal(shMet.GetShaBytes(), shMid.GetShaBytes()) {
-
-			if _, err = e.f.Seek(loc*RowSize, io.SeekStart); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+			// found
 			return
 		}
 	}

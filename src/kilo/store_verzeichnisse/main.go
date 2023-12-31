@@ -105,8 +105,12 @@ func (s *Store) applyKonfig(z *sku.Transacted) error {
 	return s.erworben.ApplyToSku(z)
 }
 
-func (i *Store) GetEnnui() ennui.Ennui {
+func (i *Store) GetEnnuiShas() ennui.Ennui {
 	return i.ennuiShas
+}
+
+func (i *Store) GetEnnuiKennung() ennui.Ennui {
+	return i.ennuiKennung
 }
 
 func (i *Store) ReadOneShas(sh *sha.Sha) (out *sku.Transacted, err error) {

@@ -14,6 +14,10 @@ type Loc struct {
 	Offset, ContentLength int64
 }
 
+func (l Loc) IsEmpty() bool {
+	return l.Page == 0 && l.Offset == 0 && l.ContentLength == 0
+}
+
 func (l Loc) String() string {
 	return fmt.Sprintf("%d@%d", l.Page, l.Offset)
 }
@@ -86,12 +90,12 @@ func (l *Loc) WriteTo(w io.Writer) (n int64, err error) {
 	var intErr int
 	var page [1]byte
 
-  intErr = binary.PutVarint(page[:], int64(l.Page))
+	intErr = binary.PutVarint(page[:], int64(l.Page))
 
-  if intErr != 1 {
-    err = errors.Errorf("expected to write %d but wrote %d", 1, intErr)
-    return
-  }
+	if intErr != 1 {
+		err = errors.Errorf("expected to write %d but wrote %d", 1, intErr)
+		return
+	}
 
 	n1, err = ohio.WriteAllOrDieTrying(w, page[:])
 	n += int64(n1)
@@ -103,7 +107,7 @@ func (l *Loc) WriteTo(w io.Writer) (n int64, err error) {
 
 	var b int64Bytes
 
-  binary.PutVarint(b[:], l.Offset)
+	binary.PutVarint(b[:], l.Offset)
 
 	n1, err = ohio.WriteAllOrDieTrying(w, b[:])
 	n += int64(n1)
@@ -113,7 +117,7 @@ func (l *Loc) WriteTo(w io.Writer) (n int64, err error) {
 		return
 	}
 
-  binary.PutVarint(b[:], l.ContentLength)
+	binary.PutVarint(b[:], l.ContentLength)
 
 	n1, err = ohio.WriteAllOrDieTrying(w, b[:])
 	n += int64(n1)

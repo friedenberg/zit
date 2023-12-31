@@ -20,5 +20,5 @@ func init() {
 }
 
 func (c Test) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	return u.StoreUtil().GetVerzeichnisse().GetEnnui().PrintAll()
+	return u.StoreUtil().GetVerzeichnisse().GetEnnuiKennung().PrintAll()
 }

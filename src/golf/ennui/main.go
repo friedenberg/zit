@@ -42,19 +42,19 @@ type ennui struct {
 	br         bufio.Reader
 	added      *heap.Heap[row, *row]
 	standort   standort.Standort
-	searchFunc func(*sha.Sha) (err error)
+	searchFunc func(*sha.Sha) (mid int64, err error)
 	path       string
 }
 
 func MakePermitDuplicates(s standort.Standort, path string) (e *ennui, err error) {
-	return make(rowEqualerComplete{}, s, path)
+	return initialize(rowEqualerComplete{}, s, path)
 }
 
 func MakeNoDuplicates(s standort.Standort, path string) (e *ennui, err error) {
-	return make(rowEqualerShaOnly{}, s, path)
+	return initialize(rowEqualerShaOnly{}, s, path)
 }
 
-func make(
+func initialize(
 	equaler schnittstellen.Equaler1[*row],
 	s standort.Standort,
 	path string,
@@ -176,13 +176,20 @@ func (e *ennui) ReadOneSha(sh *Sha) (loc Loc, err error) {
 	e.Lock()
 	defer e.Unlock()
 
-	if err = e.searchFunc(sh); err != nil {
+	var start int64
+
+	if start, err = e.searchFunc(sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = e.seekAndResetTo(start); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if loc, err = e.readCurrentLoc(sh, e.f); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Start: %d", start)
 		return
 	}
 
@@ -236,12 +243,14 @@ func (e *ennui) ReadManyKeys(
 	e.Lock()
 	defer e.Unlock()
 
-	if err = e.searchFunc(sh); err != nil {
+	var start int64
+
+	if start, err = e.searchFunc(sh); err != nil {
 		err = errors.Wrapf(err, "Key: %s", kf)
 		return
 	}
 
-	if err = e.collectLocs(sh, h); err != nil {
+	if err = e.collectLocs(sh, h, start); err != nil {
 		err = errors.Wrapf(err, "Key: %s", kf)
 		return
 	}
@@ -263,13 +272,15 @@ func (e *ennui) ReadAll(m *metadatei.Metadatei, h *[]Loc) (err error) {
 	me := errors.MakeMulti()
 
 	for k, s := range shas {
-		if err = e.searchFunc(s); err != nil {
+		var loc int64
+
+		if loc, err = e.searchFunc(s); err != nil {
 			me.Add(errors.Wrapf(err, "Key: %s", k))
 			err = nil
 			continue
 		}
 
-		if err = e.collectLocs(s, h); err != nil {
+		if err = e.collectLocs(s, h, loc); err != nil {
 			me.Add(errors.Wrapf(err, "Key: %s", k))
 			err = nil
 			continue
@@ -316,11 +327,26 @@ func (e *ennui) readCurrentLoc(
 	return
 }
 
+func (e *ennui) seekAndResetTo(loc int64) (err error) {
+	if _, err = e.f.Seek(loc*RowSize, io.SeekStart); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	e.br.Reset(e.f)
+
+	return
+}
+
 func (e *ennui) collectLocs(
 	shMet *sha.Sha,
 	h *[]Loc,
+	start int64,
 ) (err error) {
-	e.br.Reset(e.f)
+	if err = e.seekAndResetTo(start); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	for {
 		var loc Loc
@@ -347,12 +373,10 @@ func (e *ennui) PrintAll() (err error) {
 		return
 	}
 
-	if _, err = e.f.Seek(0, io.SeekStart); err != nil {
+	if err = e.seekAndResetTo(0); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	e.br.Reset(e.f)
 
 	for {
 		var current row
@@ -375,7 +399,7 @@ func (e *ennui) Flush() (err error) {
 	}
 
 	if e.f != nil {
-		if _, err = e.f.Seek(0, io.SeekStart); err != nil {
+		if err = e.seekAndResetTo(0); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -395,8 +419,7 @@ func (e *ennui) Flush() (err error) {
 	defer errors.DeferredFlusher(&err, w)
 
 	var current row
-
-	e.br.Reset(e.f)
+	var lastRow row
 
 	getOne := func() (r *row, err error) {
 		if e.f == nil {
@@ -421,7 +444,24 @@ func (e *ennui) Flush() (err error) {
 			return
 		},
 		func(r *row) (err error) {
+			if (rowLessor{}).Less(r, &lastRow) && !lastRow.IsEmpty() {
+				err = errors.Errorf(
+					"last row greater than current row:\n%s\n%s",
+					&lastRow,
+					r,
+				)
+
+				return
+			}
+
+			if (rowEqualerComplete{}).Equals(&lastRow, r) {
+				return
+			}
+
 			_, err = r.WriteTo(w)
+
+			rowResetter{}.ResetWith(&lastRow, r)
+
 			return
 		},
 	); err != nil {
