@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
 type ErrLockRequired struct {
@@ -23,22 +24,13 @@ func (e ErrLockRequired) Error() string {
 }
 
 func IsNotFound(err error) (ok bool) {
-	ok = errors.Is(err, ErrNotFound{})
+	ok = errors.Is(err, ErrNotFound(""))
 	return
 }
 
-type ErrNotFound struct {
-	Id fmt.Stringer
-}
+type ErrNotFound = collections.ErrNotFound
 
-func (e ErrNotFound) Is(target error) bool {
-	_, ok := target.(ErrNotFound)
-	return ok
-}
-
-func (e ErrNotFound) Error() string {
-	return fmt.Sprintf("objekte with id '%s' not found", e.Id)
-}
+var ErrNotFoundEmpty = ErrNotFound("")
 
 type VerlorenAndGefundenError interface {
 	error

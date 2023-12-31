@@ -120,7 +120,12 @@ func (i *Store) ReadOneShas(sh *sha.Sha) (out *sku.Transacted, err error) {
 	return i.readLoc(loc)
 }
 
-func (i *Store) ReadOneKennung(sh *sha.Sha) (out *sku.Transacted, err error) {
+func (i *Store) ReadOneKennung(
+	h schnittstellen.Stringer,
+) (out *sku.Transacted, err error) {
+	sh := sha.FromString(h.String())
+	defer sha.GetPool().Put(sh)
+
 	var loc ennui.Loc
 
 	if loc, err = i.ennuiKennung.ReadOneSha(sh); err != nil {

@@ -4,10 +4,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
-	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -139,7 +137,7 @@ func (s *Store) ReadOne(
 			return
 		}
 
-		if sk, err = s.readHinweis(h); err != nil {
+		if sk, err = s.GetVerzeichnisse().ReadOneKennung(h); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -183,7 +181,7 @@ func (s *Store) ReadOne(
 		tt1 := &s.StoreUtil.GetKonfig().Sku
 
 		if tt1.GetTai().IsEmpty() {
-			err = errors.Wrap(objekte_store.ErrNotFound{Id: k1})
+			err = errors.Wrap(objekte_store.ErrNotFound(k1.String()))
 			return
 		}
 
@@ -200,7 +198,7 @@ func (s *Store) ReadOne(
 	}
 
 	if sk == nil {
-		err = errors.Wrap(objekte_store.ErrNotFound{Id: k1})
+		err = errors.Wrap(objekte_store.ErrNotFound(k1.String()))
 		return
 	}
 
@@ -208,25 +206,6 @@ func (s *Store) ReadOne(
 
 	if err = sk1.SetFromSkuLike(sk); err != nil {
 		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) readHinweis(
-	h kennung.Kennung,
-) (found *sku.Transacted, err error) {
-	sh := sha.FromString(h.String())
-	defer sha.GetPool().Put(sh)
-
-	if found, err = s.GetVerzeichnisse().ReadOneKennung(sh); err != nil {
-		if errors.Is(err, collections.ErrNotFound("")) {
-			err = objekte_store.ErrNotFound{Id: h}
-		} else {
-			err = errors.Wrap(err)
-		}
-
 		return
 	}
 

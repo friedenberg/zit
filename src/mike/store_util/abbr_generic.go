@@ -61,12 +61,12 @@ func (ih *indexHinweis) Exists(parts [3]string) (err error) {
 	}
 
 	if !ih.Kopfen.ContainsExpansion(parts[0]) {
-		err = objekte_store.ErrNotFound{}
+		err = objekte_store.ErrNotFoundEmpty
 		return
 	}
 
 	if !ih.Schwanzen.ContainsExpansion(parts[2]) {
-		err = objekte_store.ErrNotFound{}
+		err = objekte_store.ErrNotFoundEmpty
 		return
 	}
 
@@ -168,7 +168,7 @@ func (ih *indexNotHinweis[K, KPtr]) Exists(parts [3]string) (err error) {
 	}
 
 	if !ih.Kennungen.ContainsExpansion(parts[2]) {
-		err = objekte_store.ErrNotFound{}
+		err = objekte_store.ErrNotFoundEmpty
 		return
 	}
 
