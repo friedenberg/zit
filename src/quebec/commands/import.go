@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/charlie/age"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
@@ -106,13 +107,6 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	u.Lock()
 	defer u.Unlock()
 
-	if _, err = u.StoreObjekten().GetBestandsaufnahmeStore().Create(besty); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	f1 := u.StoreObjekten().ReindexOne
-
 	for {
 		sk, ok := besty.Skus.Pop()
 
@@ -120,13 +114,20 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			break
 		}
 
-		if err = c.importAkteIfNecessary(u, sk, ag); err != nil {
-			err = errors.Wrap(err)
-			return
+		if err = u.StoreObjekten().Import(
+			sk,
+		); err != nil {
+			if errors.Is(err, collections.ErrExists) {
+				err = nil
+				continue
+			} else {
+				err = errors.Wrapf(err, "Sku: %s", sk)
+				return
+			}
 		}
 
-		if err = f1(nil, sk); err != nil {
-			err = errors.Wrapf(err, "Sku: %s", sk)
+		if err = c.importAkteIfNecessary(u, sk, ag); err != nil {
+			err = errors.Wrap(err)
 			return
 		}
 	}

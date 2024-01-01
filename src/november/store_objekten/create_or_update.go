@@ -62,7 +62,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	var mutter *sku.Transacted
 
 	if mutter, err = s.ReadOne(kennungPtr); err != nil {
-    if objekte_store.IsNotFound(err) {
+		if objekte_store.IsNotFound(err) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -92,9 +92,10 @@ func (s *Store) CreateOrUpdateTransacted(
 	return s.CreateOrUpdate(in, in.GetKennung())
 }
 
-func (s *Store) CreateOrUpdate(
+func (s *Store) createOrUpdate(
 	mg metadatei.Getter,
 	kennungPtr kennung.Kennung,
+	mutter *sku.Transacted,
 ) (transactedPtr *sku.Transacted, err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
@@ -105,17 +106,6 @@ func (s *Store) CreateOrUpdate(
 		}
 
 		return
-	}
-
-	var mutter *sku.Transacted
-
-	if mutter, err = s.ReadOne(kennungPtr); err != nil {
-		if objekte_store.IsNotFound(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
 	}
 
 	var m *metadatei.Metadatei
@@ -152,12 +142,6 @@ func (s *Store) CreateOrUpdate(
 		// transactedPtr.Sku.Kopf = s.common.GetTransaktion().Time
 	}
 
-	err = sku.CalculateAndSetSha(
-		transactedPtr,
-		s.GetPersistentMetadateiFormat(),
-		s.GetObjekteFormatOptions(),
-	)
-
 	if err != nil {
 		err = errors.Wrap(err)
 		return
@@ -184,12 +168,41 @@ func (s *Store) CreateOrUpdate(
 		return
 	}
 
-	if err = s.addMatchableAndHandleNewOrUpdated(transactedPtr, mutter); err != nil {
+	if err = s.handleNewOrUpdateWithMutter(transactedPtr, mutter); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	return
+}
+
+func (s *Store) CreateOrUpdate(
+	mg metadatei.Getter,
+	kennungPtr kennung.Kennung,
+) (transactedPtr *sku.Transacted, err error) {
+	if !s.GetStandort().GetLockSmith().IsAcquired() {
+		err = objekte_store.ErrLockRequired{
+			Operation: fmt.Sprintf(
+				"create or update %s",
+				kennungPtr.GetGattung(),
+			),
+		}
+
+		return
+	}
+
+	var mutter *sku.Transacted
+
+	if mutter, err = s.ReadOne(kennungPtr); err != nil {
+		if objekte_store.IsNotFound(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return s.createOrUpdate(mg, kennungPtr, mutter)
 }
 
 func (s *Store) readExternalAndMergeIfNecessary(
@@ -279,8 +292,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 	return
 }
 
-func (s *Store) CreateOrUpdateAkte(
-	mg metadatei.Getter,
+func (s *Store) CreateOrUpdateAkteSha(
 	kennungPtr kennung.Kennung,
 	sh schnittstellen.ShaLike,
 ) (transactedPtr *sku.Transacted, err error) {
@@ -306,79 +318,23 @@ func (s *Store) CreateOrUpdateAkte(
 		}
 	}
 
-	var m *metadatei.Metadatei
-
-	if mg != nil {
-		m = mg.GetMetadatei()
-	} else {
-		m = metadatei.GetPool().Get()
-		defer metadatei.GetPool().Put(m)
-	}
-
-	m.Tai = s.GetTai()
-
 	transactedPtr = sku.GetTransactedPool().Get()
-	metadatei.Resetter.ResetWith(&transactedPtr.Metadatei, m)
 
-	if err = transactedPtr.Kennung.SetWithKennung(kennungPtr); err != nil {
-		err = errors.Wrap(err)
-		return
+	if mutter == nil {
+		if err = transactedPtr.Kennung.SetWithKennung(kennungPtr); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		sku.TransactedResetter.ResetWith(transactedPtr, mutter)
 	}
 
 	transactedPtr.SetAkteSha(sh)
 
-	if mutter != nil {
-		transactedPtr.Kopf = mutter.GetKopf()
-
-		mu := &mutter.Metadatei.Sha
-
-		if err = transactedPtr.Metadatei.Mutter.SetShaLike(
-			mu,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		errors.TodoP4("determine if this is necessary any more")
-		// transactedPtr.Sku.Kopf = s.common.GetTransaktion().Time
-	}
-
-	err = sku.CalculateAndSetSha(
-		transactedPtr,
-		s.GetPersistentMetadateiFormat(),
-		s.GetObjekteFormatOptions(),
-	)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if mutter != nil &&
-		kennung.Equals(transactedPtr.GetKennung(), mutter.GetKennung()) &&
-		transactedPtr.Metadatei.EqualsSansTai(&mutter.Metadatei) {
-		if err = transactedPtr.SetFromSkuLike(mutter); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = s.handleUnchanged(transactedPtr); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-
-	if err = s.addMatchableAndHandleNewOrUpdated(transactedPtr, mutter); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
+	return s.createOrUpdate(transactedPtr, kennungPtr, mutter)
 }
 
-func (s *Store) addMatchableAndHandleNewOrUpdated(
+func (s *Store) handleNewOrUpdateWithMutter(
 	sk, mutter *sku.Transacted,
 ) (err error) {
 	if err = iter.Chain(

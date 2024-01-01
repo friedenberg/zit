@@ -47,6 +47,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"kennung-akte-sha",
 		"bezeichnung",
 		"akte",
+		"tai",
 		"akte-sku-prefix",
 		"metadatei",
 		"metadatei-plus-mutter",
@@ -307,6 +308,12 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			return
 		}
 
+	case "tai":
+		return func(o *sku.Transacted) (err error) {
+			fmt.Fprintln(out, o.GetTai())
+			return
+		}
+
 	case "akte":
 		return func(o *sku.Transacted) (err error) {
 			var r sha.ReadCloser
@@ -400,7 +407,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			}
 
 			if z, err = rob(&z.GetMetadatei().Mutter); err != nil {
-        fmt.Fprintln(out, err)
+				fmt.Fprintln(out, err)
 				err = nil
 				return
 			}

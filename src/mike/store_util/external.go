@@ -118,13 +118,6 @@ func (s *common) ReadOneExternalObjekteReader(
 		return
 	}
 
-	if err = s.CalculateAndSetShaSkuLike(
-		e,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	return
 }
 

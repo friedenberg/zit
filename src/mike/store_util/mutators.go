@@ -10,8 +10,6 @@ type mutators interface {
 	AddVerzeichnisse(*sku.Transacted) error
 	CommitTransacted(*sku.Transacted) error
 	CommitUpdatedTransacted(*sku.Transacted) error
-	CalculateAndSetShaTransacted(sk *sku.Transacted) (err error)
-	CalculateAndSetShaSkuLike(sk sku.SkuLike) (err error)
 }
 
 func (s *common) AddVerzeichnisse(t *sku.Transacted) (err error) {
@@ -29,8 +27,12 @@ func (s *common) AddVerzeichnisse(t *sku.Transacted) (err error) {
 func (s *common) CommitUpdatedTransacted(
 	t *sku.Transacted,
 ) (err error) {
+  // log.Debug().Printf("%s", t.StringKennungTai())
 	ta := kennung.NowTai()
-	t.SetTai(ta)
+
+	if t.GetTai().IsZero() {
+		t.SetTai(ta)
+	}
 
 	return s.CommitTransacted(t)
 }
@@ -55,23 +57,6 @@ func (s *common) CommitTransacted(t *sku.Transacted) (err error) {
 		err = errors.Wrap(err)
 		return
 	}
-
-	return
-}
-
-func (s *common) CalculateAndSetShaTransacted(sk *sku.Transacted) (err error) {
-	return s.CalculateAndSetShaSkuLike(sk)
-}
-
-func (s *common) CalculateAndSetShaSkuLike(sk sku.SkuLike) (err error) {
-	// if err = sku.CalculateAndSetSha(
-	// 	sk,
-	// 	s.persistentMetadateiFormat,
-	// 	s.options,
-	// ); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
 
 	return
 }

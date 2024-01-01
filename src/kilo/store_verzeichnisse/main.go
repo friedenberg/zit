@@ -10,15 +10,18 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/pool"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/ennui"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/sku_fmt"
 	"github.com/friedenberg/zit/src/juliett/konfig"
+	"github.com/friedenberg/zit/src/kilo/objekte_store"
 )
 
 type State int
@@ -113,6 +116,19 @@ func (i *Store) GetEnnuiKennung() ennui.Ennui {
 	return i.ennuiKennung
 }
 
+func (i *Store) ExistsOneSha(sh *sha.Sha) (err error) {
+	if _, err = i.ennuiShas.ReadOneSha(sh); err != nil {
+		err = errors.Wrap(err)
+		// log.Debug().Printf("not found: %s", sh)
+		return
+	}
+
+	// log.Debug().Printf("exists: %s", sh)
+	err = collections.ErrExists
+
+	return
+}
+
 func (i *Store) ReadOneShas(sh *sha.Sha) (out *sku.Transacted, err error) {
 	var loc ennui.Loc
 
@@ -140,15 +156,55 @@ func (i *Store) ReadOneKennung(
 	return i.readLoc(loc)
 }
 
-func (i *Store) ReadOneKey(k string, sk *sku.Transacted) (out *sku.Transacted, err error) {
-	var loc ennui.Loc
+func (i *Store) ReadOneAll(
+	mg metadatei.Getter,
+	kennungPtr kennung.Kennung,
+) (out []ennui.Loc, err error) {
+	var locKennung ennui.Loc
 
-	if loc, err = i.ennuiShas.ReadOneKey(k, sk.GetMetadatei()); err != nil {
+	wg := iter.MakeErrorWaitGroupParallel()
+
+	wg.Do(func() (err error) {
+		sh := sha.FromString(kennungPtr.String())
+		defer sha.GetPool().Put(sh)
+
+		if locKennung, err = i.ennuiKennung.ReadOneSha(sh); err != nil {
+			if errors.Is(err, objekte_store.ErrNotFoundEmpty) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
+			return
+		}
+
+		return
+	})
+
+	wg.Do(func() (err error) {
+		if err = i.ennuiShas.ReadAll(mg.GetMetadatei(), &out); err != nil {
+			if errors.Is(err, objekte_store.ErrNotFoundEmpty) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
+			return
+		}
+
+		return
+	})
+
+	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	return i.readLoc(loc)
+	if !locKennung.IsEmpty() {
+		out = append(out, locKennung)
+	}
+
+	return
 }
 
 func (i *Store) readLoc(loc ennui.Loc) (sk *sku.Transacted, err error) {

@@ -9,6 +9,7 @@ import (
 
 var (
 	ErrNilPointer        = errors.New("nil pointer")
+	ErrExists            = errors.New("exists")
 	MakeErrStopIteration = iter.MakeErrStopIteration
 )
 

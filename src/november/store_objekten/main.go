@@ -61,8 +61,7 @@ func (s *Store) GetKonfigAkteFormat() objekte.AkteFormat[erworben.Akte, *erworbe
 func (s *Store) UpdateKonfig(
 	sh schnittstellen.ShaLike,
 ) (kt *sku.Transacted, err error) {
-	return s.CreateOrUpdateAkte(
-		nil,
+	return s.CreateOrUpdateAkteSha(
 		&kennung.Konfig{},
 		sh,
 	)

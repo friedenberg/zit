@@ -166,8 +166,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 			return
 		}
 
-		if _, err = u.StoreObjekten().CreateOrUpdateAkte(
-			nil,
+		if _, err = u.StoreObjekten().CreateOrUpdateAkteSha(
 			&k,
 			sh,
 		); err != nil {
@@ -184,8 +183,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 			return
 		}
 
-		if _, err = u.StoreObjekten().CreateOrUpdateAkte(
-			nil,
+		if _, err = u.StoreObjekten().CreateOrUpdateAkteSha(
 			&kennung.Konfig{},
 			sh,
 		); err != nil {
