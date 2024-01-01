@@ -29,7 +29,7 @@ type Etikett struct {
 type IndexedEtikett = IndexedLike
 
 func MustEtikettPtr(v string) (e *Etikett) {
-  e = &Etikett{}
+	e = &Etikett{}
 
 	var err error
 

@@ -28,12 +28,12 @@ func (wg *errorWaitGroupSerial) GetError() (err error) {
 
 	wg.isDone = true
 
-  me := errors.MakeMulti()
+	me := errors.MakeMulti()
 
 	for _, f := range wg.do {
 		if err = f(); err != nil {
 			me.Add(errors.Wrap(err))
-      break
+			break
 		}
 	}
 
@@ -43,7 +43,7 @@ func (wg *errorWaitGroupSerial) GetError() (err error) {
 		}
 	}
 
-  err = me.GetError()
+	err = me.GetError()
 
 	return
 }

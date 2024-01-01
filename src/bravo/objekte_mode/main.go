@@ -1,4 +1,4 @@
-package objekte_update_type
+package objekte_mode
 
 type Type int
 

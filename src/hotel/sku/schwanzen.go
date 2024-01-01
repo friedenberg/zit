@@ -23,7 +23,7 @@ func MakeSchwanzen(
 ) (s *Schwanzen) {
 	s = &Schwanzen{}
 	s.Initialize(ei, funcFlush)
-  return
+	return
 }
 
 func (s *Schwanzen) Initialize(

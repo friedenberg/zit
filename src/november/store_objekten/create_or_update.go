@@ -8,7 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/objekte_update_type"
+	"github.com/friedenberg/zit/src/bravo/objekte_mode"
 	"github.com/friedenberg/zit/src/charlie/checkout_options"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
@@ -81,7 +81,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 
 	if err = s.handleUpdated(
 		transactedPtr,
-		objekte_update_type.ModeCommit,
+		objekte_mode.ModeCommit,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -100,7 +100,7 @@ func (s *Store) createOrUpdate(
 	mg metadatei.Getter,
 	kennungPtr kennung.Kennung,
 	mutter *sku.Transacted,
-	updateType objekte_update_type.Type,
+	updateType objekte_mode.Type,
 ) (transactedPtr *sku.Transacted, err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
@@ -172,10 +172,10 @@ func (s *Store) createOrUpdate(
 	}
 
 	if err = s.handleNewOrUpdateWithMutter(
-    transactedPtr,
-    mutter,
-    updateType,
-  ); err != nil {
+		transactedPtr,
+		mutter,
+		updateType,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -210,11 +210,11 @@ func (s *Store) CreateOrUpdate(
 	}
 
 	return s.createOrUpdate(
-    mg,
-    kennungPtr,
-    mutter,
-    objekte_update_type.ModeCommit,
-  )
+		mg,
+		kennungPtr,
+		mutter,
+		objekte_mode.ModeCommit,
+	)
 }
 
 func (s *Store) readExternalAndMergeIfNecessary(
@@ -344,16 +344,16 @@ func (s *Store) CreateOrUpdateAkteSha(
 	transactedPtr.SetAkteSha(sh)
 
 	return s.createOrUpdate(
-    transactedPtr,
-    kennungPtr,
-    mutter,
-    objekte_update_type.ModeCommit,
-  )
+		transactedPtr,
+		kennungPtr,
+		mutter,
+		objekte_mode.ModeCommit,
+	)
 }
 
 func (s *Store) handleNewOrUpdateWithMutter(
 	sk, mutter *sku.Transacted,
-	updateType objekte_update_type.Type,
+	updateType objekte_mode.Type,
 ) (err error) {
 	if err = iter.Chain(
 		sk,

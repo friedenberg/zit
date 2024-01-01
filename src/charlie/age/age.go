@@ -88,17 +88,17 @@ func MakeFromIdentityString(contents string) (a *Age, err error) {
 // }
 
 func (a *Age) Recipients() []Recipient {
-  if a == nil {
-    return nil
-  }
+	if a == nil {
+		return nil
+	}
 
 	return a.recipients
 }
 
 func (a *Age) Identities() []Identity {
-  if a == nil {
-    return nil
-  }
+	if a == nil {
+		return nil
+	}
 
 	return a.identities
 }

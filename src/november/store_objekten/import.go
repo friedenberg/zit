@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/objekte_update_type"
+	"github.com/friedenberg/zit/src/bravo/objekte_mode"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
 )
@@ -33,7 +33,7 @@ func (s *Store) Import(
 			sk,
 			sk.GetKennung(),
 			nil,
-			objekte_update_type.ModeAddToBestandsaufnahme,
+			objekte_mode.ModeAddToBestandsaufnahme,
 		)
 
 		return
@@ -72,7 +72,7 @@ func (s *Store) Import(
 		sk,
 		sk.GetKennung(),
 		schwanz,
-		objekte_update_type.ModeAddToBestandsaufnahme,
+		objekte_mode.ModeAddToBestandsaufnahme,
 	)
 
 	return

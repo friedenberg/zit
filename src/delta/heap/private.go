@@ -49,7 +49,7 @@ func (h *heapPrivate[T, TPtr]) Push(x any) {
 }
 
 func (h *heapPrivate[T, TPtr]) discardDupes() {
-  panic("don't use this yet")
+	panic("don't use this yet")
 
 	for h.lastPopped != nil &&
 		h.Len() > 0 &&

@@ -7,20 +7,7 @@ import (
 )
 
 type mutators interface {
-	AddVerzeichnisse(*sku.Transacted) error
 	CommitTransacted(*sku.Transacted) error
-}
-
-func (s *common) AddVerzeichnisse(t *sku.Transacted) (err error) {
-	if err = s.verzeichnisse.Add(
-		t,
-		t.GetKennung().String(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }
 
 func (s *common) CommitTransacted(t *sku.Transacted) (err error) {

@@ -2,7 +2,7 @@ package store_objekten
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/objekte_update_type"
+	"github.com/friedenberg/zit/src/bravo/objekte_mode"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -67,9 +67,9 @@ func (s *Store) Create(
 	}
 
 	if err = s.handleNew(
-    tz,
-    objekte_update_type.ModeCommit,
-  ); err != nil {
+		tz,
+		objekte_mode.ModeCommit,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

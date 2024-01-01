@@ -92,8 +92,8 @@ func (t Tai) String() (v string) {
 }
 
 func (t Tai) StringDefaultFormat() string {
-  f := string_format_writer.StringFormatDateTime + ".000000000"
-  return t.Format(f)
+	f := string_format_writer.StringFormatDateTime + ".000000000"
+	return t.Format(f)
 }
 
 func (t Tai) Format(v string) string {

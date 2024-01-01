@@ -4,7 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/objekte_update_type"
+	"github.com/friedenberg/zit/src/bravo/objekte_mode"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/delta/gattungen"
@@ -15,7 +15,7 @@ import (
 
 func (s *Store) handleNewOrUpdated(
 	t *sku.Transacted,
-	updateType objekte_update_type.Type,
+	updateType objekte_mode.Type,
 ) (err error) {
 	return iter.Chain(
 		t,
@@ -29,7 +29,7 @@ func (s *Store) handleNewOrUpdated(
 // true is new or updated, false is reindexed
 func (s *Store) handleNewOrUpdatedCommit(
 	t *sku.Transacted,
-	updateType objekte_update_type.Type,
+	updateType objekte_mode.Type,
 ) (err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
@@ -39,8 +39,8 @@ func (s *Store) handleNewOrUpdatedCommit(
 		return
 	}
 
-	if updateType.Contains(objekte_update_type.ModeAddToBestandsaufnahme) {
-		if updateType.Contains(objekte_update_type.ModeUpdateTai) {
+	if updateType.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
+		if updateType.Contains(objekte_mode.ModeUpdateTai) {
 			t.SetTai(kennung.NowTai())
 		}
 
@@ -92,8 +92,9 @@ func (s *Store) handleNewOrUpdatedCommit(
 		return
 	}
 
-	if err = s.AddVerzeichnisse(
+	if err = s.GetVerzeichnisse().Add(
 		t,
+		t.GetKennung().String(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -104,7 +105,7 @@ func (s *Store) handleNewOrUpdatedCommit(
 
 func (s *Store) handleNew(
 	t *sku.Transacted,
-	updateType objekte_update_type.Type,
+	updateType objekte_mode.Type,
 ) (err error) {
 	if err = s.handleNewOrUpdated(t, updateType); err != nil {
 		err = errors.Wrap(err)
@@ -116,7 +117,7 @@ func (s *Store) handleNew(
 
 func (s *Store) handleUpdated(
 	t *sku.Transacted,
-	updateType objekte_update_type.Type,
+	updateType objekte_mode.Type,
 ) (err error) {
 	if err = s.handleNewOrUpdated(t, updateType); err != nil {
 		err = errors.Wrap(err)
