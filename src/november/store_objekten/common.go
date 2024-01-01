@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/bravo/objekte_update_type"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/delta/gattungen"
@@ -14,12 +15,13 @@ import (
 
 func (s *Store) handleNewOrUpdated(
 	t *sku.Transacted,
+	updateType objekte_update_type.Type,
 ) (err error) {
 	return iter.Chain(
 		t,
 		s.AddMatchable,
 		func(t *sku.Transacted) error {
-			return s.handleNewOrUpdatedCommit(t, true)
+			return s.handleNewOrUpdatedCommit(t, updateType)
 		},
 	)
 }
@@ -27,7 +29,7 @@ func (s *Store) handleNewOrUpdated(
 // true is new or updated, false is reindexed
 func (s *Store) handleNewOrUpdatedCommit(
 	t *sku.Transacted,
-	commit bool,
+	updateType objekte_update_type.Type,
 ) (err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
@@ -37,8 +39,12 @@ func (s *Store) handleNewOrUpdatedCommit(
 		return
 	}
 
-	if commit {
-		s.CommitUpdatedTransacted(t)
+	if updateType.Contains(objekte_update_type.ModeAddToBestandsaufnahme) {
+		if updateType.Contains(objekte_update_type.ModeUpdateTai) {
+			t.SetTai(kennung.NowTai())
+		}
+
+		s.CommitTransacted(t)
 	}
 
 	g := gattung.Must(t.Kennung.GetGattung())
@@ -60,6 +66,7 @@ func (s *Store) handleNewOrUpdatedCommit(
 		}
 
 	case gattung.Zettel:
+
 		if err = s.GetKonfig().ApplyToSku(t); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -97,8 +104,9 @@ func (s *Store) handleNewOrUpdatedCommit(
 
 func (s *Store) handleNew(
 	t *sku.Transacted,
+	updateType objekte_update_type.Type,
 ) (err error) {
-	if err = s.handleNewOrUpdated(t); err != nil {
+	if err = s.handleNewOrUpdated(t, updateType); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -108,8 +116,9 @@ func (s *Store) handleNew(
 
 func (s *Store) handleUpdated(
 	t *sku.Transacted,
+	updateType objekte_update_type.Type,
 ) (err error) {
-	if err = s.handleNewOrUpdated(t); err != nil {
+	if err = s.handleNewOrUpdated(t, updateType); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

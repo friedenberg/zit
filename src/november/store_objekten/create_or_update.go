@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/bravo/objekte_update_type"
 	"github.com/friedenberg/zit/src/charlie/checkout_options"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
@@ -78,7 +79,10 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		}
 	}
 
-	if err = s.handleUpdated(transactedPtr); err != nil {
+	if err = s.handleUpdated(
+		transactedPtr,
+		objekte_update_type.ModeCommit,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -96,6 +100,7 @@ func (s *Store) createOrUpdate(
 	mg metadatei.Getter,
 	kennungPtr kennung.Kennung,
 	mutter *sku.Transacted,
+	updateType objekte_update_type.Type,
 ) (transactedPtr *sku.Transacted, err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
@@ -116,8 +121,6 @@ func (s *Store) createOrUpdate(
 		m = metadatei.GetPool().Get()
 		defer metadatei.GetPool().Put(m)
 	}
-
-	m.Tai = s.GetTai()
 
 	transactedPtr = sku.GetTransactedPool().Get()
 	metadatei.Resetter.ResetWith(&transactedPtr.Metadatei, m)
@@ -168,7 +171,11 @@ func (s *Store) createOrUpdate(
 		return
 	}
 
-	if err = s.handleNewOrUpdateWithMutter(transactedPtr, mutter); err != nil {
+	if err = s.handleNewOrUpdateWithMutter(
+    transactedPtr,
+    mutter,
+    updateType,
+  ); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -202,7 +209,12 @@ func (s *Store) CreateOrUpdate(
 		}
 	}
 
-	return s.createOrUpdate(mg, kennungPtr, mutter)
+	return s.createOrUpdate(
+    mg,
+    kennungPtr,
+    mutter,
+    objekte_update_type.ModeCommit,
+  )
 }
 
 func (s *Store) readExternalAndMergeIfNecessary(
@@ -331,19 +343,25 @@ func (s *Store) CreateOrUpdateAkteSha(
 
 	transactedPtr.SetAkteSha(sh)
 
-	return s.createOrUpdate(transactedPtr, kennungPtr, mutter)
+	return s.createOrUpdate(
+    transactedPtr,
+    kennungPtr,
+    mutter,
+    objekte_update_type.ModeCommit,
+  )
 }
 
 func (s *Store) handleNewOrUpdateWithMutter(
 	sk, mutter *sku.Transacted,
+	updateType objekte_update_type.Type,
 ) (err error) {
 	if err = iter.Chain(
 		sk,
 		func(t1 *sku.Transacted) error {
 			if mutter == nil {
-				return s.handleNew(t1)
+				return s.handleNew(t1, updateType)
 			} else {
-				return s.handleUpdated(t1)
+				return s.handleUpdated(t1, updateType)
 			}
 		},
 	); err != nil {

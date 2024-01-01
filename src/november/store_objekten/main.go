@@ -5,6 +5,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/expansion"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/bravo/objekte_update_type"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -262,7 +263,7 @@ func (s *Store) createEtikettOrTyp(k *kennung.Kennung2) (err error) {
 		return
 	}
 
-	if err = s.handleNew(t); err != nil {
+	if err = s.handleNew(t, objekte_update_type.ModeCommit); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -409,7 +410,10 @@ func (s *Store) ReindexOne(besty, sk *sku.Transacted) (err error) {
 		return
 	}
 
-	if err = s.handleNewOrUpdatedCommit(sk, false); err != nil {
+	if err = s.handleNewOrUpdatedCommit(
+		sk,
+		objekte_update_type.ModeEmpty,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

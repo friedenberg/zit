@@ -9,7 +9,6 @@ import (
 type mutators interface {
 	AddVerzeichnisse(*sku.Transacted) error
 	CommitTransacted(*sku.Transacted) error
-	CommitUpdatedTransacted(*sku.Transacted) error
 }
 
 func (s *common) AddVerzeichnisse(t *sku.Transacted) (err error) {
@@ -22,19 +21,6 @@ func (s *common) AddVerzeichnisse(t *sku.Transacted) (err error) {
 	}
 
 	return
-}
-
-func (s *common) CommitUpdatedTransacted(
-	t *sku.Transacted,
-) (err error) {
-  // log.Debug().Printf("%s", t.StringKennungTai())
-	ta := kennung.NowTai()
-
-	if t.GetTai().IsZero() {
-		t.SetTai(ta)
-	}
-
-	return s.CommitTransacted(t)
 }
 
 func (s *common) CommitTransacted(t *sku.Transacted) (err error) {

@@ -33,39 +33,40 @@ func (f *FormatterValue) Set(v string) (err error) {
 	switch v1 {
 	case
 		// TODO-P3 add toml
-		"sha",
-		"mutter",
-		"mutter-sha",
-		"bestandsaufnahme-sha",
-		"bestandsaufnahme-shas",
+		"akte",
+		"akte-sha",
+		"akte-sku-prefix",
 		"bestandsaufnahme",
 		"bestandsaufnahme-sans-tai",
+		"bestandsaufnahme-sha",
+		"bestandsaufnahme-shas",
 		"bestandsaufnahme-verzeichnisse",
-		"objekte",
-		"kennung",
-		"kennung-sha",
-		"kennung-akte-sha",
 		"bezeichnung",
-		"akte",
-		"tai",
-		"akte-sku-prefix",
-		"metadatei",
-		"metadatei-plus-mutter",
-		"akte-sha",
 		"debug",
 		"etiketten",
 		"etiketten-all",
-		"etiketten-implicit",
 		"etiketten-expanded",
-		"typ",
+		"etiketten-implicit",
 		"json",
+		"kennung",
+		"kennung-akte-sha",
+		"kennung-sha",
+		"kennung-tai",
 		"log",
+		"metadatei",
+		"metadatei-plus-mutter",
+		"mutter",
+		"mutter-sha",
+		"objekte",
+		"sha",
 		"sku",
 		"sku-metadatei",
 		"sku-metadatei-sans-tai",
+		"sku2",
+		"tai",
 		"text",
 		"text-sku-prefix",
-		"sku2":
+		"typ":
 		f.string = v1
 
 	default:
@@ -231,6 +232,12 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	case "kennung":
 		return func(e *sku.Transacted) (err error) {
 			_, err = e.Kennung.WriteTo(out)
+			return
+		}
+
+	case "kennung-tai":
+		return func(e *sku.Transacted) (err error) {
+			_, err = fmt.Fprintln(out, e.StringKennungTai())
 			return
 		}
 

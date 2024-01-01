@@ -14,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/charlie/string_format_writer"
 	"github.com/friedenberg/zit/src/delta/ohio"
 	"github.com/friedenberg/zit/src/delta/thyme"
 )
@@ -88,6 +89,11 @@ func (t Tai) String() (v string) {
 	// }
 
 	return
+}
+
+func (t Tai) StringDefaultFormat() string {
+  f := string_format_writer.StringFormatDateTime + ".000000000"
+  return t.Format(f)
 }
 
 func (t Tai) Format(v string) string {

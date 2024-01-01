@@ -56,6 +56,12 @@ function reindex_simple_twice { # @test
 }
 
 function reindex_after_changes { # @test
+	run_zit show !md:t
+	assert_success
+	assert_output - <<-EOM
+		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+	EOM
+
 	cat >md.typ <<-EOM
 		inline-akte = false
 		vim-syntax-type = "test"
@@ -63,12 +69,30 @@ function reindex_after_changes { # @test
 
 	run_zit checkin .t
 	assert_success
-	# assert_output - <<-EOM
-	# 	[!md@acbfc0e07b1be4bf1b12020d8316fe9629518b015041b7120db5a9f2012c84fa]
-	# EOM
-	# cat >zz-archive.etikett <<-EOM
-	# 	hide = true
-	# EOM
+	assert_output - <<-EOM
+		[!md@220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
+	EOM
+
+	function verify() {
+		run_zit show -format akte !md+t
+		assert_success
+		assert_output - <<-EOM
+			inline-akte = true
+			file-extension = 'md'
+			vim-syntax-type = 'markdown'
+			inline-akte = false
+			vim-syntax-type = "test"
+		EOM
+
+		run_zit show -format akte !md:t
+		assert_success
+		assert_output - <<-EOM
+			inline-akte = false
+			vim-syntax-type = "test"
+		EOM
+	}
+
+	verify
 
 	run_zit reindex
 	assert_success
@@ -86,10 +110,5 @@ function reindex_after_changes { # @test
 		[one/uno@3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
 	EOM
 
-	run_zit show -format akte !md:t
-	assert_success
-	assert_output - <<-EOM
-		inline-akte = false
-		vim-syntax-type = "test"
-	EOM
+	verify
 }

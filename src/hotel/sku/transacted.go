@@ -65,7 +65,7 @@ func (a *Transacted) StringKennungTai() string {
 	return fmt.Sprintf(
 		"%s@%s",
 		&a.Kennung,
-		a.GetTai(),
+		a.GetTai().StringDefaultFormat(),
 	)
 }
 

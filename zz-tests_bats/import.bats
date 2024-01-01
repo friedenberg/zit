@@ -58,7 +58,6 @@ function import { # @test
 }
 
 function import_one_tai_same { # @test
-	skip
 	(
 		mkdir inner
 		pushd inner || exit 1
@@ -103,7 +102,6 @@ function import_one_tai_same { # @test
 }
 
 function import_twice_no_dupes_one_zettel { # @test
-	skip
 	(
 		mkdir inner
 		pushd inner || exit 1
