@@ -1,14 +1,16 @@
 package gattung
 
 import (
+	"io"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/values"
+	"github.com/friedenberg/zit/src/delta/ohio"
 )
 
-type Gattung int
+type Gattung byte
 
 // Do not change this order, various serialization formats rely on the
 // underlying integer values.
@@ -255,4 +257,36 @@ func (g *Gattung) Set(v string) (err error) {
 
 func (g *Gattung) Reset() {
 	*g = Unknown
+}
+
+func (g *Gattung) ReadFrom(r io.Reader) (n int64, err error) {
+	*g = Unknown
+
+	var b [1]byte
+
+	var n1 int
+	n1, err = ohio.ReadAllOrDieTrying(r, b[:])
+	n += int64(n1)
+
+	if err != nil {
+		return
+	}
+
+	*g = Gattung(b[0])
+
+	return
+}
+
+func (g *Gattung) WriteTo(w io.Writer) (n int64, err error) {
+	b := [1]byte{byte(*g)}
+
+	var n1 int
+	n1, err = ohio.WriteAllOrDieTrying(w, b[:])
+	n += int64(n1)
+
+	if err != nil {
+		return
+	}
+
+	return
 }

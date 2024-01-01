@@ -2,6 +2,7 @@ package kennung
 
 import (
 	"io"
+	"math"
 	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -9,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/pool"
 	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/delta/ohio"
 )
 
 var poolKennung2 schnittstellen.Pool[Kennung2, *Kennung2]
@@ -27,14 +29,133 @@ func GetKennungPool() schnittstellen.Pool[Kennung2, *Kennung2] {
 }
 
 type Kennung2 struct {
-	g                   gattung.Gattung
-	left, middle, right catgut.String
+	g           gattung.Gattung
+	middle      byte
+	left, right catgut.String
 }
 
 func MustKennung2(kp Kennung) (k *Kennung2) {
 	k = &Kennung2{}
 	err := k.SetWithKennung(kp)
 	errors.PanicIfError(err)
+	return
+}
+
+func (k2 *Kennung2) WriteTo(w io.Writer) (n int64, err error) {
+	if k2.Len() > math.MaxUint8 {
+		err = errors.Errorf(
+			"%q is greater than max uint8 (%d)",
+			k2.String(),
+			math.MaxUint8,
+		)
+
+		return
+	}
+
+	var n1 int64
+	n1, err = k2.g.WriteTo(w)
+	n += n1
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	b := [2]uint8{uint8(k2.Len()), uint8(k2.left.Len())}
+
+	var n2 int
+	n2, err = ohio.WriteAllOrDieTrying(w, b[:])
+	n += int64(n2)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n1, err = k2.left.WriteTo(w)
+	n += n1
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	bMid := [1]byte{k2.middle}
+
+	n2, err = ohio.WriteAllOrDieTrying(w, bMid[:])
+	n += int64(n2)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n1, err = k2.right.WriteTo(w)
+	n += n1
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (k2 *Kennung2) ReadFrom(r io.Reader) (n int64, err error) {
+	var n1 int64
+	n1, err = k2.g.ReadFrom(r)
+	n += n1
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var b [2]uint8
+
+	var n2 int
+	n2, err = ohio.ReadAllOrDieTrying(r, b[:])
+	n += int64(n2)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	contentLength := b[0]
+	middlePos := b[1]
+
+	if middlePos > contentLength-1 {
+		err = errors.Errorf(
+			"middle position %d is greater than last index: %d",
+			middlePos,
+			contentLength,
+		)
+		return
+	}
+
+	if err = k2.left.ReadNFrom(r, int(middlePos)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var bMiddle [1]uint8
+
+	n2, err = ohio.ReadAllOrDieTrying(r, bMiddle[:])
+	n += int64(n2)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	k2.middle = bMiddle[0]
+
+	if err = k2.right.ReadNFrom(r, int(contentLength-middlePos-1)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
@@ -52,7 +173,7 @@ func (k2 *Kennung2) StringFromPtr() string {
 	switch k2.g {
 	case gattung.Zettel, gattung.Bestandsaufnahme, gattung.Kasten:
 		sb.Write(k2.left.Bytes())
-		sb.Write(k2.middle.Bytes())
+		sb.WriteByte(k2.middle)
 		sb.Write(k2.right.Bytes())
 
 	case gattung.Etikett, gattung.Typ, gattung.Konfig:
@@ -66,11 +187,11 @@ func (k2 *Kennung2) StringFromPtr() string {
 }
 
 func (k2 *Kennung2) IsEmpty() bool {
-	return k2.left.Len() == 0 && k2.middle.Len() == 0 && k2.right.Len() == 0
+	return k2.left.Len() == 0 && k2.middle == 0 && k2.right.Len() == 0
 }
 
 func (k2 *Kennung2) Len() int {
-	return k2.left.Len() + k2.middle.Len() + k2.right.Len()
+	return k2.left.Len() + 1 + k2.right.Len()
 }
 
 func (k2 *Kennung2) KopfUndSchwanz() (kopf, schwanz string) {
@@ -84,36 +205,6 @@ func (k2 *Kennung2) LenKopfUndSchwanz() (int, int) {
 	return k2.left.Len(), k2.right.Len()
 }
 
-func (src *Kennung2) WriteTo(w io.Writer) (n int64, err error) {
-	var n1 int64
-
-	n1, err = src.left.WriteTo(w)
-	n += n1
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	n1, err = src.middle.WriteTo(w)
-	n += n1
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	n1, err = src.right.WriteTo(w)
-	n += n1
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (k2 *Kennung2) String() string {
 	return k2.StringFromPtr()
 }
@@ -121,22 +212,33 @@ func (k2 *Kennung2) String() string {
 func (k2 *Kennung2) Reset() {
 	k2.g = gattung.Unknown
 	k2.left.Reset()
-	k2.middle.Reset()
+	k2.middle = 0
 	k2.right.Reset()
 }
 
-func (k2 *Kennung2) PartsStrings() [3]*catgut.String {
-	return [3]*catgut.String{
-		&k2.left,
-		&k2.middle,
-		&k2.right,
+type KennungParts struct {
+	Middle      byte
+	Left, Right *catgut.String
+}
+
+func (k2 *Kennung2) PartsStrings() KennungParts {
+	return KennungParts{
+		Left:   &k2.left,
+		Middle: k2.middle,
+		Right:  &k2.right,
 	}
 }
 
 func (k2 *Kennung2) Parts() [3]string {
+	var mid string
+
+	if k2.middle != 0 {
+		mid = string([]byte{k2.middle})
+	}
+
 	return [3]string{
 		k2.left.String(),
-		k2.middle.String(),
+		mid,
 		k2.right.String(),
 	}
 }
@@ -162,9 +264,7 @@ func (h *Kennung2) SetWithKennung(
 			return
 		}
 
-		if err = kt.middle.CopyTo(&h.middle); err != nil {
-			return
-		}
+		h.middle = kt.middle
 
 		if err = kt.right.CopyTo(&h.right); err != nil {
 			return
@@ -177,8 +277,10 @@ func (h *Kennung2) SetWithKennung(
 			return
 		}
 
-		if err = h.middle.Set(p[1]); err != nil {
-			return
+		mid := []byte(p[1])
+
+		if len(mid) >= 1 {
+			h.middle = mid[0]
 		}
 
 		if err = h.right.Set(p[2]); err != nil {

@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/ohio_buffer"
+	"github.com/friedenberg/zit/src/delta/ohio"
 )
 
 type String struct {
@@ -279,6 +280,24 @@ func (dst *String) ReadFromBuffer(src *bytes.Buffer) (err error) {
 func (dst *String) ReadFrom(r io.Reader) (n int64, err error) {
 	dst.Reset()
 	return dst.Data.ReadFrom(r)
+}
+
+func (dst *String) ReadNFrom(r io.Reader, n int) (err error) {
+	dst.Reset()
+	dst.Grow(n)
+	b := dst.AvailableBuffer()[:n]
+
+	if _, err = ohio.ReadAllOrDieTrying(r, b); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, err = dst.Data.Write(b); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (src *String) CopyTo(dst *String) (err error) {

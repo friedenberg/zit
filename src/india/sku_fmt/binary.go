@@ -237,7 +237,7 @@ func (bf *Binary) readFieldKey(
 		}
 
 	case schlussel.Kennung:
-		if err = sk.Kennung.Set(bf.Content.String()); err != nil {
+		if _, err = sk.Kennung.ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -390,7 +390,7 @@ func (bf *Binary) writeFieldKey(
 		}
 
 	case schlussel.Kennung:
-		if n, err = bf.writeFieldBinaryMarshaler(&sk.Kennung); err != nil {
+		if n, err = bf.writeFieldWriterTo(&sk.Kennung); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

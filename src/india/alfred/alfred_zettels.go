@@ -39,8 +39,8 @@ func (w *Writer) zettelToItem(
 	parts := k.PartsStrings()
 
 	mb.AddMatches(ks)
-	mb.AddMatchBytes(parts[0].Bytes())
-	mb.AddMatchBytes(parts[2].Bytes())
+	mb.AddMatchBytes(parts.Left.Bytes())
+	mb.AddMatchBytes(parts.Right.Bytes())
 	mb.AddMatches(z.GetMetadatei().Bezeichnung.String())
 	mb.AddMatches(z.GetTyp().String())
 	z.Metadatei.GetEtiketten().Each(

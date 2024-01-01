@@ -57,7 +57,7 @@ func (f *kennungCliFormat) WriteStringFormat(
 
 	var n1 int64
 
-	n1, err = f.sfwColor.WriteStringFormat(w, parts[0])
+	n1, err = f.sfwColor.WriteStringFormat(w, parts.Left)
 	n += n1
 
 	if err != nil {
@@ -65,16 +65,19 @@ func (f *kennungCliFormat) WriteStringFormat(
 		return
 	}
 
-	n1, err = f.sfwNoColor.WriteStringFormat(w, parts[1])
+	sm := catgut.GetPool().Get()
+	defer catgut.GetPool().Put(sm)
+	sm.WriteRune(rune(parts.Middle))
+	n1, err = f.sfwNoColor.WriteStringFormat(w, sm)
+	n += n1
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n1, err = f.sfwColor.WriteStringFormat(w, parts.Right)
 	n += int64(n1)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	n1, err = f.sfwColor.WriteStringFormat(w, parts[2])
-	n += n1
 
 	if err != nil {
 		err = errors.Wrap(err)
