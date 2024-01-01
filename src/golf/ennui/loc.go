@@ -19,7 +19,7 @@ func (l Loc) IsEmpty() bool {
 }
 
 func (l Loc) String() string {
-	return fmt.Sprintf("%d@%d", l.Page, l.Offset)
+	return fmt.Sprintf("%02d@%03d", l.Page, l.Offset)
 }
 
 func (l *Loc) ReadFrom(r io.Reader) (n int64, err error) {

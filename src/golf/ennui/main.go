@@ -419,7 +419,6 @@ func (e *ennui) Flush() (err error) {
 	defer errors.DeferredFlusher(&err, w)
 
 	var current row
-	var lastRow row
 
 	getOne := func() (r *row, err error) {
 		if e.f == nil {
@@ -444,24 +443,7 @@ func (e *ennui) Flush() (err error) {
 			return
 		},
 		func(r *row) (err error) {
-			if (rowLessor{}).Less(r, &lastRow) && !lastRow.IsEmpty() {
-				err = errors.Errorf(
-					"last row greater than current row:\n%s\n%s",
-					&lastRow,
-					r,
-				)
-
-				return
-			}
-
-			if (rowEqualerComplete{}).Equals(&lastRow, r) {
-				return
-			}
-
 			_, err = r.WriteTo(w)
-
-			rowResetter{}.ResetWith(&lastRow, r)
-
 			return
 		},
 	); err != nil {

@@ -206,6 +206,31 @@ func (a *Heap[T, TPtr]) MergeStream(
 		a.Restore()
 	}()
 
+	oldWrite := write
+
+	var last TPtr
+
+	write = func(e TPtr) (err error) {
+		if last == nil {
+			var t T
+			last = &t
+		} else if a.h.equaler.Equals(e, last) {
+			return
+		} else if a.h.Lessor.Less(e, last) {
+			err = errors.Errorf(
+				"last is greater than current! last:\n%v\ncurrent: %v",
+				last,
+				e,
+			)
+
+			return
+		}
+
+		a.h.Resetter.ResetWith(last, e)
+
+		return oldWrite(e)
+	}
+
 	for {
 		var e TPtr
 
@@ -276,26 +301,11 @@ func (a *Heap[T, TPtr]) MergeStream(
 		}
 	}
 
-	var last TPtr
-
 	for {
 		popped, ok := a.PopAndSave()
 
 		if !ok {
 			break
-		}
-
-		if last == nil {
-			last = popped
-		} else if a.h.equaler.Equals(popped, last) {
-			continue
-		} else if a.h.Lessor.Less(popped, last) {
-			err = errors.Errorf(
-				"last is greater than current! last: %v, current: %v",
-				last,
-				popped,
-			)
-			return
 		}
 
 		if err = write(popped); err != nil {
