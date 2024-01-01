@@ -10,7 +10,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/pool"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -119,12 +118,8 @@ func (i *Store) GetEnnuiKennung() ennui.Ennui {
 func (i *Store) ExistsOneSha(sh *sha.Sha) (err error) {
 	if _, err = i.ennuiShas.ReadOneSha(sh); err != nil {
 		err = errors.Wrap(err)
-		// log.Debug().Printf("not found: %s", sh)
 		return
 	}
-
-	// log.Debug().Printf("exists: %s", sh)
-	err = collections.ErrExists
 
 	return
 }
