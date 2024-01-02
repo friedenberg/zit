@@ -100,7 +100,7 @@ func (s *Store) createOrUpdate(
 	mg metadatei.Getter,
 	kennungPtr kennung.Kennung,
 	mutter *sku.Transacted,
-	updateType objekte_mode.Type,
+	updateType objekte_mode.Mode,
 ) (transactedPtr *sku.Transacted, err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
@@ -353,7 +353,7 @@ func (s *Store) CreateOrUpdateAkteSha(
 
 func (s *Store) handleNewOrUpdateWithMutter(
 	sk, mutter *sku.Transacted,
-	updateType objekte_mode.Type,
+	updateType objekte_mode.Mode,
 ) (err error) {
 	if err = iter.Chain(
 		sk,

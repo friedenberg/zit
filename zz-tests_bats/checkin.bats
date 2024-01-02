@@ -104,6 +104,7 @@ function checkin_simple_all { # @test
 }
 
 function checkin_simple_all_dry_run { # @test
+	# TODO fix race condition allowing for one double entry
 	# TODO: modify this to support "." for everything
 	run_zit checkin -dry-run .z,e,t
 	assert_success

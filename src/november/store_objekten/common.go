@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/bravo/objekte_mode"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
@@ -15,7 +16,7 @@ import (
 
 func (s *Store) handleNewOrUpdated(
 	t *sku.Transacted,
-	updateType objekte_mode.Type,
+	updateType objekte_mode.Mode,
 ) (err error) {
 	return iter.Chain(
 		t,
@@ -26,10 +27,9 @@ func (s *Store) handleNewOrUpdated(
 	)
 }
 
-// true is new or updated, false is reindexed
 func (s *Store) handleNewOrUpdatedCommit(
 	t *sku.Transacted,
-	updateType objekte_mode.Type,
+	mode objekte_mode.Mode,
 ) (err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
@@ -39,13 +39,25 @@ func (s *Store) handleNewOrUpdatedCommit(
 		return
 	}
 
-	if updateType.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
-		if updateType.Contains(objekte_mode.ModeUpdateTai) {
+	if mode.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
+		if mode.Contains(objekte_mode.ModeUpdateTai) {
 			t.SetTai(kennung.NowTai())
 		}
 
 		s.CommitTransacted(t)
 	}
+
+	if err = t.CalculateObjekteSha(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.GetVerzeichnisse().ExistsOneSha(&t.Metadatei.Sha); err == nil {
+		log.Debug().Printf("already exists: %s", t.StringKennungSha())
+		return
+	}
+
+	err = nil
 
 	g := gattung.Must(t.Kennung.GetGattung())
 
@@ -95,6 +107,7 @@ func (s *Store) handleNewOrUpdatedCommit(
 	if err = s.GetVerzeichnisse().Add(
 		t,
 		t.GetKennung().String(),
+		mode,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -105,7 +118,7 @@ func (s *Store) handleNewOrUpdatedCommit(
 
 func (s *Store) handleNew(
 	t *sku.Transacted,
-	updateType objekte_mode.Type,
+	updateType objekte_mode.Mode,
 ) (err error) {
 	if err = s.handleNewOrUpdated(t, updateType); err != nil {
 		err = errors.Wrap(err)
@@ -117,7 +130,7 @@ func (s *Store) handleNew(
 
 func (s *Store) handleUpdated(
 	t *sku.Transacted,
-	updateType objekte_mode.Type,
+	updateType objekte_mode.Mode,
 ) (err error) {
 	if err = s.handleNewOrUpdated(t, updateType); err != nil {
 		err = errors.Wrap(err)

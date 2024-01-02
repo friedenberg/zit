@@ -451,6 +451,13 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
+	if err = s.StoreUtil.GetVerzeichnisse().Initialize(
+		s.GetKennungIndex(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	f1 := s.ReindexOne
 
 	if err = s.GetBestandsaufnahmeStore().ReadAllSkus(f1); err != nil {

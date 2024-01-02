@@ -1,15 +1,17 @@
 package objekte_mode
 
-type Type int
+//go:generate stringer -type=Mode
+type Mode int
 
 const (
-	ModeEmpty                 = Type(iota)
-	ModeAddToBestandsaufnahme = Type(1 << iota)
+	ModeEmpty                 = Mode(iota)
+	ModeAddToBestandsaufnahme = Mode(1 << iota)
 	ModeUpdateTai
+	ModeSchwanz
 
-	ModeCommit = ModeAddToBestandsaufnahme | ModeUpdateTai
+	ModeCommit = ModeAddToBestandsaufnahme | ModeUpdateTai | ModeSchwanz
 )
 
-func (a Type) Contains(b Type) bool {
+func (a Mode) Contains(b Mode) bool {
 	return a&b != 0
 }

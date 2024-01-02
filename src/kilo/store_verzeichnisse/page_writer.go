@@ -117,6 +117,7 @@ func (pw *pageWriter) flush() (err error) {
 	}
 
 	defer pw.added.Reset()
+	defer pw.addedSchwanz.Reset()
 
 	pw.kennungShaMap = make(KennungShaMap)
 	pw.Binary = sku_fmt.Binary{Sigil: kennung.SigilHistory}
@@ -126,7 +127,7 @@ func (pw *pageWriter) flush() (err error) {
 	// If the cache file does not exist and we have nothing to add, short circuit
 	// the flush. This condition occurs on the initial init when the konfig is
 	// changed but there are no zettels yet.
-	if !files.Exists(path) && pw.added.Len() == 0 {
+	if !files.Exists(path) && pw.waitingToAddLen() == 0 {
 		return
 	}
 
@@ -134,30 +135,34 @@ func (pw *pageWriter) flush() (err error) {
 		err = errors.Wrap(err)
 		return
 	}
-	// if pw.File, err = files.OpenFile(
-	// path,
-	// os.O_RDWR|os.O_CREATE,
-	// 0o666,
-	// ); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
 
 	defer errors.DeferredCloseAndRename(&err, pw.File, pw.Name(), path)
 
 	pw.Reset(pw.File)
 
-	if err = pw.Copy(
-		kennung.SigilHistory,
-		iter.MakeChain(
-			pw.konfig.ApplyToSku,
-			pw.ReadMutter,
-			pw.writeOne,
-			pw.SaveSha,
-		),
-	); err != nil {
+	chain := iter.MakeChain(
+		pw.konfig.ApplyToSku,
+		pw.ReadMutter,
+		pw.writeOne,
+		pw.SaveSha,
+	)
+
+	if err = pw.Copy(kennung.SigilHistory, chain); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	for {
+		popped, ok := pw.addedSchwanz.Pop()
+
+		if !ok {
+			break
+		}
+
+		if err = chain(popped); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if err = pw.Writer.Flush(); err != nil {

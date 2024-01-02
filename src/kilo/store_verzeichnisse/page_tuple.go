@@ -9,6 +9,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/objekte_mode"
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -48,7 +49,7 @@ type PageTuple struct {
 	PageId
 	// All, Schwanzen  Page
 	ennuiShas, ennuiKennung ennui.Ennui
-	added                   *sku.TransactedHeap
+	added, addedSchwanz     *sku.TransactedHeap
 	hasChanges              bool
 	standort                standort.Standort
 	konfig                  *konfig.Compiled
@@ -63,6 +64,7 @@ func (pt *PageTuple) initialize(
 	pt.standort = i.standort.SansAge().SansCompression()
 	pt.PageId = pid
 	pt.added = sku.MakeTransactedHeap()
+	pt.addedSchwanz = sku.MakeTransactedHeap()
 	pt.etikettIndex = ki
 	pt.ennuiShas = i.ennuiShas
 	pt.ennuiKennung = i.ennuiKennung
@@ -71,6 +73,7 @@ func (pt *PageTuple) initialize(
 
 func (pt *PageTuple) add(
 	z1 *sku.Transacted,
+	mode objekte_mode.Mode,
 ) (err error) {
 	z := sku.GetTransactedPool().Get()
 
@@ -79,10 +82,20 @@ func (pt *PageTuple) add(
 		return
 	}
 
-	pt.added.Add(z)
+	if mode.Contains(objekte_mode.ModeSchwanz) {
+		// pt.addedSchwanz.Add(z)
+		pt.added.Add(z)
+	} else {
+		pt.added.Add(z)
+	}
+
 	pt.hasChanges = true
 
 	return
+}
+
+func (pt *PageTuple) waitingToAddLen() int {
+	return pt.added.Len() + pt.addedSchwanz.Len()
 }
 
 func (pt *PageTuple) SetNeedsFlush() {
@@ -127,6 +140,19 @@ func (pt *PageTuple) Copy(
 				return
 			}
 
+			return
+		},
+		w,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	addedSchwanz := pt.addedSchwanz.Copy()
+
+	if err = addedSchwanz.MergeStream(
+		func() (tz *sku.Transacted, err error) {
+			err = collections.MakeErrStopIteration()
 			return
 		},
 		w,

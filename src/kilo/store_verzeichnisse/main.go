@@ -9,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/bravo/objekte_mode"
 	"github.com/friedenberg/zit/src/bravo/pool"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
@@ -76,24 +77,33 @@ func MakeStore(
 		VerzeichnisseFactory: s,
 	}
 
+	if err = i.Initialize(ki); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (i *Store) Initialize(ki kennung_index.Index) (err error) {
 	if i.ennuiShas, err = ennui.MakePermitDuplicates(
-		s,
-		path.Join(dir, "EnnuiShas"),
+		i.standort,
+		path.Join(i.path, "EnnuiShas"),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if i.ennuiKennung, err = ennui.MakeNoDuplicates(
-		s,
-		path.Join(dir, "EnnuiKennung"),
+		i.standort,
+		path.Join(i.path, "EnnuiKennung"),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	for n := range i.pages {
-		i.pages[n].initialize(PageId{Dir: dir, Index: uint8(n)}, i, ki)
+		i.pages[n].initialize(PageId{Dir: i.path, Index: uint8(n)}, i, ki)
 	}
 
 	return
@@ -263,6 +273,7 @@ func (i *Store) Flush() (err error) {
 func (i *Store) Add(
 	z *sku.Transacted,
 	v string,
+	mode objekte_mode.Mode,
 ) (err error) {
 	var n uint8
 
@@ -273,7 +284,7 @@ func (i *Store) Add(
 
 	p := i.GetPagePair(n)
 
-	if err = p.add(z); err != nil {
+	if err = p.add(z, mode); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
