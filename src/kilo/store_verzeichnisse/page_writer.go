@@ -95,18 +95,18 @@ func (pw *pageWriter) SaveSha(z *sku.Transacted) (err error) {
 		return
 	}
 
-	old := pw.kennungShaMap[k.String()]
-	old.Mutter = old.Sha
-	old.Sha = &sh
-	old.Offset = pw.offsetLast
-	old.ContentLength = pw.offset - pw.offsetLast
-	old.Sigil = kennung.SigilHistory
+	record := pw.kennungShaMap[k.String()]
+	record.Mutter = record.Sha
+	record.Sha = &sh
+	record.Offset = pw.offsetLast
+	record.ContentLength = pw.offset - pw.offsetLast
+	record.Sigil = kennung.SigilHistory
 
 	if z.Metadatei.Verzeichnisse.Archiviert.Bool() {
-		old.Add(kennung.SigilHidden)
+		record.Add(kennung.SigilHidden)
 	}
 
-	pw.kennungShaMap[k.String()] = old
+	pw.kennungShaMap[k.String()] = record
 
 	return
 }

@@ -207,7 +207,7 @@ func (bf *Binary) readSigil(
 	}
 
 	if sigil.IncludesHidden() {
-		sk.Metadatei.Verzeichnisse.Archiviert.SetBool(true)
+		sk.SetArchiviert(true)
 	}
 
 	return
@@ -322,7 +322,10 @@ func (bf *Binary) readFieldKey(
 //     \_/\_/ |_|  |_|\__\___|
 //
 
-func (bf *Binary) WriteFormat(w io.Writer, sk *sku.Transacted) (n int64, err error) {
+func (bf *Binary) WriteFormat(
+	w io.Writer,
+	sk *sku.Transacted,
+) (n int64, err error) {
 	bf.Buffer.Reset()
 
 	for _, f := range binaryFieldOrder {
@@ -669,7 +672,9 @@ func (bf *BinaryField) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
-var errContentLengthDoesNotMatchContent = errors.New("content length does not match content")
+var errContentLengthDoesNotMatchContent = errors.New(
+	"content length does not match content",
+)
 
 func (bf *BinaryField) WriteTo(w io.Writer) (n int64, err error) {
 	if bf.Content.Len() > math.MaxUint16 {

@@ -13,22 +13,23 @@ func Lua(o *sku.Transacted, ki kennung.Index, l *lua.LState, t *lua.LTable) {
 
 	etiketten := l.NewTable()
 
-	addOne := func(e *kennung.Etikett) (err error) {
-		l.SetField(etiketten, e.String(), lua.LBool(true))
-		return
-	}
-
 	o.Metadatei.GetEtiketten().EachPtr(
 		func(e *kennung.Etikett) (err error) {
-			// indexed, err := ki.Etiketten(e)
-
-			// if err == nil {
-			// 	indexed.GetExpandedRight().EachPtr(addOne)
-			// }
-
-			return addOne(e)
+			l.SetField(etiketten, e.String(), lua.LBool(true))
+			return
 		},
 	)
 
 	l.SetField(t, "Etiketten", etiketten)
+
+	etiketten = l.NewTable()
+
+	o.Metadatei.Verzeichnisse.GetImplicitEtiketten().EachPtr(
+		func(e *kennung.Etikett) (err error) {
+			l.SetField(etiketten, e.String(), lua.LBool(true))
+			return
+		},
+	)
+
+	l.SetField(t, "EtikettenImplicit", etiketten)
 }

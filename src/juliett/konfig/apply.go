@@ -75,6 +75,11 @@ func (k *Compiled) addImplicitEtiketten(
 
 		impl := k.GetImplicitEtiketten(e)
 
+		if impl.Len() == 0 {
+			sk.Metadatei.Verzeichnisse.AddPath(p1)
+			return
+		}
+
 		if err = impl.EachPtr(
 			iter.MakeChain(
 				ie.AddPtr,
@@ -126,7 +131,7 @@ func (k *Compiled) setArchiviert(
 		)
 
 	if isHiddenEtikett {
-		mp.Verzeichnisse.Archiviert.SetBool(true)
+		sk.SetArchiviert(true)
 		return
 	}
 
@@ -138,7 +143,7 @@ func (k *Compiled) setArchiviert(
 		mp.GetEtiketten(),
 		checkFunc,
 	) {
-		mp.Verzeichnisse.Archiviert.SetBool(true)
+		sk.SetArchiviert(true)
 		return
 	}
 
@@ -146,7 +151,7 @@ func (k *Compiled) setArchiviert(
 		mp.Verzeichnisse.GetExpandedEtiketten(),
 		checkFunc,
 	) {
-		mp.Verzeichnisse.Archiviert.SetBool(true)
+		sk.SetArchiviert(true)
 		return
 	}
 
@@ -154,7 +159,7 @@ func (k *Compiled) setArchiviert(
 		mp.Verzeichnisse.GetImplicitEtiketten(),
 		checkFunc,
 	) {
-		mp.Verzeichnisse.Archiviert.SetBool(true)
+		sk.SetArchiviert(true)
 		return
 	}
 

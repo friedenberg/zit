@@ -197,6 +197,10 @@ func (s *Transacted) CalculateObjekteSha() (err error) {
 	return
 }
 
+func (s *Transacted) SetArchiviert(v bool) {
+	s.Metadatei.Verzeichnisse.Archiviert.SetBool(v)
+}
+
 func (s *Transacted) SetObjekteSha(v schnittstellen.ShaLike) (err error) {
 	return s.GetMetadatei().Sha.SetShaLike(v)
 }

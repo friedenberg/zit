@@ -201,18 +201,10 @@ func (s *Store) ReadOne(
 		sk = s.StoreUtil.GetKonfig().GetKasten(k)
 
 	case gattung.Konfig:
-		tt1 := &s.StoreUtil.GetKonfig().Sku
+		sk = &s.StoreUtil.GetKonfig().Sku
 
-		if tt1.GetTai().IsEmpty() {
-			err = errors.Wrap(objekte_store.ErrNotFound(k1.String()))
-			return
-		}
-
-		sk = sku.GetTransactedPool().Get()
-
-		if err = sk.SetFromSkuLike(tt1); err != nil {
-			err = errors.Wrap(err)
-			return
+		if sk.GetTai().IsEmpty() {
+			sk = nil
 		}
 
 	default:
