@@ -10,8 +10,8 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.8
 	github.com/yuin/gopher-lua v1.1.0
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
-	golang.org/x/sys v0.9.0
+	golang.org/x/sys v0.15.0
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
 )
 
-require golang.org/x/crypto v0.4.0 // indirect
+require golang.org/x/crypto v0.17.0 // indirect
