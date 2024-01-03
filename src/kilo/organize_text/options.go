@@ -7,7 +7,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/collections_ptr"
 	"github.com/friedenberg/zit/src/charlie/collections_value"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -15,6 +14,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
+	"github.com/friedenberg/zit/src/india/sku_fmt"
 	"github.com/friedenberg/zit/src/juliett/konfig"
 )
 
@@ -44,8 +44,10 @@ type Options struct {
 	UseRefiner             bool
 	UseMetadateiHeader     bool
 
-	PrintOptions           erworben_cli_print_options.PrintOptions
-	StringFormatReadWriter catgut.StringFormatReadWriter[*sku.Transacted]
+	PrintOptions       erworben_cli_print_options.PrintOptions
+	organize           sku_fmt.Organize
+	organizeNew        sku_fmt.OrganizeNew
+	stringFormatWriter schnittstellen.StringFormatWriter[*sku.Transacted]
 }
 
 func MakeFlags() Flags {
@@ -110,7 +112,8 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 func (o *Flags) GetOptions(
 	printOptions erworben_cli_print_options.PrintOptions,
 	q matcher.Query,
-	stringFormatReadWriter catgut.StringFormatReadWriter[*sku.Transacted],
+	organize *sku_fmt.Organize,
+	organizeNew *sku_fmt.OrganizeNew,
 ) Options {
 	o.once.Do(
 		func() {
@@ -118,7 +121,8 @@ func (o *Flags) GetOptions(
 		},
 	)
 
-	o.StringFormatReadWriter = stringFormatReadWriter
+	o.organize = *organize
+	o.organizeNew = *organizeNew
 
 	if q != nil {
 		o.rootEtiketten = q.GetEtiketten()

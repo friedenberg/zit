@@ -82,7 +82,8 @@ func (c *Organize) RunWithQuery(
 		Options: c.GetOptions(
 			u.Konfig().PrintOptions,
 			ms,
-			u.StringFormatWriterSkuLikePtrForOrganize(),
+			u.SkuFormatOldOrganize(),
+			u.SkuFmtNewOrganize(),
 		),
 	}
 

@@ -18,7 +18,7 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
-type organizeNew struct {
+type OrganizeNew struct {
 	options erworben_cli_print_options.PrintOptions
 
 	shaStringFormatWriter         schnittstellen.StringFormatWriter[schnittstellen.ShaLike]
@@ -40,11 +40,11 @@ func MakeOrganizeNewFormat(
 	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],
 	etikettenStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Etikett],
-) *organizeNew {
+) *OrganizeNew {
 	options.PrintTime = false
 	options.PrintShas = false
 
-	return &organizeNew{
+	return &OrganizeNew{
 		options:                       options,
 		shaStringFormatWriter:         shaStringFormatWriter,
 		kennungStringFormatWriter:     kennungStringFormatWriter,
@@ -54,13 +54,13 @@ func MakeOrganizeNewFormat(
 	}
 }
 
-func (f *organizeNew) SetMaxKopfUndSchwanz(k, s int) {
+func (f *OrganizeNew) SetMaxKopfUndSchwanz(k, s int) {
 	f.maxKopf = k
 	f.maxSchwanz = s
 	f.padding = strings.Repeat(" ", 5+k+s)
 }
 
-func (f *organizeNew) WriteStringFormat(
+func (f *OrganizeNew) WriteStringFormat(
 	sw schnittstellen.WriterAndStringWriter,
 	o *sku.Transacted,
 ) (n int64, err error) {
@@ -214,7 +214,7 @@ func (f *organizeNew) WriteStringFormat(
 	return
 }
 
-func (f *organizeNew) ReadStringFormat(
+func (f *OrganizeNew) ReadStringFormat(
 	rb *catgut.RingBuffer,
 	o *sku.Transacted,
 ) (n int64, err error) {
@@ -245,7 +245,7 @@ func (f *organizeNew) ReadStringFormat(
 	return
 }
 
-func (f *organizeNew) readStringFormatWithinBrackets(
+func (f *OrganizeNew) readStringFormatWithinBrackets(
 	rb *catgut.RingBuffer,
 	o *sku.Transacted,
 ) (err error) {

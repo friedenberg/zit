@@ -56,16 +56,9 @@ func (u *Umwelt) StringFormatWriterEtiketten(
 	return kennung_fmt.MakeEtikettenCliFormat()
 }
 
-func (u *Umwelt) StringFormatWriterSkuLikePtrForOrganize() catgut.StringFormatReadWriter[*sku.Transacted] {
+func (u *Umwelt) SkuFmtNewOrganize() *sku_fmt.OrganizeNew {
 	co := u.FormatColorOptions()
 	co.OffEntirely = true
-
-	if !u.Konfig().NewOrganize {
-		return sku_fmt.MakeOrganizeFormat(
-			u.MakeKennungExpanders(),
-			u.konfig.PrintOptions,
-		)
-	}
 
 	return sku_fmt.MakeOrganizeNewFormat(
 		u.konfig.PrintOptions,
@@ -75,6 +68,21 @@ func (u *Umwelt) StringFormatWriterSkuLikePtrForOrganize() catgut.StringFormatRe
 		u.StringFormatWriterBezeichnung(bezeichnung.CliFormatTruncationNone, co),
 		u.StringFormatWriterEtiketten(co),
 	)
+}
+
+func (u *Umwelt) SkuFormatOldOrganize() *sku_fmt.Organize {
+	return sku_fmt.MakeOrganizeFormat(
+		u.MakeKennungExpanders(),
+		u.konfig.PrintOptions,
+	)
+}
+
+func (u *Umwelt) StringFormatWriterSkuLikePtrForOrganize() catgut.StringFormatReadWriter[*sku.Transacted] {
+	if !u.Konfig().NewOrganize {
+		return u.SkuFormatOldOrganize()
+	}
+
+	return u.SkuFmtNewOrganize()
 }
 
 func (u *Umwelt) StringFormatWriterSkuLikePtr(

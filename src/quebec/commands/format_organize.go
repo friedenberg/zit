@@ -59,7 +59,12 @@ func (c *FormatOrganize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	ot.Options = c.Flags.GetOptions(u.Konfig().PrintOptions, nil, u.StringFormatWriterSkuLikePtrForOrganize())
+	ot.Options = c.Flags.GetOptions(
+		u.Konfig().PrintOptions,
+		nil,
+		u.SkuFormatOldOrganize(),
+		u.SkuFmtNewOrganize(),
+	)
 
 	if err = ot.Refine(); err != nil {
 		err = errors.Wrap(err)

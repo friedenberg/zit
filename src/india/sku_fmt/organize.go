@@ -16,7 +16,7 @@ type KennungAlignedFormat interface {
 	SetMaxKopfUndSchwanz(kop, schwanz int)
 }
 
-type organize struct {
+type Organize struct {
 	maxKopf, maxSchwanz int
 	ex                  kennung.Abbr
 	options             erworben_cli_print_options.PrintOptions
@@ -25,19 +25,19 @@ type organize struct {
 func MakeOrganizeFormat(
 	ex kennung.Abbr,
 	options erworben_cli_print_options.PrintOptions,
-) *organize {
-	return &organize{
+) *Organize {
+	return &Organize{
 		ex:      ex,
 		options: options,
 	}
 }
 
-func (f *organize) SetMaxKopfUndSchwanz(k, s int) {
+func (f *Organize) SetMaxKopfUndSchwanz(k, s int) {
 	f.maxKopf = k
 	f.maxSchwanz = s
 }
 
-func (f *organize) WriteStringFormat(
+func (f *Organize) WriteStringFormat(
 	sw schnittstellen.WriterAndStringWriter,
 	o *sku.Transacted,
 ) (n int64, err error) {
@@ -89,7 +89,7 @@ func (f *organize) WriteStringFormat(
 	return
 }
 
-func (f *organize) ReadStringFormat(
+func (f *Organize) ReadStringFormat(
 	rb *catgut.RingBuffer,
 	o *sku.Transacted,
 ) (n int64, err error) {
@@ -119,7 +119,7 @@ func (f *organize) ReadStringFormat(
 	return
 }
 
-func (f *organize) readStringFormatWithKennung(
+func (f *Organize) readStringFormatWithKennung(
 	rb *catgut.RingBuffer,
 	o *sku.Transacted,
 ) (err error) {

@@ -36,8 +36,28 @@ func (t *Text) Refine() (err error) {
 
 func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 	r1 := &assignmentLineReader{
-		options:            t.Options,
-		stringFormatReader: t.StringFormatReadWriter,
+		options: t.Options,
+	}
+
+	if t.Konfig.NewOrganize {
+		r1.stringFormatReader = &t.organizeNew
+	} else {
+		r1.stringFormatReader = &t.organize
+	}
+
+	ocf := optionCommentFactory{}
+	var ocs []optionComment
+
+	if ocs, err = t.GetOptionComments(ocf); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	for _, oc := range ocs {
+		if err = oc.ApplyToReader(t.Options, r1); err != nil {
+			err = errors.Wrapf(err, "OptionComment: %s", oc)
+			return
+		}
 	}
 
 	mr := metadatei.Reader{
@@ -61,12 +81,6 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 
 	omit := ot.UseMetadateiHeader && ot.HasMetadateiContent()
 
-	sfw := ot.StringFormatReadWriter
-
-	if aligned, ok := sfw.(sku_fmt.KennungAlignedFormat); ok {
-		aligned.SetMaxKopfUndSchwanz(kopf, schwanz)
-	}
-
 	aw := assignmentLineWriter{
 		LineWriter:           lw,
 		maxDepth:             ot.MaxDepth(),
@@ -76,7 +90,31 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		Metadatei:            ot.AsMetadatei(),
 		RightAlignedIndents:  ot.UseRightAlignedIndents,
 		OmitLeadingEmptyLine: omit,
-		stringFormatWriter:   sfw,
+	}
+
+	if ot.Konfig.NewOrganize {
+		aw.stringFormatWriter = &ot.organizeNew
+	} else {
+		aw.stringFormatWriter = &ot.organize
+	}
+
+	ocf := optionCommentFactory{}
+	var ocs []optionComment
+
+	if ocs, err = ot.GetOptionComments(ocf); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	for _, oc := range ocs {
+		if err = oc.ApplyToWriter(ot.Options, &aw); err != nil {
+			err = errors.Wrapf(err, "OptionComment: %s", oc)
+			return
+		}
+	}
+
+	if aligned, ok := aw.stringFormatWriter.(sku_fmt.KennungAlignedFormat); ok {
+		aligned.SetMaxKopfUndSchwanz(kopf, schwanz)
 	}
 
 	if err = aw.write(ot.assignment); err != nil {

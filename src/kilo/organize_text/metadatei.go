@@ -17,6 +17,7 @@ import (
 type Metadatei struct {
 	kennung.EtikettSet
 	Matchers schnittstellen.SetLike[matcher.Matcher]
+	Comments []string
 	Typ      kennung.Typ
 }
 
@@ -27,7 +28,7 @@ func (m Metadatei) AsMetadatei() (m1 metadatei.Metadatei) {
 }
 
 func (m Metadatei) HasMetadateiContent() bool {
-	if m.EtikettSet.Len() > 0 {
+	if m.Len() > 0 {
 		return true
 	}
 
@@ -50,7 +51,10 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 		ohio.MakeLineReaderRepeat(
 			ohio.MakeLineReaderKeyValues(
 				map[string]schnittstellen.FuncSetString{
-					"%": ohio.MakeLineReaderNop(),
+					"%": func(v string) (err error) {
+						m.Comments = append(m.Comments, v)
+						return
+					},
 					"-": iter.MakeFuncSetString[
 						kennung.Etikett,
 						*kennung.Etikett,
@@ -84,9 +88,37 @@ func (m Metadatei) WriteTo(w1 io.Writer) (n int64, err error) {
 
 	if m.Matchers != nil {
 		for _, c := range iter.SortedStrings[matcher.Matcher](m.Matchers) {
-			w.WriteFormat("%% %s", c)
+			w.WriteFormat("%% Matcher:%s", c)
 		}
 	}
 
+	for _, c := range m.Comments {
+		w.WriteFormat("%% %s", c)
+	}
+
 	return w.WriteTo(w1)
+}
+
+func (m Metadatei) GetOptionComments(
+	f optionCommentFactory,
+) (ocs []optionComment, err error) {
+	em := errors.MakeMulti()
+
+	for _, c := range m.Comments {
+		var oc optionComment
+
+		oc, err = f.Make(c)
+
+		if err == nil {
+			ocs = append(ocs, oc)
+		} else {
+			em.Add(err)
+		}
+	}
+
+	if em.Len() > 0 {
+		err = em
+	}
+
+	return
 }
