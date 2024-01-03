@@ -13,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/delta/ohio"
 	"github.com/friedenberg/zit/src/delta/schlussel"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/etiketten_path"
 	"github.com/friedenberg/zit/src/golf/ennui"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
@@ -29,6 +30,7 @@ var binaryFieldOrder = []schlussel.Schlussel{
 	schlussel.Sha,
 	schlussel.VerzeichnisseEtikettImplicit,
 	schlussel.VerzeichnisseEtikettExpanded,
+	schlussel.VerzeichnisseEtiketten,
 }
 
 type Binary struct {
@@ -125,6 +127,10 @@ func (bf *Binary) ReadFormatAndMatchSigil(
 		n += int64(n1)
 
 		if err != nil {
+			if errors.Is(err, io.ErrUnexpectedEOF) && n == 0 {
+				err = io.EOF
+			}
+
 			err = errors.WrapExcept(err, io.EOF)
 			return
 		}
@@ -292,6 +298,16 @@ func (bf *Binary) readFieldKey(
 			return
 		}
 
+	case schlussel.VerzeichnisseEtiketten:
+		var e etiketten_path.Path
+
+		if _, err = e.ReadFrom(&bf.Content); err != nil {
+			err = errors.WrapExcept(err, io.EOF)
+			return
+		}
+
+		sk.Metadatei.Verzeichnisse.AddPath(&e)
+
 	default:
 		// panic(fmt.Sprintf("unsupported key: %s", key))
 	}
@@ -451,6 +467,20 @@ func (bf *Binary) writeFieldKey(
 		for _, e := range iter.SortedValues[kennung.Etikett](es) {
 			var n1 int64
 			n1, err = bf.writeFieldBinaryMarshaler(&e)
+			n += n1
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+	case schlussel.VerzeichnisseEtiketten:
+		es := sk.Metadatei.Verzeichnisse.Etiketten
+
+		for _, e := range es {
+			var n1 int64
+			n1, err = bf.writeFieldWriterTo(e)
 			n += n1
 
 			if err != nil {

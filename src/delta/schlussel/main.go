@@ -1,13 +1,13 @@
 package schlussel
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/delta/ohio"
 )
 
-//go:generate stringer -type=Schlussel
 type Schlussel byte
 
 const (
@@ -27,9 +27,14 @@ const (
 	VerzeichnisseArchiviert      = 'a'
 	VerzeichnisseEtikettImplicit = 'I'
 	VerzeichnisseEtikettExpanded = 'e'
+	VerzeichnisseEtiketten       = 'x'
 )
 
 var ErrInvalid = errors.New("invalid schlussel")
+
+func (s Schlussel) String() string {
+	return fmt.Sprintf("%c", byte(s))
+}
 
 func (s *Schlussel) Reset() {
 	*s = 0

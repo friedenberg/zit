@@ -9,7 +9,7 @@ type poolValue[T any] struct {
 	inner *sync.Pool
 }
 
-func MakePoolValue[T any](
+func MakeValue[T any](
 	construct func() T,
 	reset func(T),
 ) poolValue[T] {

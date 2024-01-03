@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/typ_akte"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/etiketten_path"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
@@ -48,7 +49,7 @@ func (k *Compiled) ApplyToSku(
 		)
 	}
 
-	if err = k.addImplicitEtiketten(sk); err != nil {
+	if err = k.addImplicitEtiketten(sk, nil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -63,14 +64,28 @@ func (k *Compiled) ApplyToSku(
 
 func (k *Compiled) addImplicitEtiketten(
 	sk *sku.Transacted,
+	p *etiketten_path.Path,
 ) (err error) {
 	mp := &sk.Metadatei
 	ie := kennung.MakeEtikettMutableSet()
 
 	addImpEts := func(e *kennung.Etikett) (err error) {
+		p1 := p.Copy()
+		p1.Add(e)
+
 		impl := k.GetImplicitEtiketten(e)
 
-		if err = impl.EachPtr(ie.AddPtr); err != nil {
+		if err = impl.EachPtr(
+			iter.MakeChain(
+				ie.AddPtr,
+				func(e1 *kennung.Etikett) (err error) {
+					p2 := p1.Copy()
+					p2.Add(e1)
+					sk.Metadatei.Verzeichnisse.AddPath(p2)
+					return
+				},
+			),
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

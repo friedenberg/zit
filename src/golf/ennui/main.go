@@ -426,7 +426,18 @@ func (e *ennui) Flush() (err error) {
 			return
 		}
 
-		_, err = current.ReadFrom(&e.br)
+		var n int64
+		n, err = current.ReadFrom(&e.br)
+
+		if err != nil {
+			if errors.Is(err, io.ErrUnexpectedEOF) && n == 0 {
+				err = io.EOF
+			}
+
+			err = errors.WrapExcept(err, io.EOF)
+      return
+		}
+
 		r = &current
 
 		return

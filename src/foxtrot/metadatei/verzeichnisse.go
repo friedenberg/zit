@@ -5,12 +5,24 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/foxtrot/etiketten_path"
 )
 
 type Verzeichnisse struct {
 	Archiviert        values.Bool
 	ExpandedEtiketten kennung.EtikettMutableSet // public for gob, but should be private
 	ImplicitEtiketten kennung.EtikettMutableSet // public for gob, but should be private
+	Etiketten         []*etiketten_path.Path
+}
+
+func (v *Verzeichnisse) AddPath(p *etiketten_path.Path) {
+	for _, p1 := range v.Etiketten {
+		if p1.Equals(p) {
+			return
+		}
+	}
+
+	v.Etiketten = append(v.Etiketten, p.Copy())
 }
 
 func (v *Verzeichnisse) GetExpandedEtiketten() kennung.EtikettSet {

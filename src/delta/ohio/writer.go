@@ -1,6 +1,11 @@
 package ohio
 
-import "io"
+import (
+	"encoding/binary"
+	"io"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
+)
 
 func WriteAllOrDieTrying(w io.Writer, b []byte) (n int, err error) {
 	var acc int
@@ -11,6 +16,40 @@ func WriteAllOrDieTrying(w io.Writer, b []byte) (n int, err error) {
 		if err != nil {
 			return
 		}
+	}
+
+	return
+}
+
+func WriteUint8(w io.Writer, n uint8) (written int, err error) {
+	b := [1]byte{n}
+
+	written, err = WriteAllOrDieTrying(w, b[:])
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func WriteUint16(w io.Writer, n uint16) (written int, err error) {
+	var intErr int
+	var b [2]byte
+
+	intErr = binary.PutVarint(b[:], int64(n))
+
+	if intErr != 1 {
+		err = errors.Errorf("expected to write %d but wrote %d", 2, intErr)
+		return
+	}
+
+	written, err = WriteAllOrDieTrying(w, b[:])
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

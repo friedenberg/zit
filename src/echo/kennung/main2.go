@@ -134,7 +134,7 @@ func (k2 *Kennung2) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	if err = k2.left.ReadNFrom(r, int(middlePos)); err != nil {
+	if _, err = k2.left.ReadNFrom(r, int(middlePos)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -151,7 +151,7 @@ func (k2 *Kennung2) ReadFrom(r io.Reader) (n int64, err error) {
 
 	k2.middle = bMiddle[0]
 
-	if err = k2.right.ReadNFrom(r, int(contentLength-middlePos-1)); err != nil {
+	if _, err = k2.right.ReadNFrom(r, int(contentLength-middlePos-1)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

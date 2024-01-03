@@ -15,7 +15,7 @@ var (
 )
 
 func init() {
-	hash256Pool = pool.MakePoolValue[hash.Hash](
+	hash256Pool = pool.MakeValue[hash.Hash](
 		func() hash.Hash {
 			return sha256.New()
 		},

@@ -1,6 +1,7 @@
 package ohio
 
 import (
+	"encoding/binary"
 	"io"
 	"strings"
 
@@ -14,10 +15,65 @@ func ReadAllOrDieTrying(r io.Reader, b []byte) (n int, err error) {
 	for n < len(b) {
 		acc, err = r.Read(b[n:])
 		n += acc
+
 		if err != nil {
-			return
+			break
 		}
 	}
+
+	switch err {
+	case io.EOF:
+		if n < len(b) {
+			err = errors.Wrapf(io.ErrUnexpectedEOF, "Expected %d, got %d", len(b), n)
+		}
+	case nil:
+	default:
+		err = errors.Wrap(err)
+	}
+
+	return
+}
+
+func ReadUint8(r io.Reader) (n uint8, err error) {
+	cl := [1]byte{}
+
+	_, err = ReadAllOrDieTrying(r, cl[:])
+
+	if err != nil {
+		err = errors.WrapExcept(err, io.EOF)
+		return
+	}
+
+	clInt, clIntErr := binary.Uvarint(cl[:])
+
+	if clIntErr <= 0 {
+		err = errors.WrapExcept(err, io.EOF)
+		return
+	}
+
+	n = uint8(clInt)
+
+	return
+}
+
+func ReadUint16(r io.Reader) (n uint16, err error) {
+	cl := [2]byte{}
+
+	_, err = ReadAllOrDieTrying(r, cl[:])
+
+	if err != nil {
+		err = errors.WrapExcept(err, io.EOF)
+		return
+	}
+
+	clInt, clIntErr := binary.Uvarint(cl[:])
+
+	if clIntErr <= 0 {
+		err = errors.WrapExcept(err, io.EOF)
+		return
+	}
+
+	n = uint16(clInt)
 
 	return
 }

@@ -95,16 +95,11 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 
 	case "etiketten-all":
 		return func(tl *sku.Transacted) (err error) {
-			esImp := tl.GetMetadatei().Verzeichnisse.GetExpandedEtiketten()
-			esEx := tl.GetMetadatei().Verzeichnisse.GetImplicitEtiketten()
-			// TODO-P3 determine if empty sets should be printed or not
-
-			if _, err = fmt.Fprintln(
-				out,
-				iter.StringCommaSeparated[kennung.Etikett](esImp, esEx),
-			); err != nil {
-				err = errors.Wrap(err)
-				return
+			for _, es := range tl.Metadatei.Verzeichnisse.Etiketten {
+				if _, err = fmt.Fprintln(out, tl.GetKennung(), "->", es); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 
 			return

@@ -20,7 +20,7 @@ func (etikettResetter) ResetWith(a, b *Etikett) {
 }
 
 func init() {
-	etikettMapPool = pool.MakePoolValue[map[string]Etikett](
+	etikettMapPool = pool.MakeValue[map[string]Etikett](
 		func() map[string]Etikett {
 			return make(map[string]Etikett)
 		},
@@ -58,7 +58,7 @@ var (
 func GetEtikettMapPtrPool() schnittstellen.PoolValue[map[string]*Etikett] {
 	etikettPtrMapPoolOnce.Do(
 		func() {
-			etikettPtrMapPool = pool.MakePoolValue[map[string]*Etikett](
+			etikettPtrMapPool = pool.MakeValue[map[string]*Etikett](
 				func() map[string]*Etikett {
 					return make(map[string]*Etikett)
 				},

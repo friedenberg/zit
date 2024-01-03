@@ -17,7 +17,7 @@ import (
 
 type String struct {
 	addr *String
-	Data bytes.Buffer
+	data bytes.Buffer
 }
 
 func MakeFromString(v string) (s *String) {
@@ -82,7 +82,7 @@ func (b *String) copyCheck() {
 			oldB := b.addr
 			b = &String{}
 			b.addr = b
-			b.Data = bytes.Buffer{}
+			b.data = bytes.Buffer{}
 			oldB.CopyTo(b)
 		}
 	}
@@ -90,12 +90,12 @@ func (b *String) copyCheck() {
 
 func (str *String) String() string {
 	str.copyCheck()
-	return str.Data.String()
+	return str.data.String()
 }
 
 func (str *String) Len() int {
 	str.copyCheck()
-	return str.Data.Len()
+	return str.data.Len()
 }
 
 func (a *String) Equals(b *String) bool {
@@ -112,26 +112,26 @@ func (a *String) EqualsBytes(b []byte) bool {
 
 func (str *String) AvailableBuffer() []byte {
 	str.copyCheck()
-	return str.Data.AvailableBuffer()
+	return str.data.AvailableBuffer()
 }
 
 func (str *String) Available() int {
 	str.copyCheck()
-	return str.Data.Available()
+	return str.data.Available()
 }
 
 func (str *String) Bytes() []byte {
 	str.copyCheck()
-	return str.Data.Bytes()
+	return str.data.Bytes()
 }
 
 func (str *String) Reset() {
-	str.Data.Reset()
+	str.data.Reset()
 }
 
 func (str *String) Write(p []byte) (int, error) {
 	str.copyCheck()
-	return str.Data.Write(p)
+	return str.data.Write(p)
 }
 
 func (str *String) Append(vs ...*String) (n int, err error) {
@@ -153,7 +153,7 @@ func (str *String) Append(vs ...*String) (n int, err error) {
 func (str *String) Grow(n int) {
 	str.copyCheck()
 	// c := str.Cap()
-	str.Data.Grow(n)
+	str.data.Grow(n)
 
 	//	if c < str.Cap() {
 	//		log.Debug().FunctionName(2)
@@ -237,9 +237,9 @@ func (str *String) WriteLower(s []byte) (n int) {
 
 func (dst *String) WriteRune(r rune) (int, error) {
 	dst.Grow(utf8.RuneLen(r))
-	b := dst.Data.AvailableBuffer()
+	b := dst.data.AvailableBuffer()
 	b = utf8.AppendRune(b, r)
-	return dst.Data.Write(b)
+	return dst.data.Write(b)
 }
 
 func (dst *String) SetBytes(src []byte) (err error) {
@@ -279,20 +279,27 @@ func (dst *String) ReadFromBuffer(src *bytes.Buffer) (err error) {
 
 func (dst *String) ReadFrom(r io.Reader) (n int64, err error) {
 	dst.Reset()
-	return dst.Data.ReadFrom(r)
+	return dst.data.ReadFrom(r)
 }
 
-func (dst *String) ReadNFrom(r io.Reader, n int) (err error) {
+func (dst *String) ReadNFrom(r io.Reader, toRead int) (read int, err error) {
 	dst.Reset()
-	dst.Grow(n)
-	b := dst.AvailableBuffer()[:n]
+	dst.Grow(toRead)
+	b := dst.AvailableBuffer()[:toRead]
 
-	if _, err = ohio.ReadAllOrDieTrying(r, b); err != nil {
-		err = errors.Wrap(err)
-		return
+	read, err = ohio.ReadAllOrDieTrying(r, b)
+
+	if err != nil {
+		log.Debug().Printf("to read: %d, read: %d, err: %s", toRead, read, err)
+		if read == toRead && err == io.EOF {
+			err = nil
+		} else {
+			err = errors.WrapExcept(err, io.EOF)
+			return
+		}
 	}
 
-	if _, err = dst.Data.Write(b); err != nil {
+	if _, err = dst.data.Write(b); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -326,4 +333,18 @@ func (src *String) WriteToStringWriter(
 
 func (src *String) MarshalText() ([]byte, error) {
 	return src.Bytes(), nil
+}
+
+func (src *String) UnmarshalText(b []byte) error {
+	src.SetBytes(b)
+	return nil
+}
+
+func (src *String) MarshalBinary() ([]byte, error) {
+	return src.Bytes(), nil
+}
+
+func (src *String) UnmarshalBinary(b []byte) error {
+	src.SetBytes(b)
+	return nil
 }
