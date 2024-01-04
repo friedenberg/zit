@@ -24,7 +24,7 @@ type Konfig struct {
 
 func Default() Konfig {
 	return Konfig{
-		StoreVersion:                        storeVersion(values.Int(4)),
+		StoreVersion:                        storeVersion(values.Int(5)),
 		Recipients:                          make([]string, 0),
 		UseBestandsaufnahme:                 true,
 		UseBestandsaufnahmeForVerzeichnisse: true,

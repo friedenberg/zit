@@ -3,7 +3,6 @@ package objekte_format
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -54,13 +53,12 @@ func Default() Format {
 func FormatForVersion(sv schnittstellen.StoreVersion) Format {
 	v := sv.GetInt()
 
-	switch {
-	case v >= 3:
+	switch v {
+	case 3, 4:
 		return v4{}
 
 	default:
-		panic(errors.Errorf("unsupported version: %q", sv))
-
+		return v5{}
 	}
 }
 

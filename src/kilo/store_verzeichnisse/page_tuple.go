@@ -165,9 +165,21 @@ func (pt *PageTuple) Copy(
 }
 
 func (pt *PageTuple) Flush() error {
-	pw := pageWriter{
-		PageTuple: pt,
+	v := pt.konfig.GetStoreVersion().GetInt()
+
+	var pw errors.Flusher
+
+	switch v {
+	case 3, 4:
+		pw = &pageWriterV4{
+			PageTuple: pt,
+		}
+
+	default:
+		pw = &pageWriterV5{
+			PageTuple: pt,
+		}
 	}
 
-	return pw.flush()
+	return pw.Flush()
 }

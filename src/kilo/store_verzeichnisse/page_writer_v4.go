@@ -19,10 +19,9 @@ type ShaTuple struct {
 	Offset, ContentLength int64
 	kennung.Sigil
 }
-
 type KennungShaMap map[string]ShaTuple
 
-type pageWriter struct {
+type pageWriterV4 struct {
 	*PageTuple
 	sku_fmt.Binary
 	*os.File
@@ -32,7 +31,7 @@ type pageWriter struct {
 	kennungShaMap      KennungShaMap
 }
 
-func (pw *pageWriter) ReadMutter(z *sku.Transacted) (err error) {
+func (pw *pageWriterV4) ReadMutter(z *sku.Transacted) (err error) {
 	k := z.GetKennung()
 	old := pw.kennungShaMap[k.String()]
 
@@ -51,7 +50,7 @@ func (pw *pageWriter) ReadMutter(z *sku.Transacted) (err error) {
 	return
 }
 
-func (pw *pageWriter) writeOne(
+func (pw *pageWriterV4) writeOne(
 	z *sku.Transacted,
 ) (err error) {
 	pw.offsetLast = pw.offset
@@ -86,7 +85,7 @@ func (pw *pageWriter) writeOne(
 	return
 }
 
-func (pw *pageWriter) SaveSha(z *sku.Transacted) (err error) {
+func (pw *pageWriterV4) SaveSha(z *sku.Transacted) (err error) {
 	k := z.GetKennung()
 	var sh sha.Sha
 
@@ -111,7 +110,7 @@ func (pw *pageWriter) SaveSha(z *sku.Transacted) (err error) {
 	return
 }
 
-func (pw *pageWriter) flush() (err error) {
+func (pw *pageWriterV4) Flush() (err error) {
 	if !pw.hasChanges {
 		return
 	}
