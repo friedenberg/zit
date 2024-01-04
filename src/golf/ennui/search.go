@@ -9,7 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 )
 
-func (e *ennui) seekToFirstBinarySearch(shMet *sha.Sha) (mid int64, err error) {
+func (e *page) seekToFirstBinarySearch(shMet *sha.Sha) (mid int64, err error) {
 	if e.f == nil {
 		err = collections.ErrNotFound("fd nil: " + shMet.String())
 		return
@@ -66,7 +66,7 @@ func (e *ennui) seekToFirstBinarySearch(shMet *sha.Sha) (mid int64, err error) {
 	return
 }
 
-func (e *ennui) seekToFirstLinearSearch(shMet *sha.Sha) (loc int64, err error) {
+func (e *page) seekToFirstLinearSearch(shMet *sha.Sha) (loc int64, err error) {
 	if e.f == nil {
 		err = collections.ErrNotFound("fd nil: " + shMet.String())
 		return

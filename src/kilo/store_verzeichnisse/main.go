@@ -103,7 +103,15 @@ func (i *Store) Initialize(ki kennung_index.Index) (err error) {
 	}
 
 	for n := range i.pages {
-		i.pages[n].initialize(PageId{Dir: i.path, Index: uint8(n)}, i, ki)
+		i.pages[n].initialize(
+			PageId{
+				Prefix: "Page",
+				Dir:    i.path,
+				Index:  uint8(n),
+			},
+			i,
+			ki,
+		)
 	}
 
 	return
@@ -126,7 +134,7 @@ func (i *Store) GetEnnuiKennung() ennui.Ennui {
 }
 
 func (i *Store) ExistsOneSha(sh *sha.Sha) (err error) {
-	if _, err = i.ennuiShas.ReadOneSha(sh); err != nil {
+	if _, err = i.ennuiShas.ReadOne(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -137,7 +145,7 @@ func (i *Store) ExistsOneSha(sh *sha.Sha) (err error) {
 func (i *Store) ReadOneShas(sh *sha.Sha) (out *sku.Transacted, err error) {
 	var loc ennui.Loc
 
-	if loc, err = i.ennuiShas.ReadOneSha(sh); err != nil {
+	if loc, err = i.ennuiShas.ReadOne(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -153,7 +161,7 @@ func (i *Store) ReadOneKennung(
 
 	var loc ennui.Loc
 
-	if loc, err = i.ennuiKennung.ReadOneSha(sh); err != nil {
+	if loc, err = i.ennuiKennung.ReadOne(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -173,7 +181,7 @@ func (i *Store) ReadOneAll(
 		sh := sha.FromString(kennungPtr.String())
 		defer sha.GetPool().Put(sh)
 
-		if locKennung, err = i.ennuiKennung.ReadOneSha(sh); err != nil {
+		if locKennung, err = i.ennuiKennung.ReadOne(sh); err != nil {
 			if errors.Is(err, objekte_store.ErrNotFoundEmpty) {
 				err = nil
 			} else {
@@ -277,7 +285,7 @@ func (i *Store) Add(
 ) (err error) {
 	var n uint8
 
-	if n, err = i.PageForString(v); err != nil {
+	if n, err = sha.PageIndexForString(DigitWidth, v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

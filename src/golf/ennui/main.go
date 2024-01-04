@@ -1,18 +1,10 @@
 package ennui
 
 import (
-	"bufio"
-	"io"
-	"os"
-	"sync"
-
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/log"
-	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/heap"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
@@ -21,11 +13,23 @@ import (
 type (
 	Sha = sha.Sha
 
+	commonInterface interface {
+		AddSha(*sha.Sha, Loc) error
+		ReadOne(sh *Sha) (loc Loc, err error)
+		ReadMany(sh *Sha, locs *[]Loc) (err error)
+	}
+
+	pageInterface interface {
+		GetEnnuiPage() pageInterface
+		commonInterface
+		PrintAll() error
+		errors.Flusher
+	}
+
 	Ennui interface {
 		GetEnnui() Ennui
+		commonInterface
 		AddMetadatei(*metadatei.Metadatei, Loc) error
-		AddSha(*sha.Sha, Loc) error
-		ReadOneSha(sh *Sha) (loc Loc, err error)
 		ReadOneKey(string, *metadatei.Metadatei) (Loc, error)
 		ReadManyKeys(string, *metadatei.Metadatei, *[]Loc) error
 		ReadAll(*metadatei.Metadatei, *[]Loc) error
@@ -36,69 +40,35 @@ type (
 
 type Metadatei = metadatei.Metadatei
 
+const (
+	DigitWidth = 1
+	PageCount  = 1 << (DigitWidth * 4)
+)
+
 type ennui struct {
-	sync.Mutex
-	f          *os.File
-	br         bufio.Reader
-	added      *heap.Heap[row, *row]
-	standort   standort.Standort
-	searchFunc func(*sha.Sha) (mid int64, err error)
-	path       string
+	pages [PageCount]page
 }
 
 func MakePermitDuplicates(s standort.Standort, path string) (e *ennui, err error) {
-	return initialize(rowEqualerComplete{}, s, path)
-}
-
-func MakeNoDuplicates(s standort.Standort, path string) (e *ennui, err error) {
-	return initialize(rowEqualerShaOnly{}, s, path)
-}
-
-func initialize(
-	equaler schnittstellen.Equaler1[*row],
-	s standort.Standort,
-	path string,
-) (e *ennui, err error) {
-	e = &ennui{
-		added: heap.Make(
-			equaler,
-			rowLessor{},
-			rowResetter{},
-		),
-		standort: s,
-		path:     path,
-	}
-
-	e.searchFunc = e.seekToFirstBinarySearch
-
-	if err = e.open(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
+	e = &ennui{}
+	err = e.initialize(rowEqualerComplete{}, s, path)
 	return
 }
 
-func (e *ennui) open() (err error) {
-	if e.f != nil {
-		if err = e.f.Close(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
+func MakeNoDuplicates(s standort.Standort, path string) (e *ennui, err error) {
+	e = &ennui{}
+	err = e.initialize(rowEqualerShaOnly{}, s, path)
+	return
+}
 
-	if e.f, err = files.OpenFile(
-		e.path,
-		os.O_RDONLY,
-		0o666,
-	); err != nil {
-		if errors.IsNotExist(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-		}
-
-		return
+func (e *ennui) initialize(
+	equaler schnittstellen.Equaler1[*row],
+	s standort.Standort,
+	path string,
+) (err error) {
+	for i := range e.pages {
+		p := &e.pages[i]
+		p.initialize(equaler, s, sha.PageIdFromPath(uint8(i), path))
 	}
 
 	return
@@ -109,9 +79,6 @@ func (e *ennui) GetEnnui() Ennui {
 }
 
 func (e *ennui) AddMetadatei(m *Metadatei, loc Loc) (err error) {
-	e.Lock()
-	defer e.Unlock()
-
 	var shas map[string]*sha.Sha
 
 	if shas, err = objekte_format.GetShasForMetadatei(m); err != nil {
@@ -130,13 +97,6 @@ func (e *ennui) AddMetadatei(m *Metadatei, loc Loc) (err error) {
 }
 
 func (e *ennui) AddSha(sh *Sha, loc Loc) (err error) {
-	if sh.IsNull() {
-		return
-	}
-
-	e.Lock()
-	defer e.Unlock()
-
 	return e.addSha(sh, loc)
 }
 
@@ -145,55 +105,36 @@ func (e *ennui) addSha(sh *Sha, loc Loc) (err error) {
 		return
 	}
 
-	r := &row{
-		Loc: loc,
-	}
+	var i uint8
 
-	if err = r.sha.SetShaLike(sh); err != nil {
+	if i, err = sha.PageIndexForSha(DigitWidth, sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	e.added.Push(r)
-
-	return
+	return e.pages[i].AddSha(sh, loc)
 }
 
-func (e *ennui) GetRowCount() (n int64, err error) {
-	var fi os.FileInfo
+func (e *ennui) ReadOne(sh *Sha) (loc Loc, err error) {
+	var i uint8
 
-	if fi, err = e.f.Stat(); err != nil {
+	if i, err = sha.PageIndexForSha(DigitWidth, sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	n = fi.Size()/RowSize - 1
-
-	return
+	return e.pages[i].ReadOne(sh)
 }
 
-func (e *ennui) ReadOneSha(sh *Sha) (loc Loc, err error) {
-	e.Lock()
-	defer e.Unlock()
+func (e *ennui) ReadMany(sh *Sha, locs *[]Loc) (err error) {
+	var i uint8
 
-	var start int64
-
-	if start, err = e.searchFunc(sh); err != nil {
+	if i, err = sha.PageIndexForSha(DigitWidth, sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = e.seekAndResetTo(start); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if loc, err = e.readCurrentLoc(sh, e.f); err != nil {
-		err = errors.Wrapf(err, "Start: %d", start)
-		return
-	}
-
-	return
+	return e.pages[i].ReadMany(sh, locs)
 }
 
 func (e *ennui) ReadOneKey(kf string, m *metadatei.Metadatei) (loc Loc, err error) {
@@ -213,7 +154,7 @@ func (e *ennui) ReadOneKey(kf string, m *metadatei.Metadatei) (loc Loc, err erro
 
 	defer sha.GetPool().Put(sh)
 
-	if loc, err = e.ReadOneSha(sh); err != nil {
+	if loc, err = e.ReadOne(sh); err != nil {
 		err = errors.Wrapf(err, "Key: %s", kf)
 		return
 	}
@@ -240,22 +181,7 @@ func (e *ennui) ReadManyKeys(
 		return
 	}
 
-	e.Lock()
-	defer e.Unlock()
-
-	var start int64
-
-	if start, err = e.searchFunc(sh); err != nil {
-		err = errors.Wrapf(err, "Key: %s", kf)
-		return
-	}
-
-	if err = e.collectLocs(sh, h, start); err != nil {
-		err = errors.Wrapf(err, "Key: %s", kf)
-		return
-	}
-
-	return
+	return e.ReadMany(sh, h)
 }
 
 func (e *ennui) ReadAll(m *metadatei.Metadatei, h *[]Loc) (err error) {
@@ -266,216 +192,40 @@ func (e *ennui) ReadAll(m *metadatei.Metadatei, h *[]Loc) (err error) {
 		return
 	}
 
-	e.Lock()
-	defer e.Unlock()
-
-	me := errors.MakeMulti()
+	wg := iter.MakeErrorWaitGroupParallel()
 
 	for k, s := range shas {
-		var loc int64
+		s := s
+		wg.Do(
+			func() (err error) {
+				var loc Loc
 
-		if loc, err = e.searchFunc(s); err != nil {
-			me.Add(errors.Wrapf(err, "Key: %s", k))
-			err = nil
-			continue
-		}
+				if loc, err = e.ReadOne(s); err != nil {
+					err = errors.Wrapf(err, "Key: %s", k)
+					return
+				}
 
-		if err = e.collectLocs(s, h, loc); err != nil {
-			me.Add(errors.Wrapf(err, "Key: %s", k))
-			err = nil
-			continue
-		}
+				*h = append(*h, loc)
+
+				return
+			},
+		)
 	}
 
-	if me.Len() > 0 {
-		err = me
-	}
-
-	return
-}
-
-func (e *ennui) readCurrentLoc(
-	in *sha.Sha,
-	r io.Reader,
-) (out Loc, err error) {
-	if in.IsNull() {
-		err = errors.Errorf("empty sha")
-		return
-	}
-
-	sh := sha.GetPool().Get()
-	defer sha.GetPool().Put(sh)
-
-	if _, err = sh.ReadFrom(r); err != nil {
-		if err != io.EOF {
-			err = errors.Wrap(err)
-		}
-
-		return
-	}
-
-	if !in.Equals(sh) {
-		err = io.EOF
-		return
-	}
-
-	if _, err = out.ReadFrom(e.f); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (e *ennui) seekAndResetTo(loc int64) (err error) {
-	if _, err = e.f.Seek(loc*RowSize, io.SeekStart); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	e.br.Reset(e.f)
-
-	return
-}
-
-func (e *ennui) collectLocs(
-	shMet *sha.Sha,
-	h *[]Loc,
-	start int64,
-) (err error) {
-	if err = e.seekAndResetTo(start); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	for {
-		var loc Loc
-
-		loc, err = e.readCurrentLoc(shMet, &e.br)
-
-		if err != nil {
-			if err == io.EOF {
-				err = nil
-			}
-
-			return
-		}
-
-		*h = append(*h, loc)
-	}
+	return wg.GetError()
 }
 
 func (e *ennui) PrintAll() (err error) {
-	e.Lock()
-	defer e.Unlock()
-
-	if e.f == nil {
-		return
-	}
-
-	if err = e.seekAndResetTo(0); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	for {
-		var current row
-
-		if _, err = current.ReadFrom(&e.br); err != nil {
-			err = errors.WrapExceptAsNil(err, io.EOF)
-			return
-		}
-
-		log.Out().Printf("%s", &current)
-	}
+	return
 }
 
 func (e *ennui) Flush() (err error) {
-	e.Lock()
-	defer e.Unlock()
+	wg := iter.MakeErrorWaitGroupParallel()
 
-	if e.added.Len() == 0 {
-		return
+	for i := range e.pages {
+		p := &e.pages[i]
+		wg.Do(p.Flush)
 	}
 
-	if e.f != nil {
-		if err = e.seekAndResetTo(0); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	var ft *os.File
-
-	if ft, err = e.standort.FileTempLocal(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, ft)
-
-	w := bufio.NewWriter(ft)
-
-	defer errors.DeferredFlusher(&err, w)
-
-	var current row
-
-	getOne := func() (r *row, err error) {
-		if e.f == nil {
-			err = io.EOF
-			return
-		}
-
-		var n int64
-		n, err = current.ReadFrom(&e.br)
-
-		if err != nil {
-			if errors.Is(err, io.ErrUnexpectedEOF) && n == 0 {
-				err = io.EOF
-			}
-
-			err = errors.WrapExcept(err, io.EOF)
-      return
-		}
-
-		r = &current
-
-		return
-	}
-
-	if err = e.added.MergeStream(
-		func() (tz *row, err error) {
-			tz, err = getOne()
-
-			if errors.IsEOF(err) || tz == nil {
-				err = collections.MakeErrStopIteration()
-			}
-
-			return
-		},
-		func(r *row) (err error) {
-			_, err = r.WriteTo(w)
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = os.Rename(
-		ft.Name(),
-		e.path,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	e.added.Reset()
-
-	if err = e.open(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
+	return wg.GetError()
 }

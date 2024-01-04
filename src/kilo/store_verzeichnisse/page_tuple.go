@@ -3,14 +3,13 @@ package store_verzeichnisse
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"io"
-	"path/filepath"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/objekte_mode"
 	"github.com/friedenberg/zit/src/charlie/collections"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/ennui"
@@ -20,30 +19,7 @@ import (
 	"github.com/friedenberg/zit/src/juliett/konfig"
 )
 
-type PageId struct {
-	Index uint8
-	Dir   string
-}
-
-func (pid *PageId) PathForSigil(s kennung.Sigil) string {
-	if s.IncludesHistory() {
-		return pid.PathForAll()
-	} else {
-		return pid.PathForSchwanz()
-	}
-}
-
-func (pid *PageId) PathForAll() string {
-	return filepath.Join(pid.Dir, fmt.Sprintf("All-%x", pid.Index))
-}
-
-func (pid *PageId) PathForSchwanz() string {
-	return filepath.Join(pid.Dir, fmt.Sprintf("Schwanz-%x", pid.Index))
-}
-
-func (pid *PageId) Path() string {
-	return filepath.Join(pid.Dir, fmt.Sprintf("%x", pid.Index))
-}
+type PageId = sha.PageId
 
 type PageTuple struct {
 	PageId

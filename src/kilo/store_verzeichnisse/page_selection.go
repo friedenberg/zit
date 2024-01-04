@@ -15,7 +15,7 @@ import (
 
 func (i *Store) PageForKennung(h kennung.Kennung) (n uint8, err error) {
 	s := sha.FromStringer(h)
-	return i.PageForSha(s)
+	return sha.PageIndexForSha(DigitWidth, s)
 }
 
 func (i *Store) PageForString(s string) (n uint8, err error) {
