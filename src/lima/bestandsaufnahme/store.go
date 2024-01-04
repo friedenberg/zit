@@ -15,6 +15,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/golf/ennui"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/sku_fmt"
@@ -333,6 +334,42 @@ func (s *store) populateAkte(akteSha schnittstellen.ShaLike, a *Akte) (err error
 	return
 }
 
+func (s *store) streamAkte(
+	akteSha schnittstellen.ShaLike,
+	f func(*sku.Transacted, ennui.Range) error,
+) (err error) {
+	var ar schnittstellen.ShaReadCloser
+
+	if ar, err = s.af.AkteReader(akteSha); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, ar)
+
+	dec := sku_fmt.MakeFormatBestandsaufnahmeScanner(
+		ar,
+		objekte_format.FormatForVersion(s.sv),
+		s.options,
+	)
+
+	for dec.Scan() {
+		sk := dec.GetTransacted()
+
+		if err = f(sk, dec.GetRange()); err != nil {
+			err = errors.Wrapf(err, "Sku: %s", sk)
+			return
+		}
+	}
+
+	if err = dec.Error(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s *store) GetAkte(akteSha schnittstellen.ShaLike) (a *Akte, err error) {
 	a = MakeAkte()
 	err = s.populateAkte(akteSha, a)
@@ -419,15 +456,9 @@ func (s *store) ReadAllSkus(
 ) (err error) {
 	if err = s.ReadAll(
 		func(t *sku.Transacted) (err error) {
-			var a *Akte
-
-			if a, err = s.GetAkte(t.GetAkteSha()); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if err = a.Skus.EachPtr(
-				func(sk *sku.Transacted) (err error) {
+			if err = s.streamAkte(
+				t.GetAkteSha(),
+				func(sk *sku.Transacted, _ ennui.Range) (err error) {
 					return f(t, sk)
 				},
 			); err != nil {

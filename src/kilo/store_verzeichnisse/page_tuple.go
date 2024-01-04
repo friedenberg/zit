@@ -82,9 +82,11 @@ func (pt *PageTuple) add(
 		return
 	}
 
-	if mode.Contains(objekte_mode.ModeSchwanz) {
-		// pt.addedSchwanz.Add(z)
+	v := pt.konfig.GetStoreVersion().GetInt()
+
+	if mode.Contains(objekte_mode.ModeSchwanz) && v > 4 {
 		pt.added.Add(z)
+		// pt.addedSchwanz.Add(z)
 	} else {
 		pt.added.Add(z)
 	}

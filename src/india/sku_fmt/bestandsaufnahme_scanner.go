@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
+	"github.com/friedenberg/zit/src/golf/ennui"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
@@ -15,6 +16,7 @@ import (
 type FormatBestandsaufnahmeScanner interface {
 	Error() error
 	GetTransacted() *sku.Transacted
+	GetRange() ennui.Range
 	Scan() bool
 	SetDebug()
 }
@@ -33,6 +35,8 @@ func MakeFormatBestandsaufnahmeScanner(
 }
 
 type bestandsaufnahmeScanner struct {
+	ennui.Range
+
 	ringBuffer *catgut.RingBuffer
 	format     objekte_format.Format
 	options    objekte_format.Options
@@ -45,7 +49,6 @@ type bestandsaufnahmeScanner struct {
 
 	err     error
 	lastSku *sku.Transacted
-	lastN   int64
 	debug   bool
 }
 
@@ -65,22 +68,21 @@ func (scanner *bestandsaufnahmeScanner) GetTransacted() *sku.Transacted {
 	return scanner.lastSku
 }
 
+func (scanner *bestandsaufnahmeScanner) GetRange() ennui.Range {
+	return scanner.Range
+}
+
 func (scanner *bestandsaufnahmeScanner) Scan() (ok bool) {
 	if scanner.err != nil {
 		return
 	}
 
-	var (
-		n1 int64
-		n2 int
-	)
+	var n1 int64
 
-	scanner.lastN = 0
 	scanner.lastSku = nil
 
 	if !scanner.afterFirst {
-		n2, scanner.err = metadatei.ReadBoundary(scanner.ringBuffer)
-		scanner.lastN += int64(n2)
+		_, scanner.err = metadatei.ReadBoundary(scanner.ringBuffer)
 
 		if errors.IsEOF(scanner.err) {
 			return
@@ -92,17 +94,18 @@ func (scanner *bestandsaufnahmeScanner) Scan() (ok bool) {
 		scanner.afterFirst = true
 	}
 
+	scanner.Offset += int64(len(metadatei.Boundary) + 1)
+	scanner.ContentLength = 0
+
 	scanner.lastSku = sku.GetTransactedPool().Get()
 
-	n1, scanner.err = scanner.format.ParsePersistentMetadatei(
+	scanner.ContentLength, scanner.err = scanner.format.ParsePersistentMetadatei(
 		scanner.ringBuffer,
 		scanner.lastSku,
 		scanner.options,
 	)
 
-	scanner.lastN += n1
-
-	if n1 == 0 {
+	if scanner.ContentLength == 0 {
 		if scanner.err == io.EOF {
 			return
 		} else if scanner.err != nil {
@@ -114,8 +117,7 @@ func (scanner *bestandsaufnahmeScanner) Scan() (ok bool) {
 
 	oldErr := scanner.err
 
-	n2, scanner.err = metadatei.ReadBoundary(scanner.ringBuffer)
-	scanner.lastN += int64(n2)
+	_, scanner.err = metadatei.ReadBoundary(scanner.ringBuffer)
 
 	if errors.IsNotNilAndNotEOF(scanner.err) {
 		scanner.err = errors.Wrap(errors.MakeMulti(scanner.err, oldErr))

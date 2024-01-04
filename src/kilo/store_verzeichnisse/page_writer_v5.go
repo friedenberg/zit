@@ -45,9 +45,11 @@ func (pw *pageWriterV5) writeOne(
 	if err = pw.ennuiShas.AddMetadatei(
 		z.GetMetadatei(),
 		ennui.Loc{
-			Page:          pw.Index,
-			Offset:        pw.offsetLast,
-			ContentLength: n,
+			Page: pw.Index,
+			Range: ennui.Range{
+				Offset:        pw.offsetLast,
+				ContentLength: n,
+			},
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -61,16 +63,8 @@ func (pw *pageWriterV5) writeOne(
 
 func (pw *pageWriterV5) SaveSha(z *sku.Transacted) (err error) {
 	k := z.GetKennung()
-	var sh sha.Sha
-
-	if err = sh.SetShaLike(&z.GetMetadatei().Sha); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	record := pw.kennungShaMap[k.String()]
-	record.Mutter = record.Sha
-	record.Sha = &sh
 	record.Offset = pw.offsetLast
 	record.ContentLength = pw.offset - pw.offsetLast
 	record.Sigil = kennung.SigilHistory
@@ -113,6 +107,14 @@ func (pw *pageWriterV5) Flush() (err error) {
 
 	pw.Reset(pw.File)
 
+	if pw.added.Len() == 0 {
+		return pw.flushJustSchwanz()
+	} else {
+		return pw.flushBoth()
+	}
+}
+
+func (pw *pageWriterV5) flushBoth() (err error) {
 	chain := iter.MakeChain(
 		pw.konfig.ApplyToSku,
 		pw.writeOne,
@@ -164,9 +166,78 @@ func (pw *pageWriterV5) Flush() (err error) {
 		if err = pw.ennuiKennung.AddSha(
 			shK,
 			ennui.Loc{
-				Page:          pw.Index,
-				Offset:        st.Offset,
-				ContentLength: st.ContentLength,
+				Page: pw.Index,
+				Range: ennui.Range{
+					Offset:        st.Offset,
+					ContentLength: st.ContentLength,
+				},
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (pw *pageWriterV5) flushJustSchwanz() (err error) {
+	chain := iter.MakeChain(
+		pw.konfig.ApplyToSku,
+		pw.writeOne,
+		pw.SaveSha,
+	)
+
+	if err = pw.Copy(kennung.SigilHistory, chain); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	for {
+		popped, ok := pw.addedSchwanz.Pop()
+
+		if !ok {
+			break
+		}
+
+		if err = chain(popped); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if err = pw.Writer.Flush(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var n int
+
+	for ks, st := range pw.kennungShaMap {
+		st.Add(kennung.SigilSchwanzen)
+
+		// 2 uint8 + offset + 2 uint8 + Schlussel
+		offset := int64(2) + st.Offset + int64(3)
+
+		if n, err = pw.WriteAt([]byte{st.Byte()}, offset); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if n != 1 {
+			panic(errors.Errorf("expected 1 byte but wrote %d", n))
+		}
+
+		shK := sha.FromString(ks)
+
+		if err = pw.ennuiKennung.AddSha(
+			shK,
+			ennui.Loc{
+				Page: pw.Index,
+				Range: ennui.Range{
+					Offset:        st.Offset,
+					ContentLength: st.ContentLength,
+				},
 			},
 		); err != nil {
 			err = errors.Wrap(err)

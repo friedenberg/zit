@@ -63,7 +63,9 @@ func (bf *Binary) ReadFormatExactly(
 	n1, err = r.ReadAt(b, loc.Offset)
 	n += int64(n1)
 
-	if err != nil {
+  if err == io.EOF {
+    err = nil
+  } else if err != nil {
 		err = errors.Wrap(err)
 		return
 	}

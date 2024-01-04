@@ -21,6 +21,19 @@ func WriteAllOrDieTrying(w io.Writer, b []byte) (n int, err error) {
 	return
 }
 
+func WriteInt8(w io.Writer, n int8) (written int, err error) {
+	b := [1]byte{byte(n)}
+
+	written, err = WriteAllOrDieTrying(w, b[:])
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func WriteUint8(w io.Writer, n uint8) (written int, err error) {
 	b := [1]byte{n}
 
@@ -44,6 +57,21 @@ func WriteUint16(w io.Writer, n uint16) (written int, err error) {
 		err = errors.Errorf("expected to write %d but wrote %d", 2, intErr)
 		return
 	}
+
+	written, err = WriteAllOrDieTrying(w, b[:])
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func WriteInt64(w io.Writer, n int64) (written int, err error) {
+	var b [binary.MaxVarintLen64]byte
+
+	binary.PutVarint(b[:], n)
 
 	written, err = WriteAllOrDieTrying(w, b[:])
 

@@ -108,12 +108,13 @@ func (p *Path) Add(e etikettLike) {
 func (p *Path) ReadFrom(r io.Reader) (n int64, err error) {
 	var count uint8
 
-	if count, err = ohio.ReadUint8(r); err != nil {
+  var n1 int
+	if count, n1,  err = ohio.ReadUint8(r); err != nil {
 		err = errors.WrapExcept(err, io.EOF)
 		return
 	}
 
-	n += 1
+	n += int64(n1)
 
 	*p = (*p)[:p.Cap()]
 
@@ -124,12 +125,12 @@ func (p *Path) ReadFrom(r io.Reader) (n int64, err error) {
 	for i := uint8(0); i < count; i++ {
 		var cl uint8
 
-		if cl, err = ohio.ReadUint8(r); err != nil {
+		if cl, n1,  err = ohio.ReadUint8(r); err != nil {
 			err = errors.WrapExcept(err, io.EOF)
 			return
 		}
 
-		n += 1
+		n += int64(n1)
 
 		if (*p)[i] == nil {
 			(*p)[i] = catgut.GetPool().Get()

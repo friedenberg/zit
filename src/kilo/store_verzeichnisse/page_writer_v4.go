@@ -71,9 +71,11 @@ func (pw *pageWriterV4) writeOne(
 	if err = pw.ennuiShas.AddMetadatei(
 		z.GetMetadatei(),
 		ennui.Loc{
-			Page:          pw.Index,
-			Offset:        pw.offsetLast,
-			ContentLength: n,
+			Page: pw.Index,
+			Range: ennui.Range{
+				Offset:        pw.offsetLast,
+				ContentLength: n,
+			},
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -191,9 +193,11 @@ func (pw *pageWriterV4) Flush() (err error) {
 		if err = pw.ennuiKennung.AddSha(
 			shK,
 			ennui.Loc{
-				Page:          pw.Index,
-				Offset:        st.Offset,
-				ContentLength: st.ContentLength,
+				Page: pw.Index,
+				Range: ennui.Range{
+					Offset:        st.Offset,
+					ContentLength: st.ContentLength,
+				},
 			},
 		); err != nil {
 			err = errors.Wrap(err)

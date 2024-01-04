@@ -1,7 +1,6 @@
 package ennui
 
 import (
-	"encoding/binary"
 	"fmt"
 	"io"
 
@@ -10,8 +9,8 @@ import (
 )
 
 type Loc struct {
-	Page                  uint8
-	Offset, ContentLength int64
+	Page uint8
+	Range
 }
 
 func (l Loc) IsEmpty() bool {
@@ -19,15 +18,12 @@ func (l Loc) IsEmpty() bool {
 }
 
 func (l Loc) String() string {
-	return fmt.Sprintf("%02d@%03d", l.Page, l.Offset)
+	return fmt.Sprintf("%02d@%s", l.Page, l.Range)
 }
 
 func (l *Loc) ReadFrom(r io.Reader) (n int64, err error) {
 	var n1 int
-	var intErr int
-	var page [1]byte
-
-	n1, err = ohio.ReadAllOrDieTrying(r, page[:])
+	l.Page, n1, err = ohio.ReadUint8(r)
 	n += int64(n1)
 
 	if err != nil {
@@ -35,50 +31,12 @@ func (l *Loc) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	var pageInt int64
-	pageInt, intErr = binary.Varint(page[:])
-
-	if intErr <= 0 {
-		err = errors.Errorf("page parse issue: %d", intErr)
-		return
-	}
-
-	if pageInt > 16 {
-		err = errors.Errorf("page too big: %d", pageInt)
-		return
-	}
-
-	l.Page = uint8(pageInt)
-
-	var b int64Bytes
-
-	n1, err = ohio.ReadAllOrDieTrying(r, b[:])
-	n += int64(n1)
+	var n2 int64
+	n2, err = l.Range.ReadFrom(r)
+	n += n2
 
 	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	l.Offset, intErr = binary.Varint(b[:])
-
-	if intErr <= 0 {
-		err = errors.Errorf("offset parse issue: %d", intErr)
-		return
-	}
-
-	n1, err = ohio.ReadAllOrDieTrying(r, b[:])
-	n += int64(n1)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	l.ContentLength, intErr = binary.Varint(b[:])
-
-	if intErr <= 0 {
-		err = errors.Errorf("content length parse issue: %d", intErr)
+		err = errors.WrapExcept(err, io.EOF)
 		return
 	}
 
@@ -87,17 +45,7 @@ func (l *Loc) ReadFrom(r io.Reader) (n int64, err error) {
 
 func (l *Loc) WriteTo(w io.Writer) (n int64, err error) {
 	var n1 int
-	var intErr int
-	var page [1]byte
-
-	intErr = binary.PutVarint(page[:], int64(l.Page))
-
-	if intErr != 1 {
-		err = errors.Errorf("expected to write %d but wrote %d", 1, intErr)
-		return
-	}
-
-	n1, err = ohio.WriteAllOrDieTrying(w, page[:])
+	n1, err = ohio.WriteUint8(w, l.Page)
 	n += int64(n1)
 
 	if err != nil {
@@ -105,25 +53,12 @@ func (l *Loc) WriteTo(w io.Writer) (n int64, err error) {
 		return
 	}
 
-	var b int64Bytes
-
-	binary.PutVarint(b[:], l.Offset)
-
-	n1, err = ohio.WriteAllOrDieTrying(w, b[:])
-	n += int64(n1)
+	var n2 int64
+	n2, err = l.Range.WriteTo(w)
+	n += n2
 
 	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	binary.PutVarint(b[:], l.ContentLength)
-
-	n1, err = ohio.WriteAllOrDieTrying(w, b[:])
-	n += int64(n1)
-
-	if err != nil {
-		err = errors.Wrap(err)
+		err = errors.WrapExcept(err, io.EOF)
 		return
 	}
 

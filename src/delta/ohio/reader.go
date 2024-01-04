@@ -24,7 +24,12 @@ func ReadAllOrDieTrying(r io.Reader, b []byte) (n int, err error) {
 	switch err {
 	case io.EOF:
 		if n < len(b) {
-			err = errors.Wrapf(io.ErrUnexpectedEOF, "Expected %d, got %d", len(b), n)
+			err = errors.Wrapf(
+				io.ErrUnexpectedEOF,
+				"Expected %d, got %d",
+				len(b),
+				n,
+			)
 		}
 	case nil:
 	default:
@@ -34,10 +39,10 @@ func ReadAllOrDieTrying(r io.Reader, b []byte) (n int, err error) {
 	return
 }
 
-func ReadUint8(r io.Reader) (n uint8, err error) {
+func ReadUint8(r io.Reader) (n uint8, read int, err error) {
 	cl := [1]byte{}
 
-	_, err = ReadAllOrDieTrying(r, cl[:])
+	read, err = ReadAllOrDieTrying(r, cl[:])
 
 	if err != nil {
 		err = errors.WrapExcept(err, io.EOF)
@@ -52,6 +57,28 @@ func ReadUint8(r io.Reader) (n uint8, err error) {
 	}
 
 	n = uint8(clInt)
+
+	return
+}
+
+func ReadInt8(r io.Reader) (n int8, read int, err error) {
+	cl := [1]byte{}
+
+	read, err = ReadAllOrDieTrying(r, cl[:])
+
+	if err != nil {
+		err = errors.WrapExcept(err, io.EOF)
+		return
+	}
+
+	clInt, clIntErr := binary.Uvarint(cl[:])
+
+	if clIntErr <= 0 {
+		err = errors.WrapExcept(err, io.EOF)
+		return
+	}
+
+	n = int8(clInt)
 
 	return
 }
@@ -74,6 +101,26 @@ func ReadUint16(r io.Reader) (n uint16, err error) {
 	}
 
 	n = uint16(clInt)
+
+	return
+}
+
+func ReadInt64(r io.Reader) (n int64, read int, err error) {
+	cl := [binary.MaxVarintLen64]byte{}
+
+	read, err = ReadAllOrDieTrying(r, cl[:])
+
+	if err != nil {
+		err = errors.WrapExcept(err, io.EOF)
+		return
+	}
+
+	n, clIntErr := binary.Varint(cl[:])
+
+	if clIntErr <= 0 {
+		err = errors.WrapExcept(err, io.EOF)
+		return
+	}
 
 	return
 }
@@ -142,7 +189,10 @@ func MakeLineReaderKeyValues(
 		loc := strings.Index(line, " ")
 
 		if loc == -1 {
-			err = si.Errorf("expected at least one space, but found none: %q", line)
+			err = si.Errorf(
+				"expected at least one space, but found none: %q",
+				line,
+			)
 			return
 		}
 
@@ -174,7 +224,10 @@ func MakeLineReaderKeyValue(
 		loc := strings.Index(line, " ")
 
 		if loc == -1 {
-			err = errors.Errorf("expected at least one space, but found none: %q", line)
+			err = errors.Errorf(
+				"expected at least one space, but found none: %q",
+				line,
+			)
 			return
 		}
 
