@@ -108,8 +108,8 @@ func (p *Path) Add(e etikettLike) {
 func (p *Path) ReadFrom(r io.Reader) (n int64, err error) {
 	var count uint8
 
-  var n1 int
-	if count, n1,  err = ohio.ReadUint8(r); err != nil {
+	var n1 int
+	if count, n1, err = ohio.ReadUint8(r); err != nil {
 		err = errors.WrapExcept(err, io.EOF)
 		return
 	}
@@ -125,7 +125,7 @@ func (p *Path) ReadFrom(r io.Reader) (n int64, err error) {
 	for i := uint8(0); i < count; i++ {
 		var cl uint8
 
-		if cl, n1,  err = ohio.ReadUint8(r); err != nil {
+		if cl, n1, err = ohio.ReadUint8(r); err != nil {
 			err = errors.WrapExcept(err, io.EOF)
 			return
 		}
@@ -160,8 +160,7 @@ func (p *Path) WriteTo(w io.Writer) (n int64, err error) {
 
 	for _, s := range *p {
 		if s.Len() == 0 {
-			// TODO not a valid state
-			continue
+			panic("found empty etikett in etiketten_path")
 		}
 
 		n1, err = ohio.WriteUint8(w, uint8(s.Len()))

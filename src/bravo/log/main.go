@@ -23,3 +23,7 @@ func Log() errors.DevPrinter {
 func Debug() errors.DevPrinter {
 	return errors.Debug()
 }
+
+func DebugAllowCommit() errors.DevPrinter {
+	return errors.Debug()
+}

@@ -53,7 +53,7 @@ func (s *Store) handleNewOrUpdatedCommit(
 	}
 
 	if err = s.GetVerzeichnisse().ExistsOneSha(&t.Metadatei.Sha); err == nil {
-		log.Debug().Printf("already exists: %s", t.StringKennungSha())
+		log.Err().Printf("already exists: %s", t.StringKennungSha())
 		return
 	}
 

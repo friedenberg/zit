@@ -152,12 +152,7 @@ func (str *String) Append(vs ...*String) (n int, err error) {
 
 func (str *String) Grow(n int) {
 	str.copyCheck()
-	// c := str.Cap()
 	str.data.Grow(n)
-
-	//	if c < str.Cap() {
-	//		log.Debug().FunctionName(2)
-	//	}
 }
 
 func (str *String) Map(mapping func(r rune) rune, s []byte) (n int) {
@@ -290,7 +285,6 @@ func (dst *String) ReadNFrom(r io.Reader, toRead int) (read int, err error) {
 	read, err = ohio.ReadAllOrDieTrying(r, b)
 
 	if err != nil {
-		log.Debug().Printf("to read: %d, read: %d, err: %s", toRead, read, err)
 		if read == toRead && err == io.EOF {
 			err = nil
 		} else {

@@ -273,7 +273,7 @@ func getShaForMetadateiDebug(f FormatGeneric, m *Metadatei) (sh *Sha, err error)
 		return
 	}
 
-	log.Debug().Caller(2, "%s:%s -> %s", f.key, sh, &sb)
+	log.DebugAllowCommit().Caller(2, "%s:%s -> %s", f.key, sh, &sb)
 
 	return
 }
