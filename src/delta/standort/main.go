@@ -31,6 +31,7 @@ type Standort struct {
 func Make(
 	o Options,
 ) (s Standort, err error) {
+	s.age = &age.Age{}
 	errors.TodoP3("add 'touched' which can get deleted / cleaned")
 	if err = o.Validate(); err != nil {
 		err = errors.Wrap(err)
@@ -57,12 +58,17 @@ func Make(
 		fa := s.FileAge()
 
 		if files.Exists(fa) {
-			if s.age, err = age.MakeFromIdentityFile(fa); err != nil {
+			var i age.Identity
+
+			if err = i.SetFromPath(fa); err != nil {
 				errors.Wrap(err)
 				return
 			}
-		} else {
-			s.age = &age.Age{}
+
+			if err = s.age.AddIdentity(i); err != nil {
+				errors.Wrap(err)
+				return
+			}
 		}
 	}
 
@@ -117,6 +123,10 @@ func (s *Standort) loadKonfigAngeboren() (err error) {
 
 func (s Standort) GetLockSmith() schnittstellen.LockSmith {
 	return s.lockSmith
+}
+
+func (s *Standort) Age() *age.Age {
+	return s.age
 }
 
 func (s Standort) Cwd() string {

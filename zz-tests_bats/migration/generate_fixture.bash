@@ -13,7 +13,7 @@ fi
 mkdir -p "$d"
 
 pushd "$d"
-"$zit" init -yin "$dir_base/yin" -yang "$dir_base/yang" -disable-age -compression-type none
+"$zit" init -yin "$dir_base/yin" -yang "$dir_base/yang" -age none -compression-type none
 
 [ "$(zit show !md:t)" = "[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]" ]
 [ "$(zit show :konfig)" = "[konfig@bb61ffad0cd4354654743ec604066a0a02db9ef188f695ce856acd284ee0612d]" ]

@@ -72,7 +72,7 @@ function outputs_organize_two_etiketten { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run_zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit_init_disable_age
 	assert_success
 
 	to_add="$(mktemp)"
@@ -148,7 +148,7 @@ function outputs_organize_one_etiketten_group_by_one { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run_zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit_init_disable_age
 	assert_success
 
 	to_add="$(mktemp)"
@@ -196,7 +196,7 @@ function outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit_init_disable_age
 
 	to_add="$(mktemp)"
 	{
@@ -311,7 +311,7 @@ function commits_organize_one_etiketten_group_by_two { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run_zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit_init_disable_age
 	assert_success
 
 	to_add="$(mktemp)"
@@ -429,7 +429,7 @@ function commits_organize_one_etiketten_group_by_two_new_zettels { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run_zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit_init_disable_age
 	assert_success
 
 	to_add="$(mktemp)"
@@ -583,7 +583,7 @@ function commits_no_changes { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run_zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit_init_disable_age
 	assert_success
 
 	one="$(mktemp)"
@@ -668,7 +668,7 @@ function commits_dependent_leaf { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run_zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit_init_disable_age
 	assert_success
 
 	one="$(mktemp)"
@@ -796,7 +796,7 @@ function etiketten_correct { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit_init_disable_age
 
 	first_organize="$(mktemp)"
 	{
@@ -828,7 +828,7 @@ function etiketten_correct { # @test
 		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md test4]
 	EOM
 
-  # TODO-P2 fix issue with kennung schwanzen
+	# TODO-P2 fix issue with kennung schwanzen
 	# run zit cat-etiketten-schwanzen
 	# assert_output - <<-EOM
 	# 	test4
@@ -848,7 +848,7 @@ function etiketten_correct { # @test
 		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 test1-ok test4]
 	EOM
 
-  # TODO-P2 fix issue with kennung schwanzen
+	# TODO-P2 fix issue with kennung schwanzen
 	# run zit cat-etiketten-schwanzen
 	# assert_output_unsorted - <<-EOM
 	# 	test1-ok

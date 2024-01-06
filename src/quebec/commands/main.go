@@ -60,7 +60,7 @@ func Run(args []string) (exitStatus int) {
 	konfigCli := erworben.DefaultCli()
 	konfigCli.AddToFlags(cmd.FlagSet)
 
-	if err = cmd.FlagSet.Parse(args); err != nil {
+	if err = cmd.Parse(args); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -74,7 +74,7 @@ func Run(args []string) (exitStatus int) {
 
 	defer errors.DeferredCloser(&err, dc)
 
-	cmdArgs := cmd.FlagSet.Args()
+	cmdArgs := cmd.Args()
 
 	var u *umwelt.Umwelt
 
@@ -112,7 +112,7 @@ func Run(args []string) (exitStatus int) {
 		}
 
 	default:
-		if err = cmd.Command.Run(u, cmdArgs...); err != nil {
+		if err = cmd.Run(u, cmdArgs...); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

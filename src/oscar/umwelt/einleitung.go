@@ -21,17 +21,16 @@ import (
 )
 
 type Einleitung struct {
-	DisableAge bool
-	Yin        string
-	Yang       string
-	Angeboren  angeboren.Konfig
+	AgeIdentity age.Identity
+	Yin         string
+	Yang        string
+	Angeboren   angeboren.Konfig
 }
 
 func (e *Einleitung) AddToFlagSet(f *flag.FlagSet) {
-	f.BoolVar(
-		&e.DisableAge,
-		"disable-age",
-		false,
+	f.Var(
+		&e.AgeIdentity,
+		"age",
 		"",
 	) // TODO-P3 move to Angeboren
 	f.StringVar(&e.Yin, "yin", "", "File containing list of Kennung")
@@ -75,16 +74,12 @@ func (u *Umwelt) Einleitung(e Einleitung) (err error) {
 		mkdirAll(d)
 	}
 
-	if !e.DisableAge {
-		if _, err = age.Generate(s.FileAge()); err != nil {
-			// If the Age file exists, don't do anything and continue init
-			if errors.Is(err, os.ErrExist) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
-		}
+	if err = s.Age().AddIdentityOrGenerateIfNecessary(
+		e.AgeIdentity,
+		s.FileAge(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	writeFile(s.FileKonfigAngeboren(), e.Angeboren)

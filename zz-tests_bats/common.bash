@@ -84,7 +84,7 @@ function get_konfig_sha() {
 }
 
 function run_zit_init_disable_age {
-  run_zit init -yin <(cat_yin) -yang <(cat_yang) -disable-age "$@"
+  run_zit init -yin <(cat_yin) -yang <(cat_yang) -age none "$@"
   assert_success
   assert_output - <<-EOM
 		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]

@@ -33,7 +33,7 @@ func Generate(basePath string) (a *Age, err error) {
 
 	a = &Age{
 		recipients: []Recipient{i.Recipient()},
-		identities: []Identity{i},
+		identities: []age.Identity{i},
 	}
 
 	return

@@ -31,8 +31,11 @@ function can_initialize_with_age { # @test
 	run_zit init -yin <(cat_yin) -yang <(cat_yang)
 	assert_success
 
-	[ -d .zit/ ]
-	[ -f .zit/AgeIdentity ]
+	run test -d .zit/
+  assert_success
+
+	run test -f .zit/AgeIdentity
+  assert_success
 }
 
 function can_new_zettel_file { # @test

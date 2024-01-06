@@ -22,7 +22,7 @@ import (
 type Import struct {
 	Bestandsaufnahme string
 	Akten            string
-	AgeIdentity      string
+	AgeIdentity      age.Identity
 	CompressionType  angeboren.CompressionType
 	Proto            zettel.ProtoZettel
 }
@@ -38,7 +38,7 @@ func init() {
 
 			f.StringVar(&c.Bestandsaufnahme, "bestandsaufnahme", "", "")
 			f.StringVar(&c.Akten, "akten", "", "")
-			f.StringVar(&c.AgeIdentity, "age-identity", "", "")
+			f.Var(&c.AgeIdentity, "age-identity", "")
 			c.CompressionType.AddToFlagSet(f)
 
 			c.Proto.AddToFlagSet(f)
@@ -59,10 +59,10 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var ag *age.Age
+	var ag age.Age
 
-	if ag, err = age.MakeFromIdentity(c.AgeIdentity); err != nil {
-		err = errors.Wrapf(err, "age-identity: %q", c.AgeIdentity)
+	if err = ag.AddIdentity(c.AgeIdentity); err != nil {
+		err = errors.Wrapf(err, "age-identity: %q", &c.AgeIdentity)
 		return
 	}
 
@@ -75,7 +75,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	// setup besty reader
 	{
 		o := standort.FileReadOptions{
-			Age:             ag,
+			Age:             &ag,
 			Path:            c.Bestandsaufnahme,
 			CompressionType: c.CompressionType,
 		}
@@ -126,7 +126,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			}
 		}
 
-		if err = c.importAkteIfNecessary(u, sk, ag); err != nil {
+		if err = c.importAkteIfNecessary(u, sk, &ag); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

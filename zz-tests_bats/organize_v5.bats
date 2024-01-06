@@ -22,7 +22,7 @@ function organize_v5_outputs_organize_one_etikett { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run_zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit_init_disable_age
 	assert_success
 
 	to_add="$(mktemp)"
@@ -62,7 +62,7 @@ function organize_v5_outputs_organize_two_etiketten { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run_zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit_init_disable_age
 	assert_success
 
 	to_add="$(mktemp)"
@@ -127,7 +127,7 @@ function organize_v5_outputs_organize_one_etiketten_group_by_one { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run_zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit_init_disable_age
 	assert_success
 
 	to_add="$(mktemp)"
@@ -176,7 +176,7 @@ function organize_v5_outputs_organize_two_zettels_one_etiketten_group_by_one { #
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run_zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit_init_disable_age
 	assert_success
 
 	to_add="$(mktemp)"
@@ -240,7 +240,7 @@ function organize_v5_commits_organize_one_etiketten_group_by_two { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run_zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit_init_disable_age
 	assert_success
 
 	to_add="$(mktemp)"
@@ -343,7 +343,7 @@ function organize_v5_commits_organize_one_etiketten_group_by_two_new_zettels { #
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run_zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit_init_disable_age
 	assert_success
 
 	to_add="$(mktemp)"
@@ -506,7 +506,7 @@ function organize_v5_commits_no_changes { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run_zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit_init_disable_age
 	assert_success
 
 	one="$(mktemp)"
@@ -609,7 +609,7 @@ function organize_v5_commits_dependent_leaf { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run_zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit_init_disable_age
 	assert_success
 
 	one="$(mktemp)"
@@ -751,7 +751,7 @@ function organize_v5_etiketten_correct { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
-	run zit init -disable-age -yin <(cat_yin) -yang <(cat_yang)
+	run_zit_init_disable_age
 
 	first_organize="$(mktemp)"
 	{
