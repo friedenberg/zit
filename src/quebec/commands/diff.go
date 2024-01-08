@@ -67,7 +67,7 @@ func (c Diff) RunWithQuery(
 
 				var mode checkout_mode.Mode
 
-				if mode, err = el.GetFDs().GetCheckoutMode(); err != nil {
+				if mode, err = el.GetFDs().GetCheckoutModeOrError(); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

@@ -7,6 +7,10 @@ setup() {
 	export output
 }
 
+teardown() {
+	chflags_and_rm
+}
+
 function init_and_reindex { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
@@ -72,6 +76,20 @@ function init_and_deinit { # @test
 	# run ls .zit/
 	# assert_success
 	# assert_output wow
+}
+
+function init_and_with_another_age { # @test
+	run_zit_init
+	age_id="$(realpath .zit/AgeIdentity)"
+
+	mkdir inner
+	pushd inner || exit 1
+
+	run_zit init -yin <(cat_yin) -yang <(cat_yang) -age "$age_id"
+	assert_success
+
+  run diff .zit/AgeIdentity "$age_id"
+  assert_success
 }
 
 # function init_and_init { ## @test

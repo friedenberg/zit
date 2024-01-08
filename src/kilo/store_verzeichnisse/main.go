@@ -11,6 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/objekte_mode"
 	"github.com/friedenberg/zit/src/bravo/pool"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -138,6 +139,8 @@ func (i *Store) ExistsOneSha(sh *sha.Sha) (err error) {
 		err = errors.Wrap(err)
 		return
 	}
+
+	err = collections.ErrExists
 
 	return
 }

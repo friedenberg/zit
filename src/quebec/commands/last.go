@@ -56,7 +56,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		u.Standort(),
 		u.Konfig(),
 		u.PrinterTransactedLike(),
-		u.StringFormatWriterSkuLikePtrShort(),
+		u.StringFormatWriterSkuTransactedShort(),
 		u.StoreUtil().GetEnnui(),
 		u.StoreUtil().GetVerzeichnisse().ReadOneShas,
 	)

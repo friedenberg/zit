@@ -175,7 +175,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		Archived:  ptl,
 	}
 
-	u.storeUtil.SetCheckedOutLogWriter(u.PrinterCheckedOutLike())
+	u.storeUtil.SetCheckedOutLogWriter(u.PrinterCheckedOut())
 	u.storeObjekten.SetLogWriter(lw)
 
 	u.storesInitialized = true

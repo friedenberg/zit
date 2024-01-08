@@ -18,6 +18,7 @@ const (
 	StateUntracked
 	StateRecognized
 	StateConflicted
+  StateError
 )
 
 func (s State) String() string {
@@ -41,6 +42,9 @@ func (s State) String() string {
 
 	case StateConflicted:
 		return string_format_writer.StringConflicted
+
+	case StateError:
+		return "error"
 
 	default:
 		return fmt.Sprintf("unknown: %#v", s)

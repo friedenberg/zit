@@ -6,6 +6,11 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
+type (
+	CheckedOut = sku.CheckedOut
+	Transacted = sku.Transacted
+)
+
 type KeyerSkuLikeUnique struct{}
 
 func (k KeyerSkuLikeUnique) GetKey(o *sku.Transacted) string {

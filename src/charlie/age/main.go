@@ -40,6 +40,11 @@ func (a *Age) AddIdentityOrGenerateIfNecessary(
 		return
 	}
 
+	if err = identity.WriteToPathIfNecessary(path); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = a.AddIdentity(identity); err != nil {
 		err = errors.Wrap(err)
 		return

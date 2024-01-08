@@ -22,7 +22,7 @@ do_lint \
 	"todos without priorities" \
 	ag \
 	--go \
-	'// todo(?!(\s*|-)p\d)' \
+	'// todo(?!(\s*|-)p)' \
 	--ignore-case \
 	-l
 

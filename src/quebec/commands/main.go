@@ -113,7 +113,6 @@ func Run(args []string) (exitStatus int) {
 
 	default:
 		if err = cmd.Run(u, cmdArgs...); err != nil {
-			err = errors.Wrap(err)
 			return
 		}
 	}

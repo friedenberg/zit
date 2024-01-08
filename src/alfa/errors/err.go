@@ -11,6 +11,10 @@ func WrapN(n int, in error) (err error) {
 }
 
 func Wrap(in error) (err error) {
+	if in == nil {
+		return
+	}
+
 	se, _ := newStackWrapError(1)
 	err = wrapf(se, in, "")
 	return

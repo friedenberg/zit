@@ -96,6 +96,7 @@ func (s *Store) CreateOrUpdateTransacted(
 	return s.CreateOrUpdate(in, in.GetKennung())
 }
 
+// TODO-project-2022-zit-collapse_skus transition this to accepting checked out
 func (s *Store) createOrUpdate(
 	mg metadatei.Getter,
 	kennungPtr kennung.Kennung,
@@ -226,7 +227,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 
 	var co *sku.CheckedOut
 
-	if co, err = s.ReadOneExternalFS(mutter); err != nil {
+	if co, err = s.ReadOneExternalFS(transactedPtr); err != nil {
 		err = nil
 		return
 	}

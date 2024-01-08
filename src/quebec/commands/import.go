@@ -6,16 +6,17 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/angeboren"
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/charlie/age"
-	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/sha"
+	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/sku_fmt"
 	"github.com/friedenberg/zit/src/kilo/zettel"
 	"github.com/friedenberg/zit/src/lima/bestandsaufnahme"
+	"github.com/friedenberg/zit/src/november/store_objekten"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
@@ -49,6 +50,8 @@ func init() {
 }
 
 func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
+	hasConflicts := false
+
 	if c.Bestandsaufnahme == "" {
 		err = errors.Errorf("empty Bestandsaufnahme")
 		return
@@ -65,6 +68,8 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		err = errors.Wrapf(err, "age-identity: %q", &c.AgeIdentity)
 		return
 	}
+
+	coPrinter := u.PrinterCheckedOut()
 
 	ofo := objekte_format.Options{Tai: true, Verzeichnisse: true}
 
@@ -107,6 +112,8 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	u.Lock()
 	defer u.Unlock()
 
+	var co *sku.CheckedOut
+
 	for {
 		sk, ok := besty.Skus.Pop()
 
@@ -114,22 +121,43 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			break
 		}
 
-		if err = u.StoreObjekten().Import(
+		if co, err = u.StoreObjekten().Import(
 			sk,
 		); err != nil {
-			if errors.Is(err, collections.ErrExists) {
-				err = nil
-				continue
-			} else {
-				err = errors.Wrapf(err, "Sku: %s", sk)
-				return
-			}
+			err = errors.Wrapf(err, "Sku: %s", sk)
+			return
 		}
 
-		if err = c.importAkteIfNecessary(u, sk, &ag); err != nil {
+		if co.State == checked_out_state.StateError {
+			if co.Error == store_objekten.ErrNeedsMerge {
+				hasConflicts = true
+			}
+
+			if err = coPrinter(co); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			continue
+		}
+
+		if err = c.importAkteIfNecessary(u, co, &ag, coPrinter); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+
+		if co.State == checked_out_state.StateError {
+			if err = coPrinter(co); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			continue
+		}
+	}
+
+	if hasConflicts {
+		err = store_objekten.ErrNeedsMerge
 	}
 
 	return
@@ -137,10 +165,11 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 func (c Import) importAkteIfNecessary(
 	u *umwelt.Umwelt,
-	sk *sku.Transacted,
+	co *sku.CheckedOut,
 	ag *age.Age,
+	coErrPrinter schnittstellen.FuncIter[*sku.CheckedOut],
 ) (err error) {
-	akteSha := sk.GetAkteSha()
+	akteSha := co.External.GetAkteSha()
 
 	if u.Standort().HasAkte(u.Konfig().GetStoreVersion(), akteSha) {
 		return
@@ -158,10 +187,8 @@ func (c Import) importAkteIfNecessary(
 
 	if rc, err = standort.NewFileReader(o); err != nil {
 		if errors.IsNotExist(err) {
-			err = errors.TodoRecoverable(
-				"make recoverable: sku missing akte: %s",
-				sku_fmt.String(sk),
-			)
+			co.SetError(errors.New("akte missing"))
+			err = coErrPrinter(co)
 		} else {
 			err = errors.Wrap(err)
 		}
@@ -183,17 +210,19 @@ func (c Import) importAkteIfNecessary(
 	var n int64
 
 	if n, err = io.Copy(aw, rc); err != nil {
-		errors.TodoRecoverable("%s: Sku: %s", err, sku_fmt.String(sk))
-		err = nil
+		co.SetError(errors.New("akte copy failed"))
+		err = coErrPrinter(co)
 		return
 	}
 
 	shaRc := rc.GetShaLike()
 
 	if !shaRc.EqualsSha(akteSha) {
+		co.SetError(errors.New("akte sha mismatch"))
+		err = coErrPrinter(co)
 		errors.TodoRecoverable(
 			"sku akte mismatch: %s while akten had %s",
-			sku_fmt.String(sk),
+			co.Internal.GetAkteSha(),
 			shaRc,
 		)
 	}

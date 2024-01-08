@@ -13,8 +13,8 @@ import (
 )
 
 type cli struct {
-	options erworben_cli_print_options.PrintOptions
-	prefix  string
+	options       erworben_cli_print_options.PrintOptions
+	contentPrefix string
 
 	writeTyp         bool
 	writeBezeichnung bool
@@ -56,7 +56,7 @@ func MakeCliFormat(
 ) *cli {
 	return &cli{
 		options: options,
-		prefix: string_format_writer.StringPrefixFromOptions(
+		contentPrefix: string_format_writer.StringPrefixFromOptions(
 			options,
 		),
 		writeTyp:                      true,
@@ -76,23 +76,29 @@ func (f *cli) WriteStringFormat(
 ) (n int64, err error) {
 	var n1 int
 
-	if f.options.PrintTime {
-		t := o.GetTai()
+	{
+		var bracketPrefix string
 
-		n1, err = sw.WriteString(t.Format(thyme.FormatDateTime))
-		n += int64(n1)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
+		if f.options.PrintTime {
+			bracketPrefix = o.GetTai().Format(thyme.FormatDateTime)
 		}
 
-		n1, err = sw.WriteString(" ")
-		n += int64(n1)
+		if bracketPrefix != "" {
+			n1, err = sw.WriteString(bracketPrefix)
+			n += int64(n1)
 
-		if err != nil {
-			err = errors.Wrap(err)
-			return
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			n1, err = sw.WriteString(" ")
+			n += int64(n1)
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 	}
 
@@ -139,7 +145,7 @@ func (f *cli) WriteStringFormat(
 		t := o.GetMetadatei().GetTypPtr()
 
 		if len(t.String()) > 0 {
-			n1, err = sw.WriteString(f.prefix)
+			n1, err = sw.WriteString(f.contentPrefix)
 			n += int64(n1)
 
 			if err != nil {
@@ -172,7 +178,7 @@ func (f *cli) WriteStringFormat(
 		if !b.IsEmpty() {
 			didWriteBezeichnung = true
 
-			n1, err = sw.WriteString(f.prefix)
+			n1, err = sw.WriteString(f.contentPrefix)
 			n += int64(n1)
 
 			if err != nil {
@@ -240,7 +246,7 @@ func (f *cli) writeStringFormatEtiketten(
 	var n2 int64
 
 	for _, v := range iter.SortedValues[kennung.Etikett](b) {
-		n1, err = sw.WriteString(f.prefix)
+		n1, err = sw.WriteString(f.contentPrefix)
 		n += int64(n1)
 
 		if err != nil {

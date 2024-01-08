@@ -55,7 +55,7 @@ func (u *Umwelt) Einleitung(e Einleitung) (err error) {
 		return
 	}
 
-	for _, g := range gattung.All() {
+	for _, g := range []gattung.Gattung{gattung.Akte, gattung.Bestandsaufnahme} {
 		var d string
 
 		if d, err = s.DirObjektenGattung(

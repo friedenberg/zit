@@ -61,7 +61,7 @@ func (c Show) runGenericObjekteFormatterValue(
 			u.Standort(),
 			u.Konfig(),
 			u.PrinterTransactedLike(),
-			u.StringFormatWriterSkuLikePtrShort(),
+			u.StringFormatWriterSkuTransactedShort(),
 			u.StoreUtil().GetEnnui(),
 			u.StoreUtil().GetVerzeichnisse().ReadOneShas,
 		),

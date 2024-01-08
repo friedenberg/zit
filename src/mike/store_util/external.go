@@ -46,7 +46,7 @@ func (s *common) ReadOneExternal(
 
 	var m checkout_mode.Mode
 
-	if m, err = em.GetFDs().GetCheckoutMode(); err != nil {
+	if m, err = em.GetFDs().GetCheckoutModeOrError(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

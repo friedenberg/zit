@@ -1,7 +1,8 @@
-package sku
+package sku_fmt
 
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/checkout_mode"
 	"github.com/friedenberg/zit/src/bravo/iter"
@@ -12,10 +13,8 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
-type CliOptions struct{}
-
-type cli struct {
-	options CliOptions
+type cliCheckedOut struct {
+	options erworben_cli_print_options.PrintOptions
 
 	writeTyp         bool
 	writeBezeichnung bool
@@ -30,16 +29,16 @@ type cli struct {
 	etikettenStringFormatWriter   schnittstellen.StringFormatWriter[*kennung.Etikett]
 }
 
-func MakeCliFormat(
-	options CliOptions,
+func MakeCliCheckedOutFormat(
+	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],
 	fdStringFormatWriter schnittstellen.StringFormatWriter[*fd.FD],
 	kennungStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Kennung2],
 	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],
 	etikettenStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Etikett],
-) *cli {
-	return &cli{
+) *cliCheckedOut {
+	return &cliCheckedOut{
 		options:                       options,
 		writeTyp:                      true,
 		writeBezeichnung:              true,
@@ -54,27 +53,34 @@ func MakeCliFormat(
 	}
 }
 
-func (f *cli) WriteStringFormat(
+func (f *cliCheckedOut) WriteStringFormat(
 	sw schnittstellen.WriterAndStringWriter,
-	colp *CheckedOut,
+	co *CheckedOut,
 ) (n int64, err error) {
 	var (
 		n1 int
 		n2 int64
 	)
 
-	n2, err = f.rightAlignedWriter.WriteStringFormat(
-		sw,
-		colp.State.String(),
-	)
-	n += n2
+	{
+		var stateString string
 
-	if err != nil {
-		err = errors.Wrap(err)
-		return
+		if co.State == checked_out_state.StateError {
+			stateString = co.Error.Error()
+		} else {
+			stateString = co.State.String()
+		}
+
+		n2, err = f.rightAlignedWriter.WriteStringFormat(sw, stateString)
+		n += n2
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
-	o := &colp.External
+	o := &co.External
 	fds := o.GetFDsPtr()
 	n1, err = sw.WriteString("[")
 	n += int64(n1)
@@ -84,29 +90,23 @@ func (f *cli) WriteStringFormat(
 		return
 	}
 
-	var m checkout_mode.Mode
+	m := fds.GetCheckoutMode()
 
-	if m, err = fds.GetCheckoutMode(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	switch {
+	case co.IsImport:
+		fallthrough
 
-	if m == checkout_mode.ModeAkteOnly {
-		n2, err = f.kennungStringFormatWriter.WriteStringFormat(
-			sw,
-			&o.Kennung,
-		)
+	case m == checkout_mode.ModeAkteOnly:
+		n2, err = f.kennungStringFormatWriter.WriteStringFormat(sw, &o.Kennung)
 		n += n2
 
 		if err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-	} else {
-		n2, err = f.fdStringFormatWriter.WriteStringFormat(
-			sw,
-			&fds.Objekte,
-		)
+
+	default:
+		n2, err = f.fdStringFormatWriter.WriteStringFormat(sw, &fds.Objekte)
 		n += n2
 
 		if err != nil {
@@ -115,7 +115,7 @@ func (f *cli) WriteStringFormat(
 		}
 	}
 
-	if colp.State == checked_out_state.StateConflicted {
+	if co.State == checked_out_state.StateConflicted {
 		n1, err = sw.WriteString("]")
 		n += int64(n1)
 

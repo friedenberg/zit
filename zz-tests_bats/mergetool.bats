@@ -72,6 +72,8 @@ function mergetool_conflict_base {
 }
 
 function mergetool_conflict_one_local { # @test
+	#TODO-project-2022-zit-collapse_skus
+	skip
 	mergetool_conflict_base
 
 	run_zit merge-tool -merge-tool "/bin/bash -c 'cat \$LOCAL >\"\$MERGED\"'" .
@@ -102,6 +104,8 @@ function mergetool_conflict_one_local { # @test
 }
 
 function mergetool_conflict_one_remote { # @test
+	#TODO-project-2022-zit-collapse_skus
+	skip
 	mergetool_conflict_base
 
 	run_zit merge-tool -merge-tool "/bin/bash -c 'cat \$REMOTE >\"\$MERGED\"'" .

@@ -4,6 +4,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/string_format_writer"
+	"github.com/friedenberg/zit/src/delta/checked_out_state"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/fd"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -12,8 +13,13 @@ import (
 	"github.com/friedenberg/zit/src/india/sku_fmt"
 )
 
-func (u *Umwelt) FormatColorOptions() (o string_format_writer.ColorOptions) {
+func (u *Umwelt) FormatColorOptionsOut() (o string_format_writer.ColorOptions) {
 	o.OffEntirely = !u.outIsTty
+	return
+}
+
+func (u *Umwelt) FormatColorOptionsErr() (o string_format_writer.ColorOptions) {
+	o.OffEntirely = !u.errIsTty
 	return
 }
 
@@ -57,7 +63,7 @@ func (u *Umwelt) StringFormatWriterEtiketten(
 }
 
 func (u *Umwelt) SkuFmtNewOrganize() *sku_fmt.OrganizeNew {
-	co := u.FormatColorOptions()
+	co := u.FormatColorOptionsOut()
 	co.OffEntirely = true
 
 	return sku_fmt.MakeOrganizeNewFormat(
@@ -85,11 +91,11 @@ func (u *Umwelt) StringFormatWriterSkuLikePtrForOrganize() catgut.StringFormatRe
 	return u.SkuFmtNewOrganize()
 }
 
-func (u *Umwelt) StringFormatWriterSkuLikePtr(
+func (u *Umwelt) StringFormatWriterSkuTransacted(
 	co *string_format_writer.ColorOptions,
 ) schnittstellen.StringFormatWriter[*sku.Transacted] {
 	if co == nil {
-		co1 := u.FormatColorOptions()
+		co1 := u.FormatColorOptionsOut()
 		co = &co1
 	}
 
@@ -106,7 +112,7 @@ func (u *Umwelt) StringFormatWriterSkuLikePtr(
 	)
 }
 
-func (u *Umwelt) StringFormatWriterSkuLikePtrShort() schnittstellen.StringFormatWriter[*sku.Transacted] {
+func (u *Umwelt) StringFormatWriterSkuTransactedShort() schnittstellen.StringFormatWriter[*sku.Transacted] {
 	co := string_format_writer.ColorOptions{
 		OffEntirely: true,
 	}
@@ -123,8 +129,8 @@ func (u *Umwelt) StringFormatWriterSkuLikePtrShort() schnittstellen.StringFormat
 	)
 }
 
-func (u *Umwelt) PrinterSkuLikePtr() schnittstellen.FuncIter[*sku.Transacted] {
-	sw := u.StringFormatWriterSkuLikePtr(nil)
+func (u *Umwelt) PrinterSkuTransacted() schnittstellen.FuncIter[*sku.Transacted] {
+	sw := u.StringFormatWriterSkuTransacted(nil)
 
 	return string_format_writer.MakeDelim[*sku.Transacted](
 		"\n",
@@ -134,7 +140,7 @@ func (u *Umwelt) PrinterSkuLikePtr() schnittstellen.FuncIter[*sku.Transacted] {
 }
 
 func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[*sku.Transacted] {
-	sw := u.StringFormatWriterSkuLikePtr(nil)
+	sw := u.StringFormatWriterSkuTransacted(nil)
 
 	return string_format_writer.MakeDelim[*sku.Transacted](
 		"\n",
@@ -150,10 +156,10 @@ func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[*sku.Transacted
 func (u *Umwelt) PrinterFileNotRecognized() schnittstellen.FuncIter[*fd.FD] {
 	p := kennung_fmt.MakeFileNotRecognizedStringWriterFormat(
 		kennung_fmt.MakeFDCliFormat(
-			u.FormatColorOptions(),
+			u.FormatColorOptionsOut(),
 			u.standort.MakeRelativePathStringFormatWriter(),
 		),
-		u.StringFormatWriterShaLike(u.FormatColorOptions()),
+		u.StringFormatWriterShaLike(u.FormatColorOptionsOut()),
 	)
 
 	return string_format_writer.MakeDelim[*fd.FD](
@@ -167,7 +173,7 @@ func (u *Umwelt) PrinterFDDeleted() schnittstellen.FuncIter[*fd.FD] {
 	p := kennung_fmt.MakeFDDeletedStringWriterFormat(
 		u.Konfig().DryRun,
 		kennung_fmt.MakeFDCliFormat(
-			u.FormatColorOptions(),
+			u.FormatColorOptionsOut(),
 			u.standort.MakeRelativePathStringFormatWriter(),
 		),
 	)
@@ -183,32 +189,59 @@ func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[string] {
 	return string_format_writer.MakeDelim[string](
 		"\n",
 		u.Out(),
-		string_format_writer.MakeIndentedHeader(u.FormatColorOptions()),
+		string_format_writer.MakeIndentedHeader(u.FormatColorOptionsOut()),
 	)
 }
 
-func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[*sku.CheckedOut] {
-	co := u.FormatColorOptions()
+func (u *Umwelt) PrinterCheckedOut() schnittstellen.FuncIter[*sku.CheckedOut] {
+	coOut := u.FormatColorOptionsOut()
+	coErr := u.FormatColorOptionsErr()
 
-	p := sku.MakeCliFormat(
-		sku.CliOptions{},
-		u.StringFormatWriterShaLike(co),
-		kennung_fmt.MakeFDCliFormat(
-			co,
-			u.standort.MakeRelativePathStringFormatWriter(),
+	err := string_format_writer.MakeDelim[*sku.CheckedOut](
+		"\n",
+		u.Err(),
+		sku_fmt.MakeCliCheckedOutFormat(
+			u.konfig.PrintOptions,
+			u.StringFormatWriterShaLike(coErr),
+			kennung_fmt.MakeFDCliFormat(
+				coErr,
+				u.standort.MakeRelativePathStringFormatWriter(),
+			),
+			u.StringFormatWriterKennung(coErr),
+			u.StringFormatWriterTyp(coErr),
+			u.StringFormatWriterBezeichnung(
+				bezeichnung.CliFormatTruncation66CharEllipsis,
+				coErr,
+			),
+			u.StringFormatWriterEtiketten(coErr),
 		),
-		u.StringFormatWriterKennung(co),
-		u.StringFormatWriterTyp(co),
-		u.StringFormatWriterBezeichnung(
-			bezeichnung.CliFormatTruncation66CharEllipsis,
-			co,
-		),
-		u.StringFormatWriterEtiketten(co),
 	)
 
-	return string_format_writer.MakeDelim[*sku.CheckedOut](
+	out := string_format_writer.MakeDelim[*sku.CheckedOut](
 		"\n",
 		u.Out(),
-		p,
+		sku_fmt.MakeCliCheckedOutFormat(
+			u.konfig.PrintOptions,
+			u.StringFormatWriterShaLike(coOut),
+			kennung_fmt.MakeFDCliFormat(
+				coOut,
+				u.standort.MakeRelativePathStringFormatWriter(),
+			),
+			u.StringFormatWriterKennung(coOut),
+			u.StringFormatWriterTyp(coOut),
+			u.StringFormatWriterBezeichnung(
+				bezeichnung.CliFormatTruncation66CharEllipsis,
+				coOut,
+			),
+			u.StringFormatWriterEtiketten(coOut),
+		),
 	)
+
+	return func(co *sku.CheckedOut) error {
+		if co.State == checked_out_state.StateError {
+			return err(co)
+		} else {
+			return out(co)
+		}
+	}
 }

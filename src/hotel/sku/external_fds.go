@@ -61,7 +61,7 @@ func (e *ExternalFDs) ConflictMarkerError() (err error) {
 	return
 }
 
-func (e *ExternalFDs) GetCheckoutMode() (m checkout_mode.Mode, err error) {
+func (e *ExternalFDs) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 	switch {
 	case !e.Objekte.IsEmpty() && !e.Akte.IsEmpty():
 		m = checkout_mode.ModeObjekteAndAkte
@@ -76,6 +76,21 @@ func (e *ExternalFDs) GetCheckoutMode() (m checkout_mode.Mode, err error) {
 		err = checkout_mode.MakeErrInvalidCheckoutMode(
 			errors.Errorf("all FD's are empty"),
 		)
+	}
+
+	return
+}
+
+func (e *ExternalFDs) GetCheckoutMode() (m checkout_mode.Mode) {
+	switch {
+	case !e.Objekte.IsEmpty() && !e.Akte.IsEmpty():
+		m = checkout_mode.ModeObjekteAndAkte
+
+	case !e.Akte.IsEmpty():
+		m = checkout_mode.ModeAkteOnly
+
+	case !e.Objekte.IsEmpty():
+		m = checkout_mode.ModeObjekteOnly
 	}
 
 	return

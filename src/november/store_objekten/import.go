@@ -5,43 +5,31 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/objekte_mode"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
 )
 
-func (s *Store) Import(
-	sk *sku.Transacted,
-) (err error) {
+func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOut, err error) {
+	co = sku.GetCheckedOutPool().Get()
+	co.IsImport = true
+
+	if err = co.External.Transacted.SetFromSkuLike(sk); err != nil {
+    panic(err)
+	}
+
+
 	if err = sk.CalculateObjekteSha(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var schwanz *sku.Transacted
-
-	if schwanz, err = s.ReadOne(sk.GetKennung()); err != nil {
-		if objekte_store.IsNotFound(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if schwanz == nil {
-		_, err = s.createOrUpdate(
-			sk,
-			sk.GetKennung(),
-			nil,
-			objekte_mode.ModeAddToBestandsaufnahme,
-		)
-
+    co.SetError(err)
+    err = nil
 		return
 	}
 
 	err = s.GetVerzeichnisse().ExistsOneSha(&sk.Metadatei.Sha)
 
-	if err == nil {
+	if err == collections.ErrExists {
+    co.SetError(err)
+    err = nil
 		return
 	} else if errors.Is(err, objekte_store.ErrNotFoundEmpty) {
 		err = nil
@@ -50,20 +38,36 @@ func (s *Store) Import(
 		return
 	}
 
-	if !schwanz.Metadatei.Sha.Equals(&sk.Metadatei.Mutter) {
-		if err = s.importDoMerge(sk, schwanz); err != nil {
+	if err = s.ReadOneInto(sk.GetKennung(), &co.Internal); err != nil {
+		if objekte_store.IsNotFound(err) {
+			_, err = s.createOrUpdate(
+				sk,
+				sk.GetKennung(),
+				nil,
+				objekte_mode.ModeAddToBestandsaufnahme,
+			)
+		}
+
+		err = errors.Wrap(err)
+		return
+	}
+
+	if !co.Internal.Metadatei.Sha.IsNull() &&
+		!co.Internal.Metadatei.Sha.Equals(&sk.Metadatei.Mutter) &&
+		!co.Internal.Metadatei.Sha.Equals(&sk.Metadatei.Sha) {
+		if err = s.importDoMerge(co); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte_store.ErrLockRequired{
+		err = errors.Wrap(objekte_store.ErrLockRequired{
 			Operation: fmt.Sprintf(
 				"import %s",
 				sk.GetGattung(),
 			),
-		}
+		})
 
 		return
 	}
@@ -71,15 +75,16 @@ func (s *Store) Import(
 	_, err = s.createOrUpdate(
 		sk,
 		sk.GetKennung(),
-		schwanz,
+		&co.Internal,
 		objekte_mode.ModeAddToBestandsaufnahme,
 	)
 
 	return
 }
 
-func (s *Store) importDoMerge(
-	sk, mutter *sku.Transacted,
-) (err error) {
-	return errors.Errorf("conflict: LOCAL: %s, REMOTE: %s", mutter, sk)
+var ErrNeedsMerge = errors.New("needs merge")
+
+func (s *Store) importDoMerge(co *sku.CheckedOut) (err error) {
+	co.SetError(ErrNeedsMerge)
+	return
 }

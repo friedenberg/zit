@@ -4,8 +4,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/bravo/objekte_mode"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
 	"github.com/friedenberg/zit/src/delta/gattungen"
@@ -52,8 +52,7 @@ func (s *Store) handleNewOrUpdatedCommit(
 		return
 	}
 
-	if err = s.GetVerzeichnisse().ExistsOneSha(&t.Metadatei.Sha); err == nil {
-		log.Err().Printf("already exists: %s", t.StringKennungSha())
+	if err = s.GetVerzeichnisse().ExistsOneSha(&t.Metadatei.Sha); err == collections.ErrExists {
 		return
 	}
 
@@ -146,9 +145,10 @@ func (s *Store) handleUnchanged(
 	return s.Unchanged(t)
 }
 
-func (s *Store) ReadOne(
+func (s *Store) ReadOneInto(
 	k1 schnittstellen.StringerGattungGetter,
-) (sk1 *sku.Transacted, err error) {
+	out *sku.Transacted,
+) (err error) {
 	var sk *sku.Transacted
 
 	switch k1.GetGattung() {
@@ -217,9 +217,20 @@ func (s *Store) ReadOne(
 		return
 	}
 
+	if err = out.SetFromSkuLike(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) ReadOne(
+	k1 schnittstellen.StringerGattungGetter,
+) (sk1 *sku.Transacted, err error) {
 	sk1 = sku.GetTransactedPool().Get()
 
-	if err = sk1.SetFromSkuLike(sk); err != nil {
+	if err = s.ReadOneInto(k1, sk1); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

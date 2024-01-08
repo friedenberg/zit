@@ -119,7 +119,7 @@ func (c Clean) markUnsureAktenForRemovalIfNecessary(
 		return
 	}
 
-	p := u.PrinterCheckedOutLike()
+	p := u.PrinterCheckedOut()
 	var l sync.Mutex
 
 	if err = u.StoreObjekten().ReadAllMatchingAkten(

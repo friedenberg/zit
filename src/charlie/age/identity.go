@@ -6,11 +6,17 @@ import (
 
 	"filippo.io/age"
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 )
 
-type Identity struct {
+type identity interface {
 	age.Identity
+	schnittstellen.Stringer
+}
+
+type Identity struct {
+	identity
 	age.Recipient
 
 	path     string
@@ -22,7 +28,7 @@ func (i *Identity) IsDisabled() bool {
 }
 
 func (i *Identity) IsEmpty() bool {
-	return i.Identity == nil
+	return i.identity == nil
 }
 
 func (i *Identity) String() string {
@@ -33,7 +39,7 @@ func (i *Identity) SetFromX25519Identity(identity string) (err error) {
 	var x *X25519Identity
 
 	if x, err = age.ParseX25519Identity(identity); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Identity: %s", identity)
 		return
 	}
 
@@ -44,7 +50,7 @@ func (i *Identity) SetFromX25519Identity(identity string) (err error) {
 
 func (i *Identity) SetX25519Identity(x *age.X25519Identity) {
 	i.disabled = false
-	i.Identity = x
+	i.identity = x
 	i.Recipient = x.Recipient()
 }
 
@@ -91,7 +97,7 @@ func (i *Identity) Set(path_or_identity string) (err error) {
 }
 
 func (i *Identity) GenerateIfNecessary(basePath string) (err error) {
-	if i.disabled || basePath == "" {
+	if i.IsDisabled() || !i.IsEmpty() {
 		return
 	}
 
@@ -99,6 +105,16 @@ func (i *Identity) GenerateIfNecessary(basePath string) (err error) {
 
 	if x, err = age.GenerateX25519Identity(); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	i.SetX25519Identity(x)
+
+	return
+}
+
+func (i *Identity) WriteToPathIfNecessary(basePath string) (err error) {
+	if i.IsDisabled() || i.IsEmpty() || basePath == "" {
 		return
 	}
 
@@ -111,12 +127,11 @@ func (i *Identity) GenerateIfNecessary(basePath string) (err error) {
 
 	defer errors.DeferredCloser(&err, f)
 
-	if _, err = io.WriteString(f, x.String()); err != nil {
+	if _, err = io.WriteString(f, i.identity.String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	i.SetX25519Identity(x)
 	i.path = basePath
 
 	return

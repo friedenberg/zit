@@ -36,7 +36,7 @@ func (c Status) RunWithQuery(
 	u *umwelt.Umwelt,
 	ms matcher.Query,
 ) (err error) {
-	pcol := u.PrinterCheckedOutLike()
+	pcol := u.PrinterCheckedOut()
 
 	if err = u.StoreObjekten().ReadFiles(
 		matcher.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().QueryWithoutCwd),
@@ -61,7 +61,7 @@ func (c Status) RunWithQuery(
 		return
 	}
 
-	p := u.PrinterCheckedOutLike()
+	p := u.PrinterCheckedOut()
 
 	if err = u.StoreObjekten().ReadAllMatchingAkten(
 		u.StoreUtil().GetCwdFiles().UnsureAkten,
