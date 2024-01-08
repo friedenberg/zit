@@ -120,7 +120,7 @@ func (s *Store) handleNew(
 	updateType objekte_mode.Mode,
 ) (err error) {
 	if err = s.handleNewOrUpdated(t, updateType); err != nil {
-		err = errors.Wrap(err)
+		err = errors.WrapExcept(err, collections.ErrExists)
 		return
 	}
 
@@ -132,7 +132,7 @@ func (s *Store) handleUpdated(
 	updateType objekte_mode.Mode,
 ) (err error) {
 	if err = s.handleNewOrUpdated(t, updateType); err != nil {
-		err = errors.Wrap(err)
+		err = errors.WrapExcept(err, collections.ErrExists)
 		return
 	}
 

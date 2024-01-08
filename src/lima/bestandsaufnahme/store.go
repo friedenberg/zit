@@ -450,7 +450,6 @@ func (s *store) ReadAll(
 	return
 }
 
-// TODO-P3 support streaming instead of reading into heaps
 func (s *store) ReadAllSkus(
 	f func(besty, sk *sku.Transacted) error,
 ) (err error) {
@@ -468,50 +467,6 @@ func (s *store) ReadAllSkus(
 					t.GetKennung(),
 				)
 
-				return
-			}
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *store) ReadAllSkus2(
-	f schnittstellen.FuncIter[*sku.Transacted],
-) (err error) {
-	if err = s.ReadAll(
-		func(t *sku.Transacted) (err error) {
-			var r io.ReadCloser
-
-			if r, err = s.af.AkteReader(t.GetAkteSha()); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			defer errors.DeferredCloser(&err, r)
-
-			dec := sku_fmt.MakeFormatBestandsaufnahmeScanner(
-				r,
-				s.persistentMetadateiFormat,
-				s.options,
-			)
-
-			for dec.Scan() {
-				sk := dec.GetTransacted()
-
-				if err = f(sk); err != nil {
-					err = errors.Wrapf(err, "Sku: %s", sk)
-					return
-				}
-			}
-
-			if err = dec.Error(); err != nil {
-				err = errors.Wrap(err)
 				return
 			}
 

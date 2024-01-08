@@ -15,21 +15,20 @@ func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOut, err error) {
 	co.IsImport = true
 
 	if err = co.External.Transacted.SetFromSkuLike(sk); err != nil {
-    panic(err)
+		panic(err)
 	}
 
-
 	if err = sk.CalculateObjekteSha(); err != nil {
-    co.SetError(err)
-    err = nil
+		co.SetError(err)
+		err = nil
 		return
 	}
 
 	err = s.GetVerzeichnisse().ExistsOneSha(&sk.Metadatei.Sha)
 
 	if err == collections.ErrExists {
-    co.SetError(err)
-    err = nil
+		co.SetError(err)
+		err = nil
 		return
 	} else if errors.Is(err, objekte_store.ErrNotFoundEmpty) {
 		err = nil
@@ -78,6 +77,11 @@ func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOut, err error) {
 		&co.Internal,
 		objekte_mode.ModeAddToBestandsaufnahme,
 	)
+
+	if err == collections.ErrExists {
+		co.SetError(err)
+		err = nil
+	}
 
 	return
 }

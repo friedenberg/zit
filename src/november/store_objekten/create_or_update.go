@@ -10,6 +10,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/objekte_mode"
 	"github.com/friedenberg/zit/src/charlie/checkout_options"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -177,7 +178,7 @@ func (s *Store) createOrUpdate(
 		mutter,
 		updateType,
 	); err != nil {
-		err = errors.Wrap(err)
+		err = errors.WrapExcept(err, collections.ErrExists)
 		return
 	}
 
@@ -366,7 +367,7 @@ func (s *Store) handleNewOrUpdateWithMutter(
 			}
 		},
 	); err != nil {
-		err = errors.Wrap(err)
+		err = errors.WrapExcept(err, collections.ErrExists)
 		return
 	}
 
