@@ -172,17 +172,14 @@ func (s *Transacted) IsNew() bool {
 func (s *Transacted) CalculateObjekteSha() (err error) {
 	var shaFormat objekte_format.FormatGeneric
 
-	if shaFormat, err = objekte_format.FormatForKeyError("MetadateiPlusMutter"); err != nil {
+	if shaFormat, err = objekte_format.FormatForKeyError("MetadateiKennungMutter"); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	var actual *sha.Sha
 
-	if actual, err = objekte_format.GetShaForMetadatei(
-		shaFormat,
-		s.GetMetadatei(),
-	); err != nil {
+	if actual, err = objekte_format.GetShaForContext(shaFormat, s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

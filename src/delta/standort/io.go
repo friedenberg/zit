@@ -3,9 +3,11 @@ package standort
 import (
 	"bytes"
 	"io"
+	"os"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
@@ -113,18 +115,8 @@ func (s Standort) WriteCloserVerzeichnisse(
 	)
 }
 
-func (s Standort) AkteWriter() (w sha.WriteCloser, err error) {
+func (s Standort) AkteWriterTo(p string) (w sha.WriteCloser, err error) {
 	var outer Writer
-
-	var p string
-
-	if p, err = s.DirObjektenGattung(
-		s.angeboren.GetStoreVersion(),
-		gattung.Akte,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	mo := MoveOptions{
 		Age:                      s.age,
@@ -144,6 +136,55 @@ func (s Standort) AkteWriter() (w sha.WriteCloser, err error) {
 	return
 }
 
+func (s Standort) AkteWriter() (w sha.WriteCloser, err error) {
+	var p string
+
+	if p, err = s.DirObjektenGattung(
+		s.angeboren.GetStoreVersion(),
+		gattung.Akte,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if w, err = s.AkteWriterTo(p); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s Standort) AkteReaderFile(sh sha.ShaLike) (f *os.File, err error) {
+	if sh.GetShaLike().IsNull() {
+		err = errors.Errorf("sha is null")
+		return
+	}
+
+	var p string
+
+	if p, err = s.DirObjektenGattung(
+		s.angeboren.GetStoreVersion(),
+		gattung.Akte,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	p = id.Path(sh.GetShaLike(), p)
+
+	if f, err = files.OpenFile(
+		p,
+		os.O_RDONLY,
+		0o666,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s Standort) AkteReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
 	if sh.GetShaLike().IsNull() {
 		r = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
@@ -157,6 +198,23 @@ func (s Standort) AkteReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
 		gattung.Akte,
 	); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	if r, err = s.AkteReaderFrom(sh, p); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s Standort) AkteReaderFrom(
+	sh sha.ShaLike,
+	p string,
+) (r sha.ReadCloser, err error) {
+	if sh.GetShaLike().IsNull() {
+		r = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
 		return
 	}
 

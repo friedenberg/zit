@@ -210,16 +210,29 @@ func (s Standort) DirVerlorenUndGefunden() string {
 	return s.DirZit("Verloren+Gefunden")
 }
 
+func (s Standort) MakeDir(d string) (err error) {
+	if err = os.MkdirAll(d, os.ModeDir|0o755); err != nil {
+		err = errors.Wrapf(err, "Dir: %q", d)
+		return
+	}
+
+	return
+}
+
+func (s Standort) DirVerzeichnisseBestandsaufnahme() string {
+	return s.DirVerzeichnisse("Bestandsaufnahme")
+}
+
 func (s Standort) DirVerzeichnisseObjekten() string {
 	return s.DirVerzeichnisse("Objekten")
 }
 
-func (s Standort) DirVerzeichnisseAkten() string {
-	return s.DirVerzeichnisse("Akten")
+func (s Standort) DirVerzeichnisseMetadatei() string {
+	return s.DirVerzeichnisse("Metadatei")
 }
 
-func (s Standort) FileVerzeichnisseZettelen() string {
-	return s.DirVerzeichnisse("Zettelen")
+func (s Standort) DirVerzeichnisseVerweise() string {
+	return s.DirVerzeichnisse("Verweise")
 }
 
 func (s Standort) FileVerzeichnisseEtiketten() string {
@@ -243,18 +256,38 @@ func (s Standort) DirKennung() string {
 }
 
 func (s Standort) ResetVerzeichnisse() (err error) {
+	if err = files.SetAllowUserChangesRecursive(s.DirVerzeichnisse()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = os.RemoveAll(s.DirVerzeichnisse()); err != nil {
 		err = errors.Wrapf(err, "failed to remove verzeichnisse dir")
 		return
 	}
 
-	if err = os.MkdirAll(s.DirVerzeichnisse(), os.ModeDir|0o755); err != nil {
-		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
+	if err = s.MakeDir(s.DirVerzeichnisse()); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	if err = os.MkdirAll(s.DirVerzeichnisseObjekten(), os.ModeDir|0o755); err != nil {
-		err = errors.Wrapf(err, "failed to make verzeichnisse dir")
+	if err = s.MakeDir(s.DirVerzeichnisseObjekten()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.MakeDir(s.DirVerzeichnisseMetadatei()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.MakeDir(s.DirVerzeichnisseVerweise()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.MakeDir(s.DirVerzeichnisseBestandsaufnahme()); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

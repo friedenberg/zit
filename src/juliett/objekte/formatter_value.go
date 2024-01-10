@@ -265,16 +265,16 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		errors.PanicIfError(err)
 
 		return func(e *sku.Transacted) (err error) {
-			_, err = f.WriteMetadateiTo(out, e.GetMetadatei())
+			_, err = f.WriteMetadateiTo(out, e)
 			return
 		}
 
 	case "metadatei-plus-mutter":
-		f, err := objekte_format.FormatForKeyError("MetadateiPlusMutter")
+		f, err := objekte_format.FormatForKeyError("MetadateiMutter")
 		errors.PanicIfError(err)
 
 		return func(e *sku.Transacted) (err error) {
-			_, err = f.WriteMetadateiTo(out, e.GetMetadatei())
+			_, err = f.WriteMetadateiTo(out, e)
 			return
 		}
 
@@ -421,7 +421,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		return func(z *sku.Transacted) (err error) {
 			// var loc ennui.Loc
 
-			// if loc, err = enn.ReadOne("MetadateiPlusMutter", z.GetMetadatei()); err != nil {
+			// if loc, err = enn.ReadOne("MetadateiMutter", z.GetMetadatei()); err != nil {
 			// 	err = errors.Wrapf(err, "Kennung: %s", &z.Kennung)
 			// 	return
 			// }

@@ -37,25 +37,6 @@ func (pw *pageWriterV5) writeOne(
 	}
 
 	pw.etikettIndex.Add(z.Metadatei.GetEtiketten())
-
-	if pw.ennuiShas == nil {
-		return
-	}
-
-	if err = pw.ennuiShas.AddMetadatei(
-		z.GetMetadatei(),
-		ennui.Loc{
-			Page: pw.Index,
-			Range: ennui.Range{
-				Offset:        pw.offsetLast,
-				ContentLength: n,
-			},
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	pw.offset += int64(n)
 
 	return

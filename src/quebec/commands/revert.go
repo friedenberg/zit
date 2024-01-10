@@ -8,7 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
 	"github.com/friedenberg/zit/src/lima/bestandsaufnahme"
@@ -93,6 +92,8 @@ func (c Revert) addOneMutter(
 	z *sku.Transacted,
 	mutters *[]revertMutterToKennungTuple,
 ) (err error) {
+	// TODO-project-2021-zit-multi_history_chains
+  // transition to MutterMetadateiKennungMutter
 	mu := &z.Metadatei.Mutter
 
 	if mu.IsNull() {
@@ -164,30 +165,8 @@ func (c Revert) muttersFromLast(
 
 	mutterToKennung = make([]revertMutterToKennungTuple, 0, a.Skus.Len())
 
-	var formatGeneric objekte_format.FormatGeneric
-
-	if formatGeneric, err = objekte_format.FormatForKeyError("Metadatei"); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if err = a.Skus.EachPtr(
 		func(sk *sku.Transacted) (err error) {
-			var sh *sha.Sha
-
-			if sh, err = objekte_format.GetShaForMetadatei(
-				formatGeneric,
-				sk.GetMetadatei(),
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if sk, err = u.StoreUtil().GetVerzeichnisse().ReadOneShas(sh); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
 			return c.addOneMutter(sk, &mutterToKennung)
 		},
 	); err != nil {

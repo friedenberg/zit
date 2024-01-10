@@ -37,6 +37,10 @@ type Sha struct {
 	data *[ByteSize]byte
 }
 
+func (s *Sha) Size() int {
+  return ByteSize
+}
+
 func (s *Sha) GetShaBytes() []byte {
 	if s.IsNull() {
 		return shaNull.data[:]

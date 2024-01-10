@@ -15,7 +15,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/golf/ennui"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/sku_fmt"
@@ -24,8 +23,9 @@ import (
 )
 
 type Store interface {
+	errors.Flusher
 	GetStore() Store
-	objekte_store.AkteTextSaver[Akte, *Akte]
+	ReadOneEnnui(*sha.Sha) (*sku.Transacted, error)
 	Create(*Akte) (*sku.Transacted, error)
 	objekte_store.LastReader
 	ReadOne(schnittstellen.Stringer) (*sku.Transacted, error)
@@ -56,7 +56,6 @@ type store struct {
 	persistentMetadateiFormat objekte_format.Format
 	options                   objekte_format.Options
 	formatAkte                akteFormat
-	objekte_store.AkteTextSaver[Akte, *Akte]
 }
 
 func MakeStore(
@@ -84,18 +83,6 @@ func MakeStore(
 		persistentMetadateiFormat: pmf,
 		options:                   op,
 		formatAkte:                fa,
-		AkteTextSaver: objekte_store.MakeAkteStore[
-			Akte,
-			*Akte,
-		](
-			standort,
-			objekte_store.MakeAkteFormat[Akte, *Akte](
-				objekte.MakeReaderAkteParseSaver[Akte, *Akte](af, fa),
-				fa,
-				af,
-			),
-			Resetter.Reset,
-		),
 	}
 
 	return
@@ -103,6 +90,51 @@ func MakeStore(
 
 func (s *store) GetStore() Store {
 	return s
+}
+
+func (s *store) Flush() error {
+	return nil
+}
+
+func (s *store) ReadOneEnnui(sh *sha.Sha) (sk *sku.Transacted, err error) {
+	var r sha.ReadCloser
+
+	if r, err = s.standort.AkteReaderFrom(
+		sh,
+		s.standort.DirVerzeichnisseMetadatei(),
+	); err != nil {
+		if errors.IsNotExist(err) {
+			err = objekte_store.ErrNotFoundEmpty
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	defer errors.DeferredCloser(&err, r)
+
+	rb := catgut.MakeRingBuffer(r, 0)
+
+	sk = sku.GetTransactedPool().Get()
+
+	var n int64
+
+	if n, err = s.persistentMetadateiFormat.ParsePersistentMetadatei(
+		rb,
+		sk,
+		s.options,
+	); err != nil {
+		if err == io.EOF && n > 0 {
+			err = nil
+		} else if err != io.EOF {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	return
 }
 
 func (s *store) Create(o *Akte) (t *sku.Transacted, err error) {
@@ -119,9 +151,9 @@ func (s *store) Create(o *Akte) (t *sku.Transacted, err error) {
 		return
 	}
 
-	var sh schnittstellen.ShaLike
+	var sh *sha.Sha
 
-	if sh, _, err = s.SaveAkteText(o); err != nil {
+	if sh, err = s.writeAkte(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -167,6 +199,81 @@ func (s *store) Create(o *Akte) (t *sku.Transacted, err error) {
 	)
 
 	t.SetObjekteSha(sh)
+
+	return
+}
+
+func (s *store) writeAkte(o *Akte) (sh *sha.Sha, err error) {
+	var sw sha.WriteCloser
+
+	if sw, err = s.standort.AkteWriter(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, sw)
+
+	fo := sku_fmt.MakeFormatBestandsaufnahmePrinter(
+		sw,
+		s.persistentMetadateiFormat,
+		s.options,
+	)
+
+	defer o.Skus.Restore()
+
+	for {
+		sk, ok := o.Skus.PopAndSave()
+
+		if !ok {
+			break
+		}
+
+		if sk.Metadatei.Sha.IsNull() {
+			err = errors.Errorf("empty sha: %s", sk)
+			return
+		}
+
+		_, err = fo.Print(sk)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if s.writeOneObjekteMetadatei(sk); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	sh = sha.Make(sw.GetShaLike())
+
+	return
+}
+
+func (s *store) writeOneObjekteMetadatei(o *sku.Transacted) (err error) {
+	var sw sha.WriteCloser
+
+	if sw, err = s.standort.AkteWriterTo(
+		s.standort.DirVerzeichnisseMetadatei(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, sw)
+
+	var fo objekte_format.FormatGeneric
+
+	if fo, err = objekte_format.FormatForKeyError("MetadateiKennungMutter"); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, err = fo.WriteMetadateiTo(sw, o); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
@@ -336,7 +443,7 @@ func (s *store) populateAkte(akteSha schnittstellen.ShaLike, a *Akte) (err error
 
 func (s *store) streamAkte(
 	akteSha schnittstellen.ShaLike,
-	f func(*sku.Transacted, ennui.Range) error,
+	f func(*sku.Transacted) error,
 ) (err error) {
 	var ar schnittstellen.ShaReadCloser
 
@@ -356,7 +463,7 @@ func (s *store) streamAkte(
 	for dec.Scan() {
 		sk := dec.GetTransacted()
 
-		if err = f(sk, dec.GetRange()); err != nil {
+		if err = f(sk); err != nil {
 			err = errors.Wrapf(err, "Sku: %s", sk)
 			return
 		}
@@ -457,7 +564,7 @@ func (s *store) ReadAllSkus(
 		func(t *sku.Transacted) (err error) {
 			if err = s.streamAkte(
 				t.GetAkteSha(),
-				func(sk *sku.Transacted, _ ennui.Range) (err error) {
+				func(sk *sku.Transacted) (err error) {
 					return f(t, sk)
 				},
 			); err != nil {

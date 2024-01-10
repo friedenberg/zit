@@ -25,7 +25,9 @@ func (s *common) FlushBestandsaufnahme() (err error) {
 
 	errors.Log().Printf("saving Bestandsaufnahme")
 
-	if _, err = s.GetBestandsaufnahmeStore().Create(&s.bestandsaufnahmeAkte); err != nil {
+	if _, err = s.GetBestandsaufnahmeStore().Create(
+		&s.bestandsaufnahmeAkte,
+	); err != nil {
 		if errors.Is(err, bestandsaufnahme.ErrEmpty) {
 			errors.Log().Printf("Bestandsaufnahme was empty")
 			err = nil
@@ -36,6 +38,11 @@ func (s *common) FlushBestandsaufnahme() (err error) {
 	}
 
 	bestandsaufnahme.Resetter.Reset(&s.bestandsaufnahmeAkte)
+
+	if err = s.GetBestandsaufnahmeStore().Flush(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	errors.Log().Printf("done saving Bestandsaufnahme")
 

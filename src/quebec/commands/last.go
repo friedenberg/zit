@@ -58,7 +58,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		u.PrinterTransactedLike(),
 		u.StringFormatWriterSkuTransactedShort(),
 		u.StoreUtil().GetEnnui(),
-		u.StoreUtil().GetVerzeichnisse().ReadOneShas,
+		u.StoreUtil().ReadOneEnnui,
 	)
 
 	if err = c.runWithBestandsaufnahm(u, f); err != nil {

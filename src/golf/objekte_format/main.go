@@ -68,3 +68,11 @@ func FormatForVersions(write, read schnittstellen.StoreVersion) Format {
 		FormatForVersion(read),
 	)
 }
+
+type nopFormatterContext struct {
+	metadatei.PersistentFormatterContext
+}
+
+func (nopFormatterContext) GetKennung() kennung.Kennung {
+	return nil
+}

@@ -1,6 +1,7 @@
 package ennui
 
 import (
+	"encoding/binary"
 	"fmt"
 	"io"
 
@@ -10,6 +11,10 @@ import (
 
 type Range struct {
 	Offset, ContentLength int64
+}
+
+func (l *Range) Size() int {
+	return binary.MaxVarintLen64 * 2
 }
 
 func (l Range) IsEmpty() bool {

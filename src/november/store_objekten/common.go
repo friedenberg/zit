@@ -40,11 +40,10 @@ func (s *Store) handleNewOrUpdatedCommit(
 	}
 
 	if mode.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
+		// TAI must be set before calculating objekte sha
 		if mode.Contains(objekte_mode.ModeUpdateTai) {
 			t.SetTai(kennung.NowTai())
 		}
-
-		s.CommitTransacted(t)
 	}
 
 	if err = t.CalculateObjekteSha(); err != nil {
@@ -52,7 +51,13 @@ func (s *Store) handleNewOrUpdatedCommit(
 		return
 	}
 
-	if err = s.GetVerzeichnisse().ExistsOneSha(&t.Metadatei.Sha); err == collections.ErrExists {
+	if mode.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
+		s.CommitTransacted(t)
+	}
+
+	if err = s.GetVerzeichnisse().ExistsOneSha(
+		&t.Metadatei.Sha,
+	); err == collections.ErrExists {
 		return
 	}
 

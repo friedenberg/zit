@@ -35,6 +35,10 @@ var (
 	keyMutter = catgut.MakeFromString("zzMutter")
 	keySha    = catgut.MakeFromString("zzSha")
 
+	keyShasMutterMetadatei              = catgut.MakeFromString("Shas" + metadatei.ShaKeyMutterMetadatei)
+	keyShasMutterMetadateiMutter        = catgut.MakeFromString("Shas" + metadatei.ShaKeyMutterMetadateiMutter)
+	keyShasMutterMetadateiKennungMutter = catgut.MakeFromString("Shas" + metadatei.ShaKeyMutterMetadateiKennungMutter)
+
 	keyVerzeichnisseArchiviert      = catgut.MakeFromString("Verzeichnisse-Archiviert")
 	keyVerzeichnisseEtikettImplicit = catgut.MakeFromString("Verzeichnisse-Etikett-Implicit")
 	keyVerzeichnisseEtikettExpanded = catgut.MakeFromString("Verzeichnisse-Etikett-Expanded")
@@ -51,8 +55,40 @@ var FormatsGeneric = map[string][]*catgut.String{
 	// "AkteTyp":             {keyAkte, keyTyp},
 	// "MetadateiSansTai":    {keyAkte, keyBezeichnung, keyEtikett, keyTyp},
 	// "Metadatei":           {keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai},
-	"Metadatei":           {keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai},
-	"MetadateiPlusMutter": {keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai, keyMutter},
+	"Metadatei":              {keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai},
+	"MetadateiMutter":        {keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai, keyShasMutterMetadateiMutter},
+	"MetadateiKennungMutter": {keyAkte, keyBezeichnung, keyEtikett, keyKennung, keyTyp, keyTai, keyShasMutterMetadateiKennungMutter},
+}
+
+type formats struct {
+	metadatei              FormatGeneric
+	metadateiMutter        FormatGeneric
+	metadateiKennungMutter FormatGeneric
+}
+
+func (fs formats) Metadatei() FormatGeneric {
+	return fs.metadatei
+}
+
+func (fs formats) MetadateiMutter() FormatGeneric {
+	return fs.metadateiMutter
+}
+
+func (fs formats) MetadateiKennungMutter() FormatGeneric {
+	return fs.metadateiKennungMutter
+}
+
+var Formats formats
+
+func init() {
+	Formats.metadatei.key = "Metadatei"
+	Formats.metadatei.keys = FormatsGeneric["Metadatei"]
+
+	Formats.metadateiMutter.key = "MetadateiMutter"
+	Formats.metadateiMutter.keys = FormatsGeneric["MetadateiMutter"]
+
+	Formats.metadateiKennungMutter.key = "MetadateiKennungMutter"
+	Formats.metadateiKennungMutter.keys = FormatsGeneric["MetadateiKennungMutter"]
 }
 
 func FormatForKeyError(k string) (fo FormatGeneric, err error) {
@@ -79,12 +115,12 @@ func FormatForKey(k string) FormatGeneric {
 
 func (f FormatGeneric) WriteMetadateiTo(
 	w io.Writer,
-	m *Metadatei,
+	c FormatterContext,
 ) (n int64, err error) {
 	var n1 int64
 
 	for _, k := range f.keys {
-		n1, err = WriteMetadateiKeyTo(w, m, k)
+		n1, err = WriteMetadateiKeyTo(w, c, k)
 		n += n1
 
 		if err != nil {
@@ -98,9 +134,11 @@ func (f FormatGeneric) WriteMetadateiTo(
 
 func WriteMetadateiKeyTo(
 	w io.Writer,
-	m *Metadatei,
+	c FormatterContext,
 	key *catgut.String,
 ) (n int64, err error) {
+	m := c.GetMetadatei()
+
 	var n1 int
 
 	switch key {
@@ -118,6 +156,7 @@ func WriteMetadateiKeyTo(
 				return
 			}
 		}
+
 	case keyBezeichnung:
 		lines := strings.Split(m.Bezeichnung.String(), "\n")
 
@@ -156,13 +195,103 @@ func WriteMetadateiKeyTo(
 			}
 		}
 
-	case keyMutter:
+	case keyKennung:
+		n1, err = ohio.WriteKeySpaceValueNewlineString(
+			w,
+			keyGattung.String(),
+			c.GetKennung().GetGattung().GetGattungString(),
+		)
+		n += int64(n1)
 
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		n1, err = ohio.WriteKeySpaceValueNewlineString(
+			w,
+			keyKennung.String(),
+			c.GetKennung().String(),
+		)
+		n += int64(n1)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	case keyMutter:
 		if !m.Mutter.IsNull() {
 			n1, err = ohio.WriteKeySpaceValueNewlineString(
 				w,
 				keyMutter.String(),
 				m.Mutter.String(),
+			)
+			n += int64(n1)
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			n += int64(n1)
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+	case keyShasMutterMetadatei:
+		if !m.MutterMetadatei.IsNull() {
+			n1, err = ohio.WriteKeySpaceValueNewlineString(
+				w,
+				keyShasMutterMetadatei.String(),
+				m.MutterMetadatei.String(),
+			)
+			n += int64(n1)
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			n += int64(n1)
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+	case keyShasMutterMetadateiMutter:
+		if !m.MutterMetadatei.IsNull() {
+			n1, err = ohio.WriteKeySpaceValueNewlineString(
+				w,
+				keyShasMutterMetadateiMutter.String(),
+				m.MutterMetadateiMutter.String(),
+			)
+			n += int64(n1)
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			n += int64(n1)
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+	case keyShasMutterMetadateiKennungMutter:
+		if !m.MutterMetadatei.IsNull() {
+			n1, err = ohio.WriteKeySpaceValueNewlineString(
+				w,
+				keyShasMutterMetadateiKennungMutter.String(),
+				m.MutterMetadateiKennungMutter.String(),
 			)
 			n += int64(n1)
 
@@ -214,7 +343,9 @@ func WriteMetadateiKeyTo(
 	return
 }
 
-func GetShaForMetadatei(f FormatGeneric, m *Metadatei) (sh *Sha, err error) {
+func GetShaForContext(f FormatGeneric, c FormatterContext) (sh *Sha, err error) {
+	m := c.GetMetadatei()
+
 	switch f.key {
 	case "Akte", "AkteTyp":
 		if m.Akte.IsNull() {
@@ -232,20 +363,24 @@ func GetShaForMetadatei(f FormatGeneric, m *Metadatei) (sh *Sha, err error) {
 		return
 	}
 
-	return getShaForMetadatei(f, m)
+	return getShaForContext(f, c)
 }
 
-func getShaForMetadatei(f FormatGeneric, m *Metadatei) (sh *Sha, err error) {
-	sw := sha.MakeWriter(nil)
+func GetShaForMetadatei(f FormatGeneric, m *Metadatei) (sh *Sha, err error) {
+	return GetShaForContext(f, nopFormatterContext{m})
+}
 
-	_, err = f.WriteMetadateiTo(sw, m)
+func WriteMetadatei(w io.Writer, f FormatGeneric, c FormatterContext) (sh *Sha, err error) {
+	sw := sha.MakeWriter(w)
+
+	_, err = f.WriteMetadateiTo(sw, c)
 
 	if err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	sh = &Sha{}
+	sh = sha.GetPool().Get()
 
 	if err = sh.SetShaLike(sw); err != nil {
 		err = errors.Wrap(err)
@@ -255,11 +390,20 @@ func getShaForMetadatei(f FormatGeneric, m *Metadatei) (sh *Sha, err error) {
 	return
 }
 
-func getShaForMetadateiDebug(f FormatGeneric, m *Metadatei) (sh *Sha, err error) {
+func getShaForContext(f FormatGeneric, c FormatterContext) (sh *Sha, err error) {
+	if sh, err = WriteMetadatei(nil, f, c); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func getShaForMetadateiDebug(f FormatGeneric, c *Metadatei) (sh *Sha, err error) {
 	var sb strings.Builder
 	sw := sha.MakeWriter(&sb)
 
-	_, err = f.WriteMetadateiTo(sw, m)
+	_, err = f.WriteMetadateiTo(sw, nopFormatterContext{c})
 
 	if err != nil {
 		err = errors.Wrap(err)

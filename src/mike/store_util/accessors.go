@@ -1,12 +1,14 @@
 package store_util
 
 import (
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/delta/thyme"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/ennui"
 	"github.com/friedenberg/zit/src/golf/kennung_index"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
+	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/juliett/konfig"
 	"github.com/friedenberg/zit/src/kilo/cwd"
@@ -29,6 +31,7 @@ type accessors interface {
 	GetKennungIndex() kennung_index.Index
 	GetObjekteFormatOptions() objekte_format.Options
 	GetVerzeichnisse() *store_verzeichnisse.Store
+	ReadOneEnnui(*sha.Sha) (*sku.Transacted, error)
 }
 
 func (s *common) GetAkten() *akten.Akten {
@@ -85,4 +88,12 @@ func (s *common) GetKonfig() *konfig.Compiled {
 
 func (s *common) GetVerzeichnisse() *store_verzeichnisse.Store {
 	return s.verzeichnisse
+}
+
+func (s *common) ReadOneEnnui(sh *sha.Sha) (*sku.Transacted, error) {
+	if s.konfig.GetStoreVersion().GetInt() > 4 {
+		return s.GetBestandsaufnahmeStore().ReadOneEnnui(sh)
+	} else {
+		return s.GetVerzeichnisse().ReadOneShas(sh)
+	}
 }

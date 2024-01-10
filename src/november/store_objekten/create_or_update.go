@@ -71,10 +71,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 			return
 		}
 	} else {
-		mu := &mutter.Metadatei.Sha
-		if err = transactedPtr.Metadatei.Mutter.SetShaLike(
-			mu,
-		); err != nil {
+		if err = transactedPtr.Metadatei.SetMutter(mutter); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

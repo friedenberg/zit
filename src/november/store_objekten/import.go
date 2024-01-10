@@ -24,11 +24,10 @@ func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOut, err error) {
 		return
 	}
 
-	err = s.GetVerzeichnisse().ExistsOneSha(&sk.Metadatei.Sha)
+	_, err = s.GetBestandsaufnahmeStore().ReadOneEnnui(&sk.Metadatei.Sha)
 
-	if err == collections.ErrExists {
-		co.SetError(err)
-		err = nil
+	if err == nil {
+		co.SetError(collections.ErrExists)
 		return
 	} else if errors.Is(err, objekte_store.ErrNotFoundEmpty) {
 		err = nil

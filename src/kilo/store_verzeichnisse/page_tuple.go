@@ -42,7 +42,6 @@ func (pt *PageTuple) initialize(
 	pt.added = sku.MakeTransactedHeap()
 	pt.addedSchwanz = sku.MakeTransactedHeap()
 	pt.etikettIndex = ki
-	pt.ennuiShas = i.ennuiShas
 	pt.ennuiKennung = i.ennuiKennung
 	pt.konfig = i.erworben
 }

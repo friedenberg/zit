@@ -35,6 +35,8 @@ type Metadatei struct {
 	Sha    sha.Sha // sha of Metadatei
 	Mutter sha.Sha // sha of parent Metadatei
 
+	Shas
+
 	Comments      []string
 	Verzeichnisse Verzeichnisse
 }
@@ -253,4 +255,24 @@ func (z *Metadatei) ApplyGoldenChild(
 
 func (mp *Metadatei) AddComment(f string, vals ...interface{}) {
 	mp.Comments = append(mp.Comments, fmt.Sprintf(f, vals...))
+}
+
+func (selbst *Metadatei) SetMutter(mg Getter) (err error) {
+	mutter := mg.GetMetadatei()
+
+	if err = selbst.Mutter.SetShaLike(
+		&mutter.Sha,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = selbst.MutterMetadateiKennungMutter.SetShaLike(
+		&mutter.SelbstMetadateiKennungMutter,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }

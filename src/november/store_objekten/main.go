@@ -140,7 +140,7 @@ func (s *Store) SetTransactedTo(
 
 	var mutter *sku.Transacted
 
-	if mutter, err = s.GetVerzeichnisse().ReadOneShas(sh); err != nil {
+	if mutter, err = s.GetBestandsaufnahmeStore().ReadOneEnnui(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

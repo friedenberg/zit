@@ -17,11 +17,11 @@ type FormatBestandsaufnahmePrinter interface {
 }
 
 type bestandsaufnahmePrinter struct {
-	format            objekte_format.Formatter
-	options           objekte_format.Options
-	out               io.Writer
-	offset            int64
-	firstBoundaryOnce *sync.Once
+	format                 objekte_format.Formatter
+	options                objekte_format.Options
+	out                    io.Writer
+	offset                 int64
+	firstBoundaryOnce      *sync.Once
 }
 
 func MakeFormatBestandsaufnahmePrinter(
@@ -83,6 +83,16 @@ func (f *bestandsaufnahmePrinter) Offset() int64 {
 	return f.offset
 }
 
+func (f *bestandsaufnahmePrinter) makeFuncFormatOne(
+	tlp objekte_format.FormatterContext,
+) func() (int64, error) {
+	return func() (int64, error) {
+		n1, err := f.format.FormatPersistentMetadatei(f.out, tlp, f.options)
+		f.offset += n1
+		return n1, err
+	}
+}
+
 func (f *bestandsaufnahmePrinter) Print(
 	tlp objekte_format.FormatterContext,
 ) (n int64, err error) {
@@ -90,11 +100,7 @@ func (f *bestandsaufnahmePrinter) Print(
 
 	pfs := [3]func() (int64, error){
 		f.printFirstBoundary,
-		func() (int64, error) {
-			n1, err = f.format.FormatPersistentMetadatei(f.out, tlp, f.options)
-			f.offset += n1
-			return n1, err
-		},
+		f.makeFuncFormatOne(tlp),
 		f.printBoundary,
 	}
 
