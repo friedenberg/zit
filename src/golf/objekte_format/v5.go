@@ -205,11 +205,11 @@ func (f v5) FormatPersistentMetadatei(
 		}
 	}
 
-	if !m.Mutter.IsNull() {
+	if !m.Mutter().IsNull() {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			w,
 			keyMutter.String(),
-			m.Mutter.String(),
+			m.Mutter().String(),
 		)
 		n += int64(n1)
 
@@ -235,7 +235,7 @@ func (f v5) FormatPersistentMetadatei(
 	n1, err = ohio.WriteKeySpaceValueNewlineString(
 		w,
 		keySha.String(),
-		m.Sha.String(),
+		m.Sha().String(),
 	)
 
 	n += int64(n1)
@@ -407,13 +407,13 @@ func (f v5) ParsePersistentMetadatei(
 			}
 
 		case key.Equal(keyMutter.Bytes()):
-			if err = m.Mutter.SetHexBytes(val.Bytes()); err != nil {
+			if err = m.Mutter().SetHexBytes(val.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 		case key.Equal(keySha.Bytes()):
-			if err = m.Sha.SetHexBytes(val.Bytes()); err != nil {
+			if err = m.Sha().SetHexBytes(val.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

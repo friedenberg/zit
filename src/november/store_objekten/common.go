@@ -56,7 +56,7 @@ func (s *Store) handleNewOrUpdatedCommit(
 	}
 
 	if err = s.GetVerzeichnisse().ExistsOneSha(
-		&t.Metadatei.Sha,
+		t.Metadatei.Sha(),
 	); err == collections.ErrExists {
 		return
 	}

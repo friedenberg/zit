@@ -19,8 +19,8 @@ func (resetter) Reset(z *Metadatei) {
 	z.Typ = kennung.Typ{}
 	// z.Gattung = gattung.Unknown
 	z.Tai.Reset()
-	z.Sha.Reset()
-	z.Mutter.Reset()
+	z.Sha().Reset()
+	z.Mutter().Reset()
 }
 
 func (resetter) ResetWith(a *Metadatei, b *Metadatei) {
@@ -36,8 +36,8 @@ func (resetter) ResetWith(a *Metadatei, b *Metadatei) {
 	a.Typ = b.Typ
 	a.Tai = b.Tai
 
-	errors.PanicIfError(a.Sha.SetShaLike(&b.Sha))
-	errors.PanicIfError(a.Mutter.SetShaLike(&b.Mutter))
+	errors.PanicIfError(a.Sha().SetShaLike(b.Sha()))
+	errors.PanicIfError(a.Mutter().SetShaLike(b.Mutter()))
 }
 
 var ResetterVerzeichnisse resetterVerzeichnisse

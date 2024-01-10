@@ -131,9 +131,9 @@ func (s *Store) createOrUpdate(
 
 	if mutter != nil {
 		transactedPtr.Kopf = mutter.GetKopf()
-		mu := &mutter.Metadatei.Sha
+		mu := mutter.Metadatei.Sha()
 
-		if err = transactedPtr.Metadatei.Mutter.SetShaLike(
+		if err = transactedPtr.Metadatei.Mutter().SetShaLike(
 			mu,
 		); err != nil {
 			err = errors.Wrap(err)

@@ -94,7 +94,7 @@ func (c Revert) addOneMutter(
 ) (err error) {
 	// TODO-project-2021-zit-multi_history_chains
   // transition to MutterMetadateiKennungMutter
-	mu := &z.Metadatei.Mutter
+	mu := z.Metadatei.Mutter()
 
 	if mu.IsNull() {
 		// log.Err().Printf("%s has null mutter, cannot revert", z)

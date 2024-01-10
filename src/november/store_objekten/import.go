@@ -24,7 +24,7 @@ func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOut, err error) {
 		return
 	}
 
-	_, err = s.GetBestandsaufnahmeStore().ReadOneEnnui(&sk.Metadatei.Sha)
+	_, err = s.GetBestandsaufnahmeStore().ReadOneEnnui(sk.Metadatei.Sha())
 
 	if err == nil {
 		co.SetError(collections.ErrExists)
@@ -50,9 +50,9 @@ func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOut, err error) {
 		return
 	}
 
-	if !co.Internal.Metadatei.Sha.IsNull() &&
-		!co.Internal.Metadatei.Sha.Equals(&sk.Metadatei.Mutter) &&
-		!co.Internal.Metadatei.Sha.Equals(&sk.Metadatei.Sha) {
+	if !co.Internal.Metadatei.Sha().IsNull() &&
+		!co.Internal.Metadatei.Sha().Equals(sk.Metadatei.Mutter()) &&
+		!co.Internal.Metadatei.Sha().Equals(sk.Metadatei.Sha()) {
 		if err = s.importDoMerge(co); err != nil {
 			err = errors.Wrap(err)
 			return

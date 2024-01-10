@@ -228,7 +228,7 @@ func (s *store) writeAkte(o *Akte) (sh *sha.Sha, err error) {
 			break
 		}
 
-		if sk.Metadatei.Sha.IsNull() {
+		if sk.Metadatei.Sha().IsNull() {
 			err = errors.Errorf("empty sha: %s", sk)
 			return
 		}
@@ -343,7 +343,7 @@ func (s *store) ReadOneSku(besty, sh *sha.Sha) (o *sku.Transacted, err error) {
 	for dec.Scan() {
 		o = dec.GetTransacted()
 
-		if !o.Metadatei.Sha.Equals(sh) {
+		if !o.Metadatei.Sha().Equals(sh) {
 			continue
 		}
 

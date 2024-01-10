@@ -36,7 +36,7 @@ func (pw *pageWriterV4) ReadMutter(z *sku.Transacted) (err error) {
 	old := pw.kennungShaMap[k.String()]
 
 	if !old.Mutter.IsNull() {
-		if err = z.GetMetadatei().Mutter.SetShaLike(old.Mutter); err != nil {
+		if err = z.GetMetadatei().Mutter().SetShaLike(old.Mutter); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -91,7 +91,7 @@ func (pw *pageWriterV4) SaveSha(z *sku.Transacted) (err error) {
 	k := z.GetKennung()
 	var sh sha.Sha
 
-	if err = sh.SetShaLike(&z.GetMetadatei().Sha); err != nil {
+	if err = sh.SetShaLike(z.GetMetadatei().Sha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

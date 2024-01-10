@@ -73,7 +73,7 @@ func (a *Transacted) StringKennungSha() string {
 	return fmt.Sprintf(
 		"%s@%s",
 		&a.Kennung,
-		&a.GetMetadatei().Sha,
+		a.GetMetadatei().Sha(),
 	)
 }
 
@@ -81,7 +81,7 @@ func (a *Transacted) StringKennungMutter() string {
 	return fmt.Sprintf(
 		"%s^@%s",
 		&a.Kennung,
-		&a.GetMetadatei().Mutter,
+		a.GetMetadatei().Mutter(),
 	)
 }
 
@@ -166,7 +166,7 @@ func (s *Transacted) GetGattung() schnittstellen.GattungLike {
 }
 
 func (s *Transacted) IsNew() bool {
-	return s.Metadatei.Mutter.IsNull()
+	return s.Metadatei.Mutter().IsNull()
 }
 
 func (s *Transacted) CalculateObjekteSha() (err error) {
@@ -199,11 +199,11 @@ func (s *Transacted) SetArchiviert(v bool) {
 }
 
 func (s *Transacted) SetObjekteSha(v schnittstellen.ShaLike) (err error) {
-	return s.GetMetadatei().Sha.SetShaLike(v)
+	return s.GetMetadatei().Sha().SetShaLike(v)
 }
 
 func (s *Transacted) GetObjekteSha() schnittstellen.ShaLike {
-	return &s.GetMetadatei().Sha
+	return s.GetMetadatei().Sha()
 }
 
 func (s *Transacted) GetAkteSha() schnittstellen.ShaLike {

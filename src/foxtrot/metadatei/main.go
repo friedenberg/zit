@@ -32,9 +32,6 @@ type Metadatei struct {
 	Typ         kennung.Typ
 	Tai         kennung.Tai
 
-	Sha    sha.Sha // sha of Metadatei
-	Mutter sha.Sha // sha of parent Metadatei
-
 	Shas
 
 	Comments      []string
@@ -43,6 +40,14 @@ type Metadatei struct {
 
 func (m *Metadatei) GetMetadatei() *Metadatei {
 	return m
+}
+
+func (m *Metadatei) Sha() *sha.Sha {
+	return &m.Shas.SelbstMetadateiKennungMutter
+}
+
+func (m *Metadatei) Mutter() *sha.Sha {
+	return &m.Shas.MutterMetadateiKennungMutter
 }
 
 func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {
@@ -260,8 +265,8 @@ func (mp *Metadatei) AddComment(f string, vals ...interface{}) {
 func (selbst *Metadatei) SetMutter(mg Getter) (err error) {
 	mutter := mg.GetMetadatei()
 
-	if err = selbst.Mutter.SetShaLike(
-		&mutter.Sha,
+	if err = selbst.Mutter().SetShaLike(
+		mutter.Sha(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

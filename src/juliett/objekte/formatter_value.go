@@ -89,7 +89,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	switch fv.string {
 	case "sha":
 		return func(tl *sku.Transacted) (err error) {
-			_, err = fmt.Fprintln(out, &tl.Metadatei.Sha)
+			_, err = fmt.Fprintln(out, tl.Metadatei.Sha())
 			return
 		}
 
@@ -398,17 +398,17 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 
 	case "mutter-sha":
 		return func(z *sku.Transacted) (err error) {
-			_, err = fmt.Fprintln(out, &z.Metadatei.Mutter)
+			_, err = fmt.Fprintln(out, z.Metadatei.Mutter())
 			return
 		}
 
 	case "mutter":
 		return func(z *sku.Transacted) (err error) {
-			if z.Metadatei.Mutter.IsNull() {
+			if z.Metadatei.Mutter().IsNull() {
 				return
 			}
 
-			if z, err = rob(&z.GetMetadatei().Mutter); err != nil {
+			if z, err = rob(z.GetMetadatei().Mutter()); err != nil {
 				fmt.Fprintln(out, err)
 				err = nil
 				return

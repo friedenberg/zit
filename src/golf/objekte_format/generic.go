@@ -221,11 +221,11 @@ func WriteMetadateiKeyTo(
 		}
 
 	case keyMutter:
-		if !m.Mutter.IsNull() {
+		if !m.Mutter().IsNull() {
 			n1, err = ohio.WriteKeySpaceValueNewlineString(
 				w,
 				keyMutter.String(),
-				m.Mutter.String(),
+				m.Mutter().String(),
 			)
 			n += int64(n1)
 

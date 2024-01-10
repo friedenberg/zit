@@ -263,13 +263,13 @@ func (bf *Binary) readFieldKey(
 		}
 
 	case schlussel.Mutter:
-		if _, err = sk.Metadatei.Mutter.ReadFrom(&bf.Content); err != nil {
+		if _, err = sk.Metadatei.Mutter().ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case schlussel.Sha:
-		if _, err = sk.Metadatei.Sha.ReadFrom(&bf.Content); err != nil {
+		if _, err = sk.Metadatei.Sha().ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -433,21 +433,21 @@ func (bf *Binary) writeFieldKey(
 		}
 
 	case schlussel.Mutter:
-		if sk.Metadatei.Mutter.IsNull() {
+		if sk.Metadatei.Mutter().IsNull() {
 			return
 		}
 
-		if n, err = bf.writeFieldWriterTo(&sk.Metadatei.Mutter); err != nil {
+		if n, err = bf.writeFieldWriterTo(sk.Metadatei.Mutter()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case schlussel.Sha:
-		if sk.Metadatei.Sha.IsNull() {
+		if sk.Metadatei.Sha().IsNull() {
 			panic("sha was null")
 		}
 
-		if n, err = bf.writeFieldWriterTo(&sk.Metadatei.Sha); err != nil {
+		if n, err = bf.writeFieldWriterTo(sk.Metadatei.Sha()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

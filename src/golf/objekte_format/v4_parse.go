@@ -174,13 +174,13 @@ func (f v4) ParsePersistentMetadatei(
 			}
 
 		case key.Equal(keyMutter.Bytes()):
-			if err = m.Mutter.SetHexBytes(val.Bytes()); err != nil {
+			if err = m.Mutter().SetHexBytes(val.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 		case key.Equal(keySha.Bytes()):
-			if err = m.Sha.SetHexBytes(val.Bytes()); err != nil {
+			if err = m.Sha().SetHexBytes(val.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
