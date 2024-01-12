@@ -1,15 +1,26 @@
 use anyhow::Error;
 use hex::FromHex;
+use hex_literal::hex;
 use std::fmt::{self, Display, Formatter};
 use std::{path::PathBuf, str::FromStr};
-use hex_literal::hex;
 
-pub const NULL: Digest = Digest(hex!("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"));
+pub const NULL: Digest = Digest(hex!(
+    "
+    e3b0c442 98fc1c14
+    9afbf4c8 996fb924
+    27ae41e4 649b934c
+    a495991b 7852b855
+"
+));
 
 #[derive(PartialEq, Clone, Debug)]
-pub struct Digest(pub [u8; 32]);
+pub struct Digest([u8; 32]);
 
 impl Digest {
+    pub fn new(b: [u8; 32]) -> Digest {
+        Digest(b)
+    }
+
     pub fn is_null(&self) -> bool {
         self == &NULL
     }
