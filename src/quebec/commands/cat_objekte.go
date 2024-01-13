@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
@@ -51,18 +50,34 @@ func (c CatObjekte) Run(
 			return
 		}
 
+		me := errors.MakeMulti()
+
 		if err = c.akte(u, &sh, akteWriter); err == nil {
 			continue
 		}
 
-		var sk *sku.Transacted
+		me.Add(err)
 
-		if sk, err = u.StoreUtil().GetVerzeichnisse().ReadOneShas(&sh); err != nil {
-			err = errors.Wrap(err)
-			return
+		// if sk, err = u.StoreUtil().GetVerzeichnisse().ReadOneShas(&sh); err == nil {
+		// 	log.Out().Printf("%s", sk)
+		// 	continue
+		// }
+
+		// me.Add(err)
+
+		var rc sha.ReadCloser
+
+		if rc, err = u.StoreUtil().ReaderFor(&sh); err == nil {
+			if err = akteWriter(rc); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			continue
 		}
 
-		log.Err().Printf("%s", sk)
+		me.Add(err)
+		log.Err().Print(me)
 	}
 
 	return

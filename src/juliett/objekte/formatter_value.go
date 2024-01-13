@@ -59,6 +59,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"mutter-sha",
 		"objekte",
 		"sha",
+		"sha-mutter",
 		"sku",
 		"sku-metadatei",
 		"sku-metadatei-sans-tai",
@@ -90,6 +91,12 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	case "sha":
 		return func(tl *sku.Transacted) (err error) {
 			_, err = fmt.Fprintln(out, tl.Metadatei.Sha())
+			return
+		}
+
+	case "sha-mutter":
+		return func(tl *sku.Transacted) (err error) {
+			_, err = fmt.Fprintf(out, "%s -> %s\n", tl.Metadatei.Sha(), tl.Metadatei.Mutter())
 			return
 		}
 

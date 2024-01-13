@@ -63,9 +63,9 @@ func (bf *Binary) ReadFormatExactly(
 	n1, err = r.ReadAt(b, loc.Offset)
 	n += int64(n1)
 
-  if err == io.EOF {
-    err = nil
-  } else if err != nil {
+	if err == io.EOF {
+		err = nil
+	} else if err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -113,6 +113,8 @@ func (bf *Binary) ReadFormatExactly(
 	return
 }
 
+var ErrSkip = errors.New("skip")
+
 func (bf *Binary) ReadFormatAndMatchSigil(
 	r io.Reader,
 	sk *sku.Transacted,
@@ -124,6 +126,8 @@ func (bf *Binary) ReadFormatAndMatchSigil(
 	var n1 int
 	var n2 int64
 
+	// loop thru entries to find the next one that matches the current sigil
+	// when found, break the loop and deserialize it and return
 	for {
 		n1, err = ohio.ReadAllOrDieTrying(r, bf.ContentLength[:])
 		n += int64(n1)
@@ -134,6 +138,7 @@ func (bf *Binary) ReadFormatAndMatchSigil(
 			}
 
 			err = errors.WrapExcept(err, io.EOF)
+
 			return
 		}
 
@@ -161,7 +166,8 @@ func (bf *Binary) ReadFormatAndMatchSigil(
 		}
 
 		// TODO-P2 replace with buffered seeker
-		if _, err = io.CopyN(io.Discard, r, contentLength64-n2); err != nil {
+		// discard the next record
+		if _, err = io.Copy(io.Discard, &bf.LimitedReader); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

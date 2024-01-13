@@ -23,7 +23,7 @@ func ReadAllOrDieTrying(r io.Reader, b []byte) (n int, err error) {
 
 	switch err {
 	case io.EOF:
-		if n < len(b) {
+		if n < len(b) && n > 0 {
 			err = errors.Wrapf(
 				io.ErrUnexpectedEOF,
 				"Expected %d, got %d",

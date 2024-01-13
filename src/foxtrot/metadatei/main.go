@@ -43,11 +43,11 @@ func (m *Metadatei) GetMetadatei() *Metadatei {
 }
 
 func (m *Metadatei) Sha() *sha.Sha {
-	return &m.Shas.SelbstMetadateiKennungMutter
+	return &m.SelbstMetadateiKennungMutter
 }
 
 func (m *Metadatei) Mutter() *sha.Sha {
-	return &m.Shas.MutterMetadateiKennungMutter
+	return &m.MutterMetadateiKennungMutter
 }
 
 func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {

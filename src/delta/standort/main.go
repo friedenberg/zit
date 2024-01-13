@@ -198,6 +198,10 @@ func (s Standort) DirVerzeichnisse(p ...string) string {
 	return s.DirZit(append([]string{"Verzeichnisse"}, p...)...)
 }
 
+func (s Standort) DirVerzeichnisseDurable(p ...string) string {
+	return s.DirZit(append([]string{"VerzeichnisseDurable"}, p...)...)
+}
+
 func (s Standort) DirObjekten(p ...string) string {
 	return s.DirZit(append([]string{"Objekten"}, p...)...)
 }
@@ -219,16 +223,12 @@ func (s Standort) MakeDir(d string) (err error) {
 	return
 }
 
-func (s Standort) DirVerzeichnisseBestandsaufnahme() string {
-	return s.DirVerzeichnisse("Bestandsaufnahme")
-}
-
 func (s Standort) DirVerzeichnisseObjekten() string {
 	return s.DirVerzeichnisse("Objekten")
 }
 
 func (s Standort) DirVerzeichnisseMetadatei() string {
-	return s.DirVerzeichnisse("Metadatei")
+	return s.DirVerzeichnisseDurable("Metadatei")
 }
 
 func (s Standort) DirVerzeichnisseVerweise() string {
@@ -241,10 +241,6 @@ func (s Standort) FileVerzeichnisseEtiketten() string {
 
 func (s Standort) FileVerzeichnisseKennung() string {
 	return s.DirVerzeichnisse("Kennung")
-}
-
-func (s Standort) FileVerzeichnisseEnnui() string {
-	return s.DirVerzeichnisse("Ennui")
 }
 
 func (s Standort) FileVerzeichnisseHinweis() string {
@@ -282,11 +278,6 @@ func (s Standort) ResetVerzeichnisse() (err error) {
 	}
 
 	if err = s.MakeDir(s.DirVerzeichnisseVerweise()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.MakeDir(s.DirVerzeichnisseBestandsaufnahme()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -8,6 +8,8 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/id"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/bravo/pool"
 	"github.com/friedenberg/zit/src/charlie/catgut"
@@ -28,6 +30,7 @@ type Store interface {
 	ReadOneEnnui(*sha.Sha) (*sku.Transacted, error)
 	Create(*Akte) (*sku.Transacted, error)
 	objekte_store.LastReader
+	WriteOneObjekteMetadatei(o *sku.Transacted) (err error)
 	ReadOne(schnittstellen.Stringer) (*sku.Transacted, error)
 	ReadOneSku(besty, sk *sha.Sha) (*sku.Transacted, error)
 	objekte_store.AllReader
@@ -221,6 +224,9 @@ func (s *store) writeAkte(o *Akte) (sh *sha.Sha, err error) {
 
 	defer o.Skus.Restore()
 
+	wg := iter.MakeErrorWaitGroupParallel()
+	tickets := make(chan struct{}, 128)
+
 	for {
 		sk, ok := o.Skus.PopAndSave()
 
@@ -240,18 +246,45 @@ func (s *store) writeAkte(o *Akte) (sh *sha.Sha, err error) {
 			return
 		}
 
-		if s.writeOneObjekteMetadatei(sk); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		wg.Do(
+			func() (err error) {
+				tickets <- struct{}{}
+				defer func() {
+					<-tickets
+				}()
+
+				if err = s.WriteOneObjekteMetadatei(sk); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
+			},
+		)
 	}
 
 	sh = sha.Make(sw.GetShaLike())
 
+	if err = wg.GetError(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
-func (s *store) writeOneObjekteMetadatei(o *sku.Transacted) (err error) {
+func (s *store) WriteOneObjekteMetadatei(o *sku.Transacted) (err error) {
+	if o.Metadatei.Sha().IsNull() {
+		err = errors.Errorf("null sha")
+		return
+	}
+
+	p := id.Path(o.Metadatei.Sha(), s.standort.DirVerzeichnisseMetadatei())
+
+	if files.Exists(p) {
+		return
+	}
+
 	var sw sha.WriteCloser
 
 	if sw, err = s.standort.AkteWriterTo(
@@ -263,12 +296,7 @@ func (s *store) writeOneObjekteMetadatei(o *sku.Transacted) (err error) {
 
 	defer errors.DeferredCloser(&err, sw)
 
-	var fo objekte_format.FormatGeneric
-
-	if fo, err = objekte_format.FormatForKeyError("MetadateiKennungMutter"); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	fo := objekte_format.Formats.MetadateiKennungMutter()
 
 	if _, err = fo.WriteMetadateiTo(sw, o); err != nil {
 		err = errors.Wrap(err)

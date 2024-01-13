@@ -3,7 +3,6 @@ package store_util
 import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/charlie/checkout_options"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/delta/standort"
@@ -188,11 +187,6 @@ func (s *common) ResetIndexes() (err error) {
 
 	if err = s.kennungIndex.Reset(); err != nil {
 		err = errors.Wrapf(err, "failed to reset index kennung")
-		return
-	}
-
-	if err = files.RemoveIfExists(s.standort.FileVerzeichnisseEnnui()); err != nil {
-		err = errors.Wrapf(err, "failed to reset ennui")
 		return
 	}
 

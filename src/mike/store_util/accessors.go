@@ -1,6 +1,7 @@
 package store_util
 
 import (
+	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/delta/thyme"
@@ -12,6 +13,7 @@ import (
 	"github.com/friedenberg/zit/src/india/objekte_collections"
 	"github.com/friedenberg/zit/src/juliett/konfig"
 	"github.com/friedenberg/zit/src/kilo/cwd"
+	"github.com/friedenberg/zit/src/kilo/objekte_store"
 	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
 	"github.com/friedenberg/zit/src/lima/akten"
 	"github.com/friedenberg/zit/src/lima/bestandsaufnahme"
@@ -32,6 +34,7 @@ type accessors interface {
 	GetObjekteFormatOptions() objekte_format.Options
 	GetVerzeichnisse() *store_verzeichnisse.Store
 	ReadOneEnnui(*sha.Sha) (*sku.Transacted, error)
+	ReaderFor(*sha.Sha) (sha.ReadCloser, error)
 }
 
 func (s *common) GetAkten() *akten.Akten {
@@ -96,4 +99,21 @@ func (s *common) ReadOneEnnui(sh *sha.Sha) (*sku.Transacted, error) {
 	} else {
 		return s.GetVerzeichnisse().ReadOneShas(sh)
 	}
+}
+
+func (s *common) ReaderFor(sh *sha.Sha) (rc sha.ReadCloser, err error) {
+	if rc, err = s.standort.AkteReaderFrom(
+		sh,
+		s.standort.DirVerzeichnisseMetadatei(),
+	); err != nil {
+		if errors.IsNotExist(err) {
+			err = objekte_store.ErrNotFoundEmpty
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	return
 }

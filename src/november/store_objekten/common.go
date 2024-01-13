@@ -55,6 +55,13 @@ func (s *Store) handleNewOrUpdatedCommit(
 		s.CommitTransacted(t)
 	}
 
+	if mode == objekte_mode.ModeEmpty {
+		if err = s.GetBestandsaufnahmeStore().WriteOneObjekteMetadatei(t); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	if err = s.GetVerzeichnisse().ExistsOneSha(
 		t.Metadatei.Sha(),
 	); err == collections.ErrExists {

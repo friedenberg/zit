@@ -51,7 +51,7 @@ fn create_unique_temp_file() -> Result<(PathBuf, File)> {
     Ok((path, file))
 }
 
-fn copy_file_to_temp_and_generate_sha<T: Read>(input: &mut T, output: File) -> Result<Digest> {
+fn copy_file_to_temp_and_generate_digest<T: Read>(input: &mut T, output: File) -> Result<Digest> {
     let mut reader = BufReader::new(input);
     let writer = BufWriter::new(output);
     let mut hash_writer = Writer::new();
@@ -62,8 +62,8 @@ fn copy_file_to_temp_and_generate_sha<T: Read>(input: &mut T, output: File) -> R
     Ok(hash_writer.digest())
 }
 
-fn create_directory_if_necessary(sha: &mut Digest) -> Result<()> {
-    let path = Path::new(".").join(sha.kopf());
+fn create_directory_if_necessary(dig: &mut Digest) -> Result<()> {
+    let path = Path::new(".").join(dig.kopf());
 
     let result = create_dir(path);
 
@@ -77,39 +77,39 @@ fn create_directory_if_necessary(sha: &mut Digest) -> Result<()> {
     Ok(())
 }
 
-fn move_file_to_store(old_path: PathBuf, sha: &mut Digest) -> Result<()> {
-    rename(old_path, sha.path())?;
+fn move_file_to_store(old_path: PathBuf, dig: &mut Digest) -> Result<()> {
+    rename(old_path, dig.path())?;
 
     Ok(())
 }
 
 fn run_one<T: Read>(input: &mut T) -> Result<Digest> {
     let (path, file) = create_unique_temp_file()?;
-    let mut sha = copy_file_to_temp_and_generate_sha(input, file)?;
-    create_directory_if_necessary(&mut sha)?;
-    move_file_to_store(path, &mut sha)?;
-    Ok(sha)
+    let mut dig = copy_file_to_temp_and_generate_digest(input, file)?;
+    create_directory_if_necessary(&mut dig)?;
+    move_file_to_store(path, &mut dig)?;
+    Ok(dig)
 }
 
 pub fn run(paths: Vec<PathBuf>, add_mode: Mode) -> Result<()> {
     create_temp_dir_if_necessary()?;
 
     if paths.len() == 0 {
-        let sha = run_one(&mut stdin())?;
-        println!("{:} (stdin)", sha);
+        let dig = run_one(&mut stdin())?;
+        println!("{:} (stdin)", dig);
     } else {
         for path in paths.iter() {
             let mut file = OpenOptions::new().read(true).open(&path)?;
-            let sha = run_one(&mut file)?;
+            let dig = run_one(&mut file)?;
 
             let path_str = path.to_string_lossy();
 
             match add_mode {
                 Mode::Delete => {
                     remove_file(path)?;
-                    println!("{:} {:} (deleted)", sha, path_str);
+                    println!("{:} {:} (deleted)", dig, path_str);
                 }
-                _ => println!("{:} {:}", sha, path.to_string_lossy()),
+                _ => println!("{:} {:}", dig, path.to_string_lossy()),
             }
         }
     }

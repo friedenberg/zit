@@ -19,6 +19,7 @@ type ShaTuple struct {
 	Offset, ContentLength int64
 	kennung.Sigil
 }
+
 type KennungShaMap map[string]ShaTuple
 
 type pageWriterV4 struct {
@@ -33,10 +34,11 @@ type pageWriterV4 struct {
 
 func (pw *pageWriterV4) ReadMutter(z *sku.Transacted) (err error) {
 	k := z.GetKennung()
-	old := pw.kennungShaMap[k.String()]
 
-	if !old.Mutter.IsNull() {
-		if err = z.GetMetadatei().Mutter().SetShaLike(old.Mutter); err != nil {
+	record := pw.kennungShaMap[k.String()]
+
+	if !record.Mutter.IsNull() {
+		if err = z.GetMetadatei().Mutter().SetShaLike(record.Sha); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -62,6 +64,8 @@ func (pw *pageWriterV4) writeOne(
 		return
 	}
 
+	pw.offset += int64(n)
+
 	pw.etikettIndex.Add(z.Metadatei.GetEtiketten())
 
 	if pw.ennuiShas == nil {
@@ -82,14 +86,12 @@ func (pw *pageWriterV4) writeOne(
 		return
 	}
 
-	pw.offset += int64(n)
-
 	return
 }
 
 func (pw *pageWriterV4) SaveSha(z *sku.Transacted) (err error) {
 	k := z.GetKennung()
-	var sh sha.Sha
+	sh := sha.GetPool().Get()
 
 	if err = sh.SetShaLike(z.GetMetadatei().Sha()); err != nil {
 		err = errors.Wrap(err)
@@ -97,8 +99,9 @@ func (pw *pageWriterV4) SaveSha(z *sku.Transacted) (err error) {
 	}
 
 	record := pw.kennungShaMap[k.String()]
+	sha.GetPool().Put(record.Mutter)
 	record.Mutter = record.Sha
-	record.Sha = &sh
+	record.Sha = sh
 	record.Offset = pw.offsetLast
 	record.ContentLength = pw.offset - pw.offsetLast
 	record.Sigil = kennung.SigilHistory

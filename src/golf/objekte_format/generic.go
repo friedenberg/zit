@@ -143,18 +143,17 @@ func WriteMetadateiKeyTo(
 
 	switch key {
 	case keyAkte:
-		if !m.Akte.IsNull() {
-			n1, err = ohio.WriteKeySpaceValueNewlineString(
-				w,
-				keyAkte.String(),
-				m.Akte.String(),
-			)
-			n += int64(n1)
+		n1, err = writeShaKeyIfNotNull(
+			w,
+			keyAkte,
+			&m.Akte,
+		)
 
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+		n += int64(n1)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
 		}
 
 	case keyBezeichnung:
@@ -221,91 +220,59 @@ func WriteMetadateiKeyTo(
 		}
 
 	case keyMutter:
-		if !m.Mutter().IsNull() {
-			n1, err = ohio.WriteKeySpaceValueNewlineString(
-				w,
-				keyMutter.String(),
-				m.Mutter().String(),
-			)
-			n += int64(n1)
+		n1, err = writeShaKeyIfNotNull(
+			w,
+			keyMutter,
+			m.Mutter(),
+		)
 
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+		n += int64(n1)
 
-			n += int64(n1)
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+		if err != nil {
+			err = errors.Wrap(err)
+			return
 		}
 
 	case keyShasMutterMetadatei:
-		if !m.MutterMetadatei.IsNull() {
-			n1, err = ohio.WriteKeySpaceValueNewlineString(
-				w,
-				keyShasMutterMetadatei.String(),
-				m.MutterMetadatei.String(),
-			)
-			n += int64(n1)
+		n1, err = writeShaKeyIfNotNull(
+			w,
+			keyShasMutterMetadatei,
+			&m.MutterMetadatei,
+		)
 
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+		n += int64(n1)
 
-			n += int64(n1)
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+		if err != nil {
+			err = errors.Wrap(err)
+			return
 		}
 
 	case keyShasMutterMetadateiMutter:
-		if !m.MutterMetadatei.IsNull() {
-			n1, err = ohio.WriteKeySpaceValueNewlineString(
-				w,
-				keyShasMutterMetadateiMutter.String(),
-				m.MutterMetadateiMutter.String(),
-			)
-			n += int64(n1)
+		n1, err = writeShaKeyIfNotNull(
+			w,
+			keyShasMutterMetadateiMutter,
+			&m.MutterMetadateiMutter,
+		)
 
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+		n += int64(n1)
 
-			n += int64(n1)
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+		if err != nil {
+			err = errors.Wrap(err)
+			return
 		}
 
 	case keyShasMutterMetadateiKennungMutter:
-		if !m.MutterMetadatei.IsNull() {
-			n1, err = ohio.WriteKeySpaceValueNewlineString(
-				w,
-				keyShasMutterMetadateiKennungMutter.String(),
-				m.MutterMetadateiKennungMutter.String(),
-			)
-			n += int64(n1)
+		n1, err = writeShaKeyIfNotNull(
+			w,
+			keyShasMutterMetadateiKennungMutter,
+			&m.MutterMetadateiKennungMutter,
+		)
 
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+		n += int64(n1)
 
-			n += int64(n1)
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+		if err != nil {
+			err = errors.Wrap(err)
+			return
 		}
 
 	case keyTai:
@@ -338,6 +305,29 @@ func WriteMetadateiKeyTo(
 
 	default:
 		panic(fmt.Sprintf("unsupported key: %s", key))
+	}
+
+	return
+}
+
+func writeShaKeyIfNotNull(
+	w io.Writer,
+	key *catgut.String,
+	sh *sha.Sha,
+) (n int, err error) {
+	if sh.IsNull() {
+		return
+	}
+
+	n, err = ohio.WriteKeySpaceValueNewlineString(
+		w,
+		key.String(),
+		sh.String(),
+	)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

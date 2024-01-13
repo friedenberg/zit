@@ -6,7 +6,7 @@ mod show;
 use crate::alfa::hash::digest::Digest;
 use clap::{Parser, Subcommand};
 use std::error::Error;
-use std::path::{self, PathBuf};
+use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
 #[clap(name = "akte-store", version)]
@@ -17,7 +17,7 @@ struct App {
 
 #[derive(Parser, Debug)]
 struct CommandInit {
-    dir: Option<path::PathBuf>,
+    dir: Option<PathBuf>,
 }
 
 #[derive(Parser, Debug)]
@@ -27,7 +27,7 @@ struct CommandAdd {
 
 #[derive(Parser, Debug)]
 struct CommandShow {
-    shas: Vec<Digest>,
+    digests: Vec<Digest>,
 }
 
 #[derive(Subcommand, Debug)]
@@ -45,6 +45,6 @@ fn main() -> Result<()> {
         Commands::Init(cmd) => init::run(cmd.dir),
         Commands::Add(cmd) => add::run(cmd.paths, add::Mode::Add),
         Commands::Move(cmd) => add::run(cmd.paths, add::Mode::Delete),
-        Commands::Show(cmd) => show::run(&cmd.shas),
+        Commands::Show(cmd) => show::run(&cmd.digests),
     }
 }
