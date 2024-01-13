@@ -9,7 +9,7 @@ use std::error::Error;
 use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
-#[clap(name = "akte-store", version)]
+#[clap(name = "abscess", version)]
 struct App {
     #[clap(subcommand)]
     command: Commands,

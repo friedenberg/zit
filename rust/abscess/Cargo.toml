@@ -1,5 +1,5 @@
 [package]
-name = "akte-store"
+name = "abscess"
 version = "0.1.0"
 edition = "2021"
 
