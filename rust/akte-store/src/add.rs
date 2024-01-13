@@ -3,9 +3,9 @@ use crate::alfa::hash::writer::Writer;
 use io_tee::TeeWriter;
 use rand::{distributions::Alphanumeric, Rng};
 use std::error::Error;
-use std::fs::{self, File};
+use std::fs::{create_dir, rename, File};
 use std::fs::{remove_file, OpenOptions};
-use std::io::{self, copy, BufReader, BufWriter, Read, stdin};
+use std::io::{self, copy, stdin, BufReader, BufWriter, ErrorKind, Read};
 use std::path::{Path, PathBuf};
 use std::time::SystemTime;
 
@@ -19,11 +19,11 @@ pub enum Mode {
 }
 
 pub fn create_temp_dir_if_necessary() -> Result<()> {
-    let result = fs::create_dir(DIR_TMP);
+    let result = create_dir(DIR_TMP);
 
     if let Err(ref ouch) = result {
         match ouch.kind() {
-            io::ErrorKind::AlreadyExists => (),
+            ErrorKind::AlreadyExists => (),
             _ => result?,
         }
     }
@@ -65,7 +65,7 @@ fn copy_file_to_temp_and_generate_sha<T: Read>(input: &mut T, output: File) -> R
 fn create_directory_if_necessary(sha: &mut Digest) -> Result<()> {
     let path = Path::new(".").join(sha.kopf());
 
-    let result = fs::create_dir(path);
+    let result = create_dir(path);
 
     if let Err(ref ouch) = result {
         match ouch.kind() {
@@ -78,7 +78,7 @@ fn create_directory_if_necessary(sha: &mut Digest) -> Result<()> {
 }
 
 fn move_file_to_store(old_path: PathBuf, sha: &mut Digest) -> Result<()> {
-    fs::rename(old_path, sha.path())?;
+    rename(old_path, sha.path())?;
 
     Ok(())
 }

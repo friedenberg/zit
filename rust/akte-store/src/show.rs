@@ -22,7 +22,7 @@ fn write_file_to<T: Write>(file: File, out: &mut T) -> Result<()> {
     Ok(())
 }
 
-pub fn run(shas: &mut Vec<Digest>) -> Result<()> {
+pub fn run(shas: &Vec<Digest>) -> Result<()> {
     let mut out = stdout();
     for sha in shas.iter() {
         if sha.is_null() {

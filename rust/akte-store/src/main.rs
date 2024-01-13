@@ -6,9 +6,7 @@ mod show;
 use crate::alfa::hash::digest::Digest;
 use clap::{Parser, Subcommand};
 use std::error::Error;
-use std::io::{self};
 use std::path::{self, PathBuf};
-use std::{env, fs};
 
 #[derive(Parser, Debug)]
 #[clap(name = "akte-store", version)]
@@ -43,12 +41,10 @@ enum Commands {
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
 fn main() -> Result<()> {
-    let whose_command_not_urs = App::parse();
-
-    match whose_command_not_urs.command {
+    match App::parse().command {
         Commands::Init(cmd) => init::run(cmd.dir),
         Commands::Add(cmd) => add::run(cmd.paths, add::Mode::Add),
         Commands::Move(cmd) => add::run(cmd.paths, add::Mode::Delete),
-        Commands::Show(mut cmd) => show::run(&mut cmd.shas),
+        Commands::Show(cmd) => show::run(&cmd.shas),
     }
 }
