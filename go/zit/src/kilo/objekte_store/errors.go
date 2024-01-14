@@ -2,9 +2,6 @@ package objekte_store
 
 import (
 	"fmt"
-
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
 type ErrLockRequired struct {
@@ -22,15 +19,6 @@ func (e ErrLockRequired) Error() string {
 		e.Operation,
 	)
 }
-
-func IsNotFound(err error) (ok bool) {
-	ok = errors.Is(err, ErrNotFound(""))
-	return
-}
-
-type ErrNotFound = collections.ErrNotFound
-
-var ErrNotFoundEmpty = ErrNotFound("")
 
 type VerlorenAndGefundenError interface {
 	error

@@ -5,8 +5,8 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/kilo/objekte_store"
 )
 
 type AbbrStorePresenceGeneric[V any] interface {
@@ -61,12 +61,12 @@ func (ih *indexHinweis) Exists(parts [3]string) (err error) {
 	}
 
 	if !ih.Kopfen.ContainsExpansion(parts[0]) {
-		err = objekte_store.ErrNotFoundEmpty
+		err = collections.MakeErrNotFoundString(parts[0])
 		return
 	}
 
 	if !ih.Schwanzen.ContainsExpansion(parts[2]) {
-		err = objekte_store.ErrNotFoundEmpty
+		err = collections.MakeErrNotFoundString(parts[2])
 		return
 	}
 
@@ -168,7 +168,7 @@ func (ih *indexNotHinweis[K, KPtr]) Exists(parts [3]string) (err error) {
 	}
 
 	if !ih.Kennungen.ContainsExpansion(parts[2]) {
-		err = objekte_store.ErrNotFoundEmpty
+		err = collections.MakeErrNotFoundString(parts[2])
 		return
 	}
 

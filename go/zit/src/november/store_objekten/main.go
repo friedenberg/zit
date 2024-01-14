@@ -126,10 +126,15 @@ func (s *Store) UpdateManyMetadatei(
 	return
 }
 
-func (s *Store) SetTransactedTo(
-	k *kennung.Kennung2,
+func (s *Store) RevertTo(
+	sk *sku.Transacted,
 	sh *sha.Sha,
 ) (err error) {
+	if sh.IsNull() {
+		err = errors.Errorf("cannot revert to null")
+		return
+	}
+
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
 			Operation: "update many metadatei",
@@ -140,7 +145,14 @@ func (s *Store) SetTransactedTo(
 
 	var mutter *sku.Transacted
 
-	if mutter, err = s.GetBestandsaufnahmeStore().ReadOneEnnui(sh); err != nil {
+	if mutter, err = s.ReadOneEnnui(sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	mutter.Metadatei.Mutter().ResetWith(sk.Metadatei.Sha())
+
+	if err = mutter.CalculateObjekteSha(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -149,7 +161,7 @@ func (s *Store) SetTransactedTo(
 
 	if _, err = s.CreateOrUpdate(
 		&mutter.Metadatei,
-		k,
+		sk.GetKennung(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/charlie/tridex"
@@ -225,7 +226,7 @@ func (i *indexAbbr) Exists(k *kennung.Kennung2) (err error) {
 		return
 
 	default:
-		err = errors.Errorf("not found")
+		err = collections.MakeErrNotFound(k)
 	}
 
 	return

@@ -205,18 +205,17 @@ func (f v5) FormatPersistentMetadatei(
 		}
 	}
 
-	if !m.Mutter().IsNull() {
-		n1, err = ohio.WriteKeySpaceValueNewlineString(
-			w,
-			keyMutter.String(),
-			m.Mutter().String(),
-		)
-		n += int64(n1)
+	n1, err = writeShaKeyIfNotNull(
+		w,
+		keyShasMutterMetadateiKennungMutter,
+		m.Mutter(),
+	)
 
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	n += int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	// TODO-P1 set value
@@ -406,7 +405,7 @@ func (f v5) ParsePersistentMetadatei(
 				return
 			}
 
-		case key.Equal(keyMutter.Bytes()):
+		case key.Equal(keyShasMutterMetadateiKennungMutter.Bytes()):
 			if err = m.Mutter().SetHexBytes(val.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return

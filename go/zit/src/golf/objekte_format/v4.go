@@ -208,7 +208,7 @@ func (f v4) FormatPersistentMetadatei(
 	if !m.Mutter().IsNull() && !o.ExcludeMutter {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,
-			keyMutter.String(),
+			keyShasMutterMetadateiKennungMutter.String(),
 			m.Mutter().String(),
 		)
 		n += int64(n1)

@@ -22,7 +22,6 @@ import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/sku_fmt"
 	"github.com/friedenberg/zit/src/juliett/konfig"
-	"github.com/friedenberg/zit/src/kilo/objekte_store"
 )
 
 type State int
@@ -185,7 +184,7 @@ func (i *Store) ReadOneAll(
 		defer sha.GetPool().Put(sh)
 
 		if locKennung, err = i.ennuiKennung.ReadOne(sh); err != nil {
-			if errors.Is(err, objekte_store.ErrNotFoundEmpty) {
+			if collections.IsErrNotFound(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -199,7 +198,7 @@ func (i *Store) ReadOneAll(
 
 	wg.Do(func() (err error) {
 		if err = i.ennuiShas.ReadAll(mg.GetMetadatei(), &out); err != nil {
-			if errors.Is(err, objekte_store.ErrNotFoundEmpty) {
+			if collections.IsErrNotFound(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

@@ -4,13 +4,12 @@ import (
 	"flag"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/lima/bestandsaufnahme"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
 
@@ -51,23 +50,22 @@ func (c Revert) DefaultGattungen() gattungen.Set {
 	)
 }
 
-type revertMutterToKennungTuple struct {
-	*kennung.Kennung2
+type revertTuple struct {
+	*sku.Transacted
 	*sha.Sha
 }
 
 func (c Revert) RunWithQuery(u *umwelt.Umwelt, ms matcher.Query) (err error) {
-	var mutterToKennung []revertMutterToKennungTuple
+	f := func(rt revertTuple) (err error) {
+		if rt.IsNull() {
+			return
+		}
 
-	switch {
-	case c.Last:
-		mutterToKennung, err = c.muttersFromLast(u)
+		if err = u.StoreObjekten().RevertTo(rt.Transacted, rt.Sha); err != nil {
+			err = errors.Wrapf(err, "Sha %s", rt.Sha)
+			return
+		}
 
-	default:
-		mutterToKennung, err = c.muttersFromQuery(u, ms)
-	}
-
-	if err != nil {
 		return
 	}
 
@@ -78,63 +76,30 @@ func (c Revert) RunWithQuery(u *umwelt.Umwelt, ms matcher.Query) (err error) {
 
 	defer errors.Deferred(&err, u.Unlock)
 
-	for _, rt := range mutterToKennung {
-		if err = u.StoreObjekten().SetTransactedTo(rt.Kennung2, rt.Sha); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	switch {
+	case c.Last:
+		err = c.runRevertFromLast(u, f)
+
+	default:
+		err = c.runRevertFromQuery(u, ms, f)
+	}
+
+	if err != nil {
+		return
 	}
 
 	return
 }
 
-func (c Revert) addOneMutter(
-	z *sku.Transacted,
-	mutters *[]revertMutterToKennungTuple,
-) (err error) {
-	// TODO-project-2021-zit-multi_history_chains
-  // transition to MutterMetadateiKennungMutter
-	mu := z.Metadatei.Mutter()
-
-	if mu.IsNull() {
-		// log.Err().Printf("%s has null mutter, cannot revert", z)
-		return
-	}
-
-	var k kennung.Kennung2
-
-	if err = k.SetWithKennung(z.GetKennung()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var sh sha.Sha
-
-	if err = sh.SetShaLike(mu); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	rmtkt := revertMutterToKennungTuple{
-		Kennung2: &k,
-		Sha:      &sh,
-	}
-
-	*mutters = append(*mutters, rmtkt)
-
-	return
-}
-
-func (c Revert) muttersFromQuery(
+func (c Revert) runRevertFromQuery(
 	u *umwelt.Umwelt,
 	ms matcher.Query,
-) (mutterToKennung []revertMutterToKennungTuple, err error) {
-	mutterToKennung = make([]revertMutterToKennungTuple, 0)
-
+	f schnittstellen.FuncIter[revertTuple],
+) (err error) {
 	if err = u.StoreObjekten().QueryWithoutCwd(
 		ms,
 		func(z *sku.Transacted) (err error) {
-			return c.addOneMutter(z, &mutterToKennung)
+			return f(revertTuple{Transacted: z, Sha: z.Metadatei.Mutter()})
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -144,9 +109,10 @@ func (c Revert) muttersFromQuery(
 	return
 }
 
-func (c Revert) muttersFromLast(
+func (c Revert) runRevertFromLast(
 	u *umwelt.Umwelt,
-) (mutterToKennung []revertMutterToKennungTuple, err error) {
+	f schnittstellen.FuncIter[revertTuple],
+) (err error) {
 	s := u.StoreObjekten()
 
 	var b *sku.Transacted
@@ -156,18 +122,10 @@ func (c Revert) muttersFromLast(
 		return
 	}
 
-	var a *bestandsaufnahme.Akte
-
-	if a, err = s.GetBestandsaufnahmeStore().GetAkte(b.GetAkteSha()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	mutterToKennung = make([]revertMutterToKennungTuple, 0, a.Skus.Len())
-
-	if err = a.Skus.EachPtr(
+	if err = s.GetBestandsaufnahmeStore().StreamAkte(
+		b.GetAkteSha(),
 		func(sk *sku.Transacted) (err error) {
-			return c.addOneMutter(sk, &mutterToKennung)
+			return f(revertTuple{Transacted: sk, Sha: sk.Metadatei.Mutter()})
 		},
 	); err != nil {
 		err = errors.Wrap(err)

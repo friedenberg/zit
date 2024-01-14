@@ -64,7 +64,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	var mutter *sku.Transacted
 
 	if mutter, err = s.ReadOne(kennungPtr); err != nil {
-		if objekte_store.IsNotFound(err) {
+		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -200,7 +200,7 @@ func (s *Store) CreateOrUpdate(
 	var mutter *sku.Transacted
 
 	if mutter, err = s.ReadOne(kennungPtr); err != nil {
-		if objekte_store.IsNotFound(err) {
+		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -321,7 +321,7 @@ func (s *Store) CreateOrUpdateAkteSha(
 	var mutter *sku.Transacted
 
 	if mutter, err = s.ReadOne(kennungPtr); err != nil {
-		if objekte_store.IsNotFound(err) {
+		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)

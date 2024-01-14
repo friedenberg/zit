@@ -21,19 +21,16 @@ type (
 )
 
 var (
-	keyContentLength = catgut.MakeFromString("ContentLength")
-	keyAkte          = catgut.MakeFromString("Akte")
-	keyBezeichnung   = catgut.MakeFromString("Bezeichnung")
-	keyEtikett       = catgut.MakeFromString("Etikett")
-	keyGattung       = catgut.MakeFromString("Gattung")
-	keyKennung       = catgut.MakeFromString("Kennung")
-	keyKomment       = catgut.MakeFromString("Komment")
-	keySigil         = catgut.MakeFromString("Sigil")
-	keyTai           = catgut.MakeFromString("Tai")
-	keyTyp           = catgut.MakeFromString("Typ")
-
-	keyMutter = catgut.MakeFromString("zzMutter")
-	keySha    = catgut.MakeFromString("zzSha")
+	keyAkte        = catgut.MakeFromString("Akte")
+	keyBezeichnung = catgut.MakeFromString("Bezeichnung")
+	keyEtikett     = catgut.MakeFromString("Etikett")
+	keyGattung     = catgut.MakeFromString("Gattung")
+	keyKennung     = catgut.MakeFromString("Kennung")
+	keyKomment     = catgut.MakeFromString("Komment")
+	keySigil       = catgut.MakeFromString("Sigil")
+	keyTai         = catgut.MakeFromString("Tai")
+	keyTyp         = catgut.MakeFromString("Typ")
+	keySha         = catgut.MakeFromString("zzSha")
 
 	keyShasMutterMetadatei              = catgut.MakeFromString("Shas" + metadatei.ShaKeyMutterMetadatei)
 	keyShasMutterMetadateiMutter        = catgut.MakeFromString("Shas" + metadatei.ShaKeyMutterMetadateiMutter)
@@ -219,10 +216,10 @@ func WriteMetadateiKeyTo(
 			return
 		}
 
-	case keyMutter:
+	case keyShasMutterMetadateiKennungMutter:
 		n1, err = writeShaKeyIfNotNull(
 			w,
-			keyMutter,
+			keyShasMutterMetadateiKennungMutter,
 			m.Mutter(),
 		)
 
@@ -389,11 +386,14 @@ func getShaForContext(f FormatGeneric, c FormatterContext) (sh *Sha, err error) 
 	return
 }
 
-func getShaForMetadateiDebug(f FormatGeneric, c *Metadatei) (sh *Sha, err error) {
+func GetShaForContextDebug(
+	f FormatGeneric,
+	c FormatterContext,
+) (sh *Sha, err error) {
 	var sb strings.Builder
 	sw := sha.MakeWriter(&sb)
 
-	_, err = f.WriteMetadateiTo(sw, nopFormatterContext{c})
+	_, err = f.WriteMetadateiTo(sw, c)
 
 	if err != nil {
 		err = errors.Wrap(err)

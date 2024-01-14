@@ -29,7 +29,7 @@ func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOut, err error) {
 	if err == nil {
 		co.SetError(collections.ErrExists)
 		return
-	} else if errors.Is(err, objekte_store.ErrNotFoundEmpty) {
+	} else if collections.IsErrNotFound(err) {
 		err = nil
 	} else {
 		err = errors.Wrap(err)
@@ -37,7 +37,7 @@ func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOut, err error) {
 	}
 
 	if err = s.ReadOneInto(sk.GetKennung(), &co.Internal); err != nil {
-		if objekte_store.IsNotFound(err) {
+		if collections.IsErrNotFound(err) {
 			_, err = s.createOrUpdate(
 				sk,
 				sk.GetKennung(),
@@ -47,6 +47,11 @@ func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOut, err error) {
 		}
 
 		err = errors.Wrap(err)
+		return
+	}
+
+	if co.Internal.Metadatei.Sha().IsNull() {
+		err = errors.Errorf("empty sha")
 		return
 	}
 

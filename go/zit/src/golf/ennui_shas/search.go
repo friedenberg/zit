@@ -11,7 +11,7 @@ import (
 
 func (e *page) seekToFirstBinarySearch(shMet *sha.Sha) (mid int64, err error) {
 	if e.f == nil {
-		err = collections.ErrNotFound("fd nil: " + shMet.String())
+		err = collections.MakeErrNotFoundString("fd nil: " + shMet.String())
 		return
 	}
 
@@ -61,14 +61,14 @@ func (e *page) seekToFirstBinarySearch(shMet *sha.Sha) (mid int64, err error) {
 		}
 	}
 
-	err = collections.ErrNotFound(fmt.Sprintf("%d: %s", loops, shMet.String()))
+	err = collections.MakeErrNotFoundString(fmt.Sprintf("%d: %s", loops, shMet.String()))
 
 	return
 }
 
 func (e *page) seekToFirstLinearSearch(shMet *sha.Sha) (loc int64, err error) {
 	if e.f == nil {
-		err = collections.ErrNotFound("fd nil: " + shMet.String())
+		err = collections.MakeErrNotFoundString("fd nil: " + shMet.String())
 		return
 	}
 
@@ -103,7 +103,7 @@ func (e *page) seekToFirstLinearSearch(shMet *sha.Sha) (loc int64, err error) {
 		}
 	}
 
-	err = collections.ErrNotFound(shMet.String())
+	err = collections.MakeErrNotFound(shMet)
 
 	return
 }

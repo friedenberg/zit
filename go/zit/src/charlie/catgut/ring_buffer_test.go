@@ -9,6 +9,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/unicorn"
 	"github.com/friedenberg/zit/src/bravo/test_logz"
+	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
 func TestRingBufferReader(t1 *testing.T) {
@@ -384,7 +385,7 @@ func TestRingBufferPeekUpto2(t1 *testing.T) {
 
 	{
 		readable, err := sut.PeekUptoAndIncluding(' ')
-		t.AssertErrorEquals(err, ErrNotFound)
+		t.AssertErrorEquals(err, collections.ErrNotFound)
 		t.AssertEqualStrings("words", sut.PeekReadable().String())
 		sut.AdvanceRead(readable.Len())
 	}

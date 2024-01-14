@@ -178,8 +178,7 @@ func (se stackWrapError) Error() string {
 	}
 
 	sb.WriteString(":")
-	sb.WriteString(fmt.Sprintf("%d", se.line))
-	sb.WriteString(":")
+	fmt.Fprintf(sb, "%d", se.line)
 
 	if se.error != nil {
 		sb.WriteString(" ")

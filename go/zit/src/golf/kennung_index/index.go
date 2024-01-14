@@ -243,7 +243,7 @@ func (i *index2[T, TPtr]) GetInt(in int) (id T, err error) {
 	id1, ok = i.IntsToKennungen[in]
 
 	if !ok {
-		err = errors.Wrap(collections.ErrNotFound(strconv.Itoa(in)))
+		err = collections.MakeErrNotFoundString(strconv.Itoa(in))
 		return
 	}
 
@@ -267,7 +267,7 @@ func (i *index2[T, TPtr]) Get(
 	id, ok = i.Kennungen[k.String()]
 
 	if !ok {
-		err = errors.Wrap(collections.ErrNotFound(k.String()))
+		err = collections.MakeErrNotFound(k)
 		return
 	}
 

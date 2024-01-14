@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
 const RingBufferDefaultSize = 4096
@@ -322,8 +323,6 @@ func (rb *RingBuffer) Unread(toUnread int) (actuallyUnread int) {
 	return
 }
 
-var ErrNotFound = errors.New("not found")
-
 func (rb *RingBuffer) PeekUptoAndIncluding(b byte) (readable Slice, err error) {
 	ok := false
 	readable, ok = rb.PeekReadable().SliceUptoAndIncluding(b)
@@ -342,7 +341,7 @@ func (rb *RingBuffer) PeekUptoAndIncluding(b byte) (readable Slice, err error) {
 	readable, ok = rb.PeekReadable().SliceUptoAndIncluding(b)
 
 	if !ok {
-		err = ErrNotFound
+		err = collections.MakeErrNotFoundString(string(b))
 		return
 	}
 

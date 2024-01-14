@@ -8,6 +8,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/hinweisen"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/gattungen"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -27,6 +28,29 @@ func (s *Store) handleNewOrUpdated(
 	)
 }
 
+func (s *Store) addMutterIfNecessary(sk *sku.Transacted) (err error) {
+	if !sk.Metadatei.Mutter().IsNull() {
+		return
+	}
+
+	mutter, err := s.GetBestandsaufnahmeStore().ReadOneKennungSha(sk.GetKennung())
+	defer sha.GetPool().Put(mutter)
+
+	if err != nil {
+		if collections.IsErrNotFound(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	sk.Metadatei.Mutter().ResetWith(mutter)
+
+	return
+}
+
 func (s *Store) handleNewOrUpdatedCommit(
 	t *sku.Transacted,
 	mode objekte_mode.Mode,
@@ -44,6 +68,11 @@ func (s *Store) handleNewOrUpdatedCommit(
 		if mode.Contains(objekte_mode.ModeUpdateTai) {
 			t.SetTai(kennung.NowTai())
 		}
+	}
+
+	if err = s.addMutterIfNecessary(t); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if err = t.CalculateObjekteSha(); err != nil {
@@ -172,7 +201,7 @@ func (s *Store) ReadOneInto(
 			return
 		}
 
-		if sk, err = s.GetVerzeichnisse().ReadOneKennung(h); err != nil {
+		if sk, err = s.ReadOneKennung(h); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -225,7 +254,7 @@ func (s *Store) ReadOneInto(
 	}
 
 	if sk == nil {
-		err = errors.Wrap(objekte_store.ErrNotFound(k1.String()))
+    err = collections.MakeErrNotFound(k1)
 		return
 	}
 

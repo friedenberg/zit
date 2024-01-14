@@ -231,6 +231,10 @@ func (s Standort) DirVerzeichnisseMetadatei() string {
 	return s.DirVerzeichnisseDurable("Metadatei")
 }
 
+func (s Standort) DirVerzeichnisseMetadateiKennungMutter() string {
+	return s.DirVerzeichnisseDurable("MetadateiKennungMutter")
+}
+
 func (s Standort) DirVerzeichnisseVerweise() string {
 	return s.DirVerzeichnisse("Verweise")
 }
@@ -272,7 +276,7 @@ func (s Standort) ResetVerzeichnisse() (err error) {
 		return
 	}
 
-	if err = s.MakeDir(s.DirVerzeichnisseMetadatei()); err != nil {
+	if err = s.MakeDir(s.DirVerzeichnisseMetadateiKennungMutter()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

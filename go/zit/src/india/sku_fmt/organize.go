@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/catgut"
+	"github.com/friedenberg/zit/src/charlie/collections"
 	"github.com/friedenberg/zit/src/delta/zittish"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -94,7 +95,7 @@ func (f *Organize) ReadStringFormat(
 	o *sku.Transacted,
 ) (n int64, err error) {
 	if err = f.readStringFormatWithKennung(rb, o); err != nil {
-		if err == catgut.ErrNotFound {
+		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {
 			err = errors.WrapExcept(err, io.EOF, catgut.ErrBufferEmpty)
@@ -131,7 +132,10 @@ func (f *Organize) readStringFormatWithKennung(
 	var sl catgut.Slice
 
 	if sl, err = rb.PeekUptoAndIncluding(']'); err != nil {
-		err = errors.WrapExcept(err, catgut.ErrNotFound)
+		if !collections.IsErrNotFound(err) {
+			err = errors.Wrap(err)
+		}
+
 		return
 	}
 

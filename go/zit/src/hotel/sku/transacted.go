@@ -169,17 +169,27 @@ func (s *Transacted) IsNew() bool {
 	return s.Metadatei.Mutter().IsNull()
 }
 
+func (s *Transacted) CalculateObjekteShaDebug() (err error) {
+	return s.calculateObjekteSha(true)
+}
+
 func (s *Transacted) CalculateObjekteSha() (err error) {
-	var shaFormat objekte_format.FormatGeneric
+	return s.calculateObjekteSha(false)
+}
 
-	if shaFormat, err = objekte_format.FormatForKeyError("MetadateiKennungMutter"); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
+func (s *Transacted) calculateObjekteSha(debug bool) (err error) {
 	var actual *sha.Sha
 
-	if actual, err = objekte_format.GetShaForContext(shaFormat, s); err != nil {
+	f := objekte_format.GetShaForContext
+
+	if debug {
+		f = objekte_format.GetShaForContextDebug
+	}
+
+	if actual, err = f(
+		objekte_format.Formats.MetadateiKennungMutter(),
+		s,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

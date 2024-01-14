@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
 const (
@@ -80,7 +80,7 @@ func (ocf optionCommentFormat) ApplyToWriter(
 		aw.stringFormatWriter = &f.organize
 
 	default:
-		err = errors.Errorf("format not found: %q", string(ocf))
+		err = collections.MakeErrNotFoundString(string(ocf))
 		return
 	}
 
