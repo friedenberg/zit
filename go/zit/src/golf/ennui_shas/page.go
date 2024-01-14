@@ -23,6 +23,7 @@ type page struct {
 	added      *heap.Heap[row, *row]
 	standort   standort.Standort
 	searchFunc func(*sha.Sha) (mid int64, err error)
+	rowSize    int
 	sha.PageId
 }
 
@@ -30,6 +31,7 @@ func (p *page) initialize(
 	equaler schnittstellen.Equaler1[*row],
 	s standort.Standort,
 	pid sha.PageId,
+	rowSize int,
 ) (err error) {
 	p.added = heap.Make(
 		equaler,
@@ -39,6 +41,8 @@ func (p *page) initialize(
 
 	p.standort = s
 	p.PageId = pid
+
+	p.rowSize = rowSize
 
 	p.searchFunc = p.seekToFirstBinarySearch
 
@@ -79,28 +83,30 @@ func (e *page) GetEnnuiPage() pageInterface {
 	return e
 }
 
-func (e *page) AddSha(sh *Sha, loc *Loc) (err error) {
-	if sh.IsNull() {
+func (e *page) AddSha(left, right *Sha) (err error) {
+	if left.IsNull() {
 		return
 	}
 
 	e.Lock()
 	defer e.Unlock()
 
-	return e.addSha(sh, loc)
+	return e.addSha(left, right)
 }
 
-func (e *page) addSha(sh *Sha, loc *Loc) (err error) {
-	if sh.IsNull() {
+func (e *page) addSha(left, right *Sha) (err error) {
+	if left.IsNull() {
 		return
 	}
 
 	r := &row{}
 
-	r.Loc.Range = loc.Range
-	r.Loc.Sha.ResetWith(&loc.Sha)
+	if err = r.left.SetShaLike(left); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	if err = r.sha.SetShaLike(sh); err != nil {
+	if err = r.right.SetShaLike(right); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -118,18 +124,18 @@ func (e *page) GetRowCount() (n int64, err error) {
 		return
 	}
 
-	n = fi.Size()/RowSize - 1
+	n = fi.Size()/int64(e.rowSize) - 1
 
 	return
 }
 
-func (e *page) ReadOne(sh *Sha) (loc *Loc, err error) {
+func (e *page) ReadOne(left *Sha) (right *Sha, err error) {
 	e.Lock()
 	defer e.Unlock()
 
 	var start int64
 
-	if start, err = e.searchFunc(sh); err != nil {
+	if start, err = e.searchFunc(left); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -139,7 +145,7 @@ func (e *page) ReadOne(sh *Sha) (loc *Loc, err error) {
 		return
 	}
 
-	if loc, err = e.readCurrentLoc(sh, e.f); err != nil {
+	if right, err = e.readCurrentLoc(left, e.f); err != nil {
 		err = errors.Wrapf(err, "Start: %d", start)
 		return
 	}
@@ -147,7 +153,7 @@ func (e *page) ReadOne(sh *Sha) (loc *Loc, err error) {
 	return
 }
 
-func (e *page) ReadMany(sh *Sha, locs *[]*Loc) (err error) {
+func (e *page) ReadMany(sh *Sha, locs *[]*sha.Sha) (err error) {
 	e.Lock()
 	defer e.Unlock()
 
@@ -169,7 +175,7 @@ func (e *page) ReadMany(sh *Sha, locs *[]*Loc) (err error) {
 func (e *page) readCurrentLoc(
 	in *sha.Sha,
 	r io.Reader,
-) (out *Loc, err error) {
+) (out *sha.Sha, err error) {
 	if in.IsNull() {
 		err = errors.Errorf("empty sha")
 		return
@@ -191,7 +197,7 @@ func (e *page) readCurrentLoc(
 		return
 	}
 
-	out = &Loc{}
+	out = sha.GetPool().Get()
 
 	if _, err = out.ReadFrom(e.f); err != nil {
 		err = errors.Wrap(err)
@@ -202,7 +208,7 @@ func (e *page) readCurrentLoc(
 }
 
 func (e *page) seekAndResetTo(loc int64) (err error) {
-	if _, err = e.f.Seek(loc*RowSize, io.SeekStart); err != nil {
+	if _, err = e.f.Seek(loc*int64(e.rowSize), io.SeekStart); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -214,7 +220,7 @@ func (e *page) seekAndResetTo(loc int64) (err error) {
 
 func (e *page) collectLocs(
 	shMet *sha.Sha,
-	h *[]*Loc,
+	h *[]*sha.Sha,
 	start int64,
 ) (err error) {
 	if err = e.seekAndResetTo(start); err != nil {
@@ -223,9 +229,9 @@ func (e *page) collectLocs(
 	}
 
 	for {
-		var loc *Loc
+		var sh *sha.Sha
 
-		loc, err = e.readCurrentLoc(shMet, &e.br)
+		sh, err = e.readCurrentLoc(shMet, &e.br)
 
 		if err != nil {
 			if err == io.EOF {
@@ -235,7 +241,7 @@ func (e *page) collectLocs(
 			return
 		}
 
-		*h = append(*h, loc)
+		*h = append(*h, sh)
 	}
 }
 

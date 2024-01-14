@@ -2,7 +2,6 @@ package ennui_shas
 
 import (
 	"bytes"
-	"encoding/binary"
 	"fmt"
 	"io"
 
@@ -10,33 +9,29 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 )
 
-const RowSize = sha.ByteSize + sha.ByteSize + binary.MaxVarintLen64 + binary.MaxVarintLen64
+const RowSize = sha.ByteSize + sha.ByteSize
 
 type row struct {
-	sha sha.Sha
-	Loc
-}
-
-func (l *row) Size() int {
-	return l.Sha.Size() + l.Loc.Size()
+	left  sha.Sha
+	right sha.Sha
 }
 
 func (r *row) IsEmpty() bool {
-	return r.Loc.IsEmpty() && r.sha.IsNull()
+	return r.right.IsNull() && r.left.IsNull()
 }
 
 func (r *row) String() string {
 	return fmt.Sprintf(
 		"%s %s",
-		&r.Loc,
-		r.sha.GetShaString()[:4],
+		r.left.GetShaString()[:4],
+		r.left.GetShaString()[:4],
 	)
 }
 
 func (current *row) ReadFrom(r io.Reader) (n int64, err error) {
 	var n1 int64
 
-	n1, err = current.sha.ReadFrom(r)
+	n1, err = current.left.ReadFrom(r)
 	n += n1
 
 	if err != nil {
@@ -44,7 +39,7 @@ func (current *row) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	n1, err = current.Loc.ReadFrom(r)
+	n1, err = current.right.ReadFrom(r)
 	n += int64(n1)
 
 	if err != nil {
@@ -64,7 +59,7 @@ func (r *row) WriteTo(w io.Writer) (n int64, err error) {
 	var n1 int
 	var n2 int64
 
-	n, err = r.sha.WriteTo(w)
+	n, err = r.left.WriteTo(w)
 	n += int64(n1)
 
 	if err != nil {
@@ -72,7 +67,7 @@ func (r *row) WriteTo(w io.Writer) (n int64, err error) {
 		return
 	}
 
-	n2, err = r.Loc.WriteTo(w)
+	n2, err = r.right.WriteTo(w)
 	n += int64(n2)
 
 	if err != nil {
@@ -91,52 +86,37 @@ func (r *row) WriteTo(w io.Writer) (n int64, err error) {
 type rowEqualerComplete struct{}
 
 func (rowEqualerComplete) Equals(a, b *row) bool {
-	return a.sha.Equals(&b.sha) &&
-		a.Loc.Sha.Equals(&b.Loc.Sha) &&
-		a.Loc.Offset == b.Loc.Offset &&
-		a.Loc.ContentLength == b.Loc.ContentLength
+	return a.left.Equals(&b.left) && a.right.Equals(&b.right)
 }
 
 type rowEqualerShaOnly struct{}
 
 func (rowEqualerShaOnly) Equals(a, b *row) bool {
-	return a.sha.Equals(&b.sha)
+	return a.left.Equals(&b.left)
 }
 
 type rowResetter struct{}
 
 func (rowResetter) Reset(a *row) {
-	a.sha.Reset()
-	a.Loc.Sha.Reset()
-	a.Offset = 0
-	a.ContentLength = 0
+	a.left.Reset()
+	a.right.Reset()
 }
 
 func (rowResetter) ResetWith(a, b *row) {
-	a.sha.ResetWith(&b.sha)
-	a.Loc.Sha.ResetWith(&b.Loc.Sha)
-	a.Offset = b.Offset
-	a.ContentLength = b.ContentLength
+	a.left.ResetWith(&b.left)
+	a.right.ResetWith(&b.right)
 }
 
 type rowLessor struct{}
 
 func (rowLessor) Less(a, b *row) bool {
-	cmp := bytes.Compare(a.sha.GetShaBytes(), b.sha.GetShaBytes())
+	cmp := bytes.Compare(a.left.GetShaBytes(), b.left.GetShaBytes())
 
 	if cmp != 0 {
 		return cmp == -1
 	}
 
-	cmp = bytes.Compare(a.Loc.Sha.GetShaBytes(), b.Loc.Sha.GetShaBytes())
+	cmp = bytes.Compare(a.right.GetShaBytes(), b.right.GetShaBytes())
 
-	if cmp != 0 {
-		return cmp == -1
-	}
-
-	if a.Offset != b.Offset {
-		return a.Offset < b.Offset
-	}
-
-	return a.ContentLength < b.ContentLength
+	return cmp == -1
 }

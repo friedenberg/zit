@@ -12,9 +12,9 @@ type (
 	Sha = sha.Sha
 
 	commonInterface interface {
-		AddSha(*sha.Sha, *Loc) error
-		ReadOne(sh *Sha) (loc *Loc, err error)
-		ReadMany(sh *Sha, locs *[]*Loc) (err error)
+		AddSha(*sha.Sha, *sha.Sha) error
+		ReadOne(left *Sha) (right *sha.Sha, err error)
+		ReadMany(left *Sha, rights *[]*sha.Sha) (err error)
 	}
 
 	pageInterface interface {
@@ -38,7 +38,8 @@ const (
 )
 
 type ennui struct {
-	pages [PageCount]page
+	rowSize int
+	pages   [PageCount]page
 }
 
 func MakePermitDuplicates(
@@ -46,12 +47,14 @@ func MakePermitDuplicates(
 	path string,
 ) (e *ennui, err error) {
 	e = &ennui{}
+	e.rowSize = RowSize
 	err = e.initialize(rowEqualerComplete{}, s, path)
 	return
 }
 
 func MakeNoDuplicates(s standort.Standort, path string) (e *ennui, err error) {
 	e = &ennui{}
+	e.rowSize = RowSize
 	err = e.initialize(rowEqualerShaOnly{}, s, path)
 	return
 }
@@ -63,7 +66,7 @@ func (e *ennui) initialize(
 ) (err error) {
 	for i := range e.pages {
 		p := &e.pages[i]
-		p.initialize(equaler, s, sha.PageIdFromPath(uint8(i), path))
+		p.initialize(equaler, s, sha.PageIdFromPath(uint8(i), path), e.rowSize)
 	}
 
 	return
@@ -73,37 +76,37 @@ func (e *ennui) GetEnnui() Ennui {
 	return e
 }
 
-func (e *ennui) AddSha(sh *Sha, loc *Loc) (err error) {
-	return e.addSha(sh, loc)
+func (e *ennui) AddSha(left, right *Sha) (err error) {
+	return e.addSha(left, right)
 }
 
-func (e *ennui) addSha(sh *Sha, loc *Loc) (err error) {
-	if sh.IsNull() {
+func (e *ennui) addSha(left, right *Sha) (err error) {
+	if left.IsNull() {
 		return
 	}
 
 	var i uint8
 
-	if i, err = sha.PageIndexForSha(DigitWidth, sh); err != nil {
+	if i, err = sha.PageIndexForSha(DigitWidth, left); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	return e.pages[i].AddSha(sh, loc)
+	return e.pages[i].AddSha(left, right)
 }
 
-func (e *ennui) ReadOne(sh *Sha) (loc *Loc, err error) {
+func (e *ennui) ReadOne(left *Sha) (right *sha.Sha, err error) {
 	var i uint8
 
-	if i, err = sha.PageIndexForSha(DigitWidth, sh); err != nil {
+	if i, err = sha.PageIndexForSha(DigitWidth, left); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	return e.pages[i].ReadOne(sh)
+	return e.pages[i].ReadOne(left)
 }
 
-func (e *ennui) ReadMany(sh *Sha, locs *[]*Loc) (err error) {
+func (e *ennui) ReadMany(sh *Sha, locs *[]*sha.Sha) (err error) {
 	var i uint8
 
 	if i, err = sha.PageIndexForSha(DigitWidth, sh); err != nil {

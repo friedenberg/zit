@@ -3,7 +3,6 @@ package bestandsaufnahme
 import (
 	"fmt"
 	"io"
-	"os"
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
@@ -19,6 +18,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
+	"github.com/friedenberg/zit/src/golf/ennui_shas"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/sku_fmt"
@@ -68,6 +68,7 @@ type store struct {
 	persistentMetadateiFormat objekte_format.Format
 	options                   objekte_format.Options
 	formatAkte                akteFormat
+	ennuiKennung              ennui_shas.Ennui
 }
 
 func MakeStore(
@@ -97,6 +98,14 @@ func MakeStore(
 		formatAkte:                fa,
 	}
 
+	if s.ennuiKennung, err = ennui_shas.MakeNoDuplicates(
+		standort,
+		standort.DirVerzeichnisseVerweise(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
@@ -104,8 +113,10 @@ func (s *store) GetStore() Store {
 	return s
 }
 
-func (s *store) Flush() error {
-	return nil
+func (s *store) Flush() (err error) {
+	wg := iter.MakeErrorWaitGroupParallel()
+	wg.Do(s.ennuiKennung.Flush)
+	return wg.GetError()
 }
 
 func (s *store) ReadOneEnnui(sh *sha.Sha) (sk *sku.Transacted, err error) {
@@ -154,25 +165,10 @@ func (s *store) ReadOneEnnui(sh *sha.Sha) (sk *sku.Transacted, err error) {
 }
 
 func (s *store) ReadOneKennungSha(k kennung.Kennung) (sh *sha.Sha, err error) {
-	sh = sha.FromString(k.String())
+	left := sha.FromString(k.String())
+	defer sha.GetPool().Put(left)
 
-	var f *os.File
-
-	p := id.Path(sh, s.standort.DirVerzeichnisseVerweise())
-
-	if f, err = files.Open(p); err != nil {
-		if errors.IsNotExist(err) {
-			err = collections.MakeErrNotFound(k)
-		} else {
-			err = errors.Wrap(err)
-		}
-
-		return
-	}
-
-	defer errors.DeferredCloser(&err, f)
-
-	if _, err = sh.ReadFrom(f); err != nil {
+	if sh, err = s.ennuiKennung.ReadOne(left); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -354,26 +350,7 @@ func (s *store) WriteOneObjekteMetadatei(o *sku.Transacted) (err error) {
 			sh := sha.FromString(k.String())
 			defer sha.GetPool().Put(sh)
 
-			var f *os.File
-
-			var p string
-
-			if p, err = id.MakeDirIfNecessary(
-				sh,
-				s.standort.DirVerzeichnisseVerweise(),
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if f, err = files.OpenCreateWriteOnlyTruncate(p); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			defer errors.DeferredCloser(&err, f)
-
-			if _, err = o.Metadatei.Sha().WriteTo(f); err != nil {
+			if err = s.ennuiKennung.AddSha(sh, o.Metadatei.Sha()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
