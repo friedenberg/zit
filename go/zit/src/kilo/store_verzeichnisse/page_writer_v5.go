@@ -102,7 +102,7 @@ func (pw *pageWriterV5) flushBoth() (err error) {
 		pw.SaveSha,
 	)
 
-	if err = pw.Copy(kennung.SigilHistory, chain); err != nil {
+	if err = pw.CopyEverything(kennung.SigilHistory, chain); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -169,7 +169,7 @@ func (pw *pageWriterV5) flushJustSchwanz() (err error) {
 		pw.SaveSha,
 	)
 
-	if err = pw.Copy(kennung.SigilHistory, chain); err != nil {
+	if err = pw.CopyEverything(kennung.SigilHistory, chain); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

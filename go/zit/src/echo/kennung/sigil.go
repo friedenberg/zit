@@ -21,7 +21,7 @@ const (
 	SigilCwd
 	SigilHidden
 
-	SigilMax = SigilHidden
+	SigilMax
 	SigilAll = Sigil(^byte(0))
 )
 
@@ -70,7 +70,6 @@ func (a *Sigil) Reset() {
 
 func (a *Sigil) ResetWith(b Sigil) {
 	*a = b
-	return
 }
 
 func (a *Sigil) Add(b Sigil) {

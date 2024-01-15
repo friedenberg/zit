@@ -79,9 +79,24 @@ func (pt *PageTuple) SetNeedsFlush() {
 	pt.hasChanges = true
 }
 
-func (pt *PageTuple) Copy(
+func (pt *PageTuple) CopyEverything(
 	s kennung.Sigil,
 	w schnittstellen.FuncIter[*sku.Transacted],
+) (err error) {
+  return pt.copyHistoryAndMaybeSchwanz(s, w, true)
+}
+
+func (pt *PageTuple) CopyJustHistoryAndAdded(
+	s kennung.Sigil,
+	w schnittstellen.FuncIter[*sku.Transacted],
+) (err error) {
+  return pt.copyHistoryAndMaybeSchwanz(s, w, false)
+}
+
+func (pt *PageTuple) copyHistoryAndMaybeSchwanz(
+	s kennung.Sigil,
+	w schnittstellen.FuncIter[*sku.Transacted],
+  includeSchwanz bool,
 ) (err error) {
 	var r io.ReadCloser
 
@@ -124,6 +139,10 @@ func (pt *PageTuple) Copy(
 		err = errors.Wrap(err)
 		return
 	}
+
+  if !includeSchwanz {
+    return
+  }
 
 	addedSchwanz := pt.addedSchwanz.Copy()
 

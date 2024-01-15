@@ -341,7 +341,7 @@ func (i *Store) readFrom(
 
 				var err1 error
 
-				if err1 = p.Copy(s, w); err1 != nil {
+				if err1 = p.CopyEverything(s, w); err1 != nil {
 					if isDone() {
 						break
 					}

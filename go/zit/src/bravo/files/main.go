@@ -110,6 +110,21 @@ func Open(s string) (f *os.File, err error) {
 	return
 }
 
+func OpenReadWrite(s string) (f *os.File, err error) {
+	openFilesGuardInstance.Lock()
+
+	if f, err = os.OpenFile(
+		s,
+		os.O_RDWR|os.O_CREATE,
+		0o666,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func OpenCreateWriteOnlyTruncate(s string) (f *os.File, err error) {
 	openFilesGuardInstance.Lock()
 
