@@ -4,9 +4,11 @@ use std::fs::create_dir;
 use std::io;
 use std::path::PathBuf;
 
+use crate::konfig::{Konfig, Angeboren};
+
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
-pub fn run(dir: Option<PathBuf>) -> Result<()> {
+pub fn run(dir: Option<PathBuf>, angeboren: Angeboren) -> Result<()> {
     let result = create_dir(match dir {
         Some(dir) => dir,
         None => current_dir()?,
@@ -18,6 +20,9 @@ pub fn run(dir: Option<PathBuf>) -> Result<()> {
             _ => result?,
         }
     }
+
+    let k = Konfig::from_angeboren(angeboren);
+    k.angeboren.write_to_default_location()?;
 
     Ok(())
 }

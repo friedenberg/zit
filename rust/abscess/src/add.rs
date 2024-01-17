@@ -58,7 +58,7 @@ fn copy_file_to_temp_and_generate_digest<T: Read>(
     konfig: &Konfig,
 ) -> Result<Digest> {
     let mut reader = BufReader::new(input);
-    let writer = konfig.compression.writer(BufWriter::new(output));
+    let writer = konfig.angeboren.writer(BufWriter::new(output));
     let mut hash_writer = Writer::new();
     let mut tee_writer = TeeWriter::new(writer, &mut hash_writer);
 
