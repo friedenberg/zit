@@ -26,7 +26,9 @@ type PageTuple struct {
 	// All, Schwanzen  Page
 	ennuiShas, ennuiKennung ennui.Ennui
 	added, addedSchwanz     *sku.TransactedHeap
+	flushMode               objekte_mode.Mode
 	hasChanges              bool
+	changesAreHistorical    bool
 	standort                standort.Standort
 	konfig                  *konfig.Compiled
 	etikettIndex            kennung_index.EtikettIndexMutation
@@ -57,11 +59,8 @@ func (pt *PageTuple) add(
 		return
 	}
 
-	v := pt.konfig.GetStoreVersion().GetInt()
-
-	if mode.Contains(objekte_mode.ModeSchwanz) && v > 4 {
-		pt.added.Add(z)
-		// pt.addedSchwanz.Add(z)
+	if mode.Contains(objekte_mode.ModeSchwanz) {
+		pt.addedSchwanz.Add(z)
 	} else {
 		pt.added.Add(z)
 	}
@@ -75,28 +74,68 @@ func (pt *PageTuple) waitingToAddLen() int {
 	return pt.added.Len() + pt.addedSchwanz.Len()
 }
 
-func (pt *PageTuple) SetNeedsFlush() {
+func (pt *PageTuple) SetNeedsFlushHistory() {
 	pt.hasChanges = true
+	pt.changesAreHistorical = true
 }
 
 func (pt *PageTuple) CopyEverything(
 	s kennung.Sigil,
 	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-  return pt.copyHistoryAndMaybeSchwanz(s, w, true)
+	return pt.copyHistoryAndMaybeSchwanz(s, w, true, true)
+}
+
+func (pt *PageTuple) CopyJustHistory(
+	s kennung.Sigil,
+	w schnittstellen.FuncIter[*sku.Transacted],
+) (err error) {
+	return pt.copyHistoryAndMaybeSchwanz(s, w, false, false)
+}
+
+func (pt *PageTuple) CopyJustHistoryFrom(
+	r io.Reader,
+	s kennung.Sigil,
+	w schnittstellen.FuncIter[sku_fmt.Sku],
+) (err error) {
+	dec := sku_fmt.Binary{Sigil: s}
+
+	var sk sku_fmt.Sku
+
+	for {
+		sk.Offset += sk.ContentLength
+		sk.Transacted = sku.GetTransactedPool().Get()
+		sk.ContentLength, err = dec.ReadFormatAndMatchSigil(r, &sk)
+
+		if err != nil {
+			if errors.IsEOF(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
+			return
+		}
+
+		if err = w(sk); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 }
 
 func (pt *PageTuple) CopyJustHistoryAndAdded(
 	s kennung.Sigil,
 	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-  return pt.copyHistoryAndMaybeSchwanz(s, w, false)
+	return pt.copyHistoryAndMaybeSchwanz(s, w, true, false)
 }
 
 func (pt *PageTuple) copyHistoryAndMaybeSchwanz(
 	s kennung.Sigil,
 	w schnittstellen.FuncIter[*sku.Transacted],
-  includeSchwanz bool,
+	includeAdded bool,
+	includeAddedSchwanz bool,
 ) (err error) {
 	var r io.ReadCloser
 
@@ -110,17 +149,37 @@ func (pt *PageTuple) copyHistoryAndMaybeSchwanz(
 		}
 	}
 
+	defer errors.DeferredCloser(&err, r)
+
 	br := bufio.NewReader(r)
+
+	if !includeAdded && !includeAddedSchwanz {
+		if err = pt.CopyJustHistoryFrom(
+			br,
+			s,
+			func(sk sku_fmt.Sku) (err error) {
+				return w(sk.Transacted)
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
 
 	dec := sku_fmt.Binary{Sigil: s}
 
 	errors.TodoP3("determine performance of this")
 	added := pt.added.Copy()
 
+	var sk sku_fmt.Sku
+
 	if err = added.MergeStream(
 		func() (tz *sku.Transacted, err error) {
 			tz = sku.GetTransactedPool().Get()
-			_, err = dec.ReadFormatAndMatchSigil(br, tz)
+			sk.Transacted = tz
+			_, err = dec.ReadFormatAndMatchSigil(br, &sk)
 
 			if err != nil {
 				if errors.IsEOF(err) {
@@ -140,9 +199,9 @@ func (pt *PageTuple) copyHistoryAndMaybeSchwanz(
 		return
 	}
 
-  if !includeSchwanz {
-    return
-  }
+	if !includeAddedSchwanz {
+		return
+	}
 
 	addedSchwanz := pt.addedSchwanz.Copy()
 
@@ -160,22 +219,18 @@ func (pt *PageTuple) copyHistoryAndMaybeSchwanz(
 	return
 }
 
-func (pt *PageTuple) Flush() error {
-	v := pt.konfig.GetStoreVersion().GetInt()
-
-	var pw errors.Flusher
-
-	switch v {
-	case 3, 4:
-		pw = &pageWriterV4{
-			PageTuple: pt,
-		}
-
-	default:
-		pw = &pageWriterV5{
-			PageTuple: pt,
-		}
+func (pt *PageTuple) Flush() (err error) {
+	pw := &pageWriterV5{
+		PageTuple: pt,
 	}
 
-	return pw.Flush()
+	if err = pw.Flush(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+  pt.hasChanges = false
+  pt.changesAreHistorical = false
+
+	return
 }

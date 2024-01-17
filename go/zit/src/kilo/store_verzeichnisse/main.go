@@ -242,7 +242,11 @@ func (i *Store) readLoc(loc ennui.Loc) (sk *sku.Transacted, err error) {
 
 	sk = sku.GetTransactedPool().Get()
 
-	if _, err = coder.ReadFormatExactly(f, loc, sk); err != nil {
+	if _, err = coder.ReadFormatExactly(
+		f,
+		loc,
+		&sku_fmt.Sku{Transacted: sk},
+	); err != nil {
 		sku.GetTransactedPool().Put(sk)
 		sk = nil
 		err = errors.Wrapf(err, "%s", loc)
@@ -260,9 +264,9 @@ func (i *Store) GetPagePair(n uint8) (p *PageTuple) {
 	return
 }
 
-func (i *Store) SetNeedsFlush() {
+func (i *Store) SetNeedsFlushHistory() {
 	for n := range i.pages {
-		i.pages[n].SetNeedsFlush()
+		i.pages[n].SetNeedsFlushHistory()
 	}
 }
 
@@ -331,17 +335,17 @@ func (i *Store) readFrom(
 	for n := range i.pages {
 		wg.Add(1)
 
-		go func(n int, p *PageTuple, openFileCh chan struct{}) {
+		go func(p *PageTuple, openFileCh chan struct{}) {
 			defer wg.Done()
-			defer func(c chan<- struct{}) {
+			defer func() {
 				openFileCh <- struct{}{}
-			}(openFileCh)
+			}()
 
 			for !isDone() {
 
 				var err1 error
 
-				if err1 = p.CopyEverything(s, w); err1 != nil {
+				if err1 = p.CopyJustHistory(s, w); err1 != nil {
 					if isDone() {
 						break
 					}
@@ -352,17 +356,15 @@ func (i *Store) readFrom(
 						continue
 
 					case iter.IsStopIteration(err1):
-						break
 
 					default:
 						me.Add(err1)
-						break
 					}
 				}
 
 				break
 			}
-		}(n, &i.pages[n], ch)
+		}(&i.pages[n], ch)
 	}
 
 	wg.Wait()

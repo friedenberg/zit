@@ -28,6 +28,10 @@ func PageIdFromPath(n uint8, p string) PageId {
 	}
 }
 
+func (pid PageId) String() string {
+	return fmt.Sprintf("%d", pid.Index)
+}
+
 func (pid *PageId) Path() string {
 	return filepath.Join(pid.Dir, fmt.Sprintf("%s-%x", pid.Prefix, pid.Index))
 }

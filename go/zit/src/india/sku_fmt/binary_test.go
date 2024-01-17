@@ -38,10 +38,12 @@ func TestBinaryOne(t1 *testing.T) {
 		t.AssertNoError(err)
 	}
 
-	actual := &sku.Transacted{}
+	actual := Sku{
+		Transacted: &sku.Transacted{},
+	}
 
 	{
-		n, err := coder.ReadFormatAndMatchSigil(b, actual)
+		n, err := coder.ReadFormatAndMatchSigil(b, &actual)
 		t.AssertNoError(err)
 		t.Logf("%s", actual)
 
@@ -52,7 +54,7 @@ func TestBinaryOne(t1 *testing.T) {
 		}
 	}
 
-	if !sku.TransactedEqualer.Equals(expected, actual) {
+	if !sku.TransactedEqualer.Equals(expected, actual.Transacted) {
 		t.NotEqual(expected, actual)
 	}
 }

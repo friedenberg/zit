@@ -73,11 +73,11 @@ func (a *Sigil) ResetWith(b Sigil) {
 }
 
 func (a *Sigil) Add(b Sigil) {
-	*a = *a | b
+	*a |=  b
 }
 
 func (a *Sigil) Del(b Sigil) {
-	*a = *a | ^b
+	*a &= ^b
 }
 
 func (a Sigil) Contains(b Sigil) bool {

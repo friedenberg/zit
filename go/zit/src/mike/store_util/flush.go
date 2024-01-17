@@ -57,7 +57,7 @@ func (c *common) Flush() (err error) {
 	gob.Register(iter.StringerKeyerPtr[kennung.Typ, *kennung.Typ]{})
 
 	if c.GetKonfig().HasChanges() {
-		c.verzeichnisse.SetNeedsFlush()
+		c.verzeichnisse.SetNeedsFlushHistory()
 	}
 
 	wg := iter.MakeErrorWaitGroupParallel()

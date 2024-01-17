@@ -7,6 +7,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/ennui"
@@ -14,49 +15,24 @@ import (
 	"github.com/friedenberg/zit/src/india/sku_fmt"
 )
 
+type ShaTuple struct {
+	Sha, Mutter *sha.Sha
+	ennui.Range
+	kennung.Sigil
+}
+
+type KennungShaMap map[string]ShaTuple
+
 type pageWriterV5 struct {
 	*PageTuple
 	sku_fmt.Binary
 	*os.File
+	bufio.Reader
 	bufio.Writer
 
+	ennui.Range
 	offsetLast, offset int64
 	kennungShaMap      KennungShaMap
-}
-
-func (pw *pageWriterV5) writeOne(
-	z *sku.Transacted,
-) (err error) {
-	pw.offsetLast = pw.offset
-
-	var n int64
-
-	if n, err = pw.WriteFormat(&pw.Writer, z); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	pw.etikettIndex.Add(z.Metadatei.GetEtiketten())
-	pw.offset += int64(n)
-
-	return
-}
-
-func (pw *pageWriterV5) SaveSha(z *sku.Transacted) (err error) {
-	k := z.GetKennung()
-
-	record := pw.kennungShaMap[k.String()]
-	record.Offset = pw.offsetLast
-	record.ContentLength = pw.offset - pw.offsetLast
-	record.Sigil = kennung.SigilHistory
-
-	if z.Metadatei.Verzeichnisse.Archiviert.Bool() {
-		record.Add(kennung.SigilHidden)
-	}
-
-	pw.kennungShaMap[k.String()] = record
-
-	return
 }
 
 func (pw *pageWriterV5) Flush() (err error) {
@@ -79,18 +55,30 @@ func (pw *pageWriterV5) Flush() (err error) {
 		return
 	}
 
-	if pw.File, err = pw.standort.FileTempLocal(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	if pw.added.Len() == 0 && !pw.changesAreHistorical {
+		if pw.File, err = files.OpenReadWrite(path); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	defer errors.DeferredCloseAndRename(&err, pw.File, pw.Name(), path)
+		defer errors.DeferredCloser(&err, pw.File)
 
-	pw.Reset(pw.File)
+		pw.Reader.Reset(pw.File)
+		pw.Writer.Reset(pw.File)
 
-	if pw.added.Len() == 0 {
 		return pw.flushJustSchwanz()
 	} else {
+
+		if pw.File, err = pw.standort.FileTempLocal(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer errors.DeferredCloseAndRename(&err, pw.File, pw.Name(), path)
+
+		pw.Reader.Reset(pw.File)
+		pw.Writer.Reset(pw.File)
+
 		return pw.flushBoth()
 	}
 }
@@ -99,10 +87,9 @@ func (pw *pageWriterV5) flushBoth() (err error) {
 	chain := iter.MakeChain(
 		pw.konfig.ApplyToSku,
 		pw.writeOne,
-		pw.SaveSha,
 	)
 
-	if err = pw.CopyEverything(kennung.SigilHistory, chain); err != nil {
+	if err = pw.CopyJustHistoryAndAdded(kennung.SigilHistory, chain); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -125,35 +112,10 @@ func (pw *pageWriterV5) flushBoth() (err error) {
 		return
 	}
 
-	var n int
-
 	for ks, st := range pw.kennungShaMap {
 		st.Add(kennung.SigilSchwanzen)
 
-		// 2 uint8 + offset + 2 uint8 + Schlussel
-		offset := int64(2) + st.Offset + int64(3)
-
-		if n, err = pw.WriteAt([]byte{st.Byte()}, offset); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if n != 1 {
-			panic(errors.Errorf("expected 1 byte but wrote %d", n))
-		}
-
-		shK := sha.FromString(ks)
-
-		if err = pw.ennuiKennung.AddSha(
-			shK,
-			ennui.Loc{
-				Page: pw.Index,
-				Range: ennui.Range{
-					Offset:        st.Offset,
-					ContentLength: st.ContentLength,
-				},
-			},
-		); err != nil {
+		if err = pw.updateSigil(ks, st); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -163,16 +125,42 @@ func (pw *pageWriterV5) flushBoth() (err error) {
 }
 
 func (pw *pageWriterV5) flushJustSchwanz() (err error) {
-	chain := iter.MakeChain(
-		pw.konfig.ApplyToSku,
-		pw.writeOne,
-		pw.SaveSha,
-	)
-
-	if err = pw.CopyEverything(kennung.SigilHistory, chain); err != nil {
-		err = errors.Wrap(err)
+	if err = pw.CopyJustHistoryFrom(
+		&pw.Reader,
+		kennung.SigilHistory,
+		func(sk sku_fmt.Sku) (err error) {
+			pw.Range = sk.Range
+			pw.SaveSha(sk.Transacted, sk.Sigil)
+			return
+		},
+	); err != nil {
+		err = errors.Wrapf(err, "Page: %s", pw.PageId)
 		return
 	}
+
+	chain := iter.MakeChain(
+		pw.konfig.ApplyToSku,
+		func(sk *sku.Transacted) (err error) {
+			ks := sk.Kennung.String()
+			st, ok := pw.kennungShaMap[ks]
+
+			if !ok {
+				return
+			}
+
+			// log.Debug().Print(pw.PageId, sk, "before", st.Sigil)
+			st.Del(kennung.SigilSchwanzen)
+			// log.Debug().Print(pw.PageId, sk, "after", st.Sigil)
+
+			if err = pw.updateSigil(ks, st); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+		pw.writeOne,
+	)
 
 	for {
 		popped, ok := pw.addedSchwanz.Pop()
@@ -192,38 +180,63 @@ func (pw *pageWriterV5) flushJustSchwanz() (err error) {
 		return
 	}
 
-	var n int
-
 	for ks, st := range pw.kennungShaMap {
 		st.Add(kennung.SigilSchwanzen)
 
-		// 2 uint8 + offset + 2 uint8 + Schlussel
-		offset := int64(2) + st.Offset + int64(3)
-
-		if n, err = pw.WriteAt([]byte{st.Byte()}, offset); err != nil {
+		if err = pw.updateSigil(ks, st); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+	}
 
-		if n != 1 {
-			panic(errors.Errorf("expected 1 byte but wrote %d", n))
-		}
+	return
+}
 
-		shK := sha.FromString(ks)
+func (pw *pageWriterV5) writeOne(
+	z *sku.Transacted,
+) (err error) {
+	pw.Offset += pw.ContentLength
 
-		if err = pw.ennuiKennung.AddSha(
-			shK,
-			ennui.Loc{
-				Page: pw.Index,
-				Range: ennui.Range{
-					Offset:        st.Offset,
-					ContentLength: st.ContentLength,
-				},
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if pw.ContentLength, err = pw.WriteFormat(&pw.Writer, z); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	pw.etikettIndex.Add(z.Metadatei.GetEtiketten())
+
+	pw.SaveSha(z, kennung.SigilHistory)
+
+	return
+}
+
+func (pw *pageWriterV5) SaveSha(z *sku.Transacted, sigil kennung.Sigil) {
+	k := z.GetKennung()
+
+	record := pw.kennungShaMap[k.String()]
+	record.Range = pw.Range
+	record.Sigil = sigil
+
+	if z.Metadatei.Verzeichnisse.Archiviert.Bool() {
+		record.Add(kennung.SigilHidden)
+	}
+
+	pw.kennungShaMap[k.String()] = record
+}
+
+func (pw *pageWriterV5) updateSigil(ks string, st ShaTuple) (err error) {
+	// 2 uint8 + offset + 2 uint8 + Schlussel
+	offset := int64(2) + st.Offset + int64(3)
+
+	var n int
+
+	if n, err = pw.WriteAt([]byte{st.Byte()}, offset); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if n != 1 {
+		err = catgut.MakeErrLength(1, int64(n), nil)
+		return
 	}
 
 	return

@@ -50,7 +50,7 @@ type Binary struct {
 func (bf *Binary) ReadFormatExactly(
 	r io.ReaderAt,
 	loc ennui.Loc,
-	sk *sku.Transacted,
+	sk *Sku,
 ) (n int64, err error) {
 	bf.BinaryField.Reset()
 	bf.Buffer.Reset()
@@ -87,7 +87,7 @@ func (bf *Binary) ReadFormatExactly(
 		return
 	}
 
-	n2, _, err = bf.readSigil(sk, buf)
+	n2, err = bf.readSigil(sk, buf)
 	n += n2
 
 	if err != nil {
@@ -104,7 +104,7 @@ func (bf *Binary) ReadFormatExactly(
 			return
 		}
 
-		if err = bf.readFieldKey(sk); err != nil {
+		if err = bf.readFieldKey(sk.Transacted); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -115,14 +115,19 @@ func (bf *Binary) ReadFormatExactly(
 
 var ErrSkip = errors.New("skip")
 
+type Sku struct {
+	*sku.Transacted
+	ennui.Range
+	kennung.Sigil
+}
+
 func (bf *Binary) ReadFormatAndMatchSigil(
 	r io.Reader,
-	sk *sku.Transacted,
+	sk *Sku,
 ) (n int64, err error) {
 	bf.BinaryField.Reset()
 	bf.Buffer.Reset()
 
-	var sigil kennung.Sigil
 	var n1 int
 	var n2 int64
 
@@ -153,7 +158,7 @@ func (bf *Binary) ReadFormatAndMatchSigil(
 		bf.R = r
 		bf.N = contentLength64
 
-		n2, sigil, err = bf.readSigil(sk, &bf.LimitedReader)
+		n2, err = bf.readSigil(sk, &bf.LimitedReader)
 		n += n2
 
 		if err != nil {
@@ -161,7 +166,7 @@ func (bf *Binary) ReadFormatAndMatchSigil(
 			return
 		}
 
-		if bf.Contains(sigil) {
+		if bf.Contains(sk.Sigil) {
 			break
 		}
 
@@ -182,7 +187,7 @@ func (bf *Binary) ReadFormatAndMatchSigil(
 			return
 		}
 
-		if err = bf.readFieldKey(sk); err != nil {
+		if err = bf.readFieldKey(sk.Transacted); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -194,9 +199,9 @@ func (bf *Binary) ReadFormatAndMatchSigil(
 var errExpectedSigil = errors.New("expected sigil")
 
 func (bf *Binary) readSigil(
-	sk *sku.Transacted,
+	sk *Sku,
 	r io.Reader,
-) (n int64, sigil kennung.Sigil, err error) {
+) (n int64, err error) {
 	n, err = bf.BinaryField.ReadFrom(r)
 
 	if err != nil {
@@ -209,12 +214,12 @@ func (bf *Binary) readSigil(
 		return
 	}
 
-	if _, err = sigil.ReadFrom(&bf.Content); err != nil {
+	if _, err = sk.Sigil.ReadFrom(&bf.Content); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if sigil.IncludesHidden() {
+	if sk.IncludesHidden() {
 		sk.SetArchiviert(true)
 	}
 
@@ -615,10 +620,12 @@ func (bf *BinaryField) GetContentLength() (contentLength int, contentLength64 in
 
 	if contentLength64 > math.MaxUint16 {
 		err = errContentLengthTooLarge
+		return
 	}
 
 	if contentLength64 < 0 {
 		err = errContentLengthNegative
+		return
 	}
 
 	return int(contentLength64), contentLength64, nil
