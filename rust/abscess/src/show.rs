@@ -1,4 +1,5 @@
 use crate::alfa::hash::digest::Digest;
+use crate::konfig::Konfig;
 use std::error::Error;
 use std::fs::{File, OpenOptions};
 use std::io::{copy, stdout, BufReader, Write};
@@ -11,14 +12,14 @@ fn file_for_digest(dig: &Digest) -> Result<File> {
     Ok(file)
 }
 
-fn write_file_to<T: Write>(file: File, out: &mut T) -> Result<()> {
-    let mut reader = BufReader::new(file);
+fn write_file_to<T: Write>(file: File, out: &mut T, konfig: Konfig) -> Result<()> {
+    let mut reader = konfig.compression.reader(BufReader::new(file));
     copy(&mut reader, out)?;
 
     Ok(())
 }
 
-pub fn run(digs: &Vec<Digest>) -> Result<()> {
+pub fn run(digs: &Vec<Digest>, konfig: Konfig) -> Result<()> {
     let mut out = stdout();
     for dig in digs.iter() {
         if dig.is_null() {
@@ -26,7 +27,7 @@ pub fn run(digs: &Vec<Digest>) -> Result<()> {
         }
 
         let file = file_for_digest(&dig)?;
-        write_file_to(file, &mut out)?;
+        write_file_to(file, &mut out, konfig.to_owned())?;
     }
 
     Ok(())

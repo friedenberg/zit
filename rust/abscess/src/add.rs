@@ -1,5 +1,6 @@
 use crate::alfa::hash::digest::Digest;
 use crate::alfa::hash::writer::Writer;
+use crate::konfig::Konfig;
 use io_tee::TeeWriter;
 use rand::{distributions::Alphanumeric, Rng};
 use std::error::Error;
@@ -51,9 +52,13 @@ fn create_unique_temp_file() -> Result<(PathBuf, File)> {
     Ok((path, file))
 }
 
-fn copy_file_to_temp_and_generate_digest<T: Read>(input: &mut T, output: File) -> Result<Digest> {
+fn copy_file_to_temp_and_generate_digest<T: Read>(
+    input: &mut T,
+    output: File,
+    konfig: &Konfig,
+) -> Result<Digest> {
     let mut reader = BufReader::new(input);
-    let writer = BufWriter::new(output);
+    let writer = konfig.compression.writer(BufWriter::new(output));
     let mut hash_writer = Writer::new();
     let mut tee_writer = TeeWriter::new(writer, &mut hash_writer);
 
@@ -83,24 +88,24 @@ fn move_file_to_store(old_path: PathBuf, dig: &mut Digest) -> Result<()> {
     Ok(())
 }
 
-fn run_one<T: Read>(input: &mut T) -> Result<Digest> {
+fn run_one<T: Read>(input: &mut T, konfig: &Konfig) -> Result<Digest> {
     let (path, file) = create_unique_temp_file()?;
-    let mut dig = copy_file_to_temp_and_generate_digest(input, file)?;
+    let mut dig = copy_file_to_temp_and_generate_digest(input, file, &konfig)?;
     create_directory_if_necessary(&mut dig)?;
     move_file_to_store(path, &mut dig)?;
     Ok(dig)
 }
 
-pub fn run(paths: Vec<PathBuf>, add_mode: Mode) -> Result<()> {
+pub fn run(paths: Vec<PathBuf>, add_mode: Mode, konfig: &Konfig) -> Result<()> {
     create_temp_dir_if_necessary()?;
 
     if paths.len() == 0 {
-        let dig = run_one(&mut stdin())?;
+        let dig = run_one(&mut stdin(), konfig)?;
         println!("{:} (stdin)", dig);
     } else {
         for path in paths.iter() {
             let mut file = OpenOptions::new().read(true).open(&path)?;
-            let dig = run_one(&mut file)?;
+            let dig = run_one(&mut file, konfig)?;
 
             let path_str = path.to_string_lossy();
 
