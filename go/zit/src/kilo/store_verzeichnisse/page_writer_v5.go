@@ -68,7 +68,6 @@ func (pw *pageWriterV5) Flush() (err error) {
 
 		return pw.flushJustSchwanz()
 	} else {
-
 		if pw.File, err = pw.standort.FileTempLocal(); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -148,9 +147,7 @@ func (pw *pageWriterV5) flushJustSchwanz() (err error) {
 				return
 			}
 
-			// log.Debug().Print(pw.PageId, sk, "before", st.Sigil)
 			st.Del(kennung.SigilSchwanzen)
-			// log.Debug().Print(pw.PageId, sk, "after", st.Sigil)
 
 			if err = pw.updateSigil(ks, st); err != nil {
 				err = errors.Wrap(err)
@@ -214,6 +211,11 @@ func (pw *pageWriterV5) SaveSha(z *sku.Transacted, sigil kennung.Sigil) {
 
 	record := pw.kennungShaMap[k.String()]
 	record.Range = pw.Range
+
+	if z.Metadatei.Verzeichnisse.Archiviert.Bool() {
+		sigil.Add(kennung.SigilHidden)
+	}
+
 	record.Sigil = sigil
 
 	if z.Metadatei.Verzeichnisse.Archiviert.Bool() {

@@ -8,12 +8,6 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
-const (
-	optionCommentEnableMultiline = "multiline:enabled"
-	optionCommentEnableFormatOld = "format:old"
-	optionCommentEnableFormatNew = "format:new"
-)
-
 type optionComment interface {
 	GetOptionComment() optionComment
 	schnittstellen.Stringer

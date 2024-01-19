@@ -7,7 +7,7 @@ import (
 
 type V0 struct{}
 
-func (_ V0) GetGattung() schnittstellen.GattungLike {
+func (V0) GetGattung() schnittstellen.GattungLike {
 	return gattung.Etikett
 }
 

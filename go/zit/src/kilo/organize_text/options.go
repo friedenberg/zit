@@ -39,10 +39,11 @@ type Options struct {
 
 	Expanders kennung.Abbr
 
-	UsePrefixJoints        bool
-	UseRightAlignedIndents bool
-	UseRefiner             bool
-	UseMetadateiHeader     bool
+	UsePrefixJoints            bool
+	UseRightAlignedIndents     bool
+	UseRefiner                 bool
+	UseMetadateiHeader         bool
+	IncludeEtikettenInBrackets bool
 
 	PrintOptions       erworben_cli_print_options.PrintOptions
 	organize           sku_fmt.Organize
@@ -83,29 +84,41 @@ func MakeFlagsWithMetadatei(m metadatei.Metadatei) Flags {
 
 func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 	f.Var(&o.GroupingEtiketten, "group-by", "etikett prefixes to group zettels")
+
 	f.Var(
 		o.ExtraEtiketten,
 		"extras",
 		"etiketten to always add to the organize text",
 	)
+
 	f.BoolVar(
 		&o.UsePrefixJoints,
 		"prefix-joints",
 		true,
 		"split etiketten around hyphens",
 	)
+
 	f.BoolVar(
 		&o.UseRightAlignedIndents,
 		"right-align",
 		true,
 		"right-align etiketten",
 	)
+
 	f.BoolVar(&o.UseRefiner, "refine", true, "refine the organize tree")
+
 	f.BoolVar(
 		&o.UseMetadateiHeader,
 		"metadatei-header",
 		true,
 		"metadatei header",
+	)
+
+	f.BoolVar(
+		&o.IncludeEtikettenInBrackets,
+		"include-etiketten",
+		false,
+		"include etiketten between brackets",
 	)
 }
 

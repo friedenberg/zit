@@ -30,10 +30,10 @@ func (atc *Factory) makeWithMetadatei() (ot *Text, err error) {
 		assignment: newAssignment(0),
 	}
 
-	ot.assignment.isRoot = true
+	ot.isRoot = true
 
-	ot.Metadatei.EtikettSet = atc.Options.rootEtiketten
-	ot.Metadatei.Typ = atc.Options.Typ
+	ot.EtikettSet = atc.rootEtiketten
+	ot.Metadatei.Typ = atc.Typ
 
 	prefixSet := objekte_collections.MakeSetPrefixVerzeichnisse(0)
 	atc.Transacted.Each(prefixSet.Add)
@@ -41,7 +41,7 @@ func (atc *Factory) makeWithMetadatei() (ot *Text, err error) {
 	for _, e := range iter.Elements[kennung.Etikett](atc.ExtraEtiketten) {
 		ee := newAssignment(ot.Depth() + 1)
 		ee.etiketten = kennung.MakeEtikettSet(e)
-		ot.assignment.addChild(ee)
+		ot.addChild(ee)
 
 		segments := prefixSet.Subset(e)
 
@@ -69,7 +69,7 @@ func (atc *Factory) makeWithMetadatei() (ot *Text, err error) {
 }
 
 func (f Factory) makeWithoutMetadatei() (ot *Text, err error) {
-	if !f.Options.wasMade {
+	if !f.wasMade {
 		panic("options no initialized")
 	}
 
@@ -81,7 +81,7 @@ func (f Factory) makeWithoutMetadatei() (ot *Text, err error) {
 		},
 	}
 
-	ot.assignment.isRoot = true
+	ot.isRoot = true
 
 	var as []*assignment
 	as, err = f.Options.assignmentTreeConstructor().Assignments()
@@ -92,7 +92,7 @@ func (f Factory) makeWithoutMetadatei() (ot *Text, err error) {
 	}
 
 	for _, a := range as {
-		ot.assignment.addChild(a)
+		ot.addChild(a)
 	}
 
 	if err = ot.Refine(); err != nil {
@@ -118,7 +118,7 @@ func (atc Factory) makeChildren(
 				var z *obj
 
 				if z, err = makeObj(
-					atc.Options.PrintOptions,
+					atc.PrintOptions,
 					tz,
 					atc.Expanders,
 				); err != nil {
@@ -147,7 +147,7 @@ func (atc Factory) makeChildren(
 			var z *obj
 
 			if z, err = makeObj(
-				atc.Options.PrintOptions,
+				atc.PrintOptions,
 				tz,
 				atc.Expanders,
 			); err != nil {

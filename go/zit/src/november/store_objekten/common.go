@@ -254,7 +254,7 @@ func (s *Store) ReadOneInto(
 	}
 
 	if sk == nil {
-    err = collections.MakeErrNotFound(k1)
+		err = collections.MakeErrNotFound(k1)
 		return
 	}
 

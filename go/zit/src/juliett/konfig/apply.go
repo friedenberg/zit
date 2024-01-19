@@ -115,6 +115,8 @@ func (k *Compiled) addImplicitEtiketten(
 func (k *Compiled) setArchiviert(
 	sk *sku.Transacted,
 ) (err error) {
+	sk.SetArchiviert(false)
+
 	mp := &sk.Metadatei
 
 	g := gattung.Must(sk.GetGattung())
