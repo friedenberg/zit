@@ -14,9 +14,14 @@ teardown() {
 	rm_from_version "$version"
 }
 
+cmd_def_organize=(
+	"${cmd_zit_def[@]}"
+	-include-etiketten
+)
+
 function organize_simple { # @test
 	actual="$(mktemp)"
-	run_zit organize -mode output-only :z,e,t >"$actual"
+	run_zit organize "${cmd_def_organize[@]}" -mode output-only :z,e,t >"$actual"
 	assert_success
 	assert_output_unsorted - <<-EOM
 
@@ -206,7 +211,7 @@ function organize_simple_checkedout_merge_no_conflict { # @test
 
 function organize_simple_checkedout_merge_conflict { # @test
 	#TODO-project-2022-zit-collapse_skus
-  skip
+	skip
 	cat - >txt.typ <<-EOM
 		inline-akte = true
 	EOM
@@ -370,7 +375,7 @@ function organize_dry_run { # @test
 }
 
 function organize_with_typ_output { # @test
-	run_zit organize -mode output-only !md:z
+	run_zit organize "${cmd_def_organize[@]}" -mode output-only !md:z
 	assert_success
 	assert_output - <<-EOM
 		---

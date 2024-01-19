@@ -18,6 +18,7 @@ cmd_def_organize=(
 	-metadatei-header=false
 	-refine=true
 	-new-organize=false
+	-include-etiketten
 )
 
 function outputs_organize_one_etikett { # @test

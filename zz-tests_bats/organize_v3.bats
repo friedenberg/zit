@@ -16,6 +16,7 @@ cmd_def_organize_v3=(
 	-metadatei-header=false
 	-refine=true
 	-new-organize=false
+	-include-etiketten
 )
 
 function organize_v3_outputs_organize_one_etikett { # @test
