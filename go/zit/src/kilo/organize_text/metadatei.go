@@ -101,11 +101,11 @@ func (m Metadatei) WriteTo(w1 io.Writer) (n int64, err error) {
 
 func (m Metadatei) GetOptionComments(
 	f optionCommentFactory,
-) (ocs []optionComment, err error) {
+) (ocs []Option, err error) {
 	em := errors.MakeMulti()
 
 	for _, c := range m.Comments {
-		var oc optionComment
+		var oc Option
 
 		oc, err = f.Make(c)
 

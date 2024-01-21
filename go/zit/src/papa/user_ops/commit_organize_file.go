@@ -21,6 +21,7 @@ type CommitOrganizeFile struct {
 type CommitOrganizeFileResults struct{}
 
 func (c CommitOrganizeFile) Run(
+	u *umwelt.Umwelt,
 	a, b *organize_text.Text,
 ) (results CommitOrganizeFileResults, err error) {
 	store := c.StoreObjekten()

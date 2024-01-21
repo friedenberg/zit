@@ -470,9 +470,9 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	f1 := s.ReindexOne
-
-	if err = s.GetBestandsaufnahmeStore().ReadAllSkus(f1); err != nil {
+	if err = s.GetBestandsaufnahmeStore().ReadAllSkus(
+		s.ReindexOne,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -195,7 +195,11 @@ func (c *Organize) RunWithQuery(
 			Umwelt: u,
 		}
 
-		if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults, ot2); err != nil {
+		if _, err = commitOrganizeTextOp.Run(
+			u,
+			createOrganizeFileResults,
+			ot2,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -252,7 +256,11 @@ func (c *Organize) RunWithQuery(
 			Umwelt: u,
 		}
 
-		if _, err = commitOrganizeTextOp.Run(createOrganizeFileResults, ot2); err != nil {
+		if _, err = commitOrganizeTextOp.Run(
+			u,
+			createOrganizeFileResults,
+			ot2,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

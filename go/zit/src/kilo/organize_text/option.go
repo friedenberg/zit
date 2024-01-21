@@ -8,17 +8,17 @@ import (
 	"github.com/friedenberg/zit/src/charlie/collections"
 )
 
-type optionComment interface {
-	GetOptionComment() optionComment
+type Option interface {
+	GetOption() Option
 	schnittstellen.Stringer
-	ApplyToText(Options, *Text) error
+	ApplyToText(Options, *Assignment) error
 	ApplyToReader(Options, *assignmentLineReader) error
 	ApplyToWriter(Options, *assignmentLineWriter) error
 }
 
 type optionCommentFactory struct{}
 
-func (ocf optionCommentFactory) Make(c string) (oc optionComment, err error) {
+func (ocf optionCommentFactory) Make(c string) (oc Option, err error) {
 	c = strings.TrimSpace(c)
 
 	head, tail, found := strings.Cut(c, ":")
@@ -43,7 +43,7 @@ func (ocf optionCommentFactory) Make(c string) (oc optionComment, err error) {
 
 type optionCommentFormat string
 
-func (ocf optionCommentFormat) GetOptionComment() optionComment {
+func (ocf optionCommentFormat) GetOption() Option {
 	return ocf
 }
 
@@ -51,7 +51,7 @@ func (ocf optionCommentFormat) String() string {
 	return fmt.Sprintf("format:%s", string(ocf))
 }
 
-func (ocf optionCommentFormat) ApplyToText(Options, *Text) (err error) {
+func (ocf optionCommentFormat) ApplyToText(Options, *Assignment) (err error) {
 	return
 }
 
@@ -83,7 +83,7 @@ func (ocf optionCommentFormat) ApplyToWriter(
 
 type optionCommentHide string
 
-func (ocf optionCommentHide) GetOptionComment() optionComment {
+func (ocf optionCommentHide) GetOption() Option {
 	return ocf
 }
 
@@ -91,7 +91,7 @@ func (ocf optionCommentHide) String() string {
 	return fmt.Sprintf("hide:%s", string(ocf))
 }
 
-func (ocf optionCommentHide) ApplyToText(Options, *Text) (err error) {
+func (ocf optionCommentHide) ApplyToText(Options, *Assignment) (err error) {
 	return
 }
 
@@ -108,3 +108,4 @@ func (ocf optionCommentHide) ApplyToWriter(
 ) (err error) {
 	return
 }
+

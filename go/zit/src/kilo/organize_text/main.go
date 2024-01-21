@@ -12,7 +12,7 @@ import (
 type Text struct {
 	Options
 	Metadatei
-	*assignment
+	*Assignment
 }
 
 func New(options Options) (ot *Text, err error) {
@@ -26,7 +26,7 @@ func New(options Options) (ot *Text, err error) {
 }
 
 func (t *Text) Refine() (err error) {
-	if err = t.Options.refiner().Refine(t.assignment); err != nil {
+	if err = t.Options.refiner().Refine(t.Assignment); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -46,7 +46,7 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 	}
 
 	ocf := optionCommentFactory{}
-	var ocs []optionComment
+	var ocs []Option
 
 	if ocs, err = t.GetOptionComments(ocf); err != nil {
 		err = errors.Wrap(err)
@@ -67,7 +67,7 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 
 	n, err = mr.ReadFrom(r)
 
-	t.assignment = r1.root
+	t.Assignment = r1.root
 
 	return
 }
@@ -99,7 +99,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 	}
 
 	ocf := optionCommentFactory{}
-	var ocs []optionComment
+	var ocs []Option
 
 	if ocs, err = ot.GetOptionComments(ocf); err != nil {
 		err = errors.Wrap(err)
@@ -117,7 +117,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		aligned.SetMaxKopfUndSchwanz(kopf, schwanz)
 	}
 
-	if err = aw.write(ot.assignment); err != nil {
+	if err = aw.write(ot.Assignment); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

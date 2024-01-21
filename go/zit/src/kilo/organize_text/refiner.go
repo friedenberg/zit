@@ -14,9 +14,9 @@ type Refiner struct {
 	UsePrefixJoints bool
 }
 
-func (atc *Refiner) shouldMergeAllChildrenIntoParent(a *assignment) (ok bool) {
+func (atc *Refiner) shouldMergeAllChildrenIntoParent(a *Assignment) (ok bool) {
 	switch {
-	case a.parent.isRoot:
+	case a.Parent.IsRoot:
 		fallthrough
 
 	default:
@@ -26,52 +26,52 @@ func (atc *Refiner) shouldMergeAllChildrenIntoParent(a *assignment) (ok bool) {
 	return
 }
 
-func (atc *Refiner) shouldMergeIntoParent(a *assignment) bool {
+func (atc *Refiner) shouldMergeIntoParent(a *Assignment) bool {
 	errors.Log().Printf("checking node should merge: %s", a)
 
-	if a.parent == nil {
+	if a.Parent == nil {
 		errors.Log().Print("parent is nil")
 		return false
 	}
 
-	if a.parent.isRoot {
+	if a.Parent.IsRoot {
 		errors.Log().Print("parent is root")
 		return false
 	}
 
-	if a.etiketten.Len() == 1 && kennung.IsEmpty(a.etiketten.Any()) {
+	if a.Etiketten.Len() == 1 && kennung.IsEmpty(a.Etiketten.Any()) {
 		errors.Log().Print("1 Etikett, and it's empty, merging")
 		return true
 	}
 
-	if a.etiketten.Len() == 0 {
+	if a.Etiketten.Len() == 0 {
 		errors.Log().Print("etiketten length is 0, merging")
 		return true
 	}
 
-	if a.parent.etiketten.Len() != 1 {
+	if a.Parent.Etiketten.Len() != 1 {
 		errors.Log().Print("parent etiketten length is not 1")
 		return false
 	}
 
-	if a.etiketten.Len() != 1 {
+	if a.Etiketten.Len() != 1 {
 		errors.Log().Print("etiketten length is not 1")
 		return false
 	}
 
-	equal := iter.SetEqualsPtr(a.etiketten, a.parent.etiketten)
+	equal := iter.SetEqualsPtr(a.Etiketten, a.Parent.Etiketten)
 
 	if !equal {
 		errors.Log().Print("parent etiketten not equal")
 		return false
 	}
 
-	if kennung.IsDependentLeaf(a.parent.etiketten.Any()) {
+	if kennung.IsDependentLeaf(a.Parent.Etiketten.Any()) {
 		errors.Log().Print("is prefix joint")
 		return false
 	}
 
-	if kennung.IsDependentLeaf(a.etiketten.Any()) {
+	if kennung.IsDependentLeaf(a.Etiketten.Any()) {
 		errors.Log().Print("is prefix joint")
 		return false
 	}
@@ -79,7 +79,7 @@ func (atc *Refiner) shouldMergeIntoParent(a *assignment) bool {
 	return true
 }
 
-func (atc *Refiner) renameForPrefixJoint(a *assignment) (err error) {
+func (atc *Refiner) renameForPrefixJoint(a *Assignment) (err error) {
 	if !atc.UsePrefixJoints {
 		return
 	}
@@ -89,34 +89,34 @@ func (atc *Refiner) renameForPrefixJoint(a *assignment) (err error) {
 		return
 	}
 
-	if a.parent == nil {
+	if a.Parent == nil {
 		errors.Log().Printf("parent is nil: %#v", a)
 		return
 	}
 
-	if a.parent.etiketten.Len() == 0 {
+	if a.Parent.Etiketten.Len() == 0 {
 		return
 	}
 
-	if a.parent.etiketten.Len() != 1 {
+	if a.Parent.Etiketten.Len() != 1 {
 		return
 	}
 
-	if kennung.IsDependentLeaf(a.parent.etiketten.Any()) {
+	if kennung.IsDependentLeaf(a.Parent.Etiketten.Any()) {
 		return
 	}
 
-	if kennung.IsDependentLeaf(a.etiketten.Any()) {
+	if kennung.IsDependentLeaf(a.Etiketten.Any()) {
 		return
 	}
 
-	if !kennung.HasParentPrefix(a.etiketten.Any(), a.parent.etiketten.Any()) {
+	if !kennung.HasParentPrefix(a.Etiketten.Any(), a.Parent.Etiketten.Any()) {
 		errors.Log().Print("parent is not prefix joint")
 		return
 	}
 
-	aEtt := a.etiketten.Any()
-	pEtt := a.parent.etiketten.Any()
+	aEtt := a.Etiketten.Any()
+	pEtt := a.Parent.Etiketten.Any()
 
 	if aEtt.Equals(pEtt) {
 		errors.Log().Print("parent is is equal to child")
@@ -130,19 +130,19 @@ func (atc *Refiner) renameForPrefixJoint(a *assignment) (err error) {
 		return
 	}
 
-	a.etiketten = kennung.MakeEtikettSet(ls)
+	a.Etiketten = kennung.MakeEtikettSet(ls)
 
 	return
 }
 
 // passed-in assignment may be nil?
-func (atc *Refiner) Refine(a *assignment) (err error) {
+func (atc *Refiner) Refine(a *Assignment) (err error) {
 	if !atc.Enabled {
 		return
 	}
 
-	if a.isRoot {
-		for _, c := range a.children {
+	if a.IsRoot {
+		for _, c := range a.Children {
 			if err = atc.Refine(c); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -154,7 +154,7 @@ func (atc *Refiner) Refine(a *assignment) (err error) {
 
 	if atc.shouldMergeIntoParent(a) {
 		errors.Log().Print("merging into parent")
-		p := a.parent
+		p := a.Parent
 
 		if err = p.consume(a); err != nil {
 			err = errors.Wrap(err)
@@ -174,7 +174,7 @@ func (atc *Refiner) Refine(a *assignment) (err error) {
 		return
 	}
 
-	for _, child := range a.children {
+	for _, child := range a.Children {
 		if err = atc.Refine(child); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -186,12 +186,12 @@ func (atc *Refiner) Refine(a *assignment) (err error) {
 		return
 	}
 
-	sort.Slice(a.children, func(i, j int) bool {
+	sort.Slice(a.Children, func(i, j int) bool {
 		vi := iter.StringCommaSeparated[kennung.Etikett](
-			a.children[i].etiketten,
+			a.Children[i].Etiketten,
 		)
 		vj := iter.StringCommaSeparated[kennung.Etikett](
-			a.children[j].etiketten,
+			a.Children[j].Etiketten,
 		)
 		return vi < vj
 	})
@@ -199,12 +199,12 @@ func (atc *Refiner) Refine(a *assignment) (err error) {
 	return
 }
 
-func (atc Refiner) applyPrefixJoints(a *assignment) (err error) {
+func (atc Refiner) applyPrefixJoints(a *Assignment) (err error) {
 	if !atc.UsePrefixJoints {
 		return
 	}
 
-	if a.etiketten == nil || a.etiketten.Len() == 0 {
+	if a.Etiketten == nil || a.Etiketten.Len() == 0 {
 		return
 	}
 
@@ -216,19 +216,19 @@ func (atc Refiner) applyPrefixJoints(a *assignment) (err error) {
 
 	groupingPrefix := childPrefixes[0]
 
-	var na *assignment
+	var na *Assignment
 
-	if a.etiketten.Len() == 1 &&
-		a.etiketten.Any().Equals(groupingPrefix.Etikett) {
+	if a.Etiketten.Len() == 1 &&
+		a.Etiketten.Any().Equals(groupingPrefix.Etikett) {
 		na = a
 	} else {
-		na = newAssignment(a.Depth() + 1)
-		na.etiketten = kennung.MakeEtikettSet(groupingPrefix.Etikett)
+		na = newAssignment(a.GetDepth() + 1)
+		na.Etiketten = kennung.MakeEtikettSet(groupingPrefix.Etikett)
 		a.addChild(na)
 	}
 
 	for _, c := range groupingPrefix.assignments {
-		if c.parent != na {
+		if c.Parent != na {
 			if err = c.removeFromParent(); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -237,8 +237,8 @@ func (atc Refiner) applyPrefixJoints(a *assignment) (err error) {
 			na.addChild(c)
 		}
 
-		c.etiketten = kennung.SubtractPrefix(
-			c.etiketten,
+		c.Etiketten = kennung.SubtractPrefix(
+			c.Etiketten,
 			groupingPrefix.Etikett,
 		)
 	}
@@ -248,19 +248,19 @@ func (atc Refiner) applyPrefixJoints(a *assignment) (err error) {
 
 type etikettBag struct {
 	kennung.Etikett
-	assignments []*assignment
+	assignments []*Assignment
 }
 
-func (a Refiner) childPrefixes(node *assignment) (out []etikettBag) {
-	m := make(map[string][]*assignment)
-	out = make([]etikettBag, 0, len(node.children))
+func (a Refiner) childPrefixes(node *Assignment) (out []etikettBag) {
+	m := make(map[string][]*Assignment)
+	out = make([]etikettBag, 0, len(node.Children))
 
-	if node.etiketten.Len() == 0 {
+	if node.Etiketten.Len() == 0 {
 		return
 	}
 
-	for _, c := range node.children {
-		expanded := kennung.Expanded(c.etiketten, expansion.ExpanderRight)
+	for _, c := range node.Children {
+		expanded := kennung.Expanded(c.Etiketten, expansion.ExpanderRight)
 
 		expanded.Each(
 			func(e kennung.Etikett) (err error) {
@@ -268,11 +268,11 @@ func (a Refiner) childPrefixes(node *assignment) (out []etikettBag) {
 					return
 				}
 
-				var n []*assignment
+				var n []*Assignment
 				ok := false
 
 				if n, ok = m[e.String()]; !ok {
-					n = make([]*assignment, 0)
+					n = make([]*Assignment, 0)
 				}
 
 				n = append(n, c)

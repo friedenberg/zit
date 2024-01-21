@@ -10,38 +10,38 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 )
 
-type assignment struct {
-	isRoot    bool
-	depth     int
-	etiketten kennung.EtikettSet
-	named     schnittstellen.MutableSetLike[*obj]
-	unnamed   schnittstellen.MutableSetLike[*obj]
-	children  []*assignment
-	parent    *assignment
+type Assignment struct {
+	IsRoot    bool
+	Depth     int
+	Etiketten kennung.EtikettSet
+	Named     schnittstellen.MutableSetLike[*obj]
+	Unnamed   schnittstellen.MutableSetLike[*obj]
+	Children  []*Assignment
+	Parent    *Assignment
 }
 
-func newAssignment(d int) *assignment {
-	return &assignment{
-		depth:     d,
-		etiketten: kennung.MakeEtikettSet(),
-		named:     collections_value.MakeMutableValueSet[*obj](nil),
-		unnamed:   collections_value.MakeMutableValueSet[*obj](nil),
-		children:  make([]*assignment, 0),
+func newAssignment(d int) *Assignment {
+	return &Assignment{
+		Depth:     d,
+		Etiketten: kennung.MakeEtikettSet(),
+		Named:     collections_value.MakeMutableValueSet[*obj](nil),
+		Unnamed:   collections_value.MakeMutableValueSet[*obj](nil),
+		Children:  make([]*Assignment, 0),
 	}
 }
 
-func (a assignment) Depth() int {
-	if a.parent == nil {
+func (a Assignment) GetDepth() int {
+	if a.Parent == nil {
 		return 0
 	} else {
-		return a.parent.Depth() + 1
+		return a.Parent.GetDepth() + 1
 	}
 }
 
-func (a assignment) MaxDepth() (d int) {
-	d = a.Depth()
+func (a Assignment) MaxDepth() (d int) {
+	d = a.GetDepth()
 
-	for _, c := range a.children {
+	for _, c := range a.Children {
 		cd := c.MaxDepth()
 
 		if d < cd {
@@ -52,18 +52,18 @@ func (a assignment) MaxDepth() (d int) {
 	return
 }
 
-func (a assignment) AlignmentSpacing() int {
-	if a.etiketten.Len() == 1 && kennung.IsDependentLeaf(a.etiketten.Any()) {
-		return a.parent.AlignmentSpacing() + len(
-			a.parent.etiketten.Any().String(),
+func (a Assignment) AlignmentSpacing() int {
+	if a.Etiketten.Len() == 1 && kennung.IsDependentLeaf(a.Etiketten.Any()) {
+		return a.Parent.AlignmentSpacing() + len(
+			a.Parent.Etiketten.Any().String(),
 		)
 	}
 
 	return 0
 }
 
-func (a assignment) MaxLen() (m int) {
-	a.named.Each(
+func (a Assignment) MaxLen() (m int) {
+	a.Named.Each(
 		func(z *obj) (err error) {
 			oM := z.Sku.Kennung.Len()
 
@@ -75,7 +75,7 @@ func (a assignment) MaxLen() (m int) {
 		},
 	)
 
-	for _, c := range a.children {
+	for _, c := range a.Children {
 		oM := c.MaxLen()
 
 		if oM > m {
@@ -86,8 +86,8 @@ func (a assignment) MaxLen() (m int) {
 	return
 }
 
-func (a assignment) MaxKopfUndSchwanz() (kopf, schwanz int) {
-	a.named.Each(
+func (a Assignment) MaxKopfUndSchwanz() (kopf, schwanz int) {
+	a.Named.Each(
 		func(z *obj) (err error) {
 			oKopf, oSchwanz := z.Sku.Kennung.LenKopfUndSchwanz()
 
@@ -103,7 +103,7 @@ func (a assignment) MaxKopfUndSchwanz() (kopf, schwanz int) {
 		},
 	)
 
-	for _, c := range a.children {
+	for _, c := range a.Children {
 		zKopf, zSchwanz := c.MaxKopfUndSchwanz()
 
 		if zKopf > kopf {
@@ -118,42 +118,42 @@ func (a assignment) MaxKopfUndSchwanz() (kopf, schwanz int) {
 	return
 }
 
-func (a assignment) String() (s string) {
-	if a.parent != nil {
-		s = a.parent.String() + "."
+func (a Assignment) String() (s string) {
+	if a.Parent != nil {
+		s = a.Parent.String() + "."
 	}
 
-	return s + iter.StringCommaSeparated[kennung.Etikett](a.etiketten)
+	return s + iter.StringCommaSeparated[kennung.Etikett](a.Etiketten)
 }
 
-func (a *assignment) addChild(c *assignment) {
+func (a *Assignment) addChild(c *Assignment) {
 	if a == c {
 		panic("child and parent are the same")
 	}
 
-	if c.parent != nil && c.parent == a {
+	if c.Parent != nil && c.Parent == a {
 		panic("child already has self as parent")
 	}
 
-	if c.parent != nil {
+	if c.Parent != nil {
 		panic("child already has a parent")
 	}
 
-	a.children = append(a.children, c)
-	c.parent = a
+	a.Children = append(a.Children, c)
+	c.Parent = a
 }
 
-func (a *assignment) parentOrRoot() (p *assignment) {
-	switch a.parent {
+func (a *Assignment) parentOrRoot() (p *Assignment) {
+	switch a.Parent {
 	case nil:
 		return a
 
 	default:
-		return a.parent
+		return a.Parent
 	}
 }
 
-func (a *assignment) nthParent(n int) (p *assignment, err error) {
+func (a *Assignment) nthParent(n int) (p *Assignment, err error) {
 	if n < 0 {
 		n = -n
 	}
@@ -163,25 +163,25 @@ func (a *assignment) nthParent(n int) (p *assignment, err error) {
 		return
 	}
 
-	if a.parent == nil {
+	if a.Parent == nil {
 		err = errors.Errorf("cannot get nth parent as parent is nil")
 		return
 	}
 
-	return a.parent.nthParent(n - 1)
+	return a.Parent.nthParent(n - 1)
 }
 
-func (a *assignment) removeFromParent() (err error) {
-	return a.parent.removeChild(a)
+func (a *Assignment) removeFromParent() (err error) {
+	return a.Parent.removeChild(a)
 }
 
-func (a *assignment) removeChild(c *assignment) (err error) {
-	if c.parent != a {
+func (a *Assignment) removeChild(c *Assignment) (err error) {
+	if c.Parent != a {
 		err = errors.Errorf("attempting to remove child from wrong parent")
 		return
 	}
 
-	if len(a.children) == 0 {
+	if len(a.Children) == 0 {
 		err = errors.Errorf(
 			"attempting to remove child when there are no children",
 		)
@@ -189,15 +189,15 @@ func (a *assignment) removeChild(c *assignment) (err error) {
 	}
 
 	cap1 := 0
-	cap2 := len(a.children) - 1
+	cap2 := len(a.Children) - 1
 
 	if cap2 > 0 {
 		cap1 = cap2
 	}
 
-	nc := make([]*assignment, 0, cap1)
+	nc := make([]*Assignment, 0, cap1)
 
-	for _, c1 := range a.children {
+	for _, c1 := range a.Children {
 		if c1 == c {
 			continue
 		}
@@ -205,14 +205,14 @@ func (a *assignment) removeChild(c *assignment) (err error) {
 		nc = append(nc, c1)
 	}
 
-	c.parent = nil
-	a.children = nc
+	c.Parent = nil
+	a.Children = nc
 
 	return
 }
 
-func (a *assignment) consume(b *assignment) (err error) {
-	for _, c := range b.children {
+func (a *Assignment) consume(b *Assignment) (err error) {
+	for _, c := range b.Children {
 		if err = c.removeFromParent(); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -221,11 +221,11 @@ func (a *assignment) consume(b *assignment) (err error) {
 		a.addChild(c)
 	}
 
-	b.named.Each(a.named.Add)
-	b.named.Each(b.named.Del)
+	b.Named.Each(a.Named.Add)
+	b.Named.Each(b.Named.Del)
 
-	b.unnamed.Each(a.unnamed.Add)
-	b.unnamed.Each(b.unnamed.Del)
+	b.Unnamed.Each(a.Unnamed.Add)
+	b.Unnamed.Each(b.Unnamed.Del)
 
 	if err = b.removeFromParent(); err != nil {
 		err = errors.Wrap(err)
@@ -235,23 +235,23 @@ func (a *assignment) consume(b *assignment) (err error) {
 	return
 }
 
-func (a *assignment) expandedEtiketten() (es kennung.EtikettSet, err error) {
+func (a *Assignment) expandedEtiketten() (es kennung.EtikettSet, err error) {
 	es = kennung.MakeEtikettSet()
 
-	if a.etiketten == nil {
+	if a.Etiketten == nil {
 		panic("etiketten are nil")
 	}
 
-	if a.etiketten.Len() != 1 || a.parent == nil {
-		es = a.etiketten.CloneSetPtrLike()
+	if a.Etiketten.Len() != 1 || a.Parent == nil {
+		es = a.Etiketten.CloneSetPtrLike()
 		return
 	} else {
-		e := a.etiketten.Any()
+		e := a.Etiketten.Any()
 
 		if kennung.IsDependentLeaf(e) {
 			var pe kennung.EtikettSet
 
-			if pe, err = a.parent.expandedEtiketten(); err != nil {
+			if pe, err = a.Parent.expandedEtiketten(); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -259,7 +259,7 @@ func (a *assignment) expandedEtiketten() (es kennung.EtikettSet, err error) {
 			if pe.Len() > 1 {
 				err = errors.Errorf(
 					"cannot infer full etikett for assignment because parent assignment has more than one etiketten: %s",
-					a.parent.etiketten,
+					a.Parent.Etiketten,
 				)
 
 				return
@@ -284,8 +284,8 @@ func (a *assignment) expandedEtiketten() (es kennung.EtikettSet, err error) {
 	return
 }
 
-func (a *assignment) SubtractFromSet(es kennung.EtikettMutableSet) (err error) {
-	if err = a.etiketten.EachPtr(
+func (a *Assignment) SubtractFromSet(es kennung.EtikettMutableSet) (err error) {
+	if err = a.Etiketten.EachPtr(
 		func(e *kennung.Etikett) (err error) {
 			if err = es.EachPtr(
 				func(e1 *kennung.Etikett) (err error) {
@@ -307,21 +307,21 @@ func (a *assignment) SubtractFromSet(es kennung.EtikettMutableSet) (err error) {
 		return
 	}
 
-	if a.parent == nil {
+	if a.Parent == nil {
 		return
 	}
 
-	return a.parent.SubtractFromSet(es)
+	return a.Parent.SubtractFromSet(es)
 }
 
-func (a *assignment) Contains(e *kennung.Etikett) bool {
-	if a.etiketten.ContainsKey(e.String()) {
+func (a *Assignment) Contains(e *kennung.Etikett) bool {
+	if a.Etiketten.ContainsKey(e.String()) {
 		return true
 	}
 
-	if a.parent == nil {
+	if a.Parent == nil {
 		return false
 	}
 
-	return a.parent.Contains(e)
+	return a.Parent.Contains(e)
 }

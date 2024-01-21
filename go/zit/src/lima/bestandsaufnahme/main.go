@@ -3,12 +3,12 @@ package bestandsaufnahme
 import (
 	"fmt"
 	"io"
+	"sort"
 	"sync"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/bravo/pool"
@@ -361,15 +361,9 @@ func (s *store) WriteOneObjekteMetadatei(o *sku.Transacted) (err error) {
 
 	wg.Do(
 		func() (err error) {
-			p := id.Path(o.Metadatei.Sha(), s.standort.DirVerzeichnisseMetadateiKennungMutter())
-
-			if files.Exists(p) {
-				return
-			}
-
 			var sw sha.WriteCloser
 
-			if sw, err = s.standort.AkteWriterTo(
+			if sw, err = s.standort.AkteWriterToLight(
 				s.standort.DirVerzeichnisseMetadateiKennungMutter(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -382,6 +376,18 @@ func (s *store) WriteOneObjekteMetadatei(o *sku.Transacted) (err error) {
 
 			if _, err = fo.WriteMetadateiTo(sw, o); err != nil {
 				err = errors.Wrap(err)
+				return
+			}
+
+			actual := sw.GetShaLike()
+
+			if !o.Metadatei.Sha().EqualsSha(actual) {
+				err = errors.Errorf(
+					"expected %q but got %q",
+					o.Metadatei.Sha(),
+					actual,
+				)
+
 				return
 			}
 
@@ -666,6 +672,34 @@ func (s *store) ReadAll(
 	); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	return
+}
+
+func (s *store) ReadAllSorted(
+	f schnittstellen.FuncIter[*sku.Transacted],
+) (err error) {
+	var skus []*sku.Transacted
+
+	if err = s.ReadAll(
+		func(o *sku.Transacted) (err error) {
+			skus = append(skus, o)
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	sort.Slice(skus, func(i, j int) bool { return skus[i].Less(skus[j]) })
+
+	for _, o := range skus {
+		if err = f(o); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

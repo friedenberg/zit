@@ -27,10 +27,10 @@ func (f *Factory) Make() (ot *Text, err error) {
 func (atc *Factory) makeWithMetadatei() (ot *Text, err error) {
 	ot = &Text{
 		Options:    atc.Options,
-		assignment: newAssignment(0),
+		Assignment: newAssignment(0),
 	}
 
-	ot.isRoot = true
+	ot.IsRoot = true
 
 	ot.EtikettSet = atc.rootEtiketten
 	ot.Metadatei.Typ = atc.Typ
@@ -39,8 +39,8 @@ func (atc *Factory) makeWithMetadatei() (ot *Text, err error) {
 	atc.Transacted.Each(prefixSet.Add)
 
 	for _, e := range iter.Elements[kennung.Etikett](atc.ExtraEtiketten) {
-		ee := newAssignment(ot.Depth() + 1)
-		ee.etiketten = kennung.MakeEtikettSet(e)
+		ee := newAssignment(ot.GetDepth() + 1)
+		ee.Etiketten = kennung.MakeEtikettSet(e)
 		ot.addChild(ee)
 
 		segments := prefixSet.Subset(e)
@@ -55,8 +55,8 @@ func (atc *Factory) makeWithMetadatei() (ot *Text, err error) {
 		prefixSet = prefixSet.Subtract(used)
 	}
 
-	if _, err = atc.makeChildren(ot.assignment, prefixSet, atc.GroupingEtiketten); err != nil {
-		err = errors.Wrapf(err, "Assignment: %#v", ot.assignment)
+	if _, err = atc.makeChildren(ot.Assignment, prefixSet, atc.GroupingEtiketten); err != nil {
+		err = errors.Wrapf(err, "Assignment: %#v", ot.Assignment)
 		return
 	}
 
@@ -75,15 +75,15 @@ func (f Factory) makeWithoutMetadatei() (ot *Text, err error) {
 
 	ot = &Text{
 		Options:    f.Options,
-		assignment: newAssignment(0),
+		Assignment: newAssignment(0),
 		Metadatei: Metadatei{
 			EtikettSet: kennung.MakeEtikettSet(),
 		},
 	}
 
-	ot.isRoot = true
+	ot.IsRoot = true
 
-	var as []*assignment
+	var as []*Assignment
 	as, err = f.Options.assignmentTreeConstructor().Assignments()
 
 	if err != nil {
@@ -104,7 +104,7 @@ func (f Factory) makeWithoutMetadatei() (ot *Text, err error) {
 }
 
 func (atc Factory) makeChildren(
-	parent *assignment,
+	parent *Assignment,
 	prefixSet objekte_collections.SetPrefixVerzeichnisse,
 	groupingEtiketten kennung.Slice,
 ) (used objekte_collections.MutableSetMetadateiWithKennung, err error) {
@@ -126,7 +126,7 @@ func (atc Factory) makeChildren(
 					return
 				}
 
-				parent.named.Add(z)
+				parent.Named.Add(z)
 
 				return
 			},
@@ -155,7 +155,7 @@ func (atc Factory) makeChildren(
 				return
 			}
 
-			parent.named.Add(z)
+			parent.Named.Add(z)
 
 			return
 		},
@@ -169,25 +169,25 @@ func (atc Factory) makeChildren(
 	if err = segments.Grouped.Each(
 		func(e kennung.Etikett, zs objekte_collections.MutableSetMetadateiWithKennung) (err error) {
 			if atc.UsePrefixJoints {
-				if parent.etiketten.Len() > 1 {
+				if parent.Etiketten.Len() > 1 {
 				} else {
 					prefixJoint := kennung.MakeEtikettSet(groupingEtiketten[0])
 
-					var intermediate, lastChild *assignment
+					var intermediate, lastChild *Assignment
 
-					if len(parent.children) > 0 {
-						lastChild = parent.children[len(parent.children)-1]
+					if len(parent.Children) > 0 {
+						lastChild = parent.Children[len(parent.Children)-1]
 					}
 
-					if lastChild != nil && (iter.SetEqualsPtr[kennung.Etikett, *kennung.Etikett](lastChild.etiketten, prefixJoint) || lastChild.etiketten.Len() == 0) {
+					if lastChild != nil && (iter.SetEqualsPtr[kennung.Etikett, *kennung.Etikett](lastChild.Etiketten, prefixJoint) || lastChild.Etiketten.Len() == 0) {
 						intermediate = lastChild
 					} else {
-						intermediate = newAssignment(parent.Depth() + 1)
-						intermediate.etiketten = prefixJoint
+						intermediate = newAssignment(parent.GetDepth() + 1)
+						intermediate.Etiketten = prefixJoint
 						parent.addChild(intermediate)
 					}
 
-					child := newAssignment(intermediate.Depth() + 1)
+					child := newAssignment(intermediate.GetDepth() + 1)
 
 					var ls kennung.Etikett
 					b := groupingEtiketten[0]
@@ -201,7 +201,7 @@ func (atc Factory) makeChildren(
 						return
 					}
 
-					child.etiketten = kennung.MakeEtikettSet(ls)
+					child.Etiketten = kennung.MakeEtikettSet(ls)
 
 					nextGroupingEtiketten := kennung.MakeSlice()
 
@@ -225,8 +225,8 @@ func (atc Factory) makeChildren(
 					intermediate.addChild(child)
 				}
 			} else {
-				child := newAssignment(parent.Depth() + 1)
-				child.etiketten = kennung.MakeEtikettSet(e)
+				child := newAssignment(parent.GetDepth() + 1)
+				child.Etiketten = kennung.MakeEtikettSet(e)
 
 				nextGroupingEtiketten := kennung.MakeSlice()
 
@@ -256,12 +256,12 @@ func (atc Factory) makeChildren(
 		return
 	}
 
-	sort.Slice(parent.children, func(i, j int) bool {
+	sort.Slice(parent.Children, func(i, j int) bool {
 		vi := iter.StringCommaSeparated[kennung.Etikett](
-			parent.children[i].etiketten,
+			parent.Children[i].Etiketten,
 		)
 		vj := iter.StringCommaSeparated[kennung.Etikett](
-			parent.children[j].etiketten,
+			parent.Children[j].Etiketten,
 		)
 		return vi < vj
 	})

@@ -28,8 +28,12 @@ func (s *Store) handleNewOrUpdated(
 	)
 }
 
-func (s *Store) addMutterIfNecessary(sk *sku.Transacted) (err error) {
-	if !sk.Metadatei.Mutter().IsNull() {
+func (s *Store) addMutterIfNecessary(
+	sk *sku.Transacted,
+	ut objekte_mode.Mode,
+) (err error) {
+	if !sk.Metadatei.Mutter().IsNull() ||
+		!ut.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
 		return
 	}
 
@@ -70,7 +74,7 @@ func (s *Store) handleNewOrUpdatedCommit(
 		}
 	}
 
-	if err = s.addMutterIfNecessary(t); err != nil {
+	if err = s.addMutterIfNecessary(t, mode); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

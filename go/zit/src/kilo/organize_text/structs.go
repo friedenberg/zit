@@ -35,6 +35,27 @@ func makeObj(
 		}
 	}
 
+	if err = z.removeEtikettenIfNecessary(options); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (o *obj) removeEtikettenIfNecessary(
+	options erworben_cli_print_options.PrintOptions,
+) (err error) {
+	if options.PrintEtikettenAlways {
+		return
+	}
+
+	if o.Sku.Metadatei.Bezeichnung.IsEmpty() {
+		return
+	}
+
+	o.Sku.Metadatei.GetEtikettenMutable().Reset()
+
 	return
 }
 

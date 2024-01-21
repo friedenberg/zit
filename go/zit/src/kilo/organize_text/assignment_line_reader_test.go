@@ -87,11 +87,11 @@ func TestAssignmentLineReaderOneHeadingNoZettels(t1 *testing.T) {
 	{
 		expected := kennung.MakeEtikettSet(kennung.MustEtikett("wow"))
 
-		if len(sub.root.children) < 1 {
+		if len(sub.root.Children) < 1 {
 			t.Fatalf("expected exactly 1 child")
 		}
 
-		actual := sub.root.children[0].etiketten
+		actual := sub.root.Children[0].Etiketten
 
 		if !kennung.EtikettSetEquals(
 			actual,
@@ -126,7 +126,7 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 
 	{
 		expected := kennung.MakeEtikettSet(kennung.MustEtikett("wow"))
-		actual := sub.root.children[0].etiketten
+		actual := sub.root.Children[0].Etiketten
 
 		if !kennung.EtikettSetEquals(
 			actual,
@@ -141,7 +141,7 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
 		expected.Add(makeObjWithHinAndBez(t, "dos/wow", "two/wow"))
 
-		actual := sub.root.children[0].named
+		actual := sub.root.Children[0].Named
 
 		if !iter.SetEquals[*obj](
 			actual,
@@ -178,7 +178,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 
 	{
 		expected := kennung.MakeEtikettSet(kennung.MustEtikett("wow"))
-		actual := sub.root.children[0].etiketten
+		actual := sub.root.Children[0].Etiketten
 
 		if !kennung.EtikettSetEquals(
 			actual,
@@ -191,17 +191,17 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 	{
 		expected := kennung.MakeEtikettSet(kennung.MustEtikett("sub-wow"))
 
-		if sub.root != sub.root.children[0].parent {
-			t.Fatalf("%v, %v", sub.root, sub.root.children[0].parent)
+		if sub.root != sub.root.Children[0].Parent {
+			t.Fatalf("%v, %v", sub.root, sub.root.Children[0].Parent)
 		}
 
-		l := len(sub.root.children[0].children)
+		l := len(sub.root.Children[0].Children)
 
 		if l != 1 {
 			t.Fatalf("\nexpected: %d\n  actual: %d", 1, l)
 		}
 
-		actual := sub.root.children[0].children[0].etiketten
+		actual := sub.root.Children[0].Children[0].Etiketten
 
 		if !kennung.EtikettSetEquals(
 			actual,
@@ -216,7 +216,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 		expected.Add(makeObjWithHinAndBez(t.T, "one/wow", "uno"))
 		expected.Add(makeObjWithHinAndBez(t.T, "dos/wow", "two/wow"))
 
-		actual := sub.root.children[0].children[0].named
+		actual := sub.root.Children[0].Children[0].Named
 
 		if !iter.SetEquals[*obj](
 			actual,
@@ -261,7 +261,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 
 	{
 		expected := kennung.MakeEtikettSet(kennung.MustEtikett("wow"))
-		actual := sub.root.children[0].etiketten
+		actual := sub.root.Children[0].Etiketten
 
 		if !kennung.EtikettSetEquals(
 			actual,
@@ -274,12 +274,12 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	{
 		expected := kennung.MakeEtikettSet(kennung.MustEtikett("sub-wow"))
 
-		l := len(sub.root.children[0].children)
+		l := len(sub.root.Children[0].Children)
 		if l != 1 {
 			t1.Fatalf("\nexpected: %d\n  actual: %d", 1, l)
 		}
 
-		actual := sub.root.children[0].children[0].etiketten
+		actual := sub.root.Children[0].Children[0].Etiketten
 
 		if !kennung.EtikettSetEquals(
 			actual,
@@ -291,7 +291,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 
 	{
 		expected := kennung.MakeEtikettSet(kennung.MustEtikett("cow"))
-		actual := sub.root.children[1].etiketten
+		actual := sub.root.Children[1].Etiketten
 
 		if !kennung.EtikettSetEquals(
 			actual,
@@ -306,7 +306,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
 		expected.Add(makeObjWithHinAndBez(t, "dos/wow", "two/wow"))
 
-		actual := sub.root.children[0].named
+		actual := sub.root.Children[0].Named
 
 		if !iter.SetEquals[*obj](actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
@@ -318,7 +318,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
 		expected.Add(makeObjWithHinAndBez(t, "dos/wow", "two/wow"))
 
-		actual := sub.root.children[1].named
+		actual := sub.root.Children[1].Named
 
 		if !iter.SetEquals[*obj](actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
@@ -359,7 +359,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 
 	{
 		expected := kennung.MakeEtikettSet(kennung.MustEtikett("sub-wow"))
-		actual := sub.root.children[0].etiketten
+		actual := sub.root.Children[0].Etiketten
 
 		if !kennung.EtikettSetEquals(actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
@@ -369,13 +369,13 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 	{
 		expected := kennung.MakeEtikettSet(kennung.MustEtikett("sub-cow"))
 
-		l := len(sub.root.children)
+		l := len(sub.root.Children)
 		expLen := 2
 		if l != expLen {
 			t1.Fatalf("\nexpected: %d\n  actual: %d", expLen, l)
 		}
 
-		actual := sub.root.children[1].etiketten
+		actual := sub.root.Children[1].Etiketten
 
 		if !kennung.EtikettSetEquals(actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
@@ -387,7 +387,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 		expected.Add(makeObjWithHinAndBez(t, "four/wow", "quatro"))
 		expected.Add(makeObjWithHinAndBez(t, "three/wow", "tres"))
 
-		actual := sub.root.children[0].named
+		actual := sub.root.Children[0].Named
 
 		if !iter.SetEquals[*obj](actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
@@ -399,7 +399,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
 		expected.Add(makeObjWithHinAndBez(t, "dos/wow", "two/wow"))
 
-		actual := sub.root.children[1].named
+		actual := sub.root.Children[1].Named
 
 		if !iter.SetEquals[*obj](actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
@@ -439,7 +439,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// `# task
 	{
 		expected := kennung.MakeEtikettSet(kennung.MustEtikett("task"))
-		actual := sub.root.children[0].etiketten
+		actual := sub.root.Children[0].Etiketten
 
 		if !kennung.EtikettSetEquals(actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
@@ -453,7 +453,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
 		expected.Add(makeObjWithHinAndBez(t, "two/wow", "dos/wow"))
 
-		actual := sub.root.children[0].named
+		actual := sub.root.Children[0].Named
 
 		if !iter.SetEquals[*obj](actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
@@ -465,12 +465,12 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 		expected := kennung.MakeEtikettSet(kennung.MustEtikett("priority-1"))
 
 		e := 2
-		l := len(sub.root.children[0].children)
+		l := len(sub.root.Children[0].Children)
 		if l != e {
 			t1.Fatalf("\nexpected: %d\n  actual: %d", e, l)
 		}
 
-		actual := sub.root.children[0].children[0].etiketten
+		actual := sub.root.Children[0].Children[0].Etiketten
 
 		if !kennung.EtikettSetEquals(actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
@@ -480,7 +480,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// ### w-2022-07-09
 	{
 		expected := kennung.MakeEtikettSet(kennung.MustEtikett("w-2022-07-09"))
-		actual := sub.root.children[0].children[0].children[0].etiketten
+		actual := sub.root.Children[0].Children[0].Children[0].Etiketten
 
 		if !kennung.EtikettSetEquals(actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
@@ -492,7 +492,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 		expected := collections_value.MakeMutableValueSet[*obj](nil)
 		expected.Add(makeObjWithHinAndBez(t, "three/wow", "tres"))
 
-		actual := sub.root.children[0].children[0].children[0].named
+		actual := sub.root.Children[0].Children[0].Children[0].Named
 
 		if !iter.SetEquals[*obj](actual, expected) {
 			t1.Errorf("\nexpected: %q\n  actual: %q", expected, actual)
@@ -505,7 +505,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 		expected := collections_value.MakeMutableValueSet[*obj](nil)
 		expected.Add(makeObjWithHinAndBez(t, "four/wow", "quatro"))
 
-		actual := sub.root.children[0].children[0].named
+		actual := sub.root.Children[0].Children[0].Named
 
 		if !iter.SetEquals[*obj](actual, expected) {
 			t1.Errorf("\nexpected: %q\n  actual: %q", expected, actual)
@@ -521,7 +521,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 		expected.Add(makeObjWithHinAndBez(t, "five/wow", "cinco"))
 		expected.Add(makeObjWithHinAndBez(t, "six/wow", "seis"))
 
-		actual := sub.root.children[0].children[1].named
+		actual := sub.root.Children[0].Children[1].Named
 
 		if !iter.SetEquals[*obj](actual, expected) {
 			t1.Errorf("\nexpected: %q\n  actual: %q", expected, actual)

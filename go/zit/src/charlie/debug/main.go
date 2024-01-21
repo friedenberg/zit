@@ -2,12 +2,16 @@ package debug
 
 import (
 	"os"
+	"os/signal"
+	"runtime"
 	"runtime/debug"
 	"runtime/pprof"
 	"runtime/trace"
+	"syscall"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/files"
+	"github.com/friedenberg/zit/src/bravo/log"
 )
 
 type Context struct {
@@ -41,6 +45,17 @@ func MakeContext(options Options) (c *Context, err error) {
 	if options.GCDisabled {
 		debug.SetGCPercent(-1)
 	}
+
+	ch := make(chan os.Signal, 1)
+
+	signal.Notify(ch, syscall.SIGINT)
+
+	go func() {
+		<-ch
+		log.Err().Print("SIGINT")
+		c.Close()
+		runtime.Goexit()
+	}()
 
 	return
 }

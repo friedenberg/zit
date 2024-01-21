@@ -136,6 +136,27 @@ func (s Standort) AkteWriterTo(p string) (w sha.WriteCloser, err error) {
 	return
 }
 
+func (s Standort) AkteWriterToLight(p string) (w sha.WriteCloser, err error) {
+	var outer Writer
+
+	mo := MoveOptions{
+		Age:                      s.age,
+		FinalPath:                p,
+		GenerateFinalPathFromSha: true,
+		LockFile:                 s.angeboren.LockInternalFiles,
+		CompressionType:          s.angeboren.CompressionType,
+	}
+
+	if outer, err = s.NewMoverLight(mo); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	w = outer
+
+	return
+}
+
 func (s Standort) AkteWriter() (w sha.WriteCloser, err error) {
 	var p string
 

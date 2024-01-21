@@ -97,7 +97,7 @@ func (in *Text) ToCompareMap() (out CompareMap, err error) {
 	return
 }
 
-func (a *assignment) addToCompareMap(
+func (a *Assignment) addToCompareMap(
 	ot *Text,
 	m Metadatei,
 	es kennung.EtikettSet,
@@ -115,7 +115,7 @@ func (a *assignment) addToCompareMap(
 	es1.Each(mes.Add)
 	es = mes.CloneSetPtrLike()
 
-	if err = a.named.Each(
+	if err = a.Named.Each(
 		func(z *obj) (err error) {
 			if z.Sku.Kennung.String() == "" {
 				panic(fmt.Sprintf("%s: Kennung is nil", z))
@@ -156,7 +156,7 @@ func (a *assignment) addToCompareMap(
 		return
 	}
 
-	if err = a.unnamed.Each(
+	if err = a.Unnamed.Each(
 		func(z *obj) (err error) {
 			out.Unnamed.Add(
 				z.Sku.Metadatei.Bezeichnung.String(),
@@ -208,7 +208,7 @@ func (a *assignment) addToCompareMap(
 		return
 	}
 
-	for _, c := range a.children {
+	for _, c := range a.Children {
 		if err = c.addToCompareMap(ot, m, es, out); err != nil {
 			err = errors.Wrap(err)
 			return

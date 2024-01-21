@@ -14,11 +14,11 @@ type AssignmentTreeConstructor struct {
 	Options
 }
 
-func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment, err error) {
-	roots = make([]*assignment, 0, 1+atc.ExtraEtiketten.Len())
+func (atc *AssignmentTreeConstructor) Assignments() (roots []*Assignment, err error) {
+	roots = make([]*Assignment, 0, 1+atc.ExtraEtiketten.Len())
 
 	root := newAssignment(0)
-	root.etiketten = atc.rootEtiketten
+	root.Etiketten = atc.rootEtiketten
 	roots = append(roots, root)
 
 	prefixSet := objekte_collections.MakeSetPrefixVerzeichnisse(0)
@@ -43,7 +43,7 @@ func (atc *AssignmentTreeConstructor) Assignments() (roots []*assignment, err er
 }
 
 func (atc AssignmentTreeConstructor) makeChildren(
-	parent *assignment,
+	parent *Assignment,
 	prefixSet objekte_collections.SetPrefixVerzeichnisse,
 	groupingEtiketten kennung.Slice,
 ) (err error) {
@@ -61,7 +61,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 					return
 				}
 
-				parent.named.Add(z)
+				parent.Named.Add(z)
 
 				return
 			},
@@ -90,7 +90,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 				return
 			}
 
-			parent.named.Add(z)
+			parent.Named.Add(z)
 
 			return
 		},
@@ -104,25 +104,25 @@ func (atc AssignmentTreeConstructor) makeChildren(
 	segments.Grouped.Each(
 		func(e kennung.Etikett, zs objekte_collections.MutableSetMetadateiWithKennung) (err error) {
 			if atc.UsePrefixJoints {
-				if parent.etiketten != nil && parent.etiketten.Len() > 1 {
+				if parent.Etiketten != nil && parent.Etiketten.Len() > 1 {
 				} else {
 					prefixJoint := kennung.MakeEtikettSet(groupingEtiketten[0])
 
-					var intermediate, lastChild *assignment
+					var intermediate, lastChild *Assignment
 
-					if len(parent.children) > 0 {
-						lastChild = parent.children[len(parent.children)-1]
+					if len(parent.Children) > 0 {
+						lastChild = parent.Children[len(parent.Children)-1]
 					}
 
-					if lastChild != nil && iter.SetEqualsPtr[kennung.Etikett, *kennung.Etikett](lastChild.etiketten, prefixJoint) {
+					if lastChild != nil && iter.SetEqualsPtr[kennung.Etikett, *kennung.Etikett](lastChild.Etiketten, prefixJoint) {
 						intermediate = lastChild
 					} else {
-						intermediate = newAssignment(parent.Depth() + 1)
-						intermediate.etiketten = prefixJoint
+						intermediate = newAssignment(parent.GetDepth() + 1)
+						intermediate.Etiketten = prefixJoint
 						parent.addChild(intermediate)
 					}
 
-					child := newAssignment(intermediate.Depth() + 1)
+					child := newAssignment(intermediate.GetDepth() + 1)
 
 					var ls kennung.Etikett
 
@@ -131,7 +131,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 						return
 					}
 
-					child.etiketten = kennung.MakeEtikettSet(ls)
+					child.Etiketten = kennung.MakeEtikettSet(ls)
 
 					nextGroupingEtiketten := kennung.MakeSlice()
 
@@ -151,8 +151,8 @@ func (atc AssignmentTreeConstructor) makeChildren(
 					intermediate.addChild(child)
 				}
 			} else {
-				child := newAssignment(parent.Depth() + 1)
-				child.etiketten = kennung.MakeEtikettSet(e)
+				child := newAssignment(parent.GetDepth() + 1)
+				child.Etiketten = kennung.MakeEtikettSet(e)
 
 				nextGroupingEtiketten := kennung.MakeSlice()
 
@@ -175,12 +175,12 @@ func (atc AssignmentTreeConstructor) makeChildren(
 		},
 	)
 
-	sort.Slice(parent.children, func(i, j int) bool {
+	sort.Slice(parent.Children, func(i, j int) bool {
 		vi := iter.StringCommaSeparated[kennung.Etikett](
-			parent.children[i].etiketten,
+			parent.Children[i].Etiketten,
 		)
 		vj := iter.StringCommaSeparated[kennung.Etikett](
-			parent.children[j].etiketten,
+			parent.Children[j].Etiketten,
 		)
 		return vi < vj
 	})

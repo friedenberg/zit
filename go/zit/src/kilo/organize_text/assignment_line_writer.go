@@ -24,7 +24,7 @@ type assignmentLineWriter struct {
 	stringFormatWriter  schnittstellen.StringFormatWriter[*sku.Transacted]
 }
 
-func (av assignmentLineWriter) write(a *assignment) (err error) {
+func (av assignmentLineWriter) write(a *Assignment) (err error) {
 	if av.RightAlignedIndents {
 		return av.writeRightAligned(a)
 	} else {
@@ -32,31 +32,31 @@ func (av assignmentLineWriter) write(a *assignment) (err error) {
 	}
 }
 
-func (av assignmentLineWriter) writeNormal(a *assignment) (err error) {
+func (av assignmentLineWriter) writeNormal(a *Assignment) (err error) {
 	tab_prefix := ""
 
-	if a.Depth() == 0 && !av.OmitLeadingEmptyLine {
+	if a.GetDepth() == 0 && !av.OmitLeadingEmptyLine {
 		av.WriteExactlyOneEmpty()
-	} else if a.Depth() < 0 {
-		err = errors.Errorf("negative depth: %d", a.Depth())
+	} else if a.GetDepth() < 0 {
+		err = errors.Errorf("negative depth: %d", a.GetDepth())
 		return
 	} else {
-		tab_prefix = strings.Repeat(" ", a.Depth()*2-(a.Depth())-1)
+		tab_prefix = strings.Repeat(" ", a.GetDepth()*2-(a.GetDepth())-1)
 	}
 
-	if a.etiketten.Len() > 0 {
+	if a.Etiketten.Len() > 0 {
 		av.WriteLines(
 			fmt.Sprintf(
 				"%s%s %s",
 				tab_prefix,
-				strings.Repeat("#", a.Depth()),
-				iter.StringCommaSeparated[kennung.Etikett](a.etiketten),
+				strings.Repeat("#", a.GetDepth()),
+				iter.StringCommaSeparated[kennung.Etikett](a.Etiketten),
 			),
 		)
 		av.WriteExactlyOneEmpty()
 	}
 
-	for _, z := range sortObjSet(a.unnamed) {
+	for _, z := range sortObjSet(a.Unnamed) {
 		av.WriteLines(
 			fmt.Sprintf("%s- %s", tab_prefix, z.Sku.Metadatei.Bezeichnung),
 		)
@@ -65,7 +65,7 @@ func (av assignmentLineWriter) writeNormal(a *assignment) (err error) {
 	cursor := sku.GetTransactedPool().Get()
 	defer sku.GetTransactedPool().Put(cursor)
 
-	for _, z := range sortObjSet(a.named) {
+	for _, z := range sortObjSet(a.Named) {
 		var sb strings.Builder
 
 		sb.WriteString(tab_prefix)
@@ -82,11 +82,11 @@ func (av assignmentLineWriter) writeNormal(a *assignment) (err error) {
 		av.WriteStringers(&sb)
 	}
 
-	if a.named.Len() > 0 || a.unnamed.Len() > 0 {
+	if a.Named.Len() > 0 || a.Unnamed.Len() > 0 {
 		av.WriteExactlyOneEmpty()
 	}
 
-	for _, c := range a.children {
+	for _, c := range a.Children {
 		av.write(c)
 	}
 
@@ -95,7 +95,7 @@ func (av assignmentLineWriter) writeNormal(a *assignment) (err error) {
 	return
 }
 
-func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
+func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 	spaceCount := av.maxDepth
 
 	kopfUndSchwanz := av.maxKopf + av.maxSchwanz
@@ -110,15 +110,15 @@ func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 
 	tab_prefix := strings.Repeat(" ", spaceCount+1)
 
-	if a.Depth() == 0 && !av.OmitLeadingEmptyLine {
+	if a.GetDepth() == 0 && !av.OmitLeadingEmptyLine {
 		av.WriteExactlyOneEmpty()
-	} else if a.Depth() < 0 {
-		err = errors.Errorf("negative depth: %d", a.Depth())
+	} else if a.GetDepth() < 0 {
+		err = errors.Errorf("negative depth: %d", a.GetDepth())
 		return
 	}
 
-	if a.etiketten != nil && a.etiketten.Len() > 0 {
-		sharps := strings.Repeat("#", a.Depth())
+	if a.Etiketten != nil && a.Etiketten.Len() > 0 {
+		sharps := strings.Repeat("#", a.GetDepth())
 		alignmentSpacing := strings.Repeat(" ", a.AlignmentSpacing())
 
 		av.WriteLines(
@@ -127,13 +127,13 @@ func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 				tab_prefix[len(sharps)-1:],
 				sharps,
 				alignmentSpacing,
-				iter.StringCommaSeparated[kennung.Etikett](a.etiketten),
+				iter.StringCommaSeparated[kennung.Etikett](a.Etiketten),
 			),
 		)
 		av.WriteExactlyOneEmpty()
 	}
 
-	for _, z := range sortObjSet(a.unnamed) {
+	for _, z := range sortObjSet(a.Unnamed) {
 		av.WriteLines(
 			fmt.Sprintf("- %s%s", tab_prefix, z.Sku.Metadatei.Bezeichnung),
 		)
@@ -142,7 +142,7 @@ func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 	cursor := sku.GetTransactedPool().Get()
 	defer sku.GetTransactedPool().Put(cursor)
 
-	for _, z := range sortObjSet(a.named) {
+	for _, z := range sortObjSet(a.Named) {
 		var sb strings.Builder
 
 		sb.WriteString("- ")
@@ -164,11 +164,11 @@ func (av assignmentLineWriter) writeRightAligned(a *assignment) (err error) {
 		av.WriteStringers(&sb)
 	}
 
-	if a.named.Len() > 0 || a.unnamed.Len() > 0 {
+	if a.Named.Len() > 0 || a.Unnamed.Len() > 0 {
 		av.WriteExactlyOneEmpty()
 	}
 
-	for _, c := range a.children {
+	for _, c := range a.Children {
 		av.write(c)
 	}
 

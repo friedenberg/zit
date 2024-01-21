@@ -4,7 +4,6 @@ import (
 	"io"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/kilo/organize_text"
 	"github.com/friedenberg/zit/src/oscar/umwelt"
 )
@@ -33,23 +32,6 @@ func (c CreateOrganizeFile) RunAndWrite(
 }
 
 func (c CreateOrganizeFile) Run() (results *organize_text.Text, err error) {
-	if !c.IncludeEtikettenInBrackets {
-		if err = c.Transacted.Each(
-			func(sk *sku.Transacted) (err error) {
-				if sk.Metadatei.Bezeichnung.IsEmpty() {
-					return
-				}
-
-				sk.Metadatei.GetEtikettenMutable().Reset()
-
-				return
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
 	if results, err = organize_text.New(c.Options); err != nil {
 		err = errors.Wrap(err)
 		return

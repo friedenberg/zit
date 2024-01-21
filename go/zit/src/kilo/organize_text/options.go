@@ -39,11 +39,10 @@ type Options struct {
 
 	Expanders kennung.Abbr
 
-	UsePrefixJoints            bool
-	UseRightAlignedIndents     bool
-	UseRefiner                 bool
-	UseMetadateiHeader         bool
-	IncludeEtikettenInBrackets bool
+	UsePrefixJoints        bool
+	UseRightAlignedIndents bool
+	UseRefiner             bool
+	UseMetadateiHeader     bool
 
 	PrintOptions       erworben_cli_print_options.PrintOptions
 	organize           sku_fmt.Organize
@@ -112,13 +111,6 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 		"metadatei-header",
 		true,
 		"metadatei header",
-	)
-
-	f.BoolVar(
-		&o.IncludeEtikettenInBrackets,
-		"include-etiketten",
-		false,
-		"include etiketten between brackets",
 	)
 }
 

@@ -15,8 +15,8 @@ import (
 type assignmentLineReader struct {
 	options            Options
 	lineNo             int
-	root               *assignment
-	currentAssignment  *assignment
+	root               *Assignment
+	currentAssignment  *Assignment
 	stringFormatReader catgut.StringFormatReader[*sku.Transacted]
 }
 
@@ -118,14 +118,14 @@ func (ar *assignmentLineReader) readOneHeading(
 		return
 	}
 
-	var newAssignment *assignment
+	var newAssignment *Assignment
 
-	if depth < ar.currentAssignment.depth {
+	if depth < ar.currentAssignment.Depth {
 		newAssignment, err = ar.readOneHeadingLesserDepth(
 			depth,
 			currentEtiketten,
 		)
-	} else if depth == ar.currentAssignment.depth {
+	} else if depth == ar.currentAssignment.Depth {
 		newAssignment, err = ar.readOneHeadingEqualDepth(depth, currentEtiketten)
 	} else {
 		// always use currentEtiketten.depth + 1 because it corrects movements
@@ -155,8 +155,8 @@ func (ar *assignmentLineReader) readOneHeading(
 func (ar *assignmentLineReader) readOneHeadingLesserDepth(
 	d int,
 	e kennung.EtikettSet,
-) (newCurrent *assignment, err error) {
-	depthDiff := d - ar.currentAssignment.Depth()
+) (newCurrent *Assignment, err error) {
+	depthDiff := d - ar.currentAssignment.GetDepth()
 
 	if newCurrent, err = ar.currentAssignment.nthParent(depthDiff - 1); err != nil {
 		err = errors.Wrap(err)
@@ -179,7 +179,7 @@ func (ar *assignmentLineReader) readOneHeadingLesserDepth(
 		// # zz-inbox
 		// `
 		assignment := newAssignment(d)
-		assignment.etiketten = e.CloneSetPtrLike()
+		assignment.Etiketten = e.CloneSetPtrLike()
 		newCurrent.addChild(assignment)
 		// logz.Print("adding to parent")
 		// logz.Print("child", assignment.etiketten)
@@ -193,7 +193,7 @@ func (ar *assignmentLineReader) readOneHeadingLesserDepth(
 func (ar *assignmentLineReader) readOneHeadingEqualDepth(
 	d int,
 	e kennung.EtikettSet,
-) (newCurrent *assignment, err error) {
+) (newCurrent *Assignment, err error) {
 	// logz.Print("depth count is ==")
 
 	if newCurrent, err = ar.currentAssignment.nthParent(1); err != nil {
@@ -217,7 +217,7 @@ func (ar *assignmentLineReader) readOneHeadingEqualDepth(
 		// ## priority-2
 		// `
 		assignment := newAssignment(d)
-		assignment.etiketten = e.CloneSetPtrLike()
+		assignment.Etiketten = e.CloneSetPtrLike()
 		newCurrent.addChild(assignment)
 		newCurrent = assignment
 	}
@@ -228,7 +228,7 @@ func (ar *assignmentLineReader) readOneHeadingEqualDepth(
 func (ar *assignmentLineReader) readOneHeadingGreaterDepth(
 	d int,
 	e kennung.EtikettSet,
-) (newCurrent *assignment, err error) {
+) (newCurrent *Assignment, err error) {
 	// logz.Print("depth count is >")
 	// logz.Print(e)
 
@@ -250,7 +250,7 @@ func (ar *assignmentLineReader) readOneHeadingGreaterDepth(
 		// ### priority-2
 		// `
 		assignment := newAssignment(d)
-		assignment.etiketten = e.CloneSetPtrLike()
+		assignment.Etiketten = e.CloneSetPtrLike()
 		newCurrent.addChild(assignment)
 		// logz.Print("adding to parent")
 		// logz.Print("child", assignment)
@@ -277,9 +277,9 @@ func (ar *assignmentLineReader) readOneObj(r *catgut.RingBuffer) (err error) {
 	}
 
 	if z.Sku.Kennung.IsEmpty() {
-		ar.currentAssignment.unnamed.Add(&z)
+		ar.currentAssignment.Unnamed.Add(&z)
 	} else {
-		ar.currentAssignment.named.Add(&z)
+		ar.currentAssignment.Named.Add(&z)
 	}
 
 	return
