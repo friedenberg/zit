@@ -15,7 +15,6 @@ cmd_def_organize=(
 	-prefix-joints=true
 	-refine=true
 	-new-organize=false
-	-include-etiketten
 )
 
 cat_organize() (

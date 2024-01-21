@@ -16,7 +16,6 @@ teardown() {
 
 cmd_def_organize=(
 	"${cmd_zit_def[@]}"
-	-include-etiketten
 )
 
 function organize_simple { # @test

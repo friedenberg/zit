@@ -5,22 +5,15 @@ import (
 	"io"
 	"os"
 
+	"github.com/friedenberg/zit/src/alfa/angeboren"
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/files"
 	"github.com/friedenberg/zit/src/bravo/id"
 	"github.com/friedenberg/zit/src/bravo/pool"
+	"github.com/friedenberg/zit/src/charlie/age"
+	"github.com/friedenberg/zit/src/charlie/sha"
 )
-
-type MoverLight struct {
-	buf *bytes.Buffer
-	Writer
-
-	basePath                  string
-	objektePath               string
-	lockFile                  bool
-	errorOnAttemptedOverwrite bool
-}
 
 var poolBuf schnittstellen.Pool[bytes.Buffer, *bytes.Buffer]
 
@@ -33,6 +26,18 @@ func init() {
 			b.Reset()
 		},
 	)
+}
+
+type MoverLight struct {
+	swc             sha.WriteCloser
+	buf             *bytes.Buffer
+	age             *age.Age
+	CompressionType angeboren.CompressionType
+
+	basePath                  string
+	objektePath               string
+	lockFile                  bool
+	errorOnAttemptedOverwrite bool
 }
 
 func (s Standort) NewMoverLight(o MoveOptions) (m *MoverLight, err error) {
@@ -49,37 +54,33 @@ func (s Standort) NewMoverLight(o MoveOptions) (m *MoverLight, err error) {
 
 	m.buf = poolBuf.Get()
 
-	wo := WriteOptions{
-		Age:             o.Age,
-		CompressionType: o.CompressionType,
-		Writer:          m.buf,
-	}
+	m.age = o.Age
+	m.CompressionType = o.CompressionType
 
-	if m.Writer, err = NewWriter(wo); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	m.swc = sha.MakeWriter(m.buf)
 
 	return
 }
 
+func (m *MoverLight) Write(p []byte) (n int, err error) {
+	return m.swc.Write(p)
+}
+
+func (m *MoverLight) ReadFrom(r io.Reader) (n int64, err error) {
+	return m.swc.ReadFrom(r)
+}
+
+func (m *MoverLight) GetShaLike() schnittstellen.ShaLike {
+	return m.swc.GetShaLike()
+}
+
 func (m *MoverLight) Close() (err error) {
-	if m.buf == nil {
-		err = errors.Errorf("nil buf")
-		return
-	}
+	defer poolBuf.Put(m.buf)
 
-	if m.Writer == nil {
-		err = errors.Errorf("nil objekte reader")
-		return
-	}
-
-	if err = m.Writer.Close(); err != nil {
+	if err = m.swc.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	defer poolBuf.Put(m.buf)
 
 	sh := m.GetShaLike()
 
@@ -113,9 +114,28 @@ func (m *MoverLight) Close() (err error) {
 		return
 	}
 
-	defer errors.DeferredCloser(&err, f)
+	var w Writer
 
-	if _, err = io.Copy(f, m.buf); err != nil {
+	if w, err = NewWriter(WriteOptions{
+		Age:             m.age,
+		CompressionType: m.CompressionType,
+		Writer:          f,
+	}); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, err = io.Copy(w, m.buf); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = w.Close(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = f.Close(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

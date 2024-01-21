@@ -50,6 +50,7 @@ func (w *writer) Write(p []byte) (n int, err error) {
 
 func (w *writer) Close() (err error) {
 	w.closed = true
+	w.setShaLikeIfNecessary()
 
 	if w.c == nil {
 		return
@@ -60,13 +61,11 @@ func (w *writer) Close() (err error) {
 		return
 	}
 
-	w.setShaLikeIfNecessary()
-
 	return
 }
 
 func (w *writer) setShaLikeIfNecessary() {
-	if !w.closed {
+	if w.h != nil {
 		errors.PanicIfError(w.sh.SetFromHash(w.h))
 
 		hash256Pool.Put(w.h)
