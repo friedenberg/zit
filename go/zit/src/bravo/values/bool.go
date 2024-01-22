@@ -9,13 +9,13 @@ import (
 
 type Bool struct {
 	wasSet bool
-	Value  bool
+	value  bool
 }
 
 func MakeBool(v bool) Bool {
 	return Bool{
 		wasSet: true,
-		Value:  v,
+		value:  v,
 	}
 }
 
@@ -35,19 +35,19 @@ func (sv *Bool) Set(v string) (err error) {
 
 func (sv *Bool) SetBool(v bool) {
 	sv.wasSet = true
-	sv.Value = v
+	sv.value = v
 }
 
 func (sv Bool) Bool() bool {
-	return sv.Value
+	return sv.value
 }
 
 func (sv Bool) String() string {
-	return fmt.Sprintf("%t", sv.Value)
+	return fmt.Sprintf("%t", sv.value)
 }
 
 func (a Bool) Equals(b Bool) bool {
-	return a.Value == b.Value && a.wasSet && b.wasSet
+	return a.value == b.value && a.wasSet && b.wasSet
 }
 
 func (a Bool) WasSet() bool {
@@ -55,19 +55,19 @@ func (a Bool) WasSet() bool {
 }
 
 func (a *Bool) Reset() {
-	a.Value = false
+	a.value = false
 	a.wasSet = false
 }
 
 func (a *Bool) ResetWith(b Bool) {
 	a.wasSet = true
-	a.Value = b.Value
+	a.value = b.value
 }
 
 func (a *Bool) MarshalBinary() ([]byte, error) {
 	b := uint8(0)
 
-	if a.Value {
+	if a.value {
 		b = 1
 	}
 
