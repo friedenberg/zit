@@ -91,10 +91,7 @@ func (m *MoverLight) Close() (err error) {
 			return
 		}
 
-		if m.objektePath, err = id.MakeDirIfNecessary(sh, m.basePath); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		m.objektePath = id.Path(sh, m.basePath)
 	}
 
 	if files.Exists(m.objektePath) {
@@ -109,7 +106,9 @@ func (m *MoverLight) Close() (err error) {
 
 	var f *os.File
 
-	if f, err = files.CreateExclusiveWriteOnly(m.objektePath); err != nil {
+	if f, err = files.CreateExclusiveWriteOnlyAndMaybeMakeDir(
+		m.objektePath,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -20,11 +20,42 @@ type CommitOrganizeFile struct {
 
 type CommitOrganizeFileResults struct{}
 
+func (c CommitOrganizeFile) ApplyToText(
+	u *umwelt.Umwelt,
+	t *organize_text.Text,
+) (err error) {
+	if u.Konfig().PrintOptions.PrintEtikettenAlways {
+		return
+	}
+
+	if err = t.Transacted.Each(
+		func(sk *sku.Transacted) (err error) {
+			if sk.Metadatei.Bezeichnung.IsEmpty() {
+				return
+			}
+
+			sk.Metadatei.GetEtikettenMutable().Reset()
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (c CommitOrganizeFile) Run(
 	u *umwelt.Umwelt,
 	a, b *organize_text.Text,
 ) (results CommitOrganizeFileResults, err error) {
 	store := c.StoreObjekten()
+
+	if err = c.ApplyToText(u, a); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	var cs changes.Changes
 

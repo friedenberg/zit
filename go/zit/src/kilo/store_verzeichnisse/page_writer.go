@@ -23,7 +23,7 @@ type ShaTuple struct {
 
 type KennungShaMap map[string]ShaTuple
 
-type pageWriterV5 struct {
+type pageWriter struct {
 	*PageTuple
 	sku_fmt.Binary
 	*os.File
@@ -35,7 +35,7 @@ type pageWriterV5 struct {
 	kennungShaMap      KennungShaMap
 }
 
-func (pw *pageWriterV5) Flush() (err error) {
+func (pw *pageWriter) Flush() (err error) {
 	if !pw.hasChanges {
 		return
 	}
@@ -48,7 +48,8 @@ func (pw *pageWriterV5) Flush() (err error) {
 
 	path := pw.Path()
 
-	// If the cache file does not exist and we have nothing to add, short circuit
+	// If the cache file does not exist and we have nothing to add, short
+	// circuit
 	// the flush. This condition occurs on the initial init when the konfig is
 	// changed but there are no zettels yet.
 	if !files.Exists(path) && pw.waitingToAddLen() == 0 {
@@ -82,7 +83,7 @@ func (pw *pageWriterV5) Flush() (err error) {
 	}
 }
 
-func (pw *pageWriterV5) flushBoth() (err error) {
+func (pw *pageWriter) flushBoth() (err error) {
 	chain := iter.MakeChain(
 		pw.konfig.ApplyToSku,
 		pw.writeOne,
@@ -123,7 +124,7 @@ func (pw *pageWriterV5) flushBoth() (err error) {
 	return
 }
 
-func (pw *pageWriterV5) flushJustSchwanz() (err error) {
+func (pw *pageWriter) flushJustSchwanz() (err error) {
 	if err = pw.CopyJustHistoryFrom(
 		&pw.Reader,
 		kennung.SigilHistory,
@@ -139,23 +140,7 @@ func (pw *pageWriterV5) flushJustSchwanz() (err error) {
 
 	chain := iter.MakeChain(
 		pw.konfig.ApplyToSku,
-		func(sk *sku.Transacted) (err error) {
-			ks := sk.Kennung.String()
-			st, ok := pw.kennungShaMap[ks]
-
-			if !ok {
-				return
-			}
-
-			st.Del(kennung.SigilSchwanzen)
-
-			if err = pw.updateSigil(ks, st); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
+		pw.removeOldSchwanzen,
 		pw.writeOne,
 	)
 
@@ -189,7 +174,7 @@ func (pw *pageWriterV5) flushJustSchwanz() (err error) {
 	return
 }
 
-func (pw *pageWriterV5) writeOne(
+func (pw *pageWriter) writeOne(
 	z *sku.Transacted,
 ) (err error) {
 	pw.Offset += pw.ContentLength
@@ -206,7 +191,7 @@ func (pw *pageWriterV5) writeOne(
 	return
 }
 
-func (pw *pageWriterV5) SaveSha(z *sku.Transacted, sigil kennung.Sigil) {
+func (pw *pageWriter) SaveSha(z *sku.Transacted, sigil kennung.Sigil) {
 	k := z.GetKennung()
 
 	record := pw.kennungShaMap[k.String()]
@@ -220,12 +205,32 @@ func (pw *pageWriterV5) SaveSha(z *sku.Transacted, sigil kennung.Sigil) {
 
 	if z.Metadatei.Verzeichnisse.Archiviert.Bool() {
 		record.Add(kennung.SigilHidden)
+	} else {
+		record.Del(kennung.SigilHidden)
 	}
 
 	pw.kennungShaMap[k.String()] = record
 }
 
-func (pw *pageWriterV5) updateSigil(ks string, st ShaTuple) (err error) {
+func (pw *pageWriter) removeOldSchwanzen(sk *sku.Transacted) (err error) {
+	ks := sk.Kennung.String()
+	st, ok := pw.kennungShaMap[ks]
+
+	if !ok {
+		return
+	}
+
+	st.Del(kennung.SigilSchwanzen)
+
+	if err = pw.updateSigil(ks, st); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (pw *pageWriter) updateSigil(ks string, st ShaTuple) (err error) {
 	// 2 uint8 + offset + 2 uint8 + Schlussel
 	offset := int64(2) + st.Offset + int64(3)
 

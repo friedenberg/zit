@@ -3,6 +3,8 @@ package values
 import (
 	"fmt"
 	"strings"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
 )
 
 type Bool struct {
@@ -26,10 +28,7 @@ func (sv *Bool) Set(v string) (err error) {
 		v1 = true
 	}
 
-	*sv = Bool{
-		wasSet: true,
-		Value:  v1,
-	}
+	sv.SetBool(v1)
 
 	return
 }
@@ -63,4 +62,37 @@ func (a *Bool) Reset() {
 func (a *Bool) ResetWith(b Bool) {
 	a.wasSet = true
 	a.Value = b.Value
+}
+
+func (a *Bool) MarshalBinary() ([]byte, error) {
+	b := uint8(0)
+
+	if a.Value {
+		b = 1
+	}
+
+	return []byte{b}, nil
+}
+
+func (a *Bool) UnmarshalBinary(b []byte) (err error) {
+	if len(b) != 1 {
+		err = errors.Errorf("expected exactly 1 byte but got %d", b)
+		return
+	}
+
+	b1 := b[0]
+
+	switch b1 {
+	case 0:
+		a.SetBool(false)
+
+	case 1:
+		a.SetBool(true)
+
+	default:
+		err = errors.Errorf("unexpected value: %d", b1)
+		return
+	}
+
+	return
 }

@@ -220,7 +220,7 @@ func (pt *PageTuple) copyHistoryAndMaybeSchwanz(
 }
 
 func (pt *PageTuple) Flush() (err error) {
-	pw := &pageWriterV5{
+	pw := &pageWriter{
 		PageTuple: pt,
 	}
 
@@ -229,8 +229,8 @@ func (pt *PageTuple) Flush() (err error) {
 		return
 	}
 
-  pt.hasChanges = false
-  pt.changesAreHistorical = false
+	pt.hasChanges = false
+	pt.changesAreHistorical = false
 
 	return
 }

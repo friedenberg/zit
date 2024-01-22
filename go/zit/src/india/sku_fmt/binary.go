@@ -379,7 +379,7 @@ func (bf *Binary) writeFieldKey(
 		s := bf.Sigil
 
 		if sk.Metadatei.Verzeichnisse.Archiviert.Bool() {
-			bf.Add(kennung.SigilHidden)
+			s.Add(kennung.SigilHidden)
 		}
 
 		if n, err = bf.writeFieldByteReader(s); err != nil {

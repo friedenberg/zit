@@ -79,6 +79,26 @@ func CreateExclusiveWriteOnly(p string) (f *os.File, err error) {
 	return
 }
 
+func CreateExclusiveWriteOnlyAndMaybeMakeDir(p string) (f *os.File, err error) {
+	if f, err = os.OpenFile(p, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o666); err != nil {
+		if errors.IsNotExist(err) {
+			dir := path.Dir(p)
+
+			if err = os.MkdirAll(dir, os.ModeDir|0o755); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return CreateExclusiveWriteOnly(p)
+		}
+
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func Create(s string) (f *os.File, err error) {
 	openFilesGuardInstance.Lock()
 

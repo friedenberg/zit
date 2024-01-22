@@ -128,7 +128,8 @@ func (k *Compiled) setArchiviert(
 		iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
 			k.EtikettenHidden,
 			func(e *kennung.Etikett) bool {
-				return ees.ContainsKey(ees.KeyPtr(e))
+				ok := ees.ContainsKey(ees.KeyPtr(e))
+				return ok
 			},
 		)
 
@@ -138,7 +139,8 @@ func (k *Compiled) setArchiviert(
 	}
 
 	checkFunc := func(e *kennung.Etikett) bool {
-		return k.EtikettenHidden.ContainsKey(k.EtikettenHidden.KeyPtr(e))
+		ok := k.EtikettenHidden.ContainsKey(k.EtikettenHidden.KeyPtr(e))
+		return ok
 	}
 
 	if iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](

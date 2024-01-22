@@ -73,7 +73,7 @@ func (a *Sigil) ResetWith(b Sigil) {
 }
 
 func (a *Sigil) Add(b Sigil) {
-	*a |=  b
+	*a |= b
 }
 
 func (a *Sigil) Del(b Sigil) {
@@ -169,6 +169,26 @@ func (i *Sigil) ReadFrom(r io.Reader) (n int64, err error) {
 	}
 
 	*i = Sigil(b[0])
+
+	return
+}
+
+func (i *Sigil) WriteTo(w io.Writer) (n int64, err error) {
+	var b byte
+
+	if b, err = i.ReadByte(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var n1 int
+	n1, err = ohio.WriteAllOrDieTrying(w, []byte{b})
+	n = int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

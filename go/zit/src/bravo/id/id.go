@@ -3,8 +3,6 @@ package id
 import (
 	"os"
 	"path"
-	"path/filepath"
-	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
@@ -32,22 +30,6 @@ func MakeDirIfNecessary(i schnittstellen.Korper, pc ...string) (p string, err er
 	if err = os.MkdirAll(dir, os.ModeDir|0o755); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	return
-}
-
-// TODO-P2 determine if this is used
-func HeadTailFromFileName(fileName string) (head string, tail string) {
-	head, tail = filepath.Split(fileName)
-	tail = tail[0 : len(tail)-len(path.Ext(tail))]
-
-	head = strings.TrimSuffix(head, string(filepath.Separator))
-
-	idx := strings.LastIndex(head, string(filepath.Separator))
-
-	if idx != -1 {
-		head = head[idx+1:]
 	}
 
 	return
