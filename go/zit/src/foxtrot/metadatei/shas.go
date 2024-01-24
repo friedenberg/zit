@@ -15,6 +15,7 @@ const (
 )
 
 type Shas struct {
+	Akte                         sha.Sha
 	SelbstMetadatei              sha.Sha
 	SelbstMetadateiMutter        sha.Sha
 	SelbstMetadateiKennungMutter sha.Sha
@@ -24,6 +25,7 @@ type Shas struct {
 }
 
 func (s *Shas) Reset() {
+	s.Akte.Reset()
 	s.SelbstMetadatei.Reset()
 	s.SelbstMetadateiMutter.Reset()
 	s.SelbstMetadateiKennungMutter.Reset()
@@ -33,6 +35,7 @@ func (s *Shas) Reset() {
 }
 
 func (a *Shas) ResetWith(b *Shas) {
+	a.Akte.ResetWith(&b.Akte)
 	a.SelbstMetadatei.ResetWith(&b.SelbstMetadatei)
 	a.SelbstMetadateiMutter.ResetWith(&b.SelbstMetadateiMutter)
 	a.SelbstMetadateiKennungMutter.ResetWith(&b.SelbstMetadateiKennungMutter)

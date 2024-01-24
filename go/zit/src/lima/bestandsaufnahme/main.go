@@ -336,6 +336,43 @@ func (s *store) writeAkte(o *Akte) (sh *sha.Sha, err error) {
 	return
 }
 
+func (s *store) makeWriteMetadateiFunc(
+	dir string,
+	fo objekte_format.FormatGeneric,
+	o *sku.Transacted,
+	expected *sha.Sha,
+) schnittstellen.FuncError {
+	return func() (err error) {
+		var sw sha.WriteCloser
+
+		if sw, err = s.standort.AkteWriterToLight(dir); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer errors.DeferredCloser(&err, sw)
+
+		if _, err = fo.WriteMetadateiTo(sw, o); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		actual := sw.GetShaLike()
+
+		if !expected.EqualsSha(actual) {
+			err = errors.Errorf(
+				"expected %q but got %q",
+				expected,
+				actual,
+			)
+
+			return
+		}
+
+		return
+	}
+}
+
 func (s *store) WriteOneObjekteMetadatei(o *sku.Transacted) (err error) {
 	if o.Metadatei.Sha().IsNull() {
 		err = errors.Errorf("null sha")
@@ -360,76 +397,22 @@ func (s *store) WriteOneObjekteMetadatei(o *sku.Transacted) (err error) {
 	)
 
 	wg.Do(
-		func() (err error) {
-			var sw sha.WriteCloser
-
-			if sw, err = s.standort.AkteWriterToLight(
-				s.standort.DirVerzeichnisseMetadateiKennungMutter(),
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			defer errors.DeferredCloser(&err, sw)
-
-			fo := objekte_format.Formats.MetadateiKennungMutter()
-
-			if _, err = fo.WriteMetadateiTo(sw, o); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			actual := sw.GetShaLike()
-
-			if !o.Metadatei.Sha().EqualsSha(actual) {
-				err = errors.Errorf(
-					"expected %q but got %q",
-					o.Metadatei.Sha(),
-					actual,
-				)
-
-				return
-			}
-
-			return
-		},
+		s.makeWriteMetadateiFunc(
+			s.standort.DirVerzeichnisseMetadateiKennungMutter(),
+			objekte_format.Formats.MetadateiKennungMutter(),
+			o,
+			o.Metadatei.Sha(),
+		),
 	)
 
-	// wg.Do(
-	// 	func() (err error) {
-	// 		var sw sha.WriteCloser
-
-	// 		if sw, err = s.standort.AkteWriterToLight(
-	// 			s.standort.DirVerzeichnisseMetadatei(),
-	// 		); err != nil {
-	// 			err = errors.Wrap(err)
-	// 			return
-	// 		}
-
-	// 		defer errors.DeferredCloser(&err, sw)
-
-	// 		fo := objekte_format.Formats.Metadatei()
-
-	// 		if _, err = fo.WriteMetadateiTo(sw, o); err != nil {
-	// 			err = errors.Wrap(err)
-	// 			return
-	// 		}
-
-	// 		actual := sw.GetShaLike()
-
-	// 		if !o.Metadatei.SelbstMetadatei.EqualsSha(actual) {
-	// 			err = errors.Errorf(
-	// 				"expected %q but got %q",
-	// 				&o.Metadatei.SelbstMetadatei,
-	// 				actual,
-	// 			)
-
-	// 			return
-	// 		}
-
-	// 		return
-	// 	},
-	// )
+	wg.Do(
+		s.makeWriteMetadateiFunc(
+			s.standort.DirVerzeichnisseMetadatei(),
+			objekte_format.Formats.Metadatei(),
+			o,
+			&o.Metadatei.SelbstMetadatei,
+		),
+	)
 
 	return wg.GetError()
 }

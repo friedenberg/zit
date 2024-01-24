@@ -26,7 +26,6 @@ type Metadatei struct {
 	// StoreVersion values.Int
 	// Kasten
 	// Domain
-	Akte        sha.Sha
 	Bezeichnung bezeichnung.Bezeichnung
 	Etiketten   kennung.EtikettMutableSet // public for gob, but should be private
 	Typ         kennung.Typ

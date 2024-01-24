@@ -1,7 +1,6 @@
 package metadatei
 
 import (
-	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/etiketten_path"
 )
@@ -11,7 +10,6 @@ var Resetter resetter
 type resetter struct{}
 
 func (resetter) Reset(z *Metadatei) {
-	z.Akte.Reset()
 	z.Bezeichnung.Reset()
 	z.Comments = z.Comments[:0]
 	z.SetEtiketten(nil)
@@ -23,7 +21,6 @@ func (resetter) Reset(z *Metadatei) {
 }
 
 func (resetter) ResetWith(a *Metadatei, b *Metadatei) {
-	errors.PanicIfError(a.Akte.SetShaLike(&b.Akte))
 	a.Bezeichnung = b.Bezeichnung
 	a.Comments = a.Comments[:0]
 	a.Comments = append(a.Comments, b.Comments...)
