@@ -156,7 +156,7 @@ func (s *store) ReadOneEnnui(sh *sha.Sha) (sk *sku.Transacted, err error) {
 		return
 	}
 
-	if err = sk.CalculateObjekteSha(); err != nil {
+	if err = sk.CalculateObjekteShas(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -411,7 +411,7 @@ func (s *store) readOnePath(p string) (o *sku.Transacted, err error) {
 		return
 	}
 
-	if err = o.CalculateObjekteSha(); err != nil {
+	if err = o.CalculateObjekteShas(); err != nil {
 		if errors.Is(err, objekte_format.ErrEmptyTai) {
 			var t kennung.Tai
 			err1 := t.Set(o.Kennung.String())
@@ -423,7 +423,7 @@ func (s *store) readOnePath(p string) (o *sku.Transacted, err error) {
 
 			o.SetTai(t)
 
-			if err = o.CalculateObjekteSha(); err != nil {
+			if err = o.CalculateObjekteShas(); err != nil {
 				err = errors.Wrapf(err, "%#v", o)
 				return
 			}

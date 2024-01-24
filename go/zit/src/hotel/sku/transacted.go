@@ -173,7 +173,7 @@ func (s *Transacted) CalculateObjekteShaDebug() (err error) {
 	return s.calculateObjekteSha(true)
 }
 
-func (s *Transacted) CalculateObjekteSha() (err error) {
+func (s *Transacted) CalculateObjekteShas() (err error) {
 	return s.calculateObjekteSha(false)
 }
 

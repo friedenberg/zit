@@ -79,7 +79,7 @@ func (s *Store) handleNewOrUpdatedCommit(
 		return
 	}
 
-	if err = t.CalculateObjekteSha(); err != nil {
+	if err = t.CalculateObjekteShas(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

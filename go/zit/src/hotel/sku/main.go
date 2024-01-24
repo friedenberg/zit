@@ -32,9 +32,7 @@ type (
 
 		SetAkteSha(schnittstellen.ShaLike) error
 		SetObjekteSha(schnittstellen.ShaLike) error
-		CalculateObjekteSha() (err error)
-
-		EqualsSkuLikePtr(SkuLike) bool
+		CalculateObjekteShas() (err error)
 
 		SetTai(kennung.Tai)
 		SetKennungLike(kennung.Kennung) error
@@ -56,3 +54,15 @@ type (
 		ResetWithExternalMaybe(b *ExternalMaybe) (err error)
 	}
 )
+
+func EqualsSkuLike(a, b SkuLike) (ok bool) {
+	if !kennung.Equals(a.GetKennung(), b.GetKennung()) {
+		return
+	}
+
+	if !a.GetObjekteSha().EqualsSha(b.GetObjekteSha()) {
+		return
+	}
+
+	return true
+}

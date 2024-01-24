@@ -32,6 +32,15 @@ func (s *Shas) Reset() {
 	s.MutterMetadateiKennungMutter.Reset()
 }
 
+func (a *Shas) ResetWith(b *Shas) {
+	a.SelbstMetadatei.ResetWith(&b.SelbstMetadatei)
+	a.SelbstMetadateiMutter.ResetWith(&b.SelbstMetadateiMutter)
+	a.SelbstMetadateiKennungMutter.ResetWith(&b.SelbstMetadateiKennungMutter)
+	a.MutterMetadatei.ResetWith(&b.MutterMetadatei)
+	a.MutterMetadateiMutter.ResetWith(&b.MutterMetadateiMutter)
+	a.MutterMetadateiKennungMutter.ResetWith(&b.MutterMetadateiKennungMutter)
+}
+
 func (s *Shas) Add(k, v string) (err error) {
 	switch k {
 	case ShaKeySelbstMetadatei:

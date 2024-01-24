@@ -116,18 +116,6 @@ func (a *External) ResetWithExternalMaybe(
 	return
 }
 
-func (a *External) EqualsSkuLikePtr(b SkuLike) (ok bool) {
-	if !kennung.Equals(a.GetKennung(), b.GetKennung()) {
-		return
-	}
-
-	if !a.GetObjekteSha().EqualsSha(b.GetObjekteSha()) {
-		return
-	}
-
-	return true
-}
-
 func (o *External) GetKey() string {
 	return fmt.Sprintf("%s.%s", o.GetGattung(), o.GetKennung())
 }

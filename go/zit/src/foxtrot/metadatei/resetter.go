@@ -19,8 +19,7 @@ func (resetter) Reset(z *Metadatei) {
 	z.Typ = kennung.Typ{}
 	// z.Gattung = gattung.Unknown
 	z.Tai.Reset()
-	z.Sha().Reset()
-	z.Mutter().Reset()
+	z.Shas.Reset()
 }
 
 func (resetter) ResetWith(a *Metadatei, b *Metadatei) {
@@ -36,8 +35,7 @@ func (resetter) ResetWith(a *Metadatei, b *Metadatei) {
 	a.Typ = b.Typ
 	a.Tai = b.Tai
 
-	errors.PanicIfError(a.Sha().SetShaLike(b.Sha()))
-	errors.PanicIfError(a.Mutter().SetShaLike(b.Mutter()))
+	a.Shas.ResetWith(&b.Shas)
 }
 
 var ResetterVerzeichnisse resetterVerzeichnisse
@@ -45,15 +43,15 @@ var ResetterVerzeichnisse resetterVerzeichnisse
 type resetterVerzeichnisse struct{}
 
 func (resetterVerzeichnisse) Reset(a *Verzeichnisse) {
-  a.Etiketten = a.Etiketten[:0]
+	a.Etiketten = a.Etiketten[:0]
 	a.Archiviert.Reset()
 	a.SetExpandedEtiketten(nil)
 	a.SetImplicitEtiketten(nil)
 }
 
 func (resetterVerzeichnisse) ResetWith(a, b *Verzeichnisse) {
-  a.Etiketten = make([]*etiketten_path.Path, len(b.Etiketten))
-  copy(a.Etiketten, b.Etiketten)
+	a.Etiketten = make([]*etiketten_path.Path, len(b.Etiketten))
+	copy(a.Etiketten, b.Etiketten)
 	a.Archiviert.ResetWith(b.Archiviert)
 	a.SetExpandedEtiketten(b.GetExpandedEtiketten())
 	a.SetImplicitEtiketten(b.GetImplicitEtiketten())

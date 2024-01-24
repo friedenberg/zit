@@ -38,7 +38,7 @@ type Sha struct {
 }
 
 func (s *Sha) Size() int {
-  return ByteSize
+	return ByteSize
 }
 
 func (s *Sha) GetShaBytes() []byte {
@@ -241,7 +241,12 @@ func (s *Sha) Reset() {
 
 func (a *Sha) ResetWith(b *Sha) {
 	a.allocDataIfNecessary()
-	copy(a.data[:], b.data[:])
+
+	if b.IsNull() {
+		copy(a.data[:], shaNull.data[:])
+	} else {
+		copy(a.data[:], b.data[:])
+	}
 }
 
 func (a *Sha) ResetWithShaLike(b schnittstellen.ShaLike) {

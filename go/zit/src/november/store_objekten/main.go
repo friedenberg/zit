@@ -152,7 +152,7 @@ func (s *Store) RevertTo(
 
 	mutter.Metadatei.Mutter().ResetWith(sk.Metadatei.Sha())
 
-	if err = mutter.CalculateObjekteSha(); err != nil {
+	if err = mutter.CalculateObjekteShas(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
