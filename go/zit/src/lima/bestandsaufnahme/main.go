@@ -395,6 +395,42 @@ func (s *store) WriteOneObjekteMetadatei(o *sku.Transacted) (err error) {
 		},
 	)
 
+	// wg.Do(
+	// 	func() (err error) {
+	// 		var sw sha.WriteCloser
+
+	// 		if sw, err = s.standort.AkteWriterToLight(
+	// 			s.standort.DirVerzeichnisseMetadatei(),
+	// 		); err != nil {
+	// 			err = errors.Wrap(err)
+	// 			return
+	// 		}
+
+	// 		defer errors.DeferredCloser(&err, sw)
+
+	// 		fo := objekte_format.Formats.Metadatei()
+
+	// 		if _, err = fo.WriteMetadateiTo(sw, o); err != nil {
+	// 			err = errors.Wrap(err)
+	// 			return
+	// 		}
+
+	// 		actual := sw.GetShaLike()
+
+	// 		if !o.Metadatei.SelbstMetadatei.EqualsSha(actual) {
+	// 			err = errors.Errorf(
+	// 				"expected %q but got %q",
+	// 				&o.Metadatei.SelbstMetadatei,
+	// 				actual,
+	// 			)
+
+	// 			return
+	// 		}
+
+	// 		return
+	// 	},
+	// )
+
 	return wg.GetError()
 }
 

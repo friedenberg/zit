@@ -1,6 +1,20 @@
 package sha
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/friedenberg/zit/src/alfa/errors"
+)
+
+var ErrIsNull = errors.New("sha is null")
+
+func MakeErrIsNull(s *Sha) error {
+	if s.IsNull() {
+		return errors.WrapN(1, ErrIsNull)
+	}
+
+	return nil
+}
 
 type errLength [2]int
 

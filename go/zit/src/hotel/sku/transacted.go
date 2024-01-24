@@ -5,6 +5,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/bravo/values"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -178,30 +179,54 @@ func (s *Transacted) CalculateObjekteShas() (err error) {
 }
 
 func (s *Transacted) calculateObjekteSha(debug bool) (err error) {
-	var actual *sha.Sha
-
 	f := objekte_format.GetShaForContext
 
 	if debug {
 		f = objekte_format.GetShaForContextDebug
 	}
 
-	if actual, err = f(
-		objekte_format.Formats.MetadateiKennungMutter(),
-		s,
-	); err != nil {
-		err = errors.Wrap(err)
+	wg := iter.MakeErrorWaitGroupParallel()
+
+	wg.Do(func() (err error) {
+		var actual *sha.Sha
+
+		if actual, err = f(
+			objekte_format.Formats.MetadateiKennungMutter(),
+			s,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer sha.GetPool().Put(actual)
+
+		if err = s.SetObjekteSha(actual); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		return
-	}
+	})
 
-	defer sha.GetPool().Put(actual)
+	wg.Do(func() (err error) {
+		var actual *sha.Sha
 
-	if err = s.SetObjekteSha(actual); err != nil {
-		err = errors.Wrap(err)
+		if actual, err = f(
+			objekte_format.Formats.Metadatei(),
+			s,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer sha.GetPool().Put(actual)
+
+		s.Metadatei.SelbstMetadatei.ResetWith(actual)
+
 		return
-	}
+	})
 
-	return
+	return wg.GetError()
 }
 
 func (s *Transacted) SetArchiviert(v bool) {

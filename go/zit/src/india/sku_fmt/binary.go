@@ -10,6 +10,7 @@ import (
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/iter"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/ohio"
 	"github.com/friedenberg/zit/src/delta/schlussel"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -26,8 +27,9 @@ var binaryFieldOrder = []schlussel.Schlussel{
 	schlussel.Kennung,
 	schlussel.Tai,
 	schlussel.Typ,
-	schlussel.Mutter,
-	schlussel.Sha,
+	schlussel.MutterMetadateiMutterKennung,
+	schlussel.ShaMetadateiMutterKennung,
+	schlussel.ShaMetadatei,
 	schlussel.VerzeichnisseEtikettImplicit,
 	schlussel.VerzeichnisseEtikettExpanded,
 	schlussel.VerzeichnisseEtiketten,
@@ -273,14 +275,20 @@ func (bf *Binary) readFieldKey(
 			return
 		}
 
-	case schlussel.Mutter:
+	case schlussel.MutterMetadateiMutterKennung:
 		if _, err = sk.Metadatei.Mutter().ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case schlussel.Sha:
+	case schlussel.ShaMetadateiMutterKennung:
 		if _, err = sk.Metadatei.Sha().ReadFrom(&bf.Content); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	case schlussel.ShaMetadatei:
+		if _, err = sk.Metadatei.SelbstMetadatei.ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -443,7 +451,7 @@ func (bf *Binary) writeFieldKey(
 			return
 		}
 
-	case schlussel.Mutter:
+	case schlussel.MutterMetadateiMutterKennung:
 		if sk.Metadatei.Mutter().IsNull() {
 			return
 		}
@@ -453,12 +461,22 @@ func (bf *Binary) writeFieldKey(
 			return
 		}
 
-	case schlussel.Sha:
-		if sk.Metadatei.Sha().IsNull() {
-			panic("sha was null")
+	case schlussel.ShaMetadateiMutterKennung:
+		if err = sha.MakeErrIsNull(sk.Metadatei.Sha()); err != nil {
+			return
 		}
 
 		if n, err = bf.writeFieldWriterTo(sk.Metadatei.Sha()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	case schlussel.ShaMetadatei:
+		if err = sha.MakeErrIsNull(&sk.Metadatei.SelbstMetadatei); err != nil {
+			return
+		}
+
+		if n, err = bf.writeFieldWriterTo(&sk.Metadatei.SelbstMetadatei); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
