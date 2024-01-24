@@ -178,6 +178,30 @@ func (s *Transacted) CalculateObjekteShas() (err error) {
 	return s.calculateObjekteSha(false)
 }
 
+func (s *Transacted) makeShaCalcFunc(
+	f func(objekte_format.FormatGeneric, objekte_format.FormatterContext) (*sha.Sha, error),
+	of objekte_format.FormatGeneric,
+	sh *sha.Sha,
+) schnittstellen.FuncError {
+	return func() (err error) {
+		var actual *sha.Sha
+
+		if actual, err = f(
+			of,
+			s,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer sha.GetPool().Put(actual)
+
+		sh.ResetWith(actual)
+
+		return
+	}
+}
+
 func (s *Transacted) calculateObjekteSha(debug bool) (err error) {
 	f := objekte_format.GetShaForContext
 
@@ -187,44 +211,29 @@ func (s *Transacted) calculateObjekteSha(debug bool) (err error) {
 
 	wg := iter.MakeErrorWaitGroupParallel()
 
-	wg.Do(func() (err error) {
-		var actual *sha.Sha
-
-		if actual, err = f(
+	wg.Do(
+		s.makeShaCalcFunc(
+			f,
 			objekte_format.Formats.MetadateiKennungMutter(),
-			s,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+			s.Metadatei.Sha(),
+		),
+	)
 
-		defer sha.GetPool().Put(actual)
-
-		if err = s.SetObjekteSha(actual); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	})
-
-	wg.Do(func() (err error) {
-		var actual *sha.Sha
-
-		if actual, err = f(
+	wg.Do(
+		s.makeShaCalcFunc(
+			f,
 			objekte_format.Formats.Metadatei(),
-			s,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+			&s.Metadatei.SelbstMetadatei,
+		),
+	)
 
-		defer sha.GetPool().Put(actual)
-
-		s.Metadatei.SelbstMetadatei.ResetWith(actual)
-
-		return
-	})
+	wg.Do(
+		s.makeShaCalcFunc(
+			f,
+			objekte_format.Formats.MetadateiSansTai(),
+			&s.Metadatei.SelbstMetadateiSansTai,
+		),
+	)
 
 	return wg.GetError()
 }

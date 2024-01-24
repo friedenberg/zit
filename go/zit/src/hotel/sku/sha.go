@@ -52,17 +52,10 @@ func CalculateAndSetSha(
 func calculateAndSetSha(
 	sk SkuLike,
 ) (err error) {
-	var shaFormat objekte_format.FormatGeneric
-
-	if shaFormat, err = objekte_format.FormatForKeyError("Metadatei"); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	var actual *sha.Sha
 
 	if actual, err = objekte_format.GetShaForMetadatei(
-		shaFormat,
+		objekte_format.Formats.Metadatei(),
 		sk.GetMetadatei(),
 	); err != nil {
 		err = errors.Wrap(err)

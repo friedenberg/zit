@@ -50,23 +50,23 @@ var FormatsGeneric = map[string][]*catgut.String{
 	// "AkteTyp":             {keyAkte, keyTyp},
 	// "MetadateiSansTai":    {keyAkte, keyBezeichnung, keyEtikett, keyTyp},
 	// "Metadatei":           {keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai},
-	"Metadatei":              {keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai},
 	"MetadateiSansTai":       {keyAkte, keyBezeichnung, keyEtikett, keyTyp},
+	"Metadatei":              {keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai},
 	"MetadateiKennungMutter": {keyAkte, keyBezeichnung, keyEtikett, keyKennung, keyTyp, keyTai, keyShasMutterMetadateiKennungMutter},
 }
 
 type formats struct {
+	metadateiSansTai       FormatGeneric
 	metadatei              FormatGeneric
-	metadateiMutter        FormatGeneric
 	metadateiKennungMutter FormatGeneric
+}
+
+func (fs formats) MetadateiSansTai() FormatGeneric {
+	return fs.metadateiSansTai
 }
 
 func (fs formats) Metadatei() FormatGeneric {
 	return fs.metadatei
-}
-
-func (fs formats) MetadateiMutter() FormatGeneric {
-	return fs.metadateiMutter
 }
 
 func (fs formats) MetadateiKennungMutter() FormatGeneric {
@@ -79,8 +79,8 @@ func init() {
 	Formats.metadatei.key = "Metadatei"
 	Formats.metadatei.keys = FormatsGeneric["Metadatei"]
 
-	Formats.metadateiMutter.key = "MetadateiMutter"
-	Formats.metadateiMutter.keys = FormatsGeneric["MetadateiMutter"]
+	Formats.metadateiSansTai.key = "MetadateiSansTai"
+	Formats.metadateiSansTai.keys = FormatsGeneric["MetadateiSansTai"]
 
 	Formats.metadateiKennungMutter.key = "MetadateiKennungMutter"
 	Formats.metadateiKennungMutter.keys = FormatsGeneric["MetadateiKennungMutter"]
