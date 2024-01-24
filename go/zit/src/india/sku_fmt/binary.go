@@ -396,11 +396,7 @@ func (bf *Binary) writeFieldKey(
 		}
 
 	case schlussel.Akte:
-		if sk.Metadatei.Akte.IsNull() {
-			return
-		}
-
-		if n, err = bf.writeFieldWriterTo(&sk.Metadatei.Akte); err != nil {
+		if n, err = bf.writeSha(&sk.Metadatei.Akte, true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -452,21 +448,19 @@ func (bf *Binary) writeFieldKey(
 		}
 
 	case schlussel.MutterMetadateiMutterKennung:
-		if sk.Metadatei.Mutter().IsNull() {
+		if n, err = bf.writeSha(sk.Metadatei.Mutter(), true); err != nil {
+			err = errors.Wrap(err)
 			return
 		}
 
-		if n, err = bf.writeFieldWriterTo(sk.Metadatei.Mutter()); err != nil {
+	case schlussel.ShaMetadateiSansTai:
+		if n, err = bf.writeSha(&sk.Metadatei.SelbstMetadateiSansTai, false); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case schlussel.ShaMetadateiMutterKennung:
-		if err = sha.MakeErrIsNull(sk.Metadatei.Sha()); err != nil {
-			return
-		}
-
-		if n, err = bf.writeFieldWriterTo(sk.Metadatei.Sha()); err != nil {
+		if n, err = bf.writeSha(sk.Metadatei.Sha(), false); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -525,6 +519,26 @@ func (bf *Binary) writeFieldKey(
 
 	default:
 		panic(fmt.Sprintf("unsupported key: %s", bf.Schlussel))
+	}
+
+	return
+}
+
+func (bf *Binary) writeSha(
+	sh *sha.Sha,
+	allowNull bool,
+) (n int64, err error) {
+	if sh.IsNull() {
+		if !allowNull {
+			err = errors.Wrap(sha.ErrIsNull)
+		}
+
+		return
+	}
+
+	if n, err = bf.writeFieldWriterTo(sh); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

@@ -54,7 +54,7 @@ func calculateAndSetSha(
 ) (err error) {
 	var shaFormat objekte_format.FormatGeneric
 
-	if shaFormat, err = objekte_format.FormatForKeyError("MetadateiMutter"); err != nil {
+	if shaFormat, err = objekte_format.FormatForKeyError("Metadatei"); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

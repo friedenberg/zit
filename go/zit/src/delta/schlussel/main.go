@@ -24,6 +24,7 @@ const (
 	Typ                          = 't'
 	MutterMetadateiMutterKennung = 'M'
 	ShaMetadateiMutterKennung    = 's'
+	ShaMetadateiSansTai          = 'n'
 	ShaMetadatei                 = 'm'
 	VerzeichnisseArchiviert      = 'a'
 	VerzeichnisseEtikettImplicit = 'I'

@@ -32,8 +32,6 @@ var (
 	keyTyp         = catgut.MakeFromString("Typ")
 	keySha         = catgut.MakeFromString("zzSha")
 
-	keyShasMutterMetadatei              = catgut.MakeFromString("Shas" + metadatei.ShaKeyMutterMetadatei)
-	keyShasMutterMetadateiMutter        = catgut.MakeFromString("Shas" + metadatei.ShaKeyMutterMetadateiMutter)
 	keyShasMutterMetadateiKennungMutter = catgut.MakeFromString("Shas" + metadatei.ShaKeyMutterMetadateiKennungMutter)
 
 	keyVerzeichnisseArchiviert      = catgut.MakeFromString("Verzeichnisse-Archiviert")
@@ -53,7 +51,7 @@ var FormatsGeneric = map[string][]*catgut.String{
 	// "MetadateiSansTai":    {keyAkte, keyBezeichnung, keyEtikett, keyTyp},
 	// "Metadatei":           {keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai},
 	"Metadatei":              {keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai},
-	"MetadateiMutter":        {keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai, keyShasMutterMetadateiMutter},
+	"MetadateiSansTai":       {keyAkte, keyBezeichnung, keyEtikett, keyTyp},
 	"MetadateiKennungMutter": {keyAkte, keyBezeichnung, keyEtikett, keyKennung, keyTyp, keyTai, keyShasMutterMetadateiKennungMutter},
 }
 
@@ -230,34 +228,6 @@ func WriteMetadateiKeyTo(
 			return
 		}
 
-	case keyShasMutterMetadatei:
-		n1, err = writeShaKeyIfNotNull(
-			w,
-			keyShasMutterMetadatei,
-			&m.MutterMetadatei,
-		)
-
-		n += int64(n1)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case keyShasMutterMetadateiMutter:
-		n1, err = writeShaKeyIfNotNull(
-			w,
-			keyShasMutterMetadateiMutter,
-			&m.MutterMetadateiMutter,
-		)
-
-		n += int64(n1)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
 	case keyShasMutterMetadateiKennungMutter:
 		n1, err = writeShaKeyIfNotNull(
 			w,
@@ -400,7 +370,7 @@ func GetShaForContextDebug(
 		return
 	}
 
-	sh = &Sha{}
+	sh = sha.GetPool().Get()
 
 	if err = sh.SetShaLike(sw); err != nil {
 		err = errors.Wrap(err)

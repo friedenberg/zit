@@ -7,40 +7,32 @@ import (
 
 const (
 	ShaKeySelbstMetadatei              = "SelbstMetadatei"
-	ShaKeySelbstMetadateiMutter        = "SelbstMetadateiMutter"
+	ShaKeySelbstMetadateiSansTai       = "SelbstMetadateiMutterSansTai"
 	ShaKeySelbstMetadateiKennungMutter = "SelbstMetadateiKennungMutter"
-	ShaKeyMutterMetadatei              = "MutterMetadatei"
-	ShaKeyMutterMetadateiMutter        = "MutterMetadateiMutter"
 	ShaKeyMutterMetadateiKennungMutter = "MutterMetadateiKennungMutter"
 )
 
 type Shas struct {
 	Akte                         sha.Sha
 	SelbstMetadatei              sha.Sha
-	SelbstMetadateiMutter        sha.Sha
+	SelbstMetadateiSansTai       sha.Sha
 	SelbstMetadateiKennungMutter sha.Sha
-	MutterMetadatei              sha.Sha
-	MutterMetadateiMutter        sha.Sha
 	MutterMetadateiKennungMutter sha.Sha
 }
 
 func (s *Shas) Reset() {
 	s.Akte.Reset()
 	s.SelbstMetadatei.Reset()
-	s.SelbstMetadateiMutter.Reset()
+	s.SelbstMetadateiSansTai.Reset()
 	s.SelbstMetadateiKennungMutter.Reset()
-	s.MutterMetadatei.Reset()
-	s.MutterMetadateiMutter.Reset()
 	s.MutterMetadateiKennungMutter.Reset()
 }
 
 func (a *Shas) ResetWith(b *Shas) {
 	a.Akte.ResetWith(&b.Akte)
 	a.SelbstMetadatei.ResetWith(&b.SelbstMetadatei)
-	a.SelbstMetadateiMutter.ResetWith(&b.SelbstMetadateiMutter)
+	a.SelbstMetadateiSansTai.ResetWith(&b.SelbstMetadateiSansTai)
 	a.SelbstMetadateiKennungMutter.ResetWith(&b.SelbstMetadateiKennungMutter)
-	a.MutterMetadatei.ResetWith(&b.MutterMetadatei)
-	a.MutterMetadateiMutter.ResetWith(&b.MutterMetadateiMutter)
 	a.MutterMetadateiKennungMutter.ResetWith(&b.MutterMetadateiKennungMutter)
 }
 
@@ -52,26 +44,14 @@ func (s *Shas) Add(k, v string) (err error) {
 			return
 		}
 
-	case ShaKeySelbstMetadateiMutter:
-		if err = s.SelbstMetadateiMutter.Set(v); err != nil {
+	case ShaKeySelbstMetadateiSansTai:
+		if err = s.SelbstMetadateiSansTai.Set(v); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case ShaKeySelbstMetadateiKennungMutter:
 		if err = s.SelbstMetadateiKennungMutter.Set(v); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case ShaKeyMutterMetadatei:
-		if err = s.MutterMetadatei.Set(v); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case ShaKeyMutterMetadateiMutter:
-		if err = s.MutterMetadateiMutter.Set(v); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
