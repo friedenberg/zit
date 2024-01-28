@@ -354,7 +354,7 @@ func (bf *Binary) WriteFormat(
 		bf.Schlussel = f
 
 		if _, err = bf.writeFieldKey(sk); err != nil {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(err, "Sku: %s", sk)
 			return
 		}
 	}
