@@ -1,31 +1,27 @@
-package konfig
+package objekte
 
 import (
 	"github.com/friedenberg/zit/src/hotel/sku"
 )
 
 type ApproximatedTyp struct {
-	hasValue bool
-	isActual bool
-	typ      *sku.Transacted
-}
-
-func (a ApproximatedTyp) HasValue() bool {
-	return a.hasValue
+	HasValue bool
+	IsActual bool
+	Typ      *sku.Transacted
 }
 
 func (a ApproximatedTyp) ActualOrNil() (actual *sku.Transacted) {
-	if a.hasValue && a.isActual {
-		actual = a.typ
+	if a.HasValue && a.IsActual {
+		actual = a.Typ
 	}
 
 	return
 }
 
 func (a ApproximatedTyp) ApproximatedOrActual() *sku.Transacted {
-	if !a.hasValue {
+	if !a.HasValue {
 		return nil
 	}
 
-	return a.typ
+	return a.Typ
 }

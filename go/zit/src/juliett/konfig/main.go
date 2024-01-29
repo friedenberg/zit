@@ -19,6 +19,7 @@ import (
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/india/erworben"
+	"github.com/friedenberg/zit/src/juliett/objekte"
 	"github.com/friedenberg/zit/src/lima/akten"
 )
 
@@ -51,7 +52,7 @@ type Compiled struct {
 	angeboren
 }
 
-func (a *compiled) Reset() {
+func (a *compiled) Reset() error {
 	a.ExtensionsToTypen = make(map[string]string)
 	a.TypenToExtensions = make(map[string]string)
 
@@ -64,13 +65,11 @@ func (a *compiled) Reset() {
 	a.ImplicitEtiketten = make(implicitEtikettenMap)
 	a.Kisten = sku.MakeTransactedMutableSet()
 	a.Typen = sku.MakeTransactedMutableSet()
+
+	return nil
 }
 
-func (a Compiled) GetErworben() erworben.Akte {
-	return a.Akte
-}
-
-func (a *Compiled) GetErworbenPtr() *erworben.Akte {
+func (a *Compiled) GetErworben() *erworben.Akte {
 	return &a.Akte
 }
 
@@ -199,6 +198,8 @@ func (kc *compiled) IsInlineTyp(k kennung.Typ) (isInline bool) {
 	return
 }
 
+type ApproximatedTyp = objekte.ApproximatedTyp
+
 // Returns the exactly matching Typ, or if it doesn't exist, returns the parent
 // Typ or nil. (Parent Typ for `md-gdoc` would be `md`.)
 func (kc *compiled) GetApproximatedTyp(
@@ -206,11 +207,11 @@ func (kc *compiled) GetApproximatedTyp(
 ) (ct ApproximatedTyp) {
 	expandedActual := kc.GetSortedTypenExpanded(k.String())
 	if len(expandedActual) > 0 {
-		ct.hasValue = true
-		ct.typ = expandedActual[0]
+		ct.HasValue = true
+		ct.Typ = expandedActual[0]
 
-		if kennung.Equals(ct.typ.GetKennung(), k) {
-			ct.isActual = true
+		if kennung.Equals(ct.Typ.GetKennung(), k) {
+			ct.IsActual = true
 		}
 	}
 
@@ -267,7 +268,7 @@ func (k *compiled) AddKasten(
 		return
 	}
 
-	err = iter.AddOrReplaceIfGreater[*sku.Transacted](
+	_, err = iter.AddOrReplaceIfGreater[*sku.Transacted](
 		k.Kisten,
 		b,
 	)
@@ -322,12 +323,12 @@ func (k *compiled) AddTyp(
 	k.lock.Lock()
 	defer k.lock.Unlock()
 
-	k.hasChanges = true
-
-	err = iter.AddOrReplaceIfGreater[*sku.Transacted](
+	shouldAdd, err := iter.AddOrReplaceIfGreater[*sku.Transacted](
 		k.Typen,
 		b,
 	)
+
+	k.hasChanges = k.hasChanges || shouldAdd
 
 	if err != nil {
 		err = errors.Wrap(err)

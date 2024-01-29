@@ -175,7 +175,7 @@ func (k *compiled) AddEtikett(
 		return
 	}
 
-	if err = iter.AddOrReplaceIfGreater[*ketikett](k.Etiketten, &b); err != nil {
+	if _, err = iter.AddOrReplaceIfGreater[*ketikett](k.Etiketten, &b); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -182,7 +182,7 @@ func (k compiled) ApplyToNewMetadatei(
 
 	tk := k.GetApproximatedTyp(t)
 
-	if !tk.HasValue() {
+	if !tk.HasValue {
 		return
 	}
 

@@ -50,7 +50,17 @@ func (t *Transacted) SetFromSkuLike(sk SkuLike) (err error) {
 }
 
 func (a *Transacted) Less(b *Transacted) bool {
-	return a.GetTai().Less(b.GetTai())
+	less := a.GetTai().Less(b.GetTai())
+
+	// 	op := ">"
+
+	// 	if less {
+	// 		op = "<"
+	// 	}
+
+	// 	log.Debug().Print(a.StringKennungTaiAkte(), op, b.StringKennungTaiAkte())
+
+	return less
 }
 
 func (a *Transacted) String() string {
@@ -67,6 +77,15 @@ func (a *Transacted) StringKennungTai() string {
 		"%s@%s",
 		&a.Kennung,
 		a.GetTai().StringDefaultFormat(),
+	)
+}
+
+func (a *Transacted) StringKennungTaiAkte() string {
+	return fmt.Sprintf(
+		"%s@%s@%s",
+		&a.Kennung,
+		a.GetTai().StringDefaultFormat(),
+		a.GetAkteSha(),
 	)
 }
 

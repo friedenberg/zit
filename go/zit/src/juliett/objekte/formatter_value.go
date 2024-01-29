@@ -158,6 +158,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 
 			return
 		}
+
 	case "bezeichnung":
 		return func(tl *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(out, tl.GetMetadatei().Bezeichnung); err != nil {
@@ -208,6 +209,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 
 			return
 		}
+
 	case "kennung-akte-sha":
 		return func(tl *sku.Transacted) (err error) {
 			errors.TodoP3("convert into an option")

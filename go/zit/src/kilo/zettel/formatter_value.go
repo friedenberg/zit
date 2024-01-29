@@ -78,7 +78,7 @@ func (fv *FormatterValue) FuncFormatter(
 		return func(o *sku.Transacted) (err error) {
 			t := k.GetApproximatedTyp(o.GetTyp())
 
-			if !t.HasValue() {
+			if !t.HasValue {
 				return
 			}
 

@@ -19,48 +19,64 @@ import (
 func (kc *Compiled) recompile(
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) (err error) {
+	if err = kc.recompileEtiketten(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = kc.recompileTypen(tagp); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (kc *Compiled) recompileEtiketten() (err error) {
 	kc.DefaultEtiketten = kennung.MakeEtikettSet(kc.Defaults.Etiketten...)
 
-	{
-		kc.ImplicitEtiketten = make(implicitEtikettenMap)
+	kc.ImplicitEtiketten = make(implicitEtikettenMap)
 
-		if err = kc.Etiketten.Each(
-			func(ke *ketikett) (err error) {
-				var e kennung.Etikett
+	if err = kc.Etiketten.Each(
+		func(ke *ketikett) (err error) {
+			var e kennung.Etikett
 
-				if err = e.Set(ke.Transacted.GetKennung().String()); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				if err = kc.AccumulateImplicitEtiketten(e); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				if err = kc.ApplyToSku(&ke.Transacted); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
+			if err = e.Set(ke.Transacted.GetKennung().String()); err != nil {
+				err = errors.Wrap(err)
 				return
-			},
-		); err != nil {
-			err = errors.Wrap(err)
+			}
+
+			if err = kc.AccumulateImplicitEtiketten(e); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = kc.ApplyToSku(&ke.Transacted); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
 			return
-		}
-
-		sort.Slice(kc.EtikettenHiddenStringsSlice, func(i, j int) bool {
-			return kc.EtikettenHiddenStringsSlice[i] < kc.EtikettenHiddenStringsSlice[j]
-		})
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
-	{
-		kc.EtikettenHidden = kennung.MakeEtikettSet(
-			kc.HiddenEtiketten...,
-		)
-	}
+	sort.Slice(kc.EtikettenHiddenStringsSlice, func(i, j int) bool {
+		return kc.EtikettenHiddenStringsSlice[i] < kc.EtikettenHiddenStringsSlice[j]
+	})
 
+	kc.EtikettenHidden = kennung.MakeEtikettSet(
+		kc.HiddenEtiketten...,
+	)
+
+	return
+}
+
+func (kc *Compiled) recompileTypen(
+	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
+) (err error) {
 	inlineTypen := collections_value.MakeMutableValueSet[values.String](nil)
 
 	defer func() {
@@ -103,7 +119,6 @@ func (kc *Compiled) recompile(
 		err = errors.Wrap(err)
 		return
 	}
-
 	return
 }
 

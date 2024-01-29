@@ -91,11 +91,19 @@ func AddOrReplaceIfGreater[T interface {
 }](
 	c schnittstellen.MutableSetLike[T],
 	b T,
-) (err error) {
+) (shouldAdd bool, err error) {
 	a, ok := c.Get(c.Key(b))
 
-	if !ok || a.Less(b) {
-		return c.Add(b)
+	// 	if ok {
+	// 		log.Debug().Print("less:", a.Less(b))
+	// 	} else {
+	// 		log.Debug().Print("ok:", ok)
+	// 	}
+
+	shouldAdd = !ok || a.Less(b)
+
+	if shouldAdd {
+		err = c.Add(b)
 	}
 
 	return

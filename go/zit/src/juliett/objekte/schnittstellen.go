@@ -13,6 +13,7 @@ type (
 		schnittstellen.Konfig
 		matcher.ImplicitEtikettenGetter
 		IsInlineTyp(kennung.Typ) bool
+		GetApproximatedTyp(kennung.Kennung) ApproximatedTyp
 	}
 
 	SavedAkteFormatter interface {
