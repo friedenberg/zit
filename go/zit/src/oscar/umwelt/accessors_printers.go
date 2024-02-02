@@ -186,11 +186,15 @@ func (u *Umwelt) PrinterFDDeleted() schnittstellen.FuncIter[*fd.FD] {
 }
 
 func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[string] {
-	return string_format_writer.MakeDelim[string](
-		"\n",
-		u.Out(),
-		string_format_writer.MakeIndentedHeader(u.FormatColorOptionsOut()),
-	)
+	if u.konfig.PrintOptions.PrintFlush {
+		return string_format_writer.MakeDelim[string](
+			"\n",
+			u.Out(),
+			string_format_writer.MakeIndentedHeader(u.FormatColorOptionsOut()),
+		)
+	} else {
+		return func(string) error { return nil }
+	}
 }
 
 func (u *Umwelt) PrinterCheckedOut() schnittstellen.FuncIter[*sku.CheckedOut] {

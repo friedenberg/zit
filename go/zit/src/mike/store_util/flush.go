@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
@@ -49,7 +50,9 @@ func (s *common) FlushBestandsaufnahme() (err error) {
 	return
 }
 
-func (c *common) Flush() (err error) {
+func (c *common) Flush(
+	printerHeader schnittstellen.FuncIter[string],
+) (err error) {
 	if c.konfig.DryRun {
 		return
 	}
@@ -62,12 +65,15 @@ func (c *common) Flush() (err error) {
 
 	wg := iter.MakeErrorWaitGroupParallel()
 
-	wg.Do(c.verzeichnisse.Flush)
+	wg.Do(func() error { return c.verzeichnisse.Flush(printerHeader) })
 	wg.Do(c.typenIndex.Flush)
 	wg.Do(c.kennungIndex.Flush)
 	wg.Do(c.Abbr.Flush)
 
-	err = wg.GetError()
+	if err = wg.GetError(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

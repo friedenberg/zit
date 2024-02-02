@@ -20,6 +20,7 @@ type PrintOptions struct {
 	PrintEmptyShas            bool          `toml:"print-empty-shas"`
 	PrintMatchedArchiviert    bool          `toml:"print-matched-archiviert"`
 	PrintShas                 bool          `toml:"print-shas"`
+	PrintFlush                bool          `toml:"print-flush"`
 	ZittishNewlines           bool          `toml:"-"`
 }
 
@@ -60,6 +61,10 @@ func (a *PrintOptions) Merge(b PrintOptions, mask PrintOptions) {
 		a.PrintShas = b.PrintShas
 	}
 
+	if mask.PrintFlush {
+		a.PrintFlush = b.PrintFlush
+	}
+
 	a.ZittishNewlines = b.ZittishNewlines
 }
 
@@ -76,6 +81,7 @@ func Default() PrintOptions {
 		PrintEmptyShas:            false,
 		PrintMatchedArchiviert:    false,
 		PrintShas:                 true,
+		PrintFlush:                true,
 	}
 }
 
@@ -175,6 +181,14 @@ func (c *PrintOptions) AddToFlags(f *flag.FlagSet, m *PrintOptions) {
 		"print-shas",
 		&c.PrintShas,
 		&m.PrintShas,
+		"",
+	)
+
+	boolVarWithMask(
+		f,
+		"print-flush",
+		&c.PrintFlush,
+		&m.PrintFlush,
 		"",
 	)
 }

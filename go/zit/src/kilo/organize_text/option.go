@@ -108,4 +108,3 @@ func (ocf optionCommentHide) ApplyToWriter(
 ) (err error) {
 	return
 }
-

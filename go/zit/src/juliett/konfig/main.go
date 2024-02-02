@@ -66,6 +66,8 @@ func (a *compiled) Reset() error {
 	a.Kisten = sku.MakeTransactedMutableSet()
 	a.Typen = sku.MakeTransactedMutableSet()
 
+	sku.TransactedResetter.Reset(&a.Sku)
+
 	return nil
 }
 

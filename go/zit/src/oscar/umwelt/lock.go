@@ -23,7 +23,7 @@ func (u *Umwelt) Unlock() (err error) {
 			return
 		}
 
-		if err = u.storeUtil.Flush(); err != nil {
+		if err = u.storeUtil.Flush(u.PrinterHeader()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -31,12 +31,13 @@ func (u *Umwelt) Unlock() (err error) {
 		if err = u.Konfig().Flush(
 			u.Standort(),
 			u.StoreObjekten().GetAkten().GetTypV0(),
+			u.PrinterHeader(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = u.storeObjekten.Flush(); err != nil {
+		if err = u.storeObjekten.Flush(u.PrinterHeader()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

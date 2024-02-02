@@ -170,8 +170,14 @@ func (kc *Compiled) loadKonfigErworben(s standort.Standort) (err error) {
 func (kc *Compiled) Flush(
 	s standort.Standort,
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
+  printerHeader schnittstellen.FuncIter[string],
 ) (err error) {
 	if !kc.hasChanges || kc.DryRun {
+		return
+	}
+
+	if err = printerHeader("recompiling konfig"); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -198,6 +204,11 @@ func (kc *Compiled) Flush(
 	dec := gob.NewEncoder(f)
 
 	if err = dec.Encode(&kc.compiled); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = printerHeader("recompiled konfig"); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

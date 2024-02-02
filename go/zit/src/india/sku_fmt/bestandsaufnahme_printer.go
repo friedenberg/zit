@@ -17,11 +17,11 @@ type FormatBestandsaufnahmePrinter interface {
 }
 
 type bestandsaufnahmePrinter struct {
-	format                 objekte_format.Formatter
-	options                objekte_format.Options
-	out                    io.Writer
-	offset                 int64
-	firstBoundaryOnce      *sync.Once
+	format            objekte_format.Formatter
+	options           objekte_format.Options
+	out               io.Writer
+	offset            int64
+	firstBoundaryOnce *sync.Once
 }
 
 func MakeFormatBestandsaufnahmePrinter(

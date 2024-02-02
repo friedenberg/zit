@@ -68,7 +68,9 @@ func (s *Store) UpdateKonfig(
 	)
 }
 
-func (s Store) Flush() (err error) {
+func (s Store) Flush(
+	printerHeader schnittstellen.FuncIter[string],
+) (err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
 			Operation: "flush",
@@ -81,7 +83,7 @@ func (s Store) Flush() (err error) {
 		return
 	}
 
-	if err = s.StoreUtil.Flush(); err != nil {
+	if err = s.StoreUtil.Flush(printerHeader); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

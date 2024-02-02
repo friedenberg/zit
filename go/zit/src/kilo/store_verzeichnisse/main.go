@@ -270,18 +270,45 @@ func (i *Store) SetNeedsFlushHistory() {
 	}
 }
 
-func (i *Store) Flush() (err error) {
+func (i *Store) Flush(
+	printerHeader schnittstellen.FuncIter[string],
+) (err error) {
 	errors.Log().Print("flushing")
 	wg := iter.MakeErrorWaitGroupParallel()
 
+	actualFlush := false
+
 	for n := range i.pages {
+		if i.pages[n].hasChanges {
+			actualFlush = true
+		}
+
 		wg.Do(i.pages[n].Flush)
 	}
 
 	wg.DoAfter(i.ennuiShas.Flush)
 	wg.DoAfter(i.ennuiKennung.Flush)
 
-	return wg.GetError()
+	if actualFlush {
+		if err = printerHeader("writing index"); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if err = wg.GetError(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if actualFlush {
+		if err = printerHeader("wrote index"); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
 }
 
 func (i *Store) Add(

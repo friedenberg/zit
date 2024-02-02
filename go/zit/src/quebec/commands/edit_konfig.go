@@ -138,9 +138,7 @@ func (c EditKonfig) editInVim(
 
 	openVimOp := user_ops.OpenVim{
 		Options: vim_cli_options_builder.New().
-			WithCursorLocation(2, 3).
 			WithFileType("zit-konfig").
-			WithInsertMode().
 			Build(),
 	}
 

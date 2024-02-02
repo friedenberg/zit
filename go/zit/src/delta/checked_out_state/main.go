@@ -18,7 +18,7 @@ const (
 	StateUntracked
 	StateRecognized
 	StateConflicted
-  StateError
+	StateError
 )
 
 func (s State) String() string {

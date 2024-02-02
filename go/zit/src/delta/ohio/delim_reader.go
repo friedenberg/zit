@@ -188,7 +188,6 @@ func (lr *delimReader) ReadOneKeyValueBytes(
 	}
 
 	str, err := lr.ReadOneBytes()
-
 	if err != nil {
 		if err == io.EOF {
 			lr.eof = true

@@ -23,7 +23,7 @@ import (
 
 type StoreUtil interface {
 	FlushBestandsaufnahme() error
-	errors.Flusher
+	errors.FlusherWithLogger
 	kennung.Clock
 
 	ExternalReader

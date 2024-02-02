@@ -13,7 +13,6 @@ type ShaLike interface {
 	GetShaBytes() []byte
 	EqualsSha(ShaLike) bool // TODO-P3 rename to EqualsShaLike
 	IsNull() bool
-	//TODO AssertEquals() error
 	ShaGetter
 }
 
