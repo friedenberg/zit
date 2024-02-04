@@ -44,6 +44,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"bezeichnung",
 		"debug",
 		"etiketten",
+		"etiketten-newlines",
 		"etiketten-all",
 		"etiketten-expanded",
 		"etiketten-implicit",
@@ -152,6 +153,19 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 					tl.Metadatei.GetEtiketten(),
 				),
 			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+	case "etiketten-newlines":
+		return func(tl *sku.Transacted) (err error) {
+			if err = tl.Metadatei.GetEtiketten().EachPtr(func(e *kennung.Etikett) (err error) {
+				_, err = fmt.Fprintln(out, e)
+				return
+			}); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

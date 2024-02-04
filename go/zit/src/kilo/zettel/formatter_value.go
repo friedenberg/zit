@@ -1,6 +1,7 @@
 package zettel
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"strings"
@@ -8,6 +9,7 @@ import (
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/alfa/toml"
+	"github.com/friedenberg/zit/src/bravo/log"
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/typ_akte"
@@ -39,6 +41,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"text",
 		"objekte",
 		"toml",
+		"json-blob",
 		"action-names",
 		"hinweis-akte":
 		f.string = v1
@@ -189,6 +192,40 @@ func (fv *FormatterValue) FuncFormatter(
 			return
 		}
 
+	case "json-blob":
+		e := json.NewEncoder(out)
+
+		return func(o *sku.Transacted) (err error) {
+			var a map[string]interface{}
+
+			var r sha.ReadCloser
+
+			if r, err = af.AkteReader(o.GetAkteSha()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer errors.Deferred(&err, r.Close)
+
+			d := toml.NewDecoder(r)
+
+			if err = d.Decode(&a); err != nil {
+				log.Err().Printf("%s: %s", o, err)
+				err = nil
+				return
+			}
+
+			a["description"] = o.Metadatei.Bezeichnung.String()
+			a["identifier"] = o.Kennung.String()
+
+			if err = e.Encode(&a); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
 	case "toml":
 		errors.TodoP3("limit to only zettels supporting toml")
 		return func(o *sku.Transacted) (err error) {
@@ -206,7 +243,8 @@ func (fv *FormatterValue) FuncFormatter(
 			d := toml.NewDecoder(r)
 
 			if err = d.Decode(&a); err != nil {
-				err = errors.Wrap(err)
+				log.Err().Printf("%s: %s", o, err)
+				err = nil
 				return
 			}
 
