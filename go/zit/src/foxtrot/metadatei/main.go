@@ -164,7 +164,7 @@ func (z *Metadatei) SetEtiketten(e kennung.EtikettSet) {
 	)
 }
 
-func (z *Metadatei) SetAkteSha(sh schnittstellen.ShaLike) {
+func (z *Metadatei) SetAkteSha(sh schnittstellen.ShaGetter) {
 	z.Akte.SetShaLike(sh)
 }
 

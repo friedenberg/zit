@@ -1,15 +1,47 @@
 package store_objekten
 
 import (
+	"io"
+
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/objekte_mode"
 	"github.com/friedenberg/zit/src/bravo/todo"
 	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/foxtrot/metadatei"
 	"github.com/friedenberg/zit/src/hotel/sku"
 	"github.com/friedenberg/zit/src/kilo/objekte_store"
 )
+
+func (s *Store) CreateWithAkteString(
+	mg metadatei.Getter,
+  akteString string,
+) (tz *sku.Transacted, err error) {
+  var aw sha.WriteCloser
+
+  if aw, err = s.GetStandort().AkteWriter(); err != nil {
+    err = errors.Wrap(err)
+    return
+  }
+
+  if _, err = io.WriteString(aw, akteString); err != nil {
+    err = errors.Wrap(err)
+    return
+  }
+
+  m := mg.GetMetadatei()
+  m.SetAkteSha(aw)
+
+  defer errors.DeferredCloser(&err, aw)
+
+  if tz, err = s.Create(m); err != nil {
+    err = errors.Wrap(err)
+    return
+  }
+
+	return
+}
 
 func (s *Store) Create(
 	mg metadatei.Getter,

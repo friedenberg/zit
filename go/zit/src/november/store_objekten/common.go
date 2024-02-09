@@ -101,6 +101,11 @@ func (s *Store) handleNewOrUpdatedCommit(
 		return
 	}
 
+  if err = s.addToTomlIndexIfNecessary(t, mode); err != nil {
+    err = errors.Wrap(err)
+    return
+  }
+
 	err = nil
 
 	g := gattung.Must(t.Kennung.GetGattung())

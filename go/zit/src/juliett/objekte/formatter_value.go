@@ -12,6 +12,7 @@ import (
 	"github.com/friedenberg/zit/src/charlie/gattung"
 	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/ohio"
+	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/ennui"
 	"github.com/friedenberg/zit/src/golf/objekte_format"
@@ -49,6 +50,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"etiketten-expanded",
 		"etiketten-implicit",
 		"json",
+		"json-toml-bookmark",
 		"kennung",
 		"kennung-akte-sha",
 		"kennung-sha",
@@ -81,7 +83,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 
 func (fv *FormatterValue) MakeFormatterObjekte(
 	out io.Writer,
-	af schnittstellen.AkteReaderFactory,
+	s standort.Standort,
 	k Konfig,
 	logFunc schnittstellen.FuncIter[*sku.Transacted],
 	cliFmt schnittstellen.StringFormatWriter[*sku.Transacted],
@@ -184,10 +186,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		}
 
 	case "text":
-		f := MakeTextFormatter(
-			af,
-			k,
-		)
+		f := MakeTextFormatter(s, k)
 
 		return func(tl *sku.Transacted) (err error) {
 			_, err = f.WriteStringFormat(out, tl)
@@ -310,22 +309,48 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	case "log":
 		return logFunc
 
-	// case "objekte":
-	// 	f := Format{}
+		// case "objekte":
+		// 	f := Format{}
 
-	// 	return func(o TransactedLikePtr) (err error) {
-	// 		if _, err = f.Format(out, &o.Objekte); err != nil {
-	// 			err = errors.Wrap(err)
-	// 			return
-	// 		}
+		// 	return func(o TransactedLikePtr) (err error) {
+		// 		if _, err = f.Format(out, &o.Objekte); err != nil {
+		// 			err = errors.Wrap(err)
+		// 			return
+		// 		}
 
-	// 		return
-	// 	}
+		// 		return
+		// 	}
 	case "json":
 		enc := json.NewEncoder(out)
 
 		return func(o *sku.Transacted) (err error) {
-			if err = enc.Encode(o); err != nil {
+			var j sku_fmt.Json
+
+			if j, err = sku_fmt.MakeJson(o, s); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = enc.Encode(j); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+	case "json-toml-bookmark":
+		enc := json.NewEncoder(out)
+
+		return func(o *sku.Transacted) (err error) {
+			var j sku_fmt.JsonWithUrl
+
+			if j, err = sku_fmt.MakeJsonTomlBookmark(o, s); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = enc.Encode(j); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -343,7 +368,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		return func(o *sku.Transacted) (err error) {
 			var r sha.ReadCloser
 
-			if r, err = af.AkteReader(o.GetAkteSha()); err != nil {
+			if r, err = s.AkteReader(o.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -362,7 +387,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		return func(o *sku.Transacted) (err error) {
 			var r sha.ReadCloser
 
-			if r, err = af.AkteReader(o.GetAkteSha()); err != nil {
+			if r, err = s.AkteReader(o.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -381,7 +406,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		return func(o *sku.Transacted) (err error) {
 			var r sha.ReadCloser
 
-			if r, err = af.AkteReader(o.GetAkteSha()); err != nil {
+			if r, err = s.AkteReader(o.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

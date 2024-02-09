@@ -18,15 +18,7 @@ endif
 
 .PHONY: build watch exclude graph_dependencies
 
-build: install;
-
-.PHONY: install
-install: build/tests_fast
-> go install ./.
-
-.PHONY: deploy
-deploy: build/tests_slower
-> go install ./.
+build: build/zit;
 
 files_go_generate := $(shell ag 'go:generate' -l src/)
 

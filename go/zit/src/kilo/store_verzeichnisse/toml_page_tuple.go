@@ -9,7 +9,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/objekte_mode"
 	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/charlie/sha"
 	"github.com/friedenberg/zit/src/delta/standort"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/golf/ennui"
@@ -19,9 +18,7 @@ import (
 	"github.com/friedenberg/zit/src/juliett/konfig"
 )
 
-type PageId = sha.PageId
-
-type PageTuple struct {
+type TomlPageTuple struct {
 	PageId
 	// All, Schwanzen  Page
 	ennuiShas, ennuiKennung ennui.Ennui
@@ -34,7 +31,7 @@ type PageTuple struct {
 	etikettIndex            kennung_index.EtikettIndexMutation
 }
 
-func (pt *PageTuple) initialize(
+func (pt *TomlPageTuple) initialize(
 	pid PageId,
 	i *Store,
 	ki kennung_index.Index,
@@ -48,7 +45,7 @@ func (pt *PageTuple) initialize(
 	pt.konfig = i.erworben
 }
 
-func (pt *PageTuple) add(
+func (pt *TomlPageTuple) add(
 	z1 *sku.Transacted,
 	mode objekte_mode.Mode,
 ) (err error) {
@@ -70,30 +67,30 @@ func (pt *PageTuple) add(
 	return
 }
 
-func (pt *PageTuple) waitingToAddLen() int {
+func (pt *TomlPageTuple) waitingToAddLen() int {
 	return pt.added.Len() + pt.addedSchwanz.Len()
 }
 
-func (pt *PageTuple) SetNeedsFlushHistory() {
+func (pt *TomlPageTuple) SetNeedsFlushHistory() {
 	pt.hasChanges = true
 	pt.changesAreHistorical = true
 }
 
-func (pt *PageTuple) CopyEverything(
+func (pt *TomlPageTuple) CopyEverything(
 	s kennung.Sigil,
 	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return pt.copyHistoryAndMaybeSchwanz(s, w, true, true)
 }
 
-func (pt *PageTuple) CopyJustHistory(
+func (pt *TomlPageTuple) CopyJustHistory(
 	s kennung.Sigil,
 	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return pt.copyHistoryAndMaybeSchwanz(s, w, false, false)
 }
 
-func (pt *PageTuple) CopyJustHistoryFrom(
+func (pt *TomlPageTuple) CopyJustHistoryFrom(
 	r io.Reader,
 	s kennung.Sigil,
 	w schnittstellen.FuncIter[sku_fmt.Sku],
@@ -124,14 +121,14 @@ func (pt *PageTuple) CopyJustHistoryFrom(
 	}
 }
 
-func (pt *PageTuple) CopyJustHistoryAndAdded(
+func (pt *TomlPageTuple) CopyJustHistoryAndAdded(
 	s kennung.Sigil,
 	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return pt.copyHistoryAndMaybeSchwanz(s, w, true, false)
 }
 
-func (pt *PageTuple) copyHistoryAndMaybeSchwanz(
+func (pt *TomlPageTuple) copyHistoryAndMaybeSchwanz(
 	s kennung.Sigil,
 	w schnittstellen.FuncIter[*sku.Transacted],
 	includeAdded bool,
@@ -158,12 +155,7 @@ func (pt *PageTuple) copyHistoryAndMaybeSchwanz(
 			br,
 			s,
 			func(sk sku_fmt.Sku) (err error) {
-				if err = w(sk.Transacted); err != nil {
-					err = errors.Wrapf(err, "%s", sk.Transacted)
-					return
-				}
-
-				return
+				return w(sk.Transacted)
 			},
 		); err != nil {
 			err = errors.Wrap(err)
@@ -224,9 +216,9 @@ func (pt *PageTuple) copyHistoryAndMaybeSchwanz(
 	return
 }
 
-func (pt *PageTuple) Flush() (err error) {
-	pw := &pageWriter{
-		PageTuple: pt,
+func (pt *TomlPageTuple) Flush() (err error) {
+	pw := &tomlPageWriter{
+		TomlPageTuple: pt,
 	}
 
 	if err = pw.Flush(); err != nil {

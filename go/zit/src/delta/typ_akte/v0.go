@@ -1,0 +1,40 @@
+package typ_akte
+
+import (
+	"github.com/friedenberg/zit/src/alfa/etikett_rule"
+	"github.com/friedenberg/zit/src/alfa/reset"
+	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"github.com/friedenberg/zit/src/charlie/gattung"
+	"github.com/friedenberg/zit/src/charlie/script_config"
+)
+
+type V0 struct {
+	InlineAkte    bool                        `toml:"inline-akte,omitempty"`
+	Archived      bool                        `toml:"archived,omitempty"`
+	FileExtension string                      `toml:"file-extension,omitempty"`
+	ExecCommand   *script_config.ScriptConfig `toml:"exec-command,omitempty"`
+	VimSyntaxType string                      `toml:"vim-syntax-type"`
+	// TODO-P4 rename to uti-groups
+	FormatterUTIGroups map[string]FormatterUTIGroup              `toml:"formatter-uti-groups"`
+	Formatters         map[string]script_config.WithOutputFormat `toml:"formatters,omitempty"`
+	Actions            map[string]script_config.ScriptConfig     `toml:"actions,omitempty"`
+	EtikettenRules     map[string]etikett_rule.Rule              `toml:"etiketten-rules,omitempty"`
+	Keys               []string                                  `toml:"keys,omitempty"`
+}
+
+func (a V0) GetGattung() schnittstellen.GattungLike {
+	return gattung.Typ
+}
+
+func (a *V0) Reset() {
+	a.Archived = false
+	a.InlineAkte = false
+	a.FileExtension = ""
+	a.ExecCommand = nil
+	a.VimSyntaxType = ""
+
+	a.FormatterUTIGroups = reset.Map(a.FormatterUTIGroups)
+	a.Formatters = reset.Map(a.Formatters)
+	a.Actions = reset.Map(a.Actions)
+	a.EtikettenRules = reset.Map(a.EtikettenRules)
+}

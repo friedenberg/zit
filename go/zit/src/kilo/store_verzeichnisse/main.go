@@ -61,6 +61,7 @@ type Store struct {
 	path     string
 	schnittstellen.VerzeichnisseFactory
 	pages                   [PageCount]PageTuple
+	tomlPages               [PageCount]TomlPageTuple
 	ennuiShas, ennuiKennung ennui.Ennui
 }
 
@@ -104,6 +105,16 @@ func (i *Store) Initialize(ki kennung_index.Index) (err error) {
 
 	for n := range i.pages {
 		i.pages[n].initialize(
+			PageId{
+				Prefix: "Page",
+				Dir:    i.path,
+				Index:  uint8(n),
+			},
+			i,
+			ki,
+		)
+
+		i.tomlPages[n].initialize(
 			PageId{
 				Prefix: "Page",
 				Dir:    i.path,

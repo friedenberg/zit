@@ -77,6 +77,10 @@ func (o Typ) GetGattung() schnittstellen.GattungLike {
 	return gattung.Typ
 }
 
+func (t Typ) IsToml() bool {
+	return strings.HasPrefix(t.value, "toml")
+}
+
 func (e Typ) String() string {
 	return e.value
 }
