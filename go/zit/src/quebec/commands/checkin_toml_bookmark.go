@@ -2,11 +2,11 @@ package commands
 
 import (
 	"bufio"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
 	"net/url"
-	"strings"
 
 	"github.com/friedenberg/zit/src/alfa/errors"
 	"github.com/friedenberg/zit/src/bravo/iter"
@@ -35,18 +35,26 @@ func (c CheckinTomlBookmark) DefaultGattungen() gattungen.Set {
 	return gattungen.MakeSet()
 }
 
+type CheckinTomlBookmarkEntry struct {
+	UrlString string   `json:"url"`
+	Url       *url.URL `json:"-"`
+	Title     string   `json:"title"`
+}
+
 func (c CheckinTomlBookmark) Run(
 	u *umwelt.Umwelt,
 	args ...string,
 ) (err error) {
 	rb := bufio.NewReader(u.In())
 
-	urlsFound := make(map[string]struct{})
+	urlsFound := make(map[string]CheckinTomlBookmarkEntry)
+
+	dec := json.NewDecoder(rb)
 
 	for {
-		var line string
+		var entry CheckinTomlBookmarkEntry
 
-		line, err = rb.ReadString('\n')
+		err = dec.Decode(&entry)
 
 		if errors.IsNotNilAndNotEOF(err) {
 			err = errors.Wrap(err)
@@ -55,22 +63,16 @@ func (c CheckinTomlBookmark) Run(
 
 		isEOF := err == io.EOF
 
-		line = strings.TrimSpace(line)
-
-		if line != "" {
-			var ur *url.URL
-
-			if ur, err = url.Parse(line); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			urlsFound[ur.String()] = struct{}{}
-		}
-
 		if isEOF {
 			break
 		}
+
+		if entry.Url, err = url.Parse(entry.UrlString); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		urlsFound[entry.UrlString] = entry
 	}
 
 	var urls map[string]SkuWithUrl
@@ -102,11 +104,16 @@ func (c CheckinTomlBookmark) Run(
 		}
 	}
 
-	for ur := range urlsFound {
-		content := fmt.Sprintf("url = \"%s\"", ur)
+	for _, entry := range urlsFound {
+		content := fmt.Sprintf("url = \"%s\"", entry.UrlString)
 
 		mg := metadatei.GetPool().Get()
 		mg.SetEtiketten(etiketten)
+
+		if err = mg.Bezeichnung.Set(entry.Title); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 		if err = mg.Typ.Set("toml-bookmark"); err != nil {
 			err = errors.Wrap(err)
@@ -132,7 +139,7 @@ type SkuWithUrl struct {
 
 func (c CheckinTomlBookmark) getUrls(
 	u *umwelt.Umwelt,
-	urlsFound map[string]struct{},
+	urlsFound map[string]CheckinTomlBookmarkEntry,
 ) (urls map[string]SkuWithUrl, err error) {
 	query := "!toml-bookmark:z"
 
@@ -158,14 +165,23 @@ func (c CheckinTomlBookmark) getUrls(
 
 				urlString := url.String()
 
-				if _, ok := urlsFound[urlString]; !ok {
+				entry, ok := urlsFound[urlString]
+
+				if !ok {
 					return
 				}
+
+				title := entry.Title
 
 				delete(urlsFound, urlString)
 
 				sk2 := sku.GetTransactedPool().Get()
 				sku.TransactedResetter.ResetWith(sk2, sk)
+
+				if err = sk2.Metadatei.Bezeichnung.Set(title); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 
 				urls[urlString] = SkuWithUrl{
 					Transacted: sk2,
