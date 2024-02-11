@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/DataDog/zstd"
-	"code.linenisgreat.com/zit-go/src/bravo/files"
+	"code.linenisgreat.com/zit/src/bravo/files"
 )
 
 type ErrUnsupportedCompression string

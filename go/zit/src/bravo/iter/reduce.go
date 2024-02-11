@@ -1,8 +1,8 @@
 package iter
 
 import (
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 )
 
 func Elements[T any](s schnittstellen.Iterable[T]) (out []T) {

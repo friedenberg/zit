@@ -5,16 +5,16 @@ import (
 	"sync"
 	"syscall"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/bravo/iter"
-	"code.linenisgreat.com/zit-go/src/charlie/gattung"
-	"code.linenisgreat.com/zit-go/src/charlie/sha"
-	"code.linenisgreat.com/zit-go/src/golf/objekte_format"
-	"code.linenisgreat.com/zit-go/src/hotel/sku"
-	"code.linenisgreat.com/zit-go/src/india/matcher"
-	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
-	"code.linenisgreat.com/zit-go/src/papa/remote_conn"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/matcher"
+	"code.linenisgreat.com/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/papa/remote_conn"
 )
 
 type PullClient interface {

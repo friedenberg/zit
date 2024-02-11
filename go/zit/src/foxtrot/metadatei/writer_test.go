@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"code.linenisgreat.com/zit-go/src/bravo/test_logz"
+	"code.linenisgreat.com/zit/src/bravo/test_logz"
 )
 
 func TestWriter1(t1 *testing.T) {

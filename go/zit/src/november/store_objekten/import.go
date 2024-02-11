@@ -3,11 +3,11 @@ package store_objekten
 import (
 	"fmt"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/bravo/objekte_mode"
-	"code.linenisgreat.com/zit-go/src/charlie/collections"
-	"code.linenisgreat.com/zit-go/src/hotel/sku"
-	"code.linenisgreat.com/zit-go/src/kilo/objekte_store"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/src/charlie/collections"
+	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/kilo/objekte_store"
 )
 
 func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOut, err error) {

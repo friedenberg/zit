@@ -5,11 +5,11 @@ import (
 	"io"
 	"net/url"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/alfa/toml"
-	"code.linenisgreat.com/zit-go/src/charlie/sha"
-	"code.linenisgreat.com/zit-go/src/delta/standort"
-	"code.linenisgreat.com/zit-go/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/toml"
+	"code.linenisgreat.com/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/delta/standort"
+	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
 type TomlBookmark struct {

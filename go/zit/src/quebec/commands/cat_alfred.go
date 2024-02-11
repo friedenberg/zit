@@ -4,12 +4,12 @@ import (
 	"bufio"
 	"flag"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/charlie/gattung"
-	"code.linenisgreat.com/zit-go/src/delta/gattungen"
-	"code.linenisgreat.com/zit-go/src/india/alfred"
-	"code.linenisgreat.com/zit-go/src/india/matcher"
-	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/delta/gattungen"
+	"code.linenisgreat.com/zit/src/india/alfred"
+	"code.linenisgreat.com/zit/src/india/matcher"
+	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
 type CatAlfred struct {

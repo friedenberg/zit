@@ -5,13 +5,13 @@ import (
 	"io"
 	"os"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/bravo/files"
-	"code.linenisgreat.com/zit-go/src/charlie/collections_ptr"
-	"code.linenisgreat.com/zit-go/src/charlie/sha"
-	"code.linenisgreat.com/zit-go/src/echo/kennung"
-	"code.linenisgreat.com/zit-go/src/hotel/sku"
-	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/files"
+	"code.linenisgreat.com/zit/src/charlie/collections_ptr"
+	"code.linenisgreat.com/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
 type CheckinAkte struct {

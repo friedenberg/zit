@@ -3,10 +3,10 @@ package objekte_format
 import (
 	"io"
 
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/charlie/catgut"
-	"code.linenisgreat.com/zit-go/src/echo/kennung"
-	"code.linenisgreat.com/zit-go/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/charlie/catgut"
+	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 )
 
 type (

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/charlie/collections"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/charlie/collections"
 )
 
 type Option interface {

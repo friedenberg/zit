@@ -4,10 +4,10 @@ import (
 	"encoding/gob"
 	"sync"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/charlie/collections_ptr"
-	"code.linenisgreat.com/zit-go/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/charlie/collections_ptr"
+	"code.linenisgreat.com/zit/src/charlie/gattung"
 )
 
 var (

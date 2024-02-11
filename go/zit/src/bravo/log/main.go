@@ -3,7 +3,7 @@ package log
 import (
 	"log"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/errors"
 )
 
 var SetOutput = log.SetOutput

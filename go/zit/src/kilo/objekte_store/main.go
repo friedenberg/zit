@@ -1,11 +1,11 @@
 package objekte_store
 
 import (
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/echo/kennung"
-	"code.linenisgreat.com/zit-go/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit-go/src/hotel/sku"
-	"code.linenisgreat.com/zit-go/src/india/matcher"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/matcher"
 )
 
 type (

@@ -1,6 +1,6 @@
 package sha_collections
 
-import "code.linenisgreat.com/zit-go/src/charlie/sha"
+import "code.linenisgreat.com/zit/src/charlie/sha"
 
 type Slice []sha.Sha
 

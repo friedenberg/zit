@@ -1,9 +1,9 @@
 package user_ops
 
 import (
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/charlie/exec_editor"
-	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/charlie/exec_editor"
+	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
 type OpenVim struct {

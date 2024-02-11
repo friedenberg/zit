@@ -3,13 +3,13 @@ package erworben
 import (
 	"reflect"
 
-	"code.linenisgreat.com/zit-go/src/alfa/erworben_cli_print_options"
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/bravo/erworben_tools"
-	"code.linenisgreat.com/zit-go/src/bravo/todo"
-	"code.linenisgreat.com/zit-go/src/charlie/gattung"
-	"code.linenisgreat.com/zit-go/src/charlie/script_config"
-	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/alfa/erworben_cli_print_options"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/erworben_tools"
+	"code.linenisgreat.com/zit/src/bravo/todo"
+	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/charlie/script_config"
+	"code.linenisgreat.com/zit/src/echo/kennung"
 )
 
 type Defaults struct {

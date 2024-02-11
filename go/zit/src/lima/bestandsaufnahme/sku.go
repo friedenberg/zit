@@ -1,10 +1,10 @@
 package bestandsaufnahme
 
 import (
-	"code.linenisgreat.com/zit-go/src/charlie/sha"
-	"code.linenisgreat.com/zit-go/src/delta/heap"
-	"code.linenisgreat.com/zit-go/src/golf/ennui"
-	"code.linenisgreat.com/zit-go/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/delta/heap"
+	"code.linenisgreat.com/zit/src/golf/ennui"
+	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
 type (

@@ -3,10 +3,10 @@ package sku
 import (
 	"encoding/gob"
 
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/echo/fd"
-	"code.linenisgreat.com/zit-go/src/echo/kennung"
-	"code.linenisgreat.com/zit-go/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/echo/fd"
+	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 )
 
 func init() {

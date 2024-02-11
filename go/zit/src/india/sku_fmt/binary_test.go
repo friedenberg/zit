@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"testing"
 
-	"code.linenisgreat.com/zit-go/src/bravo/test_logz"
-	"code.linenisgreat.com/zit-go/src/echo/kennung"
-	"code.linenisgreat.com/zit-go/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/bravo/test_logz"
+	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
 func TestBinaryOne(t1 *testing.T) {

@@ -7,11 +7,11 @@ import (
 	"strings"
 	"testing"
 
-	"code.linenisgreat.com/zit-go/src/bravo/test_logz"
-	"code.linenisgreat.com/zit-go/src/charlie/sha"
-	"code.linenisgreat.com/zit-go/src/echo/bezeichnung"
-	"code.linenisgreat.com/zit-go/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit-go/src/foxtrot/test_metadatei_io"
+	"code.linenisgreat.com/zit/src/bravo/test_logz"
+	"code.linenisgreat.com/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/echo/bezeichnung"
+	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/src/foxtrot/test_metadatei_io"
 )
 
 type noopCloser struct {

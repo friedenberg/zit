@@ -12,10 +12,10 @@ import (
 	"sync"
 	"syscall"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/india/erworben"
-	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/india/erworben"
+	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
 type MessageHiCommander struct {

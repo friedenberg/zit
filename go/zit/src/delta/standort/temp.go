@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"syscall"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/errors"
 )
 
 func (s Standort) ResetTemp() (err error) {

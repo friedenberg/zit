@@ -1,9 +1,9 @@
 package kennung_fmt
 
 import (
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/charlie/string_format_writer"
-	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/charlie/string_format_writer"
+	"code.linenisgreat.com/zit/src/echo/kennung"
 )
 
 type typCliFormat struct {

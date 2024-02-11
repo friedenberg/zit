@@ -3,8 +3,8 @@ package metadatei
 import (
 	"fmt"
 
-	"code.linenisgreat.com/zit-go/src/charlie/sha"
-	"code.linenisgreat.com/zit-go/src/echo/fd"
+	"code.linenisgreat.com/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/echo/fd"
 )
 
 func MakeErrHasInlineAkteAndFilePath(

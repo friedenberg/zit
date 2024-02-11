@@ -3,7 +3,7 @@ package iter
 import (
 	"encoding/gob"
 
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 )
 
 type StringerKeyer[

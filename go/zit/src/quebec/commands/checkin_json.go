@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"flag"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/bravo/log"
-	"code.linenisgreat.com/zit-go/src/delta/gattungen"
-	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/delta/gattungen"
+	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
 type CheckinJson struct{}

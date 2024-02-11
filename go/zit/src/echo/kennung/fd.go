@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/echo/fd"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/echo/fd"
 )
 
 func GetIdLike(f *fd.FD) (il Kennung, err error) {

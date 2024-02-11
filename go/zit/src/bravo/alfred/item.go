@@ -1,7 +1,7 @@
 package alfred
 
 import (
-	"code.linenisgreat.com/zit-go/src/charlie/catgut"
+	"code.linenisgreat.com/zit/src/charlie/catgut"
 )
 
 type Item struct {

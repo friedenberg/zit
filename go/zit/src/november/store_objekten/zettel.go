@@ -3,15 +3,15 @@ package store_objekten
 import (
 	"io"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/bravo/objekte_mode"
-	"code.linenisgreat.com/zit-go/src/bravo/todo"
-	"code.linenisgreat.com/zit-go/src/charlie/gattung"
-	"code.linenisgreat.com/zit-go/src/charlie/sha"
-	"code.linenisgreat.com/zit-go/src/echo/kennung"
-	"code.linenisgreat.com/zit-go/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit-go/src/hotel/sku"
-	"code.linenisgreat.com/zit-go/src/kilo/objekte_store"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/src/bravo/todo"
+	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/kilo/objekte_store"
 )
 
 func (s *Store) CreateWithAkteString(

@@ -3,12 +3,12 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/delta/gattungen"
-	"code.linenisgreat.com/zit-go/src/india/matcher"
-	"code.linenisgreat.com/zit-go/src/kilo/cwd"
-	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
-	"code.linenisgreat.com/zit-go/src/papa/user_ops"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/delta/gattungen"
+	"code.linenisgreat.com/zit/src/india/matcher"
+	"code.linenisgreat.com/zit/src/kilo/cwd"
+	"code.linenisgreat.com/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/papa/user_ops"
 )
 
 type Checkin struct {

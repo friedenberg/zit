@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"code.linenisgreat.com/zit-go/src/bravo/test_logz"
+	"code.linenisgreat.com/zit/src/bravo/test_logz"
 )
 
 func TestSigilReadWrite(t1 *testing.T) {

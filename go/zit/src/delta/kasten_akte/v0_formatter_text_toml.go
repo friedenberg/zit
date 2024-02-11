@@ -3,8 +3,8 @@ package kasten_akte
 import (
 	"io"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/alfa/toml"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/toml"
 )
 
 type FormatterAkteTextToml struct{}

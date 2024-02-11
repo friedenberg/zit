@@ -3,9 +3,9 @@ package metadatei
 import (
 	"io"
 
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/charlie/script_config"
-	"code.linenisgreat.com/zit-go/src/delta/ohio"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/charlie/script_config"
+	"code.linenisgreat.com/zit/src/delta/ohio"
 )
 
 type textFormatter struct {

@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/bravo/iter"
-	"code.linenisgreat.com/zit-go/src/echo/bezeichnung"
-	"code.linenisgreat.com/zit-go/src/echo/kennung"
-	"code.linenisgreat.com/zit-go/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/echo/bezeichnung"
+	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 )
 
 type SetKeyToMetadatei map[string]*metadatei.Metadatei

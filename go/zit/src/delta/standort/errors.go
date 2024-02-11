@@ -3,8 +3,8 @@ package standort
 import (
 	"fmt"
 
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/charlie/sha"
 )
 
 type ErrNotInZitDir struct{}

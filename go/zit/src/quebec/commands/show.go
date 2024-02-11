@@ -3,14 +3,14 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/bravo/iter"
-	"code.linenisgreat.com/zit-go/src/charlie/gattung"
-	"code.linenisgreat.com/zit-go/src/delta/gattungen"
-	"code.linenisgreat.com/zit-go/src/india/matcher"
-	"code.linenisgreat.com/zit-go/src/juliett/objekte"
-	"code.linenisgreat.com/zit-go/src/kilo/objekte_formatter"
-	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/delta/gattungen"
+	"code.linenisgreat.com/zit/src/india/matcher"
+	"code.linenisgreat.com/zit/src/juliett/objekte"
+	"code.linenisgreat.com/zit/src/kilo/objekte_formatter"
+	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
 type Show struct {

@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"testing"
 
-	"code.linenisgreat.com/zit-go/src/bravo/test_logz"
-	"code.linenisgreat.com/zit-go/src/charlie/catgut"
+	"code.linenisgreat.com/zit/src/bravo/test_logz"
+	"code.linenisgreat.com/zit/src/charlie/catgut"
 )
 
 func TestReadWrite(t1 *testing.T) {

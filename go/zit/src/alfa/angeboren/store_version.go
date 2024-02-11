@@ -1,8 +1,8 @@
 package angeboren
 
 import (
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/bravo/values"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/values"
 )
 
 type storeVersion values.Int

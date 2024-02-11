@@ -1,8 +1,8 @@
 package erworben
 
 import (
-	"code.linenisgreat.com/zit-go/src/bravo/erworben_tools"
-	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/bravo/erworben_tools"
+	"code.linenisgreat.com/zit/src/echo/kennung"
 )
 
 func Default(defaultTyp kennung.Typ) (k Akte) {

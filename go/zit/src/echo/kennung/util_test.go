@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/bravo/test_logz"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/test_logz"
 )
 
 func TestMain(m *testing.M) {

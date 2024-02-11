@@ -1,9 +1,9 @@
 package iter2
 
 import (
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/iter"
 )
 
 func AddPtrOrReplaceIfGreater[T any, TPtr schnittstellen.Ptr[T]](

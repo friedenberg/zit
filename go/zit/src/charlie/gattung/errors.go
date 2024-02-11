@@ -3,8 +3,8 @@ package gattung
 import (
 	"fmt"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 )
 
 var ErrNoAbbreviation = errors.New("no abbreviation")

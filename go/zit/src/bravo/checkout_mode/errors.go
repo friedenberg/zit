@@ -1,6 +1,6 @@
 package checkout_mode
 
-import "code.linenisgreat.com/zit-go/src/alfa/errors"
+import "code.linenisgreat.com/zit/src/alfa/errors"
 
 type errInvalidCheckoutMode error
 

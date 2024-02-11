@@ -8,16 +8,16 @@ import (
 	"os"
 	"path"
 
-	"code.linenisgreat.com/zit-go/src/alfa/angeboren"
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/bravo/files"
-	"code.linenisgreat.com/zit-go/src/charlie/age"
-	"code.linenisgreat.com/zit-go/src/charlie/gattung"
-	"code.linenisgreat.com/zit-go/src/charlie/sha"
-	"code.linenisgreat.com/zit-go/src/echo/kennung"
-	"code.linenisgreat.com/zit-go/src/india/erworben"
-	"code.linenisgreat.com/zit-go/src/kilo/typ"
+	"code.linenisgreat.com/zit/src/alfa/angeboren"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/files"
+	"code.linenisgreat.com/zit/src/charlie/age"
+	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/india/erworben"
+	"code.linenisgreat.com/zit/src/kilo/typ"
 )
 
 type Einleitung struct {

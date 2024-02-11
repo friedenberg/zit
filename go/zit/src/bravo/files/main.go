@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"path"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/errors"
 )
 
 const (

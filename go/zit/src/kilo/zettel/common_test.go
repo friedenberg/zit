@@ -3,12 +3,12 @@ package zettel
 import (
 	"strings"
 
-	"code.linenisgreat.com/zit-go/src/bravo/test_logz"
-	"code.linenisgreat.com/zit-go/src/charlie/collections_ptr"
-	"code.linenisgreat.com/zit-go/src/echo/kennung"
-	"code.linenisgreat.com/zit-go/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit-go/src/foxtrot/test_metadatei_io"
-	"code.linenisgreat.com/zit-go/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/bravo/test_logz"
+	"code.linenisgreat.com/zit/src/charlie/collections_ptr"
+	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/src/foxtrot/test_metadatei_io"
+	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
 type inlineTypChecker struct {

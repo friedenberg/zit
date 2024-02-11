@@ -1,7 +1,7 @@
 package matcher
 
 import (
-	"code.linenisgreat.com/zit-go/src/echo/fd"
+	"code.linenisgreat.com/zit/src/echo/fd"
 )
 
 type matcherCwd interface {

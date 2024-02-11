@@ -3,8 +3,8 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
 type Reindex struct{}

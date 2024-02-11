@@ -3,7 +3,7 @@ package format
 import (
 	"io"
 
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 )
 
 type readerFrom[T any] struct {

@@ -3,11 +3,11 @@ package alfred
 import (
 	"fmt"
 
-	"code.linenisgreat.com/zit-go/src/bravo/alfred"
-	"code.linenisgreat.com/zit-go/src/bravo/expansion"
-	"code.linenisgreat.com/zit-go/src/bravo/iter"
-	"code.linenisgreat.com/zit-go/src/echo/kennung"
-	"code.linenisgreat.com/zit-go/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/bravo/alfred"
+	"code.linenisgreat.com/zit/src/bravo/expansion"
+	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
 func (w *Writer) zettelToItem(

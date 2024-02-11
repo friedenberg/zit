@@ -3,8 +3,8 @@ package matcher
 import (
 	"sync/atomic"
 
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
 type Archiviert interface {

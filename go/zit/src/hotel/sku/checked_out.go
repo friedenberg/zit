@@ -3,7 +3,7 @@ package sku
 import (
 	"fmt"
 
-	"code.linenisgreat.com/zit-go/src/delta/checked_out_state"
+	"code.linenisgreat.com/zit/src/delta/checked_out_state"
 )
 
 type CheckedOut struct {

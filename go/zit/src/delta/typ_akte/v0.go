@@ -1,11 +1,11 @@
 package typ_akte
 
 import (
-	"code.linenisgreat.com/zit-go/src/alfa/etikett_rule"
-	"code.linenisgreat.com/zit-go/src/alfa/reset"
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/charlie/gattung"
-	"code.linenisgreat.com/zit-go/src/charlie/script_config"
+	"code.linenisgreat.com/zit/src/alfa/etikett_rule"
+	"code.linenisgreat.com/zit/src/alfa/reset"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/charlie/script_config"
 )
 
 type V0 struct {

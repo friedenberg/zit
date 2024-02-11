@@ -3,8 +3,8 @@ package collections_value
 import (
 	"testing"
 
-	"code.linenisgreat.com/zit-go/src/bravo/test_logz"
-	"code.linenisgreat.com/zit-go/src/bravo/values"
+	"code.linenisgreat.com/zit/src/bravo/test_logz"
+	"code.linenisgreat.com/zit/src/bravo/values"
 )
 
 func TestSet(t1 *testing.T) {

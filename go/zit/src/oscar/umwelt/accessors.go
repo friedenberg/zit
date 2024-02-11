@@ -3,12 +3,12 @@ package umwelt
 import (
 	"io"
 
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/delta/standort"
-	"code.linenisgreat.com/zit-go/src/delta/thyme"
-	"code.linenisgreat.com/zit-go/src/juliett/konfig"
-	"code.linenisgreat.com/zit-go/src/mike/store_util"
-	"code.linenisgreat.com/zit-go/src/november/store_objekten"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/delta/standort"
+	"code.linenisgreat.com/zit/src/delta/thyme"
+	"code.linenisgreat.com/zit/src/juliett/konfig"
+	"code.linenisgreat.com/zit/src/mike/store_util"
+	"code.linenisgreat.com/zit/src/november/store_objekten"
 )
 
 func (u *Umwelt) Sonnenaufgang() thyme.Time {

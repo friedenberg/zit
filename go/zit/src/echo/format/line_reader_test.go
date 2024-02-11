@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"code.linenisgreat.com/zit-go/src/bravo/test_logz"
-	"code.linenisgreat.com/zit-go/src/bravo/values"
-	"code.linenisgreat.com/zit-go/src/delta/ohio"
+	"code.linenisgreat.com/zit/src/bravo/test_logz"
+	"code.linenisgreat.com/zit/src/bravo/values"
+	"code.linenisgreat.com/zit/src/delta/ohio"
 )
 
 func TestLineReaderOneReaderHappy(t1 *testing.T) {

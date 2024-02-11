@@ -3,8 +3,8 @@ package bezeichnung
 import (
 	"strings"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/charlie/catgut"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/charlie/catgut"
 )
 
 // TODO-P1 move to catgut.String

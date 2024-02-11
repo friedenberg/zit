@@ -1,7 +1,7 @@
 package changes
 
 import (
-	"code.linenisgreat.com/zit-go/src/echo/bezeichnung"
+	"code.linenisgreat.com/zit/src/echo/bezeichnung"
 )
 
 type ChangeBezeichnungKeyer struct{}

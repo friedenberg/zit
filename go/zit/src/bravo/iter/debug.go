@@ -1,7 +1,7 @@
 package iter
 
 import (
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 )
 
 func PrintPointer[T any, TPtr schnittstellen.Ptr[T]](e TPtr) (err error) {

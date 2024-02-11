@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"io"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/charlie/script_config"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/charlie/script_config"
 )
 
 type formatterActionNames struct{}

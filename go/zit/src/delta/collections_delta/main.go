@@ -1,8 +1,8 @@
 package collections_delta
 
 import (
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/charlie/collections_value"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/charlie/collections_value"
 )
 
 type delta[T schnittstellen.ValueLike] struct {

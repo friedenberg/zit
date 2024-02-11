@@ -3,15 +3,15 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit-go/src/charlie/script_config"
-	"code.linenisgreat.com/zit-go/src/delta/typ_akte"
-	"code.linenisgreat.com/zit-go/src/echo/kennung"
-	"code.linenisgreat.com/zit-go/src/hotel/sku"
-	"code.linenisgreat.com/zit-go/src/juliett/objekte"
-	"code.linenisgreat.com/zit-go/src/kilo/cwd"
-	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
+	"code.linenisgreat.com/zit/src/charlie/script_config"
+	"code.linenisgreat.com/zit/src/delta/typ_akte"
+	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/juliett/objekte"
+	"code.linenisgreat.com/zit/src/kilo/cwd"
+	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
 type FormatZettel struct {

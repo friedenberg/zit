@@ -3,12 +3,12 @@ package store_util
 import (
 	"encoding/gob"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/bravo/iter"
-	"code.linenisgreat.com/zit-go/src/echo/kennung"
-	"code.linenisgreat.com/zit-go/src/kilo/objekte_store"
-	"code.linenisgreat.com/zit-go/src/lima/bestandsaufnahme"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/kilo/objekte_store"
+	"code.linenisgreat.com/zit/src/lima/bestandsaufnahme"
 )
 
 func (s *common) FlushBestandsaufnahme() (err error) {

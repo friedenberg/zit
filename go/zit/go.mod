@@ -1,4 +1,4 @@
-module code.linenisgreat.com/zit-go
+module code.linenisgreat.com/zit
 
 go 1.21
 

@@ -4,15 +4,15 @@ import (
 	"os"
 	"syscall"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/charlie/gattung"
-	"code.linenisgreat.com/zit-go/src/delta/gattungen"
-	"code.linenisgreat.com/zit-go/src/echo/kennung"
-	"code.linenisgreat.com/zit-go/src/hotel/sku"
-	"code.linenisgreat.com/zit-go/src/india/matcher"
-	to_merge "code.linenisgreat.com/zit-go/src/india/sku_fmt"
-	"code.linenisgreat.com/zit-go/src/kilo/cwd"
-	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/delta/gattungen"
+	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/matcher"
+	to_merge "code.linenisgreat.com/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/src/kilo/cwd"
+	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
 type CommandWithCwdQuery interface {

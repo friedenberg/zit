@@ -6,8 +6,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/charlie/catgut"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/charlie/catgut"
 )
 
 var mapMatcherOperators = map[rune]bool{

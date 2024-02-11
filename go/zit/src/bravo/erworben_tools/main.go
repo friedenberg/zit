@@ -3,7 +3,7 @@ package erworben_tools
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/errors"
 	"github.com/google/shlex"
 )
 

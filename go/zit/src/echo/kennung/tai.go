@@ -9,14 +9,14 @@ import (
 	"strings"
 
 	chai "github.com/brandondube/tai"
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/bravo/values"
-	"code.linenisgreat.com/zit-go/src/charlie/collections_value"
-	"code.linenisgreat.com/zit-go/src/charlie/gattung"
-	"code.linenisgreat.com/zit-go/src/charlie/string_format_writer"
-	"code.linenisgreat.com/zit-go/src/delta/ohio"
-	"code.linenisgreat.com/zit-go/src/delta/thyme"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/values"
+	"code.linenisgreat.com/zit/src/charlie/collections_value"
+	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/charlie/string_format_writer"
+	"code.linenisgreat.com/zit/src/delta/ohio"
+	"code.linenisgreat.com/zit/src/delta/thyme"
 )
 
 type tai = chai.TAI

@@ -6,12 +6,12 @@ import (
 	"os"
 	"os/exec"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit-go/src/charlie/checkout_options"
-	"code.linenisgreat.com/zit-go/src/echo/fd"
-	"code.linenisgreat.com/zit-go/src/hotel/sku"
-	"code.linenisgreat.com/zit-go/src/juliett/to_merge"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
+	"code.linenisgreat.com/zit/src/charlie/checkout_options"
+	"code.linenisgreat.com/zit/src/echo/fd"
+	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/juliett/to_merge"
 )
 
 func (s *Store) merge(tm to_merge.Sku) (merged sku.ExternalFDs, err error) {

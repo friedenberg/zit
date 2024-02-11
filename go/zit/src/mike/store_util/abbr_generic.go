@@ -3,10 +3,10 @@ package store_util
 import (
 	"fmt"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/charlie/collections"
-	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/charlie/collections"
+	"code.linenisgreat.com/zit/src/echo/kennung"
 )
 
 type AbbrStorePresenceGeneric[V any] interface {

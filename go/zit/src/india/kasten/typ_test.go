@@ -3,7 +3,7 @@ package kasten
 import (
 	"testing"
 
-	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/echo/kennung"
 )
 
 func TestAkteExt(t *testing.T) {

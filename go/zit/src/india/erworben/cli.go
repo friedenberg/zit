@@ -3,9 +3,9 @@ package erworben
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit-go/src/alfa/erworben_cli_print_options"
-	"code.linenisgreat.com/zit-go/src/bravo/erworben_tools"
-	"code.linenisgreat.com/zit-go/src/charlie/debug"
+	"code.linenisgreat.com/zit/src/alfa/erworben_cli_print_options"
+	"code.linenisgreat.com/zit/src/bravo/erworben_tools"
+	"code.linenisgreat.com/zit/src/charlie/debug"
 )
 
 type Cli struct {

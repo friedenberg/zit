@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"io"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/errors"
 )
 
 type formatterFormatterUTIGroups struct{}

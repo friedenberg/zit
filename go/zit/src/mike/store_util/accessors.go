@@ -1,22 +1,22 @@
 package store_util
 
 import (
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/charlie/collections"
-	"code.linenisgreat.com/zit-go/src/charlie/sha"
-	"code.linenisgreat.com/zit-go/src/delta/standort"
-	"code.linenisgreat.com/zit-go/src/delta/thyme"
-	"code.linenisgreat.com/zit-go/src/echo/kennung"
-	"code.linenisgreat.com/zit-go/src/golf/ennui"
-	"code.linenisgreat.com/zit-go/src/golf/kennung_index"
-	"code.linenisgreat.com/zit-go/src/golf/objekte_format"
-	"code.linenisgreat.com/zit-go/src/hotel/sku"
-	"code.linenisgreat.com/zit-go/src/india/objekte_collections"
-	"code.linenisgreat.com/zit-go/src/juliett/konfig"
-	"code.linenisgreat.com/zit-go/src/kilo/cwd"
-	"code.linenisgreat.com/zit-go/src/kilo/store_verzeichnisse"
-	"code.linenisgreat.com/zit-go/src/lima/akten"
-	"code.linenisgreat.com/zit-go/src/lima/bestandsaufnahme"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/charlie/collections"
+	"code.linenisgreat.com/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/delta/standort"
+	"code.linenisgreat.com/zit/src/delta/thyme"
+	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/golf/ennui"
+	"code.linenisgreat.com/zit/src/golf/kennung_index"
+	"code.linenisgreat.com/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/objekte_collections"
+	"code.linenisgreat.com/zit/src/juliett/konfig"
+	"code.linenisgreat.com/zit/src/kilo/cwd"
+	"code.linenisgreat.com/zit/src/kilo/store_verzeichnisse"
+	"code.linenisgreat.com/zit/src/lima/akten"
+	"code.linenisgreat.com/zit/src/lima/bestandsaufnahme"
 )
 
 type accessors interface {

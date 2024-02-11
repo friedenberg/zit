@@ -1,7 +1,7 @@
 package umwelt
 
 import (
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/errors"
 )
 
 func (u *Umwelt) Lock() (err error) {

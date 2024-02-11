@@ -3,10 +3,10 @@ package sku
 import (
 	"fmt"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit-go/src/bravo/files"
-	"code.linenisgreat.com/zit-go/src/echo/fd"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
+	"code.linenisgreat.com/zit/src/bravo/files"
+	"code.linenisgreat.com/zit/src/echo/fd"
 )
 
 type ExternalFDs struct {

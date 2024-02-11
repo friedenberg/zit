@@ -1,8 +1,8 @@
 package sku_fmt
 
 import (
-	"code.linenisgreat.com/zit-go/src/echo/kennung"
-	"code.linenisgreat.com/zit-go/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/hotel/sku"
 	lua "github.com/yuin/gopher-lua"
 )
 

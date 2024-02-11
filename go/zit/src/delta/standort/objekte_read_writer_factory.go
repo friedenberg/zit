@@ -1,7 +1,7 @@
 package standort
 
 import (
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 )
 
 func (s Standort) ObjekteReaderFactory(

@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/errors"
 )
 
 func isNotExists(err error, msg []byte) bool {

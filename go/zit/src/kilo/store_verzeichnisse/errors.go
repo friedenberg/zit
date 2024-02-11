@@ -1,6 +1,6 @@
 package store_verzeichnisse
 
-import "code.linenisgreat.com/zit-go/src/alfa/errors"
+import "code.linenisgreat.com/zit/src/alfa/errors"
 
 var errConcurrentPageAccess = errors.New("concurrent page access")
 

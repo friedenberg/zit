@@ -3,16 +3,16 @@ package umwelt
 import (
 	"time"
 
-	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit-go/src/charlie/catgut"
-	"code.linenisgreat.com/zit-go/src/charlie/string_format_writer"
-	"code.linenisgreat.com/zit-go/src/delta/checked_out_state"
-	"code.linenisgreat.com/zit-go/src/echo/bezeichnung"
-	"code.linenisgreat.com/zit-go/src/echo/fd"
-	"code.linenisgreat.com/zit-go/src/echo/kennung"
-	"code.linenisgreat.com/zit-go/src/foxtrot/kennung_fmt"
-	"code.linenisgreat.com/zit-go/src/hotel/sku"
-	"code.linenisgreat.com/zit-go/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/charlie/catgut"
+	"code.linenisgreat.com/zit/src/charlie/string_format_writer"
+	"code.linenisgreat.com/zit/src/delta/checked_out_state"
+	"code.linenisgreat.com/zit/src/echo/bezeichnung"
+	"code.linenisgreat.com/zit/src/echo/fd"
+	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/foxtrot/kennung_fmt"
+	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/sku_fmt"
 )
 
 func (u *Umwelt) FormatColorOptionsOut() (o string_format_writer.ColorOptions) {

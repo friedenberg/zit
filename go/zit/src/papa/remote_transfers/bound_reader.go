@@ -4,8 +4,8 @@ import (
 	"io"
 	"sync"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/charlie/sha"
 )
 
 type boundReader struct {

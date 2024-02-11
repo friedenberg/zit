@@ -3,8 +3,8 @@ package standort
 import (
 	"os"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/charlie/debug"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/charlie/debug"
 )
 
 type Options struct {

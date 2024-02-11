@@ -3,10 +3,10 @@ package commands
 import (
 	"os"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/charlie/debug"
-	"code.linenisgreat.com/zit-go/src/india/erworben"
-	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/charlie/debug"
+	"code.linenisgreat.com/zit/src/india/erworben"
+	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
 func Run(args []string) (exitStatus int) {

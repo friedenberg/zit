@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"io"
 
-	"code.linenisgreat.com/zit-go/src/alfa/errors"
-	"code.linenisgreat.com/zit-go/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
 type WriterJson struct {
