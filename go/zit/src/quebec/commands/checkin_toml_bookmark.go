@@ -141,7 +141,7 @@ func (c CheckinTomlBookmark) getUrls(
 	u *umwelt.Umwelt,
 	urlsFound map[string]CheckinTomlBookmarkEntry,
 ) (urls map[string]SkuWithUrl, err error) {
-	query := "!toml-bookmark:z"
+	query := "!toml-bookmark?z"
 
 	ids := u.MakeMetaIdSetWithExcludedHidden(c.DefaultGattungen())
 

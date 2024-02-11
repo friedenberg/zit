@@ -11,7 +11,7 @@ import (
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/delta/thyme"
+	"github.com/friedenberg/zit/src/charlie/string_format_writer"
 	"github.com/friedenberg/zit/src/delta/zittish"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/kennung"
@@ -69,7 +69,7 @@ func (f *OrganizeNew) WriteStringFormat(
 	if f.options.PrintTime {
 		t := o.GetTai()
 
-		n1, err = sw.WriteString(t.Format(thyme.FormatDateTime))
+		n1, err = sw.WriteString(t.Format(string_format_writer.StringFormatDateTime))
 		n += int64(n1)
 
 		if err != nil {

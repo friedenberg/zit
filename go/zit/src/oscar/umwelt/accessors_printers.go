@@ -1,6 +1,8 @@
 package umwelt
 
 import (
+	"time"
+
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/charlie/catgut"
 	"github.com/friedenberg/zit/src/charlie/string_format_writer"
@@ -185,12 +187,23 @@ func (u *Umwelt) PrinterFDDeleted() schnittstellen.FuncIter[*fd.FD] {
 	)
 }
 
+func (u *Umwelt) GetTime() time.Time {
+	return time.Now()
+}
+
 func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[string] {
 	if u.konfig.PrintOptions.PrintFlush {
 		return string_format_writer.MakeDelim[string](
 			"\n",
 			u.Out(),
-			string_format_writer.MakeIndentedHeader(u.FormatColorOptionsOut()),
+			string_format_writer.MakeDefaultDatePrefixFormatWriter(
+				u,
+				string_format_writer.MakeColor[string](
+					u.FormatColorOptionsOut(),
+					string_format_writer.MakeString[string](),
+					string_format_writer.ColorTypeTitle,
+				),
+			),
 		)
 	} else {
 		return func(string) error { return nil }

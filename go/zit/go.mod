@@ -1,4 +1,4 @@
-module github.com/friedenberg/zit
+module code.linenisgreat.com/zit-go
 
 go 1.21
 

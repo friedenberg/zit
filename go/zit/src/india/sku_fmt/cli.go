@@ -6,7 +6,6 @@ import (
 	"github.com/friedenberg/zit/src/alfa/schnittstellen"
 	"github.com/friedenberg/zit/src/bravo/iter"
 	"github.com/friedenberg/zit/src/charlie/string_format_writer"
-	"github.com/friedenberg/zit/src/delta/thyme"
 	"github.com/friedenberg/zit/src/echo/bezeichnung"
 	"github.com/friedenberg/zit/src/echo/kennung"
 	"github.com/friedenberg/zit/src/hotel/sku"
@@ -80,7 +79,7 @@ func (f *cli) WriteStringFormat(
 		var bracketPrefix string
 
 		if f.options.PrintTime {
-			bracketPrefix = o.GetTai().Format(thyme.FormatDateTime)
+			bracketPrefix = o.GetTai().Format(string_format_writer.StringFormatDateTime)
 		}
 
 		if bracketPrefix != "" {
