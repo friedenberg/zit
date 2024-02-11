@@ -1,16 +1,16 @@
 package sku_fmt
 
 import (
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/checkout_mode"
-	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/charlie/string_format_writer"
-	"github.com/friedenberg/zit/src/delta/checked_out_state"
-	"github.com/friedenberg/zit/src/echo/bezeichnung"
-	"github.com/friedenberg/zit/src/echo/fd"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/erworben_cli_print_options"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/bravo/checkout_mode"
+	"code.linenisgreat.com/zit-go/src/bravo/iter"
+	"code.linenisgreat.com/zit-go/src/charlie/string_format_writer"
+	"code.linenisgreat.com/zit-go/src/delta/checked_out_state"
+	"code.linenisgreat.com/zit-go/src/echo/bezeichnung"
+	"code.linenisgreat.com/zit-go/src/echo/fd"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
 )
 
 type cliCheckedOut struct {

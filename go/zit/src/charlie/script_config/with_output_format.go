@@ -1,6 +1,6 @@
 package script_config
 
-import "github.com/friedenberg/zit/src/bravo/equality"
+import "code.linenisgreat.com/zit-go/src/bravo/equality"
 
 type WithOutputFormat struct {
 	ScriptConfig

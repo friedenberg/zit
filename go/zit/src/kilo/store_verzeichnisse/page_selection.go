@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/charlie/sha"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
 )
 
 func (i *Store) PageForKennung(h kennung.Kennung) (n uint8, err error) {

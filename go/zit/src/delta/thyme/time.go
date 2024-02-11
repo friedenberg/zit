@@ -9,13 +9,13 @@ import (
 	tyme "time"
 
 	chai "github.com/brandondube/tai"
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/collections_value"
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/charlie/string_format_writer"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/bravo/values"
+	"code.linenisgreat.com/zit-go/src/charlie/collections_value"
+	"code.linenisgreat.com/zit-go/src/charlie/gattung"
+	"code.linenisgreat.com/zit-go/src/charlie/sha"
+	"code.linenisgreat.com/zit-go/src/charlie/string_format_writer"
 )
 
 const (

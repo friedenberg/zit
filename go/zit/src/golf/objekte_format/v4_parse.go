@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/catgut"
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/charlie/catgut"
+	"code.linenisgreat.com/zit-go/src/charlie/gattung"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
 )
 
 type key struct {

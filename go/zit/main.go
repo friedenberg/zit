@@ -5,7 +5,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/friedenberg/zit/src/quebec/commands"
+	"code.linenisgreat.com/zit-go/src/quebec/commands"
 )
 
 func main() {

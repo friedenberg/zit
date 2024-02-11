@@ -1,8 +1,8 @@
 package store_objekten
 
 import (
-	"github.com/friedenberg/zit/src/bravo/objekte_mode"
-	"github.com/friedenberg/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
 )
 
 func (s *Store) addToTomlIndexIfNecessary(

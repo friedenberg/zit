@@ -1,7 +1,7 @@
 package iter
 
 import (
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
 )
 
 func ResetMap[K comparable, V any](m map[K]V) {

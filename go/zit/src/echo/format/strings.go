@@ -6,9 +6,9 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/string_format_writer"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/charlie/string_format_writer"
 )
 
 func MakeFormatStringRightAligned(

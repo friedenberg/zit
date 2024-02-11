@@ -1,8 +1,8 @@
 package sku
 
 import (
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/pool"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/bravo/pool"
 )
 
 var (

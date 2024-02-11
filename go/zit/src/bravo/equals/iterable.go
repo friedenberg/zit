@@ -1,6 +1,6 @@
 package equals
 
-import "github.com/friedenberg/zit/src/alfa/schnittstellen"
+import "code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
 
 func Iterable[T any](a, b schnittstellen.Iterable[T]) bool {
 	return false

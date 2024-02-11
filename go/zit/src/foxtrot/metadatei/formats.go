@@ -1,8 +1,8 @@
 package metadatei
 
 import (
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/script_config"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/charlie/script_config"
 )
 
 type TextFormat struct {

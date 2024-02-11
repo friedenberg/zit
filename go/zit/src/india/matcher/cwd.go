@@ -1,7 +1,7 @@
 package matcher
 
 import (
-	"github.com/friedenberg/zit/src/echo/fd"
+	"code.linenisgreat.com/zit-go/src/echo/fd"
 )
 
 type matcherCwd interface {

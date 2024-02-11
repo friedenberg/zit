@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/bravo/iter"
+	"code.linenisgreat.com/zit-go/src/charlie/gattung"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
 )
 
 const (

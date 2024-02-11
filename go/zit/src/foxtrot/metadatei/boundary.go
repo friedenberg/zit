@@ -3,8 +3,8 @@ package metadatei
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/catgut"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/charlie/catgut"
 )
 
 const (

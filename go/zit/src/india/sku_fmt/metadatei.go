@@ -3,9 +3,9 @@ package sku_fmt
 import (
 	"strings"
 
-	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/bravo/iter"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
 )
 
 func StringMetadatei(o *sku.Transacted) (str string) {

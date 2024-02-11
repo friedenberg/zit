@@ -1,22 +1,22 @@
 package store_util
 
 import (
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/standort"
-	"github.com/friedenberg/zit/src/delta/thyme"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/golf/ennui"
-	"github.com/friedenberg/zit/src/golf/kennung_index"
-	"github.com/friedenberg/zit/src/golf/objekte_format"
-	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/objekte_collections"
-	"github.com/friedenberg/zit/src/juliett/konfig"
-	"github.com/friedenberg/zit/src/kilo/cwd"
-	"github.com/friedenberg/zit/src/kilo/store_verzeichnisse"
-	"github.com/friedenberg/zit/src/lima/akten"
-	"github.com/friedenberg/zit/src/lima/bestandsaufnahme"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/charlie/collections"
+	"code.linenisgreat.com/zit-go/src/charlie/sha"
+	"code.linenisgreat.com/zit-go/src/delta/standort"
+	"code.linenisgreat.com/zit-go/src/delta/thyme"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/golf/ennui"
+	"code.linenisgreat.com/zit-go/src/golf/kennung_index"
+	"code.linenisgreat.com/zit-go/src/golf/objekte_format"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/india/objekte_collections"
+	"code.linenisgreat.com/zit-go/src/juliett/konfig"
+	"code.linenisgreat.com/zit-go/src/kilo/cwd"
+	"code.linenisgreat.com/zit-go/src/kilo/store_verzeichnisse"
+	"code.linenisgreat.com/zit-go/src/lima/akten"
+	"code.linenisgreat.com/zit-go/src/lima/bestandsaufnahme"
 )
 
 type accessors interface {

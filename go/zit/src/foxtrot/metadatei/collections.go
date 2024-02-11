@@ -1,6 +1,6 @@
 package metadatei
 
-import "github.com/friedenberg/zit/src/delta/heap"
+import "code.linenisgreat.com/zit-go/src/delta/heap"
 
 type (
 	Heap = heap.Heap[Metadatei, *Metadatei]

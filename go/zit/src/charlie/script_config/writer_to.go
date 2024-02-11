@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
 )
 
 type RemoteScript interface {

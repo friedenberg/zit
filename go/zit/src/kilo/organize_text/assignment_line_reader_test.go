@@ -5,16 +5,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
-	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/test_logz"
-	"github.com/friedenberg/zit/src/charlie/collections_value"
-	"github.com/friedenberg/zit/src/echo/bezeichnung"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/erworben_cli_print_options"
+	"code.linenisgreat.com/zit-go/src/bravo/iter"
+	"code.linenisgreat.com/zit-go/src/bravo/test_logz"
+	"code.linenisgreat.com/zit-go/src/charlie/collections_value"
+	"code.linenisgreat.com/zit-go/src/echo/bezeichnung"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/india/sku_fmt"
 )
 
 func TestMain(m *testing.M) {

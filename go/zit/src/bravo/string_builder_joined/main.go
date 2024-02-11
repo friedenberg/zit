@@ -3,7 +3,7 @@ package string_builder_joined
 import (
 	"strings"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
 )
 
 type builder struct {

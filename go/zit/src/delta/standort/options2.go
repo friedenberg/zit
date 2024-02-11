@@ -3,8 +3,8 @@ package standort
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/angeboren"
-	"github.com/friedenberg/zit/src/charlie/age"
+	"code.linenisgreat.com/zit-go/src/alfa/angeboren"
+	"code.linenisgreat.com/zit-go/src/charlie/age"
 )
 
 type ReadOptions struct {

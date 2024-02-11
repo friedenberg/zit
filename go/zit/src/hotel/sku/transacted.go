@@ -3,14 +3,14 @@ package sku
 import (
 	"fmt"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/bravo/iter"
+	"code.linenisgreat.com/zit-go/src/bravo/values"
+	"code.linenisgreat.com/zit-go/src/charlie/sha"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit-go/src/golf/objekte_format"
 )
 
 type Transacted struct {

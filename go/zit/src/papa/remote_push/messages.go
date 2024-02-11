@@ -1,8 +1,8 @@
 package remote_push
 
 import (
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit-go/src/charlie/gattung"
+	"code.linenisgreat.com/zit-go/src/charlie/sha"
 )
 
 type messageRequestObjekteData struct {

@@ -1,8 +1,8 @@
 package remote_transfers
 
 import (
-	"github.com/friedenberg/zit/src/golf/objekte_format"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit-go/src/golf/objekte_format"
+	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
 )
 
 type common struct {

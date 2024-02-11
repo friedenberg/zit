@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
 )
 
 type formatterVimSyntaxType struct{}

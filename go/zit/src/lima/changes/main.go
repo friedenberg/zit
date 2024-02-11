@@ -1,13 +1,13 @@
 package changes
 
 import (
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/collections_value"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/kilo/organize_text"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/bravo/values"
+	"code.linenisgreat.com/zit-go/src/charlie/collections_value"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit-go/src/kilo/organize_text"
 )
 
 type Changes interface {

@@ -4,11 +4,11 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/charlie/gattung"
+	"code.linenisgreat.com/zit-go/src/charlie/sha"
+	"code.linenisgreat.com/zit-go/src/delta/gattungen"
+	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
 )
 
 type CatAkteShas struct{}

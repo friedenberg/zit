@@ -3,14 +3,14 @@ package zettel
 import (
 	"strings"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/log"
-	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/delta/typ_akte"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/juliett/konfig"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/bravo/log"
+	"code.linenisgreat.com/zit-go/src/charlie/collections"
+	"code.linenisgreat.com/zit-go/src/delta/typ_akte"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/juliett/konfig"
 )
 
 func MakeWriterKonfig(

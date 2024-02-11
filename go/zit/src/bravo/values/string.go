@@ -1,6 +1,6 @@
 package values
 
-import "github.com/friedenberg/zit/src/alfa/errors"
+import "code.linenisgreat.com/zit-go/src/alfa/errors"
 
 type String struct {
 	wasSet bool

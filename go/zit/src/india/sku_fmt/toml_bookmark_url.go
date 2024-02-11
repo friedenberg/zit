@@ -5,11 +5,11 @@ import (
 	"io"
 	"net/url"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/toml"
-	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/standort"
-	"github.com/friedenberg/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/toml"
+	"code.linenisgreat.com/zit-go/src/charlie/sha"
+	"code.linenisgreat.com/zit-go/src/delta/standort"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
 )
 
 type TomlBookmark struct {

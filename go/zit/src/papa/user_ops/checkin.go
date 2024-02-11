@@ -3,12 +3,12 @@ package user_ops
 import (
 	"sync"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/echo/fd"
-	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/bravo/iter"
+	"code.linenisgreat.com/zit-go/src/echo/fd"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/india/matcher"
+	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
 )
 
 type Checkin struct {

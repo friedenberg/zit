@@ -8,11 +8,11 @@ import (
 	"unicode/utf8"
 	"unsafe"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/log"
-	"github.com/friedenberg/zit/src/charlie/ohio_buffer"
-	"github.com/friedenberg/zit/src/delta/ohio"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/bravo/log"
+	"code.linenisgreat.com/zit-go/src/charlie/ohio_buffer"
+	"code.linenisgreat.com/zit-go/src/delta/ohio"
 )
 
 type String struct {

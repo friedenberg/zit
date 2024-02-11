@@ -3,7 +3,7 @@ package sku_fmt
 import (
 	"fmt"
 
-	"github.com/friedenberg/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
 )
 
 type (

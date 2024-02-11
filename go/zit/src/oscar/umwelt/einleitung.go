@@ -8,16 +8,16 @@ import (
 	"os"
 	"path"
 
-	"github.com/friedenberg/zit/src/alfa/angeboren"
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/charlie/age"
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/india/erworben"
-	"github.com/friedenberg/zit/src/kilo/typ"
+	"code.linenisgreat.com/zit-go/src/alfa/angeboren"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/bravo/files"
+	"code.linenisgreat.com/zit-go/src/charlie/age"
+	"code.linenisgreat.com/zit-go/src/charlie/gattung"
+	"code.linenisgreat.com/zit-go/src/charlie/sha"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/india/erworben"
+	"code.linenisgreat.com/zit-go/src/kilo/typ"
 )
 
 type Einleitung struct {

@@ -3,9 +3,9 @@ package changes
 import (
 	"strings"
 
-	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/bravo/iter"
+	"code.linenisgreat.com/zit-go/src/bravo/values"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
 )
 
 type Change struct {

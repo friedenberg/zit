@@ -1,10 +1,10 @@
 package bestandsaufnahme
 
 import (
-	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/heap"
-	"github.com/friedenberg/zit/src/golf/ennui"
-	"github.com/friedenberg/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/charlie/sha"
+	"code.linenisgreat.com/zit-go/src/delta/heap"
+	"code.linenisgreat.com/zit-go/src/golf/ennui"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
 )
 
 type (

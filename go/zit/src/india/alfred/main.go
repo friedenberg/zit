@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/alfred"
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/bravo/alfred"
+	"code.linenisgreat.com/zit-go/src/charlie/gattung"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/india/sku_fmt"
 )
 
 type Writer struct {

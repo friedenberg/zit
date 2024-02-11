@@ -1,9 +1,9 @@
 package kasten_akte
 
 import (
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/values"
-	"github.com/friedenberg/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/bravo/values"
+	"code.linenisgreat.com/zit-go/src/charlie/gattung"
 )
 
 type V0 struct {

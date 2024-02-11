@@ -1,9 +1,9 @@
 package typ
 
 import (
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/collections_value"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/charlie/collections_value"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
 )
 
 type MutableSet = schnittstellen.MutableSetLike[kennung.Typ]

@@ -3,7 +3,7 @@ package gattung
 import (
 	"bufio"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
 )
 
 func ConfirmTypeFromReader(t Gattung, r *bufio.Reader) (err error) {

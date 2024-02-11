@@ -3,14 +3,14 @@ package sku_fmt
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/catgut"
-	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/delta/zittish"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/erworben_cli_print_options"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/charlie/catgut"
+	"code.linenisgreat.com/zit-go/src/charlie/collections"
+	"code.linenisgreat.com/zit-go/src/delta/zittish"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
 )
 
 type KennungAlignedFormat interface {

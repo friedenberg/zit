@@ -1,8 +1,8 @@
 package metadatei
 
 import (
-	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/bravo/iter"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
 )
 
 var (

@@ -3,12 +3,12 @@ package zettel
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/todo"
-	"github.com/friedenberg/zit/src/echo/fd"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/juliett/konfig"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/bravo/todo"
+	"code.linenisgreat.com/zit-go/src/echo/fd"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit-go/src/juliett/konfig"
 )
 
 type ProtoZettel struct {

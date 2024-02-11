@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/friedenberg/zit/src/bravo/test_logz"
+	"code.linenisgreat.com/zit-go/src/bravo/test_logz"
 )
 
 type testCaseOverlap struct {

@@ -1,7 +1,7 @@
 package equality
 
 import (
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
 	"golang.org/x/exp/constraints"
 )
 

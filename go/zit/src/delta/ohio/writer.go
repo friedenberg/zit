@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
 )
 
 func WriteAllOrDieTrying(w io.Writer, b []byte) (n int, err error) {

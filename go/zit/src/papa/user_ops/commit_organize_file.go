@@ -3,15 +3,15 @@ package user_ops
 import (
 	"sync"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/kilo/organize_text"
-	"github.com/friedenberg/zit/src/lima/changes"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/charlie/gattung"
+	"code.linenisgreat.com/zit-go/src/delta/gattungen"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/kilo/organize_text"
+	"code.linenisgreat.com/zit-go/src/lima/changes"
+	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
 )
 
 type CommitOrganizeFile struct {

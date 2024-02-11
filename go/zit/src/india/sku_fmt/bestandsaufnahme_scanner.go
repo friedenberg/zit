@@ -3,14 +3,14 @@ package sku_fmt
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/catgut"
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/golf/ennui"
-	"github.com/friedenberg/zit/src/golf/objekte_format"
-	"github.com/friedenberg/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/charlie/catgut"
+	"code.linenisgreat.com/zit-go/src/charlie/gattung"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit-go/src/golf/ennui"
+	"code.linenisgreat.com/zit-go/src/golf/objekte_format"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
 )
 
 type FormatBestandsaufnahmeScanner interface {

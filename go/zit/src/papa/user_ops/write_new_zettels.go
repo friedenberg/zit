@@ -1,13 +1,13 @@
 package user_ops
 
 import (
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/checkout_options"
-	"github.com/friedenberg/zit/src/charlie/collections_value"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/kilo/zettel"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/charlie/checkout_options"
+	"code.linenisgreat.com/zit-go/src/charlie/collections_value"
+	"code.linenisgreat.com/zit-go/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/kilo/zettel"
+	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
 )
 
 type WriteNewZettels struct {

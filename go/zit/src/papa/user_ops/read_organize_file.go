@@ -4,11 +4,11 @@ import (
 	"io"
 	"os"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/kilo/organize_text"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/bravo/files"
+	"code.linenisgreat.com/zit-go/src/india/matcher"
+	"code.linenisgreat.com/zit-go/src/kilo/organize_text"
+	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
 )
 
 type ReadOrganizeFile struct {

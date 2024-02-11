@@ -3,7 +3,7 @@ package objekte_format
 import (
 	"fmt"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
 )
 
 var (

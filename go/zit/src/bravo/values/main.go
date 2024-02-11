@@ -1,7 +1,7 @@
 package values
 
 import (
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
 )
 
 func Equals[T schnittstellen.Equatable[T]](a T, b any) bool {

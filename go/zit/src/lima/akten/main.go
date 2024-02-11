@@ -1,14 +1,14 @@
 package akten
 
 import (
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/delta/etikett_akte"
-	"github.com/friedenberg/zit/src/delta/kasten_akte"
-	"github.com/friedenberg/zit/src/delta/standort"
-	"github.com/friedenberg/zit/src/delta/typ_akte"
-	"github.com/friedenberg/zit/src/india/erworben"
-	"github.com/friedenberg/zit/src/juliett/objekte"
-	"github.com/friedenberg/zit/src/kilo/objekte_store"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/delta/etikett_akte"
+	"code.linenisgreat.com/zit-go/src/delta/kasten_akte"
+	"code.linenisgreat.com/zit-go/src/delta/standort"
+	"code.linenisgreat.com/zit-go/src/delta/typ_akte"
+	"code.linenisgreat.com/zit-go/src/india/erworben"
+	"code.linenisgreat.com/zit-go/src/juliett/objekte"
+	"code.linenisgreat.com/zit-go/src/kilo/objekte_store"
 )
 
 type Store[

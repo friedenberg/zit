@@ -5,8 +5,8 @@ import (
 	"io"
 	"strings"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
 )
 
 func ReadAllOrDieTrying(r io.Reader, b []byte) (n int, err error) {

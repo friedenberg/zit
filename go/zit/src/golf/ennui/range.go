@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/ohio"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/delta/ohio"
 )
 
 type Range struct {

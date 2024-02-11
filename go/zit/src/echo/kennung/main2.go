@@ -5,12 +5,12 @@ import (
 	"math"
 	"strings"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/pool"
-	"github.com/friedenberg/zit/src/charlie/catgut"
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/delta/ohio"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/bravo/pool"
+	"code.linenisgreat.com/zit-go/src/charlie/catgut"
+	"code.linenisgreat.com/zit-go/src/charlie/gattung"
+	"code.linenisgreat.com/zit-go/src/delta/ohio"
 )
 
 var poolKennung2 schnittstellen.Pool[Kennung2, *Kennung2]

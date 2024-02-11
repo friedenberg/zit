@@ -3,8 +3,8 @@ package metadatei
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/echo/fd"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/echo/fd"
 )
 
 type (

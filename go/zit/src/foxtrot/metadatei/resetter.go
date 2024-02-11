@@ -1,8 +1,8 @@
 package metadatei
 
 import (
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/etiketten_path"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/foxtrot/etiketten_path"
 )
 
 var Resetter resetter

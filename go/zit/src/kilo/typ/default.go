@@ -1,8 +1,8 @@
 package typ
 
 import (
-	"github.com/friedenberg/zit/src/delta/typ_akte"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/delta/typ_akte"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
 )
 
 func Default() (t typ_akte.V0, k kennung.Typ) {

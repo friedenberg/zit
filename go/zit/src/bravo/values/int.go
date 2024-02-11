@@ -3,7 +3,7 @@ package values
 import (
 	"strconv"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
 )
 
 type IntEqualer struct{}

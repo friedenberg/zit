@@ -3,14 +3,14 @@ package commands
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/juliett/objekte"
-	"github.com/friedenberg/zit/src/kilo/objekte_formatter"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/bravo/iter"
+	"code.linenisgreat.com/zit-go/src/charlie/gattung"
+	"code.linenisgreat.com/zit-go/src/delta/gattungen"
+	"code.linenisgreat.com/zit-go/src/india/matcher"
+	"code.linenisgreat.com/zit-go/src/juliett/objekte"
+	"code.linenisgreat.com/zit-go/src/kilo/objekte_formatter"
+	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
 )
 
 type Show struct {

@@ -1,6 +1,6 @@
 package catgut
 
-import "github.com/friedenberg/zit/src/alfa/schnittstellen"
+import "code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
 
 type (
 	StringFormatReader[T any] interface {

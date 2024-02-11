@@ -3,9 +3,9 @@ package commands
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/src/alfa/angeboren"
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit-go/src/alfa/angeboren"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
 )
 
 type StoreVersion struct {

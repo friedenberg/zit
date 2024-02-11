@@ -3,11 +3,11 @@ package commands
 import (
 	"os"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/delta/gattungen"
-	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/india/sku_fmt"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/delta/gattungen"
+	"code.linenisgreat.com/zit-go/src/india/matcher"
+	"code.linenisgreat.com/zit-go/src/india/sku_fmt"
+	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
 )
 
 type CommandWithQuery interface {

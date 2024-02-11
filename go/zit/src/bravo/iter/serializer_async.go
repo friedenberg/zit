@@ -1,6 +1,6 @@
 package iter
 
-import "github.com/friedenberg/zit/src/alfa/schnittstellen"
+import "code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
 
 type AsyncSerializer[T any] struct {
 	chError <-chan error

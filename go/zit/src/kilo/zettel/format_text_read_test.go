@@ -3,11 +3,11 @@ package zettel
 import (
 	"testing"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/test_logz"
-	"github.com/friedenberg/zit/src/echo/bezeichnung"
-	"github.com/friedenberg/zit/src/foxtrot/metadatei"
-	"github.com/friedenberg/zit/src/foxtrot/test_metadatei_io"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/bravo/test_logz"
+	"code.linenisgreat.com/zit-go/src/echo/bezeichnung"
+	"code.linenisgreat.com/zit-go/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit-go/src/foxtrot/test_metadatei_io"
 )
 
 func makeTestTextFormat(

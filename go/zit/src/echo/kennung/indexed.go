@@ -1,6 +1,6 @@
 package kennung
 
-import "github.com/friedenberg/zit/src/alfa/errors"
+import "code.linenisgreat.com/zit-go/src/alfa/errors"
 
 type IndexedLike struct {
 	Int            int

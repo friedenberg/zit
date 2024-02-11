@@ -3,10 +3,10 @@ package kennung_fmt
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/catgut"
-	"github.com/friedenberg/zit/src/charlie/collections_ptr"
-	"github.com/friedenberg/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/charlie/catgut"
+	"code.linenisgreat.com/zit-go/src/charlie/collections_ptr"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
 )
 
 type etikettenReader struct{}

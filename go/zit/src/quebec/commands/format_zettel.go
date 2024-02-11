@@ -3,15 +3,15 @@ package commands
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/checkout_mode"
-	"github.com/friedenberg/zit/src/charlie/script_config"
-	"github.com/friedenberg/zit/src/delta/typ_akte"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/juliett/objekte"
-	"github.com/friedenberg/zit/src/kilo/cwd"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/bravo/checkout_mode"
+	"code.linenisgreat.com/zit-go/src/charlie/script_config"
+	"code.linenisgreat.com/zit-go/src/delta/typ_akte"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/juliett/objekte"
+	"code.linenisgreat.com/zit-go/src/kilo/cwd"
+	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
 )
 
 type FormatZettel struct {

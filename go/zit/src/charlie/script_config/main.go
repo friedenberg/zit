@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os/exec"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/reset"
-	"github.com/friedenberg/zit/src/bravo/equality"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/reset"
+	"code.linenisgreat.com/zit-go/src/bravo/equality"
 )
 
 type ScriptConfig struct {

@@ -3,8 +3,8 @@ package etikett_akte
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/toml"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/toml"
 )
 
 type FormatterAkteTextToml struct{}

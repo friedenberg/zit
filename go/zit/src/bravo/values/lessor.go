@@ -1,6 +1,6 @@
 package values
 
-import "github.com/friedenberg/zit/src/alfa/schnittstellen"
+import "code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
 
 type ReverseLessor[T any, TPtr schnittstellen.Ptr[T]] struct {
 	Inner schnittstellen.Lessor2[T, TPtr]

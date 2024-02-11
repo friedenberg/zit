@@ -1,8 +1,8 @@
 package matcher
 
 import (
-	"github.com/friedenberg/zit/src/delta/thyme"
-	"github.com/friedenberg/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/delta/thyme"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
 )
 
 type Time thyme.Time

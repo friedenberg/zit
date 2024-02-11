@@ -3,7 +3,7 @@ package commands
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
 )
 
 type Test struct{}

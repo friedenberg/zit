@@ -9,9 +9,9 @@ import (
 	"runtime/trace"
 	"syscall"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/log"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/bravo/files"
+	"code.linenisgreat.com/zit-go/src/bravo/log"
 )
 
 type Context struct {

@@ -1,9 +1,9 @@
 package user_ops
 
 import (
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/bravo/files"
+	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
 )
 
 type OpenFiles struct{}

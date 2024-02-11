@@ -1,6 +1,6 @@
 package iter
 
-import "github.com/friedenberg/zit/src/alfa/errors"
+import "code.linenisgreat.com/zit-go/src/alfa/errors"
 
 var (
 	MakeErrStopIteration = errors.MakeErrStopIteration

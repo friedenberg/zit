@@ -1,11 +1,11 @@
 package remote_push
 
 import (
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
-	"github.com/friedenberg/zit/src/papa/remote_conn"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/charlie/gattung"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
+	"code.linenisgreat.com/zit-go/src/papa/remote_conn"
 )
 
 type Server struct {

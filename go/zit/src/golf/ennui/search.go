@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/charlie/collections"
-	"github.com/friedenberg/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/charlie/collections"
+	"code.linenisgreat.com/zit-go/src/charlie/sha"
 )
 
 func (e *page) seekToFirstBinarySearch(shMet *sha.Sha) (mid int64, err error) {

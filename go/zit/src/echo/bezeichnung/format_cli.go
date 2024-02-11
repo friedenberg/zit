@@ -1,8 +1,8 @@
 package bezeichnung
 
 import (
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/string_format_writer"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/charlie/string_format_writer"
 )
 
 type bezeichnungCliFormat struct {

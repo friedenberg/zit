@@ -4,11 +4,11 @@ import (
 	"flag"
 	"os"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/kilo/organize_text"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
-	"github.com/friedenberg/zit/src/papa/user_ops"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/bravo/files"
+	"code.linenisgreat.com/zit-go/src/kilo/organize_text"
+	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
+	"code.linenisgreat.com/zit-go/src/papa/user_ops"
 )
 
 type FormatOrganize struct {

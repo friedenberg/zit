@@ -5,16 +5,16 @@ import (
 	"io"
 	"os"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/alfa/vim_cli_options_builder"
-	"github.com/friedenberg/zit/src/bravo/files"
-	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/erworben"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
-	"github.com/friedenberg/zit/src/papa/user_ops"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/alfa/vim_cli_options_builder"
+	"code.linenisgreat.com/zit-go/src/bravo/files"
+	"code.linenisgreat.com/zit-go/src/bravo/iter"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/india/erworben"
+	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
+	"code.linenisgreat.com/zit-go/src/papa/user_ops"
 )
 
 type EditKonfig struct {

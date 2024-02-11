@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"filippo.io/age"
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/files"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/bravo/files"
 )
 
 func Generate(basePath string) (a *Age, err error) {

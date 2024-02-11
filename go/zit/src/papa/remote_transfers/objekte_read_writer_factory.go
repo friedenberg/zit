@@ -1,7 +1,7 @@
 package remote_transfers
 
 import (
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
 )
 
 func (s client) ObjekteReaderFactory(

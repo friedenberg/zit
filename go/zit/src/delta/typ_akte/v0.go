@@ -1,11 +1,11 @@
 package typ_akte
 
 import (
-	"github.com/friedenberg/zit/src/alfa/etikett_rule"
-	"github.com/friedenberg/zit/src/alfa/reset"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/charlie/script_config"
+	"code.linenisgreat.com/zit-go/src/alfa/etikett_rule"
+	"code.linenisgreat.com/zit-go/src/alfa/reset"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/charlie/gattung"
+	"code.linenisgreat.com/zit-go/src/charlie/script_config"
 )
 
 type V0 struct {

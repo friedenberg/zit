@@ -3,10 +3,10 @@ package kennung
 import (
 	"testing"
 
-	"github.com/friedenberg/zit/src/bravo/expansion"
-	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/bravo/test_logz"
-	"github.com/friedenberg/zit/src/delta/collections_delta"
+	"code.linenisgreat.com/zit-go/src/bravo/expansion"
+	"code.linenisgreat.com/zit-go/src/bravo/iter"
+	"code.linenisgreat.com/zit-go/src/bravo/test_logz"
+	"code.linenisgreat.com/zit-go/src/delta/collections_delta"
 )
 
 func TestNormalize(t *testing.T) {

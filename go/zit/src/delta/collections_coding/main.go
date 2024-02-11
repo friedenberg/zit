@@ -1,6 +1,6 @@
 package collections_coding
 
-import "github.com/friedenberg/zit/src/alfa/schnittstellen"
+import "code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
 
 type EncoderLike[T any] interface {
 	Encode(*T) (int64, error)

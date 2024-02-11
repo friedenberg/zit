@@ -4,9 +4,9 @@ import (
 	"bufio"
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/alfa/toml"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/alfa/toml"
 )
 
 type ParsedAkteTomlFormatter[O schnittstellen.Akte[O], OPtr schnittstellen.AktePtr[O]] struct{}

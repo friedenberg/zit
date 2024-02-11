@@ -3,15 +3,15 @@ package objekte_formatter
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/charlie/gattung"
-	"github.com/friedenberg/zit/src/delta/typ_akte"
-	"github.com/friedenberg/zit/src/hotel/sku"
-	"github.com/friedenberg/zit/src/india/matcher"
-	"github.com/friedenberg/zit/src/juliett/konfig"
-	"github.com/friedenberg/zit/src/kilo/typ"
-	"github.com/friedenberg/zit/src/kilo/zettel"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/charlie/gattung"
+	"code.linenisgreat.com/zit-go/src/delta/typ_akte"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/india/matcher"
+	"code.linenisgreat.com/zit-go/src/juliett/konfig"
+	"code.linenisgreat.com/zit-go/src/kilo/typ"
+	"code.linenisgreat.com/zit-go/src/kilo/zettel"
 )
 
 type funcFormat = schnittstellen.FuncIter[*sku.Transacted]

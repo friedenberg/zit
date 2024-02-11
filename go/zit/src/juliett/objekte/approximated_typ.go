@@ -1,7 +1,7 @@
 package objekte
 
 import (
-	"github.com/friedenberg/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
 )
 
 type ApproximatedTyp struct {

@@ -8,11 +8,11 @@ import (
 	"testing"
 
 	"github.com/DataDog/zstd"
-	"github.com/friedenberg/zit/src/bravo/test_logz"
-	"github.com/friedenberg/zit/src/charlie/catgut"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/golf/objekte_format"
-	"github.com/friedenberg/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/bravo/test_logz"
+	"code.linenisgreat.com/zit-go/src/charlie/catgut"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/golf/objekte_format"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
 )
 
 func TestOne(t1 *testing.T) {

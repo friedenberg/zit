@@ -3,9 +3,9 @@ package erworben
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/src/alfa/erworben_cli_print_options"
-	"github.com/friedenberg/zit/src/bravo/erworben_tools"
-	"github.com/friedenberg/zit/src/charlie/debug"
+	"code.linenisgreat.com/zit-go/src/alfa/erworben_cli_print_options"
+	"code.linenisgreat.com/zit-go/src/bravo/erworben_tools"
+	"code.linenisgreat.com/zit-go/src/charlie/debug"
 )
 
 type Cli struct {

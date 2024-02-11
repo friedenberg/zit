@@ -3,7 +3,7 @@ package values
 import (
 	"net/url"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
 )
 
 type Uri struct {

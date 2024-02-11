@@ -3,7 +3,7 @@ package erworben_cli_print_options
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/src/bravo/values"
+	"code.linenisgreat.com/zit-go/src/bravo/values"
 )
 
 type Abbreviations struct {

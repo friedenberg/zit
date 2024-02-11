@@ -3,8 +3,8 @@ package collections_ptr
 import (
 	"encoding/gob"
 
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/bravo/iter"
 )
 
 func RegisterGobValue[T schnittstellen.ValueLike, TPtr schnittstellen.ValuePtr[T]](

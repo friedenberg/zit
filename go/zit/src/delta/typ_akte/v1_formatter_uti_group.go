@@ -1,6 +1,6 @@
 package typ_akte
 
-import "github.com/friedenberg/zit/src/bravo/equality"
+import "code.linenisgreat.com/zit-go/src/bravo/equality"
 
 type FormatterUTIGroup map[string]string
 

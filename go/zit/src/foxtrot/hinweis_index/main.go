@@ -1,11 +1,11 @@
 package hinweis_index
 
 import (
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	hinweis_index_v0 "github.com/friedenberg/zit/src/foxtrot/hinweis_index/v0"
-	hinweis_index_v1 "github.com/friedenberg/zit/src/foxtrot/hinweis_index/v1"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	hinweis_index_v0 "code.linenisgreat.com/zit-go/src/foxtrot/hinweis_index/v0"
+	hinweis_index_v1 "code.linenisgreat.com/zit-go/src/foxtrot/hinweis_index/v1"
 )
 
 type HinweisStore interface {

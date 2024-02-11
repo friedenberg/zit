@@ -3,7 +3,7 @@ package expansion
 import (
 	"regexp"
 
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
 )
 
 type expanderAll struct {

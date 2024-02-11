@@ -3,7 +3,7 @@ package checkout_options
 import (
 	"flag"
 
-	"github.com/friedenberg/zit/src/bravo/checkout_mode"
+	"code.linenisgreat.com/zit-go/src/bravo/checkout_mode"
 )
 
 type Options struct {

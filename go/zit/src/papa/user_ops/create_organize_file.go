@@ -3,9 +3,9 @@ package user_ops
 import (
 	"io"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/kilo/organize_text"
-	"github.com/friedenberg/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/kilo/organize_text"
+	"code.linenisgreat.com/zit-go/src/oscar/umwelt"
 )
 
 type CreateOrganizeFile struct {

@@ -5,9 +5,9 @@ import (
 	"io"
 	"os"
 
-	"github.com/friedenberg/zit/src/alfa/coordinates"
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/files"
+	"code.linenisgreat.com/zit-go/src/alfa/coordinates"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/bravo/files"
 )
 
 type provider []string

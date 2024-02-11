@@ -3,7 +3,7 @@ package to_merge
 import (
 	"fmt"
 
-	"github.com/friedenberg/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
 )
 
 func MakeErrMergeConflict(sk *sku.ExternalFDs) (err *ErrMergeConflict) {

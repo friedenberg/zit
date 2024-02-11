@@ -3,7 +3,7 @@ package heap
 import (
 	"sort"
 
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
 )
 
 func Make[T Element, TPtr ElementPtr[T]](

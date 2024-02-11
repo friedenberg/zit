@@ -3,8 +3,8 @@ package script_config
 import (
 	"testing"
 
-	"github.com/friedenberg/zit/src/alfa/toml"
-	"github.com/friedenberg/zit/src/bravo/test_logz"
+	"code.linenisgreat.com/zit-go/src/alfa/toml"
+	"code.linenisgreat.com/zit-go/src/bravo/test_logz"
 )
 
 func TestToml(t1 *testing.T) {

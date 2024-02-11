@@ -3,7 +3,7 @@ package checked_out_state
 import (
 	"fmt"
 
-	"github.com/friedenberg/zit/src/charlie/string_format_writer"
+	"code.linenisgreat.com/zit-go/src/charlie/string_format_writer"
 )
 
 type State int

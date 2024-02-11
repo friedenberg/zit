@@ -3,8 +3,8 @@ package ohio
 import (
 	"bufio"
 
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
-	"github.com/friedenberg/zit/src/bravo/pool"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/bravo/pool"
 )
 
 var poolBufioWriter schnittstellen.Pool[bufio.Writer, *bufio.Writer]

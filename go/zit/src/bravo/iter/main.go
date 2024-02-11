@@ -3,7 +3,7 @@ package iter
 import (
 	"strings"
 
-	"github.com/friedenberg/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit-go/src/alfa/schnittstellen"
 )
 
 func AddStringToBuilder[T schnittstellen.Value[T]](

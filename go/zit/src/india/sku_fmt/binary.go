@@ -8,15 +8,15 @@ import (
 	"io"
 	"math"
 
-	"github.com/friedenberg/zit/src/alfa/errors"
-	"github.com/friedenberg/zit/src/bravo/iter"
-	"github.com/friedenberg/zit/src/charlie/sha"
-	"github.com/friedenberg/zit/src/delta/ohio"
-	"github.com/friedenberg/zit/src/delta/schlussel"
-	"github.com/friedenberg/zit/src/echo/kennung"
-	"github.com/friedenberg/zit/src/foxtrot/etiketten_path"
-	"github.com/friedenberg/zit/src/golf/ennui"
-	"github.com/friedenberg/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit-go/src/alfa/errors"
+	"code.linenisgreat.com/zit-go/src/bravo/iter"
+	"code.linenisgreat.com/zit-go/src/charlie/sha"
+	"code.linenisgreat.com/zit-go/src/delta/ohio"
+	"code.linenisgreat.com/zit-go/src/delta/schlussel"
+	"code.linenisgreat.com/zit-go/src/echo/kennung"
+	"code.linenisgreat.com/zit-go/src/foxtrot/etiketten_path"
+	"code.linenisgreat.com/zit-go/src/golf/ennui"
+	"code.linenisgreat.com/zit-go/src/hotel/sku"
 )
 
 var binaryFieldOrder = []schlussel.Schlussel{
