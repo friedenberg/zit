@@ -27,6 +27,7 @@
           };
 
           zit = pkgs.buildGoApplication {
+            name = "zit";
             pname = "zit";
             version = "0.0.1";
             src = ./.;
