@@ -1,9 +1,9 @@
 package organize_text
 
 import (
+	_ "code.linenisgreat.com/zit/src/kilo/organize_text"
 	old "code.linenisgreat.com/zit/src/kilo/organize_text"
-	organize_text "code.linenisgreat.com/zit/src/kilo/organize_text"
-	_ "code.linenisgreat.com/zit/src/kilo/organize_text2"
+	organize_text "code.linenisgreat.com/zit/src/kilo/organize_text2"
 )
 
 type (
