@@ -8,9 +8,9 @@ import (
 )
 
 // TODO-P3 make mutable / immutable?
-type Slice []Etikett
+type EtikettSlice []Etikett
 
-func MakeSlice(es ...Etikett) (s Slice) {
+func MakeEtikettSlice(es ...Etikett) (s EtikettSlice) {
 	s = make([]Etikett, len(es))
 
 	for i, e := range es {
@@ -20,7 +20,7 @@ func MakeSlice(es ...Etikett) (s Slice) {
 	return
 }
 
-func NewSliceFromStrings(es ...string) (s Slice, err error) {
+func NewSliceFromStrings(es ...string) (s EtikettSlice, err error) {
 	s = make([]Etikett, len(es))
 
 	for i, e := range es {
@@ -33,11 +33,11 @@ func NewSliceFromStrings(es ...string) (s Slice, err error) {
 	return
 }
 
-func (s Slice) Len() int {
+func (s EtikettSlice) Len() int {
 	return len(s)
 }
 
-func (es *Slice) AddString(v string) (err error) {
+func (es *EtikettSlice) AddString(v string) (err error) {
 	var e Etikett
 
 	if err = e.Set(v); err != nil {
@@ -50,11 +50,11 @@ func (es *Slice) AddString(v string) (err error) {
 	return
 }
 
-func (es *Slice) Add(e Etikett) {
+func (es *EtikettSlice) Add(e Etikett) {
 	*es = append(*es, e)
 }
 
-func (s *Slice) Set(v string) (err error) {
+func (s *EtikettSlice) Set(v string) (err error) {
 	es := strings.Split(v, ",")
 
 	for _, e := range es {
@@ -67,7 +67,7 @@ func (s *Slice) Set(v string) (err error) {
 	return
 }
 
-func (es Slice) SortedString() (out []string) {
+func (es EtikettSlice) SortedString() (out []string) {
 	out = make([]string, len(es))
 
 	i := 0
@@ -87,10 +87,10 @@ func (es Slice) SortedString() (out []string) {
 	return
 }
 
-func (s Slice) String() string {
+func (s EtikettSlice) String() string {
 	return strings.Join(s.SortedString(), ", ")
 }
 
-func (s Slice) ToSet() EtikettSet {
+func (s EtikettSlice) ToSet() EtikettSet {
 	return MakeEtikettSet([]Etikett(s)...)
 }

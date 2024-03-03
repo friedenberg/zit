@@ -134,7 +134,7 @@ func (f *OrganizeNew) WriteStringFormat(
 	t := o.GetMetadatei().GetTypPtr()
 
 	if len(t.String()) > 0 {
-		n1, err = sw.WriteString(" !")
+		n1, err = sw.WriteString("  !")
 		n += int64(n1)
 
 		if err != nil {

@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/etikett_rule"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/collections_ptr"
 	"code.linenisgreat.com/zit/src/charlie/sha"
@@ -279,4 +280,11 @@ func (selbst *Metadatei) SetMutter(mg Getter) (err error) {
 	}
 
 	return
+}
+
+func (m *Metadatei) GenerateExpandedEtiketten() {
+	m.Verzeichnisse.SetExpandedEtiketten(kennung.ExpandMany[kennung.Etikett](
+		m.GetEtiketten(),
+		expansion.ExpanderRight,
+	))
 }

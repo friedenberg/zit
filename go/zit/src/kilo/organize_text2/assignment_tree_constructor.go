@@ -1,4 +1,4 @@
-package organize_text
+package organize_text2
 
 import (
 	"sort"
@@ -10,61 +10,31 @@ import (
 	"code.linenisgreat.com/zit/src/india/objekte_collections"
 )
 
-type Factory struct {
+type AssignmentTreeConstructor struct {
 	Options
 }
 
-func (f *Factory) Make() (ot *Text, err error) {
-	if f.UseMetadateiHeader {
-		ot, err = f.makeWithMetadatei()
-	} else {
-		ot, err = f.makeWithoutMetadatei()
-	}
+func (atc *AssignmentTreeConstructor) Assignments() (roots []*Assignment, err error) {
+	roots = make([]*Assignment, 0, 1+atc.ExtraEtiketten.Len())
 
-	return
-}
-
-func (atc *Factory) makeWithMetadatei() (ot *Text, err error) {
-	ot = &Text{
-		Options:    atc.Options,
-		Assignment: newAssignment(0),
-	}
-
-	ot.IsRoot = true
-
-	ot.EtikettSet = atc.rootEtiketten
-	ot.Metadatei.Typ = atc.Typ
+	root := newAssignment(0)
+	root.Etiketten = atc.rootEtiketten
+	roots = append(roots, root)
 
 	prefixSet := objekte_collections.MakeSetPrefixVerzeichnisse(0)
 	atc.Transacted.Each(prefixSet.Add)
 
 	for _, e := range iter.Elements[kennung.Etikett](atc.ExtraEtiketten) {
-		ee := newAssignment(ot.GetDepth() + 1)
-		ee.Etiketten = kennung.MakeEtikettSet(e)
-		ot.addChild(ee)
-
-		segments := prefixSet.Subset(e)
-
-		var used objekte_collections.MutableSetMetadateiWithKennung
-
-		if used, err = atc.makeChildren(
-			ee,
-			segments.Grouped,
-			kennung.MakeEtikettSlice(e),
-		); err != nil {
+		errors.Err().Printf("making extras: %s", e)
+		errors.Err().Printf("prefix set before: %v", prefixSet)
+		if err = atc.makeChildren(root, prefixSet, kennung.MakeEtikettSlice(e)); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-
-		prefixSet = prefixSet.Subtract(used)
+		errors.Err().Printf("prefix set after: %v", prefixSet)
 	}
 
-	if _, err = atc.makeChildren(ot.Assignment, prefixSet, atc.GroupingEtiketten); err != nil {
-		err = errors.Wrapf(err, "Assignment: %#v", ot.Assignment)
-		return
-	}
-
-	if err = ot.Refine(); err != nil {
+	if err = atc.makeChildren(root, prefixSet, atc.GroupingEtiketten); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -72,51 +42,12 @@ func (atc *Factory) makeWithMetadatei() (ot *Text, err error) {
 	return
 }
 
-func (f Factory) makeWithoutMetadatei() (ot *Text, err error) {
-	if !f.wasMade {
-		panic("options no initialized")
-	}
-
-	ot = &Text{
-		Options:    f.Options,
-		Assignment: newAssignment(0),
-		Metadatei: Metadatei{
-			EtikettSet: kennung.MakeEtikettSet(),
-		},
-	}
-
-	ot.IsRoot = true
-
-	var as []*Assignment
-	as, err = f.Options.assignmentTreeConstructor().Assignments()
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	for _, a := range as {
-		ot.addChild(a)
-	}
-
-	if err = ot.Refine(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (atc Factory) makeChildren(
+func (atc AssignmentTreeConstructor) makeChildren(
 	parent *Assignment,
 	prefixSet objekte_collections.SetPrefixVerzeichnisse,
 	groupingEtiketten kennung.EtikettSlice,
-) (used objekte_collections.MutableSetMetadateiWithKennung, err error) {
-	used = objekte_collections.MakeMutableSetMetadateiWithKennung()
-
+) (err error) {
 	if groupingEtiketten.Len() == 0 {
-		prefixSet.ToSet().Each(used.Add)
-
 		err = prefixSet.EachZettel(
 			func(e kennung.Etikett, tz *sku.Transacted) (err error) {
 				var z *obj
@@ -170,10 +101,10 @@ func (atc Factory) makeChildren(
 		return
 	}
 
-	if err = segments.Grouped.Each(
+	segments.Grouped.Each(
 		func(e kennung.Etikett, zs objekte_collections.MutableSetMetadateiWithKennung) (err error) {
 			if atc.UsePrefixJoints {
-				if parent.Etiketten.Len() > 1 {
+				if parent.Etiketten != nil && parent.Etiketten.Len() > 1 {
 				} else {
 					prefixJoint := kennung.MakeEtikettSet(groupingEtiketten[0])
 
@@ -183,7 +114,7 @@ func (atc Factory) makeChildren(
 						lastChild = parent.Children[len(parent.Children)-1]
 					}
 
-					if lastChild != nil && (iter.SetEqualsPtr[kennung.Etikett, *kennung.Etikett](lastChild.Etiketten, prefixJoint) || lastChild.Etiketten.Len() == 0) {
+					if lastChild != nil && iter.SetEqualsPtr[kennung.Etikett, *kennung.Etikett](lastChild.Etiketten, prefixJoint) {
 						intermediate = lastChild
 					} else {
 						intermediate = newAssignment(parent.GetDepth() + 1)
@@ -194,13 +125,8 @@ func (atc Factory) makeChildren(
 					child := newAssignment(intermediate.GetDepth() + 1)
 
 					var ls kennung.Etikett
-					b := groupingEtiketten[0]
 
-					if e.Equals(b) {
-						return
-					}
-
-					if ls, err = kennung.LeftSubtract(e, b); err != nil {
+					if ls, err = kennung.LeftSubtract(e, groupingEtiketten[0]); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
@@ -213,18 +139,14 @@ func (atc Factory) makeChildren(
 						nextGroupingEtiketten = groupingEtiketten[1:]
 					}
 
-					var usedChild objekte_collections.MutableSetMetadateiWithKennung
-
 					psv := objekte_collections.MakeSetPrefixVerzeichnisse(0)
 					zs.Each(psv.Add)
-					usedChild, err = atc.makeChildren(child, psv, nextGroupingEtiketten)
+					err = atc.makeChildren(child, psv, nextGroupingEtiketten)
 
 					if err != nil {
 						err = errors.Wrap(err)
 						return
 					}
-
-					usedChild.Each(used.Add)
 
 					intermediate.addChild(child)
 				}
@@ -238,27 +160,20 @@ func (atc Factory) makeChildren(
 					nextGroupingEtiketten = groupingEtiketten[1:]
 				}
 
-				var usedChild objekte_collections.MutableSetMetadateiWithKennung
-
 				psv := objekte_collections.MakeSetPrefixVerzeichnisse(0)
 				zs.Each(psv.Add)
-				usedChild, err = atc.makeChildren(child, psv, nextGroupingEtiketten)
+				err = atc.makeChildren(child, psv, nextGroupingEtiketten)
 
 				if err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 
-				usedChild.Each(used.Add)
-
 				parent.addChild(child)
 			}
 			return
 		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	)
 
 	sort.Slice(parent.Children, func(i, j int) bool {
 		vi := iter.StringCommaSeparated[kennung.Etikett](

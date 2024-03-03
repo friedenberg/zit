@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/files"
 	"code.linenisgreat.com/zit/src/india/matcher"
-	"code.linenisgreat.com/zit/src/kilo/organize_text"
+	"code.linenisgreat.com/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 

@@ -100,7 +100,8 @@ func (s Store) Flush(
 func (s *Store) UpdateManyMetadatei(
 	incoming sku.TransactedSet,
 ) (err error) {
-	// TODO-P2 only set has changes if an etikett, typ, or kasten has changes
+  // TODO-P2 [rubidium/muk "only set has changes if an etikett, typ, or kasten
+  // has changes"]
 	s.GetKonfig().SetHasChanges(true)
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() {

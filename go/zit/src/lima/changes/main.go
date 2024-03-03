@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit/src/kilo/organize_text"
+	"code.linenisgreat.com/zit/src/lima/organize_text"
 )
 
 type Changes interface {

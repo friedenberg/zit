@@ -248,7 +248,15 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 
 	case "kennung":
 		return func(e *sku.Transacted) (err error) {
-			_, err = e.Kennung.WriteTo(out)
+			if _, err = fmt.Fprintf(
+				out,
+				"%s\n",
+				&e.Kennung,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
 			return
 		}
 
@@ -326,7 +334,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		return func(o *sku.Transacted) (err error) {
 			var j sku_fmt.Json
 
-			if j, err = sku_fmt.MakeJson(o, s); err != nil {
+			if err = j.FromTransacted(o, s); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

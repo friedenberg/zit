@@ -27,7 +27,7 @@ func (atc *AssignmentTreeConstructor) Assignments() (roots []*Assignment, err er
 	for _, e := range iter.Elements[kennung.Etikett](atc.ExtraEtiketten) {
 		errors.Err().Printf("making extras: %s", e)
 		errors.Err().Printf("prefix set before: %v", prefixSet)
-		if err = atc.makeChildren(root, prefixSet, kennung.MakeSlice(e)); err != nil {
+		if err = atc.makeChildren(root, prefixSet, kennung.MakeEtikettSlice(e)); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -45,7 +45,7 @@ func (atc *AssignmentTreeConstructor) Assignments() (roots []*Assignment, err er
 func (atc AssignmentTreeConstructor) makeChildren(
 	parent *Assignment,
 	prefixSet objekte_collections.SetPrefixVerzeichnisse,
-	groupingEtiketten kennung.Slice,
+	groupingEtiketten kennung.EtikettSlice,
 ) (err error) {
 	if groupingEtiketten.Len() == 0 {
 		err = prefixSet.EachZettel(
@@ -133,7 +133,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 
 					child.Etiketten = kennung.MakeEtikettSet(ls)
 
-					nextGroupingEtiketten := kennung.MakeSlice()
+					nextGroupingEtiketten := kennung.MakeEtikettSlice()
 
 					if groupingEtiketten.Len() > 1 {
 						nextGroupingEtiketten = groupingEtiketten[1:]
@@ -154,7 +154,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 				child := newAssignment(parent.GetDepth() + 1)
 				child.Etiketten = kennung.MakeEtikettSet(e)
 
-				nextGroupingEtiketten := kennung.MakeSlice()
+				nextGroupingEtiketten := kennung.MakeEtikettSlice()
 
 				if groupingEtiketten.Len() > 1 {
 					nextGroupingEtiketten = groupingEtiketten[1:]

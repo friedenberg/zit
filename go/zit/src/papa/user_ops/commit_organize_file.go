@@ -9,13 +9,14 @@ import (
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/src/lima/changes"
+	"code.linenisgreat.com/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
 type CommitOrganizeFile struct {
 	*umwelt.Umwelt
+	OutputJSON bool
 }
 
 type CommitOrganizeFileResults struct{}
@@ -46,13 +47,13 @@ func (c CommitOrganizeFile) ApplyToText(
 	return
 }
 
-func (c CommitOrganizeFile) Run(
+func (op CommitOrganizeFile) Run(
 	u *umwelt.Umwelt,
 	a, b *organize_text.Text,
 ) (results CommitOrganizeFileResults, err error) {
-	store := c.StoreObjekten()
+	store := op.StoreObjekten()
 
-	if err = c.ApplyToText(u, a); err != nil {
+	if err = op.ApplyToText(u, a); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -73,7 +74,7 @@ func (c CommitOrganizeFile) Run(
 	l := sync.Mutex{}
 	toUpdate := sku.MakeTransactedMutableSet()
 
-	ms := c.MakeMetaIdSetWithoutExcludedHidden(
+	ms := op.MakeMetaIdSetWithoutExcludedHidden(
 		gattungen.MakeSet(gattung.TrueGattung()...),
 	)
 	errors.TodoP1("create query without syntax")
@@ -156,7 +157,7 @@ func (c CommitOrganizeFile) Run(
 			// 	m.Typ = c.Konfig().Defaults.Typ
 			// }
 
-			if c.Konfig().DryRun {
+			if op.Konfig().DryRun {
 				errors.Out().Printf("[%s] (would create)", k)
 				return
 			}
@@ -189,10 +190,10 @@ func (c CommitOrganizeFile) Run(
 			}
 
 			if kennung.IsEmpty(m.GetTyp()) {
-				m.Typ = c.Konfig().Defaults.Typ
+				m.Typ = op.Konfig().Defaults.Typ
 			}
 
-			if c.Konfig().DryRun {
+			if op.Konfig().DryRun {
 				errors.Out().Printf("[%s] (would create)", m.Bezeichnung)
 				return
 			}
@@ -217,6 +218,41 @@ func (c CommitOrganizeFile) Run(
 		err = errors.Wrap(err)
 		return
 	}
+
+	if err = op.OutputJSONIfNecessary(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (op CommitOrganizeFile) OutputJSONIfNecessary() (err error) {
+	if !op.OutputJSON {
+		return
+	}
+
+	// if err = createOrganizeFileResults.EachPtr(
+	// 	func(sk *sku.Transacted) (err error) {
+	// 		var j sku_fmt.Json
+
+	// 		if err = j.FromTransacted(sk, u.Standort()); err != nil {
+	// 			err = errors.Wrap(err)
+	// 			return
+	// 		}
+
+	// 		transacted = append(transacted, j)
+
+	// 		return
+	// 	},
+	// ); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
+
+	// w := bufio.NewWriter(u.Out())
+	// defer errors.DeferredFlusher(w)
+	// enc := json.NewEncoder(w)
 
 	return
 }

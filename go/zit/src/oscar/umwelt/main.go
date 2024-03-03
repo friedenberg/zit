@@ -18,7 +18,7 @@ import (
 	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/src/kilo/objekte_store"
-	"code.linenisgreat.com/zit/src/kilo/organize_text"
+	"code.linenisgreat.com/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/src/mike/store_util"
 	"code.linenisgreat.com/zit/src/november/store_objekten"
 )

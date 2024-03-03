@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/files"
-	"code.linenisgreat.com/zit/src/kilo/organize_text"
+	"code.linenisgreat.com/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 	"code.linenisgreat.com/zit/src/papa/user_ops"
 )
@@ -31,7 +31,7 @@ func init() {
 }
 
 func (c *FormatOrganize) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	c.Flags.Options.Konfig = u.Konfig()
+	c.Flags.Konfig = u.Konfig()
 
 	if len(args) != 1 {
 		err = errors.Errorf("expected exactly one input argument")

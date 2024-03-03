@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/india/objekte_collections"
-	"code.linenisgreat.com/zit/src/kilo/organize_text"
+	"code.linenisgreat.com/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 	"code.linenisgreat.com/zit/src/papa/user_ops"
 )
@@ -50,7 +50,7 @@ func init() {
 			)
 			f.Var(&c.Mode, "mode", "mode used for handling stdin and stdout")
 
-			c.Flags.AddToFlagSet(f)
+			c.AddToFlagSet(f)
 
 			return c
 		},
