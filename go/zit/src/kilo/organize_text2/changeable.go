@@ -2,96 +2,48 @@ package organize_text2
 
 import (
 	"fmt"
-	"strings"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/echo/bezeichnung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/lima/changes2"
 )
 
-type SetKeyToMetadatei map[string]*metadatei.Metadatei
-
-func (m SetKeyToMetadatei) String() string {
-	sb := &strings.Builder{}
-
-	for h, es := range m {
-		fmt.Fprintf(sb, "%s: %s\n", h, es)
+func (ot *Text) CompareMap(
+	hinweis_expander func(string) (*kennung.Hinweis, error),
+) (out changes2.CompareMap, err error) {
+	preExpansion := changes2.CompareMap{
+		Named:   make(changes2.SetKeyToMetadatei),
+		Unnamed: make(changes2.SetKeyToMetadatei),
 	}
 
-	return sb.String()
-}
-
-func (s SetKeyToMetadatei) Add(h string, b bezeichnung.Bezeichnung) {
-	var m *metadatei.Metadatei
-	ok := false
-
-	if m, ok = s[h]; !ok {
-		m = &metadatei.Metadatei{}
-		metadatei.Resetter.Reset(m)
-		m.Bezeichnung = b
-	}
-
-	s[h] = m
-}
-
-func (s SetKeyToMetadatei) AddEtikett(
-	h string,
-	e kennung.Etikett,
-	b bezeichnung.Bezeichnung,
-) {
-	var m *metadatei.Metadatei
-	ok := false
-
-	if m, ok = s[h]; !ok {
-		metadatei.Resetter.Reset(m)
-		m.Bezeichnung = b
-	}
-
-	if !bezeichnung.Equaler.Equals(m.Bezeichnung, b) {
-		panic(fmt.Sprintf("bezeichnung changes: %q != %q", m.Bezeichnung, b))
-	}
-
-	kennung.AddNormalized(m.GetEtikettenMutable(), &e)
-
-	s[h] = m
-}
-
-func (s SetKeyToMetadatei) ContainsEtikett(
-	h string,
-	e kennung.Etikett,
-) (ok bool) {
-	var m *metadatei.Metadatei
-
-	if m, ok = s[h]; !ok {
-		return
-	}
-
-	ok = m.GetEtiketten().Contains(e)
-
-	return
-}
-
-type CompareMap struct {
-	Named   SetKeyToMetadatei // etikett to hinweis
-	Unnamed SetKeyToMetadatei // etikett to bezeichnung
-}
-
-func (in *Text) ToCompareMap() (out CompareMap, err error) {
-	out = CompareMap{
-		Named:   make(SetKeyToMetadatei),
-		Unnamed: make(SetKeyToMetadatei),
-	}
-
-	if err = in.addToCompareMap(
-		in,
-		in.Metadatei,
+	if err = ot.addToCompareMap(
+		ot,
+		ot.Metadatei,
 		kennung.MakeEtikettSet(),
-		&out,
+		&preExpansion,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	out = changes2.CompareMap{
+		Named:   make(changes2.SetKeyToMetadatei),
+		Unnamed: preExpansion.Unnamed,
+	}
+
+	for h, v := range preExpansion.Named {
+		var h1 schnittstellen.Stringer
+
+		if h1, err = hinweis_expander(h); err == nil {
+			h = h1.String()
+		}
+
+		err = nil
+
+		out.Named[h] = v
 	}
 
 	return
@@ -101,7 +53,7 @@ func (a *Assignment) addToCompareMap(
 	ot *Text,
 	m Metadatei,
 	es kennung.EtikettSet,
-	out *CompareMap,
+	out *changes2.CompareMap,
 ) (err error) {
 	mes := es.CloneMutableSetPtrLike()
 
@@ -216,4 +168,10 @@ func (a *Assignment) addToCompareMap(
 	}
 
 	return
+}
+
+func (ot *Text) GetSkus() sku.TransactedSet {
+	out := sku.MakeTransactedMutableSet()
+
+	return out
 }

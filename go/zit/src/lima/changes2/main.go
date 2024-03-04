@@ -1,4 +1,4 @@
-package changes
+package changes2
 
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
@@ -7,12 +7,19 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit/src/lima/organize_text"
+	"code.linenisgreat.com/zit/src/hotel/sku"
 )
+
+type Changeable interface {
+	CompareMap(
+		hinweis_expander func(string) (*kennung.Hinweis, error),
+	) (out CompareMap, err error)
+  GetSkus() sku.TransactedSet
+}
 
 type Changes interface {
 	GetChanges() Changes
-	GetCompareMaps() (a, b organize_text.CompareMap)
+	GetCompareMaps() (a, b CompareMap)
 	GetModified() schnittstellen.SetLike[*ChangeBezeichnung]
 	GetExisting() schnittstellen.SetLike[*Change]
 	GetAddedUnnamed() schnittstellen.SetLike[*Change]
@@ -21,7 +28,7 @@ type Changes interface {
 }
 
 type changes struct {
-	compareMapA, compareMapB organize_text.CompareMap
+	compareMapA, compareMapB CompareMap
 	modified                 schnittstellen.MutableSetLike[*ChangeBezeichnung]
 	existing                 schnittstellen.MutableSetLike[*Change]
 	addedUnnamed             schnittstellen.MutableSetLike[*Change]
@@ -33,7 +40,7 @@ func (c changes) GetChanges() Changes {
 	return c
 }
 
-func (c changes) GetCompareMaps() (a, b organize_text.CompareMap) {
+func (c changes) GetCompareMaps() (a, b CompareMap) {
 	return c.compareMapA, c.compareMapB
 }
 
@@ -58,22 +65,18 @@ func (c changes) GetAllBKeys() schnittstellen.SetLike[values.String] {
 }
 
 func ChangesFrom(
-	a1, b1 *organize_text.Text,
+	a1, b1 Changeable,
 	hinweis_expander func(string) (*kennung.Hinweis, error),
 ) (c1 Changes, err error) {
 	var c changes
 	c1 = &c
 
-	if c.compareMapA, err = a1.CompareMap(
-		hinweis_expander,
-	); err != nil {
+	if c.compareMapA, err = a1.CompareMap(hinweis_expander); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if c.compareMapB, err = b1.CompareMap(
-		hinweis_expander,
-	); err != nil {
+	if c.compareMapB, err = b1.CompareMap(hinweis_expander); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/sha"
 	"code.linenisgreat.com/zit/src/delta/standort"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
@@ -28,10 +29,14 @@ type JsonWithUrl struct {
 	TomlBookmark
 }
 
-func (j *Json) FromTransacted(sk *sku.Transacted, s standort.Standort) (err error) {
+func (j *Json) FromStringAndMetadatei(
+	k string,
+	m *metadatei.Metadatei,
+	s standort.Standort,
+) (err error) {
 	var r sha.ReadCloser
 
-	if r, err = s.AkteReader(sk.GetAkteSha()); err != nil {
+	if r, err = s.AkteReader(&m.Akte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -46,14 +51,18 @@ func (j *Json) FromTransacted(sk *sku.Transacted, s standort.Standort) (err erro
 	}
 
 	j.Akte = out.String()
-	j.AkteSha = sk.GetAkteSha().String()
-	j.Bezeichnung = sk.Metadatei.Bezeichnung.String()
-	j.Etiketten = iter.Strings(sk.GetEtiketten())
-	j.Kennung = sk.Kennung.String()
-	j.Tai = sk.Metadatei.Tai.String()
-	j.Typ = sk.Metadatei.Typ.String()
+	j.AkteSha = m.Akte.String()
+	j.Bezeichnung = m.Bezeichnung.String()
+	j.Etiketten = iter.Strings(m.GetEtiketten())
+	j.Kennung = k
+	j.Tai = m.Tai.String()
+	j.Typ = m.Typ.String()
 
 	return
+}
+
+func (j *Json) FromTransacted(sk *sku.Transacted, s standort.Standort) (err error) {
+  return j.FromStringAndMetadatei(sk.Kennung.String(), sk.GetMetadatei(), s)
 }
 
 func (j *Json) ToTransacted(sk *sku.Transacted, s standort.Standort) (err error) {

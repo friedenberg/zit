@@ -1,6 +1,8 @@
 package user_ops
 
 import (
+	"bufio"
+	"encoding/json"
 	"sync"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
@@ -9,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/lima/changes"
 	"code.linenisgreat.com/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
@@ -19,7 +22,7 @@ type CommitOrganizeFile struct {
 	OutputJSON bool
 }
 
-type CommitOrganizeFileResults struct{}
+type CommitOrganizeFileResults = changes.Changes
 
 func (c CommitOrganizeFile) ApplyToText(
 	u *umwelt.Umwelt,
@@ -51,14 +54,29 @@ func (op CommitOrganizeFile) Run(
 	u *umwelt.Umwelt,
 	a, b *organize_text.Text,
 ) (results CommitOrganizeFileResults, err error) {
+	if results, err = op.run(u, a, b); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = op.OutputJSONIfNecessary(results); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (op CommitOrganizeFile) run(
+	u *umwelt.Umwelt,
+	a, b *organize_text.Text,
+) (cs CommitOrganizeFileResults, err error) {
 	store := op.StoreObjekten()
 
 	if err = op.ApplyToText(u, a); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	var cs changes.Changes
 
 	if cs, err = changes.ChangesFrom(
 		a,
@@ -219,40 +237,38 @@ func (op CommitOrganizeFile) Run(
 		return
 	}
 
-	if err = op.OutputJSONIfNecessary(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	return
 }
 
-func (op CommitOrganizeFile) OutputJSONIfNecessary() (err error) {
+func (op CommitOrganizeFile) OutputJSONIfNecessary(c changes.Changes) (err error) {
 	if !op.OutputJSON {
 		return
 	}
 
-	// if err = createOrganizeFileResults.EachPtr(
-	// 	func(sk *sku.Transacted) (err error) {
-	// 		var j sku_fmt.Json
+	_, b := c.GetCompareMaps()
 
-	// 		if err = j.FromTransacted(sk, u.Standort()); err != nil {
-	// 			err = errors.Wrap(err)
-	// 			return
-	// 		}
+	// TODO separate into new, modified, removed
+	elements := make([]sku_fmt.Json, 0, len(b.Named))
 
-	// 		transacted = append(transacted, j)
+	for k, m := range b.Named {
+		var j sku_fmt.Json
 
-	// 		return
-	// 	},
-	// ); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
+		if err = j.FromStringAndMetadatei(k, m, op.Standort()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	// w := bufio.NewWriter(u.Out())
-	// defer errors.DeferredFlusher(w)
-	// enc := json.NewEncoder(w)
+		elements = append(elements, j)
+	}
+
+	w := bufio.NewWriter(op.Out())
+	defer errors.DeferredFlusher(&err, w)
+	enc := json.NewEncoder(w)
+
+	if err = enc.Encode(elements); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

@@ -174,7 +174,8 @@ func (c *OrganizeJSON) RunWithQuery(
 	defer errors.Deferred(&err, u.Unlock)
 
 	commitOrganizeTextOp := user_ops.CommitOrganizeFile{
-		Umwelt: u,
+		Umwelt:     u,
+		OutputJSON: true,
 	}
 
 	if _, err = commitOrganizeTextOp.Run(
