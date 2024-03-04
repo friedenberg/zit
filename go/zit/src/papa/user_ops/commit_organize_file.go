@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
-	"code.linenisgreat.com/zit/src/lima/changes"
 	"code.linenisgreat.com/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
@@ -22,7 +21,7 @@ type CommitOrganizeFile struct {
 	OutputJSON bool
 }
 
-type CommitOrganizeFileResults = changes.Changes
+type CommitOrganizeFileResults = organize_text.Changes
 
 func (c CommitOrganizeFile) ApplyToText(
 	u *umwelt.Umwelt,
@@ -78,7 +77,7 @@ func (op CommitOrganizeFile) run(
 		return
 	}
 
-	if cs, err = changes.ChangesFrom(
+	if cs, err = organize_text.ChangesFrom(
 		a,
 		b,
 		store.GetAbbrStore().Hinweis().ExpandString,
@@ -101,7 +100,7 @@ func (op CommitOrganizeFile) run(
 	if err = store.QueryWithCwd(
 		ms,
 		func(tl *sku.Transacted) (err error) {
-			var change *changes.Change
+			var change *organize_text.Change
 			ok := false
 			sk := sku.GetTransactedPool().Get()
 
@@ -150,7 +149,7 @@ func (op CommitOrganizeFile) run(
 	}
 
 	if err = cs.GetAddedNamed().Each(
-		func(change *changes.Change) (err error) {
+		func(change *organize_text.Change) (err error) {
 			var k kennung.Kennung2
 
 			if err = k.Set(change.Key); err != nil {
@@ -193,7 +192,7 @@ func (op CommitOrganizeFile) run(
 	}
 
 	if err = cs.GetAddedUnnamed().Each(
-		func(change *changes.Change) (err error) {
+		func(change *organize_text.Change) (err error) {
 			bez := change.Key
 
 			m := &metadatei.Metadatei{
@@ -240,25 +239,39 @@ func (op CommitOrganizeFile) run(
 	return
 }
 
-func (op CommitOrganizeFile) OutputJSONIfNecessary(c changes.Changes) (err error) {
+func (op CommitOrganizeFile) OutputJSONIfNecessary(c organize_text.Changes) (err error) {
 	if !op.OutputJSON {
 		return
 	}
 
-	_, b := c.GetCompareMaps()
+	_, _, b := c.GetChanges()
 
 	// TODO separate into new, modified, removed
-	elements := make([]sku_fmt.Json, 0, len(b.Named))
+	var skus sku.TransactedSet
 
-	for k, m := range b.Named {
-		var j sku_fmt.Json
+	if skus, err = b.GetSkus(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-		if err = j.FromStringAndMetadatei(k, m, op.Standort()); err != nil {
-			err = errors.Wrap(err)
+	elements := make([]sku_fmt.Json, 0, skus.Len())
+
+	if err = skus.Each(
+		func(sk *sku.Transacted) (err error) {
+			var j sku_fmt.Json
+
+			if err = j.FromTransacted(sk, op.Standort()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			elements = append(elements, j)
+
 			return
-		}
-
-		elements = append(elements, j)
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	w := bufio.NewWriter(op.Out())

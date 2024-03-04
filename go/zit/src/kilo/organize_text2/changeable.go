@@ -170,8 +170,107 @@ func (a *Assignment) addToCompareMap(
 	return
 }
 
-func (ot *Text) GetSkus() sku.TransactedSet {
+// TODO add akte cache
+func (ot *Text) GetSkus() (out2 sku.TransactedSet, err error) {
 	out := sku.MakeTransactedMutableSet()
+	out2 = out
 
-	return out
+	if err = ot.addToSet(
+		ot,
+		out,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+// TODO add akte cache
+func (a *Assignment) addToSet(
+	ot *Text,
+	out sku.TransactedMutableSet,
+) (err error) {
+	if err = a.Named.Each(
+		func(o *obj) (err error) {
+			var z *sku.Transacted
+			ok := false
+
+			if z, ok = out.Get(out.Key(&o.Transacted)); !ok {
+				z = sku.GetTransactedPool().Get()
+
+				if err = z.SetFromSkuLike(&o.Transacted); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if err = ot.EachPtr(
+					z.Metadatei.AddEtikettPtr,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if err = out.Add(z); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
+			if o.Kennung.String() == "" {
+				panic(fmt.Sprintf("%s: Kennung is nil", o))
+			}
+
+			if err = z.Metadatei.Bezeichnung.Set(
+				o.Metadatei.Bezeichnung.String(),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = z.Metadatei.Typ.Set(
+				o.Metadatei.Typ.String(),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			z.Metadatei.Comments = append(
+				z.Metadatei.Comments,
+				o.Metadatei.Comments...,
+			)
+
+			if err = o.Metadatei.GetEtiketten().EachPtr(
+				z.Metadatei.AddEtikettPtr,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = a.Unnamed.Each(
+		func(z *obj) (err error) {
+			// TODO unnamed
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	for _, c := range a.Children {
+		if err = c.addToSet(ot, out); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
 }

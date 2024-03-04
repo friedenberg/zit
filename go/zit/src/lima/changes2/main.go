@@ -14,11 +14,11 @@ type Changeable interface {
 	CompareMap(
 		hinweis_expander func(string) (*kennung.Hinweis, error),
 	) (out CompareMap, err error)
-  GetSkus() sku.TransactedSet
+	GetSkus() (sku.TransactedSet, error)
 }
 
 type Changes interface {
-	GetChanges() Changes
+	GetChanges() (self Changes, a, b Changeable)
 	GetCompareMaps() (a, b CompareMap)
 	GetModified() schnittstellen.SetLike[*ChangeBezeichnung]
 	GetExisting() schnittstellen.SetLike[*Change]
@@ -28,6 +28,7 @@ type Changes interface {
 }
 
 type changes struct {
+	a, b                     Changeable
 	compareMapA, compareMapB CompareMap
 	modified                 schnittstellen.MutableSetLike[*ChangeBezeichnung]
 	existing                 schnittstellen.MutableSetLike[*Change]
@@ -36,8 +37,8 @@ type changes struct {
 	allB                     schnittstellen.MutableSetLike[values.String]
 }
 
-func (c changes) GetChanges() Changes {
-	return c
+func (c changes) GetChanges() (Changes, Changeable, Changeable) {
+	return c, c.a, c.b
 }
 
 func (c changes) GetCompareMaps() (a, b CompareMap) {
@@ -70,6 +71,8 @@ func ChangesFrom(
 ) (c1 Changes, err error) {
 	var c changes
 	c1 = &c
+
+	c.a, c.b = a1, b1
 
 	if c.compareMapA, err = a1.CompareMap(hinweis_expander); err != nil {
 		err = errors.Wrap(err)
