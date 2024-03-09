@@ -14,7 +14,7 @@ type Changeable interface {
 	CompareMap(
 		hinweis_expander func(string) (*kennung.Hinweis, error),
 	) (out CompareMap, err error)
-	GetSkus() (sku.TransactedSet, error)
+	GetSkus(original sku.TransactedSet) (sku.TransactedSet, error)
 }
 
 type Changes interface {

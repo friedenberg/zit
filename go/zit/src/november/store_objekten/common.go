@@ -101,10 +101,10 @@ func (s *Store) handleNewOrUpdatedCommit(
 		return
 	}
 
-  if err = s.addToTomlIndexIfNecessary(t, mode); err != nil {
-    err = errors.Wrap(err)
-    return
-  }
+	if err = s.addToTomlIndexIfNecessary(t, mode); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	err = nil
 
@@ -127,7 +127,6 @@ func (s *Store) handleNewOrUpdatedCommit(
 		}
 
 	case gattung.Zettel:
-
 		if err = s.GetKonfig().ApplyToSku(t); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -186,7 +185,8 @@ func (s *Store) handleUpdated(
 		return
 	}
 
-	return s.Updated(t)
+	err = s.Updated(t)
+	return
 }
 
 func (s *Store) handleUnchanged(

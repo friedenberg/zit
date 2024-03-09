@@ -170,14 +170,14 @@ func (a *Assignment) addToCompareMap(
 	return
 }
 
-// TODO add akte cache
-func (ot *Text) GetSkus() (out2 sku.TransactedSet, err error) {
+func (ot *Text) GetSkus(original sku.TransactedSet) (out2 sku.TransactedSet, err error) {
 	out := sku.MakeTransactedMutableSet()
 	out2 = out
 
 	if err = ot.addToSet(
 		ot,
 		out,
+		original,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -186,11 +186,18 @@ func (ot *Text) GetSkus() (out2 sku.TransactedSet, err error) {
 	return
 }
 
-// TODO add akte cache
 func (a *Assignment) addToSet(
 	ot *Text,
 	out sku.TransactedMutableSet,
+	original sku.TransactedSet,
 ) (err error) {
+	expanded := kennung.MakeEtikettMutableSet()
+
+	if err = a.AllEtiketten(expanded); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = a.Named.Each(
 		func(o *obj) (err error) {
 			var z *sku.Transacted
@@ -204,12 +211,18 @@ func (a *Assignment) addToSet(
 					return
 				}
 
+				if zPrime, ok := original.Get(original.Key(&o.Transacted)); ok {
+					z.Metadatei.Akte.ResetWith(&zPrime.Metadatei.Akte)
+				}
+
 				if err = ot.EachPtr(
 					z.Metadatei.AddEtikettPtr,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
+
+				z.Metadatei.Typ.ResetWith(ot.Metadatei.Typ)
 
 				if err = out.Add(z); err != nil {
 					err = errors.Wrap(err)
@@ -228,11 +241,13 @@ func (a *Assignment) addToSet(
 				return
 			}
 
-			if err = z.Metadatei.Typ.Set(
-				o.Metadatei.Typ.String(),
-			); err != nil {
-				err = errors.Wrap(err)
-				return
+			if !o.Metadatei.Typ.IsEmpty() {
+				if err = z.Metadatei.Typ.Set(
+					o.Metadatei.Typ.String(),
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 
 			z.Metadatei.Comments = append(
@@ -241,6 +256,13 @@ func (a *Assignment) addToSet(
 			)
 
 			if err = o.Metadatei.GetEtiketten().EachPtr(
+				z.Metadatei.AddEtikettPtr,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = expanded.EachPtr(
 				z.Metadatei.AddEtikettPtr,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -266,7 +288,7 @@ func (a *Assignment) addToSet(
 	}
 
 	for _, c := range a.Children {
-		if err = c.addToSet(ot, out); err != nil {
+		if err = c.addToSet(ot, out, original); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

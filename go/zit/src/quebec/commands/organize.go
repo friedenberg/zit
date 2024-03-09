@@ -199,6 +199,7 @@ func (c *Organize) RunWithQuery(
 			u,
 			createOrganizeFileResults,
 			ot2,
+			getResults,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -260,6 +261,7 @@ func (c *Organize) RunWithQuery(
 			u,
 			createOrganizeFileResults,
 			ot2,
+			getResults,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

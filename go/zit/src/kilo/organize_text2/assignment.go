@@ -235,6 +235,31 @@ func (a *Assignment) consume(b *Assignment) (err error) {
 	return
 }
 
+func (a *Assignment) AllEtiketten(mes kennung.EtikettMutableSet) (err error) {
+	if a == nil {
+		return
+	}
+
+	var es kennung.EtikettSet
+
+	if es, err = a.expandedEtiketten(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = es.EachPtr(mes.AddPtr); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = a.Parent.AllEtiketten(mes); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (a *Assignment) expandedEtiketten() (es kennung.EtikettSet, err error) {
 	es = kennung.MakeEtikettSet()
 

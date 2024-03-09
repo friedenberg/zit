@@ -5,7 +5,6 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
@@ -24,9 +23,7 @@ func NewSetPrefixNamed() *SetPrefixNamed {
 }
 
 func makeMutableZettelLikeSet() schnittstellen.MutableSetLike[*sku.Transacted] {
-	return collections_value.MakeMutableSet[*sku.Transacted](
-		KennungKeyer{},
-	)
+	return sku.MakeTransactedMutableSetKennung()
 }
 
 // this splits on right-expanded

@@ -100,8 +100,8 @@ func (s Store) Flush(
 func (s *Store) UpdateManyMetadatei(
 	incoming sku.TransactedSet,
 ) (err error) {
-  // TODO-P2 [rubidium/muk "only set has changes if an etikett, typ, or kasten
-  // has changes"]
+	// TODO-P2 [rubidium/muk "only set has changes if an etikett, typ, or kasten
+	// has changes"]
 	s.GetKonfig().SetHasChanges(true)
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
@@ -328,6 +328,10 @@ func (s *Store) addTypAndExpanded(
 func (s *Store) addEtikett(
 	e1 kennung.Etikett,
 ) (err error) {
+	if e1.IsVirtual() {
+		return
+	}
+
 	if err = s.GetAbbrStore().Etiketten().Exists(e1.Parts()); err == nil {
 		return
 	}
@@ -352,6 +356,10 @@ func (s *Store) addEtikett(
 func (s *Store) addEtikettAndExpanded(
 	e kennung.Etikett,
 ) (err error) {
+	if e.IsVirtual() {
+		return
+	}
+
 	etikettenExpanded := kennung.ExpandOneSlice(&e, expansion.ExpanderRight)
 
 	for _, e1 := range etikettenExpanded {

@@ -18,12 +18,6 @@ import (
 	"code.linenisgreat.com/zit/src/kilo/objekte_store"
 )
 
-type CreateOrUpdateDelegate struct {
-	New       schnittstellen.FuncIter[*sku.Transacted]
-	Updated   schnittstellen.FuncIter[*sku.Transacted]
-	Unchanged schnittstellen.FuncIter[*sku.Transacted]
-}
-
 func (s *Store) CreateOrUpdateCheckedOut(
 	co *sku.CheckedOut,
 ) (transactedPtr *sku.Transacted, err error) {

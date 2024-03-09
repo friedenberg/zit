@@ -70,6 +70,10 @@ func (f v5) FormatPersistentMetadatei(
 	es := m.GetEtiketten()
 
 	for _, e := range iter.SortedValues[kennung.Etikett](es) {
+		if e.IsVirtual() {
+			continue
+		}
+
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			w,
 			keyEtikett.String(),

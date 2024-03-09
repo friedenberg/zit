@@ -53,6 +53,12 @@ func MakeTransactedMutableSet() TransactedMutableSet {
 	return collections_value.MakeMutableValueSet(transactedKeyerKennung)
 }
 
+func MakeTransactedMutableSetKennung() TransactedMutableSet {
+	return collections_value.MakeMutableValueSet(
+		KennungKeyer[Transacted, *Transacted]{},
+	)
+}
+
 type kennungGetter interface {
 	GetKennung() kennung.Kennung
 }

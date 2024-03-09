@@ -14,7 +14,7 @@ func init() {
 	register(Etikett{})
 }
 
-const EtikettRegexString = `^[-a-z0-9_]+$`
+const EtikettRegexString = `^%?[-a-z0-9_]+$`
 
 var EtikettRegex *regexp.Regexp
 
@@ -23,7 +23,9 @@ func init() {
 }
 
 type Etikett struct {
-	value string
+	virtual       bool
+	dependentLeaf bool
+	value         string
 }
 
 type IndexedEtikett = IndexedLike
@@ -80,21 +82,47 @@ func (a Etikett) Equals(b Etikett) bool {
 }
 
 func (e Etikett) String() string {
-	return e.value
+	var sb strings.Builder
+
+	if e.virtual {
+		sb.WriteRune('%')
+	}
+
+	if e.dependentLeaf {
+		sb.WriteRune('-')
+	}
+
+	sb.WriteString(e.value)
+
+	return sb.String()
 }
 
 func (e Etikett) Bytes() []byte {
-	return []byte(e.value)
+	return []byte(e.String())
 }
 
 func (e Etikett) Parts() [3]string {
-	v := e.String()
+	switch {
+	case e.virtual && e.dependentLeaf:
+		return [3]string{"%", "-", e.value}
 
-	if strings.HasPrefix(v, "-") {
-		v = v[1:]
+	case e.virtual:
+		return [3]string{"", "%", e.value}
+
+	case e.dependentLeaf:
+		return [3]string{"", "-", e.value}
+
+	default:
+		return [3]string{"", "", e.value}
 	}
+}
 
-	return [3]string{"", "-", v}
+func (e Etikett) IsVirtual() bool {
+	return e.virtual
+}
+
+func (e Etikett) IsDependentLeaf() bool {
+	return e.dependentLeaf
 }
 
 func (e *Etikett) TodoSetFromKennung2(v *Kennung2) (err error) {
@@ -114,6 +142,12 @@ func (e *Etikett) Set(v string) (err error) {
 		err = errors.Errorf("not a valid etikett: %q", v1)
 		return
 	}
+
+	e.virtual = strings.HasPrefix(v, "%")
+	v = strings.TrimPrefix(v, "%")
+
+	e.dependentLeaf = strings.HasPrefix(v, "-")
+	v = strings.TrimPrefix(v, "-")
 
 	e.value = v
 

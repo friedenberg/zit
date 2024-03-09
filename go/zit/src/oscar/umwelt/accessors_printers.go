@@ -195,7 +195,7 @@ func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[string] {
 	if u.konfig.PrintOptions.PrintFlush {
 		return string_format_writer.MakeDelim[string](
 			"\n",
-			u.Out(),
+			u.Err(),
 			string_format_writer.MakeDefaultDatePrefixFormatWriter(
 				u,
 				string_format_writer.MakeColor[string](

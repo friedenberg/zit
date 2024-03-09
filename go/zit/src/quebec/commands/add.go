@@ -192,6 +192,7 @@ func (c Add) RunWithCwdQuery(
 		u,
 		createOrganizeFileResults,
 		ot2,
+		mwk,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

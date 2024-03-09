@@ -15,7 +15,6 @@ import (
 	"code.linenisgreat.com/zit/src/delta/gattungen"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/matcher"
-	"code.linenisgreat.com/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
@@ -115,7 +114,7 @@ func (c *OrganizeJSON) RunWithQuery(
 		return
 	}
 
-	getResults := objekte_collections.MakeMutableSetMetadateiWithKennung()
+	getResults := sku.MakeTransactedMutableSetKennung()
 
 	for _, j := range transacted {
 		sk := sku.GetTransactedPool().Get()
@@ -182,6 +181,7 @@ func (c *OrganizeJSON) RunWithQuery(
 		u,
 		createOrganizeFileResults,
 		ot2,
+		getResults,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

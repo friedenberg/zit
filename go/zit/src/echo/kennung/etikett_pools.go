@@ -13,10 +13,14 @@ type etikettResetter struct{}
 
 func (etikettResetter) Reset(e *Etikett) {
 	e.value = ""
+	e.virtual = false
+	e.dependentLeaf = false
 }
 
 func (etikettResetter) ResetWith(a, b *Etikett) {
 	a.value = b.value
+	a.virtual = b.virtual
+	a.dependentLeaf = b.dependentLeaf
 }
 
 func init() {

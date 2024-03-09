@@ -52,13 +52,14 @@ func (c CommitOrganizeFile) ApplyToText(
 func (op CommitOrganizeFile) Run(
 	u *umwelt.Umwelt,
 	a, b *organize_text.Text,
+	original sku.TransactedSet,
 ) (results CommitOrganizeFileResults, err error) {
 	if results, err = op.run(u, a, b); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = op.OutputJSONIfNecessary(results); err != nil {
+	if err = op.OutputJSONIfNecessary(results, original); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -239,22 +240,56 @@ func (op CommitOrganizeFile) run(
 	return
 }
 
-func (op CommitOrganizeFile) OutputJSONIfNecessary(c organize_text.Changes) (err error) {
+func (op CommitOrganizeFile) OutputJSONIfNecessary(
+	c organize_text.Changes,
+	original sku.TransactedSet,
+) (err error) {
 	if !op.OutputJSON {
 		return
 	}
 
-	_, _, b := c.GetChanges()
+	_, a, b := c.GetChanges()
 
-	// TODO separate into new, modified, removed
-	var skus sku.TransactedSet
+	var skus, oldSkus sku.TransactedSet
 
-	if skus, err = b.GetSkus(); err != nil {
+	if skus, err = b.GetSkus(original); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	elements := make([]sku_fmt.Json, 0, skus.Len())
+	if oldSkus, err = a.GetSkus(original); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	output := map[string][]sku_fmt.Json{
+		"changed": make([]sku_fmt.Json, 0),
+		"new":     make([]sku_fmt.Json, 0),
+		"removed": make([]sku_fmt.Json, 0),
+		"same":    make([]sku_fmt.Json, 0),
+	}
+
+	if err = oldSkus.Each(
+		func(sk *sku.Transacted) (err error) {
+			var j sku_fmt.Json
+
+			if err = j.FromTransacted(sk, op.Standort()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if _, ok := skus.Get(oldSkus.Key(sk)); ok {
+				return
+			}
+
+			output["removed"] = append(output["removed"], j)
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = skus.Each(
 		func(sk *sku.Transacted) (err error) {
@@ -265,7 +300,15 @@ func (op CommitOrganizeFile) OutputJSONIfNecessary(c organize_text.Changes) (err
 				return
 			}
 
-			elements = append(elements, j)
+			if old, ok := oldSkus.Get(oldSkus.Key(sk)); ok {
+				if sku.TransactedEqualer.Equals(sk, old) {
+					output["same"] = append(output["same"], j)
+				} else {
+					output["changed"] = append(output["changed"], j)
+				}
+			} else {
+				output["new"] = append(output["new"], j)
+			}
 
 			return
 		},
@@ -278,7 +321,7 @@ func (op CommitOrganizeFile) OutputJSONIfNecessary(c organize_text.Changes) (err
 	defer errors.DeferredFlusher(&err, w)
 	enc := json.NewEncoder(w)
 
-	if err = enc.Encode(elements); err != nil {
+	if err = enc.Encode(output); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

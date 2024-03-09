@@ -415,6 +415,10 @@ func (bf *Binary) writeFieldKey(
 		es := sk.GetEtiketten()
 
 		for _, e := range iter.SortedValues[kennung.Etikett](es) {
+			if e.IsVirtual() {
+				continue
+			}
+
 			var n1 int64
 			n1, err = bf.writeFieldBinaryMarshaler(&e)
 			n += n1
