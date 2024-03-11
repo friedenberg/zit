@@ -18,11 +18,10 @@ import (
 )
 
 func init() {
-	gob.Register(&query{})
+	gob.Register(&group{})
 }
 
-// TODO-P3 rename to QueryGattungGroup
-type Query interface {
+type Group interface {
 	Get(g gattung.Gattung) (s MatcherSigil, ok bool)
 	GetCwdFDs() fd.Set
 	GetExplicitCwdFDs() fd.Set
@@ -36,16 +35,16 @@ type Query interface {
 	Matcher
 }
 
-func MakeQueryFromCheckedOutSet(
+func MakeGroupFromCheckedOutSet(
 	cos sku.CheckedOutSet,
-) (q Query, err error) {
-	gs := make(map[gattung.Gattung]setWithSigil)
+) (q Group, err error) {
+	gs := make(map[gattung.Gattung]Query)
 
 	if err = cos.Each(
 		func(co *sku.CheckedOut) (err error) {
 			m := MakeMatcherContainsExactly(&co.Internal.Kennung)
 
-			var s setWithSigil
+			var s Query
 			ok := false
 
 			if s, ok = gs[gattung.Must(co.Internal.GetGattung())]; !ok {
@@ -63,14 +62,14 @@ func MakeQueryFromCheckedOutSet(
 		return
 	}
 
-	q = &query{
+	q = &group{
 		Gattung: gs,
 	}
 
 	return
 }
 
-func MakeQuery(
+func MakeGroup(
 	k schnittstellen.Konfig,
 	cwd matcherCwd,
 	ex kennung.Abbr,
@@ -78,59 +77,42 @@ func MakeQuery(
 	feg schnittstellen.FileExtensionGetter,
 	dg gattungen.Set,
 	ki kennung.Index,
-) Query {
-	return &query{
+) Group {
+	return &group{
 		konfig:              k,
 		cwd:                 cwd,
 		fileExtensionGetter: feg,
 		expanders:           ex,
 		Hidden:              hidden,
 		DefaultGattungen:    dg.CloneMutableSetLike(),
-		Gattung:             make(map[gattung.Gattung]setWithSigil),
+		Gattung:             make(map[gattung.Gattung]Query),
 		FDs:                 fd.MakeMutableSet(),
 		index:               ki,
 	}
 }
 
-func MakeQueryAll(
+func MakeGroupAll(
 	k schnittstellen.Konfig,
 	cwd matcherCwd,
 	ex kennung.Abbr,
 	hidden Matcher,
 	feg schnittstellen.FileExtensionGetter,
 	ki kennung.Index,
-) Query {
+) Group {
 	errors.TodoP2("support allowed sigils")
-	return &query{
+	return &group{
 		konfig:              k,
 		cwd:                 cwd,
 		fileExtensionGetter: feg,
 		expanders:           ex,
 		Hidden:              hidden,
 		DefaultGattungen:    gattungen.MakeSet(gattung.TrueGattung()...),
-		Gattung:             make(map[gattung.Gattung]setWithSigil),
+		Gattung:             make(map[gattung.Gattung]Query),
 		index:               ki,
 	}
 }
 
-type setWithSigil struct {
-	Matcher MatcherExactlyThisOrAllOfThese
-	Sigil   kennung.Sigil
-}
-
-func (s setWithSigil) String() string {
-	return fmt.Sprintf("%s%s", s.Matcher, s.Sigil)
-}
-
-func (s setWithSigil) ContainsMatchable(m *sku.Transacted) bool {
-	return s.Matcher.ContainsMatchable(m)
-}
-
-func (s setWithSigil) GetSigil() kennung.Sigil {
-	return s.Sigil
-}
-
-type query struct {
+type group struct {
 	konfig              schnittstellen.Konfig
 	fileExtensionGetter schnittstellen.FileExtensionGetter
 	expanders           kennung.Abbr
@@ -140,17 +122,17 @@ type query struct {
 	index  kennung.Index
 
 	DefaultGattungen gattungen.Set
-	Gattung          map[gattung.Gattung]setWithSigil
+	Gattung          map[gattung.Gattung]Query
 	FDs              fd.MutableSet
 
 	dotOperatorActive bool
 }
 
-func (q query) MatcherLen() int {
+func (q group) MatcherLen() int {
 	return 0
 }
 
-func (q query) Each(f schnittstellen.FuncIter[Matcher]) (err error) {
+func (q group) Each(f schnittstellen.FuncIter[Matcher]) (err error) {
 	for _, s := range q.Gattung {
 		if err = f(s.Matcher); err != nil {
 			return
@@ -160,7 +142,7 @@ func (q query) Each(f schnittstellen.FuncIter[Matcher]) (err error) {
 	return
 }
 
-func (s query) String() string {
+func (s group) String() string {
 	sb := &strings.Builder{}
 
 	hasAny := false
@@ -172,22 +154,21 @@ func (s query) String() string {
 
 		hasAny = true
 
-		sb.WriteString(
-			fmt.Sprintf(
-				"%s%s%s%s%s",
-				QueryGroupOpenOperator,
-				ids,
-				QueryGroupCloseOperator,
-				ids.Sigil,
-				g,
-			),
+		fmt.Fprintf(
+			sb,
+			"%s%s%s%s%s",
+			QueryGroupOpenOperator,
+			ids,
+			QueryGroupCloseOperator,
+			ids.Sigil,
+			g,
 		)
 	}
 
 	return sb.String()
 }
 
-func (s *query) SetMany(vs ...string) (err error) {
+func (s *group) SetMany(vs ...string) (err error) {
 	builder := MatcherBuilder{}
 
 	if _, err = builder.Build(vs...); err != nil {
@@ -219,11 +200,11 @@ func (s *query) SetMany(vs ...string) (err error) {
 	return
 }
 
-func (ms *query) Set(v string) (err error) {
+func (ms *group) Set(v string) (err error) {
 	return ms.set(v)
 }
 
-func (ms *query) set(v string) (err error) {
+func (ms *group) set(v string) (err error) {
 	v = strings.TrimSpace(v)
 
 	sbs := [3]*strings.Builder{
@@ -298,19 +279,20 @@ func (ms *query) set(v string) (err error) {
 
 	if err = gs.Each(
 		func(g gattung.Gattung) (err error) {
-			var ids setWithSigil
+			var ids Query
 			ok := false
 
 			if ids, ok = ms.Gattung[g]; !ok {
 				ids.Matcher = MakeMatcherExactlyThisOrAllOfThese()
 				ids.Sigil = sigil
+				ids.Gattung = g
 			}
 
 			switch {
 			case before == "":
 				break
 
-			case ids.Sigil.IncludesCwd():
+			case ids.IncludesCwd():
 				fp := fmt.Sprintf("%s.%s", before, after)
 
 				var f *fd.FD
@@ -447,8 +429,8 @@ func tryAddMatcher(
 	return
 }
 
-func (ms query) Get(g gattung.Gattung) (s MatcherSigil, ok bool) {
-	var ids setWithSigil
+func (ms group) Get(g gattung.Gattung) (s MatcherSigil, ok bool) {
+	var ids Query
 
 	ids, ok = ms.Gattung[g]
 
@@ -467,11 +449,11 @@ func (ms query) Get(g gattung.Gattung) (s MatcherSigil, ok bool) {
 	return
 }
 
-func (ms query) GetExplicitCwdFDs() fd.Set {
+func (ms group) GetExplicitCwdFDs() fd.Set {
 	return ms.FDs
 }
 
-func (ms query) GetCwdFDs() fd.Set {
+func (ms group) GetCwdFDs() fd.Set {
 	if ms.dotOperatorActive {
 		return ms.cwd.GetCwdFDs()
 	} else {
@@ -479,7 +461,7 @@ func (ms query) GetCwdFDs() fd.Set {
 	}
 }
 
-func (ms query) GetEtiketten() kennung.EtikettSet {
+func (ms group) GetEtiketten() kennung.EtikettSet {
 	es := kennung.MakeEtikettMutableSet()
 
 	for _, s := range ms.Gattung {
@@ -505,7 +487,7 @@ func (ms query) GetEtiketten() kennung.EtikettSet {
 	return es
 }
 
-func (ms query) GetTyp() (t kennung.Typ, ok bool) {
+func (ms group) GetTyp() (t kennung.Typ, ok bool) {
 	ts := ms.GetTypen()
 
 	if ts.Len() != 1 {
@@ -518,7 +500,7 @@ func (ms query) GetTyp() (t kennung.Typ, ok bool) {
 	return
 }
 
-func (ms query) GetTypen() schnittstellen.SetLike[kennung.Typ] {
+func (ms group) GetTypen() schnittstellen.SetLike[kennung.Typ] {
 	es := kennung.MakeMutableTypSet()
 
 	for _, s := range ms.Gattung {
@@ -550,7 +532,7 @@ func (ms query) GetTypen() schnittstellen.SetLike[kennung.Typ] {
 	return es
 }
 
-func (s query) ContainsMatchable(m *sku.Transacted) bool {
+func (s group) ContainsMatchable(m *sku.Transacted) bool {
 	g := gattung.Must(m.GetGattung())
 
 	var matcher Matcher
@@ -563,7 +545,7 @@ func (s query) ContainsMatchable(m *sku.Transacted) bool {
 	return matcher.ContainsMatchable(m)
 }
 
-func (ms query) GetGattungen() gattungen.Set {
+func (ms group) GetGattungen() gattungen.Set {
 	gs := make([]gattung.Gattung, 0, len(ms.Gattung))
 
 	for g := range ms.Gattung {
@@ -574,7 +556,7 @@ func (ms query) GetGattungen() gattungen.Set {
 }
 
 // Runs in parallel
-func (ms query) All(f func(gattung.Gattung, MatcherSigil) error) (err error) {
+func (ms group) All(f func(gattung.Gattung, MatcherSigil) error) (err error) {
 	errors.TodoP1("lock")
 	chErr := make(chan error, len(ms.Gattung))
 
@@ -607,7 +589,7 @@ func (ms query) All(f func(gattung.Gattung, MatcherSigil) error) (err error) {
 	return
 }
 
-func (ms query) SplitGattungenByHistory() (schwanz, all gattungen.MutableSet) {
+func (ms group) SplitGattungenByHistory() (schwanz, all gattungen.MutableSet) {
 	all = gattungen.MakeMutableSet()
 	schwanz = gattungen.MakeMutableSet()
 

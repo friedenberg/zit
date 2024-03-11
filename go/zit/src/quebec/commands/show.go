@@ -52,7 +52,7 @@ func (c Show) DefaultGattungen() gattungen.Set {
 
 func (c Show) runGenericObjekteFormatterValue(
 	u *umwelt.Umwelt,
-	ms matcher.Query,
+	ms matcher.Group,
 	objekteFormatterValue objekte.FormatterValue,
 ) (err error) {
 	f := iter.MakeSyncSerializer(
@@ -88,7 +88,7 @@ func (c Show) runGenericObjekteFormatterValue(
 	return
 }
 
-func (c Show) RunWithQuery(u *umwelt.Umwelt, ms matcher.Query) (err error) {
+func (c Show) RunWithQuery(u *umwelt.Umwelt, ms matcher.Group) (err error) {
 	objekteFormatterValue := objekte.FormatterValue{}
 
 	if err = objekteFormatterValue.Set(c.Format); err == nil {

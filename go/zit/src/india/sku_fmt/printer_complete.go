@@ -19,8 +19,8 @@ type WriterComplete struct {
 	chDone       chan struct{}
 }
 
-func MakeWriterComplete(w io.Writer) WriterComplete {
-	w1 := WriterComplete{
+func MakeWriterComplete(w io.Writer) *WriterComplete {
+	w1 := &WriterComplete{
 		chTransacted: make(chan *sku.Transacted),
 		chDone:       make(chan struct{}),
 		wBuf:         bufio.NewWriter(w),
@@ -44,6 +44,8 @@ func MakeWriterComplete(w io.Writer) WriterComplete {
 				s.wBuf.WriteString(z.GetTyp().String())
 				s.wBuf.WriteString(" ")
 				s.wBuf.WriteString(z.GetMetadatei().Bezeichnung.String())
+			} else {
+				s.wBuf.WriteString(g.String())
 			}
 
 			s.wBuf.WriteString("\n")
@@ -51,12 +53,12 @@ func MakeWriterComplete(w io.Writer) WriterComplete {
 		}
 
 		s.chDone <- struct{}{}
-	}(&w1)
+	}(w1)
 
 	return w1
 }
 
-func (w *WriterComplete) WriteZettelVerzeichnisse(
+func (w *WriterComplete) WriteOne(
 	z *sku.Transacted,
 ) (err error) {
 	if z.GetKennung().String() == "/" {

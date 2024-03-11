@@ -228,7 +228,7 @@ func (u *Umwelt) MakeKennungExpanders() (out kennung.Abbr) {
 
 func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
 	dg gattungen.Set,
-) matcher.Query {
+) matcher.Group {
 	if dg == nil {
 		dg = gattungen.MakeSet(gattung.Zettel)
 	}
@@ -237,7 +237,7 @@ func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
 
 	i := u.MakeKennungIndex()
 
-	return matcher.MakeQuery(
+	return matcher.MakeGroup(
 		u.Konfig(),
 		u.StoreUtil().GetCwdFiles(),
 		u.MakeKennungExpanders(),
@@ -248,10 +248,10 @@ func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
 	)
 }
 
-func (u *Umwelt) MakeQueryAll() matcher.Query {
+func (u *Umwelt) MakeQueryAll() matcher.Group {
 	i := u.MakeKennungIndex()
 
-	return matcher.MakeQueryAll(
+	return matcher.MakeGroupAll(
 		u.Konfig(),
 		u.StoreUtil().GetCwdFiles(),
 		u.MakeKennungExpanders(),
@@ -263,14 +263,14 @@ func (u *Umwelt) MakeQueryAll() matcher.Query {
 
 func (u *Umwelt) MakeMetaIdSetWithoutExcludedHidden(
 	dg gattungen.Set,
-) matcher.Query {
+) matcher.Group {
 	if dg == nil {
 		dg = gattungen.MakeSet(gattung.Zettel)
 	}
 
 	i := u.MakeKennungIndex()
 
-	return matcher.MakeQuery(
+	return matcher.MakeGroup(
 		u.Konfig(),
 		u.StoreUtil().GetCwdFiles(),
 		u.MakeKennungExpanders(),

@@ -19,10 +19,10 @@ import (
 
 type PullClient interface {
 	SkusFromFilter(
-		matcher.Query,
+		matcher.Group,
 		schnittstellen.FuncIter[*sku.Transacted],
 	) error
-	PullSkus(matcher.Query) error
+	PullSkus(matcher.Group) error
 	Close() error
 }
 
@@ -85,7 +85,7 @@ func (c client) Close() (err error) {
 }
 
 func (c client) SkusFromFilter(
-	ids matcher.Query,
+	ids matcher.Group,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	var d remote_conn.Dialogue

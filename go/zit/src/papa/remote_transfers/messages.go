@@ -7,7 +7,7 @@ import (
 )
 
 type messageRequestSkus struct {
-	MetaSet matcher.Query
+	MetaSet matcher.Group
 }
 
 type messageRequestObjekteData struct {

@@ -4,7 +4,6 @@ type (
 	Akte[T any] interface{}
 
 	AktePtr[T any] interface {
-		GattungGetter
 		Akte[T]
 		Ptr[T]
 	}

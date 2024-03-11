@@ -43,7 +43,7 @@ func (c ExecAction) DefaultGattungen() gattungen.Set {
 
 func (c ExecAction) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms matcher.Query,
+	ms matcher.Group,
 ) (err error) {
 	if !c.Action.WasSet() {
 		err = errors.Normal(errors.Errorf("Action must be provided"))

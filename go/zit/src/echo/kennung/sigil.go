@@ -20,6 +20,7 @@ const (
 	SigilHistory
 	SigilCwd
 	SigilHidden
+	SigilVirtual
 
 	SigilMax
 	SigilAll = Sigil(^byte(0))
@@ -31,6 +32,7 @@ var (
 		'+': SigilHistory,
 		'.': SigilCwd,
 		'?': SigilHidden,
+		'%': SigilVirtual,
 	}
 
 	mapSigilToRune = map[Sigil]rune{
@@ -38,6 +40,7 @@ var (
 		SigilHistory:   '+',
 		SigilCwd:       '.',
 		SigilHidden:    '?',
+		SigilVirtual:   '%',
 	}
 )
 
@@ -102,6 +105,10 @@ func (a Sigil) IncludesCwd() bool {
 
 func (a Sigil) IncludesHidden() bool {
 	return a.Contains(SigilHidden) || a.Contains(SigilCwd)
+}
+
+func (a Sigil) IncludesVirtual() bool {
+	return a.Contains(SigilVirtual)
 }
 
 func (a Sigil) String() string {

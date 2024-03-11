@@ -19,7 +19,7 @@ const (
 )
 
 type Client interface {
-	SendNeededSkus(matcher.Query) error
+	SendNeededSkus(matcher.Group) error
 	Close() error
 }
 
@@ -66,7 +66,7 @@ func (c client) Close() (err error) {
 	return
 }
 
-func (c client) SendNeededSkus(filter matcher.Query) (err error) {
+func (c client) SendNeededSkus(filter matcher.Group) (err error) {
 	err = todo.Implement()
 	// var d remote_conn.Dialogue
 

@@ -234,9 +234,9 @@ func (c New) editZettels(
 
 	checkinOp := user_ops.Checkin{}
 
-	var ms matcher.Query
+	var ms matcher.Group
 
-	if ms, err = matcher.MakeQueryFromCheckedOutSet(zsc); err != nil {
+	if ms, err = matcher.MakeGroupFromCheckedOutSet(zsc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

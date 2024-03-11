@@ -55,7 +55,7 @@ type revertTuple struct {
 	*sha.Sha
 }
 
-func (c Revert) RunWithQuery(u *umwelt.Umwelt, ms matcher.Query) (err error) {
+func (c Revert) RunWithQuery(u *umwelt.Umwelt, ms matcher.Group) (err error) {
 	f := func(rt revertTuple) (err error) {
 		if rt.IsNull() {
 			return
@@ -93,7 +93,7 @@ func (c Revert) RunWithQuery(u *umwelt.Umwelt, ms matcher.Query) (err error) {
 
 func (c Revert) runRevertFromQuery(
 	u *umwelt.Umwelt,
-	ms matcher.Query,
+	ms matcher.Group,
 	f schnittstellen.FuncIter[revertTuple],
 ) (err error) {
 	if err = u.StoreObjekten().QueryWithoutCwd(

@@ -54,7 +54,7 @@ func (c Clean) DefaultGattungen() gattungen.Set {
 
 func (c Clean) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms matcher.Query,
+	ms matcher.Group,
 ) (err error) {
 	fds := fd.MakeMutableSet()
 	l := &sync.Mutex{}
@@ -107,7 +107,7 @@ func (c Clean) RunWithQuery(
 
 func (c Clean) markUnsureAktenForRemovalIfNecessary(
 	u *umwelt.Umwelt,
-	q matcher.Query,
+	q matcher.Group,
 	add schnittstellen.FuncIter[*fd.FD],
 ) (err error) {
 	if !c.includeRecognized {

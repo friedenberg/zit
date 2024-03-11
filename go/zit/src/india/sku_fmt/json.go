@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/sha"
 	"code.linenisgreat.com/zit/src/delta/standort"
@@ -22,11 +21,6 @@ type Json struct {
 	Kennung     string   `json:"kennung"`
 	Typ         string   `json:"typ"`
 	Tai         string   `json:"tai"`
-}
-
-type JsonWithUrl struct {
-	Json
-	TomlBookmark
 }
 
 func (j *Json) FromStringAndMetadatei(
@@ -62,7 +56,7 @@ func (j *Json) FromStringAndMetadatei(
 }
 
 func (j *Json) FromTransacted(sk *sku.Transacted, s standort.Standort) (err error) {
-  return j.FromStringAndMetadatei(sk.Kennung.String(), sk.GetMetadatei(), s)
+	return j.FromStringAndMetadatei(sk.Kennung.String(), sk.GetMetadatei(), s)
 }
 
 func (j *Json) ToTransacted(sk *sku.Transacted, s standort.Standort) (err error) {
@@ -112,23 +106,6 @@ func (j *Json) ToTransacted(sk *sku.Transacted, s standort.Standort) (err error)
 
 	sk.Metadatei.SetEtiketten(es)
 	sk.Metadatei.GenerateExpandedEtiketten()
-
-	return
-}
-
-func MakeJsonTomlBookmark(
-	sk *sku.Transacted,
-	s standort.Standort,
-) (j JsonWithUrl, err error) {
-	if err = j.FromTransacted(sk, s); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = toml.Unmarshal([]byte(j.Akte), &j.TomlBookmark); err != nil {
-		err = errors.Wrapf(err, "%q", j.Akte)
-		return
-	}
 
 	return
 }

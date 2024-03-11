@@ -43,7 +43,7 @@ func (c Diff) DefaultGattungen() gattungen.Set {
 
 func (c Diff) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms matcher.Query,
+	ms matcher.Group,
 ) (err error) {
 	fInline := metadatei.MakeTextFormatterMetadateiInlineAkte(
 		u.Standort(),

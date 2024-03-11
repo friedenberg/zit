@@ -8,7 +8,7 @@ import (
 )
 
 func MakeFilterFromQuery(
-	ms Query,
+	ms Group,
 ) schnittstellen.FuncIter[*sku.CheckedOut] {
 	if ms == nil {
 		return collections.MakeWriterNoop[*sku.CheckedOut]()

@@ -45,7 +45,7 @@ func (c CatAlfred) DefaultGattungen() gattungen.Set {
 
 func (c CatAlfred) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms matcher.Query,
+	ms matcher.Group,
 ) (err error) {
 	// this command does its own error handling
 	wo := bufio.NewWriter(u.Out())

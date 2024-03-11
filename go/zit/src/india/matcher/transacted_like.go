@@ -8,11 +8,11 @@ import (
 type (
 	FuncReaderTransactedLikePtr func(schnittstellen.FuncIter[*sku.Transacted]) error
 	FuncSigilTransactedLikePtr  func(MatcherSigil, schnittstellen.FuncIter[*sku.Transacted]) error
-	FuncQueryTransactedLikePtr  func(Query, schnittstellen.FuncIter[*sku.Transacted]) error
+	FuncQueryTransactedLikePtr  func(Group, schnittstellen.FuncIter[*sku.Transacted]) error
 )
 
 func MakeFuncReaderTransactedLikePtr(
-	ms Query,
+	ms Group,
 	fq FuncQueryTransactedLikePtr,
 ) FuncReaderTransactedLikePtr {
 	return func(f schnittstellen.FuncIter[*sku.Transacted]) (err error) {

@@ -3,8 +3,6 @@ package typ_akte
 import (
 	"code.linenisgreat.com/zit/src/alfa/etikett_rule"
 	"code.linenisgreat.com/zit/src/alfa/reset"
-	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/script_config"
 )
 
@@ -19,11 +17,6 @@ type V0 struct {
 	Formatters         map[string]script_config.WithOutputFormat `toml:"formatters,omitempty"`
 	Actions            map[string]script_config.ScriptConfig     `toml:"actions,omitempty"`
 	EtikettenRules     map[string]etikett_rule.Rule              `toml:"etiketten-rules,omitempty"`
-	Keys               []string                                  `toml:"keys,omitempty"`
-}
-
-func (a V0) GetGattung() schnittstellen.GattungLike {
-	return gattung.Typ
 }
 
 func (a *V0) Reset() {

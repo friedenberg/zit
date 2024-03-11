@@ -73,7 +73,7 @@ func (c *Organize) CompletionGattung() gattungen.Set {
 
 func (c *Organize) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms matcher.Query,
+	ms matcher.Group,
 ) (err error) {
 	u.ApplyToOrganizeOptions(&c.Options)
 
@@ -279,7 +279,7 @@ func (c Organize) readFromVim(
 	u *umwelt.Umwelt,
 	f string,
 	results *organize_text.Text,
-	q matcher.Query,
+	q matcher.Group,
 ) (ot *organize_text.Text, err error) {
 	openVimOp := user_ops.OpenVim{
 		Options: vim_cli_options_builder.New().

@@ -18,7 +18,7 @@ type ReadOrganizeFile struct {
 
 func (c ReadOrganizeFile) RunWithFile(
 	p string,
-	q matcher.Query,
+	q matcher.Group,
 ) (ot *organize_text.Text, err error) {
 	var f *os.File
 
@@ -36,7 +36,7 @@ func (c ReadOrganizeFile) RunWithFile(
 	return
 }
 
-func (c ReadOrganizeFile) Run(q matcher.Query) (ot *organize_text.Text, err error) {
+func (c ReadOrganizeFile) Run(q matcher.Group) (ot *organize_text.Text, err error) {
 	otFlags := organize_text.MakeFlags()
 	c.Umwelt.ApplyToOrganizeOptions(&otFlags.Options)
 

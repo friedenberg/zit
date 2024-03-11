@@ -17,7 +17,7 @@ type Checkin struct {
 
 func (c Checkin) Run(
 	u *umwelt.Umwelt,
-	ms matcher.Query,
+	ms matcher.Group,
 ) (err error) {
 	fds := fd.MakeMutableSet()
 	l := &sync.Mutex{}

@@ -2,15 +2,11 @@ package commands
 
 import (
 	"os"
-	"syscall"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/delta/gattungen"
-	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/matcher"
-	to_merge "code.linenisgreat.com/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/kilo/cwd"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
@@ -18,7 +14,7 @@ import (
 type CommandWithCwdQuery interface {
 	RunWithCwdQuery(
 		store *umwelt.Umwelt,
-		ms matcher.Query,
+		ms matcher.Group,
 		cwdFiles *cwd.CwdFiles,
 	) error
 	DefaultGattungen() gattungen.Set
@@ -39,67 +35,15 @@ func (c commandWithCwdQuery) Complete(
 		return
 	}
 
-	cg := cgg.CompletionGattung()
+	w := sku_fmt.MakeWriterComplete(os.Stdout)
+	defer errors.DeferredCloser(&err, w)
 
-	if cg.Contains(gattung.Zettel) {
-		func() {
-			zw := to_merge.MakeWriterComplete(os.Stdout)
-			defer errors.Deferred(&err, zw.Close)
-
-			w := zw.WriteZettelVerzeichnisse
-
-			if err = u.StoreObjekten().ReadAllSchwanzen(
-				gattungen.MakeSet(gattung.Zettel),
-				w,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}()
-	}
-
-	if cg.Contains(gattung.Etikett) {
-		if err = u.StoreObjekten().GetKennungIndex().EachSchwanzen(
-			func(e *kennung.IndexedLike) (err error) {
-				if err = errors.Out().Printf("%s\tEtikett", e.GetKennung().String()); err != nil {
-					err = errors.IsAsNilOrWrapf(
-						err,
-						syscall.EPIPE,
-						"Etikett: %s",
-						e.GetKennung(),
-					)
-
-					return
-				}
-
-				return
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if cg.Contains(gattung.Typ) {
-		if err = u.Konfig().Typen.Each(
-			func(tt *sku.Transacted) (err error) {
-				if err = errors.Out().Printf("%s\tTyp", tt.GetKennung()); err != nil {
-					err = errors.IsAsNilOrWrapf(
-						err,
-						syscall.EPIPE,
-						"Typ: %s",
-						tt.GetKennung(),
-					)
-
-					return
-				}
-
-				return
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = u.StoreObjekten().ReadAllSchwanzen(
+		cgg.CompletionGattung(),
+		w.WriteOne,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

@@ -34,7 +34,7 @@ func (c Status) DefaultGattungen() gattungen.Set {
 
 func (c Status) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms matcher.Query,
+	ms matcher.Group,
 ) (err error) {
 	pcol := u.PrinterCheckedOut()
 

@@ -171,16 +171,26 @@ func (k2 *Kennung2) StringFromPtr() string {
 	var sb strings.Builder
 
 	switch k2.g {
-	case gattung.Zettel, gattung.Bestandsaufnahme, gattung.Kasten:
+	case gattung.Zettel:
 		sb.Write(k2.left.Bytes())
 		sb.WriteByte(k2.middle)
 		sb.Write(k2.right.Bytes())
 
-	case gattung.Etikett, gattung.Typ, gattung.Konfig:
+	case gattung.Typ:
 		sb.Write(k2.right.Bytes())
 
 	default:
-		sb.WriteString("unknown")
+		if k2.left.Len() > 0 {
+			sb.Write(k2.left.Bytes())
+		}
+
+		if k2.middle != '\x00' {
+			sb.WriteByte(k2.middle)
+		}
+
+		if k2.right.Len() > 0 {
+			sb.Write(k2.right.Bytes())
+		}
 	}
 
 	return sb.String()
@@ -351,7 +361,12 @@ func (h *Kennung2) Set(v string) (err error) {
 		return
 	}
 
-	return h.SetWithKennung(k)
+	if err = h.SetWithKennung(k); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (a *Kennung2) ResetWithKennung(b Kennung) (err error) {

@@ -41,7 +41,7 @@ func (c Checkin) DefaultGattungen() gattungen.Set {
 
 func (c Checkin) RunWithCwdQuery(
 	u *umwelt.Umwelt,
-	ms matcher.Query,
+	ms matcher.Group,
 	pz *cwd.CwdFiles,
 ) (err error) {
 	op := user_ops.Checkin{

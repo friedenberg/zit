@@ -33,7 +33,7 @@ func (c Mergetool) DefaultGattungen() gattungen.Set {
 
 func (c Mergetool) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms matcher.Query,
+	ms matcher.Group,
 ) (err error) {
 	p := []string{}
 

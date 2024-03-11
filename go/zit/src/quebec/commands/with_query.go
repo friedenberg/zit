@@ -11,7 +11,7 @@ import (
 )
 
 type CommandWithQuery interface {
-	RunWithQuery(store *umwelt.Umwelt, ids matcher.Query) error
+	RunWithQuery(store *umwelt.Umwelt, ids matcher.Group) error
 	DefaultGattungen() gattungen.Set
 }
 
@@ -34,16 +34,12 @@ func (c commandWithQuery) Complete(
 		return
 	}
 
-	cg := cgg.CompletionGattung()
-
-	zw := sku_fmt.MakeWriterComplete(os.Stdout)
-	defer errors.DeferredCloser(&err, &zw)
-
-	w := zw.WriteZettelVerzeichnisse
+	w := sku_fmt.MakeWriterComplete(os.Stdout)
+	defer errors.DeferredCloser(&err, w)
 
 	if err = u.StoreObjekten().ReadAllSchwanzen(
-		cg,
-		w,
+		cgg.CompletionGattung(),
+		w.WriteOne,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

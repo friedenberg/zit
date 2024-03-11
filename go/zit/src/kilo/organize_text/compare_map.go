@@ -53,7 +53,7 @@ func (s SetKeyToMetadatei) AddEtikett(
 		panic(fmt.Sprintf("bezeichnung changes: %q != %q", m.Bezeichnung, b))
 	}
 
-	kennung.AddNormalized(m.GetEtikettenMutable(), &e)
+	kennung.AddNormalizedEtikett(m.GetEtikettenMutable(), &e)
 
 	s[h] = m
 }

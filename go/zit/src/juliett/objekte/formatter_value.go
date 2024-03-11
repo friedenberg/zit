@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"strings"
 
+	"code.linenisgreat.com/chrest"
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
@@ -350,10 +352,30 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	case "json-toml-bookmark":
 		enc := json.NewEncoder(out)
 
+		var chromeTabsRaw interface{}
+		var req *http.Request
+		var err error
+
+		if req, err = http.NewRequest("GET", "http://localhost/tabs", nil); err != nil {
+			errors.PanicIfError(err)
+		}
+
+		var chrestConfig chrest.Config
+
+		if err = chrestConfig.Read(); err != nil {
+			errors.PanicIfError(err)
+		}
+
+		if chromeTabsRaw, err = chrest.AskChrome(chrestConfig, req); err != nil {
+			errors.PanicIfError(err)
+		}
+
+		chromeTabs := chromeTabsRaw.([]interface{})
+
 		return func(o *sku.Transacted) (err error) {
 			var j sku_fmt.JsonWithUrl
 
-			if j, err = sku_fmt.MakeJsonTomlBookmark(o, s); err != nil {
+			if j, err = sku_fmt.MakeJsonTomlBookmark(o, s, chromeTabs); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

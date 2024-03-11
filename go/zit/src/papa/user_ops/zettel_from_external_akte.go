@@ -30,7 +30,7 @@ type ZettelFromExternalAkte struct {
 }
 
 func (c ZettelFromExternalAkte) Run(
-	ms matcher.Query,
+	ms matcher.Group,
 ) (results sku.TransactedMutableSet, err error) {
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
