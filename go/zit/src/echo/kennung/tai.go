@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"strings"
 
-	chai "github.com/brandondube/tai"
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/values"
@@ -17,6 +16,7 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/string_format_writer"
 	"code.linenisgreat.com/zit/src/delta/ohio"
 	"code.linenisgreat.com/zit/src/delta/thyme"
+	chai "github.com/brandondube/tai"
 )
 
 type tai = chai.TAI

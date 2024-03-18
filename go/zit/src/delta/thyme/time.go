@@ -8,7 +8,6 @@ import (
 	"strings"
 	tyme "time"
 
-	chai "github.com/brandondube/tai"
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/values"
@@ -16,6 +15,7 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/sha"
 	"code.linenisgreat.com/zit/src/charlie/string_format_writer"
+	chai "github.com/brandondube/tai"
 )
 
 const (

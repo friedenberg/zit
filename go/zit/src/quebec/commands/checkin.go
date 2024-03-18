@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/india/matcher"
+	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/kilo/cwd"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 	"code.linenisgreat.com/zit/src/papa/user_ops"
@@ -41,7 +41,7 @@ func (c Checkin) DefaultGattungen() kennung.Gattung {
 
 func (c Checkin) RunWithCwdQuery(
 	u *umwelt.Umwelt,
-	ms matcher.Group,
+	ms matcher_proto.QueryGroup,
 	pz *cwd.CwdFiles,
 ) (err error) {
 	op := user_ops.Checkin{

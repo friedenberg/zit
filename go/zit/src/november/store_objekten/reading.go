@@ -14,25 +14,24 @@ import (
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/matcher"
 )
 
 func (s *Store) QueryWithoutCwd(
-	ms matcher.Group,
+	ms matcher_proto.QueryGroup,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return s.query(ms, f, false)
 }
 
 func (s *Store) QueryWithCwd(
-	ms matcher.Group,
+	ms matcher_proto.QueryGroup,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return s.query(ms, f, true)
 }
 
 func (s *Store) query(
-	ms matcher.Group,
+	ms matcher_proto.QueryGroup,
 	f schnittstellen.FuncIter[*sku.Transacted],
 	includeCwd bool,
 ) (err error) {

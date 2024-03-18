@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/sha"
-	"code.linenisgreat.com/zit/src/india/matcher"
+	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 	"code.linenisgreat.com/zit/src/papa/remote_conn"
 )
@@ -19,7 +19,7 @@ const (
 )
 
 type Client interface {
-	SendNeededSkus(matcher.Group) error
+	SendNeededSkus(matcher_proto.QueryGroup) error
 	Close() error
 }
 
@@ -66,7 +66,7 @@ func (c client) Close() (err error) {
 	return
 }
 
-func (c client) SendNeededSkus(filter matcher.Group) (err error) {
+func (c client) SendNeededSkus(filter matcher_proto.QueryGroup) (err error) {
 	err = todo.Implement()
 	// var d remote_conn.Dialogue
 

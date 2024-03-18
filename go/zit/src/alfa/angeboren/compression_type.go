@@ -8,8 +8,8 @@ import (
 	"io"
 	"strings"
 
-	"github.com/DataDog/zstd"
 	"code.linenisgreat.com/zit/src/bravo/files"
+	"github.com/DataDog/zstd"
 )
 
 type ErrUnsupportedCompression string

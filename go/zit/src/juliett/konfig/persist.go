@@ -170,7 +170,7 @@ func (kc *Compiled) loadKonfigErworben(s standort.Standort) (err error) {
 func (kc *Compiled) Flush(
 	s standort.Standort,
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
-  printerHeader schnittstellen.FuncIter[string],
+	printerHeader schnittstellen.FuncIter[string],
 ) (err error) {
 	if !kc.hasChanges || kc.DryRun {
 		return

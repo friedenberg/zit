@@ -13,8 +13,8 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/sha"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
@@ -29,7 +29,7 @@ type ZettelFromExternalAkte struct {
 }
 
 func (c ZettelFromExternalAkte) Run(
-	ms matcher.Group,
+	ms matcher_proto.QueryGroup,
 ) (results sku.TransactedMutableSet, err error) {
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)

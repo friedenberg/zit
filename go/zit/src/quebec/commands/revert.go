@@ -8,8 +8,8 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/sha"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
@@ -55,7 +55,7 @@ type revertTuple struct {
 	*sha.Sha
 }
 
-func (c Revert) RunWithQuery(u *umwelt.Umwelt, ms matcher.Group) (err error) {
+func (c Revert) RunWithQuery(u *umwelt.Umwelt, ms matcher_proto.QueryGroup) (err error) {
 	f := func(rt revertTuple) (err error) {
 		if rt.IsNull() {
 			return
@@ -93,7 +93,7 @@ func (c Revert) RunWithQuery(u *umwelt.Umwelt, ms matcher.Group) (err error) {
 
 func (c Revert) runRevertFromQuery(
 	u *umwelt.Umwelt,
-	ms matcher.Group,
+	ms matcher_proto.QueryGroup,
 	f schnittstellen.FuncIter[revertTuple],
 ) (err error) {
 	if err = u.StoreObjekten().QueryWithoutCwd(

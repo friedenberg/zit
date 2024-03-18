@@ -11,9 +11,10 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/india/objekte_collections"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 )
@@ -30,7 +31,7 @@ type Options struct {
 
 	Konfig *konfig.Compiled
 
-	commentMatchers   schnittstellen.SetLike[matcher.Matcher]
+	commentMatchers   schnittstellen.SetLike[matcher_proto.Matcher]
 	rootEtiketten     kennung.EtikettSet
 	Typ               kennung.Typ
 	GroupingEtiketten kennung.EtikettSlice
@@ -116,7 +117,7 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 
 func (o *Flags) GetOptions(
 	printOptions erworben_cli_print_options.PrintOptions,
-	q matcher.Group,
+	q matcher_proto.QueryGroup,
 	organize *sku_fmt.Organize,
 	organizeNew *sku_fmt.OrganizeNew,
 ) Options {
@@ -132,20 +133,15 @@ func (o *Flags) GetOptions(
 	if q != nil {
 		o.rootEtiketten = q.GetEtiketten()
 
-		ks := collections_value.MakeMutableValueSet[matcher.Matcher](nil)
+		ks := collections_value.MakeMutableValueSet[matcher_proto.Matcher](nil)
 
-		if err := matcher.VisitAllMatchers(
-			func(m matcher.Matcher) (err error) {
-				switch m1 := m.(type) {
-				case matcher.Negate:
-					return ks.Add(m1)
-
-				case *matcher.Negate:
-					return ks.Add(m1)
-
-				default:
-					return
+		if err := matcher_proto.VisitAllMatchers(
+			func(m matcher_proto.Matcher) (err error) {
+				if e, ok := m.(*query.Exp); ok && e.Negated {
+					return ks.Add(e)
 				}
+
+				return
 			},
 			// TODO-P1 modify sigil matcher to allow child traversal
 			q,

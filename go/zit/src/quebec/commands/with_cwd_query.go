@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
-	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/kilo/cwd"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
@@ -15,7 +14,7 @@ import (
 type CommandWithCwdQuery interface {
 	RunWithCwdQuery(
 		store *umwelt.Umwelt,
-		ms matcher.Group,
+		ms matcher_proto.QueryGroup,
 		cwdFiles *cwd.CwdFiles,
 	) error
 	DefaultGattungen() kennung.Gattung

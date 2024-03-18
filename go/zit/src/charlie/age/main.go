@@ -3,8 +3,8 @@ package age
 import (
 	"io"
 
-	"filippo.io/age"
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"filippo.io/age"
 )
 
 type (

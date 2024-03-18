@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/golf/kennung_index"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/india/objekte_collections"
@@ -44,18 +45,18 @@ type StoreUtil interface {
 
 	CheckoutQuery(
 		options checkout_options.Options,
-		fq matcher.FuncReaderTransactedLikePtr,
+		fq matcher_proto.FuncReaderTransactedLikePtr,
 		f schnittstellen.FuncIter[*sku.CheckedOut],
 	) (err error)
 
 	Checkout(
 		options checkout_options.Options,
-		fq matcher.FuncReaderTransactedLikePtr,
+		fq matcher_proto.FuncReaderTransactedLikePtr,
 		ztw schnittstellen.FuncIter[*sku.Transacted],
 	) (zcs sku.CheckedOutMutableSet, err error)
 
 	ReadFiles(
-		fq matcher.FuncReaderTransactedLikePtr,
+		fq matcher_proto.FuncReaderTransactedLikePtr,
 		f schnittstellen.FuncIter[*sku.CheckedOut],
 	) (err error)
 

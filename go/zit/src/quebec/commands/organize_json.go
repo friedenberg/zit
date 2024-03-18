@@ -13,8 +13,8 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/script_value"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
@@ -71,7 +71,7 @@ func (c *OrganizeJSON) CompletionGattung() kennung.Gattung {
 
 func (c *OrganizeJSON) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms matcher.Group,
+	ms matcher_proto.QueryGroup,
 ) (err error) {
 	u.ApplyToOrganizeOptions(&c.Options)
 
@@ -194,7 +194,7 @@ func (c OrganizeJSON) readFromVim(
 	u *umwelt.Umwelt,
 	f string,
 	results *organize_text.Text,
-	q matcher.Group,
+	q matcher_proto.QueryGroup,
 ) (ot *organize_text.Text, err error) {
 	openVimOp := user_ops.OpenVim{
 		Options: vim_cli_options_builder.New().

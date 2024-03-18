@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/delta/gattungen"
 	"code.linenisgreat.com/zit/src/echo/fd"
@@ -28,7 +29,6 @@ type QueryGroupBuilder interface {
 type Matcher interface {
 	ContainsMatchable(*sku.Transacted) bool
 	schnittstellen.Stringer
-	MatcherLen() int
 	Each(schnittstellen.FuncIter[Matcher]) error
 }
 
@@ -42,21 +42,6 @@ type MatcherSigilPtr interface {
 	AddSigil(kennung.Sigil)
 }
 
-type MatcherKennungSansGattungWrapper interface {
-	Matcher
-	GetKennung() kennung.KennungSansGattung
-}
-
-type MatcherExact interface {
-	Matcher
-	ContainsMatchableExactly(*sku.Transacted) bool
-}
-
-type MatcherImplicit interface {
-	Matcher
-	GetImplicitMatcher() Matcher
-}
-
 type MatcherParentPtr interface {
 	Matcher
 	Add(Matcher) error
@@ -68,53 +53,6 @@ type MatchableAdder interface {
 
 type ImplicitEtikettenGetter interface {
 	GetImplicitEtiketten(*kennung.Etikett) kennung.EtikettSet
-}
-
-type MatcherExactlyThisOrAllOfThese interface {
-	Matcher
-	AddExactlyThis(Matcher) error
-	AddAllOfThese(Matcher) error
-}
-
-func LenMatchers(
-	matchers ...Matcher,
-) (i int) {
-	inc := func(m Matcher) (err error) {
-		if _, ok := m.(kennung.Kennung); ok {
-			i++
-		}
-
-		return
-	}
-
-	VisitAllMatchers(inc, matchers...)
-
-	return
-}
-
-func VisitAllMatcherKennungSansGattungWrappers(
-	f schnittstellen.FuncIter[MatcherKennungSansGattungWrapper],
-	ex func(Matcher) bool,
-	matchers ...Matcher,
-) (err error) {
-	return VisitAllMatchers(
-		func(m Matcher) (err error) {
-			if ex != nil && ex(m) {
-				return iter.MakeErrStopIteration()
-			}
-
-			if _, ok := m.(MatcherImplicit); ok {
-				return iter.MakeErrStopIteration()
-			}
-
-			if mksgw, ok := m.(MatcherKennungSansGattungWrapper); ok {
-				return f(mksgw)
-			}
-
-			return
-		},
-		matchers...,
-	)
 }
 
 func VisitAllMatchers(
@@ -172,4 +110,36 @@ func SplitGattungenByHistory(qg QueryGroup) (schwanz, all kennung.Gattung) {
 	errors.PanicIfError(err)
 
 	return
+}
+
+func MakeFilterFromQuery(
+	ms QueryGroup,
+) schnittstellen.FuncIter[*sku.CheckedOut] {
+	if ms == nil {
+		return collections.MakeWriterNoop[*sku.CheckedOut]()
+	}
+
+	return func(col *sku.CheckedOut) (err error) {
+		if !ms.ContainsMatchable(&col.External.Transacted) {
+			err = iter.MakeErrStopIteration()
+			return
+		}
+
+		return
+	}
+}
+
+type (
+	FuncReaderTransactedLikePtr func(schnittstellen.FuncIter[*sku.Transacted]) error
+	// FuncSigilTransactedLikePtr  func(MatcherSigil, schnittstellen.FuncIter[*sku.Transacted]) error
+	FuncQueryTransactedLikePtr func(QueryGroup, schnittstellen.FuncIter[*sku.Transacted]) error
+)
+
+func MakeFuncReaderTransactedLikePtr(
+	ms QueryGroup,
+	fq FuncQueryTransactedLikePtr,
+) FuncReaderTransactedLikePtr {
+	return func(f schnittstellen.FuncIter[*sku.Transacted]) (err error) {
+		return fq(ms, f)
+	}
 }

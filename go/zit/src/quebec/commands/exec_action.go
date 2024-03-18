@@ -12,8 +12,8 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
@@ -42,7 +42,7 @@ func (c ExecAction) DefaultGattungen() kennung.Gattung {
 
 func (c ExecAction) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms matcher.Group,
+	ms matcher_proto.QueryGroup,
 ) (err error) {
 	if !c.Action.WasSet() {
 		err = errors.Normal(errors.Errorf("Action must be provided"))

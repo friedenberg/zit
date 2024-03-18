@@ -6,13 +6,12 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
-	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
 type CommandWithQuery interface {
-	RunWithQuery(store *umwelt.Umwelt, ids matcher.Group) error
+	RunWithQuery(store *umwelt.Umwelt, ids matcher_proto.QueryGroup) error
 	DefaultGattungen() kennung.Gattung
 }
 

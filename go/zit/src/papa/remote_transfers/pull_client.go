@@ -11,18 +11,18 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/sha"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 	"code.linenisgreat.com/zit/src/papa/remote_conn"
 )
 
 type PullClient interface {
 	SkusFromFilter(
-		matcher.Group,
+		matcher_proto.QueryGroup,
 		schnittstellen.FuncIter[*sku.Transacted],
 	) error
-	PullSkus(matcher.Group) error
+	PullSkus(matcher_proto.QueryGroup) error
 	Close() error
 }
 
@@ -85,7 +85,7 @@ func (c client) Close() (err error) {
 }
 
 func (c client) SkusFromFilter(
-	ids matcher.Group,
+	ids matcher_proto.QueryGroup,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	var d remote_conn.Dialogue

@@ -114,7 +114,7 @@ func TestQuery(t1 *testing.T) {
 		},
 		{
 			expectedOptimized: "[one/uno, one/dos]",
-      expected:          "[one/uno, one/dos]",
+			expected:          "[one/uno, one/dos]",
 			inputs:            []string{"one/uno", "one/dos"},
 		},
 		{

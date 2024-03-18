@@ -89,7 +89,7 @@ func (a Sigil) GetSigil() schnittstellen.Sigil {
 }
 
 func (a Sigil) IsSchwanzenOrUnknown() bool {
-	return a == SigilSchwanzen || a == SigilUnknown || a == SigilSchwanzen | SigilUnknown
+	return a == SigilSchwanzen || a == SigilUnknown || a == SigilSchwanzen|SigilUnknown
 }
 
 func (a Sigil) IncludesSchwanzen() bool {

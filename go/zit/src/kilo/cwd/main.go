@@ -18,8 +18,8 @@ import (
 	"code.linenisgreat.com/zit/src/delta/zittish"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 )
 
@@ -38,7 +38,7 @@ type CwdFiles struct {
 }
 
 func (fs *CwdFiles) MarkUnsureAkten(f *fd.FD) (err error) {
-  log.Debug().Print(f)
+	log.Debug().Print(f)
 
 	if f, err = fd.MakeFileFromFD(f, fs.akteWriterFactory); err != nil {
 		err = errors.Wrapf(err, "%q", f)
@@ -462,7 +462,7 @@ func (c CwdFiles) MatcherLen() int {
 	)
 }
 
-func (CwdFiles) Each(_ schnittstellen.FuncIter[matcher.Matcher]) error {
+func (CwdFiles) Each(_ schnittstellen.FuncIter[matcher_proto.Matcher]) error {
 	return nil
 }
 

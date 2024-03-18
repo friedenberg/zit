@@ -7,12 +7,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/DataDog/zstd"
 	"code.linenisgreat.com/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/src/charlie/catgut"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"github.com/DataDog/zstd"
 )
 
 func TestOne(t1 *testing.T) {

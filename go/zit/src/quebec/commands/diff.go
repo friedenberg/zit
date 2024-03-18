@@ -19,8 +19,8 @@ import (
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
@@ -43,7 +43,7 @@ func (c Diff) DefaultGattungen() kennung.Gattung {
 
 func (c Diff) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms matcher.Group,
+	ms matcher_proto.QueryGroup,
 ) (err error) {
 	fInline := metadatei.MakeTextFormatterMetadateiInlineAkte(
 		u.Standort(),
@@ -56,9 +56,9 @@ func (c Diff) RunWithQuery(
 	)
 
 	if err = u.StoreObjekten().ReadFiles(
-		matcher.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().QueryWithoutCwd),
+		matcher_proto.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().QueryWithoutCwd),
 		iter.MakeChain(
-			matcher.MakeFilterFromQuery(ms),
+			matcher_proto.MakeFilterFromQuery(ms),
 			func(co *sku.CheckedOut) (err error) {
 				wg := iter.MakeErrorWaitGroupParallel()
 
