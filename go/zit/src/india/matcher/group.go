@@ -61,49 +61,6 @@ func MakeGroupFromCheckedOutSet(
 	return
 }
 
-func MakeGroup(
-	k schnittstellen.Konfig,
-	cwd matcher_proto.Cwd,
-	ex kennung.Abbr,
-	hidden Matcher,
-	feg schnittstellen.FileExtensionGetter,
-	dg kennung.Gattung,
-	ki kennung.Index,
-) matcher_proto.QueryGroupBuilder {
-	return &group{
-		konfig:              k,
-		cwd:                 cwd,
-		fileExtensionGetter: feg,
-		expanders:           ex,
-		Hidden:              hidden,
-		DefaultGattungen:    dg,
-		Gattung:             make(map[gattung.Gattung]Query),
-		FDs:                 fd.MakeMutableSet(),
-		index:               ki,
-	}
-}
-
-func MakeGroupAll(
-	k schnittstellen.Konfig,
-	cwd matcher_proto.Cwd,
-	ex kennung.Abbr,
-	hidden Matcher,
-	feg schnittstellen.FileExtensionGetter,
-	ki kennung.Index,
-) Group {
-	errors.TodoP2("support allowed sigils")
-	return &group{
-		konfig:              k,
-		cwd:                 cwd,
-		fileExtensionGetter: feg,
-		expanders:           ex,
-		Hidden:              hidden,
-		DefaultGattungen:    kennung.MakeGattung(gattung.TrueGattung()...),
-		Gattung:             make(map[gattung.Gattung]Query),
-		index:               ki,
-	}
-}
-
 type group struct {
 	konfig              schnittstellen.Konfig
 	fileExtensionGetter schnittstellen.FileExtensionGetter
@@ -175,15 +132,6 @@ func (s *group) BuildQueryGroup(vs ...string) (qg matcher_proto.QueryGroup, err 
 		err = errors.Wrap(err)
 		return
 	}
-
-	return
-
-	if err = s.SetMany(vs...); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	qg = s
 
 	return
 }

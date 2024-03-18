@@ -113,14 +113,20 @@ func TestQuery(t1 *testing.T) {
 			inputs:            []string{"one/uno+"},
 		},
 		{
-			expectedOptimized: "one/uno+",
-			expected:          "one/uno+",
+			expectedOptimized: "[one/uno, one/dos]",
+      expected:          "[one/uno, one/dos]",
 			inputs:            []string{"one/uno", "one/dos"},
 		},
 		{
-			expectedOptimized: ":Typ :Etikett :Zettelx",
+			expectedOptimized: ":Typ :Etikett :Zettel",
 			expected:          ":Typ,Etikett,Zettel",
 			inputs:            []string{":z,t,e"},
+		},
+		{
+			defaultGattung:    kennung.MakeGattung(gattung.TrueGattung()...),
+			expectedOptimized: ":Typ :Etikett :Zettel",
+			expected:          ":Typ,Etikett,Zettel",
+			inputs:            []string{},
 		},
 	}
 

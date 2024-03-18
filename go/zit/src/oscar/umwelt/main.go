@@ -13,10 +13,9 @@ import (
 	"code.linenisgreat.com/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/india/erworben"
 	"code.linenisgreat.com/zit/src/india/matcher"
-	"code.linenisgreat.com/zit/src/india/query2"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/src/kilo/objekte_store"
 	"code.linenisgreat.com/zit/src/lima/organize_text"
@@ -229,57 +228,31 @@ func (u *Umwelt) MakeKennungExpanders() (out kennung.Abbr) {
 
 func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
 	dg kennung.Gattung,
-) matcher_proto.QueryGroupBuilder {
+) *query.Builder {
 	if dg.IsEmpty() {
 		dg = kennung.MakeGattung(gattung.Zettel)
 	}
 
-	exc := u.GetMatcherArchiviert()
-
-	i := u.MakeKennungIndex()
-
-	return query2.MakeGroup(
-		u.Konfig(),
-		u.StoreUtil().GetCwdFiles(),
-		u.MakeKennungExpanders(),
-		exc,
-		u.Konfig().FileExtensions,
-		dg,
-		i,
-	)
-}
-
-func (u *Umwelt) MakeQueryAll() matcher.Group {
-	i := u.MakeKennungIndex()
-
-	return query2.MakeGroupAll(
-		u.Konfig(),
-		u.StoreUtil().GetCwdFiles(),
-		u.MakeKennungExpanders(),
-		nil,
-		u.Konfig().FileExtensions,
-		i,
-	)
+	return query.MakeBuilder().
+		WithDefaultGattungen(dg).
+		WithCwd(u.StoreUtil().GetCwdFiles()).
+		WithFileExtensionGetter(u.Konfig().FileExtensions).
+		WithHidden(u.GetMatcherArchiviert()).
+		WithExpanders(u.MakeKennungExpanders())
 }
 
 func (u *Umwelt) MakeMetaIdSetWithoutExcludedHidden(
 	dg kennung.Gattung,
-) matcher_proto.QueryGroupBuilder {
+) *query.Builder {
 	if dg.IsEmpty() {
 		dg = kennung.MakeGattung(gattung.Zettel)
 	}
 
-	i := u.MakeKennungIndex()
-
-	return query2.MakeGroup(
-		u.Konfig(),
-		u.StoreUtil().GetCwdFiles(),
-		u.MakeKennungExpanders(),
-		nil,
-		u.Konfig().FileExtensions,
-		dg,
-		i,
-	)
+	return query.MakeBuilder().
+		WithDefaultGattungen(dg).
+		WithCwd(u.StoreUtil().GetCwdFiles()).
+		WithFileExtensionGetter(u.Konfig().FileExtensions).
+		WithExpanders(u.MakeKennungExpanders())
 }
 
 func (u *Umwelt) ApplyToOrganizeOptions(oo *organize_text.Options) {

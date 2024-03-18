@@ -463,6 +463,13 @@ func (h *Kennung2) Set(v string) (err error) {
 	return
 }
 
+func (a *Kennung2) ResetWith(b *Kennung2) {
+	a.g = b.g
+	b.left.CopyTo(&a.left)
+	b.right.CopyTo(&a.right)
+	a.middle = b.middle
+}
+
 func (a *Kennung2) ResetWithKennung(b Kennung) (err error) {
 	return a.SetWithKennung(b)
 }

@@ -10,11 +10,11 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/script_value"
+	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/india/objekte_collections"
-	"code.linenisgreat.com/zit/src/india/query2"
 	"code.linenisgreat.com/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 	"code.linenisgreat.com/zit/src/papa/user_ops"
@@ -237,7 +237,9 @@ func (c New) editZettels(
 
 	var ms matcher.Group
 
-	if ms, err = query2.MakeGroupFromCheckedOutSet(zsc); err != nil {
+	builder := u.MakeMetaIdSetWithExcludedHidden(kennung.MakeGattung(gattung.Zettel))
+
+	if ms, err = builder.WithCheckedOut(zsc).BuildQueryGroup(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

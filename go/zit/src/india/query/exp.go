@@ -16,7 +16,6 @@ type Exp struct {
 	Or           bool
 	Negated      bool
 	Exact        bool
-	Virtual      bool
 	Hidden       bool
 	Debug        bool
 	Children     []matcher_proto.Matcher
@@ -98,7 +97,6 @@ func (e *Exp) Add(m matcher_proto.Matcher) (err error) {
 
 	case *Kennung:
 		mt.Exact = e.Exact
-		mt.Virtual = e.Virtual
 	}
 
 	e.Children = append(e.Children, m)

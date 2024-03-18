@@ -9,16 +9,21 @@ import (
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
+	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
+func MakeBuilder() *Builder {
+	return &Builder{}
+}
+
 type Builder struct {
+	preexistingKennung      []*kennung.Kennung2
 	implicitEtikettenGetter matcher_proto.ImplicitEtikettenGetter
 	cwd                     matcher_proto.Cwd
 	fileExtensionGetter     schnittstellen.FileExtensionGetter
 	expanders               kennung.Abbr
 	hidden                  matcher_proto.Matcher
 	defaultGattungen        kennung.Gattung
-	gattung                 map[kennung.Gattung]matcher_proto.MatcherExactlyThisOrAllOfThese
 	doNotMatchEmpty         bool
 	debug                   bool
 }
@@ -68,6 +73,22 @@ func (mb *Builder) WithImplicitEtikettenGetter(
 ) *Builder {
 	mb.implicitEtikettenGetter = ieg
 	return mb
+}
+
+func (b *Builder) WithCheckedOut(
+	cos sku.CheckedOutSet,
+) *Builder {
+	errors.PanicIfError(cos.Each(
+		func(co *sku.CheckedOut) (err error) {
+			k := kennung.GetKennungPool().Get()
+			k.ResetWith(&co.Internal.Kennung)
+			b.preexistingKennung = append(b.preexistingKennung, k)
+
+			return
+		},
+	))
+
+	return b
 }
 
 func (b *Builder) BuildQueryGroup(vs ...string) (qg matcher_proto.QueryGroup, err error) {
@@ -144,6 +165,13 @@ func (b *Builder) build(vs ...string) (qg *QueryGroup, err error) {
 	}
 
 	qg.FDs = newFDS
+
+	for _, k := range b.preexistingKennung {
+		if err = qg.AddExactKennung(b, k); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 
 	log.Log().Print(qg)
 

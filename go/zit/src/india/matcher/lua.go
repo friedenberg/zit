@@ -22,16 +22,16 @@ type luaSku struct {
 func MakeMatcherLua(ki kennung.Index, script string) (m Matcher, err error) {
 	reader := strings.NewReader(script)
 
-	var chunk []lua_ast.Stmt
+	var chunks []lua_ast.Stmt
 
-	if chunk, err = lua_parse.Parse(reader, ""); err != nil {
+	if chunks, err = lua_parse.Parse(reader, ""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	var compiled *lua.FunctionProto
 
-	if compiled, err = lua.Compile(chunk, ""); err != nil {
+	if compiled, err = lua.Compile(chunks, ""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -53,7 +53,7 @@ func MakeMatcherLua(ki kennung.Index, script string) (m Matcher, err error) {
 				return l
 			},
 			func(s *luaSku) {
-				s.LState.SetTop(0)
+				s.SetTop(0)
 			},
 		),
 	}
@@ -102,7 +102,7 @@ func (matcher *matcherLua) ContainsMatchable(matchable *sku.Transacted) bool {
 	return s.CheckBool(idx)
 }
 
-func (_ *matcherLua) MatcherLen() int {
+func (*matcherLua) MatcherLen() int {
 	return 0
 }
 
