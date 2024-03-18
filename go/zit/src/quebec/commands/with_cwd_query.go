@@ -4,7 +4,8 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/delta/gattungen"
+	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/kilo/cwd"
@@ -17,7 +18,7 @@ type CommandWithCwdQuery interface {
 		ms matcher.Group,
 		cwdFiles *cwd.CwdFiles,
 	) error
-	DefaultGattungen() gattungen.Set
+	DefaultGattungen() kennung.Gattung
 }
 
 type commandWithCwdQuery struct {
@@ -50,11 +51,13 @@ func (c commandWithCwdQuery) Complete(
 }
 
 func (c commandWithCwdQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	ids := u.MakeMetaIdSetWithoutExcludedHidden(
+	builder := u.MakeMetaIdSetWithoutExcludedHidden(
 		c.DefaultGattungen(),
 	)
 
-	if err = ids.SetMany(args...); err != nil {
+	var ids matcher_proto.QueryGroup
+
+	if ids, err = builder.BuildQueryGroup(args...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

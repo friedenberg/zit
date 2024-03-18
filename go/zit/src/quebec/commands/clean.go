@@ -10,8 +10,8 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/sha"
 	"code.linenisgreat.com/zit/src/delta/checked_out_state"
-	"code.linenisgreat.com/zit/src/delta/gattungen"
 	"code.linenisgreat.com/zit/src/echo/fd"
+	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
@@ -48,8 +48,8 @@ func init() {
 	)
 }
 
-func (c Clean) DefaultGattungen() gattungen.Set {
-	return gattungen.MakeSet(gattung.TrueGattung()...)
+func (c Clean) DefaultGattungen() kennung.Gattung {
+	return kennung.MakeGattung(gattung.TrueGattung()...)
 }
 
 func (c Clean) RunWithQuery(
@@ -114,7 +114,9 @@ func (c Clean) markUnsureAktenForRemovalIfNecessary(
 		return
 	}
 
-	if err = q.GetExplicitCwdFDs().Each(u.StoreUtil().GetCwdFiles().MarkUnsureAkten); err != nil {
+	if err = q.GetExplicitCwdFDs().Each(
+		u.StoreUtil().GetCwdFiles().MarkUnsureAkten,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

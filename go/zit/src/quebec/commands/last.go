@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
-	"code.linenisgreat.com/zit/src/delta/gattungen"
+	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/juliett/objekte"
 	"code.linenisgreat.com/zit/src/lima/bestandsaufnahme"
@@ -31,8 +31,8 @@ func init() {
 	)
 }
 
-func (c Last) CompletionGattung() gattungen.Set {
-	return gattungen.MakeSet(
+func (c Last) CompletionGattung() kennung.Gattung {
+	return kennung.MakeGattung(
 		gattung.Bestandsaufnahme,
 	)
 }

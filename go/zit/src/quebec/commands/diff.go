@@ -16,8 +16,8 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/sha"
-	"code.linenisgreat.com/zit/src/delta/gattungen"
 	"code.linenisgreat.com/zit/src/echo/fd"
+	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/matcher"
@@ -37,8 +37,8 @@ func init() {
 	)
 }
 
-func (c Diff) DefaultGattungen() gattungen.Set {
-	return gattungen.MakeSet(gattung.TrueGattung()...)
+func (c Diff) DefaultGattungen() kennung.Gattung {
+	return kennung.MakeGattung(gattung.TrueGattung()...)
 }
 
 func (c Diff) RunWithQuery(

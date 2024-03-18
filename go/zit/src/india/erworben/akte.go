@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/script_config"
+	"code.linenisgreat.com/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 )
 
@@ -20,7 +21,7 @@ type Defaults struct {
 type Akte struct {
 	Defaults        Defaults                                `toml:"defaults"`
 	HiddenEtiketten []kennung.Etikett                       `toml:"hidden-etiketten"`
-	FileExtensions  FileExtensions                          `toml:"file-extensions"`
+	FileExtensions  file_extensions.FileExtensions          `toml:"file-extensions"`
 	RemoteScripts   map[string]script_config.RemoteScript   `toml:"remote-scripts"`
 	Actions         map[string]script_config.ScriptConfig   `toml:"actions,omitempty"`
 	PrintOptions    erworben_cli_print_options.PrintOptions `toml:"cli-output"`

@@ -10,9 +10,9 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
-	"code.linenisgreat.com/zit/src/delta/gattungen"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/matcher"
 )
@@ -36,7 +36,7 @@ func (s *Store) query(
 	f schnittstellen.FuncIter[*sku.Transacted],
 	includeCwd bool,
 ) (err error) {
-	gsWithoutHistory, gsWithHistory := ms.SplitGattungenByHistory()
+	gsWithoutHistory, gsWithHistory := matcher_proto.SplitGattungenByHistory(ms)
 
 	wg := iter.MakeErrorWaitGroupParallel()
 
@@ -190,12 +190,12 @@ func (s *Store) MakeReadAllSchwanzen(
 	gs ...gattung.Gattung,
 ) func(schnittstellen.FuncIter[*sku.Transacted]) error {
 	return func(f schnittstellen.FuncIter[*sku.Transacted]) (err error) {
-		return s.ReadAllSchwanzen(gattungen.MakeSet(gs...), f)
+		return s.ReadAllSchwanzen(kennung.MakeGattung(gs...), f)
 	}
 }
 
 func (s *Store) ReadAllSchwanzen(
-	gs gattungen.Set,
+	gs kennung.Gattung,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return s.GetVerzeichnisse().ReadSchwanzen(
@@ -215,7 +215,7 @@ func (s *Store) ReadAllSchwanzen(
 }
 
 func (s *Store) ReadAll(
-	gs gattungen.Set,
+	gs kennung.Gattung,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return s.ReadAllGattungenFromVerzeichnisse(gs, f)
@@ -264,7 +264,7 @@ func (s Store) ReadAllMatchingAkten(
 	var l sync.Mutex
 
 	if err = s.ReadAll(
-		gattungen.MakeSet(gattung.TrueGattung()...),
+		kennung.MakeGattung(gattung.TrueGattung()...),
 		func(z *sku.Transacted) (err error) {
 			fd, ok := fds.Get(z.GetAkteSha().String())
 

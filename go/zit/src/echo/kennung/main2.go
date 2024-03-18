@@ -7,9 +7,11 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/files"
 	"code.linenisgreat.com/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/src/charlie/catgut"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/src/delta/ohio"
 )
 
@@ -39,6 +41,26 @@ func MustKennung2(kp Kennung) (k *Kennung2) {
 	err := k.SetWithKennung(kp)
 	errors.PanicIfError(err)
 	return
+}
+
+func (a *Kennung2) Equals(b *Kennung2) bool {
+	if a.g != b.g {
+		return false
+	}
+
+	if a.middle != b.middle {
+		return false
+	}
+
+	if !a.left.Equals(&b.left) {
+		return false
+	}
+
+	if !a.right.Equals(&b.right) {
+		return false
+	}
+
+	return true
 }
 
 func (k2 *Kennung2) WriteTo(w io.Writer) (n int64, err error) {
@@ -263,6 +285,78 @@ func MakeKennung2(v string) (KennungPtr, error) {
 	}
 
 	return k, k.Set(v)
+}
+
+func (k2 *Kennung2) Expand(
+	a Abbr,
+) (err error) {
+	ex := a.ExpanderFor(k2.g)
+
+	if ex == nil {
+		return
+	}
+
+	v := k2.String()
+
+	if v, err = ex(v); err != nil {
+		err = nil
+		return
+	}
+
+	if err = k2.SetWithGattung(v, k2.g); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (k2 *Kennung2) Abbreviate(
+	a Abbr,
+) (err error) {
+	return
+}
+
+var ErrFDNotKennung = errors.New("not a kennung file")
+
+func (k2 *Kennung2) SetFromPath(
+	path string,
+	fe file_extensions.FileExtensions,
+) (err error) {
+	els := files.PathElements(path)
+	ext := els[0]
+
+	switch ext {
+	case fe.Etikett:
+		if err = k2.SetWithGattung(els[1], gattung.Etikett); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	case fe.Typ:
+		if err = k2.SetWithGattung(els[1], gattung.Typ); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	case fe.Kasten:
+		if err = k2.SetWithGattung(els[1], gattung.Kasten); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	case fe.Zettel:
+		if err = k2.SetWithGattung(els[2]+"/"+els[1], gattung.Zettel); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	default:
+		err = ErrFDNotKennung
+		return
+	}
+
+	return
 }
 
 func (h *Kennung2) SetWithKennung(

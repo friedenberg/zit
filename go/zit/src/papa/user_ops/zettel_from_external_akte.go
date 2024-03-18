@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/script_value"
 	"code.linenisgreat.com/zit/src/charlie/sha"
-	"code.linenisgreat.com/zit/src/delta/gattungen"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
@@ -87,7 +86,7 @@ func (c ZettelFromExternalAkte) Run(
 		matcher := objekte_collections.MakeMutableMatchSet(toCreate)
 
 		if err = c.StoreObjekten().ReadAll(
-			gattungen.MakeSet(gattung.Zettel),
+			kennung.MakeGattung(gattung.Zettel),
 			iter.MakeChain(
 				matcher.Match,
 				func(sk *sku.Transacted) (err error) {

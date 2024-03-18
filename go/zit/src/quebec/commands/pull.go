@@ -5,7 +5,8 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
-	"code.linenisgreat.com/zit/src/delta/gattungen"
+	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 	"code.linenisgreat.com/zit/src/papa/remote_transfers"
 )
@@ -23,8 +24,8 @@ func init() {
 	)
 }
 
-func (c Pull) CompletionGattung() gattungen.Set {
-	return gattungen.MakeSet(
+func (c Pull) CompletionGattung() kennung.Gattung {
+	return kennung.MakeGattung(
 		gattung.Zettel,
 		gattung.Etikett,
 		gattung.Typ,
@@ -48,11 +49,13 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	ids := u.MakeMetaIdSetWithExcludedHidden(
+	builder := u.MakeMetaIdSetWithExcludedHidden(
 		c.CompletionGattung(),
 	)
 
-	if err = ids.SetMany(args...); err != nil {
+	var ids matcher_proto.QueryGroup
+
+	if ids, err = builder.BuildQueryGroup(args...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

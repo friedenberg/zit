@@ -14,6 +14,7 @@ import (
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/india/objekte_collections"
+	"code.linenisgreat.com/zit/src/india/query2"
 	"code.linenisgreat.com/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 	"code.linenisgreat.com/zit/src/papa/user_ops"
@@ -236,7 +237,7 @@ func (c New) editZettels(
 
 	var ms matcher.Group
 
-	if ms, err = matcher.MakeGroupFromCheckedOutSet(zsc); err != nil {
+	if ms, err = query2.MakeGroupFromCheckedOutSet(zsc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

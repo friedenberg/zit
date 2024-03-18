@@ -9,17 +9,9 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/delta/zittish"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-)
-
-const (
-	QueryOrOperator         = ", "
-	QueryAndOperator        = " "
-	QueryGroupOpenOperator  = "["
-	QueryGroupCloseOperator = "]"
-	QueryNegationOperator   = '^'
-	QueryExactOperator      = '='
 )
 
 func init() {
@@ -32,59 +24,6 @@ func init() {
 	gob.Register(&matcherContains{})
 	gob.Register(&matcherImplicit{})
 	gob.Register(&matcherExactlyThisOrAllOfThese{})
-}
-
-type Matcher interface {
-	ContainsMatchable(*sku.Transacted) bool
-	schnittstellen.Stringer
-	MatcherLen() int
-	Each(schnittstellen.FuncIter[Matcher]) error
-}
-
-type MatcherSigil interface {
-	Matcher
-	GetSigil() kennung.Sigil
-}
-
-type MatcherSigilPtr interface {
-	MatcherSigil
-	AddSigil(kennung.Sigil)
-}
-
-type MatcherKennungSansGattungWrapper interface {
-	Matcher
-	GetKennung() kennung.KennungSansGattung
-}
-
-type MatcherExact interface {
-	Matcher
-	ContainsMatchableExactly(*sku.Transacted) bool
-}
-
-type MatcherImplicit interface {
-	Matcher
-	GetImplicitMatcher() matcherImplicit
-}
-
-type MatcherParentPtr interface {
-	Matcher
-	Add(Matcher) error
-}
-
-func LenMatchers(
-	matchers ...Matcher,
-) (i int) {
-	inc := func(m Matcher) (err error) {
-		if _, ok := m.(kennung.Kennung); ok {
-			i++
-		}
-
-		return
-	}
-
-	VisitAllMatchers(inc, matchers...)
-
-	return
 }
 
 func IsNotMatcherNegate(m Matcher) bool {
@@ -107,64 +46,6 @@ func IsMatcherNegate(m Matcher) bool {
 	}
 
 	return ok
-}
-
-func VisitAllMatcherKennungSansGattungWrappers(
-	f schnittstellen.FuncIter[MatcherKennungSansGattungWrapper],
-	ex func(Matcher) bool,
-	matchers ...Matcher,
-) (err error) {
-	return VisitAllMatchers(
-		func(m Matcher) (err error) {
-			if ex != nil && ex(m) {
-				return iter.MakeErrStopIteration()
-			}
-
-			if _, ok := m.(MatcherImplicit); ok {
-				return iter.MakeErrStopIteration()
-			}
-
-			if mksgw, ok := m.(MatcherKennungSansGattungWrapper); ok {
-				return f(mksgw)
-			}
-
-			return
-		},
-		matchers...,
-	)
-}
-
-func VisitAllMatchers(
-	f schnittstellen.FuncIter[Matcher],
-	matchers ...Matcher,
-) (err error) {
-	for _, m := range matchers {
-		if err = f(m); err != nil {
-			if iter.IsStopIteration(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
-
-		if err = m.Each(
-			func(m Matcher) (err error) {
-				return VisitAllMatchers(f, m)
-			},
-		); err != nil {
-			if iter.IsStopIteration(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
-	}
-
-	return
 }
 
 //      _    _
@@ -261,11 +142,11 @@ func (matcher *matcherAnd) Add(m Matcher) (err error) {
 
 func (matcher matcherAnd) String() string {
 	sb := &strings.Builder{}
-	sb.WriteString(QueryGroupOpenOperator)
+	sb.WriteRune(zittish.OpGroupOpen)
 
 	for i, m := range matcher.Children {
 		if i > 0 {
-			sb.WriteString(QueryAndOperator)
+			sb.WriteRune(zittish.OpAnd)
 		}
 
 		sb.WriteString(m.String())
@@ -275,7 +156,7 @@ func (matcher matcherAnd) String() string {
 		sb.WriteString(fmt.Sprintf("%t", matcher.MatchOnEmpty))
 	}
 
-	sb.WriteString(QueryGroupCloseOperator)
+	sb.WriteRune(zittish.OpGroupClose)
 
 	return sb.String()
 }
@@ -341,11 +222,12 @@ func (matcher *matcherOr) Add(m Matcher) (err error) {
 
 func (matcher matcherOr) String() (out string) {
 	sb := &strings.Builder{}
-	sb.WriteString(QueryGroupOpenOperator)
+	sb.WriteRune(zittish.OpGroupOpen)
 
 	for i, m := range matcher.Children {
 		if i > 0 {
-			sb.WriteString(QueryOrOperator)
+			sb.WriteRune(zittish.OpOr)
+			sb.WriteRune(zittish.OpAnd)
 		}
 
 		sb.WriteString(m.String())
@@ -355,7 +237,7 @@ func (matcher matcherOr) String() (out string) {
 		sb.WriteString(fmt.Sprintf("%t", matcher.MatchOnEmpty))
 	}
 
-	sb.WriteString(QueryGroupCloseOperator)
+	sb.WriteRune(zittish.OpGroupClose)
 
 	out = sb.String()
 	return
@@ -436,7 +318,7 @@ func (matcher matcherContains) String() string {
 func (matcher matcherContains) ContainsMatchable(
 	matchable *sku.Transacted,
 ) bool {
-	if !KennungContainsMatchable(matcher.Kennung, matchable, matcher.index) {
+	if !KennungContainsMatchable(matcher.Kennung, matchable) {
 		return false
 	}
 
@@ -477,7 +359,7 @@ func (matcher matcherContainsExactly) String() string {
 		return ""
 	}
 
-	return kennung.FormattedString(matcher.Kennung) + string(QueryExactOperator)
+	return kennung.FormattedString(matcher.Kennung) + string(zittish.OpExact)
 }
 
 func (matcher matcherContainsExactly) ContainsMatchable(
@@ -519,7 +401,7 @@ func (matcher Negate) String() string {
 		return ""
 	}
 
-	return string(QueryNegationOperator) + matcher.Child.String()
+	return string(zittish.OpNegation) + matcher.Child.String()
 }
 
 func (matcher Negate) ContainsMatchable(matchable *sku.Transacted) bool {
@@ -547,7 +429,7 @@ type matcherImplicit struct {
 	Child Matcher
 }
 
-func (matcher matcherImplicit) GetImplicitMatcher() matcherImplicit {
+func (matcher matcherImplicit) GetImplicitMatcher() Matcher {
 	return matcher
 }
 
@@ -626,7 +508,7 @@ func (m matcherGattung) String() string {
 
 	for g, child := range m.Children {
 		if hasAny == true {
-			sb.WriteString(QueryAndOperator)
+			sb.WriteRune(zittish.OpAnd)
 		}
 
 		sb.WriteString(child.String())

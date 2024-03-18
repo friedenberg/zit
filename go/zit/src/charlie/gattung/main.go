@@ -32,6 +32,16 @@ const (
 	MaxGattung = Kasten
 )
 
+const (
+	unknown = byte(iota)
+	akte    = byte(1 << iota)
+	typ
+	etikett
+	zettel
+	konfig
+	kasten
+)
+
 func All() (out []Gattung) {
 	out = make([]Gattung, 0, MaxGattung-1)
 
@@ -76,6 +86,25 @@ func MakeOrUnknown(v string) (g Gattung) {
 
 func (g Gattung) GetGattung() schnittstellen.GattungLike {
 	return g
+}
+
+func (g Gattung) GetGattungBitInt() byte {
+	switch g {
+	default:
+		return unknown
+	case Akte:
+		return akte
+	case Zettel:
+		return zettel
+	case Etikett:
+		return etikett
+	case Kasten:
+		return kasten
+	case Typ:
+		return typ
+	case Konfig:
+		return konfig
+	}
 }
 
 func (a Gattung) EqualsAny(b any) bool {

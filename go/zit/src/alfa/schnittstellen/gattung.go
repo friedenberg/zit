@@ -8,6 +8,7 @@ type StringerGattungGetter interface {
 type GattungLike interface {
 	StringerGattungGetter
 	EqualsGattung(GattungGetter) bool
+	GetGattungBitInt() byte
 	GetGattungString() string
 	GetGattungStringPlural() string
 }

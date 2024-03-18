@@ -7,14 +7,16 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/delta/gattungen"
+	"code.linenisgreat.com/zit/src/delta/zittish"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/query"
 )
 
 func init() {
@@ -22,17 +24,7 @@ func init() {
 }
 
 type Group interface {
-	Get(g gattung.Gattung) (s MatcherSigil, ok bool)
-	GetCwdFDs() fd.Set
-	GetExplicitCwdFDs() fd.Set
-	GetEtiketten() kennung.EtikettSet
-	GetTypen() schnittstellen.SetLike[kennung.Typ]
-	Set(string) error
-	SetMany(...string) error
-	All(f func(gattung.Gattung, MatcherSigil) error) error
-	GetGattungen() gattungen.Set
-	SplitGattungenByHistory() (scwhanz, all gattungen.MutableSet)
-	Matcher
+	matcher_proto.QueryGroup
 }
 
 func MakeGroupFromCheckedOutSet(
@@ -71,20 +63,20 @@ func MakeGroupFromCheckedOutSet(
 
 func MakeGroup(
 	k schnittstellen.Konfig,
-	cwd matcherCwd,
+	cwd matcher_proto.Cwd,
 	ex kennung.Abbr,
 	hidden Matcher,
 	feg schnittstellen.FileExtensionGetter,
-	dg gattungen.Set,
+	dg kennung.Gattung,
 	ki kennung.Index,
-) Group {
+) matcher_proto.QueryGroupBuilder {
 	return &group{
 		konfig:              k,
 		cwd:                 cwd,
 		fileExtensionGetter: feg,
 		expanders:           ex,
 		Hidden:              hidden,
-		DefaultGattungen:    dg.CloneMutableSetLike(),
+		DefaultGattungen:    dg,
 		Gattung:             make(map[gattung.Gattung]Query),
 		FDs:                 fd.MakeMutableSet(),
 		index:               ki,
@@ -93,7 +85,7 @@ func MakeGroup(
 
 func MakeGroupAll(
 	k schnittstellen.Konfig,
-	cwd matcherCwd,
+	cwd matcher_proto.Cwd,
 	ex kennung.Abbr,
 	hidden Matcher,
 	feg schnittstellen.FileExtensionGetter,
@@ -106,7 +98,7 @@ func MakeGroupAll(
 		fileExtensionGetter: feg,
 		expanders:           ex,
 		Hidden:              hidden,
-		DefaultGattungen:    gattungen.MakeSet(gattung.TrueGattung()...),
+		DefaultGattungen:    kennung.MakeGattung(gattung.TrueGattung()...),
 		Gattung:             make(map[gattung.Gattung]Query),
 		index:               ki,
 	}
@@ -117,13 +109,14 @@ type group struct {
 	fileExtensionGetter schnittstellen.FileExtensionGetter
 	expanders           kennung.Abbr
 
-	cwd    matcherCwd
+	cwd    matcher_proto.Cwd
 	Hidden Matcher
 	index  kennung.Index
 
-	DefaultGattungen gattungen.Set
+	DefaultGattungen kennung.Gattung
 	Gattung          map[gattung.Gattung]Query
-	FDs              fd.MutableSet
+	// NewQuery         *query.QueryGroup
+	FDs fd.MutableSet
 
 	dotOperatorActive bool
 }
@@ -156,10 +149,10 @@ func (s group) String() string {
 
 		fmt.Fprintf(
 			sb,
-			"%s%s%s%s%s",
-			QueryGroupOpenOperator,
+			"%c%s%c%s%s",
+			zittish.OpGroupOpen,
 			ids,
-			QueryGroupCloseOperator,
+			zittish.OpGroupClose,
 			ids.Sigil,
 			g,
 		)
@@ -168,14 +161,34 @@ func (s group) String() string {
 	return sb.String()
 }
 
-func (s *group) SetMany(vs ...string) (err error) {
-	builder := MatcherBuilder{}
+func (s *group) BuildQueryGroup(vs ...string) (qg matcher_proto.QueryGroup, err error) {
+	var builder query.Builder
 
-	if _, err = builder.Build(vs...); err != nil {
+	builder.
+		WithDefaultGattungen(s.DefaultGattungen).
+		WithCwd(s.cwd).
+		WithFileExtensionGetter(s.fileExtensionGetter).
+		WithHidden(s.Hidden).
+		WithExpanders(s.expanders)
+
+	if qg, err = builder.BuildQueryGroup(vs...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
+	return
+
+	if err = s.SetMany(vs...); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	qg = s
+
+	return
+}
+
+func (s *group) SetMany(vs ...string) (err error) {
 	for _, v := range vs {
 		if err = s.set(v); err != nil {
 			var fd fd.FD
@@ -198,10 +211,6 @@ func (s *group) SetMany(vs ...string) (err error) {
 	log.Log().Printf("query: %q", s)
 
 	return
-}
-
-func (ms *group) Set(v string) (err error) {
-	return ms.set(v)
 }
 
 func (ms *group) set(v string) (err error) {
@@ -243,10 +252,10 @@ func (ms *group) set(v string) (err error) {
 	before := sbs[0].String()
 	after := sbs[2].String()
 
-	var gs gattungen.Set
+	var gs kennung.Gattung
 
 	if after != "" {
-		if gs, err = gattungen.GattungFromString(after); err != nil {
+		if err = gs.Set(after); err != nil {
 			if gattung.IsErrUnrecognizedGattung(err) {
 				err = nil
 
@@ -269,7 +278,7 @@ func (ms *group) set(v string) (err error) {
 			return
 		}
 	} else {
-		gs = ms.DefaultGattungen.CloneSetLike()
+		gs = ms.DefaultGattungen
 	}
 
 	if before == "" && after == "" && sigil.IncludesCwd() {
@@ -277,60 +286,53 @@ func (ms *group) set(v string) (err error) {
 		// return
 	}
 
-	if err = gs.Each(
-		func(g gattung.Gattung) (err error) {
-			var ids Query
-			ok := false
+	for _, g := range gs.Slice() {
+		var ids Query
+		ok := false
 
-			if ids, ok = ms.Gattung[g]; !ok {
-				ids.Matcher = MakeMatcherExactlyThisOrAllOfThese()
-				ids.Sigil = sigil
-				ids.Gattung = g
-			}
+		if ids, ok = ms.Gattung[g]; !ok {
+			ids.Matcher = MakeMatcherExactlyThisOrAllOfThese()
+			ids.Sigil = sigil
+			ids.Gattung = g
+		}
 
-			switch {
-			case before == "":
+		switch {
+		case before == "":
+			break
+
+		case ids.IncludesCwd():
+			fp := fmt.Sprintf("%s.%s", before, after)
+
+			var f *fd.FD
+
+			if f, err = fd.FDFromPath(fp); err == nil {
+				ids.Matcher.AddExactlyThis(FD{FD: f})
 				break
-
-			case ids.IncludesCwd():
-				fp := fmt.Sprintf("%s.%s", before, after)
-
-				var f *fd.FD
-
-				if f, err = fd.FDFromPath(fp); err == nil {
-					ids.Matcher.AddExactlyThis(FD{FD: f})
-					break
-				}
-
-				err = nil
-
-				fallthrough
-
-			default:
-				if err = tryAddMatcher(
-					ms.konfig,
-					ids.Matcher,
-					ms.expanders,
-					ms.index,
-					before,
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
 			}
 
-			// if g.Equals(gattung.Konfig) {
-			errors.TodoP1("move to gattung map")
-			// ids.Matcher.Matcher.Add(MakeMatcherContainsExactly(Konfig{}))
-			// }
+			err = nil
 
-			ms.Gattung[g] = ids
+			fallthrough
 
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		default:
+			if err = tryAddMatcher(
+				ms.konfig,
+				ids.Matcher,
+				ms.expanders,
+				ms.index,
+				before,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+		// if g.Equals(gattung.Konfig) {
+		errors.TodoP1("move to gattung map")
+		// ids.Matcher.Matcher.Add(MakeMatcherContainsExactly(Konfig{}))
+		// }
+
+		ms.Gattung[g] = ids
 	}
 
 	return
@@ -500,7 +502,7 @@ func (ms group) GetTyp() (t kennung.Typ, ok bool) {
 	return
 }
 
-func (ms group) GetTypen() schnittstellen.SetLike[kennung.Typ] {
+func (ms group) GetTypen() kennung.TypSet {
 	es := kennung.MakeMutableTypSet()
 
 	for _, s := range ms.Gattung {
@@ -553,63 +555,4 @@ func (ms group) GetGattungen() gattungen.Set {
 	}
 
 	return gattungen.MakeSet(gs...)
-}
-
-// Runs in parallel
-func (ms group) All(f func(gattung.Gattung, MatcherSigil) error) (err error) {
-	errors.TodoP1("lock")
-	chErr := make(chan error, len(ms.Gattung))
-
-	for g := range ms.Gattung {
-		ids, _ := ms.Get(g)
-
-		go func(g gattung.Gattung, m MatcherSigil) {
-			var err error
-
-			defer func() {
-				chErr <- err
-			}()
-
-			if err = f(g, ids); err != nil {
-				if iter.IsStopIteration(err) {
-					err = nil
-				} else {
-					err = errors.Wrap(err)
-				}
-
-				return
-			}
-		}(g, ids)
-	}
-
-	for i := 0; i < len(ms.Gattung); i++ {
-		err = errors.Join(err, <-chErr)
-	}
-
-	return
-}
-
-func (ms group) SplitGattungenByHistory() (schwanz, all gattungen.MutableSet) {
-	all = gattungen.MakeMutableSet()
-	schwanz = gattungen.MakeMutableSet()
-
-	err := ms.GetGattungen().Each(
-		func(g gattung.Gattung) (err error) {
-			m, ok := ms.Get(g)
-
-			if !ok {
-				return
-			}
-
-			if m.GetSigil().IncludesHistory() {
-				return all.Add(g)
-			} else {
-				return schwanz.Add(g)
-			}
-		},
-	)
-
-	errors.PanicIfError(err)
-
-	return
 }

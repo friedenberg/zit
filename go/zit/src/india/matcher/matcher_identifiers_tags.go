@@ -7,16 +7,6 @@ import (
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
-type ImplicitEtikettenGetter interface {
-	GetImplicitEtiketten(*kennung.Etikett) kennung.EtikettSet
-}
-
-type MatcherExactlyThisOrAllOfThese interface {
-	Matcher
-	AddExactlyThis(Matcher) error
-	AddAllOfThese(Matcher) error
-}
-
 type matcherExactlyThisOrAllOfThese struct {
 	MatcherExactlyThis MatcherParentPtr
 	MatcherAllOfThese  MatcherParentPtr

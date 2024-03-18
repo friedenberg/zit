@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/sha"
-	"code.linenisgreat.com/zit/src/delta/gattungen"
+	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
@@ -24,8 +24,8 @@ func init() {
 	)
 }
 
-func (c CatAkteShas) CompletionGattung() gattungen.Set {
-	return gattungen.MakeSet(
+func (c CatAkteShas) CompletionGattung() kennung.Gattung {
+	return kennung.MakeGattung(
 		gattung.Akte,
 	)
 }

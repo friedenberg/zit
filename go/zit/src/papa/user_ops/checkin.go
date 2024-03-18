@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/matcher"
@@ -24,6 +25,8 @@ func (c Checkin) Run(
 
 	u.Lock()
 	defer errors.Deferred(&err, u.Unlock)
+
+  log.Log().Print(ms)
 
 	if err = u.StoreObjekten().ReadFiles(
 		matcher.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().QueryWithoutCwd),

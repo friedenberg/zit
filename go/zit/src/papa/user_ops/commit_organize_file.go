@@ -7,9 +7,9 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
-	"code.linenisgreat.com/zit/src/delta/gattungen"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/lima/organize_text"
@@ -92,14 +92,20 @@ func (op CommitOrganizeFile) run(
 	l := sync.Mutex{}
 	toUpdate := sku.MakeTransactedMutableSet()
 
-	ms := op.MakeMetaIdSetWithoutExcludedHidden(
-		gattungen.MakeSet(gattung.TrueGattung()...),
+	builder := op.MakeMetaIdSetWithoutExcludedHidden(
+		kennung.MakeGattung(gattung.TrueGattung()...),
 	)
+
+	var ids matcher_proto.QueryGroup
+
 	errors.TodoP1("create query without syntax")
-	ms.Set(":z,e,t")
+	if ids, err = builder.BuildQueryGroup(":z,e,t"); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = store.QueryWithCwd(
-		ms,
+		ids,
 		func(tl *sku.Transacted) (err error) {
 			var change *organize_text.Change
 			ok := false

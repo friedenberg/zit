@@ -9,13 +9,14 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/charlie/age"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
-	"code.linenisgreat.com/zit/src/delta/gattungen"
 	"code.linenisgreat.com/zit/src/delta/standort"
 	"code.linenisgreat.com/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/india/erworben"
 	"code.linenisgreat.com/zit/src/india/matcher"
+	"code.linenisgreat.com/zit/src/india/query2"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/src/kilo/objekte_store"
 	"code.linenisgreat.com/zit/src/lima/organize_text"
@@ -227,17 +228,17 @@ func (u *Umwelt) MakeKennungExpanders() (out kennung.Abbr) {
 }
 
 func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
-	dg gattungen.Set,
-) matcher.Group {
-	if dg == nil {
-		dg = gattungen.MakeSet(gattung.Zettel)
+	dg kennung.Gattung,
+) matcher_proto.QueryGroupBuilder {
+	if dg.IsEmpty() {
+		dg = kennung.MakeGattung(gattung.Zettel)
 	}
 
 	exc := u.GetMatcherArchiviert()
 
 	i := u.MakeKennungIndex()
 
-	return matcher.MakeGroup(
+	return query2.MakeGroup(
 		u.Konfig(),
 		u.StoreUtil().GetCwdFiles(),
 		u.MakeKennungExpanders(),
@@ -251,7 +252,7 @@ func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
 func (u *Umwelt) MakeQueryAll() matcher.Group {
 	i := u.MakeKennungIndex()
 
-	return matcher.MakeGroupAll(
+	return query2.MakeGroupAll(
 		u.Konfig(),
 		u.StoreUtil().GetCwdFiles(),
 		u.MakeKennungExpanders(),
@@ -262,15 +263,15 @@ func (u *Umwelt) MakeQueryAll() matcher.Group {
 }
 
 func (u *Umwelt) MakeMetaIdSetWithoutExcludedHidden(
-	dg gattungen.Set,
-) matcher.Group {
-	if dg == nil {
-		dg = gattungen.MakeSet(gattung.Zettel)
+	dg kennung.Gattung,
+) matcher_proto.QueryGroupBuilder {
+	if dg.IsEmpty() {
+		dg = kennung.MakeGattung(gattung.Zettel)
 	}
 
 	i := u.MakeKennungIndex()
 
-	return matcher.MakeGroup(
+	return query2.MakeGroup(
 		u.Konfig(),
 		u.StoreUtil().GetCwdFiles(),
 		u.MakeKennungExpanders(),

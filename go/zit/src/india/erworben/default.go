@@ -2,6 +2,7 @@ package erworben
 
 import (
 	"code.linenisgreat.com/zit/src/bravo/erworben_tools"
+	"code.linenisgreat.com/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 )
 
@@ -11,7 +12,7 @@ func Default(defaultTyp kennung.Typ) (k Akte) {
 			Typ:       defaultTyp,
 			Etiketten: make([]kennung.Etikett, 0),
 		},
-		FileExtensions: FileExtensions{
+		FileExtensions: file_extensions.FileExtensions{
 			Typ:      "typ",
 			Zettel:   "zettel",
 			Organize: "md",

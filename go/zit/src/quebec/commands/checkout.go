@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
-	"code.linenisgreat.com/zit/src/delta/gattungen"
+	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
@@ -29,8 +29,8 @@ func init() {
 	)
 }
 
-func (c Checkout) DefaultGattungen() gattungen.Set {
-	return gattungen.MakeSet(
+func (c Checkout) DefaultGattungen() kennung.Gattung {
+	return kennung.MakeGattung(
 		gattung.Zettel,
 	)
 }

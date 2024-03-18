@@ -1,4 +1,4 @@
-package erworben
+package file_extensions
 
 import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"

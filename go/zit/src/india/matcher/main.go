@@ -6,13 +6,29 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/delta/zittish"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
-type MatchableAdder interface {
-	AddMatchable(*sku.Transacted) error
-}
+type (
+	Matcher                          = matcher_proto.Matcher
+	MatcherKennungSansGattungWrapper = matcher_proto.MatcherKennungSansGattungWrapper
+	MatcherImplicit                  = matcher_proto.MatcherImplicit
+	MatcherParentPtr                 = matcher_proto.MatcherParentPtr
+	MatcherSigilPtr                  = matcher_proto.MatcherSigilPtr
+	MatcherSigil                     = matcher_proto.MatcherSigil
+	MatchableAdder                   = matcher_proto.MatchableAdder
+	MatcherExactlyThisOrAllOfThese   = matcher_proto.MatcherExactlyThisOrAllOfThese
+	ImplicitEtikettenGetter          = matcher_proto.ImplicitEtikettenGetter
+)
+
+var (
+	VisitAllMatchers                          = matcher_proto.VisitAllMatchers
+	VisitAllMatcherKennungSansGattungWrappers = matcher_proto.VisitAllMatcherKennungSansGattungWrappers
+	LenMatchers                               = matcher_proto.LenMatchers
+)
 
 func MakeMatcher(
 	k kennung.KennungSansGattungPtr,
@@ -86,12 +102,12 @@ func SetQueryKennung(
 ) (isNegated bool, isExact bool, err error) {
 	v = strings.TrimSpace(v)
 
-	if len(v) > 0 && []rune(v)[0] == QueryNegationOperator {
+	if len(v) > 0 && []rune(v)[0] == zittish.OpNegation {
 		v = v[1:]
 		isNegated = true
 	}
 
-	if len(v) > 0 && []rune(v)[len(v)-1] == QueryExactOperator {
+	if len(v) > 0 && []rune(v)[len(v)-1] == zittish.OpExact {
 		v = v[:len(v)-1]
 		isExact = true
 	}
@@ -147,7 +163,6 @@ func KennungContainsExactlyMatchable(
 func KennungContainsMatchable(
 	k kennung.KennungSansGattung,
 	m *sku.Transacted,
-	ki kennung.Index,
 ) bool {
 	me := m.GetMetadatei()
 	// log.Debug().Printf("%q -> %q", k, m.GetKennungLikePtr())

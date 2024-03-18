@@ -188,7 +188,8 @@ func (f *FD) String() string {
 }
 
 func (e *FD) Ext() string {
-	return path.Ext(e.path)
+	// TODO is this safe?
+	return strings.ToLower(path.Ext(e.path))
 }
 
 func (e *FD) ExtSansDot() string {

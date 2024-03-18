@@ -2,23 +2,50 @@ package kennung
 
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/sha"
 )
 
-type Abbr struct {
-	Sha struct {
-		Expand     func(string) (string, error)
-		Abbreviate func(*sha.Sha) (string, error)
-	}
-	Etikett abbrOne[Etikett, *Etikett]
-	Typ     abbrOne[Typ, *Typ]
-	Hinweis abbrOne[Hinweis, *Hinweis]
-	Kasten  abbrOne[Kasten, *Kasten]
-}
+type (
+	// TODO use catgut.String
+	FuncExpandString                                        func(string) (string, error)
+	FuncAbbreviateString[V any, VPtr schnittstellen.Ptr[V]] func(VPtr) (string, error)
 
-type abbrOne[V KennungLike[V], VPtr KennungLikePtr[V]] struct {
-	Expand     func(string) (string, error)
-	Abbreviate func(VPtr) (string, error)
+	Abbr struct {
+		Sha struct {
+			Expand     FuncExpandString
+			Abbreviate FuncAbbreviateString[sha.Sha, *sha.Sha]
+		}
+		Etikett abbrOne[Etikett, *Etikett]
+		Typ     abbrOne[Typ, *Typ]
+		Hinweis abbrOne[Hinweis, *Hinweis]
+		Kasten  abbrOne[Kasten, *Kasten]
+	}
+
+	abbrOne[V KennungLike[V], VPtr KennungLikePtr[V]] struct {
+		Expand     FuncExpandString
+		Abbreviate FuncAbbreviateString[V, VPtr]
+	}
+)
+
+func (a Abbr) ExpanderFor(g gattung.Gattung) FuncExpandString {
+	switch g {
+	case gattung.Zettel:
+		return a.Hinweis.Expand
+
+	case gattung.Etikett:
+		return a.Etikett.Expand
+
+	case gattung.Typ:
+		return a.Typ.Expand
+
+	case gattung.Kasten:
+		return a.Kasten.Expand
+
+	default:
+		return nil
+	}
 }
 
 func (ao abbrOne[V, VPtr]) AbbreviateKennung(

@@ -20,7 +20,6 @@ const (
 	SigilHistory
 	SigilCwd
 	SigilHidden
-	SigilVirtual
 
 	SigilMax
 	SigilAll = Sigil(^byte(0))
@@ -32,7 +31,6 @@ var (
 		'+': SigilHistory,
 		'.': SigilCwd,
 		'?': SigilHidden,
-		'%': SigilVirtual,
 	}
 
 	mapSigilToRune = map[Sigil]rune{
@@ -40,7 +38,6 @@ var (
 		SigilHistory:   '+',
 		SigilCwd:       '.',
 		SigilHidden:    '?',
-		SigilVirtual:   '%',
 	}
 )
 
@@ -91,6 +88,10 @@ func (a Sigil) GetSigil() schnittstellen.Sigil {
 	return a
 }
 
+func (a Sigil) IsSchwanzenOrUnknown() bool {
+	return a == SigilSchwanzen || a == SigilUnknown || a == SigilSchwanzen | SigilUnknown
+}
+
 func (a Sigil) IncludesSchwanzen() bool {
 	return a.Contains(SigilSchwanzen) || a.Contains(SigilHistory) || a == 0
 }
@@ -107,14 +108,10 @@ func (a Sigil) IncludesHidden() bool {
 	return a.Contains(SigilHidden) || a.Contains(SigilCwd)
 }
 
-func (a Sigil) IncludesVirtual() bool {
-	return a.Contains(SigilVirtual)
-}
-
 func (a Sigil) String() string {
 	sb := strings.Builder{}
 
-	for s := SigilSchwanzen; s <= SigilMax; s++ {
+	for s := SigilHistory; s <= SigilMax; s++ {
 		if a.Contains(s) {
 			r, ok := mapSigilToRune[s]
 
@@ -156,7 +153,11 @@ func (i Sigil) GetSha() *sha.Sha {
 }
 
 func (i Sigil) Byte() byte {
-	return byte(i)
+	if i == SigilUnknown {
+		return byte(SigilSchwanzen)
+	} else {
+		return byte(i)
+	}
 }
 
 func (i Sigil) ReadByte() (byte, error) {

@@ -10,18 +10,32 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/catgut"
 )
 
+const (
+	OpOr           = ','
+	OpAnd          = ' '
+	OpGroupOpen    = '['
+	OpGroupClose   = ']'
+	OpNegation     = '^'
+	OpExact        = '='
+	OpNewline      = '\n'
+	OpSigilSchwanz = ':'
+	OpSigilHistory = '+'
+	OpSigilCwd     = '.'
+	OpSigilHidden  = '?'
+)
+
 var mapMatcherOperators = map[rune]bool{
-	'\n': true,
-	' ':  true,
-	',':  true,
-	'{':  true,
-	'}':  true,
-	'[':  true,
-	']':  true,
-	':':  true,
-	'+':  true,
-	'.':  true,
-	'?':  true,
+	OpOr:           true,
+	OpAnd:          true,
+	OpGroupOpen:    true,
+	OpGroupClose:   true,
+	OpNegation:     true,
+	OpExact:        true,
+	OpNewline:      true,
+	OpSigilSchwanz: true,
+	OpSigilHistory: true,
+	OpSigilCwd:     true,
+	OpSigilHidden:  true,
 }
 
 func IsMatcherOperator(r rune) (ok bool) {

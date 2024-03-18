@@ -10,10 +10,12 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/files"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/delta/standort"
+	"code.linenisgreat.com/zit/src/delta/zittish"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
@@ -36,6 +38,8 @@ type CwdFiles struct {
 }
 
 func (fs *CwdFiles) MarkUnsureAkten(f *fd.FD) (err error) {
+  log.Debug().Print(f)
+
 	if f, err = fd.MakeFileFromFD(f, fs.akteWriterFactory); err != nil {
 		err = errors.Wrapf(err, "%q", f)
 		return
@@ -96,13 +100,13 @@ func (fs CwdFiles) String() (out string) {
 	}
 
 	sb := &strings.Builder{}
-	sb.WriteString(matcher.QueryGroupOpenOperator)
+	sb.WriteRune(zittish.OpGroupOpen)
 
 	hasOne := false
 
 	writeOneIfNecessary := func(v schnittstellen.Stringer) (err error) {
 		if hasOne {
-			sb.WriteString(matcher.QueryOrOperator)
+			sb.WriteRune(zittish.OpOr)
 		}
 
 		sb.WriteString(v.String())
@@ -142,9 +146,23 @@ func (fs CwdFiles) String() (out string) {
 		},
 	)
 
-	sb.WriteString(matcher.QueryGroupCloseOperator)
+	sb.WriteRune(zittish.OpGroupClose)
 
 	out = sb.String()
+	return
+}
+
+func (fs CwdFiles) GetKennungForFD(fd *fd.FD) (k *kennung.Kennung2, err error) {
+	k = kennung.GetKennungPool().Get()
+
+	if err = k.SetFromPath(
+		fd.String(),
+		fs.erworben.FileExtensions,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
@@ -444,7 +462,7 @@ func (c CwdFiles) MatcherLen() int {
 	)
 }
 
-func (_ CwdFiles) Each(_ schnittstellen.FuncIter[matcher.Matcher]) error {
+func (CwdFiles) Each(_ schnittstellen.FuncIter[matcher.Matcher]) error {
 	return nil
 }
 

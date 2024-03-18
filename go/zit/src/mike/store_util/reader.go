@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
-	"code.linenisgreat.com/zit/src/delta/gattungen"
+	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
@@ -15,7 +15,7 @@ type reader interface {
 	) (err error)
 
 	ReadAllGattungenFromBestandsaufnahme(
-		g gattungen.Set,
+		g kennung.Gattung,
 		f schnittstellen.FuncIter[*sku.Transacted],
 	) (err error)
 
@@ -25,7 +25,7 @@ type reader interface {
 	) (err error)
 
 	ReadAllGattungenFromVerzeichnisse(
-		g gattungen.Set,
+		g kennung.Gattung,
 		f schnittstellen.FuncIter[*sku.Transacted],
 	) (err error)
 }
@@ -56,15 +56,15 @@ func (s *common) ReadAllGattungFromBestandsaufnahme(
 }
 
 func (s *common) ReadAllGattungenFromBestandsaufnahme(
-	g gattungen.Set,
+	g kennung.Gattung,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	if g.Len() == 0 {
+	if g.IsEmpty() {
 		return
 	}
 
 	eachSku := func(besty, sk *sku.Transacted) (err error) {
-		if !g.ContainsKey(sk.GetGattung().GetGattungString()) {
+		if !g.Contains(sk.GetGattung()) {
 			return
 		}
 
@@ -110,15 +110,15 @@ func (s *common) ReadAllGattungFromVerzeichnisse(
 }
 
 func (s *common) ReadAllGattungenFromVerzeichnisse(
-	g gattungen.Set,
+	g kennung.Gattung,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	if g.Len() == 0 {
+	if g.IsEmpty() {
 		return
 	}
 
 	eachSku := func(sk *sku.Transacted) (err error) {
-		if !g.ContainsKey(sk.GetGattung().GetGattungString()) {
+		if !g.Contains(sk.GetGattung()) {
 			return
 		}
 

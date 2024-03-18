@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/script_config"
-	"code.linenisgreat.com/zit/src/delta/gattungen"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/matcher"
@@ -35,8 +34,8 @@ func init() {
 	)
 }
 
-func (c ExecAction) DefaultGattungen() gattungen.Set {
-	return gattungen.MakeSet(
+func (c ExecAction) DefaultGattungen() kennung.Gattung {
+	return kennung.MakeGattung(
 		gattung.Zettel,
 	)
 }

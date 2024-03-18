@@ -75,7 +75,7 @@ func SortedStrings[E schnittstellen.Stringer](
 	return
 }
 
-func StringDelimiterSeparated[E schnittstellen.Value[E]](
+func StringDelimiterSeparated[E schnittstellen.Stringer](
 	d string,
 	cs ...schnittstellen.SetLike[E],
 ) string {
@@ -105,7 +105,7 @@ func StringDelimiterSeparated[E schnittstellen.Value[E]](
 	return sb.String()
 }
 
-func StringCommaSeparated[E schnittstellen.Value[E]](
+func StringCommaSeparated[E schnittstellen.Stringer](
 	cs ...schnittstellen.SetLike[E],
 ) string {
 	return StringDelimiterSeparated(", ", cs...)

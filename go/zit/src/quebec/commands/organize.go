@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/files"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/script_value"
-	"code.linenisgreat.com/zit/src/delta/gattungen"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/matcher"
@@ -57,14 +56,14 @@ func init() {
 	)
 }
 
-func (c *Organize) DefaultGattungen() gattungen.Set {
-	return gattungen.MakeSet(
+func (c *Organize) DefaultGattungen() kennung.Gattung {
+	return kennung.MakeGattung(
 		gattung.Zettel,
 	)
 }
 
-func (c *Organize) CompletionGattung() gattungen.Set {
-	return gattungen.MakeSet(
+func (c *Organize) CompletionGattung() kennung.Gattung {
+	return kennung.MakeGattung(
 		gattung.Zettel,
 		gattung.Etikett,
 		gattung.Typ,

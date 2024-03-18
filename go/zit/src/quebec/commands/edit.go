@@ -10,8 +10,8 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
-	"code.linenisgreat.com/zit/src/delta/gattungen"
 	"code.linenisgreat.com/zit/src/echo/fd"
+	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/kilo/cwd"
@@ -46,8 +46,8 @@ func init() {
 	)
 }
 
-func (c Edit) CompletionGattung() gattungen.Set {
-	return gattungen.MakeSet(
+func (c Edit) CompletionGattung() kennung.Gattung {
+	return kennung.MakeGattung(
 		gattung.Etikett,
 		gattung.Zettel,
 		gattung.Typ,
@@ -55,8 +55,8 @@ func (c Edit) CompletionGattung() gattungen.Set {
 	)
 }
 
-func (c Edit) DefaultGattungen() gattungen.Set {
-	return gattungen.MakeSet(
+func (c Edit) DefaultGattungen() kennung.Gattung {
+	return kennung.MakeGattung(
 		gattung.Etikett,
 		gattung.Zettel,
 		gattung.Typ,

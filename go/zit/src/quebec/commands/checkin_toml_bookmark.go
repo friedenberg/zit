@@ -10,9 +10,9 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/delta/gattungen"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
@@ -31,8 +31,8 @@ func init() {
 	)
 }
 
-func (c CheckinTomlBookmark) DefaultGattungen() gattungen.Set {
-	return gattungen.MakeSet()
+func (c CheckinTomlBookmark) DefaultGattungen() kennung.Gattung {
+	return kennung.MakeGattung()
 }
 
 type CheckinTomlBookmarkEntry struct {
@@ -143,9 +143,10 @@ func (c CheckinTomlBookmark) getUrls(
 ) (urls map[string]SkuWithUrl, err error) {
 	query := "!toml-bookmark?z"
 
-	ids := u.MakeMetaIdSetWithExcludedHidden(c.DefaultGattungen())
+	builder := u.MakeMetaIdSetWithExcludedHidden(c.DefaultGattungen())
+	var ids matcher_proto.QueryGroup
 
-	if err = ids.Set(query); err != nil {
+	if ids, err = builder.BuildQueryGroup(query); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

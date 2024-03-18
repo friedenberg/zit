@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/files"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/script_value"
-	"code.linenisgreat.com/zit/src/delta/gattungen"
+	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
@@ -55,14 +55,14 @@ func init() {
 	)
 }
 
-func (c *OrganizeJSON) DefaultGattungen() gattungen.Set {
-	return gattungen.MakeSet(
+func (c *OrganizeJSON) DefaultGattungen() kennung.Gattung {
+	return kennung.MakeGattung(
 		gattung.Zettel,
 	)
 }
 
-func (c *OrganizeJSON) CompletionGattung() gattungen.Set {
-	return gattungen.MakeSet(
+func (c *OrganizeJSON) CompletionGattung() kennung.Gattung {
+	return kennung.MakeGattung(
 		gattung.Zettel,
 		gattung.Etikett,
 		gattung.Typ,

@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/delta/gattungen"
+	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/kilo/cwd"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
@@ -35,8 +35,8 @@ func init() {
 	)
 }
 
-func (c Checkin) DefaultGattungen() gattungen.Set {
-	return gattungen.MakeSet()
+func (c Checkin) DefaultGattungen() kennung.Gattung {
+	return kennung.MakeGattung()
 }
 
 func (c Checkin) RunWithCwdQuery(
