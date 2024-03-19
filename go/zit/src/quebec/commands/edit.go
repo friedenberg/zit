@@ -12,8 +12,8 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/kilo/cwd"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 	"code.linenisgreat.com/zit/src/papa/user_ops"
@@ -66,7 +66,7 @@ func (c Edit) DefaultGattungen() kennung.Gattung {
 
 func (c Edit) RunWithCwdQuery(
 	u *umwelt.Umwelt,
-	ms matcher_proto.QueryGroup,
+	ms *query.QueryGroup,
 	pz *cwd.CwdFiles,
 ) (err error) {
 	options := checkout_options.Options{
@@ -78,7 +78,7 @@ func (c Edit) RunWithCwdQuery(
 
 	if err = u.StoreObjekten().CheckoutQuery(
 		options,
-		matcher_proto.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().QueryWithCwd),
+		query.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().QueryWithCwd),
 		func(co *sku.CheckedOut) (err error) {
 			e := co.External
 

@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/src/delta/gattungen"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
@@ -30,7 +29,7 @@ func MakeQueryGroup(
 }
 
 type QueryGroup struct {
-	Hidden           matcher_proto.Matcher
+	Hidden           Matcher
 	OptimizedQueries map[gattung.Gattung]*QueryWithHidden
 	UserQueries      map[kennung.Gattung]*QueryWithHidden
 	FDs              fd.MutableSet
@@ -39,11 +38,11 @@ type QueryGroup struct {
 	Typen            kennung.TypMutableSet
 }
 
-func (qg *QueryGroup) GetQueryGroup() matcher_proto.QueryGroup {
+func (qg *QueryGroup) GetQueryGroup() *QueryGroup {
 	return qg
 }
 
-func (qg *QueryGroup) Get(g gattung.Gattung) (matcher_proto.MatcherSigil, bool) {
+func (qg *QueryGroup) Get(g gattung.Gattung) (MatcherSigil, bool) {
 	q, ok := qg.OptimizedQueries[g]
 	return q, ok
 }
@@ -152,7 +151,7 @@ func (qg *QueryGroup) addOptimized(q *Query) (err error) {
 	return
 }
 
-func (q *QueryGroup) Each(_ schnittstellen.FuncIter[matcher_proto.Matcher]) (err error) {
+func (q *QueryGroup) Each(_ schnittstellen.FuncIter[Matcher]) (err error) {
 	return
 }
 

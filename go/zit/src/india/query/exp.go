@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/delta/zittish"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
@@ -18,7 +17,7 @@ type Exp struct {
 	Exact        bool
 	Hidden       bool
 	Debug        bool
-	Children     []matcher_proto.Matcher
+	Children     []Matcher
 }
 
 func (a *Exp) Clone() (b *Exp) {
@@ -31,7 +30,7 @@ func (a *Exp) Clone() (b *Exp) {
 		Debug:        a.Debug,
 	}
 
-	b.Children = make([]matcher_proto.Matcher, len(a.Children))
+	b.Children = make([]Matcher, len(a.Children))
 
 	for i, c := range a.Children {
 		switch ct := c.(type) {
@@ -56,7 +55,7 @@ func (e *Exp) Reduce(b *Builder) (err error) {
 	}
 
 	e.MatchOnEmpty = !b.doNotMatchEmpty
-	chillen := make([]matcher_proto.Matcher, 0, len(e.Children))
+	chillen := make([]Matcher, 0, len(e.Children))
 
 	for _, m := range e.Children {
 		switch mt := m.(type) {
@@ -90,7 +89,7 @@ func (e *Exp) Reduce(b *Builder) (err error) {
 	return
 }
 
-func (e *Exp) Add(m matcher_proto.Matcher) (err error) {
+func (e *Exp) Add(m Matcher) (err error) {
 	switch mt := m.(type) {
 	// case *Exp:
 	// 	e.Children = append(e.Children, m)
@@ -233,7 +232,7 @@ func (e *Exp) containsMatchableOr(sk *sku.Transacted) bool {
 }
 
 func (e *Exp) Each(
-	f schnittstellen.FuncIter[matcher_proto.Matcher],
+	f schnittstellen.FuncIter[Matcher],
 ) (err error) {
 	for _, m := range e.Children {
 		if err = f(m); err != nil {

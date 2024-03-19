@@ -9,8 +9,8 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
@@ -96,7 +96,7 @@ func (op CommitOrganizeFile) run(
 		kennung.MakeGattung(gattung.TrueGattung()...),
 	)
 
-	var ids matcher_proto.QueryGroup
+	var ids *query.QueryGroup
 
 	errors.TodoP1("create query without syntax")
 	if ids, err = builder.BuildQueryGroup(":z,e,t"); err != nil {

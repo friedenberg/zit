@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/juliett/objekte"
 	"code.linenisgreat.com/zit/src/kilo/objekte_formatter"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
@@ -52,7 +52,7 @@ func (c Show) DefaultGattungen() kennung.Gattung {
 
 func (c Show) runGenericObjekteFormatterValue(
 	u *umwelt.Umwelt,
-	ms matcher_proto.QueryGroup,
+	ms *query.QueryGroup,
 	objekteFormatterValue objekte.FormatterValue,
 ) (err error) {
 	f := iter.MakeSyncSerializer(
@@ -88,7 +88,7 @@ func (c Show) runGenericObjekteFormatterValue(
 	return
 }
 
-func (c Show) RunWithQuery(u *umwelt.Umwelt, ms matcher_proto.QueryGroup) (err error) {
+func (c Show) RunWithQuery(u *umwelt.Umwelt, ms *query.QueryGroup) (err error) {
 	objekteFormatterValue := objekte.FormatterValue{}
 
 	if err = objekteFormatterValue.Set(c.Format); err == nil {

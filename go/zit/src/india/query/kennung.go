@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
@@ -88,7 +87,7 @@ func (k Kennung) String() string {
 	return sb.String()
 }
 
-func (k Kennung) Each(_ schnittstellen.FuncIter[matcher_proto.Matcher]) error {
+func (k Kennung) Each(_ schnittstellen.FuncIter[Matcher]) error {
 	return nil
 }
 

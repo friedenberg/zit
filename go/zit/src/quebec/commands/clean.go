@@ -12,8 +12,8 @@ import (
 	"code.linenisgreat.com/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 	"code.linenisgreat.com/zit/src/papa/user_ops"
 )
@@ -54,7 +54,7 @@ func (c Clean) DefaultGattungen() kennung.Gattung {
 
 func (c Clean) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms matcher_proto.QueryGroup,
+	ms *query.QueryGroup,
 ) (err error) {
 	fds := fd.MakeMutableSet()
 	l := &sync.Mutex{}
@@ -64,9 +64,9 @@ func (c Clean) RunWithQuery(
 	}
 
 	if err = u.StoreObjekten().ReadFiles(
-		matcher_proto.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().QueryWithoutCwd),
+		query.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().QueryWithoutCwd),
 		iter.MakeChain(
-			matcher_proto.MakeFilterFromQuery(ms),
+			query.MakeFilterFromQuery(ms),
 			func(co *sku.CheckedOut) (err error) {
 				if co.State != checked_out_state.StateExistsAndSame && !c.force {
 					return
@@ -107,7 +107,7 @@ func (c Clean) RunWithQuery(
 
 func (c Clean) markUnsureAktenForRemovalIfNecessary(
 	u *umwelt.Umwelt,
-	q matcher_proto.QueryGroup,
+	q *query.QueryGroup,
 	add schnittstellen.FuncIter[*fd.FD],
 ) (err error) {
 	if !c.includeRecognized {

@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/src/delta/zittish"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
@@ -18,11 +17,11 @@ func MakeBuilder() *Builder {
 
 type Builder struct {
 	preexistingKennung      []*kennung.Kennung2
-	implicitEtikettenGetter matcher_proto.ImplicitEtikettenGetter
-	cwd                     matcher_proto.Cwd
+	implicitEtikettenGetter ImplicitEtikettenGetter
+	cwd                     Cwd
 	fileExtensionGetter     schnittstellen.FileExtensionGetter
 	expanders               kennung.Abbr
-	hidden                  matcher_proto.Matcher
+	hidden                  Matcher
 	defaultGattungen        kennung.Gattung
 	doNotMatchEmpty         bool
 	debug                   bool
@@ -34,7 +33,7 @@ func (mb *Builder) WithDebug() *Builder {
 }
 
 func (mb *Builder) WithCwd(
-	cwd matcher_proto.Cwd,
+	cwd Cwd,
 ) *Builder {
 	mb.cwd = cwd
 	return mb
@@ -62,14 +61,14 @@ func (mb *Builder) WithDefaultGattungen(
 }
 
 func (mb *Builder) WithHidden(
-	hidden matcher_proto.Matcher,
+	hidden Matcher,
 ) *Builder {
 	mb.hidden = hidden
 	return mb
 }
 
 func (mb *Builder) WithImplicitEtikettenGetter(
-	ieg matcher_proto.ImplicitEtikettenGetter,
+	ieg ImplicitEtikettenGetter,
 ) *Builder {
 	mb.implicitEtikettenGetter = ieg
 	return mb
@@ -91,7 +90,7 @@ func (b *Builder) WithCheckedOut(
 	return b
 }
 
-func (b *Builder) BuildQueryGroup(vs ...string) (qg matcher_proto.QueryGroup, err error) {
+func (b *Builder) BuildQueryGroup(vs ...string) (qg *QueryGroup, err error) {
 	if qg, err = b.build(vs...); err != nil {
 		err = errors.Wrapf(err, "Query: %q", vs)
 		return
@@ -213,7 +212,7 @@ func (b *Builder) makeQuery() *Query {
 	}
 }
 
-func (b *Builder) makeExp(negated, exact bool, children ...matcher_proto.Matcher) *Exp {
+func (b *Builder) makeExp(negated, exact bool, children ...Matcher) *Exp {
 	return &Exp{
 		// MatchOnEmpty: !b.doNotMatchEmpty,
 		Negated:  negated,
@@ -226,8 +225,13 @@ func (b *Builder) parseOneFromTokens(
 	qg *QueryGroup,
 	tokens ...string,
 ) (remainingTokens []string, err error) {
+	type stackEl interface {
+		Matcher
+		Add(Matcher) error
+	}
+
 	q := b.makeQuery()
-	stack := []matcher_proto.MatcherParentPtr{q}
+	stack := []stackEl{q}
 	isNegated := false
 	isExact := false
 

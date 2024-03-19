@@ -18,8 +18,8 @@ import (
 	"code.linenisgreat.com/zit/src/delta/zittish"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 )
 
@@ -462,7 +462,7 @@ func (c CwdFiles) MatcherLen() int {
 	)
 }
 
-func (CwdFiles) Each(_ schnittstellen.FuncIter[matcher_proto.Matcher]) error {
+func (CwdFiles) Each(_ schnittstellen.FuncIter[query.Matcher]) error {
 	return nil
 }
 

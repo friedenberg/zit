@@ -14,7 +14,6 @@ import (
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/src/india/erworben"
-	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/src/kilo/objekte_store"
@@ -43,7 +42,7 @@ type Umwelt struct {
 	storeObjekten     *store_objekten.Store
 	age               *age.Age
 
-	matcherArchiviert matcher.Archiviert
+	matcherArchiviert query.Archiviert
 }
 
 func Make(kCli erworben.Cli, options Options) (u *Umwelt, err error) {
@@ -52,7 +51,7 @@ func Make(kCli erworben.Cli, options Options) (u *Umwelt, err error) {
 		out:               os.Stdout,
 		err:               os.Stderr,
 		erworbenCli:       kCli,
-		matcherArchiviert: matcher.MakeArchiviert(),
+		matcherArchiviert: query.MakeArchiviert(),
 	}
 
 	u.konfig.Reset()
@@ -206,7 +205,7 @@ func (u *Umwelt) MakeKennungIndex() kennung.Index {
 	return kennung.Index{}
 }
 
-func (u *Umwelt) GetMatcherArchiviert() matcher.Archiviert {
+func (u *Umwelt) GetMatcherArchiviert() query.Archiviert {
 	return u.matcherArchiviert
 }
 

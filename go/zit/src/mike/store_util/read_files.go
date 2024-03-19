@@ -5,8 +5,8 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/delta/checked_out_state"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/query"
 )
 
 func (s *common) ReadOneExternalFS(
@@ -61,7 +61,7 @@ func (s *common) ReadOneExternalFS(
 }
 
 func (s *common) ReadFiles(
-	fq matcher_proto.FuncReaderTransactedLikePtr,
+	fq query.FuncReaderTransactedLikePtr,
 	f schnittstellen.FuncIter[*sku.CheckedOut],
 ) (err error) {
 	if err = fq(

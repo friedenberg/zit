@@ -7,8 +7,8 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
@@ -37,11 +37,11 @@ func (c Checkout) DefaultGattungen() kennung.Gattung {
 
 func (c Checkout) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms matcher_proto.QueryGroup,
+	ms *query.QueryGroup,
 ) (err error) {
 	if err = u.StoreObjekten().CheckoutQuery(
 		c.CheckoutOptions,
-		matcher_proto.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().QueryWithoutCwd),
+		query.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().QueryWithoutCwd),
 		func(co *sku.CheckedOut) (err error) {
 			return
 		},

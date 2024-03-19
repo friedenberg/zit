@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/src/india/query"
@@ -31,7 +30,7 @@ type Options struct {
 
 	Konfig *konfig.Compiled
 
-	commentMatchers   schnittstellen.SetLike[matcher_proto.Matcher]
+	commentMatchers   schnittstellen.SetLike[query.Matcher]
 	rootEtiketten     kennung.EtikettSet
 	Typ               kennung.Typ
 	GroupingEtiketten kennung.EtikettSlice
@@ -117,7 +116,7 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 
 func (o *Flags) GetOptions(
 	printOptions erworben_cli_print_options.PrintOptions,
-	q matcher_proto.QueryGroup,
+	q *query.QueryGroup,
 	organize *sku_fmt.Organize,
 	organizeNew *sku_fmt.OrganizeNew,
 ) Options {
@@ -133,10 +132,10 @@ func (o *Flags) GetOptions(
 	if q != nil {
 		o.rootEtiketten = q.GetEtiketten()
 
-		ks := collections_value.MakeMutableValueSet[matcher_proto.Matcher](nil)
+		ks := collections_value.MakeMutableValueSet[query.Matcher](nil)
 
-		if err := matcher_proto.VisitAllMatchers(
-			func(m matcher_proto.Matcher) (err error) {
+		if err := query.VisitAllMatchers(
+			func(m query.Matcher) (err error) {
 				if e, ok := m.(*query.Exp); ok && e.Negated {
 					return ks.Add(e)
 				}

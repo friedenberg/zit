@@ -12,9 +12,9 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/script_value"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/objekte_collections"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 	"code.linenisgreat.com/zit/src/papa/user_ops"
@@ -235,7 +235,7 @@ func (c New) editZettels(
 
 	checkinOp := user_ops.Checkin{}
 
-	var ms matcher_proto.QueryGroup
+	var ms *query.QueryGroup
 
 	builder := u.MakeMetaIdSetWithExcludedHidden(kennung.MakeGattung(gattung.Zettel))
 

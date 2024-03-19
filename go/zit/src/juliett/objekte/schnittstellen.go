@@ -5,13 +5,13 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
+	"code.linenisgreat.com/zit/src/india/query"
 )
 
 type (
 	Konfig interface {
 		schnittstellen.Konfig
-		matcher_proto.ImplicitEtikettenGetter
+		query.ImplicitEtikettenGetter
 		IsInlineTyp(kennung.Typ) bool
 		GetApproximatedTyp(kennung.Kennung) ApproximatedTyp
 	}

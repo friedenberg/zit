@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 	"code.linenisgreat.com/zit/src/papa/remote_transfers"
 )
@@ -53,7 +53,7 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		c.CompletionGattung(),
 	)
 
-	var ids matcher_proto.QueryGroup
+	var ids *query.QueryGroup
 
 	if ids, err = builder.BuildQueryGroup(args...); err != nil {
 		err = errors.Wrap(err)

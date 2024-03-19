@@ -16,14 +16,14 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/kilo/cwd"
 )
 
 func (s *common) CheckoutQuery(
 	options checkout_options.Options,
-	fq matcher_proto.FuncReaderTransactedLikePtr,
+	fq query.FuncReaderTransactedLikePtr,
 	f schnittstellen.FuncIter[*sku.CheckedOut],
 ) (err error) {
 	if err = fq(
@@ -61,7 +61,7 @@ func (s *common) CheckoutQuery(
 // just a matcher
 func (s *common) Checkout(
 	options checkout_options.Options,
-	fq matcher_proto.FuncReaderTransactedLikePtr,
+	fq query.FuncReaderTransactedLikePtr,
 	ztw schnittstellen.FuncIter[*sku.Transacted],
 ) (zcs sku.CheckedOutMutableSet, err error) {
 	zcs = collections_value.MakeMutableValueSet[*sku.CheckedOut](nil)

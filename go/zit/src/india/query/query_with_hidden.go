@@ -1,13 +1,12 @@
 package query
 
 import (
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
 type QueryWithHidden struct {
 	Query
-	Hidden matcher_proto.Matcher
+	Hidden Matcher
 }
 
 func (q *QueryWithHidden) Clone() *QueryWithHidden {

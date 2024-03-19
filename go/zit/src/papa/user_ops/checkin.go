@@ -7,8 +7,8 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
@@ -18,7 +18,7 @@ type Checkin struct {
 
 func (c Checkin) Run(
 	u *umwelt.Umwelt,
-	ms matcher_proto.QueryGroup,
+	ms *query.QueryGroup,
 ) (err error) {
 	fds := fd.MakeMutableSet()
 	l := &sync.Mutex{}
@@ -29,9 +29,9 @@ func (c Checkin) Run(
 	log.Log().Print(ms)
 
 	if err = u.StoreObjekten().ReadFiles(
-		matcher_proto.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().QueryWithoutCwd),
+		query.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().QueryWithoutCwd),
 		iter.MakeChain(
-			matcher_proto.MakeFilterFromQuery(ms),
+			query.MakeFilterFromQuery(ms),
 			func(co *sku.CheckedOut) (err error) {
 				if _, err = u.StoreObjekten().CreateOrUpdateCheckedOut(
 					co,

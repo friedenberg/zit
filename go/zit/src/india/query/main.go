@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
@@ -20,7 +19,7 @@ type Query struct {
 	Kennung map[string]*kennung.Kennung2
 }
 
-func (a *Query) GetMatcherSigil() matcher_proto.MatcherSigil {
+func (a *Query) GetMatcherSigil() MatcherSigil {
 	return a
 }
 
@@ -45,7 +44,7 @@ func (a *Query) Clone() (b *Query) {
 	return b
 }
 
-func (q *Query) Add(m matcher_proto.Matcher) (err error) {
+func (q *Query) Add(m Matcher) (err error) {
 	log.Log().Print("before", q.StringDebug(), m)
 	defer log.Log().Print("after", q.StringDebug())
 	q1, ok := m.(*Query)
@@ -91,7 +90,7 @@ func (a *Query) Merge(b *Query) (err error) {
 	return
 }
 
-func (q *Query) Each(_ schnittstellen.FuncIter[matcher_proto.Matcher]) (err error) {
+func (q *Query) Each(_ schnittstellen.FuncIter[Matcher]) (err error) {
 	return
 }
 

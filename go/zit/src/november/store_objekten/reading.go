@@ -12,30 +12,30 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/query"
 )
 
 func (s *Store) QueryWithoutCwd(
-	ms matcher_proto.QueryGroup,
+	ms *query.QueryGroup,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return s.query(ms, f, false)
 }
 
 func (s *Store) QueryWithCwd(
-	ms matcher_proto.QueryGroup,
+	ms *query.QueryGroup,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return s.query(ms, f, true)
 }
 
 func (s *Store) query(
-	ms matcher_proto.QueryGroup,
+	ms *query.QueryGroup,
 	f schnittstellen.FuncIter[*sku.Transacted],
 	includeCwd bool,
 ) (err error) {
-	gsWithoutHistory, gsWithHistory := matcher_proto.SplitGattungenByHistory(ms)
+	gsWithoutHistory, gsWithHistory := query.SplitGattungenByHistory(ms)
 
 	wg := iter.MakeErrorWaitGroupParallel()
 

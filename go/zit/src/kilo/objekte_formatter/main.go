@@ -7,8 +7,8 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/delta/typ_akte"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/src/kilo/typ"
 	"code.linenisgreat.com/zit/src/kilo/zettel"
@@ -34,7 +34,7 @@ type Formatter interface {
 }
 
 func MakeFormatter(
-	ms matcher_proto.QueryGroup,
+	ms *query.QueryGroup,
 	v string,
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,

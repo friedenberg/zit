@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/kilo/cwd"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
@@ -14,7 +14,7 @@ import (
 type CommandWithCwdQuery interface {
 	RunWithCwdQuery(
 		store *umwelt.Umwelt,
-		ms matcher_proto.QueryGroup,
+		ms *query.QueryGroup,
 		cwdFiles *cwd.CwdFiles,
 	) error
 	DefaultGattungen() kennung.Gattung
@@ -54,7 +54,7 @@ func (c commandWithCwdQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		c.DefaultGattungen(),
 	)
 
-	var ids matcher_proto.QueryGroup
+	var ids *query.QueryGroup
 
 	if ids, err = builder.BuildQueryGroup(args...); err != nil {
 		err = errors.Wrap(err)

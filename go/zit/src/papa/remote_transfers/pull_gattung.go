@@ -2,11 +2,11 @@ package remote_transfers
 
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
+	"code.linenisgreat.com/zit/src/india/query"
 )
 
 func (c *client) PullSkus(
-	ids matcher_proto.QueryGroup,
+	ids *query.QueryGroup,
 ) (err error) {
 	errors.TodoP1("implement etikett and akte")
 	// if err = c.SkusFromFilter(

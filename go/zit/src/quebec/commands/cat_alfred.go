@@ -7,8 +7,8 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/india/alfred"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
@@ -45,7 +45,7 @@ func (c CatAlfred) DefaultGattungen() kennung.Gattung {
 
 func (c CatAlfred) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms matcher_proto.QueryGroup,
+	ms *query.QueryGroup,
 ) (err error) {
 	// this command does its own error handling
 	wo := bufio.NewWriter(u.Out())

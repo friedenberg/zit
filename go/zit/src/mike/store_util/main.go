@@ -11,10 +11,9 @@ import (
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/golf/kennung_index"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/matcher"
 	"code.linenisgreat.com/zit/src/india/objekte_collections"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/src/kilo/cwd"
 	"code.linenisgreat.com/zit/src/kilo/store_verzeichnisse"
@@ -36,8 +35,8 @@ type StoreUtil interface {
 	ResetIndexes() (err error)
 	AddTypToIndex(t *kennung.Typ) (err error)
 
-	SetMatchableAdder(matcher.MatchableAdder)
-	matcher.MatchableAdder
+	SetMatchableAdder(query.MatchableAdder)
+	query.MatchableAdder
 
 	SetCheckedOutLogWriter(zelw schnittstellen.FuncIter[*sku.CheckedOut])
 
@@ -45,18 +44,18 @@ type StoreUtil interface {
 
 	CheckoutQuery(
 		options checkout_options.Options,
-		fq matcher_proto.FuncReaderTransactedLikePtr,
+		fq query.FuncReaderTransactedLikePtr,
 		f schnittstellen.FuncIter[*sku.CheckedOut],
 	) (err error)
 
 	Checkout(
 		options checkout_options.Options,
-		fq matcher_proto.FuncReaderTransactedLikePtr,
+		fq query.FuncReaderTransactedLikePtr,
 		ztw schnittstellen.FuncIter[*sku.Transacted],
 	) (zcs sku.CheckedOutMutableSet, err error)
 
 	ReadFiles(
-		fq matcher_proto.FuncReaderTransactedLikePtr,
+		fq query.FuncReaderTransactedLikePtr,
 		f schnittstellen.FuncIter[*sku.CheckedOut],
 	) (err error)
 
@@ -89,7 +88,7 @@ type common struct {
 	bestandsaufnahmeStore bestandsaufnahme.Store
 	kennungIndex          kennung_index.Index
 
-	matcher.MatchableAdder
+	query.MatchableAdder
 	typenIndex kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
 }
 
@@ -194,6 +193,6 @@ func (s *common) ResetIndexes() (err error) {
 	return
 }
 
-func (s *common) SetMatchableAdder(ma matcher.MatchableAdder) {
+func (s *common) SetMatchableAdder(ma query.MatchableAdder) {
 	s.MatchableAdder = ma
 }

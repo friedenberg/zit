@@ -12,8 +12,8 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit/src/hotel/matcher_proto"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
@@ -141,12 +141,12 @@ func (c CheckinTomlBookmark) getUrls(
 	u *umwelt.Umwelt,
 	urlsFound map[string]CheckinTomlBookmarkEntry,
 ) (urls map[string]SkuWithUrl, err error) {
-	query := "!toml-bookmark?z"
+	q := "!toml-bookmark?z"
 
 	builder := u.MakeMetaIdSetWithExcludedHidden(c.DefaultGattungen())
-	var ids matcher_proto.QueryGroup
+	var ids *query.QueryGroup
 
-	if ids, err = builder.BuildQueryGroup(query); err != nil {
+	if ids, err = builder.BuildQueryGroup(q); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
