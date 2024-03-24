@@ -27,7 +27,8 @@ func (s *Store) CheckoutQuery(
 	fq query.FuncReaderTransactedLikePtr,
 	f schnittstellen.FuncIter[*sku.CheckedOut],
 ) (err error) {
-	if err = fq(
+	if err = s.QueryWithCwd(
+		qg,
 		func(t *sku.Transacted) (err error) {
 			var cop *sku.CheckedOut
 
