@@ -66,7 +66,7 @@ func (s *Store) query(
 		return f(z)
 	}
 
-	if err = s.ReadQuery(qg, f1); err != nil {
+	if err = s.GetVerzeichnisse().ReadQuery(qg, f1); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -85,13 +85,6 @@ func (s *Store) ReadOne(
 	}
 
 	return
-}
-
-func (s *Store) ReadQuery(
-	qg *query.Group,
-	f schnittstellen.FuncIter[*sku.Transacted],
-) (err error) {
-	return s.GetVerzeichnisse().ReadQuery(qg, f)
 }
 
 func (s Store) ReadAllMatchingAkten(
@@ -137,7 +130,7 @@ func (s Store) ReadAllMatchingAkten(
 	observed := fd.MakeMutableSet()
 	var l sync.Mutex
 
-	if err = s.ReadQuery(
+	if err = s.GetVerzeichnisse().ReadQuery(
 		qg,
 		func(z *sku.Transacted) (err error) {
 			fd, ok := fds.Get(z.GetAkteSha().String())

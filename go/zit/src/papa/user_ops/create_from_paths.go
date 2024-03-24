@@ -81,7 +81,7 @@ func (c CreateFromPaths) Run(
 			return
 		}
 
-		if err = c.Store().ReadQuery(
+		if err = c.Store().QueryWithoutCwd(
 			qg,
 			iter.MakeChain(
 				matcher.Match,

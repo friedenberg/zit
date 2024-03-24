@@ -47,7 +47,7 @@ func (c commandWithCwdQuery) Complete(
 		return
 	}
 
-	if err = u.Store().ReadQuery(
+	if err = u.Store().QueryWithoutCwd(
 		qg,
 		w.WriteOne,
 	); err != nil {

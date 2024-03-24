@@ -84,7 +84,7 @@ func (c ZettelFromExternalAkte) Run(
 	if c.Dedupe {
 		matcher := objekte_collections.MakeMutableMatchSet(toCreate)
 
-		if err = c.Store().ReadQuery(
+		if err = c.Store().QueryWithoutCwd(
 			qg,
 			iter.MakeChain(
 				matcher.Match,
