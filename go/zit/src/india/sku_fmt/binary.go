@@ -234,7 +234,6 @@ func (bf *Binary) ReadFormatAndMatchSigil(
 			return
 		}
 
-
 		q, ok := bf.Get(gattung.Must(sk.Transacted))
 
 		if ok {

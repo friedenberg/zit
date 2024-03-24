@@ -1,4 +1,4 @@
-package store_util
+package store
 
 import (
 	"io"

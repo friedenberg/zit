@@ -133,8 +133,8 @@ func TestQuery(t1 *testing.T) {
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
 			defaultGattung:    kennung.MakeGattung(gattung.TrueGattung()...),
-      expectedOptimized: ":Typ :Etikett :Zettel :Konfig :Kasten",
-      expected:          ":Typ,Etikett,Zettel,Konfig,Kasten",
+			expectedOptimized: ":Typ :Etikett :Zettel :Konfig :Kasten",
+			expected:          ":Typ,Etikett,Zettel,Konfig,Kasten",
 			inputs:            []string{},
 		},
 		{

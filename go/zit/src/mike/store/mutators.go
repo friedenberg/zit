@@ -1,4 +1,4 @@
-package store_util
+package store
 
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"

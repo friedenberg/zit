@@ -18,7 +18,7 @@ import (
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/src/kilo/objekte_store"
 	"code.linenisgreat.com/zit/src/lima/organize_text"
-	"code.linenisgreat.com/zit/src/mike/store_util"
+	"code.linenisgreat.com/zit/src/mike/store"
 )
 
 type Umwelt struct {
@@ -37,7 +37,7 @@ type Umwelt struct {
 	konfig      konfig.Compiled
 
 	storesInitialized bool
-	store             store_util.Store
+	store             store.Store
 	age               *age.Age
 
 	matcherArchiviert query.Archiviert

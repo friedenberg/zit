@@ -386,7 +386,7 @@ func (i *Store) readFrom(
 				var err1 error
 
 				if err1 = p.CopyJustHistory(
-          qg,
+					qg,
 					w,
 				); err1 != nil {
 					if isDone() {

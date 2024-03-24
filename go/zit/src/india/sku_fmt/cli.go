@@ -83,7 +83,7 @@ func (f *cli) WriteStringFormat(
 			t := o.GetTai()
 
 			if t.IsZero() {
-        log.Err().Printf("empty tai: %s", o.GetKennung())
+				log.Err().Printf("empty tai: %s", o.GetKennung())
 			} else {
 				bracketPrefix = t.Format(string_format_writer.StringFormatDateTime)
 			}

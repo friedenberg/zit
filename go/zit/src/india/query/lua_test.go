@@ -45,7 +45,7 @@ func TestMatcherLuaTrue(t1 *testing.T) {
 	sk := &sku.Transacted{}
 
 	if err = sk.Kennung.SetWithKennung(&kennung.Etikett{}); err != nil {
-    t.Fatal(err)
+		t.Fatal(err)
 	}
 
 	if !m.ContainsMatchable(sk) {

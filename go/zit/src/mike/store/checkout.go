@@ -1,4 +1,4 @@
-package store_util
+package store
 
 import (
 	"fmt"
@@ -23,6 +23,7 @@ import (
 
 func (s *Store) CheckoutQuery(
 	options checkout_options.Options,
+	qg *query.Group,
 	fq query.FuncReaderTransactedLikePtr,
 	f schnittstellen.FuncIter[*sku.CheckedOut],
 ) (err error) {
@@ -48,9 +49,9 @@ func (s *Store) CheckoutQuery(
 			if err = f(cop); err != nil {
 				err = errors.Wrap(err)
 				return
-      }
+			}
 
-      return
+			return
 		},
 	); err != nil {
 		err = errors.Wrap(err)

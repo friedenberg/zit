@@ -98,7 +98,7 @@ func (pt *PageTuple) CopyJustHistoryFrom(
 	s sku_fmt.QueryGroup,
 	w schnittstellen.FuncIter[sku_fmt.Sku],
 ) (err error) {
-  dec := sku_fmt.MakeBinaryWithQueryGroup(s, kennung.SigilHistory)
+	dec := sku_fmt.MakeBinaryWithQueryGroup(s, kennung.SigilHistory)
 
 	var sk sku_fmt.Sku
 
@@ -173,7 +173,7 @@ func (pt *PageTuple) copyHistoryAndMaybeSchwanz(
 		return
 	}
 
-  dec := sku_fmt.MakeBinaryWithQueryGroup(s, kennung.SigilHistory)
+	dec := sku_fmt.MakeBinaryWithQueryGroup(s, kennung.SigilHistory)
 
 	errors.TodoP3("determine performance of this")
 	added := pt.added.Copy()

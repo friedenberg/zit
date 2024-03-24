@@ -193,7 +193,7 @@ func (m *Exp) negateIfNecessary(v bool) bool {
 }
 
 func (e *Exp) ContainsMatchable(sk *sku.Transacted) bool {
-  log.Log().Printf("%s in %s", sk, e)
+	log.Log().Printf("%s in %s", sk, e)
 
 	if len(e.Children) == 0 {
 		return e.negateIfNecessary(e.MatchOnEmpty)

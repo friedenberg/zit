@@ -15,7 +15,7 @@ ag_print_matching() (
 )
 
 ag_print_matching_with_file() (
-  query="github.com/friedenberg/zit/src/$1"
+  query="code.linenisgreat.com/zit/src/$1"
   shift
 
   ag "$query" \
@@ -30,12 +30,12 @@ ag_print_matching_with_file() (
 
 print_matches() (
   path="$1"
-  ag_print_matching 'github.com/friedenberg/zit/src/[\w/]+' "$path" | sort -u
+  ag_print_matching 'code.linenisgreat.com/zit/src/[\w/]+' "$path" | sort -u
 )
 
 print_basenames() (
   while IFS= read -r; do
-    echo "${REPLY#github.com/friedenberg/zit/src/}"
+    echo "${REPLY#code.linenisgreat.com/zit/src/}"
   done
 )
 
@@ -54,7 +54,7 @@ print_package_locations() (
   while IFS= read -r; do
     ag_print_matching_with_file "$REPLY" "$loc" </dev/null |
       tr -d ' ' |
-      sed -e 's#github.com/friedenberg/zit/##g; s/"//g' |
+      sed -e 's#code.linenisgreat.com/zit/##g; s/"//g' |
       xargs -L2 bash -c 'print_final "$@"' "$REPLY" |
       sort -u
   done
