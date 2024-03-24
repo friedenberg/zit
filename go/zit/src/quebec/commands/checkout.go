@@ -42,7 +42,6 @@ func (c Checkout) RunWithQuery(
 	if err = u.Store().CheckoutQuery(
 		c.CheckoutOptions,
 		ms,
-		query.MakeFuncReaderTransactedLikePtr(ms, u.Store().QueryWithCwd),
 		func(co *sku.CheckedOut) (err error) {
 			return
 		},

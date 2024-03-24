@@ -24,7 +24,6 @@ import (
 func (s *Store) CheckoutQuery(
 	options checkout_options.Options,
 	qg *query.Group,
-	fq query.FuncReaderTransactedLikePtr,
 	f schnittstellen.FuncIter[*sku.CheckedOut],
 ) (err error) {
 	if err = s.QueryWithCwd(

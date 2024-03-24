@@ -3,6 +3,7 @@ package commands
 import (
 	"flag"
 	"os"
+	"sync"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/vim_cli_options_builder"
@@ -228,26 +229,30 @@ func (c Add) openAktenIfNecessary(
 		CheckoutMode: checkout_mode.ModeAkteOnly,
 	}
 
-	var checkoutResults sku.CheckedOutMutableSet
+	var filesAkten []string
+	var l sync.Mutex
 
-	if checkoutResults, err = u.Store().Checkout(
+	if err = u.Store().CheckoutQuery(
 		options,
-		u.Store().MakeReadAllSchwanzen(qg, gattung.Zettel),
-		func(z *sku.Transacted) (err error) {
-			if !hs.ContainsKey(z.GetKennung().String()) {
+		qg,
+		func(z *sku.CheckedOut) (err error) {
+			if !hs.ContainsKey(z.Internal.GetKennung().String()) {
 				return iter.MakeErrStopIteration()
 			}
+
+			e := z.External.GetAkteFD().GetPath()
+
+			if e == "" {
+				return iter.MakeErrStopIteration()
+			}
+
+			l.Lock()
+			filesAkten = append(filesAkten, e)
+			l.Unlock()
 
 			return
 		},
 	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var filesAkten []string
-
-	if filesAkten, err = objekte_collections.ToSliceFilesAkten(checkoutResults); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

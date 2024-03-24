@@ -2,12 +2,14 @@ package commands
 
 import (
 	"flag"
+	"sync"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/vim_cli_options_builder"
 	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/charlie/collections"
+	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/script_value"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -116,6 +118,8 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 	} else {
+		zsc = collections_value.MakeMutableValueSet[*sku.CheckedOut](nil)
+
 		var zts sku.TransactedMutableSet
 
 		if zts, err = c.readExistingFilesAsZettels(u, f, args...); err != nil {
@@ -141,12 +145,22 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 				return
 			}
 
-			if zsc, err = u.Store().Checkout(
+			var l sync.Mutex
+
+			if err = u.Store().CheckoutQuery(
 				options,
-				u.Store().MakeReadAllSchwanzen(qg, gattung.Zettel),
-				func(sk *sku.Transacted) (err error) {
-					if zts.ContainsKey(sk.GetKennung().String()) {
+				qg,
+				func(sk *sku.CheckedOut) (err error) {
+					if zts.ContainsKey(sk.Internal.GetKennung().String()) {
 						err = collections.MakeErrStopIteration()
+						return
+					}
+
+					l.Lock()
+					defer l.Unlock()
+
+					if err = zsc.Add(sk); err != nil {
+						err = errors.Wrap(err)
 						return
 					}
 

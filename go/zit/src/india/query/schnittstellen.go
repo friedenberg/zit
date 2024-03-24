@@ -105,12 +105,3 @@ type (
 	FuncReaderTransactedLikePtr func(schnittstellen.FuncIter[*sku.Transacted]) error
 	FuncQueryTransactedLikePtr  func(*Group, schnittstellen.FuncIter[*sku.Transacted]) error
 )
-
-func MakeFuncReaderTransactedLikePtr(
-	ms *Group,
-	fq FuncQueryTransactedLikePtr,
-) FuncReaderTransactedLikePtr {
-	return func(f schnittstellen.FuncIter[*sku.Transacted]) (err error) {
-		return fq(ms, f)
-	}
-}
