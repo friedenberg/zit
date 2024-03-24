@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/script_value"
 	"code.linenisgreat.com/zit/src/charlie/sha"
 	"code.linenisgreat.com/zit/src/echo/fd"
@@ -85,9 +84,8 @@ func (c ZettelFromExternalAkte) Run(
 	if c.Dedupe {
 		matcher := objekte_collections.MakeMutableMatchSet(toCreate)
 
-		if err = c.Store().ReadAll(
+		if err = c.Store().ReadQuery(
 			qg,
-			kennung.MakeGattung(gattung.Zettel),
 			iter.MakeChain(
 				matcher.Match,
 				func(sk *sku.Transacted) (err error) {

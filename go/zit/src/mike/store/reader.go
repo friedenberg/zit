@@ -191,7 +191,7 @@ func (s *Store) ReadAllGattungFromVerzeichnisse(
 		return
 	}
 
-	if err = s.verzeichnisse.ReadAll(
+	if err = s.verzeichnisse.ReadQuery(
 		qg,
 		eachSku,
 	); err != nil {
@@ -224,7 +224,7 @@ func (s *Store) ReadAllGattungenFromVerzeichnisse(
 		return
 	}
 
-	if err = s.verzeichnisse.ReadAll(
+	if err = s.verzeichnisse.ReadQuery(
 		qg,
 		eachSku,
 	); err != nil {

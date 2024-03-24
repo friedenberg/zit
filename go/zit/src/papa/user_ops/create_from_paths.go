@@ -14,6 +14,7 @@ import (
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/objekte_collections"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/kilo/objekte_store"
 	"code.linenisgreat.com/zit/src/kilo/zettel"
@@ -71,9 +72,17 @@ func (c CreateFromPaths) Run(
 	if c.Dedupe {
 		matcher := objekte_collections.MakeMutableMatchSet(toCreate)
 
-		if err = c.Store().ReadAll(
-			nil, // TODO determine what query to pass in
-			kennung.MakeGattung(gattung.Zettel),
+		b := c.MakeMetaIdSetWithoutExcludedHidden(kennung.MakeGattung(gattung.Zettel))
+
+		var qg *query.Group
+
+		if qg, err = b.BuildQueryGroup(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = c.Store().ReadQuery(
+			qg,
 			iter.MakeChain(
 				matcher.Match,
 				func(sk *sku.Transacted) (err error) {

@@ -347,7 +347,6 @@ func (i *Store) Add(
 
 func (i *Store) readFrom(
 	qg *query.Group,
-	s kennung.Sigil,
 	ws ...schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	errors.TodoP3("switch to single writer and force callers to make chains")
@@ -419,16 +418,9 @@ func (i *Store) readFrom(
 	return
 }
 
-func (i *Store) ReadSchwanzen(
+func (i *Store) ReadQuery(
 	qg *query.Group,
 	ws ...schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	return i.readFrom(qg, kennung.SigilSchwanzen, ws...)
-}
-
-func (i *Store) ReadAll(
-	qg *query.Group,
-	ws ...schnittstellen.FuncIter[*sku.Transacted],
-) (err error) {
-	return i.readFrom(qg, kennung.SigilHistory, ws...)
+	return i.readFrom(qg, ws...)
 }

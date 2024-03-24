@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/query"
 )
@@ -34,10 +33,6 @@ func (s *Store) query(
 	f schnittstellen.FuncIter[*sku.Transacted],
 	includeCwd bool,
 ) (err error) {
-	gsWithoutHistory, gsWithHistory := query.SplitGattungenByHistory(qg)
-
-	wg := iter.MakeErrorWaitGroupParallel()
-
 	f1 := func(z *sku.Transacted) (err error) {
 		g := gattung.Must(z.GetGattung())
 		m, ok := qg.Get(g)
@@ -71,19 +66,12 @@ func (s *Store) query(
 		return f(z)
 	}
 
-	wg.Do(
-		func() error {
-			return s.ReadAllSchwanzen(qg, gsWithoutHistory, f1)
-		},
-	)
+	if err = s.ReadQuery(qg, f1); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	wg.Do(
-		func() error {
-			return s.ReadAll(qg, gsWithHistory, f1)
-		},
-	)
-
-	return wg.GetError()
+	return
 }
 
 func (s *Store) ReadOne(
@@ -99,42 +87,11 @@ func (s *Store) ReadOne(
 	return
 }
 
-func (s *Store) MakeReadAllSchwanzen(
+func (s *Store) ReadQuery(
 	qg *query.Group,
-	gs ...gattung.Gattung,
-) func(schnittstellen.FuncIter[*sku.Transacted]) error {
-	return func(f schnittstellen.FuncIter[*sku.Transacted]) (err error) {
-		return s.ReadAllSchwanzen(qg, kennung.MakeGattung(gs...), f)
-	}
-}
-
-func (s *Store) ReadAllSchwanzen(
-	qg *query.Group,
-	gs kennung.Gattung,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	return s.GetVerzeichnisse().ReadSchwanzen(
-		qg,
-		iter.MakeChain(
-			func(sk *sku.Transacted) (err error) {
-				if !gs.Contains(gattung.Must(sk.Kennung.GetGattung())) {
-					err = iter.MakeErrStopIteration()
-					return
-				}
-
-				return
-			},
-			f,
-		),
-	)
-}
-
-func (s *Store) ReadAll(
-	qg *query.Group,
-	gs kennung.Gattung,
-	f schnittstellen.FuncIter[*sku.Transacted],
-) (err error) {
-	return s.ReadAllGattungenFromVerzeichnisse(qg, gs, f)
+	return s.GetVerzeichnisse().ReadQuery(qg, f)
 }
 
 func (s Store) ReadAllMatchingAkten(
@@ -180,9 +137,8 @@ func (s Store) ReadAllMatchingAkten(
 	observed := fd.MakeMutableSet()
 	var l sync.Mutex
 
-	if err = s.ReadAll(
+	if err = s.ReadQuery(
 		qg,
-		kennung.MakeGattung(gattung.TrueGattung()...),
 		func(z *sku.Transacted) (err error) {
 			fd, ok := fds.Get(z.GetAkteSha().String())
 

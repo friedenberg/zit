@@ -47,9 +47,8 @@ func (c commandWithCwdQuery) Complete(
 		return
 	}
 
-	if err = u.Store().ReadAllSchwanzen(
+	if err = u.Store().ReadQuery(
 		qg,
-		cgg.CompletionGattung(),
 		w.WriteOne,
 	); err != nil {
 		err = errors.Wrap(err)
