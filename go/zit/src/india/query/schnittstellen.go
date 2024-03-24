@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -83,25 +82,3 @@ func SplitGattungenByHistory(qg *Group) (schwanz, all kennung.Gattung) {
 
 	return
 }
-
-func MakeCheckedOutQueryFunc(
-	m sku.QueryBase,
-) schnittstellen.FuncIter[*sku.CheckedOut] {
-	if m == nil {
-		return collections.MakeWriterNoop[*sku.CheckedOut]()
-	}
-
-	return func(col *sku.CheckedOut) (err error) {
-		if !m.ContainsMatchable(&col.External.Transacted) {
-			err = iter.MakeErrStopIteration()
-			return
-		}
-
-		return
-	}
-}
-
-type (
-	FuncReaderTransactedLikePtr func(schnittstellen.FuncIter[*sku.Transacted]) error
-	FuncQueryTransactedLikePtr  func(*Group, schnittstellen.FuncIter[*sku.Transacted]) error
-)

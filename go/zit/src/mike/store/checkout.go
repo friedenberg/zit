@@ -4,15 +4,12 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"sync"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/files"
 	"code.linenisgreat.com/zit/src/bravo/id"
-	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/checkout_options"
-	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -50,67 +47,6 @@ func (s *Store) CheckoutQuery(
 				err = errors.Wrap(err)
 				return
 			}
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-// TODO-P2 combine with CheckoutQuery once all matcher Query is simplified into
-// just a matcher
-func (s *Store) Checkout(
-	options checkout_options.Options,
-	fq query.FuncReaderTransactedLikePtr,
-	ztw schnittstellen.FuncIter[*sku.Transacted],
-) (zcs sku.CheckedOutMutableSet, err error) {
-	zcs = collections_value.MakeMutableValueSet[*sku.CheckedOut](nil)
-	zts := sku.MakeTransactedMutableSet()
-
-	var l sync.Mutex
-
-	if err = fq(
-		iter.MakeChain(
-			// zettel.MakeWriterKonfig(s.GetKonfig(), s.GetAkten().GetTypV0()),
-			ztw,
-			func(sk *sku.Transacted) (err error) {
-				var z sku.Transacted
-
-				if err = z.SetFromSkuLike(sk); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				l.Lock()
-				defer l.Unlock()
-
-				if err = zts.Add(&z); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				return
-			},
-		),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = zts.Each(
-		func(zt *sku.Transacted) (err error) {
-			var zc *sku.CheckedOut
-
-			if zc, err = s.CheckoutOne(options, zt); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			zcs.Add(zc)
 
 			return
 		},
