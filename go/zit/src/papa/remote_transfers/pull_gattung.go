@@ -6,7 +6,7 @@ import (
 )
 
 func (c *client) PullSkus(
-	ids *query.QueryGroup,
+	ids *query.Group,
 ) (err error) {
 	errors.TodoP1("implement etikett and akte")
 	// if err = c.SkusFromFilter(

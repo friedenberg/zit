@@ -42,7 +42,7 @@ func (c ExecAction) DefaultGattungen() kennung.Gattung {
 
 func (c ExecAction) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms *query.QueryGroup,
+	ms *query.Group,
 ) (err error) {
 	if !c.Action.WasSet() {
 		err = errors.Normal(errors.Errorf("Action must be provided"))

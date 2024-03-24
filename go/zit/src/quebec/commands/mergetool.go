@@ -33,14 +33,13 @@ func (c Mergetool) DefaultGattungen() kennung.Gattung {
 
 func (c Mergetool) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms *query.QueryGroup,
+	qg *query.Group,
 ) (err error) {
 	p := []string{}
 
 	if err = u.StoreObjekten().ReadFiles(
-		query.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().QueryWithoutCwd),
+		qg,
 		iter.MakeChain(
-			query.MakeFilterFromQuery(ms),
 			func(co *sku.CheckedOut) (err error) {
 				if co.State != checked_out_state.StateConflicted {
 					return iter.MakeErrStopIteration()

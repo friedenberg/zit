@@ -11,7 +11,7 @@ import (
 )
 
 type CommandWithQuery interface {
-	RunWithQuery(store *umwelt.Umwelt, ids *query.QueryGroup) error
+	RunWithQuery(store *umwelt.Umwelt, ids *query.Group) error
 	DefaultGattungen() kennung.Gattung
 }
 
@@ -37,7 +37,17 @@ func (c commandWithQuery) Complete(
 	w := sku_fmt.MakeWriterComplete(os.Stdout)
 	defer errors.DeferredCloser(&err, w)
 
+	b := u.MakeMetaIdSetWithExcludedHidden(cgg.CompletionGattung())
+
+	var qg *query.Group
+
+	if qg, err = b.BuildQueryGroup(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = u.StoreObjekten().ReadAllSchwanzen(
+		qg,
 		cgg.CompletionGattung(),
 		w.WriteOne,
 	); err != nil {
@@ -50,7 +60,16 @@ func (c commandWithQuery) Complete(
 
 func (c commandWithQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	builder := u.MakeMetaIdSetWithExcludedHidden(c.DefaultGattungen())
-	var ids *query.QueryGroup
+
+	type withDefaultSigil interface {
+		DefaultSigil() kennung.Sigil
+	}
+
+	if wds, ok := c.CommandWithQuery.(withDefaultSigil); ok {
+		builder.WithDefaultSigil(wds.DefaultSigil())
+	}
+
+	var ids *query.Group
 
 	if ids, err = builder.BuildQueryGroup(args...); err != nil {
 		err = errors.Wrap(err)

@@ -20,6 +20,7 @@ import (
 	"code.linenisgreat.com/zit/src/golf/kennung_index"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 )
@@ -249,7 +250,7 @@ func (i *Store) readLoc(loc ennui.Loc) (sk *sku.Transacted, err error) {
 
 	defer errors.DeferredCloser(&err, f)
 
-	coder := sku_fmt.Binary{Sigil: kennung.SigilAll}
+	coder := sku_fmt.Binary{QueryGroup: &sku_fmt.NopSigil{Sigil: kennung.SigilAll}}
 
 	sk = sku.GetTransactedPool().Get()
 
@@ -345,6 +346,7 @@ func (i *Store) Add(
 }
 
 func (i *Store) readFrom(
+	qg *query.Group,
 	s kennung.Sigil,
 	ws ...schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
@@ -383,7 +385,10 @@ func (i *Store) readFrom(
 
 				var err1 error
 
-				if err1 = p.CopyJustHistory(s, w); err1 != nil {
+				if err1 = p.CopyJustHistory(
+          qg,
+					w,
+				); err1 != nil {
 					if isDone() {
 						break
 					}
@@ -415,13 +420,15 @@ func (i *Store) readFrom(
 }
 
 func (i *Store) ReadSchwanzen(
+	qg *query.Group,
 	ws ...schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	return i.readFrom(kennung.SigilSchwanzen, ws...)
+	return i.readFrom(qg, kennung.SigilSchwanzen, ws...)
 }
 
 func (i *Store) ReadAll(
+	qg *query.Group,
 	ws ...schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	return i.readFrom(kennung.SigilHistory, ws...)
+	return i.readFrom(qg, kennung.SigilHistory, ws...)
 }

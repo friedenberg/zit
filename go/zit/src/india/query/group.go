@@ -14,10 +14,10 @@ import (
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
-func MakeQueryGroup(
+func MakeGroup(
 	b *Builder,
-) *QueryGroup {
-	return &QueryGroup{
+) *Group {
+	return &Group{
 		OptimizedQueries: make(map[gattung.Gattung]*QueryWithHidden),
 		UserQueries:      make(map[kennung.Gattung]*QueryWithHidden),
 		Hidden:           b.hidden,
@@ -28,7 +28,7 @@ func MakeQueryGroup(
 	}
 }
 
-type QueryGroup struct {
+type Group struct {
 	Hidden           Matcher
 	OptimizedQueries map[gattung.Gattung]*QueryWithHidden
 	UserQueries      map[kennung.Gattung]*QueryWithHidden
@@ -38,16 +38,16 @@ type QueryGroup struct {
 	Typen            kennung.TypMutableSet
 }
 
-func (qg *QueryGroup) GetQueryGroup() *QueryGroup {
-	return qg
+func (qg *Group) IsEmpty() bool {
+	return len(qg.UserQueries) == 0
 }
 
-func (qg *QueryGroup) Get(g gattung.Gattung) (MatcherSigil, bool) {
+func (qg *Group) Get(g gattung.Gattung) (MatcherSigil, bool) {
 	q, ok := qg.OptimizedQueries[g]
 	return q, ok
 }
 
-func (qg *QueryGroup) GetCwdFDs() fd.Set {
+func (qg *Group) GetCwdFDs() fd.Set {
 	// TODO support dot operator
 	// if ms.dotOperatorActive {
 	// 	return ms.cwd.GetCwdFDs()
@@ -57,19 +57,19 @@ func (qg *QueryGroup) GetCwdFDs() fd.Set {
 	return qg.FDs
 }
 
-func (qg *QueryGroup) GetExplicitCwdFDs() fd.Set {
+func (qg *Group) GetExplicitCwdFDs() fd.Set {
 	return qg.FDs
 }
 
-func (qg *QueryGroup) GetEtiketten() kennung.EtikettSet {
+func (qg *Group) GetEtiketten() kennung.EtikettSet {
 	return qg.Etiketten
 }
 
-func (qg *QueryGroup) GetTypen() kennung.TypSet {
+func (qg *Group) GetTypen() kennung.TypSet {
 	return qg.Typen
 }
 
-func (qg *QueryGroup) GetGattungen() gattungen.Set {
+func (qg *Group) GetGattungen() gattungen.Set {
 	gs := gattungen.MakeMutableSet()
 
 	for g := range qg.OptimizedQueries {
@@ -79,11 +79,35 @@ func (qg *QueryGroup) GetGattungen() gattungen.Set {
 	return gs
 }
 
-func (qg *QueryGroup) AddExactKennung(
+func (qg *Group) Reduce(b *Builder) (err error) {
+	for _, q := range qg.UserQueries {
+		if err = q.Reduce(b); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = qg.addOptimized(b, q); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	for _, q := range qg.OptimizedQueries {
+		if err = q.Reduce(b); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (qg *Group) AddExactKennung(
 	b *Builder,
 	k *kennung.Kennung2,
 ) (err error) {
 	q := b.makeQuery()
+	q.Sigil.Add(kennung.SigilSchwanzen)
 	q.Kennung[k.String()] = k
 	q.Gattung.Add(gattung.Must(k))
 
@@ -95,7 +119,7 @@ func (qg *QueryGroup) AddExactKennung(
 	return
 }
 
-func (qg *QueryGroup) Add(q *Query) (err error) {
+func (qg *Group) Add(q *Query) (err error) {
 	existing, ok := qg.UserQueries[q.Gattung]
 
 	if !ok {
@@ -115,17 +139,16 @@ func (qg *QueryGroup) Add(q *Query) (err error) {
 
 	qg.UserQueries[q.Gattung] = existing
 
-	if err = qg.addOptimized(q); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	return
 }
 
-func (qg *QueryGroup) addOptimized(q *Query) (err error) {
+func (qg *Group) addOptimized(b *Builder, q *QueryWithHidden) (err error) {
 	q = q.Clone()
 	gs := q.Slice()
+
+	if len(gs) == 0 {
+		gs = b.defaultGattungen.Slice()
+	}
 
 	for _, g := range gs {
 		existing, ok := qg.OptimizedQueries[g]
@@ -140,7 +163,7 @@ func (qg *QueryGroup) addOptimized(q *Query) (err error) {
 			}
 		}
 
-		if err = existing.Merge(q); err != nil {
+		if err = existing.Merge(&q.Query); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -151,15 +174,15 @@ func (qg *QueryGroup) addOptimized(q *Query) (err error) {
 	return
 }
 
-func (q *QueryGroup) Each(_ schnittstellen.FuncIter[Matcher]) (err error) {
+func (q *Group) Each(_ schnittstellen.FuncIter[Matcher]) (err error) {
 	return
 }
 
-func (q *QueryGroup) MatcherLen() int {
+func (q *Group) MatcherLen() int {
 	return 0
 }
 
-func (qg *QueryGroup) SortedUserQueries() []*QueryWithHidden {
+func (qg *Group) SortedUserQueries() []*QueryWithHidden {
 	out := make([]*QueryWithHidden, 0, len(qg.UserQueries))
 
 	for _, g := range qg.UserQueries {
@@ -183,7 +206,7 @@ func (qg *QueryGroup) SortedUserQueries() []*QueryWithHidden {
 	return out
 }
 
-func (qg *QueryGroup) StringDebug() string {
+func (qg *Group) StringDebug() string {
 	var sb strings.Builder
 
 	first := true
@@ -198,10 +221,29 @@ func (qg *QueryGroup) StringDebug() string {
 		first = false
 	}
 
+	sb.WriteString(" | ")
+	first = true
+
+	for _, g := range gattung.TrueGattung() {
+		q, ok := qg.OptimizedQueries[g]
+
+		if !ok {
+			continue
+		}
+
+		if !first {
+			sb.WriteRune(' ')
+		}
+
+		sb.WriteString(q.String())
+
+		first = false
+	}
+
 	return sb.String()
 }
 
-func (qg *QueryGroup) StringOptimized() string {
+func (qg *Group) StringOptimized() string {
 	var sb strings.Builder
 
 	first := true
@@ -220,12 +262,18 @@ func (qg *QueryGroup) StringOptimized() string {
 	// 	},
 	// )
 
-	for _, g := range qg.OptimizedQueries {
+	for _, g := range gattung.TrueGattung() {
+		q, ok := qg.OptimizedQueries[g]
+
+		if !ok {
+			continue
+		}
+
 		if !first {
 			sb.WriteRune(' ')
 		}
 
-		sb.WriteString(g.String())
+		sb.WriteString(q.String())
 
 		first = false
 	}
@@ -233,7 +281,7 @@ func (qg *QueryGroup) StringOptimized() string {
 	return sb.String()
 }
 
-func (qg *QueryGroup) String() string {
+func (qg *Group) String() string {
 	var sb strings.Builder
 
 	first := true
@@ -253,11 +301,18 @@ func (qg *QueryGroup) String() string {
 	// )
 
 	for _, g := range qg.SortedUserQueries() {
+		// TODO determine why GS can be ""
+		gs := g.String()
+
+		if gs == "" {
+			continue
+		}
+
 		if !first {
 			sb.WriteRune(' ')
 		}
 
-		sb.WriteString(g.String())
+		sb.WriteString(gs)
 
 		first = false
 	}
@@ -265,27 +320,27 @@ func (qg *QueryGroup) String() string {
 	return sb.String()
 }
 
-func (qg *QueryGroup) ContainsMatchable(sk *sku.Transacted) bool {
-	log.Log().Print(qg, sk)
+func (qg *Group) ContainsMatchable(sk *sku.Transacted) bool {
+	log.Log().Printf("%s in %s", sk, qg)
 	g := sk.GetGattung()
 
-	switch g {
-	case gattung.Zettel:
-		if qg.Zettelen.ContainsKey(sk.Kennung.String()) {
-			return true
-		}
+	// switch g {
+	// case gattung.Zettel:
+	// 	if qg.Zettelen.ContainsKey(sk.Kennung.String()) {
+	// 		return true
+	// 	}
 
-	case gattung.Etikett:
-		if qg.Etiketten.ContainsKey(sk.Kennung.String()) {
-			return true
-		}
+	// case gattung.Etikett:
+	// 	if qg.Etiketten.ContainsKey(sk.Kennung.String()) {
+	// 		return true
+	// 	}
 
-	case gattung.Typ:
-		if qg.Typen.ContainsKey(sk.Kennung.String()) {
-			return true
-		}
-		// TODO other gattung
-	}
+	// case gattung.Typ:
+	// 	if qg.Typen.ContainsKey(sk.Kennung.String()) {
+	// 		return true
+	// 	}
+	// 	// TODO other gattung
+	// }
 
 	q, ok := qg.OptimizedQueries[gattung.Must(g)]
 

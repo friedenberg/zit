@@ -62,6 +62,10 @@ func (c *Organize) DefaultGattungen() kennung.Gattung {
 	)
 }
 
+func (c *Organize) DefaultSigil() kennung.Sigil {
+	return kennung.SigilSchwanzen
+}
+
 func (c *Organize) CompletionGattung() kennung.Gattung {
 	return kennung.MakeGattung(
 		gattung.Zettel,
@@ -72,7 +76,7 @@ func (c *Organize) CompletionGattung() kennung.Gattung {
 
 func (c *Organize) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms *query.QueryGroup,
+	ms *query.Group,
 ) (err error) {
 	u.ApplyToOrganizeOptions(&c.Options)
 
@@ -278,7 +282,7 @@ func (c Organize) readFromVim(
 	u *umwelt.Umwelt,
 	f string,
 	results *organize_text.Text,
-	q *query.QueryGroup,
+	q *query.Group,
 ) (ot *organize_text.Text, err error) {
 	openVimOp := user_ops.OpenVim{
 		Options: vim_cli_options_builder.New().

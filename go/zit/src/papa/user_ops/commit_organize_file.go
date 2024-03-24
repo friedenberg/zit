@@ -96,7 +96,7 @@ func (op CommitOrganizeFile) run(
 		kennung.MakeGattung(gattung.TrueGattung()...),
 	)
 
-	var ids *query.QueryGroup
+	var ids *query.Group
 
 	errors.TodoP1("create query without syntax")
 	if ids, err = builder.BuildQueryGroup(":z,e,t"); err != nil {

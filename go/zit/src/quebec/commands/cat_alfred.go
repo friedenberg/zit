@@ -45,7 +45,7 @@ func (c CatAlfred) DefaultGattungen() kennung.Gattung {
 
 func (c CatAlfred) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms *query.QueryGroup,
+	ms *query.Group,
 ) (err error) {
 	// this command does its own error handling
 	wo := bufio.NewWriter(u.Out())

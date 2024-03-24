@@ -35,12 +35,10 @@ build/go_vet: $(files_go)
 > go vet ./... || true
 > touch "$@"
 
-dirs_go_unit := $(shell find src -mindepth 2 -iname '*_test.go' -print0 | sort -u)
+dirs_go_unit := $(shell find src -mindepth 2 -iname '*_test.go' | sort -u)
 
-cmd_test_unit_runner := $(HOME)/.vim/ftplugin/go-test.bash
-
-build/tests_unit: $(files_go) build/go_generate $(cmd_test_unit_runner)
-> @$(cmd_test_unit_runner) $(dirs_go_unit)
+build/tests_unit: $(files_go) build/go_generate
+> go test -v ./...
 > touch "$@"
 
 build/tests_fast: build/go_vet build/tests_unit
@@ -48,7 +46,7 @@ build/tests_fast: build/go_vet build/tests_unit
 
 files_tests_bats := $(shell find zz-tests_bats -type f)
 
-build/tests_bats: build/zit $(files_tests_bats)
+build/tests_bats: build/zit $(files_tests_bats) build/tests_gen_fixture
 > $(cmd_bats) zz-tests_bats/*.bats
 > touch "$@"
 
@@ -62,21 +60,15 @@ build/tests_slow: build/tests_fast build/tests_bats
 > touch "$@"
 
 files_tests_bats_migration := $(shell find zz-tests_bats/migration)
-files_tests_bats_migration_previous := $(shell find zz-tests_bats/migration/previous/ -mindepth 2 -type f)
-
-# TODO-P2 split in to version-specific
-build/tests_bats_migration_previous: build/zit $(files_tests_bats_migration_previous)
-# > $(cmd_bats) zz-tests_bats/migration/previous/*/*.bats
-> touch "$@"
 
 build/tests_bats_migration: build/zit $(files_tests_bats_migration)
 > $(cmd_bats) zz-tests_bats/migration/*.bats
 > touch "$@"
 
-build/tests_slower: build/tests_fast build/tests_slow build/tests_bats_migration build/tests_gen_fixture
+build/tests_slower: build/tests_fast build/tests_slow build/tests_bats_migration
 > touch "$@"
 
-build/tests_slowest: build/tests_fast build/tests_slow build/tests_bats_migration build/tests_bats_migration_previous build/tests_gen_fixture
+build/tests_slowest: build/tests_fast build/tests_slow build/tests_bats_migration
 > touch "$@"
 
 build/deploy: build/tests_slowest;

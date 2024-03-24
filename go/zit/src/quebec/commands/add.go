@@ -82,7 +82,7 @@ func (c Add) DefaultGattungen() kennung.Gattung {
 
 func (c Add) RunWithCwdQuery(
 	u *umwelt.Umwelt,
-	ms *query.QueryGroup,
+	qg *query.Group,
 	pz *cwd.CwdFiles,
 ) (err error) {
 	zettelsFromAkteOp := user_ops.ZettelFromExternalAkte{
@@ -95,12 +95,17 @@ func (c Add) RunWithCwdQuery(
 
 	var zettelsFromAkteResults sku.TransactedMutableSet
 
-	if zettelsFromAkteResults, err = zettelsFromAkteOp.Run(ms); err != nil {
+	if zettelsFromAkteResults, err = zettelsFromAkteOp.Run(qg); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = c.openAktenIfNecessary(u, zettelsFromAkteResults, pz); err != nil {
+	if err = c.openAktenIfNecessary(
+		u,
+		qg,
+		zettelsFromAkteResults,
+		pz,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -124,7 +129,7 @@ func (c Add) RunWithCwdQuery(
 		Umwelt: u,
 		Options: otFlags.GetOptions(
 			u.Konfig().PrintOptions,
-			ms,
+			qg,
 			u.SkuFormatOldOrganize(),
 			u.SkuFmtNewOrganize(),
 		),
@@ -172,7 +177,7 @@ func (c Add) RunWithCwdQuery(
 		Umwelt: u,
 	}
 
-	if ot2, err = readOrganizeTextOp.RunWithFile(f.Name(), ms); err != nil {
+	if ot2, err = readOrganizeTextOp.RunWithFile(f.Name(), qg); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -203,6 +208,7 @@ func (c Add) RunWithCwdQuery(
 
 func (c Add) openAktenIfNecessary(
 	u *umwelt.Umwelt,
+	qg *query.Group,
 	zettels sku.TransactedMutableSet,
 	cwd *cwd.CwdFiles,
 ) (err error) {
@@ -226,7 +232,7 @@ func (c Add) openAktenIfNecessary(
 
 	if checkoutResults, err = u.StoreObjekten().Checkout(
 		options,
-		u.StoreObjekten().MakeReadAllSchwanzen(gattung.Zettel),
+		u.StoreObjekten().MakeReadAllSchwanzen(qg, gattung.Zettel),
 		func(z *sku.Transacted) (err error) {
 			if !hs.ContainsKey(z.GetKennung().String()) {
 				return iter.MakeErrStopIteration()

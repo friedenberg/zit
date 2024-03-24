@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/files"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
@@ -38,8 +37,6 @@ type CwdFiles struct {
 }
 
 func (fs *CwdFiles) MarkUnsureAkten(f *fd.FD) (err error) {
-	log.Debug().Print(f)
-
 	if f, err = fd.MakeFileFromFD(f, fs.akteWriterFactory); err != nil {
 		err = errors.Wrapf(err, "%q", f)
 		return

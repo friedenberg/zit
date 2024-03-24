@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/sha"
 	"code.linenisgreat.com/zit/src/delta/checked_out_state"
@@ -54,7 +53,7 @@ func (c Clean) DefaultGattungen() kennung.Gattung {
 
 func (c Clean) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms *query.QueryGroup,
+	qg *query.Group,
 ) (err error) {
 	fds := fd.MakeMutableSet()
 	l := &sync.Mutex{}
@@ -64,31 +63,28 @@ func (c Clean) RunWithQuery(
 	}
 
 	if err = u.StoreObjekten().ReadFiles(
-		query.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().QueryWithoutCwd),
-		iter.MakeChain(
-			query.MakeFilterFromQuery(ms),
-			func(co *sku.CheckedOut) (err error) {
-				if co.State != checked_out_state.StateExistsAndSame && !c.force {
-					return
-				}
-
-				e := co.External
-
-				l.Lock()
-				defer l.Unlock()
-
-				fds.Add(e.GetObjekteFD())
-				fds.Add(e.GetAkteFD())
-
+		qg,
+		func(co *sku.CheckedOut) (err error) {
+			if co.State != checked_out_state.StateExistsAndSame && !c.force {
 				return
-			},
-		),
+			}
+
+			e := co.External
+
+			l.Lock()
+			defer l.Unlock()
+
+			fds.Add(e.GetObjekteFD())
+			fds.Add(e.GetAkteFD())
+
+			return
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = c.markUnsureAktenForRemovalIfNecessary(u, ms, fds.Add); err != nil {
+	if err = c.markUnsureAktenForRemovalIfNecessary(u, qg, fds.Add); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -107,14 +103,14 @@ func (c Clean) RunWithQuery(
 
 func (c Clean) markUnsureAktenForRemovalIfNecessary(
 	u *umwelt.Umwelt,
-	q *query.QueryGroup,
+	qg *query.Group,
 	add schnittstellen.FuncIter[*fd.FD],
 ) (err error) {
 	if !c.includeRecognized {
 		return
 	}
 
-	if err = q.GetExplicitCwdFDs().Each(
+	if err = qg.GetExplicitCwdFDs().Each(
 		u.StoreUtil().GetCwdFiles().MarkUnsureAkten,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -125,6 +121,7 @@ func (c Clean) markUnsureAktenForRemovalIfNecessary(
 	var l sync.Mutex
 
 	if err = u.StoreObjekten().ReadAllMatchingAkten(
+		qg,
 		u.StoreUtil().GetCwdFiles().UnsureAkten,
 		func(fd *fd.FD, z *sku.Transacted) (err error) {
 			if z == nil {

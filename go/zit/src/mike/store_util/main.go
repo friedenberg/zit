@@ -40,8 +40,6 @@ type StoreUtil interface {
 
 	SetCheckedOutLogWriter(zelw schnittstellen.FuncIter[*sku.CheckedOut])
 
-	ReadOneExternalFS(*sku.Transacted) (*sku.CheckedOut, error)
-
 	CheckoutQuery(
 		options checkout_options.Options,
 		fq query.FuncReaderTransactedLikePtr,
@@ -54,10 +52,7 @@ type StoreUtil interface {
 		ztw schnittstellen.FuncIter[*sku.Transacted],
 	) (zcs sku.CheckedOutMutableSet, err error)
 
-	ReadFiles(
-		fq query.FuncReaderTransactedLikePtr,
-		f schnittstellen.FuncIter[*sku.CheckedOut],
-	) (err error)
+	FileReader
 
 	CheckoutOne(
 		options checkout_options.Options,
@@ -171,6 +166,10 @@ func MakeStoreUtil(
 	}
 
 	return
+}
+
+func (s *common) GetStoreUtil() StoreUtil {
+	return s
 }
 
 func (s *common) SetCheckedOutLogWriter(

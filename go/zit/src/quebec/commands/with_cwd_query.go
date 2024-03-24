@@ -14,7 +14,7 @@ import (
 type CommandWithCwdQuery interface {
 	RunWithCwdQuery(
 		store *umwelt.Umwelt,
-		ms *query.QueryGroup,
+		ms *query.Group,
 		cwdFiles *cwd.CwdFiles,
 	) error
 	DefaultGattungen() kennung.Gattung
@@ -38,7 +38,17 @@ func (c commandWithCwdQuery) Complete(
 	w := sku_fmt.MakeWriterComplete(os.Stdout)
 	defer errors.DeferredCloser(&err, w)
 
+	b := u.MakeMetaIdSetWithExcludedHidden(cgg.CompletionGattung())
+
+	var qg *query.Group
+
+	if qg, err = b.BuildQueryGroup(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = u.StoreObjekten().ReadAllSchwanzen(
+		qg,
 		cgg.CompletionGattung(),
 		w.WriteOne,
 	); err != nil {
@@ -54,7 +64,7 @@ func (c commandWithCwdQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		c.DefaultGattungen(),
 	)
 
-	var ids *query.QueryGroup
+	var ids *query.Group
 
 	if ids, err = builder.BuildQueryGroup(args...); err != nil {
 		err = errors.Wrap(err)

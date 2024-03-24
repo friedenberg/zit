@@ -35,7 +35,7 @@ func (pw *tomlPageWriter) Flush() (err error) {
 	defer pw.addedSchwanz.Reset()
 
 	pw.kennungShaMap = make(KennungShaMap)
-	pw.Binary = sku_fmt.Binary{Sigil: kennung.SigilHistory}
+	pw.Binary = sku_fmt.MakeBinary(kennung.SigilHistory)
 
 	path := pw.Path()
 

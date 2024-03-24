@@ -1,6 +1,7 @@
 package query
 
 import (
+	"fmt"
 	"strings"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
@@ -69,7 +70,7 @@ func (e *Exp) Reduce(b *Builder) (err error) {
 				continue
 			}
 
-			if mt.Or == e.Or && mt.Negated == e.Negated {
+			if mt.Or == e.Or && mt.Negated == e.Negated && mt.Exact == e.Exact {
 				chillen = append(chillen, mt.Children...)
 				continue
 			}
@@ -91,8 +92,7 @@ func (e *Exp) Reduce(b *Builder) (err error) {
 
 func (e *Exp) Add(m Matcher) (err error) {
 	switch mt := m.(type) {
-	// case *Exp:
-	// 	e.Children = append(e.Children, m)
+	case *Exp:
 
 	case *Kennung:
 		mt.Exact = e.Exact
@@ -125,6 +125,7 @@ func (e *Exp) StringDebug() string {
 	}
 
 	sb.WriteRune(zittish.OpGroupOpen)
+	fmt.Fprintf(&sb, "(%d)", len(e.Children))
 
 	for i, m := range e.Children {
 		if i > 0 {
@@ -185,7 +186,6 @@ func (e *Exp) String() string {
 
 func (m *Exp) negateIfNecessary(v bool) bool {
 	if m.Negated {
-		log.Log().Caller(1, "negating: %t -> %t", v, !v)
 		return !v
 	} else {
 		return v
@@ -193,10 +193,9 @@ func (m *Exp) negateIfNecessary(v bool) bool {
 }
 
 func (e *Exp) ContainsMatchable(sk *sku.Transacted) bool {
-	log.Log().Print(e, sk)
+  log.Log().Printf("%s in %s", sk, e)
 
 	if len(e.Children) == 0 {
-		log.Log().Print(e, sk, e.MatchOnEmpty)
 		return e.negateIfNecessary(e.MatchOnEmpty)
 	}
 
@@ -208,8 +207,6 @@ func (e *Exp) ContainsMatchable(sk *sku.Transacted) bool {
 }
 
 func (e *Exp) containsMatchableAnd(sk *sku.Transacted) bool {
-	log.Log().Print(e, sk)
-
 	for _, m := range e.Children {
 		if !m.ContainsMatchable(sk) {
 			return e.negateIfNecessary(false)
@@ -220,8 +217,6 @@ func (e *Exp) containsMatchableAnd(sk *sku.Transacted) bool {
 }
 
 func (e *Exp) containsMatchableOr(sk *sku.Transacted) bool {
-	log.Log().Print(e, sk)
-
 	for _, m := range e.Children {
 		if m.ContainsMatchable(sk) {
 			return e.negateIfNecessary(true)

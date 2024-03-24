@@ -37,7 +37,7 @@ func (c Checkout) DefaultGattungen() kennung.Gattung {
 
 func (c Checkout) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms *query.QueryGroup,
+	ms *query.Group,
 ) (err error) {
 	if err = u.StoreObjekten().CheckoutQuery(
 		c.CheckoutOptions,

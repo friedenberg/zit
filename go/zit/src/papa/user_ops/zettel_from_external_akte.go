@@ -29,7 +29,7 @@ type ZettelFromExternalAkte struct {
 }
 
 func (c ZettelFromExternalAkte) Run(
-	ms *query.QueryGroup,
+	qg *query.Group,
 ) (results sku.TransactedMutableSet, err error) {
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
@@ -45,7 +45,7 @@ func (c ZettelFromExternalAkte) Run(
 
 	fds := fd.MakeMutableSetSha()
 
-	for _, fd := range iter.SortedValues[*fd.FD](ms.GetCwdFDs()) {
+	for _, fd := range iter.SortedValues[*fd.FD](qg.GetCwdFDs()) {
 		if err = c.processOneFD(fd, fds.Add); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -86,6 +86,7 @@ func (c ZettelFromExternalAkte) Run(
 		matcher := objekte_collections.MakeMutableMatchSet(toCreate)
 
 		if err = c.StoreObjekten().ReadAll(
+			qg,
 			kennung.MakeGattung(gattung.Zettel),
 			iter.MakeChain(
 				matcher.Match,

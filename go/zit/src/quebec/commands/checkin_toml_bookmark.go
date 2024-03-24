@@ -144,7 +144,7 @@ func (c CheckinTomlBookmark) getUrls(
 	q := "!toml-bookmark?z"
 
 	builder := u.MakeMetaIdSetWithExcludedHidden(c.DefaultGattungen())
-	var ids *query.QueryGroup
+	var ids *query.Group
 
 	if ids, err = builder.BuildQueryGroup(q); err != nil {
 		err = errors.Wrap(err)

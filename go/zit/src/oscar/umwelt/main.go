@@ -232,7 +232,7 @@ func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
 		dg = kennung.MakeGattung(gattung.Zettel)
 	}
 
-	return query.MakeBuilder().
+	return query.MakeBuilder(u.Standort()).
 		WithDefaultGattungen(dg).
 		WithCwd(u.StoreUtil().GetCwdFiles()).
 		WithFileExtensionGetter(u.Konfig().FileExtensions).
@@ -247,7 +247,7 @@ func (u *Umwelt) MakeMetaIdSetWithoutExcludedHidden(
 		dg = kennung.MakeGattung(gattung.Zettel)
 	}
 
-	return query.MakeBuilder().
+	return query.MakeBuilder(u.Standort()).
 		WithDefaultGattungen(dg).
 		WithCwd(u.StoreUtil().GetCwdFiles()).
 		WithFileExtensionGetter(u.Konfig().FileExtensions).

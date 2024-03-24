@@ -64,6 +64,10 @@ func (a Sigil) Equals(b Sigil) bool {
 	return a == b
 }
 
+func (a *Sigil) IsEmpty() bool {
+	return *a == SigilUnknown
+}
+
 func (a *Sigil) Reset() {
 	*a = SigilSchwanzen
 }
@@ -85,6 +89,10 @@ func (a Sigil) Contains(b Sigil) bool {
 }
 
 func (a Sigil) GetSigil() schnittstellen.Sigil {
+	return a
+}
+
+func (a *Sigil) GetSigilPtr() *Sigil {
 	return a
 }
 
@@ -111,7 +119,7 @@ func (a Sigil) IncludesHidden() bool {
 func (a Sigil) String() string {
 	sb := strings.Builder{}
 
-	for s := SigilHistory; s <= SigilMax; s++ {
+	for s := SigilSchwanzen; s <= SigilMax; s++ {
 		if a.Contains(s) {
 			r, ok := mapSigilToRune[s]
 
@@ -121,10 +129,6 @@ func (a Sigil) String() string {
 
 			sb.WriteRune(r)
 		}
-	}
-
-	if sb.Len() == 0 {
-		sb.WriteRune(mapSigilToRune[SigilSchwanzen])
 	}
 
 	return sb.String()

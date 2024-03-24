@@ -1,21 +1,27 @@
 package query
 
 import (
+	"strings"
+
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/delta/standort"
 	"code.linenisgreat.com/zit/src/delta/zittish"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
-func MakeBuilder() *Builder {
-	return &Builder{}
+func MakeBuilder(s standort.Standort) *Builder {
+	return &Builder{
+		standort: s,
+	}
 }
 
 type Builder struct {
+	standort                standort.Standort
 	preexistingKennung      []*kennung.Kennung2
 	implicitEtikettenGetter ImplicitEtikettenGetter
 	cwd                     Cwd
@@ -23,6 +29,7 @@ type Builder struct {
 	expanders               kennung.Abbr
 	hidden                  Matcher
 	defaultGattungen        kennung.Gattung
+	defaultSigil            kennung.Sigil
 	doNotMatchEmpty         bool
 	debug                   bool
 }
@@ -60,6 +67,13 @@ func (mb *Builder) WithDefaultGattungen(
 	return mb
 }
 
+func (mb *Builder) WithDefaultSigil(
+	defaultSigil kennung.Sigil,
+) *Builder {
+	mb.defaultSigil = defaultSigil
+	return mb
+}
+
 func (mb *Builder) WithHidden(
 	hidden Matcher,
 ) *Builder {
@@ -72,6 +86,22 @@ func (mb *Builder) WithImplicitEtikettenGetter(
 ) *Builder {
 	mb.implicitEtikettenGetter = ieg
 	return mb
+}
+
+func (b *Builder) WithTransacted(
+	zts sku.TransactedSet,
+) *Builder {
+	errors.PanicIfError(zts.Each(
+		func(t *sku.Transacted) (err error) {
+			k := kennung.GetKennungPool().Get()
+			k.ResetWith(&t.Kennung)
+			b.preexistingKennung = append(b.preexistingKennung, k)
+
+			return
+		},
+	))
+
+	return b
 }
 
 func (b *Builder) WithCheckedOut(
@@ -90,17 +120,19 @@ func (b *Builder) WithCheckedOut(
 	return b
 }
 
-func (b *Builder) BuildQueryGroup(vs ...string) (qg *QueryGroup, err error) {
+func (b *Builder) BuildQueryGroup(vs ...string) (qg *Group, err error) {
 	if qg, err = b.build(vs...); err != nil {
 		err = errors.Wrapf(err, "Query: %q", vs)
 		return
 	}
 
+	log.Log().Print(qg.StringDebug())
+
 	return
 }
 
-func (b *Builder) build(vs ...string) (qg *QueryGroup, err error) {
-	qg = MakeQueryGroup(b)
+func (b *Builder) build(vs ...string) (qg *Group, err error) {
+	qg = MakeGroup(b)
 
 	var remaining []string
 
@@ -117,8 +149,6 @@ func (b *Builder) build(vs ...string) (qg *QueryGroup, err error) {
 			return
 		}
 	}
-
-	log.Log().Print(remaining)
 
 	var tokens []string
 
@@ -172,19 +202,18 @@ func (b *Builder) build(vs ...string) (qg *QueryGroup, err error) {
 		}
 	}
 
-	log.Log().Print(qg)
+	b.addDefaultsIfNecessary(qg)
 
-	for _, q := range qg.OptimizedQueries {
-		q.Reduce(b)
+	if err = qg.Reduce(b); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
-
-	log.Log().Print(qg)
 
 	return
 }
 
 func (b *Builder) buildManyFromTokens(
-	qg *QueryGroup,
+	qg *Group,
 	tokens ...string,
 ) (err error) {
 	if len(tokens) == 1 && tokens[0] == "." {
@@ -206,6 +235,37 @@ func (b *Builder) buildManyFromTokens(
 	return
 }
 
+func (b *Builder) addDefaultsIfNecessary(qg *Group) {
+	if b.defaultGattungen.IsEmpty() || !qg.IsEmpty() {
+		return
+	}
+
+	g := kennung.MakeGattung()
+	dq, ok := qg.UserQueries[g]
+
+	if ok {
+		delete(qg.UserQueries, g)
+	} else {
+		dq = &QueryWithHidden{
+			Query: Query{
+				Kennung: make(map[string]*kennung.Kennung2),
+			},
+		}
+	}
+
+	dq.Gattung = b.defaultGattungen
+
+	if b.defaultSigil.IsEmpty() {
+		dq.Sigil = kennung.SigilSchwanzen
+	} else {
+		dq.Sigil = b.defaultSigil
+	}
+
+	qg.UserQueries[b.defaultGattungen] = dq
+
+	return
+}
+
 func (b *Builder) makeQuery() *Query {
 	return &Query{
 		Kennung: make(map[string]*kennung.Kennung2),
@@ -222,7 +282,7 @@ func (b *Builder) makeExp(negated, exact bool, children ...Matcher) *Exp {
 }
 
 func (b *Builder) parseOneFromTokens(
-	qg *QueryGroup,
+	qg *Group,
 	tokens ...string,
 ) (remainingTokens []string, err error) {
 	type stackEl interface {
@@ -232,6 +292,7 @@ func (b *Builder) parseOneFromTokens(
 
 	q := b.makeQuery()
 	stack := []stackEl{q}
+
 	isNegated := false
 	isExact := false
 
@@ -296,16 +357,10 @@ LOOP:
 				return
 			}
 
-			if gattung.Must(k) != gattung.Zettel {
-				exp := b.makeExp(isNegated, isExact, &k)
-				stack[len(stack)-1].Add(exp)
-			}
-
-			isNegated = false
-			isExact = false
-
 			switch k.GetGattung() {
 			case gattung.Zettel:
+				b.preexistingKennung = append(b.preexistingKennung, k.Kennung2)
+				q.Gattung.Add(gattung.Zettel)
 				q.Kennung[k.String()] = k.Kennung2
 
 			case gattung.Etikett:
@@ -316,9 +371,24 @@ LOOP:
 					return
 				}
 
-				if err = qg.Etiketten.Add(e); err != nil {
-					err = errors.Wrap(err)
-					return
+				if e.IsVirtual() && strings.HasPrefix(e.String(), "%chrome") {
+					c := MakeChrome(b.standort)
+
+					if err = c.Init(); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+					exp := b.makeExp(isNegated, isExact, c)
+					stack[len(stack)-1].Add(exp)
+				} else {
+					if err = qg.Etiketten.Add(e); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+					exp := b.makeExp(isNegated, isExact, &k)
+					stack[len(stack)-1].Add(exp)
 				}
 
 			case gattung.Typ:
@@ -333,12 +403,26 @@ LOOP:
 					err = errors.Wrap(err)
 					return
 				}
+
+				exp := b.makeExp(isNegated, isExact, &k)
+				stack[len(stack)-1].Add(exp)
 			}
+
+			isNegated = false
+			isExact = false
 		}
 	}
 
 	if q.IsEmpty() {
+		return
+	}
+
+	if q.Gattung.IsEmpty() {
 		q.Gattung = b.defaultGattungen
+	}
+
+	if q.Sigil.IsEmpty() {
+		q.Sigil = b.defaultSigil
 	}
 
 	if err = qg.Add(q); err != nil {
@@ -373,6 +457,10 @@ LOOP:
 			if err = s.Set(el); err != nil {
 				err = errors.Wrap(err)
 				return
+			}
+
+			if op == '?' {
+				q.Sigil.Add(kennung.SigilSchwanzen)
 			}
 
 			q.Sigil.Add(s)

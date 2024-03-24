@@ -53,7 +53,7 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		c.CompletionGattung(),
 	)
 
-	var ids *query.QueryGroup
+	var ids *query.Group
 
 	if ids, err = builder.BuildQueryGroup(args...); err != nil {
 		err = errors.Wrap(err)

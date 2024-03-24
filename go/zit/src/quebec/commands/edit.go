@@ -66,7 +66,7 @@ func (c Edit) DefaultGattungen() kennung.Gattung {
 
 func (c Edit) RunWithCwdQuery(
 	u *umwelt.Umwelt,
-	ms *query.QueryGroup,
+	ms *query.Group,
 	pz *cwd.CwdFiles,
 ) (err error) {
 	options := checkout_options.Options{

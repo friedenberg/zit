@@ -34,7 +34,7 @@ func MakeStackInfos(depth, count int) (si []StackInfo) {
 	for {
 		frame, more := frames.Next()
 
-		si = append(si, makeStackInfoFromFrame(frame))
+		si = append(si, MakeStackInfoFromFrame(frame))
 
 		if !more {
 			break
@@ -44,7 +44,7 @@ func MakeStackInfos(depth, count int) (si []StackInfo) {
 	return
 }
 
-func makeStackInfoFromFrame(frame runtime.Frame) (si StackInfo) {
+func MakeStackInfoFromFrame(frame runtime.Frame) (si StackInfo) {
 	si.filename = filepath.Clean(frame.File)
 	si.line = frame.Line
 	si.function = frame.Function
@@ -55,9 +55,9 @@ func makeStackInfoFromFrame(frame runtime.Frame) (si StackInfo) {
 	return
 }
 
-func MakeStackInfo(d int) (si StackInfo, ok bool) {
+func MakeStackInfo(skip int) (si StackInfo, ok bool) {
 	var pc uintptr
-	pc, _, _, ok = runtime.Caller(d + 1)
+	pc, _, _, ok = runtime.Caller(skip + 1)
 
 	if !ok {
 		return
@@ -66,7 +66,7 @@ func MakeStackInfo(d int) (si StackInfo, ok bool) {
 	frames := runtime.CallersFrames([]uintptr{pc})
 
 	frame, _ := frames.Next()
-	si = makeStackInfoFromFrame(frame)
+	si = MakeStackInfoFromFrame(frame)
 
 	return
 }

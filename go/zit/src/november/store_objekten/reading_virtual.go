@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"sync"
+	"syscall"
 
 	"code.linenisgreat.com/chrest"
 	"code.linenisgreat.com/zit/src/alfa/errors"
@@ -73,7 +74,13 @@ func (vs *VirtualStore) initIfNecessary() (err error) {
 			}
 
 			if chromeTabsRaw, err = chrest.AskChrome(chrestConfig, req); err != nil {
-				err = errors.Wrap(err)
+				if errors.IsErrno(err, syscall.ECONNREFUSED) {
+					errors.Err().Print("chrest offline")
+					err = nil
+				} else {
+					err = errors.Wrap(err)
+				}
+
 				return
 			}
 

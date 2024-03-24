@@ -59,7 +59,7 @@ func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		kennung.MakeGattung(),
 	)
 
-	var ids *query.QueryGroup
+	var ids *query.Group
 
 	if ids, err = builder.BuildQueryGroup(args...); err != nil {
 		err = errors.Wrap(err)

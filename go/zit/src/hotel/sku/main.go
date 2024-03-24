@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
@@ -15,6 +16,27 @@ func init() {
 }
 
 type (
+	QueryBase interface {
+		ContainsMatchable(*Transacted) bool
+		schnittstellen.Stringer
+		Each(schnittstellen.FuncIter[QueryBase]) error
+	}
+
+	Query interface {
+		QueryBase
+		GetSigil() kennung.Sigil
+		GetKennungen() map[string]*kennung.Kennung2
+	}
+
+	MatchableAdder interface {
+		AddMatchable(*Transacted) error
+	}
+
+	MatcherGroup interface {
+		QueryBase
+		Get(gattung.Gattung) (Query, bool)
+	}
+
 	SkuLike interface {
 		schnittstellen.ValueLike
 		schnittstellen.GattungGetter

@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/files"
 	"code.linenisgreat.com/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -17,31 +16,31 @@ import (
 )
 
 func (s *Store) QueryWithoutCwd(
-	ms *query.QueryGroup,
+	ms *query.Group,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return s.query(ms, f, false)
 }
 
 func (s *Store) QueryWithCwd(
-	ms *query.QueryGroup,
+	ms *query.Group,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return s.query(ms, f, true)
 }
 
 func (s *Store) query(
-	ms *query.QueryGroup,
+	qg *query.Group,
 	f schnittstellen.FuncIter[*sku.Transacted],
 	includeCwd bool,
 ) (err error) {
-	gsWithoutHistory, gsWithHistory := query.SplitGattungenByHistory(ms)
+	gsWithoutHistory, gsWithHistory := query.SplitGattungenByHistory(qg)
 
 	wg := iter.MakeErrorWaitGroupParallel()
 
 	f1 := func(z *sku.Transacted) (err error) {
 		g := gattung.Must(z.GetGattung())
-		m, ok := ms.Get(g)
+		m, ok := qg.Get(g)
 
 		if !ok {
 			return
@@ -74,102 +73,17 @@ func (s *Store) query(
 
 	wg.Do(
 		func() error {
-			return s.ReadAllSchwanzen(gsWithoutHistory, f1)
+			return s.ReadAllSchwanzen(qg, gsWithoutHistory, f1)
 		},
 	)
 
 	wg.Do(
 		func() error {
-			return s.ReadAll(gsWithHistory, f1)
+			return s.ReadAll(qg, gsWithHistory, f1)
 		},
 	)
 
 	return wg.GetError()
-}
-
-func (s *Store) ReadOneInto(
-	k1 schnittstellen.StringerGattungGetter,
-	out *sku.Transacted,
-) (err error) {
-	var sk *sku.Transacted
-
-	switch k1.GetGattung() {
-	case gattung.Zettel:
-		var h kennung.Hinweis
-
-		if err = h.Set(k1.String()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if sk, err = s.ReadOneKennung(h); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case gattung.Typ:
-		var k kennung.Typ
-
-		if err = k.Set(k1.String()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		sk = s.StoreUtil.GetKonfig().GetApproximatedTyp(k).ActualOrNil()
-
-	case gattung.Etikett:
-		var e kennung.Etikett
-
-		if err = e.Set(k1.String()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		ok := false
-		sk, ok = s.StoreUtil.GetKonfig().GetEtikett(e)
-
-		if !ok {
-			sk = nil
-		}
-
-	case gattung.Kasten:
-		var k kennung.Kasten
-
-		if err = k.Set(k.String()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		sk = s.StoreUtil.GetKonfig().GetKasten(k)
-
-	case gattung.Konfig:
-		sk = &s.StoreUtil.GetKonfig().Sku
-
-		if sk.GetTai().IsEmpty() {
-			sk = nil
-		}
-
-	default:
-		err = errors.Errorf("unsupported gattung: %q -> %q", k1.GetGattung(), k1)
-		return
-	}
-
-	if sk == nil {
-		err = collections.MakeErrNotFound(k1)
-		return
-	}
-
-	if err = out.SetFromSkuLike(sk); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.virtualStore.HydrateOneChrome(sk); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }
 
 func (s *Store) ReadOne(
@@ -186,18 +100,21 @@ func (s *Store) ReadOne(
 }
 
 func (s *Store) MakeReadAllSchwanzen(
+	qg *query.Group,
 	gs ...gattung.Gattung,
 ) func(schnittstellen.FuncIter[*sku.Transacted]) error {
 	return func(f schnittstellen.FuncIter[*sku.Transacted]) (err error) {
-		return s.ReadAllSchwanzen(kennung.MakeGattung(gs...), f)
+		return s.ReadAllSchwanzen(qg, kennung.MakeGattung(gs...), f)
 	}
 }
 
 func (s *Store) ReadAllSchwanzen(
+	qg *query.Group,
 	gs kennung.Gattung,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return s.GetVerzeichnisse().ReadSchwanzen(
+		qg,
 		iter.MakeChain(
 			func(sk *sku.Transacted) (err error) {
 				if !gs.Contains(gattung.Must(sk.Kennung.GetGattung())) {
@@ -207,20 +124,21 @@ func (s *Store) ReadAllSchwanzen(
 
 				return
 			},
-			s.virtualStore.HydrateOneChrome,
 			f,
 		),
 	)
 }
 
 func (s *Store) ReadAll(
+	qg *query.Group,
 	gs kennung.Gattung,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	return s.ReadAllGattungenFromVerzeichnisse(gs, f)
+	return s.ReadAllGattungenFromVerzeichnisse(qg, gs, f)
 }
 
 func (s Store) ReadAllMatchingAkten(
+	qg *query.Group,
 	akten fd.Set,
 	f func(*fd.FD, *sku.Transacted) error,
 ) (err error) {
@@ -263,6 +181,7 @@ func (s Store) ReadAllMatchingAkten(
 	var l sync.Mutex
 
 	if err = s.ReadAll(
+		qg,
 		kennung.MakeGattung(gattung.TrueGattung()...),
 		func(z *sku.Transacted) (err error) {
 			fd, ok := fds.Get(z.GetAkteSha().String())

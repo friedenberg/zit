@@ -95,7 +95,7 @@ func (pt *TomlPageTuple) CopyJustHistoryFrom(
 	s kennung.Sigil,
 	w schnittstellen.FuncIter[sku_fmt.Sku],
 ) (err error) {
-	dec := sku_fmt.Binary{Sigil: s}
+	dec := sku_fmt.MakeBinary(s)
 
 	var sk sku_fmt.Sku
 
@@ -165,7 +165,7 @@ func (pt *TomlPageTuple) copyHistoryAndMaybeSchwanz(
 		return
 	}
 
-	dec := sku_fmt.Binary{Sigil: s}
+	dec := sku_fmt.MakeBinary(s)
 
 	errors.TodoP3("determine performance of this")
 	added := pt.added.Copy()

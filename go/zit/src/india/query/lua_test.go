@@ -3,16 +3,15 @@ package query
 import (
 	"testing"
 
-	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
-func TestMatcherLuaFalse(t1 *testing.T) {
+func TestLuaFalse(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	m, err := MakeMatcherLua(
+	m, err := MakeLua(
 		kennung.Index{},
 		`function contains_matchable(sku) return false end`,
 	)
@@ -23,7 +22,7 @@ func TestMatcherLuaFalse(t1 *testing.T) {
 	sk := &sku.Transacted{}
 
 	if err = sk.Kennung.SetWithKennung(&kennung.Etikett{}); err != nil {
-		err = errors.Wrap(err)
+		t.Fatal(err)
 		return
 	}
 
@@ -35,7 +34,7 @@ func TestMatcherLuaFalse(t1 *testing.T) {
 func TestMatcherLuaTrue(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	m, err := MakeMatcherLua(
+	m, err := MakeLua(
 		kennung.Index{},
 		`function contains_matchable(sku) return true end`,
 	)
@@ -46,8 +45,7 @@ func TestMatcherLuaTrue(t1 *testing.T) {
 	sk := &sku.Transacted{}
 
 	if err = sk.Kennung.SetWithKennung(&kennung.Etikett{}); err != nil {
-		err = errors.Wrap(err)
-		return
+    t.Fatal(err)
 	}
 
 	if !m.ContainsMatchable(sk) {

@@ -14,6 +14,10 @@ import (
 
 type Gattung byte
 
+func MakeGattungAll() Gattung {
+	return MakeGattung(gattung.TrueGattung()...)
+}
+
 func MakeGattung(vs ...gattung.Gattung) (s Gattung) {
 	s.Add(vs...)
 	return

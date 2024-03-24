@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/charlie/string_format_writer"
 	"code.linenisgreat.com/zit/src/echo/bezeichnung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -79,7 +80,13 @@ func (f *cli) WriteStringFormat(
 		var bracketPrefix string
 
 		if f.options.PrintTime {
-			bracketPrefix = o.GetTai().Format(string_format_writer.StringFormatDateTime)
+			t := o.GetTai()
+
+			if t.IsZero() {
+        log.Err().Printf("empty tai: %s", o.GetKennung())
+			} else {
+				bracketPrefix = t.Format(string_format_writer.StringFormatDateTime)
+			}
 		}
 
 		if bracketPrefix != "" {

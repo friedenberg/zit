@@ -72,6 +72,7 @@ func (c CreateFromPaths) Run(
 		matcher := objekte_collections.MakeMutableMatchSet(toCreate)
 
 		if err = c.StoreObjekten().ReadAll(
+			nil, // TODO determine what query to pass in
 			kennung.MakeGattung(gattung.Zettel),
 			iter.MakeChain(
 				matcher.Match,

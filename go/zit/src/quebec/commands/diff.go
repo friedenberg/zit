@@ -43,7 +43,7 @@ func (c Diff) DefaultGattungen() kennung.Gattung {
 
 func (c Diff) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms *query.QueryGroup,
+	qg *query.Group,
 ) (err error) {
 	fInline := metadatei.MakeTextFormatterMetadateiInlineAkte(
 		u.Standort(),
@@ -56,111 +56,108 @@ func (c Diff) RunWithQuery(
 	)
 
 	if err = u.StoreObjekten().ReadFiles(
-		query.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().QueryWithoutCwd),
-		iter.MakeChain(
-			query.MakeFilterFromQuery(ms),
-			func(co *sku.CheckedOut) (err error) {
-				wg := iter.MakeErrorWaitGroupParallel()
+		qg,
+		func(co *sku.CheckedOut) (err error) {
+			wg := iter.MakeErrorWaitGroupParallel()
 
-				il := &co.Internal
-				el := &co.External
+			il := &co.Internal
+			el := &co.External
 
-				var mode checkout_mode.Mode
+			var mode checkout_mode.Mode
 
-				if mode, err = el.GetFDs().GetCheckoutModeOrError(); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+			if mode, err = el.GetFDs().GetCheckoutModeOrError(); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 
-				var rLeft, wLeft *os.File
+			var rLeft, wLeft *os.File
 
-				if rLeft, wLeft, err = os.Pipe(); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+			if rLeft, wLeft, err = os.Pipe(); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 
-				var rRight, wRight *os.File
+			var rRight, wRight *os.File
 
-				if rRight, wRight, err = os.Pipe(); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+			if rRight, wRight, err = os.Pipe(); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 
-				// sameTyp := il.GetTyp().Equals(el.GetTyp())
-				internalInline := u.Konfig().IsInlineTyp(il.GetTyp())
-				externalInline := u.Konfig().IsInlineTyp(el.GetTyp())
+			// sameTyp := il.GetTyp().Equals(el.GetTyp())
+			internalInline := u.Konfig().IsInlineTyp(il.GetTyp())
+			externalInline := u.Konfig().IsInlineTyp(el.GetTyp())
 
-				var externalFD *fd.FD
+			var externalFD *fd.FD
 
-				switch {
-				case mode.IncludesObjekte():
-					if internalInline && externalInline {
-						wg.Do(c.makeDo(wLeft, fInline, il))
-						wg.Do(c.makeDo(wRight, fInline, el))
-					} else {
-						wg.Do(c.makeDo(wLeft, fMetadatei, il))
-						wg.Do(c.makeDo(wRight, fMetadatei, el))
-					}
-
-					externalFD = el.GetObjekteFD()
-
-				case internalInline && externalInline:
-					wg.Do(c.makeDoAkte(wLeft, u.Standort(), il.GetAkteSha()))
-					wg.Do(c.makeDoFD(wRight, el.GetAkteFD()))
-					externalFD = el.GetAkteFD()
-
-				default:
+			switch {
+			case mode.IncludesObjekte():
+				if internalInline && externalInline {
+					wg.Do(c.makeDo(wLeft, fInline, il))
+					wg.Do(c.makeDo(wRight, fInline, el))
+				} else {
 					wg.Do(c.makeDo(wLeft, fMetadatei, il))
 					wg.Do(c.makeDo(wRight, fMetadatei, el))
-					externalFD = el.GetAkteFD()
 				}
 
-				internalLabel := fmt.Sprintf(
-					"%s:%s",
-					il.GetKennung(),
-					strings.ToLower(il.GetGattung().GetGattungString()),
-				)
+				externalFD = el.GetObjekteFD()
 
-				externalLabel := u.Standort().Rel(externalFD.GetPath())
+			case internalInline && externalInline:
+				wg.Do(c.makeDoAkte(wLeft, u.Standort(), il.GetAkteSha()))
+				wg.Do(c.makeDoFD(wRight, el.GetAkteFD()))
+				externalFD = el.GetAkteFD()
 
-				todo.Change("disambiguate internal and external, and objekte / akte")
-				cmd := exec.Command(
-					"diff",
-					"--color=always",
-					"-u",
-					"--label", internalLabel,
-					"--label", externalLabel,
-					"/dev/fd/3",
-					"/dev/fd/4",
-				)
+			default:
+				wg.Do(c.makeDo(wLeft, fMetadatei, il))
+				wg.Do(c.makeDo(wRight, fMetadatei, el))
+				externalFD = el.GetAkteFD()
+			}
 
-				cmd.ExtraFiles = []*os.File{rLeft, rRight}
-				cmd.Stdout = u.Out()
-				cmd.Stderr = u.Err()
+			internalLabel := fmt.Sprintf(
+				"%s:%s",
+				il.GetKennung(),
+				strings.ToLower(il.GetGattung().GetGattungString()),
+			)
 
-				wg.Do(
-					func() (err error) {
-						defer errors.DeferredCloser(&err, rLeft)
-						defer errors.DeferredCloser(&err, rRight)
+			externalLabel := u.Standort().Rel(externalFD.GetPath())
 
-						if err = cmd.Run(); err != nil {
-							if cmd.ProcessState.ExitCode() == 1 {
-								todo.Change("return non-zero exit code")
-								err = nil
-							} else {
-								err = errors.Wrap(err)
-							}
+			todo.Change("disambiguate internal and external, and objekte / akte")
+			cmd := exec.Command(
+				"diff",
+				"--color=always",
+				"-u",
+				"--label", internalLabel,
+				"--label", externalLabel,
+				"/dev/fd/3",
+				"/dev/fd/4",
+			)
 
-							return
+			cmd.ExtraFiles = []*os.File{rLeft, rRight}
+			cmd.Stdout = u.Out()
+			cmd.Stderr = u.Err()
+
+			wg.Do(
+				func() (err error) {
+					defer errors.DeferredCloser(&err, rLeft)
+					defer errors.DeferredCloser(&err, rRight)
+
+					if err = cmd.Run(); err != nil {
+						if cmd.ProcessState.ExitCode() == 1 {
+							todo.Change("return non-zero exit code")
+							err = nil
+						} else {
+							err = errors.Wrap(err)
 						}
 
 						return
-					},
-				)
+					}
 
-				return wg.GetError()
-			},
-		),
+					return
+				},
+			)
+
+			return wg.GetError()
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return

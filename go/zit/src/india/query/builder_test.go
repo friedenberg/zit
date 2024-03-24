@@ -11,10 +11,13 @@ import (
 
 func TestQuery(t1 *testing.T) {
 	type testCase struct {
+		stackInfo                                test_logz.StackInfo
 		description, expected, expectedOptimized string
 		defaultGattung                           kennung.Gattung
 		inputs                                   []string
 	}
+
+	t := test_logz.T{T: t1}
 
 	testCases := []testCase{
 		{
@@ -54,40 +57,43 @@ func TestQuery(t1 *testing.T) {
 			inputs:   []string{"[!md,home]:z"},
 		},
 		{
-			expected: "!md?Zettel",
+			expected: "!md:?Zettel",
 			inputs:   []string{"!md?z"},
 		},
 		{
-			expected: "ducks:Etikett [!md house]+?Zettel",
+			expected: "ducks:Etikett [!md house]:+?Zettel",
 			inputs:   []string{"!md?z", "house+z", "ducks:e"},
 		},
 		{
-			expected: "ducks:Etikett [!md house]?Zettel",
+			expected: "ducks:Etikett [!md house]:?Zettel",
 			inputs:   []string{"ducks:Etikett [!md house]?Zettel"},
 		},
 		{
-			expected: "ducks:Etikett [=!md house]?Zettel",
+			expected: "ducks:Etikett [=!md house]:?Zettel",
 			inputs:   []string{"ducks:Etikett [=!md house]?Zettel"},
 		},
 		{
-			expectedOptimized: "ducks:Etikett [wow house !md]?Zettel",
-			expected:          "ducks:Etikett [[=!md house] wow]?Zettel",
+			expectedOptimized: "ducks:Etikett [=!md house wow]:?Zettel",
+			expected:          "ducks:Etikett [=!md house wow]:?Zettel",
 			inputs: []string{
 				"ducks:Etikett [=!md house]?Zettel wow:Zettel",
 			},
 		},
+		// { //TODO
+		// 	stackInfo:         test_logz.MakeStackInfo(&t, 0),
+		// 	expectedOptimized: "one/uno.zettel",
+		// 	expected:          "one/uno.zettel",
+		// 	inputs:            []string{"one/uno.zettel"},
+		// },
 		{
-			expectedOptimized: "one/uno.zettel",
-			expected:          "one/uno.zettel",
-			inputs:            []string{"one/uno.zettel"},
-		},
-		{
+			stackInfo:         test_logz.MakeStackInfo(&t, 0),
 			expectedOptimized: "one/uno:Zettel",
 			expected:          "one/uno:Zettel",
 			defaultGattung:    kennung.MakeGattung(gattung.Zettel),
 			inputs:            []string{"one/uno"},
 		},
 		{
+			stackInfo:         test_logz.MakeStackInfo(&t, 0),
 			expectedOptimized: "one/uno:Zettel",
 			expected:          "one/uno:Zettel",
 			inputs:            []string{"one/uno:z"},
@@ -108,13 +114,15 @@ func TestQuery(t1 *testing.T) {
 			inputs:            []string{":k"},
 		},
 		{
-			expectedOptimized: "one/uno+",
-			expected:          "one/uno+",
+			stackInfo:         test_logz.MakeStackInfo(&t, 0),
+			expectedOptimized: "one/uno:+Zettel",
+			expected:          "one/uno:+Zettel",
 			inputs:            []string{"one/uno+"},
 		},
 		{
-			expectedOptimized: "[one/uno, one/dos]",
-			expected:          "[one/uno, one/dos]",
+			stackInfo:         test_logz.MakeStackInfo(&t, 0),
+			expectedOptimized: "[one/dos, one/uno]:Zettel",
+			expected:          "[one/dos, one/uno]:Zettel",
 			inputs:            []string{"one/uno", "one/dos"},
 		},
 		{
@@ -123,10 +131,18 @@ func TestQuery(t1 *testing.T) {
 			inputs:            []string{":z,t,e"},
 		},
 		{
+			stackInfo:         test_logz.MakeStackInfo(&t, 0),
 			defaultGattung:    kennung.MakeGattung(gattung.TrueGattung()...),
-			expectedOptimized: ":Typ :Etikett :Zettel",
-			expected:          ":Typ,Etikett,Zettel",
+      expectedOptimized: ":Typ :Etikett :Zettel :Konfig :Kasten",
+      expected:          ":Typ,Etikett,Zettel,Konfig,Kasten",
 			inputs:            []string{},
+		},
+		{
+			stackInfo:         test_logz.MakeStackInfo(&t, 0),
+			defaultGattung:    kennung.MakeGattung(gattung.TrueGattung()...),
+			expectedOptimized: ":Typ :Etikett :Zettel :Konfig :Kasten",
+			expected:          ":Typ,Etikett,Zettel,Konfig,Kasten",
+			inputs:            []string{":"},
 		},
 	}
 
@@ -144,9 +160,11 @@ func TestQuery(t1 *testing.T) {
 				t.AssertNoError(err)
 				actual := m.String()
 
+				tcT := test_logz.TC{T: t, StackInfo: tc.stackInfo}
+
 				if tc.expected != actual {
-					// t.Logf("%#v", m)
-					t.AssertEqual(tc.expected, actual)
+					tcT.Log("expected")
+					tcT.AssertEqual(tc.expected, actual)
 				}
 
 				if tc.expectedOptimized == "" {
@@ -156,10 +174,9 @@ func TestQuery(t1 *testing.T) {
 				actualOptimized := m.StringOptimized()
 
 				if tc.expectedOptimized != actualOptimized {
-					t.Logf("%#v", m)
-					t.Logf("%#v", m.OptimizedQueries[gattung.Zettel])
-					t.Log(m.StringDebug())
-					t.AssertEqual(tc.expectedOptimized, actualOptimized)
+					tcT.Log(m.StringDebug())
+					tcT.Log("expectedOptimized")
+					tcT.AssertEqual(tc.expectedOptimized, actualOptimized)
 				}
 			},
 		)

@@ -19,7 +19,7 @@ type luaSku struct {
 	*lua.LTable
 }
 
-func MakeMatcherLua(ki kennung.Index, script string) (m Matcher, err error) {
+func MakeLua(ki kennung.Index, script string) (m Matcher, err error) {
 	reader := strings.NewReader(script)
 
 	var chunks []lua_ast.Stmt

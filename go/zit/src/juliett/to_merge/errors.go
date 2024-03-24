@@ -26,5 +26,5 @@ func (e *ErrMergeConflict) Is(target error) bool {
 }
 
 func (e *ErrMergeConflict) Error() string {
-	return fmt.Sprintf("merge conflict for fds: %s", &e.ExternalFDs)
+	return fmt.Sprintf("merge conflict for fds: %v", &e.ExternalFDs)
 }

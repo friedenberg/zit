@@ -1,11 +1,11 @@
 package query
 
 import (
+	"sort"
 	"strings"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
@@ -19,12 +19,23 @@ type Query struct {
 	Kennung map[string]*kennung.Kennung2
 }
 
+func (a *Query) IsEmpty() bool {
+	return a.Sigil == kennung.SigilUnknown &&
+		a.Gattung.IsEmpty() &&
+		len(a.Children) == 0 &&
+		len(a.Kennung) == 0
+}
+
 func (a *Query) GetMatcherSigil() MatcherSigil {
 	return a
 }
 
 func (a *Query) GetSigil() kennung.Sigil {
 	return a.Sigil
+}
+
+func (a *Query) GetKennungen() map[string]*kennung.Kennung2 {
+	return a.Kennung
 }
 
 func (a *Query) Clone() (b *Query) {
@@ -45,8 +56,6 @@ func (a *Query) Clone() (b *Query) {
 }
 
 func (q *Query) Add(m Matcher) (err error) {
-	log.Log().Print("before", q.StringDebug(), m)
-	defer log.Log().Print("after", q.StringDebug())
 	q1, ok := m.(*Query)
 
 	if !ok {
@@ -82,10 +91,7 @@ func (a *Query) Merge(b *Query) (err error) {
 		a.Kennung[k.String()] = k
 	}
 
-	if err = a.Exp.Add(&b.Exp); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	a.Children = append(a.Children, b.Children...)
 
 	return
 }
@@ -133,11 +139,22 @@ func (q *Query) StringDebug() string {
 	return sb.String()
 }
 
+func (q *Query) SortedKennungen() []string {
+	out := make([]string, 0, len(q.Kennung))
+
+	for k := range q.Kennung {
+		out = append(out, k)
+	}
+
+	sort.Strings(out)
+
+	return out
+}
+
 func (q *Query) String() string {
 	var sb strings.Builder
 
 	e := q.Exp.String()
-	log.Log().Printf("%q", e)
 
 	if q.Kennung == nil || len(q.Kennung) == 0 {
 		sb.WriteString(e)
@@ -150,12 +167,12 @@ func (q *Query) String() string {
 
 		first := true
 
-		for _, k := range q.Kennung {
+		for _, k := range q.SortedKennungen() {
 			if !first {
 				sb.WriteString(", ")
 			}
 
-			sb.WriteString(k.String())
+			sb.WriteString(k)
 
 			first = false
 		}
@@ -168,9 +185,9 @@ func (q *Query) String() string {
 		sb.WriteString("]")
 	}
 
-	if q.IsEmpty() && !q.IsSchwanzenOrUnknown() {
+	if q.Gattung.IsEmpty() && !q.IsSchwanzenOrUnknown() {
 		sb.WriteString(q.Sigil.String())
-	} else if !q.IsEmpty() {
+	} else if !q.Gattung.IsEmpty() {
 		sb.WriteString(q.Sigil.String())
 		sb.WriteString(q.Gattung.String())
 	}
@@ -179,31 +196,20 @@ func (q *Query) String() string {
 }
 
 func (q *Query) ContainsMatchable(sk *sku.Transacted) bool {
-	log.Log().Print(q, sk)
 	g := gattung.Must(sk)
 
 	if !q.Gattung.Contains(g) {
-		log.Log().Print(q, sk, g)
 		return false
 	}
 
-	log.Log().Print(q, q.Kennung, sk.Kennung.String())
-
 	if _, ok := q.Kennung[sk.Kennung.String()]; ok {
-		log.Log().Print(q, sk)
 		return true
 	}
 
-	log.Log().Printf("%#v", q.Children)
-	log.Log().Print(q, sk, len(q.Children), q.Children, len(q.Kennung))
-
 	if len(q.Children) == 0 {
-		log.Log().Print(q, sk, len(q.Kennung))
 		return len(q.Kennung) == 0
-	} else {
-		if !q.Exp.ContainsMatchable(sk) {
-			return false
-		}
+	} else if !q.Exp.ContainsMatchable(sk) {
+		return false
 	}
 
 	return true

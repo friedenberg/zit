@@ -80,14 +80,14 @@ func (pt *PageTuple) SetNeedsFlushHistory() {
 }
 
 func (pt *PageTuple) CopyEverything(
-	s kennung.Sigil,
+	s sku_fmt.QueryGroup,
 	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return pt.copyHistoryAndMaybeSchwanz(s, w, true, true)
 }
 
 func (pt *PageTuple) CopyJustHistory(
-	s kennung.Sigil,
+	s sku_fmt.QueryGroup,
 	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return pt.copyHistoryAndMaybeSchwanz(s, w, false, false)
@@ -95,10 +95,10 @@ func (pt *PageTuple) CopyJustHistory(
 
 func (pt *PageTuple) CopyJustHistoryFrom(
 	r io.Reader,
-	s kennung.Sigil,
+	s sku_fmt.QueryGroup,
 	w schnittstellen.FuncIter[sku_fmt.Sku],
 ) (err error) {
-	dec := sku_fmt.Binary{Sigil: s}
+  dec := sku_fmt.MakeBinaryWithQueryGroup(s, kennung.SigilHistory)
 
 	var sk sku_fmt.Sku
 
@@ -125,14 +125,14 @@ func (pt *PageTuple) CopyJustHistoryFrom(
 }
 
 func (pt *PageTuple) CopyJustHistoryAndAdded(
-	s kennung.Sigil,
+	s sku_fmt.QueryGroup,
 	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return pt.copyHistoryAndMaybeSchwanz(s, w, true, false)
 }
 
 func (pt *PageTuple) copyHistoryAndMaybeSchwanz(
-	s kennung.Sigil,
+	s sku_fmt.QueryGroup,
 	w schnittstellen.FuncIter[*sku.Transacted],
 	includeAdded bool,
 	includeAddedSchwanz bool,
@@ -173,7 +173,7 @@ func (pt *PageTuple) copyHistoryAndMaybeSchwanz(
 		return
 	}
 
-	dec := sku_fmt.Binary{Sigil: s}
+  dec := sku_fmt.MakeBinaryWithQueryGroup(s, kennung.SigilHistory)
 
 	errors.TodoP3("determine performance of this")
 	added := pt.added.Copy()

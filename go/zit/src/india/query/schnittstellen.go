@@ -11,34 +11,11 @@ import (
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
-type QueryGroupBuilder interface {
-	BuildQueryGroup(...string) (QueryGroup, error)
-}
-
-type Matcher interface {
-	ContainsMatchable(*sku.Transacted) bool
-	schnittstellen.Stringer
-	Each(schnittstellen.FuncIter[Matcher]) error
-}
-
-type MatcherSigil interface {
-	Matcher
-	GetSigil() kennung.Sigil
-}
-
-type MatcherSigilPtr interface {
-	MatcherSigil
-	AddSigil(kennung.Sigil)
-}
-
-type MatcherParentPtr interface {
-	Matcher
-	Add(Matcher) error
-}
-
-type MatchableAdder interface {
-	AddMatchable(*sku.Transacted) error
-}
+type (
+	Matcher        = sku.QueryBase
+	MatcherSigil   = sku.Query
+	MatchableAdder = sku.MatchableAdder
+)
 
 type Cwd interface {
 	Matcher
@@ -83,7 +60,7 @@ func VisitAllMatchers(
 	return
 }
 
-func SplitGattungenByHistory(qg *QueryGroup) (schwanz, all kennung.Gattung) {
+func SplitGattungenByHistory(qg *Group) (schwanz, all kennung.Gattung) {
 	err := qg.GetGattungen().Each(
 		func(g gattung.Gattung) (err error) {
 			m, ok := qg.Get(g)
@@ -107,15 +84,15 @@ func SplitGattungenByHistory(qg *QueryGroup) (schwanz, all kennung.Gattung) {
 	return
 }
 
-func MakeFilterFromQuery(
-	ms *QueryGroup,
+func MakeCheckedOutQueryFunc(
+	m sku.QueryBase,
 ) schnittstellen.FuncIter[*sku.CheckedOut] {
-	if ms == nil {
+	if m == nil {
 		return collections.MakeWriterNoop[*sku.CheckedOut]()
 	}
 
 	return func(col *sku.CheckedOut) (err error) {
-		if !ms.ContainsMatchable(&col.External.Transacted) {
+		if !m.ContainsMatchable(&col.External.Transacted) {
 			err = iter.MakeErrStopIteration()
 			return
 		}
@@ -126,12 +103,11 @@ func MakeFilterFromQuery(
 
 type (
 	FuncReaderTransactedLikePtr func(schnittstellen.FuncIter[*sku.Transacted]) error
-	// FuncSigilTransactedLikePtr  func(MatcherSigil, schnittstellen.FuncIter[*sku.Transacted]) error
-	FuncQueryTransactedLikePtr func(*QueryGroup, schnittstellen.FuncIter[*sku.Transacted]) error
+	FuncQueryTransactedLikePtr  func(*Group, schnittstellen.FuncIter[*sku.Transacted]) error
 )
 
 func MakeFuncReaderTransactedLikePtr(
-	ms *QueryGroup,
+	ms *Group,
 	fq FuncQueryTransactedLikePtr,
 ) FuncReaderTransactedLikePtr {
 	return func(f schnittstellen.FuncIter[*sku.Transacted]) (err error) {

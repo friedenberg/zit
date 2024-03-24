@@ -18,8 +18,6 @@ type Store struct {
 	protoZettel      zettel.ProtoZettel
 	konfigAkteFormat objekte.AkteFormat[erworben.Akte, *erworben.Akte]
 
-	virtualStore *VirtualStore
-
 	objekte_store.LogWriter
 }
 
@@ -27,8 +25,7 @@ func Make(
 	su store_util.StoreUtil,
 ) (s *Store, err error) {
 	s = &Store{
-		StoreUtil:    su,
-		virtualStore: MakeVirtualStore(su.GetStandort()),
+		StoreUtil: su,
 	}
 
 	su.SetMatchableAdder(s)

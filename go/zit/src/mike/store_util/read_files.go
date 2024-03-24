@@ -9,6 +9,15 @@ import (
 	"code.linenisgreat.com/zit/src/india/query"
 )
 
+type FileReader interface {
+	ReadFiles(
+		qg *query.Group,
+		f schnittstellen.FuncIter[*sku.CheckedOut],
+	) (err error)
+
+	ReadOneExternalFS(*sku.Transacted) (*sku.CheckedOut, error)
+}
+
 func (s *common) ReadOneExternalFS(
 	sk2 *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
@@ -61,86 +70,29 @@ func (s *common) ReadOneExternalFS(
 }
 
 func (s *common) ReadFiles(
-	fq query.FuncReaderTransactedLikePtr,
+	qg *query.Group,
 	f schnittstellen.FuncIter[*sku.CheckedOut],
 ) (err error) {
-	if err = fq(
-		iter.MakeChain(
-			func(et *sku.Transacted) (err error) {
-				var col *sku.CheckedOut
+	if err = s.cwdFiles.All(
+		func(em *sku.ExternalMaybe) (err error) {
+			var co *sku.CheckedOut
 
-				et1 := sku.GetTransactedPool().Get()
-
-				if err = et1.SetFromSkuLike(et); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				if col, err = s.ReadOneExternalFS(et1); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				if err = col.Internal.SetFromSkuLike(et); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				if col.State == checked_out_state.StateUnknown {
-					col.DetermineState(false)
-				}
-
-				if err = f(col); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
+			if co, err = s.ReadOneCheckedOut(em); err != nil {
+				err = errors.Wrap(err)
 				return
-			},
-		),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+			}
 
-	if err = s.cwdFiles.EachCreatableMatchable(
-		iter.MakeChain(
-			func(il *sku.ExternalMaybe) (err error) {
-				if err = s.GetAbbrStore().Exists(&il.Kennung); err == nil {
-					err = iter.MakeErrStopIteration()
-					return
-				}
-
-				err = nil
-
-				tco := &sku.CheckedOut{}
-				var tcoe *sku.External
-
-				if tcoe, err = s.ReadOneExternal(
-					il,
-					nil,
-				); err != nil {
-					if errors.IsNotExist(err) {
-						err = iter.MakeErrStopIteration()
-					} else {
-						err = errors.Wrapf(err, "%#v", il)
-					}
-
-					return
-				}
-
-				tco.Internal.Kennung.ResetWithKennung(&tcoe.Kennung)
-				tco.External.SetFromSkuLike(tcoe)
-				tco.State = checked_out_state.StateUntracked
-
-				if err = f(tco); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
+			if !qg.ContainsMatchable(&co.External.Transacted) {
 				return
-			},
-		),
+			}
+
+			if err = f(co); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return

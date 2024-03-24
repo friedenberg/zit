@@ -34,7 +34,7 @@ type Formatter interface {
 }
 
 func MakeFormatter(
-	ms *query.QueryGroup,
+	ms *query.Group,
 	v string,
 	out io.Writer,
 	af schnittstellen.AkteIOFactory,

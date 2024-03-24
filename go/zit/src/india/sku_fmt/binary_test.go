@@ -13,7 +13,7 @@ func TestBinaryOne(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	b := new(bytes.Buffer)
-	coder := Binary{Sigil: kennung.SigilSchwanzen}
+	coder := MakeBinary(kennung.SigilSchwanzen)
 	expected := &sku.Transacted{}
 	var expectedN int64
 	var err error

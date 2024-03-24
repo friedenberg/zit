@@ -4,7 +4,6 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/hotel/sku"
@@ -18,7 +17,7 @@ type Checkin struct {
 
 func (c Checkin) Run(
 	u *umwelt.Umwelt,
-	ms *query.QueryGroup,
+	qg *query.Group,
 ) (err error) {
 	fds := fd.MakeMutableSet()
 	l := &sync.Mutex{}
@@ -26,29 +25,26 @@ func (c Checkin) Run(
 	u.Lock()
 	defer errors.Deferred(&err, u.Unlock)
 
-	log.Log().Print(ms)
+	log.Log().Print(qg)
 
 	if err = u.StoreObjekten().ReadFiles(
-		query.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().QueryWithoutCwd),
-		iter.MakeChain(
-			query.MakeFilterFromQuery(ms),
-			func(co *sku.CheckedOut) (err error) {
-				if _, err = u.StoreObjekten().CreateOrUpdateCheckedOut(
-					co,
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				l.Lock()
-				defer l.Unlock()
-
-				fds.Add(co.External.GetObjekteFD())
-				fds.Add(co.External.GetAkteFD())
-
+		qg,
+		func(co *sku.CheckedOut) (err error) {
+			if _, err = u.StoreObjekten().CreateOrUpdateCheckedOut(
+				co,
+			); err != nil {
+				err = errors.Wrap(err)
 				return
-			},
-		),
+			}
+
+			l.Lock()
+			defer l.Unlock()
+
+			fds.Add(co.External.GetObjekteFD())
+			fds.Add(co.External.GetAkteFD())
+
+			return
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return

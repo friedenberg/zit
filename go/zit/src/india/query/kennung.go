@@ -20,14 +20,10 @@ type Kennung struct {
 }
 
 func (k Kennung) Reduce(b *Builder) (err error) {
-	v := k.String()
-
 	if err = k.Expand(b.expanders); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	log.Log().Print(v, "->", k)
 
 	return
 }
@@ -79,6 +75,10 @@ func (k Kennung) String() string {
 	var sb strings.Builder
 
 	if k.Exact {
+		sb.WriteRune('=')
+	}
+
+	if k.Virtual {
 		sb.WriteRune('%')
 	}
 

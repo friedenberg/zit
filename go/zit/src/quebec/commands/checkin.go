@@ -41,7 +41,7 @@ func (c Checkin) DefaultGattungen() kennung.Gattung {
 
 func (c Checkin) RunWithCwdQuery(
 	u *umwelt.Umwelt,
-	ms *query.QueryGroup,
+	ms *query.Group,
 	pz *cwd.CwdFiles,
 ) (err error) {
 	op := user_ops.Checkin{

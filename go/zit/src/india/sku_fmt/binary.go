@@ -9,7 +9,9 @@ import (
 	"math"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/sha"
 	"code.linenisgreat.com/zit/src/delta/ohio"
 	"code.linenisgreat.com/zit/src/delta/schlussel"
@@ -21,10 +23,10 @@ import (
 
 var binaryFieldOrder = []schlussel.Schlussel{
 	schlussel.Sigil,
+	schlussel.Kennung,
 	schlussel.Akte,
 	schlussel.Bezeichnung,
 	schlussel.Etikett,
-	schlussel.Kennung,
 	schlussel.Tai,
 	schlussel.Typ,
 	schlussel.MutterMetadateiMutterKennung,
@@ -35,10 +37,61 @@ var binaryFieldOrder = []schlussel.Schlussel{
 	schlussel.VerzeichnisseEtiketten,
 }
 
+type QueryGroup interface {
+	sku.MatcherGroup
+}
+
+func MakeSigil(s kennung.Sigil) QueryGroup {
+	return &NopSigil{Sigil: s}
+}
+
+type NopSigil struct {
+	kennung.Sigil
+}
+
+func (qg *NopSigil) Get(_ gattung.Gattung) (sku.Query, bool) {
+	return qg, true
+}
+
+func (s *NopSigil) ContainsMatchable(_ *sku.Transacted) bool {
+	return true
+}
+
+func (s *NopSigil) String() string {
+	panic("should never be called")
+}
+
+func (s *NopSigil) GetKennungen() map[string]*kennung.Kennung2 {
+	return nil
+}
+
+func (s *NopSigil) GetSigil() kennung.Sigil {
+	return s.Sigil
+}
+
+func (s *NopSigil) Each(_ schnittstellen.FuncIter[sku.QueryBase]) error {
+	return nil
+}
+
+func MakeBinary(s kennung.Sigil) Binary {
+	return Binary{
+		QueryGroup: MakeSigil(s),
+		Sigil:      s,
+	}
+}
+
+func MakeBinaryWithQueryGroup(qg sku.MatcherGroup, s kennung.Sigil) Binary {
+	return Binary{
+		QueryGroup: qg,
+		Sigil:      s,
+	}
+}
+
 type Binary struct {
 	bytes.Buffer
 	BinaryField
 	kennung.Sigil
+	QueryGroup
 	io.LimitedReader
 }
 
@@ -168,8 +221,40 @@ func (bf *Binary) ReadFormatAndMatchSigil(
 			return
 		}
 
-		if bf.Contains(sk.Sigil) {
-			break
+		n2, err = bf.BinaryField.ReadFrom(&bf.LimitedReader)
+		n += n2
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = bf.readFieldKey(sk.Transacted); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+
+		q, ok := bf.Get(gattung.Must(sk.Transacted))
+
+		if ok {
+			qs := q.GetSigil()
+
+			if qs.Contains(sk.Sigil) {
+				break
+			}
+
+			ks := q.GetKennungen()
+
+			if len(ks) > 0 {
+				_, ok = ks[sk.Kennung.String()]
+
+				if ok &&
+					(qs.Contains(kennung.SigilHistory) ||
+						sk.Contains(kennung.SigilSchwanzen)) {
+					break
+				}
+			}
 		}
 
 		// TODO-P2 replace with buffered seeker

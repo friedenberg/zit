@@ -128,9 +128,22 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 				CheckoutMode: checkout_mode.ModeObjekteAndAkte,
 			}
 
+			b := u.MakeMetaIdSetWithoutExcludedHidden(
+				kennung.MakeGattung(gattung.Zettel),
+			).WithTransacted(
+				zts,
+			)
+
+			var qg *query.Group
+
+			if qg, err = b.BuildQueryGroup(); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
 			if zsc, err = u.StoreObjekten().Checkout(
 				options,
-				u.StoreObjekten().MakeReadAllSchwanzen(gattung.Zettel),
+				u.StoreObjekten().MakeReadAllSchwanzen(qg, gattung.Zettel),
 				func(sk *sku.Transacted) (err error) {
 					if zts.ContainsKey(sk.GetKennung().String()) {
 						err = collections.MakeErrStopIteration()
@@ -235,7 +248,7 @@ func (c New) editZettels(
 
 	checkinOp := user_ops.Checkin{}
 
-	var ms *query.QueryGroup
+	var ms *query.Group
 
 	builder := u.MakeMetaIdSetWithExcludedHidden(kennung.MakeGattung(gattung.Zettel))
 

@@ -9,13 +9,8 @@ import (
 )
 
 var (
-	Print         = errors.Log().Print
-	Printf        = errors.Log().Printf
-	MakeStackInfo = errors.MakeStackInfo
-)
-
-type (
-	StackInfo = errors.StackInfo
+	Print  = errors.Log().Print
+	Printf = errors.Log().Printf
 )
 
 type T struct {
@@ -23,72 +18,72 @@ type T struct {
 	skip int
 }
 
-func (t T) SkipTest(args ...any) {
+func (t *T) SkipTest(args ...any) {
 	t.log(1, args...)
 	t.SkipNow()
 }
 
-func (t T) Skip(skip int) T {
+func (t *T) Skip(skip int) T {
 	return T{
 		T:    t.T,
 		skip: t.skip + skip,
 	}
 }
 
-func (t T) log(skip int, args ...interface{}) {
+func (t *T) log(skip int, args ...interface{}) {
 	errors.SetTesting()
-	si, _ := MakeStackInfo(t.skip + 1 + skip)
+	si := MakeStackInfo(t, t.skip+1+skip)
 	args = append([]interface{}{si}, args...)
 	fmt.Fprintln(os.Stderr, args...)
 }
 
-func (t T) logf(skip int, format string, args ...interface{}) {
+func (t *T) logf(skip int, format string, args ...interface{}) {
 	errors.SetTesting()
-	si, _ := MakeStackInfo(t.skip + 1 + skip)
+	si := MakeStackInfo(t, t.skip+1+skip)
 	args = append([]interface{}{si}, args...)
 	fmt.Fprintf(os.Stderr, "%s"+format+"\n", args...)
 }
 
-func (t T) errorf(skip int, format string, args ...interface{}) {
+func (t *T) errorf(skip int, format string, args ...interface{}) {
 	t.logf(skip+1, format, args...)
 	t.Fail()
 }
 
-func (t T) fatalf(skip int, format string, args ...interface{}) {
+func (t *T) fatalf(skip int, format string, args ...interface{}) {
 	t.logf(skip+1, format, args...)
 	t.FailNow()
 }
 
-func (t T) Log(args ...interface{}) {
+func (t *T) Log(args ...interface{}) {
 	t.log(1, args...)
 }
 
-func (t T) Logf(format string, args ...interface{}) {
+func (t *T) Logf(format string, args ...interface{}) {
 	t.logf(1, format, args...)
 }
 
-func (t T) Errorf(format string, args ...interface{}) {
+func (t *T) Errorf(format string, args ...interface{}) {
 	t.Helper()
 	t.errorf(1, format, args...)
 }
 
-func (t T) Fatalf(format string, args ...interface{}) {
+func (t *T) Fatalf(format string, args ...interface{}) {
 	t.Helper()
 	t.fatalf(1, format, args...)
 }
 
 // TODO-P3 move to AssertNotEqual
-func (t T) NotEqual(a, b any) {
+func (t *T) NotEqual(a, b any) {
 	format := "\nexpected: %q\n  actual: %q"
 	t.errorf(1, format, a, b)
 }
 
-func (t T) AssertEqual(a, b any) {
+func (t *T) AssertEqual(a, b any) {
 	format := "\nexpected: %q\n  actual: %q"
 	t.errorf(1, format, a, b)
 }
 
-func (t T) AssertEqualStrings(a, b string) {
+func (t *T) AssertEqualStrings(a, b string) {
 	t.Helper()
 
 	if a == b {
@@ -99,7 +94,7 @@ func (t T) AssertEqualStrings(a, b string) {
 	t.errorf(1, format, a, b)
 }
 
-func (t T) AssertNoError(err error) {
+func (t *T) AssertNoError(err error) {
 	t.Helper()
 
 	if err != nil {
@@ -107,7 +102,7 @@ func (t T) AssertNoError(err error) {
 	}
 }
 
-func (t T) AssertEOF(err error) {
+func (t *T) AssertEOF(err error) {
 	t.Helper()
 
 	if !errors.IsEOF(err) {
@@ -115,7 +110,7 @@ func (t T) AssertEOF(err error) {
 	}
 }
 
-func (t T) AssertErrorEquals(expected, actual error) {
+func (t *T) AssertErrorEquals(expected, actual error) {
 	t.Helper()
 
 	if actual == nil {
@@ -127,7 +122,7 @@ func (t T) AssertErrorEquals(expected, actual error) {
 	}
 }
 
-func (t T) AssertError(err error) {
+func (t *T) AssertError(err error) {
 	t.Helper()
 
 	if err == nil {

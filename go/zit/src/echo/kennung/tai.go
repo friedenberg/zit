@@ -52,12 +52,7 @@ func TaiFromTimeWithIndex(t1 thyme.Time, n int) (t2 Tai) {
 }
 
 func (t Tai) AsTime() (t1 thyme.Time) {
-	if t.wasSet && !t.Eq(tai{}) {
-		t1 = thyme.Tyme(t.tai.AsTime().Local())
-	} else {
-		panic("empty tai")
-	}
-
+	t1 = thyme.Tyme(t.tai.AsTime().Local())
 	return
 }
 

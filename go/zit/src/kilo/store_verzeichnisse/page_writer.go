@@ -44,14 +44,13 @@ func (pw *pageWriter) Flush() (err error) {
 	defer pw.addedSchwanz.Reset()
 
 	pw.kennungShaMap = make(KennungShaMap)
-	pw.Binary = sku_fmt.Binary{Sigil: kennung.SigilHistory}
+	pw.Binary = sku_fmt.MakeBinary(kennung.SigilHistory)
 
 	path := pw.Path()
 
 	// If the cache file does not exist and we have nothing to add, short
-	// circuit
-	// the flush. This condition occurs on the initial init when the konfig is
-	// changed but there are no zettels yet.
+	// circuit the flush. This condition occurs on the initial init when the
+	// konfig is changed but there are no zettels yet.
 	if !files.Exists(path) && pw.waitingToAddLen() == 0 {
 		return
 	}
@@ -89,7 +88,10 @@ func (pw *pageWriter) flushBoth() (err error) {
 		pw.writeOne,
 	)
 
-	if err = pw.CopyJustHistoryAndAdded(kennung.SigilHistory, chain); err != nil {
+	if err = pw.CopyJustHistoryAndAdded(
+		&sku_fmt.NopSigil{Sigil: kennung.SigilHistory},
+		chain,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -127,7 +129,7 @@ func (pw *pageWriter) flushBoth() (err error) {
 func (pw *pageWriter) flushJustSchwanz() (err error) {
 	if err = pw.CopyJustHistoryFrom(
 		&pw.Reader,
-		kennung.SigilHistory,
+		&sku_fmt.NopSigil{Sigil: kennung.SigilHistory},
 		func(sk sku_fmt.Sku) (err error) {
 			pw.Range = sk.Range
 			pw.SaveSha(sk.Transacted, sk.Sigil)

@@ -4,7 +4,6 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/sha"
 	"code.linenisgreat.com/zit/src/delta/checked_out_state"
@@ -34,29 +33,26 @@ func (c Status) DefaultGattungen() kennung.Gattung {
 
 func (c Status) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms *query.QueryGroup,
+	qg *query.Group,
 ) (err error) {
 	pcol := u.PrinterCheckedOut()
 
 	if err = u.StoreObjekten().ReadFiles(
-		query.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().QueryWithoutCwd),
-		iter.MakeChain(
-			query.MakeFilterFromQuery(ms),
-			func(co *sku.CheckedOut) (err error) {
-				if err = pcol(co); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
+		qg,
+		func(co *sku.CheckedOut) (err error) {
+			if err = pcol(co); err != nil {
+				err = errors.Wrap(err)
 				return
-			},
-		),
+			}
+
+			return
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = ms.GetExplicitCwdFDs().Each(
+	if err = qg.GetExplicitCwdFDs().Each(
 		u.StoreUtil().GetCwdFiles().MarkUnsureAkten,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -66,6 +62,7 @@ func (c Status) RunWithQuery(
 	p := u.PrinterCheckedOut()
 
 	if err = u.StoreObjekten().ReadAllMatchingAkten(
+		qg,
 		u.StoreUtil().GetCwdFiles().UnsureAkten,
 		func(fd *fd.FD, z *sku.Transacted) (err error) {
 			if z == nil {
