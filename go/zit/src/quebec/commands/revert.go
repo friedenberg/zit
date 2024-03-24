@@ -61,7 +61,7 @@ func (c Revert) RunWithQuery(u *umwelt.Umwelt, ms *query.Group) (err error) {
 			return
 		}
 
-		if err = u.StoreObjekten().RevertTo(rt.Transacted, rt.Sha); err != nil {
+		if err = u.Store().RevertTo(rt.Transacted, rt.Sha); err != nil {
 			err = errors.Wrapf(err, "Sha %s", rt.Sha)
 			return
 		}
@@ -96,7 +96,7 @@ func (c Revert) runRevertFromQuery(
 	ms *query.Group,
 	f schnittstellen.FuncIter[revertTuple],
 ) (err error) {
-	if err = u.StoreObjekten().QueryWithoutCwd(
+	if err = u.Store().QueryWithoutCwd(
 		ms,
 		func(z *sku.Transacted) (err error) {
 			return f(revertTuple{Transacted: z, Sha: z.Metadatei.Mutter()})
@@ -113,7 +113,7 @@ func (c Revert) runRevertFromLast(
 	u *umwelt.Umwelt,
 	f schnittstellen.FuncIter[revertTuple],
 ) (err error) {
-	s := u.StoreObjekten()
+	s := u.Store()
 
 	var b *sku.Transacted
 

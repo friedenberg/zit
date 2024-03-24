@@ -35,7 +35,7 @@ func (c PeekHinweisen) Run(store *umwelt.Umwelt, args ...string) (err error) {
 
 	var hs []*kennung.Hinweis
 
-	if hs, err = store.StoreObjekten().GetKennungIndex().PeekHinweisen(
+	if hs, err = store.Store().GetKennungIndex().PeekHinweisen(
 		n,
 	); err != nil {
 		err = errors.Wrap(err)

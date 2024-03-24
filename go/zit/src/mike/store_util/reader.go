@@ -39,7 +39,7 @@ type reader interface {
 	) (err error)
 }
 
-func (s *common) ReadOneInto(
+func (s *Store) ReadOneInto(
 	k1 schnittstellen.StringerGattungGetter,
 	out *sku.Transacted,
 ) (err error) {
@@ -119,7 +119,7 @@ func (s *common) ReadOneInto(
 	return
 }
 
-func (s *common) ReadAllGattungFromBestandsaufnahme(
+func (s *Store) ReadAllGattungFromBestandsaufnahme(
 	g gattung.Gattung,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
@@ -144,7 +144,7 @@ func (s *common) ReadAllGattungFromBestandsaufnahme(
 	return
 }
 
-func (s *common) ReadAllGattungenFromBestandsaufnahme(
+func (s *Store) ReadAllGattungenFromBestandsaufnahme(
 	g kennung.Gattung,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
@@ -173,7 +173,7 @@ func (s *common) ReadAllGattungenFromBestandsaufnahme(
 	return
 }
 
-func (s *common) ReadAllGattungFromVerzeichnisse(
+func (s *Store) ReadAllGattungFromVerzeichnisse(
 	qg *query.Group,
 	g gattung.Gattung,
 	f schnittstellen.FuncIter[*sku.Transacted],
@@ -202,7 +202,7 @@ func (s *common) ReadAllGattungFromVerzeichnisse(
 	return
 }
 
-func (s *common) ReadAllGattungenFromVerzeichnisse(
+func (s *Store) ReadAllGattungenFromVerzeichnisse(
 	qg *query.Group,
 	g kennung.Gattung,
 	f schnittstellen.FuncIter[*sku.Transacted],

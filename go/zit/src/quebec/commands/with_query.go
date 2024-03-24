@@ -46,7 +46,7 @@ func (c commandWithQuery) Complete(
 		return
 	}
 
-	if err = u.StoreObjekten().ReadAllSchwanzen(
+	if err = u.Store().ReadAllSchwanzen(
 		qg,
 		cgg.CompletionGattung(),
 		w.WriteOne,

@@ -37,7 +37,7 @@ func (c Status) RunWithQuery(
 ) (err error) {
 	pcol := u.PrinterCheckedOut()
 
-	if err = u.StoreObjekten().ReadFiles(
+	if err = u.Store().ReadFiles(
 		qg,
 		func(co *sku.CheckedOut) (err error) {
 			if err = pcol(co); err != nil {
@@ -53,7 +53,7 @@ func (c Status) RunWithQuery(
 	}
 
 	if err = qg.GetExplicitCwdFDs().Each(
-		u.StoreUtil().GetCwdFiles().MarkUnsureAkten,
+		u.Store().GetCwdFiles().MarkUnsureAkten,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -61,9 +61,9 @@ func (c Status) RunWithQuery(
 
 	p := u.PrinterCheckedOut()
 
-	if err = u.StoreObjekten().ReadAllMatchingAkten(
+	if err = u.Store().ReadAllMatchingAkten(
 		qg,
-		u.StoreUtil().GetCwdFiles().UnsureAkten,
+		u.Store().GetCwdFiles().UnsureAkten,
 		func(fd *fd.FD, z *sku.Transacted) (err error) {
 			if z == nil {
 				err = u.PrinterFileNotRecognized()(fd)

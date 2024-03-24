@@ -19,7 +19,6 @@ import (
 	"code.linenisgreat.com/zit/src/kilo/objekte_store"
 	"code.linenisgreat.com/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/src/mike/store_util"
-	"code.linenisgreat.com/zit/src/november/store_objekten"
 )
 
 type Umwelt struct {
@@ -38,8 +37,7 @@ type Umwelt struct {
 	konfig      konfig.Compiled
 
 	storesInitialized bool
-	storeUtil         store_util.StoreUtil
-	storeObjekten     *store_objekten.Store
+	store             store_util.Store
 	age               *age.Age
 
 	matcherArchiviert query.Archiviert
@@ -146,20 +144,13 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 
 	log.Log().Printf("store version: %s", u.Konfig().GetStoreVersion())
 
-	if u.storeUtil, err = store_util.MakeStoreUtil(
+	if err = u.store.Initialize(
 		u.Konfig(),
 		u.standort,
 		objekte_format.FormatForVersion(u.Konfig().GetStoreVersion()),
 		u.sonnenaufgang,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")
-		return
-	}
-
-	if u.storeObjekten, err = store_objekten.Make(
-		u.storeUtil,
-	); err != nil {
-		err = errors.Wrapf(err, "failed to initialize zettel meta store")
 		return
 	}
 
@@ -174,8 +165,8 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		Archived:  ptl,
 	}
 
-	u.storeUtil.SetCheckedOutLogWriter(u.PrinterCheckedOut())
-	u.storeObjekten.SetLogWriter(lw)
+	u.store.SetCheckedOutLogWriter(u.PrinterCheckedOut())
+	u.store.SetLogWriter(lw)
 
 	u.storesInitialized = true
 
@@ -210,17 +201,17 @@ func (u *Umwelt) GetMatcherArchiviert() query.Archiviert {
 }
 
 func (u *Umwelt) MakeKennungExpanders() (out kennung.Abbr) {
-	out.Etikett.Expand = u.StoreObjekten().GetAbbrStore().Etiketten().ExpandStringString
-	out.Typ.Expand = u.StoreObjekten().GetAbbrStore().Typen().ExpandStringString
-	out.Kasten.Expand = u.StoreObjekten().GetAbbrStore().Kisten().ExpandStringString
-	out.Hinweis.Expand = u.StoreObjekten().GetAbbrStore().Hinweis().ExpandStringString
-	out.Sha.Expand = u.StoreObjekten().GetAbbrStore().Shas().ExpandStringString
+	out.Etikett.Expand = u.Store().GetAbbrStore().Etiketten().ExpandStringString
+	out.Typ.Expand = u.Store().GetAbbrStore().Typen().ExpandStringString
+	out.Kasten.Expand = u.Store().GetAbbrStore().Kisten().ExpandStringString
+	out.Hinweis.Expand = u.Store().GetAbbrStore().Hinweis().ExpandStringString
+	out.Sha.Expand = u.Store().GetAbbrStore().Shas().ExpandStringString
 
-	out.Etikett.Abbreviate = u.StoreObjekten().GetAbbrStore().Etiketten().Abbreviate
-	out.Typ.Abbreviate = u.StoreObjekten().GetAbbrStore().Typen().Abbreviate
-	out.Kasten.Abbreviate = u.StoreObjekten().GetAbbrStore().Kisten().Abbreviate
-	out.Hinweis.Abbreviate = u.StoreObjekten().GetAbbrStore().Hinweis().Abbreviate
-	out.Sha.Abbreviate = u.StoreObjekten().GetAbbrStore().Shas().Abbreviate
+	out.Etikett.Abbreviate = u.Store().GetAbbrStore().Etiketten().Abbreviate
+	out.Typ.Abbreviate = u.Store().GetAbbrStore().Typen().Abbreviate
+	out.Kasten.Abbreviate = u.Store().GetAbbrStore().Kisten().Abbreviate
+	out.Hinweis.Abbreviate = u.Store().GetAbbrStore().Hinweis().Abbreviate
+	out.Sha.Abbreviate = u.Store().GetAbbrStore().Shas().Abbreviate
 
 	return
 }
@@ -234,7 +225,7 @@ func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
 
 	return query.MakeBuilder(u.Standort()).
 		WithDefaultGattungen(dg).
-		WithCwd(u.StoreUtil().GetCwdFiles()).
+		WithCwd(u.Store().GetCwdFiles()).
 		WithFileExtensionGetter(u.Konfig().FileExtensions).
 		WithHidden(u.GetMatcherArchiviert()).
 		WithExpanders(u.MakeKennungExpanders())
@@ -249,7 +240,7 @@ func (u *Umwelt) MakeMetaIdSetWithoutExcludedHidden(
 
 	return query.MakeBuilder(u.Standort()).
 		WithDefaultGattungen(dg).
-		WithCwd(u.StoreUtil().GetCwdFiles()).
+		WithCwd(u.Store().GetCwdFiles()).
 		WithFileExtensionGetter(u.Konfig().FileExtensions).
 		WithExpanders(u.MakeKennungExpanders())
 }

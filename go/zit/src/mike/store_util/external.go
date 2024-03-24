@@ -41,7 +41,7 @@ type ExternalReader interface {
 	) (err error)
 }
 
-func (s *common) ReadOneCheckedOut(
+func (s *Store) ReadOneCheckedOut(
 	em *sku.ExternalMaybe,
 ) (co *sku.CheckedOut, err error) {
 	if err = em.FDs.ConflictMarkerError(); err != nil {
@@ -94,7 +94,7 @@ func (s *common) ReadOneCheckedOut(
 	return
 }
 
-func (s *common) ReadOneExternal(
+func (s *Store) ReadOneExternal(
 	em *sku.ExternalMaybe,
 	t *sku.Transacted,
 ) (e *sku.External, err error) {
@@ -142,7 +142,7 @@ func (s *common) ReadOneExternal(
 	return
 }
 
-func (s *common) ReadOneExternalObjekte(
+func (s *Store) ReadOneExternalObjekte(
 	e *sku.External,
 	t *sku.Transacted,
 ) (err error) {
@@ -176,7 +176,7 @@ func (s *common) ReadOneExternalObjekte(
 	return
 }
 
-func (s *common) ReadOneExternalObjekteReader(
+func (s *Store) ReadOneExternalObjekteReader(
 	r io.Reader,
 	e *sku.External,
 ) (err error) {
@@ -188,7 +188,7 @@ func (s *common) ReadOneExternalObjekteReader(
 	return
 }
 
-func (s *common) ReadOneExternalAkte(
+func (s *Store) ReadOneExternalAkte(
 	e *sku.External,
 	t *sku.Transacted,
 ) (err error) {

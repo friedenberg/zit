@@ -141,9 +141,9 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 				return
 			}
 
-			if zsc, err = u.StoreObjekten().Checkout(
+			if zsc, err = u.Store().Checkout(
 				options,
-				u.StoreObjekten().MakeReadAllSchwanzen(qg, gattung.Zettel),
+				u.Store().MakeReadAllSchwanzen(qg, gattung.Zettel),
 				func(sk *sku.Transacted) (err error) {
 					if zts.ContainsKey(sk.GetKennung().String()) {
 						err = collections.MakeErrStopIteration()

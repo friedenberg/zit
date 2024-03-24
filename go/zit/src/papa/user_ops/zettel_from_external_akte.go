@@ -85,7 +85,7 @@ func (c ZettelFromExternalAkte) Run(
 	if c.Dedupe {
 		matcher := objekte_collections.MakeMutableMatchSet(toCreate)
 
-		if err = c.StoreObjekten().ReadAll(
+		if err = c.Store().ReadAll(
 			qg,
 			kennung.MakeGattung(gattung.Zettel),
 			iter.MakeChain(
@@ -110,7 +110,7 @@ func (c ZettelFromExternalAkte) Run(
 	if err = results.Each(
 		func(z *sku.Transacted) (err error) {
 			if c.ProtoZettel.Apply(z) {
-				if _, err = c.StoreObjekten().CreateOrUpdateTransacted(
+				if _, err = c.Store().CreateOrUpdateTransacted(
 					z,
 				); err != nil {
 					err = errors.Wrap(err)
@@ -141,13 +141,13 @@ func (c ZettelFromExternalAkte) Run(
 
 		var tz *sku.Transacted
 
-		if tz, err = c.StoreObjekten().Create(z); err != nil {
+		if tz, err = c.Store().Create(z); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		if c.ProtoZettel.Apply(tz) {
-			if tz, err = c.StoreObjekten().CreateOrUpdateTransacted(
+			if tz, err = c.Store().CreateOrUpdateTransacted(
 				tz,
 			); err != nil {
 				err = errors.Wrap(err)

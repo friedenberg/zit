@@ -230,9 +230,9 @@ func (c Add) openAktenIfNecessary(
 
 	var checkoutResults sku.CheckedOutMutableSet
 
-	if checkoutResults, err = u.StoreObjekten().Checkout(
+	if checkoutResults, err = u.Store().Checkout(
 		options,
-		u.StoreObjekten().MakeReadAllSchwanzen(qg, gattung.Zettel),
+		u.Store().MakeReadAllSchwanzen(qg, gattung.Zettel),
 		func(z *sku.Transacted) (err error) {
 			if !hs.ContainsKey(z.GetKennung().String()) {
 				return iter.MakeErrStopIteration()

@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/src/mike/store_util"
-	"code.linenisgreat.com/zit/src/november/store_objekten"
 )
 
 func (u *Umwelt) Sonnenaufgang() thyme.Time {
@@ -35,10 +34,6 @@ func (u *Umwelt) Standort() standort.Standort {
 	return u.standort
 }
 
-func (u *Umwelt) StoreObjekten() *store_objekten.Store {
-	return u.storeObjekten
-}
-
-func (u *Umwelt) StoreUtil() store_util.StoreUtil {
-	return u.storeUtil
+func (u *Umwelt) Store() *store_util.Store {
+	return &u.store
 }

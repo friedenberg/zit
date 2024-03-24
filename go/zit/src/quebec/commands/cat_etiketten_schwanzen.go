@@ -26,7 +26,7 @@ func (c CatEtikettenSchwanzen) Run(
 	u *umwelt.Umwelt,
 	_ ...string,
 ) (err error) {
-	if err = u.StoreObjekten().GetKennungIndex().EachSchwanzen(
+	if err = u.Store().GetKennungIndex().EachSchwanzen(
 		func(e *kennung.IndexedLike) (err error) {
 			if err = errors.Out().Print(e.GetKennung().String()); err != nil {
 				err = errors.IsAsNilOrWrapf(

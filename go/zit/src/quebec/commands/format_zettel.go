@@ -80,7 +80,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var zt *sku.Transacted
 
-	if zt, err = u.StoreObjekten().ReadOne(&h); err != nil {
+	if zt, err = u.Store().ReadOne(&h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -88,7 +88,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if e, ok := cwdFiles.GetZettel(&h); ok {
 		var ze *sku.External
 
-		ze, err = u.StoreObjekten().ReadOneExternal(e, zt)
+		ze, err = u.Store().ReadOneExternal(e, zt)
 
 		switch {
 		case err != nil:
@@ -116,7 +116,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var typAkte *typ_akte.V0
 
-	if typAkte, err = u.StoreObjekten().GetAkten().GetTypV0().GetAkte(typKonfig.GetAkteSha()); err != nil {
+	if typAkte, err = u.Store().GetAkten().GetTypV0().GetAkte(typKonfig.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -158,7 +158,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	f := objekte.MakeTextFormatterWithAkteFormatter(u.Standort(), u.Konfig(), akteFormatter)
 
-	if err = u.Konfig().ApplyToNewMetadatei(zt, u.StoreObjekten().GetAkten().GetTypV0()); err != nil {
+	if err = u.Konfig().ApplyToNewMetadatei(zt, u.Store().GetAkten().GetTypV0()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

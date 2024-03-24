@@ -67,7 +67,7 @@ func (c CatObjekte) Run(
 
 		var rc sha.ReadCloser
 
-		if rc, err = u.StoreUtil().ReaderFor(&sh); err == nil {
+		if rc, err = u.Store().ReaderFor(&sh); err == nil {
 			if err = akteWriter(rc); err != nil {
 				err = errors.Wrap(err)
 				return

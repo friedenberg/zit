@@ -114,7 +114,7 @@ func (u *Umwelt) Einleitung(e Einleitung) (err error) {
 
 		defer errors.Deferred(&err, u.Unlock)
 
-		if err = u.StoreUtil().ResetIndexes(); err != nil {
+		if err = u.Store().ResetIndexes(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -147,7 +147,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 
 		var sh schnittstellen.ShaLike
 
-		if sh, _, err = u.StoreObjekten().GetAkten().GetTypV0().SaveAkteText(
+		if sh, _, err = u.Store().GetAkten().GetTypV0().SaveAkteText(
 			&defaultTyp,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -161,7 +161,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 			return
 		}
 
-		if _, err = u.StoreObjekten().CreateOrUpdateAkteSha(
+		if _, err = u.Store().CreateOrUpdateAkteSha(
 			&k,
 			sh,
 		); err != nil {
@@ -178,7 +178,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 			return
 		}
 
-		if _, err = u.StoreObjekten().CreateOrUpdateAkteSha(
+		if _, err = u.Store().CreateOrUpdateAkteSha(
 			&kennung.Konfig{},
 			sh,
 		); err != nil {
@@ -196,7 +196,7 @@ func writeDefaultErworben(
 ) (sh schnittstellen.ShaLike, err error) {
 	defaultKonfig := erworben.Default(dt)
 
-	f := u.StoreObjekten().GetKonfigAkteFormat()
+	f := u.Store().GetKonfigAkteFormat()
 
 	var aw sha.WriteCloser
 

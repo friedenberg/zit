@@ -10,7 +10,7 @@ type mutators interface {
 	CommitTransacted(*sku.Transacted) error
 }
 
-func (s *common) CommitTransacted(t *sku.Transacted) (err error) {
+func (s *Store) CommitTransacted(t *sku.Transacted) (err error) {
 	sk := sku.GetTransactedPool().Get()
 
 	if err = s.konfig.AddTransacted(
@@ -34,7 +34,7 @@ func (s *common) CommitTransacted(t *sku.Transacted) (err error) {
 	return
 }
 
-func (s *common) AddTypToIndex(t *kennung.Typ) (err error) {
+func (s *Store) AddTypToIndex(t *kennung.Typ) (err error) {
 	if t == nil {
 		return
 	}

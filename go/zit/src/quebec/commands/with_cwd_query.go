@@ -47,7 +47,7 @@ func (c commandWithCwdQuery) Complete(
 		return
 	}
 
-	if err = u.StoreObjekten().ReadAllSchwanzen(
+	if err = u.Store().ReadAllSchwanzen(
 		qg,
 		cgg.CompletionGattung(),
 		w.WriteOne,
@@ -71,7 +71,7 @@ func (c commandWithCwdQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if err = c.RunWithCwdQuery(u, ids, u.StoreUtil().GetCwdFiles()); err != nil {
+	if err = c.RunWithCwdQuery(u, ids, u.Store().GetCwdFiles()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

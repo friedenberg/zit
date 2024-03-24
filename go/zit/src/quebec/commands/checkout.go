@@ -39,9 +39,9 @@ func (c Checkout) RunWithQuery(
 	u *umwelt.Umwelt,
 	ms *query.Group,
 ) (err error) {
-	if err = u.StoreObjekten().CheckoutQuery(
+	if err = u.Store().CheckoutQuery(
 		c.CheckoutOptions,
-		query.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().QueryWithoutCwd),
+		query.MakeFuncReaderTransactedLikePtr(ms, u.Store().QueryWithoutCwd),
 		func(co *sku.CheckedOut) (err error) {
 			return
 		},

@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/src/lima/bestandsaufnahme"
 )
 
-func (s *common) FlushBestandsaufnahme() (err error) {
+func (s *Store) FlushBestandsaufnahme() (err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte_store.ErrLockRequired{
 			Operation: "flush",
@@ -50,10 +50,18 @@ func (s *common) FlushBestandsaufnahme() (err error) {
 	return
 }
 
-func (c *common) Flush(
+func (c *Store) Flush(
 	printerHeader schnittstellen.FuncIter[string],
 ) (err error) {
-	if c.konfig.DryRun {
+	if !c.GetStandort().GetLockSmith().IsAcquired() {
+		err = objekte_store.ErrLockRequired{
+			Operation: "flush",
+		}
+
+		return
+	}
+
+	if c.GetKonfig().DryRun {
 		return
 	}
 
@@ -66,6 +74,7 @@ func (c *common) Flush(
 	wg := iter.MakeErrorWaitGroupParallel()
 
 	wg.Do(func() error { return c.verzeichnisse.Flush(printerHeader) })
+	wg.Do(c.GetAbbrStore().Flush)
 	wg.Do(c.typenIndex.Flush)
 	wg.Do(c.kennungIndex.Flush)
 	wg.Do(c.Abbr.Flush)

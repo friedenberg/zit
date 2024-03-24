@@ -3,7 +3,6 @@ package store_util
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/delta/standort"
 	"code.linenisgreat.com/zit/src/delta/thyme"
@@ -12,56 +11,21 @@ import (
 	"code.linenisgreat.com/zit/src/golf/kennung_index"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/erworben"
 	"code.linenisgreat.com/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
+	"code.linenisgreat.com/zit/src/juliett/objekte"
 	"code.linenisgreat.com/zit/src/kilo/cwd"
+	"code.linenisgreat.com/zit/src/kilo/objekte_store"
 	"code.linenisgreat.com/zit/src/kilo/store_verzeichnisse"
+	"code.linenisgreat.com/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/src/lima/akten"
 	"code.linenisgreat.com/zit/src/lima/bestandsaufnahme"
 )
 
-type StoreUtil interface {
-	FlushBestandsaufnahme() error
-	errors.FlusherWithLogger
-	kennung.Clock
-
-	ExternalReader
-
-	mutators
-	accessors
-	reader
-
-	ResetIndexes() (err error)
-	AddTypToIndex(t *kennung.Typ) (err error)
-
-	SetMatchableAdder(query.MatchableAdder)
-	query.MatchableAdder
-
-	SetCheckedOutLogWriter(zelw schnittstellen.FuncIter[*sku.CheckedOut])
-
-	CheckoutQuery(
-		options checkout_options.Options,
-		fq query.FuncReaderTransactedLikePtr,
-		f schnittstellen.FuncIter[*sku.CheckedOut],
-	) (err error)
-
-	Checkout(
-		options checkout_options.Options,
-		fq query.FuncReaderTransactedLikePtr,
-		ztw schnittstellen.FuncIter[*sku.Transacted],
-	) (zcs sku.CheckedOutMutableSet, err error)
-
-	FileReader
-
-	CheckoutOne(
-		options checkout_options.Options,
-		sz *sku.Transacted,
-	) (cz *sku.CheckedOut, err error)
-}
-
 // TODO-P3 move to own package
-type common struct {
+type Store struct {
 	konfig                    *konfig.Compiled
 	standort                  standort.Standort
 	cwdFiles                  *cwd.CwdFiles
@@ -85,23 +49,26 @@ type common struct {
 
 	query.MatchableAdder
 	typenIndex kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
+
+	protoZettel      zettel.ProtoZettel
+	konfigAkteFormat objekte.AkteFormat[erworben.Akte, *erworben.Akte]
+
+	objekte_store.LogWriter
 }
 
-func MakeStoreUtil(
+func (c *Store) Initialize(
 	k *konfig.Compiled,
 	st standort.Standort,
 	pmf objekte_format.Format,
 	t thyme.Time,
-) (c *common, err error) {
-	c = &common{
-		konfig:                    k,
-		standort:                  st,
-		akten:                     akten.Make(st),
-		persistentMetadateiFormat: pmf,
-		options:                   objekte_format.Options{Tai: true},
-		sonnenaufgang:             t,
-		fileEncoder:               objekte_collections.MakeFileEncoder(st, k),
-	}
+) (err error) {
+	c.konfig = k
+	c.standort = st
+	c.akten = akten.Make(st)
+	c.persistentMetadateiFormat = pmf
+	c.options = objekte_format.Options{Tai: true}
+	c.sonnenaufgang = t
+	c.fileEncoder = objekte_collections.MakeFileEncoder(st, k)
 
 	if c.cwdFiles, err = cwd.MakeCwdFilesAll(
 		k,
@@ -165,20 +132,26 @@ func MakeStoreUtil(
 		return
 	}
 
+	c.protoZettel = zettel.MakeProtoZettel(c.GetKonfig())
+
+	c.konfigAkteFormat = objekte_store.MakeAkteFormat[erworben.Akte, *erworben.Akte](
+		objekte.MakeTextParserIgnoreTomlErrors[erworben.Akte](
+			c.GetStandort(),
+		),
+		objekte.ParsedAkteTomlFormatter[erworben.Akte, *erworben.Akte]{},
+		c.GetStandort(),
+	)
+
 	return
 }
 
-func (s *common) GetStoreUtil() StoreUtil {
-	return s
-}
-
-func (s *common) SetCheckedOutLogWriter(
+func (s *Store) SetCheckedOutLogWriter(
 	zelw schnittstellen.FuncIter[*sku.CheckedOut],
 ) {
 	s.checkedOutLogPrinter = zelw
 }
 
-func (s *common) ResetIndexes() (err error) {
+func (s *Store) ResetIndexes() (err error) {
 	if err = s.typenIndex.Reset(); err != nil {
 		err = errors.Wrapf(err, "failed to reset etiketten index")
 		return
@@ -192,6 +165,6 @@ func (s *common) ResetIndexes() (err error) {
 	return
 }
 
-func (s *common) SetMatchableAdder(ma query.MatchableAdder) {
-	s.MatchableAdder = ma
+func (s *Store) SetLogWriter(lw objekte_store.LogWriter) {
+	s.LogWriter = lw
 }

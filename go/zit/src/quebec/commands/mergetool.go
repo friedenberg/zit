@@ -37,7 +37,7 @@ func (c Mergetool) RunWithQuery(
 ) (err error) {
 	p := []string{}
 
-	if err = u.StoreObjekten().ReadFiles(
+	if err = u.Store().ReadFiles(
 		qg,
 		iter.MakeChain(
 			func(co *sku.CheckedOut) (err error) {
@@ -73,13 +73,13 @@ func (c Mergetool) RunWithQuery(
 
 		if err = tm.ReadConflictMarker(
 			u.Konfig().GetStoreVersion(),
-			u.StoreUtil().GetObjekteFormatOptions(),
+			u.Store().GetObjekteFormatOptions(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = u.StoreObjekten().RunMergeTool(
+		if err = u.Store().RunMergeTool(
 			tm,
 		); err != nil {
 			err = errors.Wrap(err)

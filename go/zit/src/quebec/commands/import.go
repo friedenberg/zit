@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/src/lima/bestandsaufnahme"
-	"code.linenisgreat.com/zit/src/november/store_objekten"
+	"code.linenisgreat.com/zit/src/mike/store_util"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
@@ -121,7 +121,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			break
 		}
 
-		if co, err = u.StoreObjekten().Import(
+		if co, err = u.Store().Import(
 			sk,
 		); err != nil {
 			err = errors.Wrapf(err, "Sku: %s", sk)
@@ -129,7 +129,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 
 		if co.State == checked_out_state.StateError {
-			if co.Error == store_objekten.ErrNeedsMerge {
+			if co.Error == store_util.ErrNeedsMerge {
 				hasConflicts = true
 			}
 
@@ -157,7 +157,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if hasConflicts {
-		err = store_objekten.ErrNeedsMerge
+		err = store_util.ErrNeedsMerge
 	}
 
 	return

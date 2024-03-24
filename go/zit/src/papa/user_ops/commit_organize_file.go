@@ -71,7 +71,7 @@ func (op CommitOrganizeFile) run(
 	u *umwelt.Umwelt,
 	a, b *organize_text.Text,
 ) (cs CommitOrganizeFileResults, err error) {
-	store := op.StoreObjekten()
+	store := op.Store()
 
 	if err = op.ApplyToText(u, a); err != nil {
 		err = errors.Wrap(err)

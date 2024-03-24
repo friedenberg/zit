@@ -55,7 +55,7 @@ func (c CatAlfred) RunWithQuery(
 
 	if aw, err = alfred.New(
 		wo,
-		u.StoreObjekten().GetAbbrStore().Hinweis().Abbreviate,
+		u.Store().GetAbbrStore().Hinweis().Abbreviate,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -63,7 +63,7 @@ func (c CatAlfred) RunWithQuery(
 
 	defer errors.DeferredCloser(&err, aw)
 
-	if err = u.StoreObjekten().QueryWithCwd(
+	if err = u.Store().QueryWithCwd(
 		ms,
 		aw.PrintOne,
 	); err != nil {

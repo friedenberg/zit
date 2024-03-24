@@ -21,7 +21,7 @@ import (
 	"code.linenisgreat.com/zit/src/kilo/cwd"
 )
 
-func (s *common) CheckoutQuery(
+func (s *Store) CheckoutQuery(
 	options checkout_options.Options,
 	fq query.FuncReaderTransactedLikePtr,
 	f schnittstellen.FuncIter[*sku.CheckedOut],
@@ -30,12 +30,10 @@ func (s *common) CheckoutQuery(
 		func(t *sku.Transacted) (err error) {
 			var cop *sku.CheckedOut
 
-			cop, err = s.CheckoutOne(
+			if cop, err = s.CheckoutOne(
 				checkout_options.Options(options),
 				t,
-			)
-
-			if err != nil {
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -47,7 +45,12 @@ func (s *common) CheckoutQuery(
 				return
 			}
 
-			return f(cop)
+			if err = f(cop); err != nil {
+				err = errors.Wrap(err)
+				return
+      }
+
+      return
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -59,7 +62,7 @@ func (s *common) CheckoutQuery(
 
 // TODO-P2 combine with CheckoutQuery once all matcher Query is simplified into
 // just a matcher
-func (s *common) Checkout(
+func (s *Store) Checkout(
 	options checkout_options.Options,
 	fq query.FuncReaderTransactedLikePtr,
 	ztw schnittstellen.FuncIter[*sku.Transacted],
@@ -118,7 +121,7 @@ func (s *common) Checkout(
 	return
 }
 
-func (s common) shouldCheckOut(
+func (s Store) shouldCheckOut(
 	options checkout_options.Options,
 	cz *sku.CheckedOut,
 ) (ok bool) {
@@ -140,13 +143,13 @@ func (s common) shouldCheckOut(
 	return
 }
 
-func (s *common) FileExtensionForGattung(
+func (s *Store) FileExtensionForGattung(
 	gg schnittstellen.GattungGetter,
 ) string {
 	return s.GetKonfig().FileExtensions.GetFileExtensionForGattung(gg)
 }
 
-func (s *common) PathForTransacted(dir string, tl *sku.Transacted) string {
+func (s *Store) PathForTransacted(dir string, tl *sku.Transacted) string {
 	return path.Join(
 		dir,
 		fmt.Sprintf(
@@ -157,7 +160,7 @@ func (s *common) PathForTransacted(dir string, tl *sku.Transacted) string {
 	)
 }
 
-func (s common) filenameForTransacted(
+func (s Store) filenameForTransacted(
 	options checkout_options.Options,
 	sz *sku.Transacted,
 ) (originalFilename string, filename string, err error) {
@@ -205,7 +208,7 @@ func (s common) filenameForTransacted(
 	return
 }
 
-func (s *common) CheckoutOne(
+func (s *Store) CheckoutOne(
 	options checkout_options.Options,
 	sz *sku.Transacted,
 ) (cz *sku.CheckedOut, err error) {

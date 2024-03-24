@@ -1,4 +1,4 @@
-package store_objekten
+package store_util
 
 import (
 	"fmt"
@@ -121,7 +121,7 @@ func (s *Store) handleNewOrUpdatedCommit(
 
 	switch g {
 	case gattung.Konfig:
-		if err = s.StoreUtil.GetKonfig().SetTransacted(
+		if err = s.GetKonfig().SetTransacted(
 			t,
 			s.GetAkten().GetKonfigV0(),
 		); err != nil {
@@ -130,7 +130,7 @@ func (s *Store) handleNewOrUpdatedCommit(
 		}
 
 	case gattung.Kasten, gattung.Typ, gattung.Etikett:
-		if err = s.StoreUtil.GetKonfig().AddTransacted(t, s.GetAkten()); err != nil {
+		if err = s.GetKonfig().AddTransacted(t, s.GetAkten()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -146,7 +146,7 @@ func (s *Store) handleNewOrUpdatedCommit(
 		// 	return
 		// }
 
-		if err = s.StoreUtil.GetKennungIndex().AddHinweis(&t.Kennung); err != nil {
+		if err = s.GetKennungIndex().AddHinweis(&t.Kennung); err != nil {
 			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 				errors.Log().Printf("kennung does not contain value: %s", err)
 				err = nil
@@ -611,7 +611,7 @@ func (s *Store) Create(
 	m := mg.GetMetadatei()
 	s.protoZettel.Apply(m)
 
-	if err = s.StoreUtil.GetKonfig().ApplyToNewMetadatei(
+	if err = s.GetKonfig().ApplyToNewMetadatei(
 		m,
 		s.GetAkten().GetTypV0(),
 	); err != nil {
@@ -629,7 +629,7 @@ func (s *Store) Create(
 
 	var ken *kennung.Hinweis
 
-	if ken, err = s.StoreUtil.GetKennungIndex().CreateHinweis(); err != nil {
+	if ken, err = s.GetKennungIndex().CreateHinweis(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -939,6 +939,72 @@ func (s *Store) addMatchableCommon(m *sku.Transacted) (err error) {
 	}
 
 	if err = s.GetAbbrStore().AddMatchable(m); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) ReindexOne(besty, sk *sku.Transacted) (err error) {
+	errExists := s.GetAbbrStore().Exists(&sk.Kennung)
+
+	if err = s.NewOrUpdated(errExists)(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.handleNewOrUpdatedCommit(
+		sk,
+		objekte_mode.ModeEmpty,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.AddTypToIndex(&sk.Metadatei.Typ); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.GetAbbrStore().AddMatchable(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+// TODO-P2 add support for quiet reindexing
+func (s *Store) Reindex() (err error) {
+	if !s.GetStandort().GetLockSmith().IsAcquired() {
+		err = objekte_store.ErrLockRequired{
+			Operation: "reindex",
+		}
+
+		return
+	}
+
+	if err = s.ResetIndexes(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.GetStandort().ResetVerzeichnisse(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.GetVerzeichnisse().Initialize(
+		s.GetKennungIndex(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.GetBestandsaufnahmeStore().ReadAllSkus(
+		s.ReindexOne,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

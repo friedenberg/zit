@@ -18,7 +18,7 @@ type FileReader interface {
 	ReadOneExternalFS(*sku.Transacted) (*sku.CheckedOut, error)
 }
 
-func (s *common) ReadOneExternalFS(
+func (s *Store) ReadOneExternalFS(
 	sk2 *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
 	co = sku.GetCheckedOutPool().Get()
@@ -69,7 +69,7 @@ func (s *common) ReadOneExternalFS(
 	return
 }
 
-func (s *common) ReadFiles(
+func (s *Store) ReadFiles(
 	qg *query.Group,
 	f schnittstellen.FuncIter[*sku.CheckedOut],
 ) (err error) {

@@ -1,4 +1,4 @@
-package store_objekten
+package store_util
 
 import (
 	"code.linenisgreat.com/zit/src/bravo/objekte_mode"

@@ -76,9 +76,9 @@ func (c Edit) RunWithCwdQuery(
 	akten := fd.MakeMutableSet()
 	objekten := fd.MakeMutableSet()
 
-	if err = u.StoreObjekten().CheckoutQuery(
+	if err = u.Store().CheckoutQuery(
 		options,
-		query.MakeFuncReaderTransactedLikePtr(ms, u.StoreObjekten().QueryWithCwd),
+		query.MakeFuncReaderTransactedLikePtr(ms, u.Store().QueryWithCwd),
 		func(co *sku.CheckedOut) (err error) {
 			e := co.External
 

@@ -67,7 +67,7 @@ func (c WriteNewZettels) runOneAlreadyLocked(
 
 	var zt *sku.Transacted
 
-	if zt, err = c.StoreObjekten().Create(z); err != nil {
+	if zt, err = c.Store().Create(z); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -83,7 +83,7 @@ func (c WriteNewZettels) runOneAlreadyLocked(
 		// TODO-P4 separate creation and checkout into two ops to allow for
 		// optimistic
 		// unlocking
-		if result, err = c.StoreObjekten().CheckoutOne(
+		if result, err = c.Store().CheckoutOne(
 			c.CheckoutOptions,
 			&result.Internal,
 		); err != nil {
