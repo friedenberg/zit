@@ -347,10 +347,8 @@ func (i *Store) Add(
 
 func (i *Store) readFrom(
 	qg *query.Group,
-	ws ...schnittstellen.FuncIter[*sku.Transacted],
+	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	errors.TodoP3("switch to single writer and force callers to make chains")
-
 	wg := &sync.WaitGroup{}
 	ch := make(chan struct{}, PageCount)
 	me := errors.MakeMulti()
@@ -366,9 +364,9 @@ func (i *Store) readFrom(
 		}
 	}
 
-	w := pool.MakePooledChain[sku.Transacted](
+	w = pool.MakePooledChain[sku.Transacted](
 		sku.GetTransactedPool(),
-		ws...,
+		w,
 	)
 
 	for n := range i.pages {
@@ -420,7 +418,7 @@ func (i *Store) readFrom(
 
 func (i *Store) ReadQuery(
 	qg *query.Group,
-	ws ...schnittstellen.FuncIter[*sku.Transacted],
+	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	return i.readFrom(qg, ws...)
+	return i.readFrom(qg, w)
 }

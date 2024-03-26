@@ -81,7 +81,7 @@ func (c CreateFromPaths) Run(
 			return
 		}
 
-		if err = c.Store().QueryWithoutCwd(
+		if err = c.GetStore().QueryWithoutCwd(
 			qg,
 			iter.MakeChain(
 				matcher.Match,
@@ -110,7 +110,7 @@ func (c CreateFromPaths) Run(
 	err = results.Each(
 		func(z *sku.Transacted) (err error) {
 			if c.ProtoZettel.Apply(z) {
-				if _, err = c.Store().CreateOrUpdateTransacted(z); err != nil {
+				if _, err = c.GetStore().CreateOrUpdateTransacted(z); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -130,7 +130,7 @@ func (c CreateFromPaths) Run(
 
 			var zt *sku.Transacted
 
-			if zt, err = c.Store().Create(z); err != nil {
+			if zt, err = c.GetStore().Create(z); err != nil {
 				// TODO-P2 add file for error handling
 				c.handleStoreError(cz, "", err)
 				err = nil
@@ -148,7 +148,7 @@ func (c CreateFromPaths) Run(
 			}
 
 			if c.ProtoZettel.Apply(&cz.Internal) {
-				if zt, err = c.Store().CreateOrUpdateTransacted(
+				if zt, err = c.GetStore().CreateOrUpdateTransacted(
 					&cz.Internal,
 				); err != nil {
 					// TODO-P2 add file for error handling

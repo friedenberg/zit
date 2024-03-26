@@ -121,6 +121,8 @@ func (s *Store) handleNewOrUpdatedCommit(
 
 	switch g {
 	case gattung.Konfig:
+		s.GetKonfig().SetHasChanges(true)
+
 		if err = s.GetKonfig().SetTransacted(
 			t,
 			s.GetAkten().GetKonfigV0(),
@@ -130,6 +132,8 @@ func (s *Store) handleNewOrUpdatedCommit(
 		}
 
 	case gattung.Kasten, gattung.Typ, gattung.Etikett:
+		s.GetKonfig().SetHasChanges(true)
+
 		if err = s.GetKonfig().AddTransacted(t, s.GetAkten()); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -140,11 +144,6 @@ func (s *Store) handleNewOrUpdatedCommit(
 			err = errors.Wrap(err)
 			return
 		}
-
-		// if err = s.CalculateAndSetShaTransacted(tz); err != nil {
-		// 	err = errors.Wrap(err)
-		// 	return
-		// }
 
 		if err = s.GetKennungIndex().AddHinweis(&t.Kennung); err != nil {
 			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
@@ -692,8 +691,6 @@ func (s *Store) UpdateKonfig(
 func (s *Store) UpdateManyMetadatei(
 	incoming sku.TransactedSet,
 ) (err error) {
-	// TODO-P2 [rubidium/muk "only set has changes if an etikett, typ, or kasten
-	// has changes"]
 	s.GetKonfig().SetHasChanges(true)
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() {

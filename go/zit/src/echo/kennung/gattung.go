@@ -55,6 +55,11 @@ func (a *Gattung) Del(b schnittstellen.GattungGetter) {
 
 func (a Gattung) Contains(b schnittstellen.GattungGetter) bool {
 	bg := Gattung(b.GetGattung().GetGattungBitInt())
+	return byte(a&bg) == byte(bg)
+}
+
+func (a Gattung) ContainsOneOf(b schnittstellen.GattungGetter) bool {
+	bg := Gattung(b.GetGattung().GetGattungBitInt())
 	return a&bg != 0
 }
 
@@ -63,7 +68,7 @@ func (a Gattung) Slice() []gattung.Gattung {
 	out := make([]gattung.Gattung, 0, len(tg))
 
 	for _, g := range tg {
-		if !a.Contains(g) {
+		if !a.ContainsOneOf(g) {
 			continue
 		}
 
@@ -79,7 +84,7 @@ func (a Gattung) String() string {
 	first := true
 
 	for _, g := range gattung.TrueGattung() {
-		if !a.Contains(g) {
+		if !a.ContainsOneOf(g) {
 			continue
 		}
 

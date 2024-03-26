@@ -121,7 +121,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			break
 		}
 
-		if co, err = u.Store().Import(
+		if co, err = u.GetStore().Import(
 			sk,
 		); err != nil {
 			err = errors.Wrapf(err, "Sku: %s", sk)

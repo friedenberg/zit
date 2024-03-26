@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
@@ -16,6 +17,7 @@ type Kennung struct {
 	Exact   bool
 	Virtual bool
 	Debug   bool
+	FD      *fd.FD
 	*kennung.Kennung2
 }
 

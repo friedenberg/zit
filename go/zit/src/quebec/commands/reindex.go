@@ -42,7 +42,7 @@ func (c Reindex) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if err = u.Store().Reindex(); err != nil {
+	if err = u.GetStore().Reindex(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

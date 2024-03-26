@@ -82,7 +82,7 @@ func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	defer errors.Deferred(&err, u.Unlock)
 
-	if _, err = u.Store().UpdateKonfig(sh); err != nil {
+	if _, err = u.GetStore().UpdateKonfig(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -114,7 +114,7 @@ func (c EditKonfig) editOnlyEtiketten(
 
 	defer errors.DeferredCloser(&err, aw)
 
-	f := u.Store().GetKonfigAkteFormat()
+	f := u.GetStore().GetKonfigAkteFormat()
 
 	if _, err = f.FormatParsedAkte(aw, &newKonfig); err != nil {
 		err = errors.Wrap(err)
@@ -160,7 +160,7 @@ func (c EditKonfig) makeTempKonfigFile(
 ) (p string, err error) {
 	var k *sku.Transacted
 
-	if k, err = u.Store().ReadOne(&kennung.Konfig{}); err != nil {
+	if k, err = u.GetStore().ReadOne(&kennung.Konfig{}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -176,7 +176,7 @@ func (c EditKonfig) makeTempKonfigFile(
 
 	p = f.Name()
 
-	format := u.Store().GetKonfigAkteFormat()
+	format := u.GetStore().GetKonfigAkteFormat()
 
 	if _, err = format.FormatSavedAkte(f, k.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
@@ -199,7 +199,7 @@ func (c EditKonfig) readTempKonfigFile(
 
 	defer errors.DeferredCloser(&err, f)
 
-	format := u.Store().GetKonfigAkteFormat()
+	format := u.GetStore().GetKonfigAkteFormat()
 
 	var k erworben.Akte
 

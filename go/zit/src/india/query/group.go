@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/delta/gattungen"
 	"code.linenisgreat.com/zit/src/echo/fd"
@@ -32,6 +31,7 @@ type Group struct {
 	Hidden           Matcher
 	OptimizedQueries map[gattung.Gattung]*QueryWithHidden
 	UserQueries      map[kennung.Gattung]*QueryWithHidden
+	Kennungen        []*kennung.Kennung2
 	FDs              fd.MutableSet
 	Zettelen         kennung.HinweisMutableSet
 	Etiketten        kennung.EtikettMutableSet
@@ -45,6 +45,49 @@ func (qg *Group) IsEmpty() bool {
 func (qg *Group) Get(g gattung.Gattung) (MatcherSigil, bool) {
 	q, ok := qg.OptimizedQueries[g]
 	return q, ok
+}
+
+func (qg *Group) GetExactlyOneKennung(
+	g gattung.Gattung,
+	c Cwd,
+) (k *kennung.Kennung2, s kennung.Sigil, err error) {
+	if len(qg.OptimizedQueries) != 1 {
+		err = errors.Errorf(
+			"expected exactly 1 gattung query but got %d",
+			len(qg.OptimizedQueries),
+		)
+
+		return
+	}
+
+	q, ok := qg.OptimizedQueries[g]
+
+	if !ok {
+		err = errors.Errorf("expected to have gattung %q", g)
+		return
+	}
+
+	kn := q.Kennung
+	lk := len(kn)
+
+	if lk != 1 {
+		err = errors.Errorf("expected to exactly 1 kennung but got %d", lk)
+		return
+	}
+
+	s = q.GetSigil()
+
+	for _, k1 := range kn {
+		k = k1.Kennung2
+
+		if k1.FD != nil {
+			s.Add(kennung.SigilCwd)
+		}
+
+		break
+	}
+
+	return
 }
 
 func (qg *Group) GetCwdFDs() fd.Set {
@@ -104,11 +147,13 @@ func (qg *Group) Reduce(b *Builder) (err error) {
 
 func (qg *Group) AddExactKennung(
 	b *Builder,
-	k *kennung.Kennung2,
+	k Kennung,
 ) (err error) {
+	qg.Kennungen = append(qg.Kennungen, k.Kennung2)
+
 	q := b.makeQuery()
 	q.Sigil.Add(kennung.SigilSchwanzen)
-	q.Kennung[k.String()] = k
+	q.Kennung[k.Kennung2.String()] = k
 	q.Gattung.Add(gattung.Must(k))
 
 	if err = qg.Add(q); err != nil {
@@ -127,7 +172,7 @@ func (qg *Group) Add(q *Query) (err error) {
 			Hidden: qg.Hidden,
 			Query: Query{
 				Gattung: q.Gattung,
-				Kennung: make(map[string]*kennung.Kennung2),
+				Kennung: make(map[string]Kennung),
 			},
 		}
 	}
@@ -158,7 +203,7 @@ func (qg *Group) addOptimized(b *Builder, q *QueryWithHidden) (err error) {
 				Hidden: qg.Hidden,
 				Query: Query{
 					Gattung: kennung.MakeGattung(g),
-					Kennung: make(map[string]*kennung.Kennung2),
+					Kennung: make(map[string]Kennung),
 				},
 			}
 		}
@@ -321,26 +366,7 @@ func (qg *Group) String() string {
 }
 
 func (qg *Group) ContainsMatchable(sk *sku.Transacted) bool {
-	log.Log().Printf("%s in %s", sk, qg)
 	g := sk.GetGattung()
-
-	// switch g {
-	// case gattung.Zettel:
-	// 	if qg.Zettelen.ContainsKey(sk.Kennung.String()) {
-	// 		return true
-	// 	}
-
-	// case gattung.Etikett:
-	// 	if qg.Etiketten.ContainsKey(sk.Kennung.String()) {
-	// 		return true
-	// 	}
-
-	// case gattung.Typ:
-	// 	if qg.Typen.ContainsKey(sk.Kennung.String()) {
-	// 		return true
-	// 	}
-	// 	// TODO other gattung
-	// }
 
 	q, ok := qg.OptimizedQueries[gattung.Must(g)]
 

@@ -27,10 +27,10 @@ func (c Checkin) Run(
 
 	log.Log().Print(qg)
 
-	if err = u.Store().ReadFiles(
+	if err = u.GetStore().ReadFiles(
 		qg,
 		func(co *sku.CheckedOut) (err error) {
-			if _, err = u.Store().CreateOrUpdateCheckedOut(
+			if _, err = u.GetStore().CreateOrUpdateCheckedOut(
 				co,
 			); err != nil {
 				err = errors.Wrap(err)

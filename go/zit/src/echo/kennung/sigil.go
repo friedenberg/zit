@@ -85,6 +85,10 @@ func (a *Sigil) Del(b Sigil) {
 }
 
 func (a Sigil) Contains(b Sigil) bool {
+	return byte(a&b) == byte(b)
+}
+
+func (a Sigil) ContainsOneOf(b Sigil) bool {
 	return a&b != 0
 }
 
@@ -101,26 +105,26 @@ func (a Sigil) IsSchwanzenOrUnknown() bool {
 }
 
 func (a Sigil) IncludesSchwanzen() bool {
-	return a.Contains(SigilSchwanzen) || a.Contains(SigilHistory) || a == 0
+	return a.ContainsOneOf(SigilSchwanzen) || a.ContainsOneOf(SigilHistory) || a == 0
 }
 
 func (a Sigil) IncludesHistory() bool {
-	return a.Contains(SigilHistory)
+	return a.ContainsOneOf(SigilHistory)
 }
 
 func (a Sigil) IncludesCwd() bool {
-	return a.Contains(SigilCwd)
+	return a.ContainsOneOf(SigilCwd)
 }
 
 func (a Sigil) IncludesHidden() bool {
-	return a.Contains(SigilHidden) || a.Contains(SigilCwd)
+	return a.ContainsOneOf(SigilHidden) || a.ContainsOneOf(SigilCwd)
 }
 
 func (a Sigil) String() string {
 	sb := strings.Builder{}
 
 	for s := SigilSchwanzen; s <= SigilMax; s++ {
-		if a.Contains(s) {
+		if a&s != 0 {
 			r, ok := mapSigilToRune[s]
 
 			if !ok {

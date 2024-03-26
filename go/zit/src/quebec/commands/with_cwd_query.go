@@ -47,7 +47,7 @@ func (c commandWithCwdQuery) Complete(
 		return
 	}
 
-	if err = u.Store().QueryWithoutCwd(
+	if err = u.GetStore().QueryWithoutCwd(
 		qg,
 		w.WriteOne,
 	); err != nil {
@@ -70,7 +70,7 @@ func (c commandWithCwdQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if err = c.RunWithCwdQuery(u, ids, u.Store().GetCwdFiles()); err != nil {
+	if err = c.RunWithCwdQuery(u, ids, u.GetStore().GetCwdFiles()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

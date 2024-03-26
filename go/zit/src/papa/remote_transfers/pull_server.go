@@ -149,7 +149,7 @@ func (op PullServer) skusForFilter(
 		return
 	}
 
-	if err = op.umwelt.Store().QueryWithCwd(
+	if err = op.umwelt.GetStore().QueryWithCwd(
 		msg.MetaSet,
 		iter.MakeChain(
 			// zettel.MakeWriterKonfig(

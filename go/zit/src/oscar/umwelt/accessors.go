@@ -34,6 +34,6 @@ func (u *Umwelt) Standort() standort.Standort {
 	return u.standort
 }
 
-func (u *Umwelt) Store() *store.Store {
+func (u *Umwelt) GetStore() *store.Store {
 	return &u.store
 }

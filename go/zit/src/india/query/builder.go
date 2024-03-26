@@ -181,7 +181,10 @@ func (b *Builder) build(vs ...string) (qg *Group, err error) {
 				return
 			}
 
-			if err = qg.AddExactKennung(b, k); err != nil {
+			if err = qg.AddExactKennung(
+				b,
+				Kennung{Kennung2: k, FD: f},
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -196,7 +199,10 @@ func (b *Builder) build(vs ...string) (qg *Group, err error) {
 	qg.FDs = newFDS
 
 	for _, k := range b.preexistingKennung {
-		if err = qg.AddExactKennung(b, k); err != nil {
+		if err = qg.AddExactKennung(
+			b,
+			Kennung{Kennung2: k},
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -248,7 +254,7 @@ func (b *Builder) addDefaultsIfNecessary(qg *Group) {
 	} else {
 		dq = &QueryWithHidden{
 			Query: Query{
-				Kennung: make(map[string]*kennung.Kennung2),
+				Kennung: make(map[string]Kennung),
 			},
 		}
 	}
@@ -268,7 +274,7 @@ func (b *Builder) addDefaultsIfNecessary(qg *Group) {
 
 func (b *Builder) makeQuery() *Query {
 	return &Query{
-		Kennung: make(map[string]*kennung.Kennung2),
+		Kennung: make(map[string]Kennung),
 	}
 }
 
@@ -361,7 +367,7 @@ LOOP:
 			case gattung.Zettel:
 				b.preexistingKennung = append(b.preexistingKennung, k.Kennung2)
 				q.Gattung.Add(gattung.Zettel)
-				q.Kennung[k.String()] = k.Kennung2
+				q.Kennung[k.Kennung2.String()] = k
 
 			case gattung.Etikett:
 				var e kennung.Etikett

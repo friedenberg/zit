@@ -24,7 +24,6 @@ import (
 	"code.linenisgreat.com/zit/src/lima/bestandsaufnahme"
 )
 
-// TODO-P3 move to own package
 type Store struct {
 	konfig                    *konfig.Compiled
 	standort                  standort.Standort

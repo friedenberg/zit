@@ -147,7 +147,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 			var l sync.Mutex
 
-			if err = u.Store().CheckoutQuery(
+			if err = u.GetStore().CheckoutQuery(
 				options,
 				qg,
 				func(sk *sku.CheckedOut) (err error) {

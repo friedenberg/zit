@@ -76,7 +76,7 @@ func (c Edit) RunWithCwdQuery(
 	akten := fd.MakeMutableSet()
 	objekten := fd.MakeMutableSet()
 
-	if err = u.Store().CheckoutQuery(
+	if err = u.GetStore().CheckoutQuery(
 		options,
 		ms,
 		func(co *sku.CheckedOut) (err error) {

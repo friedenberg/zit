@@ -61,8 +61,8 @@ func (s *NopSigil) String() string {
 	panic("should never be called")
 }
 
-func (s *NopSigil) GetKennungen() map[string]*kennung.Kennung2 {
-	return nil
+func (s *NopSigil) ContainsKennung(_ *kennung.Kennung2) bool {
+	return false
 }
 
 func (s *NopSigil) GetSigil() kennung.Sigil {
@@ -239,20 +239,28 @@ func (bf *Binary) ReadFormatAndMatchSigil(
 		if ok {
 			qs := q.GetSigil()
 
-			if qs.Contains(sk.Sigil) {
+			wantsHidden := qs.IncludesHidden()
+			wantsHistory := qs.IncludesHistory()
+			isSchwanzen := sk.Contains(kennung.SigilSchwanzen)
+			isHidden := sk.Contains(kennung.SigilHidden)
+
+			// log.Log().Print(sk)
+			// log.Log().Print("wantsHistory", wantsHistory)
+			// log.Log().Print("wantsHidden", wantsHidden)
+			// log.Log().Print("isSchwanzen", isSchwanzen)
+			// log.Log().Print("isHidden", isHidden)
+
+			if (wantsHistory && wantsHidden) ||
+				(wantsHidden && isSchwanzen) ||
+				(wantsHistory && !isHidden) ||
+				(isSchwanzen && !isHidden) {
 				break
 			}
 
-			ks := q.GetKennungen()
-
-			if len(ks) > 0 {
-				_, ok = ks[sk.Kennung.String()]
-
-				if ok &&
-					(qs.Contains(kennung.SigilHistory) ||
-						sk.Contains(kennung.SigilSchwanzen)) {
-					break
-				}
+			if q.ContainsKennung(&sk.Kennung) &&
+				(qs.ContainsOneOf(kennung.SigilHistory) ||
+					sk.ContainsOneOf(kennung.SigilSchwanzen)) {
+				break
 			}
 		}
 

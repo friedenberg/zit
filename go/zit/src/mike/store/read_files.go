@@ -9,15 +9,6 @@ import (
 	"code.linenisgreat.com/zit/src/india/query"
 )
 
-type FileReader interface {
-	ReadFiles(
-		qg *query.Group,
-		f schnittstellen.FuncIter[*sku.CheckedOut],
-	) (err error)
-
-	ReadOneExternalFS(*sku.Transacted) (*sku.CheckedOut, error)
-}
-
 func (s *Store) ReadOneExternalFS(
 	sk2 *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {

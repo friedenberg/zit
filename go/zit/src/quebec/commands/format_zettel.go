@@ -5,12 +5,13 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
+	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/src/delta/typ_akte"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/juliett/objekte"
-	"code.linenisgreat.com/zit/src/kilo/cwd"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
@@ -43,22 +44,16 @@ func init() {
 
 func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	formatId := "text"
-	var h kennung.Hinweis
+
+	var kennungString string
 
 	switch len(args) {
 	case 1:
-		if err = h.Set(args[0]); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		kennungString = args[0]
 
 	case 2:
 		formatId = args[0]
-
-		if err = h.Set(args[1]); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		kennungString = args[1]
 
 	default:
 		err = errors.Errorf(
@@ -68,11 +63,21 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var cwdFiles *cwd.CwdFiles
+	b := u.MakeMetaIdSetWithoutExcludedHidden(kennung.MakeGattung(gattung.Zettel))
 
-	if cwdFiles, err = cwd.MakeCwdFilesAll(
-		u.Konfig(),
-		u.Standort(),
+	var qg *query.Group
+
+	if qg, err = b.BuildQueryGroup(kennungString); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var k *kennung.Kennung2
+	var s kennung.Sigil
+
+	if k, s, err = qg.GetExactlyOneKennung(
+		gattung.Zettel,
+		u.GetStore().GetCwdFiles(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -80,28 +85,9 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var zt *sku.Transacted
 
-	if zt, err = u.Store().ReadOne(&h); err != nil {
+	if zt, err = u.GetStore().ReadOneSigil(k, s); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	if e, ok := cwdFiles.GetZettel(&h); ok {
-		var ze *sku.External
-
-		ze, err = u.Store().ReadOneExternal(e, zt)
-
-		switch {
-		case err != nil:
-			err = errors.Wrap(err)
-			return
-
-		default:
-			// TODO-P1 switch to methods on Transacted and External
-			if err = zt.SetFromSkuLike(ze); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
 	}
 
 	typKonfig := u.Konfig().GetApproximatedTyp(
@@ -116,7 +102,9 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var typAkte *typ_akte.V0
 
-	if typAkte, err = u.Store().GetAkten().GetTypV0().GetAkte(typKonfig.GetAkteSha()); err != nil {
+	if typAkte, err = u.GetStore().GetAkten().GetTypV0().GetAkte(
+		typKonfig.GetAkteSha(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -156,9 +144,16 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		// return
 	}
 
-	f := objekte.MakeTextFormatterWithAkteFormatter(u.Standort(), u.Konfig(), akteFormatter)
+	f := objekte.MakeTextFormatterWithAkteFormatter(
+		u.Standort(),
+		u.Konfig(),
+		akteFormatter,
+	)
 
-	if err = u.Konfig().ApplyToNewMetadatei(zt, u.Store().GetAkten().GetTypV0()); err != nil {
+	if err = u.Konfig().ApplyToNewMetadatei(
+		zt,
+		u.GetStore().GetAkten().GetTypV0(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

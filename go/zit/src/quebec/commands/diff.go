@@ -55,7 +55,7 @@ func (c Diff) RunWithQuery(
 		nil,
 	)
 
-	if err = u.Store().ReadFiles(
+	if err = u.GetStore().ReadFiles(
 		qg,
 		func(co *sku.CheckedOut) (err error) {
 			wg := iter.MakeErrorWaitGroupParallel()

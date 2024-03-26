@@ -98,7 +98,7 @@ func (c CheckinTomlBookmark) Run(
 			return
 		}
 
-		if u.Store().CreateOrUpdate(swu, swu.GetKennung()); err != nil {
+		if u.GetStore().CreateOrUpdate(swu, swu.GetKennung()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -120,7 +120,7 @@ func (c CheckinTomlBookmark) Run(
 			return
 		}
 
-		if _, err = u.Store().CreateWithAkteString(
+		if _, err = u.GetStore().CreateWithAkteString(
 			mg,
 			content,
 		); err != nil {
@@ -153,7 +153,7 @@ func (c CheckinTomlBookmark) getUrls(
 
 	urls = make(map[string]SkuWithUrl)
 
-	if err = u.Store().QueryWithoutCwd(
+	if err = u.GetStore().QueryWithoutCwd(
 		ids,
 		iter.MakeSyncSerializer(
 			func(sk *sku.Transacted) (err error) {

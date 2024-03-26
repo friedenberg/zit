@@ -232,7 +232,7 @@ func (c Add) openAktenIfNecessary(
 	var filesAkten []string
 	var l sync.Mutex
 
-	if err = u.Store().CheckoutQuery(
+	if err = u.GetStore().CheckoutQuery(
 		options,
 		qg,
 		func(z *sku.CheckedOut) (err error) {

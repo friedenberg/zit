@@ -10,35 +10,6 @@ import (
 	"code.linenisgreat.com/zit/src/india/query"
 )
 
-type reader interface {
-	ReadOneInto(
-		k1 schnittstellen.StringerGattungGetter,
-		out *sku.Transacted,
-	) (err error)
-
-	ReadAllGattungFromBestandsaufnahme(
-		g gattung.Gattung,
-		f schnittstellen.FuncIter[*sku.Transacted],
-	) (err error)
-
-	ReadAllGattungenFromBestandsaufnahme(
-		g kennung.Gattung,
-		f schnittstellen.FuncIter[*sku.Transacted],
-	) (err error)
-
-	ReadAllGattungFromVerzeichnisse(
-		qg *query.Group,
-		g gattung.Gattung,
-		f schnittstellen.FuncIter[*sku.Transacted],
-	) (err error)
-
-	ReadAllGattungenFromVerzeichnisse(
-		qg *query.Group,
-		g kennung.Gattung,
-		f schnittstellen.FuncIter[*sku.Transacted],
-	) (err error)
-}
-
 func (s *Store) ReadOneInto(
 	k1 schnittstellen.StringerGattungGetter,
 	out *sku.Transacted,
@@ -153,7 +124,7 @@ func (s *Store) ReadAllGattungenFromBestandsaufnahme(
 	}
 
 	eachSku := func(besty, sk *sku.Transacted) (err error) {
-		if !g.Contains(sk.GetGattung()) {
+		if !g.ContainsOneOf(sk.GetGattung()) {
 			return
 		}
 
@@ -212,7 +183,7 @@ func (s *Store) ReadAllGattungenFromVerzeichnisse(
 	}
 
 	eachSku := func(sk *sku.Transacted) (err error) {
-		if !g.Contains(sk.GetGattung()) {
+		if !g.ContainsOneOf(sk.GetGattung()) {
 			return
 		}
 

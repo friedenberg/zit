@@ -6,10 +6,6 @@ import (
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
-type mutators interface {
-	CommitTransacted(*sku.Transacted) error
-}
-
 func (s *Store) CommitTransacted(t *sku.Transacted) (err error) {
 	sk := sku.GetTransactedPool().Get()
 

@@ -110,7 +110,7 @@ func (c *Organize) RunWithQuery(
 	var l sync.Mutex
 	getResults := objekte_collections.MakeMutableSetMetadateiWithKennung()
 
-	if err = u.Store().QueryWithCwd(
+	if err = u.GetStore().QueryWithCwd(
 		ms,
 		func(tl *sku.Transacted) (err error) {
 			mwk := sku.GetTransactedPool().Get()
@@ -125,7 +125,7 @@ func (c *Organize) RunWithQuery(
 			h = &kennung.Hinweis{}
 
 			if err = h.Set(mwk.GetKennung().String()); err == nil {
-				if h, err = u.Store().GetAbbrStore().Hinweis().ExpandString(
+				if h, err = u.GetStore().GetAbbrStore().Hinweis().ExpandString(
 					h.String(),
 				); err != nil {
 					err = errors.Wrap(err)

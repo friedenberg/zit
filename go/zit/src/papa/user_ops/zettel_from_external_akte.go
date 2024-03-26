@@ -84,7 +84,7 @@ func (c ZettelFromExternalAkte) Run(
 	if c.Dedupe {
 		matcher := objekte_collections.MakeMutableMatchSet(toCreate)
 
-		if err = c.Store().QueryWithoutCwd(
+		if err = c.GetStore().QueryWithoutCwd(
 			qg,
 			iter.MakeChain(
 				matcher.Match,
@@ -108,7 +108,7 @@ func (c ZettelFromExternalAkte) Run(
 	if err = results.Each(
 		func(z *sku.Transacted) (err error) {
 			if c.ProtoZettel.Apply(z) {
-				if _, err = c.Store().CreateOrUpdateTransacted(
+				if _, err = c.GetStore().CreateOrUpdateTransacted(
 					z,
 				); err != nil {
 					err = errors.Wrap(err)
@@ -139,13 +139,13 @@ func (c ZettelFromExternalAkte) Run(
 
 		var tz *sku.Transacted
 
-		if tz, err = c.Store().Create(z); err != nil {
+		if tz, err = c.GetStore().Create(z); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		if c.ProtoZettel.Apply(tz) {
-			if tz, err = c.Store().CreateOrUpdateTransacted(
+			if tz, err = c.GetStore().CreateOrUpdateTransacted(
 				tz,
 			); err != nil {
 				err = errors.Wrap(err)

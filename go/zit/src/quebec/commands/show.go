@@ -62,8 +62,8 @@ func (c Show) runGenericObjekteFormatterValue(
 			u.Konfig(),
 			u.PrinterTransactedLike(),
 			u.StringFormatWriterSkuTransactedShort(),
-			u.Store().GetEnnui(),
-			u.Store().ReadOneEnnui,
+			u.GetStore().GetEnnui(),
+			u.GetStore().ReadOneEnnui,
 		),
 	)
 
@@ -80,7 +80,7 @@ func (c Show) runGenericObjekteFormatterValue(
 	// 	return
 	// }
 
-	if err = u.Store().QueryWithCwd(ms, f); err != nil {
+	if err = u.GetStore().QueryWithCwd(ms, f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -105,13 +105,13 @@ func (c Show) RunWithQuery(u *umwelt.Umwelt, ms *query.Group) (err error) {
 		u.Out(),
 		u.Standort(),
 		u.Konfig(),
-		u.Store().GetAkten().GetTypV0(),
+		u.GetStore().GetAkten().GetTypV0(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = u.Store().QueryWithCwd(
+	if err = u.GetStore().QueryWithCwd(
 		ms,
 		iter.MakeSyncSerializer(f.MakeFormatFunc()),
 	); err != nil {

@@ -30,14 +30,14 @@ func (u *Umwelt) Unlock() (err error) {
 
 		if err = u.Konfig().Flush(
 			u.Standort(),
-			u.Store().GetAkten().GetTypV0(),
+			u.GetStore().GetAkten().GetTypV0(),
 			u.PrinterHeader(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = u.Store().Flush(u.PrinterHeader()); err != nil {
+		if err = u.GetStore().Flush(u.PrinterHeader()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

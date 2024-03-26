@@ -16,7 +16,7 @@ type Query struct {
 	kennung.Gattung
 	Exp
 
-	Kennung map[string]*kennung.Kennung2
+	Kennung map[string]Kennung
 }
 
 func (a *Query) IsEmpty() bool {
@@ -34,15 +34,25 @@ func (a *Query) GetSigil() kennung.Sigil {
 	return a.Sigil
 }
 
-func (a *Query) GetKennungen() map[string]*kennung.Kennung2 {
-	return a.Kennung
+func (a *Query) ContainsKennung(k *kennung.Kennung2) bool {
+	if !a.Gattung.Contains(k.GetGattung()) {
+		panic("should never check for wrong gattung")
+	}
+
+	if len(a.Kennung) == 0 {
+		return false
+	}
+
+	_, ok := a.Kennung[k.String()]
+
+	return ok
 }
 
 func (a *Query) Clone() (b *Query) {
 	b = &Query{
 		Sigil:   a.Sigil,
 		Gattung: a.Gattung,
-		Kennung: make(map[string]*kennung.Kennung2, len(a.Kennung)),
+		Kennung: make(map[string]Kennung, len(a.Kennung)),
 	}
 
 	bExp := a.Exp.Clone()
@@ -84,11 +94,11 @@ func (a *Query) Merge(b *Query) (err error) {
 	a.Sigil.Add(b.Sigil)
 
 	if a.Kennung == nil {
-		a.Kennung = make(map[string]*kennung.Kennung2)
+		a.Kennung = make(map[string]Kennung)
 	}
 
 	for _, k := range b.Kennung {
-		a.Kennung[k.String()] = k
+		a.Kennung[k.Kennung2.String()] = k
 	}
 
 	a.Children = append(a.Children, b.Children...)
@@ -198,7 +208,7 @@ func (q *Query) String() string {
 func (q *Query) ContainsMatchable(sk *sku.Transacted) bool {
 	g := gattung.Must(sk)
 
-	if !q.Gattung.Contains(g) {
+	if !q.Gattung.ContainsOneOf(g) {
 		return false
 	}
 

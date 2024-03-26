@@ -57,8 +57,8 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		u.Konfig(),
 		u.PrinterTransactedLike(),
 		u.StringFormatWriterSkuTransactedShort(),
-		u.Store().GetEnnui(),
-		u.Store().ReadOneEnnui,
+		u.GetStore().GetEnnui(),
+		u.GetStore().ReadOneEnnui,
 	)
 
 	if err = c.runWithBestandsaufnahm(u, f); err != nil {
@@ -73,7 +73,7 @@ func (c Last) runWithBestandsaufnahm(
 	u *umwelt.Umwelt,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	s := u.Store()
+	s := u.GetStore()
 
 	var b *sku.Transacted
 

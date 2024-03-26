@@ -39,7 +39,7 @@ func (c Checkout) RunWithQuery(
 	u *umwelt.Umwelt,
 	ms *query.Group,
 ) (err error) {
-	if err = u.Store().CheckoutQuery(
+	if err = u.GetStore().CheckoutQuery(
 		c.CheckoutOptions,
 		ms,
 		func(co *sku.CheckedOut) (err error) {

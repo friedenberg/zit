@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/echo/fd"
+	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/query"
 )
@@ -82,6 +83,39 @@ func (s *Store) ReadOne(
 	if err = s.ReadOneInto(k1, sk1); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	return
+}
+
+func (s *Store) ReadOneSigil(
+	k1 schnittstellen.StringerGattungGetter,
+	si kennung.Sigil,
+) (sk1 *sku.Transacted, err error) {
+	sk1 = sku.GetTransactedPool().Get()
+
+	if err = s.ReadOneInto(k1, sk1); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if !si.IncludesCwd() {
+		return
+	}
+
+	if e, ok := s.cwdFiles.Get(k1); ok {
+		var ze *sku.External
+
+		if ze, err = s.ReadOneExternal(e, sk1); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		// TODO-P1 switch to methods on Transacted and External
+		if err = sk1.SetFromSkuLike(ze); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

@@ -223,7 +223,7 @@ func (fs CwdFiles) GetTyp(
 }
 
 func (fs CwdFiles) Get(
-	k kennung.Kennung,
+	k schnittstellen.StringerGattungGetter,
 ) (t *sku.ExternalMaybe, ok bool) {
 	g := gattung.Must(k.GetGattung())
 
