@@ -1,4 +1,4 @@
-package sku_fmt
+package store_verzeichnisse
 
 import (
 	"bytes"
@@ -15,13 +15,13 @@ import (
 	"code.linenisgreat.com/zit/src/echo/kennung"
 )
 
-type BinaryWriter struct {
+type binaryEncoder struct {
 	bytes.Buffer
-	BinaryField
+	binaryField
 	kennung.Sigil
 }
 
-func (bf *BinaryWriter) UpdateSigil(
+func (bf *binaryEncoder) updateSigil(
 	wa io.WriterAt,
 	s kennung.Sigil,
 	offset int64,
@@ -45,14 +45,14 @@ func (bf *BinaryWriter) UpdateSigil(
 	return
 }
 
-func (bf *BinaryWriter) WriteFormat(
+func (bf *binaryEncoder) writeFormat(
 	w io.Writer,
-	sk SkuWithSigil,
+	sk skuWithSigil,
 ) (n int64, err error) {
 	bf.Buffer.Reset()
 
 	for _, f := range binaryFieldOrder {
-		bf.BinaryField.Reset()
+		bf.binaryField.Reset()
 		bf.Schlussel = f
 
 		if _, err = bf.writeFieldKey(sk); err != nil {
@@ -61,7 +61,7 @@ func (bf *BinaryWriter) WriteFormat(
 		}
 	}
 
-	bf.BinaryField.Reset()
+	bf.binaryField.Reset()
 
 	bf.SetContentLength(bf.Len())
 
@@ -81,8 +81,8 @@ func (bf *BinaryWriter) WriteFormat(
 	return
 }
 
-func (bf *BinaryWriter) writeFieldKey(
-	sk SkuWithSigil,
+func (bf *binaryEncoder) writeFieldKey(
+	sk skuWithSigil,
 ) (n int64, err error) {
 	switch bf.Schlussel {
 	case schlussel.Sigil:
@@ -231,7 +231,7 @@ func (bf *BinaryWriter) writeFieldKey(
 	return
 }
 
-func (bf *BinaryWriter) writeSha(
+func (bf *binaryEncoder) writeSha(
 	sh *sha.Sha,
 	allowNull bool,
 ) (n int64, err error) {
@@ -251,7 +251,7 @@ func (bf *BinaryWriter) writeSha(
 	return
 }
 
-func (bf *BinaryWriter) writeFieldWriterTo(
+func (bf *binaryEncoder) writeFieldWriterTo(
 	wt io.WriterTo,
 ) (n int64, err error) {
 	_, err = wt.WriteTo(&bf.Content)
@@ -260,7 +260,7 @@ func (bf *BinaryWriter) writeFieldWriterTo(
 		return
 	}
 
-	if n, err = bf.BinaryField.WriteTo(&bf.Buffer); err != nil {
+	if n, err = bf.binaryField.WriteTo(&bf.Buffer); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -268,7 +268,7 @@ func (bf *BinaryWriter) writeFieldWriterTo(
 	return
 }
 
-func (bf *BinaryWriter) writeFieldBinaryMarshaler(
+func (bf *binaryEncoder) writeFieldBinaryMarshaler(
 	bm encoding.BinaryMarshaler,
 ) (n int64, err error) {
 	var b []byte
@@ -290,7 +290,7 @@ func (bf *BinaryWriter) writeFieldBinaryMarshaler(
 		return
 	}
 
-	if n, err = bf.BinaryField.WriteTo(&bf.Buffer); err != nil {
+	if n, err = bf.binaryField.WriteTo(&bf.Buffer); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -298,7 +298,7 @@ func (bf *BinaryWriter) writeFieldBinaryMarshaler(
 	return
 }
 
-func (bf *BinaryWriter) writeFieldByteReader(
+func (bf *binaryEncoder) writeFieldByteReader(
 	br io.ByteReader,
 ) (n int64, err error) {
 	var b byte
@@ -315,7 +315,7 @@ func (bf *BinaryWriter) writeFieldByteReader(
 		return
 	}
 
-	if n, err = bf.BinaryField.WriteTo(&bf.Buffer); err != nil {
+	if n, err = bf.binaryField.WriteTo(&bf.Buffer); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

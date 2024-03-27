@@ -1,4 +1,4 @@
-package sku_fmt
+package store_verzeichnisse
 
 import (
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -6,12 +6,12 @@ import (
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
-type SkuWithSigil struct {
+type skuWithSigil struct {
 	*sku.Transacted
 	kennung.Sigil
 }
 
 type Sku struct {
-	SkuWithSigil
+	skuWithSigil
 	ennui.Range
 }

@@ -22,7 +22,6 @@ import (
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/query"
-	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 )
 
@@ -251,16 +250,16 @@ func (i *Store) readLoc(loc ennui.Loc) (sk *sku.Transacted, err error) {
 
 	defer errors.DeferredCloser(&err, f)
 
-	coder := sku_fmt.Binary{
-		MatcherGroup: &sku_fmt.NopSigil{Sigil: kennung.SigilAll},
+	coder := binaryDecoder{
+		MatcherGroup: &sigil{Sigil: kennung.SigilAll},
 	}
 
 	sk = sku.GetTransactedPool().Get()
 
-	if _, err = coder.ReadFormatExactly(
+	if _, err = coder.readFormatExactly(
 		f,
 		loc,
-		&sku_fmt.Sku{SkuWithSigil: sku_fmt.SkuWithSigil{Transacted: sk}},
+		&Sku{skuWithSigil: skuWithSigil{Transacted: sk}},
 	); err != nil {
 		sku.GetTransactedPool().Put(sk)
 		sk = nil

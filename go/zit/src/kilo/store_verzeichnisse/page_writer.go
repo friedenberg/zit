@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/golf/ennui"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/sku_fmt"
 )
 
 type ShaTuple struct {
@@ -25,8 +24,8 @@ type KennungShaMap map[string]ShaTuple
 
 type pageWriter struct {
 	*PageTuple
-	sku_fmt.Binary
-	sku_fmt.BinaryWriter
+	binaryDecoder
+	binaryEncoder
 	*os.File
 	bufio.Reader
 	bufio.Writer
@@ -46,8 +45,8 @@ func (pw *pageWriter) Flush() (err error) {
 	defer pw.addedSchwanz.Reset()
 
 	pw.kennungShaMap = make(KennungShaMap)
-	pw.Binary = sku_fmt.MakeBinary(kennung.SigilHistory)
-	pw.Binary.Sigil = kennung.SigilHistory
+	pw.binaryDecoder = makeBinary(kennung.SigilHistory)
+	pw.binaryDecoder.Sigil = kennung.SigilHistory
 
 	path := pw.Path()
 
@@ -96,7 +95,7 @@ func (pw *pageWriter) flushBoth() (err error) {
 	)
 
 	if err = pw.CopyJustHistoryAndAdded(
-		sku_fmt.MakeSigil(kennung.SigilHistory, kennung.SigilHidden),
+		makeSigil(kennung.SigilHistory, kennung.SigilHidden),
 		chain,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -124,7 +123,7 @@ func (pw *pageWriter) flushBoth() (err error) {
 	for _, st := range pw.kennungShaMap {
 		st.Add(kennung.SigilSchwanzen)
 
-		if err = pw.UpdateSigil(pw, st.Sigil, st.Offset); err != nil {
+		if err = pw.updateSigil(pw, st.Sigil, st.Offset); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -136,8 +135,8 @@ func (pw *pageWriter) flushBoth() (err error) {
 func (pw *pageWriter) flushJustSchwanz() (err error) {
 	if err = pw.CopyJustHistoryFrom(
 		&pw.Reader,
-		sku_fmt.MakeSigil(kennung.SigilHistory, kennung.SigilHidden),
-		func(sk sku_fmt.Sku) (err error) {
+		makeSigil(kennung.SigilHistory, kennung.SigilHidden),
+		func(sk Sku) (err error) {
 			pw.Range = sk.Range
 			pw.SaveSha(sk.Transacted, sk.Sigil)
 			return
@@ -174,7 +173,7 @@ func (pw *pageWriter) flushJustSchwanz() (err error) {
 	for _, st := range pw.kennungShaMap {
 		st.Add(kennung.SigilSchwanzen)
 
-		if err = pw.UpdateSigil(pw, st.Sigil, st.Offset); err != nil {
+		if err = pw.updateSigil(pw, st.Sigil, st.Offset); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -188,9 +187,9 @@ func (pw *pageWriter) writeOne(
 ) (err error) {
 	pw.Offset += pw.ContentLength
 
-	if pw.ContentLength, err = pw.WriteFormat(
+	if pw.ContentLength, err = pw.writeFormat(
 		&pw.Writer,
-		sku_fmt.SkuWithSigil{Transacted: z},
+		skuWithSigil{Transacted: z},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -234,7 +233,7 @@ func (pw *pageWriter) removeOldSchwanzen(sk *sku.Transacted) (err error) {
 
 	st.Del(kennung.SigilSchwanzen)
 
-	if err = pw.UpdateSigil(pw, st.Sigil, st.Offset); err != nil {
+	if err = pw.updateSigil(pw, st.Sigil, st.Offset); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -1,4 +1,4 @@
-package sku_fmt
+package store_verzeichnisse
 
 import (
 	"bytes"
@@ -12,25 +12,25 @@ import (
 	"code.linenisgreat.com/zit/src/delta/schlussel"
 )
 
-type BinaryField struct {
+type binaryField struct {
 	schlussel.Schlussel
 	ContentLength [2]uint8
 	Content       bytes.Buffer
 }
 
-func (bf *BinaryField) String() string {
+func (bf *binaryField) String() string {
 	cl, _, _ := bf.GetContentLength()
 	return fmt.Sprintf("%s:%d:%x", bf.Schlussel, cl, bf.Content.Bytes())
 }
 
-func (bf *BinaryField) Reset() {
+func (bf *binaryField) Reset() {
 	bf.Schlussel.Reset()
 	bf.ContentLength[0] = 0
 	bf.ContentLength[1] = 0
 	bf.Content.Reset()
 }
 
-func (bf *BinaryField) GetContentLength() (contentLength int, contentLength64 int64, err error) {
+func (bf *binaryField) GetContentLength() (contentLength int, contentLength64 int64, err error) {
 	var n int
 	contentLength64, n = binary.Varint(bf.ContentLength[:])
 
@@ -52,7 +52,7 @@ func (bf *BinaryField) GetContentLength() (contentLength int, contentLength64 in
 	return int(contentLength64), contentLength64, nil
 }
 
-func (bf *BinaryField) SetContentLength(v int) {
+func (bf *binaryField) SetContentLength(v int) {
 	if v < 0 {
 		panic(errContentLengthNegative)
 	}
@@ -69,7 +69,7 @@ var (
 	errContentLengthNegative = errors.New("content length negative")
 )
 
-func (bf *BinaryField) ReadFrom(r io.Reader) (n int64, err error) {
+func (bf *binaryField) ReadFrom(r io.Reader) (n int64, err error) {
 	var n1 int
 	var n2 int64
 	n2, err = bf.Schlussel.ReadFrom(r)
@@ -112,7 +112,7 @@ var errContentLengthDoesNotMatchContent = errors.New(
 	"content length does not match content",
 )
 
-func (bf *BinaryField) WriteTo(w io.Writer) (n int64, err error) {
+func (bf *binaryField) WriteTo(w io.Writer) (n int64, err error) {
 	if bf.Content.Len() > math.MaxUint16 {
 		err = errContentLengthTooLarge
 		return

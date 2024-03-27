@@ -10,13 +10,12 @@ import (
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/golf/ennui"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/sku_fmt"
 )
 
 type tomlPageWriter struct {
 	*TomlPageTuple
-	sku_fmt.Binary
-	sku_fmt.BinaryWriter
+	binaryDecoder
+	binaryEncoder
 	*os.File
 	bufio.Reader
 	bufio.Writer
@@ -35,8 +34,8 @@ func (pw *tomlPageWriter) Flush() (err error) {
 	defer pw.addedSchwanz.Reset()
 
 	pw.kennungShaMap = make(KennungShaMap)
-	pw.Binary = sku_fmt.MakeBinary(kennung.SigilHistory)
-	pw.BinaryWriter.Sigil = kennung.SigilHistory
+	pw.binaryDecoder = makeBinary(kennung.SigilHistory)
+	pw.binaryEncoder.Sigil = kennung.SigilHistory
 
 	path := pw.Path()
 
@@ -107,7 +106,7 @@ func (pw *tomlPageWriter) flushBoth() (err error) {
 	for _, st := range pw.kennungShaMap {
 		st.Add(kennung.SigilSchwanzen)
 
-		if err = pw.UpdateSigil(pw, st.Sigil, st.Offset); err != nil {
+		if err = pw.updateSigil(pw, st.Sigil, st.Offset); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -120,7 +119,7 @@ func (pw *tomlPageWriter) flushJustSchwanz() (err error) {
 	if err = pw.CopyJustHistoryFrom(
 		&pw.Reader,
 		kennung.SigilHistory,
-		func(sk sku_fmt.Sku) (err error) {
+		func(sk Sku) (err error) {
 			pw.Range = sk.Range
 			pw.SaveSha(sk.Transacted, sk.Sigil)
 			return
@@ -157,7 +156,7 @@ func (pw *tomlPageWriter) flushJustSchwanz() (err error) {
 	for _, st := range pw.kennungShaMap {
 		st.Add(kennung.SigilSchwanzen)
 
-		if err = pw.UpdateSigil(pw, st.Sigil, st.Offset); err != nil {
+		if err = pw.updateSigil(pw, st.Sigil, st.Offset); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -171,9 +170,9 @@ func (pw *tomlPageWriter) writeOne(
 ) (err error) {
 	pw.Offset += pw.ContentLength
 
-	if pw.ContentLength, err = pw.WriteFormat(
+	if pw.ContentLength, err = pw.writeFormat(
 		&pw.Writer,
-		sku_fmt.SkuWithSigil{Transacted: z},
+		skuWithSigil{Transacted: z},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -217,7 +216,7 @@ func (pw *tomlPageWriter) removeOldSchwanzen(sk *sku.Transacted) (err error) {
 
 	st.Del(kennung.SigilSchwanzen)
 
-	if err = pw.UpdateSigil(pw, st.Sigil, st.Offset); err != nil {
+	if err = pw.updateSigil(pw, st.Sigil, st.Offset); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

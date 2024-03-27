@@ -1,11 +1,10 @@
-package sku_fmt
+package store_verzeichnisse
 
 import (
 	"bytes"
 	"io"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/delta/ohio"
 	"code.linenisgreat.com/zit/src/delta/schlussel"
@@ -31,73 +30,38 @@ var binaryFieldOrder = []schlussel.Schlussel{
 	schlussel.VerzeichnisseEtiketten,
 }
 
-func MakeSigil(ss ...kennung.Sigil) sku.MatcherGroup {
-	return &NopSigil{Sigil: kennung.MakeSigil(ss...)}
+func makeSigil(ss ...kennung.Sigil) sku.MatcherGroup {
+	return &sigil{Sigil: kennung.MakeSigil(ss...)}
 }
 
-type NopSigil struct {
-	kennung.Sigil
-}
-
-func (qg *NopSigil) Get(_ gattung.Gattung) (sku.Query, bool) {
-	return qg, true
-}
-
-func (s *NopSigil) ContainsMatchable(_ *sku.Transacted) bool {
-	return true
-}
-
-func (s *NopSigil) String() string {
-	panic("should never be called")
-}
-
-func (s *NopSigil) ContainsKennung(_ *kennung.Kennung2) bool {
-	return false
-}
-
-func (s *NopSigil) GetSigil() kennung.Sigil {
-	return s.Sigil
-}
-
-func (s *NopSigil) Each(_ schnittstellen.FuncIter[sku.QueryBase]) error {
-	return nil
-}
-
-func MakeBinary(s kennung.Sigil) Binary {
-	return Binary{
-		MatcherGroup: MakeSigil(s),
+func makeBinary(s kennung.Sigil) binaryDecoder {
+	return binaryDecoder{
+		MatcherGroup: makeSigil(s),
 		Sigil:        s,
 	}
 }
 
-func MakeBinaryWithQueryGroup(qg sku.MatcherGroup, s kennung.Sigil) Binary {
-	return Binary{
+func makeBinaryWithQueryGroup(qg sku.MatcherGroup, s kennung.Sigil) binaryDecoder {
+	return binaryDecoder{
 		MatcherGroup: qg,
 		Sigil:        s,
 	}
 }
 
-type Binary struct {
+type binaryDecoder struct {
 	bytes.Buffer
-	BinaryField
+	binaryField
 	kennung.Sigil
 	sku.MatcherGroup
 	io.LimitedReader
 }
 
-//   ____                _
-//  |  _ \ ___  __ _  __| |
-//  | |_) / _ \/ _` |/ _` |
-//  |  _ <  __/ (_| | (_| |
-//  |_| \_\___|\__,_|\__,_|
-//
-
-func (bf *Binary) ReadFormatExactly(
+func (bf *binaryDecoder) readFormatExactly(
 	r io.ReaderAt,
 	loc ennui.Loc,
 	sk *Sku,
 ) (n int64, err error) {
-	bf.BinaryField.Reset()
+	bf.binaryField.Reset()
 	bf.Buffer.Reset()
 
 	var n1 int
@@ -141,7 +105,7 @@ func (bf *Binary) ReadFormatExactly(
 	}
 
 	for buf.Len() > 0 {
-		n2, err = bf.BinaryField.ReadFrom(buf)
+		n2, err = bf.binaryField.ReadFrom(buf)
 		n += n2
 
 		if err != nil {
@@ -158,11 +122,11 @@ func (bf *Binary) ReadFormatExactly(
 	return
 }
 
-func (bf *Binary) ReadFormatAndMatchSigil(
+func (bf *binaryDecoder) readFormatAndMatchSigil(
 	r io.Reader,
 	sk *Sku,
 ) (n int64, err error) {
-	bf.BinaryField.Reset()
+	bf.binaryField.Reset()
 	bf.Buffer.Reset()
 
 	var n1 int
@@ -203,7 +167,7 @@ func (bf *Binary) ReadFormatAndMatchSigil(
 			return
 		}
 
-		n2, err = bf.BinaryField.ReadFrom(&bf.LimitedReader)
+		n2, err = bf.binaryField.ReadFrom(&bf.LimitedReader)
 		n += n2
 
 		if err != nil {
@@ -255,7 +219,7 @@ func (bf *Binary) ReadFormatAndMatchSigil(
 	}
 
 	for bf.N > 0 {
-		n2, err = bf.BinaryField.ReadFrom(&bf.LimitedReader)
+		n2, err = bf.binaryField.ReadFrom(&bf.LimitedReader)
 		n += n2
 
 		if err != nil {
@@ -274,11 +238,11 @@ func (bf *Binary) ReadFormatAndMatchSigil(
 
 var errExpectedSigil = errors.New("expected sigil")
 
-func (bf *Binary) readSigil(
+func (bf *binaryDecoder) readSigil(
 	sk *Sku,
 	r io.Reader,
 ) (n int64, err error) {
-	n, err = bf.BinaryField.ReadFrom(r)
+	n, err = bf.binaryField.ReadFrom(r)
 
 	if err != nil {
 		err = errors.Wrap(err)
@@ -302,7 +266,7 @@ func (bf *Binary) readSigil(
 	return
 }
 
-func (bf *Binary) readFieldKey(
+func (bf *binaryDecoder) readFieldKey(
 	sk *sku.Transacted,
 ) (err error) {
 	switch bf.Schlussel {

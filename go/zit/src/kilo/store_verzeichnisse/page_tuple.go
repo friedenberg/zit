@@ -15,7 +15,6 @@ import (
 	"code.linenisgreat.com/zit/src/golf/ennui"
 	"code.linenisgreat.com/zit/src/golf/kennung_index"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 )
 
@@ -89,16 +88,16 @@ func (pt *PageTuple) CopyJustHistory(
 func (pt *PageTuple) CopyJustHistoryFrom(
 	r io.Reader,
 	s sku.MatcherGroup,
-	w schnittstellen.FuncIter[sku_fmt.Sku],
+	w schnittstellen.FuncIter[Sku],
 ) (err error) {
-	dec := sku_fmt.MakeBinaryWithQueryGroup(s, kennung.SigilHistory)
+	dec := makeBinaryWithQueryGroup(s, kennung.SigilHistory)
 
-	var sk sku_fmt.Sku
+	var sk Sku
 
 	for {
 		sk.Offset += sk.ContentLength
 		sk.Transacted = sku.GetTransactedPool().Get()
-		sk.ContentLength, err = dec.ReadFormatAndMatchSigil(r, &sk)
+		sk.ContentLength, err = dec.readFormatAndMatchSigil(r, &sk)
 
 		if err != nil {
 			if errors.IsEOF(err) {
@@ -150,7 +149,7 @@ func (pt *PageTuple) copyHistoryAndMaybeSchwanz(
 		if err = pt.CopyJustHistoryFrom(
 			br,
 			s,
-			func(sk sku_fmt.Sku) (err error) {
+			func(sk Sku) (err error) {
 				if err = w(sk.Transacted); err != nil {
 					err = errors.Wrapf(err, "%s", sk.Transacted)
 					return
@@ -166,18 +165,18 @@ func (pt *PageTuple) copyHistoryAndMaybeSchwanz(
 		return
 	}
 
-	dec := sku_fmt.MakeBinaryWithQueryGroup(s, kennung.SigilHistory)
+	dec := makeBinaryWithQueryGroup(s, kennung.SigilHistory)
 
 	errors.TodoP3("determine performance of this")
 	added := pt.added.Copy()
 
-	var sk sku_fmt.Sku
+	var sk Sku
 
 	if err = added.MergeStream(
 		func() (tz *sku.Transacted, err error) {
 			tz = sku.GetTransactedPool().Get()
 			sk.Transacted = tz
-			_, err = dec.ReadFormatAndMatchSigil(br, &sk)
+			_, err = dec.readFormatAndMatchSigil(br, &sk)
 
 			if err != nil {
 				if errors.IsEOF(err) {
