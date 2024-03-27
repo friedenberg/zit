@@ -25,7 +25,7 @@ type (
 	Query interface {
 		QueryBase
 		GetSigil() kennung.Sigil
-    ContainsKennung(*kennung.Kennung2) bool
+		ContainsKennung(*kennung.Kennung2) bool
 	}
 
 	MatchableAdder interface {

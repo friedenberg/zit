@@ -46,9 +46,11 @@ func SigilFieldFunc(c rune) (ok bool) {
 	return
 }
 
-func MakeSigil(v Sigil) (s *Sigil) {
-	s1 := Sigil(v)
-	s = &s1
+func MakeSigil(vs ...Sigil) (s Sigil) {
+	for _, v := range vs {
+		s.Add(v)
+	}
+
 	return
 }
 

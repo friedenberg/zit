@@ -13,7 +13,8 @@ func TestBinaryOne(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	b := new(bytes.Buffer)
-	coder := MakeBinary(kennung.SigilSchwanzen)
+	coder := BinaryWriter{Sigil: kennung.SigilSchwanzen}
+	decoder := MakeBinary(kennung.SigilSchwanzen)
 	expected := &sku.Transacted{}
 	var expectedN int64
 	var err error
@@ -34,16 +35,18 @@ func TestBinaryOne(t1 *testing.T) {
 
 		t.Logf("%s", expected)
 
-		expectedN, err = coder.WriteFormat(b, expected)
+		expectedN, err = coder.WriteFormat(b, SkuWithSigil{Transacted: expected})
 		t.AssertNoError(err)
 	}
 
 	actual := Sku{
-		Transacted: &sku.Transacted{},
+		SkuWithSigil: SkuWithSigil{
+			Transacted: &sku.Transacted{},
+		},
 	}
 
 	{
-		n, err := coder.ReadFormatAndMatchSigil(b, &actual)
+		n, err := decoder.ReadFormatAndMatchSigil(b, &actual)
 		t.AssertNoError(err)
 		t.Logf("%s", actual)
 

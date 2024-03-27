@@ -79,15 +79,8 @@ func (pt *PageTuple) SetNeedsFlushHistory() {
 	pt.changesAreHistorical = true
 }
 
-func (pt *PageTuple) CopyEverything(
-	s sku_fmt.QueryGroup,
-	w schnittstellen.FuncIter[*sku.Transacted],
-) (err error) {
-	return pt.copyHistoryAndMaybeSchwanz(s, w, true, true)
-}
-
 func (pt *PageTuple) CopyJustHistory(
-	s sku_fmt.QueryGroup,
+	s sku.MatcherGroup,
 	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return pt.copyHistoryAndMaybeSchwanz(s, w, false, false)
@@ -95,7 +88,7 @@ func (pt *PageTuple) CopyJustHistory(
 
 func (pt *PageTuple) CopyJustHistoryFrom(
 	r io.Reader,
-	s sku_fmt.QueryGroup,
+	s sku.MatcherGroup,
 	w schnittstellen.FuncIter[sku_fmt.Sku],
 ) (err error) {
 	dec := sku_fmt.MakeBinaryWithQueryGroup(s, kennung.SigilHistory)
@@ -125,14 +118,14 @@ func (pt *PageTuple) CopyJustHistoryFrom(
 }
 
 func (pt *PageTuple) CopyJustHistoryAndAdded(
-	s sku_fmt.QueryGroup,
+	s sku.MatcherGroup,
 	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return pt.copyHistoryAndMaybeSchwanz(s, w, true, false)
 }
 
 func (pt *PageTuple) copyHistoryAndMaybeSchwanz(
-	s sku_fmt.QueryGroup,
+	s sku.MatcherGroup,
 	w schnittstellen.FuncIter[*sku.Transacted],
 	includeAdded bool,
 	includeAddedSchwanz bool,

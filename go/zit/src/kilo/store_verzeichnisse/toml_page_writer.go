@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/files"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/charlie/catgut"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/golf/ennui"
 	"code.linenisgreat.com/zit/src/hotel/sku"
@@ -17,6 +16,7 @@ import (
 type tomlPageWriter struct {
 	*TomlPageTuple
 	sku_fmt.Binary
+	sku_fmt.BinaryWriter
 	*os.File
 	bufio.Reader
 	bufio.Writer
@@ -36,6 +36,7 @@ func (pw *tomlPageWriter) Flush() (err error) {
 
 	pw.kennungShaMap = make(KennungShaMap)
 	pw.Binary = sku_fmt.MakeBinary(kennung.SigilHistory)
+	pw.BinaryWriter.Sigil = kennung.SigilHistory
 
 	path := pw.Path()
 
@@ -103,10 +104,10 @@ func (pw *tomlPageWriter) flushBoth() (err error) {
 		return
 	}
 
-	for ks, st := range pw.kennungShaMap {
+	for _, st := range pw.kennungShaMap {
 		st.Add(kennung.SigilSchwanzen)
 
-		if err = pw.updateSigil(ks, st); err != nil {
+		if err = pw.UpdateSigil(pw, st.Sigil, st.Offset); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -153,10 +154,10 @@ func (pw *tomlPageWriter) flushJustSchwanz() (err error) {
 		return
 	}
 
-	for ks, st := range pw.kennungShaMap {
+	for _, st := range pw.kennungShaMap {
 		st.Add(kennung.SigilSchwanzen)
 
-		if err = pw.updateSigil(ks, st); err != nil {
+		if err = pw.UpdateSigil(pw, st.Sigil, st.Offset); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -170,7 +171,10 @@ func (pw *tomlPageWriter) writeOne(
 ) (err error) {
 	pw.Offset += pw.ContentLength
 
-	if pw.ContentLength, err = pw.WriteFormat(&pw.Writer, z); err != nil {
+	if pw.ContentLength, err = pw.WriteFormat(
+		&pw.Writer,
+		sku_fmt.SkuWithSigil{Transacted: z},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -213,27 +217,8 @@ func (pw *tomlPageWriter) removeOldSchwanzen(sk *sku.Transacted) (err error) {
 
 	st.Del(kennung.SigilSchwanzen)
 
-	if err = pw.updateSigil(ks, st); err != nil {
+	if err = pw.UpdateSigil(pw, st.Sigil, st.Offset); err != nil {
 		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (pw *tomlPageWriter) updateSigil(ks string, st ShaTuple) (err error) {
-	// 2 uint8 + offset + 2 uint8 + Schlussel
-	offset := int64(2) + st.Offset + int64(3)
-
-	var n int
-
-	if n, err = pw.WriteAt([]byte{st.Byte()}, offset); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if n != 1 {
-		err = catgut.MakeErrLength(1, int64(n), nil)
 		return
 	}
 

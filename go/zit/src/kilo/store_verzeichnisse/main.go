@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/files"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/src/charlie/collections"
@@ -250,14 +251,16 @@ func (i *Store) readLoc(loc ennui.Loc) (sk *sku.Transacted, err error) {
 
 	defer errors.DeferredCloser(&err, f)
 
-	coder := sku_fmt.Binary{QueryGroup: &sku_fmt.NopSigil{Sigil: kennung.SigilAll}}
+	coder := sku_fmt.Binary{
+		MatcherGroup: &sku_fmt.NopSigil{Sigil: kennung.SigilAll},
+	}
 
 	sk = sku.GetTransactedPool().Get()
 
 	if _, err = coder.ReadFormatExactly(
 		f,
 		loc,
-		&sku_fmt.Sku{Transacted: sk},
+		&sku_fmt.Sku{SkuWithSigil: sku_fmt.SkuWithSigil{Transacted: sk}},
 	); err != nil {
 		sku.GetTransactedPool().Put(sk)
 		sk = nil
@@ -292,6 +295,7 @@ func (i *Store) Flush(
 
 	for n := range i.pages {
 		if i.pages[n].hasChanges {
+			log.Log().Printf("actual flush for %d", n)
 			actualFlush = true
 		}
 
