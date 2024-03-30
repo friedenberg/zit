@@ -11,7 +11,10 @@ if zettel != ""
   let cmdFormat = "zit show -format typ-vim-syntax-type " . zettel
   let zettelTypSyntax = trim(system(cmdFormat))
 
-  if zettelTypSyntax == ""
+  if v:shell_error
+    echom "Error getting vim syntax type: " . zettelTypSyntax
+    let zettelTypSyntax = "markdown"
+  elseif zettelTypSyntax == ""
     echom "Zettel Typ has no vim syntax set"
     let zettelTypSyntax = "markdown"
   endif

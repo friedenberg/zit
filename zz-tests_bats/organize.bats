@@ -16,6 +16,9 @@ teardown() {
 
 cmd_def_organize=(
 	"${cmd_zit_def[@]}"
+	-prefix-joints=true
+	-refine=true
+	-new-organize=true
 )
 
 function organize_simple { # @test
@@ -436,5 +439,728 @@ function add_named { # @test
 		[added_tag@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 with-tag]
 		[with-tag@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[with@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+	EOM
+}
+
+function organize_v5_outputs_organize_one_etikett { # @test
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# wow"
+		echo "- ok"
+		echo "! md"
+		echo "---"
+	} >"$to_add"
+
+	run_zit new -edit=false "$to_add"
+	assert_success
+	assert_output - <<-EOM
+		[ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" ok]
+	EOM
+
+	run_zit expand-hinweis o/u
+	assert_success
+	assert_output 'one/uno'
+
+	run_zit organize "${cmd_def_organize[@]}" -mode output-only ok
+	assert_success
+	assert_output - <<-EOM
+		---
+		- ok
+		---
+
+		- [two/uno  !md] wow
+	EOM
+}
+
+function organize_v5_outputs_organize_two_etiketten { # @test
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# wow"
+		echo "- ok"
+		echo "- brown"
+		echo "! md"
+		echo "---"
+	} >"$to_add"
+
+	run_zit new -edit=false "$to_add"
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[brown@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" brown ok]
+	EOM
+
+	run_zit organize "${cmd_def_organize[@]}" -mode output-only ok brown
+	assert_success
+	assert_output - <<-EOM
+		---
+		- brown
+		- ok
+		---
+
+		- [two/uno  !md] wow
+	EOM
+
+	run_zit organize "${cmd_def_organize[@]}" \
+		-mode commit-directly \
+		ok brown <<-EOM
+			      # ok
+
+			- [o/u !md] wow
+		EOM
+
+	assert_success
+	assert_output - <<-EOM
+		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" ok]
+	EOM
+
+	expected_zettel="$(mktemp)"
+	{
+		echo "---"
+		echo "# wow"
+		echo "- ok"
+		echo "! md"
+		echo "---"
+	} >"$expected_zettel"
+
+	run_zit show -format text one/uno
+	assert_success
+	assert_output "$(cat "$expected_zettel")"
+}
+
+function organize_v5_outputs_organize_one_etiketten_group_by_one { # @test
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# wow"
+		echo "- task"
+		echo "- priority-1"
+		echo "- priority-2"
+		echo "! md"
+		echo "---"
+	} >"$to_add"
+
+	run_zit new -edit=false "$to_add"
+	assert_success
+	assert_output - <<-EOM
+		[priority@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[priority-1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[priority-2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[task@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" priority-1 priority-2 task]
+	EOM
+
+	expected_organize="$(mktemp)"
+	{
+		echo
+		echo "          # task"
+		echo
+		echo "         ## priority"
+		echo
+		echo "        ###         -1"
+		echo
+		echo "- [one/uno  !md] wow"
+		echo
+		echo "        ###         -2"
+		echo
+		echo "- [one/uno  !md] wow"
+	} >"$expected_organize"
+
+	run_zit organize "${cmd_def_organize[@]}" -mode output-only -group-by priority task
+	assert_success
+	assert_output - <<-EOM
+		---
+		- task
+		---
+
+		          # priority
+
+		         ##         -1
+
+		- [two/uno  !md] wow
+
+		         ##         -2
+
+		- [two/uno  !md] wow
+	EOM
+}
+
+function organize_v5_outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# one/uno"
+		echo "- task"
+		echo "- priority-1"
+		echo "! md"
+		echo "---"
+	} >"$to_add"
+
+	run_zit new -edit=false "$to_add"
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[priority-1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[priority@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[task@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "one/uno" priority-1 task]
+	EOM
+
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# two/dos"
+		echo "- task"
+		echo "- priority-2"
+		echo "! md"
+		echo "---"
+	} >"$to_add"
+
+	run_zit new -edit=false "$to_add"
+	assert_success
+	assert_output - <<-EOM
+		[priority-2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/tres@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "two/dos" priority-2 task]
+	EOM
+
+	run_zit organize "${cmd_def_organize[@]}" -mode output-only -group-by priority task
+	assert_success
+	assert_output - <<-EOM
+		---
+		- task
+		---
+
+		           # priority
+
+		          ##         -1
+
+		- [two/uno   !md] one/uno
+
+		          ##         -2
+
+		- [one/tres  !md] two/dos
+	EOM
+}
+
+function organize_v5_commits_organize_one_etiketten_group_by_two { # @test
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# one/uno"
+		echo "- task"
+		echo "- priority-1"
+		echo "- w-2022-07-07"
+		echo "! md"
+		echo "---"
+	} >"$to_add"
+
+	run_zit new -edit=false "$to_add"
+	assert_success
+
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# two/dos"
+		echo "- task"
+		echo "- priority-1"
+		echo "- w-2022-07-06"
+		echo "! md"
+		echo "---"
+	} >"$to_add"
+
+	run_zit new -edit=false "$to_add"
+	assert_success
+
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# 3"
+		echo "- task"
+		echo "- priority-1"
+		echo "- w-2022-07-06"
+		echo "! md"
+		echo "---"
+	} >"$to_add"
+
+	run_zit new -edit=false "$to_add"
+	assert_success
+
+	expected_organize="$(mktemp)"
+	{
+		echo "# task"
+		echo
+		echo "## priority-1"
+		echo
+		echo "### w-2022-07-06"
+		echo
+		echo "- [one/dos !md] two/dos"
+		echo
+		echo "## priority-2"
+		echo
+		echo "### w-2022-07-07"
+		echo
+		echo "- [one/uno !md] one/uno"
+		echo
+		echo "###"
+		echo
+		echo "- [two/uno !md] 3"
+	} >"$expected_organize"
+
+	run_zit organize "${cmd_def_organize[@]}" -mode commit-directly -group-by priority,w task <"$expected_organize"
+	assert_success
+
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# one/uno"
+		echo "- priority-2"
+		echo "- task"
+		echo "- w-2022-07-07"
+		echo "! md"
+		echo "---"
+	} >"$to_add"
+
+	run_zit show -format text one/uno
+	assert_success
+	assert_output "$(cat "$to_add")"
+
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# 3"
+		echo "- priority-2"
+		echo "- task"
+		echo "! md"
+		echo "---"
+	} >"$to_add"
+
+	run_zit show -format text two/uno
+	assert_success
+	assert_output "$(cat "$to_add")"
+}
+
+function organize_v5_commits_organize_one_etiketten_group_by_two_new_zettels { # @test
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# one/uno"
+		echo "- task"
+		echo "- priority-1"
+		echo "- w-2022-07-07"
+		echo "! md"
+		echo "---"
+	} >"$to_add"
+
+	run_zit new -edit=false "$to_add"
+	assert_success
+
+	expected="$(mktemp)"
+	{
+		echo priority-1
+		echo task
+		echo w-2022-07-07
+	} >"$expected"
+
+	# run zit cat -gattung hinweis
+	# assert_output --partial "$(cat "$expected")"
+
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# two/dos"
+		echo "- task"
+		echo "- priority-1"
+		echo "- w-2022-07-06"
+		echo "! md"
+		echo "---"
+	} >"$to_add"
+
+	run_zit new -edit=false "$to_add"
+	assert_success
+
+	{
+		echo priority-1
+		echo task
+		echo w-2022-07-06
+		echo w-2022-07-07
+	} >"$expected"
+
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# 3"
+		echo "- task"
+		echo "- priority-1"
+		echo "- w-2022-07-06"
+		echo "! md"
+		echo "---"
+	} >"$to_add"
+
+	run_zit new -edit=false "$to_add"
+	assert_success
+
+	expected_organize="$(mktemp)"
+	{
+		echo "# task"
+		echo "- new zettel one"
+		echo "## priority-1"
+		echo "- new zettel two"
+		echo "### w-2022-07-06"
+		echo "- [one/dos !md] two/dos"
+		echo "## priority-2"
+		echo "### w-2022-07-07"
+		echo "- [one/uno !md] one/uno"
+		echo "###"
+		echo "- new zettel three"
+		echo "- [two/uno !md] 3"
+	} >"$expected_organize"
+
+	run_zit organize \
+		"${cmd_def_organize[@]}" \
+		-mode commit-directly \
+		-group-by priority,w \
+		task <"$expected_organize"
+	assert_success
+
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# one/uno"
+		echo "- priority-2"
+		echo "- task"
+		echo "- w-2022-07-07"
+		echo "! md"
+		echo "---"
+	} >"$to_add"
+
+	run_zit show -format text one/uno
+	assert_success
+	assert_output "$(cat "$to_add")"
+
+	to_add="$(mktemp)"
+	{
+		echo "---"
+		echo "# 3"
+		echo "- priority-2"
+		echo "- task"
+		echo "! md"
+		echo "---"
+	} >"$to_add"
+
+	run_zit show -format text two/uno
+	assert_success
+	assert_output "$(cat "$to_add")"
+
+	run_zit show -format text one/tres
+	assert_success
+
+	run_zit show -format text two/dos
+	assert_success
+
+	run_zit show -format text three/uno
+	assert_success
+
+	{
+		echo priority-1
+		echo priority-2
+		echo task
+		echo w-2022-07-06
+		echo w-2022-07-07
+	} >"$expected"
+
+	# TODO
+	# run zit cat-etiketten-schwanzen
+	# assert_output "$(cat "$expected")"
+}
+
+function organize_v5_commits_no_changes { # @test
+	one="$(mktemp)"
+	{
+		echo "---"
+		echo "# one/uno"
+		echo "- priority-1"
+		echo "- task"
+		echo "- w-2022-07-07"
+		echo "! md"
+		echo "---"
+	} >"$one"
+
+	run_zit new -edit=false "$one"
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[priority-1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[priority@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[task@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "one/uno" priority-1 task w-2022-07-07]
+		[w-2022-07-07@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[w-2022-07@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[w-2022@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[w@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+	EOM
+
+	two="$(mktemp)"
+	{
+		echo "---"
+		echo "# two/dos"
+		echo "- priority-1"
+		echo "- task"
+		echo "- w-2022-07-06"
+		echo "! md"
+		echo "---"
+	} >"$two"
+
+	run_zit new -edit=false "$two"
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[w-2022-07-06@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/tres@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "two/dos" priority-1 task w-2022-07-06]
+	EOM
+
+	three="$(mktemp)"
+	{
+		echo "---"
+		echo "# 3"
+		echo "- priority-1"
+		echo "- task"
+		echo "- w-2022-07-06"
+		echo "! md"
+		echo "---"
+	} >"$three"
+
+	run_zit new -edit=false "$three"
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[two/dos@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "3" priority-1 task w-2022-07-06]
+	EOM
+
+	expected_organize="$(mktemp)"
+	{
+		echo
+		echo "# task"
+		echo
+		echo " ## priority-1"
+		echo
+		echo "  ### w-2022-07-06"
+		echo
+		echo "  - [two/uno !md] 3"
+		echo "  - [one/dos !md] two/dos"
+		echo
+		echo "  ### w-2022-07-07"
+		echo
+		echo "  - [one/uno !md] one/uno"
+		echo
+	} >"$expected_organize"
+
+	# run_zit organize "${cmd_def_organize[@]}" -prefix-joints=false -mode output-only -group-by priority,w task
+	run_zit organize "${cmd_def_organize[@]}" -mode commit-directly -group-by priority,w task <"$expected_organize"
+	assert_success
+	# assert_output "$(cat "$expected_organize")"
+	assert_output_unsorted - <<-EOM
+		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "3" priority-1 task w-2022-07-06]
+		[one/dos@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "two/dos" priority-1 task w-2022-07-06]
+		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "one/uno" priority-1 task w-2022-07-07]
+	EOM
+
+	run_zit show -format text one/uno
+	assert_success
+	assert_output "$(cat "$one")"
+
+	run_zit show -format text one/dos
+	assert_success
+	assert_output "$(cat "$two")"
+
+	run_zit show -format text two/uno
+	assert_success
+	assert_output "$(cat "$three")"
+}
+
+function organize_v5_commits_dependent_leaf { # @test
+	one="$(mktemp)"
+	{
+		echo "---"
+		echo "# one/uno"
+		echo "- priority-1"
+		echo "- task"
+		echo "- w-2022-07-07"
+		echo "! md"
+		echo "---"
+	} >"$one"
+
+	run_zit new -edit=false "$one"
+	assert_success
+
+	two="$(mktemp)"
+	{
+		echo "---"
+		echo "# two/dos"
+		echo "- priority-1"
+		echo "- task"
+		echo "- w-2022-07-06"
+		echo "! md"
+		echo "---"
+	} >"$two"
+
+	run_zit new -edit=false "$two"
+	assert_success
+
+	three="$(mktemp)"
+	{
+		echo "---"
+		echo "# 3"
+		echo "- priority-1"
+		echo "- task"
+		echo "- w-2022-07-06"
+		echo "! md"
+		echo "---"
+	} >"$three"
+
+	run_zit new -edit=false "$three"
+	assert_success
+
+	expected_organize="$(mktemp)"
+	{
+		echo "# task"
+		echo "## priority-2"
+		echo "### w-2022-07"
+		echo "#### -07"
+		echo "- [one/dos !md] two/dos"
+		echo "- [two/uno !md] 3"
+		echo "#### -08"
+		echo "- [one/uno !md] one/uno"
+		echo "###"
+	} >"$expected_organize"
+
+	run_zit organize "${cmd_def_organize[@]}" -verbose -mode commit-directly -group-by priority,w task <"$expected_organize"
+	assert_success
+
+	one="$(mktemp)"
+	{
+		echo "---"
+		echo "# one/uno"
+		echo "- priority-2"
+		echo "- task"
+		echo "- w-2022-07-08"
+		echo "! md"
+		echo "---"
+	} >"$one"
+
+	run_zit show -format text one/uno
+	assert_success
+	assert_output "$(cat "$one")"
+
+	two="$(mktemp)"
+	{
+		echo "---"
+		echo "# two/dos"
+		echo "- priority-2"
+		echo "- task"
+		echo "- w-2022-07-07"
+		echo "! md"
+		echo "---"
+	} >"$two"
+
+	run_zit show -format text one/dos
+	assert_success
+	assert_output "$(cat "$two")"
+
+	three="$(mktemp)"
+	{
+		echo "---"
+		echo "# 3"
+		echo "- priority-2"
+		echo "- task"
+		echo "- w-2022-07-07"
+		echo "! md"
+		echo "---"
+	} >"$three"
+
+	run_zit show -format text two/uno
+	assert_success
+	assert_output "$(cat "$three")"
+}
+
+function organize_v5_zettels_in_correct_places { # @test
+	one="$(mktemp)"
+	{
+		echo "---"
+		echo "# jabra coral usb_a-to-usb_c cable"
+		echo "- inventory-pipe_shelves-atheist_shoes_box-jabra_yellow_box_2"
+		echo "---"
+	} >"$one"
+
+	run_zit new -edit=false "$one"
+
+	run_zit organize "${cmd_def_organize[@]}" \
+		-mode output-only -group-by inventory \
+		inventory-pipe_shelves-atheist_shoes_box-jabra_yellow_box_2
+	assert_success
+
+	assert_output - <<-EOM
+		---
+		- inventory-pipe_shelves-atheist_shoes_box-jabra_yellow_box_2
+		---
+
+		          # inventory
+
+		         ##          -pipe_shelves-atheist_shoes_box-jabra_yellow_box_2
+
+		- [two/uno  !md] jabra coral usb_a-to-usb_c cable
+	EOM
+}
+
+function organize_v5_etiketten_correct { # @test
+	first_organize="$(mktemp)"
+	{
+		echo
+		echo "# test1"
+		echo "## -wow"
+		echo
+		echo "- zettel bez"
+	} >"$first_organize"
+
+	run_zit organize "${cmd_def_organize[@]}" -mode commit-directly <"$first_organize"
+	assert_success
+
+	expected_etiketten="$(mktemp)"
+	{
+		echo test1-wow
+	} >"$expected_etiketten"
+
+	mkdir -p one
+	{
+		echo "---"
+		echo "- test4"
+		echo "! md"
+		echo "---"
+	} >"one/uno.zettel"
+
+	run_zit checkin one/uno.zettel
+	assert_success
+	assert_output - <<-EOM
+		[test4@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md test4]
+	EOM
+
+	# TODO-P2 fix issue with kennung schwanzen
+	# run_zit cat-etiketten-schwanzen
+	# assert_output - <<-EOM
+	# EOM
+
+	mkdir -p one
+	{
+		echo "---"
+		echo "- test4"
+		echo "- test1-ok"
+		echo "! md"
+		echo "---"
+	} >"one/uno.zettel"
+
+	run_zit checkin one/uno.zettel
+	assert_output - <<-EOM
+		[test1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[test1-ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md test1-ok test4]
 	EOM
 }

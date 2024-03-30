@@ -1,6 +1,6 @@
 
 " TODO-P3 use https://github.com/suy/vim-context-commentstring
-let &l:equalprg = "zit format-zettel -include-cwd %:r"
+let &l:equalprg = "zit format-zettel %"
 let &l:comments = "fb:*,fb:-,fb:+,n:>"
 let &l:commentstring = "<!--%s-->"
 
@@ -33,7 +33,7 @@ function! ZitAction()
     endif
 
     let l:val = substitute(l:items[a:result-1], '\t.*$', '', '')
-    execute("!zit exec-action -action " . l:val .  " " . expand("%:r") .".")
+    execute("!zit exec-action -action " . l:val .  " " . GetKennung())
   endfunc
 
   if len(l:items) == 0
@@ -60,9 +60,10 @@ function! ZitMakeUTIGroupCommand(uti_group, cmd_args_unprocessed_list)
     call add(l:cmd_args_list, "-i")
     call add(l:cmd_args_list, l:uti)
     let l:cmd_sub_args = [
-          \ "zit", "format-zettel", "-include-cwd", "-mode akte",
-          \ "-uti-group", a:uti_group, l:uti,
-          \ expand("%:r"),
+          \ "zit", "format-zettel", "-mode akte",
+          \ "-uti-group", a:uti_group,
+          \ l:uti,
+          \ GetKennung(),
           \ "2>/dev/null",
           \ ]
 
@@ -88,18 +89,22 @@ function! SplitListOnSpaceAndReturnBoth(rawItems)
   return [l:items, l:processedItems]
 endfunction
 
+function! GetKennung()
+  return expand("%")
+endfunction
+
 function! ZitGetUTIGroups()
-  let l:rawItems = sort(systemlist("zit show -format typ-formatter-uti-groups " . expand("%")))
+  let l:rawItems = sort(systemlist("zit show -format typ-formatter-uti-groups " . GetKennung()))
   return SplitListOnSpaceAndReturnBoth(l:rawItems)
 endfunction
 
 function! ZitGetActionNames()
-  let l:rawItems = sort(systemlist("zit show -format action-names " .. expand("%")))
+  let l:rawItems = sort(systemlist("zit show -format action-names " . GetKennung()))
   return SplitListOnSpaceAndReturnBoth(l:rawItems)
 endfunction
 
 function! ZitGetFormats()
-  let l:rawItems =  sort(systemlist("zit show -format formatters " .. expand("%")))
+  let l:rawItems =  sort(systemlist("zit show -format formatters " . GetKennung()))
   return SplitListOnSpaceAndReturnBoth(l:rawItems)
 endfunction
 
@@ -113,8 +118,7 @@ function! ZitPreview()
 
     " let l:format = substitute(l:items[a:result-1], '\t.*$', '', '')
     let l:format = l:processedItems[a:result-1]
-    echom l:format
-    let l:hinweis = expand("%:r")
+    let l:hinweis = GetKennung()
 
     let l:tempfile = tempname() .. "." .. l:format
 
@@ -127,7 +131,6 @@ function! ZitPreview()
           \ ]
 
     call system(join(l:cmd_args_list, " "))
-    echom l:tempfile
     call system("qlmanage -p "..l:tempfile..">/dev/null 2>&1 &")
   endfunc
 
