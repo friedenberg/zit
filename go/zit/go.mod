@@ -2,8 +2,6 @@ module code.linenisgreat.com/zit
 
 go 1.21.6
 
-toolchain go1.21.8
-
 require (
 	code.linenisgreat.com/chrest v0.0.0-20240309214552-f05fb9ce117d
 	filippo.io/age v1.1.1
