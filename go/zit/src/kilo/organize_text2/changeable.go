@@ -170,7 +170,9 @@ func (a *Assignment) addToCompareMap(
 	return
 }
 
-func (ot *Text) GetSkus(original sku.TransactedSet) (out2 sku.TransactedSet, err error) {
+func (ot *Text) GetSkus(
+	original sku.TransactedSet,
+) (out2 sku.TransactedSet, err error) {
 	out := sku.MakeTransactedMutableSet()
 	out2 = out
 
@@ -211,10 +213,6 @@ func (a *Assignment) addToSet(
 					return
 				}
 
-				if zPrime, ok := original.Get(original.Key(&o.Transacted)); ok {
-					z.Metadatei.Akte.ResetWith(&zPrime.Metadatei.Akte)
-				}
-
 				if err = ot.EachPtr(
 					z.Metadatei.AddEtikettPtr,
 				); err != nil {
@@ -222,11 +220,24 @@ func (a *Assignment) addToSet(
 					return
 				}
 
-				z.Metadatei.Typ.ResetWith(ot.Metadatei.Typ)
+				if !ot.Metadatei.Typ.IsEmpty() {
+					z.Metadatei.Typ.ResetWith(ot.Metadatei.Typ)
+				}
 
 				if err = out.Add(z); err != nil {
 					err = errors.Wrap(err)
 					return
+				}
+
+				zPrime, hasOriginal := original.Get(original.Key(&o.Transacted))
+
+				if hasOriginal {
+					z.Metadatei.Akte.ResetWith(&zPrime.Metadatei.Akte)
+					z.Metadatei.Typ.ResetWith(zPrime.Metadatei.Typ)
+				}
+
+				if !ot.Metadatei.Typ.IsEmpty() {
+					z.Metadatei.Typ.ResetWith(ot.Metadatei.Typ)
 				}
 			}
 

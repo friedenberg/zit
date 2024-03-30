@@ -13,13 +13,17 @@ import (
 	"code.linenisgreat.com/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/erworben"
 	"code.linenisgreat.com/zit/src/india/query"
+	"code.linenisgreat.com/zit/src/juliett/chrome"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/src/kilo/objekte_store"
 	"code.linenisgreat.com/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/src/mike/store"
 )
+
+type VirtualStore = query.VirtualStoreInitable
 
 type Umwelt struct {
 	sonnenaufgang thyme.Time
@@ -38,6 +42,7 @@ type Umwelt struct {
 
 	storesInitialized bool
 	store             store.Store
+	virtualStores     map[string]*VirtualStore
 	age               *age.Age
 
 	matcherArchiviert query.Archiviert
@@ -50,6 +55,7 @@ func Make(kCli erworben.Cli, options Options) (u *Umwelt, err error) {
 		err:               os.Stderr,
 		erworbenCli:       kCli,
 		matcherArchiviert: query.MakeArchiviert(),
+		virtualStores:     make(map[string]*VirtualStore),
 	}
 
 	u.konfig.Reset()
@@ -161,7 +167,13 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	lw := objekte_store.LogWriter{
 		New:       ptl,
 		Updated:   ptl,
-		Unchanged: ptl,
+		Unchanged: func(sk *sku.Transacted) (err error) {
+      if !u.konfig.PrintOptions.PrintUnchanged {
+        return
+      }
+
+      return ptl(sk)
+    },
 		Archived:  ptl,
 	}
 
@@ -169,6 +181,10 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	u.store.SetLogWriter(lw)
 
 	u.storesInitialized = true
+
+	u.virtualStores["%chrome"] = &query.VirtualStoreInitable{
+		VirtualStore: chrome.MakeChrome(u.Standort()),
+	}
 
 	return
 }
@@ -223,7 +239,7 @@ func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
 		dg = kennung.MakeGattung(gattung.Zettel)
 	}
 
-	return query.MakeBuilder(u.Standort()).
+	return query.MakeBuilder(u.Standort(), u.virtualStores["%chrome"]).
 		WithDefaultGattungen(dg).
 		WithCwd(u.GetStore().GetCwdFiles()).
 		WithFileExtensionGetter(u.Konfig().FileExtensions).
@@ -238,7 +254,7 @@ func (u *Umwelt) MakeMetaIdSetWithoutExcludedHidden(
 		dg = kennung.MakeGattung(gattung.Zettel)
 	}
 
-	return query.MakeBuilder(u.Standort()).
+	return query.MakeBuilder(u.Standort(), u.virtualStores["%chrome"]).
 		WithDefaultGattungen(dg).
 		WithCwd(u.GetStore().GetCwdFiles()).
 		WithFileExtensionGetter(u.Konfig().FileExtensions).

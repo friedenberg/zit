@@ -276,6 +276,11 @@ func (ar *assignmentLineReader) readOneObj(r *catgut.RingBuffer) (err error) {
 		return
 	}
 
+	if err = ar.options.Expanders.ExpandHinweisOnly(&z.Kennung); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if z.Kennung.IsEmpty() {
 		ar.currentAssignment.Unnamed.Add(&z)
 	} else {

@@ -5,6 +5,7 @@ go 1.21.6
 toolchain go1.21.8
 
 require (
+	code.linenisgreat.com/chrest v0.0.0-20240309214552-f05fb9ce117d
 	filippo.io/age v1.1.1
 	github.com/DataDog/zstd v1.5.5
 	github.com/brandondube/tai v0.1.0
@@ -17,7 +18,6 @@ require (
 )
 
 require (
-	code.linenisgreat.com/chrest v0.0.0-20240309214552-f05fb9ce117d // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/crypto v0.21.0 // indirect
 )

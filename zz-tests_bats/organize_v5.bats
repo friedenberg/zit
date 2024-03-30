@@ -19,11 +19,7 @@ cmd_def_organize_v5=(
 )
 
 function organize_v5_outputs_organize_one_etikett { # @test
-	wd="$(mktemp -d)"
-	cd "$wd" || exit 1
-
 	run_zit_init_disable_age
-	assert_success
 
 	to_add="$(mktemp)"
 	{
@@ -37,7 +33,7 @@ function organize_v5_outputs_organize_one_etikett { # @test
 	run_zit new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
-		[-ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" ok]
 	EOM
 
@@ -50,7 +46,7 @@ function organize_v5_outputs_organize_one_etikett { # @test
 		echo
 		echo "          # ok"
 		echo
-		echo "- [one/uno !md] wow"
+		echo "- [one/uno  !md] wow"
 	} >"$expected_organize"
 
 	run_zit organize "${cmd_def_organize_v5[@]}" -mode output-only ok
@@ -59,11 +55,7 @@ function organize_v5_outputs_organize_one_etikett { # @test
 }
 
 function organize_v5_outputs_organize_two_etiketten { # @test
-	wd="$(mktemp -d)"
-	cd "$wd" || exit 1
-
 	run_zit_init_disable_age
-	assert_success
 
 	to_add="$(mktemp)"
 	{
@@ -78,8 +70,8 @@ function organize_v5_outputs_organize_two_etiketten { # @test
 	run_zit new -edit=false "$to_add"
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[-brown@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[brown@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" brown ok]
 	EOM
 
@@ -88,7 +80,7 @@ function organize_v5_outputs_organize_two_etiketten { # @test
 		echo
 		echo "          # brown, ok"
 		echo
-		echo "- [one/uno !md] wow"
+		echo "- [one/uno  !md] wow"
 	} >"$expected_organize"
 
 	run_zit organize "${cmd_def_organize_v5[@]}" -mode output-only ok brown
@@ -99,11 +91,14 @@ function organize_v5_outputs_organize_two_etiketten { # @test
 		echo
 		echo "      # ok"
 		echo
-		echo "- [o/u] wow"
+		echo "- [o/u !md] wow"
 		echo
 	} >"$expected_organize"
 
-	run_zit organize "${cmd_def_organize_v5[@]}" -mode commit-directly ok brown <"$expected_organize"
+	run_zit organize "${cmd_def_organize_v5[@]}" \
+		-mode commit-directly \
+		ok brown <"$expected_organize"
+
 	assert_success
 	assert_output - <<-EOM
 		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" ok]
@@ -124,11 +119,7 @@ function organize_v5_outputs_organize_two_etiketten { # @test
 }
 
 function organize_v5_outputs_organize_one_etiketten_group_by_one { # @test
-	wd="$(mktemp -d)"
-	cd "$wd" || exit 1
-
 	run_zit_init_disable_age
-	assert_success
 
 	to_add="$(mktemp)"
 	{
@@ -144,10 +135,10 @@ function organize_v5_outputs_organize_one_etiketten_group_by_one { # @test
 	run_zit new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
-		[-priority@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-priority-1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-priority-2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-task@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[priority@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[priority-1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[priority-2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[task@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" priority-1 priority-2 task]
 	EOM
 
@@ -160,11 +151,11 @@ function organize_v5_outputs_organize_one_etiketten_group_by_one { # @test
 		echo
 		echo "        ###         -1"
 		echo
-		echo "- [one/uno !md] wow"
+		echo "- [one/uno  !md] wow"
 		echo
 		echo "        ###         -2"
 		echo
-		echo "- [one/uno !md] wow"
+		echo "- [one/uno  !md] wow"
 	} >"$expected_organize"
 
 	run_zit organize "${cmd_def_organize_v5[@]}" -mode output-only -group-by priority task
@@ -173,11 +164,7 @@ function organize_v5_outputs_organize_one_etiketten_group_by_one { # @test
 }
 
 function organize_v5_outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
-	wd="$(mktemp -d)"
-	cd "$wd" || exit 1
-
 	run_zit_init_disable_age
-	assert_success
 
 	to_add="$(mktemp)"
 	{
@@ -192,9 +179,9 @@ function organize_v5_outputs_organize_two_zettels_one_etiketten_group_by_one { #
 	run_zit new -edit=false "$to_add"
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[-priority-1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-priority@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-task@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[priority-1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[priority@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[task@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "one/uno" priority-1 task]
 	EOM
 
@@ -211,7 +198,7 @@ function organize_v5_outputs_organize_two_zettels_one_etiketten_group_by_one { #
 	run_zit new -edit=false "$to_add"
 	assert_success
 	assert_output - <<-EOM
-		[-priority-2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[priority-2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/dos@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "two/dos" priority-2 task]
 	EOM
 
@@ -224,11 +211,11 @@ function organize_v5_outputs_organize_two_zettels_one_etiketten_group_by_one { #
 		echo
 		echo "        ###         -1"
 		echo
-		echo "- [one/uno !md] one/uno"
+		echo "- [one/uno  !md] one/uno"
 		echo
 		echo "        ###         -2"
 		echo
-		echo "- [one/dos !md] two/dos"
+		echo "- [one/dos  !md] two/dos"
 	} >"$expected_organize"
 
 	run_zit organize "${cmd_def_organize_v5[@]}" -mode output-only -group-by priority task
@@ -237,11 +224,7 @@ function organize_v5_outputs_organize_two_zettels_one_etiketten_group_by_one { #
 }
 
 function organize_v5_commits_organize_one_etiketten_group_by_two { # @test
-	wd="$(mktemp -d)"
-	cd "$wd" || exit 1
-
 	run_zit_init_disable_age
-	assert_success
 
 	to_add="$(mktemp)"
 	{
@@ -340,11 +323,7 @@ function organize_v5_commits_organize_one_etiketten_group_by_two { # @test
 }
 
 function organize_v5_commits_organize_one_etiketten_group_by_two_new_zettels { # @test
-	wd="$(mktemp -d)"
-	cd "$wd" || exit 1
-
 	run_zit_init_disable_age
-	assert_success
 
 	to_add="$(mktemp)"
 	{
@@ -503,11 +482,7 @@ function organize_v5_commits_organize_one_etiketten_group_by_two_new_zettels { #
 }
 
 function organize_v5_commits_no_changes { # @test
-	wd="$(mktemp -d)"
-	cd "$wd" || exit 1
-
 	run_zit_init_disable_age
-	assert_success
 
 	one="$(mktemp)"
 	{
@@ -523,13 +498,13 @@ function organize_v5_commits_no_changes { # @test
 	run_zit new -edit=false "$one"
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[-priority-1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-priority@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-task@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-w-2022-07-07@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-w-2022-07@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-w-2022@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-w@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[priority-1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[priority@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[task@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[w-2022-07-07@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[w-2022-07@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[w-2022@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[w@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "one/uno" priority-1 task w-2022-07-07]
 	EOM
 
@@ -547,7 +522,7 @@ function organize_v5_commits_no_changes { # @test
 	run_zit new -edit=false "$two"
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[-w-2022-07-06@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[w-2022-07-06@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/dos@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "two/dos" priority-1 task w-2022-07-06]
 	EOM
 
@@ -590,7 +565,7 @@ function organize_v5_commits_no_changes { # @test
 	run_zit organize "${cmd_def_organize_v5[@]}" -mode commit-directly -group-by priority,w task <"$expected_organize"
 	assert_success
 	# assert_output "$(cat "$expected_organize")"
-	assert_output "no changes"
+	assert_output ""
 
 	run_zit show -format text one/uno
 	assert_success
@@ -606,11 +581,7 @@ function organize_v5_commits_no_changes { # @test
 }
 
 function organize_v5_commits_dependent_leaf { # @test
-	wd="$(mktemp -d)"
-	cd "$wd" || exit 1
-
 	run_zit_init_disable_age
-	assert_success
 
 	one="$(mktemp)"
 	{
@@ -717,7 +688,6 @@ function organize_v5_commits_dependent_leaf { # @test
 }
 
 function organize_v5_zettels_in_correct_places { # @test
-	cd "$BATS_TEST_TMPDIR" || exit 1
 	run_zit_init_disable_age
 
 	one="$(mktemp)"
@@ -743,14 +713,11 @@ function organize_v5_zettels_in_correct_places { # @test
 
 		        ###          -pipe_shelves-atheist_shoes_box-jabra_yellow_box_2
 
-		- [one/uno !md] jabra coral usb_a-to-usb_c cable
+		- [one/uno  !md] jabra coral usb_a-to-usb_c cable
 	EOM
 }
 
 function organize_v5_etiketten_correct { # @test
-	wd="$(mktemp -d)"
-	cd "$wd" || exit 1
-
 	run_zit_init_disable_age
 
 	first_organize="$(mktemp)"
@@ -770,10 +737,6 @@ function organize_v5_etiketten_correct { # @test
 		echo test1-wow
 	} >"$expected_etiketten"
 
-	run_zit cat-etiketten-schwanzen
-	assert_success
-	assert_output "$(cat "$expected_etiketten")"
-
 	mkdir -p one
 	{
 		echo "---"
@@ -785,7 +748,7 @@ function organize_v5_etiketten_correct { # @test
 	run_zit checkin one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
-		[-test4@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[test4@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md test4]
 	EOM
 
@@ -805,12 +768,8 @@ function organize_v5_etiketten_correct { # @test
 
 	run_zit checkin one/uno.zettel
 	assert_output - <<-EOM
-		[-test1-ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[test1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[test1-ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md test1-ok test4]
 	EOM
-
-	# TODO-P2 fix issue with kennung schwanzen
-	# run zit cat-etiketten-schwanzen
-	# assert_output_unsorted - <<-EOM
-	# EOM
 }

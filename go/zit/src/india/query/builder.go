@@ -1,8 +1,6 @@
 package query
 
 import (
-	"strings"
-
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/log"
@@ -14,10 +12,17 @@ import (
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
-func MakeBuilder(s standort.Standort) *Builder {
-	return &Builder{
-		standort: s,
+func MakeBuilder(s standort.Standort, chrome *VirtualStoreInitable) (b *Builder) {
+	b = &Builder{
+		standort:         s,
+		virtualEtiketten: make(map[string]*VirtualStoreInitable),
 	}
+
+	if chrome != nil {
+		b.WithChrome(chrome)
+	}
+
+	return
 }
 
 type Builder struct {
@@ -30,8 +35,23 @@ type Builder struct {
 	hidden                  Matcher
 	defaultGattungen        kennung.Gattung
 	defaultSigil            kennung.Sigil
+	virtualEtiketten        map[string]*VirtualStoreInitable
 	doNotMatchEmpty         bool
 	debug                   bool
+}
+
+func (mb *Builder) WithChrome(vs *VirtualStoreInitable) *Builder {
+	mb.virtualEtiketten["%chrome"] = vs
+
+	return mb
+}
+
+func (mb *Builder) WithVirtualStores(vs map[string]*VirtualStoreInitable) *Builder {
+	for k, v := range vs {
+		mb.virtualEtiketten[k] = v
+	}
+
+	return mb
 }
 
 func (mb *Builder) WithDebug() *Builder {
@@ -268,8 +288,6 @@ func (b *Builder) addDefaultsIfNecessary(qg *Group) {
 	}
 
 	qg.UserQueries[b.defaultGattungen] = dq
-
-	return
 }
 
 func (b *Builder) makeQuery() *Query {
@@ -377,15 +395,29 @@ LOOP:
 					return
 				}
 
-				if e.IsVirtual() && strings.HasPrefix(e.String(), "%chrome") {
-					c := MakeChrome(b.standort)
+				if e.IsVirtual() {
+					expanded := kennung.ExpandOneSlice(&e)
+					var store *VirtualStoreInitable
 
-					if err = c.Init(); err != nil {
+					for _, e1 := range expanded {
+						store = b.virtualEtiketten[e1.String()]
+
+						if store != nil {
+							break
+						}
+					}
+
+					if store == nil {
+						err = errors.Errorf("no virtual store registered for %q", e)
+						return
+					}
+
+					if err = store.Init(); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
 
-					exp := b.makeExp(isNegated, isExact, c)
+					exp := b.makeExp(isNegated, isExact, &Virtual{VirtualStore: store, Kennung: k})
 					stack[len(stack)-1].Add(exp)
 				} else {
 					if err = qg.Etiketten.Add(e); err != nil {

@@ -15,7 +15,7 @@ type (
 	Flags             = organize_text.Flags
 	Mode              = old.Mode
 	ErrorRead         = organize_text.ErrorRead
-	Changes           = changes2.Changes
+	Changes           = changes2.Changes2
 	Change            = changes2.Change
 )
 
@@ -29,5 +29,6 @@ var (
 	MakeFlags              = organize_text.MakeFlags
 	MakeFlagsWithMetadatei = organize_text.MakeFlagsWithMetadatei
 	New                    = organize_text.New
-	ChangesFrom            = changes2.ChangesFrom
+	// ChangesFrom            = changes2.ChangesFrom
+	ChangesFrom = changes2.ChangesFrom2
 )

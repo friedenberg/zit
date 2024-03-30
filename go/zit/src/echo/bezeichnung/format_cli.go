@@ -13,12 +13,19 @@ type bezeichnungCliFormat struct {
 func MakeCliFormat2(
 	truncate CliFormatTruncation,
 	co string_format_writer.ColorOptions,
+	quote bool,
 ) *bezeichnungCliFormat {
+	sfw := string_format_writer.MakeString[string]()
+
+	if quote {
+		sfw = string_format_writer.MakeQuotedString[string]()
+	}
+
 	return &bezeichnungCliFormat{
 		truncate: truncate,
 		stringFormatWriter: string_format_writer.MakeColor[string](
 			co,
-			string_format_writer.MakeString[string](),
+			sfw,
 			string_format_writer.ColorTypeIdentifier,
 		),
 	}

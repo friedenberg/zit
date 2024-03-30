@@ -29,6 +29,52 @@ function show_simple_one_zettel { # @test
 	EOM
 }
 
+function show_simple_one_zettel_hidden { # @test
+	run_zit edit-konfig -hide-etikett tag-3
+	assert_success
+	assert_output - <<-EOM
+		[konfig@7c7e3c0dbfef03649c5c15f52617be8f75d3836971b8720d8441207a13ab2598]
+	EOM
+
+	run_zit show :z
+	assert_success
+	assert_output - ''
+
+	run_zit show :?z
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
+		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+	EOM
+
+	run_zit show one/uno
+	assert_success
+	assert_output - <<-EOM
+		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+	EOM
+}
+
+function show_simple_one_zettel_hidden_past { # @test
+	run_zit edit-konfig -hide-etikett tag-1
+	assert_success
+	assert_output - <<-EOM
+		[konfig@f1674ec97c180b6d4139112ae2fc2b9b88e4ce8c8fbc16f4319cfa962f16457d]
+	EOM
+
+	run_zit show :?z
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
+	EOM
+
+	run_zit show one/uno
+	assert_success
+	assert_output - <<-EOM
+		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+	EOM
+}
+
 function show_all_mutter { # @test
 	skip
 	run_zit show -format mutter-sha :
@@ -59,7 +105,7 @@ function show_simple_one_zettel_binary { # @test
 }
 
 function show_history_one_zettel { # @test
-	run_zit show -format log one/uno+z
+	run_zit show one/uno+z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
@@ -89,21 +135,21 @@ function show_history_one_zettel { # @test
 }
 
 function show_zettel_etikett { # @test
-	run_zit show -format log tag-3.z
+	run_zit show tag-3:z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 	EOM
 
-	run_zit show -format akte -- -tag-3.z
+	run_zit show -format akte tag-3:z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		last time
 		not another one
 	EOM
 
-	run_zit show -format sku-metadatei-sans-tai -- -tag-3.z
+	run_zit show -format sku-metadatei-sans-tai tag-3:z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		Zettel one/uno 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-4 "wow the first"
@@ -128,21 +174,29 @@ function show_zettel_etikett_complex { # @test
 
 		last time
 	EOM
+
+	# TODO support . operator for checked out
+	# run_zit show -verbose tag-3.z tag-5.z
+	# assert_success
+	# assert_output_unsorted - <<-EOM
+	# 	[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-5]
+	# EOM
+
 	run_zit checkin -delete one/uno.zettel
 
-	run_zit show -format log tag-3.z tag-5.z
+	run_zit show [tag-3 tag-5]:z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-5]
 	EOM
 
-	run_zit show -format akte tag-3.z tag-5.z
+	run_zit show -format akte [tag-3 tag-5]:z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		last time
 	EOM
 
-	run_zit show -format sku-metadatei-sans-tai tag-3.z tag-5.z
+	run_zit show -format sku-metadatei-sans-tai [tag-3 tag-5]:z
 	assert_success
 	assert_output_unsorted --partial - <<-EOM
 		Zettel one/uno 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-5 "wow the first"
@@ -150,7 +204,7 @@ function show_zettel_etikett_complex { # @test
 }
 
 function show_complex_zettel_etikett_negation { # @test
-	run_zit show -format log ^-etikett-two.z
+	run_zit show ^-etikett-two:z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
@@ -159,7 +213,7 @@ function show_complex_zettel_etikett_negation { # @test
 }
 
 function show_simple_all { # @test
-	run_zit show -format log :z,t
+	run_zit show :z,t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
@@ -187,43 +241,43 @@ function show_simple_all { # @test
 }
 
 function show_simple_typ_schwanzen { # @test
-	run_zit show -format log .t
+	run_zit show :t
 	assert_output_unsorted - <<-EOM
 		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
 	EOM
 }
 
 function show_simple_typ_history { # @test
-	run_zit show -format log +t
+	run_zit show +t
 	assert_output_unsorted - <<-EOM
 		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
 	EOM
 }
 
 function show_simple_etikett_schwanzen { # @test
-	run_zit show -format log .e
+	run_zit show :e
 	assert_output_unsorted - <<-EOM
-		[-tag-1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-tag-2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-tag-3@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-tag-4@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-tag@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-3@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-4@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 }
 
 function show_simple_etikett_history { # @test
-	run_zit show -format log +e
+	run_zit show +e
 	assert_output_unsorted - <<-EOM
-		[-tag-1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-tag-2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-tag-3@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-tag-4@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-tag@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-3@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-4@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 }
 
 function show_konfig { # @test
-	run_zit show -format log +konfig
+	run_zit show +konfig
 	assert_output_unsorted - <<-EOM
 		[konfig@$(get_konfig_sha)]
 	EOM
@@ -251,6 +305,8 @@ function show_konfig { # @test
 		print-empty-shas = false
 		print-matched-archiviert = false
 		print-shas = false
+		print-flush = false
+		print-unchanged = false
 
 		[cli-output.abbreviations]
 		hinweisen = false

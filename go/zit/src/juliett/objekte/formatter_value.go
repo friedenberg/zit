@@ -250,9 +250,8 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 
 	case "kennung":
 		return func(e *sku.Transacted) (err error) {
-			if _, err = fmt.Fprintf(
+			if _, err = fmt.Fprintln(
 				out,
-				"%s\n",
 				&e.Kennung,
 			); err != nil {
 				err = errors.Wrap(err)

@@ -84,6 +84,10 @@ func (ao abbrOne[V, VPtr]) AbbreviateKennung(
 func (a Abbr) AbbreviateHinweisOnly(
 	in *Kennung2,
 ) (err error) {
+	if in.GetGattung() != gattung.Zettel {
+		return
+	}
+
 	var getAbbr func(Kennung) (string, error)
 
 	var h Hinweis
@@ -103,6 +107,35 @@ func (a Abbr) AbbreviateHinweisOnly(
 	}
 
 	if err = in.SetWithGattung(abbr, h); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (a Abbr) ExpandHinweisOnly(
+	in *Kennung2,
+) (err error) {
+	if in.GetGattung() != gattung.Zettel || a.Hinweis.Expand == nil {
+		return
+	}
+
+	var h Hinweis
+
+	if err = h.Set(in.String()); err != nil {
+		err = nil
+		return
+	}
+
+	var ex string
+
+	if ex, err = a.Hinweis.Expand(h.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = in.SetWithGattung(ex, h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

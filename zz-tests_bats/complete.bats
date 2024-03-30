@@ -28,7 +28,7 @@ function complete_show_all { # @test
 }
 
 function complete_show_zettelen { # @test
-	run_zit show -complete :z
+	run_zit show -verbose -complete :z
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM
 		one/dos.*Zettel: !md wow ok again

@@ -46,7 +46,7 @@ func (b *Bezeichnung) Set(v string) (err error) {
 
 	v1 := strings.TrimSpace(v)
 
-	if v0 := b.String(); v0 != "" {
+	if v0 := b.String(); v0 != "" && v0 != v1 {
 		b.value = v0 + "\n" + v1
 	} else {
 		b.value = v1

@@ -172,7 +172,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 		if !b.IsEmpty() {
 			didWriteBezeichnung = true
 
-			n1, err = sw.WriteString(" \"")
+			n1, err = sw.WriteString(" ")
 			n += int64(n1)
 
 			if err != nil {
@@ -182,14 +182,6 @@ func (f *cliCheckedOut) WriteStringFormat(
 
 			n2, err = f.bezeichnungStringFormatWriter.WriteStringFormat(sw, b)
 			n += n2
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			n1, err = sw.WriteString("\"")
-			n += int64(n1)
 
 			if err != nil {
 				err = errors.Wrap(err)

@@ -193,7 +193,11 @@ func (s *Store) handleUpdated(
 		return
 	}
 
-	err = s.Updated(t)
+	if err = s.Updated(t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 

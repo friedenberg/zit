@@ -72,6 +72,14 @@ func (a *Transacted) String() string {
 	)
 }
 
+func (a *Transacted) StringKennungBezeichnung() string {
+	return fmt.Sprintf(
+		"[%s %q]",
+		&a.Kennung,
+		a.Metadatei.Bezeichnung,
+	)
+}
+
 func (a *Transacted) StringKennungTai() string {
 	return fmt.Sprintf(
 		"%s@%s",

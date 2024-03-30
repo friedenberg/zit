@@ -337,14 +337,14 @@ LOOP:
 		}
 	}
 
-	if f.options.Abbreviations.Hinweisen {
-		if err = f.ex.AbbreviateHinweisOnly(
-			&o.Kennung,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
+	// if f.options.Abbreviations.Hinweisen {
+	// 	if err = f.ex.AbbreviateHinweisOnly(
+	// 		&o.Kennung,
+	// 	); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return
+	// 	}
+	// }
 
 	rb.AdvanceRead(n)
 

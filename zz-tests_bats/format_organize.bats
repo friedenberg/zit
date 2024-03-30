@@ -37,8 +37,8 @@ function format_organize_right_align { # @test
 
 		            ###        -1
 
-		- [!md        ]
 		- [-zz-archive]
+		- [!md        ]
 
 		            ###        -2
 	EOM
@@ -81,7 +81,7 @@ function format_organize_left_align { # @test
 cmd_def_organize=(
 	-prefix-joints=true
 	-refine=true
-  -new-organize=true
+	-new-organize=true
 )
 
 cat_organize() (
@@ -89,31 +89,31 @@ cat_organize() (
 
 		- [ ach/vil    ] blah
 
-		               # project
+		               # %project
 
-		              ##        -2021-zit
+		              ##         -2021-zit
 
-		             ###                 -22q1-uws-140
+		             ###                  -22q1-uws-140
 
-		            ####                              -moving
+		            ####                               -moving
 
 		- [  io/poliwr ] update billing addresses
 
-		            ####                              -mvp-main_room
+		            ####                               -mvp-main_room
 
 		- [prot/nidora ] Brainstorm where to place toolbox.md
 
-		             ###                 -commands
+		             ###                  -commands
 
 		- [ mer/golb   ] use error types to generate specific exit status codes
 		- [ tec/slowp  ] update output of commands to use new store
 
-		             ###                 -etiketten_and_organize
+		             ###                  -etiketten_and_organize
 
 		- [  pe/mo     ] add etikett rule type for removing etiketts based on conditions
 		- [yttr/gole   ] use default etiketten with add
 
-		             ###                 -init
+		             ###                  -init
 
 		- [  ph/hitmonc] Add bats test for initing more than once.md
 		- [ rub/rap    ] add .exrc to init

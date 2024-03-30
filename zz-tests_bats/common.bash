@@ -46,6 +46,8 @@ cmd_zit_def=(
   -print-time=false
   -print-etiketten=true
   -print-empty-shas=true
+  -print-flush=false
+  -print-unchanged=false
 )
 
 export cmd_zit_def
@@ -80,7 +82,7 @@ function run_zit_init {
 }
 
 function get_konfig_sha() {
-  echo -n "bb61ffad0cd4354654743ec604066a0a02db9ef188f695ce856acd284ee0612d"
+  echo -n "7ca8512a56a5d903d63723c942edfc02885c8c431c355775b71d8b98fd385667"
 }
 
 function run_zit_init_disable_age {

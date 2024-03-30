@@ -41,8 +41,8 @@ function dirty_new_zettel() {
 	assert_success
 	assert_output --partial - <<-EOM
 		[!txt@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-etikett@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-etikett-one@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[etikett@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[etikett-one@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[two/uno@aeb82efa111ccb5b8c5ca351f12d8b2f8e76d8d7bd0ecebf2efaaa1581d19400 !txt "the new zettel" etikett-one]
 	EOM
 }
@@ -122,8 +122,6 @@ function status_simple_one_zettel { # @test
 }
 
 function status_simple_one_zettel_akte_separate { # @test
-	#   ../../../../../../../../../Users/sashafriedenberg/Eng/zit/src/delta/kennung/set_meta.go:117: query: "[[[one/uno, one/dos, md, tag-2, tag-3, tag, tag-4, tag-1]. ^[false]. [[one/uno], [true]]], [one/uno]].Zettel"
-	#   ../../../../../../../../../Users/sashafriedenberg/Eng/zit/src/delta/kennung/set_meta.go:117: query: "[[[one/uno, one/dos, md, tag, tag-4, tag-1, tag-2, tag-3]. ^[false]. [[false], [true]] /var/folders/zx/_q_8mkpx2qbc6lqjfk665nzr0000gq/T/bats-run-OJ6I5R/test/2/v2/one/uno.zettel]].Zettel"
 	run_zit status one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
@@ -235,7 +233,6 @@ function status_complex_zettel_etikett_negation { # @test
 function status_simple_all { # @test
 	run_zit status .
 	assert_success
-	#TODO why is fix issue with untracked appear
 	assert_output_unsorted - <<-EOM
 		             same [md.typ@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
 		             same [one/dos.zettel@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again"]

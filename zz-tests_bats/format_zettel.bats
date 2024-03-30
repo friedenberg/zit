@@ -62,7 +62,7 @@ function format_simple { # @test
 		last time but new
 	EOM
 
-	run_zit format-zettel one/uno
+	run_zit format-zettel one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
 		---

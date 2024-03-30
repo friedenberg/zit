@@ -426,7 +426,12 @@ func Expanded(s EtikettSet, ex expansion.Expander) (out EtikettSet) {
 
 func AddNormalizedEtikett(es EtikettMutableSet, e *Etikett) {
 	ExpandOne(e, expansion.ExpanderRight).Each(es.Add)
-	errors.PanicIfError(iter.AddClonePool[Etikett, *Etikett](es, GetEtikettPool(), EtikettResetter, e))
+	errors.PanicIfError(iter.AddClonePool[Etikett, *Etikett](
+		es,
+		GetEtikettPool(),
+		EtikettResetter,
+		e,
+	))
 
 	c := es.CloneSetPtrLike()
 	es.Reset()

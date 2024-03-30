@@ -138,12 +138,14 @@ func (z *Metadatei) GetEtikettenMutable() kennung.EtikettMutableSet {
 }
 
 func (z *Metadatei) AddEtikettPtr(e *kennung.Etikett) (err error) {
-	return iter.AddClonePool[kennung.Etikett, *kennung.Etikett](
-		z.GetEtikettenMutable(),
-		kennung.GetEtikettPool(),
-		kennung.EtikettResetter,
-		e,
-	)
+	kennung.AddNormalizedEtikett(z.GetEtikettenMutable(), e)
+	return
+	// return iter.AddClonePool[kennung.Etikett, *kennung.Etikett](
+	// 	z.GetEtikettenMutable(),
+	// 	kennung.GetEtikettPool(),
+	// 	kennung.EtikettResetter,
+	// 	e,
+	// )
 }
 
 func (z *Metadatei) SetEtiketten(e kennung.EtikettSet) {

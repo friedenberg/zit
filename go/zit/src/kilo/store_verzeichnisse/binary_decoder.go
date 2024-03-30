@@ -228,7 +228,7 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 		}
 
 		if err = bf.readFieldKey(sk.Transacted); err != nil {
-			err = errors.Wrapf(err, "Sku: %#v", sk)
+			err = errors.Wrapf(err, "Sku: %#v", sk.Transacted)
 			return
 		}
 	}
