@@ -18,7 +18,6 @@ import (
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/golf/ennui"
-	"code.linenisgreat.com/zit/src/golf/kennung_index"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/query"
@@ -70,7 +69,6 @@ func MakeStore(
 	s standort.Standort,
 	k *konfig.Compiled,
 	dir string,
-	ki kennung_index.Index,
 ) (i *Store, err error) {
 	i = &Store{
 		standort:             s,
@@ -79,7 +77,7 @@ func MakeStore(
 		VerzeichnisseFactory: s,
 	}
 
-	if err = i.Initialize(ki); err != nil {
+	if err = i.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -87,7 +85,7 @@ func MakeStore(
 	return
 }
 
-func (i *Store) Initialize(ki kennung_index.Index) (err error) {
+func (i *Store) Initialize() (err error) {
 	if i.ennuiShas, err = ennui.MakePermitDuplicates(
 		i.standort,
 		path.Join(i.path, "EnnuiShas"),
@@ -112,7 +110,6 @@ func (i *Store) Initialize(ki kennung_index.Index) (err error) {
 				Index:  uint8(n),
 			},
 			i,
-			ki,
 		)
 
 		i.tomlPages[n].initialize(
@@ -122,7 +119,6 @@ func (i *Store) Initialize(ki kennung_index.Index) (err error) {
 				Index:  uint8(n),
 			},
 			i,
-			ki,
 		)
 	}
 

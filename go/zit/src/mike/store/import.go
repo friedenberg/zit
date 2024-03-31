@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/kilo/objekte_store"
+	"code.linenisgreat.com/zit/src/juliett/objekte"
 )
 
 func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOut, err error) {
@@ -65,7 +65,7 @@ func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOut, err error) {
 	}
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = errors.Wrap(objekte_store.ErrLockRequired{
+		err = errors.Wrap(objekte.ErrLockRequired{
 			Operation: fmt.Sprintf(
 				"import %s",
 				sk.GetGattung(),

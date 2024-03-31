@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/src/delta/typ_akte"
 	"code.linenisgreat.com/zit/src/india/erworben"
 	"code.linenisgreat.com/zit/src/juliett/objekte"
-	"code.linenisgreat.com/zit/src/kilo/objekte_store"
 )
 
 type Store[
@@ -16,7 +15,7 @@ type Store[
 	APtr schnittstellen.AktePtr[A],
 ] interface {
 	SaveAkteText(APtr) (schnittstellen.ShaLike, int64, error)
-	objekte_store.StoredParseSaver[A, APtr]
+	StoredParseSaver[A, APtr]
 	objekte.AkteFormat[A, APtr]
 	schnittstellen.AkteGetterPutter[APtr]
 }
@@ -32,9 +31,9 @@ func Make(
 	st standort.Standort,
 ) *Akten {
 	return &Akten{
-		etikett_v0: objekte_store.MakeAkteStore[etikett_akte.V0, *etikett_akte.V0](
+		etikett_v0: MakeAkteStore[etikett_akte.V0, *etikett_akte.V0](
 			st,
-			objekte_store.MakeAkteFormat[etikett_akte.V0, *etikett_akte.V0](
+			MakeAkteFormat[etikett_akte.V0, *etikett_akte.V0](
 				objekte.MakeTextParserIgnoreTomlErrors[etikett_akte.V0](
 					st,
 				),
@@ -45,9 +44,9 @@ func Make(
 				a.Reset()
 			},
 		),
-		kasten_v0: objekte_store.MakeAkteStore[kasten_akte.V0, *kasten_akte.V0](
+		kasten_v0: MakeAkteStore[kasten_akte.V0, *kasten_akte.V0](
 			st,
-			objekte_store.MakeAkteFormat[kasten_akte.V0, *kasten_akte.V0](
+			MakeAkteFormat[kasten_akte.V0, *kasten_akte.V0](
 				objekte.MakeTextParserIgnoreTomlErrors[kasten_akte.V0](
 					st,
 				),
@@ -58,9 +57,9 @@ func Make(
 				a.Reset()
 			},
 		),
-		konfig_v0: objekte_store.MakeAkteStore[erworben.Akte, *erworben.Akte](
+		konfig_v0: MakeAkteStore[erworben.Akte, *erworben.Akte](
 			st,
-			objekte_store.MakeAkteFormat[erworben.Akte, *erworben.Akte](
+			MakeAkteFormat[erworben.Akte, *erworben.Akte](
 				objekte.MakeTextParserIgnoreTomlErrors[erworben.Akte](
 					st,
 				),
@@ -71,9 +70,9 @@ func Make(
 				a.Reset()
 			},
 		),
-		typ_v0: objekte_store.MakeAkteStore[typ_akte.V0, *typ_akte.V0](
+		typ_v0: MakeAkteStore[typ_akte.V0, *typ_akte.V0](
 			st,
-			objekte_store.MakeAkteFormat[typ_akte.V0, *typ_akte.V0](
+			MakeAkteFormat[typ_akte.V0, *typ_akte.V0](
 				objekte.MakeTextParserIgnoreTomlErrors[typ_akte.V0](
 					st,
 				),

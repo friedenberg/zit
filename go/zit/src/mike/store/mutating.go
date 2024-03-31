@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/files"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/bravo/objekte_mode"
-	"code.linenisgreat.com/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
@@ -20,8 +19,8 @@ import (
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/juliett/objekte"
 	"code.linenisgreat.com/zit/src/juliett/to_merge"
-	"code.linenisgreat.com/zit/src/kilo/objekte_store"
 )
 
 func (s *Store) handleNewOrUpdated(
@@ -69,7 +68,7 @@ func (s *Store) handleNewOrUpdatedCommit(
 	mode objekte_mode.Mode,
 ) (err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte_store.ErrLockRequired{
+		err = objekte.ErrLockRequired{
 			Operation: "write named zettel to index",
 		}
 
@@ -145,7 +144,7 @@ func (s *Store) handleNewOrUpdatedCommit(
 			return
 		}
 
-		if err = s.GetKennungIndex().AddHinweis(&t.Kennung); err != nil {
+		if err = s.kennungIndex.AddHinweis(&t.Kennung); err != nil {
 			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 				errors.Log().Printf("kennung does not contain value: %s", err)
 				err = nil
@@ -213,7 +212,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	kennungPtr := &co.External.Kennung
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte_store.ErrLockRequired{
+		err = objekte.ErrLockRequired{
 			Operation: fmt.Sprintf("create or update %s", kennungPtr),
 		}
 
@@ -285,7 +284,7 @@ func (s *Store) createOrUpdate(
 	updateType objekte_mode.Mode,
 ) (transactedPtr *sku.Transacted, err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte_store.ErrLockRequired{
+		err = objekte.ErrLockRequired{
 			Operation: fmt.Sprintf(
 				"create or update %s",
 				kennungPtr.GetGattung(),
@@ -370,7 +369,7 @@ func (s *Store) CreateOrUpdate(
 	kennungPtr kennung.Kennung,
 ) (transactedPtr *sku.Transacted, err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte_store.ErrLockRequired{
+		err = objekte.ErrLockRequired{
 			Operation: fmt.Sprintf(
 				"create or update %s",
 				kennungPtr.GetGattung(),
@@ -491,7 +490,7 @@ func (s *Store) CreateOrUpdateAkteSha(
 	sh schnittstellen.ShaLike,
 ) (transactedPtr *sku.Transacted, err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte_store.ErrLockRequired{
+		err = objekte.ErrLockRequired{
 			Operation: fmt.Sprintf(
 				"create or update %s",
 				kennungPtr.GetGattung(),
@@ -594,7 +593,7 @@ func (s *Store) Create(
 	mg metadatei.Getter,
 ) (tz *sku.Transacted, err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte_store.ErrLockRequired{
+		err = objekte.ErrLockRequired{
 			Operation: "create",
 		}
 
@@ -622,17 +621,9 @@ func (s *Store) Create(
 		return
 	}
 
-	// TODO-P1
-	// If the zettel exists, short circuit and return that
-	todo.Implement()
-	// if tz2, err2 := s.ReadOne(shaObj); err2 == nil {
-	// 	tz = tz2
-	// 	return
-	// }
-
 	var ken *kennung.Hinweis
 
-	if ken, err = s.GetKennungIndex().CreateHinweis(); err != nil {
+	if ken, err = s.kennungIndex.CreateHinweis(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -698,7 +689,7 @@ func (s *Store) UpdateManyMetadatei(
 	s.GetKonfig().SetHasChanges(true)
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte_store.ErrLockRequired{
+		err = objekte.ErrLockRequired{
 			Operation: "update many metadatei",
 		}
 
@@ -732,7 +723,7 @@ func (s *Store) RevertTo(
 	}
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte_store.ErrLockRequired{
+		err = objekte.ErrLockRequired{
 			Operation: "update many metadatei",
 		}
 
@@ -979,7 +970,7 @@ func (s *Store) ReindexOne(besty, sk *sku.Transacted) (err error) {
 // TODO-P2 add support for quiet reindexing
 func (s *Store) Reindex() (err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte_store.ErrLockRequired{
+		err = objekte.ErrLockRequired{
 			Operation: "reindex",
 		}
 
@@ -996,9 +987,7 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	if err = s.GetVerzeichnisse().Initialize(
-		s.GetKennungIndex(),
-	); err != nil {
+	if err = s.GetVerzeichnisse().Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

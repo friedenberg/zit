@@ -23,7 +23,6 @@ import (
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/juliett/objekte"
-	"code.linenisgreat.com/zit/src/kilo/objekte_store"
 )
 
 type Store interface {
@@ -33,11 +32,11 @@ type Store interface {
 	ReadOneKennung(kennung.Kennung) (*sku.Transacted, error)
 	ReadOneKennungSha(kennung.Kennung) (*sha.Sha, error)
 	Create(*Akte) (*sku.Transacted, error)
-	objekte_store.LastReader
+	ReadLast() (*sku.Transacted, error)
 	WriteOneObjekteMetadatei(o *sku.Transacted) (err error)
 	ReadOne(schnittstellen.Stringer) (*sku.Transacted, error)
 	ReadOneSku(besty, sk *sha.Sha) (*sku.Transacted, error)
-	objekte_store.AllReader
+	ReadAll(schnittstellen.FuncIter[*sku.Transacted]) error
 	ReadAllSkus(func(besty, sk *sku.Transacted) error) error
 	schnittstellen.AkteGetter[*Akte]
 
@@ -205,7 +204,7 @@ func (s *store) ReadOneKennung(k kennung.Kennung) (sk *sku.Transacted, err error
 
 func (s *store) Create(o *Akte) (t *sku.Transacted, err error) {
 	if !s.ls.IsAcquired() {
-		err = objekte_store.ErrLockRequired{
+		err = objekte.ErrLockRequired{
 			Operation: "create bestandsaufnahme",
 		}
 
@@ -303,7 +302,6 @@ func (s *store) writeAkte(o *Akte) (sh *sha.Sha, err error) {
 		}
 
 		_, err = fo.Print(sk)
-
 		if err != nil {
 			err = errors.Wrap(err)
 			return
@@ -519,7 +517,6 @@ func (s *store) ReadOne(
 	defer errors.DeferredCloser(&err, or)
 
 	_, o, err = s.readOneFromReader(or)
-
 	if err != nil {
 		err = errors.Wrap(err)
 		return

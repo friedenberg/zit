@@ -17,7 +17,6 @@ import (
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/src/juliett/objekte"
 	"code.linenisgreat.com/zit/src/kilo/cwd"
-	"code.linenisgreat.com/zit/src/kilo/objekte_store"
 	"code.linenisgreat.com/zit/src/kilo/store_verzeichnisse"
 	"code.linenisgreat.com/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/src/lima/akten"
@@ -52,7 +51,7 @@ type Store struct {
 	protoZettel      zettel.ProtoZettel
 	konfigAkteFormat objekte.AkteFormat[erworben.Akte, *erworben.Akte]
 
-	objekte_store.LogWriter
+	sku.Logger
 }
 
 func (c *Store) Initialize(
@@ -125,7 +124,6 @@ func (c *Store) Initialize(
 		c.GetStandort(),
 		c.GetKonfig(),
 		c.GetStandort().DirVerzeichnisseObjekten(),
-		c.GetKennungIndex(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -133,7 +131,7 @@ func (c *Store) Initialize(
 
 	c.protoZettel = zettel.MakeProtoZettel(c.GetKonfig())
 
-	c.konfigAkteFormat = objekte_store.MakeAkteFormat[erworben.Akte, *erworben.Akte](
+	c.konfigAkteFormat = akten.MakeAkteFormat[erworben.Akte, *erworben.Akte](
 		objekte.MakeTextParserIgnoreTomlErrors[erworben.Akte](
 			c.GetStandort(),
 		),
@@ -164,6 +162,6 @@ func (s *Store) ResetIndexes() (err error) {
 	return
 }
 
-func (s *Store) SetLogWriter(lw objekte_store.LogWriter) {
-	s.LogWriter = lw
+func (s *Store) SetLogWriter(lw sku.Logger) {
+	s.Logger = lw
 }

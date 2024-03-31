@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/zit/src/delta/standort"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/golf/ennui"
-	"code.linenisgreat.com/zit/src/golf/kennung_index"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 )
@@ -30,19 +29,16 @@ type PageTuple struct {
 	changesAreHistorical    bool
 	standort                standort.Standort
 	konfig                  *konfig.Compiled
-	etikettIndex            kennung_index.EtikettIndexMutation
 }
 
 func (pt *PageTuple) initialize(
 	pid PageId,
 	i *Store,
-	ki kennung_index.Index,
 ) {
 	pt.standort = i.standort.SansAge().SansCompression()
 	pt.PageId = pid
 	pt.added = sku.MakeTransactedHeap()
 	pt.addedSchwanz = sku.MakeTransactedHeap()
-	pt.etikettIndex = ki
 	pt.ennuiKennung = i.ennuiKennung
 	pt.konfig = i.erworben
 }
@@ -98,7 +94,6 @@ func (pt *PageTuple) CopyJustHistoryFrom(
 		sk.Offset += sk.ContentLength
 		sk.Transacted = sku.GetTransactedPool().Get()
 		sk.ContentLength, err = dec.readFormatAndMatchSigil(r, &sk)
-
 		if err != nil {
 			if errors.IsEOF(err) {
 				err = nil
@@ -177,7 +172,6 @@ func (pt *PageTuple) copyHistoryAndMaybeSchwanz(
 			tz = sku.GetTransactedPool().Get()
 			sk.Transacted = tz
 			_, err = dec.readFormatAndMatchSigil(br, &sk)
-
 			if err != nil {
 				if errors.IsEOF(err) {
 					err = collections.MakeErrStopIteration()

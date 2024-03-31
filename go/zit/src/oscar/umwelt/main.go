@@ -18,7 +18,6 @@ import (
 	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/juliett/chrome"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
-	"code.linenisgreat.com/zit/src/kilo/objekte_store"
 	"code.linenisgreat.com/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/src/mike/store"
 )
@@ -164,17 +163,17 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 
 	ptl := u.PrinterTransactedLike()
 
-	lw := objekte_store.LogWriter{
-		New:       ptl,
-		Updated:   ptl,
+	lw := sku.Logger{
+		New:     ptl,
+		Updated: ptl,
 		Unchanged: func(sk *sku.Transacted) (err error) {
-      if !u.konfig.PrintOptions.PrintUnchanged {
-        return
-      }
+			if !u.konfig.PrintOptions.PrintUnchanged {
+				return
+			}
 
-      return ptl(sk)
-    },
-		Archived:  ptl,
+			return ptl(sk)
+		},
+		Archived: ptl,
 	}
 
 	u.store.SetCheckedOutLogWriter(u.PrinterCheckedOut())

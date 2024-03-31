@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
-	"code.linenisgreat.com/zit/src/kilo/objekte_store"
+	"code.linenisgreat.com/zit/src/juliett/objekte"
 	"code.linenisgreat.com/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
@@ -260,7 +260,7 @@ func (c CreateFromPaths) handleStoreError(
 ) {
 	var err error
 
-	var lostError objekte_store.VerlorenAndGefundenError
+	var lostError objekte.VerlorenAndGefundenError
 	var normalError errors.StackTracer
 
 	if errors.As(in, &lostError) {

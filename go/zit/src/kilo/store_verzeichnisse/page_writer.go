@@ -195,8 +195,6 @@ func (pw *pageWriter) writeOne(
 		return
 	}
 
-	pw.etikettIndex.Add(z.Metadatei.GetEtiketten())
-
 	pw.SaveSha(z, kennung.SigilHistory)
 
 	return

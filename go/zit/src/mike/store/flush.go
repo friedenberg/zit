@@ -7,13 +7,13 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/kilo/objekte_store"
+	"code.linenisgreat.com/zit/src/juliett/objekte"
 	"code.linenisgreat.com/zit/src/lima/bestandsaufnahme"
 )
 
 func (s *Store) FlushBestandsaufnahme() (err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte_store.ErrLockRequired{
+		err = objekte.ErrLockRequired{
 			Operation: "flush",
 		}
 
@@ -54,7 +54,7 @@ func (c *Store) Flush(
 	printerHeader schnittstellen.FuncIter[string],
 ) (err error) {
 	if !c.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte_store.ErrLockRequired{
+		err = objekte.ErrLockRequired{
 			Operation: "flush",
 		}
 

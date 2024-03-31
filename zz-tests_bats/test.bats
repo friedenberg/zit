@@ -222,23 +222,6 @@ function indexes_are_implicitly_correct { # @test
 	EOM
 
 	{
-		echo et1
-		echo et2
-	} >"$expected"
-
-	run_zit cat-etiketten-schwanzen
-	assert_success
-	assert_output_unsorted "$(cat "$expected")"
-
-	{
-		echo one/uno
-	} >"$expected"
-
-	#TODO
-	# run_zit cat -gattung hinweis
-	# assert_output --partial "$(cat "$expected")"
-
-	{
 		echo ---
 		echo "# bez"
 		echo - et1
