@@ -18,19 +18,31 @@ import (
 )
 
 type Chrome struct {
-	typ      kennung.Typ
-	standort standort.Standort
-	urls     map[url.URL][]item
+	typ          kennung.Typ
+	chrestConfig chrest.Config
+	standort     standort.Standort
+	urls         map[url.URL][]item
+	removed      map[url.URL]struct{}
 }
 
 func MakeChrome(s standort.Standort) *Chrome {
 	return &Chrome{
 		typ:      kennung.MustTyp("toml-bookmark"),
 		standort: s,
+		removed:  make(map[url.URL]struct{}),
 	}
 }
 
+func (c *Chrome) GetVirtualStore() sku.VirtualStore {
+	return c
+}
+
 func (c *Chrome) Initialize() (err error) {
+	if err = c.chrestConfig.Read(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	var chromeTabsRaw interface{}
 	var req *http.Request
 
@@ -39,14 +51,7 @@ func (c *Chrome) Initialize() (err error) {
 		return
 	}
 
-	var chrestConfig chrest.Config
-
-	if err = chrestConfig.Read(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if chromeTabsRaw, err = chrest.AskChrome(chrestConfig, req); err != nil {
+	if chromeTabsRaw, err = chrest.AskChrome(c.chrestConfig, req); err != nil {
 		if errors.IsErrno(err, syscall.ECONNREFUSED) {
 			errors.Err().Print("chrest offline")
 			err = nil
@@ -84,6 +89,34 @@ func (c *Chrome) Initialize() (err error) {
 	return
 }
 
+func (c *Chrome) Flush() (err error) {
+	if len(c.removed) == 0 {
+		return
+	}
+
+	var req *http.Request
+
+	if req, err = http.NewRequest("DELETE", "http://localhost/urls", nil); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	// TODO add body
+
+	if _, err = chrest.AskChrome(c.chrestConfig, req); err != nil {
+		if errors.IsErrno(err, syscall.ECONNREFUSED) {
+			errors.Err().Print("chrest offline")
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	return
+}
+
 func (c *Chrome) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 	var r sha.ReadCloser
 
@@ -111,7 +144,11 @@ func (c *Chrome) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 	return
 }
 
-func (c *Chrome) ContainsMatchable(sk *sku.Transacted) bool {
+func (c *Chrome) RemoveSku(sk *sku.Transacted) (err error) {
+	return
+}
+
+func (c *Chrome) ContainsSku(sk *sku.Transacted) bool {
 	if !sk.GetTyp().Equals(c.typ) {
 		return false
 	}

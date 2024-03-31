@@ -2,6 +2,7 @@ package umwelt
 
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/iter"
 )
 
 func (u *Umwelt) Lock() (err error) {
@@ -37,7 +38,19 @@ func (u *Umwelt) Unlock() (err error) {
 			return
 		}
 
-		if err = u.GetStore().Flush(u.PrinterHeader()); err != nil {
+		wg := iter.MakeErrorWaitGroupParallel()
+		wg.Do(
+			func() error {
+        // second store flush is necessary because of konfig changes
+				return u.store.Flush(u.PrinterHeader())
+			},
+		)
+
+		for _, vs := range u.virtualStores {
+			wg.Do(vs.Flush)
+		}
+
+		if err = wg.GetError(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

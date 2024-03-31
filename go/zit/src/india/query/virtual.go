@@ -6,13 +6,8 @@ import (
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
-type VirtualStore interface {
-	Initialize() error
-	ContainsMatchable(*sku.Transacted) bool
-}
-
 type VirtualStoreInitable struct {
-	VirtualStore
+	sku.VirtualStore
 	sync.Once
 }
 
@@ -22,12 +17,12 @@ func (ve *VirtualStoreInitable) Initialize() (err error) {
 }
 
 type Virtual struct {
-	VirtualStore
+	sku.VirtualStore
 	Kennung
 }
 
 func (ve *Virtual) ContainsSku(sk *sku.Transacted) bool {
-	if !ve.VirtualStore.ContainsMatchable(sk) {
+	if !ve.VirtualStore.ContainsSku(sk) {
 		return false
 	}
 

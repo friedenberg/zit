@@ -20,6 +20,13 @@ type (
 		ContainsSku(*Transacted) bool
 	}
 
+	VirtualStore interface {
+		Initialize() error
+		Flush() error
+		RemoveSku(*Transacted) error
+		Queryable
+	}
+
 	Query interface {
 		Queryable
 		schnittstellen.Stringer
