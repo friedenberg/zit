@@ -73,7 +73,7 @@ func (s *Store) ReadFiles(
 				return
 			}
 
-			if !qg.ContainsMatchable(&co.External.Transacted) {
+			if !qg.ContainsSku(&co.External.Transacted) {
 				return
 			}
 

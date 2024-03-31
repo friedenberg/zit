@@ -6,7 +6,7 @@ import (
 
 type QueryWithHidden struct {
 	Query
-	Hidden Matcher
+	Hidden sku.Query
 }
 
 func (q *QueryWithHidden) Clone() *QueryWithHidden {
@@ -18,12 +18,12 @@ func (q *QueryWithHidden) Clone() *QueryWithHidden {
 	}
 }
 
-func (q *QueryWithHidden) ContainsMatchable(sk *sku.Transacted) bool {
+func (q *QueryWithHidden) ContainsSku(sk *sku.Transacted) bool {
 	if q.ShouldHide(sk) {
 		return false
 	}
 
-	return q.Query.ContainsMatchable(sk)
+	return q.Query.ContainsSku(sk)
 }
 
 func (q *QueryWithHidden) ShouldHide(sk *sku.Transacted) bool {
@@ -35,5 +35,5 @@ func (q *QueryWithHidden) ShouldHide(sk *sku.Transacted) bool {
 		return false
 	}
 
-	return q.Hidden.ContainsMatchable(sk)
+	return q.Hidden.ContainsSku(sk)
 }

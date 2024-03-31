@@ -19,7 +19,7 @@ type luaSku struct {
 	*lua.LTable
 }
 
-func MakeLua(ki kennung.Index, script string) (m Matcher, err error) {
+func MakeLua(ki kennung.Index, script string) (m sku.Query, err error) {
 	reader := strings.NewReader(script)
 
 	var chunks []lua_ast.Stmt
@@ -70,8 +70,8 @@ func (m *matcherLua) String() string {
 	return "lua"
 	// sb := &strings.Builder{}
 
-	// if m.Matcher != nil {
-	// 	sb.WriteString(m.Matcher.String())
+	// if m.sku.Query != nil {
+	// 	sb.WriteString(m.sku.Query.String())
 	// }
 
 	// sb.WriteString(m.Sigil.String())
@@ -79,7 +79,7 @@ func (m *matcherLua) String() string {
 	// return sb.String()
 }
 
-func (matcher *matcherLua) ContainsMatchable(matchable *sku.Transacted) bool {
+func (matcher *matcherLua) ContainsSku(matchable *sku.Transacted) bool {
 	s := matcher.statePool.Get()
 	defer matcher.statePool.Put(s)
 
@@ -106,6 +106,6 @@ func (*matcherLua) MatcherLen() int {
 	return 0
 }
 
-func (_ *matcherLua) Each(f schnittstellen.FuncIter[Matcher]) (err error) {
+func (_ *matcherLua) Each(f schnittstellen.FuncIter[sku.Query]) (err error) {
 	return
 }

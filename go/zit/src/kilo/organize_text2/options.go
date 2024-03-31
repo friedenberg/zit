@@ -30,7 +30,7 @@ type Options struct {
 
 	Konfig *konfig.Compiled
 
-	commentMatchers   schnittstellen.SetLike[query.Matcher]
+	commentMatchers   schnittstellen.SetLike[sku.Query]
 	rootEtiketten     kennung.EtikettSet
 	Typ               kennung.Typ
 	GroupingEtiketten kennung.EtikettSlice
@@ -132,10 +132,10 @@ func (o *Flags) GetOptions(
 	if q != nil {
 		o.rootEtiketten = q.GetEtiketten()
 
-		ks := collections_value.MakeMutableValueSet[query.Matcher](nil)
+		ks := collections_value.MakeMutableValueSet[sku.Query](nil)
 
 		if err := query.VisitAllMatchers(
-			func(m query.Matcher) (err error) {
+			func(m sku.Query) (err error) {
 				if e, ok := m.(*query.Exp); ok && e.Negated {
 					return ks.Add(e)
 				}

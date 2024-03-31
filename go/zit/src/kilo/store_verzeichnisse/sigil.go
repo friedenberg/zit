@@ -11,11 +11,11 @@ type sigil struct {
 	kennung.Sigil
 }
 
-func (qg *sigil) Get(_ gattung.Gattung) (sku.Query, bool) {
+func (qg *sigil) Get(_ gattung.Gattung) (sku.QueryWithSigilAndKennung, bool) {
 	return qg, true
 }
 
-func (s *sigil) ContainsMatchable(_ *sku.Transacted) bool {
+func (s *sigil) ContainsSku(_ *sku.Transacted) bool {
 	return true
 }
 
@@ -31,6 +31,6 @@ func (s *sigil) GetSigil() kennung.Sigil {
 	return s.Sigil
 }
 
-func (s *sigil) Each(_ schnittstellen.FuncIter[sku.QueryBase]) error {
+func (s *sigil) Each(_ schnittstellen.FuncIter[sku.Query]) error {
 	return nil
 }

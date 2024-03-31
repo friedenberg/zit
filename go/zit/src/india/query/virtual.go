@@ -7,7 +7,7 @@ import (
 )
 
 type VirtualStore interface {
-	Init() error
+	Initialize() error
 	ContainsMatchable(*sku.Transacted) bool
 }
 
@@ -16,8 +16,8 @@ type VirtualStoreInitable struct {
 	sync.Once
 }
 
-func (ve *VirtualStoreInitable) Init() (err error) {
-	ve.Do(func() { err = ve.VirtualStore.Init() })
+func (ve *VirtualStoreInitable) Initialize() (err error) {
+	ve.Do(func() { err = ve.VirtualStore.Initialize() })
 	return
 }
 
@@ -26,12 +26,12 @@ type Virtual struct {
 	Kennung
 }
 
-func (ve *Virtual) ContainsMatchable(sk *sku.Transacted) bool {
+func (ve *Virtual) ContainsSku(sk *sku.Transacted) bool {
 	if !ve.VirtualStore.ContainsMatchable(sk) {
 		return false
 	}
 
-	if !ve.Kennung.ContainsMatchable(sk) {
+	if !ve.Kennung.ContainsSku(sk) {
 		return false
 	}
 

@@ -26,7 +26,7 @@ func (a *Query) IsEmpty() bool {
 		len(a.Kennung) == 0
 }
 
-func (a *Query) GetMatcherSigil() MatcherSigil {
+func (a *Query) GetMatcherSigil() sku.QueryWithSigilAndKennung {
 	return a
 }
 
@@ -65,7 +65,7 @@ func (a *Query) Clone() (b *Query) {
 	return b
 }
 
-func (q *Query) Add(m Matcher) (err error) {
+func (q *Query) Add(m sku.Query) (err error) {
 	q1, ok := m.(*Query)
 
 	if !ok {
@@ -106,7 +106,7 @@ func (a *Query) Merge(b *Query) (err error) {
 	return
 }
 
-func (q *Query) Each(_ schnittstellen.FuncIter[Matcher]) (err error) {
+func (q *Query) Each(_ schnittstellen.FuncIter[sku.Query]) (err error) {
 	return
 }
 
@@ -205,7 +205,7 @@ func (q *Query) String() string {
 	return sb.String()
 }
 
-func (q *Query) ContainsMatchable(sk *sku.Transacted) bool {
+func (q *Query) ContainsSku(sk *sku.Transacted) bool {
 	g := gattung.Must(sk)
 
 	if !q.Gattung.ContainsOneOf(g) {
@@ -218,7 +218,7 @@ func (q *Query) ContainsMatchable(sk *sku.Transacted) bool {
 
 	if len(q.Children) == 0 {
 		return len(q.Kennung) == 0
-	} else if !q.Exp.ContainsMatchable(sk) {
+	} else if !q.Exp.ContainsSku(sk) {
 		return false
 	}
 

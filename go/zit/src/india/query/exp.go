@@ -18,7 +18,7 @@ type Exp struct {
 	Exact        bool
 	Hidden       bool
 	Debug        bool
-	Children     []Matcher
+	Children     []sku.Query
 }
 
 func (a *Exp) Clone() (b *Exp) {
@@ -31,7 +31,7 @@ func (a *Exp) Clone() (b *Exp) {
 		Debug:        a.Debug,
 	}
 
-	b.Children = make([]Matcher, len(a.Children))
+	b.Children = make([]sku.Query, len(a.Children))
 
 	for i, c := range a.Children {
 		switch ct := c.(type) {
@@ -56,7 +56,7 @@ func (e *Exp) Reduce(b *Builder) (err error) {
 	}
 
 	e.MatchOnEmpty = !b.doNotMatchEmpty
-	chillen := make([]Matcher, 0, len(e.Children))
+	chillen := make([]sku.Query, 0, len(e.Children))
 
 	for _, m := range e.Children {
 		switch mt := m.(type) {
@@ -90,7 +90,7 @@ func (e *Exp) Reduce(b *Builder) (err error) {
 	return
 }
 
-func (e *Exp) Add(m Matcher) (err error) {
+func (e *Exp) Add(m sku.Query) (err error) {
 	switch mt := m.(type) {
 	case *Exp:
 
@@ -192,7 +192,7 @@ func (m *Exp) negateIfNecessary(v bool) bool {
 	}
 }
 
-func (e *Exp) ContainsMatchable(sk *sku.Transacted) bool {
+func (e *Exp) ContainsSku(sk *sku.Transacted) bool {
 	log.Log().Printf("%s in %s", sk, e)
 
 	if len(e.Children) == 0 {
@@ -208,7 +208,7 @@ func (e *Exp) ContainsMatchable(sk *sku.Transacted) bool {
 
 func (e *Exp) containsMatchableAnd(sk *sku.Transacted) bool {
 	for _, m := range e.Children {
-		if !m.ContainsMatchable(sk) {
+		if !m.ContainsSku(sk) {
 			return e.negateIfNecessary(false)
 		}
 	}
@@ -218,7 +218,7 @@ func (e *Exp) containsMatchableAnd(sk *sku.Transacted) bool {
 
 func (e *Exp) containsMatchableOr(sk *sku.Transacted) bool {
 	for _, m := range e.Children {
-		if m.ContainsMatchable(sk) {
+		if m.ContainsSku(sk) {
 			return e.negateIfNecessary(true)
 		}
 	}
@@ -227,7 +227,7 @@ func (e *Exp) containsMatchableOr(sk *sku.Transacted) bool {
 }
 
 func (e *Exp) Each(
-	f schnittstellen.FuncIter[Matcher],
+	f schnittstellen.FuncIter[sku.Query],
 ) (err error) {
 	for _, m := range e.Children {
 		if err = f(m); err != nil {

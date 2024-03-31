@@ -18,7 +18,6 @@ import (
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 )
 
@@ -163,7 +162,7 @@ func (fs CwdFiles) GetKennungForFD(fd *fd.FD) (k *kennung.Kennung2, err error) {
 	return
 }
 
-func (fs CwdFiles) ContainsMatchable(m *sku.Transacted) bool {
+func (fs CwdFiles) ContainsSku(m *sku.Transacted) bool {
 	g := gattung.Must(m)
 
 	switch g {
@@ -459,7 +458,7 @@ func (c CwdFiles) MatcherLen() int {
 	)
 }
 
-func (CwdFiles) Each(_ schnittstellen.FuncIter[query.Matcher]) error {
+func (CwdFiles) Each(_ schnittstellen.FuncIter[sku.Query]) error {
 	return nil
 }
 

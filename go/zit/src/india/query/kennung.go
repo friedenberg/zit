@@ -31,7 +31,7 @@ func (k Kennung) Reduce(b *Builder) (err error) {
 }
 
 // TODO support exact
-func (k Kennung) ContainsMatchable(sk *sku.Transacted) bool {
+func (k Kennung) ContainsSku(sk *sku.Transacted) bool {
 	me := sk.GetMetadatei()
 	switch k.GetGattung() {
 	case gattung.Etikett:
@@ -89,7 +89,7 @@ func (k Kennung) String() string {
 	return sb.String()
 }
 
-func (k Kennung) Each(_ schnittstellen.FuncIter[Matcher]) error {
+func (k Kennung) Each(_ schnittstellen.FuncIter[sku.Query]) error {
 	return nil
 }
 

@@ -247,7 +247,7 @@ func (i *Store) readLoc(loc ennui.Loc) (sk *sku.Transacted, err error) {
 	defer errors.DeferredCloser(&err, f)
 
 	coder := binaryDecoder{
-		MatcherGroup: &sigil{Sigil: kennung.SigilAll},
+		QueryGroup: &sigil{Sigil: kennung.SigilAll},
 	}
 
 	sk = sku.GetTransactedPool().Get()

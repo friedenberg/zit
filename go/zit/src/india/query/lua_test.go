@@ -26,7 +26,7 @@ func TestLuaFalse(t1 *testing.T) {
 		return
 	}
 
-	if m.ContainsMatchable(sk) {
+	if m.ContainsSku(sk) {
 		t.Errorf("woops")
 	}
 }
@@ -48,7 +48,7 @@ func TestMatcherLuaTrue(t1 *testing.T) {
 		t.Fatal(err)
 	}
 
-	if !m.ContainsMatchable(sk) {
+	if !m.ContainsSku(sk) {
 		t.Errorf("woops")
 	}
 }

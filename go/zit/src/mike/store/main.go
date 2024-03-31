@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/erworben"
 	"code.linenisgreat.com/zit/src/india/objekte_collections"
-	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/src/juliett/objekte"
 	"code.linenisgreat.com/zit/src/kilo/cwd"
@@ -45,7 +44,7 @@ type Store struct {
 	bestandsaufnahmeStore bestandsaufnahme.Store
 	kennungIndex          kennung_index.Index
 
-	query.MatchableAdder
+	sku.TransactedAdder
 	typenIndex kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
 
 	protoZettel      zettel.ProtoZettel

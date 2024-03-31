@@ -32,7 +32,7 @@ type Builder struct {
 	cwd                     Cwd
 	fileExtensionGetter     schnittstellen.FileExtensionGetter
 	expanders               kennung.Abbr
-	hidden                  Matcher
+	hidden                  sku.Query
 	defaultGattungen        kennung.Gattung
 	defaultSigil            kennung.Sigil
 	virtualEtiketten        map[string]*VirtualStoreInitable
@@ -95,7 +95,7 @@ func (mb *Builder) WithDefaultSigil(
 }
 
 func (mb *Builder) WithHidden(
-	hidden Matcher,
+	hidden sku.Query,
 ) *Builder {
 	mb.hidden = hidden
 	return mb
@@ -296,7 +296,7 @@ func (b *Builder) makeQuery() *Query {
 	}
 }
 
-func (b *Builder) makeExp(negated, exact bool, children ...Matcher) *Exp {
+func (b *Builder) makeExp(negated, exact bool, children ...sku.Query) *Exp {
 	return &Exp{
 		// MatchOnEmpty: !b.doNotMatchEmpty,
 		Negated:  negated,
@@ -310,8 +310,8 @@ func (b *Builder) parseOneFromTokens(
 	tokens ...string,
 ) (remainingTokens []string, err error) {
 	type stackEl interface {
-		Matcher
-		Add(Matcher) error
+		sku.Query
+		Add(sku.Query) error
 	}
 
 	q := b.makeQuery()
@@ -412,7 +412,7 @@ LOOP:
 						return
 					}
 
-					if err = store.Init(); err != nil {
+					if err = store.Initialize(); err != nil {
 						err = errors.Wrap(err)
 						return
 					}

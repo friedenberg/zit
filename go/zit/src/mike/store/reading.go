@@ -60,7 +60,7 @@ func (s *Store) query(
 			}
 		}
 
-		if !m.ContainsMatchable(z) {
+		if !m.ContainsSku(z) {
 			return
 		}
 

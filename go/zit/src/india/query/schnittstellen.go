@@ -10,14 +10,8 @@ import (
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
-type (
-	Matcher        = sku.QueryBase
-	MatcherSigil   = sku.Query
-	MatchableAdder = sku.MatchableAdder
-)
-
 type Cwd interface {
-	Matcher
+	sku.Query
 	GetCwdFDs() fd.Set
 	GetKennungForFD(*fd.FD) (*kennung.Kennung2, error)
 }
@@ -27,8 +21,8 @@ type ImplicitEtikettenGetter interface {
 }
 
 func VisitAllMatchers(
-	f schnittstellen.FuncIter[Matcher],
-	matchers ...Matcher,
+	f schnittstellen.FuncIter[sku.Query],
+	matchers ...sku.Query,
 ) (err error) {
 	for _, m := range matchers {
 		if err = f(m); err != nil {
@@ -42,7 +36,7 @@ func VisitAllMatchers(
 		}
 
 		if err = m.Each(
-			func(m Matcher) (err error) {
+			func(m sku.Query) (err error) {
 				return VisitAllMatchers(f, m)
 			},
 		); err != nil {

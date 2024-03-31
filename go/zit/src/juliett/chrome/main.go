@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"syscall"
 
 	"code.linenisgreat.com/chrest"
 	"code.linenisgreat.com/zit/src/alfa/errors"
@@ -29,7 +30,7 @@ func MakeChrome(s standort.Standort) *Chrome {
 	}
 }
 
-func (c *Chrome) Init() (err error) {
+func (c *Chrome) Initialize() (err error) {
 	var chromeTabsRaw interface{}
 	var req *http.Request
 
@@ -46,7 +47,13 @@ func (c *Chrome) Init() (err error) {
 	}
 
 	if chromeTabsRaw, err = chrest.AskChrome(chrestConfig, req); err != nil {
-		err = errors.Wrap(err)
+		if errors.IsErrno(err, syscall.ECONNREFUSED) {
+			errors.Err().Print("chrest offline")
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
 		return
 	}
 

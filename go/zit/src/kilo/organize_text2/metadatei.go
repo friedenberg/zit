@@ -11,12 +11,12 @@ import (
 	"code.linenisgreat.com/zit/src/echo/format"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit/src/india/query"
+	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
 type Metadatei struct {
 	kennung.EtikettSet
-	Matchers schnittstellen.SetLike[query.Matcher]
+	Matchers schnittstellen.SetLike[sku.Query]
 	Comments []string
 	Typ      kennung.Typ
 }
@@ -87,7 +87,7 @@ func (m Metadatei) WriteTo(w1 io.Writer) (n int64, err error) {
 	}
 
 	if m.Matchers != nil {
-		for _, c := range iter.SortedStrings[query.Matcher](m.Matchers) {
+		for _, c := range iter.SortedStrings[sku.Query](m.Matchers) {
 			w.WriteFormat("%% Matcher:%s", c)
 		}
 	}

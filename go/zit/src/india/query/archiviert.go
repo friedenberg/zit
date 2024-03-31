@@ -8,7 +8,7 @@ import (
 )
 
 type Archiviert interface {
-	Matcher
+	sku.Query
 	CountArchiviert() int64
 	Count() int64
 }
@@ -37,7 +37,7 @@ func (m archiviert) CountArchiviert() int64 {
 	return m.countArchiviert
 }
 
-func (matcher *archiviert) ContainsMatchable(matchable *sku.Transacted) bool {
+func (matcher *archiviert) ContainsSku(matchable *sku.Transacted) bool {
 	if !matchable.GetMetadatei().Verzeichnisse.Archiviert.Bool() {
 		atomic.AddInt64(&matcher.countArchiviert, 1)
 		return false
@@ -48,6 +48,6 @@ func (matcher *archiviert) ContainsMatchable(matchable *sku.Transacted) bool {
 	return true
 }
 
-func (matcher archiviert) Each(f schnittstellen.FuncIter[Matcher]) error {
+func (matcher archiviert) Each(f schnittstellen.FuncIter[sku.Query]) error {
 	return nil
 }

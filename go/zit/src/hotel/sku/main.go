@@ -16,25 +16,29 @@ func init() {
 }
 
 type (
-	QueryBase interface {
-		ContainsMatchable(*Transacted) bool
-		schnittstellen.Stringer
-		Each(schnittstellen.FuncIter[QueryBase]) error
+	Queryable interface {
+		ContainsSku(*Transacted) bool
 	}
 
 	Query interface {
-		QueryBase
+		Queryable
+		schnittstellen.Stringer
+		Each(schnittstellen.FuncIter[Query]) error
+	}
+
+	QueryWithSigilAndKennung interface {
+		Query
 		GetSigil() kennung.Sigil
 		ContainsKennung(*kennung.Kennung2) bool
 	}
 
-	MatchableAdder interface {
-		AddMatchable(*Transacted) error
+	TransactedAdder interface {
+		AddTransacted(*Transacted) error
 	}
 
-	MatcherGroup interface {
-		QueryBase
-		Get(gattung.Gattung) (Query, bool)
+	QueryGroup interface {
+		Query
+		Get(gattung.Gattung) (QueryWithSigilAndKennung, bool)
 	}
 
 	SkuLike interface {

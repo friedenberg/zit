@@ -28,7 +28,7 @@ func MakeGroup(
 }
 
 type Group struct {
-	Hidden           Matcher
+	Hidden           sku.Query
 	OptimizedQueries map[gattung.Gattung]*QueryWithHidden
 	UserQueries      map[kennung.Gattung]*QueryWithHidden
 	Kennungen        []*kennung.Kennung2
@@ -42,7 +42,7 @@ func (qg *Group) IsEmpty() bool {
 	return len(qg.UserQueries) == 0
 }
 
-func (qg *Group) Get(g gattung.Gattung) (MatcherSigil, bool) {
+func (qg *Group) Get(g gattung.Gattung) (sku.QueryWithSigilAndKennung, bool) {
 	q, ok := qg.OptimizedQueries[g]
 	return q, ok
 }
@@ -219,7 +219,7 @@ func (qg *Group) addOptimized(b *Builder, q *QueryWithHidden) (err error) {
 	return
 }
 
-func (q *Group) Each(_ schnittstellen.FuncIter[Matcher]) (err error) {
+func (q *Group) Each(_ schnittstellen.FuncIter[sku.Query]) (err error) {
 	return
 }
 
@@ -365,7 +365,7 @@ func (qg *Group) String() string {
 	return sb.String()
 }
 
-func (qg *Group) ContainsMatchable(sk *sku.Transacted) bool {
+func (qg *Group) ContainsSku(sk *sku.Transacted) bool {
 	g := sk.GetGattung()
 
 	q, ok := qg.OptimizedQueries[gattung.Must(g)]
@@ -374,7 +374,7 @@ func (qg *Group) ContainsMatchable(sk *sku.Transacted) bool {
 		return false
 	}
 
-	if !q.ContainsMatchable(sk) {
+	if !q.ContainsSku(sk) {
 		return false
 	}
 

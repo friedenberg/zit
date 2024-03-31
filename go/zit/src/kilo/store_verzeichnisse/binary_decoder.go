@@ -30,20 +30,20 @@ var binaryFieldOrder = []schlussel.Schlussel{
 	schlussel.VerzeichnisseEtiketten,
 }
 
-func makeSigil(ss ...kennung.Sigil) sku.MatcherGroup {
+func makeSigil(ss ...kennung.Sigil) sku.QueryGroup {
 	return &sigil{Sigil: kennung.MakeSigil(ss...)}
 }
 
 func makeBinary(s kennung.Sigil) binaryDecoder {
 	return binaryDecoder{
-		MatcherGroup: makeSigil(s),
+		QueryGroup: makeSigil(s),
 		Sigil:        s,
 	}
 }
 
-func makeBinaryWithQueryGroup(qg sku.MatcherGroup, s kennung.Sigil) binaryDecoder {
+func makeBinaryWithQueryGroup(qg sku.QueryGroup, s kennung.Sigil) binaryDecoder {
 	return binaryDecoder{
-		MatcherGroup: qg,
+		QueryGroup: qg,
 		Sigil:        s,
 	}
 }
@@ -52,7 +52,7 @@ type binaryDecoder struct {
 	bytes.Buffer
 	binaryField
 	kennung.Sigil
-	sku.MatcherGroup
+	sku.QueryGroup
 	io.LimitedReader
 }
 
