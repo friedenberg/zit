@@ -35,6 +35,16 @@ func (u *Umwelt) StringFormatWriterShaLike(
 	)
 }
 
+func (u *Umwelt) StringFormatWriterKennungAligned(
+	co string_format_writer.ColorOptions,
+) kennung_fmt.Aligned {
+	if u.konfig.PrintOptions.Abbreviations.Hinweisen {
+		return kennung_fmt.Aligned{Abbr: u.MakeKennungExpanders()}
+	} else {
+		return kennung_fmt.Aligned{}
+	}
+}
+
 func (u *Umwelt) StringFormatWriterKennung(
 	co string_format_writer.ColorOptions,
 ) schnittstellen.StringFormatWriter[*kennung.Kennung2] {
@@ -72,7 +82,7 @@ func (u *Umwelt) SkuFmtNewOrganize() *sku_fmt.OrganizeNew {
 	return sku_fmt.MakeOrganizeNewFormat(
 		u.konfig.PrintOptions,
 		u.StringFormatWriterShaLike(co),
-		u.StringFormatWriterKennung(co),
+		u.StringFormatWriterKennungAligned(co),
 		u.StringFormatWriterTyp(co),
 		u.StringFormatWriterBezeichnung(bezeichnung.CliFormatTruncationNone, co, false),
 		u.StringFormatWriterEtiketten(co),
@@ -110,7 +120,7 @@ func (u *Umwelt) StringFormatWriterSkuTransacted(
 		u.StringFormatWriterBezeichnung(
 			bezeichnung.CliFormatTruncation66CharEllipsis,
 			*co,
-      true,
+			true,
 		),
 		u.StringFormatWriterEtiketten(*co),
 	)
@@ -128,7 +138,7 @@ func (u *Umwelt) StringFormatWriterSkuTransactedShort() schnittstellen.StringFor
 		u.StringFormatWriterBezeichnung(
 			bezeichnung.CliFormatTruncation66CharEllipsis,
 			co,
-      true,
+			true,
 		),
 		u.StringFormatWriterEtiketten(co),
 	)
@@ -137,7 +147,7 @@ func (u *Umwelt) StringFormatWriterSkuTransactedShort() schnittstellen.StringFor
 func (u *Umwelt) PrinterSkuTransacted() schnittstellen.FuncIter[*sku.Transacted] {
 	sw := u.StringFormatWriterSkuTransacted(nil)
 
-	return string_format_writer.MakeDelim[*sku.Transacted](
+	return string_format_writer.MakeDelim(
 		"\n",
 		u.Out(),
 		sw,
@@ -147,10 +157,10 @@ func (u *Umwelt) PrinterSkuTransacted() schnittstellen.FuncIter[*sku.Transacted]
 func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[*sku.Transacted] {
 	sw := u.StringFormatWriterSkuTransacted(nil)
 
-	return string_format_writer.MakeDelim[*sku.Transacted](
+	return string_format_writer.MakeDelim(
 		"\n",
 		u.Out(),
-		string_format_writer.MakeFunc[*sku.Transacted](
+		string_format_writer.MakeFunc(
 			func(w schnittstellen.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
 				return sw.WriteStringFormat(w, o)
 			},
@@ -232,7 +242,7 @@ func (u *Umwelt) PrinterCheckedOut() schnittstellen.FuncIter[*sku.CheckedOut] {
 			u.StringFormatWriterBezeichnung(
 				bezeichnung.CliFormatTruncation66CharEllipsis,
 				coErr,
-        true,
+				true,
 			),
 			u.StringFormatWriterEtiketten(coErr),
 		),
@@ -253,7 +263,7 @@ func (u *Umwelt) PrinterCheckedOut() schnittstellen.FuncIter[*sku.CheckedOut] {
 			u.StringFormatWriterBezeichnung(
 				bezeichnung.CliFormatTruncation66CharEllipsis,
 				coOut,
-        true,
+				true,
 			),
 			u.StringFormatWriterEtiketten(coOut),
 		),

@@ -8,14 +8,12 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
 func makeObj(
 	options erworben_cli_print_options.PrintOptions,
 	named *sku.Transacted,
-	expanders kennung.Abbr,
 ) (z *obj, err error) {
 	errors.TodoP4("add bez in a better way")
 
@@ -24,15 +22,6 @@ func makeObj(
 	if err = z.SetFromSkuLike(named); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	if options.Abbreviations.Hinweisen {
-		if err = expanders.AbbreviateHinweisOnly(
-			&z.Kennung,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
 	}
 
 	if err = z.removeEtikettenIfNecessary(options); err != nil {

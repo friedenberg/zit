@@ -38,7 +38,7 @@ func (atc *Factory) makeWithMetadatei() (ot *Text, err error) {
 	prefixSet := objekte_collections.MakeSetPrefixVerzeichnisse(0)
 	atc.Transacted.Each(prefixSet.Add)
 
-	for _, e := range iter.Elements[kennung.Etikett](atc.ExtraEtiketten) {
+	for _, e := range iter.Elements(atc.ExtraEtiketten) {
 		ee := newAssignment(ot.GetDepth() + 1)
 		ee.Etiketten = kennung.MakeEtikettSet(e)
 		ot.addChild(ee)
@@ -89,7 +89,6 @@ func (f Factory) makeWithoutMetadatei() (ot *Text, err error) {
 
 	var as []*Assignment
 	as, err = f.Options.assignmentTreeConstructor().Assignments()
-
 	if err != nil {
 		err = errors.Wrap(err)
 		return
@@ -124,7 +123,6 @@ func (atc Factory) makeChildren(
 				if z, err = makeObj(
 					atc.PrintOptions,
 					tz,
-					atc.Expanders,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -135,7 +133,6 @@ func (atc Factory) makeChildren(
 				return
 			},
 		)
-
 		if err != nil {
 			err = errors.Wrap(err)
 			return
@@ -153,7 +150,6 @@ func (atc Factory) makeChildren(
 			if z, err = makeObj(
 				atc.PrintOptions,
 				tz,
-				atc.Expanders,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -164,7 +160,6 @@ func (atc Factory) makeChildren(
 			return
 		},
 	)
-
 	if err != nil {
 		err = errors.Wrap(err)
 		return
@@ -218,7 +213,6 @@ func (atc Factory) makeChildren(
 					psv := objekte_collections.MakeSetPrefixVerzeichnisse(0)
 					zs.Each(psv.Add)
 					usedChild, err = atc.makeChildren(child, psv, nextGroupingEtiketten)
-
 					if err != nil {
 						err = errors.Wrap(err)
 						return
@@ -243,7 +237,6 @@ func (atc Factory) makeChildren(
 				psv := objekte_collections.MakeSetPrefixVerzeichnisse(0)
 				zs.Each(psv.Add)
 				usedChild, err = atc.makeChildren(child, psv, nextGroupingEtiketten)
-
 				if err != nil {
 					err = errors.Wrap(err)
 					return

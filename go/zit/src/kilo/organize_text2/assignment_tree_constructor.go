@@ -55,7 +55,6 @@ func (atc AssignmentTreeConstructor) makeChildren(
 				if z, err = makeObj(
 					atc.PrintOptions,
 					tz,
-					atc.Expanders,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -84,7 +83,6 @@ func (atc AssignmentTreeConstructor) makeChildren(
 			if z, err = makeObj(
 				atc.PrintOptions,
 				tz,
-				atc.Expanders,
 			); err != nil {
 				err = errors.Wrap(err)
 				return

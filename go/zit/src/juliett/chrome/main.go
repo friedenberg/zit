@@ -1,7 +1,10 @@
 package chrome
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"syscall"
@@ -102,6 +105,21 @@ func (c *Chrome) Flush() (err error) {
 	}
 
 	// TODO add body
+	b := bytes.NewBuffer(nil)
+	urls := make([]string, 0, len(c.removed))
+
+	for u := range c.removed {
+		urls = append(urls, u.String())
+	}
+
+	enc := json.NewEncoder(b)
+
+	if err = enc.Encode(urls); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+  req.Body = io.NopCloser(b)
 
 	if _, err = chrest.AskChrome(c.chrestConfig, req); err != nil {
 		if errors.IsErrno(err, syscall.ECONNREFUSED) {

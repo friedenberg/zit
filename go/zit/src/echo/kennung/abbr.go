@@ -58,18 +58,17 @@ func (ao abbrOne[V, VPtr]) AbbreviateKennung(
 
 	var ka1 V
 
-	switch ka := k.(type) {
-	case VPtr:
-		if err = VPtr(&ka1).Set(ka.String()); err != nil {
-			err = errors.Wrap(err)
-			return
+	if ka1.GetGattung() != k.GetGattung() {
+		err = gattung.ErrWrongType{
+			ExpectedType: gattung.Must(ka1.GetGattung()),
+			ActualType:   gattung.Must(k.GetGattung()),
 		}
 
-	case V:
-		ka1 = ka
+		return
+	}
 
-	default:
-		err = errors.Errorf("expected kennung type %T but got %T", ka, k)
+	if err = VPtr(&ka1).Set(k.String()); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -144,24 +143,25 @@ func (a Abbr) ExpandHinweisOnly(
 }
 
 func (a Abbr) AbbreviateKennung(
-	in Kennung,
-) (out Kennung, err error) {
+	in *Kennung2,
+	out *Kennung2,
+) (err error) {
 	var getAbbr func(Kennung) (string, error)
 
-	switch in.(type) {
-	case Hinweis, *Hinweis:
+	switch in.GetGattung() {
+	case gattung.Zettel:
 		getAbbr = a.Hinweis.AbbreviateKennung
 
-	case Etikett, *Etikett:
+	case gattung.Etikett:
 		getAbbr = a.Etikett.AbbreviateKennung
 
-	case Typ, *Typ:
+	case gattung.Typ:
 		getAbbr = a.Typ.AbbreviateKennung
 
-	case Kasten, *Kasten:
+	case gattung.Kasten:
 		getAbbr = a.Kasten.AbbreviateKennung
 
-	case Konfig, *Konfig:
+	case gattung.Konfig:
 		out = in
 		return
 
@@ -177,14 +177,10 @@ func (a Abbr) AbbreviateKennung(
 		return
 	}
 
-	outPtr := &Kennung2{}
-
-	if err = outPtr.SetWithGattung(abbr, in); err != nil {
+	if err = out.SetWithGattung(abbr, in); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	out = outPtr
 
 	return
 }

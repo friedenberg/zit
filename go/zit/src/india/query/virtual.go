@@ -3,17 +3,36 @@ package query
 import (
 	"sync"
 
+	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
 type VirtualStoreInitable struct {
 	sku.VirtualStore
-	sync.Once
+	didInit  bool
+	onceInit sync.Once
 }
 
 func (ve *VirtualStoreInitable) Initialize() (err error) {
-	ve.Do(func() { err = ve.VirtualStore.Initialize() })
+	ve.onceInit.Do(func() {
+		err = ve.VirtualStore.Initialize()
+		ve.didInit = true
+	})
+
 	return
+}
+
+func (ve *VirtualStoreInitable) Flush() (err error) {
+  if !ve.didInit {
+    return
+  }
+
+  if err = ve.VirtualStore.Flush(); err != nil {
+    err = errors.Wrap(err)
+    return
+  }
+
+  return
 }
 
 type Virtual struct {

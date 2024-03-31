@@ -3,7 +3,6 @@ package sku_fmt
 import (
 	"fmt"
 	"io"
-	"strings"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/erworben_cli_print_options"
@@ -15,6 +14,7 @@ import (
 	"code.linenisgreat.com/zit/src/delta/zittish"
 	"code.linenisgreat.com/zit/src/echo/bezeichnung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/foxtrot/kennung_fmt"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
@@ -22,21 +22,16 @@ type OrganizeNew struct {
 	options erworben_cli_print_options.PrintOptions
 
 	shaStringFormatWriter         schnittstellen.StringFormatWriter[schnittstellen.ShaLike]
-	kennungStringFormatWriter     schnittstellen.StringFormatWriter[*kennung.Kennung2]
+	kennungStringFormatWriter     kennung_fmt.Aligned
 	typStringFormatWriter         schnittstellen.StringFormatWriter[*kennung.Typ]
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung]
 	etikettenStringFormatWriter   schnittstellen.StringFormatWriter[*kennung.Etikett]
-
-	ex kennung.Abbr
-
-	maxKopf, maxSchwanz int
-	padding             string
 }
 
 func MakeOrganizeNewFormat(
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],
-	kennungStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Kennung2],
+	kennungStringFormatWriter kennung_fmt.Aligned,
 	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
 	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],
 	etikettenStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Etikett],
@@ -55,9 +50,7 @@ func MakeOrganizeNewFormat(
 }
 
 func (f *OrganizeNew) SetMaxKopfUndSchwanz(k, s int) {
-	f.maxKopf = k
-	f.maxSchwanz = s
-	f.padding = strings.Repeat(" ", 5+k+s)
+	f.kennungStringFormatWriter.SetMaxKopfUndSchwanz(k, s)
 }
 
 func (f *OrganizeNew) WriteStringFormat(
@@ -94,9 +87,9 @@ func (f *OrganizeNew) WriteStringFormat(
 		return
 	}
 
-	h := kennung.Aligned(&o.Kennung, f.maxKopf, f.maxSchwanz)
-	n1, err = sw.WriteString(h)
-	n += int64(n1)
+	var n2 int64
+	n2, err = f.kennungStringFormatWriter.WriteStringFormat(sw, &o.Kennung)
+	n += int64(n2)
 	// var n2 int64
 	// n2, err = f.kennungStringFormatWriter.WriteStringFormat(
 	// 	sw,
@@ -110,8 +103,6 @@ func (f *OrganizeNew) WriteStringFormat(
 	}
 
 	sh := o.GetAkteSha()
-
-	var n2 int64
 
 	if f.options.PrintShas && (!sh.IsNull() || f.options.PrintEmptyShas) {
 		n1, err = sw.WriteString("@")
@@ -158,7 +149,7 @@ func (f *OrganizeNew) WriteStringFormat(
 
 		for _, v := range iter.SortedValues[kennung.Etikett](b) {
 			if f.options.ZittishNewlines {
-				n1, err = fmt.Fprintf(sw, "\n%s", f.padding)
+				n1, err = fmt.Fprintf(sw, "\n%s", f.kennungStringFormatWriter.Padding)
 			} else {
 				n1, err = sw.WriteString(" ")
 			}
@@ -181,7 +172,7 @@ func (f *OrganizeNew) WriteStringFormat(
 	}
 
 	if f.options.ZittishNewlines {
-		n1, err = fmt.Fprintf(sw, "\n%s]", f.padding)
+		n1, err = fmt.Fprintf(sw, "\n%s]", f.kennungStringFormatWriter.Padding)
 	} else {
 		n1, err = sw.WriteString("]")
 	}
@@ -226,7 +217,6 @@ func (f *OrganizeNew) ReadStringFormat(
 	var sl catgut.Slice
 
 	sl, err = rb.PeekUptoAndIncluding('\n')
-
 	if err != nil {
 		return
 	}
