@@ -1,4 +1,4 @@
-package changes2
+package changes
 
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"

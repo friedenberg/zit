@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/golf/compare_map"
 )
 
 type Assignment struct {
@@ -66,7 +65,7 @@ func (a Assignment) AlignmentSpacing() int {
 func (a Assignment) MaxLen() (m int) {
 	a.Named.Each(
 		func(z *obj) (err error) {
-			oM := z.Sku.Kennung.Len()
+			oM := z.Kennung.Len()
 
 			if oM > m {
 				m = oM
@@ -90,7 +89,7 @@ func (a Assignment) MaxLen() (m int) {
 func (a Assignment) MaxKopfUndSchwanz() (kopf, schwanz int) {
 	a.Named.Each(
 		func(z *obj) (err error) {
-			oKopf, oSchwanz := z.Sku.Kennung.LenKopfUndSchwanz()
+			oKopf, oSchwanz := z.Kennung.LenKopfUndSchwanz()
 
 			if oKopf > kopf {
 				kopf = oKopf
@@ -236,6 +235,31 @@ func (a *Assignment) consume(b *Assignment) (err error) {
 	return
 }
 
+func (a *Assignment) AllEtiketten(mes kennung.EtikettMutableSet) (err error) {
+	if a == nil {
+		return
+	}
+
+	var es kennung.EtikettSet
+
+	if es, err = a.expandedEtiketten(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = es.EachPtr(mes.AddPtr); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = a.Parent.AllEtiketten(mes); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (a *Assignment) expandedEtiketten() (es kennung.EtikettSet, err error) {
 	es = kennung.MakeEtikettSet()
 
@@ -325,125 +349,4 @@ func (a *Assignment) Contains(e *kennung.Etikett) bool {
 	}
 
 	return a.Parent.Contains(e)
-}
-
-func (a *Assignment) addToCompareMap(
-	ot *Text,
-	m Metadatei,
-	es kennung.EtikettSet,
-	out *compare_map.CompareMap,
-) (err error) {
-	mes := es.CloneMutableSetPtrLike()
-
-	var es1 kennung.EtikettSet
-
-	if es1, err = a.expandedEtiketten(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	es1.Each(mes.Add)
-	es = mes.CloneSetPtrLike()
-
-	if err = a.Named.Each(
-		func(z *obj) (err error) {
-			if z.Sku.Kennung.String() == "" {
-				panic(fmt.Sprintf("%s: Kennung is nil", z))
-			}
-
-			fk := kennung.FormattedString(&z.Sku.Kennung)
-			out.Named.Add(fk, z.Sku.Metadatei.Bezeichnung)
-
-			for _, e := range iter.SortedValues[kennung.Etikett](es) {
-				out.Named.AddEtikett(fk, e, z.Sku.Metadatei.Bezeichnung)
-			}
-
-			for _, e := range iter.Elements[kennung.Etikett](m.EtikettSet) {
-				errors.TodoP4("add typ")
-				out.Named.AddEtikett(fk, e, z.Sku.Metadatei.Bezeichnung)
-			}
-
-			if ot.Konfig.NewOrganize {
-				if err = z.Sku.Metadatei.GetEtiketten().EachPtr(
-					func(e *kennung.Etikett) (err error) {
-						if a.Contains(e) {
-							return
-						}
-
-						out.Named.AddEtikett(fk, *e, z.Sku.Metadatei.Bezeichnung)
-						return
-					},
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = a.Unnamed.Each(
-		func(z *obj) (err error) {
-			out.Unnamed.Add(
-				z.Sku.Metadatei.Bezeichnung.String(),
-				z.Sku.Metadatei.Bezeichnung,
-			)
-
-			for _, e := range iter.SortedValues[kennung.Etikett](es) {
-				out.Unnamed.AddEtikett(
-					z.Sku.Metadatei.Bezeichnung.String(),
-					e,
-					z.Sku.Metadatei.Bezeichnung,
-				)
-			}
-
-			for _, e := range iter.Elements[kennung.Etikett](m.EtikettSet) {
-				errors.TodoP4("add typ")
-				out.Unnamed.AddEtikett(
-					z.Sku.Metadatei.Bezeichnung.String(),
-					e,
-					z.Sku.Metadatei.Bezeichnung,
-				)
-			}
-
-			if ot.Konfig.NewOrganize {
-				if err = z.Sku.Metadatei.GetEtiketten().EachPtr(
-					func(e *kennung.Etikett) (err error) {
-						if a.Contains(e) {
-							return
-						}
-
-						out.Named.AddEtikett(
-							z.Sku.Metadatei.Bezeichnung.String(),
-							*e,
-							z.Sku.Metadatei.Bezeichnung,
-						)
-
-						return
-					},
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	for _, c := range a.Children {
-		if err = c.addToCompareMap(ot, m, es, out); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
 }

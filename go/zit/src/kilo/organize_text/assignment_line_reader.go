@@ -266,7 +266,7 @@ func (ar *assignmentLineReader) readOneObj(r *catgut.RingBuffer) (err error) {
 
 	var z obj
 
-	if _, err = ar.stringFormatReader.ReadStringFormat(r, &z.Sku); err != nil {
+	if _, err = ar.stringFormatReader.ReadStringFormat(r, &z.Transacted); err != nil {
 		err = ErrorRead{
 			error:  err,
 			line:   ar.lineNo,
@@ -276,11 +276,17 @@ func (ar *assignmentLineReader) readOneObj(r *catgut.RingBuffer) (err error) {
 		return
 	}
 
-	if z.Sku.Kennung.IsEmpty() {
+	if z.Kennung.IsEmpty() {
 		ar.currentAssignment.Unnamed.Add(&z)
-	} else {
-		ar.currentAssignment.Named.Add(&z)
+		return
 	}
+
+	if err = ar.options.Expanders.ExpandHinweisOnly(&z.Kennung); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	ar.currentAssignment.Named.Add(&z)
 
 	return
 }

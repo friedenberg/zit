@@ -58,7 +58,7 @@ func (av assignmentLineWriter) writeNormal(a *Assignment) (err error) {
 
 	for _, z := range sortObjSet(a.Unnamed) {
 		av.WriteLines(
-			fmt.Sprintf("%s- %s", tab_prefix, z.Sku.Metadatei.Bezeichnung),
+			fmt.Sprintf("%s- %s", tab_prefix, z.Metadatei.Bezeichnung),
 		)
 	}
 
@@ -71,7 +71,7 @@ func (av assignmentLineWriter) writeNormal(a *Assignment) (err error) {
 		sb.WriteString(tab_prefix)
 		sb.WriteString("- ")
 
-		sku.TransactedResetter.ResetWith(cursor, &z.Sku)
+		sku.TransactedResetter.ResetWith(cursor, &z.Transacted)
 		cursor.Metadatei.Subtract(&av.Metadatei)
 
 		if _, err = av.stringFormatWriter.WriteStringFormat(&sb, cursor); err != nil {
@@ -135,7 +135,7 @@ func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 
 	for _, z := range sortObjSet(a.Unnamed) {
 		av.WriteLines(
-			fmt.Sprintf("- %s%s", tab_prefix, z.Sku.Metadatei.Bezeichnung),
+			fmt.Sprintf("- %s%s", tab_prefix, z.Metadatei.Bezeichnung),
 		)
 	}
 
@@ -146,7 +146,7 @@ func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 		var sb strings.Builder
 
 		sb.WriteString("- ")
-		sku.TransactedResetter.ResetWith(cursor, &z.Sku)
+		sku.TransactedResetter.ResetWith(cursor, &z.Transacted)
 		cursor.Metadatei.Subtract(&av.Metadatei)
 
 		if err = a.SubtractFromSet(

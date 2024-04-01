@@ -47,14 +47,14 @@ func makeBez(t *testing.T, v string) (b bezeichnung.Bezeichnung) {
 
 func makeObjWithHinAndBez(t *testing.T, hin string, bez string) (o *obj) {
 	o = &obj{
-		Sku: sku.Transacted{
+		Transacted: sku.Transacted{
 			Metadatei: metadatei.Metadatei{
 				Bezeichnung: makeBez(t, bez),
 			},
 		},
 	}
 
-	o.Sku.Kennung.SetWithKennung(makeHinweis(t, hin))
+	o.Kennung.SetWithKennung(makeHinweis(t, hin))
 
 	return
 }

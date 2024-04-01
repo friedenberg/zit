@@ -8,31 +8,20 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
 func makeObj(
 	options erworben_cli_print_options.PrintOptions,
 	named *sku.Transacted,
-	expanders kennung.Abbr,
 ) (z *obj, err error) {
 	errors.TodoP4("add bez in a better way")
 
 	z = &obj{}
 
-	if err = z.Sku.SetFromSkuLike(named); err != nil {
+	if err = z.SetFromSkuLike(named); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	if options.Abbreviations.Hinweisen {
-		if err = expanders.AbbreviateHinweisOnly(
-			&z.Sku.Kennung,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
 	}
 
 	if err = z.removeEtikettenIfNecessary(options); err != nil {
@@ -50,22 +39,22 @@ func (o *obj) removeEtikettenIfNecessary(
 		return
 	}
 
-	if o.Sku.Metadatei.Bezeichnung.IsEmpty() {
+	if o.Metadatei.Bezeichnung.IsEmpty() {
 		return
 	}
 
-	o.Sku.Metadatei.GetEtikettenMutable().Reset()
+	o.Metadatei.GetEtikettenMutable().Reset()
 
 	return
 }
 
 // TODO-P1 migrate obj to sku.Transacted
 type obj struct {
-	Sku sku.Transacted
+	sku.Transacted
 }
 
 func (z *obj) String() string {
-	return fmt.Sprintf("- [%s] %s", &z.Sku.Kennung, &z.Sku.Metadatei.Bezeichnung)
+	return fmt.Sprintf("- [%s] %s", &z.Kennung, &z.Metadatei.Bezeichnung)
 }
 
 func sortObjSet(
@@ -75,17 +64,17 @@ func sortObjSet(
 
 	sort.Slice(out, func(i, j int) bool {
 		switch {
-		case out[i].Sku.Kennung.String() != "" && out[j].Sku.Kennung.String() != "":
-			return out[i].Sku.Kennung.String() < out[j].Sku.Kennung.String()
+		case out[i].Kennung.String() != "" && out[j].Kennung.String() != "":
+			return out[i].Kennung.String() < out[j].Kennung.String()
 
-		case out[i].Sku.Kennung.String() == "":
+		case out[i].Kennung.String() == "":
 			return true
 
-		case out[j].Sku.Kennung.String() == "":
+		case out[j].Kennung.String() == "":
 			return false
 
 		default:
-			return out[i].Sku.Metadatei.Bezeichnung.String() < out[j].Sku.Metadatei.Bezeichnung.String()
+			return out[i].Metadatei.Bezeichnung.String() < out[j].Metadatei.Bezeichnung.String()
 		}
 	})
 
