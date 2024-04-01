@@ -4,50 +4,11 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/golf/compare_map"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
-
-func (ot *Text) CompareMap(
-	hinweis_expander func(string) (*kennung.Hinweis, error),
-) (out compare_map.CompareMap, err error) {
-	preExpansion := compare_map.CompareMap{
-		Named:   make(compare_map.SetKeyToMetadatei),
-		Unnamed: make(compare_map.SetKeyToMetadatei),
-	}
-
-	if err = ot.addToCompareMap(
-		ot,
-		ot.Metadatei,
-		kennung.MakeEtikettSet(),
-		&preExpansion,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	out = compare_map.CompareMap{
-		Named:   make(compare_map.SetKeyToMetadatei),
-		Unnamed: preExpansion.Unnamed,
-	}
-
-	for h, v := range preExpansion.Named {
-		var h1 schnittstellen.Stringer
-
-		if h1, err = hinweis_expander(h); err == nil {
-			h = h1.String()
-		}
-
-		err = nil
-
-		out.Named[h] = v
-	}
-
-	return
-}
 
 func (a *Assignment) addToCompareMap(
 	ot *Text,

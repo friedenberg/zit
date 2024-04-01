@@ -1,19 +1,19 @@
-package changes
+package organize_text
 
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
-type Changes2 struct {
+type Changes struct {
 	A, B           sku.TransactedSet
 	Added, Removed sku.TransactedMutableSet
 }
 
-func ChangesFrom2(
-	a, b Changeable,
+func ChangesFrom(
+	a, b *Text,
 	original sku.TransactedSet,
-) (c Changes2, err error) {
+) (c Changes, err error) {
 	if c.A, err = a.GetSkus(original); err != nil {
 		err = errors.Wrap(err)
 		return
