@@ -7,8 +7,8 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/values"
-	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/ohio"
+	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/sha"
 )
 

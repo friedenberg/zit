@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/charlie/angeboren"
+	"code.linenisgreat.com/zit/src/delta/angeboren"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 

@@ -5,8 +5,8 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/ohio"
+	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/schlussel"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/etiketten_path"

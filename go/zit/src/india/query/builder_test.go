@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/zit/src/bravo/test_logz"
-	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 )
 

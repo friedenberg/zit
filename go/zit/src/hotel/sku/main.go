@@ -4,7 +4,7 @@ import (
 	"encoding/gob"
 
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"

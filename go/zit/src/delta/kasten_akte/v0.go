@@ -3,7 +3,7 @@ package kasten_akte
 import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/values"
-	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/delta/gattung"
 )
 
 type V0 struct {

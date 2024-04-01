@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/delta/gattung"
 )
 
 type ErrUnsupportedFormatterValue interface {

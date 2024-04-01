@@ -9,9 +9,9 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/src/bravo/pool"
-	"code.linenisgreat.com/zit/src/charlie/angeboren"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/age"
+	"code.linenisgreat.com/zit/src/delta/angeboren"
 	"code.linenisgreat.com/zit/src/delta/sha"
 )
 

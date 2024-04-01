@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/charlie/script_value"
+	"code.linenisgreat.com/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"

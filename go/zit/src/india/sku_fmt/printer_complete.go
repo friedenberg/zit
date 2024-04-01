@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/src/charlie/collections"
-	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 

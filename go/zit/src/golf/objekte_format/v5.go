@@ -7,9 +7,9 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/src/delta/catgut"
+	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 )
 

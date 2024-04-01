@@ -5,7 +5,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/india/alfred"
 	"code.linenisgreat.com/zit/src/india/query"

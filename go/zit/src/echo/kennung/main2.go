@@ -9,10 +9,10 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/delta/file_extensions"
+	"code.linenisgreat.com/zit/src/delta/gattung"
 )
 
 var poolKennung2 schnittstellen.Pool[Kennung2, *Kennung2]

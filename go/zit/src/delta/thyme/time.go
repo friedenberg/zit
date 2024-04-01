@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
-	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/delta/string_format_writer"
 	chai "github.com/brandondube/tai"

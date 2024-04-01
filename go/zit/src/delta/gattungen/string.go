@@ -3,7 +3,7 @@ package gattungen
 import (
 	"strings"
 
-	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/delta/gattung"
 )
 
 func String(gs Set) string {

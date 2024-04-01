@@ -2,7 +2,7 @@ package remote_push
 
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 	"code.linenisgreat.com/zit/src/papa/remote_conn"

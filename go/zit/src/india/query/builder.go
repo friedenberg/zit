@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/log"
-	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/standort"
 	"code.linenisgreat.com/zit/src/delta/zittish"
 	"code.linenisgreat.com/zit/src/echo/fd"

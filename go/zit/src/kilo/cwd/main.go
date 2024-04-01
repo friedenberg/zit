@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/standort"
 	"code.linenisgreat.com/zit/src/delta/zittish"
 	"code.linenisgreat.com/zit/src/echo/fd"
