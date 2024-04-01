@@ -131,6 +131,7 @@ func (s *Store) handleNewOrUpdatedCommit(
 		}
 
 	case gattung.Kasten, gattung.Typ, gattung.Etikett:
+		// TODO be more conservative about when konfig changes actually occurred
 		s.GetKonfig().SetHasChanges(true)
 
 		if err = s.GetKonfig().AddTransacted(t, s.GetAkten()); err != nil {
@@ -686,8 +687,6 @@ func (s *Store) UpdateKonfig(
 func (s *Store) UpdateManyMetadatei(
 	incoming sku.TransactedSet,
 ) (err error) {
-	s.GetKonfig().SetHasChanges(true)
-
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = objekte.ErrLockRequired{
 			Operation: "update many metadatei",
