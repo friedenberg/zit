@@ -37,14 +37,14 @@ func makeSigil(ss ...kennung.Sigil) sku.QueryGroup {
 func makeBinary(s kennung.Sigil) binaryDecoder {
 	return binaryDecoder{
 		QueryGroup: makeSigil(s),
-		Sigil:        s,
+		Sigil:      s,
 	}
 }
 
 func makeBinaryWithQueryGroup(qg sku.QueryGroup, s kennung.Sigil) binaryDecoder {
 	return binaryDecoder{
 		QueryGroup: qg,
-		Sigil:        s,
+		Sigil:      s,
 	}
 }
 

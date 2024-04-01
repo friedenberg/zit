@@ -5,7 +5,9 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/echo/format"
+	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/src/golf/compare_map"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 )
 
@@ -132,6 +134,25 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 	}
 
 	if n, err = mw.WriteTo(out); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (in *Text) ToCompareMap() (out compare_map.CompareMap, err error) {
+	out = compare_map.CompareMap{
+		Named:   make(compare_map.SetKeyToMetadatei),
+		Unnamed: make(compare_map.SetKeyToMetadatei),
+	}
+
+	if err = in.addToCompareMap(
+		in,
+		in.Metadatei,
+		kennung.MakeEtikettSet(),
+		&out,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

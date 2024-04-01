@@ -23,16 +23,16 @@ func (ve *VirtualStoreInitable) Initialize() (err error) {
 }
 
 func (ve *VirtualStoreInitable) Flush() (err error) {
-  if !ve.didInit {
-    return
-  }
+	if !ve.didInit {
+		return
+	}
 
-  if err = ve.VirtualStore.Flush(); err != nil {
-    err = errors.Wrap(err)
-    return
-  }
+	if err = ve.VirtualStore.Flush(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-  return
+	return
 }
 
 type Virtual struct {

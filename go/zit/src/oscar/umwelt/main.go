@@ -41,7 +41,7 @@ type Umwelt struct {
 
 	storesInitialized bool
 	store             store.Store
-	virtualStores     map[string]*VirtualStore
+	virtualStores     map[string]*query.VirtualStoreInitable
 	age               *age.Age
 
 	matcherArchiviert query.Archiviert
@@ -54,7 +54,7 @@ func Make(kCli erworben.Cli, options Options) (u *Umwelt, err error) {
 		err:               os.Stderr,
 		erworbenCli:       kCli,
 		matcherArchiviert: query.MakeArchiviert(),
-		virtualStores:     make(map[string]*VirtualStore),
+		virtualStores:     make(map[string]*query.VirtualStoreInitable),
 	}
 
 	u.konfig.Reset()
@@ -263,4 +263,8 @@ func (u *Umwelt) MakeMetaIdSetWithoutExcludedHidden(
 func (u *Umwelt) ApplyToOrganizeOptions(oo *organize_text.Options) {
 	oo.Konfig = u.Konfig()
 	oo.Expanders = u.MakeKennungExpanders()
+}
+
+func (u *Umwelt) GetVirtualStores() map[string]*query.VirtualStoreInitable {
+	return u.virtualStores
 }

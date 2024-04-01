@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/erworben"
 	"code.linenisgreat.com/zit/src/india/objekte_collections"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/src/juliett/objekte"
 	"code.linenisgreat.com/zit/src/kilo/cwd"
@@ -32,6 +33,7 @@ type Store struct {
 	Abbr                      AbbrStore
 	persistentMetadateiFormat objekte_format.Format
 	fileEncoder               objekte_collections.FileEncoder
+	virtualStores             map[string]*query.VirtualStoreInitable
 
 	verzeichnisse *store_verzeichnisse.Store
 

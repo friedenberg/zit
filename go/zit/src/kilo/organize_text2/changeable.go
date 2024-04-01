@@ -7,16 +7,16 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/golf/compare_map"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/lima/changes2"
 )
 
 func (ot *Text) CompareMap(
 	hinweis_expander func(string) (*kennung.Hinweis, error),
-) (out changes2.CompareMap, err error) {
-	preExpansion := changes2.CompareMap{
-		Named:   make(changes2.SetKeyToMetadatei),
-		Unnamed: make(changes2.SetKeyToMetadatei),
+) (out compare_map.CompareMap, err error) {
+	preExpansion := compare_map.CompareMap{
+		Named:   make(compare_map.SetKeyToMetadatei),
+		Unnamed: make(compare_map.SetKeyToMetadatei),
 	}
 
 	if err = ot.addToCompareMap(
@@ -29,8 +29,8 @@ func (ot *Text) CompareMap(
 		return
 	}
 
-	out = changes2.CompareMap{
-		Named:   make(changes2.SetKeyToMetadatei),
+	out = compare_map.CompareMap{
+		Named:   make(compare_map.SetKeyToMetadatei),
 		Unnamed: preExpansion.Unnamed,
 	}
 
@@ -53,7 +53,7 @@ func (a *Assignment) addToCompareMap(
 	ot *Text,
 	m Metadatei,
 	es kennung.EtikettSet,
-	out *changes2.CompareMap,
+	out *compare_map.CompareMap,
 ) (err error) {
 	mes := es.CloneMutableSetPtrLike()
 

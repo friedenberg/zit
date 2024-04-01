@@ -41,7 +41,7 @@ func (u *Umwelt) Unlock() (err error) {
 		wg := iter.MakeErrorWaitGroupParallel()
 		wg.Do(
 			func() error {
-        // second store flush is necessary because of konfig changes
+				// second store flush is necessary because of konfig changes
 				return u.store.Flush(u.PrinterHeader())
 			},
 		)

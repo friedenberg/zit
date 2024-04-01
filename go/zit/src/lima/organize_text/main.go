@@ -1,28 +1,28 @@
 package organize_text
 
 import (
-	_ "code.linenisgreat.com/zit/src/kilo/organize_text"
-	old "code.linenisgreat.com/zit/src/kilo/organize_text"
+	"code.linenisgreat.com/zit/src/bravo/organize_text_mode"
+	"code.linenisgreat.com/zit/src/golf/compare_map"
 	organize_text "code.linenisgreat.com/zit/src/kilo/organize_text2"
 	"code.linenisgreat.com/zit/src/lima/changes2"
 )
 
 type (
-	CompareMap        = changes2.CompareMap
-	SetKeyToMetadatei = changes2.SetKeyToMetadatei
+	CompareMap        = compare_map.CompareMap
+	SetKeyToMetadatei = compare_map.SetKeyToMetadatei
 	Text              = organize_text.Text
 	Options           = organize_text.Options
 	Flags             = organize_text.Flags
-	Mode              = old.Mode
+	Mode              = organize_text_mode.Mode
 	ErrorRead         = organize_text.ErrorRead
 	Changes           = changes2.Changes2
 	Change            = changes2.Change
 )
 
 const (
-	ModeOutputOnly     = old.ModeOutputOnly
-	ModeInteractive    = old.ModeInteractive
-	ModeCommitDirectly = old.ModeCommitDirectly
+	ModeOutputOnly     = organize_text_mode.ModeOutputOnly
+	ModeInteractive    = organize_text_mode.ModeInteractive
+	ModeCommitDirectly = organize_text_mode.ModeCommitDirectly
 )
 
 var (

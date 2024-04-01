@@ -23,7 +23,7 @@ type (
 	VirtualStore interface {
 		Initialize() error
 		Flush() error
-		RemoveSku(*Transacted) error
+		CommitTransacted(*Transacted) error
 		Queryable
 	}
 

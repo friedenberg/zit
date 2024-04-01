@@ -7,19 +7,20 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/src/golf/compare_map"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
 type Changeable interface {
 	CompareMap(
 		hinweis_expander func(string) (*kennung.Hinweis, error),
-	) (out CompareMap, err error)
+	) (out compare_map.CompareMap, err error)
 	GetSkus(original sku.TransactedSet) (sku.TransactedSet, error)
 }
 
 type Changes interface {
 	GetChanges() (self Changes, a, b Changeable)
-	GetCompareMaps() (a, b CompareMap)
+	GetCompareMaps() (a, b compare_map.CompareMap)
 	GetModified() schnittstellen.SetLike[*ChangeBezeichnung]
 	GetExisting() schnittstellen.SetLike[*Change]
 	GetAddedUnnamed() schnittstellen.SetLike[*Change]
@@ -29,7 +30,7 @@ type Changes interface {
 
 type changes struct {
 	a, b                     Changeable
-	compareMapA, compareMapB CompareMap
+	compareMapA, compareMapB compare_map.CompareMap
 	modified                 schnittstellen.MutableSetLike[*ChangeBezeichnung]
 	existing                 schnittstellen.MutableSetLike[*Change]
 	addedUnnamed             schnittstellen.MutableSetLike[*Change]
@@ -41,7 +42,7 @@ func (c changes) GetChanges() (Changes, Changeable, Changeable) {
 	return c, c.a, c.b
 }
 
-func (c changes) GetCompareMaps() (a, b CompareMap) {
+func (c changes) GetCompareMaps() (a, b compare_map.CompareMap) {
 	return c.compareMapA, c.compareMapB
 }
 

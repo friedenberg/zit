@@ -119,7 +119,7 @@ func (c *Chrome) Flush() (err error) {
 		return
 	}
 
-  req.Body = io.NopCloser(b)
+	req.Body = io.NopCloser(b)
 
 	if _, err = chrest.AskChrome(c.chrestConfig, req); err != nil {
 		if errors.IsErrno(err, syscall.ECONNREFUSED) {
@@ -162,7 +162,7 @@ func (c *Chrome) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 	return
 }
 
-func (c *Chrome) RemoveSku(sk *sku.Transacted) (err error) {
+func (c *Chrome) CommitTransacted(sk *sku.Transacted) (err error) {
 	return
 }
 

@@ -1,4 +1,4 @@
-package organize_text
+package organize_text_mode
 
 import (
 	"strings"

@@ -58,8 +58,6 @@ func (op CommitOrganizeFile) run(
 	a, b *organize_text.Text,
 	original sku.TransactedSet,
 ) (cs CommitOrganizeFileResults, err error) {
-	store := op.GetStore()
-
 	if err = op.ApplyToText(u, a); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -74,12 +72,13 @@ func (op CommitOrganizeFile) run(
 		return
 	}
 
+	// TODO move to bestandsaufnahme flush
 	// if cs.GetAddedUnnamed().Len() == 0 && cs.GetAddedNamed().Len() == 0 {
 	// 	errors.Err().Print("no changes")
 	// 	return
 	// }
 
-	if err = store.UpdateManyMetadatei(cs.B); err != nil {
+	if err = u.GetStore().UpdateManyMetadatei(cs.B); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
