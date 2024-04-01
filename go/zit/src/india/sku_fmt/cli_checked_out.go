@@ -2,12 +2,12 @@ package sku_fmt
 
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/alfa/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/charlie/string_format_writer"
+	"code.linenisgreat.com/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/src/delta/checked_out_state"
+	"code.linenisgreat.com/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/src/echo/bezeichnung"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"

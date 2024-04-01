@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/delta/sha"
 )
 
 type boundReader struct {

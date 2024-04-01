@@ -8,7 +8,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/log"
-	"code.linenisgreat.com/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 

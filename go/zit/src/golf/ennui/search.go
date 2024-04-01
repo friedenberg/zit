@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/charlie/collections"
-	"code.linenisgreat.com/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/delta/sha"
 )
 
 func (e *page) seekToFirstBinarySearch(shMet *sha.Sha) (mid int64, err error) {

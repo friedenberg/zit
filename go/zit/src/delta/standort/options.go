@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/charlie/debug"
+	"code.linenisgreat.com/zit/src/delta/debug"
 )
 
 type Options struct {

@@ -5,10 +5,10 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/alfa/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/charlie/collections_ptr"
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
+	"code.linenisgreat.com/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/hotel/sku"

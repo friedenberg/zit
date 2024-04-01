@@ -5,8 +5,8 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/bravo/alfred"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
+	"code.linenisgreat.com/zit/src/delta/alfred"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
@@ -14,12 +14,12 @@ import (
 
 type Writer struct {
 	alfredWriter *alfred.Writer
-	Abbr         func(*kennung.Hinweis) (string, error)
+	abbr         kennung.Abbr
 }
 
 func New(
 	out io.Writer,
-	ha func(*kennung.Hinweis) (string, error),
+	abbr kennung.Abbr,
 ) (w *Writer, err error) {
 	var aw *alfred.Writer
 
@@ -29,7 +29,7 @@ func New(
 	}
 
 	w = &Writer{
-		Abbr:         ha,
+		abbr:         abbr,
 		alfredWriter: aw,
 	}
 
@@ -42,7 +42,7 @@ func (w *Writer) PrintOne(z *sku.Transacted) (err error) {
 
 	switch g {
 	case gattung.Zettel:
-		item = w.zettelToItem(z, w.Abbr)
+		item = w.zettelToItem(z)
 
 	case gattung.Etikett:
 		var e kennung.Etikett

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"code.linenisgreat.com/zit/src/charlie/age"
+	"code.linenisgreat.com/zit/src/delta/age"
 )
 
 func makeAge(t *testing.T) *age.Age {

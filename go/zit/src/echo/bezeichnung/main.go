@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/charlie/catgut"
+	"code.linenisgreat.com/zit/src/delta/catgut"
 )
 
 // TODO-P1 move to catgut.String

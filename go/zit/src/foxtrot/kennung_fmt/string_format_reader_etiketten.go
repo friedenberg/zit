@@ -4,8 +4,8 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/charlie/catgut"
 	"code.linenisgreat.com/zit/src/charlie/collections_ptr"
+	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 )
 

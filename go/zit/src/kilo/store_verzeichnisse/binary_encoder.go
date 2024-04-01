@@ -8,10 +8,10 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/charlie/catgut"
-	"code.linenisgreat.com/zit/src/charlie/sha"
-	"code.linenisgreat.com/zit/src/delta/ohio"
+	"code.linenisgreat.com/zit/src/charlie/ohio"
+	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/delta/schlussel"
+	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 )
 

@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
-	"code.linenisgreat.com/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/query"

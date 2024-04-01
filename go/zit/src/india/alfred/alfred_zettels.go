@@ -3,22 +3,22 @@ package alfred
 import (
 	"fmt"
 
-	"code.linenisgreat.com/zit/src/bravo/alfred"
+	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/delta/alfred"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
 func (w *Writer) zettelToItem(
 	z *sku.Transacted,
-	ha func(*kennung.Hinweis) (string, error),
 ) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
 	a.Title = z.Metadatei.Bezeichnung.String()
 
-	es := iter.StringCommaSeparated[kennung.Etikett](
+	es := iter.StringCommaSeparated(
 		z.Metadatei.GetEtiketten(),
 	)
 
@@ -36,11 +36,19 @@ func (w *Writer) zettelToItem(
 
 	mb := alfred.GetPoolMatchBuilder().Get()
 	defer alfred.GetPoolMatchBuilder().Put(mb)
+
 	parts := k.PartsStrings()
 
 	mb.AddMatches(ks)
 	mb.AddMatchBytes(parts.Left.Bytes())
 	mb.AddMatchBytes(parts.Right.Bytes())
+
+	errors.PanicIfError(w.abbr.AbbreviateHinweisOnly(k))
+	mb.AddMatches(k.StringFromPtr())
+	parts = k.PartsStrings()
+	mb.AddMatchBytes(parts.Left.Bytes())
+	mb.AddMatchBytes(parts.Right.Bytes())
+
 	mb.AddMatches(z.GetMetadatei().Bezeichnung.String())
 	mb.AddMatches(z.GetTyp().String())
 	z.Metadatei.GetEtiketten().Each(

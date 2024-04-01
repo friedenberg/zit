@@ -9,8 +9,8 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
-	"code.linenisgreat.com/zit/src/charlie/sha"
 	"code.linenisgreat.com/zit/src/charlie/tridex"
+	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/delta/standort"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
@@ -26,6 +26,7 @@ type AbbrStore interface {
 	Typen() AbbrStoreGeneric[kennung.Typ, *kennung.Typ]
 
 	AddMatchable(*sku.Transacted) error
+	GetAbbr() kennung.Abbr
 
 	errors.Flusher
 }
@@ -159,6 +160,22 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 			}
 		},
 	)
+
+	return
+}
+
+func (i *indexAbbr) GetAbbr() (out kennung.Abbr) {
+	out.Etikett.Expand = i.Etiketten().ExpandStringString
+	out.Typ.Expand = i.Typen().ExpandStringString
+	out.Kasten.Expand = i.Kisten().ExpandStringString
+	out.Hinweis.Expand = i.Hinweis().ExpandStringString
+	out.Sha.Expand = i.Shas().ExpandStringString
+
+	out.Etikett.Abbreviate = i.Etiketten().Abbreviate
+	out.Typ.Abbreviate = i.Typen().Abbreviate
+	out.Kasten.Abbreviate = i.Kisten().Abbreviate
+	out.Hinweis.Abbreviate = i.Hinweis().Abbreviate
+	out.Sha.Abbreviate = i.Shas().Abbreviate
 
 	return
 }

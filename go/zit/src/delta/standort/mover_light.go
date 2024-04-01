@@ -5,14 +5,14 @@ import (
 	"io"
 	"os"
 
-	"code.linenisgreat.com/zit/src/alfa/angeboren"
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/files"
 	"code.linenisgreat.com/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/src/bravo/pool"
-	"code.linenisgreat.com/zit/src/charlie/age"
-	"code.linenisgreat.com/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/charlie/angeboren"
+	"code.linenisgreat.com/zit/src/charlie/files"
+	"code.linenisgreat.com/zit/src/delta/age"
+	"code.linenisgreat.com/zit/src/delta/sha"
 )
 
 var poolBuf schnittstellen.Pool[bytes.Buffer, *bytes.Buffer]

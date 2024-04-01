@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/delta/sha"
 )
 
 type ErrNotInZitDir struct{}

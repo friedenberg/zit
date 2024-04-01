@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/unicorn"
-	"code.linenisgreat.com/zit/src/charlie/catgut"
+	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/kennung_fmt"
 	"code.linenisgreat.com/zit/src/hotel/sku"

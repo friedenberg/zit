@@ -8,8 +8,8 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/charlie/catgut"
-	"code.linenisgreat.com/zit/src/delta/ohio"
+	"code.linenisgreat.com/zit/src/charlie/ohio"
+	"code.linenisgreat.com/zit/src/delta/catgut"
 )
 
 type etikettLike interface {

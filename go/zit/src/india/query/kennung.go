@@ -5,8 +5,6 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -37,8 +35,6 @@ func (k Kennung) ContainsSku(sk *sku.Transacted) bool {
 	case gattung.Etikett:
 		s := k.String()
 
-		log.Log().Printf("%q in %q", k.Kennung2, iter.StringCommaSeparated(me.GetEtiketten()))
-
 		if me.GetEtiketten().ContainsKey(s) {
 			return true
 		}
@@ -52,8 +48,6 @@ func (k Kennung) ContainsSku(sk *sku.Transacted) bool {
 		}
 
 	case gattung.Typ:
-		log.Log().Printf("%q -> %q", k.Kennung2, sk.GetKennung())
-
 		if kennung.Contains(me.GetTyp(), k) {
 			return true
 		}

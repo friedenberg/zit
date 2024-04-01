@@ -5,13 +5,13 @@ import (
 	"os"
 	"path/filepath"
 
-	"code.linenisgreat.com/zit/src/alfa/angeboren"
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/files"
-	"code.linenisgreat.com/zit/src/charlie/age"
-	"code.linenisgreat.com/zit/src/charlie/debug"
+	"code.linenisgreat.com/zit/src/charlie/angeboren"
 	"code.linenisgreat.com/zit/src/charlie/file_lock"
+	"code.linenisgreat.com/zit/src/charlie/files"
+	"code.linenisgreat.com/zit/src/delta/age"
+	"code.linenisgreat.com/zit/src/delta/debug"
 )
 
 type Getter interface {

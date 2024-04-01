@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/zit/src/bravo/test_logz"
-	"code.linenisgreat.com/zit/src/charlie/catgut"
+	"code.linenisgreat.com/zit/src/delta/catgut"
 )
 
 type testCase struct {

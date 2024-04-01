@@ -9,9 +9,9 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/files"
 	"code.linenisgreat.com/zit/src/bravo/values"
-	"code.linenisgreat.com/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/charlie/files"
+	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/delta/thyme"
 )
 

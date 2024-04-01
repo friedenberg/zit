@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/collections_ptr"
-	"code.linenisgreat.com/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/bezeichnung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 )

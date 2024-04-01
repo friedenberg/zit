@@ -13,8 +13,8 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
-	"code.linenisgreat.com/zit/src/charlie/sha"
-	"code.linenisgreat.com/zit/src/charlie/string_format_writer"
+	"code.linenisgreat.com/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/src/delta/string_format_writer"
 	chai "github.com/brandondube/tai"
 )
 

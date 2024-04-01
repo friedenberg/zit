@@ -3,7 +3,7 @@ package metadatei
 import (
 	"fmt"
 
-	"code.linenisgreat.com/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/fd"
 )
 

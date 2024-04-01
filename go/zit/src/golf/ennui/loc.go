@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/delta/ohio"
+	"code.linenisgreat.com/zit/src/charlie/ohio"
 )
 
 type Loc struct {

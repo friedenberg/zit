@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/zit/src/bravo/test_logz"
-	"code.linenisgreat.com/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/bezeichnung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/foxtrot/test_metadatei_io"

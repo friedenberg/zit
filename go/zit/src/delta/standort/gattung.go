@@ -3,10 +3,10 @@ package standort
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/files"
 	"code.linenisgreat.com/zit/src/bravo/id"
+	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
-	"code.linenisgreat.com/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/delta/sha"
 )
 
 func (s Standort) DirObjektenGattung(

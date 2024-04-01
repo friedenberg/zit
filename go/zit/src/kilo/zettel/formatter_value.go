@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
-	"code.linenisgreat.com/zit/src/charlie/sha"
+	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/delta/typ_akte"
 	"code.linenisgreat.com/zit/src/echo/format"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"

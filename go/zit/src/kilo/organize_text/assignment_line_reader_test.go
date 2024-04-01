@@ -6,10 +6,10 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/alfa/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
+	"code.linenisgreat.com/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/src/echo/bezeichnung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"

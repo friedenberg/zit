@@ -2,10 +2,10 @@ package kennung_fmt
 
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/alfa/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/charlie/catgut"
-	"code.linenisgreat.com/zit/src/charlie/string_format_writer"
+	"code.linenisgreat.com/zit/src/charlie/erworben_cli_print_options"
+	"code.linenisgreat.com/zit/src/delta/catgut"
+	"code.linenisgreat.com/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 )
 
