@@ -1,15 +1,18 @@
-use std::fmt::{self, Display, Formatter};
-use std::io::{Read, Write};
-
+use crate::prelude::*;
 use serde::{Deserialize, Serialize};
+use std::fmt::{self, Display, Formatter};
+use std::path::PathBuf;
+
+use super::age::Age;
+use super::wrap_io::{NopWrapIO, WrapIO};
 
 #[derive(Serialize, Deserialize, Debug, Clone, clap::ValueEnum)]
-pub enum Encryption {
+pub enum Type {
     None,
     Age,
 }
 
-impl Display for Encryption {
+impl Display for Type {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         match self {
             Self::None => write!(f, "none"),
@@ -18,37 +21,8 @@ impl Display for Encryption {
     }
 }
 
-// const VARIANTS: [Encryption; 2] = [Encryption::None, Encryption::Age(String::new())];
-
-// impl ValueEnum for Encryption {
-//     fn value_variants<'a>() -> &'a [Self] {
-//         &VARIANTS[..]
-//     }
-
-//     fn to_possible_value(&self) -> Option<PossibleValue> {
-//         match self {
-//             Self::Age(_) => Some(PossibleValue::new("age")),
-//             _ => None,
-//         }
-//     }
-// }
-
-impl Default for Encryption {
+impl Default for Type {
     fn default() -> Self {
-        Encryption::None
-    }
-}
-
-impl Encryption {
-    pub fn writer<'a, T: Write + 'a>(&self, writer: T) -> Box<dyn Write + 'a> {
-        match self {
-            _ => Box::new(writer),
-        }
-    }
-
-    pub fn reader<'a, T: Read + 'a>(&self, reader: T) -> Box<dyn Read + 'a> {
-        match self {
-            _ => Box::new(reader),
-        }
+        Type::None
     }
 }

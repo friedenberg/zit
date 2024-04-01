@@ -3,6 +3,7 @@ mod alfa;
 mod init;
 mod konfig;
 mod show;
+mod prelude;
 
 use crate::alfa::compression::Compression;
 use crate::alfa::hash::digest::Digest;
@@ -11,7 +12,7 @@ use clap::{Parser, Subcommand};
 use std::error::Error;
 use std::path::PathBuf;
 
-use self::alfa::encryption::Encryption;
+use self::alfa::encryption::Type;
 use self::konfig::Angeboren;
 
 #[derive(Parser, Debug)]
@@ -26,8 +27,8 @@ struct CommandInit {
     #[arg(short, long, default_value_t = Compression::None)]
     compression: Compression,
 
-    #[arg(short, long, default_value_t = Encryption::None)]
-    encryption: Encryption,
+    #[arg(short, long, default_value_t = Type::None)]
+    encryption: Type,
 
     dir: Option<PathBuf>,
 }
@@ -55,7 +56,7 @@ type Result<T> = std::result::Result<T, Box<dyn Error>>;
 fn main() -> Result<()> {
     match App::parse().command {
         Commands::Init(cmd) => {
-            let mut angeboren = Angeboren::read_from_default_location_or_default().unwrap();
+            let mut angeboren = Angeboren::default();
             angeboren.encryption = cmd.encryption;
             angeboren.compression = cmd.compression;
             init::run(cmd.dir, angeboren)

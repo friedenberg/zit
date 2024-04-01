@@ -1,3 +1,4 @@
+use anyhow::Error;
 use flate2::read::DeflateDecoder;
 use flate2::write::DeflateEncoder;
 use flate2::Compression as NOT_OUR_COMPRESSION;
@@ -7,7 +8,11 @@ use std::fmt;
 use std::fmt::Display;
 use std::fmt::Formatter;
 use std::io::Read;
-use std::io::Write;
+
+use super::wrap_io::WrapIO;
+use super::wrap_io::WriteFinish;
+
+type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Serialize, Deserialize, Debug, Clone, clap::ValueEnum)]
 pub enum Compression {
@@ -30,18 +35,21 @@ impl Default for Compression {
     }
 }
 
-impl Compression {
-    pub fn writer<'a, T: Write + 'a>(&self, writer: T) -> Box<dyn Write + 'a> {
-        match self {
-            Self::None => Box::new(writer),
-            Self::Gzip => Box::new(DeflateEncoder::new(writer, NOT_OUR_COMPRESSION::default())),
-        }
-    }
-
-    pub fn reader<'a, T: Read + 'a>(&self, reader: T) -> Box<dyn Read + 'a> {
-        match self {
+impl WrapIO for Compression {
+    fn wrap_input<'a>(&self, reader: Box<dyn Read + 'a>) -> Result<Box<dyn Read + 'a>> {
+        Ok(match self {
             Self::None => Box::new(reader),
             Self::Gzip => Box::new(DeflateDecoder::new(reader)),
-        }
+        })
+    }
+
+    fn wrap_output(
+        &self,
+        writer: Box<dyn WriteFinish>,
+    ) -> Result<Box<dyn WriteFinish>> {
+        Ok(match self {
+            Self::None => writer,
+            Self::Gzip => Box::new(DeflateEncoder::new(writer, NOT_OUR_COMPRESSION::default())),
+        })
     }
 }

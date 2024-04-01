@@ -1,4 +1,5 @@
 use crate::alfa::hash::digest::Digest;
+use crate::alfa::wrap_io::WrapIO;
 use crate::konfig::Konfig;
 use std::error::Error;
 use std::fs::{File, OpenOptions};
@@ -13,7 +14,7 @@ fn file_for_digest(dig: &Digest) -> Result<File> {
 }
 
 fn write_file_to<T: Write>(file: File, out: &mut T, konfig: Konfig) -> Result<()> {
-    let mut reader = konfig.angeboren.reader(BufReader::new(file));
+    let mut reader = konfig.angeboren.wrap_input(Box::new(BufReader::new(file)))?;
     copy(&mut reader, out)?;
 
     Ok(())

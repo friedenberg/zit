@@ -1,16 +1,24 @@
+use pcsc::*;
 use std::fs::read_to_string;
 use std::fs::OpenOptions;
 use std::io::BufWriter;
 use std::io::Read;
 use std::io::Write;
 
-use anyhow::Error;
+use anyhow::{Error, Context};
 use serde::{Deserialize, Serialize};
 
+use crate::alfa::age::Age;
 use crate::alfa::compression::Compression;
-use crate::alfa::encryption::Encryption;
+use crate::alfa::encryption::Type;
+use crate::alfa::wrap_io::NopWrapIO;
+use crate::alfa::wrap_io::WrapIO;
+use crate::alfa::wrap_io::WriteFinish;
+
+type Result<T> = std::result::Result<T, Error>;
 
 static FILE_KONFIG_ANGEBOREN: &str = "KonfigAngeboren.toml";
+static FILE_KONFIG_ENCRYPTION_AGE_KEY: &str = "AgeKey.secret";
 
 #[derive(Default, Serialize, Deserialize, Debug, Clone)]
 /// Configuration for an Abscess store.
@@ -27,7 +35,7 @@ impl Konfig {
         }
     }
 
-    pub fn new() -> Result<Self, Error> {
+    pub fn new() -> Result<Self> {
         Ok(Konfig {
             angeboren: Angeboren::read_from_default_location()?,
             erworben: Erworben::default(),
@@ -41,7 +49,7 @@ impl Konfig {
 /// configuration, and move objects to the new store.
 pub struct Angeboren {
     pub compression: Compression,
-    pub encryption: Encryption,
+    pub encryption: Type,
 }
 
 #[derive(Default, Serialize, Deserialize, Debug, Clone)]
@@ -50,19 +58,12 @@ pub struct Angeboren {
 pub struct Erworben {}
 
 impl Angeboren {
-    pub fn read_from_default_location() -> Result<Self, Error> {
+    pub fn read_from_default_location() -> Result<Self> {
         let s = read_to_string(FILE_KONFIG_ANGEBOREN)?;
         Ok(toml::from_str::<Self>(&s)?)
     }
 
-    pub fn read_from_default_location_or_default() -> Result<Self, Error> {
-        Ok(match Self::read_from_default_location() {
-            Ok(k) => k,
-            Err(_) => Self::default(),
-        })
-    }
-
-    pub fn write_to_default_location(&self) -> Result<(), Error> {
+    pub fn write_to_default_location(&self) -> Result<()> {
         let s = toml::to_string_pretty(self)?;
         let file = OpenOptions::new()
             .write(true)
@@ -73,14 +74,45 @@ impl Angeboren {
 
         write!(&mut writer, "{}", s)?;
 
+        let yk = yubikey::YubiKey::open().context("failed to open yubikey")?;
+        println!("{:?}", yk);
+        // let ctx = Context::establish(Scope::User).expect("failed to establish context");
+
+        // // List connected readers.
+        // let readers = ctx.list_readers_owned().expect("failed to list readers");
+        // println!("Readers: {:?}", readers);
+
+        // // Try to connect to a card in the first reader.
+        // let mut card = ctx
+        //     .connect(&readers[0], ShareMode::Shared, Protocols::ANY)
+        //     .expect("failed to connect to card");
+        // todo!("generate the apporpatie keyfile given the encryption type and fix those typos!!!!");
+
         Ok(())
     }
 
-    pub fn writer<'a, T: Write + 'a>(&self, writer: T) -> Box<dyn Write + 'a> {
-        self.encryption.writer(self.compression.writer(writer))
+    pub fn initialize_encryption_so_that_it_may_be_used_after_initalization_yes_i_know_its_spelled_write(
+        &self,
+    ) -> Result<Box<dyn WrapIO>> {
+        match self.encryption {
+            Type::None => Ok(Box::new(NopWrapIO {})),
+            Type::Age => Ok(Box::new(Age::with_identity_file(
+                FILE_KONFIG_ENCRYPTION_AGE_KEY.to_string(),
+            )?)),
+        }
+    }
+}
+
+impl WrapIO for Angeboren {
+    fn wrap_input(&self, reader: Box<dyn Read>) -> Result<Box<dyn Read>> {
+        self.compression.wrap_input(reader)
+        // self.encryption
+        //     .wrap_input(self.compression.wrap_input(reader))
     }
 
-    pub fn reader<'a, T: Read + 'a>(&self, reader: T) -> Box<dyn Read + 'a> {
-        self.encryption.reader(self.compression.reader(reader))
+    fn wrap_output(&self, writer: Box<dyn WriteFinish>) -> Result<Box<dyn WriteFinish>> {
+        self.compression.wrap_output(writer)
+        // self.encryption
+        //     .wrap_output(self.compression.wrap_output(Box::new(writer)))
     }
 }
