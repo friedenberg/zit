@@ -18,7 +18,7 @@ import (
 	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/juliett/chrome"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
-	"code.linenisgreat.com/zit/src/lima/organize_text"
+	"code.linenisgreat.com/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/src/mike/store"
 )
 

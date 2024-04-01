@@ -3,7 +3,8 @@ package user_ops
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/lima/organize_text"
+	"code.linenisgreat.com/zit/src/kilo/organize_text"
+	"code.linenisgreat.com/zit/src/lima/changes"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
@@ -12,7 +13,7 @@ type CommitOrganizeFile struct {
 	OutputJSON bool
 }
 
-type CommitOrganizeFileResults = organize_text.Changes
+type CommitOrganizeFileResults = changes.Changes2
 
 func (c CommitOrganizeFile) ApplyToText(
 	u *umwelt.Umwelt,
@@ -63,7 +64,7 @@ func (op CommitOrganizeFile) run(
 		return
 	}
 
-	if cs, err = organize_text.ChangesFrom(
+	if cs, err = changes.ChangesFrom2(
 		a,
 		b,
 		original,

@@ -9,13 +9,14 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/vim_cli_options_builder"
 	"code.linenisgreat.com/zit/src/bravo/files"
+	"code.linenisgreat.com/zit/src/bravo/organize_text_mode"
 	"code.linenisgreat.com/zit/src/charlie/gattung"
 	"code.linenisgreat.com/zit/src/charlie/script_value"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/src/india/query"
-	"code.linenisgreat.com/zit/src/lima/organize_text"
+	"code.linenisgreat.com/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 	"code.linenisgreat.com/zit/src/papa/user_ops"
 )
@@ -23,7 +24,7 @@ import (
 type Organize struct {
 	Or bool
 	organize_text.Flags
-	Mode organize_text.Mode
+	Mode organize_text_mode.Mode
 
 	Filter script_value.ScriptValue
 }
@@ -153,7 +154,7 @@ func (c *Organize) RunWithQuery(
 	createOrganizeFileOp.Transacted = getResults
 
 	switch c.Mode {
-	case organize_text.ModeCommitDirectly:
+	case organize_text_mode.ModeCommitDirectly:
 		errors.Log().Print("neither stdin or stdout is a tty")
 		errors.Log().Print("generate organize, read from stdin, commit")
 
@@ -208,14 +209,14 @@ func (c *Organize) RunWithQuery(
 			return
 		}
 
-	case organize_text.ModeOutputOnly:
+	case organize_text_mode.ModeOutputOnly:
 		errors.Log().Print("generate organize file and write to stdout")
 		if _, err = createOrganizeFileOp.RunAndWrite(os.Stdout); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case organize_text.ModeInteractive:
+	case organize_text_mode.ModeInteractive:
 		errors.Log().Print(
 			"generate temp file, write organize, open vim to edit, commit results",
 		)
