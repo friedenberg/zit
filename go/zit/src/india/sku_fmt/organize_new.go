@@ -11,9 +11,9 @@ import (
 	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/src/delta/zittish"
 	"code.linenisgreat.com/zit/src/echo/bezeichnung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/echo/zittish"
 	"code.linenisgreat.com/zit/src/foxtrot/kennung_fmt"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )

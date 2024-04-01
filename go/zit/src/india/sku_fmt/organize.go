@@ -8,8 +8,8 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/src/delta/zittish"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/echo/zittish"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 

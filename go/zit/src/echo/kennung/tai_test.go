@@ -6,7 +6,7 @@ import (
 	tyme "time"
 
 	"code.linenisgreat.com/zit/src/bravo/test_logz"
-	"code.linenisgreat.com/zit/src/delta/thyme"
+	"code.linenisgreat.com/zit/src/echo/thyme"
 )
 
 func TestTaiSet(t1 *testing.T) {

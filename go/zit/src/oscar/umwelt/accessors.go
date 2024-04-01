@@ -4,8 +4,8 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/delta/standort"
-	"code.linenisgreat.com/zit/src/delta/thyme"
+	"code.linenisgreat.com/zit/src/echo/standort"
+	"code.linenisgreat.com/zit/src/echo/thyme"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/src/mike/store"
 )

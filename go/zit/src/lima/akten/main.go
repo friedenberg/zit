@@ -3,9 +3,9 @@ package akten
 import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/delta/etikett_akte"
-	"code.linenisgreat.com/zit/src/delta/kasten_akte"
-	"code.linenisgreat.com/zit/src/delta/standort"
 	"code.linenisgreat.com/zit/src/delta/typ_akte"
+	"code.linenisgreat.com/zit/src/echo/kasten_akte"
+	"code.linenisgreat.com/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/src/india/erworben"
 	"code.linenisgreat.com/zit/src/juliett/objekte"
 )

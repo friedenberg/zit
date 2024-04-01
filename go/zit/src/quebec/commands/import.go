@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/src/delta/angeboren"
 	"code.linenisgreat.com/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/src/delta/standort"
+	"code.linenisgreat.com/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/kilo/zettel"

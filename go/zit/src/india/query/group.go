@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/src/delta/gattungen"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
@@ -112,14 +111,12 @@ func (qg *Group) GetTypen() kennung.TypSet {
 	return qg.Typen
 }
 
-func (qg *Group) GetGattungen() gattungen.Set {
-	gs := gattungen.MakeMutableSet()
-
-	for g := range qg.OptimizedQueries {
-		gs.Add(g)
+func (qg *Group) GetGattungen() (g kennung.Gattung) {
+	for g1 := range qg.OptimizedQueries {
+		g.Add(g1)
 	}
 
-	return gs
+	return
 }
 
 func (qg *Group) Reduce(b *Builder) (err error) {

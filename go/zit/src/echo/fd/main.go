@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/src/delta/thyme"
+	"code.linenisgreat.com/zit/src/echo/thyme"
 )
 
 type (

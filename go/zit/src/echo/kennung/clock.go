@@ -1,6 +1,6 @@
 package kennung
 
-import "code.linenisgreat.com/zit/src/delta/thyme"
+import "code.linenisgreat.com/zit/src/echo/thyme"
 
 type Clock interface {
 	GetTime() thyme.Time

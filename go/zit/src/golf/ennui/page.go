@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/heap"
 	"code.linenisgreat.com/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/src/delta/standort"
+	"code.linenisgreat.com/zit/src/echo/standort"
 )
 
 type page struct {

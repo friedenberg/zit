@@ -9,9 +9,9 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/src/charlie/script_config"
-	"code.linenisgreat.com/zit/src/delta/standort"
 	"code.linenisgreat.com/zit/src/echo/format"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/echo/standort"
 )
 
 type textFormatterCommon struct {

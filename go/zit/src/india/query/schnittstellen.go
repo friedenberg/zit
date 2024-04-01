@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
@@ -49,30 +48,6 @@ func VisitAllMatchers(
 			return
 		}
 	}
-
-	return
-}
-
-func SplitGattungenByHistory(qg *Group) (schwanz, all kennung.Gattung) {
-	err := qg.GetGattungen().Each(
-		func(g gattung.Gattung) (err error) {
-			m, ok := qg.Get(g)
-
-			if !ok {
-				return
-			}
-
-			if m.GetSigil().IncludesHistory() {
-				all.Add(g)
-			} else {
-				schwanz.Add(g)
-			}
-
-			return
-		},
-	)
-
-	errors.PanicIfError(err)
 
 	return
 }

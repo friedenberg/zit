@@ -5,8 +5,8 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/delta/alfred"
 	"code.linenisgreat.com/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/src/echo/alfred"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"

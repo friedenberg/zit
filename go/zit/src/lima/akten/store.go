@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/src/delta/standort"
+	"code.linenisgreat.com/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/src/juliett/objekte"
 )
 

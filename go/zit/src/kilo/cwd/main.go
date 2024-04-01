@@ -13,10 +13,10 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/src/delta/standort"
-	"code.linenisgreat.com/zit/src/delta/zittish"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/echo/standort"
+	"code.linenisgreat.com/zit/src/echo/zittish"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 )

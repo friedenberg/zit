@@ -7,8 +7,8 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/delta/collections_delta"
-	"code.linenisgreat.com/zit/src/delta/standort"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/src/foxtrot/hinweis_index"
 )
 
