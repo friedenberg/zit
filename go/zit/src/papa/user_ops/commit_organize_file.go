@@ -78,7 +78,7 @@ func (op CommitOrganizeFile) run(
 	// 	return
 	// }
 
-	if err = u.GetStore().UpdateManyMetadatei(cs.B); err != nil {
+	if err = u.GetStore().UpdateManyMetadatei(cs.Changed); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

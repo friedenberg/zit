@@ -509,26 +509,23 @@ function organize_v5_outputs_organize_two_etiketten { # @test
 		ok brown <<-EOM
 			      # ok
 
-			- [o/u !md] wow
+			- [two/uno !md] wow
 		EOM
 
 	assert_success
 	assert_output - <<-EOM
-		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" ok]
+		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" ok]
 	EOM
 
-	expected_zettel="$(mktemp)"
-	{
-		echo "---"
-		echo "# wow"
-		echo "- ok"
-		echo "! md"
-		echo "---"
-	} >"$expected_zettel"
-
-	run_zit show -format text one/uno
+	run_zit show -format text two/uno
 	assert_success
-	assert_output "$(cat "$expected_zettel")"
+	assert_output - <<-EOM
+		---
+		# wow
+		- ok
+		! md
+		---
+	EOM
 }
 
 function organize_v5_outputs_organize_one_etiketten_group_by_one { # @test
@@ -935,45 +932,65 @@ function organize_v5_commits_no_changes { # @test
 		[two/dos@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "3" priority-1 task w-2022-07-06]
 	EOM
 
-	expected_organize="$(mktemp)"
-	{
-		echo
-		echo "# task"
-		echo
-		echo " ## priority-1"
-		echo
-		echo "  ### w-2022-07-06"
-		echo
-		echo "  - [two/uno !md] 3"
-		echo "  - [one/dos !md] two/dos"
-		echo
-		echo "  ### w-2022-07-07"
-		echo
-		echo "  - [one/uno !md] one/uno"
-		echo
-	} >"$expected_organize"
-
-	# run_zit organize "${cmd_def_organize[@]}" -prefix-joints=false -mode output-only -group-by priority,w task
-	run_zit organize "${cmd_def_organize[@]}" -mode commit-directly -group-by priority,w task <"$expected_organize"
+	run_zit organize "${cmd_def_organize[@]}" \
+		-mode output-only \
+		-group-by priority,w task
 	assert_success
-	# assert_output "$(cat "$expected_organize")"
-	assert_output_unsorted - <<-EOM
-		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "3" priority-1 task w-2022-07-06]
-		[one/dos@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "two/dos" priority-1 task w-2022-07-06]
-		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "one/uno" priority-1 task w-2022-07-07]
+	assert_output - <<-EOM
+		---
+		- task
+		---
+
+		           # priority
+
+		          ##         -1
+
+		         ### w
+
+		        ####  -2022-07
+
+		       #####          -06
+
+		- [one/tres  !md] two/dos
+		- [two/dos   !md] 3
+
+		       #####          -07
+
+		- [two/uno   !md] one/uno
 	EOM
 
-	run_zit show -format text one/uno
-	assert_success
-	assert_output "$(cat "$one")"
+	run_zit organize "${cmd_def_organize[@]}" \
+		-mode commit-directly \
+		-group-by priority,w task \
+		<<-EOM
+			---
+			- task
+			---
 
-	run_zit show -format text one/dos
-	assert_success
-	assert_output "$(cat "$two")"
+			           # priority
 
-	run_zit show -format text two/uno
+			          ##         -1
+
+			         ### w
+
+			        ####  -2022-07
+
+			       #####          -06
+
+			- [two/uno   !md] one/uno
+
+			       #####          -07
+
+			- [one/tres  !md] two/dos
+			- [two/dos   !md] 3
+
+		EOM
 	assert_success
-	assert_output "$(cat "$three")"
+	assert_output_unsorted - <<-EOM
+		[one/tres@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "two/dos" priority-1 task w-2022-07-07]
+		[two/dos@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "3" priority-1 task w-2022-07-07]
+		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "one/uno" priority-1 task w-2022-07-06]
+	EOM
 }
 
 function organize_v5_commits_dependent_leaf { # @test
@@ -1162,5 +1179,30 @@ function organize_v5_etiketten_correct { # @test
 		[test1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[test1-ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md test1-ok test4]
+	EOM
+}
+
+function organize_remove_anchored_metadatei { # @test
+	run_zit show tag-3:z
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
+		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+	EOM
+	run_zit organize "${cmd_def_organize[@]}" -mode commit-directly tag-3 <<-EOM
+		---
+		- tag-3
+		---
+	EOM
+
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-4]
+		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-4]
+	EOM
+
+	run_zit show tag-3:z
+	assert_success
+	assert_output_unsorted - <<-EOM
 	EOM
 }

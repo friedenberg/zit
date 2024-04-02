@@ -21,6 +21,15 @@ type Metadatei struct {
 	Typ      kennung.Typ
 }
 
+func (m Metadatei) RemoveFromTransacted(sk *sku.Transacted) (err error) {
+	if err = m.Each(sk.Metadatei.GetEtikettenMutable().Del); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (m Metadatei) AsMetadatei() (m1 metadatei.Metadatei) {
 	m1.Typ = m.Typ
 	m1.SetEtiketten(m.EtikettSet)
@@ -55,10 +64,7 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 						m.Comments = append(m.Comments, v)
 						return
 					},
-					"-": iter.MakeFuncSetString[
-						kennung.Etikett,
-						*kennung.Etikett,
-					](mes),
+					"-": iter.MakeFuncSetString(mes),
 					"!": m.Typ.Set,
 				},
 			),
@@ -76,7 +82,7 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 func (m Metadatei) WriteTo(w1 io.Writer) (n int64, err error) {
 	w := format.NewLineWriter()
 
-	for _, e := range iter.SortedStrings[kennung.Etikett](m.EtikettSet) {
+	for _, e := range iter.SortedStrings(m.EtikettSet) {
 		w.WriteFormat("- %s", e)
 	}
 
@@ -87,7 +93,7 @@ func (m Metadatei) WriteTo(w1 io.Writer) (n int64, err error) {
 	}
 
 	if m.Matchers != nil {
-		for _, c := range iter.SortedStrings[sku.Query](m.Matchers) {
+		for _, c := range iter.SortedStrings(m.Matchers) {
 			w.WriteFormat("%% Matcher:%s", c)
 		}
 	}

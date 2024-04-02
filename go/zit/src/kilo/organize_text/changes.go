@@ -6,37 +6,50 @@ import (
 )
 
 type Changes struct {
-	A, B           sku.TransactedSet
-	Added, Removed sku.TransactedMutableSet
+	a, b           sku.TransactedSet
+	added, removed sku.TransactedMutableSet
+	Changed        sku.TransactedMutableSet
 }
 
 func ChangesFrom(
 	a, b *Text,
 	original sku.TransactedSet,
 ) (c Changes, err error) {
-	if c.A, err = a.GetSkus(original); err != nil {
+	if c.a, err = a.GetSkus(original); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if c.B, err = b.GetSkus(original); err != nil {
+	if c.b, err = b.GetSkus(original); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	c.Added = sku.MakeTransactedMutableSet()
-	c.Removed = c.A.CloneMutableSetLike()
+	c.Changed = c.b.CloneMutableSetLike()
+	c.removed = c.a.CloneMutableSetLike()
 
-	if err = c.B.Each(
+	if err = c.b.Each(
 		func(sk *sku.Transacted) (err error) {
-			if !c.A.Contains(sk) {
-				if err = c.Added.Add(sk); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+			if err = c.removed.Del(sk); err != nil {
+				err = errors.Wrap(err)
+				return
 			}
 
-			if err = c.Removed.Del(sk); err != nil {
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = c.removed.Each(
+		func(sk *sku.Transacted) (err error) {
+			if err = a.RemoveFromTransacted(sk); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = c.Changed.Add(sk); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
