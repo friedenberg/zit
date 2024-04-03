@@ -3,37 +3,57 @@ package chrome
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"sync"
 	"syscall"
 
 	"code.linenisgreat.com/chrest"
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/src/bravo/expansion"
+	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/src/juliett/konfig"
 )
 
+type transacted struct {
+	sync.Mutex
+	schnittstellen.MutableSetLike[*kennung.Kennung2]
+}
+
 type Chrome struct {
+	konfig       *konfig.Compiled
 	typ          kennung.Typ
 	chrestConfig chrest.Config
 	standort     standort.Standort
 	urls         map[url.URL][]item
 	removed      map[url.URL]struct{}
+	transacted   transacted
 }
 
-func MakeChrome(s standort.Standort) *Chrome {
-	return &Chrome{
+func MakeChrome(k *konfig.Compiled, s standort.Standort) *Chrome {
+	c := &Chrome{
+		konfig:   k,
 		typ:      kennung.MustTyp("toml-bookmark"),
 		standort: s,
 		removed:  make(map[url.URL]struct{}),
+		transacted: transacted{
+			MutableSetLike: collections_value.MakeMutableValueSet(
+				iter.StringerKeyer[*kennung.Kennung2]{},
+			),
+		},
 	}
+
+	return c
 }
 
 func (c *Chrome) GetVirtualStore() sku.VirtualStore {
@@ -93,6 +113,10 @@ func (c *Chrome) Initialize() (err error) {
 }
 
 func (c *Chrome) Flush() (err error) {
+	if c.konfig.DryRun {
+		return
+	}
+
 	if len(c.removed) == 0 {
 		return
 	}
@@ -163,6 +187,28 @@ func (c *Chrome) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 }
 
 func (c *Chrome) CommitTransacted(sk *sku.Transacted) (err error) {
+	if !c.transacted.Contains(&sk.Kennung) {
+		return
+	}
+
+	ees := sk.Metadatei.Verzeichnisse.GetExpandedEtiketten()
+	es := sk.Metadatei.GetEtiketten()
+	log.Debug().Print(iter.StringCommaSeparated(es), iter.StringCommaSeparated(ees))
+
+	var u *url.URL
+
+	if u, err = c.getUrl(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, ok := c.urls[*u]; !ok {
+		// TODO fetch previous URL
+		return
+	}
+
+	c.removed[*u] = struct{}{}
+
 	return
 }
 
@@ -194,47 +240,10 @@ func (c *Chrome) ContainsSku(sk *sku.Transacted) bool {
 		}
 	}
 
+	c.transacted.Lock()
+	defer c.transacted.Unlock()
+
+	errors.PanicIfError(c.transacted.Add(&sk.Kennung))
+
 	return true
-}
-
-type item map[string]interface{}
-
-func (ct item) Etiketten() kennung.EtikettSet {
-	me := kennung.MakeEtikettMutableSet()
-
-	switch ct["type"].(string) {
-	case "history":
-		me.Add(
-			kennung.MustEtikett(fmt.Sprintf("%%chrome-history-%d", int(ct["id"].(float64)))),
-		)
-
-	case "tab":
-		me.Add(
-			kennung.MustEtikett(fmt.Sprintf("%%chrome-window_id-%d", int(ct["windowId"].(float64)))),
-		)
-
-		me.Add(
-			kennung.MustEtikett(fmt.Sprintf("%%chrome-tab_id-%d", int(ct["id"].(float64)))),
-		)
-
-		v, ok := ct["active"]
-
-		if !ok {
-			break
-		}
-
-		if b, _ := v.(bool); b {
-			me.Add(
-				kennung.MustEtikett("%chrome-active"),
-			)
-		}
-
-	case "bookmark":
-		me.Add(
-			kennung.MustEtikett(fmt.Sprintf("%%chrome-bookmark-%d", int(ct["id"].(float64)))),
-		)
-
-	}
-
-	return me
 }

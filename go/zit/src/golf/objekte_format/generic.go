@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 )
 
@@ -175,7 +174,7 @@ func WriteMetadateiKeyTo(
 	case keyEtikett:
 		es := m.GetEtiketten()
 
-		for _, e := range iter.SortedValues[kennung.Etikett](es) {
+		for _, e := range iter.SortedValues(es) {
 			if e.IsVirtual() {
 				continue
 			}

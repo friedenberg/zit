@@ -93,7 +93,17 @@ func (s *Store) handleNewOrUpdatedCommit(
 	}
 
 	if mode.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
-		s.CommitTransacted(t)
+		if err = s.CommitTransacted(t); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		for _, vs := range s.virtualStores {
+			if err = vs.CommitTransacted(t); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
 	}
 
 	if mode == objekte_mode.ModeEmpty {
@@ -103,11 +113,13 @@ func (s *Store) handleNewOrUpdatedCommit(
 		}
 	}
 
-	if err = s.GetVerzeichnisse().ExistsOneSha(
-		t.Metadatei.Sha(),
-	); err == collections.ErrExists {
-		return
-	}
+	// if _, err = s.GetBestandsaufnahmeStore().ReadOneEnnui(
+	// 	t.Metadatei.Sha(),
+	// ); err == nil {
+	// 	return
+	// }
+
+	// err = nil
 
 	if err = s.addToTomlIndexIfNecessary(t, mode); err != nil {
 		err = errors.Wrap(err)

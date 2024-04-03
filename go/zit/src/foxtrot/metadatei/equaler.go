@@ -1,7 +1,7 @@
 package metadatei
 
 import (
-	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 )
 
@@ -12,20 +12,57 @@ var (
 
 type equalerSansTai struct{}
 
-func (equalerSansTai) Equals(pz, z1 *Metadatei) bool {
-	if !pz.Akte.EqualsSha(&z1.Akte) {
+func (equalerSansTai) Equals(a, b *Metadatei) bool {
+	if !a.Akte.EqualsSha(&b.Akte) {
+		// log.Debug().Print(&a.Akte, "->", &b.Akte)
 		return false
 	}
 
-	if !pz.Typ.Equals(z1.Typ) {
+	if !a.Typ.Equals(b.Typ) {
+		// log.Debug().Print(&a.Typ, "->", &b.Typ)
 		return false
 	}
 
-	if !iter.SetEquals[kennung.Etikett](pz.GetEtiketten(), z1.GetEtiketten()) {
+	aes := a.GetEtiketten()
+	bes := b.GetEtiketten()
+
+	if err := aes.EachPtr(
+		func(ea *kennung.Etikett) (err error) {
+			if ea.IsVirtual() {
+				return
+			}
+
+			if !bes.ContainsKey(bes.KeyPtr(ea)) {
+				err = errors.New("false")
+				return
+			}
+
+			return
+		},
+	); err != nil {
 		return false
 	}
 
-	if !pz.Bezeichnung.Equals(z1.Bezeichnung) {
+	if err := bes.EachPtr(
+		func(eb *kennung.Etikett) (err error) {
+			if eb.IsVirtual() {
+				return
+			}
+
+			if !aes.ContainsKey(aes.KeyPtr(eb)) {
+				err = errors.New("false")
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		// log.Debug().Print(aes, "->", bes)
+		return false
+	}
+
+	if !a.Bezeichnung.Equals(b.Bezeichnung) {
+		// log.Debug().Print(a.Bezeichnung, "->", b.Bezeichnung)
 		return false
 	}
 

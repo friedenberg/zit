@@ -371,6 +371,21 @@ func (s *store) makeWriteMetadateiFunc(
 	}
 }
 
+func (s *store) MakeFuncSaveOneVerweise(o *sku.Transacted) func() error {
+	return func() (err error) {
+		k := o.GetKennung()
+		sh := sha.FromString(k.String())
+		defer sha.GetPool().Put(sh)
+
+		if err = s.ennuiKennung.AddSha(sh, o.Metadatei.Sha()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+}
+
 func (s *store) WriteOneObjekteMetadatei(o *sku.Transacted) (err error) {
 	if o.Metadatei.Sha().IsNull() {
 		err = errors.Errorf("null sha")
@@ -379,38 +394,21 @@ func (s *store) WriteOneObjekteMetadatei(o *sku.Transacted) (err error) {
 
 	wg := iter.MakeErrorWaitGroupParallel()
 
-	wg.Do(
-		func() (err error) {
-			k := o.GetKennung()
-			sh := sha.FromString(k.String())
-			defer sha.GetPool().Put(sh)
+	wg.Do(s.MakeFuncSaveOneVerweise(o))
 
-			if err = s.ennuiKennung.AddSha(sh, o.Metadatei.Sha()); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+	wg.Do(s.makeWriteMetadateiFunc(
+		s.standort.DirVerzeichnisseMetadateiKennungMutter(),
+		objekte_format.Formats.MetadateiKennungMutter(),
+		o,
+		o.Metadatei.Sha(),
+	))
 
-			return
-		},
-	)
-
-	wg.Do(
-		s.makeWriteMetadateiFunc(
-			s.standort.DirVerzeichnisseMetadateiKennungMutter(),
-			objekte_format.Formats.MetadateiKennungMutter(),
-			o,
-			o.Metadatei.Sha(),
-		),
-	)
-
-	wg.Do(
-		s.makeWriteMetadateiFunc(
-			s.standort.DirVerzeichnisseMetadatei(),
-			objekte_format.Formats.Metadatei(),
-			o,
-			&o.Metadatei.SelbstMetadatei,
-		),
-	)
+	wg.Do(s.makeWriteMetadateiFunc(
+		s.standort.DirVerzeichnisseMetadatei(),
+		objekte_format.Formats.Metadatei(),
+		o,
+		&o.Metadatei.SelbstMetadatei,
+	))
 
 	return wg.GetError()
 }

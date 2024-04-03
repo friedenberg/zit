@@ -29,6 +29,7 @@ type PageTuple struct {
 	changesAreHistorical    bool
 	standort                standort.Standort
 	konfig                  *konfig.Compiled
+	bs                      bs
 }
 
 func (pt *PageTuple) initialize(
@@ -39,8 +40,8 @@ func (pt *PageTuple) initialize(
 	pt.PageId = pid
 	pt.added = sku.MakeTransactedHeap()
 	pt.addedSchwanz = sku.MakeTransactedHeap()
-	pt.ennuiKennung = i.ennuiKennung
 	pt.konfig = i.erworben
+	pt.bs = i.bs
 }
 
 func (pt *PageTuple) add(

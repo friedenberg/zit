@@ -60,6 +60,7 @@ func (c *Store) Initialize(
 	st standort.Standort,
 	pmf objekte_format.Format,
 	t thyme.Time,
+	virtualStores map[string]*query.VirtualStoreInitable,
 ) (err error) {
 	c.konfig = k
 	c.standort = st
@@ -68,6 +69,7 @@ func (c *Store) Initialize(
 	c.options = objekte_format.Options{Tai: true}
 	c.sonnenaufgang = t
 	c.fileEncoder = objekte_collections.MakeFileEncoder(st, k)
+	c.virtualStores = virtualStores
 
 	if c.cwdFiles, err = cwd.MakeCwdFilesAll(
 		k,
@@ -124,6 +126,7 @@ func (c *Store) Initialize(
 	if c.verzeichnisse, err = store_verzeichnisse.MakeStore(
 		c.GetStandort(),
 		c.GetKonfig(),
+		c.GetBestandsaufnahmeStore(),
 		c.GetStandort().DirVerzeichnisseObjekten(),
 	); err != nil {
 		err = errors.Wrap(err)

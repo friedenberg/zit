@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 )
@@ -134,12 +135,14 @@ func (ih *indexHinweis) Abbreviate(h *kennung.Hinweis) (v string, err error) {
 	schwanz = ih.Schwanzen.Abbreviate(h.Schwanz())
 
 	if kopf == "" {
-		err = errors.Errorf("abbreviated kopf would be empty for %s", h)
+		v = h.String()
+		log.Err().Printf("abbreviated kopf would be empty for %s", h)
 		return
 	}
 
 	if schwanz == "" {
-		err = errors.Errorf("abbreviated schwanz would be empty for %s", h)
+		v = h.String()
+		log.Err().Printf("abbreviated schwanz would be empty for %s", h)
 		return
 	}
 

@@ -29,7 +29,7 @@ func OpenVimWithArgs(args []string, fs ...string) (err error) {
 		cmd.Stderr = os.Stderr
 	} else {
 		cmd = exec.Command(
-			"mvim",
+			GetEditor(),
 			append(append(args, "-f"), fs...)...,
 		)
 	}

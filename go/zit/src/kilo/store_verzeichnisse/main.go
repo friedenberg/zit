@@ -1,8 +1,6 @@
 package store_verzeichnisse
 
 import (
-	"os"
-	"path"
 	"sync"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
@@ -11,13 +9,8 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/src/bravo/pool"
-	"code.linenisgreat.com/zit/src/charlie/collections"
-	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/echo/standort"
-	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit/src/golf/ennui"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/query"
@@ -55,19 +48,23 @@ func init() {
 	}
 }
 
+type bs interface {
+	WriteOneObjekteMetadatei(o *sku.Transacted) (err error)
+}
+
 type Store struct {
 	standort standort.Standort
 	erworben *konfig.Compiled
 	path     string
 	schnittstellen.VerzeichnisseFactory
-	pages                   [PageCount]PageTuple
-	tomlPages               [PageCount]TomlPageTuple
-	ennuiShas, ennuiKennung ennui.Ennui
+	pages [PageCount]PageTuple
+	bs    bs
 }
 
 func MakeStore(
 	s standort.Standort,
 	k *konfig.Compiled,
+	bs bs,
 	dir string,
 ) (i *Store, err error) {
 	i = &Store{
@@ -75,6 +72,7 @@ func MakeStore(
 		erworben:             k,
 		path:                 dir,
 		VerzeichnisseFactory: s,
+		bs:                   bs,
 	}
 
 	if err = i.Initialize(); err != nil {
@@ -86,33 +84,8 @@ func MakeStore(
 }
 
 func (i *Store) Initialize() (err error) {
-	if i.ennuiShas, err = ennui.MakePermitDuplicates(
-		i.standort,
-		path.Join(i.path, "EnnuiShas"),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if i.ennuiKennung, err = ennui.MakeNoDuplicates(
-		i.standort,
-		path.Join(i.path, "EnnuiKennung"),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	for n := range i.pages {
 		i.pages[n].initialize(
-			PageId{
-				Prefix: "Page",
-				Dir:    i.path,
-				Index:  uint8(n),
-			},
-			i,
-		)
-
-		i.tomlPages[n].initialize(
 			PageId{
 				Prefix: "Page",
 				Dir:    i.path,
@@ -131,139 +104,6 @@ func (s *Store) applyKonfig(z *sku.Transacted) error {
 	}
 
 	return s.erworben.ApplyToSku(z)
-}
-
-func (i *Store) GetEnnuiShas() ennui.Ennui {
-	return i.ennuiShas
-}
-
-func (i *Store) GetEnnuiKennung() ennui.Ennui {
-	return i.ennuiKennung
-}
-
-func (i *Store) ExistsOneSha(sh *sha.Sha) (err error) {
-	if _, err = i.ennuiShas.ReadOne(sh); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	err = collections.ErrExists
-
-	return
-}
-
-func (i *Store) ReadOneShas(sh *sha.Sha) (out *sku.Transacted, err error) {
-	var loc ennui.Loc
-
-	if loc, err = i.ennuiShas.ReadOne(sh); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return i.readLoc(loc)
-}
-
-func (i *Store) ReadOneKennung(
-	h schnittstellen.Stringer,
-) (out *sku.Transacted, err error) {
-	sh := sha.FromString(h.String())
-	defer sha.GetPool().Put(sh)
-
-	var loc ennui.Loc
-
-	if loc, err = i.ennuiKennung.ReadOne(sh); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return i.readLoc(loc)
-}
-
-func (i *Store) ReadOneAll(
-	mg metadatei.Getter,
-	kennungPtr kennung.Kennung,
-) (out []ennui.Loc, err error) {
-	var locKennung ennui.Loc
-
-	wg := iter.MakeErrorWaitGroupParallel()
-
-	wg.Do(func() (err error) {
-		sh := sha.FromString(kennungPtr.String())
-		defer sha.GetPool().Put(sh)
-
-		if locKennung, err = i.ennuiKennung.ReadOne(sh); err != nil {
-			if collections.IsErrNotFound(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
-
-		return
-	})
-
-	wg.Do(func() (err error) {
-		if err = i.ennuiShas.ReadAll(mg.GetMetadatei(), &out); err != nil {
-			if collections.IsErrNotFound(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
-
-		return
-	})
-
-	if err = wg.GetError(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if !locKennung.IsEmpty() {
-		out = append(out, locKennung)
-	}
-
-	return
-}
-
-func (i *Store) readLoc(loc ennui.Loc) (sk *sku.Transacted, err error) {
-	p := &i.pages[loc.Page]
-
-	var f *os.File
-
-	if f, err = files.OpenFile(
-		p.Path(),
-		os.O_RDONLY,
-		0o666,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, f)
-
-	coder := binaryDecoder{
-		QueryGroup: &sigil{Sigil: kennung.SigilAll},
-	}
-
-	sk = sku.GetTransactedPool().Get()
-
-	if _, err = coder.readFormatExactly(
-		f,
-		loc,
-		&Sku{skuWithSigil: skuWithSigil{Transacted: sk}},
-	); err != nil {
-		sku.GetTransactedPool().Put(sk)
-		sk = nil
-		err = errors.Wrapf(err, "%s", loc)
-		return
-	}
-
-	return
 }
 
 // func (i *Store) ReadMany(string, *metadatei.Metadatei, *[]Loc) error {}
@@ -296,9 +136,6 @@ func (i *Store) Flush(
 
 		wg.Do(i.pages[n].Flush)
 	}
-
-	wg.DoAfter(i.ennuiShas.Flush)
-	wg.DoAfter(i.ennuiKennung.Flush)
 
 	if actualFlush {
 		if err = printerHeader("writing index"); err != nil {

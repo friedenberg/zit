@@ -101,19 +101,11 @@ func (s *Store) GetKonfigAkteFormat() objekte.AkteFormat[erworben.Akte, *erworbe
 }
 
 func (s *Store) ReadOneEnnui(sh *sha.Sha) (*sku.Transacted, error) {
-	if s.konfig.GetStoreVersion().GetInt() > 4 {
-		return s.GetBestandsaufnahmeStore().ReadOneEnnui(sh)
-	} else {
-		return s.GetVerzeichnisse().ReadOneShas(sh)
-	}
+	return s.GetBestandsaufnahmeStore().ReadOneEnnui(sh)
 }
 
 func (s *Store) ReadOneKennung(k kennung.Kennung) (sk *sku.Transacted, err error) {
-	if s.konfig.GetStoreVersion().GetInt() > 4 {
-		return s.GetBestandsaufnahmeStore().ReadOneKennung(k)
-	} else {
-		return s.GetVerzeichnisse().ReadOneKennung(k)
-	}
+	return s.GetBestandsaufnahmeStore().ReadOneKennung(k)
 }
 
 func (s *Store) ReaderFor(sh *sha.Sha) (rc sha.ReadCloser, err error) {

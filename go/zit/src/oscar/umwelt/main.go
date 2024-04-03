@@ -22,8 +22,6 @@ import (
 	"code.linenisgreat.com/zit/src/mike/store"
 )
 
-type VirtualStore = query.VirtualStoreInitable
-
 type Umwelt struct {
 	sonnenaufgang thyme.Time
 
@@ -76,6 +74,7 @@ func Make(kCli erworben.Cli, options Options) (u *Umwelt, err error) {
 	return
 }
 
+// TODO investigate removing unnecessary resets like from organize
 func (u *Umwelt) Reset() (err error) {
 	return u.Initialize(OptionsEmpty)
 }
@@ -149,11 +148,16 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 
 	log.Log().Printf("store version: %s", u.Konfig().GetStoreVersion())
 
+	u.virtualStores["%chrome"] = &query.VirtualStoreInitable{
+		VirtualStore: chrome.MakeChrome(u.Konfig(), u.Standort()),
+	}
+
 	if err = u.store.Initialize(
 		u.Konfig(),
 		u.standort,
 		objekte_format.FormatForVersion(u.Konfig().GetStoreVersion()),
 		u.sonnenaufgang,
+		u.virtualStores,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")
 		return
@@ -180,10 +184,6 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	u.store.SetLogWriter(lw)
 
 	u.storesInitialized = true
-
-	u.virtualStores["%chrome"] = &query.VirtualStoreInitable{
-		VirtualStore: chrome.MakeChrome(u.Standort()),
-	}
 
 	return
 }

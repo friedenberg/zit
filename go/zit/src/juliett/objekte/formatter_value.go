@@ -72,7 +72,8 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"tai",
 		"text",
 		"text-sku-prefix",
-		"typ":
+		"typ",
+		"verzeichnisse":
 		f.string = v1
 
 	default:
@@ -91,6 +92,10 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	cliFmt schnittstellen.StringFormatWriter[*sku.Transacted],
 	enn ennui.Ennui,
 	rob func(*sha.Sha) (*sku.Transacted, error),
+	bs interface {
+		ReadOneKennung(kennung.Kennung) (*sku.Transacted, error)
+		ReadOneEnnui(sh *sha.Sha) (sk *sku.Transacted, err error)
+	},
 ) schnittstellen.FuncIter[*sku.Transacted] {
 	switch fv.string {
 	case "sha":
@@ -572,6 +577,27 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 	case "typ":
 		return func(o *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(out, o.GetTyp().String()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+	case "verzeichnisse":
+		return func(o *sku.Transacted) (err error) {
+			var sk *sku.Transacted
+
+			if sk, err = bs.ReadOneKennung(
+				&o.Kennung,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer sku.GetTransactedPool().Put(sk)
+
+			if err = logFunc(sk); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

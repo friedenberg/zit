@@ -57,7 +57,7 @@ func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {
 		"the Bezeichnung to use for created or updated Zettelen",
 	)
 
-	fes := collections_ptr.MakeFlagCommasFromExisting[kennung.Etikett](
+	fes := collections_ptr.MakeFlagCommasFromExisting(
 		collections_ptr.SetterPolicyAppend,
 		m.GetEtikettenMutable(),
 	)
@@ -184,8 +184,8 @@ func (z *Metadatei) GetTai() kennung.Tai {
 }
 
 // TODO-P2 remove
-func (pz *Metadatei) EqualsSansTai(z1 *Metadatei) bool {
-	return EqualerSansTai.Equals(pz, z1)
+func (b *Metadatei) EqualsSansTai(a *Metadatei) bool {
+	return EqualerSansTai.Equals(a, b)
 }
 
 // TODO-P2 remove

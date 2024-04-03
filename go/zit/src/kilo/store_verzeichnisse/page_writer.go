@@ -33,6 +33,7 @@ type pageWriter struct {
 	ennui.Range
 	offsetLast, offset int64
 	kennungShaMap      KennungShaMap
+	bs                 bs
 }
 
 func (pw *pageWriter) Flush() (err error) {
@@ -121,12 +122,22 @@ func (pw *pageWriter) flushBoth() (err error) {
 	}
 
 	for _, st := range pw.kennungShaMap {
-		st.Add(kennung.SigilSchwanzen)
-
-		if err = pw.updateSigil(pw, st.Sigil, st.Offset); err != nil {
+		if err = pw.updateSigilWithSchwanzen(st); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+	}
+
+	return
+}
+
+func (pw *pageWriter) updateSigilWithSchwanzen(st ShaTuple) (err error) {
+	st.Add(kennung.SigilSchwanzen)
+
+	// TODO pw.bs.WriteOneObjekteMetadatei
+	if err = pw.updateSigil(pw, st.Sigil, st.Offset); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
@@ -171,9 +182,7 @@ func (pw *pageWriter) flushJustSchwanz() (err error) {
 	}
 
 	for _, st := range pw.kennungShaMap {
-		st.Add(kennung.SigilSchwanzen)
-
-		if err = pw.updateSigil(pw, st.Sigil, st.Offset); err != nil {
+		if err = pw.updateSigilWithSchwanzen(st); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

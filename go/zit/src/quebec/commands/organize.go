@@ -245,11 +245,6 @@ func (c *Organize) RunWithQuery(
 			return
 		}
 
-		if err = u.Reset(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
 		if err = u.Lock(); err != nil {
 			err = errors.Wrap(err)
 			return

@@ -18,7 +18,7 @@ import (
 var poolKennung2 schnittstellen.Pool[Kennung2, *Kennung2]
 
 func init() {
-	poolKennung2 = pool.MakePool[Kennung2, *Kennung2](
+	poolKennung2 = pool.MakePool(
 		nil,
 		func(k *Kennung2) {
 			k.Reset()
