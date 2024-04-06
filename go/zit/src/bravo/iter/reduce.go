@@ -6,6 +6,10 @@ import (
 )
 
 func Elements[T any](s schnittstellen.Iterable[T]) (out []T) {
+	if s == nil {
+		return
+	}
+
 	out = make([]T, 0, s.Len())
 
 	err := s.Each(

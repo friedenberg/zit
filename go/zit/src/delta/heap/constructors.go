@@ -21,7 +21,7 @@ func Make[T Element, TPtr ElementPtr[T]](
 	}
 }
 
-func MakeHeapFromSlice[T Element, TPtr ElementPtr[T]](
+func MakeHeapFromSliceUnsorted[T Element, TPtr ElementPtr[T]](
 	equaler schnittstellen.Equaler1[TPtr],
 	lessor schnittstellen.Lessor3[TPtr],
 	resetter schnittstellen.Resetter2[T, TPtr],
@@ -35,6 +35,24 @@ func MakeHeapFromSlice[T Element, TPtr ElementPtr[T]](
 	}
 
 	sort.Sort(h)
+
+	return &Heap[T, TPtr]{
+		h: h,
+	}
+}
+
+func MakeHeapFromSlice[T Element, TPtr ElementPtr[T]](
+	equaler schnittstellen.Equaler1[TPtr],
+	lessor schnittstellen.Lessor3[TPtr],
+	resetter schnittstellen.Resetter2[T, TPtr],
+	s []TPtr,
+) *Heap[T, TPtr] {
+	h := heapPrivate[T, TPtr]{
+		Lessor:   lessor,
+		Resetter: resetter,
+		Elements: s,
+		equaler:  equaler,
+	}
 
 	return &Heap[T, TPtr]{
 		h: h,

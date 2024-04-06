@@ -11,7 +11,7 @@ type skuWithSigil struct {
 	kennung.Sigil
 }
 
-type Sku struct {
+type skuWithRangeAndSigil struct {
 	skuWithSigil
 	ennui.Range
 }

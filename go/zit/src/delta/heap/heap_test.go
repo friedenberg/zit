@@ -19,7 +19,7 @@ func TestReset(t1 *testing.T) {
 		values.MakeInt(2),
 	}
 
-	sut := MakeHeapFromSlice[values.Int, *values.Int](
+	sut := MakeHeapFromSliceUnsorted[values.Int, *values.Int](
 		values.IntEqualer{},
 		values.IntLessor{},
 		values.IntResetter{},
@@ -50,7 +50,7 @@ func TestSaveAndRestore(t1 *testing.T) {
 
 	eql := values.IntEqualer{}
 
-	sut := MakeHeapFromSlice[values.Int, *values.Int](
+	sut := MakeHeapFromSliceUnsorted[values.Int, *values.Int](
 		eql,
 		values.IntLessor{},
 		values.IntResetter{},
@@ -111,7 +111,7 @@ func Test3Sorted(t1 *testing.T) {
 
 	eql := values.IntEqualer{}
 
-	sut := MakeHeapFromSlice[values.Int, *values.Int](
+	sut := MakeHeapFromSliceUnsorted[values.Int, *values.Int](
 		eql,
 		values.IntLessor{},
 		values.IntResetter{},
@@ -148,7 +148,7 @@ func TestDupes(t1 *testing.T) {
 
 	eql := values.IntEqualer{}
 
-	sut := MakeHeapFromSlice[values.Int, *values.Int](
+	sut := MakeHeapFromSliceUnsorted[values.Int, *values.Int](
 		eql,
 		values.IntLessor{},
 		values.IntResetter{},
@@ -184,7 +184,7 @@ func TestMerge(t1 *testing.T) {
 		values.MakeInt(2),
 	}
 
-	otherStream := MakeHeapFromSlice[values.Int, *values.Int](
+	otherStream := MakeHeapFromSliceUnsorted[values.Int, *values.Int](
 		eql,
 		llr,
 		values.IntResetter{},
@@ -209,7 +209,7 @@ func TestMerge(t1 *testing.T) {
 		values.MakeInt(9),
 	}
 
-	sut := MakeHeapFromSlice[values.Int, *values.Int](
+	sut := MakeHeapFromSliceUnsorted[values.Int, *values.Int](
 		eql,
 		llr,
 		values.IntResetter{},
@@ -218,7 +218,8 @@ func TestMerge(t1 *testing.T) {
 
 	actual := make([]*values.Int, 0)
 
-	err := sut.MergeStream(
+	err := MergeStream(
+		sut,
 		otherStream.PopError,
 		func(v *values.Int) (err error) {
 			actual = append(actual, v)

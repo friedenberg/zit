@@ -8,22 +8,21 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/golf/ennui"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
-type ShaTuple struct {
-	Sha, Mutter *sha.Sha
-	ennui.Range
-	kennung.Sigil
-}
+// type entry struct {
+// 	Sha, Mutter *sha.Sha
+// 	ennui.Range
+// 	kennung.Sigil
+// }
 
-type KennungShaMap map[string]ShaTuple
+type KennungShaMap map[string]skuWithRangeAndSigil
 
-type pageWriter struct {
-	*PageTuple
+type writer struct {
+	*Page
 	binaryDecoder
 	binaryEncoder
 	*os.File
@@ -33,10 +32,9 @@ type pageWriter struct {
 	ennui.Range
 	offsetLast, offset int64
 	kennungShaMap      KennungShaMap
-	bs                 bs
 }
 
-func (pw *pageWriter) Flush() (err error) {
+func (pw *writer) Flush() (err error) {
 	if !pw.hasChanges {
 		log.Log().Print("not flushing, no changes")
 		return
@@ -89,7 +87,7 @@ func (pw *pageWriter) Flush() (err error) {
 	}
 }
 
-func (pw *pageWriter) flushBoth() (err error) {
+func (pw *writer) flushBoth() (err error) {
 	chain := iter.MakeChain(
 		pw.konfig.ApplyToSku,
 		pw.writeOne,
@@ -131,10 +129,14 @@ func (pw *pageWriter) flushBoth() (err error) {
 	return
 }
 
-func (pw *pageWriter) updateSigilWithSchwanzen(st ShaTuple) (err error) {
+func (pw *writer) updateSigilWithSchwanzen(st skuWithRangeAndSigil) (err error) {
 	st.Add(kennung.SigilSchwanzen)
 
-	// TODO pw.bs.WriteOneObjekteMetadatei
+	if err = pw.WriteOneObjekteMetadatei(st.Transacted); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = pw.updateSigil(pw, st.Sigil, st.Offset); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -143,13 +145,13 @@ func (pw *pageWriter) updateSigilWithSchwanzen(st ShaTuple) (err error) {
 	return
 }
 
-func (pw *pageWriter) flushJustSchwanz() (err error) {
+func (pw *writer) flushJustSchwanz() (err error) {
 	if err = pw.CopyJustHistoryFrom(
 		&pw.Reader,
 		makeSigil(kennung.SigilHistory, kennung.SigilHidden),
-		func(sk Sku) (err error) {
+		func(sk skuWithRangeAndSigil) (err error) {
 			pw.Range = sk.Range
-			pw.SaveSha(sk.Transacted, sk.Sigil)
+			pw.saveSchwanz(sk.Transacted, sk.Sigil)
 			return
 		},
 	); err != nil {
@@ -159,7 +161,7 @@ func (pw *pageWriter) flushJustSchwanz() (err error) {
 
 	chain := iter.MakeChain(
 		pw.konfig.ApplyToSku,
-		pw.removeOldSchwanzen,
+		pw.removeOldSchwanz,
 		pw.writeOne,
 	)
 
@@ -191,7 +193,7 @@ func (pw *pageWriter) flushJustSchwanz() (err error) {
 	return
 }
 
-func (pw *pageWriter) writeOne(
+func (pw *writer) writeOne(
 	z *sku.Transacted,
 ) (err error) {
 	pw.Offset += pw.ContentLength
@@ -204,20 +206,23 @@ func (pw *pageWriter) writeOne(
 		return
 	}
 
-	pw.SaveSha(z, kennung.SigilHistory)
+	pw.saveSchwanz(z, kennung.SigilHistory)
 
 	return
 }
 
-func (pw *pageWriter) SaveSha(z *sku.Transacted, sigil kennung.Sigil) {
+func (pw *writer) saveSchwanz(z *sku.Transacted, sigil kennung.Sigil) {
 	k := z.GetKennung()
+	ks := k.String()
 
-	record := pw.kennungShaMap[k.String()]
+	record := pw.kennungShaMap[ks]
 	record.Range = pw.Range
 
-	if z.Metadatei.Verzeichnisse.Archiviert.Bool() {
-		sigil.Add(kennung.SigilHidden)
+	if record.Transacted == nil {
+		record.Transacted = sku.GetTransactedPool().Get()
 	}
+
+	sku.TransactedResetter.ResetWith(record.Transacted, z)
 
 	record.Sigil = sigil
 
@@ -227,10 +232,10 @@ func (pw *pageWriter) SaveSha(z *sku.Transacted, sigil kennung.Sigil) {
 		record.Del(kennung.SigilHidden)
 	}
 
-	pw.kennungShaMap[k.String()] = record
+	pw.kennungShaMap[ks] = record
 }
 
-func (pw *pageWriter) removeOldSchwanzen(sk *sku.Transacted) (err error) {
+func (pw *writer) removeOldSchwanz(sk *sku.Transacted) (err error) {
 	ks := sk.Kennung.String()
 	st, ok := pw.kennungShaMap[ks]
 

@@ -126,8 +126,9 @@ func (c *Store) Initialize(
 	if c.verzeichnisse, err = store_verzeichnisse.MakeStore(
 		c.GetStandort(),
 		c.GetKonfig(),
-		c.GetBestandsaufnahmeStore(),
 		c.GetStandort().DirVerzeichnisseObjekten(),
+		pmf,
+		c.options,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

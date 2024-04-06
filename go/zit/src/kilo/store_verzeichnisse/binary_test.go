@@ -39,7 +39,7 @@ func TestBinaryOne(t1 *testing.T) {
 		t.AssertNoError(err)
 	}
 
-	actual := Sku{
+	actual := skuWithRangeAndSigil{
 		skuWithSigil: skuWithSigil{
 			Transacted: &sku.Transacted{},
 		},

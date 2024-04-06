@@ -18,13 +18,15 @@ import (
 
 type page struct {
 	sync.Mutex
+	sha.PageId
+
 	f          *os.File
 	br         bufio.Reader
-	added      *heap.Heap[row, *row]
+	equaler    schnittstellen.Equaler1[*row]
+	added      addedMap
 	standort   standort.Standort
 	searchFunc func(*sha.Sha) (mid int64, err error)
 	rowSize    int
-	sha.PageId
 }
 
 func (p *page) initialize(
@@ -33,11 +35,15 @@ func (p *page) initialize(
 	pid sha.PageId,
 	rowSize int,
 ) (err error) {
-	p.added = heap.Make(
-		equaler,
-		rowLessor{},
-		rowResetter{},
-	)
+	p.equaler = equaler
+
+	// p.added = make([]*row, 0)
+	p.added = make(addedMap)
+	// p.added = heap.Make(
+	// 	p.equaler,
+	// 	rowLessor{},
+	// 	rowResetter{},
+	// )
 
 	p.standort = s
 	p.PageId = pid
@@ -111,7 +117,8 @@ func (e *page) addSha(left, right *Sha) (err error) {
 		return
 	}
 
-	e.added.Push(r)
+	// e.added = append(e.added, r)
+	e.added[r.left.GetBytes()] = r
 
 	return
 }
@@ -232,7 +239,6 @@ func (e *page) collectLocs(
 		var sh *sha.Sha
 
 		sh, err = e.readCurrentLoc(shMet, &e.br)
-
 		if err != nil {
 			if err == io.EOF {
 				err = nil
@@ -274,7 +280,7 @@ func (e *page) Flush() (err error) {
 	e.Lock()
 	defer e.Unlock()
 
-	if e.added.Len() == 0 {
+	if len(e.added) == 0 {
 		return
 	}
 
@@ -308,13 +314,13 @@ func (e *page) Flush() (err error) {
 
 		var n int64
 		n, err = current.ReadFrom(&e.br)
-
 		if err != nil {
 			if errors.Is(err, io.ErrUnexpectedEOF) && n == 0 {
 				err = io.EOF
 			}
 
 			err = errors.WrapExcept(err, io.EOF)
+
 			return
 		}
 
@@ -323,7 +329,18 @@ func (e *page) Flush() (err error) {
 		return
 	}
 
-	if err = e.added.MergeStream(
+	// e.added.SortStableAndRemoveDuplicates()
+	s := e.added.ToSlice()
+
+	h := heap.MakeHeapFromSlice(
+		e.equaler,
+		rowLessor{},
+		rowResetter{},
+		s,
+	)
+
+	if err = heap.MergeStream(
+		h,
 		func() (tz *row, err error) {
 			tz, err = getOne()
 
@@ -350,7 +367,8 @@ func (e *page) Flush() (err error) {
 		return
 	}
 
-	e.added.Reset()
+	clear(e.added)
+	// e.added = e.added[:0]
 
 	if err = e.open(); err != nil {
 		err = errors.Wrap(err)

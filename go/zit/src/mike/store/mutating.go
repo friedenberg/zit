@@ -45,7 +45,7 @@ func (s *Store) addMutterIfNecessary(
 		return
 	}
 
-	mutter, err := s.GetBestandsaufnahmeStore().ReadOneKennungSha(sk.GetKennung())
+	mutter, err := s.GetVerzeichnisse().ReadOneKennungSha(sk.GetKennung())
 	defer sha.GetPool().Put(mutter)
 
 	if err != nil {
@@ -106,12 +106,12 @@ func (s *Store) handleNewOrUpdatedCommit(
 		}
 	}
 
-	if mode == objekte_mode.ModeEmpty {
-		if err = s.GetBestandsaufnahmeStore().WriteOneObjekteMetadatei(t); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
+	// if mode == objekte_mode.ModeEmpty {
+	// 	if err = s.GetBestandsaufnahmeStore().WriteOneObjekteMetadatei(t); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return
+	// 	}
+	// }
 
 	// if _, err = s.GetBestandsaufnahmeStore().ReadOneEnnui(
 	// 	t.Metadatei.Sha(),

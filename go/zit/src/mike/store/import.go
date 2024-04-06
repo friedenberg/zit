@@ -24,7 +24,7 @@ func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOut, err error) {
 		return
 	}
 
-	_, err = s.GetBestandsaufnahmeStore().ReadOneEnnui(sk.Metadatei.Sha())
+	_, err = s.GetVerzeichnisse().ReadOneEnnui(sk.Metadatei.Sha())
 
 	if err == nil {
 		co.SetError(collections.ErrExists)

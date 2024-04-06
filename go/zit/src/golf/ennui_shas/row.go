@@ -24,7 +24,7 @@ func (r *row) String() string {
 	return fmt.Sprintf(
 		"%s %s",
 		r.left.GetShaString()[:4],
-		r.left.GetShaString()[:4],
+		r.right.GetShaString()[:4],
 	)
 }
 
@@ -106,6 +106,8 @@ func (rowResetter) ResetWith(a, b *row) {
 	a.left.ResetWith(&b.left)
 	a.right.ResetWith(&b.right)
 }
+
+var RowLessor rowLessor
 
 type rowLessor struct{}
 

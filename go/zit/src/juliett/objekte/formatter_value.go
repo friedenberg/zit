@@ -129,7 +129,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 
 			if _, err = fmt.Fprintln(
 				out,
-				iter.StringCommaSeparated[kennung.Etikett](esImp),
+				iter.StringCommaSeparated(esImp),
 			); err != nil {
 				err = errors.Wrap(err)
 				return

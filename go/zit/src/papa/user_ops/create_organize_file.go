@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
+// TODO support using query results for organize population
 type CreateOrganizeFile struct {
 	*umwelt.Umwelt
 	organize_text.Options

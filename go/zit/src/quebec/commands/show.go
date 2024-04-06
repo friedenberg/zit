@@ -64,7 +64,7 @@ func (c Show) runGenericObjekteFormatterValue(
 			u.StringFormatWriterSkuTransactedShort(),
 			u.GetStore().GetEnnui(),
 			u.GetStore().ReadOneEnnui,
-      u.GetStore().GetBestandsaufnahmeStore(),
+      u.GetStore().GetVerzeichnisse(),
 		),
 	)
 

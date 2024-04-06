@@ -59,7 +59,7 @@ type binaryDecoder struct {
 func (bf *binaryDecoder) readFormatExactly(
 	r io.ReaderAt,
 	loc ennui.Loc,
-	sk *Sku,
+	sk *skuWithRangeAndSigil,
 ) (n int64, err error) {
 	bf.binaryField.Reset()
 	bf.Buffer.Reset()
@@ -124,7 +124,7 @@ func (bf *binaryDecoder) readFormatExactly(
 
 func (bf *binaryDecoder) readFormatAndMatchSigil(
 	r io.Reader,
-	sk *Sku,
+	sk *skuWithRangeAndSigil,
 ) (n int64, err error) {
 	bf.binaryField.Reset()
 	bf.Buffer.Reset()
@@ -239,7 +239,7 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 var errExpectedSigil = errors.New("expected sigil")
 
 func (bf *binaryDecoder) readSigil(
-	sk *Sku,
+	sk *skuWithRangeAndSigil,
 	r io.Reader,
 ) (n int64, err error) {
 	n, err = bf.binaryField.ReadFrom(r)

@@ -9,30 +9,29 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/src/charlie/collections"
+	"code.linenisgreat.com/zit/src/delta/heap"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/echo/standort"
-	"code.linenisgreat.com/zit/src/golf/ennui"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 )
 
 type PageId = sha.PageId
 
-type PageTuple struct {
+type Page struct {
 	PageId
+	ennuiStore
 	// All, Schwanzen  Page
-	ennuiShas, ennuiKennung ennui.Ennui
-	added, addedSchwanz     *sku.TransactedHeap
-	flushMode               objekte_mode.Mode
-	hasChanges              bool
-	changesAreHistorical    bool
-	standort                standort.Standort
-	konfig                  *konfig.Compiled
-	bs                      bs
+	added, addedSchwanz  *sku.TransactedHeap
+	flushMode            objekte_mode.Mode
+	hasChanges           bool
+	changesAreHistorical bool
+	standort             standort.Standort
+	konfig               *konfig.Compiled
 }
 
-func (pt *PageTuple) initialize(
+func (pt *Page) initialize(
 	pid PageId,
 	i *Store,
 ) {
@@ -41,10 +40,10 @@ func (pt *PageTuple) initialize(
 	pt.added = sku.MakeTransactedHeap()
 	pt.addedSchwanz = sku.MakeTransactedHeap()
 	pt.konfig = i.erworben
-	pt.bs = i.bs
+	pt.ennuiStore = i.ennuiStore
 }
 
-func (pt *PageTuple) add(
+func (pt *Page) add(
 	z1 *sku.Transacted,
 	mode objekte_mode.Mode,
 ) (err error) {
@@ -66,30 +65,30 @@ func (pt *PageTuple) add(
 	return
 }
 
-func (pt *PageTuple) waitingToAddLen() int {
+func (pt *Page) waitingToAddLen() int {
 	return pt.added.Len() + pt.addedSchwanz.Len()
 }
 
-func (pt *PageTuple) SetNeedsFlushHistory() {
+func (pt *Page) SetNeedsFlushHistory() {
 	pt.hasChanges = true
 	pt.changesAreHistorical = true
 }
 
-func (pt *PageTuple) CopyJustHistory(
+func (pt *Page) CopyJustHistory(
 	s sku.QueryGroup,
 	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return pt.copyHistoryAndMaybeSchwanz(s, w, false, false)
 }
 
-func (pt *PageTuple) CopyJustHistoryFrom(
+func (pt *Page) CopyJustHistoryFrom(
 	r io.Reader,
 	s sku.QueryGroup,
-	w schnittstellen.FuncIter[Sku],
+	w schnittstellen.FuncIter[skuWithRangeAndSigil],
 ) (err error) {
 	dec := makeBinaryWithQueryGroup(s, kennung.SigilHistory)
 
-	var sk Sku
+	var sk skuWithRangeAndSigil
 
 	for {
 		sk.Offset += sk.ContentLength
@@ -112,14 +111,14 @@ func (pt *PageTuple) CopyJustHistoryFrom(
 	}
 }
 
-func (pt *PageTuple) CopyJustHistoryAndAdded(
+func (pt *Page) CopyJustHistoryAndAdded(
 	s sku.QueryGroup,
 	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return pt.copyHistoryAndMaybeSchwanz(s, w, true, false)
 }
 
-func (pt *PageTuple) copyHistoryAndMaybeSchwanz(
+func (pt *Page) copyHistoryAndMaybeSchwanz(
 	s sku.QueryGroup,
 	w schnittstellen.FuncIter[*sku.Transacted],
 	includeAdded bool,
@@ -145,7 +144,7 @@ func (pt *PageTuple) copyHistoryAndMaybeSchwanz(
 		if err = pt.CopyJustHistoryFrom(
 			br,
 			s,
-			func(sk Sku) (err error) {
+			func(sk skuWithRangeAndSigil) (err error) {
 				if err = w(sk.Transacted); err != nil {
 					err = errors.Wrapf(err, "%s", sk.Transacted)
 					return
@@ -166,9 +165,10 @@ func (pt *PageTuple) copyHistoryAndMaybeSchwanz(
 	errors.TodoP3("determine performance of this")
 	added := pt.added.Copy()
 
-	var sk Sku
+	var sk skuWithRangeAndSigil
 
-	if err = added.MergeStream(
+	if err = heap.MergeStream(
+		&added,
 		func() (tz *sku.Transacted, err error) {
 			tz = sku.GetTransactedPool().Get()
 			sk.Transacted = tz
@@ -197,7 +197,8 @@ func (pt *PageTuple) copyHistoryAndMaybeSchwanz(
 
 	addedSchwanz := pt.addedSchwanz.Copy()
 
-	if err = addedSchwanz.MergeStream(
+	if err = heap.MergeStream(
+		&addedSchwanz,
 		func() (tz *sku.Transacted, err error) {
 			err = collections.MakeErrStopIteration()
 			return
@@ -211,9 +212,9 @@ func (pt *PageTuple) copyHistoryAndMaybeSchwanz(
 	return
 }
 
-func (pt *PageTuple) Flush() (err error) {
-	pw := &pageWriter{
-		PageTuple: pt,
+func (pt *Page) Flush() (err error) {
+	pw := &writer{
+		Page: pt,
 	}
 
 	if err = pw.Flush(); err != nil {

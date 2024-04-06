@@ -13,7 +13,7 @@ type ProdPrinter interface {
 
 type DevPrinter interface {
 	ProdPrinter
-	Caller(i int, f string, vs ...interface{})
+	Caller(i int, vs ...interface{})
 	FunctionName(skip int)
 }
 
@@ -175,7 +175,7 @@ func (p devPrinter) Printf(f string, a ...interface{}) (err error) {
 	return p.prodPrinter.Printf(f, a...)
 }
 
-func (p devPrinter) Caller(i int, f string, vs ...interface{}) {
+func (p devPrinter) Caller(i int, vs ...interface{}) {
 	if !p.on {
 		return
 	}
@@ -184,7 +184,7 @@ func (p devPrinter) Caller(i int, f string, vs ...interface{}) {
 
 	vs = append([]interface{}{st}, vs...)
 	// TODO-P4 strip trailing newline and add back
-	io.WriteString(p.f, fmt.Sprintf("%s"+f+"\n", vs...))
+	p.prodPrinter.Print(vs...)
 }
 
 func (p devPrinter) CallerNonEmpty(i int, v interface{}) {

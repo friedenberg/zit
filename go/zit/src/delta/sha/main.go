@@ -21,6 +21,8 @@ const (
 	Null          = ShaNullString
 )
 
+type Bytes [ByteSize]byte
+
 var shaNull Sha
 
 func init() {
@@ -34,11 +36,19 @@ type PathComponents interface {
 type ShaLike = schnittstellen.ShaGetter
 
 type Sha struct {
-	data *[ByteSize]byte
+	data *Bytes
 }
 
 func (s *Sha) Size() int {
 	return ByteSize
+}
+
+func (s *Sha) GetBytes() Bytes {
+	if s.IsNull() {
+		return *shaNull.data
+	} else {
+		return *s.data
+	}
 }
 
 func (s *Sha) GetShaBytes() []byte {
@@ -231,7 +241,7 @@ func (s *Sha) allocDataIfNecessary() {
 		return
 	}
 
-	s.data = &[ByteSize]byte{}
+	s.data = &Bytes{}
 }
 
 func (s *Sha) Reset() {

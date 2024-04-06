@@ -11,14 +11,12 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/bravo/pool"
-	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/echo/standort"
-	"code.linenisgreat.com/zit/src/golf/ennui_shas"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
@@ -28,12 +26,9 @@ import (
 type Store interface {
 	errors.Flusher
 	GetStore() Store
-	ReadOneEnnui(*sha.Sha) (*sku.Transacted, error)
-	ReadOneKennung(kennung.Kennung) (*sku.Transacted, error)
-	ReadOneKennungSha(kennung.Kennung) (*sha.Sha, error)
+
 	Create(*Akte) (*sku.Transacted, error)
 	ReadLast() (*sku.Transacted, error)
-	WriteOneObjekteMetadatei(o *sku.Transacted) (err error)
 	ReadOne(schnittstellen.Stringer) (*sku.Transacted, error)
 	ReadOneSku(besty, sk *sha.Sha) (*sku.Transacted, error)
 	ReadAll(schnittstellen.FuncIter[*sku.Transacted]) error
@@ -67,7 +62,6 @@ type store struct {
 	persistentMetadateiFormat objekte_format.Format
 	options                   objekte_format.Options
 	formatAkte                akteFormat
-	ennuiKennung              ennui_shas.Ennui
 }
 
 func MakeStore(
@@ -79,7 +73,7 @@ func MakeStore(
 	pmf objekte_format.Format,
 	clock kennung.Clock,
 ) (s *store, err error) {
-	p := pool.MakePool[Akte](nil, func(a *Akte) { Resetter.Reset(a) })
+	p := pool.MakePool(nil, func(a *Akte) { Resetter.Reset(a) })
 
 	op := objekte_format.Options{Tai: true}
 	fa := MakeAkteFormat(sv, op)
@@ -97,14 +91,6 @@ func MakeStore(
 		formatAkte:                fa,
 	}
 
-	if s.ennuiKennung, err = ennui_shas.MakeNoDuplicates(
-		standort,
-		standort.DirVerzeichnisseVerweise(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	return
 }
 
@@ -114,92 +100,7 @@ func (s *store) GetStore() Store {
 
 func (s *store) Flush() (err error) {
 	wg := iter.MakeErrorWaitGroupParallel()
-	wg.Do(s.ennuiKennung.Flush)
 	return wg.GetError()
-}
-
-func (s *store) ReadOneEnnui(sh *sha.Sha) (sk *sku.Transacted, err error) {
-	var r sha.ReadCloser
-
-	if r, err = s.standort.AkteReaderFrom(
-		sh,
-		s.standort.DirVerzeichnisseMetadateiKennungMutter(),
-	); err != nil {
-		if errors.IsNotExist(err) {
-			err = collections.MakeErrNotFound(sh)
-		} else {
-			err = errors.Wrap(err)
-		}
-
-		return
-	}
-
-	defer errors.DeferredCloser(&err, r)
-
-	rb := catgut.MakeRingBuffer(r, 0)
-
-	sk = sku.GetTransactedPool().Get()
-
-	var n int64
-
-	n, err = s.persistentMetadateiFormat.ParsePersistentMetadatei(
-		rb,
-		sk,
-		s.options,
-	)
-
-	if err == io.EOF && n > 0 {
-		err = nil
-	} else if err != io.EOF && err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = sk.CalculateObjekteShas(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *store) ReadOneKennungSha(k kennung.Kennung) (sh *sha.Sha, err error) {
-	left := sha.FromString(k.String())
-	defer sha.GetPool().Put(left)
-
-	if sh, err = s.ennuiKennung.ReadOne(left); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *store) ReadOneKennung(k kennung.Kennung) (sk *sku.Transacted, err error) {
-	sh, err := s.ReadOneKennungSha(k)
-	defer sha.GetPool().Put(sh)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if sk, err = s.ReadOneEnnui(sh); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if !sh.Equals(sk.Metadatei.Sha()) {
-		err = errors.Errorf(
-			"expected sha %q but got %q",
-			sh,
-			sk.Metadatei.Sha(),
-		)
-
-		return
-	}
-
-	return
 }
 
 func (s *store) Create(o *Akte) (t *sku.Transacted, err error) {
@@ -286,9 +187,6 @@ func (s *store) writeAkte(o *Akte) (sh *sha.Sha, err error) {
 
 	defer o.Skus.Restore()
 
-	wg := iter.MakeErrorWaitGroupParallel()
-	tickets := make(chan struct{}, 128)
-
 	for {
 		sk, ok := o.Skus.PopAndSave()
 
@@ -306,111 +204,11 @@ func (s *store) writeAkte(o *Akte) (sh *sha.Sha, err error) {
 			err = errors.Wrap(err)
 			return
 		}
-
-		wg.Do(
-			func() (err error) {
-				tickets <- struct{}{}
-				defer func() {
-					<-tickets
-				}()
-
-				if err = s.WriteOneObjekteMetadatei(sk); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				return
-			},
-		)
 	}
 
 	sh = sha.Make(sw.GetShaLike())
 
-	if err = wg.GetError(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	return
-}
-
-func (s *store) makeWriteMetadateiFunc(
-	dir string,
-	fo objekte_format.FormatGeneric,
-	o *sku.Transacted,
-	expected *sha.Sha,
-) schnittstellen.FuncError {
-	return func() (err error) {
-		var sw sha.WriteCloser
-
-		if sw, err = s.standort.AkteWriterToLight(dir); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		defer errors.DeferredCloser(&err, sw)
-
-		if _, err = fo.WriteMetadateiTo(sw, o); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		actual := sw.GetShaLike()
-
-		if !expected.EqualsSha(actual) {
-			err = errors.Errorf(
-				"expected %q but got %q",
-				expected,
-				actual,
-			)
-
-			return
-		}
-
-		return
-	}
-}
-
-func (s *store) MakeFuncSaveOneVerweise(o *sku.Transacted) func() error {
-	return func() (err error) {
-		k := o.GetKennung()
-		sh := sha.FromString(k.String())
-		defer sha.GetPool().Put(sh)
-
-		if err = s.ennuiKennung.AddSha(sh, o.Metadatei.Sha()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-}
-
-func (s *store) WriteOneObjekteMetadatei(o *sku.Transacted) (err error) {
-	if o.Metadatei.Sha().IsNull() {
-		err = errors.Errorf("null sha")
-		return
-	}
-
-	wg := iter.MakeErrorWaitGroupParallel()
-
-	wg.Do(s.MakeFuncSaveOneVerweise(o))
-
-	wg.Do(s.makeWriteMetadateiFunc(
-		s.standort.DirVerzeichnisseMetadateiKennungMutter(),
-		objekte_format.Formats.MetadateiKennungMutter(),
-		o,
-		o.Metadatei.Sha(),
-	))
-
-	wg.Do(s.makeWriteMetadateiFunc(
-		s.standort.DirVerzeichnisseMetadatei(),
-		objekte_format.Formats.Metadatei(),
-		o,
-		&o.Metadatei.SelbstMetadatei,
-	))
-
-	return wg.GetError()
 }
 
 func (s *store) readOnePath(p string) (o *sku.Transacted, err error) {

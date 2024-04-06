@@ -223,7 +223,6 @@ func (e *page) collectLocs(
 		var loc Loc
 
 		loc, err = e.readCurrentLoc(shMet, &e.br)
-
 		if err != nil {
 			if err == io.EOF {
 				err = nil
@@ -299,7 +298,6 @@ func (e *page) Flush() (err error) {
 
 		var n int64
 		n, err = current.ReadFrom(&e.br)
-
 		if err != nil {
 			if errors.Is(err, io.ErrUnexpectedEOF) && n == 0 {
 				err = io.EOF
@@ -314,7 +312,8 @@ func (e *page) Flush() (err error) {
 		return
 	}
 
-	if err = e.added.MergeStream(
+	if err = heap.MergeStream(
+		e.added,
 		func() (tz *row, err error) {
 			tz, err = getOne()
 

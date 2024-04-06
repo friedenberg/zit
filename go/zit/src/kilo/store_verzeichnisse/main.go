@@ -48,31 +48,36 @@ func init() {
 	}
 }
 
-type bs interface {
-	WriteOneObjekteMetadatei(o *sku.Transacted) (err error)
-}
-
 type Store struct {
 	standort standort.Standort
 	erworben *konfig.Compiled
 	path     string
 	schnittstellen.VerzeichnisseFactory
-	pages [PageCount]PageTuple
-	bs    bs
+	pages [PageCount]Page
+	ennuiStore
 }
 
 func MakeStore(
 	s standort.Standort,
 	k *konfig.Compiled,
-	bs bs,
 	dir string,
+	persistentMetadateiFormat objekte_format.Format,
+	options objekte_format.Options,
 ) (i *Store, err error) {
 	i = &Store{
 		standort:             s,
 		erworben:             k,
 		path:                 dir,
 		VerzeichnisseFactory: s,
-		bs:                   bs,
+	}
+
+	if err = i.ennuiStore.Initialize(
+		s,
+		persistentMetadateiFormat,
+		options,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if err = i.Initialize(); err != nil {
@@ -109,7 +114,7 @@ func (s *Store) applyKonfig(z *sku.Transacted) error {
 // func (i *Store) ReadMany(string, *metadatei.Metadatei, *[]Loc) error {}
 // func (i *Store) ReadAll(*metadatei.Metadatei, *[]Loc) error          {}
 
-func (i *Store) GetPagePair(n uint8) (p *PageTuple) {
+func (i *Store) GetPagePair(n uint8) (p *Page) {
 	p = &i.pages[n]
 	return
 }
@@ -143,6 +148,8 @@ func (i *Store) Flush(
 			return
 		}
 	}
+
+	wg.DoAfter(i.kennung.Flush)
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
@@ -208,7 +215,7 @@ func (i *Store) readFrom(
 	for n := range i.pages {
 		wg.Add(1)
 
-		go func(p *PageTuple, openFileCh chan struct{}) {
+		go func(p *Page, openFileCh chan struct{}) {
 			defer wg.Done()
 			defer func() {
 				openFileCh <- struct{}{}
