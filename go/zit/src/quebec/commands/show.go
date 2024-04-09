@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/juliett/objekte"
 	"code.linenisgreat.com/zit/src/kilo/objekte_formatter"
@@ -15,6 +16,7 @@ import (
 
 type Show struct {
 	Format string
+	Filter query.LuaFlag
 }
 
 func init() {
@@ -24,6 +26,7 @@ func init() {
 			c := &Show{}
 
 			f.StringVar(&c.Format, "format", "log", "format")
+			f.Var(&c.Filter, "filter", "lua filter")
 
 			return c
 		},
@@ -43,10 +46,10 @@ func (c Show) CompletionGattung() kennung.Gattung {
 func (c Show) DefaultGattungen() kennung.Gattung {
 	return kennung.MakeGattung(
 		gattung.Zettel,
-		gattung.Etikett,
-		gattung.Typ,
+		// gattung.Etikett,
+		// gattung.Typ,
 		// gattung.Bestandsaufnahme,
-		gattung.Kasten,
+		// gattung.Kasten,
 	)
 }
 
@@ -64,7 +67,7 @@ func (c Show) runGenericObjekteFormatterValue(
 			u.StringFormatWriterSkuTransactedShort(),
 			u.GetStore().GetEnnui(),
 			u.GetStore().ReadOneEnnui,
-      u.GetStore().GetVerzeichnisse(),
+			u.GetStore().GetVerzeichnisse(),
 		),
 	)
 
@@ -81,7 +84,23 @@ func (c Show) runGenericObjekteFormatterValue(
 	// 	return
 	// }
 
-	if err = u.GetStore().QueryWithCwd(ms, f); err != nil {
+	if err = u.GetStore().QueryWithCwd(
+    ms,
+		func(sk *sku.Transacted) (err error) {
+			if c.Filter.String() != "" {
+				if !c.Filter.ContainsSku(sk) {
+					return
+				}
+			}
+
+			if err = f(sk); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+  ); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -112,9 +131,24 @@ func (c Show) RunWithQuery(u *umwelt.Umwelt, ms *query.Group) (err error) {
 		return
 	}
 
+	f1 := iter.MakeSyncSerializer(f.MakeFormatFunc())
+
 	if err = u.GetStore().QueryWithCwd(
 		ms,
-		iter.MakeSyncSerializer(f.MakeFormatFunc()),
+		func(sk *sku.Transacted) (err error) {
+			if c.Filter.String() != "" {
+				if !c.Filter.ContainsSku(sk) {
+					return
+				}
+			}
+
+			if err = f1(sk); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return

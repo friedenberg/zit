@@ -63,7 +63,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	b := u.MakeMetaIdSetWithoutExcludedHidden(kennung.MakeGattung(gattung.Zettel))
+	b := u.MakeQueryBuilder(kennung.MakeGattung(gattung.Zettel))
 
 	var qg *query.Group
 

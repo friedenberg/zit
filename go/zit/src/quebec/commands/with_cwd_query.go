@@ -38,7 +38,7 @@ func (c commandWithCwdQuery) Complete(
 	w := sku_fmt.MakeWriterComplete(os.Stdout)
 	defer errors.DeferredCloser(&err, w)
 
-	b := u.MakeMetaIdSetWithExcludedHidden(cgg.CompletionGattung())
+	b := u.MakeQueryBuilderExcludingHidden(cgg.CompletionGattung())
 
 	var qg *query.Group
 
@@ -59,7 +59,7 @@ func (c commandWithCwdQuery) Complete(
 }
 
 func (c commandWithCwdQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	builder := u.MakeMetaIdSetWithoutExcludedHidden(
+	builder := u.MakeQueryBuilder(
 		c.DefaultGattungen(),
 	)
 

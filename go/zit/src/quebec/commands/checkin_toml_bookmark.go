@@ -143,7 +143,7 @@ func (c CheckinTomlBookmark) getUrls(
 ) (urls map[string]SkuWithUrl, err error) {
 	q := "!toml-bookmark?z"
 
-	builder := u.MakeMetaIdSetWithExcludedHidden(c.DefaultGattungen())
+	builder := u.MakeQueryBuilderExcludingHidden(c.DefaultGattungen())
 	var ids *query.Group
 
 	if ids, err = builder.BuildQueryGroup(q); err != nil {

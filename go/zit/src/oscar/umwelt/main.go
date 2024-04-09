@@ -216,22 +216,16 @@ func (u *Umwelt) GetMatcherArchiviert() query.Archiviert {
 }
 
 func (u *Umwelt) MakeKennungExpanders() (out kennung.Abbr) {
-	out.Etikett.Expand = u.GetStore().GetAbbrStore().Etiketten().ExpandStringString
-	out.Typ.Expand = u.GetStore().GetAbbrStore().Typen().ExpandStringString
-	out.Kasten.Expand = u.GetStore().GetAbbrStore().Kisten().ExpandStringString
 	out.Hinweis.Expand = u.GetStore().GetAbbrStore().Hinweis().ExpandStringString
 	out.Sha.Expand = u.GetStore().GetAbbrStore().Shas().ExpandStringString
 
-	out.Etikett.Abbreviate = u.GetStore().GetAbbrStore().Etiketten().Abbreviate
-	out.Typ.Abbreviate = u.GetStore().GetAbbrStore().Typen().Abbreviate
-	out.Kasten.Abbreviate = u.GetStore().GetAbbrStore().Kisten().Abbreviate
 	out.Hinweis.Abbreviate = u.GetStore().GetAbbrStore().Hinweis().Abbreviate
 	out.Sha.Abbreviate = u.GetStore().GetAbbrStore().Shas().Abbreviate
 
 	return
 }
 
-func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
+func (u *Umwelt) MakeQueryBuilderExcludingHidden(
 	dg kennung.Gattung,
 ) *query.Builder {
 	if dg.IsEmpty() {
@@ -240,13 +234,14 @@ func (u *Umwelt) MakeMetaIdSetWithExcludedHidden(
 
 	return query.MakeBuilder(u.Standort(), u.virtualStores["%chrome"]).
 		WithDefaultGattungen(dg).
+		WithVirtualEtiketten(u.konfig.Filters).
 		WithCwd(u.GetStore().GetCwdFiles()).
 		WithFileExtensionGetter(u.Konfig().FileExtensions).
 		WithHidden(u.GetMatcherArchiviert()).
 		WithExpanders(u.MakeKennungExpanders())
 }
 
-func (u *Umwelt) MakeMetaIdSetWithoutExcludedHidden(
+func (u *Umwelt) MakeQueryBuilder(
 	dg kennung.Gattung,
 ) *query.Builder {
 	if dg.IsEmpty() {
@@ -255,6 +250,7 @@ func (u *Umwelt) MakeMetaIdSetWithoutExcludedHidden(
 
 	return query.MakeBuilder(u.Standort(), u.virtualStores["%chrome"]).
 		WithDefaultGattungen(dg).
+		WithVirtualEtiketten(u.konfig.Filters).
 		WithCwd(u.GetStore().GetCwdFiles()).
 		WithFileExtensionGetter(u.Konfig().FileExtensions).
 		WithExpanders(u.MakeKennungExpanders())

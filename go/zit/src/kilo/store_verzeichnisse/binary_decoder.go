@@ -90,7 +90,6 @@ func (bf *binaryDecoder) readFormatExactly(
 	}
 
 	_, _, err = bf.GetContentLength()
-
 	if err != nil {
 		err = errors.Wrap(err)
 		return
@@ -150,7 +149,6 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 
 		var contentLength64 int64
 		_, contentLength64, err = bf.GetContentLength()
-
 		if err != nil {
 			err = errors.Wrap(err)
 			return
@@ -243,7 +241,6 @@ func (bf *binaryDecoder) readSigil(
 	r io.Reader,
 ) (n int64, err error) {
 	n, err = bf.binaryField.ReadFrom(r)
-
 	if err != nil {
 		err = errors.Wrap(err)
 		return
@@ -259,9 +256,7 @@ func (bf *binaryDecoder) readSigil(
 		return
 	}
 
-	if sk.IncludesHidden() {
-		sk.SetArchiviert(true)
-	}
+	sk.SetArchiviert(sk.IncludesHidden())
 
 	return
 }

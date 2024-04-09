@@ -36,12 +36,12 @@ func (ve *VirtualStoreInitable) Flush() (err error) {
 }
 
 type Virtual struct {
-	sku.VirtualStore
+	sku.Queryable
 	Kennung
 }
 
 func (ve *Virtual) ContainsSku(sk *sku.Transacted) bool {
-	if !ve.VirtualStore.ContainsSku(sk) {
+	if !ve.Queryable.ContainsSku(sk) {
 		return false
 	}
 

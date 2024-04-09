@@ -93,19 +93,8 @@ func (c *Organize) RunWithQuery(
 
 	typen := ms.GetTypen()
 
-	switch typen.Len() {
-	case 0:
-		break
-
-	case 1:
+	if typen.Len() == 1 {
 		createOrganizeFileOp.Typ = typen.Any()
-
-	default:
-		err = errors.Errorf(
-			"only one typ is supported for organize, but got %q",
-			typen,
-		)
-		return
 	}
 
 	var l sync.Mutex
@@ -224,7 +213,7 @@ func (c *Organize) RunWithQuery(
 
 		var f *os.File
 
-		if f, err = files.TempFileWithPattern(
+		if f, err = u.Standort().FileTempLocalWithTemplate(
 			"*." + u.Konfig().FileExtensions.Organize,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -234,19 +223,19 @@ func (c *Organize) RunWithQuery(
 		if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(
 			f,
 		); err != nil {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(err, "Organize File: %q", f.Name())
 			return
 		}
 
 		var ot2 *organize_text.Text
 
 		if ot2, err = c.readFromVim(u, f.Name(), createOrganizeFileResults, ms); err != nil {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(err, "Organize File: %q", f.Name())
 			return
 		}
 
 		if err = u.Lock(); err != nil {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(err, "Organize File: %q", f.Name())
 			return
 		}
 
@@ -262,7 +251,7 @@ func (c *Organize) RunWithQuery(
 			ot2,
 			getResults,
 		); err != nil {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(err, "Organize File: %q", f.Name())
 			return
 		}
 

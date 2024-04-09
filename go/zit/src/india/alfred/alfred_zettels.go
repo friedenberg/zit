@@ -29,7 +29,7 @@ func (w *Writer) zettelToItem(
 		a.Title = ks
 		a.Subtitle = es
 	} else {
-		a.Subtitle = fmt.Sprintf("%s: %s", ks, es)
+		a.Subtitle = fmt.Sprintf("%s: %s %s", z.Metadatei.Typ, ks, es)
 	}
 
 	a.Arg = ks

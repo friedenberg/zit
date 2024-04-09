@@ -37,7 +37,7 @@ func (c commandWithQuery) Complete(
 	w := sku_fmt.MakeWriterComplete(os.Stdout)
 	defer errors.DeferredCloser(&err, w)
 
-	b := u.MakeMetaIdSetWithExcludedHidden(cgg.CompletionGattung())
+	b := u.MakeQueryBuilderExcludingHidden(cgg.CompletionGattung())
 
 	var qg *query.Group
 
@@ -58,7 +58,7 @@ func (c commandWithQuery) Complete(
 }
 
 func (c commandWithQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	builder := u.MakeMetaIdSetWithExcludedHidden(c.DefaultGattungen())
+	builder := u.MakeQueryBuilderExcludingHidden(c.DefaultGattungen())
 
 	type withDefaultSigil interface {
 		DefaultSigil() kennung.Sigil

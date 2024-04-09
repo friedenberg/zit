@@ -49,7 +49,7 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	builder := u.MakeMetaIdSetWithExcludedHidden(
+	builder := u.MakeQueryBuilderExcludingHidden(
 		c.CompletionGattung(),
 	)
 

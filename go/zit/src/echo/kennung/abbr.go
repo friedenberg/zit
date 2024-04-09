@@ -17,7 +17,7 @@ type (
 			Expand     FuncExpandString
 			Abbreviate FuncAbbreviateString[sha.Sha, *sha.Sha]
 		}
-		Etikett abbrOne[Etikett, *Etikett]
+		// Etikett abbrOne[Etikett, *Etikett]
 		Typ     abbrOne[Typ, *Typ]
 		Hinweis abbrOne[Hinweis, *Hinweis]
 		Kasten  abbrOne[Kasten, *Kasten]
@@ -29,13 +29,21 @@ type (
 	}
 )
 
+func DontExpandString(v string) (string, error) {
+	return v, nil
+}
+
+func DontAbbreviateString[VPtr schnittstellen.Stringer](k VPtr) (string, error) {
+	return k.String(), nil
+}
+
 func (a Abbr) ExpanderFor(g gattung.Gattung) FuncExpandString {
 	switch g {
 	case gattung.Zettel:
 		return a.Hinweis.Expand
 
 	case gattung.Etikett:
-		return a.Etikett.Expand
+		return DontExpandString
 
 	case gattung.Typ:
 		return a.Typ.Expand
@@ -153,7 +161,7 @@ func (a Abbr) AbbreviateKennung(
 		getAbbr = a.Hinweis.AbbreviateKennung
 
 	case gattung.Etikett:
-		getAbbr = a.Etikett.AbbreviateKennung
+		getAbbr = DontAbbreviateString
 
 	case gattung.Typ:
 		getAbbr = a.Typ.AbbreviateKennung

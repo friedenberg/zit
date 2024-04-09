@@ -55,7 +55,7 @@ func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	builder := u.MakeMetaIdSetWithExcludedHidden(
+	builder := u.MakeQueryBuilderExcludingHidden(
 		kennung.MakeGattung(),
 	)
 

@@ -72,7 +72,7 @@ func (c CreateFromPaths) Run(
 	if c.Dedupe {
 		matcher := objekte_collections.MakeMutableMatchSet(toCreate)
 
-		b := c.MakeMetaIdSetWithoutExcludedHidden(kennung.MakeGattung(gattung.Zettel))
+		b := c.MakeQueryBuilder(kennung.MakeGattung(gattung.Zettel))
 
 		var qg *query.Group
 

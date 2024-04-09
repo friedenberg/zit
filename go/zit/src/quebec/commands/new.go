@@ -132,7 +132,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 				CheckoutMode: checkout_mode.ModeObjekteAndAkte,
 			}
 
-			b := u.MakeMetaIdSetWithoutExcludedHidden(
+			b := u.MakeQueryBuilder(
 				kennung.MakeGattung(gattung.Zettel),
 			).WithTransacted(
 				zts,
@@ -264,7 +264,7 @@ func (c New) editZettels(
 
 	var ms *query.Group
 
-	builder := u.MakeMetaIdSetWithExcludedHidden(kennung.MakeGattung(gattung.Zettel))
+	builder := u.MakeQueryBuilderExcludingHidden(kennung.MakeGattung(gattung.Zettel))
 
 	if ms, err = builder.WithCheckedOut(zsc).BuildQueryGroup(); err != nil {
 		err = errors.Wrap(err)

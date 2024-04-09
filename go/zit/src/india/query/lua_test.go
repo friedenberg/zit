@@ -12,7 +12,6 @@ func TestLuaFalse(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	m, err := MakeLua(
-		kennung.Index{},
 		`function contains_matchable(sku) return false end`,
 	)
 	if err != nil {
@@ -35,7 +34,6 @@ func TestMatcherLuaTrue(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	m, err := MakeLua(
-		kennung.Index{},
 		`function contains_matchable(sku) return true end`,
 	)
 	if err != nil {

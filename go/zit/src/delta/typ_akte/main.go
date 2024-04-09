@@ -18,6 +18,19 @@ func Default() (t V0) {
 	return
 }
 
+func DefaultEtikettLuaV0() (t V0) {
+	t = V0{
+		InlineAkte:     true,
+		FileExtension:  "lua",
+		Formatters:     make(map[string]script_config.WithOutputFormat),
+		VimSyntaxType:  "lua",
+		Actions:        make(map[string]script_config.ScriptConfig),
+		EtikettenRules: make(map[string]etikett_rule.Rule),
+	}
+
+	return
+}
+
 func MakeObjekte() (t *V0) {
 	t = &V0{
 		Formatters:     make(map[string]script_config.WithOutputFormat),

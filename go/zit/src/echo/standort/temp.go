@@ -1,6 +1,7 @@
 package standort
 
 import (
+	"fmt"
 	"math/rand"
 	"os"
 	"path"
@@ -33,7 +34,7 @@ func (s Standort) DirTempOS() (d string, err error) {
 }
 
 func (s Standort) DirTempLocal() string {
-	return s.DirZit("tmp")
+	return s.DirZit(fmt.Sprintf("tmp-%d", s.pid))
 }
 
 func (s Standort) FileTempOS() (f *os.File, err error) {
@@ -46,7 +47,16 @@ func (s Standort) FileTempOS() (f *os.File, err error) {
 }
 
 func (s Standort) FileTempLocal() (f *os.File, err error) {
-	if f, err = os.CreateTemp(s.DirTempLocal(), ""); err != nil {
+	if f, err = s.FileTempLocalWithTemplate(""); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s Standort) FileTempLocalWithTemplate(t string) (f *os.File, err error) {
+	if f, err = os.CreateTemp(s.DirTempLocal(), t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

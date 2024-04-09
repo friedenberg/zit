@@ -165,15 +165,9 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 }
 
 func (i *indexAbbr) GetAbbr() (out kennung.Abbr) {
-	out.Etikett.Expand = i.Etiketten().ExpandStringString
-	out.Typ.Expand = i.Typen().ExpandStringString
-	out.Kasten.Expand = i.Kisten().ExpandStringString
 	out.Hinweis.Expand = i.Hinweis().ExpandStringString
 	out.Sha.Expand = i.Shas().ExpandStringString
 
-	out.Etikett.Abbreviate = i.Etiketten().Abbreviate
-	out.Typ.Abbreviate = i.Typen().Abbreviate
-	out.Kasten.Abbreviate = i.Kisten().Abbreviate
 	out.Hinweis.Abbreviate = i.Hinweis().Abbreviate
 	out.Sha.Abbreviate = i.Shas().Abbreviate
 

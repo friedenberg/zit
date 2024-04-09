@@ -26,6 +26,7 @@ type Standort struct {
 	age       *age.Age
 	angeboren angeboren.Konfig
 	debug     debug.Options
+	pid       int
 }
 
 func Make(
@@ -41,6 +42,7 @@ func Make(
 	s.basePath = o.BasePath
 	s.debug = o.Debug
 	s.cwd = o.cwd
+	s.pid = os.Getpid()
 
 	if ok := files.Exists(s.DirZit()); !ok {
 		err = errors.Wrap(ErrNotInZitDir{})
@@ -140,7 +142,6 @@ func (s Standort) Executable() string {
 func (s Standort) RelToCwdOrSame(p string) (p1 string) {
 	var err error
 	p1, err = filepath.Rel(s.Cwd(), p)
-
 	if err != nil {
 		p1 = p
 	}
