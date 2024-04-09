@@ -12,15 +12,10 @@ import (
 
 type CommandWithQuery interface {
 	RunWithQuery(store *umwelt.Umwelt, ids *query.Group) error
-	DefaultGattungen() kennung.Gattung
 }
 
 type commandWithQuery struct {
 	CommandWithQuery
-}
-
-type CompletionGattungGetter interface {
-	CompletionGattung() kennung.Gattung
 }
 
 func (c commandWithQuery) Complete(
@@ -58,24 +53,28 @@ func (c commandWithQuery) Complete(
 }
 
 func (c commandWithQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	builder := u.MakeQueryBuilderExcludingHidden(c.DefaultGattungen())
+	b := u.MakeQueryBuilderExcludingHidden(kennung.MakeGattung())
 
-	type withDefaultSigil interface {
-		DefaultSigil() kennung.Sigil
+	if dgg, ok := c.CommandWithQuery.(DefaultGattungGetter); ok {
+		b = b.WithDefaultGattungen(dgg.DefaultGattungen())
 	}
 
-	if wds, ok := c.CommandWithQuery.(withDefaultSigil); ok {
-		builder.WithDefaultSigil(wds.DefaultSigil())
+	if dsg, ok := c.CommandWithQuery.(DefaultSigilGetter); ok {
+		b.WithDefaultSigil(dsg.DefaultSigil())
 	}
 
-	var ids *query.Group
+	if qbm, ok := c.CommandWithQuery.(QueryBuilderModifier); ok {
+		qbm.ModifyBuilder(b)
+	}
 
-	if ids, err = builder.BuildQueryGroup(args...); err != nil {
+	var qg *query.Group
+
+	if qg, err = b.BuildQueryGroup(args...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = c.RunWithQuery(u, ids); err != nil {
+	if err = c.RunWithQuery(u, qg); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -65,7 +65,7 @@ func init() {
 				"checkout each Akte and run a utility",
 			)
 			f.BoolVar(&c.Organize, "organize", false, "")
-			c.ProtoZettel.AddToFlagSet(f)
+			c.AddToFlagSet(f)
 
 			errors.TodoP2(
 				"add support for restricted query to specific gattung",
@@ -75,10 +75,8 @@ func init() {
 	)
 }
 
-func (c Add) DefaultGattungen() kennung.Gattung {
-	return kennung.MakeGattung(
-		gattung.Zettel,
-	)
+func (c Add) ModifyBuilder(b *query.Builder) {
+	b.WithDefaultGattungen(kennung.MakeGattung(gattung.Zettel))
 }
 
 func (c Add) RunWithCwdQuery(

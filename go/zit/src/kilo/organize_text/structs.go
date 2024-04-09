@@ -60,7 +60,7 @@ func (z *obj) String() string {
 func sortObjSet(
 	s schnittstellen.MutableSetLike[*obj],
 ) (out []*obj) {
-	out = iter.Elements[*obj](s)
+	out = iter.Elements(s)
 
 	sort.Slice(out, func(i, j int) bool {
 		switch {

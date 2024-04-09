@@ -7,30 +7,25 @@ import (
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
-	"code.linenisgreat.com/zit/src/kilo/cwd"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 
-type CommandWithCwdQuery interface {
-	RunWithCwdQuery(
-		store *umwelt.Umwelt,
-		ms *query.Group,
-		cwdFiles *cwd.CwdFiles,
-	) error
+type CommandWithQuery2 interface {
+	RunWithQuery(store *umwelt.Umwelt, ids *query.Group) error
 }
 
-type commandWithCwdQuery struct {
-	CommandWithCwdQuery
+type commandWithQuery2 struct {
+	CommandWithQuery2
 }
 
-func (c commandWithCwdQuery) Complete(
+func (c commandWithQuery2) Complete(
 	u *umwelt.Umwelt,
 	args ...string,
 ) (err error) {
 	var cgg CompletionGattungGetter
 	ok := false
 
-	if cgg, ok = c.CommandWithCwdQuery.(CompletionGattungGetter); !ok {
+	if cgg, ok = c.CommandWithQuery2.(CompletionGattungGetter); !ok {
 		return
 	}
 
@@ -57,16 +52,12 @@ func (c commandWithCwdQuery) Complete(
 	return
 }
 
-func (c commandWithCwdQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	b := u.MakeQueryBuilder(kennung.MakeGattung())
+func (c commandWithQuery2) Run(u *umwelt.Umwelt, args ...string) (err error) {
+	b := u.MakeQueryBuilderExcludingHidden(kennung.MakeGattung())
 
-	if dgg, ok := c.CommandWithCwdQuery.(DefaultGattungGetter); ok {
-		b.WithDefaultGattungen(dgg.DefaultGattungen())
-	}
-
-	if qbm, ok := c.CommandWithCwdQuery.(QueryBuilderModifier); ok {
-		qbm.ModifyBuilder(b)
-	}
+  if qbm, ok := c.CommandWithQuery2.(QueryBuilderModifier); ok {
+    qbm.ModifyBuilder(b)
+  }
 
 	var qg *query.Group
 
@@ -75,7 +66,7 @@ func (c commandWithCwdQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if err = c.RunWithCwdQuery(u, qg, u.GetStore().GetCwdFiles()); err != nil {
+	if err = c.RunWithQuery(u, qg); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
