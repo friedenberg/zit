@@ -318,6 +318,10 @@ func (b *Builder) addDefaultsIfNecessary(qg *Group) {
 		return
 	}
 
+	if b.requireNonEmptyQuery && qg.IsEmpty() {
+		return
+	}
+
 	g := kennung.MakeGattung()
 	dq, ok := qg.UserQueries[g]
 
