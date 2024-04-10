@@ -39,8 +39,6 @@ func registerCommand(n string, makeFunc func(*flag.FlagSet) Command) {
 		Command: c,
 		FlagSet: f,
 	}
-
-	return
 }
 
 func registerCommandSansUmwelt(n string, makeFunc func(*flag.FlagSet) Command) {
@@ -57,28 +55,6 @@ func registerCommandSansUmwelt(n string, makeFunc func(*flag.FlagSet) Command) {
 		Command:    c,
 		FlagSet:    f,
 	}
-
-	return
-}
-
-func registerCommandWithCwdQuery(
-	n string,
-	makeFunc func(*flag.FlagSet) CommandWithCwdQuery,
-) {
-	f := flag.NewFlagSet(n, flag.ExitOnError)
-
-	c := makeFunc(f)
-
-	if _, ok := commands[n]; ok {
-		panic("command added more than once: " + n)
-	}
-
-	commands[n] = command{
-		Command: commandWithCwdQuery{CommandWithCwdQuery: c},
-		FlagSet: f,
-	}
-
-	return
 }
 
 func registerCommandWithQuery(
@@ -99,6 +75,4 @@ func registerCommandWithQuery(
 		},
 		FlagSet: f,
 	}
-
-	return
 }

@@ -156,6 +156,10 @@ func (s *Store) CheckoutOne(
 		return
 	}
 
+	if s.GetKonfig().DryRun {
+		return
+	}
+
 	var originalFilename, filename string
 
 	if originalFilename, filename, err = s.filenameForTransacted(

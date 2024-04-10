@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/india/query"
-	"code.linenisgreat.com/zit/src/kilo/cwd"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 	"code.linenisgreat.com/zit/src/papa/user_ops"
 )
@@ -17,9 +16,9 @@ type Checkin struct {
 }
 
 func init() {
-	registerCommandWithCwdQuery(
+	registerCommandWithQuery(
 		"checkin",
-		func(f *flag.FlagSet) CommandWithCwdQuery {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Checkin{}
 
 			f.BoolVar(&c.Delete, "delete", false, "the checked-out file")
@@ -39,10 +38,9 @@ func (c Checkin) DefaultGattungen() kennung.Gattung {
 	return kennung.MakeGattung()
 }
 
-func (c Checkin) RunWithCwdQuery(
+func (c Checkin) RunWithQuery(
 	u *umwelt.Umwelt,
 	ms *query.Group,
-	pz *cwd.CwdFiles,
 ) (err error) {
 	op := user_ops.Checkin{
 		Delete: c.Delete,

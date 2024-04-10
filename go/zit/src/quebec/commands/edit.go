@@ -14,7 +14,6 @@ import (
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/query"
-	"code.linenisgreat.com/zit/src/kilo/cwd"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 	"code.linenisgreat.com/zit/src/papa/user_ops"
 )
@@ -26,9 +25,9 @@ type Edit struct {
 }
 
 func init() {
-	registerCommandWithCwdQuery(
+	registerCommandWithQuery(
 		"edit",
-		func(f *flag.FlagSet) CommandWithCwdQuery {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Edit{
 				CheckoutMode: checkout_mode.ModeObjekteOnly,
 			}
@@ -64,10 +63,9 @@ func (c Edit) DefaultGattungen() kennung.Gattung {
 	)
 }
 
-func (c Edit) RunWithCwdQuery(
+func (c Edit) RunWithQuery(
 	u *umwelt.Umwelt,
 	ms *query.Group,
-	pz *cwd.CwdFiles,
 ) (err error) {
 	options := checkout_options.Options{
 		CheckoutMode: c.CheckoutMode,

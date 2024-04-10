@@ -38,9 +38,9 @@ type Add struct {
 }
 
 func init() {
-	registerCommandWithCwdQuery(
+	registerCommandWithQuery(
 		"add",
-		func(f *flag.FlagSet) CommandWithCwdQuery {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Add{
 				ProtoZettel: zettel.MakeEmptyProtoZettel(),
 			}
@@ -76,14 +76,16 @@ func init() {
 }
 
 func (c Add) ModifyBuilder(b *query.Builder) {
-	b.WithDefaultGattungen(kennung.MakeGattung(gattung.Zettel))
+	b.WithDefaultGattungen(kennung.MakeGattung(gattung.Zettel)).
+		WithDoNotMatchEmpty()
 }
 
-func (c Add) RunWithCwdQuery(
+func (c Add) RunWithQuery(
 	u *umwelt.Umwelt,
 	qg *query.Group,
-	pz *cwd.CwdFiles,
 ) (err error) {
+	pz := u.GetStore().GetCwdFiles()
+
 	zettelsFromAkteOp := user_ops.ZettelFromExternalAkte{
 		Umwelt:      u,
 		ProtoZettel: c.ProtoZettel,

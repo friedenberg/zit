@@ -47,6 +47,11 @@ type Builder struct {
 	debug                      bool
 }
 
+func (b *Builder) WithDoNotMatchEmpty() *Builder {
+	b.doNotMatchEmpty = true
+	return b
+}
+
 func (mb *Builder) WithChrome(vs *VirtualStoreInitable) *Builder {
 	mb.virtualStores["%chrome"] = vs
 
