@@ -217,7 +217,7 @@ func (q *Query) ContainsSku(sk *sku.Transacted) bool {
 	}
 
 	if len(q.Children) == 0 {
-		return len(q.Kennung) == 0
+		return len(q.Kennung) == 0 && q.MatchOnEmpty
 	} else if !q.Exp.ContainsSku(sk) {
 		return false
 	}

@@ -40,15 +40,27 @@ type Builder struct {
 	hidden                     sku.Query
 	defaultGattungen           kennung.Gattung
 	defaultSigil               kennung.Sigil
+	permittedSigil             kennung.Sigil
 	virtualStores              map[string]*VirtualStoreInitable
 	virtualEtikettenBeforeInit map[string]string
 	virtualEtiketten           map[string]*Lua
 	doNotMatchEmpty            bool
 	debug                      bool
+	requireNonEmptyQuery       bool
+}
+
+func (b *Builder) WithPermittedSigil(s kennung.Sigil) *Builder {
+	b.permittedSigil.Add(s)
+	return b
 }
 
 func (b *Builder) WithDoNotMatchEmpty() *Builder {
 	b.doNotMatchEmpty = true
+	return b
+}
+
+func (b *Builder) WithRequireNonEmptyQuery() *Builder {
+	b.requireNonEmptyQuery = true
 	return b
 }
 
@@ -507,7 +519,7 @@ LOOP:
 		return
 	}
 
-	if q.Gattung.IsEmpty() {
+	if q.Gattung.IsEmpty() && !b.requireNonEmptyQuery {
 		q.Gattung = b.defaultGattungen
 	}
 
@@ -546,6 +558,11 @@ LOOP:
 
 			if err = s.Set(el); err != nil {
 				err = errors.Wrap(err)
+				return
+			}
+
+			if !b.permittedSigil.IsEmpty() && !b.permittedSigil.ContainsOneOf(s) {
+				err = errors.Errorf("cannot contain sigil %s", s)
 				return
 			}
 

@@ -9,6 +9,10 @@ import (
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
+type Reducer interface {
+	Reduce(*Builder) error
+}
+
 type Cwd interface {
 	sku.Query
 	GetCwdFDs() fd.Set

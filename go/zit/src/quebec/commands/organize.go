@@ -57,14 +57,11 @@ func init() {
 	)
 }
 
-func (c *Organize) DefaultGattungen() kennung.Gattung {
-	return kennung.MakeGattung(
-		gattung.Zettel,
-	)
-}
-
-func (c *Organize) DefaultSigil() kennung.Sigil {
-	return kennung.SigilSchwanzen
+func (c *Organize) ModifyBuilder(b *query.Builder) {
+	b.
+		WithDefaultSigil(kennung.SigilSchwanzen).
+		WithDefaultGattungen(kennung.MakeGattung(gattung.Zettel)).
+		WithRequireNonEmptyQuery()
 }
 
 func (c *Organize) CompletionGattung() kennung.Gattung {

@@ -51,10 +51,6 @@ func (matcher *Exp) MatcherLen() int {
 }
 
 func (e *Exp) Reduce(b *Builder) (err error) {
-	type reducer interface {
-		Reduce(*Builder) error
-	}
-
 	e.MatchOnEmpty = !b.doNotMatchEmpty
 	chillen := make([]sku.Query, 0, len(e.Children))
 
@@ -75,7 +71,7 @@ func (e *Exp) Reduce(b *Builder) (err error) {
 				continue
 			}
 
-		case reducer:
+		case Reducer:
 			if err = mt.Reduce(b); err != nil {
 				err = errors.Wrap(err)
 				return
