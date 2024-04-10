@@ -78,9 +78,11 @@ func (op CommitOrganizeFile) run(
 	// 	return
 	// }
 
-	if err = u.GetStore().UpdateManyMetadatei(cs.Changed); err != nil {
-		err = errors.Wrap(err)
-		return
+	for _, changed := range cs.Changed {
+		if _, err = u.GetStore().CreateOrUpdateTransacted(changed); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

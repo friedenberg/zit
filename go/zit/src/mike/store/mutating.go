@@ -286,7 +286,26 @@ func (s *Store) CreateOrUpdateCheckedOut(
 func (s *Store) CreateOrUpdateTransacted(
 	in *sku.Transacted,
 ) (out *sku.Transacted, err error) {
-	return s.CreateOrUpdate(in, in.GetKennung())
+	if in.Kennung.IsEmpty() {
+		if in.GetGattung() != gattung.Zettel {
+			err = errors.Errorf("only Zettel is supported")
+			return
+		}
+
+		if out, err = s.Create(in); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+    return
+	}
+
+	if out, err = s.CreateOrUpdate(in, in.GetKennung()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 // TODO-project-2022-zit-collapse_skus transition this to accepting checked out
@@ -694,34 +713,6 @@ func (s *Store) UpdateKonfig(
 		&kennung.Konfig{},
 		sh,
 	)
-}
-
-func (s *Store) UpdateManyMetadatei(
-	incoming sku.TransactedSet,
-) (err error) {
-	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte.ErrLockRequired{
-			Operation: "update many metadatei",
-		}
-
-		return
-	}
-
-	if err = incoming.Each(
-		func(mwk *sku.Transacted) (err error) {
-			if _, err = s.CreateOrUpdateTransacted(mwk); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }
 
 func (s *Store) RevertTo(

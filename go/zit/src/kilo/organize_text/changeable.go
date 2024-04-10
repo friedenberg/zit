@@ -4,138 +4,29 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/golf/compare_map"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
-func (a *Assignment) addToCompareMap(
-	ot *Text,
-	m Metadatei,
-	es kennung.EtikettSet,
-	out *compare_map.CompareMap,
-) (err error) {
-	mes := es.CloneMutableSetPtrLike()
+func key(sk *sku.Transacted) string {
+	if sk.Kennung.IsEmpty() {
+		s := sk.Metadatei.Bezeichnung.String()
 
-	var es1 kennung.EtikettSet
-
-	if es1, err = a.expandedEtiketten(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	es1.Each(mes.Add)
-	es = mes.CloneSetPtrLike()
-
-	if err = a.Named.Each(
-		func(z *obj) (err error) {
-			if z.Kennung.String() == "" {
-				panic(fmt.Sprintf("%s: Kennung is nil", z))
-			}
-
-			fk := kennung.FormattedString(&z.Kennung)
-			out.Named.Add(fk, z.Metadatei.Bezeichnung)
-
-			for _, e := range iter.SortedValues[kennung.Etikett](es) {
-				out.Named.AddEtikett(fk, e, z.Metadatei.Bezeichnung)
-			}
-
-			for _, e := range iter.Elements[kennung.Etikett](m.EtikettSet) {
-				errors.TodoP4("add typ")
-				out.Named.AddEtikett(fk, e, z.Metadatei.Bezeichnung)
-			}
-
-			if ot.Konfig.NewOrganize {
-				if err = z.Metadatei.GetEtiketten().EachPtr(
-					func(e *kennung.Etikett) (err error) {
-						if a.Contains(e) {
-							return
-						}
-
-						out.Named.AddEtikett(fk, *e, z.Metadatei.Bezeichnung)
-						return
-					},
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = a.Unnamed.Each(
-		func(z *obj) (err error) {
-			out.Unnamed.Add(
-				z.Metadatei.Bezeichnung.String(),
-				z.Metadatei.Bezeichnung,
-			)
-
-			for _, e := range iter.SortedValues[kennung.Etikett](es) {
-				out.Unnamed.AddEtikett(
-					z.Metadatei.Bezeichnung.String(),
-					e,
-					z.Metadatei.Bezeichnung,
-				)
-			}
-
-			for _, e := range iter.Elements[kennung.Etikett](m.EtikettSet) {
-				errors.TodoP4("add typ")
-				out.Unnamed.AddEtikett(
-					z.Metadatei.Bezeichnung.String(),
-					e,
-					z.Metadatei.Bezeichnung,
-				)
-			}
-
-			if ot.Konfig.NewOrganize {
-				if err = z.Metadatei.GetEtiketten().EachPtr(
-					func(e *kennung.Etikett) (err error) {
-						if a.Contains(e) {
-							return
-						}
-
-						out.Named.AddEtikett(
-							z.Metadatei.Bezeichnung.String(),
-							*e,
-							z.Metadatei.Bezeichnung,
-						)
-
-						return
-					},
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	for _, c := range a.Children {
-		if err = c.addToCompareMap(ot, m, es, out); err != nil {
-			err = errors.Wrap(err)
-			return
+		if s == "" {
+			panic("empty key")
 		}
-	}
 
-	return
+		return s
+	} else {
+		return sk.Kennung.String()
+	}
 }
 
 func (ot *Text) GetSkus(
 	original sku.TransactedSet,
-) (out2 sku.TransactedSet, err error) {
-	out := sku.MakeTransactedMutableSet()
-	out2 = out
+) (out map[string]*sku.Transacted, err error) {
+	out = make(map[string]*sku.Transacted)
 
 	if err = ot.addToSet(
 		ot,
@@ -151,7 +42,7 @@ func (ot *Text) GetSkus(
 
 func (a *Assignment) addToSet(
 	ot *Text,
-	out sku.TransactedMutableSet,
+	out map[string]*sku.Transacted,
 	original sku.TransactedSet,
 ) (err error) {
 	expanded := kennung.MakeEtikettMutableSet()
@@ -166,7 +57,7 @@ func (a *Assignment) addToSet(
 			var z *sku.Transacted
 			ok := false
 
-			if z, ok = out.Get(out.Key(&o.Transacted)); !ok {
+			if z, ok = out[key(&o.Transacted)]; !ok {
 				z = sku.GetTransactedPool().Get()
 
 				if err = z.SetFromSkuLike(&o.Transacted); err != nil {
@@ -185,10 +76,7 @@ func (a *Assignment) addToSet(
 					z.Metadatei.Typ.ResetWith(ot.Metadatei.Typ)
 				}
 
-				if err = out.Add(z); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+				out[key(z)] = z
 
 				zPrime, hasOriginal := original.Get(original.Key(&o.Transacted))
 
@@ -249,8 +137,72 @@ func (a *Assignment) addToSet(
 	}
 
 	if err = a.Unnamed.Each(
-		func(z *obj) (err error) {
-			// TODO unnamed
+		func(o *obj) (err error) {
+			var z *sku.Transacted
+			ok := false
+
+			if z, ok = out[key(&o.Transacted)]; !ok {
+				z = sku.GetTransactedPool().Get()
+
+				if err = z.SetFromSkuLike(&o.Transacted); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				z.Kennung.SetGattung(gattung.Zettel)
+
+				if err = ot.EachPtr(
+					z.Metadatei.AddEtikettPtr,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if !ot.Metadatei.Typ.IsEmpty() {
+					z.Metadatei.Typ.ResetWith(ot.Metadatei.Typ)
+				}
+
+				out[key(z)] = z
+
+				if !ot.Metadatei.Typ.IsEmpty() {
+					z.Metadatei.Typ.ResetWith(ot.Metadatei.Typ)
+				}
+			}
+
+			if err = z.Metadatei.Bezeichnung.Set(
+				o.Metadatei.Bezeichnung.String(),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if !o.Metadatei.Typ.IsEmpty() {
+				if err = z.Metadatei.Typ.Set(
+					o.Metadatei.Typ.String(),
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
+			z.Metadatei.Comments = append(
+				z.Metadatei.Comments,
+				o.Metadatei.Comments...,
+			)
+
+			if err = o.Metadatei.GetEtiketten().EachPtr(
+				z.Metadatei.AddEtikettPtr,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = expanded.EachPtr(
+				z.Metadatei.AddEtikettPtr,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 
 			return
 		},
