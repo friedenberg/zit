@@ -38,7 +38,7 @@ func (c ReadOrganizeFile) RunWithFile(
 
 func (c ReadOrganizeFile) Run(q *query.Group) (ot *organize_text.Text, err error) {
 	otFlags := organize_text.MakeFlags()
-	c.Umwelt.ApplyToOrganizeOptions(&otFlags.Options)
+	c.ApplyToOrganizeOptions(&otFlags.Options)
 
 	if ot, err = organize_text.New(
 		otFlags.GetOptions(
@@ -46,6 +46,7 @@ func (c ReadOrganizeFile) Run(q *query.Group) (ot *organize_text.Text, err error
 			q,
 			c.SkuFormatOldOrganize(),
 			c.SkuFmtNewOrganize(),
+			c.MakeKennungExpanders(),
 		),
 	); err != nil {
 		err = errors.Wrap(err)

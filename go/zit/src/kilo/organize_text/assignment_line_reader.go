@@ -281,7 +281,7 @@ func (ar *assignmentLineReader) readOneObj(r *catgut.RingBuffer) (err error) {
 		return
 	}
 
-	if err = ar.options.Expanders.ExpandHinweisOnly(&z.Kennung); err != nil {
+	if err = ar.options.Abbr.ExpandHinweisOnly(&z.Kennung); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

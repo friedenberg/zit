@@ -75,7 +75,7 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 	lw := format.NewLineWriter()
 
-	kopf, schwanz := ot.MaxKopfUndSchwanz()
+	kopf, schwanz := ot.MaxKopfUndSchwanz(ot.Options)
 
 	l := ot.MaxLen()
 

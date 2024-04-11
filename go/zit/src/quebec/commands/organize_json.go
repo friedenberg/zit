@@ -82,6 +82,7 @@ func (c *OrganizeJSON) RunWithQuery(
 			ms,
 			u.SkuFormatOldOrganize(),
 			u.SkuFmtNewOrganize(),
+			u.MakeKennungExpanders(),
 		),
 	}
 

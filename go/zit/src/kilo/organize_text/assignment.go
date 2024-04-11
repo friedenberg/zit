@@ -86,10 +86,21 @@ func (a Assignment) MaxLen() (m int) {
 	return
 }
 
-func (a Assignment) MaxKopfUndSchwanz() (kopf, schwanz int) {
+func (a Assignment) MaxKopfUndSchwanz(
+	o Options,
+) (kopf, schwanz int) {
 	a.Named.Each(
 		func(z *obj) (err error) {
 			oKopf, oSchwanz := z.Kennung.LenKopfUndSchwanz()
+
+			if o.PrintOptions.Abbreviations.Hinweisen {
+				if oKopf, oSchwanz, err = o.Abbr.LenKopfUndSchwanz(
+					&z.Kennung,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
 
 			if oKopf > kopf {
 				kopf = oKopf
@@ -104,7 +115,7 @@ func (a Assignment) MaxKopfUndSchwanz() (kopf, schwanz int) {
 	)
 
 	for _, c := range a.Children {
-		zKopf, zSchwanz := c.MaxKopfUndSchwanz()
+		zKopf, zSchwanz := c.MaxKopfUndSchwanz(o)
 
 		if zKopf > kopf {
 			kopf = zKopf

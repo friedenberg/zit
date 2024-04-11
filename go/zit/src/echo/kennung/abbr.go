@@ -17,10 +17,8 @@ type (
 			Expand     FuncExpandString
 			Abbreviate FuncAbbreviateString[sha.Sha, *sha.Sha]
 		}
-		// Etikett abbrOne[Etikett, *Etikett]
-		Typ     abbrOne[Typ, *Typ]
+		// TODO switch to Kennung2
 		Hinweis abbrOne[Hinweis, *Hinweis]
-		Kasten  abbrOne[Kasten, *Kasten]
 	}
 
 	abbrOne[V KennungLike[V], VPtr KennungLikePtr[V]] struct {
@@ -42,14 +40,8 @@ func (a Abbr) ExpanderFor(g gattung.Gattung) FuncExpandString {
 	case gattung.Zettel:
 		return a.Hinweis.Expand
 
-	case gattung.Etikett:
+	case gattung.Etikett, gattung.Typ, gattung.Kasten:
 		return DontExpandString
-
-	case gattung.Typ:
-		return a.Typ.Expand
-
-	case gattung.Kasten:
-		return a.Kasten.Expand
 
 	default:
 		return nil
@@ -84,6 +76,39 @@ func (ao abbrOne[V, VPtr]) AbbreviateKennung(
 		err = errors.Wrap(err)
 		return
 	}
+
+	return
+}
+
+func (a Abbr) LenKopfUndSchwanz(
+	in *Kennung2,
+) (kopf, schwanz int, err error) {
+	if in.GetGattung() != gattung.Zettel || a.Hinweis.Abbreviate == nil {
+		kopf, schwanz = in.LenKopfUndSchwanz()
+		return
+	}
+
+	var h Hinweis
+
+	if err = h.Set(in.String()); err != nil {
+		err = nil
+		return
+	}
+
+	var abbr string
+
+	if abbr, err = a.Hinweis.AbbreviateKennung(h); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = h.Set(abbr); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	kopf = len(h.Kopf())
+	schwanz = len(h.Schwanz())
 
 	return
 }
@@ -160,14 +185,8 @@ func (a Abbr) AbbreviateKennung(
 	case gattung.Zettel:
 		getAbbr = a.Hinweis.AbbreviateKennung
 
-	case gattung.Etikett:
+	case gattung.Etikett, gattung.Typ, gattung.Kasten:
 		getAbbr = DontAbbreviateString
-
-	case gattung.Typ:
-		getAbbr = a.Typ.AbbreviateKennung
-
-	case gattung.Kasten:
-		getAbbr = a.Kasten.AbbreviateKennung
 
 	case gattung.Konfig:
 		out = in

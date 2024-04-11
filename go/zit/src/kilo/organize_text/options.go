@@ -37,7 +37,7 @@ type Options struct {
 	ExtraEtiketten    kennung.EtikettSet
 	Transacted        schnittstellen.SetLike[*sku.Transacted]
 
-	Expanders kennung.Abbr
+	Abbr kennung.Abbr
 
 	UsePrefixJoints        bool
 	UseRightAlignedIndents bool
@@ -119,6 +119,7 @@ func (o *Flags) GetOptions(
 	q *query.Group,
 	organize *sku_fmt.Organize,
 	organizeNew *sku_fmt.OrganizeNew,
+	abbr kennung.Abbr,
 ) Options {
 	o.once.Do(
 		func() {
@@ -152,6 +153,7 @@ func (o *Flags) GetOptions(
 	}
 
 	o.PrintOptions = printOptions
+	o.Abbr = abbr
 
 	return o.Options
 }

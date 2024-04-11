@@ -21,6 +21,24 @@ cmd_def_organize=(
 	-new-organize=true
 )
 
+function organize_empty { # @test
+	run_zit organize "${cmd_def_organize[@]}" -mode output-only
+	assert_success
+	assert_output_unsorted - <<-EOM
+	EOM
+}
+
+function organize_empty_commit { # @test
+	run_zit organize "${cmd_def_organize[@]}" -mode commit-directly <<-EOM
+		- test
+	EOM
+
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "test"]
+	EOM
+}
+
 function organize_simple { # @test
 	actual="$(mktemp)"
 	run_zit organize "${cmd_def_organize[@]}" -mode output-only :z,e,t >"$actual"
@@ -1128,22 +1146,20 @@ function organize_v5_zettels_in_correct_places { # @test
 }
 
 function organize_v5_etiketten_correct { # @test
-	first_organize="$(mktemp)"
-	{
-		echo
-		echo "# test1"
-		echo "## -wow"
-		echo
-		echo "- zettel bez"
-	} >"$first_organize"
 
-	run_zit organize "${cmd_def_organize[@]}" -mode commit-directly <"$first_organize"
+	run_zit organize "${cmd_def_organize[@]}" -mode commit-directly <<-EOM
+		# test1
+		## -wow
+
+		- zettel bez
+	EOM
 	assert_success
 
-	expected_etiketten="$(mktemp)"
-	{
-		echo test1-wow
-	} >"$expected_etiketten"
+	assert_output - <<-EOM
+		[test1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[test1-wow@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "zettel bez" test1-wow]
+	EOM
 
 	mkdir -p one
 	{
@@ -1176,7 +1192,6 @@ function organize_v5_etiketten_correct { # @test
 
 	run_zit checkin one/uno.zettel
 	assert_output - <<-EOM
-		[test1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[test1-ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md test1-ok test4]
 	EOM

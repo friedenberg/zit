@@ -59,11 +59,13 @@ func (c *FormatOrganize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
+	// TODO move Abbr as required arg
 	ot.Options = c.Flags.GetOptions(
 		u.Konfig().PrintOptions,
 		nil,
 		u.SkuFormatOldOrganize(),
 		u.SkuFmtNewOrganize(),
+		u.MakeKennungExpanders(),
 	)
 
 	if err = ot.Refine(); err != nil {

@@ -258,7 +258,7 @@ func (u *Umwelt) MakeQueryBuilder(
 
 func (u *Umwelt) ApplyToOrganizeOptions(oo *organize_text.Options) {
 	oo.Konfig = u.Konfig()
-	oo.Expanders = u.MakeKennungExpanders()
+	oo.Abbr = u.MakeKennungExpanders()
 }
 
 func (u *Umwelt) GetVirtualStores() map[string]*query.VirtualStoreInitable {

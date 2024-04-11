@@ -133,6 +133,7 @@ func (c Add) RunWithQuery(
 			qg,
 			u.SkuFormatOldOrganize(),
 			u.SkuFmtNewOrganize(),
+			u.MakeKennungExpanders(),
 		),
 	}
 

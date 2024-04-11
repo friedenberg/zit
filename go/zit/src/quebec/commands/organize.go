@@ -85,6 +85,7 @@ func (c *Organize) RunWithQuery(
 			ms,
 			u.SkuFormatOldOrganize(),
 			u.SkuFmtNewOrganize(),
+			u.MakeKennungExpanders(),
 		),
 	}
 
