@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/chrest"
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/src/delta/gattung"
@@ -51,6 +52,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"etiketten-all",
 		"etiketten-expanded",
 		"etiketten-implicit",
+		"toml-json",
 		"json",
 		"json-toml-bookmark",
 		"kennung",
@@ -341,6 +343,35 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			var j sku_fmt.Json
 
 			if err = j.FromTransacted(o, s); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = enc.Encode(j); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+	case "toml-json":
+		enc := json.NewEncoder(out)
+
+		type tomlJson struct {
+			sku_fmt.Json
+			Akte map[string]interface{} `json:"akte"`
+		}
+
+		return func(o *sku.Transacted) (err error) {
+			var j tomlJson
+
+			if err = j.FromTransacted(o, s); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = toml.Unmarshal([]byte(j.Json.Akte), &j.Akte); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
