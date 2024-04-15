@@ -18,17 +18,17 @@ import (
 )
 
 func (s *Store) tryCommit(
-	t *sku.Transacted,
+	kinder *sku.Transacted,
 	mode objekte_mode.Mode,
 ) (err error) {
 	// TODO figure out how to move this to after CommitTransacted
 	if mode.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
-		if err = s.addMatchableTypAndEtikettenIfNecessary(t); err != nil {
+		if err = s.addMatchableTypAndEtikettenIfNecessary(kinder); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = s.addMatchableCommon(t); err != nil {
+		if err = s.addMatchableCommon(kinder); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -46,13 +46,13 @@ func (s *Store) tryCommit(
 	if mode.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
 		// TAI must be set before calculating objekte sha
 		if mode.Contains(objekte_mode.ModeUpdateTai) {
-			t.SetTai(kennung.NowTai())
+			kinder.SetTai(kennung.NowTai())
 		}
 	}
 
 	var mutter *sku.Transacted
 
-	if mutter, err = s.addMutterIfNecessary(t, mode); err != nil {
+	if mutter, err = s.addMutterIfNecessary(kinder, mode); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -61,20 +61,28 @@ func (s *Store) tryCommit(
 		defer sku.GetTransactedPool().Put(mutter)
 	}
 
-	if err = t.CalculateObjekteShas(); err != nil {
+	if err = kinder.CalculateObjekteShas(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
+	for _, vs := range s.virtualStores {
+		if err = vs.CommitTransacted(kinder, mutter); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	// TODO if changes are virtual, still CommitTransacted
 	if mutter != nil &&
-		kennung.Equals(t.GetKennung(), mutter.GetKennung()) &&
-		t.Metadatei.EqualsSansTai(&mutter.Metadatei) {
-		if err = t.SetFromSkuLike(mutter); err != nil {
+		kennung.Equals(kinder.GetKennung(), mutter.GetKennung()) &&
+		kinder.Metadatei.EqualsSansTai(&mutter.Metadatei) {
+		if err = kinder.SetFromSkuLike(mutter); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = s.Unchanged(t); err != nil {
+		if err = s.Unchanged(kinder); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -83,42 +91,35 @@ func (s *Store) tryCommit(
 	}
 
 	if mode.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
-		if err = s.CommitTransacted(t); err != nil {
+		if err = s.konfig.AddTransacted(
+			kinder,
+			s.GetAkten(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = s.commitTransacted(kinder, mutter); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	// if mode == objekte_mode.ModeEmpty {
-	// 	if err = s.GetBestandsaufnahmeStore().WriteOneObjekteMetadatei(t); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return
-	// 	}
-	// }
-
-	// if _, err = s.GetBestandsaufnahmeStore().ReadOneEnnui(
-	// 	t.Metadatei.Sha(),
-	// ); err == nil {
-	// 	return
-	// }
-
-	// err = nil
-
-	if err = s.addToTomlIndexIfNecessary(t, mode); err != nil {
+	if err = s.addToTomlIndexIfNecessary(kinder, mode); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	err = nil
 
-	g := gattung.Must(t.Kennung.GetGattung())
+	g := gattung.Must(kinder.Kennung.GetGattung())
 
 	switch g {
 	case gattung.Konfig:
 		s.GetKonfig().SetHasChanges(true)
 
 		if err = s.GetKonfig().SetTransacted(
-			t,
+			kinder,
 			s.GetAkten().GetKonfigV0(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -129,23 +130,23 @@ func (s *Store) tryCommit(
 		// TODO be more conservative about when konfig changes actually occurred
 		s.GetKonfig().SetHasChanges(true)
 
-		if err = s.GetKonfig().AddTransacted(t, s.GetAkten()); err != nil {
+		if err = s.GetKonfig().AddTransacted(kinder, s.GetAkten()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case gattung.Zettel:
-		if err = s.GetKonfig().ApplyToSku(t); err != nil {
+		if err = s.GetKonfig().ApplyToSku(kinder); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = s.kennungIndex.AddHinweis(&t.Kennung); err != nil {
+		if err = s.kennungIndex.AddHinweis(&kinder.Kennung); err != nil {
 			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 				errors.Log().Printf("kennung does not contain value: %s", err)
 				err = nil
 			} else {
-				err = errors.Wrapf(err, "failed to write zettel to index: %s", t)
+				err = errors.Wrapf(err, "failed to write zettel to index: %s", kinder)
 				return
 			}
 		}
@@ -156,28 +157,28 @@ func (s *Store) tryCommit(
 	}
 
 	if err = s.GetVerzeichnisse().Add(
-		t,
-		t.GetKennung().String(),
+		kinder,
+		kinder.GetKennung().String(),
 		mode,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if t.Metadatei.Mutter().IsNull() {
-		if err = s.New(t); err != nil {
+	if kinder.Metadatei.Mutter().IsNull() {
+		if err = s.New(kinder); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if err = s.Updated(t); err != nil {
+		if err = s.Updated(kinder); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
 	if mode.Contains(objekte_mode.ModeMergeCheckedOut) {
-		if err = s.readExternalAndMergeIfNecessary(t, mutter); err != nil {
+		if err = s.readExternalAndMergeIfNecessary(kinder, mutter); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -207,7 +208,51 @@ func (s *Store) addMutterIfNecessary(
 		return
 	}
 
+	for _, vs := range s.virtualStores {
+		if err = vs.ModifySku(mutter); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	sk.Metadatei.Mutter().ResetWith(mutter.Metadatei.Sha())
+
+	return
+}
+
+// TODO add results for which stores had which change types
+func (s *Store) commitTransacted(
+	kinder *sku.Transacted,
+	mutter *sku.Transacted,
+) (err error) {
+	sk := sku.GetTransactedPool().Get()
+
+	if err = sk.SetFromSkuLike(kinder); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.bestandsaufnahmeAkte.Skus.Add(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) AddTypToIndex(t *kennung.Typ) (err error) {
+	if t == nil {
+		return
+	}
+
+	if t.IsEmpty() {
+		return
+	}
+
+	if err = s.typenIndex.StoreOne(*t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

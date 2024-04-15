@@ -18,7 +18,7 @@ func (k *Compiled) ApplyToSku(
 ) (err error) {
 	mp := &sk.Metadatei
 
-	mp.Verzeichnisse.SetExpandedEtiketten(kennung.ExpandMany[kennung.Etikett](
+	mp.Verzeichnisse.SetExpandedEtiketten(kennung.ExpandMany(
 		mp.GetEtiketten(),
 		expansion.ExpanderRight,
 	))
@@ -41,7 +41,7 @@ func (k *Compiled) ApplyToSku(
 	}
 
 	if isEtikett {
-		kennung.ExpandOne[kennung.Etikett](
+		kennung.ExpandOne(
 			&etikett,
 			expansion.ExpanderRight,
 		).EachPtr(

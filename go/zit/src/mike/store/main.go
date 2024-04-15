@@ -56,7 +56,7 @@ type Store struct {
 }
 
 type Logger struct {
-	New, Updated, Unchanged, Archived schnittstellen.FuncIter[*sku.Transacted]
+	New, Updated, Unchanged schnittstellen.FuncIter[*sku.Transacted]
 }
 
 func (c *Store) Initialize(

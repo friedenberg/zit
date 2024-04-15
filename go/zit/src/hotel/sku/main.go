@@ -20,10 +20,11 @@ type (
 		ContainsSku(*Transacted) bool
 	}
 
-	VirtualStore interface {
+	Store interface {
 		Initialize() error
 		Flush() error
-		CommitTransacted(*Transacted) error
+		CommitTransacted(kinder, mutter *Transacted) error
+		ModifySku(*Transacted) error
 		Queryable
 	}
 

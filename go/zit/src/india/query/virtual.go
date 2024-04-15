@@ -8,14 +8,14 @@ import (
 )
 
 type VirtualStoreInitable struct {
-	sku.VirtualStore
+	sku.Store
 	didInit  bool
 	onceInit sync.Once
 }
 
 func (ve *VirtualStoreInitable) Initialize() (err error) {
 	ve.onceInit.Do(func() {
-		err = ve.VirtualStore.Initialize()
+		err = ve.Store.Initialize()
 		ve.didInit = true
 	})
 
@@ -27,7 +27,7 @@ func (ve *VirtualStoreInitable) Flush() (err error) {
 		return
 	}
 
-	if err = ve.VirtualStore.Flush(); err != nil {
+	if err = ve.Store.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

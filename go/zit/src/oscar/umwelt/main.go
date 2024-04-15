@@ -149,7 +149,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	log.Log().Printf("store version: %s", u.Konfig().GetStoreVersion())
 
 	u.virtualStores["%chrome"] = &query.VirtualStoreInitable{
-		VirtualStore: chrome.MakeChrome(u.Konfig(), u.Standort()),
+		Store: chrome.MakeChrome(u.Konfig(), u.Standort()),
 	}
 
 	if err = u.store.Initialize(
@@ -177,7 +177,6 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 
 			return ptl(sk)
 		},
-		Archived: ptl,
 	}
 
 	u.store.SetCheckedOutLogWriter(u.PrinterCheckedOut())

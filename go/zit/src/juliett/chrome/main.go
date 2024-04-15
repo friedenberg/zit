@@ -56,7 +56,7 @@ func MakeChrome(k *konfig.Compiled, s standort.Standort) *Chrome {
 	return c
 }
 
-func (c *Chrome) GetVirtualStore() sku.VirtualStore {
+func (c *Chrome) GetVirtualStore() sku.Store {
 	return c
 }
 
@@ -186,18 +186,20 @@ func (c *Chrome) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 	return
 }
 
-func (c *Chrome) CommitTransacted(sk *sku.Transacted) (err error) {
-	if !c.transacted.Contains(&sk.Kennung) {
+func (c *Chrome) CommitTransacted(kinder, mutter *sku.Transacted) (err error) {
+	// log.Debug().Print(kinder, mutter)
+	// TODO
+	if !c.transacted.Contains(&kinder.Kennung) {
 		return
 	}
 
-	ees := sk.Metadatei.Verzeichnisse.GetExpandedEtiketten()
-	es := sk.Metadatei.GetEtiketten()
+	ees := kinder.Metadatei.Verzeichnisse.GetExpandedEtiketten()
+	es := kinder.Metadatei.GetEtiketten()
 	log.Debug().Print(iter.StringCommaSeparated(es), iter.StringCommaSeparated(ees))
 
 	var u *url.URL
 
-	if u, err = c.getUrl(sk); err != nil {
+	if u, err = c.getUrl(kinder); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -212,19 +214,24 @@ func (c *Chrome) CommitTransacted(sk *sku.Transacted) (err error) {
 	return
 }
 
-func (c *Chrome) ContainsSku(sk *sku.Transacted) bool {
+func (c *Chrome) modifySku(sk *sku.Transacted) (didModify bool, err error) {
 	if !sk.GetTyp().Equals(c.typ) {
-		return false
+		return
 	}
 
 	u, err := c.getUrl(sk)
-	errors.PanicIfError(err)
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	ts, ok := c.urls[*u]
 
 	if !ok {
-		return false
+		return
 	}
+
+	didModify = true
 
 	for _, t := range ts {
 		es := t.Etiketten()
@@ -240,10 +247,20 @@ func (c *Chrome) ContainsSku(sk *sku.Transacted) bool {
 		}
 	}
 
-	c.transacted.Lock()
-	defer c.transacted.Unlock()
+	return
+}
 
-	errors.PanicIfError(c.transacted.Add(&sk.Kennung))
+func (c *Chrome) ModifySku(sk *sku.Transacted) (err error) {
+	if _, err = c.modifySku(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	return true
+	return
+}
+
+func (c *Chrome) ContainsSku(sk *sku.Transacted) bool {
+	ok, err := c.modifySku(sk)
+	log.Err().Print(err)
+	return ok
 }
