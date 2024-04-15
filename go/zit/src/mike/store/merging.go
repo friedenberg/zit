@@ -9,10 +9,98 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/src/charlie/checkout_options"
+	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/juliett/to_merge"
 )
+
+func (s *Store) readExternalAndMergeIfNecessary(
+	transactedPtr, mutter *sku.Transacted,
+) (err error) {
+	if mutter == nil {
+		return
+	}
+
+	var co *sku.CheckedOut
+
+	if co, err = s.ReadOneExternalFS(transactedPtr); err != nil {
+		err = nil
+		return
+	}
+
+	defer sku.GetCheckedOutPool().Put(co)
+
+	mutterEqualsExternal := co.InternalAndExternalEqualsSansTai()
+
+	var mode checkout_mode.Mode
+
+	if mode, err = co.External.GetCheckoutMode(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	op := checkout_options.Options{
+		CheckoutMode: mode,
+		Force:        true,
+	}
+
+	if mutterEqualsExternal {
+		if co, err = s.CheckoutOne(op, transactedPtr); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		sku.GetCheckedOutPool().Put(co)
+
+		return
+	}
+
+	transactedPtrCopy := sku.GetTransactedPool().Get()
+	defer sku.GetTransactedPool().Put(transactedPtrCopy)
+
+	if err = transactedPtrCopy.SetFromSkuLike(transactedPtr); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	tm := to_merge.Sku{
+		Left:   transactedPtrCopy,
+		Middle: &co.Internal,
+		Right:  &co.External.Transacted,
+	}
+
+	var merged sku.ExternalFDs
+
+	merged, err = s.merge(tm)
+
+	switch {
+	case errors.Is(err, &to_merge.ErrMergeConflict{}):
+		if err = tm.WriteConflictMarker(
+			s.GetStandort(),
+			s.GetKonfig().GetStoreVersion(),
+			s.GetObjekteFormatOptions(),
+			co.External.FDs.MakeConflictMarker(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	case err != nil:
+		err = errors.Wrap(err)
+		return
+
+	default:
+		src := merged.Objekte.GetPath()
+		dst := co.External.FDs.Objekte.GetPath()
+
+		if err = files.Rename(src, dst); err != nil {
+			return
+		}
+	}
+
+	return
+}
 
 func (s *Store) merge(tm to_merge.Sku) (merged sku.ExternalFDs, err error) {
 	if err = tm.MergeEtiketten(); err != nil {

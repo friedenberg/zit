@@ -8,6 +8,7 @@ const (
 	ModeAddToBestandsaufnahme = Mode(1 << iota)
 	ModeUpdateTai
 	ModeSchwanz
+	ModeMergeCheckedOut
 
 	ModeCommit = ModeAddToBestandsaufnahme | ModeUpdateTai | ModeSchwanz
 )

@@ -27,6 +27,13 @@ func (s *Store) CommitTransacted(t *sku.Transacted) (err error) {
 		return
 	}
 
+	for _, vs := range s.virtualStores {
+		if err = vs.CommitTransacted(t); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	return
 }
 

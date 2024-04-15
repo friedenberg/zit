@@ -41,7 +41,6 @@ func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOut, err error) {
 			_, err = s.createOrUpdate(
 				sk,
 				sk.GetKennung(),
-				nil,
 				objekte_mode.ModeAddToBestandsaufnahme,
 			)
 		}
@@ -78,7 +77,6 @@ func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOut, err error) {
 	_, err = s.createOrUpdate(
 		sk,
 		sk.GetKennung(),
-		&co.Internal,
 		objekte_mode.ModeAddToBestandsaufnahme,
 	)
 

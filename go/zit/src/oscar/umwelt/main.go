@@ -167,7 +167,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 
 	ptl := u.PrinterTransactedLike()
 
-	lw := sku.Logger{
+	lw := store.Logger{
 		New:     ptl,
 		Updated: ptl,
 		Unchanged: func(sk *sku.Transacted) (err error) {

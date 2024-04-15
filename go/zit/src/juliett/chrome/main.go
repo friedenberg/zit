@@ -128,7 +128,6 @@ func (c *Chrome) Flush() (err error) {
 		return
 	}
 
-	// TODO add body
 	b := bytes.NewBuffer(nil)
 	urls := make([]string, 0, len(c.removed))
 
@@ -174,7 +173,8 @@ func (c *Chrome) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 	dec := toml.NewDecoder(r)
 
 	if err = dec.Decode(&tb); err != nil {
-		err = errors.Wrap(err)
+		errors.Err().Print(errors.Wrapf(err, "Sha: %s, Kennung: %s", sk.GetAkteSha(), sk.GetKennung()))
+		err = nil
 		return
 	}
 

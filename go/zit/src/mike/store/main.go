@@ -52,7 +52,11 @@ type Store struct {
 	protoZettel      zettel.ProtoZettel
 	konfigAkteFormat objekte.AkteFormat[erworben.Akte, *erworben.Akte]
 
-	sku.Logger
+	Logger
+}
+
+type Logger struct {
+	New, Updated, Unchanged, Archived schnittstellen.FuncIter[*sku.Transacted]
 }
 
 func (c *Store) Initialize(
@@ -167,6 +171,6 @@ func (s *Store) ResetIndexes() (err error) {
 	return
 }
 
-func (s *Store) SetLogWriter(lw sku.Logger) {
+func (s *Store) SetLogWriter(lw Logger) {
 	s.Logger = lw
 }
