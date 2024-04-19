@@ -6,13 +6,21 @@ import (
 )
 
 var (
-	EqualerSansTai equalerSansTai
-	Equaler        equaler
+	EqualerSansTai               equaler
+	Equaler                      = equaler{includeTai: true}
+	EqualerSansTaiIncludeVirtual = equaler{includeVirtual: true}
 )
 
-type equalerSansTai struct{}
+type equaler struct {
+	includeVirtual bool
+	includeTai     bool
+}
 
-func (equalerSansTai) Equals(a, b *Metadatei) bool {
+func (e equaler) Equals(a, b *Metadatei) bool {
+	if e.includeTai && !a.Tai.Equals(b.Tai) {
+		return false
+	}
+
 	if !a.Akte.EqualsSha(&b.Akte) {
 		// log.Debug().Print(&a.Akte, "->", &b.Akte)
 		return false
@@ -28,7 +36,7 @@ func (equalerSansTai) Equals(a, b *Metadatei) bool {
 
 	if err := aes.EachPtr(
 		func(ea *kennung.Etikett) (err error) {
-			if ea.IsVirtual() {
+			if !e.includeVirtual && ea.IsVirtual() {
 				return
 			}
 
@@ -45,7 +53,7 @@ func (equalerSansTai) Equals(a, b *Metadatei) bool {
 
 	if err := bes.EachPtr(
 		func(eb *kennung.Etikett) (err error) {
-			if eb.IsVirtual() {
+			if !e.includeVirtual && eb.IsVirtual() {
 				return
 			}
 
@@ -63,20 +71,6 @@ func (equalerSansTai) Equals(a, b *Metadatei) bool {
 
 	if !a.Bezeichnung.Equals(b.Bezeichnung) {
 		// log.Debug().Print(a.Bezeichnung, "->", b.Bezeichnung)
-		return false
-	}
-
-	return true
-}
-
-type equaler struct{}
-
-func (equaler) Equals(pz, z1 *Metadatei) bool {
-	if !EqualerSansTai.Equals(pz, z1) {
-		return false
-	}
-
-	if !pz.Tai.Equals(z1.Tai) {
 		return false
 	}
 

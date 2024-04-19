@@ -4,18 +4,19 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
 type VirtualStoreInitable struct {
-	sku.Store
+	VirtualStore
 	didInit  bool
 	onceInit sync.Once
 }
 
 func (ve *VirtualStoreInitable) Initialize() (err error) {
 	ve.onceInit.Do(func() {
-		err = ve.Store.Initialize()
+		err = ve.VirtualStore.Initialize()
 		ve.didInit = true
 	})
 
@@ -27,7 +28,7 @@ func (ve *VirtualStoreInitable) Flush() (err error) {
 		return
 	}
 
-	if err = ve.Store.Flush(); err != nil {
+	if err = ve.VirtualStore.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -38,6 +39,23 @@ func (ve *VirtualStoreInitable) Flush() (err error) {
 type Virtual struct {
 	sku.Queryable
 	Kennung
+}
+
+func (ve *VirtualStoreInitable) Query(
+  qg *Group,
+  f schnittstellen.FuncIter[*sku.Transacted],
+) (err error) {
+	if err = ve.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = ve.VirtualStore.Query(qg, f); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (ve *Virtual) ContainsSku(sk *sku.Transacted) bool {

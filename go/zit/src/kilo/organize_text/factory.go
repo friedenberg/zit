@@ -1,8 +1,6 @@
 package organize_text
 
 import (
-	"sort"
-
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -253,15 +251,7 @@ func (atc Factory) makeChildren(
 		return
 	}
 
-	sort.Slice(parent.Children, func(i, j int) bool {
-		vi := iter.StringCommaSeparated[kennung.Etikett](
-			parent.Children[i].Etiketten,
-		)
-		vj := iter.StringCommaSeparated[kennung.Etikett](
-			parent.Children[j].Etiketten,
-		)
-		return vi < vj
-	})
+  parent.SortChildren()
 
 	return
 }

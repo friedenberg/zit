@@ -21,7 +21,13 @@ import (
 const (
 	Epoch          = 1660007128
 	FormatDateTime = string_format_writer.StringFormatDateTime
+	RFC3339        = tyme.RFC3339
 	// FormatDateTai  = "%y-%m-%d %H:%M"
+)
+
+var (
+	Date  = tyme.Date
+	Parse = tyme.Parse
 )
 
 func init() {

@@ -21,6 +21,7 @@ import (
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 )
@@ -56,7 +57,7 @@ func MakeChrome(k *konfig.Compiled, s standort.Standort) *Chrome {
 	return c
 }
 
-func (c *Chrome) GetVirtualStore() sku.Store {
+func (c *Chrome) GetVirtualStore() query.VirtualStore {
 	return c
 }
 
@@ -123,21 +124,22 @@ func (c *Chrome) Flush() (err error) {
 
 	var req *http.Request
 
-	if req, err = http.NewRequest("DELETE", "http://localhost/urls", nil); err != nil {
+	if req, err = http.NewRequest("PUT", "http://localhost/urls", nil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	b := bytes.NewBuffer(nil)
-	urls := make([]string, 0, len(c.removed))
+	var reqPayload putRequest
+	reqPayload.Deleted = make([]string, 0, len(c.removed))
 
 	for u := range c.removed {
-		urls = append(urls, u.String())
+		reqPayload.Deleted = append(reqPayload.Deleted, u.String())
 	}
 
 	enc := json.NewEncoder(b)
 
-	if err = enc.Encode(urls); err != nil {
+	if err = enc.Encode(reqPayload); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -147,6 +149,8 @@ func (c *Chrome) Flush() (err error) {
 	if _, err = chrest.AskChrome(c.chrestConfig, req); err != nil {
 		if errors.IsErrno(err, syscall.ECONNREFUSED) {
 			errors.Err().Print("chrest offline")
+			err = nil
+		} else if err == io.EOF {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -187,15 +191,16 @@ func (c *Chrome) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 }
 
 func (c *Chrome) CommitTransacted(kinder, mutter *sku.Transacted) (err error) {
-	// log.Debug().Print(kinder, mutter)
-	// TODO
-	if !c.transacted.Contains(&kinder.Kennung) {
+	var dt diff
+
+	if dt, err = c.getDiff(kinder, mutter); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	ees := kinder.Metadatei.Verzeichnisse.GetExpandedEtiketten()
-	es := kinder.Metadatei.GetEtiketten()
-	log.Debug().Print(iter.StringCommaSeparated(es), iter.StringCommaSeparated(ees))
+	if dt.diffType == diffTypeIgnore {
+		return
+	}
 
 	var u *url.URL
 
@@ -209,7 +214,14 @@ func (c *Chrome) CommitTransacted(kinder, mutter *sku.Transacted) (err error) {
 		return
 	}
 
-	c.removed[*u] = struct{}{}
+	switch dt.diffType {
+	case diffTypeDelete:
+		log.Debug().Print("deleted", "TODO add to dedicated printer", kinder)
+		c.removed[*u] = struct{}{}
+
+	default:
+		log.Debug().Print("TODO not implemented", dt, kinder, mutter)
+	}
 
 	return
 }
@@ -250,6 +262,35 @@ func (c *Chrome) modifySku(sk *sku.Transacted) (didModify bool, err error) {
 	return
 }
 
+func (c *Chrome) Query(
+	ms *query.Group,
+	f schnittstellen.FuncIter[*sku.Transacted],
+) (err error) {
+	var sk sku.Transacted
+
+	for _, items := range c.urls {
+		for _, item := range items {
+			sku.TransactedResetter.Reset(&sk)
+
+			if err = item.HydrateSku(&sk); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if !ms.ContainsSku(&sk) {
+				continue
+			}
+
+			if err = f(&sk); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+	}
+
+	return
+}
+
 func (c *Chrome) ModifySku(sk *sku.Transacted) (err error) {
 	if _, err = c.modifySku(sk); err != nil {
 		err = errors.Wrap(err)
@@ -261,6 +302,9 @@ func (c *Chrome) ModifySku(sk *sku.Transacted) (err error) {
 
 func (c *Chrome) ContainsSku(sk *sku.Transacted) bool {
 	ok, err := c.modifySku(sk)
-	log.Err().Print(err)
+	if err != nil {
+		log.Err().Print(err)
+	}
+
 	return ok
 }

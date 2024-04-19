@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/echo/format"
-	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
@@ -50,7 +49,7 @@ func (av assignmentLineWriter) writeNormal(a *Assignment) (err error) {
 				"%s%s %s",
 				tab_prefix,
 				strings.Repeat("#", a.GetDepth()),
-				iter.StringCommaSeparated[kennung.Etikett](a.Etiketten),
+				iter.StringCommaSeparated(a.Etiketten),
 			),
 		)
 		av.WriteExactlyOneEmpty()
@@ -127,7 +126,7 @@ func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 				tab_prefix[len(sharps)-1:],
 				sharps,
 				alignmentSpacing,
-				iter.StringCommaSeparated[kennung.Etikett](a.Etiketten),
+				iter.StringCommaSeparated(a.Etiketten),
 			),
 		)
 		av.WriteExactlyOneEmpty()

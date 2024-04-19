@@ -7,6 +7,7 @@ import (
 	"math"
 	"strconv"
 	"strings"
+	"time"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
@@ -40,6 +41,13 @@ func NowTai() Tai {
 
 func TaiFromTime(t1 thyme.Time) (t2 Tai) {
 	t2 = TaiFromTimeWithIndex(t1, 0)
+	return
+}
+
+func TaiFromTime1(t1 time.Time) (t2 Tai) {
+	t2.wasSet = true
+	t2.tai = chai.FromTime(t1)
+
 	return
 }
 
@@ -93,6 +101,21 @@ func (t Tai) StringDefaultFormat() string {
 
 func (t Tai) Format(v string) string {
 	return t.AsTime().Format(v)
+}
+
+func (t *Tai) SetFromRFC3339(v string) (err error) {
+	t.wasSet = true
+
+	var t1 time.Time
+
+	if t1, err = thyme.Parse(thyme.RFC3339, v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	*t = TaiFromTime1(t1)
+
+	return
 }
 
 func (t *Tai) Set(v string) (err error) {

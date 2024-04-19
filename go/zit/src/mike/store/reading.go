@@ -72,6 +72,14 @@ func (s *Store) query(
 		return
 	}
 
+	for _, vs := range s.virtualStores {
+		// TODO only query story if query group contains store type
+		if err = vs.Query(qg, f1); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	return
 }
 

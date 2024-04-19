@@ -11,11 +11,12 @@ import (
 type Cli struct {
 	BasePath string
 
-	Debug    debug.Options
-	Verbose  bool
-	Todo     bool
-	DryRun   bool
-	Complete bool
+	Debug         debug.Options
+	Verbose       bool
+	Todo          bool
+	DryRun        bool
+	Complete      bool
+	ChrestEnabled bool
 
 	IncludeCwd    bool
 	IncludeHidden bool
@@ -68,6 +69,13 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 		"new-organize",
 		true,
 		"use the new CLI-like organize syntax",
+	)
+
+	f.BoolVar(
+		&c.ChrestEnabled,
+		"chrest-enabled",
+		true,
+		"enable Chrest functionality",
 	)
 
 	c.PrintOptions.AddToFlags(f, &c.maskPrintOptions)

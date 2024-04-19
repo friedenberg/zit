@@ -148,8 +148,10 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 
 	log.Log().Printf("store version: %s", u.Konfig().GetStoreVersion())
 
-	u.virtualStores["%chrome"] = &query.VirtualStoreInitable{
-		Store: chrome.MakeChrome(u.Konfig(), u.Standort()),
+	if u.konfig.ChrestEnabled {
+		u.virtualStores["%chrome"] = &query.VirtualStoreInitable{
+			VirtualStore: chrome.MakeChrome(u.Konfig(), u.Standort()),
+		}
 	}
 
 	if err = u.store.Initialize(
@@ -224,6 +226,10 @@ func (u *Umwelt) MakeKennungExpanders() (out kennung.Abbr) {
 	return
 }
 
+func (u *Umwelt) GetChrestStore() *query.VirtualStoreInitable {
+	return u.virtualStores["%chrome"]
+}
+
 func (u *Umwelt) MakeQueryBuilderExcludingHidden(
 	dg kennung.Gattung,
 ) *query.Builder {
@@ -231,7 +237,7 @@ func (u *Umwelt) MakeQueryBuilderExcludingHidden(
 		dg = kennung.MakeGattung(gattung.Zettel)
 	}
 
-	return query.MakeBuilder(u.Standort(), u.virtualStores["%chrome"]).
+	return query.MakeBuilder(u.Standort(), u.GetChrestStore()).
 		WithDefaultGattungen(dg).
 		WithVirtualEtiketten(u.konfig.Filters).
 		WithCwd(u.GetStore().GetCwdFiles()).
@@ -247,7 +253,7 @@ func (u *Umwelt) MakeQueryBuilder(
 		dg = kennung.MakeGattung(gattung.Zettel)
 	}
 
-	return query.MakeBuilder(u.Standort(), u.virtualStores["%chrome"]).
+	return query.MakeBuilder(u.Standort(), u.GetChrestStore()).
 		WithDefaultGattungen(dg).
 		WithVirtualEtiketten(u.konfig.Filters).
 		WithCwd(u.GetStore().GetCwdFiles()).

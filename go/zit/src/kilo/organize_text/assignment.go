@@ -2,6 +2,9 @@ package organize_text
 
 import (
 	"fmt"
+	"sort"
+	"strconv"
+	"strings"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
@@ -360,4 +363,29 @@ func (a *Assignment) Contains(e *kennung.Etikett) bool {
 	}
 
 	return a.Parent.Contains(e)
+}
+
+func (parent *Assignment) SortChildren() {
+	sort.Slice(parent.Children, func(i, j int) bool {
+		esi := parent.Children[i].Etiketten
+		esj := parent.Children[j].Etiketten
+
+		if esi.Len() == 1 && esj.Len() == 1 {
+			ei := strings.TrimPrefix(esi.Any().String(), "-")
+			ej := strings.TrimPrefix(esj.Any().String(), "-")
+
+			ii, ierr := strconv.ParseInt(ei, 0, 64)
+			ij, jerr := strconv.ParseInt(ej, 0, 64)
+
+			if ierr == nil && jerr == nil {
+				return ii < ij
+			} else {
+				return ei < ej
+			}
+		} else {
+			vi := iter.StringCommaSeparated(esi)
+			vj := iter.StringCommaSeparated(esj)
+			return vi < vj
+		}
+	})
 }

@@ -1,5 +1,7 @@
 code.linenisgreat.com/chrest v0.0.0-20240309214552-f05fb9ce117d h1:mGwGWUcuP0fVTgq4c08sI55ofUBe0AqPyaZ05IRttVU=
 code.linenisgreat.com/chrest v0.0.0-20240309214552-f05fb9ce117d/go.mod h1:apuFTD/nYbsJhjUObf1CcM71xjthUoRhG3ZpVucrI9E=
+code.linenisgreat.com/chrest v0.0.0-20240415144423-276214110ed1 h1:zqMIdIudI1aCNwRBSNR+Xb0NUxw7KOTOCBdG4EbmShw=
+code.linenisgreat.com/chrest v0.0.0-20240415144423-276214110ed1/go.mod h1:apuFTD/nYbsJhjUObf1CcM71xjthUoRhG3ZpVucrI9E=
 filippo.io/age v1.1.1 h1:pIpO7l151hCnQ4BdyBujnGP2YlUo0uj6sAVNHGBvXHg=
 filippo.io/age v1.1.1/go.mod h1:l03SrzDUrBkdBx8+IILdnn2KZysqQdbEBUQ4p3sqEQE=
 github.com/DataDog/zstd v1.5.5 h1:oWf5W7GtOLgp6bciQYDmhHHjdhYkALu6S/5Ni9ZgSvQ=

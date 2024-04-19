@@ -48,6 +48,7 @@ cmd_zit_def=(
   -print-empty-shas=true
   -print-flush=false
   -print-unchanged=false
+  -chrest-enabled=false
 )
 
 export cmd_zit_def

@@ -9,6 +9,15 @@ import (
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
+type VirtualStore interface {
+	Initialize() error
+	Flush() error
+	CommitTransacted(kinder, mutter *sku.Transacted) error
+	ModifySku(*sku.Transacted) error
+	Query(*Group, schnittstellen.FuncIter[*sku.Transacted]) error
+	sku.Queryable
+}
+
 type Reducer interface {
 	Reduce(*Builder) error
 }

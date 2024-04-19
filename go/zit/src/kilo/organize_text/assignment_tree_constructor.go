@@ -1,8 +1,6 @@
 package organize_text
 
 import (
-	"sort"
-
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -65,7 +63,6 @@ func (atc AssignmentTreeConstructor) makeChildren(
 				return
 			},
 		)
-
 		if err != nil {
 			err = errors.Wrap(err)
 			return
@@ -93,7 +90,6 @@ func (atc AssignmentTreeConstructor) makeChildren(
 			return
 		},
 	)
-
 	if err != nil {
 		err = errors.Wrap(err)
 		return
@@ -112,7 +108,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 						lastChild = parent.Children[len(parent.Children)-1]
 					}
 
-					if lastChild != nil && iter.SetEqualsPtr[kennung.Etikett, *kennung.Etikett](lastChild.Etiketten, prefixJoint) {
+					if lastChild != nil && iter.SetEqualsPtr(lastChild.Etiketten, prefixJoint) {
 						intermediate = lastChild
 					} else {
 						intermediate = newAssignment(parent.GetDepth() + 1)
@@ -140,7 +136,6 @@ func (atc AssignmentTreeConstructor) makeChildren(
 					psv := objekte_collections.MakeSetPrefixVerzeichnisse(0)
 					zs.Each(psv.Add)
 					err = atc.makeChildren(child, psv, nextGroupingEtiketten)
-
 					if err != nil {
 						err = errors.Wrap(err)
 						return
@@ -161,7 +156,6 @@ func (atc AssignmentTreeConstructor) makeChildren(
 				psv := objekte_collections.MakeSetPrefixVerzeichnisse(0)
 				zs.Each(psv.Add)
 				err = atc.makeChildren(child, psv, nextGroupingEtiketten)
-
 				if err != nil {
 					err = errors.Wrap(err)
 					return
@@ -173,15 +167,7 @@ func (atc AssignmentTreeConstructor) makeChildren(
 		},
 	)
 
-	sort.Slice(parent.Children, func(i, j int) bool {
-		vi := iter.StringCommaSeparated[kennung.Etikett](
-			parent.Children[i].Etiketten,
-		)
-		vj := iter.StringCommaSeparated[kennung.Etikett](
-			parent.Children[j].Etiketten,
-		)
-		return vi < vj
-	})
+	parent.SortChildren()
 
 	return
 }

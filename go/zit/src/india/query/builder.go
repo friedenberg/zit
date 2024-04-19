@@ -488,9 +488,11 @@ LOOP:
 						stack[len(stack)-1].Add(exp)
 					}
 				} else {
-					if err = qg.Etiketten.Add(e); err != nil {
-						err = errors.Wrap(err)
-						return
+					if !isNegated {
+						if err = qg.Etiketten.Add(e); err != nil {
+							err = errors.Wrap(err)
+							return
+						}
 					}
 
 					exp := b.makeExp(isNegated, isExact, &k)
@@ -505,9 +507,11 @@ LOOP:
 					return
 				}
 
-				if err = qg.Typen.Add(t); err != nil {
-					err = errors.Wrap(err)
-					return
+				if !isNegated {
+					if err = qg.Typen.Add(t); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
 				}
 
 				exp := b.makeExp(isNegated, isExact, &k)

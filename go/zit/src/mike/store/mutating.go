@@ -73,7 +73,6 @@ func (s *Store) tryCommit(
 		}
 	}
 
-	// TODO if changes are virtual, still CommitTransacted
 	if mutter != nil &&
 		kennung.Equals(kinder.GetKennung(), mutter.GetKennung()) &&
 		kinder.Metadatei.EqualsSansTai(&mutter.Metadatei) {

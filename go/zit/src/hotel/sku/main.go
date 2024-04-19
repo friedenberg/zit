@@ -20,14 +20,6 @@ type (
 		ContainsSku(*Transacted) bool
 	}
 
-	Store interface {
-		Initialize() error
-		Flush() error
-		CommitTransacted(kinder, mutter *Transacted) error
-		ModifySku(*Transacted) error
-		Queryable
-	}
-
 	Query interface {
 		Queryable
 		schnittstellen.Stringer
