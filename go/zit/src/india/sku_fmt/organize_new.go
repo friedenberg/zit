@@ -308,7 +308,7 @@ LOOP:
 						return
 					}
 
-					if err = o.Metadatei.AddEtikettPtr(&e); err != nil {
+					if err = o.AddEtikettPtr(&e); err != nil {
 						err = errors.Wrap(err)
 						return
 					}

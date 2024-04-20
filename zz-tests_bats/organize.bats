@@ -325,7 +325,7 @@ function organize_hides_hidden_etiketten_from_organize { # @test
 	run_zit edit-konfig -hide-etikett zz-archive
 	assert_success
 	assert_output - <<-EOM
-		[konfig@86e2da3c9f93c7aca6a8d7d1559f374d33fc3a5efb47d9114145b7b467f8dea8]
+		[konfig@3c63bd15bfabde4e6995007947d782fb402b716d7255bdd941cde7a72c6cb218]
 	EOM
 
 	to_add="$(mktemp)"

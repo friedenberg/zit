@@ -359,10 +359,10 @@ func ExpandOneSlice[T KennungLike[T], TPtr KennungLikePtr[T]](
 	}
 
 	for _, ex := range exes {
-		expandOne[T, TPtr](k, ex, s1)
+		expandOne(k, ex, s1)
 	}
 
-	out = iter.SortedValuesBy[T](
+	out = iter.SortedValuesBy(
 		s1,
 		func(a, b T) bool {
 			return len(a.String()) < len(b.String())
@@ -383,7 +383,7 @@ func ExpandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 	}
 
 	for _, ex := range exes {
-		expandOne[T, TPtr](k, ex, s1)
+		expandOne(k, ex, s1)
 	}
 
 	out = s1.CloneSetPtrLike()
@@ -421,12 +421,12 @@ func ExpandOneTo[T KennungLike[T], TPtr KennungLikePtr[T]](
 }
 
 func Expanded(s EtikettSet, ex expansion.Expander) (out EtikettSet) {
-	return ExpandMany[Etikett, *Etikett](s, ex)
+	return ExpandMany(s, ex)
 }
 
 func AddNormalizedEtikett(es EtikettMutableSet, e *Etikett) {
 	ExpandOne(e, expansion.ExpanderRight).Each(es.Add)
-	errors.PanicIfError(iter.AddClonePool[Etikett, *Etikett](
+	errors.PanicIfError(iter.AddClonePool(
 		es,
 		GetEtikettPool(),
 		EtikettResetter,
@@ -439,7 +439,7 @@ func AddNormalizedEtikett(es EtikettMutableSet, e *Etikett) {
 }
 
 func RemovePrefixes(es EtikettMutableSet, needle Etikett) {
-	for _, haystack := range iter.Elements[Etikett](es) {
+	for _, haystack := range iter.Elements(es) {
 		// TODO-P2 make more efficient
 		if strings.HasPrefix(haystack.String(), needle.String()) {
 			es.Del(haystack)

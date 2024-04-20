@@ -33,7 +33,7 @@ function show_simple_one_zettel_hidden { # @test
 	run_zit edit-konfig -hide-etikett tag-3
 	assert_success
 	assert_output - <<-EOM
-		[konfig@7c7e3c0dbfef03649c5c15f52617be8f75d3836971b8720d8441207a13ab2598]
+		[konfig@9faf629a95cd95b7c3cd3b8d69a11c0d592b68e7929fe0b5fcf8912db0aaee8a]
 	EOM
 
 	run_zit show :z
@@ -58,7 +58,7 @@ function show_simple_one_zettel_hidden_past { # @test
 	run_zit edit-konfig -hide-etikett tag-1
 	assert_success
 	assert_output - <<-EOM
-		[konfig@f1674ec97c180b6d4139112ae2fc2b9b88e4ce8c8fbc16f4319cfa962f16457d]
+		[konfig@d797d9a2e844be4404da716578e215770827f7da14d144f4a98c66a349ae9692]
 	EOM
 
 	run_zit show :?z
@@ -307,6 +307,7 @@ function show_konfig { # @test
 		print-shas = false
 		print-flush = false
 		print-unchanged = false
+		print-colors = false
 
 		[cli-output.abbreviations]
 		hinweisen = false

@@ -16,12 +16,12 @@ import (
 )
 
 func (u *Umwelt) FormatColorOptionsOut() (o string_format_writer.ColorOptions) {
-	o.OffEntirely = !u.outIsTty
+	o.OffEntirely = !u.outIsTty || !u.konfig.PrintOptions.PrintColors
 	return
 }
 
 func (u *Umwelt) FormatColorOptionsErr() (o string_format_writer.ColorOptions) {
-	o.OffEntirely = !u.errIsTty
+	o.OffEntirely = !u.errIsTty || !u.konfig.PrintOptions.PrintColors
 	return
 }
 

@@ -83,7 +83,7 @@ function run_zit_init {
 }
 
 function get_konfig_sha() {
-  echo -n "7ca8512a56a5d903d63723c942edfc02885c8c431c355775b71d8b98fd385667"
+  echo -n "4ca7ba6d7d4d36b0b3d4d18ea3f65df57d441a8f0d2c4e1bb5903b098c96d4c1"
 }
 
 function run_zit_init_disable_age {

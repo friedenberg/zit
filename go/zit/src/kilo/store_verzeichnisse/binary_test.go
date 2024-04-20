@@ -27,7 +27,7 @@ func TestBinaryOne(t1 *testing.T) {
 		))
 		t.AssertNoError(expected.Metadatei.Typ.Set("da-typ"))
 		t.AssertNoError(expected.Metadatei.Bezeichnung.Set("the bez"))
-		t.AssertNoError(expected.Metadatei.AddEtikettPtr(kennung.MustEtikettPtr("tag")))
+		t.AssertNoError(expected.AddEtikettPtr(kennung.MustEtikettPtr("tag")))
 		t.AssertNoError(expected.Metadatei.Mutter().Set(
 			"3c5d8b1db2149d279f4d4a6cb9457804aac6944834b62aa283beef99bccd10f0",
 		))

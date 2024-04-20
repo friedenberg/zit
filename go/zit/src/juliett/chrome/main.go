@@ -248,7 +248,7 @@ func (c *Chrome) modifySku(sk *sku.Transacted) (didModify bool, err error) {
 	for _, t := range ts {
 		es := t.Etiketten()
 
-		if err = t.Etiketten().EachPtr(sk.Metadatei.AddEtikettPtr); err != nil {
+		if err = t.Etiketten().EachPtr(sk.AddEtikettPtr); err != nil {
 			errors.PanicIfError(err)
 		}
 

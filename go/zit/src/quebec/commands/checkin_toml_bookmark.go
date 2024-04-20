@@ -93,7 +93,7 @@ func (c CheckinTomlBookmark) Run(
 	defer errors.Deferred(&err, u.Unlock)
 
 	for _, swu := range urls {
-		if err = etiketten.EachPtr(swu.Metadatei.AddEtikettPtr); err != nil {
+		if err = etiketten.EachPtr(swu.AddEtikettPtr); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

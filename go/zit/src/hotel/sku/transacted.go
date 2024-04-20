@@ -5,8 +5,10 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/bravo/values"
+	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
@@ -119,6 +121,24 @@ func (a *Transacted) GetSkuLikePtr() SkuLike {
 
 func (a *Transacted) GetEtiketten() kennung.EtikettSet {
 	return a.Metadatei.GetEtiketten()
+}
+
+func (a *Transacted) AddEtikettPtr(e *kennung.Etikett) (err error) {
+	if a.Kennung.GetGattung() == gattung.Etikett {
+		e1 := kennung.MustEtikett(a.Kennung.String())
+		ex := kennung.ExpandOne(&e1, expansion.ExpanderRight)
+
+		if ex.ContainsKey(ex.KeyPtr(e)) {
+			return
+		}
+	}
+
+	if err = a.GetMetadatei().AddEtikettPtr(e); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (a *Transacted) GetTyp() kennung.Typ {
