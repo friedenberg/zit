@@ -89,15 +89,28 @@ func (s *Store) tryCommit(
 		return
 	}
 
-	if mode.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
-		if err = s.konfig.AddTransacted(
-			kinder,
-			s.GetAkten(),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = s.GetKonfig().ApplyAndAddTransacted(
+		kinder,
+		mutter,
+		s.GetAkten(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
+	if kinder.GetGattung() == gattung.Zettel {
+		if err = s.kennungIndex.AddHinweis(&kinder.Kennung); err != nil {
+			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
+				errors.Log().Printf("kennung does not contain value: %s", err)
+				err = nil
+			} else {
+				err = errors.Wrapf(err, "failed to write zettel to index: %s", kinder)
+				return
+			}
+		}
+	}
+
+	if mode.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
 		if err = s.commitTransacted(kinder, mutter); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -110,49 +123,6 @@ func (s *Store) tryCommit(
 	}
 
 	err = nil
-
-	g := gattung.Must(kinder.Kennung.GetGattung())
-
-	switch g {
-	case gattung.Konfig:
-		s.GetKonfig().SetHasChanges(true)
-
-		if err = s.GetKonfig().SetTransacted(
-			kinder,
-			s.GetAkten().GetKonfigV0(),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case gattung.Kasten, gattung.Typ, gattung.Etikett:
-		s.GetKonfig().SetHasChanges(mutter != nil)
-
-		if err = s.GetKonfig().AddTransacted(kinder, s.GetAkten()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case gattung.Zettel:
-		if err = s.GetKonfig().ApplyToSku(kinder); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = s.kennungIndex.AddHinweis(&kinder.Kennung); err != nil {
-			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
-				errors.Log().Printf("kennung does not contain value: %s", err)
-				err = nil
-			} else {
-				err = errors.Wrapf(err, "failed to write zettel to index: %s", kinder)
-				return
-			}
-		}
-
-	default:
-		err = gattung.MakeErrUnsupportedGattung(g)
-		return
-	}
 
 	if err = s.GetVerzeichnisse().Add(
 		kinder,

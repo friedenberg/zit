@@ -233,6 +233,9 @@ func (k *compiled) SetTransacted(
 		return
 	}
 
+	k.lock.Lock()
+	defer k.lock.Unlock()
+
 	k.hasChanges = true
 
 	if err = k.Sku.SetFromSkuLike(kt1); err != nil {
@@ -278,23 +281,29 @@ func (k *compiled) AddKasten(
 	return
 }
 
-func (k *compiled) AddTransacted(
-	a *sku.Transacted,
+func (k *Compiled) ApplyAndAddTransacted(
+	kinder *sku.Transacted,
+	mutter *sku.Transacted,
 	ak *akten.Akten,
 ) (err error) {
-	switch a.Kennung.GetGattung() {
+	if err = k.ApplyToSku(kinder); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	switch kinder.Kennung.GetGattung() {
 	case gattung.Typ:
-		return k.AddTyp(a)
+		return k.AddTyp(kinder)
 
 	case gattung.Etikett:
-		return k.AddEtikett(a)
+		return k.AddEtikett(kinder, mutter)
 
 	case gattung.Kasten:
-		return k.AddKasten(a)
+		return k.AddKasten(kinder)
 
 	case gattung.Konfig:
 		return k.SetTransacted(
-			a,
+			kinder,
 			ak.GetKonfigV0(),
 		)
 	}

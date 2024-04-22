@@ -162,20 +162,24 @@ func (k *compiled) AccumulateImplicitEtiketten(
 }
 
 func (k *compiled) AddEtikett(
-	b1 *sku.Transacted,
+	kinder *sku.Transacted,
+	mutter *sku.Transacted,
 ) (err error) {
 	k.lock.Lock()
 	defer k.lock.Unlock()
-	k.hasChanges = true
+
+	// TODO use more specific criteria for determine recompliation like if any
+	// kinder.Metadatei.Etiketten were changed
+	k.hasChanges = mutter != nil
 
 	var b ketikett
 
-	if err = b.Transacted.SetFromSkuLike(b1); err != nil {
+	if err = b.Transacted.SetFromSkuLike(kinder); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if _, err = iter.AddOrReplaceIfGreater[*ketikett](k.Etiketten, &b); err != nil {
+	if _, err = iter.AddOrReplaceIfGreater(k.Etiketten, &b); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
