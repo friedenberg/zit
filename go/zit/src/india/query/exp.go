@@ -7,6 +7,8 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/echo/zittish"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
@@ -46,8 +48,25 @@ func (a *Exp) Clone() (b *Exp) {
 	return b
 }
 
-func (matcher *Exp) MatcherLen() int {
-	return len(matcher.Children)
+func (e *Exp) CollectEtiketten(mes kennung.EtikettMutableSet) {
+	if e.Or {
+		return
+	}
+
+	for _, m := range e.Children {
+		switch mt := m.(type) {
+		case *Exp:
+			mt.CollectEtiketten(mes)
+
+		case *Kennung:
+			if mt.Kennung2.GetGattung() != gattung.Etikett {
+				continue
+			}
+
+			e := kennung.MustEtikett(mt.Kennung2.String())
+			mes.Add(e)
+		}
+	}
 }
 
 func (e *Exp) Reduce(b *Builder) (err error) {

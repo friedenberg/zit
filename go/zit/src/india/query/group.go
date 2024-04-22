@@ -104,7 +104,13 @@ func (qg *Group) GetExplicitCwdFDs() fd.Set {
 }
 
 func (qg *Group) GetEtiketten() kennung.EtikettSet {
-	return qg.Etiketten
+	mes := kennung.MakeMutableEtikettSet()
+
+	for _, oq := range qg.OptimizedQueries {
+		oq.CollectEtiketten(mes)
+	}
+
+	return mes
 }
 
 func (qg *Group) GetTypen() kennung.TypSet {
