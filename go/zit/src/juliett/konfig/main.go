@@ -236,7 +236,7 @@ func (k *compiled) SetTransacted(
 	k.lock.Lock()
 	defer k.lock.Unlock()
 
-	k.hasChanges = true
+	k.setHasChanges()
 
 	if err = k.Sku.SetFromSkuLike(kt1); err != nil {
 		err = errors.Wrap(err)
@@ -260,7 +260,7 @@ func (k *compiled) AddKasten(
 ) (err error) {
 	k.lock.Lock()
 	defer k.lock.Unlock()
-	k.hasChanges = true
+	k.setHasChanges()
 
 	b := sku.GetTransactedPool().Get()
 
@@ -334,7 +334,9 @@ func (k *compiled) AddTyp(
 		b,
 	)
 
-	k.hasChanges = k.hasChanges || shouldAdd
+	if shouldAdd {
+		k.setHasChanges()
+	}
 
 	if err != nil {
 		err = errors.Wrap(err)

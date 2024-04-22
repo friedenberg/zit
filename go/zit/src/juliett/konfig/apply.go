@@ -27,14 +27,13 @@ func (k *Compiled) ApplyToSku(
 	isEtikett := g == gattung.Etikett
 
 	if g.HasParents() {
-		k.SetHasChanges(true)
+		k.SetHasChanges()
 	}
 
 	var etikett kennung.Etikett
 
 	if isEtikett {
 		err = etikett.Set(sk.Kennung.String())
-
 		if err != nil {
 			return
 		}

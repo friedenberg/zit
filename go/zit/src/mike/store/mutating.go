@@ -32,7 +32,6 @@ func (s *Store) tryCommit(
 			err = errors.Wrap(err)
 			return
 		}
-
 	}
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
@@ -59,6 +58,18 @@ func (s *Store) tryCommit(
 
 	if mutter != nil {
 		defer sku.GetTransactedPool().Put(mutter)
+	}
+
+	if err = s.tryPreCommitHook(kinder, mutter, mode); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if kinder.Metadatei.Mutter().IsNull() {
+		if err = s.tryNewHook(kinder, mode); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if err = kinder.CalculateObjekteShas(); err != nil {

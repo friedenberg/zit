@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/delta/etikett_akte"
 	"code.linenisgreat.com/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/echo/standort"
@@ -522,24 +523,40 @@ func (b *Builder) makeEtikettOrEtikettLua(
 
 	defer sku.GetTransactedPool().Put(sk)
 
-	var akte *etikett_akte.V1
-
-	if akte, err = b.akten.GetEtikettV1().GetAkte(
-		sk.GetAkteSha(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if akte.Filter == "" {
-		return
-	}
-
 	var lua Lua
+	if sk.GetTyp().String() == "lua" {
+		var ar sha.ReadCloser
 
-	if err = lua.Set(akte.Filter); err != nil {
-		err = errors.Wrap(err)
-		return
+		if ar, err = b.standort.AkteReader(sk.GetAkteSha()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer errors.DeferredCloser(&err, ar)
+
+		if err = lua.SetReader(ar); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		var akte *etikett_akte.V1
+
+		if akte, err = b.akten.GetEtikettV1().GetAkte(
+			sk.GetAkteSha(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if akte.Filter == "" {
+			return
+		}
+
+		if err = lua.Set(akte.Filter); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 	}
 
 	exp = &EtikettLua{Lua: &lua, Kennung: k}

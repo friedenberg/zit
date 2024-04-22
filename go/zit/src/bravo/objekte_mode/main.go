@@ -9,6 +9,7 @@ const (
 	ModeUpdateTai
 	ModeSchwanz
 	ModeMergeCheckedOut
+	// TODO add hooks modes
 
 	ModeCommit = ModeAddToBestandsaufnahme | ModeUpdateTai | ModeSchwanz
 )

@@ -1,22 +1,11 @@
 package query
 
 import (
-	"strings"
-
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/pool"
+	"code.linenisgreat.com/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
-	lua "github.com/yuin/gopher-lua"
-	lua_ast "github.com/yuin/gopher-lua/ast"
-	lua_parse "github.com/yuin/gopher-lua/parse"
 )
-
-type luaSku struct {
-	*lua.LState
-	*lua.LTable
-}
 
 func MakeLua(script string) (ml *Lua, err error) {
 	ml = &Lua{}
@@ -30,66 +19,36 @@ func MakeLua(script string) (ml *Lua, err error) {
 }
 
 type Lua struct {
-	statePool schnittstellen.Pool[luaSku, *luaSku]
-}
-
-func (matcher *Lua) Set(script string) (err error) {
-	reader := strings.NewReader(script)
-
-	var chunks []lua_ast.Stmt
-
-	if chunks, err = lua_parse.Parse(reader, ""); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var compiled *lua.FunctionProto
-
-	if compiled, err = lua.Compile(chunks, ""); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	matcher.statePool = pool.MakePool(
-		func() (l *luaSku) {
-			l = &luaSku{
-				LState: lua.NewState(),
-			}
-
-			l.LTable = l.NewTable()
-
-			lfunc := l.NewFunctionFromProto(compiled)
-			l.Push(lfunc)
-			l.PCall(0, lua.MultRet, nil)
-
-			return l
-		},
-		func(s *luaSku) {
-			s.SetTop(0)
-		},
-	)
-
-	return
+	lua.VMPool
 }
 
 func (matcher *Lua) ContainsSku(sk *sku.Transacted) bool {
-	s := matcher.statePool.Get()
-	defer matcher.statePool.Put(s)
+	vm := matcher.Get()
+	defer matcher.Put(vm)
 
-	f := s.GetGlobal("contains_matchable")
-	s.Push(f)
+	t := vm.Pool.Get()
+	defer vm.Put(t)
 
-	sku_fmt.Lua(
+	f := vm.GetField(vm.LTable, "contains_sku")
+
+	if f == nil {
+		return false
+	}
+
+	vm.Push(f)
+
+	sku_fmt.ToLuaTable(
 		sk,
-		s.LState,
-		s.LTable,
+		vm.LState,
+		t,
 	)
-	s.Push(s.LTable)
-	s.Call(
+	vm.Push(t)
+	vm.Call(
 		1,
 		1,
 	)
 
+	// TODO make safer than checking bool
 	const idx = -1
-	return s.CheckBool(idx)
+	return vm.CheckBool(idx)
 }

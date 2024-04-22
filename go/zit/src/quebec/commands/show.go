@@ -16,7 +16,7 @@ import (
 
 type Show struct {
 	Format string
-	Filter query.LuaFlag
+	// Filter lua.Flag
 }
 
 func init() {
@@ -26,7 +26,7 @@ func init() {
 			c := &Show{}
 
 			f.StringVar(&c.Format, "format", "log", "format")
-			f.Var(&c.Filter, "filter", "lua filter")
+			// f.Var(&c.Filter, "filter", "lua filter")
 
 			return c
 		},
@@ -87,11 +87,11 @@ func (c Show) runGenericObjekteFormatterValue(
 	if err = u.GetStore().QueryWithCwd(
 		ms,
 		func(sk *sku.Transacted) (err error) {
-			if c.Filter.String() != "" {
-				if !c.Filter.ContainsSku(sk) {
-					return
-				}
-			}
+			// if c.Filter.String() != "" {
+			// 	if !c.Filter.ContainsSku(sk) {
+			// 		return
+			// 	}
+			// }
 
 			if err = f(sk); err != nil {
 				err = errors.Wrap(err)
@@ -136,11 +136,11 @@ func (c Show) RunWithQuery(u *umwelt.Umwelt, ms *query.Group) (err error) {
 	if err = u.GetStore().QueryWithCwd(
 		ms,
 		func(sk *sku.Transacted) (err error) {
-			if c.Filter.String() != "" {
-				if !c.Filter.ContainsSku(sk) {
-					return
-				}
-			}
+			// if c.Filter.String() != "" {
+			// 	if !c.Filter.ContainsSku(sk) {
+			// 		return
+			// 	}
+			// }
 
 			if err = f1(sk); err != nil {
 				err = errors.Wrap(err)

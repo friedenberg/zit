@@ -208,3 +208,40 @@ function checkin_simple_etikett { # @test
 		hide = true
 	EOM
 }
+
+function checkin_zettel_typ_has_commit_hook { # @test
+	cat >typ_with_hook.typ <<-EOM
+		hooks = """
+		return {
+		  on_new = function (kinder)
+		    kinder["Etiketten"]["on_new"] = true
+		    return nil
+		  end,
+		  on_pre_commit = function (kinder, mutter)
+		    kinder["Etiketten"]["on_pre_commit"] = true
+		    return nil
+		  end,
+		}
+		"""
+	EOM
+
+	run_zit checkin -delete typ_with_hook.typ
+	assert_success
+	assert_output - <<-EOM
+		[!typ_with_hook@1f6b9061059a83822901612bc050dd7d966bb5a2ceb917549ca3881728854477]
+		          deleted [typ_with_hook.typ]
+	EOM
+
+	run_zit new -edit=false - <<-EOM
+		---
+		# test lua
+		! typ_with_hook
+		---
+
+		should add new etikett
+	EOM
+	assert_success
+	assert_output - <<-EOM
+		[two/uno@edf7b6df934442ad0d6ac9fe4132c5e588391eb307fbbdc3ab6de780e17245a5 !typ_with_hook "test lua" on_new on_pre_commit]
+	EOM
+}

@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/charlie/files"
@@ -129,10 +130,16 @@ func (kc *Compiled) HasChanges() bool {
 	return kc.hasChanges
 }
 
-func (kc *Compiled) SetHasChanges(v bool) {
+func (kc *compiled) SetHasChanges() {
 	kc.lock.Lock()
 	defer kc.lock.Unlock()
 
+	log.Log().FunctionName(1)
+	kc.hasChanges = true
+}
+
+func (kc *compiled) setHasChanges() {
+	log.Log().FunctionName(1)
 	kc.hasChanges = true
 }
 
@@ -172,7 +179,7 @@ func (kc *Compiled) Flush(
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 	printerHeader schnittstellen.FuncIter[string],
 ) (err error) {
-	if !kc.hasChanges || kc.DryRun {
+	if !kc.HasChanges() || kc.DryRun {
 		return
 	}
 

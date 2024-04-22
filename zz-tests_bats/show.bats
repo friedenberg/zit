@@ -337,9 +337,11 @@ function show_history_all { # @test
 function show_etikett_lua { # @test
 	cat >true.etikett <<-EOM
 		filter = """
-		  function contains_matchable(sk)
+		return {
+		  contains_sku = function (sk)
 		    return true
 		  end
+		}
 		"""
 	EOM
 
@@ -347,7 +349,7 @@ function show_etikett_lua { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		          deleted [true.etikett]
-		[true@da7ac47a19bb0185dcf7f08a6de4b07d2f98ead7f9ec02981d1b6a0ef1d92cf6]
+		[true@1379cb8d553a340a4d262b3be216659d8d8835ad0b4cc48005db8db264a395ed]
 	EOM
 
 	run_zit show true

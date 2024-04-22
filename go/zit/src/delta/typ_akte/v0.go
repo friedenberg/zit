@@ -17,6 +17,7 @@ type V0 struct {
 	Formatters         map[string]script_config.WithOutputFormat `toml:"formatters,omitempty"`
 	Actions            map[string]script_config.ScriptConfig     `toml:"actions,omitempty"`
 	EtikettenRules     map[string]etikett_rule.Rule              `toml:"etiketten-rules,omitempty"`
+	Hooks              interface{}                               `toml:"hooks"`
 }
 
 func (a *V0) Reset() {
@@ -30,4 +31,5 @@ func (a *V0) Reset() {
 	a.Formatters = reset.Map(a.Formatters)
 	a.Actions = reset.Map(a.Actions)
 	a.EtikettenRules = reset.Map(a.EtikettenRules)
+	a.Hooks = nil
 }
