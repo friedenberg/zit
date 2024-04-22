@@ -12,12 +12,12 @@ import (
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/src/echo/thyme"
+	"code.linenisgreat.com/zit/src/foxtrot/erworben"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/erworben"
-	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/juliett/chrome"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
+	"code.linenisgreat.com/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/src/mike/store"
 )
@@ -237,7 +237,7 @@ func (u *Umwelt) MakeQueryBuilderExcludingHidden(
 		dg = kennung.MakeGattung(gattung.Zettel)
 	}
 
-	return query.MakeBuilder(u.Standort(), u.GetChrestStore()).
+	return query.MakeBuilder(u.Standort(), u.GetStore().GetAkten(), u.GetChrestStore()).
 		WithDefaultGattungen(dg).
 		WithVirtualEtiketten(u.konfig.Filters).
 		WithCwd(u.GetStore().GetCwdFiles()).
@@ -253,7 +253,7 @@ func (u *Umwelt) MakeQueryBuilder(
 		dg = kennung.MakeGattung(gattung.Zettel)
 	}
 
-	return query.MakeBuilder(u.Standort(), u.GetChrestStore()).
+	return query.MakeBuilder(u.Standort(), u.GetStore().GetAkten(), u.GetChrestStore()).
 		WithDefaultGattungen(dg).
 		WithVirtualEtiketten(u.konfig.Filters).
 		WithCwd(u.GetStore().GetCwdFiles()).

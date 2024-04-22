@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/query"
+	"code.linenisgreat.com/zit/src/juliett/query"
 )
 
 func (s *Store) QueryWithoutCwd(

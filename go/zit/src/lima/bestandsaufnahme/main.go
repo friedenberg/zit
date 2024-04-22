@@ -19,9 +19,9 @@ import (
 	"code.linenisgreat.com/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/akten"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/juliett/objekte"
-	"code.linenisgreat.com/zit/src/lima/akten"
 )
 
 type Store interface {
@@ -42,14 +42,14 @@ type Store interface {
 	) error
 }
 
-type AkteFormat = akten.AkteFormat[
+type AkteFormat = akten.Format[
 	Akte,
 	*Akte,
 ]
 
 type akteFormat interface {
 	FormatParsedAkte(io.Writer, *Akte) (n int64, err error)
-	akten.AkteParser[Akte, *Akte]
+	akten.Parser[Akte, *Akte]
 }
 
 type store struct {

@@ -21,9 +21,9 @@ import (
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
+	"code.linenisgreat.com/zit/src/juliett/query"
 )
 
 type transacted struct {

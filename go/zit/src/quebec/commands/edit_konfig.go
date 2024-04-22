@@ -11,8 +11,8 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/foxtrot/erworben"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/erworben"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 	"code.linenisgreat.com/zit/src/papa/user_ops"
 )

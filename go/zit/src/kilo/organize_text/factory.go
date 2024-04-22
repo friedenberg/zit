@@ -251,7 +251,7 @@ func (atc Factory) makeChildren(
 		return
 	}
 
-  parent.SortChildren()
+	parent.SortChildren()
 
 	return
 }

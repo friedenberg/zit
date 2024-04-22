@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/src/india/query"
+	"code.linenisgreat.com/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 	"code.linenisgreat.com/zit/src/papa/remote_conn"
 )

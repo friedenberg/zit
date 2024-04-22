@@ -20,6 +20,7 @@ import (
 	"code.linenisgreat.com/zit/src/golf/ennui"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/akten"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 )
 
@@ -89,7 +90,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 func (fv *FormatterValue) MakeFormatterObjekte(
 	out io.Writer,
 	s standort.Standort,
-	k Konfig,
+	k akten.Konfig,
 	logFunc schnittstellen.FuncIter[*sku.Transacted],
 	cliFmt schnittstellen.StringFormatWriter[*sku.Transacted],
 	enn ennui.Ennui,

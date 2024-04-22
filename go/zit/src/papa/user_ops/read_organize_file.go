@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/src/india/query"
+	"code.linenisgreat.com/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )

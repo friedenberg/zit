@@ -14,7 +14,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/india/erworben"
+	"code.linenisgreat.com/zit/src/foxtrot/erworben"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 

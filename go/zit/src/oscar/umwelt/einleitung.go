@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/india/erworben"
+	"code.linenisgreat.com/zit/src/foxtrot/erworben"
 	"code.linenisgreat.com/zit/src/kilo/typ"
 )
 

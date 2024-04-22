@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/india/alfred"
-	"code.linenisgreat.com/zit/src/india/query"
+	"code.linenisgreat.com/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
 

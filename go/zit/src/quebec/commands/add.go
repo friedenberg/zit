@@ -18,7 +18,7 @@ import (
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/objekte_collections"
-	"code.linenisgreat.com/zit/src/india/query"
+	"code.linenisgreat.com/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/src/kilo/cwd"
 	"code.linenisgreat.com/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/src/kilo/zettel"

@@ -8,8 +8,8 @@ import (
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/juliett/objekte"
+	"code.linenisgreat.com/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/src/kilo/objekte_formatter"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
@@ -85,7 +85,7 @@ func (c Show) runGenericObjekteFormatterValue(
 	// }
 
 	if err = u.GetStore().QueryWithCwd(
-    ms,
+		ms,
 		func(sk *sku.Transacted) (err error) {
 			if c.Filter.String() != "" {
 				if !c.Filter.ContainsSku(sk) {
@@ -100,7 +100,7 @@ func (c Show) runGenericObjekteFormatterValue(
 
 			return
 		},
-  ); err != nil {
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

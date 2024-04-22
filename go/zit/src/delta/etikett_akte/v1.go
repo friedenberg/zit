@@ -5,9 +5,9 @@ type V1 struct {
 }
 
 func (a *V1) Reset() {
-  a.Filter = ""
+	a.Filter = ""
 }
 
 func (a *V1) ResetWith(b V1) {
-  a.Filter = b.Filter
+	a.Filter = b.Filter
 }

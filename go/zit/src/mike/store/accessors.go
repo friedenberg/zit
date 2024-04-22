@@ -7,16 +7,16 @@ import (
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/src/echo/thyme"
+	"code.linenisgreat.com/zit/src/foxtrot/erworben"
 	"code.linenisgreat.com/zit/src/golf/ennui"
 	"code.linenisgreat.com/zit/src/golf/kennung_index"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/erworben"
+	"code.linenisgreat.com/zit/src/india/akten"
 	"code.linenisgreat.com/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/src/kilo/cwd"
 	"code.linenisgreat.com/zit/src/kilo/store_verzeichnisse"
-	"code.linenisgreat.com/zit/src/lima/akten"
 	"code.linenisgreat.com/zit/src/lima/bestandsaufnahme"
 )
 
@@ -95,7 +95,7 @@ func (s *Store) GetVerzeichnisse() *store_verzeichnisse.Store {
 	return s.verzeichnisse
 }
 
-func (s *Store) GetKonfigAkteFormat() akten.AkteFormat[erworben.Akte, *erworben.Akte] {
+func (s *Store) GetKonfigAkteFormat() akten.Format[erworben.Akte, *erworben.Akte] {
 	return s.konfigAkteFormat
 }
 

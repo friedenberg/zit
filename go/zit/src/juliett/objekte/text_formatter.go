@@ -9,18 +9,19 @@ import (
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/akten"
 )
 
 func MakeTextFormatter(
 	af schnittstellen.AkteReaderFactory,
-	k Konfig,
+	k akten.Konfig,
 ) textFormatter {
 	return MakeTextFormatterWithAkteFormatter(af, k, nil)
 }
 
 func MakeTextFormatterWithAkteFormatter(
 	af schnittstellen.AkteReaderFactory,
-	k Konfig,
+	k akten.Konfig,
 	akteFormatter script_config.RemoteScript,
 ) textFormatter {
 	return textFormatter{
@@ -32,7 +33,7 @@ func MakeTextFormatterWithAkteFormatter(
 }
 
 type textFormatter struct {
-	k                                            Konfig
+	k                                            akten.Konfig
 	fMetadateiAndAkte, fMetadateiOnly, fAkteOnly metadatei.TextFormatter
 }
 

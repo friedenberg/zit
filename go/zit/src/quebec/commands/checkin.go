@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/india/query"
+	"code.linenisgreat.com/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 	"code.linenisgreat.com/zit/src/papa/user_ops"
 )

@@ -2,7 +2,7 @@ package commands
 
 import (
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/india/query"
+	"code.linenisgreat.com/zit/src/juliett/query"
 )
 
 type QueryBuilderModifier interface {
