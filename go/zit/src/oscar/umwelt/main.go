@@ -230,6 +230,15 @@ func (u *Umwelt) GetChrestStore() *query.VirtualStoreInitable {
 	return u.virtualStores["%chrome"]
 }
 
+func (u *Umwelt) makeQueryBuilder() *query.Builder {
+	return query.MakeBuilder(
+		u.Standort(),
+		u.GetStore().GetAkten(),
+		u.GetStore().GetVerzeichnisse(),
+		u.GetChrestStore(),
+	)
+}
+
 func (u *Umwelt) MakeQueryBuilderExcludingHidden(
 	dg kennung.Gattung,
 ) *query.Builder {
@@ -237,7 +246,7 @@ func (u *Umwelt) MakeQueryBuilderExcludingHidden(
 		dg = kennung.MakeGattung(gattung.Zettel)
 	}
 
-	return query.MakeBuilder(u.Standort(), u.GetStore().GetAkten(), u.GetChrestStore()).
+	return u.makeQueryBuilder().
 		WithDefaultGattungen(dg).
 		WithVirtualEtiketten(u.konfig.Filters).
 		WithCwd(u.GetStore().GetCwdFiles()).
@@ -253,7 +262,7 @@ func (u *Umwelt) MakeQueryBuilder(
 		dg = kennung.MakeGattung(gattung.Zettel)
 	}
 
-	return query.MakeBuilder(u.Standort(), u.GetStore().GetAkten(), u.GetChrestStore()).
+	return u.makeQueryBuilder().
 		WithDefaultGattungen(dg).
 		WithVirtualEtiketten(u.konfig.Filters).
 		WithCwd(u.GetStore().GetCwdFiles()).

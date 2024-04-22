@@ -38,7 +38,7 @@ func (ve *VirtualStoreInitable) Flush() (err error) {
 
 type Virtual struct {
 	sku.Queryable
-	Kennung
+	*Kennung
 }
 
 func (ve *VirtualStoreInitable) Query(

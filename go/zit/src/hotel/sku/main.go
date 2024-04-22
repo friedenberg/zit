@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
@@ -16,6 +17,13 @@ func init() {
 }
 
 type (
+	Ennui interface {
+		WriteOneObjekteMetadatei(o *Transacted) (err error)
+		ReadOneEnnui(*sha.Sha) (*Transacted, error)
+		ReadOneKennung(kennung.Kennung) (*Transacted, error)
+		ReadOneKennungSha(kennung.Kennung) (*sha.Sha, error)
+	}
+
 	Queryable interface {
 		ContainsSku(*Transacted) bool
 	}

@@ -4,6 +4,8 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/charlie/collections"
+	"code.linenisgreat.com/zit/src/delta/etikett_akte"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -16,11 +18,13 @@ import (
 func MakeBuilder(
 	s standort.Standort,
 	akten *akten.Akten,
+	ennui sku.Ennui,
 	chrome *VirtualStoreInitable,
 ) (b *Builder) {
 	b = &Builder{
 		standort:                   s,
 		akten:                      akten,
+		ennui:                      ennui,
 		virtualStores:              make(map[string]*VirtualStoreInitable),
 		virtualEtikettenBeforeInit: make(map[string]string),
 		virtualEtiketten:           make(map[string]*Lua),
@@ -36,6 +40,7 @@ func MakeBuilder(
 type Builder struct {
 	standort                   standort.Standort
 	akten                      *akten.Akten
+	ennui                      sku.Ennui
 	preexistingKennung         []*kennung.Kennung2
 	cwd                        Cwd
 	fileExtensionGetter        schnittstellen.FileExtensionGetter
@@ -440,54 +445,15 @@ LOOP:
 				q.Kennung[k.Kennung2.String()] = k
 
 			case gattung.Etikett:
-				// TODO use b.akten to read Etikett Akte and find filter if necessary
-				var e kennung.Etikett
+				var et sku.Query
 
-				if err = e.TodoSetFromKennung2(k.Kennung2); err != nil {
+				if et, err = b.makeEtikettExp(&k); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 
-				if e.IsVirtual() {
-					expanded := kennung.ExpandOneSlice(&e)
-					var store *VirtualStoreInitable
-					var eStore *Lua
-
-					for _, e1 := range expanded {
-						store = b.virtualStores[e1.String()]
-
-						if store != nil {
-							break
-						}
-
-						eStore = b.virtualEtiketten[e1.String()]
-
-						if eStore != nil {
-							break
-						}
-					}
-
-					if store == nil && eStore == nil {
-						err = errors.Errorf("no virtual store registered for %q", e)
-						return
-					}
-
-					if store != nil {
-						if err = store.Initialize(); err != nil {
-							err = errors.Wrap(err)
-							return
-						}
-
-						exp := b.makeExp(isNegated, isExact, &Virtual{Queryable: store, Kennung: k})
-						stack[len(stack)-1].Add(exp)
-					} else {
-						exp := b.makeExp(isNegated, isExact, &Virtual{Queryable: eStore, Kennung: k})
-						stack[len(stack)-1].Add(exp)
-					}
-				} else {
-					exp := b.makeExp(isNegated, isExact, &k)
-					stack[len(stack)-1].Add(exp)
-				}
+				exp := b.makeExp(isNegated, isExact, et)
+				stack[len(stack)-1].Add(exp)
 
 			case gattung.Typ:
 				var t kennung.Typ
@@ -528,6 +494,109 @@ LOOP:
 	if err = qg.Add(q); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	return
+}
+
+func (b *Builder) makeEtikettOrEtikettLua(
+	k *Kennung,
+) (exp sku.Query, err error) {
+	exp = k
+
+	if b.ennui == nil || b.akten == nil {
+		return
+	}
+
+	var sk *sku.Transacted
+
+	if sk, err = b.ennui.ReadOneKennung(k); err != nil {
+		if collections.IsErrNotFound(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	defer sku.GetTransactedPool().Put(sk)
+
+	var akte *etikett_akte.V1
+
+	if akte, err = b.akten.GetEtikettV1().GetAkte(
+		sk.GetAkteSha(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if akte.Filter == "" {
+		return
+	}
+
+	var lua Lua
+
+	if err = lua.Set(akte.Filter); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	exp = &EtikettLua{Lua: &lua, Kennung: k}
+
+	return
+}
+
+func (b *Builder) makeEtikettExp(k *Kennung) (exp sku.Query, err error) {
+	// TODO use b.akten to read Etikett Akte and find filter if necessary
+	var e kennung.Etikett
+
+	if err = e.TodoSetFromKennung2(k.Kennung2); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if !e.IsVirtual() {
+		if exp, err = b.makeEtikettOrEtikettLua(k); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+
+	expanded := kennung.ExpandOneSlice(&e)
+	var store *VirtualStoreInitable
+	var eStore *Lua
+
+	for _, e1 := range expanded {
+		store = b.virtualStores[e1.String()]
+
+		if store != nil {
+			break
+		}
+
+		eStore = b.virtualEtiketten[e1.String()]
+
+		if eStore != nil {
+			break
+		}
+	}
+
+	if store == nil && eStore == nil {
+		err = errors.Errorf("no virtual store registered for %q", e)
+		return
+	}
+
+	if store != nil {
+		if err = store.Initialize(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		exp = &Virtual{Queryable: store, Kennung: k}
+	} else {
+		exp = &Virtual{Queryable: eStore, Kennung: k}
 	}
 
 	return

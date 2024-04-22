@@ -16,13 +16,6 @@ import (
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
-type Ennui interface {
-	WriteOneObjekteMetadatei(o *sku.Transacted) (err error)
-	ReadOneEnnui(*sha.Sha) (*sku.Transacted, error)
-	ReadOneKennung(kennung.Kennung) (*sku.Transacted, error)
-	ReadOneKennungSha(kennung.Kennung) (*sha.Sha, error)
-}
-
 type ennuiStore struct {
 	standort                  standort.Standort
 	persistentMetadateiFormat objekte_format.Format
