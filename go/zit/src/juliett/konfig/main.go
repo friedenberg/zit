@@ -153,10 +153,7 @@ func (c *compiled) GetSortedTypenExpanded(
 ) (expandedActual []*sku.Transacted) {
 	expandedMaybe := collections_value.MakeMutableValueSet[values.String](nil)
 
-	sa := iter.MakeFuncSetString[
-		values.String,
-		*values.String,
-	](expandedMaybe)
+	sa := iter.MakeFuncSetString(expandedMaybe)
 
 	typExpander.Expand(sa, v)
 	expandedActual = make([]*sku.Transacted, 0)
@@ -270,7 +267,7 @@ func (k *compiled) AddKasten(
 		return
 	}
 
-	_, err = iter.AddOrReplaceIfGreater[*sku.Transacted](
+	_, err = iter.AddOrReplaceIfGreater(
 		k.Kisten,
 		b,
 	)
@@ -325,7 +322,7 @@ func (k *compiled) AddTyp(
 	k.lock.Lock()
 	defer k.lock.Unlock()
 
-	shouldAdd, err := iter.AddOrReplaceIfGreater[*sku.Transacted](
+	shouldAdd, err := iter.AddOrReplaceIfGreater(
 		k.Typen,
 		b,
 	)

@@ -49,7 +49,7 @@ func (a *Exp) Clone() (b *Exp) {
 }
 
 func (e *Exp) CollectEtiketten(mes kennung.EtikettMutableSet) {
-	if e.Or {
+	if e.Or || e.Negated {
 		return
 	}
 

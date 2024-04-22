@@ -15,7 +15,6 @@ import (
 	"code.linenisgreat.com/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/src/india/query"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
-	"code.linenisgreat.com/zit/src/juliett/objekte"
 	"code.linenisgreat.com/zit/src/kilo/cwd"
 	"code.linenisgreat.com/zit/src/kilo/store_verzeichnisse"
 	"code.linenisgreat.com/zit/src/kilo/zettel"
@@ -50,7 +49,7 @@ type Store struct {
 	typenIndex kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
 
 	protoZettel      zettel.ProtoZettel
-	konfigAkteFormat objekte.AkteFormat[erworben.Akte, *erworben.Akte]
+	konfigAkteFormat akten.AkteFormat[erworben.Akte, *erworben.Akte]
 
 	Logger
 }
@@ -141,10 +140,10 @@ func (c *Store) Initialize(
 	c.protoZettel = zettel.MakeProtoZettel(c.GetKonfig())
 
 	c.konfigAkteFormat = akten.MakeAkteFormat[erworben.Akte, *erworben.Akte](
-		objekte.MakeTextParserIgnoreTomlErrors[erworben.Akte](
+		akten.MakeTextParserIgnoreTomlErrors[erworben.Akte](
 			c.GetStandort(),
 		),
-		objekte.ParsedAkteTomlFormatter[erworben.Akte, *erworben.Akte]{},
+		akten.ParsedAkteTomlFormatter[erworben.Akte, *erworben.Akte]{},
 		c.GetStandort(),
 	)
 

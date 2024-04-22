@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/src/lima/akten"
 )
 
 type readerAkteParseSaver[
@@ -13,7 +14,7 @@ type readerAkteParseSaver[
 	OPtr schnittstellen.AktePtr[O],
 ] struct {
 	awf    schnittstellen.AkteWriterFactory
-	parser AkteParser[O, OPtr]
+	parser akten.AkteParser[O, OPtr]
 }
 
 func MakeReaderAkteParseSaver[
@@ -21,7 +22,7 @@ func MakeReaderAkteParseSaver[
 	OPtr schnittstellen.AktePtr[O],
 ](
 	awf schnittstellen.AkteWriterFactory,
-	parser AkteParser[O, OPtr],
+	parser akten.AkteParser[O, OPtr],
 ) readerAkteParseSaver[O, OPtr] {
 	return readerAkteParseSaver[O, OPtr]{
 		awf:    awf,

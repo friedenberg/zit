@@ -126,8 +126,7 @@ func (s *Store) tryCommit(
 		}
 
 	case gattung.Kasten, gattung.Typ, gattung.Etikett:
-		// TODO be more conservative about when konfig changes actually occurred
-		s.GetKonfig().SetHasChanges(true)
+		s.GetKonfig().SetHasChanges(mutter != nil)
 
 		if err = s.GetKonfig().AddTransacted(kinder, s.GetAkten()); err != nil {
 			err = errors.Wrap(err)

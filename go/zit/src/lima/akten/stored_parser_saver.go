@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/juliett/objekte"
 )
 
 type StoredParseSaver[
@@ -28,7 +27,7 @@ type storedParserSaver[
 	OPtr schnittstellen.AktePtr[O],
 ] struct {
 	awf        schnittstellen.AkteWriterFactory
-	akteParser objekte.AkteParser[O, OPtr]
+	akteParser AkteParser[O, OPtr]
 }
 
 func MakeStoredParseSaver[
@@ -36,12 +35,12 @@ func MakeStoredParseSaver[
 	OPtr schnittstellen.AktePtr[O],
 ](
 	awf schnittstellen.AkteIOFactory,
-	akteParser objekte.AkteParser[O, OPtr],
+	akteParser AkteParser[O, OPtr],
 	pmf objekte_format.Format,
 	op objekte_format.Options,
 ) storedParserSaver[O, OPtr] {
 	if akteParser == nil {
-		akteParser = objekte.MakeNopAkteParseSaver[O, OPtr](awf)
+		akteParser = MakeNopAkteParseSaver[O, OPtr](awf)
 	}
 
 	if pmf == nil {

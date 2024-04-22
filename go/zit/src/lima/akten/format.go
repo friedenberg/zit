@@ -5,31 +5,30 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/juliett/objekte"
 )
 
 type akteFormat[
 	O schnittstellen.Akte[O],
 	OPtr schnittstellen.AktePtr[O],
 ] struct {
-	objekte.AkteParser[O, OPtr]
-	objekte.AkteParseSaver[O, OPtr]
-	objekte.SavedAkteFormatter
-	objekte.ParsedAkteFormatter[O, OPtr]
+	AkteParser[O, OPtr]
+	AkteParseSaver[O, OPtr]
+	SavedAkteFormatter
+	ParsedAkteFormatter[O, OPtr]
 }
 
 func MakeAkteFormat[
 	O schnittstellen.Akte[O],
 	OPtr schnittstellen.AktePtr[O],
 ](
-	akteParser objekte.AkteParser[O, OPtr],
-	parsedAkteFormatter objekte.ParsedAkteFormatter[O, OPtr],
+	akteParser AkteParser[O, OPtr],
+	parsedAkteFormatter ParsedAkteFormatter[O, OPtr],
 	arf schnittstellen.AkteReaderFactory,
-) objekte.AkteFormat[O, OPtr] {
+) AkteFormat[O, OPtr] {
 	return akteFormat[O, OPtr]{
 		AkteParser:          akteParser,
 		ParsedAkteFormatter: parsedAkteFormatter,
-		SavedAkteFormatter:  objekte.MakeSavedAkteFormatter(arf),
+		SavedAkteFormatter:  MakeSavedAkteFormatter(arf),
 	}
 }
 

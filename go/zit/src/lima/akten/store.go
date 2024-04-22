@@ -5,7 +5,6 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/standort"
-	"code.linenisgreat.com/zit/src/juliett/objekte"
 )
 
 type AkteStore[
@@ -14,7 +13,7 @@ type AkteStore[
 ] struct {
 	standort standort.Standort
 	StoredParseSaver[A, APtr]
-	objekte.AkteFormat[A, APtr]
+	AkteFormat[A, APtr]
 	resetFunc func(APtr)
 }
 
@@ -23,7 +22,7 @@ func MakeAkteStore[
 	APtr schnittstellen.AktePtr[A],
 ](
 	st standort.Standort,
-	akteFormat objekte.AkteFormat[A, APtr],
+	akteFormat AkteFormat[A, APtr],
 	resetFunc func(APtr),
 ) (s *AkteStore[A, APtr]) {
 	s = &AkteStore[A, APtr]{

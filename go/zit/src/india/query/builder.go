@@ -14,10 +14,12 @@ import (
 
 func MakeBuilder(
 	s standort.Standort,
+	// akten *akten.Akten,
 	chrome *VirtualStoreInitable,
 ) (b *Builder) {
 	b = &Builder{
-		standort:                   s,
+		standort: s,
+		// akten:                      akten,
 		virtualStores:              make(map[string]*VirtualStoreInitable),
 		virtualEtikettenBeforeInit: make(map[string]string),
 		virtualEtiketten:           make(map[string]*Lua),
@@ -31,7 +33,8 @@ func MakeBuilder(
 }
 
 type Builder struct {
-	standort                   standort.Standort
+	standort standort.Standort
+	// akten                      *akten.Akten
 	preexistingKennung         []*kennung.Kennung2
 	implicitEtikettenGetter    ImplicitEtikettenGetter
 	cwd                        Cwd
@@ -488,13 +491,6 @@ LOOP:
 						stack[len(stack)-1].Add(exp)
 					}
 				} else {
-					if !isNegated {
-						if err = qg.Etiketten.Add(e); err != nil {
-							err = errors.Wrap(err)
-							return
-						}
-					}
-
 					exp := b.makeExp(isNegated, isExact, &k)
 					stack[len(stack)-1].Add(exp)
 				}

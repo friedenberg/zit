@@ -21,7 +21,6 @@ func MakeGroup(
 		Hidden:           b.hidden,
 		FDs:              fd.MakeMutableSet(),
 		Zettelen:         kennung.MakeHinweisMutableSet(),
-		Etiketten:        kennung.MakeMutableEtikettSet(),
 		Typen:            kennung.MakeMutableTypSet(),
 	}
 }
@@ -33,7 +32,6 @@ type Group struct {
 	Kennungen        []*kennung.Kennung2
 	FDs              fd.MutableSet
 	Zettelen         kennung.HinweisMutableSet
-	Etiketten        kennung.EtikettMutableSet
 	Typen            kennung.TypMutableSet
 }
 
