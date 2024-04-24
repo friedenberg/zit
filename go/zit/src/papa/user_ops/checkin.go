@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/november/umwelt"
 )
 
 type Checkin struct {

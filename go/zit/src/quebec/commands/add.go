@@ -22,7 +22,7 @@ import (
 	"code.linenisgreat.com/zit/src/kilo/cwd"
 	"code.linenisgreat.com/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/src/kilo/zettel"
-	"code.linenisgreat.com/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/src/papa/user_ops"
 )
 

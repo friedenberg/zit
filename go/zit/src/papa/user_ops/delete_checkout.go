@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/november/umwelt"
 )
 
 type DeleteCheckout struct {

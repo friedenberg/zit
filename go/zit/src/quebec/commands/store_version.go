@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/delta/angeboren"
-	"code.linenisgreat.com/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/november/umwelt"
 )
 
 type StoreVersion struct {

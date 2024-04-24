@@ -3,7 +3,7 @@ package user_ops
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/delta/exec_editor"
-	"code.linenisgreat.com/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/november/umwelt"
 )
 
 type OpenVim struct {

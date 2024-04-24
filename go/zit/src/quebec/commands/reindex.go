@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/november/umwelt"
 )
 
 type Reindex struct{}

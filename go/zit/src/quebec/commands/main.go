@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/src/foxtrot/erworben"
-	"code.linenisgreat.com/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/november/umwelt"
 )
 
 func Run(args []string) (exitStatus int) {

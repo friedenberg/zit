@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/src/kilo/organize_text"
-	"code.linenisgreat.com/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/november/umwelt"
 )
 
 type ReadOrganizeFile struct {

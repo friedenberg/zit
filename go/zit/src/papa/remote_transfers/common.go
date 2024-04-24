@@ -2,7 +2,7 @@ package remote_transfers
 
 import (
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
-	"code.linenisgreat.com/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/november/umwelt"
 )
 
 type common struct {

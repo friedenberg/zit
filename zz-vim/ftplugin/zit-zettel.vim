@@ -1,16 +1,16 @@
 
 " TODO-P3 use https://github.com/suy/vim-context-commentstring
-let &l:equalprg = "zit format-zettel %"
+let &l:equalprg = "$BIN_ZIT format-zettel %"
 let &l:comments = "fb:*,fb:-,fb:+,n:>"
 let &l:commentstring = "<!--%s-->"
 
 function! GfZettel()
   let l:h = expand("<cfile>")
-  let l:expanded = trim(system("zit expand-hinweis " . l:h))
+  let l:expanded = trim(system("$BIN_ZIT expand-hinweis " . l:h))
   let l:f = l:expanded . ".zettel"
 
   if !filereadable(l:f)
-    echo system("zit checkout -mode both " . l:expanded)
+    echo system("$BIN_ZIT checkout -mode both " . l:expanded)
   endif
 
   let l:cmd = 'tabedit ' . l:f
@@ -33,7 +33,7 @@ function! ZitAction()
     endif
 
     let l:val = substitute(l:items[a:result-1], '\t.*$', '', '')
-    execute("!zit exec-action -action " . l:val .  " " . GetKennung())
+    execute("!$BIN_ZIT exec-action -action " . l:val .  " " . GetKennung())
   endfunc
 
   if len(l:items) == 0
@@ -60,7 +60,7 @@ function! ZitMakeUTIGroupCommand(uti_group, cmd_args_unprocessed_list)
     call add(l:cmd_args_list, "-i")
     call add(l:cmd_args_list, l:uti)
     let l:cmd_sub_args = [
-          \ "zit", "format-zettel", "-mode akte",
+          \ "$BIN_ZIT", "format-zettel", "-mode akte",
           \ "-uti-group", a:uti_group,
           \ l:uti,
           \ GetKennung(),
@@ -94,17 +94,17 @@ function! GetKennung()
 endfunction
 
 function! ZitGetUTIGroups()
-  let l:rawItems = sort(systemlist("zit show -format typ-formatter-uti-groups " . GetKennung()))
+  let l:rawItems = sort(systemlist("$BIN_ZIT show -format typ.formatter-uti-groups " . GetKennung()))
   return SplitListOnSpaceAndReturnBoth(l:rawItems)
 endfunction
 
 function! ZitGetActionNames()
-  let l:rawItems = sort(systemlist("zit show -format action-names " . GetKennung()))
+  let l:rawItems = sort(systemlist("$BIN_ZIT show -format typ.action-names " . GetKennung()))
   return SplitListOnSpaceAndReturnBoth(l:rawItems)
 endfunction
 
 function! ZitGetFormats()
-  let l:rawItems =  sort(systemlist("zit show -format formatters " . GetKennung()))
+  let l:rawItems =  sort(systemlist("$BIN_ZIT show -format typ.formatters " . GetKennung()))
   return SplitListOnSpaceAndReturnBoth(l:rawItems)
 endfunction
 

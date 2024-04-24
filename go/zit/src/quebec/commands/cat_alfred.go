@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/india/alfred"
 	"code.linenisgreat.com/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/november/umwelt"
 )
 
 type CatAlfred struct {

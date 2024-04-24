@@ -3,7 +3,7 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/november/umwelt"
 )
 
 type Command interface {

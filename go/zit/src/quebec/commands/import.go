@@ -17,7 +17,7 @@ import (
 	"code.linenisgreat.com/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/src/lima/bestandsaufnahme"
 	"code.linenisgreat.com/zit/src/mike/store"
-	"code.linenisgreat.com/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/november/umwelt"
 )
 
 type Import struct {

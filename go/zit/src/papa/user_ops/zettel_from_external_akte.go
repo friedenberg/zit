@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/src/kilo/zettel"
-	"code.linenisgreat.com/zit/src/oscar/umwelt"
+	"code.linenisgreat.com/zit/src/november/umwelt"
 )
 
 type ZettelFromExternalAkte struct {
