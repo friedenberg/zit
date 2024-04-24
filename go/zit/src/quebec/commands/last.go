@@ -60,6 +60,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		u.GetStore().GetEnnui(),
 		u.GetStore().ReadOneEnnui,
 		u.GetStore().GetVerzeichnisse(),
+		u.GetStore().GetAkten(),
 	)
 
 	if err = c.runWithBestandsaufnahm(u, f); err != nil {

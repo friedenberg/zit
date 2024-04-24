@@ -68,6 +68,7 @@ func (c Show) runGenericObjekteFormatterValue(
 			u.GetStore().GetEnnui(),
 			u.GetStore().ReadOneEnnui,
 			u.GetStore().GetVerzeichnisse(),
+      u.GetStore().GetAkten(),
 		),
 	)
 

@@ -182,7 +182,7 @@ function checkin_simple_typ { # @test
 
 	run_zit show -format vim-syntax-type !md:typ
 	assert_success
-	assert_output 'test'
+	assert_output 'toml'
 }
 
 function checkin_simple_etikett { # @test

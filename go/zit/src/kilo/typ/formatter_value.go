@@ -6,7 +6,9 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/src/delta/typ_akte"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/juliett/objekte"
@@ -23,7 +25,7 @@ func (f FormatterValue) String() string {
 func (f *FormatterValue) Set(v string) (err error) {
 	v1 := strings.TrimSpace(strings.ToLower(v))
 	switch v1 {
-	case "action-names", "vim-syntax-type":
+	case "action-names", "hooks.on_pre_commit":
 		f.string = v1
 
 	default:
@@ -61,9 +63,7 @@ func (f *FormatterValue) FuncFormatter(
 			return
 		}
 
-	case "vim-syntax-type":
-		f := typ_akte.MakeFormatterVimSyntaxType()
-
+	case "hooks.on_pre_commit":
 		return func(o *sku.Transacted) (err error) {
 			var akte *typ_akte.V0
 
@@ -74,10 +74,32 @@ func (f *FormatterValue) FuncFormatter(
 
 			defer agp.PutAkte(akte)
 
-			if _, err = f.Format(out, akte); err != nil {
+			script, ok := akte.Hooks.(string)
+
+			if !ok || script == "" {
+				return
+			}
+
+			var vp lua.VMPool
+
+			if err = vp.Set(script); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
+
+			vm := vp.Get()
+			defer vp.Put(vm)
+
+			var tt *lua.LTable
+
+			if tt, err = vm.GetTopTableOrError(); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			f := vm.GetField(tt, "on_pre_commit")
+
+			log.Out().Print(f.String())
 
 			return
 		}

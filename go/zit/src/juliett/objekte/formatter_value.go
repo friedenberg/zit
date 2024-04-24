@@ -15,6 +15,7 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/src/delta/typ_akte"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/src/golf/ennui"
@@ -75,6 +76,7 @@ func (f *FormatterValue) Set(v string) (err error) {
 		"tai",
 		"text",
 		"text-sku-prefix",
+		"vim-syntax-type",
 		"typ",
 		"verzeichnisse":
 		f.string = v1
@@ -99,6 +101,7 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 		ReadOneKennung(kennung.Kennung) (*sku.Transacted, error)
 		ReadOneEnnui(sh *sha.Sha) (sk *sku.Transacted, err error)
 	},
+	akten *akten.Akten,
 ) schnittstellen.FuncIter[*sku.Transacted] {
 	switch fv.string {
 	case "sha":
@@ -630,6 +633,49 @@ func (fv *FormatterValue) MakeFormatterObjekte(
 			defer sku.GetTransactedPool().Put(sk)
 
 			if err = logFunc(sk); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+	case "vim-syntax-type":
+		return func(o *sku.Transacted) (err error) {
+			t := k.GetApproximatedTyp(o.GetTyp()).ApproximatedOrActual()
+
+			if t == nil || t.Kennung.IsEmpty() || t.GetAkteSha().IsNull() {
+				ty := ""
+
+				switch o.GetGattung() {
+				case gattung.Typ, gattung.Etikett, gattung.Kasten, gattung.Konfig:
+					ty = "toml"
+
+				default:
+					// TODO zettel default typ
+				}
+
+				if _, err = fmt.Fprintln(out, ty); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
+			}
+
+			var ta *typ_akte.V0
+
+			if ta, err = akten.GetTypV0().GetAkte(t.GetAkteSha()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer akten.GetTypV0().PutAkte(ta)
+
+			if _, err = fmt.Fprintln(
+				out,
+				ta.VimSyntaxType,
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

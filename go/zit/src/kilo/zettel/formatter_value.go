@@ -15,7 +15,6 @@ import (
 	"code.linenisgreat.com/zit/src/delta/typ_akte"
 	"code.linenisgreat.com/zit/src/echo/format"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/src/juliett/objekte"
@@ -34,16 +33,13 @@ func (f *FormatterValue) Set(v string) (err error) {
 	switch v1 {
 	case
 		"formatters",
-		"typ-vim-syntax-type",
 		"typ",
 		"typ-formatter-uti-groups",
 		"hinweis-text",
 		"text",
-		"objekte",
 		"toml",
 		"json-blob",
-		"action-names",
-		"hinweis-akte":
+    "action-names":
 		f.string = v1
 
 	default:
@@ -109,49 +105,6 @@ func (fv *FormatterValue) FuncFormatter(
 			}
 
 			if _, err = lw.WriteTo(out); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		}
-
-	case "typ-vim-syntax-type":
-		return func(o *sku.Transacted) (err error) {
-			var t *sku.Transacted
-
-			if t = k.GetApproximatedTyp(
-				o.GetTyp(),
-			).ApproximatedOrActual(); t == nil {
-				return
-			}
-
-			var ta *typ_akte.V0
-
-			if ta, err = tagp.GetAkte(t.GetAkteSha()); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			defer tagp.PutAkte(ta)
-
-			if _, err = fmt.Fprintln(
-				out,
-				ta.VimSyntaxType,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		}
-
-	case "objekte":
-		f := objekte_format.FormatForVersion(k.GetStoreVersion())
-		op := objekte_format.Options{}
-
-		return func(o *sku.Transacted) (err error) {
-			if _, err = f.FormatPersistentMetadatei(out, o, op); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
