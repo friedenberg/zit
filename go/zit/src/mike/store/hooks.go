@@ -49,7 +49,14 @@ func (s *Store) tryNewHook(
 	vm := vp.Get()
 	defer vp.Put(vm)
 
-	f := vm.GetField(vm.LTable, "on_new")
+	var tt *lua.LTable
+
+	if tt, err = vm.GetTopTableOrError(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	f := vm.GetField(tt, "on_new")
 
 	if f.Type() != lua.LTFunction {
 		return
@@ -127,7 +134,14 @@ func (s *Store) tryPreCommitHook(
 	vm := vp.Get()
 	defer vp.Put(vm)
 
-	f := vm.GetField(vm.LTable, "on_pre_commit")
+	var tt *lua.LTable
+
+	if tt, err = vm.GetTopTableOrError(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	f := vm.GetField(tt, "on_pre_commit")
 
 	if f.Type() != lua.LTFunction {
 		return

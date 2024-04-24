@@ -14,8 +14,30 @@ import (
 
 type VM struct {
 	*lua.LState
-	*lua.LTable
+	lua.LValue
 	schnittstellen.Pool[LTable, *LTable]
+}
+
+func (vm *VM) GetTopTableOrError() (t *LTable, err error) {
+	if vm.LValue.Type() != LTTable {
+		err = errors.Errorf("expected %v but got %v", LTTable, vm.LValue.Type())
+		return
+	}
+
+	t = vm.LValue.(*LTable)
+
+	return
+}
+
+func (vm *VM) GetTopFunctionOrError() (t *LFunction, err error) {
+	if vm.LValue.Type() != LTFunction {
+		err = errors.Errorf("expected %v but got %v", LTFunction, vm.LValue.Type())
+		return
+	}
+
+	t = vm.LValue.(*LFunction)
+
+	return
 }
 
 func MakeVMPool(script string) (ml *VMPool, err error) {
@@ -79,12 +101,8 @@ func (sp *VMPool) SetReader(reader io.Reader) (err error) {
 			vm.Push(lfunc)
 			errors.PanicIfError(vm.PCall(0, 1, nil))
 
-			retval := vm.LState.Get(1)
+			vm.LValue = vm.LState.Get(1)
 			vm.Pop(1)
-
-			if retvalTable, ok := retval.(*LTable); ok {
-				vm.LTable = retvalTable
-			}
 
 			return vm
 		},

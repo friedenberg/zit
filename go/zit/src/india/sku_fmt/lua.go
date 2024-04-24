@@ -49,6 +49,8 @@ func FromLuaTable(o *sku.Transacted, l *lua.LState, t *lua.LTable) (err error) {
 		return
 	}
 
+	o.Metadatei.SetEtiketten(nil)
+
 	ets.ForEach(
 		func(key, value lua.LValue) {
 			var e kennung.Etikett

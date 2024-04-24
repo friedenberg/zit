@@ -29,7 +29,10 @@ func (matcher *Lua) ContainsSku(sk *sku.Transacted) bool {
 	t := vm.Pool.Get()
 	defer vm.Put(t)
 
-	f := vm.GetField(vm.LTable, "contains_sku")
+	tt, err := vm.GetTopTableOrError()
+	errors.PanicIfError(err)
+
+	f := vm.GetField(tt, "contains_sku")
 
 	if f == nil {
 		return false
