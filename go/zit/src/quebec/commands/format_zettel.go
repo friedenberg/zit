@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/src/delta/typ_akte"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/juliett/objekte"
+	"code.linenisgreat.com/zit/src/india/akten"
 	"code.linenisgreat.com/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
@@ -144,7 +144,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		// return
 	}
 
-	f := objekte.MakeTextFormatterWithAkteFormatter(
+	f := akten.MakeTextFormatterWithAkteFormatter(
 		u.Standort(),
 		u.Konfig(),
 		akteFormatter,

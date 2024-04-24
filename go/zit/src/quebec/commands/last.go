@@ -5,10 +5,10 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/juliett/objekte"
 	"code.linenisgreat.com/zit/src/lima/bestandsaufnahme"
 	"code.linenisgreat.com/zit/src/oscar/umwelt"
 )
@@ -44,24 +44,12 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var f schnittstellen.FuncIter[*sku.Transacted]
 
-	objekteFormatterValue := objekte.FormatterValue{}
-
-	if err = objekteFormatterValue.Set(c.Format); err != nil {
+	if f, err = u.MakeFormatFunc(c.Format, u.Out()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	f = objekteFormatterValue.MakeFormatterObjekte(
-		u.Out(),
-		u.Standort(),
-		u.Konfig(),
-		u.PrinterTransactedLike(),
-		u.StringFormatWriterSkuTransactedShort(),
-		u.GetStore().GetEnnui(),
-		u.GetStore().ReadOneEnnui,
-		u.GetStore().GetVerzeichnisse(),
-		u.GetStore().GetAkten(),
-	)
+	f = iter.MakeSyncSerializer(f)
 
 	if err = c.runWithBestandsaufnahm(u, f); err != nil {
 		err = errors.Wrap(err)
