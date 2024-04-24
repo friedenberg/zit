@@ -8,18 +8,18 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/src/charlie/collections"
+	"code.linenisgreat.com/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/juliett/objekte"
 )
 
 // TODO-P2 add support for quiet reindexing
 func (s *Store) Reindex() (err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte.ErrLockRequired{
+		err = file_lock.ErrLockRequired{
 			Operation: "reindex",
 		}
 
@@ -81,7 +81,7 @@ func (s *Store) CreateOrUpdate(
 	kennungPtr kennung.Kennung,
 ) (transactedPtr *sku.Transacted, err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte.ErrLockRequired{
+		err = file_lock.ErrLockRequired{
 			Operation: fmt.Sprintf(
 				"create or update %s",
 				kennungPtr.GetGattung(),
@@ -103,7 +103,7 @@ func (s *Store) CreateOrUpdateAkteSha(
 	sh schnittstellen.ShaLike,
 ) (transactedPtr *sku.Transacted, err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte.ErrLockRequired{
+		err = file_lock.ErrLockRequired{
 			Operation: fmt.Sprintf(
 				"create or update %s",
 				kennungPtr.GetGattung(),
@@ -154,7 +154,7 @@ func (s *Store) RevertTo(
 	}
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte.ErrLockRequired{
+		err = file_lock.ErrLockRequired{
 			Operation: "update many metadatei",
 		}
 
@@ -228,7 +228,7 @@ func (s *Store) Create(
 	mg metadatei.Getter,
 ) (tz *sku.Transacted, err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte.ErrLockRequired{
+		err = file_lock.ErrLockRequired{
 			Operation: "create",
 		}
 

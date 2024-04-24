@@ -9,12 +9,12 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/src/charlie/collections"
+	"code.linenisgreat.com/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/hinweisen"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/juliett/objekte"
 )
 
 func (s *Store) tryCommit(
@@ -35,7 +35,7 @@ func (s *Store) tryCommit(
 	}
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte.ErrLockRequired{
+		err = file_lock.ErrLockRequired{
 			Operation: "commit",
 		}
 
@@ -248,7 +248,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	kennungPtr := &co.External.Kennung
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte.ErrLockRequired{
+		err = file_lock.ErrLockRequired{
 			Operation: fmt.Sprintf("create or update %s", kennungPtr),
 		}
 
@@ -285,7 +285,7 @@ func (s *Store) createOrUpdate(
 	updateType objekte_mode.Mode,
 ) (transactedPtr *sku.Transacted, err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = objekte.ErrLockRequired{
+		err = file_lock.ErrLockRequired{
 			Operation: fmt.Sprintf(
 				"create or update %s",
 				kennungPtr.GetGattung(),

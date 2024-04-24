@@ -18,12 +18,13 @@ import (
 	"code.linenisgreat.com/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/delta/typ_akte"
+	"code.linenisgreat.com/zit/src/echo/format"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/akten"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
-	"code.linenisgreat.com/zit/src/juliett/objekte"
+	"code.linenisgreat.com/zit/src/kilo/zettel"
 )
 
 func (u *Umwelt) MakeFormatFunc(
@@ -562,8 +563,86 @@ func (u *Umwelt) MakeFormatFunc(
 			return
 		}
 
+	case "json-blob":
+		e := json.NewEncoder(out)
+
+		f = func(o *sku.Transacted) (err error) {
+			var a map[string]interface{}
+
+			var r sha.ReadCloser
+
+			if r, err = u.GetStore().GetStandort().AkteReader(
+				o.GetAkteSha(),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer errors.Deferred(&err, r.Close)
+
+			d := toml.NewDecoder(r)
+
+			if err = d.Decode(&a); err != nil {
+				log.Err().Printf("%s: %s", o, err)
+				err = nil
+				return
+			}
+
+			a["description"] = o.Metadatei.Bezeichnung.String()
+			a["identifier"] = o.Kennung.String()
+
+			if err = e.Encode(&a); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+	case "toml":
+		errors.TodoP3("limit to only zettels supporting toml")
+		f = func(o *sku.Transacted) (err error) {
+			var a map[string]interface{}
+
+			var r sha.ReadCloser
+
+			if r, err = u.GetStore().GetStandort().AkteReader(
+				o.GetAkteSha(),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer errors.DeferredCloser(&err, r)
+
+			d := toml.NewDecoder(r)
+
+			if err = d.Decode(&a); err != nil {
+				log.Err().Printf("%s: %s", o, err)
+				err = nil
+				return
+			}
+
+			a["description"] = o.Metadatei.Bezeichnung.String()
+			a["identifier"] = o.Kennung.String()
+
+			e := toml.NewEncoder(out)
+
+			if err = e.Encode(&a); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if _, err = out.Write([]byte("\x00")); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
 	default:
-		err = objekte.MakeErrUnsupportedFormatterValue(v, gattung.Unknown)
+		err = MakeErrUnsupportedFormatterValue(v, gattung.Unknown)
 	}
 
 	return
@@ -580,6 +659,57 @@ func (u *Umwelt) makeTypFormatter(
 	}
 
 	switch v {
+	case "formatters":
+		f = func(o *sku.Transacted) (err error) {
+			t := u.Konfig().GetApproximatedTyp(o.GetTyp())
+
+			if !t.HasValue {
+				return
+			}
+
+			tt := t.ActualOrNil()
+
+			var ta *typ_akte.V0
+
+			if ta, err = agp.GetAkte(tt.GetAkteSha()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer agp.PutAkte(ta)
+
+			lw := format.MakeLineWriter()
+
+			for fn, f := range ta.Formatters {
+				fe := f.FileExtension
+
+				if fe == "" {
+					fe = fn
+				}
+
+				lw.WriteFormat("%s\t%s", fn, fe)
+			}
+
+			if _, err = lw.WriteTo(out); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+	case "typ-formatter-uti-groups":
+		fo := zettel.MakeFormatterTypFormatterUTIGroups(u.Konfig(), agp)
+
+		f = func(o *sku.Transacted) (err error) {
+			if _, err = fo.Format(out, o); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
 	case "action-names":
 		fan := typ_akte.MakeFormatterActionNames()
 
@@ -688,7 +818,7 @@ func (u *Umwelt) makeTypFormatter(
 		}
 
 	default:
-		err = objekte.MakeErrUnsupportedFormatterValue(
+		err = MakeErrUnsupportedFormatterValue(
 			v,
 			gattung.Typ,
 		)

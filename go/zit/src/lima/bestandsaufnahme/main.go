@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/catgut"
+	"code.linenisgreat.com/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -21,7 +22,6 @@ import (
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/akten"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
-	"code.linenisgreat.com/zit/src/juliett/objekte"
 )
 
 type Store interface {
@@ -106,7 +106,7 @@ func (s *store) Flush() (err error) {
 
 func (s *store) Create(o *Akte) (t *sku.Transacted, err error) {
 	if !s.ls.IsAcquired() {
-		err = objekte.ErrLockRequired{
+		err = file_lock.ErrLockRequired{
 			Operation: "create bestandsaufnahme",
 		}
 
