@@ -236,6 +236,7 @@ func (u *Umwelt) makeQueryBuilder() *query.Builder {
 		u.GetStore().GetAkten(),
 		u.GetStore().GetVerzeichnisse(),
 		u.GetChrestStore(),
+		u.GetStore().LuaRequire,
 	)
 }
 

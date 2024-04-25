@@ -17,6 +17,7 @@ type Cli struct {
 	DryRun        bool
 	Complete      bool
 	ChrestEnabled bool
+	Hooks         string
 
 	IncludeCwd    bool
 	IncludeHidden bool
@@ -87,6 +88,8 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 		false,
 		"add extra newlines to zittish to improve readability",
 	)
+
+	f.StringVar(&c.Hooks, "hooks", "", "")
 }
 
 func DefaultCli() (c Cli) {

@@ -41,7 +41,7 @@ func (s *Store) tryNewHook(
 
 	var vp lua.VMPool
 
-	if err = vp.Set(script); err != nil {
+	if err = vp.Set(script, s.LuaRequire); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -94,11 +94,18 @@ func (s *Store) tryNewHook(
 	return
 }
 
-func (s *Store) tryPreCommitHook(
+func (s *Store) tryPreCommitHooks(
 	kinder *sku.Transacted,
 	mutter *sku.Transacted,
 	mode objekte_mode.Mode,
 ) (err error) {
+	type hook struct {
+		script      string
+		description string
+	}
+
+	hooks := []hook{}
+
 	var t *sku.Transacted
 
 	if t, err = s.ReadOneKennung(kinder.GetTyp()); err != nil {
@@ -118,15 +125,39 @@ func (s *Store) tryPreCommitHook(
 		return
 	}
 
-	script, ok := akte.Hooks.(string)
+	script, _ := akte.Hooks.(string)
 
-	if !ok || script == "" {
-		return
+	hooks = append(hooks, hook{script: script, description: "typ"})
+	hooks = append(hooks, hook{script: s.GetKonfig().Hooks, description: "erworben"})
+
+	for _, h := range hooks {
+		if h.script == "" {
+			continue
+		}
+
+		if err = s.tryPreCommitHook(
+			kinder,
+			mutter,
+			mode,
+			h.script,
+		); err != nil {
+			err = errors.Wrapf(err, "Hook: %#v", h)
+			return
+		}
 	}
 
+	return
+}
+
+func (s *Store) tryPreCommitHook(
+	kinder *sku.Transacted,
+	mutter *sku.Transacted,
+	mode objekte_mode.Mode,
+	script string,
+) (err error) {
 	var vp lua.VMPool
 
-	if err = vp.Set(script); err != nil {
+	if err = vp.Set(script, s.LuaRequire); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -165,17 +196,18 @@ func (s *Store) tryPreCommitHook(
 		sku_fmt.ToLuaTable(
 			mutter,
 			vm.LState,
-			tableKinder,
+			tableMutter,
 		)
 	}
 
 	vm.Push(f)
 	vm.Push(tableKinder)
 	vm.Push(tableMutter)
-	vm.Call(
-		2,
-		1,
-	)
+
+	if err = vm.PCall(2, 1, nil); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	retval := vm.LState.Get(1)
 	vm.Pop(1)

@@ -60,7 +60,7 @@ func (s *Store) tryCommit(
 		defer sku.GetTransactedPool().Put(mutter)
 	}
 
-	if err = s.tryPreCommitHook(kinder, mutter, mode); err != nil {
+	if err = s.tryPreCommitHooks(kinder, mutter, mode); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

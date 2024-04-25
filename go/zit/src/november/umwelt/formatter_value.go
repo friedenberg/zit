@@ -748,9 +748,9 @@ func (u *Umwelt) makeTypFormatter(
 				return
 			}
 
-			var vp lua.VMPool
+			var vp *lua.VMPool
 
-			if err = vp.Set(script); err != nil {
+			if vp, err = u.GetStore().MakeLuaVMPool(script); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

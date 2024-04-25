@@ -13,6 +13,7 @@ func TestLuaFalse(t1 *testing.T) {
 
 	m, err := MakeLua(
 		`return { contains_sku = function (sku) return false end }`,
+    nil,
 	)
 	if err != nil {
 		t.Errorf("expected no error but got %w", err)
@@ -35,6 +36,7 @@ func TestMatcherLuaTrue(t1 *testing.T) {
 
 	m, err := MakeLua(
 		`return { contains_sku = function (sku) return true end }`,
+    nil,
 	)
 	if err != nil {
 		t.Errorf("expected no error but got %w", err)

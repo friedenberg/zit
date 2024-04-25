@@ -7,10 +7,10 @@ import (
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 )
 
-func MakeLua(script string) (ml *Lua, err error) {
+func MakeLua(script string, require lua.LGFunction) (ml *Lua, err error) {
 	ml = &Lua{}
 
-	if err = ml.Set(script); err != nil {
+	if err = ml.Set(script, require); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -38,9 +38,9 @@ func (c RunLua) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	var vp lua.VMPool
+	var vp *lua.VMPool
 
-	if err = vp.Set(script); err != nil {
+	if vp, err = u.GetStore().MakeLuaVMPool(script); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -81,6 +81,11 @@ func (c RunLua) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 			if retval.Type() != lua.LTNil {
 				err = errors.Errorf("lua error: %s", retval)
+				return
+			}
+
+			if err = p(sk); err != nil {
+				err = errors.Wrap(err)
 				return
 			}
 

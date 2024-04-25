@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/delta/etikett_akte"
 	"code.linenisgreat.com/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -21,11 +22,13 @@ func MakeBuilder(
 	akten *akten.Akten,
 	ennui sku.Ennui,
 	chrome *VirtualStoreInitable,
+	luaRequire lua.LGFunction,
 ) (b *Builder) {
 	b = &Builder{
 		standort:                   s,
 		akten:                      akten,
 		ennui:                      ennui,
+		luaRequire:                 luaRequire,
 		virtualStores:              make(map[string]*VirtualStoreInitable),
 		virtualEtikettenBeforeInit: make(map[string]string),
 		virtualEtiketten:           make(map[string]*Lua),
@@ -42,6 +45,7 @@ type Builder struct {
 	standort                   standort.Standort
 	akten                      *akten.Akten
 	ennui                      sku.Ennui
+	luaRequire                 lua.LGFunction
 	preexistingKennung         []*kennung.Kennung2
 	cwd                        Cwd
 	fileExtensionGetter        schnittstellen.FileExtensionGetter
@@ -178,7 +182,7 @@ func (b *Builder) realizeVirtualEtiketten() (err error) {
 	for k, v := range b.virtualEtikettenBeforeInit {
 		var ml *Lua
 
-		if ml, err = MakeLua(v); err != nil {
+		if ml, err = MakeLua(v, b.luaRequire); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -534,7 +538,7 @@ func (b *Builder) makeEtikettOrEtikettLua(
 
 		defer errors.DeferredCloser(&err, ar)
 
-		if err = lua.SetReader(ar); err != nil {
+		if err = lua.SetReader(ar, b.luaRequire); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -552,7 +556,7 @@ func (b *Builder) makeEtikettOrEtikettLua(
 			return
 		}
 
-		if err = lua.Set(akte.Filter); err != nil {
+		if err = lua.Set(akte.Filter, b.luaRequire); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

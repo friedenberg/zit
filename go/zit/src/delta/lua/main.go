@@ -8,10 +8,15 @@ const (
 	LTNil      = lua.LTNil
 	LTFunction = lua.LTFunction
 	LTTable    = lua.LTTable
+	MultRet    = lua.MultRet
 )
 
 type (
-	LTable    = lua.LTable
-	LValue    = lua.LValue
-	LFunction = lua.LFunction
+	LTable        = lua.LTable
+	LValue        = lua.LValue
+	LState        = lua.LState
+	LFunction     = lua.LFunction
+	LString       = lua.LString
+	FunctionProto = lua.FunctionProto
+	LGFunction    = lua.LGFunction
 )

@@ -8,8 +8,6 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/pool"
 	lua "github.com/yuin/gopher-lua"
-	lua_ast "github.com/yuin/gopher-lua/ast"
-	lua_parse "github.com/yuin/gopher-lua/parse"
 )
 
 type VM struct {
@@ -40,10 +38,13 @@ func (vm *VM) GetTopFunctionOrError() (t *LFunction, err error) {
 	return
 }
 
-func MakeVMPool(script string) (ml *VMPool, err error) {
+func MakeVMPool(
+	script string,
+	require LGFunction,
+) (ml *VMPool, err error) {
 	ml = &VMPool{}
 
-	if err = ml.Set(script); err != nil {
+	if err = ml.Set(script, require); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -55,10 +56,10 @@ type VMPool struct {
 	schnittstellen.Pool[VM, *VM]
 }
 
-func (sp *VMPool) Set(script string) (err error) {
+func (sp *VMPool) Set(script string, require LGFunction) (err error) {
 	reader := strings.NewReader(script)
 
-	if err = sp.SetReader(reader); err != nil {
+	if err = sp.SetReader(reader, require); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -66,17 +67,13 @@ func (sp *VMPool) Set(script string) (err error) {
 	return
 }
 
-func (sp *VMPool) SetReader(reader io.Reader) (err error) {
-	var chunks []lua_ast.Stmt
-
-	if chunks, err = lua_parse.Parse(reader, ""); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
+func (sp *VMPool) SetReader(
+	reader io.Reader,
+	require lua.LGFunction,
+) (err error) {
 	var compiled *lua.FunctionProto
 
-	if compiled, err = lua.Compile(chunks, ""); err != nil {
+	if compiled, err = CompileReader(reader); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -87,6 +84,17 @@ func (sp *VMPool) SetReader(reader io.Reader) (err error) {
 				LState: lua.NewState(),
 			}
 
+			vm.PreloadModule("zit", func(s *lua.LState) int {
+				// register functions to the table
+				mod := s.SetFuncs(s.NewTable(), map[string]lua.LGFunction{
+					"require": require,
+				})
+
+				s.Push(mod)
+
+				return 1
+			})
+
 			vm.Pool = pool.MakePool(
 				func() (t *lua.LTable) {
 					t = vm.NewTable()
@@ -96,6 +104,10 @@ func (sp *VMPool) SetReader(reader io.Reader) (err error) {
 					// TODO reset table
 				},
 			)
+
+			tableZit := vm.Pool.Get()
+			vm.SetField(tableZit, "require", vm.NewFunction(require))
+			vm.SetGlobal("zit", tableZit)
 
 			lfunc := vm.NewFunctionFromProto(compiled)
 			vm.Push(lfunc)
