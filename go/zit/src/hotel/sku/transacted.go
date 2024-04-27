@@ -133,6 +133,12 @@ func (a *Transacted) AddEtikettPtr(e *kennung.Etikett) (err error) {
 		}
 	}
 
+	ek := a.Metadatei.Verzeichnisse.GetImplicitEtiketten().KeyPtr(e)
+
+	if a.Metadatei.Verzeichnisse.GetImplicitEtiketten().ContainsKey(ek) {
+		return
+	}
+
 	if err = a.GetMetadatei().AddEtikettPtr(e); err != nil {
 		err = errors.Wrap(err)
 		return

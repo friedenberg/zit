@@ -148,18 +148,6 @@ func (z *Metadatei) AddEtikettPtr(e *kennung.Etikett) (err error) {
 	// )
 }
 
-func (z *Metadatei) AddEtikettPtrExceptImplicit(e *kennung.Etikett) (err error) {
-	ek := z.Verzeichnisse.ImplicitEtiketten.KeyPtr(e)
-
-	if z.Verzeichnisse.ImplicitEtiketten.ContainsKey(ek) {
-		return
-	}
-
-	kennung.AddNormalizedEtikett(z.GetEtikettenMutable(), e)
-
-	return
-}
-
 func (z *Metadatei) SetEtiketten(e kennung.EtikettSet) {
 	es := z.GetEtikettenMutable()
 	iter.ResetMutableSetWithPool(es, kennung.GetEtikettPool())
@@ -170,7 +158,7 @@ func (z *Metadatei) SetEtiketten(e kennung.EtikettSet) {
 
 	errors.PanicIfError(
 		e.EachPtr(
-			iter.MakeAddClonePoolFunc[kennung.Etikett, *kennung.Etikett](
+			iter.MakeAddClonePoolFunc(
 				es,
 				kennung.GetEtikettPool(),
 				kennung.EtikettResetter,
@@ -213,7 +201,7 @@ func (z *Metadatei) Description() (d string) {
 	d = z.Bezeichnung.String()
 
 	if strings.TrimSpace(d) == "" {
-		d = iter.StringCommaSeparated[kennung.Etikett](z.GetEtiketten())
+		d = iter.StringCommaSeparated(z.GetEtiketten())
 	}
 
 	return
@@ -249,7 +237,7 @@ func (z *Metadatei) ApplyGoldenChild(
 
 	mes := z.GetEtikettenMutable()
 
-	prefixes := iter.Elements[kennung.Etikett](kennung.Withdraw(mes, e))
+	prefixes := iter.Elements(kennung.Withdraw(mes, e))
 
 	if len(prefixes) == 0 {
 		return
@@ -297,7 +285,7 @@ func (selbst *Metadatei) SetMutter(mg Getter) (err error) {
 }
 
 func (m *Metadatei) GenerateExpandedEtiketten() {
-	m.Verzeichnisse.SetExpandedEtiketten(kennung.ExpandMany[kennung.Etikett](
+	m.Verzeichnisse.SetExpandedEtiketten(kennung.ExpandMany(
 		m.GetEtiketten(),
 		expansion.ExpanderRight,
 	))
