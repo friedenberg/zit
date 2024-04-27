@@ -148,6 +148,18 @@ func (z *Metadatei) AddEtikettPtr(e *kennung.Etikett) (err error) {
 	// )
 }
 
+func (z *Metadatei) AddEtikettPtrExceptImplicit(e *kennung.Etikett) (err error) {
+	ek := z.Verzeichnisse.ImplicitEtiketten.KeyPtr(e)
+
+	if z.Verzeichnisse.ImplicitEtiketten.ContainsKey(ek) {
+		return
+	}
+
+	kennung.AddNormalizedEtikett(z.GetEtikettenMutable(), e)
+
+	return
+}
+
 func (z *Metadatei) SetEtiketten(e kennung.EtikettSet) {
 	es := z.GetEtikettenMutable()
 	iter.ResetMutableSetWithPool(es, kennung.GetEtikettPool())

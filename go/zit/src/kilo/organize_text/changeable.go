@@ -66,7 +66,7 @@ func (a *Assignment) addToSet(
 				}
 
 				if err = ot.EachPtr(
-					z.AddEtikettPtr,
+					z.Metadatei.AddEtikettPtrExceptImplicit,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -116,14 +116,14 @@ func (a *Assignment) addToSet(
 			)
 
 			if err = o.Metadatei.GetEtiketten().EachPtr(
-				z.AddEtikettPtr,
+				z.Metadatei.AddEtikettPtrExceptImplicit,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 			if err = expanded.EachPtr(
-				z.AddEtikettPtr,
+				z.Metadatei.AddEtikettPtrExceptImplicit,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -152,7 +152,7 @@ func (a *Assignment) addToSet(
 				z.Kennung.SetGattung(gattung.Zettel)
 
 				if err = ot.EachPtr(
-					z.AddEtikettPtr,
+					z.Metadatei.AddEtikettPtrExceptImplicit,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -191,14 +191,14 @@ func (a *Assignment) addToSet(
 			)
 
 			if err = o.Metadatei.GetEtiketten().EachPtr(
-				z.AddEtikettPtr,
+				z.Metadatei.AddEtikettPtrExceptImplicit,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 			if err = expanded.EachPtr(
-				z.AddEtikettPtr,
+				z.Metadatei.AddEtikettPtrExceptImplicit,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
