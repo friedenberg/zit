@@ -139,7 +139,7 @@ func (i *Store) Flush(
 			actualFlush = true
 		}
 
-		wg.Do(i.pages[n].Flush)
+		wg.Do(i.pages[n].MakeFlush())
 	}
 
 	if actualFlush {

@@ -39,7 +39,7 @@ func (u *Umwelt) StringFormatWriterKennungAligned(
 	co string_format_writer.ColorOptions,
 ) kennung_fmt.Aligned {
 	if u.konfig.PrintOptions.Abbreviations.Hinweisen {
-		return kennung_fmt.Aligned{Abbr: u.MakeKennungExpanders()}
+		return kennung_fmt.Aligned{Abbr: u.GetStore().GetAbbrStore().GetAbbr()}
 	} else {
 		return kennung_fmt.Aligned{}
 	}
@@ -51,7 +51,7 @@ func (u *Umwelt) StringFormatWriterKennung(
 	return kennung_fmt.MakeKennungCliFormat(
 		u.konfig.PrintOptions,
 		co,
-		u.MakeKennungExpanders(),
+		u.GetStore().GetAbbrStore().GetAbbr(),
 	)
 }
 
@@ -91,7 +91,7 @@ func (u *Umwelt) SkuFmtNewOrganize() *sku_fmt.OrganizeNew {
 
 func (u *Umwelt) SkuFormatOldOrganize() *sku_fmt.Organize {
 	return sku_fmt.MakeOrganizeFormat(
-		u.MakeKennungExpanders(),
+		u.GetStore().GetAbbrStore().GetAbbr(),
 		u.konfig.PrintOptions,
 	)
 }

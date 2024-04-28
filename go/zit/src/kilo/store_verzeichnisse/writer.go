@@ -88,6 +88,8 @@ func (pw *writer) Flush() (err error) {
 }
 
 func (pw *writer) flushBoth() (err error) {
+	log.Log().Printf("flushing both: %s", pw.Path())
+
 	chain := iter.MakeChain(
 		pw.konfig.ApplyToSku,
 		pw.writeOne,
@@ -146,6 +148,8 @@ func (pw *writer) updateSigilWithSchwanzen(st skuWithRangeAndSigil) (err error) 
 }
 
 func (pw *writer) flushJustSchwanz() (err error) {
+	log.Log().Printf("flushing just schwanz: %s", pw.Path())
+
 	if err = pw.CopyJustHistoryFrom(
 		&pw.Reader,
 		makeSigil(kennung.SigilHistory, kennung.SigilHidden),

@@ -212,18 +212,20 @@ func (pt *Page) copyHistoryAndMaybeSchwanz(
 	return
 }
 
-func (pt *Page) Flush() (err error) {
-	pw := &writer{
-		Page: pt,
-	}
+func (pt *Page) MakeFlush() func() error {
+	return func() (err error) {
+		pw := &writer{
+			Page: pt,
+		}
 
-	if err = pw.Flush(); err != nil {
-		err = errors.Wrap(err)
+		if err = pw.Flush(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		pt.hasChanges = false
+		pt.changesAreHistorical = false
+
 		return
 	}
-
-	pt.hasChanges = false
-	pt.changesAreHistorical = false
-
-	return
 }

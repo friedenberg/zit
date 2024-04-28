@@ -18,7 +18,6 @@ import (
 
 // TODO-P4 make generic
 type AbbrStore interface {
-	Exists(k *kennung.Kennung2) (err error)
 	Hinweis() AbbrStoreGeneric[kennung.Hinweis, *kennung.Hinweis]
 	Kisten() AbbrStoreGeneric[kennung.Kasten, *kennung.Kasten]
 	Shas() AbbrStoreGeneric[sha.Sha, *sha.Sha]

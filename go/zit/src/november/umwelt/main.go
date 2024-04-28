@@ -216,16 +216,6 @@ func (u *Umwelt) GetMatcherArchiviert() query.Archiviert {
 	return u.matcherArchiviert
 }
 
-func (u *Umwelt) MakeKennungExpanders() (out kennung.Abbr) {
-	out.Hinweis.Expand = u.GetStore().GetAbbrStore().Hinweis().ExpandStringString
-	out.Sha.Expand = u.GetStore().GetAbbrStore().Shas().ExpandStringString
-
-	out.Hinweis.Abbreviate = u.GetStore().GetAbbrStore().Hinweis().Abbreviate
-	out.Sha.Abbreviate = u.GetStore().GetAbbrStore().Shas().Abbreviate
-
-	return
-}
-
 func (u *Umwelt) GetChrestStore() *query.VirtualStoreInitable {
 	return u.virtualStores["%chrome"]
 }
@@ -253,7 +243,7 @@ func (u *Umwelt) MakeQueryBuilderExcludingHidden(
 		WithCwd(u.GetStore().GetCwdFiles()).
 		WithFileExtensionGetter(u.Konfig().FileExtensions).
 		WithHidden(u.GetMatcherArchiviert()).
-		WithExpanders(u.MakeKennungExpanders())
+		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr())
 }
 
 func (u *Umwelt) MakeQueryBuilder(
@@ -268,12 +258,12 @@ func (u *Umwelt) MakeQueryBuilder(
 		WithVirtualEtiketten(u.konfig.Filters).
 		WithCwd(u.GetStore().GetCwdFiles()).
 		WithFileExtensionGetter(u.Konfig().FileExtensions).
-		WithExpanders(u.MakeKennungExpanders())
+		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr())
 }
 
 func (u *Umwelt) ApplyToOrganizeOptions(oo *organize_text.Options) {
 	oo.Konfig = u.Konfig()
-	oo.Abbr = u.MakeKennungExpanders()
+	oo.Abbr = u.GetStore().GetAbbrStore().GetAbbr()
 }
 
 func (u *Umwelt) GetVirtualStores() map[string]*query.VirtualStoreInitable {

@@ -18,6 +18,7 @@ type equaler struct {
 
 func (e equaler) Equals(a, b *Metadatei) bool {
 	if e.includeTai && !a.Tai.Equals(b.Tai) {
+		// log.Debug().Print(&a.Tai, "->", &b.Tai)
 		return false
 	}
 

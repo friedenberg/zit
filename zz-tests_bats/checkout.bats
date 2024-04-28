@@ -94,3 +94,35 @@ function checkout_simple_typ { # @test
 		      checked out [md.typ@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
 	EOM
 }
+
+function checkout_zettel_akte_then_objekte { # @test
+	run_zit checkout -mode akte one/uno
+	assert_success
+	assert_output - <<-EOM
+		      checked out [one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first"
+		                   one/uno.md]
+	EOM
+
+	run_zit checkout one/uno
+	assert_success
+	assert_output - <<-EOM
+		      checked out [one/uno.zettel@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first"]
+	EOM
+
+	run ls one/
+	assert_output - <<-EOM
+		uno.zettel
+	EOM
+
+	run_zit checkout -mode akte one/uno
+	assert_success
+	assert_output - <<-EOM
+		      checked out [one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first"
+		                   one/uno.md]
+	EOM
+
+	run ls one/
+	assert_output - <<-EOM
+		uno.md
+	EOM
+}

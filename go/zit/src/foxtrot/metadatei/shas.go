@@ -10,6 +10,8 @@ const (
 	ShaKeySelbstMetadateiSansTai       = "SelbstMetadateiMutterSansTai"
 	ShaKeySelbstMetadateiKennungMutter = "SelbstMetadateiKennungMutter"
 	ShaKeyMutterMetadateiKennungMutter = "MutterMetadateiKennungMutter"
+	ShaKeySelbst                       = "MetadateiTai"
+	ShaKeyMutter                       = "MutterMetadateiMutterTai"
 )
 
 type Shas struct {

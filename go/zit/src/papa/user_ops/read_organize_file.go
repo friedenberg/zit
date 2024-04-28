@@ -46,7 +46,7 @@ func (c ReadOrganizeFile) Run(q *query.Group) (ot *organize_text.Text, err error
 			q,
 			c.SkuFormatOldOrganize(),
 			c.SkuFmtNewOrganize(),
-			c.MakeKennungExpanders(),
+			c.GetStore().GetAbbrStore().GetAbbr(),
 		),
 	); err != nil {
 		err = errors.Wrap(err)

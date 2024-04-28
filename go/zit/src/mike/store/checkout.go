@@ -9,10 +9,10 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/src/charlie/checkout_options"
-	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/src/kilo/cwd"
@@ -61,23 +61,22 @@ func (s *Store) CheckoutQuery(
 func (s Store) shouldCheckOut(
 	options checkout_options.Options,
 	cz *sku.CheckedOut,
-) (ok bool) {
+) bool {
 	if options.Force {
-		ok = true
-		return
+		return true
 	}
 
 	if cz.State == checked_out_state.StateEmpty {
-		ok = true
+		return true
 	}
 
-	if cz.Internal.Metadatei.Equals(
-		&cz.External.Metadatei,
-	) {
-		return
+	eq := metadatei.EqualerSansTai.Equals(&cz.Internal.Metadatei, &cz.External.Metadatei)
+
+	if eq {
+		return true
 	}
 
-	return
+	return false
 }
 
 func (s *Store) FileExtensionForGattung(
@@ -170,28 +169,16 @@ func (s *Store) CheckoutOne(
 		return
 	}
 
-	if files.Exists(filename) {
-		var e *cwd.Zettel
-		ok := false
+	var e *cwd.Zettel
+	ok := false
 
-		if e, ok = s.cwdFiles.Get(&sz.Kennung); !ok {
-			err = errors.Errorf(
-				"file at %s not recognized as zettel: %s",
-				filename,
-				sz,
-			)
-
-			return
-		}
-
+	if e, ok = s.cwdFiles.Get(&sz.Kennung); ok {
 		var cze *sku.External
 
-		cze, err = s.ReadOneExternal(
+		if cze, err = s.ReadOneExternal(
 			e,
 			sz,
-		)
-
-		if err != nil {
+		); err != nil {
 			if errors.Is(err, sku.ErrExternalHasConflictMarker) && options.AllowConflicted {
 				err = nil
 			} else {
@@ -199,7 +186,7 @@ func (s *Store) CheckoutOne(
 				return
 			}
 		} else {
-			if cz.External.SetFromSkuLike(cze); err != nil {
+			if err = cz.External.SetFromSkuLike(cze); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -209,17 +196,17 @@ func (s *Store) CheckoutOne(
 			if !s.shouldCheckOut(options, cz) {
 				return
 			}
+
+			if err = cz.Remove(); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 	}
 
-	inlineAkte := s.GetKonfig().IsInlineTyp(sz.GetTyp())
-
 	cz.State = checked_out_state.StateJustCheckedOut
 
-	if err = cz.External.SetFromSkuLike(sz); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	inlineAkte := s.GetKonfig().IsInlineTyp(sz.GetTyp())
 
 	if options.CheckoutMode.IncludesObjekte() {
 		if err = cz.External.GetFDsPtr().Objekte.SetPath(filename); err != nil {
@@ -245,6 +232,11 @@ func (s *Store) CheckoutOne(
 			err = errors.Wrap(err)
 			return
 		}
+	}
+
+	if err = cz.External.SetFromSkuLike(sz); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if err = s.fileEncoder.Encode(&cz.External); err != nil {

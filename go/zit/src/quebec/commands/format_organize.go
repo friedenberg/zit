@@ -65,7 +65,7 @@ func (c *FormatOrganize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		nil,
 		u.SkuFormatOldOrganize(),
 		u.SkuFmtNewOrganize(),
-		u.MakeKennungExpanders(),
+		u.GetStore().GetAbbrStore().GetAbbr(),
 	)
 
 	if err = ot.Refine(); err != nil {

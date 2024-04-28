@@ -252,6 +252,32 @@ func (fd *FD) GetState() State {
 	return fd.state
 }
 
+func (fd *FD) Exists() bool {
+	if fd.path == "" {
+		return false
+	}
+
+	return files.Exists(fd.path)
+}
+
+func (fd *FD) Remove() (err error) {
+	if fd.path == "" {
+		return
+	}
+
+	if err = os.Remove(fd.path); err != nil {
+		if errors.IsNotExist(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	return
+}
+
 func (fd *FD) Reset() {
 	fd.state = StateUnknown
 	fd.isDir = false

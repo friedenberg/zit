@@ -30,9 +30,9 @@ type Metadatei struct {
 	Bezeichnung bezeichnung.Bezeichnung
 	Etiketten   kennung.EtikettMutableSet // public for gob, but should be private
 	Typ         kennung.Typ
-	Tai         kennung.Tai
 
 	Shas
+	Tai kennung.Tai
 
 	Comments      []string
 	Verzeichnisse Verzeichnisse
