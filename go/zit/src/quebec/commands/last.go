@@ -5,9 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
@@ -29,6 +27,8 @@ func init() {
 			c := &Last{}
 
 			f.StringVar(&c.Format, "format", "log", "format")
+			f.BoolVar(&c.Organize, "organize", false, "")
+			f.BoolVar(&c.Edit, "edit", false, "")
 
 			return c
 		},
@@ -44,6 +44,13 @@ func (c Last) CompletionGattung() kennung.Gattung {
 func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if len(args) != 0 {
 		errors.Err().Print("ignoring arguments")
+	}
+
+	if (c.Edit || c.Organize) && c.Format != "" {
+		errors.Err().Print("ignoring format")
+	} else if c.Edit && c.Organize {
+		err = errors.Errorf("cannot organize and edit at the same time")
+		return
 	}
 
 	skus := sku.MakeTransactedMutableSet()
@@ -66,10 +73,6 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if !c.Organize && !c.Edit {
-		return
-	}
-
 	if c.Organize {
 		opOrganize := user_ops.Organize{
 			Umwelt: u,
@@ -82,9 +85,6 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	} else if c.Edit {
 		opCheckout := user_ops.Checkout{
 			Umwelt: u,
-			Options: checkout_options.Options{
-				CheckoutMode: checkout_mode.ModeObjekteAndAkte,
-			},
 		}
 
 		var zsc sku.CheckedOutMutableSet

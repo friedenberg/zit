@@ -12,17 +12,17 @@ var (
 )
 
 func init() {
-	poolTransacted = pool.MakePool[Transacted, *Transacted](
+	poolTransacted = pool.MakePool(
 		nil,
 		TransactedResetter.Reset,
 	)
 
-	poolExternal = pool.MakePool[External, *External](
+	poolExternal = pool.MakePool[External](
 		nil,
 		nil,
 	)
 
-	poolCheckedOut = pool.MakePool[CheckedOut, *CheckedOut](
+	poolCheckedOut = pool.MakePool[CheckedOut](
 		nil,
 		nil,
 	)

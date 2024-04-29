@@ -29,10 +29,7 @@ func (s *Store) CheckoutQuery(
 		func(t *sku.Transacted) (err error) {
 			var cop *sku.CheckedOut
 
-			if cop, err = s.CheckoutOne(
-				checkout_options.Options(options),
-				t,
-			); err != nil {
+			if cop, err = s.CheckoutOne(options, t); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

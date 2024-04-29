@@ -7,9 +7,9 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/src/papa/user_ops"
 )
 
 type Checkout struct {
@@ -37,15 +37,14 @@ func (c Checkout) DefaultGattungen() kennung.Gattung {
 
 func (c Checkout) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms *query.Group,
+	qg *query.Group,
 ) (err error) {
-	if err = u.GetStore().CheckoutQuery(
-		c.CheckoutOptions,
-		ms,
-		func(co *sku.CheckedOut) (err error) {
-			return
-		},
-	); err != nil {
+	opCheckout := user_ops.Checkout{
+		Umwelt:  u,
+		Options: c.CheckoutOptions,
+	}
+
+	if _, err = opCheckout.RunQuery(qg); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

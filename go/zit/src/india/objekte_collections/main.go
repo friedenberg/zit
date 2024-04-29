@@ -9,7 +9,7 @@ import (
 func ToSliceFilesZettelen(
 	s sku.CheckedOutSet,
 ) (out []string, err error) {
-	return iter.DerivedValues[*sku.CheckedOut, string](
+	return iter.DerivedValues(
 		s,
 		func(z *sku.CheckedOut) (e string, err error) {
 			e = z.External.GetObjekteFD().GetPath()
