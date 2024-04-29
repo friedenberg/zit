@@ -5,9 +5,11 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/src/delta/gattung"
@@ -244,6 +246,7 @@ func (s *Store) handleUnchanged(
 
 func (s *Store) CreateOrUpdateCheckedOut(
 	co *sku.CheckedOut,
+	updateCheckout bool,
 ) (transactedPtr *sku.Transacted, err error) {
 	kennungPtr := &co.External.Kennung
 
@@ -270,6 +273,27 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	if err = s.tryCommit(
 		transactedPtr,
 		objekte_mode.ModeCommit,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if !updateCheckout {
+		return
+	}
+
+	// TODO update existing checkout
+
+	var mode checkout_mode.Mode
+
+	if mode, err = co.External.GetCheckoutMode(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, err = s.CheckoutOne(
+		checkout_options.Options{CheckoutMode: mode, Force: true},
+		transactedPtr,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

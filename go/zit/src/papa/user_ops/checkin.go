@@ -32,6 +32,7 @@ func (c Checkin) Run(
 		func(co *sku.CheckedOut) (err error) {
 			if _, err = u.GetStore().CreateOrUpdateCheckedOut(
 				co,
+				true,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
