@@ -79,7 +79,10 @@ func (op CommitOrganizeFile) run(
 	// }
 
 	for _, changed := range cs.Changed {
-		if _, err = u.GetStore().CreateOrUpdateTransacted(changed); err != nil {
+		if err = u.GetStore().CreateOrUpdateTransacted(
+			changed,
+			true,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

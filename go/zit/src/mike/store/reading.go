@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/fd"
@@ -89,6 +90,11 @@ func (s *Store) ReadOne(
 	sk1 = sku.GetTransactedPool().Get()
 
 	if err = s.ReadOneInto(k1, sk1); err != nil {
+		if collections.IsErrNotFound(err) {
+			sku.GetTransactedPool().Put(sk1)
+			sk1 = nil
+		}
+
 		err = errors.Wrap(err)
 		return
 	}

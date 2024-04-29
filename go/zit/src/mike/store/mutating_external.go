@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/src/delta/gattung"
@@ -53,25 +54,33 @@ func (s *Store) Reindex() (err error) {
 
 func (s *Store) CreateOrUpdateTransacted(
 	in *sku.Transacted,
-) (out *sku.Transacted, err error) {
+	updateCheckout bool,
+) (err error) {
 	if in.Kennung.IsEmpty() {
-		if in.GetGattung() != gattung.Zettel {
-			err = errors.Errorf("only Zettel is supported")
-			return
-		}
-
-		if out, err = s.Create(in); err != nil {
+		if err = s.CreateZettelOrError(in); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+	} else {
+		if err = s.createOrUpdate(in, objekte_mode.ModeCommit); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 
+	if !updateCheckout {
 		return
 	}
 
-	if out, err = s.CreateOrUpdate(in, in.GetKennung()); err != nil {
+	if _, err = s.UpdateCheckoutOne(
+		checkout_options.Options{},
+		in,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	// TODO update checkout
 
 	return
 }
@@ -91,11 +100,32 @@ func (s *Store) CreateOrUpdate(
 		return
 	}
 
-	return s.createOrUpdate(
-		mg,
-		kennungPtr,
+	var m *metadatei.Metadatei
+
+	if mg != nil {
+		m = mg.GetMetadatei()
+	} else {
+		m = metadatei.GetPool().Get()
+		defer metadatei.GetPool().Put(m)
+	}
+
+	transactedPtr = sku.GetTransactedPool().Get()
+	metadatei.Resetter.ResetWith(&transactedPtr.Metadatei, m)
+
+	if err = transactedPtr.Kennung.SetWithKennung(kennungPtr); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.createOrUpdate(
+		transactedPtr,
 		objekte_mode.ModeCommit,
-	)
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (s *Store) CreateOrUpdateAkteSha(
@@ -126,22 +156,26 @@ func (s *Store) CreateOrUpdateAkteSha(
 
 	transactedPtr = sku.GetTransactedPool().Get()
 
-	if mutter == nil {
-		if err = transactedPtr.Kennung.SetWithKennung(kennungPtr); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
+	if mutter != nil {
 		sku.TransactedResetter.ResetWith(transactedPtr, mutter)
+	}
+
+	if err = transactedPtr.Kennung.SetWithKennung(kennungPtr); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	transactedPtr.SetAkteSha(sh)
 
-	return s.createOrUpdate(
+	if err = s.createOrUpdate(
 		transactedPtr,
-		kennungPtr,
 		objekte_mode.ModeCommit,
-	)
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (s *Store) RevertTo(
@@ -217,6 +251,36 @@ func (s *Store) CreateWithAkteString(
 	defer errors.DeferredCloser(&err, aw)
 
 	if tz, err = s.Create(m); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) CreateZettelOrError(
+	in *sku.Transacted,
+) (err error) {
+	if !in.Kennung.IsEmpty() {
+		err = errors.Errorf("Kennung not empty: %s", in.GetKennung())
+		return
+	}
+
+	if in.GetGattung() != gattung.Zettel {
+		err = errors.Errorf("only Zettel is supported")
+		return
+	}
+
+	var out *sku.Transacted
+
+	if out, err = s.Create(in); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer sku.GetTransactedPool().Put(out)
+
+	if err = in.SetFromSkuLike(out); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

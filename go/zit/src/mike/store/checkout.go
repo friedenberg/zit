@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/delta/checked_out_state"
@@ -144,6 +145,74 @@ func (s Store) filenameForTransacted(
 	return
 }
 
+func (s *Store) UpdateCheckoutOne(
+	options checkout_options.Options, // TODO CheckoutMode is currently ignored
+	sz *sku.Transacted,
+) (cz *sku.CheckedOut, err error) {
+	var e *cwd.Zettel
+	ok := false
+
+	if e, ok = s.cwdFiles.Get(&sz.Kennung); !ok {
+		return
+	}
+
+	cz = &sku.CheckedOut{}
+
+	if err = cz.Internal.SetFromSkuLike(sz); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var cze *sku.External
+
+	if cze, err = s.ReadOneExternal(
+		e,
+		sz,
+	); err != nil {
+		if errors.Is(err, sku.ErrExternalHasConflictMarker) && options.AllowConflicted {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if err = cz.External.SetFromSkuLike(cze); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		cz.DetermineState(true)
+
+		if !s.shouldCheckOut(options, cz) {
+			return
+		}
+
+		if err = cz.Remove(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	var mode checkout_mode.Mode
+
+	if mode, err = cz.External.GetCheckoutMode(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	options.CheckoutMode = mode
+
+	if err = s.checkoutOne(
+		options,
+		cz,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s *Store) CheckoutOne(
 	options checkout_options.Options,
 	sz *sku.Transacted,
@@ -156,16 +225,6 @@ func (s *Store) CheckoutOne(
 	}
 
 	if s.GetKonfig().DryRun {
-		return
-	}
-
-	var originalFilename, filename string
-
-	if originalFilename, filename, err = s.filenameForTransacted(
-		options,
-		sz,
-	); err != nil {
-		err = errors.Wrap(err)
 		return
 	}
 
@@ -204,9 +263,39 @@ func (s *Store) CheckoutOne(
 		}
 	}
 
+	if err = s.checkoutOne(
+		options,
+		cz,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) checkoutOne(
+	options checkout_options.Options,
+	cz *sku.CheckedOut,
+) (err error) {
+	if s.GetKonfig().DryRun {
+		return
+	}
+
+	var originalFilename, filename string
+
+	if originalFilename, filename, err = s.filenameForTransacted(
+		options,
+		&cz.Internal,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	cz.State = checked_out_state.StateJustCheckedOut
 
-	inlineAkte := s.GetKonfig().IsInlineTyp(sz.GetTyp())
+	t := cz.Internal.GetTyp()
+	inlineAkte := s.GetKonfig().IsInlineTyp(t)
 
 	if options.CheckoutMode.IncludesObjekte() {
 		if err = cz.External.GetFDsPtr().Objekte.SetPath(filename); err != nil {
@@ -218,7 +307,6 @@ func (s *Store) CheckoutOne(
 	if ((!inlineAkte || !options.CheckoutMode.IncludesObjekte()) &&
 		!options.ForceInlineAkte) &&
 		options.CheckoutMode.IncludesAkte() {
-		t := sz.GetTyp()
 
 		fe := s.GetKonfig().TypenToExtensions[t.String()]
 
@@ -234,7 +322,7 @@ func (s *Store) CheckoutOne(
 		}
 	}
 
-	if err = cz.External.SetFromSkuLike(sz); err != nil {
+	if err = cz.External.SetFromSkuLike(&cz.Internal); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

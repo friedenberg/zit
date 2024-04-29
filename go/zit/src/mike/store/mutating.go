@@ -23,6 +23,11 @@ func (s *Store) tryCommit(
 	kinder *sku.Transacted,
 	mode objekte_mode.Mode,
 ) (err error) {
+	if kinder.Kennung.IsEmpty() {
+		err = errors.Errorf("empty kennung")
+		return
+	}
+
 	// TODO figure out how to move this to after CommitTransacted
 	if mode.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
 		if err = s.addMatchableTypAndEtikettenIfNecessary(kinder); err != nil {
@@ -304,40 +309,17 @@ func (s *Store) CreateOrUpdateCheckedOut(
 
 // TODO-project-2022-zit-collapse_skus transition this to accepting checked out
 func (s *Store) createOrUpdate(
-	mg metadatei.Getter,
-	kennungPtr kennung.Kennung,
+	transactedPtr *sku.Transacted,
 	updateType objekte_mode.Mode,
-) (transactedPtr *sku.Transacted, err error) {
+) (err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
 			Operation: fmt.Sprintf(
-				"create or update %s",
-				kennungPtr.GetGattung(),
+				"create or update: %s",
+				transactedPtr.GetGattung(),
 			),
 		}
 
-		return
-	}
-
-	var m *metadatei.Metadatei
-
-	if mg != nil {
-		m = mg.GetMetadatei()
-	} else {
-		m = metadatei.GetPool().Get()
-		defer metadatei.GetPool().Put(m)
-	}
-
-	transactedPtr = sku.GetTransactedPool().Get()
-	metadatei.Resetter.ResetWith(&transactedPtr.Metadatei, m)
-
-	if err = transactedPtr.Kennung.SetWithKennung(kennungPtr); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err != nil {
-		err = errors.Wrap(err)
 		return
 	}
 
