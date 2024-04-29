@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/src/november/umwelt"
@@ -39,7 +38,7 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 	otFlags := organize_text.MakeFlagsWithMetadatei(u.Metadatei)
 	u.ApplyToOrganizeOptions(&otFlags.Options)
 	// otFlags.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
-	mwk := objekte_collections.MakeMutableSetMetadateiWithKennung()
+	mwk := sku.MakeTransactedMutableSet()
 	skus.Each(
 		func(z *sku.Transacted) (err error) {
 			return mwk.Add(z)
@@ -52,8 +51,7 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 		Options: otFlags.GetOptions(
 			u.Konfig().PrintOptions,
 			qg,
-			u.SkuFormatOldOrganize(),
-			u.SkuFmtNewOrganize(),
+			u.SkuFmtOrganize(),
 			u.GetStore().GetAbbrStore().GetAbbr(),
 		),
 	}

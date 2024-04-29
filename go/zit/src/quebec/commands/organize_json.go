@@ -80,8 +80,7 @@ func (c *OrganizeJSON) RunWithQuery(
 		Options: c.GetOptions(
 			u.Konfig().PrintOptions,
 			ms,
-			u.SkuFormatOldOrganize(),
-			u.SkuFmtNewOrganize(),
+			u.SkuFmtOrganize(),
 			u.GetStore().GetAbbrStore().GetAbbr(),
 		),
 	}

@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/akten"
-	"code.linenisgreat.com/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/src/kilo/cwd"
 	"code.linenisgreat.com/zit/src/kilo/store_verzeichnisse"
@@ -30,7 +29,7 @@ type accessors interface {
 	GetBestandsaufnahmeStore() bestandsaufnahme.Store
 	GetCwdFiles() *cwd.CwdFiles
 	GetEnnui() ennui.Ennui
-	GetFileEncoder() objekte_collections.FileEncoder
+	GetFileEncoder() sku.FileEncoder
 	GetKennungIndex() kennung_index.Index
 	GetObjekteFormatOptions() objekte_format.Options
 	GetVerzeichnisse() *store_verzeichnisse.Store
@@ -47,7 +46,7 @@ func (s *Store) GetEnnui() ennui.Ennui {
 	return nil
 }
 
-func (s *Store) GetFileEncoder() objekte_collections.FileEncoder {
+func (s *Store) GetFileEncoder() sku.FileEncoder {
 	return s.fileEncoder
 }
 

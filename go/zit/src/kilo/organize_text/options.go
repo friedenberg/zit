@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/src/juliett/query"
@@ -45,8 +44,7 @@ type Options struct {
 	UseMetadateiHeader     bool
 
 	PrintOptions       erworben_cli_print_options.PrintOptions
-	organize           sku_fmt.Organize
-	organizeNew        sku_fmt.OrganizeNew
+	skuFmt             sku_fmt.OrganizeNew
 	stringFormatWriter schnittstellen.StringFormatWriter[*sku.Transacted]
 }
 
@@ -60,7 +58,7 @@ func MakeFlags() Flags {
 		Options: Options{
 			wasMade:           true,
 			GroupingEtiketten: kennung.MakeEtikettSlice(),
-			Transacted:        objekte_collections.MakeMutableSetMetadateiWithKennung(),
+			Transacted:        sku.MakeTransactedMutableSet(),
 		},
 	}
 }
@@ -76,7 +74,7 @@ func MakeFlagsWithMetadatei(m metadatei.Metadatei) Flags {
 			rootEtiketten:     m.GetEtiketten(),
 			wasMade:           true,
 			GroupingEtiketten: kennung.MakeEtikettSlice(),
-			Transacted:        objekte_collections.MakeMutableSetMetadateiWithKennung(),
+			Transacted:        sku.MakeTransactedMutableSet(),
 		},
 	}
 }
@@ -117,8 +115,7 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 func (o *Flags) GetOptions(
 	printOptions erworben_cli_print_options.PrintOptions,
 	q *query.Group,
-	organize *sku_fmt.Organize,
-	organizeNew *sku_fmt.OrganizeNew,
+	skuFmt *sku_fmt.OrganizeNew,
 	abbr kennung.Abbr,
 ) Options {
 	o.once.Do(
@@ -127,8 +124,7 @@ func (o *Flags) GetOptions(
 		},
 	)
 
-	o.organize = *organize
-	o.organizeNew = *organizeNew
+	o.skuFmt = *skuFmt
 
 	if q != nil {
 		o.rootEtiketten = q.GetEtiketten()

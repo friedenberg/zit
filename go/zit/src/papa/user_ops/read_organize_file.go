@@ -44,8 +44,7 @@ func (c ReadOrganizeFile) Run(q *query.Group) (ot *organize_text.Text, err error
 		otFlags.GetOptions(
 			c.Umwelt.Konfig().PrintOptions,
 			q,
-			c.SkuFormatOldOrganize(),
-			c.SkuFmtNewOrganize(),
+			c.SkuFmtOrganize(),
 			c.GetStore().GetAbbrStore().GetAbbr(),
 		),
 	); err != nil {

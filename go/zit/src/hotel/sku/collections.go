@@ -34,7 +34,7 @@ type (
 )
 
 func MakeTransactedHeap() *TransactedHeap {
-	h := heap.Make[Transacted, *Transacted](
+	h := heap.Make(
 		transactedEqualer{},
 		transactedLessor{},
 		transactedResetter{},

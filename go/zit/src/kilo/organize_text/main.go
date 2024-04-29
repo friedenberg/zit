@@ -39,11 +39,7 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 		options: t.Options,
 	}
 
-	if t.Konfig.NewOrganize {
-		r1.stringFormatReader = &t.organizeNew
-	} else {
-		r1.stringFormatReader = &t.organize
-	}
+	r1.stringFormatReader = &t.skuFmt
 
 	ocf := optionCommentFactory{}
 	var ocs []Option
@@ -92,11 +88,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		OmitLeadingEmptyLine: omit,
 	}
 
-	if ot.Konfig.NewOrganize {
-		aw.stringFormatWriter = &ot.organizeNew
-	} else {
-		aw.stringFormatWriter = &ot.organize
-	}
+	aw.stringFormatWriter = &ot.skuFmt
 
 	ocf := optionCommentFactory{}
 	var ocs []Option

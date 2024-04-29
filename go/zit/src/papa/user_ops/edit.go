@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/src/november/umwelt"
 )
@@ -18,7 +17,7 @@ type Edit struct {
 func (u Edit) Run(zsc sku.CheckedOutSet) (err error) {
 	var filesZettelen []string
 
-	if filesZettelen, err = objekte_collections.ToSliceFilesZettelen(zsc); err != nil {
+	if filesZettelen, err = sku.ToSliceFilesZettelen(zsc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

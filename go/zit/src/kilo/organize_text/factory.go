@@ -5,7 +5,6 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/objekte_collections"
 )
 
 type Factory struct {
@@ -33,7 +32,7 @@ func (atc *Factory) makeWithMetadatei() (ot *Text, err error) {
 	ot.EtikettSet = atc.rootEtiketten
 	ot.Metadatei.Typ = atc.Typ
 
-	prefixSet := objekte_collections.MakeSetPrefixVerzeichnisse(0)
+	prefixSet := sku.MakeSetPrefixVerzeichnisse(0)
 	atc.Transacted.Each(prefixSet.Add)
 
 	for _, e := range iter.Elements(atc.ExtraEtiketten) {
@@ -43,7 +42,7 @@ func (atc *Factory) makeWithMetadatei() (ot *Text, err error) {
 
 		segments := prefixSet.Subset(e)
 
-		var used objekte_collections.MutableSetMetadateiWithKennung
+		var used sku.TransactedMutableSet
 
 		if used, err = atc.makeChildren(
 			ee,
@@ -106,10 +105,10 @@ func (f Factory) makeWithoutMetadatei() (ot *Text, err error) {
 
 func (atc Factory) makeChildren(
 	parent *Assignment,
-	prefixSet objekte_collections.SetPrefixVerzeichnisse,
+	prefixSet sku.SetPrefixVerzeichnisse,
 	groupingEtiketten kennung.EtikettSlice,
-) (used objekte_collections.MutableSetMetadateiWithKennung, err error) {
-	used = objekte_collections.MakeMutableSetMetadateiWithKennung()
+) (used sku.TransactedMutableSet, err error) {
+	used = sku.MakeTransactedMutableSet()
 
 	if groupingEtiketten.Len() == 0 {
 		prefixSet.ToSet().Each(used.Add)
@@ -164,7 +163,7 @@ func (atc Factory) makeChildren(
 	}
 
 	if err = segments.Grouped.Each(
-		func(e kennung.Etikett, zs objekte_collections.MutableSetMetadateiWithKennung) (err error) {
+		func(e kennung.Etikett, zs sku.TransactedMutableSet) (err error) {
 			if atc.UsePrefixJoints {
 				if parent.Etiketten.Len() > 1 {
 				} else {
@@ -206,9 +205,9 @@ func (atc Factory) makeChildren(
 						nextGroupingEtiketten = groupingEtiketten[1:]
 					}
 
-					var usedChild objekte_collections.MutableSetMetadateiWithKennung
+					var usedChild sku.TransactedMutableSet
 
-					psv := objekte_collections.MakeSetPrefixVerzeichnisse(0)
+					psv := sku.MakeSetPrefixVerzeichnisse(0)
 					zs.Each(psv.Add)
 					usedChild, err = atc.makeChildren(child, psv, nextGroupingEtiketten)
 					if err != nil {
@@ -230,9 +229,9 @@ func (atc Factory) makeChildren(
 					nextGroupingEtiketten = groupingEtiketten[1:]
 				}
 
-				var usedChild objekte_collections.MutableSetMetadateiWithKennung
+				var usedChild sku.TransactedMutableSet
 
-				psv := objekte_collections.MakeSetPrefixVerzeichnisse(0)
+				psv := sku.MakeSetPrefixVerzeichnisse(0)
 				zs.Each(psv.Add)
 				usedChild, err = atc.makeChildren(child, psv, nextGroupingEtiketten)
 				if err != nil {

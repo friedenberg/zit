@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/akten"
-	"code.linenisgreat.com/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/src/kilo/cwd"
@@ -31,7 +30,7 @@ type Store struct {
 	options                   objekte_format.Options
 	Abbr                      AbbrStore
 	persistentMetadateiFormat objekte_format.Format
-	fileEncoder               objekte_collections.FileEncoder
+	fileEncoder               sku.FileEncoder
 	virtualStores             map[string]*query.VirtualStoreInitable
 
 	verzeichnisse *store_verzeichnisse.Store
@@ -71,7 +70,7 @@ func (c *Store) Initialize(
 	c.persistentMetadateiFormat = pmf
 	c.options = objekte_format.Options{Tai: true}
 	c.sonnenaufgang = t
-	c.fileEncoder = objekte_collections.MakeFileEncoder(st, k)
+	c.fileEncoder = sku.MakeFileEncoder(st, k)
 	c.virtualStores = virtualStores
 
 	if c.cwdFiles, err = cwd.MakeCwdFilesAll(

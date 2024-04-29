@@ -57,19 +57,19 @@ func TestQuery(t1 *testing.T) {
 			inputs:   []string{"[!md,home]:z"},
 		},
 		{
-			expected: "!md:?Zettel",
+			expected: "!md?Zettel",
 			inputs:   []string{"!md?z"},
 		},
 		{
-			expected: "ducks:Etikett [!md house]:+?Zettel",
+			expected: "ducks:Etikett [!md house]+?Zettel",
 			inputs:   []string{"!md?z", "house+z", "ducks:e"},
 		},
 		{
-			expected: "ducks:Etikett [!md house]:?Zettel",
+			expected: "ducks:Etikett [!md house]?Zettel",
 			inputs:   []string{"ducks:Etikett [!md house]?Zettel"},
 		},
 		{
-			expected: "ducks:Etikett [=!md house]:?Zettel",
+			expected: "ducks:Etikett [=!md house]?Zettel",
 			inputs:   []string{"ducks:Etikett [=!md house]?Zettel"},
 		},
 		{

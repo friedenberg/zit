@@ -63,8 +63,7 @@ func (c *FormatOrganize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	ot.Options = c.Flags.GetOptions(
 		u.Konfig().PrintOptions,
 		nil,
-		u.SkuFormatOldOrganize(),
-		u.SkuFmtNewOrganize(),
+		u.SkuFmtOrganize(),
 		u.GetStore().GetAbbrStore().GetAbbr(),
 	)
 

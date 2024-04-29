@@ -25,7 +25,6 @@ type Cli struct {
 	AllowMissingHinweis  bool
 	CheckoutCacheEnabled bool
 	PredictableHinweisen bool
-	NewOrganize          bool
 
 	PrintOptions, maskPrintOptions erworben_cli_print_options.PrintOptions
 	ToolOptions                    erworben_tools.Tools
@@ -63,13 +62,6 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 		"predictable-hinweisen",
 		false,
 		"don't randomly select new hinweisen",
-	)
-
-	f.BoolVar(
-		&c.NewOrganize,
-		"new-organize",
-		true,
-		"use the new CLI-like organize syntax",
 	)
 
 	f.BoolVar(

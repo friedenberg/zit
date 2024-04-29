@@ -30,7 +30,7 @@ func (v *Verzeichnisse) GetExpandedEtiketten() kennung.EtikettSet {
 }
 
 func (v *Verzeichnisse) AddEtikettExpandedPtr(e *kennung.Etikett) (err error) {
-	return iter.AddClonePool[kennung.Etikett, *kennung.Etikett](
+	return iter.AddClonePool(
 		v.GetExpandedEtikettenMutable(),
 		kennung.GetEtikettPool(),
 		kennung.EtikettResetter,

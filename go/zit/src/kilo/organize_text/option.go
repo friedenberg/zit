@@ -68,10 +68,7 @@ func (ocf optionCommentFormat) ApplyToWriter(
 ) (err error) {
 	switch string(ocf) {
 	case "new":
-		aw.stringFormatWriter = &f.organizeNew
-
-	case "old":
-		aw.stringFormatWriter = &f.organize
+		aw.stringFormatWriter = &f.skuFmt
 
 	default:
 		err = collections.MakeErrNotFoundString(string(ocf))

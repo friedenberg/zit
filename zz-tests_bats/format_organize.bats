@@ -81,7 +81,6 @@ function format_organize_left_align { # @test
 cmd_def_organize=(
 	-prefix-joints=true
 	-refine=true
-	-new-organize=true
 )
 
 cat_organize() (

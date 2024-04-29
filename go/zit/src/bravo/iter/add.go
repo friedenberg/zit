@@ -35,9 +35,9 @@ func MakeAddClonePoolFunc[E any, EPtr schnittstellen.Ptr[E]](
 	p schnittstellen.Pool[E, EPtr],
 	r schnittstellen.Resetter2[E, EPtr],
 ) schnittstellen.FuncIter[EPtr] {
-	return func(e EPtr) (err error) {
+	return MakeSyncSerializer(func(e EPtr) (err error) {
 		return AddClonePool(s, p, r, e)
-	}
+	})
 }
 
 func ExpandAndAddString[E any, EPtr schnittstellen.SetterPtr[E]](

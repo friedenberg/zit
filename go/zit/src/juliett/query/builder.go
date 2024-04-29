@@ -654,9 +654,9 @@ LOOP:
 				return
 			}
 
-			if op == '?' {
-				q.Sigil.Add(kennung.SigilSchwanzen)
-			}
+			// if op == '?' {
+			// 	q.Sigil.Add(kennung.SigilSchwanzen)
+			// }
 
 			q.Sigil.Add(s)
 		}

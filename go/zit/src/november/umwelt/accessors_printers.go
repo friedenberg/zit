@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/src/echo/bezeichnung"
@@ -75,7 +74,7 @@ func (u *Umwelt) StringFormatWriterEtiketten(
 	return kennung_fmt.MakeEtikettenCliFormat()
 }
 
-func (u *Umwelt) SkuFmtNewOrganize() *sku_fmt.OrganizeNew {
+func (u *Umwelt) SkuFmtOrganize() *sku_fmt.OrganizeNew {
 	co := u.FormatColorOptionsOut()
 	co.OffEntirely = true
 
@@ -87,21 +86,6 @@ func (u *Umwelt) SkuFmtNewOrganize() *sku_fmt.OrganizeNew {
 		u.StringFormatWriterBezeichnung(bezeichnung.CliFormatTruncationNone, co, false),
 		u.StringFormatWriterEtiketten(co),
 	)
-}
-
-func (u *Umwelt) SkuFormatOldOrganize() *sku_fmt.Organize {
-	return sku_fmt.MakeOrganizeFormat(
-		u.GetStore().GetAbbrStore().GetAbbr(),
-		u.konfig.PrintOptions,
-	)
-}
-
-func (u *Umwelt) StringFormatWriterSkuLikePtrForOrganize() catgut.StringFormatReadWriter[*sku.Transacted] {
-	if !u.Konfig().NewOrganize {
-		return u.SkuFormatOldOrganize()
-	}
-
-	return u.SkuFmtNewOrganize()
 }
 
 func (u *Umwelt) StringFormatWriterSkuTransacted(
@@ -177,7 +161,7 @@ func (u *Umwelt) PrinterFileNotRecognized() schnittstellen.FuncIter[*fd.FD] {
 		u.StringFormatWriterShaLike(u.FormatColorOptionsOut()),
 	)
 
-	return string_format_writer.MakeDelim[*fd.FD](
+	return string_format_writer.MakeDelim(
 		"\n",
 		u.Out(),
 		p,

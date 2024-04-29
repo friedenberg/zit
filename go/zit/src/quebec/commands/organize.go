@@ -4,17 +4,16 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"sync"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/vim_cli_options_builder"
+	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/bravo/organize_text_mode"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/src/november/umwelt"
@@ -77,8 +76,7 @@ func (c *Organize) RunWithQuery(
 		Options: c.GetOptions(
 			u.Konfig().PrintOptions,
 			ms,
-			u.SkuFormatOldOrganize(),
-			u.SkuFmtNewOrganize(),
+			u.SkuFmtOrganize(),
 			u.GetStore().GetAbbrStore().GetAbbr(),
 		),
 	}
@@ -89,44 +87,15 @@ func (c *Organize) RunWithQuery(
 		createOrganizeFileOp.Typ = typen.Any()
 	}
 
-	var l sync.Mutex
-	getResults := objekte_collections.MakeMutableSetMetadateiWithKennung()
+	getResults := sku.MakeTransactedMutableSet()
 
 	if err = u.GetStore().QueryWithCwd(
 		ms,
-		func(tl *sku.Transacted) (err error) {
-			mwk := sku.GetTransactedPool().Get()
-
-			if err = mwk.SetFromSkuLike(tl); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			// TODO-P1 determine if this is necessary
-			var h *kennung.Hinweis
-			h = &kennung.Hinweis{}
-
-			if err = h.Set(mwk.GetKennung().String()); err == nil {
-				if h, err = u.GetStore().GetAbbrStore().Hinweis().ExpandString(
-					h.String(),
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				if err = mwk.SetKennungLike(h); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			} else {
-				err = nil
-			}
-
-			l.Lock()
-			defer l.Unlock()
-
-			return getResults.Add(mwk)
-		},
+		iter.MakeAddClonePoolPtrFunc(
+			getResults,
+			sku.GetTransactedPool(),
+			sku.TransactedResetter,
+		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

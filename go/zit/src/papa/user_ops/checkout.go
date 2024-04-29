@@ -45,17 +45,15 @@ func (op Checkout) RunQuery(
 	qg *query.Group,
 ) (zsc sku.CheckedOutMutableSet, err error) {
 	zsc = collections_value.MakeMutableValueSet[*sku.CheckedOut](nil)
-	add := func(co *sku.CheckedOut) (err error) {
-		co1 := sku.GetCheckedOutPool().Get()
-		sku.CheckedOutResetter.ResetWith(co1, co)
-
-		return zsc.Add(co1)
-	}
 
 	if err = op.Umwelt.GetStore().CheckoutQuery(
 		op.Options,
 		qg,
-		iter.MakeSyncSerializer(add),
+		iter.MakeAddClonePoolPtrFunc(
+			zsc,
+			sku.GetCheckedOutPool(),
+			sku.CheckedOutResetter,
+		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
