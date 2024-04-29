@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/src/november/umwelt"
@@ -20,6 +21,7 @@ import (
 type Clean struct {
 	force             bool
 	includeRecognized bool
+	includeMutter     bool
 }
 
 func init() {
@@ -33,6 +35,13 @@ func init() {
 				"force",
 				false,
 				"remove Objekten in working directory even if they have changes",
+			)
+
+			f.BoolVar(
+				&c.includeMutter,
+				"include-mutter",
+				false,
+				"remove Objekten in working directory if they match their Mutter",
 			)
 
 			f.BoolVar(
@@ -51,6 +60,31 @@ func (c Clean) DefaultGattungen() kennung.Gattung {
 	return kennung.MakeGattung(gattung.TrueGattung()...)
 }
 
+func (c Clean) shouldClean(u *umwelt.Umwelt, co *sku.CheckedOut) bool {
+	if co.State == checked_out_state.StateExistsAndSame {
+		return true
+	}
+
+	if c.force {
+		return true
+	}
+
+	if c.includeMutter {
+		mutter, err := u.GetStore().GetVerzeichnisse().ReadOneEnnui(
+			co.Internal.Metadatei.Mutter(),
+		)
+
+		errors.PanicIfError(err)
+
+		if mutter != nil &&
+			metadatei.EqualerSansTai.Equals(&co.External.Metadatei, &mutter.Metadatei) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (c Clean) RunWithQuery(
 	u *umwelt.Umwelt,
 	qg *query.Group,
@@ -65,7 +99,7 @@ func (c Clean) RunWithQuery(
 	if err = u.GetStore().ReadFiles(
 		qg,
 		func(co *sku.CheckedOut) (err error) {
-			if co.State != checked_out_state.StateExistsAndSame && !c.force {
+			if !c.shouldClean(u, co) {
 				return
 			}
 

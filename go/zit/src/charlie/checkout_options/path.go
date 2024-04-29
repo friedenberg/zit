@@ -1,17 +1,10 @@
 package checkout_options
 
-type (
-	Path interface {
-		isPath()
-	}
-
-	path int
-)
-
-func (path) isPath() {}
+//go:generate stringer -type=Path
+type Path int
 
 const (
-	PathDefault = path(iota)
+	PathDefault = Path(iota)
 	PathLeft
 	PathMiddle
 	PathRight

@@ -39,6 +39,7 @@ cat_yang() (
 )
 
 cmd_zit_def=(
+  -debug no-tempdir-cleanup
   -abbreviate-hinweisen=false
   -abbreviate-shas=false
   -predictable-hinweisen

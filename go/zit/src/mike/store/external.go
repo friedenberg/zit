@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/charlie/files"
+	"code.linenisgreat.com/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/echo/thyme"
@@ -44,10 +45,6 @@ type ExternalReader interface {
 func (s *Store) ReadOneCheckedOut(
 	em *sku.ExternalMaybe,
 ) (co *sku.CheckedOut, err error) {
-	if err = em.FDs.ConflictMarkerError(); err != nil {
-		return
-	}
-
 	var m checkout_mode.Mode
 
 	if m, err = em.GetFDs().GetCheckoutModeOrError(); err != nil {
@@ -87,6 +84,12 @@ func (s *Store) ReadOneCheckedOut(
 
 	default:
 		panic(checkout_mode.MakeErrInvalidCheckoutModeMode(m))
+	}
+
+	if err = em.FDs.ConflictMarkerError(); err != nil {
+		err = nil
+		co.State = checked_out_state.StateConflicted
+		return
 	}
 
 	co.DetermineState(false)

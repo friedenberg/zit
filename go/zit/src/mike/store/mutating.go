@@ -287,8 +287,6 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	// TODO update existing checkout
-
 	var mode checkout_mode.Mode
 
 	if mode, err = co.External.GetCheckoutMode(); err != nil {

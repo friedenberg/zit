@@ -24,7 +24,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 
 	var co *sku.CheckedOut
 
-	if co, err = s.ReadOneExternalFS(transactedPtr); err != nil {
+	if co, err = s.ReadOneExternalFS(mutter); err != nil {
 		err = nil
 		return
 	}
@@ -33,19 +33,19 @@ func (s *Store) readExternalAndMergeIfNecessary(
 
 	mutterEqualsExternal := co.InternalAndExternalEqualsSansTai()
 
-	var mode checkout_mode.Mode
-
-	if mode, err = co.External.GetCheckoutMode(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	op := checkout_options.Options{
-		CheckoutMode: mode,
-		Force:        true,
-	}
-
 	if mutterEqualsExternal {
+		var mode checkout_mode.Mode
+
+		if mode, err = co.External.GetCheckoutMode(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		op := checkout_options.Options{
+			CheckoutMode: mode,
+			Force:        true,
+		}
+
 		if co, err = s.CheckoutOne(op, transactedPtr); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -345,7 +345,7 @@ func (s *Store) RunMergeTool(
 		return
 	}
 
-	if _, err = s.CreateOrUpdateCheckedOut(co, true); err != nil {
+	if _, err = s.CreateOrUpdateCheckedOut(co, false); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

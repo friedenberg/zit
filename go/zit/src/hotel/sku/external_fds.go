@@ -51,11 +51,13 @@ func (e *ExternalFDs) conflictMarkerExists(fd *fd.FD) (ok bool) {
 
 func (e *ExternalFDs) ConflictMarkerError() (err error) {
 	if e.conflictMarkerExists(&e.Objekte) {
-		err = ErrExternalHasConflictMarker
+		err = errors.Wrapf(ErrExternalHasConflictMarker, "Objekte: %s", &e.Objekte)
+		return
 	}
 
 	if e.conflictMarkerExists(&e.Akte) {
-		err = ErrExternalHasConflictMarker
+		err = errors.Wrapf(ErrExternalHasConflictMarker, "Akte: %s", &e.Akte)
+		return
 	}
 
 	return

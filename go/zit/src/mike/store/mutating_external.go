@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/objekte_mode"
-	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/src/delta/gattung"
@@ -62,23 +61,29 @@ func (s *Store) CreateOrUpdateTransacted(
 			return
 		}
 	} else {
-		if err = s.createOrUpdate(in, objekte_mode.ModeCommit); err != nil {
+		mode := objekte_mode.ModeCommit
+
+		if updateCheckout {
+			mode |= objekte_mode.ModeMergeCheckedOut
+		}
+
+		if err = s.createOrUpdate(in, mode); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	if !updateCheckout {
-		return
-	}
+	// if !updateCheckout {
+	// 	return
+	// }
 
-	if _, err = s.UpdateCheckoutOne(
-		checkout_options.Options{},
-		in,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	// if _, err = s.UpdateCheckoutOne(
+	// 	checkout_options.Options{},
+	// 	in,
+	// ); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
 	// TODO update checkout
 
@@ -129,23 +134,28 @@ func (s *Store) CreateOrUpdate(
 }
 
 func (s *Store) CreateOrUpdateAkteSha(
-	kennungPtr kennung.Kennung,
+	k kennung.Kennung,
 	sh schnittstellen.ShaLike,
-) (transactedPtr *sku.Transacted, err error) {
+) (t *sku.Transacted, err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
 			Operation: fmt.Sprintf(
 				"create or update %s",
-				kennungPtr.GetGattung(),
+				k.GetGattung(),
 			),
 		}
 
 		return
 	}
 
-	var mutter *sku.Transacted
+	t = sku.GetTransactedPool().Get()
 
-	if mutter, err = s.ReadOne(kennungPtr); err != nil {
+	if err = t.Kennung.SetWithKennung(k); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.ReadOneInto(k, t); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {
@@ -154,21 +164,10 @@ func (s *Store) CreateOrUpdateAkteSha(
 		}
 	}
 
-	transactedPtr = sku.GetTransactedPool().Get()
-
-	if mutter != nil {
-		sku.TransactedResetter.ResetWith(transactedPtr, mutter)
-	}
-
-	if err = transactedPtr.Kennung.SetWithKennung(kennungPtr); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	transactedPtr.SetAkteSha(sh)
+	t.SetAkteSha(sh)
 
 	if err = s.createOrUpdate(
-		transactedPtr,
+		t,
 		objekte_mode.ModeCommit,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -211,9 +210,9 @@ func (s *Store) RevertTo(
 
 	defer sku.GetTransactedPool().Put(mutter)
 
-	if _, err = s.CreateOrUpdate(
-		&mutter.Metadatei,
-		sk.GetKennung(),
+	if err = s.createOrUpdate(
+		mutter,
+		objekte_mode.ModeCommit,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

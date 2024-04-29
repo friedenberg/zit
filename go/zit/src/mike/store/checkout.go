@@ -62,6 +62,7 @@ func (s *Store) CheckoutQuery(
 func (s Store) shouldCheckOut(
 	options checkout_options.Options,
 	cz *sku.CheckedOut,
+	allowMutterMatch bool,
 ) bool {
 	if options.Force {
 		return true
@@ -75,6 +76,16 @@ func (s Store) shouldCheckOut(
 
 	if eq {
 		return true
+	}
+
+	if !allowMutterMatch {
+		return false
+	}
+
+	if mutter, err := s.ReadOneEnnui(cz.Internal.Metadatei.Mutter()); err == nil {
+		if metadatei.EqualerSansTai.Equals(&mutter.Metadatei, &cz.External.Metadatei) {
+			return true
+		}
 	}
 
 	return false
@@ -183,24 +194,24 @@ func (s *Store) UpdateCheckoutOne(
 
 		cz.DetermineState(true)
 
-		if !s.shouldCheckOut(options, cz) {
+		if !s.shouldCheckOut(options, cz, true) {
 			return
 		}
+
+		var mode checkout_mode.Mode
+
+		if mode, err = cz.External.GetCheckoutMode(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		options.CheckoutMode = mode
 
 		if err = cz.Remove(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
-
-	var mode checkout_mode.Mode
-
-	if mode, err = cz.External.GetCheckoutMode(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	options.CheckoutMode = mode
 
 	if err = s.checkoutOne(
 		options,
@@ -252,13 +263,15 @@ func (s *Store) CheckoutOne(
 
 			cz.DetermineState(true)
 
-			if !s.shouldCheckOut(options, cz) {
+			if !s.shouldCheckOut(options, cz, false) {
 				return
 			}
 
-			if err = cz.Remove(); err != nil {
-				err = errors.Wrap(err)
-				return
+			if options.Path == checkout_options.PathDefault {
+				if err = cz.Remove(); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 		}
 	}
