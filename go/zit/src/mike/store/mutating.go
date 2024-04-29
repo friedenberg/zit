@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/charlie/collections"
@@ -23,6 +24,8 @@ func (s *Store) tryCommit(
 	kinder *sku.Transacted,
 	mode objekte_mode.Mode,
 ) (err error) {
+	log.Log().Printf("%s -> %s", mode, kinder)
+
 	if kinder.Kennung.IsEmpty() {
 		err = errors.Errorf("empty kennung")
 		return
@@ -94,6 +97,8 @@ func (s *Store) tryCommit(
 	if mutter != nil &&
 		kennung.Equals(kinder.GetKennung(), mutter.GetKennung()) &&
 		kinder.Metadatei.EqualsSansTai(&mutter.Metadatei) {
+		log.Log().Printf("equals mutter", kinder)
+
 		if err = kinder.SetFromSkuLike(mutter); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -129,6 +134,7 @@ func (s *Store) tryCommit(
 	}
 
 	if mode.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
+		log.Log().Printf("adding to bestandsaufnahme", mode, kinder)
 		if err = s.commitTransacted(kinder, mutter); err != nil {
 			err = errors.Wrap(err)
 			return

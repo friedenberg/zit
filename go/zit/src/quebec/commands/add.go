@@ -2,25 +2,20 @@ package commands
 
 import (
 	"flag"
-	"os"
 	"sync"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/alfa/vim_cli_options_builder"
 	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
-	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/src/kilo/cwd"
-	"code.linenisgreat.com/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/src/papa/user_ops"
@@ -115,91 +110,12 @@ func (c Add) RunWithQuery(
 		return
 	}
 
-	otFlags := organize_text.MakeFlagsWithMetadatei(c.Metadatei)
-	u.ApplyToOrganizeOptions(&otFlags.Options)
-	// otFlags.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
-	mwk := objekte_collections.MakeMutableSetMetadateiWithKennung()
-	zettelsFromAkteResults.Each(
-		func(z *sku.Transacted) (err error) {
-			return mwk.Add(z)
-		},
-	)
-	otFlags.Transacted = mwk
-
-	createOrganizeFileOp := user_ops.CreateOrganizeFile{
-		Umwelt: u,
-		Options: otFlags.GetOptions(
-			u.Konfig().PrintOptions,
-			qg,
-			u.SkuFormatOldOrganize(),
-			u.SkuFmtNewOrganize(),
-			u.GetStore().GetAbbrStore().GetAbbr(),
-		),
+	opOrganize := user_ops.Organize{
+		Umwelt:    u,
+		Metadatei: c.Metadatei,
 	}
 
-	var createOrganizeFileResults *organize_text.Text
-
-	var f *os.File
-
-	if f, err = files.TempFileWithPattern(
-		"*." + u.Konfig().FileExtensions.Organize,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(
-		f,
-	)
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	openVimOp := user_ops.OpenVim{
-		Options: vim_cli_options_builder.New().
-			WithFileType("zit-organize").
-			Build(),
-	}
-
-	if _, err = openVimOp.Run(u, f.Name()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = u.Reset(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var ot2 *organize_text.Text
-
-	readOrganizeTextOp := user_ops.ReadOrganizeFile{
-		Umwelt: u,
-	}
-
-	if ot2, err = readOrganizeTextOp.RunWithFile(f.Name(), qg); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	commitOrganizeTextOp := user_ops.CommitOrganizeFile{
-		Umwelt: u,
-	}
-
-	if err = u.Lock(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.Deferred(&err, u.Unlock)
-
-	if _, err = commitOrganizeTextOp.Run(
-		u,
-		createOrganizeFileResults,
-		ot2,
-		mwk,
-	); err != nil {
+	if err = opOrganize.Run(qg, zettelsFromAkteResults); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

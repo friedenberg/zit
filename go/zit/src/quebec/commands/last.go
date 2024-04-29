@@ -5,17 +5,21 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/lima/bestandsaufnahme"
 	"code.linenisgreat.com/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/src/papa/user_ops"
 )
 
 type Last struct {
-	Type   gattung.Gattung
-	Format string
+	Edit     bool
+	Organize bool
+	Format   string
 }
 
 func init() {
@@ -42,11 +46,17 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		errors.Err().Print("ignoring arguments")
 	}
 
+	skus := sku.MakeTransactedMutableSet()
+
 	var f schnittstellen.FuncIter[*sku.Transacted]
 
-	if f, err = u.MakeFormatFunc(c.Format, u.Out()); err != nil {
-		err = errors.Wrap(err)
-		return
+	if c.Organize || c.Edit {
+		f = skus.Add
+	} else {
+		if f, err = u.MakeFormatFunc(c.Format, u.Out()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	f = iter.MakeSyncSerializer(f)
@@ -54,6 +64,44 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if err = c.runWithBestandsaufnahm(u, f); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	if !c.Organize && !c.Edit {
+		return
+	}
+
+	if c.Organize {
+		opOrganize := user_ops.Organize{
+			Umwelt: u,
+		}
+
+		if err = opOrganize.Run(nil, skus); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else if c.Edit {
+		opCheckout := user_ops.Checkout{
+			Umwelt: u,
+			Options: checkout_options.Options{
+				CheckoutMode: checkout_mode.ModeObjekteAndAkte,
+			},
+		}
+
+		var zsc sku.CheckedOutMutableSet
+
+		if zsc, err = opCheckout.Run(skus); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		opEdit := user_ops.Edit{
+			Umwelt: u,
+		}
+
+		if err = opEdit.Run(zsc); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

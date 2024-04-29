@@ -34,6 +34,7 @@ func (c Checkin) Run(
 				co,
 				true,
 			); err != nil {
+				log.Debug().Print(err)
 				err = errors.Wrap(err)
 				return
 			}

@@ -2,21 +2,14 @@ package commands
 
 import (
 	"flag"
-	"sync"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/alfa/vim_cli_options_builder"
 	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/src/charlie/checkout_options"
-	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
-	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/script_value"
-	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/india/objekte_collections"
-	"code.linenisgreat.com/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/src/papa/user_ops"
@@ -128,45 +121,14 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 
 		if c.Edit {
-			options := checkout_options.Options{
-				CheckoutMode: checkout_mode.ModeObjekteAndAkte,
-			}
-
-			b := u.MakeQueryBuilder(
-				kennung.MakeGattung(gattung.Zettel),
-			).WithTransacted(
-				zts,
-			)
-
-			var qg *query.Group
-
-			if qg, err = b.BuildQueryGroup(); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			var l sync.Mutex
-
-			if err = u.GetStore().CheckoutQuery(
-				options,
-				qg,
-				func(sk *sku.CheckedOut) (err error) {
-					if zts.ContainsKey(sk.Internal.GetKennung().String()) {
-						err = collections.MakeErrStopIteration()
-						return
-					}
-
-					l.Lock()
-					defer l.Unlock()
-
-					if err = zsc.Add(sk); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
-					return
+			opCheckout := user_ops.Checkout{
+				Umwelt: u,
+				Options: checkout_options.Options{
+					CheckoutMode: checkout_mode.ModeObjekteAndAkte,
 				},
-			); err != nil {
+			}
+
+			if zsc, err = opCheckout.Run(zts); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -174,10 +136,11 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	if c.Edit {
-		if err = c.editZettels(
-			u,
-			zsc,
-		); err != nil {
+		opEdit := user_ops.Edit{
+			Umwelt: u,
+		}
+
+		if err = opEdit.Run(zsc); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -219,59 +182,6 @@ func (c New) writeNewZettels(
 	u.Konfig().DefaultEtiketten.EachPtr(c.Metadatei.AddEtikettPtr)
 
 	if zsc, err = emptyOp.RunMany(c.ProtoZettel, c.Count); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (c New) editZettels(
-	u *umwelt.Umwelt,
-	zsc sku.CheckedOutMutableSet,
-) (err error) {
-	if !c.Edit {
-		errors.Log().Print("edit set to false, not editing")
-		return
-	}
-
-	var filesZettelen []string
-
-	if filesZettelen, err = objekte_collections.ToSliceFilesZettelen(zsc); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	openVimOp := user_ops.OpenVim{
-		Options: vim_cli_options_builder.New().
-			WithCursorLocation(2, 3).
-			WithFileType("zit-zettel").
-			WithInsertMode().
-			Build(),
-	}
-
-	if _, err = openVimOp.Run(u, filesZettelen...); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = u.Reset(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	checkinOp := user_ops.Checkin{}
-
-	var ms *query.Group
-
-	builder := u.MakeQueryBuilderExcludingHidden(kennung.MakeGattung(gattung.Zettel))
-
-	if ms, err = builder.WithCheckedOut(zsc).BuildQueryGroup(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = checkinOp.Run(u, ms); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

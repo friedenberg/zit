@@ -22,7 +22,6 @@ import (
 )
 
 type Organize struct {
-	Or bool
 	organize_text.Flags
 	Mode organize_text_mode.Mode
 
@@ -37,17 +36,12 @@ func init() {
 				Flags: organize_text.MakeFlags(),
 			}
 
-			f.BoolVar(
-				&c.Or,
-				"or",
-				false,
-				"allow optional criteria instead of required",
-			)
 			f.Var(
 				&c.Filter,
 				"filter",
 				"a script to run for each file to transform it the standard zettel format",
 			)
+
 			f.Var(&c.Mode, "mode", "mode used for handling stdin and stdout")
 
 			c.AddToFlagSet(f)
