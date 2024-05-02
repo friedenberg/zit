@@ -158,6 +158,11 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
+	if err = u.GetStore().TryFormatHook(zt); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if _, err = f.WriteStringFormatWithMode(u.Out(), zt, c.Mode); err != nil {
 		err = errors.Wrap(err)
 		return

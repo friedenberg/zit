@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 	"sync"
 	"syscall"
 
@@ -13,7 +14,6 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/alfa/toml"
-	"code.linenisgreat.com/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
@@ -177,8 +177,7 @@ func (c *Chrome) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 	dec := toml.NewDecoder(r)
 
 	if err = dec.Decode(&tb); err != nil {
-		errors.Err().Print(errors.Wrapf(err, "Sha: %s, Kennung: %s", sk.GetAkteSha(), sk.GetKennung()))
-		err = nil
+		err = errors.Wrapf(err, "Sha: %s, Kennung: %s", sk.GetAkteSha(), sk.GetKennung())
 		return
 	}
 
@@ -227,6 +226,11 @@ func (c *Chrome) CommitTransacted(kinder, mutter *sku.Transacted) (err error) {
 }
 
 func (c *Chrome) modifySku(sk *sku.Transacted) (didModify bool, err error) {
+	if strings.HasPrefix(sk.GetTyp().String(), "!chrome") {
+		didModify = true
+		return
+	}
+
 	if !sk.GetTyp().Equals(c.typ) {
 		return
 	}
@@ -246,16 +250,9 @@ func (c *Chrome) modifySku(sk *sku.Transacted) (didModify bool, err error) {
 	didModify = true
 
 	for _, t := range ts {
-		es := t.Etiketten()
-
-		if err = t.Etiketten().EachPtr(sk.AddEtikettPtr); err != nil {
-			errors.PanicIfError(err)
-		}
-
-		ex := kennung.ExpandMany(es, expansion.ExpanderRight)
-
-		if err = ex.EachPtr(sk.Metadatei.Verzeichnisse.AddEtikettExpandedPtr); err != nil {
-			errors.PanicIfError(err)
+		if err = t.AddEtiketten(sk); err != nil {
+			err = errors.Wrap(err)
+			return
 		}
 	}
 
@@ -263,7 +260,7 @@ func (c *Chrome) modifySku(sk *sku.Transacted) (didModify bool, err error) {
 }
 
 func (c *Chrome) Query(
-	ms *query.Group,
+	qg *query.Group,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	var sk sku.Transacted
@@ -275,10 +272,6 @@ func (c *Chrome) Query(
 			if err = item.HydrateSku(&sk); err != nil {
 				err = errors.Wrap(err)
 				return
-			}
-
-			if !ms.ContainsSku(&sk) {
-				continue
 			}
 
 			if err = f(&sk); err != nil {

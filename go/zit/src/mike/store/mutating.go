@@ -202,7 +202,8 @@ func (s *Store) addMutterIfNecessary(
 
 	for _, vs := range s.virtualStores {
 		if err = vs.ModifySku(mutter); err != nil {
-			err = errors.Wrap(err)
+			errors.Err().Print(err)
+			err = nil
 			return
 		}
 	}

@@ -39,55 +39,68 @@ func (s *Store) tryNewHook(
 		return
 	}
 
-	var vp lua.VMPool
-
-	if err = vp.Set(script, s.LuaRequire); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	vm := vp.Get()
-	defer vp.Put(vm)
-
-	var tt *lua.LTable
-
-	if tt, err = vm.GetTopTableOrError(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	f := vm.GetField(tt, "on_new")
-
-	if f.Type() != lua.LTFunction {
-		return
-	}
-
-	tableKinder := vm.Pool.Get()
-	defer vm.Put(tableKinder)
-
-	sku_fmt.ToLuaTable(
+	if err = s.tryHookWithName(
 		kinder,
-		vm.LState,
-		tableKinder,
-	)
-
-	vm.Push(f)
-	vm.Push(tableKinder)
-	vm.Call(
-		1,
-		1,
-	)
-
-	retval := vm.LState.Get(1)
-	vm.Pop(1)
-
-	if retval.Type() != lua.LTNil {
-		err = errors.Errorf("lua error: %s", retval)
+		nil,
+		mode,
+		script,
+		"on_new",
+	); err != nil {
+		err = errors.Wrapf(err, "Hook: %#v", script)
 		return
 	}
 
-	if err = sku_fmt.FromLuaTable(kinder, vm.LState, tableKinder); err != nil {
+	return
+}
+
+func (s *Store) TryFormatHook(
+	kinder *sku.Transacted,
+) (err error) {
+	var mutter *sku.Transacted
+
+	if mutter, err = s.ReadOneKennung(kinder.GetKennung()); err != nil {
+		if collections.IsErrNotFound(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	var t *sku.Transacted
+
+	if t, err = s.ReadOneKennung(kinder.GetTyp()); err != nil {
+		if collections.IsErrNotFound(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	var akte *typ_akte.V0
+
+	if akte, err = s.GetAkten().GetTypV0().GetAkte(t.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	script, ok := akte.Hooks.(string)
+
+	if !ok || script == "" {
+		return
+	}
+
+	if err = s.tryHookWithName(
+		kinder,
+		mutter,
+		objekte_mode.ModeEmpty,
+		script,
+		"on_format",
+	); err != nil {
+		err = errors.Wrapf(err, "Hook: %#v", script)
 		return
 	}
 
@@ -135,11 +148,12 @@ func (s *Store) tryPreCommitHooks(
 			continue
 		}
 
-		if err = s.tryPreCommitHook(
+		if err = s.tryHookWithName(
 			kinder,
 			mutter,
 			mode,
 			h.script,
+			"on_pre_commit",
 		); err != nil {
 			err = errors.Wrapf(err, "Hook: %#v", h)
 			return
@@ -155,9 +169,9 @@ func (s *Store) tryPreCommitHook(
 	mode objekte_mode.Mode,
 	script string,
 ) (err error) {
-	var vp lua.VMPool
+	var vp *lua.VMPool
 
-	if err = vp.Set(script, s.LuaRequire); err != nil {
+	if vp, err = s.MakeLuaVMPool(script); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -173,6 +187,83 @@ func (s *Store) tryPreCommitHook(
 	}
 
 	f := vm.GetField(tt, "on_pre_commit")
+
+	if f.Type() != lua.LTFunction {
+		return
+	}
+
+	tableKinder := vm.Pool.Get()
+	defer vm.Put(tableKinder)
+
+	sku_fmt.ToLuaTable(
+		kinder,
+		vm.LState,
+		tableKinder,
+	)
+
+	var tableMutter *lua.LTable
+
+	if mutter != nil {
+		tableMutter = vm.Pool.Get()
+		defer vm.Put(tableMutter)
+
+		sku_fmt.ToLuaTable(
+			mutter,
+			vm.LState,
+			tableMutter,
+		)
+	}
+
+	vm.Push(f)
+	vm.Push(tableKinder)
+	vm.Push(tableMutter)
+
+	if err = vm.PCall(2, 1, nil); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	retval := vm.LState.Get(1)
+	vm.Pop(1)
+
+	if retval.Type() != lua.LTNil {
+		err = errors.Errorf("lua error: %s", retval)
+		return
+	}
+
+	if err = sku_fmt.FromLuaTable(kinder, vm.LState, tableKinder); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) tryHookWithName(
+	kinder *sku.Transacted,
+	mutter *sku.Transacted,
+	mode objekte_mode.Mode,
+	script string,
+	name string,
+) (err error) {
+	var vp *lua.VMPool
+
+	if vp, err = s.MakeLuaVMPool(script); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	vm := vp.Get()
+	defer vp.Put(vm)
+
+	var tt *lua.LTable
+
+	if tt, err = vm.GetTopTableOrError(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	f := vm.GetField(tt, name)
 
 	if f.Type() != lua.LTFunction {
 		return

@@ -25,8 +25,8 @@ type MetadateiWriterTo interface {
 
 type Metadatei struct {
 	// StoreVersion values.Int
-	// Kasten
 	// Domain
+	Kasten      kennung.Kasten
 	Bezeichnung bezeichnung.Bezeichnung
 	Etiketten   kennung.EtikettMutableSet // public for gob, but should be private
 	Typ         kennung.Typ

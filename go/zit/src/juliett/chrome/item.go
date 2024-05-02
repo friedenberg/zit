@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
@@ -27,35 +28,41 @@ func (ct item) HydrateSku(sk *sku.Transacted) (err error) {
 	sk.Metadatei.Typ = kennung.MustTyp("chrome-" + t)
 
 	if err = sk.Kennung.Set(
-		fmt.Sprintf("%%%d", int(ct["id"].(float64))),
+		fmt.Sprintf("%%/%d", int(ct["id"].(float64))),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	me := sk.GetMetadatei().GetEtikettenMutable()
-
 	switch t {
 	case "history":
 
 	case "tab":
-		me.Add(
-			kennung.MustEtikett(fmt.Sprintf("%%chrome-window_id-%d", int(ct["windowId"].(float64)))),
-		)
-
-		v, ok := ct["active"]
-
-		if !ok {
-			break
-		}
-
-		if b, _ := v.(bool); b {
-			me.Add(
-				kennung.MustEtikett("%chrome-active"),
-			)
-		}
 
 	case "bookmark":
+	}
+
+	if err = ct.AddEtiketten(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (ct item) AddEtiketten(sk *sku.Transacted) (err error) {
+	es := ct.Etiketten()
+
+	if err = es.EachPtr(sk.AddEtikettPtr); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	ex := kennung.ExpandMany(es, expansion.ExpanderRight)
+
+	if err = ex.EachPtr(sk.Metadatei.Verzeichnisse.AddEtikettExpandedPtr); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
