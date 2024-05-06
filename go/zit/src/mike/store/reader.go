@@ -10,6 +10,8 @@ import (
 	"code.linenisgreat.com/zit/src/juliett/query"
 )
 
+// TODO add support for cwd and sigil
+// TODO simplify
 func (s *Store) ReadOneInto(
 	k1 schnittstellen.StringerGattungGetter,
 	out *sku.Transacted,
@@ -18,9 +20,11 @@ func (s *Store) ReadOneInto(
 
 	switch k1.GetGattung() {
 	case gattung.Zettel:
-		var h kennung.Hinweis
+		var h *kennung.Hinweis
 
-		if err = h.Set(k1.String()); err != nil {
+		if h, err = s.GetAbbrStore().Hinweis().ExpandString(
+			k1.String(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

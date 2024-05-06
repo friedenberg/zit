@@ -1,15 +1,22 @@
 package sku_fmt
 
 import (
+	"fmt"
 	"io"
+	"strings"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/src/delta/catgut"
+	"code.linenisgreat.com/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/src/delta/string_format_writer"
+	"code.linenisgreat.com/zit/src/echo/bezeichnung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/echo/zittish"
+	"code.linenisgreat.com/zit/src/foxtrot/kennung_fmt"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
@@ -17,25 +24,44 @@ type KennungAlignedFormat interface {
 	SetMaxKopfUndSchwanz(kop, schwanz int)
 }
 
-type Organize struct {
-	maxKopf, maxSchwanz int
-	ex                  kennung.Abbr
-	options             erworben_cli_print_options.PrintOptions
-}
-
-func MakeOrganizeFormat(
-	ex kennung.Abbr,
+func MakeFormatOrganize(
 	options erworben_cli_print_options.PrintOptions,
+	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],
+	kennungStringFormatWriter kennung_fmt.Aligned,
+	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
+	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],
+	etikettenStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Etikett],
 ) *Organize {
+	options.PrintTime = false
+	options.PrintShas = false
+
 	return &Organize{
-		ex:      ex,
-		options: options,
+		options:                       options,
+		shaStringFormatWriter:         shaStringFormatWriter,
+		kennungStringFormatWriter:     kennungStringFormatWriter,
+		typStringFormatWriter:         typStringFormatWriter,
+		bezeichnungStringFormatWriter: bezeichnungStringFormatWriter,
+		etikettenStringFormatWriter:   etikettenStringFormatWriter,
 	}
 }
 
+type Organize struct {
+	options erworben_cli_print_options.PrintOptions
+
+	maxKopf, maxSchwanz int
+	padding             string
+
+	shaStringFormatWriter         schnittstellen.StringFormatWriter[schnittstellen.ShaLike]
+	kennungStringFormatWriter     kennung_fmt.Aligned
+	typStringFormatWriter         schnittstellen.StringFormatWriter[*kennung.Typ]
+	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung]
+	etikettenStringFormatWriter   schnittstellen.StringFormatWriter[*kennung.Etikett]
+}
+
 func (f *Organize) SetMaxKopfUndSchwanz(k, s int) {
-	f.maxKopf = k
-	f.maxSchwanz = s
+	f.maxKopf, f.maxSchwanz = k, s
+	f.padding = strings.Repeat(" ", 5+k+s)
+	f.kennungStringFormatWriter.SetMaxKopfUndSchwanz(k, s)
 }
 
 func (f *Organize) WriteStringFormat(
@@ -43,6 +69,26 @@ func (f *Organize) WriteStringFormat(
 	o *sku.Transacted,
 ) (n int64, err error) {
 	var n1 int
+
+	if f.options.PrintTime {
+		t := o.GetTai()
+
+		n1, err = sw.WriteString(t.Format(string_format_writer.StringFormatDateTime))
+		n += int64(n1)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		n1, err = sw.WriteString(" ")
+		n += int64(n1)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 
 	n1, err = sw.WriteString("[")
 	n += int64(n1)
@@ -52,8 +98,101 @@ func (f *Organize) WriteStringFormat(
 		return
 	}
 
-	h := kennung.Aligned(&o.Kennung, f.maxKopf, f.maxSchwanz)
-	n1, err = sw.WriteString(h)
+	var n2 int64
+	n2, err = f.kennungStringFormatWriter.WriteStringFormat(sw, &o.Kennung)
+	n += int64(n2)
+	// var n2 int64
+	// n2, err = f.kennungStringFormatWriter.WriteStringFormat(
+	// 	sw,
+	// 	o.Kennung,
+	// )
+	// n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	sh := o.GetAkteSha()
+
+	if f.options.PrintShas && (!sh.IsNull() || f.options.PrintEmptyShas) {
+		n1, err = sw.WriteString("@")
+		n += int64(n1)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		n2, err = f.shaStringFormatWriter.WriteStringFormat(sw, o.GetAkteSha())
+		n += n2
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	t := o.GetMetadatei().GetTypPtr()
+
+	if len(t.String()) > 0 {
+		if f.padding == "" {
+			n1, err = sw.WriteString(" !")
+		} else {
+			n1, err = sw.WriteString("  !")
+		}
+
+		n += int64(n1)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		n2, err = f.typStringFormatWriter.WriteStringFormat(sw, t)
+		n += n2
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	b := o.GetMetadatei().GetBezeichnungPtr()
+
+	if f.options.PrintEtikettenAlways {
+		b := o.GetMetadatei().GetEtiketten()
+
+		for _, v := range iter.SortedValues(b) {
+			if f.options.ZittishNewlines {
+				n1, err = fmt.Fprintf(sw, "\n%s", f.padding)
+			} else {
+				n1, err = sw.WriteString(" ")
+			}
+
+			n += int64(n1)
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			n2, err = f.etikettenStringFormatWriter.WriteStringFormat(sw, &v)
+			n += n2
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+	}
+
+	if f.options.ZittishNewlines {
+		n1, err = fmt.Fprintf(sw, "\n%s]", f.padding)
+	} else {
+		n1, err = sw.WriteString("]")
+	}
+
 	n += int64(n1)
 
 	if err != nil {
@@ -61,15 +200,7 @@ func (f *Organize) WriteStringFormat(
 		return
 	}
 
-	n1, err = sw.WriteString("]")
-	n += int64(n1)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if !o.Metadatei.Bezeichnung.IsEmpty() {
+	if !b.IsEmpty() {
 		n1, err = sw.WriteString(" ")
 		n += int64(n1)
 
@@ -78,8 +209,8 @@ func (f *Organize) WriteStringFormat(
 			return
 		}
 
-		n1, err = sw.WriteString(o.Metadatei.Description())
-		n += int64(n1)
+		n2, err = f.bezeichnungStringFormatWriter.WriteStringFormat(sw, b)
+		n += n2
 
 		if err != nil {
 			err = errors.Wrap(err)
@@ -94,20 +225,20 @@ func (f *Organize) ReadStringFormat(
 	rb *catgut.RingBuffer,
 	o *sku.Transacted,
 ) (n int64, err error) {
-	if err = f.readStringFormatWithKennung(rb, o); err != nil {
-		if collections.IsErrNotFound(err) {
-			err = nil
-		} else {
-			err = errors.WrapExcept(err, io.EOF, catgut.ErrBufferEmpty)
-			return
-		}
+	if err = f.readStringFormatWithinBrackets(rb, o); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	var sl catgut.Slice
 
 	if sl, err = rb.PeekUptoAndIncluding('\n'); err != nil {
-		err = errors.Wrap(err)
-		return
+		if collections.IsErrNotFound(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if err = o.Metadatei.Bezeichnung.TodoSetSlice(sl); err != nil {
@@ -120,26 +251,17 @@ func (f *Organize) ReadStringFormat(
 	return
 }
 
-func (f *Organize) readStringFormatWithKennung(
+func (f *Organize) readStringFormatWithinBrackets(
 	rb *catgut.RingBuffer,
 	o *sku.Transacted,
 ) (err error) {
+	rr := catgut.MakeRingBufferRuneScanner(rb)
+
 	state := 0
-	n := 0
-	eof := false
+	var k kennung.Kennung2
 	var t catgut.String
-
-	var sl catgut.Slice
-
-	if sl, err = rb.PeekUptoAndIncluding(']'); err != nil {
-		if !collections.IsErrNotFound(err) {
-			err = errors.Wrap(err)
-		}
-
-		return
-	}
-
-	rr := catgut.MakeSliceRuneScanner(sl)
+	var eof bool
+	var n int
 
 LOOP:
 	for !eof {
@@ -170,7 +292,6 @@ LOOP:
 
 		case 1:
 			if err = o.Kennung.TodoSetBytes(&t); err != nil {
-				err = errors.Wrapf(err, "Readable: len: %d, cap %d, 1:%q, 2:%q", rb.Len(), rb.Cap(), string(rb.PeekReadable().First()), string(rb.PeekReadable().Second()))
 				o.Kennung.Reset()
 				return
 			}
@@ -178,21 +299,43 @@ LOOP:
 			state++
 
 		case 2:
-			if !t.EqualsString("]") {
-				o.Kennung.Reset()
-				return
-			}
-
-			if f.options.Abbreviations.Hinweisen {
-				if err = f.ex.AbbreviateHinweisOnly(
-					&o.Kennung,
-				); err != nil {
-					err = errors.Wrap(err)
+			if t.EqualsString("]") {
+				break LOOP
+			} else {
+				if err = k.TodoSetBytes(&t); err != nil {
+					err = errors.Wrapf(err, "Readable: %q", rb.PeekReadable())
 					return
 				}
-			}
 
-			break LOOP
+				g := k.GetGattung()
+
+				switch g {
+				case gattung.Typ:
+					if err = o.Metadatei.Typ.TodoSetFromKennung2(&k); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+				case gattung.Etikett:
+					var e kennung.Etikett
+
+					if err = e.TodoSetFromKennung2(&k); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+					if err = o.AddEtikettPtr(&e); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+				default:
+					err = gattung.MakeErrUnsupportedGattung(k.GetGattung())
+					return
+				}
+
+				k.Reset()
+			}
 
 		default:
 			err = errors.Errorf("invalid state: %d", state)
@@ -200,7 +343,16 @@ LOOP:
 		}
 	}
 
-	rb.AdvanceRead(sl.Len())
+	// if f.options.Abbreviations.Hinweisen {
+	// 	if err = f.ex.AbbreviateHinweisOnly(
+	// 		&o.Kennung,
+	// 	); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return
+	// 	}
+	// }
+
+	rb.AdvanceRead(n)
 
 	return
 }

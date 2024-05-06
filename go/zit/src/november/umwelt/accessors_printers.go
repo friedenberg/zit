@@ -37,11 +37,10 @@ func (u *Umwelt) StringFormatWriterShaLike(
 func (u *Umwelt) StringFormatWriterKennungAligned(
 	co string_format_writer.ColorOptions,
 ) kennung_fmt.Aligned {
-	if u.konfig.PrintOptions.Abbreviations.Hinweisen {
-		return kennung_fmt.Aligned{Abbr: u.GetStore().GetAbbrStore().GetAbbr()}
-	} else {
-		return kennung_fmt.Aligned{}
-	}
+	return kennung_fmt.MakeAligned(
+		u.konfig.PrintOptions,
+		u.GetStore().GetAbbrStore().GetAbbr(),
+	)
 }
 
 func (u *Umwelt) StringFormatWriterKennung(
@@ -74,11 +73,11 @@ func (u *Umwelt) StringFormatWriterEtiketten(
 	return kennung_fmt.MakeEtikettenCliFormat()
 }
 
-func (u *Umwelt) SkuFmtOrganize() *sku_fmt.OrganizeNew {
+func (u *Umwelt) SkuFmtOrganize() *sku_fmt.Organize {
 	co := u.FormatColorOptionsOut()
 	co.OffEntirely = true
 
-	return sku_fmt.MakeOrganizeNewFormat(
+	return sku_fmt.MakeFormatOrganize(
 		u.konfig.PrintOptions,
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterKennungAligned(co),

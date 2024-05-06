@@ -22,7 +22,7 @@ func MakeKennungCliFormat(
 ) *kennungCliFormat {
 	return &kennungCliFormat{
 		options: options,
-		sfwColor: string_format_writer.MakeColor[*catgut.String](
+		sfwColor: string_format_writer.MakeColor(
 			co,
 			catgut.StringFormatWriter,
 			string_format_writer.ColorTypePointer,

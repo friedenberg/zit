@@ -29,7 +29,7 @@ import (
 
 func (u *Umwelt) MakeFormatFunc(
 	v string,
-	out io.Writer,
+	out schnittstellen.WriterAndStringWriter,
 ) (f schnittstellen.FuncIter[*sku.Transacted], err error) {
 	if out == nil {
 		out = u.Out()
@@ -40,6 +40,23 @@ func (u *Umwelt) MakeFormatFunc(
 	}
 
 	switch v {
+	case "organize":
+		p := u.SkuFmtOrganize()
+
+		f = func(tl *sku.Transacted) (err error) {
+			if _, err = p.WriteStringFormat(out, tl); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if _, err = fmt.Fprintln(out); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
 	case "sha":
 		f = func(tl *sku.Transacted) (err error) {
 			_, err = fmt.Fprintln(out, tl.Metadatei.Sha())

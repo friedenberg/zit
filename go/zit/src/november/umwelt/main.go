@@ -9,12 +9,14 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/age"
 	"code.linenisgreat.com/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/src/echo/thyme"
 	"code.linenisgreat.com/zit/src/foxtrot/erworben"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/juliett/chrome"
 	"code.linenisgreat.com/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/src/juliett/query"
@@ -43,6 +45,8 @@ type Umwelt struct {
 	age               *age.Age
 
 	matcherArchiviert query.Archiviert
+
+	luaSkuFormat *sku_fmt.Organize
 }
 
 func Make(kCli erworben.Cli, options Options) (u *Umwelt, err error) {
@@ -160,6 +164,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		objekte_format.FormatForVersion(u.Konfig().GetStoreVersion()),
 		u.sonnenaufgang,
 		u.virtualStores,
+		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")
 		return
@@ -185,6 +190,8 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	u.store.SetLogWriter(lw)
 
 	u.storesInitialized = true
+
+	u.luaSkuFormat = u.SkuFmtOrganize()
 
 	return
 }
@@ -226,7 +233,7 @@ func (u *Umwelt) makeQueryBuilder() *query.Builder {
 		u.GetStore().GetAkten(),
 		u.GetStore().GetVerzeichnisse(),
 		u.GetChrestStore(),
-		u.GetStore().LuaRequire,
+		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
 	)
 }
 

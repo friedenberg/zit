@@ -44,7 +44,7 @@ type Options struct {
 	UseMetadateiHeader     bool
 
 	PrintOptions       erworben_cli_print_options.PrintOptions
-	skuFmt             sku_fmt.OrganizeNew
+	skuFmt             sku_fmt.Organize
 	stringFormatWriter schnittstellen.StringFormatWriter[*sku.Transacted]
 }
 
@@ -115,7 +115,7 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 func (o *Flags) GetOptions(
 	printOptions erworben_cli_print_options.PrintOptions,
 	q *query.Group,
-	skuFmt *sku_fmt.OrganizeNew,
+	skuFmt *sku_fmt.Organize,
 	abbr kennung.Abbr,
 ) Options {
 	o.once.Do(

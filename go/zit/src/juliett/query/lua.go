@@ -8,10 +8,12 @@ import (
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 )
 
-func MakeLua(script string, require lua.LGFunction) (ml *Lua, err error) {
-	ml = &Lua{}
+func MakeLua(script string, require lua.LGFunction) (ml Lua, err error) {
+	ml = Lua{
+		VMPool: (&lua.VMPoolBuilder{}).WithRequire(require).Build(),
+	}
 
-	if err = ml.Set(script, require); err != nil {
+	if err = ml.Set(script); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -20,10 +22,10 @@ func MakeLua(script string, require lua.LGFunction) (ml *Lua, err error) {
 }
 
 type Lua struct {
-	lua.VMPool
+	*lua.VMPool
 }
 
-func (matcher *Lua) ContainsSku(sk *sku.Transacted) bool {
+func (matcher Lua) ContainsSku(sk *sku.Transacted) bool {
 	vm := matcher.Get()
 	defer matcher.Put(vm)
 

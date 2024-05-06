@@ -22,16 +22,16 @@ func MakeBuilder(
 	akten *akten.Akten,
 	ennui sku.Ennui,
 	chrome *VirtualStoreInitable,
-	luaRequire lua.LGFunction,
+	luaVMPoolBuilder *lua.VMPoolBuilder,
 ) (b *Builder) {
 	b = &Builder{
 		standort:                   s,
 		akten:                      akten,
 		ennui:                      ennui,
-		luaRequire:                 luaRequire,
+		luaVMPoolBuilder:           luaVMPoolBuilder,
 		virtualStores:              make(map[string]*VirtualStoreInitable),
 		virtualEtikettenBeforeInit: make(map[string]string),
-		virtualEtiketten:           make(map[string]*Lua),
+		virtualEtiketten:           make(map[string]Lua),
 	}
 
 	if chrome != nil {
@@ -45,7 +45,7 @@ type Builder struct {
 	standort                   standort.Standort
 	akten                      *akten.Akten
 	ennui                      sku.Ennui
-	luaRequire                 lua.LGFunction
+	luaVMPoolBuilder           *lua.VMPoolBuilder
 	preexistingKennung         []*kennung.Kennung2
 	cwd                        Cwd
 	fileExtensionGetter        schnittstellen.FileExtensionGetter
@@ -56,7 +56,7 @@ type Builder struct {
 	permittedSigil             kennung.Sigil
 	virtualStores              map[string]*VirtualStoreInitable
 	virtualEtikettenBeforeInit map[string]string
-	virtualEtiketten           map[string]*Lua
+	virtualEtiketten           map[string]Lua
 	doNotMatchEmpty            bool
 	debug                      bool
 	requireNonEmptyQuery       bool
@@ -180,9 +180,11 @@ func (b *Builder) WithCheckedOut(
 
 func (b *Builder) realizeVirtualEtiketten() (err error) {
 	for k, v := range b.virtualEtikettenBeforeInit {
-		var ml *Lua
+		ml := Lua{
+			VMPool: b.luaVMPoolBuilder.Build(),
+		}
 
-		if ml, err = MakeLua(v, b.luaRequire); err != nil {
+		if err = ml.Set(v); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -527,7 +529,10 @@ func (b *Builder) makeEtikettOrEtikettLua(
 
 	defer sku.GetTransactedPool().Put(sk)
 
-	var lua Lua
+	lua := Lua{
+		VMPool: b.luaVMPoolBuilder.Build(),
+	}
+
 	if sk.GetTyp().String() == "lua" {
 		var ar sha.ReadCloser
 
@@ -538,7 +543,7 @@ func (b *Builder) makeEtikettOrEtikettLua(
 
 		defer errors.DeferredCloser(&err, ar)
 
-		if err = lua.SetReader(ar, b.luaRequire); err != nil {
+		if err = lua.SetReader(ar); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -556,7 +561,7 @@ func (b *Builder) makeEtikettOrEtikettLua(
 			return
 		}
 
-		if err = lua.Set(akte.Filter, b.luaRequire); err != nil {
+		if err = lua.Set(akte.Filter); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -588,8 +593,9 @@ func (b *Builder) makeEtikettExp(k *Kennung) (exp sku.Query, err error) {
 
 	expanded := kennung.ExpandOneSlice(&e)
 	var store *VirtualStoreInitable
-	var eStore *Lua
+	var eStore Lua
 
+	ok := false
 	for _, e1 := range expanded {
 		store = b.virtualStores[e1.String()]
 
@@ -597,14 +603,14 @@ func (b *Builder) makeEtikettExp(k *Kennung) (exp sku.Query, err error) {
 			break
 		}
 
-		eStore = b.virtualEtiketten[e1.String()]
+		eStore, ok = b.virtualEtiketten[e1.String()]
 
-		if eStore != nil {
+		if ok {
 			break
 		}
 	}
 
-	if store == nil && eStore == nil {
+	if store == nil && !ok {
 		err = errors.Errorf("no virtual store registered for %q", e)
 		return
 	}

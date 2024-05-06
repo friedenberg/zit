@@ -61,9 +61,13 @@ func makeObjWithHinAndBez(t *testing.T, hin string, bez string) (o *obj) {
 
 func makeAssignmentLineReader() assignmentLineReader {
 	return assignmentLineReader{
-		stringFormatReader: sku_fmt.MakeOrganizeFormat(
-			kennung.Abbr{},
+		stringFormatReader: sku_fmt.MakeFormatOrganize(
 			erworben_cli_print_options.PrintOptions{},
+			nil,
+      nil,
+			nil,
+			nil,
+			nil,
 		),
 	}
 }

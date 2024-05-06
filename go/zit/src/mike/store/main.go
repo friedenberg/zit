@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/src/echo/thyme"
@@ -32,6 +33,7 @@ type Store struct {
 	persistentMetadateiFormat objekte_format.Format
 	fileEncoder               sku.FileEncoder
 	virtualStores             map[string]*query.VirtualStoreInitable
+	luaVMPoolBuilder          *lua.VMPoolBuilder
 
 	verzeichnisse *store_verzeichnisse.Store
 
@@ -63,6 +65,7 @@ func (c *Store) Initialize(
 	pmf objekte_format.Format,
 	t thyme.Time,
 	virtualStores map[string]*query.VirtualStoreInitable,
+	luaVMPoolBuilder *lua.VMPoolBuilder,
 ) (err error) {
 	c.konfig = k
 	c.standort = st
@@ -72,6 +75,7 @@ func (c *Store) Initialize(
 	c.sonnenaufgang = t
 	c.fileEncoder = sku.MakeFileEncoder(st, k)
 	c.virtualStores = virtualStores
+	c.luaVMPoolBuilder = luaVMPoolBuilder
 
 	if c.cwdFiles, err = cwd.MakeCwdFilesAll(
 		k,

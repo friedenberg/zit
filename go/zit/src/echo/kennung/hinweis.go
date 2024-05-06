@@ -3,6 +3,7 @@ package kennung
 import (
 	"fmt"
 	"strings"
+	"unicode"
 
 	"code.linenisgreat.com/zit/src/alfa/coordinates"
 	"code.linenisgreat.com/zit/src/alfa/errors"
@@ -146,18 +147,24 @@ func (i Hinweis) Less(j Hinweis) bool {
 func (h *Hinweis) Set(v string) (err error) {
 	v = strings.TrimSpace(v)
 	v = strings.ToLower(v)
-	v = strings.Map(
-		func(r rune) rune {
-			if r > 'z' {
-				return -1
-			}
-
-			return r
-		},
-		v,
-	)
 
 	v = strings.TrimSuffix(v, ".zettel")
+
+	if strings.ContainsFunc(
+		v,
+		func(r rune) bool {
+			switch {
+			case unicode.IsDigit(r), unicode.IsLetter(r), r == '_', r == '/', r == '%':
+				return false
+
+			default:
+				return true
+			}
+		},
+	) {
+		err = errors.Errorf("contains invalid characters: %q", v)
+		return
+	}
 
 	parts := strings.Split(v, "/")
 
