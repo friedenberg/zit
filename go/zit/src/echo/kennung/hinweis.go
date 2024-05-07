@@ -166,8 +166,11 @@ func (h *Hinweis) Set(v string) (err error) {
 		return
 	}
 
-	parts := strings.Split(v, "/")
+	if v == "/" {
+		return
+	}
 
+	parts := strings.Split(v, "/")
 	count := len(parts)
 
 	switch count {
@@ -182,16 +185,6 @@ func (h *Hinweis) Set(v string) (err error) {
 	case 2:
 		h.left = parts[0]
 		h.right = parts[1]
-	}
-
-	switch {
-	case h.left == "":
-		err = errors.Errorf("left is empty: %q", v)
-		return
-
-	case h.right == "":
-		err = errors.Errorf("right is empty: %q", v)
-		return
 	}
 
 	return

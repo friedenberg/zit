@@ -126,3 +126,31 @@ function outputs_organize_one_etikett { # @test
 	run_zit format-organize "${cmd_def_organize[@]}" <(cat_organize)
 	assert_output "$(cat_organize)"
 }
+
+function create_structured_zettels { # @test
+	run_zit_init_disable_age
+
+	function cat_body {
+		cat <<-EOM
+			---
+			- test
+			---
+
+			- [/] first
+			- [/  !task tag-3] second
+			- third
+		EOM
+	}
+
+	run_zit format-organize "${cmd_def_organize[@]}" <(cat_body)
+	assert_success
+	assert_output - <<-EOM
+		---
+		- test
+		---
+
+		- [/] first
+		- [/  !task tag-3] second
+		- [/] third
+	EOM
+}

@@ -98,6 +98,11 @@ func (str *String) Len() int {
 	return str.data.Len()
 }
 
+func (str *String) IsEmpty() bool {
+	str.copyCheck()
+	return str.data.Len() == 0
+}
+
 func (a *String) Equals(b *String) bool {
 	return bytes.Equal(a.Bytes(), b.Bytes())
 }
@@ -283,7 +288,6 @@ func (dst *String) ReadNFrom(r io.Reader, toRead int) (read int, err error) {
 	b := dst.AvailableBuffer()[:toRead]
 
 	read, err = ohio.ReadAllOrDieTrying(r, b)
-
 	if err != nil {
 		if read == toRead && err == io.EOF {
 			err = nil

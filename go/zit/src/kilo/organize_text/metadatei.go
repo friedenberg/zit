@@ -15,6 +15,7 @@ import (
 )
 
 type Metadatei struct {
+	// metadatei.Metadatei
 	kennung.EtikettSet
 	Matchers schnittstellen.SetLike[sku.Query]
 	Comments []string

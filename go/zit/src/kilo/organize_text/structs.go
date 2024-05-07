@@ -64,17 +64,17 @@ func sortObjSet(
 
 	sort.Slice(out, func(i, j int) bool {
 		switch {
-		case out[i].Kennung.String() != "" && out[j].Kennung.String() != "":
-			return out[i].Kennung.String() < out[j].Kennung.String()
+		case out[i].Kennung.IsEmpty() && out[j].Kennung.IsEmpty():
+			return out[i].Metadatei.Bezeichnung.String() < out[j].Metadatei.Bezeichnung.String()
 
-		case out[i].Kennung.String() == "":
+		case out[i].Kennung.IsEmpty():
 			return true
 
-		case out[j].Kennung.String() == "":
+		case out[j].Kennung.IsEmpty():
 			return false
 
 		default:
-			return out[i].Metadatei.Bezeichnung.String() < out[j].Metadatei.Bezeichnung.String()
+			return out[i].Kennung.String() < out[j].Kennung.String()
 		}
 	})
 

@@ -1241,3 +1241,21 @@ function organize_update_checkout { # @test
 		             same [one/dos.zettel@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again"]
 	EOM
 }
+
+function create_structured_zettels { # @test
+	run_zit organize "${cmd_def_organize[@]}" -mode commit-directly <<-EOM
+		---
+		- test
+		---
+
+		- [/] first
+		- [/  !task tag-3] second
+	EOM
+	assert_success
+	assert_output - <<-EOM
+		[test@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "first" test]
+		[!task@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/tres@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !task "second" tag-3 test]
+	EOM
+}

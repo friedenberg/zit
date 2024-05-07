@@ -219,6 +219,12 @@ func (k2 *Kennung2) StringFromPtr() string {
 }
 
 func (k2 *Kennung2) IsEmpty() bool {
+	if k2.g == gattung.Zettel {
+		if k2.left.IsEmpty() && k2.right.IsEmpty() {
+			return true
+		}
+	}
+
 	return k2.left.Len() == 0 && k2.middle == 0 && k2.right.Len() == 0
 }
 
@@ -452,6 +458,7 @@ func (h *Kennung2) Set(v string) (err error) {
 	}
 
 	if err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

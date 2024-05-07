@@ -277,7 +277,14 @@ func (ar *assignmentLineReader) readOneObj(r *catgut.RingBuffer) (err error) {
 	}
 
 	if z.Kennung.IsEmpty() {
+    // set empty hinweis to ensure middle is '/'
+		if err = z.Kennung.SetWithKennung(kennung.Hinweis{}); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		ar.currentAssignment.Unnamed.Add(&z)
+
 		return
 	}
 
