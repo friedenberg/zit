@@ -63,7 +63,6 @@ func (s *Umwelt) LuaRequire(ls *lua.LState) int {
 
 	defer sku.GetTransactedPool().Put(sk)
 
-	// TODO add support for cwd in readonekennung
 	if err = s.GetStore().ReadOneInto(sk.GetKennung(), sk); err != nil {
 		panic(err)
 	}

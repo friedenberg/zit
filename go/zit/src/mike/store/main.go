@@ -1,6 +1,8 @@
 package store
 
 import (
+	"flag"
+
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/delta/gattung"
@@ -60,6 +62,7 @@ type Logger struct {
 }
 
 func (c *Store) Initialize(
+	flags *flag.FlagSet,
 	k *konfig.Compiled,
 	st standort.Standort,
 	pmf objekte_format.Format,

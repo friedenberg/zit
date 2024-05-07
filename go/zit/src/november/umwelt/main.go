@@ -1,6 +1,7 @@
 package umwelt
 
 import (
+	"flag"
 	"io"
 	"os"
 
@@ -31,6 +32,8 @@ type Umwelt struct {
 	out *os.File
 	err *os.File
 
+	flags *flag.FlagSet
+
 	inIsTty  bool
 	outIsTty bool
 	errIsTty bool
@@ -49,11 +52,16 @@ type Umwelt struct {
 	luaSkuFormat *sku_fmt.Organize
 }
 
-func Make(kCli erworben.Cli, options Options) (u *Umwelt, err error) {
+func Make(
+	flags *flag.FlagSet,
+	kCli erworben.Cli,
+	options Options,
+) (u *Umwelt, err error) {
 	u = &Umwelt{
 		in:                os.Stdin,
 		out:               os.Stdout,
 		err:               os.Stderr,
+		flags:             flags,
 		erworbenCli:       kCli,
 		matcherArchiviert: query.MakeArchiviert(),
 		virtualStores:     make(map[string]*query.VirtualStoreInitable),
@@ -159,6 +167,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	}
 
 	if err = u.store.Initialize(
+		u.flags,
 		u.Konfig(),
 		u.standort,
 		objekte_format.FormatForVersion(u.Konfig().GetStoreVersion()),

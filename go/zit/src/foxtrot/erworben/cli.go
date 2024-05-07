@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/erworben_tools"
 	"code.linenisgreat.com/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/src/delta/debug"
+	"code.linenisgreat.com/zit/src/echo/bezeichnung"
 )
 
 type Cli struct {
@@ -28,6 +29,8 @@ type Cli struct {
 
 	PrintOptions, maskPrintOptions erworben_cli_print_options.PrintOptions
 	ToolOptions                    erworben_tools.Tools
+
+	bezeichnung.Bezeichnung
 }
 
 func (c *Cli) AddToFlags(f *flag.FlagSet) {
@@ -82,6 +85,8 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	)
 
 	f.StringVar(&c.Hooks, "hooks", "", "")
+
+	f.Var(&c.Bezeichnung, "komment", "Comment for Bestandsaufnahme")
 }
 
 func DefaultCli() (c Cli) {

@@ -8,10 +8,13 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/lima/bestandsaufnahme"
 )
 
-func (s *Store) FlushBestandsaufnahme() (err error) {
+func (s *Store) FlushBestandsaufnahme(
+	p schnittstellen.FuncIter[*sku.Transacted],
+) (err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
 			Operation: "flush",
@@ -26,13 +29,25 @@ func (s *Store) FlushBestandsaufnahme() (err error) {
 
 	errors.Log().Printf("saving Bestandsaufnahme")
 
-	if _, err = s.GetBestandsaufnahmeStore().Create(
+	var bestandsaufnahmeSku *sku.Transacted
+
+	if bestandsaufnahmeSku, err = s.GetBestandsaufnahmeStore().Create(
 		&s.bestandsaufnahmeAkte,
+		s.GetKonfig().Bezeichnung,
 	); err != nil {
 		if errors.Is(err, bestandsaufnahme.ErrEmpty) {
 			errors.Log().Printf("Bestandsaufnahme was empty")
 			err = nil
 		} else {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	defer sku.GetTransactedPool().Put(bestandsaufnahmeSku)
+
+	if s.GetKonfig().PrintOptions.PrintBestandsaufnahme {
+		if err = p(bestandsaufnahmeSku); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

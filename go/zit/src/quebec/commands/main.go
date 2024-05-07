@@ -60,6 +60,7 @@ func Run(args []string) (exitStatus int) {
 	konfigCli := erworben.DefaultCli()
 	konfigCli.AddToFlags(cmd.FlagSet)
 
+	// TODO add Komment / bestandsaufnahmeBezeichnung
 	if err = cmd.Parse(args); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -84,7 +85,7 @@ func Run(args []string) (exitStatus int) {
 		options = og.GetUmweltInitializeOptions()
 	}
 
-	if u, err = umwelt.Make(konfigCli, options); err != nil {
+	if u, err = umwelt.Make(cmd.FlagSet, konfigCli, options); err != nil {
 		if cmd.sansUmwelt {
 			err = nil
 		} else {

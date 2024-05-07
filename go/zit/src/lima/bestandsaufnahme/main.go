@@ -16,6 +16,7 @@ import (
 	"code.linenisgreat.com/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/src/echo/bezeichnung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
@@ -28,7 +29,10 @@ type Store interface {
 	errors.Flusher
 	GetStore() Store
 
-	Create(*Akte) (*sku.Transacted, error)
+	Create(
+		*Akte,
+		bezeichnung.Bezeichnung,
+	) (*sku.Transacted, error)
 	ReadLast() (*sku.Transacted, error)
 	ReadOne(schnittstellen.Stringer) (*sku.Transacted, error)
 	ReadOneSku(besty, sk *sha.Sha) (*sku.Transacted, error)
@@ -104,7 +108,10 @@ func (s *store) Flush() (err error) {
 	return wg.GetError()
 }
 
-func (s *store) Create(o *Akte) (t *sku.Transacted, err error) {
+func (s *store) Create(
+	o *Akte,
+	bez bezeichnung.Bezeichnung,
+) (t *sku.Transacted, err error) {
 	if !s.ls.IsAcquired() {
 		err = file_lock.ErrLockRequired{
 			Operation: "create bestandsaufnahme",
@@ -126,9 +133,9 @@ func (s *store) Create(o *Akte) (t *sku.Transacted, err error) {
 	}
 
 	t = sku.GetTransactedPool().Get()
-	defer sku.GetTransactedPool().Put(t)
 
 	sku.TransactedResetter.Reset(t)
+	t.Metadatei.Bezeichnung = bez
 	t.SetAkteSha(sh)
 	tai := s.clock.GetTai()
 

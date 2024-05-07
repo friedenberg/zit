@@ -249,3 +249,14 @@ function checkin_zettel_typ_has_commit_hook { # @test
 		[two/uno@edf7b6df934442ad0d6ac9fe4132c5e588391eb307fbbdc3ab6de780e17245a5 !typ_with_hook "test lua" on_new on_pre_commit]
 	EOM
 }
+
+function checkin_zettel_with_komment { # @test
+	run_zit checkin -print-bestandsaufnahme=true -komment "message" one/uno.zettel
+	assert_success
+	assert_output --regexp - <<-'EOM'
+		\[etikett@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\]
+		\[etikett-one@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\]
+		\[one/uno@d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "wildly different" etikett-one\]
+		\[[0-9]+\.[0-9]+@[0-9a-f]{64} "message"\]
+	EOM
+}

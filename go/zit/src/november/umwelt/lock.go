@@ -18,8 +18,10 @@ func (u *Umwelt) Lock() (err error) {
 }
 
 func (u *Umwelt) Unlock() (err error) {
+	ptl := u.PrinterTransactedLike()
+
 	if u.storesInitialized {
-		if err = u.store.FlushBestandsaufnahme(); err != nil {
+		if err = u.store.FlushBestandsaufnahme(ptl); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

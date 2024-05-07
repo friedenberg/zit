@@ -25,7 +25,7 @@ function mark_one_as_hidden { # @test
 	run_zit edit-konfig -hide-etikett tag-3
 	assert_success
 	assert_output - <<-EOM
-		[konfig@9faf629a95cd95b7c3cd3b8d69a11c0d592b68e7929fe0b5fcf8912db0aaee8a]
+		[konfig@dc3ffc61367cf6b8528fa26d8ded6cc8f364846e2f44059cc32e0ebb4a4cc559]
 	EOM
 
 	run_zit show :z
@@ -42,7 +42,7 @@ function mark_one_as_hidden { # @test
 	run_zit edit-konfig -unhide-etikett tag-3
 	assert_success
 	assert_output - <<-EOM
-		[konfig@2add70c77fac6a831bb9339e8a43446c06d4e92506e5d01d3ee9247b16ebbdbe]
+		[konfig@18d10f21461e6d02a3362055d32ea0edd8e7ae1fdc79ce141559982d9a245ca7]
 	EOM
 
 	# run_zit reindex

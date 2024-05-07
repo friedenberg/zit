@@ -23,6 +23,7 @@ type PrintOptions struct {
 	PrintFlush                bool          `toml:"print-flush"`
 	PrintUnchanged            bool          `toml:"print-unchanged"`
 	PrintColors               bool          `toml:"print-colors"`
+	PrintBestandsaufnahme     bool          `toml:"print-bestandsaufnahme"`
 	ZittishNewlines           bool          `toml:"-"`
 }
 
@@ -75,6 +76,10 @@ func (a *PrintOptions) Merge(b PrintOptions, mask PrintOptions) {
 		a.PrintColors = b.PrintColors
 	}
 
+	if mask.PrintBestandsaufnahme {
+		a.PrintBestandsaufnahme = b.PrintBestandsaufnahme
+	}
+
 	a.ZittishNewlines = b.ZittishNewlines
 }
 
@@ -94,6 +99,7 @@ func Default() PrintOptions {
 		PrintFlush:                true,
 		PrintUnchanged:            true,
 		PrintColors:               true,
+		PrintBestandsaufnahme:     true,
 	}
 }
 
@@ -217,6 +223,14 @@ func (c *PrintOptions) AddToFlags(f *flag.FlagSet, m *PrintOptions) {
 		"print-colors",
 		&c.PrintColors,
 		&m.PrintColors,
+		"",
+	)
+
+	boolVarWithMask(
+		f,
+		"print-bestandsaufnahme",
+		&c.PrintBestandsaufnahme,
+		&m.PrintBestandsaufnahme,
 		"",
 	)
 }
