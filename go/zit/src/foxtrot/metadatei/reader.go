@@ -10,14 +10,35 @@ import (
 )
 
 type Reader struct {
-	// TODO-P4 add delimiter
-	RequireMetadatei bool
+	state            readerState
+	RequireMetadatei bool // TODO-P4 add delimiter
 	Metadatei, Akte  io.ReaderFrom
 }
 
 // TODO-P4 add constructors and remove public fields
-func (mr *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
-	r := bufio.NewReader(r1)
+func (mr *Reader) ReadFrom(r io.Reader) (n int64, err error) {
+	var n1 int64
+	n1, err = mr.ReadMetadateiFrom(&r)
+	n += n1
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n1, err = mr.ReadAkteFrom(r)
+	n += n1
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (mr *Reader) ReadMetadateiFrom(r *io.Reader) (n int64, err error) {
+	br := bufio.NewReader(*r)
 
 	if mr.RequireMetadatei && mr.Metadatei == nil {
 		err = errors.Errorf("metadatei reader is nil")
@@ -29,20 +50,15 @@ func (mr *Reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 		return
 	}
 
-	var metadatei, akte ohio.PipedReaderFrom
-	var state readerState
+	var metadatei ohio.PipedReaderFrom
 
 	isEOF := false
 
 LINE_READ_LOOP:
-	for {
-		if isEOF {
-			break
-		}
-
+	for !isEOF {
 		var rawLine, line string
 
-		rawLine, err = r.ReadString('\n')
+		rawLine, err = br.ReadString('\n')
 		n += int64(len(rawLine))
 
 		if err != nil && err != io.EOF {
@@ -51,12 +67,13 @@ LINE_READ_LOOP:
 		}
 
 		if errors.IsEOF(err) {
+			err = nil
 			isEOF = true
 		}
 
 		line = strings.TrimSuffix(rawLine, "\n")
 
-		switch state {
+		switch mr.state {
 		case readerStateEmpty:
 			switch {
 			case mr.RequireMetadatei && line != Boundary:
@@ -64,29 +81,26 @@ LINE_READ_LOOP:
 				return
 
 			case line != Boundary:
-				r2 := io.MultiReader(
+				*r = io.MultiReader(
 					strings.NewReader(rawLine),
-					r,
+					br,
 				)
 
-				r = bufio.NewReader(r2)
 				break LINE_READ_LOOP
 			}
 
-			state += 1
+			mr.state += 1
 
 			metadatei = ohio.MakePipedReaderFrom(mr.Metadatei)
 
 		case readerStateFirstBoundary:
 			if line == Boundary {
-				_, err = metadatei.Close()
-
-				if err != nil {
+				if _, err = metadatei.Close(); err != nil {
 					err = errors.Wrapf(err, "metadatei read failed")
 					return
 				}
 
-				state += 1
+				mr.state += 1
 				break
 			}
 
@@ -96,28 +110,35 @@ LINE_READ_LOOP:
 			}
 
 		case readerStateSecondBoundary:
+			*r = br
 			break LINE_READ_LOOP
 
 		default:
-			err = errors.Errorf("impossible state %d", state)
+			err = errors.Errorf("impossible state %d", mr.state)
 			return
 		}
 	}
 
-	akte = ohio.MakePipedReaderFrom(mr.Akte)
+	return
+}
+
+func (mr *Reader) ReadAkteFrom(r io.Reader) (n int64, err error) {
+	br := bufio.NewReader(r)
+	akte := ohio.MakePipedReaderFrom(mr.Akte)
 
 	var n1 int64
-	n1, err = r.WriteTo(akte)
+	n1, err = br.WriteTo(akte)
 	n += n1
 
-	_, err = akte.Close()
-
 	if err != nil {
-		err = errors.Wrapf(err, "akte read failed")
+		err = errors.Wrapf(err, "akte write failed")
 		return
 	}
 
-	// TODO-P2 handle errors
+	if _, err = akte.Close(); err != nil {
+		err = errors.Wrapf(err, "akte read failed")
+		return
+	}
 
 	return
 }

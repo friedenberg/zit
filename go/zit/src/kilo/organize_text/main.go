@@ -41,6 +41,20 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 
 	r1.stringFormatReader = &t.skuFmt
 
+	mr := metadatei.Reader{
+		Metadatei: &t.Metadatei,
+		Akte:      r1,
+	}
+
+	var n1 int64
+	n1, err = mr.ReadMetadateiFrom(&r)
+	n += n1
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	ocf := optionCommentFactory{}
 	var ocs []Option
 
@@ -56,12 +70,13 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 		}
 	}
 
-	mr := metadatei.Reader{
-		Metadatei: &t.Metadatei,
-		Akte:      r1,
-	}
+	n1, err = mr.ReadAkteFrom(r)
+	n += n1
 
-	n, err = mr.ReadFrom(r)
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	t.Assignment = r1.root
 
