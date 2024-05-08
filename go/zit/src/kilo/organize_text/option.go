@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/src/charlie/collections"
 )
 
@@ -34,6 +36,16 @@ func (ocf optionCommentFactory) Make(c string) (oc Option, err error) {
 
 	case "hide":
 		oc = optionCommentHide(tail)
+
+	case "dry-run":
+		var b values.Bool
+
+		if err = b.Set(tail); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		oc = optionCommentDryRun(b)
 
 	default:
 	}
@@ -103,5 +115,36 @@ func (ocf optionCommentHide) ApplyToWriter(
 	f Options,
 	aw *assignmentLineWriter,
 ) (err error) {
+	return
+}
+
+type optionCommentDryRun values.Bool
+
+func (ocf optionCommentDryRun) GetOption() Option {
+	return ocf
+}
+
+func (ocf optionCommentDryRun) String() string {
+	return fmt.Sprintf("dry-run:%s", values.Bool(ocf))
+}
+
+func (ocf optionCommentDryRun) ApplyToText(o Options, a *Assignment) (err error) {
+	o.Konfig.DryRun = values.Bool(ocf).Bool()
+	return
+}
+
+func (ocf optionCommentDryRun) ApplyToReader(
+	o Options,
+	a *assignmentLineReader,
+) (err error) {
+	o.Konfig.DryRun = values.Bool(ocf).Bool()
+	return
+}
+
+func (ocf optionCommentDryRun) ApplyToWriter(
+	f Options,
+	aw *assignmentLineWriter,
+) (err error) {
+	f.Konfig.DryRun = values.Bool(ocf).Bool()
 	return
 }

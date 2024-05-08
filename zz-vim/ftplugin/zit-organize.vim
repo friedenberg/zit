@@ -3,7 +3,7 @@ setlocal list
 " TODO document
 let &l:t_ut = ''
 let &l:listchars = "tab:  ,trail:·,nbsp:·"
-let &l:equalprg = "zit format-organize -metadatei-header %"
+let &l:equalprg = "$BIN_ZIT format-organize -metadatei-header %"
 
 let &l:foldmethod = "expr"
 let &l:foldexpr = "GetZitOrganizeFold()"
@@ -49,10 +49,10 @@ endfunction
 " TODO refactor into common
 function! GfOrganize()
   let l:cfile = expand("<cfile>")
-  let l:expanded = trim(system("zit expand-hinweis " .. l:cfile))
+  let l:expanded = trim(system("$BIN_ZIT expand-hinweis " .. l:cfile))
 
   if !filereadable(l:expanded .. ".zettel")
-    echom trim(system("zit checkout -mode both " .. l:expanded))
+    echom trim(system("$BIN_ZIT checkout -mode both " .. l:expanded))
   endif
 
   " let l:cmd = 'tabedit ' .. fnameescape(l:expanded .. ".zettel")

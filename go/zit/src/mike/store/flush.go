@@ -44,12 +44,14 @@ func (s *Store) FlushBestandsaufnahme(
 		}
 	}
 
-	defer sku.GetTransactedPool().Put(bestandsaufnahmeSku)
+	if bestandsaufnahmeSku != nil {
+		defer sku.GetTransactedPool().Put(bestandsaufnahmeSku)
 
-	if s.GetKonfig().PrintOptions.PrintBestandsaufnahme {
-		if err = p(bestandsaufnahmeSku); err != nil {
-			err = errors.Wrap(err)
-			return
+		if s.GetKonfig().PrintOptions.PrintBestandsaufnahme {
+			if err = p(bestandsaufnahmeSku); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 	}
 

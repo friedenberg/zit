@@ -11,28 +11,12 @@ import (
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
-func (w *Writer) zettelToItem(
+func (w *Writer) addCommonMatches(
 	z *sku.Transacted,
-) (a *alfred.Item) {
-	a = w.alfredWriter.Get()
-
-	a.Title = z.Metadatei.Bezeichnung.String()
-
-	es := iter.StringCommaSeparated(
-		z.Metadatei.GetEtiketten(),
-	)
-
+	a *alfred.Item,
+) {
 	k := &z.Kennung
 	ks := k.StringFromPtr()
-
-	if a.Title == "" {
-		a.Title = ks
-		a.Subtitle = es
-	} else {
-		a.Subtitle = fmt.Sprintf("%s: %s %s", z.Metadatei.Typ, ks, es)
-	}
-
-	a.Arg = ks
 
 	mb := alfred.GetPoolMatchBuilder().Get()
 	defer alfred.GetPoolMatchBuilder().Put(mb)
@@ -75,24 +59,34 @@ func (w *Writer) zettelToItem(
 		t.String(),
 	)
 
-	// if ha != nil {
-	// 	var h hinweis.Hinweis
-	// 	var err error
-
-	// 	if h, err = ha.AbbreviateHinweis(z.Hinweis); err != nil {
-	// 		return ErrorToItem(err)
-	// 	}
-
-	// 	mb.AddMatches(h.String())
-	// 	mb.AddMatches(h.Kopf())
-	// 	mb.AddMatches(h.Schwanz())
-	// }
-
 	a.Match.Write(mb.Bytes())
+	// a.Match.ReadFromBuffer(&mb.Buffer)
+}
 
-	// if len(a.Match) > 100 {
-	// 	a.Match = a.Match[:100]
-	// }
+func (w *Writer) zettelToItem(
+	z *sku.Transacted,
+) (a *alfred.Item) {
+	a = w.alfredWriter.Get()
+
+	a.Title = z.Metadatei.Bezeichnung.String()
+
+	es := iter.StringCommaSeparated(
+		z.Metadatei.GetEtiketten(),
+	)
+
+	k := &z.Kennung
+	ks := k.StringFromPtr()
+
+	if a.Title == "" {
+		a.Title = ks
+		a.Subtitle = es
+	} else {
+		a.Subtitle = fmt.Sprintf("%s: %s %s", z.Metadatei.Typ, ks, es)
+	}
+
+	a.Arg = ks
+
+	w.addCommonMatches(z, a)
 
 	a.Text.Copy = ks
 	a.Uid = "zit://" + ks
@@ -101,6 +95,7 @@ func (w *Writer) zettelToItem(
 }
 
 func (w *Writer) etikettToItem(
+	z *sku.Transacted,
 	e *kennung.Etikett,
 ) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
@@ -109,13 +104,7 @@ func (w *Writer) etikettToItem(
 
 	a.Arg = e.String()
 
-	mb := alfred.GetPoolMatchBuilder().Get()
-	defer alfred.GetPoolMatchBuilder().Put(mb)
-
-	mb.AddMatches(a.Title)
-	mb.AddMatches(iter.Strings[kennung.Etikett](kennung.ExpandOne(e))...)
-
-	a.Match.ReadFromBuffer(&mb.Buffer)
+	w.addCommonMatches(z, a)
 
 	a.Text.Copy = e.String()
 	a.Uid = "zit://" + e.String()

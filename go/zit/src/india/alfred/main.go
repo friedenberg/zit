@@ -52,7 +52,7 @@ func (w *Writer) PrintOne(z *sku.Transacted) (err error) {
 			return
 		}
 
-		item = w.etikettToItem(&e)
+		item = w.etikettToItem(z, &e)
 
 	default:
 		item = w.alfredWriter.Get()
