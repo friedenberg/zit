@@ -246,6 +246,8 @@ function checkin_zettel_typ_has_commit_hook { # @test
 	EOM
 	assert_success
 	assert_output - <<-EOM
+		[on_new@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[on_pre_commit@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[two/uno@edf7b6df934442ad0d6ac9fe4132c5e588391eb307fbbdc3ab6de780e17245a5 !typ_with_hook "test lua" on_new on_pre_commit]
 	EOM
 }

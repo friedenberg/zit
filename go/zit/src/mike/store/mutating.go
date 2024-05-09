@@ -31,19 +31,6 @@ func (s *Store) tryCommit(
 		return
 	}
 
-	// TODO figure out how to move this to after CommitTransacted
-	if mode.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
-		if err = s.addMatchableTypAndEtikettenIfNecessary(kinder); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = s.addMatchableCommon(kinder); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
 			Operation: "commit",
@@ -85,6 +72,18 @@ func (s *Store) tryCommit(
 	if err = kinder.CalculateObjekteShas(); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	if mode.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
+		if err = s.addMatchableTypAndEtikettenIfNecessary(kinder); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = s.addMatchableCommon(kinder); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	for _, vs := range s.virtualStores {
