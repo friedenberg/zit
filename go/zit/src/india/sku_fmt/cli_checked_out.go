@@ -4,29 +4,22 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/src/echo/bezeichnung"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 )
 
 type cliCheckedOut struct {
 	options erworben_cli_print_options.PrintOptions
 
-	writeTyp         bool
-	writeBezeichnung bool
-	writeEtiketten   bool
-
-	rightAlignedWriter            schnittstellen.StringFormatWriter[string]
-	shaStringFormatWriter         schnittstellen.StringFormatWriter[schnittstellen.ShaLike]
-	kennungStringFormatWriter     schnittstellen.StringFormatWriter[*kennung.Kennung2]
-	fdStringFormatWriter          schnittstellen.StringFormatWriter[*fd.FD]
-	typStringFormatWriter         schnittstellen.StringFormatWriter[*kennung.Typ]
-	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung]
-	etikettenStringFormatWriter   schnittstellen.StringFormatWriter[*kennung.Etikett]
+	rightAlignedWriter          schnittstellen.StringFormatWriter[string]
+	shaStringFormatWriter       schnittstellen.StringFormatWriter[schnittstellen.ShaLike]
+	kennungStringFormatWriter   schnittstellen.StringFormatWriter[*kennung.Kennung2]
+	fdStringFormatWriter        schnittstellen.StringFormatWriter[*fd.FD]
+	metadateiStringFormatWriter schnittstellen.StringFormatWriter[*metadatei.Metadatei]
 }
 
 func MakeCliCheckedOutFormat(
@@ -34,22 +27,15 @@ func MakeCliCheckedOutFormat(
 	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],
 	fdStringFormatWriter schnittstellen.StringFormatWriter[*fd.FD],
 	kennungStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Kennung2],
-	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
-	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],
-	etikettenStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Etikett],
+	metadateiStringFormatWriter schnittstellen.StringFormatWriter[*metadatei.Metadatei],
 ) *cliCheckedOut {
 	return &cliCheckedOut{
-		options:                       options,
-		writeTyp:                      true,
-		writeBezeichnung:              true,
-		writeEtiketten:                true,
-		rightAlignedWriter:            string_format_writer.MakeRightAligned(),
-		shaStringFormatWriter:         shaStringFormatWriter,
-		kennungStringFormatWriter:     kennungStringFormatWriter,
-		fdStringFormatWriter:          fdStringFormatWriter,
-		typStringFormatWriter:         typStringFormatWriter,
-		bezeichnungStringFormatWriter: bezeichnungStringFormatWriter,
-		etikettenStringFormatWriter:   etikettenStringFormatWriter,
+		options:                     options,
+		rightAlignedWriter:          string_format_writer.MakeRightAligned(),
+		shaStringFormatWriter:       shaStringFormatWriter,
+		kennungStringFormatWriter:   kennungStringFormatWriter,
+		fdStringFormatWriter:        fdStringFormatWriter,
+		metadateiStringFormatWriter: metadateiStringFormatWriter,
 	}
 }
 
@@ -127,89 +113,12 @@ func (f *cliCheckedOut) WriteStringFormat(
 		return
 	}
 
-	n1, err = sw.WriteString("@")
-	n += int64(n1)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	n2, err = f.shaStringFormatWriter.WriteStringFormat(sw, o.GetAkteSha())
+	n2, err = f.metadateiStringFormatWriter.WriteStringFormat(sw, o.GetMetadatei())
 	n += n2
 
 	if err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	if f.writeTyp {
-		t := o.GetMetadatei().GetTypPtr()
-
-		if len(t.String()) > 0 {
-			n1, err = sw.WriteString(" !")
-			n += int64(n1)
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			n2, err = f.typStringFormatWriter.WriteStringFormat(sw, t)
-			n += n2
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-	}
-
-	didWriteBezeichnung := false
-	if f.writeBezeichnung {
-		b := o.GetMetadatei().GetBezeichnungPtr()
-
-		if !b.IsEmpty() {
-			didWriteBezeichnung = true
-
-			n1, err = sw.WriteString(" ")
-			n += int64(n1)
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			n2, err = f.bezeichnungStringFormatWriter.WriteStringFormat(sw, b)
-			n += n2
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-	}
-
-	if f.writeEtiketten && !didWriteBezeichnung {
-		b := o.GetMetadatei().GetEtiketten()
-
-		for _, v := range iter.SortedValues[kennung.Etikett](b) {
-			n1, err = sw.WriteString(" ")
-			n += int64(n1)
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			n2, err = f.etikettenStringFormatWriter.WriteStringFormat(sw, &v)
-			n += n2
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
 	}
 
 	if m != checkout_mode.ModeObjekteOnly {

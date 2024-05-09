@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/kennung_fmt"
+	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 )
@@ -73,6 +74,22 @@ func (u *Umwelt) StringFormatWriterEtiketten(
 	return kennung_fmt.MakeEtikettenCliFormat()
 }
 
+func (u *Umwelt) StringFormatWriterMetadatei(
+	co string_format_writer.ColorOptions,
+) schnittstellen.StringFormatWriter[*metadatei.Metadatei] {
+	return sku_fmt.MakeCliMetadateiFormat(
+		u.konfig.PrintOptions,
+		u.StringFormatWriterShaLike(co),
+		u.StringFormatWriterTyp(co),
+		u.StringFormatWriterBezeichnung(
+			bezeichnung.CliFormatTruncation66CharEllipsis,
+			co,
+			true,
+		),
+		u.StringFormatWriterEtiketten(co),
+	)
+}
+
 func (u *Umwelt) SkuFmtOrganize() *sku_fmt.Organize {
 	co := u.FormatColorOptionsOut()
 	co.OffEntirely = true
@@ -97,15 +114,8 @@ func (u *Umwelt) StringFormatWriterSkuTransacted(
 
 	return sku_fmt.MakeCliFormat(
 		u.konfig.PrintOptions,
-		u.StringFormatWriterShaLike(*co),
 		u.StringFormatWriterKennung(*co),
-		u.StringFormatWriterTyp(*co),
-		u.StringFormatWriterBezeichnung(
-			bezeichnung.CliFormatTruncation66CharEllipsis,
-			*co,
-			true,
-		),
-		u.StringFormatWriterEtiketten(*co),
+		u.StringFormatWriterMetadatei(*co),
 	)
 }
 
@@ -115,15 +125,8 @@ func (u *Umwelt) StringFormatWriterSkuTransactedShort() schnittstellen.StringFor
 	}
 
 	return sku_fmt.MakeCliFormatShort(
-		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterKennung(co),
-		u.StringFormatWriterTyp(co),
-		u.StringFormatWriterBezeichnung(
-			bezeichnung.CliFormatTruncation66CharEllipsis,
-			co,
-			true,
-		),
-		u.StringFormatWriterEtiketten(co),
+		u.StringFormatWriterMetadatei(co),
 	)
 }
 
@@ -210,7 +213,7 @@ func (u *Umwelt) PrinterCheckedOut() schnittstellen.FuncIter[*sku.CheckedOut] {
 	coOut := u.FormatColorOptionsOut()
 	coErr := u.FormatColorOptionsErr()
 
-	err := string_format_writer.MakeDelim[*sku.CheckedOut](
+	err := string_format_writer.MakeDelim(
 		"\n",
 		u.Err(),
 		sku_fmt.MakeCliCheckedOutFormat(
@@ -221,13 +224,7 @@ func (u *Umwelt) PrinterCheckedOut() schnittstellen.FuncIter[*sku.CheckedOut] {
 				u.standort.MakeRelativePathStringFormatWriter(),
 			),
 			u.StringFormatWriterKennung(coErr),
-			u.StringFormatWriterTyp(coErr),
-			u.StringFormatWriterBezeichnung(
-				bezeichnung.CliFormatTruncation66CharEllipsis,
-				coErr,
-				true,
-			),
-			u.StringFormatWriterEtiketten(coErr),
+			u.StringFormatWriterMetadatei(coErr),
 		),
 	)
 
@@ -242,13 +239,7 @@ func (u *Umwelt) PrinterCheckedOut() schnittstellen.FuncIter[*sku.CheckedOut] {
 				u.standort.MakeRelativePathStringFormatWriter(),
 			),
 			u.StringFormatWriterKennung(coOut),
-			u.StringFormatWriterTyp(coOut),
-			u.StringFormatWriterBezeichnung(
-				bezeichnung.CliFormatTruncation66CharEllipsis,
-				coOut,
-				true,
-			),
-			u.StringFormatWriterEtiketten(coOut),
+			u.StringFormatWriterMetadatei(coOut),
 		),
 	)
 

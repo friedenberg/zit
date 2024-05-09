@@ -32,10 +32,10 @@ function can_initialize_with_age { # @test
 	assert_success
 
 	run test -d .zit/
-  assert_success
+	assert_success
 
 	run test -f .zit/AgeIdentity
-  assert_success
+	assert_success
 }
 
 function can_new_zettel_file { # @test
@@ -163,7 +163,7 @@ function can_checkout_via_etiketten { # @test
 	run_zit checkout -- ok:z
 	assert_success
 	assert_output - <<-EOM
-		      checked out [one/uno.zettel@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow"]
+		      checked out [one/uno.zettel@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" ok]
 	EOM
 }
 
@@ -286,7 +286,7 @@ function checkouts_dont_overwrite { # @test
 	run_zit checkout one/uno
 	assert_success
 	assert_output - <<-EOM
-		      checked out [one/uno.zettel@036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064 !md "bez"]
+		      checked out [one/uno.zettel@036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064 !md "bez" et1 et2]
 	EOM
 
 	run cat one/uno.zettel
@@ -309,7 +309,7 @@ function checkouts_dont_overwrite { # @test
 	run_zit checkout one/uno:z
 	assert_success
 	assert_output - <<-EOM
-		          changed [one/uno.zettel@65bdb8b57dfc8b0365a68c71b8a465dd2ff7d26ed07602ffe1a1b39367f42228 !md "bez"]
+		          changed [one/uno.zettel@65bdb8b57dfc8b0365a68c71b8a465dd2ff7d26ed07602ffe1a1b39367f42228 !md "bez" et1 et2]
 	EOM
 
 	run cat one/uno.zettel

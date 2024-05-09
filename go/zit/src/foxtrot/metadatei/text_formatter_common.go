@@ -80,7 +80,7 @@ func (f textFormatterCommon) writeCommonMetadateiFormat(
 		)
 	}
 
-	for _, e := range iter.SortedValues[kennung.Etikett](m.GetEtiketten()) {
+	for _, e := range iter.SortedValues(m.GetEtiketten()) {
 		if kennung.IsEmpty(e) {
 			continue
 		}
@@ -101,6 +101,11 @@ func (f textFormatterCommon) writeTyp(
 	c TextFormatterContext,
 ) (n int64, err error) {
 	m := c.GetMetadatei()
+
+	if m.Typ.IsEmpty() {
+		return
+	}
+
 	return ohio.WriteLine(w1, fmt.Sprintf("! %s", m.Typ))
 }
 
