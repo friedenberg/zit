@@ -9,8 +9,8 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/bravo/pool"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/delta/file_lock"
@@ -166,7 +166,7 @@ func (s *store) Create(
 
 	sh = sha.Make(w.GetShaLike())
 
-	log.Log().Printf(
+	ui.Log().Printf(
 		"saving Bestandsaufnahme with tai: %s -> %s",
 		t.GetKennung().GetGattung(),
 		sh,

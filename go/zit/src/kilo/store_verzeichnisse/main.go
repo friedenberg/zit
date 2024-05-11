@@ -6,9 +6,9 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/src/bravo/pool"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
@@ -128,14 +128,14 @@ func (i *Store) SetNeedsFlushHistory() {
 func (i *Store) Flush(
 	printerHeader schnittstellen.FuncIter[string],
 ) (err error) {
-	errors.Log().Print("flushing")
+	ui.Log().Print("flushing")
 	wg := iter.MakeErrorWaitGroupParallel()
 
 	actualFlush := false
 
 	for n := range i.pages {
 		if i.pages[n].hasChanges {
-			log.Log().Printf("actual flush for %d", n)
+			ui.Log().Printf("actual flush for %d", n)
 			actualFlush = true
 		}
 

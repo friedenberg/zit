@@ -10,6 +10,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/age"
 	"code.linenisgreat.com/zit/src/delta/angeboren"
@@ -228,7 +229,7 @@ func writeFile(p string, contents any) {
 
 	if f, err = files.CreateExclusiveWriteOnly(p); err != nil {
 		if errors.IsExist(err) {
-			errors.Err().Printf("%s already exists, not overwriting", p)
+			ui.Err().Printf("%s already exists, not overwriting", p)
 			err = nil
 		} else {
 		}

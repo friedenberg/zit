@@ -12,7 +12,7 @@ func assertSetRemovesPrefixes(
 	ex EtikettSet,
 	prefix string,
 ) {
-	t := test_logz.T{T: t1}
+	t := &test_logz.T{T: t1}
 	t = t.Skip(1)
 
 	ac := ac1.CloneMutableSetPtrLike()

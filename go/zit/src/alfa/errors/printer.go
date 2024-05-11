@@ -76,35 +76,6 @@ func Debug() DevPrinter {
 	return printerDebug
 }
 
-// func MakePrinter(o io.Writer) *printer {
-// 	return &printer{
-// 		f:  o,
-// 		on: true,
-// 	}
-// }
-
-// func (p printer) PrintDebug(vs ...interface{}) (err error) {
-// 	if !p.on {
-// 		return
-// 	}
-
-// 	si, _ := MakeStackInfo(1)
-
-// 	for _, v := range vs {
-// 		if _, err = fmt.Fprintf(
-// 			p.f,
-// 			"%s%#v\n",
-// 			si,
-// 			v,
-// 		); err != nil {
-// 			err = Wrap(err)
-// 			return
-// 		}
-// 	}
-
-// 	return
-// }
-
 func (p prodPrinter) Print(a ...interface{}) (err error) {
 	if !p.on {
 		return
@@ -199,5 +170,5 @@ func (p devPrinter) FunctionName(skip int) {
 	}
 
 	st, _ := MakeStackInfo(skip + 1)
-	io.WriteString(p.f, fmt.Sprintf("%s%s\n", st, st.function))
+	io.WriteString(p.f, fmt.Sprintf("%s%s\n", st, st.Function))
 }

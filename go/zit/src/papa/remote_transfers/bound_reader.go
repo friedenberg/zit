@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/sha"
 )
 
@@ -34,8 +35,8 @@ func makeBoundReader(
 }
 
 func (r *boundReader) Close() (err error) {
-	errors.Log().Printf("closing bound reader")
-	defer errors.Log().Printf("did close bound")
+	ui.Log().Printf("closing bound reader")
+	defer ui.Log().Printf("did close bound")
 
 	defer r.lContinue.Unlock()
 

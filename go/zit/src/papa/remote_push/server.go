@@ -2,6 +2,7 @@ package remote_push
 
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/november/umwelt"
@@ -88,11 +89,11 @@ func (op Server) GetNeededSkus(
 			sk.GetGattung(),
 			sk.GetObjekteSha(),
 		) {
-			errors.Log().Printf("already have objekte: %s", sk.GetObjekteSha())
+			ui.Log().Printf("already have objekte: %s", sk.GetObjekteSha())
 			return
 		}
 
-		errors.Log().Printf("need objekte: %s", sk.GetObjekteSha())
+		ui.Log().Printf("need objekte: %s", sk.GetObjekteSha())
 
 		// TODO-P1 check for akte sha
 		// TODO-P1 write akte

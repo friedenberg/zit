@@ -13,11 +13,11 @@ type StackTracer interface {
 }
 
 type StackInfo struct {
-	pakkage     string
-	function    string
-	filename    string
-	relFilename string
-	line        int
+	Package     string
+	Function    string
+	Filename    string
+	RelFilename string
+	Line        int
 }
 
 func MakeStackInfos(depth, count int) (si []StackInfo) {
@@ -45,12 +45,12 @@ func MakeStackInfos(depth, count int) (si []StackInfo) {
 }
 
 func MakeStackInfoFromFrame(frame runtime.Frame) (si StackInfo) {
-	si.filename = filepath.Clean(frame.File)
-	si.line = frame.Line
-	si.function = frame.Function
-	si.pakkage, si.function = getPackageAndFunctionName(si.function)
+	si.Filename = filepath.Clean(frame.File)
+	si.Line = frame.Line
+	si.Function = frame.Function
+	si.Package, si.Function = getPackageAndFunctionName(si.Function)
 
-	si.relFilename, _ = filepath.Rel(cwd, si.filename)
+	si.RelFilename, _ = filepath.Rel(cwd, si.Filename)
 
 	return
 }
@@ -96,14 +96,14 @@ func (si StackInfo) String() string {
 		testPrefix = "    "
 	}
 
-	filename := si.filename
+	filename := si.Filename
 
-	if si.relFilename != "" {
-		filename = si.relFilename
+	if si.RelFilename != "" {
+		filename = si.RelFilename
 	}
 
 	// TODO-P3 determine if si.line is ever not valid
-	return fmt.Sprintf("%s%s:%d: ", testPrefix, filename, si.line)
+	return fmt.Sprintf("%s%s:%d: ", testPrefix, filename, si.Line)
 }
 
 func (si StackInfo) Wrap(in error) (err errer) {
@@ -168,17 +168,17 @@ func (se stackWrapError) Error() string {
 	// sb.WriteString("\n")
 
 	sb.WriteString("# ")
-	sb.WriteString(se.function)
+	sb.WriteString(se.Function)
 	sb.WriteString("\n")
 
-	if se.relFilename != "" {
-		sb.WriteString(se.relFilename)
+	if se.RelFilename != "" {
+		sb.WriteString(se.RelFilename)
 	} else {
-		sb.WriteString(se.filename)
+		sb.WriteString(se.Filename)
 	}
 
 	sb.WriteString(":")
-	fmt.Fprintf(sb, "%d", se.line)
+	fmt.Fprintf(sb, "%d", se.Line)
 
 	if se.error != nil {
 		sb.WriteString(" ")

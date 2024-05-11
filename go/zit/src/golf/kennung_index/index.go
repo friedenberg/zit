@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -74,11 +74,11 @@ func (ei *index2[T, TPtr]) Flush() (err error) {
 
 func (ei *index2[T, TPtr]) WriteIfNecessary() (err error) {
 	if !ei.HasChanges() {
-		log.Log().Printf("%s does not have changes", ei.path)
+		ui.Log().Printf("%s does not have changes", ei.path)
 		return
 	}
 
-	log.Log().Printf("%s has changes", ei.path)
+	ui.Log().Printf("%s has changes", ei.path)
 
 	var wc schnittstellen.ShaWriteCloser
 
@@ -94,7 +94,7 @@ func (ei *index2[T, TPtr]) WriteIfNecessary() (err error) {
 		return
 	}
 
-	log.Log().Printf("%s done writing changes", ei.path)
+	ui.Log().Printf("%s done writing changes", ei.path)
 
 	return
 }
@@ -283,7 +283,7 @@ func (i *index2[T, TPtr]) StoreDelta(d schnittstellen.Delta[T]) (err error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
-	log.Log().Printf("delta: %s", d)
+	ui.Log().Printf("delta: %s", d)
 
 	if err = d.GetAdded().Each(i.storeOne); err != nil {
 		err = errors.Wrap(err)
@@ -301,7 +301,7 @@ func (i *index2[T, TPtr]) StoreDelta(d schnittstellen.Delta[T]) (err error) {
 
 			id.SchwanzenCount -= 1
 
-			log.Log().Printf("new SchwanzenCount: %s -> %d", e, id.SchwanzenCount)
+			ui.Log().Printf("new SchwanzenCount: %s -> %d", e, id.SchwanzenCount)
 
 			i.Kennungen[e.String()] = id
 
@@ -355,7 +355,7 @@ func (i *index2[T, TPtr]) storeOne(k T) (err error) {
 	id.SchwanzenCount += 1
 	id.Count += 1
 
-	log.Log().Printf("new SchwanzenCount: %s -> %d", k, id.SchwanzenCount)
+	ui.Log().Printf("new SchwanzenCount: %s -> %d", k, id.SchwanzenCount)
 
 	i.Kennungen[k.String()] = id
 

@@ -8,6 +8,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/standort"
@@ -43,7 +44,7 @@ func (c WriteObjekte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	for _, a := range args {
 		switch {
 		case sawStdin:
-			errors.Err().Print("'-' passed in more than once. Ignoring")
+			ui.Err().Print("'-' passed in more than once. Ignoring")
 			continue
 
 		case a == "-":
@@ -61,7 +62,7 @@ func (c WriteObjekte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	go func() {
 		err = <-chError
-		errors.Err().Print(err)
+		ui.Err().Print(err)
 		close(chCancel)
 	}()
 
@@ -133,5 +134,5 @@ func (c WriteObjekte) doOne(
 		return
 	}
 
-	errors.Out().Printf("%s %s", wc.GetShaLike(), p)
+	ui.Out().Printf("%s %s", wc.GetShaLike(), p)
 }

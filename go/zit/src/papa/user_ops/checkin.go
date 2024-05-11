@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/juliett/query"
@@ -25,7 +25,7 @@ func (c Checkin) Run(
 	u.Lock()
 	defer errors.Deferred(&err, u.Unlock)
 
-	log.Log().Print(qg)
+	ui.Log().Print(qg)
 
 	if err = u.GetStore().ReadFiles(
 		qg,
@@ -34,7 +34,7 @@ func (c Checkin) Run(
 				co,
 				true,
 			); err != nil {
-				log.Debug().Print(err)
+				ui.Debug().Print(err)
 				err = errors.Wrap(err)
 				return
 			}

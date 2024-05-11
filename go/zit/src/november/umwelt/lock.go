@@ -3,17 +3,18 @@ package umwelt
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 )
 
 func (u *Umwelt) Lock() (err error) {
-	errors.Log().Caller(1, "Umwelt Lock")
+	ui.Log().Caller(1, "Umwelt Lock")
 	if err = u.standort.GetLockSmith().Lock(); err != nil {
-		errors.Log().Caller(1, "Umwelt Lock Failure")
+		ui.Log().Caller(1, "Umwelt Lock Failure")
 		err = errors.Wrap(err)
 		return
 	}
 
-	errors.Log().Caller(1, "Umwelt Lock Success")
+	ui.Log().Caller(1, "Umwelt Lock Success")
 	return
 }
 

@@ -14,6 +14,7 @@ type Cli struct {
 
 	Debug         debug.Options
 	Verbose       bool
+	Quiet         bool
 	Todo          bool
 	DryRun        bool
 	Complete      bool
@@ -40,6 +41,7 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	f.BoolVar(&c.Todo, "todo", false, "")
 	f.BoolVar(&c.DryRun, "dry-run", false, "")
 	f.BoolVar(&c.Verbose, "verbose", false, "")
+	f.BoolVar(&c.Quiet, "quiet", false, "")
 	f.BoolVar(&c.Complete, "complete", false, "")
 
 	f.BoolVar(

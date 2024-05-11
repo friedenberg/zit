@@ -6,11 +6,12 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 )
 
 var (
-	Print  = errors.Log().Print
-	Printf = errors.Log().Printf
+	Print  = ui.Log().Print
+	Printf = ui.Log().Printf
 )
 
 type T struct {
@@ -19,18 +20,18 @@ type T struct {
 }
 
 func (t *T) SkipTest(args ...any) {
-	t.log(1, args...)
+	t.ui(1, args...)
 	t.SkipNow()
 }
 
-func (t *T) Skip(skip int) T {
-	return T{
+func (t *T) Skip(skip int) *T {
+	return &T{
 		T:    t.T,
 		skip: t.skip + skip,
 	}
 }
 
-func (t *T) log(skip int, args ...interface{}) {
+func (t *T) ui(skip int, args ...interface{}) {
 	errors.SetTesting()
 	si := MakeStackInfo(t, t.skip+1+skip)
 	args = append([]interface{}{si}, args...)
@@ -55,7 +56,7 @@ func (t *T) fatalf(skip int, format string, args ...interface{}) {
 }
 
 func (t *T) Log(args ...interface{}) {
-	t.log(1, args...)
+	t.ui(1, args...)
 }
 
 func (t *T) Logf(format string, args ...interface{}) {

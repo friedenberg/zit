@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
@@ -137,7 +138,7 @@ func (c client) SkusFromFilter(
 			return
 		}
 
-		errors.Log().Printf("received sku: %v", sk)
+		ui.Log().Printf("received sku: %v", sk)
 
 		c.chFilterSkuTickets <- struct{}{}
 		wg.Add(1)

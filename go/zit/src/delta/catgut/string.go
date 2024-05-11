@@ -10,7 +10,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/src/charlie/ohio_buffer"
 )
@@ -64,7 +64,7 @@ func (b *String) copyCheck() {
 		// TODO-P1: once issue 7921 is fixed, this should be reverted to
 		// just "b.addr = b".
 		if configDebugCopyCheck {
-			log.Log().Caller(6, "saved addr: %d", unsafe.Pointer(b))
+			ui.Log().Caller(6, "saved addr: %d", unsafe.Pointer(b))
 		}
 		b.addr = (*String)(noescape(unsafe.Pointer(b)))
 		return

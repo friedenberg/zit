@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/alfa/vim_cli_options_builder"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/erworben"
@@ -51,7 +52,7 @@ func init() {
 
 func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if len(args) > 0 {
-		errors.Err().Print("Command edit-konfig ignores passed in arguments.")
+		ui.Err().Print("Command edit-konfig ignores passed in arguments.")
 	}
 
 	var sh schnittstellen.ShaLike

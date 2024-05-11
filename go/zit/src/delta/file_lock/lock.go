@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/files"
 )
 
@@ -39,7 +40,7 @@ func (l *Lock) Lock() (err error) {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 
-	errors.Log().Caller(2, "locking "+l.Path())
+	ui.Log().Caller(2, "locking "+l.Path())
 	if l.f, err = files.OpenFile(l.Path(), os.O_RDONLY|os.O_EXCL|os.O_CREATE, 755); err != nil {
 		if errors.Is(err, fs.ErrExist) {
 			err = errors.Wrapf(err, "lockfile already exists, unable to acquire lock: %s", l.Path())
@@ -59,7 +60,7 @@ func (l *Lock) Unlock() (err error) {
 
 	// TODO-P4 determine if there's some way for error.Deferred to correctly log
 	// the location of this
-	errors.Log().Caller(2, "unlocking "+l.Path())
+	ui.Log().Caller(2, "unlocking "+l.Path())
 	if err = files.Close(l.f); err != nil {
 		err = errors.Wrap(err)
 		return

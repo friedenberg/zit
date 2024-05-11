@@ -10,6 +10,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/delta/gattung"
@@ -128,7 +129,7 @@ func (t *Time) UnmarshalBinary(text []byte) (err error) {
 }
 
 func (t Time) MarshalText() (text []byte, err error) {
-	errors.Err().Printf(t.String())
+	ui.Err().Printf(t.String())
 	text = []byte(t.String())
 
 	return

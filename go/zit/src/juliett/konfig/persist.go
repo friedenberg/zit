@@ -7,7 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/charlie/files"
@@ -134,12 +134,12 @@ func (kc *compiled) SetHasChanges() {
 	kc.lock.Lock()
 	defer kc.lock.Unlock()
 
-	log.Log().FunctionName(1)
+	ui.Log().FunctionName(1)
 	kc.hasChanges = true
 }
 
 func (kc *compiled) setHasChanges() {
-	log.Log().FunctionName(1)
+	ui.Log().FunctionName(1)
 	kc.hasChanges = true
 }
 

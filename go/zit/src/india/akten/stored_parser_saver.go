@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
@@ -117,7 +118,7 @@ func (h storedParserSaver[O, OPtr]) readAkte(
 
 	sh = sw.GetShaLike()
 
-	errors.Log().Printf("parsed %d akte bytes", n)
+	ui.Log().Printf("parsed %d akte bytes", n)
 
 	return
 }

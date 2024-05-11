@@ -2,13 +2,12 @@ package organize_text
 
 import (
 	"os"
+	"reflect"
 	"strings"
 	"testing"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/bravo/test_logz"
-	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/src/echo/bezeichnung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -64,11 +63,22 @@ func makeAssignmentLineReader() assignmentLineReader {
 		stringFormatReader: sku_fmt.MakeFormatOrganize(
 			erworben_cli_print_options.PrintOptions{},
 			nil,
-      nil,
+			nil,
 			nil,
 			nil,
 			nil,
 		),
+	}
+}
+
+func assertEqualObjekten(t *test_logz.T, expected, actual Objekten) {
+	t = t.Skip(1)
+
+	actual.Sort()
+	expected.Sort()
+
+	if !reflect.DeepEqual(actual, expected) {
+		t.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 	}
 }
 
@@ -141,18 +151,13 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := collections_value.MakeMutableValueSet[*obj](nil)
+		expected := make(Objekten, 0)
 		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
 		expected.Add(makeObjWithHinAndBez(t, "dos/wow", "two/wow"))
 
-		actual := sub.root.Children[0].Named
+		actual := sub.root.Children[0].Objekten
 
-		if !iter.SetEquals[*obj](
-			actual,
-			expected,
-		) {
-			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
-		}
+		assertEqualObjekten(&t1, expected, actual)
 	}
 }
 
@@ -216,18 +221,13 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 	}
 
 	{
-		expected := collections_value.MakeMutableValueSet[*obj](nil)
+		expected := make(Objekten, 0)
 		expected.Add(makeObjWithHinAndBez(t.T, "one/wow", "uno"))
 		expected.Add(makeObjWithHinAndBez(t.T, "dos/wow", "two/wow"))
 
-		actual := sub.root.Children[0].Children[0].Named
+		actual := sub.root.Children[0].Children[0].Objekten
 
-		if !iter.SetEquals[*obj](
-			actual,
-			expected,
-		) {
-			t1.Errorf("\nexpected: %q\n  actual: %q", expected, actual)
-		}
+		assertEqualObjekten(&t, expected, actual)
 	}
 }
 
@@ -306,27 +306,23 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := collections_value.MakeMutableValueSet[*obj](nil)
+		expected := make(Objekten, 0)
 		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
 		expected.Add(makeObjWithHinAndBez(t, "dos/wow", "two/wow"))
 
-		actual := sub.root.Children[0].Named
+		actual := sub.root.Children[0].Objekten
 
-		if !iter.SetEquals[*obj](actual, expected) {
-			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
-		}
+		assertEqualObjekten(&t1, expected, actual)
 	}
 
 	{
-		expected := collections_value.MakeMutableValueSet[*obj](nil)
+		expected := make(Objekten, 0)
 		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
 		expected.Add(makeObjWithHinAndBez(t, "dos/wow", "two/wow"))
 
-		actual := sub.root.Children[1].Named
+		actual := sub.root.Children[1].Objekten
 
-		if !iter.SetEquals[*obj](actual, expected) {
-			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
-		}
+		assertEqualObjekten(&t1, expected, actual)
 	}
 }
 
@@ -387,27 +383,23 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 	}
 
 	{
-		expected := collections_value.MakeMutableValueSet[*obj](nil)
+		expected := make(Objekten, 0)
 		expected.Add(makeObjWithHinAndBez(t, "four/wow", "quatro"))
 		expected.Add(makeObjWithHinAndBez(t, "three/wow", "tres"))
 
-		actual := sub.root.Children[0].Named
+		actual := sub.root.Children[0].Objekten
 
-		if !iter.SetEquals[*obj](actual, expected) {
-			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
-		}
+		assertEqualObjekten(&t1, expected, actual)
 	}
 
 	{
-		expected := collections_value.MakeMutableValueSet[*obj](nil)
+		expected := make(Objekten, 0)
 		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
 		expected.Add(makeObjWithHinAndBez(t, "dos/wow", "two/wow"))
 
-		actual := sub.root.Children[1].Named
+		actual := sub.root.Children[1].Objekten
 
-		if !iter.SetEquals[*obj](actual, expected) {
-			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
-		}
+		assertEqualObjekten(&t1, expected, actual)
 	}
 }
 
@@ -453,15 +445,13 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// - [one/wow] uno
 	// - [two/wow] dos/wow
 	{
-		expected := collections_value.MakeMutableValueSet[*obj](nil)
+		expected := make(Objekten, 0)
 		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
 		expected.Add(makeObjWithHinAndBez(t, "two/wow", "dos/wow"))
 
-		actual := sub.root.Children[0].Named
+		actual := sub.root.Children[0].Objekten
 
-		if !iter.SetEquals[*obj](actual, expected) {
-			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
-		}
+		assertEqualObjekten(&t1, expected, actual)
 	}
 
 	// ## priority-1
@@ -493,27 +483,23 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 	// - [three/wow] tres
 	{
-		expected := collections_value.MakeMutableValueSet[*obj](nil)
+		expected := make(Objekten, 0)
 		expected.Add(makeObjWithHinAndBez(t, "three/wow", "tres"))
 
-		actual := sub.root.Children[0].Children[0].Children[0].Named
+		actual := sub.root.Children[0].Children[0].Children[0].Objekten
 
-		if !iter.SetEquals[*obj](actual, expected) {
-			t1.Errorf("\nexpected: %q\n  actual: %q", expected, actual)
-		}
+		assertEqualObjekten(&t1, expected, actual)
 	}
 
 	// ##
 	// - [four/wow] quatro
 	{
-		expected := collections_value.MakeMutableValueSet[*obj](nil)
+		expected := make(Objekten, 0)
 		expected.Add(makeObjWithHinAndBez(t, "four/wow", "quatro"))
 
-		actual := sub.root.Children[0].Children[0].Named
+		actual := sub.root.Children[0].Children[0].Objekten
 
-		if !iter.SetEquals[*obj](actual, expected) {
-			t1.Errorf("\nexpected: %q\n  actual: %q", expected, actual)
-		}
+		assertEqualObjekten(&t1, expected, actual)
 	}
 
 	// ## priority-2
@@ -521,14 +507,12 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// - [six/wow] seis
 	// `
 	{
-		expected := collections_value.MakeMutableValueSet[*obj](nil)
+		expected := make(Objekten, 0)
 		expected.Add(makeObjWithHinAndBez(t, "five/wow", "cinco"))
 		expected.Add(makeObjWithHinAndBez(t, "six/wow", "seis"))
 
-		actual := sub.root.Children[0].Children[1].Named
+		actual := sub.root.Children[0].Children[1].Objekten
 
-		if !iter.SetEquals[*obj](actual, expected) {
-			t1.Errorf("\nexpected: %q\n  actual: %q", expected, actual)
-		}
+		assertEqualObjekten(&t1, expected, actual)
 	}
 }

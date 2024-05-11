@@ -8,8 +8,8 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/bravo/pool"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 )
 
 var delimReaderPool schnittstellen.Pool[delimReader, *delimReader]
@@ -164,7 +164,7 @@ func (lr *delimReader) ReadOneKeyValue(
 	loc := strings.Index(str, sep)
 
 	if loc == -1 {
-		log.Log().Printf("N: %d, lastReadN: %d", lr.N(), lr.lastReadN)
+		ui.Log().Printf("N: %d, lastReadN: %d", lr.N(), lr.lastReadN)
 		err = errors.Errorf(
 			"expected at least one %q, but found none: %q",
 			sep,
@@ -201,7 +201,7 @@ func (lr *delimReader) ReadOneKeyValueBytes(
 	loc := bytes.IndexByte(str, sep)
 
 	if loc == -1 {
-		log.Log().Printf("N: %d, lastReadN: %d", lr.N(), lr.lastReadN)
+		ui.Log().Printf("N: %d, lastReadN: %d", lr.N(), lr.lastReadN)
 		err = errors.Errorf(
 			"expected at least one %q, but found none: %q",
 			sep,

@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/november/umwelt"
 )
@@ -77,7 +77,7 @@ func (c CatObjekte) Run(
 		}
 
 		me.Add(err)
-		log.Err().Print(me)
+		ui.Err().Print(me)
 	}
 
 	return

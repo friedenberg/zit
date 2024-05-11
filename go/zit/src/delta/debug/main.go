@@ -10,7 +10,7 @@ import (
 	"syscall"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/files"
 )
 
@@ -52,7 +52,7 @@ func MakeContext(options Options) (c *Context, err error) {
 
 	go func() {
 		<-ch
-		log.Err().Print("SIGINT")
+		ui.Err().Print("SIGINT")
 		c.Close()
 		runtime.Goexit()
 	}()

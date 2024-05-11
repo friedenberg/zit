@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/golf/ennui"
@@ -36,7 +36,7 @@ type writer struct {
 
 func (pw *writer) Flush() (err error) {
 	if !pw.hasChanges {
-		log.Log().Print("not flushing, no changes")
+		ui.Log().Print("not flushing, no changes")
 		return
 	}
 
@@ -56,9 +56,9 @@ func (pw *writer) Flush() (err error) {
 		return
 	}
 
-	log.Log().Print("changesAreHistorical", pw.changesAreHistorical)
-	log.Log().Print("added", pw.added.Len())
-	log.Log().Print("addedSchwanz", pw.addedSchwanz.Len())
+	ui.Log().Print("changesAreHistorical", pw.changesAreHistorical)
+	ui.Log().Print("added", pw.added.Len())
+	ui.Log().Print("addedSchwanz", pw.addedSchwanz.Len())
 
 	if pw.added.Len() == 0 && !pw.changesAreHistorical {
 		if pw.File, err = files.OpenReadWrite(path); err != nil {
@@ -88,7 +88,7 @@ func (pw *writer) Flush() (err error) {
 }
 
 func (pw *writer) flushBoth() (err error) {
-	log.Log().Printf("flushing both: %s", pw.Path())
+	ui.Log().Printf("flushing both: %s", pw.Path())
 
 	chain := iter.MakeChain(
 		pw.konfig.ApplyToSku,
@@ -148,7 +148,7 @@ func (pw *writer) updateSigilWithSchwanzen(st skuWithRangeAndSigil) (err error) 
 }
 
 func (pw *writer) flushJustSchwanz() (err error) {
-	log.Log().Printf("flushing just schwanz: %s", pw.Path())
+	ui.Log().Printf("flushing just schwanz: %s", pw.Path())
 
 	if err = pw.CopyJustHistoryFrom(
 		&pw.Reader,

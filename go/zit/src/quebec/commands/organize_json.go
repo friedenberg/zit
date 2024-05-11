@@ -9,6 +9,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/vim_cli_options_builder"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/script_value"
@@ -132,7 +133,7 @@ func (c *OrganizeJSON) RunWithQuery(
 
 	createOrganizeFileOp.Transacted = getResults
 
-	errors.Log().Print(
+	ui.Log().Print(
 		"generate temp file, write organize, open vim to edit, commit results",
 	)
 	var createOrganizeFileResults *organize_text.Text
@@ -216,7 +217,7 @@ func (c OrganizeJSON) readFromVim(
 			err = nil
 			ot, err = c.readFromVim(u, f, results, q)
 		} else {
-			errors.Err().Printf("aborting organize")
+			ui.Err().Printf("aborting organize")
 			return
 		}
 	}
@@ -228,26 +229,26 @@ func (c OrganizeJSON) handleReadChangesError(err error) (tryAgain bool) {
 	var errorRead organize_text.ErrorRead
 
 	if err != nil && !errors.As(err, &errorRead) {
-		errors.Err().Printf("unrecoverable organize read failure: %s", err)
+		ui.Err().Printf("unrecoverable organize read failure: %s", err)
 		tryAgain = false
 		return
 	}
 
-	errors.Err().Printf("reading changes failed: %q", err)
-	errors.Err().Printf("would you like to edit and try again? (y/*)")
+	ui.Err().Printf("reading changes failed: %q", err)
+	ui.Err().Printf("would you like to edit and try again? (y/*)")
 
 	var answer rune
 	var n int
 
 	if n, err = fmt.Scanf("%c", &answer); err != nil {
 		tryAgain = false
-		errors.Err().Printf("failed to read answer: %s", err)
+		ui.Err().Printf("failed to read answer: %s", err)
 		return
 	}
 
 	if n != 1 {
 		tryAgain = false
-		errors.Err().Printf("failed to read at exactly 1 answer: %s", err)
+		ui.Err().Printf("failed to read at exactly 1 answer: %s", err)
 		return
 	}
 

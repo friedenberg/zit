@@ -5,7 +5,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/november/umwelt"
 )
@@ -52,7 +52,7 @@ func (c CheckinJson) Run(
 			}
 		}
 
-		log.Debug().Print(entry)
+		ui.Debug().Print(entry)
 	}
 
 	return

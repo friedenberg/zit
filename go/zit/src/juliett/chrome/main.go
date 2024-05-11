@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -62,6 +62,10 @@ func (c *Chrome) GetVirtualStore() query.VirtualStore {
 }
 
 func (c *Chrome) Initialize() (err error) {
+	if !c.konfig.ChrestEnabled {
+		return
+	}
+
 	if err = c.chrestConfig.Read(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -77,7 +81,10 @@ func (c *Chrome) Initialize() (err error) {
 
 	if chromeTabsRaw, err = chrest.AskChrome(c.chrestConfig, req); err != nil {
 		if errors.IsErrno(err, syscall.ECONNREFUSED) {
-			errors.Err().Print("chrest offline")
+			if !c.konfig.Quiet {
+				ui.Err().Print("chrest offline")
+			}
+
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -114,7 +121,7 @@ func (c *Chrome) Initialize() (err error) {
 }
 
 func (c *Chrome) Flush() (err error) {
-	if c.konfig.DryRun {
+	if c.konfig.DryRun || !c.konfig.ChrestEnabled {
 		return
 	}
 
@@ -148,7 +155,7 @@ func (c *Chrome) Flush() (err error) {
 
 	if _, err = chrest.AskChrome(c.chrestConfig, req); err != nil {
 		if errors.IsErrno(err, syscall.ECONNREFUSED) {
-			errors.Err().Print("chrest offline")
+			ui.Err().Print("chrest offline")
 			err = nil
 		} else if err == io.EOF {
 			err = nil
@@ -190,6 +197,10 @@ func (c *Chrome) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 }
 
 func (c *Chrome) CommitTransacted(kinder, mutter *sku.Transacted) (err error) {
+	if c.konfig.DryRun || !c.konfig.ChrestEnabled {
+		return
+	}
+
 	var dt diff
 
 	if dt, err = c.getDiff(kinder, mutter); err != nil {
@@ -215,11 +226,11 @@ func (c *Chrome) CommitTransacted(kinder, mutter *sku.Transacted) (err error) {
 
 	switch dt.diffType {
 	case diffTypeDelete:
-		log.Debug().Print("deleted", "TODO add to dedicated printer", kinder)
+		ui.Debug().Print("deleted", "TODO add to dedicated printer", kinder)
 		c.removed[*u] = struct{}{}
 
 	default:
-		log.Debug().Print("TODO not implemented", dt, kinder, mutter)
+		ui.Debug().Print("TODO not implemented", dt, kinder, mutter)
 	}
 
 	return
@@ -296,7 +307,7 @@ func (c *Chrome) ModifySku(sk *sku.Transacted) (err error) {
 func (c *Chrome) ContainsSku(sk *sku.Transacted) bool {
 	ok, err := c.modifySku(sk)
 	if err != nil {
-		log.Err().Print(err)
+		ui.Err().Print(err)
 	}
 
 	return ok

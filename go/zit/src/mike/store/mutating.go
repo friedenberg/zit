@@ -8,8 +8,8 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/bravo/log"
 	"code.linenisgreat.com/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/delta/file_lock"
@@ -24,7 +24,7 @@ func (s *Store) tryCommit(
 	kinder *sku.Transacted,
 	mode objekte_mode.Mode,
 ) (err error) {
-	log.Log().Printf("%s -> %s", mode, kinder)
+	ui.Log().Printf("%s -> %s", mode, kinder)
 
 	if kinder.Kennung.IsEmpty() {
 		err = errors.Errorf("empty kennung")
@@ -96,7 +96,7 @@ func (s *Store) tryCommit(
 	if mutter != nil &&
 		kennung.Equals(kinder.GetKennung(), mutter.GetKennung()) &&
 		kinder.Metadatei.EqualsSansTai(&mutter.Metadatei) {
-		log.Log().Printf("equals mutter", kinder)
+		ui.Log().Printf("equals mutter", kinder)
 
 		if err = kinder.SetFromSkuLike(mutter); err != nil {
 			err = errors.Wrap(err)
@@ -123,7 +123,7 @@ func (s *Store) tryCommit(
 	if kinder.GetGattung() == gattung.Zettel {
 		if err = s.kennungIndex.AddHinweis(&kinder.Kennung); err != nil {
 			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
-				errors.Log().Printf("kennung does not contain value: %s", err)
+				ui.Log().Printf("kennung does not contain value: %s", err)
 				err = nil
 			} else {
 				err = errors.Wrapf(err, "failed to write zettel to index: %s", kinder)
@@ -133,7 +133,7 @@ func (s *Store) tryCommit(
 	}
 
 	if mode.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
-		log.Log().Printf("adding to bestandsaufnahme", mode, kinder)
+		ui.Log().Printf("adding to bestandsaufnahme", mode, kinder)
 		if err = s.commitTransacted(kinder, mutter); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -201,7 +201,7 @@ func (s *Store) addMutterIfNecessary(
 
 	for _, vs := range s.virtualStores {
 		if err = vs.ModifySku(mutter); err != nil {
-			errors.Err().Print(err)
+			ui.Err().Print(err)
 			err = nil
 			return
 		}

@@ -2,39 +2,81 @@ package organize_text
 
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
-type SkuMap map[string]*sku.Transacted
+func MakeSkuMapWithOrder(c int) (out SkuMapWithOrder) {
+	out.m = make(map[string]*sku.Transacted, c)
+	out.o = make([]*sku.Transacted, 0, c)
+	return
+}
 
-func (sm *SkuMap) Del(sk *sku.Transacted) error {
-	delete((*sm), key(sk))
+type SkuMapWithOrder struct {
+	m map[string]*sku.Transacted
+	o []*sku.Transacted
+}
+
+func (sm *SkuMapWithOrder) Del(sk *sku.Transacted) error {
+	delete(sm.m, key(sk))
 	return nil
 }
 
-func (sm *SkuMap) Add(sk *sku.Transacted) error {
-	(*sm)[key(sk)] = sk
+func (sm *SkuMapWithOrder) Add(sk *sku.Transacted) error {
+	k := key(sk)
+	_, ok := sm.m[k]
+
+	if !ok {
+		sm.m[k] = sk
+		sm.o = append(sm.o, sk)
+	}
+
 	return nil
 }
 
-func (sm *SkuMap) Len() int {
-	return len(*sm)
+func (sm *SkuMapWithOrder) Len() int {
+	return len(sm.m)
 }
 
-func (sm *SkuMap) Clone() SkuMap {
-	out := make(SkuMap, sm.Len())
+func (sm *SkuMapWithOrder) Clone() (out SkuMapWithOrder) {
+	out = MakeSkuMapWithOrder(sm.Len())
 
-	for k, v := range *sm {
-		out[k] = v
+	for _, v := range sm.m {
+		out.Add(v)
 	}
 
 	return out
 }
 
+func (sm *SkuMapWithOrder) Each(
+	f schnittstellen.FuncIter[*sku.Transacted],
+) (err error) {
+	for _, v := range sm.o {
+		_, ok := sm.m[key(v)]
+
+		if !ok {
+			continue
+		}
+
+		if err = f(v); err != nil {
+			if iter.IsStopIteration(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
+			return
+		}
+	}
+
+	return
+}
+
 type Changes struct {
-	a, b           SkuMap
-	added, removed SkuMap
-	Changed        SkuMap
+	a, b           SkuMapWithOrder
+	added, removed SkuMapWithOrder
+	Changed        SkuMapWithOrder
 }
 
 func ChangesFrom(
@@ -54,14 +96,14 @@ func ChangesFrom(
 	c.Changed = c.b.Clone()
 	c.removed = c.a.Clone()
 
-	for _, sk := range c.b {
+	for _, sk := range c.b.o {
 		if err = c.removed.Del(sk); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	for _, sk := range c.removed {
+	for _, sk := range c.removed.o {
 		if err = a.RemoveFromTransacted(sk); err != nil {
 			err = errors.Wrap(err)
 			return

@@ -55,20 +55,21 @@ func (av assignmentLineWriter) writeNormal(a *Assignment) (err error) {
 		av.WriteExactlyOneEmpty()
 	}
 
-	for _, z := range sortObjSet(a.Unnamed) {
-		av.WriteLines(
-			fmt.Sprintf("%s- %s", tab_prefix, z.Metadatei.Bezeichnung),
-		)
-	}
-
 	cursor := sku.GetTransactedPool().Get()
 	defer sku.GetTransactedPool().Put(cursor)
 
-	for _, z := range sortObjSet(a.Named) {
+	a.Objekten.Sort()
+
+	for _, z := range a.Objekten {
 		var sb strings.Builder
 
-		sb.WriteString(tab_prefix)
-		sb.WriteString("- ")
+		if z.virtual {
+			sb.WriteString(tab_prefix[1:])
+			sb.WriteString("- %")
+		} else {
+			sb.WriteString(tab_prefix)
+			sb.WriteString("- ")
+		}
 
 		sku.TransactedResetter.ResetWith(cursor, &z.Transacted)
 		cursor.Metadatei.Subtract(&av.Metadatei)
@@ -81,7 +82,7 @@ func (av assignmentLineWriter) writeNormal(a *Assignment) (err error) {
 		av.WriteStringers(&sb)
 	}
 
-	if a.Named.Len() > 0 || a.Unnamed.Len() > 0 {
+	if a.Objekten.Len() > 0 {
 		av.WriteExactlyOneEmpty()
 	}
 
@@ -135,11 +136,15 @@ func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 	cursor := sku.GetTransactedPool().Get()
 	defer sku.GetTransactedPool().Put(cursor)
 
-	write := func(z *sku.Transacted) (err error) {
+	write := func(z *obj) (err error) {
 		var sb strings.Builder
 
-		sb.WriteString("- ")
-		sku.TransactedResetter.ResetWith(cursor, z)
+		if z.virtual {
+			sb.WriteString("- %")
+		} else {
+			sb.WriteString("- ")
+		}
+		sku.TransactedResetter.ResetWith(cursor, &z.Transacted)
 		cursor.Metadatei.Subtract(&av.Metadatei)
 
 		if err = a.SubtractFromSet(
@@ -159,21 +164,16 @@ func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 		return
 	}
 
-	for _, z := range sortObjSet(a.Unnamed) {
-		if err = write(&z.Transacted); err != nil {
+	a.Objekten.Sort()
+
+	for _, z := range a.Objekten {
+		if err = write(z); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	for _, z := range sortObjSet(a.Named) {
-		if err = write(&z.Transacted); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if a.Named.Len() > 0 || a.Unnamed.Len() > 0 {
+	if a.Objekten.Len() > 0 {
 		av.WriteExactlyOneEmpty()
 	}
 

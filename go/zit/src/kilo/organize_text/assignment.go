@@ -7,30 +7,41 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 )
-
-type Assignment struct {
-	IsRoot    bool
-	Depth     int
-	Etiketten kennung.EtikettSet
-	Named     schnittstellen.MutableSetLike[*obj]
-	Unnamed   schnittstellen.MutableSetLike[*obj]
-	Children  []*Assignment
-	Parent    *Assignment
-}
 
 func newAssignment(d int) *Assignment {
 	return &Assignment{
 		Depth:     d,
 		Etiketten: kennung.MakeEtikettSet(),
-		Named:     collections_value.MakeMutableValueSet[*obj](nil),
-		Unnamed:   collections_value.MakeMutableValueSet[*obj](nil),
+		objekten:  make(map[string]struct{}),
+		Objekten:  make(Objekten, 0),
 		Children:  make([]*Assignment, 0),
 	}
+}
+
+type Assignment struct {
+	IsRoot    bool
+	Depth     int
+	Etiketten kennung.EtikettSet
+	objekten  map[string]struct{}
+	Objekten
+	Children []*Assignment
+	Parent   *Assignment
+}
+
+func (a *Assignment) AddObjekte(v *obj) (err error) {
+	k := key(&v.Transacted)
+	_, ok := a.objekten[k]
+
+	if ok {
+		return
+	}
+
+	a.objekten[k] = struct{}{}
+
+	return a.Objekten.Add(v)
 }
 
 func (a Assignment) GetDepth() int {
@@ -66,7 +77,7 @@ func (a Assignment) AlignmentSpacing() int {
 }
 
 func (a Assignment) MaxLen() (m int) {
-	a.Named.Each(
+	a.Objekten.Each(
 		func(z *obj) (err error) {
 			oM := z.Kennung.Len()
 
@@ -92,7 +103,7 @@ func (a Assignment) MaxLen() (m int) {
 func (a Assignment) MaxKopfUndSchwanz(
 	o Options,
 ) (kopf, schwanz int) {
-	a.Named.Each(
+	a.Objekten.Each(
 		func(z *obj) (err error) {
 			oKopf, oSchwanz := z.Kennung.LenKopfUndSchwanz()
 
@@ -137,7 +148,7 @@ func (a Assignment) String() (s string) {
 		s = a.Parent.String() + "."
 	}
 
-	return s + iter.StringCommaSeparated[kennung.Etikett](a.Etiketten)
+	return s + iter.StringCommaSeparated(a.Etiketten)
 }
 
 func (a *Assignment) addChild(c *Assignment) {
@@ -235,11 +246,8 @@ func (a *Assignment) consume(b *Assignment) (err error) {
 		a.addChild(c)
 	}
 
-	b.Named.Each(a.Named.Add)
-	b.Named.Each(b.Named.Del)
-
-	b.Unnamed.Each(a.Unnamed.Add)
-	b.Unnamed.Each(b.Unnamed.Del)
+	b.Objekten.Each(a.AddObjekte)
+	b.Objekten.Each(b.Objekten.Del)
 
 	if err = b.removeFromParent(); err != nil {
 		err = errors.Wrap(err)

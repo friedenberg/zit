@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/echo/zittish"
@@ -208,7 +208,7 @@ func (m *Exp) negateIfNecessary(v bool) bool {
 }
 
 func (e *Exp) ContainsSku(sk *sku.Transacted) bool {
-	log.Log().Printf("%s in %s", sk, e)
+	ui.Log().Printf("%s in %s", sk, e)
 
 	if len(e.Children) == 0 {
 		return e.negateIfNecessary(e.MatchOnEmpty)

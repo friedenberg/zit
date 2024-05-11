@@ -7,7 +7,7 @@ import (
 	"os/exec"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 )
 
 type RemoteScript interface {
@@ -35,7 +35,7 @@ func MakeWriterTo(
 		return
 	}
 
-	log.Log().Print(wt.cmd)
+	ui.Log().Print(wt.cmd)
 
 	envCollapsed := os.Environ()
 

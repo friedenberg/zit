@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/november/umwelt"
 )
@@ -50,7 +51,7 @@ func (c PeekHinweisen) Run(store *umwelt.Umwelt, args ...string) (err error) {
 	)
 
 	for i, h := range hs {
-		errors.Out().Printf("%d: %s", i, h)
+		ui.Out().Printf("%d: %s", i, h)
 	}
 
 	return

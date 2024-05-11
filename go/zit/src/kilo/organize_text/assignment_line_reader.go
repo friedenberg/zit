@@ -266,6 +266,8 @@ func (ar *assignmentLineReader) readOneObj(r *catgut.RingBuffer) (err error) {
 
 	var z obj
 
+	// TODO read virtual %, if exists
+
 	if _, err = ar.stringFormatReader.ReadStringFormat(r, &z.Transacted); err != nil {
 		err = ErrorRead{
 			error:  err,
@@ -277,13 +279,13 @@ func (ar *assignmentLineReader) readOneObj(r *catgut.RingBuffer) (err error) {
 	}
 
 	if z.Kennung.IsEmpty() {
-    // set empty hinweis to ensure middle is '/'
+		// set empty hinweis to ensure middle is '/'
 		if err = z.Kennung.SetWithKennung(kennung.Hinweis{}); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		ar.currentAssignment.Unnamed.Add(&z)
+	ar.currentAssignment.AddObjekte(&z)
 
 		return
 	}
@@ -293,7 +295,7 @@ func (ar *assignmentLineReader) readOneObj(r *catgut.RingBuffer) (err error) {
 		return
 	}
 
-	ar.currentAssignment.Named.Add(&z)
+	ar.currentAssignment.AddObjekte(&z)
 
 	return
 }

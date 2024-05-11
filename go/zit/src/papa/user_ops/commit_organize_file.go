@@ -78,14 +78,21 @@ func (op CommitOrganizeFile) run(
 	// 	return
 	// }
 
-	for _, changed := range cs.Changed {
-		if err = u.GetStore().CreateOrUpdateTransacted(
-			changed,
-			true,
-		); err != nil {
-			err = errors.Wrap(err)
+	if err = cs.Changed.Each(
+		func(changed *sku.Transacted) (err error) {
+			if err = u.GetStore().CreateOrUpdateTransacted(
+				changed,
+				true,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
 			return
-		}
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

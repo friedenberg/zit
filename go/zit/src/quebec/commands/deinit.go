@@ -7,6 +7,7 @@ import (
 	"path"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/november/umwelt"
 )
@@ -55,7 +56,7 @@ func (c Deinit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 func (c Deinit) getPermission(u *umwelt.Umwelt) (success bool) {
 	var err error
-	errors.Err().Printf(
+	ui.Err().Printf(
 		"are you sure you want to deinit in %q? (y/*)",
 		u.Standort().Dir(),
 	)
@@ -64,12 +65,12 @@ func (c Deinit) getPermission(u *umwelt.Umwelt) (success bool) {
 	var n int
 
 	if n, err = fmt.Scanf("%c", &answer); err != nil {
-		errors.Err().Printf("failed to read answer: %s", err)
+		ui.Err().Printf("failed to read answer: %s", err)
 		return
 	}
 
 	if n != 1 {
-		errors.Err().Printf("failed to read at exactly 1 answer: %s", err)
+		ui.Err().Printf("failed to read at exactly 1 answer: %s", err)
 		return
 	}
 

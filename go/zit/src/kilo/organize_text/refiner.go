@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 )
 
@@ -27,52 +28,52 @@ func (atc *Refiner) shouldMergeAllChildrenIntoParent(a *Assignment) (ok bool) {
 }
 
 func (atc *Refiner) shouldMergeIntoParent(a *Assignment) bool {
-	errors.Log().Printf("checking node should merge: %s", a)
+	ui.Log().Printf("checking node should merge: %s", a)
 
 	if a.Parent == nil {
-		errors.Log().Print("parent is nil")
+		ui.Log().Print("parent is nil")
 		return false
 	}
 
 	if a.Parent.IsRoot {
-		errors.Log().Print("parent is root")
+		ui.Log().Print("parent is root")
 		return false
 	}
 
 	if a.Etiketten.Len() == 1 && kennung.IsEmpty(a.Etiketten.Any()) {
-		errors.Log().Print("1 Etikett, and it's empty, merging")
+		ui.Log().Print("1 Etikett, and it's empty, merging")
 		return true
 	}
 
 	if a.Etiketten.Len() == 0 {
-		errors.Log().Print("etiketten length is 0, merging")
+		ui.Log().Print("etiketten length is 0, merging")
 		return true
 	}
 
 	if a.Parent.Etiketten.Len() != 1 {
-		errors.Log().Print("parent etiketten length is not 1")
+		ui.Log().Print("parent etiketten length is not 1")
 		return false
 	}
 
 	if a.Etiketten.Len() != 1 {
-		errors.Log().Print("etiketten length is not 1")
+		ui.Log().Print("etiketten length is not 1")
 		return false
 	}
 
 	equal := iter.SetEqualsPtr(a.Etiketten, a.Parent.Etiketten)
 
 	if !equal {
-		errors.Log().Print("parent etiketten not equal")
+		ui.Log().Print("parent etiketten not equal")
 		return false
 	}
 
 	if kennung.IsDependentLeaf(a.Parent.Etiketten.Any()) {
-		errors.Log().Print("is prefix joint")
+		ui.Log().Print("is prefix joint")
 		return false
 	}
 
 	if kennung.IsDependentLeaf(a.Etiketten.Any()) {
-		errors.Log().Print("is prefix joint")
+		ui.Log().Print("is prefix joint")
 		return false
 	}
 
@@ -85,12 +86,12 @@ func (atc *Refiner) renameForPrefixJoint(a *Assignment) (err error) {
 	}
 
 	if a == nil {
-		errors.Log().Printf("assignment is nil")
+		ui.Log().Printf("assignment is nil")
 		return
 	}
 
 	if a.Parent == nil {
-		errors.Log().Printf("parent is nil: %#v", a)
+		ui.Log().Printf("parent is nil: %#v", a)
 		return
 	}
 
@@ -111,7 +112,7 @@ func (atc *Refiner) renameForPrefixJoint(a *Assignment) (err error) {
 	}
 
 	if !kennung.HasParentPrefix(a.Etiketten.Any(), a.Parent.Etiketten.Any()) {
-		errors.Log().Print("parent is not prefix joint")
+		ui.Log().Print("parent is not prefix joint")
 		return
 	}
 
@@ -119,7 +120,7 @@ func (atc *Refiner) renameForPrefixJoint(a *Assignment) (err error) {
 	pEtt := a.Parent.Etiketten.Any()
 
 	if aEtt.Equals(pEtt) {
-		errors.Log().Print("parent is is equal to child")
+		ui.Log().Print("parent is is equal to child")
 		return
 	}
 
@@ -153,7 +154,7 @@ func (atc *Refiner) Refine(a *Assignment) (err error) {
 	}
 
 	if atc.shouldMergeIntoParent(a) {
-		errors.Log().Print("merging into parent")
+		ui.Log().Print("merging into parent")
 		p := a.Parent
 
 		if err = p.consume(a); err != nil {

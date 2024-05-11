@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/november/umwelt"
 )
@@ -33,7 +34,7 @@ func (c ExpandHinweis) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 
-		errors.Out().Print(h)
+		ui.Out().Print(h)
 	}
 
 	return

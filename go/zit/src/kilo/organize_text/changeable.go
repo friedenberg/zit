@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
@@ -25,8 +24,8 @@ func key(sk *sku.Transacted) string {
 
 func (ot *Text) GetSkus(
 	original sku.TransactedSet,
-) (out map[string]*sku.Transacted, err error) {
-	out = make(map[string]*sku.Transacted)
+) (out SkuMapWithOrder, err error) {
+	out = MakeSkuMapWithOrder(original.Len())
 
 	if err = ot.addToSet(
 		ot,
@@ -42,7 +41,7 @@ func (ot *Text) GetSkus(
 
 func (a *Assignment) addToSet(
 	ot *Text,
-	out map[string]*sku.Transacted,
+	out SkuMapWithOrder,
 	original sku.TransactedSet,
 ) (err error) {
 	expanded := kennung.MakeEtikettMutableSet()
@@ -52,12 +51,12 @@ func (a *Assignment) addToSet(
 		return
 	}
 
-	if err = a.Named.Each(
+	if err = a.Each(
 		func(o *obj) (err error) {
 			var z *sku.Transacted
 			ok := false
 
-			if z, ok = out[key(&o.Transacted)]; !ok {
+			if z, ok = out.m[key(&o.Transacted)]; !ok {
 				z = sku.GetTransactedPool().Get()
 
 				if err = z.SetFromSkuLike(&o.Transacted); err != nil {
@@ -76,7 +75,7 @@ func (a *Assignment) addToSet(
 					z.Metadatei.Typ.ResetWith(ot.Metadatei.Typ)
 				}
 
-				out[key(z)] = z
+				out.Add(z)
 
 				zPrime, hasOriginal := original.Get(original.Key(&o.Transacted))
 
@@ -92,81 +91,6 @@ func (a *Assignment) addToSet(
 
 			if o.Kennung.String() == "" {
 				panic(fmt.Sprintf("%s: Kennung is nil", o))
-			}
-
-			if err = z.Metadatei.Bezeichnung.Set(
-				o.Metadatei.Bezeichnung.String(),
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if !o.Metadatei.Typ.IsEmpty() {
-				if err = z.Metadatei.Typ.Set(
-					o.Metadatei.Typ.String(),
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-
-			z.Metadatei.Comments = append(
-				z.Metadatei.Comments,
-				o.Metadatei.Comments...,
-			)
-
-			if err = o.Metadatei.GetEtiketten().EachPtr(
-				z.AddEtikettPtr,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if err = expanded.EachPtr(
-				z.AddEtikettPtr,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = a.Unnamed.Each(
-		func(o *obj) (err error) {
-			var z *sku.Transacted
-			ok := false
-
-			if z, ok = out[key(&o.Transacted)]; !ok {
-				z = sku.GetTransactedPool().Get()
-
-				if err = z.SetFromSkuLike(&o.Transacted); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				z.Kennung.SetGattung(gattung.Zettel)
-
-				if err = ot.EachPtr(
-					z.AddEtikettPtr,
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				if !ot.Metadatei.Typ.IsEmpty() {
-					z.Metadatei.Typ.ResetWith(ot.Metadatei.Typ)
-				}
-
-				out[key(z)] = z
-
-				if !ot.Metadatei.Typ.IsEmpty() {
-					z.Metadatei.Typ.ResetWith(ot.Metadatei.Typ)
-				}
 			}
 
 			if err = z.Metadatei.Bezeichnung.Set(

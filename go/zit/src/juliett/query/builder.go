@@ -3,7 +3,7 @@ package query
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/delta/etikett_akte"
 	"code.linenisgreat.com/zit/src/delta/gattung"
@@ -206,7 +206,7 @@ func (b *Builder) BuildQueryGroup(vs ...string) (qg *Group, err error) {
 		return
 	}
 
-	log.Log().Print(qg.StringDebug())
+	ui.Log().Print(qg.StringDebug())
 
 	return
 }

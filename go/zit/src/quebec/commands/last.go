@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
@@ -43,11 +44,11 @@ func (c Last) CompletionGattung() kennung.Gattung {
 
 func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if len(args) != 0 {
-		errors.Err().Print("ignoring arguments")
+		ui.Err().Print("ignoring arguments")
 	}
 
 	if (c.Edit || c.Organize) && c.Format != "" {
-		errors.Err().Print("ignoring format")
+		ui.Err().Print("ignoring format")
 	} else if c.Edit && c.Organize {
 		err = errors.Errorf("cannot organize and edit at the same time")
 		return

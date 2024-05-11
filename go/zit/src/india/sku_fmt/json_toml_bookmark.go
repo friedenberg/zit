@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/toml"
-	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
@@ -47,7 +47,7 @@ func MakeJsonTomlBookmark(
 		}
 
 		if *u == *u1 {
-			log.Debug().Print(u, u1)
+			ui.Debug().Print(u, u1)
 		}
 	}
 

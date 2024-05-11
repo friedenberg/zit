@@ -2,7 +2,7 @@ package query
 
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
@@ -34,7 +34,7 @@ func (matcher Lua) ContainsSku(sk *sku.Transacted) bool {
 
 	t, err = vm.GetTopTableOrError()
 	if err != nil {
-		log.Err().Print(err)
+		ui.Err().Print(err)
 		return false
 	}
 
@@ -55,7 +55,7 @@ func (matcher Lua) ContainsSku(sk *sku.Transacted) bool {
 
 	err = vm.PCall(1, 1, nil)
 	if err != nil {
-		log.Err().Print(err)
+		ui.Err().Print(err)
 		return false
 	}
 
@@ -63,7 +63,7 @@ func (matcher Lua) ContainsSku(sk *sku.Transacted) bool {
 	vm.Pop(1)
 
 	if retval.Type() != lua.LTBool {
-		log.Err().Printf("expected bool but got %s", retval.Type())
+		ui.Err().Printf("expected bool but got %s", retval.Type())
 		return false
 	}
 

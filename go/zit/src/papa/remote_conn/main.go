@@ -8,6 +8,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 )
 
 type Dialogue struct {
@@ -139,7 +140,7 @@ func (s Dialogue) Send(e any) (err error) {
 
 	if err = s.enc.Encode(e); err != nil {
 		if errors.IsEOF(err) {
-			errors.Log().Caller(1, "%s EOF", s.Type())
+			ui.Log().Caller(1, "%s EOF", s.Type())
 		}
 
 		err = errors.Wrapf(err, "%s", s.Type())
@@ -161,7 +162,7 @@ func (s Dialogue) Receive(e any) (err error) {
 
 	if err = s.dec.Decode(e); err != nil {
 		if errors.IsEOF(err) {
-			errors.Log().Caller(1, "%s EOF", s.Type())
+			ui.Log().Caller(1, "%s EOF", s.Type())
 		} else {
 			err = errors.Wrapf(err, "%s", s.Type())
 			return

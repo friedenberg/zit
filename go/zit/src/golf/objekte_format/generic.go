@@ -7,7 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/delta/sha"
@@ -380,7 +380,7 @@ func GetShaForContextDebug(
 		return
 	}
 
-	log.DebugAllowCommit().Caller(2, "%s:%s -> %s", f.key, sh, &sb)
+	ui.DebugAllowCommit().Caller(2, "%s:%s -> %s", f.key, sh, &sb)
 
 	return
 }

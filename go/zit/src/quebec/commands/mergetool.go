@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -62,7 +63,7 @@ func (c Mergetool) RunWithQuery(
 
 	if len(p) == 0 {
 		// TODO-P2 return status 1
-		errors.Err().Printf("nothing to merge")
+		ui.Err().Printf("nothing to merge")
 		return
 	}
 

@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/lua"
@@ -600,7 +600,7 @@ func (u *Umwelt) MakeFormatFunc(
 			d := toml.NewDecoder(r)
 
 			if err = d.Decode(&a); err != nil {
-				log.Err().Printf("%s: %s", o, err)
+				ui.Err().Printf("%s: %s", o, err)
 				err = nil
 				return
 			}
@@ -635,7 +635,7 @@ func (u *Umwelt) MakeFormatFunc(
 			d := toml.NewDecoder(r)
 
 			if err = d.Decode(&a); err != nil {
-				log.Err().Printf("%s: %s", o, err)
+				ui.Err().Printf("%s: %s", o, err)
 				err = nil
 				return
 			}
@@ -784,7 +784,7 @@ func (u *Umwelt) makeTypFormatter(
 
 			f := vm.GetField(tt, "on_pre_commit")
 
-			log.Out().Print(f.String())
+			ui.Out().Print(f.String())
 
 			return
 		}

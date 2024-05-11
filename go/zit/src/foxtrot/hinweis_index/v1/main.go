@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/coordinates"
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/hinweisen"
@@ -63,7 +64,7 @@ func (i *hinweisIndex) Flush() (err error) {
 	i.lock.RLock()
 
 	if !i.hasChanges {
-		errors.Log().Print("no changes")
+		ui.Log().Print("no changes")
 		i.lock.RUnlock()
 		return
 	}
@@ -106,7 +107,7 @@ func (i *hinweisIndex) readIfNecessary() (err error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
-	errors.Log().Print("reading")
+	ui.Log().Print("reading")
 
 	i.didRead = true
 
@@ -193,7 +194,7 @@ func (i *hinweisIndex) AddHinweis(k1 kennung.Kennung) (err error) {
 	}
 
 	n := k.Id()
-	errors.Log().Printf("deleting %d, %s", n, h)
+	ui.Log().Printf("deleting %d, %s", n, h)
 
 	i.lock.Lock()
 	defer i.lock.Unlock()

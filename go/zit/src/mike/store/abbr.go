@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/charlie/tridex"
 	"code.linenisgreat.com/zit/src/delta/gattung"
@@ -94,7 +95,7 @@ func (i *indexAbbr) Flush() (err error) {
 	defer i.lock.Unlock()
 
 	if !i.hasChanges {
-		errors.Log().Print("no changes")
+		ui.Log().Print("no changes")
 		return
 	}
 
@@ -128,7 +129,7 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 				return
 			}
 
-			errors.Log().Print("reading")
+			ui.Log().Print("reading")
 
 			i.didRead = true
 
@@ -150,10 +151,10 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 
 			dec := gob.NewDecoder(r)
 
-			errors.Log().Print("starting decode")
+			ui.Log().Print("starting decode")
 
 			if err = dec.Decode(&i.indexAbbrEncodableTridexes); err != nil {
-				errors.Log().Print("finished decode unsuccessfully")
+				ui.Log().Print("finished decode unsuccessfully")
 				err = errors.Wrap(err)
 				return
 			}

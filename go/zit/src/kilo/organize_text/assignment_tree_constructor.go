@@ -3,6 +3,7 @@ package organize_text
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
@@ -22,13 +23,13 @@ func (atc *AssignmentTreeConstructor) Assignments() (roots []*Assignment, err er
 	atc.Transacted.Each(prefixSet.Add)
 
 	for _, e := range iter.Elements(atc.ExtraEtiketten) {
-		errors.Err().Printf("making extras: %s", e)
-		errors.Err().Printf("prefix set before: %v", prefixSet)
+		ui.Err().Printf("making extras: %s", e)
+		ui.Err().Printf("prefix set before: %v", prefixSet)
 		if err = atc.makeChildren(root, prefixSet, kennung.MakeEtikettSlice(e)); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-		errors.Err().Printf("prefix set after: %v", prefixSet)
+		ui.Err().Printf("prefix set after: %v", prefixSet)
 	}
 
 	if err = atc.makeChildren(root, prefixSet, atc.GroupingEtiketten); err != nil {
@@ -57,7 +58,11 @@ func (atc AssignmentTreeConstructor) makeChildren(
 					return
 				}
 
-				parent.Named.Add(z)
+				if tz.Metadatei.Verzeichnisse.GetImplicitEtiketten().Contains(e) {
+					z.virtual = true
+				}
+
+				parent.AddObjekte(z)
 
 				return
 			},
@@ -84,7 +89,8 @@ func (atc AssignmentTreeConstructor) makeChildren(
 				return
 			}
 
-			parent.Named.Add(z)
+			//TODO if one of anchors matches
+			parent.AddObjekte(z)
 
 			return
 		},

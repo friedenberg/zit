@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/november/umwelt"
@@ -73,7 +74,7 @@ func (op PullServer) akteReaderForSha(
 
 	// TODO-P2 rest is common
 
-	errors.Log().Printf("received sha: %s", sh)
+	ui.Log().Printf("received sha: %s", sh)
 
 	var or io.ReadCloser
 
@@ -91,7 +92,7 @@ func (op PullServer) akteReaderForSha(
 		return
 	}
 
-	errors.Log().Printf("served %d objekte bytes", n)
+	ui.Log().Printf("served %d objekte bytes", n)
 
 	return
 }
@@ -110,7 +111,7 @@ func (op PullServer) objekteReaderForSku(
 
 	// TODO-P2 rest is common
 
-	errors.Log().Printf("received request: %#v", msg)
+	ui.Log().Printf("received request: %#v", msg)
 
 	orf := op.umwelt.Standort().ObjekteReaderWriterFactory(msg.Gattung)
 
@@ -132,7 +133,7 @@ func (op PullServer) objekteReaderForSku(
 		return
 	}
 
-	errors.Log().Printf("served %d objekte bytes", n)
+	ui.Log().Printf("served %d objekte bytes", n)
 
 	return
 }

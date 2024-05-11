@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
@@ -27,7 +28,7 @@ func (s *Store) FlushBestandsaufnahme(
 		return
 	}
 
-	errors.Log().Printf("saving Bestandsaufnahme")
+	ui.Log().Printf("saving Bestandsaufnahme")
 
 	var bestandsaufnahmeSku *sku.Transacted
 
@@ -36,7 +37,7 @@ func (s *Store) FlushBestandsaufnahme(
 		s.GetKonfig().Bezeichnung,
 	); err != nil {
 		if errors.Is(err, bestandsaufnahme.ErrEmpty) {
-			errors.Log().Printf("Bestandsaufnahme was empty")
+			ui.Log().Printf("Bestandsaufnahme was empty")
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -62,7 +63,7 @@ func (s *Store) FlushBestandsaufnahme(
 		return
 	}
 
-	errors.Log().Printf("done saving Bestandsaufnahme")
+	ui.Log().Printf("done saving Bestandsaufnahme")
 
 	return
 }

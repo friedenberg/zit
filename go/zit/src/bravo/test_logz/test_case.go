@@ -12,7 +12,7 @@ type TC struct {
 	StackInfo
 }
 
-func (t *TC) log(args ...interface{}) {
+func (t *TC) ui(args ...interface{}) {
 	errors.SetTesting()
 	args = append([]interface{}{t.StackInfo}, args...)
 	fmt.Fprintln(os.Stderr, args...)
@@ -35,7 +35,7 @@ func (t *TC) fatalf(format string, args ...interface{}) {
 }
 
 func (t *TC) Log(args ...interface{}) {
-	t.log(args...)
+	t.ui(args...)
 }
 
 func (t *TC) Logf(format string, args ...interface{}) {

@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/age"
 	"code.linenisgreat.com/zit/src/delta/gattung"
@@ -101,10 +101,10 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 
 	errors.TodoP4("find a better place for this")
 	{
-		if u.erworbenCli.Verbose {
+		if u.erworbenCli.Verbose && !u.erworbenCli.Quiet {
 			errors.SetVerbose()
 		} else {
-			log.SetOutput(io.Discard)
+			ui.SetOutput(io.Discard)
 		}
 
 		if u.erworbenCli.Todo {
@@ -158,7 +158,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	// 	}
 	// }
 
-	log.Log().Printf("store version: %s", u.Konfig().GetStoreVersion())
+	ui.Log().Printf("store version: %s", u.Konfig().GetStoreVersion())
 
 	if u.konfig.ChrestEnabled {
 		u.virtualStores["%chrome"] = &query.VirtualStoreInitable{
@@ -179,7 +179,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		return
 	}
 
-	errors.Log().Print("done initing checkout store")
+	ui.Log().Print("done initing checkout store")
 
 	ptl := u.PrinterTransactedLike()
 
@@ -221,7 +221,7 @@ func (u Umwelt) PrintMatchedArchiviertIfNecessary() {
 		return
 	}
 
-	errors.Err().Printf("%d archived objekten matched", c)
+	ui.Err().Printf("%d archived objekten matched", c)
 }
 
 func (u *Umwelt) MakeKennungIndex() kennung.Index {

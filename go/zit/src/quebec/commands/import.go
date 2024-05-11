@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/id"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/age"
 	"code.linenisgreat.com/zit/src/delta/angeboren"
 	"code.linenisgreat.com/zit/src/delta/checked_out_state"
@@ -227,7 +228,7 @@ func (c Import) importAkteIfNecessary(
 		)
 	}
 
-	errors.Err().Printf("copied Akte %s (%d bytes)", akteSha, n)
+	ui.Err().Printf("copied Akte %s (%d bytes)", akteSha, n)
 
 	return
 }

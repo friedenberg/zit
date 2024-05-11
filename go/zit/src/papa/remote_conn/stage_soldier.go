@@ -10,6 +10,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/november/umwelt"
 )
 
@@ -93,7 +94,7 @@ func MakeStageSoldier(u *umwelt.Umwelt) (
 
 	s.mainDialogue = el.Dialogue
 	u.Konfig().SetCliFromCommander(el.MessageHiCommander.CliKonfig)
-	errors.Log().Printf("set konfig")
+	ui.Log().Printf("set konfig")
 
 	if err = u.Reset(); err != nil {
 		err = errors.Wrap(err)
@@ -147,7 +148,7 @@ func (s *StageSoldier) Listen() (err error) {
 }
 
 func (s *StageSoldier) awaitRegisteredDialogueHandlers(errMulti errors.Multi) {
-	errors.Log().Printf("waiting for handlers")
+	ui.Log().Printf("waiting for handlers")
 
 	for {
 		if !errMulti.Empty() {
@@ -156,7 +157,7 @@ func (s *StageSoldier) awaitRegisteredDialogueHandlers(errMulti errors.Multi) {
 
 		var el SoldierDialogueChanElement
 
-		errors.Log().Printf("waiting for connection")
+		ui.Log().Printf("waiting for connection")
 
 		if el = s.AwaitDialogue(); el.error != nil {
 			errMulti.Add(el.error)
@@ -188,7 +189,7 @@ func (s *StageSoldier) awaitRegisteredDialogueHandlers(errMulti errors.Multi) {
 				return
 			}
 
-			errors.Log().Printf("connection accepted")
+			ui.Log().Printf("connection accepted")
 
 			var h func(Dialogue) error
 			ok := false
@@ -202,10 +203,10 @@ func (s *StageSoldier) awaitRegisteredDialogueHandlers(errMulti errors.Multi) {
 				return
 			}
 
-			errors.Log().Printf("found handler: %s", el.Dialogue.Type())
+			ui.Log().Printf("found handler: %s", el.Dialogue.Type())
 
-			errors.Log().Printf("start handler: %s", el.Dialogue.Type())
-			defer errors.Log().Printf("end handler: %s", el.Dialogue.Type())
+			ui.Log().Printf("start handler: %s", el.Dialogue.Type())
+			defer ui.Log().Printf("end handler: %s", el.Dialogue.Type())
 
 			if err := h(el.Dialogue); err != nil {
 				errMulti.Add(errors.Wrap(err))

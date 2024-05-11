@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/november/umwelt"
 )
@@ -52,7 +52,7 @@ func (c ReadAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 
-		log.Debug().Print(sh)
+		ui.Debug().Print(sh)
 	}
 
 	return

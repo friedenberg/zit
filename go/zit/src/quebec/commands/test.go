@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
@@ -67,9 +67,9 @@ func (c Test) RunWithQuery(u *umwelt.Umwelt, ms *query.Group) (err error) {
 					return
 				}
 
-				log.Out().Print(o.GetKennung())
-				log.Debug().Print(o.GetTai())
-				log.Debug().Print(sk.GetTai())
+				ui.Out().Print(o.GetKennung())
+				ui.Debug().Print(o.GetTai())
+				ui.Debug().Print(sk.GetTai())
 
 				return
 			},

@@ -11,6 +11,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/charlie/ohio"
@@ -251,7 +252,7 @@ func (t *Tai) ReadFrom(r io.Reader) (n int64, err error) {
 }
 
 func (t Tai) MarshalText() (text []byte, err error) {
-	errors.Err().Printf(t.String())
+	ui.Err().Printf(t.String())
 	text = []byte(t.String())
 
 	return

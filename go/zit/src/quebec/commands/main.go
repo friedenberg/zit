@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/src/foxtrot/erworben"
 	"code.linenisgreat.com/zit/src/november/umwelt"
@@ -20,10 +21,10 @@ func Run(args []string) (exitStatus int) {
 		}
 
 		if errors.As(err, &normalError) {
-			errors.Err().Printf("%s", normalError.Error())
+			ui.Err().Printf("%s", normalError.Error())
 		} else {
 			if err != nil {
-				errors.Err().Print(err)
+				ui.Err().Print(err)
 			}
 		}
 	}()
@@ -36,7 +37,7 @@ func Run(args []string) (exitStatus int) {
 	}
 
 	if len(os.Args) < 1 {
-		errors.Log().Print("printing usage")
+		ui.Log().Print("printing usage")
 		return cmd.PrintUsage(nil)
 	}
 

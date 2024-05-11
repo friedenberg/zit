@@ -6,6 +6,7 @@ import (
 	"os/exec"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/files"
 )
 
@@ -82,23 +83,23 @@ func (s *ScriptValue) Run(input string) (r io.Reader, err error) {
 		return
 	}
 
-	errors.Log().Print("starting")
+	ui.Log().Print("starting")
 	s.cmd.Start()
 
 	return
 }
 
 func (s *ScriptValue) Close() (err error) {
-	errors.Log().Print("closing script")
-	defer errors.Log().Print("done closing script")
+	ui.Log().Print("closing script")
+	defer ui.Log().Print("done closing script")
 
 	if s.file != nil {
-		errors.Log().Print("closing file")
+		ui.Log().Print("closing file")
 		err = files.Close(s.file)
 	}
 
 	if s.cmd != nil {
-		errors.Log().Print("waiting for script")
+		ui.Log().Print("waiting for script")
 		err = s.cmd.Wait()
 	}
 

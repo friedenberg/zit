@@ -125,7 +125,7 @@ func (atc Factory) makeChildren(
 					return
 				}
 
-				parent.Named.Add(z)
+				parent.AddObjekte(z)
 
 				return
 			},
@@ -152,7 +152,7 @@ func (atc Factory) makeChildren(
 				return
 			}
 
-			parent.Named.Add(z)
+			parent.AddObjekte(z)
 
 			return
 		},

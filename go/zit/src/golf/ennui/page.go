@@ -8,7 +8,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/log"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/heap"
@@ -256,7 +256,7 @@ func (e *page) PrintAll() (err error) {
 			return
 		}
 
-		log.Out().Printf("%s", &current)
+		ui.Out().Printf("%s", &current)
 	}
 }
 
