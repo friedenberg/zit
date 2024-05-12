@@ -49,12 +49,9 @@ func (c *FormatOrganize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var ot *organize_text.Text
 
-	readOrganizeTextOp := user_ops.ReadOrganizeFile{
-		Umwelt: u,
-		Reader: f,
-	}
+	readOrganizeTextOp := user_ops.ReadOrganizeFile{}
 
-	if ot, err = readOrganizeTextOp.Run(nil); err != nil {
+	if ot, err = readOrganizeTextOp.Run(u, f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

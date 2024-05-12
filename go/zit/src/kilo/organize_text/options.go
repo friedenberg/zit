@@ -126,7 +126,9 @@ func (o *Flags) GetOptions(
 
 	o.skuFmt = *skuFmt
 
-	if q != nil {
+	if q == nil {
+		o.rootEtiketten = kennung.MakeEtikettSet()
+	} else {
 		o.rootEtiketten = q.GetEtiketten()
 
 		ks := collections_value.MakeMutableValueSet[sku.Query](nil)
@@ -152,12 +154,6 @@ func (o *Flags) GetOptions(
 	o.Abbr = abbr
 
 	return o.Options
-}
-
-func (o Options) assignmentTreeConstructor() *AssignmentTreeConstructor {
-	return &AssignmentTreeConstructor{
-		Options: o,
-	}
 }
 
 func (o Options) Factory() *Factory {

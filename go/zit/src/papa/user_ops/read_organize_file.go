@@ -6,19 +6,15 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/src/november/umwelt"
 )
 
-type ReadOrganizeFile struct {
-	*umwelt.Umwelt
-	io.Reader
-}
+type ReadOrganizeFile struct{}
 
-func (c ReadOrganizeFile) RunWithFile(
+func (c ReadOrganizeFile) RunWithPath(
+	u *umwelt.Umwelt,
 	p string,
-	q *query.Group,
 ) (ot *organize_text.Text, err error) {
 	var f *os.File
 
@@ -29,30 +25,31 @@ func (c ReadOrganizeFile) RunWithFile(
 
 	defer files.Close(f)
 
-	c.Reader = f
-	ot, err = c.Run(q)
-	c.Reader = nil
+	ot, err = c.Run(u, f)
 
 	return
 }
 
-func (c ReadOrganizeFile) Run(q *query.Group) (ot *organize_text.Text, err error) {
+func (c ReadOrganizeFile) Run(
+	u *umwelt.Umwelt,
+	r io.Reader,
+) (ot *organize_text.Text, err error) {
 	otFlags := organize_text.MakeFlags()
-	c.ApplyToOrganizeOptions(&otFlags.Options)
+	u.ApplyToOrganizeOptions(&otFlags.Options)
 
 	if ot, err = organize_text.New(
 		otFlags.GetOptions(
-			c.Umwelt.Konfig().PrintOptions,
-			q,
-			c.SkuFmtOrganize(),
-			c.GetStore().GetAbbrStore().GetAbbr(),
+			u.Konfig().PrintOptions,
+			nil,
+			u.SkuFmtOrganize(),
+			u.GetStore().GetAbbrStore().GetAbbr(),
 		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if _, err = ot.ReadFrom(c.Reader); err != nil {
+	if _, err = ot.ReadFrom(r); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

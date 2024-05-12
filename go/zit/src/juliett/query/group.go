@@ -16,8 +16,8 @@ func MakeGroup(
 	b *Builder,
 ) *Group {
 	return &Group{
-		OptimizedQueries: make(map[gattung.Gattung]*QueryWithHidden),
-		UserQueries:      make(map[kennung.Gattung]*QueryWithHidden),
+		OptimizedQueries: make(map[gattung.Gattung]*Query),
+		UserQueries:      make(map[kennung.Gattung]*Query),
 		Hidden:           b.hidden,
 		FDs:              fd.MakeMutableSet(),
 		Zettelen:         kennung.MakeHinweisMutableSet(),
@@ -27,8 +27,8 @@ func MakeGroup(
 
 type Group struct {
 	Hidden           sku.Query
-	OptimizedQueries map[gattung.Gattung]*QueryWithHidden
-	UserQueries      map[kennung.Gattung]*QueryWithHidden
+	OptimizedQueries map[gattung.Gattung]*Query
+	UserQueries      map[kennung.Gattung]*Query
 	Kennungen        []*kennung.Kennung2
 	FDs              fd.MutableSet
 	Zettelen         kennung.HinweisMutableSet
@@ -42,6 +42,14 @@ func (qg *Group) IsEmpty() bool {
 func (qg *Group) Get(g gattung.Gattung) (sku.QueryWithSigilAndKennung, bool) {
 	q, ok := qg.OptimizedQueries[g]
 	return q, ok
+}
+
+func (qg *Group) GetSigil() (s kennung.Sigil) {
+	for _, q := range qg.OptimizedQueries {
+		s.Add(q.Sigil)
+	}
+
+	return
 }
 
 func (qg *Group) GetExactlyOneKennung(
@@ -169,12 +177,10 @@ func (qg *Group) Add(q *Query) (err error) {
 	existing, ok := qg.UserQueries[q.Gattung]
 
 	if !ok {
-		existing = &QueryWithHidden{
-			Hidden: qg.Hidden,
-			Query: Query{
-				Gattung: q.Gattung,
-				Kennung: make(map[string]Kennung),
-			},
+		existing = &Query{
+			Hidden:  qg.Hidden,
+			Gattung: q.Gattung,
+			Kennung: make(map[string]Kennung),
 		}
 	}
 
@@ -188,7 +194,7 @@ func (qg *Group) Add(q *Query) (err error) {
 	return
 }
 
-func (qg *Group) addOptimized(b *Builder, q *QueryWithHidden) (err error) {
+func (qg *Group) addOptimized(b *Builder, q *Query) (err error) {
 	q = q.Clone()
 	gs := q.Slice()
 
@@ -200,16 +206,14 @@ func (qg *Group) addOptimized(b *Builder, q *QueryWithHidden) (err error) {
 		existing, ok := qg.OptimizedQueries[g]
 
 		if !ok {
-			existing = &QueryWithHidden{
-				Hidden: qg.Hidden,
-				Query: Query{
-					Gattung: kennung.MakeGattung(g),
-					Kennung: make(map[string]Kennung),
-				},
+			existing = &Query{
+				Hidden:  qg.Hidden,
+				Gattung: kennung.MakeGattung(g),
+				Kennung: make(map[string]Kennung),
 			}
 		}
 
-		if err = existing.Merge(&q.Query); err != nil {
+		if err = existing.Merge(q); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -228,8 +232,8 @@ func (q *Group) MatcherLen() int {
 	return 0
 }
 
-func (qg *Group) SortedUserQueries() []*QueryWithHidden {
-	out := make([]*QueryWithHidden, 0, len(qg.UserQueries))
+func (qg *Group) SortedUserQueries() []*Query {
+	out := make([]*Query, 0, len(qg.UserQueries))
 
 	for _, g := range qg.UserQueries {
 		out = append(out, g)

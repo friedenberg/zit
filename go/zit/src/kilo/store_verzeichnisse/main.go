@@ -207,7 +207,7 @@ func (i *Store) readFrom(
 		}
 	}
 
-	w = pool.MakePooledChain[sku.Transacted](
+	w = pool.MakePooledChain(
 		sku.GetTransactedPool(),
 		w,
 	)

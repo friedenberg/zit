@@ -1,6 +1,8 @@
 package organize_text
 
 import (
+	"sort"
+
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
@@ -49,9 +51,31 @@ func (sm *SkuMapWithOrder) Clone() (out SkuMapWithOrder) {
 	return out
 }
 
+func (sm SkuMapWithOrder) Sort() {
+	out := sm.o
+
+	sort.Slice(out, func(i, j int) bool {
+		switch {
+		case out[i].Kennung.IsEmpty() && out[j].Kennung.IsEmpty():
+			return out[i].Metadatei.Bezeichnung.String() < out[j].Metadatei.Bezeichnung.String()
+
+		case out[i].Kennung.IsEmpty():
+			return true
+
+		case out[j].Kennung.IsEmpty():
+			return false
+
+		default:
+			return out[i].Kennung.String() < out[j].Kennung.String()
+		}
+	})
+}
+
 func (sm *SkuMapWithOrder) Each(
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
+	sm.Sort()
+
 	for _, v := range sm.o {
 		_, ok := sm.m[key(v)]
 

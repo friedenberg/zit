@@ -35,37 +35,88 @@ func (s *Store) query(
 	f schnittstellen.FuncIter[*sku.Transacted],
 	includeCwd bool,
 ) (err error) {
-	f1 := func(z *sku.Transacted) (err error) {
-		g := gattung.Must(z.GetGattung())
-		m, ok := qg.Get(g)
+	var f1 schnittstellen.FuncIter[*sku.Transacted]
 
-		if !ok {
-			return
-		}
+	// TODO improve performance by only reading Cwd zettels rather than scanning
+	// everything
+	if qg.GetSigil() == kennung.SigilCwd && includeCwd {
+		f1 = func(z *sku.Transacted) (err error) {
+			g := gattung.Must(z.GetGattung())
+			m, ok := qg.Get(g)
 
-		if includeCwd && m.GetSigil().IncludesCwd() {
+			if !ok {
+				return
+			}
+
 			var e *sku.ExternalMaybe
 
-			if e, ok = s.GetCwdFiles().Get(&z.Kennung); ok {
-				var e2 *sku.External
+			e, ok = s.GetCwdFiles().Get(&z.Kennung)
 
-				if e2, err = s.ReadOneExternal(e, z); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				if err = z.SetFromSkuLike(&e2.Transacted); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+			if !ok {
+				return
 			}
-		}
 
-		if !m.ContainsSku(z) {
+			var e2 *sku.External
+
+			if e2, err = s.ReadOneExternal(e, z); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = z.SetFromSkuLike(&e2.Transacted); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if !m.ContainsSku(z) {
+				return
+			}
+
+			if err = f(z); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
 			return
 		}
+	} else {
+		f1 = func(z *sku.Transacted) (err error) {
+			g := gattung.Must(z.GetGattung())
+			m, ok := qg.Get(g)
 
-		return f(z)
+			if !ok {
+				return
+			}
+
+			if includeCwd && m.GetSigil().IncludesCwd() {
+				var e *sku.ExternalMaybe
+
+				if e, ok = s.GetCwdFiles().Get(&z.Kennung); ok {
+					var e2 *sku.External
+
+					if e2, err = s.ReadOneExternal(e, z); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+					if err = z.SetFromSkuLike(&e2.Transacted); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+				}
+			}
+
+			if !m.ContainsSku(z) {
+				return
+			}
+
+			if err = f(z); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
 	}
 
 	if err = s.GetVerzeichnisse().ReadQuery(qg, f1); err != nil {

@@ -48,6 +48,7 @@ type Builder struct {
 	luaVMPoolBuilder           *lua.VMPoolBuilder
 	preexistingKennung         []*kennung.Kennung2
 	cwd                        Cwd
+	cwdFilterEnabled           bool
 	fileExtensionGetter        schnittstellen.FileExtensionGetter
 	expanders                  kennung.Abbr
 	hidden                     sku.Query
@@ -69,6 +70,11 @@ func (b *Builder) WithPermittedSigil(s kennung.Sigil) *Builder {
 
 func (b *Builder) WithDoNotMatchEmpty() *Builder {
 	b.doNotMatchEmpty = true
+	return b
+}
+
+func (b *Builder) WithCwdFilterEnabled() *Builder {
+	b.cwdFilterEnabled = true
 	return b
 }
 
@@ -336,10 +342,8 @@ func (b *Builder) addDefaultsIfNecessary(qg *Group) {
 	if ok {
 		delete(qg.UserQueries, g)
 	} else {
-		dq = &QueryWithHidden{
-			Query: Query{
-				Kennung: make(map[string]Kennung),
-			},
+		dq = &Query{
+			Kennung: make(map[string]Kennung),
 		}
 	}
 
@@ -533,6 +537,7 @@ func (b *Builder) makeEtikettOrEtikettLua(
 		VMPool: b.luaVMPoolBuilder.Build(),
 	}
 
+	// TODO use repo pattern
 	if sk.GetTyp().String() == "lua" {
 		var ar sha.ReadCloser
 

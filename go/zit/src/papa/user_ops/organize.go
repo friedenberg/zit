@@ -94,11 +94,9 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 			return
 		}
 
-		readOrganizeTextOp := ReadOrganizeFile{
-			Umwelt: u.Umwelt,
-		}
+		readOrganizeTextOp := ReadOrganizeFile{}
 
-		if ot2, err = readOrganizeTextOp.RunWithFile(f.Name(), qg); err != nil {
+		if ot2, err = readOrganizeTextOp.Run(u.Umwelt, f); err != nil {
 			if u.handleReadChangesError(err) {
 				err = nil
 				continue

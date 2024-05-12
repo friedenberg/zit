@@ -15,7 +15,6 @@ import (
 
 type Show struct {
 	Format string
-	// Filter lua.Flag
 }
 
 func init() {
@@ -25,7 +24,6 @@ func init() {
 			c := &Show{}
 
 			f.StringVar(&c.Format, "format", "log", "format")
-			// f.Var(&c.Filter, "filter", "lua filter")
 
 			return c
 		},
@@ -45,10 +43,6 @@ func (c Show) CompletionGattung() kennung.Gattung {
 func (c Show) DefaultGattungen() kennung.Gattung {
 	return kennung.MakeGattung(
 		gattung.Zettel,
-		// gattung.Etikett,
-		// gattung.Typ,
-		// gattung.Bestandsaufnahme,
-		// gattung.Kasten,
 	)
 }
 
@@ -60,24 +54,9 @@ func (c Show) RunWithQuery(u *umwelt.Umwelt, ms *query.Group) (err error) {
 		return
 	}
 
-	f = iter.MakeSyncSerializer(f)
-
 	if err = u.GetStore().QueryWithCwd(
 		ms,
-		func(sk *sku.Transacted) (err error) {
-			// if c.Filter.String() != "" {
-			// 	if !c.Filter.ContainsSku(sk) {
-			// 		return
-			// 	}
-			// }
-
-			if err = f(sk); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
+		iter.MakeSyncSerializer(f),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

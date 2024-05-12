@@ -129,12 +129,9 @@ func (c *Organize) RunWithQuery(
 
 		var ot2 *organize_text.Text
 
-		readOrganizeTextOp := user_ops.ReadOrganizeFile{
-			Umwelt: u,
-			Reader: os.Stdin,
-		}
+		readOrganizeTextOp := user_ops.ReadOrganizeFile{}
 
-		if ot2, err = readOrganizeTextOp.Run(ms); err != nil {
+		if ot2, err = readOrganizeTextOp.Run(u, os.Stdin); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -242,11 +239,9 @@ func (c Organize) readFromVim(
 		return
 	}
 
-	readOrganizeTextOp := user_ops.ReadOrganizeFile{
-		Umwelt: u,
-	}
+	readOrganizeTextOp := user_ops.ReadOrganizeFile{}
 
-	if ot, err = readOrganizeTextOp.RunWithFile(f, q); err != nil {
+	if ot, err = readOrganizeTextOp.RunWithPath(u, f); err != nil {
 		if c.handleReadChangesError(err) {
 			err = nil
 			ot, err = c.readFromVim(u, f, results, q)

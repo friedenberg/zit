@@ -17,6 +17,8 @@ type Query struct {
 	Exp
 
 	Kennung map[string]Kennung
+
+	Hidden sku.Query
 }
 
 func (a *Query) IsEmpty() bool {
@@ -24,10 +26,6 @@ func (a *Query) IsEmpty() bool {
 		a.Gattung.IsEmpty() &&
 		len(a.Children) == 0 &&
 		len(a.Kennung) == 0
-}
-
-func (a *Query) GetMatcherSigil() sku.QueryWithSigilAndKennung {
-	return a
 }
 
 func (a *Query) GetSigil() kennung.Sigil {
@@ -53,6 +51,7 @@ func (a *Query) Clone() (b *Query) {
 		Sigil:   a.Sigil,
 		Gattung: a.Gattung,
 		Kennung: make(map[string]Kennung, len(a.Kennung)),
+		Hidden:  a.Hidden,
 	}
 
 	bExp := a.Exp.Clone()
@@ -205,14 +204,30 @@ func (q *Query) String() string {
 	return sb.String()
 }
 
+func (q *Query) ShouldHide(sk *sku.Transacted, k string) bool {
+	_, ok := q.Kennung[k]
+
+	if q.IncludesHidden() || q.Hidden == nil || ok {
+		return false
+	}
+
+	return q.Hidden.ContainsSku(sk)
+}
+
 func (q *Query) ContainsSku(sk *sku.Transacted) bool {
+	k := sk.Kennung.String()
+
+	if q.ShouldHide(sk, k) {
+		return false
+	}
+
 	g := gattung.Must(sk)
 
 	if !q.Gattung.ContainsOneOf(g) {
 		return false
 	}
 
-	if _, ok := q.Kennung[sk.Kennung.String()]; ok {
+	if _, ok := q.Kennung[k]; ok {
 		return true
 	}
 

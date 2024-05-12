@@ -193,7 +193,7 @@ func (c *OrganizeJSON) RunWithQuery(
 
 func (c OrganizeJSON) readFromVim(
 	u *umwelt.Umwelt,
-	f string,
+	p string,
 	results *organize_text.Text,
 	q *query.Group,
 ) (ot *organize_text.Text, err error) {
@@ -203,19 +203,17 @@ func (c OrganizeJSON) readFromVim(
 			Build(),
 	}
 
-	if _, err = openVimOp.Run(u, f); err != nil {
+	if _, err = openVimOp.Run(u, p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	readOrganizeTextOp := user_ops.ReadOrganizeFile{
-		Umwelt: u,
-	}
+	readOrganizeTextOp := user_ops.ReadOrganizeFile{}
 
-	if ot, err = readOrganizeTextOp.RunWithFile(f, q); err != nil {
+	if ot, err = readOrganizeTextOp.RunWithPath(u, p); err != nil {
 		if c.handleReadChangesError(err) {
 			err = nil
-			ot, err = c.readFromVim(u, f, results, q)
+			ot, err = c.readFromVim(u, p, results, q)
 		} else {
 			ui.Err().Printf("aborting organize")
 			return

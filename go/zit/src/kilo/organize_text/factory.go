@@ -11,17 +11,7 @@ type Factory struct {
 	Options
 }
 
-func (f *Factory) Make() (ot *Text, err error) {
-	if f.UseMetadateiHeader {
-		ot, err = f.makeWithMetadatei()
-	} else {
-		ot, err = f.makeWithoutMetadatei()
-	}
-
-	return
-}
-
-func (atc *Factory) makeWithMetadatei() (ot *Text, err error) {
+func (atc *Factory) Make() (ot *Text, err error) {
 	ot = &Text{
 		Options:    atc.Options,
 		Assignment: newAssignment(0),
@@ -59,40 +49,6 @@ func (atc *Factory) makeWithMetadatei() (ot *Text, err error) {
 	if _, err = atc.makeChildren(ot.Assignment, prefixSet, atc.GroupingEtiketten); err != nil {
 		err = errors.Wrapf(err, "Assignment: %#v", ot.Assignment)
 		return
-	}
-
-	if err = ot.Refine(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (f Factory) makeWithoutMetadatei() (ot *Text, err error) {
-	if !f.wasMade {
-		panic("options no initialized")
-	}
-
-	ot = &Text{
-		Options:    f.Options,
-		Assignment: newAssignment(0),
-		Metadatei: Metadatei{
-			EtikettSet: kennung.MakeEtikettSet(),
-		},
-	}
-
-	ot.IsRoot = true
-
-	var as []*Assignment
-	as, err = f.Options.assignmentTreeConstructor().Assignments()
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	for _, a := range as {
-		ot.addChild(a)
 	}
 
 	if err = ot.Refine(); err != nil {
