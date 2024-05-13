@@ -7,46 +7,8 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
-
-func makeObj(
-	options erworben_cli_print_options.PrintOptions,
-	named *sku.Transacted,
-) (z *obj, err error) {
-	errors.TodoP4("add bez in a better way")
-
-	z = &obj{}
-
-	if err = z.SetFromSkuLike(named); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = z.removeEtikettenIfNecessary(options); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (o *obj) removeEtikettenIfNecessary(
-	options erworben_cli_print_options.PrintOptions,
-) (err error) {
-	if options.PrintEtikettenAlways {
-		return
-	}
-
-	if o.Metadatei.Bezeichnung.IsEmpty() {
-		return
-	}
-
-	o.Metadatei.GetEtikettenMutable().Reset()
-
-	return
-}
 
 // TODO-P1 migrate obj to sku.Transacted
 type obj struct {

@@ -20,7 +20,7 @@ func New(options Options) (ot *Text, err error) {
 		panic("options not initialized")
 	}
 
-	ot, err = options.Factory().Make()
+	ot, err = options.Make()
 
 	return
 }

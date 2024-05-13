@@ -2,6 +2,7 @@ package sku
 
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -20,6 +21,14 @@ type SetPrefixVerzeichnisseSegments struct {
 func MakeSetPrefixVerzeichnisse(c int) (s SetPrefixVerzeichnisse) {
 	s.innerMap = make(map[string]TransactedMutableSet, c)
 	return s
+}
+
+func MakeSetPrefixVerzeichnisseFrom(
+	ts TransactedSet,
+) (s SetPrefixVerzeichnisse) {
+	s = MakeSetPrefixVerzeichnisse(ts.Len())
+	ts.Each(s.Add)
+	return
 }
 
 func (s SetPrefixVerzeichnisse) Len() int {
@@ -120,6 +129,23 @@ func (a SetPrefixVerzeichnisse) Each(
 }
 
 func (a SetPrefixVerzeichnisse) EachZettel(
+	f schnittstellen.FuncIter[*Transacted],
+) error {
+	return a.Each(
+		func(_ kennung.Etikett, st TransactedMutableSet) (err error) {
+			err = st.Each(
+				func(z *Transacted) (err error) {
+					err = f(z)
+					return
+				},
+			)
+
+			return
+		},
+	)
+}
+
+func (a SetPrefixVerzeichnisse) EachPair(
 	f func(kennung.Etikett, *Transacted) error,
 ) error {
 	return a.Each(

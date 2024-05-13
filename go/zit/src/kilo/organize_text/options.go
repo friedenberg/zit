@@ -156,10 +156,19 @@ func (o *Flags) GetOptions(
 	return o.Options
 }
 
-func (o Options) Factory() *Factory {
-	return &Factory{
-		Options: o,
+func (o Options) Make() (ot *Text, err error) {
+	c := &constructor{
+		Text: Text{
+			Options: o,
+		},
 	}
+
+	if ot, err = c.Make(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (o Options) refiner() *Refiner {

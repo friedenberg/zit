@@ -8,7 +8,7 @@ let zettel = expand("%")
 let g:markdown_syntax_conceal = 0
 
 if zettel != ""
-  let cmdFormat = "zit show -format typ.vim-syntax-type " . zettel
+  let cmdFormat = "$BIN_ZIT show -quiet -format typ.vim-syntax-type " . zettel
   let zettelTypSyntax = trim(system(cmdFormat))
 
   if v:shell_error

@@ -19,6 +19,14 @@ type etikettLike interface {
 
 type Path []*catgut.String
 
+func (a *Path) First() *catgut.String {
+	return (*a)[0]
+}
+
+func (a *Path) Last() *catgut.String {
+	return (*a)[a.Len()-1]
+}
+
 func (a *Path) Equals(b *Path) bool {
 	if a.Len() != b.Len() {
 		return false
@@ -39,10 +47,7 @@ func (p *Path) String() string {
 	afterFirst := false
 	for i := p.Len() - 1; i >= 0; i-- {
 		if afterFirst {
-			sb.WriteByte(' ')
-			sb.WriteByte('-')
-			sb.WriteByte('>')
-			sb.WriteByte(' ')
+			sb.WriteString(" -> ")
 		}
 
 		afterFirst = true
@@ -137,7 +142,6 @@ func (p *Path) ReadFrom(r io.Reader) (n int64, err error) {
 		}
 
 		_, err = (*p)[i].ReadNFrom(r, int(cl))
-
 		if err != nil {
 			err = errors.WrapExcept(err, io.EOF)
 			return
