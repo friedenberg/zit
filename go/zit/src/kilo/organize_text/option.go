@@ -26,6 +26,10 @@ func (ocf optionCommentFactory) Make(c string) (oc Option, err error) {
 	head, tail, found := strings.Cut(c, ":")
 
 	if !found {
+		if c == "abort" {
+			err = errors.New("aborting!")
+			return
+		}
 		// err = errors.New("':' not found")
 		return
 	}
