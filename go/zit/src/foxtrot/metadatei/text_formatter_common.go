@@ -18,7 +18,7 @@ type textFormatterCommon struct {
 	standort                   standort.Standort
 	akteFactory                schnittstellen.AkteReaderFactory
 	akteFormatter              script_config.RemoteScript
-	doNotWriteEmptyBezeichnung bool
+  TextFormatterOptions
 }
 
 func (f textFormatterCommon) writeComments(
@@ -74,7 +74,7 @@ func (f textFormatterCommon) writeCommonMetadateiFormat(
 	w := format.NewLineWriter()
 	m := c.GetMetadatei()
 
-	if m.Bezeichnung.String() != "" || !f.doNotWriteEmptyBezeichnung {
+	if m.Bezeichnung.String() != "" || !f.DoNotWriteEmptyBezeichnung {
 		w.WriteLines(
 			fmt.Sprintf("# %s", m.Bezeichnung),
 		)

@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -13,7 +14,7 @@ import (
 )
 
 type FileEncoder interface {
-	Encode(z *External) (err error)
+	Encode(options checkout_options.TextFormatterOptions, z *External) (err error)
 }
 
 type fileEncoder struct {
@@ -69,6 +70,7 @@ func (e *fileEncoder) openOrCreate(p string) (f *os.File, err error) {
 }
 
 func (e *fileEncoder) EncodeObjekte(
+	options checkout_options.TextFormatterOptions,
 	z *External,
 	objektePath string,
 	aktePath string,
@@ -87,6 +89,7 @@ func (e *fileEncoder) EncodeObjekte(
 	switch {
 	case aktePath != "" && objektePath != "":
 		mtw := metadatei.MakeTextFormatterMetadateiAktePath(
+			options,
 			e.arf,
 			nil,
 		)
@@ -162,11 +165,13 @@ func (e *fileEncoder) EncodeObjekte(
 
 		if inline {
 			mtw = metadatei.MakeTextFormatterMetadateiInlineAkte(
+				options,
 				e.arf,
 				nil,
 			)
 		} else {
 			mtw = metadatei.MakeTextFormatterMetadateiOnly(
+				options,
 				e.arf,
 				nil,
 			)
@@ -193,9 +198,11 @@ func (e *fileEncoder) EncodeObjekte(
 }
 
 func (e *fileEncoder) Encode(
+	options checkout_options.TextFormatterOptions,
 	z *External,
 ) (err error) {
 	return e.EncodeObjekte(
+		options,
 		z,
 		z.GetObjekteFD().GetPath(),
 		z.GetAkteFD().GetPath(),

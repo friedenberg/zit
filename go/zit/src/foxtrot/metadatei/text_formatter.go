@@ -14,6 +14,7 @@ type textFormatter struct {
 }
 
 func MakeTextFormatterMetadateiAktePath(
+	options TextFormatterOptions,
 	akteFactory schnittstellen.AkteReaderFactory,
 	akteFormatter script_config.RemoteScript,
 ) textFormatter {
@@ -22,8 +23,9 @@ func MakeTextFormatterMetadateiAktePath(
 	}
 
 	common := textFormatterCommon{
-		akteFactory:   akteFactory,
-		akteFormatter: akteFormatter,
+		akteFactory:                akteFactory,
+		akteFormatter:              akteFormatter,
+		TextFormatterOptions: options,
 	}
 
 	return textFormatter{
@@ -39,6 +41,7 @@ func MakeTextFormatterMetadateiAktePath(
 }
 
 func MakeTextFormatterMetadateiOnly(
+	options TextFormatterOptions,
 	akteFactory schnittstellen.AkteReaderFactory,
 	akteFormatter script_config.RemoteScript,
 ) textFormatter {
@@ -47,8 +50,9 @@ func MakeTextFormatterMetadateiOnly(
 	}
 
 	common := textFormatterCommon{
-		akteFactory:   akteFactory,
-		akteFormatter: akteFormatter,
+		akteFactory:                akteFactory,
+		akteFormatter:              akteFormatter,
+		TextFormatterOptions: options,
 	}
 
 	return textFormatter{
@@ -64,6 +68,7 @@ func MakeTextFormatterMetadateiOnly(
 }
 
 func MakeTextFormatterMetadateiInlineAkte(
+	options TextFormatterOptions,
 	akteFactory schnittstellen.AkteReaderFactory,
 	akteFormatter script_config.RemoteScript,
 ) textFormatter {
@@ -72,8 +77,9 @@ func MakeTextFormatterMetadateiInlineAkte(
 	}
 
 	common := textFormatterCommon{
-		akteFactory:   akteFactory,
-		akteFormatter: akteFormatter,
+		akteFactory:                akteFactory,
+		akteFormatter:              akteFormatter,
+		TextFormatterOptions: options,
 	}
 
 	return textFormatter{
@@ -91,6 +97,7 @@ func MakeTextFormatterMetadateiInlineAkte(
 }
 
 func MakeTextFormatterExcludeMetadatei(
+	options TextFormatterOptions,
 	akteFactory schnittstellen.AkteReaderFactory,
 	akteFormatter script_config.RemoteScript,
 ) textFormatter {
@@ -99,8 +106,9 @@ func MakeTextFormatterExcludeMetadatei(
 	}
 
 	common := textFormatterCommon{
-		akteFactory:   akteFactory,
-		akteFormatter: akteFormatter,
+		akteFactory:          akteFactory,
+		akteFormatter:        akteFormatter,
+		TextFormatterOptions: options,
 	}
 
 	return textFormatter{

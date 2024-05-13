@@ -337,7 +337,10 @@ func (s *Store) checkoutOne(
 		return
 	}
 
-	if err = s.fileEncoder.Encode(&cz.External); err != nil {
+	if err = s.fileEncoder.Encode(
+		options.TextFormatterOptions,
+		&cz.External,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

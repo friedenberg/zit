@@ -7,11 +7,7 @@ var (
 )
 
 func MakeErrStopIteration() error {
-	if IsVerbose() {
-		return WrapN(2, ErrStopIteration)
-	} else {
-		return ErrStopIteration
-	}
+	return ErrStopIteration
 }
 
 func IsStopIteration(err error) bool {

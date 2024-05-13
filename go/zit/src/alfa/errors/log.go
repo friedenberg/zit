@@ -26,7 +26,6 @@ type Logger interface {
 var (
 	cwd          string
 	isTest       bool
-	verbose      bool
 	maxCallDepth int
 )
 
@@ -40,19 +39,6 @@ func init() {
 	log_package.SetOutput(io.Discard)
 }
 
-func SetVerbose() {
-	printerLog.on = true
-	printerDebug.on = true
-	verbose = true
-	log_package.SetFlags(log_package.LstdFlags | log_package.Lshortfile | log_package.Lmicroseconds)
-	log_package.Print("verbose")
-}
-
-func IsVerbose() bool {
-	return verbose
-}
-
 func SetTesting() {
-	SetVerbose()
 	isTest = true
 }

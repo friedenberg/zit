@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/lua"
@@ -152,7 +153,13 @@ func (u *Umwelt) MakeFormatFunc(
 		}
 
 	case "text":
-		fo := akten.MakeTextFormatter(u.GetStore().GetStandort(), u.Konfig())
+		fo := akten.MakeTextFormatter(
+			checkout_options.TextFormatterOptions{
+				DoNotWriteEmptyBezeichnung: true,
+			},
+			u.GetStore().GetStandort(),
+			u.Konfig(),
+		)
 
 		f = func(tl *sku.Transacted) (err error) {
 			_, err = fo.WriteStringFormat(out, tl)

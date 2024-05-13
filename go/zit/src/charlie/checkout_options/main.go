@@ -12,6 +12,7 @@ type Options struct {
 	ForceInlineAkte bool
 	CheckoutMode    checkout_mode.Mode
 	AllowConflicted bool
+	TextFormatterOptions
 }
 
 func (c *Options) AddToFlagSet(f *flag.FlagSet) {

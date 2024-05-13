@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
+	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
@@ -12,22 +13,24 @@ import (
 )
 
 func MakeTextFormatter(
+	options checkout_options.TextFormatterOptions,
 	af schnittstellen.AkteReaderFactory,
 	k Konfig,
 ) textFormatter {
-	return MakeTextFormatterWithAkteFormatter(af, k, nil)
+	return MakeTextFormatterWithAkteFormatter(options, af, k, nil)
 }
 
 func MakeTextFormatterWithAkteFormatter(
+	options checkout_options.TextFormatterOptions,
 	af schnittstellen.AkteReaderFactory,
 	k Konfig,
 	akteFormatter script_config.RemoteScript,
 ) textFormatter {
 	return textFormatter{
 		k:                 k,
-		fMetadateiAndAkte: metadatei.MakeTextFormatterMetadateiInlineAkte(af, akteFormatter),
-		fMetadateiOnly:    metadatei.MakeTextFormatterMetadateiOnly(af, akteFormatter),
-		fAkteOnly:         metadatei.MakeTextFormatterExcludeMetadatei(af, akteFormatter),
+		fMetadateiAndAkte: metadatei.MakeTextFormatterMetadateiInlineAkte(options, af, akteFormatter),
+		fMetadateiOnly:    metadatei.MakeTextFormatterMetadateiOnly(options, af, akteFormatter),
+		fAkteOnly:         metadatei.MakeTextFormatterExcludeMetadatei(options, af, akteFormatter),
 	}
 }
 

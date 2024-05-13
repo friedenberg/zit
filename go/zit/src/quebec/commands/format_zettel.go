@@ -5,6 +5,8 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
+	"code.linenisgreat.com/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/typ_akte"
@@ -78,6 +80,9 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	f := akten.MakeTextFormatterWithAkteFormatter(
+		checkout_options.TextFormatterOptions{
+			DoNotWriteEmptyBezeichnung: true,
+		},
 		u.Standort(),
 		u.Konfig(),
 		akteFormatter,
@@ -142,6 +147,7 @@ func (c *FormatZettel) getAkteFormatter(
 	formatId string,
 ) (akteFormatter script_config.RemoteScript, err error) {
 	if zt.GetTyp().IsEmpty() {
+		ui.Log().Print("empty typ")
 		return
 	}
 
@@ -167,38 +173,47 @@ func (c *FormatZettel) getAkteFormatter(
 	ok := false
 
 	if c.UTIGroup == "" {
-		return
-	}
+		akteFormatter, ok = typAkte.Formatters[actualFormatId]
 
-	var g typ_akte.FormatterUTIGroup
-	g, ok = typAkte.FormatterUTIGroups[c.UTIGroup]
+		if !ok {
+			ui.Log().Print("no matching format id")
+			akteFormatter = nil
+			// TODO-P2 allow option to error on missing format
+			// err = errors.Normalf("no format id %q", actualFormatId)
+			// return
+		}
+	} else {
+		var g typ_akte.FormatterUTIGroup
+		g, ok = typAkte.FormatterUTIGroups[c.UTIGroup]
 
-	if !ok {
-		err = errors.Errorf("no uti group: %q", c.UTIGroup)
-		return
-	}
+		if !ok {
+			err = errors.Errorf("no uti group: %q", c.UTIGroup)
+			return
+		}
 
-	ft, ok := g.Map()[formatId]
+		ft, ok := g.Map()[formatId]
 
-	if !ok {
-		err = errors.Errorf(
-			"no format id %q for uti group %q",
-			formatId,
-			c.UTIGroup,
-		)
+		if !ok {
+			err = errors.Errorf(
+				"no format id %q for uti group %q",
+				formatId,
+				c.UTIGroup,
+			)
 
-		return
-	}
+			return
+		}
 
-	actualFormatId = ft
+		actualFormatId = ft
 
-	akteFormatter, ok = typAkte.Formatters[actualFormatId]
+		akteFormatter, ok = typAkte.Formatters[actualFormatId]
 
-	if !ok {
-		akteFormatter = nil
-		// TODO-P2 allow option to error on missing format
-		// err = errors.Normalf("no format id %q", actualFormatId)
-		// return
+		if !ok {
+			ui.Log().Print("no matching format id")
+			akteFormatter = nil
+			// TODO-P2 allow option to error on missing format
+			// err = errors.Normalf("no format id %q", actualFormatId)
+			// return
+		}
 	}
 
 	return

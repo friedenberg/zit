@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/bravo/todo"
+	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/sha"
@@ -45,12 +46,18 @@ func (c Diff) RunWithQuery(
 	u *umwelt.Umwelt,
 	qg *query.Group,
 ) (err error) {
+	co := checkout_options.TextFormatterOptions{
+		DoNotWriteEmptyBezeichnung: true,
+	}
+
 	fInline := metadatei.MakeTextFormatterMetadateiInlineAkte(
+		co,
 		u.Standort(),
 		nil,
 	)
 
 	fMetadatei := metadatei.MakeTextFormatterMetadateiOnly(
+		co,
 		u.Standort(),
 		nil,
 	)

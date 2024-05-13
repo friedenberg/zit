@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 )
 
 var (
@@ -15,7 +16,7 @@ var (
 )
 
 func makeErrWithBytes(err error, bs []byte) error {
-	if errors.IsVerbose() {
+	if ui.IsVerbose() {
 		return errors.WrapN(1, errWithBytes{error: err, bytes: bs})
 	}
 

@@ -102,7 +102,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	errors.TodoP4("find a better place for this")
 	{
 		if u.erworbenCli.Verbose && !u.erworbenCli.Quiet {
-			errors.SetVerbose()
+			ui.SetVerbose()
 		} else {
 			ui.SetOutput(io.Discard)
 		}

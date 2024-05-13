@@ -9,7 +9,29 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 )
 
-var SetOutput = log.SetOutput
+var (
+	SetOutput = log.SetOutput
+	verbose   bool
+	isTest    bool
+)
+
+func SetVerbose() {
+	printerLog.on = true
+	printerDebug.on = true
+	verbose = true
+	log.SetFlags(log.LstdFlags | log.Lshortfile | log.Lmicroseconds)
+	log.Print("verbose")
+}
+
+func SetTesting() {
+	isTest = true
+	errors.SetTesting()
+	SetVerbose()
+}
+
+func IsVerbose() bool {
+	return verbose
+}
 
 type ProdPrinter interface {
 	Print(v ...interface{}) error

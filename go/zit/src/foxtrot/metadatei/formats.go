@@ -20,6 +20,7 @@ func MakeTextFormat(
 			akteFormatter,
 		),
 		TextFormatter: MakeTextFormatterMetadateiOnly(
+			TextFormatterOptions{},
 			akteFactory,
 			akteFormatter,
 		),
