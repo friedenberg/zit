@@ -370,18 +370,18 @@ func (qg *Group) String() string {
 	return sb.String()
 }
 
-func (qg *Group) ContainsSku(sk *sku.Transacted) bool {
+func (qg *Group) ContainsSku(sk *sku.Transacted) (ok bool) {
+	defer sk.Metadatei.Verzeichnisse.QueryPath.PushOnOk(qg, &ok)
 	g := sk.GetGattung()
 
 	q, ok := qg.OptimizedQueries[gattung.Must(g)]
 
-	if !ok {
-		return false
+	if !ok || !q.ContainsSku(sk) {
+    ok = false
+		return
 	}
 
-	if !q.ContainsSku(sk) {
-		return false
-	}
+	ok = true
 
-	return true
+	return
 }

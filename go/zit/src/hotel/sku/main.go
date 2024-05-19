@@ -4,7 +4,6 @@ import (
 	"encoding/gob"
 
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -24,29 +23,8 @@ type (
 		ReadOneKennungSha(kennung.Kennung) (*sha.Sha, error)
 	}
 
-	Queryable interface {
-		ContainsSku(*Transacted) bool
-	}
-
-	Query interface {
-		Queryable
-		schnittstellen.Stringer
-		Each(schnittstellen.FuncIter[Query]) error
-	}
-
-	QueryWithSigilAndKennung interface {
-		Query
-		GetSigil() kennung.Sigil
-		ContainsKennung(*kennung.Kennung2) bool
-	}
-
 	TransactedAdder interface {
 		AddTransacted(*Transacted) error
-	}
-
-	QueryGroup interface {
-		Query
-		Get(gattung.Gattung) (QueryWithSigilAndKennung, bool)
 	}
 
 	SkuLike interface {

@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -31,27 +30,46 @@ func (k Kennung) Reduce(b *Builder) (err error) {
 }
 
 // TODO support exact
-func (k Kennung) ContainsSku(sk *sku.Transacted) bool {
+func (k Kennung) ContainsSku(sk *sku.Transacted) (ok bool) {
+	defer sk.Metadatei.Verzeichnisse.QueryPath.PushOnOk(k, &ok)
+
 	me := sk.GetMetadatei()
 	switch k.GetGattung() {
 	case gattung.Etikett:
-		s := k.String()
+		if k.useEtikettenPaths {
+			kps := k.PartsStrings()
 
-		if me.GetEtiketten().ContainsKey(s) {
-			return true
-		}
+			var idx int
+			idx, ok = me.Verzeichnisse.Etiketten.ContainsEtikett(kps.Right)
 
-		if me.Verzeichnisse.GetExpandedEtiketten().ContainsKey(s) {
-			return true
-		}
+			if ok {
+				ps := me.Verzeichnisse.Etiketten.All[idx]
+				sk.Metadatei.Verzeichnisse.QueryPath.Push(ps.Parents)
+				return
+			}
+		} else {
+			s := k.String()
 
-		if me.Verzeichnisse.GetImplicitEtiketten().ContainsKey(s) {
-			return true
+			if me.GetEtiketten().ContainsKey(s) {
+				ok = true
+				return
+			}
+
+			if me.Verzeichnisse.GetExpandedEtiketten().ContainsKey(s) {
+				ok = true
+				return
+			}
+
+			if me.Verzeichnisse.GetImplicitEtiketten().ContainsKey(s) {
+				ok = true
+				return
+			}
 		}
 
 	case gattung.Typ:
 		if kennung.Contains(me.GetTyp(), k) {
-			return true
+			ok = true
+			return
 		}
 
 		// case kennung.ShaLike:
@@ -63,10 +81,12 @@ func (k Kennung) ContainsSku(sk *sku.Transacted) bool {
 	idl := &sk.Kennung
 
 	if !kennung.Contains(idl, k) {
-		return false
+		return
 	}
 
-	return true
+	ok = true
+
+	return
 }
 
 func (k Kennung) String() string {
@@ -83,12 +103,4 @@ func (k Kennung) String() string {
 	sb.WriteString(kennung.FormattedString(k.Kennung2))
 
 	return sb.String()
-}
-
-func (k Kennung) Each(_ schnittstellen.FuncIter[sku.Query]) error {
-	return nil
-}
-
-func (k Kennung) MatcherLen() int {
-	return 1
 }
