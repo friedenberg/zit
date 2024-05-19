@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/collections_ptr"
+	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/bezeichnung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -139,6 +140,7 @@ func (z *Metadatei) GetEtikettenMutable() kennung.EtikettMutableSet {
 
 func (z *Metadatei) AddEtikettPtr(e *kennung.Etikett) (err error) {
 	kennung.AddNormalizedEtikett(z.GetEtikettenMutable(), e)
+	z.Verzeichnisse.Etiketten.AddEtikett(catgut.MakeFromString(e.String()))
 	return
 	// return iter.AddClonePool[kennung.Etikett, *kennung.Etikett](
 	// 	z.GetEtikettenMutable(),

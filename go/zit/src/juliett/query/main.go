@@ -214,28 +214,32 @@ func (q *Query) ShouldHide(sk *sku.Transacted, k string) bool {
 	return q.Hidden.ContainsSku(sk)
 }
 
-func (q *Query) ContainsSku(sk *sku.Transacted) bool {
+func (q *Query) ContainsSku(sk *sku.Transacted) (ok bool) {
+	defer sk.Metadatei.Verzeichnisse.QueryPath.PushOnOk(q, &ok)
 	k := sk.Kennung.String()
 
 	if q.ShouldHide(sk, k) {
-		return false
+    return
 	}
 
 	g := gattung.Must(sk)
 
 	if !q.Gattung.ContainsOneOf(g) {
-		return false
+    return
 	}
 
-	if _, ok := q.Kennung[k]; ok {
-		return true
+	if _, ok = q.Kennung[k]; ok {
+		return
 	}
 
 	if len(q.Children) == 0 {
-		return len(q.Kennung) == 0 && q.MatchOnEmpty
+		ok = len(q.Kennung) == 0 && q.MatchOnEmpty
+		return
 	} else if !q.Exp.ContainsSku(sk) {
-		return false
+		return
 	}
 
-	return true
+  ok = true
+
+	return
 }
