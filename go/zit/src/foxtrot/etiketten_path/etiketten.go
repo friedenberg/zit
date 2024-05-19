@@ -40,6 +40,10 @@ func (es *Etiketten) Swap(i, j int) {
 }
 
 func (es *Etiketten) AddEtikett(e *Etikett) (err error) {
+	if e.IsEmpty() {
+		return
+	}
+
 	p := MakePath(e)
 
 	if err = es.AddPath(p); err != nil {

@@ -170,6 +170,10 @@ func (str *String) Len() int {
 }
 
 func (str *String) IsEmpty() bool {
+	if str == nil {
+		return true
+	}
+
 	str.copyCheck()
 	return str.data.Len() == 0
 }
@@ -197,6 +201,10 @@ func (str *String) Available() int {
 }
 
 func (str *String) Bytes() []byte {
+	if str == nil {
+		return nil
+	}
+
 	str.copyCheck()
 	return str.data.Bytes()
 }

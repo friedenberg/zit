@@ -23,6 +23,14 @@ func MakePath(els ...*Etikett) *Path {
 	return &p
 }
 
+func (a *Path) IsEmpty() bool {
+	if a == nil {
+		return true
+	}
+
+	return a.Len() == 0
+}
+
 func (a *Path) First() *Etikett {
 	return (*a)[0]
 }
@@ -143,6 +151,10 @@ func (p *Path) Swap(i, j int) {
 }
 
 func (p *Path) Add(e *Etikett) {
+	if e.IsEmpty() {
+		return
+	}
+
 	*p = append(*p, catgut.GetPool().Get())
 	(*p)[p.Len()-1].SetBytes(e.Bytes())
 	sort.Sort(p)
