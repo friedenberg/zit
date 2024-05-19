@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/charlie/collections_ptr"
-	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
@@ -131,23 +130,24 @@ func (o *Flags) GetOptions(
 	} else {
 		o.rootEtiketten = q.GetEtiketten()
 
-		ks := collections_value.MakeMutableValueSet[sku.Query](nil)
+		// TODO handle negated
+		// ks := collections_value.MakeMutableValueSet[sku.Query](nil)
 
-		if err := query.VisitAllMatchers(
-			func(m sku.Query) (err error) {
-				if e, ok := m.(*query.Exp); ok && e.Negated {
-					return ks.Add(e)
-				}
+		// if err := query.VisitAllMatchers(
+		// 	func(m sku.Query) (err error) {
+		// 		if e, ok := m.(*query.Exp); ok && e.Negated {
+		// 			return ks.Add(e)
+		// 		}
 
-				return
-			},
-			// TODO-P1 modify sigil matcher to allow child traversal
-			q,
-		); err != nil {
-			errors.PanicIfError(err)
-		}
+		// 		return
+		// 	},
+		// 	// TODO-P1 modify sigil matcher to allow child traversal
+		// 	q,
+		// ); err != nil {
+		// 	errors.PanicIfError(err)
+		// }
 
-		o.commentMatchers = ks
+		// o.commentMatchers = ks
 	}
 
 	o.PrintOptions = printOptions

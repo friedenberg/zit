@@ -5,8 +5,14 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/zit/src/bravo/test_logz"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/catgut"
 )
+
+func TestMain(m *testing.M) {
+	ui.SetTesting()
+	m.Run()
+}
 
 func TestReadWrite(t1 *testing.T) {
 	t := test_logz.T{T: t1}

@@ -88,7 +88,7 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 				return
 			}
 
-			for _, ep := range sk.Metadatei.Verzeichnisse.Etiketten {
+			for _, ep := range sk.Metadatei.Verzeichnisse.Etiketten.Paths {
 				if ep.Len() == 1 {
 					continue
 				}

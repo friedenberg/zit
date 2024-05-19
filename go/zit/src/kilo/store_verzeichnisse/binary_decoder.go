@@ -360,7 +360,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-		sk.Metadatei.Verzeichnisse.AddPath(&e)
+		sk.Metadatei.Verzeichnisse.Etiketten.AddPath(&e)
 
 	default:
 		// panic(fmt.Sprintf("unsupported key: %s", key))

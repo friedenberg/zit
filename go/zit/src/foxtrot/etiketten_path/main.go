@@ -7,23 +7,27 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/src/delta/catgut"
 )
 
-type etikettLike interface {
-	schnittstellen.Stringer
-	Bytes() []byte
+type Path []*Etikett
+
+func MakePath(els ...*Etikett) *Path {
+	p := Path(make([]*Etikett, 0, len(els)))
+
+	for _, e := range els {
+		p.Add(e)
+	}
+
+	return &p
 }
 
-type Path []*catgut.String
-
-func (a *Path) First() *catgut.String {
+func (a *Path) First() *Etikett {
 	return (*a)[0]
 }
 
-func (a *Path) Last() *catgut.String {
+func (a *Path) Last() *Etikett {
 	return (*a)[a.Len()-1]
 }
 
@@ -39,6 +43,40 @@ func (a *Path) Equals(b *Path) bool {
 	}
 
 	return true
+}
+
+func (a *Path) Compare(b *Path) int {
+	elsA := *a
+	elsB := *b
+
+	for {
+		lenA, lenB := len(elsA), len(elsB)
+
+		switch {
+		case lenA == 0 && lenB == 0:
+			return 0
+
+		case lenA == 0:
+			return -1
+
+		case lenB == 0:
+			return 1
+		}
+
+		elA := elsA[0]
+		elsA = elsA[1:]
+
+		elB := elsB[0]
+		elsB = elsB[1:]
+
+		cmp := elA.Compare(elB)
+
+		if cmp != 0 {
+			return cmp
+		}
+	}
+
+	return 0
 }
 
 func (p *Path) String() string {
@@ -61,7 +99,7 @@ func (p *Path) String() string {
 
 func (a *Path) Copy() (b *Path) {
 	b = &Path{}
-	*b = make([]*catgut.String, a.Len())
+	*b = make([]*Etikett, a.Len())
 
 	if a == nil {
 		return
@@ -98,13 +136,13 @@ func (p *Path) Less(i, j int) bool {
 
 func (p *Path) Swap(i, j int) {
 	a, b := (*p)[i], (*p)[j]
-	var x catgut.String
+	var x Etikett
 	x.SetBytes(a.Bytes())
 	a.SetBytes(b.Bytes())
 	b.SetBytes(x.Bytes())
 }
 
-func (p *Path) Add(e etikettLike) {
+func (p *Path) Add(e *Etikett) {
 	*p = append(*p, catgut.GetPool().Get())
 	(*p)[p.Len()-1].SetBytes(e.Bytes())
 	sort.Sort(p)
@@ -124,7 +162,7 @@ func (p *Path) ReadFrom(r io.Reader) (n int64, err error) {
 	*p = (*p)[:p.Cap()]
 
 	if diff := count - uint8(p.Len()); diff > 0 {
-		*p = append(*p, make([]*catgut.String, diff)...)
+		*p = append(*p, make([]*Etikett, diff)...)
 	}
 
 	for i := uint8(0); i < count; i++ {

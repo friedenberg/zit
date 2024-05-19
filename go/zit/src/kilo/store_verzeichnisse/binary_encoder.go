@@ -213,7 +213,7 @@ func (bf *binaryEncoder) writeFieldKey(
 	case schlussel.VerzeichnisseEtiketten:
 		es := sk.Metadatei.Verzeichnisse.Etiketten
 
-		for _, e := range es {
+		for _, e := range es.Paths {
 			var n1 int64
 			n1, err = bf.writeFieldWriterTo(e)
 			n += n1
@@ -255,7 +255,6 @@ func (bf *binaryEncoder) writeFieldWriterTo(
 	wt io.WriterTo,
 ) (n int64, err error) {
 	_, err = wt.WriteTo(&bf.Content)
-
 	if err != nil {
 		return
 	}

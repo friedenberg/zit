@@ -1,8 +1,9 @@
 package metadatei
 
 import (
+	"slices"
+
 	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/foxtrot/etiketten_path"
 )
 
 var Resetter resetter
@@ -40,16 +41,19 @@ var ResetterVerzeichnisse resetterVerzeichnisse
 type resetterVerzeichnisse struct{}
 
 func (resetterVerzeichnisse) Reset(a *Verzeichnisse) {
-	a.Etiketten = a.Etiketten[:0]
+	a.Etiketten.Reset()
 	a.Archiviert.Reset()
 	a.SetExpandedEtiketten(nil)
 	a.SetImplicitEtiketten(nil)
+	a.QueryPath.Reset()
 }
 
 func (resetterVerzeichnisse) ResetWith(a, b *Verzeichnisse) {
-	a.Etiketten = make([]*etiketten_path.Path, len(b.Etiketten))
-	copy(a.Etiketten, b.Etiketten)
+	a.Etiketten.ResetWith(&b.Etiketten)
 	a.Archiviert.ResetWith(b.Archiviert)
 	a.SetExpandedEtiketten(b.GetExpandedEtiketten())
 	a.SetImplicitEtiketten(b.GetImplicitEtiketten())
+	a.QueryPath.Reset()
+	a.QueryPath = slices.Grow(a.QueryPath, b.QueryPath.Len())
+	copy(a.QueryPath, b.QueryPath)
 }

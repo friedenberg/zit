@@ -41,6 +41,34 @@ func (u *Umwelt) MakeFormatFunc(
 	}
 
 	switch v {
+	case "etiketten-path":
+		f = func(tl *sku.Transacted) (err error) {
+			if _, err = fmt.Fprintln(
+				out,
+				tl.GetKennung(),
+				tl.Metadatei.Verzeichnisse.Etiketten,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+	case "query-path":
+		f = func(tl *sku.Transacted) (err error) {
+			if _, err = fmt.Fprintln(
+				out,
+				tl.GetKennung(),
+				tl.Metadatei.Verzeichnisse.QueryPath,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
 	case "organize":
 		p := u.SkuFmtOrganize()
 
@@ -72,8 +100,15 @@ func (u *Umwelt) MakeFormatFunc(
 
 	case "etiketten-all":
 		f = func(tl *sku.Transacted) (err error) {
-			for _, es := range tl.Metadatei.Verzeichnisse.Etiketten {
-				if _, err = fmt.Fprintln(out, tl.GetKennung(), "->", es); err != nil {
+			for _, es := range tl.Metadatei.Verzeichnisse.Etiketten.Paths {
+				if _, err = fmt.Fprintf(out, "%s: %s\n", tl.GetKennung(), es); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
+			for _, es := range tl.Metadatei.Verzeichnisse.Etiketten.All {
+				if _, err = fmt.Fprintf(out, "%s: %s -> %s\n", tl.GetKennung(), es.Etikett, es.Parents); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

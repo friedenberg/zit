@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/typ_akte"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -70,12 +71,12 @@ func (k *Compiled) addImplicitEtiketten(
 
 	addImpEts := func(e *kennung.Etikett) (err error) {
 		p1 := p.Copy()
-		p1.Add(e)
+		p1.Add(catgut.MakeFromString(e.String()))
 
 		impl := k.GetImplicitEtiketten(e)
 
 		if impl.Len() == 0 {
-			sk.Metadatei.Verzeichnisse.AddPath(p1)
+			sk.Metadatei.Verzeichnisse.Etiketten.AddPath(p1)
 			return
 		}
 
@@ -84,8 +85,8 @@ func (k *Compiled) addImplicitEtiketten(
 				ie.AddPtr,
 				func(e1 *kennung.Etikett) (err error) {
 					p2 := p1.Copy()
-					p2.Add(e1)
-					sk.Metadatei.Verzeichnisse.AddPath(p2)
+					p2.Add(catgut.MakeFromString(e1.String()))
+					sk.Metadatei.Verzeichnisse.Etiketten.AddPath(p2)
 					return
 				},
 			),

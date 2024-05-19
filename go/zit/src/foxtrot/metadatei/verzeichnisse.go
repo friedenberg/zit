@@ -12,17 +12,8 @@ type Verzeichnisse struct {
 	Archiviert        values.Bool
 	ExpandedEtiketten kennung.EtikettMutableSet // public for gob, but should be private
 	ImplicitEtiketten kennung.EtikettMutableSet // public for gob, but should be private
-	Etiketten         []*etiketten_path.Path
-}
-
-func (v *Verzeichnisse) AddPath(p *etiketten_path.Path) {
-	for _, p1 := range v.Etiketten {
-		if p1.Equals(p) {
-			return
-		}
-	}
-
-	v.Etiketten = append(v.Etiketten, p.Copy())
+	Etiketten         etiketten_path.Etiketten
+	QueryPath
 }
 
 func (v *Verzeichnisse) GetExpandedEtiketten() kennung.EtikettSet {
@@ -62,7 +53,7 @@ func (v *Verzeichnisse) GetImplicitEtiketten() kennung.EtikettSet {
 }
 
 func (v *Verzeichnisse) AddEtikettImplicitPtr(e *kennung.Etikett) (err error) {
-	return iter.AddClonePool[kennung.Etikett, *kennung.Etikett](
+	return iter.AddClonePool(
 		v.GetImplicitEtikettenMutable(),
 		kennung.GetEtikettPool(),
 		kennung.EtikettResetter,
