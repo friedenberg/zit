@@ -243,6 +243,7 @@ func (u *Umwelt) makeQueryBuilder() *query.Builder {
 		u.GetStore().GetVerzeichnisse(),
 		u.GetChrestStore(),
 		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
+		&u.konfig,
 	)
 }
 

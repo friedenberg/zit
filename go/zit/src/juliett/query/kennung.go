@@ -12,6 +12,8 @@ import (
 )
 
 type Kennung struct {
+	useEtikettenPaths bool
+
 	Exact   bool
 	Virtual bool
 	Debug   bool

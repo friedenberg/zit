@@ -274,7 +274,6 @@ func (bf *binaryEncoder) writeFieldBinaryMarshaler(
 	var b []byte
 
 	b, err = bm.MarshalBinary()
-
 	if err != nil {
 		err = errors.Wrap(err)
 		return
@@ -304,13 +303,11 @@ func (bf *binaryEncoder) writeFieldByteReader(
 	var b byte
 
 	b, err = br.ReadByte()
-
 	if err != nil {
 		return
 	}
 
 	err = bf.Content.WriteByte(b)
-
 	if err != nil {
 		return
 	}
