@@ -207,18 +207,22 @@ func (m *Exp) negateIfNecessary(v bool) bool {
 	}
 }
 
-func (e *Exp) ContainsSku(sk *sku.Transacted) bool {
+func (e *Exp) ContainsSku(sk *sku.Transacted) (ok bool) {
 	ui.Log().Printf("%s in %s", sk, e)
+	defer sk.Metadatei.Verzeichnisse.QueryPath.PushOnOk(e, &ok)
 
 	if len(e.Children) == 0 {
-		return e.negateIfNecessary(e.MatchOnEmpty)
+		ok = e.negateIfNecessary(e.MatchOnEmpty)
+		return
 	}
 
 	if e.Or {
-		return e.containsMatchableOr(sk)
+		ok = e.containsMatchableOr(sk)
 	} else {
-		return e.containsMatchableAnd(sk)
+		ok = e.containsMatchableAnd(sk)
 	}
+
+	return
 }
 
 func (e *Exp) containsMatchableAnd(sk *sku.Transacted) bool {
