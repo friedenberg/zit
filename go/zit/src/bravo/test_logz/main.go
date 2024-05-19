@@ -20,7 +20,10 @@ type T struct {
 }
 
 func (t *T) SkipTest(args ...any) {
-	t.ui(1, args...)
+	if len(args) > 0 {
+		t.ui(1, args...)
+	}
+
 	t.SkipNow()
 }
 

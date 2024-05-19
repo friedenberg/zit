@@ -133,7 +133,7 @@ func (s *Store) tryCommit(
 	}
 
 	if mode.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
-		ui.Log().Printf("adding to bestandsaufnahme", mode, kinder)
+		ui.Log().Print("adding to bestandsaufnahme", mode, kinder)
 		if err = s.commitTransacted(kinder, mutter); err != nil {
 			err = errors.Wrap(err)
 			return

@@ -88,6 +88,77 @@ func (b *String) copyCheck() {
 	}
 }
 
+func (a *String) ComparePartial(b *String) int {
+	return a.compare(b, true)
+}
+
+func (a *String) Compare(b *String) int {
+	return a.compare(b, false)
+}
+
+func (a *String) compare(b *String, partial bool) int {
+	a.copyCheck()
+
+	byA := a.Bytes()
+	byB := b.Bytes()
+
+	lenA, lenB := a.Len(), b.Len()
+
+	switch {
+	case lenA == 0 && lenB == 0:
+		return 0
+
+	case lenA == 0:
+		return -1
+
+	case lenB == 0:
+		return 1
+	}
+
+	for {
+		lenA, lenB := len(byA), len(byB)
+
+		switch {
+		case lenA == 0 && lenB == 0:
+			return 0
+
+		case lenA == 0:
+			if partial {
+				return 0
+			} else {
+				return -1
+			}
+
+		case lenB == 0:
+			if partial {
+				return 0
+			} else {
+				return 1
+			}
+		}
+
+		runeA, widthA := utf8.DecodeRune(byA)
+		byA = byA[widthA:]
+
+		if runeA == utf8.RuneError {
+			panic("not a valid utf8 string")
+		}
+
+		runeB, widthB := utf8.DecodeRune(byB)
+		byB = byB[widthB:]
+
+		if runeB == utf8.RuneError {
+			panic("not a valid utf8 string")
+		}
+
+		if runeA < runeB {
+			return -1
+		} else if runeA > runeB {
+			return 1
+		}
+	}
+}
+
 func (str *String) String() string {
 	str.copyCheck()
 	return str.data.String()
@@ -334,6 +405,10 @@ func (src *String) MarshalText() ([]byte, error) {
 }
 
 func (src *String) UnmarshalText(b []byte) error {
+	if src == nil {
+		src = &String{}
+	}
+
 	src.SetBytes(b)
 	return nil
 }
@@ -343,6 +418,10 @@ func (src *String) MarshalBinary() ([]byte, error) {
 }
 
 func (src *String) UnmarshalBinary(b []byte) error {
+	if src == nil {
+		src = &String{}
+	}
+
 	src.SetBytes(b)
 	return nil
 }

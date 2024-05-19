@@ -174,6 +174,10 @@ func WriteMetadateiKeyTo(
 	case keyEtikett:
 		es := m.GetEtiketten()
 
+		if es == nil {
+			break
+		}
+
 		for _, e := range iter.SortedValues(es) {
 			if e.IsVirtual() {
 				continue
@@ -294,7 +298,6 @@ func writeShaKeyIfNotNull(
 		key.String(),
 		sh.String(),
 	)
-
 	if err != nil {
 		err = errors.Wrap(err)
 		return
@@ -334,7 +337,6 @@ func WriteMetadatei(w io.Writer, f FormatGeneric, c FormatterContext) (sh *Sha, 
 	sw := sha.MakeWriter(w)
 
 	_, err = f.WriteMetadateiTo(sw, c)
-
 	if err != nil {
 		err = errors.Wrap(err)
 		return
@@ -367,7 +369,6 @@ func GetShaForContextDebug(
 	sw := sha.MakeWriter(&sb)
 
 	_, err = f.WriteMetadateiTo(sw, c)
-
 	if err != nil {
 		err = errors.Wrap(err)
 		return

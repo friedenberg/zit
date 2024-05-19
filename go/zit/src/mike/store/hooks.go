@@ -14,6 +14,10 @@ func (s *Store) tryNewHook(
 	kinder *sku.Transacted,
 	mode objekte_mode.Mode,
 ) (err error) {
+	if mode == objekte_mode.ModeEmpty {
+		return
+	}
+
 	var t *sku.Transacted
 
 	if t, err = s.ReadOneKennung(kinder.GetTyp()); err != nil {
@@ -112,6 +116,10 @@ func (s *Store) tryPreCommitHooks(
 	mutter *sku.Transacted,
 	mode objekte_mode.Mode,
 ) (err error) {
+	if mode == objekte_mode.ModeEmpty {
+		return
+	}
+
 	type hook struct {
 		script      string
 		description string
@@ -169,6 +177,10 @@ func (s *Store) tryPreCommitHook(
 	mode objekte_mode.Mode,
 	script string,
 ) (err error) {
+	if mode == objekte_mode.ModeEmpty {
+		return
+	}
+
 	var vp *lua.VMPool
 
 	if vp, err = s.MakeLuaVMPool(script); err != nil {

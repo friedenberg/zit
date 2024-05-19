@@ -27,6 +27,7 @@ type Cli struct {
 	AllowMissingHinweis  bool
 	CheckoutCacheEnabled bool
 	PredictableHinweisen bool
+	EtikettenPaths       bool
 
 	PrintOptions, maskPrintOptions erworben_cli_print_options.PrintOptions
 	ToolOptions                    erworben_tools.Tools
@@ -67,6 +68,13 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 		"predictable-hinweisen",
 		false,
 		"don't randomly select new hinweisen",
+	)
+
+	f.BoolVar(
+		&c.EtikettenPaths,
+		"etiketten-paths",
+		false,
+		"use new etiketten paths for queries",
 	)
 
 	f.BoolVar(
