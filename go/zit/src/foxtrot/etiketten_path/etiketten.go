@@ -55,6 +55,10 @@ func (es *Etiketten) AddEtikett(e *Etikett) (err error) {
 }
 
 func (es *Etiketten) AddPath(p *Path) (err error) {
+  if p.IsEmpty() {
+    return
+  }
+
 	idx, ok := es.ContainsPath(p)
 
 	if ok {

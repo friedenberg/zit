@@ -15,7 +15,6 @@ import (
 	"code.linenisgreat.com/zit/src/echo/zittish"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/akten"
-	"code.linenisgreat.com/zit/src/juliett/konfig"
 )
 
 func MakeBuilder(
@@ -24,7 +23,6 @@ func MakeBuilder(
 	ennui sku.Ennui,
 	chrome *VirtualStoreInitable,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
-	k *konfig.Compiled,
 ) (b *Builder) {
 	b = &Builder{
 		standort:                   s,
@@ -34,7 +32,6 @@ func MakeBuilder(
 		virtualStores:              make(map[string]*VirtualStoreInitable),
 		virtualEtikettenBeforeInit: make(map[string]string),
 		virtualEtiketten:           make(map[string]Lua),
-		useNewKennung:              k.EtikettenPaths,
 	}
 
 	if chrome != nil {
@@ -64,7 +61,6 @@ type Builder struct {
 	doNotMatchEmpty            bool
 	debug                      bool
 	requireNonEmptyQuery       bool
-	useNewKennung              bool
 }
 
 func (b *Builder) WithPermittedSigil(s kennung.Sigil) *Builder {
@@ -440,8 +436,7 @@ LOOP:
 			}
 		} else {
 			k := Kennung{
-				Kennung2:          kennung.GetKennungPool().Get(),
-				useEtikettenPaths: b.useNewKennung,
+				Kennung2: kennung.GetKennungPool().Get(),
 			}
 
 			if err = k.Set(el); err != nil {

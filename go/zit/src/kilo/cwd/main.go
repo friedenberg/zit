@@ -253,7 +253,7 @@ func (fs CwdFiles) All(
 ) (err error) {
 	wg := iter.MakeErrorWaitGroupParallel()
 
-	iter.ErrorWaitGroupApply[*Zettel](
+	iter.ErrorWaitGroupApply(
 		wg,
 		fs.Zettelen,
 		func(e *Zettel) (err error) {
@@ -261,7 +261,7 @@ func (fs CwdFiles) All(
 		},
 	)
 
-	iter.ErrorWaitGroupApply[*Typ](
+	iter.ErrorWaitGroupApply(
 		wg,
 		fs.Typen,
 		func(e *Typ) (err error) {
@@ -269,7 +269,7 @@ func (fs CwdFiles) All(
 		},
 	)
 
-	iter.ErrorWaitGroupApply[*Kasten](
+	iter.ErrorWaitGroupApply(
 		wg,
 		fs.Kisten,
 		func(e *Kasten) (err error) {
@@ -277,7 +277,7 @@ func (fs CwdFiles) All(
 		},
 	)
 
-	iter.ErrorWaitGroupApply[*Etikett](
+	iter.ErrorWaitGroupApply(
 		wg,
 		fs.Etiketten,
 		func(e *Etikett) (err error) {
@@ -289,7 +289,7 @@ func (fs CwdFiles) All(
 }
 
 func (fs CwdFiles) ZettelFiles() (out []string, err error) {
-	out, err = iter.DerivedValues[*Zettel, string](
+	out, err = iter.DerivedValues(
 		fs.Zettelen,
 		func(z *Zettel) (p string, err error) {
 			p = z.GetObjekteFD().GetPath()

@@ -94,6 +94,11 @@ func (s *Store) ReadOneCheckedOut(
 
 	co.DetermineState(false)
 
+	if err = s.konfig.ApplyToSku(&co.External.Transacted); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
@@ -140,6 +145,11 @@ func (s *Store) ReadOneExternal(
 
 	default:
 		panic(checkout_mode.MakeErrInvalidCheckoutModeMode(m))
+	}
+
+	if err = s.konfig.ApplyToSku(&e.Transacted); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

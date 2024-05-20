@@ -11,8 +11,6 @@ import (
 )
 
 type Kennung struct {
-	useEtikettenPaths bool
-
 	Exact   bool
 	Virtual bool
 	Debug   bool
@@ -36,34 +34,15 @@ func (k Kennung) ContainsSku(sk *sku.Transacted) (ok bool) {
 	me := sk.GetMetadatei()
 	switch k.GetGattung() {
 	case gattung.Etikett:
-		if k.useEtikettenPaths {
-			kps := k.PartsStrings()
+		kps := k.PartsStrings()
 
-			var idx int
-			idx, ok = me.Verzeichnisse.Etiketten.ContainsEtikett(kps.Right)
+		var idx int
+		idx, ok = me.Verzeichnisse.Etiketten.ContainsEtikett(kps.Right)
 
-			if ok {
-				ps := me.Verzeichnisse.Etiketten.All[idx]
-				sk.Metadatei.Verzeichnisse.QueryPath.Push(ps.Parents)
-				return
-			}
-		} else {
-			s := k.String()
-
-			if me.GetEtiketten().ContainsKey(s) {
-				ok = true
-				return
-			}
-
-			if me.Verzeichnisse.GetExpandedEtiketten().ContainsKey(s) {
-				ok = true
-				return
-			}
-
-			if me.Verzeichnisse.GetImplicitEtiketten().ContainsKey(s) {
-				ok = true
-				return
-			}
+		if ok {
+			ps := me.Verzeichnisse.Etiketten.All[idx]
+			sk.Metadatei.Verzeichnisse.QueryPath.Push(ps.Parents)
+			return
 		}
 
 	case gattung.Typ:

@@ -125,7 +125,7 @@ func (k *Compiled) setArchiviert(
 	ees := mp.Verzeichnisse.GetExpandedEtiketten()
 
 	isHiddenEtikett := isEtikett &&
-		iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
+		iter.CheckAnyPtr(
 			k.EtikettenHidden,
 			func(e *kennung.Etikett) bool {
 				ok := ees.ContainsKey(ees.KeyPtr(e))
@@ -143,7 +143,7 @@ func (k *Compiled) setArchiviert(
 		return ok
 	}
 
-	if iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
+	if iter.CheckAnyPtr(
 		mp.GetEtiketten(),
 		checkFunc,
 	) {
@@ -151,7 +151,7 @@ func (k *Compiled) setArchiviert(
 		return
 	}
 
-	if iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
+	if iter.CheckAnyPtr(
 		mp.Verzeichnisse.GetExpandedEtiketten(),
 		checkFunc,
 	) {
@@ -159,7 +159,7 @@ func (k *Compiled) setArchiviert(
 		return
 	}
 
-	if iter.CheckAnyPtr[kennung.Etikett, *kennung.Etikett](
+	if iter.CheckAnyPtr(
 		mp.Verzeichnisse.GetImplicitEtiketten(),
 		checkFunc,
 	) {

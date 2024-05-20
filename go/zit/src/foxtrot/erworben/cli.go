@@ -73,7 +73,7 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	f.BoolVar(
 		&c.EtikettenPaths,
 		"etiketten-paths",
-		false,
+		true,
 		"use new etiketten paths for queries",
 	)
 
