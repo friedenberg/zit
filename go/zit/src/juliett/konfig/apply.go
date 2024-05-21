@@ -49,6 +49,12 @@ func (k *Compiled) ApplyToSku(
 		)
 	}
 
+	// TODO better solution for "realizing" etiketten against Konfig.
+	// Specifically, making this less fragile and dependent on remembering to do
+	// ApplyToSku for each Sku. Maybe a factory?
+	mp.Verzeichnisse.Etiketten.Reset()
+	mp.GetEtiketten().Each(mp.Verzeichnisse.Etiketten.AddEtikettOld)
+
 	if err = k.addImplicitEtiketten(sk, nil); err != nil {
 		err = errors.Wrap(err)
 		return

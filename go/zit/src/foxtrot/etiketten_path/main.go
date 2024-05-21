@@ -23,6 +23,11 @@ func MakePath(els ...*Etikett) *Path {
 	return &p
 }
 
+func (a *Path) Clone() (b *Path) {
+	b = MakePath(*a...)
+	return
+}
+
 func (a *Path) IsEmpty() bool {
 	if a == nil {
 		return true

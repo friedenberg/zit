@@ -151,6 +151,13 @@ func (a Assignment) String() (s string) {
 	return s + iter.StringCommaSeparated(a.Etiketten)
 }
 
+func (a *Assignment) makeChild(e kennung.Etikett) (b *Assignment) {
+	b = newAssignment(a.GetDepth() + 1)
+	b.Etiketten = kennung.MakeEtikettSet(e)
+	a.addChild(b)
+	return
+}
+
 func (a *Assignment) addChild(c *Assignment) {
 	if a == c {
 		panic("child and parent are the same")

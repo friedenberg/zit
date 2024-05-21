@@ -4,6 +4,8 @@ import (
 	"slices"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/delta/catgut"
+	"code.linenisgreat.com/zit/src/echo/kennung"
 )
 
 type Etiketten struct {
@@ -11,20 +13,26 @@ type Etiketten struct {
 	All   []EtikettWithParents
 }
 
-func (es *Etiketten) Reset() {
+func (a *Etiketten) Reset() {
 	// TODO pool *Path's
-	es.Paths = es.Paths[:0]
-	es.All = es.All[:0]
+	a.Paths = a.Paths[:0]
+	a.All = a.All[:0]
 }
 
+// TODO improve performance
 func (a *Etiketten) ResetWith(b *Etiketten) {
-	a.Reset()
-	a.Paths = slices.Grow(a.Paths, b.Len())
-	copy(a.Paths, b.Paths)
+	a.Paths = slices.Grow(a.Paths, len(b.Paths))
 
-	a.Reset()
-	a.All = slices.Grow(a.All, b.Len())
-	copy(a.All, b.All)
+	for _, p := range b.Paths {
+		a.AddPath(p.Clone())
+	}
+	// a.Paths = a.Paths[:cap(a.Paths)]
+	// nPaths := copy(a.Paths, b.Paths)
+
+	// a.All = slices.Grow(a.All, len(b.All))
+	// a.All = a.All[:cap(a.All)]
+	// nAll := copy(a.All, b.All)
+	// ui.Debug().Print(nPaths, nAll, a, b)
 }
 
 func (es *Etiketten) Len() int {
@@ -37,6 +45,10 @@ func (es *Etiketten) Less(i, j int) bool {
 
 func (es *Etiketten) Swap(i, j int) {
 	es.Paths[j], es.Paths[i] = es.Paths[i], es.Paths[j]
+}
+
+func (es *Etiketten) AddEtikettOld(e kennung.Etikett) (err error) {
+	return es.AddEtikett(catgut.MakeFromString(e.String()))
 }
 
 func (es *Etiketten) AddEtikett(e *Etikett) (err error) {
@@ -55,9 +67,9 @@ func (es *Etiketten) AddEtikett(e *Etikett) (err error) {
 }
 
 func (es *Etiketten) AddPath(p *Path) (err error) {
-  if p.IsEmpty() {
-    return
-  }
+	if p.IsEmpty() {
+		return
+	}
 
 	idx, ok := es.ContainsPath(p)
 
