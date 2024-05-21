@@ -149,20 +149,10 @@ func (c *constructor) populate() (err error) {
 	allUsed := sku.MakeTransactedMutableSet()
 
 	for _, e := range iter.Elements(c.ExtraEtiketten) {
-		ee := newAssignment(c.GetDepth() + 1)
-		ee.Etiketten = kennung.MakeEtikettSet(e)
-		c.addChild(ee)
+		ee := c.makeChild(e)
 
 		segments := c.all.Match(e)
-		// ui.Debug().Printf(
-		// 	"all: %d, e: %s, segments.ungrouped: %d, segments.grouped: %d",
-		// 	c.all.Len(),
-		// 	e,
-		// 	segments.Ungrouped.Len(),
-		// 	segments.Grouped.Len(),
-		// )
 
-		// ui.Debug().Print(e, segments)
 		var used sku.TransactedMutableSet
 
 		if used, err = c.makeChildrenWithPossibleGroups(
@@ -184,8 +174,6 @@ func (c *constructor) populate() (err error) {
 			err = errors.Wrap(err)
 			return
 		}
-
-		// ui.Debug().Print(used.Len())
 	}
 
 	c.all = c.all.Subtract(allUsed)
@@ -240,6 +228,7 @@ func (c *constructor) makeChildrenWithPossibleGroups(
 		return
 	}
 
+	// TODO use implicit here
 	segments := prefixSet.Subset(groupingEtiketten[0])
 
 	if err = c.makeAndAddUngrouped(parent, segments.Ungrouped.Each); err != nil {
@@ -268,38 +257,7 @@ func (c *constructor) addGroupedChildren(
 	groupingEtiketten kennung.EtikettSlice,
 	used sku.TransactedMutableSet,
 ) (err error) {
-	if c.UsePrefixJoints {
-		if err = c.addGroupedChildrenWithPrefixJoints(
-			parent,
-			segments.Grouped,
-			groupingEtiketten,
-			used,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		if err = c.addGroupedChildrenWithoutPrefixJoints(
-			parent,
-			segments.Grouped,
-			groupingEtiketten,
-			used,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
-func (c *constructor) addGroupedChildrenWithoutPrefixJoints(
-	parent *Assignment,
-	prefixSet PrefixSet,
-	groupingEtiketten kennung.EtikettSlice,
-	used sku.TransactedMutableSet,
-) (err error) {
-	if err = prefixSet.Each(
+	if err = segments.Grouped.Each(
 		func(e kennung.Etikett, zs sku.TransactedMutableSet) (err error) {
 			child := newAssignment(parent.GetDepth() + 1)
 			child.Etiketten = kennung.MakeEtikettSet(e)
@@ -326,85 +284,6 @@ func (c *constructor) addGroupedChildrenWithoutPrefixJoints(
 			usedChild.Each(used.Add)
 
 			parent.addChild(child)
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (c *constructor) addGroupedChildrenWithPrefixJoints(
-	parent *Assignment,
-	prefixSet PrefixSet,
-	groupingEtiketten kennung.EtikettSlice,
-	used sku.TransactedMutableSet,
-) (err error) {
-	if err = prefixSet.Each(
-		func(e kennung.Etikett, zs sku.TransactedMutableSet) (err error) {
-			if parent.Etiketten.Len() > 1 {
-				return
-			}
-
-			prefixJoint := kennung.MakeEtikettSet(groupingEtiketten[0])
-
-			var intermediate, lastChild *Assignment
-
-			if len(parent.Children) > 0 {
-				lastChild = parent.Children[len(parent.Children)-1]
-			}
-
-			if lastChild != nil &&
-				(iter.SetEqualsPtr(lastChild.Etiketten, prefixJoint) ||
-					lastChild.Etiketten.Len() == 0) {
-				intermediate = lastChild
-			} else {
-				intermediate = newAssignment(parent.GetDepth() + 1)
-				intermediate.Etiketten = prefixJoint
-				parent.addChild(intermediate)
-			}
-
-			child := newAssignment(intermediate.GetDepth() + 1)
-
-			var ls kennung.Etikett
-			b := groupingEtiketten[0]
-
-			if e.Equals(b) {
-				return
-			}
-
-			if ls, err = kennung.LeftSubtract(e, b); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			child.Etiketten = kennung.MakeEtikettSet(ls)
-
-			nextGroupingEtiketten := kennung.MakeEtikettSlice()
-
-			if groupingEtiketten.Len() > 1 {
-				nextGroupingEtiketten = groupingEtiketten[1:]
-			}
-
-			var usedChild sku.TransactedMutableSet
-
-			psv := MakePrefixSetFrom(zs)
-
-			if usedChild, err = c.makeChildrenWithPossibleGroups(
-				child,
-				psv,
-				nextGroupingEtiketten,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			usedChild.Each(used.Add)
-
-			intermediate.addChild(child)
 
 			return
 		},
