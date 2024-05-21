@@ -178,13 +178,13 @@ func TestPrefixIntersection(t *testing.T) {
 		MustEtikett("zz-archive-task-done"),
 	)
 
-	ex := IntersectPrefixes(s, MakeEtikettSet(MustEtikett("project")))
+	ex := IntersectPrefixes(s, MustEtikett("project"))
 
 	expected := []string{
 		"project-2021-zit",
 	}
 
-	actual := iter.SortedStrings[Etikett](ex)
+	actual := iter.SortedStrings(ex)
 
 	if !stringSliceEquals(actual, expected) {
 		t.Errorf(

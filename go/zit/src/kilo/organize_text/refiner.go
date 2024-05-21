@@ -142,27 +142,18 @@ func (atc *Refiner) Refine(a *Assignment) (err error) {
 		return
 	}
 
-	if a.IsRoot {
-		for _, c := range a.Children {
-			if err = atc.Refine(c); err != nil {
+	if !a.IsRoot {
+		if atc.shouldMergeIntoParent(a) {
+			ui.Log().Print("merging into parent")
+			p := a.Parent
+
+			if err = p.consume(a); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
+
+			return atc.Refine(p)
 		}
-
-		return
-	}
-
-	if atc.shouldMergeIntoParent(a) {
-		ui.Log().Print("merging into parent")
-		p := a.Parent
-
-		if err = p.consume(a); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return atc.Refine(p)
 	}
 
 	if err = atc.applyPrefixJoints(a); err != nil {

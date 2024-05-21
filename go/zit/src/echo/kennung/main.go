@@ -263,22 +263,12 @@ func HasParentPrefix(a, b Etikett) (has bool) {
 	return
 }
 
-func IntersectPrefixes(s1 EtikettSet, s2 EtikettSet) (s3 EtikettSet) {
+func IntersectPrefixes(haystack EtikettSet, needle Etikett) (s3 EtikettSet) {
 	s4 := MakeEtikettMutableSet()
 
-	for _, e1 := range iter.Elements[Etikett](s2) {
-		didAdd := false
-
-		for _, e := range iter.Elements[Etikett](s1) {
-			if strings.HasPrefix(e.String(), e1.String()) {
-				didAdd = true
-				s4.Add(e)
-			}
-		}
-
-		if !didAdd {
-			s3 = MakeEtikettMutableSet()
-			return
+	for _, e := range iter.Elements[Etikett](haystack) {
+		if strings.HasPrefix(e.String(), needle.String()) {
+			s4.Add(e)
 		}
 	}
 

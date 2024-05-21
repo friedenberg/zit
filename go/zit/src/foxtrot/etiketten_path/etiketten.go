@@ -122,6 +122,26 @@ func (es *Etiketten) ContainsPath(p *Path) (int, bool) {
 	)
 }
 
+func (es *Etiketten) GetMatching(e *Etikett) (matching []EtikettWithParents) {
+	i, ok := es.ContainsEtikett(e)
+
+	if !ok {
+		return
+	}
+
+	for _, ewp := range es.All[i:] {
+		cmp := ewp.ComparePartial(e)
+
+		if cmp != 0 {
+			return
+		}
+
+		matching = append(matching, ewp)
+	}
+
+	return
+}
+
 func (es *Etiketten) ContainsEtikett(e *Etikett) (i int, ok bool) {
 	i, ok = slices.BinarySearchFunc(
 		es.All,

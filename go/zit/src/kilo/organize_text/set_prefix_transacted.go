@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
@@ -200,7 +201,7 @@ func (a PrefixSet) Match(
 
 				intersection := kennung.IntersectPrefixes(
 					es,
-					kennung.MakeEtikettSet(e),
+					e,
 				)
 
 				exactMatch := intersection.Len() == 1 &&
@@ -228,32 +229,60 @@ func (a PrefixSet) Subset(
 	out.Ungrouped = sku.MakeTransactedMutableSet()
 	out.Grouped = MakePrefixSet(len(a.innerMap))
 
+	e2 := catgut.MakeFromString(e.String())
+
 	for e1, zSet := range a.innerMap {
 		if e1 == "" {
 			continue
 		}
 
 		zSet.Each(
+			// func(z *sku.Transacted) (err error) {
+			// 	intersectionNew := z.Metadatei.Verzeichnisse.Etiketten.GetMatching(e2)
+			// 	// es := z.GetEtiketten()
+			// 	// intersection := kennung.IntersectPrefixes(es, e)
+			// 	// ui.Debug().Print(
+			// 	// 	e,
+			// 	// 	"es:", iter.StringCommaSeparated(es),
+			// 	// 	"int1:", iter.StringCommaSeparated(intersection),
+			// 	// 	"int2:", intersectionNew,
+			// 	// )
+			// exactMatch := len(intersectionNew) == 1 && intersectionNew[0].Equals(e2)
+
+			// 	// exactMatch := intersection.Len() == 1 &&
+			// 	// 	intersection.Any().Equals(e)
+
+			// if len(intersectionNew) > 0 && !exactMatch {
+			// 		for _, e2 := range intersectionNew {
+			// 			out.Grouped.addPair(e2.String(), z)
+			// 		}
+			// } else {
+			// 		out.Ungrouped.Add(z)
+			// }
+
+			// 	// if intersection.Len() > 0 && !exactMatch {
+			// 	// 	for _, e2 := range iter.Elements(intersection) {
+			// 	// 		out.Grouped.addPair(e2.String(), z)
+			// 	// 	}
+			// 	// } else {
+			// 	// 	out.Ungrouped.Add(z)
+			// 	// }
+
+			// 	return
+			// },
 			func(z *sku.Transacted) (err error) {
-				es := z.GetEtiketten()
-				// var es kennung.EtikettSet
+				intersection := z.Metadatei.Verzeichnisse.Etiketten.GetMatching(e2)
+				exactMatch := len(intersection) == 1 && intersection[0].Equals(e2)
 
-				// if es, err = allEtiketten(z); err != nil {
-				// 	err = errors.Wrap(err)
-				// 	return
-				// }
+				if len(intersection) > 0 && !exactMatch {
+					for _, e2 := range intersection {
+						if len(e2.Parents) == 0 {
+							out.Grouped.addPair(e2.String(), z)
+						}
 
-				intersection := kennung.IntersectPrefixes(
-					es,
-					kennung.MakeEtikettSet(e),
-				)
-
-				exactMatch := intersection.Len() == 1 &&
-					intersection.Any().Equals(e)
-
-				if intersection.Len() > 0 && !exactMatch {
-					for _, e2 := range iter.Elements(intersection) {
-						out.Grouped.addPair(e2.String(), z)
+						for _, e3 := range e2.Parents {
+							out.Grouped.addPair(e3.First().String(), z)
+						}
 					}
 				} else {
 					out.Ungrouped.Add(z)

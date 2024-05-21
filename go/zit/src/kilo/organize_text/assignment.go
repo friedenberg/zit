@@ -158,6 +158,13 @@ func (a *Assignment) makeChild(e kennung.Etikett) (b *Assignment) {
 	return
 }
 
+func (a *Assignment) makeChildWithSet(es kennung.EtikettSet) (b *Assignment) {
+	b = newAssignment(a.GetDepth() + 1)
+	b.Etiketten = es
+	a.addChild(b)
+	return
+}
+
 func (a *Assignment) addChild(c *Assignment) {
 	if a == c {
 		panic("child and parent are the same")
