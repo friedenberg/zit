@@ -6,6 +6,7 @@ type StringForward Path
 
 func (p *StringForward) String() string {
 	var sb strings.Builder
+	sb.WriteString("[")
 
 	afterFirst := false
 	l := (*Path)(p).Len()
@@ -20,6 +21,8 @@ func (p *StringForward) String() string {
 		sb.Write(s.Bytes())
 	}
 
+	sb.WriteString("]")
+
 	return sb.String()
 }
 
@@ -27,6 +30,8 @@ type StringBackward Path
 
 func (p *StringBackward) String() string {
 	var sb strings.Builder
+
+	sb.WriteString("[")
 
 	afterFirst := false
 	l := (*Path)(p).Len()
@@ -41,6 +46,8 @@ func (p *StringBackward) String() string {
 		s := (*p)[i]
 		sb.Write(s.Bytes())
 	}
+
+	sb.WriteString("]")
 
 	return sb.String()
 }

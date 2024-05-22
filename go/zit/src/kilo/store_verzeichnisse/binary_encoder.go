@@ -8,6 +8,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/delta/schlussel"
@@ -63,6 +64,17 @@ func (bf *binaryEncoder) writeFormat(
 
 	bf.binaryField.Reset()
 
+	defer func() {
+		r := recover()
+
+		if r == nil {
+			return
+		}
+
+		ui.Debug().Print(bf.Len(), &sk.Metadatei.Verzeichnisse.Etiketten)
+		panic(r)
+	}()
+	// TODO
 	bf.SetContentLength(bf.Len())
 
 	var n1 int

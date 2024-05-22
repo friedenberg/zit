@@ -62,7 +62,7 @@ func (a *ketikett) Equals(b *ketikett) bool {
 		return false
 	}
 
-	if !iter.SetEqualsPtr[kennung.Etikett, *kennung.Etikett](
+	if !iter.SetEqualsPtr(
 		a.Transacted.Metadatei.Verzeichnisse.GetImplicitEtiketten(),
 		b.Transacted.Metadatei.Verzeichnisse.GetImplicitEtiketten(),
 	) {
@@ -101,10 +101,7 @@ func (k *compiled) AccumulateImplicitEtiketten(
 
 	ees := kennung.MakeEtikettMutableSet()
 
-	kennung.ExpandOne[kennung.Etikett](
-		&e,
-		expansion.ExpanderRight,
-	).EachPtr(
+	kennung.ExpandOne(&e, expansion.ExpanderRight).EachPtr(
 		ees.AddPtr,
 	)
 
@@ -207,7 +204,7 @@ func (c *compiled) GetSortedEtikettenExpanded(
 	defer c.lock.Unlock()
 
 	expandedMaybe := collections_value.MakeMutableValueSet[values.String](nil)
-	sa := iter.MakeFuncSetString[values.String, *values.String](
+	sa := iter.MakeFuncSetString(
 		expandedMaybe,
 	)
 	typExpander.Expand(sa, v)

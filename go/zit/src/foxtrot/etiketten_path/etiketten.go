@@ -1,6 +1,7 @@
 package etiketten_path
 
 import (
+	"fmt"
 	"slices"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
@@ -11,6 +12,10 @@ import (
 type Etiketten struct {
 	Paths []*Path
 	All   []EtikettWithParents
+}
+
+func (a *Etiketten) String() string {
+	return fmt.Sprintf("[Paths: %s, All: %s]", a.Paths, a.All)
 }
 
 func (a *Etiketten) Reset() {
@@ -47,6 +52,17 @@ func (es *Etiketten) Swap(i, j int) {
 	es.Paths[j], es.Paths[i] = es.Paths[i], es.Paths[j]
 }
 
+func (a *Etiketten) AddFrom(b *Etiketten, prefix *Path) (err error) {
+	for _, ep := range b.Paths {
+		if err = a.AddPath(prefix.CloneAndAddPath(ep)); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
 func (es *Etiketten) AddEtikettOld(e kennung.Etikett) (err error) {
 	return es.AddEtikett(catgut.MakeFromString(e.String()))
 }
@@ -70,6 +86,8 @@ func (es *Etiketten) AddPath(p *Path) (err error) {
 	if p.IsEmpty() {
 		return
 	}
+
+	// p = p.Clone()
 
 	idx, ok := es.ContainsPath(p)
 

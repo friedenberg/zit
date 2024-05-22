@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io"
 	"sort"
-	"strings"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/charlie/ohio"
@@ -25,6 +24,18 @@ func MakePath(els ...*Etikett) *Path {
 
 func (a *Path) Clone() (b *Path) {
 	b = MakePath(*a...)
+	return
+}
+
+func (a *Path) CloneAndAddPath(c *Path) (b *Path) {
+	if a == nil {
+		b = MakePath()
+	} else {
+		b = MakePath(*a...)
+	}
+
+	b.AddPath(c)
+
 	return
 }
 
@@ -93,21 +104,7 @@ func (a *Path) Compare(b *Path) int {
 }
 
 func (p *Path) String() string {
-	var sb strings.Builder
-
-	afterFirst := false
-	for i := p.Len() - 1; i >= 0; i-- {
-		if afterFirst {
-			sb.WriteString(" -> ")
-		}
-
-		afterFirst = true
-
-		s := (*p)[i]
-		sb.Write(s.Bytes())
-	}
-
-	return sb.String()
+	return (*StringBackward)(p).String()
 }
 
 func (a *Path) Copy() (b *Path) {
@@ -153,6 +150,19 @@ func (p *Path) Swap(i, j int) {
 	x.SetBytes(a.Bytes())
 	a.SetBytes(b.Bytes())
 	b.SetBytes(x.Bytes())
+}
+
+func (a *Path) AddPath(b *Path) {
+	if b.IsEmpty() {
+		return
+	}
+
+	for _, e := range *b {
+		*a = append(*a, catgut.GetPool().Get())
+		(*a)[a.Len()-1].SetBytes(e.Bytes())
+	}
+
+	sort.Sort(a)
 }
 
 func (p *Path) Add(e *Etikett) {

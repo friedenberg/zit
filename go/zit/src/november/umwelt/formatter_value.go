@@ -46,7 +46,7 @@ func (u *Umwelt) MakeFormatFunc(
 			if _, err = fmt.Fprintln(
 				out,
 				tl.GetKennung(),
-				tl.Metadatei.Verzeichnisse.Etiketten,
+				&tl.Metadatei.Verzeichnisse.Etiketten,
 			); err != nil {
 				err = errors.Wrap(err)
 				return

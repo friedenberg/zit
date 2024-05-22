@@ -55,7 +55,12 @@ func (k *Compiled) ApplyToSku(
 	mp.Verzeichnisse.Etiketten.Reset()
 	mp.GetEtiketten().Each(mp.Verzeichnisse.Etiketten.AddEtikettOld)
 
-	if err = k.addImplicitEtiketten(sk, nil); err != nil {
+	if err = k.addSuperEtiketten(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = k.addImplicitEtiketten(sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -68,15 +73,69 @@ func (k *Compiled) ApplyToSku(
 	return
 }
 
+func (k *Compiled) addSuperEtiketten(
+	sk *sku.Transacted,
+) (err error) {
+	g := sk.GetGattung()
+
+	switch g {
+	case gattung.Etikett:
+		break
+
+	// case gattung.Etikett, gattung.Typ, gattung.Kasten:
+	//   break
+
+	default:
+		return
+	}
+
+	e := kennung.MustEtikett(sk.GetKennung().String())
+
+	expanded := kennung.ExpandOne(&e, expansion.ExpanderRight)
+
+	if err = expanded.Each(
+		func(e kennung.Etikett) (err error) {
+			if e.String() == sk.GetKennung().String() {
+				return
+			}
+
+			ek, ok := k.GetEtikett(e)
+
+			if !ok {
+				// err = errors.Errorf("expected %s, only have %s", e, iter.StringCommaSeparated(k.Etiketten))
+				return
+			}
+
+			prefix := etiketten_path.MakePath(catgut.MakeFromString(e.String()))
+			a := &sk.Metadatei.Verzeichnisse.Etiketten
+			b := &ek.Metadatei.Verzeichnisse.Etiketten
+
+			// ui.Err().Print("before", sk.GetKennung(), e, prefix, a, b)
+			// defer ui.Err().Print("after ", sk.GetKennung(), e, prefix, a, b)
+
+			if err = a.AddFrom(b, prefix); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (k *Compiled) addImplicitEtiketten(
 	sk *sku.Transacted,
-	p *etiketten_path.Path,
 ) (err error) {
 	mp := &sk.Metadatei
 	ie := kennung.MakeEtikettMutableSet()
 
 	addImpEts := func(e *kennung.Etikett) (err error) {
-		p1 := p.Copy()
+		p1 := etiketten_path.MakePath()
 		p1.Add(catgut.MakeFromString(e.String()))
 
 		impl := k.GetImplicitEtiketten(e)

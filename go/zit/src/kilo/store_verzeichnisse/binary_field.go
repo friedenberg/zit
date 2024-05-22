@@ -61,6 +61,7 @@ func (bf *binaryField) SetContentLength(v int) {
 		panic(errContentLengthTooLarge)
 	}
 
+	// TODO
 	binary.PutVarint(bf.ContentLength[:], int64(v))
 }
 
