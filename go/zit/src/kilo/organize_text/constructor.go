@@ -3,21 +3,27 @@ package organize_text
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
 type constructor struct {
 	Text
-	all, implicit PrefixSet
+	all PrefixSet
 }
 
 func (c *constructor) Make() (ot *Text, err error) {
 	ot = &c.Text
+	c.all = MakePrefixSet(0)
 	c.Assignment = newAssignment(0)
 	c.IsRoot = true
+
+	if err = c.Transacted.Each(c.all.Add); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = c.preparePrefixSetsAndRootsAndExtras(); err != nil {
 		err = errors.Wrap(err)
@@ -41,80 +47,38 @@ func (c *constructor) Make() (ot *Text, err error) {
 	return
 }
 
-func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
-	c.all = MakePrefixSet(0)
-	c.implicit = MakePrefixSet(0)
-	implicit := kennung.MakeMutableEtikettSet()
-	explicit := kennung.MakeMutableEtikettSet()
+func (c *constructor) collectExplicitAndImplicitFor(
+	skus sku.TransactedSet,
+	re kennung.Etikett,
+	explicit kennung.EtikettMutableSet,
+	implicit kennung.EtikettMutableSet,
+	f schnittstellen.FuncIter[*sku.Transacted],
+) (explicitCount, implicitCount int, err error) {
+	res := catgut.MakeFromString(re.String())
 
-	if err = c.Transacted.Each(
+	if err = skus.Each(
 		func(sk *sku.Transacted) (err error) {
-			if err = c.all.Add(sk); err != nil {
-				err = errors.Wrap(err)
-				return
+			if f != nil {
+				if err = f(sk); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 
-			isExplicit := false
+			for _, ewp := range sk.Metadatei.Verzeichnisse.Etiketten.All {
+				if cmp := ewp.ComparePartial(res); cmp != 0 {
+					continue
+				}
 
-			if err = c.rootEtiketten.Each(
-				func(re kennung.Etikett) (err error) {
-					if err = sk.Metadatei.GetEtiketten().Each(
-						func(skE kennung.Etikett) (err error) {
-							es := kennung.ExpandOne(
-								&skE,
-								expansion.ExpanderRight,
-							)
-
-							if es.Contains(re) {
-								explicit.Add(skE)
-								isExplicit = true
-							}
-
-							return
-						},
-					); err != nil {
-						err = errors.Wrap(err)
-						return
+				if len(ewp.Parents) > 0 {
+					for _, p := range ewp.Parents {
+						implicitCount++
+						implicit.Add(kennung.MustEtikett(p.First().String()))
 					}
-
-					return
-				},
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if isExplicit {
-				return
-			}
-
-			for _, ep := range sk.Metadatei.Verzeichnisse.Etiketten.Paths {
-				if ep.Len() == 1 {
-					continue
+				} else {
+					explicitCount++
+					explicit.Add(kennung.MustEtikett(ewp.String()))
 				}
-
-				if !c.rootEtiketten.ContainsKey(ep.Last().String()) {
-					continue
-				}
-
-				if err = c.implicit.Add(sk); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				var e kennung.Etikett
-
-				if err = e.Set(ep.First().String()); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				if err = implicit.Add(e); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				// ui.Debug().Print(sk, (*etiketten_path.StringBackward)(ep))
 			}
 
 			return
@@ -124,23 +88,48 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 		return
 	}
 
-	if implicit.Len() == 0 {
-		c.EtikettSet = c.rootEtiketten
-		return
-	}
+	return
+}
 
-	if err = explicit.Each(implicit.Add); err != nil {
+func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
+	implicit := kennung.MakeMutableEtikettSet()
+	explicit := kennung.MakeMutableEtikettSet()
+
+	mes := kennung.MakeMutableEtikettSet()
+
+	if err = c.rootEtiketten.Each(
+		func(re kennung.Etikett) (err error) {
+			explicitCount := 0
+
+			if explicitCount, _, err = c.collectExplicitAndImplicitFor(
+				c.Transacted,
+				re,
+				explicit,
+				implicit,
+				nil,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if explicitCount != c.Transacted.Len() {
+				return
+			}
+
+			if err = mes.Add(re); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = c.ExtraEtiketten.Each(implicit.Add); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	c.ExtraEtiketten = implicit
-	c.EtikettSet = kennung.MakeEtikettSet()
+	c.EtikettSet = mes
+	// c.ExtraEtiketten = implicit
 
 	return
 }

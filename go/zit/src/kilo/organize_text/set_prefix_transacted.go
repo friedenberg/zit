@@ -52,7 +52,8 @@ func (s *PrefixSet) Add(z *sku.Transacted) (err error) {
 	}
 
 	if es.Len() == 0 {
-		es = kennung.MakeEtikettMutableSet(kennung.Etikett{})
+		s.addPair("", z)
+		return
 	}
 
 	if err = es.Each(
