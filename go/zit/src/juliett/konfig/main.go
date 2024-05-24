@@ -2,8 +2,6 @@ package konfig
 
 import (
 	"encoding/gob"
-	"fmt"
-	"sort"
 	"sync"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
@@ -124,14 +122,6 @@ func (c *Compiled) Initialize(
 	return
 }
 
-func (kc *Compiled) GetAngeboren() schnittstellen.Angeboren {
-	return kc.angeboren
-}
-
-func (kc *Compiled) Cli() erworben.Cli {
-	return kc.cli
-}
-
 func (kc *Compiled) SetCli(k erworben.Cli) {
 	kc.cli = k
 }
@@ -140,49 +130,6 @@ func (kc *Compiled) SetCliFromCommander(k erworben.Cli) {
 	oldBasePath := kc.BasePath
 	kc.cli = k
 	kc.BasePath = oldBasePath
-}
-
-func (c *compiled) GetZettelFileExtension() string {
-	return fmt.Sprintf(".%s", c.FileExtensions.Zettel)
-}
-
-// TODO-P3 merge all the below
-func (c *compiled) GetSortedTypenExpanded(
-	v string,
-) (expandedActual []*sku.Transacted) {
-	expandedMaybe := collections_value.MakeMutableValueSet[values.String](nil)
-
-	sa := iter.MakeFuncSetString(expandedMaybe)
-
-	typExpander.Expand(sa, v)
-	expandedActual = make([]*sku.Transacted, 0)
-
-	expandedMaybe.Each(
-		func(v values.String) (err error) {
-			c.lock.Lock()
-			defer c.lock.Unlock()
-
-			ct, ok := c.Typen.Get(v.String())
-
-			if !ok {
-				return
-			}
-
-			expandedActual = append(expandedActual, ct)
-
-			return
-		},
-	)
-
-	sort.Slice(expandedActual, func(i, j int) bool {
-		return len(
-			expandedActual[i].GetKennung().String(),
-		) > len(
-			expandedActual[j].GetKennung().String(),
-		)
-	})
-
-	return
 }
 
 func (kc *compiled) IsInlineTyp(k kennung.Typ) (isInline bool) {
@@ -197,33 +144,6 @@ func (kc *compiled) IsInlineTyp(k kennung.Typ) (isInline bool) {
 }
 
 type ApproximatedTyp = akten.ApproximatedTyp
-
-// Returns the exactly matching Typ, or if it doesn't exist, returns the parent
-// Typ or nil. (Parent Typ for `md-gdoc` would be `md`.)
-func (kc *compiled) GetApproximatedTyp(
-	k kennung.Kennung,
-) (ct ApproximatedTyp) {
-	expandedActual := kc.GetSortedTypenExpanded(k.String())
-	if len(expandedActual) > 0 {
-		ct.HasValue = true
-		ct.Typ = expandedActual[0]
-
-		if kennung.Equals(ct.Typ.GetKennung(), k) {
-			ct.IsActual = true
-		}
-	}
-
-	return
-}
-
-func (kc *compiled) GetKasten(k kennung.Kasten) (ct *sku.Transacted) {
-	if ct1, ok := kc.Kisten.Get(k.String()); ok {
-		ct = sku.GetTransactedPool().Get()
-		errors.PanicIfError(ct.SetFromSkuLike(ct1))
-	}
-
-	return
-}
 
 func (k *compiled) SetTransacted(
 	kt1 *sku.Transacted,

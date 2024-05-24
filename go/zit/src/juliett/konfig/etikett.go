@@ -1,8 +1,6 @@
 package konfig
 
 import (
-	"sort"
-
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/expansion"
@@ -182,74 +180,4 @@ func (k *compiled) AddEtikett(
 	}
 
 	return
-}
-
-func (kc *compiled) GetEtikett(
-	k kennung.Etikett,
-) (ct *sku.Transacted, ok bool) {
-	expandedActual := kc.GetSortedEtikettenExpanded(k.String())
-
-	if len(expandedActual) > 0 {
-		ct = expandedActual[0]
-		ok = true
-	}
-
-	return
-}
-
-func (c *compiled) GetSortedEtikettenExpanded(
-	v string,
-) (expandedActual []*sku.Transacted) {
-	c.lock.Lock()
-	defer c.lock.Unlock()
-
-	expandedMaybe := collections_value.MakeMutableValueSet[values.String](nil)
-	sa := iter.MakeFuncSetString(
-		expandedMaybe,
-	)
-	typExpander.Expand(sa, v)
-	expandedActual = make([]*sku.Transacted, 0)
-
-	expandedMaybe.Each(
-		func(v values.String) (err error) {
-			ct, ok := c.Etiketten.Get(v.String())
-
-			if !ok {
-				return
-			}
-
-			ct1 := sku.GetTransactedPool().Get()
-
-			if err = ct1.SetFromSkuLike(&ct.Transacted); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			expandedActual = append(expandedActual, ct1)
-
-			return
-		},
-	)
-
-	sort.Slice(expandedActual, func(i, j int) bool {
-		return len(
-			expandedActual[i].GetKennung().String(),
-		) > len(
-			expandedActual[j].GetKennung().String(),
-		)
-	})
-
-	return
-}
-
-func (c *compiled) GetImplicitEtiketten(
-	e *kennung.Etikett,
-) kennung.EtikettSet {
-	s, ok := c.ImplicitEtiketten[e.String()]
-
-	if !ok || s == nil {
-		return kennung.MakeEtikettSet()
-	}
-
-	return s
 }
