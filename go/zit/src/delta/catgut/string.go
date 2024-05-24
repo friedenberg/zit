@@ -123,7 +123,7 @@ func (a *String) compare(b *String, partial bool) int {
 			return 0
 
 		case lenA == 0:
-			if partial {
+			if partial && lenB <= lenA {
 				return 0
 			} else {
 				return -1

@@ -71,6 +71,11 @@ func getTestCasesComparePartial() []testCaseCompare {
 			expected: 0,
 		},
 		{
+			a:        "test",
+			b:        "tests",
+			expected: -1,
+		},
+		{
 			a:        "",
 			b:        "test",
 			expected: -1,
