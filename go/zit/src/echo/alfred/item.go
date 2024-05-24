@@ -14,6 +14,7 @@ type Item struct {
 	ItemType     string         `json:"type,omitempty"`
 	QuicklookUrl string         `json:"quicklookurl,omitempty"`
 	Text         ItemText       `json:"text,omitempty"`
+	Mods         map[string]Mod `json:"mods,omitempty"`
 	// Valid        bool     `json:"valid,omitempty"`
 }
 
@@ -27,6 +28,7 @@ func (i *Item) Reset() {
 	i.Uid = ""
 	i.QuicklookUrl = ""
 	i.Text.Copy = ""
+	clear(i.Mods)
 }
 
 type ItemText struct {

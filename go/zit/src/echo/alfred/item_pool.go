@@ -16,6 +16,7 @@ func MakeItemPool() ItemPool {
 			New: func() interface{} {
 				return &Item{
 					Match: &catgut.String{},
+					Mods:  make(map[string]Mod),
 				}
 			},
 		},

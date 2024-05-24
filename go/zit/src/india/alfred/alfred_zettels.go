@@ -2,6 +2,7 @@ package alfred
 
 import (
 	"fmt"
+	"strings"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/expansion"
@@ -90,6 +91,21 @@ func (w *Writer) zettelToItem(
 
 	a.Text.Copy = ks
 	a.Uid = "zit://" + ks
+
+	{
+		var sb strings.Builder
+
+		if _, err := w.organizeFmt.WriteStringFormat(&sb, z); err != nil {
+			a = w.errorToItem(err)
+			return
+		}
+
+		a.Mods["alt"] = alfred.Mod{
+			Valid:    true,
+			Arg:      sb.String(),
+			Subtitle: sb.String(),
+		}
+	}
 
 	return
 }
