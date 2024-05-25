@@ -3,23 +3,35 @@ package flag
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/flag_policy"
-	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 )
 
-type Flag[T interface {
-	schnittstellen.StringerSetter
-	schnittstellen.Resetter
-}] struct {
-	flag_policy.FlagPolicy
-	Embedded T
+func Make(
+	fp flag_policy.FlagPolicy,
+	stringer func() string,
+	set func(string) error,
+	reset func(),
+) Flag {
+	return Flag{
+		FlagPolicy: fp,
+		stringer:   stringer,
+		set:        set,
+		reset:      reset,
+	}
 }
 
-func (f Flag[T]) Set(v string) (err error) {
+type Flag struct {
+	flag_policy.FlagPolicy
+	stringer func() string
+	set      func(string) error
+	reset    func()
+}
+
+func (f Flag) Set(v string) (err error) {
 	if f.FlagPolicy == flag_policy.FlagPolicyReset {
-		f.Embedded.Reset()
+		f.reset()
 	}
 
-	if err = f.Embedded.Set(v); err != nil {
+	if err = f.set(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -27,6 +39,6 @@ func (f Flag[T]) Set(v string) (err error) {
 	return
 }
 
-func (f Flag[T]) String() string {
-	return f.Embedded.String()
+func (f Flag) String() string {
+	return f.stringer()
 }

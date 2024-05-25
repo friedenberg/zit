@@ -16,7 +16,7 @@ type V0 struct {
 	FormatterUTIGroups map[string]FormatterUTIGroup              `toml:"formatter-uti-groups"`
 	Formatters         map[string]script_config.WithOutputFormat `toml:"formatters,omitempty"`
 	Actions            map[string]script_config.ScriptConfig     `toml:"actions,omitempty"`
-	EtikettenRules     map[string]etikett_rule.Rule              `toml:"etiketten-rules,omitempty"`
+	EtikettenRules     map[string]etikett_rule.Rule              `toml:"etiketten-rules,omitempty"` // deprecated
 	Hooks              interface{}                               `toml:"hooks"`
 }
 

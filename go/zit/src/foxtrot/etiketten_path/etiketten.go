@@ -3,6 +3,7 @@ package etiketten_path
 import (
 	"fmt"
 	"slices"
+	"strings"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/delta/catgut"
@@ -88,18 +89,22 @@ func (es *Etiketten) AddPath(p *Path) (err error) {
 }
 
 func (s *Etiketten) Set(v string) (err error) {
-	var e kennung.Etikett
+	vs := strings.Split(v, ",")
 
-	if err = e.Set(v); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	for _, v := range vs {
+		var e kennung.Etikett
 
-	es := catgut.MakeFromString(e.String())
+		if err = e.Set(v); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	if err = s.AddEtikett(es); err != nil {
-		err = errors.Wrap(err)
-		return
+		es := catgut.MakeFromString(e.String())
+
+		if err = s.AddEtikett(es); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

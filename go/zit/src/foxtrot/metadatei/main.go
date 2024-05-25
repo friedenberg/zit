@@ -7,10 +7,11 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/flag_policy"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/expansion"
+	flag2 "code.linenisgreat.com/zit/src/bravo/flag"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/charlie/collections_ptr"
 	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/bezeichnung"
@@ -57,9 +58,26 @@ func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {
 	)
 
 	// TODO add support for etiketten_path
-	fes := collections_ptr.MakeFlagCommasFromExisting(
-		collections_ptr.SetterPolicyAppend,
-		m.GetEtikettenMutable(),
+	fes := flag2.Make(
+		flag_policy.FlagPolicyAppend,
+		func() string {
+			return m.Verzeichnisse.Etiketten.String()
+		},
+		func(v string) (err error) {
+			vs := strings.Split(v, ",")
+
+			for _, v := range vs {
+				if err = m.AddEtikettString(v); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
+			return
+		},
+		func() {
+			m.ResetEtiketten()
+		},
 	)
 
 	f.Var(
