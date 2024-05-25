@@ -164,23 +164,18 @@ func (z *Metadatei) AddEtikettPtr(e *kennung.Etikett) (err error) {
 	return
 }
 
-func (z *Metadatei) SetEtiketten(e kennung.EtikettSet) {
-	es := z.GetEtikettenMutable()
-	iter.ResetMutableSetWithPool(es, kennung.GetEtikettPool())
+func (m *Metadatei) SetEtiketten(e kennung.EtikettSet) {
+	if m.Etiketten == nil {
+		m.Etiketten = kennung.MakeEtikettMutableSet()
+	}
+
+	iter.ResetMutableSetWithPool(m.Etiketten, kennung.GetEtikettPool())
 
 	if e == nil {
 		return
 	}
 
-	errors.PanicIfError(
-		e.EachPtr(
-			iter.MakeAddClonePoolFunc(
-				es,
-				kennung.GetEtikettPool(),
-				kennung.EtikettResetter,
-			),
-		),
-	)
+	errors.PanicIfError(e.EachPtr(m.AddEtikettPtr))
 }
 
 func (z *Metadatei) SetAkteSha(sh schnittstellen.ShaGetter) {
