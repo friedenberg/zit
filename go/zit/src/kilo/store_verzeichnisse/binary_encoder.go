@@ -129,9 +129,14 @@ func (bf *binaryEncoder) writeFieldKey(
 	case schlussel.Etikett:
 		es := sk.GetEtiketten()
 
-		for _, e := range iter.SortedValues[kennung.Etikett](es) {
+		for _, e := range iter.SortedValues(es) {
 			if e.IsVirtual() {
 				continue
+			}
+
+			if e.String() == "" {
+				err = errors.Errorf("empty etikett in %q", es)
+				return
 			}
 
 			var n1 int64

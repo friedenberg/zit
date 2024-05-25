@@ -7,24 +7,13 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/pool"
 )
 
-var EtikettResetter etikettResetter
-
-type etikettResetter struct{}
-
-func (etikettResetter) Reset(e *Etikett) {
-	e.value = ""
-	e.virtual = false
-	e.dependentLeaf = false
-}
-
-func (etikettResetter) ResetWith(a, b *Etikett) {
-	a.value = b.value
-	a.virtual = b.virtual
-	a.dependentLeaf = b.dependentLeaf
-}
+var (
+	etikettPool     schnittstellen.Pool[Etikett, *Etikett]
+	etikettPoolOnce sync.Once
+)
 
 func init() {
-	etikettMapPool = pool.MakeValue[map[string]Etikett](
+	etikettMapPool = pool.MakeValue(
 		func() map[string]Etikett {
 			return make(map[string]Etikett)
 		},
@@ -36,15 +25,43 @@ func init() {
 	)
 }
 
-var (
-	etikettPool     schnittstellen.Pool[Etikett, *Etikett]
-	etikettPoolOnce sync.Once
-)
+type etikettResetter struct{}
+
+func (etikettResetter) Reset(e *etikett) {
+	e.value = ""
+	e.virtual = false
+	e.dependentLeaf = false
+}
+
+func (etikettResetter) ResetWith(a, b *etikett) {
+	a.value = b.value
+	a.virtual = b.virtual
+	a.dependentLeaf = b.dependentLeaf
+}
+
+type etikett2Resetter struct{}
+
+func (etikett2Resetter) Reset(e *Etikett2) {
+	e.value.Reset()
+	e.virtual = false
+	e.dependentLeaf = false
+}
+
+func (etikett2Resetter) ResetWith(a, b *Etikett2) {
+	b.value.CopyTo(a.value)
+	a.virtual = b.virtual
+	a.dependentLeaf = b.dependentLeaf
+}
 
 func GetEtikettPool() schnittstellen.Pool[Etikett, *Etikett] {
 	etikettPoolOnce.Do(
 		func() {
-			etikettPool = pool.MakePool[Etikett, *Etikett](
+			etikettPool = pool.MakePool(
+				// func() *Etikett {
+				// 	return &Etikett{
+				// 		value: catgut.GetPool().Get(),
+				// 	}
+				// },
 				nil,
 				EtikettResetter.Reset,
 			)

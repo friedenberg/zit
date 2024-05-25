@@ -13,7 +13,7 @@ type resetter struct{}
 func (resetter) Reset(z *Metadatei) {
 	z.Bezeichnung.Reset()
 	z.Comments = z.Comments[:0]
-	z.SetEtiketten(nil)
+	z.ResetEtiketten()
 	ResetterVerzeichnisse.Reset(&z.Verzeichnisse)
 	z.Typ = kennung.Typ{}
 	// z.Gattung = gattung.Unknown

@@ -22,7 +22,14 @@ func init() {
 	EtikettRegex = regexp.MustCompile(EtikettRegexString)
 }
 
-type Etikett struct {
+type Etikett = etikett
+
+var (
+	EtikettResetter  etikettResetter
+	Etikett2Resetter etikett2Resetter
+)
+
+type etikett struct {
 	virtual       bool
 	dependentLeaf bool
 	value         string
@@ -30,8 +37,8 @@ type Etikett struct {
 
 type IndexedEtikett = IndexedLike
 
-func MustEtikettPtr(v string) (e *Etikett) {
-	e = &Etikett{}
+func MustEtikettPtr(v string) (e *etikett) {
+	e = &etikett{}
 
 	var err error
 
@@ -42,7 +49,7 @@ func MustEtikettPtr(v string) (e *Etikett) {
 	return
 }
 
-func MustEtikett(v string) (e Etikett) {
+func MustEtikett(v string) (e etikett) {
 	var err error
 
 	if err = e.Set(v); err != nil {
@@ -52,7 +59,7 @@ func MustEtikett(v string) (e Etikett) {
 	return
 }
 
-func MakeEtikett(v string) (e Etikett, err error) {
+func MakeEtikett(v string) (e etikett, err error) {
 	if err = e.Set(v); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -61,27 +68,27 @@ func MakeEtikett(v string) (e Etikett, err error) {
 	return
 }
 
-func (e Etikett) GetQueryPrefix() string {
+func (e etikett) GetQueryPrefix() string {
 	return "-"
 }
 
-func (e Etikett) GetGattung() schnittstellen.GattungLike {
+func (e etikett) GetGattung() schnittstellen.GattungLike {
 	return gattung.Etikett
 }
 
-func (e *Etikett) Reset() {
+func (e *etikett) Reset() {
 	EtikettResetter.Reset(e)
 }
 
-func (a Etikett) EqualsAny(b any) bool {
+func (a etikett) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a Etikett) Equals(b Etikett) bool {
+func (a etikett) Equals(b etikett) bool {
 	return a == b
 }
 
-func (e Etikett) String() string {
+func (e etikett) String() string {
 	var sb strings.Builder
 
 	if e.virtual {
@@ -97,11 +104,11 @@ func (e Etikett) String() string {
 	return sb.String()
 }
 
-func (e Etikett) Bytes() []byte {
+func (e etikett) Bytes() []byte {
 	return []byte(e.String())
 }
 
-func (e Etikett) Parts() [3]string {
+func (e etikett) Parts() [3]string {
 	switch {
 	case e.virtual && e.dependentLeaf:
 		return [3]string{"%", "-", e.value}
@@ -117,19 +124,19 @@ func (e Etikett) Parts() [3]string {
 	}
 }
 
-func (e Etikett) IsVirtual() bool {
+func (e etikett) IsVirtual() bool {
 	return e.virtual
 }
 
-func (e Etikett) IsDependentLeaf() bool {
+func (e etikett) IsDependentLeaf() bool {
 	return e.dependentLeaf
 }
 
-func (e *Etikett) TodoSetFromKennung2(v *Kennung2) (err error) {
+func (e *etikett) TodoSetFromKennung2(v *Kennung2) (err error) {
 	return e.Set(v.String())
 }
 
-func (e *Etikett) Set(v string) (err error) {
+func (e *etikett) Set(v string) (err error) {
 	v1 := v
 	v = strings.ToLower(strings.TrimSpace(v))
 
@@ -154,12 +161,12 @@ func (e *Etikett) Set(v string) (err error) {
 	return
 }
 
-func (t Etikett) MarshalText() (text []byte, err error) {
+func (t etikett) MarshalText() (text []byte, err error) {
 	text = []byte(t.String())
 	return
 }
 
-func (t *Etikett) UnmarshalText(text []byte) (err error) {
+func (t *etikett) UnmarshalText(text []byte) (err error) {
 	if err = t.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -168,12 +175,12 @@ func (t *Etikett) UnmarshalText(text []byte) (err error) {
 	return
 }
 
-func (t Etikett) MarshalBinary() (text []byte, err error) {
+func (t etikett) MarshalBinary() (text []byte, err error) {
 	text = []byte(t.String())
 	return
 }
 
-func (t *Etikett) UnmarshalBinary(text []byte) (err error) {
+func (t *etikett) UnmarshalBinary(text []byte) (err error) {
 	if err = t.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return

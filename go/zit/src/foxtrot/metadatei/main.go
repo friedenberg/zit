@@ -143,20 +143,28 @@ func (z *Metadatei) GetBezeichnungPtr() *bezeichnung.Bezeichnung {
 	return &z.Bezeichnung
 }
 
-func (z *Metadatei) GetEtiketten() kennung.EtikettSet {
-	if z.Etiketten == nil {
-		z.Etiketten = kennung.MakeEtikettMutableSet()
+func (m *Metadatei) GetEtiketten() kennung.EtikettSet {
+	if m.Etiketten == nil {
+		m.Etiketten = kennung.MakeEtikettMutableSet()
 	}
 
-	return z.Etiketten
+	return m.Etiketten
 }
 
 func (m *Metadatei) ResetEtiketten() {
+	if m.Etiketten == nil {
+		m.Etiketten = kennung.MakeEtikettMutableSet()
+	}
+
 	m.Etiketten.Reset()
 	m.Verzeichnisse.Etiketten.Reset()
 }
 
 func (z *Metadatei) AddEtikettString(es string) (err error) {
+	if es == "" {
+		return
+	}
+
 	var e kennung.Etikett
 
 	if err = e.Set(es); err != nil {
@@ -173,12 +181,17 @@ func (z *Metadatei) AddEtikettString(es string) (err error) {
 }
 
 func (m *Metadatei) AddEtikettPtr(e *kennung.Etikett) (err error) {
+	if e == nil || e.String() == "" {
+		return
+	}
+
 	if m.Etiketten == nil {
 		m.Etiketten = kennung.MakeEtikettMutableSet()
 	}
 
 	kennung.AddNormalizedEtikett(m.Etiketten, e)
 	m.Verzeichnisse.Etiketten.AddEtikett(catgut.MakeFromString(e.String()))
+
 	return
 }
 
@@ -191,6 +204,10 @@ func (m *Metadatei) SetEtiketten(e kennung.EtikettSet) {
 
 	if e == nil {
 		return
+	}
+
+	if e.Len() == 1 && e.Any().String() == "" {
+		panic("empty etikett set")
 	}
 
 	errors.PanicIfError(e.EachPtr(m.AddEtikettPtr))
@@ -220,20 +237,6 @@ func (b *Metadatei) EqualsSansTai(a *Metadatei) bool {
 // TODO-P2 remove
 func (pz *Metadatei) Equals(z1 *Metadatei) bool {
 	return Equaler.Equals(pz, z1)
-}
-
-func (z *Metadatei) String() (d string) {
-	return z.Description()
-}
-
-func (z *Metadatei) Description() (d string) {
-	d = z.Bezeichnung.String()
-
-	if strings.TrimSpace(d) == "" {
-		d = iter.StringCommaSeparated(z.GetEtiketten())
-	}
-
-	return
 }
 
 func (a *Metadatei) Subtract(

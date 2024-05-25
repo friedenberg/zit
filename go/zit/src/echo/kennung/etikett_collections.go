@@ -14,7 +14,7 @@ type (
 var EtikettSetEmpty EtikettSet
 
 func init() {
-	collections_ptr.RegisterGobValue[Etikett, *Etikett](nil)
+	collections_ptr.RegisterGobValue[Etikett](nil)
 	EtikettSetEmpty = MakeEtikettSet()
 }
 
@@ -24,12 +24,12 @@ func MakeEtikettSet(es ...Etikett) (s EtikettSet) {
 	}
 
 	return EtikettSet(
-		collections_ptr.MakeValueSetValue[Etikett, *Etikett](nil, es...),
+		collections_ptr.MakeValueSetValue(nil, es...),
 	)
 }
 
 func MakeEtikettSetStrings(vs ...string) (s EtikettSet, err error) {
-	return collections_ptr.MakeValueSetString[Etikett, *Etikett](nil, vs...)
+	return collections_ptr.MakeValueSetString[Etikett](nil, vs...)
 }
 
 func MakeMutableEtikettSet(hs ...Etikett) EtikettMutableSet {
@@ -38,7 +38,7 @@ func MakeMutableEtikettSet(hs ...Etikett) EtikettMutableSet {
 
 func MakeEtikettMutableSet(hs ...Etikett) EtikettMutableSet {
 	return EtikettMutableSet(
-		collections_ptr.MakeMutableValueSetValue[Etikett, *Etikett](
+		collections_ptr.MakeMutableValueSetValue(
 			nil,
 			hs...,
 		),
@@ -46,5 +46,5 @@ func MakeEtikettMutableSet(hs ...Etikett) EtikettMutableSet {
 }
 
 func EtikettSetEquals(a, b EtikettSet) bool {
-	return iter.SetEqualsPtr[Etikett, *Etikett](a, b)
+	return iter.SetEqualsPtr(a, b)
 }

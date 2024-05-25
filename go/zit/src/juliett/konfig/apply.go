@@ -239,10 +239,10 @@ func (k compiled) ApplyToNewMetadatei(
 	ml metadatei.MetadateiLike,
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) (err error) {
-	m := ml.GetMetadatei()
+	// m := ml.GetMetadatei()
 
-	normalized := kennung.WithRemovedCommonPrefixes(m.GetEtiketten())
-	m.SetEtiketten(normalized)
+	// normalized := kennung.WithRemovedCommonPrefixes(m.GetEtiketten())
+	// m.SetEtiketten(normalized)
 
 	return
 }
