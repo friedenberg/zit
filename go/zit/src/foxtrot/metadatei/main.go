@@ -58,6 +58,7 @@ func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {
 		"the Bezeichnung to use for created or updated Zettelen",
 	)
 
+	// TODO add support for etiketten_path
 	fes := collections_ptr.MakeFlagCommasFromExisting(
 		collections_ptr.SetterPolicyAppend,
 		m.GetEtikettenMutable(),

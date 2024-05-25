@@ -272,7 +272,7 @@ func (a PrefixSet) Subset(
 			// 	return
 			// },
 			func(z *sku.Transacted) (err error) {
-				intersection := z.Metadatei.Verzeichnisse.Etiketten.GetMatching(e2)
+				intersection := z.Metadatei.Verzeichnisse.Etiketten.All.GetMatching(e2)
 				exactMatch := len(intersection) == 1 && intersection[0].Equals(e2)
 
 				if len(intersection) > 0 && !exactMatch {

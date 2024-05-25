@@ -4,6 +4,11 @@ import (
 	"flag"
 )
 
+type Iter[T any] interface {
+	Each(FuncIter[T]) error
+  Next() (T, bool)
+}
+
 type Delta[T any] interface {
 	GetAdded() SetLike[T]
 	GetRemoved() SetLike[T]

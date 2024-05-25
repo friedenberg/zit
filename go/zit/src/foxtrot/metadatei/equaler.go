@@ -35,6 +35,10 @@ func (e equaler) Equals(a, b *Metadatei) bool {
 	aes := a.GetEtiketten()
 	bes := b.GetEtiketten()
 
+  // for i, ea := range a.Verzeichnisse.Etiketten.All {
+
+  // }
+
 	if err := aes.EachPtr(
 		func(ea *kennung.Etikett) (err error) {
 			if !e.includeVirtual && ea.IsVirtual() {

@@ -10,6 +10,13 @@ import (
 	"code.linenisgreat.com/zit/src/delta/catgut"
 )
 
+type (
+	Etikett            = catgut.String
+	EtikettWithParents struct {
+		*Etikett
+		Parents SlicePaths
+	}
+)
 type Path []*Etikett
 
 func MakePath(els ...*Etikett) *Path {

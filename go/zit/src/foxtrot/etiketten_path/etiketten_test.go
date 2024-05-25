@@ -18,10 +18,10 @@ func TestAddPaths(t1 *testing.T) {
 	))
 
 	{
-		i, ok := es.ContainsEtikett(catgut.MakeFromString("area"))
+		i, ok := es.All.ContainsString(catgut.MakeFromString("area"))
 
 		if !ok {
-			t.Errorf("expected some etikett: %d, %t, %s", i, ok, es.All)
+			t.Errorf("expected some etikett: %d, %t, %s", i, ok, es)
 		}
 	}
 
@@ -31,7 +31,7 @@ func TestAddPaths(t1 *testing.T) {
 	))
 
 	{
-		i, ok := es.ContainsEtikett(catgut.MakeFromString("area"))
+		i, ok := es.All.ContainsString(catgut.MakeFromString("area"))
 
 		if !ok {
 			t.Errorf("expected some etikett: %d, %t, %s", i, ok, es.All)
@@ -50,7 +50,7 @@ func TestRealWorld(t1 *testing.T) {
 
 	{
 		e := catgut.MakeFromString("req-comp-internet")
-		_, ok := es.ContainsEtikett(e)
+		_, ok := es.All.ContainsString(e)
 
 		if !ok {
 			t.Errorf("expected %s to be in %s", e, es)
@@ -63,7 +63,7 @@ func TestRealWorld(t1 *testing.T) {
 	))
 
 	e := catgut.MakeFromString("req-comp-internet")
-	_, ok := es.ContainsEtikett(e)
+	_, ok := es.All.ContainsString(e)
 
 	if !ok {
 		t.Errorf("expected %s to be in %s", e, es)
@@ -88,7 +88,7 @@ func BenchmarkMatchFirstYes(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		es.ContainsEtikett(m)
+		es.All.ContainsString(m)
 	}
 }
 
@@ -110,6 +110,6 @@ func BenchmarkMatchFirstNo(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		es.ContainsEtikett(m)
+		es.All.ContainsString(m)
 	}
 }
