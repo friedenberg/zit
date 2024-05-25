@@ -144,10 +144,6 @@ func (z *Metadatei) GetBezeichnungPtr() *bezeichnung.Bezeichnung {
 }
 
 func (z *Metadatei) GetEtiketten() kennung.EtikettSet {
-	return z.GetEtikettenMutable()
-}
-
-func (z *Metadatei) GetEtikettenMutable() kennung.EtikettMutableSet {
 	if z.Etiketten == nil {
 		z.Etiketten = kennung.MakeEtikettMutableSet()
 	}
@@ -176,9 +172,13 @@ func (z *Metadatei) AddEtikettString(es string) (err error) {
 	return
 }
 
-func (z *Metadatei) AddEtikettPtr(e *kennung.Etikett) (err error) {
-	kennung.AddNormalizedEtikett(z.GetEtikettenMutable(), e)
-	z.Verzeichnisse.Etiketten.AddEtikett(catgut.MakeFromString(e.String()))
+func (m *Metadatei) AddEtikettPtr(e *kennung.Etikett) (err error) {
+	if m.Etiketten == nil {
+		m.Etiketten = kennung.MakeEtikettMutableSet()
+	}
+
+	kennung.AddNormalizedEtikett(m.Etiketten, e)
+	m.Verzeichnisse.Etiketten.AddEtikett(catgut.MakeFromString(e.String()))
 	return
 }
 

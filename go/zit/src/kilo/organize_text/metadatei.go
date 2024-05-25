@@ -23,10 +23,14 @@ type Metadatei struct {
 }
 
 func (m Metadatei) RemoveFromTransacted(sk *sku.Transacted) (err error) {
-	if err = m.Each(sk.Metadatei.GetEtikettenMutable().Del); err != nil {
+	mes := sk.Metadatei.GetEtiketten().CloneMutableSetPtrLike()
+
+	if err = m.Each(mes.Del); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	sk.Metadatei.SetEtiketten(mes)
 
 	return
 }

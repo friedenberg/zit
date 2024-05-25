@@ -147,12 +147,14 @@ func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 		sku.TransactedResetter.ResetWith(cursor, &z.Transacted)
 		cursor.Metadatei.Subtract(&av.Metadatei)
 
-		if err = a.SubtractFromSet(
-			cursor.Metadatei.GetEtikettenMutable(),
-		); err != nil {
+		mes := cursor.GetMetadatei().GetEtiketten().CloneMutableSetPtrLike()
+
+		if err = a.SubtractFromSet(mes); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+
+		cursor.Metadatei.SetEtiketten(mes)
 
 		if _, err = av.stringFormatWriter.WriteStringFormat(&sb, cursor); err != nil {
 			err = errors.Wrap(err)
