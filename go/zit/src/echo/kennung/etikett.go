@@ -22,12 +22,17 @@ func init() {
 	EtikettRegex = regexp.MustCompile(EtikettRegexString)
 }
 
+var (
+	sEtikettResetter  etikettResetter
+	sEtikett2Resetter etikett2Resetter
+)
+
 type Etikett = etikett
 
-var (
-	EtikettResetter  etikettResetter
-	Etikett2Resetter etikett2Resetter
-)
+var EtikettResetter = sEtikettResetter
+
+// type Etikett = etikett2
+// var EtikettResetter = sEtikett2Resetter
 
 type etikett struct {
 	virtual       bool
@@ -37,8 +42,9 @@ type etikett struct {
 
 type IndexedEtikett = IndexedLike
 
-func MustEtikettPtr(v string) (e *etikett) {
-	e = &etikett{}
+func MustEtikettPtr(v string) (e *Etikett) {
+	e = &Etikett{}
+	e.init()
 
 	var err error
 
@@ -49,7 +55,9 @@ func MustEtikettPtr(v string) (e *etikett) {
 	return
 }
 
-func MustEtikett(v string) (e etikett) {
+func MustEtikett(v string) (e Etikett) {
+	e.init()
+
 	var err error
 
 	if err = e.Set(v); err != nil {
@@ -59,7 +67,9 @@ func MustEtikett(v string) (e etikett) {
 	return
 }
 
-func MakeEtikett(v string) (e etikett, err error) {
+func MakeEtikett(v string) (e Etikett, err error) {
+	e.init()
+
 	if err = e.Set(v); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -68,16 +78,19 @@ func MakeEtikett(v string) (e etikett, err error) {
 	return
 }
 
+func (e etikett) init() {
+}
+
+func (e *etikett) Reset() {
+	sEtikettResetter.Reset(e)
+}
+
 func (e etikett) GetQueryPrefix() string {
 	return "-"
 }
 
 func (e etikett) GetGattung() schnittstellen.GattungLike {
 	return gattung.Etikett
-}
-
-func (e *etikett) Reset() {
-	EtikettResetter.Reset(e)
 }
 
 func (a etikett) EqualsAny(b any) bool {

@@ -41,28 +41,32 @@ func (etikettResetter) ResetWith(a, b *etikett) {
 
 type etikett2Resetter struct{}
 
-func (etikett2Resetter) Reset(e *Etikett2) {
+func (etikett2Resetter) Reset(e *etikett2) {
 	e.value.Reset()
 	e.virtual = false
 	e.dependentLeaf = false
 }
 
-func (etikett2Resetter) ResetWith(a, b *Etikett2) {
+func (etikett2Resetter) ResetWith(a, b *etikett2) {
 	b.value.CopyTo(a.value)
 	a.virtual = b.virtual
 	a.dependentLeaf = b.dependentLeaf
 }
 
+var (
+	etikettPtrMapPool     schnittstellen.PoolValue[map[string]*Etikett]
+	etikettPtrMapPoolOnce sync.Once
+)
+
 func GetEtikettPool() schnittstellen.Pool[Etikett, *Etikett] {
 	etikettPoolOnce.Do(
 		func() {
 			etikettPool = pool.MakePool(
-				// func() *Etikett {
-				// 	return &Etikett{
-				// 		value: catgut.GetPool().Get(),
-				// 	}
-				// },
-				nil,
+				func() *Etikett {
+					e := &Etikett{}
+					e.init()
+					return e
+				},
 				EtikettResetter.Reset,
 			)
 		},
@@ -71,15 +75,10 @@ func GetEtikettPool() schnittstellen.Pool[Etikett, *Etikett] {
 	return etikettPool
 }
 
-var (
-	etikettPtrMapPool     schnittstellen.PoolValue[map[string]*Etikett]
-	etikettPtrMapPoolOnce sync.Once
-)
-
 func GetEtikettMapPtrPool() schnittstellen.PoolValue[map[string]*Etikett] {
 	etikettPtrMapPoolOnce.Do(
 		func() {
-			etikettPtrMapPool = pool.MakeValue[map[string]*Etikett](
+			etikettPtrMapPool = pool.MakeValue(
 				func() map[string]*Etikett {
 					return make(map[string]*Etikett)
 				},
