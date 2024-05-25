@@ -241,42 +241,8 @@ func (k compiled) ApplyToNewMetadatei(
 ) (err error) {
 	m := ml.GetMetadatei()
 
-	t := m.GetTyp()
 	normalized := kennung.WithRemovedCommonPrefixes(m.GetEtiketten())
 	m.SetEtiketten(normalized)
-
-	tk := k.GetApproximatedTyp(t)
-
-	if !tk.HasValue {
-		return
-	}
-
-	toa := tk.ApproximatedOrActual()
-
-	if toa == nil {
-		return
-	}
-
-	var ta *typ_akte.V0
-
-	if ta, err = tagp.GetAkte(toa.GetAkteSha()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	for e, r := range ta.EtikettenRules {
-		var e1 kennung.Etikett
-
-		if e1, err = kennung.MakeEtikett(e); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = m.ApplyGoldenChild(e1, r.GoldenChild); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
 
 	return
 }

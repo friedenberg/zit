@@ -86,3 +86,21 @@ func (es *Etiketten) AddPath(p *Path) (err error) {
 
 	return
 }
+
+func (s *Etiketten) Set(v string) (err error) {
+	var e kennung.Etikett
+
+	if err = e.Set(v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	es := catgut.MakeFromString(e.String())
+
+	if err = s.AddEtikett(es); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}

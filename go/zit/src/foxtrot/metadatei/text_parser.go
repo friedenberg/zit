@@ -6,14 +6,12 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/format"
-	"code.linenisgreat.com/zit/src/echo/kennung"
 )
 
 type textParser struct {
@@ -59,10 +57,7 @@ func (f textParser) ParseMetadatei(
 						m.Comments = append(m.Comments, v)
 						return
 					},
-					"-": iter.MakeFuncSetString[
-						kennung.Etikett,
-						*kennung.Etikett,
-					](m.GetEtikettenMutable()),
+					"-": m.AddEtikettString,
 					"!": func(v string) (err error) {
 						return f.readTyp(m, v, &akteFD)
 					},

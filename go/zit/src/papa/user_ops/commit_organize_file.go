@@ -28,7 +28,7 @@ func (c CommitOrganizeFile) ApplyToText(
 				return
 			}
 
-			sk.Metadatei.GetEtikettenMutable().Reset()
+			sk.Metadatei.ResetEtiketten()
 
 			return
 		},

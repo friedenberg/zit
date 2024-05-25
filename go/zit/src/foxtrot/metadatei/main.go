@@ -4,11 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"sort"
 	"strings"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/alfa/etikett_rule"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/src/bravo/iter"
@@ -139,16 +137,31 @@ func (z *Metadatei) GetEtikettenMutable() kennung.EtikettMutableSet {
 	return z.Etiketten
 }
 
+func (m *Metadatei) ResetEtiketten() {
+	m.Etiketten.Reset()
+	m.Verzeichnisse.Etiketten.Reset()
+}
+
+func (z *Metadatei) AddEtikettString(es string) (err error) {
+	var e kennung.Etikett
+
+	if err = e.Set(es); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = z.AddEtikettPtr(&e); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (z *Metadatei) AddEtikettPtr(e *kennung.Etikett) (err error) {
 	kennung.AddNormalizedEtikett(z.GetEtikettenMutable(), e)
 	z.Verzeichnisse.Etiketten.AddEtikett(catgut.MakeFromString(e.String()))
 	return
-	// return iter.AddClonePool[kennung.Etikett, *kennung.Etikett](
-	// 	z.GetEtikettenMutable(),
-	// 	kennung.GetEtikettPool(),
-	// 	kennung.EtikettResetter,
-	// 	e,
-	// )
 }
 
 func (z *Metadatei) SetEtiketten(e kennung.EtikettSet) {
@@ -223,44 +236,6 @@ func (a *Metadatei) Subtract(
 		},
 	)
 	errors.PanicIfError(err)
-}
-
-func (z *Metadatei) ApplyGoldenChild(
-	e kennung.Etikett,
-	mode etikett_rule.RuleGoldenChild,
-) (err error) {
-	if z.GetEtiketten().Len() == 0 {
-		return
-	}
-
-	switch mode {
-	case etikett_rule.RuleGoldenChildUnset:
-		return
-	}
-
-	mes := z.GetEtikettenMutable()
-
-	prefixes := iter.Elements(kennung.Withdraw(mes, e))
-
-	if len(prefixes) == 0 {
-		return
-	}
-
-	var sortFunc func(i, j int) bool
-
-	switch mode {
-	case etikett_rule.RuleGoldenChildLowest:
-		sortFunc = func(i, j int) bool { return kennung.Less(prefixes[j], prefixes[i]) }
-
-	case etikett_rule.RuleGoldenChildHighest:
-		sortFunc = func(i, j int) bool { return kennung.Less(prefixes[i], prefixes[j]) }
-	}
-
-	sort.Slice(prefixes, sortFunc)
-
-	mes.Add(prefixes[0])
-
-	return
 }
 
 func (mp *Metadatei) AddComment(f string, vals ...interface{}) {
