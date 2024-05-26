@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/delta/sha"
@@ -191,10 +190,6 @@ func (s *ennuiStore) WriteOneObjekteMetadatei(o *sku.Transacted) (err error) {
 	if o.Metadatei.Sha().IsNull() {
 		err = errors.Errorf("null sha")
 		return
-	}
-
-	if o.Kennung.String() == "yttrium/butterfree" {
-		ui.Debug().Caller(1, "WriteOneObjekteMetadatei", o.StringKennungTai(), o.Metadatei.Sha())
 	}
 
 	wg := iter.MakeErrorWaitGroupParallel()

@@ -103,14 +103,6 @@ func (i *Store) Initialize() (err error) {
 	return
 }
 
-func (s *Store) applyKonfig(z *sku.Transacted) error {
-	if !s.erworben.HasChanges() {
-		return nil
-	}
-
-	return s.erworben.ApplyToSku(z)
-}
-
 // func (i *Store) ReadMany(string, *metadatei.Metadatei, *[]Loc) error {}
 // func (i *Store) ReadAll(*metadatei.Metadatei, *[]Loc) error          {}
 
