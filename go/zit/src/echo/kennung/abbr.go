@@ -116,7 +116,7 @@ func (a Abbr) LenKopfUndSchwanz(
 func (a Abbr) AbbreviateHinweisOnly(
 	in *Kennung2,
 ) (err error) {
-	if in.GetGattung() != gattung.Zettel {
+	if in.GetGattung() != gattung.Zettel || in.IsVirtual() {
 		return
 	}
 

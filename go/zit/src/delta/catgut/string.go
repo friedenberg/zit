@@ -88,75 +88,22 @@ func (b *String) copyCheck() {
 	}
 }
 
+func (a *String) ComparePartialOffset(b *String, offset int) int {
+	lenA, lenB := a.Len(), b.Len()
+
+	if offset > min(lenA, lenB)-1 {
+		panic("offset out of bounds")
+	}
+
+  return CompareUTF8Bytes(a.Bytes()[offset:], b.Bytes()[offset:], true)
+}
+
 func (a *String) ComparePartial(b *String) int {
-	return a.compare(b, true)
+	return CompareUTF8Bytes(a.Bytes(), b.Bytes(), true)
 }
 
 func (a *String) Compare(b *String) int {
-	return a.compare(b, false)
-}
-
-func (a *String) compare(b *String, partial bool) int {
-	a.copyCheck()
-
-	byA := a.Bytes()
-	byB := b.Bytes()
-
-	lenA, lenB := a.Len(), b.Len()
-
-	switch {
-	case lenA == 0 && lenB == 0:
-		return 0
-
-	case lenA == 0:
-		return -1
-
-	case lenB == 0:
-		return 1
-	}
-
-	for {
-		lenA, lenB := len(byA), len(byB)
-
-		switch {
-		case lenA == 0 && lenB == 0:
-			return 0
-
-		case lenA == 0:
-			if partial && lenB <= lenA {
-				return 0
-			} else {
-				return -1
-			}
-
-		case lenB == 0:
-			if partial {
-				return 0
-			} else {
-				return 1
-			}
-		}
-
-		runeA, widthA := utf8.DecodeRune(byA)
-		byA = byA[widthA:]
-
-		if runeA == utf8.RuneError {
-			panic("not a valid utf8 string")
-		}
-
-		runeB, widthB := utf8.DecodeRune(byB)
-		byB = byB[widthB:]
-
-		if runeB == utf8.RuneError {
-			panic("not a valid utf8 string")
-		}
-
-		if runeA < runeB {
-			return -1
-		} else if runeA > runeB {
-			return 1
-		}
-	}
+	return CompareUTF8Bytes(a.Bytes(), b.Bytes(), false)
 }
 
 func (str *String) String() string {

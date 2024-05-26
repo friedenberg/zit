@@ -4,6 +4,7 @@ import (
 	"slices"
 	"strings"
 
+	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 )
 
@@ -22,12 +23,36 @@ func (s SliceEtikettWithParents) Len() int {
 // TODO make less fragile
 func (s SliceEtikettWithParents) ContainsEtikett(k *kennung.Kennung2) (int, bool) {
 	e := k.PartsStrings().Right
+	offset := 0
+
+	if k.IsVirtual() {
+		percent := catgut.GetPool().Get()
+		defer catgut.GetPool().Put(percent)
+
+		percent.Set("%")
+
+		loc, ok := slices.BinarySearchFunc(
+			s,
+			percent,
+			func(ewp EtikettWithParents, e *Etikett) int {
+				cmp := ewp.Etikett.ComparePartial(e)
+				return cmp
+			},
+		)
+
+		if !ok {
+			return loc, ok
+		}
+
+		offset = percent.Len()
+		s = s[loc:]
+	}
 
 	return slices.BinarySearchFunc(
 		s,
 		e,
 		func(ewp EtikettWithParents, e *Etikett) int {
-			cmp := ewp.Etikett.ComparePartial(e)
+			cmp := catgut.CompareUTF8Bytes(ewp.Etikett.Bytes()[offset:], e.Bytes(), true)
 			return cmp
 		},
 	)

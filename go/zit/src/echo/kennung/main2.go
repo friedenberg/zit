@@ -3,6 +3,7 @@ package kennung
 import (
 	"io"
 	"math"
+	"slices"
 	"strings"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
@@ -41,6 +42,19 @@ func MustKennung2(kp Kennung) (k *Kennung2) {
 	err := k.SetWithKennung(kp)
 	errors.PanicIfError(err)
 	return
+}
+
+func (a *Kennung2) IsVirtual() bool {
+	switch a.g {
+	case gattung.Zettel:
+		return slices.Equal(a.left.Bytes(), []byte{'%'})
+
+	case gattung.Etikett:
+		return a.middle == '%' || slices.Equal(a.left.Bytes(), []byte{'%'})
+
+	default:
+		return false
+	}
 }
 
 func (a *Kennung2) Equals(b *Kennung2) bool {
