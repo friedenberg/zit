@@ -42,6 +42,12 @@ func (c Diff) DefaultGattungen() kennung.Gattung {
 	return kennung.MakeGattung(gattung.TrueGattung()...)
 }
 
+func (c Diff) ModifyBuilder(
+	b *query.Builder,
+) {
+	b.WithHidden(nil)
+}
+
 func (c Diff) RunWithQuery(
 	u *umwelt.Umwelt,
 	qg *query.Group,

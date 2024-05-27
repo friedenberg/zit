@@ -171,8 +171,43 @@ function clean_all_force_dirty_wd { # @test
 	assert_output '.'
 }
 
+function clean_hidden { # @test
+	run_zit organize -mode commit-directly :z <<-EOM
+		- [one/uno  !md zz-archive tag-3 tag-4] wow the first
+	EOM
+	assert_success
+	assert_output - <<-EOM
+		[zz@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[zz-archive@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4 zz-archive]
+	EOM
+
+	run_zit schlummernd-add zz-archive
+	assert_success
+	assert_output ''
+
+	run_zit show :z
+	assert_success
+	assert_output - <<-EOM
+		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
+	EOM
+
+	run_zit checkout one/uno
+	assert_success
+	assert_output - <<-EOM
+		      checked out [one/uno.zettel@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4 zz-archive]
+	EOM
+
+	run_zit clean !md:z
+	assert_success
+	assert_output_unsorted - <<-EOM
+		          deleted [one/]
+		          deleted [one/dos.zettel]
+		          deleted [one/uno.zettel]
+	EOM
+}
+
 function clean_mode_akte { # @test
-	skip
 	run_zit organize -mode commit-directly :z <<-EOM
 		- [one/uno  !md zz-archive tag-3 tag-4] wow the first
 	EOM
@@ -196,7 +231,7 @@ function clean_mode_akte { # @test
 
 	run_zit clean !md:z
 	assert_success
-	assert_output - <<-EOM
+	assert_output_unsorted - <<-EOM
 		          deleted [one/uno.md]
 		          deleted [one/dos.zettel]
 		          deleted [one/]

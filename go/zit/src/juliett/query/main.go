@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/hotel/sku"
@@ -207,8 +206,6 @@ func (q *Query) String() string {
 
 func (q *Query) ShouldHide(sk *sku.Transacted, k string) bool {
 	_, ok := q.Kennung[k]
-
-	ui.Log().Print(sk, k, q.IncludesHidden(), q.Hidden, ok, q.Hidden.ContainsSku(sk))
 
 	if q.IncludesHidden() || q.Hidden == nil || ok {
 		return false

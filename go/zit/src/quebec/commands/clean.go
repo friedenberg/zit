@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/sha"
@@ -61,6 +62,7 @@ func (c Clean) DefaultGattungen() kennung.Gattung {
 }
 
 func (c Clean) shouldClean(u *umwelt.Umwelt, co *sku.CheckedOut) bool {
+	ui.Log().Print(co)
 	if co.State == checked_out_state.StateExistsAndSame {
 		return true
 	}
@@ -87,9 +89,8 @@ func (c Clean) shouldClean(u *umwelt.Umwelt, co *sku.CheckedOut) bool {
 
 func (c Clean) ModifyBuilder(
 	b *query.Builder,
-) (err error) {
+) {
 	b.WithHidden(nil)
-	return
 }
 
 func (c Clean) RunWithQuery(

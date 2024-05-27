@@ -31,6 +31,12 @@ func (c Status) DefaultGattungen() kennung.Gattung {
 	return kennung.MakeGattung(gattung.TrueGattung()...)
 }
 
+func (c Status) ModifyBuilder(
+	b *query.Builder,
+) {
+	b.WithHidden(nil)
+}
+
 func (c Status) RunWithQuery(
 	u *umwelt.Umwelt,
 	qg *query.Group,

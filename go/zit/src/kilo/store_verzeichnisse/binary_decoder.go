@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/schlussel"
@@ -42,6 +43,7 @@ func makeBinary(s kennung.Sigil) binaryDecoder {
 }
 
 func makeBinaryWithQueryGroup(qg sku.QueryGroup, s kennung.Sigil) binaryDecoder {
+	ui.Log().Print(qg)
 	if !qg.HasHidden() {
 		s.Add(kennung.SigilHidden)
 	}
