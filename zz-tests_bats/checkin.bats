@@ -69,6 +69,21 @@ function checkin_simple_one_zettel { # @test
 	EOM
 }
 
+function checkin_two_zettel_hidden { # @test
+	run_zit schlummernd-add etikett-one tag-3
+	assert_success
+
+	run_zit checkin .z
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[etikett@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[etikett-one@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/uno@d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "wildly different" etikett-one]
+		[etikett-two@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/dos@b5c4fbaac3b71657edee74de4b947f13dfa104715feb8bab7cfa4dd47cafa3db !md "dos wildly different" etikett-two]
+	EOM
+}
+
 function checkin_simple_one_zettel_virtual_etikett { # @test
 	dirty_one_virtual
 	run_zit checkin one/uno.zettel

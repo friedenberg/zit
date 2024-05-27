@@ -47,13 +47,18 @@ you'll notice something pretty quickly: there are a lot of bizarre names:
 -   Erworben: acquired config (*can* be changed after init)
 -   Etikett: tag
 -   Gattung: genre (of the object that is being stored)
+-   Hinweis: identifier for a Zettel chain
 -   Kasten: repo
 -   Kennung: identifier
 -   Konfig: configuration
 -   Metadatei: metadata
 -   Objekte: object
 -   Schlussel: key
+-   Schlummernd: "sleeping or dormant", objects that are hidden from ordinary
+    queries and must be explicitly recalled using the `?` operator, or
+    explicitly recalled using their direct `Kennnung` (id)
 -   Schnittstellen: interface
+-   Sku: stock-keeping unit, representing an entry in a Bestandsaufnahme
 -   Standort: directory (all directory operations are consolidated here)
 -   Typ: type
 -   Umwelt: environment
