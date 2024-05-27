@@ -126,7 +126,7 @@ func (f v4) ParsePersistentMetadatei(
 			}
 
 		case key.Equal(keyVerzeichnisseArchiviert.Bytes()):
-			if err = m.Verzeichnisse.Archiviert.Set(val.String()); err != nil {
+			if err = m.Verzeichnisse.Schlummernd.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

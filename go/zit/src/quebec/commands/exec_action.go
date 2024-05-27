@@ -52,7 +52,7 @@ func (c ExecAction) RunWithQuery(
 	var sc script_config.ScriptConfig
 	ok := false
 
-	if sc, ok = u.Konfig().Actions[c.Action.String()]; !ok {
+	if sc, ok = u.GetKonfig().Actions[c.Action.String()]; !ok {
 		err = errors.Normalf(
 			"Konfig Action '%s' not found",
 			c.Action.String(),

@@ -85,7 +85,7 @@ func (op Server) GetNeededSkus(
 		}
 
 		if op.umwelt.Standort().HasObjekte(
-			op.umwelt.Konfig().GetStoreVersion(),
+			op.umwelt.GetKonfig().GetStoreVersion(),
 			sk.GetGattung(),
 			sk.GetObjekteSha(),
 		) {

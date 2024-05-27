@@ -157,6 +157,10 @@ func (c Standort) FileKonfigCompiled() string {
 	return c.DirZit("KonfigCompiled")
 }
 
+func (c Standort) FileSchlummernd() string {
+	return c.DirZit("Schlummernd")
+}
+
 func (c Standort) FileKonfigAngeboren() string {
 	return c.DirZit("KonfigAngeboren")
 }

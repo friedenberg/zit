@@ -96,7 +96,7 @@ func (pw *writer) flushBoth() (err error) {
 	)
 
 	if err = pw.CopyJustHistoryAndAdded(
-		makeSigil(kennung.SigilHistory, kennung.SigilHidden),
+		makeFlushQueryGroup(kennung.SigilHistory, kennung.SigilHidden),
 		chain,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -152,7 +152,7 @@ func (pw *writer) flushJustSchwanz() (err error) {
 
 	if err = pw.CopyJustHistoryFrom(
 		&pw.Reader,
-		makeSigil(kennung.SigilHistory, kennung.SigilHidden),
+		makeFlushQueryGroup(kennung.SigilHistory, kennung.SigilHidden),
 		func(sk skuWithRangeAndSigil) (err error) {
 			pw.Range = sk.Range
 			pw.saveSchwanz(sk.Transacted, sk.Sigil)
@@ -230,7 +230,7 @@ func (pw *writer) saveSchwanz(z *sku.Transacted, sigil kennung.Sigil) {
 
 	record.Sigil = sigil
 
-	if z.Metadatei.Verzeichnisse.Archiviert.Bool() {
+	if z.Metadatei.Verzeichnisse.Schlummernd.Bool() {
 		record.Add(kennung.SigilHidden)
 	} else {
 		record.Del(kennung.SigilHidden)

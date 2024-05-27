@@ -85,10 +85,6 @@ func (c *Store) Flush(
 
 	gob.Register(iter.StringerKeyerPtr[kennung.Typ, *kennung.Typ]{})
 
-	if c.GetKonfig().HasChanges() {
-		c.verzeichnisse.SetNeedsFlushHistory()
-	}
-
 	wg := iter.MakeErrorWaitGroupParallel()
 
 	wg.Do(func() error { return c.verzeichnisse.Flush(printerHeader) })

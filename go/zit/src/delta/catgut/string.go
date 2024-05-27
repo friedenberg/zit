@@ -20,6 +20,17 @@ type String struct {
 	data bytes.Buffer
 }
 
+func MakeFromReader(r io.Reader, limit int) (s *String, err error) {
+	s = GetPool().Get()
+
+	if _, err = s.ReadNFrom(r, limit); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func MakeFromString(v string) (s *String) {
 	s = GetPool().Get()
 	errors.PanicIfError(s.Set(v))
@@ -95,7 +106,7 @@ func (a *String) ComparePartialOffset(b *String, offset int) int {
 		panic("offset out of bounds")
 	}
 
-  return CompareUTF8Bytes(a.Bytes()[offset:], b.Bytes()[offset:], true)
+	return CompareUTF8Bytes(a.Bytes()[offset:], b.Bytes()[offset:], true)
 }
 
 func (a *String) ComparePartial(b *String) int {
@@ -324,6 +335,17 @@ func (dst *String) ReadNFrom(r io.Reader, toRead int) (read int, err error) {
 	}
 
 	if _, err = dst.data.Write(b); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (src *String) Clone() (dst *String, err error) {
+	dst = GetPool().Get()
+
+	if err = src.CopyTo(dst); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

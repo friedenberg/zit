@@ -22,17 +22,29 @@ func (u *Umwelt) Unlock() (err error) {
 	ptl := u.PrinterTransactedLike()
 
 	if u.storesInitialized {
+		ui.Log().Printf("konfig has changes: %t", u.GetKonfig().HasChanges())
+		ui.Log().Printf("schlummernd has changes: %t", u.Schlummernd().HasChanges())
+
+		needsHistory := u.GetKonfig().HasChanges() || u.Schlummernd().HasChanges()
+
+		if needsHistory {
+			u.GetStore().GetVerzeichnisse().SetNeedsFlushHistory()
+		}
+
+		ui.Log().Print("will flush bestandsaufnahme")
 		if err = u.store.FlushBestandsaufnahme(ptl); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
+		ui.Log().Print("will flush store")
 		if err = u.store.Flush(u.PrinterHeader()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = u.Konfig().Flush(
+		ui.Log().Print("will flush konfig")
+		if err = u.konfig.Flush(
 			u.Standort(),
 			u.GetStore().GetAkten().GetTypV0(),
 			u.PrinterHeader(),
@@ -41,15 +53,31 @@ func (u *Umwelt) Unlock() (err error) {
 			return
 		}
 
+		ui.Log().Print("will flush schlummernd")
+		if err = u.schlummernd.Flush(
+			u.Standort(),
+			u.PrinterHeader(),
+			u.konfig.DryRun,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if needsHistory {
+			u.GetStore().GetVerzeichnisse().SetNeedsFlushHistory()
+		}
+
 		wg := iter.MakeErrorWaitGroupParallel()
 		wg.Do(
 			func() error {
+				ui.Log().Print("will flush store second time")
 				// second store flush is necessary because of konfig changes
 				return u.store.Flush(u.PrinterHeader())
 			},
 		)
 
-		for _, vs := range u.virtualStores {
+		for k, vs := range u.virtualStores {
+			ui.Log().Printf("will flush virtual store: %s", k)
 			wg.Do(vs.Flush)
 		}
 

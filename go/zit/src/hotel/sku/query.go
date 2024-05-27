@@ -26,6 +26,7 @@ type (
 
 	QueryGroup interface {
 		Query
+		HasHidden() bool
 		Get(gattung.Gattung) (QueryWithSigilAndKennung, bool)
 	}
 )

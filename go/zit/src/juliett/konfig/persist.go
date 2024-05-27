@@ -3,10 +3,10 @@ package konfig
 import (
 	"encoding/gob"
 	"os"
-	"sort"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
@@ -38,7 +38,7 @@ func (kc *Compiled) recompileEtiketten() (err error) {
 
 	kc.ImplicitEtiketten = make(implicitEtikettenMap)
 
-	if err = kc.Etiketten.Each(
+	if err = kc.compiled.Etiketten.Each(
 		func(ke *ketikett) (err error) {
 			var e kennung.Etikett
 
@@ -63,14 +63,6 @@ func (kc *Compiled) recompileEtiketten() (err error) {
 		err = errors.Wrap(err)
 		return
 	}
-
-	sort.Slice(kc.EtikettenHiddenStringsSlice, func(i, j int) bool {
-		return kc.EtikettenHiddenStringsSlice[i] < kc.EtikettenHiddenStringsSlice[j]
-	})
-
-	kc.EtikettenHidden = kennung.MakeEtikettSet(
-		kc.HiddenEtiketten...,
-	)
 
 	return
 }
@@ -127,7 +119,7 @@ func (kc *Compiled) HasChanges() bool {
 	kc.lock.Lock()
 	defer kc.lock.Unlock()
 
-	return kc.hasChanges
+	return kc.compiled.hasChanges
 }
 
 func (kc *compiled) SetHasChanges() {
@@ -183,6 +175,32 @@ func (kc *Compiled) Flush(
 		return
 	}
 
+	wg := iter.MakeErrorWaitGroupParallel()
+	wg.Do(func() (err error) {
+		if err = kc.flushErworben(s, tagp, printerHeader); err != nil {
+			if errors.IsNotExist(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+		}
+
+		return
+	})
+
+	if err = wg.GetError(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (kc *Compiled) flushErworben(
+	s standort.Standort,
+	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
+	printerHeader schnittstellen.FuncIter[string],
+) (err error) {
 	if err = printerHeader("recompiling konfig"); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -75,7 +75,7 @@ func (c *Organize) RunWithQuery(
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Umwelt: u,
 		Options: c.GetOptions(
-			u.Konfig().PrintOptions,
+			u.GetKonfig().PrintOptions,
 			ms,
 			u.SkuFmtOrganize(),
 			u.GetStore().GetAbbrStore().GetAbbr(),
@@ -114,7 +114,7 @@ func (c *Organize) RunWithQuery(
 		var f *os.File
 
 		if f, err = files.TempFileWithPattern(
-			"*." + u.Konfig().FileExtensions.Organize,
+			"*." + u.GetKonfig().FileExtensions.Organize,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -173,7 +173,7 @@ func (c *Organize) RunWithQuery(
 		var f *os.File
 
 		if f, err = u.Standort().FileTempLocalWithTemplate(
-			"*." + u.Konfig().FileExtensions.Organize,
+			"*." + u.GetKonfig().FileExtensions.Organize,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

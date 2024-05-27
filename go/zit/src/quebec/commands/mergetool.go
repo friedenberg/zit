@@ -73,7 +73,7 @@ func (c Mergetool) RunWithQuery(
 		}
 
 		if err = tm.ReadConflictMarker(
-			u.Konfig().GetStoreVersion(),
+			u.GetKonfig().GetStoreVersion(),
 			u.GetStore().GetObjekteFormatOptions(),
 		); err != nil {
 			err = errors.Wrap(err)

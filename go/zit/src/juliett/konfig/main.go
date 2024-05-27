@@ -18,6 +18,7 @@ import (
 	"code.linenisgreat.com/zit/src/foxtrot/erworben"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/akten"
+	"code.linenisgreat.com/zit/src/juliett/query"
 )
 
 var typExpander expansion.Expander
@@ -47,6 +48,7 @@ type Compiled struct {
 	cli
 	compiled
 	angeboren
+	schlummernd *query.Schlummernd
 }
 
 func (a *compiled) Reset() error {
@@ -54,7 +56,6 @@ func (a *compiled) Reset() error {
 	a.TypenToExtensions = make(map[string]string)
 
 	a.lock = &sync.Mutex{}
-	a.EtikettenHidden = kennung.MakeEtikettSet()
 	a.Etiketten = collections_value.MakeMutableValueSet[*ketikett](nil)
 	a.InlineTypen = collections_value.MakeMutableValueSet[values.String](
 		nil,
@@ -84,11 +85,9 @@ type compiled struct {
 	erworben.Akte
 
 	// Etiketten
-	EtikettenHidden             kennung.EtikettSet
-	EtikettenHiddenStringsSlice []string
-	DefaultEtiketten            kennung.EtikettSet
-	Etiketten                   schnittstellen.MutableSetLike[*ketikett]
-	ImplicitEtiketten           implicitEtikettenMap
+	DefaultEtiketten  kennung.EtikettSet
+	Etiketten         schnittstellen.MutableSetLike[*ketikett]
+	ImplicitEtiketten implicitEtikettenMap
 
 	// Typen
 	ExtensionsToTypen map[string]string
@@ -104,18 +103,28 @@ type compiled struct {
 func (c *Compiled) Initialize(
 	s standort.Standort,
 	kcli erworben.Cli,
+  schlummernd *query.Schlummernd,
 ) (err error) {
 	c.cli = kcli
 	c.Reset()
 	c.angeboren = s.GetKonfig()
+  c.schlummernd = schlummernd
 
-	if err = c.loadKonfigErworben(s); err != nil {
-		if errors.IsNotExist(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
+	wg := iter.MakeErrorWaitGroupParallel()
+	wg.Do(func() (err error) {
+		if err = c.loadKonfigErworben(s); err != nil {
+			if errors.IsNotExist(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
 		}
 
+		return
+	})
+
+	if err = wg.GetError(); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -216,7 +225,7 @@ func (k *Compiled) ApplyAndAddTransacted(
 		return k.AddTyp(kinder)
 
 	case gattung.Etikett:
-		return k.AddEtikett(kinder, mutter)
+		return k.compiled.AddEtikett(kinder, mutter)
 
 	case gattung.Kasten:
 		return k.AddKasten(kinder)

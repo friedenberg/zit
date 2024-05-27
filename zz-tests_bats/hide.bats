@@ -22,11 +22,9 @@ function mark_one_as_hidden { # @test
 		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 	EOM
 
-	run_zit edit-konfig -hide-etikett tag-3
+	run_zit schlummernd-add tag-3
 	assert_success
-	assert_output - <<-EOM
-		[konfig@dc3ffc61367cf6b8528fa26d8ded6cc8f364846e2f44059cc32e0ebb4a4cc559]
-	EOM
+	assert_output ''
 
 	run_zit show :z
 	assert_success
@@ -39,16 +37,9 @@ function mark_one_as_hidden { # @test
 		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 	EOM
 
-	run_zit edit-konfig -unhide-etikett tag-3
+	run_zit schlummernd-remove tag-3
 	assert_success
-	assert_output - <<-EOM
-		[konfig@18d10f21461e6d02a3362055d32ea0edd8e7ae1fdc79ce141559982d9a245ca7]
-	EOM
-
-	# run_zit reindex
-	# assert_success
-
-	#TODO [act/zu "fix issue with -unhide-etikett erasing the hidden zettels from the index on flush and requiring this reindex to work"
+	assert_output ''
 
 	run_zit show :z
 	assert_success

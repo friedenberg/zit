@@ -4,6 +4,7 @@ import (
 	"slices"
 	"strings"
 
+	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 )
@@ -21,7 +22,7 @@ func (s SliceEtikettWithParents) Len() int {
 }
 
 // TODO make less fragile
-func (s SliceEtikettWithParents) ContainsEtikett(k *kennung.Kennung2) (int, bool) {
+func (s SliceEtikettWithParents) ContainsKennungEtikett(k *kennung.Kennung2) (int, bool) {
 	e := k.PartsStrings().Right
 	offset := 0
 
@@ -58,7 +59,7 @@ func (s SliceEtikettWithParents) ContainsEtikett(k *kennung.Kennung2) (int, bool
 	)
 }
 
-func (s SliceEtikettWithParents) ContainsString(e *Etikett) (int, bool) {
+func (s SliceEtikettWithParents) ContainsEtikett(e *Etikett) (int, bool) {
 	return slices.BinarySearchFunc(
 		s,
 		e,
@@ -70,7 +71,7 @@ func (s SliceEtikettWithParents) ContainsString(e *Etikett) (int, bool) {
 }
 
 func (s SliceEtikettWithParents) GetMatching(e *Etikett) (matching []EtikettWithParents) {
-	i, ok := s.ContainsString(e)
+	i, ok := s.ContainsEtikett(e)
 
 	if !ok {
 		return
@@ -89,8 +90,16 @@ func (s SliceEtikettWithParents) GetMatching(e *Etikett) (matching []EtikettWith
 	return
 }
 
-func (s *SliceEtikettWithParents) Add(e *Etikett, p *Path) (err error) {
-	idx, ok := s.ContainsString(e)
+// TODO return success
+func (s *SliceEtikettWithParents) Add(e1 *Etikett, p *Path) (err error) {
+	var e *Etikett
+
+	if e, err = e1.Clone(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	idx, ok := s.ContainsEtikett(e)
 
 	var a EtikettWithParents
 
@@ -108,6 +117,26 @@ func (s *SliceEtikettWithParents) Add(e *Etikett, p *Path) (err error) {
 			*s = slices.Insert(*s, idx, a)
 		}
 	}
+
+	return
+}
+
+// TODO return success
+func (s *SliceEtikettWithParents) Remove(e1 *Etikett) (err error) {
+	var e *Etikett
+
+	if e, err = e1.Clone(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	idx, ok := s.ContainsEtikett(e)
+
+	if !ok {
+		return
+	}
+
+	*s = slices.Delete(*s, idx, idx+1)
 
 	return
 }

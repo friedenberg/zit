@@ -69,7 +69,7 @@ func (s *Store) ReadFiles(
 			var co *sku.CheckedOut
 
 			if co, err = s.ReadOneCheckedOut(em); err != nil {
-				err = errors.Wrap(err)
+				err = errors.Wrapf(err, "%v", em)
 				return
 			}
 

@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/typ_akte"
@@ -17,6 +18,7 @@ import (
 func (k *Compiled) ApplyToSku(
 	sk *sku.Transacted,
 ) (err error) {
+	ui.Log().Print("applying konfig to:", sk)
 	mp := &sk.Metadatei
 
 	mp.Verzeichnisse.SetExpandedEtiketten(kennung.ExpandMany(
@@ -65,10 +67,7 @@ func (k *Compiled) ApplyToSku(
 		return
 	}
 
-	if err = k.setArchiviert(sk); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	sk.SetSchlummernd(k.schlummernd.ContainsSku(sk))
 
 	return
 }
@@ -173,64 +172,6 @@ func (k *Compiled) addImplicitEtiketten(
 	}
 
 	mp.Verzeichnisse.SetImplicitEtiketten(ie)
-
-	return
-}
-
-func (k *Compiled) setArchiviert(
-	sk *sku.Transacted,
-) (err error) {
-	sk.SetArchiviert(false)
-
-	mp := &sk.Metadatei
-
-	g := gattung.Must(sk.GetGattung())
-	isEtikett := g == gattung.Etikett
-
-	ees := mp.Verzeichnisse.GetExpandedEtiketten()
-
-	isHiddenEtikett := isEtikett &&
-		iter.CheckAnyPtr(
-			k.EtikettenHidden,
-			func(e *kennung.Etikett) bool {
-				ok := ees.ContainsKey(ees.KeyPtr(e))
-				return ok
-			},
-		)
-
-	if isHiddenEtikett {
-		sk.SetArchiviert(true)
-		return
-	}
-
-	checkFunc := func(e *kennung.Etikett) bool {
-		ok := k.EtikettenHidden.ContainsKey(k.EtikettenHidden.KeyPtr(e))
-		return ok
-	}
-
-	if iter.CheckAnyPtr(
-		mp.GetEtiketten(),
-		checkFunc,
-	) {
-		sk.SetArchiviert(true)
-		return
-	}
-
-	if iter.CheckAnyPtr(
-		mp.Verzeichnisse.GetExpandedEtiketten(),
-		checkFunc,
-	) {
-		sk.SetArchiviert(true)
-		return
-	}
-
-	if iter.CheckAnyPtr(
-		mp.Verzeichnisse.GetImplicitEtiketten(),
-		checkFunc,
-	) {
-		sk.SetArchiviert(true)
-		return
-	}
 
 	return
 }

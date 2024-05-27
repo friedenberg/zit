@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/src/echo/bezeichnung"
@@ -172,7 +173,7 @@ func (u *Umwelt) PrinterFileNotRecognized() schnittstellen.FuncIter[*fd.FD] {
 
 func (u *Umwelt) PrinterFDDeleted() schnittstellen.FuncIter[*fd.FD] {
 	p := kennung_fmt.MakeFDDeletedStringWriterFormat(
-		u.Konfig().DryRun,
+		u.GetKonfig().DryRun,
 		kennung_fmt.MakeFDCliFormat(
 			u.FormatColorOptionsOut(),
 			u.standort.MakeRelativePathStringFormatWriter(),
@@ -192,12 +193,12 @@ func (u *Umwelt) GetTime() time.Time {
 
 func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[string] {
 	if u.konfig.PrintOptions.PrintFlush {
-		return string_format_writer.MakeDelim[string](
+		return string_format_writer.MakeDelim(
 			"\n",
 			u.Err(),
 			string_format_writer.MakeDefaultDatePrefixFormatWriter(
 				u,
-				string_format_writer.MakeColor[string](
+				string_format_writer.MakeColor(
 					u.FormatColorOptionsOut(),
 					string_format_writer.MakeString[string](),
 					string_format_writer.ColorTypeTitle,
@@ -205,7 +206,7 @@ func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[string] {
 			),
 		)
 	} else {
-		return func(string) error { return nil }
+		return func(v string) error { return ui.Log().Print(v) }
 	}
 }
 

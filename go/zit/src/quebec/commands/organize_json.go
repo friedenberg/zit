@@ -79,7 +79,7 @@ func (c *OrganizeJSON) RunWithQuery(
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Umwelt: u,
 		Options: c.GetOptions(
-			u.Konfig().PrintOptions,
+			u.GetKonfig().PrintOptions,
 			ms,
 			u.SkuFmtOrganize(),
 			u.GetStore().GetAbbrStore().GetAbbr(),
@@ -103,8 +103,8 @@ func (c *OrganizeJSON) RunWithQuery(
 		return
 	}
 
-	u.Konfig().DryRun = true
-	u.Konfig().PrintOptions.Abbreviations.Hinweisen = false
+	u.GetKonfig().DryRun = true
+	u.GetKonfig().PrintOptions.Abbreviations.Hinweisen = false
 
 	var transacted []sku_fmt.Json
 
@@ -141,7 +141,7 @@ func (c *OrganizeJSON) RunWithQuery(
 	var f *os.File
 
 	if f, err = files.TempFileWithPattern(
-		"*." + u.Konfig().FileExtensions.Organize,
+		"*." + u.GetKonfig().FileExtensions.Organize,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

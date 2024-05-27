@@ -25,7 +25,6 @@ func WriteInt8(w io.Writer, n int8) (written int, err error) {
 	b := [1]byte{byte(n)}
 
 	written, err = WriteAllOrDieTrying(w, b[:])
-
 	if err != nil {
 		err = errors.Wrap(err)
 		return
@@ -38,7 +37,6 @@ func WriteUint8(w io.Writer, n uint8) (written int, err error) {
 	b := [1]byte{n}
 
 	written, err = WriteAllOrDieTrying(w, b[:])
-
 	if err != nil {
 		err = errors.Wrap(err)
 		return
@@ -49,7 +47,27 @@ func WriteUint8(w io.Writer, n uint8) (written int, err error) {
 
 func WriteUint16(w io.Writer, n uint16) (written int, err error) {
 	var intErr int
-	var b [2]byte
+	var b [binary.MaxVarintLen16]byte
+
+	intErr = binary.PutUvarint(b[:], uint64(n))
+
+	if intErr != 1 {
+		err = errors.Errorf("expected to write %d but wrote %d", 2, intErr)
+		return
+	}
+
+	written, err = WriteAllOrDieTrying(w, b[:intErr])
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func WriteUint32(w io.Writer, n uint32) (written int, err error) {
+	var intErr int
+	var b [binary.MaxVarintLen32]byte
 
 	intErr = binary.PutVarint(b[:], int64(n))
 
@@ -58,8 +76,7 @@ func WriteUint16(w io.Writer, n uint16) (written int, err error) {
 		return
 	}
 
-	written, err = WriteAllOrDieTrying(w, b[:])
-
+	written, err = WriteAllOrDieTrying(w, b[:intErr])
 	if err != nil {
 		err = errors.Wrap(err)
 		return
@@ -69,12 +86,12 @@ func WriteUint16(w io.Writer, n uint16) (written int, err error) {
 }
 
 func WriteInt64(w io.Writer, n int64) (written int, err error) {
+	var intErr int
 	var b [binary.MaxVarintLen64]byte
 
-	binary.PutVarint(b[:], n)
+	intErr = binary.PutVarint(b[:], n)
 
-	written, err = WriteAllOrDieTrying(w, b[:])
-
+	written, err = WriteAllOrDieTrying(w, b[:intErr])
 	if err != nil {
 		err = errors.Wrap(err)
 		return

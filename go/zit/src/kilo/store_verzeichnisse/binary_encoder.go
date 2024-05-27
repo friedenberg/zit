@@ -101,7 +101,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		s := sk.Sigil
 		s.Add(bf.Sigil)
 
-		if sk.Metadatei.Verzeichnisse.Archiviert.Bool() {
+		if sk.Metadatei.Verzeichnisse.Schlummernd.Bool() {
 			s.Add(kennung.SigilHidden)
 		}
 

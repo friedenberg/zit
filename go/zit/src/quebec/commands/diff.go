@@ -92,8 +92,8 @@ func (c Diff) RunWithQuery(
 			}
 
 			// sameTyp := il.GetTyp().Equals(el.GetTyp())
-			internalInline := u.Konfig().IsInlineTyp(il.GetTyp())
-			externalInline := u.Konfig().IsInlineTyp(el.GetTyp())
+			internalInline := u.GetKonfig().IsInlineTyp(il.GetTyp())
+			externalInline := u.GetKonfig().IsInlineTyp(el.GetTyp())
 
 			var externalFD *fd.FD
 

@@ -31,7 +31,7 @@ func init() {
 }
 
 func (c *FormatOrganize) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	c.Flags.Konfig = u.Konfig()
+	c.Flags.Konfig = u.GetKonfig()
 
 	if len(args) != 1 {
 		err = errors.Errorf("expected exactly one input argument")
@@ -58,7 +58,7 @@ func (c *FormatOrganize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	// TODO move Abbr as required arg
 	ot.Options = c.Flags.GetOptions(
-		u.Konfig().PrintOptions,
+		u.GetKonfig().PrintOptions,
 		nil,
 		u.SkuFmtOrganize(),
 		u.GetStore().GetAbbrStore().GetAbbr(),

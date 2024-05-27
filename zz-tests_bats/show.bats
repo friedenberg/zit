@@ -30,15 +30,13 @@ function show_simple_one_zettel { # @test
 }
 
 function show_simple_one_zettel_hidden { # @test
-	run_zit edit-konfig -hide-etikett tag-3
+	run_zit schlummernd-add tag-3
 	assert_success
-	assert_output - <<-EOM
-		[konfig@dc3ffc61367cf6b8528fa26d8ded6cc8f364846e2f44059cc32e0ebb4a4cc559]
-	EOM
+	assert_output ''
 
 	run_zit show :z
 	assert_success
-	assert_output - ''
+	assert_output ''
 
 	run_zit show :?z
 	assert_success
@@ -55,11 +53,9 @@ function show_simple_one_zettel_hidden { # @test
 }
 
 function show_simple_one_zettel_hidden_past { # @test
-	run_zit edit-konfig -hide-etikett tag-1
+	run_zit schlummernd-add tag-1
 	assert_success
-	assert_output - <<-EOM
-		[konfig@ecc5492d8635e4b2a9bea264eac0dfa609da0249c4ab31b5ae110d47da1541fc]
-	EOM
+	assert_output ''
 
 	run_zit show :?z
 	assert_success

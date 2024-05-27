@@ -9,7 +9,7 @@ import (
 )
 
 type Verzeichnisse struct {
-	Archiviert        values.Bool
+	Schlummernd        values.Bool
 	ExpandedEtiketten kennung.EtikettMutableSet // public for gob, but should be private
 	ImplicitEtiketten kennung.EtikettMutableSet // public for gob, but should be private
 	Etiketten         etiketten_path.Etiketten

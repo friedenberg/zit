@@ -291,8 +291,8 @@ func (s *Transacted) calculateObjekteSha(debug bool) (err error) {
 	return wg.GetError()
 }
 
-func (s *Transacted) SetArchiviert(v bool) {
-	s.Metadatei.Verzeichnisse.Archiviert.SetBool(v)
+func (s *Transacted) SetSchlummernd(v bool) {
+	s.Metadatei.Verzeichnisse.Schlummernd.SetBool(v)
 }
 
 func (s *Transacted) SetObjekteSha(v schnittstellen.ShaLike) (err error) {

@@ -50,7 +50,7 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 	createOrganizeFileOp := CreateOrganizeFile{
 		Umwelt: u.Umwelt,
 		Options: otFlags.GetOptions(
-			u.Konfig().PrintOptions,
+			u.GetKonfig().PrintOptions,
 			qg,
 			u.SkuFmtOrganize(),
 			u.GetStore().GetAbbrStore().GetAbbr(),
@@ -62,7 +62,7 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 	var f *os.File
 
 	if f, err = files.TempFileWithPattern(
-		"*." + u.Konfig().FileExtensions.Organize,
+		"*." + u.GetKonfig().FileExtensions.Organize,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

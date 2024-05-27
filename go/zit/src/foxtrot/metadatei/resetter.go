@@ -42,7 +42,7 @@ type resetterVerzeichnisse struct{}
 
 func (resetterVerzeichnisse) Reset(a *Verzeichnisse) {
 	a.Etiketten.Reset()
-	a.Archiviert.Reset()
+	a.Schlummernd.Reset()
 	a.SetExpandedEtiketten(nil)
 	a.SetImplicitEtiketten(nil)
 	a.QueryPath.Reset()
@@ -50,7 +50,7 @@ func (resetterVerzeichnisse) Reset(a *Verzeichnisse) {
 
 func (resetterVerzeichnisse) ResetWith(a, b *Verzeichnisse) {
 	a.Etiketten.ResetWith(&b.Etiketten)
-	a.Archiviert.ResetWith(b.Archiviert)
+	a.Schlummernd.ResetWith(b.Schlummernd)
 	a.SetExpandedEtiketten(b.GetExpandedEtiketten())
 	a.SetImplicitEtiketten(b.GetImplicitEtiketten())
 	a.QueryPath.Reset()

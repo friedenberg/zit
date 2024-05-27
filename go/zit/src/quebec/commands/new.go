@@ -76,7 +76,7 @@ func (c New) ValidateFlagsAndArgs(
 	u *umwelt.Umwelt,
 	args ...string,
 ) (err error) {
-	if u.Konfig().DryRun && len(args) == 0 {
+	if u.GetKonfig().DryRun && len(args) == 0 {
 		err = errors.Errorf(
 			"when -dry-run is set, paths to existing zettels must be provided",
 		)
@@ -183,7 +183,7 @@ func (c New) writeNewZettels(
 		CheckOut: c.Edit,
 	}
 
-	u.Konfig().DefaultEtiketten.EachPtr(c.Metadatei.AddEtikettPtr)
+	u.GetKonfig().DefaultEtiketten.EachPtr(c.Metadatei.AddEtikettPtr)
 
 	if zsc, err = emptyOp.RunMany(c.ProtoZettel, c.Count); err != nil {
 		err = errors.Wrap(err)

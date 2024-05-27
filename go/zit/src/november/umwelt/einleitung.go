@@ -91,6 +91,17 @@ func (u *Umwelt) Einleitung(e Einleitung) (err error) {
 		writeFile(s.FileKonfigCompiled(), "")
 	}
 
+	writeFile(s.FileSchlummernd(), "")
+
+	if err = u.schlummernd.Flush(
+		u.Standort(),
+		u.PrinterHeader(),
+		u.konfig.DryRun,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = u.Reset(); err != nil {
 		err = errors.Wrap(err)
 		return

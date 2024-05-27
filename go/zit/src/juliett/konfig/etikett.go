@@ -179,5 +179,19 @@ func (k *compiled) AddEtikett(
 		return
 	}
 
+	if kinder.Metadatei.Verzeichnisse.Schlummernd.Bool() {
+		var e kennung.Etikett
+
+		if err = e.Set(kinder.Kennung.String()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		// if err = k.EtikettenSchlummernd.Add(e); err != nil {
+		// 	err = errors.Wrap(err)
+		// 	return
+		// }
+	}
+
 	return
 }

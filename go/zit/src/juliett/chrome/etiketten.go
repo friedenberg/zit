@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
+// TODO replace with etiketten_path.Etiketten
 func etiketten(sk *sku.Transacted) kennung.EtikettSet {
 	return kennung.ExpandMany(sk.Metadatei.GetEtiketten(), expansion.ExpanderRight)
 }

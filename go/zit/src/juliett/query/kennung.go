@@ -35,7 +35,7 @@ func (k Kennung) ContainsSku(sk *sku.Transacted) (ok bool) {
 	switch k.GetGattung() {
 	case gattung.Etikett:
 		var idx int
-		idx, ok = me.Verzeichnisse.Etiketten.All.ContainsEtikett(k.Kennung2)
+		idx, ok = me.Verzeichnisse.Etiketten.All.ContainsKennungEtikett(k.Kennung2)
 
 		if ok {
 			ps := me.Verzeichnisse.Etiketten.All[idx]

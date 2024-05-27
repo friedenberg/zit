@@ -18,7 +18,7 @@ func (c CommitOrganizeFile) ApplyToText(
 	u *umwelt.Umwelt,
 	t *organize_text.Text,
 ) (err error) {
-	if u.Konfig().PrintOptions.PrintEtikettenAlways {
+	if u.GetKonfig().PrintOptions.PrintEtikettenAlways {
 		return
 	}
 

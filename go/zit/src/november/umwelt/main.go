@@ -41,6 +41,7 @@ type Umwelt struct {
 	standort    standort.Standort
 	erworbenCli erworben.Cli
 	konfig      konfig.Compiled
+	schlummernd query.Schlummernd
 
 	storesInitialized bool
 	store             store.Store
@@ -137,9 +138,17 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		}
 	}
 
+	if err = u.schlummernd.Load(
+		u.standort,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = u.konfig.Initialize(
 		u.standort,
 		u.erworbenCli,
+		&u.schlummernd,
 	); err != nil {
 		if options.GetAllowKonfigReadError() {
 			err = nil
@@ -158,19 +167,19 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	// 	}
 	// }
 
-	ui.Log().Printf("store version: %s", u.Konfig().GetStoreVersion())
+	ui.Log().Printf("store version: %s", u.GetKonfig().GetStoreVersion())
 
 	if u.konfig.ChrestEnabled {
 		u.virtualStores["%chrome"] = &query.VirtualStoreInitable{
-			VirtualStore: chrome.MakeChrome(u.Konfig(), u.Standort()),
+			VirtualStore: chrome.MakeChrome(u.GetKonfig(), u.Standort()),
 		}
 	}
 
 	if err = u.store.Initialize(
 		u.flags,
-		u.Konfig(),
+		u.GetKonfig(),
 		u.standort,
-		objekte_format.FormatForVersion(u.Konfig().GetStoreVersion()),
+		objekte_format.FormatForVersion(u.GetKonfig().GetStoreVersion()),
 		u.sonnenaufgang,
 		u.virtualStores,
 		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
@@ -210,7 +219,7 @@ func (u Umwelt) Flush() error {
 }
 
 func (u Umwelt) PrintMatchedArchiviertIfNecessary() {
-	if !u.Konfig().PrintOptions.PrintMatchedArchiviert {
+	if !u.GetKonfig().PrintOptions.PrintMatchedArchiviert {
 		return
 	}
 
@@ -257,7 +266,7 @@ func (u *Umwelt) MakeQueryBuilderExcludingHidden(
 		WithDefaultGattungen(dg).
 		WithVirtualEtiketten(u.konfig.Filters).
 		WithCwd(u.GetStore().GetCwdFiles()).
-		WithFileExtensionGetter(u.Konfig().FileExtensions).
+		WithFileExtensionGetter(u.GetKonfig().FileExtensions).
 		WithHidden(u.GetMatcherArchiviert()).
 		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr())
 }
@@ -273,12 +282,12 @@ func (u *Umwelt) MakeQueryBuilder(
 		WithDefaultGattungen(dg).
 		WithVirtualEtiketten(u.konfig.Filters).
 		WithCwd(u.GetStore().GetCwdFiles()).
-		WithFileExtensionGetter(u.Konfig().FileExtensions).
+		WithFileExtensionGetter(u.GetKonfig().FileExtensions).
 		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr())
 }
 
 func (u *Umwelt) ApplyToOrganizeOptions(oo *organize_text.Options) {
-	oo.Konfig = u.Konfig()
+	oo.Konfig = u.GetKonfig()
 	oo.Abbr = u.GetStore().GetAbbrStore().GetAbbr()
 }
 

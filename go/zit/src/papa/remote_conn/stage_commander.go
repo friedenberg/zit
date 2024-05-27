@@ -97,9 +97,9 @@ func MakeStageCommander(
 	}()
 
 	s = &StageCommander{
-		Angeboren:           u.Konfig(),
+		Angeboren:           u.GetKonfig(),
 		wg:                  &sync.WaitGroup{},
-		konfigCli:           u.Konfig().Cli(),
+		konfigCli:           u.GetKonfig().Cli(),
 		chRemoteCommandDone: make(chan struct{}),
 	}
 

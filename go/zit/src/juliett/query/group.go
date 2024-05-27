@@ -35,6 +35,10 @@ type Group struct {
 	Typen            kennung.TypMutableSet
 }
 
+func (qg *Group) HasHidden() bool {
+	return qg.Hidden != nil
+}
+
 func (qg *Group) IsEmpty() bool {
 	return len(qg.UserQueries) == 0
 }
@@ -377,7 +381,7 @@ func (qg *Group) ContainsSku(sk *sku.Transacted) (ok bool) {
 	q, ok := qg.OptimizedQueries[gattung.Must(g)]
 
 	if !ok || !q.ContainsSku(sk) {
-    ok = false
+		ok = false
 		return
 	}
 

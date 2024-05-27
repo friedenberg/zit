@@ -85,6 +85,13 @@ func (c Clean) shouldClean(u *umwelt.Umwelt, co *sku.CheckedOut) bool {
 	return false
 }
 
+func (c Clean) ModifyBuilder(
+	b *query.Builder,
+) (err error) {
+	b.WithHidden(nil)
+	return
+}
+
 func (c Clean) RunWithQuery(
 	u *umwelt.Umwelt,
 	qg *query.Group,

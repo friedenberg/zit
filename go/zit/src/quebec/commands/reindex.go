@@ -37,7 +37,7 @@ func (c Reindex) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	defer errors.Deferred(&err, u.Unlock)
 
-	if err = u.Konfig().Reset(); err != nil {
+	if err = u.GetKonfig().Reset(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

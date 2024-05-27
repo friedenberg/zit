@@ -22,7 +22,7 @@ func (c DeleteCheckout) Run(
 ) (err error) {
 	p := c.PrinterFDDeleted()
 
-	if c.Konfig().DryRun {
+	if c.GetKonfig().DryRun {
 		return fs.Each(p)
 	}
 

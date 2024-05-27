@@ -55,7 +55,7 @@ func MakePullClient(u *umwelt.Umwelt, from string) (c *client, err error) {
 	}
 
 	theirVersion := c.stage.MainDialogue().GetAngeboren().GetStoreVersion()
-	ourVersion := u.Konfig().GetAngeboren().GetStoreVersion()
+	ourVersion := u.GetKonfig().GetAngeboren().GetStoreVersion()
 
 	if ourVersion.Less(theirVersion) {
 		err = errors.Normal(ErrPullRemoteHasHigherVersion)

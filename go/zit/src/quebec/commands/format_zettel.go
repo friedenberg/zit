@@ -84,11 +84,11 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			DoNotWriteEmptyBezeichnung: true,
 		},
 		u.Standort(),
-		u.Konfig(),
+		u.GetKonfig(),
 		akteFormatter,
 	)
 
-	if err = u.Konfig().ApplyToNewMetadatei(
+	if err = u.GetKonfig().ApplyToNewMetadatei(
 		zt,
 		u.GetStore().GetAkten().GetTypV0(),
 	); err != nil {
@@ -151,7 +151,7 @@ func (c *FormatZettel) getAkteFormatter(
 		return
 	}
 
-	typKonfig := u.Konfig().GetApproximatedTyp(
+	typKonfig := u.GetKonfig().GetApproximatedTyp(
 		zt.GetTyp(),
 	).ApproximatedOrActual()
 

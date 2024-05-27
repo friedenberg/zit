@@ -99,7 +99,7 @@ func Run(args []string) (exitStatus int) {
 	defer errors.DeferredFlusher(&err, u)
 
 	switch {
-	case u.Konfig().Complete:
+	case u.GetKonfig().Complete:
 		var t WithCompletion
 		ok := false
 

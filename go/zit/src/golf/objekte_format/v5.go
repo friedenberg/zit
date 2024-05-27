@@ -154,11 +154,11 @@ func (f v5) FormatPersistentMetadatei(
 	}
 
 	if o.Verzeichnisse {
-		if m.Verzeichnisse.Archiviert.Bool() {
+		if m.Verzeichnisse.Schlummernd.Bool() {
 			n1, err = ohio.WriteKeySpaceValueNewlineString(
 				w,
 				keyVerzeichnisseArchiviert.String(),
-				m.Verzeichnisse.Archiviert.String(),
+				m.Verzeichnisse.Schlummernd.String(),
 			)
 			n += int64(n1)
 
@@ -362,7 +362,7 @@ func (f v5) ParsePersistentMetadatei(
 			}
 
 		case key.Equal(keyVerzeichnisseArchiviert.Bytes()):
-			if err = m.Verzeichnisse.Archiviert.Set(val.String()); err != nil {
+			if err = m.Verzeichnisse.Schlummernd.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

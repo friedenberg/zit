@@ -38,7 +38,7 @@ func (m archiviert) CountArchiviert() int64 {
 }
 
 func (matcher *archiviert) ContainsSku(matchable *sku.Transacted) bool {
-	if !matchable.GetMetadatei().Verzeichnisse.Archiviert.Bool() {
+	if !matchable.GetMetadatei().Verzeichnisse.Schlummernd.Bool() {
 		atomic.AddInt64(&matcher.countArchiviert, 1)
 		return false
 	}

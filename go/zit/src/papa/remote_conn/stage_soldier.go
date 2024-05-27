@@ -53,7 +53,7 @@ func MakeStageSoldier(u *umwelt.Umwelt) (
 	err error,
 ) {
 	s = &StageSoldier{
-		Angeboren:                 u.Konfig(),
+		Angeboren:                 u.GetKonfig(),
 		chStopWaitingForDialogues: make(chan struct{}),
 		handlers:                  make(map[DialogueType]func(Dialogue) error),
 	}
@@ -93,7 +93,7 @@ func MakeStageSoldier(u *umwelt.Umwelt) (
 	}
 
 	s.mainDialogue = el.Dialogue
-	u.Konfig().SetCliFromCommander(el.MessageHiCommander.CliKonfig)
+	u.GetKonfig().SetCliFromCommander(el.MessageHiCommander.CliKonfig)
 	ui.Log().Printf("set konfig")
 
 	if err = u.Reset(); err != nil {

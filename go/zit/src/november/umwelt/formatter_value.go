@@ -193,7 +193,7 @@ func (u *Umwelt) MakeFormatFunc(
 				DoNotWriteEmptyBezeichnung: true,
 			},
 			u.GetStore().GetStandort(),
-			u.Konfig(),
+			u.GetKonfig(),
 		)
 
 		f = func(tl *sku.Transacted) (err error) {
@@ -202,7 +202,7 @@ func (u *Umwelt) MakeFormatFunc(
 		}
 
 	case "objekte":
-		fo := objekte_format.FormatForVersion(u.Konfig().GetStoreVersion())
+		fo := objekte_format.FormatForVersion(u.GetKonfig().GetStoreVersion())
 		o := objekte_format.Options{
 			Tai: true,
 		}
@@ -720,7 +720,7 @@ func (u *Umwelt) makeTypFormatter(
 	switch v {
 	case "formatters":
 		f = func(o *sku.Transacted) (err error) {
-			t := u.Konfig().GetApproximatedTyp(o.GetTyp())
+			t := u.GetKonfig().GetApproximatedTyp(o.GetTyp())
 
 			if !t.HasValue {
 				return
@@ -758,7 +758,7 @@ func (u *Umwelt) makeTypFormatter(
 		}
 
 	case "formatter-uti-groups":
-		fo := zettel.MakeFormatterTypFormatterUTIGroups(u.Konfig(), agp)
+		fo := zettel.MakeFormatterTypFormatterUTIGroups(u.GetKonfig(), agp)
 
 		f = func(o *sku.Transacted) (err error) {
 			if _, err = fo.Format(out, o); err != nil {
@@ -833,7 +833,7 @@ func (u *Umwelt) makeTypFormatter(
 
 	case "vim-syntax-type":
 		f = func(o *sku.Transacted) (err error) {
-			t := u.Konfig().GetApproximatedTyp(o.GetTyp()).ApproximatedOrActual()
+			t := u.GetKonfig().GetApproximatedTyp(o.GetTyp()).ApproximatedOrActual()
 
 			if t == nil || t.Kennung.IsEmpty() || t.GetAkteSha().IsNull() {
 				ty := ""

@@ -119,7 +119,7 @@ func (pt *Page) CopyJustHistoryAndAdded(
 }
 
 func (pt *Page) copyHistoryAndMaybeSchwanz(
-	s sku.QueryGroup,
+	qg sku.QueryGroup,
 	w schnittstellen.FuncIter[*sku.Transacted],
 	includeAdded bool,
 	includeAddedSchwanz bool,
@@ -143,7 +143,7 @@ func (pt *Page) copyHistoryAndMaybeSchwanz(
 	if !includeAdded && !includeAddedSchwanz {
 		if err = pt.CopyJustHistoryFrom(
 			br,
-			s,
+			qg,
 			func(sk skuWithRangeAndSigil) (err error) {
 				if err = w(sk.Transacted); err != nil {
 					err = errors.Wrapf(err, "%s", sk.Transacted)
@@ -160,7 +160,7 @@ func (pt *Page) copyHistoryAndMaybeSchwanz(
 		return
 	}
 
-	dec := makeBinaryWithQueryGroup(s, kennung.SigilHistory)
+	dec := makeBinaryWithQueryGroup(qg, kennung.SigilHistory)
 
 	errors.TodoP3("determine performance of this")
 	added := pt.added.Copy()

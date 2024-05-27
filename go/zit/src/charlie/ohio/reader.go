@@ -43,7 +43,6 @@ func ReadUint8(r io.Reader) (n uint8, read int, err error) {
 	cl := [1]byte{}
 
 	read, err = ReadAllOrDieTrying(r, cl[:])
-
 	if err != nil {
 		err = errors.WrapExcept(err, io.EOF)
 		return
@@ -65,7 +64,6 @@ func ReadInt8(r io.Reader) (n int8, read int, err error) {
 	cl := [1]byte{}
 
 	read, err = ReadAllOrDieTrying(r, cl[:])
-
 	if err != nil {
 		err = errors.WrapExcept(err, io.EOF)
 		return
@@ -83,24 +81,16 @@ func ReadInt8(r io.Reader) (n int8, read int, err error) {
 	return
 }
 
-func ReadUint16(r io.Reader) (n uint16, err error) {
-	cl := [2]byte{}
+func ReadUint16(r io.ByteReader) (v uint16, n int64, err error) {
+	var clInt uint64
 
-	_, err = ReadAllOrDieTrying(r, cl[:])
-
-	if err != nil {
-		err = errors.WrapExcept(err, io.EOF)
+	if clInt, err = binary.ReadUvarint(r); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	clInt, clIntErr := binary.Uvarint(cl[:])
-
-	if clIntErr <= 0 {
-		err = errors.WrapExcept(err, io.EOF)
-		return
-	}
-
-	n = uint16(clInt)
+	v = uint16(clInt)
+	n = int64(binary.Size(v))
 
 	return
 }
@@ -109,7 +99,6 @@ func ReadInt64(r io.Reader) (n int64, read int, err error) {
 	cl := [binary.MaxVarintLen64]byte{}
 
 	read, err = ReadAllOrDieTrying(r, cl[:])
-
 	if err != nil {
 		err = errors.WrapExcept(err, io.EOF)
 		return

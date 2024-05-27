@@ -74,7 +74,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	ofo := objekte_format.Options{Tai: true, Verzeichnisse: true}
 
-	bf := bestandsaufnahme.MakeAkteFormat(u.Konfig().GetStoreVersion(), ofo)
+	bf := bestandsaufnahme.MakeAkteFormat(u.GetKonfig().GetStoreVersion(), ofo)
 
 	var rc io.ReadCloser
 
@@ -172,7 +172,7 @@ func (c Import) importAkteIfNecessary(
 ) (err error) {
 	akteSha := co.External.GetAkteSha()
 
-	if u.Standort().HasAkte(u.Konfig().GetStoreVersion(), akteSha) {
+	if u.Standort().HasAkte(u.GetKonfig().GetStoreVersion(), akteSha) {
 		return
 	}
 

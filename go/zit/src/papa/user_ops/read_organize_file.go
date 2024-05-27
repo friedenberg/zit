@@ -39,7 +39,7 @@ func (c ReadOrganizeFile) Run(
 
 	if ot, err = organize_text.New(
 		otFlags.GetOptions(
-			u.Konfig().PrintOptions,
+			u.GetKonfig().PrintOptions,
 			nil,
 			u.SkuFmtOrganize(),
 			u.GetStore().GetAbbrStore().GetAbbr(),

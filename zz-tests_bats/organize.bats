@@ -319,11 +319,9 @@ function organize_simple_checkedout_merge_conflict { # @test
 }
 
 function organize_hides_hidden_etiketten_from_organize { # @test
-	run_zit edit-konfig -hide-etikett zz-archive
+	run_zit schlummernd-add zz-archive
 	assert_success
-	assert_output - <<-EOM
-		[konfig@bf141a9565304fe39d9b98d7912e23705200a1acd108b073904ee322b2f37bc0]
-	EOM
+	assert_output ''
 
 	to_add="$(mktemp)"
 	{

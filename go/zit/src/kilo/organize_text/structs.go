@@ -105,6 +105,7 @@ func (os Objekten) Sort() {
 			return false
 
 		default:
+			// TODO sort by ints for virtual kennung
 			return out[i].Kennung.String() < out[j].Kennung.String()
 		}
 	})

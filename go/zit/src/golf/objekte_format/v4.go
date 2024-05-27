@@ -150,11 +150,11 @@ func (f v4) FormatPersistentMetadatei(
 	}
 
 	if o.Verzeichnisse {
-		if m.Verzeichnisse.Archiviert.Bool() {
+		if m.Verzeichnisse.Schlummernd.Bool() {
 			n1, err = ohio.WriteKeySpaceValueNewlineString(
 				w,
 				keyVerzeichnisseArchiviert.String(),
-				m.Verzeichnisse.Archiviert.String(),
+				m.Verzeichnisse.Schlummernd.String(),
 			)
 			n += int64(n1)
 
