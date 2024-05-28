@@ -57,6 +57,11 @@ func (k *Compiled) ApplyToSku(
 	mp.Verzeichnisse.Etiketten.Reset()
 	mp.GetEtiketten().Each(mp.Verzeichnisse.Etiketten.AddEtikettOld)
 
+	// if err = k.addSuperEtikettenOld(sk); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
+
 	if err = k.addSuperEtiketten(sk); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -77,51 +82,57 @@ func (k *Compiled) addSuperEtiketten(
 ) (err error) {
 	g := sk.GetGattung()
 
-	switch g {
-	case gattung.Etikett:
-		break
+	var expanded []string
+	var ks string
 
-	// case gattung.Etikett, gattung.Typ, gattung.Kasten:
-	//   break
+	switch g {
+	case gattung.Etikett, gattung.Typ, gattung.Kasten:
+		ks = sk.Kennung.String()
+
+		expansion.ExpanderRight.Expand(
+			func(v string) (err error) {
+				expanded = append(expanded, v)
+				return
+			},
+			ks,
+		)
 
 	default:
 		return
 	}
 
-	e := kennung.MustEtikett(sk.GetKennung().String())
+	for _, ex := range expanded {
+		if ex == ks || ex == "" {
+			continue
+		}
 
-	expanded := kennung.ExpandOne(&e, expansion.ExpanderRight)
+		var ek *sku.Transacted
 
-	if err = expanded.Each(
-		func(e kennung.Etikett) (err error) {
-			if e.String() == sk.GetKennung().String() {
-				return
-			}
-
-			ek, ok := k.GetEtikett(e)
-
-			if !ok {
-				// err = errors.Errorf("expected %s, only have %s", e, iter.StringCommaSeparated(k.Etiketten))
-				return
-			}
-
-			prefix := etiketten_path.MakePath(catgut.MakeFromString(e.String()))
-			a := &sk.Metadatei.Verzeichnisse.Etiketten
-			b := &ek.Metadatei.Verzeichnisse.Etiketten
-
-			// ui.Err().Print("before", sk.GetKennung(), e, prefix, a, b)
-			// defer ui.Err().Print("after ", sk.GetKennung(), e, prefix, a, b)
-
-			if err = a.AddFrom(b, prefix); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+		if ek, err = k.GetEtikettOrKastenOrTyp(ex); err != nil {
+			err = errors.Wrapf(err, "Expanded: %q", ex)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		if ek == nil {
+			// this is ok because currently, konfig is applied twice. However, this
+			// is fragile as the order in which this method is called is
+			// non-deterministic and the `GetEtikett` call may request an Etikett we
+			// have not processed yet
+			// err = errors.Errorf("expected %s, only have %s", e, iter.StringCommaSeparated(k.Etiketten))
+			return
+		}
+
+		prefix := etiketten_path.MakePath(catgut.MakeFromString(ex))
+		a := &sk.Metadatei.Verzeichnisse.Etiketten
+		b := &ek.Metadatei.Verzeichnisse.Etiketten
+
+		// ui.Err().Print("before", sk.GetKennung(), e, prefix, a, b)
+		// defer ui.Err().Print("after ", sk.GetKennung(), e, prefix, a, b)
+
+		if err = a.AddFrom(b, prefix); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
