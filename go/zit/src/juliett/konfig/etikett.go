@@ -1,6 +1,8 @@
 package konfig
 
 import (
+	"fmt"
+
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/expansion"
@@ -163,10 +165,6 @@ func (k *compiled) AddEtikett(
 	k.lock.Lock()
 	defer k.lock.Unlock()
 
-	// TODO use more specific criteria for determine recompliation like if any
-	// kinder.Metadatei.Etiketten were changed
-	k.hasChanges = mutter != nil
-
 	var b ketikett
 
 	if err = b.Transacted.SetFromSkuLike(kinder); err != nil {
@@ -174,9 +172,15 @@ func (k *compiled) AddEtikett(
 		return
 	}
 
-	if _, err = iter.AddOrReplaceIfGreater(k.Etiketten, &b); err != nil {
+  shouldAdd := false
+
+	if shouldAdd, err = iter.AddOrReplaceIfGreater(k.Etiketten, &b); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	if shouldAdd {
+		k.setHasChanges(fmt.Sprintf("added %s", &b.Transacted))
 	}
 
 	if kinder.Metadatei.Verzeichnisse.Schlummernd.Bool() {

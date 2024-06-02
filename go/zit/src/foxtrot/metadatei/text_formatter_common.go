@@ -1,8 +1,10 @@
 package metadatei
 
 import (
+	"bufio"
 	"fmt"
 	"io"
+	"strings"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
@@ -15,10 +17,10 @@ import (
 )
 
 type textFormatterCommon struct {
-	standort                   standort.Standort
-	akteFactory                schnittstellen.AkteReaderFactory
-	akteFormatter              script_config.RemoteScript
-  TextFormatterOptions
+	standort      standort.Standort
+	akteFactory   schnittstellen.AkteReaderFactory
+	akteFormatter script_config.RemoteScript
+	TextFormatterOptions
 }
 
 func (f textFormatterCommon) writeComments(
@@ -75,9 +77,26 @@ func (f textFormatterCommon) writeCommonMetadateiFormat(
 	m := c.GetMetadatei()
 
 	if m.Bezeichnung.String() != "" || !f.DoNotWriteEmptyBezeichnung {
-		w.WriteLines(
-			fmt.Sprintf("# %s", m.Bezeichnung),
-		)
+		sr := bufio.NewReader(strings.NewReader(m.Bezeichnung.String()))
+
+		for {
+			var line string
+			line, err = sr.ReadString('\n')
+			isEOF := err == io.EOF
+
+			if err != nil && !isEOF {
+				err = errors.Wrap(err)
+				return
+			}
+
+			w.WriteLines(
+				fmt.Sprintf("# %s", strings.TrimSpace(line)),
+			)
+
+			if isEOF {
+				break
+			}
+		}
 	}
 
 	for _, e := range iter.SortedValues(m.GetEtiketten()) {

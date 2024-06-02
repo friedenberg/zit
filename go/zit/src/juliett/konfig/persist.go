@@ -115,24 +115,39 @@ func (kc *Compiled) recompileTypen(
 	return
 }
 
-func (kc *Compiled) HasChanges() bool {
+func (kc *Compiled) HasChanges() (ok bool) {
 	kc.lock.Lock()
 	defer kc.lock.Unlock()
 
-	return kc.compiled.hasChanges
+	ok = len(kc.compiled.changes) > 0
+
+	if ok {
+		ui.Log().Print(kc.compiled.changes)
+	}
+
+	return
 }
 
-func (kc *compiled) SetHasChanges() {
+func (kc *Compiled) GetChanges() (out []string) {
 	kc.lock.Lock()
 	defer kc.lock.Unlock()
 
-	ui.Log().FunctionName(1)
-	kc.hasChanges = true
+	out = make([]string, len(kc.changes))
+	copy(out, kc.changes)
+
+	return
 }
 
-func (kc *compiled) setHasChanges() {
+func (kc *compiled) SetHasChanges(reason string) {
+	kc.lock.Lock()
+	defer kc.lock.Unlock()
+
+	kc.setHasChanges(reason)
+}
+
+func (kc *compiled) setHasChanges(reason string) {
 	ui.Log().FunctionName(1)
-	kc.hasChanges = true
+	kc.changes = append(kc.changes, reason)
 }
 
 func (kc *Compiled) loadKonfigErworben(s standort.Standort) (err error) {
@@ -192,6 +207,8 @@ func (kc *Compiled) Flush(
 		err = errors.Wrap(err)
 		return
 	}
+
+	kc.changes = kc.changes[:0]
 
 	return
 }

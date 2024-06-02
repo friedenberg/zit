@@ -54,8 +54,8 @@ type Store struct {
 	erworben *konfig.Compiled
 	path     string
 	schnittstellen.VerzeichnisseFactory
-	pages                [PageCount]Page
-	changesAreHistorical bool
+	pages             [PageCount]Page
+	historicalChanges []string
 	ennuiStore
 }
 
@@ -113,14 +113,14 @@ func (i *Store) GetPagePair(n uint8) (p *Page) {
 	return
 }
 
-func (i *Store) SetNeedsFlushHistory() {
-	i.changesAreHistorical = true
+func (i *Store) SetNeedsFlushHistory(changes []string) {
+	i.historicalChanges = changes
 }
 
 func (i *Store) Flush(
 	printerHeader schnittstellen.FuncIter[string],
 ) (err error) {
-	if i.changesAreHistorical {
+	if len(i.historicalChanges) > 0 {
 		if err = i.flushEverything(printerHeader); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -202,6 +202,27 @@ func (i *Store) flushEverything(
 	); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	for n, change := range i.historicalChanges {
+		if err = printerHeader(fmt.Sprintf("change: %s", change)); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if n == 99 {
+			if err = printerHeader(
+				fmt.Sprintf(
+					"(%d more changes omitted)",
+					len(i.historicalChanges)-100,
+				),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			break
+		}
 	}
 
 	wg.DoAfter(i.kennung.Flush)

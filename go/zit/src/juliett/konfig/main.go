@@ -2,6 +2,7 @@ package konfig
 
 import (
 	"encoding/gob"
+	"fmt"
 	"sync"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
@@ -78,7 +79,7 @@ type cli = erworben.Cli
 type compiled struct {
 	lock sync.Locker
 
-	hasChanges bool
+	changes []string
 
 	Sku sku.Transacted
 
@@ -103,12 +104,12 @@ type compiled struct {
 func (c *Compiled) Initialize(
 	s standort.Standort,
 	kcli erworben.Cli,
-  schlummernd *query.Schlummernd,
+	schlummernd *query.Schlummernd,
 ) (err error) {
 	c.cli = kcli
 	c.Reset()
 	c.angeboren = s.GetKonfig()
-  c.schlummernd = schlummernd
+	c.schlummernd = schlummernd
 
 	wg := iter.MakeErrorWaitGroupParallel()
 	wg.Do(func() (err error) {
@@ -165,12 +166,12 @@ func (k *compiled) SetTransacted(
 	k.lock.Lock()
 	defer k.lock.Unlock()
 
-	k.setHasChanges()
-
 	if err = k.Sku.SetFromSkuLike(kt1); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	k.setHasChanges(fmt.Sprintf("updated konfig: %s", &k.Sku))
 
 	var a *erworben.Akte
 
@@ -189,7 +190,6 @@ func (k *compiled) AddKasten(
 ) (err error) {
 	k.lock.Lock()
 	defer k.lock.Unlock()
-	k.setHasChanges()
 
 	b := sku.GetTransactedPool().Get()
 
@@ -198,13 +198,18 @@ func (k *compiled) AddKasten(
 		return
 	}
 
-	_, err = iter.AddOrReplaceIfGreater(
+	shouldAdd := false
+
+	if shouldAdd, err = iter.AddOrReplaceIfGreater(
 		k.Kisten,
 		b,
-	)
-	if err != nil {
+	); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	if shouldAdd {
+		k.setHasChanges(fmt.Sprintf("added %s", b))
 	}
 
 	return
@@ -264,7 +269,7 @@ func (k *compiled) AddTyp(
 	)
 
 	if shouldAdd {
-		k.setHasChanges()
+		k.setHasChanges(fmt.Sprintf("added %s", b))
 	}
 
 	if err != nil {

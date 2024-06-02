@@ -25,11 +25,10 @@ func (u *Umwelt) Unlock() (err error) {
 		ui.Log().Printf("konfig has changes: %t", u.GetKonfig().HasChanges())
 		ui.Log().Printf("schlummernd has changes: %t", u.Schlummernd().HasChanges())
 
-		needsHistory := u.GetKonfig().HasChanges() || u.Schlummernd().HasChanges()
-
-		if needsHistory {
-			u.GetStore().GetVerzeichnisse().SetNeedsFlushHistory()
-		}
+		var changes []string
+		changes = append(changes, u.GetKonfig().GetChanges()...)
+		changes = append(changes, u.Schlummernd().GetChanges()...)
+		u.GetStore().GetVerzeichnisse().SetNeedsFlushHistory(changes)
 
 		ui.Log().Print("will flush bestandsaufnahme")
 		if err = u.store.FlushBestandsaufnahme(ptl); err != nil {
@@ -63,9 +62,7 @@ func (u *Umwelt) Unlock() (err error) {
 			return
 		}
 
-		if needsHistory {
-			u.GetStore().GetVerzeichnisse().SetNeedsFlushHistory()
-		}
+		u.GetStore().GetVerzeichnisse().SetNeedsFlushHistory(changes)
 
 		wg := iter.MakeErrorWaitGroupParallel()
 		wg.Do(

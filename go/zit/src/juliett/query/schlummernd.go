@@ -2,6 +2,7 @@ package query
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"os"
 	"slices"
@@ -18,16 +19,23 @@ import (
 )
 
 type Schlummernd struct {
-	hasChanges bool
-	etiketten  etiketten_path.SliceEtikettWithParents
+	changes   []string
+	etiketten etiketten_path.SliceEtikettWithParents
+}
+
+func (sch *Schlummernd) GetChanges() (out []string) {
+	out = make([]string, len(sch.changes))
+	copy(out, sch.changes)
+
+	return
 }
 
 func (sch *Schlummernd) HasChanges() bool {
-	return sch.hasChanges
+	return len(sch.changes) > 0
 }
 
 func (sch *Schlummernd) AddSchlummerndEtikett(e *etiketten_path.Etikett) (err error) {
-	sch.hasChanges = true
+	sch.changes = append(sch.changes, fmt.Sprintf("added %q", e))
 
 	if err = sch.etiketten.Add(e, nil); err != nil {
 		err = errors.Wrap(err)
@@ -38,7 +46,7 @@ func (sch *Schlummernd) AddSchlummerndEtikett(e *etiketten_path.Etikett) (err er
 }
 
 func (sch *Schlummernd) RemoveSchlummerndEtikett(e *etiketten_path.Etikett) (err error) {
-	sch.hasChanges = true
+	sch.changes = append(sch.changes, fmt.Sprintf("removed %q", e))
 
 	if err = sch.etiketten.Remove(e); err != nil {
 		err = errors.Wrap(err)
@@ -109,7 +117,7 @@ func (sch *Schlummernd) Flush(
 	printerHeader schnittstellen.FuncIter[string],
 	dryRun bool,
 ) (err error) {
-	if !sch.hasChanges {
+	if len(sch.changes) == 0 {
 		ui.Log().Print("no Schlummernd changes")
 		return
 	}
