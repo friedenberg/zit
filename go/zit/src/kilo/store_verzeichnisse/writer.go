@@ -29,6 +29,8 @@ type writer struct {
 	bufio.Reader
 	bufio.Writer
 
+	changesAreHistorical bool
+
 	ennui.Range
 	offsetLast, offset int64
 	kennungShaMap      KennungShaMap

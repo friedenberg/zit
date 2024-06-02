@@ -284,7 +284,6 @@ func (i *oldIndex) makeHinweisButDontStore(
 		i.oldHinweisenStore.Left(),
 		i.oldHinweisenStore.Right(),
 	)
-
 	if err != nil {
 		err = errors.Wrapf(err, "trying to make hinweis for %s", k)
 		return
@@ -294,9 +293,6 @@ func (i *oldIndex) makeHinweisButDontStore(
 }
 
 func (i *oldIndex) PeekHinweisen(m int) (hs []*kennung.Hinweis, err error) {
-	i.lock.Lock()
-	defer i.lock.Unlock()
-
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return

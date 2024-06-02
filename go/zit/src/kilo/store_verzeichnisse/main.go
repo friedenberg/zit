@@ -1,6 +1,7 @@
 package store_verzeichnisse
 
 import (
+	"fmt"
 	"sync"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
@@ -53,7 +54,8 @@ type Store struct {
 	erworben *konfig.Compiled
 	path     string
 	schnittstellen.VerzeichnisseFactory
-	pages [PageCount]Page
+	pages                [PageCount]Page
+	changesAreHistorical bool
 	ennuiStore
 }
 
@@ -112,33 +114,53 @@ func (i *Store) GetPagePair(n uint8) (p *Page) {
 }
 
 func (i *Store) SetNeedsFlushHistory() {
-	for n := range i.pages {
-		i.pages[n].SetNeedsFlushHistory()
-	}
+	i.changesAreHistorical = true
 }
 
 func (i *Store) Flush(
 	printerHeader schnittstellen.FuncIter[string],
 ) (err error) {
+	if i.changesAreHistorical {
+		if err = i.flushEverything(printerHeader); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if err = i.flushAdded(printerHeader); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (i *Store) flushAdded(
+	printerHeader schnittstellen.FuncIter[string],
+) (err error) {
 	ui.Log().Print("flushing")
 	wg := iter.MakeErrorWaitGroupParallel()
 
-	actualFlush := false
+	actualFlushCount := 0
 
 	for n := range i.pages {
 		if i.pages[n].hasChanges {
 			ui.Log().Printf("actual flush for %d", n)
-			actualFlush = true
+			actualFlushCount++
 		}
 
-		wg.Do(i.pages[n].MakeFlush())
+		wg.Do(i.pages[n].MakeFlush(false))
 	}
 
-	if actualFlush {
-		if err = printerHeader("writing index"); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = printerHeader(
+		fmt.Sprintf(
+			"appending to index (%d/%d pages)",
+			actualFlushCount,
+			len(i.pages),
+		),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	wg.DoAfter(i.kennung.Flush)
@@ -148,11 +170,55 @@ func (i *Store) Flush(
 		return
 	}
 
-	if actualFlush {
-		if err = printerHeader("wrote index"); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = printerHeader(
+		fmt.Sprintf(
+			"appended to index (%d/%d pages)",
+			actualFlushCount,
+			len(i.pages),
+		),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (i *Store) flushEverything(
+	printerHeader schnittstellen.FuncIter[string],
+) (err error) {
+	ui.Log().Print("flushing")
+	wg := iter.MakeErrorWaitGroupParallel()
+
+	for n := range i.pages {
+		wg.Do(i.pages[n].MakeFlush(true))
+	}
+
+	if err = printerHeader(
+		fmt.Sprintf(
+			"writing index (%d pages)",
+			len(i.pages),
+		),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	wg.DoAfter(i.kennung.Flush)
+
+	if err = wg.GetError(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = printerHeader(
+		fmt.Sprintf(
+			"wrote index (%d pages)",
+			len(i.pages),
+		),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

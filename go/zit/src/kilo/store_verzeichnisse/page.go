@@ -23,12 +23,11 @@ type Page struct {
 	PageId
 	ennuiStore
 	// All, Schwanzen  Page
-	added, addedSchwanz  *sku.TransactedHeap
-	flushMode            objekte_mode.Mode
-	hasChanges           bool
-	changesAreHistorical bool
-	standort             standort.Standort
-	konfig               *konfig.Compiled
+	added, addedSchwanz *sku.TransactedHeap
+	flushMode           objekte_mode.Mode
+	hasChanges          bool
+	standort            standort.Standort
+	konfig              *konfig.Compiled
 }
 
 func (pt *Page) initialize(
@@ -67,11 +66,6 @@ func (pt *Page) add(
 
 func (pt *Page) waitingToAddLen() int {
 	return pt.added.Len() + pt.addedSchwanz.Len()
-}
-
-func (pt *Page) SetNeedsFlushHistory() {
-	pt.hasChanges = true
-	pt.changesAreHistorical = true
 }
 
 func (pt *Page) CopyJustHistory(
@@ -212,10 +206,15 @@ func (pt *Page) copyHistoryAndMaybeSchwanz(
 	return
 }
 
-func (pt *Page) MakeFlush() func() error {
+func (pt *Page) MakeFlush(changesAreHistorical bool) func() error {
 	return func() (err error) {
 		pw := &writer{
 			Page: pt,
+		}
+
+		if changesAreHistorical {
+			pw.changesAreHistorical = true
+			pw.hasChanges = true
 		}
 
 		if err = pw.Flush(); err != nil {
@@ -224,7 +223,6 @@ func (pt *Page) MakeFlush() func() error {
 		}
 
 		pt.hasChanges = false
-		pt.changesAreHistorical = false
 
 		return
 	}
