@@ -151,12 +151,10 @@ func (c *FormatZettel) getAkteFormatter(
 		return
 	}
 
-	typKonfig := u.GetKonfig().GetApproximatedTyp(
-		zt.GetTyp(),
-	).ApproximatedOrActual()
+	var typKonfig *sku.Transacted
 
-	if typKonfig == nil {
-		err = errors.Errorf("typ konfig was nil")
+	if typKonfig, err = u.GetStore().ReadOne(zt.GetTyp()); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

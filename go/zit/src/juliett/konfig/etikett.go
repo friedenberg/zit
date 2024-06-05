@@ -114,7 +114,7 @@ func (k *compiled) AccumulateImplicitEtiketten(
 				return
 			}
 
-			if err = k.GetImplicitEtiketten(&e1).Each(
+			if err = k.getImplicitEtiketten(&e1).Each(
 				func(e2 kennung.Etikett) (err error) {
 					return k.ImplicitEtiketten.Set(e, e2)
 				},

@@ -108,7 +108,7 @@ func (k *Compiled) addSuperEtiketten(
 
 		var ek *sku.Transacted
 
-		if ek, err = k.GetEtikettOrKastenOrTyp(ex); err != nil {
+		if ek, err = k.getEtikettOrKastenOrTyp(ex); err != nil {
 			err = errors.Wrapf(err, "Expanded: %q", ex)
 			return
 		}
@@ -148,7 +148,7 @@ func (k *Compiled) addImplicitEtiketten(
 		p1 := etiketten_path.MakePath()
 		p1.Add(catgut.MakeFromString(e.String()))
 
-		impl := k.GetImplicitEtiketten(e)
+		impl := k.getImplicitEtiketten(e)
 
 		if impl.Len() == 0 {
 			sk.Metadatei.Verzeichnisse.Etiketten.AddPath(p1)
@@ -175,7 +175,7 @@ func (k *Compiled) addImplicitEtiketten(
 
 	mp.GetEtiketten().EachPtr(addImpEts)
 
-	typKonfig := k.GetApproximatedTyp(mp.GetTyp()).ApproximatedOrActual()
+	typKonfig := k.getApproximatedTyp(mp.GetTyp()).ApproximatedOrActual()
 
 	if typKonfig != nil {
 		typKonfig.GetEtiketten().EachPtr(ie.AddPtr)

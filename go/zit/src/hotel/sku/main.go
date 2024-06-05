@@ -65,6 +65,12 @@ type (
 
 		ResetWithExternalMaybe(b *ExternalMaybe) (err error)
 	}
+
+	OneReader interface {
+		ReadOne(
+			k1 schnittstellen.StringerGattungGetter,
+		) (sk1 *Transacted, err error)
+	}
 )
 
 func EqualsSkuLike(a, b SkuLike) (ok bool) {

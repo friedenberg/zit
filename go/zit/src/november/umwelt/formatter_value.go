@@ -14,6 +14,7 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/charlie/checkout_options"
+	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/sha"
@@ -720,13 +721,12 @@ func (u *Umwelt) makeTypFormatter(
 	switch v {
 	case "formatters":
 		f = func(o *sku.Transacted) (err error) {
-			t := u.GetKonfig().GetApproximatedTyp(o.GetTyp())
+			var tt *sku.Transacted
 
-			if !t.HasValue {
+			if tt, err = u.GetStore().ReadOne(o.GetTyp()); err != nil {
+				err = errors.Wrap(err)
 				return
 			}
-
-			tt := t.ActualOrNil()
 
 			var ta *typ_akte.V0
 
@@ -758,7 +758,7 @@ func (u *Umwelt) makeTypFormatter(
 		}
 
 	case "formatter-uti-groups":
-		fo := zettel.MakeFormatterTypFormatterUTIGroups(u.GetKonfig(), agp)
+		fo := zettel.MakeFormatterTypFormatterUTIGroups(u.GetStore(), agp)
 
 		f = func(o *sku.Transacted) (err error) {
 			if _, err = fo.Format(out, o); err != nil {
@@ -832,7 +832,16 @@ func (u *Umwelt) makeTypFormatter(
 
 	case "vim-syntax-type":
 		f = func(o *sku.Transacted) (err error) {
-			t := u.GetKonfig().GetApproximatedTyp(o.GetTyp()).ApproximatedOrActual()
+			var t *sku.Transacted
+
+			if t, err = u.GetStore().ReadOne(o.GetTyp()); err != nil {
+				if collections.IsErrNotFound(err) {
+					err = nil
+				} else {
+					err = errors.Wrap(err)
+					return
+				}
+			}
 
 			if t == nil || t.Kennung.IsEmpty() || t.GetAkteSha().IsNull() {
 				ty := ""

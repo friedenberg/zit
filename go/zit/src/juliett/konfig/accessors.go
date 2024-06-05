@@ -23,7 +23,7 @@ func (kc *Compiled) GetAngeboren() schnittstellen.Angeboren {
 	return kc.angeboren
 }
 
-func (kc *compiled) GetTyp(k kennung.Kennung) (ct *sku.Transacted) {
+func (kc *compiled) getTyp(k kennung.Kennung) (ct *sku.Transacted) {
 	if k.GetGattung() != gattung.Typ {
 		return
 	}
@@ -36,7 +36,7 @@ func (kc *compiled) GetTyp(k kennung.Kennung) (ct *sku.Transacted) {
 	return
 }
 
-func (kc *compiled) GetKasten(k kennung.Kennung) (ct *sku.Transacted) {
+func (kc *compiled) getKasten(k kennung.Kennung) (ct *sku.Transacted) {
 	if k.GetGattung() != gattung.Kasten {
 		return
 	}
@@ -51,14 +51,14 @@ func (kc *compiled) GetKasten(k kennung.Kennung) (ct *sku.Transacted) {
 
 // Returns the exactly matching Typ, or if it doesn't exist, returns the parent
 // Typ or nil. (Parent Typ for `md-gdoc` would be `md`.)
-func (kc *compiled) GetApproximatedTyp(
+func (kc *compiled) getApproximatedTyp(
 	k kennung.Kennung,
 ) (ct ApproximatedTyp) {
 	if k.GetGattung() != gattung.Typ {
 		return
 	}
 
-	expandedActual := kc.GetSortedTypenExpanded(k.String())
+	expandedActual := kc.getSortedTypenExpanded(k.String())
 	if len(expandedActual) > 0 {
 		ct.HasValue = true
 		ct.Typ = expandedActual[0]
@@ -71,7 +71,7 @@ func (kc *compiled) GetApproximatedTyp(
 	return
 }
 
-func (kc *compiled) GetEtikettOrKastenOrTyp(
+func (kc *compiled) getEtikettOrKastenOrTyp(
 	v string,
 ) (sk *sku.Transacted, err error) {
 	var k kennung.Kennung2
@@ -83,11 +83,11 @@ func (kc *compiled) GetEtikettOrKastenOrTyp(
 
 	switch k.GetGattung() {
 	case gattung.Etikett:
-		sk, _ = kc.GetEtikett(&k)
+		sk, _ = kc.getEtikett(&k)
 	case gattung.Kasten:
-		sk = kc.GetKasten(&k)
+		sk = kc.getKasten(&k)
 	case gattung.Typ:
-		sk = kc.GetTyp(&k)
+		sk = kc.getTyp(&k)
 
 	default:
 		err = gattung.MakeErrUnsupportedGattung(&k)
@@ -97,14 +97,14 @@ func (kc *compiled) GetEtikettOrKastenOrTyp(
 	return
 }
 
-func (kc *compiled) GetEtikett(
+func (kc *compiled) getEtikett(
 	k kennung.Kennung,
 ) (ct *sku.Transacted, ok bool) {
 	if k.GetGattung() != gattung.Etikett {
 		return
 	}
 
-	expandedActual := kc.GetSortedEtikettenExpanded(k.String())
+	expandedActual := kc.getSortedEtikettenExpanded(k.String())
 
 	if len(expandedActual) > 0 {
 		ct = expandedActual[0]
@@ -115,7 +115,7 @@ func (kc *compiled) GetEtikett(
 }
 
 // TODO-P3 merge all the below
-func (c *compiled) GetSortedTypenExpanded(
+func (c *compiled) getSortedTypenExpanded(
 	v string,
 ) (expandedActual []*sku.Transacted) {
 	expandedMaybe := collections_value.MakeMutableValueSet[values.String](nil)
@@ -153,7 +153,7 @@ func (c *compiled) GetSortedTypenExpanded(
 	return
 }
 
-func (c *compiled) GetSortedEtikettenExpanded(
+func (c *compiled) getSortedEtikettenExpanded(
 	v string,
 ) (expandedActual []*sku.Transacted) {
 	c.lock.Lock()
@@ -198,7 +198,7 @@ func (c *compiled) GetSortedEtikettenExpanded(
 	return
 }
 
-func (c *compiled) GetImplicitEtiketten(
+func (c *compiled) getImplicitEtiketten(
 	e *kennung.Etikett,
 ) kennung.EtikettSet {
 	s, ok := c.ImplicitEtiketten[e.String()]

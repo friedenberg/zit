@@ -33,6 +33,5 @@ type (
 	Konfig interface {
 		schnittstellen.Konfig
 		IsInlineTyp(kennung.Typ) bool
-		GetApproximatedTyp(kennung.Kennung) ApproximatedTyp
 	}
 )

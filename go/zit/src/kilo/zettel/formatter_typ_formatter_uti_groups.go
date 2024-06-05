@@ -7,20 +7,19 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/delta/typ_akte"
 	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/juliett/konfig"
 )
 
 type formatterTypFormatterUTIGroups struct {
-	erworben            *konfig.Compiled
+	sku.OneReader
 	typAkteGetterPutter schnittstellen.AkteGetterPutter[*typ_akte.V0]
 }
 
 func MakeFormatterTypFormatterUTIGroups(
-	erworben *konfig.Compiled,
+	sr sku.OneReader,
 	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
 ) *formatterTypFormatterUTIGroups {
 	return &formatterTypFormatterUTIGroups{
-		erworben:            erworben,
+		OneReader:           sr,
 		typAkteGetterPutter: tagp,
 	}
 }
@@ -31,17 +30,16 @@ func (e formatterTypFormatterUTIGroups) Format(
 ) (n int64, err error) {
 	e1 := typ_akte.MakeFormatterFormatterUTIGroups()
 
-	ct := e.erworben.GetApproximatedTyp(
-		z.Metadatei.GetTyp(),
-	).ApproximatedOrActual()
+	var skuTyp *sku.Transacted
 
-	if ct == nil {
+	if skuTyp, err = e.ReadOne(z.Metadatei.GetTyp()); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
 	var ta *typ_akte.V0
 
-	if ta, err = e.typAkteGetterPutter.GetAkte(ct.GetAkteSha()); err != nil {
+	if ta, err = e.typAkteGetterPutter.GetAkte(skuTyp.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
