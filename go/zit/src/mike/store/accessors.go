@@ -2,6 +2,7 @@ package store
 
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -83,7 +84,9 @@ func (s *Store) ReadOneEnnui(sh *sha.Sha) (*sku.Transacted, error) {
 	return s.GetVerzeichnisse().ReadOneEnnui(sh)
 }
 
-func (s *Store) ReadOneKennung(k kennung.Kennung) (sk *sku.Transacted, err error) {
+func (s *Store) ReadOneKennung(
+	k schnittstellen.StringerGattungGetter,
+) (sk *sku.Transacted, err error) {
 	return s.GetVerzeichnisse().ReadOneKennung(k)
 }
 

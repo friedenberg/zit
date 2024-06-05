@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/src/golf/ennui_shas"
 	"code.linenisgreat.com/zit/src/golf/objekte_format"
@@ -88,7 +87,9 @@ func (s *ennuiStore) ReadOneEnnui(sh *sha.Sha) (sk *sku.Transacted, err error) {
 	return
 }
 
-func (s *ennuiStore) ReadOneKennungSha(k kennung.Kennung) (sh *sha.Sha, err error) {
+func (s *ennuiStore) ReadOneKennungSha(
+	k schnittstellen.StringerGattungGetter,
+) (sh *sha.Sha, err error) {
 	left := sha.FromString(k.String())
 	defer sha.GetPool().Put(left)
 
@@ -100,7 +101,9 @@ func (s *ennuiStore) ReadOneKennungSha(k kennung.Kennung) (sh *sha.Sha, err erro
 	return
 }
 
-func (s *ennuiStore) ReadOneKennung(k kennung.Kennung) (sk *sku.Transacted, err error) {
+func (s *ennuiStore) ReadOneKennung(
+	k schnittstellen.StringerGattungGetter,
+) (sk *sku.Transacted, err error) {
 	sh, err := s.ReadOneKennungSha(k)
 	defer sha.GetPool().Put(sh)
 

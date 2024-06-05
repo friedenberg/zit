@@ -34,40 +34,46 @@ func (s *Store) ReadOneInto(
 			return
 		}
 
-	case gattung.Typ:
-		var k kennung.Typ
-
-		if err = k.Set(k1.String()); err != nil {
+	case gattung.Typ, gattung.Etikett, gattung.Kasten:
+		if sk, err = s.ReadOneKennung(k1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		sk = s.GetKonfig().GetApproximatedTyp(k).ActualOrNil()
+	// case gattung.Typ:
+	// 	var k kennung.Typ
 
-	case gattung.Etikett:
-		var e kennung.Etikett
+	// 	if err = k.Set(k1.String()); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return
+	// 	}
 
-		if err = e.Set(k1.String()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	// 	sk = s.GetKonfig().GetApproximatedTyp(k).ActualOrNil()
 
-		ok := false
-		sk, ok = s.GetKonfig().GetEtikett(e)
+	// case gattung.Etikett:
+	// 	var e kennung.Etikett
 
-		if !ok {
-			sk = nil
-		}
+	// 	if err = e.Set(k1.String()); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return
+	// 	}
 
-	case gattung.Kasten:
-		var k kennung.Kasten
+	// 	ok := false
+	// 	sk, ok = s.GetKonfig().GetEtikett(e)
 
-		if err = k.Set(k.String()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	// 	if !ok {
+	// 		sk = nil
+	// 	}
 
-		sk = s.GetKonfig().GetKasten(k)
+	// case gattung.Kasten:
+	// 	var k kennung.Kasten
+
+	// 	if err = k.Set(k.String()); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return
+	// 	}
+
+	// 	sk = s.GetKonfig().GetKasten(k)
 
 	case gattung.Konfig:
 		sk = &s.GetKonfig().Sku

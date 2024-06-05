@@ -19,8 +19,8 @@ type (
 	Ennui interface {
 		WriteOneObjekteMetadatei(o *Transacted) (err error)
 		ReadOneEnnui(*sha.Sha) (*Transacted, error)
-		ReadOneKennung(kennung.Kennung) (*Transacted, error)
-		ReadOneKennungSha(kennung.Kennung) (*sha.Sha, error)
+		ReadOneKennung(schnittstellen.StringerGattungGetter) (*Transacted, error)
+		ReadOneKennungSha(schnittstellen.StringerGattungGetter) (*sha.Sha, error)
 	}
 
 	TransactedAdder interface {
