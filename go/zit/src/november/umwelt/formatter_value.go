@@ -16,7 +16,6 @@ import (
 	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/delta/typ_akte"
 	"code.linenisgreat.com/zit/src/echo/format"
@@ -26,6 +25,7 @@ import (
 	"code.linenisgreat.com/zit/src/india/akten"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/src/kilo/zettel"
+	"code.linenisgreat.com/zit/src/mike/store"
 )
 
 func (u *Umwelt) MakeFormatFunc(
@@ -807,24 +807,23 @@ func (u *Umwelt) makeTypFormatter(
 				return
 			}
 
-			var vp *lua.VMPool
+			var vp store.LuaVMPool
 
-			if vp, err = u.GetStore().MakeLuaVMPool(script); err != nil {
+			if vp, err = u.GetStore().MakeLuaVMPool(o, script); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			vm := vp.Get()
+			var vm store.LuaVM
+
+			if vm, err = vp.Get(); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
 			defer vp.Put(vm)
 
-			var tt *lua.LTable
-
-			if tt, err = vm.GetTopTableOrError(); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			f := vm.GetField(tt, "on_pre_commit")
+			f := vm.GetField(vm.LTable, "on_pre_commit")
 
 			ui.Out().Print(f.String())
 

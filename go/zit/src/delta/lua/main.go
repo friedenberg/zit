@@ -22,3 +22,5 @@ type (
 	FunctionProto = lua.FunctionProto
 	LGFunction    = lua.LGFunction
 )
+
+var LNil = lua.LNil

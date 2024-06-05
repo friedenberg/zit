@@ -39,6 +39,17 @@ func Make(
 		return
 	}
 
+	if o.BasePath == "" {
+		o.BasePath = os.Getenv("DIR_ZIT")
+	}
+
+	if o.BasePath == "" {
+		if o.BasePath, err = os.Getwd(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	s.basePath = o.BasePath
 	s.debug = o.Debug
 	s.cwd = o.cwd
@@ -52,6 +63,16 @@ func Make(
 	s.lockSmith = file_lock.New(s.DirZit("Lock"))
 
 	if s.execPath, err = os.Executable(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = os.Setenv("DIR_ZIT", s.basePath); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = os.Setenv("BIN_ZIT", s.execPath); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -1,7 +1,6 @@
 package exec_editor
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 
@@ -34,15 +33,6 @@ func OpenVimWithArgs(args []string, fs ...string) (err error) {
 			append(append(args, "-f"), fs...)...,
 		)
 	}
-
-	var loc string
-
-	if loc, err = os.Executable(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	cmd.Env = append(os.Environ(), fmt.Sprintf("BIN_ZIT=%s", loc))
 
 	if err = cmd.Run(); err != nil {
 		err = errors.Wrap(err)

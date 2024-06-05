@@ -1,8 +1,6 @@
 package konfig
 
 import (
-	"fmt"
-
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/expansion"
@@ -158,10 +156,10 @@ func (k *compiled) AccumulateImplicitEtiketten(
 	return
 }
 
-func (k *compiled) AddEtikett(
+func (k *compiled) addEtikett(
 	kinder *sku.Transacted,
 	mutter *sku.Transacted,
-) (err error) {
+) (didChange bool, err error) {
 	k.lock.Lock()
 	defer k.lock.Unlock()
 
@@ -172,29 +170,9 @@ func (k *compiled) AddEtikett(
 		return
 	}
 
-  shouldAdd := false
-
-	if shouldAdd, err = iter.AddOrReplaceIfGreater(k.Etiketten, &b); err != nil {
+	if didChange, err = iter.AddOrReplaceIfGreater(k.Etiketten, &b); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	if shouldAdd {
-		k.setHasChanges(fmt.Sprintf("added %s", &b.Transacted))
-	}
-
-	if kinder.Metadatei.Verzeichnisse.Schlummernd.Bool() {
-		var e kennung.Etikett
-
-		if err = e.Set(kinder.Kennung.String()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		// if err = k.EtikettenSchlummernd.Add(e); err != nil {
-		// 	err = errors.Wrap(err)
-		// 	return
-		// }
 	}
 
 	return

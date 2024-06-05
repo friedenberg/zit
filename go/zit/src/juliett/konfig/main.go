@@ -155,16 +155,18 @@ func (kc *compiled) IsInlineTyp(k kennung.Typ) (isInline bool) {
 
 type ApproximatedTyp = akten.ApproximatedTyp
 
-func (k *compiled) SetTransacted(
+func (k *compiled) setTransacted(
 	kt1 *sku.Transacted,
 	kag schnittstellen.AkteGetter[*erworben.Akte],
-) (err error) {
+) (didChange bool, err error) {
 	if !sku.TransactedLessor.LessPtr(&k.Sku, kt1) {
 		return
 	}
 
 	k.lock.Lock()
 	defer k.lock.Unlock()
+
+	didChange = true
 
 	if err = k.Sku.SetFromSkuLike(kt1); err != nil {
 		err = errors.Wrap(err)
@@ -185,9 +187,9 @@ func (k *compiled) SetTransacted(
 	return
 }
 
-func (k *compiled) AddKasten(
+func (k *compiled) addKasten(
 	c *sku.Transacted,
-) (err error) {
+) (didChange bool, err error) {
 	k.lock.Lock()
 	defer k.lock.Unlock()
 
@@ -198,18 +200,12 @@ func (k *compiled) AddKasten(
 		return
 	}
 
-	shouldAdd := false
-
-	if shouldAdd, err = iter.AddOrReplaceIfGreater(
+	if didChange, err = iter.AddOrReplaceIfGreater(
 		k.Kisten,
 		b,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	if shouldAdd {
-		k.setHasChanges(fmt.Sprintf("added %s", b))
 	}
 
 	return
@@ -225,29 +221,49 @@ func (k *Compiled) ApplyAndAddTransacted(
 		return
 	}
 
+	didChange := false
+
 	switch kinder.Kennung.GetGattung() {
 	case gattung.Typ:
-		return k.AddTyp(kinder)
+		if didChange, err = k.addTyp(kinder); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 	case gattung.Etikett:
-		return k.compiled.AddEtikett(kinder, mutter)
+		if didChange, err = k.addEtikett(kinder, mutter); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 	case gattung.Kasten:
-		return k.AddKasten(kinder)
+		if didChange, err = k.addKasten(kinder); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 	case gattung.Konfig:
-		return k.SetTransacted(
-			kinder,
-			ak.GetKonfigV0(),
-		)
+		if didChange, err = k.setTransacted(kinder, ak.GetKonfigV0()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	// switch kinder.Kennung.GetGattung() {
+	// case gattung.Typ, gattung.Etikett, gattung.Kasten:
+	// 	didChange = didChange && mutter != nil
+	// }
+
+	if didChange {
+		k.SetHasChanges(fmt.Sprintf("added: %s", kinder))
 	}
 
 	return
 }
 
-func (k *compiled) AddTyp(
+func (k *compiled) addTyp(
 	b1 *sku.Transacted,
-) (err error) {
+) (didChange bool, err error) {
 	if err = gattung.Typ.AssertGattung(b1); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -263,16 +279,10 @@ func (k *compiled) AddTyp(
 	k.lock.Lock()
 	defer k.lock.Unlock()
 
-	shouldAdd, err := iter.AddOrReplaceIfGreater(
+	if didChange, err = iter.AddOrReplaceIfGreater(
 		k.Typen,
 		b,
-	)
-
-	if shouldAdd {
-		k.setHasChanges(fmt.Sprintf("added %s", b))
-	}
-
-	if err != nil {
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

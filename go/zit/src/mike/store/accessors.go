@@ -19,25 +19,6 @@ import (
 	"code.linenisgreat.com/zit/src/lima/bestandsaufnahme"
 )
 
-type accessors interface {
-	standort.Getter
-	konfig.Getter
-	objekte_format.Getter
-
-	GetAbbrStore() AbbrStore
-	GetAkten() *akten.Akten
-	GetBestandsaufnahmeStore() bestandsaufnahme.Store
-	GetCwdFiles() *cwd.CwdFiles
-	GetEnnui() ennui.Ennui
-	GetFileEncoder() sku.FileEncoder
-	GetKennungIndex() kennung_index.Index
-	GetObjekteFormatOptions() objekte_format.Options
-	GetVerzeichnisse() *store_verzeichnisse.Store
-	ReadOneEnnui(*sha.Sha) (*sku.Transacted, error)
-	ReadOneKennung(kennung.Kennung) (*sku.Transacted, error)
-	ReaderFor(*sha.Sha) (sha.ReadCloser, error)
-}
-
 func (s *Store) GetAkten() *akten.Akten {
 	return s.akten
 }

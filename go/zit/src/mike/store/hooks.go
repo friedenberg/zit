@@ -47,6 +47,7 @@ func (s *Store) tryNewHook(
 		kinder,
 		nil,
 		mode,
+		t,
 		script,
 		"on_new",
 	); err != nil {
@@ -101,6 +102,7 @@ func (s *Store) TryFormatHook(
 		kinder,
 		mutter,
 		objekte_mode.ModeEmpty,
+		t,
 		script,
 		"on_format",
 	); err != nil {
@@ -160,6 +162,7 @@ func (s *Store) tryPreCommitHooks(
 			kinder,
 			mutter,
 			mode,
+			t,
 			h.script,
 			"on_pre_commit",
 		); err != nil {
@@ -175,20 +178,27 @@ func (s *Store) tryPreCommitHook(
 	kinder *sku.Transacted,
 	mutter *sku.Transacted,
 	mode objekte_mode.Mode,
+	selbst *sku.Transacted,
 	script string,
 ) (err error) {
 	if mode == objekte_mode.ModeEmpty {
 		return
 	}
 
-	var vp *lua.VMPool
+	var vp LuaVMPool
 
-	if vp, err = s.MakeLuaVMPool(script); err != nil {
+	if vp, err = s.MakeLuaVMPool(selbst, script); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	vm := vp.Get()
+	var vm LuaVM
+
+	if vm, err = vp.Get(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	defer vp.Put(vm)
 
 	var tt *lua.LTable
@@ -255,17 +265,24 @@ func (s *Store) tryHookWithName(
 	kinder *sku.Transacted,
 	mutter *sku.Transacted,
 	mode objekte_mode.Mode,
+	selbst *sku.Transacted,
 	script string,
 	name string,
 ) (err error) {
-	var vp *lua.VMPool
+	var vp LuaVMPool
 
-	if vp, err = s.MakeLuaVMPool(script); err != nil {
+	if vp, err = s.MakeLuaVMPool(selbst, script); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	vm := vp.Get()
+	var vm LuaVM
+
+	if vm, err = vp.Get(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	defer vp.Put(vm)
 
 	var tt *lua.LTable

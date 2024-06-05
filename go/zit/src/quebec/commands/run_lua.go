@@ -4,7 +4,13 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/delta/lua"
+	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/src/mike/store"
 	"code.linenisgreat.com/zit/src/november/umwelt"
 )
 
@@ -22,39 +28,95 @@ func init() {
 }
 
 func (c RunLua) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	script := args[0]
-	funcName := args[1]
+	if len(args) == 0 {
+		err = errors.Normalf("needs etikett and function name")
+		return
+	}
 
-	var vp *lua.VMPool
+	var e kennung.Etikett
+	etikett, args := args[0], args[1:]
 
-	if vp, err = u.GetStore().MakeLuaVMPool(script); err != nil {
+	if err = e.Set(etikett); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	vm := vp.Get()
-	defer vp.Put(vm)
+	funcName, args := args[0], args[1:]
 
-	var t *lua.LTable
+	if len(args) == 0 {
+		err = errors.Normalf("function name")
+		return
+	}
 
-	if t, err = vm.GetTopTableOrError(); err != nil {
+	var lvp store.LuaVMPool
+
+	if lvp, err = u.GetStore().ReadOneSigilLua(e, kennung.SigilCwd); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	f := vm.GetField(t, funcName).(*lua.LFunction)
+	var vm store.LuaVM
+
+	if vm, err = lvp.Get(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	fMaybe := vm.GetField(vm.LTable, funcName)
+
+	var f *lua.LFunction
+	var ok bool
+
+	if f, ok = fMaybe.(*lua.LFunction); !ok {
+		err = errors.Errorf("no such function: %q", funcName)
+		return
+	}
+
 	vm.Push(f)
 
-	if err = vm.PCall(0, 0, nil); err != nil {
+	for _, arg := range args {
+		vm.Push(lua.LString(arg))
+	}
+
+	if err = vm.PCall(len(args), 0, nil); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	retval := vm.LState.Get(1)
-	// vm.Pop(1)
 
 	if retval.Type() != lua.LTNil {
 		err = errors.Errorf("lua error: %s", retval)
+		return
+	}
+
+	return
+}
+
+func (c RunLua) fetchZettels(
+	u *umwelt.Umwelt,
+	vm *lua.VM,
+	t *lua.LTable,
+	e kennung.Etikett,
+) (err error) {
+	qgb := u.MakeQueryBuilderExcludingHidden(kennung.MakeGattung(gattung.Zettel))
+	var qg *query.Group
+
+	if qg, err = qgb.BuildQueryGroup(e.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = u.GetStore().QueryWithCwd(
+		qg,
+		func(sk *sku.Transacted) (err error) {
+			skut := vm.Pool.Get()
+			sku_fmt.ToLuaTable(sk, vm.LState, skut)
+			t.Append(skut)
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

@@ -186,6 +186,25 @@ func (s *Store) ReadOneSigil(
 	return
 }
 
+func (s *Store) ReadOneSigilLua(
+	k1 schnittstellen.StringerGattungGetter,
+	si kennung.Sigil,
+) (sk1 LuaVMPool, err error) {
+	var sk *sku.Transacted
+
+	if sk, err = s.ReadOneSigil(k1, si); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if sk1, err = s.MakeLuaVMPoolWithSku(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s Store) ReadAllMatchingAkten(
 	qg *query.Group,
 	akten fd.Set,
