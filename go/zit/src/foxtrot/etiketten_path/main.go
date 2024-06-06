@@ -11,13 +11,9 @@ import (
 )
 
 type (
-	Etikett            = catgut.String
-	EtikettWithParents struct {
-		*Etikett
-		Parents SlicePaths
-	}
+	Etikett = catgut.String
+	Path    []*Etikett
 )
-type Path []*Etikett
 
 func MakePath(els ...*Etikett) *Path {
 	p := Path(make([]*Etikett, 0, len(els)))
@@ -174,6 +170,10 @@ func (a *Path) AddPath(b *Path) {
 
 func (p *Path) Add(e *Etikett) {
 	if e.IsEmpty() {
+		return
+	}
+
+	if p.Len() > 0 && (*p)[p.Len()-1].Compare(e) == 0 {
 		return
 	}
 

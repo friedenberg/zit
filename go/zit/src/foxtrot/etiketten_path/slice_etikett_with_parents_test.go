@@ -19,7 +19,7 @@ func TestContains(t1 *testing.T) {
 	var e kennung.Kennung2
 	e.Set("%chrome-tab_id")
 
-	if _, ok := s.ContainsKennungEtikett(&e); !ok {
+	if _, ok := s.ContainsKennungEtikettPartial(&e); !ok {
 		t.Errorf("expected %q to be in %s", &e, &s)
 	}
 }

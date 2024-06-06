@@ -95,6 +95,10 @@ func (s *PrefixSet) addPair(
 	e string,
 	z *sku.Transacted,
 ) {
+	if e != "" {
+		errors.PanicIfError((&kennung.Etikett{}).Set(e))
+	}
+
 	s.count += 1
 
 	existing, ok := s.innerMap[e]
@@ -278,7 +282,7 @@ func (a PrefixSet) Subset(
 				if len(intersection) > 0 && !exactMatch {
 					for _, e2 := range intersection {
 						if len(e2.Parents) == 0 {
-							out.Grouped.addPair(e2.String(), z)
+							out.Grouped.addPair(e2.Etikett.String(), z)
 						}
 
 						for _, e3 := range e2.Parents {

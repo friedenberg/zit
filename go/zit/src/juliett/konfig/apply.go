@@ -35,14 +35,21 @@ func (k *Compiled) ApplyToSku(
 
 	var etikett kennung.Etikett
 
-	if isEtikett {
-		err = etikett.Set(sk.Kennung.String())
-		if err != nil {
-			return
-		}
-	}
+	// TODO better solution for "realizing" etiketten against Konfig.
+	// Specifically, making this less fragile and dependent on remembering to do
+	// ApplyToSku for each Sku. Maybe a factory?
+	mp.Verzeichnisse.Etiketten.Reset()
+	mp.GetEtiketten().Each(mp.Verzeichnisse.Etiketten.AddEtikettOld)
 
 	if isEtikett {
+		ks := sk.Kennung.String()
+
+		if err = etikett.Set(ks); err != nil {
+			return
+		}
+
+		sk.Metadatei.Verzeichnisse.Etiketten.AddEtikett(catgut.MakeFromString(ks))
+
 		kennung.ExpandOne(
 			&etikett,
 			expansion.ExpanderRight,
@@ -50,17 +57,6 @@ func (k *Compiled) ApplyToSku(
 			mp.Verzeichnisse.GetExpandedEtikettenMutable().AddPtr,
 		)
 	}
-
-	// TODO better solution for "realizing" etiketten against Konfig.
-	// Specifically, making this less fragile and dependent on remembering to do
-	// ApplyToSku for each Sku. Maybe a factory?
-	mp.Verzeichnisse.Etiketten.Reset()
-	mp.GetEtiketten().Each(mp.Verzeichnisse.Etiketten.AddEtikettOld)
-
-	// if err = k.addSuperEtikettenOld(sk); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
 
 	if err = k.addSuperEtiketten(sk); err != nil {
 		err = errors.Wrap(err)
@@ -101,6 +97,8 @@ func (k *Compiled) addSuperEtiketten(
 		return
 	}
 
+	kcg := catgut.MakeFromString(ks)
+
 	for _, ex := range expanded {
 		if ex == ks || ex == "" {
 			continue
@@ -118,21 +116,33 @@ func (k *Compiled) addSuperEtiketten(
 			// is fragile as the order in which this method is called is
 			// non-deterministic and the `GetEtikett` call may request an Etikett we
 			// have not processed yet
-			// err = errors.Errorf("expected %s, only have %s", e, iter.StringCommaSeparated(k.Etiketten))
-			return
+			continue
 		}
 
-		prefix := etiketten_path.MakePath(catgut.MakeFromString(ex))
+		if ek.Metadatei.Verzeichnisse.Etiketten.Paths.Len() <= 1 {
+			ui.Log().Print(kcg, ex, ek.Metadatei.Verzeichnisse.Etiketten)
+			continue
+		}
+
+		prefix := etiketten_path.MakePath(kcg)
+
 		a := &sk.Metadatei.Verzeichnisse.Etiketten
 		b := &ek.Metadatei.Verzeichnisse.Etiketten
 
-		// ui.Err().Print("before", sk.GetKennung(), e, prefix, a, b)
-		// defer ui.Err().Print("after ", sk.GetKennung(), e, prefix, a, b)
+		ui.Log().Print("a", a)
+		ui.Log().Print("b", b)
+
+		ui.Log().Print("prefix", prefix)
+
+		// ui.Log().Print("before", sk.GetKennung(), ex, prefix, a, b)
+		// defer ui.Log().Print("after ", sk.GetKennung(), ex, prefix, a, b)
 
 		if err = a.AddFrom(b, prefix); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+
+		ui.Log().Print("a after", a)
 	}
 
 	return

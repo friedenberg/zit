@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 )
@@ -43,6 +44,11 @@ func (a *Etiketten) ResetWith(b *Etiketten) {
 
 func (a *Etiketten) AddFrom(b *Etiketten, prefix *Path) (err error) {
 	for _, ep := range b.Paths {
+		ui.Log().Print("adding", prefix, ep)
+		if prefix.First().ComparePartial(ep.First()) == 0 {
+			continue
+		}
+
 		if err = a.AddPath(prefix.CloneAndAddPath(ep)); err != nil {
 			err = errors.Wrap(err)
 			return

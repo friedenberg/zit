@@ -71,7 +71,7 @@ func (bf *binaryEncoder) writeFormat(
 			return
 		}
 
-		ui.Debug().Print(bf.Len(), &sk.Metadatei.Verzeichnisse.Etiketten)
+		ui.Debug().Print(sk, bf.Len(), &sk.Metadatei.Verzeichnisse.Etiketten)
 		panic(r)
 	}()
 	// TODO

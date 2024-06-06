@@ -70,6 +70,21 @@ func (e *Exp) CollectEtiketten(mes kennung.EtikettMutableSet) {
 }
 
 func (e *Exp) Reduce(b *Builder) (err error) {
+	if e.Exact {
+		for _, child := range e.Children {
+			switch k := child.(type) {
+			case *Kennung:
+				k.Exact = true
+
+			case *Exp:
+				k.Exact = true
+
+			default:
+				continue
+			}
+		}
+	}
+
 	e.MatchOnEmpty = !b.doNotMatchEmpty
 	chillen := make([]sku.Query, 0, len(e.Children))
 
@@ -135,10 +150,6 @@ func (e *Exp) StringDebug() string {
 		sb.WriteRune('^')
 	}
 
-	if e.Exact {
-		sb.WriteRune('=')
-	}
-
 	sb.WriteRune(zittish.OpGroupOpen)
 	fmt.Fprintf(&sb, "(%d)", len(e.Children))
 
@@ -172,10 +183,6 @@ func (e *Exp) String() string {
 
 	if e.Negated {
 		sb.WriteRune('^')
-	}
-
-	if e.Exact {
-		sb.WriteRune('=')
 	}
 
 	switch l {

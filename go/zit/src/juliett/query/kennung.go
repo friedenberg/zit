@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -32,16 +33,30 @@ func (k Kennung) ContainsSku(sk *sku.Transacted) (ok bool) {
 	defer sk.Metadatei.Verzeichnisse.QueryPath.PushOnOk(k, &ok)
 
 	me := sk.GetMetadatei()
+
 	switch k.GetGattung() {
 	case gattung.Etikett:
 		var idx int
-		idx, ok = me.Verzeichnisse.Etiketten.All.ContainsKennungEtikett(k.Kennung2)
+
+		idx, ok = me.Verzeichnisse.Etiketten.All.ContainsKennungEtikett(
+			k.Kennung2,
+			!k.Exact,
+		)
+
+		ui.Log().Print(k, idx, ok, me.Verzeichnisse.Etiketten.All, sk)
 
 		if ok {
+			// if k.Exact {
+			// 	ewp := me.Verzeichnisse.Etiketten.All[idx]
+			// 	ui.Debug().Print(ewp, sk)
+			// }
+
 			ps := me.Verzeichnisse.Etiketten.All[idx]
 			sk.Metadatei.Verzeichnisse.QueryPath.Push(ps.Parents)
 			return
 		}
+
+		return
 
 	case gattung.Typ:
 		if kennung.Contains(me.GetTyp(), k) {

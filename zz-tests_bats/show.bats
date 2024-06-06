@@ -356,3 +356,28 @@ function show_etikett_lua { # @test
 		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 	EOM
 }
+
+function show_etiketten_paths { # @test
+	run_zit show -format etiketten-path :e
+	assert_success
+	assert_output_unsorted - <<-EOM
+		tag [Paths: [[tag]], All: [tag:[]]]
+		tag-1 [Paths: [[tag-1]], All: [tag-1:[]]]
+		tag-2 [Paths: [[tag-2]], All: [tag-2:[]]]
+		tag-3 [Paths: [[tag-3]], All: [tag-3:[]]]
+		tag-4 [Paths: [[tag-4]], All: [tag-4:[]]]
+	EOM
+}
+
+function show_etiketten_exact { # @test
+	run_zit show =tag :e
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[tag@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+	EOM
+
+	run_zit show =tag
+	assert_success
+	assert_output_unsorted - <<-EOM
+	EOM
+}

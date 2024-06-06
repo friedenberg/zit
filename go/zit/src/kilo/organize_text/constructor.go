@@ -77,7 +77,7 @@ func (c *constructor) collectExplicitAndImplicitFor(
 					}
 				} else {
 					explicitCount++
-					explicit.Add(kennung.MustEtikett(ewp.String()))
+					explicit.Add(kennung.MustEtikett(ewp.Etikett.String()))
 				}
 			}
 

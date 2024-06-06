@@ -23,10 +23,6 @@ func (s *flushQueryGroup) ContainsSku(_ *sku.Transacted) bool {
 	return true
 }
 
-func (s *flushQueryGroup) String() string {
-	panic("should never be called")
-}
-
 func (s *flushQueryGroup) ContainsKennung(_ *kennung.Kennung2) bool {
 	return false
 }

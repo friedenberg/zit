@@ -21,8 +21,23 @@ func (s SliceEtikettWithParents) Len() int {
 	return len(s)
 }
 
+func (s SliceEtikettWithParents) ContainsKennungEtikettPartial(
+	k *kennung.Kennung2,
+) (int, bool) {
+	return s.ContainsKennungEtikett(k, true)
+}
+
+func (s SliceEtikettWithParents) ContainsKennungEtikettExact(
+	k *kennung.Kennung2,
+) (int, bool) {
+	return s.ContainsKennungEtikett(k, false)
+}
+
 // TODO make less fragile
-func (s SliceEtikettWithParents) ContainsKennungEtikett(k *kennung.Kennung2) (int, bool) {
+func (s SliceEtikettWithParents) ContainsKennungEtikett(
+	k *kennung.Kennung2,
+	partial bool,
+) (int, bool) {
 	e := k.PartsStrings().Right
 	offset := 0
 
@@ -53,7 +68,12 @@ func (s SliceEtikettWithParents) ContainsKennungEtikett(k *kennung.Kennung2) (in
 		s,
 		e,
 		func(ewp EtikettWithParents, e *Etikett) int {
-			cmp := catgut.CompareUTF8Bytes(ewp.Etikett.Bytes()[offset:], e.Bytes(), true)
+			cmp := catgut.CompareUTF8Bytes(
+				ewp.Etikett.Bytes()[offset:],
+				e.Bytes(),
+				partial,
+			)
+
 			return cmp
 		},
 	)
