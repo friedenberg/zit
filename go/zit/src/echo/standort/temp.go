@@ -64,6 +64,25 @@ func (s Standort) FileTempLocalWithTemplate(t string) (f *os.File, err error) {
 	return
 }
 
+func (s Standort) FifoPipeWithExtension(ext string) (p string, err error) {
+	p = path.Join(
+		s.DirTempLocal(),
+		fmt.Sprintf("%s.%s", strconv.Itoa(rand.Int()), ext),
+	)
+
+	if err = syscall.Mknod(p, syscall.S_IFIFO|0o666, 0); err != nil {
+		err = errors.Wrapf(err, "Path: %s", p)
+		return
+	}
+
+	// if err = os.Remove(p); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
+
+	return
+}
+
 func (s Standort) FifoPipe() (p string, err error) {
 	p = path.Join(
 		s.DirTempLocal(),

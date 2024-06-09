@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/vim_cli_options_builder"
 	"code.linenisgreat.com/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
@@ -61,12 +60,14 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 
 	var f *os.File
 
-	if f, err = files.TempFileWithPattern(
+	if f, err = u.Standort().FileTempLocalWithTemplate(
 		"*." + u.GetKonfig().FileExtensions.Organize,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	defer errors.DeferredCloser(&err, f)
 
 	if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(
 		f,

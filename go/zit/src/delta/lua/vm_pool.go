@@ -13,12 +13,13 @@ import (
 func MakeVMPoolWithZitRequire(
 	script string,
 	require LGFunction,
+	apply schnittstellen.FuncIter[*VM],
 ) (ml *VMPool, err error) {
 	ml = &VMPool{
 		Require: require,
 	}
 
-	if err = ml.Set(script); err != nil {
+	if err = ml.Set(script, apply); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -29,12 +30,13 @@ func MakeVMPoolWithZitRequire(
 func MakeVMPoolWithZitSearcher(
 	script string,
 	searcher LGFunction,
+	apply schnittstellen.FuncIter[*VM],
 ) (ml *VMPool, err error) {
 	ml = &VMPool{
 		Searcher: searcher,
 	}
 
-	if err = ml.Set(script); err != nil {
+	if err = ml.Set(script, apply); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -49,10 +51,13 @@ type VMPool struct {
 	compiled *lua.FunctionProto
 }
 
-func (sp *VMPool) Set(script string) (err error) {
+func (sp *VMPool) Set(
+	script string,
+	apply schnittstellen.FuncIter[*VM],
+) (err error) {
 	reader := strings.NewReader(script)
 
-	if err = sp.SetReader(reader); err != nil {
+	if err = sp.SetReader(reader, apply); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -60,7 +65,10 @@ func (sp *VMPool) Set(script string) (err error) {
 	return
 }
 
-func (sp *VMPool) PrepareVM(vm *VM) {
+func (sp *VMPool) PrepareVM(
+	vm *VM,
+	apply schnittstellen.FuncIter[*VM],
+) (err error) {
 	vm.Pool = pool.MakePool(
 		func() (t *lua.LTable) {
 			t = vm.NewTable()
@@ -101,16 +109,26 @@ func (sp *VMPool) PrepareVM(vm *VM) {
 		}
 	}
 
+	if apply != nil {
+		if err = apply(vm); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	lfunc := vm.NewFunctionFromProto(sp.compiled)
 	vm.Push(lfunc)
 	errors.PanicIfError(vm.PCall(0, 1, nil))
 
-	vm.LValue = vm.LState.Get(1)
+	vm.Top = vm.LState.Get(1)
 	vm.Pop(1)
+
+  return
 }
 
 func (sp *VMPool) SetReader(
 	reader io.Reader,
+	apply schnittstellen.FuncIter[*VM],
 ) (err error) {
 	if sp.compiled, err = CompileReader(reader); err != nil {
 		err = errors.Wrap(err)
@@ -123,7 +141,7 @@ func (sp *VMPool) SetReader(
 				LState: lua.NewState(),
 			}
 
-			sp.PrepareVM(vm)
+			errors.PanicIfError(sp.PrepareVM(vm, apply))
 
 			return vm
 		},

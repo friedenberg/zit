@@ -99,7 +99,12 @@ func (ih *indexHinweis) ExpandString(s string) (h *kennung.Hinweis, err error) {
 		return
 	}
 
-	return ih.Expand(ha)
+	if h, err = ih.Expand(ha); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (ih *indexHinweis) Expand(
@@ -204,7 +209,12 @@ func (ih *indexNotHinweis[K, KPtr]) ExpandString(s string) (k KPtr, err error) {
 		return
 	}
 
-	return ih.Expand(k)
+	if k, err = ih.Expand(k); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (ih *indexNotHinweis[K, KPtr]) Expand(

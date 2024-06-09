@@ -65,25 +65,59 @@ func (s *Store) ReadFiles(
 	f schnittstellen.FuncIter[*sku.CheckedOut],
 ) (err error) {
 	if err = s.cwdFiles.All(
-		func(em *sku.ExternalMaybe) (err error) {
-			var co *sku.CheckedOut
+		s.MakeHydrateExternalMaybe(qg, f),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-			if co, err = s.ReadOneCheckedOut(em); err != nil {
-				err = errors.Wrapf(err, "%v", em)
-				return
-			}
+	return
+}
 
-			if !qg.ContainsSku(&co.External.Transacted) {
-				return
-			}
-
-			if err = f(co); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+func (s *Store) MakeHydrateExternalMaybe(
+	qg *query.Group,
+	f schnittstellen.FuncIter[*sku.CheckedOut],
+) schnittstellen.FuncIter[*sku.ExternalMaybe] {
+	return func(em *sku.ExternalMaybe) (err error) {
+		if err = s.HydrateExternalMaybe(qg, em, f); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
+		}
+
+		return
+	}
+}
+
+func (s *Store) HydrateExternalMaybe(
+	qg *query.Group,
+	em *sku.ExternalMaybe,
+	f schnittstellen.FuncIter[*sku.CheckedOut],
+) (err error) {
+	var co *sku.CheckedOut
+
+	if co, err = s.ReadOneCheckedOut(em); err != nil {
+		err = errors.Wrapf(err, "%v", em)
+		return
+	}
+
+	if !qg.ContainsSku(&co.External.Transacted) {
+		return
+	}
+
+	if err = f(co); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) ReadFilesUnsure(
+	qg *query.Group,
+	f schnittstellen.FuncIter[*sku.CheckedOut],
+) (err error) {
+	if err = s.cwdFiles.AllUnsure(
+		s.MakeHydrateExternalMaybe(qg, f),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

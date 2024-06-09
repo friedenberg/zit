@@ -178,6 +178,7 @@ func WriteMetadateiKeyTo(
 			break
 		}
 
+		// TODO fix issue with es being nil sometimes
 		for _, e := range iter.SortedValues(es) {
 			if e.IsVirtual() {
 				continue

@@ -23,9 +23,12 @@ func (c ReadOrganizeFile) RunWithPath(
 		return
 	}
 
-	defer files.Close(f)
+	defer errors.DeferredCloser(&err, f)
 
-	ot, err = c.Run(u, f)
+	if ot, err = c.Run(u, f); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

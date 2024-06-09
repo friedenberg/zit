@@ -55,7 +55,10 @@ func (j *Json) FromStringAndMetadatei(
 	return
 }
 
-func (j *Json) FromTransacted(sk *sku.Transacted, s standort.Standort) (err error) {
+func (j *Json) FromTransacted(
+  sk *sku.Transacted,
+  s standort.Standort,
+) (err error) {
 	return j.FromStringAndMetadatei(sk.Kennung.String(), sk.GetMetadatei(), s)
 }
 

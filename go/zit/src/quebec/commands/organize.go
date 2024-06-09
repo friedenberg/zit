@@ -120,6 +120,8 @@ func (c *Organize) RunWithQuery(
 			return
 		}
 
+		defer errors.DeferredCloser(&err, f)
+
 		if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(
 			f,
 		); err != nil {
@@ -178,6 +180,8 @@ func (c *Organize) RunWithQuery(
 			err = errors.Wrap(err)
 			return
 		}
+
+		defer errors.DeferredCloser(&err, f)
 
 		if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(
 			f,

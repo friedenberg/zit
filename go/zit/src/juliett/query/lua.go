@@ -2,18 +2,38 @@ package query
 
 import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
 )
 
-func MakeLua(script string, require lua.LGFunction) (ml Lua, err error) {
+func MakeSelbstApply(
+	selbst *sku.Transacted,
+) schnittstellen.FuncIter[*lua.VM] {
+	if selbst == nil {
+		return nil
+	}
+
+	return func(vm *lua.VM) (err error) {
+		selbstTable := vm.Pool.Get()
+		sku_fmt.ToLuaTable(selbst, vm.LState, selbstTable)
+		vm.SetGlobal("Selbst", selbstTable)
+		return
+	}
+}
+
+func MakeLua(
+	selbst *sku.Transacted,
+	script string,
+	require lua.LGFunction,
+) (ml Lua, err error) {
 	ml = Lua{
 		VMPool: (&lua.VMPoolBuilder{}).WithRequire(require).Build(),
 	}
 
-	if err = ml.Set(script); err != nil {
+	if err = ml.Set(script, MakeSelbstApply(selbst)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

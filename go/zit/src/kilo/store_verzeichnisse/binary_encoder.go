@@ -178,7 +178,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case schlussel.ShaMetadateiSansTai:
-		if n, err = bf.writeSha(&sk.Metadatei.SelbstMetadateiSansTai, false); err != nil {
+		if n, err = bf.writeSha(&sk.Metadatei.SelbstMetadateiSansTai, true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

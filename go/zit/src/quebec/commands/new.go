@@ -20,6 +20,7 @@ type New struct {
 	Delete    bool
 	Dedupe    bool
 	Count     int
+	Organize  bool
 	PrintOnly bool
 	Filter    script_value.ScriptValue
 
@@ -45,6 +46,12 @@ func init() {
 				"dedupe",
 				false,
 				"deduplicate added Zettelen based on Akte sha",
+			)
+			f.BoolVar(
+				&c.Organize,
+				"organize",
+				false,
+				"open organize",
 			)
 			f.BoolVar(
 				&c.Edit,
@@ -150,6 +157,34 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 	}
 
+	if c.Organize {
+		opOrganize := user_ops.Organize{
+			Umwelt:    u,
+			Metadatei: c.Metadatei,
+		}
+
+		skus := sku.MakeTransactedMutableSet()
+
+		if err = zsc.Each(
+			func(co *sku.CheckedOut) (err error) {
+				if err = skus.Add(&co.Internal); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = opOrganize.Run(nil, skus); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	return
 }
 
@@ -182,8 +217,6 @@ func (c New) writeNewZettels(
 		Umwelt:   u,
 		CheckOut: c.Edit,
 	}
-
-	u.GetKonfig().DefaultEtiketten.EachPtr(c.Metadatei.AddEtikettPtr)
 
 	if zsc, err = emptyOp.RunMany(c.ProtoZettel, c.Count); err != nil {
 		err = errors.Wrap(err)

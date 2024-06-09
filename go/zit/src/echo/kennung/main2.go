@@ -385,12 +385,14 @@ func (h *Kennung2) SetWithKennung(
 	switch kt := k.(type) {
 	case *Kennung2:
 		if err = kt.left.CopyTo(&h.left); err != nil {
+      err = errors.Wrap(err)
 			return
 		}
 
 		h.middle = kt.middle
 
 		if err = kt.right.CopyTo(&h.right); err != nil {
+      err = errors.Wrap(err)
 			return
 		}
 
@@ -398,6 +400,7 @@ func (h *Kennung2) SetWithKennung(
 		p := k.Parts()
 
 		if err = h.left.Set(p[0]); err != nil {
+      err = errors.Wrap(err)
 			return
 		}
 
@@ -408,6 +411,7 @@ func (h *Kennung2) SetWithKennung(
 		}
 
 		if err = h.right.Set(p[2]); err != nil {
+      err = errors.Wrap(err)
 			return
 		}
 	}
@@ -423,7 +427,12 @@ func (h *Kennung2) SetWithGattung(
 ) (err error) {
 	h.g = gattung.Make(g.GetGattung())
 
-	return h.Set(v)
+	if err = h.Set(v); err != nil {
+    err = errors.Wrap(err)
+    return
+  }
+
+  return
 }
 
 func (h *Kennung2) TodoSetBytes(v *catgut.String) (err error) {

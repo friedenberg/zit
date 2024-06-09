@@ -2,6 +2,7 @@ package commands
 
 import (
 	"flag"
+	"sync"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/delta/checked_out_state"
@@ -58,14 +59,108 @@ func (c Status) RunWithQuery(
 		return
 	}
 
-	if err = qg.GetExplicitCwdFDs().Each(
-		u.GetStore().GetCwdFiles().MarkUnsureAkten,
+	selbstMetadateiSansTaiToZettels := make(
+		map[sha.Bytes]sku.CheckedOutMutableSet,
+		u.GetStore().GetCwdFiles().Len(),
+	)
+
+	var l sync.Mutex
+
+	if err = u.GetStore().ReadFilesUnsure(
+		qg,
+		func(co *sku.CheckedOut) (err error) {
+			if err = pcol(co); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			sh := &co.External.Metadatei.Shas.SelbstMetadateiSansTai
+
+			if sh.IsNull() {
+				return
+			}
+
+			by := sh.GetBytes()
+			l.Lock()
+			defer l.Unlock()
+
+			existing, ok := selbstMetadateiSansTaiToZettels[by]
+
+			if !ok {
+				existing = sku.MakeCheckedOutMutableSet()
+			}
+
+			clone := sku.GetCheckedOutPool().Get()
+			sku.CheckedOutResetter.ResetWith(clone, co)
+
+			if err = existing.Add(clone); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			selbstMetadateiSansTaiToZettels[by] = existing
+
+			return
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	p := u.PrinterCheckedOut()
+
+	if len(selbstMetadateiSansTaiToZettels) > 0 {
+		if err = u.GetStore().QueryWithoutCwd(
+			qg,
+			func(sk *sku.Transacted) (err error) {
+				sh := &sk.Metadatei.Shas.SelbstMetadateiSansTai
+
+				if sh.IsNull() {
+					return
+				}
+
+				by := sh.GetBytes()
+				existing, ok := selbstMetadateiSansTaiToZettels[by]
+
+				if !ok {
+					return
+				}
+
+				if err = existing.Each(
+					func(co *sku.CheckedOut) (err error) {
+						co.State = checked_out_state.StateRecognized
+
+						if err = co.Internal.SetFromSkuLike(sk); err != nil {
+							err = errors.Wrap(err)
+							return
+						}
+
+						if err = p(co); err != nil {
+							err = errors.Wrap(err)
+							return
+						}
+
+						return
+					},
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if err = qg.GetExplicitCwdFDs().Each(
+		u.GetStore().GetCwdFiles().MarkUnsureAkten,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = u.GetStore().ReadAllMatchingAkten(
 		qg,

@@ -12,6 +12,7 @@ func TestLuaFalse(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	m, err := MakeLua(
+    nil,
 		`return { contains_sku = function (sku) return false end }`,
 		nil,
 	)
@@ -35,6 +36,7 @@ func TestMatcherLuaTrue(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	m, err := MakeLua(
+    nil,
 		`return { contains_sku = function (sku) return true end }`,
 		nil,
 	)

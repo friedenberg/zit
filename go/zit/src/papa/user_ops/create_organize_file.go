@@ -15,10 +15,8 @@ type CreateOrganizeFile struct {
 }
 
 func (c CreateOrganizeFile) RunAndWrite(
-	w io.WriteCloser,
+	w io.Writer,
 ) (results *organize_text.Text, err error) {
-	defer errors.DeferredCloser(&err, w)
-
 	if results, err = c.Run(); err != nil {
 		err = errors.Wrap(err)
 		return

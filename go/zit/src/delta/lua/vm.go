@@ -1,106 +1,77 @@
 package lua
 
 import (
-	"strings"
-
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/pool"
 	lua "github.com/yuin/gopher-lua"
 )
 
 type VM struct {
 	*lua.LState
-	lua.LValue
+	Top lua.LValue
 	schnittstellen.Pool[LTable, *LTable]
 }
 
-func MakeVMFromScript(
-	require LGFunction,
-	script string,
-) (vm *VM, err error) {
-	reader := strings.NewReader(script)
+func (vm *VM) GetTopFunctionOrFunctionNamedError(
+	args []string,
+) (t *LFunction, argsOut []string, err error) {
+	funcName := ""
+	argsOut = args
 
-	var compiled *lua.FunctionProto
-
-	if compiled, err = CompileReader(reader); err != nil {
-		err = errors.Wrap(err)
-		return
+	if len(args) > 0 {
+		funcName = args[0]
 	}
 
-	if vm, err = MakeVMFromCompiled(require, compiled); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func MakeVMFromCompiled(
-	require LGFunction,
-	compiled *lua.FunctionProto,
-) (vm *VM, err error) {
-	vm = &VM{
-		LState: lua.NewState(),
-	}
-
-	// vm.PreloadModule("zit", func(s *lua.LState) int {
-	// 	// register functions to the table
-	// 	mod := s.SetFuncs(s.NewTable(), map[string]lua.LGFunction{
-	// 		"require": require,
-	// 	})
-
-	// 	s.Push(mod)
-
-	// 	return 1
-	// })
-
-	vm.Pool = pool.MakePool(
-		func() (t *lua.LTable) {
-			t = vm.NewTable()
+	if vm.Top.Type() == LTTable {
+		if funcName == "" {
+			err = errors.Errorf("needs function name because top is table")
 			return
-		},
-		func(t *lua.LTable) {
-			// TODO reset table
-		},
-	)
+		}
 
-	tableZit := vm.Pool.Get()
-	vm.SetField(tableZit, "require", vm.NewFunction(require))
-	vm.SetGlobal("zit", tableZit)
+		tt := vm.Top.(*LTable)
 
-	lfunc := vm.NewFunctionFromProto(compiled)
-	vm.Push(lfunc)
+		tv := vm.GetField(tt, funcName)
 
-	if err = vm.PCall(0, 1, nil); err != nil {
-		err = errors.Wrap(err)
+		if tv.Type() != LTFunction {
+			err = errors.Errorf("expected %v but got %v", LTFunction, tv.Type())
+			return
+		}
+
+		argsOut = argsOut[1:]
+
+		t = tv.(*LFunction)
+	} else if vm.Top.Type() == LTFunction {
+		t = vm.Top.(*LFunction)
+	} else {
+		err = errors.Errorf(
+			"expected table or function but got: %q",
+			vm.Top.Type(),
+		)
+
 		return
 	}
-
-	vm.LValue = vm.LState.Get(1)
-	vm.Pop(1)
 
 	return
 }
 
 func (vm *VM) GetTopTableOrError() (t *LTable, err error) {
-	if vm.LValue.Type() != LTTable {
-		err = errors.Errorf("expected %v but got %v", LTTable, vm.LValue.Type())
+	if vm.Top.Type() != LTTable {
+		err = errors.Errorf("expected %v but got %v", LTTable, vm.Top.Type())
 		return
 	}
 
-	t = vm.LValue.(*LTable)
+	t = vm.Top.(*LTable)
 
 	return
 }
 
 func (vm *VM) GetTopFunctionOrError() (t *LFunction, err error) {
-	if vm.LValue.Type() != LTFunction {
-		err = errors.Errorf("expected %v but got %v", LTFunction, vm.LValue.Type())
+	if vm.Top.Type() != LTFunction {
+		err = errors.Errorf("expected %v but got %v", LTFunction, vm.Top.Type())
 		return
 	}
 
-	t = vm.LValue.(*LFunction)
+	t = vm.Top.(*LFunction)
 
 	return
 }

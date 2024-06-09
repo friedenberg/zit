@@ -59,6 +59,13 @@ func MakeTransactedMutableSetKennung() TransactedMutableSet {
 	)
 }
 
+func MakeCheckedOutMutableSet() CheckedOutMutableSet {
+	return collections_value.MakeMutableValueSet[*CheckedOut](
+		nil,
+		// KennungKeyer[CheckedOut, *CheckedOut]{},
+	)
+}
+
 type kennungGetter interface {
 	GetKennung() kennung.Kennung
 }

@@ -190,7 +190,7 @@ func (b *Builder) realizeVirtualEtiketten() (err error) {
 			VMPool: b.luaVMPoolBuilder.Build(),
 		}
 
-		if err = ml.Set(v); err != nil {
+		if err = ml.Set(v, nil); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -255,16 +255,23 @@ func (b *Builder) build(vs ...string) (qg *Group, err error) {
 			var k *kennung.Kennung2
 
 			if k, err = b.cwd.GetKennungForFD(f); err != nil {
-				if errors.Is(err, kennung.ErrFDNotKennung) {
-					if err = newFDS.Add(f); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-				} else {
-					err = errors.Wrapf(err, "File: %q", f)
+				if err = newFDS.Add(f); err != nil {
+					err = errors.Wrap(err)
+					return
 				}
 
 				return
+				// if errors.Is(err, kennung.ErrFDNotKennung) {
+				// 	if err = newFDS.Add(f); err != nil {
+				// 		err = errors.Wrap(err)
+				// 		return
+				// 	}
+
+				// 	return
+				// } else {
+				// 	err = nil
+				// 	// err = errors.Wrapf(err, "File: %q", f)
+				// }
 			}
 
 			if err = qg.AddExactKennung(
@@ -548,7 +555,7 @@ func (b *Builder) makeEtikettOrEtikettLua(
 
 		defer errors.DeferredCloser(&err, ar)
 
-		if err = lua.SetReader(ar); err != nil {
+		if err = lua.SetReader(ar, MakeSelbstApply(sk)); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -566,7 +573,7 @@ func (b *Builder) makeEtikettOrEtikettLua(
 			return
 		}
 
-		if err = lua.Set(akte.Filter); err != nil {
+		if err = lua.Set(akte.Filter, MakeSelbstApply(sk)); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -9,29 +9,7 @@ import (
 	"code.linenisgreat.com/zit/src/echo/fd"
 )
 
-func GetIdLike(f *fd.FD) (il Kennung, err error) {
-	var h Hinweis
-
-	if h, err = GetHinweis(f); err == nil {
-		il = h
-		return
-	}
-
-	errors.TodoP1("implement Typ and Etikett")
-
-	err = errors.Errorf("not an id")
-
-	return
-}
-
-func AsHinweis(f *fd.FD) (h Hinweis, ok bool) {
-	var err error
-	h, err = GetHinweis(f)
-	ok = err == nil
-	return
-}
-
-func GetHinweis(f *fd.FD) (h Hinweis, err error) {
+func GetHinweis(f *fd.FD, allowErrors bool) (h Hinweis, err error) {
 	parts := strings.Split(f.GetPath(), string(filepath.Separator))
 
 	switch len(parts) {
@@ -53,8 +31,12 @@ func GetHinweis(f *fd.FD) (h Hinweis, err error) {
 	}
 
 	if err = h.Set(p1); err != nil {
-		err = errors.Wrap(err)
-		return
+		if allowErrors {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

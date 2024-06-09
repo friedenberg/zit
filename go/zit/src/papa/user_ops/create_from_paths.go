@@ -41,16 +41,21 @@ func (c CreateFromPaths) Run(
 	toDelete := objekte_collections.MakeMutableSetUniqueFD()
 
 	for _, arg := range args {
-		if err = c.zettelsFromPath(
-			arg,
-			func(z *sku.External) (err error) {
-				toCreate.Add(z)
-				if c.Delete {
-					toDelete.Add(z)
-				}
+		var z *sku.External
 
-				return
-			},
+		var t sku.ExternalMaybe
+
+		t.Kennung.SetGattung(gattung.Zettel)
+
+		if err = t.FDs.Objekte.Set(arg); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if z, err = c.GetStore().ReadOneExternal(
+			&t,
+			nil,
+			// sku.GetTransactedPool().Get(),
 		); err != nil {
 			err = errors.Errorf(
 				"zettel text format error for path: %s: %s",
@@ -58,6 +63,12 @@ func (c CreateFromPaths) Run(
 				err,
 			)
 			return
+		}
+
+		toCreate.Add(z)
+
+		if c.Delete {
+			toDelete.Add(z)
 		}
 	}
 
@@ -205,6 +216,7 @@ func (c CreateFromPaths) Run(
 }
 
 // TODO-P1 migrate this to use store_working_directory
+// TODO remove this
 func (c *CreateFromPaths) zettelsFromPath(
 	p string,
 	wf schnittstellen.FuncIter[*sku.External],
@@ -222,7 +234,7 @@ func (c *CreateFromPaths) zettelsFromPath(
 
 	var fd fd.FD
 
-	if err = fd.SetPath(p); err != nil {
+	if err = fd.Set(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -232,12 +244,16 @@ func (c *CreateFromPaths) zettelsFromPath(
 		Objekte: fd,
 	}
 
-	if err = ze.Kennung.SetWithKennung(&kennung.Hinweis{}); err != nil {
+	ze.Metadatei.Tai = kennung.TaiFromTime(fd.ModTime())
+
+	ze.Kennung.SetGattung(gattung.Zettel)
+
+	if _, err = c.TextParser.ParseMetadatei(r, ze); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if _, err = c.TextParser.ParseMetadatei(r, ze); err != nil {
+	if err = ze.CalculateObjekteShas(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

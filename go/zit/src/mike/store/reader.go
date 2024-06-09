@@ -24,12 +24,13 @@ func (s *Store) ReadOneInto(
 
 		if h, err = s.GetAbbrStore().Hinweis().ExpandString(
 			k1.String(),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
+		); err == nil {
+			k1 = h
+		} else {
+			err = nil
 		}
 
-		if sk, err = s.ReadOneKennung(h); err != nil {
+		if sk, err = s.ReadOneKennung(k1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

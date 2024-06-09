@@ -94,10 +94,11 @@ func (s *Store) ReadOneCheckedOut(
 
 	co.DetermineState(false)
 
-	if err = s.konfig.ApplyToSku(&co.External.Transacted); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	// TODO determine if needed
+	// if err = s.konfig.ApplyToSku(&co.External.Transacted); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
 	return
 }
@@ -138,13 +139,27 @@ func (s *Store) ReadOneExternal(
 		}
 
 	case checkout_mode.ModeObjekteOnly, checkout_mode.ModeObjekteAndAkte:
-		if err = s.ReadOneExternalObjekte(e, t1); err != nil {
-			err = errors.Wrap(err)
-			return
+		if e.FDs.Objekte.IsStdin() {
+			if err = s.ReadOneExternalObjekteReader(os.Stdin, e); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		} else {
+			if err = s.ReadOneExternalObjekte(e, t1); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 
 	default:
 		panic(checkout_mode.MakeErrInvalidCheckoutModeMode(m))
+	}
+
+	e.Metadatei.Tai = kennung.TaiFromTime(e.FDs.LatestModTime())
+
+	if err = e.CalculateObjekteShas(); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if err = s.konfig.ApplyToSku(&e.Transacted); err != nil {
@@ -176,15 +191,6 @@ func (s *Store) ReadOneExternalObjekte(
 		err = errors.Wrap(err)
 		return
 	}
-
-	var fi os.FileInfo
-
-	if fi, err = f.Stat(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	e.Metadatei.Tai = kennung.TaiFromTime(thyme.Tyme(fi.ModTime()))
 
 	return
 }

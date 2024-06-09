@@ -8,13 +8,14 @@ import (
 	"code.linenisgreat.com/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/src/juliett/query"
 )
 
 func (s *Store) MakeLuaVMPoolWithSku(
 	sk *sku.Transacted,
 ) (lvp LuaVMPool, err error) {
 	if sk.GetTyp().String() != "lua" {
-		err = errors.Errorf("unsupported etikett: %s", sk)
+		err = errors.Errorf("unsupported typ: %s, Sku: %s", sk.GetTyp(), sk)
 		return
 	}
 
@@ -42,7 +43,7 @@ func (u *Store) MakeLuaVMPool(
 	vp.Transacted = selbst
 	vp.VMPool = u.luaVMPoolBuilder.Build()
 
-	if err = vp.Set(script); err != nil {
+	if err = vp.Set(script, query.MakeSelbstApply(selbst)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -57,7 +58,7 @@ func (u *Store) MakeLuaVMPoolWithReader(
 	vp.Transacted = selbst
 	vp.VMPool = u.luaVMPoolBuilder.Build()
 
-	if err = vp.SetReader(r); err != nil {
+	if err = vp.SetReader(r, query.MakeSelbstApply(selbst)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -71,26 +72,46 @@ type LuaVMPool struct {
 }
 
 func (lvm LuaVMPool) Put(vm LuaVM) {
-	vm.Put(vm.LTable)
+	// vm.Put(vm.LTable)
 	lvm.VMPool.Put(vm.VM)
+}
+
+func (lvm LuaVMPool) PushTopFunc(
+	args []string,
+) (vm LuaVM, argsOut []string, err error) {
+	vm.VM = lvm.VMPool.Get()
+	vm.LValue = vm.Top
+
+	var f *lua.LFunction
+
+	if f, argsOut, err = vm.GetTopFunctionOrFunctionNamedError(
+		args,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	vm.Push(f)
+
+	return
 }
 
 func (lvm LuaVMPool) Get() (vm LuaVM, err error) {
 	vm.VM = lvm.VMPool.Get()
 
-	if vm.LTable, err = vm.GetTopTableOrError(); err != nil {
+	if vm.LValue, err = vm.GetTopTableOrError(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	selbstTable := vm.Pool.Get()
 	sku_fmt.ToLuaTable(lvm.Transacted, vm.LState, selbstTable)
-	vm.SetField(vm.LTable, "Selbst", selbstTable)
+	vm.SetField(vm.LValue, "Selbst", selbstTable)
 
 	return
 }
 
 type LuaVM struct {
 	*lua.VM
-	*lua.LTable
+	lua.LValue
 }

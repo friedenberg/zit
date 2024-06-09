@@ -150,6 +150,8 @@ func (h *Hinweis) Set(v string) (err error) {
 
 	v = strings.TrimSuffix(v, ".zettel")
 
+	me := errors.MakeMulti()
+
 	if strings.ContainsFunc(
 		v,
 		func(r rune) bool {
@@ -162,11 +164,14 @@ func (h *Hinweis) Set(v string) (err error) {
 			}
 		},
 	) {
-		err = errors.Errorf("contains invalid characters: %q", v)
-		return
+		me.Add(errors.Errorf("contains invalid characters: %q", v))
 	}
 
 	if v == "/" {
+		if me.Len() > 0 {
+			err = me
+		}
+
 		return
 	}
 
@@ -175,16 +180,19 @@ func (h *Hinweis) Set(v string) (err error) {
 
 	switch count {
 	default:
-		err = errors.Errorf(
+		me.Add(errors.Errorf(
 			"hinweis needs exactly 2 components, but got %d: %q",
 			count,
 			v,
-		)
-		return
+		))
 
 	case 2:
 		h.left = parts[0]
 		h.right = parts[1]
+	}
+
+	if me.Len() > 0 {
+		err = me
 	}
 
 	return

@@ -35,7 +35,7 @@ func OpenVimWithArgs(args []string, fs ...string) (err error) {
 	}
 
 	if err = cmd.Run(); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Cmd: %s", cmd)
 		return
 	}
 

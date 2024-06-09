@@ -7,11 +7,22 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/src/echo/fd"
+	"code.linenisgreat.com/zit/src/echo/thyme"
 )
 
 type ExternalFDs struct {
 	Objekte fd.FD
 	Akte    fd.FD
+}
+
+func (ef *ExternalFDs) LatestModTime() thyme.Time {
+	o, a := ef.Objekte.ModTime(), ef.Akte.ModTime()
+
+	if o.Less(a) {
+		return a
+	} else {
+		return o
+	}
 }
 
 // func (dst *ExternalFDs) String() string {

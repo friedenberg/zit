@@ -1,0 +1,47 @@
+package user_ops
+
+import (
+	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/delta/lua"
+	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/src/mike/store"
+	"code.linenisgreat.com/zit/src/november/umwelt"
+)
+
+type ExecLua struct {
+	*umwelt.Umwelt
+}
+
+func (u ExecLua) Run(sk *sku.Transacted, args ...string) (err error) {
+	var lvp store.LuaVMPool
+
+	if lvp, err = u.GetStore().MakeLuaVMPoolWithSku(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var vm store.LuaVM
+
+	if vm, args, err = lvp.PushTopFunc(args); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	for _, arg := range args {
+		vm.Push(lua.LString(arg))
+	}
+
+	if err = vm.PCall(len(args), 0, nil); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	retval := vm.LState.Get(1)
+
+	if retval.Type() != lua.LTNil {
+		err = errors.Errorf("lua error: %s", retval)
+		return
+	}
+
+	return
+}

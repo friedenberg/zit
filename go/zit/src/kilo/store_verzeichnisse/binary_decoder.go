@@ -26,6 +26,7 @@ var binaryFieldOrder = []schlussel.Schlussel{
 	schlussel.MutterMetadateiMutterKennung,
 	schlussel.ShaMetadateiMutterKennung,
 	schlussel.ShaMetadatei,
+	schlussel.ShaMetadateiSansTai,
 	schlussel.VerzeichnisseEtikettImplicit,
 	schlussel.VerzeichnisseEtikettExpanded,
 	schlussel.VerzeichnisseEtiketten,
@@ -328,6 +329,14 @@ func (bf *binaryDecoder) readFieldKey(
 
 	case schlussel.ShaMetadatei:
 		if _, err = sk.Metadatei.SelbstMetadatei.ReadFrom(&bf.Content); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	case schlussel.ShaMetadateiSansTai:
+		if _, err = sk.Metadatei.SelbstMetadateiSansTai.ReadFrom(
+			&bf.Content,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

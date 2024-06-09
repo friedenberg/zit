@@ -42,6 +42,14 @@ type FD struct {
 	state   State
 }
 
+func (a *FD) IsStdin() bool {
+	return a.path == "-"
+}
+
+func (a *FD) ModTime() thyme.Time {
+	return a.modTime
+}
+
 func (a *FD) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
@@ -131,6 +139,13 @@ func (f *FD) SetFileInfo(fi os.FileInfo, dir string) (err error) {
 
 func (fd *FD) Set(v string) (err error) {
 	v = strings.TrimSpace(v)
+
+	if v == "-" {
+		fd.path = v
+		fd.modTime = thyme.Now()
+		fd.isDir = false
+		return
+	}
 
 	if v == "." {
 		err = errors.Errorf("'.' not supported")

@@ -372,8 +372,16 @@ func (u *Umwelt) MakeFormatFunc(
 			}
 
 			if err = toml.Unmarshal([]byte(j.Json.Akte), &j.Akte); err != nil {
-				err = errors.Wrap(err)
+				err = nil
+
+				if err = enc.Encode(j.Json); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
 				return
+				// err = errors.Wrap(err)
+				// return
 			}
 
 			if err = enc.Encode(j); err != nil {
@@ -496,7 +504,12 @@ func (u *Umwelt) MakeFormatFunc(
 				return
 			}
 
-			if _, err = ohio.CopyWithPrefixOnDelim('\n', sb.String(), out, r); err != nil {
+			if _, err = ohio.CopyWithPrefixOnDelim(
+				'\n',
+				sb.String(),
+				out,
+				r,
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -517,6 +530,12 @@ func (u *Umwelt) MakeFormatFunc(
 				return
 			}
 
+			return
+		}
+
+	case "shas":
+		f = func(z *sku.Transacted) (err error) {
+			_, err = fmt.Fprintln(out, &z.Metadatei.Shas)
 			return
 		}
 
@@ -823,7 +842,7 @@ func (u *Umwelt) makeTypFormatter(
 
 			defer vp.Put(vm)
 
-			f := vm.GetField(vm.LTable, "on_pre_commit")
+			f := vm.GetField(vm.Top, "on_pre_commit")
 
 			ui.Out().Print(f.String())
 

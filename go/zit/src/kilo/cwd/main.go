@@ -26,10 +26,11 @@ type CwdFiles struct {
 	erworben          *konfig.Compiled
 	dir               string
 	// TODO-P4 make private
-	Zettelen  schnittstellen.MutableSetLike[*Zettel]
-	Typen     schnittstellen.MutableSetLike[*Typ]
-	Kisten    schnittstellen.MutableSetLike[*Kasten]
-	Etiketten schnittstellen.MutableSetLike[*Etikett]
+	Zettelen       schnittstellen.MutableSetLike[*Zettel]
+	UnsureZettelen schnittstellen.MutableSetLike[*Zettel]
+	Typen          schnittstellen.MutableSetLike[*Typ]
+	Kisten         schnittstellen.MutableSetLike[*Kasten]
+	Etiketten      schnittstellen.MutableSetLike[*Etikett]
 	// TODO-P4 make set
 	UnsureAkten      fd.MutableSet
 	EmptyDirectories []*fd.FD
@@ -188,6 +189,7 @@ func (fs CwdFiles) GetCwdFDs() fd.Set {
 	fd.SetAddPairs[*Zettel](fs.Zettelen, fds)
 	fd.SetAddPairs[*Typ](fs.Typen, fds)
 	fd.SetAddPairs[*Etikett](fs.Etiketten, fds)
+	fd.SetAddPairs[*Zettel](fs.UnsureZettelen, fds)
 	fs.UnsureAkten.Each(fds.Add)
 
 	return fds
@@ -288,6 +290,22 @@ func (fs CwdFiles) All(
 	return wg.GetError()
 }
 
+func (fs CwdFiles) AllUnsure(
+	f schnittstellen.FuncIter[*sku.ExternalMaybe],
+) (err error) {
+	wg := iter.MakeErrorWaitGroupParallel()
+
+	iter.ErrorWaitGroupApply(
+		wg,
+		fs.UnsureZettelen,
+		func(e *Zettel) (err error) {
+			return f(e)
+		},
+	)
+
+	return wg.GetError()
+}
+
 func (fs CwdFiles) ZettelFiles() (out []string, err error) {
 	out, err = iter.DerivedValues(
 		fs.Zettelen,
@@ -313,6 +331,9 @@ func makeCwdFiles(
 		),
 		Typen: collections_value.MakeMutableValueSet[*Typ](nil),
 		Zettelen: collections_value.MakeMutableValueSet[*Zettel](
+			nil,
+		),
+		UnsureZettelen: collections_value.MakeMutableValueSet[*Zettel](
 			nil,
 		),
 		Etiketten: collections_value.MakeMutableValueSet[*Etikett](
@@ -471,14 +492,16 @@ func (c CwdFiles) Len() int {
 	)
 }
 
-func (fs *CwdFiles) readFirstLevelFile(a string) (err error) {
-	if strings.HasPrefix(a, ".") {
+func (fs *CwdFiles) readFirstLevelFile(name string) (err error) {
+	if strings.HasPrefix(name, ".") {
 		return
 	}
 
+	fullPath := path.Join(fs.dir, name)
+
 	var fi os.FileInfo
 
-	if fi, err = os.Stat(path.Join(fs.dir, a)); err != nil {
+	if fi, err = os.Stat(fullPath); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -487,7 +510,7 @@ func (fs *CwdFiles) readFirstLevelFile(a string) (err error) {
 		return
 	}
 
-	ext := filepath.Ext(a)
+	ext := filepath.Ext(name)
 	ext = strings.ToLower(ext)
 	ext = strings.TrimSpace(ext)
 
@@ -510,10 +533,16 @@ func (fs *CwdFiles) readFirstLevelFile(a string) (err error) {
 			return
 		}
 
+	case fs.erworben.FileExtensions.Zettel:
+		if err = fs.tryZettel(fs.dir, name, fullPath, true); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 	default:
 		var ut *fd.FD
 
-		if ut, err = fd.MakeFile(fs.dir, a, fs.akteWriterFactory); err != nil {
+		if ut, err = fd.MakeFile(fs.dir, name, fs.akteWriterFactory); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -524,16 +553,16 @@ func (fs *CwdFiles) readFirstLevelFile(a string) (err error) {
 	return
 }
 
-func (fs *CwdFiles) readSecondLevelFile(d string, a string) (err error) {
-	if strings.HasPrefix(a, ".") {
+func (fs *CwdFiles) readSecondLevelFile(dir string, name string) (err error) {
+	if strings.HasPrefix(name, ".") {
 		return
 	}
 
 	var fi os.FileInfo
 
-	p := path.Join(d, a)
+	fullPath := path.Join(dir, name)
 
-	if fi, err = os.Stat(p); err != nil {
+	if fi, err = os.Stat(fullPath); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -542,7 +571,7 @@ func (fs *CwdFiles) readSecondLevelFile(d string, a string) (err error) {
 		return
 	}
 
-	ext := filepath.Ext(p)
+	ext := filepath.Ext(fullPath)
 	ext = strings.ToLower(ext)
 	ext = strings.TrimSpace(ext)
 
@@ -552,7 +581,7 @@ func (fs *CwdFiles) readSecondLevelFile(d string, a string) (err error) {
 
 		// Zettel-Akten can have any extension, and so default is Zettel
 	default:
-		if err = fs.tryZettel(d, a, p); err != nil {
+		if err = fs.tryZettel(dir, name, fullPath, false); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

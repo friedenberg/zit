@@ -1,6 +1,9 @@
 package metadatei
 
 import (
+	"fmt"
+	"strings"
+
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/delta/sha"
 )
@@ -36,6 +39,16 @@ func (a *Shas) ResetWith(b *Shas) {
 	a.SelbstMetadateiSansTai.ResetWith(&b.SelbstMetadateiSansTai)
 	a.SelbstMetadateiKennungMutter.ResetWith(&b.SelbstMetadateiKennungMutter)
 	a.MutterMetadateiKennungMutter.ResetWith(&b.MutterMetadateiKennungMutter)
+}
+
+func (s *Shas) String() string {
+	var sb strings.Builder
+
+	fmt.Fprintf(&sb, "%s: %s\n", "Akte", &s.Akte)
+	fmt.Fprintf(&sb, "%s: %s\n", ShaKeySelbstMetadatei, &s.SelbstMetadatei)
+	fmt.Fprintf(&sb, "%s: %s\n", ShaKeySelbstMetadateiSansTai, &s.SelbstMetadateiSansTai)
+
+	return sb.String()
 }
 
 func (s *Shas) Add(k, v string) (err error) {

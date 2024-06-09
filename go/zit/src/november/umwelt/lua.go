@@ -12,6 +12,16 @@ import (
 
 func (s *Umwelt) GetSkuFromString(lv string) (sk *sku.Transacted, err error) {
 	sk = sku.GetTransactedPool().Get()
+	defer func() {
+    if err != nil {
+      return
+    }
+
+		if err = s.GetStore().ReadOneInto(sk.GetKennung(), sk); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}()
 
 	if err = sk.Kennung.Set(lv); err == nil {
 		return
@@ -92,8 +102,13 @@ func (s *Umwelt) LuaRequire(ls *lua.LState) int {
 	return 1
 }
 
+// TODO check if selbst needs to be passed in
 func (u *Umwelt) MakeLuaVMPool(script string) (vp *lua.VMPool, err error) {
-	if vp, err = lua.MakeVMPoolWithZitSearcher(script, u.LuaSearcher); err != nil {
+	if vp, err = lua.MakeVMPoolWithZitSearcher(
+    script,
+    u.LuaSearcher,
+    nil,
+  ); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
