@@ -69,7 +69,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	f = iter.MakeSyncSerializer(f)
 
-	if err = c.runWithBestandsaufnahm(u, f); err != nil {
+	if err = c.runWithBestandsaufnahme(u, f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -108,7 +108,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	return
 }
 
-func (c Last) runWithBestandsaufnahm(
+func (c Last) runWithBestandsaufnahme(
 	u *umwelt.Umwelt,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {

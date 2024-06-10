@@ -41,6 +41,7 @@ function organize_empty_commit { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "test"]
+		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 "test"]
 	EOM
 }
 
@@ -1156,6 +1157,7 @@ function organize_v5_etiketten_correct { # @test
 	assert_output - <<-EOM
 		[test1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[test1-wow@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 "zettel bez" test1-wow]
 		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "zettel bez" test1-wow]
 	EOM
 
@@ -1288,5 +1290,6 @@ function create_structured_zettels { # @test
 		[one/tres@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !task "second" tag-3 test]
 		[test@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "first" test]
+		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 "first" test]
 	EOM
 }

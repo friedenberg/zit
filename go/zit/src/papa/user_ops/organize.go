@@ -2,6 +2,7 @@ package user_ops
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
@@ -96,6 +97,11 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 		}
 
 		readOrganizeTextOp := ReadOrganizeFile{}
+
+    if _, err = f.Seek(0, io.SeekStart); err != nil {
+      err = errors.Wrap(err)
+      return
+    }
 
 		if ot2, err = readOrganizeTextOp.Run(u.Umwelt, f); err != nil {
 			if u.handleReadChangesError(err) {

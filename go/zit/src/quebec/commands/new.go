@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/src/charlie/checkout_options"
-	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/src/hotel/sku"
@@ -16,11 +15,12 @@ import (
 )
 
 type New struct {
-	Edit      bool
-	Delete    bool
-	Dedupe    bool
-	Count     int
+	Delete bool
+	Dedupe bool
+	Count  int
+	// TODO combine organize and edit and refactor
 	Organize  bool
+	Edit      bool
 	PrintOnly bool
 	Filter    script_value.ScriptValue
 
@@ -113,40 +113,36 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		),
 	}
 
-	var zsc sku.CheckedOutMutableSet
+	var zts sku.TransactedMutableSet
 
 	if len(args) == 0 {
-		if zsc, err = c.writeNewZettels(u); err != nil {
+		if zts, err = c.writeNewZettels(u); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		zsc = collections_value.MakeMutableValueSet[*sku.CheckedOut](nil)
-
-		var zts sku.TransactedMutableSet
-
 		if zts, err = c.readExistingFilesAsZettels(u, f, args...); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-
-		if c.Edit {
-			opCheckout := user_ops.Checkout{
-				Umwelt: u,
-				Options: checkout_options.Options{
-					CheckoutMode:         checkout_mode.ModeObjekteAndAkte,
-					TextFormatterOptions: cotfo,
-				},
-			}
-
-			if zsc, err = opCheckout.Run(zts); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
 	}
 
 	if c.Edit {
+		opCheckout := user_ops.Checkout{
+			Umwelt: u,
+			Options: checkout_options.Options{
+				CheckoutMode:         checkout_mode.ModeObjekteAndAkte,
+				TextFormatterOptions: cotfo,
+			},
+		}
+
+		var zsc sku.CheckedOutMutableSet
+
+		if zsc, err = opCheckout.Run(zts); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		opEdit := user_ops.Edit{
 			Umwelt: u,
 		}
@@ -163,23 +159,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			Metadatei: c.Metadatei,
 		}
 
-		skus := sku.MakeTransactedMutableSet()
-
-		if err = zsc.Each(
-			func(co *sku.CheckedOut) (err error) {
-				if err = skus.Add(&co.Internal); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				return
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = opOrganize.Run(nil, skus); err != nil {
+		if err = opOrganize.Run(nil, zts); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -212,13 +192,12 @@ func (c New) readExistingFilesAsZettels(
 
 func (c New) writeNewZettels(
 	u *umwelt.Umwelt,
-) (zsc sku.CheckedOutMutableSet, err error) {
+) (zts sku.TransactedMutableSet, err error) {
 	emptyOp := user_ops.WriteNewZettels{
-		Umwelt:   u,
-		CheckOut: c.Edit,
+		Umwelt: u,
 	}
 
-	if zsc, err = emptyOp.RunMany(c.ProtoZettel, c.Count); err != nil {
+	if zts, err = emptyOp.RunMany(c.ProtoZettel, c.Count); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -25,14 +25,15 @@ func OpenVimWithArgs(args []string, fs ...string) (err error) {
 		)
 
 		cmd.Stdin = os.Stdin
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
 	} else {
 		cmd = exec.Command(
 			GetEditor(),
 			append(append(args, "-f"), fs...)...,
 		)
 	}
+
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 
 	if err = cmd.Run(); err != nil {
 		err = errors.Wrapf(err, "Cmd: %s", cmd)

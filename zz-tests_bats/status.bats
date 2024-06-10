@@ -338,3 +338,54 @@ function status_simple_etikett { # @test
 		        untracked [zz-archive.etikett@b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
 	EOM
 }
+
+function status_conflict { # @test
+	run_zit checkout one/dos
+	assert_success
+	assert_output_unsorted - <<-EOM
+		      checked out [one/dos.zettel@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
+	EOM
+
+	cat - >one/dos.zettel <<-EOM
+		---
+		# wow ok again
+		- get_this_shit_merged
+		- tag-3
+		- tag-4
+		! txt
+		---
+
+		not another one, conflict time
+	EOM
+
+	run_zit organize -mode commit-directly one/dos <<-EOM
+		---
+		! txt2
+		---
+
+		# new-etikett-for-all
+		- [one/dos  tag-3 tag-4] wow ok again
+	EOM
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[!txt2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[new-etikett-for-all@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[new-etikett-for@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[new-etikett@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[new@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
+	EOM
+
+	run_zit show -format log new-etikett-for-all:z,e,t
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[new-etikett-for-all@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
+	EOM
+
+	run_zit status one/dos.zettel
+	assert_success
+	assert_output - <<-EOM
+		       conflicted [one/dos.zettel]
+	EOM
+}

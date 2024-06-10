@@ -285,7 +285,7 @@ func (ar *assignmentLineReader) readOneObj(r *catgut.RingBuffer) (err error) {
 			return
 		}
 
-	ar.currentAssignment.AddObjekte(&z)
+		ar.currentAssignment.AddObjekte(&z)
 
 		return
 	}

@@ -64,6 +64,11 @@ func (c Status) RunWithQuery(
 		u.GetStore().GetCwdFiles().Len(),
 	)
 
+	bezToZettels := make(
+		map[string]sku.CheckedOutMutableSet,
+		u.GetStore().GetCwdFiles().Len(),
+	)
+
 	var l sync.Mutex
 
 	if err = u.GetStore().ReadFilesUnsure(
@@ -80,25 +85,43 @@ func (c Status) RunWithQuery(
 				return
 			}
 
-			by := sh.GetBytes()
 			l.Lock()
 			defer l.Unlock()
-
-			existing, ok := selbstMetadateiSansTaiToZettels[by]
-
-			if !ok {
-				existing = sku.MakeCheckedOutMutableSet()
-			}
 
 			clone := sku.GetCheckedOutPool().Get()
 			sku.CheckedOutResetter.ResetWith(clone, co)
 
-			if err = existing.Add(clone); err != nil {
-				err = errors.Wrap(err)
-				return
+			{
+				k := sh.GetBytes()
+				existing, ok := selbstMetadateiSansTaiToZettels[k]
+
+				if !ok {
+					existing = sku.MakeCheckedOutMutableSet()
+				}
+
+				if err = existing.Add(clone); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				selbstMetadateiSansTaiToZettels[k] = existing
 			}
 
-			selbstMetadateiSansTaiToZettels[by] = existing
+			{
+				k := co.External.Metadatei.Bezeichnung.String()
+				existing, ok := bezToZettels[k]
+
+				if !ok {
+					existing = sku.MakeCheckedOutMutableSet()
+				}
+
+				if err = existing.Add(clone); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				bezToZettels[k] = existing
+			}
 
 			return
 		},
@@ -109,7 +132,9 @@ func (c Status) RunWithQuery(
 
 	p := u.PrinterCheckedOut()
 
-	if len(selbstMetadateiSansTaiToZettels) > 0 {
+	qg.SetIncludeHistory()
+
+	if len(selbstMetadateiSansTaiToZettels) > 0 || len(bezToZettels) > 0 {
 		if err = u.GetStore().QueryWithoutCwd(
 			qg,
 			func(sk *sku.Transacted) (err error) {
@@ -119,32 +144,57 @@ func (c Status) RunWithQuery(
 					return
 				}
 
-				by := sh.GetBytes()
-				existing, ok := selbstMetadateiSansTaiToZettels[by]
+				printMatching := func(existing sku.CheckedOutMutableSet) (err error) {
+					if err = existing.Each(
+						func(co *sku.CheckedOut) (err error) {
+							co.State = checked_out_state.StateRecognized
 
-				if !ok {
+							if err = co.Internal.SetFromSkuLike(sk); err != nil {
+								err = errors.Wrap(err)
+								return
+							}
+
+							if err = p(co); err != nil {
+								err = errors.Wrap(err)
+								return
+							}
+
+							return
+						},
+					); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
 					return
 				}
 
-				if err = existing.Each(
-					func(co *sku.CheckedOut) (err error) {
-						co.State = checked_out_state.StateRecognized
+				{
+					k := sh.GetBytes()
+					existing, ok := selbstMetadateiSansTaiToZettels[k]
 
-						if err = co.Internal.SetFromSkuLike(sk); err != nil {
-							err = errors.Wrap(err)
-							return
-						}
-
-						if err = p(co); err != nil {
-							err = errors.Wrap(err)
-							return
-						}
-
+					if !ok {
 						return
-					},
-				); err != nil {
-					err = errors.Wrap(err)
-					return
+					}
+
+					if err = printMatching(existing); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+				}
+
+				{
+					k := sk.Metadatei.Bezeichnung.String()
+					existing, ok := bezToZettels[k]
+
+					if !ok {
+						return
+					}
+
+					if err = printMatching(existing); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
 				}
 
 				return

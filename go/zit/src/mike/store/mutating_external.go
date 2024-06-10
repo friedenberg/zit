@@ -287,6 +287,8 @@ func (s *Store) CreateZettelOrError(
 	return
 }
 
+// Given metadatei, generate a new identifier and commit up to two revisions,
+// first without applications of defaults, second with application
 func (s *Store) Create(
 	mg metadatei.Getter,
 ) (tz *sku.Transacted, err error) {
@@ -308,17 +310,6 @@ func (s *Store) Create(
 		return
 	}
 
-	m := mg.GetMetadatei()
-	s.protoZettel.Apply(m)
-
-	if err = s.GetKonfig().ApplyToNewMetadatei(
-		m,
-		s.GetAkten().GetTypV0(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	var ken *kennung.Hinweis
 
 	if ken, err = s.kennungIndex.CreateHinweis(); err != nil {
@@ -326,20 +317,23 @@ func (s *Store) Create(
 		return
 	}
 
-	if tz, err = s.makeSku(
-		m,
-		ken,
-	); err != nil {
+	m := mg.GetMetadatei()
+
+	if tz, err = s.makeSku(m, ken); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.tryCommit(
-		tz,
-		objekte_mode.ModeCommit,
-	); err != nil {
+	if err = s.tryCommit(tz, objekte_mode.ModeCommit); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	if s.protoZettel.Apply(&tz.Metadatei) {
+		if err = s.tryCommit(tz, objekte_mode.ModeCommit); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

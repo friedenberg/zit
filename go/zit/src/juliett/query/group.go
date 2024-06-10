@@ -35,6 +35,16 @@ type Group struct {
 	Typen            kennung.TypMutableSet
 }
 
+func (qg *Group) SetIncludeHistory() {
+	for _, q := range qg.UserQueries {
+		q.Sigil.Add(kennung.SigilHistory)
+	}
+
+	for _, q := range qg.OptimizedQueries {
+		q.Sigil.Add(kennung.SigilHistory)
+	}
+}
+
 func (qg *Group) HasHidden() bool {
 	return qg.Hidden != nil
 }

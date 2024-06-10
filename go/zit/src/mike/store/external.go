@@ -45,19 +45,7 @@ type ExternalReader interface {
 func (s *Store) ReadOneCheckedOut(
 	em *sku.ExternalMaybe,
 ) (co *sku.CheckedOut, err error) {
-	var m checkout_mode.Mode
-
-	if m, err = em.GetFDs().GetCheckoutModeOrError(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	co = sku.GetCheckedOutPool().Get()
-
-	if err = co.External.ResetWithExternalMaybe(em); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	if err = s.ReadOneInto(&em.Kennung, &co.Internal); err != nil {
 		if collections.IsErrNotFound(err) {
@@ -69,36 +57,18 @@ func (s *Store) ReadOneCheckedOut(
 		}
 	}
 
-	switch m {
-	case checkout_mode.ModeAkteOnly:
-		if err = s.ReadOneExternalAkte(&co.External, &co.Internal); err != nil {
+	if err = s.ReadOneExternalInto(em, &co.Internal, &co.External); err != nil {
+		if errors.Is(err, sku.ErrExternalHasConflictMarker) {
+			err = nil
+			co.State = checked_out_state.StateConflicted
+		} else {
 			err = errors.Wrap(err)
-			return
 		}
 
-	case checkout_mode.ModeObjekteOnly, checkout_mode.ModeObjekteAndAkte:
-		if err = s.ReadOneExternalObjekte(&co.External, &co.Internal); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	default:
-		panic(checkout_mode.MakeErrInvalidCheckoutModeMode(m))
-	}
-
-	if err = em.FDs.ConflictMarkerError(); err != nil {
-		err = nil
-		co.State = checked_out_state.StateConflicted
 		return
 	}
 
 	co.DetermineState(false)
-
-	// TODO determine if needed
-	// if err = s.konfig.ApplyToSku(&co.External.Transacted); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
 
 	return
 }
@@ -107,10 +77,21 @@ func (s *Store) ReadOneExternal(
 	em *sku.ExternalMaybe,
 	t *sku.Transacted,
 ) (e *sku.External, err error) {
-	if err = em.FDs.ConflictMarkerError(); err != nil {
+	e = sku.GetExternalPool().Get()
+
+	if err = s.ReadOneExternalInto(em, t, e); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
+	return
+}
+
+func (s *Store) ReadOneExternalInto(
+	em *sku.ExternalMaybe,
+	t *sku.Transacted,
+	e *sku.External,
+) (err error) {
 	var m checkout_mode.Mode
 
 	if m, err = em.GetFDs().GetCheckoutModeOrError(); err != nil {
@@ -118,10 +99,12 @@ func (s *Store) ReadOneExternal(
 		return
 	}
 
-	e = sku.GetExternalPool().Get()
-
 	if err = e.ResetWithExternalMaybe(em); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	if err = em.FDs.ConflictMarkerError(); err != nil {
 		return
 	}
 
