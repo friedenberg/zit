@@ -38,10 +38,15 @@ func (k Kennung) ContainsSku(sk *sku.Transacted) (ok bool) {
 	case gattung.Etikett:
 		var idx int
 
-		idx, ok = me.Verzeichnisse.Etiketten.All.ContainsKennungEtikett(
-			k.Kennung2,
-			!k.Exact,
-		)
+		if k.Exact {
+			idx, ok = me.Verzeichnisse.Etiketten.All.ContainsKennungEtikettExact(
+				k.Kennung2,
+			)
+		} else {
+			idx, ok = me.Verzeichnisse.Etiketten.All.ContainsKennungEtikett(
+				k.Kennung2,
+			)
+		}
 
 		ui.Log().Print(k, idx, ok, me.Verzeichnisse.Etiketten.All, sk)
 

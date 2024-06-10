@@ -182,6 +182,10 @@ func (c Standort) FileSchlummernd() string {
 	return c.DirZit("Schlummernd")
 }
 
+func (c Standort) FileEtiketten() string {
+	return c.DirZit("Etiketten")
+}
+
 func (c Standort) FileKonfigAngeboren() string {
 	return c.DirZit("KonfigAngeboren")
 }

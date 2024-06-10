@@ -26,7 +26,7 @@ func (c ReadOrganizeFile) RunWithPath(
 	defer errors.DeferredCloser(&err, f)
 
 	if ot, err = c.Run(u, f); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Path: %q", p)
 		return
 	}
 

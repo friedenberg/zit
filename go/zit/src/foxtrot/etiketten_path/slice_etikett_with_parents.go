@@ -21,20 +21,20 @@ func (s SliceEtikettWithParents) Len() int {
 	return len(s)
 }
 
-func (s SliceEtikettWithParents) ContainsKennungEtikettPartial(
+func (s SliceEtikettWithParents) ContainsKennungEtikett(
 	k *kennung.Kennung2,
 ) (int, bool) {
-	return s.ContainsKennungEtikett(k, true)
+	return s.containsKennungEtikett(k, true)
 }
 
 func (s SliceEtikettWithParents) ContainsKennungEtikettExact(
 	k *kennung.Kennung2,
 ) (int, bool) {
-	return s.ContainsKennungEtikett(k, false)
+	return s.containsKennungEtikett(k, false)
 }
 
 // TODO make less fragile
-func (s SliceEtikettWithParents) ContainsKennungEtikett(
+func (s SliceEtikettWithParents) containsKennungEtikett(
 	k *kennung.Kennung2,
 	partial bool,
 ) (int, bool) {
