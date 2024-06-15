@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/foxtrot/etiketten_path"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
@@ -76,21 +77,21 @@ func (c *constructor) collectExplicitAndImplicitFor(
 					continue
 				}
 
-				if len(ewp.Parents) > 0 {
-					for _, p := range ewp.Parents {
-						implicitCount++
-
-						eString := p.First().String()
-
-						if eString == sk.Kennung.String() {
-							continue
-						}
-
-						implicit.Add(kennung.MustEtikett(eString))
-					}
-				} else {
+				if len(ewp.Parents) == 0 {
 					explicitCount++
 					explicit.Add(kennung.MustEtikett(ewp.Etikett.String()))
+					continue
+				}
+
+				for _, p := range ewp.Parents {
+					if p.Type == etiketten_path.TypeDirect {
+						explicitCount++
+						explicit.Add(kennung.MustEtikett(ewp.Etikett.String()))
+					} else {
+						implicitCount++
+						eString := p.First().String()
+						implicit.Add(kennung.MustEtikett(eString))
+					}
 				}
 			}
 
@@ -159,7 +160,7 @@ func (c *constructor) populate() (err error) {
 			ee,
 			segments.Grouped,
 			c.GroupingEtiketten,
-      allUsed,
+			allUsed,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -181,7 +182,7 @@ func (c *constructor) populate() (err error) {
 		c.Assignment,
 		c.all,
 		c.GroupingEtiketten,
-    makeObjSet(),
+		makeObjSet(),
 	); err != nil {
 		err = errors.Wrapf(err, "Assignment: %#v", c.Assignment)
 		return
@@ -279,7 +280,7 @@ func (c *constructor) addGroupedChildren(
 				child,
 				psv,
 				groupingEtiketten,
-        used,
+				used,
 			); err != nil {
 				err = errors.Wrap(err)
 				return

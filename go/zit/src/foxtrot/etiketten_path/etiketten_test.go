@@ -12,7 +12,7 @@ func TestAddPaths(t1 *testing.T) {
 
 	var es Etiketten
 
-	es.AddPath(MakePath(
+	es.AddPath(MakePathWithType(
 		catgut.MakeFromString("area-home"),
 		catgut.MakeFromString("project-reno"),
 	))
@@ -25,7 +25,7 @@ func TestAddPaths(t1 *testing.T) {
 		}
 	}
 
-	es.AddPath(MakePath(
+	es.AddPath(MakePathWithType(
 		catgut.MakeFromString("area-career"),
 		catgut.MakeFromString("project-recurse"),
 	))
@@ -57,7 +57,7 @@ func TestRealWorld(t1 *testing.T) {
 		}
 	}
 
-	es.AddPath(MakePath(
+	es.AddPath(MakePathWithType(
 		catgut.MakeFromString("project-2022-recurse"),
 		catgut.MakeFromString("project-24q2-talent_show"),
 	))
@@ -73,12 +73,12 @@ func TestRealWorld(t1 *testing.T) {
 func BenchmarkMatchFirstYes(b *testing.B) {
 	var es Etiketten
 
-	es.AddPath(MakePath(
+	es.AddPath(MakePathWithType(
 		catgut.MakeFromString("area-home"),
 		catgut.MakeFromString("project-reno"),
 	))
 
-	es.AddPath(MakePath(
+	es.AddPath(MakePathWithType(
 		catgut.MakeFromString("area-career"),
 		catgut.MakeFromString("project-recurse"),
 	))
@@ -95,12 +95,12 @@ func BenchmarkMatchFirstYes(b *testing.B) {
 func BenchmarkMatchFirstNo(b *testing.B) {
 	var es Etiketten
 
-	es.AddPath(MakePath(
+	es.AddPath(MakePathWithType(
 		catgut.MakeFromString("area-home"),
 		catgut.MakeFromString("project-reno"),
 	))
 
-	es.AddPath(MakePath(
+	es.AddPath(MakePathWithType(
 		catgut.MakeFromString("area-career"),
 		catgut.MakeFromString("project-recurse"),
 	))

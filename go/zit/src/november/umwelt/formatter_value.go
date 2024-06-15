@@ -56,6 +56,20 @@ func (u *Umwelt) MakeFormatFunc(
 			return
 		}
 
+	case "etiketten-path-with-types":
+		f = func(tl *sku.Transacted) (err error) {
+			if _, err = fmt.Fprintln(
+				out,
+				tl.GetKennung(),
+				&tl.Metadatei.Verzeichnisse.Etiketten,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
 	case "query-path":
 		f = func(tl *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(

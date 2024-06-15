@@ -124,7 +124,7 @@ func (k *Compiled) addSuperEtiketten(
 			continue
 		}
 
-		prefix := etiketten_path.MakePath(kcg)
+		prefix := etiketten_path.MakePathWithType(kcg)
 
 		a := &sk.Metadatei.Verzeichnisse.Etiketten
 		b := &ek.Metadatei.Verzeichnisse.Etiketten
@@ -137,7 +137,7 @@ func (k *Compiled) addSuperEtiketten(
 		// ui.Log().Print("before", sk.GetKennung(), ex, prefix, a, b)
 		// defer ui.Log().Print("after ", sk.GetKennung(), ex, prefix, a, b)
 
-		if err = a.AddFrom(b, prefix); err != nil {
+		if err = a.AddSuperFrom(b, prefix); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -155,7 +155,8 @@ func (k *Compiled) addImplicitEtiketten(
 	ie := kennung.MakeEtikettMutableSet()
 
 	addImpEts := func(e *kennung.Etikett) (err error) {
-		p1 := etiketten_path.MakePath()
+		p1 := etiketten_path.MakePathWithType()
+		p1.Type = etiketten_path.TypeIndirect
 		p1.Add(catgut.MakeFromString(e.String()))
 
 		impl := k.getImplicitEtiketten(e)
@@ -169,7 +170,7 @@ func (k *Compiled) addImplicitEtiketten(
 			iter.MakeChain(
 				ie.AddPtr,
 				func(e1 *kennung.Etikett) (err error) {
-					p2 := p1.Copy()
+					p2 := p1.Clone()
 					p2.Add(catgut.MakeFromString(e1.String()))
 					sk.Metadatei.Verzeichnisse.Etiketten.AddPath(p2)
 					return

@@ -361,11 +361,11 @@ function show_etiketten_paths { # @test
 	run_zit show -format etiketten-path :e
 	assert_success
 	assert_output_unsorted - <<-EOM
-		tag [Paths: [[tag]], All: [tag:[]]]
-		tag-1 [Paths: [[tag-1]], All: [tag-1:[]]]
-		tag-2 [Paths: [[tag-2]], All: [tag-2:[]]]
-		tag-3 [Paths: [[tag-3]], All: [tag-3:[]]]
-		tag-4 [Paths: [[tag-4]], All: [tag-4:[]]]
+		tag [Paths: [TypeDirect:[tag]], All: [tag:[]]]
+		tag-1 [Paths: [TypeDirect:[tag-1]], All: [tag-1:[]]]
+		tag-2 [Paths: [TypeDirect:[tag-2]], All: [tag-2:[]]]
+		tag-3 [Paths: [TypeDirect:[tag-3]], All: [tag-3:[]]]
+		tag-4 [Paths: [TypeDirect:[tag-4]], All: [tag-4:[]]]
 	EOM
 }
 

@@ -21,7 +21,7 @@ import (
 // TODO move implicit etiketten here
 type Etiketten struct {
 	changes   []string
-	etiketten etiketten_path.EtikettenWithParents
+	etiketten etiketten_path.EtikettenWithParentsAndTypes
 }
 
 func (sch *Etiketten) GetChanges() (out []string) {
@@ -199,7 +199,7 @@ func (s *Etiketten) ReadFrom(r *bufio.Reader) (n int64, err error) {
 			return
 		}
 
-		s.etiketten = append(s.etiketten, etiketten_path.EtikettWithParents{
+		s.etiketten = append(s.etiketten, etiketten_path.EtikettWithParentsAndTypes{
 			Etikett: cs,
 		})
 	}

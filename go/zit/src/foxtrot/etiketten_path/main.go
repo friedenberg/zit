@@ -11,39 +11,42 @@ import (
 )
 
 type (
-	Etikett      = catgut.String
-	PathWithType struct {
-		Path
-		Type
-	}
-	Path []*Etikett
+	Etikett = catgut.String
+	Path    []*Etikett
 )
 
-func MakePath(els ...*Etikett) *Path {
+func MakePathWithType(els ...*Etikett) *PathWithType {
+	return &PathWithType{
+		Path: makePath(els...),
+	}
+}
+
+func makePath(els ...*Etikett) Path {
 	p := Path(make([]*Etikett, 0, len(els)))
 
 	for _, e := range els {
 		p.Add(e)
 	}
 
-	return &p
+	return p
 }
 
-func (a *Path) Clone() (b *Path) {
-	b = MakePath(*a...)
-	return
+func (a *Path) Clone() *Path {
+	b := makePath(*a...)
+	return &b
 }
 
-func (a *Path) CloneAndAddPath(c *Path) (b *Path) {
+func (a *Path) CloneAndAddPath(c *Path) *Path {
+	var b Path
 	if a == nil {
-		b = MakePath()
+		b = makePath()
 	} else {
-		b = MakePath(*a...)
+		b = makePath(*a...)
 	}
 
 	b.AddPath(c)
 
-	return
+	return &b
 }
 
 func (a *Path) IsEmpty() bool {

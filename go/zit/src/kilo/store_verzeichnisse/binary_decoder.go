@@ -368,7 +368,7 @@ func (bf *binaryDecoder) readFieldKey(
 		}
 
 	case schlussel.VerzeichnisseEtiketten:
-		var e etiketten_path.Path
+		var e etiketten_path.PathWithType
 
 		if _, err = e.ReadFrom(&bf.Content); err != nil {
 			err = errors.WrapExcept(err, io.EOF)

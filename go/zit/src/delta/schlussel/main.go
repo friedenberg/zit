@@ -30,6 +30,7 @@ const (
 	VerzeichnisseEtikettImplicit = 'I'
 	VerzeichnisseEtikettExpanded = 'e'
 	VerzeichnisseEtiketten       = 'x'
+	VerzeichnisseEtiketten2      = 'y'
 )
 
 var ErrInvalid = errors.New("invalid schlussel")

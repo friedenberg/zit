@@ -190,7 +190,8 @@ func (m *Metadatei) AddEtikettPtr(e *kennung.Etikett) (err error) {
 	}
 
 	kennung.AddNormalizedEtikett(m.Etiketten, e)
-	m.Verzeichnisse.Etiketten.AddEtikett(catgut.MakeFromString(e.String()))
+	cs := catgut.MakeFromString(e.String())
+	m.Verzeichnisse.Etiketten.AddEtikett(cs)
 
 	return
 }

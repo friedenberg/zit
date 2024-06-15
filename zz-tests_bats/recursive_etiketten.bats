@@ -80,7 +80,7 @@ function add_one_super_etiketten { # @test
 	run_zit show -format etiketten-path tag-3-sub:e
 	assert_success
 	assert_output_unsorted - <<-EOM
-		tag-3-sub [Paths: [[tag-3-sub] [tag-3-sub -> recurse]], All: [recurse:[[tag-3-sub -> recurse]] tag-3-sub:[[tag-3-sub -> recurse]]]]
+		tag-3-sub [Paths: [TypeDirect:[tag-3-sub] TypeSuper:[tag-3-sub -> recurse]], All: [recurse:[TypeSuper:[tag-3-sub -> recurse]] tag-3-sub:[TypeSuper:[tag-3-sub -> recurse]]]]
 	EOM
 
 	run_zit show recurse:e,z
@@ -96,20 +96,20 @@ function add_one_super_etiketten { # @test
 	run_zit show -format etiketten-path recurse:z,e
 	assert_success
 	assert_output_unsorted - <<-EOM
-		one/dos [Paths: [[tag-3] [tag-3 -> recurse] [tag-4]], All: [recurse:[[tag-3 -> recurse]] tag-3:[[tag-3 -> recurse]] tag-4:[]]]
-		one/uno [Paths: [[tag-3] [tag-3 -> recurse] [tag-4]], All: [recurse:[[tag-3 -> recurse]] tag-3:[[tag-3 -> recurse]] tag-4:[]]]
-		recurse [Paths: [[recurse]], All: [recurse:[]]]
-		tag-3 [Paths: [[recurse] [tag-3]], All: [recurse:[] tag-3:[]]]
-		tag-3-sub [Paths: [[tag-3-sub] [tag-3-sub -> recurse]], All: [recurse:[[tag-3-sub -> recurse]] tag-3-sub:[[tag-3-sub -> recurse]]]]
+		one/dos [Paths: [TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse] TypeDirect:[tag-4]], All: [recurse:[TypeIndirect:[tag-3 -> recurse]] tag-3:[TypeIndirect:[tag-3 -> recurse]] tag-4:[]]]
+		one/uno [Paths: [TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse] TypeDirect:[tag-4]], All: [recurse:[TypeIndirect:[tag-3 -> recurse]] tag-3:[TypeIndirect:[tag-3 -> recurse]] tag-4:[]]]
+		recurse [Paths: [TypeDirect:[recurse]], All: [recurse:[]]]
+		tag-3 [Paths: [TypeDirect:[recurse] TypeDirect:[tag-3]], All: [recurse:[] tag-3:[]]]
+		tag-3-sub [Paths: [TypeDirect:[tag-3-sub] TypeSuper:[tag-3-sub -> recurse]], All: [recurse:[TypeSuper:[tag-3-sub -> recurse]] tag-3-sub:[TypeSuper:[tag-3-sub -> recurse]]]]
 	EOM
 
 	run_zit show -format etiketten-path recurse:e,z
 	assert_success
 	assert_output_unsorted - <<-EOM
-		one/dos [Paths: [[tag-3] [tag-3 -> recurse] [tag-4]], All: [recurse:[[tag-3 -> recurse]] tag-3:[[tag-3 -> recurse]] tag-4:[]]]
-		one/uno [Paths: [[tag-3] [tag-3 -> recurse] [tag-4]], All: [recurse:[[tag-3 -> recurse]] tag-3:[[tag-3 -> recurse]] tag-4:[]]]
-		recurse [Paths: [[recurse]], All: [recurse:[]]]
-		tag-3 [Paths: [[recurse] [tag-3]], All: [recurse:[] tag-3:[]]]
-		tag-3-sub [Paths: [[tag-3-sub] [tag-3-sub -> recurse]], All: [recurse:[[tag-3-sub -> recurse]] tag-3-sub:[[tag-3-sub -> recurse]]]]
+		one/dos [Paths: [TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse] TypeDirect:[tag-4]], All: [recurse:[TypeIndirect:[tag-3 -> recurse]] tag-3:[TypeIndirect:[tag-3 -> recurse]] tag-4:[]]]
+		one/uno [Paths: [TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse] TypeDirect:[tag-4]], All: [recurse:[TypeIndirect:[tag-3 -> recurse]] tag-3:[TypeIndirect:[tag-3 -> recurse]] tag-4:[]]]
+		recurse [Paths: [TypeDirect:[recurse]], All: [recurse:[]]]
+		tag-3 [Paths: [TypeDirect:[recurse] TypeDirect:[tag-3]], All: [recurse:[] tag-3:[]]]
+		tag-3-sub [Paths: [TypeDirect:[tag-3-sub] TypeSuper:[tag-3-sub -> recurse]], All: [recurse:[TypeSuper:[tag-3-sub -> recurse]] tag-3-sub:[TypeSuper:[tag-3-sub -> recurse]]]]
 	EOM
 }

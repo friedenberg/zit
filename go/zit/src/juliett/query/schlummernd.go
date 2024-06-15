@@ -20,7 +20,7 @@ import (
 
 type Schlummernd struct {
 	changes   []string
-	etiketten etiketten_path.EtikettenWithParents
+	etiketten etiketten_path.EtikettenWithParentsAndTypes
 }
 
 func (sch *Schlummernd) GetChanges() (out []string) {
@@ -198,7 +198,7 @@ func (s *Schlummernd) ReadFrom(r *bufio.Reader) (n int64, err error) {
 			return
 		}
 
-		s.etiketten = append(s.etiketten, etiketten_path.EtikettWithParents{
+		s.etiketten = append(s.etiketten, etiketten_path.EtikettWithParentsAndTypes{
 			Etikett: cs,
 		})
 	}
