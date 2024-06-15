@@ -21,7 +21,7 @@ import (
 // TODO move implicit etiketten here
 type Etiketten struct {
 	changes   []string
-	etiketten etiketten_path.SliceEtikettWithParents
+	etiketten etiketten_path.EtikettenWithParents
 }
 
 func (sch *Etiketten) GetChanges() (out []string) {

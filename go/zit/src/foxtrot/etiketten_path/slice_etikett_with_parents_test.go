@@ -11,7 +11,7 @@ import (
 func TestContains(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	var s SliceEtikettWithParents
+	var s EtikettenWithParents
 
 	s.Add(catgut.MakeFromString("%chrome-tab_id-1"), nil)
 	s.Add(catgut.MakeFromString("%chrome-tab_id-2"), nil)

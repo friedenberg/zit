@@ -12,21 +12,21 @@ import (
 
 type PrefixSet struct {
 	count    int
-	innerMap map[string]sku.TransactedMutableSet
+	innerMap map[string]objSet
 }
 
 type Segments struct {
-	Ungrouped sku.TransactedMutableSet
+	Ungrouped objSet
 	Grouped   PrefixSet
 }
 
 func MakePrefixSet(c int) (s PrefixSet) {
-	s.innerMap = make(map[string]sku.TransactedMutableSet, c)
+	s.innerMap = make(map[string]objSet, c)
 	return s
 }
 
 func MakePrefixSetFrom(
-	ts sku.TransactedSet,
+	ts objSet,
 ) (s PrefixSet) {
 	s = MakePrefixSet(ts.Len())
 	ts.Each(s.Add)
@@ -37,8 +37,24 @@ func (s PrefixSet) Len() int {
 	return s.count
 }
 
+func (s *PrefixSet) AddTransacted(z *sku.Transacted) (err error) {
+	var o obj
+
+	if err = o.Transacted.SetFromSkuLike(z); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.Add(&o); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 // this splits on right-expanded
-func (s *PrefixSet) Add(z *sku.Transacted) (err error) {
+func (s *PrefixSet) Add(z *obj) (err error) {
 	es := kennung.Expanded(
 		z.GetMetadatei().Verzeichnisse.GetImplicitEtiketten(),
 		expansion.ExpanderRight,
@@ -70,13 +86,13 @@ func (s *PrefixSet) Add(z *sku.Transacted) (err error) {
 }
 
 func (a PrefixSet) Subtract(
-	b sku.TransactedMutableSet,
+	b objSet,
 ) (c PrefixSet) {
 	c = MakePrefixSet(len(a.innerMap))
 
 	for e, aSet := range a.innerMap {
 		aSet.Each(
-			func(z *sku.Transacted) (err error) {
+			func(z *obj) (err error) {
 				if b.Contains(z) {
 					return
 				}
@@ -93,7 +109,7 @@ func (a PrefixSet) Subtract(
 
 func (s *PrefixSet) addPair(
 	e string,
-	z *sku.Transacted,
+	z *obj,
 ) {
 	if e == z.Kennung.String() {
 		e = ""
@@ -107,7 +123,7 @@ func (s *PrefixSet) addPair(
 	existing, ok := s.innerMap[e]
 
 	if !ok {
-		existing = sku.MakeTransactedMutableSet()
+		existing = makeObjSet()
 	}
 
 	existing.Add(z)
@@ -115,7 +131,7 @@ func (s *PrefixSet) addPair(
 }
 
 func (a PrefixSet) Each(
-	f func(kennung.Etikett, sku.TransactedMutableSet) error,
+	f func(kennung.Etikett, objSet) error,
 ) (err error) {
 	for e, ssz := range a.innerMap {
 		var e1 kennung.Etikett
@@ -139,12 +155,12 @@ func (a PrefixSet) Each(
 }
 
 func (a PrefixSet) EachZettel(
-	f schnittstellen.FuncIter[*sku.Transacted],
+	f schnittstellen.FuncIter[*obj],
 ) error {
 	return a.Each(
-		func(_ kennung.Etikett, st sku.TransactedMutableSet) (err error) {
+		func(_ kennung.Etikett, st objSet) (err error) {
 			err = st.Each(
-				func(z *sku.Transacted) (err error) {
+				func(z *obj) (err error) {
 					err = f(z)
 					return
 				},
@@ -155,41 +171,10 @@ func (a PrefixSet) EachZettel(
 	)
 }
 
-func (a PrefixSet) EachPair(
-	f func(kennung.Etikett, *sku.Transacted) error,
-) error {
-	return a.Each(
-		func(e kennung.Etikett, st sku.TransactedMutableSet) (err error) {
-			err = st.Each(
-				func(z *sku.Transacted) (err error) {
-					err = f(e, z)
-					return
-				},
-			)
-
-			return
-		},
-	)
-}
-
-// for all of the zettels, check for intersections with the passed in
-// etikett, and if there is a prefix match, group it out the output set segments
-// appropriately
-
-func (s PrefixSet) ToSet() (out sku.TransactedMutableSet) {
-	out = sku.MakeTransactedMutableSet()
-
-	for _, zs := range s.innerMap {
-		zs.Each(out.Add)
-	}
-
-	return
-}
-
 func (a PrefixSet) Match(
 	e kennung.Etikett,
 ) (out Segments) {
-	out.Ungrouped = sku.MakeTransactedMutableSet()
+	out.Ungrouped = makeObjSet()
 	out.Grouped = MakePrefixSet(len(a.innerMap))
 
 	for e1, zSet := range a.innerMap {
@@ -198,7 +183,7 @@ func (a PrefixSet) Match(
 		}
 
 		zSet.Each(
-			func(z *sku.Transacted) (err error) {
+			func(z *obj) (err error) {
 				es := z.GetEtiketten()
 				// var es kennung.EtikettSet
 
@@ -234,7 +219,7 @@ func (a PrefixSet) Match(
 func (a PrefixSet) Subset(
 	e kennung.Etikett,
 ) (out Segments) {
-	out.Ungrouped = sku.MakeTransactedMutableSet()
+	out.Ungrouped = makeObjSet()
 	out.Grouped = MakePrefixSet(len(a.innerMap))
 
 	e2 := catgut.MakeFromString(e.String())
@@ -245,40 +230,8 @@ func (a PrefixSet) Subset(
 		}
 
 		zSet.Each(
-			// func(z *sku.Transacted) (err error) {
-			// 	intersectionNew := z.Metadatei.Verzeichnisse.Etiketten.GetMatching(e2)
-			// 	// es := z.GetEtiketten()
-			// 	// intersection := kennung.IntersectPrefixes(es, e)
-			// 	// ui.Debug().Print(
-			// 	// 	e,
-			// 	// 	"es:", iter.StringCommaSeparated(es),
-			// 	// 	"int1:", iter.StringCommaSeparated(intersection),
-			// 	// 	"int2:", intersectionNew,
-			// 	// )
-			// exactMatch := len(intersectionNew) == 1 && intersectionNew[0].Equals(e2)
-
-			// 	// exactMatch := intersection.Len() == 1 &&
-			// 	// 	intersection.Any().Equals(e)
-
-			// if len(intersectionNew) > 0 && !exactMatch {
-			// 		for _, e2 := range intersectionNew {
-			// 			out.Grouped.addPair(e2.String(), z)
-			// 		}
-			// } else {
-			// 		out.Ungrouped.Add(z)
-			// }
-
-			// 	// if intersection.Len() > 0 && !exactMatch {
-			// 	// 	for _, e2 := range iter.Elements(intersection) {
-			// 	// 		out.Grouped.addPair(e2.String(), z)
-			// 	// 	}
-			// 	// } else {
-			// 	// 	out.Ungrouped.Add(z)
-			// 	// }
-
-			// 	return
-			// },
-			func(z *sku.Transacted) (err error) {
+			func(z *obj) (err error) {
+				ks := z.Kennung.String()
 				intersection := z.Metadatei.Verzeichnisse.Etiketten.All.GetMatching(e2)
 				exactMatch := len(intersection) == 1 && intersection[0].Equals(e2)
 
@@ -289,7 +242,14 @@ func (a PrefixSet) Subset(
 						}
 
 						for _, e3 := range e2.Parents {
-							out.Grouped.addPair(e3.First().String(), z)
+							if e3.First().String() == ks {
+								out.Grouped.addPair(e3.Last().String(), z)
+							} else {
+								out.Grouped.addPair(e3.First().String(), z.cloneVirtual())
+								// for _, e4 := range *e3 {
+								// 	out.Grouped.addPair(e4.String(), z.cloneVirtual())
+								// }
+							}
 						}
 					}
 				} else {

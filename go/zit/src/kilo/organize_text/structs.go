@@ -1,14 +1,24 @@
 package organize_text
 
 import (
-	"fmt"
 	"sort"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
+
+type (
+	objSet = schnittstellen.MutableSetLike[*obj]
+)
+
+var objKeyer schnittstellen.StringKeyer[*obj]
+
+func makeObjSet() objSet {
+	return collections_value.MakeMutableValueSet(objKeyer)
+}
 
 // TODO-P1 migrate obj to sku.Transacted
 type obj struct {
@@ -16,8 +26,10 @@ type obj struct {
 	virtual bool
 }
 
-func (z *obj) String() string {
-	return fmt.Sprintf("- [%s] %s", &z.Kennung, &z.Metadatei.Bezeichnung)
+func (a *obj) cloneVirtual() (b *obj) {
+	b = &obj{virtual: true}
+	sku.TransactedResetter.ResetWith(&b.Transacted, &a.Transacted)
+	return
 }
 
 func sortObjSet(

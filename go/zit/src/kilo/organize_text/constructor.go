@@ -20,7 +20,7 @@ func (c *constructor) Make() (ot *Text, err error) {
 	c.Assignment = newAssignment(0)
 	c.IsRoot = true
 
-	if err = c.Transacted.Each(c.all.Add); err != nil {
+	if err = c.Transacted.Each(c.all.AddTransacted); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -148,25 +148,22 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 }
 
 func (c *constructor) populate() (err error) {
-	allUsed := sku.MakeTransactedMutableSet()
+	allUsed := makeObjSet()
 
 	for _, e := range iter.Elements(c.ExtraEtiketten) {
 		ee := c.makeChild(e)
 
 		segments := c.all.Match(e)
 
-		var used sku.TransactedMutableSet
-
-		if used, err = c.makeChildrenWithPossibleGroups(
+		if err = c.makeChildrenWithPossibleGroups(
 			ee,
 			segments.Grouped,
 			c.GroupingEtiketten,
+      allUsed,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-
-		used.Each(allUsed.Add)
 
 		if err = c.makeChildrenWithoutGroups(
 			ee,
@@ -180,10 +177,11 @@ func (c *constructor) populate() (err error) {
 
 	c.all = c.all.Subtract(allUsed)
 
-	if _, err = c.makeChildrenWithPossibleGroups(
+	if err = c.makeChildrenWithPossibleGroups(
 		c.Assignment,
 		c.all,
 		c.GroupingEtiketten,
+    makeObjSet(),
 	); err != nil {
 		err = errors.Wrapf(err, "Assignment: %#v", c.Assignment)
 		return
@@ -194,8 +192,8 @@ func (c *constructor) populate() (err error) {
 
 func (c *constructor) makeChildrenWithoutGroups(
 	parent *Assignment,
-	fi func(schnittstellen.FuncIter[*sku.Transacted]) error,
-	used sku.TransactedMutableSet,
+	fi func(schnittstellen.FuncIter[*obj]) error,
+	used objSet,
 ) (err error) {
 	if err = fi(used.Add); err != nil {
 		err = errors.Wrap(err)
@@ -214,9 +212,8 @@ func (c *constructor) makeChildrenWithPossibleGroups(
 	parent *Assignment,
 	prefixSet PrefixSet,
 	groupingEtiketten kennung.EtikettSlice,
-) (used sku.TransactedMutableSet, err error) {
-	used = sku.MakeTransactedMutableSet()
-
+	used objSet,
+) (err error) {
 	if groupingEtiketten.Len() == 0 {
 		if err = c.makeChildrenWithoutGroups(
 			parent,
@@ -240,7 +237,7 @@ func (c *constructor) makeChildrenWithPossibleGroups(
 
 	if err = c.addGroupedChildren(
 		parent,
-		segments,
+		segments.Grouped,
 		groupingEtiketten,
 		used,
 	); err != nil {
@@ -255,12 +252,12 @@ func (c *constructor) makeChildrenWithPossibleGroups(
 
 func (c *constructor) addGroupedChildren(
 	parent *Assignment,
-	segments Segments,
+	grouped PrefixSet,
 	groupingEtiketten kennung.EtikettSlice,
-	used sku.TransactedMutableSet,
+	used objSet,
 ) (err error) {
-	if err = segments.Grouped.Each(
-		func(e kennung.Etikett, zs sku.TransactedMutableSet) (err error) {
+	if err = grouped.Each(
+		func(e kennung.Etikett, zs objSet) (err error) {
 			if e.IsEmpty() {
 				if err = c.makeAndAddUngrouped(parent, zs.Each); err != nil {
 					err = errors.Wrap(err)
@@ -276,20 +273,18 @@ func (c *constructor) addGroupedChildren(
 			child.Etiketten = kennung.MakeEtikettSet(e)
 			groupingEtiketten.DropFirst()
 
-			var usedChild sku.TransactedMutableSet
-
 			psv := MakePrefixSetFrom(zs)
 
-			if usedChild, err = c.makeChildrenWithPossibleGroups(
+			if err = c.makeChildrenWithPossibleGroups(
 				child,
 				psv,
 				groupingEtiketten,
+        used,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			usedChild.Each(used.Add)
 			parent.addChild(child)
 
 			return
@@ -304,13 +299,13 @@ func (c *constructor) addGroupedChildren(
 
 func (c *constructor) makeAndAddUngrouped(
 	parent *Assignment,
-	fi func(schnittstellen.FuncIter[*sku.Transacted]) error,
+	fi func(schnittstellen.FuncIter[*obj]) error,
 ) (err error) {
 	if err = fi(
-		func(tz *sku.Transacted) (err error) {
+		func(tz *obj) (err error) {
 			var z *obj
 
-			if z, err = c.makeObj(tz); err != nil {
+			if z, err = c.cloneObj(tz); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -326,12 +321,12 @@ func (c *constructor) makeAndAddUngrouped(
 	return
 }
 
-func (c *constructor) makeObj(
-	named *sku.Transacted,
+func (c *constructor) cloneObj(
+	named *obj,
 ) (z *obj, err error) {
 	errors.TodoP4("add bez in a better way")
 
-	z = &obj{}
+	z = &obj{virtual: named.virtual}
 
 	if err = z.SetFromSkuLike(named); err != nil {
 		err = errors.Wrap(err)

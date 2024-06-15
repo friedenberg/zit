@@ -10,31 +10,31 @@ import (
 )
 
 type (
-	SliceEtikettWithParents []EtikettWithParents
+	EtikettenWithParents []EtikettWithParents
 )
 
-func (s *SliceEtikettWithParents) Reset() {
+func (s *EtikettenWithParents) Reset() {
 	*s = (*s)[:0]
 }
 
-func (s SliceEtikettWithParents) Len() int {
+func (s EtikettenWithParents) Len() int {
 	return len(s)
 }
 
-func (s SliceEtikettWithParents) ContainsKennungEtikett(
+func (s EtikettenWithParents) ContainsKennungEtikett(
 	k *kennung.Kennung2,
 ) (int, bool) {
 	return s.containsKennungEtikett(k, true)
 }
 
-func (s SliceEtikettWithParents) ContainsKennungEtikettExact(
+func (s EtikettenWithParents) ContainsKennungEtikettExact(
 	k *kennung.Kennung2,
 ) (int, bool) {
 	return s.containsKennungEtikett(k, false)
 }
 
 // TODO make less fragile
-func (s SliceEtikettWithParents) containsKennungEtikett(
+func (s EtikettenWithParents) containsKennungEtikett(
 	k *kennung.Kennung2,
 	partial bool,
 ) (int, bool) {
@@ -79,7 +79,7 @@ func (s SliceEtikettWithParents) containsKennungEtikett(
 	)
 }
 
-func (s SliceEtikettWithParents) ContainsEtikett(e *Etikett) (int, bool) {
+func (s EtikettenWithParents) ContainsEtikett(e *Etikett) (int, bool) {
 	return slices.BinarySearchFunc(
 		s,
 		e,
@@ -90,7 +90,7 @@ func (s SliceEtikettWithParents) ContainsEtikett(e *Etikett) (int, bool) {
 	)
 }
 
-func (s SliceEtikettWithParents) GetMatching(e *Etikett) (matching []EtikettWithParents) {
+func (s EtikettenWithParents) GetMatching(e *Etikett) (matching []EtikettWithParents) {
 	i, ok := s.ContainsEtikett(e)
 
 	if !ok {
@@ -111,7 +111,10 @@ func (s SliceEtikettWithParents) GetMatching(e *Etikett) (matching []EtikettWith
 }
 
 // TODO return success
-func (s *SliceEtikettWithParents) Add(e1 *Etikett, p *Path) (err error) {
+func (s *EtikettenWithParents) Add(
+	e1 *Etikett,
+	p *Path,
+) (err error) {
 	var e *Etikett
 
 	if e, err = e1.Clone(); err != nil {
@@ -142,7 +145,7 @@ func (s *SliceEtikettWithParents) Add(e1 *Etikett, p *Path) (err error) {
 }
 
 // TODO return success
-func (s *SliceEtikettWithParents) Remove(e1 *Etikett) (err error) {
+func (s *EtikettenWithParents) Remove(e1 *Etikett) (err error) {
 	var e *Etikett
 
 	if e, err = e1.Clone(); err != nil {
@@ -161,7 +164,7 @@ func (s *SliceEtikettWithParents) Remove(e1 *Etikett) (err error) {
 	return
 }
 
-func (s SliceEtikettWithParents) StringCommaSeparatedExplicit() string {
+func (s EtikettenWithParents) StringCommaSeparatedExplicit() string {
 	var sb strings.Builder
 
 	first := true

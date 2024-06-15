@@ -11,8 +11,12 @@ import (
 )
 
 type (
-	Etikett = catgut.String
-	Path    []*Etikett
+	Etikett      = catgut.String
+	PathWithType struct {
+		Path
+		Type
+	}
+	Path []*Etikett
 )
 
 func MakePath(els ...*Etikett) *Path {

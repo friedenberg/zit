@@ -12,8 +12,9 @@ import (
 )
 
 type Etiketten struct {
+	PathsWithTypes // TODO implement
 	Paths SlicePaths
-	All   SliceEtikettWithParents
+	All   EtikettenWithParents
 }
 
 func (a *Etiketten) String() string {

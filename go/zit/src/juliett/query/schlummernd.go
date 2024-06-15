@@ -20,7 +20,7 @@ import (
 
 type Schlummernd struct {
 	changes   []string
-	etiketten etiketten_path.SliceEtikettWithParents
+	etiketten etiketten_path.EtikettenWithParents
 }
 
 func (sch *Schlummernd) GetChanges() (out []string) {
