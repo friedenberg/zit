@@ -89,6 +89,10 @@ func (e etikett) GetQueryPrefix() string {
 	return "-"
 }
 
+func (e etikett) IsEmpty() bool {
+	return e.value == ""
+}
+
 func (e etikett) GetGattung() schnittstellen.GattungLike {
 	return gattung.Etikett
 }

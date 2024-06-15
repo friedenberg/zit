@@ -95,6 +95,9 @@ func (s *PrefixSet) addPair(
 	e string,
 	z *sku.Transacted,
 ) {
+	if e == z.Kennung.String() {
+		e = ""
+	}
 	// if e != "" {
 	// 	errors.PanicIfError((&kennung.Etikett{}).Set(e))
 	// }

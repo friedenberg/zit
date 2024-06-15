@@ -66,14 +66,27 @@ func (c *constructor) collectExplicitAndImplicitFor(
 			}
 
 			for _, ewp := range sk.Metadatei.Verzeichnisse.Etiketten.All {
-				if cmp := ewp.ComparePartial(res); cmp != 0 {
+				if ewp.Etikett.String() == sk.Kennung.String() {
+					continue
+				}
+
+				cmp := ewp.ComparePartial(res)
+
+				if cmp != 0 {
 					continue
 				}
 
 				if len(ewp.Parents) > 0 {
 					for _, p := range ewp.Parents {
 						implicitCount++
-						implicit.Add(kennung.MustEtikett(p.First().String()))
+
+						eString := p.First().String()
+
+						if eString == sk.Kennung.String() {
+							continue
+						}
+
+						implicit.Add(kennung.MustEtikett(eString))
 					}
 				} else {
 					explicitCount++
@@ -248,14 +261,20 @@ func (c *constructor) addGroupedChildren(
 ) (err error) {
 	if err = segments.Grouped.Each(
 		func(e kennung.Etikett, zs sku.TransactedMutableSet) (err error) {
+			if e.IsEmpty() {
+				if err = c.makeAndAddUngrouped(parent, zs.Each); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				zs.Each(used.Add)
+
+				return
+			}
+
 			child := newAssignment(parent.GetDepth() + 1)
 			child.Etiketten = kennung.MakeEtikettSet(e)
-
-			nextGroupingEtiketten := kennung.MakeEtikettSlice()
-
-			if groupingEtiketten.Len() > 1 {
-				nextGroupingEtiketten = groupingEtiketten[1:]
-			}
+			groupingEtiketten.DropFirst()
 
 			var usedChild sku.TransactedMutableSet
 
@@ -264,14 +283,13 @@ func (c *constructor) addGroupedChildren(
 			if usedChild, err = c.makeChildrenWithPossibleGroups(
 				child,
 				psv,
-				nextGroupingEtiketten,
+				groupingEtiketten,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 			usedChild.Each(used.Add)
-
 			parent.addChild(child)
 
 			return

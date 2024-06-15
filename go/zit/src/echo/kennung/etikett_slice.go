@@ -33,6 +33,12 @@ func NewSliceFromStrings(es ...string) (s EtikettSlice, err error) {
 	return
 }
 
+func (s *EtikettSlice) DropFirst() {
+	if s.Len() > 0 {
+		*s = (*s)[1:]
+	}
+}
+
 func (s EtikettSlice) Len() int {
 	return len(s)
 }
