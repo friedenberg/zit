@@ -324,6 +324,8 @@ func (s *Store) Create(
 		return
 	}
 
+	// TODO move default application to tryCommit and control via options / mode
+	// then, use that to de-dupe output
 	if err = s.tryCommit(tz, objekte_mode.ModeCommit); err != nil {
 		err = errors.Wrap(err)
 		return

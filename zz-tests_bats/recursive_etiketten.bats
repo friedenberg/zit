@@ -80,7 +80,7 @@ function add_one_super_etiketten { # @test
 	run_zit show -format etiketten-path tag-3-sub:e
 	assert_success
 	assert_output_unsorted - <<-EOM
-		tag-3-sub [Paths: [TypeDirect:[tag-3-sub] TypeSuper:[tag-3-sub -> recurse]], All: [recurse:[TypeSuper:[tag-3-sub -> recurse]] tag-3-sub:[TypeSuper:[tag-3-sub -> recurse]]]]
+		tag-3-sub [Paths: [TypeSuper:[tag-3 -> recurse] TypeSelf:[tag-3-sub]], All: [recurse:[TypeSuper:[tag-3 -> recurse]] tag-3:[TypeSuper:[tag-3 -> recurse]] tag-3-sub:[TypeSelf:[tag-3-sub]]]]
 	EOM
 
 	run_zit show recurse:e,z
@@ -96,20 +96,20 @@ function add_one_super_etiketten { # @test
 	run_zit show -format etiketten-path recurse:z,e
 	assert_success
 	assert_output_unsorted - <<-EOM
-		one/dos [Paths: [TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse] TypeDirect:[tag-4]], All: [recurse:[TypeIndirect:[tag-3 -> recurse]] tag-3:[TypeIndirect:[tag-3 -> recurse]] tag-4:[]]]
-		one/uno [Paths: [TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse] TypeDirect:[tag-4]], All: [recurse:[TypeIndirect:[tag-3 -> recurse]] tag-3:[TypeIndirect:[tag-3 -> recurse]] tag-4:[]]]
-		recurse [Paths: [TypeDirect:[recurse]], All: [recurse:[]]]
-		tag-3 [Paths: [TypeDirect:[recurse] TypeDirect:[tag-3]], All: [recurse:[] tag-3:[]]]
-		tag-3-sub [Paths: [TypeDirect:[tag-3-sub] TypeSuper:[tag-3-sub -> recurse]], All: [recurse:[TypeSuper:[tag-3-sub -> recurse]] tag-3-sub:[TypeSuper:[tag-3-sub -> recurse]]]]
+		one/dos [Paths: [TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse] TypeDirect:[tag-4]], All: [recurse:[TypeIndirect:[tag-3 -> recurse]] tag-3:[TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse]] tag-4:[TypeDirect:[tag-4]]]]
+		one/uno [Paths: [TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse] TypeDirect:[tag-4]], All: [recurse:[TypeIndirect:[tag-3 -> recurse]] tag-3:[TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse]] tag-4:[TypeDirect:[tag-4]]]]
+		recurse [Paths: [TypeSelf:[recurse]], All: [recurse:[TypeSelf:[recurse]]]]
+		tag-3 [Paths: [TypeDirect:[recurse] TypeSelf:[tag-3]], All: [recurse:[TypeDirect:[recurse]] tag-3:[TypeSelf:[tag-3]]]]
+		tag-3-sub [Paths: [TypeSuper:[tag-3 -> recurse] TypeSelf:[tag-3-sub]], All: [recurse:[TypeSuper:[tag-3 -> recurse]] tag-3:[TypeSuper:[tag-3 -> recurse]] tag-3-sub:[TypeSelf:[tag-3-sub]]]]
 	EOM
 
 	run_zit show -format etiketten-path recurse:e,z
 	assert_success
 	assert_output_unsorted - <<-EOM
-		one/dos [Paths: [TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse] TypeDirect:[tag-4]], All: [recurse:[TypeIndirect:[tag-3 -> recurse]] tag-3:[TypeIndirect:[tag-3 -> recurse]] tag-4:[]]]
-		one/uno [Paths: [TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse] TypeDirect:[tag-4]], All: [recurse:[TypeIndirect:[tag-3 -> recurse]] tag-3:[TypeIndirect:[tag-3 -> recurse]] tag-4:[]]]
-		recurse [Paths: [TypeDirect:[recurse]], All: [recurse:[]]]
-		tag-3 [Paths: [TypeDirect:[recurse] TypeDirect:[tag-3]], All: [recurse:[] tag-3:[]]]
-		tag-3-sub [Paths: [TypeDirect:[tag-3-sub] TypeSuper:[tag-3-sub -> recurse]], All: [recurse:[TypeSuper:[tag-3-sub -> recurse]] tag-3-sub:[TypeSuper:[tag-3-sub -> recurse]]]]
+		one/dos [Paths: [TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse] TypeDirect:[tag-4]], All: [recurse:[TypeIndirect:[tag-3 -> recurse]] tag-3:[TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse]] tag-4:[TypeDirect:[tag-4]]]]
+		one/uno [Paths: [TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse] TypeDirect:[tag-4]], All: [recurse:[TypeIndirect:[tag-3 -> recurse]] tag-3:[TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse]] tag-4:[TypeDirect:[tag-4]]]]
+		recurse [Paths: [TypeSelf:[recurse]], All: [recurse:[TypeSelf:[recurse]]]]
+		tag-3 [Paths: [TypeDirect:[recurse] TypeSelf:[tag-3]], All: [recurse:[TypeDirect:[recurse]] tag-3:[TypeSelf:[tag-3]]]]
+		tag-3-sub [Paths: [TypeSuper:[tag-3 -> recurse] TypeSelf:[tag-3-sub]], All: [recurse:[TypeSuper:[tag-3 -> recurse]] tag-3:[TypeSuper:[tag-3 -> recurse]] tag-3-sub:[TypeSelf:[tag-3-sub]]]]
 	EOM
 }

@@ -118,16 +118,23 @@ func (s *PrefixSet) addPair(
 	// 	errors.PanicIfError((&kennung.Etikett{}).Set(e))
 	// }
 
-	s.count += 1
-
-	existing, ok := s.innerMap[e]
+	existingSet, ok := s.innerMap[e]
 
 	if !ok {
-		existing = makeObjSet()
+		existingSet = makeObjSet()
+		s.innerMap[e] = existingSet
 	}
 
-	existing.Add(z)
-	s.innerMap[e] = existing
+	var existingObj *obj
+	existingObj, ok = existingSet.Get(existingSet.Key(z))
+
+	if ok && existingObj.IsDirectOrSelf() {
+		z.SetDirect()
+	} else if !ok {
+		s.count += 1
+	}
+
+	existingSet.Add(z)
 }
 
 func (a PrefixSet) Each(
@@ -231,25 +238,13 @@ func (a PrefixSet) Subset(
 
 		zSet.Each(
 			func(z *obj) (err error) {
-				ks := z.Kennung.String()
 				intersection := z.Metadatei.Verzeichnisse.Etiketten.All.GetMatching(e2)
 				exactMatch := len(intersection) == 1 && intersection[0].Equals(e2)
 
 				if len(intersection) > 0 && !exactMatch {
-					for _, e2 := range intersection {
-						if len(e2.Parents) == 0 {
-							out.Grouped.addPair(e2.Etikett.String(), z)
-						}
-
-						for _, e3 := range e2.Parents {
-							if e3.First().String() == ks {
-								out.Grouped.addPair(e3.Last().String(), z)
-							} else {
-								out.Grouped.addPair(e3.First().String(), z.cloneVirtual())
-								// for _, e4 := range *e3 {
-								// 	out.Grouped.addPair(e4.String(), z.cloneVirtual())
-								// }
-							}
+					for _, e2Match := range intersection {
+						for _, e3 := range e2Match.Parents {
+							out.Grouped.addPair(e3.Last().String(), z.cloneWithType(e3.Type))
 						}
 					}
 				} else {

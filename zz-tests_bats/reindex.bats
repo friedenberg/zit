@@ -34,13 +34,13 @@ function reindex_simple { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		md [Paths: [], All: []]
-		one/dos [Paths: [TypeDirect:[tag-3] TypeDirect:[tag-4]], All: [tag-3:[] tag-4:[]]]
-		one/uno [Paths: [TypeDirect:[tag-3] TypeDirect:[tag-4]], All: [tag-3:[] tag-4:[]]]
-		tag [Paths: [TypeDirect:[tag]], All: [tag:[]]]
-		tag-1 [Paths: [TypeDirect:[tag-1]], All: [tag-1:[]]]
-		tag-2 [Paths: [TypeDirect:[tag-2]], All: [tag-2:[]]]
-		tag-3 [Paths: [TypeDirect:[tag-3]], All: [tag-3:[]]]
-		tag-4 [Paths: [TypeDirect:[tag-4]], All: [tag-4:[]]]
+		one/dos [Paths: [TypeDirect:[tag-3] TypeDirect:[tag-4]], All: [tag-3:[TypeDirect:[tag-3]] tag-4:[TypeDirect:[tag-4]]]]
+		one/uno [Paths: [TypeDirect:[tag-3] TypeDirect:[tag-4]], All: [tag-3:[TypeDirect:[tag-3]] tag-4:[TypeDirect:[tag-4]]]]
+		tag [Paths: [TypeSelf:[tag]], All: [tag:[TypeSelf:[tag]]]]
+		tag-1 [Paths: [TypeSelf:[tag-1]], All: [tag-1:[TypeSelf:[tag-1]]]]
+		tag-2 [Paths: [TypeSelf:[tag-2]], All: [tag-2:[TypeSelf:[tag-2]]]]
+		tag-3 [Paths: [TypeSelf:[tag-3]], All: [tag-3:[TypeSelf:[tag-3]]]]
+		tag-4 [Paths: [TypeSelf:[tag-4]], All: [tag-4:[TypeSelf:[tag-4]]]]
 	EOM
 }
 

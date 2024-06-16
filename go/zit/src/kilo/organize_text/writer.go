@@ -63,12 +63,12 @@ func (av assignmentLineWriter) writeNormal(a *Assignment) (err error) {
 	for _, z := range a.Objekten {
 		var sb strings.Builder
 
-		if z.virtual {
-			sb.WriteString(tab_prefix[1:])
-			sb.WriteString("- %")
-		} else {
-			sb.WriteString(tab_prefix)
+		sb.WriteString(tab_prefix)
+
+		if z.IsDirectOrSelf() {
 			sb.WriteString("- ")
+		} else {
+			sb.WriteString("% ")
 		}
 
 		sku.TransactedResetter.ResetWith(cursor, &z.Transacted)
@@ -139,11 +139,12 @@ func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 	write := func(z *obj) (err error) {
 		var sb strings.Builder
 
-		if z.virtual {
-			sb.WriteString("- %")
-		} else {
+		if z.IsDirectOrSelf() {
 			sb.WriteString("- ")
+		} else {
+			sb.WriteString("% ")
 		}
+
 		sku.TransactedResetter.ResetWith(cursor, &z.Transacted)
 		cursor.Metadatei.Subtract(&av.Metadatei)
 

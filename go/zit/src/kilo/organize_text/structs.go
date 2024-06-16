@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
+	"code.linenisgreat.com/zit/src/foxtrot/etiketten_path"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
@@ -23,13 +24,17 @@ func makeObjSet() objSet {
 // TODO-P1 migrate obj to sku.Transacted
 type obj struct {
 	sku.Transacted
-	virtual bool
+	etiketten_path.Type
 }
 
-func (a *obj) cloneVirtual() (b *obj) {
-	b = &obj{virtual: true}
+func (a *obj) cloneWithType(t etiketten_path.Type) (b *obj) {
+	b = &obj{Type: t}
 	sku.TransactedResetter.ResetWith(&b.Transacted, &a.Transacted)
 	return
+}
+
+func (a *obj) String() string {
+	return a.Transacted.String()
 }
 
 func sortObjSet(

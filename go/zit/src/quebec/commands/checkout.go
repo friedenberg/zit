@@ -4,6 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/src/echo/kennung"
@@ -20,7 +21,11 @@ func init() {
 	registerCommandWithQuery(
 		"checkout",
 		func(f *flag.FlagSet) CommandWithQuery {
-			c := &Checkout{}
+			c := &Checkout{
+				CheckoutOptions: checkout_options.Options{
+					CheckoutMode: checkout_mode.ModeObjekteOnly,
+				},
+			}
 
 			c.CheckoutOptions.AddToFlagSet(f)
 

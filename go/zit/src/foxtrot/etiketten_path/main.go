@@ -175,17 +175,20 @@ func (a *Path) AddPath(b *Path) {
 	sort.Sort(a)
 }
 
-func (p *Path) Add(e *Etikett) {
-	if e.IsEmpty() {
-		return
+func (p *Path) Add(es ...*Etikett) {
+	for _, e := range es {
+		if e.IsEmpty() {
+			return
+		}
+
+		if p.Len() > 0 && (*p)[p.Len()-1].Compare(e) == 0 {
+			return
+		}
+
+		*p = append(*p, catgut.GetPool().Get())
+		(*p)[p.Len()-1].SetBytes(e.Bytes())
 	}
 
-	if p.Len() > 0 && (*p)[p.Len()-1].Compare(e) == 0 {
-		return
-	}
-
-	*p = append(*p, catgut.GetPool().Get())
-	(*p)[p.Len()-1].SetBytes(e.Bytes())
 	sort.Sort(p)
 }
 

@@ -327,7 +327,7 @@ func (c *constructor) cloneObj(
 ) (z *obj, err error) {
 	errors.TodoP4("add bez in a better way")
 
-	z = &obj{virtual: named.virtual}
+	z = &obj{Type: named.Type}
 
 	if err = z.SetFromSkuLike(named); err != nil {
 		err = errors.Wrap(err)

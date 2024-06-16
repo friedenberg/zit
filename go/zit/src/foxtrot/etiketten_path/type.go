@@ -15,7 +15,24 @@ const (
 	TypeDirect = Type(iota)
 	TypeSuper
 	TypeIndirect
+	TypeSelf
+	TypeUnknown
 )
+
+// TODO determine if this should include type self
+func (t Type) IsDirectOrSelf() bool {
+	switch t {
+	case TypeDirect, TypeSelf:
+		return true
+
+	default:
+		return false
+	}
+}
+
+func (t *Type) SetDirect() {
+	*t = TypeDirect
+}
 
 func (t Type) ReadByte() (byte, error) {
 	return byte(t), nil

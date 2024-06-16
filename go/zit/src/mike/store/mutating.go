@@ -115,6 +115,7 @@ func (s *Store) tryCommit(
 		kinder,
 		mutter,
 		s.GetAkten(),
+		mode,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

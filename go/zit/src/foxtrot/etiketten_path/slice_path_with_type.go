@@ -35,7 +35,7 @@ func (s PathsWithTypes) ContainsPath(p *PathWithType) (int, bool) {
 }
 
 func (s *PathsWithTypes) AddNonEmptyPath(p *PathWithType) {
-	if p == nil || p.Len() == 1 {
+	if p == nil {
 		return
 	}
 

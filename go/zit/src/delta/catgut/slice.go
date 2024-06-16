@@ -38,6 +38,19 @@ func (a Slice) FirstByte() byte {
 	}
 }
 
+func (a Slice) LastByte() byte {
+	switch {
+	case a.LenSecond() > 0:
+		return a.Second()[a.LenSecond()-1]
+
+	case a.LenFirst() > 0:
+		return a.First()[a.LenFirst()-1]
+
+	default:
+		panic("LastByte called on empty slice")
+	}
+}
+
 func (a Slice) Slice(left, right int) (b Slice) {
 	lastIdx := a.Len()
 

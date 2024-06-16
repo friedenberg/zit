@@ -48,7 +48,7 @@ func (k *Compiled) ApplyToSku(
 			return
 		}
 
-		sk.Metadatei.Verzeichnisse.Etiketten.AddEtikett(catgut.MakeFromString(ks))
+		sk.Metadatei.Verzeichnisse.Etiketten.AddSelf(catgut.MakeFromString(ks))
 
 		kennung.ExpandOne(
 			&etikett,
@@ -97,8 +97,6 @@ func (k *Compiled) addSuperEtiketten(
 		return
 	}
 
-	kcg := catgut.MakeFromString(ks)
-
 	for _, ex := range expanded {
 		if ex == ks || ex == "" {
 			continue
@@ -120,11 +118,11 @@ func (k *Compiled) addSuperEtiketten(
 		}
 
 		if ek.Metadatei.Verzeichnisse.Etiketten.Paths.Len() <= 1 {
-			ui.Log().Print(kcg, ex, ek.Metadatei.Verzeichnisse.Etiketten)
+			ui.Log().Print(ks, ex, ek.Metadatei.Verzeichnisse.Etiketten)
 			continue
 		}
 
-		prefix := etiketten_path.MakePathWithType(kcg)
+		prefix := catgut.MakeFromString(ex)
 
 		a := &sk.Metadatei.Verzeichnisse.Etiketten
 		b := &ek.Metadatei.Verzeichnisse.Etiketten
@@ -162,7 +160,7 @@ func (k *Compiled) addImplicitEtiketten(
 		impl := k.getImplicitEtiketten(e)
 
 		if impl.Len() == 0 {
-			sk.Metadatei.Verzeichnisse.Etiketten.AddPath(p1)
+			sk.Metadatei.Verzeichnisse.Etiketten.AddPathWithType(p1)
 			return
 		}
 
@@ -172,7 +170,7 @@ func (k *Compiled) addImplicitEtiketten(
 				func(e1 *kennung.Etikett) (err error) {
 					p2 := p1.Clone()
 					p2.Add(catgut.MakeFromString(e1.String()))
-					sk.Metadatei.Verzeichnisse.Etiketten.AddPath(p2)
+					sk.Metadatei.Verzeichnisse.Etiketten.AddPathWithType(p2)
 					return
 				},
 			),

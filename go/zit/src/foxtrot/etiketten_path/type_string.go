@@ -11,11 +11,13 @@ func _() {
 	_ = x[TypeDirect-0]
 	_ = x[TypeSuper-1]
 	_ = x[TypeIndirect-2]
+	_ = x[TypeSelf-3]
+	_ = x[TypeUnknown-4]
 }
 
-const _Type_name = "TypeDirectTypeSuperTypeIndirect"
+const _Type_name = "TypeDirectTypeSuperTypeIndirectTypeSelfTypeUnknown"
 
-var _Type_index = [...]uint8{0, 10, 19, 31}
+var _Type_index = [...]uint8{0, 10, 19, 31, 39, 50}
 
 func (i Type) String() string {
 	if i >= Type(len(_Type_index)-1) {

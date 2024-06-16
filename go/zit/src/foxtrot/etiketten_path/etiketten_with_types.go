@@ -44,16 +44,19 @@ func (a *Etiketten) ResetWith(b *Etiketten) {
 
 func (a *Etiketten) AddSuperFrom(
 	b *Etiketten,
-	prefix *PathWithType,
+	prefix *Etikett,
 ) (err error) {
 	for _, ep := range b.Paths {
 		ui.Log().Print("adding", prefix, ep)
-		if prefix.First().ComparePartial(ep.First()) == 0 {
+		if prefix.ComparePartial(ep.First()) == 0 {
 			continue
 		}
 
+		prefixPath := makePath(prefix)
+		prefixPath.Add(ep.Path...)
+
 		c := &PathWithType{
-			Path: *(prefix.CloneAndAddPath(&ep.Path)),
+			Path: prefixPath,
 			Type: TypeSuper,
 		}
 
@@ -77,7 +80,23 @@ func (es *Etiketten) AddEtikett(e *Etikett) (err error) {
 
 	p := MakePathWithType(e)
 
-	if err = es.AddPath(p); err != nil {
+	if err = es.AddPathWithType(p); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (es *Etiketten) AddSelf(e *Etikett) (err error) {
+	if e.IsEmpty() {
+		return
+	}
+
+	p := MakePathWithType(e)
+  p.Type = TypeSelf
+
+	if err = es.AddPathWithType(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -103,17 +122,9 @@ func (es *Etiketten) AddPathWithType(pwt *PathWithType) (err error) {
 }
 
 func (es *Etiketten) AddPath(p *PathWithType) (err error) {
-	_, alreadyExists := es.Paths.AddPath(p)
-
-	if alreadyExists {
+	if err = es.AddPathWithType(p); err != nil {
+		err = errors.Wrap(err)
 		return
-	}
-
-	for _, e := range p.Path {
-		if err = es.All.Add(e, p); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
 	}
 
 	return

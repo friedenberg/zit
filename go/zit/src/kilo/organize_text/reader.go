@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/unicorn"
 	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/foxtrot/etiketten_path"
 	"code.linenisgreat.com/zit/src/foxtrot/kennung_fmt"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
@@ -74,8 +75,18 @@ LOOP:
 					return
 				}
 
+			case '%':
+				if err = ar.readOneObj(r, etiketten_path.TypeUnknown); err != nil {
+					if err == io.EOF {
+						err = nil
+					} else {
+						err = errors.Wrap(err)
+						return
+					}
+				}
+
 			case '-':
-				if err = ar.readOneObj(r); err != nil {
+				if err = ar.readOneObj(r, etiketten_path.TypeDirect); err != nil {
 					if err == io.EOF {
 						err = nil
 					} else {
@@ -261,12 +272,30 @@ func (ar *assignmentLineReader) readOneHeadingGreaterDepth(
 	return
 }
 
-func (ar *assignmentLineReader) readOneObj(r *catgut.RingBuffer) (err error) {
+func (ar *assignmentLineReader) readOneObj(
+	r *catgut.RingBuffer,
+	t etiketten_path.Type,
+) (err error) {
 	// logz.Print("reading one zettel", l)
 
 	var z obj
+	z.Type = t
 
-	// TODO read virtual %, if exists
+	// {
+	// 	var sl catgut.Slice
+
+	// 	if sl, err = r.PeekUpto('['); err != nil {
+	// 		if collections.IsErrNotFound(err) {
+	// 			err = nil
+	// 		} else {
+	// 			err = errors.Wrap(err)
+	// 			return
+	// 		}
+	// 	} else if sl.LastByte() == '%' {
+	// 		z.Type = etiketten_path.TypeUnknown
+	// 		r.AdvanceRead(sl.Len())
+	// 	}
+	// }
 
 	if _, err = ar.stringFormatReader.ReadStringFormat(r, &z.Transacted); err != nil {
 		err = ErrorRead{

@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/src/charlie/collections_value"
@@ -215,6 +216,7 @@ func (k *Compiled) ApplyAndAddTransacted(
 	kinder *sku.Transacted,
 	mutter *sku.Transacted,
 	ak *akten.Akten,
+	mode objekte_mode.Mode,
 ) (err error) {
 	if err = k.ApplyToSku(kinder); err != nil {
 		err = errors.Wrap(err)
@@ -254,7 +256,7 @@ func (k *Compiled) ApplyAndAddTransacted(
 	// 	didChange = didChange && mutter != nil
 	// }
 
-	if didChange {
+	if didChange && (mutter != nil || mode == objekte_mode.ModeEmpty) {
 		k.SetHasChanges(fmt.Sprintf("added: %s", kinder))
 	}
 
