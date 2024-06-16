@@ -13,13 +13,17 @@ type Getter interface {
 }
 
 const (
-	ModeObjekteOnly = Mode(iota)
+	ModeNone = Mode(iota)
+	ModeObjekteOnly
 	ModeObjekteAndAkte
 	ModeAkteOnly
 )
 
 func (m Mode) String() string {
 	switch m {
+	case ModeNone:
+		return "none"
+
 	case ModeObjekteOnly:
 		return "objekte-only"
 
@@ -38,6 +42,9 @@ func (m *Mode) Set(v string) (err error) {
 	v = strings.ToLower(strings.TrimSpace(v))
 
 	switch v {
+	case "":
+		*m = ModeNone
+
 	case "objekte-only":
 		fallthrough
 	case "objekte":

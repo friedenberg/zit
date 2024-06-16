@@ -121,7 +121,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 		return
 	}
 
-	if m != checkout_mode.ModeObjekteOnly {
+	if m != checkout_mode.ModeObjekteOnly && m != checkout_mode.ModeNone {
 		n1, err = sw.WriteString("\n")
 		n += int64(n1)
 

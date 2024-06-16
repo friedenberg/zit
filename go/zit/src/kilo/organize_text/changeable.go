@@ -109,6 +109,10 @@ func (a *Assignment) addToSet(
 				}
 			}
 
+			if !o.IsDirectOrSelf() {
+				return
+			}
+
 			z.Metadatei.Comments = append(
 				z.Metadatei.Comments,
 				o.Metadatei.Comments...,
