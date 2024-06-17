@@ -90,7 +90,9 @@ func (s EtikettenWithParentsAndTypes) ContainsEtikett(e *Etikett) (int, bool) {
 	)
 }
 
-func (s EtikettenWithParentsAndTypes) GetMatching(e *Etikett) (matching []EtikettWithParentsAndTypes) {
+func (s EtikettenWithParentsAndTypes) GetMatching(
+  e *Etikett,
+) (matching []EtikettWithParentsAndTypes) {
 	i, ok := s.ContainsEtikett(e)
 
 	if !ok {

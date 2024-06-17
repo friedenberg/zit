@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/src/foxtrot/etiketten_path"
@@ -26,10 +27,7 @@ func (c *constructor) Make() (ot *Text, err error) {
 		return
 	}
 
-	if err = c.preparePrefixSetsAndRootsAndExtras(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	c.EtikettSet = c.rootEtiketten
 
 	if err = c.populate(); err != nil {
 		err = errors.Wrap(err)
@@ -77,10 +75,10 @@ func (c *constructor) collectExplicitAndImplicitFor(
 					continue
 				}
 
-				if len(ewp.Parents) == 0 {
+				if len(ewp.Parents) == 0 { // TODO use Type
 					explicitCount++
 					explicit.Add(kennung.MustEtikett(ewp.Etikett.String()))
-					continue
+					break
 				}
 
 				for _, p := range ewp.Parents {
@@ -125,6 +123,8 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 				err = errors.Wrap(err)
 				return
 			}
+
+			ui.Debug().Print(explicitCount, c.Transacted.Len())
 
 			if explicitCount != c.Transacted.Len() {
 				return
@@ -228,7 +228,6 @@ func (c *constructor) makeChildrenWithPossibleGroups(
 		return
 	}
 
-	// TODO use implicit here
 	segments := prefixSet.Subset(groupingEtiketten[0])
 
 	if err = c.makeAndAddUngrouped(parent, segments.Ungrouped.Each); err != nil {
@@ -259,7 +258,7 @@ func (c *constructor) addGroupedChildren(
 ) (err error) {
 	if err = grouped.Each(
 		func(e kennung.Etikett, zs objSet) (err error) {
-			if e.IsEmpty() {
+			if e.IsEmpty() || c.EtikettSet.Contains(e) {
 				if err = c.makeAndAddUngrouped(parent, zs.Each); err != nil {
 					err = errors.Wrap(err)
 					return

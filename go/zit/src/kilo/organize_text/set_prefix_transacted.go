@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/src/foxtrot/etiketten_path"
 	"code.linenisgreat.com/zit/src/hotel/sku"
 )
 
@@ -239,16 +240,35 @@ func (a PrefixSet) Subset(
 		zSet.Each(
 			func(z *obj) (err error) {
 				intersection := z.Metadatei.Verzeichnisse.Etiketten.All.GetMatching(e2)
-				exactMatch := len(intersection) == 1 && intersection[0].Equals(e2)
+				hasDirect := false || len(intersection) == 0
+				toAddGrouped := make([]*etiketten_path.PathWithType, 0)
 
-				if len(intersection) > 0 && !exactMatch {
-					for _, e2Match := range intersection {
-						for _, e3 := range e2Match.Parents {
-							out.Grouped.addPair(e3.Last().String(), z.cloneWithType(e3.Type))
+				for _, e2Match := range intersection {
+					for _, e3 := range e2Match.Parents {
+						toAddGrouped = append(toAddGrouped, e3)
+
+						if e3.Type == etiketten_path.TypeDirect &&
+							e2Match.Etikett.Len() == e2.Len() {
+							hasDirect = true
 						}
 					}
-				} else {
+				}
+
+				if hasDirect {
 					out.Ungrouped.Add(z)
+				} else {
+					for _, e3 := range toAddGrouped {
+						c := z.cloneWithType(e3.Type)
+						var e3s string
+
+						if e3.Type == etiketten_path.TypeSuper {
+							e3s = e3.Last().String()
+						} else {
+							e3s = e3.First().String()
+						}
+
+						out.Grouped.addPair(e3s, c)
+					}
 				}
 
 				return

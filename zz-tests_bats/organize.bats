@@ -1138,8 +1138,6 @@ function organize_v5_zettels_in_correct_places { # @test
 		- inventory-pipe_shelves-atheist_shoes_box-jabra_yellow_box_2
 		---
 
-		          # inventory-pipe_shelves-atheist_shoes_box-jabra_yellow_box_2
-
 		- [two/uno  !md] jabra coral usb_a-to-usb_c cable
 	EOM
 }
