@@ -1,0 +1,4 @@
+code.linenisgreat.com/zit/go/zit v0.0.0-20240618133538-6a912d23d0eb h1:Cm5b9Ii870bebAQOKhe8zKOmIHHZsnwzOcAnXrXbSR8=
+code.linenisgreat.com/zit/go/zit v0.0.0-20240618133538-6a912d23d0eb/go.mod h1:AIr6rEiqXbBGaplGA3F7arZTrULjP9x4qgUr9SM1p8c=
+golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 h1:+cNy6SZtPcJQH3LJVLOSmiC7MMxXNOb3PU/VUEz+EhU=
+golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028/go.mod h1:NDW/Ps6MPRej6fsCIbMTohpP40sJ/P/vI1MoTEGwX90=
