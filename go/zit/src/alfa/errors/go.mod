@@ -1,4 +1,4 @@
-module code.linenisgreat.com/zit/go/zit/alfa/errors
+module code.linenisgreat.com/zit/go/zit/src/alfa/errors
 
 go 1.21.8
 
