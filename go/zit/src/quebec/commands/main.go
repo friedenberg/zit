@@ -3,11 +3,11 @@ package commands
 import (
 	"os"
 
-	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/src/delta/debug"
-	"code.linenisgreat.com/zit/src/foxtrot/erworben"
-	"code.linenisgreat.com/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/erworben"
+	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
 func Run(args []string) (exitStatus int) {

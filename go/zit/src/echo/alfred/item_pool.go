@@ -3,7 +3,7 @@ package alfred
 import (
 	"sync"
 
-	"code.linenisgreat.com/zit/src/delta/catgut"
+	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 )
 
 type ItemPool struct {

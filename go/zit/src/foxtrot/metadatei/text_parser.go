@@ -4,14 +4,14 @@ import (
 	"io"
 	"path"
 
-	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/src/charlie/ohio"
-	"code.linenisgreat.com/zit/src/charlie/script_config"
-	"code.linenisgreat.com/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/src/echo/format"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
+	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
+	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 )
 
 type textParser struct {

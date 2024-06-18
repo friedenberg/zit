@@ -3,7 +3,7 @@ package typ
 import (
 	"testing"
 
-	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 )
 
 func TestAkteExt(t *testing.T) {

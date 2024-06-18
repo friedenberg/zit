@@ -4,15 +4,15 @@ import (
 	"bytes"
 	"io"
 
-	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/src/charlie/ohio"
-	"code.linenisgreat.com/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/src/delta/schlussel"
-	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/foxtrot/etiketten_path"
-	"code.linenisgreat.com/zit/src/golf/ennui"
-	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
+	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/schlussel"
+	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/etiketten_path"
+	"code.linenisgreat.com/zit/go/zit/src/golf/ennui"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 var binaryFieldOrder = []schlussel.Schlussel{

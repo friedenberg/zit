@@ -3,8 +3,8 @@ package etiketten_path
 import (
 	"io"
 
-	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/charlie/ohio"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 )
 
 //go:generate stringer -type=Type

@@ -5,9 +5,9 @@ import (
 	"io"
 	"strings"
 
-	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/src/echo/standort"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 )
 
 type AkteIOFactory struct {

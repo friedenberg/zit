@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"slices"
 
-	"code.linenisgreat.com/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
 type addedMap map[sha.Bytes]*row

@@ -1,8 +1,8 @@
 package store
 
 import (
-	"code.linenisgreat.com/zit/src/bravo/objekte_mode"
-	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 func (s *Store) addToTomlIndexIfNecessary(

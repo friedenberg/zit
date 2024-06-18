@@ -7,15 +7,15 @@ import (
 	"os"
 	"slices"
 
-	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/src/charlie/ohio"
-	"code.linenisgreat.com/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/src/echo/standort"
-	"code.linenisgreat.com/zit/src/foxtrot/etiketten_path"
-	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
+	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
+	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/etiketten_path"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type Schlummernd struct {

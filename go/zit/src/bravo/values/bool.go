@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
 
 type Bool struct {

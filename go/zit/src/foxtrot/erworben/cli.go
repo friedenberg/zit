@@ -3,10 +3,10 @@ package erworben
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/src/bravo/erworben_tools"
-	"code.linenisgreat.com/zit/src/charlie/erworben_cli_print_options"
-	"code.linenisgreat.com/zit/src/delta/debug"
-	"code.linenisgreat.com/zit/src/echo/bezeichnung"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/erworben_tools"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
+	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
+	"code.linenisgreat.com/zit/go/zit/src/echo/bezeichnung"
 )
 
 type Cli struct {

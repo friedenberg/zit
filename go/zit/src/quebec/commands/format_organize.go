@@ -4,11 +4,11 @@ import (
 	"flag"
 	"os"
 
-	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/src/kilo/organize_text"
-	"code.linenisgreat.com/zit/src/november/umwelt"
-	"code.linenisgreat.com/zit/src/papa/user_ops"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
+	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
 type FormatOrganize struct {

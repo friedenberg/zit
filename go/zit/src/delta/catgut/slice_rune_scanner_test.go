@@ -4,7 +4,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"code.linenisgreat.com/zit/src/bravo/test_logz"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 )
 
 func testSliceRuneScannerDataValid() []Slice {

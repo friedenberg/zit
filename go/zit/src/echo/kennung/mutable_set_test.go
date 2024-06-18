@@ -3,7 +3,7 @@ package kennung
 import (
 	"testing"
 
-	"code.linenisgreat.com/zit/src/bravo/test_logz"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 )
 
 func TestAddNormalized(t1 *testing.T) {

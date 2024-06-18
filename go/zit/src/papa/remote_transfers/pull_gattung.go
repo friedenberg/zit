@@ -1,8 +1,8 @@
 package remote_transfers
 
 import (
-	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
 func (c *client) PullSkus(

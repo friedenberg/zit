@@ -3,7 +3,7 @@ package metadatei
 import (
 	"slices"
 
-	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 )
 
 var Resetter resetter

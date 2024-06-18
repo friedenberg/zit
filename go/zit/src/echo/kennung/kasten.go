@@ -4,10 +4,10 @@ import (
 	"regexp"
 	"strings"
 
-	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/values"
-	"code.linenisgreat.com/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
+	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 )
 
 const KastenRegexString = `^(//)?[-a-z0-9_]+$`

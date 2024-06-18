@@ -3,8 +3,8 @@ package debug
 import (
 	"strings"
 
-	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/bravo/string_builder_joined"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/string_builder_joined"
 )
 
 type Options struct {

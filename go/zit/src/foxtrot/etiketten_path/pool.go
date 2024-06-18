@@ -1,8 +1,8 @@
 package etiketten_path
 
 import (
-	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/pool"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 )
 
 var p schnittstellen.Pool[Path, *Path]

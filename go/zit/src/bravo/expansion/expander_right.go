@@ -3,7 +3,7 @@ package expansion
 import (
 	"regexp"
 
-	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 )
 
 type expanderRight struct {

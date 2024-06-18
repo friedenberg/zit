@@ -1,8 +1,8 @@
 package flag
 
 import (
-	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/alfa/flag_policy"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/flag_policy"
 )
 
 func Make(

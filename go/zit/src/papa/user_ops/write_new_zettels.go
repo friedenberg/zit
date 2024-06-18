@@ -1,11 +1,11 @@
 package user_ops
 
 import (
-	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/src/kilo/zettel"
-	"code.linenisgreat.com/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
+	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
 type WriteNewZettels struct {

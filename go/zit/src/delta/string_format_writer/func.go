@@ -1,7 +1,7 @@
 package string_format_writer
 
 import (
-	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 )
 
 func MakeFunc[T any](

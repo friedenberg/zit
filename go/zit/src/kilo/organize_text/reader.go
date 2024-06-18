@@ -4,13 +4,13 @@ import (
 	"io"
 	"unicode"
 
-	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/alfa/unicorn"
-	"code.linenisgreat.com/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/foxtrot/etiketten_path"
-	"code.linenisgreat.com/zit/src/foxtrot/kennung_fmt"
-	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/unicorn"
+	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
+	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/etiketten_path"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/kennung_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type assignmentLineReader struct {

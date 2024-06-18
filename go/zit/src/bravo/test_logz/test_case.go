@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
 
 type TC struct {

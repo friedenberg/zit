@@ -1,6 +1,6 @@
 package iter
 
-import "code.linenisgreat.com/zit/src/alfa/schnittstellen"
+import "code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 
 func AddClonePoolPtr[E any, EPtr schnittstellen.Ptr[E]](
 	s schnittstellen.Adder[EPtr],

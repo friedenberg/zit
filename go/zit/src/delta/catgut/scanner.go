@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"io"
 
-	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
 
 // Scanner provides a convenient interface for reading data such as

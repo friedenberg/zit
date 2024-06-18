@@ -3,8 +3,8 @@ package standort
 import (
 	"io"
 
-	"code.linenisgreat.com/zit/src/delta/age"
-	"code.linenisgreat.com/zit/src/delta/angeboren"
+	"code.linenisgreat.com/zit/go/zit/src/delta/age"
+	"code.linenisgreat.com/zit/go/zit/src/delta/angeboren"
 )
 
 type ReadOptions struct {

@@ -3,8 +3,8 @@ package query
 import (
 	"sync/atomic"
 
-	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type Archiviert interface {

@@ -1,8 +1,8 @@
 package commands
 
 import (
-	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
 type QueryBuilderModifier interface {

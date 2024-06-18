@@ -1,14 +1,15 @@
 package organize_text
 
 import (
-	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/expansion"
-	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/src/foxtrot/etiketten_path"
-	"code.linenisgreat.com/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
+	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/etiketten_path"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type PrefixSet struct {
@@ -239,17 +240,30 @@ func (a PrefixSet) Subset(
 
 		zSet.Each(
 			func(z *obj) (err error) {
+				ui.Log().Print(e2, z)
 				intersection := z.Metadatei.Verzeichnisse.Etiketten.All.GetMatching(e2)
 				hasDirect := false || len(intersection) == 0
-				toAddGrouped := make([]*etiketten_path.PathWithType, 0)
+				type match struct {
+					string
+					etiketten_path.Type
+				}
+				toAddGrouped := make([]match, 0)
 
+			OUTER:
 				for _, e2Match := range intersection {
+					e2s := e2Match.Etikett.String()
+					ui.Log().Print(e2Match.Etikett)
 					for _, e3 := range e2Match.Parents {
-						toAddGrouped = append(toAddGrouped, e3)
+						toAddGrouped = append(toAddGrouped, match{
+							string: e2s,
+							Type:   e3.Type,
+						})
 
+						ui.Log().Print(e3)
 						if e3.Type == etiketten_path.TypeDirect &&
 							e2Match.Etikett.Len() == e2.Len() {
 							hasDirect = true
+							break OUTER
 						}
 					}
 				}
@@ -259,15 +273,7 @@ func (a PrefixSet) Subset(
 				} else {
 					for _, e3 := range toAddGrouped {
 						c := z.cloneWithType(e3.Type)
-						var e3s string
-
-						if e3.Type == etiketten_path.TypeSuper {
-							e3s = e3.Last().String()
-						} else {
-							e3s = e3.First().String()
-						}
-
-						out.Grouped.addPair(e3s, c)
+						out.Grouped.addPair(e3.string, c)
 					}
 				}
 

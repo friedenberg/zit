@@ -3,8 +3,8 @@ package etiketten_path
 import (
 	"testing"
 
-	"code.linenisgreat.com/zit/src/bravo/test_logz"
-	"code.linenisgreat.com/zit/src/delta/catgut"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
+	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 )
 
 func TestAddPaths(t1 *testing.T) {

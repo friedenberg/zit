@@ -3,7 +3,7 @@ package files
 import (
 	"os"
 
-	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
 
 func Rename(src, dst string) (err error) {

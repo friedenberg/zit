@@ -1,8 +1,8 @@
 package zettel
 
 import (
-	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 )
 
 type Objekte struct{}

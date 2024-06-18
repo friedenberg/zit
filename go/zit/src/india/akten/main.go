@@ -1,12 +1,12 @@
 package akten
 
 import (
-	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/delta/etikett_akte"
-	"code.linenisgreat.com/zit/src/delta/typ_akte"
-	"code.linenisgreat.com/zit/src/echo/kasten_akte"
-	"code.linenisgreat.com/zit/src/echo/standort"
-	"code.linenisgreat.com/zit/src/foxtrot/erworben"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/delta/etikett_akte"
+	"code.linenisgreat.com/zit/go/zit/src/delta/typ_akte"
+	"code.linenisgreat.com/zit/go/zit/src/echo/kasten_akte"
+	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/erworben"
 )
 
 type Store[

@@ -5,7 +5,7 @@ import (
 	"encoding/gob"
 	"testing"
 
-	"code.linenisgreat.com/zit/src/bravo/test_logz"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 )
 
 func TestBitset0CapGreaterAdd(t1 *testing.T) {

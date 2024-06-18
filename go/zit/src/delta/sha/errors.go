@@ -3,7 +3,7 @@ package sha
 import (
 	"fmt"
 
-	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
 
 var ErrIsNull = errors.New("sha is null")

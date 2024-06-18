@@ -1,8 +1,8 @@
 package sku
 
 import (
-	"code.linenisgreat.com/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/src/charlie/collections"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 )
 
 func ToSliceFilesZettelen(

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"io"
 
-	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/charlie/collections"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 )
 
 const RingBufferDefaultSize = 4096

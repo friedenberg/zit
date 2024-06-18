@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"code.linenisgreat.com/zit/src/bravo/test_logz"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 )
 
 func Test1(t1 *testing.T) {

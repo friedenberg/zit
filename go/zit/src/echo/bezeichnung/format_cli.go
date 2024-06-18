@@ -1,8 +1,8 @@
 package bezeichnung
 
 import (
-	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/delta/string_format_writer"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 )
 
 type bezeichnungCliFormat struct {

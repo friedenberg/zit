@@ -3,10 +3,10 @@ package sku
 import (
 	"encoding/gob"
 
-	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/charlie/collections_value"
-	"code.linenisgreat.com/zit/src/delta/heap"
-	"code.linenisgreat.com/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
+	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
+	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 )
 
 var (

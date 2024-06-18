@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"strings"
 
-	"code.linenisgreat.com/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/src/bravo/pool"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 )
 
 var poolMatchBuilder schnittstellen.Pool[MatchBuilder, *MatchBuilder]

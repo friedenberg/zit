@@ -1,8 +1,8 @@
 package typ_akte
 
 import (
-	"code.linenisgreat.com/zit/src/alfa/etikett_rule"
-	"code.linenisgreat.com/zit/src/charlie/script_config"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/etikett_rule"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 )
 
 func Default() (t V0) {

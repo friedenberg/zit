@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"io"
 
-	"code.linenisgreat.com/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
 const RowSize = sha.ByteSize + 1 + binary.MaxVarintLen64 + binary.MaxVarintLen64

@@ -1,7 +1,7 @@
 package alfred
 
 import (
-	"code.linenisgreat.com/zit/src/delta/catgut"
+	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 )
 
 type Item struct {

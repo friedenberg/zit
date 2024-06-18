@@ -4,7 +4,7 @@ import (
 	"io"
 	"unicode/utf8"
 
-	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
 
 func MakeSliceRuneScanner(slice Slice) (s *SliceRuneScanner) {

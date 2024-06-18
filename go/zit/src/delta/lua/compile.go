@@ -3,7 +3,7 @@ package lua
 import (
 	"io"
 
-	"code.linenisgreat.com/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	lua "github.com/yuin/gopher-lua"
 	lua_ast "github.com/yuin/gopher-lua/ast"
 	lua_parse "github.com/yuin/gopher-lua/parse"

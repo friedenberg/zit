@@ -1,6 +1,6 @@
 package pool
 
-import "code.linenisgreat.com/zit/src/alfa/schnittstellen"
+import "code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 
 type fakePool[T any, TPtr schnittstellen.Ptr[T]] struct{}
 
