@@ -275,12 +275,12 @@ func (fd *FD) Exists() bool {
 	return files.Exists(fd.path)
 }
 
-func (fd *FD) Remove() (err error) {
+func (fd *FD) Remove(s schnittstellen.Standort) (err error) {
 	if fd.path == "" {
 		return
 	}
 
-	if err = os.Remove(fd.path); err != nil {
+	if err = s.Delete(fd.path); err != nil {
 		if errors.IsNotExist(err) {
 			err = nil
 		} else {

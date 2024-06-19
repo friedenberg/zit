@@ -28,9 +28,8 @@ func (c EachAkte) Run(
 	}
 
 	var args []string
-	args, err = shlex.Split(utility)
 
-	if err != nil {
+	if args, err = shlex.Split(utility); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -38,6 +37,9 @@ func (c EachAkte) Run(
 	args = append(args, akten...)
 
 	cmd := exec.Command(args[0], args[1:]...)
+	cmd.Stdout = u.Out()
+	cmd.Stdin = u.In()
+	cmd.Stderr = u.Err()
 
 	if err = cmd.Start(); err != nil {
 		err = errors.Wrap(err)

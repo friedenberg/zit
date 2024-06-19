@@ -8,7 +8,12 @@ import (
 )
 
 type Options struct {
-	Trace, PProfCPU, PProfHeap, GCDisabled, NoTempDirCleanup bool
+	Trace            bool
+	PProfCPU         bool
+	PProfHeap        bool
+	GCDisabled       bool
+	NoTempDirCleanup bool
+	DryRun           bool
 }
 
 func (o Options) String() string {
@@ -32,6 +37,10 @@ func (o Options) String() string {
 
 	if o.Trace {
 		sb.WriteString("trace")
+	}
+
+	if o.DryRun {
+		sb.WriteString("dry-run")
 	}
 
 	return sb.String()
@@ -62,6 +71,9 @@ func (o *Options) Set(v string) (err error) {
 
 		case "no-tempdir-cleanup":
 			o.NoTempDirCleanup = true
+
+		case "dry-run":
+			o.DryRun = true
 
 		case "true":
 			fallthrough

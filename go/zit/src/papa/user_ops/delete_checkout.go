@@ -55,7 +55,7 @@ func (c DeleteCheckout) Run(
 				dirs.Add(values.MakeString(dir))
 			}()
 
-			if err = os.Remove(path); err != nil {
+			if err = c.Standort().Delete(path); err != nil {
 				if errors.IsNotExist(err) {
 					err = nil
 				} else {
@@ -89,7 +89,7 @@ func (c DeleteCheckout) Run(
 				return
 			}
 
-			if err = os.Remove(d.String()); err != nil {
+			if err = c.Standort().Delete(d.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

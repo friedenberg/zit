@@ -2,7 +2,6 @@ package user_ops
 
 import (
 	"io"
-	"os"
 	"sort"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -163,12 +162,12 @@ func (c ZettelFromExternalAkte) Run(
 		return
 	}
 
+	// TODO move to umwelt
 	dp := c.Umwelt.PrinterFDDeleted()
 
 	err = toDelete.Each(
 		func(z *sku.External) (err error) {
-			// TODO-P4 move to checkout store
-			if err = os.Remove(z.GetAkteFD().GetPath()); err != nil {
+			if err = c.Umwelt.Standort().Delete(z.GetAkteFD().GetPath()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

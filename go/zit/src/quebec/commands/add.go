@@ -7,9 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
@@ -46,20 +44,25 @@ func init() {
 				false,
 				"deduplicate added Zettelen based on Akte sha",
 			)
+
 			f.BoolVar(
 				&c.Delete,
 				"delete",
 				false,
 				"delete the zettel and akte after successful checkin",
 			)
+
 			f.BoolVar(&c.OpenAkten, "open-akten", false, "also open the Akten")
+
 			f.StringVar(
 				&c.CheckoutAktenAndRun,
 				"each-akte",
 				"",
 				"checkout each Akte and run a utility",
 			)
+
 			f.BoolVar(&c.Organize, "organize", false, "")
+
 			c.AddToFlagSet(f)
 
 			errors.TodoP2(
@@ -96,12 +99,7 @@ func (c Add) RunWithQuery(
 		return
 	}
 
-	if err = c.openAktenIfNecessary(
-		u,
-		qg,
-		zettelsFromAkteResults,
-		pz,
-	); err != nil {
+	if err = c.openAktenIfNecessary(u, zettelsFromAkteResults, pz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -125,21 +123,12 @@ func (c Add) RunWithQuery(
 
 func (c Add) openAktenIfNecessary(
 	u *umwelt.Umwelt,
-	qg *query.Group,
 	zettels sku.TransactedMutableSet,
 	cwd *cwd.CwdFiles,
 ) (err error) {
 	if !c.OpenAkten && c.CheckoutAktenAndRun == "" {
 		return
 	}
-
-	hs := collections_value.MakeMutableValueSet[values.String](nil)
-
-	zettels.Each(
-		func(z *sku.Transacted) (err error) {
-			return hs.Add(values.MakeString(z.GetKennung().String()))
-		},
-	)
 
 	options := checkout_options.Options{
 		CheckoutMode: checkout_mode.ModeAkteOnly,
@@ -148,15 +137,16 @@ func (c Add) openAktenIfNecessary(
 	var filesAkten []string
 	var l sync.Mutex
 
-	if err = u.GetStore().CheckoutQuery(
-		options,
-		qg,
-		func(z *sku.CheckedOut) (err error) {
-			if !hs.ContainsKey(z.Internal.GetKennung().String()) {
-				return iter.MakeErrStopIteration()
+	if err = zettels.Each(
+		func(z *sku.Transacted) (err error) {
+			var co *sku.CheckedOut
+
+			if co, err = u.GetStore().CheckoutOne(options, z); err != nil {
+				err = errors.Wrap(err)
+				return
 			}
 
-			e := z.External.GetAkteFD().GetPath()
+			e := co.External.GetAkteFD().GetPath()
 
 			if e == "" {
 				return iter.MakeErrStopIteration()
@@ -185,7 +175,11 @@ func (c Add) openAktenIfNecessary(
 	if c.CheckoutAktenAndRun != "" {
 		eachAkteOp := user_ops.EachAkte{}
 
-		if err = eachAkteOp.Run(u, c.CheckoutAktenAndRun, filesAkten...); err != nil {
+		if err = eachAkteOp.Run(
+			u,
+			c.CheckoutAktenAndRun,
+			filesAkten...,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

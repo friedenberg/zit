@@ -1,5 +1,7 @@
 #! /bin/bash -e
 
+pkg="code.linenisgreat.com/zit/go/zit"
+
 ag_print_matching() (
   query="$1"
   shift
@@ -15,7 +17,7 @@ ag_print_matching() (
 )
 
 ag_print_matching_with_file() (
-  query="code.linenisgreat.com/zit/src/$1"
+  query="$pkg/src/$1"
   shift
 
   ag "$query" \
@@ -30,12 +32,12 @@ ag_print_matching_with_file() (
 
 print_matches() (
   path="$1"
-  ag_print_matching 'code.linenisgreat.com/zit/src/[\w/]+' "$path" | sort -u
+  ag_print_matching "$pkg/src/[\\w/]+" "$path" | sort -u
 )
 
 print_basenames() (
   while IFS= read -r; do
-    echo "${REPLY#code.linenisgreat.com/zit/src/}"
+    echo "${REPLY#"$pkg/src/"}"
   done
 )
 
@@ -54,7 +56,7 @@ print_package_locations() (
   while IFS= read -r; do
     ag_print_matching_with_file "$REPLY" "$loc" </dev/null |
       tr -d ' ' |
-      sed -e 's#code.linenisgreat.com/zit/##g; s/"//g' |
+      sed -e "s#$pkg/##g; s/\"//g" |
       xargs -L2 bash -c 'print_final "$@"' "$REPLY" |
       sort -u
   done

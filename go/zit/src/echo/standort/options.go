@@ -10,6 +10,7 @@ import (
 type Options struct {
 	BasePath string
 	Debug    debug.Options
+	DryRun   bool
 	cwd      string
 }
 

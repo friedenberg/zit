@@ -332,7 +332,7 @@ func (s *Store) RunMergeTool(
 		return
 	}
 
-	if err = os.Remove(tm.ConflictMarkerPath); err != nil {
+	if err = s.GetStandort().Delete(tm.ConflictMarkerPath); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

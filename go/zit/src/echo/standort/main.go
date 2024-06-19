@@ -26,6 +26,7 @@ type Standort struct {
 	age       *age.Age
 	angeboren angeboren.Konfig
 	debug     debug.Options
+	dryRun    bool
 	pid       int
 }
 
@@ -50,6 +51,7 @@ func Make(
 		}
 	}
 
+	s.dryRun = o.DryRun
 	s.basePath = o.BasePath
 	s.debug = o.Debug
 	s.cwd = o.cwd

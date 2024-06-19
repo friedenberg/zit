@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 )
 
@@ -52,14 +53,14 @@ func (a *CheckedOut) String() string {
 	return fmt.Sprintf("%s %s", &a.Internal, &a.External)
 }
 
-func (e *CheckedOut) Remove() (err error) {
+func (e *CheckedOut) Remove(s schnittstellen.Standort) (err error) {
 	// TODO check conflict state
-	if err = e.External.FDs.Objekte.Remove(); err != nil {
+	if err = e.External.FDs.Objekte.Remove(s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = e.External.FDs.Akte.Remove(); err != nil {
+	if err = e.External.FDs.Akte.Remove(s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

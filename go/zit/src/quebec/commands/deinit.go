@@ -3,7 +3,6 @@ package commands
 import (
 	"flag"
 	"fmt"
-	"os"
 	"path"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -46,7 +45,7 @@ func (c Deinit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if err = os.RemoveAll(base); err != nil {
+	if err = u.Standort().DeleteAll(base); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

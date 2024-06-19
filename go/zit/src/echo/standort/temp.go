@@ -11,6 +11,32 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
 
+func (s Standort) DeleteAll(p string) (err error) {
+	if s.dryRun {
+		return
+	}
+
+	if err = os.RemoveAll(p); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s Standort) Delete(p string) (err error) {
+	if s.dryRun {
+		return
+	}
+
+	if err = os.Remove(p); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s Standort) ResetTemp() (err error) {
 	if s.debug.NoTempDirCleanup {
 		return

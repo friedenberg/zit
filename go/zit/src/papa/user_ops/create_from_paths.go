@@ -2,7 +2,6 @@ package user_ops
 
 import (
 	"io"
-	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
@@ -195,7 +194,7 @@ func (c CreateFromPaths) Run(
 	if err = toDelete.Each(
 		func(z *sku.External) (err error) {
 			// TODO-P2 move to checkout store
-			if err = os.Remove(z.GetObjekteFD().GetPath()); err != nil {
+			if err = c.Standort().Delete(z.GetObjekteFD().GetPath()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

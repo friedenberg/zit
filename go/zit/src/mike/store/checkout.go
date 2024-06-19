@@ -204,7 +204,7 @@ func (s *Store) UpdateCheckoutOne(
 
 		options.CheckoutMode = mode
 
-		if err = cz.Remove(); err != nil {
+		if err = cz.Remove(s.GetStandort()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -265,7 +265,7 @@ func (s *Store) CheckoutOne(
 			}
 
 			if options.Path == checkout_options.PathDefault {
-				if err = cz.Remove(); err != nil {
+				if err = cz.Remove(s.GetStandort()); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
