@@ -14,7 +14,7 @@ func (s *Store) tryNewHook(
 	kinder *sku.Transacted,
 	o ObjekteOptions,
 ) (err error) {
-	if o.Mode == objekte_mode.ModeEmpty {
+	if !o.Mode.Contains(objekte_mode.ModeHooks) {
 		return
 	}
 
@@ -101,7 +101,7 @@ func (s *Store) TryFormatHook(
 	if err = s.tryHookWithName(
 		kinder,
 		mutter,
-    ObjekteOptions{},
+		ObjekteOptions{},
 		t,
 		script,
 		"on_format",
@@ -118,7 +118,7 @@ func (s *Store) tryPreCommitHooks(
 	mutter *sku.Transacted,
 	o ObjekteOptions,
 ) (err error) {
-	if o.Mode == objekte_mode.ModeEmpty {
+	if !o.Mode.Contains(objekte_mode.ModeHooks) {
 		return
 	}
 

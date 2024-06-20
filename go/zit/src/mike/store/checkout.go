@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
@@ -174,6 +175,9 @@ func (s *Store) UpdateCheckoutOne(
 	var cze *sku.External
 
 	if cze, err = s.ReadOneExternal(
+		ObjekteOptions{
+			Mode: objekte_mode.ModeRealize,
+		},
 		e,
 		sz,
 	); err != nil {
@@ -243,6 +247,9 @@ func (s *Store) CheckoutOne(
 		var cze *sku.External
 
 		if cze, err = s.ReadOneExternal(
+			ObjekteOptions{
+				Mode: objekte_mode.ModeRealize,
+			},
 			e,
 			sz,
 		); err != nil {

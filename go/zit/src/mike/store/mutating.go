@@ -69,7 +69,7 @@ func (s *Store) tryRealizeAndOrStore(
 	}
 
 	ui.Log().Print(kinder, o.SmartString())
-	if o.Contains(objekte_mode.ModeApplyProto) {
+	if mutter == nil && o.Contains(objekte_mode.ModeApplyProto) {
 		s.protoZettel.Apply(kinder, kinder)
 	}
 

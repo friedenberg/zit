@@ -5,12 +5,14 @@ import (
 	"sync/atomic"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -56,7 +58,12 @@ func (c Validate) RunWithQuery(
 
 			t.FDs.Objekte.ResetWith(f)
 
-			if _, err = u.GetStore().ReadOneCheckedOut(t); err != nil {
+			if _, err = u.GetStore().ReadOneCheckedOut(
+				store.ObjekteOptions{
+					Mode: objekte_mode.ModeUpdateTai,
+				},
+				t,
+			); err != nil {
 				failureCount.Add(1)
 				err = errors.Wrapf(err, "File: %q", f)
 				ui.Err().Print(err)

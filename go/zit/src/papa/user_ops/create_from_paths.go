@@ -51,7 +51,7 @@ func (c CreateFromPaths) Run(
 			return
 		}
 
-		if z, err = c.GetStore().ReadOneExternalWithOptions(
+		if z, err = c.GetStore().ReadOneExternal(
 			o,
 			&t,
 			nil,

@@ -281,14 +281,6 @@ func (s *Store) CreateZettelOrError(
 func (s *Store) Create(
 	mg metadatei.Getter,
 ) (tz *sku.Transacted, err error) {
-	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = file_lock.ErrLockRequired{
-			Operation: "create",
-		}
-
-		return
-	}
-
 	if mg.GetMetadatei().IsEmpty() {
 		err = errors.Normalf("zettel is empty")
 		return

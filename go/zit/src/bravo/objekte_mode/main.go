@@ -23,11 +23,12 @@ const (
 	ModeSchwanz                                 // only features updates that have no retroactive effects
 	ModeMergeCheckedOut
 	ModeApplyProto
+	ModeHooks
 	// TODO add hooks modes
 
-	ModeRealize = ModeUpdateTai | ModeApplyProto
+	ModeRealize = ModeUpdateTai | ModeApplyProto | ModeHooks
 	ModeReindex = ModeSchwanz
-	ModeCommit  = ModeReindex | ModeAddToBestandsaufnahme
+	ModeCommit  = ModeReindex | ModeAddToBestandsaufnahme | ModeHooks
 	ModeCreate  = ModeCommit | ModeApplyProto
 )
 
@@ -39,15 +40,15 @@ func (i Mode) SmartString() string {
 		switch {
 		case i == 0:
 			sb.WriteString(_Mode_name_0)
-		case i & 2 != 0:
+		case i&2 != 0:
 			sb.WriteString(_Mode_name_1)
-		case i & 4 != 0:
+		case i&4 != 0:
 			sb.WriteString(_Mode_name_2)
-		case i & 8 != 0:
+		case i&8 != 0:
 			sb.WriteString(_Mode_name_3)
-		case i & 16 != 0:
+		case i&16 != 0:
 			sb.WriteString(_Mode_name_4)
-		case i & 32 != 0:
+		case i&32 != 0:
 			sb.WriteString(_Mode_name_5)
 		default:
 			sb.WriteString("Mode(" + strconv.FormatInt(int64(i), 10) + ")")

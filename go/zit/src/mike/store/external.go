@@ -23,24 +23,6 @@ type ObjekteOptions struct {
 }
 
 func (s *Store) ReadOneCheckedOut(
-	em *sku.ExternalMaybe,
-) (co *sku.CheckedOut, err error) {
-	o := ObjekteOptions{
-		Mode: objekte_mode.ModeRealize,
-	}
-
-	if co, err = s.ReadOneCheckedOutWithOptions(
-		o,
-		em,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) ReadOneCheckedOutWithOptions(
 	o ObjekteOptions,
 	em *sku.ExternalMaybe,
 ) (co *sku.CheckedOut, err error) {
@@ -78,24 +60,6 @@ func (s *Store) ReadOneCheckedOutWithOptions(
 }
 
 func (s *Store) ReadOneExternal(
-	em *sku.ExternalMaybe,
-	t *sku.Transacted,
-) (e *sku.External, err error) {
-	e = sku.GetExternalPool().Get()
-
-	o := ObjekteOptions{
-		Mode: objekte_mode.ModeRealize,
-	}
-
-	if err = s.ReadOneExternalInto(o, em, t, e); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) ReadOneExternalWithOptions(
 	o ObjekteOptions,
 	em *sku.ExternalMaybe,
 	t *sku.Transacted,

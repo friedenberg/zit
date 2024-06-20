@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
@@ -58,7 +59,13 @@ func (s *Store) query(
 
 			var e2 *sku.External
 
-			if e2, err = s.ReadOneExternal(e, z); err != nil {
+			if e2, err = s.ReadOneExternal(
+				ObjekteOptions{
+					Mode: objekte_mode.ModeUpdateTai,
+				},
+				e,
+				z,
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -94,7 +101,13 @@ func (s *Store) query(
 				if e, ok = s.GetCwdFiles().Get(&z.Kennung); ok {
 					var e2 *sku.External
 
-					if e2, err = s.ReadOneExternal(e, z); err != nil {
+					if e2, err = s.ReadOneExternal(
+						ObjekteOptions{
+							Mode: objekte_mode.ModeUpdateTai,
+						},
+						e,
+						z,
+					); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
@@ -171,7 +184,13 @@ func (s *Store) ReadOneSigil(
 	if e, ok := s.cwdFiles.Get(k1); ok {
 		var ze *sku.External
 
-		if ze, err = s.ReadOneExternal(e, sk1); err != nil {
+		if ze, err = s.ReadOneExternal(
+			ObjekteOptions{
+				Mode: objekte_mode.ModeUpdateTai,
+			},
+			e,
+			sk1,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

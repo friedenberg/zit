@@ -31,7 +31,13 @@ func (s *Store) ReadOneExternalFS(
 
 	var e2 *sku.External
 
-	if e2, err = s.ReadOneExternal(e, sk2); err != nil {
+	if e2, err = s.ReadOneExternal(
+		ObjekteOptions{
+			Mode: objekte_mode.ModeUpdateTai,
+		},
+		e,
+		sk2,
+	); err != nil {
 		if errors.IsNotExist(err) {
 			err = iter.MakeErrStopIteration()
 		} else if errors.Is(err, sku.ErrExternalHasConflictMarker) {
@@ -102,7 +108,7 @@ func (s *Store) HydrateExternalMaybe(
 ) (err error) {
 	var co *sku.CheckedOut
 
-	if co, err = s.ReadOneCheckedOutWithOptions(o, em); err != nil {
+	if co, err = s.ReadOneCheckedOut(o, em); err != nil {
 		err = errors.Wrapf(err, "%v", em)
 		return
 	}
