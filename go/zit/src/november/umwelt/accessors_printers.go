@@ -3,6 +3,7 @@ package umwelt
 import (
 	"time"
 
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
@@ -14,6 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
 func (u *Umwelt) FormatColorOptionsOut() (o string_format_writer.ColorOptions) {
@@ -250,5 +252,46 @@ func (u *Umwelt) PrinterCheckedOut() schnittstellen.FuncIter[*sku.CheckedOut] {
 		} else {
 			return out(co)
 		}
+	}
+}
+
+type PrinterMatching = store.IterMatching
+
+func (u *Umwelt) PrinterMatching() PrinterMatching {
+	pt := u.PrinterSkuTransacted()
+	pco := u.PrinterCheckedOut()
+
+	return func(
+		mt store.UnsureMatchType,
+		sk *sku.Transacted,
+		existing sku.CheckedOutMutableSet,
+	) (err error) {
+		if err = pt(sk); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = existing.Each(
+			func(co *sku.CheckedOut) (err error) {
+				co.State = checked_out_state.StateRecognized
+
+				if err = co.Internal.SetFromSkuLike(sk); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if err = pco(co); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
 	}
 }

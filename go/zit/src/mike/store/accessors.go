@@ -17,6 +17,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/cwd"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/store_verzeichnisse"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/lima/bestandsaufnahme"
 )
 
@@ -38,6 +39,10 @@ func (s *Store) GetCwdFiles() *cwd.CwdFiles {
 
 func (s *Store) GetObjekteFormatOptions() objekte_format.Options {
 	return s.options
+}
+
+func (s *Store) GetProtoZettel() zettel.ProtoZettel {
+	return s.protoZettel
 }
 
 func (s *Store) GetPersistentMetadateiFormat() objekte_format.Format {

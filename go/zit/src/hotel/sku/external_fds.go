@@ -7,12 +7,21 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
+	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/thyme"
 )
 
 type ExternalFDs struct {
 	Objekte fd.FD
 	Akte    fd.FD
+}
+
+func (ef *ExternalFDs) GetTai() kennung.Tai {
+	return kennung.TaiFromTime(ef.LatestModTime())
+}
+
+func (ef *ExternalFDs) GetTime() thyme.Time {
+	return ef.LatestModTime()
 }
 
 func (ef *ExternalFDs) LatestModTime() thyme.Time {

@@ -20,9 +20,5 @@ func (o *Options) Validate() (err error) {
 		return
 	}
 
-	if o.BasePath == "" {
-		o.BasePath = o.cwd
-	}
-
 	return
 }

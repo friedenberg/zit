@@ -19,6 +19,7 @@ type Json struct {
 	Bezeichnung string   `json:"bezeichnung"`
 	Etiketten   []string `json:"etiketten"`
 	Kennung     string   `json:"kennung"`
+	Sha         string   `json:"sha"`
 	Typ         string   `json:"typ"`
 	Tai         string   `json:"tai"`
 }
@@ -49,6 +50,7 @@ func (j *Json) FromStringAndMetadatei(
 	j.Bezeichnung = m.Bezeichnung.String()
 	j.Etiketten = iter.Strings(m.GetEtiketten())
 	j.Kennung = k
+	j.Sha = m.SelbstMetadateiSansTai.String()
 	j.Tai = m.Tai.String()
 	j.Typ = m.Typ.String()
 
@@ -56,8 +58,8 @@ func (j *Json) FromStringAndMetadatei(
 }
 
 func (j *Json) FromTransacted(
-  sk *sku.Transacted,
-  s standort.Standort,
+	sk *sku.Transacted,
+	s standort.Standort,
 ) (err error) {
 	return j.FromStringAndMetadatei(sk.Kennung.String(), sk.GetMetadatei(), s)
 }

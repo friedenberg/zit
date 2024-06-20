@@ -4,7 +4,10 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
@@ -54,19 +57,28 @@ func (pz ProtoZettel) Make() (z *metadatei.Metadatei) {
 	todo.Change("add Bezeichnung")
 	z = metadatei.GetPool().Get()
 
-	pz.Apply(z)
+	pz.Apply(z, gattung.Zettel)
 
 	return
 }
 
-func (pz ProtoZettel) Apply(ml metadatei.MetadateiLike) (ok bool) {
+func (pz ProtoZettel) Apply(
+	ml metadatei.MetadateiLike,
+	gg schnittstellen.GattungGetter,
+) (ok bool) {
 	z := ml.GetMetadatei()
 
-	if kennung.IsEmpty(z.GetTyp()) &&
-		!kennung.IsEmpty(pz.Metadatei.Typ) &&
-		!z.GetTyp().Equals(pz.Metadatei.Typ) {
-		ok = true
-		z.Typ = pz.Metadatei.Typ
+	g := gg.GetGattung()
+	ui.Log().Print(ml, g)
+
+	switch g {
+	case gattung.Zettel, gattung.Unknown:
+		if kennung.IsEmpty(z.GetTyp()) &&
+			!kennung.IsEmpty(pz.Metadatei.Typ) &&
+			!z.GetTyp().Equals(pz.Metadatei.Typ) {
+			ok = true
+			z.Typ = pz.Metadatei.Typ
+		}
 	}
 
 	if pz.Metadatei.Bezeichnung.WasSet() &&

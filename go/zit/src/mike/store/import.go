@@ -38,13 +38,19 @@ func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOut, err error) {
 
 	if err = s.ReadOneInto(sk.GetKennung(), &co.Internal); err != nil {
 		if collections.IsErrNotFound(err) {
-			err = s.createOrUpdate(
+			err = s.tryRealizeAndOrStore(
 				sk,
-				objekte_mode.ModeAddToBestandsaufnahme,
+				ObjekteOptions{
+					Clock: &co.External.Transacted,
+					Mode:  objekte_mode.ModeCommit,
+				},
 			)
+
+			err = errors.WrapExcept(err, collections.ErrExists)
 		}
 
 		err = errors.Wrap(err)
+
 		return
 	}
 
@@ -73,12 +79,12 @@ func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOut, err error) {
 		return
 	}
 
-	err = s.createOrUpdate(
+	if err = s.tryRealizeAndOrStore(
 		sk,
-		objekte_mode.ModeAddToBestandsaufnahme,
-	)
-
-	if err == collections.ErrExists {
+		ObjekteOptions{
+			Mode: objekte_mode.ModeCommit,
+		},
+	); err == collections.ErrExists {
 		co.SetError(err)
 		err = nil
 	}

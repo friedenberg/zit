@@ -2,12 +2,14 @@ package sku_fmt
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	lua "github.com/yuin/gopher-lua"
 )
 
 func ToLuaTable(o *sku.Transacted, l *lua.LState, t *lua.LTable) {
+	l.SetField(t, "Gattung", lua.LString(o.GetGattung().String()))
 	l.SetField(t, "Kennung", lua.LString(o.GetKennung().String()))
 	l.SetField(t, "Gattung", lua.LString(o.GetGattung().GetGattungString()))
 	l.SetField(t, "Typ", lua.LString(o.GetTyp().String()))
@@ -36,7 +38,16 @@ func ToLuaTable(o *sku.Transacted, l *lua.LState, t *lua.LTable) {
 }
 
 func FromLuaTable(o *sku.Transacted, l *lua.LState, t *lua.LTable) (err error) {
-	if err = o.Kennung.Set(l.GetField(t, "Kennung").String()); err != nil {
+  var g gattung.Gattung
+	if err = g.Set(l.GetField(t, "Gattung").String()); err != nil {
+		err = errors.Wrap(err)
+		return
+  }
+
+  o.Kennung.SetGattung(g)
+	k := l.GetField(t, "Kennung").String()
+
+	if err = o.Kennung.Set(k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

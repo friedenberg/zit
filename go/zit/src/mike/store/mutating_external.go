@@ -55,37 +55,26 @@ func (s *Store) CreateOrUpdateTransacted(
 	in *sku.Transacted,
 	updateCheckout bool,
 ) (err error) {
+	mode := objekte_mode.Make(
+		objekte_mode.ModeCommit,
+		objekte_mode.ModeApplyProto,
+	)
+
+	if updateCheckout {
+		mode |= objekte_mode.ModeMergeCheckedOut
+	}
+
 	if in.Kennung.IsEmpty() {
 		if err = s.CreateZettelOrError(in); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		mode := objekte_mode.ModeCommit
-
-		if updateCheckout {
-			mode |= objekte_mode.ModeMergeCheckedOut
-		}
-
-		if err = s.createOrUpdate(in, mode); err != nil {
-			err = errors.Wrap(err)
+		if err = s.tryRealizeAndOrStore(in, ObjekteOptions{Mode: mode}); err != nil {
+			err = errors.WrapExcept(err, collections.ErrExists)
 			return
 		}
 	}
-
-	// if !updateCheckout {
-	// 	return
-	// }
-
-	// if _, err = s.UpdateCheckoutOne(
-	// 	checkout_options.Options{},
-	// 	in,
-	// ); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
-
-	// TODO update checkout
 
 	return
 }
@@ -122,11 +111,11 @@ func (s *Store) CreateOrUpdate(
 		return
 	}
 
-	if err = s.createOrUpdate(
+	if err = s.tryRealizeAndOrStore(
 		transactedPtr,
-		objekte_mode.ModeCommit,
+		ObjekteOptions{Mode: objekte_mode.ModeCommit},
 	); err != nil {
-		err = errors.Wrap(err)
+		err = errors.WrapExcept(err, collections.ErrExists)
 		return
 	}
 
@@ -166,11 +155,11 @@ func (s *Store) CreateOrUpdateAkteSha(
 
 	t.SetAkteSha(sh)
 
-	if err = s.createOrUpdate(
+	if err = s.tryRealizeAndOrStore(
 		t,
-		objekte_mode.ModeCommit,
+		ObjekteOptions{Mode: objekte_mode.ModeCommit},
 	); err != nil {
-		err = errors.Wrap(err)
+		err = errors.WrapExcept(err, collections.ErrExists)
 		return
 	}
 
@@ -210,11 +199,11 @@ func (s *Store) RevertTo(
 
 	defer sku.GetTransactedPool().Put(mutter)
 
-	if err = s.createOrUpdate(
+	if err = s.tryRealizeAndOrStore(
 		mutter,
-		objekte_mode.ModeCommit,
+		ObjekteOptions{Mode: objekte_mode.ModeCommit},
 	); err != nil {
-		err = errors.Wrap(err)
+		err = errors.WrapExcept(err, collections.ErrExists)
 		return
 	}
 
@@ -324,18 +313,16 @@ func (s *Store) Create(
 		return
 	}
 
-	// TODO move default application to tryCommit and control via options / mode
-	// then, use that to de-dupe output
-	if err = s.tryCommit(tz, objekte_mode.ModeCommit); err != nil {
-		err = errors.Wrap(err)
-		return
+	o := ObjekteOptions{
+		Mode: objekte_mode.ModeCreate,
 	}
 
-	if s.protoZettel.Apply(&tz.Metadatei) {
-		if err = s.tryCommit(tz, objekte_mode.ModeCommit); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = s.tryRealizeAndOrStore(
+		tz,
+		o,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

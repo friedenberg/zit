@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -64,8 +65,12 @@ func (s *Store) ReadFiles(
 	qg *query.Group,
 	f schnittstellen.FuncIter[*sku.CheckedOut],
 ) (err error) {
+	o := ObjekteOptions{
+		Mode: objekte_mode.ModeRealize,
+	}
+
 	if err = s.cwdFiles.All(
-		s.MakeHydrateExternalMaybe(qg, f),
+		s.MakeHydrateExternalMaybe(qg, f, o),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -77,9 +82,10 @@ func (s *Store) ReadFiles(
 func (s *Store) MakeHydrateExternalMaybe(
 	qg *query.Group,
 	f schnittstellen.FuncIter[*sku.CheckedOut],
+	o ObjekteOptions,
 ) schnittstellen.FuncIter[*sku.ExternalMaybe] {
 	return func(em *sku.ExternalMaybe) (err error) {
-		if err = s.HydrateExternalMaybe(qg, em, f); err != nil {
+		if err = s.HydrateExternalMaybe(o, qg, em, f); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -89,13 +95,14 @@ func (s *Store) MakeHydrateExternalMaybe(
 }
 
 func (s *Store) HydrateExternalMaybe(
+	o ObjekteOptions,
 	qg *query.Group,
 	em *sku.ExternalMaybe,
 	f schnittstellen.FuncIter[*sku.CheckedOut],
 ) (err error) {
 	var co *sku.CheckedOut
 
-	if co, err = s.ReadOneCheckedOut(em); err != nil {
+	if co, err = s.ReadOneCheckedOutWithOptions(o, em); err != nil {
 		err = errors.Wrapf(err, "%v", em)
 		return
 	}
@@ -116,8 +123,12 @@ func (s *Store) ReadFilesUnsure(
 	qg *query.Group,
 	f schnittstellen.FuncIter[*sku.CheckedOut],
 ) (err error) {
+	o := ObjekteOptions{
+		Mode: objekte_mode.ModeRealize,
+	}
+
 	if err = s.cwdFiles.AllUnsure(
-		s.MakeHydrateExternalMaybe(qg, f),
+		s.MakeHydrateExternalMaybe(qg, f, o),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

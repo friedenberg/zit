@@ -10,6 +10,7 @@ import (
 type VirtualStore interface {
 	Initialize() error
 	Flush() error
+	// TODO add objekte mode
 	CommitTransacted(kinder, mutter *sku.Transacted) error
 	ModifySku(*sku.Transacted) error
 	Query(*Group, schnittstellen.FuncIter[*sku.Transacted]) error

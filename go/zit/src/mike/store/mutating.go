@@ -20,35 +20,46 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func (s *Store) tryCommit(
+func (s *Store) tryRealizeAndOrStore(
 	kinder *sku.Transacted,
-	mode objekte_mode.Mode,
+	o ObjekteOptions,
 ) (err error) {
-	ui.Log().Printf("%s -> %s", mode, kinder)
+	ui.Log().Printf("%s -> %s", o, kinder)
 
-	if kinder.Kennung.IsEmpty() {
+	if kinder.Kennung.IsEmpty() &&
+		o.ContainsAny(
+			objekte_mode.ModeAddToBestandsaufnahme,
+		) {
 		err = errors.Errorf("empty kennung")
 		return
 	}
 
-	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = file_lock.ErrLockRequired{
+	if !s.GetStandort().GetLockSmith().IsAcquired() &&
+		o.ContainsAny(
+			objekte_mode.ModeAddToBestandsaufnahme,
+		) {
+		err = errors.Wrap(file_lock.ErrLockRequired{
 			Operation: "commit",
-		}
+		})
 
 		return
 	}
 
-	if mode.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
-		// TAI must be set before calculating objekte sha
-		if mode.Contains(objekte_mode.ModeUpdateTai) {
-			kinder.SetTai(kennung.NowTai())
+	// TAI must be set before calculating objekte sha
+	if o.ContainsAny(
+		objekte_mode.ModeAddToBestandsaufnahme,
+		objekte_mode.ModeUpdateTai,
+	) {
+		if o.Clock == nil {
+			o.Clock = s
 		}
+
+		kinder.SetTai(o.Clock.GetTai())
 	}
 
 	var mutter *sku.Transacted
 
-	if mutter, err = s.addMutterIfNecessary(kinder, mode); err != nil {
+	if mutter, err = s.addMutterIfNecessary(kinder, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -57,13 +68,19 @@ func (s *Store) tryCommit(
 		defer sku.GetTransactedPool().Put(mutter)
 	}
 
-	if err = s.tryPreCommitHooks(kinder, mutter, mode); err != nil {
+	ui.Log().Print(kinder, o.SmartString())
+	if o.Contains(objekte_mode.ModeApplyProto) {
+		s.protoZettel.Apply(kinder, kinder)
+	}
+
+	if err = s.tryPreCommitHooks(kinder, mutter, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
+	// TODO just just mutter == nil
 	if kinder.Metadatei.Mutter().IsNull() {
-		if err = s.tryNewHook(kinder, mode); err != nil {
+		if err = s.tryNewHook(kinder, o); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -74,7 +91,7 @@ func (s *Store) tryCommit(
 		return
 	}
 
-	if mode.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
+	if o.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
 		if err = s.addMatchableTypAndEtikettenIfNecessary(kinder); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -103,73 +120,88 @@ func (s *Store) tryCommit(
 			return
 		}
 
-		if err = s.Unchanged(kinder); err != nil {
-			err = errors.Wrap(err)
-			return
+		if o.Mode.Contains(objekte_mode.ModeSchwanz) {
+			if err = s.Unchanged(kinder); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 
 		return
 	}
 
-	if err = s.GetKonfig().ApplyAndAddTransacted(
+	if err = s.GetKonfig().ApplySchlummerndAndRealizeEtiketten(
 		kinder,
-		mutter,
-		s.GetAkten(),
-		mode,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if kinder.GetGattung() == gattung.Zettel {
-		if err = s.kennungIndex.AddHinweis(&kinder.Kennung); err != nil {
-			if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
-				ui.Log().Printf("kennung does not contain value: %s", err)
-				err = nil
-			} else {
-				err = errors.Wrapf(err, "failed to write zettel to index: %s", kinder)
-				return
+	if o.Mode.Contains(objekte_mode.ModeSchwanz) {
+		if err = s.GetKonfig().AddTransacted(
+			kinder,
+			mutter,
+			s.GetAkten(),
+			o.Mode,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if kinder.GetGattung() == gattung.Zettel {
+			if err = s.kennungIndex.AddHinweis(&kinder.Kennung); err != nil {
+				if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
+					ui.Log().Printf("kennung does not contain value: %s", err)
+					err = nil
+				} else {
+					err = errors.Wrapf(err, "failed to write zettel to index: %s", kinder)
+					return
+				}
 			}
 		}
+
 	}
 
-	if mode.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
-		ui.Log().Print("adding to bestandsaufnahme", mode, kinder)
+	if o.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
+		ui.Log().Print("adding to bestandsaufnahme", o, kinder)
 		if err = s.commitTransacted(kinder, mutter); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-	}
 
-	if err = s.addToTomlIndexIfNecessary(kinder, mode); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	err = nil
-
-	if err = s.GetVerzeichnisse().Add(
-		kinder,
-		kinder.GetKennung().String(),
-		mode,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if kinder.Metadatei.Mutter().IsNull() {
-		if err = s.New(kinder); err != nil {
+		if err = s.addToTomlIndexIfNecessary(kinder, o); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-	} else {
-		if err = s.Updated(kinder); err != nil {
+
+		err = nil
+	}
+
+	if o.Contains(objekte_mode.ModeSchwanz) {
+		if err = s.GetVerzeichnisse().Add(
+			kinder,
+			kinder.GetKennung().String(),
+			o.Mode,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+
+		if kinder.Metadatei.Mutter().IsNull() {
+			if err = s.New(kinder); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		} else {
+			if err = s.Updated(kinder); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
 	}
 
-	if mode.Contains(objekte_mode.ModeMergeCheckedOut) {
+	if o.Contains(objekte_mode.ModeMergeCheckedOut) {
 		if err = s.readExternalAndMergeIfNecessary(kinder, mutter); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -181,7 +213,7 @@ func (s *Store) tryCommit(
 
 func (s *Store) addMutterIfNecessary(
 	sk *sku.Transacted,
-	ut objekte_mode.Mode,
+	ut ObjekteOptions,
 ) (mutter *sku.Transacted, err error) {
 	if !sk.Metadatei.Mutter().IsNull() ||
 		!ut.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
@@ -282,9 +314,9 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	if err = s.tryCommit(
+	if err = s.tryRealizeAndOrStore(
 		transactedPtr,
-		objekte_mode.ModeCommit,
+		ObjekteOptions{Mode: objekte_mode.ModeCommit},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -306,33 +338,6 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		transactedPtr,
 	); err != nil {
 		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-// TODO-project-2022-zit-collapse_skus transition this to accepting checked out
-func (s *Store) createOrUpdate(
-	transactedPtr *sku.Transacted,
-	updateType objekte_mode.Mode,
-) (err error) {
-	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = file_lock.ErrLockRequired{
-			Operation: fmt.Sprintf(
-				"create or update: %s",
-				transactedPtr.GetGattung(),
-			),
-		}
-
-		return
-	}
-
-	if err = s.tryCommit(
-		transactedPtr,
-		updateType,
-	); err != nil {
-		err = errors.WrapExcept(err, collections.ErrExists)
 		return
 	}
 
@@ -409,7 +414,10 @@ func (s *Store) createEtikettOrTyp(k *kennung.Kennung2) (err error) {
 		return
 	}
 
-	if err = s.tryCommit(t, objekte_mode.ModeCommit); err != nil {
+	if err = s.tryRealizeAndOrStore(
+		t,
+		ObjekteOptions{Mode: objekte_mode.ModeCommit},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -540,9 +548,13 @@ func (s *Store) addMatchableCommon(m *sku.Transacted) (err error) {
 }
 
 func (s *Store) reindexOne(besty, sk *sku.Transacted) (err error) {
-	if err = s.tryCommit(
+	o := ObjekteOptions{
+		Mode: objekte_mode.ModeReindex,
+	}
+
+	if err = s.tryRealizeAndOrStore(
 		sk,
-		objekte_mode.ModeEmpty,
+		o,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

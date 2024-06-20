@@ -14,6 +14,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 )
 
+const (
+	EnvDir = "DIR_ZIT"
+	EnvBin = "BIN_ZIT"
+)
+
 type Getter interface {
 	GetStandort() Standort
 }
@@ -41,7 +46,7 @@ func Make(
 	}
 
 	if o.BasePath == "" {
-		o.BasePath = os.Getenv("DIR_ZIT")
+		o.BasePath = os.Getenv(EnvDir)
 	}
 
 	if o.BasePath == "" {
@@ -69,12 +74,12 @@ func Make(
 		return
 	}
 
-	if err = os.Setenv("DIR_ZIT", s.basePath); err != nil {
+	if err = os.Setenv(EnvDir, s.basePath); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = os.Setenv("BIN_ZIT", s.execPath); err != nil {
+	if err = os.Setenv(EnvBin, s.execPath); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

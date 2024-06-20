@@ -86,7 +86,6 @@ function can_new_zettel { # @test
 	assert_success
 	assert_output - <<-EOM
 		[ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 "wow" ok]
 		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" ok]
 	EOM
 
@@ -114,7 +113,6 @@ function can_checkout_and_checkin { # @test
 	assert_success
 	assert_output - <<-EOM
 		[ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 "wow" ok]
 		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" ok]
 	EOM
 
@@ -133,10 +131,8 @@ function can_checkout_and_checkin { # @test
 
 	run_zit checkin one/uno.zettel
 	assert_success
-	# run_zit diff .
-	#TODO fix missing typ
 	assert_output - <<-EOM
-		[one/uno@434728a410a78f56fc1b5899c3593436e61ab0c731e9072d95e96db290205e53 "wow" ok]
+		[one/uno@434728a410a78f56fc1b5899c3593436e61ab0c731e9072d95e96db290205e53 !md "wow" ok]
 	EOM
 }
 
@@ -159,7 +155,6 @@ function can_checkout_via_etiketten { # @test
 	assert_success
 	assert_output - <<-EOM
 		[ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 "wow" ok]
 		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" ok]
 	EOM
 
@@ -193,7 +188,6 @@ function can_new_zettel_with_metadatei { # @test
 		[et1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[et2@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "bez" et1 et2]
-		[one/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 "bez" et1 et2]
 	EOM
 }
 

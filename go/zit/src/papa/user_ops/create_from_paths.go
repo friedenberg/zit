@@ -5,19 +5,19 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
+	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/objekte_collections"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/objekte"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -27,21 +27,21 @@ type CreateFromPaths struct {
 	Filter      script_value.ScriptValue
 	ProtoZettel zettel.ProtoZettel
 	Delete      bool
-	Dedupe      bool
 	// ReadHinweisFromPath bool
 }
 
 func (c CreateFromPaths) Run(
 	args ...string,
 ) (results sku.TransactedMutableSet, err error) {
-	// TODO-P3 support different modes of de-duplication
-	// TODO-P3 support merging of duplicated akten
-	toCreate := objekte_collections.MakeMutableSetUniqueFD()
+	toCreate := make(map[sha.Bytes]*sku.External)
 	toDelete := objekte_collections.MakeMutableSetUniqueFD()
+
+	o := store.ObjekteOptions{
+		Mode: objekte_mode.ModeRealize,
+	}
 
 	for _, arg := range args {
 		var z *sku.External
-
 		var t sku.ExternalMaybe
 
 		t.Kennung.SetGattung(gattung.Zettel)
@@ -51,10 +51,10 @@ func (c CreateFromPaths) Run(
 			return
 		}
 
-		if z, err = c.GetStore().ReadOneExternal(
+		if z, err = c.GetStore().ReadOneExternalWithOptions(
+			o,
 			&t,
 			nil,
-			// sku.GetTransactedPool().Get(),
 		); err != nil {
 			err = errors.Errorf(
 				"zettel text format error for path: %s: %s",
@@ -64,7 +64,25 @@ func (c CreateFromPaths) Run(
 			return
 		}
 
-		toCreate.Add(z)
+		sh := &z.Metadatei.Shas.SelbstMetadateiSansTai
+
+		if sh.IsNull() {
+			return
+		}
+
+		k := sh.GetBytes()
+		existing, ok := toCreate[k]
+
+		if ok {
+			if err = existing.Metadatei.Bezeichnung.Set(
+				z.Metadatei.Bezeichnung.String(),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		} else {
+			toCreate[k] = z
+		}
 
 		if c.Delete {
 			toDelete.Add(z)
@@ -80,115 +98,22 @@ func (c CreateFromPaths) Run(
 
 	defer errors.Deferred(&err, c.Unlock)
 
-	if c.Dedupe {
-		matcher := objekte_collections.MakeMutableMatchSet(toCreate)
-
-		b := c.MakeQueryBuilder(kennung.MakeGattung(gattung.Zettel))
-
-		var qg *query.Group
-
-		if qg, err = b.BuildQueryGroup(); err != nil {
-			err = errors.Wrap(err)
+	for _, z := range toCreate {
+		if z.Metadatei.IsEmpty() {
 			return
 		}
 
-		if err = c.GetStore().QueryWithoutCwd(
-			qg,
-			iter.MakeChain(
-				matcher.Match,
-				func(sk *sku.Transacted) (err error) {
-					var z sku.Transacted
-
-					if err = z.SetFromSkuLike(sk); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
-					return results.Add(&z)
-				},
-			),
+		if err = c.GetStore().CreateOrUpdateTransacted(
+			&z.Transacted,
+			false,
 		); err != nil {
-			err = errors.Wrap(err)
-			return
+			// TODO-P2 add file for error handling
+			c.handleStoreError(z, "", err)
+			err = nil
+			continue
 		}
-	}
 
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	err = results.Each(
-		func(z *sku.Transacted) (err error) {
-			if c.ProtoZettel.Apply(z) {
-				if err = c.GetStore().CreateOrUpdateTransacted(z, false); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-
-			return
-		},
-	)
-
-	if err = toCreate.Each(
-		func(z *sku.External) (err error) {
-			if z.Metadatei.IsEmpty() {
-				return
-			}
-
-			cz := sku.CheckedOut{}
-
-			var zt *sku.Transacted
-
-			if zt, err = c.GetStore().Create(z); err != nil {
-				// TODO-P2 add file for error handling
-				c.handleStoreError(cz, "", err)
-				err = nil
-				return
-			}
-
-			if err = cz.External.Transacted.SetFromSkuLike(zt); err != nil {
-				err = errors.Wrapf(err, "Sku: %q", sku_fmt.String(&z.Transacted))
-				return
-			}
-
-			if err = cz.Internal.SetFromSkuLike(zt); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if c.ProtoZettel.Apply(&cz.Internal) {
-				if err = c.GetStore().CreateOrUpdateTransacted(
-					&cz.Internal,
-					false,
-				); err != nil {
-					// TODO-P2 add file for error handling
-					c.handleStoreError(cz, "", err)
-					err = nil
-					return
-				}
-			}
-
-			// TODO-P4 get matches
-			cz.DetermineState(true)
-
-			zv := &sku.Transacted{}
-
-			if err = zv.Kennung.SetWithKennung(&kennung.Hinweis{}); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			sku.TransactedResetter.ResetWith(zv, &cz.Internal)
-
-			results.Add(zv)
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		results.Add(&z.Transacted)
 	}
 
 	if err = toDelete.Each(
@@ -266,7 +191,7 @@ func (c *CreateFromPaths) zettelsFromPath(
 }
 
 func (c CreateFromPaths) handleStoreError(
-	z sku.CheckedOut,
+	z *sku.External,
 	f string,
 	in error,
 ) {

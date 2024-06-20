@@ -212,17 +212,12 @@ func (k *compiled) addKasten(
 	return
 }
 
-func (k *Compiled) ApplyAndAddTransacted(
+func (k *Compiled) AddTransacted(
 	kinder *sku.Transacted,
 	mutter *sku.Transacted,
 	ak *akten.Akten,
 	mode objekte_mode.Mode,
 ) (err error) {
-	if err = k.ApplyToSku(kinder); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	didChange := false
 
 	switch kinder.Kennung.GetGattung() {

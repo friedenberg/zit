@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
@@ -106,7 +107,7 @@ func (c ZettelFromExternalAkte) Run(
 
 	if err = results.Each(
 		func(z *sku.Transacted) (err error) {
-			if c.ProtoZettel.Apply(z) {
+			if c.ProtoZettel.Apply(z, gattung.Zettel) {
 				if err = c.GetStore().CreateOrUpdateTransacted(
 					z,
 					false,
@@ -144,7 +145,7 @@ func (c ZettelFromExternalAkte) Run(
 			return
 		}
 
-		if c.ProtoZettel.Apply(tz) {
+		if c.ProtoZettel.Apply(tz, gattung.Zettel) {
 			if err = c.GetStore().CreateOrUpdateTransacted(
 				tz,
 				false,

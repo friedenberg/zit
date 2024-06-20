@@ -15,7 +15,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func (k *Compiled) ApplyToSku(
+// TODO
+func (k *Compiled) ApplySchlummerndAndRealizeEtiketten(
 	sk *sku.Transacted,
 ) (err error) {
 	ui.Log().Print("applying konfig to:", sk)

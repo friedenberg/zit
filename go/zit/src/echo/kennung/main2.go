@@ -33,7 +33,7 @@ func GetKennungPool() schnittstellen.Pool[Kennung2, *Kennung2] {
 
 type Kennung2 struct {
 	g           gattung.Gattung
-	middle      byte
+	middle      byte // remove and replace with virtual
 	left, right catgut.String
 }
 
@@ -200,6 +200,10 @@ func (k2 *Kennung2) SetGattung(g schnittstellen.GattungGetter) {
 		k2.g = gattung.Unknown
 	} else {
 		k2.g = gattung.Must(g.GetGattung())
+	}
+
+	if k2.g == gattung.Zettel {
+		k2.middle = '/'
 	}
 }
 
@@ -385,14 +389,14 @@ func (h *Kennung2) SetWithKennung(
 	switch kt := k.(type) {
 	case *Kennung2:
 		if err = kt.left.CopyTo(&h.left); err != nil {
-      err = errors.Wrap(err)
+			err = errors.Wrap(err)
 			return
 		}
 
 		h.middle = kt.middle
 
 		if err = kt.right.CopyTo(&h.right); err != nil {
-      err = errors.Wrap(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -400,7 +404,7 @@ func (h *Kennung2) SetWithKennung(
 		p := k.Parts()
 
 		if err = h.left.Set(p[0]); err != nil {
-      err = errors.Wrap(err)
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -411,7 +415,7 @@ func (h *Kennung2) SetWithKennung(
 		}
 
 		if err = h.right.Set(p[2]); err != nil {
-      err = errors.Wrap(err)
+			err = errors.Wrap(err)
 			return
 		}
 	}
@@ -428,11 +432,11 @@ func (h *Kennung2) SetWithGattung(
 	h.g = gattung.Make(g.GetGattung())
 
 	if err = h.Set(v); err != nil {
-    err = errors.Wrap(err)
-    return
-  }
+		err = errors.Wrap(err)
+		return
+	}
 
-  return
+	return
 }
 
 func (h *Kennung2) TodoSetBytes(v *catgut.String) (err error) {
@@ -481,7 +485,7 @@ func (h *Kennung2) Set(v string) (err error) {
 	}
 
 	if err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "String: %q", v)
 		return
 	}
 

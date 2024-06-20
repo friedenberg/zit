@@ -118,13 +118,6 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 			DryRun:   u.erworbenCli.DryRun,
 		}
 
-		if standortOptions.BasePath == "" {
-			if standortOptions.BasePath, err = os.Getwd(); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
 		if u.standort, err = standort.Make(standortOptions); err != nil {
 			err = errors.Wrap(err)
 			return

@@ -21,6 +21,10 @@ func Wrap(in error) (err error) {
 }
 
 func WrapExceptAsNil(in error, except ...error) (err error) {
+	if in == nil {
+		return
+	}
+
 	for _, e := range except {
 		if in == e {
 			return nil
@@ -33,6 +37,10 @@ func WrapExceptAsNil(in error, except ...error) (err error) {
 }
 
 func WrapExcept(in error, except ...error) (err error) {
+	if in == nil {
+		return
+	}
+
 	for _, e := range except {
 		if in == e {
 			return in

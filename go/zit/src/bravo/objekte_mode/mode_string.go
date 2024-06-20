@@ -13,6 +13,7 @@ func _() {
 	_ = x[ModeUpdateTai-4]
 	_ = x[ModeSchwanz-8]
 	_ = x[ModeMergeCheckedOut-16]
+	_ = x[ModeApplyProto-32]
 }
 
 const (
@@ -21,6 +22,7 @@ const (
 	_Mode_name_2 = "ModeUpdateTai"
 	_Mode_name_3 = "ModeSchwanz"
 	_Mode_name_4 = "ModeMergeCheckedOut"
+	_Mode_name_5 = "ModeApplyProto"
 )
 
 func (i Mode) String() string {
@@ -35,6 +37,8 @@ func (i Mode) String() string {
 		return _Mode_name_3
 	case i == 16:
 		return _Mode_name_4
+	case i == 32:
+		return _Mode_name_5
 	default:
 		return "Mode(" + strconv.FormatInt(int64(i), 10) + ")"
 	}

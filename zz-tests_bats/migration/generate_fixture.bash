@@ -1,4 +1,4 @@
-#! /bin/bash -ex
+#! /bin/bash -e
 
 dir_base="$(realpath "$(dirname "$0")")"
 zit="$(realpath build/zit)"
@@ -19,7 +19,7 @@ function zit() (
 )
 
 flags=(
-  -verbose
+  # -verbose
   -chrest-enabled=false
   -predictable-hinweisen 
 )

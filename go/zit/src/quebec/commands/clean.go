@@ -15,14 +15,16 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
 type Clean struct {
-	force             bool
-	includeRecognized bool
-	includeMutter     bool
+	force                     bool
+	includeRecognizedAkten    bool
+	includeRecognizedZettelen bool
+	includeMutter             bool
 }
 
 func init() {
@@ -46,10 +48,17 @@ func init() {
 			)
 
 			f.BoolVar(
-				&c.includeRecognized,
-				"recognized",
+				&c.includeRecognizedAkten,
+				"recognized-akten",
 				false,
 				"remove Akten in working directory or args that are recognized",
+			)
+
+			f.BoolVar(
+				&c.includeRecognizedZettelen,
+				"recognized-zettelen",
+				false,
+				"remove Zetteln in working directory or args that are recognized",
 			)
 
 			return c
@@ -131,6 +140,15 @@ func (c Clean) RunWithQuery(
 		return
 	}
 
+	if err = c.markUnsureZettelenForRemovalIfNecessary(
+		u,
+		qg,
+		fds.Add,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	deleteOp := user_ops.DeleteCheckout{
 		Umwelt: u,
 	}
@@ -148,7 +166,7 @@ func (c Clean) markUnsureAktenForRemovalIfNecessary(
 	qg *query.Group,
 	add schnittstellen.FuncIter[*fd.FD],
 ) (err error) {
-	if !c.includeRecognized {
+	if !c.includeRecognizedAkten {
 		return
 	}
 
@@ -210,6 +228,71 @@ func (c Clean) markUnsureAktenForRemovalIfNecessary(
 			defer l.Unlock()
 
 			if err = add(fd); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (c Clean) markUnsureZettelenForRemovalIfNecessary(
+	u *umwelt.Umwelt,
+	qg *query.Group,
+	add schnittstellen.FuncIter[*fd.FD],
+) (err error) {
+	if !c.includeRecognizedZettelen {
+		return
+	}
+
+	p := u.PrinterCheckedOut()
+	var l sync.Mutex
+
+	if err = u.GetStore().QueryUnsure(
+		qg,
+		store.UnsureMatchOptions{
+			UnsureMatchType: store.UnsureMatchTypeMetadateiSansTaiHistory,
+		},
+		func(
+			mt store.UnsureMatchType,
+			sk *sku.Transacted,
+			existing sku.CheckedOutMutableSet,
+		) (err error) {
+			if err = existing.Each(
+				func(fr *sku.CheckedOut) (err error) {
+					fr.State = checked_out_state.StateRecognized
+
+					if err = p(fr); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
+					l.Lock()
+					defer l.Unlock()
+
+					if !fr.External.FDs.Objekte.IsEmpty() {
+						if err = add(&fr.External.FDs.Objekte); err != nil {
+							err = errors.Wrap(err)
+							return
+						}
+					}
+
+					if !fr.External.FDs.Akte.IsEmpty() {
+						if err = add(&fr.External.FDs.Akte); err != nil {
+							err = errors.Wrap(err)
+							return
+						}
+					}
+
+					return
+				},
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

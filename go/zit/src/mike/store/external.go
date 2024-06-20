@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
@@ -16,33 +17,31 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type ExternalReader interface {
-	ReadOneCheckedOut(
-		em *sku.ExternalMaybe,
-	) (co *sku.CheckedOut, err error)
-
-	ReadOneExternal(
-		em *sku.ExternalMaybe,
-		t *sku.Transacted,
-	) (e *sku.External, err error)
-
-	ReadOneExternalObjekte(
-		e *sku.External,
-		t *sku.Transacted,
-	) (err error)
-
-	ReadOneExternalObjekteReader(
-		r io.Reader,
-		e *sku.External,
-	) (err error)
-
-	ReadOneExternalAkte(
-		e *sku.External,
-		t *sku.Transacted,
-	) (err error)
+type ObjekteOptions struct {
+	objekte_mode.Mode
+	kennung.Clock
 }
 
 func (s *Store) ReadOneCheckedOut(
+	em *sku.ExternalMaybe,
+) (co *sku.CheckedOut, err error) {
+	o := ObjekteOptions{
+		Mode: objekte_mode.ModeRealize,
+	}
+
+	if co, err = s.ReadOneCheckedOutWithOptions(
+		o,
+		em,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) ReadOneCheckedOutWithOptions(
+	o ObjekteOptions,
 	em *sku.ExternalMaybe,
 ) (co *sku.CheckedOut, err error) {
 	co = sku.GetCheckedOutPool().Get()
@@ -57,7 +56,12 @@ func (s *Store) ReadOneCheckedOut(
 		}
 	}
 
-	if err = s.ReadOneExternalInto(em, &co.Internal, &co.External); err != nil {
+	if err = s.ReadOneExternalInto(
+		o,
+		em,
+		&co.Internal,
+		&co.External,
+	); err != nil {
 		if errors.Is(err, sku.ErrExternalHasConflictMarker) {
 			err = nil
 			co.State = checked_out_state.StateConflicted
@@ -79,7 +83,26 @@ func (s *Store) ReadOneExternal(
 ) (e *sku.External, err error) {
 	e = sku.GetExternalPool().Get()
 
-	if err = s.ReadOneExternalInto(em, t, e); err != nil {
+	o := ObjekteOptions{
+		Mode: objekte_mode.ModeRealize,
+	}
+
+	if err = s.ReadOneExternalInto(o, em, t, e); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) ReadOneExternalWithOptions(
+	o ObjekteOptions,
+	em *sku.ExternalMaybe,
+	t *sku.Transacted,
+) (e *sku.External, err error) {
+	e = sku.GetExternalPool().Get()
+
+	if err = s.ReadOneExternalInto(o, em, t, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -88,6 +111,7 @@ func (s *Store) ReadOneExternal(
 }
 
 func (s *Store) ReadOneExternalInto(
+	o ObjekteOptions,
 	em *sku.ExternalMaybe,
 	t *sku.Transacted,
 	e *sku.External,
@@ -138,14 +162,14 @@ func (s *Store) ReadOneExternalInto(
 		panic(checkout_mode.MakeErrInvalidCheckoutModeMode(m))
 	}
 
-	e.Metadatei.Tai = kennung.TaiFromTime(e.FDs.LatestModTime())
-
-	if err = e.CalculateObjekteShas(); err != nil {
-		err = errors.Wrap(err)
-		return
+	if o.Clock == nil {
+		o.Clock = &e.FDs
 	}
 
-	if err = s.konfig.ApplyToSku(&e.Transacted); err != nil {
+	if err = s.tryRealizeAndOrStore(
+		&e.Transacted,
+		o,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -52,7 +52,7 @@ func (kc *Compiled) recompileEtiketten() (err error) {
 				return
 			}
 
-			if err = kc.ApplyToSku(&ke.Transacted); err != nil {
+			if err = kc.ApplySchlummerndAndRealizeEtiketten(&ke.Transacted); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -101,7 +101,7 @@ func (kc *Compiled) recompileTypen(
 				inlineTypen.Add(values.MakeString(ct.Kennung.String()))
 			}
 
-			if err = kc.ApplyToSku(ct); err != nil {
+			if err = kc.ApplySchlummerndAndRealizeEtiketten(ct); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

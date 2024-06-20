@@ -16,7 +16,6 @@ import (
 
 type New struct {
 	Delete bool
-	Dedupe bool
 	Count  int
 	// TODO combine organize and edit and refactor
 	Organize  bool
@@ -41,24 +40,21 @@ func init() {
 				false,
 				"delete the zettel and akte after successful checkin",
 			)
-			f.BoolVar(
-				&c.Dedupe,
-				"dedupe",
-				false,
-				"deduplicate added Zettelen based on Akte sha",
-			)
+
 			f.BoolVar(
 				&c.Organize,
 				"organize",
 				false,
 				"open organize",
 			)
+
 			f.BoolVar(
 				&c.Edit,
 				"edit",
 				true,
 				"create a new empty zettel and open EDITOR or VISUAL for editing and then commit the resulting changes",
 			)
+
 			f.IntVar(
 				&c.Count,
 				"count",
@@ -178,7 +174,6 @@ func (c New) readExistingFilesAsZettels(
 		TextParser:  f,
 		Filter:      c.Filter,
 		Delete:      c.Delete,
-		Dedupe:      c.Dedupe,
 		ProtoZettel: c.ProtoZettel,
 	}
 
