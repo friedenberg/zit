@@ -112,6 +112,7 @@ func (s *Store) QueryUnsure(
 		return
 	}
 
+  // TODO create a new query group for all of history
 	qg.SetIncludeHistory()
 
 	if len(selbstMetadateiSansTaiToZettels) > 0 || len(bezToZettels) > 0 {

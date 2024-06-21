@@ -180,6 +180,9 @@ func (c Clean) markUnsureAktenForRemovalIfNecessary(
 	p := u.PrinterCheckedOut()
 	var l sync.Mutex
 
+  // TODO create a new query group for all of history
+	qg.SetIncludeHistory()
+
 	if err = u.GetStore().ReadAllMatchingAkten(
 		qg,
 		u.GetStore().GetCwdFiles().UnsureAkten,
