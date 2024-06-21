@@ -27,7 +27,12 @@ func (c *constructor) Make() (ot *Text, err error) {
 		return
 	}
 
-	c.EtikettSet = c.rootEtiketten
+	if err = c.preparePrefixSetsAndRootsAndExtras(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	// c.EtikettSet = c.rootEtiketten
 
 	if err = c.populate(); err != nil {
 		err = errors.Wrap(err)
@@ -49,21 +54,11 @@ func (c *constructor) Make() (ot *Text, err error) {
 func (c *constructor) collectExplicitAndImplicitFor(
 	skus sku.TransactedSet,
 	re kennung.Etikett,
-	explicit kennung.EtikettMutableSet,
-	implicit kennung.EtikettMutableSet,
-	f schnittstellen.FuncIter[*sku.Transacted],
 ) (explicitCount, implicitCount int, err error) {
 	res := catgut.MakeFromString(re.String())
 
 	if err = skus.Each(
 		func(sk *sku.Transacted) (err error) {
-			if f != nil {
-				if err = f(sk); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-
 			for _, ewp := range sk.Metadatei.Verzeichnisse.Etiketten.All {
 				if ewp.Etikett.String() == sk.Kennung.String() {
 					continue
@@ -77,18 +72,14 @@ func (c *constructor) collectExplicitAndImplicitFor(
 
 				if len(ewp.Parents) == 0 { // TODO use Type
 					explicitCount++
-					explicit.Add(kennung.MustEtikett(ewp.Etikett.String()))
 					break
 				}
 
 				for _, p := range ewp.Parents {
 					if p.Type == etiketten_path.TypeDirect {
 						explicitCount++
-						explicit.Add(kennung.MustEtikett(ewp.Etikett.String()))
 					} else {
 						implicitCount++
-						eString := p.First().String()
-						implicit.Add(kennung.MustEtikett(eString))
 					}
 				}
 			}
@@ -104,35 +95,33 @@ func (c *constructor) collectExplicitAndImplicitFor(
 }
 
 func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
-	implicit := kennung.MakeMutableEtikettSet()
-	explicit := kennung.MakeMutableEtikettSet()
-
-	mes := kennung.MakeMutableEtikettSet()
+	anchored := kennung.MakeMutableEtikettSet()
+	extras := kennung.MakeMutableEtikettSet()
 
 	if err = c.rootEtiketten.Each(
 		func(re kennung.Etikett) (err error) {
-			explicitCount := 0
+			var explicitCount, implicitCount int
 
-			if explicitCount, _, err = c.collectExplicitAndImplicitFor(
+			if explicitCount, implicitCount, err = c.collectExplicitAndImplicitFor(
 				c.Transacted,
 				re,
-				explicit,
-				implicit,
-				nil,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			ui.Debug().Print(explicitCount, c.Transacted.Len())
+			ui.Log().Print(re, "explicit", explicitCount, "implicit", implicitCount)
 
-			if explicitCount != c.Transacted.Len() {
-				return
-			}
-
-			if err = mes.Add(re); err != nil {
-				err = errors.Wrap(err)
-				return
+			if explicitCount == c.Transacted.Len() {
+				if err = anchored.Add(re); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			} else if explicitCount > 0 {
+				if err = extras.Add(re); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 
 			return
@@ -142,9 +131,10 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 		return
 	}
 
-	c.EtikettSet = mes
-	// c.ExtraEtiketten = implicit
+	c.EtikettSet = anchored
+	c.ExtraEtiketten = extras
 
+	// c.ExtraEtiketten = implicit
 	return
 }
 
@@ -154,7 +144,7 @@ func (c *constructor) populate() (err error) {
 	for _, e := range iter.Elements(c.ExtraEtiketten) {
 		ee := c.makeChild(e)
 
-		segments := c.all.Match(e)
+		segments := c.all.Subset(e)
 
 		if err = c.makeChildrenWithPossibleGroups(
 			ee,
@@ -182,7 +172,7 @@ func (c *constructor) populate() (err error) {
 		c.Assignment,
 		c.all,
 		c.GroupingEtiketten,
-		makeObjSet(),
+		allUsed,
 	); err != nil {
 		err = errors.Wrapf(err, "Assignment: %#v", c.Assignment)
 		return

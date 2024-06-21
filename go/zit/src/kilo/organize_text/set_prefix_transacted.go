@@ -194,12 +194,6 @@ func (a PrefixSet) Match(
 		zSet.Each(
 			func(z *obj) (err error) {
 				es := z.GetEtiketten()
-				// var es kennung.EtikettSet
-
-				// if es, err = allEtiketten(z); err != nil {
-				// 	err = errors.Wrap(err)
-				// 	return
-				// }
 
 				intersection := kennung.IntersectPrefixes(
 					es,
