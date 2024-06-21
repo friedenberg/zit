@@ -20,6 +20,36 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+func (s *Store) tryRealize(
+	kinder, mutter *sku.Transacted,
+	o ObjekteOptions,
+) (err error) {
+	if mutter == nil && o.Contains(objekte_mode.ModeApplyProto) {
+		s.protoZettel.Apply(kinder, kinder)
+	}
+
+	if err = s.tryPreCommitHooks(kinder, mutter, o); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	// TODO just just mutter == nil
+	if mutter == nil {
+		if err = s.tryNewHook(kinder, o); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if err = kinder.CalculateObjekteShas(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+// TODO add RealizeAndOrStore result
 func (s *Store) tryRealizeAndOrStore(
 	kinder *sku.Transacted,
 	o ObjekteOptions,
@@ -59,7 +89,7 @@ func (s *Store) tryRealizeAndOrStore(
 
 	var mutter *sku.Transacted
 
-	if mutter, err = s.addMutterIfNecessary(kinder, o); err != nil {
+	if mutter, err = s.fetchMutterIfNecessary(kinder, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -68,25 +98,7 @@ func (s *Store) tryRealizeAndOrStore(
 		defer sku.GetTransactedPool().Put(mutter)
 	}
 
-	ui.Log().Print(kinder, o.SmartString())
-	if mutter == nil && o.Contains(objekte_mode.ModeApplyProto) {
-		s.protoZettel.Apply(kinder, kinder)
-	}
-
-	if err = s.tryPreCommitHooks(kinder, mutter, o); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	// TODO just just mutter == nil
-	if kinder.Metadatei.Mutter().IsNull() {
-		if err = s.tryNewHook(kinder, o); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if err = kinder.CalculateObjekteShas(); err != nil {
+	if err = s.tryRealize(kinder, mutter, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -110,10 +122,10 @@ func (s *Store) tryRealizeAndOrStore(
 		}
 	}
 
-	if mutter != nil &&
+	if o.Mode != objekte_mode.ModeReindex &&
+		mutter != nil &&
 		kennung.Equals(kinder.GetKennung(), mutter.GetKennung()) &&
 		kinder.Metadatei.EqualsSansTai(&mutter.Metadatei) {
-		ui.Log().Printf("equals mutter", kinder)
 
 		if err = kinder.SetFromSkuLike(mutter); err != nil {
 			err = errors.Wrap(err)
@@ -187,7 +199,7 @@ func (s *Store) tryRealizeAndOrStore(
 			return
 		}
 
-		if kinder.Metadatei.Mutter().IsNull() {
+		if mutter == nil {
 			if err = s.New(kinder); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -211,12 +223,11 @@ func (s *Store) tryRealizeAndOrStore(
 	return
 }
 
-func (s *Store) addMutterIfNecessary(
+func (s *Store) fetchMutterIfNecessary(
 	sk *sku.Transacted,
 	ut ObjekteOptions,
 ) (mutter *sku.Transacted, err error) {
-	if !sk.Metadatei.Mutter().IsNull() ||
-		!ut.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
+	if !sk.Metadatei.Mutter().IsNull() {
 		return
 	}
 
@@ -316,7 +327,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 
 	if err = s.tryRealizeAndOrStore(
 		transactedPtr,
-		ObjekteOptions{Mode: objekte_mode.ModeCommit},
+		ObjekteOptions{Mode: objekte_mode.ModeCreate},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -464,34 +475,6 @@ func (s *Store) addTypAndExpanded(
 	return
 }
 
-func (s *Store) addEtikett(
-	e1 kennung.Etikett,
-) (err error) {
-	if e1.IsVirtual() {
-		return
-	}
-
-	if err = s.GetAbbrStore().Etiketten().Exists(e1.Parts()); err == nil {
-		return
-	}
-
-	err = nil
-
-	var k kennung.Kennung2
-
-	if err = k.SetWithKennung(e1); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.createEtikettOrTyp(&k); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (s *Store) addEtikettAndExpanded(
 	e kennung.Etikett,
 ) (err error) {
@@ -501,8 +484,28 @@ func (s *Store) addEtikettAndExpanded(
 
 	etikettenExpanded := kennung.ExpandOneSlice(&e, expansion.ExpanderRight)
 
+	s.etikettenLock.Lock()
+	defer s.etikettenLock.Unlock()
+
 	for _, e1 := range etikettenExpanded {
-		if err = s.addEtikett(e1); err != nil {
+		if e1.IsVirtual() {
+			continue
+		}
+
+		if err = s.GetAbbrStore().Etiketten().Exists(e1.Parts()); err == nil {
+			continue
+		}
+
+		err = nil
+
+		var k kennung.Kennung2
+
+		if err = k.SetWithKennung(e1); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = s.createEtikettOrTyp(&k); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

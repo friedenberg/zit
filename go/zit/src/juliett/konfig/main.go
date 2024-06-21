@@ -251,7 +251,7 @@ func (k *Compiled) AddTransacted(
 	// 	didChange = didChange && mutter != nil
 	// }
 
-	if didChange && (mutter != nil || mode == objekte_mode.ModeEmpty) {
+	if didChange && (mutter != nil || mode.Contains(objekte_mode.ModeSchwanz)) {
 		k.SetHasChanges(fmt.Sprintf("added: %s", kinder))
 	}
 

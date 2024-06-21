@@ -112,8 +112,7 @@ function checkin_complex_zettel_etikett_negation { # @test
 }
 
 function checkin_simple_all { # @test
-	# TODO: modify this to support "." for everything
-	run_zit checkin .z,e,t
+	run_zit checkin .
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md@220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
@@ -144,9 +143,7 @@ function checkin_simple_all { # @test
 }
 
 function checkin_simple_all_dry_run { # @test
-	# TODO fix race condition allowing for one double entry
-	# TODO: modify this to support "." for everything
-	run_zit checkin -dry-run .z,e,t
+	run_zit checkin -dry-run .
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md@220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]

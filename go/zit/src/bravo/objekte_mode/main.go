@@ -24,7 +24,6 @@ const (
 	ModeMergeCheckedOut
 	ModeApplyProto
 	ModeHooks
-	// TODO add hooks modes
 
 	ModeRealize = ModeUpdateTai | ModeApplyProto | ModeHooks
 	ModeReindex = ModeSchwanz

@@ -2,6 +2,7 @@ package store
 
 import (
 	"flag"
+	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
@@ -36,6 +37,7 @@ type Store struct {
 	fileEncoder               sku.FileEncoder
 	virtualStores             map[string]*query.VirtualStoreInitable
 	luaVMPoolBuilder          *lua.VMPoolBuilder
+	etikettenLock             sync.Mutex
 
 	verzeichnisse *store_verzeichnisse.Store
 
