@@ -21,7 +21,7 @@ function zit() (
 flags=(
   # -verbose
   -chrest-enabled=false
-  -predictable-hinweisen 
+  -predictable-hinweisen
 )
 
 zit init "${flags[@]}" -yin "$dir_base/yin" -yang "$dir_base/yang" -age none -compression-type none
@@ -69,4 +69,4 @@ EOM
 
 zit checkin "${flags[@]}" -delete one/uno.zettel
 
-[ "$(zit show -format etiketten one/uno)" = "tag-3, tag-4" ]
+[ "$(zit show "${flags[@]}" -format etiketten one/uno)" = "tag-3, tag-4" ]

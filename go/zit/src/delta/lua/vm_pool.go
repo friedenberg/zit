@@ -2,7 +2,6 @@ package lua
 
 import (
 	"io"
-	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
@@ -10,59 +9,11 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
-func MakeVMPoolWithZitRequire(
-	script string,
-	require LGFunction,
-	apply schnittstellen.FuncIter[*VM],
-) (ml *VMPool, err error) {
-	ml = &VMPool{
-		Require: require,
-	}
-
-	if err = ml.Set(script, apply); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func MakeVMPoolWithZitSearcher(
-	script string,
-	searcher LGFunction,
-	apply schnittstellen.FuncIter[*VM],
-) (ml *VMPool, err error) {
-	ml = &VMPool{
-		Searcher: searcher,
-	}
-
-	if err = ml.Set(script, apply); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 type VMPool struct {
 	schnittstellen.Pool[VM, *VM]
 	Require  LGFunction
 	Searcher LGFunction
 	compiled *lua.FunctionProto
-}
-
-func (sp *VMPool) Set(
-	script string,
-	apply schnittstellen.FuncIter[*VM],
-) (err error) {
-	reader := strings.NewReader(script)
-
-	if err = sp.SetReader(reader, apply); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }
 
 func (sp *VMPool) PrepareVM(
@@ -75,7 +26,7 @@ func (sp *VMPool) PrepareVM(
 			return
 		},
 		func(t *lua.LTable) {
-			// TODO reset table
+			ClearTable(vm.LState, t)
 		},
 	)
 
@@ -123,7 +74,7 @@ func (sp *VMPool) PrepareVM(
 	vm.Top = vm.LState.Get(1)
 	vm.Pop(1)
 
-  return
+	return
 }
 
 func (sp *VMPool) SetReader(

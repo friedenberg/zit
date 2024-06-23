@@ -2,6 +2,7 @@ package chrome
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -9,8 +10,9 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+	"time"
 
-	"code.linenisgreat.com/chrest"
+	"code.linenisgreat.com/chrest/go/chrest"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
@@ -79,7 +81,12 @@ func (c *Chrome) Initialize() (err error) {
 		return
 	}
 
-	if chromeTabsRaw, err = chrest.AskChrome(c.chrestConfig, req); err != nil {
+	ctx, _ := context.WithDeadline(
+		context.Background(),
+		time.Now().Add(time.Duration(1e9)),
+	)
+
+	if chromeTabsRaw, err = chrest.AskChrome(ctx, c.chrestConfig, req); err != nil {
 		if errors.IsErrno(err, syscall.ECONNREFUSED) {
 			if !c.konfig.Quiet {
 				ui.Err().Print("chrest offline")
@@ -153,7 +160,12 @@ func (c *Chrome) Flush() (err error) {
 
 	req.Body = io.NopCloser(b)
 
-	if _, err = chrest.AskChrome(c.chrestConfig, req); err != nil {
+	ctx, _ := context.WithDeadline(
+		context.Background(),
+		time.Now().Add(time.Duration(1e9)),
+	)
+
+	if _, err = chrest.AskChrome(ctx, c.chrestConfig, req); err != nil {
 		if errors.IsErrno(err, syscall.ECONNREFUSED) {
 			ui.Err().Print("chrest offline")
 			err = nil

@@ -62,6 +62,14 @@ func (f *fileNotRecognizedStringWriterFormat) WriteStringFormat(
 		return
 	}
 
+	n1, err = sw.WriteString("@")
+	n += int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	n2, err = f.shaStringFormatWriter.WriteStringFormat(sw, fd.GetShaLike())
 	n += n2
 

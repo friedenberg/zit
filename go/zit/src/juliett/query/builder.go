@@ -15,6 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/zittish"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/akten"
+	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
 func MakeBuilder(
@@ -186,13 +187,17 @@ func (b *Builder) WithCheckedOut(
 
 func (b *Builder) realizeVirtualEtiketten() (err error) {
 	for k, v := range b.virtualEtikettenBeforeInit {
-		ml := Lua{
-			VMPool: b.luaVMPoolBuilder.Build(),
-		}
+		var vmp *lua.VMPool
 
-		if err = ml.Set(v, nil); err != nil {
+		lb := b.luaVMPoolBuilder.Clone().WithScript(v)
+
+		if vmp, err = lb.Build(); err != nil {
 			err = errors.Wrap(err)
 			return
+		}
+
+		ml := Lua{
+			LuaVMPool: sku_fmt.MakeLuaVMPool(vmp, nil),
 		}
 
 		b.virtualEtiketten[k] = ml
@@ -540,9 +545,7 @@ func (b *Builder) makeEtikettOrEtikettLua(
 
 	defer sku.GetTransactedPool().Put(sk)
 
-	lua := Lua{
-		VMPool: b.luaVMPoolBuilder.Build(),
-	}
+	lb := b.luaVMPoolBuilder.Clone().WithApply(MakeSelbstApply(sk))
 
 	// TODO use repo pattern
 	if sk.GetTyp().String() == "lua" {
@@ -555,10 +558,7 @@ func (b *Builder) makeEtikettOrEtikettLua(
 
 		defer errors.DeferredCloser(&err, ar)
 
-		if err = lua.SetReader(ar, MakeSelbstApply(sk)); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		lb.WithReader(ar)
 	} else {
 		var akte *etikett_akte.V1
 
@@ -573,14 +573,21 @@ func (b *Builder) makeEtikettOrEtikettLua(
 			return
 		}
 
-		if err = lua.Set(akte.Filter, MakeSelbstApply(sk)); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
+		lb.WithScript(akte.Filter)
 	}
 
-	exp = &EtikettLua{Lua: &lua, Kennung: k}
+	var vmp *lua.VMPool
+
+	if vmp, err = lb.Build(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	ml := Lua{
+		LuaVMPool: sku_fmt.MakeLuaVMPool(vmp, nil),
+	}
+
+	exp = &EtikettLua{Lua: &ml, Kennung: k}
 
 	return
 }

@@ -17,9 +17,9 @@ func MakeSelbstApply(
 	}
 
 	return func(vm *lua.VM) (err error) {
-		selbstTable := vm.Pool.Get()
+		selbstTable := sku_fmt.MakeLuaTablePool(vm).Get()
 		sku_fmt.ToLuaTable(selbst, vm.LState, selbstTable)
-		vm.SetGlobal("Selbst", selbstTable)
+		vm.SetGlobal("Selbst", selbstTable.Transacted)
 		return
 	}
 }
@@ -29,11 +29,11 @@ func MakeLua(
 	script string,
 	require lua.LGFunction,
 ) (ml Lua, err error) {
-	ml = Lua{
-		VMPool: (&lua.VMPoolBuilder{}).WithRequire(require).Build(),
-	}
+	b := (&lua.VMPoolBuilder{}).
+		WithScript(script).
+		WithRequire(require)
 
-	if err = ml.Set(script, MakeSelbstApply(selbst)); err != nil {
+	if ml, err = MakeLuaFromBuilder(b, selbst); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -41,8 +41,26 @@ func MakeLua(
 	return
 }
 
+func MakeLuaFromBuilder(
+	b *lua.VMPoolBuilder,
+	selbst *sku.Transacted,
+) (l Lua, err error) {
+	b = b.Clone().WithApply(MakeSelbstApply(selbst))
+
+	var vmp *lua.VMPool
+
+	if vmp, err = b.Build(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	l.LuaVMPool = sku_fmt.MakeLuaVMPool(vmp, selbst)
+
+	return
+}
+
 type Lua struct {
-	*lua.VMPool
+	sku_fmt.LuaVMPool
 }
 
 func (matcher Lua) ContainsSku(sk *sku.Transacted) bool {
@@ -52,28 +70,29 @@ func (matcher Lua) ContainsSku(sk *sku.Transacted) bool {
 	var t *lua.LTable
 	var err error
 
-	t, err = vm.GetTopTableOrError()
+	t, err = vm.VM.GetTopTableOrError()
 	if err != nil {
 		ui.Err().Print(err)
 		return false
 	}
 
-	f := vm.GetField(t, "contains_sku").(*lua.LFunction)
+	// TODO safer
+	f := vm.VM.GetField(t, "contains_sku").(*lua.LFunction)
 
-	tSku := vm.Pool.Get()
-	defer vm.Put(tSku)
+	tSku := vm.TablePool.Get()
+	defer vm.TablePool.Put(tSku)
 
-	vm.Push(f)
+	vm.VM.Push(f)
 
 	sku_fmt.ToLuaTable(
 		sk,
-		vm.LState,
+		vm.VM.LState,
 		tSku,
 	)
 
-	vm.Push(tSku)
+	vm.VM.Push(tSku.Transacted)
 
-	err = vm.PCall(1, 1, nil)
+	err = vm.VM.PCall(1, 1, nil)
 	if err != nil {
 		ui.Err().Print(err)
 		return false

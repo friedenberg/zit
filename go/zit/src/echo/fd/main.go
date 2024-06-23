@@ -155,7 +155,7 @@ func (fd *FD) Set(v string) (err error) {
 	var fi os.FileInfo
 
 	if fi, err = os.Stat(v); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Value: %q", v)
 		return
 	}
 
@@ -244,11 +244,16 @@ func (fd *FD) SetPath(p string) (err error) {
 
 func (fd *FD) SetPathRel(p, dir string) (err error) {
 	if p, err = filepath.Rel(dir, p); err != nil {
-		err = errors.Wrapf(err, "path: %q", p)
+		err = errors.Wrapf(err, "Name: %q, Dir: %q", p, dir)
 		return
 	}
 
-	return fd.SetPath(p)
+	if err = fd.SetPath(p); err != nil {
+		err = errors.Wrapf(err, "Name: %q, Dir: %q", p, dir)
+		return
+	}
+
+	return
 }
 
 func (fd *FD) IsDir() bool {

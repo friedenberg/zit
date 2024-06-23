@@ -179,7 +179,7 @@ func OpenExclusiveReadOnly(s string) (f *os.File, err error) {
 	openFilesGuardInstance.Lock()
 
 	if f, err = os.OpenFile(s, os.O_RDONLY|os.O_EXCL, 0o666); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Path: %q", s)
 		return
 	}
 

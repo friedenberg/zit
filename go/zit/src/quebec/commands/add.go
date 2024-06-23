@@ -113,6 +113,13 @@ func (c Add) RunWithQuery(
 		Metadatei: c.Metadatei,
 	}
 
+	if err = u.GetKonfig().DefaultEtiketten.EachPtr(
+		opOrganize.Metadatei.AddEtikettPtr,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = opOrganize.Run(qg, zettelsFromAkteResults); err != nil {
 		err = errors.Wrap(err)
 		return

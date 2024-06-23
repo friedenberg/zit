@@ -1,6 +1,7 @@
 package cwd
 
 import (
+	"io/fs"
 	"os"
 	"path"
 	"path/filepath"
@@ -10,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
@@ -21,19 +23,18 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
 )
 
+// TODO support globs and ignores
 type CwdFiles struct {
 	akteWriterFactory schnittstellen.AkteWriterFactory
 	erworben          *konfig.Compiled
 	dir               string
-	// TODO-P4 make private
-	Zettelen       schnittstellen.MutableSetLike[*Zettel]
-	UnsureZettelen schnittstellen.MutableSetLike[*Zettel]
-	Typen          schnittstellen.MutableSetLike[*Typ]
-	Kisten         schnittstellen.MutableSetLike[*Kasten]
-	Etiketten      schnittstellen.MutableSetLike[*Etikett]
-	// TODO-P4 make set
-	UnsureAkten      fd.MutableSet
-	EmptyDirectories []*fd.FD
+	zettelen          schnittstellen.MutableSetLike[*Zettel]
+	unsureZettelen    schnittstellen.MutableSetLike[*Zettel]
+	typen             schnittstellen.MutableSetLike[*Typ]
+	kisten            schnittstellen.MutableSetLike[*Kasten]
+	etiketten         schnittstellen.MutableSetLike[*Etikett]
+	unsureAkten       fd.MutableSet
+	emptyDirectories  fd.MutableSet
 }
 
 func (fs *CwdFiles) MarkUnsureAkten(f *fd.FD) (err error) {
@@ -42,7 +43,7 @@ func (fs *CwdFiles) MarkUnsureAkten(f *fd.FD) (err error) {
 		return
 	}
 
-	if err = fs.UnsureAkten.Add(f); err != nil {
+	if err = fs.unsureAkten.Add(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -55,7 +56,7 @@ func (fs CwdFiles) EachCreatableMatchable(
 ) (err error) {
 	todo.Parallelize()
 
-	if err = fs.Typen.Each(
+	if err = fs.typen.Each(
 		func(e *Typ) (err error) {
 			return m(e)
 		},
@@ -64,7 +65,7 @@ func (fs CwdFiles) EachCreatableMatchable(
 		return
 	}
 
-	if err = fs.Etiketten.Each(
+	if err = fs.etiketten.Each(
 		func(e *Etikett) (err error) {
 			return m(e)
 		},
@@ -73,7 +74,7 @@ func (fs CwdFiles) EachCreatableMatchable(
 		return
 	}
 
-	if err = fs.Kisten.Each(
+	if err = fs.kisten.Each(
 		func(e *Kasten) (err error) {
 			return m(e)
 		},
@@ -87,11 +88,11 @@ func (fs CwdFiles) EachCreatableMatchable(
 
 func (fs CwdFiles) String() (out string) {
 	if iter.Len(
-		fs.Zettelen,
-		fs.Typen,
-		fs.Kisten,
-		fs.Etiketten,
-		fs.UnsureAkten,
+		fs.zettelen,
+		fs.typen,
+		fs.kisten,
+		fs.etiketten,
+		fs.unsureAkten,
 	) == 0 {
 		return
 	}
@@ -113,31 +114,31 @@ func (fs CwdFiles) String() (out string) {
 		return
 	}
 
-	fs.Zettelen.Each(
+	fs.zettelen.Each(
 		func(z *Zettel) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
 
-	fs.Typen.Each(
+	fs.typen.Each(
 		func(z *Typ) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
 
-	fs.Etiketten.Each(
+	fs.etiketten.Each(
 		func(z *Etikett) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
 
-	fs.Kisten.Each(
+	fs.kisten.Each(
 		func(z *Kasten) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
 
-	fs.UnsureAkten.Each(
+	fs.unsureAkten.Each(
 		func(z *fd.FD) (err error) {
 			return writeOneIfNecessary(z)
 		},
@@ -168,16 +169,16 @@ func (fs CwdFiles) ContainsSku(m *sku.Transacted) bool {
 
 	switch g {
 	case gattung.Zettel:
-		return fs.Zettelen.ContainsKey(m.GetKennung().String())
+		return fs.zettelen.ContainsKey(m.GetKennung().String())
 
 	case gattung.Typ:
-		return fs.Typen.ContainsKey(m.GetKennung().String())
+		return fs.typen.ContainsKey(m.GetKennung().String())
 
 	case gattung.Etikett:
-		return fs.Etiketten.ContainsKey(m.GetKennung().String())
+		return fs.etiketten.ContainsKey(m.GetKennung().String())
 
 	case gattung.Kasten:
-		return fs.Kisten.ContainsKey(m.GetKennung().String())
+		return fs.kisten.ContainsKey(m.GetKennung().String())
 	}
 
 	return true
@@ -186,40 +187,52 @@ func (fs CwdFiles) ContainsSku(m *sku.Transacted) bool {
 func (fs CwdFiles) GetCwdFDs() fd.Set {
 	fds := fd.MakeMutableSet()
 
-	fd.SetAddPairs[*Zettel](fs.Zettelen, fds)
-	fd.SetAddPairs[*Typ](fs.Typen, fds)
-	fd.SetAddPairs[*Etikett](fs.Etiketten, fds)
-	fd.SetAddPairs[*Zettel](fs.UnsureZettelen, fds)
-	fs.UnsureAkten.Each(fds.Add)
+	fd.SetAddPairs(fs.zettelen, fds)
+	fd.SetAddPairs(fs.typen, fds)
+	fd.SetAddPairs(fs.etiketten, fds)
+	fd.SetAddPairs(fs.unsureZettelen, fds)
+	fs.unsureAkten.Each(fds.Add)
 
+	return fds
+}
+
+func (fs CwdFiles) GetUnsureAkten() fd.Set {
+	fds := fd.MakeMutableSet()
+	fs.unsureAkten.Each(fds.Add)
+	return fds
+}
+
+func (fs CwdFiles) GetEmptyDirectories() fd.Set {
+	fds := fd.MakeMutableSet()
+	fs.emptyDirectories.Each(fds.Add)
 	return fds
 }
 
 func (fs CwdFiles) GetZettel(
 	h *kennung.Hinweis,
 ) (z *Zettel, ok bool) {
-	z, ok = fs.Zettelen.Get(h.String())
+	z, ok = fs.zettelen.Get(h.String())
 	return
 }
 
 func (fs CwdFiles) GetKasten(
 	h *kennung.Kasten,
 ) (z *Kasten, ok bool) {
-	z, ok = fs.Kisten.Get(h.String())
+	z, ok = fs.kisten.Get(h.String())
 	return
 }
 
 func (fs CwdFiles) GetEtikett(
 	k *kennung.Etikett,
 ) (e *Etikett, ok bool) {
-	e, ok = fs.Etiketten.Get(k.String())
+	e, ok = fs.etiketten.Get(k.String())
 	return
 }
 
 func (fs CwdFiles) GetTyp(
 	k *kennung.Typ,
 ) (t *Typ, ok bool) {
-	t, ok = fs.Typen.Get(k.String())
+	t, ok = fs.typen.Get(k.String())
 	return
 }
 
@@ -230,16 +243,16 @@ func (fs CwdFiles) Get(
 
 	switch g {
 	case gattung.Kasten:
-		return fs.Kisten.Get(k.String())
+		return fs.kisten.Get(k.String())
 
 	case gattung.Zettel:
-		return fs.Zettelen.Get(k.String())
+		return fs.zettelen.Get(k.String())
 
 	case gattung.Typ:
-		return fs.Typen.Get(k.String())
+		return fs.typen.Get(k.String())
 
 	case gattung.Etikett:
-		return fs.Etiketten.Get(k.String())
+		return fs.etiketten.Get(k.String())
 
 	case gattung.Konfig:
 		// TODO-P3
@@ -257,7 +270,7 @@ func (fs CwdFiles) All(
 
 	iter.ErrorWaitGroupApply(
 		wg,
-		fs.Zettelen,
+		fs.zettelen,
 		func(e *Zettel) (err error) {
 			return f(e)
 		},
@@ -265,7 +278,7 @@ func (fs CwdFiles) All(
 
 	iter.ErrorWaitGroupApply(
 		wg,
-		fs.Typen,
+		fs.typen,
 		func(e *Typ) (err error) {
 			return f(e)
 		},
@@ -273,7 +286,7 @@ func (fs CwdFiles) All(
 
 	iter.ErrorWaitGroupApply(
 		wg,
-		fs.Kisten,
+		fs.kisten,
 		func(e *Kasten) (err error) {
 			return f(e)
 		},
@@ -281,7 +294,7 @@ func (fs CwdFiles) All(
 
 	iter.ErrorWaitGroupApply(
 		wg,
-		fs.Etiketten,
+		fs.etiketten,
 		func(e *Etikett) (err error) {
 			return f(e)
 		},
@@ -297,7 +310,7 @@ func (fs CwdFiles) AllUnsure(
 
 	iter.ErrorWaitGroupApply(
 		wg,
-		fs.UnsureZettelen,
+		fs.unsureZettelen,
 		func(e *Zettel) (err error) {
 			return f(e)
 		},
@@ -308,7 +321,7 @@ func (fs CwdFiles) AllUnsure(
 
 func (fs CwdFiles) ZettelFiles() (out []string, err error) {
 	out, err = iter.DerivedValues(
-		fs.Zettelen,
+		fs.zettelen,
 		func(z *Zettel) (p string, err error) {
 			p = z.GetObjekteFD().GetPath()
 			return
@@ -326,23 +339,25 @@ func makeCwdFiles(
 		akteWriterFactory: st,
 		erworben:          erworben,
 		dir:               st.Cwd(),
-		Kisten: collections_value.MakeMutableValueSet[*Kasten](
+		kisten: collections_value.MakeMutableValueSet[*Kasten](
 			nil,
 		),
-		Typen: collections_value.MakeMutableValueSet[*Typ](nil),
-		Zettelen: collections_value.MakeMutableValueSet[*Zettel](
+		typen: collections_value.MakeMutableValueSet[*Typ](nil),
+		zettelen: collections_value.MakeMutableValueSet[*Zettel](
 			nil,
 		),
-		UnsureZettelen: collections_value.MakeMutableValueSet[*Zettel](
+		unsureZettelen: collections_value.MakeMutableValueSet[*Zettel](
 			nil,
 		),
-		Etiketten: collections_value.MakeMutableValueSet[*Etikett](
+		etiketten: collections_value.MakeMutableValueSet[*Etikett](
 			nil,
 		),
-		UnsureAkten: collections_value.MakeMutableValueSet[*fd.FD](
+		unsureAkten: collections_value.MakeMutableValueSet[*fd.FD](
 			nil,
 		),
-		EmptyDirectories: make([]*fd.FD, 0),
+		emptyDirectories: collections_value.MakeMutableValueSet[*fd.FD](
+			nil,
+		),
 	}
 
 	return
@@ -384,7 +399,7 @@ func (fs *CwdFiles) readInputFiles(args ...string) (err error) {
 		case 0:
 
 		case 1:
-			if err = fs.readFirstLevelFile(parts[0]); err != nil {
+			if err = fs.readNotSecondLevelFile(parts[0]); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -411,10 +426,60 @@ func (fs *CwdFiles) readInputFiles(args ...string) (err error) {
 	return
 }
 
-func (fs *CwdFiles) readAll() (err error) {
+func (cwd *CwdFiles) readAll() (err error) {
+	// TODO use walkdir instead
+	// check for empty directories
+	if err = filepath.WalkDir(
+		cwd.dir,
+		func(p string, d fs.DirEntry, in error) (err error) {
+			if in != nil {
+				err = errors.Wrap(in)
+				return
+			}
+
+			var rel string
+
+			if rel, err = filepath.Rel(cwd.dir, p); err != nil {
+				err = errors.Wrap(in)
+				return
+			}
+
+			dir := filepath.Dir(p)
+			base := filepath.Base(p)
+
+			if strings.HasPrefix(dir, ".") ||
+				strings.HasPrefix(base, ".") ||
+				strings.HasPrefix(rel, ".") {
+				err = filepath.SkipDir
+				return
+			}
+
+			if d.IsDir() {
+				if strings.HasPrefix(p, ".") {
+					err = filepath.SkipDir
+				}
+
+				return
+			}
+
+			levels := files.DirectoriesRelativeTo(rel)
+
+			if len(levels) == 1 {
+				ui.Log().Print("second", rel)
+			} else {
+				ui.Log().Print("not second", rel)
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	var dirs []string
 
-	if dirs, err = files.ReadDirNames(fs.dir); err != nil {
+	if dirs, err = files.ReadDirNames(cwd.dir); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -424,7 +489,7 @@ func (fs *CwdFiles) readAll() (err error) {
 			continue
 		}
 
-		d2 := path.Join(fs.dir, d)
+		d2 := path.Join(cwd.dir, d)
 
 		var fi os.FileInfo
 
@@ -435,7 +500,7 @@ func (fs *CwdFiles) readAll() (err error) {
 
 		var f *fd.FD
 
-		if f, err = fd.FileInfo(fi, fs.dir); err != nil {
+		if f, err = fd.FileInfo(fi, cwd.dir); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -449,18 +514,21 @@ func (fs *CwdFiles) readAll() (err error) {
 			}
 
 			if len(dirs2) == 0 {
-				fs.EmptyDirectories = append(fs.EmptyDirectories, f)
+				if err = cwd.emptyDirectories.Add(f); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 
 			for _, a := range dirs2 {
-				if err = fs.readSecondLevelFile(d2, a); err != nil {
+				if err = cwd.readSecondLevelFile(d2, a); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 			}
 
 		} else if fi.Mode().IsRegular() {
-			if err = fs.readFirstLevelFile(d); err != nil {
+			if err = cwd.readNotSecondLevelFile(d); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -472,10 +540,10 @@ func (fs *CwdFiles) readAll() (err error) {
 
 func (c CwdFiles) MatcherLen() int {
 	return iter.Len(
-		c.Zettelen,
-		c.Typen,
-		c.Kisten,
-		c.Etiketten,
+		c.zettelen,
+		c.typen,
+		c.kisten,
+		c.etiketten,
 	)
 }
 
@@ -485,14 +553,14 @@ func (CwdFiles) Each(_ schnittstellen.FuncIter[sku.Query]) error {
 
 func (c CwdFiles) Len() int {
 	return iter.Len(
-		c.Zettelen,
-		c.Typen,
-		c.Kisten,
-		c.Etiketten,
+		c.zettelen,
+		c.typen,
+		c.kisten,
+		c.etiketten,
 	)
 }
 
-func (fs *CwdFiles) readFirstLevelFile(name string) (err error) {
+func (fs *CwdFiles) readNotSecondLevelFile(name string) (err error) {
 	if strings.HasPrefix(name, ".") {
 		return
 	}
@@ -540,15 +608,33 @@ func (fs *CwdFiles) readFirstLevelFile(name string) (err error) {
 		}
 
 	default:
-		var ut *fd.FD
-
-		if ut, err = fd.MakeFile(fs.dir, name, fs.akteWriterFactory); err != nil {
+		if err = fs.addUnsureAkten("", fullPath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-
-		err = fs.UnsureAkten.Add(ut)
 	}
+
+	return
+}
+
+func (fs *CwdFiles) addUnsureAkten(dir, name string) (err error) {
+	var ut *fd.FD
+
+	fullPath := name
+
+	if dir != "" {
+		fullPath = path.Join(dir, fullPath)
+	}
+
+	if ut, err = fd.MakeFile(
+		fullPath,
+		fs.akteWriterFactory,
+	); err != nil {
+		err = errors.Wrapf(err, "Dir: %q, Name: %q", dir, name)
+		return
+	}
+
+	err = fs.unsureAkten.Add(ut)
 
 	return
 }
@@ -582,8 +668,10 @@ func (fs *CwdFiles) readSecondLevelFile(dir string, name string) (err error) {
 		// Zettel-Akten can have any extension, and so default is Zettel
 	default:
 		if err = fs.tryZettel(dir, name, fullPath, false); err != nil {
-			err = errors.Wrap(err)
-			return
+			if err = fs.addUnsureAkten(dir, name); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 	}
 

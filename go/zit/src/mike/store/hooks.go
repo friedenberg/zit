@@ -186,20 +186,14 @@ func (s *Store) tryPreCommitHook(
 		return
 	}
 
-	var vp LuaVMPool
+	var vp sku_fmt.LuaVMPool
 
 	if vp, err = s.MakeLuaVMPool(selbst, script); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var vm LuaVM
-
-	if vm, err = vp.Get(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
+	vm := vp.Get()
 	defer vp.Put(vm)
 
 	var tt *lua.LTable
@@ -215,8 +209,8 @@ func (s *Store) tryPreCommitHook(
 		return
 	}
 
-	tableKinder := vm.Pool.Get()
-	defer vm.Put(tableKinder)
+	tableKinder := vm.TablePool.Get()
+	defer vm.TablePool.Put(tableKinder)
 
 	sku_fmt.ToLuaTable(
 		kinder,
@@ -224,11 +218,11 @@ func (s *Store) tryPreCommitHook(
 		tableKinder,
 	)
 
-	var tableMutter *lua.LTable
+	var tableMutter *sku_fmt.LuaTable
 
 	if mutter != nil {
-		tableMutter = vm.Pool.Get()
-		defer vm.Put(tableMutter)
+		tableMutter = vm.TablePool.Get()
+		defer vm.TablePool.Put(tableMutter)
 
 		sku_fmt.ToLuaTable(
 			mutter,
@@ -238,8 +232,8 @@ func (s *Store) tryPreCommitHook(
 	}
 
 	vm.Push(f)
-	vm.Push(tableKinder)
-	vm.Push(tableMutter)
+	vm.Push(tableKinder.Transacted)
+	vm.Push(tableMutter.Transacted)
 
 	if err = vm.PCall(2, 1, nil); err != nil {
 		err = errors.Wrap(err)
@@ -270,20 +264,14 @@ func (s *Store) tryHookWithName(
 	script string,
 	name string,
 ) (err error) {
-	var vp LuaVMPool
+	var vp sku_fmt.LuaVMPool
 
 	if vp, err = s.MakeLuaVMPool(selbst, script); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var vm LuaVM
-
-	if vm, err = vp.Get(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
+	vm := vp.Get()
 	defer vp.Put(vm)
 
 	var tt *lua.LTable
@@ -299,8 +287,8 @@ func (s *Store) tryHookWithName(
 		return
 	}
 
-	tableKinder := vm.Pool.Get()
-	defer vm.Put(tableKinder)
+	tableKinder := vm.TablePool.Get()
+	defer vm.TablePool.Put(tableKinder)
 
 	sku_fmt.ToLuaTable(
 		kinder,
@@ -308,11 +296,11 @@ func (s *Store) tryHookWithName(
 		tableKinder,
 	)
 
-	var tableMutter *lua.LTable
+	var tableMutter *sku_fmt.LuaTable
 
 	if mutter != nil {
-		tableMutter = vm.Pool.Get()
-		defer vm.Put(tableMutter)
+		tableMutter = vm.TablePool.Get()
+		defer vm.TablePool.Put(tableMutter)
 
 		sku_fmt.ToLuaTable(
 			mutter,
@@ -322,8 +310,13 @@ func (s *Store) tryHookWithName(
 	}
 
 	vm.Push(f)
-	vm.Push(tableKinder)
-	vm.Push(tableMutter)
+	vm.Push(tableKinder.Transacted)
+
+	if tableMutter != nil {
+		vm.Push(tableMutter.Transacted)
+	} else {
+		vm.Push(nil)
+	}
 
 	if err = vm.PCall(2, 1, nil); err != nil {
 		err = errors.Wrap(err)

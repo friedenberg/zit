@@ -109,8 +109,11 @@ func (c Clean) RunWithQuery(
 	fds := fd.MakeMutableSet()
 	l := &sync.Mutex{}
 
-	for _, d := range u.GetStore().GetCwdFiles().EmptyDirectories {
-		fds.Add(d)
+	if err = u.GetStore().GetCwdFiles().GetEmptyDirectories().Each(
+		fds.Add,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if err = u.GetStore().ReadFiles(
@@ -180,12 +183,12 @@ func (c Clean) markUnsureAktenForRemovalIfNecessary(
 	p := u.PrinterCheckedOut()
 	var l sync.Mutex
 
-  // TODO create a new query group for all of history
+	// TODO create a new query group for all of history
 	qg.SetIncludeHistory()
 
 	if err = u.GetStore().ReadAllMatchingAkten(
 		qg,
-		u.GetStore().GetCwdFiles().UnsureAkten,
+		u.GetStore().GetCwdFiles().GetUnsureAkten(),
 		func(fd *fd.FD, z *sku.Transacted) (err error) {
 			if z == nil {
 				err = u.PrinterFileNotRecognized()(fd)

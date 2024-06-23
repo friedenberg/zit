@@ -28,7 +28,7 @@ func (c *CwdFiles) tryKasten(fi os.FileInfo, dir string) (err error) {
 		return
 	}
 
-	t, ok := c.Kisten.Get(h.String())
+	t, ok := c.kisten.Get(h.String())
 
 	if !ok {
 		t = &sku.ExternalMaybe{}
@@ -41,5 +41,5 @@ func (c *CwdFiles) tryKasten(fi os.FileInfo, dir string) (err error) {
 
 	t.FDs.Objekte.ResetWith(f)
 
-	return c.Kisten.Add(t)
+	return c.kisten.Add(t)
 }

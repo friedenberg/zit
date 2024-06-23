@@ -67,14 +67,15 @@ function add_with_dupe_added { # @test
 		"$f" "$f2"
 
 	assert_success
-	assert_output - <<-EOM
+	assert_output_unsorted - <<-EOM
 		[zz@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox-2022@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox-2022-11@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[zz-inbox-2022-11-14@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add2" zz-inbox-2022-11-14]
-		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add2" zz-inbox-2022-11-14]
+		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add" zz-inbox-2022-11-14]
+		[one/uno@55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add" zz-inbox-2022-11-14]
+		          deleted [to_add.md]
 		          deleted [to_add2.md]
 	EOM
 
@@ -82,7 +83,7 @@ function add_with_dupe_added { # @test
 	assert_success
 	assert_output - <<-EOM
 		---
-		# to_add2
+		# to_add
 		- zz-inbox-2022-11-14
 		! md
 		---

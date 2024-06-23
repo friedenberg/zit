@@ -5,7 +5,6 @@ import (
 	"sort"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
@@ -38,47 +37,46 @@ func (c ZettelFromExternalAkte) Run(
 	defer errors.Deferred(&err, c.Unlock)
 
 	toCreate := objekte_collections.MakeMutableSetUniqueAkte()
-	toDelete := objekte_collections.MakeMutableSetUniqueFD()
+	toDelete := fd.MakeMutableSet()
 
 	results = sku.MakeTransactedMutableSet()
 
-	fds := fd.MakeMutableSetSha()
+	fds := make(map[sha.Bytes][]*fd.FD)
 
-	for _, fd := range iter.SortedValues[*fd.FD](qg.GetCwdFDs()) {
-		if err = c.processOneFD(fd, fds.Add); err != nil {
+	for _, fd := range iter.SortedValues(qg.GetCwdFDs()) {
+		if err = c.processOneFD(fd, fds); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	if err = fds.Each(
-		func(fd *fd.FD) (err error) {
-			var z *sku.External
+	for _, fdsForSha := range fds {
+		sort.Slice(fdsForSha, func(i, j int) bool {
+			return fdsForSha[i].String() < fdsForSha[j].String()
+		})
 
-			if z, err = c.zettelForAkte(fd); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+		var z *sku.External
 
-			if err = toCreate.Add(z); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if !c.Delete {
-				return
-			}
-
-			if err = toDelete.Add(z); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+		if z, err = c.zettelForAkte(fdsForSha); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		if err = toCreate.Add(z); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if !c.Delete {
+			return
+		}
+
+		for _, fd := range fdsForSha {
+			if err = toDelete.Add(fd); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
 	}
 
 	if c.Dedupe {
@@ -167,13 +165,18 @@ func (c ZettelFromExternalAkte) Run(
 	dp := c.Umwelt.PrinterFDDeleted()
 
 	err = toDelete.Each(
-		func(z *sku.External) (err error) {
-			if err = c.Umwelt.Standort().Delete(z.GetAkteFD().GetPath()); err != nil {
+		func(f *fd.FD) (err error) {
+			if err = c.Umwelt.Standort().Delete(f.GetPath()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			return dp(&z.GetFDsPtr().Akte)
+			if err = dp(f); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
 		},
 	)
 	if err != nil {
@@ -185,12 +188,12 @@ func (c ZettelFromExternalAkte) Run(
 }
 
 func (c *ZettelFromExternalAkte) processOneFD(
-	fd *fd.FD,
-	add schnittstellen.FuncIter[*fd.FD],
+	f *fd.FD,
+	fds map[sha.Bytes][]*fd.FD,
 ) (err error) {
 	var r io.Reader
 
-	if r, err = c.Filter.Run(fd.GetPath()); err != nil {
+	if r, err = c.Filter.Run(f.GetPath()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -211,19 +214,20 @@ func (c *ZettelFromExternalAkte) processOneFD(
 		return
 	}
 
-	fd.SetShaLike(akteWriter.GetShaLike())
+	f.SetShaLike(akteWriter.GetShaLike())
 
-	if err = add(fd); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	key := sha.Make(f.GetShaLike()).GetBytes()
+	existing := fds[key]
+	existing = append(existing, f)
+	fds[key] = existing
 
 	return
 }
 
 func (c *ZettelFromExternalAkte) zettelForAkte(
-	akteFD *fd.FD,
+	akteFDs []*fd.FD,
 ) (z *sku.External, err error) {
+	akteFD := akteFDs[0]
 	z = sku.GetExternalPool().Get()
 
 	z.FDs.Akte.ResetWith(akteFD)

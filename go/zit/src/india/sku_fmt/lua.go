@@ -3,18 +3,24 @@ package sku_fmt
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	lua "github.com/yuin/gopher-lua"
 )
 
-func ToLuaTable(o *sku.Transacted, l *lua.LState, t *lua.LTable) {
-	l.SetField(t, "Gattung", lua.LString(o.GetGattung().String()))
-	l.SetField(t, "Kennung", lua.LString(o.GetKennung().String()))
-	l.SetField(t, "Gattung", lua.LString(o.GetGattung().GetGattungString()))
-	l.SetField(t, "Typ", lua.LString(o.GetTyp().String()))
+type LuaTable struct {
+	Transacted        *lua.LTable
+	Etiketten         *lua.LTable
+	EtikettenImplicit *lua.LTable
+}
 
-	etiketten := l.NewTable()
+func ToLuaTable(o *sku.Transacted, l *lua.LState, t *LuaTable) {
+	l.SetField(t.Transacted, "Gattung", lua.LString(o.GetGattung().String()))
+	l.SetField(t.Transacted, "Kennung", lua.LString(o.GetKennung().String()))
+	l.SetField(t.Transacted, "Gattung", lua.LString(o.GetGattung().GetGattungString()))
+	l.SetField(t.Transacted, "Typ", lua.LString(o.GetTyp().String()))
+
+	etiketten := t.Etiketten
 
 	o.Metadatei.GetEtiketten().EachPtr(
 		func(e *kennung.Etikett) (err error) {
@@ -23,9 +29,7 @@ func ToLuaTable(o *sku.Transacted, l *lua.LState, t *lua.LTable) {
 		},
 	)
 
-	l.SetField(t, "Etiketten", etiketten)
-
-	etiketten = l.NewTable()
+	etiketten = t.EtikettenImplicit
 
 	o.Metadatei.Verzeichnisse.GetImplicitEtiketten().EachPtr(
 		func(e *kennung.Etikett) (err error) {
@@ -33,18 +37,18 @@ func ToLuaTable(o *sku.Transacted, l *lua.LState, t *lua.LTable) {
 			return
 		},
 	)
-
-	l.SetField(t, "EtikettenImplicit", etiketten)
 }
 
-func FromLuaTable(o *sku.Transacted, l *lua.LState, t *lua.LTable) (err error) {
-  var g gattung.Gattung
+func FromLuaTable(o *sku.Transacted, l *lua.LState, lt *LuaTable) (err error) {
+	t := lt.Transacted
+
+	var g gattung.Gattung
 	if err = g.Set(l.GetField(t, "Gattung").String()); err != nil {
 		err = errors.Wrap(err)
 		return
-  }
+	}
 
-  o.Kennung.SetGattung(g)
+	o.Kennung.SetGattung(g)
 	k := l.GetField(t, "Kennung").String()
 
 	if err = o.Kennung.Set(k); err != nil {

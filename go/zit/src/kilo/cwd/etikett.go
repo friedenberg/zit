@@ -28,7 +28,7 @@ func (c *CwdFiles) tryEtikett(fi os.FileInfo, dir string) (err error) {
 		return
 	}
 
-	t, ok := c.Etiketten.Get(h.String())
+	t, ok := c.etiketten.Get(h.String())
 
 	if !ok {
 		t = &sku.ExternalMaybe{}
@@ -41,5 +41,5 @@ func (c *CwdFiles) tryEtikett(fi os.FileInfo, dir string) (err error) {
 
 	t.FDs.Objekte.ResetWith(f)
 
-	return c.Etiketten.Add(t)
+	return c.etiketten.Add(t)
 }

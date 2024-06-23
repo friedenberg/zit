@@ -28,7 +28,7 @@ func (c *CwdFiles) tryTyp(fi os.FileInfo, dir string) (err error) {
 		return
 	}
 
-	t, ok := c.Typen.Get(h.String())
+	t, ok := c.typen.Get(h.String())
 
 	if !ok {
 		t = &sku.ExternalMaybe{}
@@ -41,5 +41,5 @@ func (c *CwdFiles) tryTyp(fi os.FileInfo, dir string) (err error) {
 
 	t.FDs.Objekte.ResetWith(f)
 
-	return c.Typen.Add(t)
+	return c.typen.Add(t)
 }

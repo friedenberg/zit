@@ -31,7 +31,7 @@ func (c *CwdFiles) tryZettel(
 		return
 	}
 
-	t, ok := c.Zettelen.Get(h.String())
+	t, ok := c.zettelen.Get(h.String())
 
 	if !ok {
 		t = &sku.ExternalMaybe{}
@@ -55,12 +55,12 @@ func (c *CwdFiles) tryZettel(
 	}
 
 	if unsure {
-		if err = c.UnsureZettelen.Add(t); err != nil {
+		if err = c.unsureZettelen.Add(t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if err = c.Zettelen.Add(t); err != nil {
+		if err = c.zettelen.Add(t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

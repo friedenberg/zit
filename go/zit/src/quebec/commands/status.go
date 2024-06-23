@@ -81,7 +81,7 @@ func (c Status) RunWithQuery(
 
 	if err = u.GetStore().ReadAllMatchingAkten(
 		qg,
-		u.GetStore().GetCwdFiles().UnsureAkten,
+		u.GetStore().GetCwdFiles().GetUnsureAkten(),
 		func(fd *fd.FD, z *sku.Transacted) (err error) {
 			if z == nil {
 				err = u.PrinterFileNotRecognized()(fd)

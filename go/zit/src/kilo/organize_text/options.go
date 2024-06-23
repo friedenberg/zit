@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
@@ -63,6 +64,8 @@ func MakeFlags() Flags {
 }
 
 func MakeFlagsWithMetadatei(m metadatei.Metadatei) Flags {
+	ui.Debug().Print(m.GetEtiketten())
+
 	return Flags{
 		once: &sync.Once{},
 		ExtraEtiketten: collections_ptr.MakeFlagCommas[kennung.Etikett](

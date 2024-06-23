@@ -13,7 +13,7 @@ import (
 
 func (s *Store) MakeLuaVMPoolWithSku(
 	sk *sku.Transacted,
-) (lvp LuaVMPool, err error) {
+) (lvp sku_fmt.LuaVMPool, err error) {
 	if sk.GetTyp().String() != "lua" {
 		err = errors.Errorf("unsupported typ: %s, Sku: %s", sk.GetTyp(), sk)
 		return
@@ -39,14 +39,19 @@ func (s *Store) MakeLuaVMPoolWithSku(
 func (u *Store) MakeLuaVMPool(
 	selbst *sku.Transacted,
 	script string,
-) (vp LuaVMPool, err error) {
-	vp.Transacted = selbst
-	vp.VMPool = u.luaVMPoolBuilder.Build()
+) (vp sku_fmt.LuaVMPool, err error) {
+	b := u.luaVMPoolBuilder.Clone().
+		WithScript(script).
+		WithApply(query.MakeSelbstApply(selbst))
 
-	if err = vp.Set(script, query.MakeSelbstApply(selbst)); err != nil {
+	var lvmp *lua.VMPool
+
+	if lvmp, err = b.Build(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	vp = sku_fmt.MakeLuaVMPool(lvmp, selbst)
 
 	return
 }
@@ -54,64 +59,49 @@ func (u *Store) MakeLuaVMPool(
 func (u *Store) MakeLuaVMPoolWithReader(
 	selbst *sku.Transacted,
 	r io.Reader,
-) (vp LuaVMPool, err error) {
-	vp.Transacted = selbst
-	vp.VMPool = u.luaVMPoolBuilder.Build()
+) (vp sku_fmt.LuaVMPool, err error) {
+	b := u.luaVMPoolBuilder.Clone().
+		WithReader(r).
+		WithApply(query.MakeSelbstApply(selbst))
 
-	if err = vp.SetReader(r, query.MakeSelbstApply(selbst)); err != nil {
+	var lvmp *lua.VMPool
+
+	if lvmp, err = b.Build(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	return
-}
-
-type LuaVMPool struct {
-	*sku.Transacted
-	*lua.VMPool
-}
-
-func (lvm LuaVMPool) Put(vm LuaVM) {
-	// vm.Put(vm.LTable)
-	lvm.VMPool.Put(vm.VM)
-}
-
-func (lvm LuaVMPool) PushTopFunc(
-	args []string,
-) (vm LuaVM, argsOut []string, err error) {
-	vm.VM = lvm.VMPool.Get()
-	vm.LValue = vm.Top
-
-	var f *lua.LFunction
-
-	if f, argsOut, err = vm.GetTopFunctionOrFunctionNamedError(
-		args,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	vm.Push(f)
+	vp = sku_fmt.MakeLuaVMPool(lvmp, selbst)
 
 	return
 }
 
-func (lvm LuaVMPool) Get() (vm LuaVM, err error) {
-	vm.VM = lvm.VMPool.Get()
+// type LuaVMPool struct {
+// 	*sku.Transacted
+// 	*lua.VMPool
+// }
 
-	if vm.LValue, err = vm.GetTopTableOrError(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// func (lvm LuaVMPool) Put(vm LuaVM) {
+// 	// vm.Put(vm.LTable)
+// 	lvm.VMPool.Put(vm.VM)
+// }
 
-	selbstTable := vm.Pool.Get()
-	sku_fmt.ToLuaTable(lvm.Transacted, vm.LState, selbstTable)
-	vm.SetField(vm.LValue, "Selbst", selbstTable)
+// func (lvm LuaVMPool) Get() (vm LuaVM, err error) {
+// 	vm.VM = lvm.VMPool.Get()
 
-	return
-}
+// 	if vm.LValue, err = vm.GetTopTableOrError(); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-type LuaVM struct {
-	*lua.VM
-	lua.LValue
-}
+// 	selbstTable := vm.Pool.Get()
+// 	sku_fmt.ToLuaTable(lvm.Transacted, vm.LState, selbstTable)
+// 	vm.SetField(vm.LValue, "Selbst", selbstTable)
+
+// 	return
+// }
+
+// type LuaVM struct {
+// 	*lua.VM
+// 	lua.LValue
+// }

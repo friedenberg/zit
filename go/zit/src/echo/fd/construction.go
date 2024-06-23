@@ -133,7 +133,7 @@ func MakeFileFromFD(
 	return
 }
 
-func MakeFile(
+func MakeFileRelativeTo(
 	dir string,
 	p string,
 	awf schnittstellen.AkteWriterFactory,
@@ -154,7 +154,27 @@ func MakeFile(
 	}
 
 	if ut, err = MakeFileFromFD(ut, awf); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Path: %q, Dir: %q, FDPath: %q", p, dir, ut.GetPath())
+		return
+	}
+
+	return
+}
+
+func MakeFile(
+	p string,
+	awf schnittstellen.AkteWriterFactory,
+) (ut *FD, err error) {
+	todo.Remove()
+	ut = &FD{}
+
+	if err = ut.Set(p); err != nil {
+		err = errors.Wrapf(err, "path: %q", p)
+		return
+	}
+
+	if ut, err = MakeFileFromFD(ut, awf); err != nil {
+		err = errors.Wrapf(err, "Path: %q", p)
 		return
 	}
 

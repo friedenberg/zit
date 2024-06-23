@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"code.linenisgreat.com/chrest"
+	chrest "code.linenisgreat.com/chrest/src"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
@@ -26,7 +26,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/akten"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
-	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
 func (u *Umwelt) MakeFormatFunc(
@@ -840,20 +839,14 @@ func (u *Umwelt) makeTypFormatter(
 				return
 			}
 
-			var vp store.LuaVMPool
+			var vp sku_fmt.LuaVMPool
 
 			if vp, err = u.GetStore().MakeLuaVMPool(o, script); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			var vm store.LuaVM
-
-			if vm, err = vp.Get(); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+			vm := vp.Get()
 			defer vp.Put(vm)
 
 			f := vm.GetField(vm.Top, "on_pre_commit")
