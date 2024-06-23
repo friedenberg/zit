@@ -205,7 +205,7 @@ func (s *Store) ReadOneSigil(
 	return
 }
 
-func (s Store) ReadAllMatchingAkten(
+func (s *Store) ReadAllMatchingAkten(
 	qg *query.Group,
 	akten fd.Set,
 	f func(*fd.FD, *sku.Transacted) error,

@@ -208,11 +208,11 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	return
 }
 
-func (u Umwelt) Flush() error {
+func (u *Umwelt) Flush() error {
 	return u.age.Close()
 }
 
-func (u Umwelt) PrintMatchedArchiviertIfNecessary() {
+func (u *Umwelt) PrintMatchedArchiviertIfNecessary() {
 	if !u.GetKonfig().PrintOptions.PrintMatchedArchiviert {
 		return
 	}

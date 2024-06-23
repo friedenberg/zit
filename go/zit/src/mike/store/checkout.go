@@ -57,7 +57,7 @@ func (s *Store) CheckoutQuery(
 	return
 }
 
-func (s Store) shouldCheckOut(
+func (s *Store) shouldCheckOut(
 	options checkout_options.Options,
 	cz *sku.CheckedOut,
 	allowMutterMatch bool,
@@ -106,7 +106,7 @@ func (s *Store) PathForTransacted(dir string, tl *sku.Transacted) string {
 	)
 }
 
-func (s Store) filenameForTransacted(
+func (s *Store) filenameForTransacted(
 	options checkout_options.Options,
 	sz *sku.Transacted,
 ) (originalFilename string, filename string, err error) {
