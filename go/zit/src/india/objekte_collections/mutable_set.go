@@ -3,7 +3,7 @@ package objekte_collections
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
+	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 )
 
 type MutableSet = schnittstellen.MutableSetLike[*store_fs.External]

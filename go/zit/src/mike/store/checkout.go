@@ -16,8 +16,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 )
 
 func (s *Store) CheckoutQuery(
@@ -159,7 +159,7 @@ func (s *Store) UpdateCheckoutOneFS(
 	options checkout_options.Options, // TODO CheckoutMode is currently ignored
 	sz *sku.Transacted,
 ) (cz *store_fs.CheckedOut, err error) {
-	var e *store_fs.Zettel
+	var e *store_fs.KennungFDPair
 	ok := false
 
 	if e, ok = s.cwdFiles.Get(&sz.Kennung); !ok {
@@ -182,7 +182,7 @@ func (s *Store) UpdateCheckoutOneFS(
 		e,
 		sz,
 	); err != nil {
-		if errors.Is(err, sku.ErrExternalHasConflictMarker) && options.AllowConflicted {
+		if errors.Is(err, store_fs.ErrExternalHasConflictMarker) && options.AllowConflicted {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -242,7 +242,7 @@ func (s *Store) CheckoutOneFS(
 		return
 	}
 
-	var e *store_fs.Zettel
+	var e *store_fs.KennungFDPair
 	ok := false
 
 	if e, ok = s.cwdFiles.Get(&sz.Kennung); ok {
@@ -255,7 +255,7 @@ func (s *Store) CheckoutOneFS(
 			e,
 			sz,
 		); err != nil {
-			if errors.Is(err, sku.ErrExternalHasConflictMarker) && options.AllowConflicted {
+			if errors.Is(err, store_fs.ErrExternalHasConflictMarker) && options.AllowConflicted {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

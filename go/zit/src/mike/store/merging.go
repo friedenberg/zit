@@ -12,8 +12,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/to_merge"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 )
 
 func (s *Store) readExternalAndMergeIfNecessary(
@@ -71,7 +71,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 		Right:  &co.External.Transacted,
 	}
 
-	var merged sku.FDPair
+	var merged store_fs.FDPair
 
 	merged, err = s.merge(tm)
 
@@ -103,7 +103,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 	return
 }
 
-func (s *Store) merge(tm to_merge.Sku) (merged sku.FDPair, err error) {
+func (s *Store) merge(tm to_merge.Sku) (merged store_fs.FDPair, err error) {
 	if err = tm.MergeEtiketten(); err != nil {
 		err = errors.Wrap(err)
 		return

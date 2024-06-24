@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
+	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 )
 
 func (s *Store) Import(sk *sku.Transacted) (co *store_fs.CheckedOut, err error) {

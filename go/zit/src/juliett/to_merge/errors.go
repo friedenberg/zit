@@ -3,10 +3,10 @@ package to_merge
 import (
 	"fmt"
 
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 )
 
-func MakeErrMergeConflict(sk *sku.FDPair) (err *ErrMergeConflict) {
+func MakeErrMergeConflict(sk *store_fs.FDPair) (err *ErrMergeConflict) {
 	err = &ErrMergeConflict{}
 
 	if sk != nil {
@@ -17,7 +17,7 @@ func MakeErrMergeConflict(sk *sku.FDPair) (err *ErrMergeConflict) {
 }
 
 type ErrMergeConflict struct {
-	sku.FDPair
+	store_fs.FDPair
 }
 
 func (e *ErrMergeConflict) Is(target error) bool {

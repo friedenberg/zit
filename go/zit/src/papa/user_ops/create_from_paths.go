@@ -15,8 +15,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/objekte_collections"
+	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/objekte"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
@@ -43,7 +43,7 @@ func (c CreateFromPaths) Run(
 
 	for _, arg := range args {
 		var z *store_fs.External
-		var t sku.KennungFDPair
+		var t store_fs.KennungFDPair
 
 		t.Kennung.SetGattung(gattung.Zettel)
 
@@ -165,7 +165,7 @@ func (c *CreateFromPaths) zettelsFromPath(
 	}
 
 	ze := store_fs.GetExternalPool().Get()
-	ze.FDs = sku.FDPair{
+	ze.FDs = store_fs.FDPair{
 		Objekte: fd,
 	}
 

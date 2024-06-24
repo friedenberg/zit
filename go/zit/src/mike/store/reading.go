@@ -14,8 +14,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 )
 
 func (s *Store) QueryWithoutCwd(
@@ -50,7 +50,7 @@ func (s *Store) query(
 				return
 			}
 
-			var e *sku.KennungFDPair
+			var e *store_fs.KennungFDPair
 
 			e, ok = s.GetCwdFiles().Get(&z.Kennung)
 
@@ -97,7 +97,7 @@ func (s *Store) query(
 			}
 
 			if includeCwd && m.GetSigil().IncludesCwd() {
-				var e *sku.KennungFDPair
+				var e *store_fs.KennungFDPair
 
 				if e, ok = s.GetCwdFiles().Get(&z.Kennung); ok {
 					var e2 *store_fs.External

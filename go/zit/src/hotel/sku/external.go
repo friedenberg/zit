@@ -71,16 +71,6 @@ func (a *External) AsTransacted() (b Transacted) {
 	return
 }
 
-func (a *External) ResetWithExternalMaybe(
-	b *KennungFDPair,
-) (err error) {
-	k := b.GetKennungLike()
-	a.Kennung.ResetWithKennung(k)
-	metadatei.Resetter.Reset(&a.Metadatei)
-
-	return
-}
-
 func (o *External) GetKey() string {
 	return fmt.Sprintf("%s.%s", o.GetGattung(), o.GetKennung())
 }

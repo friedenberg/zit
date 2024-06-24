@@ -18,7 +18,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
+	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 )
 
 func (s *Store) tryRealize(

@@ -8,8 +8,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 )
 
 // zips a CheckedOutFS from a known internal Sku with whatever Sku that may be
@@ -28,7 +28,7 @@ func (s *Store) CombineOneCheckedOutFS(
 
 	ok := false
 
-	var e *sku.KennungFDPair
+	var e *store_fs.KennungFDPair
 
 	if e, ok = s.cwdFiles.Get(&sk2.Kennung); !ok {
 		err = iter.MakeErrStopIteration()
@@ -46,7 +46,7 @@ func (s *Store) CombineOneCheckedOutFS(
 	); err != nil {
 		if errors.IsNotExist(err) {
 			err = iter.MakeErrStopIteration()
-		} else if errors.Is(err, sku.ErrExternalHasConflictMarker) {
+		} else if errors.Is(err, store_fs.ErrExternalHasConflictMarker) {
 			co.State = checked_out_state.StateConflicted
 			co.External.FDs = e.FDs
 
@@ -119,8 +119,8 @@ func (s *Store) MakeHydrateCheckedOutFS(
 	qg *query.Group,
 	f schnittstellen.FuncIter[*store_fs.CheckedOut],
 	o ObjekteOptions,
-) schnittstellen.FuncIter[*sku.KennungFDPair] {
-	return func(em *sku.KennungFDPair) (err error) {
+) schnittstellen.FuncIter[*store_fs.KennungFDPair] {
+	return func(em *store_fs.KennungFDPair) (err error) {
 		if err = s.HydrateCheckedOutFS(o, qg, em, f); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -133,7 +133,7 @@ func (s *Store) MakeHydrateCheckedOutFS(
 func (s *Store) HydrateCheckedOutFS(
 	o ObjekteOptions,
 	qg *query.Group,
-	em *sku.KennungFDPair,
+	em *store_fs.KennungFDPair,
 	f schnittstellen.FuncIter[*store_fs.CheckedOut],
 ) (err error) {
 	var co *store_fs.CheckedOut

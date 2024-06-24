@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
+	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 )
 
 type ObjekteOptions struct {
@@ -52,7 +52,7 @@ func (s *Store) ReadOneExternal(
 
 func (s *Store) ReadOneCheckedOutFS(
 	o ObjekteOptions,
-	em *sku.KennungFDPair,
+	em *store_fs.KennungFDPair,
 ) (co *store_fs.CheckedOut, err error) {
 	co = store_fs.GetCheckedOutPool().Get()
 
@@ -72,7 +72,7 @@ func (s *Store) ReadOneCheckedOutFS(
 		&co.Internal,
 		&co.External,
 	); err != nil {
-		if errors.Is(err, sku.ErrExternalHasConflictMarker) {
+		if errors.Is(err, store_fs.ErrExternalHasConflictMarker) {
 			err = nil
 			co.State = checked_out_state.StateConflicted
 		} else {
@@ -89,7 +89,7 @@ func (s *Store) ReadOneCheckedOutFS(
 
 func (s *Store) ReadOneExternalFS(
 	o ObjekteOptions,
-	em *sku.KennungFDPair,
+	em *store_fs.KennungFDPair,
 	t *sku.Transacted,
 ) (e *store_fs.External, err error) {
 	e = store_fs.GetExternalPool().Get()
@@ -104,7 +104,7 @@ func (s *Store) ReadOneExternalFS(
 
 func (s *Store) ReadOneExternalInto(
 	o ObjekteOptions,
-	em *sku.KennungFDPair,
+	em *store_fs.KennungFDPair,
 	t *sku.Transacted,
 	e *store_fs.External,
 ) (err error) {

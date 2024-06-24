@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
@@ -49,7 +49,7 @@ func (c Validate) RunWithQuery(
 				return
 			}
 
-			t := &sku.KennungFDPair{}
+			t := &store_fs.KennungFDPair{}
 
 			if err = t.Kennung.SetWithKennung(h); err != nil {
 				err = errors.Wrap(err)
