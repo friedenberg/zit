@@ -1,13 +1,15 @@
 package umwelt
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"strings"
+	"time"
 
-	chrest "code.linenisgreat.com/chrest/src"
+	"code.linenisgreat.com/chrest/go/chrest"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
@@ -421,7 +423,18 @@ func (u *Umwelt) MakeFormatFunc(
 			errors.PanicIfError(err)
 		}
 
-		if chromeTabsRaw, err = chrest.AskChrome(chrestConfig, req); err != nil {
+		ctx, cancel := context.WithDeadline(
+			context.Background(),
+			time.Now().Add(time.Duration(1e9)),
+		)
+
+		defer cancel()
+
+		if chromeTabsRaw, err = chrest.AskChrome(
+			ctx,
+			chrestConfig,
+			req,
+		); err != nil {
 			errors.PanicIfError(err)
 		}
 

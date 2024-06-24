@@ -346,7 +346,7 @@ func (s *Store) RunMergeTool(
 		return
 	}
 
-	if _, err = s.CreateOrUpdateCheckedOut(co, false); err != nil {
+	if _, err = s.CreateOrUpdateCheckedOutFS(co, false); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

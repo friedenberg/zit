@@ -1,12 +1,9 @@
 package user_ops
 
 import (
-	"sync"
-
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -21,9 +18,6 @@ func (c Checkin) Run(
 	u *umwelt.Umwelt,
 	qg query.GroupWithKasten,
 ) (err error) {
-	fds := fd.MakeMutableSet()
-	l := &sync.Mutex{}
-
 	u.Lock()
 	defer errors.Deferred(&err, u.Unlock)
 
@@ -39,7 +33,7 @@ func (c Checkin) Run(
 				err = todo.Implement()
 
 			case *store_fs.CheckedOut:
-				if _, err = u.GetStore().CreateOrUpdateCheckedOut(
+				if _, err = u.GetStore().CreateOrUpdateCheckedOutFS(
 					cot,
 					true,
 				); err != nil {
@@ -47,31 +41,20 @@ func (c Checkin) Run(
 					err = errors.Wrap(err)
 					return
 				}
+			}
 
-				l.Lock()
-				defer l.Unlock()
+			if !c.Delete {
+				return
+			}
 
-				// TODO support generic deletes
-				fds.Add(cot.External.GetObjekteFD())
-				fds.Add(cot.External.GetAkteFD())
+			if err = u.GetStore().DeleteCheckout(col); err != nil {
+				err = errors.Wrap(err)
+				return
 			}
 
 			return
 		},
 	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if !c.Delete {
-		return
-	}
-
-	deleteOp := DeleteCheckout{
-		Umwelt: u,
-	}
-
-	if err = deleteOp.Run(fds); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

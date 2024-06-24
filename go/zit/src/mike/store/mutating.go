@@ -300,7 +300,8 @@ func (s *Store) handleUnchanged(
 	return s.Unchanged(t)
 }
 
-func (s *Store) CreateOrUpdateCheckedOut(
+// TODO add generic
+func (s *Store) CreateOrUpdateCheckedOutFS(
 	co *store_fs.CheckedOut,
 	updateCheckout bool,
 ) (transactedPtr *sku.Transacted, err error) {

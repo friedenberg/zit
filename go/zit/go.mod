@@ -3,7 +3,6 @@ module code.linenisgreat.com/zit/go/zit
 go 1.21.6
 
 require (
-	code.linenisgreat.com/chrest v0.0.0-20240618135250-d9be513b1b76
 	filippo.io/age v1.1.1
 	github.com/DataDog/zstd v1.5.5
 	github.com/brandondube/tai v0.1.0
@@ -16,7 +15,6 @@ require (
 )
 
 require (
-	code.linenisgreat.com/chrest/go/chrest v0.0.0-20240623135220-d8993ab43cdd // indirect
-	github.com/pkg/errors v0.9.1 // indirect
+	code.linenisgreat.com/chrest/go/chrest v0.0.0-20240623175136-220b0978299b // indirect
 	golang.org/x/crypto v0.21.0 // indirect
 )

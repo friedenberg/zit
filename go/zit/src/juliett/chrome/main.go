@@ -81,10 +81,12 @@ func (c *Chrome) Initialize() (err error) {
 		return
 	}
 
-	ctx, _ := context.WithDeadline(
+	ctx, cancel := context.WithDeadline(
 		context.Background(),
 		time.Now().Add(time.Duration(1e9)),
 	)
+
+	defer cancel()
 
 	if chromeTabsRaw, err = chrest.AskChrome(ctx, c.chrestConfig, req); err != nil {
 		if errors.IsErrno(err, syscall.ECONNREFUSED) {

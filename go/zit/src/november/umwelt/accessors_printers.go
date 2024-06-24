@@ -174,6 +174,7 @@ func (u *Umwelt) PrinterFileNotRecognized() schnittstellen.FuncIter[*fd.FD] {
 	)
 }
 
+// TODO make generic external version
 func (u *Umwelt) PrinterFDDeleted() schnittstellen.FuncIter[*fd.FD] {
 	p := kennung_fmt.MakeFDDeletedStringWriterFormat(
 		u.GetKonfig().DryRun,
@@ -183,7 +184,7 @@ func (u *Umwelt) PrinterFDDeleted() schnittstellen.FuncIter[*fd.FD] {
 		),
 	)
 
-	return string_format_writer.MakeDelim[*fd.FD](
+	return string_format_writer.MakeDelim(
 		"\n",
 		u.Out(),
 		p,

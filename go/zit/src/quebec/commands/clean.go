@@ -18,7 +18,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
-	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
 type Clean struct {
@@ -170,11 +169,7 @@ func (c Clean) RunWithQuery(
 		return
 	}
 
-	deleteOp := user_ops.DeleteCheckout{
-		Umwelt: u,
-	}
-
-	if err = deleteOp.Run(fds); err != nil {
+	if err = u.DeleteFiles(fds); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -1,13 +1,9 @@
-code.linenisgreat.com/chrest v0.0.0-20240309214552-f05fb9ce117d h1:mGwGWUcuP0fVTgq4c08sI55ofUBe0AqPyaZ05IRttVU=
-code.linenisgreat.com/chrest v0.0.0-20240309214552-f05fb9ce117d/go.mod h1:apuFTD/nYbsJhjUObf1CcM71xjthUoRhG3ZpVucrI9E=
-code.linenisgreat.com/chrest v0.0.0-20240415144423-276214110ed1 h1:zqMIdIudI1aCNwRBSNR+Xb0NUxw7KOTOCBdG4EbmShw=
-code.linenisgreat.com/chrest v0.0.0-20240415144423-276214110ed1/go.mod h1:apuFTD/nYbsJhjUObf1CcM71xjthUoRhG3ZpVucrI9E=
 code.linenisgreat.com/chrest v0.0.0-20240618135250-d9be513b1b76 h1:8JIR5wB36wliE/MqtgqzOJMzZs7y8EOQGQAzXPnQ2Hw=
 code.linenisgreat.com/chrest v0.0.0-20240618135250-d9be513b1b76/go.mod h1:BMKl/5vdlusfEDmmHfuPqTaKIt2s3AqZy3+fIoyXp3Y=
-code.linenisgreat.com/chrest/go/chrest v0.0.0-20240623133503-c513f1d85693 h1:ocM84zgSE8TpEJCUV6g8sDuU62z84bAEVYUrPb5dK30=
-code.linenisgreat.com/chrest/go/chrest v0.0.0-20240623133503-c513f1d85693/go.mod h1:+pJOHF0PqRK4wTMD6eKz/9dGv7NqUf323fie3q6CbPQ=
 code.linenisgreat.com/chrest/go/chrest v0.0.0-20240623135220-d8993ab43cdd h1:2BvIkLVO1Q05Mg93iGfxPbbJyHAQRJ9G0ZNo87aTQis=
 code.linenisgreat.com/chrest/go/chrest v0.0.0-20240623135220-d8993ab43cdd/go.mod h1:+pJOHF0PqRK4wTMD6eKz/9dGv7NqUf323fie3q6CbPQ=
+code.linenisgreat.com/chrest/go/chrest v0.0.0-20240623175136-220b0978299b h1:eCpSNlWmrbcNd/kbHiD2VV918fY13ncqOZ+ZQskiN58=
+code.linenisgreat.com/chrest/go/chrest v0.0.0-20240623175136-220b0978299b/go.mod h1:+pJOHF0PqRK4wTMD6eKz/9dGv7NqUf323fie3q6CbPQ=
 filippo.io/age v1.1.1 h1:pIpO7l151hCnQ4BdyBujnGP2YlUo0uj6sAVNHGBvXHg=
 filippo.io/age v1.1.1/go.mod h1:l03SrzDUrBkdBx8+IILdnn2KZysqQdbEBUQ4p3sqEQE=
 github.com/DataDog/zstd v1.5.5 h1:oWf5W7GtOLgp6bciQYDmhHHjdhYkALu6S/5Ni9ZgSvQ=
@@ -21,8 +17,6 @@ github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 h1:El6M4kTTCOh6aBiKaU
 github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510/go.mod h1:pupxD2MaaD3pAXIBCelhxNneeOaAeabZDe5s4K6zSpQ=
 github.com/pelletier/go-toml/v2 v2.1.1 h1:LWAJwfNvjQZCFIDKWYQaM62NcYeYViCmWIwmOStowAI=
 github.com/pelletier/go-toml/v2 v2.1.1/go.mod h1:tJU2Z3ZkXwnxa4DPO899bsyIoywizdUvyaeZurnPPDc=
-github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
-github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
@@ -36,8 +30,6 @@ github.com/yuin/gopher-lua v1.1.1 h1:kYKnWBjvbNP4XLT3+bPEwAXJx262OhaHDWDVOPjL46M
 github.com/yuin/gopher-lua v1.1.1/go.mod h1:GBR0iDaNXjAgGg9zfCvksxSRnQx76gclCIb7kdAd1Pw=
 golang.org/x/crypto v0.21.0 h1:X31++rzVUdKhX5sWmSOFZxx8UW/ldWx55cbf08iNAMA=
 golang.org/x/crypto v0.21.0/go.mod h1:0BP7YvVV9gBbVKyeTG0Gyn+gZm94bibOW5BjDEYAOMs=
-golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 h1:LfspQV/FYTatPTr/3HzIcmiUFH7PGP+OQ6mgDYo3yuQ=
-golang.org/x/exp v0.0.0-20240222234643-814bf88cf225/go.mod h1:CxmFvTBINI24O/j8iY7H1xHzx2i4OsyguNBmN/uPtqc=
 golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842 h1:vr/HnozRka3pE4EsMEg1lgkXJkTFJCVUX+S/ZT6wYzM=
 golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842/go.mod h1:XtvwrStGgqGPLc4cjQfWqZHG1YFdYs6swckp8vpsjnc=
 golang.org/x/sys v0.18.0 h1:DBdB3niSjOA/O0blCZBqDefyWNYveAYMNF1Wum0DYQ4=

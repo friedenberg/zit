@@ -20,6 +20,22 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
+func (s *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
+	switch cot := col.(type) {
+	default:
+		err = errors.Errorf("unsupported checkout: %T, %s", cot, cot)
+		return
+
+	case *store_fs.CheckedOut:
+		if err = s.GetCwdFiles().Delete(&cot.External); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
 func (s *Store) CheckoutQuery(
 	options checkout_options.Options,
 	qg *query.Group,

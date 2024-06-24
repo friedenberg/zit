@@ -7,6 +7,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
@@ -40,10 +41,41 @@ type Store struct {
 	unsureAkten       fd.MutableSet
 	emptyDirectories  fd.MutableSet
 
-	deleted fd.MutableSet
+	deleteLock sync.Mutex
+	deleted    fd.MutableSet
 }
 
-func (fs *Store) Flush() (err error) {
+func (fs *Store) Delete(e *External) (err error) {
+	fs.deleteLock.Lock()
+	defer fs.deleteLock.Unlock()
+
+	if err = fs.deleted.Add(e.GetObjekteFD()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = fs.deleted.Add(e.GetAkteFD()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (fs *Store) Flush(
+	dryRun bool,
+	s standort.Standort,
+	p schnittstellen.FuncIter[*fd.FD],
+) (err error) {
+	deleteOp := DeleteCheckout{}
+
+	if err = deleteOp.Run(dryRun, s, p, fs.deleted); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	fs.deleted.Reset()
+
 	return
 }
 
