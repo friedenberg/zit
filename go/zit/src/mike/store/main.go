@@ -19,7 +19,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/akten"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/cwd"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/store_verzeichnisse"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/lima/bestandsaufnahme"
@@ -28,13 +28,13 @@ import (
 type Store struct {
 	konfig                    *konfig.Compiled
 	standort                  standort.Standort
-	cwdFiles                  *cwd.CwdFiles
+	cwdFiles                  *store_fs.Store
 	akten                     *akten.Akten
 	bestandsaufnahmeAkte      bestandsaufnahme.Akte
 	options                   objekte_format.Options
 	Abbr                      AbbrStore
 	persistentMetadateiFormat objekte_format.Format
-	fileEncoder               sku.FileEncoder
+	fileEncoder               store_fs.FileEncoder
 	virtualStores             map[string]*query.VirtualStoreInitable
 	luaVMPoolBuilder          *lua.VMPoolBuilder
 	etikettenLock             sync.Mutex
@@ -43,7 +43,7 @@ type Store struct {
 
 	sonnenaufgang thyme.Time
 
-	checkedOutLogPrinter schnittstellen.FuncIter[*sku.CheckedOutFS]
+	checkedOutLogPrinter schnittstellen.FuncIter[*store_fs.CheckedOut]
 
 	metadateiTextParser metadatei.TextParser
 
@@ -78,12 +78,12 @@ func (c *Store) Initialize(
 	c.persistentMetadateiFormat = pmf
 	c.options = objekte_format.Options{Tai: true}
 	c.sonnenaufgang = t
-	c.fileEncoder = sku.MakeFileEncoder(st, k)
+	c.fileEncoder = store_fs.MakeFileEncoder(st, k)
 	c.virtualStores = virtualStores
 	c.luaVMPoolBuilder = luaVMPoolBuilder
 
-	if c.cwdFiles, err = cwd.MakeCwdFilesAll(
-		k,
+	if c.cwdFiles, err = store_fs.MakeCwdFilesAll(
+		k.FileExtensions,
 		st,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -159,7 +159,7 @@ func (c *Store) Initialize(
 }
 
 func (s *Store) SetCheckedOutLogWriter(
-	zelw schnittstellen.FuncIter[*sku.CheckedOutFS],
+	zelw schnittstellen.FuncIter[*store_fs.CheckedOut],
 ) {
 	s.checkedOutLogPrinter = zelw
 }

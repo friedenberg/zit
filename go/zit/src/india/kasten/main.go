@@ -1,5 +1,5 @@
 package kasten
 
-import "code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+import "code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 
-type CheckedOut = sku.CheckedOutFS
+type CheckedOut = store_fs.CheckedOut

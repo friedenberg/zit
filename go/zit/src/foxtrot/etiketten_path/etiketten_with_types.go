@@ -94,7 +94,7 @@ func (es *Etiketten) AddSelf(e *Etikett) (err error) {
 	}
 
 	p := MakePathWithType(e)
-  p.Type = TypeSelf
+	p.Type = TypeSelf
 
 	if err = es.AddPathWithType(p); err != nil {
 		err = errors.Wrap(err)

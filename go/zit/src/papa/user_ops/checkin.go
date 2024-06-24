@@ -4,10 +4,12 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -17,7 +19,7 @@ type Checkin struct {
 
 func (c Checkin) Run(
 	u *umwelt.Umwelt,
-	qg *query.Group,
+	qg query.GroupWithKasten,
 ) (err error) {
 	fds := fd.MakeMutableSet()
 	l := &sync.Mutex{}
@@ -27,24 +29,32 @@ func (c Checkin) Run(
 
 	ui.Log().Print(qg)
 
-	if err = u.GetStore().ReadExternalFS(
+	if err = u.GetStore().ReadExternal(
 		qg,
-		func(co *sku.CheckedOutFS) (err error) {
-			ui.Log().Print(co)
-			if _, err = u.GetStore().CreateOrUpdateCheckedOut(
-				co,
-				true,
-			); err != nil {
-				ui.Debug().Print(err)
-				err = errors.Wrap(err)
-				return
+		func(col sku.CheckedOutLike) (err error) {
+			ui.Log().Print(col)
+
+			switch cot := col.(type) {
+			default:
+				err = todo.Implement()
+
+			case *store_fs.CheckedOut:
+				if _, err = u.GetStore().CreateOrUpdateCheckedOut(
+					cot,
+					true,
+				); err != nil {
+					ui.Debug().Print(err)
+					err = errors.Wrap(err)
+					return
+				}
+
+				l.Lock()
+				defer l.Unlock()
+
+				// TODO support generic deletes
+				fds.Add(cot.External.GetObjekteFD())
+				fds.Add(cot.External.GetAkteFD())
 			}
-
-			l.Lock()
-			defer l.Unlock()
-
-			fds.Add(co.External.GetObjekteFD())
-			fds.Add(co.External.GetAkteFD())
 
 			return
 		},

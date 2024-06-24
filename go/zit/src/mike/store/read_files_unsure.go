@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 )
 
 type UnsureMatchType byte
@@ -58,9 +59,9 @@ func (s *Store) QueryUnsure(
 
 	var l sync.Mutex
 
-	if err = s.ReadFSUnsure(
+	if err = s.ReadExternalFSUnsure(
 		qg,
-		func(co *sku.CheckedOutFS) (err error) {
+		func(co *store_fs.CheckedOut) (err error) {
 			sh := &co.External.Metadatei.Shas.SelbstMetadateiSansTai
 
 			if sh.IsNull() {
@@ -70,8 +71,8 @@ func (s *Store) QueryUnsure(
 			l.Lock()
 			defer l.Unlock()
 
-			clone := sku.GetCheckedOutPool().Get()
-			sku.CheckedOutResetter.ResetWith(clone, co)
+			clone := store_fs.GetCheckedOutPool().Get()
+			store_fs.CheckedOutResetter.ResetWith(clone, co)
 
 			if o.Contains(UnsureMatchTypeMetadateiSansTaiHistory) {
 				k := sh.GetBytes()

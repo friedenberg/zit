@@ -15,6 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 )
 
 func (s *Store) QueryWithoutCwd(
@@ -57,7 +58,7 @@ func (s *Store) query(
 				return
 			}
 
-			var e2 *sku.ExternalFS
+			var e2 *store_fs.External
 
 			if e2, err = s.ReadOneExternalFS(
 				ObjekteOptions{
@@ -99,7 +100,7 @@ func (s *Store) query(
 				var e *sku.KennungFDPair
 
 				if e, ok = s.GetCwdFiles().Get(&z.Kennung); ok {
-					var e2 *sku.ExternalFS
+					var e2 *store_fs.External
 
 					if e2, err = s.ReadOneExternalFS(
 						ObjekteOptions{

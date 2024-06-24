@@ -14,6 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
@@ -55,7 +56,7 @@ func (c ZettelFromExternalAkte) Run(
 			return fdsForSha[i].String() < fdsForSha[j].String()
 		})
 
-		var z *sku.ExternalFS
+		var z *store_fs.External
 
 		if z, err = c.zettelForAkte(fdsForSha); err != nil {
 			err = errors.Wrap(err)
@@ -122,7 +123,7 @@ func (c ZettelFromExternalAkte) Run(
 		return
 	}
 
-	sortedToCreated := iter.Elements[*sku.ExternalFS](toCreate)
+	sortedToCreated := iter.Elements[*store_fs.External](toCreate)
 
 	sort.Slice(
 		sortedToCreated,
@@ -226,9 +227,9 @@ func (c *ZettelFromExternalAkte) processOneFD(
 
 func (c *ZettelFromExternalAkte) zettelForAkte(
 	akteFDs []*fd.FD,
-) (z *sku.ExternalFS, err error) {
+) (z *store_fs.External, err error) {
 	akteFD := akteFDs[0]
-	z = sku.GetExternalPool().Get()
+	z = store_fs.GetExternalPool().Get()
 
 	z.FDs.Akte.ResetWith(akteFD)
 

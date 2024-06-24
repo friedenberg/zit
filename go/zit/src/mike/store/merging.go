@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/to_merge"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 )
 
 func (s *Store) readExternalAndMergeIfNecessary(
@@ -22,14 +23,14 @@ func (s *Store) readExternalAndMergeIfNecessary(
 		return
 	}
 
-	var co *sku.CheckedOutFS
+	var co *store_fs.CheckedOut
 
 	if co, err = s.CombineOneCheckedOutFS(mutter); err != nil {
 		err = nil
 		return
 	}
 
-	defer sku.GetCheckedOutPool().Put(co)
+	defer store_fs.GetCheckedOutPool().Put(co)
 
 	mutterEqualsExternal := co.InternalAndExternalEqualsSansTai()
 
@@ -51,7 +52,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 			return
 		}
 
-		sku.GetCheckedOutPool().Put(co)
+		store_fs.GetCheckedOutPool().Put(co)
 
 		return
 	}
@@ -108,7 +109,7 @@ func (s *Store) merge(tm to_merge.Sku) (merged sku.FDPair, err error) {
 		return
 	}
 
-	var leftCO, middleCO, rightCO *sku.CheckedOutFS
+	var leftCO, middleCO, rightCO *store_fs.CheckedOut
 
 	inlineAkte := tm.IsAllInlineTyp(s.GetKonfig())
 
@@ -253,7 +254,7 @@ func (s *Store) RunMergeTool(
 		op.CheckoutMode = checkout_mode.ModeObjekteOnly
 	}
 
-	var leftCO, middleCO, rightCO *sku.CheckedOutFS
+	var leftCO, middleCO, rightCO *store_fs.CheckedOut
 
 	if leftCO, err = s.CheckoutOneFS(op, tm.Left); err != nil {
 		err = errors.Wrap(err)
@@ -319,8 +320,8 @@ func (s *Store) RunMergeTool(
 		return
 	}
 
-	e := sku.GetExternalPool().Get()
-	defer sku.GetExternalPool().Put(e)
+	e := store_fs.GetExternalPool().Get()
+	defer store_fs.GetExternalPool().Put(e)
 
 	if err = e.SetFromSkuLike(&leftCO.External); err != nil {
 		err = errors.Wrap(err)
@@ -337,8 +338,8 @@ func (s *Store) RunMergeTool(
 		return
 	}
 
-	co := sku.GetCheckedOutPool().Get()
-	defer sku.GetCheckedOutPool().Put(co)
+	co := store_fs.GetCheckedOutPool().Get()
+	defer store_fs.GetCheckedOutPool().Put(co)
 
 	if err = co.External.SetFromSkuLike(e); err != nil {
 		err = errors.Wrap(err)

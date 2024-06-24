@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
@@ -98,8 +99,8 @@ func (c Status) RunWithQuery(
 			os := sha.Make(z.GetObjekteSha())
 			as := sha.Make(z.GetAkteSha())
 
-			fr := sku.GetCheckedOutPool().Get()
-			defer sku.GetCheckedOutPool().Put(fr)
+			fr := store_fs.GetCheckedOutPool().Get()
+			defer store_fs.GetCheckedOutPool().Put(fr)
 
 			fr.State = checked_out_state.StateRecognized
 

@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/cwd"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
@@ -131,7 +131,7 @@ func (c Add) RunWithQuery(
 func (c Add) openAktenIfNecessary(
 	u *umwelt.Umwelt,
 	zettels sku.TransactedMutableSet,
-	cwd *cwd.CwdFiles,
+	sfs *store_fs.Store,
 ) (err error) {
 	if !c.OpenAkten && c.CheckoutAktenAndRun == "" {
 		return
@@ -146,7 +146,7 @@ func (c Add) openAktenIfNecessary(
 
 	if err = zettels.Each(
 		func(z *sku.Transacted) (err error) {
-			var co *sku.CheckedOutFS
+			var co *store_fs.CheckedOut
 
 			if co, err = u.GetStore().CheckoutOneFS(options, z); err != nil {
 				err = errors.Wrap(err)

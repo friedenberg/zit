@@ -30,8 +30,6 @@ type (
 	TransactedMutableSet = schnittstellen.MutableSetLike[*Transacted]
 	TransactedHeap       = heap.Heap[Transacted, *Transacted]
 
-	CheckedOutFSSet          = schnittstellen.SetLike[*CheckedOutFS]
-	CheckedOutFSMutableSet   = schnittstellen.MutableSetLike[*CheckedOutFS]
 	CheckedOutSet            = schnittstellen.SetLike[*CheckedOut]
 	CheckedOutMutableSet     = schnittstellen.MutableSetLike[*CheckedOut]
 	CheckedOutLikeSet        = schnittstellen.SetLike[CheckedOutLike]
@@ -61,13 +59,6 @@ func MakeTransactedMutableSet() TransactedMutableSet {
 func MakeTransactedMutableSetKennung() TransactedMutableSet {
 	return collections_value.MakeMutableValueSet(
 		KennungKeyer[Transacted, *Transacted]{},
-	)
-}
-
-func MakeCheckedOutFSMutableSet() CheckedOutFSMutableSet {
-	return collections_value.MakeMutableValueSet[*CheckedOutFS](
-		nil,
-		// KennungKeyer[CheckedOut, *CheckedOut]{},
 	)
 }
 

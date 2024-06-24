@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 )
 
 // zips a CheckedOutFS from a known internal Sku with whatever Sku that may be
@@ -17,8 +18,8 @@ import (
 // TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
 func (s *Store) CombineOneCheckedOutFS(
 	sk2 *sku.Transacted,
-) (co *sku.CheckedOutFS, err error) {
-	co = sku.GetCheckedOutPool().Get()
+) (co *store_fs.CheckedOut, err error) {
+	co = store_fs.GetCheckedOutPool().Get()
 
 	if err = co.Internal.SetFromSkuLike(sk2); err != nil {
 		err = errors.Wrap(err)
@@ -34,7 +35,7 @@ func (s *Store) CombineOneCheckedOutFS(
 		return
 	}
 
-	var e2 *sku.ExternalFS
+	var e2 *store_fs.External
 
 	if e2, err = s.ReadOneExternalFS(
 		ObjekteOptions{
@@ -84,7 +85,7 @@ func (s *Store) ReadExternal(
 	default:
 		if err = s.ReadExternalFS(
 			qg.Group,
-			func(cofs *sku.CheckedOutFS) (err error) {
+			func(cofs *store_fs.CheckedOut) (err error) {
 				return f(cofs)
 			},
 		); err != nil {
@@ -98,7 +99,7 @@ func (s *Store) ReadExternal(
 
 func (s *Store) ReadExternalFS(
 	qg *query.Group,
-	f schnittstellen.FuncIter[*sku.CheckedOutFS],
+	f schnittstellen.FuncIter[*store_fs.CheckedOut],
 ) (err error) {
 	o := ObjekteOptions{
 		Mode: objekte_mode.ModeRealize,
@@ -116,7 +117,7 @@ func (s *Store) ReadExternalFS(
 
 func (s *Store) MakeHydrateCheckedOutFS(
 	qg *query.Group,
-	f schnittstellen.FuncIter[*sku.CheckedOutFS],
+	f schnittstellen.FuncIter[*store_fs.CheckedOut],
 	o ObjekteOptions,
 ) schnittstellen.FuncIter[*sku.KennungFDPair] {
 	return func(em *sku.KennungFDPair) (err error) {
@@ -133,9 +134,9 @@ func (s *Store) HydrateCheckedOutFS(
 	o ObjekteOptions,
 	qg *query.Group,
 	em *sku.KennungFDPair,
-	f schnittstellen.FuncIter[*sku.CheckedOutFS],
+	f schnittstellen.FuncIter[*store_fs.CheckedOut],
 ) (err error) {
-	var co *sku.CheckedOutFS
+	var co *store_fs.CheckedOut
 
 	if co, err = s.ReadOneCheckedOutFS(o, em); err != nil {
 		err = errors.Wrapf(err, "%v", em)
@@ -155,9 +156,9 @@ func (s *Store) HydrateCheckedOutFS(
 }
 
 // TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
-func (s *Store) ReadFSUnsure(
+func (s *Store) ReadExternalFSUnsure(
 	qg *query.Group,
-	f schnittstellen.FuncIter[*sku.CheckedOutFS],
+	f schnittstellen.FuncIter[*store_fs.CheckedOut],
 ) (err error) {
 	o := ObjekteOptions{
 		Mode: objekte_mode.ModeRealize,

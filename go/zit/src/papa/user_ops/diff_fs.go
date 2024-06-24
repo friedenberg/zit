@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -26,7 +26,7 @@ type DiffFS struct {
 	Metadatei metadatei.TextFormatter
 }
 
-func (op DiffFS) Run(cofs *sku.CheckedOutFS) (err error) {
+func (op DiffFS) Run(cofs *store_fs.CheckedOut) (err error) {
 	wg := iter.MakeErrorWaitGroupParallel()
 	var mode checkout_mode.Mode
 

@@ -12,8 +12,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
@@ -77,7 +77,7 @@ func (c Edit) RunWithQuery(
 	if err = u.GetStore().CheckoutQuery(
 		options,
 		ms,
-		func(co *sku.CheckedOutFS) (err error) {
+		func(co *store_fs.CheckedOut) (err error) {
 			e := co.External
 
 			if afd := e.GetAkteFD(); afd.String() != "." {
@@ -132,7 +132,12 @@ func (c Edit) RunWithQuery(
 		Delete: c.Delete,
 	}
 
-	if err = op.Run(u, ms); err != nil {
+	if err = op.Run(
+		u,
+		query.GroupWithKasten{
+			Group: ms,
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

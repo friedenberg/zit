@@ -24,7 +24,7 @@ type Getter interface {
 }
 
 type Standort struct {
-	cwd       string
+	store_fs  string
 	basePath  string
 	execPath  string
 	lockSmith schnittstellen.LockSmith
@@ -59,7 +59,7 @@ func Make(
 	s.dryRun = o.DryRun
 	s.basePath = o.BasePath
 	s.debug = o.Debug
-	s.cwd = o.cwd
+	s.store_fs = o.store_fs
 	s.pid = os.Getpid()
 
 	if ok := files.Exists(s.DirZit()); !ok {
@@ -160,7 +160,7 @@ func (s *Standort) Age() *age.Age {
 }
 
 func (s Standort) Cwd() string {
-	return s.cwd
+	return s.store_fs
 }
 
 func (s Standort) Executable() string {

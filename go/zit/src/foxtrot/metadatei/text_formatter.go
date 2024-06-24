@@ -23,8 +23,8 @@ func MakeTextFormatterMetadateiAktePath(
 	}
 
 	common := textFormatterCommon{
-		akteFactory:                akteFactory,
-		akteFormatter:              akteFormatter,
+		akteFactory:          akteFactory,
+		akteFormatter:        akteFormatter,
 		TextFormatterOptions: options,
 	}
 
@@ -50,8 +50,8 @@ func MakeTextFormatterMetadateiOnly(
 	}
 
 	common := textFormatterCommon{
-		akteFactory:                akteFactory,
-		akteFormatter:              akteFormatter,
+		akteFactory:          akteFactory,
+		akteFormatter:        akteFormatter,
 		TextFormatterOptions: options,
 	}
 
@@ -77,8 +77,8 @@ func MakeTextFormatterMetadateiInlineAkte(
 	}
 
 	common := textFormatterCommon{
-		akteFactory:                akteFactory,
-		akteFormatter:              akteFormatter,
+		akteFactory:          akteFactory,
+		akteFormatter:        akteFormatter,
 		TextFormatterOptions: options,
 	}
 

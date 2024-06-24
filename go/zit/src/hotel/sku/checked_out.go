@@ -50,7 +50,7 @@ func (c *CheckedOut) SetState(v checked_out_state.State) (err error) {
 }
 
 func (c *CheckedOut) GetError() error {
-  return c.Error
+	return c.Error
 }
 
 func (c *CheckedOut) DetermineState(justCheckedOut bool) {

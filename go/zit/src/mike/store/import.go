@@ -8,10 +8,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 )
 
-func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOutFS, err error) {
-	co = sku.GetCheckedOutPool().Get()
+func (s *Store) Import(sk *sku.Transacted) (co *store_fs.CheckedOut, err error) {
+	co = store_fs.GetCheckedOutPool().Get()
 	co.IsImport = true
 
 	if err = co.External.Transacted.SetFromSkuLike(sk); err != nil {
@@ -94,7 +95,7 @@ func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOutFS, err error) {
 
 var ErrNeedsMerge = errors.New("needs merge")
 
-func (s *Store) importDoMerge(co *sku.CheckedOutFS) (err error) {
+func (s *Store) importDoMerge(co *store_fs.CheckedOut) (err error) {
 	co.SetError(ErrNeedsMerge)
 	return
 }

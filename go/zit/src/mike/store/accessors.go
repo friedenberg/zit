@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/akten"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/cwd"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/store_verzeichnisse"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/lima/bestandsaufnahme"
@@ -29,11 +29,11 @@ func (s *Store) GetEnnui() ennui.Ennui {
 	return nil
 }
 
-func (s *Store) GetFileEncoder() sku.FileEncoder {
+func (s *Store) GetFileEncoder() store_fs.FileEncoder {
 	return s.fileEncoder
 }
 
-func (s *Store) GetCwdFiles() *cwd.CwdFiles {
+func (s *Store) GetCwdFiles() *store_fs.Store {
 	return s.cwdFiles
 }
 

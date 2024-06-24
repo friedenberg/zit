@@ -15,6 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/lima/bestandsaufnahme"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
@@ -113,7 +114,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	u.Lock()
 	defer u.Unlock()
 
-	var co *sku.CheckedOutFS
+	var co *store_fs.CheckedOut
 
 	for {
 		sk, ok := besty.Skus.Pop()
@@ -166,7 +167,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 func (c Import) importAkteIfNecessary(
 	u *umwelt.Umwelt,
-	co *sku.CheckedOutFS,
+	co *store_fs.CheckedOut,
 	ag *age.Age,
 	coErrPrinter schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {

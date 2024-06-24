@@ -16,6 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 )
 
 type ObjekteOptions struct {
@@ -31,7 +32,7 @@ func (s *Store) ReadOneExternal(
 	switch k1.GetKasten().GetKastenString() {
 	case "chrome":
 		// TODO populate with chrome kasten
-    ui.Debug().Print("would populate from chrome")
+		ui.Debug().Print("would populate from chrome")
 
 	default:
 		e, ok := s.cwdFiles.Get(k1)
@@ -52,8 +53,8 @@ func (s *Store) ReadOneExternal(
 func (s *Store) ReadOneCheckedOutFS(
 	o ObjekteOptions,
 	em *sku.KennungFDPair,
-) (co *sku.CheckedOutFS, err error) {
-	co = sku.GetCheckedOutPool().Get()
+) (co *store_fs.CheckedOut, err error) {
+	co = store_fs.GetCheckedOutPool().Get()
 
 	if err = s.ReadOneInto(&em.Kennung, &co.Internal); err != nil {
 		if collections.IsErrNotFound(err) {
@@ -90,8 +91,8 @@ func (s *Store) ReadOneExternalFS(
 	o ObjekteOptions,
 	em *sku.KennungFDPair,
 	t *sku.Transacted,
-) (e *sku.ExternalFS, err error) {
-	e = sku.GetExternalPool().Get()
+) (e *store_fs.External, err error) {
+	e = store_fs.GetExternalPool().Get()
 
 	if err = s.ReadOneExternalInto(o, em, t, e); err != nil {
 		err = errors.Wrap(err)
@@ -105,7 +106,7 @@ func (s *Store) ReadOneExternalInto(
 	o ObjekteOptions,
 	em *sku.KennungFDPair,
 	t *sku.Transacted,
-	e *sku.ExternalFS,
+	e *store_fs.External,
 ) (err error) {
 	var m checkout_mode.Mode
 
@@ -169,7 +170,7 @@ func (s *Store) ReadOneExternalInto(
 }
 
 func (s *Store) ReadOneExternalObjekte(
-	e *sku.ExternalFS,
+	e *store_fs.External,
 	t *sku.Transacted,
 ) (err error) {
 	if t != nil {
@@ -195,7 +196,7 @@ func (s *Store) ReadOneExternalObjekte(
 
 func (s *Store) ReadOneExternalObjekteReader(
 	r io.Reader,
-	e *sku.ExternalFS,
+	e *store_fs.External,
 ) (err error) {
 	if _, err = s.metadateiTextParser.ParseMetadatei(r, e); err != nil {
 		err = errors.Wrap(err)
@@ -206,7 +207,7 @@ func (s *Store) ReadOneExternalObjekteReader(
 }
 
 func (s *Store) ReadOneExternalAkte(
-	e *sku.ExternalFS,
+	e *store_fs.External,
 	t *sku.Transacted,
 ) (err error) {
 	metadatei.Resetter.ResetWith(&e.Metadatei, t.GetMetadatei())

@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -14,10 +15,10 @@ type Edit struct {
 	*umwelt.Umwelt
 }
 
-func (u Edit) Run(zsc sku.CheckedOutFSSet) (err error) {
+func (u Edit) Run(zsc store_fs.CheckedOutSet) (err error) {
 	var filesZettelen []string
 
-	if filesZettelen, err = sku.ToSliceFilesZettelen(zsc); err != nil {
+	if filesZettelen, err = store_fs.ToSliceFilesZettelen(zsc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -49,7 +50,7 @@ func (u Edit) Run(zsc sku.CheckedOutFSSet) (err error) {
 	col := sku.MakeCheckedOutLikeMutableSet()
 
 	if err = zsc.Each(
-		func(cofs *sku.CheckedOutFS) (err error) {
+		func(cofs *store_fs.CheckedOut) (err error) {
 			if err = col.Add(cofs); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -67,7 +68,12 @@ func (u Edit) Run(zsc sku.CheckedOutFSSet) (err error) {
 		return
 	}
 
-	if err = checkinOp.Run(u.Umwelt, ms); err != nil {
+	if err = checkinOp.Run(
+		u.Umwelt,
+		query.GroupWithKasten{
+			Group: ms,
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

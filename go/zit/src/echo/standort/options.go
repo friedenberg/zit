@@ -11,11 +11,11 @@ type Options struct {
 	BasePath string
 	Debug    debug.Options
 	DryRun   bool
-	cwd      string
+	store_fs string
 }
 
 func (o *Options) Validate() (err error) {
-	if o.cwd, err = os.Getwd(); err != nil {
+	if o.store_fs, err = os.Getwd(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

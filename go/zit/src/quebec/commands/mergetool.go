@@ -9,9 +9,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/to_merge"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -41,14 +41,14 @@ func (c Mergetool) RunWithQuery(
 	if err = u.GetStore().ReadExternalFS(
 		qg,
 		iter.MakeChain(
-			func(co *sku.CheckedOutFS) (err error) {
+			func(co *store_fs.CheckedOut) (err error) {
 				if co.State != checked_out_state.StateConflicted {
 					return iter.MakeErrStopIteration()
 				}
 
 				return
 			},
-			func(co *sku.CheckedOutFS) (err error) {
+			func(co *store_fs.CheckedOut) (err error) {
 				p = append(p, co.External.FDs.MakeConflictMarker())
 				return
 			},

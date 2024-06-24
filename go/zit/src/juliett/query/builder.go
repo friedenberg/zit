@@ -48,7 +48,7 @@ type Builder struct {
 	ennui                      sku.Ennui
 	luaVMPoolBuilder           *lua.VMPoolBuilder
 	preexistingKennung         []*kennung.Kennung2
-	cwd                        Cwd
+	store_fs                   Cwd
 	cwdFilterEnabled           bool
 	fileExtensionGetter        schnittstellen.FileExtensionGetter
 	expanders                  kennung.Abbr
@@ -112,9 +112,9 @@ func (mb *Builder) WithDebug() *Builder {
 }
 
 func (mb *Builder) WithCwd(
-	cwd Cwd,
+	store_fs Cwd,
 ) *Builder {
-	mb.cwd = cwd
+	mb.store_fs = store_fs
 	return mb
 }
 
@@ -259,7 +259,7 @@ func (b *Builder) build(vs ...string) (qg *Group, err error) {
 		func(f *fd.FD) (err error) {
 			var k *kennung.Kennung2
 
-			if k, err = b.cwd.GetKennungForFD(f); err != nil {
+			if k, err = b.store_fs.GetKennungForFD(f); err != nil {
 				if err = newFDS.Add(f); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -321,7 +321,7 @@ func (b *Builder) buildManyFromTokens(
 	tokens ...string,
 ) (err error) {
 	if len(tokens) == 1 && tokens[0] == "." {
-		if err = b.cwd.GetCwdFDs().Each(qg.FDs.Add); err != nil {
+		if err = b.store_fs.GetCwdFDs().Each(qg.FDs.Add); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

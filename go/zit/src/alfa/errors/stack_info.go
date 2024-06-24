@@ -50,7 +50,7 @@ func MakeStackInfoFromFrame(frame runtime.Frame) (si StackInfo) {
 	si.Function = frame.Function
 	si.Package, si.Function = getPackageAndFunctionName(si.Function)
 
-	si.RelFilename, _ = filepath.Rel(cwd, si.Filename)
+	si.RelFilename, _ = filepath.Rel(store_fs, si.Filename)
 
 	return
 }

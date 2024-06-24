@@ -96,7 +96,7 @@ func TestWriteWithoutAkte(t1 *testing.T) {
 	)
 
 	format := metadatei.MakeTextFormatterMetadateiOnly(
-    metadatei.TextFormatterOptions{},
+		metadatei.TextFormatterOptions{},
 		af,
 		nil,
 	)
@@ -138,7 +138,7 @@ func TestWriteWithInlineAkte(t1 *testing.T) {
 	)
 
 	format := metadatei.MakeTextFormatterMetadateiInlineAkte(
-    metadatei.TextFormatterOptions{},
+		metadatei.TextFormatterOptions{},
 		af,
 		nil,
 	)

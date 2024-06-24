@@ -22,7 +22,7 @@ func (p *PathWithType) String() string {
 
 func (a *PathWithType) Clone() (b *PathWithType) {
 	b = MakePathWithType(a.Path...)
-  b.Type = a.Type
+	b.Type = a.Type
 
 	return
 }

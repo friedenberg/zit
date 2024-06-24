@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -19,7 +20,7 @@ type Checkout struct {
 
 func (op Checkout) Run(
 	skus sku.TransactedSet,
-) (zsc sku.CheckedOutFSMutableSet, err error) {
+) (zsc store_fs.CheckedOutMutableSet, err error) {
 	b := op.Umwelt.MakeQueryBuilder(
 		kennung.MakeGattung(gattung.Zettel),
 	).WithTransacted(
@@ -43,16 +44,16 @@ func (op Checkout) Run(
 
 func (op Checkout) RunQuery(
 	qg *query.Group,
-) (zsc sku.CheckedOutFSMutableSet, err error) {
-	zsc = collections_value.MakeMutableValueSet[*sku.CheckedOutFS](nil)
+) (zsc store_fs.CheckedOutMutableSet, err error) {
+	zsc = collections_value.MakeMutableValueSet[*store_fs.CheckedOut](nil)
 
 	if err = op.Umwelt.GetStore().CheckoutQuery(
 		op.Options,
 		qg,
 		iter.MakeAddClonePoolPtrFunc(
 			zsc,
-			sku.GetCheckedOutPool(),
-			sku.CheckedOutResetter,
+			store_fs.GetCheckedOutPool(),
+			store_fs.CheckedOutResetter,
 		),
 	); err != nil {
 		err = errors.Wrap(err)

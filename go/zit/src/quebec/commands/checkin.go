@@ -11,6 +11,7 @@ import (
 )
 
 type Checkin struct {
+	Kasten     kennung.Kasten
 	Delete     bool
 	IgnoreAkte bool
 }
@@ -21,7 +22,10 @@ func init() {
 		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Checkin{}
 
+			f.Var(&c.Kasten, "kasten", "none or Chrome")
+
 			f.BoolVar(&c.Delete, "delete", false, "the checked-out file")
+
 			f.BoolVar(
 				&c.IgnoreAkte,
 				"ignore-akte",
@@ -46,7 +50,13 @@ func (c Checkin) RunWithQuery(
 		Delete: c.Delete,
 	}
 
-	if err = op.Run(u, ms); err != nil {
+	if err = op.Run(
+		u,
+		query.GroupWithKasten{
+			Group:  ms,
+			Kasten: c.Kasten,
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

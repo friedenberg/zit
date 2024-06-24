@@ -6,7 +6,7 @@ import (
 
 type Iter[T any] interface {
 	Each(FuncIter[T]) error
-  Next() (T, bool)
+	Next() (T, bool)
 }
 
 type Delta[T any] interface {

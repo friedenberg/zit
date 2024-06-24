@@ -12,7 +12,6 @@ import (
 
 func init() {
 	gob.Register(Transacted{})
-	gob.Register(ExternalFS{})
 }
 
 type (

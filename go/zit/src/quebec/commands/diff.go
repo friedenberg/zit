@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
@@ -71,7 +72,7 @@ func (c Diff) RunWithQuery(
 		},
 		func(co sku.CheckedOutLike) (err error) {
 			switch cot := co.(type) {
-			case *sku.CheckedOutFS:
+			case *store_fs.CheckedOut:
 				if err = opDiffFS.Run(cot); err != nil {
 					err = errors.Wrap(err)
 					return

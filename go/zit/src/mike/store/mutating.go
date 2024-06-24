@@ -18,6 +18,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 )
 
 func (s *Store) tryRealize(
@@ -300,7 +301,7 @@ func (s *Store) handleUnchanged(
 }
 
 func (s *Store) CreateOrUpdateCheckedOut(
-	co *sku.CheckedOutFS,
+	co *store_fs.CheckedOut,
 	updateCheckout bool,
 ) (transactedPtr *sku.Transacted, err error) {
 	kennungPtr := &co.External.Kennung

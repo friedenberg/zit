@@ -16,6 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/objekte"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
@@ -33,7 +34,7 @@ type CreateFromPaths struct {
 func (c CreateFromPaths) Run(
 	args ...string,
 ) (results sku.TransactedMutableSet, err error) {
-	toCreate := make(map[sha.Bytes]*sku.ExternalFS)
+	toCreate := make(map[sha.Bytes]*store_fs.External)
 	toDelete := objekte_collections.MakeMutableSetUniqueFD()
 
 	o := store.ObjekteOptions{
@@ -41,7 +42,7 @@ func (c CreateFromPaths) Run(
 	}
 
 	for _, arg := range args {
-		var z *sku.ExternalFS
+		var z *store_fs.External
 		var t sku.KennungFDPair
 
 		t.Kennung.SetGattung(gattung.Zettel)
@@ -117,7 +118,7 @@ func (c CreateFromPaths) Run(
 	}
 
 	if err = toDelete.Each(
-		func(z *sku.ExternalFS) (err error) {
+		func(z *store_fs.External) (err error) {
 			// TODO-P2 move to checkout store
 			if err = c.Standort().Delete(z.GetObjekteFD().GetPath()); err != nil {
 				err = errors.Wrap(err)
@@ -143,7 +144,7 @@ func (c CreateFromPaths) Run(
 // TODO remove this
 func (c *CreateFromPaths) zettelsFromPath(
 	p string,
-	wf schnittstellen.FuncIter[*sku.ExternalFS],
+	wf schnittstellen.FuncIter[*store_fs.External],
 ) (err error) {
 	var r io.Reader
 
@@ -163,7 +164,7 @@ func (c *CreateFromPaths) zettelsFromPath(
 		return
 	}
 
-	ze := sku.GetExternalPool().Get()
+	ze := store_fs.GetExternalPool().Get()
 	ze.FDs = sku.FDPair{
 		Objekte: fd,
 	}
@@ -191,7 +192,7 @@ func (c *CreateFromPaths) zettelsFromPath(
 }
 
 func (c CreateFromPaths) handleStoreError(
-	z *sku.ExternalFS,
+	z *store_fs.External,
 	f string,
 	in error,
 ) {

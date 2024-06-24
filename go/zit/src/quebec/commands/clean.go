@@ -15,12 +15,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
 type Clean struct {
+	Kasten kennung.Kasten
+
 	force                     bool
 	includeRecognizedAkten    bool
 	includeRecognizedZettelen bool
@@ -32,6 +35,8 @@ func init() {
 		"clean",
 		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Clean{}
+
+			f.Var(&c.Kasten, "kasten", "none or Chrome")
 
 			f.BoolVar(
 				&c.force,
@@ -122,7 +127,8 @@ func (c Clean) RunWithQuery(
 
 	if err = u.GetStore().ReadExternal(
 		query.GroupWithKasten{
-			Group: qg,
+			Group:  qg,
+			Kasten: c.Kasten,
 		},
 		func(co sku.CheckedOutLike) (err error) {
 			if !c.shouldClean(u, co) {
@@ -131,7 +137,7 @@ func (c Clean) RunWithQuery(
 
 			el := co.GetSkuExternalLike()
 
-			e, ok := el.(*sku.ExternalFS)
+			e, ok := el.(*store_fs.External)
 
 			if !ok {
 				return
@@ -210,8 +216,8 @@ func (c Clean) markUnsureAktenForRemovalIfNecessary(
 			os := sha.Make(z.GetObjekteSha())
 			as := sha.Make(z.GetAkteSha())
 
-			fr := sku.GetCheckedOutPool().Get()
-			defer sku.GetCheckedOutPool().Put(fr)
+			fr := store_fs.GetCheckedOutPool().Get()
+			defer store_fs.GetCheckedOutPool().Put(fr)
 
 			fr.State = checked_out_state.StateRecognized
 
@@ -300,7 +306,7 @@ func (c Clean) markUnsureZettelenForRemovalIfNecessary(
 					defer l.Unlock()
 
 					// TODO add support for other checked out types
-					cofs, ok := fr.(*sku.CheckedOutFS)
+					cofs, ok := fr.(*store_fs.CheckedOut)
 
 					if !ok {
 						return

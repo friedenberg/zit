@@ -17,18 +17,18 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/cwd"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 )
 
 func (s *Store) CheckoutQuery(
 	options checkout_options.Options,
 	qg *query.Group,
-	f schnittstellen.FuncIter[*sku.CheckedOutFS],
+	f schnittstellen.FuncIter[*store_fs.CheckedOut],
 ) (err error) {
 	if err = s.QueryWithCwd(
 		qg,
 		func(t *sku.Transacted) (err error) {
-			var cop *sku.CheckedOutFS
+			var cop *store_fs.CheckedOut
 
 			if cop, err = s.CheckoutOneFS(options, t); err != nil {
 				err = errors.Wrap(err)
@@ -59,7 +59,7 @@ func (s *Store) CheckoutQuery(
 
 func (s *Store) shouldCheckOut(
 	options checkout_options.Options,
-	cz *sku.CheckedOutFS,
+	cz *store_fs.CheckedOut,
 	allowMutterMatch bool,
 ) bool {
 	if options.Force {
@@ -158,22 +158,22 @@ func (s *Store) filenameForTransacted(
 func (s *Store) UpdateCheckoutOneFS(
 	options checkout_options.Options, // TODO CheckoutMode is currently ignored
 	sz *sku.Transacted,
-) (cz *sku.CheckedOutFS, err error) {
-	var e *cwd.Zettel
+) (cz *store_fs.CheckedOut, err error) {
+	var e *store_fs.Zettel
 	ok := false
 
 	if e, ok = s.cwdFiles.Get(&sz.Kennung); !ok {
 		return
 	}
 
-	cz = &sku.CheckedOutFS{}
+	cz = &store_fs.CheckedOut{}
 
 	if err = cz.Internal.SetFromSkuLike(sz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var cze *sku.ExternalFS
+	var cze *store_fs.External
 
 	if cze, err = s.ReadOneExternalFS(
 		ObjekteOptions{
@@ -230,8 +230,8 @@ func (s *Store) UpdateCheckoutOneFS(
 func (s *Store) CheckoutOneFS(
 	options checkout_options.Options,
 	sz *sku.Transacted,
-) (cz *sku.CheckedOutFS, err error) {
-	cz = &sku.CheckedOutFS{}
+) (cz *store_fs.CheckedOut, err error) {
+	cz = &store_fs.CheckedOut{}
 
 	if err = cz.Internal.SetFromSkuLike(sz); err != nil {
 		err = errors.Wrap(err)
@@ -242,11 +242,11 @@ func (s *Store) CheckoutOneFS(
 		return
 	}
 
-	var e *cwd.Zettel
+	var e *store_fs.Zettel
 	ok := false
 
 	if e, ok = s.cwdFiles.Get(&sz.Kennung); ok {
-		var cze *sku.ExternalFS
+		var cze *store_fs.External
 
 		if cze, err = s.ReadOneExternalFS(
 			ObjekteOptions{
@@ -295,7 +295,7 @@ func (s *Store) CheckoutOneFS(
 
 func (s *Store) checkoutOne(
 	options checkout_options.Options,
-	cz *sku.CheckedOutFS,
+	cz *store_fs.CheckedOut,
 ) (err error) {
 	if s.GetKonfig().DryRun {
 		return

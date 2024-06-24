@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
@@ -132,7 +133,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			},
 		}
 
-		var zsc sku.CheckedOutFSMutableSet
+		var zsc store_fs.CheckedOutMutableSet
 
 		if zsc, err = opCheckout.Run(zts); err != nil {
 			err = errors.Wrap(err)

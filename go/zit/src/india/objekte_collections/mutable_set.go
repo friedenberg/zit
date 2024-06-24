@@ -3,14 +3,14 @@ package objekte_collections
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 )
 
-type MutableSet = schnittstellen.MutableSetLike[*sku.ExternalFS]
+type MutableSet = schnittstellen.MutableSetLike[*store_fs.External]
 
 type KeyerHinweis struct{}
 
-func (k KeyerHinweis) GetKey(z *sku.ExternalFS) string {
+func (k KeyerHinweis) GetKey(z *store_fs.External) string {
 	if z == nil {
 		return ""
 	}
@@ -18,15 +18,15 @@ func (k KeyerHinweis) GetKey(z *sku.ExternalFS) string {
 	return z.GetKennung().String()
 }
 
-func MakeMutableSetUniqueHinweis(zs ...*sku.ExternalFS) MutableSet {
-	return collections_value.MakeMutableValueSet[*sku.ExternalFS](
+func MakeMutableSetUniqueHinweis(zs ...*store_fs.External) MutableSet {
+	return collections_value.MakeMutableValueSet[*store_fs.External](
 		KeyerHinweis{},
 		zs...)
 }
 
 type KeyerFD struct{}
 
-func (k KeyerFD) GetKey(z *sku.ExternalFS) string {
+func (k KeyerFD) GetKey(z *store_fs.External) string {
 	if z == nil {
 		return ""
 	}
@@ -34,15 +34,15 @@ func (k KeyerFD) GetKey(z *sku.ExternalFS) string {
 	return z.String()
 }
 
-func MakeMutableSetUniqueFD(zs ...*sku.ExternalFS) MutableSet {
-	return collections_value.MakeMutableValueSet[*sku.ExternalFS](
+func MakeMutableSetUniqueFD(zs ...*store_fs.External) MutableSet {
+	return collections_value.MakeMutableValueSet[*store_fs.External](
 		KeyerFD{},
 		zs...)
 }
 
 type KeyerStored struct{}
 
-func (k KeyerStored) GetKey(z *sku.ExternalFS) string {
+func (k KeyerStored) GetKey(z *store_fs.External) string {
 	if z == nil {
 		return ""
 	}
@@ -54,15 +54,15 @@ func (k KeyerStored) GetKey(z *sku.ExternalFS) string {
 	return z.GetObjekteSha().String()
 }
 
-func MakeMutableSetUniqueStored(zs ...*sku.ExternalFS) MutableSet {
-	return collections_value.MakeMutableValueSet[*sku.ExternalFS](
+func MakeMutableSetUniqueStored(zs ...*store_fs.External) MutableSet {
+	return collections_value.MakeMutableValueSet[*store_fs.External](
 		KeyerStored{},
 		zs...)
 }
 
 type KeyerAkte struct{}
 
-func (k KeyerAkte) GetKey(z *sku.ExternalFS) string {
+func (k KeyerAkte) GetKey(z *store_fs.External) string {
 	if z == nil {
 		return ""
 	}
@@ -76,8 +76,8 @@ func (k KeyerAkte) GetKey(z *sku.ExternalFS) string {
 	return sh.String()
 }
 
-func MakeMutableSetUniqueAkte(zs ...*sku.ExternalFS) MutableSet {
-	return collections_value.MakeMutableValueSet[*sku.ExternalFS](
+func MakeMutableSetUniqueAkte(zs ...*store_fs.External) MutableSet {
+	return collections_value.MakeMutableValueSet[*store_fs.External](
 		KeyerAkte{},
 		zs...)
 }

@@ -24,7 +24,7 @@ type Logger interface {
 }
 
 var (
-	cwd          string
+	store_fs     string
 	isTest       bool
 	maxCallDepth int
 )
@@ -32,7 +32,7 @@ var (
 func init() {
 	var err error
 
-	if cwd, err = os.Getwd(); err != nil {
+	if store_fs, err = os.Getwd(); err != nil {
 		log_package.Panic(err)
 	}
 

@@ -15,6 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
@@ -212,14 +213,14 @@ func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[string] {
 	}
 }
 
-func (u *Umwelt) PrinterCheckedOutFS() schnittstellen.FuncIter[*sku.CheckedOutFS] {
+func (u *Umwelt) PrinterCheckedOutFS() schnittstellen.FuncIter[*store_fs.CheckedOut] {
 	coOut := u.FormatColorOptionsOut()
 	coErr := u.FormatColorOptionsErr()
 
 	err := string_format_writer.MakeDelim(
 		"\n",
 		u.Err(),
-		sku_fmt.MakeCliCheckedOutFormat(
+		store_fs.MakeCliCheckedOutFormat(
 			u.konfig.PrintOptions,
 			u.StringFormatWriterShaLike(coErr),
 			kennung_fmt.MakeFDCliFormat(
@@ -231,10 +232,10 @@ func (u *Umwelt) PrinterCheckedOutFS() schnittstellen.FuncIter[*sku.CheckedOutFS
 		),
 	)
 
-	out := string_format_writer.MakeDelim[*sku.CheckedOutFS](
+	out := string_format_writer.MakeDelim[*store_fs.CheckedOut](
 		"\n",
 		u.Out(),
-		sku_fmt.MakeCliCheckedOutFormat(
+		store_fs.MakeCliCheckedOutFormat(
 			u.konfig.PrintOptions,
 			u.StringFormatWriterShaLike(coOut),
 			kennung_fmt.MakeFDCliFormat(
@@ -246,7 +247,7 @@ func (u *Umwelt) PrinterCheckedOutFS() schnittstellen.FuncIter[*sku.CheckedOutFS
 		),
 	)
 
-	return func(co *sku.CheckedOutFS) error {
+	return func(co *store_fs.CheckedOut) error {
 		if co.State == checked_out_state.StateError {
 			return err(co)
 		} else {
@@ -262,7 +263,7 @@ func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[sku.CheckedOutL
 	err := string_format_writer.MakeDelim(
 		"\n",
 		u.Err(),
-		sku_fmt.MakeCliCheckedOutLikeFormat(
+		store_fs.MakeCliCheckedOutLikeFormat(
 			u.konfig.PrintOptions,
 			u.StringFormatWriterShaLike(coErr),
 			kennung_fmt.MakeFDCliFormat(
@@ -277,7 +278,7 @@ func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[sku.CheckedOutL
 	out := string_format_writer.MakeDelim[sku.CheckedOutLike](
 		"\n",
 		u.Out(),
-		sku_fmt.MakeCliCheckedOutLikeFormat(
+		store_fs.MakeCliCheckedOutLikeFormat(
 			u.konfig.PrintOptions,
 			u.StringFormatWriterShaLike(coOut),
 			kennung_fmt.MakeFDCliFormat(
