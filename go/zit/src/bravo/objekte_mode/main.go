@@ -25,10 +25,11 @@ const (
 	ModeApplyProto
 	ModeHooks
 
-	ModeRealize = ModeUpdateTai | ModeApplyProto | ModeHooks
-	ModeReindex = ModeSchwanz
-	ModeCommit  = ModeReindex | ModeAddToBestandsaufnahme | ModeHooks
-	ModeCreate  = ModeCommit | ModeApplyProto
+	ModeRealizeWithProto = ModeUpdateTai | ModeApplyProto | ModeHooks
+	ModeRealizeSansProto = ModeUpdateTai | ModeHooks
+	ModeReindex          = ModeSchwanz
+	ModeCommit           = ModeReindex | ModeAddToBestandsaufnahme | ModeHooks
+	ModeCreate           = ModeCommit | ModeApplyProto
 )
 
 func (i Mode) SmartString() string {
@@ -55,6 +56,14 @@ func (i Mode) SmartString() string {
 	}
 
 	return sb.String()
+}
+
+func (a *Mode) Add(b Mode) {
+	*a |= b
+}
+
+func (a *Mode) Del(b Mode) {
+	*a &= ^b
 }
 
 func (a Mode) Contains(b Mode) bool {

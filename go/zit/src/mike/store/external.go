@@ -3,6 +3,7 @@ package store
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
@@ -96,15 +97,17 @@ func (s *Store) ReadOneExternalInto(
 	t *sku.Transacted,
 	e *store_fs.External,
 ) (err error) {
-  if err = s.cwdFiles.ReadOneExternalInto(
-    &o,
-    em,
-    t,
-    e,
-  ); err != nil {
+	o.Del(objekte_mode.ModeApplyProto)
+
+	if err = s.cwdFiles.ReadOneExternalInto(
+		&o,
+		em,
+		t,
+		e,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
-  }
+	}
 
 	if err = s.tryRealizeAndOrStore(
 		&e.Transacted,

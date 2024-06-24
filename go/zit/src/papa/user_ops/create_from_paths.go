@@ -38,7 +38,7 @@ func (c CreateFromPaths) Run(
 	toDelete := objekte_collections.MakeMutableSetUniqueFD()
 
 	o := store.ObjekteOptions{
-		Mode: objekte_mode.ModeRealize,
+		Mode: objekte_mode.ModeRealizeWithProto,
 	}
 
 	for _, arg := range args {

@@ -102,7 +102,7 @@ func (s *Store) ReadExternalFS(
 	f schnittstellen.FuncIter[*store_fs.CheckedOut],
 ) (err error) {
 	o := ObjekteOptions{
-		Mode: objekte_mode.ModeRealize,
+		Mode: objekte_mode.ModeRealizeSansProto,
 	}
 
 	if err = s.cwdFiles.All(
@@ -161,7 +161,7 @@ func (s *Store) ReadExternalFSUnsure(
 	f schnittstellen.FuncIter[*store_fs.CheckedOut],
 ) (err error) {
 	o := ObjekteOptions{
-		Mode: objekte_mode.ModeRealize,
+		Mode: objekte_mode.ModeRealizeWithProto,
 	}
 
 	if err = s.cwdFiles.AllUnsure(

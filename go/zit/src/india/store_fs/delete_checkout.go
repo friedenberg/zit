@@ -6,8 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
@@ -19,97 +18,102 @@ func (c DeleteCheckout) Run(
 	dryRun bool,
 	s standort.Standort,
 	p schnittstellen.FuncIter[*fd.FD],
-	fs schnittstellen.Iterable[*fd.FD],
+	fs schnittstellen.Iterable[*fd.FD], // TODO switch to sorted slice
 ) (err error) {
+	els := iter.ElementsSorted(
+		fs,
+		func(i, j *fd.FD) bool {
+			return i.String() < j.String()
+		},
+	)
+
 	if dryRun {
-		if err = fs.Each(p); err != nil {
-			err = errors.Wrap(err)
-			return
+		for _, f := range els {
+			if err = p(f); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 
 		return
 	}
 
-	dirs := collections_value.MakeMutableValueSet[values.String](nil)
+	dirs := make([]string, 0)
 
-	if err = fs.Each(
-		func(fd *fd.FD) (err error) {
-			path := fd.String()
+	for _, fd := range els {
+		path := fd.String()
 
-			if path == "." {
+		if path == "." {
+			continue
+		}
+
+		if pRel, pErr := filepath.Rel(s.Cwd(), fd.String()); pErr == nil {
+			path = pRel
+		}
+
+		func() {
+			if fd.IsDir() && fd.GetPath() != s.Cwd() {
+				dirs = append(dirs, fd.GetPath())
 				return
 			}
 
-			if pRel, pErr := filepath.Rel(s.Cwd(), fd.String()); pErr == nil {
-				path = pRel
+			dir := filepath.Dir(path)
+
+			if dir == s.Cwd() {
+				return
 			}
 
-			func() {
-				if fd.IsDir() && fd.GetPath() != s.Cwd() {
-					dirs.Add(values.MakeString(fd.GetPath()))
-					return
-				}
+			dirs = append(dirs, dir)
+		}()
 
-				dir := filepath.Dir(path)
-
-				if dir == s.Cwd() {
-					return
-				}
-
-				dirs.Add(values.MakeString(dir))
-			}()
-
-			if err = s.Delete(path); err != nil {
-				if errors.IsNotExist(err) {
-					err = nil
-				} else {
-					err = errors.Wrapf(err, "FD: %s", fd)
-					return
-				}
+		if err = s.Delete(path); err != nil {
+			if errors.IsNotExist(err) {
+				err = nil
+			} else {
+				err = errors.Wrapf(err, "FD: %s", fd)
+				return
 			}
+		}
 
-			return p(fd)
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		if err = p(fd); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
-	if err = dirs.Each(
-		func(d values.String) (err error) {
-			var contents []os.DirEntry
+	for _, d := range dirs {
+		var contents []os.DirEntry
 
-			if contents, err = files.ReadDir(d.String()); err != nil {
-				if errors.IsNotExist(err) {
-					err = nil
-				} else {
-					err = errors.Wrapf(err, "Dir: %s", d)
-				}
-
-				return
+		if contents, err = files.ReadDir(d); err != nil {
+			if errors.IsNotExist(err) {
+				err = nil
+			} else {
+				err = errors.Wrapf(err, "Dir: %s", d)
 			}
 
-			if len(contents) != 0 {
-				return
-			}
+			continue
+		}
 
-			if err = s.Delete(d.String()); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+		if len(contents) != 0 {
+			continue
+		}
 
-			var f *fd.FD
+		if err = s.Delete(d); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-			if f, err = fd.FDFromDir(d.String()); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+		var f *fd.FD
 
-			return p(f)
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		if f, err = fd.FDFromDir(d); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = p(f); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
