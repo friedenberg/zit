@@ -90,6 +90,10 @@ func (c *Store) Initialize(
 		return
 	}
 
+	// c.virtualStores[""] = &query.VirtualStoreInitable{
+	// 	VirtualStore: c.cwdFiles,
+	// }
+
 	c.metadateiTextParser = metadatei.MakeTextParser(
 		c.standort,
 		nil, // TODO-P1 make akteFormatter

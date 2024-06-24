@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
@@ -12,6 +13,11 @@ import (
 
 func init() {
 	gob.Register(Transacted{})
+}
+
+type ObjekteOptions struct {
+	objekte_mode.Mode
+	kennung.Clock
 }
 
 type (

@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
@@ -21,6 +20,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/echo/zittish"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -30,16 +30,17 @@ func init() {
 
 // TODO support globs and ignores
 type Store struct {
-	akteWriterFactory schnittstellen.AkteWriterFactory
-	fileExtensions    file_extensions.FileExtensions
-	dir               string
-	zettelen          schnittstellen.MutableSetLike[*KennungFDPair]
-	unsureZettelen    schnittstellen.MutableSetLike[*KennungFDPair]
-	typen             schnittstellen.MutableSetLike[*KennungFDPair]
-	kisten            schnittstellen.MutableSetLike[*KennungFDPair]
-	etiketten         schnittstellen.MutableSetLike[*KennungFDPair]
-	unsureAkten       fd.MutableSet
-	emptyDirectories  fd.MutableSet
+	metadateiTextParser metadatei.TextParser
+	standort            standort.Standort
+	fileExtensions      file_extensions.FileExtensions
+	dir                 string
+	zettelen            schnittstellen.MutableSetLike[*KennungFDPair]
+	unsureZettelen      schnittstellen.MutableSetLike[*KennungFDPair]
+	typen               schnittstellen.MutableSetLike[*KennungFDPair]
+	kisten              schnittstellen.MutableSetLike[*KennungFDPair]
+	etiketten           schnittstellen.MutableSetLike[*KennungFDPair]
+	unsureAkten         fd.MutableSet
+	emptyDirectories    fd.MutableSet
 
 	deleteLock sync.Mutex
 	deleted    fd.MutableSet
@@ -80,7 +81,7 @@ func (fs *Store) Flush(
 }
 
 func (fs *Store) MarkUnsureAkten(f *fd.FD) (err error) {
-	if f, err = fd.MakeFileFromFD(f, fs.akteWriterFactory); err != nil {
+	if f, err = fd.MakeFileFromFD(f, fs.standort); err != nil {
 		err = errors.Wrapf(err, "%q", f)
 		return
 	}
@@ -338,60 +339,6 @@ func (fs Store) ZettelFiles() (out []string, err error) {
 	return
 }
 
-func makeCwdFiles(
-	fileExtensions file_extensions.FileExtensions,
-	st standort.Standort,
-) (fs *Store) {
-	fs = &Store{
-		akteWriterFactory: st,
-		fileExtensions:    fileExtensions,
-		dir:               st.Cwd(),
-		kisten: collections_value.MakeMutableValueSet[*KennungFDPair](
-			nil,
-		),
-		typen: collections_value.MakeMutableValueSet[*KennungFDPair](nil),
-		zettelen: collections_value.MakeMutableValueSet[*KennungFDPair](
-			nil,
-		),
-		unsureZettelen: collections_value.MakeMutableValueSet[*KennungFDPair](
-			nil,
-		),
-		etiketten: collections_value.MakeMutableValueSet[*KennungFDPair](
-			nil,
-		),
-		unsureAkten: collections_value.MakeMutableValueSet[*fd.FD](
-			nil,
-		),
-		emptyDirectories: collections_value.MakeMutableValueSet[*fd.FD](
-			nil,
-		),
-		deleted: collections_value.MakeMutableValueSet[*fd.FD](
-			nil,
-		),
-	}
-
-	return
-}
-
-func MakeCwdFilesAll(
-	fileExtensions file_extensions.FileExtensions,
-	st standort.Standort,
-) (fs *Store, err error) {
-	fs = makeCwdFiles(fileExtensions, st)
-	err = fs.readAll()
-	return
-}
-
-func MakeCwdFilesExactly(
-	fileExtensions file_extensions.FileExtensions,
-	st standort.Standort,
-	files ...string,
-) (fs *Store, err error) {
-	fs = makeCwdFiles(fileExtensions, st)
-	err = fs.readInputFiles(files...)
-	return
-}
-
 func (fs *Store) readInputFiles(args ...string) (err error) {
 	for _, f := range args {
 		f = filepath.Clean(f)
@@ -638,7 +585,7 @@ func (fs *Store) addUnsureAkten(dir, name string) (err error) {
 
 	if ut, err = fd.MakeFile(
 		fullPath,
-		fs.akteWriterFactory,
+		fs.standort,
 	); err != nil {
 		err = errors.Wrapf(err, "Dir: %q, Name: %q", dir, name)
 		return
