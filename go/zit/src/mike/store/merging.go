@@ -328,7 +328,7 @@ func (s *Store) RunMergeTool(
 		return
 	}
 
-	if err = s.ReadOneExternalObjekteReader(f, e); err != nil {
+	if err = s.cwdFiles.ReadOneExternalObjekteReader(f, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

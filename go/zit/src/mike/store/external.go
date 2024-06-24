@@ -1,7 +1,6 @@
 package store
 
 import (
-	"io"
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -9,9 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 )
@@ -133,12 +130,12 @@ func (s *Store) ReadOneExternalInto(
 
 	case checkout_mode.ModeObjekteOnly, checkout_mode.ModeObjekteAndAkte:
 		if e.FDs.Objekte.IsStdin() {
-			if err = s.ReadOneExternalObjekteReader(os.Stdin, e); err != nil {
+			if err = s.cwdFiles.ReadOneExternalObjekteReader(os.Stdin, e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 		} else {
-			if err = s.ReadOneExternalObjekte(e, t1); err != nil {
+			if err = s.cwdFiles.ReadOneExternalObjekte(e, t1); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -156,43 +153,6 @@ func (s *Store) ReadOneExternalInto(
 		&e.Transacted,
 		o,
 	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) ReadOneExternalObjekte(
-	e *store_fs.External,
-	t *sku.Transacted,
-) (err error) {
-	if t != nil {
-		metadatei.Resetter.ResetWith(e.GetMetadatei(), t.GetMetadatei())
-	}
-
-	var f *os.File
-
-	if f, err = files.Open(e.GetObjekteFD().GetPath()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, f)
-
-	if err = s.ReadOneExternalObjekteReader(f, e); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) ReadOneExternalObjekteReader(
-	r io.Reader,
-	e *store_fs.External,
-) (err error) {
-	if _, err = s.metadateiTextParser.ParseMetadatei(r, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

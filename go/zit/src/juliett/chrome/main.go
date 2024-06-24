@@ -162,10 +162,12 @@ func (c *Chrome) Flush() (err error) {
 
 	req.Body = io.NopCloser(b)
 
-	ctx, _ := context.WithDeadline(
+	ctx, cancel := context.WithDeadline(
 		context.Background(),
 		time.Now().Add(time.Duration(1e9)),
 	)
+
+	defer cancel()
 
 	if _, err = chrest.AskChrome(ctx, c.chrestConfig, req); err != nil {
 		if errors.IsErrno(err, syscall.ECONNREFUSED) {
