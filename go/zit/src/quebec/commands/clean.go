@@ -70,9 +70,10 @@ func (c Clean) DefaultGattungen() kennung.Gattung {
 	return kennung.MakeGattung(gattung.TrueGattung()...)
 }
 
-func (c Clean) shouldClean(u *umwelt.Umwelt, co *sku.CheckedOutFS) bool {
+func (c Clean) shouldClean(u *umwelt.Umwelt, co sku.CheckedOutLike) bool {
+	state := co.GetState()
 	ui.Log().Print(co)
-	if co.State == checked_out_state.StateExistsAndSame {
+	if state == checked_out_state.StateExistsAndSame {
 		return true
 	}
 
@@ -82,13 +83,16 @@ func (c Clean) shouldClean(u *umwelt.Umwelt, co *sku.CheckedOutFS) bool {
 
 	if c.includeMutter {
 		mutter, err := u.GetStore().GetVerzeichnisse().ReadOneEnnui(
-			co.Internal.Metadatei.Mutter(),
+			co.GetSku().Metadatei.Mutter(),
 		)
 
 		errors.PanicIfError(err)
 
 		if mutter != nil &&
-			metadatei.EqualerSansTai.Equals(&co.External.Metadatei, &mutter.Metadatei) {
+			metadatei.EqualerSansTai.Equals(
+				&co.GetSkuExternalLike().GetSku().Metadatei,
+				&mutter.Metadatei,
+			) {
 			return true
 		}
 	}
@@ -116,14 +120,22 @@ func (c Clean) RunWithQuery(
 		return
 	}
 
-	if err = u.GetStore().ReadFiles(
-		qg,
-		func(co *sku.CheckedOutFS) (err error) {
+	if err = u.GetStore().ReadExternal(
+		query.GroupWithKasten{
+			Group: qg,
+		},
+		func(co sku.CheckedOutLike) (err error) {
 			if !c.shouldClean(u, co) {
 				return
 			}
 
-			e := co.External
+			el := co.GetSkuExternalLike()
+
+			e, ok := el.(*sku.ExternalFS)
+
+			if !ok {
+				return
+			}
 
 			l.Lock()
 			defer l.Unlock()

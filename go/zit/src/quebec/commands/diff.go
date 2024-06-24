@@ -2,36 +2,30 @@ package commands
 
 import (
 	"flag"
-	"fmt"
-	"io"
-	"os"
-	"os/exec"
-	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
-type Diff struct{}
+type Diff struct {
+	Kasten kennung.Kasten
+}
 
 func init() {
 	registerCommandWithQuery(
 		"diff",
 		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Diff{}
+
+			f.Var(&c.Kasten, "kasten", "none or Chrome")
 
 			return c
 		},
@@ -56,120 +50,39 @@ func (c Diff) RunWithQuery(
 		DoNotWriteEmptyBezeichnung: true,
 	}
 
-	fInline := metadatei.MakeTextFormatterMetadateiInlineAkte(
-		co,
-		u.Standort(),
-		nil,
-	)
+	opDiffFS := user_ops.DiffFS{
+		Umwelt: u,
+		Inline: metadatei.MakeTextFormatterMetadateiInlineAkte(
+			co,
+			u.Standort(),
+			nil,
+		),
+		Metadatei: metadatei.MakeTextFormatterMetadateiOnly(
+			co,
+			u.Standort(),
+			nil,
+		),
+	}
 
-	fMetadatei := metadatei.MakeTextFormatterMetadateiOnly(
-		co,
-		u.Standort(),
-		nil,
-	)
-
-	if err = u.GetStore().ReadFiles(
-		qg,
-		func(co *sku.CheckedOutFS) (err error) {
-			wg := iter.MakeErrorWaitGroupParallel()
-
-			il := &co.Internal
-			el := &co.External
-
-			var mode checkout_mode.Mode
-
-			if mode, err = el.GetFDs().GetCheckoutModeOrError(); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			var rLeft, wLeft *os.File
-
-			if rLeft, wLeft, err = os.Pipe(); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			var rRight, wRight *os.File
-
-			if rRight, wRight, err = os.Pipe(); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			// sameTyp := il.GetTyp().Equals(el.GetTyp())
-			internalInline := u.GetKonfig().IsInlineTyp(il.GetTyp())
-			externalInline := u.GetKonfig().IsInlineTyp(el.GetTyp())
-
-			var externalFD *fd.FD
-
-			switch {
-			case mode.IncludesObjekte():
-				if internalInline && externalInline {
-					wg.Do(c.makeDo(wLeft, fInline, il))
-					wg.Do(c.makeDo(wRight, fInline, el))
-				} else {
-					wg.Do(c.makeDo(wLeft, fMetadatei, il))
-					wg.Do(c.makeDo(wRight, fMetadatei, el))
+	if err = u.GetStore().ReadExternal(
+		query.GroupWithKasten{
+			Group:  qg,
+			Kasten: c.Kasten,
+		},
+		func(co sku.CheckedOutLike) (err error) {
+			switch cot := co.(type) {
+			case *sku.CheckedOutFS:
+				if err = opDiffFS.Run(cot); err != nil {
+					err = errors.Wrap(err)
+					return
 				}
 
-				externalFD = el.GetObjekteFD()
-
-			case internalInline && externalInline:
-				wg.Do(c.makeDoAkte(wLeft, u.Standort(), il.GetAkteSha()))
-				wg.Do(c.makeDoFD(wRight, el.GetAkteFD()))
-				externalFD = el.GetAkteFD()
-
+				// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
 			default:
-				wg.Do(c.makeDo(wLeft, fMetadatei, il))
-				wg.Do(c.makeDo(wRight, fMetadatei, el))
-				externalFD = el.GetAkteFD()
+				ui.Err().Printf("unsupportted type: %T, %s", cot, cot)
 			}
 
-			internalLabel := fmt.Sprintf(
-				"%s:%s",
-				il.GetKennung(),
-				strings.ToLower(il.GetGattung().GetGattungString()),
-			)
-
-			externalLabel := u.Standort().Rel(externalFD.GetPath())
-
-			todo.Change("disambiguate internal and external, and objekte / akte")
-			cmd := exec.Command(
-				"diff",
-				"--color=always",
-				"-u",
-				"--label", internalLabel,
-				"--label", externalLabel,
-				"/dev/fd/3",
-				"/dev/fd/4",
-			)
-
-			cmd.ExtraFiles = []*os.File{rLeft, rRight}
-			cmd.Stdout = u.Out()
-			cmd.Stderr = u.Err()
-
-			wg.Do(
-				func() (err error) {
-					defer errors.DeferredCloser(&err, rLeft)
-					defer errors.DeferredCloser(&err, rRight)
-
-					if err = cmd.Run(); err != nil {
-						if cmd.ProcessState.ExitCode() == 1 {
-							todo.Change("return non-zero exit code")
-							err = nil
-						} else {
-							err = errors.Wrap(err)
-						}
-
-						return
-					}
-
-					return
-				},
-			)
-
-			return wg.GetError()
+			return
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -177,87 +90,4 @@ func (c Diff) RunWithQuery(
 	}
 
 	return
-}
-
-func (c Diff) makeDo(
-	w io.WriteCloser,
-	mf metadatei.TextFormatter,
-	m metadatei.TextFormatterContext,
-) schnittstellen.FuncError {
-	return func() (err error) {
-		defer errors.DeferredCloser(&err, w)
-
-		if _, err = mf.FormatMetadatei(w, m); err != nil {
-			if errors.IsBrokenPipe(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
-
-		return
-	}
-}
-
-func (c Diff) makeDoAkte(
-	w io.WriteCloser,
-	arf schnittstellen.AkteReaderFactory,
-	sh schnittstellen.ShaLike,
-) schnittstellen.FuncError {
-	return func() (err error) {
-		defer errors.DeferredCloser(&err, w)
-
-		var ar sha.ReadCloser
-
-		if ar, err = arf.AkteReader(sh); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		defer errors.DeferredCloser(&err, ar)
-
-		if _, err = io.Copy(w, ar); err != nil {
-			if errors.IsBrokenPipe(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
-
-		return
-	}
-}
-
-func (c Diff) makeDoFD(
-	w io.WriteCloser,
-	fd *fd.FD,
-) schnittstellen.FuncError {
-	return func() (err error) {
-		defer errors.DeferredCloser(&err, w)
-
-		var f *os.File
-
-		if f, err = files.OpenExclusiveReadOnly(fd.GetPath()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		defer errors.DeferredCloser(&err, f)
-
-		if _, err = io.Copy(w, f); err != nil {
-			if errors.IsBrokenPipe(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
-
-		return
-	}
 }

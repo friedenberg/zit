@@ -148,7 +148,7 @@ func (c Add) openAktenIfNecessary(
 		func(z *sku.Transacted) (err error) {
 			var co *sku.CheckedOutFS
 
-			if co, err = u.GetStore().CheckoutOne(options, z); err != nil {
+			if co, err = u.GetStore().CheckoutOneFS(options, z); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

@@ -49,7 +49,7 @@ func (c Validate) RunWithQuery(
 				return
 			}
 
-			t := &sku.ExternalMaybe{}
+			t := &sku.KennungFDPair{}
 
 			if err = t.Kennung.SetWithKennung(h); err != nil {
 				err = errors.Wrap(err)
@@ -58,7 +58,7 @@ func (c Validate) RunWithQuery(
 
 			t.FDs.Objekte.ResetWith(f)
 
-			if _, err = u.GetStore().ReadOneCheckedOut(
+			if _, err = u.GetStore().ReadOneCheckedOutFS(
 				store.ObjekteOptions{
 					Mode: objekte_mode.ModeUpdateTai,
 				},

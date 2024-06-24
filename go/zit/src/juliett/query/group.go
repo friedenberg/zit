@@ -25,6 +25,11 @@ func MakeGroup(
 	}
 }
 
+type GroupWithKasten struct {
+	*Group
+	kennung.Kasten
+}
+
 type Group struct {
 	Hidden           sku.Query
 	OptimizedQueries map[gattung.Gattung]*Query

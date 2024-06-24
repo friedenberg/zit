@@ -24,7 +24,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 
 	var co *sku.CheckedOutFS
 
-	if co, err = s.ReadOneExternalFS(mutter); err != nil {
+	if co, err = s.CombineOneCheckedOutFS(mutter); err != nil {
 		err = nil
 		return
 	}
@@ -46,7 +46,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 			Force:        true,
 		}
 
-		if co, err = s.CheckoutOne(op, transactedPtr); err != nil {
+		if co, err = s.CheckoutOneFS(op, transactedPtr); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -125,17 +125,17 @@ func (s *Store) merge(tm to_merge.Sku) (merged sku.FDPair, err error) {
 		Force:           true,
 	}
 
-	if leftCO, err = s.CheckoutOne(op, tm.Left); err != nil {
+	if leftCO, err = s.CheckoutOneFS(op, tm.Left); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if middleCO, err = s.CheckoutOne(op, tm.Middle); err != nil {
+	if middleCO, err = s.CheckoutOneFS(op, tm.Middle); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if rightCO, err = s.CheckoutOne(op, tm.Right); err != nil {
+	if rightCO, err = s.CheckoutOneFS(op, tm.Right); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -255,17 +255,17 @@ func (s *Store) RunMergeTool(
 
 	var leftCO, middleCO, rightCO *sku.CheckedOutFS
 
-	if leftCO, err = s.CheckoutOne(op, tm.Left); err != nil {
+	if leftCO, err = s.CheckoutOneFS(op, tm.Left); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if middleCO, err = s.CheckoutOne(op, tm.Middle); err != nil {
+	if middleCO, err = s.CheckoutOneFS(op, tm.Middle); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if rightCO, err = s.CheckoutOne(op, tm.Right); err != nil {
+	if rightCO, err = s.CheckoutOneFS(op, tm.Right); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

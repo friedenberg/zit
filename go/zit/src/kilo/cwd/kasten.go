@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type Kasten = sku.ExternalMaybe
+type Kasten = sku.KennungFDPair
 
 func (c *CwdFiles) tryKasten(fi os.FileInfo, dir string) (err error) {
 	var h kennung.Kasten
@@ -31,7 +31,7 @@ func (c *CwdFiles) tryKasten(fi os.FileInfo, dir string) (err error) {
 	t, ok := c.kisten.Get(h.String())
 
 	if !ok {
-		t = &sku.ExternalMaybe{}
+		t = &sku.KennungFDPair{}
 	}
 
 	if err = t.Kennung.SetWithKennung(h); err != nil {

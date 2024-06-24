@@ -72,7 +72,7 @@ func (a *External) AsTransacted() (b Transacted) {
 }
 
 func (a *External) ResetWithExternalMaybe(
-	b *ExternalMaybe,
+	b *KennungFDPair,
 ) (err error) {
 	k := b.GetKennungLike()
 	a.Kennung.ResetWithKennung(k)

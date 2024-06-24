@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type Etikett = sku.ExternalMaybe
+type Etikett = sku.KennungFDPair
 
 func (c *CwdFiles) tryEtikett(fi os.FileInfo, dir string) (err error) {
 	var h kennung.Etikett
@@ -31,7 +31,7 @@ func (c *CwdFiles) tryEtikett(fi os.FileInfo, dir string) (err error) {
 	t, ok := c.etiketten.Get(h.String())
 
 	if !ok {
-		t = &sku.ExternalMaybe{}
+		t = &sku.KennungFDPair{}
 	}
 
 	if err = t.Kennung.SetWithKennung(h); err != nil {

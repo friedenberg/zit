@@ -42,7 +42,7 @@ func (c CreateFromPaths) Run(
 
 	for _, arg := range args {
 		var z *sku.ExternalFS
-		var t sku.ExternalMaybe
+		var t sku.KennungFDPair
 
 		t.Kennung.SetGattung(gattung.Zettel)
 
@@ -51,7 +51,7 @@ func (c CreateFromPaths) Run(
 			return
 		}
 
-		if z, err = c.GetStore().ReadOneExternal(
+		if z, err = c.GetStore().ReadOneExternalFS(
 			o,
 			&t,
 			nil,

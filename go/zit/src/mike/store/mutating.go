@@ -344,7 +344,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	if _, err = s.CheckoutOne(
+	if _, err = s.CheckoutOneFS(
 		checkout_options.Options{CheckoutMode: mode, Force: true},
 		transactedPtr,
 	); err != nil {

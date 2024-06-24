@@ -30,7 +30,7 @@ func (s *Store) CheckoutQuery(
 		func(t *sku.Transacted) (err error) {
 			var cop *sku.CheckedOutFS
 
-			if cop, err = s.CheckoutOne(options, t); err != nil {
+			if cop, err = s.CheckoutOneFS(options, t); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -154,7 +154,8 @@ func (s *Store) filenameForTransacted(
 	return
 }
 
-func (s *Store) UpdateCheckoutOne(
+// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
+func (s *Store) UpdateCheckoutOneFS(
 	options checkout_options.Options, // TODO CheckoutMode is currently ignored
 	sz *sku.Transacted,
 ) (cz *sku.CheckedOutFS, err error) {
@@ -174,7 +175,7 @@ func (s *Store) UpdateCheckoutOne(
 
 	var cze *sku.ExternalFS
 
-	if cze, err = s.ReadOneExternal(
+	if cze, err = s.ReadOneExternalFS(
 		ObjekteOptions{
 			Mode: objekte_mode.ModeRealize,
 		},
@@ -225,7 +226,8 @@ func (s *Store) UpdateCheckoutOne(
 	return
 }
 
-func (s *Store) CheckoutOne(
+// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
+func (s *Store) CheckoutOneFS(
 	options checkout_options.Options,
 	sz *sku.Transacted,
 ) (cz *sku.CheckedOutFS, err error) {
@@ -246,7 +248,7 @@ func (s *Store) CheckoutOne(
 	if e, ok = s.cwdFiles.Get(&sz.Kennung); ok {
 		var cze *sku.ExternalFS
 
-		if cze, err = s.ReadOneExternal(
+		if cze, err = s.ReadOneExternalFS(
 			ObjekteOptions{
 				Mode: objekte_mode.ModeRealize,
 			},

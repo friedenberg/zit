@@ -110,7 +110,7 @@ func (a *ExternalFS) GetObjekteFD() *fd.FD {
 }
 
 func (a *ExternalFS) ResetWithExternalMaybe(
-	b *ExternalMaybe,
+	b *KennungFDPair,
 ) (err error) {
 	k := b.GetKennungLike()
 	a.Kennung.ResetWithKennung(k)

@@ -27,7 +27,7 @@ func (c Checkin) Run(
 
 	ui.Log().Print(qg)
 
-	if err = u.GetStore().ReadFiles(
+	if err = u.GetStore().ReadExternalFS(
 		qg,
 		func(co *sku.CheckedOutFS) (err error) {
 			ui.Log().Print(co)

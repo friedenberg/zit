@@ -18,7 +18,7 @@ type StoredParseSaver[
 	OPtr schnittstellen.AktePtr[O],
 ] interface {
 	ParseSaveStored(
-		sem sku.ExternalMaybe,
+		sem sku.KennungFDPair,
 		t *sku.ExternalFS,
 	) (a OPtr, err error)
 }
@@ -55,7 +55,7 @@ func MakeStoredParseSaver[
 }
 
 func (h storedParserSaver[O, OPtr]) ParseSaveStored(
-	sem *sku.ExternalMaybe,
+	sem *sku.KennungFDPair,
 	t *sku.ExternalFS,
 ) (o OPtr, err error) {
 	var f *os.File

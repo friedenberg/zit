@@ -38,7 +38,7 @@ func (c Mergetool) RunWithQuery(
 ) (err error) {
 	p := []string{}
 
-	if err = u.GetStore().ReadFiles(
+	if err = u.GetStore().ReadExternalFS(
 		qg,
 		iter.MakeChain(
 			func(co *sku.CheckedOutFS) (err error) {

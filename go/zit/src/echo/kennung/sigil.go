@@ -22,7 +22,8 @@ const (
 	SigilHidden
 
 	SigilMax
-	SigilAll = Sigil(^byte(0))
+	SigilAll      = Sigil(^byte(0))
+	SigilExternal = SigilCwd
 )
 
 var (
@@ -116,6 +117,10 @@ func (a Sigil) IncludesHistory() bool {
 
 func (a Sigil) IncludesCwd() bool {
 	return a.ContainsOneOf(SigilCwd)
+}
+
+func (a Sigil) IncludesExternal() bool {
+	return a.ContainsOneOf(SigilExternal)
 }
 
 func (a Sigil) IncludesHidden() bool {

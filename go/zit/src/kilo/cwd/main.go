@@ -52,7 +52,7 @@ func (fs *CwdFiles) MarkUnsureAkten(f *fd.FD) (err error) {
 }
 
 func (fs CwdFiles) EachCreatableMatchable(
-	m schnittstellen.FuncIter[*sku.ExternalMaybe],
+	m schnittstellen.FuncIter[*sku.KennungFDPair],
 ) (err error) {
 	todo.Parallelize()
 
@@ -238,7 +238,7 @@ func (fs CwdFiles) GetTyp(
 
 func (fs CwdFiles) Get(
 	k schnittstellen.StringerGattungGetter,
-) (t *sku.ExternalMaybe, ok bool) {
+) (t *sku.KennungFDPair, ok bool) {
 	g := gattung.Must(k.GetGattung())
 
 	switch g {
@@ -264,7 +264,7 @@ func (fs CwdFiles) Get(
 }
 
 func (fs CwdFiles) All(
-	f schnittstellen.FuncIter[*sku.ExternalMaybe],
+	f schnittstellen.FuncIter[*sku.KennungFDPair],
 ) (err error) {
 	wg := iter.MakeErrorWaitGroupParallel()
 
@@ -304,7 +304,7 @@ func (fs CwdFiles) All(
 }
 
 func (fs CwdFiles) AllUnsure(
-	f schnittstellen.FuncIter[*sku.ExternalMaybe],
+	f schnittstellen.FuncIter[*sku.KennungFDPair],
 ) (err error) {
 	wg := iter.MakeErrorWaitGroupParallel()
 

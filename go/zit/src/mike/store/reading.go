@@ -49,7 +49,7 @@ func (s *Store) query(
 				return
 			}
 
-			var e *sku.ExternalMaybe
+			var e *sku.KennungFDPair
 
 			e, ok = s.GetCwdFiles().Get(&z.Kennung)
 
@@ -59,7 +59,7 @@ func (s *Store) query(
 
 			var e2 *sku.ExternalFS
 
-			if e2, err = s.ReadOneExternal(
+			if e2, err = s.ReadOneExternalFS(
 				ObjekteOptions{
 					Mode: objekte_mode.ModeUpdateTai,
 				},
@@ -96,12 +96,12 @@ func (s *Store) query(
 			}
 
 			if includeCwd && m.GetSigil().IncludesCwd() {
-				var e *sku.ExternalMaybe
+				var e *sku.KennungFDPair
 
 				if e, ok = s.GetCwdFiles().Get(&z.Kennung); ok {
 					var e2 *sku.ExternalFS
 
-					if e2, err = s.ReadOneExternal(
+					if e2, err = s.ReadOneExternalFS(
 						ObjekteOptions{
 							Mode: objekte_mode.ModeUpdateTai,
 						},
@@ -166,8 +166,10 @@ func (s *Store) ReadOne(
 	return
 }
 
+// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
 func (s *Store) ReadOneSigil(
 	k1 schnittstellen.StringerGattungGetter,
+	ka kennung.Kasten,
 	si kennung.Sigil,
 ) (sk1 *sku.Transacted, err error) {
 	sk1 = sku.GetTransactedPool().Get()
@@ -177,29 +179,32 @@ func (s *Store) ReadOneSigil(
 		return
 	}
 
-	if !si.IncludesCwd() {
+	if !si.IncludesExternal() {
 		return
 	}
 
-	if e, ok := s.cwdFiles.Get(k1); ok {
-		var ze *sku.ExternalFS
+	var k3 *kennung.Kennung3
 
-		if ze, err = s.ReadOneExternal(
-			ObjekteOptions{
-				Mode: objekte_mode.ModeUpdateTai,
-			},
-			e,
-			sk1,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if k3, err = kennung.MakeKennung3(k1, ka); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-		// TODO-P1 switch to methods on Transacted and External
-		if err = sk1.SetFromSkuLike(ze); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	var ze sku.ExternalLike
+
+	if ze, err = s.ReadOneExternal(
+		ObjekteOptions{
+			Mode: objekte_mode.ModeUpdateTai,
+		},
+		k3,
+		sk1,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if ze != nil {
+		sku.TransactedResetter.ResetWith(sk1, ze.GetSku())
 	}
 
 	return

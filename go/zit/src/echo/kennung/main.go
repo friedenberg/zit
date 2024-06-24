@@ -86,19 +86,19 @@ func Make(v string) (k KennungPtr, err error) {
 	}
 
 	{
-		var ka Kasten
+		var h Hinweis
 
-		if err = ka.Set(v); err == nil {
-			k = &ka
+		if err = h.Set(v); err == nil {
+			k = &h
 			return
 		}
 	}
 
 	{
-		var h Hinweis
+		var ka Kasten
 
-		if err = h.Set(v); err == nil {
-			k = &h
+		if err = ka.Set(v); err == nil {
+			k = &ka
 			return
 		}
 	}

@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type Zettel = sku.ExternalMaybe
+type Zettel = sku.KennungFDPair
 
 func (c *CwdFiles) tryZettel(
 	dir string,
@@ -34,7 +34,7 @@ func (c *CwdFiles) tryZettel(
 	t, ok := c.zettelen.Get(h.String())
 
 	if !ok {
-		t = &sku.ExternalMaybe{}
+		t = &sku.KennungFDPair{}
 	}
 
 	if err = t.Kennung.SetWithKennung(h); err != nil {

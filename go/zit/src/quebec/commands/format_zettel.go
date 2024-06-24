@@ -19,6 +19,7 @@ import (
 
 type FormatZettel struct {
 	Format   string
+	Kasten   kennung.Kasten
 	UTIGroup string
 	Mode     checkout_mode.Mode
 }
@@ -32,6 +33,9 @@ func init() {
 			}
 
 			f.Var(&c.Mode, "mode", "zettel, akte, or both")
+
+			f.Var(&c.Kasten, "kasten", "none or Chrome")
+
 			f.StringVar(
 				&c.UTIGroup,
 				"uti-group",
@@ -133,7 +137,7 @@ func (c *FormatZettel) getSku(
 		return
 	}
 
-	if sk, err = u.GetStore().ReadOneSigil(k, s); err != nil {
+	if sk, err = u.GetStore().ReadOneSigil(k, c.Kasten, s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -195,6 +195,12 @@ func (h *Hinweis) Set(v string) (err error) {
 		err = me
 	}
 
+	if (len(h.left) == 0 && len(h.right) > 0) ||
+		(len(h.right) == 0 && len(h.left) > 0) {
+		err = errors.Errorf("incomplete hinweis: %s", h)
+		return
+	}
+
 	return
 }
 

@@ -273,8 +273,8 @@ func (k2 *Kennung2) Reset() {
 }
 
 type KennungParts struct {
-	Middle      byte
-	Left, Right *catgut.String
+	Middle              byte
+	Kasten, Left, Right *catgut.String
 }
 
 func (k2 *Kennung2) PartsStrings() KennungParts {

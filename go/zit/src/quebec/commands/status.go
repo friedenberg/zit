@@ -15,13 +15,17 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
-type Status struct{}
+type Status struct {
+	Kasten kennung.Kasten
+}
 
 func init() {
 	registerCommandWithQuery(
 		"status",
 		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Status{}
+
+			f.Var(&c.Kasten, "kasten", "none or Chrome")
 
 			return c
 		},
@@ -44,9 +48,12 @@ func (c Status) RunWithQuery(
 ) (err error) {
 	pcol := u.PrinterCheckedOutLike()
 
-	if err = u.GetStore().ReadFiles(
-		qg,
-		func(co *sku.CheckedOutFS) (err error) {
+	if err = u.GetStore().ReadExternal(
+		query.GroupWithKasten{
+			Group:  qg,
+			Kasten: c.Kasten,
+		},
+		func(co sku.CheckedOutLike) (err error) {
 			if err = pcol(co); err != nil {
 				err = errors.Wrap(err)
 				return

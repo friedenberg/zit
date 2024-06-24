@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 )
 
-const KastenRegexString = `^(//)?[-a-z0-9_]+$`
+const KastenRegexString = `^(/)?[-a-z0-9_]+$`
 
 var KastenRegex *regexp.Regexp
 
@@ -19,7 +19,9 @@ func init() {
 	register(Kasten{})
 }
 
-func MustKasten(v string) (e Kasten) {
+func MustKasten(v string) (e *Kasten) {
+	e = &Kasten{}
+
 	if err := e.Set(v); err != nil {
 		errors.PanicIfError(err)
 	}
@@ -27,7 +29,9 @@ func MustKasten(v string) (e Kasten) {
 	return
 }
 
-func MakeKasten(v string) (e Kasten, err error) {
+func MakeKasten(v string) (e *Kasten, err error) {
+	e = &Kasten{}
+
 	if err = e.Set(v); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -38,6 +42,18 @@ func MakeKasten(v string) (e Kasten, err error) {
 
 type Kasten struct {
 	value string
+}
+
+func (k *Kasten) GetKasten() schnittstellen.KastenLike {
+	return k
+}
+
+func (k *Kasten) EqualsKasten(kg schnittstellen.KastenGetter) bool {
+	return kg.GetKasten().GetKastenString() == k.GetKastenString()
+}
+
+func (k *Kasten) GetKastenString() string {
+	return k.String()
 }
 
 func (e *Kasten) Reset() {
@@ -65,19 +81,23 @@ func (k Kasten) String() string {
 }
 
 func (k Kasten) Parts() [3]string {
-	return [3]string{"/", "/", k.value}
+	return [3]string{"", "/", k.value}
 }
 
 func (k Kasten) GetQueryPrefix() string {
-	return "//"
+	return "/"
 }
 
 func (e *Kasten) Set(v string) (err error) {
-	v = strings.TrimPrefix(v, "//")
+	v = strings.TrimPrefix(v, "/")
 	v = strings.ToLower(strings.TrimSpace(v))
 
 	if err = ErrOnKonfig(v); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	if v == "" {
 		return
 	}
 

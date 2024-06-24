@@ -5,8 +5,10 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
@@ -21,9 +23,35 @@ type ObjekteOptions struct {
 	kennung.Clock
 }
 
-func (s *Store) ReadOneCheckedOut(
+func (s *Store) ReadOneExternal(
 	o ObjekteOptions,
-	em *sku.ExternalMaybe,
+	k1 schnittstellen.StringerGattungKastenGetter,
+	sk *sku.Transacted,
+) (el sku.ExternalLike, err error) {
+	switch k1.GetKasten().GetKastenString() {
+	case "chrome":
+		// TODO populate with chrome kasten
+    ui.Debug().Print("would populate from chrome")
+
+	default:
+		e, ok := s.cwdFiles.Get(k1)
+
+		if !ok {
+			return
+		}
+
+		if el, err = s.ReadOneExternalFS(o, e, sk); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (s *Store) ReadOneCheckedOutFS(
+	o ObjekteOptions,
+	em *sku.KennungFDPair,
 ) (co *sku.CheckedOutFS, err error) {
 	co = sku.GetCheckedOutPool().Get()
 
@@ -58,9 +86,9 @@ func (s *Store) ReadOneCheckedOut(
 	return
 }
 
-func (s *Store) ReadOneExternal(
+func (s *Store) ReadOneExternalFS(
 	o ObjekteOptions,
-	em *sku.ExternalMaybe,
+	em *sku.KennungFDPair,
 	t *sku.Transacted,
 ) (e *sku.ExternalFS, err error) {
 	e = sku.GetExternalPool().Get()
@@ -75,7 +103,7 @@ func (s *Store) ReadOneExternal(
 
 func (s *Store) ReadOneExternalInto(
 	o ObjekteOptions,
-	em *sku.ExternalMaybe,
+	em *sku.KennungFDPair,
 	t *sku.Transacted,
 	e *sku.ExternalFS,
 ) (err error) {
