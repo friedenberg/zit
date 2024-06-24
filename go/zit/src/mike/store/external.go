@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
-	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
@@ -127,7 +126,7 @@ func (s *Store) ReadOneExternalInto(
 
 	switch m {
 	case checkout_mode.ModeAkteOnly:
-		if err = s.ReadOneExternalAkte(e, t1); err != nil {
+		if err = s.cwdFiles.ReadOneExternalAkte(e, t1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -197,42 +196,6 @@ func (s *Store) ReadOneExternalObjekteReader(
 		err = errors.Wrap(err)
 		return
 	}
-
-	return
-}
-
-func (s *Store) ReadOneExternalAkte(
-	e *store_fs.External,
-	t *sku.Transacted,
-) (err error) {
-	metadatei.Resetter.ResetWith(&e.Metadatei, t.GetMetadatei())
-
-	var aw sha.WriteCloser
-
-	if aw, err = s.standort.AkteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, aw)
-
-	var f *os.File
-
-	if f, err = files.OpenExclusiveReadOnly(
-		e.GetAkteFD().GetPath(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, f)
-
-	if _, err = io.Copy(aw, f); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	e.GetMetadatei().Akte.SetShaLike(aw)
 
 	return
 }

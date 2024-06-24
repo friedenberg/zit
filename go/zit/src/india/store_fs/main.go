@@ -94,7 +94,7 @@ func (fs *Store) MarkUnsureAkten(f *fd.FD) (err error) {
 	return
 }
 
-func (fs Store) String() (out string) {
+func (fs *Store) String() (out string) {
 	if iter.Len(
 		fs.zettelen,
 		fs.typen,
@@ -158,7 +158,7 @@ func (fs Store) String() (out string) {
 	return
 }
 
-func (fs Store) GetKennungForFD(fd *fd.FD) (k *kennung.Kennung2, err error) {
+func (fs *Store) GetKennungForFD(fd *fd.FD) (k *kennung.Kennung2, err error) {
 	k = kennung.GetKennungPool().Get()
 
 	if err = k.SetFromPath(
@@ -172,7 +172,7 @@ func (fs Store) GetKennungForFD(fd *fd.FD) (k *kennung.Kennung2, err error) {
 	return
 }
 
-func (fs Store) ContainsSku(m *sku.Transacted) bool {
+func (fs *Store) ContainsSku(m *sku.Transacted) bool {
 	g := gattung.Must(m)
 
 	switch g {
@@ -192,7 +192,7 @@ func (fs Store) ContainsSku(m *sku.Transacted) bool {
 	return true
 }
 
-func (fs Store) GetCwdFDs() fd.Set {
+func (fs *Store) GetCwdFDs() fd.Set {
 	fds := fd.MakeMutableSet()
 
 	fd.SetAddPairs(fs.zettelen, fds)
@@ -204,47 +204,47 @@ func (fs Store) GetCwdFDs() fd.Set {
 	return fds
 }
 
-func (fs Store) GetUnsureAkten() fd.Set {
+func (fs *Store) GetUnsureAkten() fd.Set {
 	fds := fd.MakeMutableSet()
 	fs.unsureAkten.Each(fds.Add)
 	return fds
 }
 
-func (fs Store) GetEmptyDirectories() fd.Set {
+func (fs *Store) GetEmptyDirectories() fd.Set {
 	fds := fd.MakeMutableSet()
 	fs.emptyDirectories.Each(fds.Add)
 	return fds
 }
 
-func (fs Store) GetZettel(
+func (fs *Store) GetZettel(
 	h *kennung.Hinweis,
 ) (z *KennungFDPair, ok bool) {
 	z, ok = fs.zettelen.Get(h.String())
 	return
 }
 
-func (fs Store) GetKasten(
+func (fs *Store) GetKasten(
 	h *kennung.Kasten,
 ) (z *KennungFDPair, ok bool) {
 	z, ok = fs.kisten.Get(h.String())
 	return
 }
 
-func (fs Store) GetEtikett(
+func (fs *Store) GetEtikett(
 	k *kennung.Etikett,
 ) (e *KennungFDPair, ok bool) {
 	e, ok = fs.etiketten.Get(k.String())
 	return
 }
 
-func (fs Store) GetTyp(
+func (fs *Store) GetTyp(
 	k *kennung.Typ,
 ) (t *KennungFDPair, ok bool) {
 	t, ok = fs.typen.Get(k.String())
 	return
 }
 
-func (fs Store) Get(
+func (fs *Store) Get(
 	k schnittstellen.StringerGattungGetter,
 ) (t *KennungFDPair, ok bool) {
 	g := gattung.Must(k.GetGattung())
@@ -271,7 +271,7 @@ func (fs Store) Get(
 	}
 }
 
-func (fs Store) All(
+func (fs *Store) All(
 	f schnittstellen.FuncIter[*KennungFDPair],
 ) (err error) {
 	wg := iter.MakeErrorWaitGroupParallel()
@@ -311,7 +311,7 @@ func (fs Store) All(
 	return wg.GetError()
 }
 
-func (fs Store) AllUnsure(
+func (fs *Store) AllUnsure(
 	f schnittstellen.FuncIter[*KennungFDPair],
 ) (err error) {
 	wg := iter.MakeErrorWaitGroupParallel()
@@ -327,7 +327,7 @@ func (fs Store) AllUnsure(
 	return wg.GetError()
 }
 
-func (fs Store) ZettelFiles() (out []string, err error) {
+func (fs *Store) ZettelFiles() (out []string, err error) {
 	out, err = iter.DerivedValues(
 		fs.zettelen,
 		func(z *KennungFDPair) (p string, err error) {
@@ -495,7 +495,7 @@ func (store_fs *Store) readAll() (err error) {
 	return
 }
 
-func (c Store) MatcherLen() int {
+func (c *Store) MatcherLen() int {
 	return iter.Len(
 		c.zettelen,
 		c.typen,
@@ -504,11 +504,11 @@ func (c Store) MatcherLen() int {
 	)
 }
 
-func (Store) Each(_ schnittstellen.FuncIter[sku.Query]) error {
+func (*Store) Each(_ schnittstellen.FuncIter[sku.Query]) error {
 	return nil
 }
 
-func (c Store) Len() int {
+func (c *Store) Len() int {
 	return iter.Len(
 		c.zettelen,
 		c.typen,

@@ -74,6 +74,7 @@ func (m *MoverLight) GetShaLike() schnittstellen.ShaLike {
 	return m.swc.GetShaLike()
 }
 
+// TODO handle intermittent failure on duplicates
 func (m *MoverLight) Close() (err error) {
 	defer poolBuf.Put(m.buf)
 
