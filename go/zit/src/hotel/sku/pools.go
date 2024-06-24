@@ -7,8 +7,8 @@ import (
 
 var (
 	poolTransacted schnittstellen.Pool[Transacted, *Transacted]
-	poolExternal   schnittstellen.Pool[External, *External]
-	poolCheckedOut schnittstellen.Pool[CheckedOut, *CheckedOut]
+	poolExternal   schnittstellen.Pool[ExternalFS, *ExternalFS]
+	poolCheckedOut schnittstellen.Pool[CheckedOutFS, *CheckedOutFS]
 )
 
 func init() {
@@ -17,12 +17,12 @@ func init() {
 		TransactedResetter.Reset,
 	)
 
-	poolExternal = pool.MakePool[External](
+	poolExternal = pool.MakePool[ExternalFS](
 		nil,
 		nil,
 	)
 
-	poolCheckedOut = pool.MakePool[CheckedOut](
+	poolCheckedOut = pool.MakePool[CheckedOutFS](
 		nil,
 		nil,
 	)
@@ -32,10 +32,10 @@ func GetTransactedPool() schnittstellen.Pool[Transacted, *Transacted] {
 	return poolTransacted
 }
 
-func GetExternalPool() schnittstellen.Pool[External, *External] {
+func GetExternalPool() schnittstellen.Pool[ExternalFS, *ExternalFS] {
 	return poolExternal
 }
 
-func GetCheckedOutPool() schnittstellen.Pool[CheckedOut, *CheckedOut] {
+func GetCheckedOutPool() schnittstellen.Pool[CheckedOutFS, *CheckedOutFS] {
 	return poolCheckedOut
 }

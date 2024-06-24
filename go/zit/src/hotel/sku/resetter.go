@@ -29,7 +29,7 @@ var CheckedOutResetter checkedOutResetter
 
 type checkedOutResetter struct{}
 
-func (checkedOutResetter) Reset(a *CheckedOut) {
+func (checkedOutResetter) Reset(a *CheckedOutFS) {
 	a.State = checked_out_state.StateUnknown
 	a.IsImport = false
 	a.Error = nil
@@ -40,7 +40,7 @@ func (checkedOutResetter) Reset(a *CheckedOut) {
 	a.External.FDs.Akte.Reset()
 }
 
-func (checkedOutResetter) ResetWith(a *CheckedOut, b *CheckedOut) {
+func (checkedOutResetter) ResetWith(a *CheckedOutFS, b *CheckedOutFS) {
 	a.State = b.State
 	a.IsImport = b.IsImport
 	a.Error = b.Error

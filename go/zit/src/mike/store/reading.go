@@ -57,7 +57,7 @@ func (s *Store) query(
 				return
 			}
 
-			var e2 *sku.External
+			var e2 *sku.ExternalFS
 
 			if e2, err = s.ReadOneExternal(
 				ObjekteOptions{
@@ -99,7 +99,7 @@ func (s *Store) query(
 				var e *sku.ExternalMaybe
 
 				if e, ok = s.GetCwdFiles().Get(&z.Kennung); ok {
-					var e2 *sku.External
+					var e2 *sku.ExternalFS
 
 					if e2, err = s.ReadOneExternal(
 						ObjekteOptions{
@@ -182,7 +182,7 @@ func (s *Store) ReadOneSigil(
 	}
 
 	if e, ok := s.cwdFiles.Get(k1); ok {
-		var ze *sku.External
+		var ze *sku.ExternalFS
 
 		if ze, err = s.ReadOneExternal(
 			ObjekteOptions{

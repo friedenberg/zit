@@ -29,7 +29,7 @@ func (c Checkin) Run(
 
 	if err = u.GetStore().ReadFiles(
 		qg,
-		func(co *sku.CheckedOut) (err error) {
+		func(co *sku.CheckedOutFS) (err error) {
 			ui.Log().Print(co)
 			if _, err = u.GetStore().CreateOrUpdateCheckedOut(
 				co,

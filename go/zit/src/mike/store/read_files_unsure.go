@@ -38,7 +38,7 @@ func UnsureMatchOptionsDefault() UnsureMatchOptions {
 type IterMatching func(
 	mt UnsureMatchType,
 	sk *sku.Transacted,
-	existing sku.CheckedOutMutableSet,
+	existing sku.CheckedOutLikeMutableSet,
 ) error
 
 func (s *Store) QueryUnsure(
@@ -47,12 +47,12 @@ func (s *Store) QueryUnsure(
 	f IterMatching,
 ) (err error) {
 	selbstMetadateiSansTaiToZettels := make(
-		map[sha.Bytes]sku.CheckedOutMutableSet,
+		map[sha.Bytes]sku.CheckedOutLikeMutableSet,
 		s.GetCwdFiles().Len(),
 	)
 
 	bezToZettels := make(
-		map[string]sku.CheckedOutMutableSet,
+		map[string]sku.CheckedOutLikeMutableSet,
 		s.GetCwdFiles().Len(),
 	)
 
@@ -60,7 +60,7 @@ func (s *Store) QueryUnsure(
 
 	if err = s.ReadFilesUnsure(
 		qg,
-		func(co *sku.CheckedOut) (err error) {
+		func(co *sku.CheckedOutFS) (err error) {
 			sh := &co.External.Metadatei.Shas.SelbstMetadateiSansTai
 
 			if sh.IsNull() {
@@ -78,7 +78,7 @@ func (s *Store) QueryUnsure(
 				existing, ok := selbstMetadateiSansTaiToZettels[k]
 
 				if !ok {
-					existing = sku.MakeCheckedOutMutableSet()
+					existing = sku.MakeCheckedOutLikeMutableSet()
 				}
 
 				if err = existing.Add(clone); err != nil {
@@ -94,7 +94,7 @@ func (s *Store) QueryUnsure(
 				existing, ok := bezToZettels[k]
 
 				if !ok {
-					existing = sku.MakeCheckedOutMutableSet()
+					existing = sku.MakeCheckedOutLikeMutableSet()
 				}
 
 				if err = existing.Add(clone); err != nil {
@@ -112,7 +112,7 @@ func (s *Store) QueryUnsure(
 		return
 	}
 
-  // TODO create a new query group for all of history
+	// TODO create a new query group for all of history
 	qg.SetIncludeHistory()
 
 	if len(selbstMetadateiSansTaiToZettels) > 0 || len(bezToZettels) > 0 {

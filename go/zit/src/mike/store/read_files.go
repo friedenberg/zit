@@ -12,7 +12,7 @@ import (
 
 func (s *Store) ReadOneExternalFS(
 	sk2 *sku.Transacted,
-) (co *sku.CheckedOut, err error) {
+) (co *sku.CheckedOutFS, err error) {
 	co = sku.GetCheckedOutPool().Get()
 
 	if err = co.Internal.SetFromSkuLike(sk2); err != nil {
@@ -29,7 +29,7 @@ func (s *Store) ReadOneExternalFS(
 		return
 	}
 
-	var e2 *sku.External
+	var e2 *sku.ExternalFS
 
 	if e2, err = s.ReadOneExternal(
 		ObjekteOptions{
@@ -69,7 +69,7 @@ func (s *Store) ReadOneExternalFS(
 
 func (s *Store) ReadFiles(
 	qg *query.Group,
-	f schnittstellen.FuncIter[*sku.CheckedOut],
+	f schnittstellen.FuncIter[*sku.CheckedOutFS],
 ) (err error) {
 	o := ObjekteOptions{
 		Mode: objekte_mode.ModeRealize,
@@ -87,7 +87,7 @@ func (s *Store) ReadFiles(
 
 func (s *Store) MakeHydrateExternalMaybe(
 	qg *query.Group,
-	f schnittstellen.FuncIter[*sku.CheckedOut],
+	f schnittstellen.FuncIter[*sku.CheckedOutFS],
 	o ObjekteOptions,
 ) schnittstellen.FuncIter[*sku.ExternalMaybe] {
 	return func(em *sku.ExternalMaybe) (err error) {
@@ -104,9 +104,9 @@ func (s *Store) HydrateExternalMaybe(
 	o ObjekteOptions,
 	qg *query.Group,
 	em *sku.ExternalMaybe,
-	f schnittstellen.FuncIter[*sku.CheckedOut],
+	f schnittstellen.FuncIter[*sku.CheckedOutFS],
 ) (err error) {
-	var co *sku.CheckedOut
+	var co *sku.CheckedOutFS
 
 	if co, err = s.ReadOneCheckedOut(o, em); err != nil {
 		err = errors.Wrapf(err, "%v", em)
@@ -127,7 +127,7 @@ func (s *Store) HydrateExternalMaybe(
 
 func (s *Store) ReadFilesUnsure(
 	qg *query.Group,
-	f schnittstellen.FuncIter[*sku.CheckedOut],
+	f schnittstellen.FuncIter[*sku.CheckedOutFS],
 ) (err error) {
 	o := ObjekteOptions{
 		Mode: objekte_mode.ModeRealize,

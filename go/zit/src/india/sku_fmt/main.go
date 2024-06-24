@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	CheckedOut = sku.CheckedOut
+	CheckedOut = sku.CheckedOutFS
 	Transacted = sku.Transacted
 )
 

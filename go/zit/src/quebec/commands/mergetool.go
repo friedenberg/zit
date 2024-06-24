@@ -41,14 +41,14 @@ func (c Mergetool) RunWithQuery(
 	if err = u.GetStore().ReadFiles(
 		qg,
 		iter.MakeChain(
-			func(co *sku.CheckedOut) (err error) {
+			func(co *sku.CheckedOutFS) (err error) {
 				if co.State != checked_out_state.StateConflicted {
 					return iter.MakeErrStopIteration()
 				}
 
 				return
 			},
-			func(co *sku.CheckedOut) (err error) {
+			func(co *sku.CheckedOutFS) (err error) {
 				p = append(p, co.External.FDs.MakeConflictMarker())
 				return
 			},

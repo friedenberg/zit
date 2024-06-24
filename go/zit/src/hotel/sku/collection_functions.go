@@ -6,11 +6,11 @@ import (
 )
 
 func ToSliceFilesZettelen(
-	s CheckedOutSet,
+	s CheckedOutFSSet,
 ) (out []string, err error) {
 	return iter.DerivedValues(
 		s,
-		func(z *CheckedOut) (e string, err error) {
+		func(z *CheckedOutFS) (e string, err error) {
 			e = z.External.GetObjekteFD().GetPath()
 
 			if e == "" {

@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOut, err error) {
+func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOutFS, err error) {
 	co = sku.GetCheckedOutPool().Get()
 	co.IsImport = true
 
@@ -94,7 +94,7 @@ func (s *Store) Import(sk *sku.Transacted) (co *sku.CheckedOut, err error) {
 
 var ErrNeedsMerge = errors.New("needs merge")
 
-func (s *Store) importDoMerge(co *sku.CheckedOut) (err error) {
+func (s *Store) importDoMerge(co *sku.CheckedOutFS) (err error) {
 	co.SetError(ErrNeedsMerge)
 	return
 }

@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -25,7 +24,7 @@ type ObjekteOptions struct {
 func (s *Store) ReadOneCheckedOut(
 	o ObjekteOptions,
 	em *sku.ExternalMaybe,
-) (co *sku.CheckedOut, err error) {
+) (co *sku.CheckedOutFS, err error) {
 	co = sku.GetCheckedOutPool().Get()
 
 	if err = s.ReadOneInto(&em.Kennung, &co.Internal); err != nil {
@@ -63,7 +62,7 @@ func (s *Store) ReadOneExternal(
 	o ObjekteOptions,
 	em *sku.ExternalMaybe,
 	t *sku.Transacted,
-) (e *sku.External, err error) {
+) (e *sku.ExternalFS, err error) {
 	e = sku.GetExternalPool().Get()
 
 	if err = s.ReadOneExternalInto(o, em, t, e); err != nil {
@@ -78,7 +77,7 @@ func (s *Store) ReadOneExternalInto(
 	o ObjekteOptions,
 	em *sku.ExternalMaybe,
 	t *sku.Transacted,
-	e *sku.External,
+	e *sku.ExternalFS,
 ) (err error) {
 	var m checkout_mode.Mode
 
@@ -142,7 +141,7 @@ func (s *Store) ReadOneExternalInto(
 }
 
 func (s *Store) ReadOneExternalObjekte(
-	e *sku.External,
+	e *sku.ExternalFS,
 	t *sku.Transacted,
 ) (err error) {
 	if t != nil {
@@ -168,7 +167,7 @@ func (s *Store) ReadOneExternalObjekte(
 
 func (s *Store) ReadOneExternalObjekteReader(
 	r io.Reader,
-	e *sku.External,
+	e *sku.ExternalFS,
 ) (err error) {
 	if _, err = s.metadateiTextParser.ParseMetadatei(r, e); err != nil {
 		err = errors.Wrap(err)
@@ -179,7 +178,7 @@ func (s *Store) ReadOneExternalObjekteReader(
 }
 
 func (s *Store) ReadOneExternalAkte(
-	e *sku.External,
+	e *sku.ExternalFS,
 	t *sku.Transacted,
 ) (err error) {
 	metadatei.Resetter.ResetWith(&e.Metadatei, t.GetMetadatei())
@@ -209,24 +208,7 @@ func (s *Store) ReadOneExternalAkte(
 		return
 	}
 
-	var fStat os.FileInfo
-
-	if fStat, err = f.Stat(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	e.Metadatei.Tai = kennung.TaiFromTime(thyme.Tyme(fStat.ModTime()))
 	e.GetMetadatei().Akte.SetShaLike(aw)
-
-	if err = sku.CalculateAndSetSha(
-		e,
-		s.persistentMetadateiFormat,
-		s.options,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	return
 }

@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func MakeErrMergeConflict(sk *sku.ExternalFDs) (err *ErrMergeConflict) {
+func MakeErrMergeConflict(sk *sku.FDPair) (err *ErrMergeConflict) {
 	err = &ErrMergeConflict{}
 
 	if sk != nil {
@@ -17,7 +17,7 @@ func MakeErrMergeConflict(sk *sku.ExternalFDs) (err *ErrMergeConflict) {
 }
 
 type ErrMergeConflict struct {
-	sku.ExternalFDs
+	sku.FDPair
 }
 
 func (e *ErrMergeConflict) Is(target error) bool {
@@ -26,5 +26,5 @@ func (e *ErrMergeConflict) Is(target error) bool {
 }
 
 func (e *ErrMergeConflict) Error() string {
-	return fmt.Sprintf("merge conflict for fds: %v", &e.ExternalFDs)
+	return fmt.Sprintf("merge conflict for fds: %v", &e.FDPair)
 }

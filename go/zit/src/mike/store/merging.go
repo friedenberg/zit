@@ -22,7 +22,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 		return
 	}
 
-	var co *sku.CheckedOut
+	var co *sku.CheckedOutFS
 
 	if co, err = s.ReadOneExternalFS(mutter); err != nil {
 		err = nil
@@ -70,7 +70,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 		Right:  &co.External.Transacted,
 	}
 
-	var merged sku.ExternalFDs
+	var merged sku.FDPair
 
 	merged, err = s.merge(tm)
 
@@ -102,13 +102,13 @@ func (s *Store) readExternalAndMergeIfNecessary(
 	return
 }
 
-func (s *Store) merge(tm to_merge.Sku) (merged sku.ExternalFDs, err error) {
+func (s *Store) merge(tm to_merge.Sku) (merged sku.FDPair, err error) {
 	if err = tm.MergeEtiketten(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var leftCO, middleCO, rightCO *sku.CheckedOut
+	var leftCO, middleCO, rightCO *sku.CheckedOutFS
 
 	inlineAkte := tm.IsAllInlineTyp(s.GetKonfig())
 
@@ -253,7 +253,7 @@ func (s *Store) RunMergeTool(
 		op.CheckoutMode = checkout_mode.ModeObjekteOnly
 	}
 
-	var leftCO, middleCO, rightCO *sku.CheckedOut
+	var leftCO, middleCO, rightCO *sku.CheckedOutFS
 
 	if leftCO, err = s.CheckoutOne(op, tm.Left); err != nil {
 		err = errors.Wrap(err)

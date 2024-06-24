@@ -42,11 +42,11 @@ func (c Status) RunWithQuery(
 	u *umwelt.Umwelt,
 	qg *query.Group,
 ) (err error) {
-	pcol := u.PrinterCheckedOut()
+	pcol := u.PrinterCheckedOutLike()
 
 	if err = u.GetStore().ReadFiles(
 		qg,
-		func(co *sku.CheckedOut) (err error) {
+		func(co *sku.CheckedOutFS) (err error) {
 			if err = pcol(co); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -77,7 +77,7 @@ func (c Status) RunWithQuery(
 		return
 	}
 
-	p := u.PrinterCheckedOut()
+	p := u.PrinterCheckedOutLike()
 
 	if err = u.GetStore().ReadAllMatchingAkten(
 		qg,

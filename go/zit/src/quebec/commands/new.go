@@ -132,7 +132,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			},
 		}
 
-		var zsc sku.CheckedOutMutableSet
+		var zsc sku.CheckedOutFSMutableSet
 
 		if zsc, err = opCheckout.Run(zts); err != nil {
 			err = errors.Wrap(err)

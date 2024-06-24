@@ -43,7 +43,7 @@ type Store struct {
 
 	sonnenaufgang thyme.Time
 
-	checkedOutLogPrinter schnittstellen.FuncIter[*sku.CheckedOut]
+	checkedOutLogPrinter schnittstellen.FuncIter[*sku.CheckedOutFS]
 
 	metadateiTextParser metadatei.TextParser
 
@@ -159,7 +159,7 @@ func (c *Store) Initialize(
 }
 
 func (s *Store) SetCheckedOutLogWriter(
-	zelw schnittstellen.FuncIter[*sku.CheckedOut],
+	zelw schnittstellen.FuncIter[*sku.CheckedOutFS],
 ) {
 	s.checkedOutLogPrinter = zelw
 }

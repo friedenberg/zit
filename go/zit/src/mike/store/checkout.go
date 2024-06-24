@@ -23,12 +23,12 @@ import (
 func (s *Store) CheckoutQuery(
 	options checkout_options.Options,
 	qg *query.Group,
-	f schnittstellen.FuncIter[*sku.CheckedOut],
+	f schnittstellen.FuncIter[*sku.CheckedOutFS],
 ) (err error) {
 	if err = s.QueryWithCwd(
 		qg,
 		func(t *sku.Transacted) (err error) {
-			var cop *sku.CheckedOut
+			var cop *sku.CheckedOutFS
 
 			if cop, err = s.CheckoutOne(options, t); err != nil {
 				err = errors.Wrap(err)
@@ -59,7 +59,7 @@ func (s *Store) CheckoutQuery(
 
 func (s *Store) shouldCheckOut(
 	options checkout_options.Options,
-	cz *sku.CheckedOut,
+	cz *sku.CheckedOutFS,
 	allowMutterMatch bool,
 ) bool {
 	if options.Force {
@@ -157,7 +157,7 @@ func (s *Store) filenameForTransacted(
 func (s *Store) UpdateCheckoutOne(
 	options checkout_options.Options, // TODO CheckoutMode is currently ignored
 	sz *sku.Transacted,
-) (cz *sku.CheckedOut, err error) {
+) (cz *sku.CheckedOutFS, err error) {
 	var e *cwd.Zettel
 	ok := false
 
@@ -165,14 +165,14 @@ func (s *Store) UpdateCheckoutOne(
 		return
 	}
 
-	cz = &sku.CheckedOut{}
+	cz = &sku.CheckedOutFS{}
 
 	if err = cz.Internal.SetFromSkuLike(sz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var cze *sku.External
+	var cze *sku.ExternalFS
 
 	if cze, err = s.ReadOneExternal(
 		ObjekteOptions{
@@ -228,8 +228,8 @@ func (s *Store) UpdateCheckoutOne(
 func (s *Store) CheckoutOne(
 	options checkout_options.Options,
 	sz *sku.Transacted,
-) (cz *sku.CheckedOut, err error) {
-	cz = &sku.CheckedOut{}
+) (cz *sku.CheckedOutFS, err error) {
+	cz = &sku.CheckedOutFS{}
 
 	if err = cz.Internal.SetFromSkuLike(sz); err != nil {
 		err = errors.Wrap(err)
@@ -244,7 +244,7 @@ func (s *Store) CheckoutOne(
 	ok := false
 
 	if e, ok = s.cwdFiles.Get(&sz.Kennung); ok {
-		var cze *sku.External
+		var cze *sku.ExternalFS
 
 		if cze, err = s.ReadOneExternal(
 			ObjekteOptions{
@@ -293,7 +293,7 @@ func (s *Store) CheckoutOne(
 
 func (s *Store) checkoutOne(
 	options checkout_options.Options,
-	cz *sku.CheckedOut,
+	cz *sku.CheckedOutFS,
 ) (err error) {
 	if s.GetKonfig().DryRun {
 		return

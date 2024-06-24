@@ -300,7 +300,7 @@ func (s *Store) handleUnchanged(
 }
 
 func (s *Store) CreateOrUpdateCheckedOut(
-	co *sku.CheckedOut,
+	co *sku.CheckedOutFS,
 	updateCheckout bool,
 ) (transactedPtr *sku.Transacted, err error) {
 	kennungPtr := &co.External.Kennung

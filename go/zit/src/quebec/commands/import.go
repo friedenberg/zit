@@ -70,7 +70,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	coPrinter := u.PrinterCheckedOut()
+	coPrinter := u.PrinterCheckedOutLike()
 
 	ofo := objekte_format.Options{Tai: true, Verzeichnisse: true}
 
@@ -113,7 +113,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	u.Lock()
 	defer u.Unlock()
 
-	var co *sku.CheckedOut
+	var co *sku.CheckedOutFS
 
 	for {
 		sk, ok := besty.Skus.Pop()
@@ -166,9 +166,9 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 func (c Import) importAkteIfNecessary(
 	u *umwelt.Umwelt,
-	co *sku.CheckedOut,
+	co *sku.CheckedOutFS,
 	ag *age.Age,
-	coErrPrinter schnittstellen.FuncIter[*sku.CheckedOut],
+	coErrPrinter schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	akteSha := co.External.GetAkteSha()
 

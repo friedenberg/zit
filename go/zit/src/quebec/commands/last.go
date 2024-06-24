@@ -88,7 +88,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			Umwelt: u,
 		}
 
-		var zsc sku.CheckedOutMutableSet
+		var zsc sku.CheckedOutFSMutableSet
 
 		if zsc, err = opCheckout.Run(skus); err != nil {
 			err = errors.Wrap(err)

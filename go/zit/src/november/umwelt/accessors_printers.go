@@ -212,7 +212,7 @@ func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[string] {
 	}
 }
 
-func (u *Umwelt) PrinterCheckedOut() schnittstellen.FuncIter[*sku.CheckedOut] {
+func (u *Umwelt) PrinterCheckedOutFS() schnittstellen.FuncIter[*sku.CheckedOutFS] {
 	coOut := u.FormatColorOptionsOut()
 	coErr := u.FormatColorOptionsErr()
 
@@ -231,7 +231,7 @@ func (u *Umwelt) PrinterCheckedOut() schnittstellen.FuncIter[*sku.CheckedOut] {
 		),
 	)
 
-	out := string_format_writer.MakeDelim[*sku.CheckedOut](
+	out := string_format_writer.MakeDelim[*sku.CheckedOutFS](
 		"\n",
 		u.Out(),
 		sku_fmt.MakeCliCheckedOutFormat(
@@ -246,8 +246,51 @@ func (u *Umwelt) PrinterCheckedOut() schnittstellen.FuncIter[*sku.CheckedOut] {
 		),
 	)
 
-	return func(co *sku.CheckedOut) error {
+	return func(co *sku.CheckedOutFS) error {
 		if co.State == checked_out_state.StateError {
+			return err(co)
+		} else {
+			return out(co)
+		}
+	}
+}
+
+func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[sku.CheckedOutLike] {
+	coOut := u.FormatColorOptionsOut()
+	coErr := u.FormatColorOptionsErr()
+
+	err := string_format_writer.MakeDelim(
+		"\n",
+		u.Err(),
+		sku_fmt.MakeCliCheckedOutLikeFormat(
+			u.konfig.PrintOptions,
+			u.StringFormatWriterShaLike(coErr),
+			kennung_fmt.MakeFDCliFormat(
+				coErr,
+				u.standort.MakeRelativePathStringFormatWriter(),
+			),
+			u.StringFormatWriterKennung(coErr),
+			u.StringFormatWriterMetadatei(coErr),
+		),
+	)
+
+	out := string_format_writer.MakeDelim[sku.CheckedOutLike](
+		"\n",
+		u.Out(),
+		sku_fmt.MakeCliCheckedOutLikeFormat(
+			u.konfig.PrintOptions,
+			u.StringFormatWriterShaLike(coOut),
+			kennung_fmt.MakeFDCliFormat(
+				coOut,
+				u.standort.MakeRelativePathStringFormatWriter(),
+			),
+			u.StringFormatWriterKennung(coOut),
+			u.StringFormatWriterMetadatei(coOut),
+		),
+	)
+
+	return func(co sku.CheckedOutLike) error {
+		if co.GetState() == checked_out_state.StateError {
 			return err(co)
 		} else {
 			return out(co)
@@ -259,12 +302,12 @@ type PrinterMatching = store.IterMatching
 
 func (u *Umwelt) PrinterMatching() PrinterMatching {
 	pt := u.PrinterSkuTransacted()
-	pco := u.PrinterCheckedOut()
+	pco := u.PrinterCheckedOutLike()
 
 	return func(
 		mt store.UnsureMatchType,
 		sk *sku.Transacted,
-		existing sku.CheckedOutMutableSet,
+		existing sku.CheckedOutLikeMutableSet,
 	) (err error) {
 		if err = pt(sk); err != nil {
 			err = errors.Wrap(err)
@@ -272,10 +315,15 @@ func (u *Umwelt) PrinterMatching() PrinterMatching {
 		}
 
 		if err = existing.Each(
-			func(co *sku.CheckedOut) (err error) {
-				co.State = checked_out_state.StateRecognized
+			func(co sku.CheckedOutLike) (err error) {
+				if err = co.SetState(
+					checked_out_state.StateRecognized,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 
-				if err = co.Internal.SetFromSkuLike(sk); err != nil {
+				if err = co.GetSku().SetFromSkuLike(sk); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

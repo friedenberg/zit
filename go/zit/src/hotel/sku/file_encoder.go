@@ -14,7 +14,7 @@ import (
 )
 
 type FileEncoder interface {
-	Encode(options checkout_options.TextFormatterOptions, z *External) (err error)
+	Encode(options checkout_options.TextFormatterOptions, z *ExternalFS) (err error)
 }
 
 type fileEncoder struct {
@@ -71,7 +71,7 @@ func (e *fileEncoder) openOrCreate(p string) (f *os.File, err error) {
 
 func (e *fileEncoder) EncodeObjekte(
 	options checkout_options.TextFormatterOptions,
-	z *External,
+	z *ExternalFS,
 	objektePath string,
 	aktePath string,
 ) (err error) {
@@ -199,7 +199,7 @@ func (e *fileEncoder) EncodeObjekte(
 
 func (e *fileEncoder) Encode(
 	options checkout_options.TextFormatterOptions,
-	z *External,
+	z *ExternalFS,
 ) (err error) {
 	return e.EncodeObjekte(
 		options,

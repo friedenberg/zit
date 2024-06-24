@@ -14,7 +14,7 @@ type Edit struct {
 	*umwelt.Umwelt
 }
 
-func (u Edit) Run(zsc sku.CheckedOutSet) (err error) {
+func (u Edit) Run(zsc sku.CheckedOutFSSet) (err error) {
 	var filesZettelen []string
 
 	if filesZettelen, err = sku.ToSliceFilesZettelen(zsc); err != nil {
@@ -46,7 +46,23 @@ func (u Edit) Run(zsc sku.CheckedOutSet) (err error) {
 
 	builder := u.MakeQueryBuilderExcludingHidden(kennung.MakeGattung(gattung.Zettel))
 
-	if ms, err = builder.WithCheckedOut(zsc).BuildQueryGroup(); err != nil {
+	col := sku.MakeCheckedOutLikeMutableSet()
+
+	if err = zsc.Each(
+		func(cofs *sku.CheckedOutFS) (err error) {
+			if err = col.Add(cofs); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if ms, err = builder.WithCheckedOut(col).BuildQueryGroup(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

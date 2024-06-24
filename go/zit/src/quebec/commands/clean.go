@@ -70,7 +70,7 @@ func (c Clean) DefaultGattungen() kennung.Gattung {
 	return kennung.MakeGattung(gattung.TrueGattung()...)
 }
 
-func (c Clean) shouldClean(u *umwelt.Umwelt, co *sku.CheckedOut) bool {
+func (c Clean) shouldClean(u *umwelt.Umwelt, co *sku.CheckedOutFS) bool {
 	ui.Log().Print(co)
 	if co.State == checked_out_state.StateExistsAndSame {
 		return true
@@ -118,7 +118,7 @@ func (c Clean) RunWithQuery(
 
 	if err = u.GetStore().ReadFiles(
 		qg,
-		func(co *sku.CheckedOut) (err error) {
+		func(co *sku.CheckedOutFS) (err error) {
 			if !c.shouldClean(u, co) {
 				return
 			}
@@ -180,7 +180,7 @@ func (c Clean) markUnsureAktenForRemovalIfNecessary(
 		return
 	}
 
-	p := u.PrinterCheckedOut()
+	p := u.PrinterCheckedOutLike()
 	var l sync.Mutex
 
 	// TODO create a new query group for all of history
@@ -257,7 +257,7 @@ func (c Clean) markUnsureZettelenForRemovalIfNecessary(
 		return
 	}
 
-	p := u.PrinterCheckedOut()
+	p := u.PrinterCheckedOutLike()
 	var l sync.Mutex
 
 	if err = u.GetStore().QueryUnsure(
@@ -268,11 +268,16 @@ func (c Clean) markUnsureZettelenForRemovalIfNecessary(
 		func(
 			mt store.UnsureMatchType,
 			sk *sku.Transacted,
-			existing sku.CheckedOutMutableSet,
+			existing sku.CheckedOutLikeMutableSet,
 		) (err error) {
 			if err = existing.Each(
-				func(fr *sku.CheckedOut) (err error) {
-					fr.State = checked_out_state.StateRecognized
+				func(fr sku.CheckedOutLike) (err error) {
+					if err = fr.SetState(
+						checked_out_state.StateRecognized,
+					); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
 
 					if err = p(fr); err != nil {
 						err = errors.Wrap(err)
@@ -282,15 +287,22 @@ func (c Clean) markUnsureZettelenForRemovalIfNecessary(
 					l.Lock()
 					defer l.Unlock()
 
-					if !fr.External.FDs.Objekte.IsEmpty() {
-						if err = add(&fr.External.FDs.Objekte); err != nil {
+					// TODO add support for other checked out types
+					cofs, ok := fr.(*sku.CheckedOutFS)
+
+					if !ok {
+						return
+					}
+
+					if !cofs.External.FDs.Objekte.IsEmpty() {
+						if err = add(&cofs.External.FDs.Objekte); err != nil {
 							err = errors.Wrap(err)
 							return
 						}
 					}
 
-					if !fr.External.FDs.Akte.IsEmpty() {
-						if err = add(&fr.External.FDs.Akte); err != nil {
+					if !cofs.External.FDs.Akte.IsEmpty() {
+						if err = add(&cofs.External.FDs.Akte); err != nil {
 							err = errors.Wrap(err)
 							return
 						}

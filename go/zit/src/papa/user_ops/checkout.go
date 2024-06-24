@@ -19,7 +19,7 @@ type Checkout struct {
 
 func (op Checkout) Run(
 	skus sku.TransactedSet,
-) (zsc sku.CheckedOutMutableSet, err error) {
+) (zsc sku.CheckedOutFSMutableSet, err error) {
 	b := op.Umwelt.MakeQueryBuilder(
 		kennung.MakeGattung(gattung.Zettel),
 	).WithTransacted(
@@ -43,8 +43,8 @@ func (op Checkout) Run(
 
 func (op Checkout) RunQuery(
 	qg *query.Group,
-) (zsc sku.CheckedOutMutableSet, err error) {
-	zsc = collections_value.MakeMutableValueSet[*sku.CheckedOut](nil)
+) (zsc sku.CheckedOutFSMutableSet, err error) {
+	zsc = collections_value.MakeMutableValueSet[*sku.CheckedOutFS](nil)
 
 	if err = op.Umwelt.GetStore().CheckoutQuery(
 		op.Options,

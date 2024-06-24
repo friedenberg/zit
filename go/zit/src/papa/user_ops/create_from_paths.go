@@ -33,7 +33,7 @@ type CreateFromPaths struct {
 func (c CreateFromPaths) Run(
 	args ...string,
 ) (results sku.TransactedMutableSet, err error) {
-	toCreate := make(map[sha.Bytes]*sku.External)
+	toCreate := make(map[sha.Bytes]*sku.ExternalFS)
 	toDelete := objekte_collections.MakeMutableSetUniqueFD()
 
 	o := store.ObjekteOptions{
@@ -41,7 +41,7 @@ func (c CreateFromPaths) Run(
 	}
 
 	for _, arg := range args {
-		var z *sku.External
+		var z *sku.ExternalFS
 		var t sku.ExternalMaybe
 
 		t.Kennung.SetGattung(gattung.Zettel)
@@ -117,7 +117,7 @@ func (c CreateFromPaths) Run(
 	}
 
 	if err = toDelete.Each(
-		func(z *sku.External) (err error) {
+		func(z *sku.ExternalFS) (err error) {
 			// TODO-P2 move to checkout store
 			if err = c.Standort().Delete(z.GetObjekteFD().GetPath()); err != nil {
 				err = errors.Wrap(err)
@@ -143,7 +143,7 @@ func (c CreateFromPaths) Run(
 // TODO remove this
 func (c *CreateFromPaths) zettelsFromPath(
 	p string,
-	wf schnittstellen.FuncIter[*sku.External],
+	wf schnittstellen.FuncIter[*sku.ExternalFS],
 ) (err error) {
 	var r io.Reader
 
@@ -164,7 +164,7 @@ func (c *CreateFromPaths) zettelsFromPath(
 	}
 
 	ze := sku.GetExternalPool().Get()
-	ze.FDs = sku.ExternalFDs{
+	ze.FDs = sku.FDPair{
 		Objekte: fd,
 	}
 
@@ -191,7 +191,7 @@ func (c *CreateFromPaths) zettelsFromPath(
 }
 
 func (c CreateFromPaths) handleStoreError(
-	z *sku.External,
+	z *sku.ExternalFS,
 	f string,
 	in error,
 ) {

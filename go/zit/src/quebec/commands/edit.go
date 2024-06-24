@@ -77,7 +77,7 @@ func (c Edit) RunWithQuery(
 	if err = u.GetStore().CheckoutQuery(
 		options,
 		ms,
-		func(co *sku.CheckedOut) (err error) {
+		func(co *sku.CheckedOutFS) (err error) {
 			e := co.External
 
 			if afd := e.GetAkteFD(); afd.String() != "." {

@@ -55,7 +55,7 @@ func (c ZettelFromExternalAkte) Run(
 			return fdsForSha[i].String() < fdsForSha[j].String()
 		})
 
-		var z *sku.External
+		var z *sku.ExternalFS
 
 		if z, err = c.zettelForAkte(fdsForSha); err != nil {
 			err = errors.Wrap(err)
@@ -122,7 +122,7 @@ func (c ZettelFromExternalAkte) Run(
 		return
 	}
 
-	sortedToCreated := iter.Elements[*sku.External](toCreate)
+	sortedToCreated := iter.Elements[*sku.ExternalFS](toCreate)
 
 	sort.Slice(
 		sortedToCreated,
@@ -226,7 +226,7 @@ func (c *ZettelFromExternalAkte) processOneFD(
 
 func (c *ZettelFromExternalAkte) zettelForAkte(
 	akteFDs []*fd.FD,
-) (z *sku.External, err error) {
+) (z *sku.ExternalFS, err error) {
 	akteFD := akteFDs[0]
 	z = sku.GetExternalPool().Get()
 

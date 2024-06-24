@@ -170,12 +170,12 @@ func (b *Builder) WithTransacted(
 }
 
 func (b *Builder) WithCheckedOut(
-	cos sku.CheckedOutSet,
+	cos sku.CheckedOutLikeSet,
 ) *Builder {
 	errors.PanicIfError(cos.Each(
-		func(co *sku.CheckedOut) (err error) {
+		func(co sku.CheckedOutLike) (err error) {
 			k := kennung.GetKennungPool().Get()
-			k.ResetWith(&co.Internal.Kennung)
+			k.ResetWith(&(co.GetSku()).Kennung)
 			b.preexistingKennung = append(b.preexistingKennung, k)
 
 			return

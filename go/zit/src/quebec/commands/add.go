@@ -146,7 +146,7 @@ func (c Add) openAktenIfNecessary(
 
 	if err = zettels.Each(
 		func(z *sku.Transacted) (err error) {
-			var co *sku.CheckedOut
+			var co *sku.CheckedOutFS
 
 			if co, err = u.GetStore().CheckoutOne(options, z); err != nil {
 				err = errors.Wrap(err)

@@ -4,23 +4,27 @@ import (
 	"encoding/gob"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 )
 
 func init() {
 	gob.Register(Transacted{})
-	gob.Register(External{})
+	gob.Register(ExternalFS{})
 }
 
 type (
 	Ennui interface {
 		WriteOneObjekteMetadatei(o *Transacted) (err error)
 		ReadOneEnnui(*sha.Sha) (*Transacted, error)
-		ReadOneKennung(schnittstellen.StringerGattungGetter) (*Transacted, error)
-		ReadOneKennungSha(schnittstellen.StringerGattungGetter) (*sha.Sha, error)
+		ReadOneKennung(
+			schnittstellen.StringerGattungGetter,
+		) (*Transacted, error)
+		ReadOneKennungSha(
+			schnittstellen.StringerGattungGetter,
+		) (*sha.Sha, error)
 	}
 
 	TransactedAdder interface {
@@ -29,7 +33,7 @@ type (
 
 	SkuLike interface {
 		schnittstellen.ValueLike
-		schnittstellen.GattungGetter
+		schnittstellen.Stringer
 		metadatei.Getter
 
 		GetKopf() kennung.Tai
@@ -53,17 +57,28 @@ type (
 		GetSkuLike() SkuLike
 	}
 
-	SkuExternalLike interface {
-		SkuLike
+	TransactedGetter interface {
+		GetSku() *Transacted
+	}
 
-		GetExternalSkuLike() SkuExternalLike
+	ExternalLikeGetter interface {
+		GetSkuExternalLike() ExternalLike
+	}
 
-		GetFDs() *ExternalFDs
-		GetAkteFD() *fd.FD
-		GetObjekteFD() *fd.FD
-		GetAktePath() string
+	ExternalLike interface {
+		schnittstellen.Stringer
+		TransactedGetter
+		ExternalLikeGetter
+	}
 
-		ResetWithExternalMaybe(b *ExternalMaybe) (err error)
+	CheckedOutLike interface {
+		schnittstellen.Stringer
+		TransactedGetter
+		ExternalLike
+		GetSkuCheckedOutLike() CheckedOutLike
+		GetState() checked_out_state.State
+		SetState(checked_out_state.State) error
+		GetError() error
 	}
 
 	OneReader interface {

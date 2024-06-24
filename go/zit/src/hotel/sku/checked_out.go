@@ -3,8 +3,6 @@ package sku
 import (
 	"fmt"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 )
 
@@ -12,8 +10,23 @@ type CheckedOut struct {
 	Internal Transacted
 	External External
 	State    checked_out_state.State
-	IsImport bool
 	Error    error
+}
+
+func (c *CheckedOut) GetSkuCheckedOutLike() CheckedOutLike {
+	return c
+}
+
+func (c *CheckedOut) GetSkuExternalLike() ExternalLike {
+	return &c.External
+}
+
+func (c *CheckedOut) GetSku() *Transacted {
+	return &c.Internal
+}
+
+func (c *CheckedOut) GetState() checked_out_state.State {
+	return c.State
 }
 
 func (c *CheckedOut) SetError(err error) {
@@ -29,6 +42,15 @@ func (c *CheckedOut) InternalAndExternalEqualsSansTai() bool {
 	return c.External.Metadatei.EqualsSansTai(
 		&c.Internal.Metadatei,
 	)
+}
+
+func (c *CheckedOut) SetState(v checked_out_state.State) (err error) {
+	c.State = v
+	return
+}
+
+func (c *CheckedOut) GetError() error {
+  return c.Error
 }
 
 func (c *CheckedOut) DetermineState(justCheckedOut bool) {
@@ -53,20 +75,20 @@ func (a *CheckedOut) String() string {
 	return fmt.Sprintf("%s %s", &a.Internal, &a.External)
 }
 
-func (e *CheckedOut) Remove(s schnittstellen.Standort) (err error) {
-	// TODO check conflict state
-	if err = e.External.FDs.Objekte.Remove(s); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// func (e *CheckedOut) Remove(s schnittstellen.Standort) (err error) {
+// 	// TODO check conflict state
+// 	if err = e.External.FDs.Objekte.Remove(s); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	if err = e.External.FDs.Akte.Remove(s); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	if err = e.External.FDs.Akte.Remove(s); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	e.External.FDs.Akte.Reset()
-	e.External.FDs.Objekte.Reset()
+// 	e.External.FDs.Akte.Reset()
+// 	e.External.FDs.Objekte.Reset()
 
-	return
-}
+// 	return
+// }
