@@ -30,6 +30,7 @@ func init() {
 
 // TODO support globs and ignores
 type Store struct {
+	storeFuncs          sku.StoreFuncs
 	metadateiTextParser metadatei.TextParser
 	standort            standort.Standort
 	fileExtensions      file_extensions.FileExtensions

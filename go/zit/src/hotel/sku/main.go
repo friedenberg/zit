@@ -21,6 +21,14 @@ type ObjekteOptions struct {
 }
 
 type (
+	FuncRealize = func(*Transacted, *Transacted, ObjekteOptions) error
+	FuncCommit  = func(*Transacted, ObjekteOptions) error
+
+	StoreFuncs struct {
+		FuncRealize
+		FuncCommit
+	}
+
 	Ennui interface {
 		WriteOneObjekteMetadatei(o *Transacted) (err error)
 		ReadOneEnnui(*sha.Sha) (*Transacted, error)

@@ -18,7 +18,7 @@ func (c DeleteCheckout) Run(
 	dryRun bool,
 	s standort.Standort,
 	p schnittstellen.FuncIter[*fd.FD],
-	fs schnittstellen.Iterable[*fd.FD], // TODO switch to sorted slice
+	fs schnittstellen.Iterable[*fd.FD],
 ) (err error) {
 	els := iter.ElementsSorted(
 		fs,

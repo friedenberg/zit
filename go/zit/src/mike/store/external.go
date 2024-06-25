@@ -3,7 +3,6 @@ package store
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
@@ -55,7 +54,7 @@ func (s *Store) ReadOneCheckedOutFS(
 		}
 	}
 
-	if err = s.ReadOneExternalInto(
+	if err = s.cwdFiles.ReadOneExternalFSInto(
 		o,
 		em,
 		&co.Internal,
@@ -83,36 +82,7 @@ func (s *Store) ReadOneExternalFS(
 ) (e *store_fs.External, err error) {
 	e = store_fs.GetExternalPool().Get()
 
-	if err = s.ReadOneExternalInto(o, em, t, e); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) ReadOneExternalInto(
-	o ObjekteOptions,
-	em *store_fs.KennungFDPair,
-	t *sku.Transacted,
-	e *store_fs.External,
-) (err error) {
-	o.Del(objekte_mode.ModeApplyProto)
-
-	if err = s.cwdFiles.ReadOneExternalInto(
-		&o,
-		em,
-		t,
-		e,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.tryRealizeAndOrStore(
-		&e.Transacted,
-		o,
-	); err != nil {
+	if err = s.cwdFiles.ReadOneExternalFSInto(o, em, t, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

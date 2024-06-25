@@ -6,13 +6,16 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 func makeCwdFiles(
+	storeFuncs sku.StoreFuncs,
 	fileExtensions file_extensions.FileExtensions,
 	st standort.Standort,
 ) (fs *Store) {
 	fs = &Store{
+		storeFuncs:    storeFuncs,
 		standort:       st,
 		fileExtensions: fileExtensions,
 		dir:            st.Cwd(),
@@ -48,20 +51,11 @@ func makeCwdFiles(
 }
 
 func MakeCwdFilesAll(
+	storeFuncs sku.StoreFuncs,
 	fileExtensions file_extensions.FileExtensions,
 	st standort.Standort,
 ) (fs *Store, err error) {
-	fs = makeCwdFiles(fileExtensions, st)
+	fs = makeCwdFiles(storeFuncs, fileExtensions, st)
 	err = fs.readAll()
-	return
-}
-
-func MakeCwdFilesExactly(
-	fileExtensions file_extensions.FileExtensions,
-	st standort.Standort,
-	files ...string,
-) (fs *Store, err error) {
-	fs = makeCwdFiles(fileExtensions, st)
-	err = fs.readInputFiles(files...)
 	return
 }

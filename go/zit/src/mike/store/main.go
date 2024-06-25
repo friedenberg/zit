@@ -83,6 +83,10 @@ func (c *Store) Initialize(
 	c.luaVMPoolBuilder = luaVMPoolBuilder
 
 	if c.cwdFiles, err = store_fs.MakeCwdFilesAll(
+		sku.StoreFuncs{
+			FuncRealize: c.tryRealize,
+			FuncCommit:  c.tryRealizeAndOrStore,
+		},
 		k.FileExtensions,
 		st,
 	); err != nil {
