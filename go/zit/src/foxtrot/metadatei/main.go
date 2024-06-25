@@ -196,6 +196,26 @@ func (m *Metadatei) AddEtikettPtr(e *kennung.Etikett) (err error) {
 	return
 }
 
+func (m *Metadatei) AddEtikettPtrFast(e *kennung.Etikett) (err error) {
+	if m.Etiketten == nil {
+		m.Etiketten = kennung.MakeEtikettMutableSet()
+	}
+
+	if err = m.Etiketten.Add(*e); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	cs := catgut.MakeFromString(e.String())
+
+	if err = m.Verzeichnisse.Etiketten.AddEtikett(cs); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (m *Metadatei) SetEtiketten(e kennung.EtikettSet) {
 	if m.Etiketten == nil {
 		m.Etiketten = kennung.MakeEtikettMutableSet()

@@ -292,7 +292,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-		if err = sk.AddEtikettPtr(&e); err != nil {
+		if err = sk.AddEtikettPtrFast(&e); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -147,6 +147,15 @@ func (a *Transacted) AddEtikettPtr(e *kennung.Etikett) (err error) {
 	return
 }
 
+func (a *Transacted) AddEtikettPtrFast(e *kennung.Etikett) (err error) {
+	if err = a.GetMetadatei().AddEtikettPtrFast(e); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (a *Transacted) GetTyp() kennung.Typ {
 	return a.Metadatei.Typ
 }

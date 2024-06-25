@@ -229,13 +229,18 @@ func (s *Store) fetchMutterIfNecessary(
 	ut ObjekteOptions,
 ) (mutter *sku.Transacted, err error) {
 	if !sk.Metadatei.Mutter().IsNull() {
-		return
+		mutter, err = s.GetVerzeichnisse().ReadOneEnnui(
+			sk.Metadatei.Mutter(),
+		)
+	} else {
+		mutter, err = s.GetVerzeichnisse().ReadOneKennung(
+			sk.GetKennung(),
+		)
 	}
 
-	if mutter, err = s.GetVerzeichnisse().ReadOneKennung(
-		sk.GetKennung(),
-	); err != nil {
+	if err != nil {
 		if collections.IsErrNotFound(err) {
+			// TODO decide if this should continue to virtual stores
 			err = nil
 		} else {
 			err = errors.Wrap(err)

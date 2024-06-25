@@ -132,7 +132,7 @@ function can_checkout_and_checkin { # @test
 	run_zit checkin one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
-		[one/uno@434728a410a78f56fc1b5899c3593436e61ab0c731e9072d95e96db290205e53 !md "wow" ok]
+		[one/uno@434728a410a78f56fc1b5899c3593436e61ab0c731e9072d95e96db290205e53 "wow" ok]
 	EOM
 }
 
