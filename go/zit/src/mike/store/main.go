@@ -16,8 +16,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/kennung_index"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/akten"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/akten"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/store_verzeichnisse"
@@ -83,9 +83,11 @@ func (c *Store) Initialize(
 	c.luaVMPoolBuilder = luaVMPoolBuilder
 
 	if c.cwdFiles, err = store_fs.MakeCwdFilesAll(
+		k,
 		sku.StoreFuncs{
 			FuncRealize: c.tryRealize,
 			FuncCommit:  c.tryRealizeAndOrStore,
+			FuncReadSha: c.ReadOneEnnui,
 		},
 		k.FileExtensions,
 		st,

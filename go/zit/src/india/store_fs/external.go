@@ -6,9 +6,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
-	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
@@ -160,105 +157,4 @@ func (equalerExternal) Equals(a, b External) bool {
 
 func (equalerExternal) EqualsPtr(a, b *External) bool {
 	return a.EqualsSkuLikePtr(b)
-}
-
-func (s *Store) CombineOneCheckedOutFS(
-	sk2 *sku.Transacted,
-) (co *CheckedOut, err error) {
-	co = GetCheckedOutPool().Get()
-
-	if err = co.Internal.SetFromSkuLike(sk2); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	ok := false
-
-	var e *KennungFDPair
-
-	if e, ok = s.Get(&sk2.Kennung); !ok {
-		err = iter.MakeErrStopIteration()
-		return
-	}
-
-	var e2 *External
-
-	if e2, err = s.ReadOneExternalFS(
-		sku.ObjekteOptions{
-			Mode: objekte_mode.ModeUpdateTai,
-		},
-		e,
-		sk2,
-	); err != nil {
-		if errors.IsNotExist(err) {
-			err = iter.MakeErrStopIteration()
-		} else if errors.Is(err, ErrExternalHasConflictMarker) {
-			co.State = checked_out_state.StateConflicted
-			co.External.FDs = e.FDs
-
-			if err = co.External.Kennung.SetWithKennung(&sk2.Kennung); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		} else {
-			err = errors.Wrapf(err, "Cwd: %#v", e)
-		}
-
-		return
-	}
-
-	if err = co.External.SetFromSkuLike(e2); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	co.DetermineState(false)
-
-	return
-}
-
-func (s *Store) ReadOneExternalFS(
-	o sku.ObjekteOptions,
-	em *KennungFDPair,
-	t *sku.Transacted,
-) (e *External, err error) {
-	e = GetExternalPool().Get()
-
-	if err = s.ReadOneExternalFSInto(o, em, t, e); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) ReadOneExternalFSInto(
-	o sku.ObjekteOptions,
-	em *KennungFDPair,
-	t *sku.Transacted,
-	e *External,
-) (err error) {
-	o.Del(objekte_mode.ModeApplyProto)
-
-	if err = s.ReadOneExternalInto(
-		&o,
-		em,
-		t,
-		e,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.storeFuncs.FuncCommit(
-		&e.Transacted,
-		o,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }

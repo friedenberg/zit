@@ -74,7 +74,7 @@ func (c Edit) RunWithQuery(
 	akten := fd.MakeMutableSet()
 	objekten := fd.MakeMutableSet()
 
-	if err = u.GetStore().CheckoutQuery(
+	if err = u.GetStore().CheckoutQueryFS(
 		options,
 		ms,
 		func(co *store_fs.CheckedOut) (err error) {

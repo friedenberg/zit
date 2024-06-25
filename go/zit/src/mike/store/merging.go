@@ -25,7 +25,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 
 	var co *store_fs.CheckedOut
 
-	if co, err = s.CombineOneCheckedOutFS(mutter); err != nil {
+	if co, err = s.cwdFiles.ReadTransactedCheckedOut(mutter); err != nil {
 		err = nil
 		return
 	}

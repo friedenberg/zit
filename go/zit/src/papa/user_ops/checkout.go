@@ -47,7 +47,7 @@ func (op Checkout) RunQuery(
 ) (zsc store_fs.CheckedOutMutableSet, err error) {
 	zsc = collections_value.MakeMutableValueSet[*store_fs.CheckedOut](nil)
 
-	if err = op.Umwelt.GetStore().CheckoutQuery(
+	if err = op.Umwelt.GetStore().CheckoutQueryFS(
 		op.Options,
 		qg,
 		iter.MakeAddClonePoolPtrFunc(

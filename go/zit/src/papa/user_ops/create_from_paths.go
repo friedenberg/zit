@@ -52,7 +52,7 @@ func (c CreateFromPaths) Run(
 			return
 		}
 
-		if z, err = c.GetStore().GetCwdFiles().ReadOneExternalFS(
+		if z, err = c.GetStore().GetCwdFiles().ReadOneKennungFDPairExternal(
 			o,
 			&t,
 			nil,

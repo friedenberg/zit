@@ -10,13 +10,16 @@ import (
 )
 
 func makeCwdFiles(
+	k sku.Konfig,
 	storeFuncs sku.StoreFuncs,
 	fileExtensions file_extensions.FileExtensions,
 	st standort.Standort,
 ) (fs *Store) {
 	fs = &Store{
-		storeFuncs:    storeFuncs,
+		konfig:         k,
+		storeFuncs:     storeFuncs,
 		standort:       st,
+		fileEncoder:    MakeFileEncoder(st, k),
 		fileExtensions: fileExtensions,
 		dir:            st.Cwd(),
 		kisten: collections_value.MakeMutableValueSet[*KennungFDPair](
@@ -51,11 +54,12 @@ func makeCwdFiles(
 }
 
 func MakeCwdFilesAll(
+	k sku.Konfig,
 	storeFuncs sku.StoreFuncs,
 	fileExtensions file_extensions.FileExtensions,
 	st standort.Standort,
 ) (fs *Store, err error) {
-	fs = makeCwdFiles(storeFuncs, fileExtensions, st)
+	fs = makeCwdFiles(k, storeFuncs, fileExtensions, st)
 	err = fs.readAll()
 	return
 }

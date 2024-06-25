@@ -60,7 +60,7 @@ func (s *Store) query(
 
 			var e2 *store_fs.External
 
-			if e2, err = s.cwdFiles.ReadOneExternalFS(
+			if e2, err = s.cwdFiles.ReadOneKennungFDPairExternal(
 				ObjekteOptions{
 					Mode: objekte_mode.ModeUpdateTai,
 				},
@@ -102,7 +102,7 @@ func (s *Store) query(
 				if e, ok = s.GetCwdFiles().Get(&z.Kennung); ok {
 					var e2 *store_fs.External
 
-					if e2, err = s.cwdFiles.ReadOneExternalFS(
+					if e2, err = s.cwdFiles.ReadOneKennungFDPairExternal(
 						ObjekteOptions{
 							Mode: objekte_mode.ModeUpdateTai,
 						},
@@ -193,7 +193,7 @@ func (s *Store) ReadOneSigil(
 
 	var ze sku.ExternalLike
 
-	if ze, err = s.ReadOneExternal(
+	if ze, err = s.ReadOneKennungExternal(
 		ObjekteOptions{
 			Mode: objekte_mode.ModeUpdateTai,
 		},

@@ -17,4 +17,5 @@ type Konfig interface {
 	UsePredictableHinweisen() bool
 	UsePrintTime() bool
 	GetFilters() map[string]string
+	IsDryRun() bool
 }

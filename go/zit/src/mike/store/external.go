@@ -12,7 +12,7 @@ import (
 
 type ObjekteOptions = sku.ObjekteOptions
 
-func (s *Store) ReadOneExternal(
+func (s *Store) ReadOneKennungExternal(
 	o ObjekteOptions,
 	k1 schnittstellen.StringerGattungKastenGetter,
 	sk *sku.Transacted,
@@ -23,13 +23,7 @@ func (s *Store) ReadOneExternal(
 		ui.Debug().Print("would populate from chrome")
 
 	default:
-		e, ok := s.cwdFiles.Get(k1)
-
-		if !ok {
-			return
-		}
-
-		if el, err = s.cwdFiles.ReadOneExternalFS(o, e, sk); err != nil {
+		if el, err = s.cwdFiles.ReadOneKennung(o, k1, sk); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -54,7 +48,7 @@ func (s *Store) ReadOneCheckedOutFS(
 		}
 	}
 
-	if err = s.cwdFiles.ReadOneExternalFSInto(
+	if err = s.cwdFiles.ReadOneKennungFDPairExternalInto(
 		o,
 		em,
 		&co.Internal,

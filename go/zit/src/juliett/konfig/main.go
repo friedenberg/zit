@@ -19,7 +19,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/erworben"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/akten"
+	"code.linenisgreat.com/zit/go/zit/src/india/akten"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
@@ -210,6 +210,14 @@ func (k *compiled) addKasten(
 	}
 
 	return
+}
+
+func (k *Compiled) IsDryRun() bool {
+	return k.DryRun
+}
+
+func (k *Compiled) GetTypExtension(v string) string {
+	return k.TypenToExtensions[v]
 }
 
 func (k *Compiled) AddTransacted(

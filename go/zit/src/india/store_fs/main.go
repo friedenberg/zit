@@ -30,9 +30,12 @@ func init() {
 
 // TODO support globs and ignores
 type Store struct {
+	konfig              sku.Konfig
 	storeFuncs          sku.StoreFuncs
 	metadateiTextParser metadatei.TextParser
 	standort            standort.Standort
+	fileEncoder         FileEncoder
+	ic                  kennung.InlineTypChecker
 	fileExtensions      file_extensions.FileExtensions
 	dir                 string
 	zettelen            schnittstellen.MutableSetLike[*KennungFDPair]

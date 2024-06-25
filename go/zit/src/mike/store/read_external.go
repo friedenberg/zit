@@ -3,75 +3,12 @@ package store
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
-	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
-
-// zips a CheckedOutFS from a known internal Sku with whatever Sku that may be
-// checked out. If there is no checked, returns ErrStopIteration
-//
-// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
-func (s *Store) CombineOneCheckedOutFS(
-	sk2 *sku.Transacted,
-) (co *store_fs.CheckedOut, err error) {
-	co = store_fs.GetCheckedOutPool().Get()
-
-	if err = co.Internal.SetFromSkuLike(sk2); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	ok := false
-
-	var e *store_fs.KennungFDPair
-
-	if e, ok = s.cwdFiles.Get(&sk2.Kennung); !ok {
-		err = iter.MakeErrStopIteration()
-		return
-	}
-
-	var e2 *store_fs.External
-
-	if e2, err = s.cwdFiles.ReadOneExternalFS(
-		ObjekteOptions{
-			Mode: objekte_mode.ModeUpdateTai,
-		},
-		e,
-		sk2,
-	); err != nil {
-		if errors.IsNotExist(err) {
-			err = iter.MakeErrStopIteration()
-		} else if errors.Is(err, store_fs.ErrExternalHasConflictMarker) {
-			co.State = checked_out_state.StateConflicted
-			co.External.FDs = e.FDs
-
-			if err = co.External.Kennung.SetWithKennung(&sk2.Kennung); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		} else {
-			err = errors.Wrapf(err, "Cwd: %#v", e)
-		}
-
-		return
-	}
-
-	if err = co.External.SetFromSkuLike(e2); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	co.DetermineState(false)
-
-	return
-}
 
 // TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
 func (s *Store) ReadExternal(

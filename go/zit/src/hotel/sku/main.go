@@ -21,12 +21,20 @@ type ObjekteOptions struct {
 }
 
 type (
+	Konfig interface {
+		schnittstellen.Konfig
+		kennung.InlineTypChecker // TODO move out of konfig entirely
+		GetTypExtension(string) string
+	}
+
 	FuncRealize = func(*Transacted, *Transacted, ObjekteOptions) error
 	FuncCommit  = func(*Transacted, ObjekteOptions) error
+	FuncReadSha = func(*sha.Sha) (*Transacted, error)
 
 	StoreFuncs struct {
 		FuncRealize
 		FuncCommit
+		FuncReadSha
 	}
 
 	Ennui interface {
