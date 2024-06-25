@@ -191,7 +191,7 @@ func (s *Store) UpdateCheckoutOneFS(
 
 	var cze *store_fs.External
 
-	if cze, err = s.ReadOneExternalFS(
+	if cze, err = s.cwdFiles.ReadOneExternalFS(
 		ObjekteOptions{
 			Mode: objekte_mode.ModeRealizeSansProto,
 		},
@@ -264,7 +264,7 @@ func (s *Store) CheckoutOneFS(
 	if e, ok = s.cwdFiles.Get(&sz.Kennung); ok {
 		var cze *store_fs.External
 
-		if cze, err = s.ReadOneExternalFS(
+		if cze, err = s.cwdFiles.ReadOneExternalFS(
 			ObjekteOptions{
 				Mode: objekte_mode.ModeRealizeSansProto,
 			},

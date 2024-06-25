@@ -29,7 +29,7 @@ func (s *Store) ReadOneExternal(
 			return
 		}
 
-		if el, err = s.ReadOneExternalFS(o, e, sk); err != nil {
+		if el, err = s.cwdFiles.ReadOneExternalFS(o, e, sk); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -71,21 +71,6 @@ func (s *Store) ReadOneCheckedOutFS(
 	}
 
 	co.DetermineState(false)
-
-	return
-}
-
-func (s *Store) ReadOneExternalFS(
-	o ObjekteOptions,
-	em *store_fs.KennungFDPair,
-	t *sku.Transacted,
-) (e *store_fs.External, err error) {
-	e = store_fs.GetExternalPool().Get()
-
-	if err = s.cwdFiles.ReadOneExternalFSInto(o, em, t, e); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	return
 }

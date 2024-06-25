@@ -37,7 +37,7 @@ func (s *Store) CombineOneCheckedOutFS(
 
 	var e2 *store_fs.External
 
-	if e2, err = s.ReadOneExternalFS(
+	if e2, err = s.cwdFiles.ReadOneExternalFS(
 		ObjekteOptions{
 			Mode: objekte_mode.ModeUpdateTai,
 		},
