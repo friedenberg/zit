@@ -44,6 +44,12 @@ func (c *CheckedOut) GetError() error {
 	return c.Error
 }
 
+func (a *CheckedOut) Clone() sku.CheckedOutLike {
+	b := GetCheckedOutPool().Get()
+	CheckedOutResetter.ResetWith(b, a)
+	return b
+}
+
 func (c *CheckedOut) SetError(err error) {
 	if err == nil {
 		return
@@ -100,6 +106,25 @@ func (e *CheckedOut) Remove(s schnittstellen.Standort) (err error) {
 }
 
 func ToSliceFilesZettelen(
+	s sku.CheckedOutLikeSet,
+) (out []string, err error) {
+	return iter.DerivedValues(
+		s,
+		func(col sku.CheckedOutLike) (e string, err error) {
+			z := col.(*CheckedOut)
+			e = z.External.GetObjekteFD().GetPath()
+
+			if e == "" {
+				err = collections.MakeErrStopIteration()
+				return
+			}
+
+			return
+		},
+	)
+}
+
+func ToSliceFilesZettelenFS(
 	s CheckedOutSet,
 ) (out []string, err error) {
 	return iter.DerivedValues(

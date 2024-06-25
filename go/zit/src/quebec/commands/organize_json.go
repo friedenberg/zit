@@ -203,7 +203,7 @@ func (c OrganizeJSON) readFromVim(
 			Build(),
 	}
 
-	if _, err = openVimOp.Run(u, p); err != nil {
+	if err = openVimOp.Run(u, p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

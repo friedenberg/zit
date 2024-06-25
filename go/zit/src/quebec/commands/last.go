@@ -5,18 +5,19 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/lima/bestandsaufnahme"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
 type Last struct {
+	Kasten   kennung.Kasten
 	Edit     bool
 	Organize bool
 	Format   string
@@ -28,6 +29,7 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Last{}
 
+			f.Var(&c.Kasten, "kasten", "none or Chrome")
 			f.StringVar(&c.Format, "format", "log", "format")
 			f.BoolVar(&c.Organize, "organize", false, "")
 			f.BoolVar(&c.Edit, "edit", false, "")
@@ -89,7 +91,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			Umwelt: u,
 		}
 
-		var zsc store_fs.CheckedOutMutableSet
+		var zsc sku.CheckedOutLikeMutableSet
 
 		if zsc, err = opCheckout.Run(skus); err != nil {
 			err = errors.Wrap(err)
@@ -100,7 +102,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			Umwelt: u,
 		}
 
-		if err = opEdit.Run(zsc); err != nil {
+		if err = opEdit.Run(checkout_mode.ModeObjekteAndAkte, zsc); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

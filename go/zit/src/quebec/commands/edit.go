@@ -113,7 +113,7 @@ func (c Edit) RunWithQuery(
 			Build(),
 	}
 
-	if _, err = openVimOp.Run(u, objektenFiles...); err != nil {
+	if err = openVimOp.Run(u, objektenFiles...); err != nil {
 		if errors.Is(err, files.ErrEmptyFileList) {
 			err = errors.Normalf("nothing to open in vim")
 		} else {

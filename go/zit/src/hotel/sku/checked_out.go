@@ -3,6 +3,7 @@ package sku
 import (
 	"fmt"
 
+	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 )
 
@@ -27,6 +28,10 @@ func (c *CheckedOut) GetSku() *Transacted {
 
 func (c *CheckedOut) GetState() checked_out_state.State {
 	return c.State
+}
+
+func (c *CheckedOut) Clone() CheckedOutLike {
+	panic(todo.Implement())
 }
 
 func (c *CheckedOut) SetError(err error) {

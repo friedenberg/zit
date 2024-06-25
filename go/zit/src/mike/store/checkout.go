@@ -3,6 +3,7 @@ package store
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
@@ -26,6 +27,32 @@ func (s *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
 }
 
 // TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
+func (s *Store) CheckoutQuery(
+	kasten schnittstellen.KastenGetter,
+	options checkout_options.Options,
+	qg *query.Group,
+	f schnittstellen.FuncIter[sku.CheckedOutLike],
+) (err error) {
+	switch kasten.GetKasten().GetKastenString() {
+	case "chrome":
+		err = todo.Implement()
+
+	default:
+		if err = s.CheckoutQueryFS(
+			options,
+			qg,
+			func(cofs *store_fs.CheckedOut) (err error) {
+				return f(cofs)
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
 func (s *Store) CheckoutQueryFS(
 	options checkout_options.Options,
 	qg *query.Group,

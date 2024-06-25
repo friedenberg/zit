@@ -14,6 +14,7 @@ import (
 )
 
 type Checkout struct {
+	Kasten          kennung.Kasten
 	CheckoutOptions checkout_options.Options
 }
 
@@ -27,6 +28,7 @@ func init() {
 				},
 			}
 
+			f.Var(&c.Kasten, "kasten", "none or Chrome")
 			c.CheckoutOptions.AddToFlagSet(f)
 
 			return c
@@ -45,6 +47,7 @@ func (c Checkout) RunWithQuery(
 	qg *query.Group,
 ) (err error) {
 	opCheckout := user_ops.Checkout{
+		Kasten:  c.Kasten,
 		Umwelt:  u,
 		Options: c.CheckoutOptions,
 	}

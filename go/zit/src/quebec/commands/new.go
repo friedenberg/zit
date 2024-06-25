@@ -7,15 +7,16 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
+	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
 type New struct {
+	Kasten kennung.Kasten
 	Delete bool
 	Count  int
 	// TODO combine organize and edit and refactor
@@ -34,6 +35,8 @@ func init() {
 			c := &New{
 				ProtoZettel: zettel.MakeEmptyProtoZettel(),
 			}
+
+			f.Var(&c.Kasten, "kasten", "none or Chrome")
 
 			f.BoolVar(
 				&c.Delete,
@@ -133,7 +136,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			},
 		}
 
-		var zsc store_fs.CheckedOutMutableSet
+		var zsc sku.CheckedOutLikeMutableSet
 
 		if zsc, err = opCheckout.Run(zts); err != nil {
 			err = errors.Wrap(err)
@@ -144,7 +147,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			Umwelt: u,
 		}
 
-		if err = opEdit.Run(zsc); err != nil {
+		if err = opEdit.Run(opCheckout.CheckoutMode, zsc); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

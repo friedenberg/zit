@@ -86,7 +86,7 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 				Build(),
 		}
 
-		if _, err = openVimOp.Run(u.Umwelt, f.Name()); err != nil {
+		if err = openVimOp.Run(u.Umwelt, f.Name()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
