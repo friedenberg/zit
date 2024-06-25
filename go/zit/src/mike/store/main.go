@@ -85,9 +85,10 @@ func (c *Store) Initialize(
 	if c.cwdFiles, err = store_fs.MakeCwdFilesAll(
 		k,
 		sku.StoreFuncs{
-			FuncRealize: c.tryRealize,
-			FuncCommit:  c.tryRealizeAndOrStore,
-			FuncReadSha: c.ReadOneEnnui,
+			FuncRealize:     c.tryRealize,
+			FuncCommit:      c.tryRealizeAndOrStore,
+			FuncReadSha:     c.ReadOneEnnui,
+			FuncReadOneInto: c.ReadOneInto,
 		},
 		k.FileExtensions,
 		st,

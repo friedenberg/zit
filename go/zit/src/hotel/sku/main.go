@@ -27,14 +27,19 @@ type (
 		GetTypExtension(string) string
 	}
 
-	FuncRealize = func(*Transacted, *Transacted, ObjekteOptions) error
-	FuncCommit  = func(*Transacted, ObjekteOptions) error
-	FuncReadSha = func(*sha.Sha) (*Transacted, error)
+	FuncRealize     = func(*Transacted, *Transacted, ObjekteOptions) error
+	FuncCommit      = func(*Transacted, ObjekteOptions) error
+	FuncReadSha     = func(*sha.Sha) (*Transacted, error)
+	FuncReadOneInto = func(
+		k1 schnittstellen.StringerGattungGetter,
+		out *Transacted,
+	) (err error)
 
 	StoreFuncs struct {
 		FuncRealize
 		FuncCommit
 		FuncReadSha
+		FuncReadOneInto
 	}
 
 	Ennui interface {

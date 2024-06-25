@@ -5,9 +5,47 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
+
+func (s *Store) ReadOneCheckedOut(
+	o sku.ObjekteOptions,
+	em *KennungFDPair,
+) (co *CheckedOut, err error) {
+	co = GetCheckedOutPool().Get()
+
+	if err = s.storeFuncs.FuncReadOneInto(&em.Kennung, &co.Internal); err != nil {
+		if collections.IsErrNotFound(err) {
+			// TODO mark status as new
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if err = s.ReadOneKennungFDPairExternalInto(
+		o,
+		em,
+		&co.Internal,
+		&co.External,
+	); err != nil {
+		if errors.Is(err, ErrExternalHasConflictMarker) {
+			err = nil
+			co.State = checked_out_state.StateConflicted
+		} else {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	co.DetermineState(false)
+
+	return
+}
 
 func (s *Store) ReadOneKennungFDPairExternal(
 	o sku.ObjekteOptions,
@@ -53,18 +91,18 @@ func (s *Store) ReadOneKennungFDPairExternalInto(
 	return
 }
 
-func (s *Store) ReadOneKennungExternalFS(
+func (s *Store) ReadKennung(
 	o sku.ObjekteOptions,
 	k1 schnittstellen.StringerGattungGetter,
-	sk *sku.Transacted,
-) (el *External, err error) {
-	e, ok := s.Get(k1)
+	t *sku.Transacted,
+) (e *External, err error) {
+	k, ok := s.Get(k1)
 
 	if !ok {
 		return
 	}
 
-	if el, err = s.ReadOneKennungFDPairExternal(o, e, sk); err != nil {
+	if e, err = s.ReadOneKennungFDPairExternal(o, k, t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -129,18 +167,75 @@ func (s *Store) ReadTransactedCheckedOut(
 	return
 }
 
-func (s *Store) ReadOneKennung(
+func (s *Store) MakeHydrateCheckedOut(
+	qg sku.Queryable,
+	f schnittstellen.FuncIter[*CheckedOut],
 	o sku.ObjekteOptions,
-	k1 schnittstellen.StringerGattungGetter,
-	t *sku.Transacted,
-) (e *External, err error) {
-	k, ok := s.Get(k1)
+) schnittstellen.FuncIter[*KennungFDPair] {
+	return func(em *KennungFDPair) (err error) {
+		if err = s.HydrateCheckedOut(o, qg, em, f); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	if !ok {
+		return
+	}
+}
+
+func (s *Store) HydrateCheckedOut(
+	o sku.ObjekteOptions,
+	qg sku.Queryable,
+	em *KennungFDPair,
+	f schnittstellen.FuncIter[*CheckedOut],
+) (err error) {
+	var co *CheckedOut
+
+	if co, err = s.ReadOneCheckedOut(o, em); err != nil {
+		err = errors.Wrapf(err, "%v", em)
 		return
 	}
 
-	if e, err = s.ReadOneKennungFDPairExternal(o, k, t); err != nil {
+	if !qg.ContainsSku(&co.External.Transacted) {
+		return
+	}
+
+	if err = f(co); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) ReadQuery(
+	qg sku.Queryable,
+	f schnittstellen.FuncIter[*CheckedOut],
+) (err error) {
+	o := sku.ObjekteOptions{
+		Mode: objekte_mode.ModeRealizeSansProto,
+	}
+
+	if err = s.All(
+		s.MakeHydrateCheckedOut(qg, f, o),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) ReadUnsure(
+	qg sku.Queryable,
+	f schnittstellen.FuncIter[*CheckedOut],
+) (err error) {
+	o := sku.ObjekteOptions{
+		Mode: objekte_mode.ModeRealizeWithProto,
+	}
+
+	if err = s.AllUnsure(
+		s.MakeHydrateCheckedOut(qg, f, o),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

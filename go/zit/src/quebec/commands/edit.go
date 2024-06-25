@@ -98,7 +98,10 @@ func (c Edit) RunWithQuery(
 	objektenFiles := iter.Strings[*fd.FD](objekten)
 	aktenFiles := iter.Strings[*fd.FD](akten)
 
-	if err = (user_ops.OpenFiles{}).Run(u, aktenFiles...); err != nil {
+	if err = (store_fs.OpenFiles{}).Run(
+		u.PrinterHeader(),
+		aktenFiles...,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

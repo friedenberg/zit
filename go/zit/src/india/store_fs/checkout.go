@@ -18,8 +18,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
-func (s *Store) CheckoutOneFS(
+func (s *Store) CheckoutOne(
 	options checkout_options.Options,
 	sz *sku.Transacted,
 ) (cz *CheckedOut, err error) {
@@ -61,7 +60,7 @@ func (s *Store) CheckoutOneFS(
 
 			cz.DetermineState(true)
 
-			if !s.shouldCheckOutFS(options, cz, false) {
+			if !s.shouldCheckOut(options, cz, false) {
 				return
 			}
 
@@ -74,7 +73,7 @@ func (s *Store) CheckoutOneFS(
 		}
 	}
 
-	if err = s.checkoutOneFS(
+	if err = s.checkoutOne(
 		options,
 		cz,
 	); err != nil {
@@ -85,7 +84,7 @@ func (s *Store) CheckoutOneFS(
 	return
 }
 
-func (s *Store) UpdateCheckoutOneFS(
+func (s *Store) UpdateCheckoutOne(
 	options checkout_options.Options, // TODO CheckoutMode is currently ignored
 	sz *sku.Transacted,
 ) (cz *CheckedOut, err error) {
@@ -96,7 +95,7 @@ func (s *Store) UpdateCheckoutOneFS(
 		return
 	}
 
-  cz = GetCheckedOutPool().Get()
+	cz = GetCheckedOutPool().Get()
 
 	if err = cz.Internal.SetFromSkuLike(sz); err != nil {
 		err = errors.Wrap(err)
@@ -126,7 +125,7 @@ func (s *Store) UpdateCheckoutOneFS(
 
 		cz.DetermineState(true)
 
-		if !s.shouldCheckOutFS(options, cz, true) {
+		if !s.shouldCheckOut(options, cz, true) {
 			return
 		}
 
@@ -145,7 +144,7 @@ func (s *Store) UpdateCheckoutOneFS(
 		}
 	}
 
-	if err = s.checkoutOneFS(
+	if err = s.checkoutOne(
 		options,
 		cz,
 	); err != nil {
@@ -156,7 +155,7 @@ func (s *Store) UpdateCheckoutOneFS(
 	return
 }
 
-func (s *Store) checkoutOneFS(
+func (s *Store) checkoutOne(
 	options checkout_options.Options,
 	cz *CheckedOut,
 ) (err error) {
@@ -220,7 +219,7 @@ func (s *Store) checkoutOneFS(
 	return
 }
 
-func (s *Store) shouldCheckOutFS(
+func (s *Store) shouldCheckOut(
 	options checkout_options.Options,
 	cz *CheckedOut,
 	allowMutterMatch bool,

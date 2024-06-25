@@ -38,7 +38,8 @@ func (c Mergetool) RunWithQuery(
 ) (err error) {
 	p := []string{}
 
-	if err = u.GetStore().ReadExternalFS(
+	// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
+	if err = u.GetStore().GetCwdFiles().ReadQuery(
 		qg,
 		iter.MakeChain(
 			func(co *store_fs.CheckedOut) (err error) {

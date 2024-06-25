@@ -128,6 +128,7 @@ func (c Add) RunWithQuery(
 	return
 }
 
+// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
 func (c Add) openAktenIfNecessary(
 	u *umwelt.Umwelt,
 	zettels sku.TransactedMutableSet,
@@ -171,9 +172,9 @@ func (c Add) openAktenIfNecessary(
 	}
 
 	if c.OpenAkten {
-		openOp := user_ops.OpenFiles{}
+		openOp := store_fs.OpenFiles{}
 
-		if err = openOp.Run(u, filesAkten...); err != nil {
+		if err = openOp.Run(u.PrinterHeader(), filesAkten...); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

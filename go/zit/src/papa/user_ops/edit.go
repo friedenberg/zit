@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
+// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
 type Edit struct {
 	*umwelt.Umwelt
 }

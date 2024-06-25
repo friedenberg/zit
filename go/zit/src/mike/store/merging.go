@@ -16,6 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/to_merge"
 )
 
+// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
 func (s *Store) readExternalAndMergeIfNecessary(
 	transactedPtr, mutter *sku.Transacted,
 ) (err error) {

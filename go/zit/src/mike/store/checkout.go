@@ -25,6 +25,7 @@ func (s *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
 	return
 }
 
+// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
 func (s *Store) CheckoutQueryFS(
 	options checkout_options.Options,
 	qg *query.Group,
@@ -67,7 +68,7 @@ func (s *Store) CheckoutOneFS(
 	options checkout_options.Options,
 	sz *sku.Transacted,
 ) (cz *store_fs.CheckedOut, err error) {
-	if cz, err = s.cwdFiles.CheckoutOneFS(options, sz); err != nil {
+	if cz, err = s.cwdFiles.CheckoutOne(options, sz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -79,7 +80,7 @@ func (s *Store) CheckoutOne(
 	options checkout_options.Options,
 	sz *sku.Transacted,
 ) (cz sku.CheckedOutLike, err error) {
-	if cz, err = s.cwdFiles.CheckoutOneFS(options, sz); err != nil {
+	if cz, err = s.cwdFiles.CheckoutOne(options, sz); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

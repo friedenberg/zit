@@ -59,7 +59,7 @@ func (s *Store) QueryUnsure(
 
 	var l sync.Mutex
 
-	if err = s.ReadExternalFSUnsure(
+	if err = s.cwdFiles.ReadUnsure(
 		qg,
 		func(co *store_fs.CheckedOut) (err error) {
 			sh := &co.External.Metadatei.Shas.SelbstMetadateiSansTai
