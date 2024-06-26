@@ -101,11 +101,12 @@ type (
 		schnittstellen.Stringer
 		TransactedGetter
 		ExternalLike
+		GetKasten() kennung.Kasten
 		GetSkuCheckedOutLike() CheckedOutLike
 		GetState() checked_out_state.State
 		SetState(checked_out_state.State) error
 		GetError() error
-    Clone() CheckedOutLike
+		Clone() CheckedOutLike
 	}
 
 	OneReader interface {

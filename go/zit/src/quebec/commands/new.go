@@ -127,6 +127,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 	}
 
+	// TODO make mutually exclusive with organize
 	if c.Edit {
 		opCheckout := user_ops.Checkout{
 			Umwelt: u,
@@ -134,20 +135,10 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 				CheckoutMode:         checkout_mode.ModeObjekteAndAkte,
 				TextFormatterOptions: cotfo,
 			},
+			Edit: true,
 		}
 
-		var zsc sku.CheckedOutLikeMutableSet
-
-		if zsc, err = opCheckout.Run(zts); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		opEdit := user_ops.Edit{
-			Umwelt: u,
-		}
-
-		if err = opEdit.Run(opCheckout.CheckoutMode, zsc); err != nil {
+		if _, err = opCheckout.Run(zts); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -50,7 +50,8 @@ type Store struct {
 	deleted    fd.MutableSet
 }
 
-func (fs *Store) Delete(e *External) (err error) {
+func (fs *Store) Delete(e1 sku.ExternalLike) (err error) {
+	e := e1.(*External)
 	fs.deleteLock.Lock()
 	defer fs.deleteLock.Unlock()
 

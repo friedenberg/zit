@@ -5,13 +5,39 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
+	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 )
+
+func DetermineState(c CheckedOutLike, justCheckedOut bool) {
+	i := c.GetSku()
+	e := c.GetSkuExternalLike().GetSku()
+
+	if i.GetObjekteSha().IsNull() {
+		c.SetState(checked_out_state.StateUntracked)
+	} else if i.Metadatei.EqualsSansTai(&e.Metadatei) {
+		if justCheckedOut {
+			c.SetState(checked_out_state.StateJustCheckedOut)
+		} else {
+			c.SetState(checked_out_state.StateExistsAndSame)
+		}
+	} else {
+		if justCheckedOut {
+			c.SetState(checked_out_state.StateJustCheckedOutButDifferent)
+		} else {
+			c.SetState(checked_out_state.StateExistsAndDifferent)
+		}
+	}
+}
 
 type CheckedOut struct {
 	Internal Transacted
 	External External
 	State    checked_out_state.State
 	Error    error
+}
+
+func (c *CheckedOut) GetKasten() kennung.Kasten {
+	panic(todo.Implement())
 }
 
 func (c *CheckedOut) GetSkuCheckedOutLike() CheckedOutLike {

@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -88,21 +89,14 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 	} else if c.Edit {
 		opCheckout := user_ops.Checkout{
+			Options: checkout_options.Options{
+				CheckoutMode: checkout_mode.ModeObjekteAndAkte,
+			},
 			Umwelt: u,
+			Edit:   true,
 		}
 
-		var zsc sku.CheckedOutLikeMutableSet
-
-		if zsc, err = opCheckout.Run(skus); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		opEdit := user_ops.Edit{
-			Umwelt: u,
-		}
-
-		if err = opEdit.Run(checkout_mode.ModeObjekteAndAkte, zsc); err != nil {
+		if _, err = opCheckout.Run(skus); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

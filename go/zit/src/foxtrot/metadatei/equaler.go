@@ -2,6 +2,7 @@ package metadatei
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 )
 
@@ -16,19 +17,28 @@ type equaler struct {
 	includeTai     bool
 }
 
+const debug = false
+
+// TODO make better diffing facility
 func (e equaler) Equals(a, b *Metadatei) bool {
 	if e.includeTai && !a.Tai.Equals(b.Tai) {
-		// log.Debug().Print(&a.Tai, "->", &b.Tai)
+		if debug {
+			ui.Debug().Print(&a.Tai, "->", &b.Tai)
+		}
 		return false
 	}
 
 	if !a.Akte.EqualsSha(&b.Akte) {
-		// log.Debug().Print(&a.Akte, "->", &b.Akte)
+		if debug {
+			ui.Debug().Print(&a.Akte, "->", &b.Akte)
+		}
 		return false
 	}
 
 	if !a.Typ.Equals(b.Typ) {
-		// log.Debug().Print(&a.Typ, "->", &b.Typ)
+		if debug {
+			ui.Debug().Print(&a.Typ, "->", &b.Typ)
+		}
 		return false
 	}
 
@@ -41,11 +51,15 @@ func (e equaler) Equals(a, b *Metadatei) bool {
 
 	if err := aes.EachPtr(
 		func(ea *kennung.Etikett) (err error) {
-			if !e.includeVirtual && ea.IsVirtual() {
+			if (!e.includeVirtual && ea.IsVirtual()) || ea.IsEmpty() {
 				return
 			}
 
 			if !bes.ContainsKey(bes.KeyPtr(ea)) {
+				if debug {
+					ui.Debug().Print(ea, "-> X")
+				}
+
 				err = errors.New("false")
 				return
 			}
@@ -53,6 +67,10 @@ func (e equaler) Equals(a, b *Metadatei) bool {
 			return
 		},
 	); err != nil {
+		if debug {
+			ui.Debug().Print(aes, "->", bes)
+		}
+
 		return false
 	}
 
@@ -70,12 +88,16 @@ func (e equaler) Equals(a, b *Metadatei) bool {
 			return
 		},
 	); err != nil {
-		// log.Debug().Print(aes, "->", bes)
+		if debug {
+			ui.Debug().Print(aes, "->", bes)
+		}
 		return false
 	}
 
 	if !a.Bezeichnung.Equals(b.Bezeichnung) {
-		// log.Debug().Print(a.Bezeichnung, "->", b.Bezeichnung)
+		if debug {
+			ui.Debug().Print(a.Bezeichnung, "->", b.Bezeichnung)
+		}
 		return false
 	}
 

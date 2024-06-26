@@ -42,7 +42,7 @@ func (s *Store) ReadOneCheckedOut(
 		return
 	}
 
-	co.DetermineState(false)
+	sku.DetermineState(co, false)
 
 	return
 }
@@ -162,7 +162,7 @@ func (s *Store) ReadTransactedCheckedOut(
 		return
 	}
 
-	co.DetermineState(false)
+	sku.DetermineState(co, false)
 
 	return
 }

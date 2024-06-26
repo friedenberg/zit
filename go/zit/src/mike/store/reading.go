@@ -167,7 +167,6 @@ func (s *Store) ReadOne(
 	return
 }
 
-// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
 func (s *Store) ReadOneSigil(
 	k1 schnittstellen.StringerGattungGetter,
 	ka kennung.Kasten,

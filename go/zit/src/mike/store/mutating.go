@@ -228,7 +228,7 @@ func (s *Store) fetchMutterIfNecessary(
 	sk *sku.Transacted,
 	ut ObjekteOptions,
 ) (mutter *sku.Transacted, err error) {
-	if !sk.Metadatei.Mutter().IsNull() {
+	if !sk.Metadatei.Mutter().IsNull() && false {
 		mutter, err = s.GetVerzeichnisse().ReadOneEnnui(
 			sk.Metadatei.Mutter(),
 		)
@@ -305,7 +305,7 @@ func (s *Store) handleUnchanged(
 	return s.Unchanged(t)
 }
 
-// TODO add generic
+// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
 func (s *Store) CreateOrUpdateCheckedOutFS(
 	co *store_fs.CheckedOut,
 	updateCheckout bool,
@@ -353,6 +353,59 @@ func (s *Store) CreateOrUpdateCheckedOutFS(
 
 	if _, err = s.CheckoutOneFS(
 		checkout_options.Options{CheckoutMode: mode, Force: true},
+		transactedPtr,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) CreateOrUpdateCheckedOut(
+	co sku.CheckedOutLike,
+	updateCheckout bool,
+) (transactedPtr *sku.Transacted, err error) {
+	e := co.GetSkuExternalLike().GetSku()
+	kennungPtr := e.GetKennung()
+
+	if !s.GetStandort().GetLockSmith().IsAcquired() {
+		err = file_lock.ErrLockRequired{
+			Operation: fmt.Sprintf("create or update %s", kennungPtr),
+		}
+
+		return
+	}
+
+	transactedPtr = sku.GetTransactedPool().Get()
+
+	if err = transactedPtr.SetFromSkuLike(e); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = transactedPtr.SetAkteSha(e.GetAkteSha()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.tryRealizeAndOrStore(
+		transactedPtr,
+		ObjekteOptions{Mode: objekte_mode.ModeCreate},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if !updateCheckout {
+		return
+	}
+
+	// TODO pass mode?
+	if _, err = s.CheckoutOne(
+		co.GetKasten(),
+		checkout_options.Options{Force: true},
+		// checkout_options.Options{CheckoutMode: mode, Force: true},
 		transactedPtr,
 	); err != nil {
 		err = errors.Wrap(err)

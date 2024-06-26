@@ -4,15 +4,10 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/vim_cli_options_builder"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
@@ -71,76 +66,13 @@ func (c Edit) RunWithQuery(
 		CheckoutMode: c.CheckoutMode,
 	}
 
-	akten := fd.MakeMutableSet()
-	objekten := fd.MakeMutableSet()
-
-	if err = u.GetStore().CheckoutQueryFS(
-		options,
-		ms,
-		func(co *store_fs.CheckedOut) (err error) {
-			e := co.External
-
-			if afd := e.GetAkteFD(); afd.String() != "." {
-				akten.Add(afd)
-			}
-
-			if ofd := e.GetObjekteFD(); ofd.String() != "." {
-				objekten.Add(ofd)
-			}
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	opEdit := user_ops.Checkout{
+		Umwelt:  u,
+		Options: options,
+		Edit:    true,
 	}
 
-	objektenFiles := iter.Strings[*fd.FD](objekten)
-	aktenFiles := iter.Strings[*fd.FD](akten)
-
-	if err = (store_fs.OpenFiles{}).Run(
-		u.PrinterHeader(),
-		aktenFiles...,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	openVimOp := user_ops.OpenVim{
-		Options: vim_cli_options_builder.New().
-			WithCursorLocation(2, 3).
-			WithInsertMode().
-			Build(),
-	}
-
-	if err = openVimOp.Run(u, objektenFiles...); err != nil {
-		if errors.Is(err, files.ErrEmptyFileList) {
-			err = errors.Normalf("nothing to open in vim")
-		} else {
-			err = errors.Wrap(err)
-		}
-
-		return
-	}
-
-	if err = u.Reset(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	filez := append([]string{}, objektenFiles...)
-	filez = append(filez, aktenFiles...)
-
-	op := user_ops.Checkin{
-		Delete: c.Delete,
-	}
-
-	if err = op.Run(
-		u,
-		query.GroupWithKasten{
-			Group: ms,
-		},
-	); err != nil {
+	if _, err = opEdit.RunQuery(ms); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

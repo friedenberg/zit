@@ -5,46 +5,19 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
+	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
 func (s *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
-	switch cot := col.(type) {
-	default:
-		err = errors.Errorf("unsupported checkout: %T, %s", cot, cot)
-		return
-
-	case *store_fs.CheckedOut:
-		if err = s.GetCwdFiles().Delete(&cot.External); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
-// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
-func (s *Store) CheckoutQuery(
-	kasten schnittstellen.KastenGetter,
-	options checkout_options.Options,
-	qg *query.Group,
-	f schnittstellen.FuncIter[sku.CheckedOutLike],
-) (err error) {
-	switch kasten.GetKasten().GetKastenString() {
+	switch col.GetKasten().GetKastenString() {
 	case "chrome":
 		err = todo.Implement()
 
 	default:
-		if err = s.CheckoutQueryFS(
-			options,
-			qg,
-			func(cofs *store_fs.CheckedOut) (err error) {
-				return f(cofs)
-			},
-		); err != nil {
+		if err = s.GetCwdFiles().Delete(col.GetSkuExternalLike()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -53,35 +26,43 @@ func (s *Store) CheckoutQuery(
 	return
 }
 
-func (s *Store) CheckoutQueryFS(
+func (s *Store) CheckoutQuery(
 	options checkout_options.Options,
-	qg *query.Group,
-	f schnittstellen.FuncIter[*store_fs.CheckedOut],
+	qg query.GroupWithKasten,
+	f schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	if err = s.QueryWithCwd(
-		qg,
-		func(t *sku.Transacted) (err error) {
-			var cop *store_fs.CheckedOut
+	qf := func(t *sku.Transacted) (err error) {
+		var col sku.CheckedOutLike
 
-			if cop, err = s.CheckoutOneFS(options, t); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			cop.DetermineState(true)
-
-			if err = s.checkedOutLogPrinter(cop); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if err = f(cop); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+		if col, err = s.CheckoutOne(qg.Kasten, options, t); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
+		}
+
+		sku.DetermineState(col, true)
+
+		if err = s.checkedOutLogPrinter(col); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = f(col); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+
+	switch qg.GetKastenString() {
+	case "chrome":
+		err = todo.Implement()
+		return
+	}
+
+	if err = s.QueryWithCwd(
+		qg.Group,
+		qf,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -104,12 +85,19 @@ func (s *Store) CheckoutOneFS(
 }
 
 func (s *Store) CheckoutOne(
+	kasten kennung.Kasten,
 	options checkout_options.Options,
 	sz *sku.Transacted,
 ) (cz sku.CheckedOutLike, err error) {
-	if cz, err = s.cwdFiles.CheckoutOne(options, sz); err != nil {
-		err = errors.Wrap(err)
-		return
+	switch kasten.GetKastenString() {
+	case "chrome":
+		err = todo.Implement()
+
+	default:
+		if cz, err = s.cwdFiles.CheckoutOne(options, sz); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

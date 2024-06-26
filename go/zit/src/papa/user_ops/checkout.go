@@ -16,6 +16,8 @@ type Checkout struct {
 	Kasten kennung.Kasten
 	*umwelt.Umwelt
 	checkout_options.Options
+	Open bool
+	Edit bool
 }
 
 func (op Checkout) Run(
@@ -46,25 +48,72 @@ func (op Checkout) RunQuery(
 	qg *query.Group,
 ) (zsc sku.CheckedOutLikeMutableSet, err error) {
 	zsc = sku.MakeCheckedOutLikeMutableSet()
-  var l sync.Mutex
+	var l sync.Mutex
 
 	if err = op.Umwelt.GetStore().CheckoutQuery(
-		&op.Kasten,
 		op.Options,
-		qg,
-    func (col sku.CheckedOutLike) (err error) {
-      l.Lock()
-      defer l.Unlock()
+		query.GroupWithKasten{
+			Group:  qg,
+			Kasten: op.Kasten,
+		},
+		func(col sku.CheckedOutLike) (err error) {
+			l.Lock()
+			defer l.Unlock()
 
-      cl := col.Clone()
+			cl := col.Clone()
 
-      if err = zsc.Add(cl); err != nil {
-        err = errors.Wrap(err)
-        return
-      }
+			if err = zsc.Add(cl); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 
-      return
-    },
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if !op.Open && !op.Edit {
+		return
+	}
+
+	if err = op.GetStore().Open(
+		op.Kasten,
+		op.CheckoutMode,
+		op.PrinterHeader(),
+		zsc,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if !op.Edit {
+		return
+	}
+
+	if err = op.Reset(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var ms *query.Group
+
+	builder := op.MakeQueryBuilderExcludingHidden(kennung.MakeGattung(gattung.Zettel))
+
+	if ms, err = builder.WithCheckedOut(zsc).BuildQueryGroup(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	checkinOp := Checkin{}
+
+	if err = checkinOp.Run(
+		op.Umwelt,
+		query.GroupWithKasten{
+			Kasten: op.Kasten,
+			Group:  ms,
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
+	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -17,6 +18,10 @@ type CheckedOut struct {
 	State    checked_out_state.State
 	IsImport bool
 	Error    error
+}
+
+func (c *CheckedOut) GetKasten() kennung.Kasten {
+	return *(kennung.MustKasten(""))
 }
 
 func (c *CheckedOut) GetSkuCheckedOutLike() sku.CheckedOutLike {
@@ -63,24 +68,6 @@ func (c *CheckedOut) InternalAndExternalEqualsSansTai() bool {
 	return c.External.Metadatei.EqualsSansTai(
 		&c.Internal.Metadatei,
 	)
-}
-
-func (c *CheckedOut) DetermineState(justCheckedOut bool) {
-	if c.Internal.GetObjekteSha().IsNull() {
-		c.State = checked_out_state.StateUntracked
-	} else if c.Internal.Metadatei.EqualsSansTai(&c.External.Metadatei) {
-		if justCheckedOut {
-			c.State = checked_out_state.StateJustCheckedOut
-		} else {
-			c.State = checked_out_state.StateExistsAndSame
-		}
-	} else {
-		if justCheckedOut {
-			c.State = checked_out_state.StateJustCheckedOutButDifferent
-		} else {
-			c.State = checked_out_state.StateExistsAndDifferent
-		}
-	}
 }
 
 func (a *CheckedOut) String() string {

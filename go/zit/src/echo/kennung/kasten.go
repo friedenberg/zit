@@ -44,15 +44,15 @@ type Kasten struct {
 	value string
 }
 
-func (k *Kasten) GetKasten() schnittstellen.KastenLike {
+func (k Kasten) GetKasten() schnittstellen.KastenLike {
 	return k
 }
 
-func (k *Kasten) EqualsKasten(kg schnittstellen.KastenGetter) bool {
+func (k Kasten) EqualsKasten(kg schnittstellen.KastenGetter) bool {
 	return kg.GetKasten().GetKastenString() == k.GetKastenString()
 }
 
-func (k *Kasten) GetKastenString() string {
+func (k Kasten) GetKastenString() string {
 	return k.String()
 }
 

@@ -198,7 +198,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		},
 	}
 
-	u.store.SetCheckedOutLogWriter(u.PrinterCheckedOutFS())
+	u.store.SetCheckedOutLogWriter(u.PrinterCheckedOutLike())
 	u.store.SetLogWriter(lw)
 
 	u.storesInitialized = true

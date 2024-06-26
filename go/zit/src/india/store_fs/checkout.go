@@ -58,7 +58,7 @@ func (s *Store) CheckoutOne(
 				return
 			}
 
-			cz.DetermineState(true)
+			sku.DetermineState(cz, true)
 
 			if !s.shouldCheckOut(options, cz, false) {
 				return
@@ -123,7 +123,7 @@ func (s *Store) UpdateCheckoutOne(
 			return
 		}
 
-		cz.DetermineState(true)
+		sku.DetermineState(cz, true)
 
 		if !s.shouldCheckOut(options, cz, true) {
 			return
