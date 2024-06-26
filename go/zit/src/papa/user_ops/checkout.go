@@ -16,8 +16,9 @@ type Checkout struct {
 	Kasten kennung.Kasten
 	*umwelt.Umwelt
 	checkout_options.Options
-	Open bool
-	Edit bool
+	Open    bool
+	Edit    bool
+	Utility string
 }
 
 func (op Checkout) Run(
@@ -74,49 +75,57 @@ func (op Checkout) RunQuery(
 		return
 	}
 
-	if !op.Open && !op.Edit {
-		return
+	if op.Utility != "" {
+		eachAkteOp := EachAkte{
+			Utility: op.Utility,
+			Umwelt:  op.Umwelt,
+		}
+
+		if err = eachAkteOp.Run(zsc); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
-	if err = op.GetStore().Open(
-		op.Kasten,
-		op.CheckoutMode,
-		op.PrinterHeader(),
-		zsc,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	if op.Open {
+		if err = op.GetStore().Open(
+			op.Kasten,
+			op.CheckoutMode,
+			op.PrinterHeader(),
+			zsc,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
-	if !op.Edit {
-		return
-	}
+	if op.Edit {
+		if err = op.Reset(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	if err = op.Reset(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+		var ms *query.Group
 
-	var ms *query.Group
+		builder := op.MakeQueryBuilderExcludingHidden(kennung.MakeGattung(gattung.Zettel))
 
-	builder := op.MakeQueryBuilderExcludingHidden(kennung.MakeGattung(gattung.Zettel))
+		if ms, err = builder.WithCheckedOut(zsc).BuildQueryGroup(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	if ms, err = builder.WithCheckedOut(zsc).BuildQueryGroup(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+		checkinOp := Checkin{}
 
-	checkinOp := Checkin{}
-
-	if err = checkinOp.Run(
-		op.Umwelt,
-		query.GroupWithKasten{
-			Kasten: op.Kasten,
-			Group:  ms,
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		if err = checkinOp.Run(
+			op.Umwelt,
+			query.GroupWithKasten{
+				Kasten: op.Kasten,
+				Group:  ms,
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

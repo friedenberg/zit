@@ -2,17 +2,14 @@ package commands
 
 import (
 	"flag"
-	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
@@ -82,8 +79,6 @@ func (c Add) RunWithQuery(
 	u *umwelt.Umwelt,
 	qg *query.Group,
 ) (err error) {
-	pz := u.GetStore().GetCwdFiles()
-
 	zettelsFromAkteOp := user_ops.ZettelFromExternalAkte{
 		Umwelt:      u,
 		ProtoZettel: c.ProtoZettel,
@@ -99,7 +94,7 @@ func (c Add) RunWithQuery(
 		return
 	}
 
-	if err = c.openAktenIfNecessary(u, zettelsFromAkteResults, pz); err != nil {
+	if err = c.openAktenIfNecessary(u, zettelsFromAkteResults); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -132,65 +127,24 @@ func (c Add) RunWithQuery(
 func (c Add) openAktenIfNecessary(
 	u *umwelt.Umwelt,
 	zettels sku.TransactedMutableSet,
-	sfs *store_fs.Store,
 ) (err error) {
 	if !c.OpenAkten && c.CheckoutAktenAndRun == "" {
 		return
 	}
 
-	options := checkout_options.Options{
-		CheckoutMode: checkout_mode.ModeAkteOnly,
+	opCheckout := user_ops.Checkout{
+		Umwelt: u,
+		Options: checkout_options.Options{
+			CheckoutMode: checkout_mode.ModeAkteOnly,
+		},
+		Utility: c.CheckoutAktenAndRun,
 	}
 
-	var filesAkten []string
-	var l sync.Mutex
-
-	if err = zettels.Each(
-		func(z *sku.Transacted) (err error) {
-			var co *store_fs.CheckedOut
-
-			if co, err = u.GetStore().CheckoutOneFS(options, z); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			e := co.External.GetAkteFD().GetPath()
-
-			if e == "" {
-				return iter.MakeErrStopIteration()
-			}
-
-			l.Lock()
-			filesAkten = append(filesAkten, e)
-			l.Unlock()
-
-			return
-		},
+	if _, err = opCheckout.Run(
+		zettels,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	if c.OpenAkten {
-		openOp := store_fs.OpenFiles{}
-
-		if err = openOp.Run(u.PrinterHeader(), filesAkten...); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if c.CheckoutAktenAndRun != "" {
-		eachAkteOp := user_ops.EachAkte{}
-
-		if err = eachAkteOp.Run(
-			u,
-			c.CheckoutAktenAndRun,
-			filesAkten...,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
 	}
 
 	return
