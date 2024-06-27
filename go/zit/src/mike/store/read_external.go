@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
-// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
 func (s *Store) ReadExternal(
 	qg query.GroupWithKasten,
 	f schnittstellen.FuncIter[sku.CheckedOutLike],

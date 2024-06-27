@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 )
 
 func init() {
@@ -107,6 +108,16 @@ type (
 		SetState(checked_out_state.State) error
 		GetError() error
 		Clone() CheckedOutLike
+	}
+
+	ManyPrinter interface {
+		PrintMany(...objekte_format.FormatterContext) (int64, error)
+	}
+
+	Scanner interface {
+		Scan() bool
+		GetTransacted() *Transacted
+		Error() error
 	}
 
 	OneReader interface {

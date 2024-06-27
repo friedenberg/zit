@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
@@ -18,7 +17,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 )
 
 func (s *Store) tryRealize(
@@ -303,63 +301,6 @@ func (s *Store) handleUnchanged(
 	t *sku.Transacted,
 ) (err error) {
 	return s.Unchanged(t)
-}
-
-// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
-func (s *Store) CreateOrUpdateCheckedOutFS(
-	co *store_fs.CheckedOut,
-	updateCheckout bool,
-) (transactedPtr *sku.Transacted, err error) {
-	kennungPtr := &co.External.Kennung
-
-	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = file_lock.ErrLockRequired{
-			Operation: fmt.Sprintf("create or update %s", kennungPtr),
-		}
-
-		return
-	}
-
-	transactedPtr = sku.GetTransactedPool().Get()
-
-	if err = transactedPtr.SetFromSkuLike(&co.External); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = transactedPtr.SetAkteSha(co.External.GetAkteSha()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.tryRealizeAndOrStore(
-		transactedPtr,
-		ObjekteOptions{Mode: objekte_mode.ModeCreate},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if !updateCheckout {
-		return
-	}
-
-	var mode checkout_mode.Mode
-
-	if mode, err = co.External.GetCheckoutMode(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if _, err = s.CheckoutOneFS(
-		checkout_options.Options{CheckoutMode: mode, Force: true},
-		transactedPtr,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }
 
 func (s *Store) CreateOrUpdateCheckedOut(

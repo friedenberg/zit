@@ -123,7 +123,6 @@ func (c Add) RunWithQuery(
 	return
 }
 
-// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
 func (c Add) openAktenIfNecessary(
 	u *umwelt.Umwelt,
 	zettels sku.TransactedMutableSet,

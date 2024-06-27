@@ -32,6 +32,7 @@ func (s *Store) QueryWithCwd(
 	return s.query(ms, f, true)
 }
 
+// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
 func (s *Store) query(
 	qg *query.Group,
 	f schnittstellen.FuncIter[*sku.Transacted],

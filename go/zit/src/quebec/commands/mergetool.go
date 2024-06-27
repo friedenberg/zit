@@ -1,17 +1,21 @@
 package commands
 
 import (
+	"bufio"
 	"flag"
+	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/to_merge"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -36,24 +40,24 @@ func (c Mergetool) RunWithQuery(
 	u *umwelt.Umwelt,
 	qg *query.Group,
 ) (err error) {
-	p := []string{}
+	conflicted := sku.MakeCheckedOutLikeMutableSet()
 
-	// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
-	if err = u.GetStore().GetCwdFiles().ReadQuery(
-		qg,
-		iter.MakeChain(
-			func(co *store_fs.CheckedOut) (err error) {
-				if co.State != checked_out_state.StateConflicted {
-					return iter.MakeErrStopIteration()
-				}
+	if err = u.GetStore().ReadExternal(
+		query.GroupWithKasten{
+			Group: qg,
+		},
+		func(co sku.CheckedOutLike) (err error) {
+			if co.GetState() != checked_out_state.StateConflicted {
+				return
+			}
 
+			if err = conflicted.Add(co.Clone()); err != nil {
+				err = errors.Wrap(err)
 				return
-			},
-			func(co *store_fs.CheckedOut) (err error) {
-				p = append(p, co.External.FDs.MakeConflictMarker())
-				return
-			},
-		),
+			}
+
+			return
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -62,31 +66,57 @@ func (c Mergetool) RunWithQuery(
 	u.Lock()
 	defer errors.Deferred(&err, u.Unlock)
 
-	if len(p) == 0 {
+	if conflicted.Len() == 0 {
 		// TODO-P2 return status 1
 		ui.Err().Printf("nothing to merge")
 		return
 	}
 
-	for _, p1 := range p {
-		tm := to_merge.Sku{
-			ConflictMarkerPath: p1,
-		}
+	if err = conflicted.Each(
+		func(col sku.CheckedOutLike) (err error) {
+			cofs := col.(*store_fs.CheckedOut)
+			p1 := cofs.External.FDs.MakeConflictMarker()
 
-		if err = tm.ReadConflictMarker(
-			u.GetKonfig().GetStoreVersion(),
-			u.GetStore().GetObjekteFormatOptions(),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+			tm := sku.Conflicted{
+				CheckedOutLike: col.Clone(),
+			}
 
-		if err = u.GetStore().RunMergeTool(
-			tm,
-		); err != nil {
-			err = errors.Wrap(err)
+			var f *os.File
+
+			if f, err = files.Open(p1); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer errors.DeferredCloser(&err, f)
+
+			br := bufio.NewReader(f)
+
+			s := sku_fmt.MakeFormatBestandsaufnahmeScanner(
+				br,
+				objekte_format.FormatForVersion(u.GetKonfig().GetStoreVersion()),
+				u.GetStore().GetObjekteFormatOptions(),
+			)
+
+			if err = tm.ReadConflictMarker(
+				s,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = u.GetStore().RunMergeTool(
+				tm,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
 			return
-		}
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

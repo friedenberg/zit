@@ -1,6 +1,7 @@
 package store
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -11,7 +12,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
+	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/to_merge"
 )
@@ -66,7 +69,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 		return
 	}
 
-	tm := to_merge.Sku{
+	tm := sku.Conflicted{
 		Left:   transactedPtrCopy,
 		Middle: &co.Internal,
 		Right:  &co.External.Transacted,
@@ -78,10 +81,33 @@ func (s *Store) readExternalAndMergeIfNecessary(
 
 	switch {
 	case errors.Is(err, &to_merge.ErrMergeConflict{}):
-		if err = tm.WriteConflictMarker(
-			s.GetStandort(),
-			s.GetKonfig().GetStoreVersion(),
+		var f *os.File
+
+		if f, err = s.GetStandort().FileTempLocal(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer errors.DeferredCloser(&err, f)
+
+		bw := bufio.NewWriter(f)
+		defer errors.DeferredFlusher(&err, bw)
+
+		p := sku_fmt.MakeFormatBestandsaufnahmePrinter(
+			bw,
+			objekte_format.FormatForVersion(s.konfig.GetStoreVersion()),
 			s.GetObjekteFormatOptions(),
+		)
+
+		if err = tm.WriteConflictMarker(
+			p,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = os.Rename(
+			f.Name(),
 			co.External.FDs.MakeConflictMarker(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -104,7 +130,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 	return
 }
 
-func (s *Store) merge(tm to_merge.Sku) (merged store_fs.FDPair, err error) {
+func (s *Store) merge(tm sku.Conflicted) (merged store_fs.FDPair, err error) {
 	if err = tm.MergeEtiketten(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -240,7 +266,7 @@ func (s *Store) runDiff3(left, middle, right fd.FD) (path string, err error) {
 }
 
 func (s *Store) RunMergeTool(
-	tm to_merge.Sku,
+	tm sku.Conflicted,
 ) (err error) {
 	tool := s.GetKonfig().Cli().ToolOptions.Merge
 	inlineAkte := tm.IsAllInlineTyp(s.GetKonfig())
@@ -334,7 +360,7 @@ func (s *Store) RunMergeTool(
 		return
 	}
 
-	if err = s.GetStandort().Delete(tm.ConflictMarkerPath); err != nil {
+	if err = s.DeleteCheckout(tm); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -347,7 +373,7 @@ func (s *Store) RunMergeTool(
 		return
 	}
 
-	if _, err = s.CreateOrUpdateCheckedOutFS(co, false); err != nil {
+	if _, err = s.CreateOrUpdateCheckedOut(co, false); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
