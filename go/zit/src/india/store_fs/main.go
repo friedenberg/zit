@@ -21,6 +21,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/echo/zittish"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -46,12 +47,15 @@ type Store struct {
 	unsureAkten         fd.MutableSet
 	emptyDirectories    fd.MutableSet
 
+	objekteFormatOptions objekte_format.Options
+
 	deleteLock sync.Mutex
 	deleted    fd.MutableSet
 }
 
 func (fs *Store) Delete(e1 sku.ExternalLike) (err error) {
-	e := e1.(*External)
+	e := e1.GetSkuExternalLike().(*External)
+
 	fs.deleteLock.Lock()
 	defer fs.deleteLock.Unlock()
 

@@ -8,6 +8,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 )
 
+func InternalAndExternalEqualsSansTai(col CheckedOutLike) bool {
+	i := col.GetSku()
+	e := col.GetSkuExternalLike().GetSku()
+
+	return e.Metadatei.EqualsSansTai(
+		&i.Metadatei,
+	)
+}
+
 func DetermineState(c CheckedOutLike, justCheckedOut bool) {
 	i := c.GetSku()
 	e := c.GetSkuExternalLike().GetSku()

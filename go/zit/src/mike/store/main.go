@@ -92,6 +92,7 @@ func (c *Store) Initialize(
 		},
 		k.FileExtensions,
 		st,
+		c.options,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

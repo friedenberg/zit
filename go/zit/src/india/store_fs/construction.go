@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -14,6 +15,7 @@ func makeCwdFiles(
 	storeFuncs sku.StoreFuncs,
 	fileExtensions file_extensions.FileExtensions,
 	st standort.Standort,
+	ofo objekte_format.Options,
 ) (fs *Store) {
 	fs = &Store{
 		konfig:         k,
@@ -44,6 +46,7 @@ func makeCwdFiles(
 		deleted: collections_value.MakeMutableValueSet[*fd.FD](
 			nil,
 		),
+		objekteFormatOptions: ofo,
 		metadateiTextParser: metadatei.MakeTextParser(
 			st,
 			nil, // TODO-P1 make akteFormatter
@@ -58,8 +61,9 @@ func MakeCwdFilesAll(
 	storeFuncs sku.StoreFuncs,
 	fileExtensions file_extensions.FileExtensions,
 	st standort.Standort,
+	ofo objekte_format.Options,
 ) (fs *Store, err error) {
-	fs = makeCwdFiles(k, storeFuncs, fileExtensions, st)
+	fs = makeCwdFiles(k, storeFuncs, fileExtensions, st, ofo)
 	err = fs.readAll()
 	return
 }

@@ -64,12 +64,6 @@ func (c *CheckedOut) SetError(err error) {
 	c.Error = err
 }
 
-func (c *CheckedOut) InternalAndExternalEqualsSansTai() bool {
-	return c.External.Metadatei.EqualsSansTai(
-		&c.Internal.Metadatei,
-	)
-}
-
 func (a *CheckedOut) String() string {
 	return fmt.Sprintf("%s %s", &a.Internal, &a.External)
 }

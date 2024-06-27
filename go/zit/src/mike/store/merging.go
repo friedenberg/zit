@@ -1,36 +1,11 @@
 package store
 
 import (
-	"bufio"
-	"fmt"
-	"io"
-	"os"
-	"os/exec"
-
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
-	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/to_merge"
 )
-
-// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
-func (s *Store) CheckoutOneFS(
-	options checkout_options.Options,
-	sz *sku.Transacted,
-) (cz *store_fs.CheckedOut, err error) {
-	if cz, err = s.cwdFiles.CheckoutOne(options, sz); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
 
 // TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
 func (s *Store) readExternalAndMergeIfNecessary(
@@ -40,36 +15,32 @@ func (s *Store) readExternalAndMergeIfNecessary(
 		return
 	}
 
-	var co *store_fs.CheckedOut
+	var col sku.CheckedOutLike
 
-	if co, err = s.cwdFiles.ReadTransactedCheckedOut(mutter); err != nil {
+	if col, err = s.cwdFiles.ReadTransactedCheckedOut(mutter); err != nil {
 		err = nil
 		return
 	}
 
-	defer store_fs.GetCheckedOutPool().Put(co)
+	defer s.PutCheckedOutLike(col)
 
-	mutterEqualsExternal := co.InternalAndExternalEqualsSansTai()
+	mutterEqualsExternal := sku.InternalAndExternalEqualsSansTai(col)
 
 	if mutterEqualsExternal {
-		var mode checkout_mode.Mode
-
-		if mode, err = co.External.GetCheckoutMode(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
 		op := checkout_options.Options{
-			CheckoutMode: mode,
-			Force:        true,
+			Force: true,
 		}
 
-		if co, err = s.CheckoutOneFS(op, transactedPtr); err != nil {
+		if col, err = s.UpdateCheckout(
+			col.GetKasten(),
+			op,
+			transactedPtr,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		store_fs.GetCheckedOutPool().Put(co)
+		s.PutCheckedOutLike(col)
 
 		return
 	}
@@ -83,197 +54,16 @@ func (s *Store) readExternalAndMergeIfNecessary(
 	}
 
 	tm := sku.Conflicted{
-		Left:   transactedPtrCopy,
-		Middle: &co.Internal,
-		Right:  &co.External.Transacted,
+		CheckedOutLike: col,
+		Left:           transactedPtrCopy,
+		Middle:         col.GetSku(),
+		Right:          col.GetSkuExternalLike().GetSku(),
 	}
 
-	var merged store_fs.FDPair
-
-	merged, err = s.merge(tm)
-
-	switch {
-	case errors.Is(err, &to_merge.ErrMergeConflict{}):
-		var f *os.File
-
-		if f, err = s.GetStandort().FileTempLocal(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		defer errors.DeferredCloser(&err, f)
-
-		bw := bufio.NewWriter(f)
-		defer errors.DeferredFlusher(&err, bw)
-
-		p := sku_fmt.MakeFormatBestandsaufnahmePrinter(
-			bw,
-			objekte_format.FormatForVersion(s.konfig.GetStoreVersion()),
-			s.GetObjekteFormatOptions(),
-		)
-
-		if err = tm.WriteConflictMarker(
-			p,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = os.Rename(
-			f.Name(),
-			co.External.FDs.MakeConflictMarker(),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case err != nil:
-		err = errors.Wrap(err)
-		return
-
-	default:
-		src := merged.Objekte.GetPath()
-		dst := co.External.FDs.Objekte.GetPath()
-
-		if err = files.Rename(src, dst); err != nil {
-			return
-		}
-	}
-
-	return
-}
-
-func (s *Store) merge(tm sku.Conflicted) (merged store_fs.FDPair, err error) {
-	if err = tm.MergeEtiketten(); err != nil {
+	if err = s.cwdFiles.Merge(tm); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	var leftCO, middleCO, rightCO *store_fs.CheckedOut
-
-	inlineAkte := tm.IsAllInlineTyp(s.GetKonfig())
-
-	mode := checkout_mode.ModeObjekteAndAkte
-
-	if !inlineAkte {
-		mode = checkout_mode.ModeObjekteOnly
-	}
-
-	op := checkout_options.Options{
-		CheckoutMode:    mode,
-		ForceInlineAkte: true,
-		Path:            checkout_options.PathTempLocal,
-		Force:           true,
-	}
-
-	if leftCO, err = s.CheckoutOneFS(op, tm.Left); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if middleCO, err = s.CheckoutOneFS(op, tm.Middle); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if rightCO, err = s.CheckoutOneFS(op, tm.Right); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var p string
-
-	if p, err = s.runDiff3(
-		leftCO.External.FDs.Objekte,
-		middleCO.External.FDs.Objekte,
-		rightCO.External.FDs.Objekte,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = merged.Objekte.SetPath(p); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	// if merged.Akte.Path, err = s.runDiff3(
-	// 	leftCO.External.FDs.Akte,
-	// 	middleCO.External.FDs.Akte,
-	// 	rightCO.External.FDs.Akte,
-	// ); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
-
-	return
-}
-
-func (s *Store) runDiff3(left, middle, right fd.FD) (path string, err error) {
-	cmd := exec.Command(
-		"diff3",
-		"--text",
-		"--merge",
-		"--label=left",
-		"--label=middle",
-		"--label=right",
-		left.GetPath(),
-		middle.GetPath(),
-		right.GetPath(),
-	)
-
-	var out io.ReadCloser
-
-	if out, err = cmd.StdoutPipe(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	cmd.Stderr = os.Stderr
-
-	var f *os.File
-
-	if f, err = s.GetStandort().FileTempLocal(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, f)
-
-	if err = cmd.Start(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	// merged = sku.GetExternalPool().Get()
-
-	// if err = merged.Kennung.SetWithKennung(tm.right.Kennung); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
-
-	if _, err = io.Copy(f, out); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	// if err = s.ReadOneExternalObjekteReader(out, merged); err != nil {
-	// 	log.Debug().Printf("%s", err)
-	// 	err = nil
-	// 	// err = errors.Wrap(err)
-	// 	// return
-	// }
-
-	if err = cmd.Wait(); err != nil {
-		if cmd.ProcessState.ExitCode() == 1 {
-			err = errors.Wrap(to_merge.MakeErrMergeConflict(nil))
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	path = f.Name()
 
 	return
 }
@@ -282,113 +72,26 @@ func (s *Store) RunMergeTool(
 	tm sku.Conflicted,
 ) (err error) {
 	tool := s.GetKonfig().Cli().ToolOptions.Merge
-	inlineAkte := tm.IsAllInlineTyp(s.GetKonfig())
 
-	op := checkout_options.Options{
-		CheckoutMode:    checkout_mode.ModeObjekteAndAkte,
-		AllowConflicted: true,
-		Path:            checkout_options.PathTempLocal,
-	}
+	switch tm.GetKasten().GetKastenString() {
+	case "chrome":
+		err = todo.Implement()
 
-	if !inlineAkte {
-		op.CheckoutMode = checkout_mode.ModeObjekteOnly
-	}
+	default:
+		var co sku.CheckedOutLike
 
-	var leftCO, middleCO, rightCO *store_fs.CheckedOut
+		if co, err = s.cwdFiles.RunMergeTool(tool, tm); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	if leftCO, err = s.CheckoutOneFS(op, tm.Left); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+		defer s.PutCheckedOutLike(co)
 
-	if middleCO, err = s.CheckoutOneFS(op, tm.Middle); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+		if _, err = s.CreateOrUpdateCheckedOut(co, false); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	if rightCO, err = s.CheckoutOneFS(op, tm.Right); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var f *os.File
-
-	if f, err = s.GetStandort().FileTempLocal(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	tmpPath := f.Name()
-
-	defer errors.DeferredCloser(&err, f)
-
-	var cmdStrings []string
-
-	if len(tool) > 1 {
-		toolArgs := tool[1:]
-		cmdStrings = make([]string, 3+len(toolArgs))
-		copy(cmdStrings, toolArgs)
-	}
-
-	cmdStrings = append(
-		cmdStrings,
-		leftCO.External.FDs.Objekte.GetPath(),
-		middleCO.External.FDs.Objekte.GetPath(),
-		rightCO.External.FDs.Objekte.GetPath(),
-		tmpPath,
-	)
-
-	if len(tool) == 0 {
-		err = errors.Errorf("no utility provided")
-		return
-	}
-
-	cmd := exec.Command(tool[0], cmdStrings...)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	cmd.Env = []string{
-		fmt.Sprintf("LOCAL=%s", leftCO.External.FDs.Objekte.GetPath()),
-		fmt.Sprintf("BASE=%s", middleCO.External.FDs.Objekte.GetPath()),
-		fmt.Sprintf("REMOTE=%s", rightCO.External.FDs.Objekte.GetPath()),
-		fmt.Sprintf("MERGED=%s", tmpPath),
-	}
-
-	if err = cmd.Run(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	e := store_fs.GetExternalPool().Get()
-	defer store_fs.GetExternalPool().Put(e)
-
-	if err = e.SetFromSkuLike(&leftCO.External); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.cwdFiles.ReadOneExternalObjekteReader(f, e); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.DeleteCheckout(tm); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	co := store_fs.GetCheckedOutPool().Get()
-	defer store_fs.GetCheckedOutPool().Put(co)
-
-	if err = co.External.SetFromSkuLike(e); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if _, err = s.CreateOrUpdateCheckedOut(co, false); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	return
