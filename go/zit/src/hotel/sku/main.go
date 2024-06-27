@@ -45,10 +45,11 @@ type (
 	}
 
 	ExternalStore interface {
-		// QueryCheckedOut(
-		// 	qg Queryable,
-		// 	f schnittstellen.FuncIter[CheckedOutLike],
-		// ) (err error)
+		// Flush() error
+		QueryCheckedOut(
+			qg Queryable,
+			f schnittstellen.FuncIter[CheckedOutLike],
+		) (err error)
 	}
 
 	Ennui interface {

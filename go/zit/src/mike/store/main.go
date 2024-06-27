@@ -18,6 +18,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/akten"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/chrome"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/store_verzeichnisse"
@@ -36,7 +37,6 @@ type Store struct {
 	Abbr                      AbbrStore
 	persistentMetadateiFormat objekte_format.Format
 	fileEncoder               store_fs.FileEncoder
-	virtualStores             map[string]*query.VirtualStoreInitable
 	luaVMPoolBuilder          *lua.VMPoolBuilder
 	etikettenLock             sync.Mutex
 
@@ -57,6 +57,8 @@ type Store struct {
 	protoZettel      zettel.ProtoZettel
 	konfigAkteFormat akten.Format[erworben.Akte, *erworben.Akte]
 
+	queryBuilder *query.Builder
+
 	Logger
 }
 
@@ -70,8 +72,8 @@ func (c *Store) Initialize(
 	st standort.Standort,
 	pmf objekte_format.Format,
 	t thyme.Time,
-	virtualStores map[string]*query.VirtualStoreInitable,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
+	qb *query.Builder,
 ) (err error) {
 	c.konfig = k
 	c.standort = st
@@ -80,17 +82,19 @@ func (c *Store) Initialize(
 	c.options = objekte_format.Options{Tai: true}
 	c.sonnenaufgang = t
 	c.fileEncoder = store_fs.MakeFileEncoder(st, k)
-	c.virtualStores = virtualStores
 	c.luaVMPoolBuilder = luaVMPoolBuilder
+	c.queryBuilder = qb
+
+	sf := sku.StoreFuncs{
+		FuncRealize:     c.tryRealize,
+		FuncCommit:      c.tryRealizeAndOrStore,
+		FuncReadSha:     c.ReadOneEnnui,
+		FuncReadOneInto: c.ReadOneInto,
+	}
 
 	if c.cwdFiles, err = store_fs.MakeCwdFilesAll(
 		k,
-		sku.StoreFuncs{
-			FuncRealize:     c.tryRealize,
-			FuncCommit:      c.tryRealizeAndOrStore,
-			FuncReadSha:     c.ReadOneEnnui,
-			FuncReadOneInto: c.ReadOneInto,
-		},
+		sf,
 		k.FileExtensions,
 		st,
 		c.options,
@@ -103,13 +107,11 @@ func (c *Store) Initialize(
 		"": c.cwdFiles,
 	}
 
-	for k, v := range virtualStores {
-		c.externalStores[k] = v
+	if k.ChrestEnabled {
+		c.externalStores["%chrome"] = &query.VirtualStoreInitable{
+			VirtualStore: chrome.MakeChrome(k, st),
+		}
 	}
-
-	// c.virtualStores[""] = &query.VirtualStoreInitable{
-	// 	VirtualStore: c.cwdFiles,
-	// }
 
 	c.metadateiTextParser = metadatei.MakeTextParser(
 		c.standort,

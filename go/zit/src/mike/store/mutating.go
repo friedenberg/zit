@@ -114,12 +114,12 @@ func (s *Store) tryRealizeAndOrStore(
 		}
 	}
 
-	for _, vs := range s.virtualStores {
-		if err = vs.CommitTransacted(kinder, mutter); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
+	// for _, vs := range s.virtualStores {
+	// 	if err = vs.CommitTransacted(kinder, mutter); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return
+	// 	}
+	// }
 
 	if o.Mode != objekte_mode.ModeReindex &&
 		mutter != nil &&
@@ -251,13 +251,13 @@ func (s *Store) fetchMutterIfNecessary(
 		return
 	}
 
-	for _, vs := range s.virtualStores {
-		if err = vs.ModifySku(mutter); err != nil {
-			ui.Err().Print(err)
-			err = nil
-			return
-		}
-	}
+	// for _, vs := range s.virtualStores {
+	// 	if err = vs.ModifySku(mutter); err != nil {
+	// 		ui.Err().Print(err)
+	// 		err = nil
+	// 		return
+	// 	}
+	// }
 
 	sk.Metadatei.Mutter().ResetWith(mutter.Metadatei.Sha())
 

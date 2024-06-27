@@ -21,6 +21,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/bestandsaufnahme"
 )
 
+func (u *Store) GetChrestStore() sku.ExternalStore {
+	return u.externalStores["%chrome"]
+}
+
 func (s *Store) GetAkten() *akten.Akten {
 	return s.akten
 }

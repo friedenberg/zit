@@ -8,6 +8,7 @@ import (
 )
 
 type VirtualStore interface {
+	sku.ExternalStore
 	Initialize() error
 	Flush() error
 	// TODO add objekte mode

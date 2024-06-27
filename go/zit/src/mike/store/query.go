@@ -35,6 +35,13 @@ func (s *Store) query(
 	f schnittstellen.FuncIter[*sku.Transacted],
 	includeCwd bool,
 ) (err error) {
+	if qg.Group == nil {
+		if qg.Group, err = s.queryBuilder.BuildQueryGroup(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	var f1 schnittstellen.FuncIter[*sku.Transacted]
 
 	// TODO improve performance by only reading Cwd zettels rather than scanning
@@ -101,13 +108,13 @@ func (s *Store) query(
 		return
 	}
 
-	for _, vs := range s.virtualStores {
-		// TODO only query story if query group contains store type
-		if err = vs.Query(qg.Group, f1); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
+	// for _, vs := range s.virtualStores {
+	// 	// TODO only query story if query group contains store type
+	// 	if err = vs.Query(qg.Group, f1); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return
+	// 	}
+	// }
 
 	return
 }

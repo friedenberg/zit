@@ -175,8 +175,11 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		u.standort,
 		objekte_format.FormatForVersion(u.GetKonfig().GetStoreVersion()),
 		u.sonnenaufgang,
-		u.virtualStores,
+		// u.virtualStores,
 		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
+		// u.PrinterFDDeleted(),
+		u.makeQueryBuilder().
+			WithDefaultGattungen(kennung.MakeGattung(gattung.TrueGattung()...)),
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")
 		return
