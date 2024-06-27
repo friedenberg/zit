@@ -153,7 +153,7 @@ func (c CheckinTomlBookmark) getUrls(
 
 	urls = make(map[string]SkuWithUrl)
 
-	if err = u.GetStore().QueryWithoutCwd(
+	if err = u.GetStore().Query(
 		ids,
 		iter.MakeSyncSerializer(
 			func(sk *sku.Transacted) (err error) {

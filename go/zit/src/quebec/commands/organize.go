@@ -90,7 +90,7 @@ func (c *Organize) RunWithQuery(
 
 	getResults := sku.MakeTransactedMutableSet()
 
-	if err = u.GetStore().QueryWithCwd(
+	if err = u.GetStore().QueryWithKasten(
 		query.GroupWithKasten{Group: ms},
 		iter.MakeAddClonePoolPtrFunc(
 			getResults,

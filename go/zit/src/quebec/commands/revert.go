@@ -96,7 +96,7 @@ func (c Revert) runRevertFromQuery(
 	ms *query.Group,
 	f schnittstellen.FuncIter[revertTuple],
 ) (err error) {
-	if err = u.GetStore().QueryWithoutCwd(
+	if err = u.GetStore().Query(
 		ms,
 		func(z *sku.Transacted) (err error) {
 			return f(revertTuple{Transacted: z, Sha: z.Metadatei.Mutter()})

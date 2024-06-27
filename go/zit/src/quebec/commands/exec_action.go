@@ -63,7 +63,7 @@ func (c ExecAction) RunWithQuery(
 
 	hinweisen := collections_value.MakeMutableValueSet[kennung.Kennung](nil)
 
-	if err = u.GetStore().QueryWithCwd(
+	if err = u.GetStore().QueryWithKasten(
 		query.GroupWithKasten{Group: ms},
 		func(z *sku.Transacted) (err error) {
 			return hinweisen.Add(z.GetKennung())

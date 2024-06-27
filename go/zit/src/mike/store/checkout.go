@@ -59,7 +59,7 @@ func (s *Store) CheckoutQuery(
 		return
 	}
 
-	if err = s.QueryWithCwd(qg, qf); err != nil {
+	if err = s.QueryWithKasten(qg, qf); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

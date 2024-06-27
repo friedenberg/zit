@@ -16,14 +16,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
-func (s *Store) QueryWithoutCwd(
+func (s *Store) Query(
 	ms *query.Group,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return s.query(query.GroupWithKasten{Group: ms}, f, false)
 }
 
-func (s *Store) QueryWithCwd(
+func (s *Store) QueryWithKasten(
 	ms query.GroupWithKasten,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
@@ -121,7 +121,7 @@ func (s *Store) QueryCheckedOut(
 		err = todo.Implement()
 		if err = s.cwdFiles.QueryCheckedOut(
 			qg.Group,
-      f,
+			f,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
