@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/remote_conn"
 )
@@ -151,7 +152,7 @@ func (op PullServer) skusForFilter(
 	}
 
 	if err = op.umwelt.GetStore().QueryWithCwd(
-		msg.MetaSet,
+		query.GroupWithKasten{Group: msg.MetaSet},
 		iter.MakeChain(
 			// zettel.MakeWriterKonfig(
 			// 	op.umwelt.Konfig(),

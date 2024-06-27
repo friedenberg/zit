@@ -55,7 +55,7 @@ func (c Show) RunWithQuery(u *umwelt.Umwelt, ms *query.Group) (err error) {
 	}
 
 	if err = u.GetStore().QueryWithCwd(
-		ms,
+		query.GroupWithKasten{Group: ms},
 		iter.MakeSyncSerializer(f),
 	); err != nil {
 		err = errors.Wrap(err)

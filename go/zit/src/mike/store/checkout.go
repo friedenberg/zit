@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
@@ -60,23 +59,7 @@ func (s *Store) CheckoutQuery(
 		return
 	}
 
-	if err = s.QueryWithCwd(
-		qg.Group,
-		qf,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
-func (s *Store) CheckoutOneFS(
-	options checkout_options.Options,
-	sz *sku.Transacted,
-) (cz *store_fs.CheckedOut, err error) {
-	if cz, err = s.cwdFiles.CheckoutOne(options, sz); err != nil {
+	if err = s.QueryWithCwd(qg, qf); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

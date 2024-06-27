@@ -8,13 +8,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
@@ -22,19 +22,18 @@ func (s *Store) QueryWithoutCwd(
 	ms *query.Group,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	return s.query(ms, f, false)
+	return s.query(query.GroupWithKasten{Group: ms}, f, false)
 }
 
 func (s *Store) QueryWithCwd(
-	ms *query.Group,
+	ms query.GroupWithKasten,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return s.query(ms, f, true)
 }
 
-// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
 func (s *Store) query(
-	qg *query.Group,
+	qg query.GroupWithKasten,
 	f schnittstellen.FuncIter[*sku.Transacted],
 	includeCwd bool,
 ) (err error) {
@@ -51,28 +50,7 @@ func (s *Store) query(
 				return
 			}
 
-			var e *store_fs.KennungFDPair
-
-			e, ok = s.GetCwdFiles().Get(&z.Kennung)
-
-			if !ok {
-				return
-			}
-
-			var e2 *store_fs.External
-
-			if e2, err = s.cwdFiles.ReadOneKennungFDPairExternal(
-				ObjekteOptions{
-					Mode: objekte_mode.ModeUpdateTai,
-				},
-				e,
-				z,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if err = z.SetFromSkuLike(&e2.Transacted); err != nil {
+			if err = s.UpdateTransactedWithExternal(qg.Kasten, z); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -98,26 +76,9 @@ func (s *Store) query(
 			}
 
 			if includeCwd && m.GetSigil().IncludesCwd() {
-				var e *store_fs.KennungFDPair
-
-				if e, ok = s.GetCwdFiles().Get(&z.Kennung); ok {
-					var e2 *store_fs.External
-
-					if e2, err = s.cwdFiles.ReadOneKennungFDPairExternal(
-						ObjekteOptions{
-							Mode: objekte_mode.ModeUpdateTai,
-						},
-						e,
-						z,
-					); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
-					if err = z.SetFromSkuLike(&e2.Transacted); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
+				if err = s.UpdateTransactedWithExternal(qg.Kasten, z); err != nil {
+					err = errors.Wrap(err)
+					return
 				}
 			}
 
@@ -134,14 +95,35 @@ func (s *Store) query(
 		}
 	}
 
-	if err = s.GetVerzeichnisse().ReadQuery(qg, f1); err != nil {
+	if err = s.GetVerzeichnisse().ReadQuery(
+		qg.Group,
+		f1,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	for _, vs := range s.virtualStores {
 		// TODO only query story if query group contains store type
-		if err = vs.Query(qg, f1); err != nil {
+		if err = vs.Query(qg.Group, f1); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (s *Store) UpdateTransactedWithExternal(
+	kasten kennung.Kasten,
+	z *sku.Transacted,
+) (err error) {
+	switch kasten.GetKastenString() {
+	case "chrome":
+		err = todo.Implement()
+
+	default:
+		if err = s.GetCwdFiles().UpdateTransacted(z); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

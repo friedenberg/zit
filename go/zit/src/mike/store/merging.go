@@ -20,6 +20,19 @@ import (
 )
 
 // TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
+func (s *Store) CheckoutOneFS(
+	options checkout_options.Options,
+	sz *sku.Transacted,
+) (cz *store_fs.CheckedOut, err error) {
+	if cz, err = s.cwdFiles.CheckoutOne(options, sz); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
 func (s *Store) readExternalAndMergeIfNecessary(
 	transactedPtr, mutter *sku.Transacted,
 ) (err error) {

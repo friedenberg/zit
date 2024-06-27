@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
@@ -66,6 +67,34 @@ func (s *Store) ReadOneExternal(
 	e = GetExternalPool().Get()
 
 	if err = s.ReadOneExternalInto(o, em, t, e); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
+	e, ok := s.Get(&z.Kennung)
+
+	if !ok {
+		return
+	}
+
+	var e2 *External
+
+	if e2, err = s.ReadOneKennungFDPairExternal(
+		sku.ObjekteOptions{
+			Mode: objekte_mode.ModeUpdateTai,
+		},
+		e,
+		z,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = z.SetFromSkuLike(&e2.Transacted); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
