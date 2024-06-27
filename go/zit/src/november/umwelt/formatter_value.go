@@ -768,7 +768,7 @@ func (u *Umwelt) makeTypFormatter(
 		f = func(o *sku.Transacted) (err error) {
 			var tt *sku.Transacted
 
-			if tt, err = u.GetStore().ReadOne(o.GetTyp()); err != nil {
+			if tt, err = u.GetStore().ReadTransactedFromKennung(o.GetTyp()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -873,7 +873,7 @@ func (u *Umwelt) makeTypFormatter(
 		f = func(o *sku.Transacted) (err error) {
 			var t *sku.Transacted
 
-			if t, err = u.GetStore().ReadOne(o.GetTyp()); err != nil {
+			if t, err = u.GetStore().ReadTransactedFromKennung(o.GetTyp()); err != nil {
 				if collections.IsErrNotFound(err) {
 					err = nil
 				} else {

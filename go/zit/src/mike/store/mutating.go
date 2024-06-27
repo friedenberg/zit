@@ -213,7 +213,11 @@ func (s *Store) tryRealizeAndOrStore(
 	}
 
 	if o.Contains(objekte_mode.ModeMergeCheckedOut) {
-		if err = s.readExternalAndMergeIfNecessary(kinder, mutter); err != nil {
+		if err = s.readExternalAndMergeIfNecessary(
+			kinder,
+			mutter,
+			o,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

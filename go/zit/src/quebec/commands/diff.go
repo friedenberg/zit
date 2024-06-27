@@ -51,7 +51,7 @@ func (c Diff) RunWithQuery(
 		DoNotWriteEmptyBezeichnung: true,
 	}
 
-	opDiffFS := user_ops.DiffFS{
+	opDiffFS := user_ops.Diff{
 		Umwelt: u,
 		Inline: metadatei.MakeTextFormatterMetadateiInlineAkte(
 			co,
@@ -65,7 +65,7 @@ func (c Diff) RunWithQuery(
 		),
 	}
 
-	if err = u.GetStore().ReadExternal(
+	if err = u.GetStore().QueryCheckedOut(
 		query.GroupWithKasten{
 			Group:  qg,
 			Kasten: c.Kasten,

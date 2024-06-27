@@ -124,7 +124,7 @@ func (c Clean) RunWithQuery(
 		return
 	}
 
-	if err = u.GetStore().ReadExternal(
+	if err = u.GetStore().QueryCheckedOut(
 		query.GroupWithKasten{
 			Group:  qg,
 			Kasten: c.Kasten,
@@ -199,7 +199,7 @@ func (c Clean) markUnsureAktenForRemovalIfNecessary(
 	// TODO create a new query group for all of history
 	qg.SetIncludeHistory()
 
-	if err = u.GetStore().ReadAllMatchingAkten(
+	if err = u.GetStore().QueryAllMatchingAkten(
 		qg,
 		u.GetStore().GetCwdFiles().GetUnsureAkten(),
 		func(fd *fd.FD, z *sku.Transacted) (err error) {

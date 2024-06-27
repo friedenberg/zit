@@ -74,7 +74,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	// iterate through pairs and read current zettel
 	for i, p := range pairs {
-		if zettels[i], err = u.GetStore().ReadOne(
+		if zettels[i], err = u.GetStore().ReadTransactedFromKennung(
 			p.Hinweis,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -115,7 +115,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 				return
 			}
 
-			if zettels[i], err = u.GetStore().ReadOne(
+			if zettels[i], err = u.GetStore().ReadTransactedFromKennung(
 				p.Hinweis,
 			); err != nil {
 				err = errors.Wrap(err)

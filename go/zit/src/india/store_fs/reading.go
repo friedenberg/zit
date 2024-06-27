@@ -83,7 +83,7 @@ func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 
 	var e2 *External
 
-	if e2, err = s.ReadOneKennungFDPairExternal(
+	if e2, err = s.ReadExternalFromKennungFDPair(
 		sku.ObjekteOptions{
 			Mode: objekte_mode.ModeUpdateTai,
 		},

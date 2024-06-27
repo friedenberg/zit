@@ -137,7 +137,7 @@ func (c *FormatZettel) getSku(
 		return
 	}
 
-	if sk, err = u.GetStore().ReadOneSigil(k, c.Kasten, s); err != nil {
+	if sk, err = u.GetStore().ReadTransactedFromKennungKastenSigil(k, c.Kasten, s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -157,7 +157,7 @@ func (c *FormatZettel) getAkteFormatter(
 
 	var typKonfig *sku.Transacted
 
-	if typKonfig, err = u.GetStore().ReadOne(zt.GetTyp()); err != nil {
+	if typKonfig, err = u.GetStore().ReadTransactedFromKennung(zt.GetTyp()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

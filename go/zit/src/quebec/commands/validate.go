@@ -58,7 +58,7 @@ func (c Validate) RunWithQuery(
 
 			t.FDs.Objekte.ResetWith(f)
 
-			if _, err = u.GetStore().GetCwdFiles().ReadOneCheckedOut(
+			if _, err = u.GetStore().GetCwdFiles().ReadCheckedOutFromKennungFDPair(
 				store.ObjekteOptions{
 					Mode: objekte_mode.ModeUpdateTai,
 				},

@@ -42,7 +42,7 @@ func (c Mergetool) RunWithQuery(
 ) (err error) {
 	conflicted := sku.MakeCheckedOutLikeMutableSet()
 
-	if err = u.GetStore().ReadExternal(
+	if err = u.GetStore().QueryCheckedOut(
 		query.GroupWithKasten{
 			Group: qg,
 		},

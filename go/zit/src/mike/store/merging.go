@@ -7,9 +7,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-// TODO [radi/kof !task "add support for kasten in checkouts and external" project-2021-zit-features today zz-inbox]
 func (s *Store) readExternalAndMergeIfNecessary(
-	transactedPtr, mutter *sku.Transacted,
+	kinder, mutter *sku.Transacted,
+	options sku.ObjekteOptions,
 ) (err error) {
 	if mutter == nil {
 		return
@@ -17,7 +17,10 @@ func (s *Store) readExternalAndMergeIfNecessary(
 
 	var col sku.CheckedOutLike
 
-	if col, err = s.cwdFiles.ReadTransactedCheckedOut(mutter); err != nil {
+	if col, err = s.ReadCheckedOutFromTransacted(
+		options.Kasten,
+		mutter,
+	); err != nil {
 		err = nil
 		return
 	}
@@ -31,10 +34,11 @@ func (s *Store) readExternalAndMergeIfNecessary(
 			Force: true,
 		}
 
-		if col, err = s.UpdateCheckout(
-			col.GetKasten(),
+		sku.TransactedResetter.ResetWith(col.GetSku(), kinder)
+
+		if err = s.UpdateCheckoutFromCheckedOut(
 			op,
-			transactedPtr,
+			col,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -48,7 +52,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 	transactedPtrCopy := sku.GetTransactedPool().Get()
 	defer sku.GetTransactedPool().Put(transactedPtrCopy)
 
-	if err = transactedPtrCopy.SetFromSkuLike(transactedPtr); err != nil {
+	if err = transactedPtrCopy.SetFromSkuLike(kinder); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -60,9 +64,26 @@ func (s *Store) readExternalAndMergeIfNecessary(
 		Right:          col.GetSkuExternalLike().GetSku(),
 	}
 
-	if err = s.cwdFiles.Merge(tm); err != nil {
+	if err = s.Merge(tm); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	return
+}
+
+func (s *Store) Merge(
+	tm sku.Conflicted,
+) (err error) {
+	switch tm.CheckedOutLike.GetKasten().GetKastenString() {
+	case "chrome":
+		err = todo.Implement()
+
+	default:
+		if err = s.cwdFiles.Merge(tm); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

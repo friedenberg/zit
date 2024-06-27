@@ -21,7 +21,7 @@ func (c Checkin) Run(
 
 	ui.Log().Print(qg)
 
-	if err = u.GetStore().ReadExternal(
+	if err = u.GetStore().QueryCheckedOut(
 		qg,
 		func(col sku.CheckedOutLike) (err error) {
 			if _, err = u.GetStore().CreateOrUpdateCheckedOut(

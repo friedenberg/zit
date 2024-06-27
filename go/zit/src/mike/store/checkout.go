@@ -86,17 +86,19 @@ func (s *Store) CheckoutOne(
 	return
 }
 
-func (s *Store) UpdateCheckout(
-	kasten kennung.Kasten,
+func (s *Store) UpdateCheckoutFromCheckedOut(
 	options checkout_options.Options,
-	sz *sku.Transacted,
-) (cz sku.CheckedOutLike, err error) {
-	switch kasten.GetKastenString() {
+	col sku.CheckedOutLike,
+) (err error) {
+	switch col.GetKasten().GetKastenString() {
 	case "chrome":
 		err = todo.Implement()
 
 	default:
-		if cz, err = s.cwdFiles.UpdateCheckoutOne(options, sz); err != nil {
+		if err = s.cwdFiles.UpdateCheckoutFromCheckedOut(
+			options,
+			col,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

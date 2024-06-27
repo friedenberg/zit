@@ -119,13 +119,13 @@ func (e *fileEncoder) EncodeObjekte(
 					err = errors.Wrap(err)
 					return
 				}
-			} else {
-				defer errors.DeferredCloser(&err, fAkte)
+			}
 
-				if _, err = io.Copy(fAkte, ar); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+			defer errors.DeferredCloser(&err, fAkte)
+
+			if _, err = io.Copy(fAkte, ar); err != nil {
+				err = errors.Wrap(err)
+				return
 			}
 		}
 

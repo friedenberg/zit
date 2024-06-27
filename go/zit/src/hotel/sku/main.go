@@ -17,6 +17,7 @@ func init() {
 }
 
 type ObjekteOptions struct {
+	kennung.Kasten
 	objekte_mode.Mode
 	kennung.Clock
 }
@@ -121,7 +122,7 @@ type (
 	}
 
 	OneReader interface {
-		ReadOne(
+		ReadTransactedFromKennung(
 			k1 schnittstellen.StringerGattungGetter,
 		) (sk1 *Transacted, err error)
 	}

@@ -276,7 +276,13 @@ func (fs *Store) Get(
 		return
 
 	default:
-		panic(gattung.MakeErrUnsupportedGattung(g))
+		err := errors.Wrapf(
+			gattung.MakeErrUnsupportedGattung(g),
+			"Kennung: %q",
+			k,
+		)
+
+		panic(err)
 	}
 }
 

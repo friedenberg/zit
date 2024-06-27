@@ -49,7 +49,7 @@ func (c Status) RunWithQuery(
 ) (err error) {
 	pcol := u.PrinterCheckedOutLike()
 
-	if err = u.GetStore().ReadExternal(
+	if err = u.GetStore().QueryCheckedOut(
 		query.GroupWithKasten{
 			Group:  qg,
 			Kasten: c.Kasten,
@@ -87,7 +87,7 @@ func (c Status) RunWithQuery(
 
 	p := u.PrinterCheckedOutLike()
 
-	if err = u.GetStore().ReadAllMatchingAkten(
+	if err = u.GetStore().QueryAllMatchingAkten(
 		qg,
 		u.GetStore().GetCwdFiles().GetUnsureAkten(),
 		func(fd *fd.FD, z *sku.Transacted) (err error) {

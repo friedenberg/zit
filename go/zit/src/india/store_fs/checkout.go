@@ -39,7 +39,7 @@ func (s *Store) CheckoutOne(
 	if e, ok = s.Get(&sz.Kennung); ok {
 		var cze *External
 
-		if cze, err = s.ReadOneKennungFDPairExternal(
+		if cze, err = s.ReadExternalFromKennungFDPair(
 			sku.ObjekteOptions{
 				Mode: objekte_mode.ModeRealizeSansProto,
 			},
@@ -84,10 +84,13 @@ func (s *Store) CheckoutOne(
 	return
 }
 
-func (s *Store) UpdateCheckoutOne(
+func (s *Store) UpdateCheckoutFromCheckedOut(
 	options checkout_options.Options, // TODO CheckoutMode is currently ignored
-	sz *sku.Transacted,
-) (cz *CheckedOut, err error) {
+	col sku.CheckedOutLike,
+) (err error) {
+	cofs := col.(*CheckedOut)
+	sz := cofs.GetSku()
+
 	var e *KennungFDPair
 	ok := false
 
@@ -95,21 +98,13 @@ func (s *Store) UpdateCheckoutOne(
 		return
 	}
 
-	cz = GetCheckedOutPool().Get()
-
-	if err = cz.Internal.SetFromSkuLike(sz); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var cze *External
-
-	if cze, err = s.ReadOneKennungFDPairExternal(
+	if err = s.ReadIntoExternalFromKennungFDPair(
 		sku.ObjekteOptions{
 			Mode: objekte_mode.ModeRealizeSansProto,
 		},
 		e,
 		sz,
+		&cofs.External,
 	); err != nil {
 		if errors.Is(err, ErrExternalHasConflictMarker) && options.AllowConflicted {
 			err = nil
@@ -118,27 +113,22 @@ func (s *Store) UpdateCheckoutOne(
 			return
 		}
 	} else {
-		if err = cz.External.SetFromSkuLike(cze); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		sku.DetermineState(cofs, true)
 
-		sku.DetermineState(cz, true)
-
-		if !s.shouldCheckOut(options, cz, true) {
+		if !s.shouldCheckOut(options, cofs, true) {
 			return
 		}
 
 		var mode checkout_mode.Mode
 
-		if mode, err = cz.External.GetCheckoutMode(); err != nil {
+		if mode, err = cofs.External.GetCheckoutMode(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		options.CheckoutMode = mode
 
-		if err = cz.Remove(s.standort); err != nil {
+		if err = cofs.Remove(s.standort); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -146,7 +136,7 @@ func (s *Store) UpdateCheckoutOne(
 
 	if err = s.checkoutOne(
 		options,
-		cz,
+		cofs,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
