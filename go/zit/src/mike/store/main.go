@@ -29,6 +29,7 @@ type Store struct {
 	konfig                    *konfig.Compiled
 	standort                  standort.Standort
 	cwdFiles                  *store_fs.Store
+	externalStores            map[string]sku.ExternalStore
 	akten                     *akten.Akten
 	bestandsaufnahmeAkte      bestandsaufnahme.Akte
 	options                   objekte_format.Options
@@ -96,6 +97,14 @@ func (c *Store) Initialize(
 	); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	c.externalStores = map[string]sku.ExternalStore{
+		"": c.cwdFiles,
+	}
+
+	for k, v := range virtualStores {
+		c.externalStores[k] = v
 	}
 
 	// c.virtualStores[""] = &query.VirtualStoreInitable{

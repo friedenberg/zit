@@ -9,7 +9,7 @@ import (
 
 func (s *Store) MakeApplyCheckedOut(
 	qg sku.Queryable,
-	f schnittstellen.FuncIter[*CheckedOut],
+	f schnittstellen.FuncIter[sku.CheckedOutLike],
 	o sku.ObjekteOptions,
 ) schnittstellen.FuncIter[*KennungFDPair] {
 	return func(em *KennungFDPair) (err error) {
@@ -26,7 +26,7 @@ func (s *Store) ApplyCheckedOut(
 	o sku.ObjekteOptions,
 	qg sku.Queryable,
 	em *KennungFDPair,
-	f schnittstellen.FuncIter[*CheckedOut],
+	f schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	var co *CheckedOut
 
@@ -49,7 +49,7 @@ func (s *Store) ApplyCheckedOut(
 
 func (s *Store) QueryCheckedOut(
 	qg sku.Queryable,
-	f schnittstellen.FuncIter[*CheckedOut],
+	f schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	o := sku.ObjekteOptions{
 		Mode: objekte_mode.ModeRealizeSansProto,
@@ -67,7 +67,7 @@ func (s *Store) QueryCheckedOut(
 
 func (s *Store) QueryUnsure(
 	qg sku.Queryable,
-	f schnittstellen.FuncIter[*CheckedOut],
+	f schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	o := sku.ObjekteOptions{
 		Mode: objekte_mode.ModeRealizeWithProto,

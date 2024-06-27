@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
@@ -120,13 +119,18 @@ func (s *Store) QueryCheckedOut(
 	switch qg.Kasten.String() {
 	case "chrome":
 		err = todo.Implement()
+		if err = s.cwdFiles.QueryCheckedOut(
+			qg.Group,
+      f,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 	default:
 		if err = s.cwdFiles.QueryCheckedOut(
 			qg.Group,
-			func(cofs *store_fs.CheckedOut) (err error) {
-				return f(cofs)
-			},
+			f,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
@@ -61,8 +60,9 @@ func (s *Store) QueryUnsure(
 
 	if err = s.cwdFiles.QueryUnsure(
 		qg,
-		func(co *store_fs.CheckedOut) (err error) {
-			sh := &co.External.Metadatei.Shas.SelbstMetadateiSansTai
+		func(col sku.CheckedOutLike) (err error) {
+			e := col.GetSkuExternalLike().GetSku()
+			sh := &e.Metadatei.Shas.SelbstMetadateiSansTai
 
 			if sh.IsNull() {
 				return
@@ -71,8 +71,7 @@ func (s *Store) QueryUnsure(
 			l.Lock()
 			defer l.Unlock()
 
-			clone := store_fs.GetCheckedOutPool().Get()
-			store_fs.CheckedOutResetter.ResetWith(clone, co)
+			clone := col.Clone()
 
 			if o.Contains(UnsureMatchTypeMetadateiSansTaiHistory) {
 				k := sh.GetBytes()
@@ -91,7 +90,7 @@ func (s *Store) QueryUnsure(
 			}
 
 			if o.Contains(UnsureMatchTypeBezeichnung) {
-				k := co.External.Metadatei.Bezeichnung.String()
+				k := e.Metadatei.Bezeichnung.String()
 				existing, ok := bezToZettels[k]
 
 				if !ok {

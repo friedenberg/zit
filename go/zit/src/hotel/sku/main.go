@@ -44,6 +44,13 @@ type (
 		FuncReadOneInto
 	}
 
+	ExternalStore interface {
+		// QueryCheckedOut(
+		// 	qg Queryable,
+		// 	f schnittstellen.FuncIter[CheckedOutLike],
+		// ) (err error)
+	}
+
 	Ennui interface {
 		WriteOneObjekteMetadatei(o *Transacted) (err error)
 		ReadOneEnnui(*sha.Sha) (*Transacted, error)
