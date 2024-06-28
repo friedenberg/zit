@@ -29,29 +29,6 @@ type (
 		GetTypExtension(string) string
 	}
 
-	FuncRealize     = func(*Transacted, *Transacted, ObjekteOptions) error
-	FuncCommit      = func(*Transacted, ObjekteOptions) error
-	FuncReadSha     = func(*sha.Sha) (*Transacted, error)
-	FuncReadOneInto = func(
-		k1 schnittstellen.StringerGattungGetter,
-		out *Transacted,
-	) (err error)
-
-	StoreFuncs struct {
-		FuncRealize
-		FuncCommit
-		FuncReadSha
-		FuncReadOneInto
-	}
-
-	ExternalStore interface {
-		Flush() error
-		QueryCheckedOut(
-			qg Queryable,
-			f schnittstellen.FuncIter[CheckedOutLike],
-		) (err error)
-	}
-
 	Ennui interface {
 		WriteOneObjekteMetadatei(o *Transacted) (err error)
 		ReadOneEnnui(*sha.Sha) (*Transacted, error)

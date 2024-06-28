@@ -77,11 +77,6 @@ func (u *Umwelt) Unlock() (err error) {
 			},
 		)
 
-		for k, vs := range u.virtualStores {
-			ui.Log().Printf("will flush virtual store: %s", k)
-			wg.Do(vs.Flush)
-		}
-
 		if err = wg.GetError(); err != nil {
 			err = errors.Wrap(err)
 			return

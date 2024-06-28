@@ -43,8 +43,10 @@ func (c Mergetool) RunWithQuery(
 	conflicted := sku.MakeCheckedOutLikeMutableSet()
 
 	if err = u.GetStore().QueryCheckedOut(
-		query.GroupWithKasten{
-			Group: qg,
+		sku.ExternalQueryWithKasten{
+			ExternalQuery: sku.ExternalQuery{
+				Queryable: qg,
+			},
 		},
 		func(co sku.CheckedOutLike) (err error) {
 			if co.GetState() != checked_out_state.StateConflicted {

@@ -48,7 +48,7 @@ func (s *Store) ApplyCheckedOut(
 }
 
 func (s *Store) QueryCheckedOut(
-	qg sku.Queryable,
+	qg sku.ExternalQuery,
 	f schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	o := sku.ObjekteOptions{

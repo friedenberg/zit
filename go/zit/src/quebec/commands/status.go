@@ -16,17 +16,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
-type Status struct {
-	Kasten kennung.Kasten
-}
+type Status struct{}
 
 func init() {
-	registerCommandWithQuery(
+	registerCommandWithExternalQuery(
 		"status",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) CommandWithExternalQuery {
 			c := &Status{}
-
-			f.Var(&c.Kasten, "kasten", "none or Chrome")
 
 			return c
 		},
@@ -43,17 +39,14 @@ func (c Status) ModifyBuilder(
 	b.WithHidden(nil)
 }
 
-func (c Status) RunWithQuery(
+func (c Status) RunWithExternalQuery(
 	u *umwelt.Umwelt,
-	qg *query.Group,
+	eqwk sku.ExternalQueryWithKasten,
 ) (err error) {
-	pcol := u.PrinterCheckedOutLike()
+	pcol := u.PrinterCheckedOutForKasten(eqwk.Kasten)
 
 	if err = u.GetStore().QueryCheckedOut(
-		query.GroupWithKasten{
-			Group:  qg,
-			Kasten: c.Kasten,
-		},
+		eqwk,
 		func(co sku.CheckedOutLike) (err error) {
 			if err = pcol(co); err != nil {
 				err = errors.Wrap(err)
@@ -66,6 +59,8 @@ func (c Status) RunWithQuery(
 		err = errors.Wrap(err)
 		return
 	}
+
+	qg := eqwk.Queryable.(*query.Group)
 
 	if err = u.GetStore().QueryUnsure(
 		qg,
@@ -85,7 +80,7 @@ func (c Status) RunWithQuery(
 		return
 	}
 
-	p := u.PrinterCheckedOutLike()
+	p := u.PrinterCheckedOutForKasten(eqwk.Kasten)
 
 	if err = u.GetStore().QueryAllMatchingAkten(
 		qg,

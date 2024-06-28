@@ -31,7 +31,7 @@ type Store struct {
 	konfig                    *konfig.Compiled
 	standort                  standort.Standort
 	cwdFiles                  *store_fs.Store
-	externalStores            map[string]sku.ExternalStore
+	externalStores            map[string]*query.VirtualStoreInitable
 	akten                     *akten.Akten
 	bestandsaufnahmeAkte      bestandsaufnahme.Akte
 	options                   objekte_format.Options
@@ -92,6 +92,7 @@ func (c *Store) Initialize(
 		FuncCommit:      c.tryRealizeAndOrStore,
 		FuncReadSha:     c.ReadOneEnnui,
 		FuncReadOneInto: c.ReadOneInto,
+		FuncQuery:       c.Query,
 	}
 
 	if c.cwdFiles, err = store_fs.MakeCwdFilesAll(
@@ -106,14 +107,15 @@ func (c *Store) Initialize(
 		return
 	}
 
-	c.externalStores = map[string]sku.ExternalStore{
-		"": c.cwdFiles,
+	c.externalStores = map[string]*query.VirtualStoreInitable{
+		"": {
+			VirtualStore: c.cwdFiles,
+		},
 	}
 
 	if k.ChrestEnabled {
-		c.externalStores["%chrome"] = &query.VirtualStoreInitable{
-			VirtualStore: chrome.MakeChrome(k, st),
-		}
+		c.externalStores["chrome"] = &query.VirtualStoreInitable{
+			VirtualStore: chrome.MakeChrome(k, st, sf), }
 	}
 
 	c.metadateiTextParser = metadatei.MakeTextParser(

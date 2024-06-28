@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
@@ -17,6 +18,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 )
 
 func (s *Store) tryRealize(
@@ -346,11 +348,18 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	// TODO pass mode?
+	var mode checkout_mode.Mode
+
+	if cofs, ok := co.(*store_fs.CheckedOut); ok {
+		if mode, err = cofs.External.FDs.GetCheckoutModeOrError(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	if _, err = s.CheckoutOne(
 		co.GetKasten(),
-		checkout_options.Options{Force: true},
-		// checkout_options.Options{CheckoutMode: mode, Force: true},
+		checkout_options.Options{Force: true, CheckoutMode: mode},
 		transactedPtr,
 	); err != nil {
 		err = errors.Wrap(err)

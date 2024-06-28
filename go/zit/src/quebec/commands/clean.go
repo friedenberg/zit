@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -76,7 +75,6 @@ func (c Clean) DefaultGattungen() kennung.Gattung {
 
 func (c Clean) shouldClean(u *umwelt.Umwelt, co sku.CheckedOutLike) bool {
 	state := co.GetState()
-	ui.Log().Print(co)
 	if state == checked_out_state.StateExistsAndSame {
 		return true
 	}
@@ -115,7 +113,9 @@ func (c Clean) RunWithQuery(
 	qg *query.Group,
 ) (err error) {
 	fds := fd.MakeMutableSet()
-	l := &sync.Mutex{}
+
+	u.Lock()
+	defer errors.Deferred(&err, u.Unlock)
 
 	if err = u.GetStore().GetCwdFiles().GetEmptyDirectories().Each(
 		fds.Add,
@@ -125,8 +125,10 @@ func (c Clean) RunWithQuery(
 	}
 
 	if err = u.GetStore().QueryCheckedOut(
-		query.GroupWithKasten{
-			Group:  qg,
+		sku.ExternalQueryWithKasten{
+			ExternalQuery: sku.ExternalQuery{
+				Queryable: qg,
+			},
 			Kasten: c.Kasten,
 		},
 		func(co sku.CheckedOutLike) (err error) {
@@ -134,19 +136,10 @@ func (c Clean) RunWithQuery(
 				return
 			}
 
-			el := co.GetSkuExternalLike()
-
-			e, ok := el.(*store_fs.External)
-
-			if !ok {
+			if err = u.GetStore().DeleteCheckout(co); err != nil {
+				err = errors.Wrap(err)
 				return
 			}
-
-			l.Lock()
-			defer l.Unlock()
-
-			fds.Add(e.GetObjekteFD())
-			fds.Add(e.GetAkteFD())
 
 			return
 		},
@@ -193,7 +186,7 @@ func (c Clean) markUnsureAktenForRemovalIfNecessary(
 		return
 	}
 
-	p := u.PrinterCheckedOutLike()
+	p := u.PrinterCheckedOutForKasten(c.Kasten)
 	var l sync.Mutex
 
 	// TODO create a new query group for all of history
@@ -270,7 +263,7 @@ func (c Clean) markUnsureZettelenForRemovalIfNecessary(
 		return
 	}
 
-	p := u.PrinterCheckedOutLike()
+	p := u.PrinterCheckedOutForKasten(c.Kasten)
 	var l sync.Mutex
 
 	if err = u.GetStore().QueryUnsure(

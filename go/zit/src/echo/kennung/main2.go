@@ -370,6 +370,11 @@ func (k2 *Kennung2) SetFromPath(
 		}
 
 	case fe.Zettel:
+		if len(els) < 3 {
+			err = errors.Errorf("not a valid zettel: %q, %q", els, path)
+			return
+		}
+
 		if err = k2.SetWithGattung(els[2]+"/"+els[1], gattung.Zettel); err != nil {
 			err = errors.Wrap(err)
 			return

@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -19,6 +18,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
+	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
+	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
@@ -33,103 +34,47 @@ type transacted struct {
 	schnittstellen.MutableSetLike[*kennung.Kennung2]
 }
 
-type Chrome struct {
+type Store struct {
 	konfig       *konfig.Compiled
+	storeFuncs   sku.StoreFuncs
 	typ          kennung.Typ
 	chrestConfig chrest.Config
 	standort     standort.Standort
-	urls         map[url.URL][]item
-	removed      map[url.URL]struct{}
-	transacted   transacted
+
+	urls       map[url.URL][]item
+	removed    map[url.URL]struct{}
+	transacted transacted
+
+	transactedUrlIndex map[url.URL]sku.TransactedMutableSet
 }
 
-func MakeChrome(k *konfig.Compiled, s standort.Standort) *Chrome {
-	c := &Chrome{
-		konfig:   k,
-		typ:      kennung.MustTyp("toml-bookmark"),
-		standort: s,
-		removed:  make(map[url.URL]struct{}),
+func MakeChrome(
+	k *konfig.Compiled,
+	s standort.Standort,
+	storeFuncs sku.StoreFuncs,
+) *Store {
+	c := &Store{
+		konfig:     k,
+		storeFuncs: storeFuncs,
+		typ:        kennung.MustTyp("toml-bookmark"),
+		standort:   s,
+		removed:    make(map[url.URL]struct{}),
 		transacted: transacted{
 			MutableSetLike: collections_value.MakeMutableValueSet(
 				iter.StringerKeyer[*kennung.Kennung2]{},
 			),
 		},
+		transactedUrlIndex: make(map[url.URL]sku.TransactedMutableSet),
 	}
 
 	return c
 }
 
-func (c *Chrome) GetVirtualStore() query.VirtualStore {
+func (c *Store) GetVirtualStore() query.VirtualStore {
 	return c
 }
 
-func (c *Chrome) Initialize() (err error) {
-	if !c.konfig.ChrestEnabled {
-		return
-	}
-
-	if err = c.chrestConfig.Read(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var chromeTabsRaw interface{}
-	var req *http.Request
-
-	if req, err = http.NewRequest("GET", "http://localhost/urls", nil); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	ctx, cancel := context.WithDeadline(
-		context.Background(),
-		time.Now().Add(time.Duration(1e9)),
-	)
-
-	defer cancel()
-
-	if chromeTabsRaw, err = chrest.AskChrome(ctx, c.chrestConfig, req); err != nil {
-		if errors.IsErrno(err, syscall.ECONNREFUSED) {
-			if !c.konfig.Quiet {
-				ui.Err().Print("chrest offline")
-			}
-
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-		}
-
-		return
-	}
-
-	chromeTabsRaw2 := chromeTabsRaw.([]interface{})
-
-	chromeTabs := make(map[url.URL][]item, len(chromeTabsRaw2))
-
-	for _, tabRaw := range chromeTabsRaw2 {
-		tab := tabRaw.(map[string]interface{})
-		ur := tab["url"]
-
-		if ur == nil {
-			continue
-		}
-
-		var u *url.URL
-
-		if u, err = url.Parse(ur.(string)); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		chromeTabs[*u] = append(chromeTabs[*u], tab)
-	}
-
-	c.urls = chromeTabs
-
-	return
-}
-
-func (c *Chrome) Flush() (err error) {
+func (c *Store) Flush() (err error) {
 	if c.konfig.DryRun || !c.konfig.ChrestEnabled {
 		return
 	}
@@ -185,7 +130,7 @@ func (c *Chrome) Flush() (err error) {
 	return
 }
 
-func (c *Chrome) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
+func (c *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 	var r sha.ReadCloser
 
 	if r, err = c.standort.AkteReader(sk.GetAkteSha()); err != nil {
@@ -212,119 +157,82 @@ func (c *Chrome) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 	return
 }
 
-func (c *Chrome) CommitTransacted(kinder, mutter *sku.Transacted) (err error) {
-	if c.konfig.DryRun || !c.konfig.ChrestEnabled {
-		return
-	}
-
-	var dt diff
-
-	if dt, err = c.getDiff(kinder, mutter); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if dt.diffType == diffTypeIgnore {
-		return
-	}
-
-	var u *url.URL
-
-	if u, err = c.getUrl(kinder); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if _, ok := c.urls[*u]; !ok {
-		// TODO fetch previous URL
-		return
-	}
-
-	switch dt.diffType {
-	case diffTypeDelete:
-		ui.Debug().Print("deleted", "TODO add to dedicated printer", kinder)
-		c.removed[*u] = struct{}{}
-
-	default:
-		ui.Debug().Print("TODO not implemented", dt, kinder, mutter)
-	}
-
-	return
-}
-
-func (c *Chrome) modifySku(sk *sku.Transacted) (didModify bool, err error) {
-	if strings.HasPrefix(sk.GetTyp().String(), "!chrome") {
-		didModify = true
-		return
-	}
-
-	if !sk.GetTyp().Equals(c.typ) {
-		return
-	}
-
-	u, err := c.getUrl(sk)
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	ts, ok := c.urls[*u]
-
-	if !ok {
-		return
-	}
-
-	didModify = true
-
-	for _, t := range ts {
-		if err = t.AddEtiketten(sk); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
-func (c *Chrome) Query(
-	qg *query.Group,
-	f schnittstellen.FuncIter[*sku.Transacted],
+func (c *Store) QueryCheckedOut(
+	qg sku.ExternalQuery,
+	f schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	var sk sku.Transacted
+	// o := sku.ObjekteOptions{
+	// 	Mode: objekte_mode.ModeRealizeSansProto,
+	// }
 
-	for _, items := range c.urls {
+	var co CheckedOut
+
+	for u, items := range c.urls {
 		for _, item := range items {
-			sku.TransactedResetter.Reset(&sk)
+			processOne := func(internal *sku.Transacted) (err error) {
+				if internal != nil {
+					sku.TransactedResetter.ResetWith(&co.Internal, internal)
+					sku.TransactedResetter.ResetWith(&co.External.Transacted, internal)
+					co.State = checked_out_state.StateExistsAndSame
+				} else {
+					sku.TransactedResetter.Reset(&co.External.Transacted)
+					sku.TransactedResetter.Reset(&co.Internal)
+					co.State = checked_out_state.StateUntracked
+					co.External.Kennung.SetGattung(gattung.Zettel)
+					co.External.browser.Kennung.SetGattung(gattung.Zettel)
+				}
 
-			if err = item.HydrateSku(&sk); err != nil {
-				err = errors.Wrap(err)
+				browser := &co.External.browser
+				co.External.item = item
+
+				if co.External.Metadatei.Tai, err = item.GetTai(); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				browser.Metadatei.Tai = co.External.Metadatei.Tai
+
+				if browser.Metadatei.Typ, err = item.GetTyp(); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if browser.Metadatei.Bezeichnung, err = item.GetBezeichnung(); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if !qg.ContainsSku(browser) {
+					return
+				}
+
+				if err = f(&co); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
 				return
 			}
 
-			if err = f(&sk); err != nil {
-				err = errors.Wrap(err)
-				return
+			existing, ok := c.transactedUrlIndex[u]
+
+			if !ok {
+				if qg.ExcludeUntracked {
+					continue
+				}
+
+				if err = processOne(nil); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			} else {
+				if err = existing.Each(processOne); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 		}
 	}
 
 	return
-}
-
-func (c *Chrome) ModifySku(sk *sku.Transacted) (err error) {
-	if _, err = c.modifySku(sk); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (c *Chrome) ContainsSku(sk *sku.Transacted) bool {
-	ok, err := c.modifySku(sk)
-	if err != nil {
-		ui.Err().Print(err)
-	}
-
-	return ok
 }

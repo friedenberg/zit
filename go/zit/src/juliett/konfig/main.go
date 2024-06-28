@@ -216,6 +216,10 @@ func (k *Compiled) IsDryRun() bool {
 	return k.DryRun
 }
 
+func (k *Compiled) GetTypStringFromExtension(t string) string {
+	return k.ExtensionsToTypen[t]
+}
+
 func (k *Compiled) GetTypExtension(v string) string {
 	return k.TypenToExtensions[v]
 }

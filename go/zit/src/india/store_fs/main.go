@@ -91,7 +91,13 @@ func (fs *Store) Flush() (err error) {
 	return
 }
 
+// must accept directories
 func (fs *Store) MarkUnsureAkten(f *fd.FD) (err error) {
+	if f.IsDir() {
+		// TODO handle recursion
+		return
+	}
+
 	if f, err = fd.MakeFileFromFD(f, fs.standort); err != nil {
 		err = errors.Wrapf(err, "%q", f)
 		return
@@ -169,6 +175,7 @@ func (fs *Store) String() (out string) {
 	return
 }
 
+// TODO confirm against actual Kennung
 func (fs *Store) GetKennungForFD(fd *fd.FD) (k *kennung.Kennung2, err error) {
 	k = kennung.GetKennungPool().Get()
 
@@ -397,6 +404,10 @@ func (fs *Store) readInputFiles(args ...string) (err error) {
 		}
 	}
 
+	return
+}
+
+func (store_fs *Store) Initialize() (err error) {
 	return
 }
 

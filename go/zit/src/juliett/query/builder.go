@@ -22,7 +22,6 @@ func MakeBuilder(
 	s standort.Standort,
 	akten *akten.Akten,
 	ennui sku.Ennui,
-	chrome *VirtualStoreInitable,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
 ) (b *Builder) {
 	b = &Builder{
@@ -33,10 +32,6 @@ func MakeBuilder(
 		virtualStores:              make(map[string]*VirtualStoreInitable),
 		virtualEtikettenBeforeInit: make(map[string]string),
 		virtualEtiketten:           make(map[string]Lua),
-	}
-
-	if chrome != nil {
-		b.WithChrome(chrome)
 	}
 
 	return
@@ -601,48 +596,9 @@ func (b *Builder) makeEtikettExp(k *Kennung) (exp sku.Query, err error) {
 		return
 	}
 
-	if !e.IsVirtual() {
-		if exp, err = b.makeEtikettOrEtikettLua(k); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
+	if exp, err = b.makeEtikettOrEtikettLua(k); err != nil {
+		err = errors.Wrap(err)
 		return
-	}
-
-	expanded := kennung.ExpandOneSlice(&e)
-	var store *VirtualStoreInitable
-	var eStore Lua
-
-	ok := false
-	for _, e1 := range expanded {
-		store = b.virtualStores[e1.String()]
-
-		if store != nil {
-			break
-		}
-
-		eStore, ok = b.virtualEtiketten[e1.String()]
-
-		if ok {
-			break
-		}
-	}
-
-	if store == nil && !ok {
-		err = errors.Errorf("no virtual store registered for %q", e)
-		return
-	}
-
-	if store != nil {
-		if err = store.Initialize(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		exp = &Virtual{Queryable: store, Kennung: k}
-	} else {
-		exp = &Virtual{Queryable: eStore, Kennung: k}
 	}
 
 	return

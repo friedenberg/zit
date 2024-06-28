@@ -2,47 +2,24 @@ package chrome
 
 import (
 	"fmt"
+	"net/url"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
+	"code.linenisgreat.com/zit/go/zit/src/echo/bezeichnung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type item map[string]interface{}
 
-func (ct item) HydrateSku(sk *sku.Transacted) (err error) {
-	if date, ok := ct["date"].(string); ok {
-		if err = sk.Metadatei.Tai.SetFromRFC3339(date); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
+func (tab item) GetUrl() (u *url.URL, err error) {
+	ur := tab["url"]
 
-	if err = sk.Metadatei.Bezeichnung.Set(ct["title"].(string)); err != nil {
-		err = errors.Wrap(err)
+	if ur == nil {
+		err = errors.Errorf("no url: %#v", tab)
 		return
 	}
 
-	t := ct["type"].(string)
-	sk.Metadatei.Typ = kennung.MustTyp("chrome-" + t)
-
-	if err = sk.Kennung.Set(
-		fmt.Sprintf("%%/%d", int(ct["id"].(float64))),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	switch t {
-	case "history":
-
-	case "tab":
-
-	case "bookmark":
-	}
-
-	if err = ct.AddEtiketten(sk); err != nil {
+	if u, err = url.Parse(ur.(string)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -50,17 +27,47 @@ func (ct item) HydrateSku(sk *sku.Transacted) (err error) {
 	return
 }
 
-func (ct item) AddEtiketten(sk *sku.Transacted) (err error) {
-	es := ct.Etiketten()
+func (tab item) GetTai() (t kennung.Tai, err error) {
+	date, ok := tab["date"].(string)
 
-	if err = es.EachPtr(sk.AddEtikettPtr); err != nil {
+	if !ok {
+		err = errors.Errorf("expected string but got %T, %q", tab["date"], tab["date"])
+		return
+	}
+
+	if err = t.SetFromRFC3339(date); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	ex := kennung.ExpandMany(es, expansion.ExpanderRight)
+	return
+}
 
-	if err = ex.EachPtr(sk.Metadatei.Verzeichnisse.AddEtikettExpandedPtr); err != nil {
+func (tab item) GetBezeichnung() (b bezeichnung.Bezeichnung, err error) {
+	t, ok := tab["title"].(string)
+
+	if !ok {
+		err = errors.Errorf("expected string but got %T, %q", tab["title"], tab["title"])
+		return
+	}
+
+	if err = b.Set(t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (tab item) GetTyp() (t kennung.Typ, err error) {
+	ty, ok := tab["type"].(string)
+
+	if !ok {
+		err = errors.Errorf("expected string but got %T, %q", tab["type"], tab["type"])
+		return
+	}
+
+	if err = t.Set("chrome-" + ty); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

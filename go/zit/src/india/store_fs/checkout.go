@@ -21,8 +21,15 @@ import (
 func (s *Store) CheckoutOne(
 	options checkout_options.Options,
 	sz *sku.Transacted,
+) (col sku.CheckedOutLike, err error) {
+	return s.checkoutOneNew(options, sz)
+}
+
+func (s *Store) checkoutOneNew(
+	options checkout_options.Options,
+	sz *sku.Transacted,
 ) (cz *CheckedOut, err error) {
-	cz = &CheckedOut{}
+	cz = GetCheckedOutPool().Get()
 
 	if err = cz.Internal.SetFromSkuLike(sz); err != nil {
 		err = errors.Wrap(err)

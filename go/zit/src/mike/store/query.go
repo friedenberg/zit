@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
@@ -17,26 +16,53 @@ import (
 )
 
 func (s *Store) Query(
+	ms sku.QueryGroup,
+	f schnittstellen.FuncIter[*sku.Transacted],
+) (err error) {
+	return s.query(sku.QueryGroupWithKasten{QueryGroup: ms}, f, false)
+}
+
+func (s *Store) QueryOld(
 	ms *query.Group,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	return s.query(query.GroupWithKasten{Group: ms}, f, false)
+	return s.queryOld(query.GroupWithKasten{Group: ms}, f, false)
 }
 
 func (s *Store) QueryWithKasten(
 	ms query.GroupWithKasten,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	return s.query(ms, f, true)
+	return s.queryOld(ms, f, true)
 }
 
-func (s *Store) query(
+func (s *Store) queryOld(
 	qg query.GroupWithKasten,
 	f schnittstellen.FuncIter[*sku.Transacted],
 	includeCwd bool,
 ) (err error) {
-	if qg.Group == nil {
-		if qg.Group, err = s.queryBuilder.BuildQueryGroup(); err != nil {
+	if err = s.query(
+		sku.QueryGroupWithKasten{
+			QueryGroup: qg.Group,
+			Kasten:     qg.Kasten,
+		},
+		f,
+		includeCwd,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) query(
+	qg sku.QueryGroupWithKasten,
+	f schnittstellen.FuncIter[*sku.Transacted],
+	includeCwd bool,
+) (err error) {
+	if qg.QueryGroup == nil {
+		if qg.QueryGroup, err = s.queryBuilder.BuildQueryGroup(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -101,7 +127,7 @@ func (s *Store) query(
 	}
 
 	if err = s.GetVerzeichnisse().ReadQuery(
-		qg.Group,
+		qg.QueryGroup,
 		f1,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -120,28 +146,23 @@ func (s *Store) query(
 }
 
 func (s *Store) QueryCheckedOut(
-	qg query.GroupWithKasten,
+	qg sku.ExternalQueryWithKasten,
 	f schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	switch qg.Kasten.String() {
-	case "chrome":
-		err = todo.Implement()
-		if err = s.cwdFiles.QueryCheckedOut(
-			qg.Group,
-			f,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	kid := qg.Kasten.GetKastenString()
+	es, ok := s.externalStores[kid]
 
-	default:
-		if err = s.cwdFiles.QueryCheckedOut(
-			qg.Group,
-			f,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if !ok {
+		err = errors.Errorf("no kasten with id %q", kid)
+		return
+	}
+
+	if err = es.QueryCheckedOut(
+		qg.ExternalQuery,
+		f,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

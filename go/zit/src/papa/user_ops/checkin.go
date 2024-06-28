@@ -22,7 +22,12 @@ func (c Checkin) Run(
 	ui.Log().Print(qg)
 
 	if err = u.GetStore().QueryCheckedOut(
-		qg,
+		sku.ExternalQueryWithKasten{
+			ExternalQuery: sku.ExternalQuery{
+				Queryable: qg.Group,
+			},
+			Kasten: qg.Kasten,
+		},
 		func(col sku.CheckedOutLike) (err error) {
 			if _, err = u.GetStore().CreateOrUpdateCheckedOut(
 				col,

@@ -40,17 +40,17 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 		Force:           true,
 	}
 
-	if leftCO, err = s.CheckoutOne(op, tm.Left); err != nil {
+	if leftCO, err = s.checkoutOneNew(op, tm.Left); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if middleCO, err = s.CheckoutOne(op, tm.Middle); err != nil {
+	if middleCO, err = s.checkoutOneNew(op, tm.Middle); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if rightCO, err = s.CheckoutOne(op, tm.Right); err != nil {
+	if rightCO, err = s.checkoutOneNew(op, tm.Right); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -165,17 +165,17 @@ func (s *Store) RunMergeTool(
 
 	var leftCO, middleCO, rightCO *CheckedOut
 
-	if leftCO, err = s.CheckoutOne(op, tm.Left); err != nil {
+	if leftCO, err = s.checkoutOneNew(op, tm.Left); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if middleCO, err = s.CheckoutOne(op, tm.Middle); err != nil {
+	if middleCO, err = s.checkoutOneNew(op, tm.Middle); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if rightCO, err = s.CheckoutOne(op, tm.Right); err != nil {
+	if rightCO, err = s.checkoutOneNew(op, tm.Right); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

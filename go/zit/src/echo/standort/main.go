@@ -167,6 +167,16 @@ func (s Standort) Executable() string {
 	return s.execPath
 }
 
+func (s Standort) AbsFromCwdOrSame(p string) (p1 string) {
+	var err error
+	p1, err = filepath.Abs(p)
+	if err != nil {
+		p1 = p
+	}
+
+	return
+}
+
 func (s Standort) RelToCwdOrSame(p string) (p1 string) {
 	var err error
 	p1, err = filepath.Rel(s.Cwd(), p)

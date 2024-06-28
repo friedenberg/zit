@@ -76,3 +76,30 @@ func registerCommandWithQuery(
 		FlagSet: f,
 	}
 }
+
+func registerCommandWithExternalQuery(
+	n string,
+	makeFunc func(*flag.FlagSet) CommandWithExternalQuery,
+) {
+	f := flag.NewFlagSet(n, flag.ExitOnError)
+
+	c := makeFunc(f)
+
+	if _, ok := commands[n]; ok {
+		panic("command added more than once: " + n)
+	}
+
+	cweq := &commandWithExternalQuery{
+		CommandWithExternalQuery: c,
+	}
+
+	f.Var(&cweq.Kasten, "kasten", "none or Chrome")
+	f.BoolVar(&cweq.ExcludeUntracked, "exclude-untracked", false, "")
+
+	co := command{
+		Command: cweq,
+		FlagSet: f,
+	}
+
+	commands[n] = co
+}

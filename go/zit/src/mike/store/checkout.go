@@ -72,15 +72,20 @@ func (s *Store) CheckoutOne(
 	options checkout_options.Options,
 	sz *sku.Transacted,
 ) (cz sku.CheckedOutLike, err error) {
-	switch kasten.GetKastenString() {
-	case "chrome":
-		err = todo.Implement()
+	kid := kasten.GetKastenString()
+	es, ok := s.externalStores[kid]
 
-	default:
-		if cz, err = s.cwdFiles.CheckoutOne(options, sz); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if !ok {
+		err = errors.Errorf("no kasten with id %q", kid)
+		return
+	}
+
+	if cz, err = es.CheckoutOne(
+		options,
+		sz,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

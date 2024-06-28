@@ -22,6 +22,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
+// Switch to External store
 type Import struct {
 	Bestandsaufnahme string
 	Akten            string

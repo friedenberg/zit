@@ -211,6 +211,12 @@ func (e *FD) ExtSansDot() string {
 	return strings.TrimPrefix(path.Ext(e.path), ".")
 }
 
+func (e *FD) FilePathSansExt() string {
+	base := e.path
+	ext := e.Ext()
+	return base[:len(base)-len(ext)]
+}
+
 func (e *FD) FileNameSansExt() string {
 	base := filepath.Base(e.path)
 	ext := e.Ext()

@@ -6,6 +6,11 @@ type (
 	ColorOptions struct {
 		OffEntirely bool
 	}
+
+	OutputOptions struct {
+		ColorOptionsOut ColorOptions
+		ColorOptionsErr ColorOptions
+	}
 )
 
 const (

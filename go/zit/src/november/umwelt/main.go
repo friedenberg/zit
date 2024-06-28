@@ -18,7 +18,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/chrome"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
@@ -45,7 +44,6 @@ type Umwelt struct {
 
 	storesInitialized bool
 	store             store.Store
-	virtualStores     map[string]*query.VirtualStoreInitable
 	age               *age.Age
 
 	matcherArchiviert query.Archiviert
@@ -65,7 +63,6 @@ func Make(
 		flags:             flags,
 		erworbenCli:       kCli,
 		matcherArchiviert: query.MakeArchiviert(),
-		virtualStores:     make(map[string]*query.VirtualStoreInitable),
 	}
 
 	u.konfig.Reset()
@@ -163,19 +160,12 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 
 	ui.Log().Printf("store version: %s", u.GetKonfig().GetStoreVersion())
 
-	if u.konfig.ChrestEnabled {
-		u.virtualStores["%chrome"] = &query.VirtualStoreInitable{
-			VirtualStore: chrome.MakeChrome(u.GetKonfig(), u.Standort()),
-		}
-	}
-
 	if err = u.store.Initialize(
 		u.flags,
 		u.GetKonfig(),
 		u.standort,
 		objekte_format.FormatForVersion(u.GetKonfig().GetStoreVersion()),
 		u.sonnenaufgang,
-		// u.virtualStores,
 		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
 		u.PrinterFDDeleted(),
 		u.makeQueryBuilder().
@@ -238,16 +228,11 @@ func (u *Umwelt) GetMatcherArchiviert() query.Archiviert {
 	return u.matcherArchiviert
 }
 
-func (u *Umwelt) GetChrestStore() *query.VirtualStoreInitable {
-	return u.virtualStores["%chrome"]
-}
-
 func (u *Umwelt) makeQueryBuilder() *query.Builder {
 	return query.MakeBuilder(
 		u.Standort(),
 		u.GetStore().GetAkten(),
 		u.GetStore().GetVerzeichnisse(),
-		u.GetChrestStore(),
 		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
 	)
 }
@@ -286,8 +271,4 @@ func (u *Umwelt) MakeQueryBuilder(
 func (u *Umwelt) ApplyToOrganizeOptions(oo *organize_text.Options) {
 	oo.Konfig = u.GetKonfig()
 	oo.Abbr = u.GetStore().GetAbbrStore().GetAbbr()
-}
-
-func (u *Umwelt) GetVirtualStores() map[string]*query.VirtualStoreInitable {
-	return u.virtualStores
 }

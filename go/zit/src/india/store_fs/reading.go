@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
@@ -152,6 +153,22 @@ func (s *Store) ReadOneExternalInto(
 
 	default:
 		panic(checkout_mode.MakeErrInvalidCheckoutModeMode(m))
+	}
+
+	if !e.FDs.Akte.IsEmpty() {
+		aFD := &e.FDs.Akte
+		ext := aFD.ExtSansDot()
+		typFromExtension := s.konfig.GetTypStringFromExtension(ext)
+
+		if typFromExtension == "" {
+			ui.Err().Printf("typ extension unknown: %s", aFD.ExtSansDot())
+			typFromExtension = ext
+		}
+
+		if err = e.Transacted.Metadatei.Typ.Set(typFromExtension); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if o.Clock == nil {

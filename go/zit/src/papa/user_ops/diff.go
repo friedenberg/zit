@@ -32,7 +32,7 @@ func (op Diff) Run(col sku.CheckedOutLike) (err error) {
 	cofs, ok := col.(*store_fs.CheckedOut)
 
 	if !ok {
-		if cofs, err = op.GetStore().GetCwdFiles().CheckoutOne(
+		if col, err = op.GetStore().GetCwdFiles().CheckoutOne(
 			checkout_options.Options{
 				Path:         checkout_options.PathTempLocal,
 				CheckoutMode: checkout_mode.ModeObjekteAndAkte,
@@ -42,6 +42,8 @@ func (op Diff) Run(col sku.CheckedOutLike) (err error) {
 			err = errors.Wrap(err)
 			return
 		}
+
+		cofs = col.(*store_fs.CheckedOut)
 
 		defer errors.Deferred(&err, func() (err error) {
 			if err = op.GetStore().GetCwdFiles().Delete(cofs); err != nil {

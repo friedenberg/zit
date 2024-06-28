@@ -15,7 +15,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
 type State int
@@ -152,15 +151,17 @@ func (i *Store) flushAdded(
 		wg.Do(i.pages[n].MakeFlush(false))
 	}
 
-	if err = printerHeader(
-		fmt.Sprintf(
-			"appending to index (%d/%d pages)",
-			actualFlushCount,
-			len(i.pages),
-		),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	if actualFlushCount > 0 {
+		if err = printerHeader(
+			fmt.Sprintf(
+				"appending to index (%d/%d pages)",
+				actualFlushCount,
+				len(i.pages),
+			),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	wg.DoAfter(i.kennung.Flush)
@@ -268,7 +269,7 @@ func (i *Store) Add(
 }
 
 func (i *Store) readFrom(
-	qg *query.Group,
+	qg sku.QueryGroup,
 	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	wg := &sync.WaitGroup{}
@@ -339,7 +340,7 @@ func (i *Store) readFrom(
 }
 
 func (i *Store) ReadQuery(
-	qg *query.Group,
+	qg sku.QueryGroup,
 	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return i.readFrom(qg, w)

@@ -18,9 +18,13 @@ type (
 		// Each(schnittstellen.FuncIter[Query]) error
 	}
 
+	SigilGetter interface {
+		GetSigil() kennung.Sigil
+	}
+
 	QueryWithSigilAndKennung interface {
 		Query
-		GetSigil() kennung.Sigil
+		SigilGetter
 		ContainsKennung(*kennung.Kennung2) bool
 	}
 
@@ -28,5 +32,11 @@ type (
 		Query
 		HasHidden() bool
 		Get(gattung.Gattung) (QueryWithSigilAndKennung, bool)
+		SigilGetter
+	}
+
+	QueryGroupWithKasten struct {
+		QueryGroup
+		kennung.Kasten
 	}
 )

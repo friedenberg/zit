@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -36,21 +37,26 @@ func (ve *VirtualStoreInitable) Flush() (err error) {
 	return
 }
 
-type Virtual struct {
-	sku.Queryable
-	*Kennung
-}
-
-func (ve *VirtualStoreInitable) Query(
-	qg *Group,
-	f schnittstellen.FuncIter[*sku.Transacted],
+func (es *VirtualStoreInitable) QueryCheckedOut(
+	qg sku.ExternalQuery,
+	f schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	if err = ve.Initialize(); err != nil {
+	esqco, ok := es.VirtualStore.(sku.ExternalStoreQueryCheckedOut)
+
+	if !ok {
+		err = errors.Errorf("store does not support %T", esqco)
+		return
+	}
+
+	if err = es.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = ve.VirtualStore.Query(qg, f); err != nil {
+	if err = esqco.QueryCheckedOut(
+		qg,
+		f,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -58,14 +64,63 @@ func (ve *VirtualStoreInitable) Query(
 	return
 }
 
-func (ve *Virtual) ContainsSku(sk *sku.Transacted) bool {
-	if !ve.Queryable.ContainsSku(sk) {
-		return false
+func (es *VirtualStoreInitable) CheckoutOne(
+	options checkout_options.Options,
+	sz *sku.Transacted,
+) (cz sku.CheckedOutLike, err error) {
+	escoo, ok := es.VirtualStore.(sku.ExternalStoreCheckoutOne)
+
+	if !ok {
+		err = errors.Errorf("store does not support %T", escoo)
+		return
 	}
 
-	if !ve.Kennung.ContainsSku(sk) {
-		return false
+	if err = es.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
-	return true
+	if cz, err = escoo.CheckoutOne(
+		options,
+		sz,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
+
+type Virtual struct {
+	sku.Queryable
+	*Kennung
+}
+
+// func (ve *VirtualStoreInitable) Query(
+// 	qg *Group,
+// 	f schnittstellen.FuncIter[*sku.Transacted],
+// ) (err error) {
+// 	if err = ve.Initialize(); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
+
+// 	if err = ve.VirtualStore.Query(qg, f); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
+
+// 	return
+// }
+
+// func (ve *Virtual) ContainsSku(sk *sku.Transacted) bool {
+// 	if !ve.Queryable.ContainsSku(sk) {
+// 		return false
+// 	}
+
+// 	if !ve.Kennung.ContainsSku(sk) {
+// 		return false
+// 	}
+
+// 	return true
+// }

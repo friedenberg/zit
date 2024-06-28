@@ -18,4 +18,5 @@ type Konfig interface {
 	UsePrintTime() bool
 	GetFilters() map[string]string
 	IsDryRun() bool
+	GetTypStringFromExtension(t string) string
 }

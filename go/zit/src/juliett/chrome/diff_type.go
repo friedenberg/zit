@@ -20,7 +20,7 @@ type diff struct {
 	diffType
 }
 
-func (c *Chrome) getDiff(kinder, mutter *sku.Transacted) (dt diff, err error) {
+func (c *Store) getDiff(kinder, mutter *sku.Transacted) (dt diff, err error) {
 	dt.diffType = diffTypeIgnore
 
 	if mutter == nil {
@@ -59,7 +59,7 @@ func (c *Chrome) getDiff(kinder, mutter *sku.Transacted) (dt diff, err error) {
 	return
 }
 
-func (c *Chrome) getDiffKinderOnly(kinder *sku.Transacted) (dt diff, err error) {
+func (c *Store) getDiffKinderOnly(kinder *sku.Transacted) (dt diff, err error) {
 	dt.diffType = diffTypeIgnore
 
 	if !kinder.GetTyp().Equals(c.typ) {

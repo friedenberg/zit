@@ -83,8 +83,8 @@ func (c ZettelFromExternalAkte) Run(
 	if c.Dedupe {
 		matcher := objekte_collections.MakeMutableMatchSet(toCreate)
 
-		if err = c.GetStore().QueryWithKasten(
-			query.GroupWithKasten{Group: qg},
+		if err = c.GetStore().QueryOld(
+			qg,
 			iter.MakeChain(
 				matcher.Match,
 				func(sk *sku.Transacted) (err error) {

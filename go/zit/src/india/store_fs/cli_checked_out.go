@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type cliCheckedOut struct {
@@ -41,8 +42,9 @@ func MakeCliCheckedOutFormat(
 
 func (f *cliCheckedOut) WriteStringFormat(
 	sw schnittstellen.WriterAndStringWriter,
-	co *CheckedOut,
+	col sku.CheckedOutLike,
 ) (n int64, err error) {
+	co := col.(*CheckedOut)
 	var (
 		n1 int
 		n2 int64
