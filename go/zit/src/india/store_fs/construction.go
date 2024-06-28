@@ -1,6 +1,8 @@
 package store_fs
 
 import (
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
@@ -10,15 +12,17 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func makeCwdFiles(
+func MakeCwdFilesAll(
 	k sku.Konfig,
+	dp schnittstellen.FuncIter[*fd.FD],
 	storeFuncs sku.StoreFuncs,
 	fileExtensions file_extensions.FileExtensions,
 	st standort.Standort,
 	ofo objekte_format.Options,
-) (fs *Store) {
+) (fs *Store, err error) {
 	fs = &Store{
 		konfig:         k,
+		deletedPrinter: dp,
 		storeFuncs:     storeFuncs,
 		standort:       st,
 		fileEncoder:    MakeFileEncoder(st, k),
@@ -53,17 +57,10 @@ func makeCwdFiles(
 		),
 	}
 
-	return
-}
+	if err = fs.readAll(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-func MakeCwdFilesAll(
-	k sku.Konfig,
-	storeFuncs sku.StoreFuncs,
-	fileExtensions file_extensions.FileExtensions,
-	st standort.Standort,
-	ofo objekte_format.Options,
-) (fs *Store, err error) {
-	fs = makeCwdFiles(k, storeFuncs, fileExtensions, st, ofo)
-	err = fs.readAll()
 	return
 }

@@ -45,7 +45,7 @@ type (
 	}
 
 	ExternalStore interface {
-		// Flush() error
+		Flush() error
 		QueryCheckedOut(
 			qg Queryable,
 			f schnittstellen.FuncIter[CheckedOutLike],

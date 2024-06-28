@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/echo/thyme"
@@ -73,6 +74,7 @@ func (c *Store) Initialize(
 	pmf objekte_format.Format,
 	t thyme.Time,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
+	dp schnittstellen.FuncIter[*fd.FD],
 	qb *query.Builder,
 ) (err error) {
 	c.konfig = k
@@ -94,6 +96,7 @@ func (c *Store) Initialize(
 
 	if c.cwdFiles, err = store_fs.MakeCwdFilesAll(
 		k,
+		dp,
 		sf,
 		k.FileExtensions,
 		st,

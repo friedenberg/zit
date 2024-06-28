@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/bestandsaufnahme"
@@ -71,7 +70,6 @@ func (s *Store) FlushBestandsaufnahme(
 
 func (c *Store) Flush(
 	printerHeader schnittstellen.FuncIter[string],
-	printerFDDeleted schnittstellen.FuncIter[*fd.FD],
 ) (err error) {
 	if !c.GetStandort().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
@@ -96,18 +94,10 @@ func (c *Store) Flush(
 	wg.Do(c.kennungIndex.Flush)
 	wg.Do(c.Abbr.Flush)
 
-	wg.Do(func() (err error) {
-		if err = c.cwdFiles.Flush(
-			c.GetKonfig().DryRun,
-			c.GetStandort(),
-			printerFDDeleted,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	})
+	for k, vs := range c.externalStores {
+		ui.Log().Printf("will flush virtual store: %s", k)
+		wg.Do(vs.Flush)
+	}
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)

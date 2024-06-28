@@ -39,7 +39,6 @@ func (u *Umwelt) Unlock() (err error) {
 		ui.Log().Print("will flush store")
 		if err = u.store.Flush(
 			u.PrinterHeader(),
-			u.PrinterFDDeleted(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -74,7 +73,6 @@ func (u *Umwelt) Unlock() (err error) {
 				// second store flush is necessary because of konfig changes
 				return u.store.Flush(
 					u.PrinterHeader(),
-					u.PrinterFDDeleted(),
 				)
 			},
 		)

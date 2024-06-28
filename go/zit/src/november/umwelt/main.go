@@ -177,7 +177,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		u.sonnenaufgang,
 		// u.virtualStores,
 		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
-		// u.PrinterFDDeleted(),
+		u.PrinterFDDeleted(),
 		u.makeQueryBuilder().
 			WithDefaultGattungen(kennung.MakeGattung(gattung.TrueGattung()...)),
 	); err != nil {

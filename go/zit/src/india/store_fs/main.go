@@ -32,6 +32,7 @@ func init() {
 // TODO support globs and ignores
 type Store struct {
 	konfig              sku.Konfig
+	deletedPrinter      schnittstellen.FuncIter[*fd.FD]
 	storeFuncs          sku.StoreFuncs
 	metadateiTextParser metadatei.TextParser
 	standort            standort.Standort
@@ -72,14 +73,15 @@ func (fs *Store) Delete(e1 sku.ExternalLike) (err error) {
 	return
 }
 
-func (fs *Store) Flush(
-	dryRun bool,
-	s standort.Standort,
-	p schnittstellen.FuncIter[*fd.FD],
-) (err error) {
+func (fs *Store) Flush() (err error) {
 	deleteOp := DeleteCheckout{}
 
-	if err = deleteOp.Run(dryRun, s, p, fs.deleted); err != nil {
+	if err = deleteOp.Run(
+		fs.konfig.IsDryRun(),
+		fs.standort,
+		fs.deletedPrinter,
+		fs.deleted,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
