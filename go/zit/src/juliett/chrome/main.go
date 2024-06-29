@@ -26,7 +26,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
 type transacted struct {
@@ -70,7 +69,7 @@ func MakeChrome(
 	return c
 }
 
-func (c *Store) GetVirtualStore() query.VirtualStore {
+func (c *Store) GetVirtualStore() sku.ExternalStoreLike {
 	return c
 }
 

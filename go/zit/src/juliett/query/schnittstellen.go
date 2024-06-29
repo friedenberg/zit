@@ -6,17 +6,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type VirtualStore interface {
-	// sku.ExternalStore
-	Initialize() error
-	Flush() error
-	// TODO add objekte mode
-	// CommitTransacted(kinder, mutter *sku.Transacted) error
-	// ModifySku(*sku.Transacted) error
-	// Query(*Group, schnittstellen.FuncIter[*sku.Transacted]) error
-	// sku.Queryable
-}
-
 type Reducer interface {
 	Reduce(*Builder) error
 }

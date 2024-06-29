@@ -46,7 +46,7 @@ func (op Diff) Run(col sku.CheckedOutLike) (err error) {
 		cofs = col.(*store_fs.CheckedOut)
 
 		defer errors.Deferred(&err, func() (err error) {
-			if err = op.GetStore().GetCwdFiles().Delete(cofs); err != nil {
+			if err = op.GetStore().GetCwdFiles().DeleteCheckout(cofs); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

@@ -16,13 +16,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/akten"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/store_verzeichnisse"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/lima/bestandsaufnahme"
 )
 
-func (u *Store) GetChrestStore() *query.VirtualStoreInitable {
+func (u *Store) GetChrestStore() *sku.ExternalStore {
 	return u.externalStores["chrome"]
 }
 

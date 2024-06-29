@@ -242,7 +242,7 @@ func (s *Store) RunMergeTool(
 		return
 	}
 
-	if err = s.Delete(tm.CheckedOutLike); err != nil {
+	if err = s.DeleteCheckout(tm.CheckedOutLike); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

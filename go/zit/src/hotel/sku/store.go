@@ -1,6 +1,9 @@
 package sku
 
 import (
+	"sync"
+
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -53,9 +56,117 @@ type (
 		) (cz CheckedOutLike, err error)
 	}
 
-	ExternalStore interface {
-		schnittstellen.Flusher
+	ExternalStoreDeleteCheckout interface {
+		DeleteCheckout(col CheckedOutLike) (err error)
+	}
+
+	ExternalStoreLike interface {
+		Initialize() error
 		ExternalStoreQueryCheckedOut
-		ExternalStoreCheckoutOne
+		// ExternalStoreCheckoutOne
+		schnittstellen.Flusher
 	}
 )
+
+type ExternalStore struct {
+	ExternalStoreLike
+	didInit  bool
+	onceInit sync.Once
+}
+
+func (ve *ExternalStore) Initialize() (err error) {
+	ve.onceInit.Do(func() {
+		err = ve.ExternalStoreLike.Initialize()
+		ve.didInit = true
+	})
+
+	return
+}
+
+func (ve *ExternalStore) Flush() (err error) {
+	if !ve.didInit {
+		return
+	}
+
+	if err = ve.ExternalStoreLike.Flush(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (es *ExternalStore) QueryCheckedOut(
+	qg ExternalQuery,
+	f schnittstellen.FuncIter[CheckedOutLike],
+) (err error) {
+	esqco, ok := es.ExternalStoreLike.(ExternalStoreQueryCheckedOut)
+
+	if !ok {
+		err = errors.Errorf("store does not support %T", esqco)
+		return
+	}
+
+	if err = es.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = esqco.QueryCheckedOut(
+		qg,
+		f,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (es *ExternalStore) CheckoutOne(
+	options checkout_options.Options,
+	sz *Transacted,
+) (cz CheckedOutLike, err error) {
+	escoo, ok := es.ExternalStoreLike.(ExternalStoreCheckoutOne)
+
+	if !ok {
+		err = errors.Errorf("store does not support %T", escoo)
+		return
+	}
+
+	if err = es.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if cz, err = escoo.CheckoutOne(
+		options,
+		sz,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (es *ExternalStore) DeleteCheckout(col CheckedOutLike) (err error) {
+	esdc, ok := es.ExternalStoreLike.(ExternalStoreDeleteCheckout)
+
+	if !ok {
+		err = errors.Errorf("store does not support %T", esdc)
+		return
+	}
+
+	if err = es.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = esdc.DeleteCheckout(col); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}

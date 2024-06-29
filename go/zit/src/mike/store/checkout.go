@@ -11,15 +11,17 @@ import (
 )
 
 func (s *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
-	switch col.GetKasten().GetKastenString() {
-	case "chrome":
-		err = todo.Implement()
+	kid := col.GetKasten().GetKastenString()
+	es, ok := s.externalStores[kid]
 
-	default:
-		if err = s.GetCwdFiles().Delete(col.GetSkuExternalLike()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if !ok {
+		err = errors.Errorf("no kasten with id %q", kid)
+		return
+	}
+
+	if err = es.DeleteCheckout(col); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

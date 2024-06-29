@@ -69,4 +69,3 @@ func (s *Store) ReadIntoExternalFromKennungFDPair(
 
 	return
 }
-

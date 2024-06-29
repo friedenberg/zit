@@ -29,7 +29,7 @@ func MakeBuilder(
 		akten:                      akten,
 		ennui:                      ennui,
 		luaVMPoolBuilder:           luaVMPoolBuilder,
-		virtualStores:              make(map[string]*VirtualStoreInitable),
+		virtualStores:              make(map[string]*sku.ExternalStore),
 		virtualEtikettenBeforeInit: make(map[string]string),
 		virtualEtiketten:           make(map[string]Lua),
 	}
@@ -51,7 +51,7 @@ type Builder struct {
 	defaultGattungen           kennung.Gattung
 	defaultSigil               kennung.Sigil
 	permittedSigil             kennung.Sigil
-	virtualStores              map[string]*VirtualStoreInitable
+	virtualStores              map[string]*sku.ExternalStore
 	virtualEtikettenBeforeInit map[string]string
 	virtualEtiketten           map[string]Lua
 	doNotMatchEmpty            bool
@@ -79,13 +79,13 @@ func (b *Builder) WithRequireNonEmptyQuery() *Builder {
 	return b
 }
 
-func (mb *Builder) WithChrome(vs *VirtualStoreInitable) *Builder {
+func (mb *Builder) WithChrome(vs *sku.ExternalStore) *Builder {
 	mb.virtualStores["%chrome"] = vs
 
 	return mb
 }
 
-func (mb *Builder) WithVirtualStores(vs map[string]*VirtualStoreInitable) *Builder {
+func (mb *Builder) WithVirtualStores(vs map[string]*sku.ExternalStore) *Builder {
 	for k, v := range vs {
 		mb.virtualStores[k] = v
 	}

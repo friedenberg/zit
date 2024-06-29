@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
 // TODO add support for cwd and sigil
@@ -94,122 +93,6 @@ func (s *Store) ReadOneInto(
 	}
 
 	if err = out.SetFromSkuLike(sk); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) ReadAllGattungFromBestandsaufnahme(
-	g gattung.Gattung,
-	f schnittstellen.FuncIter[*sku.Transacted],
-) (err error) {
-	eachSku := func(_, sk *sku.Transacted) (err error) {
-		if sk.GetGattung() != g {
-			return
-		}
-
-		if err = f(sk); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-
-	if err = s.GetBestandsaufnahmeStore().ReadAllSkus(eachSku); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) ReadAllGattungenFromBestandsaufnahme(
-	g kennung.Gattung,
-	f schnittstellen.FuncIter[*sku.Transacted],
-) (err error) {
-	if g.IsEmpty() {
-		return
-	}
-
-	eachSku := func(besty, sk *sku.Transacted) (err error) {
-		if !g.ContainsOneOf(sk.GetGattung()) {
-			return
-		}
-
-		if err = f(sk); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-
-	if err = s.GetBestandsaufnahmeStore().ReadAllSkus(eachSku); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) ReadAllGattungFromVerzeichnisse(
-	qg *query.Group,
-	g gattung.Gattung,
-	f schnittstellen.FuncIter[*sku.Transacted],
-) (err error) {
-	eachSku := func(sk *sku.Transacted) (err error) {
-		if sk.GetGattung() != g {
-			return
-		}
-
-		if err = f(sk); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-
-	if err = s.verzeichnisse.ReadQuery(
-		qg,
-		eachSku,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) ReadAllGattungenFromVerzeichnisse(
-	qg *query.Group,
-	g kennung.Gattung,
-	f schnittstellen.FuncIter[*sku.Transacted],
-) (err error) {
-	if g.IsEmpty() {
-		return
-	}
-
-	eachSku := func(sk *sku.Transacted) (err error) {
-		if !g.ContainsOneOf(sk.GetGattung()) {
-			return
-		}
-
-		if err = f(sk); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-
-	if err = s.verzeichnisse.ReadQuery(
-		qg,
-		eachSku,
-	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
