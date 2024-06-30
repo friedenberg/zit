@@ -83,7 +83,7 @@ func (c *Store) initializeUrls() (err error) {
 		return
 	}
 
-	var chromeTabsRaw interface{}
+	var resp chrest.ResponseWithParsedJSONBody
 	var req *http.Request
 
 	if req, err = http.NewRequest("GET", "http://localhost/urls", nil); err != nil {
@@ -98,7 +98,7 @@ func (c *Store) initializeUrls() (err error) {
 
 	defer cancel()
 
-	if chromeTabsRaw, err = chrest.AskChrome(ctx, c.chrestConfig, req); err != nil {
+	if resp, err = chrest.AskChrome(ctx, c.chrestConfig, req); err != nil {
 		if errors.IsErrno(err, syscall.ECONNREFUSED) {
 			if !c.konfig.Quiet {
 				ui.Err().Print("chrest offline")
@@ -112,7 +112,7 @@ func (c *Store) initializeUrls() (err error) {
 		return
 	}
 
-	chromeTabsRaw2 := chromeTabsRaw.([]interface{})
+	chromeTabsRaw2 := resp.ParsedJSONBody.([]interface{})
 
 	chromeTabs := make(map[url.URL][]item, len(chromeTabsRaw2))
 

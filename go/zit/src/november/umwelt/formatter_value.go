@@ -410,7 +410,7 @@ func (u *Umwelt) MakeFormatFunc(
 	case "json-toml-bookmark":
 		enc := json.NewEncoder(out)
 
-		var chromeTabsRaw interface{}
+		var resp chrest.ResponseWithParsedJSONBody
 		var req *http.Request
 
 		if req, err = http.NewRequest("GET", "http://localhost/tabs", nil); err != nil {
@@ -430,7 +430,7 @@ func (u *Umwelt) MakeFormatFunc(
 
 		defer cancel()
 
-		if chromeTabsRaw, err = chrest.AskChrome(
+		if resp, err = chrest.AskChrome(
 			ctx,
 			chrestConfig,
 			req,
@@ -438,7 +438,7 @@ func (u *Umwelt) MakeFormatFunc(
 			errors.PanicIfError(err)
 		}
 
-		chromeTabs := chromeTabsRaw.([]interface{})
+		chromeTabs := resp.ParsedJSONBody.([]interface{})
 
 		f = func(o *sku.Transacted) (err error) {
 			var j sku_fmt.JsonWithUrl

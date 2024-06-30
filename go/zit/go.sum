@@ -4,6 +4,8 @@ code.linenisgreat.com/chrest/go/chrest v0.0.0-20240629231744-da47f054e862 h1:IMD
 code.linenisgreat.com/chrest/go/chrest v0.0.0-20240629231744-da47f054e862/go.mod h1:+pJOHF0PqRK4wTMD6eKz/9dGv7NqUf323fie3q6CbPQ=
 code.linenisgreat.com/chrest/go/chrest v0.0.0-20240630000946-e49df0237008 h1:ji2YXDd+/eU1aCFzwTkRdo5nWL2AJb24hXmofGmHbVA=
 code.linenisgreat.com/chrest/go/chrest v0.0.0-20240630000946-e49df0237008/go.mod h1:+pJOHF0PqRK4wTMD6eKz/9dGv7NqUf323fie3q6CbPQ=
+code.linenisgreat.com/chrest/go/chrest v0.0.0-20240630105503-f11ca412c266 h1:LT1nutMZmpv2SAlBQ2QiiohuImbfuNbZK7yThdvcT8M=
+code.linenisgreat.com/chrest/go/chrest v0.0.0-20240630105503-f11ca412c266/go.mod h1:taa/l8ImB3hxfFWVXbKP/YOzLhvjw1ttpX0/VrU9W4I=
 filippo.io/age v1.1.1 h1:pIpO7l151hCnQ4BdyBujnGP2YlUo0uj6sAVNHGBvXHg=
 filippo.io/age v1.1.1/go.mod h1:l03SrzDUrBkdBx8+IILdnn2KZysqQdbEBUQ4p3sqEQE=
 github.com/DataDog/zstd v1.5.5 h1:oWf5W7GtOLgp6bciQYDmhHHjdhYkALu6S/5Ni9ZgSvQ=

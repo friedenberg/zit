@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
@@ -48,6 +49,7 @@ type Umwelt struct {
 	storesInitialized bool
 	store             store.Store
 	age               *age.Age
+	externalStores    map[string]*sku.ExternalStore
 
 	matcherArchiviert query.Archiviert
 
@@ -179,25 +181,24 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		return
 	}
 
-	externalStores := map[string]*sku.ExternalStore{
+	u.externalStores = map[string]*sku.ExternalStore{
 		"": {
 			ExternalStoreLike: sfs,
 		},
-	}
-
-	externalStores["chrome"] = &sku.ExternalStore{
-		ExternalStoreLike: chrome.MakeChrome(
-			k,
-			u.Standort(),
-			string_format_writer.MakeDelim(
-				"\n",
-				u.Out(),
-				chrome.MakeItemDeletedStringWriterFormat(
-					k,
-					u.FormatColorOptionsOut(),
+		"chrome": {
+			ExternalStoreLike: chrome.MakeChrome(
+				k,
+				u.Standort(),
+				string_format_writer.MakeDelim(
+					"\n",
+					u.Out(),
+					chrome.MakeItemDeletedStringWriterFormat(
+						k,
+						u.FormatColorOptionsOut(),
+					),
 				),
 			),
-		),
+		},
 	}
 
 	if err = u.store.Initialize(
@@ -216,7 +217,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	}
 
 	if err = u.store.SetExternalStores(
-		externalStores,
+		u.externalStores,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to set external stores")
 		return
@@ -248,8 +249,22 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	return
 }
 
-func (u *Umwelt) Flush() error {
-	return u.age.Close()
+func (u *Umwelt) Flush() (err error) {
+	wg := iter.MakeErrorWaitGroupParallel()
+
+	wg.Do(u.age.Close)
+
+	for k, vs := range u.externalStores {
+		ui.Log().Printf("will flush virtual store: %s", k)
+		wg.Do(vs.Flush)
+	}
+
+	if err = wg.GetError(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (u *Umwelt) PrintMatchedArchiviertIfNecessary() {

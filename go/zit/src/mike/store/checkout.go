@@ -37,8 +37,6 @@ func (s *Store) CheckoutQuery(
 	qg query.GroupWithKasten,
 	f schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	defer errors.Deferred(&err, s.FlushExternalStores)
-
 	qf := func(t *sku.Transacted) (err error) {
 		var col sku.CheckedOutLike
 

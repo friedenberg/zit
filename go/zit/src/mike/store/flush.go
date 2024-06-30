@@ -63,22 +63,6 @@ func (s *Store) FlushBestandsaufnahme(
 	return
 }
 
-func (s *Store) FlushExternalStores() (err error) {
-	wg := iter.MakeErrorWaitGroupParallel()
-
-	for k, vs := range s.externalStores {
-		ui.Log().Printf("will flush virtual store: %s", k)
-		wg.Do(vs.Flush)
-	}
-
-	if err = wg.GetError(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (c *Store) Flush(
 	printerHeader schnittstellen.FuncIter[string],
 ) (err error) {
@@ -97,8 +81,6 @@ func (c *Store) Flush(
 		wg.Do(c.kennungIndex.Flush)
 		wg.Do(c.Abbr.Flush)
 	}
-
-	wg.Do(c.FlushExternalStores)
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
