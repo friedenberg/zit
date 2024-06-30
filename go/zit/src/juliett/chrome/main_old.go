@@ -11,7 +11,7 @@ import (
 )
 
 func (c *Store) CommitTransacted(kinder, mutter *sku.Transacted) (err error) {
-	if c.konfig.DryRun || !c.konfig.ChrestEnabled {
+	if c.konfig.DryRun {
 		return
 	}
 

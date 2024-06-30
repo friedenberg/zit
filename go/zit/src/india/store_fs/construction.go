@@ -15,7 +15,6 @@ import (
 func MakeCwdFilesAll(
 	k sku.Konfig,
 	dp schnittstellen.FuncIter[*fd.FD],
-	storeFuncs sku.StoreFuncs,
 	fileExtensions file_extensions.FileExtensions,
 	st standort.Standort,
 	ofo objekte_format.Options,
@@ -23,7 +22,6 @@ func MakeCwdFilesAll(
 	fs = &Store{
 		konfig:         k,
 		deletedPrinter: dp,
-		storeFuncs:     storeFuncs,
 		standort:       st,
 		fileEncoder:    MakeFileEncoder(st, k),
 		fileExtensions: fileExtensions,

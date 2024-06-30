@@ -1,6 +1,7 @@
 package sku
 
 import (
+	"fmt"
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -60,15 +61,22 @@ type (
 		DeleteCheckout(col CheckedOutLike) (err error)
 	}
 
+	ExternalStoreInitInfo struct {
+		StoreFuncs
+	}
+
 	ExternalStoreLike interface {
-		Initialize() error
+		Initialize(ExternalStoreInitInfo) error
 		ExternalStoreQueryCheckedOut
 		// ExternalStoreCheckoutOne
 		schnittstellen.Flusher
 	}
 )
 
+// Add typ set
 type ExternalStore struct {
+	kennung.TypSet
+	ExternalStoreInitInfo
 	ExternalStoreLike
 	didInit  bool
 	onceInit sync.Once
@@ -76,7 +84,7 @@ type ExternalStore struct {
 
 func (ve *ExternalStore) Initialize() (err error) {
 	ve.onceInit.Do(func() {
-		err = ve.ExternalStoreLike.Initialize()
+		err = ve.ExternalStoreLike.Initialize(ve.ExternalStoreInitInfo)
 		ve.didInit = true
 	})
 
@@ -169,4 +177,15 @@ func (es *ExternalStore) DeleteCheckout(col CheckedOutLike) (err error) {
 	}
 
 	return
+}
+
+type ErrExternalStoreUnsupportedTyp kennung.Typ
+
+func (e ErrExternalStoreUnsupportedTyp) Is(target error) bool {
+	_, ok := target.(ErrExternalStoreUnsupportedTyp)
+	return ok
+}
+
+func (e ErrExternalStoreUnsupportedTyp) Error() string {
+	return fmt.Sprintf("unsupported typ: %q", kennung.Typ(e))
 }

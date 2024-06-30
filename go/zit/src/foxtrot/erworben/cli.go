@@ -18,7 +18,6 @@ type Cli struct {
 	Todo          bool
 	DryRun        bool
 	Complete      bool
-	ChrestEnabled bool
 	Hooks         string
 
 	IncludeCwd    bool
@@ -75,13 +74,6 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 		"etiketten-paths",
 		true,
 		"use new etiketten paths for queries",
-	)
-
-	f.BoolVar(
-		&c.ChrestEnabled,
-		"chrest-enabled",
-		true,
-		"enable Chrest functionality",
 	)
 
 	c.PrintOptions.AddToFlags(f, &c.maskPrintOptions)

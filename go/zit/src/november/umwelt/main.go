@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
+	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/echo/thyme"
@@ -18,6 +19,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/chrome"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
@@ -160,6 +163,43 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 
 	ui.Log().Printf("store version: %s", u.GetKonfig().GetStoreVersion())
 
+	var sfs *store_fs.Store
+
+	k := u.GetKonfig()
+	ofo := objekte_format.Options{Tai: true}
+
+	if sfs, err = store_fs.MakeCwdFilesAll(
+		k,
+		u.PrinterFDDeleted(),
+		k.FileExtensions,
+		u.Standort(),
+		ofo,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	externalStores := map[string]*sku.ExternalStore{
+		"": {
+			ExternalStoreLike: sfs,
+		},
+	}
+
+	externalStores["chrome"] = &sku.ExternalStore{
+		ExternalStoreLike: chrome.MakeChrome(
+			k,
+			u.Standort(),
+			string_format_writer.MakeDelim(
+				"\n",
+				u.Out(),
+				chrome.MakeItemDeletedStringWriterFormat(
+					k,
+					u.FormatColorOptionsOut(),
+				),
+			),
+		),
+	}
+
 	if err = u.store.Initialize(
 		u.flags,
 		u.GetKonfig(),
@@ -167,11 +207,18 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		objekte_format.FormatForVersion(u.GetKonfig().GetStoreVersion()),
 		u.sonnenaufgang,
 		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
-		u.PrinterFDDeleted(),
 		u.makeQueryBuilder().
 			WithDefaultGattungen(kennung.MakeGattung(gattung.TrueGattung()...)),
+		ofo,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")
+		return
+	}
+
+	if err = u.store.SetExternalStores(
+		externalStores,
+	); err != nil {
+		err = errors.Wrapf(err, "failed to set external stores")
 		return
 	}
 

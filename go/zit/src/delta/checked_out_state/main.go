@@ -17,6 +17,7 @@ const (
 	StateExistsAndDifferent
 	StateUntracked
 	StateRecognized
+	StateSimilar
 	StateConflicted
 	StateError
 )

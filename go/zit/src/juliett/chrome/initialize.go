@@ -15,11 +15,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func (c *Store) Initialize() (err error) {
-	if !c.konfig.ChrestEnabled {
-		return
-	}
-
+// TODO init chrest run start and tab id cache
+func (c *Store) Initialize(ii sku.ExternalStoreInitInfo) (err error) {
+	c.storeFuncs = ii.StoreFuncs
 	wg := iter.MakeErrorWaitGroupParallel()
 
 	wg.Do(c.initializeUrls)

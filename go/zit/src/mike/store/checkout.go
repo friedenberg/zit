@@ -19,6 +19,11 @@ func (s *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
 		return
 	}
 
+	if err = es.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = es.DeleteCheckout(col); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -32,11 +37,18 @@ func (s *Store) CheckoutQuery(
 	qg query.GroupWithKasten,
 	f schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {
+	defer errors.Deferred(&err, s.FlushExternalStores)
+
 	qf := func(t *sku.Transacted) (err error) {
 		var col sku.CheckedOutLike
 
 		if col, err = s.CheckoutOne(qg.Kasten, options, t); err != nil {
-			err = errors.Wrap(err)
+			if errors.Is(err, sku.ErrExternalStoreUnsupportedTyp{}) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
 			return
 		}
 
@@ -52,12 +64,6 @@ func (s *Store) CheckoutQuery(
 			return
 		}
 
-		return
-	}
-
-	switch qg.GetKastenString() {
-	case "chrome":
-		err = todo.Implement()
 		return
 	}
 

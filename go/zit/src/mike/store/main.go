@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/echo/thyme"
@@ -19,7 +18,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/akten"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/chrome"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/store_verzeichnisse"
@@ -74,50 +72,18 @@ func (c *Store) Initialize(
 	pmf objekte_format.Format,
 	t thyme.Time,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
-	dp schnittstellen.FuncIter[*fd.FD],
 	qb *query.Builder,
+	options objekte_format.Options,
 ) (err error) {
 	c.konfig = k
 	c.standort = st
 	c.akten = akten.Make(st)
 	c.persistentMetadateiFormat = pmf
-	c.options = objekte_format.Options{Tai: true}
+	c.options = options
 	c.sonnenaufgang = t
 	c.fileEncoder = store_fs.MakeFileEncoder(st, k)
 	c.luaVMPoolBuilder = luaVMPoolBuilder
 	c.queryBuilder = qb
-
-	sf := sku.StoreFuncs{
-		FuncRealize:     c.tryRealize,
-		FuncCommit:      c.tryRealizeAndOrStore,
-		FuncReadSha:     c.ReadOneEnnui,
-		FuncReadOneInto: c.ReadOneInto,
-		FuncQuery:       c.Query,
-	}
-
-	if c.cwdFiles, err = store_fs.MakeCwdFilesAll(
-		k,
-		dp,
-		sf,
-		k.FileExtensions,
-		st,
-		c.options,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	c.externalStores = map[string]*sku.ExternalStore{
-		"": {
-			ExternalStoreLike: c.cwdFiles,
-		},
-	}
-
-	if k.ChrestEnabled {
-		c.externalStores["chrome"] = &sku.ExternalStore{
-			ExternalStoreLike: chrome.MakeChrome(k, st, sf),
-		}
-	}
 
 	c.metadateiTextParser = metadatei.MakeTextParser(
 		c.standort,
@@ -187,6 +153,35 @@ func (c *Store) Initialize(
 	return
 }
 
+func (s *Store) SetExternalStores(
+	stores map[string]*sku.ExternalStore,
+) (err error) {
+	s.externalStores = stores
+
+	for _, es := range s.externalStores {
+		es.StoreFuncs = sku.StoreFuncs{
+			FuncRealize:     s.tryRealize,
+			FuncCommit:      s.tryRealizeAndOrStore,
+			FuncReadSha:     s.ReadOneEnnui,
+			FuncReadOneInto: s.ReadOneInto,
+			FuncQuery:       s.Query,
+		}
+
+		if esfs, ok := es.ExternalStoreLike.(*store_fs.Store); ok {
+			s.cwdFiles = esfs
+
+			// TODO remove once store_fs.Store is fully ExternalStoreLike
+			if err = es.Initialize(); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// TODO remove
 func (s *Store) SetCheckedOutLogWriter(
 	zelw schnittstellen.FuncIter[sku.CheckedOutLike],
 ) {

@@ -171,15 +171,17 @@ func (i *Store) flushAdded(
 		return
 	}
 
-	if err = printerHeader(
-		fmt.Sprintf(
-			"appended to index (%d/%d pages)",
-			actualFlushCount,
-			len(i.pages),
-		),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	if actualFlushCount > 0 {
+		if err = printerHeader(
+			fmt.Sprintf(
+				"appended to index (%d/%d pages)",
+				actualFlushCount,
+				len(i.pages),
+			),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

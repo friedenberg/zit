@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 )
 
+// TODO make more specific
 type item map[string]interface{}
 
 func (tab item) GetUrl() (u *url.URL, err error) {

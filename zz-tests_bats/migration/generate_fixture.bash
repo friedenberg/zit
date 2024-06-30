@@ -20,7 +20,6 @@ function zit() (
 
 flags=(
   # -verbose
-  -chrest-enabled=false
   -predictable-hinweisen
 )
 

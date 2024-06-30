@@ -17,7 +17,7 @@ type CheckedOut struct {
 }
 
 func (c *CheckedOut) GetKasten() kennung.Kasten {
-	return *(kennung.MustKasten(""))
+	return *(kennung.MustKasten("chrome"))
 }
 
 func (c *CheckedOut) GetSkuCheckedOutLike() sku.CheckedOutLike {

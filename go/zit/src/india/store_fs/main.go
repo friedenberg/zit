@@ -407,15 +407,16 @@ func (fs *Store) readInputFiles(args ...string) (err error) {
 	return
 }
 
-func (store_fs *Store) Initialize() (err error) {
+func (s *Store) Initialize(ii sku.ExternalStoreInitInfo) (err error) {
+  s.storeFuncs = ii.StoreFuncs
 	return
 }
 
-func (store_fs *Store) readAll() (err error) {
+func (s *Store) readAll() (err error) {
 	// TODO use walkdir instead
 	// check for empty directories
 	if err = filepath.WalkDir(
-		store_fs.dir,
+		s.dir,
 		func(p string, d fs.DirEntry, in error) (err error) {
 			if in != nil {
 				err = errors.Wrap(in)
@@ -424,7 +425,7 @@ func (store_fs *Store) readAll() (err error) {
 
 			var rel string
 
-			if rel, err = filepath.Rel(store_fs.dir, p); err != nil {
+			if rel, err = filepath.Rel(s.dir, p); err != nil {
 				err = errors.Wrap(in)
 				return
 			}
@@ -464,7 +465,7 @@ func (store_fs *Store) readAll() (err error) {
 
 	var dirs []string
 
-	if dirs, err = files.ReadDirNames(store_fs.dir); err != nil {
+	if dirs, err = files.ReadDirNames(s.dir); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -474,7 +475,7 @@ func (store_fs *Store) readAll() (err error) {
 			continue
 		}
 
-		d2 := path.Join(store_fs.dir, d)
+		d2 := path.Join(s.dir, d)
 
 		var fi os.FileInfo
 
@@ -485,7 +486,7 @@ func (store_fs *Store) readAll() (err error) {
 
 		var f *fd.FD
 
-		if f, err = fd.FileInfo(fi, store_fs.dir); err != nil {
+		if f, err = fd.FileInfo(fi, s.dir); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -499,21 +500,21 @@ func (store_fs *Store) readAll() (err error) {
 			}
 
 			if len(dirs2) == 0 {
-				if err = store_fs.emptyDirectories.Add(f); err != nil {
+				if err = s.emptyDirectories.Add(f); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 			}
 
 			for _, a := range dirs2 {
-				if err = store_fs.readSecondLevelFile(d2, a); err != nil {
+				if err = s.readSecondLevelFile(d2, a); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 			}
 
 		} else if fi.Mode().IsRegular() {
-			if err = store_fs.readNotSecondLevelFile(d); err != nil {
+			if err = s.readNotSecondLevelFile(d); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
