@@ -13,7 +13,7 @@ PATH="$BATS_CWD/build:$PATH"
 
 {
   pushd "$BATS_CWD" >/dev/null 2>&1
-  gmake build/zit || exit 1
+  make build/zit || exit 1
 }
 
 {
@@ -68,7 +68,7 @@ function rm_from_version {
 }
 
 function chflags_and_rm {
-  chflags -R nouchg "$BATS_TEST_TMPDIR"
+  "$BATS_CWD/bin/chflags.bash" -R nouchg "$BATS_TEST_TMPDIR"
 }
 
 function run_zit {

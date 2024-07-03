@@ -6,7 +6,7 @@ v="$("$zit" store-version)"
 d="${1:-$dir_base/v$v}"
 
 if [[ -d $d ]]; then
-  chflags -R nouchg "$d"
+  ./bin/chflags.bash -R nouchg "$d"
   rm -rf "$d"
 fi
 

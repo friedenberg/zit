@@ -47,6 +47,7 @@
               gopls
               gotools
               /* go-tools */
+              gnumake
               gomod2nix.packages.${system}.default
             ];
           };

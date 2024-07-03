@@ -5,13 +5,11 @@ import (
 	"os/exec"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"golang.org/x/sys/unix"
+	"golang.org/x/term"
 )
 
 func IsTty(f *os.File) (ok bool) {
-	_, err := unix.IoctlGetTermios(int(f.Fd()), unix.TIOCGETA)
-	ok = err == nil
-
+	ok = term.IsTerminal(int(f.Fd()))
 	return
 }
 

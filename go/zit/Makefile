@@ -6,8 +6,19 @@ SHELL := bash
 MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 MAKEFLAGS += --output-sync=target
-n_prc := $(shell sysctl -n hw.logicalcpu)
+
+os := $(shell uname -s)
+
+ifeq ($(os), Darwin)
+	n_prc := $(shell sysctl -n hw.logicalcpu)
+endif
+
+ifeq ($(os), Linux)
+	n_prc := $(shell nproc --all)
+endif
+
 MAKEFLAGS := --jobs=$(n_prc)
+
 timeout := 10
 cmd_bats := BATS_TEST_TIMEOUT=$(timeout) bats --tap
 
@@ -16,28 +27,33 @@ ifeq ($(origin .RECIPEPREFIX), undefined)
 endif
 .RECIPEPREFIX = >
 
-.PHONY: build watch exclude graph_dependencies
+uname_p := $(shell uname -s) # store the output of the command in a variable
 
-build: build/zit;
+.PHONY: build build_dir watch exclude graph_dependencies
+
+build: build/zit | build_dir;
+
+build_dir:
+> mkdir -p build
 
 files_go_generate := $(shell ag 'go:generate' -l src/)
 
-build/go_generate: $(files_go_generate)
+build/go_generate: $(files_go_generate) | build_dir
 > go generate ./...
 > touch "$@"
 
 files_go := $(shell find src -type f)
 
-build/zit: build/go_generate $(files_go)
+build/zit: build/go_generate $(files_go) | build_dir
 > go build -o build/zit ./.
 
-build/go_vet: $(files_go)
+build/go_vet: $(files_go) | build_dir
 > go vet ./... || true
 > touch "$@"
 
 dirs_go_unit := $(shell find src -mindepth 2 -iname '*_test.go' | sort -u)
 
-build/tests_unit: $(files_go) build/go_generate
+build/tests_unit: $(files_go) build/go_generate | build_dir
 > go test -v ./...
 > touch "$@"
 
