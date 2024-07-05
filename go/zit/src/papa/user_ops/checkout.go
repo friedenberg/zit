@@ -87,7 +87,7 @@ func (op Checkout) RunQuery(
 		}
 	}
 
-	if op.Open {
+	if op.Open || op.Edit {
 		if err = op.GetStore().Open(
 			op.Kasten,
 			op.CheckoutMode,

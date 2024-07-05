@@ -10,7 +10,7 @@ type Reducer interface {
 	Reduce(*Builder) error
 }
 
-type Cwd interface {
+type Kasten interface {
 	sku.Query
 	GetCwdFDs() fd.Set
 	GetKennungForFD(*fd.FD) (*kennung.Kennung2, error)

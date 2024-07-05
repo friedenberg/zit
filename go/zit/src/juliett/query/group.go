@@ -73,7 +73,7 @@ func (qg *Group) GetSigil() (s kennung.Sigil) {
 
 func (qg *Group) GetExactlyOneKennung(
 	g gattung.Gattung,
-	c Cwd,
+	c Kasten,
 ) (k *kennung.Kennung2, s kennung.Sigil, err error) {
 	if len(qg.OptimizedQueries) != 1 {
 		err = errors.Errorf(

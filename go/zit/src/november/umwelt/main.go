@@ -309,7 +309,7 @@ func (u *Umwelt) MakeQueryBuilderExcludingHidden(
 	return u.makeQueryBuilder().
 		WithDefaultGattungen(dg).
 		WithVirtualEtiketten(u.konfig.Filters).
-		WithCwd(u.GetStore().GetCwdFiles()).
+		WithKasten(u.GetStore().GetCwdFiles()).
 		WithFileExtensionGetter(u.GetKonfig().FileExtensions).
 		WithHidden(u.GetMatcherArchiviert()).
 		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr())
@@ -325,7 +325,7 @@ func (u *Umwelt) MakeQueryBuilder(
 	return u.makeQueryBuilder().
 		WithDefaultGattungen(dg).
 		WithVirtualEtiketten(u.konfig.Filters).
-		WithCwd(u.GetStore().GetCwdFiles()).
+		WithKasten(u.GetStore().GetCwdFiles()).
 		WithFileExtensionGetter(u.GetKonfig().FileExtensions).
 		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr())
 }
