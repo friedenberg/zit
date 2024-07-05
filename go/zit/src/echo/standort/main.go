@@ -245,6 +245,10 @@ func (s Standort) DirVerzeichnisse(p ...string) string {
 	return s.DirZit(append([]string{"Verzeichnisse"}, p...)...)
 }
 
+func (s Standort) DirVerzeichnisseKasten(p ...string) string {
+	return s.DirZit(append([]string{"Verzeichnisse", "Kasten"}, p...)...)
+}
+
 func (s Standort) DirVerzeichnisseDurable(p ...string) string {
 	return s.DirZit(append([]string{"VerzeichnisseDurable"}, p...)...)
 }

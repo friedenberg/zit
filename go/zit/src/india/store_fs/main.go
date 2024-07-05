@@ -33,7 +33,7 @@ func init() {
 type Store struct {
 	konfig              sku.Konfig
 	deletedPrinter      schnittstellen.FuncIter[*fd.FD]
-	storeFuncs          sku.StoreFuncs
+	externalStoreInfo   sku.ExternalStoreInfo
 	metadateiTextParser metadatei.TextParser
 	standort            standort.Standort
 	fileEncoder         FileEncoder
@@ -407,8 +407,8 @@ func (fs *Store) readInputFiles(args ...string) (err error) {
 	return
 }
 
-func (s *Store) Initialize(ii sku.ExternalStoreInitInfo) (err error) {
-  s.storeFuncs = ii.StoreFuncs
+func (s *Store) Initialize(esi sku.ExternalStoreInfo) (err error) {
+	s.externalStoreInfo = esi
 	return
 }
 

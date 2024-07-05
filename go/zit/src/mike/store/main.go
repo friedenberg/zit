@@ -158,7 +158,7 @@ func (s *Store) SetExternalStores(
 ) (err error) {
 	s.externalStores = stores
 
-	for _, es := range s.externalStores {
+	for k, es := range s.externalStores {
 		es.StoreFuncs = sku.StoreFuncs{
 			FuncRealize:     s.tryRealize,
 			FuncCommit:      s.tryRealizeAndOrStore,
@@ -166,6 +166,9 @@ func (s *Store) SetExternalStores(
 			FuncReadOneInto: s.ReadOneInto,
 			FuncQuery:       s.Query,
 		}
+
+		es.Standort = s.GetStandort()
+		es.DirCache = s.GetStandort().DirVerzeichnisseKasten(k)
 
 		if esfs, ok := es.ExternalStoreLike.(*store_fs.Store); ok {
 			s.cwdFiles = esfs

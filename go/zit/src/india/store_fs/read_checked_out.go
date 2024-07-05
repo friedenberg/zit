@@ -15,7 +15,7 @@ func (s *Store) ReadCheckedOutFromKennungFDPair(
 ) (co *CheckedOut, err error) {
 	co = GetCheckedOutPool().Get()
 
-	if err = s.storeFuncs.FuncReadOneInto(&em.Kennung, &co.Internal); err != nil {
+	if err = s.externalStoreInfo.FuncReadOneInto(&em.Kennung, &co.Internal); err != nil {
 		if collections.IsErrNotFound(err) {
 			// TODO mark status as new
 			err = nil

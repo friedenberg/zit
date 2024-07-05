@@ -59,7 +59,7 @@ func (s *Store) ReadIntoExternalFromKennungFDPair(
 		return
 	}
 
-	if err = s.storeFuncs.FuncCommit(
+	if err = s.externalStoreInfo.FuncCommit(
 		&e.Transacted,
 		o,
 	); err != nil {

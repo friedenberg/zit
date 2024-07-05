@@ -1,13 +1,10 @@
 package umwelt
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
-	"net/http"
 	"strings"
-	"time"
 
 	"code.linenisgreat.com/chrest/go/chrest"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -411,30 +408,19 @@ func (u *Umwelt) MakeFormatFunc(
 		enc := json.NewEncoder(out)
 
 		var resp chrest.ResponseWithParsedJSONBody
-		var req *http.Request
 
-		if req, err = http.NewRequest("GET", "http://localhost/tabs", nil); err != nil {
+		req := chrest.BrowserRequest{
+			Method: "GET",
+			Path:   "/tabs",
+		}
+
+		var b chrest.Browser
+
+		if err = b.Read(); err != nil {
 			errors.PanicIfError(err)
 		}
 
-		var chrestConfig chrest.Config
-
-		if err = chrestConfig.Read(); err != nil {
-			errors.PanicIfError(err)
-		}
-
-		ctx, cancel := context.WithDeadline(
-			context.Background(),
-			time.Now().Add(time.Duration(1e9)),
-		)
-
-		defer cancel()
-
-		if resp, err = chrest.AskChrome(
-			ctx,
-			chrestConfig,
-			req,
-		); err != nil {
+		if resp, err = b.Request(req); err != nil {
 			errors.PanicIfError(err)
 		}
 

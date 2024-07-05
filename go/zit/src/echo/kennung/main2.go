@@ -37,6 +37,12 @@ type Kennung2 struct {
 	left, right catgut.String
 }
 
+func (a *Kennung2) Clone() (b *Kennung2) {
+	b = GetKennungPool().Get()
+	b.ResetWithKennung(a)
+	return
+}
+
 func MustKennung2(kp Kennung) (k *Kennung2) {
 	k = &Kennung2{}
 	err := k.SetWithKennung(kp)

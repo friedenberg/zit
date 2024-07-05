@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 )
 
 type (
@@ -61,12 +62,14 @@ type (
 		DeleteCheckout(col CheckedOutLike) (err error)
 	}
 
-	ExternalStoreInitInfo struct {
+	ExternalStoreInfo struct {
 		StoreFuncs
+		DirCache string
+		standort.Standort
 	}
 
 	ExternalStoreLike interface {
-		Initialize(ExternalStoreInitInfo) error
+		Initialize(ExternalStoreInfo) error
 		ExternalStoreQueryCheckedOut
 		// ExternalStoreCheckoutOne
 		schnittstellen.Flusher
@@ -76,7 +79,7 @@ type (
 // Add typ set
 type ExternalStore struct {
 	kennung.TypSet
-	ExternalStoreInitInfo
+	ExternalStoreInfo
 	ExternalStoreLike
 	didInit  bool
 	onceInit sync.Once
@@ -84,7 +87,7 @@ type ExternalStore struct {
 
 func (ve *ExternalStore) Initialize() (err error) {
 	ve.onceInit.Do(func() {
-		err = ve.ExternalStoreLike.Initialize(ve.ExternalStoreInitInfo)
+		err = ve.ExternalStoreLike.Initialize(ve.ExternalStoreInfo)
 		ve.didInit = true
 	})
 

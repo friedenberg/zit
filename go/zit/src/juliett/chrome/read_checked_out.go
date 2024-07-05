@@ -13,7 +13,7 @@ func (s *Store) ReadCheckedOutFromItem(
 ) (co *CheckedOut, err error) {
 	co = GetCheckedOutPool().Get()
 
-	if err = s.storeFuncs.FuncReadOneInto(k, &co.Internal); err != nil {
+	if err = s.externalStoreInfo.FuncReadOneInto(k, &co.Internal); err != nil {
 		// if collections.IsErrNotFound(err) {
 		// 	// TODO mark status as new
 		// 	err = nil

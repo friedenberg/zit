@@ -2,8 +2,8 @@ schema = 3
 
 [mod]
   [mod."code.linenisgreat.com/chrest/go/chrest"]
-    version = "v0.0.0-20240630105503-f11ca412c266"
-    hash = "sha256-mQYkbkAkr5rTUF0C4vxuQbzEU5pAR/pLLXcZBBb9o2k="
+    version = "v0.0.0-20240701154206-09f915ed5461"
+    hash = "sha256-zpz8Q1X/LnVoO9PLA+TqCaKqkx8E5JytH7gfce2kS3w="
   [mod."filippo.io/age"]
     version = "v1.1.1"
     hash = "sha256-LRxxJQLQkzoCNYGS/XBixVmYXoZ1mPHKvFicPGXYLcw="
@@ -19,9 +19,6 @@ schema = 3
   [mod."github.com/pelletier/go-toml/v2"]
     version = "v2.1.1"
     hash = "sha256-BQtflYQ8Dt7FL/yFI9OnxwvsRk0oEO37ZXuGXFveVpo="
-  [mod."github.com/snapcore/snapd"]
-    version = "v0.0.0-20240703123059-1185b819032d"
-    hash = "sha256-lE5w3HIZqwBz087qk8vdzs8KbYvEhQqEgt8yyeCGcWY="
   [mod."github.com/yuin/gopher-lua"]
     version = "v1.1.1"
     hash = "sha256-f7clAQeOHKQ3pL9ibNgXvc9QnIEvlMzm5SlWEDkj5tk="
@@ -31,9 +28,6 @@ schema = 3
   [mod."golang.org/x/exp"]
     version = "v0.0.0-20240506185415-9bf2ced13842"
     hash = "sha256-5JZE4OhePWHtObIT4RJOS+2zv265Io1yJkFeE8wHXY4="
-  [mod."golang.org/x/net"]
-    version = "v0.21.0"
-    hash = "sha256-LfiqMpPtqvW/eLkfx6Ebr5ksqKbQli6uq06c/+XrBsw="
   [mod."golang.org/x/sys"]
     version = "v0.21.0"
     hash = "sha256-gapzPWuEqY36V6W2YhIDYR49sEvjJRd7bSuf9K1f4JY="
@@ -43,9 +37,3 @@ schema = 3
   [mod."golang.org/x/xerrors"]
     version = "v0.0.0-20231012003039-104605ab7028"
     hash = "sha256-IsFTm5WZQ6W1ZDF8WOP+6xiOAc7pIq8r9Afvkjp3PRQ="
-  [mod."gopkg.in/tomb.v2"]
-    version = "v2.0.0-20161208151619-d5d1b5820637"
-    hash = "sha256-IHjnHVcTZjtCVA6WznO+yCZuSI4AzhV+m1+nFLMuYes="
-  [mod."gopkg.in/yaml.v2"]
-    version = "v2.4.0"
-    hash = "sha256-uVEGglIedjOIGZzHW4YwN1VoRSTK8o0eGZqzd+TNdd0="

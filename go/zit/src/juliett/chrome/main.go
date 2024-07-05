@@ -1,22 +1,14 @@
 package chrome
 
 import (
-	"bytes"
-	"context"
-	"encoding/json"
-	"io"
-	"net/http"
 	"net/url"
 	"sync"
-	"syscall"
-	"time"
 
 	"code.linenisgreat.com/chrest/go/chrest"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
@@ -35,21 +27,23 @@ type transacted struct {
 }
 
 type Store struct {
-	konfig       *konfig.Compiled
-	storeFuncs   sku.StoreFuncs
-	typ          kennung.Typ
-	chrestConfig chrest.Config
-	standort     standort.Standort
+	konfig            *konfig.Compiled
+	externalStoreInfo sku.ExternalStoreInfo
+	typ               kennung.Typ
+	chrome            chrest.Browser
+
+	tabCache cache
 
 	urls map[url.URL][]item
 
 	l       sync.Mutex
 	removed map[url.URL]struct{}
-	added   map[url.URL]struct{}
+	added   map[url.URL][]*kennung.Kennung2
 
 	transacted transacted
 
-	transactedUrlIndex map[url.URL]sku.TransactedMutableSet
+	transactedUrlIndex   map[url.URL]sku.TransactedMutableSet
+	transactedTabIdIndex map[float64]*sku.Transacted
 
 	itemDeletedStringFormatWriter schnittstellen.FuncIter[*CheckedOut]
 }
@@ -60,17 +54,17 @@ func MakeChrome(
 	itemDeletedStringFormatWriter schnittstellen.FuncIter[*CheckedOut],
 ) *Store {
 	c := &Store{
-		konfig:   k,
-		typ:      kennung.MustTyp("toml-bookmark"),
-		standort: s,
-		removed:  make(map[url.URL]struct{}),
-		added:    make(map[url.URL]struct{}),
+		konfig:  k,
+		typ:     kennung.MustTyp("toml-bookmark"),
+		removed: make(map[url.URL]struct{}),
+		added:   make(map[url.URL][]*kennung.Kennung2),
 		transacted: transacted{
 			MutableSetLike: collections_value.MakeMutableValueSet(
 				iter.StringerKeyer[*kennung.Kennung2]{},
 			),
 		},
 		transactedUrlIndex:            make(map[url.URL]sku.TransactedMutableSet),
+		transactedTabIdIndex:          make(map[float64]*sku.Transacted),
 		itemDeletedStringFormatWriter: itemDeletedStringFormatWriter,
 	}
 
@@ -81,69 +75,19 @@ func (c *Store) GetVirtualStore() sku.ExternalStoreLike {
 	return c
 }
 
-func (c *Store) Flush() (err error) {
-	if c.konfig.DryRun {
+func (s *Store) Flush() (err error) {
+	if s.konfig.DryRun {
 		return
 	}
 
-	if len(c.removed) == 0 && len(c.added) == 0 {
-		return
-	}
+	wg := iter.MakeErrorWaitGroupParallel()
 
-	var req *http.Request
+	wg.Do(s.flushUrls)
 
-	if req, err = http.NewRequest("PUT", "http://localhost/urls", nil); err != nil {
+	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	b := bytes.NewBuffer(nil)
-	var reqPayload requestUrlsPut
-	reqPayload.Deleted = make([]string, 0, len(c.removed))
-
-	for u := range c.removed {
-		reqPayload.Deleted = append(reqPayload.Deleted, u.String())
-	}
-
-	for u := range c.added {
-		reqPayload.Added = append(
-			reqPayload.Added,
-			createOneTabRequest{
-				Url: u.String(),
-			},
-		)
-	}
-
-	enc := json.NewEncoder(b)
-
-	if err = enc.Encode(reqPayload); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	req.Body = io.NopCloser(b)
-
-	ctx, cancel := context.WithDeadline(
-		context.Background(),
-		time.Now().Add(time.Duration(1e9)),
-	)
-
-	defer cancel()
-
-	if _, err = chrest.AskChrome(ctx, c.chrestConfig, req); err != nil {
-		if errors.IsErrno(err, syscall.ECONNREFUSED) {
-			ui.Err().Print("chrest offline")
-			err = nil
-		} else if err == io.EOF {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	clear(c.added)
-	clear(c.removed)
 
 	return
 }
@@ -151,7 +95,7 @@ func (c *Store) Flush() (err error) {
 func (c *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 	var r sha.ReadCloser
 
-	if r, err = c.standort.AkteReader(sk.GetAkteSha()); err != nil {
+	if r, err = c.externalStoreInfo.AkteReader(sk.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -186,21 +130,37 @@ func (c *Store) QueryCheckedOut(
 	var co CheckedOut
 
 	for u, items := range c.urls {
-		existing, ok := c.transactedUrlIndex[u]
-
-		if !ok && qg.ExcludeUntracked {
-			continue
-		}
+		matchingUrls, ok := c.transactedUrlIndex[u]
 
 		for _, item := range items {
+			var uChrome *url.URL
+
+			if uChrome, err = item.GetUrl(); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
 			processOne := func(internal *sku.Transacted) (err error) {
 				co.External.browser.Kennung.SetGattung(gattung.Zettel)
 				co.External.Kennung.SetGattung(gattung.Zettel)
 
 				if internal != nil {
+					var uSku *url.URL
+
+					if uSku, err = c.getUrl(internal); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
+
 					sku.TransactedResetter.ResetWith(&co.Internal, internal)
 					sku.TransactedResetter.ResetWith(&co.External.Transacted, internal)
-					co.State = checked_out_state.StateExistsAndSame
+
+					if *uSku == *uChrome {
+						co.State = checked_out_state.StateExistsAndSame
+					} else {
+						co.State = checked_out_state.StateExistsAndDifferent
+					}
+
 				} else {
 					sku.TransactedResetter.Reset(&co.External.Transacted)
 					sku.TransactedResetter.Reset(&co.Internal)
@@ -239,13 +199,20 @@ func (c *Store) QueryCheckedOut(
 				return
 			}
 
-			if !ok {
-				if err = processOne(nil); err != nil {
-					err = errors.Wrap(err)
+			tabId, okTabId := item.GetTabId()
+			var matchingTabId *sku.Transacted
+
+			if okTabId {
+				matchingTabId, okTabId = c.transactedTabIdIndex[tabId]
+			}
+
+			if !ok || okTabId {
+				if err = processOne(matchingTabId); err != nil {
+					err = errors.Wrapf(err, "Item: %#v", item)
 					return
 				}
-			} else {
-				if err = existing.Each(processOne); err != nil {
+			} else if ok && !qg.ExcludeUntracked {
+				if err = matchingUrls.Each(processOne); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -279,13 +246,13 @@ func (c *Store) CheckoutOne(
 	sku.TransactedResetter.ResetWith(co.GetSkuExternalLike().GetSku(), sz)
 	co.State = checked_out_state.StateJustCheckedOut
 	co.External.browser.Metadatei.Typ = kennung.MustTyp("!chrome-tab")
-	co.External.browser.Metadatei.Typ = kennung.MustTyp("!chrome-tab")
 	co.External.item = map[string]interface{}{"url": u.String()}
 
 	c.l.Lock()
 	defer c.l.Unlock()
 
-	c.added[*u] = struct{}{}
+	existing := c.added[*u]
+	c.added[*u] = append(existing, sz.Kennung.Clone())
 
 	// 	ui.Debug().Print(response)
 

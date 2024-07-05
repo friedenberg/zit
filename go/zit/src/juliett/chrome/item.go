@@ -12,6 +12,17 @@ import (
 // TODO make more specific
 type item map[string]interface{}
 
+func (tab item) GetTabId() (id float64, ok bool) {
+	switch tab["type"].(string) {
+	case "history", "bookmark":
+		return
+	}
+
+	id, ok = tab["id"].(float64)
+
+	return
+}
+
 func (tab item) GetUrl() (u *url.URL, err error) {
 	ur := tab["url"]
 
@@ -29,15 +40,18 @@ func (tab item) GetUrl() (u *url.URL, err error) {
 }
 
 func (tab item) GetTai() (t kennung.Tai, err error) {
-	date, ok := tab["date"].(string)
+	switch date := tab["date"].(type) {
+	case nil:
+		t = kennung.NowTai()
 
-	if !ok {
+	case string:
+		if err = t.SetFromRFC3339(date); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	default:
 		err = errors.Errorf("expected string but got %T, %q", tab["date"], tab["date"])
-		return
-	}
-
-	if err = t.SetFromRFC3339(date); err != nil {
-		err = errors.Wrap(err)
 		return
 	}
 
