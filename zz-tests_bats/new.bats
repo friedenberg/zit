@@ -16,9 +16,9 @@ teardown() {
 
 function new_empty_no_edit { # @test
 	run_zit new -edit=false
-	assert_failure
+	assert_success
 	assert_output - <<-EOM
-		zettel is empty
+		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md]
 	EOM
 }
 

@@ -2,7 +2,7 @@ package user_ops
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
@@ -64,10 +64,12 @@ func (c WriteNewZettels) RunOne(
 func (c WriteNewZettels) runOneAlreadyLocked(
 	pz zettel.ProtoZettel,
 ) (zt *sku.Transacted, err error) {
-	z := pz.Make()
-	defer metadatei.GetPool().Put(z)
+	zt = pz.Make()
 
-	if zt, err = c.GetStore().Create(z); err != nil {
+	if err = c.GetStore().CreateOrUpdateFromTransacted(
+		zt,
+		objekte_mode.ModeApplyProto,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

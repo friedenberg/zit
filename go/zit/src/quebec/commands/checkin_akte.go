@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -146,9 +147,11 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	defer errors.Deferred(&err, u.Unlock)
 
 	for _, z := range zettels {
-		if err = u.GetStore().CreateOrUpdateTransacted(
+		if err = u.GetStore().CreateOrUpdateFromTransacted(
 			z,
-			true,
+			objekte_mode.Make(
+				objekte_mode.ModeMergeCheckedOut,
+			),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

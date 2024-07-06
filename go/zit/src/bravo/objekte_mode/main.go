@@ -58,8 +58,10 @@ func (i Mode) SmartString() string {
 	return sb.String()
 }
 
-func (a *Mode) Add(b Mode) {
-	*a |= b
+func (a *Mode) Add(bs ...Mode) {
+	for _, b := range bs {
+		*a |= b
+	}
 }
 
 func (a *Mode) Del(b Mode) {

@@ -176,7 +176,7 @@ func (f *cliMetadatei) writeStringFormatEtiketten(
 	var n1 int
 	var n2 int64
 
-	for _, v := range iter.SortedValues[kennung.Etikett](b) {
+	for _, v := range iter.SortedValues(b) {
 		n1, err = sw.WriteString(f.contentPrefix)
 		n += int64(n1)
 

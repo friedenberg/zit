@@ -118,9 +118,11 @@ func (op Checkout) RunQuery(
 
 		if err = checkinOp.Run(
 			op.Umwelt,
-			query.GroupWithKasten{
+			sku.ExternalQueryWithKasten{
 				Kasten: op.Kasten,
-				Group:  ms,
+				ExternalQuery: sku.ExternalQuery{
+					Queryable: ms,
+				},
 			},
 		); err != nil {
 			err = errors.Wrap(err)

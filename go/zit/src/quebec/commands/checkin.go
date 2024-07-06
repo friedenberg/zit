@@ -4,25 +4,23 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
 type Checkin struct {
-	Kasten     kennung.Kasten
 	Delete     bool
 	IgnoreAkte bool
 }
 
 func init() {
-	registerCommandWithQuery(
+	registerCommandWithExternalQuery(
 		"checkin",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) CommandWithExternalQuery {
 			c := &Checkin{}
-
-			f.Var(&c.Kasten, "kasten", "none or Chrome")
 
 			f.BoolVar(&c.Delete, "delete", false, "the checked-out file")
 
@@ -39,12 +37,12 @@ func init() {
 }
 
 func (c Checkin) DefaultGattungen() kennung.Gattung {
-	return kennung.MakeGattung()
+	return kennung.MakeGattung(gattung.TrueGattung()...)
 }
 
-func (c Checkin) RunWithQuery(
+func (c Checkin) RunWithExternalQuery(
 	u *umwelt.Umwelt,
-	ms *query.Group,
+	eqwk sku.ExternalQueryWithKasten,
 ) (err error) {
 	op := user_ops.Checkin{
 		Delete: c.Delete,
@@ -52,10 +50,7 @@ func (c Checkin) RunWithQuery(
 
 	if err = op.Run(
 		u,
-		query.GroupWithKasten{
-			Group:  ms,
-			Kasten: c.Kasten,
-		},
+		eqwk,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

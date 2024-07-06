@@ -20,8 +20,6 @@ import (
 )
 
 type Clean struct {
-	Kasten kennung.Kasten
-
 	force                     bool
 	includeRecognizedAkten    bool
 	includeRecognizedZettelen bool
@@ -29,12 +27,10 @@ type Clean struct {
 }
 
 func init() {
-	registerCommandWithQuery(
+	registerCommandWithExternalQuery(
 		"clean",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) CommandWithExternalQuery {
 			c := &Clean{}
-
-			f.Var(&c.Kasten, "kasten", "none or Chrome")
 
 			f.BoolVar(
 				&c.force,
@@ -73,14 +69,23 @@ func (c Clean) DefaultGattungen() kennung.Gattung {
 	return kennung.MakeGattung(gattung.TrueGattung()...)
 }
 
-func (c Clean) shouldClean(u *umwelt.Umwelt, co sku.CheckedOutLike) bool {
-	state := co.GetState()
-	if state == checked_out_state.StateExistsAndSame {
+func (c Clean) shouldClean(
+	u *umwelt.Umwelt,
+	co sku.CheckedOutLike,
+	eqwk sku.ExternalQueryWithKasten,
+) bool {
+	if c.force {
 		return true
 	}
 
-	if c.force {
+	state := co.GetState()
+
+	switch state {
+	case checked_out_state.StateExistsAndSame:
 		return true
+
+	case checked_out_state.StateRecognized:
+		return eqwk.IncludeRecognized
 	}
 
 	if c.includeMutter {
@@ -102,21 +107,20 @@ func (c Clean) shouldClean(u *umwelt.Umwelt, co sku.CheckedOutLike) bool {
 	return false
 }
 
-func (c Clean) ModifyBuilder(
-	b *query.Builder,
-) {
+func (c Clean) ModifyBuilder(b *query.Builder) {
 	b.WithHidden(nil)
 }
 
-func (c Clean) RunWithQuery(
+func (c Clean) RunWithExternalQuery(
 	u *umwelt.Umwelt,
-	qg *query.Group,
+	eqwk sku.ExternalQueryWithKasten,
 ) (err error) {
 	fds := fd.MakeMutableSet()
 
 	u.Lock()
 	defer errors.Deferred(&err, u.Unlock)
 
+	// TODO [radi/kof !task project-2021-zit-features zz-inbox] add support for kasten in checkouts and external
 	if err = u.GetStore().GetCwdFiles().GetEmptyDirectories().Each(
 		fds.Add,
 	); err != nil {
@@ -125,16 +129,13 @@ func (c Clean) RunWithQuery(
 	}
 
 	if err = u.GetStore().QueryCheckedOut(
-		sku.ExternalQueryWithKasten{
-			ExternalQuery: sku.ExternalQuery{
-				Queryable: qg,
-			},
-			Kasten: c.Kasten,
-		},
+		eqwk,
 		func(co sku.CheckedOutLike) (err error) {
-			if !c.shouldClean(u, co) {
+			if !c.shouldClean(u, co, eqwk) {
 				return
 			}
+
+			// ui.Debug().Print(co)
 
 			if err = u.GetStore().DeleteCheckout(co); err != nil {
 				err = errors.Wrap(err)
@@ -148,19 +149,21 @@ func (c Clean) RunWithQuery(
 		return
 	}
 
-	if err = c.markUnsureAktenForRemovalIfNecessary(u, qg, fds.Add); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	// TODO [radi/kof !task project-2021-zit-features zz-inbox] add support for kasten in checkouts and external
+	// if err = c.markUnsureAktenForRemovalIfNecessary(u, eqwk, fds.Add); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
-	if err = c.markUnsureZettelenForRemovalIfNecessary(
-		u,
-		qg,
-		fds.Add,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	// TODO [radi/kof !task project-2021-zit-features zz-inbox] add support for kasten in checkouts and external
+	// if err = c.markUnsureZettelenForRemovalIfNecessary(
+	// 	u,
+	// 	eqwk,
+	// 	fds.Add,
+	// ); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
 	if err = u.DeleteFiles(fds); err != nil {
 		err = errors.Wrap(err)
@@ -170,9 +173,11 @@ func (c Clean) RunWithQuery(
 	return
 }
 
+// TODO [radi/kof !task project-2021-zit-features zz-inbox] add support for kasten in checkouts and external
 func (c Clean) markUnsureAktenForRemovalIfNecessary(
 	u *umwelt.Umwelt,
 	qg *query.Group,
+	k kennung.Kasten,
 	add schnittstellen.FuncIter[*fd.FD],
 ) (err error) {
 	if !c.includeRecognizedAkten {
@@ -186,7 +191,7 @@ func (c Clean) markUnsureAktenForRemovalIfNecessary(
 		return
 	}
 
-	p := u.PrinterCheckedOutForKasten(c.Kasten)
+	p := u.PrinterCheckedOutForKasten(k)
 	var l sync.Mutex
 
 	// TODO create a new query group for all of history
@@ -254,16 +259,18 @@ func (c Clean) markUnsureAktenForRemovalIfNecessary(
 	return
 }
 
+// TODO [radi/kof !task project-2021-zit-features zz-inbox] add support for kasten in checkouts and external
 func (c Clean) markUnsureZettelenForRemovalIfNecessary(
 	u *umwelt.Umwelt,
 	qg *query.Group,
+	k kennung.Kasten,
 	add schnittstellen.FuncIter[*fd.FD],
 ) (err error) {
 	if !c.includeRecognizedZettelen {
 		return
 	}
 
-	p := u.PrinterCheckedOutForKasten(c.Kasten)
+	p := u.PrinterCheckedOutForKasten(k)
 	var l sync.Mutex
 
 	if err = u.GetStore().QueryUnsure(

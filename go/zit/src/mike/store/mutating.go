@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/hinweisen"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 )
@@ -57,14 +57,6 @@ func (s *Store) tryRealizeAndOrStore(
 ) (err error) {
 	ui.Log().Printf("%s -> %s", o, kinder)
 
-	if kinder.Kennung.IsEmpty() &&
-		o.ContainsAny(
-			objekte_mode.ModeAddToBestandsaufnahme,
-		) {
-		err = errors.Errorf("empty kennung")
-		return
-	}
-
 	if !s.GetStandort().GetLockSmith().IsAcquired() &&
 		o.ContainsAny(
 			objekte_mode.ModeAddToBestandsaufnahme,
@@ -86,6 +78,23 @@ func (s *Store) tryRealizeAndOrStore(
 		}
 
 		kinder.SetTai(o.Clock.GetTai())
+	}
+
+	if o.ContainsAny(
+		objekte_mode.ModeAddToBestandsaufnahme,
+	) && (kinder.Kennung.IsEmpty() || kinder.GetGattung() == gattung.Unknown) {
+		var ken *kennung.Hinweis
+
+		if ken, err = s.kennungIndex.CreateHinweis(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = kinder.Kennung.SetWithKennung(ken); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 	}
 
 	var mutter *sku.Transacted
@@ -331,6 +340,17 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		return
 	}
 
+	type akteSaver interface {
+		SaveAkte(s standort.Standort) (err error)
+	}
+
+	if as, ok := co.GetSkuExternalLike().(akteSaver); ok {
+		if err = as.SaveAkte(s.GetStandort()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	if err = transactedPtr.SetAkteSha(e.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -350,6 +370,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 
 	var mode checkout_mode.Mode
 
+	// TODO [radi/kof !task project-2021-zit-features zz-inbox] add support for kasten in checkouts and external
 	if cofs, ok := co.(*store_fs.CheckedOut); ok {
 		if mode, err = cofs.External.FDs.GetCheckoutModeOrError(); err != nil {
 			err = errors.Wrap(err)
@@ -364,33 +385,6 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	return
-}
-
-func (s *Store) makeSku(
-	mg metadatei.Getter,
-	k kennung.Kennung,
-) (tz *sku.Transacted, err error) {
-	if mg == nil {
-		panic("metadatei.Getter was nil")
-	}
-
-	m := mg.GetMetadatei()
-	tz = sku.GetTransactedPool().Get()
-	metadatei.Resetter.ResetWith(&tz.Metadatei, m)
-
-	if err = tz.Kennung.SetWithKennung(k); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if tz.Kennung.GetGattung() != gattung.Zettel {
-		err = gattung.ErrWrongType{
-			ExpectedType: gattung.Zettel,
-			ActualType:   gattung.Must(tz.Kennung.GetGattung()),
-		}
 	}
 
 	return

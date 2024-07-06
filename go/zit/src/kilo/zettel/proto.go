@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
 )
 
@@ -52,10 +53,10 @@ func (pz ProtoZettel) Equals(z *metadatei.Metadatei) (ok bool) {
 	return
 }
 
-func (pz ProtoZettel) Make() (z *metadatei.Metadatei) {
+func (pz ProtoZettel) Make() (z *sku.Transacted) {
 	todo.Change("add typ")
 	todo.Change("add Bezeichnung")
-	z = metadatei.GetPool().Get()
+	z = sku.GetTransactedPool().Get()
 
 	pz.Apply(z, gattung.Zettel)
 

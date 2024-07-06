@@ -2,6 +2,7 @@ package user_ops
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
@@ -80,9 +81,11 @@ func (op CommitOrganizeFile) run(
 
 	if err = cs.Changed.Each(
 		func(changed *sku.Transacted) (err error) {
-			if err = u.GetStore().CreateOrUpdateTransacted(
+			if err = u.GetStore().CreateOrUpdateFromTransacted(
 				changed,
-				true,
+				objekte_mode.Make(
+					objekte_mode.ModeMergeCheckedOut,
+				),
 			); err != nil {
 				err = errors.Wrap(err)
 				return

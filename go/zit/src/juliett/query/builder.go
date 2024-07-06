@@ -317,7 +317,7 @@ func (b *Builder) buildManyFromTokens(
 	tokens ...string,
 ) (err error) {
 	if len(tokens) == 1 && tokens[0] == "." {
-		// TODO switch to marker on query group for Cwd
+		// TODO [ces/mew] switch to marker on query group for Cwd
 		if err = b.store_fs.GetCwdFDs().Each(qg.FDs.Add); err != nil {
 			err = errors.Wrap(err)
 			return

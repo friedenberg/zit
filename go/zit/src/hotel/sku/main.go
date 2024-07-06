@@ -20,6 +20,7 @@ type ObjekteOptions struct {
 	kennung.Kasten
 	objekte_mode.Mode
 	kennung.Clock
+	Proto *Transacted
 }
 
 type (

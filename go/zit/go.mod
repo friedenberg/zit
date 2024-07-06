@@ -5,7 +5,7 @@ go 1.22.4
 // replace code.linenisgreat.com/chrest/go/chrest => /Users/sasha/eng/chrest/go/chrest
 
 require (
-	code.linenisgreat.com/chrest/go/chrest v0.0.0-20240701154206-09f915ed5461
+	code.linenisgreat.com/chrest/go/chrest v0.0.0-20240706144420-44dc626ba09e
 	filippo.io/age v1.1.1
 	github.com/DataDog/zstd v1.5.5
 	github.com/brandondube/tai v0.1.0

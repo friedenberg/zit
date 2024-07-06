@@ -15,7 +15,8 @@ import (
 type (
 	ExternalQuery struct {
 		Queryable
-		ExcludeUntracked bool
+		ExcludeUntracked   bool
+		IncludeRecognized bool
 	}
 
 	ExternalQueryWithKasten struct {
@@ -71,6 +72,7 @@ type (
 	ExternalStoreLike interface {
 		Initialize(ExternalStoreInfo) error
 		ExternalStoreQueryCheckedOut
+		// SaveAkte(col CheckedOutLike) (err error)
 		// ExternalStoreCheckoutOne
 		schnittstellen.Flusher
 	}

@@ -109,14 +109,14 @@ func (s *Store) ReadOneExternalInto(
 	t *sku.Transacted,
 	e *External,
 ) (err error) {
-	var m checkout_mode.Mode
-
-	if m, err = em.GetFDs().GetCheckoutModeOrError(); err != nil {
+	if err = e.ResetWithExternalMaybe(em); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = e.ResetWithExternalMaybe(em); err != nil {
+	var m checkout_mode.Mode
+
+	if m, err = em.GetFDs().GetCheckoutModeOrError(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

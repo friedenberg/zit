@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -14,20 +13,15 @@ type Checkin struct {
 
 func (c Checkin) Run(
 	u *umwelt.Umwelt,
-	qg query.GroupWithKasten,
+	eqwk sku.ExternalQueryWithKasten,
 ) (err error) {
 	u.Lock()
 	defer errors.Deferred(&err, u.Unlock)
 
-	ui.Log().Print(qg)
+	ui.Log().Print(eqwk)
 
 	if err = u.GetStore().QueryCheckedOut(
-		sku.ExternalQueryWithKasten{
-			ExternalQuery: sku.ExternalQuery{
-				Queryable: qg.Group,
-			},
-			Kasten: qg.Kasten,
-		},
+		eqwk,
 		func(col sku.CheckedOutLike) (err error) {
 			if _, err = u.GetStore().CreateOrUpdateCheckedOut(
 				col,

@@ -104,9 +104,9 @@ func (c CreateFromPaths) Run(
 			return
 		}
 
-		if err = c.GetStore().CreateOrUpdateTransacted(
+		if err = c.GetStore().CreateOrUpdateFromTransacted(
 			&z.Transacted,
-			false,
+      objekte_mode.ModeApplyProto,
 		); err != nil {
 			// TODO-P2 add file for error handling
 			c.handleStoreError(z, "", err)

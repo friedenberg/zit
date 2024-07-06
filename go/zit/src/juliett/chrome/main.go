@@ -119,110 +119,6 @@ func (c *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 	return
 }
 
-func (c *Store) QueryCheckedOut(
-	qg sku.ExternalQuery,
-	f schnittstellen.FuncIter[sku.CheckedOutLike],
-) (err error) {
-	// o := sku.ObjekteOptions{
-	// 	Mode: objekte_mode.ModeRealizeSansProto,
-	// }
-
-	var co CheckedOut
-
-	for u, items := range c.urls {
-		matchingUrls, ok := c.transactedUrlIndex[u]
-
-		for _, item := range items {
-			var uChrome *url.URL
-
-			if uChrome, err = item.GetUrl(); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			processOne := func(internal *sku.Transacted) (err error) {
-				co.External.browser.Kennung.SetGattung(gattung.Zettel)
-				co.External.Kennung.SetGattung(gattung.Zettel)
-
-				if internal != nil {
-					var uSku *url.URL
-
-					if uSku, err = c.getUrl(internal); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
-					sku.TransactedResetter.ResetWith(&co.Internal, internal)
-					sku.TransactedResetter.ResetWith(&co.External.Transacted, internal)
-
-					if *uSku == *uChrome {
-						co.State = checked_out_state.StateExistsAndSame
-					} else {
-						co.State = checked_out_state.StateExistsAndDifferent
-					}
-
-				} else {
-					sku.TransactedResetter.Reset(&co.External.Transacted)
-					sku.TransactedResetter.Reset(&co.Internal)
-					co.State = checked_out_state.StateUntracked
-				}
-
-				browser := &co.External.browser
-				co.External.item = item
-
-				if co.External.Metadatei.Tai, err = item.GetTai(); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				browser.Metadatei.Tai = co.External.Metadatei.Tai
-
-				if browser.Metadatei.Typ, err = item.GetTyp(); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				if browser.Metadatei.Bezeichnung, err = item.GetBezeichnung(); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				if !qg.ContainsSku(browser) {
-					return
-				}
-
-				if err = f(&co); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				return
-			}
-
-			tabId, okTabId := item.GetTabId()
-			var matchingTabId *sku.Transacted
-
-			if okTabId {
-				matchingTabId, okTabId = c.transactedTabIdIndex[tabId]
-			}
-
-			if !ok || okTabId {
-				if err = processOne(matchingTabId); err != nil {
-					err = errors.Wrapf(err, "Item: %#v", item)
-					return
-				}
-			} else if ok && !qg.ExcludeUntracked {
-				if err = matchingUrls.Each(processOne); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-		}
-	}
-
-	return
-}
-
 func (c *Store) CheckoutOne(
 	options checkout_options.Options,
 	sz *sku.Transacted,
@@ -255,6 +151,219 @@ func (c *Store) CheckoutOne(
 	c.added[*u] = append(existing, sz.Kennung.Clone())
 
 	// 	ui.Debug().Print(response)
+
+	return
+}
+
+func (c *Store) QueryCheckedOut(
+	qg sku.ExternalQuery,
+	f schnittstellen.FuncIter[sku.CheckedOutLike],
+) (err error) {
+	// o := sku.ObjekteOptions{
+	// 	Mode: objekte_mode.ModeRealizeSansProto,
+	// }
+
+	var co CheckedOut
+
+	for u, items := range c.urls {
+		matchingUrls, exactIndexURLMatch := c.transactedUrlIndex[u]
+
+		for _, item := range items {
+			var matchingTabId *sku.Transacted
+			var trackedFromBefore bool
+
+			{
+				tabId, okTabId := item.GetTabId()
+
+				if okTabId {
+					matchingTabId, trackedFromBefore = c.transactedTabIdIndex[tabId]
+				}
+			}
+
+			if trackedFromBefore {
+				if err = c.tryToEmitOneExplicitlyCheckedOut(
+					qg,
+					matchingTabId,
+					&co,
+					item,
+					f,
+				); err != nil {
+					err = errors.Wrapf(err, "Item: %#v", item)
+					return
+				}
+			} else if !exactIndexURLMatch {
+				if err = c.tryToEmitOneUntracked(
+					qg,
+					&co,
+					item,
+					f,
+				); err != nil {
+					err = errors.Wrapf(err, "Item: %#v", item)
+					return
+				}
+			} else if exactIndexURLMatch {
+				if err = matchingUrls.Each(
+					func(matching *sku.Transacted) (err error) {
+						if err = c.tryToEmitOneRecognized(
+							qg,
+							matching,
+							&co,
+							item,
+							f,
+						); err != nil {
+							err = errors.Wrapf(err, "Item: %#v", item)
+							return
+						}
+
+						return
+					},
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+		}
+	}
+
+	return
+}
+
+func (c *Store) tryToEmitOneExplicitlyCheckedOut(
+	qg sku.ExternalQuery,
+	internal *sku.Transacted,
+	co *CheckedOut,
+	item item,
+	f schnittstellen.FuncIter[sku.CheckedOutLike],
+) (err error) {
+	sku.TransactedResetter.Reset(&co.External.browser)
+	co.External.browser.Kennung.SetGattung(gattung.Zettel)
+	co.External.Kennung.SetGattung(gattung.Zettel)
+
+	var uSku *url.URL
+
+	if uSku, err = c.getUrl(internal); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var uChrome *url.URL
+
+	if uChrome, err = item.GetUrl(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	sku.TransactedResetter.ResetWith(&co.Internal, internal)
+	sku.TransactedResetter.ResetWith(&co.External.Transacted, internal)
+
+	if *uSku == *uChrome {
+		co.State = checked_out_state.StateExistsAndSame
+	} else {
+		co.State = checked_out_state.StateExistsAndDifferent
+	}
+
+	if err = c.tryToEmitOneCommon(
+		qg,
+		co,
+		item,
+		false,
+		f,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (c *Store) tryToEmitOneRecognized(
+	qg sku.ExternalQuery,
+	internal *sku.Transacted,
+	co *CheckedOut,
+	item item,
+	f schnittstellen.FuncIter[sku.CheckedOutLike],
+) (err error) {
+	if !qg.IncludeRecognized {
+		return
+	}
+
+	sku.TransactedResetter.Reset(&co.External.browser)
+	co.External.browser.Kennung.SetGattung(gattung.Zettel)
+	co.External.Kennung.SetGattung(gattung.Zettel)
+
+	sku.TransactedResetter.ResetWith(&co.Internal, internal)
+	sku.TransactedResetter.ResetWith(&co.External.Transacted, internal)
+
+	co.State = checked_out_state.StateRecognized
+
+	if err = c.tryToEmitOneCommon(
+		qg,
+		co,
+		item,
+		true,
+		f,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (c *Store) tryToEmitOneUntracked(
+	qg sku.ExternalQuery,
+	co *CheckedOut,
+	item item,
+	f schnittstellen.FuncIter[sku.CheckedOutLike],
+) (err error) {
+	if qg.ExcludeUntracked {
+		return
+	}
+
+	sku.TransactedResetter.Reset(&co.External.browser)
+	co.External.browser.Kennung.SetGattung(gattung.Zettel)
+	co.External.Kennung.SetGattung(gattung.Zettel)
+
+	sku.TransactedResetter.Reset(&co.External.Transacted)
+	sku.TransactedResetter.Reset(&co.Internal)
+	co.State = checked_out_state.StateUntracked
+
+	if err = c.tryToEmitOneCommon(
+		qg,
+		co,
+		item,
+		true,
+		f,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (c *Store) tryToEmitOneCommon(
+	qg sku.ExternalQuery,
+	co *CheckedOut,
+	i item,
+	overwrite bool,
+	f schnittstellen.FuncIter[sku.CheckedOutLike],
+) (err error) {
+	browser := &co.External.browser
+
+	if err = co.External.SetItem(i, overwrite); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if !qg.ContainsSku(browser) && !qg.ContainsSku(co.GetSku()) {
+		return
+	}
+
+	if err = f(co); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

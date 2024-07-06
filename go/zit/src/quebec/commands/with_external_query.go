@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"flag"
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -10,6 +11,34 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
+
+func registerCommandWithExternalQuery(
+	n string,
+	makeFunc func(*flag.FlagSet) CommandWithExternalQuery,
+) {
+	f := flag.NewFlagSet(n, flag.ExitOnError)
+
+	c := makeFunc(f)
+
+	if _, ok := commands[n]; ok {
+		panic("command added more than once: " + n)
+	}
+
+	cweq := &commandWithExternalQuery{
+		CommandWithExternalQuery: c,
+	}
+
+	f.Var(&cweq.Kasten, "kasten", "none or Chrome")
+	f.BoolVar(&cweq.ExcludeUntracked, "exclude-untracked", false, "")
+	f.BoolVar(&cweq.IncludeRecognized, "include-recognized", false, "")
+
+	co := command{
+		Command: cweq,
+		FlagSet: f,
+	}
+
+	commands[n] = co
+}
 
 type CommandWithExternalQuery interface {
 	RunWithExternalQuery(

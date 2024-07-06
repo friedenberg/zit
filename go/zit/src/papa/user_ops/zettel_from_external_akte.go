@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -21,6 +22,7 @@ import (
 
 type ZettelFromExternalAkte struct {
 	*umwelt.Umwelt
+	// TODO switch to using ObjekteOptions
 	ProtoZettel zettel.ProtoZettel
 	Filter      script_value.ScriptValue
 	Delete      bool
@@ -107,9 +109,9 @@ func (c ZettelFromExternalAkte) Run(
 	if err = results.Each(
 		func(z *sku.Transacted) (err error) {
 			if c.ProtoZettel.Apply(z, gattung.Zettel) {
-				if err = c.GetStore().CreateOrUpdateTransacted(
+				if err = c.GetStore().CreateOrUpdateFromTransacted(
 					z,
-					false,
+					objekte_mode.ModeApplyProto,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -137,24 +139,26 @@ func (c ZettelFromExternalAkte) Run(
 			return
 		}
 
-		var tz *sku.Transacted
-
-		if tz, err = c.GetStore().Create(z); err != nil {
+		if err = c.GetStore().CreateOrUpdateFromTransacted(
+			z.GetSku(),
+			objekte_mode.ModeApplyProto,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if c.ProtoZettel.Apply(tz, gattung.Zettel) {
-			if err = c.GetStore().CreateOrUpdateTransacted(
-				tz,
-				false,
+		// TODO switch to using ObjekteOptions
+		if c.ProtoZettel.Apply(z, gattung.Zettel) {
+			if err = c.GetStore().CreateOrUpdateFromTransacted(
+				z.GetSku(),
+				objekte_mode.ModeEmpty,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 		}
 
-		results.Add(tz)
+		results.Add(z.GetSku())
 	}
 
 	if err != nil {

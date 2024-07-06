@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -222,6 +223,43 @@ func (f *cliCheckedOut) WriteStringFormat(
 		if err != nil {
 			err = errors.Wrap(err)
 			return
+		}
+
+		n1, err = sw.WriteString("\n")
+		n += int64(n1)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		n2, err = f.rightAlignedWriter.WriteStringFormat(
+			sw,
+			"",
+		)
+		n += n2
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		for _, v := range iter.SortedValues(browser.Metadatei.GetEtiketten()) {
+			n1, err = sw.WriteString(" ")
+			n += int64(n1)
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			n2, err = f.etikettenStringFormatWriter.WriteStringFormat(sw, &v)
+			n += n2
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 	}
 

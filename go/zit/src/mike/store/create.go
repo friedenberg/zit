@@ -2,17 +2,14 @@ package store
 
 import (
 	"fmt"
-	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -51,70 +48,16 @@ func (s *Store) Reindex() (err error) {
 	return
 }
 
-func (s *Store) CreateOrUpdateTransacted(
+func (s *Store) CreateOrUpdateFromTransacted(
 	in *sku.Transacted,
-	updateCheckout bool,
+	mode objekte_mode.Mode,
 ) (err error) {
-	mode := objekte_mode.Make(
+	mode.Add(
 		objekte_mode.ModeCommit,
 		objekte_mode.ModeApplyProto,
 	)
 
-	if updateCheckout {
-		mode |= objekte_mode.ModeMergeCheckedOut
-	}
-
-	if in.Kennung.IsEmpty() {
-		if err = s.CreateZettelOrError(in); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		if err = s.tryRealizeAndOrStore(in, ObjekteOptions{Mode: mode}); err != nil {
-			err = errors.WrapExcept(err, collections.ErrExists)
-			return
-		}
-	}
-
-	return
-}
-
-func (s *Store) CreateOrUpdate(
-	mg metadatei.Getter,
-	kennungPtr kennung.Kennung,
-) (transactedPtr *sku.Transacted, err error) {
-	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = file_lock.ErrLockRequired{
-			Operation: fmt.Sprintf(
-				"create or update %s",
-				kennungPtr.GetGattung(),
-			),
-		}
-
-		return
-	}
-
-	var m *metadatei.Metadatei
-
-	if mg != nil {
-		m = mg.GetMetadatei()
-	} else {
-		m = metadatei.GetPool().Get()
-		defer metadatei.GetPool().Put(m)
-	}
-
-	transactedPtr = sku.GetTransactedPool().Get()
-	metadatei.Resetter.ResetWith(&transactedPtr.Metadatei, m)
-
-	if err = transactedPtr.Kennung.SetWithKennung(kennungPtr); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.tryRealizeAndOrStore(
-		transactedPtr,
-		ObjekteOptions{Mode: objekte_mode.ModeCommit},
-	); err != nil {
+	if err = s.tryRealizeAndOrStore(in, ObjekteOptions{Mode: mode}); err != nil {
 		err = errors.WrapExcept(err, collections.ErrExists)
 		return
 	}
@@ -204,116 +147,6 @@ func (s *Store) RevertTo(
 		ObjekteOptions{Mode: objekte_mode.ModeCommit},
 	); err != nil {
 		err = errors.WrapExcept(err, collections.ErrExists)
-		return
-	}
-
-	return
-}
-
-//   _____    _   _       _
-//  |__  /___| |_| |_ ___| |
-//    / // _ \ __| __/ _ \ |
-//   / /|  __/ |_| ||  __/ |
-//  /____\___|\__|\__\___|_|
-//
-
-func (s *Store) CreateWithAkteString(
-	mg metadatei.Getter,
-	akteString string,
-) (tz *sku.Transacted, err error) {
-	var aw sha.WriteCloser
-
-	if aw, err = s.GetStandort().AkteWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if _, err = io.WriteString(aw, akteString); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	m := mg.GetMetadatei()
-	m.SetAkteSha(aw)
-
-	defer errors.DeferredCloser(&err, aw)
-
-	if tz, err = s.Create(m); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) CreateZettelOrError(
-	in *sku.Transacted,
-) (err error) {
-	if !in.Kennung.IsEmpty() {
-		err = errors.Errorf("Kennung not empty: %s", in.GetKennung())
-		return
-	}
-
-	if in.GetGattung() != gattung.Zettel {
-		err = errors.Errorf("only Zettel is supported")
-		return
-	}
-
-	var out *sku.Transacted
-
-	if out, err = s.Create(in); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer sku.GetTransactedPool().Put(out)
-
-	if err = in.SetFromSkuLike(out); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-// Given metadatei, generate a new identifier and commit up to two revisions,
-// first without applications of defaults, second with application
-func (s *Store) Create(
-	mg metadatei.Getter,
-) (tz *sku.Transacted, err error) {
-	if mg.GetMetadatei().IsEmpty() {
-		err = errors.Normalf("zettel is empty")
-		return
-	}
-
-	if s.protoZettel.Equals(mg.GetMetadatei()) {
-		err = errors.Normalf("zettel matches protozettel")
-		return
-	}
-
-	var ken *kennung.Hinweis
-
-	if ken, err = s.kennungIndex.CreateHinweis(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	m := mg.GetMetadatei()
-
-	if tz, err = s.makeSku(m, ken); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	o := ObjekteOptions{
-		Mode: objekte_mode.ModeCreate,
-	}
-
-	if err = s.tryRealizeAndOrStore(
-		tz,
-		o,
-	); err != nil {
-		err = errors.Wrap(err)
 		return
 	}
 
