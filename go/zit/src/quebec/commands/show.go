@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -18,9 +17,9 @@ type Show struct {
 }
 
 func init() {
-	registerCommandWithQuery(
+	registerCommandWithExternalQuery(
 		"show",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) CommandWithExternalQuery {
 			c := &Show{}
 
 			f.StringVar(&c.Format, "format", "log", "format")
@@ -46,7 +45,10 @@ func (c Show) DefaultGattungen() kennung.Gattung {
 	)
 }
 
-func (c Show) RunWithQuery(u *umwelt.Umwelt, ms *query.Group) (err error) {
+func (c Show) RunWithExternalQuery(
+	u *umwelt.Umwelt,
+	eqwk sku.ExternalQueryWithKasten,
+) (err error) {
 	var f schnittstellen.FuncIter[*sku.Transacted]
 
 	if f, err = u.MakeFormatFunc(c.Format, u.Out()); err != nil {
@@ -55,7 +57,7 @@ func (c Show) RunWithQuery(u *umwelt.Umwelt, ms *query.Group) (err error) {
 	}
 
 	if err = u.GetStore().QueryWithKasten(
-		query.GroupWithKasten{Group: ms},
+		eqwk,
 		iter.MakeSyncSerializer(f),
 	); err != nil {
 		err = errors.Wrap(err)

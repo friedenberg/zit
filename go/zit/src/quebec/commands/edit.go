@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
@@ -20,9 +20,9 @@ type Edit struct {
 }
 
 func init() {
-	registerCommandWithQuery(
+	registerCommandWithExternalQuery(
 		"edit",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) CommandWithExternalQuery {
 			c := &Edit{
 				CheckoutMode: checkout_mode.ModeObjekteOnly,
 			}
@@ -58,9 +58,9 @@ func (c Edit) DefaultGattungen() kennung.Gattung {
 	)
 }
 
-func (c Edit) RunWithQuery(
+func (c Edit) RunWithExternalQuery(
 	u *umwelt.Umwelt,
-	ms *query.Group,
+	eqwk sku.ExternalQueryWithKasten,
 ) (err error) {
 	options := checkout_options.Options{
 		CheckoutMode: c.CheckoutMode,
@@ -72,7 +72,7 @@ func (c Edit) RunWithQuery(
 		Edit:    true,
 	}
 
-	if _, err = opEdit.RunQuery(ms); err != nil {
+	if _, err = opEdit.RunQuery(eqwk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

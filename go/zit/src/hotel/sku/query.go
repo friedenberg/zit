@@ -35,6 +35,17 @@ type (
 		SigilGetter
 	}
 
+	ExternalQuery struct {
+		QueryGroup
+		ExcludeUntracked  bool
+		IncludeRecognized bool
+	}
+
+	ExternalQueryWithKasten struct {
+		ExternalQuery
+		kennung.Kasten
+	}
+
 	QueryGroupWithKasten struct {
 		QueryGroup
 		kennung.Kasten

@@ -101,7 +101,7 @@ func (c commandWithExternalQuery) Run(u *umwelt.Umwelt, args ...string) (err err
 		qbm.ModifyBuilder(b)
 	}
 
-	if c.Queryable, err = b.BuildQueryGroup(
+	if c.QueryGroup, err = b.BuildQueryGroup(
 		args...,
 	); err != nil {
 		err = errors.Wrap(err)

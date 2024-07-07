@@ -19,50 +19,26 @@ func (s *Store) Query(
 	ms sku.QueryGroup,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	return s.query(sku.QueryGroupWithKasten{QueryGroup: ms}, f, false)
+	return s.query(ms, f)
 }
 
 func (s *Store) QueryOld(
 	ms *query.Group,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	return s.queryOld(query.GroupWithKasten{Group: ms}, f, false)
+	return s.queryOld(
+		ms,
+		f,
+		false,
+	)
 }
 
 func (s *Store) QueryWithKasten(
-	ms query.GroupWithKasten,
+	ms sku.ExternalQueryWithKasten,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	return s.queryOld(ms, f, true)
-}
-
-func (s *Store) queryOld(
-	qg query.GroupWithKasten,
-	f schnittstellen.FuncIter[*sku.Transacted],
-	includeCwd bool,
-) (err error) {
-	if err = s.query(
-		sku.QueryGroupWithKasten{
-			QueryGroup: qg.Group,
-			Kasten:     qg.Kasten,
-		},
-		f,
-		includeCwd,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) query(
-	qg sku.QueryGroupWithKasten,
-	f schnittstellen.FuncIter[*sku.Transacted],
-	includeCwd bool,
-) (err error) {
-	if qg.QueryGroup == nil {
-		if qg.QueryGroup, err = s.queryBuilder.BuildQueryGroup(); err != nil {
+	if ms.QueryGroup == nil {
+		if ms.QueryGroup, err = s.queryBuilder.BuildQueryGroup(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -72,16 +48,16 @@ func (s *Store) query(
 
 	// TODO improve performance by only reading Cwd zettels rather than scanning
 	// everything
-	if qg.GetSigil() == kennung.SigilCwd && includeCwd {
+	if ms.QueryGroup.GetSigil() == kennung.SigilCwd {
 		f1 = func(z *sku.Transacted) (err error) {
 			g := gattung.Must(z.GetGattung())
-			m, ok := qg.Get(g)
+			m, ok := ms.QueryGroup.Get(g)
 
 			if !ok {
 				return
 			}
 
-			if err = s.UpdateTransactedWithExternal(qg.Kasten, z); err != nil {
+			if err = s.UpdateTransactedWithExternal(ms.Kasten, z); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -100,14 +76,14 @@ func (s *Store) query(
 	} else {
 		f1 = func(z *sku.Transacted) (err error) {
 			g := gattung.Must(z.GetGattung())
-			m, ok := qg.Get(g)
+			m, ok := ms.QueryGroup.Get(g)
 
 			if !ok {
 				return
 			}
 
-			if includeCwd && m.GetSigil().IncludesCwd() {
-				if err = s.UpdateTransactedWithExternal(qg.Kasten, z); err != nil {
+			if m.GetSigil().IncludesCwd() {
+				if err = s.UpdateTransactedWithExternal(ms.Kasten, z); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -127,7 +103,69 @@ func (s *Store) query(
 	}
 
 	if err = s.GetVerzeichnisse().ReadQuery(
-		qg.QueryGroup,
+		ms.QueryGroup,
+		f1,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) queryOld(
+	qg sku.QueryGroup,
+	f schnittstellen.FuncIter[*sku.Transacted],
+	includeCwd bool,
+) (err error) {
+	if err = s.query(
+		qg,
+		f,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) query(
+	qg sku.QueryGroup,
+	f schnittstellen.FuncIter[*sku.Transacted],
+) (err error) {
+	if qg == nil {
+		if qg, err = s.queryBuilder.BuildQueryGroup(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	var f1 schnittstellen.FuncIter[*sku.Transacted]
+
+	// TODO improve performance by only reading Cwd zettels rather than scanning
+	// everything
+	f1 = func(z *sku.Transacted) (err error) {
+		g := gattung.Must(z.GetGattung())
+		m, ok := qg.Get(g)
+
+		if !ok {
+			return
+		}
+
+		if !m.ContainsSku(z) {
+			return
+		}
+
+		if err = f(z); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+
+	if err = s.GetVerzeichnisse().ReadQuery(
+		qg,
 		f1,
 	); err != nil {
 		err = errors.Wrap(err)

@@ -13,7 +13,6 @@ import (
 )
 
 type Checkout struct {
-	Kasten kennung.Kasten
 	*umwelt.Umwelt
 	checkout_options.Options
 	Open    bool
@@ -22,6 +21,20 @@ type Checkout struct {
 }
 
 func (op Checkout) Run(
+	skus sku.TransactedSet,
+) (zsc sku.CheckedOutLikeMutableSet, err error) {
+	var k kennung.Kasten
+
+	if zsc, err = op.RunWithKasten(k, skus); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (op Checkout) RunWithKasten(
+	kasten kennung.Kasten,
 	skus sku.TransactedSet,
 ) (zsc sku.CheckedOutLikeMutableSet, err error) {
 	b := op.Umwelt.MakeQueryBuilder(
@@ -37,7 +50,14 @@ func (op Checkout) Run(
 		return
 	}
 
-	if zsc, err = op.RunQuery(qg); err != nil {
+	if zsc, err = op.RunQuery(
+		sku.ExternalQueryWithKasten{
+			Kasten: kasten,
+			ExternalQuery: sku.ExternalQuery{
+				QueryGroup: qg,
+			},
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -46,17 +66,14 @@ func (op Checkout) Run(
 }
 
 func (op Checkout) RunQuery(
-	qg *query.Group,
+	eqwk sku.ExternalQueryWithKasten,
 ) (zsc sku.CheckedOutLikeMutableSet, err error) {
 	zsc = sku.MakeCheckedOutLikeMutableSet()
 	var l sync.Mutex
 
 	if err = op.Umwelt.GetStore().CheckoutQuery(
 		op.Options,
-		query.GroupWithKasten{
-			Group:  qg,
-			Kasten: op.Kasten,
-		},
+		eqwk,
 		func(col sku.CheckedOutLike) (err error) {
 			l.Lock()
 			defer l.Unlock()
@@ -89,7 +106,7 @@ func (op Checkout) RunQuery(
 
 	if op.Open || op.Edit {
 		if err = op.GetStore().Open(
-			op.Kasten,
+			eqwk.Kasten,
 			op.CheckoutMode,
 			op.PrinterHeader(),
 			zsc,
@@ -119,9 +136,9 @@ func (op Checkout) RunQuery(
 		if err = checkinOp.Run(
 			op.Umwelt,
 			sku.ExternalQueryWithKasten{
-				Kasten: op.Kasten,
+				Kasten: eqwk.Kasten,
 				ExternalQuery: sku.ExternalQuery{
-					Queryable: ms,
+					QueryGroup: ms,
 				},
 			},
 		); err != nil {

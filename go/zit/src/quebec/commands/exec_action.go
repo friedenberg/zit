@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -22,9 +21,9 @@ type ExecAction struct {
 }
 
 func init() {
-	registerCommandWithQuery(
+	registerCommandWithExternalQuery(
 		"exec-action",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) CommandWithExternalQuery {
 			c := &ExecAction{}
 
 			f.Var(&c.Action, "action", "which Konfig action to execute")
@@ -40,9 +39,9 @@ func (c ExecAction) DefaultGattungen() kennung.Gattung {
 	)
 }
 
-func (c ExecAction) RunWithQuery(
+func (c ExecAction) RunWithExternalQuery(
 	u *umwelt.Umwelt,
-	ms *query.Group,
+	ms sku.ExternalQueryWithKasten,
 ) (err error) {
 	if !c.Action.WasSet() {
 		err = errors.Normal(errors.Errorf("Action must be provided"))
@@ -64,7 +63,7 @@ func (c ExecAction) RunWithQuery(
 	hinweisen := collections_value.MakeMutableValueSet[kennung.Kennung](nil)
 
 	if err = u.GetStore().QueryWithKasten(
-		query.GroupWithKasten{Group: ms},
+		ms,
 		func(z *sku.Transacted) (err error) {
 			return hinweisen.Add(z.GetKennung())
 		},

@@ -60,7 +60,7 @@ func (c Status) RunWithExternalQuery(
 		return
 	}
 
-	qg := eqwk.Queryable.(*query.Group)
+	qg := eqwk.QueryGroup.(*query.Group)
 
 	if err = u.GetStore().QueryUnsure(
 		qg,

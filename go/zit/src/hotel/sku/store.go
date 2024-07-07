@@ -13,17 +13,6 @@ import (
 )
 
 type (
-	ExternalQuery struct {
-		Queryable
-		ExcludeUntracked   bool
-		IncludeRecognized bool
-	}
-
-	ExternalQueryWithKasten struct {
-		ExternalQuery
-		kennung.Kasten
-	}
-
 	FuncRealize     = func(*Transacted, *Transacted, ObjekteOptions) error
 	FuncCommit      = func(*Transacted, ObjekteOptions) error
 	FuncReadSha     = func(*sha.Sha) (*Transacted, error)

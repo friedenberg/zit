@@ -20,6 +20,7 @@ type Diff struct {
 	Kasten kennung.Kasten
 }
 
+// TODO switch to registerCommandWithExternalQuery
 func init() {
 	registerCommandWithQuery(
 		"diff",
@@ -68,7 +69,7 @@ func (c Diff) RunWithQuery(
 	if err = u.GetStore().QueryCheckedOut(
 		sku.ExternalQueryWithKasten{
 			ExternalQuery: sku.ExternalQuery{
-				Queryable: qg,
+				QueryGroup: qg,
 			},
 			Kasten: c.Kasten,
 		},

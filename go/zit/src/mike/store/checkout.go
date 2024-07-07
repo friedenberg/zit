@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
 func (s *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
@@ -34,7 +33,7 @@ func (s *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
 
 func (s *Store) CheckoutQuery(
 	options checkout_options.Options,
-	qg query.GroupWithKasten,
+	qg sku.ExternalQueryWithKasten,
 	f schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	qf := func(t *sku.Transacted) (err error) {

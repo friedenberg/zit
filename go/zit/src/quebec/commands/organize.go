@@ -29,9 +29,9 @@ type Organize struct {
 }
 
 func init() {
-	registerCommandWithQuery(
+	registerCommandWithExternalQuery(
 		"organize",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) CommandWithExternalQuery {
 			c := &Organize{
 				Flags: organize_text.MakeFlags(),
 			}
@@ -66,10 +66,12 @@ func (c *Organize) CompletionGattung() kennung.Gattung {
 	)
 }
 
-func (c *Organize) RunWithQuery(
+func (c *Organize) RunWithExternalQuery(
 	u *umwelt.Umwelt,
-	ms *query.Group,
+	eqwk sku.ExternalQueryWithKasten,
 ) (err error) {
+	ms := eqwk.QueryGroup.(*query.Group)
+
 	u.ApplyToOrganizeOptions(&c.Options)
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
@@ -91,7 +93,7 @@ func (c *Organize) RunWithQuery(
 	getResults := sku.MakeTransactedMutableSet()
 
 	if err = u.GetStore().QueryWithKasten(
-		query.GroupWithKasten{Group: ms},
+		eqwk,
 		iter.MakeAddClonePoolPtrFunc(
 			getResults,
 			sku.GetTransactedPool(),

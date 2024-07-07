@@ -45,7 +45,7 @@ func (c Mergetool) RunWithQuery(
 	if err = u.GetStore().QueryCheckedOut(
 		sku.ExternalQueryWithKasten{
 			ExternalQuery: sku.ExternalQuery{
-				Queryable: qg,
+				QueryGroup: qg,
 			},
 		},
 		func(co sku.CheckedOutLike) (err error) {

@@ -8,27 +8,25 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
 type Checkout struct {
-	Kasten          kennung.Kasten
 	CheckoutOptions checkout_options.Options
 }
 
 func init() {
-	registerCommandWithQuery(
+	registerCommandWithExternalQuery(
 		"checkout",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) CommandWithExternalQuery {
 			c := &Checkout{
 				CheckoutOptions: checkout_options.Options{
 					CheckoutMode: checkout_mode.ModeObjekteOnly,
 				},
 			}
 
-			f.Var(&c.Kasten, "kasten", "none or Chrome")
 			c.CheckoutOptions.AddToFlagSet(f)
 
 			return c
@@ -42,17 +40,16 @@ func (c Checkout) DefaultGattungen() kennung.Gattung {
 	)
 }
 
-func (c Checkout) RunWithQuery(
+func (c Checkout) RunWithExternalQuery(
 	u *umwelt.Umwelt,
-	qg *query.Group,
+	eqwk sku.ExternalQueryWithKasten,
 ) (err error) {
 	opCheckout := user_ops.Checkout{
-		Kasten:  c.Kasten,
 		Umwelt:  u,
 		Options: c.CheckoutOptions,
 	}
 
-	if _, err = opCheckout.RunQuery(qg); err != nil {
+	if _, err = opCheckout.RunQuery(eqwk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -48,8 +48,8 @@ func (c Test) DefaultGattungen() kennung.Gattung {
 }
 
 func (c Test) RunWithQuery(u *umwelt.Umwelt, ms *query.Group) (err error) {
-	if err = u.GetStore().QueryWithKasten(
-		query.GroupWithKasten{Group: ms},
+	if err = u.GetStore().Query(
+		ms,
 		iter.MakeSyncSerializer(
 			func(o *sku.Transacted) (err error) {
 				var sk *sku.Transacted
