@@ -6,16 +6,17 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type Kennung struct {
-	Exact   bool
-	Virtual bool
-	Debug   bool
-	FD      *fd.FD
+	Exact    bool
+	Virtual  bool
+	Debug    bool
+	External bool
+	// TODO [ces/mew] switch to kasten parsing ID's before body
+	// FD      *fd.FD
 	*kennung.Kennung2
 }
 

@@ -14,15 +14,17 @@ func (s *Store) UpdateTransactedWithExternal(
 	kasten kennung.Kasten,
 	z *sku.Transacted,
 ) (err error) {
-	switch kasten.GetKastenString() {
-	case "chrome":
-		err = todo.Implement()
+	kid := kasten.GetKastenString()
+	es, ok := s.externalStores[kid]
 
-	default:
-		if err = s.GetCwdFiles().UpdateTransacted(z); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if !ok {
+		err = errors.Errorf("no kasten with id %q", kid)
+		return
+	}
+
+	if err = es.UpdateTransacted(z); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

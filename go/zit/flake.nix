@@ -31,6 +31,7 @@
             buildInputs = with pkgs; [
               fish
               gnumake
+              parallel
             ];
           };
         })

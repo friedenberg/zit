@@ -67,11 +67,9 @@ func (c Diff) RunWithQuery(
 	}
 
 	if err = u.GetStore().QueryCheckedOut(
-		sku.ExternalQueryWithKasten{
-			ExternalQuery: sku.ExternalQuery{
-				QueryGroup: qg,
-			},
-			Kasten: c.Kasten,
+		sku.ExternalQuery{
+			Kasten:     c.Kasten,
+			QueryGroup: qg,
 		},
 		func(co sku.CheckedOutLike) (err error) {
 			switch cot := co.(type) {

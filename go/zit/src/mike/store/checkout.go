@@ -33,7 +33,7 @@ func (s *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
 
 func (s *Store) CheckoutQuery(
 	options checkout_options.Options,
-	qg sku.ExternalQueryWithKasten,
+	qg sku.ExternalQuery,
 	f schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	qf := func(t *sku.Transacted) (err error) {

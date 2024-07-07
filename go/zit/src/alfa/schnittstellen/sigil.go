@@ -3,7 +3,7 @@ package schnittstellen
 type Sigil interface {
 	IncludesHistory
 	IncludesSchwanzen
-	IncludesCwd
+	IncludesExternal
 	IncludesHidden
 }
 
@@ -19,8 +19,8 @@ type IncludesSchwanzen interface {
 	IncludesSchwanzen() bool
 }
 
-type IncludesCwd interface {
-	IncludesCwd() bool
+type IncludesExternal interface {
+	IncludesExternal() bool
 }
 
 type IncludesHidden interface {

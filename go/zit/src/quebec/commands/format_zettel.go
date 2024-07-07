@@ -131,13 +131,17 @@ func (c *FormatZettel) getSku(
 
 	if k, s, err = qg.GetExactlyOneKennung(
 		gattung.Zettel,
-		u.GetStore().GetCwdFiles(),
+		u.GetDefaultExternalStore(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if sk, err = u.GetStore().ReadTransactedFromKennungKastenSigil(k, c.Kasten, s); err != nil {
+	if sk, err = u.GetStore().ReadTransactedFromKennungKastenSigil(
+		k,
+		c.Kasten,
+		s,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

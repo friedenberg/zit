@@ -51,11 +51,9 @@ func (op Checkout) RunWithKasten(
 	}
 
 	if zsc, err = op.RunQuery(
-		sku.ExternalQueryWithKasten{
-			Kasten: kasten,
-			ExternalQuery: sku.ExternalQuery{
-				QueryGroup: qg,
-			},
+		sku.ExternalQuery{
+			Kasten:     kasten,
+			QueryGroup: qg,
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -66,7 +64,7 @@ func (op Checkout) RunWithKasten(
 }
 
 func (op Checkout) RunQuery(
-	eqwk sku.ExternalQueryWithKasten,
+	eqwk sku.ExternalQuery,
 ) (zsc sku.CheckedOutLikeMutableSet, err error) {
 	zsc = sku.MakeCheckedOutLikeMutableSet()
 	var l sync.Mutex
@@ -135,11 +133,9 @@ func (op Checkout) RunQuery(
 
 		if err = checkinOp.Run(
 			op.Umwelt,
-			sku.ExternalQueryWithKasten{
-				Kasten: eqwk.Kasten,
-				ExternalQuery: sku.ExternalQuery{
-					QueryGroup: ms,
-				},
+			sku.ExternalQuery{
+				Kasten:     eqwk.Kasten,
+				QueryGroup: ms,
 			},
 		); err != nil {
 			err = errors.Wrap(err)

@@ -116,7 +116,7 @@ func (s *Store) QueryUnsure(
 	qg.SetIncludeHistory()
 
 	if len(selbstMetadateiSansTaiToZettels) > 0 || len(bezToZettels) > 0 {
-		if err = s.QueryOld(
+		if err = s.Query(
 			qg,
 			func(sk *sku.Transacted) (err error) {
 				if o.Filter != nil {

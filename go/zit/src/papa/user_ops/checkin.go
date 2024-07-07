@@ -13,7 +13,7 @@ type Checkin struct {
 
 func (c Checkin) Run(
 	u *umwelt.Umwelt,
-	eqwk sku.ExternalQueryWithKasten,
+	eqwk sku.ExternalQuery,
 ) (err error) {
 	u.Lock()
 	defer errors.Deferred(&err, u.Unlock)

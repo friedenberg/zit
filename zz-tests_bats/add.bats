@@ -374,7 +374,7 @@ function add_each_akte { # @test
 		-each-akte "cat" \
 		-delete \
 		-etiketten zz-inbox-2022-11-14 \
-		"$f" "$f2"
+		"$f"
 
 	assert_success
 	assert_output_unsorted - <<-EOM

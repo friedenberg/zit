@@ -41,7 +41,7 @@ func (c commandWithQuery) Complete(
 		return
 	}
 
-	if err = u.GetStore().QueryOld(
+	if err = u.GetStore().Query(
 		qg,
 		w.WriteOne,
 	); err != nil {

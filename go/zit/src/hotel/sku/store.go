@@ -7,6 +7,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
@@ -52,6 +54,10 @@ type (
 		DeleteCheckout(col CheckedOutLike) (err error)
 	}
 
+	ExternalStoreUpdateTransacted interface {
+		UpdateTransacted(z *Transacted) (err error)
+	}
+
 	ExternalStoreInfo struct {
 		StoreFuncs
 		DirCache string
@@ -64,6 +70,12 @@ type (
 		// SaveAkte(col CheckedOutLike) (err error)
 		// ExternalStoreCheckoutOne
 		schnittstellen.Flusher
+		GetExternalKennung() (schnittstellen.SetLike[*kennung.Kennung2], error)
+		GetKennungForString(string) (*kennung.Kennung2, error)
+	}
+
+	ExternalStoreGetter interface {
+		GetExternalStore(kennung.Kasten) (*ExternalStore, bool)
 	}
 )
 
@@ -156,7 +168,7 @@ func (es *ExternalStore) DeleteCheckout(col CheckedOutLike) (err error) {
 	esdc, ok := es.ExternalStoreLike.(ExternalStoreDeleteCheckout)
 
 	if !ok {
-		err = errors.Errorf("store does not support %T", esdc)
+		err = errors.Errorf("store does not support DeleteCheckout")
 		return
 	}
 
@@ -166,6 +178,65 @@ func (es *ExternalStore) DeleteCheckout(col CheckedOutLike) (err error) {
 	}
 
 	if err = esdc.DeleteCheckout(col); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (es *ExternalStore) UpdateTransacted(z *Transacted) (err error) {
+	esut, ok := es.ExternalStoreLike.(ExternalStoreUpdateTransacted)
+
+	if !ok {
+		err = errors.Errorf("store does not support UpdateTransacted")
+		return
+	}
+
+	if err = es.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = esut.UpdateTransacted(z); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (es *ExternalStore) GetExternalKennung() (ks schnittstellen.SetLike[*kennung.Kennung2], err error) {
+	if es == nil {
+		ks = collections_value.MakeValueSet[*kennung.Kennung2](nil)
+		return
+	}
+
+	if err = es.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if ks, err = es.ExternalStoreLike.GetExternalKennung(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (es *ExternalStore) GetKennungForString(v string) (k *kennung.Kennung2, err error) {
+	if es == nil {
+		err = collections.MakeErrNotFoundString(v)
+		return
+	}
+
+	if err = es.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if k, err = es.ExternalStoreLike.GetKennungForString(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

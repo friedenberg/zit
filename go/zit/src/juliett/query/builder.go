@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/echo/zittish"
@@ -23,15 +22,16 @@ func MakeBuilder(
 	akten *akten.Akten,
 	ennui sku.Ennui,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
+	kastenGetter sku.ExternalStoreGetter,
 ) (b *Builder) {
 	b = &Builder{
 		standort:                   s,
 		akten:                      akten,
 		ennui:                      ennui,
 		luaVMPoolBuilder:           luaVMPoolBuilder,
-		virtualStores:              make(map[string]*sku.ExternalStore),
 		virtualEtikettenBeforeInit: make(map[string]string),
 		virtualEtiketten:           make(map[string]Lua),
+		kastenGetter:               kastenGetter,
 	}
 
 	return
@@ -42,8 +42,9 @@ type Builder struct {
 	akten                      *akten.Akten
 	ennui                      sku.Ennui
 	luaVMPoolBuilder           *lua.VMPoolBuilder
-	preexistingKennung         []*kennung.Kennung2
-	store_fs                   Kasten
+	preexistingKennung         []Kennung
+	kastenGetter               sku.ExternalStoreGetter
+	kasten                     *sku.ExternalStore
 	cwdFilterEnabled           bool
 	fileExtensionGetter        schnittstellen.FileExtensionGetter
 	expanders                  kennung.Abbr
@@ -51,7 +52,6 @@ type Builder struct {
 	defaultGattungen           kennung.Gattung
 	defaultSigil               kennung.Sigil
 	permittedSigil             kennung.Sigil
-	virtualStores              map[string]*sku.ExternalStore
 	virtualEtikettenBeforeInit map[string]string
 	virtualEtiketten           map[string]Lua
 	doNotMatchEmpty            bool
@@ -79,20 +79,6 @@ func (b *Builder) WithRequireNonEmptyQuery() *Builder {
 	return b
 }
 
-func (mb *Builder) WithChrome(vs *sku.ExternalStore) *Builder {
-	mb.virtualStores["%chrome"] = vs
-
-	return mb
-}
-
-func (mb *Builder) WithVirtualStores(vs map[string]*sku.ExternalStore) *Builder {
-	for k, v := range vs {
-		mb.virtualStores[k] = v
-	}
-
-	return mb
-}
-
 func (mb *Builder) WithVirtualEtiketten(vs map[string]string) *Builder {
 	for k, v := range vs {
 		mb.virtualEtikettenBeforeInit["%"+k] = v
@@ -107,9 +93,9 @@ func (mb *Builder) WithDebug() *Builder {
 }
 
 func (mb *Builder) WithKasten(
-	store_fs Kasten,
+	kasten *sku.ExternalStore,
 ) *Builder {
-	mb.store_fs = store_fs
+	mb.kasten = kasten
 	return mb
 }
 
@@ -153,9 +139,12 @@ func (b *Builder) WithTransacted(
 ) *Builder {
 	errors.PanicIfError(zts.Each(
 		func(t *sku.Transacted) (err error) {
-			k := kennung.GetKennungPool().Get()
-			k.ResetWith(&t.Kennung)
-			b.preexistingKennung = append(b.preexistingKennung, k)
+			b.preexistingKennung = append(
+				b.preexistingKennung,
+				Kennung{
+					Kennung2: t.Kennung.Clone(),
+				},
+			)
 
 			return
 		},
@@ -169,9 +158,12 @@ func (b *Builder) WithCheckedOut(
 ) *Builder {
 	errors.PanicIfError(cos.Each(
 		func(co sku.CheckedOutLike) (err error) {
-			k := kennung.GetKennungPool().Get()
-			k.ResetWith(&(co.GetSku()).Kennung)
-			b.preexistingKennung = append(b.preexistingKennung, k)
+			b.preexistingKennung = append(
+				b.preexistingKennung,
+				Kennung{
+					Kennung2: co.GetSku().Kennung.Clone(),
+				},
+			)
 
 			return
 		},
@@ -201,6 +193,26 @@ func (b *Builder) realizeVirtualEtiketten() (err error) {
 	return
 }
 
+func (b *Builder) BuildQueryGroupWithKasten(
+	k kennung.Kasten,
+	vs ...string,
+) (qg *Group, err error) {
+	ok := false
+	b.kasten, ok = b.kastenGetter.GetExternalStore(k)
+
+	if !ok {
+		err = errors.Errorf("kasten not found: %q", k)
+		return
+	}
+
+	if qg, err = b.BuildQueryGroup(vs...); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (b *Builder) BuildQueryGroup(vs ...string) (qg *Group, err error) {
 	if err = b.realizeVirtualEtiketten(); err != nil {
 		err = errors.Wrap(err)
@@ -222,19 +234,22 @@ func (b *Builder) build(vs ...string) (qg *Group, err error) {
 
 	var remaining []string
 
-	// TODO [ces/mew] switch to kasten parsing ID's before body
 	for _, v := range vs {
-		var fd fd.FD
+		var k *kennung.Kennung2
 
-		if err1 := fd.Set(v); err1 != nil {
+		if k, err = b.kasten.GetKennungForString(v); err != nil {
+			err = nil
 			remaining = append(remaining, v)
 			continue
 		}
 
-		if err = qg.FDs.Add(&fd); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		b.preexistingKennung = append(
+			b.preexistingKennung,
+			Kennung{
+				Kennung2: k,
+				External: true,
+			},
+		)
 	}
 
 	var tokens []string
@@ -249,53 +264,10 @@ func (b *Builder) build(vs ...string) (qg *Group, err error) {
 		return
 	}
 
-	newFDS := fd.MakeMutableSet()
-
-	if err = qg.FDs.Each(
-		func(f *fd.FD) (err error) {
-			var k *kennung.Kennung2
-
-			if k, err = b.store_fs.GetKennungForFD(f); err != nil {
-				if err = newFDS.Add(f); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				return
-				// if errors.Is(err, kennung.ErrFDNotKennung) {
-				// 	if err = newFDS.Add(f); err != nil {
-				// 		err = errors.Wrap(err)
-				// 		return
-				// 	}
-
-				// 	return
-				// } else {
-				// 	err = nil
-				// 	// err = errors.Wrapf(err, "File: %q", f)
-				// }
-			}
-
-			if err = qg.AddExactKennung(
-				b,
-				Kennung{Kennung2: k, FD: f},
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	qg.FDs = newFDS
-
 	for _, k := range b.preexistingKennung {
 		if err = qg.AddExactKennung(
 			b,
-			Kennung{Kennung2: k},
+			k,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -318,7 +290,26 @@ func (b *Builder) buildManyFromTokens(
 ) (err error) {
 	if len(tokens) == 1 && tokens[0] == "." {
 		// TODO [ces/mew] switch to marker on query group for Cwd
-		if err = b.store_fs.GetCwdFDs().Each(qg.FDs.Add); err != nil {
+		var ks schnittstellen.SetLike[*kennung.Kennung2]
+
+		if ks, err = b.kasten.GetExternalKennung(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = ks.Each(
+			func(k *kennung.Kennung2) (err error) {
+				b.preexistingKennung = append(
+					b.preexistingKennung,
+					Kennung{
+						Kennung2: k,
+						External: true,
+					},
+				)
+
+				return
+			},
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -460,7 +451,11 @@ LOOP:
 
 			switch k.GetGattung() {
 			case gattung.Zettel:
-				b.preexistingKennung = append(b.preexistingKennung, k.Kennung2)
+				b.preexistingKennung = append(
+					b.preexistingKennung,
+					k,
+				)
+
 				q.Gattung.Add(gattung.Zettel)
 				q.Kennung[k.Kennung2.String()] = k
 

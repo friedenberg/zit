@@ -68,7 +68,7 @@ func (c *Organize) CompletionGattung() kennung.Gattung {
 
 func (c *Organize) RunWithExternalQuery(
 	u *umwelt.Umwelt,
-	eqwk sku.ExternalQueryWithKasten,
+	eqwk sku.ExternalQuery,
 ) (err error) {
 	ms := eqwk.QueryGroup.(*query.Group)
 

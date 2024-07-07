@@ -18,26 +18,25 @@ const (
 	SigilUnknown   = Sigil(iota)
 	SigilSchwanzen = Sigil(1 << iota)
 	SigilHistory
-	SigilCwd
+	SigilExternal
 	SigilHidden
 
 	SigilMax
-	SigilAll      = Sigil(^byte(0))
-	SigilExternal = SigilCwd
+	SigilAll = Sigil(^byte(0))
 )
 
 var (
 	mapRuneToSigil = map[rune]Sigil{
 		':': SigilSchwanzen,
 		'+': SigilHistory,
-		'.': SigilCwd,
+		'.': SigilExternal,
 		'?': SigilHidden,
 	}
 
 	mapSigilToRune = map[Sigil]rune{
 		SigilSchwanzen: ':',
 		SigilHistory:   '+',
-		SigilCwd:       '.',
+		SigilExternal:  '.',
 		SigilHidden:    '?',
 	}
 )
@@ -115,16 +114,12 @@ func (a Sigil) IncludesHistory() bool {
 	return a.ContainsOneOf(SigilHistory)
 }
 
-func (a Sigil) IncludesCwd() bool {
-	return a.ContainsOneOf(SigilCwd)
-}
-
 func (a Sigil) IncludesExternal() bool {
 	return a.ContainsOneOf(SigilExternal)
 }
 
 func (a Sigil) IncludesHidden() bool {
-	return a.ContainsOneOf(SigilHidden) || a.ContainsOneOf(SigilCwd)
+	return a.ContainsOneOf(SigilHidden) || a.ContainsOneOf(SigilExternal)
 }
 
 func (a Sigil) String() string {

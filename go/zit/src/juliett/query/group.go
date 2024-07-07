@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -19,7 +18,6 @@ func MakeGroup(
 		OptimizedQueries: make(map[gattung.Gattung]*Query),
 		UserQueries:      make(map[kennung.Gattung]*Query),
 		Hidden:           b.hidden,
-		FDs:              fd.MakeMutableSet(),
 		Zettelen:         kennung.MakeHinweisMutableSet(),
 		Typen:            kennung.MakeMutableTypSet(),
 	}
@@ -30,7 +28,6 @@ type Group struct {
 	OptimizedQueries map[gattung.Gattung]*Query
 	UserQueries      map[kennung.Gattung]*Query
 	Kennungen        []*kennung.Kennung2
-	FDs              fd.MutableSet
 	Zettelen         kennung.HinweisMutableSet
 	Typen            kennung.TypMutableSet
 }
@@ -68,7 +65,7 @@ func (qg *Group) GetSigil() (s kennung.Sigil) {
 
 func (qg *Group) GetExactlyOneKennung(
 	g gattung.Gattung,
-	c Kasten,
+	c *sku.ExternalStore,
 ) (k *kennung.Kennung2, s kennung.Sigil, err error) {
 	if len(qg.OptimizedQueries) != 1 {
 		err = errors.Errorf(
@@ -99,28 +96,14 @@ func (qg *Group) GetExactlyOneKennung(
 	for _, k1 := range kn {
 		k = k1.Kennung2
 
-		if k1.FD != nil {
-			s.Add(kennung.SigilCwd)
+		if k1.External {
+			s.Add(kennung.SigilExternal)
 		}
 
 		break
 	}
 
 	return
-}
-
-func (qg *Group) GetCwdFDs() fd.Set {
-	// TODO support dot operator
-	// if ms.dotOperatorActive {
-	// 	return ms.cwd.GetCwdFDs()
-	// } else {
-	// 	return ms.FDs
-	// }
-	return qg.FDs
-}
-
-func (qg *Group) GetExplicitCwdFDs() fd.Set {
-	return qg.FDs
 }
 
 func (qg *Group) GetEtiketten() kennung.EtikettSet {

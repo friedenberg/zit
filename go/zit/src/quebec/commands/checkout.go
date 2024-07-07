@@ -42,7 +42,7 @@ func (c Checkout) DefaultGattungen() kennung.Gattung {
 
 func (c Checkout) RunWithExternalQuery(
 	u *umwelt.Umwelt,
-	eqwk sku.ExternalQueryWithKasten,
+	eqwk sku.ExternalQuery,
 ) (err error) {
 	opCheckout := user_ops.Checkout{
 		Umwelt:  u,

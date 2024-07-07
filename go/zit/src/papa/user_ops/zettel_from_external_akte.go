@@ -15,7 +15,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
@@ -30,7 +29,7 @@ type ZettelFromExternalAkte struct {
 }
 
 func (c ZettelFromExternalAkte) Run(
-	qg *query.Group,
+	fdSet fd.Set,
 ) (results sku.TransactedMutableSet, err error) {
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
@@ -46,7 +45,7 @@ func (c ZettelFromExternalAkte) Run(
 
 	fds := make(map[sha.Bytes][]*fd.FD)
 
-	for _, fd := range iter.SortedValues(qg.GetCwdFDs()) {
+	for _, fd := range iter.SortedValues(fdSet) {
 		if err = c.processOneFD(fd, fds); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -82,29 +81,29 @@ func (c ZettelFromExternalAkte) Run(
 		}
 	}
 
-	if c.Dedupe {
-		matcher := objekte_collections.MakeMutableMatchSet(toCreate)
+	// if c.Dedupe {
+	// 	matcher := objekte_collections.MakeMutableMatchSet(toCreate)
 
-		if err = c.GetStore().QueryOld(
-			qg,
-			iter.MakeChain(
-				matcher.Match,
-				func(sk *sku.Transacted) (err error) {
-					z := &sku.Transacted{}
+	// 	if err = c.GetStore().Query(
+	// 		qg,
+	// 		iter.MakeChain(
+	// 			matcher.Match,
+	// 			func(sk *sku.Transacted) (err error) {
+	// 				z := &sku.Transacted{}
 
-					if err = z.SetFromSkuLike(sk); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
+	// 				if err = z.SetFromSkuLike(sk); err != nil {
+	// 					err = errors.Wrap(err)
+	// 					return
+	// 				}
 
-					return results.Add(z)
-				},
-			),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
+	// 				return results.Add(z)
+	// 			},
+	// 		),
+	// 	); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return
+	// 	}
+	// }
 
 	if err = results.Each(
 		func(z *sku.Transacted) (err error) {

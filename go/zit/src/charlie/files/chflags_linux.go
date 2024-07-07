@@ -8,7 +8,7 @@ import (
 )
 
 func setUserChanges(paths []string, options userChangesOptions) (err error) {
-  return
+	return
 	var args []string
 
 	if options.recursive {

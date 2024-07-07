@@ -12,13 +12,13 @@ import (
 type Cli struct {
 	BasePath string
 
-	Debug         debug.Options
-	Verbose       bool
-	Quiet         bool
-	Todo          bool
-	DryRun        bool
-	Complete      bool
-	Hooks         string
+	Debug    debug.Options
+	Verbose  bool
+	Quiet    bool
+	Todo     bool
+	DryRun   bool
+	Complete bool
+	Hooks    string
 
 	IncludeCwd    bool
 	IncludeHidden bool

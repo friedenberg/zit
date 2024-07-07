@@ -43,13 +43,13 @@ func registerCommandWithExternalQuery(
 type CommandWithExternalQuery interface {
 	RunWithExternalQuery(
 		store *umwelt.Umwelt,
-		ids sku.ExternalQueryWithKasten,
+		ids sku.ExternalQuery,
 	) error
 }
 
 type commandWithExternalQuery struct {
 	CommandWithExternalQuery
-	sku.ExternalQueryWithKasten
+	sku.ExternalQuery
 }
 
 func (c commandWithExternalQuery) Complete(
@@ -70,12 +70,12 @@ func (c commandWithExternalQuery) Complete(
 
 	var qg *query.Group
 
-	if qg, err = b.BuildQueryGroup(); err != nil {
+	if qg, err = b.BuildQueryGroupWithKasten(c.Kasten); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = u.GetStore().QueryOld(
+	if err = u.GetStore().Query(
 		qg,
 		w.WriteOne,
 	); err != nil {
@@ -101,14 +101,15 @@ func (c commandWithExternalQuery) Run(u *umwelt.Umwelt, args ...string) (err err
 		qbm.ModifyBuilder(b)
 	}
 
-	if c.QueryGroup, err = b.BuildQueryGroup(
+	if c.QueryGroup, err = b.BuildQueryGroupWithKasten(
+		c.Kasten,
 		args...,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = c.RunWithExternalQuery(u, c.ExternalQueryWithKasten); err != nil {
+	if err = c.RunWithExternalQuery(u, c.ExternalQuery); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

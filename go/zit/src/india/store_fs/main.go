@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
@@ -175,8 +176,42 @@ func (fs *Store) String() (out string) {
 	return
 }
 
+func (s *Store) GetExternalKennung() (ks schnittstellen.SetLike[*kennung.Kennung2], err error) {
+	ksm := collections_value.MakeMutableValueSet[*kennung.Kennung2](nil)
+	ks = ksm
+	var l sync.Mutex
+
+	if err = s.All(
+		func(kfp *KennungFDPair) (err error) {
+			kc := kfp.Kennung.Clone()
+
+			l.Lock()
+			defer l.Unlock()
+
+			if err = ksm.Add(kc); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 // TODO confirm against actual Kennung
-func (fs *Store) GetKennungForFD(fd *fd.FD) (k *kennung.Kennung2, err error) {
+func (fs *Store) GetKennungForString(v string) (k *kennung.Kennung2, err error) {
+	var fd fd.FD
+
+	if err = fd.Set(v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	k = kennung.GetKennungPool().Get()
 
 	if err = k.SetFromPath(
@@ -217,6 +252,14 @@ func (fs *Store) GetCwdFDs() fd.Set {
 	fd.SetAddPairs(fs.typen, fds)
 	fd.SetAddPairs(fs.etiketten, fds)
 	fd.SetAddPairs(fs.unsureZettelen, fds)
+	fs.unsureAkten.Each(fds.Add)
+
+	return fds
+}
+
+func (fs *Store) GetAktenFDs() fd.Set {
+	fds := fd.MakeMutableSet()
+
 	fs.unsureAkten.Each(fds.Add)
 
 	return fds

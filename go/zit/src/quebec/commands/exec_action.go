@@ -41,7 +41,7 @@ func (c ExecAction) DefaultGattungen() kennung.Gattung {
 
 func (c ExecAction) RunWithExternalQuery(
 	u *umwelt.Umwelt,
-	ms sku.ExternalQueryWithKasten,
+	ms sku.ExternalQuery,
 ) (err error) {
 	if !c.Action.WasSet() {
 		err = errors.Normal(errors.Errorf("Action must be provided"))

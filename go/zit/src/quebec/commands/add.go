@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -28,9 +29,9 @@ type Add struct {
 }
 
 func init() {
-	registerCommandWithQuery(
+	registerCommand(
 		"add",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) Command {
 			c := &Add{
 				ProtoZettel: zettel.MakeEmptyProtoZettel(),
 			}
@@ -75,9 +76,9 @@ func (c Add) ModifyBuilder(b *query.Builder) {
 		WithDoNotMatchEmpty()
 }
 
-func (c Add) RunWithQuery(
+func (c Add) Run(
 	u *umwelt.Umwelt,
-	qg *query.Group,
+	args ...string,
 ) (err error) {
 	zettelsFromAkteOp := user_ops.ZettelFromExternalAkte{
 		Umwelt:      u,
@@ -89,7 +90,34 @@ func (c Add) RunWithQuery(
 
 	var zettelsFromAkteResults sku.TransactedMutableSet
 
-	if zettelsFromAkteResults, err = zettelsFromAkteOp.Run(qg); err != nil {
+	fds := fd.MakeMutableSet()
+
+	for _, v := range args {
+		if v == "." {
+			if err = u.GetStore().GetCwdFiles().GetAktenFDs().Each(fds.Add); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			break
+		} else if v == "" {
+			continue
+		}
+
+		var f fd.FD
+
+		if err = f.Set(v); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = fds.Add(&f); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if zettelsFromAkteResults, err = zettelsFromAkteOp.Run(fds); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -115,7 +143,7 @@ func (c Add) RunWithQuery(
 		return
 	}
 
-	if err = opOrganize.Run(qg, zettelsFromAkteResults); err != nil {
+	if err = opOrganize.Run(nil, zettelsFromAkteResults); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -290,44 +290,9 @@ func (u *Umwelt) GetMatcherArchiviert() query.Archiviert {
 	return u.matcherArchiviert
 }
 
-func (u *Umwelt) makeQueryBuilder() *query.Builder {
-	return query.MakeBuilder(
-		u.Standort(),
-		u.GetStore().GetAkten(),
-		u.GetStore().GetVerzeichnisse(),
-		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
-	)
-}
-
-func (u *Umwelt) MakeQueryBuilderExcludingHidden(
-	dg kennung.Gattung,
-) *query.Builder {
-	if dg.IsEmpty() {
-		dg = kennung.MakeGattung(gattung.Zettel)
-	}
-
-	return u.makeQueryBuilder().
-		WithDefaultGattungen(dg).
-		WithVirtualEtiketten(u.konfig.Filters).
-		WithKasten(u.GetStore().GetCwdFiles()).
-		WithFileExtensionGetter(u.GetKonfig().FileExtensions).
-		WithHidden(u.GetMatcherArchiviert()).
-		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr())
-}
-
-func (u *Umwelt) MakeQueryBuilder(
-	dg kennung.Gattung,
-) *query.Builder {
-	if dg.IsEmpty() {
-		dg = kennung.MakeGattung(gattung.Zettel)
-	}
-
-	return u.makeQueryBuilder().
-		WithDefaultGattungen(dg).
-		WithVirtualEtiketten(u.konfig.Filters).
-		WithKasten(u.GetStore().GetCwdFiles()).
-		WithFileExtensionGetter(u.GetKonfig().FileExtensions).
-		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr())
+func (u *Umwelt) GetExternalStore(k kennung.Kasten) (*sku.ExternalStore, bool) {
+	e, ok := u.externalStores[k.String()]
+	return e, ok
 }
 
 func (u *Umwelt) ApplyToOrganizeOptions(oo *organize_text.Options) {

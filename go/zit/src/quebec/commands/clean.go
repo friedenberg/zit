@@ -72,7 +72,7 @@ func (c Clean) DefaultGattungen() kennung.Gattung {
 func (c Clean) shouldClean(
 	u *umwelt.Umwelt,
 	co sku.CheckedOutLike,
-	eqwk sku.ExternalQueryWithKasten,
+	eqwk sku.ExternalQuery,
 ) bool {
 	if c.force {
 		return true
@@ -113,7 +113,7 @@ func (c Clean) ModifyBuilder(b *query.Builder) {
 
 func (c Clean) RunWithExternalQuery(
 	u *umwelt.Umwelt,
-	eqwk sku.ExternalQueryWithKasten,
+	eqwk sku.ExternalQuery,
 ) (err error) {
 	fds := fd.MakeMutableSet()
 
@@ -184,12 +184,13 @@ func (c Clean) markUnsureAktenForRemovalIfNecessary(
 		return
 	}
 
-	if err = qg.GetExplicitCwdFDs().Each(
-		u.GetStore().GetCwdFiles().MarkUnsureAkten,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	// TODO [ces/mew] switch to kasten parsing ID's before body
+	// if err = qg.GetExplicitCwdFDs().Each(
+	// 	u.GetStore().GetCwdFiles().MarkUnsureAkten,
+	// ); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
 	p := u.PrinterCheckedOutForKasten(k)
 	var l sync.Mutex

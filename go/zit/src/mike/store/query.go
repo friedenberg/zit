@@ -16,120 +16,6 @@ import (
 )
 
 func (s *Store) Query(
-	ms sku.QueryGroup,
-	f schnittstellen.FuncIter[*sku.Transacted],
-) (err error) {
-	return s.query(ms, f)
-}
-
-func (s *Store) QueryOld(
-	ms *query.Group,
-	f schnittstellen.FuncIter[*sku.Transacted],
-) (err error) {
-	return s.queryOld(
-		ms,
-		f,
-		false,
-	)
-}
-
-func (s *Store) QueryWithKasten(
-	ms sku.ExternalQueryWithKasten,
-	f schnittstellen.FuncIter[*sku.Transacted],
-) (err error) {
-	if ms.QueryGroup == nil {
-		if ms.QueryGroup, err = s.queryBuilder.BuildQueryGroup(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	var f1 schnittstellen.FuncIter[*sku.Transacted]
-
-	// TODO improve performance by only reading Cwd zettels rather than scanning
-	// everything
-	if ms.QueryGroup.GetSigil() == kennung.SigilCwd {
-		f1 = func(z *sku.Transacted) (err error) {
-			g := gattung.Must(z.GetGattung())
-			m, ok := ms.QueryGroup.Get(g)
-
-			if !ok {
-				return
-			}
-
-			if err = s.UpdateTransactedWithExternal(ms.Kasten, z); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if !m.ContainsSku(z) {
-				return
-			}
-
-			if err = f(z); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		}
-	} else {
-		f1 = func(z *sku.Transacted) (err error) {
-			g := gattung.Must(z.GetGattung())
-			m, ok := ms.QueryGroup.Get(g)
-
-			if !ok {
-				return
-			}
-
-			if m.GetSigil().IncludesCwd() {
-				if err = s.UpdateTransactedWithExternal(ms.Kasten, z); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-
-			if !m.ContainsSku(z) {
-				return
-			}
-
-			if err = f(z); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		}
-	}
-
-	if err = s.GetVerzeichnisse().ReadQuery(
-		ms.QueryGroup,
-		f1,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) queryOld(
-	qg sku.QueryGroup,
-	f schnittstellen.FuncIter[*sku.Transacted],
-	includeCwd bool,
-) (err error) {
-	if err = s.query(
-		qg,
-		f,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) query(
 	qg sku.QueryGroup,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
@@ -140,11 +26,9 @@ func (s *Store) query(
 		}
 	}
 
-	var f1 schnittstellen.FuncIter[*sku.Transacted]
-
 	// TODO improve performance by only reading Cwd zettels rather than scanning
 	// everything
-	f1 = func(z *sku.Transacted) (err error) {
+	f1 := func(z *sku.Transacted) (err error) {
 		g := gattung.Must(z.GetGattung())
 		m, ok := qg.Get(g)
 
@@ -183,8 +67,106 @@ func (s *Store) query(
 	return
 }
 
+func (s *Store) QueryWithKasten(
+	q sku.ExternalQuery,
+	f schnittstellen.FuncIter[*sku.Transacted],
+) (err error) {
+	if q.QueryGroup == nil {
+		if q.QueryGroup, err = s.queryBuilder.BuildQueryGroup(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	var f1 schnittstellen.FuncIter[*sku.Transacted]
+
+	// TODO improve performance by only reading Cwd zettels rather than scanning
+	// everything
+	if q.GetSigil() == kennung.SigilExternal {
+		f1 = func(z *sku.Transacted) (err error) {
+			g := gattung.Must(z.GetGattung())
+			m, ok := q.Get(g)
+
+			if !ok {
+				return
+			}
+
+			if err = s.UpdateTransactedWithExternal(q.Kasten, z); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if !m.ContainsSku(z) {
+				return
+			}
+
+			if err = f(z); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+	} else {
+		f1 = func(z *sku.Transacted) (err error) {
+			g := gattung.Must(z.GetGattung())
+			m, ok := q.QueryGroup.Get(g)
+
+			if !ok {
+				return
+			}
+
+			if m.GetSigil().IncludesExternal() {
+				if err = s.UpdateTransactedWithExternal(q.Kasten, z); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
+			if !m.ContainsSku(z) {
+				return
+			}
+
+			if err = f(z); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+	}
+
+	wg := iter.MakeErrorWaitGroupParallel()
+
+	wg.Do(func() (err error) {
+		if err = s.GetVerzeichnisse().ReadQuery(
+			q.QueryGroup,
+			f1,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	})
+
+	// TODO add untracked and recognized
+  if q.IncludeRecognized {
+  }
+  
+  if !q.ExcludeUntracked {
+  }
+
+	if err = wg.GetError(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s *Store) QueryCheckedOut(
-	qg sku.ExternalQueryWithKasten,
+	qg sku.ExternalQuery,
 	f schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	kid := qg.Kasten.GetKastenString()
@@ -196,7 +178,7 @@ func (s *Store) QueryCheckedOut(
 	}
 
 	if err = es.QueryCheckedOut(
-		qg.ExternalQuery,
+		qg,
 		f,
 	); err != nil {
 		err = errors.Wrap(err)

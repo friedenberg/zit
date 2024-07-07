@@ -36,18 +36,9 @@ type (
 	}
 
 	ExternalQuery struct {
+		kennung.Kasten
 		QueryGroup
 		ExcludeUntracked  bool
 		IncludeRecognized bool
-	}
-
-	ExternalQueryWithKasten struct {
-		ExternalQuery
-		kennung.Kasten
-	}
-
-	QueryGroupWithKasten struct {
-		QueryGroup
-		kennung.Kasten
 	}
 )

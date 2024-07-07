@@ -47,7 +47,7 @@ func (c Show) DefaultGattungen() kennung.Gattung {
 
 func (c Show) RunWithExternalQuery(
 	u *umwelt.Umwelt,
-	eqwk sku.ExternalQueryWithKasten,
+	eqwk sku.ExternalQuery,
 ) (err error) {
 	var f schnittstellen.FuncIter[*sku.Transacted]
 

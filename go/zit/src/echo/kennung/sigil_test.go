@@ -46,7 +46,7 @@ func TestSigilContains(t1 *testing.T) {
 		t.Errorf("expected sut not to contain other")
 	}
 
-	if sut.ContainsOneOf(SigilCwd) {
+	if sut.ContainsOneOf(SigilExternal) {
 		t.Errorf("expected sut not to contain SigilCwd")
 	}
 }

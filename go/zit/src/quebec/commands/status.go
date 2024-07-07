@@ -41,7 +41,7 @@ func (c Status) ModifyBuilder(
 
 func (c Status) RunWithExternalQuery(
 	u *umwelt.Umwelt,
-	eqwk sku.ExternalQueryWithKasten,
+	eqwk sku.ExternalQuery,
 ) (err error) {
 	pcol := u.PrinterCheckedOutForKasten(eqwk.Kasten)
 
@@ -73,12 +73,13 @@ func (c Status) RunWithExternalQuery(
 		return
 	}
 
-	if err = qg.GetExplicitCwdFDs().Each(
-		u.GetStore().GetCwdFiles().MarkUnsureAkten,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	// TODO [ces/mew] switch to kasten parsing ID's before body
+	// if err = qg.GetExplicitCwdFDs().Each(
+	// 	u.GetStore().GetCwdFiles().MarkUnsureAkten,
+	// ); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
 	p := u.PrinterCheckedOutForKasten(eqwk.Kasten)
 

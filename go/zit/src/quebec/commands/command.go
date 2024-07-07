@@ -76,4 +76,3 @@ func registerCommandWithQuery(
 		FlagSet: f,
 	}
 }
-

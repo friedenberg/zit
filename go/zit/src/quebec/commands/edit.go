@@ -60,7 +60,7 @@ func (c Edit) DefaultGattungen() kennung.Gattung {
 
 func (c Edit) RunWithExternalQuery(
 	u *umwelt.Umwelt,
-	eqwk sku.ExternalQueryWithKasten,
+	eqwk sku.ExternalQuery,
 ) (err error) {
 	options := checkout_options.Options{
 		CheckoutMode: c.CheckoutMode,

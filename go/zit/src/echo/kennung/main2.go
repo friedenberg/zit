@@ -454,6 +454,17 @@ func (h *Kennung2) TodoSetBytes(v *catgut.String) (err error) {
 	return h.Set(v.String())
 }
 
+func (h *Kennung2) SetRaw(v string) (err error) {
+	h.g = gattung.Unknown
+
+	if err = h.left.Set(v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (h *Kennung2) Set(v string) (err error) {
 	var k Kennung
 

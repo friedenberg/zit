@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
@@ -73,6 +74,61 @@ func MakeChrome(
 
 func (c *Store) GetVirtualStore() sku.ExternalStoreLike {
 	return c
+}
+
+func (c *Store) GetExternalKennung() (ks schnittstellen.SetLike[*kennung.Kennung2], err error) {
+	ksm := collections_value.MakeMutableValueSet[*kennung.Kennung2](nil)
+	ks = ksm
+
+	for u, items := range c.urls {
+		for _, item := range items {
+			var matchingTabId *sku.Transacted
+			var trackedFromBefore bool
+
+			{
+				tabId, okTabId := item.GetTabId()
+
+				if okTabId {
+					matchingTabId, trackedFromBefore = c.transactedTabIdIndex[tabId]
+				}
+			}
+
+			if trackedFromBefore {
+				if err = ksm.Add(matchingTabId.Kennung.Clone()); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			} else {
+				k := kennung.GetKennungPool().Get()
+
+				if err = k.SetRaw(u.String()); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if err = ksm.Add(k); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+		}
+	}
+
+	return
+}
+
+// TODO
+func (s *Store) GetKennungForString(v string) (k *kennung.Kennung2, err error) {
+	err = collections.MakeErrNotFoundString(v)
+	return
+	k = kennung.GetKennungPool().Get()
+
+	if err = k.SetRaw(v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (s *Store) Flush() (err error) {
