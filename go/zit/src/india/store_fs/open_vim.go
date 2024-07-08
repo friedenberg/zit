@@ -6,11 +6,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/exec_editor"
 )
 
-type OpenVim struct {
+type Open struct {
 	Options []string
 }
 
-func (c OpenVim) Run(
+func (c Open) Run(
 	ph schnittstellen.FuncIter[string],
 	args ...string,
 ) (err error) {

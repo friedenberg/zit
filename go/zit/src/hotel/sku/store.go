@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
@@ -56,6 +57,14 @@ type (
 
 	ExternalStoreUpdateTransacted interface {
 		UpdateTransacted(z *Transacted) (err error)
+	}
+
+	ExternalStoreOpen interface {
+		Open(
+			m checkout_mode.Mode,
+			ph schnittstellen.FuncIter[string],
+			zsc CheckedOutLikeSet,
+		) (err error)
 	}
 
 	ExternalStoreInfo struct {
@@ -237,6 +246,31 @@ func (es *ExternalStore) GetKennungForString(v string) (k *kennung.Kennung2, err
 	}
 
 	if k, err = es.ExternalStoreLike.GetKennungForString(v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (es *ExternalStore) Open(
+	m checkout_mode.Mode,
+	ph schnittstellen.FuncIter[string],
+	zsc CheckedOutLikeSet,
+) (err error) {
+	eso, ok := es.ExternalStoreLike.(ExternalStoreOpen)
+
+	if !ok {
+		err = errors.Errorf("store does not support UpdateTransacted")
+		return
+	}
+
+	if err = es.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = eso.Open(m, ph, zsc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

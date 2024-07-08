@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -37,15 +36,17 @@ func (s *Store) Open(
 	ph schnittstellen.FuncIter[string],
 	zsc sku.CheckedOutLikeSet,
 ) (err error) {
-	switch kasten.GetKasten().GetKastenString() {
-	case "chrome":
-		err = todo.Implement()
+	kid := kasten.GetKasten().GetKastenString()
+	es, ok := s.externalStores[kid]
 
-	default:
-		if err = s.cwdFiles.Open(m, ph, zsc); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if !ok {
+		err = errors.Errorf("no kasten with id %q", kid)
+		return
+	}
+
+	if err = es.Open(m, ph, zsc); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

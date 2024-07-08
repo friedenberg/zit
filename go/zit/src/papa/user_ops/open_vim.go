@@ -14,7 +14,7 @@ func (c OpenVim) Run(
 	u *umwelt.Umwelt,
 	args ...string,
 ) (err error) {
-	op := store_fs.OpenVim{
+	op := store_fs.Open{
 		Options: c.Options,
 	}
 

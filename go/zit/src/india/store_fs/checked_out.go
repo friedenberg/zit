@@ -105,13 +105,14 @@ func ToSliceFilesZettelen(
 	)
 }
 
-func ToSliceFilesZettelenFS(
-	s CheckedOutSet,
+func ToSliceFilesAkten(
+	s sku.CheckedOutLikeSet,
 ) (out []string, err error) {
 	return iter.DerivedValues(
 		s,
-		func(z *CheckedOut) (e string, err error) {
-			e = z.External.GetObjekteFD().GetPath()
+		func(col sku.CheckedOutLike) (e string, err error) {
+			z := col.(*CheckedOut)
+			e = z.External.GetAkteFD().GetPath()
 
 			if e == "" {
 				err = collections.MakeErrStopIteration()
