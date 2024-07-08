@@ -2,15 +2,23 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
     utils.url = "github:numtide/flake-utils";
+
+    go = {
+      url = "github:friedenberg/dev-flake-templates?dir=go";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, utils }:
+  outputs = { self, nixpkgs, utils, go }:
     (utils.lib.eachDefaultSystem
       (system:
         let
 
           pkgs = import nixpkgs {
             inherit system;
+            overlays = [
+              go.overlays.default
+            ];
           };
 
           zit = pkgs.buildGoApplication {
@@ -32,6 +40,7 @@
               fish
               gnumake
               parallel
+              gomod2nix
             ];
           };
         })
