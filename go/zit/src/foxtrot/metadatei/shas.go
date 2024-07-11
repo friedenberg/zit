@@ -17,6 +17,12 @@ const (
 	ShaKeyMutter                       = "MutterMetadateiMutterTai"
 )
 
+type Sha struct {
+	*sha.Sha
+	string
+}
+
+// TODO make this a map
 type Shas struct {
 	Akte                         sha.Sha
 	SelbstMetadatei              sha.Sha

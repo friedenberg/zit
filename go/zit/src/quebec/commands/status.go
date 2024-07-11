@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -62,8 +61,8 @@ func (c Status) RunWithExternalQuery(
 
 	if err = u.GetStore().QueryUnsure(
 		eqwk,
-		store.UnsureMatchOptions{
-			UnsureMatchType: store.UnsureMatchTypeMetadateiSansTaiHistory | store.UnsureMatchTypeBezeichnung,
+		sku.UnsureMatchOptions{
+			UnsureMatchType: sku.UnsureMatchTypeMetadateiSansTaiHistory | sku.UnsureMatchTypeBezeichnung,
 		},
 		u.PrinterMatching(),
 	); err != nil {

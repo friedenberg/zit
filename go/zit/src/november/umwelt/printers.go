@@ -17,7 +17,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/chrome"
-	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
 func (u *Umwelt) FormatOutputOptions() (o string_format_writer.OutputOptions) {
@@ -341,14 +340,12 @@ func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[sku.CheckedOutL
 	}
 }
 
-type PrinterMatching = store.IterMatching
-
-func (u *Umwelt) PrinterMatching() PrinterMatching {
+func (u *Umwelt) PrinterMatching() sku.IterMatching {
 	pt := u.PrinterSkuTransacted()
 	pco := u.PrinterCheckedOutLike()
 
 	return func(
-		mt store.UnsureMatchType,
+		mt sku.UnsureMatchType,
 		sk *sku.Transacted,
 		existing sku.CheckedOutLikeMutableSet,
 	) (err error) {
