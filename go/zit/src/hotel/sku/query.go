@@ -33,6 +33,7 @@ type (
 		HasHidden() bool
 		Get(gattung.Gattung) (QueryWithSigilAndKennung, bool)
 		SigilGetter
+		SetIncludeHistory()
 	}
 
 	ExternalQuery struct {

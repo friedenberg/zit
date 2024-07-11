@@ -11,6 +11,10 @@ type flushQueryGroup struct {
 	kennung.Sigil
 }
 
+func (qg *flushQueryGroup) SetIncludeHistory() {
+	qg.Add(kennung.SigilHistory)
+}
+
 func (qg *flushQueryGroup) HasHidden() bool {
 	return false
 }

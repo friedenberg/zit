@@ -60,10 +60,8 @@ func (c Status) RunWithExternalQuery(
 		return
 	}
 
-	qg := eqwk.QueryGroup.(*query.Group)
-
 	if err = u.GetStore().QueryUnsure(
-		qg,
+		eqwk,
 		store.UnsureMatchOptions{
 			UnsureMatchType: store.UnsureMatchTypeMetadateiSansTaiHistory | store.UnsureMatchTypeBezeichnung,
 		},
@@ -82,7 +80,9 @@ func (c Status) RunWithExternalQuery(
 	// }
 
 	p := u.PrinterCheckedOutForKasten(eqwk.Kasten)
+	qg := eqwk.QueryGroup.(*query.Group)
 
+	// TODO [cot/gl !task project-2021-zit-kasten today zz-inbox] move unsure akten and untracked into kasten interface and store_fs
 	if err = u.GetStore().QueryAllMatchingAkten(
 		qg,
 		u.GetStore().GetCwdFiles().GetUnsureAkten(),

@@ -36,11 +36,13 @@
           pname = "zit";
           packages.default = zit;
           devShells.default = pkgs.mkShell {
-            buildInputs = with pkgs; [
+            packages = (with pkgs; [
               fish
               gnumake
-              parallel
-              gomod2nix
+            ]);
+
+            inputsFrom = [
+              go.devShells.${system}.default
             ];
           };
         })

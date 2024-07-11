@@ -3,6 +3,7 @@ package store_fs
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -51,13 +52,25 @@ func (s *Store) QueryCheckedOut(
 	qg sku.ExternalQuery,
 	f schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	o := sku.ObjekteOptions{
-		Mode: objekte_mode.ModeRealizeSansProto,
+	wg := iter.MakeErrorWaitGroupParallel()
+
+	{
+		o := sku.ObjekteOptions{
+			Mode: objekte_mode.ModeRealizeSansProto,
+		}
+
+		wg.Do(func() error {
+			return s.All(s.MakeApplyCheckedOut(qg, f, o))
+		})
 	}
 
-	if err = s.All(
-		s.MakeApplyCheckedOut(qg, f, o),
-	); err != nil {
+	if !qg.ExcludeUntracked {
+		wg.Do(func() error {
+			return s.QueryUnsure(qg, f)
+		})
+	}
+
+	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -65,8 +78,9 @@ func (s *Store) QueryCheckedOut(
 	return
 }
 
+// TODO [cot/gl !task project-2021-zit-kasten today zz-inbox] move unsure akten and untracked into kasten interface and store_fs
 func (s *Store) QueryUnsure(
-	qg sku.Queryable,
+	qg sku.ExternalQuery,
 	f schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	o := sku.ObjekteOptions{

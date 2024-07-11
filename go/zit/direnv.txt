@@ -1,0 +1,121 @@
+PWD=/Users/sasha/eng/zit/go/zit
+FONTCONFIG_PATH=/etc/fonts
+EDITOR=/Users/sasha/.local/bin/editor
+__CF_USER_TEXT_ENCODING=0x1F5:0x0:0x0
+USER=sasha
+WINDOWID=129
+XPC_FLAGS=0x0
+TERM_PROGRAM=tmux
+TERM_PROGRAM_VERSION=3.3a
+DIRENV_DIFF=eJzsW3tv4ziS_yqG7v7byNb7kcX-4Y6dxNNpO-u4p9ONBgxKlEhKFEWRsl6L-e4HyU4miT07l3TPAXtIgNgSi_WrIlmsKj78L4Ur5_9Sbqeba-VcmXyWkZATCSQGkzHNQ0AnAWHnp8plCcpowkgz4SKPCY1O1AyBQPmJcpiXPYeciEjuaHlc44YEAoh2ctuWOGcTc6zr-0q9vAqIp3LlBEYxOAlzUCBi1flkJ8XkSYvuWllG2eRCtLyMmkhOppwPdQbq48Pjmxye9p-9AmLHJmGejQHnNBrLKNwJUrbjcI8HJ2EOo2Ys91KCPC9lKQB_qcUPIv0MjIGFsDIS7EGrh96f9qTnnbLX_RMIr26vjH1xzssJJ1X7nHcT3U_KqBnKehwSgpLkTE5SUpZtr-jkImdlxErZw63uXmNkr7SCd0N-N-T_O0NWfjtTWO9Up2vlXAFCOVOmd_2TVM6UiwvlXAkpYKh_WS0vF1fbu-v5zU3vfXtbkGUuoklleNw07KQCWMu8ukKyi4Hucs0HDshSrgZAYtUeG9xwenUn_XuPeH__gP-3vylnymyxni9_3c4WvSrqM5OKGJp0pJygvP_6ve7l4mb-MhQ8rzsZR6wS4e8sX6abi-t538bolzZMP-kfm830n-vSo46_SNNu4xuB_GzeoLtLf5lqOQgMbbpxtPvG_Oevl95H-DHcfBGrb11nbozuqq27q4Zsu2CdseT6tr3KvqmXn_J4zivufKNfWkMY17-2v3xrf5kFi8uv92vxhV41hVYtfglWWEy32uedNnNsJNfcZveLzJXLj234tW5u45vV18QHzuev1zxTnY6kc-3TN4HqfFov8Jp8c-SHj5nnaMG8IYTRL1hbuJtupwdFvvzitjDSNtrn6OvW9Q0QXGI1S74hj37xU_5Vm-mN2apdZCWswFGdfWGfw9sPDdWzzW2gTdtcX97y-PMcBoywq12x7rbXtzeqH06n09l22-ZNq339h3KmXK02q9XNftSeWIUvpcU7TVRWkMaG2epeIg3D99uAtZZrxSrKyzynUtXGujfWesNQzpTr1d1m-xDgfwcjussrJy6Ix43G0TC1QW3YPCSJaetNGKhNP9eCHaGwxxsbKhdP3O8ehGLHsyD1JJJGxxodGQ0SPkdSqzNseIm6yXMaYkCYnNz3eLO9hxs3YflAeYlpI1zZcd262CWdI7za85qqSVqzhrWbJJka5iLalYRK1R_bL7lDDdiBp2e1aeKu46lb-AJ6robrVGCDZGpMGNxzW2N_30lP-SvuF7psYGqCSkrOUz-zbMe1W82rE-pRFZI43vObY_2IPa1BloiEpF0d6h4DdWy2sjFNCySUxj5VEdvJCPayX7ISJIBP7TSuUVanHcG4JW6FTY82HUCp37MiEXH1eRDZM2NYA9_ymYhFyAub6xZzBMsaIHQHhHGsIlCnvcMYG0c9ZhO97moTwlRAAQLk-w4SteV7VkHcrunllkCo-tg86u2stQyzwBUNXT1hUDMSs22Rn9YN7mwYOCrqCFf1sW6-5HQDH4YJJYkwMi1xkwKGncOLqvODRkeWrQYd4Yaqj7WxpwbHVqKJ1qxx2LltE0C3KRxUp6zTbNMrEk5Z3GudgTRSrbE1Puqu1_rXZ22WWtoJXzig6HCYpFB4RWPWvsEyxHTsqByUIVaNsTs-4k0yWKei8EwfuJVVEUmEi30Ww466rpn6atOp9tgau6eaXLjYDpoiaXlIG7fyXcC10OYtd4IaUearfRLRs9uHmb9YbpeL-8f4QjK-E5FyptzMlHOFwuFpO_t6M3t0D0NkJMEEtgP50_RidXe_nc1vb1ZfP82Xm-1mur6ab5RzRdfGuqGcKb2AD4tl76_unjsYyNNEBL6NPCl1nWh6qgnJKxi0fpppuq6G4d5bBYTtJxQEoiZMrQXgPBKq7oy1saP6rjnWxvoLWdsv6-nt7Xx90Gg7eLnGc7aOtR0yge0erVf1gfXz4ma2vVith1BlHUqHiPxEbdZU3PI6knowrVM38xIPMSCCinc1KiRSh-j6QslHrDeodXF5M726216sPt3uQ696-UQdq0JhRgudCQNrOIyLxG1R6hma4dmCI6EOqGosQBbVuUjVi1xEl_mOwSFNeUxjLh8qyNEzfC_kDspEwrvQwWmcwTgo3M4RvpW0egqrP8FX9X6GaqfEjHomBvNMlVEE_-G2oVMEVqixkUpkK0Wel6Onwc1zLQsD1GlZHDMCO99zEYw7GdOkEnGtSpj2POpgeftU6354HkuYjlTyqOJTVNhmusmw05iZWdm8gF5aC5fHkkqHN7Z-1Lz_VdP-QBjpMr9GZghlmBFJWOFWjdYYGDpt4WZaeiTsST55F4mKhJF8vVTW2oIklh8XXmw3nbDiroGOVbWBpVdOmpwYQZqLu5aFr5f111nLYBNllD2V1jqaizLdpZplujSNkRXYacgRjT3uAWyplAR5kDy2g7CQ7mD0R8rbAUskt9Oitik0YtvSQ8NGuhQ1bizTCE4qfyUAxyR8w7hYgStdjkEGfQfpVZFQqWlSd0jmOraTtEfiFquPpHy9HMxrVlhIpjVzPZvpqCuqgDRJg7yEeHF9JGe_YrzIWUzQTrzR1j1ZkCIAvlsktemGNetaGiRZAWwsdDdjx1IPa7lX2gD2w8ClHYaBwDpyNU0Q5lRhkGoGI0Hx4P8oCfr_2Xz9Z1YQ22GsM25w7HHhdK3bFrjTklRLmsyJZXfSCt4-OzXkudQseAya0PY1SzM8LaMtrEiHWwHksbjLZVQOT6-W1RC_pgn37MqQntBqywINQGEVcgcGyMxONm26gyR_vawAJp1vUxTQwktcFCRaUktUN02rO42buX8sa9Pyt3RkQ4EfFBWQZhMnvBUNMgvLgMLOKOoa1z4SOCMynYqAlG81caH5tUANxGad6IAbNsIdK6CEAYMMg-ZI4jIqL-9eLycWuECMcxP50qkI1N2OJ4FklSl5Z_n-iak0WOMnwACKsoi9wWkUgWskmdGA2vFY09RhhXxpuoGu254Dxenh20TNG0RpnklrL846rHFm0Br6VqsxrdPTlngWOw7BiwygaLF6vSSd-xqoRQpxIbyEADtrmIQtwqEniQdO5UpZQFj0Spf0Uxa9v3upYwGm6PwAedhmmhfSkAEaIwszhAOD4Nhqek8XNs1Dggyj6t_CUduCDsIuTEnY6TRGGROpsDLQdUIHDlfDPOOERkIV5QB9Gvh0kPsL0tP3TO49k3vP5N4zufdM7j2Te8_k3jO590zuPzOTO-xvzlbLzfZuvtmuD7vM-knC9nK13m_RPqkyX16u1hfz7XK1XU43i1_nT2jX0_Vsvlwsr7bz5fTDsHMaEAZZXo_iXGSg7L9KErcP3-aIk3AkIirykSxBmHKRl1FY5mIkS0HCMq8iEdO8PghYXC1X6_n2ZrbdXK9Xn6-ut1fDZvGDAjezYef2-fbxX5ZXTZ5XHD8ivCSUAfxrx_VVmqg3P5AGUhI8B-DYyFBqubJAoqkNVNO01bDn45AlLin85_PpmL_z_BYKQwibAcl8mPm0ZsyohZdogBHxRxPoGOk_uikHA16utnfzm8ujiXm3Wa3nz8y6J3xSzhWWKWfK8VlyQpEe08wXJq78wqlAHBKNAJ_YsIkxIirKVX1sGGPr5ZmW4Bi2iR62mi6lRIbdoDDRqwLhzglgi1WUU8BQSFRK-ug4tr3jE0xGMy9OmyDmsk2thJi8FUK6Tp06GXHcVEU535-K2-Ojg8g3HKo_ZTdkmzg21X0PAckCXDUOr7Gm-UlAIApMlQMBKI2oamiGpVnGkfZuYRQcC93DjR22mij0Km66DHCInSJtbBXlWQ4NRprBjb9s-1uOq45Goe46jOzKdV27MgO_ICa3UFvjVkCGk-YAcpr5x87rf_Ip4VHnepBDy9ZZQRo3lkEjgqKIg9rDCaJaTf8Q_t_Dvl-eeL888X554v_v5Yn3C6TvF0jfb0K_G_K7If_QTej9WmF7s7qY3sxf3HBORCDaQHALuxkqTBKYReXXCCA3abBdqQBW2zCDUtV1Xx10jCYSgz5vGl6UM2U9Xd4sPijnigBsv6q5W3zr5UjS9fS71ef1xXw7m27m2_nt6qJftZi6bZuGp2k9fbNeLIcFfL_-Z0geym4PJVw5U-5nVz3AdDtbrO_evOoZFP_xdc8RzBtWH0cYr1x_7PmVM-XbfL3aTtdD9x4Wj9vD7bYppXl90w_TYQecMKScK0ON_S3E61yWs4jLvkcP8_YVGw2jN_C8IIyGa_MSjx7vPFIS7FHHH8aw7dfbj6TDLKMk2LHwgdh3RheJfP-0v-q2f949vOxFDM3mIucAgTKCi5cd8IJ-BxgM8uZ27wof6PJ0aSl2YbkTEZyWpTiADcuOBeO78mnBLQay5_vXKApxPvquqD_w9135-3c2ekAafZmul4vl1fmoxNEoaogsIxZGozwelZjIEQclHhE5Ynk5QjsgACujCI5fgCzKvg5gowfPNSIZp8Ou-H7EYFQCQkdxLkY8RXKcpXc4ovQFzk9q1vDwX6N1FOYCjgClo6EXR2To1xGQI7FjJcmiEYx4xGDEQhLJgbvhuSj__p39Nvq-0zQz2n-Oviv_ne_K78p39jAkkfg5v_oI-1z9kgJ0GO_wcCD4tAxGXH7ohQ4fp8puHy3wBXUDBIrKk4WneHrL7v-PS07V3uO8FPG09Igrv8BRmD68LJgsAaXPylg5hXBGJAhoNIv4RoCB1ruoLJI5e9IvDGT9rOi9m-ytaSgqSRV9eDaL3uT2Rz_q8Edv3eQavX2Da_RD4WX05sCinCn5rvyTXx7lu7IfkP57X_8wPPv3Ye0YHQaW9_6uf37i_c4ULqI4EkNoepgI-lD8YGMfXjrP30nLE3ahnCl7s_kpE3mAus7zgyHLEkaseg6NMfQDxwg9mgK3M72Y0Ipjp0N2mAay0dU902EbawARJHwSavaxTDlX9rfSHyr-9tv_BAAA__-n_P-A
+__structuredAttrs=
+TERMINFO=/Applications/kitty.app/Contents/Resources/kitty/terminfo
+COMMAND_MODE=unix2003
+TMUX_PANE=%12
+SHELL=/Users/sasha/.dotfiles/result/bin/fish
+__CFBundleIdentifier=net.kovidgoyal.kitty
+NIX_SSL_CERT_FILE=/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt
+KITTY_PUBLIC_KEY=1:r=z4%9GLs&W&S<@zHU{0aO6(dWC3`)wzHf;x&Uox
+MANPATH=/usr/share/man:/usr/local/share/man:/usr/local/MacGPG2/share/man:/Library/TeX/Distributions/.DefaultTeX/Contents/Man:/Applications/kitty.app/Contents/Resources/man:
+PATH_LOCALE=/nix/store/vjrbrybrp4h7mgq3ib3qv9wgag7jxh5v-adv_cmds-119-locale/share/locale
+DIRENV_DIR=-/Users/sasha/eng/zit/go/zit
+NIX_DONT_SET_RPATH_FOR_BUILD=1
+SHLVL=3
+NIX_BUILD_CORES=4
+LANG=en_US.UTF-8
+GPG_TTY=/dev/ttys004
+MACOSX_DEPLOYMENT_TARGET=10.12
+TERM=xterm-kitty
+out=/Users/sasha/eng/zit/go/zit/outputs/out
+shellHook=
+COLORTERM=truecolor
+preferLocalBuild=1
+DIRENV_FILE=/Users/sasha/eng/zit/go/zit/.envrc
+NIX_LDFLAGS=/nix/store/8cp6gmrjpzc6hkfmdfbq7z6r94jy1kdv-apple-framework-CoreFoundation-11.0.0/Library/Frameworks/CoreFoundation.framework/CoreFoundation.tbd /nix/store/4vgcmlq1nr2h0hcfqj7ygk820285rpgr-apple-framework-CoreFoundation/Library/Frameworks/CoreFoundation.framework/CoreFoundation.tbd -L/nix/store/y607gm17l0437lkfg4b5kcpglf8p8ah4-libobjc-11.0.0/lib -L/nix/store/ph2mgk47sqgrxw2gwlky0h89hcnj7iq9-libcxx-16.0.6/lib -L/nix/store/z89ydr2rr5nasn9dm9lwnn2wr8j0anir-compiler-rt-libc-16.0.6/lib -L/nix/store/y607gm17l0437lkfg4b5kcpglf8p8ah4-libobjc-11.0.0/lib -L/nix/store/ph2mgk47sqgrxw2gwlky0h89hcnj7iq9-libcxx-16.0.6/lib -L/nix/store/z89ydr2rr5nasn9dm9lwnn2wr8j0anir-compiler-rt-libc-16.0.6/lib
+IN_NIX_SHELL=impure
+buildPhase={ echo "------------------------------------------------------------";
+  echo " WARNING: the existence of this path is not guaranteed.";
+  echo " It is an internal implementation detail for pkgs.mkShell.";
+  echo "------------------------------------------------------------";
+  echo;
+  # Record all build inputs as runtime dependencies
+  export;
+} >> "$out"
+
+propagatedBuildInputs=
+doCheck=
+patches=
+SSH_AUTH_SOCK=/Users/sasha/.gnupg/S.gpg-agent.ssh
+KITTY_PID=867
+STRINGS=strings
+system=x86_64-darwin
+STRIP=strip
+NIX_CC=/nix/store/nxvp48zik8dkwk7m8j8gnarbvpzwgqsg-clang-wrapper-16.0.6
+mesonFlags=
+__impureHostDeps=/System/Library/Frameworks/CoreFoundation.framework /System/Library/Frameworks/CoreFoundation.framework/CoreFoundation /bin/sh /usr/lib/libSystem.B.dylib /usr/lib/system/libunc.dylib /dev/zero /dev/random /dev/urandom /bin/sh
+phases=buildPhase
+TMUX=/private/tmp/tmux-501/sessions,957,7
+nativeBuildInputs=/nix/store/jlg1flm9r3hv9q6vafci0ia9i5dxfhgi-go-1.22.4 /nix/store/rphdyj1cy01sssg25xgcj1vqghz6bdyh-golangci-lint-1.58.2 /nix/store/nlm8fkxbfpsyk4ji3pyrrs76wk6mi67k-gopls-0.15.3 /nix/store/9ss4pz0rv4bkf23y18js2299ybny474f-gotools-0.18.0 /nix/store/2syj65l198gasnbhvx6pwh009jbidgb3-parallel-20240422 /nix/store/7q2qphr18hx5cy0rq1vfxzmapdh6qkx5-gomod2nix-dev
+AS=as
+GOTOOLDIR=/nix/store/9ss4pz0rv4bkf23y18js2299ybny474f-gotools-0.18.0/bin
+HOST_PATH=/nix/store/i17pv6fqi8p2x60hl5aw25pcij351xcb-xcodebuild-0.1.2-pre/bin:/nix/store/lh684dl8sgs2znx1g2xgr9pgs0wmh28j-Toolchains/XcodeDefault.xctoolchain/bin:/nix/store/5ghv5fwy7h7iz6r8w88xvxjy3wdw7jjm-coreutils-9.5/bin:/nix/store/c0a5b81mw33hzzpk7q9rd870hwkrh2im-findutils-4.9.0/bin:/nix/store/vp9q1sxdk3avssppk9m45675y08wjl8l-diffutils-3.10/bin:/nix/store/kwamjrjikzwc18nawf3ysx334ajllf9l-gnused-4.9/bin:/nix/store/igra9l5kfwgmwkzihhyi7vh38lxzagk9-gnugrep-3.11/bin:/nix/store/hdwa949nrfrcpq5p14n6rnmxar16acff-gawk-5.2.2/bin:/nix/store/c5i1wzw3ddkrdrabg996grw4984qi7zx-gnutar-1.35/bin:/nix/store/my423qhvlc71jnd02j3yyg9kwxhz5db6-gzip-1.13/bin:/nix/store/7b9dcjlijr2m0j7jqdcz6pqvz9bx1g45-bzip2-1.0.8-bin/bin:/nix/store/0ry3whcz7yxbd7xq6gwknz0538qjplnf-gnumake-4.4.1/bin:/nix/store/v28p325jvah0m8wvgszfa17p09a6amkp-bash-5.2p26/bin:/nix/store/ms0kzr9r6aqzhcjkdr8qx3w92nmgn1h6-patch-2.7.6/bin:/nix/store/jmdwkrq839a7v4visir7h9nfdzl773k9-xz-5.4.7-bin/bin:/nix/store/q7h5bxqjypclx7v97ap0c5pyp6bwgln9-file-5.45/bin
+NIX_DONT_SET_RPATH=1
+RANLIB=ranlib
+XDG_DATA_DIRS=/nix/store/jlg1flm9r3hv9q6vafci0ia9i5dxfhgi-go-1.22.4/share:/nix/store/rphdyj1cy01sssg25xgcj1vqghz6bdyh-golangci-lint-1.58.2/share:/nix/store/2syj65l198gasnbhvx6pwh009jbidgb3-parallel-20240422/share:/nix/store/7q2qphr18hx5cy0rq1vfxzmapdh6qkx5-gomod2nix-dev/share:
+doInstallCheck=
+CONFIG_SHELL=/nix/store/v28p325jvah0m8wvgszfa17p09a6amkp-bash-5.2p26/bin/bash
+outputs=out
+KITTY_SHELL_INTEGRATION=enabled
+configureFlags=
+NIX_ENFORCE_NO_NATIVE=1
+LOGNAME=sasha
+stdenv=/nix/store/hhd9b62c8lka7z38filvph6zg5ckbsx1-stdenv-darwin
+KITTY_INSTALLATION_DIR=/Applications/kitty.app/Contents/Resources/kitty
+PATH=/nix/store/jlg1flm9r3hv9q6vafci0ia9i5dxfhgi-go-1.22.4/bin:/nix/store/rphdyj1cy01sssg25xgcj1vqghz6bdyh-golangci-lint-1.58.2/bin:/nix/store/nlm8fkxbfpsyk4ji3pyrrs76wk6mi67k-gopls-0.15.3/bin:/nix/store/9ss4pz0rv4bkf23y18js2299ybny474f-gotools-0.18.0/bin:/nix/store/2syj65l198gasnbhvx6pwh009jbidgb3-parallel-20240422/bin:/nix/store/7q2qphr18hx5cy0rq1vfxzmapdh6qkx5-gomod2nix-dev/bin:/nix/store/nxvp48zik8dkwk7m8j8gnarbvpzwgqsg-clang-wrapper-16.0.6/bin:/nix/store/rwzzhg5v7775v3b9qi3p4gywhyrdnhjx-clang-16.0.6/bin:/nix/store/5ghv5fwy7h7iz6r8w88xvxjy3wdw7jjm-coreutils-9.5/bin:/nix/store/dpkjrb95g8ss11i01k0rspvdby9km011-cctools-binutils-darwin-wrapper-16.0.6-973.0.1/bin:/nix/store/78dpd451nqix7fsbxrbqqfbw8hjgl0wl-cctools-binutils-darwin-16.0.6-973.0.1/bin:/nix/store/i17pv6fqi8p2x60hl5aw25pcij351xcb-xcodebuild-0.1.2-pre/bin:/nix/store/lh684dl8sgs2znx1g2xgr9pgs0wmh28j-Toolchains/XcodeDefault.xctoolchain/bin:/nix/store/5ghv5fwy7h7iz6r8w88xvxjy3wdw7jjm-coreutils-9.5/bin:/nix/store/c0a5b81mw33hzzpk7q9rd870hwkrh2im-findutils-4.9.0/bin:/nix/store/vp9q1sxdk3avssppk9m45675y08wjl8l-diffutils-3.10/bin:/nix/store/kwamjrjikzwc18nawf3ysx334ajllf9l-gnused-4.9/bin:/nix/store/igra9l5kfwgmwkzihhyi7vh38lxzagk9-gnugrep-3.11/bin:/nix/store/hdwa949nrfrcpq5p14n6rnmxar16acff-gawk-5.2.2/bin:/nix/store/c5i1wzw3ddkrdrabg996grw4984qi7zx-gnutar-1.35/bin:/nix/store/my423qhvlc71jnd02j3yyg9kwxhz5db6-gzip-1.13/bin:/nix/store/7b9dcjlijr2m0j7jqdcz6pqvz9bx1g45-bzip2-1.0.8-bin/bin:/nix/store/0ry3whcz7yxbd7xq6gwknz0538qjplnf-gnumake-4.4.1/bin:/nix/store/v28p325jvah0m8wvgszfa17p09a6amkp-bash-5.2p26/bin:/nix/store/ms0kzr9r6aqzhcjkdr8qx3w92nmgn1h6-patch-2.7.6/bin:/nix/store/jmdwkrq839a7v4visir7h9nfdzl773k9-xz-5.4.7-bin/bin:/nix/store/q7h5bxqjypclx7v97ap0c5pyp6bwgln9-file-5.45/bin:/Users/sasha/.local/bin:/Users/sasha/.local/state/nix/profile/bin:/Users/sasha/.cargo/bin:/Users/sasha/.dotfiles/result/bin:/Users/sasha/Library/Python/3.11/bin:/nix/var/nix/profiles/default/bin:/Users/sasha/.cargo/env:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Library/Apple/usr/bin:/usr/local/MacGPG2/bin:/opt/pivy/bin:/Library/TeX/texbin:/Applications/kitty.app/Contents/MacOS:/Users/sasha/.local/state/nix/profile/bin:/nix/var/nix/profiles/default/bin:/Users/sasha/.local/bin:/Users/sasha/.local/state/nix/profile/bin:/Users/sasha/.cargo/bin:/Users/sasha/.dotfiles/result/bin:/Users/sasha/Library/Python/3.11/bin:/nix/var/nix/profiles/default/bin:/Users/sasha/.cargo/env:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Library/Apple/usr/bin:/usr/local/MacGPG2/bin:/opt/pivy/bin:/Library/TeX/texbin:/Applications/kitty.app/Contents/MacOS
+XDG_RUNTIME_DIR=/Users/sasha/.local/runtime
+shell=/nix/store/v28p325jvah0m8wvgszfa17p09a6amkp-bash-5.2p26/bin/bash
+NIX_CC_WRAPPER_TARGET_HOST_x86_64_apple_darwin=1
+NIX_IGNORE_LD_THROUGH_GCC=1
+SIZE=size
+builder=/nix/store/v28p325jvah0m8wvgszfa17p09a6amkp-bash-5.2p26/bin/bash
+DIRENV_WATCHES=eJyckM1KxTAQRt8l69IkkzT92bsU3LgSF9Nk0oab20AT60Xx3QVF8KdKcTWrOZzz3T2zGywzGxi_zbRmnjHPyGmZ-FMofEpvp6ZlWy2r2HVyJZyJDbIFYXRrWlGxq0vIJbOhrA_0Uu0D65gsRp5nXIm7sNKycYwxPfLOYj9a6UYHpm-6zikE0MZrgwoAwIhRiZ6sBKm860bExiinlWh0I7Tzu1bqoNW7yde0T0UeY_792abFh-mjZg8lW9kpY0D1x3y-ze4jnqhewmWnUcPBxl1mTPb0Ayo1NPpfUEdbninGuqRz_HPL-9cAAAD__yoxy0Y=
+NIX_CFLAGS_COMPILE=-F/nix/store/4vgcmlq1nr2h0hcfqj7ygk820285rpgr-apple-framework-CoreFoundation/Library/Frameworks -F/nix/store/8cp6gmrjpzc6hkfmdfbq7z6r94jy1kdv-apple-framework-CoreFoundation-11.0.0/Library/Frameworks  -frandom-seed=7yc6qb4c0n -isysroot /nix/store/98744hagz0mffnidz987gdfzsfljvrfw-sdkroot-10.12/MacOSX10.12.sdk -iframework /nix/store/dym13nh6x3m3v5pqd8kwr7pfsls6px51-apple-framework-Foundation-11.0.0/Library/Frameworks -iframework /nix/store/izm9wg3cdscmisinq7vx0x2hd6yq7m0k-apple-framework-ApplicationServices-11.0.0/Library/Frameworks -iframework /nix/store/ny5rij49fq8f5xzr4fzxd64vyb41v6kj-apple-framework-ColorSync-11.0.0/Library/Frameworks -iframework /nix/store/8cp6gmrjpzc6hkfmdfbq7z6r94jy1kdv-apple-framework-CoreFoundation-11.0.0/Library/Frameworks -isystem /nix/store/y607gm17l0437lkfg4b5kcpglf8p8ah4-libobjc-11.0.0/include -iframework /nix/store/5bnjsp5kqw5ld2f541c25g1srwhx432b-apple-framework-CoreGraphics-11.0.0/Library/Frameworks -iframework /nix/store/4b7s7phamd96g1vqjls00s16im7656jy-apple-framework-IOKit-11.0.0/Library/Frameworks -iframework /nix/store/hpwnq4gskwn785n1gzqvbixjxg8ji8fw-apple-framework-SystemConfiguration-11.0.0/Library/Frameworks -iframework /nix/store/8sqiqba97qjw37cwnzylbjmqa5hr17mn-apple-framework-Security-11.0.0/Library/Frameworks -isystem /nix/store/h9cb7lzhdbrh1g700rin6vcbk02nibqr-apple-lib-libDER/include -iframework /nix/store/f5cf1np2ph8pr6zy7yqhz0jk0jxm6fsz-apple-framework-CoreServices-11.0.0/Library/Frameworks -iframework /nix/store/0g87l3qpfaxc59040280mlydvizhyras-apple-framework-CFNetwork-11.0.0/Library/Frameworks -iframework /nix/store/xi9wljp85v2s8r0w44axagcvcp6dbg3m-apple-framework-CoreAudio-11.0.0/Library/Frameworks -iframework /nix/store/bdjz95lgblq8j7gbj0jwsgwxxy16x7m7-apple-framework-CoreAudioTypes-11.0.0/Library/Frameworks -iframework /nix/store/xla9bqvas3xfjpyrxg3q42dr5mlgzx75-apple-framework-DiskArbitration-11.0.0/Library/Frameworks -iframework /nix/store/r09wrgxdh3wj1ap25ghznqdsdbndnhax-apple-framework-NetFS-11.0.0/Library/Frameworks -iframework /nix/store/frhqgnpp3g9s6vid17zpjbsnv3spz499-apple-framework-ServiceManagement-11.0.0/Library/Frameworks -iframework /nix/store/qb72jm2xaw68nxxwcvg9s37b11586dr7-apple-framework-CoreText-11.0.0/Library/Frameworks -iframework /nix/store/083lw8fmzh0pn2lwd94y0n0z1kyi84n1-apple-framework-ImageIO-11.0.0/Library/Frameworks -iframework /nix/store/1p90awrkdhqr8jia5mxnsdyghc8si8ar-apple-framework-Combine-11.0.0/Library/Frameworks -isystem /nix/store/lh684dl8sgs2znx1g2xgr9pgs0wmh28j-Toolchains/XcodeDefault.xctoolchain/include -isystem /nix/store/3rz9bg8h5n08clcnalfg4hnghb2ihf4x-libcxx-16.0.6-dev/include -isystem /nix/store/l54d6gh7dkicz1lfgmnrkr4mazzr1a6p-compiler-rt-libc-16.0.6-dev/include -iframework /nix/store/4vgcmlq1nr2h0hcfqj7ygk820285rpgr-apple-framework-CoreFoundation/Library/Frameworks -iframework /nix/store/dym13nh6x3m3v5pqd8kwr7pfsls6px51-apple-framework-Foundation-11.0.0/Library/Frameworks -iframework /nix/store/izm9wg3cdscmisinq7vx0x2hd6yq7m0k-apple-framework-ApplicationServices-11.0.0/Library/Frameworks -iframework /nix/store/ny5rij49fq8f5xzr4fzxd64vyb41v6kj-apple-framework-ColorSync-11.0.0/Library/Frameworks -iframework /nix/store/8cp6gmrjpzc6hkfmdfbq7z6r94jy1kdv-apple-framework-CoreFoundation-11.0.0/Library/Frameworks -isystem /nix/store/y607gm17l0437lkfg4b5kcpglf8p8ah4-libobjc-11.0.0/include -iframework /nix/store/5bnjsp5kqw5ld2f541c25g1srwhx432b-apple-framework-CoreGraphics-11.0.0/Library/Frameworks -iframework /nix/store/4b7s7phamd96g1vqjls00s16im7656jy-apple-framework-IOKit-11.0.0/Library/Frameworks -iframework /nix/store/hpwnq4gskwn785n1gzqvbixjxg8ji8fw-apple-framework-SystemConfiguration-11.0.0/Library/Frameworks -iframework /nix/store/8sqiqba97qjw37cwnzylbjmqa5hr17mn-apple-framework-Security-11.0.0/Library/Frameworks -isystem /nix/store/h9cb7lzhdbrh1g700rin6vcbk02nibqr-apple-lib-libDER/include -iframework /nix/store/f5cf1np2ph8pr6zy7yqhz0jk0jxm6fsz-apple-framework-CoreServices-11.0.0/Library/Frameworks -iframework /nix/store/0g87l3qpfaxc59040280mlydvizhyras-apple-framework-CFNetwork-11.0.0/Library/Frameworks -iframework /nix/store/xi9wljp85v2s8r0w44axagcvcp6dbg3m-apple-framework-CoreAudio-11.0.0/Library/Frameworks -iframework /nix/store/bdjz95lgblq8j7gbj0jwsgwxxy16x7m7-apple-framework-CoreAudioTypes-11.0.0/Library/Frameworks -iframework /nix/store/xla9bqvas3xfjpyrxg3q42dr5mlgzx75-apple-framework-DiskArbitration-11.0.0/Library/Frameworks -iframework /nix/store/r09wrgxdh3wj1ap25ghznqdsdbndnhax-apple-framework-NetFS-11.0.0/Library/Frameworks -iframework /nix/store/frhqgnpp3g9s6vid17zpjbsnv3spz499-apple-framework-ServiceManagement-11.0.0/Library/Frameworks -iframework /nix/store/qb72jm2xaw68nxxwcvg9s37b11586dr7-apple-framework-CoreText-11.0.0/Library/Frameworks -iframework /nix/store/083lw8fmzh0pn2lwd94y0n0z1kyi84n1-apple-framework-ImageIO-11.0.0/Library/Frameworks -iframework /nix/store/1p90awrkdhqr8jia5mxnsdyghc8si8ar-apple-framework-Combine-11.0.0/Library/Frameworks -isystem /nix/store/lh684dl8sgs2znx1g2xgr9pgs0wmh28j-Toolchains/XcodeDefault.xctoolchain/include -isystem /nix/store/3rz9bg8h5n08clcnalfg4hnghb2ihf4x-libcxx-16.0.6-dev/include -isystem /nix/store/l54d6gh7dkicz1lfgmnrkr4mazzr1a6p-compiler-rt-libc-16.0.6-dev/include -iframework /nix/store/4vgcmlq1nr2h0hcfqj7ygk820285rpgr-apple-framework-CoreFoundation/Library/Frameworks
+__darwinAllowLocalNetworking=
+strictDeps=
+depsBuildBuild=
+depsBuildTarget=
+buildInputs=
+AR=ar
+LD_DYLD_PATH=/usr/lib/dyld
+NIX_NO_SELF_RPATH=1
+TMPDIR=/var/folders/1r/m92r_2px0sj_w_6081dgcnkm0000gn/T/
+XPC_SERVICE_NAME=0
+name=nix-shell
+dontAddDisableDepTrack=1
+CC=clang
+NIX_HARDENING_ENABLE=bindnow format fortify fortify3 pic relro stackprotector strictoverflow
+CXX=clang++
+NIX_BINTOOLS_WRAPPER_TARGET_HOST_x86_64_apple_darwin=1
+depsBuildTargetPropagated=
+NIX_PROFILES=/nix/var/nix/profiles/default /Users/sasha/.local/state/nix/profile
+depsBuildBuildPropagated=
+LD=ld
+propagatedNativeBuildInputs=
+__propagatedImpureHostDeps=
+cmakeFlags=
+NIX_BINTOOLS=/nix/store/dpkjrb95g8ss11i01k0rspvdby9km011-cctools-binutils-darwin-wrapper-16.0.6-973.0.1
+__propagatedSandboxProfile=
+fish_user_paths=/Users/sasha/.local/bin /Users/sasha/.local/state/nix/profile/bin /Users/sasha/.cargo/bin /Users/sasha/.dotfiles/result/bin /Users/sasha/Library/Python/3.11/bin /nix/var/nix/profiles/default/bin /Users/sasha/.cargo/env
+depsHostHost=
+SOURCE_DATE_EPOCH=315532800
+depsTargetTarget=
+NM=nm
+depsTargetTargetPropagated=
+depsHostHostPropagated=
+HOME=/Users/sasha
+BIN_ZIT=/Users/sasha/.dotfiles/result/bin/zit
+XDG_CONFIG_HOME=/Users/sasha/.config
+NIX_STORE=/nix/store
+KITTY_WINDOW_ID=1
+ZERO_AR_DATE=1
+__sandboxProfile=

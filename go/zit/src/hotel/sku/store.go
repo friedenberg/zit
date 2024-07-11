@@ -37,13 +37,6 @@ type (
 		FuncQuery
 	}
 
-	ExternalStoreQueryCheckedOut interface {
-		QueryCheckedOut(
-			qg ExternalQuery,
-			f schnittstellen.FuncIter[CheckedOutLike],
-		) (err error)
-	}
-
 	ExternalStoreCheckoutOne interface {
 		CheckoutOne(
 			options checkout_options.Options,
@@ -67,6 +60,20 @@ type (
 		) (err error)
 	}
 
+	ExternalStoreQueryCheckedOut interface {
+		QueryCheckedOut(
+			qg ExternalQuery,
+			f schnittstellen.FuncIter[CheckedOutLike],
+		) (err error)
+	}
+
+  ExternalStoreQueryUnsure interface {
+		QueryUnsure(
+			qg ExternalQuery,
+			f schnittstellen.FuncIter[CheckedOutLike],
+		) (err error)
+	}
+
 	ExternalStoreInfo struct {
 		StoreFuncs
 		DirCache string
@@ -75,6 +82,7 @@ type (
 
 	ExternalStoreLike interface {
 		Initialize(ExternalStoreInfo) error
+		ExternalStoreQueryUnsure
 		ExternalStoreQueryCheckedOut
 		// SaveAkte(col CheckedOutLike) (err error)
 		// ExternalStoreCheckoutOne
@@ -136,6 +144,33 @@ func (es *ExternalStore) QueryCheckedOut(
 	}
 
 	if err = esqco.QueryCheckedOut(
+		qg,
+		f,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (es *ExternalStore) QueryUnsure(
+	qg ExternalQuery,
+	f schnittstellen.FuncIter[CheckedOutLike],
+) (err error) {
+	esqu, ok := es.ExternalStoreLike.(ExternalStoreQueryUnsure)
+
+	if !ok {
+		err = errors.Errorf("store does not support %T", esqu)
+		return
+	}
+
+	if err = es.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = esqu.QueryUnsure(
 		qg,
 		f,
 	); err != nil {

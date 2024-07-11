@@ -284,6 +284,67 @@ func (c *Store) QueryCheckedOut(
 	return
 }
 
+func (c *Store) QueryUnsure(
+	qg sku.ExternalQuery,
+	f schnittstellen.FuncIter[sku.CheckedOutLike],
+) (err error) {
+	// o := sku.ObjekteOptions{
+	// 	Mode: objekte_mode.ModeRealizeSansProto,
+	// }
+
+	var co CheckedOut
+
+	for u, items := range c.urls {
+		matchingUrls, exactIndexURLMatch := c.transactedUrlIndex[u]
+
+		for _, item := range items {
+			{
+				tabId, okTabId := item.GetTabId()
+
+				if okTabId {
+          if _, trackedFromBefore := c.transactedTabIdIndex[tabId]; trackedFromBefore {
+            continue
+          }
+				}
+			}
+
+			if !exactIndexURLMatch {
+				if err = c.tryToEmitOneUntracked(
+					qg,
+					&co,
+					item,
+					f,
+				); err != nil {
+					err = errors.Wrapf(err, "Item: %#v", item)
+					return
+				}
+			} else if exactIndexURLMatch {
+				if err = matchingUrls.Each(
+					func(matching *sku.Transacted) (err error) {
+						if err = c.tryToEmitOneRecognized(
+							qg,
+							matching,
+							&co,
+							item,
+							f,
+						); err != nil {
+							err = errors.Wrapf(err, "Item: %#v", item)
+							return
+						}
+
+						return
+					},
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+		}
+	}
+
+	return
+}
+
 func (c *Store) tryToEmitOneExplicitlyCheckedOut(
 	qg sku.ExternalQuery,
 	internal *sku.Transacted,

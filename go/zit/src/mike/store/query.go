@@ -188,6 +188,7 @@ func (s *Store) QueryCheckedOut(
 	return
 }
 
+// TODO [cot/gl !task project-2021-zit-kasten today zz-inbox] move unsure akten and untracked into kasten interface and store_fs
 func (s *Store) QueryAllMatchingAkten(
 	qg *query.Group,
 	akten fd.Set,

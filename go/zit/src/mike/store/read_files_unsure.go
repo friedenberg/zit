@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
 type UnsureMatchType byte
@@ -42,7 +41,7 @@ type IterMatching func(
 ) error
 
 func (s *Store) QueryUnsure(
-	qg *query.Group,
+	qg sku.ExternalQuery,
 	o UnsureMatchOptions,
 	f IterMatching,
 ) (err error) {
@@ -113,11 +112,11 @@ func (s *Store) QueryUnsure(
 	}
 
 	// TODO create a new query group for all of history
-	qg.SetIncludeHistory()
+	qg.QueryGroup.SetIncludeHistory()
 
 	if len(selbstMetadateiSansTaiToZettels) > 0 || len(bezToZettels) > 0 {
 		if err = s.Query(
-			qg,
+			qg.QueryGroup,
 			func(sk *sku.Transacted) (err error) {
 				if o.Filter != nil {
 					if err = o.Filter(sk); err != nil {
