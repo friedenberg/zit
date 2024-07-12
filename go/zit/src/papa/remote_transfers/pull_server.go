@@ -150,8 +150,10 @@ func (op PullServer) skusForFilter(
 		return
 	}
 
-	if err = op.umwelt.GetStore().Query(
-		msg.MetaSet,
+	if err = op.umwelt.GetStore().QueryWithKasten(
+		sku.ExternalQuery{
+			QueryGroup: msg.MetaSet,
+		},
 		iter.MakeChain(
 			// zettel.MakeWriterKonfig(
 			// 	op.umwelt.Konfig(),

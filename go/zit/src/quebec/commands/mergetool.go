@@ -15,16 +15,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
 type Mergetool struct{}
 
 func init() {
-	registerCommandWithQuery(
+	registerCommandWithExternalQuery(
 		"merge-tool",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) CommandWithExternalQuery {
 			c := &Mergetool{}
 
 			return c
@@ -36,16 +35,14 @@ func (c Mergetool) DefaultGattungen() kennung.Gattung {
 	return kennung.MakeGattung(gattung.TrueGattung()...)
 }
 
-func (c Mergetool) RunWithQuery(
+func (c Mergetool) RunWithExternalQuery(
 	u *umwelt.Umwelt,
-	qg *query.Group,
+	qg sku.ExternalQuery,
 ) (err error) {
 	conflicted := sku.MakeCheckedOutLikeMutableSet()
 
 	if err = u.GetStore().QueryCheckedOut(
-		sku.ExternalQuery{
-			QueryGroup: qg,
-		},
+		qg,
 		func(co sku.CheckedOutLike) (err error) {
 			if co.GetState() != checked_out_state.StateConflicted {
 				return

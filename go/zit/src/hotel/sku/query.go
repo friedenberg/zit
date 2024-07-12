@@ -39,7 +39,7 @@ type (
 		PrimitiveQueryGroup
 		Query
 		SetIncludeHistory()
-		MakeEmitSkuIfNecessary(
+		MakeEmitSkuMaybeExternal(
 			f schnittstellen.FuncIter[*Transacted],
 			k kennung.Kasten,
 			updateTransacted func(
@@ -55,6 +55,8 @@ type (
 				z *Transacted,
 			) (err error),
 		) schnittstellen.FuncIter[*Transacted]
+		GetEtiketten() kennung.EtikettSet
+		GetTypen() kennung.TypSet
 	}
 
 	ExternalQueryOptions struct {

@@ -7,8 +7,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/alfred"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -17,9 +17,9 @@ type CatAlfred struct {
 }
 
 func init() {
-	registerCommandWithQuery(
+	registerCommandWithExternalQuery(
 		"cat-alfred",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) CommandWithExternalQuery {
 			c := &CatAlfred{}
 
 			return c
@@ -43,9 +43,9 @@ func (c CatAlfred) DefaultGattungen() kennung.Gattung {
 	)
 }
 
-func (c CatAlfred) RunWithQuery(
+func (c CatAlfred) RunWithExternalQuery(
 	u *umwelt.Umwelt,
-	ms *query.Group,
+	ms sku.ExternalQuery,
 ) (err error) {
 	// this command does its own error handling
 	wo := bufio.NewWriter(u.Out())
@@ -64,7 +64,7 @@ func (c CatAlfred) RunWithQuery(
 
 	defer errors.DeferredCloser(&err, aw)
 
-	if err = u.GetStore().Query(
+	if err = u.GetStore().QueryWithKasten(
 		ms,
 		aw.PrintOne,
 	); err != nil {

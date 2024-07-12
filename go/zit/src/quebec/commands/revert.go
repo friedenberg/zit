@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -18,9 +17,9 @@ type Revert struct {
 }
 
 func init() {
-	registerCommandWithQuery(
+	registerCommandWithExternalQuery(
 		"revert",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) CommandWithExternalQuery {
 			c := &Revert{}
 
 			f.BoolVar(&c.Last, "last", false, "revert the last changes")
@@ -55,7 +54,10 @@ type revertTuple struct {
 	*sha.Sha
 }
 
-func (c Revert) RunWithQuery(u *umwelt.Umwelt, ms *query.Group) (err error) {
+func (c Revert) RunWithExternalQuery(
+	u *umwelt.Umwelt,
+	ms sku.ExternalQuery,
+) (err error) {
 	f := func(rt revertTuple) (err error) {
 		if rt.IsNull() {
 			return
@@ -93,11 +95,11 @@ func (c Revert) RunWithQuery(u *umwelt.Umwelt, ms *query.Group) (err error) {
 
 func (c Revert) runRevertFromQuery(
 	u *umwelt.Umwelt,
-	ms *query.Group,
+	eq sku.ExternalQuery,
 	f schnittstellen.FuncIter[revertTuple],
 ) (err error) {
-	if err = u.GetStore().Query(
-		ms,
+	if err = u.GetStore().QueryWithKasten(
+		eq,
 		func(z *sku.Transacted) (err error) {
 			return f(revertTuple{Transacted: z, Sha: z.Metadatei.Mutter()})
 		},

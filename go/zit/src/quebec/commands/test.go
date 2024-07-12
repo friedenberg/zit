@@ -10,16 +10,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
 type Test struct{}
 
 func init() {
-	registerCommandWithQuery(
+	registerCommandWithExternalQuery(
 		"test",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) CommandWithExternalQuery {
 			c := &Test{}
 
 			return c
@@ -47,8 +46,11 @@ func (c Test) DefaultGattungen() kennung.Gattung {
 	)
 }
 
-func (c Test) RunWithQuery(u *umwelt.Umwelt, ms *query.Group) (err error) {
-	if err = u.GetStore().Query(
+func (c Test) RunWithExternalQuery(
+  u *umwelt.Umwelt,
+  ms sku.ExternalQuery,
+) (err error) {
+	if err = u.GetStore().QueryWithKasten(
 		ms,
 		iter.MakeSyncSerializer(
 			func(o *sku.Transacted) (err error) {

@@ -33,8 +33,8 @@ func (s *Store) QueryUnsure(
 		return
 	}
 
-	if err = s.Query(
-		qg.QueryGroup,
+	if err = s.QueryWithKasten(
+		qg,
 		sku.MakeUnsureMatchMapsMatcher(
 			matchMaps,
 			f,

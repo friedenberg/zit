@@ -57,7 +57,7 @@ func (s *Store) QueryWithKasten(
 	wg.Do(func() (err error) {
 		if err = s.GetVerzeichnisse().ReadQuery(
 			qg.QueryGroup,
-			qg.QueryGroup.MakeEmitSkuIfNecessary(
+			qg.QueryGroup.MakeEmitSkuMaybeExternal(
 				f,
 				qg.Kasten,
 				s.UpdateTransactedWithExternal,

@@ -14,7 +14,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
 type Flags struct {
@@ -116,7 +115,7 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 
 func (o *Flags) GetOptions(
 	printOptions erworben_cli_print_options.PrintOptions,
-	q *query.Group,
+	q sku.QueryGroup,
 	skuFmt *sku_fmt.Organize,
 	abbr kennung.Abbr,
 ) Options {

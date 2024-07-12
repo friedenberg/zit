@@ -383,9 +383,33 @@ func (qg *Group) ContainsSku(sk *sku.Transacted) (ok bool) {
 	return
 }
 
+func (qg *Group) MakeEmitSku(
+	f schnittstellen.FuncIter[*sku.Transacted],
+) schnittstellen.FuncIter[*sku.Transacted] {
+	return func(z *sku.Transacted) (err error) {
+		g := gattung.Must(z.GetGattung())
+		m, ok := qg.Get(g)
+
+		if !ok {
+			return
+		}
+
+		if !m.ContainsSku(z) {
+			return
+		}
+
+		if err = f(z); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+}
+
 // TODO improve performance by only reading Cwd zettels rather than scanning
 // everything
-func (qg *Group) MakeEmitSkuIfNecessary(
+func (qg *Group) MakeEmitSkuMaybeExternal(
 	f schnittstellen.FuncIter[*sku.Transacted],
 	k kennung.Kasten,
 	updateTransacted func(

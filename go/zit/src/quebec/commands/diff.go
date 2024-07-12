@@ -16,18 +16,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
-type Diff struct {
-	Kasten kennung.Kasten
-}
+type Diff struct{}
 
 // TODO switch to registerCommandWithExternalQuery
 func init() {
-	registerCommandWithQuery(
+	registerCommandWithExternalQuery(
 		"diff",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) CommandWithExternalQuery {
 			c := &Diff{}
-
-			f.Var(&c.Kasten, "kasten", "none or Chrome")
 
 			return c
 		},
@@ -44,9 +40,9 @@ func (c Diff) ModifyBuilder(
 	b.WithHidden(nil)
 }
 
-func (c Diff) RunWithQuery(
+func (c Diff) RunWithExternalQuery(
 	u *umwelt.Umwelt,
-	qg *query.Group,
+	qg sku.ExternalQuery,
 ) (err error) {
 	co := checkout_options.TextFormatterOptions{
 		DoNotWriteEmptyBezeichnung: true,
@@ -67,10 +63,7 @@ func (c Diff) RunWithQuery(
 	}
 
 	if err = u.GetStore().QueryCheckedOut(
-		sku.ExternalQuery{
-			Kasten:     c.Kasten,
-			QueryGroup: qg,
-		},
+		qg,
 		func(co sku.CheckedOutLike) (err error) {
 			switch cot := co.(type) {
 			case *store_fs.CheckedOut:

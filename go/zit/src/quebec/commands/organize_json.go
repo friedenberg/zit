@@ -16,7 +16,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
@@ -30,9 +29,9 @@ type OrganizeJSON struct {
 }
 
 func init() {
-	registerCommandWithQuery(
+	registerCommandWithExternalQuery(
 		"organize-json",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) CommandWithExternalQuery {
 			c := &OrganizeJSON{
 				Flags: organize_text.MakeFlags(),
 			}
@@ -70,9 +69,9 @@ func (c *OrganizeJSON) CompletionGattung() kennung.Gattung {
 	)
 }
 
-func (c *OrganizeJSON) RunWithQuery(
+func (c *OrganizeJSON) RunWithExternalQuery(
 	u *umwelt.Umwelt,
-	ms *query.Group,
+	ms sku.ExternalQuery,
 ) (err error) {
 	u.ApplyToOrganizeOptions(&c.Options)
 
@@ -80,7 +79,7 @@ func (c *OrganizeJSON) RunWithQuery(
 		Umwelt: u,
 		Options: c.GetOptions(
 			u.GetKonfig().PrintOptions,
-			ms,
+			ms.QueryGroup,
 			u.SkuFmtOrganize(),
 			u.GetStore().GetAbbrStore().GetAbbr(),
 		),
@@ -156,7 +155,12 @@ func (c *OrganizeJSON) RunWithQuery(
 
 	var ot2 *organize_text.Text
 
-	if ot2, err = c.readFromVim(u, f.Name(), createOrganizeFileResults, ms); err != nil {
+	if ot2, err = c.readFromVim(
+		u,
+		f.Name(),
+		createOrganizeFileResults,
+		ms.QueryGroup,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -195,7 +199,7 @@ func (c OrganizeJSON) readFromVim(
 	u *umwelt.Umwelt,
 	p string,
 	results *organize_text.Text,
-	q *query.Group,
+	q sku.QueryGroup,
 ) (ot *organize_text.Text, err error) {
 	openVimOp := user_ops.OpenVim{
 		Options: vim_cli_options_builder.New().

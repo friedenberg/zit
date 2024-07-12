@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -69,18 +68,16 @@ func (c commandWithExternalQuery) Complete(
 
 	b := u.MakeQueryBuilderExcludingHidden(cgg.CompletionGattung())
 
-	var qg *query.Group
-
-	if qg, err = b.BuildQueryGroupWithKasten(
-    c.Kasten,
-    c.ExternalQueryOptions,
-  ); err != nil {
+	if c.QueryGroup, err = b.BuildQueryGroupWithKasten(
+		c.Kasten,
+		c.ExternalQueryOptions,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = u.GetStore().Query(
-		qg,
+	if err = u.GetStore().QueryWithKasten(
+		c.ExternalQuery,
 		w.WriteOne,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -107,7 +104,7 @@ func (c commandWithExternalQuery) Run(u *umwelt.Umwelt, args ...string) (err err
 
 	if c.QueryGroup, err = b.BuildQueryGroupWithKasten(
 		c.Kasten,
-    c.ExternalQueryOptions,
+		c.ExternalQueryOptions,
 		args...,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -115,7 +112,7 @@ func (c commandWithExternalQuery) Run(u *umwelt.Umwelt, args ...string) (err err
 	}
 
 	if err = c.RunWithExternalQuery(u, c.ExternalQuery); err != nil {
-    ui.Debug().Printf("%#v", err)
+		ui.Debug().Printf("%#v", err)
 		err = errors.Wrap(err)
 		return
 	}

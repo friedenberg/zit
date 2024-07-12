@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
@@ -14,9 +15,9 @@ import (
 type Validate struct{}
 
 func init() {
-	registerCommandWithQuery(
+	registerCommandWithExternalQuery(
 		"validate",
-		func(f *flag.FlagSet) CommandWithQuery {
+		func(f *flag.FlagSet) CommandWithExternalQuery {
 			c := &Validate{}
 
 			return c
@@ -29,9 +30,9 @@ func (c Validate) ModifyBuilder(b *query.Builder) {
 		WithDoNotMatchEmpty()
 }
 
-func (c Validate) RunWithQuery(
+func (c Validate) RunWithExternalQuery(
 	u *umwelt.Umwelt,
-	qg *query.Group,
+	qg sku.ExternalQuery,
 ) (err error) {
 	var failureCount atomic.Int32
 
