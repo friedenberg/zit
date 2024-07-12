@@ -69,10 +69,18 @@ func registerCommandWithQuery(
 		panic("command added more than once: " + n)
 	}
 
-	commands[n] = command{
-		Command: commandWithQuery{
-			CommandWithQuery: c,
-		},
+	cweq := &commandWithQuery{
+		CommandWithQuery: c,
+	}
+
+	f.Var(&cweq.Kasten, "kasten", "none or Chrome")
+	f.BoolVar(&cweq.ExcludeUntracked, "exclude-untracked", false, "")
+	f.BoolVar(&cweq.IncludeRecognized, "include-recognized", false, "")
+
+	co := command{
+		Command: cweq,
 		FlagSet: f,
 	}
+
+	commands[n] = co
 }

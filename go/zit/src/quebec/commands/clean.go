@@ -22,9 +22,9 @@ type Clean struct {
 }
 
 func init() {
-	registerCommandWithExternalQuery(
+	registerCommandWithQuery(
 		"clean",
-		func(f *flag.FlagSet) CommandWithExternalQuery {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Clean{}
 
 			f.BoolVar(
@@ -67,7 +67,7 @@ func (c Clean) DefaultGattungen() kennung.Gattung {
 func (c Clean) shouldClean(
 	u *umwelt.Umwelt,
 	co sku.CheckedOutLike,
-	eqwk sku.ExternalQuery,
+	eqwk *query.Group,
 ) bool {
 	if c.force {
 		return true
@@ -106,9 +106,9 @@ func (c Clean) ModifyBuilder(b *query.Builder) {
 	b.WithHidden(nil)
 }
 
-func (c Clean) RunWithExternalQuery(
+func (c Clean) RunWithQuery(
 	u *umwelt.Umwelt,
-	eqwk sku.ExternalQuery,
+	eqwk *query.Group,
 ) (err error) {
 	fds := fd.MakeMutableSet()
 

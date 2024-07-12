@@ -18,9 +18,9 @@ import (
 type Status struct{}
 
 func init() {
-	registerCommandWithExternalQuery(
+	registerCommandWithQuery(
 		"status",
-		func(f *flag.FlagSet) CommandWithExternalQuery {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Status{}
 
 			return c
@@ -38,9 +38,9 @@ func (c Status) ModifyBuilder(
 	b.WithHidden(nil)
 }
 
-func (c Status) RunWithExternalQuery(
+func (c Status) RunWithQuery(
 	u *umwelt.Umwelt,
-	eqwk sku.ExternalQuery,
+	eqwk *query.Group,
 ) (err error) {
 	pcol := u.PrinterCheckedOutForKasten(eqwk.Kasten)
 
@@ -79,7 +79,7 @@ func (c Status) RunWithExternalQuery(
 	// }
 
 	p := u.PrinterCheckedOutForKasten(eqwk.Kasten)
-	qg := eqwk.QueryGroup.(*query.Group)
+	qg := eqwk
 
 	// TODO [cot/gl !task project-2021-zit-kasten today zz-inbox] move unsure akten and untracked into kasten interface and store_fs
 	if err = u.GetStore().QueryAllMatchingAkten(

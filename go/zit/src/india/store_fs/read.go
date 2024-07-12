@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
 func (s *Store) MakeApplyCheckedOut(
@@ -51,7 +52,7 @@ func (s *Store) ApplyCheckedOut(
 }
 
 func (s *Store) QueryCheckedOut(
-	qg sku.ExternalQuery,
+	qg *query.Group,
 	f schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	wg := iter.MakeErrorWaitGroupParallel()
@@ -82,7 +83,7 @@ func (s *Store) QueryCheckedOut(
 
 // TODO [cot/gl !task project-2021-zit-kasten today zz-inbox] move unsure akten and untracked into kasten interface and store_fs
 func (s *Store) QueryUnsure(
-	qg sku.ExternalQuery,
+	qg *query.Group,
 	f schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	o := sku.ObjekteOptions{

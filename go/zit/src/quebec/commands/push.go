@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/remote_push"
@@ -61,7 +62,11 @@ func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var ids *query.Group
 
-	if ids, err = builder.BuildQueryGroup(args...); err != nil {
+	if ids, err = builder.BuildQueryGroupWithKasten(
+		kennung.Kasten{},
+		sku.ExternalQueryOptions{},
+		args...,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

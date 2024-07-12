@@ -44,10 +44,6 @@ func (c command) PrintSubcommandUsage(flags flag.FlagSet) {
 
 	printTabbed(flags.Name())
 
-	if v2, ok := c.Command.(CommandV2); ok {
-		printTabbed(v2.Description)
-	}
-
 	flags.PrintDefaults()
 
 	scanner := bufio.NewScanner(&b)

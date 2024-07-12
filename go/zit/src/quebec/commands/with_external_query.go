@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"flag"
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -9,57 +8,31 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
-func registerCommandWithExternalQuery(
-	n string,
-	makeFunc func(*flag.FlagSet) CommandWithExternalQuery,
-) {
-	f := flag.NewFlagSet(n, flag.ExitOnError)
-
-	c := makeFunc(f)
-
-	if _, ok := commands[n]; ok {
-		panic("command added more than once: " + n)
-	}
-
-	cweq := &commandWithExternalQuery{
-		CommandWithExternalQuery: c,
-	}
-
-	f.Var(&cweq.Kasten, "kasten", "none or Chrome")
-	f.BoolVar(&cweq.ExcludeUntracked, "exclude-untracked", false, "")
-	f.BoolVar(&cweq.IncludeRecognized, "include-recognized", false, "")
-
-	co := command{
-		Command: cweq,
-		FlagSet: f,
-	}
-
-	commands[n] = co
-}
-
-type CommandWithExternalQuery interface {
-	RunWithExternalQuery(
+type CommandWithQuery interface {
+	RunWithQuery(
 		store *umwelt.Umwelt,
-		ids sku.ExternalQuery,
+		ids *query.Group,
 	) error
 }
 
-type commandWithExternalQuery struct {
-	CommandWithExternalQuery
-	sku.ExternalQuery
+type commandWithQuery struct {
+	CommandWithQuery
+	sku.ExternalQueryOptions
+	*query.Group
 }
 
-func (c commandWithExternalQuery) Complete(
+func (c commandWithQuery) Complete(
 	u *umwelt.Umwelt,
 	args ...string,
 ) (err error) {
 	var cgg CompletionGattungGetter
 	ok := false
 
-	if cgg, ok = c.CommandWithExternalQuery.(CompletionGattungGetter); !ok {
+	if cgg, ok = c.CommandWithQuery.(CompletionGattungGetter); !ok {
 		return
 	}
 
@@ -68,7 +41,7 @@ func (c commandWithExternalQuery) Complete(
 
 	b := u.MakeQueryBuilderExcludingHidden(cgg.CompletionGattung())
 
-	if c.QueryGroup, err = b.BuildQueryGroupWithKasten(
+	if c.Group, err = b.BuildQueryGroupWithKasten(
 		c.Kasten,
 		c.ExternalQueryOptions,
 	); err != nil {
@@ -77,7 +50,7 @@ func (c commandWithExternalQuery) Complete(
 	}
 
 	if err = u.GetStore().QueryWithKasten(
-		c.ExternalQuery,
+		c.Group,
 		w.WriteOne,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -87,22 +60,22 @@ func (c commandWithExternalQuery) Complete(
 	return
 }
 
-func (c commandWithExternalQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c commandWithQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	b := u.MakeQueryBuilderExcludingHidden(kennung.MakeGattung())
 
-	if dgg, ok := c.CommandWithExternalQuery.(DefaultGattungGetter); ok {
+	if dgg, ok := c.CommandWithQuery.(DefaultGattungGetter); ok {
 		b = b.WithDefaultGattungen(dgg.DefaultGattungen())
 	}
 
-	if dsg, ok := c.CommandWithExternalQuery.(DefaultSigilGetter); ok {
+	if dsg, ok := c.CommandWithQuery.(DefaultSigilGetter); ok {
 		b.WithDefaultSigil(dsg.DefaultSigil())
 	}
 
-	if qbm, ok := c.CommandWithExternalQuery.(QueryBuilderModifier); ok {
+	if qbm, ok := c.CommandWithQuery.(QueryBuilderModifier); ok {
 		qbm.ModifyBuilder(b)
 	}
 
-	if c.QueryGroup, err = b.BuildQueryGroupWithKasten(
+	if c.Group, err = b.BuildQueryGroupWithKasten(
 		c.Kasten,
 		c.ExternalQueryOptions,
 		args...,
@@ -111,7 +84,9 @@ func (c commandWithExternalQuery) Run(u *umwelt.Umwelt, args ...string) (err err
 		return
 	}
 
-	if err = c.RunWithExternalQuery(u, c.ExternalQuery); err != nil {
+	c.Group.ExternalQueryOptions = c.ExternalQueryOptions
+
+	if err = c.RunWithQuery(u, c.Group); err != nil {
 		ui.Debug().Printf("%#v", err)
 		err = errors.Wrap(err)
 		return

@@ -29,9 +29,9 @@ type Organize struct {
 }
 
 func init() {
-	registerCommandWithExternalQuery(
+	registerCommandWithQuery(
 		"organize",
-		func(f *flag.FlagSet) CommandWithExternalQuery {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Organize{
 				Flags: organize_text.MakeFlags(),
 			}
@@ -66,11 +66,11 @@ func (c *Organize) CompletionGattung() kennung.Gattung {
 	)
 }
 
-func (c *Organize) RunWithExternalQuery(
+func (c *Organize) RunWithQuery(
 	u *umwelt.Umwelt,
-	eqwk sku.ExternalQuery,
+	eqwk *query.Group,
 ) (err error) {
-	ms := eqwk.QueryGroup.(*query.Group)
+	ms := eqwk
 
 	u.ApplyToOrganizeOptions(&c.Options)
 

@@ -60,6 +60,7 @@ type (
 	}
 
 	ExternalQueryOptions struct {
+		kennung.Kasten
 		ExcludeUntracked  bool
 		IncludeRecognized bool
 	}

@@ -16,6 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/echo/thyme"
+	"code.linenisgreat.com/zit/go/zit/src/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/erworben"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -49,7 +50,7 @@ type Umwelt struct {
 	storesInitialized bool
 	store             store.Store
 	age               *age.Age
-	externalStores    map[string]*sku.ExternalStore
+	externalStores    map[string]*external_store.Store
 
 	matcherArchiviert query.Archiviert
 
@@ -181,12 +182,12 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		return
 	}
 
-	u.externalStores = map[string]*sku.ExternalStore{
+	u.externalStores = map[string]*external_store.Store{
 		"": {
-			ExternalStoreLike: sfs,
+			StoreLike: sfs,
 		},
 		"chrome": {
-			ExternalStoreLike: chrome.MakeChrome(
+			StoreLike: chrome.MakeChrome(
 				k,
 				u.Standort(),
 				string_format_writer.MakeDelim(
@@ -290,7 +291,9 @@ func (u *Umwelt) GetMatcherArchiviert() query.Archiviert {
 	return u.matcherArchiviert
 }
 
-func (u *Umwelt) GetExternalStore(k kennung.Kasten) (*sku.ExternalStore, bool) {
+func (u *Umwelt) GetExternalStoreForQuery(
+	k kennung.Kasten,
+) (sku.ExternalStoreForQuery, bool) {
 	e, ok := u.externalStores[k.String()]
 	return e, ok
 }

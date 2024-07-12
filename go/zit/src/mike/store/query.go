@@ -42,11 +42,11 @@ func (s *Store) Query(
 }
 
 func (s *Store) QueryWithKasten(
-	qg sku.ExternalQuery,
+	qg *query.Group,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	if qg.QueryGroup == nil {
-		if qg.QueryGroup, err = s.queryBuilder.BuildQueryGroup(); err != nil {
+	if qg == nil {
+		if qg, err = s.queryBuilder.BuildQueryGroup(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -56,8 +56,8 @@ func (s *Store) QueryWithKasten(
 
 	wg.Do(func() (err error) {
 		if err = s.GetVerzeichnisse().ReadQuery(
-			qg.QueryGroup,
-			qg.QueryGroup.MakeEmitSkuMaybeExternal(
+			qg,
+			qg.MakeEmitSkuMaybeExternal(
 				f,
 				qg.Kasten,
 				s.UpdateTransactedWithExternal,
@@ -79,7 +79,7 @@ func (s *Store) QueryWithKasten(
 }
 
 func (s *Store) QueryCheckedOut(
-	qg sku.ExternalQuery,
+	qg *query.Group,
 	f schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	kid := qg.Kasten.GetKastenString()

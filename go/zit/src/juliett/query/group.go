@@ -30,6 +30,8 @@ type Group struct {
 	Kennungen        []*kennung.Kennung2
 	Zettelen         kennung.HinweisMutableSet
 	Typen            kennung.TypMutableSet
+
+	sku.ExternalQueryOptions
 }
 
 func (qg *Group) SetIncludeHistory() {
@@ -65,7 +67,6 @@ func (qg *Group) GetSigil() (s kennung.Sigil) {
 
 func (qg *Group) GetExactlyOneKennung(
 	g gattung.Gattung,
-	c *sku.ExternalStore,
 ) (k *kennung.Kennung2, s kennung.Sigil, err error) {
 	if len(qg.OptimizedQueries) != 1 {
 		err = errors.Errorf(
@@ -155,6 +156,11 @@ func (qg *Group) AddExactKennung(
 	b *Builder,
 	k Kennung,
 ) (err error) {
+	if k.Kennung2 == nil {
+		err = errors.Errorf("nil kennung")
+		return
+	}
+
 	qg.Kennungen = append(qg.Kennungen, k.Kennung2)
 
 	q := b.makeQuery()

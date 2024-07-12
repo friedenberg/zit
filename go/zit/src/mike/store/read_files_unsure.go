@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
 type UnsureMatchMap struct {
@@ -12,7 +13,7 @@ type UnsureMatchMap struct {
 }
 
 func (s *Store) QueryUnsure(
-	qg sku.ExternalQuery,
+	qg *query.Group,
 	o sku.UnsureMatchOptions,
 	f sku.IterMatching,
 ) (err error) {
@@ -27,7 +28,7 @@ func (s *Store) QueryUnsure(
 	}
 
 	// TODO create a new query group for all of history
-	qg.QueryGroup.SetIncludeHistory()
+	qg.SetIncludeHistory()
 
 	if matchMaps.Len() == 0 {
 		return

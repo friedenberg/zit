@@ -12,10 +12,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/external_store"
 )
 
-func (s *Store) Initialize(esi sku.ExternalStoreInfo) (err error) {
+func (s *Store) Initialize(esi external_store.Info) (err error) {
 	s.externalStoreInfo = esi
 
 	if err = s.chrome.Read(); err != nil {

@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/echo/thyme"
+	"code.linenisgreat.com/zit/go/zit/src/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/erworben"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/golf/kennung_index"
@@ -29,7 +30,7 @@ type Store struct {
 	konfig                    *konfig.Compiled
 	standort                  standort.Standort
 	cwdFiles                  *store_fs.Store
-	externalStores            map[string]*sku.ExternalStore
+	externalStores            map[string]*external_store.Store
 	akten                     *akten.Akten
 	bestandsaufnahmeAkte      bestandsaufnahme.Akte
 	options                   objekte_format.Options
@@ -154,12 +155,12 @@ func (c *Store) Initialize(
 }
 
 func (s *Store) SetExternalStores(
-	stores map[string]*sku.ExternalStore,
+	stores map[string]*external_store.Store,
 ) (err error) {
 	s.externalStores = stores
 
 	for k, es := range s.externalStores {
-		es.StoreFuncs = sku.StoreFuncs{
+		es.StoreFuncs = external_store.StoreFuncs{
 			FuncRealize:     s.tryRealize,
 			FuncCommit:      s.tryRealizeAndOrStore,
 			FuncReadSha:     s.ReadOneEnnui,
@@ -170,7 +171,7 @@ func (s *Store) SetExternalStores(
 		es.Standort = s.GetStandort()
 		es.DirCache = s.GetStandort().DirVerzeichnisseKasten(k)
 
-		if esfs, ok := es.ExternalStoreLike.(*store_fs.Store); ok {
+		if esfs, ok := es.StoreLike.(*store_fs.Store); ok {
 			s.cwdFiles = esfs
 
 			// TODO remove once store_fs.Store is fully ExternalStoreLike

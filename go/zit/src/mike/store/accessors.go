@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/echo/thyme"
+	"code.linenisgreat.com/zit/go/zit/src/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/erworben"
 	"code.linenisgreat.com/zit/go/zit/src/golf/ennui"
 	"code.linenisgreat.com/zit/go/zit/src/golf/kennung_index"
@@ -21,7 +22,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/bestandsaufnahme"
 )
 
-func (u *Store) GetChrestStore() *sku.ExternalStore {
+func (u *Store) GetChrestStore() *external_store.Store {
 	return u.externalStores["chrome"]
 }
 

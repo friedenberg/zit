@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
@@ -18,9 +18,9 @@ type Checkout struct {
 }
 
 func init() {
-	registerCommandWithExternalQuery(
+	registerCommandWithQuery(
 		"checkout",
-		func(f *flag.FlagSet) CommandWithExternalQuery {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Checkout{
 				CheckoutOptions: checkout_options.Options{
 					CheckoutMode: checkout_mode.ModeObjekteOnly,
@@ -40,9 +40,9 @@ func (c Checkout) DefaultGattungen() kennung.Gattung {
 	)
 }
 
-func (c Checkout) RunWithExternalQuery(
+func (c Checkout) RunWithQuery(
 	u *umwelt.Umwelt,
-	eqwk sku.ExternalQuery,
+	eqwk *query.Group,
 ) (err error) {
 	opCheckout := user_ops.Checkout{
 		Umwelt:  u,

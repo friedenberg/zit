@@ -3,7 +3,6 @@ package query
 import (
 	"sync/atomic"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -46,8 +45,4 @@ func (matcher *archiviert) ContainsSku(matchable *sku.Transacted) bool {
 	atomic.AddInt64(&matcher.count, 1)
 
 	return true
-}
-
-func (matcher archiviert) Each(f schnittstellen.FuncIter[sku.Query]) error {
-	return nil
 }

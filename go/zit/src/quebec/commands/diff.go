@@ -20,9 +20,9 @@ type Diff struct{}
 
 // TODO switch to registerCommandWithExternalQuery
 func init() {
-	registerCommandWithExternalQuery(
+	registerCommandWithQuery(
 		"diff",
-		func(f *flag.FlagSet) CommandWithExternalQuery {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Diff{}
 
 			return c
@@ -40,9 +40,9 @@ func (c Diff) ModifyBuilder(
 	b.WithHidden(nil)
 }
 
-func (c Diff) RunWithExternalQuery(
+func (c Diff) RunWithQuery(
 	u *umwelt.Umwelt,
-	qg sku.ExternalQuery,
+	qg *query.Group,
 ) (err error) {
 	co := checkout_options.TextFormatterOptions{
 		DoNotWriteEmptyBezeichnung: true,

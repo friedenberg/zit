@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -21,9 +22,9 @@ type ExecAction struct {
 }
 
 func init() {
-	registerCommandWithExternalQuery(
+	registerCommandWithQuery(
 		"exec-action",
-		func(f *flag.FlagSet) CommandWithExternalQuery {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &ExecAction{}
 
 			f.Var(&c.Action, "action", "which Konfig action to execute")
@@ -39,9 +40,9 @@ func (c ExecAction) DefaultGattungen() kennung.Gattung {
 	)
 }
 
-func (c ExecAction) RunWithExternalQuery(
+func (c ExecAction) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms sku.ExternalQuery,
+	ms *query.Group,
 ) (err error) {
 	if !c.Action.WasSet() {
 		err = errors.Normal(errors.Errorf("Action must be provided"))

@@ -21,6 +21,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/echo/zittish"
+	"code.linenisgreat.com/zit/go/zit/src/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -34,7 +35,7 @@ func init() {
 type Store struct {
 	konfig              sku.Konfig
 	deletedPrinter      schnittstellen.FuncIter[*fd.FD]
-	externalStoreInfo   sku.ExternalStoreInfo
+	externalStoreInfo   external_store.Info
 	metadateiTextParser metadatei.TextParser
 	standort            standort.Standort
 	fileEncoder         FileEncoder
@@ -53,6 +54,10 @@ type Store struct {
 
 	deleteLock sync.Mutex
 	deleted    fd.MutableSet
+}
+
+func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
+	return fs
 }
 
 func (fs *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
@@ -452,7 +457,7 @@ func (fs *Store) readInputFiles(args ...string) (err error) {
 	return
 }
 
-func (s *Store) Initialize(esi sku.ExternalStoreInfo) (err error) {
+func (s *Store) Initialize(esi external_store.Info) (err error) {
 	s.externalStoreInfo = esi
 	return
 }

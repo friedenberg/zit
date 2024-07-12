@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
@@ -49,6 +49,6 @@ func (u *Umwelt) MakeQueryBuilder(
 		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr())
 }
 
-func (u *Umwelt) GetDefaultExternalStore() *sku.ExternalStore {
+func (u *Umwelt) GetDefaultExternalStore() *external_store.Store {
 	return u.externalStores[""]
 }

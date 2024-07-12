@@ -67,7 +67,7 @@ type (
 		) (err error)
 	}
 
-  ExternalStoreQueryUnsure interface {
+	ExternalStoreQueryUnsure interface {
 		QueryUnsure(
 			qg ExternalQuery,
 			f schnittstellen.FuncIter[CheckedOutLike],
@@ -78,6 +78,11 @@ type (
 		StoreFuncs
 		DirCache string
 		standort.Standort
+	}
+
+	ExternalStoreForQuery interface {
+		GetExternalKennung() (schnittstellen.SetLike[*kennung.Kennung2], error)
+		GetKennungForString(string) (*kennung.Kennung2, error)
 	}
 
 	ExternalStoreLike interface {
@@ -91,8 +96,8 @@ type (
 		GetKennungForString(string) (*kennung.Kennung2, error)
 	}
 
-	ExternalStoreGetter interface {
-		GetExternalStore(kennung.Kasten) (*ExternalStore, bool)
+	ExternalStoreForQueryGetter interface {
+		GetExternalStoreForQuery(kennung.Kasten) (ExternalStoreForQuery, bool)
 	}
 )
 

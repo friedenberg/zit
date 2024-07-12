@@ -22,7 +22,7 @@ func MakeBuilder(
 	akten *akten.Akten,
 	ennui sku.Ennui,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
-	kastenGetter sku.ExternalStoreGetter,
+	kastenGetter sku.ExternalStoreForQueryGetter,
 ) (b *Builder) {
 	b = &Builder{
 		standort:                   s,
@@ -43,8 +43,8 @@ type Builder struct {
 	ennui                      sku.Ennui
 	luaVMPoolBuilder           *lua.VMPoolBuilder
 	preexistingKennung         []Kennung
-	kastenGetter               sku.ExternalStoreGetter
-	kasten                     *sku.ExternalStore
+	kastenGetter               sku.ExternalStoreForQueryGetter
+	kasten                     sku.ExternalStoreForQuery
 	cwdFilterEnabled           bool
 	fileExtensionGetter        schnittstellen.FileExtensionGetter
 	expanders                  kennung.Abbr
@@ -94,7 +94,7 @@ func (mb *Builder) WithDebug() *Builder {
 }
 
 func (mb *Builder) WithKasten(
-	kasten *sku.ExternalStore,
+	kasten sku.ExternalStoreForQuery,
 ) *Builder {
 	mb.kasten = kasten
 	return mb
@@ -173,27 +173,6 @@ func (b *Builder) WithCheckedOut(
 	return b
 }
 
-func (b *Builder) realizeVirtualEtiketten() (err error) {
-	for k, v := range b.virtualEtikettenBeforeInit {
-		var vmp *lua.VMPool
-
-		lb := b.luaVMPoolBuilder.Clone().WithScript(v)
-
-		if vmp, err = lb.Build(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		ml := Lua{
-			LuaVMPool: sku_fmt.MakeLuaVMPool(vmp, nil),
-		}
-
-		b.virtualEtiketten[k] = ml
-	}
-
-	return
-}
-
 func (b *Builder) BuildQueryGroupWithKasten(
 	k kennung.Kasten,
 	eqo sku.ExternalQueryOptions,
@@ -201,7 +180,7 @@ func (b *Builder) BuildQueryGroupWithKasten(
 ) (qg *Group, err error) {
 	ok := false
 	b.eqo = eqo
-	b.kasten, ok = b.kastenGetter.GetExternalStore(k)
+	b.kasten, ok = b.kastenGetter.GetExternalStoreForQuery(k)
 
 	if !ok {
 		err = errors.Errorf("kasten not found: %q", k)
@@ -212,6 +191,9 @@ func (b *Builder) BuildQueryGroupWithKasten(
 		err = errors.Wrap(err)
 		return
 	}
+
+	qg.Kasten = k
+	qg.ExternalQueryOptions = eqo
 
 	return
 }
@@ -232,6 +214,13 @@ func (b *Builder) BuildQueryGroup(vs ...string) (qg *Group, err error) {
 	return
 }
 
+//   ____        _ _     _ _
+//  | __ ) _   _(_) | __| (_)_ __   __ _
+//  |  _ \| | | | | |/ _` | | '_ \ / _` |
+//  | |_) | |_| | | | (_| | | | | | (_| |
+//  |____/ \__,_|_|_|\__,_|_|_| |_|\__, |
+//                                 |___/
+
 func (b *Builder) build(vs ...string) (qg *Group, err error) {
 	qg = MakeGroup(b)
 
@@ -239,6 +228,11 @@ func (b *Builder) build(vs ...string) (qg *Group, err error) {
 
 	for _, v := range vs {
 		var k *kennung.Kennung2
+
+		if b.kasten == nil {
+			remaining = append(remaining, v)
+			continue
+		}
 
 		if k, err = b.kasten.GetKennungForString(v); err != nil {
 			err = nil
@@ -282,6 +276,27 @@ func (b *Builder) build(vs ...string) (qg *Group, err error) {
 	if err = qg.Reduce(b); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	return
+}
+
+func (b *Builder) realizeVirtualEtiketten() (err error) {
+	for k, v := range b.virtualEtikettenBeforeInit {
+		var vmp *lua.VMPool
+
+		lb := b.luaVMPoolBuilder.Clone().WithScript(v)
+
+		if vmp, err = lb.Build(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		ml := Lua{
+			LuaVMPool: sku_fmt.MakeLuaVMPool(vmp, nil),
+		}
+
+		b.virtualEtiketten[k] = ml
 	}
 
 	return

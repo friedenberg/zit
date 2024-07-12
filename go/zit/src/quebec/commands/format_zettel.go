@@ -131,7 +131,6 @@ func (c *FormatZettel) getSku(
 
 	if k, s, err = qg.GetExactlyOneKennung(
 		gattung.Zettel,
-		u.GetDefaultExternalStore(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

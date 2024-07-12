@@ -16,6 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
@@ -29,9 +30,9 @@ type OrganizeJSON struct {
 }
 
 func init() {
-	registerCommandWithExternalQuery(
+	registerCommandWithQuery(
 		"organize-json",
-		func(f *flag.FlagSet) CommandWithExternalQuery {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &OrganizeJSON{
 				Flags: organize_text.MakeFlags(),
 			}
@@ -69,9 +70,9 @@ func (c *OrganizeJSON) CompletionGattung() kennung.Gattung {
 	)
 }
 
-func (c *OrganizeJSON) RunWithExternalQuery(
+func (c *OrganizeJSON) RunWithQuery(
 	u *umwelt.Umwelt,
-	ms sku.ExternalQuery,
+	ms *query.Group,
 ) (err error) {
 	u.ApplyToOrganizeOptions(&c.Options)
 
@@ -79,7 +80,7 @@ func (c *OrganizeJSON) RunWithExternalQuery(
 		Umwelt: u,
 		Options: c.GetOptions(
 			u.GetKonfig().PrintOptions,
-			ms.QueryGroup,
+			ms,
 			u.SkuFmtOrganize(),
 			u.GetStore().GetAbbrStore().GetAbbr(),
 		),
@@ -159,7 +160,7 @@ func (c *OrganizeJSON) RunWithExternalQuery(
 		u,
 		f.Name(),
 		createOrganizeFileResults,
-		ms.QueryGroup,
+		ms,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

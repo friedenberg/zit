@@ -17,9 +17,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
+	"code.linenisgreat.com/zit/go/zit/src/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
 type transacted struct {
@@ -29,7 +31,7 @@ type transacted struct {
 
 type Store struct {
 	konfig            *konfig.Compiled
-	externalStoreInfo sku.ExternalStoreInfo
+	externalStoreInfo external_store.Info
 	typ               kennung.Typ
 	chrome            chrest.Browser
 
@@ -72,8 +74,8 @@ func MakeChrome(
 	return c
 }
 
-func (c *Store) GetVirtualStore() sku.ExternalStoreLike {
-	return c
+func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
+	return fs
 }
 
 func (c *Store) GetExternalKennung() (ks schnittstellen.SetLike[*kennung.Kennung2], err error) {
@@ -212,7 +214,7 @@ func (c *Store) CheckoutOne(
 }
 
 func (c *Store) QueryCheckedOut(
-	qg sku.ExternalQuery,
+	qg *query.Group,
 	f schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	// o := sku.ObjekteOptions{
@@ -285,7 +287,7 @@ func (c *Store) QueryCheckedOut(
 }
 
 func (c *Store) QueryUnsure(
-	qg sku.ExternalQuery,
+	qg *query.Group,
 	f schnittstellen.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	// o := sku.ObjekteOptions{
@@ -302,9 +304,9 @@ func (c *Store) QueryUnsure(
 				tabId, okTabId := item.GetTabId()
 
 				if okTabId {
-          if _, trackedFromBefore := c.transactedTabIdIndex[tabId]; trackedFromBefore {
-            continue
-          }
+					if _, trackedFromBefore := c.transactedTabIdIndex[tabId]; trackedFromBefore {
+						continue
+					}
 				}
 			}
 
@@ -346,7 +348,7 @@ func (c *Store) QueryUnsure(
 }
 
 func (c *Store) tryToEmitOneExplicitlyCheckedOut(
-	qg sku.ExternalQuery,
+	qg *query.Group,
 	internal *sku.Transacted,
 	co *CheckedOut,
 	item item,
@@ -394,7 +396,7 @@ func (c *Store) tryToEmitOneExplicitlyCheckedOut(
 }
 
 func (c *Store) tryToEmitOneRecognized(
-	qg sku.ExternalQuery,
+	qg *query.Group,
 	internal *sku.Transacted,
 	co *CheckedOut,
 	item item,
@@ -428,7 +430,7 @@ func (c *Store) tryToEmitOneRecognized(
 }
 
 func (c *Store) tryToEmitOneUntracked(
-	qg sku.ExternalQuery,
+	qg *query.Group,
 	co *CheckedOut,
 	item item,
 	f schnittstellen.FuncIter[sku.CheckedOutLike],
@@ -460,7 +462,7 @@ func (c *Store) tryToEmitOneUntracked(
 }
 
 func (c *Store) tryToEmitOneCommon(
-	qg sku.ExternalQuery,
+	qg *query.Group,
 	co *CheckedOut,
 	i item,
 	overwrite bool,
