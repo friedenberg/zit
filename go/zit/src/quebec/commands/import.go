@@ -224,7 +224,7 @@ func (c Import) importAkteIfNecessary(
 		co.SetError(errors.New("akte sha mismatch"))
 		err = coErrPrinter(co)
 		errors.TodoRecoverable(
-			"sku akte mismatch: %s while akten had %s",
+			"sku akte mismatch: sku had %s while akten had %s",
 			co.Internal.GetAkteSha(),
 			shaRc,
 		)

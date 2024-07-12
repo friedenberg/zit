@@ -23,7 +23,7 @@ function import { # @test
 
 	run_zit show -format bestandsaufnahme-verzeichnisse +:z
 	assert_success
-	echo "$output" >besties
+	echo "$output" | gzip >besties
 
 	besties="$(realpath besties)"
 	akten="$(realpath .zit/Objekten2/Akten)"
@@ -33,7 +33,7 @@ function import { # @test
 	run_zit import \
 		-bestandsaufnahme "$besties" \
 		-akten "$akten" \
-		-compression-type none
+		-compression-type gzip
 
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -69,7 +69,7 @@ function import_one_tai_same { # @test
 
 	run_zit show -format bestandsaufnahme-verzeichnisse one/uno
 	assert_success
-	echo "$output" >besties
+	echo "$output" | gzip >besties
 
 	besties="$(realpath besties)"
 	akten="$(realpath .zit/Objekten2/Akten)"
@@ -79,7 +79,7 @@ function import_one_tai_same { # @test
 	run_zit import \
 		-bestandsaufnahme "$besties" \
 		-akten "$akten" \
-		-compression-type none
+		-compression-type gzip
 
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -111,14 +111,14 @@ function import_twice_no_dupes_one_zettel { # @test
 
 	run_zit show -format bestandsaufnahme-verzeichnisse one/uno+
 	assert_success
-	echo "$output" >besties
+	echo "$output" | gzip >besties
 
 	besties="$(realpath besties)"
 	akten="$(realpath .zit/Objekten2/Akten)"
 
 	pushd inner || exit 1
 
-	run_zit import -bestandsaufnahme "$besties" -akten "$akten" -compression-type none
+	run_zit import -bestandsaufnahme "$besties" -akten "$akten" -compression-type gzip
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[tag-1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -132,7 +132,7 @@ function import_twice_no_dupes_one_zettel { # @test
 		copied Akte 3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 (27 bytes)
 	EOM
 
-	run_zit import -bestandsaufnahme "$besties" -akten "$akten" -compression-type none
+	run_zit import -bestandsaufnahme "$besties" -akten "$akten" -compression-type gzip
 	assert_success
 	assert_output - <<-EOM
 		           exists [one/uno@3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok"]
@@ -161,7 +161,7 @@ function import_conflict { # @test
 
 	run_zit show -format bestandsaufnahme-verzeichnisse one/uno+
 	assert_success
-	echo "$output" >besties
+	echo "$output" | gzip >besties
 
 	besties="$(realpath besties)"
 	akten="$(realpath .zit/Objekten2/Akten)"
@@ -183,7 +183,7 @@ function import_conflict { # @test
 		[one/uno@81c3b19e19b4dd2d8e69f413cd253c67c861ec0066e30f90be23ff62fb7b0cf5 !md "get out of here!" scary]
 	EOM
 
-	run_zit import -bestandsaufnahme "$besties" -akten "$akten" -compression-type none
+	run_zit import -bestandsaufnahme "$besties" -akten "$akten" -compression-type gzip
 	assert_failure
 	assert_output_unsorted - <<-EOM
 		      needs merge [one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
@@ -209,14 +209,14 @@ function import_twice_no_dupes { # @test
 
 	run_zit show -format bestandsaufnahme +:z,e,t,k
 	assert_success
-	echo -n "$output" >besties
+	echo -n "$output" | gzip >besties
 
 	besties="$(realpath besties)"
 	akten="$(realpath .zit/Objekten2/Akten)"
 
 	pushd inner || exit 1
 
-	run_zit import -bestandsaufnahme "$besties" -akten "$akten" -compression-type none
+	run_zit import -bestandsaufnahme "$besties" -akten "$akten" -compression-type gzip
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
@@ -268,7 +268,7 @@ function import_age { # @test
 	skip
 	run_zit show -format bestandsaufnahme +:z,e,t,k
 	assert_success
-	echo -n "$output" >besties
+	echo -n "$output" | gzip >besties
 
 	besties="$(realpath besties)"
 	akten="$(realpath .zit/Objekten2/Akten)"
@@ -279,7 +279,7 @@ function import_age { # @test
 
 	run_zit_init
 
-	run_zit import -bestandsaufnahme "$besties" -akten "$akten" -age-identity "$(cat "$age_id")"
+	run_zit import -bestandsaufnahme "$besties" -akten "$akten" -age-identity "$(cat "$age_id")" -compression-type gzip
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
