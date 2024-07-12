@@ -97,7 +97,7 @@ func (pw *writer) flushBoth() (err error) {
 		pw.writeOne,
 	)
 
-	if err = pw.CopyJustHistoryAndAdded(
+	if err = pw.copyJustHistoryAndAdded(
 		makeFlushQueryGroup(kennung.SigilHistory, kennung.SigilHidden),
 		chain,
 	); err != nil {
@@ -152,7 +152,7 @@ func (pw *writer) updateSigilWithSchwanzen(st skuWithRangeAndSigil) (err error) 
 func (pw *writer) flushJustSchwanz() (err error) {
 	ui.Log().Printf("flushing just schwanz: %s", pw.Path())
 
-	if err = pw.CopyJustHistoryFrom(
+	if err = pw.copyJustHistoryFrom(
 		&pw.Reader,
 		makeFlushQueryGroup(kennung.SigilHistory, kennung.SigilHidden),
 		func(sk skuWithRangeAndSigil) (err error) {

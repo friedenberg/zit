@@ -26,43 +26,17 @@ func (s *Store) Query(
 		}
 	}
 
-	// TODO improve performance by only reading Cwd zettels rather than scanning
-	// everything
-	f1 := func(z *sku.Transacted) (err error) {
-		g := gattung.Must(z.GetGattung())
-		m, ok := qg.Get(g)
-
-		if !ok {
-			return
-		}
-
-		if !m.ContainsSku(z) {
-			return
-		}
-
-		if err = f(z); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-
 	if err = s.GetVerzeichnisse().ReadQuery(
 		qg,
-		f1,
+		qg.MakeEmitSkuSigilSchwanzen(
+			f,
+			kennung.Kasten{},
+			s.UpdateTransactedWithExternal,
+		),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	// for _, vs := range s.virtualStores {
-	// 	// TODO only query story if query group contains store type
-	// 	if err = vs.Query(qg.Group, f1); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return
-	// 	}
-	// }
 
 	return
 }
@@ -78,72 +52,16 @@ func (s *Store) QueryWithKasten(
 		}
 	}
 
-	var f1 schnittstellen.FuncIter[*sku.Transacted]
-
-  // TODO
-
-	// TODO improve performance by only reading Cwd zettels rather than scanning
-	// everything
-	if qg.GetSigil() == kennung.SigilExternal {
-		f1 = func(z *sku.Transacted) (err error) {
-			g := gattung.Must(z.GetGattung())
-			m, ok := qg.Get(g)
-
-			if !ok {
-				return
-			}
-
-			if err = s.UpdateTransactedWithExternal(qg.Kasten, z); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if !m.ContainsSku(z) {
-				return
-			}
-
-			if err = f(z); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		}
-	} else {
-		f1 = func(z *sku.Transacted) (err error) {
-			g := gattung.Must(z.GetGattung())
-			m, ok := qg.QueryGroup.Get(g)
-
-			if !ok {
-				return
-			}
-
-			if m.GetSigil().IncludesExternal() {
-				if err = s.UpdateTransactedWithExternal(qg.Kasten, z); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-
-			if !m.ContainsSku(z) {
-				return
-			}
-
-			if err = f(z); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		}
-	}
-
 	wg := iter.MakeErrorWaitGroupParallel()
 
 	wg.Do(func() (err error) {
 		if err = s.GetVerzeichnisse().ReadQuery(
 			qg.QueryGroup,
-			f1,
+			qg.QueryGroup.MakeEmitSkuIfNecessary(
+				f,
+				qg.Kasten,
+				s.UpdateTransactedWithExternal,
+			),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -151,13 +69,6 @@ func (s *Store) QueryWithKasten(
 
 		return
 	})
-
-	// TODO add untracked and recognized
-	if qg.IncludeRecognized {
-	}
-
-	if !qg.ExcludeUntracked {
-	}
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)

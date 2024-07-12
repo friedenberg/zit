@@ -32,14 +32,14 @@ var binaryFieldOrder = []schlussel.Schlussel{
 	schlussel.VerzeichnisseEtiketten,
 }
 
-func makeFlushQueryGroup(ss ...kennung.Sigil) sku.QueryGroup {
+func makeFlushQueryGroup(ss ...kennung.Sigil) sku.PrimitiveQueryGroup {
 	return &flushQueryGroup{Sigil: kennung.MakeSigil(ss...)}
 }
 
 func makeBinary(s kennung.Sigil) binaryDecoder {
 	return binaryDecoder{
 		PrimitiveQueryGroup: makeFlushQueryGroup(s),
-		Sigil:      s,
+		Sigil:               s,
 	}
 }
 
@@ -190,6 +190,7 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 
 		q, ok := bf.Get(gattung.Must(sk.Transacted))
 
+		// TODO use query to decide whether to read and inflate or skip
 		if ok {
 			qs := q.GetSigil()
 

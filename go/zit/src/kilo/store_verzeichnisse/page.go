@@ -75,7 +75,7 @@ func (pt *Page) CopyJustHistory(
 	return pt.copyHistoryAndMaybeSchwanz(s, w, false, false)
 }
 
-func (pt *Page) CopyJustHistoryFrom(
+func (pt *Page) copyJustHistoryFrom(
 	r io.Reader,
 	s sku.PrimitiveQueryGroup,
 	w schnittstellen.FuncIter[skuWithRangeAndSigil],
@@ -105,7 +105,7 @@ func (pt *Page) CopyJustHistoryFrom(
 	}
 }
 
-func (pt *Page) CopyJustHistoryAndAdded(
+func (pt *Page) copyJustHistoryAndAdded(
 	s sku.PrimitiveQueryGroup,
 	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
@@ -135,7 +135,7 @@ func (pt *Page) copyHistoryAndMaybeSchwanz(
 	br := bufio.NewReader(r)
 
 	if !includeAdded && !includeAddedSchwanz {
-		if err = pt.CopyJustHistoryFrom(
+		if err = pt.copyJustHistoryFrom(
 			br,
 			qg,
 			func(sk skuWithRangeAndSigil) (err error) {

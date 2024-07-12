@@ -28,7 +28,7 @@ type (
 		ContainsKennung(*kennung.Kennung2) bool
 	}
 
-  // Used by store_verzeichnisse.binary*
+	// Used by store_verzeichnisse.binary*
 	PrimitiveQueryGroup interface {
 		Get(gattung.Gattung) (QueryWithSigilAndKennung, bool)
 		SigilGetter
@@ -39,6 +39,22 @@ type (
 		PrimitiveQueryGroup
 		Query
 		SetIncludeHistory()
+		MakeEmitSkuIfNecessary(
+			f schnittstellen.FuncIter[*Transacted],
+			k kennung.Kasten,
+			updateTransacted func(
+				kasten kennung.Kasten,
+				z *Transacted,
+			) (err error),
+		) schnittstellen.FuncIter[*Transacted]
+		MakeEmitSkuSigilSchwanzen(
+			f schnittstellen.FuncIter[*Transacted],
+			k kennung.Kasten,
+			updateTransacted func(
+				kasten kennung.Kasten,
+				z *Transacted,
+			) (err error),
+		) schnittstellen.FuncIter[*Transacted]
 	}
 
 	ExternalQueryOptions struct {

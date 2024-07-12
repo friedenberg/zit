@@ -382,3 +382,97 @@ func (qg *Group) ContainsSku(sk *sku.Transacted) (ok bool) {
 
 	return
 }
+
+// TODO improve performance by only reading Cwd zettels rather than scanning
+// everything
+func (qg *Group) MakeEmitSkuIfNecessary(
+	f schnittstellen.FuncIter[*sku.Transacted],
+	k kennung.Kasten,
+	updateTransacted func(
+		kasten kennung.Kasten,
+		z *sku.Transacted,
+	) (err error),
+) schnittstellen.FuncIter[*sku.Transacted] {
+	// TODO add untracked and recognized
+	// if qg.IncludeRecognized {
+	// }
+
+	// if !qg.ExcludeUntracked {
+	// }
+
+	if qg.GetSigil() == kennung.SigilExternal {
+		return qg.MakeEmitSkuSigilExternal(f, k, updateTransacted)
+	} else {
+		return qg.MakeEmitSkuSigilSchwanzen(f, k, updateTransacted)
+	}
+}
+
+func (qg *Group) MakeEmitSkuSigilSchwanzen(
+	f schnittstellen.FuncIter[*sku.Transacted],
+	k kennung.Kasten,
+	updateTransacted func(
+		kasten kennung.Kasten,
+		z *sku.Transacted,
+	) (err error),
+) schnittstellen.FuncIter[*sku.Transacted] {
+	return func(z *sku.Transacted) (err error) {
+		g := gattung.Must(z.GetGattung())
+		m, ok := qg.Get(g)
+
+		if !ok {
+			return
+		}
+
+		if m.GetSigil().IncludesExternal() {
+			if err = updateTransacted(k, z); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+		if !m.ContainsSku(z) {
+			return
+		}
+
+		if err = f(z); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+}
+
+func (qg *Group) MakeEmitSkuSigilExternal(
+	f schnittstellen.FuncIter[*sku.Transacted],
+	k kennung.Kasten,
+	updateTransacted func(
+		kasten kennung.Kasten,
+		z *sku.Transacted,
+	) (err error),
+) schnittstellen.FuncIter[*sku.Transacted] {
+	return func(z *sku.Transacted) (err error) {
+		g := gattung.Must(z.GetGattung())
+		m, ok := qg.Get(g)
+
+		if !ok {
+			return
+		}
+
+		if err = updateTransacted(k, z); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if !m.ContainsSku(z) {
+			return
+		}
+
+		if err = f(z); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+}
