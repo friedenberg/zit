@@ -83,7 +83,7 @@ func (s *Store) ReadOneInto(
 		}
 
 	default:
-		err = errors.Errorf("unsupported gattung: %q -> %q", k1.GetGattung(), k1)
+		err = gattung.MakeErrUnsupportedGattung(k1)
 		return
 	}
 

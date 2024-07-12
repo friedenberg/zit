@@ -66,8 +66,8 @@ func (a Sigil) Equals(b Sigil) bool {
 	return a == b
 }
 
-func (a *Sigil) IsEmpty() bool {
-	return *a == SigilUnknown
+func (a Sigil) IsEmpty() bool {
+	return a == SigilUnknown
 }
 
 func (a *Sigil) Reset() {

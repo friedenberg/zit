@@ -57,6 +57,7 @@ type Builder struct {
 	doNotMatchEmpty            bool
 	debug                      bool
 	requireNonEmptyQuery       bool
+	eqo                        sku.ExternalQueryOptions
 }
 
 func (b *Builder) WithPermittedSigil(s kennung.Sigil) *Builder {
@@ -195,9 +196,11 @@ func (b *Builder) realizeVirtualEtiketten() (err error) {
 
 func (b *Builder) BuildQueryGroupWithKasten(
 	k kennung.Kasten,
+	eqo sku.ExternalQueryOptions,
 	vs ...string,
 ) (qg *Group, err error) {
 	ok := false
+	b.eqo = eqo
 	b.kasten, ok = b.kastenGetter.GetExternalStore(k)
 
 	if !ok {

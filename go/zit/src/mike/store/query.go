@@ -68,11 +68,11 @@ func (s *Store) Query(
 }
 
 func (s *Store) QueryWithKasten(
-	q sku.ExternalQuery,
+	qg sku.ExternalQuery,
 	f schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
-	if q.QueryGroup == nil {
-		if q.QueryGroup, err = s.queryBuilder.BuildQueryGroup(); err != nil {
+	if qg.QueryGroup == nil {
+		if qg.QueryGroup, err = s.queryBuilder.BuildQueryGroup(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -80,18 +80,20 @@ func (s *Store) QueryWithKasten(
 
 	var f1 schnittstellen.FuncIter[*sku.Transacted]
 
+  // TODO
+
 	// TODO improve performance by only reading Cwd zettels rather than scanning
 	// everything
-	if q.GetSigil() == kennung.SigilExternal {
+	if qg.GetSigil() == kennung.SigilExternal {
 		f1 = func(z *sku.Transacted) (err error) {
 			g := gattung.Must(z.GetGattung())
-			m, ok := q.Get(g)
+			m, ok := qg.Get(g)
 
 			if !ok {
 				return
 			}
 
-			if err = s.UpdateTransactedWithExternal(q.Kasten, z); err != nil {
+			if err = s.UpdateTransactedWithExternal(qg.Kasten, z); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -110,14 +112,14 @@ func (s *Store) QueryWithKasten(
 	} else {
 		f1 = func(z *sku.Transacted) (err error) {
 			g := gattung.Must(z.GetGattung())
-			m, ok := q.QueryGroup.Get(g)
+			m, ok := qg.QueryGroup.Get(g)
 
 			if !ok {
 				return
 			}
 
 			if m.GetSigil().IncludesExternal() {
-				if err = s.UpdateTransactedWithExternal(q.Kasten, z); err != nil {
+				if err = s.UpdateTransactedWithExternal(qg.Kasten, z); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -140,7 +142,7 @@ func (s *Store) QueryWithKasten(
 
 	wg.Do(func() (err error) {
 		if err = s.GetVerzeichnisse().ReadQuery(
-			q.QueryGroup,
+			qg.QueryGroup,
 			f1,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -151,11 +153,11 @@ func (s *Store) QueryWithKasten(
 	})
 
 	// TODO add untracked and recognized
-  if q.IncludeRecognized {
-  }
-  
-  if !q.ExcludeUntracked {
-  }
+	if qg.IncludeRecognized {
+	}
+
+	if !qg.ExcludeUntracked {
+	}
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)

@@ -112,7 +112,6 @@ func (c *Store) tryZettel(
 	dir string,
 	name string,
 	fullPath string,
-	unsure bool,
 ) (err error) {
 	var f *fd.FD
 
@@ -123,7 +122,7 @@ func (c *Store) tryZettel(
 
 	var h kennung.Hinweis
 
-	if h, err = kennung.GetHinweis(f, unsure); err != nil {
+	if h, err = kennung.GetHinweis(f, false); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -153,16 +152,46 @@ func (c *Store) tryZettel(
 		}
 	}
 
-	if unsure {
-		if err = c.unsureZettelen.Add(t); err != nil {
+	if err = c.zettelen.Add(t); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (c *Store) tryZettelUnsure(
+	name string,
+	fullPath string,
+) (err error) {
+	t, ok := c.unsureZettelen.Get(fullPath)
+
+	if !ok {
+		t = &KennungFDPair{}
+	}
+
+	if err = t.Kennung.SetRaw(name); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	ext := strings.TrimPrefix(path.Ext(name), ".")
+
+	if ext == c.fileExtensions.Zettel {
+		if err = t.FDs.Objekte.SetPath(fullPath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if err = c.zettelen.Add(t); err != nil {
+		if err = t.FDs.Akte.SetPath(fullPath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+	}
+
+	if err = c.unsureZettelen.Add(t); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

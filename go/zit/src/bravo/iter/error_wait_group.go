@@ -87,7 +87,7 @@ func (wg *errorWaitGroupParallel) Do(f schnittstellen.FuncError) (d bool) {
 
 	wg.inner.Add(1)
 
-	si, _ := errors.MakeStackInfo(1)
+	si, _ := errors.MakeStackInfo(2)
 
 	go func() {
 		wg.doneWith(si, f())
@@ -101,15 +101,14 @@ func (wg *errorWaitGroupParallel) DoAfter(f schnittstellen.FuncError) {
 	defer wg.lock.Unlock()
 
 	wg.doAfter = append(wg.doAfter, f)
-
-	return
 }
 
 func (wg *errorWaitGroupParallel) doneWith(si errors.StackInfo, err error) {
 	wg.inner.Done()
 
 	if err != nil {
-		wg.err.Add(si.WrapN(2, err))
+		wg.err.Add(err)
+		// wg.err.Add(si.Wrap(err))
 	}
 }
 

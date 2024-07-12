@@ -28,18 +28,27 @@ type (
 		ContainsKennung(*kennung.Kennung2) bool
 	}
 
-	QueryGroup interface {
-		Query
-		HasHidden() bool
+  // Used by store_verzeichnisse.binary*
+	PrimitiveQueryGroup interface {
 		Get(gattung.Gattung) (QueryWithSigilAndKennung, bool)
 		SigilGetter
+		HasHidden() bool
+	}
+
+	QueryGroup interface {
+		PrimitiveQueryGroup
+		Query
 		SetIncludeHistory()
+	}
+
+	ExternalQueryOptions struct {
+		ExcludeUntracked  bool
+		IncludeRecognized bool
 	}
 
 	ExternalQuery struct {
 		kennung.Kasten
 		QueryGroup
-		ExcludeUntracked  bool
-		IncludeRecognized bool
+		ExternalQueryOptions
 	}
 )

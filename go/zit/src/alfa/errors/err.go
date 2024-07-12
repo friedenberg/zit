@@ -65,12 +65,35 @@ func Errorf(f string, values ...interface{}) (err errer) {
 	return
 }
 
-func wrapf(se stackWrapError, in error, f string, values ...interface{}) (err errer) {
+func wrapf(
+	se stackWrapError,
+	in error,
+	f string,
+	values ...interface{},
+) (err errer) {
 	// TODO-P2 case where values are present but f is ""
 	if f != "" {
 		se.error = fmt.Errorf(f, values...)
 	}
 
+	if As(in, &err) {
+		in = se
+	} else {
+		in = wrapped{
+			outer: se,
+			inner: in,
+		}
+	}
+
+	err.errers = append(err.errers, in)
+
+	return
+}
+
+func wrapWithStack(
+	se stackWrapError,
+	in error,
+) (err errer) {
 	if As(in, &err) {
 		in = se
 	} else {

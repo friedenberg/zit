@@ -103,21 +103,30 @@ func (si StackInfo) String() string {
 	}
 
 	// TODO-P3 determine if si.line is ever not valid
-	return fmt.Sprintf("%s%s:%d: ", testPrefix, filename, si.Line)
-}
-
-func (si StackInfo) WrapN(skip int, in error) (err errer) {
-	se := stackWrapError{StackInfo: si}
-	err = wrapf(se, in, "")
-
-	se, _ = newStackWrapError(skip + 1)
-	err = wrapf(se, err, "")
-
-	return
+	return fmt.Sprintf(
+		"# %s\n%s%s:%d",
+		si.Function,
+		testPrefix,
+		filename,
+		si.Line,
+	)
 }
 
 func (si StackInfo) Wrap(in error) (err errer) {
-	return si.WrapN(1, in)
+	se := stackWrapError{StackInfo: si}
+
+	if As(in, &err) {
+		in = se
+	} else {
+		in = wrapped{
+			outer: se,
+			inner: in,
+		}
+	}
+
+	err.errers = append(err.errers, in)
+
+	return
 }
 
 func (si StackInfo) Wrapf(in error, f string, values ...interface{}) (err errer) {
@@ -164,32 +173,16 @@ func (se stackWrapError) Unwrap() error {
 	return se.error
 }
 
+// TODO use StackInfo.String() method
 func (se stackWrapError) Error() string {
 	sb := &strings.Builder{}
 
-	// sb.WriteString("# ")
-	// sb.WriteString(se.pakkage)
-	// sb.WriteString("\n")
-
-	sb.WriteString("# ")
-	sb.WriteString(se.Function)
-	sb.WriteString("\n")
-
-	if se.RelFilename != "" {
-		sb.WriteString(se.RelFilename)
-	} else {
-		sb.WriteString(se.Filename)
-	}
-
-	sb.WriteString(":")
-	fmt.Fprintf(sb, "%d", se.Line)
+	sb.WriteString(se.StackInfo.String())
 
 	if se.error != nil {
-		sb.WriteString(" ")
+		sb.WriteString(": ")
 		sb.WriteString(se.error.Error())
 	}
-
-	// sb.WriteString("\n")
 
 	return sb.String()
 }

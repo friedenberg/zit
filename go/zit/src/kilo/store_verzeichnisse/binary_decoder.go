@@ -38,20 +38,23 @@ func makeFlushQueryGroup(ss ...kennung.Sigil) sku.QueryGroup {
 
 func makeBinary(s kennung.Sigil) binaryDecoder {
 	return binaryDecoder{
-		QueryGroup: makeFlushQueryGroup(s),
+		PrimitiveQueryGroup: makeFlushQueryGroup(s),
 		Sigil:      s,
 	}
 }
 
-func makeBinaryWithQueryGroup(qg sku.QueryGroup, s kennung.Sigil) binaryDecoder {
+func makeBinaryWithQueryGroup(
+	qg sku.PrimitiveQueryGroup,
+	s kennung.Sigil,
+) binaryDecoder {
 	ui.Log().Print(qg)
 	if !qg.HasHidden() {
 		s.Add(kennung.SigilHidden)
 	}
 
 	return binaryDecoder{
-		QueryGroup: qg,
-		Sigil:      s,
+		PrimitiveQueryGroup: qg,
+		Sigil:               s,
 	}
 }
 
@@ -59,7 +62,7 @@ type binaryDecoder struct {
 	bytes.Buffer
 	binaryField
 	kennung.Sigil
-	sku.QueryGroup
+	sku.PrimitiveQueryGroup
 	io.LimitedReader
 }
 

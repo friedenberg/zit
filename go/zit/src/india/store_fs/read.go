@@ -36,6 +36,8 @@ func (s *Store) ApplyCheckedOut(
 		return
 	}
 
+	// ui.Debug().Print(qg, qg.ContainsSku(&co.External.Transacted), co)
+
 	if !qg.ContainsSku(&co.External.Transacted) {
 		return
 	}

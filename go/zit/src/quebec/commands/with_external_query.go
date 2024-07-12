@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
@@ -70,7 +71,10 @@ func (c commandWithExternalQuery) Complete(
 
 	var qg *query.Group
 
-	if qg, err = b.BuildQueryGroupWithKasten(c.Kasten); err != nil {
+	if qg, err = b.BuildQueryGroupWithKasten(
+    c.Kasten,
+    c.ExternalQueryOptions,
+  ); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -103,6 +107,7 @@ func (c commandWithExternalQuery) Run(u *umwelt.Umwelt, args ...string) (err err
 
 	if c.QueryGroup, err = b.BuildQueryGroupWithKasten(
 		c.Kasten,
+    c.ExternalQueryOptions,
 		args...,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -110,6 +115,7 @@ func (c commandWithExternalQuery) Run(u *umwelt.Umwelt, args ...string) (err err
 	}
 
 	if err = c.RunWithExternalQuery(u, c.ExternalQuery); err != nil {
+    ui.Debug().Printf("%#v", err)
 		err = errors.Wrap(err)
 		return
 	}

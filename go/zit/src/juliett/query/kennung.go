@@ -15,8 +15,7 @@ type Kennung struct {
 	Virtual  bool
 	Debug    bool
 	External bool
-	// TODO [ces/mew] switch to kasten parsing ID's before body
-	// FD      *fd.FD
+
 	*kennung.Kennung2
 }
 

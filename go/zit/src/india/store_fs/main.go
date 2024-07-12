@@ -328,13 +328,7 @@ func (fs *Store) Get(
 		return
 
 	default:
-		err := errors.Wrapf(
-			gattung.MakeErrUnsupportedGattung(g),
-			"Kennung: %q",
-			k,
-		)
-
-		panic(err)
+		return fs.unsureZettelen.Get(k.String())
 	}
 }
 
@@ -370,6 +364,14 @@ func (fs *Store) All(
 	iter.ErrorWaitGroupApply(
 		wg,
 		fs.etiketten,
+		func(e *KennungFDPair) (err error) {
+			return f(e)
+		},
+	)
+
+	iter.ErrorWaitGroupApply(
+		wg,
+		fs.unsureZettelen,
 		func(e *KennungFDPair) (err error) {
 			return f(e)
 		},
@@ -631,7 +633,7 @@ func (fs *Store) readNotSecondLevelFile(name string) (err error) {
 		}
 
 	case fs.fileExtensions.Zettel:
-		if err = fs.tryZettel(fs.dir, name, fullPath, true); err != nil {
+		if err = fs.tryZettelUnsure(name, fullPath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -696,7 +698,7 @@ func (fs *Store) readSecondLevelFile(dir string, name string) (err error) {
 
 		// Zettel-Akten can have any extension, and so default is Zettel
 	default:
-		if err = fs.tryZettel(dir, name, fullPath, false); err != nil {
+		if err = fs.tryZettel(dir, name, fullPath); err != nil {
 			if err = fs.addUnsureAkten(dir, name); err != nil {
 				err = errors.Wrap(err)
 				return

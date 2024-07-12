@@ -1,6 +1,12 @@
 package store_fs
 
 import (
+	"path"
+	"path/filepath"
+	"strings"
+
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 )
@@ -44,4 +50,52 @@ func (e *KennungFDPair) GetObjekteFD() *fd.FD {
 
 func (e *KennungFDPair) GetAkteFD() *fd.FD {
 	return &e.FDs.Akte
+}
+
+func (e *KennungFDPair) SetKennungFromFullPath(
+	fullPath string,
+	allowErrors bool,
+) (err error) {
+	var f *fd.FD
+
+	if f, err = fd.FDFromPath(fullPath); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	parts := strings.Split(f.GetPath(), string(filepath.Separator))
+
+	switch len(parts) {
+	case 0, 1:
+		err = errors.Errorf("not enough parts: %q", parts)
+		return
+
+	default:
+		parts = parts[len(parts)-2:]
+	}
+
+	p := strings.Join(parts, string(filepath.Separator))
+
+	p1 := p
+	ext := path.Ext(p)
+
+	if len(ext) != 0 {
+		p1 = p[:len(p)-len(ext)]
+	}
+
+	e.Kennung.SetGattung(gattung.Zettel)
+
+	if err = e.Kennung.Set(p1); err != nil {
+		if allowErrors {
+			if err = e.Kennung.SetRaw(p1); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
 }

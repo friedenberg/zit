@@ -19,6 +19,7 @@ cmd_bats=(
 
 if ! bats_run="$("${cmd_bats[@]}" 2>&1)"; then
   echo "$bats_run" >&2
+  exit 1
 else
   bats_dir="$(echo "$bats_run" | grep "BATS_RUN_TMPDIR" | cut -d' ' -f2)"
 fi

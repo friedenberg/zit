@@ -271,7 +271,7 @@ func (i *Store) Add(
 }
 
 func (i *Store) readFrom(
-	qg sku.QueryGroup,
+	qg sku.PrimitiveQueryGroup,
 	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	wg := &sync.WaitGroup{}
@@ -342,7 +342,7 @@ func (i *Store) readFrom(
 }
 
 func (i *Store) ReadQuery(
-	qg sku.QueryGroup,
+	qg sku.PrimitiveQueryGroup,
 	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return i.readFrom(qg, w)

@@ -69,7 +69,7 @@ func (pt *Page) waitingToAddLen() int {
 }
 
 func (pt *Page) CopyJustHistory(
-	s sku.QueryGroup,
+	s sku.PrimitiveQueryGroup,
 	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return pt.copyHistoryAndMaybeSchwanz(s, w, false, false)
@@ -77,7 +77,7 @@ func (pt *Page) CopyJustHistory(
 
 func (pt *Page) CopyJustHistoryFrom(
 	r io.Reader,
-	s sku.QueryGroup,
+	s sku.PrimitiveQueryGroup,
 	w schnittstellen.FuncIter[skuWithRangeAndSigil],
 ) (err error) {
 	dec := makeBinaryWithQueryGroup(s, kennung.SigilHistory)
@@ -106,14 +106,14 @@ func (pt *Page) CopyJustHistoryFrom(
 }
 
 func (pt *Page) CopyJustHistoryAndAdded(
-	s sku.QueryGroup,
+	s sku.PrimitiveQueryGroup,
 	w schnittstellen.FuncIter[*sku.Transacted],
 ) (err error) {
 	return pt.copyHistoryAndMaybeSchwanz(s, w, true, false)
 }
 
 func (pt *Page) copyHistoryAndMaybeSchwanz(
-	qg sku.QueryGroup,
+	qg sku.PrimitiveQueryGroup,
 	w schnittstellen.FuncIter[*sku.Transacted],
 	includeAdded bool,
 	includeAddedSchwanz bool,
