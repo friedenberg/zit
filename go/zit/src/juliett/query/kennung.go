@@ -30,7 +30,7 @@ func (k Kennung) Reduce(b *Builder) (err error) {
 
 // TODO support exact
 func (k Kennung) ContainsSku(sk *sku.Transacted) (ok bool) {
-	defer sk.Metadatei.Cached.QueryPath.PushOnOk(k, &ok)
+	defer sk.Metadatei.Cache.QueryPath.PushOnOk(k, &ok)
 
 	me := sk.GetMetadata()
 
@@ -39,16 +39,16 @@ func (k Kennung) ContainsSku(sk *sku.Transacted) (ok bool) {
 		var idx int
 
 		if k.Exact {
-			idx, ok = me.Cached.Etiketten.All.ContainsKennungEtikettExact(
+			idx, ok = me.Cache.TagPaths.All.ContainsKennungEtikettExact(
 				k.ObjectId,
 			)
 		} else {
-			idx, ok = me.Cached.Etiketten.All.ContainsKennungEtikett(
+			idx, ok = me.Cache.TagPaths.All.ContainsKennungEtikett(
 				k.ObjectId,
 			)
 		}
 
-		ui.Log().Print(k, idx, ok, me.Cached.Etiketten.All, sk)
+		ui.Log().Print(k, idx, ok, me.Cache.TagPaths.All, sk)
 
 		if ok {
 			// if k.Exact {
@@ -56,8 +56,8 @@ func (k Kennung) ContainsSku(sk *sku.Transacted) (ok bool) {
 			// 	ui.Debug().Print(ewp, sk)
 			// }
 
-			ps := me.Cached.Etiketten.All[idx]
-			sk.Metadatei.Cached.QueryPath.Push(ps.Parents)
+			ps := me.Cache.TagPaths.All[idx]
+			sk.Metadatei.Cache.QueryPath.Push(ps.Parents)
 			return
 		}
 

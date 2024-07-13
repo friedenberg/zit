@@ -31,7 +31,7 @@ func (j *Json) FromStringAndMetadatei(
 ) (err error) {
 	var r sha.ReadCloser
 
-	if r, err = s.BlobReader(&m.Akte); err != nil {
+	if r, err = s.BlobReader(&m.Blob); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -46,11 +46,11 @@ func (j *Json) FromStringAndMetadatei(
 	}
 
 	j.Akte = out.String()
-	j.AkteSha = m.Akte.String()
+	j.AkteSha = m.Blob.String()
 	j.Bezeichnung = m.Description.String()
 	j.Etiketten = iter.Strings(m.GetEtiketten())
 	j.Kennung = k
-	j.Sha = m.SelbstMetadateiSansTai.String()
+	j.Sha = m.SelfMetadataWithoutTai.String()
 	j.Tai = m.Tai.String()
 	j.Typ = m.Type.String()
 

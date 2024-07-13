@@ -33,11 +33,11 @@ func (f v5) FormatPersistentMetadatei(
 		n2 int64
 	)
 
-	if !m.Akte.IsNull() {
+	if !m.Blob.IsNull() {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			w,
 			keyAkte.String(),
-			m.Akte.String(),
+			m.Blob.String(),
 		)
 		n += int64(n1)
 
@@ -154,11 +154,11 @@ func (f v5) FormatPersistentMetadatei(
 	}
 
 	if o.Verzeichnisse {
-		if m.Cached.Schlummernd.Bool() {
+		if m.Cache.Dormant.Bool() {
 			n1, err = ohio.WriteKeySpaceValueNewlineString(
 				w,
 				keyVerzeichnisseArchiviert.String(),
-				m.Cached.Schlummernd.String(),
+				m.Cache.Dormant.String(),
 			)
 			n += int64(n1)
 
@@ -168,11 +168,11 @@ func (f v5) FormatPersistentMetadatei(
 			}
 		}
 
-		if m.Cached.GetExpandedEtiketten().Len() > 0 {
+		if m.Cache.GetExpandedTags().Len() > 0 {
 			k := keyVerzeichnisseEtikettExpanded.String()
 
 			for _, e := range iter.SortedValues[ids.Tag](
-				m.Cached.GetExpandedEtiketten(),
+				m.Cache.GetExpandedTags(),
 			) {
 				n1, err = ohio.WriteKeySpaceValueNewlineString(
 					w,
@@ -188,11 +188,11 @@ func (f v5) FormatPersistentMetadatei(
 			}
 		}
 
-		if m.Cached.GetImplicitEtiketten().Len() > 0 {
+		if m.Cache.GetImplicitTags().Len() > 0 {
 			k := keyVerzeichnisseEtikettImplicit.String()
 
 			for _, e := range iter.SortedValues[ids.Tag](
-				m.Cached.GetImplicitEtiketten(),
+				m.Cache.GetImplicitTags(),
 			) {
 				n2, err = ohio.WriteKeySpaceValueNewline(
 					w,
@@ -305,7 +305,7 @@ func (f v5) ParsePersistentMetadatei(
 
 		switch {
 		case key.Equal(keyAkte.Bytes()):
-			if err = m.Akte.SetHexBytes(valBuffer.Bytes()); err != nil {
+			if err = m.Blob.SetHexBytes(valBuffer.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -362,7 +362,7 @@ func (f v5) ParsePersistentMetadatei(
 			}
 
 		case key.Equal(keyVerzeichnisseArchiviert.Bytes()):
-			if err = m.Cached.Schlummernd.Set(val.String()); err != nil {
+			if err = m.Cache.Dormant.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -383,7 +383,7 @@ func (f v5) ParsePersistentMetadatei(
 				return
 			}
 
-			if err = m.Cached.AddEtikettImplicitPtr(e); err != nil {
+			if err = m.Cache.AddTagsImplicitPtr(e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -404,7 +404,7 @@ func (f v5) ParsePersistentMetadatei(
 				return
 			}
 
-			if err = m.Cached.AddEtikettExpandedPtr(e); err != nil {
+			if err = m.Cache.AddTagExpandedPtr(e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

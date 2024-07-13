@@ -31,7 +31,7 @@ func ToLuaTable(o *sku.Transacted, l *lua.LState, t *LuaTable) {
 
 	etiketten = t.EtikettenImplicit
 
-	o.Metadatei.Cached.GetImplicitEtiketten().EachPtr(
+	o.Metadatei.Cache.GetImplicitTags().EachPtr(
 		func(e *ids.Tag) (err error) {
 			l.SetField(etiketten, e.String(), lua.LBool(true))
 			return

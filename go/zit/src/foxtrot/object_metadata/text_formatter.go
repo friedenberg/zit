@@ -15,16 +15,16 @@ type textFormatter struct {
 
 func MakeTextFormatterMetadateiAktePath(
 	options TextFormatterOptions,
-	akteFactory interfaces.BlobReaderFactory,
-	akteFormatter script_config.RemoteScript,
+	blobReaderFactory interfaces.BlobReaderFactory,
+	blobFormatter script_config.RemoteScript,
 ) textFormatter {
-	if akteFactory == nil {
+	if blobReaderFactory == nil {
 		panic("akte reader factory is nil")
 	}
 
 	common := textFormatterCommon{
-		akteFactory:          akteFactory,
-		akteFormatter:        akteFormatter,
+		blobFactory:          blobReaderFactory,
+		blobFormatter:        blobFormatter,
 		TextFormatterOptions: options,
 	}
 
@@ -32,26 +32,26 @@ func MakeTextFormatterMetadateiAktePath(
 		textFormatterCommon: common,
 		sequence: []interfaces.FuncWriterElementInterface[TextFormatterContext]{
 			common.writeBoundary,
-			common.writeCommonMetadateiFormat,
-			common.writePathTyp,
+			common.writeCommonMetadataFormat,
+			common.writePathType,
 			common.writeComments,
 			common.writeBoundary,
 		},
 	}
 }
 
-func MakeTextFormatterMetadateiOnly(
+func MakeTextFormatterMetadataOnly(
 	options TextFormatterOptions,
-	akteFactory interfaces.BlobReaderFactory,
-	akteFormatter script_config.RemoteScript,
+	blobReaderFactory interfaces.BlobReaderFactory,
+	blobFormatter script_config.RemoteScript,
 ) textFormatter {
-	if akteFactory == nil {
+	if blobReaderFactory == nil {
 		panic("akte reader factory is nil")
 	}
 
 	common := textFormatterCommon{
-		akteFactory:          akteFactory,
-		akteFormatter:        akteFormatter,
+		blobFactory:          blobReaderFactory,
+		blobFormatter:        blobFormatter,
 		TextFormatterOptions: options,
 	}
 
@@ -59,7 +59,7 @@ func MakeTextFormatterMetadateiOnly(
 		textFormatterCommon: common,
 		sequence: []interfaces.FuncWriterElementInterface[TextFormatterContext]{
 			common.writeBoundary,
-			common.writeCommonMetadateiFormat,
+			common.writeCommonMetadataFormat,
 			common.writeShaTyp,
 			common.writeComments,
 			common.writeBoundary,
@@ -67,18 +67,18 @@ func MakeTextFormatterMetadateiOnly(
 	}
 }
 
-func MakeTextFormatterMetadateiInlineBlob(
+func MakeTextFormatterMetadataInlineBlob(
 	options TextFormatterOptions,
-	akteFactory interfaces.BlobReaderFactory,
-	akteFormatter script_config.RemoteScript,
+	blobReaderFactory interfaces.BlobReaderFactory,
+	blobFormatter script_config.RemoteScript,
 ) textFormatter {
-	if akteFactory == nil {
-		panic("akte reader factory is nil")
+	if blobReaderFactory == nil {
+		panic("blob reader factory is nil")
 	}
 
 	common := textFormatterCommon{
-		akteFactory:          akteFactory,
-		akteFormatter:        akteFormatter,
+		blobFactory:          blobReaderFactory,
+		blobFormatter:        blobFormatter,
 		TextFormatterOptions: options,
 	}
 
@@ -86,7 +86,7 @@ func MakeTextFormatterMetadateiInlineBlob(
 		textFormatterCommon: common,
 		sequence: []interfaces.FuncWriterElementInterface[TextFormatterContext]{
 			common.writeBoundary,
-			common.writeCommonMetadateiFormat,
+			common.writeCommonMetadataFormat,
 			common.writeTyp,
 			common.writeComments,
 			common.writeBoundary,
@@ -96,18 +96,18 @@ func MakeTextFormatterMetadateiInlineBlob(
 	}
 }
 
-func MakeTextFormatterExcludeMetadatei(
+func MakeTextFormatterExcludeMetadata(
 	options TextFormatterOptions,
-	akteFactory interfaces.BlobReaderFactory,
-	akteFormatter script_config.RemoteScript,
+	blobFactory interfaces.BlobReaderFactory,
+	blobFormatter script_config.RemoteScript,
 ) textFormatter {
-	if akteFactory == nil {
-		panic("akte reader factory is nil")
+	if blobFactory == nil {
+		panic("blob reader factory is nil")
 	}
 
 	common := textFormatterCommon{
-		akteFactory:          akteFactory,
-		akteFormatter:        akteFormatter,
+		blobFactory:          blobFactory,
+		blobFormatter:        blobFormatter,
 		TextFormatterOptions: options,
 	}
 
@@ -119,7 +119,7 @@ func MakeTextFormatterExcludeMetadatei(
 	}
 }
 
-func (f textFormatter) FormatMetadatei(
+func (f textFormatter) FormatMetadata(
 	w io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {

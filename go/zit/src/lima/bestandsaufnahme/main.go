@@ -263,7 +263,7 @@ func (s *store) ReadOneSku(besty, sh *sha.Sha) (o *sku.Transacted, err error) {
 
 	var ar interfaces.ShaReadCloser
 
-	if ar, err = s.af.BlobReader(&bestySku.Metadatei.Akte); err != nil {
+	if ar, err = s.af.BlobReader(&bestySku.Metadatei.Blob); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

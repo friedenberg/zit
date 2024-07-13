@@ -18,9 +18,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
-type MetadateiWriterTo interface {
+type MetadataWriterTo interface {
 	io.WriterTo
-	HasMetadateiContent() bool
+	HasMetadataContent() bool
 }
 
 type Metadata struct {
@@ -28,14 +28,14 @@ type Metadata struct {
 	// Domain
 	RepoId      ids.RepoId
 	Description descriptions.Description
-	Tags   ids.TagMutableSet // public for gob, but should be private
-	Type         ids.Type
+	Tags        ids.TagMutableSet // public for gob, but should be private
+	Type        ids.Type
 
 	Shas
 	Tai ids.Tai
 
-	Comments      []string
-	Cached Verzeichnisse
+	Comments []string
+	Cache    Cache
 }
 
 func (m *Metadata) GetMetadata() *Metadata {
@@ -43,25 +43,25 @@ func (m *Metadata) GetMetadata() *Metadata {
 }
 
 func (m *Metadata) Sha() *sha.Sha {
-	return &m.SelbstMetadateiKennungMutter
+	return &m.SelfMetadataObjectIdParent
 }
 
 func (m *Metadata) Mutter() *sha.Sha {
-	return &m.MutterMetadateiKennungMutter
+	return &m.ParentMetadataObjectIdParent
 }
 
 func (m *Metadata) AddToFlagSet(f *flag.FlagSet) {
 	f.Var(
 		&m.Description,
 		"bezeichnung",
-		"the Bezeichnung to use for created or updated Zettelen",
+		"the Bezeichnung to use for created or updated Zettels",
 	)
 
 	// TODO add support for etiketten_path
 	fes := flag2.Make(
 		flag_policy.FlagPolicyAppend,
 		func() string {
-			return m.Cached.Etiketten.String()
+			return m.Cache.TagPaths.String()
 		},
 		func(v string) (err error) {
 			vs := strings.Split(v, ",")
@@ -112,7 +112,7 @@ func (z *Metadata) UserInputIsEmpty() bool {
 }
 
 func (z *Metadata) IsEmpty() bool {
-	if !z.Akte.IsNull() {
+	if !z.Blob.IsNull() {
 		return false
 	}
 
@@ -157,7 +157,7 @@ func (m *Metadata) ResetEtiketten() {
 	}
 
 	m.Tags.Reset()
-	m.Cached.Etiketten.Reset()
+	m.Cache.TagPaths.Reset()
 }
 
 func (z *Metadata) AddEtikettString(es string) (err error) {
@@ -191,7 +191,7 @@ func (m *Metadata) AddEtikettPtr(e *ids.Tag) (err error) {
 
 	ids.AddNormalizedEtikett(m.Tags, e)
 	cs := catgut.MakeFromString(e.String())
-	m.Cached.Etiketten.AddEtikett(cs)
+	m.Cache.TagPaths.AddEtikett(cs)
 
 	return
 }
@@ -208,7 +208,7 @@ func (m *Metadata) AddEtikettPtrFast(e *ids.Tag) (err error) {
 
 	cs := catgut.MakeFromString(e.String())
 
-	if err = m.Cached.Etiketten.AddEtikett(cs); err != nil {
+	if err = m.Cache.TagPaths.AddEtikett(cs); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -235,7 +235,7 @@ func (m *Metadata) SetEtiketten(e ids.TagSet) {
 }
 
 func (z *Metadata) SetAkteSha(sh interfaces.ShaGetter) {
-	z.Akte.SetShaLike(sh)
+	z.Blob.SetShaLike(sh)
 }
 
 func (z *Metadata) GetTyp() ids.Type {
@@ -289,8 +289,8 @@ func (selbst *Metadata) SetMutter(mg Getter) (err error) {
 		return
 	}
 
-	if err = selbst.MutterMetadateiKennungMutter.SetShaLike(
-		&mutter.SelbstMetadateiKennungMutter,
+	if err = selbst.ParentMetadataObjectIdParent.SetShaLike(
+		&mutter.SelfMetadataObjectIdParent,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -300,7 +300,7 @@ func (selbst *Metadata) SetMutter(mg Getter) (err error) {
 }
 
 func (m *Metadata) GenerateExpandedEtiketten() {
-	m.Cached.SetExpandedEtiketten(ids.ExpandMany(
+	m.Cache.SetExpandedTags(ids.ExpandMany(
 		m.GetEtiketten(),
 		expansion.ExpanderRight,
 	))

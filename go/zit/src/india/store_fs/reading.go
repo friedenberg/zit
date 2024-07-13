@@ -207,7 +207,7 @@ func (s *Store) ReadOneExternalObjekteReader(
 	r io.Reader,
 	e *External,
 ) (err error) {
-	if _, err = s.metadateiTextParser.ParseMetadatei(r, e); err != nil {
+	if _, err = s.metadateiTextParser.ParseMetadata(r, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -246,7 +246,7 @@ func (s *Store) ReadOneExternalAkte(
 		return
 	}
 
-	e.GetMetadata().Akte.SetShaLike(aw)
+	e.GetMetadata().Blob.SetShaLike(aw)
 
 	return
 }

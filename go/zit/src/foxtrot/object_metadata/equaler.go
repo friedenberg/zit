@@ -28,9 +28,9 @@ func (e equaler) Equals(a, b *Metadata) bool {
 		return false
 	}
 
-	if !a.Akte.EqualsSha(&b.Akte) {
+	if !a.Blob.EqualsSha(&b.Blob) {
 		if debug {
-			ui.Debug().Print(&a.Akte, "->", &b.Akte)
+			ui.Debug().Print(&a.Blob, "->", &b.Blob)
 		}
 		return false
 	}

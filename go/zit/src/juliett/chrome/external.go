@@ -55,7 +55,7 @@ func (e *External) SaveAkte(s fs_home.Standort) (err error) {
 		}
 	}()
 
-	e.Metadatei.Akte.SetShaLike(aw)
+	e.Metadatei.Blob.SetShaLike(aw)
 
 	return
 }
@@ -128,7 +128,7 @@ func (a *External) String() string {
 }
 
 func (a *External) GetAkteSha() interfaces.Sha {
-	return &a.Metadatei.Akte
+	return &a.Metadatei.Blob
 }
 
 // func (a *External) SetAkteSha(v schnittstellen.ShaLike) (err error) {

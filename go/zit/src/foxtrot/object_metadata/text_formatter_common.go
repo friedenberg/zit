@@ -18,8 +18,8 @@ import (
 
 type textFormatterCommon struct {
 	fs_home       fs_home.Standort
-	akteFactory   interfaces.BlobReaderFactory
-	akteFormatter script_config.RemoteScript
+	blobFactory   interfaces.BlobReaderFactory
+	blobFormatter script_config.RemoteScript
 	TextFormatterOptions
 }
 
@@ -69,7 +69,7 @@ func (f textFormatterCommon) writeNewLine(
 	return ohio.WriteLine(w1, "")
 }
 
-func (f textFormatterCommon) writeCommonMetadateiFormat(
+func (f textFormatterCommon) writeCommonMetadataFormat(
 	w1 io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {
@@ -133,10 +133,10 @@ func (f textFormatterCommon) writeShaTyp(
 	c TextFormatterContext,
 ) (n int64, err error) {
 	m := c.GetMetadata()
-	return ohio.WriteLine(w1, fmt.Sprintf("! %s.%s", &m.Akte, m.Type))
+	return ohio.WriteLine(w1, fmt.Sprintf("! %s.%s", &m.Blob, m.Type))
 }
 
-func (f textFormatterCommon) writePathTyp(
+func (f textFormatterCommon) writePathType(
 	w1 io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {
@@ -159,7 +159,7 @@ func (f textFormatterCommon) writeAkte(
 	var ar io.ReadCloser
 	m := c.GetMetadata()
 
-	if ar, err = f.akteFactory.BlobReader(&m.Akte); err != nil {
+	if ar, err = f.blobFactory.BlobReader(&m.Blob); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -171,11 +171,11 @@ func (f textFormatterCommon) writeAkte(
 
 	defer errors.DeferredCloser(&err, ar)
 
-	if f.akteFormatter != nil {
+	if f.blobFormatter != nil {
 		var wt io.WriterTo
 
 		if wt, err = script_config.MakeWriterToWithStdin(
-			f.akteFormatter,
+			f.blobFormatter,
 			map[string]string{
 				"ZIT_BIN": f.fs_home.Executable(),
 			},

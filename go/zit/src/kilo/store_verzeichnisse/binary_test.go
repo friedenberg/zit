@@ -22,7 +22,7 @@ func TestBinaryOne(t1 *testing.T) {
 	{
 		t.AssertNoError(expected.Kennung.SetWithIdLike(ids.MustZettelId("one/uno")))
 		expected.SetTai(ids.NowTai())
-		t.AssertNoError(expected.Metadatei.Akte.Set(
+		t.AssertNoError(expected.Metadatei.Blob.Set(
 			"ed500e315f33358824203cee073893311e0a80d77989dc55c5d86247d95b2403",
 		))
 		t.AssertNoError(expected.Metadatei.Type.Set("da-typ"))

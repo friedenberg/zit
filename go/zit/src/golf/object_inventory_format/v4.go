@@ -33,11 +33,11 @@ func (f v4) FormatPersistentMetadatei(
 		n2 int64
 	)
 
-	if !m.Akte.IsNull() {
+	if !m.Blob.IsNull() {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,
 			keyAkte.String(),
-			m.Akte.String(),
+			m.Blob.String(),
 		)
 		n += int64(n1)
 
@@ -150,11 +150,11 @@ func (f v4) FormatPersistentMetadatei(
 	}
 
 	if o.Verzeichnisse {
-		if m.Cached.Schlummernd.Bool() {
+		if m.Cache.Dormant.Bool() {
 			n1, err = ohio.WriteKeySpaceValueNewlineString(
 				w,
 				keyVerzeichnisseArchiviert.String(),
-				m.Cached.Schlummernd.String(),
+				m.Cache.Dormant.String(),
 			)
 			n += int64(n1)
 
@@ -164,11 +164,11 @@ func (f v4) FormatPersistentMetadatei(
 			}
 		}
 
-		if m.Cached.GetExpandedEtiketten().Len() > 0 {
+		if m.Cache.GetExpandedTags().Len() > 0 {
 			k := keyVerzeichnisseEtikettExpanded.String()
 
 			for _, e := range iter.SortedValues[ids.Tag](
-				m.Cached.GetExpandedEtiketten(),
+				m.Cache.GetExpandedTags(),
 			) {
 				n1, err = ohio.WriteKeySpaceValueNewlineString(
 					w,
@@ -184,11 +184,11 @@ func (f v4) FormatPersistentMetadatei(
 			}
 		}
 
-		if m.Cached.GetImplicitEtiketten().Len() > 0 {
+		if m.Cache.GetImplicitTags().Len() > 0 {
 			k := keyVerzeichnisseEtikettImplicit.String()
 
 			for _, e := range iter.SortedValues[ids.Tag](
-				m.Cached.GetImplicitEtiketten(),
+				m.Cache.GetImplicitTags(),
 			) {
 				n2, err = ohio.WriteKeySpaceValueNewline(
 					w,

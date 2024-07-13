@@ -203,7 +203,7 @@ func (s *ennuiStore) WriteOneObjekteMetadatei(o *sku.Transacted) (err error) {
 		s.fs_home.DirVerzeichnisseMetadatei(),
 		object_inventory_format.Formats.Metadatei(),
 		o,
-		&o.Metadatei.SelbstMetadatei,
+		&o.Metadatei.SelfMetadata,
 	))
 
 	return wg.GetError()

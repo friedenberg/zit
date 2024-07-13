@@ -42,12 +42,12 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 	r1.stringFormatReader = &t.skuFmt
 
 	mr := object_metadata.Reader{
-		Metadatei: &t.Metadatei,
-		Akte:      r1,
+		Metadata: &t.Metadatei,
+		Blob:     r1,
 	}
 
 	var n1 int64
-	n1, err = mr.ReadMetadateiFrom(&r)
+	n1, err = mr.ReadMetadataFrom(&r)
 	n += n1
 
 	if err != nil {
@@ -90,7 +90,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 
 	l := ot.MaxLen()
 
-	omit := ot.UseMetadateiHeader && ot.HasMetadateiContent()
+	omit := ot.UseMetadateiHeader && ot.HasMetadataContent()
 
 	aw := assignmentLineWriter{
 		LineWriter:           lw,
@@ -130,12 +130,12 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 	}
 
 	mw := object_metadata.Writer{
-		Akte: lw,
+		Blob: lw,
 	}
 
 	if ot.UseMetadateiHeader {
 		ot.Matchers = ot.commentMatchers
-		mw.Metadatei = ot.Metadatei
+		mw.Metadata = ot.Metadatei
 	}
 
 	if n, err = mw.WriteTo(out); err != nil {

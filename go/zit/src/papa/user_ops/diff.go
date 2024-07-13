@@ -163,7 +163,7 @@ func (c Diff) makeDo(
 	return func() (err error) {
 		defer errors.DeferredCloser(&err, w)
 
-		if _, err = mf.FormatMetadatei(w, m); err != nil {
+		if _, err = mf.FormatMetadata(w, m); err != nil {
 			if errors.IsBrokenPipe(err) {
 				err = nil
 			} else {

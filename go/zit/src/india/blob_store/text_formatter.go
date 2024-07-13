@@ -28,9 +28,9 @@ func MakeTextFormatterWithBlobFormatter(
 ) textFormatter {
 	return textFormatter{
 		k:                 k,
-		fMetadateiAndBlob: object_metadata.MakeTextFormatterMetadateiInlineBlob(options, af, formatter),
-		fMetadateiOnly:    object_metadata.MakeTextFormatterMetadateiOnly(options, af, formatter),
-		fBlobOnly:         object_metadata.MakeTextFormatterExcludeMetadatei(options, af, formatter),
+		fMetadateiAndBlob: object_metadata.MakeTextFormatterMetadataInlineBlob(options, af, formatter),
+		fMetadateiOnly:    object_metadata.MakeTextFormatterMetadataOnly(options, af, formatter),
+		fBlobOnly:         object_metadata.MakeTextFormatterExcludeMetadata(options, af, formatter),
 	}
 }
 
@@ -41,11 +41,11 @@ type textFormatter struct {
 
 func (tf textFormatter) WriteStringFormat(w io.Writer, s *sku.Transacted) (n int64, err error) {
 	if genres.Config.EqualsGenre(s.GetGenre()) {
-		n, err = tf.fBlobOnly.FormatMetadatei(w, s)
+		n, err = tf.fBlobOnly.FormatMetadata(w, s)
 	} else if tf.k.IsInlineTyp(s.GetType()) {
-		n, err = tf.fMetadateiAndBlob.FormatMetadatei(w, s)
+		n, err = tf.fMetadateiAndBlob.FormatMetadata(w, s)
 	} else {
-		n, err = tf.fMetadateiOnly.FormatMetadatei(w, s)
+		n, err = tf.fMetadateiOnly.FormatMetadata(w, s)
 	}
 
 	return
@@ -57,11 +57,11 @@ func (tf textFormatter) WriteStringFormatWithMode(
 	mode checkout_mode.Mode,
 ) (n int64, err error) {
 	if genres.Config.EqualsGenre(s.GetGenre()) || mode == checkout_mode.ModeAkteOnly {
-		n, err = tf.fBlobOnly.FormatMetadatei(w, s)
+		n, err = tf.fBlobOnly.FormatMetadata(w, s)
 	} else if tf.k.IsInlineTyp(s.GetType()) {
-		n, err = tf.fMetadateiAndBlob.FormatMetadatei(w, s)
+		n, err = tf.fMetadateiAndBlob.FormatMetadata(w, s)
 	} else {
-		n, err = tf.fMetadateiOnly.FormatMetadatei(w, s)
+		n, err = tf.fMetadateiOnly.FormatMetadata(w, s)
 	}
 
 	return

@@ -41,7 +41,11 @@ func (m Metadatei) AsMetadatei() (m1 object_metadata.Metadata) {
 	return
 }
 
-func (m Metadatei) HasMetadateiContent() bool {
+func (m Metadatei) GetMetadataWriterTo() object_metadata.MetadataWriterTo {
+  return m
+}
+
+func (m Metadatei) HasMetadataContent() bool {
 	if m.Len() > 0 {
 		return true
 	}

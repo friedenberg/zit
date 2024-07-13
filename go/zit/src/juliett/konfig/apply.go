@@ -22,7 +22,7 @@ func (k *Compiled) ApplySchlummerndAndRealizeEtiketten(
 	ui.Log().Print("applying konfig to:", sk)
 	mp := &sk.Metadatei
 
-	mp.Cached.SetExpandedEtiketten(ids.ExpandMany(
+	mp.Cache.SetExpandedTags(ids.ExpandMany(
 		mp.GetEtiketten(),
 		expansion.ExpanderRight,
 	))
@@ -39,8 +39,8 @@ func (k *Compiled) ApplySchlummerndAndRealizeEtiketten(
 	// TODO better solution for "realizing" etiketten against Konfig.
 	// Specifically, making this less fragile and dependent on remembering to do
 	// ApplyToSku for each Sku. Maybe a factory?
-	mp.Cached.Etiketten.Reset()
-	mp.GetEtiketten().Each(mp.Cached.Etiketten.AddEtikettOld)
+	mp.Cache.TagPaths.Reset()
+	mp.GetEtiketten().Each(mp.Cache.TagPaths.AddEtikettOld)
 
 	if isEtikett {
 		ks := sk.Kennung.String()
@@ -49,13 +49,13 @@ func (k *Compiled) ApplySchlummerndAndRealizeEtiketten(
 			return
 		}
 
-		sk.Metadatei.Cached.Etiketten.AddSelf(catgut.MakeFromString(ks))
+		sk.Metadatei.Cache.TagPaths.AddSelf(catgut.MakeFromString(ks))
 
 		ids.ExpandOne(
 			&etikett,
 			expansion.ExpanderRight,
 		).EachPtr(
-			mp.Cached.GetExpandedEtikettenMutable().AddPtr,
+			mp.Cache.GetExpandedTagsMutable().AddPtr,
 		)
 	}
 
@@ -118,15 +118,15 @@ func (k *Compiled) addSuperEtiketten(
 			continue
 		}
 
-		if ek.Metadatei.Cached.Etiketten.Paths.Len() <= 1 {
-			ui.Log().Print(ks, ex, ek.Metadatei.Cached.Etiketten)
+		if ek.Metadatei.Cache.TagPaths.Paths.Len() <= 1 {
+			ui.Log().Print(ks, ex, ek.Metadatei.Cache.TagPaths)
 			continue
 		}
 
 		prefix := catgut.MakeFromString(ex)
 
-		a := &sk.Metadatei.Cached.Etiketten
-		b := &ek.Metadatei.Cached.Etiketten
+		a := &sk.Metadatei.Cache.TagPaths
+		b := &ek.Metadatei.Cache.TagPaths
 
 		ui.Log().Print("a", a)
 		ui.Log().Print("b", b)
@@ -161,7 +161,7 @@ func (k *Compiled) addImplicitEtiketten(
 		impl := k.getImplicitEtiketten(e)
 
 		if impl.Len() == 0 {
-			sk.Metadatei.Cached.Etiketten.AddPathWithType(p1)
+			sk.Metadatei.Cache.TagPaths.AddPathWithType(p1)
 			return
 		}
 
@@ -171,7 +171,7 @@ func (k *Compiled) addImplicitEtiketten(
 				func(e1 *ids.Tag) (err error) {
 					p2 := p1.Clone()
 					p2.Add(catgut.MakeFromString(e1.String()))
-					sk.Metadatei.Cached.Etiketten.AddPathWithType(p2)
+					sk.Metadatei.Cache.TagPaths.AddPathWithType(p2)
 					return
 				},
 			),
@@ -192,7 +192,7 @@ func (k *Compiled) addImplicitEtiketten(
 		typKonfig.GetEtiketten().EachPtr(addImpEts)
 	}
 
-	mp.Cached.SetImplicitEtiketten(ie)
+	mp.Cache.SetImplicitTags(ie)
 
 	return
 }

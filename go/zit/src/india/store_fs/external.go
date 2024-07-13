@@ -62,11 +62,11 @@ func (a *External) String() string {
 }
 
 func (a *External) GetAkteSha() interfaces.Sha {
-	return &a.Metadatei.Akte
+	return &a.Metadatei.Blob
 }
 
 func (a *External) SetBlobSha(v interfaces.Sha) (err error) {
-	if err = a.Metadatei.Akte.SetShaLike(v); err != nil {
+	if err = a.Metadatei.Blob.SetShaLike(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -93,7 +93,7 @@ func (a *External) GetAkteFD() *fd.FD {
 
 func (a *External) SetAkteFD(v *fd.FD) {
 	a.FDs.Akte.ResetWith(v)
-	a.Metadatei.Akte.SetShaLike(v.GetShaLike())
+	a.Metadatei.Blob.SetShaLike(v.GetShaLike())
 }
 
 func (a *External) GetAktePath() string {

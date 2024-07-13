@@ -62,7 +62,7 @@ func (sch *Schlummernd) ContainsSku(sk *sku.Transacted) bool {
 			panic("empty schlummernd etikett")
 		}
 
-		all := sk.Metadatei.Cached.Etiketten.All
+		all := sk.Metadatei.Cache.TagPaths.All
 		i, ok := all.ContainsEtikett(e.Etikett)
 
 		if ok {

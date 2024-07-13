@@ -8,37 +8,37 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
 )
 
-type Verzeichnisse struct {
-	Schlummernd       values.Bool
-	ExpandedEtiketten ids.TagMutableSet // public for gob, but should be private
-	ImplicitEtiketten ids.TagMutableSet // public for gob, but should be private
-	Etiketten         tag_paths.Etiketten
+type Cache struct {
+	Dormant      values.Bool
+	ExpandedTags ids.TagMutableSet // public for gob, but should be private
+	ImplicitTags ids.TagMutableSet // public for gob, but should be private
+	TagPaths     tag_paths.Etiketten
 	QueryPath
 }
 
-func (v *Verzeichnisse) GetExpandedEtiketten() ids.TagSet {
-	return v.GetExpandedEtikettenMutable()
+func (v *Cache) GetExpandedTags() ids.TagSet {
+	return v.GetExpandedTagsMutable()
 }
 
-func (v *Verzeichnisse) AddEtikettExpandedPtr(e *ids.Tag) (err error) {
+func (v *Cache) AddTagExpandedPtr(e *ids.Tag) (err error) {
 	return iter.AddClonePool(
-		v.GetExpandedEtikettenMutable(),
+		v.GetExpandedTagsMutable(),
 		ids.GetTagPool(),
 		ids.TagResetter,
 		e,
 	)
 }
 
-func (v *Verzeichnisse) GetExpandedEtikettenMutable() ids.TagMutableSet {
-	if v.ExpandedEtiketten == nil {
-		v.ExpandedEtiketten = ids.MakeTagMutableSet()
+func (v *Cache) GetExpandedTagsMutable() ids.TagMutableSet {
+	if v.ExpandedTags == nil {
+		v.ExpandedTags = ids.MakeTagMutableSet()
 	}
 
-	return v.ExpandedEtiketten
+	return v.ExpandedTags
 }
 
-func (v *Verzeichnisse) SetExpandedEtiketten(e ids.TagSet) {
-	es := v.GetExpandedEtikettenMutable()
+func (v *Cache) SetExpandedTags(e ids.TagSet) {
+	es := v.GetExpandedTagsMutable()
 	iter.ResetMutableSetWithPool(es, ids.GetTagPool())
 
 	if e == nil {
@@ -48,29 +48,29 @@ func (v *Verzeichnisse) SetExpandedEtiketten(e ids.TagSet) {
 	errors.PanicIfError(e.Each(es.Add))
 }
 
-func (v *Verzeichnisse) GetImplicitEtiketten() ids.TagSet {
-	return v.GetImplicitEtikettenMutable()
+func (v *Cache) GetImplicitTags() ids.TagSet {
+	return v.GetImplicitTagsMutable()
 }
 
-func (v *Verzeichnisse) AddEtikettImplicitPtr(e *ids.Tag) (err error) {
+func (v *Cache) AddTagsImplicitPtr(e *ids.Tag) (err error) {
 	return iter.AddClonePool(
-		v.GetImplicitEtikettenMutable(),
+		v.GetImplicitTagsMutable(),
 		ids.GetTagPool(),
 		ids.TagResetter,
 		e,
 	)
 }
 
-func (v *Verzeichnisse) GetImplicitEtikettenMutable() ids.TagMutableSet {
-	if v.ImplicitEtiketten == nil {
-		v.ImplicitEtiketten = ids.MakeTagMutableSet()
+func (v *Cache) GetImplicitTagsMutable() ids.TagMutableSet {
+	if v.ImplicitTags == nil {
+		v.ImplicitTags = ids.MakeTagMutableSet()
 	}
 
-	return v.ImplicitEtiketten
+	return v.ImplicitTags
 }
 
-func (v *Verzeichnisse) SetImplicitEtiketten(e ids.TagSet) {
-	es := v.GetImplicitEtikettenMutable()
+func (v *Cache) SetImplicitTags(e ids.TagSet) {
+	es := v.GetImplicitTagsMutable()
 	iter.ResetMutableSetWithPool(es, ids.GetTagPool())
 
 	if e == nil {

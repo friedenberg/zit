@@ -277,7 +277,7 @@ func (bf *binaryDecoder) readFieldKey(
 ) (err error) {
 	switch bf.Key {
 	case keys.Blob:
-		if _, err = sk.Metadatei.Akte.ReadFrom(&bf.Content); err != nil {
+		if _, err = sk.Metadatei.Blob.ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -332,13 +332,13 @@ func (bf *binaryDecoder) readFieldKey(
 		}
 
 	case keys.ShaMetadatei:
-		if _, err = sk.Metadatei.SelbstMetadatei.ReadFrom(&bf.Content); err != nil {
+		if _, err = sk.Metadatei.SelfMetadata.ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.ShaMetadateiSansTai:
-		if _, err = sk.Metadatei.SelbstMetadateiSansTai.ReadFrom(
+		if _, err = sk.Metadatei.SelfMetadataWithoutTai.ReadFrom(
 			&bf.Content,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -353,7 +353,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-		if err = sk.Metadatei.Cached.AddEtikettImplicitPtr(&e); err != nil {
+		if err = sk.Metadatei.Cache.AddTagsImplicitPtr(&e); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -366,7 +366,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-		if err = sk.Metadatei.Cached.AddEtikettExpandedPtr(&e); err != nil {
+		if err = sk.Metadatei.Cache.AddTagExpandedPtr(&e); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -379,7 +379,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-		sk.Metadatei.Cached.Etiketten.AddPath(&e)
+		sk.Metadatei.Cache.TagPaths.AddPath(&e)
 
 	default:
 		// panic(fmt.Sprintf("unsupported key: %s", key))

@@ -232,7 +232,7 @@ func (pw *writer) saveSchwanz(z *sku.Transacted, sigil ids.Sigil) {
 
 	record.Sigil = sigil
 
-	if z.Metadatei.Cached.Schlummernd.Bool() {
+	if z.Metadatei.Cache.Dormant.Bool() {
 		record.Add(ids.SigilHidden)
 	} else {
 		record.Del(ids.SigilHidden)

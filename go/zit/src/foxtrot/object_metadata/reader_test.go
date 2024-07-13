@@ -27,8 +27,8 @@ body
 	ar := &bytes.Buffer{}
 
 	r := Reader{
-		Metadatei: mr,
-		Akte:      ar,
+		Metadata: mr,
+		Blob:      ar,
 	}
 
 	var n int64
@@ -74,8 +74,8 @@ metadatei
 	ar := &bytes.Buffer{}
 
 	r := Reader{
-		Metadatei: mr,
-		Akte:      ar,
+		Metadata: mr,
+		Blob:      ar,
 	}
 
 	var n int64

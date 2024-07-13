@@ -31,7 +31,7 @@ var (
 	keyTyp         = catgut.MakeFromString("Typ")
 	keySha         = catgut.MakeFromString("zzSha")
 
-	keyShasMutterMetadateiKennungMutter = catgut.MakeFromString("Shas" + object_metadata.ShaKeyMutterMetadateiKennungMutter)
+	keyShasMutterMetadateiKennungMutter = catgut.MakeFromString("Shas" + object_metadata.ShaKeyParentMetadataObjectIdParent)
 
 	keyVerzeichnisseArchiviert      = catgut.MakeFromString("Verzeichnisse-Archiviert")
 	keyVerzeichnisseEtikettImplicit = catgut.MakeFromString("Verzeichnisse-Etikett-Implicit")
@@ -140,7 +140,7 @@ func WriteMetadateiKeyTo(
 		n1, err = writeShaKeyIfNotNull(
 			w,
 			keyAkte,
-			&m.Akte,
+			&m.Blob,
 		)
 
 		n += int64(n1)
@@ -240,7 +240,7 @@ func WriteMetadateiKeyTo(
 		n1, err = writeShaKeyIfNotNull(
 			w,
 			keyShasMutterMetadateiKennungMutter,
-			&m.MutterMetadateiKennungMutter,
+			&m.ParentMetadataObjectIdParent,
 		)
 
 		n += int64(n1)
@@ -312,12 +312,12 @@ func GetShaForContext(f FormatGeneric, c FormatterContext) (sh *Sha, err error) 
 
 	switch f.key {
 	case "Akte", "AkteTyp":
-		if m.Akte.IsNull() {
+		if m.Blob.IsNull() {
 			return
 		}
 
 	case "AkteBez":
-		if m.Akte.IsNull() && m.Description.IsEmpty() {
+		if m.Blob.IsNull() && m.Description.IsEmpty() {
 			return
 		}
 	}

@@ -50,12 +50,12 @@ func (c Diff) RunWithQuery(
 
 	opDiffFS := user_ops.Diff{
 		Umwelt: u,
-		Inline: object_metadata.MakeTextFormatterMetadateiInlineBlob(
+		Inline: object_metadata.MakeTextFormatterMetadataInlineBlob(
 			co,
 			u.Standort(),
 			nil,
 		),
-		Metadatei: object_metadata.MakeTextFormatterMetadateiOnly(
+		Metadatei: object_metadata.MakeTextFormatterMetadataOnly(
 			co,
 			u.Standort(),
 			nil,

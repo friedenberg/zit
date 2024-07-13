@@ -53,11 +53,11 @@ func (a *External) String() string {
 }
 
 func (a *External) GetAkteSha() interfaces.Sha {
-	return &a.Metadatei.Akte
+	return &a.Metadatei.Blob
 }
 
 func (a *External) SetAkteSha(v interfaces.Sha) (err error) {
-	if err = a.Metadatei.Akte.SetShaLike(v); err != nil {
+	if err = a.Metadatei.Blob.SetShaLike(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

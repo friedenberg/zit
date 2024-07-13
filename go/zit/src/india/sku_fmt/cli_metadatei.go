@@ -71,7 +71,7 @@ func (f *cliMetadatei) WriteStringFormat(
 	var n1 int
 	var n2 int64
 
-	sh := &o.Akte
+	sh := &o.Blob
 
 	if !sh.IsNull() || f.options.PrintEmptyShas {
 		n1, err = sw.WriteString("@")

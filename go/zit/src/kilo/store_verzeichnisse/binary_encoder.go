@@ -71,7 +71,7 @@ func (bf *binaryEncoder) writeFormat(
 			return
 		}
 
-		ui.Debug().Print(sk, bf.Len(), &sk.Metadatei.Cached.Etiketten)
+		ui.Debug().Print(sk, bf.Len(), &sk.Metadatei.Cache.TagPaths)
 		panic(r)
 	}()
 	// TODO
@@ -101,7 +101,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		s := sk.Sigil
 		s.Add(bf.Sigil)
 
-		if sk.Metadatei.Cached.Schlummernd.Bool() {
+		if sk.Metadatei.Cache.Dormant.Bool() {
 			s.Add(ids.SigilHidden)
 		}
 
@@ -111,7 +111,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.Blob:
-		if n, err = bf.writeSha(&sk.Metadatei.Akte, true); err != nil {
+		if n, err = bf.writeSha(&sk.Metadatei.Blob, true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -178,7 +178,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.ShaMetadateiSansTai:
-		if n, err = bf.writeSha(&sk.Metadatei.SelbstMetadateiSansTai, true); err != nil {
+		if n, err = bf.writeSha(&sk.Metadatei.SelfMetadataWithoutTai, true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -190,17 +190,17 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.ShaMetadatei:
-		if err = sha.MakeErrIsNull(&sk.Metadatei.SelbstMetadatei); err != nil {
+		if err = sha.MakeErrIsNull(&sk.Metadatei.SelfMetadata); err != nil {
 			return
 		}
 
-		if n, err = bf.writeFieldWriterTo(&sk.Metadatei.SelbstMetadatei); err != nil {
+		if n, err = bf.writeFieldWriterTo(&sk.Metadatei.SelfMetadata); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.VerzeichnisseEtikettImplicit:
-		es := sk.Metadatei.Cached.GetImplicitEtiketten()
+		es := sk.Metadatei.Cache.GetImplicitTags()
 
 		for _, e := range iter.SortedValues[ids.Tag](es) {
 			var n1 int64
@@ -214,7 +214,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.VerzeichnisseEtikettExpanded:
-		es := sk.Metadatei.Cached.GetExpandedEtiketten()
+		es := sk.Metadatei.Cache.GetExpandedTags()
 
 		for _, e := range iter.SortedValues[ids.Tag](es) {
 			var n1 int64
@@ -228,7 +228,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.VerzeichnisseEtiketten:
-		es := sk.Metadatei.Cached.Etiketten
+		es := sk.Metadatei.Cache.TagPaths
 
 		for _, e := range es.Paths {
 			var n1 int64

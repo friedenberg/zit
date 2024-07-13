@@ -22,8 +22,8 @@ akte
 	out := &strings.Builder{}
 
 	sut := Writer{
-		Metadatei: strings.NewReader("metadatei\n"),
-		Akte:      strings.NewReader("akte\n"),
+		Metadata: strings.NewReader("metadatei\n"),
+		Blob:      strings.NewReader("akte\n"),
 	}
 
 	sut.WriteTo(out)
@@ -46,7 +46,7 @@ metadatei
 	out := &strings.Builder{}
 
 	sut := Writer{
-		Metadatei: strings.NewReader("metadatei\n"),
+		Metadata: strings.NewReader("metadatei\n"),
 	}
 
 	sut.WriteTo(out)
@@ -67,7 +67,7 @@ func TestWriter3(t1 *testing.T) {
 	out := &strings.Builder{}
 
 	sut := Writer{
-		Akte: strings.NewReader("akte\n"),
+		Blob: strings.NewReader("akte\n"),
 	}
 
 	sut.WriteTo(out)

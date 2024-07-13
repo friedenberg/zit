@@ -65,7 +65,7 @@ func (c CreateFromPaths) Run(
 			return
 		}
 
-		sh := &z.Metadatei.Shas.SelbstMetadateiSansTai
+		sh := &z.Metadatei.Shas.SelfMetadataWithoutTai
 
 		if sh.IsNull() {
 			return
@@ -173,7 +173,7 @@ func (c *CreateFromPaths) zettelsFromPath(
 
 	ze.Kennung.SetGenre(genres.Zettel)
 
-	if _, err = c.TextParser.ParseMetadatei(r, ze); err != nil {
+	if _, err = c.TextParser.ParseMetadata(r, ze); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

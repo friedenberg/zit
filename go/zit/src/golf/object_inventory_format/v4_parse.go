@@ -69,7 +69,7 @@ func (f v4) ParsePersistentMetadatei(
 
 		switch {
 		case key.Equal(keyAkte.Bytes()):
-			if err = m.Akte.SetHexBytes(valBuffer.Bytes()); err != nil {
+			if err = m.Blob.SetHexBytes(valBuffer.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -126,7 +126,7 @@ func (f v4) ParsePersistentMetadatei(
 			}
 
 		case key.Equal(keyVerzeichnisseArchiviert.Bytes()):
-			if err = m.Cached.Schlummernd.Set(val.String()); err != nil {
+			if err = m.Cache.Dormant.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -147,7 +147,7 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-			if err = m.Cached.AddEtikettImplicitPtr(e); err != nil {
+			if err = m.Cache.AddTagsImplicitPtr(e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -168,7 +168,7 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-			if err = m.Cached.AddEtikettExpandedPtr(e); err != nil {
+			if err = m.Cache.AddTagExpandedPtr(e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

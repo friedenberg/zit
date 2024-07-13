@@ -45,7 +45,7 @@ func (u *Umwelt) MakeFormatFunc(
 			if _, err = fmt.Fprintln(
 				out,
 				tl.GetObjectId(),
-				&tl.Metadatei.Cached.Etiketten,
+				&tl.Metadatei.Cache.TagPaths,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -59,7 +59,7 @@ func (u *Umwelt) MakeFormatFunc(
 			if _, err = fmt.Fprintln(
 				out,
 				tl.GetObjectId(),
-				&tl.Metadatei.Cached.Etiketten,
+				&tl.Metadatei.Cache.TagPaths,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -73,7 +73,7 @@ func (u *Umwelt) MakeFormatFunc(
 			if _, err = fmt.Fprintln(
 				out,
 				tl.GetObjectId(),
-				tl.Metadatei.Cached.QueryPath,
+				tl.Metadatei.Cache.QueryPath,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -113,14 +113,14 @@ func (u *Umwelt) MakeFormatFunc(
 
 	case "etiketten-all":
 		f = func(tl *sku.Transacted) (err error) {
-			for _, es := range tl.Metadatei.Cached.Etiketten.Paths {
+			for _, es := range tl.Metadatei.Cache.TagPaths.Paths {
 				if _, err = fmt.Fprintf(out, "%s: %s\n", tl.GetObjectId(), es); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 			}
 
-			for _, es := range tl.Metadatei.Cached.Etiketten.All {
+			for _, es := range tl.Metadatei.Cache.TagPaths.All {
 				if _, err = fmt.Fprintf(out, "%s: %s -> %s\n", tl.GetObjectId(), es.Etikett, es.Parents); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -132,7 +132,7 @@ func (u *Umwelt) MakeFormatFunc(
 
 	case "etiketten-expanded":
 		f = func(tl *sku.Transacted) (err error) {
-			esImp := tl.GetMetadata().Cached.GetExpandedEtiketten()
+			esImp := tl.GetMetadata().Cache.GetExpandedTags()
 			// TODO-P3 determine if empty sets should be printed or not
 
 			if _, err = fmt.Fprintln(
@@ -148,7 +148,7 @@ func (u *Umwelt) MakeFormatFunc(
 
 	case "etiketten-implicit":
 		f = func(tl *sku.Transacted) (err error) {
-			esImp := tl.GetMetadata().Cached.GetImplicitEtiketten()
+			esImp := tl.GetMetadata().Cache.GetImplicitTags()
 			// TODO-P3 determine if empty sets should be printed or not
 
 			if _, err = fmt.Fprintln(

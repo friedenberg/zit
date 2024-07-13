@@ -80,7 +80,7 @@ func (a *Assignment) addToSet(
 				zPrime, hasOriginal := original.Get(original.Key(&o.Transacted))
 
 				if hasOriginal {
-					z.Metadatei.Akte.ResetWith(&zPrime.Metadatei.Akte)
+					z.Metadatei.Blob.ResetWith(&zPrime.Metadatei.Blob)
 					z.Metadatei.Type.ResetWith(zPrime.Metadatei.Type)
 				}
 

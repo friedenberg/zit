@@ -133,9 +133,9 @@ func (a *Transacted) AddEtikettPtr(e *ids.Tag) (err error) {
 		}
 	}
 
-	ek := a.Metadatei.Cached.GetImplicitEtiketten().KeyPtr(e)
+	ek := a.Metadatei.Cache.GetImplicitTags().KeyPtr(e)
 
-	if a.Metadatei.Cached.GetImplicitEtiketten().ContainsKey(ek) {
+	if a.Metadatei.Cache.GetImplicitTags().ContainsKey(ek) {
 		return
 	}
 
@@ -285,7 +285,7 @@ func (s *Transacted) calculateObjekteSha(debug bool) (err error) {
 		s.makeShaCalcFunc(
 			f,
 			object_inventory_format.Formats.Metadatei(),
-			&s.Metadatei.SelbstMetadatei,
+			&s.Metadatei.SelfMetadata,
 		),
 	)
 
@@ -293,7 +293,7 @@ func (s *Transacted) calculateObjekteSha(debug bool) (err error) {
 		s.makeShaCalcFunc(
 			f,
 			object_inventory_format.Formats.MetadateiSansTai(),
-			&s.Metadatei.SelbstMetadateiSansTai,
+			&s.Metadatei.SelfMetadataWithoutTai,
 		),
 	)
 
@@ -301,7 +301,7 @@ func (s *Transacted) calculateObjekteSha(debug bool) (err error) {
 }
 
 func (s *Transacted) SetSchlummernd(v bool) {
-	s.Metadatei.Cached.Schlummernd.SetBool(v)
+	s.Metadatei.Cache.Dormant.SetBool(v)
 }
 
 func (s *Transacted) SetObjectSha(v interfaces.Sha) (err error) {
@@ -313,11 +313,11 @@ func (s *Transacted) GetObjekteSha() interfaces.Sha {
 }
 
 func (s *Transacted) GetAkteSha() interfaces.Sha {
-	return &s.Metadatei.Akte
+	return &s.Metadatei.Blob
 }
 
 func (s *Transacted) SetBlobSha(sh interfaces.Sha) error {
-	return s.Metadatei.Akte.SetShaLike(sh)
+	return s.Metadatei.Blob.SetShaLike(sh)
 }
 
 func (s *Transacted) GetTransactionIndex() values.Int {

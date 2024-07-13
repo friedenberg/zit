@@ -60,13 +60,13 @@ func writeFormat(
 		t.Fatalf("%s", err)
 	}
 
-	if err = m.Akte.SetShaLike(&blobSha); err != nil {
+	if err = m.Blob.SetShaLike(&blobSha); err != nil {
 		t.Fatalf("%s", err)
 	}
 
 	sb := &strings.Builder{}
 
-	if _, err := f.FormatMetadatei(sb, m); err != nil {
+	if _, err := f.FormatMetadata(sb, m); err != nil {
 		t.Errorf("%s", err)
 	}
 
@@ -95,7 +95,7 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 		},
 	)
 
-	format := object_metadata.MakeTextFormatterMetadateiOnly(
+	format := object_metadata.MakeTextFormatterMetadataOnly(
 		object_metadata.TextFormatterOptions{},
 		af,
 		nil,
@@ -137,7 +137,7 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 		},
 	)
 
-	format := object_metadata.MakeTextFormatterMetadateiInlineBlob(
+	format := object_metadata.MakeTextFormatterMetadataInlineBlob(
 		object_metadata.TextFormatterOptions{},
 		af,
 		nil,

@@ -33,7 +33,7 @@ func MakeTextParser(
 	}
 }
 
-func (f textParser) ParseMetadatei(
+func (f textParser) ParseMetadata(
 	r io.Reader,
 	c TextParserContext,
 ) (n int64, err error) {
@@ -43,7 +43,7 @@ func (f textParser) ParseMetadatei(
 	var n1 int64
 
 	defer func() {
-		c.SetBlobSha(&m.Akte)
+		c.SetBlobSha(&m.Blob)
 	}()
 
 	var akteFD fd.FD
@@ -82,8 +82,8 @@ func (f textParser) ParseMetadatei(
 
 	mr := Reader{
 		// RequireMetadatei: true,
-		Metadatei: lr,
-		Akte:      akteWriter,
+		Metadata: lr,
+		Blob:      akteWriter,
 	}
 
 	// if cmg, ok := c.(checkout_mode.Getter); ok {
@@ -107,7 +107,7 @@ func (f textParser) ParseMetadatei(
 
 	inlineAkteSha := sha.Make(akteWriter.GetShaLike())
 
-	if !m.Akte.IsNull() && !akteFD.GetShaLike().IsNull() {
+	if !m.Blob.IsNull() && !akteFD.GetShaLike().IsNull() {
 		err = errors.Wrap(
 			MakeErrHasInlineBlobAndFilePath(
 				&akteFD,
@@ -121,22 +121,22 @@ func (f textParser) ParseMetadatei(
 			afs.SetAkteFD(&akteFD)
 		}
 
-		m.Akte.SetShaLike(akteFD.GetShaLike())
+		m.Blob.SetShaLike(akteFD.GetShaLike())
 	}
 
 	switch {
-	case m.Akte.IsNull() && !inlineAkteSha.IsNull():
-		m.Akte.SetShaLike(inlineAkteSha)
+	case m.Blob.IsNull() && !inlineAkteSha.IsNull():
+		m.Blob.SetShaLike(inlineAkteSha)
 
-	case !m.Akte.IsNull() && inlineAkteSha.IsNull():
+	case !m.Blob.IsNull() && inlineAkteSha.IsNull():
 		// noop
 
-	case !m.Akte.IsNull() && !inlineAkteSha.IsNull() &&
-		!m.Akte.Equals(inlineAkteSha):
+	case !m.Blob.IsNull() && !inlineAkteSha.IsNull() &&
+		!m.Blob.Equals(inlineAkteSha):
 		err = errors.Wrap(
 			MakeErrHasInlineBlobAndMetadateiSha(
 				inlineAkteSha,
-				&m.Akte,
+				&m.Blob,
 			),
 		)
 
@@ -211,7 +211,7 @@ func (f textParser) setAkteSha(
 	m *Metadata,
 	maybeSha string,
 ) (err error) {
-	if err = m.Akte.Set(maybeSha); err != nil {
+	if err = m.Blob.Set(maybeSha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

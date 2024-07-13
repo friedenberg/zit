@@ -138,7 +138,7 @@ func (e *fileEncoder) EncodeObjekte(
 
 		defer errors.DeferredCloser(&err, fZettel)
 
-		if _, err = mtw.FormatMetadatei(fZettel, z); err != nil {
+		if _, err = mtw.FormatMetadata(fZettel, z); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -164,13 +164,13 @@ func (e *fileEncoder) EncodeObjekte(
 		var mtw object_metadata.TextFormatter
 
 		if inline {
-			mtw = object_metadata.MakeTextFormatterMetadateiInlineBlob(
+			mtw = object_metadata.MakeTextFormatterMetadataInlineBlob(
 				options,
 				e.arf,
 				nil,
 			)
 		} else {
-			mtw = object_metadata.MakeTextFormatterMetadateiOnly(
+			mtw = object_metadata.MakeTextFormatterMetadataOnly(
 				options,
 				e.arf,
 				nil,
@@ -188,7 +188,7 @@ func (e *fileEncoder) EncodeObjekte(
 
 		defer errors.DeferredCloser(&err, fZettel)
 
-		if _, err = mtw.FormatMetadatei(fZettel, z); err != nil {
+		if _, err = mtw.FormatMetadata(fZettel, z); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

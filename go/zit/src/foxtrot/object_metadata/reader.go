@@ -11,14 +11,14 @@ import (
 
 type Reader struct {
 	state            readerState
-	RequireMetadatei bool // TODO-P4 add delimiter
-	Metadatei, Akte  io.ReaderFrom
+	RequireMetadata bool // TODO-P4 add delimiter
+	Metadata, Blob  io.ReaderFrom
 }
 
 // TODO-P4 add constructors and remove public fields
 func (mr *Reader) ReadFrom(r io.Reader) (n int64, err error) {
 	var n1 int64
-	n1, err = mr.ReadMetadateiFrom(&r)
+	n1, err = mr.ReadMetadataFrom(&r)
 	n += n1
 
 	if err != nil {
@@ -37,16 +37,16 @@ func (mr *Reader) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
-func (mr *Reader) ReadMetadateiFrom(r *io.Reader) (n int64, err error) {
+func (mr *Reader) ReadMetadataFrom(r *io.Reader) (n int64, err error) {
 	br := bufio.NewReader(*r)
 
-	if mr.RequireMetadatei && mr.Metadatei == nil {
+	if mr.RequireMetadata && mr.Metadata == nil {
 		err = errors.Errorf("metadatei reader is nil")
 		return
 	}
 
-	if mr.Akte == nil {
-		err = errors.Errorf("akte reader is nil")
+	if mr.Blob == nil {
+		err = errors.Errorf("blob reader is nil")
 		return
 	}
 
@@ -76,7 +76,7 @@ LINE_READ_LOOP:
 		switch mr.state {
 		case readerStateEmpty:
 			switch {
-			case mr.RequireMetadatei && line != Boundary:
+			case mr.RequireMetadata && line != Boundary:
 				err = errors.Errorf("expected %q but got %q", Boundary, line)
 				return
 
@@ -91,7 +91,7 @@ LINE_READ_LOOP:
 
 			mr.state += 1
 
-			object_metadata = ohio.MakePipedReaderFrom(mr.Metadatei)
+			object_metadata = ohio.MakePipedReaderFrom(mr.Metadata)
 
 		case readerStateFirstBoundary:
 			if line == Boundary {
@@ -124,19 +124,19 @@ LINE_READ_LOOP:
 
 func (mr *Reader) ReadBlobFrom(r io.Reader) (n int64, err error) {
 	br := bufio.NewReader(r)
-	akte := ohio.MakePipedReaderFrom(mr.Akte)
+	blob := ohio.MakePipedReaderFrom(mr.Blob)
 
 	var n1 int64
-	n1, err = br.WriteTo(akte)
+	n1, err = br.WriteTo(blob)
 	n += n1
 
 	if err != nil {
-		err = errors.Wrapf(err, "akte write failed")
+		err = errors.Wrapf(err, "blob write failed")
 		return
 	}
 
-	if _, err = akte.Close(); err != nil {
-		err = errors.Wrapf(err, "akte read failed")
+	if _, err = blob.Close(); err != nil {
+		err = errors.Wrapf(err, "blob read failed")
 		return
 	}
 

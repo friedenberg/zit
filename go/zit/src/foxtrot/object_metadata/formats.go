@@ -19,7 +19,7 @@ func MakeTextFormat(
 			blobIOFactory,
 			blobFormatter,
 		),
-		TextFormatter: MakeTextFormatterMetadateiOnly(
+		TextFormatter: MakeTextFormatterMetadataOnly(
 			TextFormatterOptions{},
 			blobIOFactory,
 			blobFormatter,

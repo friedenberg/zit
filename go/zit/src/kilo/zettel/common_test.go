@@ -47,7 +47,7 @@ func readFormat(
 
 	t := t1.Skip(1)
 
-	n, err := f.ParseMetadatei(
+	n, err := f.ParseMetadata(
 		strings.NewReader(contents),
 		&zt,
 	)

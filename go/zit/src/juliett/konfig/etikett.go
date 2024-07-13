@@ -61,8 +61,8 @@ func (a *ketikett) Equals(b *ketikett) bool {
 	}
 
 	if !iter.SetEqualsPtr(
-		a.Transacted.Metadatei.Cached.GetImplicitEtiketten(),
-		b.Transacted.Metadatei.Cached.GetImplicitEtiketten(),
+		a.Transacted.Metadatei.Cache.GetImplicitTags(),
+		b.Transacted.Metadatei.Cache.GetImplicitTags(),
 	) {
 		return false
 	}

@@ -132,7 +132,7 @@ the body
 		Type:         makeBlobExt(t, "md"),
 	}
 
-	errors.PanicIfError(expected.Akte.Set(
+	errors.PanicIfError(expected.Blob.Set(
 		"036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064",
 	))
 
