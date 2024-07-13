@@ -22,7 +22,7 @@ func MakeTypCliFormat(co string_format_writer.ColorOptions) *typCliFormat {
 
 func (f *typCliFormat) WriteStringFormat(
 	w interfaces.WriterAndStringWriter,
-	k *kennung.Typ,
+	k *kennung.Type,
 ) (n int64, err error) {
 	v := k.String()
 

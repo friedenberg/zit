@@ -56,7 +56,7 @@ func (u *Umwelt) StringFormatWriterKennungAligned(
 
 func (u *Umwelt) StringFormatWriterKennung(
 	co string_format_writer.ColorOptions,
-) interfaces.StringFormatWriter[*kennung.Id] {
+) interfaces.StringFormatWriter[*kennung.ObjectId] {
 	return kennung_fmt.MakeKennungCliFormat(
 		u.konfig.PrintOptions,
 		co,
@@ -66,7 +66,7 @@ func (u *Umwelt) StringFormatWriterKennung(
 
 func (u *Umwelt) StringFormatWriterTyp(
 	co string_format_writer.ColorOptions,
-) interfaces.StringFormatWriter[*kennung.Typ] {
+) interfaces.StringFormatWriter[*kennung.Type] {
 	return kennung_fmt.MakeTypCliFormat(co)
 }
 

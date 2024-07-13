@@ -74,7 +74,7 @@ func (kc *compiled) getApproximatedTyp(
 func (kc *compiled) getEtikettOrKastenOrTyp(
 	v string,
 ) (sk *sku.Transacted, err error) {
-	var k kennung.Id
+	var k kennung.ObjectId
 
 	if err = k.Set(v); err != nil {
 		err = errors.Wrap(err)

@@ -29,7 +29,7 @@ type Metadatei struct {
 	Kasten      kennung.RepoId
 	Bezeichnung bezeichnung.Bezeichnung
 	Etiketten   kennung.TagMutableSet // public for gob, but should be private
-	Typ         kennung.Typ
+	Typ         kennung.Type
 
 	Shas
 	Tai kennung.Tai
@@ -131,7 +131,7 @@ func (z *Metadatei) SetBezeichnung(b bezeichnung.Bezeichnung) {
 	z.Bezeichnung = b
 }
 
-func (z *Metadatei) SetTyp(t kennung.Typ) {
+func (z *Metadatei) SetTyp(t kennung.Type) {
 	z.Typ = t
 }
 
@@ -238,11 +238,11 @@ func (z *Metadatei) SetAkteSha(sh interfaces.ShaGetter) {
 	z.Akte.SetShaLike(sh)
 }
 
-func (z *Metadatei) GetTyp() kennung.Typ {
+func (z *Metadatei) GetTyp() kennung.Type {
 	return z.Typ
 }
 
-func (z *Metadatei) GetTypPtr() *kennung.Typ {
+func (z *Metadatei) GetTypPtr() *kennung.Type {
 	return &z.Typ
 }
 
@@ -264,7 +264,7 @@ func (a *Metadatei) Subtract(
 	b *Metadatei,
 ) {
 	if a.Typ.String() == b.Typ.String() {
-		a.Typ = kennung.Typ{}
+		a.Typ = kennung.Type{}
 	}
 
 	err := b.GetEtiketten().EachPtr(

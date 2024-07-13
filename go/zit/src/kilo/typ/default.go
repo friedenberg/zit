@@ -5,8 +5,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 )
 
-func Default() (t type_blob.V0, k kennung.Typ) {
-	k = kennung.MustTyp("md")
+func Default() (t type_blob.V0, k kennung.Type) {
+	k = kennung.MustType("md")
 
 	t = type_blob.Default()
 

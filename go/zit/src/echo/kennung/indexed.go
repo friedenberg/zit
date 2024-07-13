@@ -4,7 +4,7 @@ import "code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 
 type IndexedLike struct {
 	Int            int
-	Kennung        Id
+	Kennung        ObjectId
 	SchwanzenCount int
 	Count          int
 }

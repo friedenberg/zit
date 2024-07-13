@@ -17,7 +17,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/go/zit/src/echo/thyme"
+	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 	chai "github.com/brandondube/tai"
 )
 

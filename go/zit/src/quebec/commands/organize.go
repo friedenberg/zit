@@ -53,7 +53,7 @@ func init() {
 
 func (c *Organize) ModifyBuilder(b *query.Builder) {
 	b.
-		WithDefaultSigil(kennung.SigilSchwanzen).
+		WithDefaultSigil(kennung.SigilLatest).
 		WithDefaultGattungen(kennung.MakeGenre(gattung.Zettel)).
 		WithRequireNonEmptyQuery()
 }

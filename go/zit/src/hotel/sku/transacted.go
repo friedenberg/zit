@@ -16,7 +16,7 @@ import (
 )
 
 type Transacted struct {
-	Kennung          kennung.Id
+	Kennung          kennung.ObjectId
 	Metadatei        metadatei.Metadatei
 	TransactionIndex values.Int
 	Kopf             kennung.Tai
@@ -156,7 +156,7 @@ func (a *Transacted) AddEtikettPtrFast(e *kennung.Tag) (err error) {
 	return
 }
 
-func (a *Transacted) GetTyp() kennung.Typ {
+func (a *Transacted) GetTyp() kennung.Type {
 	return a.Metadatei.Typ
 }
 

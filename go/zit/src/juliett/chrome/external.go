@@ -78,7 +78,7 @@ func (e *External) SetItem(i item, overwrite bool) (err error) {
 	}
 
 	// TODO make configurable
-	e.Metadatei.Typ = kennung.MustTyp("!toml-bookmark")
+	e.Metadatei.Typ = kennung.MustType("!toml-bookmark")
 
 	return
 }

@@ -41,7 +41,7 @@ func init() {
 	)
 
 	gob.Register(iter.StringerKeyer[values.String]{})
-	gob.Register(iter.StringerKeyerPtr[kennung.Typ, *kennung.Typ]{})
+	gob.Register(iter.StringerKeyerPtr[kennung.Type, *kennung.Type]{})
 }
 
 type angeboren = pkg_angeboren.Konfig
@@ -143,7 +143,7 @@ func (kc *Compiled) SetCliFromCommander(k mutable_config.Cli) {
 	kc.BasePath = oldBasePath
 }
 
-func (kc *compiled) IsInlineTyp(k kennung.Typ) (isInline bool) {
+func (kc *compiled) IsInlineTyp(k kennung.Type) (isInline bool) {
 	todo.Change("fix this horrible hack")
 	if k.IsEmpty() {
 		return true

@@ -9,13 +9,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
 var delimReaderPool interfaces.Pool[delimReader, *delimReader]
 
 func init() {
-	delimReaderPool = pool.MakePoolWithReset[delimReader, *delimReader]()
+	delimReaderPool = pool.MakePoolWithReset[delimReader]()
 }
 
 func PutDelimReader(dr *delimReader) {
@@ -164,7 +163,6 @@ func (lr *delimReader) ReadOneKeyValue(
 	loc := strings.Index(str, sep)
 
 	if loc == -1 {
-		ui.Log().Printf("N: %d, lastReadN: %d", lr.N(), lr.lastReadN)
 		err = errors.Errorf(
 			"expected at least one %q, but found none: %q",
 			sep,
@@ -201,7 +199,6 @@ func (lr *delimReader) ReadOneKeyValueBytes(
 	loc := bytes.IndexByte(str, sep)
 
 	if loc == -1 {
-		ui.Log().Printf("N: %d, lastReadN: %d", lr.N(), lr.lastReadN)
 		err = errors.Errorf(
 			"expected at least one %q, but found none: %q",
 			sep,

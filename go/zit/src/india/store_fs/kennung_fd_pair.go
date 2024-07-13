@@ -12,7 +12,7 @@ import (
 )
 
 type KennungFDPair struct {
-	Kennung kennung.Id
+	Kennung kennung.ObjectId
 	FDs     FDPair
 }
 

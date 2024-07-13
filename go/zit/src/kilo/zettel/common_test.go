@@ -15,7 +15,7 @@ type inlineTypChecker struct {
 	answer bool
 }
 
-func (t inlineTypChecker) IsInlineTyp(k kennung.Typ) bool {
+func (t inlineTypChecker) IsInlineTyp(k kennung.Type) bool {
 	return t.answer
 }
 
@@ -29,7 +29,7 @@ func makeEtiketten(t test_logz.T, vs ...string) (es kennung.TagSet) {
 	return
 }
 
-func makeBlobExt(t test_logz.T, v string) (es kennung.Typ) {
+func makeBlobExt(t test_logz.T, v string) (es kennung.Type) {
 	if err := es.Set(v); err != nil {
 		t.Fatalf("%s", err)
 	}

@@ -52,7 +52,7 @@ type (
 
 		GetKopf() kennung.Tai
 		GetTai() kennung.Tai
-		GetTyp() kennung.Typ
+		GetTyp() kennung.Type
 		GetKennung() kennung.IdLike
 		GetObjekteSha() interfaces.ShaLike
 		GetAkteSha() interfaces.ShaLike

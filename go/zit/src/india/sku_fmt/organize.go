@@ -28,7 +28,7 @@ func MakeFormatOrganize(
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
 	kennungStringFormatWriter kennung_fmt.Aligned,
-	typStringFormatWriter interfaces.StringFormatWriter[*kennung.Typ],
+	typStringFormatWriter interfaces.StringFormatWriter[*kennung.Type],
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung],
 	etikettenStringFormatWriter interfaces.StringFormatWriter[*kennung.Tag],
 ) *Organize {
@@ -53,7 +53,7 @@ type Organize struct {
 
 	shaStringFormatWriter         interfaces.StringFormatWriter[interfaces.ShaLike]
 	kennungStringFormatWriter     kennung_fmt.Aligned
-	typStringFormatWriter         interfaces.StringFormatWriter[*kennung.Typ]
+	typStringFormatWriter         interfaces.StringFormatWriter[*kennung.Type]
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung]
 	etikettenStringFormatWriter   interfaces.StringFormatWriter[*kennung.Tag]
 }
@@ -258,7 +258,7 @@ func (f *Organize) readStringFormatWithinBrackets(
 	rr := catgut.MakeRingBufferRuneScanner(rb)
 
 	state := 0
-	var k kennung.Id
+	var k kennung.ObjectId
 	var t catgut.String
 	var eof bool
 	var n int

@@ -69,7 +69,7 @@ func (w *Writer) PrintOne(z *sku.Transacted) (err error) {
 	return
 }
 
-func (w *Writer) WriteHinweis(e kennung.Hinweis) (n int64, err error) {
+func (w *Writer) WriteHinweis(e kennung.ZettelId) (n int64, err error) {
 	item := w.hinweisToItem(e)
 	w.alfredWriter.WriteItem(item)
 	return

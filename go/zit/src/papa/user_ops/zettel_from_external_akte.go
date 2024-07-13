@@ -236,7 +236,7 @@ func (c *ZettelFromExternalAkte) zettelForAkte(
 
 	z.FDs.Akte.ResetWith(akteFD)
 
-	if err = z.Transacted.Kennung.SetWithIdLike(&kennung.Hinweis{}); err != nil {
+	if err = z.Transacted.Kennung.SetWithIdLike(&kennung.ZettelId{}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

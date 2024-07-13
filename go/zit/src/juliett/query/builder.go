@@ -143,7 +143,7 @@ func (b *Builder) WithTransacted(
 			b.preexistingKennung = append(
 				b.preexistingKennung,
 				Kennung{
-					Id: t.Kennung.Clone(),
+					ObjectId: t.Kennung.Clone(),
 				},
 			)
 
@@ -162,7 +162,7 @@ func (b *Builder) WithCheckedOut(
 			b.preexistingKennung = append(
 				b.preexistingKennung,
 				Kennung{
-					Id: co.GetSku().Kennung.Clone(),
+					ObjectId: co.GetSku().Kennung.Clone(),
 				},
 			)
 
@@ -227,7 +227,7 @@ func (b *Builder) build(vs ...string) (qg *Group, err error) {
 	var remaining []string
 
 	for _, v := range vs {
-		var k *kennung.Id
+		var k *kennung.ObjectId
 
 		if b.kasten == nil {
 			remaining = append(remaining, v)
@@ -243,7 +243,7 @@ func (b *Builder) build(vs ...string) (qg *Group, err error) {
 		b.preexistingKennung = append(
 			b.preexistingKennung,
 			Kennung{
-				Id: k,
+				ObjectId:       k,
 				External: true,
 			},
 		)
@@ -308,7 +308,7 @@ func (b *Builder) buildManyFromTokens(
 ) (err error) {
 	if len(tokens) == 1 && tokens[0] == "." {
 		// TODO [ces/mew] switch to marker on query group for Cwd
-		var ks interfaces.SetLike[*kennung.Id]
+		var ks interfaces.SetLike[*kennung.ObjectId]
 
 		if ks, err = b.kasten.GetExternalKennung(); err != nil {
 			err = errors.Wrap(err)
@@ -316,11 +316,11 @@ func (b *Builder) buildManyFromTokens(
 		}
 
 		if err = ks.Each(
-			func(k *kennung.Id) (err error) {
+			func(k *kennung.ObjectId) (err error) {
 				b.preexistingKennung = append(
 					b.preexistingKennung,
 					Kennung{
-						Id: k,
+						ObjectId:       k,
 						External: true,
 					},
 				)
@@ -368,7 +368,7 @@ func (b *Builder) addDefaultsIfNecessary(qg *Group) {
 	dq.Genre = b.defaultGattungen
 
 	if b.defaultSigil.IsEmpty() {
-		dq.Sigil = kennung.SigilSchwanzen
+		dq.Sigil = kennung.SigilLatest
 	} else {
 		dq.Sigil = b.defaultSigil
 	}
@@ -454,7 +454,7 @@ LOOP:
 			}
 		} else {
 			k := Kennung{
-				Id: kennung.GetIdPool().Get(),
+				ObjectId: kennung.GetObjectIdPool().Get(),
 			}
 
 			if err = k.Set(el); err != nil {
@@ -475,7 +475,7 @@ LOOP:
 				)
 
 				q.Genre.Add(gattung.Zettel)
-				q.Kennung[k.Id.String()] = k
+				q.Kennung[k.ObjectId.String()] = k
 
 			case gattung.Etikett:
 				var et sku.Query
@@ -489,9 +489,9 @@ LOOP:
 				stack[len(stack)-1].Add(exp)
 
 			case gattung.Typ:
-				var t kennung.Typ
+				var t kennung.Type
 
-				if err = t.TodoSetFromKennung2(k.Id); err != nil {
+				if err = t.TodoSetFromKennung2(k.ObjectId); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -606,7 +606,7 @@ func (b *Builder) makeEtikettExp(k *Kennung) (exp sku.Query, err error) {
 	// TODO use b.akten to read Etikett Akte and find filter if necessary
 	var e kennung.Tag
 
-	if err = e.TodoSetFromKennung2(k.Id); err != nil {
+	if err = e.TodoSetFromKennung2(k.ObjectId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

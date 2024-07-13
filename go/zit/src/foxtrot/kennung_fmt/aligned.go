@@ -32,7 +32,7 @@ func (f *aligned) SetMaxKopfUndSchwanz(k, s int) {
 
 func (f *aligned) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
-	o *kennung.Id,
+	o *kennung.ObjectId,
 ) (n int64, err error) {
 	var n1 int
 

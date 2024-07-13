@@ -121,7 +121,7 @@ func (tab item) GetBezeichnung() (b bezeichnung.Bezeichnung, err error) {
 	return
 }
 
-func (tab item) GetTyp() (t kennung.Typ, err error) {
+func (tab item) GetTyp() (t kennung.Type, err error) {
 	ty, ok := tab["type"].(string)
 
 	if !ok {

@@ -83,7 +83,7 @@ func (s *Store) tryRealizeAndOrStore(
 	if o.ContainsAny(
 		objekte_mode.ModeAddToBestandsaufnahme,
 	) && (kinder.Kennung.IsEmpty() || kinder.GetGenre() == gattung.Unknown) {
-		var ken *kennung.Hinweis
+		var ken *kennung.ZettelId
 
 		if ken, err = s.kennungIndex.CreateHinweis(); err != nil {
 			err = errors.Wrap(err)
@@ -295,7 +295,7 @@ func (s *Store) commitTransacted(
 	return
 }
 
-func (s *Store) AddTypToIndex(t *kennung.Typ) (err error) {
+func (s *Store) AddTypToIndex(t *kennung.Type) (err error) {
 	if t == nil {
 		return
 	}
@@ -399,7 +399,7 @@ func (s *Store) UpdateKonfig(
 	)
 }
 
-func (s *Store) createEtikettOrTyp(k *kennung.Id) (err error) {
+func (s *Store) createEtikettOrTyp(k *kennung.ObjectId) (err error) {
 	switch k.GetGenre() {
 	default:
 		err = gattung.MakeErrUnsupportedGattung(k.GetGenre())
@@ -445,7 +445,7 @@ func (s *Store) createEtikettOrTyp(k *kennung.Id) (err error) {
 }
 
 func (s *Store) addTyp(
-	t kennung.Typ,
+	t kennung.Type,
 ) (err error) {
 	if err = s.GetAbbrStore().Typen().Exists(t.Parts()); err == nil {
 		return
@@ -453,7 +453,7 @@ func (s *Store) addTyp(
 
 	err = nil
 
-	var k kennung.Id
+	var k kennung.ObjectId
 
 	if err = k.SetWithIdLike(t); err != nil {
 		err = errors.Wrap(err)
@@ -469,7 +469,7 @@ func (s *Store) addTyp(
 }
 
 func (s *Store) addTypAndExpanded(
-	t kennung.Typ,
+	t kennung.Type,
 ) (err error) {
 	typenExpanded := kennung.ExpandOneSlice(&t, expansion.ExpanderRight)
 
@@ -506,7 +506,7 @@ func (s *Store) addEtikettAndExpanded(
 
 		err = nil
 
-		var k kennung.Id
+		var k kennung.ObjectId
 
 		if err = k.SetWithIdLike(e1); err != nil {
 			err = errors.Wrap(err)

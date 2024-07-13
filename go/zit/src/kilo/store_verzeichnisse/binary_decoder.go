@@ -196,7 +196,7 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 
 			wantsHidden := qs.IncludesHidden()
 			wantsHistory := qs.IncludesHistory()
-			isSchwanzen := sk.Contains(kennung.SigilSchwanzen)
+			isSchwanzen := sk.Contains(kennung.SigilLatest)
 			isHidden := sk.Contains(kennung.SigilHidden)
 
 			// log.Log().Print(sk)
@@ -214,7 +214,7 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 
 			if q.ContainsKennung(&sk.Kennung) &&
 				(qs.ContainsOneOf(kennung.SigilHistory) ||
-					sk.ContainsOneOf(kennung.SigilSchwanzen)) {
+					sk.ContainsOneOf(kennung.SigilLatest)) {
 				break
 			}
 		}

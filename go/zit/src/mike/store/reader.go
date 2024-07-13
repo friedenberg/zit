@@ -19,7 +19,7 @@ func (s *Store) ReadOneInto(
 
 	switch k1.GetGenre() {
 	case gattung.Zettel:
-		var h *kennung.Hinweis
+		var h *kennung.ZettelId
 
 		if h, err = s.GetAbbrStore().Hinweis().ExpandString(
 			k1.String(),

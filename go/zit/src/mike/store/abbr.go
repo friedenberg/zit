@@ -19,11 +19,11 @@ import (
 
 // TODO-P4 make generic
 type AbbrStore interface {
-	Hinweis() AbbrStoreGeneric[kennung.Hinweis, *kennung.Hinweis]
+	Hinweis() AbbrStoreGeneric[kennung.ZettelId, *kennung.ZettelId]
 	Kisten() AbbrStoreGeneric[kennung.RepoId, *kennung.RepoId]
 	Shas() AbbrStoreGeneric[sha.Sha, *sha.Sha]
 	Etiketten() AbbrStoreGeneric[kennung.Tag, *kennung.Tag]
-	Typen() AbbrStoreGeneric[kennung.Typ, *kennung.Typ]
+	Typen() AbbrStoreGeneric[kennung.Type, *kennung.Type]
 
 	AddMatchable(*sku.Transacted) error
 	GetAbbr() kennung.Abbr
@@ -35,7 +35,7 @@ type indexAbbrEncodableTridexes struct {
 	Shas      indexNotHinweis[sha.Sha, *sha.Sha]
 	Hinweis   indexHinweis
 	Etiketten indexNotHinweis[kennung.Tag, *kennung.Tag]
-	Typen     indexNotHinweis[kennung.Typ, *kennung.Typ]
+	Typen     indexNotHinweis[kennung.Type, *kennung.Type]
 	Kisten    indexNotHinweis[kennung.RepoId, *kennung.RepoId]
 }
 
@@ -72,7 +72,7 @@ func newIndexAbbr(
 			Etiketten: indexNotHinweis[kennung.Tag, *kennung.Tag]{
 				Kennungen: tridex.Make(),
 			},
-			Typen: indexNotHinweis[kennung.Typ, *kennung.Typ]{
+			Typen: indexNotHinweis[kennung.Type, *kennung.Type]{
 				Kennungen: tridex.Make(),
 			},
 			Kisten: indexNotHinweis[kennung.RepoId, *kennung.RepoId]{
@@ -188,7 +188,7 @@ func (i *indexAbbr) AddMatchable(o *sku.Transacted) (err error) {
 
 	switch o.GetGenre() {
 	case gattung.Zettel:
-		var h kennung.Hinweis
+		var h kennung.ZettelId
 
 		if err = h.Set(ks); err != nil {
 			err = errors.Wrap(err)
@@ -216,7 +216,7 @@ func (i *indexAbbr) AddMatchable(o *sku.Transacted) (err error) {
 }
 
 // TODO switch to using ennui for existence
-func (i *indexAbbr) Exists(k *kennung.Id) (err error) {
+func (i *indexAbbr) Exists(k *kennung.ObjectId) (err error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
@@ -244,7 +244,7 @@ func (i *indexAbbr) Exists(k *kennung.Id) (err error) {
 	return
 }
 
-func (i *indexAbbr) Hinweis() (asg AbbrStoreGeneric[kennung.Hinweis, *kennung.Hinweis]) {
+func (i *indexAbbr) Hinweis() (asg AbbrStoreGeneric[kennung.ZettelId, *kennung.ZettelId]) {
 	asg = &i.indexAbbrEncodableTridexes.Hinweis
 
 	return
@@ -268,7 +268,7 @@ func (i *indexAbbr) Etiketten() (asg AbbrStoreGeneric[kennung.Tag, *kennung.Tag]
 	return
 }
 
-func (i *indexAbbr) Typen() (asg AbbrStoreGeneric[kennung.Typ, *kennung.Typ]) {
+func (i *indexAbbr) Typen() (asg AbbrStoreGeneric[kennung.Type, *kennung.Type]) {
 	asg = &i.indexAbbrEncodableTridexes.Typen
 
 	return

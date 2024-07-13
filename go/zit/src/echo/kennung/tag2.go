@@ -95,7 +95,7 @@ func (e tag2) IsDependentLeaf() bool {
 	return e.dependentLeaf
 }
 
-func (e *tag2) TodoSetFromKennung2(v *Id) (err error) {
+func (e *tag2) TodoSetFromKennung2(v *ObjectId) (err error) {
 	return e.Set(v.String())
 }
 

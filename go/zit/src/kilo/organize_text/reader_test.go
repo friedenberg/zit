@@ -22,16 +22,16 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func makeHinweis(t *testing.T, v string) (k *kennung.Id) {
+func makeHinweis(t *testing.T, v string) (k *kennung.ObjectId) {
 	var err error
 
-	var h kennung.Hinweis
+	var h kennung.ZettelId
 
 	if err = h.Set(v); err != nil {
 		t.Fatalf("%s", err)
 	}
 
-	return kennung.MustId(h)
+	return kennung.MustObjectId(h)
 }
 
 func makeBez(t *testing.T, v string) (b bezeichnung.Bezeichnung) {

@@ -32,7 +32,7 @@ func (a *Query) GetSigil() kennung.Sigil {
 	return a.Sigil
 }
 
-func (a *Query) ContainsKennung(k *kennung.Id) bool {
+func (a *Query) ContainsKennung(k *kennung.ObjectId) bool {
 	if !a.Genre.Contains(k.GetGenre()) {
 		panic("should never check for wrong gattung")
 	}
@@ -49,7 +49,7 @@ func (a *Query) ContainsKennung(k *kennung.Id) bool {
 func (a *Query) Clone() (b *Query) {
 	b = &Query{
 		Sigil:   a.Sigil,
-		Genre: a.Genre,
+		Genre:   a.Genre,
 		Kennung: make(map[string]Kennung, len(a.Kennung)),
 		Hidden:  a.Hidden,
 	}
@@ -97,7 +97,7 @@ func (a *Query) Merge(b *Query) (err error) {
 	}
 
 	for _, k := range b.Kennung {
-		a.Kennung[k.Id.String()] = k
+		a.Kennung[k.ObjectId.String()] = k
 	}
 
 	a.Children = append(a.Children, b.Children...)
@@ -138,7 +138,7 @@ func (q *Query) StringDebug() string {
 		sb.WriteString("]")
 	}
 
-	if q.IsEmpty() && !q.IsSchwanzenOrUnknown() {
+	if q.IsEmpty() && !q.IsLatestOrUnknown() {
 		sb.WriteString(q.Sigil.String())
 	} else if !q.IsEmpty() {
 		sb.WriteString(q.Sigil.String())
@@ -194,7 +194,7 @@ func (q *Query) String() string {
 		sb.WriteString("]")
 	}
 
-	if q.Genre.IsEmpty() && !q.IsSchwanzenOrUnknown() {
+	if q.Genre.IsEmpty() && !q.IsLatestOrUnknown() {
 		sb.WriteString(q.Sigil.String())
 	} else if !q.Genre.IsEmpty() {
 		sb.WriteString(q.Sigil.String())

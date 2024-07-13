@@ -30,7 +30,7 @@ type Options struct {
 
 	commentMatchers   interfaces.SetLike[sku.Query]
 	rootEtiketten     kennung.TagSet
-	Typ               kennung.Typ
+	Typ               kennung.Type
 	GroupingEtiketten kennung.TagSlice
 	ExtraEtiketten    kennung.TagSet
 	Transacted        interfaces.SetLike[*sku.Transacted]

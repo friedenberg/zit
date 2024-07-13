@@ -15,7 +15,7 @@ func (resetter) Reset(z *Metadatei) {
 	z.Comments = z.Comments[:0]
 	z.ResetEtiketten()
 	ResetterVerzeichnisse.Reset(&z.Verzeichnisse)
-	z.Typ = kennung.Typ{}
+	z.Typ = kennung.Type{}
 	// z.Gattung = gattung.Unknown
 	z.Tai.Reset()
 	z.Shas.Reset()

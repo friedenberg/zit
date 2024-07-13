@@ -18,7 +18,7 @@ func MakeGroup(
 		OptimizedQueries: make(map[gattung.Gattung]*Query),
 		UserQueries:      make(map[kennung.Genre]*Query),
 		Hidden:           b.hidden,
-		Zettelen:         kennung.MakeHinweisMutableSet(),
+		Zettelen:         kennung.MakeZettelIdMutableSet(),
 		Typen:            kennung.MakeMutableTypSet(),
 	}
 }
@@ -27,9 +27,9 @@ type Group struct {
 	Hidden           sku.Query
 	OptimizedQueries map[gattung.Gattung]*Query
 	UserQueries      map[kennung.Genre]*Query
-	Kennungen        []*kennung.Id
-	Zettelen         kennung.HinweisMutableSet
-	Typen            kennung.TypMutableSet
+	Kennungen        []*kennung.ObjectId
+	Zettelen         kennung.ZettelIdMutableSet
+	Typen            kennung.TypeMutableSet
 
 	sku.ExternalQueryOptions
 }
@@ -67,7 +67,7 @@ func (qg *Group) GetSigil() (s kennung.Sigil) {
 
 func (qg *Group) GetExactlyOneKennung(
 	g gattung.Gattung,
-) (k *kennung.Id, s kennung.Sigil, err error) {
+) (k *kennung.ObjectId, s kennung.Sigil, err error) {
 	if len(qg.OptimizedQueries) != 1 {
 		err = errors.Errorf(
 			"expected exactly 1 gattung query but got %d",
@@ -95,7 +95,7 @@ func (qg *Group) GetExactlyOneKennung(
 	s = q.GetSigil()
 
 	for _, k1 := range kn {
-		k = k1.Id
+		k = k1.ObjectId
 
 		if k1.External {
 			s.Add(kennung.SigilExternal)
@@ -117,7 +117,7 @@ func (qg *Group) GetEtiketten() kennung.TagSet {
 	return mes
 }
 
-func (qg *Group) GetTypen() kennung.TypSet {
+func (qg *Group) GetTypen() kennung.TypeSet {
 	return qg.Typen
 }
 
@@ -156,16 +156,16 @@ func (qg *Group) AddExactKennung(
 	b *Builder,
 	k Kennung,
 ) (err error) {
-	if k.Id == nil {
+	if k.ObjectId == nil {
 		err = errors.Errorf("nil kennung")
 		return
 	}
 
-	qg.Kennungen = append(qg.Kennungen, k.Id)
+	qg.Kennungen = append(qg.Kennungen, k.ObjectId)
 
 	q := b.makeQuery()
-	q.Sigil.Add(kennung.SigilSchwanzen)
-	q.Kennung[k.Id.String()] = k
+	q.Sigil.Add(kennung.SigilLatest)
+	q.Kennung[k.ObjectId.String()] = k
 	q.Genre.Add(gattung.Must(k))
 
 	if err = qg.Add(q); err != nil {
@@ -182,7 +182,7 @@ func (qg *Group) Add(q *Query) (err error) {
 	if !ok {
 		existing = &Query{
 			Hidden:  qg.Hidden,
-			Genre: q.Genre,
+			Genre:   q.Genre,
 			Kennung: make(map[string]Kennung),
 		}
 	}
@@ -211,7 +211,7 @@ func (qg *Group) addOptimized(b *Builder, q *Query) (err error) {
 		if !ok {
 			existing = &Query{
 				Hidden:  qg.Hidden,
-				Genre: kennung.MakeGenre(g),
+				Genre:   kennung.MakeGenre(g),
 				Kennung: make(map[string]Kennung),
 			}
 		}

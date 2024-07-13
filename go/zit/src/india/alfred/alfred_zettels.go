@@ -136,7 +136,7 @@ func (w *Writer) errorToItem(err error) (a *alfred.Item) {
 	return
 }
 
-func (w *Writer) hinweisToItem(e kennung.Hinweis) (a *alfred.Item) {
+func (w *Writer) hinweisToItem(e kennung.ZettelId) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
 	a.Title = e.String()

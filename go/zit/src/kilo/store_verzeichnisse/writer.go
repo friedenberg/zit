@@ -134,7 +134,7 @@ func (pw *writer) flushBoth() (err error) {
 }
 
 func (pw *writer) updateSigilWithSchwanzen(st skuWithRangeAndSigil) (err error) {
-	st.Add(kennung.SigilSchwanzen)
+	st.Add(kennung.SigilLatest)
 
 	if err = pw.WriteOneObjekteMetadatei(st.Transacted); err != nil {
 		err = errors.Wrap(err)
@@ -249,7 +249,7 @@ func (pw *writer) removeOldSchwanz(sk *sku.Transacted) (err error) {
 		return
 	}
 
-	st.Del(kennung.SigilSchwanzen)
+	st.Del(kennung.SigilLatest)
 
 	if err = pw.updateSigil(pw, st.Sigil, st.Offset); err != nil {
 		err = errors.Wrap(err)

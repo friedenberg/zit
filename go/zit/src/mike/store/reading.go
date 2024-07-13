@@ -64,7 +64,7 @@ func (s *Store) ReadTransactedFromKennungKastenSigil(
 		return
 	}
 
-	var k3 *kennung.Kennung3
+	var k3 *kennung.ObjectIdWithRepoId
 
 	if k3, err = kennung.MakeKennung3(k1, ka); err != nil {
 		err = errors.Wrap(err)

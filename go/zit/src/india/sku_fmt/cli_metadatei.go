@@ -20,14 +20,14 @@ type cliMetadatei struct {
 	writeEtiketten   bool
 
 	shaStringFormatWriter         interfaces.StringFormatWriter[interfaces.ShaLike]
-	typStringFormatWriter         interfaces.StringFormatWriter[*kennung.Typ]
+	typStringFormatWriter         interfaces.StringFormatWriter[*kennung.Type]
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung]
 	etikettenStringFormatWriter   interfaces.StringFormatWriter[*kennung.Tag]
 }
 
 func MakeCliMetadateiFormatShort(
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
-	typStringFormatWriter interfaces.StringFormatWriter[*kennung.Typ],
+	typStringFormatWriter interfaces.StringFormatWriter[*kennung.Type],
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung],
 	etikettenStringFormatWriter interfaces.StringFormatWriter[*kennung.Tag],
 ) *cliMetadatei {
@@ -45,7 +45,7 @@ func MakeCliMetadateiFormatShort(
 func MakeCliMetadateiFormat(
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
-	typStringFormatWriter interfaces.StringFormatWriter[*kennung.Typ],
+	typStringFormatWriter interfaces.StringFormatWriter[*kennung.Type],
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung],
 	etikettenStringFormatWriter interfaces.StringFormatWriter[*kennung.Tag],
 ) *cliMetadatei {

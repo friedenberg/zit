@@ -74,7 +74,7 @@ func (c *Store) Flush(
 	wg := iter.MakeErrorWaitGroupParallel()
 
 	if c.GetStandort().GetLockSmith().IsAcquired() {
-		gob.Register(iter.StringerKeyerPtr[kennung.Typ, *kennung.Typ]{}) // TODO check if can be removed
+		gob.Register(iter.StringerKeyerPtr[kennung.Type, *kennung.Type]{}) // TODO check if can be removed
 		wg.Do(func() error { return c.verzeichnisse.Flush(printerHeader) })
 		wg.Do(c.GetAbbrStore().Flush)
 		wg.Do(c.typenIndex.Flush)

@@ -16,7 +16,7 @@ type Sigil byte
 
 const (
 	SigilUnknown   = Sigil(iota)
-	SigilSchwanzen = Sigil(1 << iota)
+	SigilLatest = Sigil(1 << iota)
 	SigilHistory
 	SigilExternal
 	SigilHidden
@@ -27,14 +27,14 @@ const (
 
 var (
 	mapRuneToSigil = map[rune]Sigil{
-		':': SigilSchwanzen,
+		':': SigilLatest,
 		'+': SigilHistory,
 		'.': SigilExternal,
 		'?': SigilHidden,
 	}
 
 	mapSigilToRune = map[Sigil]rune{
-		SigilSchwanzen: ':',
+		SigilLatest: ':',
 		SigilHistory:   '+',
 		SigilExternal:  '.',
 		SigilHidden:    '?',
@@ -71,7 +71,7 @@ func (a Sigil) IsEmpty() bool {
 }
 
 func (a *Sigil) Reset() {
-	*a = SigilSchwanzen
+	*a = SigilLatest
 }
 
 func (a *Sigil) ResetWith(b Sigil) {
@@ -102,12 +102,12 @@ func (a *Sigil) GetSigilPtr() *Sigil {
 	return a
 }
 
-func (a Sigil) IsSchwanzenOrUnknown() bool {
-	return a == SigilSchwanzen || a == SigilUnknown || a == SigilSchwanzen|SigilUnknown
+func (a Sigil) IsLatestOrUnknown() bool {
+	return a == SigilLatest || a == SigilUnknown || a == SigilLatest|SigilUnknown
 }
 
 func (a Sigil) IncludesLatest() bool {
-	return a.ContainsOneOf(SigilSchwanzen) || a.ContainsOneOf(SigilHistory) || a == 0
+	return a.ContainsOneOf(SigilLatest) || a.ContainsOneOf(SigilHistory) || a == 0
 }
 
 func (a Sigil) IncludesHistory() bool {
@@ -125,7 +125,7 @@ func (a Sigil) IncludesHidden() bool {
 func (a Sigil) String() string {
 	sb := strings.Builder{}
 
-	for s := SigilSchwanzen; s <= SigilMax; s++ {
+	for s := SigilLatest; s <= SigilMax; s++ {
 		if a&s != 0 {
 			r, ok := mapSigilToRune[s]
 
@@ -164,7 +164,7 @@ func (i Sigil) GetSha() *sha.Sha {
 
 func (i Sigil) Byte() byte {
 	if i == SigilUnknown {
-		return byte(SigilSchwanzen)
+		return byte(SigilLatest)
 	} else {
 		return byte(i)
 	}

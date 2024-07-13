@@ -97,7 +97,7 @@ type (
 
 // Add typ set
 type Store struct {
-	kennung.TypSet
+	kennung.TypeSet
 	Info
 	StoreLike
 	didInit  bool
@@ -249,9 +249,9 @@ func (es *Store) UpdateTransacted(z *Transacted) (err error) {
 	return
 }
 
-func (es *Store) GetExternalKennung() (ks interfaces.SetLike[*kennung.Id], err error) {
+func (es *Store) GetExternalKennung() (ks interfaces.SetLike[*kennung.ObjectId], err error) {
 	if es == nil {
-		ks = collections_value.MakeValueSet[*kennung.Id](nil)
+		ks = collections_value.MakeValueSet[*kennung.ObjectId](nil)
 		return
 	}
 
@@ -268,7 +268,7 @@ func (es *Store) GetExternalKennung() (ks interfaces.SetLike[*kennung.Id], err e
 	return
 }
 
-func (es *Store) GetKennungForString(v string) (k *kennung.Id, err error) {
+func (es *Store) GetKennungForString(v string) (k *kennung.ObjectId, err error) {
 	if es == nil {
 		err = collections.MakeErrNotFoundString(v)
 		return
@@ -312,7 +312,7 @@ func (es *Store) Open(
 	return
 }
 
-type ErrExternalStoreUnsupportedTyp kennung.Typ
+type ErrExternalStoreUnsupportedTyp kennung.Type
 
 func (e ErrExternalStoreUnsupportedTyp) Is(target error) bool {
 	_, ok := target.(ErrExternalStoreUnsupportedTyp)
@@ -320,5 +320,5 @@ func (e ErrExternalStoreUnsupportedTyp) Is(target error) bool {
 }
 
 func (e ErrExternalStoreUnsupportedTyp) Error() string {
-	return fmt.Sprintf("unsupported typ: %q", kennung.Typ(e))
+	return fmt.Sprintf("unsupported typ: %q", kennung.Type(e))
 }

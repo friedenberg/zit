@@ -16,7 +16,7 @@ type Kennung struct {
 	Debug    bool
 	External bool
 
-	*kennung.Id
+	*kennung.ObjectId
 }
 
 func (k Kennung) Reduce(b *Builder) (err error) {
@@ -40,11 +40,11 @@ func (k Kennung) ContainsSku(sk *sku.Transacted) (ok bool) {
 
 		if k.Exact {
 			idx, ok = me.Verzeichnisse.Etiketten.All.ContainsKennungEtikettExact(
-				k.Id,
+				k.ObjectId,
 			)
 		} else {
 			idx, ok = me.Verzeichnisse.Etiketten.All.ContainsKennungEtikett(
-				k.Id,
+				k.ObjectId,
 			)
 		}
 
@@ -97,7 +97,7 @@ func (k Kennung) String() string {
 		sb.WriteRune('%')
 	}
 
-	sb.WriteString(kennung.FormattedString(k.Id))
+	sb.WriteString(kennung.FormattedString(k.ObjectId))
 
 	return sb.String()
 }

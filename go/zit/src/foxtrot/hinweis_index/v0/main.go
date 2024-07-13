@@ -16,8 +16,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 )
 
-type encodedKennung struct {
-	AvailableKennung map[int]bool
+type encodedIds struct {
+	AvailableIds map[int]bool
 }
 
 type oldIndex struct {
@@ -26,9 +26,9 @@ type oldIndex struct {
 	lock sync.Mutex
 	path string
 
-	encodedKennung
+	encodedIds
 
-	oldHinweisenStore *hinweisen.Hinweisen
+	oldZettelIdStore *hinweisen.Hinweisen
 
 	didRead    bool
 	hasChanges bool
@@ -45,12 +45,12 @@ func MakeIndex(
 		path:               s.FileVerzeichnisseKennung(),
 		nonRandomSelection: k.UsePredictableHinweisen(),
 		su:                 su,
-		encodedKennung: encodedKennung{
-			AvailableKennung: make(map[int]bool),
+		encodedIds: encodedIds{
+			AvailableIds: make(map[int]bool),
 		},
 	}
 
-	if i.oldHinweisenStore, err = hinweisen.New(s); err != nil {
+	if i.oldZettelIdStore, err = hinweisen.New(s); err != nil {
 		if errors.IsNotExist(err) {
 			errors.TodoP4("determine which layer handles no-create kasten")
 			err = nil
@@ -87,7 +87,7 @@ func (i *oldIndex) Flush() (err error) {
 
 	enc := gob.NewEncoder(w)
 
-	if err = enc.Encode(i.encodedKennung); err != nil {
+	if err = enc.Encode(i.encodedIds); err != nil {
 		err = errors.Wrapf(err, "failed to write encoded kennung")
 		return
 	}
@@ -125,7 +125,7 @@ func (i *oldIndex) readIfNecessary() (err error) {
 
 	dec := gob.NewDecoder(r)
 
-	if err = dec.Decode(&i.encodedKennung); err != nil {
+	if err = dec.Decode(&i.encodedIds); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -137,8 +137,8 @@ func (i *oldIndex) Reset() (err error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
-	lMax := i.oldHinweisenStore.Left().Len() - 1
-	rMax := i.oldHinweisenStore.Right().Len() - 1
+	lMax := i.oldZettelIdStore.Left().Len() - 1
+	rMax := i.oldZettelIdStore.Right().Len() - 1
 
 	if lMax == 0 {
 		err = errors.Errorf("left kennung are empty")
@@ -150,7 +150,7 @@ func (i *oldIndex) Reset() (err error) {
 		return
 	}
 
-	i.AvailableKennung = make(map[int]bool, lMax*rMax)
+	i.AvailableIds = make(map[int]bool, lMax*rMax)
 
 	for l := 0; l <= lMax; l++ {
 		for r := 0; r <= rMax; r++ {
@@ -162,7 +162,7 @@ func (i *oldIndex) Reset() (err error) {
 			ui.Log().Print(k)
 
 			n := int(k.Id())
-			i.AvailableKennung[n] = true
+			i.AvailableIds[n] = true
 		}
 	}
 
@@ -177,7 +177,7 @@ func (i *oldIndex) AddHinweis(k1 kennung.IdLike) (err error) {
 		return
 	}
 
-	var h kennung.Hinweis
+	var h kennung.ZettelId
 
 	if err = h.Set(k1.String()); err != nil {
 		err = errors.Wrap(err)
@@ -191,12 +191,12 @@ func (i *oldIndex) AddHinweis(k1 kennung.IdLike) (err error) {
 
 	var left, right int
 
-	if left, err = i.oldHinweisenStore.Left().Kennung(h.GetHead()); err != nil {
+	if left, err = i.oldZettelIdStore.Left().Kennung(h.GetHead()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if right, err = i.oldHinweisenStore.Right().Kennung(h.GetTail()); err != nil {
+	if right, err = i.oldZettelIdStore.Right().Kennung(h.GetTail()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -212,39 +212,39 @@ func (i *oldIndex) AddHinweis(k1 kennung.IdLike) (err error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
-	delete(i.AvailableKennung, int(n))
+	delete(i.AvailableIds, int(n))
 
 	i.hasChanges = true
 
 	return
 }
 
-func (i *oldIndex) CreateHinweis() (h *kennung.Hinweis, err error) {
+func (i *oldIndex) CreateHinweis() (h *kennung.ZettelId, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if len(i.AvailableKennung) == 0 {
+	if len(i.AvailableIds) == 0 {
 		err = errors.Errorf("no available kennung")
 		return
 	}
 
-	if len(i.AvailableKennung) == 0 {
+	if len(i.AvailableIds) == 0 {
 		err = errors.Wrap(hinweisen.ErrHinweisenExhausted{})
 		return
 	}
 
 	ri := 0
 
-	if len(i.AvailableKennung) > 1 {
-		ri = rand.Intn(len(i.AvailableKennung) - 1)
+	if len(i.AvailableIds) > 1 {
+		ri = rand.Intn(len(i.AvailableIds) - 1)
 	}
 
 	m := 0
 	j := 0
 
-	for n := range i.AvailableKennung {
+	for n := range i.AvailableIds {
 		if i.nonRandomSelection {
 			if m == 0 {
 				m = n
@@ -266,23 +266,23 @@ func (i *oldIndex) CreateHinweis() (h *kennung.Hinweis, err error) {
 		}
 	}
 
-	delete(i.AvailableKennung, int(m))
+	delete(i.AvailableIds, int(m))
 
 	i.hasChanges = true
 
-	return i.makeHinweisButDontStore(m)
+	return i.makeZettelIdButDontStore(m)
 }
 
-func (i *oldIndex) makeHinweisButDontStore(
+func (i *oldIndex) makeZettelIdButDontStore(
 	j int,
-) (h *kennung.Hinweis, err error) {
+) (h *kennung.ZettelId, err error) {
 	k := &coordinates.Kennung{}
 	k.SetInt(coordinates.Int(j))
 
-	h, err = kennung.NewHinweis(
+	h, err = kennung.MakeZettelIdFromProvidersAndCoordinates(
 		k.Id(),
-		i.oldHinweisenStore.Left(),
-		i.oldHinweisenStore.Right(),
+		i.oldZettelIdStore.Left(),
+		i.oldZettelIdStore.Right(),
 	)
 	if err != nil {
 		err = errors.Wrapf(err, "trying to make hinweis for %s", k)
@@ -292,26 +292,26 @@ func (i *oldIndex) makeHinweisButDontStore(
 	return
 }
 
-func (i *oldIndex) PeekHinweisen(m int) (hs []*kennung.Hinweis, err error) {
+func (i *oldIndex) PeekHinweisen(m int) (hs []*kennung.ZettelId, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if m > len(i.AvailableKennung) || m == 0 {
-		m = len(i.AvailableKennung)
+	if m > len(i.AvailableIds) || m == 0 {
+		m = len(i.AvailableIds)
 	}
 
-	hs = make([]*kennung.Hinweis, 0, m)
+	hs = make([]*kennung.ZettelId, 0, m)
 	j := 0
 
-	for n := range i.AvailableKennung {
+	for n := range i.AvailableIds {
 		k := &coordinates.Kennung{}
 		k.SetInt(coordinates.Int(n))
 
-		var h *kennung.Hinweis
+		var h *kennung.ZettelId
 
-		if h, err = i.makeHinweisButDontStore(n); err != nil {
+		if h, err = i.makeZettelIdButDontStore(n); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

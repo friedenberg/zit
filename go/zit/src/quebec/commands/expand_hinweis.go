@@ -25,7 +25,7 @@ func init() {
 
 func (c ExpandHinweis) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	for _, v := range args {
-		var h *kennung.Hinweis
+		var h *kennung.ZettelId
 
 		h, err = u.GetStore().GetAbbrStore().Hinweis().ExpandString(v)
 

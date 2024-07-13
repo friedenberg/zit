@@ -48,7 +48,7 @@ type indexHinweis struct {
 	Schwanzen interfaces.MutableTridex
 }
 
-func (ih *indexHinweis) Add(h *kennung.Hinweis) (err error) {
+func (ih *indexHinweis) Add(h *kennung.ZettelId) (err error) {
 	ih.Kopfen.Add(h.GetHead())
 	ih.Schwanzen.Add(h.GetTail())
 	return
@@ -74,7 +74,7 @@ func (ih *indexHinweis) Exists(parts [3]string) (err error) {
 }
 
 func (ih *indexHinweis) ExpandStringString(in string) (out string, err error) {
-	var h *kennung.Hinweis
+	var h *kennung.ZettelId
 
 	if h, err = ih.ExpandString(in); err != nil {
 		err = errors.Wrap(err)
@@ -86,15 +86,15 @@ func (ih *indexHinweis) ExpandStringString(in string) (out string, err error) {
 	return
 }
 
-func (ih *indexHinweis) ExpandString(s string) (h *kennung.Hinweis, err error) {
+func (ih *indexHinweis) ExpandString(s string) (h *kennung.ZettelId, err error) {
 	if err = ih.readFunc(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var ha *kennung.Hinweis
+	var ha *kennung.ZettelId
 
-	if ha, err = kennung.MakeHinweis(s); err != nil {
+	if ha, err = kennung.MakeZettelId(s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -108,8 +108,8 @@ func (ih *indexHinweis) ExpandString(s string) (h *kennung.Hinweis, err error) {
 }
 
 func (ih *indexHinweis) Expand(
-	hAbbr *kennung.Hinweis,
-) (h *kennung.Hinweis, err error) {
+	hAbbr *kennung.ZettelId,
+) (h *kennung.ZettelId, err error) {
 	if err = ih.readFunc(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -118,7 +118,7 @@ func (ih *indexHinweis) Expand(
 	kopf := ih.Kopfen.Expand(hAbbr.GetHead())
 	schwanz := ih.Schwanzen.Expand(hAbbr.GetTail())
 
-	if h, err = kennung.MakeHinweisKopfUndSchwanz(kopf, schwanz); err != nil {
+	if h, err = kennung.MakeZettelIdFromHeadAndTail(kopf, schwanz); err != nil {
 		err = errors.Wrapf(err, "{Abbreviated: '%s'}", hAbbr)
 		return
 	}
@@ -126,7 +126,7 @@ func (ih *indexHinweis) Expand(
 	return
 }
 
-func (ih *indexHinweis) Abbreviate(h *kennung.Hinweis) (v string, err error) {
+func (ih *indexHinweis) Abbreviate(h *kennung.ZettelId) (v string, err error) {
 	if err = ih.readFunc(); err != nil {
 		err = errors.Wrap(err)
 		return

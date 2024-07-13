@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 )
 
-func Default(defaultTyp kennung.Typ) (k Blob) {
+func Default(defaultTyp kennung.Type) (k Blob) {
 	k = Blob{
 		Defaults: Defaults{
 			Typ:       defaultTyp,

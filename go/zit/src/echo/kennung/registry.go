@@ -11,16 +11,14 @@ import (
 )
 
 var (
-	registerOnce        sync.Once
-	registryLock        *sync.Mutex
-	registryGattung     map[gattung.Gattung]IdLike
-	registryQueryPrefix map[string]IdLike
+	registerOnce    sync.Once
+	registryLock    *sync.Mutex
+	registryGenres map[gattung.Gattung]IdLike
 )
 
 func once() {
 	registryLock = &sync.Mutex{}
-	registryGattung = make(map[gattung.Gattung]IdLike)
-	registryQueryPrefix = make(map[string]IdLike)
+	registryGenres = make(map[gattung.Gattung]IdLike)
 }
 
 func register[T IdLike, TPtr interface {
@@ -40,7 +38,7 @@ func register[T IdLike, TPtr interface {
 	var id1 IdLike
 	g := gattung.Must(id.GetGenre())
 
-	if id1, ok = registryGattung[g]; ok {
+	if id1, ok = registryGenres[g]; ok {
 		panic(
 			errors.Errorf(
 				"gattung %s has two registrations: %s (old), %s (new)",
@@ -51,22 +49,5 @@ func register[T IdLike, TPtr interface {
 		)
 	}
 
-	registryGattung[g] = id
-
-	if idQueryPrefix, ok := IdLike(id).(QueryPrefixer); ok {
-		p := idQueryPrefix.GetQueryPrefix()
-
-		if id1, ok := registryQueryPrefix[p]; ok {
-			panic(
-				errors.Errorf(
-					"prefix '%s' has two registrations: %s (old), %s (new)",
-					p,
-					id1,
-					id,
-				),
-			)
-		}
-
-		registryQueryPrefix[p] = id
-	}
+	registryGenres[g] = id
 }

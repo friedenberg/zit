@@ -18,7 +18,7 @@ type (
 			Abbreviate FuncAbbreviateString[sha.Sha, *sha.Sha]
 		}
 		// TODO switch to Kennung2
-		Hinweis abbrOne[Hinweis, *Hinweis]
+		Hinweis abbrOne[ZettelId, *ZettelId]
 	}
 
 	abbrOne[V IdGeneric[V], VPtr IdGenericPtr[V]] struct {
@@ -81,14 +81,14 @@ func (ao abbrOne[V, VPtr]) AbbreviateKennung(
 }
 
 func (a Abbr) LenKopfUndSchwanz(
-	in *Id,
+	in *ObjectId,
 ) (kopf, schwanz int, err error) {
 	if in.GetGenre() != gattung.Zettel || a.Hinweis.Abbreviate == nil {
 		kopf, schwanz = in.LenHeadAndTail()
 		return
 	}
 
-	var h Hinweis
+	var h ZettelId
 
 	if err = h.Set(in.String()); err != nil {
 		err = nil
@@ -114,7 +114,7 @@ func (a Abbr) LenKopfUndSchwanz(
 }
 
 func (a Abbr) AbbreviateHinweisOnly(
-	in *Id,
+	in *ObjectId,
 ) (err error) {
 	if in.GetGenre() != gattung.Zettel || in.IsVirtual() {
 		return
@@ -122,7 +122,7 @@ func (a Abbr) AbbreviateHinweisOnly(
 
 	var getAbbr func(IdLike) (string, error)
 
-	var h Hinweis
+	var h ZettelId
 
 	if err = h.Set(in.String()); err != nil {
 		err = nil
@@ -147,13 +147,13 @@ func (a Abbr) AbbreviateHinweisOnly(
 }
 
 func (a Abbr) ExpandHinweisOnly(
-	in *Id,
+	in *ObjectId,
 ) (err error) {
 	if in.GetGenre() != gattung.Zettel || a.Hinweis.Expand == nil {
 		return
 	}
 
-	var h Hinweis
+	var h ZettelId
 
 	if err = h.Set(in.String()); err != nil {
 		err = nil
@@ -176,8 +176,8 @@ func (a Abbr) ExpandHinweisOnly(
 }
 
 func (a Abbr) AbbreviateKennung(
-	in *Id,
-	out *Id,
+	in *ObjectId,
+	out *ObjectId,
 ) (err error) {
 	var getAbbr func(IdLike) (string, error)
 

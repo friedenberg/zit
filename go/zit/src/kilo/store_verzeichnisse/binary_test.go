@@ -13,14 +13,14 @@ func TestBinaryOne(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	b := new(bytes.Buffer)
-	coder := binaryEncoder{Sigil: kennung.SigilSchwanzen}
-	decoder := makeBinary(kennung.SigilSchwanzen)
+	coder := binaryEncoder{Sigil: kennung.SigilLatest}
+	decoder := makeBinary(kennung.SigilLatest)
 	expected := &sku.Transacted{}
 	var expectedN int64
 	var err error
 
 	{
-		t.AssertNoError(expected.Kennung.SetWithIdLike(kennung.MustHinweis("one/uno")))
+		t.AssertNoError(expected.Kennung.SetWithIdLike(kennung.MustZettelId("one/uno")))
 		expected.SetTai(kennung.NowTai())
 		t.AssertNoError(expected.Metadatei.Akte.Set(
 			"ed500e315f33358824203cee073893311e0a80d77989dc55c5d86247d95b2403",

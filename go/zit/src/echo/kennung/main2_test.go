@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 )
 
-func kennung2WriteToReadFromData() []string {
+func idWriteToReadFromData() []string {
 	return []string{
 		"one/uno",
 		"konfig",
@@ -18,10 +18,10 @@ func kennung2WriteToReadFromData() []string {
 	}
 }
 
-func TestKennung2WriteToReadFrom(t1 *testing.T) {
+func TestIdWriteToReadFrom(t1 *testing.T) {
 	t := test_logz.T{T: t1}
-	for _, v := range kennung2WriteToReadFromData() {
-		var k Id
+	for _, v := range idWriteToReadFromData() {
+		var k ObjectId
 		t.AssertNoError(k.Set(v))
 
 		var b bytes.Buffer
@@ -29,7 +29,7 @@ func TestKennung2WriteToReadFrom(t1 *testing.T) {
 		_, err := k.WriteTo(&b)
 		t.AssertNoError(err)
 
-		var k2 Id
+		var k2 ObjectId
 
 		_, err = k2.ReadFrom(&b)
 		t.AssertNoError(err)

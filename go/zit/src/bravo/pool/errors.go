@@ -1,6 +1,6 @@
 package pool
 
-import "errors"
+import "code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 
 var ErrDoNotRepool = errors.New("do not repool")
 

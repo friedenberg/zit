@@ -12,10 +12,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 )
 
-type QueryPrefixer interface {
-	GetQueryPrefix() string
-}
-
 type IdWithoutGenre interface {
 	interfaces.Stringer
 	Parts() [3]string
@@ -54,7 +50,7 @@ type Index struct{}
 
 func Make(v string) (k IdLikePtr, err error) {
 	if v == "" {
-		k = &Id{}
+		k = &ObjectId{}
 		return
 	}
 
@@ -77,7 +73,7 @@ func Make(v string) (k IdLikePtr, err error) {
 	}
 
 	{
-		var t Typ
+		var t Type
 
 		if err = t.Set(v); err == nil {
 			k = &t
@@ -86,7 +82,7 @@ func Make(v string) (k IdLikePtr, err error) {
 	}
 
 	{
-		var h Hinweis
+		var h ZettelId
 
 		if err = h.Set(v); err == nil {
 			k = &h

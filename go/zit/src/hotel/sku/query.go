@@ -25,7 +25,7 @@ type (
 	QueryWithSigilAndKennung interface {
 		Query
 		SigilGetter
-		ContainsKennung(*kennung.Id) bool
+		ContainsKennung(*kennung.ObjectId) bool
 	}
 
 	// Used by store_verzeichnisse.binary*
@@ -56,7 +56,7 @@ type (
 			) (err error),
 		) interfaces.FuncIter[*Transacted]
 		GetEtiketten() kennung.TagSet
-		GetTypen() kennung.TypSet
+		GetTypen() kennung.TypeSet
 	}
 
 	ExternalQueryOptions struct {

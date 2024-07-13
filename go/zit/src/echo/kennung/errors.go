@@ -1,23 +1,24 @@
 package kennung
 
 import (
-	"errors"
 	"fmt"
+
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
 
-type ErrInvalidKennung string
+type ErrInvalidId string
 
-func (e ErrInvalidKennung) Error() string {
+func (e ErrInvalidId) Error() string {
 	return fmt.Sprintf("invalid kennung: %q", string(e))
 }
 
-func (e ErrInvalidKennung) Is(err error) (ok bool) {
-	_, ok = err.(ErrInvalidKennung)
+func (e ErrInvalidId) Is(err error) (ok bool) {
+	_, ok = err.(ErrInvalidId)
 	return
 }
 
 func IsErrInvalid(err error) bool {
-	return errors.Is(err, ErrInvalidKennung(""))
+	return errors.Is(err, ErrInvalidId(""))
 }
 
 type errInvalidSigil string

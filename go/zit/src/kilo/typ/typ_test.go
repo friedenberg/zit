@@ -7,7 +7,7 @@ import (
 )
 
 func TestBlobExt(t *testing.T) {
-	var e kennung.Typ
+	var e kennung.Type
 	var err error
 
 	if err = e.Set("!md"); err != nil {
@@ -23,7 +23,7 @@ func TestBlobExt(t *testing.T) {
 }
 
 func TestBlobExt1(t *testing.T) {
-	var e kennung.Typ
+	var e kennung.Type
 	var err error
 
 	if err = e.Set("md"); err != nil {

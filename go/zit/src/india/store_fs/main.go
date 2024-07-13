@@ -181,8 +181,8 @@ func (fs *Store) String() (out string) {
 	return
 }
 
-func (s *Store) GetExternalKennung() (ks interfaces.SetLike[*kennung.Id], err error) {
-	ksm := collections_value.MakeMutableValueSet[*kennung.Id](nil)
+func (s *Store) GetExternalKennung() (ks interfaces.SetLike[*kennung.ObjectId], err error) {
+	ksm := collections_value.MakeMutableValueSet[*kennung.ObjectId](nil)
 	ks = ksm
 	var l sync.Mutex
 
@@ -209,7 +209,7 @@ func (s *Store) GetExternalKennung() (ks interfaces.SetLike[*kennung.Id], err er
 }
 
 // TODO confirm against actual Kennung
-func (fs *Store) GetKennungForString(v string) (k *kennung.Id, err error) {
+func (fs *Store) GetKennungForString(v string) (k *kennung.ObjectId, err error) {
 	var fd fd.FD
 
 	if err = fd.Set(v); err != nil {
@@ -217,7 +217,7 @@ func (fs *Store) GetKennungForString(v string) (k *kennung.Id, err error) {
 		return
 	}
 
-	k = kennung.GetIdPool().Get()
+	k = kennung.GetObjectIdPool().Get()
 
 	if err = k.SetFromPath(
 		fd.String(),
@@ -283,7 +283,7 @@ func (fs *Store) GetEmptyDirectories() fd.Set {
 }
 
 func (fs *Store) GetZettel(
-	h *kennung.Hinweis,
+	h *kennung.ZettelId,
 ) (z *KennungFDPair, ok bool) {
 	z, ok = fs.zettelen.Get(h.String())
 	return
@@ -304,7 +304,7 @@ func (fs *Store) GetEtikett(
 }
 
 func (fs *Store) GetTyp(
-	k *kennung.Typ,
+	k *kennung.Type,
 ) (t *KennungFDPair, ok bool) {
 	t, ok = fs.typen.Get(k.String())
 	return

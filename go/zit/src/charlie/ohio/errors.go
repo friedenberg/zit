@@ -1,8 +1,9 @@
 package ohio
 
 import (
-	"errors"
 	"fmt"
+
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
 
 var (

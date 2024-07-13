@@ -3,6 +3,7 @@ package store_fs
 import (
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -77,7 +78,7 @@ func (c *Store) tryKasten(fi os.FileInfo, dir string) (err error) {
 }
 
 func (c *Store) tryTyp(fi os.FileInfo, dir string) (err error) {
-	var h kennung.Typ
+	var h kennung.Type
 	var f *fd.FD
 
 	if f, err = fd.FileInfo(fi, dir); err != nil {
@@ -108,6 +109,39 @@ func (c *Store) tryTyp(fi os.FileInfo, dir string) (err error) {
 	return c.typen.Add(t)
 }
 
+func getHinweis(f *fd.FD, allowErrors bool) (h kennung.ZettelId, err error) {
+	parts := strings.Split(f.GetPath(), string(filepath.Separator))
+
+	switch len(parts) {
+	case 0, 1:
+		err = errors.Errorf("not enough parts: %q", parts)
+		return
+
+	default:
+		parts = parts[len(parts)-2:]
+	}
+
+	p := strings.Join(parts, string(filepath.Separator))
+
+	p1 := p
+	ext := path.Ext(p)
+
+	if len(ext) != 0 {
+		p1 = p[:len(p)-len(ext)]
+	}
+
+	if err = h.Set(p1); err != nil {
+		if allowErrors {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
 func (c *Store) tryZettel(
 	dir string,
 	name string,
@@ -120,9 +154,9 @@ func (c *Store) tryZettel(
 		return
 	}
 
-	var h kennung.Hinweis
+	var h kennung.ZettelId
 
-	if h, err = kennung.GetHinweis(f, false); err != nil {
+	if h, err = getHinweis(f, false); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

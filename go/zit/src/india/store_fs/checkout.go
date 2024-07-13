@@ -274,7 +274,7 @@ func (s *Store) filenameForTransacted(
 
 	switch sz.GetGenre() {
 	case gattung.Zettel:
-		var h kennung.Hinweis
+		var h kennung.ZettelId
 
 		if err = h.Set(sz.GetKennung().String()); err != nil {
 			err = errors.Wrap(err)

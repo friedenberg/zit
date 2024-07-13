@@ -147,7 +147,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 
 	// var defaultTypTransacted *typ.Transacted
 
-	var k kennung.Id
+	var k kennung.ObjectId
 
 	if err = k.SetWithIdLike(defaultTypKennung); err != nil {
 		err = errors.Wrap(err)
@@ -166,7 +166,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 			return
 		}
 
-		var k kennung.Id
+		var k kennung.ObjectId
 
 		if err = k.SetWithIdLike(defaultTypKennung); err != nil {
 			err = errors.Wrap(err)
@@ -204,7 +204,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 
 func writeDefaultErworben(
 	u *Umwelt,
-	dt kennung.Typ,
+	dt kennung.Type,
 ) (sh interfaces.ShaLike, err error) {
 	defaultKonfig := mutable_config.Default(dt)
 

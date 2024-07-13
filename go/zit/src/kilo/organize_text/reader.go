@@ -309,7 +309,7 @@ func (ar *assignmentLineReader) readOneObj(
 
 	if z.Kennung.IsEmpty() {
 		// set empty hinweis to ensure middle is '/'
-		if err = z.Kennung.SetWithIdLike(kennung.Hinweis{}); err != nil {
+		if err = z.Kennung.SetWithIdLike(kennung.ZettelId{}); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

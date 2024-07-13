@@ -34,7 +34,7 @@ func (c PeekHinweisen) Run(store *umwelt.Umwelt, args ...string) (err error) {
 		}
 	}
 
-	var hs []*kennung.Hinweis
+	var hs []*kennung.ZettelId
 
 	if hs, err = store.GetStore().GetKennungIndex().PeekHinweisen(
 		n,

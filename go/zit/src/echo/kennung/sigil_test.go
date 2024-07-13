@@ -12,14 +12,14 @@ func TestSigilContains(t1 *testing.T) {
 
 	sut := SigilAll
 
-	if !sut.ContainsOneOf(SigilSchwanzen) {
+	if !sut.ContainsOneOf(SigilLatest) {
 		t.Errorf("expected SigilAll to contain SigilSchwanzen")
 	}
 
-	sut = SigilSchwanzen
+	sut = SigilLatest
 	sut.Add(SigilHidden)
 
-	if !sut.ContainsOneOf(SigilSchwanzen) {
+	if !sut.ContainsOneOf(SigilLatest) {
 		t.Errorf("expected sut to contain SigilSchwanzen")
 	}
 

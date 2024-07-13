@@ -6,10 +6,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 )
 
-type MutableSet = interfaces.MutableSetLike[kennung.Typ]
+type MutableSet = interfaces.MutableSetLike[kennung.Type]
 
-func MakeMutableSet(hs ...kennung.Typ) MutableSet {
-	return collections_value.MakeMutableValueSet[kennung.Typ](
+func MakeMutableSet(hs ...kennung.Type) MutableSet {
+	return collections_value.MakeMutableValueSet[kennung.Type](
 		nil,
 		hs...,
 	)

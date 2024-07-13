@@ -6,6 +6,6 @@ import (
 )
 
 type Aligned interface {
-	interfaces.StringFormatWriter[*kennung.Id]
+	interfaces.StringFormatWriter[*kennung.ObjectId]
 	SetMaxKopfUndSchwanz(kop, schwanz int)
 }

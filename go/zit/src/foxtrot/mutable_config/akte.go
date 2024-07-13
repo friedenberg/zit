@@ -12,13 +12,13 @@ import (
 )
 
 type Defaults struct {
-	Typ       kennung.Typ       `toml:"typ"`
+	Typ       kennung.Type   `toml:"typ"`
 	Etiketten []kennung.Tag `toml:"etiketten"`
 }
 
 type Blob struct {
 	Defaults        Defaults                                `toml:"defaults"`
-	HiddenEtiketten []kennung.Tag                       `toml:"hidden-etiketten"`
+	HiddenEtiketten []kennung.Tag                           `toml:"hidden-etiketten"`
 	FileExtensions  file_extensions.FileExtensions          `toml:"file-extensions"`
 	RemoteScripts   map[string]script_config.RemoteScript   `toml:"remote-scripts"`
 	Actions         map[string]script_config.ScriptConfig   `toml:"actions,omitempty"`
@@ -71,7 +71,7 @@ func (a Blob) Equals(b Blob) bool {
 
 func (a *Blob) Reset() {
 	a.FileExtensions.Reset()
-	a.Defaults.Typ = kennung.Typ{}
+	a.Defaults.Typ = kennung.Type{}
 	a.Defaults.Etiketten = make([]kennung.Tag, 0)
 	a.HiddenEtiketten = make([]kennung.Tag, 0)
 	a.RemoteScripts = make(map[string]script_config.RemoteScript)

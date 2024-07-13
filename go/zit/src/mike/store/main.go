@@ -8,9 +8,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
+	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
-	"code.linenisgreat.com/zit/go/zit/src/echo/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/golf/kennung_index"
@@ -52,7 +52,7 @@ type Store struct {
 	kennungIndex          kennung_index.Index
 
 	sku.TransactedAdder
-	typenIndex kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
+	typenIndex kennung_index.KennungIndex[kennung.Type, *kennung.Type]
 
 	protoZettel      zettel.ProtoZettel
 	konfigAkteFormat blob_store.Format[mutable_config.Blob, *mutable_config.Blob]
@@ -91,7 +91,7 @@ func (c *Store) Initialize(
 		nil, // TODO-P1 make akteFormatter
 	)
 
-	c.typenIndex = kennung_index.MakeIndex2[kennung.Typ](
+	c.typenIndex = kennung_index.MakeIndex2[kennung.Type](
 		c.standort,
 		st.DirVerzeichnisse("TypenIndexV0"),
 	)

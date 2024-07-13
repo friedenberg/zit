@@ -10,14 +10,14 @@ import (
 
 type HinweisStore interface {
 	interfaces.Flusher
-	CreateHinweis() (*kennung.Hinweis, error)
+	CreateHinweis() (*kennung.ZettelId, error)
 }
 
 type HinweisIndex interface {
 	HinweisStore
 	interfaces.ResetterWithError
 	AddHinweis(kennung.IdLike) error
-	PeekHinweisen(int) ([]*kennung.Hinweis, error)
+	PeekHinweisen(int) ([]*kennung.ZettelId, error)
 }
 
 func MakeIndex(

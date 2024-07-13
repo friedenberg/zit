@@ -51,7 +51,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	type externalAktePair struct {
-		*kennung.Hinweis
+		*kennung.ZettelId
 		path string
 	}
 
@@ -62,7 +62,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		hs := args[i*2]
 		ap := args[(i*2)+1]
 
-		if p.Hinweis, err = kennung.MakeHinweis(hs); err != nil {
+		if p.ZettelId, err = kennung.MakeZettelId(hs); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -76,7 +76,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	// iterate through pairs and read current zettel
 	for i, p := range pairs {
 		if zettels[i], err = u.GetStore().ReadTransactedFromKennung(
-			p.Hinweis,
+			p.ZettelId,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -117,7 +117,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			}
 
 			if zettels[i], err = u.GetStore().ReadTransactedFromKennung(
-				p.Hinweis,
+				p.ZettelId,
 			); err != nil {
 				err = errors.Wrap(err)
 				return

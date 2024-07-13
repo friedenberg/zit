@@ -19,7 +19,7 @@ type Metadatei struct {
 	kennung.TagSet
 	Matchers interfaces.SetLike[sku.Query]
 	Comments []string
-	Typ      kennung.Typ
+	Typ      kennung.Type
 }
 
 func (m Metadatei) RemoveFromTransacted(sk *sku.Transacted) (err error) {
