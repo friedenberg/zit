@@ -65,7 +65,7 @@ func (t Tai) AsTime() (t1 thyme.Time) {
 	return
 }
 
-func (t Tai) GetGattung() interfaces.GattungLike {
+func (t Tai) GetGenre() interfaces.Genre {
 	return gattung.Bestandsaufnahme
 }
 

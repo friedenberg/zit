@@ -73,7 +73,7 @@ func (t *Typ) GetTypPtr() *Typ {
 	return t
 }
 
-func (o Typ) GetGattung() interfaces.GattungLike {
+func (o Typ) GetGenre() interfaces.Genre {
 	return gattung.Typ
 }
 

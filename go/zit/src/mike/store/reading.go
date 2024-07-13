@@ -14,7 +14,7 @@ func (s *Store) UpdateTransactedWithExternal(
 	kasten kennung.Kasten,
 	z *sku.Transacted,
 ) (err error) {
-	kid := kasten.GetKastenString()
+	kid := kasten.GetRepoIdString()
 	es, ok := s.externalStores[kid]
 
 	if !ok {
@@ -31,7 +31,7 @@ func (s *Store) UpdateTransactedWithExternal(
 }
 
 func (s *Store) ReadTransactedFromKennung(
-	k1 interfaces.StringerGattungGetter,
+	k1 interfaces.StringerGenreGetter,
 ) (sk1 *sku.Transacted, err error) {
 	sk1 = sku.GetTransactedPool().Get()
 
@@ -49,7 +49,7 @@ func (s *Store) ReadTransactedFromKennung(
 }
 
 func (s *Store) ReadTransactedFromKennungKastenSigil(
-	k1 interfaces.StringerGattungGetter,
+	k1 interfaces.StringerGenreGetter,
 	ka kennung.Kasten,
 	si kennung.Sigil,
 ) (sk1 *sku.Transacted, err error) {
@@ -95,7 +95,7 @@ func (s *Store) ReadCheckedOutFromTransacted(
 	kasten kennung.Kasten,
 	sk *sku.Transacted,
 ) (co sku.CheckedOutLike, err error) {
-	switch kasten.GetKastenString() {
+	switch kasten.GetRepoIdString() {
 	case "chrome":
 		err = todo.Implement()
 

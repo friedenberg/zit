@@ -7,7 +7,7 @@ import (
 )
 
 func (s *Store) PutCheckedOutLike(col sku.CheckedOutLike) {
-	switch col.GetKasten().GetKastenString() {
+	switch col.GetKasten().GetRepoIdString() {
 	case "chrome":
 		chrome.GetCheckedOutPool().Put(col.(*chrome.CheckedOut))
 

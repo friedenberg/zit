@@ -61,7 +61,7 @@ func (a *Sha) Equals(b *Sha) bool {
 	return a.value.Equals(&b.value)
 }
 
-func (e Sha) GetGattung() interfaces.GattungLike {
+func (e Sha) GetGattung() interfaces.Genre {
 	return gattung.Akte
 }
 
@@ -104,12 +104,12 @@ func (t Sha) IsNull() bool {
 	return t.value.IsNull()
 }
 
-func (t Sha) Kopf() string {
-	return t.value.Kopf()
+func (t Sha) GetHead() string {
+	return t.value.GetHead()
 }
 
-func (t Sha) Schwanz() string {
-	return t.value.Schwanz()
+func (t Sha) GetTail() string {
+	return t.value.GetTail()
 }
 
 func (t Sha) GetShaLike() interfaces.ShaLike {

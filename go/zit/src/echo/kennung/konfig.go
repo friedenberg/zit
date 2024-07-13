@@ -34,7 +34,7 @@ func ErrOnKonfig(v string) (err error) {
 
 type Konfig struct{}
 
-func (a Konfig) GetGattung() interfaces.GattungLike {
+func (a Konfig) GetGenre() interfaces.Genre {
 	return gattung.Konfig
 }
 

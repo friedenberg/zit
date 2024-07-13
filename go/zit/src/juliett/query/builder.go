@@ -467,7 +467,7 @@ LOOP:
 				return
 			}
 
-			switch k.GetGattung() {
+			switch k.GetGenre() {
 			case gattung.Zettel:
 				b.preexistingKennung = append(
 					b.preexistingKennung,

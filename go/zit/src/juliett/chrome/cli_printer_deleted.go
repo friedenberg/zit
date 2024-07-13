@@ -9,17 +9,17 @@ import (
 )
 
 type itemDeletedStringFormatWriter struct {
-	interfaces.Konfig
+	interfaces.Config
 	rightAlignedWriter   interfaces.StringFormatWriter[string]
 	idStringFormatWriter interfaces.StringFormatWriter[string]
 }
 
 func MakeItemDeletedStringWriterFormat(
-	konfig interfaces.Konfig,
+	konfig interfaces.Config,
 	co string_format_writer.ColorOptions,
 ) *itemDeletedStringFormatWriter {
 	return &itemDeletedStringFormatWriter{
-		Konfig:             konfig,
+		Config:             konfig,
 		rightAlignedWriter: string_format_writer.MakeRightAligned(),
 		idStringFormatWriter: string_format_writer.MakeColor(
 			co,

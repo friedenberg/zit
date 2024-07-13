@@ -272,7 +272,7 @@ func (s *Store) filenameForTransacted(
 	default:
 	}
 
-	switch sz.GetGattung() {
+	switch sz.GetGenre() {
 	case gattung.Zettel:
 		var h kennung.Hinweis
 
@@ -308,7 +308,7 @@ func (s *Store) PathForTransacted(dir string, tl *sku.Transacted) string {
 }
 
 func (s *Store) FileExtensionForGattung(
-	gg interfaces.GattungGetter,
+	gg interfaces.GenreGetter,
 ) string {
 	return s.fileExtensions.GetFileExtensionForGattung(gg)
 }

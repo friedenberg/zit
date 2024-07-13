@@ -12,12 +12,12 @@ import (
 // TODO add support for cwd and sigil
 // TODO simplify
 func (s *Store) ReadOneInto(
-	k1 interfaces.StringerGattungGetter,
+	k1 interfaces.StringerGenreGetter,
 	out *sku.Transacted,
 ) (err error) {
 	var sk *sku.Transacted
 
-	switch k1.GetGattung() {
+	switch k1.GetGenre() {
 	case gattung.Zettel:
 		var h *kennung.Hinweis
 

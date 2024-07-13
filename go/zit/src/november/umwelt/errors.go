@@ -11,7 +11,7 @@ import (
 type ErrUnsupportedFormatterValue interface {
 	error
 	GetFormatValue() string
-	GetGattung() interfaces.GattungLike
+	GetGattung() interfaces.Genre
 }
 
 func IsErrUnsupportedFormatterValue(err error) bool {
@@ -21,7 +21,7 @@ func IsErrUnsupportedFormatterValue(err error) bool {
 
 func MakeErrUnsupportedFormatterValue(
 	formatValue string,
-	g interfaces.GattungLike,
+	g interfaces.Genre,
 ) error {
 	return errors.Wrap(
 		errUnsupportedFormatter{
@@ -53,6 +53,6 @@ func (e errUnsupportedFormatter) GetFormatValue() string {
 	return e.format
 }
 
-func (e errUnsupportedFormatter) GetGattung() interfaces.GattungLike {
+func (e errUnsupportedFormatter) GetGattung() interfaces.Genre {
 	return e.gattung
 }

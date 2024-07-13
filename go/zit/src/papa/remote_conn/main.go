@@ -12,7 +12,7 @@ import (
 )
 
 type Dialogue struct {
-	Angeboren interfaces.Angeboren
+	Angeboren interfaces.ImmutableConfig
 	typ       DialogueType
 	conn      *net.UnixConn
 	stage     *stage
@@ -20,12 +20,12 @@ type Dialogue struct {
 	enc       *gob.Encoder
 }
 
-func (d Dialogue) GetAngeboren() interfaces.Angeboren {
+func (d Dialogue) GetAngeboren() interfaces.ImmutableConfig {
 	return d.Angeboren
 }
 
 func makeDialogueListen(
-	a interfaces.AngeborenGetter,
+	a interfaces.ImmutableConfigGetter,
 	s *stage,
 	l *net.UnixListener,
 ) (d Dialogue, msg MessageHiCommander, err error) {
@@ -45,7 +45,7 @@ func makeDialogueListen(
 	d.dec = gob.NewDecoder(d.conn)
 
 	msgOurHi := MessageHiSoldier{
-		Angeboren: a.GetAngeboren(),
+		Angeboren: a.GetImmutableConfig(),
 	}
 
 	if err = d.Send(msgOurHi); err != nil {

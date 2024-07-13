@@ -26,7 +26,7 @@ func (mr *Reader) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	n1, err = mr.ReadAkteFrom(r)
+	n1, err = mr.ReadBlobFrom(r)
 	n += n1
 
 	if err != nil {
@@ -122,7 +122,7 @@ LINE_READ_LOOP:
 	return
 }
 
-func (mr *Reader) ReadAkteFrom(r io.Reader) (n int64, err error) {
+func (mr *Reader) ReadBlobFrom(r io.Reader) (n int64, err error) {
 	br := bufio.NewReader(r)
 	akte := ohio.MakePipedReaderFrom(mr.Akte)
 

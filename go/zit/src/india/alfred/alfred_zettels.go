@@ -149,8 +149,8 @@ func (w *Writer) hinweisToItem(e kennung.Hinweis) (a *alfred.Item) {
 	defer alfred.GetPoolMatchBuilder().Put(mb)
 
 	mb.AddMatch(e.String())
-	mb.AddMatch(e.Kopf())
-	mb.AddMatch(e.Schwanz())
+	mb.AddMatch(e.GetHead())
+	mb.AddMatch(e.GetTail())
 
 	a.Match.ReadFromBuffer(&mb.Buffer)
 

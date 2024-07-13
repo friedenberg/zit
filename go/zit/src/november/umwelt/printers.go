@@ -316,7 +316,7 @@ func (u *Umwelt) PrinterCheckedOutForKasten(
 	pcofs := u.PrinterCheckedOutFS()
 	pcochrome := u.PrinterCheckedOutChrome()
 
-	switch k.GetKastenString() {
+	switch k.GetRepoIdString() {
 	case "chrome":
 		return pcochrome
 
@@ -330,7 +330,7 @@ func (u *Umwelt) PrinterCheckedOutLike() interfaces.FuncIter[sku.CheckedOutLike]
 	pcochrome := u.PrinterCheckedOutChrome()
 
 	return func(co sku.CheckedOutLike) (err error) {
-		switch co.GetKasten().GetKastenString() {
+		switch co.GetKasten().GetRepoIdString() {
 		case "chrome":
 			return pcochrome(co)
 

@@ -241,7 +241,7 @@ func (c *ZettelFromExternalAkte) zettelForAkte(
 		return
 	}
 
-	if err = c.ProtoZettel.ApplyWithAkteFD(z, akteFD); err != nil {
+	if err = c.ProtoZettel.ApplyWithBlobFD(z, akteFD); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

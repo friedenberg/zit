@@ -70,7 +70,7 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 		}
 	}
 
-	n1, err = mr.ReadAkteFrom(r)
+	n1, err = mr.ReadBlobFrom(r)
 	n += n1
 
 	if err != nil {

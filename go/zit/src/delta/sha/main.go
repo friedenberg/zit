@@ -98,11 +98,11 @@ func (s *Sha) IsNull() bool {
 	return false
 }
 
-func (s *Sha) Kopf() string {
+func (s *Sha) GetHead() string {
 	return s.String()[0:2]
 }
 
-func (s *Sha) Schwanz() string {
+func (s *Sha) GetTail() string {
 	return s.String()[2:]
 }
 
@@ -264,8 +264,8 @@ func (a *Sha) ResetWithShaLike(b interfaces.ShaLike) {
 }
 
 func (s *Sha) Path(pc ...string) string {
-	pc = append(pc, s.Kopf())
-	pc = append(pc, s.Schwanz())
+	pc = append(pc, s.GetHead())
+	pc = append(pc, s.GetTail())
 
 	return path.Join(pc...)
 }

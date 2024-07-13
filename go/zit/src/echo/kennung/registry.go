@@ -38,7 +38,7 @@ func register[T Kennung, TPtr interface {
 
 	ok := false
 	var id1 Kennung
-	g := gattung.Must(id.GetGattung())
+	g := gattung.Must(id.GetGenre())
 
 	if id1, ok = registryGattung[g]; ok {
 		panic(

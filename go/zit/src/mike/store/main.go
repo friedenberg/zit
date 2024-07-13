@@ -32,7 +32,7 @@ type Store struct {
 	cwdFiles                  *store_fs.Store
 	externalStores            map[string]*external_store.Store
 	akten                     *akten.Akten
-	bestandsaufnahmeAkte      bestandsaufnahme.Akte
+	bestandsaufnahmeAkte      bestandsaufnahme.InventoryList
 	options                   objekte_format.Options
 	Abbr                      AbbrStore
 	persistentMetadateiFormat objekte_format.Format
@@ -96,7 +96,7 @@ func (c *Store) Initialize(
 		st.DirVerzeichnisse("TypenIndexV0"),
 	)
 
-	c.bestandsaufnahmeAkte = bestandsaufnahme.Akte{
+	c.bestandsaufnahmeAkte = bestandsaufnahme.InventoryList{
 		Skus: sku.MakeTransactedHeap(),
 	}
 
@@ -143,7 +143,7 @@ func (c *Store) Initialize(
 
 	c.protoZettel = zettel.MakeProtoZettel(c.GetKonfig())
 
-	c.konfigAkteFormat = akten.MakeAkteFormat[erworben.Akte, *erworben.Akte](
+	c.konfigAkteFormat = akten.MakeAkteFormat(
 		akten.MakeTextParserIgnoreTomlErrors[erworben.Akte](
 			c.GetStandort(),
 		),

@@ -14,7 +14,7 @@ type FileExtensions struct {
 }
 
 func (a FileExtensions) GetFileExtensionForGattung(
-	g1 interfaces.GattungGetter,
+	g1 interfaces.GenreGetter,
 ) string {
 	g := gattung.Must(g1)
 

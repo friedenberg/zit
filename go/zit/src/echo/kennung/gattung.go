@@ -45,21 +45,21 @@ func (a *Gattung) ResetWith(b Gattung) {
 
 func (a *Gattung) Add(bs ...gattung.Gattung) {
 	for _, b := range bs {
-		*a |= Gattung(b.GetGattung().GetGattungBitInt())
+		*a |= Gattung(b.GetGenre().GetGenreBitInt())
 	}
 }
 
-func (a *Gattung) Del(b interfaces.GattungGetter) {
-	*a &= ^Gattung(b.GetGattung().GetGattungBitInt())
+func (a *Gattung) Del(b interfaces.GenreGetter) {
+	*a &= ^Gattung(b.GetGenre().GetGenreBitInt())
 }
 
-func (a Gattung) Contains(b interfaces.GattungGetter) bool {
-	bg := Gattung(b.GetGattung().GetGattungBitInt())
+func (a Gattung) Contains(b interfaces.GenreGetter) bool {
+	bg := Gattung(b.GetGenre().GetGenreBitInt())
 	return byte(a&bg) == byte(bg)
 }
 
-func (a Gattung) ContainsOneOf(b interfaces.GattungGetter) bool {
-	bg := Gattung(b.GetGattung().GetGattungBitInt())
+func (a Gattung) ContainsOneOf(b interfaces.GenreGetter) bool {
+	bg := Gattung(b.GetGenre().GetGenreBitInt())
 	return a&bg != 0
 }
 
@@ -92,7 +92,7 @@ func (a Gattung) String() string {
 			sb.WriteRune(',')
 		}
 
-		sb.WriteString(g.GetGattungString())
+		sb.WriteString(g.GetGenreString())
 		first = false
 	}
 

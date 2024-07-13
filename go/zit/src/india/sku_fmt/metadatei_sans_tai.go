@@ -11,7 +11,7 @@ import (
 func StringMetadateiSansTai(o *sku.Transacted) (str string) {
 	sb := &strings.Builder{}
 
-	sb.WriteString(o.GetGattung().GetGattungString())
+	sb.WriteString(o.GetGenre().GetGenreString())
 
 	sb.WriteString(" ")
 	sb.WriteString(o.GetKennung().String())

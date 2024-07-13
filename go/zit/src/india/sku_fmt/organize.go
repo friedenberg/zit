@@ -307,7 +307,7 @@ LOOP:
 					return
 				}
 
-				g := k.GetGattung()
+				g := k.GetGenre()
 
 				switch g {
 				case gattung.Typ:
@@ -330,7 +330,7 @@ LOOP:
 					}
 
 				default:
-					err = gattung.MakeErrUnsupportedGattung(k.GetGattung())
+					err = gattung.MakeErrUnsupportedGattung(k.GetGenre())
 					return
 				}
 

@@ -52,7 +52,7 @@ type Store struct {
 	standort standort.Standort
 	erworben *konfig.Compiled
 	path     string
-	interfaces.VerzeichnisseFactory
+	interfaces.CacheIOFactory
 	pages             [PageCount]Page
 	historicalChanges []string
 	ennuiStore
@@ -69,7 +69,7 @@ func MakeStore(
 		standort:             s,
 		erworben:             k,
 		path:                 dir,
-		VerzeichnisseFactory: s,
+		CacheIOFactory: s,
 	}
 
 	if err = i.ennuiStore.Initialize(

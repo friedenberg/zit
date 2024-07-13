@@ -21,7 +21,7 @@ type encodedKennung struct {
 }
 
 type oldIndex struct {
-	su interfaces.VerzeichnisseFactory
+	su interfaces.CacheIOFactory
 
 	lock sync.Mutex
 	path string
@@ -37,9 +37,9 @@ type oldIndex struct {
 }
 
 func MakeIndex(
-	k interfaces.Konfig,
-	s interfaces.Standort,
-	su interfaces.VerzeichnisseFactory,
+	k interfaces.Config,
+	s interfaces.Directory,
+	su interfaces.CacheIOFactory,
 ) (i *oldIndex, err error) {
 	i = &oldIndex{
 		path:               s.FileVerzeichnisseKennung(),
@@ -74,7 +74,7 @@ func (i *oldIndex) Flush() (err error) {
 
 	var w1 io.WriteCloser
 
-	if w1, err = i.su.WriteCloserVerzeichnisse(i.path); err != nil {
+	if w1, err = i.su.WriteCloserCache(i.path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -109,7 +109,7 @@ func (i *oldIndex) readIfNecessary() (err error) {
 
 	var r1 io.ReadCloser
 
-	if r1, err = i.su.ReadCloserVerzeichnisse(i.path); err != nil {
+	if r1, err = i.su.ReadCloserCache(i.path); err != nil {
 		if errors.IsNotExist(err) {
 			err = nil
 		} else {
@@ -172,7 +172,7 @@ func (i *oldIndex) Reset() (err error) {
 }
 
 func (i *oldIndex) AddHinweis(k1 kennung.Kennung) (err error) {
-	if !k1.GetGattung().EqualsGattung(gattung.Zettel) {
+	if !k1.GetGenre().EqualsGenre(gattung.Zettel) {
 		err = gattung.MakeErrUnsupportedGattung(k1)
 		return
 	}
@@ -191,12 +191,12 @@ func (i *oldIndex) AddHinweis(k1 kennung.Kennung) (err error) {
 
 	var left, right int
 
-	if left, err = i.oldHinweisenStore.Left().Kennung(h.Kopf()); err != nil {
+	if left, err = i.oldHinweisenStore.Left().Kennung(h.GetHead()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if right, err = i.oldHinweisenStore.Right().Kennung(h.Schwanz()); err != nil {
+	if right, err = i.oldHinweisenStore.Right().Kennung(h.GetTail()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

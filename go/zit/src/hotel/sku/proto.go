@@ -49,11 +49,11 @@ func (pz Proto) Make() (z *metadatei.Metadatei) {
 
 func (pz Proto) Apply(
 	ml metadatei.MetadateiLike,
-	g interfaces.GattungGetter,
+	g interfaces.GenreGetter,
 ) (ok bool) {
 	z := ml.GetMetadatei()
 
-	if g.GetGattung() == gattung.Zettel {
+	if g.GetGenre() == gattung.Zettel {
 		if kennung.IsEmpty(z.GetTyp()) &&
 			!kennung.IsEmpty(pz.Metadatei.Typ) &&
 			!z.GetTyp().Equals(pz.Metadatei.Typ) {

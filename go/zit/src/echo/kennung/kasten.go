@@ -44,15 +44,15 @@ type Kasten struct {
 	value string
 }
 
-func (k Kasten) GetKasten() interfaces.KastenLike {
+func (k Kasten) GetRepoId() interfaces.RepoId {
 	return k
 }
 
-func (k Kasten) EqualsKasten(kg interfaces.KastenGetter) bool {
-	return kg.GetKasten().GetKastenString() == k.GetKastenString()
+func (k Kasten) EqualsRepoId(kg interfaces.RepoIdGetter) bool {
+	return kg.GetRepoId().GetRepoIdString() == k.GetRepoIdString()
 }
 
-func (k Kasten) GetKastenString() string {
+func (k Kasten) GetRepoIdString() string {
 	return k.String()
 }
 
@@ -72,7 +72,7 @@ func (a Kasten) Equals(b Kasten) bool {
 	return a.value == b.value
 }
 
-func (o Kasten) GetGattung() interfaces.GattungLike {
+func (o Kasten) GetGenre() interfaces.Genre {
 	return gattung.Kasten
 }
 

@@ -49,7 +49,7 @@ func (s *AkteStore[A, APtr]) GetBlob(
 	a = APtr(&a1)
 	s.resetFunc(a)
 
-	if _, err = s.ParseAkte(ar, a); err != nil {
+	if _, err = s.ParseBlob(ar, a); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

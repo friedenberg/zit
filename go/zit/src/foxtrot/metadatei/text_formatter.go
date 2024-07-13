@@ -67,7 +67,7 @@ func MakeTextFormatterMetadateiOnly(
 	}
 }
 
-func MakeTextFormatterMetadateiInlineAkte(
+func MakeTextFormatterMetadateiInlineBlob(
 	options TextFormatterOptions,
 	akteFactory interfaces.BlobReaderFactory,
 	akteFormatter script_config.RemoteScript,

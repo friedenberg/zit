@@ -37,7 +37,7 @@ func (f *aligned) WriteStringFormat(
 	var n1 int
 
 	if f.Abbreviations.Hinweisen &&
-		o.GetGattung() == gattung.Zettel &&
+		o.GetGenre() == gattung.Zettel &&
 		!o.IsVirtual() {
 		if err = f.AbbreviateKennung(o, o); err != nil {
 			err = errors.Wrap(err)

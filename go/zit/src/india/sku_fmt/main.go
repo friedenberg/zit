@@ -20,7 +20,7 @@ func (k KeyerSkuLikeUnique) GetKey(o *sku.Transacted) string {
 	return fmt.Sprintf(
 		"%s %s %s %s %s",
 		o.GetTai(),
-		o.GetGattung(),
+		o.GetGenre(),
 		o.GetKennung(),
 		o.GetObjekteSha(),
 		o.GetAkteSha(),
@@ -31,7 +31,7 @@ func String(o *sku.Transacted) (str string) {
 	str = fmt.Sprintf(
 		"%s %s %s %s %s",
 		o.GetTai(),
-		o.GetGattung(),
+		o.GetGenre(),
 		o.GetKennung(),
 		o.GetObjekteSha(),
 		o.GetAkteSha(),

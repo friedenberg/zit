@@ -23,11 +23,11 @@ func makeTestTextFormat(
 	)
 }
 
-func TestReadWithoutAkte(t1 *testing.T) {
+func TestReadWithoutBlob(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 	af := test_metadatei_io.FixtureFactoryReadWriteCloser(nil)
 
-	actual, akte := readFormat(
+	actual, blob := readFormat(
 		t,
 		makeTestTextFormat(af),
 		af,
@@ -43,7 +43,7 @@ func TestReadWithoutAkte(t1 *testing.T) {
 
 	expected := &metadatei.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
-		Typ:         makeAkteExt(t, "md"),
+		Typ:         makeBlobExt(t, "md"),
 	}
 
 	expected.SetEtiketten(makeEtiketten(t,
@@ -56,17 +56,17 @@ func TestReadWithoutAkte(t1 *testing.T) {
 		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)
 	}
 
-	if akte != "" {
-		t.Fatalf("akte:\nexpected empty but got %q", akte)
+	if blob != "" {
+		t.Fatalf("blob:\nexpected empty but got %q", blob)
 	}
 }
 
-func TestReadWithoutAkteWithMultilineBezeichnung(t1 *testing.T) {
+func TestReadWithoutBlobWithMultilineBezeichnung(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	af := test_metadatei_io.FixtureFactoryReadWriteCloser(nil)
 
-	actual, akte := readFormat(
+	actual, blob := readFormat(
 		t,
 		makeTestTextFormat(af),
 		af,
@@ -83,7 +83,7 @@ func TestReadWithoutAkteWithMultilineBezeichnung(t1 *testing.T) {
 
 	expected := &metadatei.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title\ncontinues"),
-		Typ:         makeAkteExt(t, "md"),
+		Typ:         makeBlobExt(t, "md"),
 	}
 
 	expected.SetEtiketten(makeEtiketten(t,
@@ -96,12 +96,12 @@ func TestReadWithoutAkteWithMultilineBezeichnung(t1 *testing.T) {
 		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)
 	}
 
-	if akte != "" {
-		t.Fatalf("akte:\nexpected empty but got %q", akte)
+	if blob != "" {
+		t.Fatalf("blob:\nexpected empty but got %q", blob)
 	}
 }
 
-func TestReadWithAkte(t1 *testing.T) {
+func TestReadWithBlob(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	af := test_metadatei_io.FixtureFactoryReadWriteCloser(
@@ -111,7 +111,7 @@ func TestReadWithAkte(t1 *testing.T) {
 		},
 	)
 
-	actual, akte := readFormat(
+	actual, blob := readFormat(
 		t,
 		makeTestTextFormat(af),
 		af,
@@ -129,7 +129,7 @@ the body
 
 	expected := &metadatei.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
-		Typ:         makeAkteExt(t, "md"),
+		Typ:         makeBlobExt(t, "md"),
 	}
 
 	errors.PanicIfError(expected.Akte.Set(
@@ -146,115 +146,9 @@ the body
 		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)
 	}
 
-	expectedAkte := "the body\n"
+	expectedBlob := "the body\n"
 
-	if expectedAkte != akte {
-		t.Fatalf("akte:\nexpected: %#v\n  actual: %#v", expectedAkte, akte)
+	if expectedBlob != blob {
+		t.Fatalf("blob:\nexpected: %#v\n  actual: %#v", expectedBlob, blob)
 	}
 }
-
-// func TestReadMultilineBezeichnung(t *testing.T) {
-// 	zt := makeText(
-// 		t,
-// 		`---
-// # the title
-//   continues here
-// - tag1
-// - tag2
-// - tag3
-// ! text/plain
-// ---
-
-// the body`,
-// 	)
-
-// 	expected := Text{
-// 		Metadatei: Metadatei{
-// 			Bezeichnung: "the title continues here",
-// 			Etiketten: []etikett.Etikett{
-// 				etikett.Etikett{Value: "tag1"},
-// 				etikett.Etikett{Value: "tag2"},
-// 				etikett.Etikett{Value: "tag3"},
-// 			},
-// 			AkteExt: "text/plain",
-// 		},
-// 		Akte: akte{
-// 			buffer: bytes.NewBufferString("the body"),
-// 		},
-// 	}
-
-// 	if !zt.Equals(expected) {
-// 		t.Fatalf("\nexpected: %#v\nactual: %#v", expected, zt)
-// 	}
-// }
-
-// func TestReadImplicitExt(t *testing.T) {
-// 	zt := makeText(
-// 		t,
-// 		`---
-// # the title
-// - tag1
-// - tag2
-// - tag3
-// ! the_file.png
-// ---`,
-// 	)
-
-// 	panic(errors.Errorf("%#v", zt))
-
-// 	expected := Text{
-// 		Metadatei: Metadatei{
-// 			Bezeichnung: "the title",
-// 			Etiketten: []etikett.Etikett{
-// 				etikett.Etikett{Value: "tag1"},
-// 				etikett.Etikett{Value: "tag2"},
-// 				etikett.Etikett{Value: "tag3"},
-// 			},
-// 			AkteExt: "the_file.png",
-// 		},
-// 	}
-
-// 	if !zt.Equals(expected) {
-// 		t.Fatalf("\nexpected: %#v\nactual: %#v", expected, zt)
-// 	}
-// }
-
-// func TestWrite(t *testing.T) {
-// 	zt := &Text{
-// 		Metadatei: Metadatei{
-// 			Bezeichnung: "the title",
-// 			Etiketten: []etikett.Etikett{
-// 				etikett.Etikett{Value: "tag1"},
-// 				etikett.Etikett{Value: "tag2"},
-// 				etikett.Etikett{Value: "tag3"},
-// 			},
-// 			AkteExt: "text/plain",
-// 		},
-// 		Akte: akte{
-// 			buffer: bytes.NewBufferString("the body"),
-// 		},
-// 	}
-
-// 	expected := `---
-// # the title
-// - tag1
-// - tag2
-// - tag3
-// ! text/plain
-// ---
-
-// the body`
-
-// 	var err error
-
-// 	actual := &strings.Builder{}
-
-// 	if _, err = zt.WriteTo(actual); err != nil {
-// 		t.Fatalf("%s", err)
-// 		return
-// 	}
-
-// 	if expected != actual.String() {
-// 		t.Fatalf("\nexpected: %q\nactual:   %q", expected, actual.String())
-// 	}
-// }

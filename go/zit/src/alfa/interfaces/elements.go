@@ -32,7 +32,7 @@ type ValuePtr[T any] interface {
 
 type Id[T any] interface {
 	Value[T]
-	GattungGetter
+	GenreGetter
 }
 
 type IdPtr[T any] interface {

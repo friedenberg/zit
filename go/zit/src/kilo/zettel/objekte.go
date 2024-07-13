@@ -7,7 +7,7 @@ import (
 
 type Objekte struct{}
 
-func (z Objekte) GetGattung() interfaces.GattungLike {
+func (z Objekte) GetGattung() interfaces.Genre {
 	return gattung.Zettel
 }
 

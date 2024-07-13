@@ -113,8 +113,8 @@ func (a *External) GetMetadatei() *metadatei.Metadatei {
 	return &a.Metadatei
 }
 
-func (a *External) GetGattung() interfaces.GattungLike {
-	return a.Kennung.GetGattung()
+func (a *External) GetGattung() interfaces.Genre {
+	return a.Kennung.GetGenre()
 }
 
 func (a *External) String() string {

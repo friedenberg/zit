@@ -90,7 +90,7 @@ func (f v5) FormatPersistentMetadatei(
 	n1, err = ohio.WriteKeySpaceValueNewlineString(
 		w,
 		keyGattung.String(),
-		c.GetKennung().GetGattung().GetGattungString(),
+		c.GetKennung().GetGenre().GetGenreString(),
 	)
 	n += int64(n1)
 

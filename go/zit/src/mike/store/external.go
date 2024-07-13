@@ -12,10 +12,10 @@ type ObjekteOptions = sku.ObjekteOptions
 
 func (s *Store) ReadOneKennungExternal(
 	o ObjekteOptions,
-	k1 interfaces.StringerGattungKastenGetter,
+	k1 interfaces.StringerGenreRepoIdGetter,
 	sk *sku.Transacted,
 ) (el sku.ExternalLike, err error) {
-	switch k1.GetKasten().GetKastenString() {
+	switch k1.GetRepoId().GetRepoIdString() {
 	case "chrome":
 		// TODO populate with chrome kasten
 		ui.Debug().Print("would populate from chrome")
@@ -31,12 +31,12 @@ func (s *Store) ReadOneKennungExternal(
 }
 
 func (s *Store) Open(
-	kasten interfaces.KastenGetter,
+	kasten interfaces.RepoIdGetter,
 	m checkout_mode.Mode,
 	ph interfaces.FuncIter[string],
 	zsc sku.CheckedOutLikeSet,
 ) (err error) {
-	kid := kasten.GetKasten().GetKastenString()
+	kid := kasten.GetRepoId().GetRepoIdString()
 	es, ok := s.externalStores[kid]
 
 	if !ok {

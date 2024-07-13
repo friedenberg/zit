@@ -73,7 +73,7 @@ func (s *Store) CreateOrUpdateAkteSha(
 		err = file_lock.ErrLockRequired{
 			Operation: fmt.Sprintf(
 				"create or update %s",
-				k.GetGattung(),
+				k.GetGenre(),
 			),
 		}
 

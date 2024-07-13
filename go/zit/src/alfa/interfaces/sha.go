@@ -8,7 +8,7 @@ type ShaLike interface {
 	// TODO-P3
 	// GetHashBytes() []byte
 	// ValueLike
-	Korper
+	StringerWithHeadAndTail
 	GetShaString() string
 	GetShaBytes() []byte
 	EqualsSha(ShaLike) bool // TODO-P3 rename to EqualsShaLike

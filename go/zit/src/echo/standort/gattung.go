@@ -11,7 +11,7 @@ import (
 
 func (s Standort) DirObjektenGattung(
 	sv interfaces.StoreVersion,
-	g interfaces.GattungGetter,
+	g interfaces.GenreGetter,
 ) (p string, err error) {
 	switch sv.GetInt() {
 	case 0, 1:
@@ -23,24 +23,24 @@ func (s Standort) DirObjektenGattung(
 }
 
 func (s Standort) dirObjektenGattung2(
-	g1 interfaces.GattungGetter,
+	g1 interfaces.GenreGetter,
 ) (p string, err error) {
-	g := g1.GetGattung()
+	g := g1.GetGenre()
 
 	if g == gattung.Unknown {
 		err = gattung.MakeErrUnsupportedGattung(g)
 		return
 	}
 
-	p = s.DirObjekten2(g.GetGattungStringPlural())
+	p = s.DirObjekten2(g.GetGenreStringPlural())
 
 	return
 }
 
 func (s Standort) dirObjektenGattung(
-	g interfaces.GattungGetter,
+	g interfaces.GenreGetter,
 ) (p string, err error) {
-	switch g.GetGattung() {
+	switch g.GetGenre() {
 	case gattung.Akte:
 		p = s.DirObjekten("Akten")
 
@@ -72,7 +72,7 @@ func (s Standort) dirObjektenGattung(
 
 func (s Standort) HasObjekte(
 	sv interfaces.StoreVersion,
-	g interfaces.GattungGetter,
+	g interfaces.GenreGetter,
 	sh sha.ShaLike,
 ) (ok bool) {
 	var d string
@@ -159,7 +159,7 @@ func (s Standort) ReadAllShas(
 
 func (s Standort) ReadAllShasForGattung(
 	sv interfaces.StoreVersion,
-	g interfaces.GattungGetter,
+	g interfaces.GenreGetter,
 	w interfaces.FuncIter[*sha.Sha],
 ) (err error) {
 	var p string

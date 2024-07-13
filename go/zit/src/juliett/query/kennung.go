@@ -34,7 +34,7 @@ func (k Kennung) ContainsSku(sk *sku.Transacted) (ok bool) {
 
 	me := sk.GetMetadatei()
 
-	switch k.GetGattung() {
+	switch k.GetGenre() {
 	case gattung.Etikett:
 		var idx int
 

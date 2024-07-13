@@ -19,7 +19,7 @@ type Listener interface {
 }
 
 type MessageHiSoldier struct {
-	Angeboren interfaces.Angeboren
+	Angeboren interfaces.ImmutableConfig
 }
 
 type SoldierDialogueChanElement struct {
@@ -29,7 +29,7 @@ type SoldierDialogueChanElement struct {
 }
 
 type StageSoldier struct {
-	Angeboren                 interfaces.AngeborenGetter
+	Angeboren                 interfaces.ImmutableConfigGetter
 	listener                  *net.UnixListener
 	chStopWaitingForDialogues chan struct{}
 	chDialogue                chan SoldierDialogueChanElement

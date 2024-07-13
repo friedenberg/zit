@@ -65,11 +65,11 @@ func (pz ProtoZettel) Make() (z *sku.Transacted) {
 
 func (pz ProtoZettel) Apply(
 	ml metadatei.MetadateiLike,
-	gg interfaces.GattungGetter,
+	gg interfaces.GenreGetter,
 ) (ok bool) {
 	z := ml.GetMetadatei()
 
-	g := gg.GetGattung()
+	g := gg.GetGenre()
 	ui.Log().Print(ml, g)
 
 	switch g {
@@ -97,7 +97,7 @@ func (pz ProtoZettel) Apply(
 	return
 }
 
-func (pz ProtoZettel) ApplyWithAkteFD(
+func (pz ProtoZettel) ApplyWithBlobFD(
 	ml metadatei.MetadateiLike,
 	akteFD *fd.FD,
 ) (err error) {

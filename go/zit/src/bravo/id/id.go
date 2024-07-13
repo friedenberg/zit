@@ -9,7 +9,7 @@ import (
 )
 
 type TypedId interface {
-	interfaces.GattungLike
+	interfaces.Genre
 	interfaces.Setter
 }
 
@@ -18,12 +18,12 @@ type TypedId interface {
 // 	return path.Join(pc...)
 // }
 
-func Path(i interfaces.Korper, pc ...string) string {
-	pc = append(pc, i.Kopf(), i.Schwanz())
+func Path(i interfaces.StringerWithHeadAndTail, pc ...string) string {
+	pc = append(pc, i.GetHead(), i.GetTail())
 	return path.Join(pc...)
 }
 
-func MakeDirIfNecessary(i interfaces.Korper, pc ...string) (p string, err error) {
+func MakeDirIfNecessary(i interfaces.StringerWithHeadAndTail, pc ...string) (p string, err error) {
 	p = Path(i, pc...)
 	dir := path.Dir(p)
 

@@ -80,13 +80,13 @@ func (op Server) GetNeededSkus(
 
 	for _, sk := range in {
 		// TODO-P2 support other Gattung
-		if sk.GetGattung() != gattung.Zettel {
+		if sk.GetGenre() != gattung.Zettel {
 			continue
 		}
 
 		if op.umwelt.Standort().HasObjekte(
 			op.umwelt.GetKonfig().GetStoreVersion(),
-			sk.GetGattung(),
+			sk.GetGenre(),
 			sk.GetObjekteSha(),
 		) {
 			ui.Log().Printf("already have objekte: %s", sk.GetObjekteSha())

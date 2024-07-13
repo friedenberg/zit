@@ -27,7 +27,7 @@ func (k *Compiled) ApplySchlummerndAndRealizeEtiketten(
 		expansion.ExpanderRight,
 	))
 
-	g := gattung.Must(sk.GetGattung())
+	g := gattung.Must(sk.GetGenre())
 	isEtikett := g == gattung.Etikett
 
 	// if g.HasParents() {
@@ -77,7 +77,7 @@ func (k *Compiled) ApplySchlummerndAndRealizeEtiketten(
 func (k *Compiled) addSuperEtiketten(
 	sk *sku.Transacted,
 ) (err error) {
-	g := sk.GetGattung()
+	g := sk.GetGenre()
 
 	var expanded []string
 	var ks string

@@ -9,16 +9,16 @@ import (
 
 var ErrNoAbbreviation = errors.New("no abbreviation")
 
-func MakeErrUnsupportedGattung(g interfaces.GattungGetter) error {
-	return errors.WrapN(1, errUnsupportedGattung{GattungLike: g.GetGattung()})
+func MakeErrUnsupportedGattung(g interfaces.GenreGetter) error {
+	return errors.WrapN(1, errUnsupportedGattung{Genre: g.GetGenre()})
 }
 
 func IsErrUnsupportedGattung(err error) bool {
-	return errors.Is(err, errUnsupportedGattung{GattungLike: Unknown})
+	return errors.Is(err, errUnsupportedGattung{Genre: Unknown})
 }
 
 type errUnsupportedGattung struct {
-	interfaces.GattungLike
+	interfaces.Genre
 }
 
 func (e errUnsupportedGattung) Is(target error) (ok bool) {
@@ -27,7 +27,7 @@ func (e errUnsupportedGattung) Is(target error) (ok bool) {
 }
 
 func (e errUnsupportedGattung) Error() string {
-	return fmt.Sprintf("unsupported gattung: %q", e.GattungLike)
+	return fmt.Sprintf("unsupported gattung: %q", e.Genre)
 }
 
 func MakeErrUnrecognizedGattung(v string) errUnrecognizedGattung {

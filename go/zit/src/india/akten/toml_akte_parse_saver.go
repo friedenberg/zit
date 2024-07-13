@@ -37,7 +37,7 @@ func MakeTextParserIgnoreTomlErrors[
 	}
 }
 
-func (f tomlAkteParseSaver[O, OPtr]) ParseAkte(
+func (f tomlAkteParseSaver[O, OPtr]) ParseBlob(
 	r io.Reader,
 	t OPtr,
 ) (n int64, err error) {

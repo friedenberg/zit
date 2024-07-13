@@ -30,7 +30,7 @@ type Store interface {
 	GetStore() Store
 
 	Create(
-		*Akte,
+		*InventoryList,
 		bezeichnung.Bezeichnung,
 	) (*sku.Transacted, error)
 	ReadLast() (*sku.Transacted, error)
@@ -38,50 +38,50 @@ type Store interface {
 	ReadOneSku(besty, sk *sha.Sha) (*sku.Transacted, error)
 	ReadAll(interfaces.FuncIter[*sku.Transacted]) error
 	ReadAllSkus(func(besty, sk *sku.Transacted) error) error
-	interfaces.BlobGetter[*Akte]
+	interfaces.BlobGetter[*InventoryList]
 
-	StreamAkte(
+	StreamInventoryList(
 		interfaces.ShaLike,
 		interfaces.FuncIter[*sku.Transacted],
 	) error
 }
 
-type AkteFormat = akten.Format[
-	Akte,
-	*Akte,
+type Format = akten.Format[
+	InventoryList,
+	*InventoryList,
 ]
 
-type akteFormat interface {
-	FormatParsedAkte(io.Writer, *Akte) (n int64, err error)
-	akten.Parser[Akte, *Akte]
+type format interface {
+	FormatParsedInventoryList(io.Writer, *InventoryList) (n int64, err error)
+	akten.Parser[InventoryList, *InventoryList]
 }
 
 type store struct {
 	standort                  standort.Standort
 	ls                        interfaces.LockSmith
 	sv                        interfaces.StoreVersion
-	of                        interfaces.ObjekteIOFactory
+	of                        interfaces.ObjectIOFactory
 	af                        interfaces.BlobIOFactory
 	clock                     kennung.Clock
-	pool                      interfaces.Pool[Akte, *Akte]
+	pool                      interfaces.Pool[InventoryList, *InventoryList]
 	persistentMetadateiFormat objekte_format.Format
 	options                   objekte_format.Options
-	formatAkte                akteFormat
+	format
 }
 
 func MakeStore(
 	standort standort.Standort,
 	ls interfaces.LockSmith,
 	sv interfaces.StoreVersion,
-	of interfaces.ObjekteIOFactory,
+	of interfaces.ObjectIOFactory,
 	af interfaces.BlobIOFactory,
 	pmf objekte_format.Format,
 	clock kennung.Clock,
 ) (s *store, err error) {
-	p := pool.MakePool(nil, func(a *Akte) { Resetter.Reset(a) })
+	p := pool.MakePool(nil, func(a *InventoryList) { Resetter.Reset(a) })
 
 	op := objekte_format.Options{Tai: true}
-	fa := MakeAkteFormat(sv, op)
+	fa := MakeFormat(sv, op)
 
 	s = &store{
 		standort:                  standort,
@@ -93,7 +93,7 @@ func MakeStore(
 		clock:                     clock,
 		persistentMetadateiFormat: pmf,
 		options:                   op,
-		formatAkte:                fa,
+		format:                    fa,
 	}
 
 	return
@@ -109,7 +109,7 @@ func (s *store) Flush() (err error) {
 }
 
 func (s *store) Create(
-	o *Akte,
+	o *InventoryList,
 	bez bezeichnung.Bezeichnung,
 ) (t *sku.Transacted, err error) {
 	if !s.ls.IsAcquired() {
@@ -127,7 +127,7 @@ func (s *store) Create(
 
 	var sh *sha.Sha
 
-	if sh, err = s.writeAkte(o); err != nil {
+	if sh, err = s.writeInventoryList(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -148,7 +148,7 @@ func (s *store) Create(
 
 	var w sha.WriteCloser
 
-	if w, err = s.of.ObjekteWriter(); err != nil {
+	if w, err = s.of.ObjectWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -168,7 +168,7 @@ func (s *store) Create(
 
 	ui.Log().Printf(
 		"saving Bestandsaufnahme with tai: %s -> %s",
-		t.GetKennung().GetGattung(),
+		t.GetKennung().GetGenre(),
 		sh,
 	)
 
@@ -177,7 +177,7 @@ func (s *store) Create(
 	return
 }
 
-func (s *store) writeAkte(o *Akte) (sh *sha.Sha, err error) {
+func (s *store) writeInventoryList(o *InventoryList) (sh *sha.Sha, err error) {
 	var sw sha.WriteCloser
 
 	if sw, err = s.standort.BlobWriter(); err != nil {
@@ -313,7 +313,7 @@ func (s *store) ReadOne(
 
 	var or sha.ReadCloser
 
-	if or, err = s.of.ObjekteReader(&sh); err != nil {
+	if or, err = s.of.ObjectReader(&sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -350,10 +350,10 @@ func (s *store) readOneFromReader(
 	return
 }
 
-func (s *store) populateAkte(akteSha interfaces.ShaLike, a *Akte) (err error) {
+func (s *store) populateInventoryList(blobSha interfaces.ShaLike, a *InventoryList) (err error) {
 	var ar interfaces.ShaReadCloser
 
-	if ar, err = s.af.BlobReader(akteSha); err != nil {
+	if ar, err = s.af.BlobReader(blobSha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -362,17 +362,17 @@ func (s *store) populateAkte(akteSha interfaces.ShaLike, a *Akte) (err error) {
 
 	sw := sha.MakeWriter(nil)
 
-	if _, err = s.formatAkte.ParseAkte(io.TeeReader(ar, sw), a); err != nil {
+	if _, err = s.format.ParseBlob(io.TeeReader(ar, sw), a); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	sh := sw.GetShaLike()
 
-	if !sh.EqualsSha(akteSha) {
+	if !sh.EqualsSha(blobSha) {
 		err = errors.Errorf(
 			"objekte had akte sha %s while akte reader had %s",
-			akteSha,
+			blobSha,
 			sh,
 		)
 		return
@@ -381,7 +381,7 @@ func (s *store) populateAkte(akteSha interfaces.ShaLike, a *Akte) (err error) {
 	return
 }
 
-func (s *store) StreamAkte(
+func (s *store) StreamInventoryList(
 	akteSha interfaces.ShaLike,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
@@ -417,9 +417,9 @@ func (s *store) StreamAkte(
 	return
 }
 
-func (s *store) GetBlob(akteSha interfaces.ShaLike) (a *Akte, err error) {
-	a = MakeAkte()
-	err = s.populateAkte(akteSha, a)
+func (s *store) GetBlob(akteSha interfaces.ShaLike) (a *InventoryList, err error) {
+	a = MakeInventoryList()
+	err = s.populateInventoryList(akteSha, a)
 	return
 }
 
@@ -530,7 +530,7 @@ func (s *store) ReadAllSkus(
 ) (err error) {
 	if err = s.ReadAll(
 		func(t *sku.Transacted) (err error) {
-			if err = s.StreamAkte(
+			if err = s.StreamInventoryList(
 				t.GetAkteSha(),
 				func(sk *sku.Transacted) (err error) {
 					return f(t, sk)

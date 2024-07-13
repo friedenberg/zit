@@ -19,7 +19,7 @@ type Hinweisen struct {
 	yang provider
 }
 
-func New(ps interfaces.Standort) (f *Hinweisen, err error) {
+func New(ps interfaces.Directory) (f *Hinweisen, err error) {
 	providerPathYin := path.Join(ps.DirKennung(), FilePathKennungYin)
 	providerPathYang := path.Join(ps.DirKennung(), FilePathKennungYang)
 

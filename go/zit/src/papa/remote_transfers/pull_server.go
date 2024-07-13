@@ -117,7 +117,7 @@ func (op PullServer) objekteReaderForSku(
 
 	var or io.ReadCloser
 
-	if or, err = orf.ObjekteReader(
+	if or, err = orf.ObjectReader(
 		&msg.Sha,
 	); err != nil {
 		err = errors.Wrap(err)

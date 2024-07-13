@@ -123,11 +123,11 @@ func (a Hinweis) Equals(b Hinweis) bool {
 	return true
 }
 
-func (h Hinweis) Kopf() string {
+func (h Hinweis) GetHead() string {
 	return h.left
 }
 
-func (h Hinweis) Schwanz() string {
+func (h Hinweis) GetTail() string {
 	return h.right
 }
 
@@ -214,7 +214,7 @@ func (h *Hinweis) ResetWith(h1 Hinweis) {
 	h.right = h1.right
 }
 
-func (h Hinweis) GetGattung() interfaces.GattungLike {
+func (h Hinweis) GetGenre() interfaces.Genre {
 	return gattung.Zettel
 }
 

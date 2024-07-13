@@ -232,7 +232,7 @@ func (k *Compiled) AddTransacted(
 ) (err error) {
 	didChange := false
 
-	switch kinder.Kennung.GetGattung() {
+	switch kinder.Kennung.GetGenre() {
 	case gattung.Typ:
 		if didChange, err = k.addTyp(kinder); err != nil {
 			err = errors.Wrap(err)

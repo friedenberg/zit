@@ -29,7 +29,7 @@ type Akte struct {
 	Filters         map[string]string                       `toml:"filters"`
 }
 
-func (Akte) GetGattung() interfaces.GattungLike {
+func (Akte) GetGattung() interfaces.Genre {
 	return gattung.Konfig
 }
 

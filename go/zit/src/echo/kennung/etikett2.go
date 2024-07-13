@@ -35,7 +35,7 @@ func (e etikett2) GetQueryPrefix() string {
 	return "-"
 }
 
-func (e etikett2) GetGattung() interfaces.GattungLike {
+func (e etikett2) GetGattung() interfaces.Genre {
 	return gattung.Etikett
 }
 

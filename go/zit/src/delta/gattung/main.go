@@ -68,11 +68,11 @@ func TrueGattung() (out []Gattung) {
 	return
 }
 
-func Must(g interfaces.GattungGetter) Gattung {
-	return g.GetGattung().(Gattung)
+func Must(g interfaces.GenreGetter) Gattung {
+	return g.GetGenre().(Gattung)
 }
 
-func Make(g interfaces.GattungLike) Gattung {
+func Make(g interfaces.Genre) Gattung {
 	return Must(g)
 }
 
@@ -84,11 +84,11 @@ func MakeOrUnknown(v string) (g Gattung) {
 	return
 }
 
-func (g Gattung) GetGattung() interfaces.GattungLike {
+func (g Gattung) GetGenre() interfaces.Genre {
 	return g
 }
 
-func (g Gattung) GetGattungBitInt() byte {
+func (g Gattung) GetGenreBitInt() byte {
 	switch g {
 	default:
 		return unknown
@@ -115,12 +115,12 @@ func (a Gattung) Equals(b Gattung) bool {
 	return a == b
 }
 
-func (a Gattung) EqualsGattung(b interfaces.GattungGetter) bool {
-	return a.GetGattungString() == b.GetGattung().GetGattungString()
+func (a Gattung) EqualsGenre(b interfaces.GenreGetter) bool {
+	return a.GetGenreString() == b.GetGenre().GetGenreString()
 }
 
-func (a Gattung) AssertGattung(b interfaces.GattungGetter) (err error) {
-	if a.GetGattungString() != b.GetGattung().GetGattungString() {
+func (a Gattung) AssertGattung(b interfaces.GenreGetter) (err error) {
+	if a.GetGenreString() != b.GetGenre().GetGenreString() {
 		err = MakeErrUnsupportedGattung(b)
 		return
 	}
@@ -128,7 +128,7 @@ func (a Gattung) AssertGattung(b interfaces.GattungGetter) (err error) {
 	return
 }
 
-func (g Gattung) GetGattungString() string {
+func (g Gattung) GetGenreString() string {
 	return g.String()
 }
 
@@ -152,7 +152,7 @@ func (g Gattung) IsTrueGattung() bool {
 	}
 }
 
-func (g Gattung) GetGattungStringPlural() string {
+func (g Gattung) GetGenreStringPlural() string {
 	switch g {
 	case Akte:
 		return "Akten"

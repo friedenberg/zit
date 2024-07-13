@@ -9,7 +9,7 @@ import (
 
 func (s *Store) ReadTransactedFromKennung(
 	o sku.ObjekteOptions,
-	k1 interfaces.StringerGattungGetter,
+	k1 interfaces.StringerGenreGetter,
 	t *sku.Transacted,
 ) (e *External, err error) {
 	k, ok := s.Get(k1)

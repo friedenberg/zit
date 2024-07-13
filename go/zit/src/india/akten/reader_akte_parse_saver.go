@@ -89,7 +89,7 @@ func (f readerAkteParseSaver[O, OPtr]) ParseAkte(
 			}
 		}()
 
-		if n1, err = f.parser.ParseAkte(pr, t); err != nil {
+		if n1, err = f.parser.ParseBlob(pr, t); err != nil {
 			pr.CloseWithError(err)
 		}
 	}(pr)

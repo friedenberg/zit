@@ -45,7 +45,7 @@ func (s *ennuiStore) Initialize(
 func (s *ennuiStore) ReadOneEnnui(sh *sha.Sha) (sk *sku.Transacted, err error) {
 	var r sha.ReadCloser
 
-	if r, err = s.standort.AkteReaderFrom(
+	if r, err = s.standort.BlobReaderFrom(
 		sh,
 		s.standort.DirVerzeichnisseMetadateiKennungMutter(),
 	); err != nil {
@@ -88,7 +88,7 @@ func (s *ennuiStore) ReadOneEnnui(sh *sha.Sha) (sk *sku.Transacted, err error) {
 }
 
 func (s *ennuiStore) ReadOneKennungSha(
-	k interfaces.StringerGattungGetter,
+	k interfaces.StringerGenreGetter,
 ) (sh *sha.Sha, err error) {
 	left := sha.FromString(k.String())
 	defer sha.GetPool().Put(left)
@@ -102,7 +102,7 @@ func (s *ennuiStore) ReadOneKennungSha(
 }
 
 func (s *ennuiStore) ReadOneKennung(
-	k interfaces.StringerGattungGetter,
+	k interfaces.StringerGenreGetter,
 ) (sk *sku.Transacted, err error) {
 	sh, err := s.ReadOneKennungSha(k)
 	defer sha.GetPool().Put(sh)
@@ -139,7 +139,7 @@ func (s *ennuiStore) makeWriteMetadateiFunc(
 	return func() (err error) {
 		var sw sha.WriteCloser
 
-		if sw, err = s.standort.AkteWriterToLight(dir); err != nil {
+		if sw, err = s.standort.BlobWriterToLight(dir); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

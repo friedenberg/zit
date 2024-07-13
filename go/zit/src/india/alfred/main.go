@@ -42,7 +42,7 @@ func New(
 
 func (w *Writer) PrintOne(z *sku.Transacted) (err error) {
 	var item *alfred.Item
-	g := z.GetGattung()
+	g := z.GetGenre()
 
 	switch g {
 	case gattung.Zettel:

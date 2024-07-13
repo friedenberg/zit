@@ -23,7 +23,7 @@ type KennungSansGattung interface {
 
 type Kennung interface {
 	KennungSansGattung
-	interfaces.GattungGetter
+	interfaces.GenreGetter
 }
 
 type KennungSansGattungPtr interface {
@@ -39,7 +39,7 @@ type KennungPtr interface {
 
 type KennungLike[T any] interface {
 	Kennung
-	interfaces.GattungGetter
+	interfaces.GenreGetter
 	interfaces.Stringer
 }
 
@@ -118,7 +118,7 @@ func Make(v string) (k KennungPtr, err error) {
 }
 
 func Equals(a, b Kennung) (ok bool) {
-	if a.GetGattung().GetGattungString() != b.GetGattung().GetGattungString() {
+	if a.GetGenre().GetGenreString() != b.GetGenre().GetGenreString() {
 		return
 	}
 

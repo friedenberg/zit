@@ -21,9 +21,9 @@ type HinweisIndex interface {
 }
 
 func MakeIndex(
-	k interfaces.Konfig,
-	s interfaces.Standort,
-	su interfaces.VerzeichnisseFactory,
+	k interfaces.Config,
+	s interfaces.Directory,
+	su interfaces.CacheIOFactory,
 ) (i HinweisIndex, err error) {
 	switch v := k.GetStoreVersion().GetInt(); {
 	case v >= 1 && false:

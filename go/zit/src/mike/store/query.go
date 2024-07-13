@@ -82,7 +82,7 @@ func (s *Store) QueryCheckedOut(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	kid := qg.Kasten.GetKastenString()
+	kid := qg.Kasten.GetRepoIdString()
 	es, ok := s.externalStores[kid]
 
 	if !ok {

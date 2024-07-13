@@ -74,7 +74,7 @@ func (t *Time) MoveForwardIota() {
 // 	return t.time.Local().Format(f)
 // }
 
-func (t Time) GetGattung() interfaces.GattungLike {
+func (t Time) GetGattung() interfaces.Genre {
 	return gattung.Unknown
 }
 

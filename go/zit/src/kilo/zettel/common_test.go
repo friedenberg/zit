@@ -29,7 +29,7 @@ func makeEtiketten(t test_logz.T, vs ...string) (es kennung.EtikettSet) {
 	return
 }
 
-func makeAkteExt(t test_logz.T, v string) (es kennung.Typ) {
+func makeBlobExt(t test_logz.T, v string) (es kennung.Typ) {
 	if err := es.Set(v); err != nil {
 		t.Fatalf("%s", err)
 	}

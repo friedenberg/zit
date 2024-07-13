@@ -91,7 +91,7 @@ func (c client) SendNeededSkus(filter *query.Group) (err error) {
 }
 
 func (c *client) ObjekteWriter(
-	g interfaces.GattungGetter,
+	g interfaces.GenreGetter,
 	sh interfaces.ShaLike,
 ) (rc sha.ReadCloser, err error) {
 	var d remote_conn.Dialogue
@@ -104,7 +104,7 @@ func (c *client) ObjekteWriter(
 	}
 
 	msgRequest := messageRequestObjekteData{
-		Gattung: gattung.Make(g.GetGattung()),
+		Gattung: gattung.Make(g.GetGenre()),
 	}
 
 	msgRequest.Sha.SetShaLike(sh)

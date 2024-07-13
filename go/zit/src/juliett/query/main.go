@@ -33,7 +33,7 @@ func (a *Query) GetSigil() kennung.Sigil {
 }
 
 func (a *Query) ContainsKennung(k *kennung.Kennung2) bool {
-	if !a.Gattung.Contains(k.GetGattung()) {
+	if !a.Gattung.Contains(k.GetGenre()) {
 		panic("should never check for wrong gattung")
 	}
 

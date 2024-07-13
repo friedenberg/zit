@@ -25,7 +25,7 @@ type ObjekteOptions struct {
 
 type (
 	Konfig interface {
-		interfaces.Konfig
+		interfaces.Config
 		kennung.InlineTypChecker // TODO move out of konfig entirely
 		GetTypExtension(string) string
 	}
@@ -34,10 +34,10 @@ type (
 		WriteOneObjekteMetadatei(o *Transacted) (err error)
 		ReadOneEnnui(*sha.Sha) (*Transacted, error)
 		ReadOneKennung(
-			interfaces.StringerGattungGetter,
+			interfaces.StringerGenreGetter,
 		) (*Transacted, error)
 		ReadOneKennungSha(
-			interfaces.StringerGattungGetter,
+			interfaces.StringerGenreGetter,
 		) (*sha.Sha, error)
 	}
 
@@ -109,7 +109,7 @@ type (
 
 	OneReader interface {
 		ReadTransactedFromKennung(
-			k1 interfaces.StringerGattungGetter,
+			k1 interfaces.StringerGenreGetter,
 		) (sk1 *Transacted, err error)
 	}
 )

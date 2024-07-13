@@ -14,7 +14,7 @@ import (
 )
 
 func (s Standort) objekteReader(
-	g interfaces.GattungGetter,
+	g interfaces.GenreGetter,
 	sh sha.ShaLike,
 ) (rc sha.ReadCloser, err error) {
 	var p string
@@ -34,7 +34,7 @@ func (s Standort) objekteReader(
 	}
 
 	if rc, err = NewFileReader(o); err != nil {
-		err = errors.Wrapf(err, "Gattung: %s", g.GetGattung())
+		err = errors.Wrapf(err, "Gattung: %s", g.GetGenre())
 		err = errors.Wrapf(err, "Sha: %s", sh.GetShaLike())
 		return
 	}
@@ -43,7 +43,7 @@ func (s Standort) objekteReader(
 }
 
 func (s Standort) objekteWriter(
-	g interfaces.GattungGetter,
+	g interfaces.GenreGetter,
 ) (wc sha.WriteCloser, err error) {
 	var p string
 
@@ -81,7 +81,7 @@ func (s Standort) ReadCloserObjekten(p string) (sha.ReadCloser, error) {
 	return NewFileReader(o)
 }
 
-func (s Standort) ReadCloserVerzeichnisse(p string) (sha.ReadCloser, error) {
+func (s Standort) ReadCloserCache(p string) (sha.ReadCloser, error) {
 	o := FileReadOptions{
 		Age:             s.age,
 		Path:            p,
@@ -102,7 +102,7 @@ func (s Standort) WriteCloserObjekten(p string) (w sha.WriteCloser, err error) {
 	)
 }
 
-func (s Standort) WriteCloserVerzeichnisse(
+func (s Standort) WriteCloserCache(
 	p string,
 ) (w sha.WriteCloser, err error) {
 	return s.NewMover(
@@ -136,7 +136,7 @@ func (s Standort) AkteWriterTo(p string) (w sha.WriteCloser, err error) {
 	return
 }
 
-func (s Standort) AkteWriterToLight(p string) (w sha.WriteCloser, err error) {
+func (s Standort) BlobWriterToLight(p string) (w sha.WriteCloser, err error) {
 	var outer Writer
 
 	mo := MoveOptions{
@@ -222,7 +222,7 @@ func (s Standort) BlobReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
 		return
 	}
 
-	if r, err = s.AkteReaderFrom(sh, p); err != nil {
+	if r, err = s.BlobReaderFrom(sh, p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -230,7 +230,7 @@ func (s Standort) BlobReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
 	return
 }
 
-func (s Standort) AkteReaderFrom(
+func (s Standort) BlobReaderFrom(
 	sh sha.ShaLike,
 	p string,
 ) (r sha.ReadCloser, err error) {

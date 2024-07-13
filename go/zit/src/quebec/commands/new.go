@@ -102,7 +102,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	cotfo := checkout_options.TextFormatterOptions{}
 
 	f := metadatei.TextFormat{
-		TextFormatter: metadatei.MakeTextFormatterMetadateiInlineAkte(
+		TextFormatter: metadatei.MakeTextFormatterMetadateiInlineBlob(
 			cotfo,
 			u.Standort(),
 			nil,

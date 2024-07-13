@@ -68,7 +68,7 @@ func (a *CheckedOut) String() string {
 	return fmt.Sprintf("%s %s", &a.Internal, &a.External)
 }
 
-func (e *CheckedOut) Remove(s interfaces.Standort) (err error) {
+func (e *CheckedOut) Remove(s interfaces.Directory) (err error) {
 	// TODO check conflict state
 	if err = e.External.FDs.Objekte.Remove(s); err != nil {
 		err = errors.Wrap(err)

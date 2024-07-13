@@ -49,8 +49,8 @@ type indexHinweis struct {
 }
 
 func (ih *indexHinweis) Add(h *kennung.Hinweis) (err error) {
-	ih.Kopfen.Add(h.Kopf())
-	ih.Schwanzen.Add(h.Schwanz())
+	ih.Kopfen.Add(h.GetHead())
+	ih.Schwanzen.Add(h.GetTail())
 	return
 }
 
@@ -115,8 +115,8 @@ func (ih *indexHinweis) Expand(
 		return
 	}
 
-	kopf := ih.Kopfen.Expand(hAbbr.Kopf())
-	schwanz := ih.Schwanzen.Expand(hAbbr.Schwanz())
+	kopf := ih.Kopfen.Expand(hAbbr.GetHead())
+	schwanz := ih.Schwanzen.Expand(hAbbr.GetTail())
 
 	if h, err = kennung.MakeHinweisKopfUndSchwanz(kopf, schwanz); err != nil {
 		err = errors.Wrapf(err, "{Abbreviated: '%s'}", hAbbr)
@@ -132,11 +132,11 @@ func (ih *indexHinweis) Abbreviate(h *kennung.Hinweis) (v string, err error) {
 		return
 	}
 
-	kopf := h.Kopf()
-	schwanz := h.Schwanz()
+	kopf := h.GetHead()
+	schwanz := h.GetTail()
 
-	kopf = ih.Kopfen.Abbreviate(h.Kopf())
-	schwanz = ih.Schwanzen.Abbreviate(h.Schwanz())
+	kopf = ih.Kopfen.Abbreviate(h.GetHead())
+	schwanz = ih.Schwanzen.Abbreviate(h.GetTail())
 
 	if kopf == "" {
 		v = h.String()

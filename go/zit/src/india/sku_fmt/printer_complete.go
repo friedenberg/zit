@@ -36,8 +36,8 @@ func MakeWriterComplete(w io.Writer) *WriterComplete {
 			s.wBuf.WriteString(z.GetKennung().String())
 			s.wBuf.WriteByte('\t')
 
-			g := z.GetKennung().GetGattung()
-			s.wBuf.WriteString(z.GetKennung().GetGattung().String())
+			g := z.GetKennung().GetGenre()
+			s.wBuf.WriteString(z.GetKennung().GetGenre().String())
 
 			if g == gattung.Zettel {
 				s.wBuf.WriteString(": !")

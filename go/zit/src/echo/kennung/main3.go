@@ -44,7 +44,7 @@ func MustKennung3(kp Kennung) (k *Kennung3) {
 	return
 }
 
-func (a *Kennung3) GetKasten() interfaces.KastenLike {
+func (a *Kennung3) GetRepoId() interfaces.RepoId {
 	return MustKasten(a.kasten.String())
 }
 
@@ -203,11 +203,11 @@ func (k3 *Kennung3) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
-func (k3 *Kennung3) SetGattung(g interfaces.GattungGetter) {
+func (k3 *Kennung3) SetGattung(g interfaces.GenreGetter) {
 	if g == nil {
 		k3.g = gattung.Unknown
 	} else {
-		k3.g = gattung.Must(g.GetGattung())
+		k3.g = gattung.Must(g.GetGenre())
 	}
 
 	if k3.g == gattung.Zettel {
@@ -303,12 +303,12 @@ func (k3 *Kennung3) Parts() [3]string {
 	}
 }
 
-func (k3 *Kennung3) GetGattung() interfaces.GattungLike {
+func (k3 *Kennung3) GetGenre() interfaces.Genre {
 	return k3.g
 }
 
 func MakeKennung3(
-	v interfaces.StringerGattungGetter,
+	v interfaces.StringerGenreGetter,
 	ka Kasten,
 ) (k *Kennung3, err error) {
 	k = &Kennung3{
@@ -442,9 +442,9 @@ func (h *Kennung3) SetWithKennung(
 
 func (h *Kennung3) SetWithGattung(
 	v string,
-	g interfaces.GattungGetter,
+	g interfaces.GenreGetter,
 ) (err error) {
-	h.g = gattung.Make(g.GetGattung())
+	h.g = gattung.Make(g.GetGenre())
 
 	if err = h.Set(v); err != nil {
 		err = errors.Wrap(err)
@@ -496,7 +496,7 @@ func (h *Kennung3) Set(v string) (err error) {
 		k = h
 
 	default:
-		err = gattung.MakeErrUnrecognizedGattung(h.g.GetGattungString())
+		err = gattung.MakeErrUnrecognizedGattung(h.g.GetGenreString())
 	}
 
 	if err != nil {

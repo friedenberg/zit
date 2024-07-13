@@ -28,7 +28,7 @@ func MakeTextFormatterWithAkteFormatter(
 ) textFormatter {
 	return textFormatter{
 		k:                 k,
-		fMetadateiAndAkte: metadatei.MakeTextFormatterMetadateiInlineAkte(options, af, akteFormatter),
+		fMetadateiAndAkte: metadatei.MakeTextFormatterMetadateiInlineBlob(options, af, akteFormatter),
 		fMetadateiOnly:    metadatei.MakeTextFormatterMetadateiOnly(options, af, akteFormatter),
 		fAkteOnly:         metadatei.MakeTextFormatterExcludeMetadatei(options, af, akteFormatter),
 	}
@@ -40,7 +40,7 @@ type textFormatter struct {
 }
 
 func (tf textFormatter) WriteStringFormat(w io.Writer, s *sku.Transacted) (n int64, err error) {
-	if gattung.Konfig.EqualsGattung(s.GetGattung()) {
+	if gattung.Konfig.EqualsGenre(s.GetGenre()) {
 		n, err = tf.fAkteOnly.FormatMetadatei(w, s)
 	} else if tf.k.IsInlineTyp(s.GetTyp()) {
 		n, err = tf.fMetadateiAndAkte.FormatMetadatei(w, s)
@@ -56,7 +56,7 @@ func (tf textFormatter) WriteStringFormatWithMode(
 	s *sku.Transacted,
 	mode checkout_mode.Mode,
 ) (n int64, err error) {
-	if gattung.Konfig.EqualsGattung(s.GetGattung()) || mode == checkout_mode.ModeAkteOnly {
+	if gattung.Konfig.EqualsGenre(s.GetGenre()) || mode == checkout_mode.ModeAkteOnly {
 		n, err = tf.fAkteOnly.FormatMetadatei(w, s)
 	} else if tf.k.IsInlineTyp(s.GetTyp()) {
 		n, err = tf.fMetadateiAndAkte.FormatMetadatei(w, s)

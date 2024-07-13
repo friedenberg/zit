@@ -15,7 +15,7 @@ type formatAkte struct {
 	options       objekte_format.Options
 }
 
-func MakeAkteFormat(
+func MakeFormat(
 	sv interfaces.StoreVersion,
 	op objekte_format.Options,
 ) formatAkte {
@@ -25,9 +25,9 @@ func MakeAkteFormat(
 	}
 }
 
-func (f formatAkte) ParseAkte(
+func (f formatAkte) ParseBlob(
 	r io.Reader,
-	o *Akte,
+	o *InventoryList,
 ) (n int64, err error) {
 	dec := sku_fmt.MakeFormatBestandsaufnahmeScanner(
 		r,
@@ -54,13 +54,13 @@ func (f formatAkte) ParseAkte(
 	return
 }
 
-func (f formatAkte) Format(w io.Writer, o *Akte) (n int64, err error) {
-	return f.FormatParsedAkte(w, o)
+func (f formatAkte) Format(w io.Writer, o *InventoryList) (n int64, err error) {
+	return f.FormatParsedInventoryList(w, o)
 }
 
-func (f formatAkte) FormatParsedAkte(
+func (f formatAkte) FormatParsedInventoryList(
 	w io.Writer,
-	o *Akte,
+	o *InventoryList,
 ) (n int64, err error) {
 	bw := bufio.NewWriter(w)
 	defer errors.DeferredFlusher(&err, bw)

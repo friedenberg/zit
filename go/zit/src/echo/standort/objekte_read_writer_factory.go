@@ -5,21 +5,21 @@ import (
 )
 
 func (s Standort) ObjekteReaderFactory(
-	g interfaces.GattungGetter,
-) interfaces.ObjekteReaderFactory {
+	g interfaces.GenreGetter,
+) interfaces.ObjectReaderFactory {
 	return s.ObjekteReaderWriterFactory(g)
 }
 
 func (s Standort) ObjekteReaderWriterFactory(
-	g interfaces.GattungGetter,
-) interfaces.ObjekteIOFactory {
-	return interfaces.MakeBespokeObjekteReadWriterFactory(
-		interfaces.MakeBespokeObjekteReadFactory(
+	g interfaces.GenreGetter,
+) interfaces.ObjectIOFactory {
+	return interfaces.MakeBespokeObjectReadWriterFactory(
+		interfaces.MakeBespokeObjectReadFactory(
 			func(sh interfaces.ShaGetter) (interfaces.ShaReadCloser, error) {
 				return s.objekteReader(g, sh)
 			},
 		),
-		interfaces.MakeBespokeObjekteWriteFactory(
+		interfaces.MakeBespokeObjectWriteFactory(
 			func() (interfaces.ShaWriteCloser, error) {
 				return s.objekteWriter(g)
 			},

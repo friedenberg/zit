@@ -21,11 +21,11 @@ import (
 type MessageHiCommander struct {
 	DialogueType
 	CliKonfig erworben.Cli
-	Angeboren interfaces.Angeboren
+	Angeboren interfaces.ImmutableConfig
 }
 
 type StageCommander struct {
-	Angeboren           interfaces.AngeborenGetter
+	Angeboren           interfaces.ImmutableConfigGetter
 	remoteActorCmd      *exec.Cmd
 	konfigCli           erworben.Cli
 	wg                  *sync.WaitGroup
@@ -182,7 +182,7 @@ func (s *StageCommander) StartDialogue(t DialogueType) (d Dialogue, err error) {
 	msgOurHi := MessageHiCommander{
 		DialogueType: d.Type(),
 		CliKonfig:    s.konfigCli,
-		Angeboren:    s.Angeboren.GetAngeboren(),
+		Angeboren:    s.Angeboren.GetImmutableConfig(),
 	}
 
 	if err = d.Send(msgOurHi); err != nil {

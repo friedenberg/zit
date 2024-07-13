@@ -93,7 +93,7 @@ func (e etikett) IsEmpty() bool {
 	return e.value == ""
 }
 
-func (e etikett) GetGattung() interfaces.GattungLike {
+func (e etikett) GetGenre() interfaces.Genre {
 	return gattung.Etikett
 }
 

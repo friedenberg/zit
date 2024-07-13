@@ -75,7 +75,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 func (s *Store) Merge(
 	tm sku.Conflicted,
 ) (err error) {
-	switch tm.CheckedOutLike.GetKasten().GetKastenString() {
+	switch tm.CheckedOutLike.GetKasten().GetRepoIdString() {
 	case "chrome":
 		err = todo.Implement()
 
@@ -94,7 +94,7 @@ func (s *Store) RunMergeTool(
 ) (err error) {
 	tool := s.GetKonfig().Cli().ToolOptions.Merge
 
-	switch tm.GetKasten().GetKastenString() {
+	switch tm.GetKasten().GetRepoIdString() {
 	case "chrome":
 		err = todo.Implement()
 

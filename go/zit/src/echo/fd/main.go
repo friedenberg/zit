@@ -286,7 +286,7 @@ func (fd *FD) Exists() bool {
 	return files.Exists(fd.path)
 }
 
-func (fd *FD) Remove(s interfaces.Standort) (err error) {
+func (fd *FD) Remove(s interfaces.Directory) (err error) {
 	if fd.path == "" {
 		return
 	}

@@ -871,7 +871,7 @@ func (u *Umwelt) makeTypFormatter(
 			if t == nil || t.Kennung.IsEmpty() || t.GetAkteSha().IsNull() {
 				ty := ""
 
-				switch o.GetGattung() {
+				switch o.GetGenre() {
 				case gattung.Typ, gattung.Etikett, gattung.Kasten, gattung.Konfig:
 					ty = "toml"
 

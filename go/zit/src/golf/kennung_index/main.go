@@ -57,7 +57,7 @@ type Index interface {
 
 type index struct {
 	path string
-	interfaces.VerzeichnisseFactory
+	interfaces.CacheIOFactory
 	didRead    bool
 	hasChanges bool
 	lock       *sync.RWMutex
@@ -67,13 +67,13 @@ type index struct {
 }
 
 func MakeIndex(
-	k interfaces.Konfig,
+	k interfaces.Config,
 	s standort.Standort,
-	vf interfaces.VerzeichnisseFactory,
+	vf interfaces.CacheIOFactory,
 ) (i *index, err error) {
 	i = &index{
 		path:                 s.FileVerzeichnisseEtiketten(),
-		VerzeichnisseFactory: vf,
+		CacheIOFactory: vf,
 		lock:                 &sync.RWMutex{},
 		etikettenIndex: MakeIndex2[kennung.Etikett](
 			vf,

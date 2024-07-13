@@ -54,7 +54,7 @@ func MakeSigil(vs ...Sigil) (s Sigil) {
 	return
 }
 
-func (a Sigil) GetGattung() interfaces.GattungLike {
+func (a Sigil) GetGattung() interfaces.Genre {
 	return gattung.Unknown
 }
 
@@ -106,7 +106,7 @@ func (a Sigil) IsSchwanzenOrUnknown() bool {
 	return a == SigilSchwanzen || a == SigilUnknown || a == SigilSchwanzen|SigilUnknown
 }
 
-func (a Sigil) IncludesSchwanzen() bool {
+func (a Sigil) IncludesLatest() bool {
 	return a.ContainsOneOf(SigilSchwanzen) || a.ContainsOneOf(SigilHistory) || a == 0
 }
 

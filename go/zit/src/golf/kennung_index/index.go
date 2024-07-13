@@ -22,7 +22,7 @@ type index2[
 	TPtr kennung.KennungLikePtr[T],
 ] struct {
 	path            string
-	vf              interfaces.VerzeichnisseFactory
+	vf              interfaces.CacheIOFactory
 	readOnce        *sync.Once
 	hasChanges      bool
 	lock            *sync.RWMutex
@@ -34,7 +34,7 @@ func MakeIndex2[
 	T kennung.KennungLike[T],
 	TPtr kennung.KennungLikePtr[T],
 ](
-	vf interfaces.VerzeichnisseFactory,
+	vf interfaces.CacheIOFactory,
 	path string,
 ) (i *index2[T, TPtr]) {
 	i = &index2[T, TPtr]{
@@ -82,7 +82,7 @@ func (ei *index2[T, TPtr]) WriteIfNecessary() (err error) {
 
 	var wc interfaces.ShaWriteCloser
 
-	if wc, err = ei.vf.WriteCloserVerzeichnisse(ei.path); err != nil {
+	if wc, err = ei.vf.WriteCloserCache(ei.path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -124,7 +124,7 @@ func (ei *index2[T, TPtr]) ReadIfNecessary() (err error) {
 func (ei *index2[T, TPtr]) read() (err error) {
 	var rc io.ReadCloser
 
-	if rc, err = ei.vf.ReadCloserVerzeichnisse(ei.path); err != nil {
+	if rc, err = ei.vf.ReadCloserCache(ei.path); err != nil {
 		if errors.IsNotExist(err) {
 			err = nil
 			rc = sha.MakeReadCloser(bytes.NewBuffer(nil))

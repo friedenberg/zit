@@ -112,7 +112,7 @@ func (op Diff) Run(col sku.CheckedOutLike) (err error) {
 	internalLabel := fmt.Sprintf(
 		"%s:%s",
 		il.GetKennung(),
-		strings.ToLower(il.GetGattung().GetGattungString()),
+		strings.ToLower(il.GetGenre().GetGenreString()),
 	)
 
 	externalLabel := op.Standort().Rel(externalFD.GetPath())

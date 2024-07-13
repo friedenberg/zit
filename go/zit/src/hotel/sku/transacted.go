@@ -124,7 +124,7 @@ func (a *Transacted) GetEtiketten() kennung.EtikettSet {
 }
 
 func (a *Transacted) AddEtikettPtr(e *kennung.Etikett) (err error) {
-	if a.Kennung.GetGattung() == gattung.Etikett {
+	if a.Kennung.GetGenre() == gattung.Etikett {
 		e1 := kennung.MustEtikett(a.Kennung.String())
 		ex := kennung.ExpandOne(&e1, expansion.ExpanderRight)
 
@@ -224,8 +224,8 @@ func (a *Transacted) Equals(b *Transacted) (ok bool) {
 	return true
 }
 
-func (s *Transacted) GetGattung() interfaces.GattungLike {
-	return s.Kennung.GetGattung()
+func (s *Transacted) GetGenre() interfaces.Genre {
+	return s.Kennung.GetGenre()
 }
 
 func (s *Transacted) IsNew() bool {

@@ -79,7 +79,7 @@ func TestEqualitySelf(t1 *testing.T) {
 
 	text := &metadatei.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
-		Typ:         makeAkteExt(t, "text"),
+		Typ:         makeBlobExt(t, "text"),
 	}
 
 	text.SetEtiketten(makeEtiketten(t,
@@ -98,7 +98,7 @@ func TestEqualityNotSelf(t1 *testing.T) {
 
 	text := metadatei.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
-		Typ:         makeAkteExt(t, "text"),
+		Typ:         makeBlobExt(t, "text"),
 	}
 
 	text.SetEtiketten(makeEtiketten(t,
@@ -109,7 +109,7 @@ func TestEqualityNotSelf(t1 *testing.T) {
 
 	text1 := &metadatei.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
-		Typ:         makeAkteExt(t, "text"),
+		Typ:         makeBlobExt(t, "text"),
 	}
 
 	text1.SetEtiketten(makeEtiketten(t,

@@ -19,12 +19,12 @@ func (c *compiled) GetZettelFileExtension() string {
 	return fmt.Sprintf(".%s", c.FileExtensions.Zettel)
 }
 
-func (kc *Compiled) GetAngeboren() interfaces.Angeboren {
+func (kc *Compiled) GetImmutableConfig() interfaces.ImmutableConfig {
 	return kc.angeboren
 }
 
 func (kc *compiled) getTyp(k kennung.Kennung) (ct *sku.Transacted) {
-	if k.GetGattung() != gattung.Typ {
+	if k.GetGenre() != gattung.Typ {
 		return
 	}
 
@@ -37,7 +37,7 @@ func (kc *compiled) getTyp(k kennung.Kennung) (ct *sku.Transacted) {
 }
 
 func (kc *compiled) getKasten(k kennung.Kennung) (ct *sku.Transacted) {
-	if k.GetGattung() != gattung.Kasten {
+	if k.GetGenre() != gattung.Kasten {
 		return
 	}
 
@@ -54,7 +54,7 @@ func (kc *compiled) getKasten(k kennung.Kennung) (ct *sku.Transacted) {
 func (kc *compiled) getApproximatedTyp(
 	k kennung.Kennung,
 ) (ct ApproximatedTyp) {
-	if k.GetGattung() != gattung.Typ {
+	if k.GetGenre() != gattung.Typ {
 		return
 	}
 
@@ -81,7 +81,7 @@ func (kc *compiled) getEtikettOrKastenOrTyp(
 		return
 	}
 
-	switch k.GetGattung() {
+	switch k.GetGenre() {
 	case gattung.Etikett:
 		sk, _ = kc.getEtikett(&k)
 	case gattung.Kasten:
@@ -100,7 +100,7 @@ func (kc *compiled) getEtikettOrKastenOrTyp(
 func (kc *compiled) getEtikett(
 	k kennung.Kennung,
 ) (ct *sku.Transacted, ok bool) {
-	if k.GetGattung() != gattung.Etikett {
+	if k.GetGenre() != gattung.Etikett {
 		return
 	}
 

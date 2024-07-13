@@ -118,7 +118,7 @@ func (c Last) runWithBestandsaufnahme(
 		return
 	}
 
-	var a *bestandsaufnahme.Akte
+	var a *bestandsaufnahme.InventoryList
 
 	if a, err = s.GetBestandsaufnahmeStore().GetBlob(b.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)

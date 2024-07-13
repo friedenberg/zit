@@ -164,7 +164,7 @@ func (e *fileEncoder) EncodeObjekte(
 		var mtw metadatei.TextFormatter
 
 		if inline {
-			mtw = metadatei.MakeTextFormatterMetadateiInlineAkte(
+			mtw = metadatei.MakeTextFormatterMetadateiInlineBlob(
 				options,
 				e.arf,
 				nil,

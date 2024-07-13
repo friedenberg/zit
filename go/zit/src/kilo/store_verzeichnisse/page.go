@@ -120,7 +120,7 @@ func (pt *Page) copyHistoryAndMaybeSchwanz(
 ) (err error) {
 	var r io.ReadCloser
 
-	if r, err = pt.standort.ReadCloserVerzeichnisse(pt.Path()); err != nil {
+	if r, err = pt.standort.ReadCloserCache(pt.Path()); err != nil {
 		if errors.IsNotExist(err) {
 			r = io.NopCloser(bytes.NewReader(nil))
 			err = nil

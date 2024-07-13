@@ -76,7 +76,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	ofo := objekte_format.Options{Tai: true, Verzeichnisse: true}
 
-	bf := bestandsaufnahme.MakeAkteFormat(u.GetKonfig().GetStoreVersion(), ofo)
+	bf := bestandsaufnahme.MakeFormat(u.GetKonfig().GetStoreVersion(), ofo)
 
 	var rc io.ReadCloser
 
@@ -105,9 +105,9 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	// for scanner.Scan() {
 	// }
 
-	besty := bestandsaufnahme.MakeAkte()
+	besty := bestandsaufnahme.MakeInventoryList()
 
-	if _, err = bf.ParseAkte(rc, besty); err != nil {
+	if _, err = bf.ParseBlob(rc, besty); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

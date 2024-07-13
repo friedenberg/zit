@@ -5,9 +5,9 @@ import (
 )
 
 func (s client) ObjekteReaderFactory(
-	g interfaces.GattungGetter,
-) interfaces.ObjekteReaderFactory {
-	return interfaces.MakeBespokeObjekteReadFactory(
+	g interfaces.GenreGetter,
+) interfaces.ObjectReaderFactory {
+	return interfaces.MakeBespokeObjectReadFactory(
 		func(sh interfaces.ShaGetter) (interfaces.ShaReadCloser, error) {
 			return s.ObjekteReader(g, sh)
 		},

@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 )
 
-func TestAkteExt(t *testing.T) {
+func TestBlobExt(t *testing.T) {
 	var e kennung.Typ
 	var err error
 
@@ -22,7 +22,7 @@ func TestAkteExt(t *testing.T) {
 	}
 }
 
-func TestAkteExt1(t *testing.T) {
+func TestBlobExt1(t *testing.T) {
 	var e kennung.Typ
 	var err error
 

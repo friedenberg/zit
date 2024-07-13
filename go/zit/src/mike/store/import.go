@@ -73,7 +73,7 @@ func (s *Store) Import(sk *sku.Transacted) (co *store_fs.CheckedOut, err error) 
 		err = errors.Wrap(file_lock.ErrLockRequired{
 			Operation: fmt.Sprintf(
 				"import %s",
-				sk.GetGattung(),
+				sk.GetGenre(),
 			),
 		})
 

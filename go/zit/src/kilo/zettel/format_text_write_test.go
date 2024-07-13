@@ -22,17 +22,17 @@ func (c noopCloser) Close() error {
 	return nil
 }
 
-type akteReaderFactory struct {
+type blobReaderFactory struct {
 	t     test_logz.T
-	akten map[string]string
+	blobs map[string]string
 }
 
-func (arf akteReaderFactory) AkteReader(s sha.Sha) (r sha.ReadCloser, err error) {
+func (arf blobReaderFactory) BlobReader(s sha.Sha) (r sha.ReadCloser, err error) {
 	var v string
 	var ok bool
 
-	if v, ok = arf.akten[s.String()]; !ok {
-		arf.t.Fatalf("request for non-existent akte: %s", s)
+	if v, ok = arf.blobs[s.String()]; !ok {
+		arf.t.Fatalf("request for non-existent blob: %s", s)
 	}
 
 	r = sha.MakeNopReadCloser(io.NopCloser(strings.NewReader(v)))
@@ -44,23 +44,23 @@ func writeFormat(
 	t test_logz.T,
 	m *metadatei.Metadatei,
 	f metadatei.TextFormatter,
-	includeAkte bool,
-	akteBody string,
+	includeBlob bool,
+	blobBody string,
 ) (out string) {
 	hash := sha256.New()
-	_, err := io.Copy(hash, strings.NewReader(akteBody))
+	_, err := io.Copy(hash, strings.NewReader(blobBody))
 	if err != nil {
 		t.Fatalf("%s", err)
 	}
 
-	akteShaRaw := fmt.Sprintf("%x", hash.Sum(nil))
-	var akteSha sha.Sha
+	blobShaRaw := fmt.Sprintf("%x", hash.Sum(nil))
+	var blobSha sha.Sha
 
-	if err := akteSha.Set(akteShaRaw); err != nil {
+	if err := blobSha.Set(blobShaRaw); err != nil {
 		t.Fatalf("%s", err)
 	}
 
-	if err = m.Akte.SetShaLike(&akteSha); err != nil {
+	if err = m.Akte.SetShaLike(&blobSha); err != nil {
 		t.Fatalf("%s", err)
 	}
 
@@ -75,12 +75,12 @@ func writeFormat(
 	return
 }
 
-func TestWriteWithoutAkte(t1 *testing.T) {
+func TestWriteWithoutBlob(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	z := &metadatei.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
-		Typ:         makeAkteExt(t, "md"),
+		Typ:         makeBlobExt(t, "md"),
 	}
 
 	z.SetEtiketten(makeEtiketten(t,
@@ -117,12 +117,12 @@ func TestWriteWithoutAkte(t1 *testing.T) {
 	}
 }
 
-func TestWriteWithInlineAkte(t1 *testing.T) {
+func TestWriteWithInlineBlob(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	z := &metadatei.Metadatei{
 		Bezeichnung: bezeichnung.Make("the title"),
-		Typ:         makeAkteExt(t, "md"),
+		Typ:         makeBlobExt(t, "md"),
 	}
 
 	z.SetEtiketten(makeEtiketten(t,
@@ -137,7 +137,7 @@ func TestWriteWithInlineAkte(t1 *testing.T) {
 		},
 	)
 
-	format := metadatei.MakeTextFormatterMetadateiInlineAkte(
+	format := metadatei.MakeTextFormatterMetadateiInlineBlob(
 		metadatei.TextFormatterOptions{},
 		af,
 		nil,

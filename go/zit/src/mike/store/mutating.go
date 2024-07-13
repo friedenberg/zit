@@ -82,7 +82,7 @@ func (s *Store) tryRealizeAndOrStore(
 
 	if o.ContainsAny(
 		objekte_mode.ModeAddToBestandsaufnahme,
-	) && (kinder.Kennung.IsEmpty() || kinder.GetGattung() == gattung.Unknown) {
+	) && (kinder.Kennung.IsEmpty() || kinder.GetGenre() == gattung.Unknown) {
 		var ken *kennung.Hinweis
 
 		if ken, err = s.kennungIndex.CreateHinweis(); err != nil {
@@ -170,7 +170,7 @@ func (s *Store) tryRealizeAndOrStore(
 			return
 		}
 
-		if kinder.GetGattung() == gattung.Zettel {
+		if kinder.GetGenre() == gattung.Zettel {
 			if err = s.kennungIndex.AddHinweis(&kinder.Kennung); err != nil {
 				if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
 					ui.Log().Printf("kennung does not contain value: %s", err)
@@ -400,9 +400,9 @@ func (s *Store) UpdateKonfig(
 }
 
 func (s *Store) createEtikettOrTyp(k *kennung.Kennung2) (err error) {
-	switch k.GetGattung() {
+	switch k.GetGenre() {
 	default:
-		err = gattung.MakeErrUnsupportedGattung(k.GetGattung())
+		err = gattung.MakeErrUnsupportedGattung(k.GetGenre())
 		return
 
 	case gattung.Typ, gattung.Etikett:

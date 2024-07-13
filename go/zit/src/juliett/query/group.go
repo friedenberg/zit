@@ -375,7 +375,7 @@ func (qg *Group) String() string {
 
 func (qg *Group) ContainsSku(sk *sku.Transacted) (ok bool) {
 	defer sk.Metadatei.Verzeichnisse.QueryPath.PushOnOk(qg, &ok)
-	g := sk.GetGattung()
+	g := sk.GetGenre()
 
 	q, ok := qg.OptimizedQueries[gattung.Must(g)]
 
@@ -393,7 +393,7 @@ func (qg *Group) MakeEmitSku(
 	f interfaces.FuncIter[*sku.Transacted],
 ) interfaces.FuncIter[*sku.Transacted] {
 	return func(z *sku.Transacted) (err error) {
-		g := gattung.Must(z.GetGattung())
+		g := gattung.Must(z.GetGenre())
 		m, ok := qg.Get(g)
 
 		if !ok {
@@ -446,7 +446,7 @@ func (qg *Group) MakeEmitSkuSigilSchwanzen(
 	) (err error),
 ) interfaces.FuncIter[*sku.Transacted] {
 	return func(z *sku.Transacted) (err error) {
-		g := gattung.Must(z.GetGattung())
+		g := gattung.Must(z.GetGenre())
 		m, ok := qg.Get(g)
 
 		if !ok {
@@ -482,7 +482,7 @@ func (qg *Group) MakeEmitSkuSigilExternal(
 	) (err error),
 ) interfaces.FuncIter[*sku.Transacted] {
 	return func(z *sku.Transacted) (err error) {
-		g := gattung.Must(z.GetGattung())
+		g := gattung.Must(z.GetGenre())
 		m, ok := qg.Get(g)
 
 		if !ok {

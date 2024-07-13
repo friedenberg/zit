@@ -311,9 +311,9 @@ func (fs *Store) GetTyp(
 }
 
 func (fs *Store) Get(
-	k interfaces.StringerGattungGetter,
+	k interfaces.StringerGenreGetter,
 ) (t *KennungFDPair, ok bool) {
-	g := gattung.Must(k.GetGattung())
+	g := gattung.Must(k.GetGenre())
 
 	switch g {
 	case gattung.Kasten:

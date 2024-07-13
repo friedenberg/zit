@@ -55,7 +55,7 @@ func MakePullClient(u *umwelt.Umwelt, from string) (c *client, err error) {
 	}
 
 	theirVersion := c.stage.MainDialogue().GetAngeboren().GetStoreVersion()
-	ourVersion := u.GetKonfig().GetAngeboren().GetStoreVersion()
+	ourVersion := u.GetKonfig().GetImmutableConfig().GetStoreVersion()
 
 	if ourVersion.Less(theirVersion) {
 		err = errors.Normal(ErrPullRemoteHasHigherVersion)
@@ -184,7 +184,7 @@ func (c *client) makeAndProcessOneSkuWithFilter(
 }
 
 func (c *client) ObjekteReader(
-	g interfaces.GattungGetter,
+	g interfaces.GenreGetter,
 	sh interfaces.ShaGetter,
 ) (rc sha.ReadCloser, err error) {
 	var d remote_conn.Dialogue
@@ -197,7 +197,7 @@ func (c *client) ObjekteReader(
 	}
 
 	msgRequest := messageRequestObjekteData{
-		Gattung: gattung.Make(g.GetGattung()),
+		Gattung: gattung.Make(g.GetGenre()),
 	}
 
 	msgRequest.Sha.SetShaLike(sh)

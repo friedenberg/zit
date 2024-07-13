@@ -1,8 +1,9 @@
 package interfaces
 
+// Used primarily for limiting / restricting queries.
 type Sigil interface {
 	IncludesHistory
-	IncludesSchwanzen
+	IncludesLatest
 	IncludesExternal
 	IncludesHidden
 }
@@ -15,8 +16,8 @@ type IncludesHistory interface {
 	IncludesHistory() bool
 }
 
-type IncludesSchwanzen interface {
-	IncludesSchwanzen() bool
+type IncludesLatest interface {
+	IncludesLatest() bool
 }
 
 type IncludesExternal interface {

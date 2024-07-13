@@ -4,7 +4,7 @@ type (
 	FuncSetString        func(string) error
 	FuncString[T any]    func(T) string
 	FuncAbbreviateValue  func(ValueLike) (string, error)
-	FuncAbbreviateKorper func(Korper) (string, error)
+	FuncAbbreviateKorper func(StringerWithHeadAndTail) (string, error)
 )
 
 type Stringer interface {
@@ -45,4 +45,10 @@ type StringSetterPtr[T any] interface {
 	Stringer
 	Ptr[T]
 	Setter
+}
+
+type StringerWithHeadAndTail interface {
+	Stringer
+	GetHead() string
+	GetTail() string
 }

@@ -11,7 +11,7 @@ import (
 
 type formatterTypFormatterUTIGroups struct {
 	sku.OneReader
-	typAkteGetterPutter interfaces.BlobGetterPutter[*typ_akte.V0]
+	typBlobGetterPutter interfaces.BlobGetterPutter[*typ_akte.V0]
 }
 
 func MakeFormatterTypFormatterUTIGroups(
@@ -20,7 +20,7 @@ func MakeFormatterTypFormatterUTIGroups(
 ) *formatterTypFormatterUTIGroups {
 	return &formatterTypFormatterUTIGroups{
 		OneReader:           sr,
-		typAkteGetterPutter: tagp,
+		typBlobGetterPutter: tagp,
 	}
 }
 
@@ -39,12 +39,12 @@ func (e formatterTypFormatterUTIGroups) Format(
 
 	var ta *typ_akte.V0
 
-	if ta, err = e.typAkteGetterPutter.GetBlob(skuTyp.GetAkteSha()); err != nil {
+	if ta, err = e.typBlobGetterPutter.GetBlob(skuTyp.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer e.typAkteGetterPutter.PutBlob(ta)
+	defer e.typBlobGetterPutter.PutBlob(ta)
 
 	if n, err = e1.Format(w, ta); err != nil {
 		err = errors.Wrap(err)

@@ -201,11 +201,11 @@ func (k2 *Kennung2) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
-func (k2 *Kennung2) SetGattung(g interfaces.GattungGetter) {
+func (k2 *Kennung2) SetGattung(g interfaces.GenreGetter) {
 	if g == nil {
 		k2.g = gattung.Unknown
 	} else {
-		k2.g = gattung.Must(g.GetGattung())
+		k2.g = gattung.Must(g.GetGenre())
 	}
 
 	if k2.g == gattung.Zettel {
@@ -305,7 +305,7 @@ func (k2 *Kennung2) Parts() [3]string {
 	}
 }
 
-func (k2 *Kennung2) GetGattung() interfaces.GattungLike {
+func (k2 *Kennung2) GetGenre() interfaces.Genre {
 	return k2.g
 }
 
@@ -438,9 +438,9 @@ func (h *Kennung2) SetWithKennung(
 
 func (h *Kennung2) SetWithGattung(
 	v string,
-	g interfaces.GattungGetter,
+	g interfaces.GenreGetter,
 ) (err error) {
-	h.g = gattung.Make(g.GetGattung())
+	h.g = gattung.Make(g.GetGenre())
 
 	if err = h.Set(v); err != nil {
 		err = errors.Wrap(err)
@@ -503,7 +503,7 @@ func (h *Kennung2) Set(v string) (err error) {
 		k = h
 
 	default:
-		err = gattung.MakeErrUnrecognizedGattung(h.g.GetGattungString())
+		err = gattung.MakeErrUnrecognizedGattung(h.g.GetGenreString())
 	}
 
 	if err != nil {

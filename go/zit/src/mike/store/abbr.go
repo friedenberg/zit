@@ -101,7 +101,7 @@ func (i *indexAbbr) Flush() (err error) {
 
 	var w1 io.WriteCloser
 
-	if w1, err = i.standort.WriteCloserVerzeichnisse(i.path); err != nil {
+	if w1, err = i.standort.WriteCloserCache(i.path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -135,7 +135,7 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 
 			var r1 io.ReadCloser
 
-			if r1, err = i.standort.ReadCloserVerzeichnisse(i.path); err != nil {
+			if r1, err = i.standort.ReadCloserCache(i.path); err != nil {
 				if errors.IsNotExist(err) {
 					err = nil
 				} else {
@@ -186,7 +186,7 @@ func (i *indexAbbr) AddMatchable(o *sku.Transacted) (err error) {
 
 	ks := o.GetKennung().String()
 
-	switch o.GetGattung() {
+	switch o.GetGenre() {
 	case gattung.Zettel:
 		var h kennung.Hinweis
 
@@ -195,8 +195,8 @@ func (i *indexAbbr) AddMatchable(o *sku.Transacted) (err error) {
 			return
 		}
 
-		i.indexAbbrEncodableTridexes.Hinweis.Kopfen.Add(h.Kopf())
-		i.indexAbbrEncodableTridexes.Hinweis.Schwanzen.Add(h.Schwanz())
+		i.indexAbbrEncodableTridexes.Hinweis.Kopfen.Add(h.GetHead())
+		i.indexAbbrEncodableTridexes.Hinweis.Schwanzen.Add(h.GetTail())
 
 	case gattung.Typ:
 		i.indexAbbrEncodableTridexes.Typen.Kennungen.Add(ks)
@@ -220,7 +220,7 @@ func (i *indexAbbr) Exists(k *kennung.Kennung2) (err error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
-	switch k.GetGattung() {
+	switch k.GetGenre() {
 	case gattung.Zettel:
 		err = i.Hinweis().Exists(k.Parts())
 

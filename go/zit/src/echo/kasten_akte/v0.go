@@ -10,7 +10,7 @@ type V0 struct {
 	Uri values.Uri `toml:"uri"`
 }
 
-func (_ V0) GetGattung() interfaces.GattungLike {
+func (_ V0) GetGattung() interfaces.Genre {
 	return gattung.Typ
 }
 

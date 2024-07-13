@@ -58,10 +58,10 @@ func (ao abbrOne[V, VPtr]) AbbreviateKennung(
 
 	var ka1 V
 
-	if ka1.GetGattung() != k.GetGattung() {
+	if ka1.GetGenre() != k.GetGenre() {
 		err = gattung.ErrWrongType{
-			ExpectedType: gattung.Must(ka1.GetGattung()),
-			ActualType:   gattung.Must(k.GetGattung()),
+			ExpectedType: gattung.Must(ka1.GetGenre()),
+			ActualType:   gattung.Must(k.GetGenre()),
 		}
 
 		return
@@ -83,7 +83,7 @@ func (ao abbrOne[V, VPtr]) AbbreviateKennung(
 func (a Abbr) LenKopfUndSchwanz(
 	in *Kennung2,
 ) (kopf, schwanz int, err error) {
-	if in.GetGattung() != gattung.Zettel || a.Hinweis.Abbreviate == nil {
+	if in.GetGenre() != gattung.Zettel || a.Hinweis.Abbreviate == nil {
 		kopf, schwanz = in.LenKopfUndSchwanz()
 		return
 	}
@@ -107,8 +107,8 @@ func (a Abbr) LenKopfUndSchwanz(
 		return
 	}
 
-	kopf = len(h.Kopf())
-	schwanz = len(h.Schwanz())
+	kopf = len(h.GetHead())
+	schwanz = len(h.GetTail())
 
 	return
 }
@@ -116,7 +116,7 @@ func (a Abbr) LenKopfUndSchwanz(
 func (a Abbr) AbbreviateHinweisOnly(
 	in *Kennung2,
 ) (err error) {
-	if in.GetGattung() != gattung.Zettel || in.IsVirtual() {
+	if in.GetGenre() != gattung.Zettel || in.IsVirtual() {
 		return
 	}
 
@@ -149,7 +149,7 @@ func (a Abbr) AbbreviateHinweisOnly(
 func (a Abbr) ExpandHinweisOnly(
 	in *Kennung2,
 ) (err error) {
-	if in.GetGattung() != gattung.Zettel || a.Hinweis.Expand == nil {
+	if in.GetGenre() != gattung.Zettel || a.Hinweis.Expand == nil {
 		return
 	}
 
@@ -181,7 +181,7 @@ func (a Abbr) AbbreviateKennung(
 ) (err error) {
 	var getAbbr func(Kennung) (string, error)
 
-	switch in.GetGattung() {
+	switch in.GetGenre() {
 	case gattung.Zettel:
 		getAbbr = a.Hinweis.AbbreviateKennung
 

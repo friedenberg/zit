@@ -149,7 +149,7 @@ func (c EditKonfig) readTempKonfigFile(
 	defer errors.DeferredCloser(&err, aw)
 
 	// TODO-P3 offer option to edit again
-	if _, err = format.ParseAkte(io.TeeReader(f, aw), &k); err != nil {
+	if _, err = format.ParseBlob(io.TeeReader(f, aw), &k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

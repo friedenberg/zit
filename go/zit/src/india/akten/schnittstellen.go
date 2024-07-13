@@ -21,7 +21,7 @@ type (
 	}
 
 	Parser[T any, TPtr interfaces.Ptr[T]] interface {
-		ParseAkte(io.Reader, TPtr) (int64, error)
+		ParseBlob(io.Reader, TPtr) (int64, error)
 	}
 
 	Format[T any, TPtr interfaces.Ptr[T]] interface {
@@ -31,7 +31,7 @@ type (
 	}
 
 	Konfig interface {
-		interfaces.Konfig
+		interfaces.Config
 		IsInlineTyp(kennung.Typ) bool
 	}
 )

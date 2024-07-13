@@ -95,13 +95,13 @@ func (s *Store) ReadOneEnnui(sh *sha.Sha) (*sku.Transacted, error) {
 }
 
 func (s *Store) ReadOneKennung(
-	k interfaces.StringerGattungGetter,
+	k interfaces.StringerGenreGetter,
 ) (sk *sku.Transacted, err error) {
 	return s.GetVerzeichnisse().ReadOneKennung(k)
 }
 
 func (s *Store) ReaderFor(sh *sha.Sha) (rc sha.ReadCloser, err error) {
-	if rc, err = s.standort.AkteReaderFrom(
+	if rc, err = s.standort.BlobReaderFrom(
 		sh,
 		s.standort.DirVerzeichnisseMetadateiKennungMutter(),
 	); err != nil {
