@@ -26,7 +26,7 @@ import (
 
 type transacted struct {
 	sync.Mutex
-	interfaces.MutableSetLike[*kennung.Kennung2]
+	interfaces.MutableSetLike[*kennung.Id]
 }
 
 type Store struct {
@@ -41,7 +41,7 @@ type Store struct {
 
 	l       sync.Mutex
 	removed map[url.URL]struct{}
-	added   map[url.URL][]*kennung.Kennung2
+	added   map[url.URL][]*kennung.Id
 
 	transacted transacted
 
@@ -60,10 +60,10 @@ func MakeChrome(
 		konfig:  k,
 		typ:     kennung.MustTyp("toml-bookmark"),
 		removed: make(map[url.URL]struct{}),
-		added:   make(map[url.URL][]*kennung.Kennung2),
+		added:   make(map[url.URL][]*kennung.Id),
 		transacted: transacted{
 			MutableSetLike: collections_value.MakeMutableValueSet(
-				iter.StringerKeyer[*kennung.Kennung2]{},
+				iter.StringerKeyer[*kennung.Id]{},
 			),
 		},
 		transactedUrlIndex:            make(map[url.URL]sku.TransactedMutableSet),
@@ -78,8 +78,8 @@ func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
 	return fs
 }
 
-func (c *Store) GetExternalKennung() (ks interfaces.SetLike[*kennung.Kennung2], err error) {
-	ksm := collections_value.MakeMutableValueSet[*kennung.Kennung2](nil)
+func (c *Store) GetExternalKennung() (ks interfaces.SetLike[*kennung.Id], err error) {
+	ksm := collections_value.MakeMutableValueSet[*kennung.Id](nil)
 	ks = ksm
 
 	for u, items := range c.urls {
@@ -101,7 +101,7 @@ func (c *Store) GetExternalKennung() (ks interfaces.SetLike[*kennung.Kennung2], 
 					return
 				}
 			} else {
-				k := kennung.GetKennungPool().Get()
+				k := kennung.GetIdPool().Get()
 
 				if err = k.SetRaw(u.String()); err != nil {
 					err = errors.Wrap(err)
@@ -120,10 +120,10 @@ func (c *Store) GetExternalKennung() (ks interfaces.SetLike[*kennung.Kennung2], 
 }
 
 // TODO
-func (s *Store) GetKennungForString(v string) (k *kennung.Kennung2, err error) {
+func (s *Store) GetKennungForString(v string) (k *kennung.Id, err error) {
 	err = collections.MakeErrNotFoundString(v)
 	return
-	k = kennung.GetKennungPool().Get()
+	k = kennung.GetIdPool().Get()
 
 	if err = k.SetRaw(v); err != nil {
 		err = errors.Wrap(err)
@@ -355,8 +355,8 @@ func (c *Store) tryToEmitOneExplicitlyCheckedOut(
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	sku.TransactedResetter.Reset(&co.External.browser)
-	co.External.browser.Kennung.SetGattung(gattung.Zettel)
-	co.External.Kennung.SetGattung(gattung.Zettel)
+	co.External.browser.Kennung.SetGenre(gattung.Zettel)
+	co.External.Kennung.SetGenre(gattung.Zettel)
 
 	var uSku *url.URL
 
@@ -407,8 +407,8 @@ func (c *Store) tryToEmitOneRecognized(
 	}
 
 	sku.TransactedResetter.Reset(&co.External.browser)
-	co.External.browser.Kennung.SetGattung(gattung.Zettel)
-	co.External.Kennung.SetGattung(gattung.Zettel)
+	co.External.browser.Kennung.SetGenre(gattung.Zettel)
+	co.External.Kennung.SetGenre(gattung.Zettel)
 
 	sku.TransactedResetter.ResetWith(&co.Internal, internal)
 	sku.TransactedResetter.ResetWith(&co.External.Transacted, internal)
@@ -440,8 +440,8 @@ func (c *Store) tryToEmitOneUntracked(
 	}
 
 	sku.TransactedResetter.Reset(&co.External.browser)
-	co.External.browser.Kennung.SetGattung(gattung.Zettel)
-	co.External.Kennung.SetGattung(gattung.Zettel)
+	co.External.browser.Kennung.SetGenre(gattung.Zettel)
+	co.External.Kennung.SetGenre(gattung.Zettel)
 
 	sku.TransactedResetter.Reset(&co.External.Transacted)
 	sku.TransactedResetter.Reset(&co.Internal)

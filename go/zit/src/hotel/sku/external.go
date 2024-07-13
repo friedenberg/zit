@@ -30,7 +30,7 @@ func (t *External) SetFromSkuLike(sk SkuLike) (err error) {
 	return
 }
 
-func (a *External) GetKennung() kennung.Id {
+func (a *External) GetKennung() kennung.IdLike {
 	return &a.Kennung
 }
 

@@ -216,7 +216,7 @@ func (i *indexAbbr) AddMatchable(o *sku.Transacted) (err error) {
 }
 
 // TODO switch to using ennui for existence
-func (i *indexAbbr) Exists(k *kennung.Kennung2) (err error) {
+func (i *indexAbbr) Exists(k *kennung.Id) (err error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 

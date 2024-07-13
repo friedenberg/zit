@@ -16,7 +16,7 @@ type HinweisStore interface {
 type HinweisIndex interface {
 	HinweisStore
 	interfaces.ResetterWithError
-	AddHinweis(kennung.Id) error
+	AddHinweis(kennung.IdLike) error
 	PeekHinweisen(int) ([]*kennung.Hinweis, error)
 }
 

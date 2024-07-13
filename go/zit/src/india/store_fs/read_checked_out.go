@@ -90,7 +90,7 @@ func (s *Store) ReadIntoCheckedOutFromTransacted(
 			co.State = checked_out_state.StateConflicted
 			co.External.FDs = kfp.FDs
 
-			if err = co.External.Kennung.SetWithKennung(&sk.Kennung); err != nil {
+			if err = co.External.Kennung.SetWithIdLike(&sk.Kennung); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

@@ -12,14 +12,14 @@ type transactedResetter struct{}
 
 func (transactedResetter) Reset(a *Transacted) {
 	a.Kopf.Reset()
-	a.Kennung.SetGattung(gattung.Unknown)
+	a.Kennung.SetGenre(gattung.Unknown)
 	metadatei.Resetter.Reset(&a.Metadatei)
 	a.TransactionIndex.Reset()
 }
 
 func (transactedResetter) ResetWith(a *Transacted, b *Transacted) {
 	a.Kopf = b.Kopf
-	errors.PanicIfError(a.Kennung.ResetWithKennung(&b.Kennung))
+	errors.PanicIfError(a.Kennung.ResetWithIdLike(&b.Kennung))
 	metadatei.Resetter.ResetWith(&a.Metadatei, &b.Metadatei)
 	a.TransactionIndex.SetInt(b.TransactionIndex.Int())
 }

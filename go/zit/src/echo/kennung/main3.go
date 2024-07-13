@@ -37,7 +37,7 @@ type Kennung3 struct {
 	kasten, left, right catgut.String
 }
 
-func MustKennung3(kp Id) (k *Kennung3) {
+func MustKennung3(kp IdLike) (k *Kennung3) {
 	k = &Kennung3{}
 	err := k.SetWithKennung(kp)
 	errors.PanicIfError(err)
@@ -280,9 +280,9 @@ func (k3 *Kennung3) Reset() {
 	k3.right.Reset()
 }
 
-func (k3 *Kennung3) PartsStrings() KennungParts {
-	return KennungParts{
-		Kasten: &k3.kasten,
+func (k3 *Kennung3) PartsStrings() IdParts {
+	return IdParts{
+		RepoId: &k3.kasten,
 		Left:   &k3.left,
 		Middle: k3.middle,
 		Right:  &k3.right,
@@ -391,7 +391,7 @@ func (k3 *Kennung3) SetFromPath(
 		}
 
 	default:
-		err = ErrFDNotKennung
+		err = ErrFDNotId
 		return
 	}
 
@@ -399,7 +399,7 @@ func (k3 *Kennung3) SetFromPath(
 }
 
 func (h *Kennung3) SetWithKennung(
-	k Id,
+	k IdLike,
 ) (err error) {
 	switch kt := k.(type) {
 	case *Kennung3:
@@ -459,7 +459,7 @@ func (h *Kennung3) TodoSetBytes(v *catgut.String) (err error) {
 }
 
 func (h *Kennung3) Set(v string) (err error) {
-	var k Id
+	var k IdLike
 
 	switch h.g {
 	case gattung.Unknown:
@@ -519,7 +519,7 @@ func (a *Kennung3) ResetWith(b *Kennung3) {
 	a.middle = b.middle
 }
 
-func (a *Kennung3) ResetWithKennung(b Id) (err error) {
+func (a *Kennung3) ResetWithKennung(b IdLike) (err error) {
 	return a.SetWithKennung(b)
 }
 

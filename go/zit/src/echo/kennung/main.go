@@ -21,40 +21,40 @@ type IdWithoutGenre interface {
 	Parts() [3]string
 }
 
-type Id interface {
+type IdLike interface {
 	IdWithoutGenre
 	interfaces.GenreGetter
 }
 
-type KennungSansGattungPtr interface {
+type IdLikeWithoutGenrePtr interface {
 	IdWithoutGenre
 	interfaces.Resetter
 	interfaces.Setter
 }
 
-type KennungPtr interface {
-	Id
-	KennungSansGattungPtr
+type IdLikePtr interface {
+	IdLike
+	IdLikeWithoutGenrePtr
 }
 
-type KennungLike[T any] interface {
-	Id
+type IdGeneric[T any] interface {
+	IdLike
 	interfaces.GenreGetter
 	interfaces.Stringer
 }
 
-type KennungLikePtr[T KennungLike[T]] interface {
+type IdGenericPtr[T IdGeneric[T]] interface {
 	interfaces.Ptr[T]
-	KennungLike[T]
-	KennungPtr
+	IdGeneric[T]
+	IdLikePtr
 	interfaces.SetterPtr[T]
 }
 
 type Index struct{}
 
-func Make(v string) (k KennungPtr, err error) {
+func Make(v string) (k IdLikePtr, err error) {
 	if v == "" {
-		k = &Kennung2{}
+		k = &Id{}
 		return
 	}
 
@@ -117,7 +117,7 @@ func Make(v string) (k KennungPtr, err error) {
 	return
 }
 
-func Equals(a, b Id) (ok bool) {
+func Equals(a, b IdLike) (ok bool) {
 	if a.GetGenre().GetGenreString() != b.GetGenre().GetGenreString() {
 		return
 	}
@@ -139,7 +139,7 @@ func FormattedString(k IdWithoutGenre) string {
 }
 
 func AlignedParts(
-	id Id,
+	id IdLike,
 	lenLeft, lenRight int,
 ) (string, string, string) {
 	parts := id.Parts()
@@ -160,7 +160,7 @@ func AlignedParts(
 	return left, middle, right
 }
 
-func Aligned(id Id, lenLeft, lenRight int) string {
+func Aligned(id IdLike, lenLeft, lenRight int) string {
 	left, middle, right := AlignedParts(id, lenLeft, lenRight)
 	return fmt.Sprintf("%s%s%s", left, middle, right)
 }
@@ -329,7 +329,7 @@ func WithRemovedCommonPrefixes(s TagSet) (s2 TagSet) {
 	return
 }
 
-func expandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
+func expandOne[T IdGeneric[T], TPtr IdGenericPtr[T]](
 	k TPtr,
 	ex expansion.Expander,
 	acc interfaces.Adder[T],
@@ -338,7 +338,7 @@ func expandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 	ex.Expand(f, k.String())
 }
 
-func ExpandOneSlice[T KennungLike[T], TPtr KennungLikePtr[T]](
+func ExpandOneSlice[T IdGeneric[T], TPtr IdGenericPtr[T]](
 	k TPtr,
 	exes ...expansion.Expander,
 ) (out []T) {
@@ -362,7 +362,7 @@ func ExpandOneSlice[T KennungLike[T], TPtr KennungLikePtr[T]](
 	return
 }
 
-func ExpandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
+func ExpandOne[T IdGeneric[T], TPtr IdGenericPtr[T]](
 	k TPtr,
 	exes ...expansion.Expander,
 ) (out interfaces.SetPtrLike[T, TPtr]) {
@@ -381,7 +381,7 @@ func ExpandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 	return
 }
 
-func ExpandMany[T KennungLike[T], TPtr KennungLikePtr[T]](
+func ExpandMany[T IdGeneric[T], TPtr IdGenericPtr[T]](
 	ks interfaces.SetPtrLike[T, TPtr],
 	ex expansion.Expander,
 ) (out interfaces.SetPtrLike[T, TPtr]) {
@@ -400,7 +400,7 @@ func ExpandMany[T KennungLike[T], TPtr KennungLikePtr[T]](
 	return
 }
 
-func ExpandOneTo[T KennungLike[T], TPtr KennungLikePtr[T]](
+func ExpandOneTo[T IdGeneric[T], TPtr IdGenericPtr[T]](
 	k TPtr,
 	ex expansion.Expander,
 	s1 interfaces.FuncSetString,

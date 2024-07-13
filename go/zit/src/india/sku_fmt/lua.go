@@ -48,7 +48,7 @@ func FromLuaTable(o *sku.Transacted, l *lua.LState, lt *LuaTable) (err error) {
 		return
 	}
 
-	o.Kennung.SetGattung(g)
+	o.Kennung.SetGenre(g)
 	k := l.GetField(t, "Kennung").String()
 
 	if err = o.Kennung.Set(k); err != nil {

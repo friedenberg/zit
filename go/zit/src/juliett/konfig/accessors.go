@@ -23,7 +23,7 @@ func (kc *Compiled) GetImmutableConfig() interfaces.ImmutableConfig {
 	return kc.angeboren
 }
 
-func (kc *compiled) getTyp(k kennung.Id) (ct *sku.Transacted) {
+func (kc *compiled) getTyp(k kennung.IdLike) (ct *sku.Transacted) {
 	if k.GetGenre() != gattung.Typ {
 		return
 	}
@@ -36,7 +36,7 @@ func (kc *compiled) getTyp(k kennung.Id) (ct *sku.Transacted) {
 	return
 }
 
-func (kc *compiled) getKasten(k kennung.Id) (ct *sku.Transacted) {
+func (kc *compiled) getKasten(k kennung.IdLike) (ct *sku.Transacted) {
 	if k.GetGenre() != gattung.Kasten {
 		return
 	}
@@ -52,7 +52,7 @@ func (kc *compiled) getKasten(k kennung.Id) (ct *sku.Transacted) {
 // Returns the exactly matching Typ, or if it doesn't exist, returns the parent
 // Typ or nil. (Parent Typ for `md-gdoc` would be `md`.)
 func (kc *compiled) getApproximatedTyp(
-	k kennung.Id,
+	k kennung.IdLike,
 ) (ct ApproximatedTyp) {
 	if k.GetGenre() != gattung.Typ {
 		return
@@ -74,7 +74,7 @@ func (kc *compiled) getApproximatedTyp(
 func (kc *compiled) getEtikettOrKastenOrTyp(
 	v string,
 ) (sk *sku.Transacted, err error) {
-	var k kennung.Kennung2
+	var k kennung.Id
 
 	if err = k.Set(v); err != nil {
 		err = errors.Wrap(err)
@@ -98,7 +98,7 @@ func (kc *compiled) getEtikettOrKastenOrTyp(
 }
 
 func (kc *compiled) getEtikett(
-	k kennung.Id,
+	k kennung.IdLike,
 ) (ct *sku.Transacted, ok bool) {
 	if k.GetGenre() != gattung.Etikett {
 		return

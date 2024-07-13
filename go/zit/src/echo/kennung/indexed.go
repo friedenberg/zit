@@ -4,26 +4,26 @@ import "code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 
 type IndexedLike struct {
 	Int            int
-	Kennung        Kennung2
+	Kennung        Id
 	SchwanzenCount int
 	Count          int
 }
 
-func MakeIndexed(k Id) (i *IndexedLike) {
+func MakeIndexed(k IdLike) (i *IndexedLike) {
 	i = &IndexedLike{}
 	i.ResetWithKennung(k)
 	return
 }
 
-func (i *IndexedLike) ResetWithKennung(k Id) {
-	errors.PanicIfError(i.Kennung.SetWithKennung(k))
+func (i *IndexedLike) ResetWithKennung(k IdLike) {
+	errors.PanicIfError(i.Kennung.SetWithIdLike(k))
 }
 
 func (z *IndexedLike) GetInt() int {
 	return 0
 }
 
-func (z *IndexedLike) GetKennung() Id {
+func (z *IndexedLike) GetKennung() IdLike {
 	return &z.Kennung
 }
 

@@ -90,7 +90,7 @@ func (s *Store) tryRealizeAndOrStore(
 			return
 		}
 
-		if err = kinder.Kennung.SetWithKennung(ken); err != nil {
+		if err = kinder.Kennung.SetWithIdLike(ken); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -399,7 +399,7 @@ func (s *Store) UpdateKonfig(
 	)
 }
 
-func (s *Store) createEtikettOrTyp(k *kennung.Kennung2) (err error) {
+func (s *Store) createEtikettOrTyp(k *kennung.Id) (err error) {
 	switch k.GetGenre() {
 	default:
 		err = gattung.MakeErrUnsupportedGattung(k.GetGenre())
@@ -412,7 +412,7 @@ func (s *Store) createEtikettOrTyp(k *kennung.Kennung2) (err error) {
 	t := sku.GetTransactedPool().Get()
 	defer sku.GetTransactedPool().Put(t)
 
-	if err = t.Kennung.SetWithKennung(k); err != nil {
+	if err = t.Kennung.SetWithIdLike(k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -453,9 +453,9 @@ func (s *Store) addTyp(
 
 	err = nil
 
-	var k kennung.Kennung2
+	var k kennung.Id
 
-	if err = k.SetWithKennung(t); err != nil {
+	if err = k.SetWithIdLike(t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -506,9 +506,9 @@ func (s *Store) addEtikettAndExpanded(
 
 		err = nil
 
-		var k kennung.Kennung2
+		var k kennung.Id
 
-		if err = k.SetWithKennung(e1); err != nil {
+		if err = k.SetWithIdLike(e1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

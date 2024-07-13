@@ -21,7 +21,7 @@ type (
 		Hinweis abbrOne[Hinweis, *Hinweis]
 	}
 
-	abbrOne[V KennungLike[V], VPtr KennungLikePtr[V]] struct {
+	abbrOne[V IdGeneric[V], VPtr IdGenericPtr[V]] struct {
 		Expand     FuncExpandString
 		Abbreviate FuncAbbreviateString[V, VPtr]
 	}
@@ -49,7 +49,7 @@ func (a Abbr) ExpanderFor(g gattung.Gattung) FuncExpandString {
 }
 
 func (ao abbrOne[V, VPtr]) AbbreviateKennung(
-	k Id,
+	k IdLike,
 ) (v string, err error) {
 	if ao.Abbreviate == nil {
 		v = k.String()
@@ -81,10 +81,10 @@ func (ao abbrOne[V, VPtr]) AbbreviateKennung(
 }
 
 func (a Abbr) LenKopfUndSchwanz(
-	in *Kennung2,
+	in *Id,
 ) (kopf, schwanz int, err error) {
 	if in.GetGenre() != gattung.Zettel || a.Hinweis.Abbreviate == nil {
-		kopf, schwanz = in.LenKopfUndSchwanz()
+		kopf, schwanz = in.LenHeadAndTail()
 		return
 	}
 
@@ -114,13 +114,13 @@ func (a Abbr) LenKopfUndSchwanz(
 }
 
 func (a Abbr) AbbreviateHinweisOnly(
-	in *Kennung2,
+	in *Id,
 ) (err error) {
 	if in.GetGenre() != gattung.Zettel || in.IsVirtual() {
 		return
 	}
 
-	var getAbbr func(Id) (string, error)
+	var getAbbr func(IdLike) (string, error)
 
 	var h Hinweis
 
@@ -138,7 +138,7 @@ func (a Abbr) AbbreviateHinweisOnly(
 		return
 	}
 
-	if err = in.SetWithGattung(abbr, h); err != nil {
+	if err = in.SetWithGenre(abbr, h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -147,7 +147,7 @@ func (a Abbr) AbbreviateHinweisOnly(
 }
 
 func (a Abbr) ExpandHinweisOnly(
-	in *Kennung2,
+	in *Id,
 ) (err error) {
 	if in.GetGenre() != gattung.Zettel || a.Hinweis.Expand == nil {
 		return
@@ -167,7 +167,7 @@ func (a Abbr) ExpandHinweisOnly(
 		return
 	}
 
-	if err = in.SetWithGattung(ex, h); err != nil {
+	if err = in.SetWithGenre(ex, h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -176,10 +176,10 @@ func (a Abbr) ExpandHinweisOnly(
 }
 
 func (a Abbr) AbbreviateKennung(
-	in *Kennung2,
-	out *Kennung2,
+	in *Id,
+	out *Id,
 ) (err error) {
-	var getAbbr func(Id) (string, error)
+	var getAbbr func(IdLike) (string, error)
 
 	switch in.GetGenre() {
 	case gattung.Zettel:
@@ -204,7 +204,7 @@ func (a Abbr) AbbreviateKennung(
 		return
 	}
 
-	if err = out.SetWithGattung(abbr, in); err != nil {
+	if err = out.SetWithGenre(abbr, in); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

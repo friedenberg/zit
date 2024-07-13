@@ -45,7 +45,7 @@ func (c CreateFromPaths) Run(
 		var z *store_fs.External
 		var t store_fs.KennungFDPair
 
-		t.Kennung.SetGattung(gattung.Zettel)
+		t.Kennung.SetGenre(gattung.Zettel)
 
 		if err = t.FDs.Objekte.Set(arg); err != nil {
 			err = errors.Wrap(err)
@@ -171,7 +171,7 @@ func (c *CreateFromPaths) zettelsFromPath(
 
 	ze.Metadatei.Tai = kennung.TaiFromTime(fd.ModTime())
 
-	ze.Kennung.SetGattung(gattung.Zettel)
+	ze.Kennung.SetGenre(gattung.Zettel)
 
 	if _, err = c.TextParser.ParseMetadatei(r, ze); err != nil {
 		err = errors.Wrap(err)

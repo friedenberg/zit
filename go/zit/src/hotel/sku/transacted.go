@@ -16,7 +16,7 @@ import (
 )
 
 type Transacted struct {
-	Kennung          kennung.Kennung2
+	Kennung          kennung.Id
 	Metadatei        metadatei.Metadatei
 	TransactionIndex values.Int
 	Kopf             kennung.Tai
@@ -33,7 +33,7 @@ func (a *Transacted) SetFromTransacted(b *Transacted) (err error) {
 }
 
 func (t *Transacted) SetFromSkuLike(sk SkuLike) (err error) {
-	if err = t.Kennung.SetWithKennung(sk.GetKennung()); err != nil {
+	if err = t.Kennung.SetWithIdLike(sk.GetKennung()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -178,16 +178,16 @@ func (a *Transacted) SetTai(t kennung.Tai) {
 	// log.Debug().Caller(6, "after: %s", a.StringKennungTai())
 }
 
-func (a *Transacted) GetKennung() kennung.Id {
+func (a *Transacted) GetKennung() kennung.IdLike {
 	return &a.Kennung
 }
 
-func (a *Transacted) GetKennungLike() kennung.Id {
+func (a *Transacted) GetKennungLike() kennung.IdLike {
 	return &a.Kennung
 }
 
-func (a *Transacted) SetKennungLike(kl kennung.Id) (err error) {
-	if err = a.Kennung.SetWithKennung(kl); err != nil {
+func (a *Transacted) SetKennungLike(kl kennung.IdLike) (err error) {
+	if err = a.Kennung.SetWithIdLike(kl); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

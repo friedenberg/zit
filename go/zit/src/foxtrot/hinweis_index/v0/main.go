@@ -171,7 +171,7 @@ func (i *oldIndex) Reset() (err error) {
 	return
 }
 
-func (i *oldIndex) AddHinweis(k1 kennung.Id) (err error) {
+func (i *oldIndex) AddHinweis(k1 kennung.IdLike) (err error) {
 	if !k1.GetGenre().EqualsGenre(gattung.Zettel) {
 		err = gattung.MakeErrUnsupportedGattung(k1)
 		return

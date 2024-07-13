@@ -134,7 +134,7 @@ func (s *store) Create(
 	t.SetAkteSha(sh)
 	tai := s.clock.GetTai()
 
-	if err = t.Kennung.SetWithKennung(tai); err != nil {
+	if err = t.Kennung.SetWithIdLike(tai); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

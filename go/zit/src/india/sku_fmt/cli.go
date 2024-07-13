@@ -15,12 +15,12 @@ type cli struct {
 	options       erworben_cli_print_options.PrintOptions
 	contentPrefix string
 
-	kennungStringFormatWriter   interfaces.StringFormatWriter[*kennung.Kennung2]
+	kennungStringFormatWriter   interfaces.StringFormatWriter[*kennung.Id]
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*metadatei.Metadatei]
 }
 
 func MakeCliFormatShort(
-	kennungStringFormatWriter interfaces.StringFormatWriter[*kennung.Kennung2],
+	kennungStringFormatWriter interfaces.StringFormatWriter[*kennung.Id],
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*metadatei.Metadatei],
 ) *cli {
 	return &cli{
@@ -31,7 +31,7 @@ func MakeCliFormatShort(
 
 func MakeCliFormat(
 	options erworben_cli_print_options.PrintOptions,
-	kennungStringFormatWriter interfaces.StringFormatWriter[*kennung.Kennung2],
+	kennungStringFormatWriter interfaces.StringFormatWriter[*kennung.Id],
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*metadatei.Metadatei],
 ) *cli {
 	return &cli{

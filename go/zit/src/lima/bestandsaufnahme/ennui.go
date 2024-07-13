@@ -19,8 +19,8 @@ import (
 type Ennui interface {
 	WriteOneObjekteMetadatei(o *sku.Transacted) (err error)
 	ReadOneEnnui(*sha.Sha) (*sku.Transacted, error)
-	ReadOneKennung(kennung.Id) (*sku.Transacted, error)
-	ReadOneKennungSha(kennung.Id) (*sha.Sha, error)
+	ReadOneKennung(kennung.IdLike) (*sku.Transacted, error)
+	ReadOneKennungSha(kennung.IdLike) (*sha.Sha, error)
 }
 
 type ennuiStore struct {
@@ -95,7 +95,7 @@ func (s *ennuiStore) ReadOneEnnui(sh *sha.Sha) (sk *sku.Transacted, err error) {
 	return
 }
 
-func (s *ennuiStore) ReadOneKennungSha(k kennung.Id) (sh *sha.Sha, err error) {
+func (s *ennuiStore) ReadOneKennungSha(k kennung.IdLike) (sh *sha.Sha, err error) {
 	left := sha.FromString(k.String())
 	defer sha.GetPool().Put(left)
 
@@ -107,7 +107,7 @@ func (s *ennuiStore) ReadOneKennungSha(k kennung.Id) (sh *sha.Sha, err error) {
 	return
 }
 
-func (s *ennuiStore) ReadOneKennung(k kennung.Id) (sk *sku.Transacted, err error) {
+func (s *ennuiStore) ReadOneKennung(k kennung.IdLike) (sk *sku.Transacted, err error) {
 	sh, err := s.ReadOneKennungSha(k)
 	defer sha.GetPool().Put(sh)
 

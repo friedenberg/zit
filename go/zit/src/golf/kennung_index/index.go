@@ -18,8 +18,8 @@ import (
 )
 
 type index2[
-	T kennung.KennungLike[T],
-	TPtr kennung.KennungLikePtr[T],
+	T kennung.IdGeneric[T],
+	TPtr kennung.IdGenericPtr[T],
 ] struct {
 	path            string
 	vf              interfaces.CacheIOFactory
@@ -31,8 +31,8 @@ type index2[
 }
 
 func MakeIndex2[
-	T kennung.KennungLike[T],
-	TPtr kennung.KennungLikePtr[T],
+	T kennung.IdGeneric[T],
+	TPtr kennung.IdGenericPtr[T],
 ](
 	vf interfaces.CacheIOFactory,
 	path string,
@@ -214,13 +214,13 @@ func (i *index2[T, TPtr]) EachSchwanzen(
 	return
 }
 
-func (i *index2[T, TPtr]) GetAll() (out []kennung.Id, err error) {
+func (i *index2[T, TPtr]) GetAll() (out []kennung.IdLike, err error) {
 	if err = i.ReadIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	out = make([]kennung.Id, 0, len(i.Kennungen))
+	out = make([]kennung.IdLike, 0, len(i.Kennungen))
 
 	for _, ki := range i.Kennungen {
 		out = append(out, ki.GetKennung())

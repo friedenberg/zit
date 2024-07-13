@@ -147,9 +147,9 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 
 	// var defaultTypTransacted *typ.Transacted
 
-	var k kennung.Kennung2
+	var k kennung.Id
 
-	if err = k.SetWithKennung(defaultTypKennung); err != nil {
+	if err = k.SetWithIdLike(defaultTypKennung); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -166,9 +166,9 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 			return
 		}
 
-		var k kennung.Kennung2
+		var k kennung.Id
 
-		if err = k.SetWithKennung(defaultTypKennung); err != nil {
+		if err = k.SetWithIdLike(defaultTypKennung); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

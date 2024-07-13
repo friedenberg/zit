@@ -122,7 +122,7 @@ func (s *Store) flushUrls() (err error) {
 		reqPayload.Deleted = append(reqPayload.Deleted, u.String())
 	}
 
-	lookup := make([][]*kennung.Kennung2, 0, len(s.added))
+	lookup := make([][]*kennung.Id, 0, len(s.added))
 
 	for u, k := range s.added {
 		reqPayload.Added = append(

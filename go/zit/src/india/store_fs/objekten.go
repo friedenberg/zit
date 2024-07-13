@@ -34,7 +34,7 @@ func (c *Store) tryEtikett(fi os.FileInfo, dir string) (err error) {
 		t = &KennungFDPair{}
 	}
 
-	if err = t.Kennung.SetWithKennung(h); err != nil {
+	if err = t.Kennung.SetWithIdLike(h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -66,7 +66,7 @@ func (c *Store) tryKasten(fi os.FileInfo, dir string) (err error) {
 		t = &KennungFDPair{}
 	}
 
-	if err = t.Kennung.SetWithKennung(h); err != nil {
+	if err = t.Kennung.SetWithIdLike(h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -98,7 +98,7 @@ func (c *Store) tryTyp(fi os.FileInfo, dir string) (err error) {
 		t = &KennungFDPair{}
 	}
 
-	if err = t.Kennung.SetWithKennung(h); err != nil {
+	if err = t.Kennung.SetWithIdLike(h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -133,7 +133,7 @@ func (c *Store) tryZettel(
 		t = &KennungFDPair{}
 	}
 
-	if err = t.Kennung.SetWithKennung(h); err != nil {
+	if err = t.Kennung.SetWithIdLike(h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

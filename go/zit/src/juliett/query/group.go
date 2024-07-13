@@ -27,7 +27,7 @@ type Group struct {
 	Hidden           sku.Query
 	OptimizedQueries map[gattung.Gattung]*Query
 	UserQueries      map[kennung.Genre]*Query
-	Kennungen        []*kennung.Kennung2
+	Kennungen        []*kennung.Id
 	Zettelen         kennung.HinweisMutableSet
 	Typen            kennung.TypMutableSet
 
@@ -67,7 +67,7 @@ func (qg *Group) GetSigil() (s kennung.Sigil) {
 
 func (qg *Group) GetExactlyOneKennung(
 	g gattung.Gattung,
-) (k *kennung.Kennung2, s kennung.Sigil, err error) {
+) (k *kennung.Id, s kennung.Sigil, err error) {
 	if len(qg.OptimizedQueries) != 1 {
 		err = errors.Errorf(
 			"expected exactly 1 gattung query but got %d",
@@ -95,7 +95,7 @@ func (qg *Group) GetExactlyOneKennung(
 	s = q.GetSigil()
 
 	for _, k1 := range kn {
-		k = k1.Kennung2
+		k = k1.Id
 
 		if k1.External {
 			s.Add(kennung.SigilExternal)
@@ -156,16 +156,16 @@ func (qg *Group) AddExactKennung(
 	b *Builder,
 	k Kennung,
 ) (err error) {
-	if k.Kennung2 == nil {
+	if k.Id == nil {
 		err = errors.Errorf("nil kennung")
 		return
 	}
 
-	qg.Kennungen = append(qg.Kennungen, k.Kennung2)
+	qg.Kennungen = append(qg.Kennungen, k.Id)
 
 	q := b.makeQuery()
 	q.Sigil.Add(kennung.SigilSchwanzen)
-	q.Kennung[k.Kennung2.String()] = k
+	q.Kennung[k.Id.String()] = k
 	q.Genre.Add(gattung.Must(k))
 
 	if err = qg.Add(q); err != nil {

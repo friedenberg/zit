@@ -126,7 +126,7 @@ func (c *FormatZettel) getSku(
 		return
 	}
 
-	var k *kennung.Kennung2
+	var k *kennung.Id
 	var s kennung.Sigil
 
 	if k, s, err = qg.GetExactlyOneKennung(

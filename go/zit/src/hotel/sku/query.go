@@ -25,7 +25,7 @@ type (
 	QueryWithSigilAndKennung interface {
 		Query
 		SigilGetter
-		ContainsKennung(*kennung.Kennung2) bool
+		ContainsKennung(*kennung.Id) bool
 	}
 
 	// Used by store_verzeichnisse.binary*

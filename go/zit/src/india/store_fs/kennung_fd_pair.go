@@ -12,7 +12,7 @@ import (
 )
 
 type KennungFDPair struct {
-	Kennung kennung.Kennung2
+	Kennung kennung.Id
 	FDs     FDPair
 }
 
@@ -32,11 +32,11 @@ func (a *KennungFDPair) Equals(b KennungFDPair) bool {
 	return true
 }
 
-func (e *KennungFDPair) GetKennungLike() kennung.Id {
+func (e *KennungFDPair) GetKennungLike() kennung.IdLike {
 	return &e.Kennung
 }
 
-func (e *KennungFDPair) GetKennungLikePtr() kennung.KennungPtr {
+func (e *KennungFDPair) GetKennungLikePtr() kennung.IdLikePtr {
 	return &e.Kennung
 }
 
@@ -83,7 +83,7 @@ func (e *KennungFDPair) SetKennungFromFullPath(
 		p1 = p[:len(p)-len(ext)]
 	}
 
-	e.Kennung.SetGattung(gattung.Zettel)
+	e.Kennung.SetGenre(gattung.Zettel)
 
 	if err = e.Kennung.Set(p1); err != nil {
 		if allowErrors {

@@ -13,19 +13,19 @@ import (
 var (
 	registerOnce        sync.Once
 	registryLock        *sync.Mutex
-	registryGattung     map[gattung.Gattung]Id
-	registryQueryPrefix map[string]Id
+	registryGattung     map[gattung.Gattung]IdLike
+	registryQueryPrefix map[string]IdLike
 )
 
 func once() {
 	registryLock = &sync.Mutex{}
-	registryGattung = make(map[gattung.Gattung]Id)
-	registryQueryPrefix = make(map[string]Id)
+	registryGattung = make(map[gattung.Gattung]IdLike)
+	registryQueryPrefix = make(map[string]IdLike)
 }
 
-func register[T Id, TPtr interface {
+func register[T IdLike, TPtr interface {
 	interfaces.StringSetterPtr[T]
-	Id
+	IdLike
 }](id T,
 ) {
 	gob.Register(&id)
@@ -37,7 +37,7 @@ func register[T Id, TPtr interface {
 	defer registryLock.Unlock()
 
 	ok := false
-	var id1 Id
+	var id1 IdLike
 	g := gattung.Must(id.GetGenre())
 
 	if id1, ok = registryGattung[g]; ok {
@@ -53,7 +53,7 @@ func register[T Id, TPtr interface {
 
 	registryGattung[g] = id
 
-	if idQueryPrefix, ok := Id(id).(QueryPrefixer); ok {
+	if idQueryPrefix, ok := IdLike(id).(QueryPrefixer); ok {
 		p := idQueryPrefix.GetQueryPrefix()
 
 		if id1, ok := registryQueryPrefix[p]; ok {

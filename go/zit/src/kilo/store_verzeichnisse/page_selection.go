@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 )
 
-func (i *Store) PageForKennung(h kennung.Id) (n uint8, err error) {
+func (i *Store) PageForKennung(h kennung.IdLike) (n uint8, err error) {
 	s := sha.FromStringer(h)
 	return sha.PageIndexForSha(DigitWidth, s)
 }

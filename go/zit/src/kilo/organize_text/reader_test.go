@@ -22,7 +22,7 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func makeHinweis(t *testing.T, v string) (k *kennung.Kennung2) {
+func makeHinweis(t *testing.T, v string) (k *kennung.Id) {
 	var err error
 
 	var h kennung.Hinweis
@@ -31,7 +31,7 @@ func makeHinweis(t *testing.T, v string) (k *kennung.Kennung2) {
 		t.Fatalf("%s", err)
 	}
 
-	return kennung.MustKennung2(h)
+	return kennung.MustId(h)
 }
 
 func makeBez(t *testing.T, v string) (b bezeichnung.Bezeichnung) {
@@ -53,7 +53,7 @@ func makeObjWithHinAndBez(t *testing.T, hin string, bez string) (o *obj) {
 		},
 	}
 
-	o.Kennung.SetWithKennung(makeHinweis(t, hin))
+	o.Kennung.SetWithIdLike(makeHinweis(t, hin))
 
 	return
 }

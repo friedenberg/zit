@@ -81,8 +81,8 @@ type (
 	}
 
 	ExternalStoreForQuery interface {
-		GetExternalKennung() (interfaces.SetLike[*kennung.Kennung2], error)
-		GetKennungForString(string) (*kennung.Kennung2, error)
+		GetExternalKennung() (interfaces.SetLike[*kennung.Id], error)
+		GetKennungForString(string) (*kennung.Id, error)
 	}
 
 	ExternalStoreLike interface {
@@ -92,8 +92,8 @@ type (
 		// SaveAkte(col CheckedOutLike) (err error)
 		// ExternalStoreCheckoutOne
 		interfaces.Flusher
-		GetExternalKennung() (interfaces.SetLike[*kennung.Kennung2], error)
-		GetKennungForString(string) (*kennung.Kennung2, error)
+		GetExternalKennung() (interfaces.SetLike[*kennung.Id], error)
+		GetKennungForString(string) (*kennung.Id, error)
 	}
 
 	ExternalStoreForQueryGetter interface {
@@ -255,9 +255,9 @@ func (es *ExternalStore) UpdateTransacted(z *Transacted) (err error) {
 	return
 }
 
-func (es *ExternalStore) GetExternalKennung() (ks interfaces.SetLike[*kennung.Kennung2], err error) {
+func (es *ExternalStore) GetExternalKennung() (ks interfaces.SetLike[*kennung.Id], err error) {
 	if es == nil {
-		ks = collections_value.MakeValueSet[*kennung.Kennung2](nil)
+		ks = collections_value.MakeValueSet[*kennung.Id](nil)
 		return
 	}
 
@@ -274,7 +274,7 @@ func (es *ExternalStore) GetExternalKennung() (ks interfaces.SetLike[*kennung.Ke
 	return
 }
 
-func (es *ExternalStore) GetKennungForString(v string) (k *kennung.Kennung2, err error) {
+func (es *ExternalStore) GetKennungForString(v string) (k *kennung.Id, err error) {
 	if es == nil {
 		err = collections.MakeErrNotFoundString(v)
 		return

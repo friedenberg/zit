@@ -17,7 +17,7 @@ type MutableMatchSet struct {
 	Stored                    MutableSet
 	Akten                     MutableSet
 	Matched                   MutableSet
-	MatchedHinweisen          interfaces.MutableSetLike[kennung.Id]
+	MatchedHinweisen          interfaces.MutableSetLike[kennung.IdLike]
 	MatchedHinweisenSchwanzen map[string]kennung.Tai
 }
 
@@ -28,7 +28,7 @@ func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
 		Stored:   MakeMutableSetUniqueStored(),
 		Akten:    MakeMutableSetUniqueAkte(),
 		Matched:  MakeMutableSetUniqueFD(),
-		MatchedHinweisen: collections_value.MakeMutableValueSet[kennung.Id](
+		MatchedHinweisen: collections_value.MakeMutableValueSet[kennung.IdLike](
 			nil,
 		),
 		MatchedHinweisenSchwanzen: make(map[string]kennung.Tai),

@@ -61,7 +61,7 @@ func (c ExecAction) RunWithQuery(
 		return
 	}
 
-	hinweisen := collections_value.MakeMutableValueSet[kennung.Id](nil)
+	hinweisen := collections_value.MakeMutableValueSet[kennung.IdLike](nil)
 
 	if err = u.GetStore().QueryWithKasten(
 		ms,
@@ -88,7 +88,7 @@ func (c ExecAction) RunWithQuery(
 func (c ExecAction) runAction(
 	u *umwelt.Umwelt,
 	sc script_config.ScriptConfig,
-	hinweisen interfaces.SetLike[kennung.Id],
+	hinweisen interfaces.SetLike[kennung.IdLike],
 ) (err error) {
 	var wt io.WriterTo
 
@@ -97,7 +97,7 @@ func (c ExecAction) runAction(
 		map[string]string{
 			"ZIT_BIN": u.Standort().Executable(),
 		},
-		iter.Strings[kennung.Id](hinweisen)...,
+		iter.Strings[kennung.IdLike](hinweisen)...,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

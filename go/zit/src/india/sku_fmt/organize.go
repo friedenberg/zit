@@ -258,7 +258,7 @@ func (f *Organize) readStringFormatWithinBrackets(
 	rr := catgut.MakeRingBufferRuneScanner(rb)
 
 	state := 0
-	var k kennung.Kennung2
+	var k kennung.Id
 	var t catgut.String
 	var eof bool
 	var n int

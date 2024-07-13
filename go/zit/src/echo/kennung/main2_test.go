@@ -21,7 +21,7 @@ func kennung2WriteToReadFromData() []string {
 func TestKennung2WriteToReadFrom(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 	for _, v := range kennung2WriteToReadFromData() {
-		var k Kennung2
+		var k Id
 		t.AssertNoError(k.Set(v))
 
 		var b bytes.Buffer
@@ -29,7 +29,7 @@ func TestKennung2WriteToReadFrom(t1 *testing.T) {
 		_, err := k.WriteTo(&b)
 		t.AssertNoError(err)
 
-		var k2 Kennung2
+		var k2 Id
 
 		_, err = k2.ReadFrom(&b)
 		t.AssertNoError(err)

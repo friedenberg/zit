@@ -32,7 +32,7 @@ func (a *Query) GetSigil() kennung.Sigil {
 	return a.Sigil
 }
 
-func (a *Query) ContainsKennung(k *kennung.Kennung2) bool {
+func (a *Query) ContainsKennung(k *kennung.Id) bool {
 	if !a.Genre.Contains(k.GetGenre()) {
 		panic("should never check for wrong gattung")
 	}
@@ -97,7 +97,7 @@ func (a *Query) Merge(b *Query) (err error) {
 	}
 
 	for _, k := range b.Kennung {
-		a.Kennung[k.Kennung2.String()] = k
+		a.Kennung[k.Id.String()] = k
 	}
 
 	a.Children = append(a.Children, b.Children...)

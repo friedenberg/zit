@@ -149,7 +149,7 @@ func (e tag) IsDependentLeaf() bool {
 	return e.dependentLeaf
 }
 
-func (e *tag) TodoSetFromKennung2(v *Kennung2) (err error) {
+func (e *tag) TodoSetFromKennung2(v *Id) (err error) {
 	return e.Set(v.String())
 }
 

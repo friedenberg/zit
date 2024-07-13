@@ -24,7 +24,7 @@ func (f v4) ParsePersistentMetadatei(
 
 	var (
 		g gattung.Gattung
-		k *kennung.Kennung2
+		k *kennung.Id
 	)
 
 	var (
@@ -100,10 +100,10 @@ func (f v4) ParsePersistentMetadatei(
 			}
 
 		case key.Equal(keyKennung.Bytes()):
-			k = kennung.GetKennungPool().Get()
-			defer kennung.GetKennungPool().Put(k)
+			k = kennung.GetIdPool().Get()
+			defer kennung.GetIdPool().Put(k)
 
-			if err = k.SetWithGattung(val.String(), g); err != nil {
+			if err = k.SetWithGenre(val.String(), g); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

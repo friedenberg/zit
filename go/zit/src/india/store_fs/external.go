@@ -39,7 +39,7 @@ func (t *External) SetFromSkuLike(sk sku.SkuLike) (err error) {
 	return
 }
 
-func (a *External) GetKennung() kennung.Id {
+func (a *External) GetKennung() kennung.IdLike {
 	return &a.Kennung
 }
 
@@ -108,7 +108,7 @@ func (a *External) ResetWithExternalMaybe(
 	b *KennungFDPair,
 ) (err error) {
 	k := b.GetKennungLike()
-	a.Kennung.ResetWithKennung(k)
+	a.Kennung.ResetWithIdLike(k)
 	metadatei.Resetter.Reset(&a.Metadatei)
 	a.FDs.ResetWith(b.GetFDs())
 

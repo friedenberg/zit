@@ -52,7 +52,7 @@ func (zws *Schwanzen) Less(zt *Transacted) (ok bool) {
 	return
 }
 
-func (zws *Schwanzen) Get(h kennung.Id) (t kennung.Tai, ok bool) {
+func (zws *Schwanzen) Get(h kennung.IdLike) (t kennung.Tai, ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 

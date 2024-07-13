@@ -59,11 +59,11 @@ func (e *Exp) CollectEtiketten(mes kennung.TagMutableSet) {
 			mt.CollectEtiketten(mes)
 
 		case *Kennung:
-			if mt.Kennung2.GetGenre() != gattung.Etikett {
+			if mt.Id.GetGenre() != gattung.Etikett {
 				continue
 			}
 
-			e := kennung.MustTag(mt.Kennung2.String())
+			e := kennung.MustTag(mt.Id.String())
 			mes.Add(e)
 		}
 	}

@@ -53,7 +53,7 @@ type (
 		GetKopf() kennung.Tai
 		GetTai() kennung.Tai
 		GetTyp() kennung.Typ
-		GetKennung() kennung.Id
+		GetKennung() kennung.IdLike
 		GetObjekteSha() interfaces.ShaLike
 		GetAkteSha() interfaces.ShaLike
 		GetKey() string
@@ -65,7 +65,7 @@ type (
 		CalculateObjekteShas() (err error)
 
 		SetTai(kennung.Tai)
-		SetKennungLike(kennung.Id) error
+		SetKennungLike(kennung.IdLike) error
 		SetFromSkuLike(SkuLike) error
 
 		GetSkuLike() SkuLike

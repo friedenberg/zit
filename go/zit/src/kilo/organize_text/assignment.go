@@ -105,7 +105,7 @@ func (a Assignment) MaxKopfUndSchwanz(
 ) (kopf, schwanz int) {
 	a.Objekten.Each(
 		func(z *obj) (err error) {
-			oKopf, oSchwanz := z.Kennung.LenKopfUndSchwanz()
+			oKopf, oSchwanz := z.Kennung.LenHeadAndTail()
 
 			if o.PrintOptions.Abbreviations.Hinweisen {
 				if oKopf, oSchwanz, err = o.Abbr.LenKopfUndSchwanz(

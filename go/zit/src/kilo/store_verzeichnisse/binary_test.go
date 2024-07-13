@@ -20,7 +20,7 @@ func TestBinaryOne(t1 *testing.T) {
 	var err error
 
 	{
-		t.AssertNoError(expected.Kennung.SetWithKennung(kennung.MustHinweis("one/uno")))
+		t.AssertNoError(expected.Kennung.SetWithIdLike(kennung.MustHinweis("one/uno")))
 		expected.SetTai(kennung.NowTai())
 		t.AssertNoError(expected.Metadatei.Akte.Set(
 			"ed500e315f33358824203cee073893311e0a80d77989dc55c5d86247d95b2403",

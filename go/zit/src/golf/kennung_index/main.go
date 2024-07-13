@@ -13,14 +13,14 @@ import (
 )
 
 type KennungIndex[
-	T kennung.KennungLike[T],
-	TPtr kennung.KennungLikePtr[T],
+	T kennung.IdGeneric[T],
+	TPtr kennung.IdGenericPtr[T],
 ] interface {
 	GetInt(int) (T, error)
 	Get(*T) (*kennung.IndexedLike, error)
 	HasChanges() bool
 	Reset() error
-	GetAll() ([]kennung.Id, error)
+	GetAll() ([]kennung.IdLike, error)
 	Each(interfaces.FuncIter[kennung.IndexedLike]) error
 	EachSchwanzen(interfaces.FuncIter[*kennung.IndexedLike]) error
 	StoreDelta(interfaces.Delta[T]) (err error)
@@ -152,7 +152,7 @@ func (i *index) Reset() (err error) {
 	return
 }
 
-func (i *index) AddHinweis(k kennung.Id) (err error) {
+func (i *index) AddHinweis(k kennung.IdLike) (err error) {
 	if err = i.hinweisIndex.AddHinweis(k); err != nil {
 		err = errors.Wrap(err)
 		return

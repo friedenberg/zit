@@ -22,20 +22,20 @@ func (s EtikettenWithParentsAndTypes) Len() int {
 }
 
 func (s EtikettenWithParentsAndTypes) ContainsKennungEtikett(
-	k *kennung.Kennung2,
+	k *kennung.Id,
 ) (int, bool) {
 	return s.containsKennungEtikett(k, true)
 }
 
 func (s EtikettenWithParentsAndTypes) ContainsKennungEtikettExact(
-	k *kennung.Kennung2,
+	k *kennung.Id,
 ) (int, bool) {
 	return s.containsKennungEtikett(k, false)
 }
 
 // TODO make less fragile
 func (s EtikettenWithParentsAndTypes) containsKennungEtikett(
-	k *kennung.Kennung2,
+	k *kennung.Id,
 	partial bool,
 ) (int, bool) {
 	e := k.PartsStrings().Right

@@ -18,7 +18,7 @@ type cliCheckedOut struct {
 
 	rightAlignedWriter          interfaces.StringFormatWriter[string]
 	shaStringFormatWriter       interfaces.StringFormatWriter[interfaces.ShaLike]
-	kennungStringFormatWriter   interfaces.StringFormatWriter[*kennung.Kennung2]
+	kennungStringFormatWriter   interfaces.StringFormatWriter[*kennung.Id]
 	fdStringFormatWriter        interfaces.StringFormatWriter[*fd.FD]
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*metadatei.Metadatei]
 }
@@ -27,7 +27,7 @@ func MakeCliCheckedOutFormat(
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
 	fdStringFormatWriter interfaces.StringFormatWriter[*fd.FD],
-	kennungStringFormatWriter interfaces.StringFormatWriter[*kennung.Kennung2],
+	kennungStringFormatWriter interfaces.StringFormatWriter[*kennung.Id],
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*metadatei.Metadatei],
 ) *cliCheckedOut {
 	return &cliCheckedOut{

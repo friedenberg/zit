@@ -34,13 +34,13 @@ func MakeKennungCliFormat(
 
 func (f *kennungCliFormat) WriteStringFormat(
 	w interfaces.WriterAndStringWriter,
-	k *kennung.Kennung2,
+	k *kennung.Id,
 ) (n int64, err error) {
 	if f.options.Abbreviations.Hinweisen {
-		k1 := kennung.GetKennungPool().Get()
-		defer kennung.GetKennungPool().Put(k1)
+		k1 := kennung.GetIdPool().Get()
+		defer kennung.GetIdPool().Put(k1)
 
-		if err = k1.ResetWithKennung(k); err != nil {
+		if err = k1.ResetWithIdLike(k); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

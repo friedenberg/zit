@@ -70,7 +70,7 @@ func MakeCheckedOutLikeMutableSet() CheckedOutLikeMutableSet {
 }
 
 type kennungGetter interface {
-	GetKennung() kennung.Id
+	GetKennung() kennung.IdLike
 }
 
 type KennungKeyer[
