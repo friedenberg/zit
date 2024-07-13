@@ -131,7 +131,9 @@ function! ZitPreview()
           \ ]
 
     call system(join(l:cmd_args_list, " "))
-    call system("qlmanage -p "..l:tempfile..">/dev/null 2>&1 &")
+
+    let l:cmd_preview = "qlmanage -p "..l:tempfile..">/dev/null 2>&1 &"
+    call system(l:cmd_preview)
   endfunc
 
   if len(l:items) == 1

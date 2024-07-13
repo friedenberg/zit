@@ -70,11 +70,11 @@ type UnsureMatchMaps struct {
 }
 
 func (umm UnsureMatchMaps) Len() int {
-  l := 0
+	l := 0
 
-  for _, v := range umm.Lookup {
-    l += len(v.Lookup)
-  }
+	for _, v := range umm.Lookup {
+		l += len(v.Lookup)
+	}
 
 	return l
 }

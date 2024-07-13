@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/go/zit/src/external_store"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
 func (s *Store) Initialize(esi external_store.Info) (err error) {
