@@ -46,7 +46,7 @@ func TestReadWithoutBlob(t1 *testing.T) {
 		Type:         makeBlobExt(t, "md"),
 	}
 
-	expected.SetEtiketten(makeEtiketten(t,
+	expected.SetTags(makeEtiketten(t,
 		"tag1",
 		"tag2",
 		"tag3",
@@ -86,7 +86,7 @@ func TestReadWithoutBlobWithMultilineBezeichnung(t1 *testing.T) {
 		Type:         makeBlobExt(t, "md"),
 	}
 
-	expected.SetEtiketten(makeEtiketten(t,
+	expected.SetTags(makeEtiketten(t,
 		"tag1",
 		"tag2",
 		"tag3",
@@ -136,7 +136,7 @@ the body
 		"036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064",
 	))
 
-	expected.SetEtiketten(makeEtiketten(t,
+	expected.SetTags(makeEtiketten(t,
 		"tag1",
 		"tag2",
 		"tag3",

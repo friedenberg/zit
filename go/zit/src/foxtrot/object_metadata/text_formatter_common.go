@@ -99,7 +99,7 @@ func (f textFormatterCommon) writeCommonMetadataFormat(
 		}
 	}
 
-	for _, e := range iter.SortedValues(m.GetEtiketten()) {
+	for _, e := range iter.SortedValues(m.GetTags()) {
 		if ids.IsEmpty(e) {
 			continue
 		}

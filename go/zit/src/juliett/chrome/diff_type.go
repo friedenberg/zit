@@ -80,5 +80,5 @@ func (c *Store) getDiffKinderOnly(kinder *sku.Transacted) (dt diff, err error) {
 }
 
 func etiketten(sk *sku.Transacted) ids.TagSet {
-	return ids.ExpandMany(sk.Metadatei.GetEtiketten(), expansion.ExpanderRight)
+	return ids.ExpandMany(sk.Metadatei.GetTags(), expansion.ExpanderRight)
 }

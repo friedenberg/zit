@@ -130,7 +130,7 @@ func (k *compiled) AccumulateImplicitEtiketten(
 		return
 	}
 
-	if err = ek.Transacted.Metadatei.GetEtiketten().Each(
+	if err = ek.Transacted.Metadatei.GetTags().Each(
 		func(e1 ids.Tag) (err error) {
 			if k.ImplicitEtiketten.Contains(e1, e) {
 				return

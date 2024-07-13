@@ -29,7 +29,7 @@ func (c CommitOrganizeFile) ApplyToText(
 				return
 			}
 
-			sk.Metadatei.ResetEtiketten()
+			sk.Metadatei.ResetTags()
 
 			return
 		},

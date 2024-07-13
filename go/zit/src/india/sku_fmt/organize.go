@@ -133,7 +133,7 @@ func (f *Organize) WriteStringFormat(
 		}
 	}
 
-	t := o.GetMetadata().GetTypPtr()
+	t := o.GetMetadata().GetTypePtr()
 
 	if len(t.String()) > 0 {
 		if f.padding == "" {
@@ -158,10 +158,10 @@ func (f *Organize) WriteStringFormat(
 		}
 	}
 
-	b := o.GetMetadata().GetBezeichnungPtr()
+	b := &o.Metadatei.Description
 
 	if f.options.PrintEtikettenAlways {
-		b := o.GetMetadata().GetEtiketten()
+		b := o.GetMetadata().GetTags()
 
 		for _, v := range iter.SortedValues(b) {
 			if f.options.ZittishNewlines {

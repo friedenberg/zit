@@ -19,7 +19,7 @@ function add { # @test
 	run_zit add \
 		-dedupe \
 		-delete \
-		-etiketten zz-inbox-2022-11-14 \
+		-tags zz-inbox-2022-11-14 \
 		"$f"
 
 	assert_success
@@ -63,7 +63,7 @@ function add_with_dupe_added { # @test
 	run_zit add \
 		-dedupe \
 		-delete \
-		-etiketten zz-inbox-2022-11-14 \
+		-tags zz-inbox-2022-11-14 \
 		"$f" "$f2"
 
 	assert_success
@@ -103,7 +103,7 @@ function add_not_md { # @test
 
 	run_zit add \
 		-delete \
-		-etiketten zz-inbox-2022-11-14 \
+		-tags zz-inbox-2022-11-14 \
 		-each-akte "echo" \
 		"$f"
 
@@ -143,7 +143,7 @@ function add_1 { # @test
 	run_zit add \
 		-dedupe \
 		-delete \
-		-etiketten zz-inbox-2022-11-14 \
+		-tags zz-inbox-2022-11-14 \
 		"$f"
 
 	assert_success
@@ -179,7 +179,7 @@ function add_2 { # @test
 	run_zit add \
 		-dedupe \
 		-delete \
-		-etiketten zz-inbox-2022-11-14 \
+		-tags zz-inbox-2022-11-14 \
 		"$f" "$f2"
 
 	assert_success
@@ -218,7 +218,7 @@ function add_dot { # @test
 	run_zit add \
 		-dedupe \
 		-delete \
-		-etiketten zz-inbox-2022-11-14 \
+		-tags zz-inbox-2022-11-14 \
 		.
 
 	assert_success
@@ -251,7 +251,7 @@ function add_dot { # @test
 
 #	run_zit add \
 #		-dedupe \
-#		-etiketten zz-inbox-2022-11-14 \
+#		-tags zz-inbox-2022-11-14 \
 #		"$f"
 
 #	assert_success
@@ -296,7 +296,7 @@ function add_dot { # @test
 #		-predictable-hinweisen \
 #		-dedupe \
 #		-delete \
-#		-etiketten new-etikett-2 \
+#		-tags new-etikett-2 \
 #		"$f"
 
 #	run zit show o/u
@@ -331,7 +331,7 @@ function add_several_with_spaces_in_filename { # @test
 	run_zit add \
 		-dedupe \
 		-delete \
-		-etiketten zz-inbox-2022-11-14 \
+		-tags zz-inbox-2022-11-14 \
 		"$f" "$f2"
 
 	assert_success
@@ -373,7 +373,7 @@ function add_each_akte { # @test
 	run_zit add \
 		-each-akte "cat" \
 		-delete \
-		-etiketten zz-inbox-2022-11-14 \
+		-tags zz-inbox-2022-11-14 \
 		"$f"
 
 	assert_success

@@ -244,7 +244,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 			return
 		}
 
-		for _, v := range iter.SortedValues(browser.Metadatei.GetEtiketten()) {
+		for _, v := range iter.SortedValues(browser.Metadatei.GetTags()) {
 			n1, err = sw.WriteString(" ")
 			n += int64(n1)
 

@@ -57,7 +57,7 @@ func (f textParser) ParseMetadata(
 						m.Comments = append(m.Comments, v)
 						return
 					},
-					"-": m.AddEtikettString,
+					"-": m.AddTagString,
 					"!": func(v string) (err error) {
 						return f.readTyp(m, v, &akteFD)
 					},

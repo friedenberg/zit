@@ -48,7 +48,7 @@ func (j *Json) FromStringAndMetadatei(
 	j.Akte = out.String()
 	j.AkteSha = m.Blob.String()
 	j.Bezeichnung = m.Description.String()
-	j.Etiketten = iter.Strings(m.GetEtiketten())
+	j.Etiketten = iter.Strings(m.GetTags())
 	j.Kennung = k
 	j.Sha = m.SelfMetadataWithoutTai.String()
 	j.Tai = m.Tai.String()
@@ -109,8 +109,8 @@ func (j *Json) ToTransacted(sk *sku.Transacted, s fs_home.Standort) (err error) 
 		return
 	}
 
-	sk.Metadatei.SetEtiketten(es)
-	sk.Metadatei.GenerateExpandedEtiketten()
+	sk.Metadatei.SetTags(es)
+	sk.Metadatei.GenerateExpandedTags()
 
 	return
 }

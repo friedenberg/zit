@@ -92,7 +92,7 @@ func (f *cliMetadatei) WriteStringFormat(
 	}
 
 	if f.writeTyp {
-		t := o.GetMetadata().GetTypPtr()
+		t := o.GetMetadata().GetTypePtr()
 
 		if len(t.String()) > 0 {
 			n1, err = sw.WriteString(f.contentPrefix)
@@ -123,7 +123,7 @@ func (f *cliMetadatei) WriteStringFormat(
 
 	didWriteBezeichnung := false
 	if f.writeBezeichnung {
-		b := o.GetMetadata().GetBezeichnungPtr()
+		b := &o.Description
 
 		if !b.IsEmpty() {
 			didWriteBezeichnung = true
@@ -167,7 +167,7 @@ func (f *cliMetadatei) writeStringFormatEtiketten(
 		return
 	}
 
-	b := o.GetMetadata().GetEtiketten()
+	b := o.GetMetadata().GetTags()
 
 	if b.Len() == 0 {
 		return

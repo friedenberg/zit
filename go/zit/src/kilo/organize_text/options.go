@@ -63,7 +63,7 @@ func MakeFlags() Flags {
 }
 
 func MakeFlagsWithMetadatei(m object_metadata.Metadata) Flags {
-	ui.Debug().Print(m.GetEtiketten())
+	ui.Debug().Print(m.GetTags())
 
 	return Flags{
 		once: &sync.Once{},
@@ -72,7 +72,7 @@ func MakeFlagsWithMetadatei(m object_metadata.Metadata) Flags {
 		),
 
 		Options: Options{
-			rootEtiketten:     m.GetEtiketten(),
+			rootEtiketten:     m.GetTags(),
 			wasMade:           true,
 			GroupingEtiketten: ids.MakeTagSlice(),
 			Transacted:        sku.MakeTransactedMutableSet(),

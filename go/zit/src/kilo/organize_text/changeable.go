@@ -118,7 +118,7 @@ func (a *Assignment) addToSet(
 				o.Metadatei.Comments...,
 			)
 
-			if err = o.Metadatei.GetEtiketten().EachPtr(
+			if err = o.Metadatei.GetTags().EachPtr(
 				z.AddEtikettPtr,
 			); err != nil {
 				err = errors.Wrap(err)

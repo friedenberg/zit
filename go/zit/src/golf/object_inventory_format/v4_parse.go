@@ -88,7 +88,7 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-			if err = m.AddEtikettPtr(e); err != nil {
+			if err = m.AddTagPtr(e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

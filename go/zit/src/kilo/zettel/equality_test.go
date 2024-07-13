@@ -82,7 +82,7 @@ func TestEqualitySelf(t1 *testing.T) {
 		Type:         makeBlobExt(t, "text"),
 	}
 
-	text.SetEtiketten(makeEtiketten(t,
+	text.SetTags(makeEtiketten(t,
 		"tag1",
 		"tag2",
 		"tag3",
@@ -101,7 +101,7 @@ func TestEqualityNotSelf(t1 *testing.T) {
 		Type:         makeBlobExt(t, "text"),
 	}
 
-	text.SetEtiketten(makeEtiketten(t,
+	text.SetTags(makeEtiketten(t,
 		"tag1",
 		"tag2",
 		"tag3",
@@ -112,7 +112,7 @@ func TestEqualityNotSelf(t1 *testing.T) {
 		Type:         makeBlobExt(t, "text"),
 	}
 
-	text1.SetEtiketten(makeEtiketten(t,
+	text1.SetTags(makeEtiketten(t,
 		"tag1",
 		"tag2",
 		"tag3",

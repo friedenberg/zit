@@ -13,7 +13,7 @@ type resetter struct{}
 func (resetter) Reset(z *Metadata) {
 	z.Description.Reset()
 	z.Comments = z.Comments[:0]
-	z.ResetEtiketten()
+	z.ResetTags()
 	ResetterVerzeichnisse.Reset(&z.Cache)
 	z.Type = ids.Type{}
 	// z.Gattung = gattung.Unknown
@@ -26,7 +26,7 @@ func (resetter) ResetWith(a *Metadata, b *Metadata) {
 	a.Comments = a.Comments[:0]
 	a.Comments = append(a.Comments, b.Comments...)
 
-	a.SetEtiketten(b.Tags)
+	a.SetTags(b.Tags)
 
 	ResetterVerzeichnisse.ResetWith(&a.Cache, &b.Cache)
 

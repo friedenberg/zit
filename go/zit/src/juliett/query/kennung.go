@@ -64,7 +64,7 @@ func (k Kennung) ContainsSku(sk *sku.Transacted) (ok bool) {
 		return
 
 	case genres.Type:
-		if ids.Contains(me.GetTyp(), k) {
+		if ids.Contains(me.GetType(), k) {
 			ok = true
 			return
 		}

@@ -137,7 +137,7 @@ func (c Add) Run(
 	}
 
 	if err = u.GetKonfig().DefaultEtiketten.EachPtr(
-		opOrganize.Metadata.AddEtikettPtr,
+		opOrganize.Metadata.AddTagPtr,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

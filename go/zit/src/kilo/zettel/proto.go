@@ -23,7 +23,7 @@ func MakeProtoZettel(k *konfig.Compiled) (p ProtoZettel) {
 	errors.TodoP1("modify konfig to keep etiketten set")
 
 	p.Metadatei.Type = k.GetErworben().Defaults.Typ
-	p.Metadatei.SetEtiketten(k.DefaultEtiketten)
+	p.Metadatei.SetTags(k.DefaultEtiketten)
 
 	return
 }
@@ -40,7 +40,7 @@ func (pz ProtoZettel) Equals(z *object_metadata.Metadata) (ok bool) {
 	var okTyp, okMet bool
 
 	if !ids.IsEmpty(pz.Metadatei.Type) &&
-		pz.Metadatei.Type.Equals(z.GetTyp()) {
+		pz.Metadatei.Type.Equals(z.GetType()) {
 		okTyp = true
 	}
 
@@ -74,9 +74,9 @@ func (pz ProtoZettel) Apply(
 
 	switch g {
 	case genres.Zettel, genres.Unknown:
-		if ids.IsEmpty(z.GetTyp()) &&
+		if ids.IsEmpty(z.GetType()) &&
 			!ids.IsEmpty(pz.Metadatei.Type) &&
-			!z.GetTyp().Equals(pz.Metadatei.Type) {
+			!z.GetType().Equals(pz.Metadatei.Type) {
 			ok = true
 			z.Type = pz.Metadatei.Type
 		}
@@ -88,11 +88,11 @@ func (pz ProtoZettel) Apply(
 		z.Description = pz.Metadatei.Description
 	}
 
-	if pz.Metadatei.GetEtiketten().Len() > 0 {
+	if pz.Metadatei.GetTags().Len() > 0 {
 		ok = true
 	}
 
-	errors.PanicIfError(pz.Metadatei.GetEtiketten().EachPtr(z.AddEtikettPtr))
+	errors.PanicIfError(pz.Metadatei.GetTags().EachPtr(z.AddTagPtr))
 
 	return
 }
@@ -103,9 +103,9 @@ func (pz ProtoZettel) ApplyWithBlobFD(
 ) (err error) {
 	z := ml.GetMetadata()
 
-	if ids.IsEmpty(z.GetTyp()) &&
+	if ids.IsEmpty(z.GetType()) &&
 		!ids.IsEmpty(pz.Metadatei.Type) &&
-		!z.GetTyp().Equals(pz.Metadatei.Type) {
+		!z.GetType().Equals(pz.Metadatei.Type) {
 		z.Type = pz.Metadatei.Type
 	} else {
 		// TODO-P4 use konfig
@@ -131,7 +131,7 @@ func (pz ProtoZettel) ApplyWithBlobFD(
 		return
 	}
 
-	errors.PanicIfError(pz.Metadatei.GetEtiketten().EachPtr(z.AddEtikettPtr))
+	errors.PanicIfError(pz.Metadatei.GetTags().EachPtr(z.AddTagPtr))
 
 	return
 }

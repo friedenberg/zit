@@ -532,7 +532,7 @@ func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 		return
 	}
 
-	es := iter.SortedValues(m.Metadatei.GetEtiketten())
+	es := iter.SortedValues(m.Metadatei.GetTags())
 
 	for _, e := range es {
 		if err = s.addEtikettAndExpanded(e); err != nil {

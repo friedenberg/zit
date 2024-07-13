@@ -67,7 +67,7 @@ func (f v5) FormatPersistentMetadatei(
 		}
 	}
 
-	es := m.GetEtiketten()
+	es := m.GetTags()
 
 	for _, e := range iter.SortedValues[ids.Tag](es) {
 		if e.IsVirtual() {
@@ -143,7 +143,7 @@ func (f v5) FormatPersistentMetadatei(
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			w,
 			keyTyp.String(),
-			m.GetTyp().String(),
+			m.GetType().String(),
 		)
 		n += int64(n1)
 
@@ -324,7 +324,7 @@ func (f v5) ParsePersistentMetadatei(
 				return
 			}
 
-			if err = m.AddEtikettPtr(e); err != nil {
+			if err = m.AddTagPtr(e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

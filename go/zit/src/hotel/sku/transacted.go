@@ -120,7 +120,7 @@ func (a *Transacted) GetSkuLikePtr() SkuLike {
 }
 
 func (a *Transacted) GetEtiketten() ids.TagSet {
-	return a.Metadatei.GetEtiketten()
+	return a.Metadatei.GetTags()
 }
 
 func (a *Transacted) AddEtikettPtr(e *ids.Tag) (err error) {
@@ -139,7 +139,7 @@ func (a *Transacted) AddEtikettPtr(e *ids.Tag) (err error) {
 		return
 	}
 
-	if err = a.GetMetadata().AddEtikettPtr(e); err != nil {
+	if err = a.GetMetadata().AddTagPtr(e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -148,7 +148,7 @@ func (a *Transacted) AddEtikettPtr(e *ids.Tag) (err error) {
 }
 
 func (a *Transacted) AddEtikettPtrFast(e *ids.Tag) (err error) {
-	if err = a.GetMetadata().AddEtikettPtrFast(e); err != nil {
+	if err = a.GetMetadata().AddTagPtrFast(e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

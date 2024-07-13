@@ -21,26 +21,26 @@ func StringMetadateiSansTai(o *sku.Transacted) (str string) {
 
 	m := o.GetMetadata()
 
-	t := m.GetTyp()
+	t := m.GetType()
 
 	if !t.IsEmpty() {
 		sb.WriteString(" ")
-		sb.WriteString(ids.FormattedString(m.GetTyp()))
+		sb.WriteString(ids.FormattedString(m.GetType()))
 	}
 
-	es := m.GetEtiketten()
+	es := m.GetTags()
 
 	if es.Len() > 0 {
 		sb.WriteString(" ")
 		sb.WriteString(
 			iter.StringDelimiterSeparated[ids.Tag](
 				" ",
-				m.GetEtiketten(),
+				m.GetTags(),
 			),
 		)
 	}
 
-	b := m.GetBezeichnung()
+	b := m.Description
 
 	if !b.IsEmpty() {
 		sb.WriteString(" ")

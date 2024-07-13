@@ -88,9 +88,9 @@ func (tm *Conflicted) MergeEtiketten() (err error) {
 
 	ets := same.CloneSetPtrLike()
 
-	tm.Left.GetMetadata().SetEtiketten(ets)
-	tm.Middle.GetMetadata().SetEtiketten(ets)
-	tm.Right.GetMetadata().SetEtiketten(ets)
+	tm.Left.GetMetadata().SetTags(ets)
+	tm.Middle.GetMetadata().SetTags(ets)
+	tm.Right.GetMetadata().SetTags(ets)
 
 	return
 }

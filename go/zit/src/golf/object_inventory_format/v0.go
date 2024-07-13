@@ -28,10 +28,10 @@ func (f v0) FormatPersistentMetadatei(
 	}
 
 	w.WriteFormat("%s %s", genres.Blob, &m.Blob)
-	w.WriteFormat("%s %s", genres.Type, m.GetTyp())
+	w.WriteFormat("%s %s", genres.Type, m.GetType())
 	w.WriteFormat("Bezeichnung %s", m.Description)
 
-	for _, e := range iter.SortedValues[ids.Tag](m.GetEtiketten()) {
+	for _, e := range iter.SortedValues[ids.Tag](m.GetTags()) {
 		w.WriteFormat("%s %s", genres.Tag, e)
 	}
 
@@ -83,7 +83,7 @@ func (f v0) ParsePersistentMetadatei(
 		return
 	}
 
-	m.SetEtiketten(etiketten)
+	m.SetTags(etiketten)
 
 	return
 }

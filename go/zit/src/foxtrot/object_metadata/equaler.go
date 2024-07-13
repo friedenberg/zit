@@ -42,8 +42,8 @@ func (e equaler) Equals(a, b *Metadata) bool {
 		return false
 	}
 
-	aes := a.GetEtiketten()
-	bes := b.GetEtiketten()
+	aes := a.GetTags()
+	bes := b.GetTags()
 
 	// for i, ea := range a.Verzeichnisse.Etiketten.All {
 

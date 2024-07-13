@@ -23,7 +23,7 @@ func (k *Compiled) ApplySchlummerndAndRealizeEtiketten(
 	mp := &sk.Metadatei
 
 	mp.Cache.SetExpandedTags(ids.ExpandMany(
-		mp.GetEtiketten(),
+		mp.GetTags(),
 		expansion.ExpanderRight,
 	))
 
@@ -40,7 +40,7 @@ func (k *Compiled) ApplySchlummerndAndRealizeEtiketten(
 	// Specifically, making this less fragile and dependent on remembering to do
 	// ApplyToSku for each Sku. Maybe a factory?
 	mp.Cache.TagPaths.Reset()
-	mp.GetEtiketten().Each(mp.Cache.TagPaths.AddEtikettOld)
+	mp.GetTags().Each(mp.Cache.TagPaths.AddEtikettOld)
 
 	if isEtikett {
 		ks := sk.Kennung.String()
@@ -183,9 +183,9 @@ func (k *Compiled) addImplicitEtiketten(
 		return
 	}
 
-	mp.GetEtiketten().EachPtr(addImpEts)
+	mp.GetTags().EachPtr(addImpEts)
 
-	typKonfig := k.getApproximatedTyp(mp.GetTyp()).ApproximatedOrActual()
+	typKonfig := k.getApproximatedTyp(mp.GetType()).ApproximatedOrActual()
 
 	if typKonfig != nil {
 		typKonfig.GetEtiketten().EachPtr(ie.AddPtr)

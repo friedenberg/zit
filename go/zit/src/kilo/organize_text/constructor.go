@@ -342,7 +342,7 @@ func (c *constructor) removeEtikettenIfNecessary(
 		return
 	}
 
-	o.Metadatei.ResetEtiketten()
+	o.Metadatei.ResetTags()
 
 	return
 }

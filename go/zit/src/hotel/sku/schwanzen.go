@@ -81,13 +81,13 @@ func (zws *Schwanzen) Set(z *Transacted, flush bool) (ok bool) {
 		ok = true
 
 	case t1.Metadatei.EqualsSansTai(&z.Metadatei):
-		zws.etikettIndex.Add(z.Metadatei.GetEtiketten())
+		zws.etikettIndex.Add(z.Metadatei.GetTags())
 		ok = flush && t1.GetTai().Equals(z.GetTai())
 
 	default:
 		zws.etikettIndex.AddEtikettSet(
-			t1.Metadatei.GetEtiketten(),
-			z.Metadatei.GetEtiketten(),
+			t1.Metadatei.GetTags(),
+			z.Metadatei.GetTags(),
 		)
 	}
 

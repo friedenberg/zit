@@ -82,7 +82,7 @@ function can_new_zettel { # @test
 		echo "---"
 	} >"$expected"
 
-	run_zit new -edit=false -bezeichnung wow -etiketten ok
+	run_zit new -edit=false -description wow -tags ok
 	assert_success
 	assert_output - <<-EOM
 		[ok@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -182,7 +182,7 @@ function can_new_zettel_with_metadatei { # @test
 		echo ---
 	} >"$expected"
 
-	run_zit new -edit=false -bezeichnung bez -etiketten et1,et2
+	run_zit new -edit=false -description bez -tags et1,et2
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[et1@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]

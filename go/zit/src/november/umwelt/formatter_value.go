@@ -167,7 +167,7 @@ func (u *Umwelt) MakeFormatFunc(
 			if _, err = fmt.Fprintln(
 				out,
 				iter.StringCommaSeparated(
-					tl.Metadatei.GetEtiketten(),
+					tl.Metadatei.GetTags(),
 				),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -179,7 +179,7 @@ func (u *Umwelt) MakeFormatFunc(
 
 	case "etiketten-newlines":
 		f = func(tl *sku.Transacted) (err error) {
-			if err = tl.Metadatei.GetEtiketten().EachPtr(func(e *ids.Tag) (err error) {
+			if err = tl.Metadatei.GetTags().EachPtr(func(e *ids.Tag) (err error) {
 				_, err = fmt.Fprintln(out, e)
 				return
 			}); err != nil {

@@ -8,7 +8,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/flag_policy"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	flag2 "code.linenisgreat.com/zit/go/zit/src/bravo/flag"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
@@ -53,8 +52,8 @@ func (m *Metadata) Mutter() *sha.Sha {
 func (m *Metadata) AddToFlagSet(f *flag.FlagSet) {
 	f.Var(
 		&m.Description,
-		"bezeichnung",
-		"the Bezeichnung to use for created or updated Zettels",
+		"description",
+		"the description to use for created or updated Zettels",
 	)
 
 	// TODO add support for etiketten_path
@@ -67,7 +66,7 @@ func (m *Metadata) AddToFlagSet(f *flag.FlagSet) {
 			vs := strings.Split(v, ",")
 
 			for _, v := range vs {
-				if err = m.AddEtikettString(v); err != nil {
+				if err = m.AddTagString(v); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -76,19 +75,19 @@ func (m *Metadata) AddToFlagSet(f *flag.FlagSet) {
 			return
 		},
 		func() {
-			m.ResetEtiketten()
+			m.ResetTags()
 		},
 	)
 
 	f.Var(
 		fes,
-		"etiketten",
-		"the Etiketten to use for created or updated Objekte",
+		"tags",
+		"the tags to use for created or updated object",
 	)
 
 	f.Func(
-		"typ",
-		"the Typ for the created or updated Objekte",
+		"type",
+		"the type for the created or updated object",
 		func(v string) (err error) {
 			return m.Type.Set(v)
 		},
@@ -127,23 +126,7 @@ func (z *Metadata) IsEmpty() bool {
 	return true
 }
 
-func (z *Metadata) SetBezeichnung(b descriptions.Description) {
-	z.Description = b
-}
-
-func (z *Metadata) SetTyp(t ids.Type) {
-	z.Type = t
-}
-
-func (z *Metadata) GetBezeichnung() descriptions.Description {
-	return z.Description
-}
-
-func (z *Metadata) GetBezeichnungPtr() *descriptions.Description {
-	return &z.Description
-}
-
-func (m *Metadata) GetEtiketten() ids.TagSet {
+func (m *Metadata) GetTags() ids.TagSet {
 	if m.Tags == nil {
 		m.Tags = ids.MakeTagMutableSet()
 	}
@@ -151,7 +134,7 @@ func (m *Metadata) GetEtiketten() ids.TagSet {
 	return m.Tags
 }
 
-func (m *Metadata) ResetEtiketten() {
+func (m *Metadata) ResetTags() {
 	if m.Tags == nil {
 		m.Tags = ids.MakeTagMutableSet()
 	}
@@ -160,7 +143,7 @@ func (m *Metadata) ResetEtiketten() {
 	m.Cache.TagPaths.Reset()
 }
 
-func (z *Metadata) AddEtikettString(es string) (err error) {
+func (z *Metadata) AddTagString(es string) (err error) {
 	if es == "" {
 		return
 	}
@@ -172,7 +155,7 @@ func (z *Metadata) AddEtikettString(es string) (err error) {
 		return
 	}
 
-	if err = z.AddEtikettPtr(&e); err != nil {
+	if err = z.AddTagPtr(&e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -180,7 +163,7 @@ func (z *Metadata) AddEtikettString(es string) (err error) {
 	return
 }
 
-func (m *Metadata) AddEtikettPtr(e *ids.Tag) (err error) {
+func (m *Metadata) AddTagPtr(e *ids.Tag) (err error) {
 	if e == nil || e.String() == "" {
 		return
 	}
@@ -196,7 +179,7 @@ func (m *Metadata) AddEtikettPtr(e *ids.Tag) (err error) {
 	return
 }
 
-func (m *Metadata) AddEtikettPtrFast(e *ids.Tag) (err error) {
+func (m *Metadata) AddTagPtrFast(e *ids.Tag) (err error) {
 	if m.Tags == nil {
 		m.Tags = ids.MakeTagMutableSet()
 	}
@@ -216,7 +199,7 @@ func (m *Metadata) AddEtikettPtrFast(e *ids.Tag) (err error) {
 	return
 }
 
-func (m *Metadata) SetEtiketten(e ids.TagSet) {
+func (m *Metadata) SetTags(e ids.TagSet) {
 	if m.Tags == nil {
 		m.Tags = ids.MakeTagMutableSet()
 	}
@@ -231,18 +214,14 @@ func (m *Metadata) SetEtiketten(e ids.TagSet) {
 		panic("empty etikett set")
 	}
 
-	errors.PanicIfError(e.EachPtr(m.AddEtikettPtr))
+	errors.PanicIfError(e.EachPtr(m.AddTagPtr))
 }
 
-func (z *Metadata) SetAkteSha(sh interfaces.ShaGetter) {
-	z.Blob.SetShaLike(sh)
-}
-
-func (z *Metadata) GetTyp() ids.Type {
+func (z *Metadata) GetType() ids.Type {
 	return z.Type
 }
 
-func (z *Metadata) GetTypPtr() *ids.Type {
+func (z *Metadata) GetTypePtr() *ids.Type {
 	return &z.Type
 }
 
@@ -267,7 +246,7 @@ func (a *Metadata) Subtract(
 		a.Type = ids.Type{}
 	}
 
-	err := b.GetEtiketten().EachPtr(
+	err := b.GetTags().EachPtr(
 		func(e *ids.Tag) (err error) {
 			return a.Tags.DelPtr(e)
 		},
@@ -299,9 +278,9 @@ func (selbst *Metadata) SetMutter(mg Getter) (err error) {
 	return
 }
 
-func (m *Metadata) GenerateExpandedEtiketten() {
+func (m *Metadata) GenerateExpandedTags() {
 	m.Cache.SetExpandedTags(ids.ExpandMany(
-		m.GetEtiketten(),
+		m.GetTags(),
 		expansion.ExpanderRight,
 	))
 }

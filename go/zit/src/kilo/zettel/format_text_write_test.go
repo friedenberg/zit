@@ -83,7 +83,7 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 		Type:         makeBlobExt(t, "md"),
 	}
 
-	z.SetEtiketten(makeEtiketten(t,
+	z.SetTags(makeEtiketten(t,
 		"tag1",
 		"tag2",
 		"tag3",
@@ -125,7 +125,7 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 		Type:         makeBlobExt(t, "md"),
 	}
 
-	z.SetEtiketten(makeEtiketten(t,
+	z.SetTags(makeEtiketten(t,
 		"tag1",
 		"tag2",
 		"tag3",

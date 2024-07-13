@@ -36,7 +36,7 @@ func (w *Writer) addCommonMatches(
 
 	mb.AddMatches(z.GetMetadata().Description.String())
 	mb.AddMatches(z.GetType().String())
-	z.Metadatei.GetEtiketten().Each(
+	z.Metadatei.GetTags().Each(
 		func(e ids.Tag) (err error) {
 			expansion.ExpanderAll.Expand(
 				func(v string) (err error) {
@@ -72,7 +72,7 @@ func (w *Writer) zettelToItem(
 	a.Title = z.Metadatei.Description.String()
 
 	es := iter.StringCommaSeparated(
-		z.Metadatei.GetEtiketten(),
+		z.Metadatei.GetTags(),
 	)
 
 	k := &z.Kennung

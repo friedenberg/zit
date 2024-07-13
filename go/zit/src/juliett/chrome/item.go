@@ -49,7 +49,7 @@ func (item item) WriteToMetadatei(m *object_metadata.Metadata) (err error) {
 		return
 	}
 
-	if err = m.AddEtikettPtr(&e); err != nil {
+	if err = m.AddTagPtr(&e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

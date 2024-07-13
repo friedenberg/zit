@@ -172,7 +172,7 @@ func WriteMetadateiKeyTo(
 		}
 
 	case keyEtikett:
-		es := m.GetEtiketten()
+		es := m.GetTags()
 
 		if es == nil {
 			break
@@ -268,7 +268,7 @@ func WriteMetadateiKeyTo(
 			n1, err = ohio.WriteKeySpaceValueNewlineString(
 				w,
 				keyTyp.String(),
-				m.GetTyp().String(),
+				m.GetType().String(),
 			)
 			n += int64(n1)
 
