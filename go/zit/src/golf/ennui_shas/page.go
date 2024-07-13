@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
@@ -22,7 +22,7 @@ type page struct {
 
 	f          *os.File
 	br         bufio.Reader
-	equaler    schnittstellen.Equaler1[*row]
+	equaler    interfaces.Equaler1[*row]
 	added      addedMap
 	standort   standort.Standort
 	searchFunc func(*sha.Sha) (mid int64, err error)
@@ -30,7 +30,7 @@ type page struct {
 }
 
 func (p *page) initialize(
-	equaler schnittstellen.Equaler1[*row],
+	equaler interfaces.Equaler1[*row],
 	s standort.Standort,
 	pid sha.PageId,
 	rowSize int,

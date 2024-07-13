@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/collections_delta"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
@@ -21,10 +21,10 @@ type KennungIndex[
 	HasChanges() bool
 	Reset() error
 	GetAll() ([]kennung.Kennung, error)
-	Each(schnittstellen.FuncIter[kennung.IndexedLike]) error
-	EachSchwanzen(schnittstellen.FuncIter[*kennung.IndexedLike]) error
-	StoreDelta(schnittstellen.Delta[T]) (err error)
-	StoreMany(schnittstellen.SetLike[T]) (err error)
+	Each(interfaces.FuncIter[kennung.IndexedLike]) error
+	EachSchwanzen(interfaces.FuncIter[*kennung.IndexedLike]) error
+	StoreDelta(interfaces.Delta[T]) (err error)
+	StoreMany(interfaces.SetLike[T]) (err error)
 	StoreOne(T) (err error)
 	io.WriterTo
 	io.ReaderFrom
@@ -40,7 +40,7 @@ type EtikettIndex interface {
 	EtikettIndexMutation
 
 	EachSchwanzen(
-		schnittstellen.FuncIter[*kennung.IndexedEtikett],
+		interfaces.FuncIter[*kennung.IndexedEtikett],
 	) error
 	GetEtikett(
 		*kennung.Etikett,
@@ -48,7 +48,7 @@ type EtikettIndex interface {
 }
 
 type Index interface {
-	schnittstellen.Flusher
+	interfaces.Flusher
 
 	EtikettIndex
 
@@ -57,7 +57,7 @@ type Index interface {
 
 type index struct {
 	path string
-	schnittstellen.VerzeichnisseFactory
+	interfaces.VerzeichnisseFactory
 	didRead    bool
 	hasChanges bool
 	lock       *sync.RWMutex
@@ -67,9 +67,9 @@ type index struct {
 }
 
 func MakeIndex(
-	k schnittstellen.Konfig,
+	k interfaces.Konfig,
 	s standort.Standort,
-	vf schnittstellen.VerzeichnisseFactory,
+	vf interfaces.VerzeichnisseFactory,
 ) (i *index, err error) {
 	i = &index{
 		path:                 s.FileVerzeichnisseEtiketten(),
@@ -127,13 +127,13 @@ func (i *index) Add(s kennung.EtikettSet) (err error) {
 }
 
 func (i *index) Each(
-	f schnittstellen.FuncIter[kennung.IndexedLike],
+	f interfaces.FuncIter[kennung.IndexedLike],
 ) (err error) {
 	return i.etikettenIndex.Each(f)
 }
 
 func (i *index) EachSchwanzen(
-	f schnittstellen.FuncIter[*kennung.IndexedLike],
+	f interfaces.FuncIter[*kennung.IndexedLike],
 ) (err error) {
 	return i.etikettenIndex.EachSchwanzen(f)
 }

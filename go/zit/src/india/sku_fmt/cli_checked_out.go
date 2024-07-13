@@ -2,11 +2,11 @@ package sku_fmt
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type StringFormatWriterCheckedOutLike = schnittstellen.StringFormatWriter[sku.CheckedOutLike]
+type StringFormatWriterCheckedOutLike = interfaces.StringFormatWriter[sku.CheckedOutLike]
 
 type cliCheckedOutLike struct {
 	externalWriters map[string]StringFormatWriterCheckedOutLike
@@ -21,7 +21,7 @@ func MakeCliCheckedOutLikeFormat(
 }
 
 func (f *cliCheckedOutLike) WriteStringFormat(
-	sw schnittstellen.WriterAndStringWriter,
+	sw interfaces.WriterAndStringWriter,
 	co sku.CheckedOutLike,
 ) (n int64, err error) {
 	kid := co.GetKasten().GetKastenString()

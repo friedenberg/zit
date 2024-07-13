@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 func MakeHashWriter() (h hash.Hash) {
@@ -17,7 +17,7 @@ func MakeHashWriter() (h hash.Hash) {
 	return
 }
 
-func Make(s schnittstellen.ShaLike) *Sha {
+func Make(s interfaces.ShaLike) *Sha {
 	switch st := s.(type) {
 	case *Sha:
 		return st
@@ -88,7 +88,7 @@ func FromString(s string) *Sha {
 	return FromHash(hash)
 }
 
-func FromStringer(v schnittstellen.Stringer) *Sha {
+func FromStringer(v interfaces.Stringer) *Sha {
 	return FromString(v.String())
 }
 

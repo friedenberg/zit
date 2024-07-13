@@ -3,12 +3,12 @@ package iter
 import (
 	"strings"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
-func AddStringToBuilder[T schnittstellen.Value[T]](
+func AddStringToBuilder[T interfaces.Value[T]](
 	sb *strings.Builder,
-) schnittstellen.FuncIter[T] {
+) interfaces.FuncIter[T] {
 	return func(e T) (err error) {
 		sb.WriteString(e.String())
 		sb.WriteString(" ")
@@ -17,7 +17,7 @@ func AddStringToBuilder[T schnittstellen.Value[T]](
 	}
 }
 
-func MakeFuncIterNoOp[T any]() schnittstellen.FuncIter[T] {
+func MakeFuncIterNoOp[T any]() interfaces.FuncIter[T] {
 	return func(e T) (err error) {
 		return
 	}

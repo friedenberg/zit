@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 type writer struct {
@@ -73,7 +73,7 @@ func (w *writer) setShaLikeIfNecessary() {
 	}
 }
 
-func (w *writer) GetShaLike() (s schnittstellen.ShaLike) {
+func (w *writer) GetShaLike() (s interfaces.ShaLike) {
 	w.setShaLikeIfNecessary()
 	s = &w.sh
 

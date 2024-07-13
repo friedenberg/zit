@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
-var poolBuf schnittstellen.Pool[bytes.Buffer, *bytes.Buffer]
+var poolBuf interfaces.Pool[bytes.Buffer, *bytes.Buffer]
 
 func init() {
 	poolBuf = pool.MakePool(
@@ -70,7 +70,7 @@ func (m *MoverLight) ReadFrom(r io.Reader) (n int64, err error) {
 	return m.swc.ReadFrom(r)
 }
 
-func (m *MoverLight) GetShaLike() schnittstellen.ShaLike {
+func (m *MoverLight) GetShaLike() interfaces.ShaLike {
 	return m.swc.GetShaLike()
 }
 

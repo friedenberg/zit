@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
@@ -17,7 +17,7 @@ import (
 type Metadatei struct {
 	// metadatei.Metadatei
 	kennung.EtikettSet
-	Matchers schnittstellen.SetLike[sku.Query]
+	Matchers interfaces.SetLike[sku.Query]
 	Comments []string
 	Typ      kennung.Typ
 }
@@ -64,7 +64,7 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 		r,
 		ohio.MakeLineReaderRepeat(
 			ohio.MakeLineReaderKeyValues(
-				map[string]schnittstellen.FuncSetString{
+				map[string]interfaces.FuncSetString{
 					"%": func(v string) (err error) {
 						m.Comments = append(m.Comments, v)
 						return

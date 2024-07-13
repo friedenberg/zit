@@ -5,13 +5,13 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 func WriteSeq[T any](
 	w1 io.Writer,
 	e T,
-	seq ...schnittstellen.FuncWriterElementInterface[T],
+	seq ...interfaces.FuncWriterElementInterface[T],
 ) (n int64, err error) {
 	w := bufio.NewWriter(w1)
 	defer errors.DeferredFlusher(&err, w)

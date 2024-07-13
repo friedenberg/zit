@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 type Clock interface {
@@ -15,13 +15,13 @@ type Clock interface {
 type Date[T any] struct {
 	Clock
 	Format string
-	schnittstellen.StringFormatWriter[T]
+	interfaces.StringFormatWriter[T]
 }
 
 func MakeDefaultDatePrefixFormatWriter[T any](
 	clock Clock,
-	f schnittstellen.StringFormatWriter[T],
-) schnittstellen.StringFormatWriter[T] {
+	f interfaces.StringFormatWriter[T],
+) interfaces.StringFormatWriter[T] {
 	return &Date[T]{
 		Clock:              clock,
 		Format:             StringFormatDateTime,
@@ -30,7 +30,7 @@ func MakeDefaultDatePrefixFormatWriter[T any](
 }
 
 func (f *Date[T]) WriteStringFormat(
-	w schnittstellen.WriterAndStringWriter,
+	w interfaces.WriterAndStringWriter,
 	e T,
 ) (n int64, err error) {
 	d := f.GetTime().Format(f.Format)

@@ -4,26 +4,26 @@ import (
 	"container/heap"
 	"sort"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 )
 
 type Element interface{}
 
 type ElementPtr[T Element] interface {
-	schnittstellen.Ptr[T]
+	interfaces.Ptr[T]
 }
 
 type heapPrivate[T Element, TPtr ElementPtr[T]] struct {
-	Lessor     schnittstellen.Lessor3[TPtr]
-	Resetter   schnittstellen.Resetter2[T, TPtr]
+	Lessor     interfaces.Lessor3[TPtr]
+	Resetter   interfaces.Resetter2[T, TPtr]
 	Elements   []TPtr
 	lastPopped TPtr
-	p          schnittstellen.Pool[T, TPtr]
-	equaler    schnittstellen.Equaler1[TPtr]
+	p          interfaces.Pool[T, TPtr]
+	equaler    interfaces.Equaler1[TPtr]
 }
 
-func (h *heapPrivate[T, TPtr]) GetPool() schnittstellen.Pool[T, TPtr] {
+func (h *heapPrivate[T, TPtr]) GetPool() interfaces.Pool[T, TPtr] {
 	if h.p == nil {
 		h.p = pool.MakeFakePool[T, TPtr]()
 	}

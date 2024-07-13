@@ -1,7 +1,7 @@
 package bestandsaufnahme
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -16,7 +16,7 @@ func MakeAkte() *Akte {
 	}
 }
 
-func (a *Akte) GetGattung() (g schnittstellen.GattungLike) {
+func (a *Akte) GetGattung() (g interfaces.GattungLike) {
 	g = gattung.Bestandsaufnahme
 
 	return

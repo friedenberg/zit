@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 )
@@ -93,7 +93,7 @@ func (e etikett) IsEmpty() bool {
 	return e.value == ""
 }
 
-func (e etikett) GetGattung() schnittstellen.GattungLike {
+func (e etikett) GetGattung() interfaces.GattungLike {
 	return gattung.Etikett
 }
 

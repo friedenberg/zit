@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 )
@@ -13,7 +13,7 @@ type AbbrStorePresenceGeneric[V any] interface {
 	Exists([3]string) error
 }
 
-type AbbrStoreGeneric[V any, VPtr schnittstellen.Ptr[V]] interface {
+type AbbrStoreGeneric[V any, VPtr interfaces.Ptr[V]] interface {
 	AbbrStorePresenceGeneric[V]
 	ExpandStringString(string) (string, error)
 	ExpandString(string) (VPtr, error)
@@ -21,18 +21,18 @@ type AbbrStoreGeneric[V any, VPtr schnittstellen.Ptr[V]] interface {
 	Abbreviate(VPtr) (string, error)
 }
 
-type AbbrStoreMutableGeneric[V any, VPtr schnittstellen.Ptr[V]] interface {
+type AbbrStoreMutableGeneric[V any, VPtr interfaces.Ptr[V]] interface {
 	Add(VPtr) error
 }
 
-type AbbrStoreCompleteGeneric[V any, VPtr schnittstellen.Ptr[V]] interface {
+type AbbrStoreCompleteGeneric[V any, VPtr interfaces.Ptr[V]] interface {
 	AbbrStoreGeneric[V, VPtr]
 	AbbrStoreMutableGeneric[V, VPtr]
 }
 
 type indexNoAbbr[
-	V schnittstellen.Stringer,
-	VPtr schnittstellen.SetterPtr[V],
+	V interfaces.Stringer,
+	VPtr interfaces.SetterPtr[V],
 ] struct {
 	AbbrStoreGeneric[V, VPtr]
 }
@@ -44,8 +44,8 @@ func (ih indexNoAbbr[V, VPtr]) Abbreviate(h V) (v string, err error) {
 
 type indexHinweis struct {
 	readFunc  func() error
-	Kopfen    schnittstellen.MutableTridex
-	Schwanzen schnittstellen.MutableTridex
+	Kopfen    interfaces.MutableTridex
+	Schwanzen interfaces.MutableTridex
 }
 
 func (ih *indexHinweis) Add(h *kennung.Hinweis) (err error) {
@@ -155,10 +155,10 @@ func (ih *indexHinweis) Abbreviate(h *kennung.Hinweis) (v string, err error) {
 
 type indexNotHinweis[
 	K any,
-	KPtr schnittstellen.StringerSetterPtr[K],
+	KPtr interfaces.StringerSetterPtr[K],
 ] struct {
 	readFunc  func() error
-	Kennungen schnittstellen.MutableTridex
+	Kennungen interfaces.MutableTridex
 }
 
 func (ih *indexNotHinweis[K, KPtr]) Add(k KPtr) (err error) {

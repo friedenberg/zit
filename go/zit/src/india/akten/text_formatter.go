@@ -3,7 +3,7 @@ package akten
 import (
 	"io"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
@@ -14,7 +14,7 @@ import (
 
 func MakeTextFormatter(
 	options checkout_options.TextFormatterOptions,
-	af schnittstellen.AkteReaderFactory,
+	af interfaces.BlobReaderFactory,
 	k Konfig,
 ) textFormatter {
 	return MakeTextFormatterWithAkteFormatter(options, af, k, nil)
@@ -22,7 +22,7 @@ func MakeTextFormatter(
 
 func MakeTextFormatterWithAkteFormatter(
 	options checkout_options.TextFormatterOptions,
-	af schnittstellen.AkteReaderFactory,
+	af interfaces.BlobReaderFactory,
 	k Konfig,
 	akteFormatter script_config.RemoteScript,
 ) textFormatter {

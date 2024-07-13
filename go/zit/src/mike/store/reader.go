@@ -2,7 +2,7 @@ package store
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
@@ -12,7 +12,7 @@ import (
 // TODO add support for cwd and sigil
 // TODO simplify
 func (s *Store) ReadOneInto(
-	k1 schnittstellen.StringerGattungGetter,
+	k1 interfaces.StringerGattungGetter,
 	out *sku.Transacted,
 ) (err error) {
 	var sk *sku.Transacted

@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"strings"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 )
 
-var poolMatchBuilder schnittstellen.Pool[MatchBuilder, *MatchBuilder]
+var poolMatchBuilder interfaces.Pool[MatchBuilder, *MatchBuilder]
 
 func init() {
 	poolMatchBuilder = pool.MakePool[MatchBuilder, *MatchBuilder](
@@ -19,7 +19,7 @@ func init() {
 	)
 }
 
-func GetPoolMatchBuilder() schnittstellen.Pool[MatchBuilder, *MatchBuilder] {
+func GetPoolMatchBuilder() interfaces.Pool[MatchBuilder, *MatchBuilder] {
 	return poolMatchBuilder
 }
 

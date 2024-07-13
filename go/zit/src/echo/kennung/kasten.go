@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 )
@@ -44,11 +44,11 @@ type Kasten struct {
 	value string
 }
 
-func (k Kasten) GetKasten() schnittstellen.KastenLike {
+func (k Kasten) GetKasten() interfaces.KastenLike {
 	return k
 }
 
-func (k Kasten) EqualsKasten(kg schnittstellen.KastenGetter) bool {
+func (k Kasten) EqualsKasten(kg interfaces.KastenGetter) bool {
 	return kg.GetKasten().GetKastenString() == k.GetKastenString()
 }
 
@@ -72,7 +72,7 @@ func (a Kasten) Equals(b Kasten) bool {
 	return a.value == b.value
 }
 
-func (o Kasten) GetGattung() schnittstellen.GattungLike {
+func (o Kasten) GetGattung() interfaces.GattungLike {
 	return gattung.Kasten
 }
 

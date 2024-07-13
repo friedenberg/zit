@@ -8,7 +8,7 @@ import (
 
 	"code.linenisgreat.com/chrest/go/chrest"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
@@ -29,8 +29,8 @@ import (
 
 func (u *Umwelt) MakeFormatFunc(
 	v string,
-	out schnittstellen.WriterAndStringWriter,
-) (f schnittstellen.FuncIter[*sku.Transacted], err error) {
+	out interfaces.WriterAndStringWriter,
+) (f interfaces.FuncIter[*sku.Transacted], err error) {
 	if out == nil {
 		out = u.Out()
 	}
@@ -456,7 +456,7 @@ func (u *Umwelt) MakeFormatFunc(
 		f = func(o *sku.Transacted) (err error) {
 			var r sha.ReadCloser
 
-			if r, err = u.GetStore().GetStandort().AkteReader(
+			if r, err = u.GetStore().GetStandort().BlobReader(
 				o.GetAkteSha(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -477,7 +477,7 @@ func (u *Umwelt) MakeFormatFunc(
 		f = func(o *sku.Transacted) (err error) {
 			var r sha.ReadCloser
 
-			if r, err = u.GetStore().GetStandort().AkteReader(
+			if r, err = u.GetStore().GetStandort().BlobReader(
 				o.GetAkteSha(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -500,7 +500,7 @@ func (u *Umwelt) MakeFormatFunc(
 		f = func(o *sku.Transacted) (err error) {
 			var r sha.ReadCloser
 
-			if r, err = u.GetStore().GetStandort().AkteReader(
+			if r, err = u.GetStore().GetStandort().BlobReader(
 				o.GetAkteSha(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -662,7 +662,7 @@ func (u *Umwelt) MakeFormatFunc(
 
 			var r sha.ReadCloser
 
-			if r, err = u.GetStore().GetStandort().AkteReader(
+			if r, err = u.GetStore().GetStandort().BlobReader(
 				o.GetAkteSha(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -697,7 +697,7 @@ func (u *Umwelt) MakeFormatFunc(
 
 			var r sha.ReadCloser
 
-			if r, err = u.GetStore().GetStandort().AkteReader(
+			if r, err = u.GetStore().GetStandort().BlobReader(
 				o.GetAkteSha(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -742,7 +742,7 @@ func (u *Umwelt) MakeFormatFunc(
 func (u *Umwelt) makeTypFormatter(
 	v string,
 	out io.Writer,
-) (f schnittstellen.FuncIter[*sku.Transacted], err error) {
+) (f interfaces.FuncIter[*sku.Transacted], err error) {
 	agp := u.GetStore().GetAkten().GetTypV0()
 
 	if out == nil {
@@ -761,12 +761,12 @@ func (u *Umwelt) makeTypFormatter(
 
 			var ta *typ_akte.V0
 
-			if ta, err = agp.GetAkte(tt.GetAkteSha()); err != nil {
+			if ta, err = agp.GetBlob(tt.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			defer agp.PutAkte(ta)
+			defer agp.PutBlob(ta)
 
 			lw := format.MakeLineWriter()
 
@@ -806,12 +806,12 @@ func (u *Umwelt) makeTypFormatter(
 		f = func(o *sku.Transacted) (err error) {
 			var akte *typ_akte.V0
 
-			if akte, err = agp.GetAkte(o.GetAkteSha()); err != nil {
+			if akte, err = agp.GetBlob(o.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			defer agp.PutAkte(akte)
+			defer agp.PutBlob(akte)
 
 			if _, err = fan.Format(out, akte); err != nil {
 				err = errors.Wrap(err)
@@ -825,12 +825,12 @@ func (u *Umwelt) makeTypFormatter(
 		f = func(o *sku.Transacted) (err error) {
 			var akte *typ_akte.V0
 
-			if akte, err = agp.GetAkte(o.GetAkteSha()); err != nil {
+			if akte, err = agp.GetBlob(o.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			defer agp.PutAkte(akte)
+			defer agp.PutBlob(akte)
 
 			script, ok := akte.Hooks.(string)
 
@@ -889,14 +889,14 @@ func (u *Umwelt) makeTypFormatter(
 
 			var ta *typ_akte.V0
 
-			if ta, err = u.GetStore().GetAkten().GetTypV0().GetAkte(
+			if ta, err = u.GetStore().GetAkten().GetTypV0().GetBlob(
 				t.GetAkteSha(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			defer u.GetStore().GetAkten().GetTypV0().PutAkte(ta)
+			defer u.GetStore().GetAkten().GetTypV0().PutBlob(ta)
 
 			if _, err = fmt.Fprintln(
 				out,

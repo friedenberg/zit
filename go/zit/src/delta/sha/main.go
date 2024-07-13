@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 )
@@ -33,7 +33,7 @@ type PathComponents interface {
 	PathComponents() []string
 }
 
-type ShaLike = schnittstellen.ShaGetter
+type ShaLike = interfaces.ShaGetter
 
 type Sha struct {
 	data *Bytes
@@ -82,7 +82,7 @@ func (src *Sha) WriteTo(w io.Writer) (n int64, err error) {
 	return
 }
 
-func (s *Sha) GetShaLike() schnittstellen.ShaLike {
+func (s *Sha) GetShaLike() interfaces.ShaLike {
 	return s
 }
 
@@ -110,7 +110,7 @@ func (a *Sha) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a *Sha) EqualsSha(b schnittstellen.ShaLike) bool {
+func (a *Sha) EqualsSha(b interfaces.ShaLike) bool {
 	return a.GetShaString() == b.GetShaString()
 }
 
@@ -259,7 +259,7 @@ func (a *Sha) ResetWith(b *Sha) {
 	}
 }
 
-func (a *Sha) ResetWithShaLike(b schnittstellen.ShaLike) {
+func (a *Sha) ResetWithShaLike(b interfaces.ShaLike) {
 	copy(a.data[:], b.GetShaBytes())
 }
 

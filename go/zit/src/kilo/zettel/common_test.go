@@ -40,7 +40,7 @@ func makeAkteExt(t test_logz.T, v string) (es kennung.Typ) {
 func readFormat(
 	t1 test_logz.T,
 	f metadatei.TextFormat,
-	af *test_metadatei_io.AkteIOFactory,
+	af *test_metadatei_io.BlobIOFactory,
 	contents string,
 ) (z *metadatei.Metadatei, a string) {
 	var zt sku.Transacted

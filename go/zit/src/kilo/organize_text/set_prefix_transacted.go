@@ -2,7 +2,7 @@ package organize_text
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
@@ -164,7 +164,7 @@ func (a PrefixSet) Each(
 }
 
 func (a PrefixSet) EachZettel(
-	f schnittstellen.FuncIter[*obj],
+	f interfaces.FuncIter[*obj],
 ) error {
 	return a.Each(
 		func(_ kennung.Etikett, st objSet) (err error) {

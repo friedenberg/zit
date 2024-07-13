@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
@@ -54,7 +54,7 @@ func MakeSigil(vs ...Sigil) (s Sigil) {
 	return
 }
 
-func (a Sigil) GetGattung() schnittstellen.GattungLike {
+func (a Sigil) GetGattung() interfaces.GattungLike {
 	return gattung.Unknown
 }
 
@@ -94,7 +94,7 @@ func (a Sigil) ContainsOneOf(b Sigil) bool {
 	return a&b != 0
 }
 
-func (a Sigil) GetSigil() schnittstellen.Sigil {
+func (a Sigil) GetSigil() interfaces.Sigil {
 	return a
 }
 

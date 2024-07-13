@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 type PageId struct {
@@ -49,7 +49,7 @@ func PageIndexForString(width uint8, s string) (n uint8, err error) {
 	return PageIndexForSha(width, sh)
 }
 
-func PageIndexForSha(width uint8, s schnittstellen.ShaLike) (n uint8, err error) {
+func PageIndexForSha(width uint8, s interfaces.ShaLike) (n uint8, err error) {
 	var n1 int64
 	ss := s.String()[:width]
 

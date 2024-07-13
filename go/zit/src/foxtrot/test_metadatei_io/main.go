@@ -10,20 +10,20 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 )
 
-type AkteIOFactory struct {
+type BlobIOFactory struct {
 	contents      map[string]string
 	currentBuffer *bytes.Buffer
 }
 
 func FixtureFactoryReadWriteCloser(
 	contents map[string]string,
-) *AkteIOFactory {
-	return &AkteIOFactory{
+) *BlobIOFactory {
+	return &BlobIOFactory{
 		contents: contents,
 	}
 }
 
-func (aw AkteIOFactory) AkteReader(
+func (aw BlobIOFactory) BlobReader(
 	sh sha.ShaLike,
 ) (rc sha.ReadCloser, err error) {
 	if s, ok := aw.contents[sh.GetShaLike().String()]; ok {
@@ -36,7 +36,7 @@ func (aw AkteIOFactory) AkteReader(
 	return
 }
 
-func (aw *AkteIOFactory) AkteWriter() (sha.WriteCloser, error) {
+func (aw *BlobIOFactory) BlobWriter() (sha.WriteCloser, error) {
 	aw.currentBuffer = bytes.NewBuffer(nil)
 	wo := standort.WriteOptions{
 		Writer: aw.currentBuffer,
@@ -45,7 +45,7 @@ func (aw *AkteIOFactory) AkteWriter() (sha.WriteCloser, error) {
 	return standort.NewWriter(wo)
 }
 
-func (aw AkteIOFactory) CurrentBufferString() string {
+func (aw BlobIOFactory) CurrentBufferString() string {
 	if aw.currentBuffer == nil {
 		return ""
 	}

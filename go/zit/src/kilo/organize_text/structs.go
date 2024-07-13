@@ -4,7 +4,7 @@ import (
 	"sort"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/etiketten_path"
@@ -12,10 +12,10 @@ import (
 )
 
 type (
-	objSet = schnittstellen.MutableSetLike[*obj]
+	objSet = interfaces.MutableSetLike[*obj]
 )
 
-var objKeyer schnittstellen.StringKeyer[*obj]
+var objKeyer interfaces.StringKeyer[*obj]
 
 func makeObjSet() objSet {
 	return collections_value.MakeMutableValueSet(objKeyer)
@@ -38,7 +38,7 @@ func (a *obj) String() string {
 }
 
 func sortObjSet(
-	s schnittstellen.MutableSetLike[*obj],
+	s interfaces.MutableSetLike[*obj],
 ) (out []*obj) {
 	out = iter.Elements(s)
 
@@ -67,7 +67,7 @@ func (os Objekten) Len() int {
 	return len(os)
 }
 
-func (os *Objekten) Each(f schnittstellen.FuncIter[*obj]) (err error) {
+func (os *Objekten) Each(f interfaces.FuncIter[*obj]) (err error) {
 	for _, v := range *os {
 		if err = f(v); err != nil {
 			if iter.IsStopIteration(err) {

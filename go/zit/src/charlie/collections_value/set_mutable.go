@@ -2,14 +2,14 @@ package collections_value
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 )
 
 type MutableSet[
 	T any,
 ] struct {
-	K schnittstellen.StringKeyer[T]
+	K interfaces.StringKeyer[T]
 	E map[string]T
 }
 
@@ -69,7 +69,7 @@ func (s MutableSet[T]) Add(v T) (err error) {
 }
 
 func (s MutableSet[T]) EachKey(
-	wf schnittstellen.FuncIterKey,
+	wf interfaces.FuncIterKey,
 ) (err error) {
 	for v := range s.E {
 		if err = wf(v); err != nil {
@@ -87,7 +87,7 @@ func (s MutableSet[T]) EachKey(
 }
 
 func (s MutableSet[T]) Each(
-	wf schnittstellen.FuncIter[T],
+	wf interfaces.FuncIter[T],
 ) (err error) {
 	for _, v := range s.E {
 		if err = wf(v); err != nil {
@@ -110,7 +110,7 @@ func (a MutableSet[T]) Reset() {
 	}
 }
 
-func (a MutableSet[T]) CloneSetLike() schnittstellen.SetLike[T] {
+func (a MutableSet[T]) CloneSetLike() interfaces.SetLike[T] {
 	b := MakeSet[T](a.K)
 
 	for k, v := range a.E {
@@ -120,7 +120,7 @@ func (a MutableSet[T]) CloneSetLike() schnittstellen.SetLike[T] {
 	return b
 }
 
-func (a MutableSet[T]) CloneMutableSetLike() schnittstellen.MutableSetLike[T] {
+func (a MutableSet[T]) CloneMutableSetLike() interfaces.MutableSetLike[T] {
 	c := MakeMutableSet[T](a.K)
 	a.Each(c.Add)
 	return c

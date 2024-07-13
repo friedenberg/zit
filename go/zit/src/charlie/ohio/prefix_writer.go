@@ -6,13 +6,13 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 )
 
 var (
-	poolPrefixOnDelimReader schnittstellen.Pool[bufio.Reader, *bufio.Reader]
-	poolPrefixOnDelimWriter schnittstellen.Pool[bufio.Writer, *bufio.Writer]
+	poolPrefixOnDelimReader interfaces.Pool[bufio.Reader, *bufio.Reader]
+	poolPrefixOnDelimWriter interfaces.Pool[bufio.Writer, *bufio.Writer]
 )
 
 func init() {

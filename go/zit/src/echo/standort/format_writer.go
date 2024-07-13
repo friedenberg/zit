@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 func (s Standort) Rel(
@@ -22,14 +22,14 @@ func (s Standort) Rel(
 	return
 }
 
-func (s Standort) MakeRelativePathStringFormatWriter() schnittstellen.StringFormatWriter[string] {
+func (s Standort) MakeRelativePathStringFormatWriter() interfaces.StringFormatWriter[string] {
 	return relativePathStringFormatWriter(s)
 }
 
 type relativePathStringFormatWriter Standort
 
 func (f relativePathStringFormatWriter) WriteStringFormat(
-	w schnittstellen.WriterAndStringWriter,
+	w interfaces.WriterAndStringWriter,
 	p string,
 ) (n int64, err error) {
 	var n1 int
@@ -60,7 +60,7 @@ func (f relativePathStringFormatWriter) WriteStringFormat(
 
 func (s Standort) MakeWriterRelativePath(
 	p string,
-) schnittstellen.FuncWriter {
+) interfaces.FuncWriter {
 	return func(w io.Writer) (n int64, err error) {
 		var n1 int
 
@@ -91,8 +91,8 @@ func (s Standort) MakeWriterRelativePath(
 
 func (s Standort) MakeWriterRelativePathOr(
 	p string,
-	or schnittstellen.FuncWriter,
-) schnittstellen.FuncWriter {
+	or interfaces.FuncWriter,
+) interfaces.FuncWriter {
 	if p == "" {
 		return or
 	}

@@ -2,7 +2,7 @@ package string_format_writer
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 )
 
@@ -17,7 +17,7 @@ func StringPrefixFromOptions(
 }
 
 func WriteStringPrefixFormat(
-	w schnittstellen.WriterAndStringWriter,
+	w interfaces.WriterAndStringWriter,
 	prefix, body string,
 ) (n int64, err error) {
 	var n1 int

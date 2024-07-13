@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 )
 
@@ -21,8 +21,8 @@ type Bitset interface {
 	Get(int) bool
 	CountOn() int
 	CountOff() int
-	EachOn(schnittstellen.FuncIter[int]) error
-	EachOff(schnittstellen.FuncIter[int]) error
+	EachOn(interfaces.FuncIter[int]) error
+	EachOff(interfaces.FuncIter[int]) error
 
 	Add(int)
 	Del(int)
@@ -125,7 +125,7 @@ func (b bitset) Get(idx int) bool {
 	return b.get(idx)
 }
 
-func (b bitset) EachOff(f schnittstellen.FuncIter[int]) (err error) {
+func (b bitset) EachOff(f interfaces.FuncIter[int]) (err error) {
 	errors.TodoP4("measure and improve performance if necessary")
 
 	b.lock.Lock()
@@ -150,7 +150,7 @@ func (b bitset) EachOff(f schnittstellen.FuncIter[int]) (err error) {
 	return
 }
 
-func (b bitset) EachOn(f schnittstellen.FuncIter[int]) (err error) {
+func (b bitset) EachOn(f interfaces.FuncIter[int]) (err error) {
 	errors.TodoP4("measure and improve performance if necessary")
 
 	b.lock.Lock()

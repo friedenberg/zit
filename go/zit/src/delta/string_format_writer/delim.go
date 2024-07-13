@@ -5,14 +5,14 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 )
 
 func MakeDelim[T any](
 	delim string,
-	w1 schnittstellen.WriterAndStringWriter,
-	f schnittstellen.StringFormatWriter[T],
+	w1 interfaces.WriterAndStringWriter,
+	f interfaces.StringFormatWriter[T],
 ) func(T) error {
 	w := bufio.NewWriter(w1)
 

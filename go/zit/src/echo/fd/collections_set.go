@@ -2,7 +2,7 @@ package fd
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 )
 
@@ -11,8 +11,8 @@ func init() {
 }
 
 type (
-	Set        = schnittstellen.SetLike[*FD]
-	MutableSet = schnittstellen.MutableSetLike[*FD]
+	Set        = interfaces.SetLike[*FD]
+	MutableSet = interfaces.MutableSetLike[*FD]
 )
 
 func MakeSet(ts ...*FD) Set {
@@ -36,7 +36,7 @@ func MakeMutableSetSha() MutableSet {
 }
 
 func SetAddPairs[T FDPairGetter](
-	in schnittstellen.SetLike[T],
+	in interfaces.SetLike[T],
 	out MutableSet,
 ) (err error) {
 	return in.Each(

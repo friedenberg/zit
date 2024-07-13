@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
@@ -68,7 +68,7 @@ func (r *reader) Close() (err error) {
 	return
 }
 
-func (r *reader) GetShaLike() (s schnittstellen.ShaLike) {
+func (r *reader) GetShaLike() (s interfaces.ShaLike) {
 	s = sha.FromHash(r.hash)
 
 	return

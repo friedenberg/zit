@@ -4,23 +4,23 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
 type readerAkteParseSaver[
-	O schnittstellen.Akte[O],
-	OPtr schnittstellen.AktePtr[O],
+	O interfaces.Blob[O],
+	OPtr interfaces.BlobPtr[O],
 ] struct {
-	awf    schnittstellen.AkteWriterFactory
+	awf    interfaces.BlobWriterFactory
 	parser Parser[O, OPtr]
 }
 
 func MakeReaderAkteParseSaver[
-	O schnittstellen.Akte[O],
-	OPtr schnittstellen.AktePtr[O],
+	O interfaces.Blob[O],
+	OPtr interfaces.BlobPtr[O],
 ](
-	awf schnittstellen.AkteWriterFactory,
+	awf interfaces.BlobWriterFactory,
 	parser Parser[O, OPtr],
 ) readerAkteParseSaver[O, OPtr] {
 	return readerAkteParseSaver[O, OPtr]{
@@ -32,13 +32,13 @@ func MakeReaderAkteParseSaver[
 func (f readerAkteParseSaver[O, OPtr]) ParseSaveAkte(
 	r io.Reader,
 	t OPtr,
-) (sh schnittstellen.ShaLike, n int64, err error) {
+) (sh interfaces.ShaLike, n int64, err error) {
 	var (
 		aw  sha.WriteCloser
-		sh1 schnittstellen.ShaLike
+		sh1 interfaces.ShaLike
 	)
 
-	if aw, err = f.awf.AkteWriter(); err != nil {
+	if aw, err = f.awf.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

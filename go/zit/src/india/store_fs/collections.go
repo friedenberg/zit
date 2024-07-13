@@ -1,13 +1,13 @@
 package store_fs
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 )
 
 type (
-	CheckedOutSet        = schnittstellen.SetLike[*CheckedOut]
-	CheckedOutMutableSet = schnittstellen.MutableSetLike[*CheckedOut]
+	CheckedOutSet        = interfaces.SetLike[*CheckedOut]
+	CheckedOutMutableSet = interfaces.MutableSetLike[*CheckedOut]
 )
 
 func MakeCheckedOutMutableSet() CheckedOutMutableSet {

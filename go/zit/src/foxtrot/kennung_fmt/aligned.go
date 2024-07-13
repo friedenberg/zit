@@ -2,7 +2,7 @@ package kennung_fmt
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
@@ -31,7 +31,7 @@ func (f *aligned) SetMaxKopfUndSchwanz(k, s int) {
 }
 
 func (f *aligned) WriteStringFormat(
-	sw schnittstellen.WriterAndStringWriter,
+	sw interfaces.WriterAndStringWriter,
 	o *kennung.Kennung2,
 ) (n int64, err error) {
 	var n1 int

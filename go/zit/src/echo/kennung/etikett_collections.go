@@ -1,14 +1,14 @@
 package kennung
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
 )
 
 type (
-	EtikettSet        = schnittstellen.SetPtrLike[Etikett, *Etikett]
-	EtikettMutableSet = schnittstellen.MutableSetPtrLike[Etikett, *Etikett]
+	EtikettSet        = interfaces.SetPtrLike[Etikett, *Etikett]
+	EtikettMutableSet = interfaces.MutableSetPtrLike[Etikett, *Etikett]
 )
 
 var EtikettSetEmpty EtikettSet

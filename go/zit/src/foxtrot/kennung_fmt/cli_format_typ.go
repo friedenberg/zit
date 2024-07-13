@@ -1,13 +1,13 @@
 package kennung_fmt
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 )
 
 type typCliFormat struct {
-	stringFormatWriter schnittstellen.StringFormatWriter[string]
+	stringFormatWriter interfaces.StringFormatWriter[string]
 }
 
 func MakeTypCliFormat(co string_format_writer.ColorOptions) *typCliFormat {
@@ -21,7 +21,7 @@ func MakeTypCliFormat(co string_format_writer.ColorOptions) *typCliFormat {
 }
 
 func (f *typCliFormat) WriteStringFormat(
-	w schnittstellen.WriterAndStringWriter,
+	w interfaces.WriterAndStringWriter,
 	k *kennung.Typ,
 ) (n int64, err error) {
 	v := k.String()

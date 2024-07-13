@@ -4,15 +4,15 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
-type pool[T any, TPtr schnittstellen.Ptr[T]] struct {
+type pool[T any, TPtr interfaces.Ptr[T]] struct {
 	inner *sync.Pool
 	reset func(TPtr)
 }
 
-func MakePool[T any, TPtr schnittstellen.Ptr[T]](
+func MakePool[T any, TPtr interfaces.Ptr[T]](
 	New func() TPtr,
 	Reset func(TPtr),
 ) *pool[T, TPtr] {
@@ -32,7 +32,7 @@ func MakePool[T any, TPtr schnittstellen.Ptr[T]](
 	}
 }
 
-func (p pool[T, TPtr]) Apply(f schnittstellen.FuncIter[T], e T) (err error) {
+func (p pool[T, TPtr]) Apply(f interfaces.FuncIter[T], e T) (err error) {
 	err = f(e)
 
 	switch {

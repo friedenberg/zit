@@ -3,7 +3,7 @@ package sku
 import (
 	"encoding/gob"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -25,7 +25,7 @@ type ObjekteOptions struct {
 
 type (
 	Konfig interface {
-		schnittstellen.Konfig
+		interfaces.Konfig
 		kennung.InlineTypChecker // TODO move out of konfig entirely
 		GetTypExtension(string) string
 	}
@@ -34,10 +34,10 @@ type (
 		WriteOneObjekteMetadatei(o *Transacted) (err error)
 		ReadOneEnnui(*sha.Sha) (*Transacted, error)
 		ReadOneKennung(
-			schnittstellen.StringerGattungGetter,
+			interfaces.StringerGattungGetter,
 		) (*Transacted, error)
 		ReadOneKennungSha(
-			schnittstellen.StringerGattungGetter,
+			interfaces.StringerGattungGetter,
 		) (*sha.Sha, error)
 	}
 
@@ -46,22 +46,22 @@ type (
 	}
 
 	SkuLike interface {
-		schnittstellen.ValueLike
-		schnittstellen.Stringer
+		interfaces.ValueLike
+		interfaces.Stringer
 		metadatei.Getter
 
 		GetKopf() kennung.Tai
 		GetTai() kennung.Tai
 		GetTyp() kennung.Typ
 		GetKennung() kennung.Kennung
-		GetObjekteSha() schnittstellen.ShaLike
-		GetAkteSha() schnittstellen.ShaLike
+		GetObjekteSha() interfaces.ShaLike
+		GetAkteSha() interfaces.ShaLike
 		GetKey() string
 
 		metadatei.Getter
 
-		SetAkteSha(schnittstellen.ShaLike) error
-		SetObjekteSha(schnittstellen.ShaLike) error
+		SetAkteSha(interfaces.ShaLike) error
+		SetObjekteSha(interfaces.ShaLike) error
 		CalculateObjekteShas() (err error)
 
 		SetTai(kennung.Tai)
@@ -80,13 +80,13 @@ type (
 	}
 
 	ExternalLike interface {
-		schnittstellen.Stringer
+		interfaces.Stringer
 		TransactedGetter
 		ExternalLikeGetter
 	}
 
 	CheckedOutLike interface {
-		schnittstellen.Stringer
+		interfaces.Stringer
 		TransactedGetter
 		ExternalLike
 		GetKasten() kennung.Kasten
@@ -109,7 +109,7 @@ type (
 
 	OneReader interface {
 		ReadTransactedFromKennung(
-			k1 schnittstellen.StringerGattungGetter,
+			k1 interfaces.StringerGattungGetter,
 		) (sk1 *Transacted, err error)
 	}
 )

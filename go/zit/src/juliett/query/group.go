@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -227,7 +227,7 @@ func (qg *Group) addOptimized(b *Builder, q *Query) (err error) {
 	return
 }
 
-func (q *Group) Each(_ schnittstellen.FuncIter[sku.Query]) (err error) {
+func (q *Group) Each(_ interfaces.FuncIter[sku.Query]) (err error) {
 	return
 }
 
@@ -390,8 +390,8 @@ func (qg *Group) ContainsSku(sk *sku.Transacted) (ok bool) {
 }
 
 func (qg *Group) MakeEmitSku(
-	f schnittstellen.FuncIter[*sku.Transacted],
-) schnittstellen.FuncIter[*sku.Transacted] {
+	f interfaces.FuncIter[*sku.Transacted],
+) interfaces.FuncIter[*sku.Transacted] {
 	return func(z *sku.Transacted) (err error) {
 		g := gattung.Must(z.GetGattung())
 		m, ok := qg.Get(g)
@@ -416,13 +416,13 @@ func (qg *Group) MakeEmitSku(
 // TODO improve performance by only reading Cwd zettels rather than scanning
 // everything
 func (qg *Group) MakeEmitSkuMaybeExternal(
-	f schnittstellen.FuncIter[*sku.Transacted],
+	f interfaces.FuncIter[*sku.Transacted],
 	k kennung.Kasten,
 	updateTransacted func(
 		kasten kennung.Kasten,
 		z *sku.Transacted,
 	) (err error),
-) schnittstellen.FuncIter[*sku.Transacted] {
+) interfaces.FuncIter[*sku.Transacted] {
 	// TODO add untracked and recognized
 	// if qg.IncludeRecognized {
 	// }
@@ -438,13 +438,13 @@ func (qg *Group) MakeEmitSkuMaybeExternal(
 }
 
 func (qg *Group) MakeEmitSkuSigilSchwanzen(
-	f schnittstellen.FuncIter[*sku.Transacted],
+	f interfaces.FuncIter[*sku.Transacted],
 	k kennung.Kasten,
 	updateTransacted func(
 		kasten kennung.Kasten,
 		z *sku.Transacted,
 	) (err error),
-) schnittstellen.FuncIter[*sku.Transacted] {
+) interfaces.FuncIter[*sku.Transacted] {
 	return func(z *sku.Transacted) (err error) {
 		g := gattung.Must(z.GetGattung())
 		m, ok := qg.Get(g)
@@ -474,13 +474,13 @@ func (qg *Group) MakeEmitSkuSigilSchwanzen(
 }
 
 func (qg *Group) MakeEmitSkuSigilExternal(
-	f schnittstellen.FuncIter[*sku.Transacted],
+	f interfaces.FuncIter[*sku.Transacted],
 	k kennung.Kasten,
 	updateTransacted func(
 		kasten kennung.Kasten,
 		z *sku.Transacted,
 	) (err error),
-) schnittstellen.FuncIter[*sku.Transacted] {
+) interfaces.FuncIter[*sku.Transacted] {
 	return func(z *sku.Transacted) (err error) {
 		g := gattung.Must(z.GetGattung())
 		m, ok := qg.Get(g)

@@ -2,7 +2,7 @@ package store_fs
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
@@ -16,19 +16,19 @@ import (
 type cliCheckedOut struct {
 	options erworben_cli_print_options.PrintOptions
 
-	rightAlignedWriter          schnittstellen.StringFormatWriter[string]
-	shaStringFormatWriter       schnittstellen.StringFormatWriter[schnittstellen.ShaLike]
-	kennungStringFormatWriter   schnittstellen.StringFormatWriter[*kennung.Kennung2]
-	fdStringFormatWriter        schnittstellen.StringFormatWriter[*fd.FD]
-	metadateiStringFormatWriter schnittstellen.StringFormatWriter[*metadatei.Metadatei]
+	rightAlignedWriter          interfaces.StringFormatWriter[string]
+	shaStringFormatWriter       interfaces.StringFormatWriter[interfaces.ShaLike]
+	kennungStringFormatWriter   interfaces.StringFormatWriter[*kennung.Kennung2]
+	fdStringFormatWriter        interfaces.StringFormatWriter[*fd.FD]
+	metadateiStringFormatWriter interfaces.StringFormatWriter[*metadatei.Metadatei]
 }
 
 func MakeCliCheckedOutFormat(
 	options erworben_cli_print_options.PrintOptions,
-	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],
-	fdStringFormatWriter schnittstellen.StringFormatWriter[*fd.FD],
-	kennungStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Kennung2],
-	metadateiStringFormatWriter schnittstellen.StringFormatWriter[*metadatei.Metadatei],
+	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
+	fdStringFormatWriter interfaces.StringFormatWriter[*fd.FD],
+	kennungStringFormatWriter interfaces.StringFormatWriter[*kennung.Kennung2],
+	metadateiStringFormatWriter interfaces.StringFormatWriter[*metadatei.Metadatei],
 ) *cliCheckedOut {
 	return &cliCheckedOut{
 		options:                     options,
@@ -41,7 +41,7 @@ func MakeCliCheckedOutFormat(
 }
 
 func (f *cliCheckedOut) WriteStringFormat(
-	sw schnittstellen.WriterAndStringWriter,
+	sw interfaces.WriterAndStringWriter,
 	col sku.CheckedOutLike,
 ) (n int64, err error) {
 	co := col.(*CheckedOut)

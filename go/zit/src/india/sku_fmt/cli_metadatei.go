@@ -2,7 +2,7 @@ package sku_fmt
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -19,17 +19,17 @@ type cliMetadatei struct {
 	writeBezeichnung bool
 	writeEtiketten   bool
 
-	shaStringFormatWriter         schnittstellen.StringFormatWriter[schnittstellen.ShaLike]
-	typStringFormatWriter         schnittstellen.StringFormatWriter[*kennung.Typ]
-	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung]
-	etikettenStringFormatWriter   schnittstellen.StringFormatWriter[*kennung.Etikett]
+	shaStringFormatWriter         interfaces.StringFormatWriter[interfaces.ShaLike]
+	typStringFormatWriter         interfaces.StringFormatWriter[*kennung.Typ]
+	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung]
+	etikettenStringFormatWriter   interfaces.StringFormatWriter[*kennung.Etikett]
 }
 
 func MakeCliMetadateiFormatShort(
-	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],
-	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
-	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],
-	etikettenStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Etikett],
+	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
+	typStringFormatWriter interfaces.StringFormatWriter[*kennung.Typ],
+	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung],
+	etikettenStringFormatWriter interfaces.StringFormatWriter[*kennung.Etikett],
 ) *cliMetadatei {
 	return &cliMetadatei{
 		writeTyp:                      false,
@@ -44,10 +44,10 @@ func MakeCliMetadateiFormatShort(
 
 func MakeCliMetadateiFormat(
 	options erworben_cli_print_options.PrintOptions,
-	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],
-	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
-	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],
-	etikettenStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Etikett],
+	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
+	typStringFormatWriter interfaces.StringFormatWriter[*kennung.Typ],
+	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung],
+	etikettenStringFormatWriter interfaces.StringFormatWriter[*kennung.Etikett],
 ) *cliMetadatei {
 	return &cliMetadatei{
 		options: options,
@@ -65,7 +65,7 @@ func MakeCliMetadateiFormat(
 }
 
 func (f *cliMetadatei) WriteStringFormat(
-	sw schnittstellen.WriterAndStringWriter,
+	sw interfaces.WriterAndStringWriter,
 	o *metadatei.Metadatei,
 ) (n int64, err error) {
 	var n1 int
@@ -158,7 +158,7 @@ func (f *cliMetadatei) WriteStringFormat(
 }
 
 func (f *cliMetadatei) writeStringFormatEtiketten(
-	sw schnittstellen.WriterAndStringWriter,
+	sw interfaces.WriterAndStringWriter,
 	o *metadatei.Metadatei,
 	didWriteBezeichnung bool,
 ) (n int64, err error) {

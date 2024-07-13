@@ -5,13 +5,13 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 type VMPoolBuilder struct {
 	proto        VMPool
 	scriptReader io.Reader
-	apply        schnittstellen.FuncIter[*VM]
+	apply        interfaces.FuncIter[*VM]
 }
 
 func (vpb *VMPoolBuilder) Clone() *VMPoolBuilder {
@@ -44,7 +44,7 @@ func (sp *VMPoolBuilder) WithReader(
 }
 
 func (sp *VMPoolBuilder) WithApply(
-	apply schnittstellen.FuncIter[*VM],
+	apply interfaces.FuncIter[*VM],
 ) *VMPoolBuilder {
 	sp.apply = apply
 	return sp
@@ -72,7 +72,7 @@ func (vpb *VMPoolBuilder) Build() (vm *VMPool, err error) {
 func MakeVMPoolWithZitSearcher(
 	script string,
 	searcher LGFunction,
-	apply schnittstellen.FuncIter[*VM],
+	apply interfaces.FuncIter[*VM],
 ) (ml *VMPool, err error) {
 	b := (&VMPoolBuilder{}).WithSearcher(searcher).WithScript(script).WithApply(apply)
 
@@ -87,7 +87,7 @@ func MakeVMPoolWithZitSearcher(
 func MakeVMPoolWithZitRequire(
 	script string,
 	require LGFunction,
-	apply schnittstellen.FuncIter[*VM],
+	apply interfaces.FuncIter[*VM],
 ) (ml *VMPool, err error) {
 	b := (&VMPoolBuilder{}).WithRequire(require).WithScript(script).WithApply(apply)
 

@@ -11,7 +11,7 @@ import (
 )
 
 func makeTestTextFormat(
-	af *test_metadatei_io.AkteIOFactory,
+	af *test_metadatei_io.BlobIOFactory,
 ) metadatei.TextFormat {
 	if af == nil {
 		af = test_metadatei_io.FixtureFactoryReadWriteCloser(nil)

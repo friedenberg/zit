@@ -7,14 +7,14 @@ import (
 	"unicode/utf8"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 )
 
 func MakeFormatStringRightAligned(
 	f string,
 	args ...any,
-) schnittstellen.FuncWriter {
+) interfaces.FuncWriter {
 	return func(w io.Writer) (n int64, err error) {
 		f = fmt.Sprintf(f+" ", args...)
 

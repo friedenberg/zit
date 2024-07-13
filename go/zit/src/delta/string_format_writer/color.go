@@ -2,20 +2,20 @@ package string_format_writer
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 type color[T any] struct {
 	options            ColorOptions
 	color              ColorType
-	stringFormatWriter schnittstellen.StringFormatWriter[T]
+	stringFormatWriter interfaces.StringFormatWriter[T]
 }
 
 func MakeColor[T any](
 	o ColorOptions,
-	fsw schnittstellen.StringFormatWriter[T],
+	fsw interfaces.StringFormatWriter[T],
 	c ColorType,
-) schnittstellen.StringFormatWriter[T] {
+) interfaces.StringFormatWriter[T] {
 	if o.OffEntirely {
 		return fsw
 	} else {
@@ -27,7 +27,7 @@ func MakeColor[T any](
 }
 
 func (f *color[T]) WriteStringFormat(
-	sw schnittstellen.WriterAndStringWriter,
+	sw interfaces.WriterAndStringWriter,
 	e T,
 ) (n int64, err error) {
 	if f.options.OffEntirely {

@@ -7,12 +7,12 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
-var delimReaderPool schnittstellen.Pool[delimReader, *delimReader]
+var delimReaderPool interfaces.Pool[delimReader, *delimReader]
 
 func init() {
 	delimReaderPool = pool.MakePoolWithReset[delimReader, *delimReader]()

@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
@@ -35,7 +35,7 @@ func (e etikett2) GetQueryPrefix() string {
 	return "-"
 }
 
-func (e etikett2) GetGattung() schnittstellen.GattungLike {
+func (e etikett2) GetGattung() interfaces.GattungLike {
 	return gattung.Etikett
 }
 

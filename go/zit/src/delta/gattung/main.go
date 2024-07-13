@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 )
@@ -68,11 +68,11 @@ func TrueGattung() (out []Gattung) {
 	return
 }
 
-func Must(g schnittstellen.GattungGetter) Gattung {
+func Must(g interfaces.GattungGetter) Gattung {
 	return g.GetGattung().(Gattung)
 }
 
-func Make(g schnittstellen.GattungLike) Gattung {
+func Make(g interfaces.GattungLike) Gattung {
 	return Must(g)
 }
 
@@ -84,7 +84,7 @@ func MakeOrUnknown(v string) (g Gattung) {
 	return
 }
 
-func (g Gattung) GetGattung() schnittstellen.GattungLike {
+func (g Gattung) GetGattung() interfaces.GattungLike {
 	return g
 }
 
@@ -115,11 +115,11 @@ func (a Gattung) Equals(b Gattung) bool {
 	return a == b
 }
 
-func (a Gattung) EqualsGattung(b schnittstellen.GattungGetter) bool {
+func (a Gattung) EqualsGattung(b interfaces.GattungGetter) bool {
 	return a.GetGattungString() == b.GetGattung().GetGattungString()
 }
 
-func (a Gattung) AssertGattung(b schnittstellen.GattungGetter) (err error) {
+func (a Gattung) AssertGattung(b interfaces.GattungGetter) (err error) {
 	if a.GetGattungString() != b.GetGattung().GetGattungString() {
 		err = MakeErrUnsupportedGattung(b)
 		return

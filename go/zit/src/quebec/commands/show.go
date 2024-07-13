@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
@@ -50,7 +50,7 @@ func (c Show) RunWithQuery(
 	u *umwelt.Umwelt,
 	eqwk *query.Group,
 ) (err error) {
-	var f schnittstellen.FuncIter[*sku.Transacted]
+	var f interfaces.FuncIter[*sku.Transacted]
 
 	if f, err = u.MakeFormatFunc(c.Format, u.Out()); err != nil {
 		err = errors.Wrap(err)

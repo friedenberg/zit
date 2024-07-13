@@ -2,11 +2,11 @@ package iter
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 func CheckAnyOrTrueEmpty[T any](
-	c schnittstellen.Collection[T],
+	c interfaces.Collection[T],
 	f func(T) bool,
 ) bool {
 	if c.Len() == 0 {
@@ -17,7 +17,7 @@ func CheckAnyOrTrueEmpty[T any](
 }
 
 func CheckAnyOrFalseEmpty[T any](
-	c schnittstellen.Collection[T],
+	c interfaces.Collection[T],
 	f func(T) bool,
 ) bool {
 	if c.Len() == 0 {
@@ -29,9 +29,9 @@ func CheckAnyOrFalseEmpty[T any](
 
 func CheckAnyPtr[
 	T any,
-	TPtr schnittstellen.Ptr[T],
+	TPtr interfaces.Ptr[T],
 ](
-	c schnittstellen.CollectionPtr[T, TPtr],
+	c interfaces.CollectionPtr[T, TPtr],
 	f func(TPtr) bool,
 ) bool {
 	err := c.EachPtr(
@@ -47,7 +47,7 @@ func CheckAnyPtr[
 	return errors.IsErrTrue(err)
 }
 
-func CheckAny[T any](c schnittstellen.Collection[T], f func(T) bool) bool {
+func CheckAny[T any](c interfaces.Collection[T], f func(T) bool) bool {
 	err := c.Each(
 		func(e T) (err error) {
 			if f(e) {
@@ -61,7 +61,7 @@ func CheckAny[T any](c schnittstellen.Collection[T], f func(T) bool) bool {
 	return errors.IsErrTrue(err)
 }
 
-func All[T any](c schnittstellen.Collection[T], f func(T) bool) bool {
+func All[T any](c interfaces.Collection[T], f func(T) bool) bool {
 	err := c.Each(
 		func(e T) (err error) {
 			if !f(e) {
@@ -77,10 +77,10 @@ func All[T any](c schnittstellen.Collection[T], f func(T) bool) bool {
 
 func MakeFuncSetString[
 	E any,
-	EPtr schnittstellen.SetterPtr[E],
+	EPtr interfaces.SetterPtr[E],
 ](
-	c schnittstellen.Adder[E],
-) schnittstellen.FuncSetString {
+	c interfaces.Adder[E],
+) interfaces.FuncSetString {
 	return func(v string) (err error) {
 		return AddString[E, EPtr](c, v)
 	}
@@ -99,7 +99,7 @@ func MakeFuncSetString[
 // 	return false
 // }
 
-func Len(cs ...schnittstellen.Lenner) (n int) {
+func Len(cs ...interfaces.Lenner) (n int) {
 	for _, c := range cs {
 		n += c.Len()
 	}
@@ -107,10 +107,10 @@ func Len(cs ...schnittstellen.Lenner) (n int) {
 	return
 }
 
-func Map[E schnittstellen.Value[E], F schnittstellen.Value[F]](
-	in schnittstellen.SetLike[E],
-	tr schnittstellen.FuncTransform[E, F],
-	out schnittstellen.MutableSetLike[F],
+func Map[E interfaces.Value[E], F interfaces.Value[F]](
+	in interfaces.SetLike[E],
+	tr interfaces.FuncTransform[E, F],
+	out interfaces.MutableSetLike[F],
 ) (err error) {
 	if err = in.Each(
 		func(e E) (err error) {
@@ -137,8 +137,8 @@ func Map[E schnittstellen.Value[E], F schnittstellen.Value[F]](
 }
 
 func DerivedValues[E any, F any](
-	c schnittstellen.SetLike[E],
-	f schnittstellen.FuncTransform[E, F],
+	c interfaces.SetLike[E],
+	f interfaces.FuncTransform[E, F],
 ) (out []F, err error) {
 	out = make([]F, 0, c.Len())
 
@@ -168,9 +168,9 @@ func DerivedValues[E any, F any](
 	return
 }
 
-func DerivedValuesPtr[E any, EPtr schnittstellen.Ptr[E], F any](
-	c schnittstellen.SetPtrLike[E, EPtr],
-	f schnittstellen.FuncTransform[EPtr, F],
+func DerivedValuesPtr[E any, EPtr interfaces.Ptr[E], F any](
+	c interfaces.SetPtrLike[E, EPtr],
+	f interfaces.FuncTransform[EPtr, F],
 ) (out []F, err error) {
 	out = make([]F, 0, c.Len())
 
@@ -201,8 +201,8 @@ func DerivedValuesPtr[E any, EPtr schnittstellen.Ptr[E], F any](
 }
 
 func MakeFuncTransformer[T any, T1 any](
-	wf schnittstellen.FuncIter[T],
-) schnittstellen.FuncIter[T1] {
+	wf interfaces.FuncIter[T],
+) interfaces.FuncIter[T1] {
 	return func(e T1) (err error) {
 		if e1, ok := any(e).(T); ok {
 			return wf(e1)

@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
@@ -70,7 +70,7 @@ func (pt *Page) waitingToAddLen() int {
 
 func (pt *Page) CopyJustHistory(
 	s sku.PrimitiveQueryGroup,
-	w schnittstellen.FuncIter[*sku.Transacted],
+	w interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	return pt.copyHistoryAndMaybeSchwanz(s, w, false, false)
 }
@@ -78,7 +78,7 @@ func (pt *Page) CopyJustHistory(
 func (pt *Page) copyJustHistoryFrom(
 	r io.Reader,
 	s sku.PrimitiveQueryGroup,
-	w schnittstellen.FuncIter[skuWithRangeAndSigil],
+	w interfaces.FuncIter[skuWithRangeAndSigil],
 ) (err error) {
 	dec := makeBinaryWithQueryGroup(s, kennung.SigilHistory)
 
@@ -107,14 +107,14 @@ func (pt *Page) copyJustHistoryFrom(
 
 func (pt *Page) copyJustHistoryAndAdded(
 	s sku.PrimitiveQueryGroup,
-	w schnittstellen.FuncIter[*sku.Transacted],
+	w interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	return pt.copyHistoryAndMaybeSchwanz(s, w, true, false)
 }
 
 func (pt *Page) copyHistoryAndMaybeSchwanz(
 	qg sku.PrimitiveQueryGroup,
-	w schnittstellen.FuncIter[*sku.Transacted],
+	w interfaces.FuncIter[*sku.Transacted],
 	includeAdded bool,
 	includeAddedSchwanz bool,
 ) (err error) {

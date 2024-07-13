@@ -3,7 +3,7 @@ package expansion
 import (
 	"regexp"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 type expanderRight struct {
@@ -19,7 +19,7 @@ func MakeExpanderRight(
 }
 
 func (ex expanderRight) Expand(
-	sa schnittstellen.FuncSetString,
+	sa interfaces.FuncSetString,
 	s string,
 ) {
 	sa(s)

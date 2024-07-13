@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
@@ -28,12 +28,12 @@ type Options struct {
 
 	Konfig *konfig.Compiled
 
-	commentMatchers   schnittstellen.SetLike[sku.Query]
+	commentMatchers   interfaces.SetLike[sku.Query]
 	rootEtiketten     kennung.EtikettSet
 	Typ               kennung.Typ
 	GroupingEtiketten kennung.EtikettSlice
 	ExtraEtiketten    kennung.EtikettSet
-	Transacted        schnittstellen.SetLike[*sku.Transacted]
+	Transacted        interfaces.SetLike[*sku.Transacted]
 
 	Abbr kennung.Abbr
 
@@ -44,7 +44,7 @@ type Options struct {
 
 	PrintOptions       erworben_cli_print_options.PrintOptions
 	skuFmt             sku_fmt.Organize
-	stringFormatWriter schnittstellen.StringFormatWriter[*sku.Transacted]
+	stringFormatWriter interfaces.StringFormatWriter[*sku.Transacted]
 }
 
 func MakeFlags() Flags {

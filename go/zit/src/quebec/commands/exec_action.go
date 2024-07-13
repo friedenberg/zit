@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
@@ -88,7 +88,7 @@ func (c ExecAction) RunWithQuery(
 func (c ExecAction) runAction(
 	u *umwelt.Umwelt,
 	sc script_config.ScriptConfig,
-	hinweisen schnittstellen.SetLike[kennung.Kennung],
+	hinweisen interfaces.SetLike[kennung.Kennung],
 ) (err error) {
 	var wt io.WriterTo
 

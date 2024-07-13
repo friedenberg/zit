@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
@@ -44,7 +44,7 @@ type Store struct {
 
 	sonnenaufgang thyme.Time
 
-	checkedOutLogPrinter schnittstellen.FuncIter[sku.CheckedOutLike]
+	checkedOutLogPrinter interfaces.FuncIter[sku.CheckedOutLike]
 
 	metadateiTextParser metadatei.TextParser
 
@@ -63,7 +63,7 @@ type Store struct {
 }
 
 type Logger struct {
-	New, Updated, Unchanged schnittstellen.FuncIter[*sku.Transacted]
+	New, Updated, Unchanged interfaces.FuncIter[*sku.Transacted]
 }
 
 func (c *Store) Initialize(
@@ -187,7 +187,7 @@ func (s *Store) SetExternalStores(
 
 // TODO remove
 func (s *Store) SetCheckedOutLogWriter(
-	zelw schnittstellen.FuncIter[sku.CheckedOutLike],
+	zelw interfaces.FuncIter[sku.CheckedOutLike],
 ) {
 	s.checkedOutLogPrinter = zelw
 }

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
@@ -224,7 +224,7 @@ func (a *Transacted) Equals(b *Transacted) (ok bool) {
 	return true
 }
 
-func (s *Transacted) GetGattung() schnittstellen.GattungLike {
+func (s *Transacted) GetGattung() interfaces.GattungLike {
 	return s.Kennung.GetGattung()
 }
 
@@ -244,7 +244,7 @@ func (s *Transacted) makeShaCalcFunc(
 	f func(objekte_format.FormatGeneric, objekte_format.FormatterContext) (*sha.Sha, error),
 	of objekte_format.FormatGeneric,
 	sh *sha.Sha,
-) schnittstellen.FuncError {
+) interfaces.FuncError {
 	return func() (err error) {
 		var actual *sha.Sha
 
@@ -304,19 +304,19 @@ func (s *Transacted) SetSchlummernd(v bool) {
 	s.Metadatei.Verzeichnisse.Schlummernd.SetBool(v)
 }
 
-func (s *Transacted) SetObjekteSha(v schnittstellen.ShaLike) (err error) {
+func (s *Transacted) SetObjekteSha(v interfaces.ShaLike) (err error) {
 	return s.GetMetadatei().Sha().SetShaLike(v)
 }
 
-func (s *Transacted) GetObjekteSha() schnittstellen.ShaLike {
+func (s *Transacted) GetObjekteSha() interfaces.ShaLike {
 	return s.GetMetadatei().Sha()
 }
 
-func (s *Transacted) GetAkteSha() schnittstellen.ShaLike {
+func (s *Transacted) GetAkteSha() interfaces.ShaLike {
 	return &s.Metadatei.Akte
 }
 
-func (s *Transacted) SetAkteSha(sh schnittstellen.ShaLike) error {
+func (s *Transacted) SetAkteSha(sh interfaces.ShaLike) error {
 	return s.Metadatei.Akte.SetShaLike(sh)
 }
 

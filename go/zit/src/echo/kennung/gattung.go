@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
@@ -49,16 +49,16 @@ func (a *Gattung) Add(bs ...gattung.Gattung) {
 	}
 }
 
-func (a *Gattung) Del(b schnittstellen.GattungGetter) {
+func (a *Gattung) Del(b interfaces.GattungGetter) {
 	*a &= ^Gattung(b.GetGattung().GetGattungBitInt())
 }
 
-func (a Gattung) Contains(b schnittstellen.GattungGetter) bool {
+func (a Gattung) Contains(b interfaces.GattungGetter) bool {
 	bg := Gattung(b.GetGattung().GetGattungBitInt())
 	return byte(a&bg) == byte(bg)
 }
 
-func (a Gattung) ContainsOneOf(b schnittstellen.GattungGetter) bool {
+func (a Gattung) ContainsOneOf(b interfaces.GattungGetter) bool {
 	bg := Gattung(b.GetGattung().GetGattungBitInt())
 	return a&bg != 0
 }

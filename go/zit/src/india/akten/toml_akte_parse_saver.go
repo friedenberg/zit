@@ -4,22 +4,22 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 )
 
 type tomlAkteParseSaver[
-	O schnittstellen.Akte[O],
-	OPtr schnittstellen.AktePtr[O],
+	O interfaces.Blob[O],
+	OPtr interfaces.BlobPtr[O],
 ] struct {
-	awf              schnittstellen.AkteWriterFactory
+	awf              interfaces.BlobWriterFactory
 	ignoreTomlErrors bool
 }
 
 func MakeTomlAkteParseSaver[
-	O schnittstellen.Akte[O],
-	OPtr schnittstellen.AktePtr[O],
-](awf schnittstellen.AkteWriterFactory,
+	O interfaces.Blob[O],
+	OPtr interfaces.BlobPtr[O],
+](awf interfaces.BlobWriterFactory,
 ) tomlAkteParseSaver[O, OPtr] {
 	return tomlAkteParseSaver[O, OPtr]{
 		awf: awf,
@@ -27,9 +27,9 @@ func MakeTomlAkteParseSaver[
 }
 
 func MakeTextParserIgnoreTomlErrors[
-	O schnittstellen.Akte[O],
-	OPtr schnittstellen.AktePtr[O],
-](awf schnittstellen.AkteWriterFactory,
+	O interfaces.Blob[O],
+	OPtr interfaces.BlobPtr[O],
+](awf interfaces.BlobWriterFactory,
 ) tomlAkteParseSaver[O, OPtr] {
 	return tomlAkteParseSaver[O, OPtr]{
 		awf:              awf,

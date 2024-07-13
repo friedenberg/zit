@@ -4,7 +4,7 @@ import (
 	"net/url"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
@@ -18,24 +18,24 @@ import (
 type cliCheckedOut struct {
 	options erworben_cli_print_options.PrintOptions
 
-	rightAlignedWriter          schnittstellen.StringFormatWriter[string]
-	shaStringFormatWriter       schnittstellen.StringFormatWriter[schnittstellen.ShaLike]
-	kennungStringFormatWriter   schnittstellen.StringFormatWriter[*kennung.Kennung2]
-	metadateiStringFormatWriter schnittstellen.StringFormatWriter[*metadatei.Metadatei]
+	rightAlignedWriter          interfaces.StringFormatWriter[string]
+	shaStringFormatWriter       interfaces.StringFormatWriter[interfaces.ShaLike]
+	kennungStringFormatWriter   interfaces.StringFormatWriter[*kennung.Kennung2]
+	metadateiStringFormatWriter interfaces.StringFormatWriter[*metadatei.Metadatei]
 
-	typStringFormatWriter         schnittstellen.StringFormatWriter[*kennung.Typ]
-	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung]
-	etikettenStringFormatWriter   schnittstellen.StringFormatWriter[*kennung.Etikett]
+	typStringFormatWriter         interfaces.StringFormatWriter[*kennung.Typ]
+	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung]
+	etikettenStringFormatWriter   interfaces.StringFormatWriter[*kennung.Etikett]
 }
 
 func MakeCliCheckedOutFormat(
 	options erworben_cli_print_options.PrintOptions,
-	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],
-	kennungStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Kennung2],
-	metadateiStringFormatWriter schnittstellen.StringFormatWriter[*metadatei.Metadatei],
-	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
-	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],
-	etikettenStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Etikett],
+	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
+	kennungStringFormatWriter interfaces.StringFormatWriter[*kennung.Kennung2],
+	metadateiStringFormatWriter interfaces.StringFormatWriter[*metadatei.Metadatei],
+	typStringFormatWriter interfaces.StringFormatWriter[*kennung.Typ],
+	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung],
+	etikettenStringFormatWriter interfaces.StringFormatWriter[*kennung.Etikett],
 ) *cliCheckedOut {
 	return &cliCheckedOut{
 		options:                       options,
@@ -50,7 +50,7 @@ func MakeCliCheckedOutFormat(
 }
 
 func (f *cliCheckedOut) WriteStringFormat(
-	sw schnittstellen.WriterAndStringWriter,
+	sw interfaces.WriterAndStringWriter,
 	col sku.CheckedOutLike,
 ) (n int64, err error) {
 	co := col.(*CheckedOut)

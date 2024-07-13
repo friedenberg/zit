@@ -3,13 +3,13 @@ package heap
 import (
 	"sort"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 func Make[T Element, TPtr ElementPtr[T]](
-	equaler schnittstellen.Equaler1[TPtr],
-	lessor schnittstellen.Lessor3[TPtr],
-	resetter schnittstellen.Resetter2[T, TPtr],
+	equaler interfaces.Equaler1[TPtr],
+	lessor interfaces.Lessor3[TPtr],
+	resetter interfaces.Resetter2[T, TPtr],
 ) *Heap[T, TPtr] {
 	return &Heap[T, TPtr]{
 		h: heapPrivate[T, TPtr]{
@@ -22,9 +22,9 @@ func Make[T Element, TPtr ElementPtr[T]](
 }
 
 func MakeHeapFromSliceUnsorted[T Element, TPtr ElementPtr[T]](
-	equaler schnittstellen.Equaler1[TPtr],
-	lessor schnittstellen.Lessor3[TPtr],
-	resetter schnittstellen.Resetter2[T, TPtr],
+	equaler interfaces.Equaler1[TPtr],
+	lessor interfaces.Lessor3[TPtr],
+	resetter interfaces.Resetter2[T, TPtr],
 	s []TPtr,
 ) *Heap[T, TPtr] {
 	h := heapPrivate[T, TPtr]{
@@ -42,9 +42,9 @@ func MakeHeapFromSliceUnsorted[T Element, TPtr ElementPtr[T]](
 }
 
 func MakeHeapFromSlice[T Element, TPtr ElementPtr[T]](
-	equaler schnittstellen.Equaler1[TPtr],
-	lessor schnittstellen.Lessor3[TPtr],
-	resetter schnittstellen.Resetter2[T, TPtr],
+	equaler interfaces.Equaler1[TPtr],
+	lessor interfaces.Lessor3[TPtr],
+	resetter interfaces.Resetter2[T, TPtr],
 	s []TPtr,
 ) *Heap[T, TPtr] {
 	h := heapPrivate[T, TPtr]{

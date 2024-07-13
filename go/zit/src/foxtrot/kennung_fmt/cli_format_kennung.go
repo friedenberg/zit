@@ -2,7 +2,7 @@ package kennung_fmt
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -11,7 +11,7 @@ import (
 
 type kennungCliFormat struct {
 	options              erworben_cli_print_options.PrintOptions
-	sfwColor, sfwNoColor schnittstellen.StringFormatWriter[*catgut.String]
+	sfwColor, sfwNoColor interfaces.StringFormatWriter[*catgut.String]
 	abbr                 kennung.Abbr
 }
 
@@ -33,7 +33,7 @@ func MakeKennungCliFormat(
 }
 
 func (f *kennungCliFormat) WriteStringFormat(
-	w schnittstellen.WriterAndStringWriter,
+	w interfaces.WriterAndStringWriter,
 	k *kennung.Kennung2,
 ) (n int64, err error) {
 	if f.options.Abbreviations.Hinweisen {

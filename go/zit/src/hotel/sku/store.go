@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
@@ -20,13 +20,13 @@ type (
 	FuncCommit      = func(*Transacted, ObjekteOptions) error
 	FuncReadSha     = func(*sha.Sha) (*Transacted, error)
 	FuncReadOneInto = func(
-		k1 schnittstellen.StringerGattungGetter,
+		k1 interfaces.StringerGattungGetter,
 		out *Transacted,
 	) (err error)
 
 	FuncQuery = func(
 		QueryGroup,
-		schnittstellen.FuncIter[*Transacted],
+		interfaces.FuncIter[*Transacted],
 	) (err error)
 
 	StoreFuncs struct {
@@ -55,7 +55,7 @@ type (
 	ExternalStoreOpen interface {
 		Open(
 			m checkout_mode.Mode,
-			ph schnittstellen.FuncIter[string],
+			ph interfaces.FuncIter[string],
 			zsc CheckedOutLikeSet,
 		) (err error)
 	}
@@ -63,14 +63,14 @@ type (
 	ExternalStoreQueryCheckedOut interface {
 		QueryCheckedOut(
 			qg ExternalQuery,
-			f schnittstellen.FuncIter[CheckedOutLike],
+			f interfaces.FuncIter[CheckedOutLike],
 		) (err error)
 	}
 
 	ExternalStoreQueryUnsure interface {
 		QueryUnsure(
 			qg ExternalQuery,
-			f schnittstellen.FuncIter[CheckedOutLike],
+			f interfaces.FuncIter[CheckedOutLike],
 		) (err error)
 	}
 
@@ -81,7 +81,7 @@ type (
 	}
 
 	ExternalStoreForQuery interface {
-		GetExternalKennung() (schnittstellen.SetLike[*kennung.Kennung2], error)
+		GetExternalKennung() (interfaces.SetLike[*kennung.Kennung2], error)
 		GetKennungForString(string) (*kennung.Kennung2, error)
 	}
 
@@ -91,8 +91,8 @@ type (
 		ExternalStoreQueryCheckedOut
 		// SaveAkte(col CheckedOutLike) (err error)
 		// ExternalStoreCheckoutOne
-		schnittstellen.Flusher
-		GetExternalKennung() (schnittstellen.SetLike[*kennung.Kennung2], error)
+		interfaces.Flusher
+		GetExternalKennung() (interfaces.SetLike[*kennung.Kennung2], error)
 		GetKennungForString(string) (*kennung.Kennung2, error)
 	}
 
@@ -134,7 +134,7 @@ func (ve *ExternalStore) Flush() (err error) {
 
 func (es *ExternalStore) QueryCheckedOut(
 	qg ExternalQuery,
-	f schnittstellen.FuncIter[CheckedOutLike],
+	f interfaces.FuncIter[CheckedOutLike],
 ) (err error) {
 	esqco, ok := es.ExternalStoreLike.(ExternalStoreQueryCheckedOut)
 
@@ -161,7 +161,7 @@ func (es *ExternalStore) QueryCheckedOut(
 
 func (es *ExternalStore) QueryUnsure(
 	qg ExternalQuery,
-	f schnittstellen.FuncIter[CheckedOutLike],
+	f interfaces.FuncIter[CheckedOutLike],
 ) (err error) {
 	esqu, ok := es.ExternalStoreLike.(ExternalStoreQueryUnsure)
 
@@ -255,7 +255,7 @@ func (es *ExternalStore) UpdateTransacted(z *Transacted) (err error) {
 	return
 }
 
-func (es *ExternalStore) GetExternalKennung() (ks schnittstellen.SetLike[*kennung.Kennung2], err error) {
+func (es *ExternalStore) GetExternalKennung() (ks interfaces.SetLike[*kennung.Kennung2], err error) {
 	if es == nil {
 		ks = collections_value.MakeValueSet[*kennung.Kennung2](nil)
 		return
@@ -295,7 +295,7 @@ func (es *ExternalStore) GetKennungForString(v string) (k *kennung.Kennung2, err
 
 func (es *ExternalStore) Open(
 	m checkout_mode.Mode,
-	ph schnittstellen.FuncIter[string],
+	ph interfaces.FuncIter[string],
 	zsc CheckedOutLikeSet,
 ) (err error) {
 	eso, ok := es.ExternalStoreLike.(ExternalStoreOpen)

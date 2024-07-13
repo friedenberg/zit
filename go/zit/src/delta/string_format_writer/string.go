@@ -2,17 +2,17 @@ package string_format_writer
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 type streeng[T ~string] struct{}
 
-func MakeString[T ~string]() schnittstellen.StringFormatWriter[T] {
+func MakeString[T ~string]() interfaces.StringFormatWriter[T] {
 	return &streeng[T]{}
 }
 
 func (f *streeng[T]) WriteStringFormat(
-	sw schnittstellen.WriterAndStringWriter,
+	sw interfaces.WriterAndStringWriter,
 	e T,
 ) (n int64, err error) {
 	var n1 int

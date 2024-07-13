@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 )
 
@@ -31,7 +31,7 @@ type node struct {
 	IncludesTerminus bool
 }
 
-func Make(vs ...string) (t schnittstellen.MutableTridex) {
+func Make(vs ...string) (t interfaces.MutableTridex) {
 	t = &Tridex{
 		Root: node{
 			Children: make(map[byte]node),
@@ -51,7 +51,7 @@ func Make(vs ...string) (t schnittstellen.MutableTridex) {
 	return
 }
 
-func (a *Tridex) MutableClone() (b schnittstellen.MutableTridex) {
+func (a *Tridex) MutableClone() (b interfaces.MutableTridex) {
 	errors.TodoP4("improve the performance of this")
 	errors.TodoP4("collections-copy")
 	errors.TodoP4("collections-reset")
@@ -135,7 +135,7 @@ func (t *Tridex) Add(v string) {
 	t.Root.Add(v)
 }
 
-func (t *Tridex) EachString(f schnittstellen.FuncIter[string]) (err error) {
+func (t *Tridex) EachString(f interfaces.FuncIter[string]) (err error) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 

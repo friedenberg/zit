@@ -5,13 +5,13 @@ import (
 	"crypto/sha256"
 	"hash"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 )
 
 var (
-	hash256Pool schnittstellen.PoolValue[hash.Hash]
-	shaPool     schnittstellen.Pool[Sha, *Sha]
+	hash256Pool interfaces.PoolValue[hash.Hash]
+	shaPool     interfaces.Pool[Sha, *Sha]
 )
 
 func init() {
@@ -31,7 +31,7 @@ func init() {
 	)
 }
 
-func GetPool() schnittstellen.Pool[Sha, *Sha] {
+func GetPool() interfaces.Pool[Sha, *Sha] {
 	return shaPool
 }
 

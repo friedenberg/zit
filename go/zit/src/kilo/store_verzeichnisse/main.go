@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
@@ -52,7 +52,7 @@ type Store struct {
 	standort standort.Standort
 	erworben *konfig.Compiled
 	path     string
-	schnittstellen.VerzeichnisseFactory
+	interfaces.VerzeichnisseFactory
 	pages             [PageCount]Page
 	historicalChanges []string
 	ennuiStore
@@ -117,7 +117,7 @@ func (i *Store) SetNeedsFlushHistory(changes []string) {
 }
 
 func (i *Store) Flush(
-	printerHeader schnittstellen.FuncIter[string],
+	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	if len(i.historicalChanges) > 0 {
 		if err = i.flushEverything(printerHeader); err != nil {
@@ -135,7 +135,7 @@ func (i *Store) Flush(
 }
 
 func (i *Store) flushAdded(
-	printerHeader schnittstellen.FuncIter[string],
+	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	ui.Log().Print("flushing")
 	wg := iter.MakeErrorWaitGroupParallel()
@@ -188,7 +188,7 @@ func (i *Store) flushAdded(
 }
 
 func (i *Store) flushEverything(
-	printerHeader schnittstellen.FuncIter[string],
+	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	ui.Log().Print("flushing")
 	wg := iter.MakeErrorWaitGroupParallel()
@@ -272,7 +272,7 @@ func (i *Store) Add(
 
 func (i *Store) readFrom(
 	qg sku.PrimitiveQueryGroup,
-	w schnittstellen.FuncIter[*sku.Transacted],
+	w interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	wg := &sync.WaitGroup{}
 	ch := make(chan struct{}, PageCount)
@@ -343,7 +343,7 @@ func (i *Store) readFrom(
 
 func (i *Store) ReadQuery(
 	qg sku.PrimitiveQueryGroup,
-	w schnittstellen.FuncIter[*sku.Transacted],
+	w interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	return i.readFrom(qg, w)
 }

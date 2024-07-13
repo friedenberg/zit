@@ -6,7 +6,7 @@ import (
 	"net/url"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
@@ -25,7 +25,7 @@ type External struct {
 func (e *External) SaveAkte(s standort.Standort) (err error) {
 	var aw sha.WriteCloser
 
-	if aw, err = s.AkteWriter(); err != nil {
+	if aw, err = s.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -113,7 +113,7 @@ func (a *External) GetMetadatei() *metadatei.Metadatei {
 	return &a.Metadatei
 }
 
-func (a *External) GetGattung() schnittstellen.GattungLike {
+func (a *External) GetGattung() interfaces.GattungLike {
 	return a.Kennung.GetGattung()
 }
 
@@ -127,7 +127,7 @@ func (a *External) String() string {
 	)
 }
 
-func (a *External) GetAkteSha() schnittstellen.ShaLike {
+func (a *External) GetAkteSha() interfaces.ShaLike {
 	return &a.Metadatei.Akte
 }
 

@@ -4,13 +4,13 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	lua "github.com/yuin/gopher-lua"
 )
 
 type VMPool struct {
-	schnittstellen.Pool[VM, *VM]
+	interfaces.Pool[VM, *VM]
 	Require  LGFunction
 	Searcher LGFunction
 	compiled *lua.FunctionProto
@@ -18,7 +18,7 @@ type VMPool struct {
 
 func (sp *VMPool) PrepareVM(
 	vm *VM,
-	apply schnittstellen.FuncIter[*VM],
+	apply interfaces.FuncIter[*VM],
 ) (err error) {
 	vm.Pool = pool.MakePool(
 		func() (t *lua.LTable) {
@@ -79,7 +79,7 @@ func (sp *VMPool) PrepareVM(
 
 func (sp *VMPool) SetReader(
 	reader io.Reader,
-	apply schnittstellen.FuncIter[*VM],
+	apply interfaces.FuncIter[*VM],
 ) (err error) {
 	if sp.compiled, err = CompileReader(reader); err != nil {
 		err = errors.Wrap(err)

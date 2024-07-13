@@ -1,11 +1,11 @@
 package metadatei
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 )
 
-var thePool schnittstellen.Pool[Metadatei, *Metadatei]
+var thePool interfaces.Pool[Metadatei, *Metadatei]
 
 func init() {
 	thePool = pool.MakePool[Metadatei, *Metadatei](
@@ -14,6 +14,6 @@ func init() {
 	)
 }
 
-func GetPool() schnittstellen.Pool[Metadatei, *Metadatei] {
+func GetPool() interfaces.Pool[Metadatei, *Metadatei] {
 	return thePool
 }

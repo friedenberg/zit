@@ -2,23 +2,23 @@ package string_format_writer
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 func MakeBracketWrapped[T any](
-	sfw schnittstellen.StringFormatWriter[T],
-) schnittstellen.StringFormatWriter[T] {
+	sfw interfaces.StringFormatWriter[T],
+) interfaces.StringFormatWriter[T] {
 	return &bracketWrapped[T]{
 		stringFormatWriter: sfw,
 	}
 }
 
 type bracketWrapped[T any] struct {
-	stringFormatWriter schnittstellen.StringFormatWriter[T]
+	stringFormatWriter interfaces.StringFormatWriter[T]
 }
 
 func (f bracketWrapped[T]) WriteStringFormat(
-	w schnittstellen.WriterAndStringWriter,
+	w interfaces.WriterAndStringWriter,
 	e T,
 ) (n int64, err error) {
 	var (

@@ -2,14 +2,14 @@ package heap
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 )
 
 func MergeStream[T Element, TPtr ElementPtr[T]](
 	a *Heap[T, TPtr],
 	read func() (TPtr, error),
-	write schnittstellen.FuncIter[TPtr],
+	write interfaces.FuncIter[TPtr],
 ) (err error) {
 	if err = MergeStreamPreferringHeap(
 		a,
@@ -29,10 +29,10 @@ func MergeStream[T Element, TPtr ElementPtr[T]](
 func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 	h *Heap[T, TPtr],
 	r func() (TPtr, error),
-	w schnittstellen.FuncIter[TPtr],
-	equaler schnittstellen.Equaler1[TPtr],
-	l schnittstellen.Lessor3[TPtr],
-	re schnittstellen.Resetter2[T, TPtr],
+	w interfaces.FuncIter[TPtr],
+	equaler interfaces.Equaler1[TPtr],
+	l interfaces.Lessor3[TPtr],
+	re interfaces.Resetter2[T, TPtr],
 ) (err error) {
 	defer func() {
 		h.Restore()

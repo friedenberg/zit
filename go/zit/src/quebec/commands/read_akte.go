@@ -61,7 +61,7 @@ func (c ReadAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 func (ReadAkte) readOneAkte(u *umwelt.Umwelt, entry readAkteEntry) (sh *sha.Sha, err error) {
 	var aw sha.WriteCloser
 
-	if aw, err = u.Standort().AkteWriter(); err != nil {
+	if aw, err = u.Standort().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -5,14 +5,14 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"filippo.io/age"
 )
 
 type identity interface {
 	age.Identity
-	schnittstellen.Stringer
+	interfaces.Stringer
 }
 
 type Identity struct {

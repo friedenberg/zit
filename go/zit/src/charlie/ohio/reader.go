@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 func ReadAllOrDieTrying(r io.Reader, b []byte) (n int, err error) {
@@ -115,8 +115,8 @@ func ReadInt64(r io.Reader) (n int64, read int, err error) {
 }
 
 func MakeLineReaderIterateStrict(
-	rffs ...schnittstellen.FuncSetString,
-) schnittstellen.FuncSetString {
+	rffs ...interfaces.FuncSetString,
+) interfaces.FuncSetString {
 	si, _ := errors.MakeStackInfo(1)
 	var i int64
 
@@ -142,8 +142,8 @@ func MakeLineReaderIterateStrict(
 }
 
 func MakeLineReaderIterate(
-	rffs ...schnittstellen.FuncSetString,
-) schnittstellen.FuncSetString {
+	rffs ...interfaces.FuncSetString,
+) interfaces.FuncSetString {
 	si, _ := errors.MakeStackInfo(1)
 	var i int64
 
@@ -170,8 +170,8 @@ func MakeLineReaderIterate(
 }
 
 func MakeLineReaderKeyValues(
-	dict map[string]schnittstellen.FuncSetString,
-) schnittstellen.FuncSetString {
+	dict map[string]interfaces.FuncSetString,
+) interfaces.FuncSetString {
 	si, _ := errors.MakeStackInfo(1)
 
 	return func(line string) (err error) {
@@ -188,7 +188,7 @@ func MakeLineReaderKeyValues(
 		key := line[:loc]
 		value := line[loc+1:]
 
-		var reader schnittstellen.FuncSetString
+		var reader interfaces.FuncSetString
 		ok := false
 
 		if reader, ok = dict[key]; !ok {
@@ -207,8 +207,8 @@ func MakeLineReaderKeyValues(
 
 func MakeLineReaderKeyValue(
 	key string,
-	valueReader schnittstellen.FuncSetString,
-) schnittstellen.FuncSetString {
+	valueReader interfaces.FuncSetString,
+) interfaces.FuncSetString {
 	return func(line string) (err error) {
 		loc := strings.Index(line, " ")
 
@@ -241,8 +241,8 @@ func MakeLineReaderKeyValue(
 }
 
 func MakeLineReaderRepeat(
-	in schnittstellen.FuncSetString,
-) schnittstellen.FuncSetString {
+	in interfaces.FuncSetString,
+) interfaces.FuncSetString {
 	return func(line string) (err error) {
 		if err = in(line); err != nil {
 			err = errors.Wrap(&ErrExhaustedFuncSetStringersLine{
@@ -258,8 +258,8 @@ func MakeLineReaderRepeat(
 }
 
 func MakeLineReaderIgnoreErrors(
-	in schnittstellen.FuncSetString,
-) schnittstellen.FuncSetString {
+	in interfaces.FuncSetString,
+) interfaces.FuncSetString {
 	return func(line string) (err error) {
 		in(line)
 
@@ -267,7 +267,7 @@ func MakeLineReaderIgnoreErrors(
 	}
 }
 
-func MakeLineReaderNop() schnittstellen.FuncSetString {
+func MakeLineReaderNop() interfaces.FuncSetString {
 	return func(line string) (err error) {
 		return
 	}

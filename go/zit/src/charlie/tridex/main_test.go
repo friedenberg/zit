@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 )
 
@@ -22,31 +22,31 @@ func TestMain(m *testing.M) {
 
 type t test_logz.T
 
-func (t t) assertLen(sut schnittstellen.Tridex, d int) {
+func (t t) assertLen(sut interfaces.Tridex, d int) {
 	if sut.Len() != d {
 		t.Fatalf("expected count %d but got %d", d, sut.Len())
 	}
 }
 
-func (t t) assertNotContains(sut schnittstellen.Tridex, v string) {
+func (t t) assertNotContains(sut interfaces.Tridex, v string) {
 	if sut.ContainsAbbreviation(v) {
 		t.Fatalf("expected to not contain %q", v)
 	}
 }
 
-func (t t) assertContains(sut schnittstellen.Tridex, v string) {
+func (t t) assertContains(sut interfaces.Tridex, v string) {
 	if !sut.ContainsAbbreviation(v) {
 		t.Fatalf("expected to contain %q", v)
 	}
 }
 
-func (t t) assertContainsExpansion(sut schnittstellen.Tridex, v string) {
+func (t t) assertContainsExpansion(sut interfaces.Tridex, v string) {
 	if !sut.ContainsExpansion(v) {
 		t.Fatalf("expected to contain exactly %q", v)
 	}
 }
 
-func (t t) assertNotContainsExpansion(sut schnittstellen.Tridex, v string) {
+func (t t) assertNotContainsExpansion(sut interfaces.Tridex, v string) {
 	if sut.ContainsExpansion(v) {
 		t.Fatalf("expected not to contain exactly %q", v)
 	}
@@ -321,7 +321,7 @@ func TestExpand(t1 *testing.T) {
 
 func TestDoesNotContainPrefix(t1 *testing.T) {
 	t := t(test_logz.T{T: t1})
-	makeSut := func() schnittstellen.MutableTridex {
+	makeSut := func() interfaces.MutableTridex {
 		return Make(
 			"121",
 			"127",
@@ -341,7 +341,7 @@ func TestDoesNotContainPrefix(t1 *testing.T) {
 func TestRemove(t1 *testing.T) {
 	t := t(test_logz.T{T: t1})
 
-	makeSut := func() schnittstellen.MutableTridex {
+	makeSut := func() interfaces.MutableTridex {
 		return Make(
 			"12",
 			"121",

@@ -4,16 +4,16 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
 type savedAkteFormatter struct {
-	arf schnittstellen.AkteReaderFactory
+	arf interfaces.BlobReaderFactory
 }
 
 func MakeSavedAkteFormatter(
-	akteReaderFactory schnittstellen.AkteReaderFactory,
+	akteReaderFactory interfaces.BlobReaderFactory,
 ) savedAkteFormatter {
 	return savedAkteFormatter{
 		arf: akteReaderFactory,
@@ -22,11 +22,11 @@ func MakeSavedAkteFormatter(
 
 func (f savedAkteFormatter) FormatSavedAkte(
 	w io.Writer,
-	sh schnittstellen.ShaLike,
+	sh interfaces.ShaLike,
 ) (n int64, err error) {
 	var ar sha.ReadCloser
 
-	if ar, err = f.arf.AkteReader(sh); err != nil {
+	if ar, err = f.arf.BlobReader(sh); err != nil {
 		if errors.IsNotExist(err) {
 			err = nil
 		} else {

@@ -2,7 +2,7 @@ package konfig
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
@@ -199,7 +199,7 @@ func (k *Compiled) addImplicitEtiketten(
 
 func (k compiled) ApplyToNewMetadatei(
 	ml metadatei.MetadateiLike,
-	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
+	tagp interfaces.BlobGetterPutter[*typ_akte.V0],
 ) (err error) {
 	// m := ml.GetMetadatei()
 

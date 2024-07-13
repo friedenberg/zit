@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/alfred"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
@@ -16,13 +16,13 @@ import (
 type Writer struct {
 	alfredWriter *alfred.Writer
 	abbr         kennung.Abbr
-	organizeFmt  schnittstellen.StringFormatWriter[*sku.Transacted]
+	organizeFmt  interfaces.StringFormatWriter[*sku.Transacted]
 }
 
 func New(
 	out io.Writer,
 	abbr kennung.Abbr,
-	organizeFmt schnittstellen.StringFormatWriter[*sku.Transacted],
+	organizeFmt interfaces.StringFormatWriter[*sku.Transacted],
 ) (w *Writer, err error) {
 	var aw *alfred.Writer
 

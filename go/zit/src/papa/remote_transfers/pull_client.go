@@ -6,7 +6,7 @@ import (
 	"syscall"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
@@ -21,7 +21,7 @@ import (
 type PullClient interface {
 	SkusFromFilter(
 		*query.Group,
-		schnittstellen.FuncIter[*sku.Transacted],
+		interfaces.FuncIter[*sku.Transacted],
 	) error
 	PullSkus(*query.Group) error
 	Close() error
@@ -87,7 +87,7 @@ func (c client) Close() (err error) {
 
 func (c client) SkusFromFilter(
 	ids *query.Group,
-	f schnittstellen.FuncIter[*sku.Transacted],
+	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	var d remote_conn.Dialogue
 
@@ -155,7 +155,7 @@ func (c client) SkusFromFilter(
 
 func (c *client) makeAndProcessOneSkuWithFilter(
 	sk *sku.Transacted,
-	f schnittstellen.FuncIter[*sku.Transacted],
+	f interfaces.FuncIter[*sku.Transacted],
 	wg *sync.WaitGroup,
 	errMulti errors.Multi,
 ) {
@@ -184,8 +184,8 @@ func (c *client) makeAndProcessOneSkuWithFilter(
 }
 
 func (c *client) ObjekteReader(
-	g schnittstellen.GattungGetter,
-	sh schnittstellen.ShaGetter,
+	g interfaces.GattungGetter,
+	sh interfaces.ShaGetter,
 ) (rc sha.ReadCloser, err error) {
 	var d remote_conn.Dialogue
 
@@ -236,7 +236,7 @@ func (c client) AkteReader(
 
 	var ow sha.WriteCloser
 
-	if ow, err = c.umwelt.Standort().AkteWriter(); err != nil {
+	if ow, err = c.umwelt.Standort().BlobWriter(); err != nil {
 		if c.stage.ShouldIgnoreConnectionError(err) {
 			err = nil
 		} else {

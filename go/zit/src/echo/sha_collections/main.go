@@ -6,14 +6,14 @@ import (
 	"sort"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
 type (
-	Set        = schnittstellen.SetLike[*sha.Sha]
-	MutableSet = schnittstellen.MutableSetLike[*sha.Sha]
+	Set        = interfaces.SetLike[*sha.Sha]
+	MutableSet = interfaces.MutableSetLike[*sha.Sha]
 )
 
 func init() {
@@ -24,7 +24,7 @@ func MakeMutableSet(es ...*sha.Sha) (s MutableSet) {
 	return collections_value.MakeMutableValueSet(nil, es...)
 }
 
-func ShaFromSet(s schnittstellen.SetLike[sha.Sha]) *sha.Sha {
+func ShaFromSet(s interfaces.SetLike[sha.Sha]) *sha.Sha {
 	hash := sha256.New()
 
 	elements := make([]sha.Sha, 0, s.Len())

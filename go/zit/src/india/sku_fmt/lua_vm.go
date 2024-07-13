@@ -2,7 +2,7 @@ package sku_fmt
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -37,8 +37,8 @@ func PushTopFunc(
 }
 
 type (
-	LuaVMPool    schnittstellen.Pool[LuaVM, *LuaVM]
-	LuaTablePool = schnittstellen.Pool[LuaTable, *LuaTable]
+	LuaVMPool    interfaces.Pool[LuaVM, *LuaVM]
+	LuaTablePool = interfaces.Pool[LuaTable, *LuaTable]
 )
 
 func MakeLuaVMPool(lvp *lua.VMPool, selbst *sku.Transacted) LuaVMPool {

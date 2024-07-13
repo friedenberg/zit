@@ -7,12 +7,12 @@ import (
 	"syscall"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
 type Dialogue struct {
-	Angeboren schnittstellen.Angeboren
+	Angeboren interfaces.Angeboren
 	typ       DialogueType
 	conn      *net.UnixConn
 	stage     *stage
@@ -20,12 +20,12 @@ type Dialogue struct {
 	enc       *gob.Encoder
 }
 
-func (d Dialogue) GetAngeboren() schnittstellen.Angeboren {
+func (d Dialogue) GetAngeboren() interfaces.Angeboren {
 	return d.Angeboren
 }
 
 func makeDialogueListen(
-	a schnittstellen.AngeborenGetter,
+	a interfaces.AngeborenGetter,
 	s *stage,
 	l *net.UnixListener,
 ) (d Dialogue, msg MessageHiCommander, err error) {

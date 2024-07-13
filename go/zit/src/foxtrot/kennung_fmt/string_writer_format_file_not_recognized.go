@@ -2,20 +2,20 @@ package kennung_fmt
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 )
 
 type fileNotRecognizedStringWriterFormat struct {
-	rightAlignedWriter    schnittstellen.StringFormatWriter[string]
-	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike]
-	fdStringFormatWriter  schnittstellen.StringFormatWriter[*fd.FD]
+	rightAlignedWriter    interfaces.StringFormatWriter[string]
+	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike]
+	fdStringFormatWriter  interfaces.StringFormatWriter[*fd.FD]
 }
 
 func MakeFileNotRecognizedStringWriterFormat(
-	fdStringFormatWriter schnittstellen.StringFormatWriter[*fd.FD],
-	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],
+	fdStringFormatWriter interfaces.StringFormatWriter[*fd.FD],
+	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
 ) *fileNotRecognizedStringWriterFormat {
 	return &fileNotRecognizedStringWriterFormat{
 		rightAlignedWriter:    string_format_writer.MakeRightAligned(),
@@ -25,7 +25,7 @@ func MakeFileNotRecognizedStringWriterFormat(
 }
 
 func (f *fileNotRecognizedStringWriterFormat) WriteStringFormat(
-	sw schnittstellen.WriterAndStringWriter,
+	sw interfaces.WriterAndStringWriter,
 	fd *fd.FD,
 ) (n int64, err error) {
 	var (

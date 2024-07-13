@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/angeboren"
@@ -27,7 +27,7 @@ type Standort struct {
 	store_fs  string
 	basePath  string
 	execPath  string
-	lockSmith schnittstellen.LockSmith
+	lockSmith interfaces.LockSmith
 	age       *age.Age
 	angeboren angeboren.Konfig
 	debug     debug.Options
@@ -151,7 +151,7 @@ func (s *Standort) loadKonfigAngeboren() (err error) {
 	return
 }
 
-func (s Standort) GetLockSmith() schnittstellen.LockSmith {
+func (s Standort) GetLockSmith() interfaces.LockSmith {
 	return s.lockSmith
 }
 

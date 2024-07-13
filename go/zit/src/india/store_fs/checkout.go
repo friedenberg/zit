@@ -6,7 +6,7 @@ import (
 	"path"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
@@ -308,7 +308,7 @@ func (s *Store) PathForTransacted(dir string, tl *sku.Transacted) string {
 }
 
 func (s *Store) FileExtensionForGattung(
-	gg schnittstellen.GattungGetter,
+	gg interfaces.GattungGetter,
 ) string {
 	return s.fileExtensions.GetFileExtensionForGattung(gg)
 }

@@ -4,12 +4,12 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 type ErrorWaitGroup interface {
-	Do(schnittstellen.FuncError) bool
-	DoAfter(schnittstellen.FuncError)
+	Do(interfaces.FuncError) bool
+	DoAfter(interfaces.FuncError)
 	GetError() error
 }
 
@@ -18,7 +18,7 @@ func MakeErrorWaitGroupParallel() ErrorWaitGroup {
 		lock:    &sync.Mutex{},
 		inner:   &sync.WaitGroup{},
 		err:     errors.MakeMulti(),
-		doAfter: make([]schnittstellen.FuncError, 0),
+		doAfter: make([]interfaces.FuncError, 0),
 	}
 
 	return wg
@@ -28,7 +28,7 @@ type errorWaitGroupParallel struct {
 	lock    *sync.Mutex
 	inner   *sync.WaitGroup
 	err     errors.Multi
-	doAfter []schnittstellen.FuncError
+	doAfter []interfaces.FuncError
 
 	isDone bool
 }
@@ -53,8 +53,8 @@ func (wg *errorWaitGroupParallel) GetError() (err error) {
 
 func ErrorWaitGroupApply[T any](
 	wg ErrorWaitGroup,
-	s schnittstellen.SetLike[T],
-	f schnittstellen.FuncIter[T],
+	s interfaces.SetLike[T],
+	f interfaces.FuncIter[T],
 ) (d bool) {
 	if err := s.Each(
 		func(e T) (err error) {
@@ -75,7 +75,7 @@ func ErrorWaitGroupApply[T any](
 	return
 }
 
-func (wg *errorWaitGroupParallel) Do(f schnittstellen.FuncError) (d bool) {
+func (wg *errorWaitGroupParallel) Do(f interfaces.FuncError) (d bool) {
 	wg.lock.Lock()
 
 	if wg.isDone {
@@ -96,7 +96,7 @@ func (wg *errorWaitGroupParallel) Do(f schnittstellen.FuncError) (d bool) {
 	return true
 }
 
-func (wg *errorWaitGroupParallel) DoAfter(f schnittstellen.FuncError) {
+func (wg *errorWaitGroupParallel) DoAfter(f interfaces.FuncError) {
 	wg.lock.Lock()
 	defer wg.lock.Unlock()
 

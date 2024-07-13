@@ -4,12 +4,12 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 type akteFormat[
-	O schnittstellen.Akte[O],
-	OPtr schnittstellen.AktePtr[O],
+	O interfaces.Blob[O],
+	OPtr interfaces.BlobPtr[O],
 ] struct {
 	Parser[O, OPtr]
 	ParseSaver[O, OPtr]
@@ -18,12 +18,12 @@ type akteFormat[
 }
 
 func MakeAkteFormat[
-	O schnittstellen.Akte[O],
-	OPtr schnittstellen.AktePtr[O],
+	O interfaces.Blob[O],
+	OPtr interfaces.BlobPtr[O],
 ](
 	akteParser Parser[O, OPtr],
 	parsedAkteFormatter ParsedAkteFormatter[O, OPtr],
-	arf schnittstellen.AkteReaderFactory,
+	arf interfaces.BlobReaderFactory,
 ) Format[O, OPtr] {
 	return akteFormat[O, OPtr]{
 		Parser:              akteParser,

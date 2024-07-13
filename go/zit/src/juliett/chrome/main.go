@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/chrest/go/chrest"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
@@ -26,7 +26,7 @@ import (
 
 type transacted struct {
 	sync.Mutex
-	schnittstellen.MutableSetLike[*kennung.Kennung2]
+	interfaces.MutableSetLike[*kennung.Kennung2]
 }
 
 type Store struct {
@@ -48,13 +48,13 @@ type Store struct {
 	transactedUrlIndex   map[url.URL]sku.TransactedMutableSet
 	transactedTabIdIndex map[float64]*sku.Transacted
 
-	itemDeletedStringFormatWriter schnittstellen.FuncIter[*CheckedOut]
+	itemDeletedStringFormatWriter interfaces.FuncIter[*CheckedOut]
 }
 
 func MakeChrome(
 	k *konfig.Compiled,
 	s standort.Standort,
-	itemDeletedStringFormatWriter schnittstellen.FuncIter[*CheckedOut],
+	itemDeletedStringFormatWriter interfaces.FuncIter[*CheckedOut],
 ) *Store {
 	c := &Store{
 		konfig:  k,
@@ -78,7 +78,7 @@ func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
 	return fs
 }
 
-func (c *Store) GetExternalKennung() (ks schnittstellen.SetLike[*kennung.Kennung2], err error) {
+func (c *Store) GetExternalKennung() (ks interfaces.SetLike[*kennung.Kennung2], err error) {
 	ksm := collections_value.MakeMutableValueSet[*kennung.Kennung2](nil)
 	ks = ksm
 
@@ -153,7 +153,7 @@ func (s *Store) Flush() (err error) {
 func (c *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 	var r sha.ReadCloser
 
-	if r, err = c.externalStoreInfo.AkteReader(sk.GetAkteSha()); err != nil {
+	if r, err = c.externalStoreInfo.BlobReader(sk.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -215,7 +215,7 @@ func (c *Store) CheckoutOne(
 
 func (c *Store) QueryCheckedOut(
 	qg *query.Group,
-	f schnittstellen.FuncIter[sku.CheckedOutLike],
+	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	// o := sku.ObjekteOptions{
 	// 	Mode: objekte_mode.ModeRealizeSansProto,
@@ -288,7 +288,7 @@ func (c *Store) QueryCheckedOut(
 
 func (c *Store) QueryUnsure(
 	qg *query.Group,
-	f schnittstellen.FuncIter[sku.CheckedOutLike],
+	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	// o := sku.ObjekteOptions{
 	// 	Mode: objekte_mode.ModeRealizeSansProto,
@@ -352,7 +352,7 @@ func (c *Store) tryToEmitOneExplicitlyCheckedOut(
 	internal *sku.Transacted,
 	co *CheckedOut,
 	item item,
-	f schnittstellen.FuncIter[sku.CheckedOutLike],
+	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	sku.TransactedResetter.Reset(&co.External.browser)
 	co.External.browser.Kennung.SetGattung(gattung.Zettel)
@@ -400,7 +400,7 @@ func (c *Store) tryToEmitOneRecognized(
 	internal *sku.Transacted,
 	co *CheckedOut,
 	item item,
-	f schnittstellen.FuncIter[sku.CheckedOutLike],
+	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	if !qg.IncludeRecognized {
 		return
@@ -433,7 +433,7 @@ func (c *Store) tryToEmitOneUntracked(
 	qg *query.Group,
 	co *CheckedOut,
 	item item,
-	f schnittstellen.FuncIter[sku.CheckedOutLike],
+	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	if qg.ExcludeUntracked {
 		return
@@ -466,7 +466,7 @@ func (c *Store) tryToEmitOneCommon(
 	co *CheckedOut,
 	i item,
 	overwrite bool,
-	f schnittstellen.FuncIter[sku.CheckedOutLike],
+	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	browser := &co.External.browser
 

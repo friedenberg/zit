@@ -2,7 +2,7 @@ package store_fs
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/vim_cli_options_builder"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
@@ -11,7 +11,7 @@ import (
 
 func (s *Store) Open(
 	m checkout_mode.Mode,
-	ph schnittstellen.FuncIter[string],
+	ph interfaces.FuncIter[string],
 	zsc sku.CheckedOutLikeSet,
 ) (err error) {
 	wg := iter.MakeErrorWaitGroupParallel()
@@ -37,7 +37,7 @@ func (s *Store) Open(
 }
 
 func (s *Store) openZettelen(
-	ph schnittstellen.FuncIter[string],
+	ph interfaces.FuncIter[string],
 	zsc sku.CheckedOutLikeSet,
 ) (err error) {
 	var filesZettelen []string
@@ -64,7 +64,7 @@ func (s *Store) openZettelen(
 }
 
 func (s *Store) openAkten(
-	ph schnittstellen.FuncIter[string],
+	ph interfaces.FuncIter[string],
 	zsc sku.CheckedOutLikeSet,
 ) (err error) {
 	var filesAkten []string

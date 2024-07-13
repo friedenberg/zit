@@ -2,12 +2,12 @@ package string_format_writer
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 func MakeIndentedHeader(
 	o ColorOptions,
-) schnittstellen.StringFormatWriter[string] {
+) interfaces.StringFormatWriter[string] {
 	return &indentedHeader{
 		stringFormatWriter: MakeColor[string](
 			o,
@@ -18,11 +18,11 @@ func MakeIndentedHeader(
 }
 
 type indentedHeader struct {
-	stringFormatWriter schnittstellen.StringFormatWriter[string]
+	stringFormatWriter interfaces.StringFormatWriter[string]
 }
 
 func (f indentedHeader) WriteStringFormat(
-	w schnittstellen.WriterAndStringWriter,
+	w interfaces.WriterAndStringWriter,
 	v string,
 ) (n int64, err error) {
 	// n1 int

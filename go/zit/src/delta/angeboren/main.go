@@ -4,7 +4,7 @@ import (
 	"encoding/gob"
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 )
 
@@ -34,7 +34,7 @@ func Default() Konfig {
 	}
 }
 
-func (k Konfig) GetStoreVersion() schnittstellen.StoreVersion {
+func (k Konfig) GetStoreVersion() interfaces.StoreVersion {
 	return k.StoreVersion
 }
 

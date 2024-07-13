@@ -1,7 +1,7 @@
 package akten
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/etikett_akte"
 	"code.linenisgreat.com/zit/go/zit/src/delta/typ_akte"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kasten_akte"
@@ -10,12 +10,12 @@ import (
 )
 
 type Store[
-	A schnittstellen.Akte[A],
-	APtr schnittstellen.AktePtr[A],
+	A interfaces.Blob[A],
+	APtr interfaces.BlobPtr[A],
 ] interface {
-	SaveAkteText(APtr) (schnittstellen.ShaLike, int64, error)
+	SaveAkteText(APtr) (interfaces.ShaLike, int64, error)
 	Format[A, APtr]
-	schnittstellen.AkteGetterPutter[APtr]
+	interfaces.BlobGetterPutter[APtr]
 }
 
 type Akten struct {

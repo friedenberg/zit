@@ -5,11 +5,11 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 func SortedValuesBy[E any](
-	c schnittstellen.SetLike[E],
+	c interfaces.SetLike[E],
 	sf func(E, E) bool,
 ) (out []E) {
 	out = Elements(c)
@@ -19,8 +19,8 @@ func SortedValuesBy[E any](
 	return
 }
 
-func SortedValues[E schnittstellen.Value[E]](
-	c schnittstellen.SetLike[E],
+func SortedValues[E interfaces.Value[E]](
+	c interfaces.SetLike[E],
 ) (out []E) {
 	out = Elements(c)
 
@@ -32,8 +32,8 @@ func SortedValues[E schnittstellen.Value[E]](
 	return
 }
 
-func Strings[E schnittstellen.Stringer](
-	cs ...schnittstellen.SetLike[E],
+func Strings[E interfaces.Stringer](
+	cs ...interfaces.SetLike[E],
 ) (out []string) {
 	l := 0
 
@@ -65,8 +65,8 @@ func Strings[E schnittstellen.Stringer](
 	return
 }
 
-func SortedStrings[E schnittstellen.Stringer](
-	cs ...schnittstellen.SetLike[E],
+func SortedStrings[E interfaces.Stringer](
+	cs ...interfaces.SetLike[E],
 ) (out []string) {
 	out = Strings(cs...)
 
@@ -75,9 +75,9 @@ func SortedStrings[E schnittstellen.Stringer](
 	return
 }
 
-func StringDelimiterSeparated[E schnittstellen.Stringer](
+func StringDelimiterSeparated[E interfaces.Stringer](
 	d string,
-	cs ...schnittstellen.SetLike[E],
+	cs ...interfaces.SetLike[E],
 ) string {
 	if cs == nil {
 		return ""
@@ -105,8 +105,8 @@ func StringDelimiterSeparated[E schnittstellen.Stringer](
 	return sb.String()
 }
 
-func StringCommaSeparated[E schnittstellen.Stringer](
-	cs ...schnittstellen.SetLike[E],
+func StringCommaSeparated[E interfaces.Stringer](
+	cs ...interfaces.SetLike[E],
 ) string {
 	return StringDelimiterSeparated(", ", cs...)
 }

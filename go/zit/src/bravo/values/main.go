@@ -1,10 +1,10 @@
 package values
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
-func Equals[T schnittstellen.Equatable[T]](a T, b any) bool {
+func Equals[T interfaces.Equatable[T]](a T, b any) bool {
 	{
 		b1, ok := b.(T)
 
@@ -16,7 +16,7 @@ func Equals[T schnittstellen.Equatable[T]](a T, b any) bool {
 	return false
 }
 
-func EqualsPtr[T schnittstellen.Equatable[T], TPtr schnittstellen.Ptr[T]](
+func EqualsPtr[T interfaces.Equatable[T], TPtr interfaces.Ptr[T]](
 	a T,
 	b any,
 ) bool {

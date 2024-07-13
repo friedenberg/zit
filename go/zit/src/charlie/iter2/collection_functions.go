@@ -2,13 +2,13 @@ package iter2
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 )
 
-func AddPtrOrReplaceIfGreater[T any, TPtr schnittstellen.Ptr[T]](
-	c schnittstellen.MutableSetPtrLike[T, TPtr],
-	l schnittstellen.Lessor2[T, TPtr],
+func AddPtrOrReplaceIfGreater[T any, TPtr interfaces.Ptr[T]](
+	c interfaces.MutableSetPtrLike[T, TPtr],
+	l interfaces.Lessor2[T, TPtr],
 	b TPtr,
 ) (err error) {
 	a, ok := c.GetPtr(c.KeyPtr(b))
@@ -21,8 +21,8 @@ func AddPtrOrReplaceIfGreater[T any, TPtr schnittstellen.Ptr[T]](
 }
 
 func Parallel[T any](
-	c schnittstellen.SetLike[T],
-	f schnittstellen.FuncIter[T],
+	c interfaces.SetLike[T],
+	f interfaces.FuncIter[T],
 ) (err error) {
 	eg := iter.MakeErrorWaitGroupParallel()
 

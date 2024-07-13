@@ -4,21 +4,21 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
 type nopAkteParseSaver[
-	O schnittstellen.Akte[O],
-	OPtr schnittstellen.AktePtr[O],
+	O interfaces.Blob[O],
+	OPtr interfaces.BlobPtr[O],
 ] struct {
-	awf schnittstellen.AkteWriterFactory
+	awf interfaces.BlobWriterFactory
 }
 
 func MakeNopAkteParseSaver[
-	O schnittstellen.Akte[O],
-	OPtr schnittstellen.AktePtr[O],
-](awf schnittstellen.AkteWriterFactory,
+	O interfaces.Blob[O],
+	OPtr interfaces.BlobPtr[O],
+](awf interfaces.BlobWriterFactory,
 ) nopAkteParseSaver[O, OPtr] {
 	return nopAkteParseSaver[O, OPtr]{
 		awf: awf,
@@ -31,7 +31,7 @@ func (f nopAkteParseSaver[O, OPtr]) ParseAkte(
 ) (n int64, err error) {
 	var aw sha.WriteCloser
 
-	if aw, err = f.awf.AkteWriter(); err != nil {
+	if aw, err = f.awf.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

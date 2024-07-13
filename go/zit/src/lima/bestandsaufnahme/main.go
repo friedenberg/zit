@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
@@ -34,15 +34,15 @@ type Store interface {
 		bezeichnung.Bezeichnung,
 	) (*sku.Transacted, error)
 	ReadLast() (*sku.Transacted, error)
-	ReadOne(schnittstellen.Stringer) (*sku.Transacted, error)
+	ReadOne(interfaces.Stringer) (*sku.Transacted, error)
 	ReadOneSku(besty, sk *sha.Sha) (*sku.Transacted, error)
-	ReadAll(schnittstellen.FuncIter[*sku.Transacted]) error
+	ReadAll(interfaces.FuncIter[*sku.Transacted]) error
 	ReadAllSkus(func(besty, sk *sku.Transacted) error) error
-	schnittstellen.AkteGetter[*Akte]
+	interfaces.BlobGetter[*Akte]
 
 	StreamAkte(
-		schnittstellen.ShaLike,
-		schnittstellen.FuncIter[*sku.Transacted],
+		interfaces.ShaLike,
+		interfaces.FuncIter[*sku.Transacted],
 	) error
 }
 
@@ -58,12 +58,12 @@ type akteFormat interface {
 
 type store struct {
 	standort                  standort.Standort
-	ls                        schnittstellen.LockSmith
-	sv                        schnittstellen.StoreVersion
-	of                        schnittstellen.ObjekteIOFactory
-	af                        schnittstellen.AkteIOFactory
+	ls                        interfaces.LockSmith
+	sv                        interfaces.StoreVersion
+	of                        interfaces.ObjekteIOFactory
+	af                        interfaces.BlobIOFactory
 	clock                     kennung.Clock
-	pool                      schnittstellen.Pool[Akte, *Akte]
+	pool                      interfaces.Pool[Akte, *Akte]
 	persistentMetadateiFormat objekte_format.Format
 	options                   objekte_format.Options
 	formatAkte                akteFormat
@@ -71,10 +71,10 @@ type store struct {
 
 func MakeStore(
 	standort standort.Standort,
-	ls schnittstellen.LockSmith,
-	sv schnittstellen.StoreVersion,
-	of schnittstellen.ObjekteIOFactory,
-	af schnittstellen.AkteIOFactory,
+	ls interfaces.LockSmith,
+	sv interfaces.StoreVersion,
+	of interfaces.ObjekteIOFactory,
+	af interfaces.BlobIOFactory,
 	pmf objekte_format.Format,
 	clock kennung.Clock,
 ) (s *store, err error) {
@@ -180,7 +180,7 @@ func (s *store) Create(
 func (s *store) writeAkte(o *Akte) (sh *sha.Sha, err error) {
 	var sw sha.WriteCloser
 
-	if sw, err = s.standort.AkteWriter(); err != nil {
+	if sw, err = s.standort.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -266,9 +266,9 @@ func (s *store) ReadOneSku(besty, sh *sha.Sha) (o *sku.Transacted, err error) {
 		return
 	}
 
-	var ar schnittstellen.ShaReadCloser
+	var ar interfaces.ShaReadCloser
 
-	if ar, err = s.af.AkteReader(&bestySku.Metadatei.Akte); err != nil {
+	if ar, err = s.af.BlobReader(&bestySku.Metadatei.Akte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -302,7 +302,7 @@ func (s *store) ReadOneSku(besty, sh *sha.Sha) (o *sku.Transacted, err error) {
 }
 
 func (s *store) ReadOne(
-	k schnittstellen.Stringer,
+	k interfaces.Stringer,
 ) (o *sku.Transacted, err error) {
 	var sh sha.Sha
 
@@ -350,10 +350,10 @@ func (s *store) readOneFromReader(
 	return
 }
 
-func (s *store) populateAkte(akteSha schnittstellen.ShaLike, a *Akte) (err error) {
-	var ar schnittstellen.ShaReadCloser
+func (s *store) populateAkte(akteSha interfaces.ShaLike, a *Akte) (err error) {
+	var ar interfaces.ShaReadCloser
 
-	if ar, err = s.af.AkteReader(akteSha); err != nil {
+	if ar, err = s.af.BlobReader(akteSha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -382,12 +382,12 @@ func (s *store) populateAkte(akteSha schnittstellen.ShaLike, a *Akte) (err error
 }
 
 func (s *store) StreamAkte(
-	akteSha schnittstellen.ShaLike,
-	f schnittstellen.FuncIter[*sku.Transacted],
+	akteSha interfaces.ShaLike,
+	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	var ar schnittstellen.ShaReadCloser
+	var ar interfaces.ShaReadCloser
 
-	if ar, err = s.af.AkteReader(akteSha); err != nil {
+	if ar, err = s.af.BlobReader(akteSha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -417,7 +417,7 @@ func (s *store) StreamAkte(
 	return
 }
 
-func (s *store) GetAkte(akteSha schnittstellen.ShaLike) (a *Akte, err error) {
+func (s *store) GetBlob(akteSha interfaces.ShaLike) (a *Akte, err error) {
 	a = MakeAkte()
 	err = s.populateAkte(akteSha, a)
 	return
@@ -460,7 +460,7 @@ func (s *store) ReadLast() (max *sku.Transacted, err error) {
 }
 
 func (s *store) ReadAll(
-	f schnittstellen.FuncIter[*sku.Transacted],
+	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	var p string
 
@@ -498,7 +498,7 @@ func (s *store) ReadAll(
 }
 
 func (s *store) ReadAllSorted(
-	f schnittstellen.FuncIter[*sku.Transacted],
+	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	var skus []*sku.Transacted
 

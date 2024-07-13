@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
@@ -81,7 +81,7 @@ func (umm UnsureMatchMaps) Len() int {
 
 func MakeUnsureMatchMapsCollector(
 	umm UnsureMatchMaps,
-) schnittstellen.FuncIter[CheckedOutLike] {
+) interfaces.FuncIter[CheckedOutLike] {
 	var l sync.Mutex
 
 	return func(col CheckedOutLike) (err error) {
@@ -127,7 +127,7 @@ func MakeUnsureMatchMapsCollector(
 func MakeUnsureMatchMapsMatcher(
 	umm UnsureMatchMaps,
 	f IterMatching,
-) schnittstellen.FuncIter[*Transacted] {
+) interfaces.FuncIter[*Transacted] {
 	return func(sk *Transacted) (err error) {
 		for t, v := range umm.Lookup {
 			var k sha.Bytes

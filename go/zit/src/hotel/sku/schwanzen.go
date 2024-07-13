@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/golf/kennung_index"
@@ -14,12 +14,12 @@ type Schwanzen struct {
 	lock         sync.RWMutex
 	hinweisen    map[string]*Transacted
 	etikettIndex kennung_index.EtikettIndexMutation
-	funcFlush    schnittstellen.FuncIter[*Transacted]
+	funcFlush    interfaces.FuncIter[*Transacted]
 }
 
 func MakeSchwanzen(
 	ei kennung_index.EtikettIndexMutation,
-	funcFlush schnittstellen.FuncIter[*Transacted],
+	funcFlush interfaces.FuncIter[*Transacted],
 ) (s *Schwanzen) {
 	s = &Schwanzen{}
 	s.Initialize(ei, funcFlush)
@@ -28,7 +28,7 @@ func MakeSchwanzen(
 
 func (s *Schwanzen) Initialize(
 	ei kennung_index.EtikettIndexMutation,
-	funcFlush schnittstellen.FuncIter[*Transacted],
+	funcFlush interfaces.FuncIter[*Transacted],
 ) {
 	s.hinweisen = make(map[string]*Transacted)
 	s.etikettIndex = ei

@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -20,12 +20,12 @@ type FileEncoder interface {
 type fileEncoder struct {
 	mode int
 	perm os.FileMode
-	arf  schnittstellen.AkteIOFactory
+	arf  interfaces.BlobIOFactory
 	ic   kennung.InlineTypChecker
 }
 
 func MakeFileEncoder(
-	arf schnittstellen.AkteIOFactory,
+	arf interfaces.BlobIOFactory,
 	ic kennung.InlineTypChecker,
 ) *fileEncoder {
 	return &fileEncoder{
@@ -37,7 +37,7 @@ func MakeFileEncoder(
 }
 
 func MakeFileEncoderJustOpen(
-	arf schnittstellen.AkteIOFactory,
+	arf interfaces.BlobIOFactory,
 	ic kennung.InlineTypChecker,
 ) fileEncoder {
 	return fileEncoder{
@@ -79,7 +79,7 @@ func (e *fileEncoder) EncodeObjekte(
 
 	var ar sha.ReadCloser
 
-	if ar, err = e.arf.AkteReader(z.GetAkteSha()); err != nil {
+	if ar, err = e.arf.BlobReader(z.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -103,7 +103,7 @@ func (e *fileEncoder) EncodeObjekte(
 				if errors.IsExist(err) {
 					var aw sha.WriteCloser
 
-					if aw, err = e.arf.AkteWriter(); err != nil {
+					if aw, err = e.arf.BlobWriter(); err != nil {
 						err = errors.Wrap(err)
 						return
 					}

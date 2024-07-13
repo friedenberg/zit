@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -105,7 +105,7 @@ func (a *Query) Merge(b *Query) (err error) {
 	return
 }
 
-func (q *Query) Each(_ schnittstellen.FuncIter[sku.Query]) (err error) {
+func (q *Query) Each(_ interfaces.FuncIter[sku.Query]) (err error) {
 	return
 }
 

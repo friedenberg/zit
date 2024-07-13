@@ -5,14 +5,14 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 )
 
 type Option interface {
 	GetOption() Option
-	schnittstellen.Stringer
+	interfaces.Stringer
 	ApplyToText(Options, *Assignment) error
 	ApplyToReader(Options, *assignmentLineReader) error
 	ApplyToWriter(Options, *assignmentLineWriter) error

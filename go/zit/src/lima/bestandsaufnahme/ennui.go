@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
@@ -139,7 +139,7 @@ func (s *ennuiStore) makeWriteMetadateiFunc(
 	fo objekte_format.FormatGeneric,
 	o *sku.Transacted,
 	expected *sha.Sha,
-) schnittstellen.FuncError {
+) interfaces.FuncError {
 	return func() (err error) {
 		var sw sha.WriteCloser
 

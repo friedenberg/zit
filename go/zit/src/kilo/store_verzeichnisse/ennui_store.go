@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
@@ -88,7 +88,7 @@ func (s *ennuiStore) ReadOneEnnui(sh *sha.Sha) (sk *sku.Transacted, err error) {
 }
 
 func (s *ennuiStore) ReadOneKennungSha(
-	k schnittstellen.StringerGattungGetter,
+	k interfaces.StringerGattungGetter,
 ) (sh *sha.Sha, err error) {
 	left := sha.FromString(k.String())
 	defer sha.GetPool().Put(left)
@@ -102,7 +102,7 @@ func (s *ennuiStore) ReadOneKennungSha(
 }
 
 func (s *ennuiStore) ReadOneKennung(
-	k schnittstellen.StringerGattungGetter,
+	k interfaces.StringerGattungGetter,
 ) (sk *sku.Transacted, err error) {
 	sh, err := s.ReadOneKennungSha(k)
 	defer sha.GetPool().Put(sh)
@@ -135,7 +135,7 @@ func (s *ennuiStore) makeWriteMetadateiFunc(
 	fo objekte_format.FormatGeneric,
 	o *sku.Transacted,
 	expected *sha.Sha,
-) schnittstellen.FuncError {
+) interfaces.FuncError {
 	return func() (err error) {
 		var sw sha.WriteCloser
 

@@ -2,20 +2,20 @@ package pool
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
-func MakeWriterDoNotRepool[T any]() schnittstellen.FuncIter[*T] {
+func MakeWriterDoNotRepool[T any]() interfaces.FuncIter[*T] {
 	return func(e *T) (err error) {
 		err = ErrDoNotRepool
 		return
 	}
 }
 
-func MakePooledChain[T schnittstellen.Poolable[T], TPtr schnittstellen.PoolablePtr[T]](
-	p schnittstellen.Pool[T, TPtr],
-	wfs ...schnittstellen.FuncIter[TPtr],
-) schnittstellen.FuncIter[TPtr] {
+func MakePooledChain[T interfaces.Poolable[T], TPtr interfaces.PoolablePtr[T]](
+	p interfaces.Pool[T, TPtr],
+	wfs ...interfaces.FuncIter[TPtr],
+) interfaces.FuncIter[TPtr] {
 	return func(e TPtr) (err error) {
 		for _, w := range wfs {
 			err = w(e)

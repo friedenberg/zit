@@ -9,7 +9,7 @@ import (
 	tyme "time"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
@@ -74,7 +74,7 @@ func (t *Time) MoveForwardIota() {
 // 	return t.time.Local().Format(f)
 // }
 
-func (t Time) GetGattung() schnittstellen.GattungLike {
+func (t Time) GetGattung() interfaces.GattungLike {
 	return gattung.Unknown
 }
 

@@ -1,13 +1,13 @@
 package zettel
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 )
 
 type Objekte struct{}
 
-func (z Objekte) GetGattung() schnittstellen.GattungLike {
+func (z Objekte) GetGattung() interfaces.GattungLike {
 	return gattung.Zettel
 }
 

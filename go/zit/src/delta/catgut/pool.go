@@ -3,19 +3,19 @@ package catgut
 import (
 	"sync"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 )
 
 var (
-	p     schnittstellen.Pool[String, *String]
+	p     interfaces.Pool[String, *String]
 	ponce sync.Once
 )
 
 func init() {
 }
 
-func GetPool() schnittstellen.Pool[String, *String] {
+func GetPool() interfaces.Pool[String, *String] {
 	ponce.Do(
 		func() {
 			p = pool.MakePool[String, *String](

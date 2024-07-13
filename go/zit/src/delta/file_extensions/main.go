@@ -1,7 +1,7 @@
 package file_extensions
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 )
 
@@ -14,7 +14,7 @@ type FileExtensions struct {
 }
 
 func (a FileExtensions) GetFileExtensionForGattung(
-	g1 schnittstellen.GattungGetter,
+	g1 interfaces.GattungGetter,
 ) string {
 	g := gattung.Must(g1)
 

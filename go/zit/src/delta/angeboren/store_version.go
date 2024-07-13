@@ -1,13 +1,13 @@
 package angeboren
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 )
 
 type storeVersion values.Int
 
-func (a storeVersion) Less(b schnittstellen.StoreVersion) bool {
+func (a storeVersion) Less(b interfaces.StoreVersion) bool {
 	return a.String() < b.String()
 }
 

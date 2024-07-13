@@ -3,7 +3,7 @@ package tridex
 import (
 	"strings"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 func (n *node) Add(v string) {
@@ -216,7 +216,7 @@ func (a *node) Copy() (b node) {
 	return
 }
 
-func (n *node) Each(f schnittstellen.FuncIter[string], acc string) (err error) {
+func (n *node) Each(f interfaces.FuncIter[string], acc string) (err error) {
 	if n.Value != "" {
 		if err = f(acc + n.Value); err != nil {
 			return

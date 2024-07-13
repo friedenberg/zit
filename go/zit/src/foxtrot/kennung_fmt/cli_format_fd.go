@@ -2,18 +2,18 @@ package kennung_fmt
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 )
 
 type fdCliFormat struct {
-	stringFormatWriter schnittstellen.StringFormatWriter[string]
+	stringFormatWriter interfaces.StringFormatWriter[string]
 }
 
 func MakeFDCliFormat(
 	co string_format_writer.ColorOptions,
-	relativePathStringFormatWriter schnittstellen.StringFormatWriter[string],
+	relativePathStringFormatWriter interfaces.StringFormatWriter[string],
 ) *fdCliFormat {
 	return &fdCliFormat{
 		stringFormatWriter: string_format_writer.MakeColor[string](
@@ -25,7 +25,7 @@ func MakeFDCliFormat(
 }
 
 func (f *fdCliFormat) WriteStringFormat(
-	w schnittstellen.WriterAndStringWriter,
+	w interfaces.WriterAndStringWriter,
 	k *fd.FD,
 ) (n int64, err error) {
 	// TODO-P2 add abbreviation

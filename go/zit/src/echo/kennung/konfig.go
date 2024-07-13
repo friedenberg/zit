@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 )
@@ -34,7 +34,7 @@ func ErrOnKonfig(v string) (err error) {
 
 type Konfig struct{}
 
-func (a Konfig) GetGattung() schnittstellen.GattungLike {
+func (a Konfig) GetGattung() interfaces.GattungLike {
 	return gattung.Konfig
 }
 

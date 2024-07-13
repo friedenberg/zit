@@ -2,15 +2,15 @@ package iter
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 func AddClone[E any, EPtr interface {
 	*E
 	ResetWithPtr(*E)
 }](
-	c schnittstellen.Adder[EPtr],
-) schnittstellen.FuncIter[EPtr] {
+	c interfaces.Adder[EPtr],
+) interfaces.FuncIter[EPtr] {
 	return func(e EPtr) (err error) {
 		var e1 E
 		EPtr(&e1).ResetWithPtr((*E)(e))
@@ -19,10 +19,10 @@ func AddClone[E any, EPtr interface {
 	}
 }
 
-func AddClonePool[E any, EPtr schnittstellen.Ptr[E]](
-	s schnittstellen.AdderPtr[E, EPtr],
-	p schnittstellen.Pool[E, EPtr],
-	r schnittstellen.Resetter2[E, EPtr],
+func AddClonePool[E any, EPtr interfaces.Ptr[E]](
+	s interfaces.AdderPtr[E, EPtr],
+	p interfaces.Pool[E, EPtr],
+	r interfaces.Resetter2[E, EPtr],
 	b EPtr,
 ) (err error) {
 	a := p.Get()
@@ -30,18 +30,18 @@ func AddClonePool[E any, EPtr schnittstellen.Ptr[E]](
 	return s.AddPtr(a)
 }
 
-func MakeAddClonePoolFunc[E any, EPtr schnittstellen.Ptr[E]](
-	s schnittstellen.AdderPtr[E, EPtr],
-	p schnittstellen.Pool[E, EPtr],
-	r schnittstellen.Resetter2[E, EPtr],
-) schnittstellen.FuncIter[EPtr] {
+func MakeAddClonePoolFunc[E any, EPtr interfaces.Ptr[E]](
+	s interfaces.AdderPtr[E, EPtr],
+	p interfaces.Pool[E, EPtr],
+	r interfaces.Resetter2[E, EPtr],
+) interfaces.FuncIter[EPtr] {
 	return MakeSyncSerializer(func(e EPtr) (err error) {
 		return AddClonePool(s, p, r, e)
 	})
 }
 
-func ExpandAndAddString[E any, EPtr schnittstellen.SetterPtr[E]](
-	c schnittstellen.Adder[E],
+func ExpandAndAddString[E any, EPtr interfaces.SetterPtr[E]](
+	c interfaces.Adder[E],
 	expander func(string) (string, error),
 	v string,
 ) (err error) {
@@ -64,13 +64,13 @@ func ExpandAndAddString[E any, EPtr schnittstellen.SetterPtr[E]](
 	return
 }
 
-type AddGetKeyer[E schnittstellen.Lessor[E]] interface {
-	schnittstellen.Adder[E]
+type AddGetKeyer[E interfaces.Lessor[E]] interface {
+	interfaces.Adder[E]
 	Get(string) (E, bool)
 	Key(E) string
 }
 
-func AddIfGreater[E schnittstellen.Lessor[E]](
+func AddIfGreater[E interfaces.Lessor[E]](
 	c AddGetKeyer[E],
 	e E,
 ) (ok bool) {
@@ -85,11 +85,11 @@ func AddIfGreater[E schnittstellen.Lessor[E]](
 }
 
 func AddOrReplaceIfGreater[T interface {
-	schnittstellen.Stringer
-	schnittstellen.ValueLike
-	schnittstellen.Lessor[T]
+	interfaces.Stringer
+	interfaces.ValueLike
+	interfaces.Lessor[T]
 }](
-	c schnittstellen.MutableSetLike[T],
+	c interfaces.MutableSetLike[T],
 	b T,
 ) (shouldAdd bool, err error) {
 	a, ok := c.Get(c.Key(b))
@@ -109,9 +109,9 @@ func AddOrReplaceIfGreater[T interface {
 	return
 }
 
-func AddStringPtr[E any, EPtr schnittstellen.SetterPtr[E]](
-	c schnittstellen.AdderPtr[E, EPtr],
-	p schnittstellen.Pool[E, EPtr],
+func AddStringPtr[E any, EPtr interfaces.SetterPtr[E]](
+	c interfaces.AdderPtr[E, EPtr],
+	p interfaces.Pool[E, EPtr],
 	v string,
 ) (err error) {
 	e := p.Get()
@@ -129,8 +129,8 @@ func AddStringPtr[E any, EPtr schnittstellen.SetterPtr[E]](
 	return
 }
 
-func AddString[E any, EPtr schnittstellen.SetterPtr[E]](
-	c schnittstellen.Adder[E],
+func AddString[E any, EPtr interfaces.SetterPtr[E]](
+	c interfaces.Adder[E],
 	v string,
 ) (err error) {
 	var e E

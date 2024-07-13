@@ -1,7 +1,7 @@
 package equals
 
-import "code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+import "code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 
-func Iterable[T any](a, b schnittstellen.Iterable[T]) bool {
+func Iterable[T any](a, b interfaces.Iterable[T]) bool {
 	return false
 }

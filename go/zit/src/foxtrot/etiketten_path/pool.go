@@ -1,11 +1,11 @@
 package etiketten_path
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 )
 
-var p schnittstellen.Pool[Path, *Path]
+var p interfaces.Pool[Path, *Path]
 
 func init() {
 	p = pool.MakePool(
@@ -22,6 +22,6 @@ func init() {
 	)
 }
 
-func GetPool() schnittstellen.Pool[Path, *Path] {
+func GetPool() interfaces.Pool[Path, *Path] {
 	return p
 }

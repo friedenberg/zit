@@ -5,24 +5,24 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 func MakeWriter[T any](
-	wff schnittstellen.FuncWriterFormat[T],
+	wff interfaces.FuncWriterFormat[T],
 	e T,
-) schnittstellen.FuncWriter {
+) interfaces.FuncWriter {
 	return func(w io.Writer) (int64, error) {
 		return wff(w, e)
 	}
 }
 
-func MakeWriterOr[A schnittstellen.Stringer, B schnittstellen.Stringer](
-	wffA schnittstellen.FuncWriterFormat[A],
+func MakeWriterOr[A interfaces.Stringer, B interfaces.Stringer](
+	wffA interfaces.FuncWriterFormat[A],
 	eA A,
-	wffB schnittstellen.FuncWriterFormat[B],
+	wffB interfaces.FuncWriterFormat[B],
 	eB B,
-) schnittstellen.FuncWriter {
+) interfaces.FuncWriter {
 	return func(w io.Writer) (int64, error) {
 		if eA.String() == "" {
 			return wffB(w, eB)
@@ -33,9 +33,9 @@ func MakeWriterOr[A schnittstellen.Stringer, B schnittstellen.Stringer](
 }
 
 func MakeWriterPtr[T any](
-	wff schnittstellen.FuncWriterFormat[*T],
+	wff interfaces.FuncWriterFormat[*T],
 	e *T,
-) schnittstellen.FuncWriter {
+) interfaces.FuncWriter {
 	return func(w io.Writer) (int64, error) {
 		return wff(w, e)
 	}
@@ -44,7 +44,7 @@ func MakeWriterPtr[T any](
 func MakeFormatString(
 	f string,
 	vs ...interface{},
-) schnittstellen.FuncWriter {
+) interfaces.FuncWriter {
 	return func(w io.Writer) (n int64, err error) {
 		var n1 int
 
@@ -62,7 +62,7 @@ func MakeFormatString(
 
 func MakeStringer(
 	v fmt.Stringer,
-) schnittstellen.FuncWriter {
+) interfaces.FuncWriter {
 	return func(w io.Writer) (n int64, err error) {
 		var n1 int
 
@@ -78,10 +78,10 @@ func MakeStringer(
 	}
 }
 
-func MakeFormatStringer[T schnittstellen.ValueLike](
-	sf schnittstellen.FuncString[schnittstellen.SetLike[T]],
-) schnittstellen.FuncWriterFormat[schnittstellen.SetLike[T]] {
-	return func(w io.Writer, e schnittstellen.SetLike[T]) (n int64, err error) {
+func MakeFormatStringer[T interfaces.ValueLike](
+	sf interfaces.FuncString[interfaces.SetLike[T]],
+) interfaces.FuncWriterFormat[interfaces.SetLike[T]] {
+	return func(w io.Writer, e interfaces.SetLike[T]) (n int64, err error) {
 		var n1 int
 
 		if n1, err = io.WriteString(w, sf(e)); err != nil {

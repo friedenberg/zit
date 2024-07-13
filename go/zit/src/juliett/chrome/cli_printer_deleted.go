@@ -4,18 +4,18 @@ import (
 	"net/url"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 )
 
 type itemDeletedStringFormatWriter struct {
-	schnittstellen.Konfig
-	rightAlignedWriter   schnittstellen.StringFormatWriter[string]
-	idStringFormatWriter schnittstellen.StringFormatWriter[string]
+	interfaces.Konfig
+	rightAlignedWriter   interfaces.StringFormatWriter[string]
+	idStringFormatWriter interfaces.StringFormatWriter[string]
 }
 
 func MakeItemDeletedStringWriterFormat(
-	konfig schnittstellen.Konfig,
+	konfig interfaces.Konfig,
 	co string_format_writer.ColorOptions,
 ) *itemDeletedStringFormatWriter {
 	return &itemDeletedStringFormatWriter{
@@ -30,7 +30,7 @@ func MakeItemDeletedStringWriterFormat(
 }
 
 func (f *itemDeletedStringFormatWriter) WriteStringFormat(
-	sw schnittstellen.WriterAndStringWriter,
+	sw interfaces.WriterAndStringWriter,
 	co *CheckedOut,
 ) (n int64, err error) {
 	item := co.External.item

@@ -2,7 +2,7 @@ package store
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -12,7 +12,7 @@ type ObjekteOptions = sku.ObjekteOptions
 
 func (s *Store) ReadOneKennungExternal(
 	o ObjekteOptions,
-	k1 schnittstellen.StringerGattungKastenGetter,
+	k1 interfaces.StringerGattungKastenGetter,
 	sk *sku.Transacted,
 ) (el sku.ExternalLike, err error) {
 	switch k1.GetKasten().GetKastenString() {
@@ -31,9 +31,9 @@ func (s *Store) ReadOneKennungExternal(
 }
 
 func (s *Store) Open(
-	kasten schnittstellen.KastenGetter,
+	kasten interfaces.KastenGetter,
 	m checkout_mode.Mode,
-	ph schnittstellen.FuncIter[string],
+	ph interfaces.FuncIter[string],
 	zsc sku.CheckedOutLikeSet,
 ) (err error) {
 	kid := kasten.GetKasten().GetKastenString()

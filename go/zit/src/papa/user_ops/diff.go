@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
@@ -159,7 +159,7 @@ func (c Diff) makeDo(
 	w io.WriteCloser,
 	mf metadatei.TextFormatter,
 	m metadatei.TextFormatterContext,
-) schnittstellen.FuncError {
+) interfaces.FuncError {
 	return func() (err error) {
 		defer errors.DeferredCloser(&err, w)
 
@@ -179,15 +179,15 @@ func (c Diff) makeDo(
 
 func (c Diff) makeDoAkte(
 	w io.WriteCloser,
-	arf schnittstellen.AkteReaderFactory,
-	sh schnittstellen.ShaLike,
-) schnittstellen.FuncError {
+	arf interfaces.BlobReaderFactory,
+	sh interfaces.ShaLike,
+) interfaces.FuncError {
 	return func() (err error) {
 		defer errors.DeferredCloser(&err, w)
 
 		var ar sha.ReadCloser
 
-		if ar, err = arf.AkteReader(sh); err != nil {
+		if ar, err = arf.BlobReader(sh); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -211,7 +211,7 @@ func (c Diff) makeDoAkte(
 func (c Diff) makeDoFD(
 	w io.WriteCloser,
 	fd *fd.FD,
-) schnittstellen.FuncError {
+) interfaces.FuncError {
 	return func() (err error) {
 		defer errors.DeferredCloser(&err, w)
 

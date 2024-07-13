@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
@@ -17,7 +17,7 @@ type MutableMatchSet struct {
 	Stored                    MutableSet
 	Akten                     MutableSet
 	Matched                   MutableSet
-	MatchedHinweisen          schnittstellen.MutableSetLike[kennung.Kennung]
+	MatchedHinweisen          interfaces.MutableSetLike[kennung.Kennung]
 	MatchedHinweisenSchwanzen map[string]kennung.Tai
 }
 

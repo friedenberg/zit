@@ -5,7 +5,7 @@ import (
 	"sort"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
@@ -19,7 +19,7 @@ func (c *compiled) GetZettelFileExtension() string {
 	return fmt.Sprintf(".%s", c.FileExtensions.Zettel)
 }
 
-func (kc *Compiled) GetAngeboren() schnittstellen.Angeboren {
+func (kc *Compiled) GetAngeboren() interfaces.Angeboren {
 	return kc.angeboren
 }
 

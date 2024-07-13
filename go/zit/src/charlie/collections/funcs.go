@@ -2,11 +2,11 @@ package collections
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 // TODO-P3 move to iter
-func MakeWriterNoop[T any]() schnittstellen.FuncIter[T] {
+func MakeWriterNoop[T any]() interfaces.FuncIter[T] {
 	return func(e T) (err error) {
 		return
 	}
@@ -14,9 +14,9 @@ func MakeWriterNoop[T any]() schnittstellen.FuncIter[T] {
 
 // TODO-P3 move to iter
 func MakeTryFinally[T any](
-	try schnittstellen.FuncIter[T],
-	finally schnittstellen.FuncIter[T],
-) schnittstellen.FuncIter[T] {
+	try interfaces.FuncIter[T],
+	finally interfaces.FuncIter[T],
+) interfaces.FuncIter[T] {
 	return func(e T) (err error) {
 		defer func() {
 			err1 := finally(e)

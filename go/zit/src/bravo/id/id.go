@@ -5,12 +5,12 @@ import (
 	"path"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 type TypedId interface {
-	schnittstellen.GattungLike
-	schnittstellen.Setter
+	interfaces.GattungLike
+	interfaces.Setter
 }
 
 // func Path(i IdMitKorper, pc ...string) string {
@@ -18,12 +18,12 @@ type TypedId interface {
 // 	return path.Join(pc...)
 // }
 
-func Path(i schnittstellen.Korper, pc ...string) string {
+func Path(i interfaces.Korper, pc ...string) string {
 	pc = append(pc, i.Kopf(), i.Schwanz())
 	return path.Join(pc...)
 }
 
-func MakeDirIfNecessary(i schnittstellen.Korper, pc ...string) (p string, err error) {
+func MakeDirIfNecessary(i interfaces.Korper, pc ...string) (p string, err error) {
 	p = Path(i, pc...)
 	dir := path.Dir(p)
 

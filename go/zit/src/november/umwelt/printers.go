@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -37,7 +37,7 @@ func (u *Umwelt) FormatColorOptionsErr() (o string_format_writer.ColorOptions) {
 
 func (u *Umwelt) StringFormatWriterShaLike(
 	co string_format_writer.ColorOptions,
-) schnittstellen.StringFormatWriter[schnittstellen.ShaLike] {
+) interfaces.StringFormatWriter[interfaces.ShaLike] {
 	return kennung_fmt.MakeShaCliFormat(
 		u.konfig.PrintOptions,
 		co,
@@ -56,7 +56,7 @@ func (u *Umwelt) StringFormatWriterKennungAligned(
 
 func (u *Umwelt) StringFormatWriterKennung(
 	co string_format_writer.ColorOptions,
-) schnittstellen.StringFormatWriter[*kennung.Kennung2] {
+) interfaces.StringFormatWriter[*kennung.Kennung2] {
 	return kennung_fmt.MakeKennungCliFormat(
 		u.konfig.PrintOptions,
 		co,
@@ -66,7 +66,7 @@ func (u *Umwelt) StringFormatWriterKennung(
 
 func (u *Umwelt) StringFormatWriterTyp(
 	co string_format_writer.ColorOptions,
-) schnittstellen.StringFormatWriter[*kennung.Typ] {
+) interfaces.StringFormatWriter[*kennung.Typ] {
 	return kennung_fmt.MakeTypCliFormat(co)
 }
 
@@ -74,19 +74,19 @@ func (u *Umwelt) StringFormatWriterBezeichnung(
 	truncate bezeichnung.CliFormatTruncation,
 	co string_format_writer.ColorOptions,
 	quote bool,
-) schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung] {
+) interfaces.StringFormatWriter[*bezeichnung.Bezeichnung] {
 	return bezeichnung.MakeCliFormat2(truncate, co, quote)
 }
 
 func (u *Umwelt) StringFormatWriterEtiketten(
 	co string_format_writer.ColorOptions,
-) schnittstellen.StringFormatWriter[*kennung.Etikett] {
+) interfaces.StringFormatWriter[*kennung.Etikett] {
 	return kennung_fmt.MakeEtikettenCliFormat()
 }
 
 func (u *Umwelt) StringFormatWriterMetadatei(
 	co string_format_writer.ColorOptions,
-) schnittstellen.StringFormatWriter[*metadatei.Metadatei] {
+) interfaces.StringFormatWriter[*metadatei.Metadatei] {
 	return sku_fmt.MakeCliMetadateiFormat(
 		u.konfig.PrintOptions,
 		u.StringFormatWriterShaLike(co),
@@ -116,7 +116,7 @@ func (u *Umwelt) SkuFmtOrganize() *sku_fmt.Organize {
 
 func (u *Umwelt) StringFormatWriterSkuTransacted(
 	co *string_format_writer.ColorOptions,
-) schnittstellen.StringFormatWriter[*sku.Transacted] {
+) interfaces.StringFormatWriter[*sku.Transacted] {
 	if co == nil {
 		co1 := u.FormatColorOptionsOut()
 		co = &co1
@@ -129,7 +129,7 @@ func (u *Umwelt) StringFormatWriterSkuTransacted(
 	)
 }
 
-func (u *Umwelt) StringFormatWriterSkuTransactedShort() schnittstellen.StringFormatWriter[*sku.Transacted] {
+func (u *Umwelt) StringFormatWriterSkuTransactedShort() interfaces.StringFormatWriter[*sku.Transacted] {
 	co := string_format_writer.ColorOptions{
 		OffEntirely: true,
 	}
@@ -140,7 +140,7 @@ func (u *Umwelt) StringFormatWriterSkuTransactedShort() schnittstellen.StringFor
 	)
 }
 
-func (u *Umwelt) PrinterSkuTransacted() schnittstellen.FuncIter[*sku.Transacted] {
+func (u *Umwelt) PrinterSkuTransacted() interfaces.FuncIter[*sku.Transacted] {
 	sw := u.StringFormatWriterSkuTransacted(nil)
 
 	return string_format_writer.MakeDelim(
@@ -150,21 +150,21 @@ func (u *Umwelt) PrinterSkuTransacted() schnittstellen.FuncIter[*sku.Transacted]
 	)
 }
 
-func (u *Umwelt) PrinterTransactedLike() schnittstellen.FuncIter[*sku.Transacted] {
+func (u *Umwelt) PrinterTransactedLike() interfaces.FuncIter[*sku.Transacted] {
 	sw := u.StringFormatWriterSkuTransacted(nil)
 
 	return string_format_writer.MakeDelim(
 		"\n",
 		u.Out(),
 		string_format_writer.MakeFunc(
-			func(w schnittstellen.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
+			func(w interfaces.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
 				return sw.WriteStringFormat(w, o)
 			},
 		),
 	)
 }
 
-func (u *Umwelt) PrinterFileNotRecognized() schnittstellen.FuncIter[*fd.FD] {
+func (u *Umwelt) PrinterFileNotRecognized() interfaces.FuncIter[*fd.FD] {
 	p := kennung_fmt.MakeFileNotRecognizedStringWriterFormat(
 		kennung_fmt.MakeFDCliFormat(
 			u.FormatColorOptionsOut(),
@@ -181,7 +181,7 @@ func (u *Umwelt) PrinterFileNotRecognized() schnittstellen.FuncIter[*fd.FD] {
 }
 
 // TODO make generic external version
-func (u *Umwelt) PrinterFDDeleted() schnittstellen.FuncIter[*fd.FD] {
+func (u *Umwelt) PrinterFDDeleted() interfaces.FuncIter[*fd.FD] {
 	p := kennung_fmt.MakeFDDeletedStringWriterFormat(
 		u.GetKonfig().DryRun,
 		kennung_fmt.MakeFDCliFormat(
@@ -201,7 +201,7 @@ func (u *Umwelt) GetTime() time.Time {
 	return time.Now()
 }
 
-func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[string] {
+func (u *Umwelt) PrinterHeader() interfaces.FuncIter[string] {
 	if u.konfig.PrintOptions.PrintFlush {
 		return string_format_writer.MakeDelim(
 			"\n",
@@ -220,7 +220,7 @@ func (u *Umwelt) PrinterHeader() schnittstellen.FuncIter[string] {
 	}
 }
 
-func (u *Umwelt) PrinterCheckedOutFS() schnittstellen.FuncIter[sku.CheckedOutLike] {
+func (u *Umwelt) PrinterCheckedOutFS() interfaces.FuncIter[sku.CheckedOutLike] {
 	oo := u.FormatOutputOptions()
 
 	err := string_format_writer.MakeDelim(
@@ -262,7 +262,7 @@ func (u *Umwelt) PrinterCheckedOutFS() schnittstellen.FuncIter[sku.CheckedOutLik
 	}
 }
 
-func (u *Umwelt) PrinterCheckedOutChrome() schnittstellen.FuncIter[sku.CheckedOutLike] {
+func (u *Umwelt) PrinterCheckedOutChrome() interfaces.FuncIter[sku.CheckedOutLike] {
 	oo := u.FormatOutputOptions()
 
 	err := string_format_writer.MakeDelim(
@@ -312,7 +312,7 @@ func (u *Umwelt) PrinterCheckedOutChrome() schnittstellen.FuncIter[sku.CheckedOu
 
 func (u *Umwelt) PrinterCheckedOutForKasten(
 	k kennung.Kasten,
-) schnittstellen.FuncIter[sku.CheckedOutLike] {
+) interfaces.FuncIter[sku.CheckedOutLike] {
 	pcofs := u.PrinterCheckedOutFS()
 	pcochrome := u.PrinterCheckedOutChrome()
 
@@ -325,7 +325,7 @@ func (u *Umwelt) PrinterCheckedOutForKasten(
 	}
 }
 
-func (u *Umwelt) PrinterCheckedOutLike() schnittstellen.FuncIter[sku.CheckedOutLike] {
+func (u *Umwelt) PrinterCheckedOutLike() interfaces.FuncIter[sku.CheckedOutLike] {
 	pcofs := u.PrinterCheckedOutFS()
 	pcochrome := u.PrinterCheckedOutChrome()
 

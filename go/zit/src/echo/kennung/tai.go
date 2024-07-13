@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
@@ -65,7 +65,7 @@ func (t Tai) AsTime() (t1 thyme.Time) {
 	return
 }
 
-func (t Tai) GetGattung() schnittstellen.GattungLike {
+func (t Tai) GetGattung() interfaces.GattungLike {
 	return gattung.Bestandsaufnahme
 }
 

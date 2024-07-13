@@ -4,15 +4,15 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 )
 
 type mutableSetExperimental[
-	T schnittstellen.Element,
-	TPtr schnittstellen.ElementPtr[T],
+	T interfaces.Element,
+	TPtr interfaces.ElementPtr[T],
 ] struct {
-	K schnittstellen.StringKeyerPtr[T, TPtr]
+	K interfaces.StringKeyerPtr[T, TPtr]
 	E map[string]TPtr
 
 	lAdded          sync.Mutex
@@ -41,7 +41,7 @@ func (s *mutableSetExperimental[T, TPtr]) len() int {
 }
 
 func (a *mutableSetExperimental[T, TPtr]) EqualsSetPtrLike(
-	b schnittstellen.SetPtrLike[T, TPtr],
+	b interfaces.SetPtrLike[T, TPtr],
 ) bool {
 	defer a.TryProcessMutationsDuringReads()
 	a.l.RLock()
@@ -51,7 +51,7 @@ func (a *mutableSetExperimental[T, TPtr]) EqualsSetPtrLike(
 }
 
 func (a *mutableSetExperimental[T, TPtr]) EqualsSetLike(
-	b schnittstellen.SetLike[T],
+	b interfaces.SetLike[T],
 ) bool {
 	if b == nil {
 		return false
@@ -302,7 +302,7 @@ func (s *mutableSetExperimental[T, TPtr]) Elements() (out []T) {
 }
 
 func (s *mutableSetExperimental[T, TPtr]) EachKey(
-	wf schnittstellen.FuncIterKey,
+	wf interfaces.FuncIterKey,
 ) (err error) {
 	defer s.TryProcessMutationsDuringReads()
 	s.l.RLock()
@@ -324,7 +324,7 @@ func (s *mutableSetExperimental[T, TPtr]) EachKey(
 }
 
 func (s *mutableSetExperimental[T, TPtr]) Each(
-	wf schnittstellen.FuncIter[T],
+	wf interfaces.FuncIter[T],
 ) (err error) {
 	defer s.TryProcessMutationsDuringReads()
 	s.l.RLock()
@@ -346,7 +346,7 @@ func (s *mutableSetExperimental[T, TPtr]) Each(
 }
 
 func (s *mutableSetExperimental[T, TPtr]) EachPtr(
-	wf schnittstellen.FuncIter[TPtr],
+	wf interfaces.FuncIter[TPtr],
 ) (err error) {
 	defer s.TryProcessMutationsDuringReads()
 	s.l.RLock()
@@ -356,7 +356,7 @@ func (s *mutableSetExperimental[T, TPtr]) EachPtr(
 }
 
 func (s *mutableSetExperimental[T, TPtr]) eachPtr(
-	wf schnittstellen.FuncIter[TPtr],
+	wf interfaces.FuncIter[TPtr],
 ) (err error) {
 	for _, v := range s.E {
 		if err = wf(v); err != nil {

@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
@@ -60,7 +60,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	skus := sku.MakeTransactedMutableSet()
 
-	var f schnittstellen.FuncIter[*sku.Transacted]
+	var f interfaces.FuncIter[*sku.Transacted]
 
 	if c.Organize || c.Edit {
 		f = skus.Add
@@ -107,7 +107,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 func (c Last) runWithBestandsaufnahme(
 	u *umwelt.Umwelt,
-	f schnittstellen.FuncIter[*sku.Transacted],
+	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	s := u.GetStore()
 
@@ -120,7 +120,7 @@ func (c Last) runWithBestandsaufnahme(
 
 	var a *bestandsaufnahme.Akte
 
-	if a, err = s.GetBestandsaufnahmeStore().GetAkte(b.GetAkteSha()); err != nil {
+	if a, err = s.GetBestandsaufnahmeStore().GetBlob(b.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

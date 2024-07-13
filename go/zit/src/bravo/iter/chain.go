@@ -4,10 +4,10 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
-func Chain[T any](e T, wfs ...schnittstellen.FuncIter[T]) (err error) {
+func Chain[T any](e T, wfs ...interfaces.FuncIter[T]) (err error) {
 	for _, w := range wfs {
 		if w == nil {
 			continue
@@ -31,7 +31,7 @@ func Chain[T any](e T, wfs ...schnittstellen.FuncIter[T]) (err error) {
 	return
 }
 
-func MakeChainDebug[T any](wfs ...schnittstellen.FuncIter[T]) schnittstellen.FuncIter[T] {
+func MakeChainDebug[T any](wfs ...interfaces.FuncIter[T]) interfaces.FuncIter[T] {
 	for i := range wfs {
 		old := wfs[i]
 		wfs[i] = func(e T) (err error) {
@@ -46,7 +46,7 @@ func MakeChainDebug[T any](wfs ...schnittstellen.FuncIter[T]) schnittstellen.Fun
 	return MakeChain(wfs...)
 }
 
-func MakeChain[T any](wfs ...schnittstellen.FuncIter[T]) schnittstellen.FuncIter[T] {
+func MakeChain[T any](wfs ...interfaces.FuncIter[T]) interfaces.FuncIter[T] {
 	return func(e T) (err error) {
 		for _, w := range wfs {
 			if w == nil {
@@ -73,15 +73,15 @@ func MakeChain[T any](wfs ...schnittstellen.FuncIter[T]) schnittstellen.FuncIter
 }
 
 func Multiplex[T any](
-	e schnittstellen.FuncIter[T],
-	producers ...func(schnittstellen.FuncIter[T]) error,
+	e interfaces.FuncIter[T],
+	producers ...func(interfaces.FuncIter[T]) error,
 ) (err error) {
 	ch := make(chan error, len(producers))
 	wg := &sync.WaitGroup{}
 	wg.Add(len(producers))
 
 	for _, p := range producers {
-		go func(p func(schnittstellen.FuncIter[T]) error, ch chan<- error) {
+		go func(p func(interfaces.FuncIter[T]) error, ch chan<- error) {
 			var err error
 
 			defer func() {

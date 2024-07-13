@@ -2,14 +2,14 @@ package lua
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	lua "github.com/yuin/gopher-lua"
 )
 
 type VM struct {
 	*lua.LState
 	Top lua.LValue
-	schnittstellen.Pool[LTable, *LTable]
+	interfaces.Pool[LTable, *LTable]
 }
 
 func (vm *VM) GetTopFunctionOrFunctionNamedError(

@@ -4,15 +4,15 @@ import (
 	"encoding/gob"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 )
 
 func MakeValueSetString[
-	T schnittstellen.Stringer,
-	TPtr schnittstellen.StringSetterPtr[T],
+	T interfaces.Stringer,
+	TPtr interfaces.StringSetterPtr[T],
 ](
-	keyer schnittstellen.StringKeyer[T],
+	keyer interfaces.StringKeyer[T],
 	es ...string,
 ) (s Set[T], err error) {
 	gob.Register(s)
@@ -39,8 +39,8 @@ func MakeValueSetString[
 	return
 }
 
-func MakeValueSetValue[T schnittstellen.Stringer](
-	keyer schnittstellen.StringKeyer[T],
+func MakeValueSetValue[T interfaces.Stringer](
+	keyer interfaces.StringKeyer[T],
 	es ...T,
 ) (s Set[T]) {
 	gob.Register(s)
@@ -60,8 +60,8 @@ func MakeValueSetValue[T schnittstellen.Stringer](
 	return
 }
 
-func MakeValueSet[T schnittstellen.Stringer](
-	keyer schnittstellen.StringKeyer[T],
+func MakeValueSet[T interfaces.Stringer](
+	keyer interfaces.StringKeyer[T],
 	es ...T,
 ) (s Set[T]) {
 	gob.Register(s)
@@ -81,8 +81,8 @@ func MakeValueSet[T schnittstellen.Stringer](
 	return
 }
 
-func MakeSetValue[T schnittstellen.Stringer](
-	keyer schnittstellen.StringKeyer[T],
+func MakeSetValue[T interfaces.Stringer](
+	keyer interfaces.StringKeyer[T],
 	es ...T,
 ) (s Set[T]) {
 	gob.Register(s)
@@ -103,7 +103,7 @@ func MakeSetValue[T schnittstellen.Stringer](
 }
 
 func MakeSet[T any](
-	keyer schnittstellen.StringKeyer[T],
+	keyer interfaces.StringKeyer[T],
 	es ...T,
 ) (s Set[T]) {
 	gob.Register(s)
@@ -123,8 +123,8 @@ func MakeSet[T any](
 	return
 }
 
-func MakeMutableValueSetValue[T schnittstellen.Stringer](
-	keyer schnittstellen.StringKeyer[T],
+func MakeMutableValueSetValue[T interfaces.Stringer](
+	keyer interfaces.StringKeyer[T],
 	es ...T,
 ) (s MutableSet[T]) {
 	gob.Register(s)
@@ -144,8 +144,8 @@ func MakeMutableValueSetValue[T schnittstellen.Stringer](
 	return
 }
 
-func MakeMutableValueSet[T schnittstellen.Stringer](
-	keyer schnittstellen.StringKeyer[T],
+func MakeMutableValueSet[T interfaces.Stringer](
+	keyer interfaces.StringKeyer[T],
 	es ...T,
 ) (s MutableSet[T]) {
 	gob.Register(s)
@@ -166,7 +166,7 @@ func MakeMutableValueSet[T schnittstellen.Stringer](
 }
 
 func MakeMutableSetValue[T any](
-	keyer schnittstellen.StringKeyer[T],
+	keyer interfaces.StringKeyer[T],
 	es ...T,
 ) (s MutableSet[T]) {
 	gob.Register(s)
@@ -187,7 +187,7 @@ func MakeMutableSetValue[T any](
 }
 
 func MakeMutableSet[T any](
-	keyer schnittstellen.StringKeyer[T],
+	keyer interfaces.StringKeyer[T],
 	es ...T,
 ) (s MutableSet[T]) {
 	gob.Register(s)

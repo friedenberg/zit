@@ -2,7 +2,7 @@ package store_fs
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/exec_editor"
 )
 
@@ -11,7 +11,7 @@ type Open struct {
 }
 
 func (c Open) Run(
-	ph schnittstellen.FuncIter[string],
+	ph interfaces.FuncIter[string],
 	args ...string,
 ) (err error) {
 	vimArgs := make([]string, 0, len(c.Options)*2)

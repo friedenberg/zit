@@ -3,7 +3,7 @@ package erworben
 import (
 	"reflect"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/erworben_tools"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
@@ -29,7 +29,7 @@ type Akte struct {
 	Filters         map[string]string                       `toml:"filters"`
 }
 
-func (Akte) GetGattung() schnittstellen.GattungLike {
+func (Akte) GetGattung() interfaces.GattungLike {
 	return gattung.Konfig
 }
 

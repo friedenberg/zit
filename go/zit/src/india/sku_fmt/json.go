@@ -31,7 +31,7 @@ func (j *Json) FromStringAndMetadatei(
 ) (err error) {
 	var r sha.ReadCloser
 
-	if r, err = s.AkteReader(&m.Akte); err != nil {
+	if r, err = s.BlobReader(&m.Akte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -67,7 +67,7 @@ func (j *Json) FromTransacted(
 func (j *Json) ToTransacted(sk *sku.Transacted, s standort.Standort) (err error) {
 	var w sha.WriteCloser
 
-	if w, err = s.AkteWriter(); err != nil {
+	if w, err = s.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

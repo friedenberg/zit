@@ -2,20 +2,20 @@ package kennung_fmt
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 )
 
 type fdDeletedStringWriterFormat struct {
 	dryRun               bool
-	rightAlignedWriter   schnittstellen.StringFormatWriter[string]
-	fdStringFormatWriter schnittstellen.StringFormatWriter[*fd.FD]
+	rightAlignedWriter   interfaces.StringFormatWriter[string]
+	fdStringFormatWriter interfaces.StringFormatWriter[*fd.FD]
 }
 
 func MakeFDDeletedStringWriterFormat(
 	dryRun bool,
-	fdStringFormatWriter schnittstellen.StringFormatWriter[*fd.FD],
+	fdStringFormatWriter interfaces.StringFormatWriter[*fd.FD],
 ) *fdDeletedStringWriterFormat {
 	return &fdDeletedStringWriterFormat{
 		dryRun:               dryRun,
@@ -25,7 +25,7 @@ func MakeFDDeletedStringWriterFormat(
 }
 
 func (f *fdDeletedStringWriterFormat) WriteStringFormat(
-	sw schnittstellen.WriterAndStringWriter,
+	sw interfaces.WriterAndStringWriter,
 	fd *fd.FD,
 ) (n int64, err error) {
 	var (

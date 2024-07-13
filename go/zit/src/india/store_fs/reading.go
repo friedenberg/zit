@@ -223,7 +223,7 @@ func (s *Store) ReadOneExternalAkte(
 
 	var aw sha.WriteCloser
 
-	if aw, err = s.standort.AkteWriter(); err != nil {
+	if aw, err = s.standort.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

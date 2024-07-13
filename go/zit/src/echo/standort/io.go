@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
@@ -14,7 +14,7 @@ import (
 )
 
 func (s Standort) objekteReader(
-	g schnittstellen.GattungGetter,
+	g interfaces.GattungGetter,
 	sh sha.ShaLike,
 ) (rc sha.ReadCloser, err error) {
 	var p string
@@ -43,7 +43,7 @@ func (s Standort) objekteReader(
 }
 
 func (s Standort) objekteWriter(
-	g schnittstellen.GattungGetter,
+	g interfaces.GattungGetter,
 ) (wc sha.WriteCloser, err error) {
 	var p string
 
@@ -157,7 +157,7 @@ func (s Standort) AkteWriterToLight(p string) (w sha.WriteCloser, err error) {
 	return
 }
 
-func (s Standort) AkteWriter() (w sha.WriteCloser, err error) {
+func (s Standort) BlobWriter() (w sha.WriteCloser, err error) {
 	var p string
 
 	if p, err = s.DirObjektenGattung(
@@ -206,7 +206,7 @@ func (s Standort) AkteReaderFile(sh sha.ShaLike) (f *os.File, err error) {
 	return
 }
 
-func (s Standort) AkteReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
+func (s Standort) BlobReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
 	if sh.GetShaLike().IsNull() {
 		r = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
 		return

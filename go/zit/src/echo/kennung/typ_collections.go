@@ -1,7 +1,7 @@
 package kennung
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/echo/thyme"
@@ -12,8 +12,8 @@ func init() {
 }
 
 type (
-	TypSet        = schnittstellen.SetPtrLike[Typ, *Typ]
-	TypMutableSet = schnittstellen.MutableSetPtrLike[Typ, *Typ]
+	TypSet        = interfaces.SetPtrLike[Typ, *Typ]
+	TypMutableSet = interfaces.MutableSetPtrLike[Typ, *Typ]
 )
 
 func MakeTypSet(es ...Typ) (s TypSet) {

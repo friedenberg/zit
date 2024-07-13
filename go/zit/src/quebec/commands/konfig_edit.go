@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/vim_cli_options_builder"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
@@ -35,7 +35,7 @@ func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		ui.Err().Print("Command edit-konfig ignores passed in arguments.")
 	}
 
-	var sh schnittstellen.ShaLike
+	var sh interfaces.ShaLike
 
 	if sh, err = c.editInVim(u); err != nil {
 		err = errors.Wrap(err)
@@ -64,7 +64,7 @@ func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 func (c EditKonfig) editInVim(
 	u *umwelt.Umwelt,
-) (sh schnittstellen.ShaLike, err error) {
+) (sh interfaces.ShaLike, err error) {
 	var p string
 
 	if p, err = c.makeTempKonfigFile(u); err != nil {
@@ -125,7 +125,7 @@ func (c EditKonfig) makeTempKonfigFile(
 func (c EditKonfig) readTempKonfigFile(
 	u *umwelt.Umwelt,
 	p string,
-) (sh schnittstellen.ShaLike, err error) {
+) (sh interfaces.ShaLike, err error) {
 	var f *os.File
 
 	if f, err = files.Open(p); err != nil {
@@ -139,9 +139,9 @@ func (c EditKonfig) readTempKonfigFile(
 
 	var k erworben.Akte
 
-	var aw schnittstellen.ShaWriteCloser
+	var aw interfaces.ShaWriteCloser
 
-	if aw, err = u.Standort().AkteWriter(); err != nil {
+	if aw, err = u.Standort().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

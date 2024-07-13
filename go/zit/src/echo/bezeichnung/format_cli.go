@@ -1,13 +1,13 @@
 package bezeichnung
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 )
 
 type bezeichnungCliFormat struct {
 	truncate           CliFormatTruncation
-	stringFormatWriter schnittstellen.StringFormatWriter[string]
+	stringFormatWriter interfaces.StringFormatWriter[string]
 }
 
 func MakeCliFormat2(
@@ -32,7 +32,7 @@ func MakeCliFormat2(
 }
 
 func (f *bezeichnungCliFormat) WriteStringFormat(
-	w schnittstellen.WriterAndStringWriter,
+	w interfaces.WriterAndStringWriter,
 	k *Bezeichnung,
 ) (n int64, err error) {
 	v := k.value

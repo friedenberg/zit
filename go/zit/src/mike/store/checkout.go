@@ -2,7 +2,7 @@ package store
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
@@ -35,7 +35,7 @@ func (s *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
 func (s *Store) CheckoutQuery(
 	options checkout_options.Options,
 	qg *query.Group,
-	f schnittstellen.FuncIter[sku.CheckedOutLike],
+	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	qf := func(t *sku.Transacted) (err error) {
 		var col sku.CheckedOutLike

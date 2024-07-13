@@ -2,15 +2,15 @@ package kennung
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
 type (
 	// TODO use catgut.String
-	FuncExpandString                                        func(string) (string, error)
-	FuncAbbreviateString[V any, VPtr schnittstellen.Ptr[V]] func(VPtr) (string, error)
+	FuncExpandString                                    func(string) (string, error)
+	FuncAbbreviateString[V any, VPtr interfaces.Ptr[V]] func(VPtr) (string, error)
 
 	Abbr struct {
 		Sha struct {
@@ -31,7 +31,7 @@ func DontExpandString(v string) (string, error) {
 	return v, nil
 }
 
-func DontAbbreviateString[VPtr schnittstellen.Stringer](k VPtr) (string, error) {
+func DontAbbreviateString[VPtr interfaces.Stringer](k VPtr) (string, error) {
 	return k.String(), nil
 }
 

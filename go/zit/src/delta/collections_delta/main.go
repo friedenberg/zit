@@ -1,25 +1,25 @@
 package collections_delta
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 )
 
-type delta[T schnittstellen.ValueLike] struct {
-	Added, Removed schnittstellen.MutableSetLike[T]
+type delta[T interfaces.ValueLike] struct {
+	Added, Removed interfaces.MutableSetLike[T]
 }
 
-func (d delta[T]) GetAdded() schnittstellen.SetLike[T] {
+func (d delta[T]) GetAdded() interfaces.SetLike[T] {
 	return d.Added
 }
 
-func (d delta[T]) GetRemoved() schnittstellen.SetLike[T] {
+func (d delta[T]) GetRemoved() interfaces.SetLike[T] {
 	return d.Removed
 }
 
-func MakeSetDelta[T schnittstellen.ValueLike](
-	from, to schnittstellen.SetLike[T],
-) schnittstellen.Delta[T] {
+func MakeSetDelta[T interfaces.ValueLike](
+	from, to interfaces.SetLike[T],
+) interfaces.Delta[T] {
 	d := delta[T]{
 		Added:   collections_value.MakeMutableValueSet[T](nil),
 		Removed: from.CloneMutableSetLike(),

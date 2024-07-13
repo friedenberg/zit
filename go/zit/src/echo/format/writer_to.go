@@ -4,11 +4,11 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 type writerTo[T any] struct {
-	wf schnittstellen.FuncWriterElement[T]
+	wf interfaces.FuncWriterElement[T]
 	e  *T
 }
 
@@ -22,7 +22,7 @@ func (wt *writerTo[T]) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 func MakeWriterTo2[T any](
-	wf schnittstellen.FuncWriterElement[T],
+	wf interfaces.FuncWriterElement[T],
 	e *T,
 ) *writerTo[T] {
 	return &writerTo[T]{
@@ -32,7 +32,7 @@ func MakeWriterTo2[T any](
 }
 
 type writerToInterface[T any] struct {
-	wf schnittstellen.FuncWriterElementInterface[T]
+	wf interfaces.FuncWriterElementInterface[T]
 	e  T
 }
 
@@ -46,7 +46,7 @@ func (wt writerToInterface[T]) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 func MakeWriterToInterface[T any](
-	wf schnittstellen.FuncWriterElementInterface[T],
+	wf interfaces.FuncWriterElementInterface[T],
 	e T,
 ) writerToInterface[T] {
 	return writerToInterface[T]{

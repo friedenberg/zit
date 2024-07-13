@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 )
 
@@ -15,19 +15,19 @@ type Heap[T Element, TPtr ElementPtr[T]] struct {
 	s int
 }
 
-func (h *Heap[T, TPtr]) SetPool(v schnittstellen.Pool[T, TPtr]) {
+func (h *Heap[T, TPtr]) SetPool(v interfaces.Pool[T, TPtr]) {
 	h.h.p = v
 }
 
-func (h *Heap[T, TPtr]) GetEqualer() schnittstellen.Equaler1[TPtr] {
+func (h *Heap[T, TPtr]) GetEqualer() interfaces.Equaler1[TPtr] {
 	return h.h.equaler
 }
 
-func (h *Heap[T, TPtr]) GetLessor() schnittstellen.Lessor3[TPtr] {
+func (h *Heap[T, TPtr]) GetLessor() interfaces.Lessor3[TPtr] {
 	return h.h.Lessor
 }
 
-func (h *Heap[T, TPtr]) GetResetter() schnittstellen.Resetter2[T, TPtr] {
+func (h *Heap[T, TPtr]) GetResetter() interfaces.Resetter2[T, TPtr] {
 	return h.h.Resetter
 }
 
@@ -160,7 +160,7 @@ func (a *Heap[T, TPtr]) Copy() Heap[T, TPtr] {
 	}
 }
 
-func (a *Heap[T, TPtr]) EachPtr(f schnittstellen.FuncIter[TPtr]) (err error) {
+func (a *Heap[T, TPtr]) EachPtr(f interfaces.FuncIter[TPtr]) (err error) {
 	a.l.Lock()
 	defer a.l.Unlock()
 
@@ -179,7 +179,7 @@ func (a *Heap[T, TPtr]) EachPtr(f schnittstellen.FuncIter[TPtr]) (err error) {
 	return
 }
 
-func (a *Heap[T, TPtr]) Each(f schnittstellen.FuncIter[T]) (err error) {
+func (a *Heap[T, TPtr]) Each(f interfaces.FuncIter[T]) (err error) {
 	a.l.Lock()
 	defer a.l.Unlock()
 

@@ -5,7 +5,7 @@ import (
 	"path"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
@@ -15,12 +15,12 @@ import (
 )
 
 type textParser struct {
-	awf schnittstellen.AkteWriterFactory
+	awf interfaces.BlobWriterFactory
 	af  script_config.RemoteScript
 }
 
 func MakeTextParser(
-	awf schnittstellen.AkteWriterFactory,
+	awf interfaces.BlobWriterFactory,
 	akteFormatter script_config.RemoteScript,
 ) TextParser {
 	if awf == nil {
@@ -51,7 +51,7 @@ func (f textParser) ParseMetadatei(
 	lr := format.MakeLineReaderConsumeEmpty(
 		ohio.MakeLineReaderIterate(
 			ohio.MakeLineReaderKeyValues(
-				map[string]schnittstellen.FuncSetString{
+				map[string]interfaces.FuncSetString{
 					"#": m.Bezeichnung.Set,
 					"%": func(v string) (err error) {
 						m.Comments = append(m.Comments, v)
@@ -68,7 +68,7 @@ func (f textParser) ParseMetadatei(
 
 	var akteWriter sha.WriteCloser
 
-	if akteWriter, err = f.awf.AkteWriter(); err != nil {
+	if akteWriter, err = f.awf.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

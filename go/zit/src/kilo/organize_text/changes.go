@@ -4,7 +4,7 @@ import (
 	"sort"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -72,7 +72,7 @@ func (sm SkuMapWithOrder) Sort() {
 }
 
 func (sm *SkuMapWithOrder) Each(
-	f schnittstellen.FuncIter[*sku.Transacted],
+	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	sm.Sort()
 

@@ -2,7 +2,7 @@ package kennung_fmt
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 )
 
@@ -15,7 +15,7 @@ func MakeEtikettenCliFormat() (f *etikettenCliFormat) {
 }
 
 func (f *etikettenCliFormat) WriteStringFormat(
-	w schnittstellen.WriterAndStringWriter,
+	w interfaces.WriterAndStringWriter,
 	k *kennung.Etikett,
 ) (n int64, err error) {
 	var n1 int

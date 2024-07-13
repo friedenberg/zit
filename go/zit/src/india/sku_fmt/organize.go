@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
@@ -26,11 +26,11 @@ type KennungAlignedFormat interface {
 
 func MakeFormatOrganize(
 	options erworben_cli_print_options.PrintOptions,
-	shaStringFormatWriter schnittstellen.StringFormatWriter[schnittstellen.ShaLike],
+	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
 	kennungStringFormatWriter kennung_fmt.Aligned,
-	typStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Typ],
-	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung],
-	etikettenStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Etikett],
+	typStringFormatWriter interfaces.StringFormatWriter[*kennung.Typ],
+	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung],
+	etikettenStringFormatWriter interfaces.StringFormatWriter[*kennung.Etikett],
 ) *Organize {
 	options.PrintTime = false
 	options.PrintShas = false
@@ -51,11 +51,11 @@ type Organize struct {
 	maxKopf, maxSchwanz int
 	padding             string
 
-	shaStringFormatWriter         schnittstellen.StringFormatWriter[schnittstellen.ShaLike]
+	shaStringFormatWriter         interfaces.StringFormatWriter[interfaces.ShaLike]
 	kennungStringFormatWriter     kennung_fmt.Aligned
-	typStringFormatWriter         schnittstellen.StringFormatWriter[*kennung.Typ]
-	bezeichnungStringFormatWriter schnittstellen.StringFormatWriter[*bezeichnung.Bezeichnung]
-	etikettenStringFormatWriter   schnittstellen.StringFormatWriter[*kennung.Etikett]
+	typStringFormatWriter         interfaces.StringFormatWriter[*kennung.Typ]
+	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung]
+	etikettenStringFormatWriter   interfaces.StringFormatWriter[*kennung.Etikett]
 }
 
 func (f *Organize) SetMaxKopfUndSchwanz(k, s int) {
@@ -65,7 +65,7 @@ func (f *Organize) SetMaxKopfUndSchwanz(k, s int) {
 }
 
 func (f *Organize) WriteStringFormat(
-	sw schnittstellen.WriterAndStringWriter,
+	sw interfaces.WriterAndStringWriter,
 	o *sku.Transacted,
 ) (n int64, err error) {
 	var n1 int

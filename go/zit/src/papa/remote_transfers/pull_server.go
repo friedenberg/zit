@@ -78,7 +78,7 @@ func (op PullServer) akteReaderForSha(
 
 	var or io.ReadCloser
 
-	if or, err = op.umwelt.Standort().AkteReader(&sh); err != nil {
+	if or, err = op.umwelt.Standort().BlobReader(&sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

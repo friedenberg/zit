@@ -3,12 +3,12 @@ package kennung
 import (
 	"sync"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 )
 
 var (
-	etikettPool     schnittstellen.Pool[Etikett, *Etikett]
+	etikettPool     interfaces.Pool[Etikett, *Etikett]
 	etikettPoolOnce sync.Once
 )
 
@@ -54,11 +54,11 @@ func (etikett2Resetter) ResetWith(a, b *etikett2) {
 }
 
 var (
-	etikettPtrMapPool     schnittstellen.PoolValue[map[string]*Etikett]
+	etikettPtrMapPool     interfaces.PoolValue[map[string]*Etikett]
 	etikettPtrMapPoolOnce sync.Once
 )
 
-func GetEtikettPool() schnittstellen.Pool[Etikett, *Etikett] {
+func GetEtikettPool() interfaces.Pool[Etikett, *Etikett] {
 	etikettPoolOnce.Do(
 		func() {
 			etikettPool = pool.MakePool(
@@ -75,7 +75,7 @@ func GetEtikettPool() schnittstellen.Pool[Etikett, *Etikett] {
 	return etikettPool
 }
 
-func GetEtikettMapPtrPool() schnittstellen.PoolValue[map[string]*Etikett] {
+func GetEtikettMapPtrPool() interfaces.PoolValue[map[string]*Etikett] {
 	etikettPtrMapPoolOnce.Do(
 		func() {
 			etikettPtrMapPool = pool.MakeValue(
@@ -95,4 +95,4 @@ func GetEtikettMapPtrPool() schnittstellen.PoolValue[map[string]*Etikett] {
 	return etikettPtrMapPool
 }
 
-var etikettMapPool schnittstellen.PoolValue[map[string]Etikett]
+var etikettMapPool interfaces.PoolValue[map[string]Etikett]

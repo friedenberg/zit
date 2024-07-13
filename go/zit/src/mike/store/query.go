@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
@@ -17,7 +17,7 @@ import (
 
 func (s *Store) Query(
 	qg sku.QueryGroup,
-	f schnittstellen.FuncIter[*sku.Transacted],
+	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	if qg == nil {
 		if qg, err = s.queryBuilder.BuildQueryGroup(); err != nil {
@@ -43,7 +43,7 @@ func (s *Store) Query(
 
 func (s *Store) QueryWithKasten(
 	qg *query.Group,
-	f schnittstellen.FuncIter[*sku.Transacted],
+	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	if qg == nil {
 		if qg, err = s.queryBuilder.BuildQueryGroup(); err != nil {
@@ -80,7 +80,7 @@ func (s *Store) QueryWithKasten(
 
 func (s *Store) QueryCheckedOut(
 	qg *query.Group,
-	f schnittstellen.FuncIter[sku.CheckedOutLike],
+	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	kid := qg.Kasten.GetKastenString()
 	es, ok := s.externalStores[kid]

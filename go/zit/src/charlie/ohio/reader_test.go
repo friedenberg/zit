@@ -3,7 +3,7 @@ package ohio
 import (
 	"testing"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 )
@@ -66,7 +66,7 @@ func TestReaderKeyValueHappy(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	sut := MakeLineReaderKeyValues(
-		map[string]schnittstellen.FuncSetString{
+		map[string]interfaces.FuncSetString{
 			"#": values.MakeString("bez").Match,
 			"%": values.MakeString("com").Match,
 			"-": values.MakeString("et").Match,

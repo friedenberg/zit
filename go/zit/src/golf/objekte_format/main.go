@@ -3,7 +3,7 @@ package objekte_format
 import (
 	"io"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
@@ -50,7 +50,7 @@ func Default() Format {
 	return v4{}
 }
 
-func FormatForVersion(sv schnittstellen.StoreVersion) Format {
+func FormatForVersion(sv interfaces.StoreVersion) Format {
 	v := sv.GetInt()
 
 	switch v {
@@ -62,7 +62,7 @@ func FormatForVersion(sv schnittstellen.StoreVersion) Format {
 	}
 }
 
-func FormatForVersions(write, read schnittstellen.StoreVersion) Format {
+func FormatForVersions(write, read interfaces.StoreVersion) Format {
 	return MakeBespoke(
 		FormatForVersion(write),
 		FormatForVersion(read),

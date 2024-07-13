@@ -3,7 +3,7 @@ package umwelt
 import (
 	"io"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/echo/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
@@ -27,11 +27,11 @@ func (u *Umwelt) In() io.Reader {
 	return u.in
 }
 
-func (u *Umwelt) Out() schnittstellen.WriterAndStringWriter {
+func (u *Umwelt) Out() interfaces.WriterAndStringWriter {
 	return u.out
 }
 
-func (u *Umwelt) Err() schnittstellen.WriterAndStringWriter {
+func (u *Umwelt) Err() interfaces.WriterAndStringWriter {
 	return u.err
 }
 

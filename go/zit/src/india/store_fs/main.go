@@ -10,7 +10,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
@@ -34,7 +34,7 @@ func init() {
 // TODO support globs and ignores
 type Store struct {
 	konfig              sku.Konfig
-	deletedPrinter      schnittstellen.FuncIter[*fd.FD]
+	deletedPrinter      interfaces.FuncIter[*fd.FD]
 	externalStoreInfo   external_store.Info
 	metadateiTextParser metadatei.TextParser
 	standort            standort.Standort
@@ -42,11 +42,11 @@ type Store struct {
 	ic                  kennung.InlineTypChecker
 	fileExtensions      file_extensions.FileExtensions
 	dir                 string
-	zettelen            schnittstellen.MutableSetLike[*KennungFDPair]
-	unsureZettelen      schnittstellen.MutableSetLike[*KennungFDPair]
-	typen               schnittstellen.MutableSetLike[*KennungFDPair]
-	kisten              schnittstellen.MutableSetLike[*KennungFDPair]
-	etiketten           schnittstellen.MutableSetLike[*KennungFDPair]
+	zettelen            interfaces.MutableSetLike[*KennungFDPair]
+	unsureZettelen      interfaces.MutableSetLike[*KennungFDPair]
+	typen               interfaces.MutableSetLike[*KennungFDPair]
+	kisten              interfaces.MutableSetLike[*KennungFDPair]
+	etiketten           interfaces.MutableSetLike[*KennungFDPair]
 	unsureAkten         fd.MutableSet
 	emptyDirectories    fd.MutableSet
 
@@ -133,7 +133,7 @@ func (fs *Store) String() (out string) {
 
 	hasOne := false
 
-	writeOneIfNecessary := func(v schnittstellen.Stringer) (err error) {
+	writeOneIfNecessary := func(v interfaces.Stringer) (err error) {
 		if hasOne {
 			sb.WriteRune(zittish.OpOr)
 		}
@@ -181,7 +181,7 @@ func (fs *Store) String() (out string) {
 	return
 }
 
-func (s *Store) GetExternalKennung() (ks schnittstellen.SetLike[*kennung.Kennung2], err error) {
+func (s *Store) GetExternalKennung() (ks interfaces.SetLike[*kennung.Kennung2], err error) {
 	ksm := collections_value.MakeMutableValueSet[*kennung.Kennung2](nil)
 	ks = ksm
 	var l sync.Mutex
@@ -311,7 +311,7 @@ func (fs *Store) GetTyp(
 }
 
 func (fs *Store) Get(
-	k schnittstellen.StringerGattungGetter,
+	k interfaces.StringerGattungGetter,
 ) (t *KennungFDPair, ok bool) {
 	g := gattung.Must(k.GetGattung())
 
@@ -338,7 +338,7 @@ func (fs *Store) Get(
 }
 
 func (fs *Store) All(
-	f schnittstellen.FuncIter[*KennungFDPair],
+	f interfaces.FuncIter[*KennungFDPair],
 ) (err error) {
 	wg := iter.MakeErrorWaitGroupParallel()
 
@@ -386,7 +386,7 @@ func (fs *Store) All(
 }
 
 func (fs *Store) AllUnsure(
-	f schnittstellen.FuncIter[*KennungFDPair],
+	f interfaces.FuncIter[*KennungFDPair],
 ) (err error) {
 	wg := iter.MakeErrorWaitGroupParallel()
 
@@ -583,7 +583,7 @@ func (c *Store) MatcherLen() int {
 	)
 }
 
-func (*Store) Each(_ schnittstellen.FuncIter[sku.Query]) error {
+func (*Store) Each(_ interfaces.FuncIter[sku.Query]) error {
 	return nil
 }
 

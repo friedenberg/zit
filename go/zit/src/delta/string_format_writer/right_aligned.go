@@ -5,17 +5,17 @@ import (
 	"unicode/utf8"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
-func MakeRightAligned() schnittstellen.StringFormatWriter[string] {
+func MakeRightAligned() interfaces.StringFormatWriter[string] {
 	return &rightAligned{}
 }
 
 type rightAligned struct{}
 
 func (f rightAligned) WriteStringFormat(
-	w schnittstellen.WriterAndStringWriter,
+	w interfaces.WriterAndStringWriter,
 	v string,
 ) (n int64, err error) {
 	diff := LenStringMax + 1 - utf8.RuneCountInString(v)

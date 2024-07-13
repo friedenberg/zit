@@ -1,7 +1,7 @@
 package kasten_akte
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 )
@@ -10,7 +10,7 @@ type V0 struct {
 	Uri values.Uri `toml:"uri"`
 }
 
-func (_ V0) GetGattung() schnittstellen.GattungLike {
+func (_ V0) GetGattung() interfaces.GattungLike {
 	return gattung.Typ
 }
 

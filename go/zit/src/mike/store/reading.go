@@ -2,7 +2,7 @@ package store
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
@@ -31,7 +31,7 @@ func (s *Store) UpdateTransactedWithExternal(
 }
 
 func (s *Store) ReadTransactedFromKennung(
-	k1 schnittstellen.StringerGattungGetter,
+	k1 interfaces.StringerGattungGetter,
 ) (sk1 *sku.Transacted, err error) {
 	sk1 = sku.GetTransactedPool().Get()
 
@@ -49,7 +49,7 @@ func (s *Store) ReadTransactedFromKennung(
 }
 
 func (s *Store) ReadTransactedFromKennungKastenSigil(
-	k1 schnittstellen.StringerGattungGetter,
+	k1 interfaces.StringerGattungGetter,
 	ka kennung.Kasten,
 	si kennung.Sigil,
 ) (sk1 *sku.Transacted, err error) {

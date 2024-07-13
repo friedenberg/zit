@@ -1,7 +1,7 @@
 package iter
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 func ResetMap[K comparable, V any](m map[K]V) {
@@ -10,9 +10,9 @@ func ResetMap[K comparable, V any](m map[K]V) {
 	}
 }
 
-func ResetMutableSetWithPool[E any, EPtr schnittstellen.Ptr[E]](
-	s schnittstellen.MutableSetPtrLike[E, EPtr],
-	p schnittstellen.Pool[E, EPtr],
+func ResetMutableSetWithPool[E any, EPtr interfaces.Ptr[E]](
+	s interfaces.MutableSetPtrLike[E, EPtr],
+	p interfaces.Pool[E, EPtr],
 ) {
 	s.EachPtr(p.Put)
 	s.Reset()

@@ -1,6 +1,6 @@
 package iter
 
-import "code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+import "code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 
 type AsyncSerializer[T any] struct {
 	chError <-chan error
@@ -9,7 +9,7 @@ type AsyncSerializer[T any] struct {
 }
 
 func MakeAsyncSerializer[T any](
-	wf schnittstellen.FuncIter[T],
+	wf interfaces.FuncIter[T],
 ) AsyncSerializer[T] {
 	chError := make(chan error)
 	chE := make(chan T)

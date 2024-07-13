@@ -71,7 +71,7 @@ func (c Exec) runBash(
 	func() {
 		var ar io.ReadCloser
 
-		if ar, err = u.Standort().AkteReader(
+		if ar, err = u.Standort().BlobReader(
 			tz.GetAkteSha(),
 		); err != nil {
 			err = errors.Wrap(err)

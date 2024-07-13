@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
@@ -18,7 +18,7 @@ import (
 
 type textFormatterCommon struct {
 	standort      standort.Standort
-	akteFactory   schnittstellen.AkteReaderFactory
+	akteFactory   interfaces.BlobReaderFactory
 	akteFormatter script_config.RemoteScript
 	TextFormatterOptions
 }
@@ -159,7 +159,7 @@ func (f textFormatterCommon) writeAkte(
 	var ar io.ReadCloser
 	m := c.GetMetadatei()
 
-	if ar, err = f.akteFactory.AkteReader(&m.Akte); err != nil {
+	if ar, err = f.akteFactory.BlobReader(&m.Akte); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

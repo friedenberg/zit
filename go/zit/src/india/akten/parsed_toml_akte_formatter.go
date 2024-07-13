@@ -5,11 +5,11 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 )
 
-type ParsedAkteTomlFormatter[O schnittstellen.Akte[O], OPtr schnittstellen.AktePtr[O]] struct{}
+type ParsedAkteTomlFormatter[O interfaces.Blob[O], OPtr interfaces.BlobPtr[O]] struct{}
 
 func (_ ParsedAkteTomlFormatter[O, OPtr]) FormatParsedAkte(
 	w1 io.Writer,

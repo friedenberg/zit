@@ -9,7 +9,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/coordinates"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/hinweisen"
@@ -21,7 +21,7 @@ type encodedKennung struct {
 }
 
 type oldIndex struct {
-	su schnittstellen.VerzeichnisseFactory
+	su interfaces.VerzeichnisseFactory
 
 	lock sync.Mutex
 	path string
@@ -37,9 +37,9 @@ type oldIndex struct {
 }
 
 func MakeIndex(
-	k schnittstellen.Konfig,
-	s schnittstellen.Standort,
-	su schnittstellen.VerzeichnisseFactory,
+	k interfaces.Konfig,
+	s interfaces.Standort,
+	su interfaces.VerzeichnisseFactory,
 ) (i *oldIndex, err error) {
 	i = &oldIndex{
 		path:               s.FileVerzeichnisseKennung(),

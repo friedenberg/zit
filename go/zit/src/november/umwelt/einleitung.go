@@ -9,7 +9,7 @@ import (
 	"path"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
@@ -157,7 +157,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 	{
 		err = nil
 
-		var sh schnittstellen.ShaLike
+		var sh interfaces.ShaLike
 
 		if sh, _, err = u.GetStore().GetAkten().GetTypV0().SaveAkteText(
 			&defaultTyp,
@@ -183,7 +183,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 	}
 
 	{
-		var sh schnittstellen.ShaLike
+		var sh interfaces.ShaLike
 
 		if sh, err = writeDefaultErworben(u, defaultTypKennung); err != nil {
 			err = errors.Wrap(err)
@@ -205,14 +205,14 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 func writeDefaultErworben(
 	u *Umwelt,
 	dt kennung.Typ,
-) (sh schnittstellen.ShaLike, err error) {
+) (sh interfaces.ShaLike, err error) {
 	defaultKonfig := erworben.Default(dt)
 
 	f := u.GetStore().GetKonfigAkteFormat()
 
 	var aw sha.WriteCloser
 
-	if aw, err = u.Standort().AkteWriter(); err != nil {
+	if aw, err = u.Standort().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

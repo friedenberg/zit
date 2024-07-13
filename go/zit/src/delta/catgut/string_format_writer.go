@@ -2,7 +2,7 @@ package catgut
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 type stringFormatWriter struct{}
@@ -10,7 +10,7 @@ type stringFormatWriter struct{}
 var StringFormatWriter stringFormatWriter
 
 func (stringFormatWriter) WriteStringFormat(
-	sw schnittstellen.WriterAndStringWriter,
+	sw interfaces.WriterAndStringWriter,
 	e *String,
 ) (n int64, err error) {
 	n, err = e.WriteTo(sw)

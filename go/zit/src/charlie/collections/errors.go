@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 )
 
@@ -15,7 +15,7 @@ var (
 	ErrNotFound          = errNotFound("not found")
 )
 
-func MakeErrNotFound(value schnittstellen.Stringer) error {
+func MakeErrNotFound(value interfaces.Stringer) error {
 	return errors.WrapN(1, errNotFound(value.String()))
 }
 

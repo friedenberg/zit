@@ -6,19 +6,19 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 type LineWriter struct {
 	lastWasNewline bool
-	elements       []schnittstellen.FuncWriter
+	elements       []interfaces.FuncWriter
 }
 
 var MakeLineWriter = NewLineWriter
 
 func NewLineWriter() *LineWriter {
 	w := &LineWriter{
-		elements: make([]schnittstellen.FuncWriter, 0),
+		elements: make([]interfaces.FuncWriter, 0),
 	}
 
 	return w

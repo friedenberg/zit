@@ -3,11 +3,11 @@ package iter
 import (
 	"encoding/gob"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 type StringerKeyer[
-	T schnittstellen.Stringer,
+	T interfaces.Stringer,
 ] struct{}
 
 func (sk StringerKeyer[T]) RegisterGob() StringerKeyer[T] {
@@ -20,10 +20,10 @@ func (sk StringerKeyer[T]) GetKey(e T) string {
 }
 
 type StringerKeyerPtr[
-	T schnittstellen.Stringer,
+	T interfaces.Stringer,
 	TPtr interface {
-		schnittstellen.Ptr[T]
-		schnittstellen.Stringer
+		interfaces.Ptr[T]
+		interfaces.Stringer
 	},
 ] struct{}
 

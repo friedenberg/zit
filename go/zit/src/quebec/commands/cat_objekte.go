@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -86,11 +86,11 @@ func (c CatObjekte) Run(
 func (c CatObjekte) akte(
 	u *umwelt.Umwelt,
 	sh *sha.Sha,
-	akteWriter schnittstellen.FuncIter[io.ReadCloser],
+	akteWriter interfaces.FuncIter[io.ReadCloser],
 ) (err error) {
 	var r io.ReadCloser
 
-	if r, err = u.Standort().AkteReader(sh); err != nil {
+	if r, err = u.Standort().BlobReader(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

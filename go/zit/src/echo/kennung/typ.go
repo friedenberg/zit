@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 )
@@ -73,7 +73,7 @@ func (t *Typ) GetTypPtr() *Typ {
 	return t
 }
 
-func (o Typ) GetGattung() schnittstellen.GattungLike {
+func (o Typ) GetGattung() interfaces.GattungLike {
 	return gattung.Typ
 }
 

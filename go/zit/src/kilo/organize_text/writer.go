@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
@@ -20,7 +20,7 @@ type assignmentLineWriter struct {
 	maxDepth            int
 	maxKopf, maxSchwanz int
 	maxLen              int
-	stringFormatWriter  schnittstellen.StringFormatWriter[*sku.Transacted]
+	stringFormatWriter  interfaces.StringFormatWriter[*sku.Transacted]
 }
 
 func (av assignmentLineWriter) write(a *Assignment) (err error) {

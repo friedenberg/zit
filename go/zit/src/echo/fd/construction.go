@@ -6,7 +6,7 @@ import (
 	"path"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -24,7 +24,7 @@ func FDFromDir(
 
 func FDFromPathWithAkteWriterFactory(
 	p string,
-	awf schnittstellen.AkteWriterFactory,
+	awf interfaces.BlobWriterFactory,
 ) (fd *FD, err error) {
 	if p == "" {
 		err = errors.Errorf("empty path")
@@ -100,7 +100,7 @@ func FileInfo(fi os.FileInfo, dir string) (fd *FD, err error) {
 
 func MakeFileFromFD(
 	fd *FD,
-	awf schnittstellen.AkteWriterFactory,
+	awf interfaces.BlobWriterFactory,
 ) (ut *FD, err error) {
 	ut = &FD{}
 	ut.ResetWith(fd)
@@ -116,7 +116,7 @@ func MakeFileFromFD(
 
 	var aw sha.WriteCloser
 
-	if aw, err = awf.AkteWriter(); err != nil {
+	if aw, err = awf.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -136,7 +136,7 @@ func MakeFileFromFD(
 func MakeFileRelativeTo(
 	dir string,
 	p string,
-	awf schnittstellen.AkteWriterFactory,
+	awf interfaces.BlobWriterFactory,
 ) (ut *FD, err error) {
 	todo.Remove()
 	ut = &FD{}
@@ -163,7 +163,7 @@ func MakeFileRelativeTo(
 
 func MakeFile(
 	p string,
-	awf schnittstellen.AkteWriterFactory,
+	awf interfaces.BlobWriterFactory,
 ) (ut *FD, err error) {
 	todo.Remove()
 	ut = &FD{}

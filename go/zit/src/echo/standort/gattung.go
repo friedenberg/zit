@@ -2,7 +2,7 @@ package standort
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
@@ -10,8 +10,8 @@ import (
 )
 
 func (s Standort) DirObjektenGattung(
-	sv schnittstellen.StoreVersion,
-	g schnittstellen.GattungGetter,
+	sv interfaces.StoreVersion,
+	g interfaces.GattungGetter,
 ) (p string, err error) {
 	switch sv.GetInt() {
 	case 0, 1:
@@ -23,7 +23,7 @@ func (s Standort) DirObjektenGattung(
 }
 
 func (s Standort) dirObjektenGattung2(
-	g1 schnittstellen.GattungGetter,
+	g1 interfaces.GattungGetter,
 ) (p string, err error) {
 	g := g1.GetGattung()
 
@@ -38,7 +38,7 @@ func (s Standort) dirObjektenGattung2(
 }
 
 func (s Standort) dirObjektenGattung(
-	g schnittstellen.GattungGetter,
+	g interfaces.GattungGetter,
 ) (p string, err error) {
 	switch g.GetGattung() {
 	case gattung.Akte:
@@ -71,8 +71,8 @@ func (s Standort) dirObjektenGattung(
 }
 
 func (s Standort) HasObjekte(
-	sv schnittstellen.StoreVersion,
-	g schnittstellen.GattungGetter,
+	sv interfaces.StoreVersion,
+	g interfaces.GattungGetter,
 	sh sha.ShaLike,
 ) (ok bool) {
 	var d string
@@ -89,7 +89,7 @@ func (s Standort) HasObjekte(
 }
 
 func (s Standort) HasAkte(
-	sv schnittstellen.StoreVersion,
+	sv interfaces.StoreVersion,
 	sh sha.ShaLike,
 ) (ok bool) {
 	if sh.GetShaLike().IsNull() {
@@ -116,7 +116,7 @@ func (s Standort) DirObjektenTransaktion() string {
 
 func (s Standort) ReadAllLevel2Files(
 	p string,
-	w schnittstellen.FuncIter[string],
+	w interfaces.FuncIter[string],
 ) (err error) {
 	if err = files.ReadDirNamesLevel2(
 		files.MakeDirNameWriterIgnoringHidden(w),
@@ -131,7 +131,7 @@ func (s Standort) ReadAllLevel2Files(
 
 func (s Standort) ReadAllShas(
 	p string,
-	w schnittstellen.FuncIter[*sha.Sha],
+	w interfaces.FuncIter[*sha.Sha],
 ) (err error) {
 	wf := func(p string) (err error) {
 		var sh *sha.Sha
@@ -158,9 +158,9 @@ func (s Standort) ReadAllShas(
 }
 
 func (s Standort) ReadAllShasForGattung(
-	sv schnittstellen.StoreVersion,
-	g schnittstellen.GattungGetter,
-	w schnittstellen.FuncIter[*sha.Sha],
+	sv interfaces.StoreVersion,
+	g interfaces.GattungGetter,
+	w interfaces.FuncIter[*sha.Sha],
 ) (err error) {
 	var p string
 

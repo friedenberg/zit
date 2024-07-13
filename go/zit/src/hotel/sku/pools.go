@@ -1,11 +1,11 @@
 package sku
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 )
 
-var poolTransacted schnittstellen.Pool[Transacted, *Transacted]
+var poolTransacted interfaces.Pool[Transacted, *Transacted]
 
 func init() {
 	poolTransacted = pool.MakePool(
@@ -14,6 +14,6 @@ func init() {
 	)
 }
 
-func GetTransactedPool() schnittstellen.Pool[Transacted, *Transacted] {
+func GetTransactedPool() interfaces.Pool[Transacted, *Transacted] {
 	return poolTransacted
 }

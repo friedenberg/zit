@@ -1,11 +1,11 @@
 package iter
 
-import "code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+import "code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 
-func AddClonePoolPtr[E any, EPtr schnittstellen.Ptr[E]](
-	s schnittstellen.Adder[EPtr],
-	p schnittstellen.Pool[E, EPtr],
-	r schnittstellen.Resetter2[E, EPtr],
+func AddClonePoolPtr[E any, EPtr interfaces.Ptr[E]](
+	s interfaces.Adder[EPtr],
+	p interfaces.Pool[E, EPtr],
+	r interfaces.Resetter2[E, EPtr],
 	b EPtr,
 ) (err error) {
 	a := p.Get()
@@ -13,11 +13,11 @@ func AddClonePoolPtr[E any, EPtr schnittstellen.Ptr[E]](
 	return s.Add(a)
 }
 
-func MakeAddClonePoolPtrFunc[E any, EPtr schnittstellen.Ptr[E]](
-	s schnittstellen.Adder[EPtr],
-	p schnittstellen.Pool[E, EPtr],
-	r schnittstellen.Resetter2[E, EPtr],
-) schnittstellen.FuncIter[EPtr] {
+func MakeAddClonePoolPtrFunc[E any, EPtr interfaces.Ptr[E]](
+	s interfaces.Adder[EPtr],
+	p interfaces.Pool[E, EPtr],
+	r interfaces.Resetter2[E, EPtr],
+) interfaces.FuncIter[EPtr] {
 	return MakeSyncSerializer(func(e EPtr) (err error) {
 		return AddClonePoolPtr(s, p, r, e)
 	})

@@ -10,7 +10,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/coordinates"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
@@ -19,7 +19,7 @@ import (
 )
 
 type hinweisIndex struct {
-	su schnittstellen.VerzeichnisseFactory
+	su interfaces.VerzeichnisseFactory
 
 	lock *sync.RWMutex
 	path string
@@ -35,9 +35,9 @@ type hinweisIndex struct {
 }
 
 func MakeIndex(
-	k schnittstellen.Konfig,
-	s schnittstellen.Standort,
-	su schnittstellen.VerzeichnisseFactory,
+	k interfaces.Konfig,
+	s interfaces.Standort,
+	su interfaces.VerzeichnisseFactory,
 ) (i *hinweisIndex, err error) {
 	i = &hinweisIndex{
 		lock:               &sync.RWMutex{},

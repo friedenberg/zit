@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -61,7 +61,7 @@ func (a *Sha) Equals(b *Sha) bool {
 	return a.value.Equals(&b.value)
 }
 
-func (e Sha) GetGattung() schnittstellen.GattungLike {
+func (e Sha) GetGattung() interfaces.GattungLike {
 	return gattung.Akte
 }
 
@@ -88,7 +88,7 @@ func (t Sha) GetSha() Sha {
 	return t
 }
 
-func (a Sha) EqualsSha(b schnittstellen.ShaLike) bool {
+func (a Sha) EqualsSha(b interfaces.ShaLike) bool {
 	return a.value.EqualsSha(b)
 }
 
@@ -112,7 +112,7 @@ func (t Sha) Schwanz() string {
 	return t.value.Schwanz()
 }
 
-func (t Sha) GetShaLike() schnittstellen.ShaLike {
+func (t Sha) GetShaLike() interfaces.ShaLike {
 	return t
 }
 

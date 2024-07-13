@@ -2,15 +2,15 @@ package collections_ptr
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 )
 
 func MakeValueSetString[
-	T schnittstellen.Stringer,
-	TPtr schnittstellen.StringSetterPtr[T],
+	T interfaces.Stringer,
+	TPtr interfaces.StringSetterPtr[T],
 ](
-	keyer schnittstellen.StringKeyerPtr[T, TPtr],
+	keyer interfaces.StringKeyerPtr[T, TPtr],
 	es ...string,
 ) (s Set[T, TPtr], err error) {
 	s.E = make(map[string]TPtr, len(es))
@@ -37,10 +37,10 @@ func MakeValueSetString[
 }
 
 func MakeValueSetValue[
-	T schnittstellen.Stringer,
-	TPtr schnittstellen.StringerPtr[T],
+	T interfaces.Stringer,
+	TPtr interfaces.StringerPtr[T],
 ](
-	keyer schnittstellen.StringKeyerPtr[T, TPtr],
+	keyer interfaces.StringKeyerPtr[T, TPtr],
 	es ...T,
 ) (s Set[T, TPtr]) {
 	s.E = make(map[string]TPtr, len(es))
@@ -60,10 +60,10 @@ func MakeValueSetValue[
 }
 
 func MakeValueSet[
-	T schnittstellen.Stringer,
-	TPtr schnittstellen.StringerPtr[T],
+	T interfaces.Stringer,
+	TPtr interfaces.StringerPtr[T],
 ](
-	keyer schnittstellen.StringKeyerPtr[T, TPtr],
+	keyer interfaces.StringKeyerPtr[T, TPtr],
 	es ...TPtr,
 ) (s Set[T, TPtr]) {
 	s.E = make(map[string]TPtr, len(es))
@@ -82,8 +82,8 @@ func MakeValueSet[
 	return
 }
 
-func MakeSetValue[T any, TPtr schnittstellen.Ptr[T]](
-	keyer schnittstellen.StringKeyerPtr[T, TPtr],
+func MakeSetValue[T any, TPtr interfaces.Ptr[T]](
+	keyer interfaces.StringKeyerPtr[T, TPtr],
 	es ...T,
 ) (s Set[T, TPtr]) {
 	s.E = make(map[string]TPtr, len(es))
@@ -102,8 +102,8 @@ func MakeSetValue[T any, TPtr schnittstellen.Ptr[T]](
 	return
 }
 
-func MakeSet[T any, TPtr schnittstellen.Ptr[T]](
-	keyer schnittstellen.StringKeyerPtr[T, TPtr],
+func MakeSet[T any, TPtr interfaces.Ptr[T]](
+	keyer interfaces.StringKeyerPtr[T, TPtr],
 	es ...TPtr,
 ) (s Set[T, TPtr]) {
 	s.E = make(map[string]TPtr, len(es))
@@ -123,10 +123,10 @@ func MakeSet[T any, TPtr schnittstellen.Ptr[T]](
 }
 
 func MakeMutableValueSetValue[
-	T schnittstellen.Stringer,
-	TPtr schnittstellen.StringerPtr[T],
+	T interfaces.Stringer,
+	TPtr interfaces.StringerPtr[T],
 ](
-	keyer schnittstellen.StringKeyerPtr[T, TPtr],
+	keyer interfaces.StringKeyerPtr[T, TPtr],
 	es ...T,
 ) (s MutableSet[T, TPtr]) {
 	s.E = make(map[string]TPtr, len(es))
@@ -146,10 +146,10 @@ func MakeMutableValueSetValue[
 }
 
 func MakeMutableValueSet[
-	T schnittstellen.Stringer,
-	TPtr schnittstellen.StringerPtr[T],
+	T interfaces.Stringer,
+	TPtr interfaces.StringerPtr[T],
 ](
-	keyer schnittstellen.StringKeyerPtr[T, TPtr],
+	keyer interfaces.StringKeyerPtr[T, TPtr],
 	es ...TPtr,
 ) (s MutableSet[T, TPtr]) {
 	s.E = make(map[string]TPtr, len(es))
@@ -169,10 +169,10 @@ func MakeMutableValueSet[
 }
 
 func MakeMutableSetValue[
-	T schnittstellen.Stringer,
-	TPtr schnittstellen.StringerPtr[T],
+	T interfaces.Stringer,
+	TPtr interfaces.StringerPtr[T],
 ](
-	keyer schnittstellen.StringKeyerPtr[T, TPtr],
+	keyer interfaces.StringKeyerPtr[T, TPtr],
 	es ...T,
 ) (s MutableSet[T, TPtr]) {
 	s.E = make(map[string]TPtr, len(es))
@@ -191,8 +191,8 @@ func MakeMutableSetValue[
 	return
 }
 
-func MakeMutableSet[T any, TPtr schnittstellen.Ptr[T]](
-	keyer schnittstellen.StringKeyerPtr[T, TPtr],
+func MakeMutableSet[T any, TPtr interfaces.Ptr[T]](
+	keyer interfaces.StringKeyerPtr[T, TPtr],
 	es ...TPtr,
 ) (s MutableSet[T, TPtr]) {
 	s.E = make(map[string]TPtr, len(es))

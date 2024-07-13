@@ -3,7 +3,7 @@ package standort
 import (
 	"fmt"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
@@ -23,7 +23,7 @@ func (e ErrNotInZitDir) Is(target error) (ok bool) {
 }
 
 func MakeErrAlreadyExists(
-	sh schnittstellen.ShaLike,
+	sh interfaces.ShaLike,
 	path string,
 ) (err *ErrAlreadyExists) {
 	err = &ErrAlreadyExists{Path: path}

@@ -4,12 +4,12 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 var ErrNoAbbreviation = errors.New("no abbreviation")
 
-func MakeErrUnsupportedGattung(g schnittstellen.GattungGetter) error {
+func MakeErrUnsupportedGattung(g interfaces.GattungGetter) error {
 	return errors.WrapN(1, errUnsupportedGattung{GattungLike: g.GetGattung()})
 }
 
@@ -18,7 +18,7 @@ func IsErrUnsupportedGattung(err error) bool {
 }
 
 type errUnsupportedGattung struct {
-	schnittstellen.GattungLike
+	interfaces.GattungLike
 }
 
 func (e errUnsupportedGattung) Is(target error) (ok bool) {

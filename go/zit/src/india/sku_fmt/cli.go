@@ -2,7 +2,7 @@ package sku_fmt
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -15,13 +15,13 @@ type cli struct {
 	options       erworben_cli_print_options.PrintOptions
 	contentPrefix string
 
-	kennungStringFormatWriter   schnittstellen.StringFormatWriter[*kennung.Kennung2]
-	metadateiStringFormatWriter schnittstellen.StringFormatWriter[*metadatei.Metadatei]
+	kennungStringFormatWriter   interfaces.StringFormatWriter[*kennung.Kennung2]
+	metadateiStringFormatWriter interfaces.StringFormatWriter[*metadatei.Metadatei]
 }
 
 func MakeCliFormatShort(
-	kennungStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Kennung2],
-	metadateiStringFormatWriter schnittstellen.StringFormatWriter[*metadatei.Metadatei],
+	kennungStringFormatWriter interfaces.StringFormatWriter[*kennung.Kennung2],
+	metadateiStringFormatWriter interfaces.StringFormatWriter[*metadatei.Metadatei],
 ) *cli {
 	return &cli{
 		kennungStringFormatWriter:   kennungStringFormatWriter,
@@ -31,8 +31,8 @@ func MakeCliFormatShort(
 
 func MakeCliFormat(
 	options erworben_cli_print_options.PrintOptions,
-	kennungStringFormatWriter schnittstellen.StringFormatWriter[*kennung.Kennung2],
-	metadateiStringFormatWriter schnittstellen.StringFormatWriter[*metadatei.Metadatei],
+	kennungStringFormatWriter interfaces.StringFormatWriter[*kennung.Kennung2],
+	metadateiStringFormatWriter interfaces.StringFormatWriter[*metadatei.Metadatei],
 ) *cli {
 	return &cli{
 		options: options,
@@ -45,7 +45,7 @@ func MakeCliFormat(
 }
 
 func (f *cli) WriteStringFormat(
-	sw schnittstellen.WriterAndStringWriter,
+	sw interfaces.WriterAndStringWriter,
 	o *sku.Transacted,
 ) (n int64, err error) {
 	var n1 int

@@ -2,15 +2,15 @@ package collections_ptr
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 )
 
 type Set[
 	T any,
-	TPtr schnittstellen.Ptr[T],
+	TPtr interfaces.Ptr[T],
 ] struct {
-	K schnittstellen.StringKeyerPtr[T, TPtr]
+	K interfaces.StringKeyerPtr[T, TPtr]
 	E map[string]TPtr
 }
 
@@ -68,7 +68,7 @@ func (s Set[T, TPtr]) Contains(e T) (ok bool) {
 	return s.ContainsKey(s.Key(e))
 }
 
-func (s Set[T, TPtr]) EachKey(wf schnittstellen.FuncIterKey) (err error) {
+func (s Set[T, TPtr]) EachKey(wf interfaces.FuncIterKey) (err error) {
 	for v := range s.E {
 		if err = wf(v); err != nil {
 			if errors.Is(err, iter.MakeErrStopIteration()) {
@@ -94,7 +94,7 @@ func (s Set[T, TPtr]) AddPtr(v TPtr) (err error) {
 	return
 }
 
-func (s Set[T, TPtr]) Each(wf schnittstellen.FuncIter[T]) (err error) {
+func (s Set[T, TPtr]) Each(wf interfaces.FuncIter[T]) (err error) {
 	for _, v := range s.E {
 		if err = wf(*v); err != nil {
 			if iter.IsStopIteration(err) {
@@ -111,7 +111,7 @@ func (s Set[T, TPtr]) Each(wf schnittstellen.FuncIter[T]) (err error) {
 }
 
 func (s Set[T, TPtr]) EachPtr(
-	wf schnittstellen.FuncIter[TPtr],
+	wf interfaces.FuncIter[TPtr],
 ) (err error) {
 	for _, v := range s.E {
 		if err = wf(v); err != nil {
@@ -128,21 +128,21 @@ func (s Set[T, TPtr]) EachPtr(
 	return
 }
 
-func (a Set[T, TPtr]) CloneSetLike() schnittstellen.SetLike[T] {
+func (a Set[T, TPtr]) CloneSetLike() interfaces.SetLike[T] {
 	return a
 }
 
-func (a Set[T, TPtr]) CloneMutableSetLike() schnittstellen.MutableSetLike[T] {
+func (a Set[T, TPtr]) CloneMutableSetLike() interfaces.MutableSetLike[T] {
 	c := MakeMutableSet[T, TPtr](a.K)
 	a.Each(c.Add)
 	return c
 }
 
-func (a Set[T, TPtr]) CloneSetPtrLike() schnittstellen.SetPtrLike[T, TPtr] {
+func (a Set[T, TPtr]) CloneSetPtrLike() interfaces.SetPtrLike[T, TPtr] {
 	return a
 }
 
-func (a Set[T, TPtr]) CloneMutableSetPtrLike() schnittstellen.MutableSetPtrLike[T, TPtr] {
+func (a Set[T, TPtr]) CloneMutableSetPtrLike() interfaces.MutableSetPtrLike[T, TPtr] {
 	c := MakeMutableSet[T, TPtr](a.K)
 	a.Each(c.Add)
 	return c

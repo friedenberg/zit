@@ -2,14 +2,14 @@ package store_fs
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 func (s *Store) ReadTransactedFromKennung(
 	o sku.ObjekteOptions,
-	k1 schnittstellen.StringerGattungGetter,
+	k1 interfaces.StringerGattungGetter,
 	t *sku.Transacted,
 ) (e *External, err error) {
 	k, ok := s.Get(k1)

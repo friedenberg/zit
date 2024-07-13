@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
@@ -88,7 +88,7 @@ type compiled struct {
 
 	// Etiketten
 	DefaultEtiketten  kennung.EtikettSet
-	Etiketten         schnittstellen.MutableSetLike[*ketikett]
+	Etiketten         interfaces.MutableSetLike[*ketikett]
 	ImplicitEtiketten implicitEtikettenMap
 
 	// Typen
@@ -96,7 +96,7 @@ type compiled struct {
 	TypenToExtensions map[string]string
 	DefaultTyp        sku.Transacted // deprecated
 	Typen             sku.TransactedMutableSet
-	InlineTypen       schnittstellen.SetLike[values.String]
+	InlineTypen       interfaces.SetLike[values.String]
 
 	// Kasten
 	Kisten sku.TransactedMutableSet
@@ -158,7 +158,7 @@ type ApproximatedTyp = akten.ApproximatedTyp
 
 func (k *compiled) setTransacted(
 	kt1 *sku.Transacted,
-	kag schnittstellen.AkteGetter[*erworben.Akte],
+	kag interfaces.BlobGetter[*erworben.Akte],
 ) (didChange bool, err error) {
 	if !sku.TransactedLessor.LessPtr(&k.Sku, kt1) {
 		return
@@ -178,7 +178,7 @@ func (k *compiled) setTransacted(
 
 	var a *erworben.Akte
 
-	if a, err = kag.GetAkte(k.Sku.GetAkteSha()); err != nil {
+	if a, err = kag.GetBlob(k.Sku.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

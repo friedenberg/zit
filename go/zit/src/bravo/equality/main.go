@@ -1,11 +1,11 @@
 package equality
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"golang.org/x/exp/constraints"
 )
 
-func MapsEquatable[K constraints.Ordered, V schnittstellen.Equatable[V]](
+func MapsEquatable[K constraints.Ordered, V interfaces.Equatable[V]](
 	a, b map[K]V,
 ) bool {
 	if len(a) != len(b) {

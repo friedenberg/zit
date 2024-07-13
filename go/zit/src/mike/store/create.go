@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
@@ -67,7 +67,7 @@ func (s *Store) CreateOrUpdateFromTransacted(
 
 func (s *Store) CreateOrUpdateAkteSha(
 	k kennung.Kennung,
-	sh schnittstellen.ShaLike,
+	sh interfaces.ShaLike,
 ) (t *sku.Transacted, err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{

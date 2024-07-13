@@ -1,7 +1,7 @@
 package kennung
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 )
 
@@ -10,8 +10,8 @@ func init() {
 }
 
 type (
-	HinweisSet        = schnittstellen.SetLike[Hinweis]
-	HinweisMutableSet = schnittstellen.MutableSetLike[Hinweis]
+	HinweisSet        = interfaces.SetLike[Hinweis]
+	HinweisMutableSet = interfaces.MutableSetLike[Hinweis]
 )
 
 func MakeHinweisMutableSet(hs ...Hinweis) HinweisMutableSet {

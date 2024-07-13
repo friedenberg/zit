@@ -3,7 +3,7 @@ package expansion
 import (
 	"regexp"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 var (
@@ -13,7 +13,7 @@ var (
 )
 
 type Expander interface {
-	Expand(schnittstellen.FuncSetString, string)
+	Expand(interfaces.FuncSetString, string)
 }
 
 func init() {

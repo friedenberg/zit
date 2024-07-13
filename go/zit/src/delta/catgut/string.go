@@ -9,7 +9,7 @@ import (
 	"unsafe"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio_buffer"
@@ -372,7 +372,7 @@ func (src *String) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 func (src *String) WriteToStringWriter(
-	w schnittstellen.WriterAndStringWriter,
+	w interfaces.WriterAndStringWriter,
 ) (n int64, err error) {
 	return src.WriteTo(w)
 }

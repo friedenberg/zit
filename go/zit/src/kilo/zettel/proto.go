@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
@@ -65,7 +65,7 @@ func (pz ProtoZettel) Make() (z *sku.Transacted) {
 
 func (pz ProtoZettel) Apply(
 	ml metadatei.MetadateiLike,
-	gg schnittstellen.GattungGetter,
+	gg interfaces.GattungGetter,
 ) (ok bool) {
 	z := ml.GetMetadatei()
 

@@ -1,7 +1,7 @@
 package metadatei
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 )
 
@@ -11,7 +11,7 @@ type TextFormat struct {
 }
 
 func MakeTextFormat(
-	akteFactory schnittstellen.AkteIOFactory,
+	akteFactory interfaces.BlobIOFactory,
 	akteFormatter script_config.RemoteScript,
 ) TextFormat {
 	return TextFormat{

@@ -2,7 +2,7 @@ package query
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -11,7 +11,7 @@ import (
 
 func MakeSelbstApply(
 	selbst *sku.Transacted,
-) schnittstellen.FuncIter[*lua.VM] {
+) interfaces.FuncIter[*lua.VM] {
 	if selbst == nil {
 		return nil
 	}

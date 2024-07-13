@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 )
@@ -24,7 +24,7 @@ func once() {
 }
 
 func register[T Kennung, TPtr interface {
-	schnittstellen.StringSetterPtr[T]
+	interfaces.StringSetterPtr[T]
 	Kennung
 }](id T,
 ) {

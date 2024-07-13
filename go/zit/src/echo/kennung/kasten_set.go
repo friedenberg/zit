@@ -1,7 +1,7 @@
 package kennung
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 )
 
@@ -10,8 +10,8 @@ func init() {
 }
 
 type (
-	KastenSet        = schnittstellen.SetLike[Kasten]
-	KastenMutableSet = schnittstellen.MutableSetLike[Kasten]
+	KastenSet        = interfaces.SetLike[Kasten]
+	KastenMutableSet = interfaces.MutableSetLike[Kasten]
 )
 
 func MakeKastenSet(ts ...Kasten) KastenSet {

@@ -4,14 +4,14 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 )
 
 type ErrUnsupportedFormatterValue interface {
 	error
 	GetFormatValue() string
-	GetGattung() schnittstellen.GattungLike
+	GetGattung() interfaces.GattungLike
 }
 
 func IsErrUnsupportedFormatterValue(err error) bool {
@@ -21,7 +21,7 @@ func IsErrUnsupportedFormatterValue(err error) bool {
 
 func MakeErrUnsupportedFormatterValue(
 	formatValue string,
-	g schnittstellen.GattungLike,
+	g interfaces.GattungLike,
 ) error {
 	return errors.Wrap(
 		errUnsupportedFormatter{
@@ -53,6 +53,6 @@ func (e errUnsupportedFormatter) GetFormatValue() string {
 	return e.format
 }
 
-func (e errUnsupportedFormatter) GetGattung() schnittstellen.GattungLike {
+func (e errUnsupportedFormatter) GetGattung() interfaces.GattungLike {
 	return e.gattung
 }

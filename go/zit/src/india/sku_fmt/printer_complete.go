@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
@@ -14,7 +14,7 @@ import (
 
 type WriterComplete struct {
 	wBuf         *bufio.Writer
-	pool         schnittstellen.Pool[sku.Transacted, *sku.Transacted]
+	pool         interfaces.Pool[sku.Transacted, *sku.Transacted]
 	chTransacted chan *sku.Transacted
 	chDone       chan struct{}
 }

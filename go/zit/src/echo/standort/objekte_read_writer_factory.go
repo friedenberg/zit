@@ -1,26 +1,26 @@
 package standort
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 func (s Standort) ObjekteReaderFactory(
-	g schnittstellen.GattungGetter,
-) schnittstellen.ObjekteReaderFactory {
+	g interfaces.GattungGetter,
+) interfaces.ObjekteReaderFactory {
 	return s.ObjekteReaderWriterFactory(g)
 }
 
 func (s Standort) ObjekteReaderWriterFactory(
-	g schnittstellen.GattungGetter,
-) schnittstellen.ObjekteIOFactory {
-	return schnittstellen.MakeBespokeObjekteReadWriterFactory(
-		schnittstellen.MakeBespokeObjekteReadFactory(
-			func(sh schnittstellen.ShaGetter) (schnittstellen.ShaReadCloser, error) {
+	g interfaces.GattungGetter,
+) interfaces.ObjekteIOFactory {
+	return interfaces.MakeBespokeObjekteReadWriterFactory(
+		interfaces.MakeBespokeObjekteReadFactory(
+			func(sh interfaces.ShaGetter) (interfaces.ShaReadCloser, error) {
 				return s.objekteReader(g, sh)
 			},
 		),
-		schnittstellen.MakeBespokeObjekteWriteFactory(
-			func() (schnittstellen.ShaWriteCloser, error) {
+		interfaces.MakeBespokeObjekteWriteFactory(
+			func() (interfaces.ShaWriteCloser, error) {
 				return s.objekteWriter(g)
 			},
 		),

@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
@@ -27,7 +27,7 @@ type page struct {
 }
 
 func (p *page) initialize(
-	equaler schnittstellen.Equaler1[*row],
+	equaler interfaces.Equaler1[*row],
 	s standort.Standort,
 	pid sha.PageId,
 ) (err error) {

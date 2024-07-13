@@ -4,12 +4,12 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 func MakeSyncSerializer[T any](
-	wf schnittstellen.FuncIter[T],
-) schnittstellen.FuncIter[T] {
+	wf interfaces.FuncIter[T],
+) interfaces.FuncIter[T] {
 	l := &sync.Mutex{}
 
 	return func(e T) (err error) {

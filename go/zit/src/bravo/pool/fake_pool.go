@@ -1,10 +1,10 @@
 package pool
 
-import "code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+import "code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 
-type fakePool[T any, TPtr schnittstellen.Ptr[T]] struct{}
+type fakePool[T any, TPtr interfaces.Ptr[T]] struct{}
 
-func MakeFakePool[T any, TPtr schnittstellen.Ptr[T]]() *fakePool[T, TPtr] {
+func MakeFakePool[T any, TPtr interfaces.Ptr[T]]() *fakePool[T, TPtr] {
 	return &fakePool[T, TPtr]{}
 }
 

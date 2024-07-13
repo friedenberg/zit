@@ -4,10 +4,10 @@ import (
 	"sort"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
-func Elements[T any](s schnittstellen.Iterable[T]) (out []T) {
+func Elements[T any](s interfaces.Iterable[T]) (out []T) {
 	if s == nil {
 		return
 	}
@@ -27,7 +27,7 @@ func Elements[T any](s schnittstellen.Iterable[T]) (out []T) {
 }
 
 func ElementsSorted[T any](
-	s schnittstellen.Iterable[T],
+	s interfaces.Iterable[T],
 	sf func(T, T) bool,
 ) (out []T) {
 	if s == nil {

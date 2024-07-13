@@ -3,14 +3,14 @@ package sku
 import (
 	"encoding/gob"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 )
 
 var (
-	transactedKeyerKennung schnittstellen.StringKeyer[*Transacted]
+	transactedKeyerKennung interfaces.StringKeyer[*Transacted]
 	TransactedSetEmpty     TransactedSet
 	TransactedLessor       transactedLessor
 	TransactedEqualer      transactedEqualer
@@ -26,14 +26,14 @@ func init() {
 }
 
 type (
-	TransactedSet        = schnittstellen.SetLike[*Transacted]
-	TransactedMutableSet = schnittstellen.MutableSetLike[*Transacted]
+	TransactedSet        = interfaces.SetLike[*Transacted]
+	TransactedMutableSet = interfaces.MutableSetLike[*Transacted]
 	TransactedHeap       = heap.Heap[Transacted, *Transacted]
 
-	CheckedOutSet            = schnittstellen.SetLike[*CheckedOut]
-	CheckedOutMutableSet     = schnittstellen.MutableSetLike[*CheckedOut]
-	CheckedOutLikeSet        = schnittstellen.SetLike[CheckedOutLike]
-	CheckedOutLikeMutableSet = schnittstellen.MutableSetLike[CheckedOutLike]
+	CheckedOutSet            = interfaces.SetLike[*CheckedOut]
+	CheckedOutMutableSet     = interfaces.MutableSetLike[*CheckedOut]
+	CheckedOutLikeSet        = interfaces.SetLike[CheckedOutLike]
+	CheckedOutLikeMutableSet = interfaces.MutableSetLike[CheckedOutLike]
 )
 
 func MakeTransactedHeap() *TransactedHeap {
@@ -76,7 +76,7 @@ type kennungGetter interface {
 type KennungKeyer[
 	T any,
 	TPtr interface {
-		schnittstellen.Ptr[T]
+		interfaces.Ptr[T]
 		kennungGetter
 	},
 ] struct{}

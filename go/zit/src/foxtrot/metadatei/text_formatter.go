@@ -3,19 +3,19 @@ package metadatei
 import (
 	"io"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 )
 
 type textFormatter struct {
 	textFormatterCommon
-	sequence []schnittstellen.FuncWriterElementInterface[TextFormatterContext]
+	sequence []interfaces.FuncWriterElementInterface[TextFormatterContext]
 }
 
 func MakeTextFormatterMetadateiAktePath(
 	options TextFormatterOptions,
-	akteFactory schnittstellen.AkteReaderFactory,
+	akteFactory interfaces.BlobReaderFactory,
 	akteFormatter script_config.RemoteScript,
 ) textFormatter {
 	if akteFactory == nil {
@@ -30,7 +30,7 @@ func MakeTextFormatterMetadateiAktePath(
 
 	return textFormatter{
 		textFormatterCommon: common,
-		sequence: []schnittstellen.FuncWriterElementInterface[TextFormatterContext]{
+		sequence: []interfaces.FuncWriterElementInterface[TextFormatterContext]{
 			common.writeBoundary,
 			common.writeCommonMetadateiFormat,
 			common.writePathTyp,
@@ -42,7 +42,7 @@ func MakeTextFormatterMetadateiAktePath(
 
 func MakeTextFormatterMetadateiOnly(
 	options TextFormatterOptions,
-	akteFactory schnittstellen.AkteReaderFactory,
+	akteFactory interfaces.BlobReaderFactory,
 	akteFormatter script_config.RemoteScript,
 ) textFormatter {
 	if akteFactory == nil {
@@ -57,7 +57,7 @@ func MakeTextFormatterMetadateiOnly(
 
 	return textFormatter{
 		textFormatterCommon: common,
-		sequence: []schnittstellen.FuncWriterElementInterface[TextFormatterContext]{
+		sequence: []interfaces.FuncWriterElementInterface[TextFormatterContext]{
 			common.writeBoundary,
 			common.writeCommonMetadateiFormat,
 			common.writeShaTyp,
@@ -69,7 +69,7 @@ func MakeTextFormatterMetadateiOnly(
 
 func MakeTextFormatterMetadateiInlineAkte(
 	options TextFormatterOptions,
-	akteFactory schnittstellen.AkteReaderFactory,
+	akteFactory interfaces.BlobReaderFactory,
 	akteFormatter script_config.RemoteScript,
 ) textFormatter {
 	if akteFactory == nil {
@@ -84,7 +84,7 @@ func MakeTextFormatterMetadateiInlineAkte(
 
 	return textFormatter{
 		textFormatterCommon: common,
-		sequence: []schnittstellen.FuncWriterElementInterface[TextFormatterContext]{
+		sequence: []interfaces.FuncWriterElementInterface[TextFormatterContext]{
 			common.writeBoundary,
 			common.writeCommonMetadateiFormat,
 			common.writeTyp,
@@ -98,7 +98,7 @@ func MakeTextFormatterMetadateiInlineAkte(
 
 func MakeTextFormatterExcludeMetadatei(
 	options TextFormatterOptions,
-	akteFactory schnittstellen.AkteReaderFactory,
+	akteFactory interfaces.BlobReaderFactory,
 	akteFormatter script_config.RemoteScript,
 ) textFormatter {
 	if akteFactory == nil {
@@ -113,7 +113,7 @@ func MakeTextFormatterExcludeMetadatei(
 
 	return textFormatter{
 		textFormatterCommon: common,
-		sequence: []schnittstellen.FuncWriterElementInterface[TextFormatterContext]{
+		sequence: []interfaces.FuncWriterElementInterface[TextFormatterContext]{
 			common.writeAkte,
 		},
 	}

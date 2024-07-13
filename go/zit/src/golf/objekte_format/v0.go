@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
@@ -66,7 +66,7 @@ func (f v0) ParsePersistentMetadatei(
 		ohio.MakeLineReaderIterate(
 			g.Set,
 			ohio.MakeLineReaderKeyValues(
-				map[string]schnittstellen.FuncSetString{
+				map[string]interfaces.FuncSetString{
 					"Tai":                        m.Tai.Set,
 					gattung.Akte.String():        m.Akte.Set,
 					gattung.Typ.String():         typLineReader,

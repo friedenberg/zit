@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
@@ -16,7 +16,7 @@ type formatAkte struct {
 }
 
 func MakeAkteFormat(
-	sv schnittstellen.StoreVersion,
+	sv interfaces.StoreVersion,
 	op objekte_format.Options,
 ) formatAkte {
 	return formatAkte{

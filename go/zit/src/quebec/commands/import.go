@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
@@ -170,7 +170,7 @@ func (c Import) importAkteIfNecessary(
 	u *umwelt.Umwelt,
 	co *store_fs.CheckedOut,
 	ag *age.Age,
-	coErrPrinter schnittstellen.FuncIter[sku.CheckedOutLike],
+	coErrPrinter interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	akteSha := co.External.GetAkteSha()
 
@@ -203,7 +203,7 @@ func (c Import) importAkteIfNecessary(
 
 	var aw sha.WriteCloser
 
-	if aw, err = u.Standort().AkteWriter(); err != nil {
+	if aw, err = u.Standort().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

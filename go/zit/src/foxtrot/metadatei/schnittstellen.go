@@ -3,7 +3,7 @@ package metadatei
 import (
 	"io"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 )
 
@@ -43,7 +43,7 @@ type (
 
 	TextParserContext interface {
 		PersistentParserContext
-		SetAkteSha(schnittstellen.ShaLike) error
+		SetAkteSha(interfaces.ShaLike) error
 	}
 
 	TextFormatOutput struct {

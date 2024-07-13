@@ -2,11 +2,11 @@ package iter
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 func SetEquals[T any](
-	a, b schnittstellen.SetLike[T],
+	a, b interfaces.SetLike[T],
 ) bool {
 	if a == nil && b == nil {
 		return true
@@ -37,8 +37,8 @@ func SetEquals[T any](
 	return true
 }
 
-func SetEqualsPtr[T any, TPtr schnittstellen.Ptr[T]](
-	a, b schnittstellen.SetPtrLike[T, TPtr],
+func SetEqualsPtr[T any, TPtr interfaces.Ptr[T]](
+	a, b interfaces.SetPtrLike[T, TPtr],
 ) bool {
 	if a == nil && b == nil {
 		return true

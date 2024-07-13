@@ -2,7 +2,7 @@ package kennung_fmt
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -10,7 +10,7 @@ import (
 
 type shaCliFormat struct {
 	abbr               func(*sha.Sha) (string, error)
-	stringFormatWriter schnittstellen.StringFormatWriter[string]
+	stringFormatWriter interfaces.StringFormatWriter[string]
 }
 
 func MakeShaCliFormat(
@@ -33,8 +33,8 @@ func MakeShaCliFormat(
 }
 
 func (f *shaCliFormat) WriteStringFormat(
-	w schnittstellen.WriterAndStringWriter,
-	s schnittstellen.ShaLike,
+	w interfaces.WriterAndStringWriter,
+	s interfaces.ShaLike,
 ) (n int64, err error) {
 	v := s.String()
 

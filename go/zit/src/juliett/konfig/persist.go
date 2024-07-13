@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
@@ -18,7 +18,7 @@ import (
 )
 
 func (kc *Compiled) recompile(
-	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
+	tagp interfaces.BlobGetterPutter[*typ_akte.V0],
 ) (err error) {
 	if err = kc.recompileEtiketten(); err != nil {
 		err = errors.Wrap(err)
@@ -68,7 +68,7 @@ func (kc *Compiled) recompileEtiketten() (err error) {
 }
 
 func (kc *Compiled) recompileTypen(
-	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
+	tagp interfaces.BlobGetterPutter[*typ_akte.V0],
 ) (err error) {
 	inlineTypen := collections_value.MakeMutableValueSet[values.String](nil)
 
@@ -80,12 +80,12 @@ func (kc *Compiled) recompileTypen(
 		func(ct *sku.Transacted) (err error) {
 			var ta *typ_akte.V0
 
-			if ta, err = tagp.GetAkte(ct.GetAkteSha()); err != nil {
+			if ta, err = tagp.GetBlob(ct.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			defer tagp.PutAkte(ta)
+			defer tagp.PutBlob(ta)
 
 			fe := ta.FileExtension
 
@@ -183,8 +183,8 @@ func (kc *Compiled) loadKonfigErworben(s standort.Standort) (err error) {
 
 func (kc *Compiled) Flush(
 	s standort.Standort,
-	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
-	printerHeader schnittstellen.FuncIter[string],
+	tagp interfaces.BlobGetterPutter[*typ_akte.V0],
+	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	if !kc.HasChanges() || kc.DryRun {
 		return
@@ -215,8 +215,8 @@ func (kc *Compiled) Flush(
 
 func (kc *Compiled) flushErworben(
 	s standort.Standort,
-	tagp schnittstellen.AkteGetterPutter[*typ_akte.V0],
-	printerHeader schnittstellen.FuncIter[string],
+	tagp interfaces.BlobGetterPutter[*typ_akte.V0],
+	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	if err = printerHeader("recompiling konfig"); err != nil {
 		err = errors.Wrap(err)

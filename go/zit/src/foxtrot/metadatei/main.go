@@ -8,7 +8,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/flag_policy"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	flag2 "code.linenisgreat.com/zit/go/zit/src/bravo/flag"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
@@ -234,7 +234,7 @@ func (m *Metadatei) SetEtiketten(e kennung.EtikettSet) {
 	errors.PanicIfError(e.EachPtr(m.AddEtikettPtr))
 }
 
-func (z *Metadatei) SetAkteSha(sh schnittstellen.ShaGetter) {
+func (z *Metadatei) SetAkteSha(sh interfaces.ShaGetter) {
 	z.Akte.SetShaLike(sh)
 }
 

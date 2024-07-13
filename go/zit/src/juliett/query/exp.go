@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
@@ -253,7 +253,7 @@ func (e *Exp) containsMatchableOr(sk *sku.Transacted) bool {
 }
 
 func (e *Exp) Each(
-	f schnittstellen.FuncIter[sku.Query],
+	f interfaces.FuncIter[sku.Query],
 ) (err error) {
 	for _, m := range e.Children {
 		if err = f(m); err != nil {

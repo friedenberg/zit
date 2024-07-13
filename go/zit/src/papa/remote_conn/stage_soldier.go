@@ -9,7 +9,7 @@ import (
 	"syscall"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
@@ -19,7 +19,7 @@ type Listener interface {
 }
 
 type MessageHiSoldier struct {
-	Angeboren schnittstellen.Angeboren
+	Angeboren interfaces.Angeboren
 }
 
 type SoldierDialogueChanElement struct {
@@ -29,7 +29,7 @@ type SoldierDialogueChanElement struct {
 }
 
 type StageSoldier struct {
-	Angeboren                 schnittstellen.AngeborenGetter
+	Angeboren                 interfaces.AngeborenGetter
 	listener                  *net.UnixListener
 	chStopWaitingForDialogues chan struct{}
 	chDialogue                chan SoldierDialogueChanElement

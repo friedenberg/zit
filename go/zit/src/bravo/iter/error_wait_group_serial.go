@@ -4,13 +4,13 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 func MakeErrorWaitGroupSerial() ErrorWaitGroup {
 	wg := &errorWaitGroupSerial{
-		do:      make([]schnittstellen.FuncError, 0),
-		doAfter: make([]schnittstellen.FuncError, 0),
+		do:      make([]interfaces.FuncError, 0),
+		doAfter: make([]interfaces.FuncError, 0),
 	}
 
 	return wg
@@ -18,7 +18,7 @@ func MakeErrorWaitGroupSerial() ErrorWaitGroup {
 
 type errorWaitGroupSerial struct {
 	lock        sync.Mutex
-	do, doAfter []schnittstellen.FuncError
+	do, doAfter []interfaces.FuncError
 	isDone      bool
 }
 
@@ -48,7 +48,7 @@ func (wg *errorWaitGroupSerial) GetError() (err error) {
 	return
 }
 
-func (wg *errorWaitGroupSerial) Do(f schnittstellen.FuncError) (d bool) {
+func (wg *errorWaitGroupSerial) Do(f interfaces.FuncError) (d bool) {
 	wg.lock.Lock()
 	defer wg.lock.Unlock()
 
@@ -61,7 +61,7 @@ func (wg *errorWaitGroupSerial) Do(f schnittstellen.FuncError) (d bool) {
 	return true
 }
 
-func (wg *errorWaitGroupSerial) DoAfter(f schnittstellen.FuncError) {
+func (wg *errorWaitGroupSerial) DoAfter(f interfaces.FuncError) {
 	wg.lock.Lock()
 	defer wg.lock.Unlock()
 

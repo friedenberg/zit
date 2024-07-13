@@ -2,7 +2,7 @@ package query
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/etikett_akte"
@@ -46,7 +46,7 @@ type Builder struct {
 	kastenGetter               sku.ExternalStoreForQueryGetter
 	kasten                     sku.ExternalStoreForQuery
 	cwdFilterEnabled           bool
-	fileExtensionGetter        schnittstellen.FileExtensionGetter
+	fileExtensionGetter        interfaces.FileExtensionGetter
 	expanders                  kennung.Abbr
 	hidden                     sku.Query
 	defaultGattungen           kennung.Gattung
@@ -101,7 +101,7 @@ func (mb *Builder) WithKasten(
 }
 
 func (mb *Builder) WithFileExtensionGetter(
-	feg schnittstellen.FileExtensionGetter,
+	feg interfaces.FileExtensionGetter,
 ) *Builder {
 	mb.fileExtensionGetter = feg
 	return mb
@@ -308,7 +308,7 @@ func (b *Builder) buildManyFromTokens(
 ) (err error) {
 	if len(tokens) == 1 && tokens[0] == "." {
 		// TODO [ces/mew] switch to marker on query group for Cwd
-		var ks schnittstellen.SetLike[*kennung.Kennung2]
+		var ks interfaces.SetLike[*kennung.Kennung2]
 
 		if ks, err = b.kasten.GetExternalKennung(); err != nil {
 			err = errors.Wrap(err)
@@ -561,7 +561,7 @@ func (b *Builder) makeEtikettOrEtikettLua(
 	if sk.GetTyp().String() == "lua" {
 		var ar sha.ReadCloser
 
-		if ar, err = b.standort.AkteReader(sk.GetAkteSha()); err != nil {
+		if ar, err = b.standort.BlobReader(sk.GetAkteSha()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -572,7 +572,7 @@ func (b *Builder) makeEtikettOrEtikettLua(
 	} else {
 		var akte *etikett_akte.V1
 
-		if akte, err = b.akten.GetEtikettV1().GetAkte(
+		if akte, err = b.akten.GetEtikettV1().GetBlob(
 			sk.GetAkteSha(),
 		); err != nil {
 			err = errors.Wrap(err)

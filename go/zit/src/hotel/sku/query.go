@@ -1,7 +1,7 @@
 package sku
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 )
@@ -14,7 +14,7 @@ type (
 
 	Query interface {
 		Queryable
-		schnittstellen.Stringer
+		interfaces.Stringer
 		// Each(schnittstellen.FuncIter[Query]) error
 	}
 
@@ -40,21 +40,21 @@ type (
 		Query
 		SetIncludeHistory()
 		MakeEmitSkuMaybeExternal(
-			f schnittstellen.FuncIter[*Transacted],
+			f interfaces.FuncIter[*Transacted],
 			k kennung.Kasten,
 			updateTransacted func(
 				kasten kennung.Kasten,
 				z *Transacted,
 			) (err error),
-		) schnittstellen.FuncIter[*Transacted]
+		) interfaces.FuncIter[*Transacted]
 		MakeEmitSkuSigilSchwanzen(
-			f schnittstellen.FuncIter[*Transacted],
+			f interfaces.FuncIter[*Transacted],
 			k kennung.Kasten,
 			updateTransacted func(
 				kasten kennung.Kasten,
 				z *Transacted,
 			) (err error),
-		) schnittstellen.FuncIter[*Transacted]
+		) interfaces.FuncIter[*Transacted]
 		GetEtiketten() kennung.EtikettSet
 		GetTypen() kennung.TypSet
 	}

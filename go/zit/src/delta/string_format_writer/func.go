@@ -1,20 +1,20 @@
 package string_format_writer
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 func MakeFunc[T any](
-	f schnittstellen.FuncStringWriterFormat[T],
-) schnittstellen.StringFormatWriter[T] {
+	f interfaces.FuncStringWriterFormat[T],
+) interfaces.StringFormatWriter[T] {
 	return funk[T](f)
 }
 
-type funk[T any] schnittstellen.FuncStringWriterFormat[T]
+type funk[T any] interfaces.FuncStringWriterFormat[T]
 
 func (f funk[T]) WriteStringFormat(
-	w schnittstellen.WriterAndStringWriter,
+	w interfaces.WriterAndStringWriter,
 	e T,
 ) (int64, error) {
-	return schnittstellen.FuncStringWriterFormat[T](f)(w, e)
+	return interfaces.FuncStringWriterFormat[T](f)(w, e)
 }

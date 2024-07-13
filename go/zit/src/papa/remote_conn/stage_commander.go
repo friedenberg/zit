@@ -13,7 +13,7 @@ import (
 	"syscall"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/erworben"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
@@ -21,11 +21,11 @@ import (
 type MessageHiCommander struct {
 	DialogueType
 	CliKonfig erworben.Cli
-	Angeboren schnittstellen.Angeboren
+	Angeboren interfaces.Angeboren
 }
 
 type StageCommander struct {
-	Angeboren           schnittstellen.AngeborenGetter
+	Angeboren           interfaces.AngeborenGetter
 	remoteActorCmd      *exec.Cmd
 	konfigCli           erworben.Cli
 	wg                  *sync.WaitGroup

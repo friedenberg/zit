@@ -9,7 +9,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
@@ -22,7 +22,7 @@ type index2[
 	TPtr kennung.KennungLikePtr[T],
 ] struct {
 	path            string
-	vf              schnittstellen.VerzeichnisseFactory
+	vf              interfaces.VerzeichnisseFactory
 	readOnce        *sync.Once
 	hasChanges      bool
 	lock            *sync.RWMutex
@@ -34,7 +34,7 @@ func MakeIndex2[
 	T kennung.KennungLike[T],
 	TPtr kennung.KennungLikePtr[T],
 ](
-	vf schnittstellen.VerzeichnisseFactory,
+	vf interfaces.VerzeichnisseFactory,
 	path string,
 ) (i *index2[T, TPtr]) {
 	i = &index2[T, TPtr]{
@@ -80,7 +80,7 @@ func (ei *index2[T, TPtr]) WriteIfNecessary() (err error) {
 
 	ui.Log().Printf("%s has changes", ei.path)
 
-	var wc schnittstellen.ShaWriteCloser
+	var wc interfaces.ShaWriteCloser
 
 	if wc, err = ei.vf.WriteCloserVerzeichnisse(ei.path); err != nil {
 		err = errors.Wrap(err)
@@ -165,7 +165,7 @@ func (i *index2[T, TPtr]) ReadFrom(r1 io.Reader) (n int64, err error) {
 }
 
 func (i *index2[T, TPtr]) Each(
-	f schnittstellen.FuncIter[kennung.IndexedLike],
+	f interfaces.FuncIter[kennung.IndexedLike],
 ) (err error) {
 	if err = i.ReadIfNecessary(); err != nil {
 		err = errors.Wrap(err)
@@ -188,7 +188,7 @@ func (i *index2[T, TPtr]) Each(
 }
 
 func (i *index2[T, TPtr]) EachSchwanzen(
-	f schnittstellen.FuncIter[*kennung.IndexedLike],
+	f interfaces.FuncIter[*kennung.IndexedLike],
 ) (err error) {
 	if err = i.ReadIfNecessary(); err != nil {
 		err = errors.Wrap(err)
@@ -274,7 +274,7 @@ func (i *index2[T, TPtr]) Get(
 	return
 }
 
-func (i *index2[T, TPtr]) StoreDelta(d schnittstellen.Delta[T]) (err error) {
+func (i *index2[T, TPtr]) StoreDelta(d interfaces.Delta[T]) (err error) {
 	if err = i.ReadIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -315,7 +315,7 @@ func (i *index2[T, TPtr]) StoreDelta(d schnittstellen.Delta[T]) (err error) {
 	return
 }
 
-func (i *index2[T, TPtr]) StoreMany(ks schnittstellen.SetLike[T]) (err error) {
+func (i *index2[T, TPtr]) StoreMany(ks interfaces.SetLike[T]) (err error) {
 	if err = i.ReadIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -4,7 +4,7 @@ import (
 	"encoding/gob"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
@@ -13,7 +13,7 @@ import (
 )
 
 func (s *Store) FlushBestandsaufnahme(
-	p schnittstellen.FuncIter[*sku.Transacted],
+	p interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	if s.GetKonfig().DryRun {
 		return
@@ -64,7 +64,7 @@ func (s *Store) FlushBestandsaufnahme(
 }
 
 func (c *Store) Flush(
-	printerHeader schnittstellen.FuncIter[string],
+	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	// TODO handle flushes with dry run
 	if c.GetKonfig().DryRun {

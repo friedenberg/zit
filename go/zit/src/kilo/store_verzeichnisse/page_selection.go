@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 )
@@ -31,7 +31,7 @@ func (i *Store) PageForString(s string) (n uint8, err error) {
 	return i.PageForSha(sh)
 }
 
-func (i *Store) PageForSha(s schnittstellen.ShaLike) (n uint8, err error) {
+func (i *Store) PageForSha(s interfaces.ShaLike) (n uint8, err error) {
 	var n1 int64
 	ss := s.String()[:DigitWidth]
 

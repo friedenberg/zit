@@ -2,7 +2,7 @@ package store_fs
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -11,9 +11,9 @@ import (
 
 func (s *Store) MakeApplyCheckedOut(
 	qg sku.Queryable,
-	f schnittstellen.FuncIter[sku.CheckedOutLike],
+	f interfaces.FuncIter[sku.CheckedOutLike],
 	o sku.ObjekteOptions,
-) schnittstellen.FuncIter[*KennungFDPair] {
+) interfaces.FuncIter[*KennungFDPair] {
 	return func(em *KennungFDPair) (err error) {
 		if err = s.ApplyCheckedOut(o, qg, em, f); err != nil {
 			err = errors.Wrap(err)
@@ -28,7 +28,7 @@ func (s *Store) ApplyCheckedOut(
 	o sku.ObjekteOptions,
 	qg sku.Queryable,
 	em *KennungFDPair,
-	f schnittstellen.FuncIter[sku.CheckedOutLike],
+	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	var co *CheckedOut
 
@@ -53,7 +53,7 @@ func (s *Store) ApplyCheckedOut(
 
 func (s *Store) QueryCheckedOut(
 	qg *query.Group,
-	f schnittstellen.FuncIter[sku.CheckedOutLike],
+	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	wg := iter.MakeErrorWaitGroupParallel()
 
@@ -84,7 +84,7 @@ func (s *Store) QueryCheckedOut(
 // TODO [cot/gl !task project-2021-zit-kasten today zz-inbox] move unsure akten and untracked into kasten interface and store_fs
 func (s *Store) QueryUnsure(
 	qg *query.Group,
-	f schnittstellen.FuncIter[sku.CheckedOutLike],
+	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	o := sku.ObjekteOptions{
 		Mode: objekte_mode.ModeRealizeWithProto,

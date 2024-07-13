@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
@@ -17,8 +17,8 @@ type DeleteCheckout struct{}
 func (c DeleteCheckout) Run(
 	dryRun bool,
 	s standort.Standort,
-	p schnittstellen.FuncIter[*fd.FD],
-	fs schnittstellen.Iterable[*fd.FD],
+	p interfaces.FuncIter[*fd.FD],
+	fs interfaces.Iterable[*fd.FD],
 ) (err error) {
 	els := iter.ElementsSorted(
 		fs,

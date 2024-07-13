@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 )
 
@@ -16,29 +16,29 @@ const (
 	SetterPolicyReset
 )
 
-type flagPtr[T schnittstellen.ValueLike] interface {
-	schnittstellen.ValuePtr[T]
-	schnittstellen.SetterPtr[T]
+type flagPtr[T interfaces.ValueLike] interface {
+	interfaces.ValuePtr[T]
+	interfaces.SetterPtr[T]
 }
 
 // TODO-P2 add Resetter2 and Pool
 type Flag[
-	T schnittstellen.ValueLike,
+	T interfaces.ValueLike,
 	TPtr flagPtr[T],
 ] interface {
 	flag.Value
 	SetMany(vs ...string) (err error)
-	schnittstellen.MutableSetPtrLike[T, TPtr]
-	GetSetPtrLike() schnittstellen.SetPtrLike[T, TPtr]
-	GetMutableSetPtrLike() schnittstellen.MutableSetPtrLike[T, TPtr]
+	interfaces.MutableSetPtrLike[T, TPtr]
+	GetSetPtrLike() interfaces.SetPtrLike[T, TPtr]
+	GetMutableSetPtrLike() interfaces.MutableSetPtrLike[T, TPtr]
 }
 
 func MakeFlagCommasFromExisting[
-	T schnittstellen.ValueLike,
+	T interfaces.ValueLike,
 	TPtr flagPtr[T],
 ](
 	p SetterPolicy,
-	existing schnittstellen.MutableSetPtrLike[T, TPtr],
+	existing interfaces.MutableSetPtrLike[T, TPtr],
 	// pool schnittstellen.Pool[T, TPtr],
 	// resetter schnittstellen.Resetter2[T, TPtr],
 ) Flag[T, TPtr] {
@@ -51,7 +51,7 @@ func MakeFlagCommasFromExisting[
 }
 
 func MakeFlagCommas[
-	T schnittstellen.ValueLike,
+	T interfaces.ValueLike,
 	TPtr flagPtr[T],
 ](
 	p SetterPolicy,
@@ -67,20 +67,20 @@ func MakeFlagCommas[
 }
 
 type flagCommas[
-	T schnittstellen.ValueLike,
+	T interfaces.ValueLike,
 	TPtr flagPtr[T],
 ] struct {
 	SP SetterPolicy
-	schnittstellen.MutableSetPtrLike[T, TPtr]
-	pool     schnittstellen.Pool[T, TPtr]
-	resetter schnittstellen.Resetter2[T, TPtr]
+	interfaces.MutableSetPtrLike[T, TPtr]
+	pool     interfaces.Pool[T, TPtr]
+	resetter interfaces.Resetter2[T, TPtr]
 }
 
-func (f flagCommas[T, TPtr]) GetSetPtrLike() (s schnittstellen.SetPtrLike[T, TPtr]) {
+func (f flagCommas[T, TPtr]) GetSetPtrLike() (s interfaces.SetPtrLike[T, TPtr]) {
 	return f.CloneSetPtrLike()
 }
 
-func (f flagCommas[T, TPtr]) GetMutableSetPtrLike() (s schnittstellen.MutableSetPtrLike[T, TPtr]) {
+func (f flagCommas[T, TPtr]) GetMutableSetPtrLike() (s interfaces.MutableSetPtrLike[T, TPtr]) {
 	return f.CloneMutableSetPtrLike()
 }
 

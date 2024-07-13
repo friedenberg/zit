@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
@@ -17,19 +17,19 @@ type QueryPrefixer interface {
 }
 
 type KennungSansGattung interface {
-	schnittstellen.Stringer
+	interfaces.Stringer
 	Parts() [3]string
 }
 
 type Kennung interface {
 	KennungSansGattung
-	schnittstellen.GattungGetter
+	interfaces.GattungGetter
 }
 
 type KennungSansGattungPtr interface {
 	KennungSansGattung
-	schnittstellen.Resetter
-	schnittstellen.Setter
+	interfaces.Resetter
+	interfaces.Setter
 }
 
 type KennungPtr interface {
@@ -39,15 +39,15 @@ type KennungPtr interface {
 
 type KennungLike[T any] interface {
 	Kennung
-	schnittstellen.GattungGetter
-	schnittstellen.Stringer
+	interfaces.GattungGetter
+	interfaces.Stringer
 }
 
 type KennungLikePtr[T KennungLike[T]] interface {
-	schnittstellen.Ptr[T]
+	interfaces.Ptr[T]
 	KennungLike[T]
 	KennungPtr
-	schnittstellen.SetterPtr[T]
+	interfaces.SetterPtr[T]
 }
 
 type Index struct{}
@@ -166,8 +166,8 @@ func Aligned(id Kennung, lenLeft, lenRight int) string {
 }
 
 func LeftSubtract[
-	T schnittstellen.Stringer,
-	TPtr schnittstellen.StringSetterPtr[T],
+	T interfaces.Stringer,
+	TPtr interfaces.StringSetterPtr[T],
 ](
 	a, b T,
 ) (c T, err error) {
@@ -179,7 +179,7 @@ func LeftSubtract[
 	return
 }
 
-func ContainsWithoutUnderscoreSuffix[T schnittstellen.Stringer](a, b T) bool {
+func ContainsWithoutUnderscoreSuffix[T interfaces.Stringer](a, b T) bool {
 	as := []rune(a.String())
 	bs := []rune(b.String())
 
@@ -236,15 +236,15 @@ func Includes(a, b KennungSansGattung) bool {
 	return Contains(b, a)
 }
 
-func Less[T schnittstellen.Stringer](a, b T) bool {
+func Less[T interfaces.Stringer](a, b T) bool {
 	return a.String() < b.String()
 }
 
-func LessLen[T schnittstellen.Stringer](a, b T) bool {
+func LessLen[T interfaces.Stringer](a, b T) bool {
 	return len(a.String()) < len(b.String())
 }
 
-func IsEmpty[T schnittstellen.Stringer](a T) bool {
+func IsEmpty[T interfaces.Stringer](a T) bool {
 	return len(a.String()) == 0
 }
 
@@ -332,7 +332,7 @@ func WithRemovedCommonPrefixes(s EtikettSet) (s2 EtikettSet) {
 func expandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 	k TPtr,
 	ex expansion.Expander,
-	acc schnittstellen.Adder[T],
+	acc interfaces.Adder[T],
 ) {
 	f := iter.MakeFuncSetString[T, TPtr](acc)
 	ex.Expand(f, k.String())
@@ -365,7 +365,7 @@ func ExpandOneSlice[T KennungLike[T], TPtr KennungLikePtr[T]](
 func ExpandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 	k TPtr,
 	exes ...expansion.Expander,
-) (out schnittstellen.SetPtrLike[T, TPtr]) {
+) (out interfaces.SetPtrLike[T, TPtr]) {
 	s1 := collections_ptr.MakeMutableValueSetValue[T, TPtr](nil)
 
 	if len(exes) == 0 {
@@ -382,9 +382,9 @@ func ExpandOne[T KennungLike[T], TPtr KennungLikePtr[T]](
 }
 
 func ExpandMany[T KennungLike[T], TPtr KennungLikePtr[T]](
-	ks schnittstellen.SetPtrLike[T, TPtr],
+	ks interfaces.SetPtrLike[T, TPtr],
 	ex expansion.Expander,
-) (out schnittstellen.SetPtrLike[T, TPtr]) {
+) (out interfaces.SetPtrLike[T, TPtr]) {
 	s1 := collections_ptr.MakeMutableValueSetValue[T, TPtr](nil)
 
 	ks.EachPtr(
@@ -403,8 +403,8 @@ func ExpandMany[T KennungLike[T], TPtr KennungLikePtr[T]](
 func ExpandOneTo[T KennungLike[T], TPtr KennungLikePtr[T]](
 	k TPtr,
 	ex expansion.Expander,
-	s1 schnittstellen.FuncSetString,
-) (out schnittstellen.SetPtrLike[T, TPtr]) {
+	s1 interfaces.FuncSetString,
+) (out interfaces.SetPtrLike[T, TPtr]) {
 	ex.Expand(s1, k.String())
 
 	return

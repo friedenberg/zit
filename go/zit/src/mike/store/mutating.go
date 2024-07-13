@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
@@ -391,7 +391,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 }
 
 func (s *Store) UpdateKonfig(
-	sh schnittstellen.ShaLike,
+	sh interfaces.ShaLike,
 ) (kt *sku.Transacted, err error) {
 	return s.CreateOrUpdateAkteSha(
 		&kennung.Konfig{},

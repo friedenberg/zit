@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 const (
@@ -19,7 +19,7 @@ type Hinweisen struct {
 	yang provider
 }
 
-func New(ps schnittstellen.Standort) (f *Hinweisen, err error) {
+func New(ps interfaces.Standort) (f *Hinweisen, err error) {
 	providerPathYin := path.Join(ps.DirKennung(), FilePathKennungYin)
 	providerPathYang := path.Join(ps.DirKennung(), FilePathKennungYang)
 

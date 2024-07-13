@@ -1,13 +1,13 @@
 package store_fs
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 )
 
 var (
-	poolExternal   schnittstellen.Pool[External, *External]
-	poolCheckedOut schnittstellen.Pool[CheckedOut, *CheckedOut]
+	poolExternal   interfaces.Pool[External, *External]
+	poolCheckedOut interfaces.Pool[CheckedOut, *CheckedOut]
 )
 
 func init() {
@@ -22,10 +22,10 @@ func init() {
 	)
 }
 
-func GetExternalPool() schnittstellen.Pool[External, *External] {
+func GetExternalPool() interfaces.Pool[External, *External] {
 	return poolExternal
 }
 
-func GetCheckedOutPool() schnittstellen.Pool[CheckedOut, *CheckedOut] {
+func GetCheckedOutPool() interfaces.Pool[CheckedOut, *CheckedOut] {
 	return poolCheckedOut
 }

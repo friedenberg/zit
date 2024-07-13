@@ -2,28 +2,28 @@ package hinweis_index
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	hinweis_index_v0 "code.linenisgreat.com/zit/go/zit/src/foxtrot/hinweis_index/v0"
 	hinweis_index_v1 "code.linenisgreat.com/zit/go/zit/src/foxtrot/hinweis_index/v1"
 )
 
 type HinweisStore interface {
-	schnittstellen.Flusher
+	interfaces.Flusher
 	CreateHinweis() (*kennung.Hinweis, error)
 }
 
 type HinweisIndex interface {
 	HinweisStore
-	schnittstellen.ResetterWithError
+	interfaces.ResetterWithError
 	AddHinweis(kennung.Kennung) error
 	PeekHinweisen(int) ([]*kennung.Hinweis, error)
 }
 
 func MakeIndex(
-	k schnittstellen.Konfig,
-	s schnittstellen.Standort,
-	su schnittstellen.VerzeichnisseFactory,
+	k interfaces.Konfig,
+	s interfaces.Standort,
+	su interfaces.VerzeichnisseFactory,
 ) (i HinweisIndex, err error) {
 	switch v := k.GetStoreVersion().GetInt(); {
 	case v >= 1 && false:

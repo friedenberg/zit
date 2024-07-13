@@ -2,13 +2,13 @@ package collections
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
-func WriterContainer[T schnittstellen.Element](
-	s schnittstellen.SetLike[T],
+func WriterContainer[T interfaces.Element](
+	s interfaces.SetLike[T],
 	sigil error,
-) schnittstellen.FuncIter[T] {
+) interfaces.FuncIter[T] {
 	return func(e T) (err error) {
 		k := s.Key(e)
 

@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -75,7 +75,7 @@ func (c WriteObjekte) doOne(
 	chCancel <-chan struct{},
 	chError chan<- error,
 	wg *sync.WaitGroup,
-	arf schnittstellen.AkteWriterFactory,
+	arf interfaces.BlobWriterFactory,
 	p string,
 ) {
 	var err error
@@ -112,7 +112,7 @@ func (c WriteObjekte) doOne(
 
 	var wc standort.Writer
 
-	if wc, err = arf.AkteWriter(); err != nil {
+	if wc, err = arf.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		chError <- err
 		return

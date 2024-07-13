@@ -6,18 +6,18 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 )
 
 type lineReader struct {
 	delim         byte
 	passthruEmpty bool
-	reader        schnittstellen.FuncSetString
+	reader        interfaces.FuncSetString
 }
 
 func MakeLineReaderConsumeEmpty(
-	rffs schnittstellen.FuncSetString,
+	rffs interfaces.FuncSetString,
 ) io.ReaderFrom {
 	return lineReader{
 		delim:  '\n',
@@ -26,7 +26,7 @@ func MakeLineReaderConsumeEmpty(
 }
 
 func MakeLineReaderPassThruEmpty(
-	rffs schnittstellen.FuncSetString,
+	rffs interfaces.FuncSetString,
 ) io.ReaderFrom {
 	return lineReader{
 		delim:         '\n',
@@ -37,7 +37,7 @@ func MakeLineReaderPassThruEmpty(
 
 func MakeDelimReaderConsumeEmpty(
 	delim byte,
-	rffs schnittstellen.FuncSetString,
+	rffs interfaces.FuncSetString,
 ) io.ReaderFrom {
 	return lineReader{
 		delim:  delim,
@@ -47,7 +47,7 @@ func MakeDelimReaderConsumeEmpty(
 
 func ReadLines(
 	r1 io.Reader,
-	rffs schnittstellen.FuncSetString,
+	rffs interfaces.FuncSetString,
 ) (n int64, err error) {
 	lr := MakeLineReaderConsumeEmpty(rffs)
 	return lr.ReadFrom(r1)
@@ -56,7 +56,7 @@ func ReadLines(
 func ReadSep(
 	delim byte,
 	r1 io.Reader,
-	rffs schnittstellen.FuncSetString,
+	rffs interfaces.FuncSetString,
 ) (n int64, err error) {
 	lr := MakeDelimReaderConsumeEmpty(delim, rffs)
 	return lr.ReadFrom(r1)

@@ -7,13 +7,13 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 // TODO-P4 remove
 type (
-	ReadCloser  = schnittstellen.ShaReadCloser
-	WriteCloser = schnittstellen.ShaWriteCloser
+	ReadCloser  = interfaces.ShaReadCloser
+	WriteCloser = interfaces.ShaWriteCloser
 )
 
 type readCloser struct {
@@ -111,7 +111,7 @@ func (r readCloser) Close() (err error) {
 	return
 }
 
-func (r readCloser) GetShaLike() schnittstellen.ShaLike {
+func (r readCloser) GetShaLike() interfaces.ShaLike {
 	return FromHash(r.hash)
 }
 
@@ -134,21 +134,21 @@ func (nrc nopReadCloser) WriteTo(w io.Writer) (n int64, err error) {
 	return io.Copy(w, nrc.ReadCloser)
 }
 
-func (nrc nopReadCloser) GetShaLike() schnittstellen.ShaLike {
+func (nrc nopReadCloser) GetShaLike() interfaces.ShaLike {
 	return &Sha{}
 }
 
 type nopAkteFactory struct{}
 
-func NopAkteFactory() schnittstellen.AkteIOFactory {
+func NopAkteFactory() interfaces.BlobIOFactory {
 	return nopAkteFactory{}
 }
 
-func (_ nopAkteFactory) AkteWriter() (WriteCloser, error) {
+func (_ nopAkteFactory) BlobWriter() (WriteCloser, error) {
 	return MakeWriter(nil), nil
 }
 
-func (_ nopAkteFactory) AkteReader(s ShaLike) (ReadCloser, error) {
+func (_ nopAkteFactory) BlobReader(s ShaLike) (ReadCloser, error) {
 	return MakeNopReadCloser(io.NopCloser(bytes.NewBuffer(nil))), nil
 }
 

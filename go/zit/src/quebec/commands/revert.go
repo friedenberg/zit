@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
@@ -97,7 +97,7 @@ func (c Revert) RunWithQuery(
 func (c Revert) runRevertFromQuery(
 	u *umwelt.Umwelt,
 	eq *query.Group,
-	f schnittstellen.FuncIter[revertTuple],
+	f interfaces.FuncIter[revertTuple],
 ) (err error) {
 	if err = u.GetStore().QueryWithKasten(
 		eq,
@@ -114,7 +114,7 @@ func (c Revert) runRevertFromQuery(
 
 func (c Revert) runRevertFromLast(
 	u *umwelt.Umwelt,
-	f schnittstellen.FuncIter[revertTuple],
+	f interfaces.FuncIter[revertTuple],
 ) (err error) {
 	s := u.GetStore()
 

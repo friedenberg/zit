@@ -2,7 +2,7 @@ package organize_text
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
@@ -183,7 +183,7 @@ func (c *constructor) populate() (err error) {
 
 func (c *constructor) makeChildrenWithoutGroups(
 	parent *Assignment,
-	fi func(schnittstellen.FuncIter[*obj]) error,
+	fi func(interfaces.FuncIter[*obj]) error,
 	used objSet,
 ) (err error) {
 	if err = fi(used.Add); err != nil {
@@ -289,7 +289,7 @@ func (c *constructor) addGroupedChildren(
 
 func (c *constructor) makeAndAddUngrouped(
 	parent *Assignment,
-	fi func(schnittstellen.FuncIter[*obj]) error,
+	fi func(interfaces.FuncIter[*obj]) error,
 ) (err error) {
 	if err = fi(
 		func(tz *obj) (err error) {

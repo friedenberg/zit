@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"sort"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
@@ -22,7 +22,7 @@ func makeStringValues(vs ...string) (out []values.String) {
 
 func assertSet(
 	t test_logz.T,
-	sut schnittstellen.SetLike[values.String],
+	sut interfaces.SetLike[values.String],
 	vals []values.String,
 ) {
 	t.Helper()

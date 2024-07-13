@@ -1,7 +1,7 @@
 package store_verzeichnisse
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -35,6 +35,6 @@ func (s *flushQueryGroup) GetSigil() kennung.Sigil {
 	return s.Sigil
 }
 
-func (s *flushQueryGroup) Each(_ schnittstellen.FuncIter[sku.Query]) error {
+func (s *flushQueryGroup) Each(_ interfaces.FuncIter[sku.Query]) error {
 	return nil
 }

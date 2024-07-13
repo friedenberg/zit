@@ -8,7 +8,7 @@ import (
 	"slices"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
@@ -114,7 +114,7 @@ func (sch *Schlummernd) Load(s standort.Standort) (err error) {
 
 func (sch *Schlummernd) Flush(
 	s standort.Standort,
-	printerHeader schnittstellen.FuncIter[string],
+	printerHeader interfaces.FuncIter[string],
 	dryRun bool,
 ) (err error) {
 	if len(sch.changes) == 0 {

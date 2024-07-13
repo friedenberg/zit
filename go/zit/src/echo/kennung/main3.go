@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 )
 
-var poolKennung3 schnittstellen.Pool[Kennung3, *Kennung3]
+var poolKennung3 interfaces.Pool[Kennung3, *Kennung3]
 
 func init() {
 	poolKennung3 = pool.MakePool(
@@ -27,7 +27,7 @@ func init() {
 	)
 }
 
-func GetKennung3Pool() schnittstellen.Pool[Kennung3, *Kennung3] {
+func GetKennung3Pool() interfaces.Pool[Kennung3, *Kennung3] {
 	return poolKennung3
 }
 
@@ -44,7 +44,7 @@ func MustKennung3(kp Kennung) (k *Kennung3) {
 	return
 }
 
-func (a *Kennung3) GetKasten() schnittstellen.KastenLike {
+func (a *Kennung3) GetKasten() interfaces.KastenLike {
 	return MustKasten(a.kasten.String())
 }
 
@@ -203,7 +203,7 @@ func (k3 *Kennung3) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
-func (k3 *Kennung3) SetGattung(g schnittstellen.GattungGetter) {
+func (k3 *Kennung3) SetGattung(g interfaces.GattungGetter) {
 	if g == nil {
 		k3.g = gattung.Unknown
 	} else {
@@ -303,12 +303,12 @@ func (k3 *Kennung3) Parts() [3]string {
 	}
 }
 
-func (k3 *Kennung3) GetGattung() schnittstellen.GattungLike {
+func (k3 *Kennung3) GetGattung() interfaces.GattungLike {
 	return k3.g
 }
 
 func MakeKennung3(
-	v schnittstellen.StringerGattungGetter,
+	v interfaces.StringerGattungGetter,
 	ka Kasten,
 ) (k *Kennung3, err error) {
 	k = &Kennung3{
@@ -442,7 +442,7 @@ func (h *Kennung3) SetWithKennung(
 
 func (h *Kennung3) SetWithGattung(
 	v string,
-	g schnittstellen.GattungGetter,
+	g interfaces.GattungGetter,
 ) (err error) {
 	h.g = gattung.Make(g.GetGattung())
 

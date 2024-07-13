@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -72,7 +72,7 @@ func (a *FD) Equals(b *FD) bool {
 
 func (fd *FD) SetWithAkteWriterFactory(
 	p string,
-	awf schnittstellen.AkteWriterFactory,
+	awf interfaces.BlobWriterFactory,
 ) (err error) {
 	if p == "" {
 		err = errors.Errorf("empty path")
@@ -94,7 +94,7 @@ func (fd *FD) SetWithAkteWriterFactory(
 
 	var akteWriter sha.WriteCloser
 
-	if akteWriter, err = awf.AkteWriter(); err != nil {
+	if akteWriter, err = awf.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -266,11 +266,11 @@ func (fd *FD) IsDir() bool {
 	return fd.isDir
 }
 
-func (fd *FD) SetShaLike(v schnittstellen.ShaLike) (err error) {
+func (fd *FD) SetShaLike(v interfaces.ShaLike) (err error) {
 	return fd.sha.SetShaLike(v)
 }
 
-func (fd *FD) GetShaLike() schnittstellen.ShaLike {
+func (fd *FD) GetShaLike() interfaces.ShaLike {
 	return &fd.sha
 }
 
@@ -286,7 +286,7 @@ func (fd *FD) Exists() bool {
 	return files.Exists(fd.path)
 }
 
-func (fd *FD) Remove(s schnittstellen.Standort) (err error) {
+func (fd *FD) Remove(s interfaces.Standort) (err error) {
 	if fd.path == "" {
 		return
 	}

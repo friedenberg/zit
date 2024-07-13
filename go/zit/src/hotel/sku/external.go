@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 )
@@ -38,7 +38,7 @@ func (a *External) GetMetadatei() *metadatei.Metadatei {
 	return &a.Metadatei
 }
 
-func (a *External) GetGattung() schnittstellen.GattungLike {
+func (a *External) GetGattung() interfaces.GattungLike {
 	return a.Kennung.GetGattung()
 }
 
@@ -52,11 +52,11 @@ func (a *External) String() string {
 	)
 }
 
-func (a *External) GetAkteSha() schnittstellen.ShaLike {
+func (a *External) GetAkteSha() interfaces.ShaLike {
 	return &a.Metadatei.Akte
 }
 
-func (a *External) SetAkteSha(v schnittstellen.ShaLike) (err error) {
+func (a *External) SetAkteSha(v interfaces.ShaLike) (err error) {
 	if err = a.Metadatei.Akte.SetShaLike(v); err != nil {
 		err = errors.Wrap(err)
 		return

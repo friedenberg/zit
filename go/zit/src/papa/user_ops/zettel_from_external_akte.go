@@ -206,7 +206,7 @@ func (c *ZettelFromExternalAkte) processOneFD(
 
 	var akteWriter sha.WriteCloser
 
-	if akteWriter, err = c.Standort().AkteWriter(); err != nil {
+	if akteWriter, err = c.Standort().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

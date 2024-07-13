@@ -3,12 +3,12 @@ package collections_value
 import (
 	"encoding/gob"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 )
 
-func RegisterGobValue[T schnittstellen.ValueLike](
-	keyer schnittstellen.StringKeyer[T],
+func RegisterGobValue[T interfaces.ValueLike](
+	keyer interfaces.StringKeyer[T],
 ) {
 	if keyer == nil {
 		keyer = iter.StringerKeyer[T]{}.RegisterGob()
@@ -19,7 +19,7 @@ func RegisterGobValue[T schnittstellen.ValueLike](
 	RegisterGob[T]()
 }
 
-func RegisterGob[T schnittstellen.ValueLike]() {
+func RegisterGob[T interfaces.ValueLike]() {
 	gob.Register(Set[T]{})
 	gob.Register(MutableSet[T]{})
 }

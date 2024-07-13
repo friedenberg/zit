@@ -2,13 +2,13 @@ package chrome
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/schnittstellen"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 func (s *Store) ReadCheckedOutFromItem(
 	o sku.ObjekteOptions,
-	k schnittstellen.StringerGattungGetter,
+	k interfaces.StringerGattungGetter,
 	em *item,
 ) (co *CheckedOut, err error) {
 	co = GetCheckedOutPool().Get()
