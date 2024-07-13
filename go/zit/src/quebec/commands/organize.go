@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/organize_text_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -54,15 +54,15 @@ func init() {
 func (c *Organize) ModifyBuilder(b *query.Builder) {
 	b.
 		WithDefaultSigil(ids.SigilLatest).
-		WithDefaultGattungen(ids.MakeGenre(gattung.Zettel)).
+		WithDefaultGattungen(ids.MakeGenre(genres.Zettel)).
 		WithRequireNonEmptyQuery()
 }
 
 func (c *Organize) CompletionGattung() ids.Genre {
 	return ids.MakeGenre(
-		gattung.Zettel,
-		gattung.Etikett,
-		gattung.Typ,
+		genres.Zettel,
+		genres.Tag,
+		genres.Type,
 	)
 }
 

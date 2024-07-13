@@ -29,7 +29,7 @@ func (s *Store) FlushBestandsaufnahme(
 
 	if bestandsaufnahmeSku, err = s.GetBestandsaufnahmeStore().Create(
 		&s.bestandsaufnahmeAkte,
-		s.GetKonfig().Bezeichnung,
+		s.GetKonfig().Description,
 	); err != nil {
 		if errors.Is(err, bestandsaufnahme.ErrEmpty) {
 			ui.Log().Printf("Bestandsaufnahme was empty")

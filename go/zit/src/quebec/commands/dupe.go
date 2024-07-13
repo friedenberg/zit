@@ -6,7 +6,7 @@ package commands
 // 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 // 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 // 	"code.linenisgreat.com/zit/go/zit/src/alfa/vim_cli_options_builder"
-// 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+// 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 // 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 // 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 // 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"

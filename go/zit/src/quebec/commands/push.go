@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -13,7 +13,7 @@ import (
 )
 
 type Push struct {
-	gattung.Genre
+	genres.Genre
 }
 
 func init() {
@@ -21,7 +21,7 @@ func init() {
 		"push",
 		func(f *flag.FlagSet) Command {
 			c := &Push{
-				Genre: gattung.Zettel,
+				Genre: genres.Zettel,
 			}
 
 			f.Var(&c.Genre, "gattung", "Gattung")
@@ -33,11 +33,11 @@ func init() {
 
 func (c Push) CompletionGattung() ids.Genre {
 	return ids.MakeGenre(
-		gattung.Zettel,
-		gattung.Etikett,
-		gattung.Typ,
-		gattung.Bestandsaufnahme,
-		gattung.Kasten,
+		genres.Zettel,
+		genres.Tag,
+		genres.Type,
+		genres.InventoryList,
+		genres.Repo,
 	)
 }
 

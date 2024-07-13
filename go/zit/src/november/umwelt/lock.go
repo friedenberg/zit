@@ -8,7 +8,7 @@ import (
 
 func (u *Umwelt) Lock() (err error) {
 	ui.Log().Caller(1, "Umwelt Lock")
-	if err = u.standort.GetLockSmith().Lock(); err != nil {
+	if err = u.fs_home.GetLockSmith().Lock(); err != nil {
 		ui.Log().Caller(1, "Umwelt Lock Failure")
 		err = errors.Wrap(err)
 		return
@@ -86,7 +86,7 @@ func (u *Umwelt) Unlock() (err error) {
 	// explicitly do not unlock if there was an error to encourage user
 	// interaction
 	// and manual recovery
-	if err = u.standort.GetLockSmith().Unlock(); err != nil {
+	if err = u.fs_home.GetLockSmith().Unlock(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

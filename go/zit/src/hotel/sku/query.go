@@ -2,7 +2,7 @@ package sku
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
@@ -30,7 +30,7 @@ type (
 
 	// Used by store_verzeichnisse.binary*
 	PrimitiveQueryGroup interface {
-		Get(gattung.Genre) (QueryWithSigilAndKennung, bool)
+		Get(genres.Genre) (QueryWithSigilAndKennung, bool)
 		SigilGetter
 		HasHidden() bool
 	}

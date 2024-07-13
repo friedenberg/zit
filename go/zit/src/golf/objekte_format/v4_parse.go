@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
@@ -23,7 +23,7 @@ func (f v4) ParsePersistentMetadatei(
 	m := c.GetMetadatei()
 
 	var (
-		g gattung.Genre
+		g genres.Genre
 		k *ids.ObjectId
 	)
 

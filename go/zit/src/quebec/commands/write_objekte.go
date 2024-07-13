@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -110,7 +110,7 @@ func (c WriteObjekte) doOne(
 
 	defer errors.DeferredChan(chError, rc.Close)
 
-	var wc standort.Writer
+	var wc fs_home.Writer
 
 	if wc, err = arf.BlobWriter(); err != nil {
 		err = errors.Wrap(err)

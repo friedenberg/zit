@@ -13,10 +13,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/delta/hinweisen"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/delta/object_id_provider"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 )
@@ -82,7 +82,7 @@ func (s *Store) tryRealizeAndOrStore(
 
 	if o.ContainsAny(
 		objekte_mode.ModeAddToBestandsaufnahme,
-	) && (kinder.Kennung.IsEmpty() || kinder.GetGenre() == gattung.Unknown) {
+	) && (kinder.Kennung.IsEmpty() || kinder.GetGenre() == genres.Unknown) {
 		var ken *ids.ZettelId
 
 		if ken, err = s.kennungIndex.CreateHinweis(); err != nil {
@@ -170,9 +170,9 @@ func (s *Store) tryRealizeAndOrStore(
 			return
 		}
 
-		if kinder.GetGenre() == gattung.Zettel {
+		if kinder.GetGenre() == genres.Zettel {
 			if err = s.kennungIndex.AddHinweis(&kinder.Kennung); err != nil {
-				if errors.Is(err, hinweisen.ErrDoesNotExist{}) {
+				if errors.Is(err, object_id_provider.ErrDoesNotExist{}) {
 					ui.Log().Printf("kennung does not contain value: %s", err)
 					err = nil
 				} else {
@@ -341,7 +341,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	}
 
 	type akteSaver interface {
-		SaveAkte(s standort.Standort) (err error)
+		SaveAkte(s fs_home.Standort) (err error)
 	}
 
 	if as, ok := co.GetSkuExternalLike().(akteSaver); ok {
@@ -402,10 +402,10 @@ func (s *Store) UpdateKonfig(
 func (s *Store) createEtikettOrTyp(k *ids.ObjectId) (err error) {
 	switch k.GetGenre() {
 	default:
-		err = gattung.MakeErrUnsupportedGattung(k.GetGenre())
+		err = genres.MakeErrUnsupportedGattung(k.GetGenre())
 		return
 
-	case gattung.Typ, gattung.Etikett:
+	case genres.Type, genres.Tag:
 		break
 	}
 

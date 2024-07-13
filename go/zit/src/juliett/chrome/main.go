@@ -13,10 +13,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
@@ -53,7 +53,7 @@ type Store struct {
 
 func MakeChrome(
 	k *konfig.Compiled,
-	s standort.Standort,
+	s fs_home.Standort,
 	itemDeletedStringFormatWriter interfaces.FuncIter[*CheckedOut],
 ) *Store {
 	c := &Store{
@@ -355,8 +355,8 @@ func (c *Store) tryToEmitOneExplicitlyCheckedOut(
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	sku.TransactedResetter.Reset(&co.External.browser)
-	co.External.browser.Kennung.SetGenre(gattung.Zettel)
-	co.External.Kennung.SetGenre(gattung.Zettel)
+	co.External.browser.Kennung.SetGenre(genres.Zettel)
+	co.External.Kennung.SetGenre(genres.Zettel)
 
 	var uSku *url.URL
 
@@ -407,8 +407,8 @@ func (c *Store) tryToEmitOneRecognized(
 	}
 
 	sku.TransactedResetter.Reset(&co.External.browser)
-	co.External.browser.Kennung.SetGenre(gattung.Zettel)
-	co.External.Kennung.SetGenre(gattung.Zettel)
+	co.External.browser.Kennung.SetGenre(genres.Zettel)
+	co.External.Kennung.SetGenre(genres.Zettel)
 
 	sku.TransactedResetter.ResetWith(&co.Internal, internal)
 	sku.TransactedResetter.ResetWith(&co.External.Transacted, internal)
@@ -440,8 +440,8 @@ func (c *Store) tryToEmitOneUntracked(
 	}
 
 	sku.TransactedResetter.Reset(&co.External.browser)
-	co.External.browser.Kennung.SetGenre(gattung.Zettel)
-	co.External.Kennung.SetGenre(gattung.Zettel)
+	co.External.browser.Kennung.SetGenre(genres.Zettel)
+	co.External.Kennung.SetGenre(genres.Zettel)
 
 	sku.TransactedResetter.Reset(&co.External.Transacted)
 	sku.TransactedResetter.Reset(&co.Internal)

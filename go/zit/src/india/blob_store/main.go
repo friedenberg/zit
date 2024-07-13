@@ -2,10 +2,10 @@ package blob_store
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/tag_blob"
-	"code.linenisgreat.com/zit/go/zit/src/delta/type_blob"
-	"code.linenisgreat.com/zit/go/zit/src/echo/repo_blob"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
+	"code.linenisgreat.com/zit/go/zit/src/delta/tag_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 )
 
@@ -19,53 +19,53 @@ type Store[
 }
 
 type VersionedStores struct {
-	tag_v0    Store[tag_blob.V0, *tag_blob.V0]
-	tag_v1    Store[tag_blob.V1, *tag_blob.V1]
-	repo_v0   Store[repo_blob.V0, *repo_blob.V0]
+	tag_v0    Store[tag_blobs.V0, *tag_blobs.V0]
+	tag_v1    Store[tag_blobs.V1, *tag_blobs.V1]
+	repo_v0   Store[repo_blobs.V0, *repo_blobs.V0]
 	config_v0 Store[mutable_config.Blob, *mutable_config.Blob]
-	type_v0   Store[type_blob.V0, *type_blob.V0]
+	type_v0   Store[type_blobs.V0, *type_blobs.V0]
 }
 
 func Make(
-	st standort.Standort,
+	st fs_home.Standort,
 ) *VersionedStores {
 	return &VersionedStores{
 		tag_v0: MakeBlobStore(
 			st,
 			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[tag_blob.V0](
+				MakeTextParserIgnoreTomlErrors[tag_blobs.V0](
 					st,
 				),
-				ParsedBlobTomlFormatter[tag_blob.V0, *tag_blob.V0]{},
+				ParsedBlobTomlFormatter[tag_blobs.V0, *tag_blobs.V0]{},
 				st,
 			),
-			func(a *tag_blob.V0) {
+			func(a *tag_blobs.V0) {
 				a.Reset()
 			},
 		),
 		tag_v1: MakeBlobStore(
 			st,
 			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[tag_blob.V1](
+				MakeTextParserIgnoreTomlErrors[tag_blobs.V1](
 					st,
 				),
-				ParsedBlobTomlFormatter[tag_blob.V1, *tag_blob.V1]{},
+				ParsedBlobTomlFormatter[tag_blobs.V1, *tag_blobs.V1]{},
 				st,
 			),
-			func(a *tag_blob.V1) {
+			func(a *tag_blobs.V1) {
 				a.Reset()
 			},
 		),
 		repo_v0: MakeBlobStore(
 			st,
 			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[repo_blob.V0](
+				MakeTextParserIgnoreTomlErrors[repo_blobs.V0](
 					st,
 				),
-				ParsedBlobTomlFormatter[repo_blob.V0, *repo_blob.V0]{},
+				ParsedBlobTomlFormatter[repo_blobs.V0, *repo_blobs.V0]{},
 				st,
 			),
-			func(a *repo_blob.V0) {
+			func(a *repo_blobs.V0) {
 				a.Reset()
 			},
 		),
@@ -85,28 +85,28 @@ func Make(
 		type_v0: MakeBlobStore(
 			st,
 			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[type_blob.V0](
+				MakeTextParserIgnoreTomlErrors[type_blobs.V0](
 					st,
 				),
-				ParsedBlobTomlFormatter[type_blob.V0, *type_blob.V0]{},
+				ParsedBlobTomlFormatter[type_blobs.V0, *type_blobs.V0]{},
 				st,
 			),
-			func(a *type_blob.V0) {
+			func(a *type_blobs.V0) {
 				a.Reset()
 			},
 		),
 	}
 }
 
-func (a *VersionedStores) GetTagV0() Store[tag_blob.V0, *tag_blob.V0] {
+func (a *VersionedStores) GetTagV0() Store[tag_blobs.V0, *tag_blobs.V0] {
 	return a.tag_v0
 }
 
-func (a *VersionedStores) GetTagV1() Store[tag_blob.V1, *tag_blob.V1] {
+func (a *VersionedStores) GetTagV1() Store[tag_blobs.V1, *tag_blobs.V1] {
 	return a.tag_v1
 }
 
-func (a *VersionedStores) GetRepoV0() Store[repo_blob.V0, *repo_blob.V0] {
+func (a *VersionedStores) GetRepoV0() Store[repo_blobs.V0, *repo_blobs.V0] {
 	return a.repo_v0
 }
 
@@ -114,6 +114,6 @@ func (a *VersionedStores) GetConfigV0() Store[mutable_config.Blob, *mutable_conf
 	return a.config_v0
 }
 
-func (a *VersionedStores) GetTypeV0() Store[type_blob.V0, *type_blob.V0] {
+func (a *VersionedStores) GetTypeV0() Store[type_blobs.V0, *type_blobs.V0] {
 	return a.type_v0
 }

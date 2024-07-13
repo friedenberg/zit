@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/go/zit/src/echo/bezeichnung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/kennung_fmt"
@@ -71,11 +71,11 @@ func (u *Umwelt) StringFormatWriterTyp(
 }
 
 func (u *Umwelt) StringFormatWriterBezeichnung(
-	truncate bezeichnung.CliFormatTruncation,
+	truncate descriptions.CliFormatTruncation,
 	co string_format_writer.ColorOptions,
 	quote bool,
-) interfaces.StringFormatWriter[*bezeichnung.Bezeichnung] {
-	return bezeichnung.MakeCliFormat2(truncate, co, quote)
+) interfaces.StringFormatWriter[*descriptions.Description] {
+	return descriptions.MakeCliFormat(truncate, co, quote)
 }
 
 func (u *Umwelt) StringFormatWriterEtiketten(
@@ -92,7 +92,7 @@ func (u *Umwelt) StringFormatWriterMetadatei(
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterTyp(co),
 		u.StringFormatWriterBezeichnung(
-			bezeichnung.CliFormatTruncation66CharEllipsis,
+			descriptions.CliFormatTruncation66CharEllipsis,
 			co,
 			true,
 		),
@@ -109,7 +109,7 @@ func (u *Umwelt) SkuFmtOrganize() *sku_fmt.Organize {
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterKennungAligned(co),
 		u.StringFormatWriterTyp(co),
-		u.StringFormatWriterBezeichnung(bezeichnung.CliFormatTruncationNone, co, false),
+		u.StringFormatWriterBezeichnung(descriptions.CliFormatTruncationNone, co, false),
 		u.StringFormatWriterEtiketten(co),
 	)
 }
@@ -168,7 +168,7 @@ func (u *Umwelt) PrinterFileNotRecognized() interfaces.FuncIter[*fd.FD] {
 	p := kennung_fmt.MakeFileNotRecognizedStringWriterFormat(
 		kennung_fmt.MakeFDCliFormat(
 			u.FormatColorOptionsOut(),
-			u.standort.MakeRelativePathStringFormatWriter(),
+			u.fs_home.MakeRelativePathStringFormatWriter(),
 		),
 		u.StringFormatWriterShaLike(u.FormatColorOptionsOut()),
 	)
@@ -186,7 +186,7 @@ func (u *Umwelt) PrinterFDDeleted() interfaces.FuncIter[*fd.FD] {
 		u.GetKonfig().DryRun,
 		kennung_fmt.MakeFDCliFormat(
 			u.FormatColorOptionsOut(),
-			u.standort.MakeRelativePathStringFormatWriter(),
+			u.fs_home.MakeRelativePathStringFormatWriter(),
 		),
 	)
 
@@ -231,7 +231,7 @@ func (u *Umwelt) PrinterCheckedOutFS() interfaces.FuncIter[sku.CheckedOutLike] {
 			u.StringFormatWriterShaLike(oo.ColorOptionsErr),
 			kennung_fmt.MakeFDCliFormat(
 				oo.ColorOptionsErr,
-				u.standort.MakeRelativePathStringFormatWriter(),
+				u.fs_home.MakeRelativePathStringFormatWriter(),
 			),
 			u.StringFormatWriterKennung(oo.ColorOptionsErr),
 			u.StringFormatWriterMetadatei(oo.ColorOptionsErr),
@@ -246,7 +246,7 @@ func (u *Umwelt) PrinterCheckedOutFS() interfaces.FuncIter[sku.CheckedOutLike] {
 			u.StringFormatWriterShaLike(oo.ColorOptionsOut),
 			kennung_fmt.MakeFDCliFormat(
 				oo.ColorOptionsOut,
-				u.standort.MakeRelativePathStringFormatWriter(),
+				u.fs_home.MakeRelativePathStringFormatWriter(),
 			),
 			u.StringFormatWriterKennung(oo.ColorOptionsOut),
 			u.StringFormatWriterMetadatei(oo.ColorOptionsOut),
@@ -275,7 +275,7 @@ func (u *Umwelt) PrinterCheckedOutChrome() interfaces.FuncIter[sku.CheckedOutLik
 			u.StringFormatWriterMetadatei(oo.ColorOptionsErr),
 			u.StringFormatWriterTyp(oo.ColorOptionsErr),
 			u.StringFormatWriterBezeichnung(
-				bezeichnung.CliFormatTruncation66CharEllipsis,
+				descriptions.CliFormatTruncation66CharEllipsis,
 				oo.ColorOptionsErr,
 				true,
 			),
@@ -293,7 +293,7 @@ func (u *Umwelt) PrinterCheckedOutChrome() interfaces.FuncIter[sku.CheckedOutLik
 			u.StringFormatWriterMetadatei(oo.ColorOptionsOut),
 			u.StringFormatWriterTyp(oo.ColorOptionsOut),
 			u.StringFormatWriterBezeichnung(
-				bezeichnung.CliFormatTruncation66CharEllipsis,
+				descriptions.CliFormatTruncation66CharEllipsis,
 				oo.ColorOptionsOut,
 				true,
 			),

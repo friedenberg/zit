@@ -13,8 +13,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
-	"code.linenisgreat.com/zit/go/zit/src/delta/angeboren"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
@@ -25,7 +25,7 @@ type Einleitung struct {
 	AgeIdentity age.Identity
 	Yin         string
 	Yang        string
-	Angeboren   angeboren.Konfig
+	Angeboren   immutable_config.Konfig
 }
 
 func (e *Einleitung) AddToFlagSet(f *flag.FlagSet) {
@@ -56,14 +56,14 @@ func (u *Umwelt) Einleitung(e Einleitung) (err error) {
 		return
 	}
 
-	for _, g := range []gattung.Genre{gattung.Akte, gattung.Bestandsaufnahme} {
+	for _, g := range []genres.Genre{genres.Blob, genres.InventoryList} {
 		var d string
 
 		if d, err = s.DirObjektenGattung(
 			e.Angeboren.GetStoreVersion(),
 			g,
 		); err != nil {
-			if gattung.IsErrUnsupportedGattung(err) {
+			if genres.IsErrUnsupportedGattung(err) {
 				err = nil
 				continue
 			} else {

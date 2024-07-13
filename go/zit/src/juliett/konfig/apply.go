@@ -7,8 +7,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/delta/type_blob"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/etiketten_path"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
@@ -27,8 +27,8 @@ func (k *Compiled) ApplySchlummerndAndRealizeEtiketten(
 		expansion.ExpanderRight,
 	))
 
-	g := gattung.Must(sk.GetGenre())
-	isEtikett := g == gattung.Etikett
+	g := genres.Must(sk.GetGenre())
+	isEtikett := g == genres.Tag
 
 	// if g.HasParents() {
 	// 	k.SetHasChanges(fmt.Sprintf("adding etikett with parents: %s", sk))
@@ -83,7 +83,7 @@ func (k *Compiled) addSuperEtiketten(
 	var ks string
 
 	switch g {
-	case gattung.Etikett, gattung.Typ, gattung.Kasten:
+	case genres.Tag, genres.Type, genres.Repo:
 		ks = sk.Kennung.String()
 
 		expansion.ExpanderRight.Expand(
@@ -199,7 +199,7 @@ func (k *Compiled) addImplicitEtiketten(
 
 func (k compiled) ApplyToNewMetadatei(
 	ml metadatei.MetadateiLike,
-	tagp interfaces.BlobGetterPutter[*type_blob.V0],
+	tagp interfaces.BlobGetterPutter[*type_blobs.V0],
 ) (err error) {
 	// m := ml.GetMetadatei()
 

@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -36,7 +36,7 @@ func init() {
 
 func (c ExecAction) DefaultGattungen() ids.Genre {
 	return ids.MakeGenre(
-		gattung.Zettel,
+		genres.Zettel,
 	)
 }
 
@@ -61,12 +61,12 @@ func (c ExecAction) RunWithQuery(
 		return
 	}
 
-	hinweisen := collections_value.MakeMutableValueSet[ids.IdLike](nil)
+	object_id_provider := collections_value.MakeMutableValueSet[ids.IdLike](nil)
 
 	if err = u.GetStore().QueryWithKasten(
 		ms,
 		func(z *sku.Transacted) (err error) {
-			return hinweisen.Add(z.GetKennung())
+			return object_id_provider.Add(z.GetKennung())
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -76,7 +76,7 @@ func (c ExecAction) RunWithQuery(
 	if err = c.runAction(
 		u,
 		sc,
-		hinweisen,
+		object_id_provider,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -88,7 +88,7 @@ func (c ExecAction) RunWithQuery(
 func (c ExecAction) runAction(
 	u *umwelt.Umwelt,
 	sc script_config.ScriptConfig,
-	hinweisen interfaces.SetLike[ids.IdLike],
+	object_id_provider interfaces.SetLike[ids.IdLike],
 ) (err error) {
 	var wt io.WriterTo
 
@@ -97,7 +97,7 @@ func (c ExecAction) runAction(
 		map[string]string{
 			"ZIT_BIN": u.Standort().Executable(),
 		},
-		iter.Strings[ids.IdLike](hinweisen)...,
+		iter.Strings[ids.IdLike](object_id_provider)...,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

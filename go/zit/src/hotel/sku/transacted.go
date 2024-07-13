@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
@@ -124,7 +124,7 @@ func (a *Transacted) GetEtiketten() ids.TagSet {
 }
 
 func (a *Transacted) AddEtikettPtr(e *ids.Tag) (err error) {
-	if a.Kennung.GetGenre() == gattung.Etikett {
+	if a.Kennung.GetGenre() == genres.Tag {
 		e1 := ids.MustTag(a.Kennung.String())
 		ex := ids.ExpandOne(&e1, expansion.ExpanderRight)
 

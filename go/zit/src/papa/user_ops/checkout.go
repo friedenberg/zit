@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -38,7 +38,7 @@ func (op Checkout) RunWithKasten(
 	skus sku.TransactedSet,
 ) (zsc sku.CheckedOutLikeMutableSet, err error) {
 	b := op.Umwelt.MakeQueryBuilder(
-		ids.MakeGenre(gattung.Zettel),
+		ids.MakeGenre(genres.Zettel),
 	).WithTransacted(
 		skus,
 	)
@@ -119,7 +119,7 @@ func (op Checkout) RunQuery(
 
 		var ms *query.Group
 
-		builder := op.MakeQueryBuilderExcludingHidden(ids.MakeGenre(gattung.Zettel))
+		builder := op.MakeQueryBuilderExcludingHidden(ids.MakeGenre(genres.Zettel))
 
 		if ms, err = builder.WithCheckedOut(zsc).BuildQueryGroup(); err != nil {
 			err = errors.Wrap(err)

@@ -15,9 +15,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/delta/type_blob"
+	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
@@ -733,7 +733,7 @@ func (u *Umwelt) MakeFormatFunc(
 		}
 
 	default:
-		err = MakeErrUnsupportedFormatterValue(v, gattung.Unknown)
+		err = MakeErrUnsupportedFormatterValue(v, genres.Unknown)
 	}
 
 	return
@@ -759,7 +759,7 @@ func (u *Umwelt) makeTypFormatter(
 				return
 			}
 
-			var ta *type_blob.V0
+			var ta *type_blobs.V0
 
 			if ta, err = agp.GetBlob(tt.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)
@@ -801,10 +801,10 @@ func (u *Umwelt) makeTypFormatter(
 		}
 
 	case "action-names":
-		fan := type_blob.MakeFormatterActionNames()
+		fan := type_blobs.MakeFormatterActionNames()
 
 		f = func(o *sku.Transacted) (err error) {
-			var akte *type_blob.V0
+			var akte *type_blobs.V0
 
 			if akte, err = agp.GetBlob(o.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)
@@ -823,7 +823,7 @@ func (u *Umwelt) makeTypFormatter(
 
 	case "hooks.on_pre_commit":
 		f = func(o *sku.Transacted) (err error) {
-			var akte *type_blob.V0
+			var akte *type_blobs.V0
 
 			if akte, err = agp.GetBlob(o.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)
@@ -872,7 +872,7 @@ func (u *Umwelt) makeTypFormatter(
 				ty := ""
 
 				switch o.GetGenre() {
-				case gattung.Typ, gattung.Etikett, gattung.Kasten, gattung.Konfig:
+				case genres.Type, genres.Tag, genres.Repo, genres.Config:
 					ty = "toml"
 
 				default:
@@ -887,7 +887,7 @@ func (u *Umwelt) makeTypFormatter(
 				return
 			}
 
-			var ta *type_blob.V0
+			var ta *type_blobs.V0
 
 			if ta, err = u.GetStore().GetAkten().GetTypeV0().GetBlob(
 				t.GetAkteSha(),
@@ -912,7 +912,7 @@ func (u *Umwelt) makeTypFormatter(
 	default:
 		err = MakeErrUnsupportedFormatterValue(
 			v,
-			gattung.Typ,
+			genres.Type,
 		)
 
 		return

@@ -2,7 +2,7 @@ package bestandsaufnahme
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -17,7 +17,7 @@ func MakeInventoryList() *InventoryList {
 }
 
 func (a *InventoryList) GetGattung() (g interfaces.Genre) {
-	g = gattung.Bestandsaufnahme
+	g = genres.InventoryList
 
 	return
 }

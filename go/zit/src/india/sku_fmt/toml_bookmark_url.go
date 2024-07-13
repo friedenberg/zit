@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -18,7 +18,7 @@ type TomlBookmark struct {
 
 func TomlBookmarkUrl(
 	sk *sku.Transacted,
-	s standort.Standort,
+	s fs_home.Standort,
 ) (ur *url.URL, err error) {
 	var r sha.ReadCloser
 

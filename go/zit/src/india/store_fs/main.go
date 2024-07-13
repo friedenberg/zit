@@ -16,11 +16,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
-	"code.linenisgreat.com/zit/go/zit/src/echo/zittish"
+	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -37,7 +37,7 @@ type Store struct {
 	deletedPrinter      interfaces.FuncIter[*fd.FD]
 	externalStoreInfo   external_store.Info
 	metadateiTextParser metadatei.TextParser
-	standort            standort.Standort
+	fs_home             fs_home.Standort
 	fileEncoder         FileEncoder
 	ic                  ids.InlineTypChecker
 	fileExtensions      file_extensions.FileExtensions
@@ -84,7 +84,7 @@ func (fs *Store) Flush() (err error) {
 
 	if err = deleteOp.Run(
 		fs.konfig.IsDryRun(),
-		fs.standort,
+		fs.fs_home,
 		fs.deletedPrinter,
 		fs.deleted,
 	); err != nil {
@@ -104,7 +104,7 @@ func (fs *Store) MarkUnsureAkten(f *fd.FD) (err error) {
 		return
 	}
 
-	if f, err = fd.MakeFileFromFD(f, fs.standort); err != nil {
+	if f, err = fd.MakeFileFromFD(f, fs.fs_home); err != nil {
 		err = errors.Wrapf(err, "%q", f)
 		return
 	}
@@ -129,13 +129,13 @@ func (fs *Store) String() (out string) {
 	}
 
 	sb := &strings.Builder{}
-	sb.WriteRune(zittish.OpGroupOpen)
+	sb.WriteRune(query_spec.OpGroupOpen)
 
 	hasOne := false
 
 	writeOneIfNecessary := func(v interfaces.Stringer) (err error) {
 		if hasOne {
-			sb.WriteRune(zittish.OpOr)
+			sb.WriteRune(query_spec.OpOr)
 		}
 
 		sb.WriteString(v.String())
@@ -175,7 +175,7 @@ func (fs *Store) String() (out string) {
 		},
 	)
 
-	sb.WriteRune(zittish.OpGroupClose)
+	sb.WriteRune(query_spec.OpGroupClose)
 
 	out = sb.String()
 	return
@@ -231,19 +231,19 @@ func (fs *Store) GetKennungForString(v string) (k *ids.ObjectId, err error) {
 }
 
 func (fs *Store) ContainsSku(m *sku.Transacted) bool {
-	g := gattung.Must(m)
+	g := genres.Must(m)
 
 	switch g {
-	case gattung.Zettel:
+	case genres.Zettel:
 		return fs.zettelen.ContainsKey(m.GetKennung().String())
 
-	case gattung.Typ:
+	case genres.Type:
 		return fs.typen.ContainsKey(m.GetKennung().String())
 
-	case gattung.Etikett:
+	case genres.Tag:
 		return fs.etiketten.ContainsKey(m.GetKennung().String())
 
-	case gattung.Kasten:
+	case genres.Repo:
 		return fs.kisten.ContainsKey(m.GetKennung().String())
 	}
 
@@ -313,22 +313,22 @@ func (fs *Store) GetTyp(
 func (fs *Store) Get(
 	k interfaces.StringerGenreGetter,
 ) (t *KennungFDPair, ok bool) {
-	g := gattung.Must(k.GetGenre())
+	g := genres.Must(k.GetGenre())
 
 	switch g {
-	case gattung.Kasten:
+	case genres.Repo:
 		return fs.kisten.Get(k.String())
 
-	case gattung.Zettel:
+	case genres.Zettel:
 		return fs.zettelen.Get(k.String())
 
-	case gattung.Typ:
+	case genres.Type:
 		return fs.typen.Get(k.String())
 
-	case gattung.Etikett:
+	case genres.Tag:
 		return fs.etiketten.Get(k.String())
 
-	case gattung.Konfig:
+	case genres.Config:
 		// TODO-P3
 		return
 
@@ -664,7 +664,7 @@ func (fs *Store) addUnsureAkten(dir, name string) (err error) {
 
 	if ut, err = fd.MakeFile(
 		fullPath,
-		fs.standort,
+		fs.fs_home,
 	); err != nil {
 		err = errors.Wrapf(err, "Dir: %q, Name: %q", dir, name)
 		return

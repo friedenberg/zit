@@ -12,12 +12,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 )
 
 type textFormatterCommon struct {
-	standort      standort.Standort
+	fs_home       fs_home.Standort
 	akteFactory   interfaces.BlobReaderFactory
 	akteFormatter script_config.RemoteScript
 	TextFormatterOptions
@@ -177,7 +177,7 @@ func (f textFormatterCommon) writeAkte(
 		if wt, err = script_config.MakeWriterToWithStdin(
 			f.akteFormatter,
 			map[string]string{
-				"ZIT_BIN": f.standort.Executable(),
+				"ZIT_BIN": f.fs_home.Executable(),
 			},
 			ar,
 		); err != nil {

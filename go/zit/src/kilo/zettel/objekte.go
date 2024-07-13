@@ -2,13 +2,13 @@ package zettel
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 )
 
 type Objekte struct{}
 
 func (z Objekte) GetGattung() interfaces.Genre {
-	return gattung.Zettel
+	return genres.Zettel
 }
 
 func (z Objekte) Equals(z1 Objekte) bool {

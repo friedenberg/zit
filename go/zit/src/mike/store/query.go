@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -113,7 +113,7 @@ func (s *Store) QueryAllMatchingAkten(
 
 	if pa, err = s.GetStandort().DirObjektenGattung(
 		s.GetKonfig().GetStoreVersion(),
-		gattung.Akte,
+		genres.Blob,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

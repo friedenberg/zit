@@ -7,29 +7,29 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/delta/schlussel"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/delta/keys"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/etiketten_path"
 	"code.linenisgreat.com/zit/go/zit/src/golf/ennui"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-var binaryFieldOrder = []schlussel.Schlussel{
-	schlussel.Sigil,
-	schlussel.Kennung,
-	schlussel.Akte,
-	schlussel.Bezeichnung,
-	schlussel.Etikett,
-	schlussel.Tai,
-	schlussel.Typ,
-	schlussel.MutterMetadateiMutterKennung,
-	schlussel.ShaMetadateiMutterKennung,
-	schlussel.ShaMetadatei,
-	schlussel.ShaMetadateiSansTai,
-	schlussel.VerzeichnisseEtikettImplicit,
-	schlussel.VerzeichnisseEtikettExpanded,
-	schlussel.VerzeichnisseEtiketten,
+var binaryFieldOrder = []keys.Key{
+	keys.Sigil,
+	keys.ObjectId,
+	keys.Blob,
+	keys.Description,
+	keys.Tag,
+	keys.Tai,
+	keys.Type,
+	keys.MutterMetadateiMutterKennung,
+	keys.ShaMetadateiMutterKennung,
+	keys.ShaMetadatei,
+	keys.ShaMetadateiSansTai,
+	keys.VerzeichnisseEtikettImplicit,
+	keys.VerzeichnisseEtikettExpanded,
+	keys.VerzeichnisseEtiketten,
 }
 
 func makeFlushQueryGroup(ss ...ids.Sigil) sku.PrimitiveQueryGroup {
@@ -188,7 +188,7 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 			return
 		}
 
-		q, ok := bf.Get(gattung.Must(sk.Transacted))
+		q, ok := bf.Get(genres.Must(sk.Transacted))
 
 		// TODO use query to decide whether to read and inflate or skip
 		if ok {
@@ -257,8 +257,8 @@ func (bf *binaryDecoder) readSigil(
 		return
 	}
 
-	if bf.Schlussel != schlussel.Sigil {
-		err = errors.Wrapf(errExpectedSigil, "Key: %s", bf.Schlussel)
+	if bf.Key != keys.Sigil {
+		err = errors.Wrapf(errExpectedSigil, "Key: %s", bf.Key)
 		return
 	}
 
@@ -275,20 +275,20 @@ func (bf *binaryDecoder) readSigil(
 func (bf *binaryDecoder) readFieldKey(
 	sk *sku.Transacted,
 ) (err error) {
-	switch bf.Schlussel {
-	case schlussel.Akte:
+	switch bf.Key {
+	case keys.Blob:
 		if _, err = sk.Metadatei.Akte.ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case schlussel.Bezeichnung:
+	case keys.Description:
 		if err = sk.Metadatei.Bezeichnung.Set(bf.Content.String()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case schlussel.Etikett:
+	case keys.Tag:
 		var e ids.Tag
 
 		if err = e.Set(bf.Content.String()); err != nil {
@@ -301,43 +301,43 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-	case schlussel.Kennung:
+	case keys.ObjectId:
 		if _, err = sk.Kennung.ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case schlussel.Tai:
+	case keys.Tai:
 		if _, err = sk.Metadatei.Tai.ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case schlussel.Typ:
+	case keys.Type:
 		if err = sk.Metadatei.Typ.Set(bf.Content.String()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case schlussel.MutterMetadateiMutterKennung:
+	case keys.MutterMetadateiMutterKennung:
 		if _, err = sk.Metadatei.Mutter().ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case schlussel.ShaMetadateiMutterKennung:
+	case keys.ShaMetadateiMutterKennung:
 		if _, err = sk.Metadatei.Sha().ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case schlussel.ShaMetadatei:
+	case keys.ShaMetadatei:
 		if _, err = sk.Metadatei.SelbstMetadatei.ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case schlussel.ShaMetadateiSansTai:
+	case keys.ShaMetadateiSansTai:
 		if _, err = sk.Metadatei.SelbstMetadateiSansTai.ReadFrom(
 			&bf.Content,
 		); err != nil {
@@ -345,7 +345,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-	case schlussel.VerzeichnisseEtikettImplicit:
+	case keys.VerzeichnisseEtikettImplicit:
 		var e ids.Tag
 
 		if err = e.Set(bf.Content.String()); err != nil {
@@ -358,7 +358,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-	case schlussel.VerzeichnisseEtikettExpanded:
+	case keys.VerzeichnisseEtikettExpanded:
 		var e ids.Tag
 
 		if err = e.Set(bf.Content.String()); err != nil {
@@ -371,7 +371,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-	case schlussel.VerzeichnisseEtiketten:
+	case keys.VerzeichnisseEtiketten:
 		var e etiketten_path.PathWithType
 
 		if _, err = e.ReadFrom(&bf.Content); err != nil {

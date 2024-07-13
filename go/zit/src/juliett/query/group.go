@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -15,7 +15,7 @@ func MakeGroup(
 	b *Builder,
 ) *Group {
 	return &Group{
-		OptimizedQueries: make(map[gattung.Genre]*Query),
+		OptimizedQueries: make(map[genres.Genre]*Query),
 		UserQueries:      make(map[ids.Genre]*Query),
 		Hidden:           b.hidden,
 		Zettelen:         ids.MakeZettelIdMutableSet(),
@@ -25,7 +25,7 @@ func MakeGroup(
 
 type Group struct {
 	Hidden           sku.Query
-	OptimizedQueries map[gattung.Genre]*Query
+	OptimizedQueries map[genres.Genre]*Query
 	UserQueries      map[ids.Genre]*Query
 	Kennungen        []*ids.ObjectId
 	Zettelen         ids.ZettelIdMutableSet
@@ -52,7 +52,7 @@ func (qg *Group) IsEmpty() bool {
 	return len(qg.UserQueries) == 0
 }
 
-func (qg *Group) Get(g gattung.Genre) (sku.QueryWithSigilAndKennung, bool) {
+func (qg *Group) Get(g genres.Genre) (sku.QueryWithSigilAndKennung, bool) {
 	q, ok := qg.OptimizedQueries[g]
 	return q, ok
 }
@@ -66,7 +66,7 @@ func (qg *Group) GetSigil() (s ids.Sigil) {
 }
 
 func (qg *Group) GetExactlyOneKennung(
-	g gattung.Genre,
+	g genres.Genre,
 ) (k *ids.ObjectId, s ids.Sigil, err error) {
 	if len(qg.OptimizedQueries) != 1 {
 		err = errors.Errorf(
@@ -166,7 +166,7 @@ func (qg *Group) AddExactKennung(
 	q := b.makeQuery()
 	q.Sigil.Add(ids.SigilLatest)
 	q.Kennung[k.ObjectId.String()] = k
-	q.Genre.Add(gattung.Must(k))
+	q.Genre.Add(genres.Must(k))
 
 	if err = qg.Add(q); err != nil {
 		err = errors.Wrap(err)
@@ -277,7 +277,7 @@ func (qg *Group) StringDebug() string {
 	sb.WriteString(" | ")
 	first = true
 
-	for _, g := range gattung.TrueGattung() {
+	for _, g := range genres.TrueGenre() {
 		q, ok := qg.OptimizedQueries[g]
 
 		if !ok {
@@ -315,7 +315,7 @@ func (qg *Group) StringOptimized() string {
 	// 	},
 	// )
 
-	for _, g := range gattung.TrueGattung() {
+	for _, g := range genres.TrueGenre() {
 		q, ok := qg.OptimizedQueries[g]
 
 		if !ok {
@@ -377,7 +377,7 @@ func (qg *Group) ContainsSku(sk *sku.Transacted) (ok bool) {
 	defer sk.Metadatei.Verzeichnisse.QueryPath.PushOnOk(qg, &ok)
 	g := sk.GetGenre()
 
-	q, ok := qg.OptimizedQueries[gattung.Must(g)]
+	q, ok := qg.OptimizedQueries[genres.Must(g)]
 
 	if !ok || !q.ContainsSku(sk) {
 		ok = false
@@ -393,7 +393,7 @@ func (qg *Group) MakeEmitSku(
 	f interfaces.FuncIter[*sku.Transacted],
 ) interfaces.FuncIter[*sku.Transacted] {
 	return func(z *sku.Transacted) (err error) {
-		g := gattung.Must(z.GetGenre())
+		g := genres.Must(z.GetGenre())
 		m, ok := qg.Get(g)
 
 		if !ok {
@@ -446,7 +446,7 @@ func (qg *Group) MakeEmitSkuSigilSchwanzen(
 	) (err error),
 ) interfaces.FuncIter[*sku.Transacted] {
 	return func(z *sku.Transacted) (err error) {
-		g := gattung.Must(z.GetGenre())
+		g := genres.Must(z.GetGenre())
 		m, ok := qg.Get(g)
 
 		if !ok {
@@ -482,7 +482,7 @@ func (qg *Group) MakeEmitSkuSigilExternal(
 	) (err error),
 ) interfaces.FuncIter[*sku.Transacted] {
 	return func(z *sku.Transacted) (err error) {
-		g := gattung.Must(z.GetGenre())
+		g := genres.Must(z.GetGenre())
 		m, ok := qg.Get(g)
 
 		if !ok {

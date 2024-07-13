@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
@@ -58,7 +58,7 @@ func (pz ProtoZettel) Make() (z *sku.Transacted) {
 	todo.Change("add Bezeichnung")
 	z = sku.GetTransactedPool().Get()
 
-	pz.Apply(z, gattung.Zettel)
+	pz.Apply(z, genres.Zettel)
 
 	return
 }
@@ -73,7 +73,7 @@ func (pz ProtoZettel) Apply(
 	ui.Log().Print(ml, g)
 
 	switch g {
-	case gattung.Zettel, gattung.Unknown:
+	case genres.Zettel, genres.Unknown:
 		if ids.IsEmpty(z.GetTyp()) &&
 			!ids.IsEmpty(pz.Metadatei.Typ) &&
 			!z.GetTyp().Equals(pz.Metadatei.Typ) {

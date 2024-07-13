@@ -8,17 +8,17 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
 type Genre byte
 
 func MakeGenreAll() Genre {
-	return MakeGenre(gattung.TrueGattung()...)
+	return MakeGenre(genres.TrueGenre()...)
 }
 
-func MakeGenre(vs ...gattung.Genre) (s Genre) {
+func MakeGenre(vs ...genres.Genre) (s Genre) {
 	s.Add(vs...)
 	return
 }
@@ -43,7 +43,7 @@ func (a *Genre) ResetWith(b Genre) {
 	*a = b
 }
 
-func (a *Genre) Add(bs ...gattung.Genre) {
+func (a *Genre) Add(bs ...genres.Genre) {
 	for _, b := range bs {
 		*a |= Genre(b.GetGenre().GetGenreBitInt())
 	}
@@ -63,9 +63,9 @@ func (a Genre) ContainsOneOf(b interfaces.GenreGetter) bool {
 	return a&bg != 0
 }
 
-func (a Genre) Slice() []gattung.Genre {
-	tg := gattung.TrueGattung()
-	out := make([]gattung.Genre, 0, len(tg))
+func (a Genre) Slice() []genres.Genre {
+	tg := genres.TrueGenre()
+	out := make([]genres.Genre, 0, len(tg))
 
 	for _, g := range tg {
 		if !a.ContainsOneOf(g) {
@@ -83,7 +83,7 @@ func (a Genre) String() string {
 
 	first := true
 
-	for _, g := range gattung.TrueGattung() {
+	for _, g := range genres.TrueGenre() {
 		if !a.ContainsOneOf(g) {
 			continue
 		}
@@ -100,7 +100,7 @@ func (a Genre) String() string {
 }
 
 func (i *Genre) AddString(v string) (err error) {
-	var g gattung.Genre
+	var g genres.Genre
 
 	if err = g.Set(v); err != nil {
 		err = errors.Wrap(err)

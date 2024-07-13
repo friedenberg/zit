@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -20,11 +20,11 @@ func (c *compiled) GetZettelFileExtension() string {
 }
 
 func (kc *Compiled) GetImmutableConfig() interfaces.ImmutableConfig {
-	return kc.angeboren
+	return kc.immutable_config
 }
 
 func (kc *compiled) getTyp(k ids.IdLike) (ct *sku.Transacted) {
-	if k.GetGenre() != gattung.Typ {
+	if k.GetGenre() != genres.Type {
 		return
 	}
 
@@ -37,7 +37,7 @@ func (kc *compiled) getTyp(k ids.IdLike) (ct *sku.Transacted) {
 }
 
 func (kc *compiled) getKasten(k ids.IdLike) (ct *sku.Transacted) {
-	if k.GetGenre() != gattung.Kasten {
+	if k.GetGenre() != genres.Repo {
 		return
 	}
 
@@ -54,7 +54,7 @@ func (kc *compiled) getKasten(k ids.IdLike) (ct *sku.Transacted) {
 func (kc *compiled) getApproximatedTyp(
 	k ids.IdLike,
 ) (ct ApproximatedTyp) {
-	if k.GetGenre() != gattung.Typ {
+	if k.GetGenre() != genres.Type {
 		return
 	}
 
@@ -82,15 +82,15 @@ func (kc *compiled) getEtikettOrKastenOrTyp(
 	}
 
 	switch k.GetGenre() {
-	case gattung.Etikett:
+	case genres.Tag:
 		sk, _ = kc.getEtikett(&k)
-	case gattung.Kasten:
+	case genres.Repo:
 		sk = kc.getKasten(&k)
-	case gattung.Typ:
+	case genres.Type:
 		sk = kc.getTyp(&k)
 
 	default:
-		err = gattung.MakeErrUnsupportedGattung(&k)
+		err = genres.MakeErrUnsupportedGattung(&k)
 		return
 	}
 
@@ -100,7 +100,7 @@ func (kc *compiled) getEtikettOrKastenOrTyp(
 func (kc *compiled) getEtikett(
 	k ids.IdLike,
 ) (ct *sku.Transacted, ok bool) {
-	if k.GetGenre() != gattung.Etikett {
+	if k.GetGenre() != genres.Tag {
 		return
 	}
 

@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/delta/schlussel"
+	"code.linenisgreat.com/zit/go/zit/src/delta/keys"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
@@ -54,7 +54,7 @@ func (bf *binaryEncoder) writeFormat(
 
 	for _, f := range binaryFieldOrder {
 		bf.binaryField.Reset()
-		bf.Schlussel = f
+		bf.Key = f
 
 		if _, err = bf.writeFieldKey(sk); err != nil {
 			err = errors.Wrapf(err, "Sku: %s", sk)
@@ -96,8 +96,8 @@ func (bf *binaryEncoder) writeFormat(
 func (bf *binaryEncoder) writeFieldKey(
 	sk skuWithSigil,
 ) (n int64, err error) {
-	switch bf.Schlussel {
-	case schlussel.Sigil:
+	switch bf.Key {
+	case keys.Sigil:
 		s := sk.Sigil
 		s.Add(bf.Sigil)
 
@@ -110,13 +110,13 @@ func (bf *binaryEncoder) writeFieldKey(
 			return
 		}
 
-	case schlussel.Akte:
+	case keys.Blob:
 		if n, err = bf.writeSha(&sk.Metadatei.Akte, true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case schlussel.Bezeichnung:
+	case keys.Description:
 		if sk.Metadatei.Bezeichnung.IsEmpty() {
 			return
 		}
@@ -126,7 +126,7 @@ func (bf *binaryEncoder) writeFieldKey(
 			return
 		}
 
-	case schlussel.Etikett:
+	case keys.Tag:
 		es := sk.GetEtiketten()
 
 		for _, e := range iter.SortedValues(es) {
@@ -149,19 +149,19 @@ func (bf *binaryEncoder) writeFieldKey(
 			}
 		}
 
-	case schlussel.Kennung:
+	case keys.ObjectId:
 		if n, err = bf.writeFieldWriterTo(&sk.Kennung); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case schlussel.Tai:
+	case keys.Tai:
 		if n, err = bf.writeFieldWriterTo(&sk.Metadatei.Tai); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case schlussel.Typ:
+	case keys.Type:
 		if sk.Metadatei.Typ.IsEmpty() {
 			return
 		}
@@ -171,25 +171,25 @@ func (bf *binaryEncoder) writeFieldKey(
 			return
 		}
 
-	case schlussel.MutterMetadateiMutterKennung:
+	case keys.MutterMetadateiMutterKennung:
 		if n, err = bf.writeSha(sk.Metadatei.Mutter(), true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case schlussel.ShaMetadateiSansTai:
+	case keys.ShaMetadateiSansTai:
 		if n, err = bf.writeSha(&sk.Metadatei.SelbstMetadateiSansTai, true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case schlussel.ShaMetadateiMutterKennung:
+	case keys.ShaMetadateiMutterKennung:
 		if n, err = bf.writeSha(sk.Metadatei.Sha(), false); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case schlussel.ShaMetadatei:
+	case keys.ShaMetadatei:
 		if err = sha.MakeErrIsNull(&sk.Metadatei.SelbstMetadatei); err != nil {
 			return
 		}
@@ -199,7 +199,7 @@ func (bf *binaryEncoder) writeFieldKey(
 			return
 		}
 
-	case schlussel.VerzeichnisseEtikettImplicit:
+	case keys.VerzeichnisseEtikettImplicit:
 		es := sk.Metadatei.Verzeichnisse.GetImplicitEtiketten()
 
 		for _, e := range iter.SortedValues[ids.Tag](es) {
@@ -213,7 +213,7 @@ func (bf *binaryEncoder) writeFieldKey(
 			}
 		}
 
-	case schlussel.VerzeichnisseEtikettExpanded:
+	case keys.VerzeichnisseEtikettExpanded:
 		es := sk.Metadatei.Verzeichnisse.GetExpandedEtiketten()
 
 		for _, e := range iter.SortedValues[ids.Tag](es) {
@@ -227,7 +227,7 @@ func (bf *binaryEncoder) writeFieldKey(
 			}
 		}
 
-	case schlussel.VerzeichnisseEtiketten:
+	case keys.VerzeichnisseEtiketten:
 		es := sk.Metadatei.Verzeichnisse.Etiketten
 
 		for _, e := range es.Paths {
@@ -242,7 +242,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	default:
-		panic(fmt.Sprintf("unsupported key: %s", bf.Schlussel))
+		panic(fmt.Sprintf("unsupported key: %s", bf.Key))
 	}
 
 	return

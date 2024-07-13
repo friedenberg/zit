@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
@@ -61,7 +61,7 @@ func init() {
 }
 
 func (c Clean) DefaultGattungen() ids.Genre {
-	return ids.MakeGenre(gattung.TrueGattung()...)
+	return ids.MakeGenre(genres.TrueGenre()...)
 }
 
 func (c Clean) shouldClean(

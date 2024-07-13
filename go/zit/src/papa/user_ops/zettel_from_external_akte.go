@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
@@ -107,7 +107,7 @@ func (c ZettelFromExternalAkte) Run(
 
 	if err = results.Each(
 		func(z *sku.Transacted) (err error) {
-			if c.ProtoZettel.Apply(z, gattung.Zettel) {
+			if c.ProtoZettel.Apply(z, genres.Zettel) {
 				if err = c.GetStore().CreateOrUpdateFromTransacted(
 					z,
 					objekte_mode.ModeApplyProto,
@@ -147,7 +147,7 @@ func (c ZettelFromExternalAkte) Run(
 		}
 
 		// TODO switch to using ObjekteOptions
-		if c.ProtoZettel.Apply(z, gattung.Zettel) {
+		if c.ProtoZettel.Apply(z, genres.Zettel) {
 			if err = c.GetStore().CreateOrUpdateFromTransacted(
 				z.GetSku(),
 				objekte_mode.ModeEmpty,

@@ -10,12 +10,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -42,7 +42,7 @@ type Umwelt struct {
 	outIsTty bool
 	errIsTty bool
 
-	standort    standort.Standort
+	fs_home     fs_home.Standort
 	erworbenCli mutable_config.Cli
 	konfig      konfig.Compiled
 	schlummernd query.Schlummernd
@@ -115,19 +115,19 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 			errors.SetTodoOn()
 		}
 
-		standortOptions := standort.Options{
+		standortOptions := fs_home.Options{
 			BasePath: u.erworbenCli.BasePath,
 			Debug:    u.erworbenCli.Debug,
 			DryRun:   u.erworbenCli.DryRun,
 		}
 
-		if u.standort, err = standort.Make(standortOptions); err != nil {
+		if u.fs_home, err = fs_home.Make(standortOptions); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		if err = os.MkdirAll(
-			u.standort.DirTempLocal(),
+			u.fs_home.DirTempLocal(),
 			os.ModeDir|0o755,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -136,14 +136,14 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	}
 
 	if err = u.schlummernd.Load(
-		u.standort,
+		u.fs_home,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if err = u.konfig.Initialize(
-		u.standort,
+		u.fs_home,
 		u.erworbenCli,
 		&u.schlummernd,
 	); err != nil {
@@ -205,12 +205,12 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	if err = u.store.Initialize(
 		u.flags,
 		u.GetKonfig(),
-		u.standort,
+		u.fs_home,
 		objekte_format.FormatForVersion(u.GetKonfig().GetStoreVersion()),
 		u.sonnenaufgang,
 		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
 		u.makeQueryBuilder().
-			WithDefaultGattungen(ids.MakeGenre(gattung.TrueGattung()...)),
+			WithDefaultGattungen(ids.MakeGenre(genres.TrueGenre()...)),
 		ofo,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")

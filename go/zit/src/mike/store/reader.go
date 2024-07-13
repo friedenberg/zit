@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -18,7 +18,7 @@ func (s *Store) ReadOneInto(
 	var sk *sku.Transacted
 
 	switch k1.GetGenre() {
-	case gattung.Zettel:
+	case genres.Zettel:
 		var h *ids.ZettelId
 
 		if h, err = s.GetAbbrStore().Hinweis().ExpandString(
@@ -34,7 +34,7 @@ func (s *Store) ReadOneInto(
 			return
 		}
 
-	case gattung.Typ, gattung.Etikett, gattung.Kasten:
+	case genres.Type, genres.Tag, genres.Repo:
 		if sk, err = s.ReadOneKennung(k1); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -75,7 +75,7 @@ func (s *Store) ReadOneInto(
 
 	// 	sk = s.GetKonfig().GetKasten(k)
 
-	case gattung.Konfig:
+	case genres.Config:
 		sk = &s.GetKonfig().Sku
 
 		if sk.GetTai().IsEmpty() {
@@ -83,7 +83,7 @@ func (s *Store) ReadOneInto(
 		}
 
 	default:
-		err = gattung.MakeErrUnsupportedGattung(k1)
+		err = genres.MakeErrUnsupportedGattung(k1)
 		return
 	}
 

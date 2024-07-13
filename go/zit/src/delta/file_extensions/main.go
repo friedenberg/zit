@@ -2,7 +2,7 @@ package file_extensions
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 )
 
 type FileExtensions struct {
@@ -16,19 +16,19 @@ type FileExtensions struct {
 func (a FileExtensions) GetFileExtensionForGattung(
 	g1 interfaces.GenreGetter,
 ) string {
-	g := gattung.Must(g1)
+	g := genres.Must(g1)
 
 	switch g {
-	case gattung.Zettel:
+	case genres.Zettel:
 		return a.GetFileExtensionZettel()
 
-	case gattung.Typ:
+	case genres.Type:
 		return a.GetFileExtensionTyp()
 
-	case gattung.Etikett:
+	case genres.Tag:
 		return a.GetFileExtensionEtikett()
 
-	case gattung.Kasten:
+	case genres.Repo:
 		return a.GetFileExtensionKasten()
 
 	default:

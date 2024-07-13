@@ -6,11 +6,11 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/golf/kennung_index"
@@ -28,7 +28,7 @@ import (
 
 type Store struct {
 	konfig                    *konfig.Compiled
-	standort                  standort.Standort
+	fs_home                   fs_home.Standort
 	cwdFiles                  *store_fs.Store
 	externalStores            map[string]*external_store.Store
 	blob_store                *blob_store.VersionedStores
@@ -69,7 +69,7 @@ type Logger struct {
 func (c *Store) Initialize(
 	flags *flag.FlagSet,
 	k *konfig.Compiled,
-	st standort.Standort,
+	st fs_home.Standort,
 	pmf objekte_format.Format,
 	t thyme.Time,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
@@ -77,7 +77,7 @@ func (c *Store) Initialize(
 	options objekte_format.Options,
 ) (err error) {
 	c.konfig = k
-	c.standort = st
+	c.fs_home = st
 	c.blob_store = blob_store.Make(st)
 	c.persistentMetadateiFormat = pmf
 	c.options = options
@@ -87,12 +87,12 @@ func (c *Store) Initialize(
 	c.queryBuilder = qb
 
 	c.metadateiTextParser = metadatei.MakeTextParser(
-		c.standort,
+		c.fs_home,
 		nil, // TODO-P1 make akteFormatter
 	)
 
 	c.typenIndex = kennung_index.MakeIndex2[ids.Type](
-		c.standort,
+		c.fs_home,
 		st.DirVerzeichnisse("TypenIndexV0"),
 	)
 
@@ -101,7 +101,7 @@ func (c *Store) Initialize(
 	}
 
 	if c.Abbr, err = newIndexAbbr(
-		c.standort,
+		c.fs_home,
 		st.DirVerzeichnisse("Abbr"),
 	); err != nil {
 		err = errors.Wrapf(err, "failed to init abbr index")
@@ -112,8 +112,8 @@ func (c *Store) Initialize(
 		c.GetStandort(),
 		c.GetStandort().GetLockSmith(),
 		c.konfig.GetStoreVersion(),
-		c.standort.ObjekteReaderWriterFactory(gattung.Bestandsaufnahme),
-		c.standort,
+		c.fs_home.ObjekteReaderWriterFactory(genres.InventoryList),
+		c.fs_home,
 		pmf,
 		c,
 	); err != nil {

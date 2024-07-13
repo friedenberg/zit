@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -40,7 +40,7 @@ type textFormatter struct {
 }
 
 func (tf textFormatter) WriteStringFormat(w io.Writer, s *sku.Transacted) (n int64, err error) {
-	if gattung.Konfig.EqualsGenre(s.GetGenre()) {
+	if genres.Config.EqualsGenre(s.GetGenre()) {
 		n, err = tf.fBlobOnly.FormatMetadatei(w, s)
 	} else if tf.k.IsInlineTyp(s.GetTyp()) {
 		n, err = tf.fMetadateiAndBlob.FormatMetadatei(w, s)
@@ -56,7 +56,7 @@ func (tf textFormatter) WriteStringFormatWithMode(
 	s *sku.Transacted,
 	mode checkout_mode.Mode,
 ) (n int64, err error) {
-	if gattung.Konfig.EqualsGenre(s.GetGenre()) || mode == checkout_mode.ModeAkteOnly {
+	if genres.Config.EqualsGenre(s.GetGenre()) || mode == checkout_mode.ModeAkteOnly {
 		n, err = tf.fBlobOnly.FormatMetadatei(w, s)
 	} else if tf.k.IsInlineTyp(s.GetTyp()) {
 		n, err = tf.fMetadateiAndBlob.FormatMetadatei(w, s)

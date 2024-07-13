@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -32,17 +32,17 @@ func init() {
 
 func (c Show) CompletionGattung() ids.Genre {
 	return ids.MakeGenre(
-		gattung.Zettel,
-		gattung.Etikett,
-		gattung.Typ,
-		gattung.Bestandsaufnahme,
-		gattung.Kasten,
+		genres.Zettel,
+		genres.Tag,
+		genres.Type,
+		genres.InventoryList,
+		genres.Repo,
 	)
 }
 
 func (c Show) DefaultGattungen() ids.Genre {
 	return ids.MakeGenre(
-		gattung.Zettel,
+		genres.Zettel,
 	)
 }
 

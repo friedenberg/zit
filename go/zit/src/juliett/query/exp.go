@@ -7,9 +7,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/zittish"
+	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -59,7 +59,7 @@ func (e *Exp) CollectEtiketten(mes ids.TagMutableSet) {
 			mt.CollectEtiketten(mes)
 
 		case *Kennung:
-			if mt.ObjectId.GetGenre() != gattung.Etikett {
+			if mt.ObjectId.GetGenre() != genres.Tag {
 				continue
 			}
 
@@ -135,9 +135,9 @@ func (e *Exp) Add(m sku.Query) (err error) {
 
 func (matcher *Exp) Operator() rune {
 	if matcher.Or {
-		return zittish.OpOr
+		return query_spec.OpOr
 	} else {
-		return zittish.OpAnd
+		return query_spec.OpAnd
 	}
 }
 
@@ -150,7 +150,7 @@ func (e *Exp) StringDebug() string {
 		sb.WriteRune('^')
 	}
 
-	sb.WriteRune(zittish.OpGroupOpen)
+	sb.WriteRune(query_spec.OpGroupOpen)
 	fmt.Fprintf(&sb, "(%d)", len(e.Children))
 
 	for i, m := range e.Children {
@@ -161,7 +161,7 @@ func (e *Exp) StringDebug() string {
 		sb.WriteString(m.String())
 	}
 
-	sb.WriteRune(zittish.OpGroupClose)
+	sb.WriteRune(query_spec.OpGroupClose)
 
 	return sb.String()
 }
@@ -190,7 +190,7 @@ func (e *Exp) String() string {
 		sb.WriteString(e.Children[0].String())
 
 	default:
-		sb.WriteRune(zittish.OpGroupOpen)
+		sb.WriteRune(query_spec.OpGroupOpen)
 
 		for i, m := range e.Children {
 			if i > 0 {
@@ -200,7 +200,7 @@ func (e *Exp) String() string {
 			sb.WriteString(m.String())
 		}
 
-		sb.WriteRune(zittish.OpGroupClose)
+		sb.WriteRune(query_spec.OpGroupClose)
 	}
 
 	return sb.String()

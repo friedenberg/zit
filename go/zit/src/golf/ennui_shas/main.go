@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 )
 
 type (
@@ -43,7 +43,7 @@ type ennui struct {
 }
 
 func MakePermitDuplicates(
-	s standort.Standort,
+	s fs_home.Standort,
 	path string,
 ) (e *ennui, err error) {
 	e = &ennui{}
@@ -52,7 +52,7 @@ func MakePermitDuplicates(
 	return
 }
 
-func MakeNoDuplicates(s standort.Standort, path string) (e *ennui, err error) {
+func MakeNoDuplicates(s fs_home.Standort, path string) (e *ennui, err error) {
 	e = &ennui{}
 	e.rowSize = RowSize
 	err = e.initialize(rowEqualerShaOnly{}, s, path)
@@ -61,7 +61,7 @@ func MakeNoDuplicates(s standort.Standort, path string) (e *ennui, err error) {
 
 func (e *ennui) initialize(
 	equaler interfaces.Equaler1[*row],
-	s standort.Standort,
+	s fs_home.Standort,
 	path string,
 ) (err error) {
 	for i := range e.pages {

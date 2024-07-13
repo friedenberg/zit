@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -17,7 +17,7 @@ type JsonWithUrl struct {
 
 func MakeJsonTomlBookmark(
 	sk *sku.Transacted,
-	s standort.Standort,
+	s fs_home.Standort,
 	chromeTabs []interface{},
 ) (j JsonWithUrl, err error) {
 	if err = j.FromTransacted(sk, s); err != nil {

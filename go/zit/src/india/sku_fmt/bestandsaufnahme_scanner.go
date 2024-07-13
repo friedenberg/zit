@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/golf/ennui"
@@ -43,7 +43,7 @@ type bestandsaufnahmeScanner struct {
 	afterFirst bool
 
 	m  metadatei.Metadatei
-	g  gattung.Genre
+	g  genres.Genre
 	es ids.TagMutableSet
 	k  string
 

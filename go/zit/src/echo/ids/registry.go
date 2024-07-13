@@ -7,18 +7,18 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 )
 
 var (
 	registerOnce   sync.Once
 	registryLock   *sync.Mutex
-	registryGenres map[gattung.Genre]IdLike
+	registryGenres map[genres.Genre]IdLike
 )
 
 func once() {
 	registryLock = &sync.Mutex{}
-	registryGenres = make(map[gattung.Genre]IdLike)
+	registryGenres = make(map[genres.Genre]IdLike)
 }
 
 func register[T IdLike, TPtr interface {
@@ -36,7 +36,7 @@ func register[T IdLike, TPtr interface {
 
 	ok := false
 	var id1 IdLike
-	g := gattung.Must(id.GetGenre())
+	g := genres.Must(id.GetGenre())
 
 	if id1, ok = registryGenres[g]; ok {
 		panic(

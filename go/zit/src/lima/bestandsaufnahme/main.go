@@ -14,11 +14,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/bezeichnung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
@@ -31,7 +31,7 @@ type Store interface {
 
 	Create(
 		*InventoryList,
-		bezeichnung.Bezeichnung,
+		descriptions.Description,
 	) (*sku.Transacted, error)
 	ReadLast() (*sku.Transacted, error)
 	ReadOne(interfaces.Stringer) (*sku.Transacted, error)
@@ -52,7 +52,7 @@ type Format = blob_store.Format[
 ]
 
 type store struct {
-	standort                  standort.Standort
+	fs_home                   fs_home.Standort
 	ls                        interfaces.LockSmith
 	sv                        interfaces.StoreVersion
 	of                        interfaces.ObjectIOFactory
@@ -65,7 +65,7 @@ type store struct {
 }
 
 func MakeStore(
-	standort standort.Standort,
+	fs_home fs_home.Standort,
 	ls interfaces.LockSmith,
 	sv interfaces.StoreVersion,
 	of interfaces.ObjectIOFactory,
@@ -79,7 +79,7 @@ func MakeStore(
 	fa := MakeFormat(sv, op)
 
 	s = &store{
-		standort:                  standort,
+		fs_home:                   fs_home,
 		ls:                        ls,
 		sv:                        sv,
 		of:                        of,
@@ -105,7 +105,7 @@ func (s *store) Flush() (err error) {
 
 func (s *store) Create(
 	o *InventoryList,
-	bez bezeichnung.Bezeichnung,
+	bez descriptions.Description,
 ) (t *sku.Transacted, err error) {
 	if !s.ls.IsAcquired() {
 		err = file_lock.ErrLockRequired{
@@ -175,7 +175,7 @@ func (s *store) Create(
 func (s *store) writeInventoryList(o *InventoryList) (sh *sha.Sha, err error) {
 	var sw sha.WriteCloser
 
-	if sw, err = s.standort.BlobWriter(); err != nil {
+	if sw, err = s.fs_home.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -459,9 +459,9 @@ func (s *store) ReadAll(
 ) (err error) {
 	var p string
 
-	if p, err = s.standort.DirObjektenGattung(
+	if p, err = s.fs_home.DirObjektenGattung(
 		s.sv,
-		gattung.Bestandsaufnahme,
+		genres.InventoryList,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

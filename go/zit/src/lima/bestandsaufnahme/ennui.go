@@ -9,8 +9,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/golf/ennui_shas"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -24,24 +24,24 @@ type Ennui interface {
 }
 
 type ennuiStore struct {
-	standort                  standort.Standort
+	fs_home                   fs_home.Standort
 	persistentMetadateiFormat objekte_format.Format
 	ennuiKennung              ennui_shas.Ennui
 	options                   objekte_format.Options
 }
 
 func (s *ennuiStore) Initialize(
-	standort standort.Standort,
+	fs_home fs_home.Standort,
 	persistentMetadateiFormat objekte_format.Format,
 	options objekte_format.Options,
 ) (err error) {
-	s.standort = standort
+	s.fs_home = fs_home
 	s.persistentMetadateiFormat = persistentMetadateiFormat
 	s.options = options
 
 	if s.ennuiKennung, err = ennui_shas.MakeNoDuplicates(
-		s.standort,
-		s.standort.DirVerzeichnisseVerweise(),
+		s.fs_home,
+		s.fs_home.DirVerzeichnisseVerweise(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -53,9 +53,9 @@ func (s *ennuiStore) Initialize(
 func (s *ennuiStore) ReadOneEnnui(sh *sha.Sha) (sk *sku.Transacted, err error) {
 	var r sha.ReadCloser
 
-	if r, err = s.standort.BlobReaderFrom(
+	if r, err = s.fs_home.BlobReaderFrom(
 		sh,
-		s.standort.DirVerzeichnisseMetadateiKennungMutter(),
+		s.fs_home.DirVerzeichnisseMetadateiKennungMutter(),
 	); err != nil {
 		if errors.IsNotExist(err) {
 			err = collections.MakeErrNotFound(sh)
@@ -143,7 +143,7 @@ func (s *ennuiStore) makeWriteMetadateiFunc(
 	return func() (err error) {
 		var sw sha.WriteCloser
 
-		if sw, err = s.standort.BlobWriterToLight(dir); err != nil {
+		if sw, err = s.fs_home.BlobWriterToLight(dir); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -197,14 +197,14 @@ func (s *ennuiStore) WriteOneObjekteMetadatei(o *sku.Transacted) (err error) {
 	wg.Do(s.MakeFuncSaveOneVerweise(o))
 
 	wg.Do(s.makeWriteMetadateiFunc(
-		s.standort.DirVerzeichnisseMetadateiKennungMutter(),
+		s.fs_home.DirVerzeichnisseMetadateiKennungMutter(),
 		objekte_format.Formats.MetadateiKennungMutter(),
 		o,
 		o.Metadatei.Sha(),
 	))
 
 	wg.Do(s.makeWriteMetadateiFunc(
-		s.standort.DirVerzeichnisseMetadatei(),
+		s.fs_home.DirVerzeichnisseMetadatei(),
 		objekte_format.Formats.Metadatei(),
 		o,
 		&o.Metadatei.SelbstMetadatei,

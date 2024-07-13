@@ -115,7 +115,7 @@ func (s *Store) handleMergeResult(
 ) (err error) {
 	var f *os.File
 
-	if f, err = s.standort.FileTempLocal(); err != nil {
+	if f, err = s.fs_home.FileTempLocal(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -182,7 +182,7 @@ func (s *Store) RunMergeTool(
 
 	var f *os.File
 
-	if f, err = s.standort.FileTempLocal(); err != nil {
+	if f, err = s.fs_home.FileTempLocal(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

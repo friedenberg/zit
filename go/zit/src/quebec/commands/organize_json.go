@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/vim_cli_options_builder"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -58,15 +58,15 @@ func init() {
 
 func (c *OrganizeJSON) DefaultGattungen() ids.Genre {
 	return ids.MakeGenre(
-		gattung.Zettel,
+		genres.Zettel,
 	)
 }
 
 func (c *OrganizeJSON) CompletionGattung() ids.Genre {
 	return ids.MakeGenre(
-		gattung.Zettel,
-		gattung.Etikett,
-		gattung.Typ,
+		genres.Zettel,
+		genres.Tag,
+		genres.Type,
 	)
 }
 

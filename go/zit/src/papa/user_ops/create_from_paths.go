@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
@@ -45,7 +45,7 @@ func (c CreateFromPaths) Run(
 		var z *store_fs.External
 		var t store_fs.KennungFDPair
 
-		t.Kennung.SetGenre(gattung.Zettel)
+		t.Kennung.SetGenre(genres.Zettel)
 
 		if err = t.FDs.Objekte.Set(arg); err != nil {
 			err = errors.Wrap(err)
@@ -171,7 +171,7 @@ func (c *CreateFromPaths) zettelsFromPath(
 
 	ze.Metadatei.Tai = ids.TaiFromTime(fd.ModTime())
 
-	ze.Kennung.SetGenre(gattung.Zettel)
+	ze.Kennung.SetGenre(genres.Zettel)
 
 	if _, err = c.TextParser.ParseMetadatei(r, ze); err != nil {
 		err = errors.Wrap(err)

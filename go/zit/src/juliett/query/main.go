@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -222,7 +222,7 @@ func (q *Query) ContainsSku(sk *sku.Transacted) (ok bool) {
 		return
 	}
 
-	g := gattung.Must(sk)
+	g := genres.Must(sk)
 
 	if !q.Genre.ContainsOneOf(g) {
 		return

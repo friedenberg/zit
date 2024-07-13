@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 )
 
 const Tag2RegexString = `^%?[-a-z0-9_]+$`
@@ -36,7 +36,7 @@ func (e tag2) GetQueryPrefix() string {
 }
 
 func (e tag2) GetGattung() interfaces.Genre {
-	return gattung.Etikett
+	return genres.Tag
 }
 
 func (e *tag2) Reset() {

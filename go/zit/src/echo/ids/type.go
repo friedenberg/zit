@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 )
 
 func init() {
@@ -69,7 +69,7 @@ func (t *Type) GetTypPtr() *Type {
 }
 
 func (o Type) GetGenre() interfaces.Genre {
-	return gattung.Typ
+	return genres.Type
 }
 
 func (t Type) IsToml() bool {

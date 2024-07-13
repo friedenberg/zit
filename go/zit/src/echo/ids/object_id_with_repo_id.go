@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 )
 
 var poolObjectIdWithRepoId interfaces.Pool[ObjectIdWithRepoId, *ObjectIdWithRepoId]
@@ -32,7 +32,7 @@ func GetObjectIdWithRepoIdPool() interfaces.Pool[ObjectIdWithRepoId, *ObjectIdWi
 }
 
 type ObjectIdWithRepoId struct {
-	g                   gattung.Genre
+	g                   genres.Genre
 	middle              byte // remove and replace with virtual
 	kasten, left, right catgut.String
 }
@@ -50,10 +50,10 @@ func (a *ObjectIdWithRepoId) GetRepoId() interfaces.RepoId {
 
 func (a *ObjectIdWithRepoId) IsVirtual() bool {
 	switch a.g {
-	case gattung.Zettel:
+	case genres.Zettel:
 		return slices.Equal(a.left.Bytes(), []byte{'%'})
 
-	case gattung.Etikett:
+	case genres.Tag:
 		return a.middle == '%' || slices.Equal(a.left.Bytes(), []byte{'%'})
 
 	default:
@@ -205,12 +205,12 @@ func (k3 *ObjectIdWithRepoId) ReadFrom(r io.Reader) (n int64, err error) {
 
 func (k3 *ObjectIdWithRepoId) SetGattung(g interfaces.GenreGetter) {
 	if g == nil {
-		k3.g = gattung.Unknown
+		k3.g = genres.Unknown
 	} else {
-		k3.g = gattung.Must(g.GetGenre())
+		k3.g = genres.Must(g.GetGenre())
 	}
 
-	if k3.g == gattung.Zettel {
+	if k3.g == genres.Zettel {
 		k3.middle = '/'
 	}
 }
@@ -219,12 +219,12 @@ func (k3 *ObjectIdWithRepoId) StringFromPtr() string {
 	var sb strings.Builder
 
 	switch k3.g {
-	case gattung.Zettel:
+	case genres.Zettel:
 		sb.Write(k3.left.Bytes())
 		sb.WriteByte(k3.middle)
 		sb.Write(k3.right.Bytes())
 
-	case gattung.Typ:
+	case genres.Type:
 		sb.Write(k3.right.Bytes())
 
 	default:
@@ -245,7 +245,7 @@ func (k3 *ObjectIdWithRepoId) StringFromPtr() string {
 }
 
 func (k3 *ObjectIdWithRepoId) IsEmpty() bool {
-	if k3.g == gattung.Zettel {
+	if k3.g == genres.Zettel {
 		if k3.left.IsEmpty() && k3.right.IsEmpty() {
 			return true
 		}
@@ -274,7 +274,7 @@ func (k3 *ObjectIdWithRepoId) String() string {
 }
 
 func (k3 *ObjectIdWithRepoId) Reset() {
-	k3.g = gattung.Unknown
+	k3.g = genres.Unknown
 	k3.left.Reset()
 	k3.middle = 0
 	k3.right.Reset()
@@ -312,7 +312,7 @@ func MakeKennung3(
 	ka RepoId,
 ) (k *ObjectIdWithRepoId, err error) {
 	k = &ObjectIdWithRepoId{
-		g: gattung.Unknown,
+		g: genres.Unknown,
 	}
 
 	if err = k.kasten.Set(ka.String()); err != nil {
@@ -367,25 +367,25 @@ func (k3 *ObjectIdWithRepoId) SetFromPath(
 
 	switch ext {
 	case fe.Etikett:
-		if err = k3.SetWithGattung(els[1], gattung.Etikett); err != nil {
+		if err = k3.SetWithGattung(els[1], genres.Tag); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case fe.Typ:
-		if err = k3.SetWithGattung(els[1], gattung.Typ); err != nil {
+		if err = k3.SetWithGattung(els[1], genres.Type); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case fe.Kasten:
-		if err = k3.SetWithGattung(els[1], gattung.Kasten); err != nil {
+		if err = k3.SetWithGattung(els[1], genres.Repo); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case fe.Zettel:
-		if err = k3.SetWithGattung(els[2]+"/"+els[1], gattung.Zettel); err != nil {
+		if err = k3.SetWithGattung(els[2]+"/"+els[1], genres.Zettel); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -444,7 +444,7 @@ func (h *ObjectIdWithRepoId) SetWithGattung(
 	v string,
 	g interfaces.GenreGetter,
 ) (err error) {
-	h.g = gattung.Make(g.GetGenre())
+	h.g = genres.Make(g.GetGenre())
 
 	if err = h.Set(v); err != nil {
 		err = errors.Wrap(err)
@@ -462,41 +462,41 @@ func (h *ObjectIdWithRepoId) Set(v string) (err error) {
 	var k IdLike
 
 	switch h.g {
-	case gattung.Unknown:
+	case genres.Unknown:
 		k, err = Make(v)
 
-	case gattung.Zettel:
+	case genres.Zettel:
 		var h ZettelId
 		err = h.Set(v)
 		k = h
 
-	case gattung.Etikett:
+	case genres.Tag:
 		var h Tag
 		err = h.Set(v)
 		k = h
 
-	case gattung.Typ:
+	case genres.Type:
 		var h Type
 		err = h.Set(v)
 		k = h
 
-	case gattung.Kasten:
+	case genres.Repo:
 		var h RepoId
 		err = h.Set(v)
 		k = h
 
-	case gattung.Konfig:
+	case genres.Config:
 		var h Config
 		err = h.Set(v)
 		k = h
 
-	case gattung.Bestandsaufnahme:
+	case genres.InventoryList:
 		var h Tai
 		err = h.Set(v)
 		k = h
 
 	default:
-		err = gattung.MakeErrUnrecognizedGattung(h.g.GetGenreString())
+		err = genres.MakeErrUnrecognizedGattung(h.g.GetGenreString())
 	}
 
 	if err != nil {

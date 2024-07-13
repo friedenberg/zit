@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -72,7 +72,7 @@ func (s *Store) checkoutOneNew(
 			}
 
 			if options.Path == checkout_options.PathDefault {
-				if err = cz.Remove(s.standort); err != nil {
+				if err = cz.Remove(s.fs_home); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -135,7 +135,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 
 		options.CheckoutMode = mode
 
-		if err = cofs.Remove(s.standort); err != nil {
+		if err = cofs.Remove(s.fs_home); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -252,13 +252,13 @@ func (s *Store) filenameForTransacted(
 	options checkout_options.Options,
 	sz *sku.Transacted,
 ) (originalFilename string, filename string, err error) {
-	dir := s.standort.Cwd()
+	dir := s.fs_home.Cwd()
 
 	switch options.Path {
 	case checkout_options.PathTempLocal:
 		var f *os.File
 
-		if f, err = s.standort.FileTempLocal(); err != nil {
+		if f, err = s.fs_home.FileTempLocal(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -273,7 +273,7 @@ func (s *Store) filenameForTransacted(
 	}
 
 	switch sz.GetGenre() {
-	case gattung.Zettel:
+	case genres.Zettel:
 		var h ids.ZettelId
 
 		if err = h.Set(sz.GetKennung().String()); err != nil {

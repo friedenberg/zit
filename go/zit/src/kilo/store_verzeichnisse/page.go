@@ -11,8 +11,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
 )
@@ -26,7 +26,7 @@ type Page struct {
 	added, addedSchwanz *sku.TransactedHeap
 	flushMode           objekte_mode.Mode
 	hasChanges          bool
-	standort            standort.Standort
+	fs_home             fs_home.Standort
 	konfig              *konfig.Compiled
 }
 
@@ -34,7 +34,7 @@ func (pt *Page) initialize(
 	pid PageId,
 	i *Store,
 ) {
-	pt.standort = i.standort.SansAge().SansCompression()
+	pt.fs_home = i.fs_home.SansAge().SansCompression()
 	pt.PageId = pid
 	pt.added = sku.MakeTransactedHeap()
 	pt.addedSchwanz = sku.MakeTransactedHeap()
@@ -120,7 +120,7 @@ func (pt *Page) copyHistoryAndMaybeSchwanz(
 ) (err error) {
 	var r io.ReadCloser
 
-	if r, err = pt.standort.ReadCloserCache(pt.Path()); err != nil {
+	if r, err = pt.fs_home.ReadCloserCache(pt.Path()); err != nil {
 		if errors.IsNotExist(err) {
 			r = io.NopCloser(bytes.NewReader(nil))
 			err = nil

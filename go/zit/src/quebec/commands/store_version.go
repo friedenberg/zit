@@ -4,12 +4,12 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/delta/angeboren"
+	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
 type StoreVersion struct {
-	Angeboren angeboren.Konfig
+	Angeboren immutable_config.Konfig
 }
 
 func init() {
@@ -17,7 +17,7 @@ func init() {
 		"store-version",
 		func(f *flag.FlagSet) Command {
 			c := &StoreVersion{
-				Angeboren: angeboren.Default(),
+				Angeboren: immutable_config.Default(),
 			}
 
 			return c

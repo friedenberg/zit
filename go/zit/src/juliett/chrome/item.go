@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/echo/bezeichnung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 )
@@ -105,7 +105,7 @@ func (tab item) GetTai() (t ids.Tai, err error) {
 	return
 }
 
-func (tab item) GetBezeichnung() (b bezeichnung.Bezeichnung, err error) {
+func (tab item) GetBezeichnung() (b descriptions.Description, err error) {
 	t, ok := tab["title"].(string)
 
 	if !ok {

@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -17,7 +17,7 @@ func (s *Store) ReadCheckedOutFromKennungFDPair(
 	co = GetCheckedOutPool().Get()
 
 	if err = s.externalStoreInfo.FuncReadOneInto(&em.Kennung, &co.Internal); err != nil {
-		if collections.IsErrNotFound(err) || gattung.IsErrUnsupportedGattung(err) {
+		if collections.IsErrNotFound(err) || genres.IsErrUnsupportedGattung(err) {
 			// TODO mark status as new
 			err = nil
 			co.Internal.Kennung.ResetWith(&em.Kennung)

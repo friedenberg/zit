@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
@@ -83,7 +83,7 @@ func (e *KennungFDPair) SetKennungFromFullPath(
 		p1 = p[:len(p)-len(ext)]
 	}
 
-	e.Kennung.SetGenre(gattung.Zettel)
+	e.Kennung.SetGenre(genres.Zettel)
 
 	if err = e.Kennung.Set(p1); err != nil {
 		if allowErrors {

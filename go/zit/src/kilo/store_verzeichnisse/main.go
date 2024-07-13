@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
@@ -49,7 +49,7 @@ func init() {
 }
 
 type Store struct {
-	standort       standort.Standort
+	fs_home        fs_home.Standort
 	mutable_config *konfig.Compiled
 	path           string
 	interfaces.CacheIOFactory
@@ -59,14 +59,14 @@ type Store struct {
 }
 
 func MakeStore(
-	s standort.Standort,
+	s fs_home.Standort,
 	k *konfig.Compiled,
 	dir string,
 	persistentMetadateiFormat objekte_format.Format,
 	options objekte_format.Options,
 ) (i *Store, err error) {
 	i = &Store{
-		standort:       s,
+		fs_home:        s,
 		mutable_config: k,
 		path:           dir,
 		CacheIOFactory: s,

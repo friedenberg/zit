@@ -2,7 +2,7 @@ package store_verzeichnisse
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -19,7 +19,7 @@ func (qg *flushQueryGroup) HasHidden() bool {
 	return false
 }
 
-func (qg *flushQueryGroup) Get(_ gattung.Genre) (sku.QueryWithSigilAndKennung, bool) {
+func (qg *flushQueryGroup) Get(_ genres.Genre) (sku.QueryWithSigilAndKennung, bool) {
 	return qg, true
 }
 

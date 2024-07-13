@@ -11,8 +11,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/delta/hinweisen"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/delta/object_id_provider"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
@@ -28,7 +28,7 @@ type oldIndex struct {
 
 	encodedIds
 
-	oldZettelIdStore *hinweisen.Hinweisen
+	oldZettelIdStore *object_id_provider.Hinweisen
 
 	didRead    bool
 	hasChanges bool
@@ -50,7 +50,7 @@ func MakeIndex(
 		},
 	}
 
-	if i.oldZettelIdStore, err = hinweisen.New(s); err != nil {
+	if i.oldZettelIdStore, err = object_id_provider.New(s); err != nil {
 		if errors.IsNotExist(err) {
 			errors.TodoP4("determine which layer handles no-create kasten")
 			err = nil
@@ -172,8 +172,8 @@ func (i *oldIndex) Reset() (err error) {
 }
 
 func (i *oldIndex) AddHinweis(k1 ids.IdLike) (err error) {
-	if !k1.GetGenre().EqualsGenre(gattung.Zettel) {
-		err = gattung.MakeErrUnsupportedGattung(k1)
+	if !k1.GetGenre().EqualsGenre(genres.Zettel) {
+		err = genres.MakeErrUnsupportedGattung(k1)
 		return
 	}
 
@@ -231,7 +231,7 @@ func (i *oldIndex) CreateHinweis() (h *ids.ZettelId, err error) {
 	}
 
 	if len(i.AvailableIds) == 0 {
-		err = errors.Wrap(hinweisen.ErrHinweisenExhausted{})
+		err = errors.Wrap(object_id_provider.ErrHinweisenExhausted{})
 		return
 	}
 

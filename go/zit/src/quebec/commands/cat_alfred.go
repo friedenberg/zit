@@ -5,7 +5,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/india/alfred"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -29,17 +29,17 @@ func init() {
 
 func (c CatAlfred) CompletionGattung() ids.Genre {
 	return ids.MakeGenre(
-		gattung.Etikett,
-		gattung.Zettel,
-		gattung.Typ,
+		genres.Tag,
+		genres.Zettel,
+		genres.Type,
 	)
 }
 
 func (c CatAlfred) DefaultGattungen() ids.Genre {
 	return ids.MakeGenre(
-		gattung.Etikett,
-		gattung.Zettel,
-		gattung.Typ,
+		genres.Tag,
+		genres.Zettel,
+		genres.Type,
 	)
 }
 

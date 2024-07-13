@@ -11,11 +11,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/go/zit/src/echo/bezeichnung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/zittish"
+	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/kennung_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -29,7 +29,7 @@ func MakeFormatOrganize(
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
 	kennungStringFormatWriter kennung_fmt.Aligned,
 	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
-	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung],
+	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description],
 	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
 ) *Organize {
 	options.PrintTime = false
@@ -54,7 +54,7 @@ type Organize struct {
 	shaStringFormatWriter         interfaces.StringFormatWriter[interfaces.ShaLike]
 	kennungStringFormatWriter     kennung_fmt.Aligned
 	typStringFormatWriter         interfaces.StringFormatWriter[*ids.Type]
-	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung]
+	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description]
 	etikettenStringFormatWriter   interfaces.StringFormatWriter[*ids.Tag]
 }
 
@@ -266,7 +266,7 @@ func (f *Organize) readStringFormatWithinBrackets(
 LOOP:
 	for !eof {
 		t.Reset()
-		err = zittish.NextToken(rr, &t)
+		err = query_spec.NextToken(rr, &t)
 
 		if err == io.EOF {
 			err = nil
@@ -310,13 +310,13 @@ LOOP:
 				g := k.GetGenre()
 
 				switch g {
-				case gattung.Typ:
+				case genres.Type:
 					if err = o.Metadatei.Typ.TodoSetFromKennung2(&k); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
 
-				case gattung.Etikett:
+				case genres.Tag:
 					var e ids.Tag
 
 					if err = e.TodoSetFromKennung2(&k); err != nil {
@@ -330,7 +330,7 @@ LOOP:
 					}
 
 				default:
-					err = gattung.MakeErrUnsupportedGattung(k.GetGenre())
+					err = genres.MakeErrUnsupportedGattung(k.GetGenre())
 					return
 				}
 

@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
-	"code.linenisgreat.com/zit/go/zit/src/echo/bezeichnung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/test_metadatei_io"
 )
@@ -42,7 +42,7 @@ func TestReadWithoutBlob(t1 *testing.T) {
 	)
 
 	expected := &metadatei.Metadatei{
-		Bezeichnung: bezeichnung.Make("the title"),
+		Bezeichnung: descriptions.Make("the title"),
 		Typ:         makeBlobExt(t, "md"),
 	}
 
@@ -82,7 +82,7 @@ func TestReadWithoutBlobWithMultilineBezeichnung(t1 *testing.T) {
 	)
 
 	expected := &metadatei.Metadatei{
-		Bezeichnung: bezeichnung.Make("the title\ncontinues"),
+		Bezeichnung: descriptions.Make("the title\ncontinues"),
 		Typ:         makeBlobExt(t, "md"),
 	}
 
@@ -128,7 +128,7 @@ the body
 	)
 
 	expected := &metadatei.Metadatei{
-		Bezeichnung: bezeichnung.Make("the title"),
+		Bezeichnung: descriptions.Make("the title"),
 		Typ:         makeBlobExt(t, "md"),
 	}
 

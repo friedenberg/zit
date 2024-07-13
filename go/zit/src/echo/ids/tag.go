@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 )
 
 func init() {
@@ -94,7 +94,7 @@ func (e tag) IsEmpty() bool {
 }
 
 func (e tag) GetGenre() interfaces.Genre {
-	return gattung.Etikett
+	return genres.Tag
 }
 
 func (a tag) EqualsAny(b any) bool {

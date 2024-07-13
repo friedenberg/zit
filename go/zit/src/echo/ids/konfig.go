@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 )
 
 func init() {
@@ -35,7 +35,7 @@ func ErrOnConfig(v string) (err error) {
 type Config struct{}
 
 func (a Config) GetGenre() interfaces.Genre {
-	return gattung.Konfig
+	return genres.Config
 }
 
 func (a Config) EqualsAny(b any) bool {

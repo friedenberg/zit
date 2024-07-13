@@ -7,8 +7,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -27,7 +27,7 @@ type Json struct {
 func (j *Json) FromStringAndMetadatei(
 	k string,
 	m *metadatei.Metadatei,
-	s standort.Standort,
+	s fs_home.Standort,
 ) (err error) {
 	var r sha.ReadCloser
 
@@ -59,12 +59,12 @@ func (j *Json) FromStringAndMetadatei(
 
 func (j *Json) FromTransacted(
 	sk *sku.Transacted,
-	s standort.Standort,
+	s fs_home.Standort,
 ) (err error) {
 	return j.FromStringAndMetadatei(sk.Kennung.String(), sk.GetMetadatei(), s)
 }
 
-func (j *Json) ToTransacted(sk *sku.Transacted, s standort.Standort) (err error) {
+func (j *Json) ToTransacted(sk *sku.Transacted, s fs_home.Standort) (err error) {
 	var w sha.WriteCloser
 
 	if w, err = s.BlobWriter(); err != nil {

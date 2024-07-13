@@ -9,10 +9,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
-	"code.linenisgreat.com/zit/go/zit/src/delta/angeboren"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
+	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
@@ -27,7 +27,7 @@ type Import struct {
 	Bestandsaufnahme string
 	Akten            string
 	AgeIdentity      age.Identity
-	CompressionType  angeboren.CompressionType
+	CompressionType  immutable_config.CompressionType
 	Proto            zettel.ProtoZettel
 }
 
@@ -37,7 +37,7 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Import{
 				Proto:           zettel.MakeEmptyProtoZettel(),
-				CompressionType: angeboren.CompressionTypeDefault,
+				CompressionType: immutable_config.CompressionTypeDefault,
 			}
 
 			f.StringVar(&c.Bestandsaufnahme, "bestandsaufnahme", "", "")
@@ -82,13 +82,13 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	// setup besty reader
 	{
-		o := standort.FileReadOptions{
+		o := fs_home.FileReadOptions{
 			Age:             &ag,
 			Path:            c.Bestandsaufnahme,
 			CompressionType: c.CompressionType,
 		}
 
-		if rc, err = standort.NewFileReader(o); err != nil {
+		if rc, err = fs_home.NewFileReader(o); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -180,7 +180,7 @@ func (c Import) importAkteIfNecessary(
 
 	p := id.Path(akteSha, c.Akten)
 
-	o := standort.FileReadOptions{
+	o := fs_home.FileReadOptions{
 		Age:             ag,
 		Path:            p,
 		CompressionType: c.CompressionType,
@@ -188,7 +188,7 @@ func (c Import) importAkteIfNecessary(
 
 	var rc sha.ReadCloser
 
-	if rc, err = standort.NewFileReader(o); err != nil {
+	if rc, err = fs_home.NewFileReader(o); err != nil {
 		if errors.IsNotExist(err) {
 			co.SetError(errors.New("akte missing"))
 			err = coErrPrinter(co)

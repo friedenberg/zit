@@ -1,7 +1,7 @@
 package umwelt
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -22,7 +22,7 @@ func (u *Umwelt) MakeQueryBuilderExcludingHidden(
 	dg ids.Genre,
 ) *query.Builder {
 	if dg.IsEmpty() {
-		dg = ids.MakeGenre(gattung.Zettel)
+		dg = ids.MakeGenre(genres.Zettel)
 	}
 
 	return u.makeQueryBuilder().
@@ -38,7 +38,7 @@ func (u *Umwelt) MakeQueryBuilder(
 	dg ids.Genre,
 ) *query.Builder {
 	if dg.IsEmpty() {
-		dg = ids.MakeGenre(gattung.Zettel)
+		dg = ids.MakeGenre(genres.Zettel)
 	}
 
 	return u.makeQueryBuilder().

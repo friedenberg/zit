@@ -7,7 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 )
 
 type BlobIOFactory struct {
@@ -38,11 +38,11 @@ func (aw BlobIOFactory) BlobReader(
 
 func (aw *BlobIOFactory) BlobWriter() (sha.WriteCloser, error) {
 	aw.currentBuffer = bytes.NewBuffer(nil)
-	wo := standort.WriteOptions{
+	wo := fs_home.WriteOptions{
 		Writer: aw.currentBuffer,
 	}
 
-	return standort.NewWriter(wo)
+	return fs_home.NewWriter(wo)
 }
 
 func (aw BlobIOFactory) CurrentBufferString() string {

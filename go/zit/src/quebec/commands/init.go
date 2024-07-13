@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/delta/angeboren"
+	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -18,7 +18,7 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Init{
 				Einleitung: umwelt.Einleitung{
-					Angeboren: angeboren.Default(),
+					Angeboren: immutable_config.Default(),
 				},
 			}
 

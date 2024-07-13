@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
-	"code.linenisgreat.com/zit/go/zit/src/echo/bezeichnung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -34,7 +34,7 @@ func makeHinweis(t *testing.T, v string) (k *ids.ObjectId) {
 	return ids.MustObjectId(h)
 }
 
-func makeBez(t *testing.T, v string) (b bezeichnung.Bezeichnung) {
+func makeBez(t *testing.T, v string) (b descriptions.Description) {
 	var err error
 
 	if err = b.Set(v); err != nil {

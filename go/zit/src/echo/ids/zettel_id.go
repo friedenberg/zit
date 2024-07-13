@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 )
 
 func init() {
@@ -215,7 +215,7 @@ func (h *ZettelId) ResetWith(h1 ZettelId) {
 }
 
 func (h ZettelId) GetGenre() interfaces.Genre {
-	return gattung.Zettel
+	return genres.Zettel
 }
 
 func (t ZettelId) MarshalText() (text []byte, err error) {

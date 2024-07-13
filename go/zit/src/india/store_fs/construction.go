@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -16,13 +16,13 @@ func MakeCwdFilesAll(
 	k sku.Konfig,
 	dp interfaces.FuncIter[*fd.FD],
 	fileExtensions file_extensions.FileExtensions,
-	st standort.Standort,
+	st fs_home.Standort,
 	ofo objekte_format.Options,
 ) (fs *Store, err error) {
 	fs = &Store{
 		konfig:         k,
 		deletedPrinter: dp,
-		standort:       st,
+		fs_home:        st,
 		fileEncoder:    MakeFileEncoder(st, k),
 		fileExtensions: fileExtensions,
 		dir:            st.Cwd(),

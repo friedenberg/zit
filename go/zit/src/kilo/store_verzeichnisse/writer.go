@@ -75,7 +75,7 @@ func (pw *writer) Flush() (err error) {
 
 		return pw.flushJustSchwanz()
 	} else {
-		if pw.File, err = pw.standort.FileTempLocal(); err != nil {
+		if pw.File, err = pw.fs_home.FileTempLocal(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

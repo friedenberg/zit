@@ -5,27 +5,27 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/delta/tag_blob"
+	"code.linenisgreat.com/zit/go/zit/src/delta/tag_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
-	"code.linenisgreat.com/zit/go/zit/src/echo/zittish"
+	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
 func MakeBuilder(
-	s standort.Standort,
+	s fs_home.Standort,
 	blob_store *blob_store.VersionedStores,
 	ennui sku.Ennui,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
 	kastenGetter sku.ExternalStoreForQueryGetter,
 ) (b *Builder) {
 	b = &Builder{
-		standort:                   s,
+		fs_home:                    s,
 		blob_store:                 blob_store,
 		ennui:                      ennui,
 		luaVMPoolBuilder:           luaVMPoolBuilder,
@@ -38,7 +38,7 @@ func MakeBuilder(
 }
 
 type Builder struct {
-	standort                   standort.Standort
+	fs_home                    fs_home.Standort
 	blob_store                 *blob_store.VersionedStores
 	ennui                      sku.Ennui
 	luaVMPoolBuilder           *lua.VMPoolBuilder
@@ -251,7 +251,7 @@ func (b *Builder) build(vs ...string) (qg *Group, err error) {
 
 	var tokens []string
 
-	if tokens, err = zittish.GetTokensFromStrings(remaining...); err != nil {
+	if tokens, err = query_spec.GetTokensFromStrings(remaining...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -408,7 +408,7 @@ func (b *Builder) parseOneFromTokens(
 
 LOOP:
 	for i, el := range tokens {
-		if len(el) == 1 && zittish.IsMatcherOperator([]rune(el)[0]) {
+		if len(el) == 1 && query_spec.IsMatcherOperator([]rune(el)[0]) {
 			op := el[0]
 			switch op {
 			case '=':
@@ -468,16 +468,16 @@ LOOP:
 			}
 
 			switch k.GetGenre() {
-			case gattung.Zettel:
+			case genres.Zettel:
 				b.preexistingKennung = append(
 					b.preexistingKennung,
 					k,
 				)
 
-				q.Genre.Add(gattung.Zettel)
+				q.Genre.Add(genres.Zettel)
 				q.Kennung[k.ObjectId.String()] = k
 
-			case gattung.Etikett:
+			case genres.Tag:
 				var et sku.Query
 
 				if et, err = b.makeEtikettExp(&k); err != nil {
@@ -488,7 +488,7 @@ LOOP:
 				exp := b.makeExp(isNegated, isExact, et)
 				stack[len(stack)-1].Add(exp)
 
-			case gattung.Typ:
+			case genres.Type:
 				var t ids.Type
 
 				if err = t.TodoSetFromKennung2(k.ObjectId); err != nil {
@@ -561,7 +561,7 @@ func (b *Builder) makeEtikettOrEtikettLua(
 	if sk.GetTyp().String() == "lua" {
 		var ar sha.ReadCloser
 
-		if ar, err = b.standort.BlobReader(sk.GetAkteSha()); err != nil {
+		if ar, err = b.fs_home.BlobReader(sk.GetAkteSha()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -570,7 +570,7 @@ func (b *Builder) makeEtikettOrEtikettLua(
 
 		lb.WithReader(ar)
 	} else {
-		var akte *tag_blob.V1
+		var akte *tag_blobs.V1
 
 		if akte, err = b.blob_store.GetTagV1().GetBlob(
 			sk.GetAkteSha(),

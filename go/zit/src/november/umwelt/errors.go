@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 )
 
 type ErrUnsupportedFormatterValue interface {
@@ -25,22 +25,22 @@ func MakeErrUnsupportedFormatterValue(
 ) error {
 	return errors.Wrap(
 		errUnsupportedFormatter{
-			format:  formatValue,
-			gattung: gattung.Must(g),
+			format: formatValue,
+			genres: genres.Must(g),
 		},
 	)
 }
 
 type errUnsupportedFormatter struct {
-	format  string
-	gattung gattung.Genre
+	format string
+	genres genres.Genre
 }
 
 func (e errUnsupportedFormatter) Error() string {
 	return fmt.Sprintf(
 		"unsupported formatter value %q for gattung %s",
 		e.format,
-		e.gattung,
+		e.genres,
 	)
 }
 
@@ -54,5 +54,5 @@ func (e errUnsupportedFormatter) GetFormatValue() string {
 }
 
 func (e errUnsupportedFormatter) GetGattung() interfaces.Genre {
-	return e.gattung
+	return e.genres
 }

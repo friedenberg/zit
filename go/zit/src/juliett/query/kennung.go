@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -35,7 +35,7 @@ func (k Kennung) ContainsSku(sk *sku.Transacted) (ok bool) {
 	me := sk.GetMetadatei()
 
 	switch k.GetGenre() {
-	case gattung.Etikett:
+	case genres.Tag:
 		var idx int
 
 		if k.Exact {
@@ -63,7 +63,7 @@ func (k Kennung) ContainsSku(sk *sku.Transacted) (ok bool) {
 
 		return
 
-	case gattung.Typ:
+	case genres.Type:
 		if ids.Contains(me.GetTyp(), k) {
 			ok = true
 			return

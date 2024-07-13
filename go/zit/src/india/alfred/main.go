@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/alfred"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -45,10 +45,10 @@ func (w *Writer) PrintOne(z *sku.Transacted) (err error) {
 	g := z.GetGenre()
 
 	switch g {
-	case gattung.Zettel:
+	case genres.Zettel:
 		item = w.zettelToItem(z)
 
-	case gattung.Etikett:
+	case genres.Tag:
 		var e ids.Tag
 
 		if err = e.Set(z.Kennung.String()); err != nil {

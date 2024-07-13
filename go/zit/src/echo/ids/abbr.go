@@ -3,7 +3,7 @@ package ids
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
@@ -35,12 +35,12 @@ func DontAbbreviateString[VPtr interfaces.Stringer](k VPtr) (string, error) {
 	return k.String(), nil
 }
 
-func (a Abbr) ExpanderFor(g gattung.Genre) FuncExpandString {
+func (a Abbr) ExpanderFor(g genres.Genre) FuncExpandString {
 	switch g {
-	case gattung.Zettel:
+	case genres.Zettel:
 		return a.Hinweis.Expand
 
-	case gattung.Etikett, gattung.Typ, gattung.Kasten:
+	case genres.Tag, genres.Type, genres.Repo:
 		return DontExpandString
 
 	default:
@@ -59,9 +59,9 @@ func (ao abbrOne[V, VPtr]) AbbreviateKennung(
 	var ka1 V
 
 	if ka1.GetGenre() != k.GetGenre() {
-		err = gattung.ErrWrongType{
-			ExpectedType: gattung.Must(ka1.GetGenre()),
-			ActualType:   gattung.Must(k.GetGenre()),
+		err = genres.ErrWrongType{
+			ExpectedType: genres.Must(ka1.GetGenre()),
+			ActualType:   genres.Must(k.GetGenre()),
 		}
 
 		return
@@ -83,7 +83,7 @@ func (ao abbrOne[V, VPtr]) AbbreviateKennung(
 func (a Abbr) LenKopfUndSchwanz(
 	in *ObjectId,
 ) (kopf, schwanz int, err error) {
-	if in.GetGenre() != gattung.Zettel || a.Hinweis.Abbreviate == nil {
+	if in.GetGenre() != genres.Zettel || a.Hinweis.Abbreviate == nil {
 		kopf, schwanz = in.LenHeadAndTail()
 		return
 	}
@@ -116,7 +116,7 @@ func (a Abbr) LenKopfUndSchwanz(
 func (a Abbr) AbbreviateHinweisOnly(
 	in *ObjectId,
 ) (err error) {
-	if in.GetGenre() != gattung.Zettel || in.IsVirtual() {
+	if in.GetGenre() != genres.Zettel || in.IsVirtual() {
 		return
 	}
 
@@ -149,7 +149,7 @@ func (a Abbr) AbbreviateHinweisOnly(
 func (a Abbr) ExpandHinweisOnly(
 	in *ObjectId,
 ) (err error) {
-	if in.GetGenre() != gattung.Zettel || a.Hinweis.Expand == nil {
+	if in.GetGenre() != genres.Zettel || a.Hinweis.Expand == nil {
 		return
 	}
 
@@ -182,13 +182,13 @@ func (a Abbr) AbbreviateKennung(
 	var getAbbr func(IdLike) (string, error)
 
 	switch in.GetGenre() {
-	case gattung.Zettel:
+	case genres.Zettel:
 		getAbbr = a.Hinweis.AbbreviateKennung
 
-	case gattung.Etikett, gattung.Typ, gattung.Kasten:
+	case genres.Tag, genres.Type, genres.Repo:
 		getAbbr = DontAbbreviateString
 
-	case gattung.Konfig:
+	case genres.Config:
 		out = in
 		return
 

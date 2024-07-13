@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 	chai "github.com/brandondube/tai"
@@ -66,7 +66,7 @@ func (t Tai) AsTime() (t1 thyme.Time) {
 }
 
 func (t Tai) GetGenre() interfaces.Genre {
-	return gattung.Bestandsaufnahme
+	return genres.InventoryList
 }
 
 func (t Tai) Parts() [3]string {

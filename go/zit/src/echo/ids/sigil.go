@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
@@ -55,7 +55,7 @@ func MakeSigil(vs ...Sigil) (s Sigil) {
 }
 
 func (a Sigil) GetGattung() interfaces.Genre {
-	return gattung.Unknown
+	return genres.Unknown
 }
 
 func (a Sigil) EqualsAny(b any) bool {

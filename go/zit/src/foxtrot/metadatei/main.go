@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/bezeichnung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
@@ -27,7 +27,7 @@ type Metadatei struct {
 	// StoreVersion values.Int
 	// Domain
 	Kasten      ids.RepoId
-	Bezeichnung bezeichnung.Bezeichnung
+	Bezeichnung descriptions.Description
 	Etiketten   ids.TagMutableSet // public for gob, but should be private
 	Typ         ids.Type
 
@@ -127,7 +127,7 @@ func (z *Metadatei) IsEmpty() bool {
 	return true
 }
 
-func (z *Metadatei) SetBezeichnung(b bezeichnung.Bezeichnung) {
+func (z *Metadatei) SetBezeichnung(b descriptions.Description) {
 	z.Bezeichnung = b
 }
 
@@ -135,11 +135,11 @@ func (z *Metadatei) SetTyp(t ids.Type) {
 	z.Typ = t
 }
 
-func (z *Metadatei) GetBezeichnung() bezeichnung.Bezeichnung {
+func (z *Metadatei) GetBezeichnung() descriptions.Description {
 	return z.Bezeichnung
 }
 
-func (z *Metadatei) GetBezeichnungPtr() *bezeichnung.Bezeichnung {
+func (z *Metadatei) GetBezeichnungPtr() *descriptions.Description {
 	return &z.Bezeichnung
 }
 

@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 )
 
 const RepoIdRegexString = `^(/)?[-a-z0-9_]+$`
@@ -73,7 +73,7 @@ func (a RepoId) Equals(b RepoId) bool {
 }
 
 func (o RepoId) GetGenre() interfaces.Genre {
-	return gattung.Kasten
+	return genres.Repo
 }
 
 func (k RepoId) String() string {

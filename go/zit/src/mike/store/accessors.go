@@ -6,8 +6,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/golf/ennui"
 	"code.linenisgreat.com/zit/go/zit/src/golf/kennung_index"
@@ -74,8 +74,8 @@ func (s *Store) GetKennungIndex() kennung_index.Index {
 	return s.kennungIndex
 }
 
-func (s *Store) GetStandort() standort.Standort {
-	return s.standort
+func (s *Store) GetStandort() fs_home.Standort {
+	return s.fs_home
 }
 
 func (s *Store) GetKonfig() *konfig.Compiled {
@@ -101,9 +101,9 @@ func (s *Store) ReadOneKennung(
 }
 
 func (s *Store) ReaderFor(sh *sha.Sha) (rc sha.ReadCloser, err error) {
-	if rc, err = s.standort.BlobReaderFrom(
+	if rc, err = s.fs_home.BlobReaderFrom(
 		sh,
-		s.standort.DirVerzeichnisseMetadateiKennungMutter(),
+		s.fs_home.DirVerzeichnisseMetadateiKennungMutter(),
 	); err != nil {
 		if errors.IsNotExist(err) {
 			err = collections.MakeErrNotFound(sh)

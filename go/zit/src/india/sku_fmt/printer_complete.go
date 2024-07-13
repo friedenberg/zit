@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -39,7 +39,7 @@ func MakeWriterComplete(w io.Writer) *WriterComplete {
 			g := z.GetKennung().GetGenre()
 			s.wBuf.WriteString(z.GetKennung().GetGenre().String())
 
-			if g == gattung.Zettel {
+			if g == genres.Zettel {
 				s.wBuf.WriteString(": !")
 				s.wBuf.WriteString(z.GetTyp().String())
 				s.wBuf.WriteString(" ")

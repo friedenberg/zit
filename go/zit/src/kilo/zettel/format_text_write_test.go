@@ -9,7 +9,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/bezeichnung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/test_metadatei_io"
 )
@@ -79,7 +79,7 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	z := &metadatei.Metadatei{
-		Bezeichnung: bezeichnung.Make("the title"),
+		Bezeichnung: descriptions.Make("the title"),
 		Typ:         makeBlobExt(t, "md"),
 	}
 
@@ -121,7 +121,7 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	z := &metadatei.Metadatei{
-		Bezeichnung: bezeichnung.Make("the title"),
+		Bezeichnung: descriptions.Make("the title"),
 		Typ:         makeBlobExt(t, "md"),
 	}
 

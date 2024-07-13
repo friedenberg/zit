@@ -2,7 +2,7 @@ package sku
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 )
 
@@ -12,7 +12,7 @@ type transactedResetter struct{}
 
 func (transactedResetter) Reset(a *Transacted) {
 	a.Kopf.Reset()
-	a.Kennung.SetGenre(gattung.Unknown)
+	a.Kennung.SetGenre(genres.Unknown)
 	metadatei.Resetter.Reset(&a.Metadatei)
 	a.TransactionIndex.Reset()
 }

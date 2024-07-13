@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
@@ -27,12 +27,12 @@ func (f v0) FormatPersistentMetadatei(
 		w.WriteFormat("Tai %s", m.Tai)
 	}
 
-	w.WriteFormat("%s %s", gattung.Akte, &m.Akte)
-	w.WriteFormat("%s %s", gattung.Typ, m.GetTyp())
+	w.WriteFormat("%s %s", genres.Blob, &m.Akte)
+	w.WriteFormat("%s %s", genres.Type, m.GetTyp())
 	w.WriteFormat("Bezeichnung %s", m.Bezeichnung)
 
 	for _, e := range iter.SortedValues[ids.Tag](m.GetEtiketten()) {
-		w.WriteFormat("%s %s", gattung.Etikett, e)
+		w.WriteFormat("%s %s", genres.Tag, e)
 	}
 
 	if n, err = w.WriteTo(w1); err != nil {
@@ -60,19 +60,19 @@ func (f v0) ParsePersistentMetadatei(
 		etiketten,
 	)
 
-	var g gattung.Genre
+	var g genres.Genre
 
 	lr := format.MakeLineReaderConsumeEmpty(
 		ohio.MakeLineReaderIterate(
 			g.Set,
 			ohio.MakeLineReaderKeyValues(
 				map[string]interfaces.FuncSetString{
-					"Tai":                        m.Tai.Set,
-					gattung.Akte.String():        m.Akte.Set,
-					gattung.Typ.String():         typLineReader,
-					gattung.AkteTyp.String():     typLineReader,
-					"Bezeichnung": m.Bezeichnung.Set,
-					gattung.Etikett.String():     esa,
+					"Tai":                m.Tai.Set,
+					genres.Blob.String(): m.Akte.Set,
+					genres.Type.String(): typLineReader,
+					"AkteTyp":            typLineReader,
+					"Bezeichnung":        m.Bezeichnung.Set,
+					genres.Tag.String():  esa,
 				},
 			),
 		),

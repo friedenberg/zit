@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -197,7 +197,7 @@ func (c *client) ObjekteReader(
 	}
 
 	msgRequest := messageRequestObjekteData{
-		Gattung: gattung.Make(g.GetGenre()),
+		Gattung: genres.Make(g.GetGenre()),
 	}
 
 	msgRequest.Sha.SetShaLike(sh)

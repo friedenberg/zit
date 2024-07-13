@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/etiketten_path"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -86,7 +86,7 @@ func (sch *Etiketten) ContainsSku(sk *sku.Transacted) bool {
 	return false
 }
 
-func (sch *Etiketten) Load(s standort.Standort) (err error) {
+func (sch *Etiketten) Load(s fs_home.Standort) (err error) {
 	var f *os.File
 
 	p := s.FileEtiketten()
@@ -114,7 +114,7 @@ func (sch *Etiketten) Load(s standort.Standort) (err error) {
 }
 
 func (sch *Etiketten) Flush(
-	s standort.Standort,
+	s fs_home.Standort,
 	printerHeader interfaces.FuncIter[string],
 	dryRun bool,
 ) (err error) {

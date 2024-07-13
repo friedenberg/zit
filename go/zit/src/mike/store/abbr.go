@@ -10,10 +10,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/tridex"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -40,9 +40,9 @@ type indexAbbrEncodableTridexes struct {
 }
 
 type indexAbbr struct {
-	lock     sync.Locker
-	once     *sync.Once
-	standort standort.Standort
+	lock    sync.Locker
+	once    *sync.Once
+	fs_home fs_home.Standort
 
 	path string
 
@@ -53,14 +53,14 @@ type indexAbbr struct {
 }
 
 func newIndexAbbr(
-	standort standort.Standort,
+	fs_home fs_home.Standort,
 	p string,
 ) (i *indexAbbr, err error) {
 	i = &indexAbbr{
-		lock:     &sync.Mutex{},
-		once:     &sync.Once{},
-		path:     p,
-		standort: standort,
+		lock:    &sync.Mutex{},
+		once:    &sync.Once{},
+		path:    p,
+		fs_home: fs_home,
 		indexAbbrEncodableTridexes: indexAbbrEncodableTridexes{
 			Shas: indexNotHinweis[sha.Sha, *sha.Sha]{
 				Kennungen: tridex.Make(),
@@ -101,7 +101,7 @@ func (i *indexAbbr) Flush() (err error) {
 
 	var w1 io.WriteCloser
 
-	if w1, err = i.standort.WriteCloserCache(i.path); err != nil {
+	if w1, err = i.fs_home.WriteCloserCache(i.path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -135,7 +135,7 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 
 			var r1 io.ReadCloser
 
-			if r1, err = i.standort.ReadCloserCache(i.path); err != nil {
+			if r1, err = i.fs_home.ReadCloserCache(i.path); err != nil {
 				if errors.IsNotExist(err) {
 					err = nil
 				} else {
@@ -187,7 +187,7 @@ func (i *indexAbbr) AddMatchable(o *sku.Transacted) (err error) {
 	ks := o.GetKennung().String()
 
 	switch o.GetGenre() {
-	case gattung.Zettel:
+	case genres.Zettel:
 		var h ids.ZettelId
 
 		if err = h.Set(ks); err != nil {
@@ -198,13 +198,13 @@ func (i *indexAbbr) AddMatchable(o *sku.Transacted) (err error) {
 		i.indexAbbrEncodableTridexes.Hinweis.Kopfen.Add(h.GetHead())
 		i.indexAbbrEncodableTridexes.Hinweis.Schwanzen.Add(h.GetTail())
 
-	case gattung.Typ:
+	case genres.Type:
 		i.indexAbbrEncodableTridexes.Typen.Kennungen.Add(ks)
 
-	case gattung.Etikett:
+	case genres.Tag:
 		i.indexAbbrEncodableTridexes.Etiketten.Kennungen.Add(ks)
 
-	case gattung.Kasten:
+	case genres.Repo:
 		i.indexAbbrEncodableTridexes.Kisten.Kennungen.Add(ks)
 
 		// default:
@@ -221,19 +221,19 @@ func (i *indexAbbr) Exists(k *ids.ObjectId) (err error) {
 	defer i.lock.Unlock()
 
 	switch k.GetGenre() {
-	case gattung.Zettel:
+	case genres.Zettel:
 		err = i.Hinweis().Exists(k.Parts())
 
-	case gattung.Typ:
+	case genres.Type:
 		err = i.Typen().Exists(k.Parts())
 
-	case gattung.Etikett:
+	case genres.Tag:
 		err = i.Etiketten().Exists(k.Parts())
 
-	case gattung.Kasten:
+	case genres.Repo:
 		err = i.Kisten().Exists(k.Parts())
 
-	case gattung.Konfig:
+	case genres.Config:
 		// konfig always exists
 		return
 

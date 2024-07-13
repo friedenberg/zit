@@ -8,8 +8,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/delta/type_blob"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
@@ -117,7 +117,7 @@ func (c *FormatZettel) getSku(
 	u *umwelt.Umwelt,
 	kennungString string,
 ) (sk *sku.Transacted, err error) {
-	b := u.MakeQueryBuilder(ids.MakeGenre(gattung.Zettel))
+	b := u.MakeQueryBuilder(ids.MakeGenre(genres.Zettel))
 
 	var qg *query.Group
 
@@ -130,7 +130,7 @@ func (c *FormatZettel) getSku(
 	var s ids.Sigil
 
 	if k, s, err = qg.GetExactlyOneKennung(
-		gattung.Zettel,
+		genres.Zettel,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -165,7 +165,7 @@ func (c *FormatZettel) getAkteFormatter(
 		return
 	}
 
-	var typAkte *type_blob.V0
+	var typAkte *type_blobs.V0
 
 	if typAkte, err = u.GetStore().GetAkten().GetTypeV0().GetBlob(
 		typKonfig.GetAkteSha(),
@@ -188,7 +188,7 @@ func (c *FormatZettel) getAkteFormatter(
 			// return
 		}
 	} else {
-		var g type_blob.FormatterUTIGroup
+		var g type_blobs.FormatterUTIGroup
 		g, ok = typAkte.FormatterUTIGroups[c.UTIGroup]
 
 		if !ok {

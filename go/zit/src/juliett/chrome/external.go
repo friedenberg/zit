@@ -9,8 +9,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
@@ -22,7 +22,7 @@ type External struct {
 	item
 }
 
-func (e *External) SaveAkte(s standort.Standort) (err error) {
+func (e *External) SaveAkte(s fs_home.Standort) (err error) {
 	var aw sha.WriteCloser
 
 	if aw, err = s.BlobWriter(); err != nil {

@@ -1,11 +1,11 @@
 package remote_push
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
 type messageRequestObjekteData struct {
-	Gattung gattung.Genre
+	Gattung genres.Genre
 	Sha     sha.Sha
 }

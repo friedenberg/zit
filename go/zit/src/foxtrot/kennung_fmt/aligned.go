@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
@@ -37,7 +37,7 @@ func (f *aligned) WriteStringFormat(
 	var n1 int
 
 	if f.Abbreviations.Hinweisen &&
-		o.GetGenre() == gattung.Zettel &&
+		o.GetGenre() == genres.Zettel &&
 		!o.IsVirtual() {
 		if err = f.AbbreviateKennung(o, o); err != nil {
 			err = errors.Wrap(err)

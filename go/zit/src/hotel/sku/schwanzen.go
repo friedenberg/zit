@@ -11,10 +11,10 @@ import (
 )
 
 type Schwanzen struct {
-	lock         sync.RWMutex
-	hinweisen    map[string]*Transacted
-	etikettIndex kennung_index.EtikettIndexMutation
-	funcFlush    interfaces.FuncIter[*Transacted]
+	lock               sync.RWMutex
+	object_id_provider map[string]*Transacted
+	etikettIndex       kennung_index.EtikettIndexMutation
+	funcFlush          interfaces.FuncIter[*Transacted]
 }
 
 func MakeSchwanzen(
@@ -30,7 +30,7 @@ func (s *Schwanzen) Initialize(
 	ei kennung_index.EtikettIndexMutation,
 	funcFlush interfaces.FuncIter[*Transacted],
 ) {
-	s.hinweisen = make(map[string]*Transacted)
+	s.object_id_provider = make(map[string]*Transacted)
 	s.etikettIndex = ei
 	s.funcFlush = funcFlush
 }
@@ -39,7 +39,7 @@ func (zws *Schwanzen) Less(zt *Transacted) (ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
-	t, ok := zws.hinweisen[zt.GetKennung().String()]
+	t, ok := zws.object_id_provider[zt.GetKennung().String()]
 
 	switch {
 	case !ok:
@@ -56,7 +56,7 @@ func (zws *Schwanzen) Get(h ids.IdLike) (t ids.Tai, ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
-	o, ok := zws.hinweisen[h.String()]
+	o, ok := zws.object_id_provider[h.String()]
 
 	if ok {
 		t = o.GetTai()
@@ -70,14 +70,14 @@ func (zws *Schwanzen) Set(z *Transacted, flush bool) (ok bool) {
 	defer zws.lock.Unlock()
 
 	h := z.GetKennung()
-	t1, found := zws.hinweisen[h.String()]
+	t1, found := zws.object_id_provider[h.String()]
 
 	switch {
 	case !found:
 		fallthrough
 
 	case TransactedLessor.LessPtr(t1, z):
-		zws.hinweisen[h.String()] = z
+		zws.object_id_provider[h.String()] = z
 		ok = true
 
 	case t1.Metadatei.EqualsSansTai(&z.Metadatei):

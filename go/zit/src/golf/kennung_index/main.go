@@ -7,8 +7,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/collections_delta"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/hinweis_index"
 )
 
@@ -68,7 +68,7 @@ type index struct {
 
 func MakeIndex(
 	k interfaces.Config,
-	s standort.Standort,
+	s fs_home.Standort,
 	vf interfaces.CacheIOFactory,
 ) (i *index, err error) {
 	i = &index{

@@ -13,10 +13,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
-	pkg_angeboren "code.linenisgreat.com/zit/go/zit/src/delta/angeboren"
-	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	pkg_angeboren "code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
@@ -44,12 +44,12 @@ func init() {
 	gob.Register(iter.StringerKeyerPtr[ids.Type, *ids.Type]{})
 }
 
-type angeboren = pkg_angeboren.Konfig
+type immutable_config = pkg_angeboren.Konfig
 
 type Compiled struct {
 	cli
 	compiled
-	angeboren
+	immutable_config
 	schlummernd *query.Schlummernd
 }
 
@@ -103,13 +103,13 @@ type compiled struct {
 }
 
 func (c *Compiled) Initialize(
-	s standort.Standort,
+	s fs_home.Standort,
 	kcli mutable_config.Cli,
 	schlummernd *query.Schlummernd,
 ) (err error) {
 	c.cli = kcli
 	c.Reset()
-	c.angeboren = s.GetKonfig()
+	c.immutable_config = s.GetKonfig()
 	c.schlummernd = schlummernd
 
 	wg := iter.MakeErrorWaitGroupParallel()
@@ -233,25 +233,25 @@ func (k *Compiled) AddTransacted(
 	didChange := false
 
 	switch kinder.Kennung.GetGenre() {
-	case gattung.Typ:
+	case genres.Type:
 		if didChange, err = k.addTyp(kinder); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case gattung.Etikett:
+	case genres.Tag:
 		if didChange, err = k.addEtikett(kinder, mutter); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case gattung.Kasten:
+	case genres.Repo:
 		if didChange, err = k.addKasten(kinder); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case gattung.Konfig:
+	case genres.Config:
 		if didChange, err = k.setTransacted(kinder, ak.GetConfigV0()); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -273,7 +273,7 @@ func (k *Compiled) AddTransacted(
 func (k *compiled) addTyp(
 	b1 *sku.Transacted,
 ) (didChange bool, err error) {
-	if err = gattung.Typ.AssertGattung(b1); err != nil {
+	if err = genres.Type.AssertGenre(b1); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
