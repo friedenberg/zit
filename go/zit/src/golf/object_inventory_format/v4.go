@@ -24,7 +24,7 @@ func (f v4) FormatPersistentMetadatei(
 	w.Reset(w1)
 	defer errors.DeferredFlusher(&err, w)
 
-	m := c.GetMetadatei()
+	m := c.GetMetadata()
 
 	mh := sha.MakeWriter(nil)
 	mw := io.MultiWriter(w, mh)
@@ -47,7 +47,7 @@ func (f v4) FormatPersistentMetadatei(
 		}
 	}
 
-	lines := strings.Split(m.Bezeichnung.String(), "\n")
+	lines := strings.Split(m.Description.String(), "\n")
 
 	for _, line := range lines {
 		if line == "" {
@@ -86,7 +86,7 @@ func (f v4) FormatPersistentMetadatei(
 	n1, err = ohio.WriteKeySpaceValueNewlineString(
 		w,
 		keyGattung.String(),
-		c.GetKennung().GetGenre().GetGenreString(),
+		c.GetObjectId().GetGenre().GetGenreString(),
 	)
 	n += int64(n1)
 
@@ -98,7 +98,7 @@ func (f v4) FormatPersistentMetadatei(
 	n1, err = ohio.WriteKeySpaceValueNewlineString(
 		w,
 		keyKennung.String(),
-		c.GetKennung().String(),
+		c.GetObjectId().String(),
 	)
 	n += int64(n1)
 
@@ -135,7 +135,7 @@ func (f v4) FormatPersistentMetadatei(
 		}
 	}
 
-	if !m.Typ.IsEmpty() {
+	if !m.Type.IsEmpty() {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,
 			keyTyp.String(),
@@ -150,11 +150,11 @@ func (f v4) FormatPersistentMetadatei(
 	}
 
 	if o.Verzeichnisse {
-		if m.Verzeichnisse.Schlummernd.Bool() {
+		if m.Cached.Schlummernd.Bool() {
 			n1, err = ohio.WriteKeySpaceValueNewlineString(
 				w,
 				keyVerzeichnisseArchiviert.String(),
-				m.Verzeichnisse.Schlummernd.String(),
+				m.Cached.Schlummernd.String(),
 			)
 			n += int64(n1)
 
@@ -164,11 +164,11 @@ func (f v4) FormatPersistentMetadatei(
 			}
 		}
 
-		if m.Verzeichnisse.GetExpandedEtiketten().Len() > 0 {
+		if m.Cached.GetExpandedEtiketten().Len() > 0 {
 			k := keyVerzeichnisseEtikettExpanded.String()
 
 			for _, e := range iter.SortedValues[ids.Tag](
-				m.Verzeichnisse.GetExpandedEtiketten(),
+				m.Cached.GetExpandedEtiketten(),
 			) {
 				n1, err = ohio.WriteKeySpaceValueNewlineString(
 					w,
@@ -184,11 +184,11 @@ func (f v4) FormatPersistentMetadatei(
 			}
 		}
 
-		if m.Verzeichnisse.GetImplicitEtiketten().Len() > 0 {
+		if m.Cached.GetImplicitEtiketten().Len() > 0 {
 			k := keyVerzeichnisseEtikettImplicit.String()
 
 			for _, e := range iter.SortedValues[ids.Tag](
-				m.Verzeichnisse.GetImplicitEtiketten(),
+				m.Cached.GetImplicitEtiketten(),
 			) {
 				n2, err = ohio.WriteKeySpaceValueNewline(
 					w,

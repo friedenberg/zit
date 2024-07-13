@@ -68,7 +68,7 @@ func (r *reader) Close() (err error) {
 	return
 }
 
-func (r *reader) GetShaLike() (s interfaces.ShaLike) {
+func (r *reader) GetShaLike() (s interfaces.Sha) {
 	s = sha.FromHash(r.hash)
 
 	return

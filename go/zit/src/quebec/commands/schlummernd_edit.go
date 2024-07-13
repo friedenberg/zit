@@ -35,7 +35,7 @@ func (c EditSchlummernd) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		ui.Err().Print("Command edit-konfig ignores passed in arguments.")
 	}
 
-	var sh interfaces.ShaLike
+	var sh interfaces.Sha
 
 	if sh, err = c.editInVim(u); err != nil {
 		err = errors.Wrap(err)
@@ -64,7 +64,7 @@ func (c EditSchlummernd) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 func (c EditSchlummernd) editInVim(
 	u *umwelt.Umwelt,
-) (sh interfaces.ShaLike, err error) {
+) (sh interfaces.Sha, err error) {
 	var p string
 
 	if p, err = c.makeTempKonfigFile(u); err != nil {
@@ -125,7 +125,7 @@ func (c EditSchlummernd) makeTempKonfigFile(
 func (c EditSchlummernd) readTempKonfigFile(
 	u *umwelt.Umwelt,
 	p string,
-) (sh interfaces.ShaLike, err error) {
+) (sh interfaces.Sha, err error) {
 	var f *os.File
 
 	if f, err = files.Open(p); err != nil {

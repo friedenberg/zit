@@ -72,7 +72,7 @@ func (w *writer) Close() (err error) {
 	return
 }
 
-func (w *writer) GetShaLike() (s interfaces.ShaLike) {
+func (w *writer) GetShaLike() (s interfaces.Sha) {
 	s = sha.FromHash(w.hash)
 
 	return

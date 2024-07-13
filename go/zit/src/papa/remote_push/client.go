@@ -92,7 +92,7 @@ func (c client) SendNeededSkus(filter *query.Group) (err error) {
 
 func (c *client) ObjekteWriter(
 	g interfaces.GenreGetter,
-	sh interfaces.ShaLike,
+	sh interfaces.Sha,
 ) (rc sha.ReadCloser, err error) {
 	var d remote_conn.Dialogue
 

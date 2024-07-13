@@ -11,15 +11,15 @@ type Conflicted struct {
 }
 
 func (tm Conflicted) IsAllInlineTyp(itc ids.InlineTypChecker) bool {
-	if !itc.IsInlineTyp(tm.Left.GetTyp()) {
+	if !itc.IsInlineTyp(tm.Left.GetType()) {
 		return false
 	}
 
-	if !itc.IsInlineTyp(tm.Middle.GetTyp()) {
+	if !itc.IsInlineTyp(tm.Middle.GetType()) {
 		return false
 	}
 
-	if !itc.IsInlineTyp(tm.Right.GetTyp()) {
+	if !itc.IsInlineTyp(tm.Right.GetType()) {
 		return false
 	}
 
@@ -88,9 +88,9 @@ func (tm *Conflicted) MergeEtiketten() (err error) {
 
 	ets := same.CloneSetPtrLike()
 
-	tm.Left.GetMetadatei().SetEtiketten(ets)
-	tm.Middle.GetMetadatei().SetEtiketten(ets)
-	tm.Right.GetMetadatei().SetEtiketten(ets)
+	tm.Left.GetMetadata().SetEtiketten(ets)
+	tm.Middle.GetMetadata().SetEtiketten(ets)
+	tm.Right.GetMetadata().SetEtiketten(ets)
 
 	return
 }

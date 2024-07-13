@@ -19,7 +19,7 @@ import (
 
 type Organize struct {
 	*umwelt.Umwelt
-	object_metadata.Metadatei
+	object_metadata.Metadata
 }
 
 func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
@@ -36,7 +36,7 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 		}
 	}
 
-	otFlags := organize_text.MakeFlagsWithMetadatei(u.Metadatei)
+	otFlags := organize_text.MakeFlagsWithMetadatei(u.Metadata)
 	u.ApplyToOrganizeOptions(&otFlags.Options)
 	// otFlags.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
 	mwk := sku.MakeTransactedMutableSet()

@@ -41,13 +41,13 @@ func (c Exec) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	switch {
-	case strings.HasPrefix(sk.GetTyp().String(), "bash"):
+	case strings.HasPrefix(sk.GetType().String(), "bash"):
 		if err = c.runBash(u, sk, args...); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case strings.HasPrefix(sk.GetTyp().String(), "lua"):
+	case strings.HasPrefix(sk.GetType().String(), "lua"):
 		execLuaOp := user_ops.ExecLua{
 			Umwelt: u,
 		}

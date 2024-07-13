@@ -19,9 +19,9 @@ type cliCheckedOut struct {
 	options erworben_cli_print_options.PrintOptions
 
 	rightAlignedWriter          interfaces.StringFormatWriter[string]
-	shaStringFormatWriter       interfaces.StringFormatWriter[interfaces.ShaLike]
+	shaStringFormatWriter       interfaces.StringFormatWriter[interfaces.Sha]
 	kennungStringFormatWriter   interfaces.StringFormatWriter[*ids.ObjectId]
-	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadatei]
+	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata]
 
 	typStringFormatWriter         interfaces.StringFormatWriter[*ids.Type]
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description]
@@ -30,9 +30,9 @@ type cliCheckedOut struct {
 
 func MakeCliCheckedOutFormat(
 	options erworben_cli_print_options.PrintOptions,
-	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
+	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 	kennungStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
-	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadatei],
+	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata],
 	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description],
 	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
@@ -151,7 +151,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 
 		n2, err = f.typStringFormatWriter.WriteStringFormat(
 			sw,
-			&browser.Metadatei.Typ,
+			&browser.Metadatei.Type,
 		)
 		n += n2
 
@@ -160,7 +160,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 			return
 		}
 
-		if !browser.Metadatei.Bezeichnung.IsEmpty() {
+		if !browser.Metadatei.Description.IsEmpty() {
 			n1, err = sw.WriteString(" ")
 			n += int64(n1)
 
@@ -171,7 +171,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 
 			n2, err = f.bezeichnungStringFormatWriter.WriteStringFormat(
 				sw,
-				&browser.Metadatei.Bezeichnung,
+				&browser.Metadatei.Description,
 			)
 			n += n2
 

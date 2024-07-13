@@ -134,7 +134,7 @@ func (s *Store) tryRealizeAndOrStore(
 
 	if o.Mode != objekte_mode.ModeReindex &&
 		mutter != nil &&
-		ids.Equals(kinder.GetKennung(), mutter.GetKennung()) &&
+		ids.Equals(kinder.GetObjectId(), mutter.GetObjectId()) &&
 		kinder.Metadatei.EqualsSansTai(&mutter.Metadatei) {
 
 		if err = kinder.SetFromSkuLike(mutter); err != nil {
@@ -202,7 +202,7 @@ func (s *Store) tryRealizeAndOrStore(
 	if o.Contains(objekte_mode.ModeSchwanz) {
 		if err = s.GetVerzeichnisse().Add(
 			kinder,
-			kinder.GetKennung().String(),
+			kinder.GetObjectId().String(),
 			o.Mode,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -247,7 +247,7 @@ func (s *Store) fetchMutterIfNecessary(
 		)
 	} else {
 		mutter, err = s.GetVerzeichnisse().ReadOneKennung(
-			sk.GetKennung(),
+			sk.GetObjectId(),
 		)
 	}
 
@@ -323,7 +323,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	updateCheckout bool,
 ) (transactedPtr *sku.Transacted, err error) {
 	e := co.GetSkuExternalLike().GetSku()
-	kennungPtr := e.GetKennung()
+	kennungPtr := e.GetObjectId()
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
@@ -351,7 +351,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		}
 	}
 
-	if err = transactedPtr.SetAkteSha(e.GetAkteSha()); err != nil {
+	if err = transactedPtr.SetBlobSha(e.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -391,7 +391,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 }
 
 func (s *Store) UpdateKonfig(
-	sh interfaces.ShaLike,
+	sh interfaces.Sha,
 ) (kt *sku.Transacted, err error) {
 	return s.CreateOrUpdateAkteSha(
 		&ids.Config{},
@@ -525,7 +525,7 @@ func (s *Store) addEtikettAndExpanded(
 func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 	m *sku.Transacted,
 ) (err error) {
-	t := m.GetTyp()
+	t := m.GetType()
 
 	if err = s.addTypAndExpanded(t); err != nil {
 		err = errors.Wrap(err)
@@ -545,7 +545,7 @@ func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 }
 
 func (s *Store) addMatchableCommon(m *sku.Transacted) (err error) {
-	if err = s.AddTypToIndex(&m.Metadatei.Typ); err != nil {
+	if err = s.AddTypToIndex(&m.Metadatei.Type); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -571,7 +571,7 @@ func (s *Store) reindexOne(besty, sk *sku.Transacted) (err error) {
 		return
 	}
 
-	if err = s.AddTypToIndex(&sk.Metadatei.Typ); err != nil {
+	if err = s.AddTypToIndex(&sk.Metadatei.Type); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

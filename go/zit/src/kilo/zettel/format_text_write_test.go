@@ -42,7 +42,7 @@ func (arf blobReaderFactory) BlobReader(s sha.Sha) (r sha.ReadCloser, err error)
 
 func writeFormat(
 	t test_logz.T,
-	m *object_metadata.Metadatei,
+	m *object_metadata.Metadata,
 	f object_metadata.TextFormatter,
 	includeBlob bool,
 	blobBody string,
@@ -78,9 +78,9 @@ func writeFormat(
 func TestWriteWithoutBlob(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	z := &object_metadata.Metadatei{
-		Bezeichnung: descriptions.Make("the title"),
-		Typ:         makeBlobExt(t, "md"),
+	z := &object_metadata.Metadata{
+		Description: descriptions.Make("the title"),
+		Type:         makeBlobExt(t, "md"),
 	}
 
 	z.SetEtiketten(makeEtiketten(t,
@@ -120,9 +120,9 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 func TestWriteWithInlineBlob(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	z := &object_metadata.Metadatei{
-		Bezeichnung: descriptions.Make("the title"),
-		Typ:         makeBlobExt(t, "md"),
+	z := &object_metadata.Metadata{
+		Description: descriptions.Make("the title"),
+		Type:         makeBlobExt(t, "md"),
 	}
 
 	z.SetEtiketten(makeEtiketten(t,

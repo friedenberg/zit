@@ -66,11 +66,11 @@ func (c Test) RunWithQuery(
 
 				defer sku.GetTransactedPool().Put(sk)
 
-				if object_metadata.EqualerSansTai.Equals(o.GetMetadatei(), sk.GetMetadatei()) {
+				if object_metadata.EqualerSansTai.Equals(o.GetMetadata(), sk.GetMetadata()) {
 					return
 				}
 
-				ui.Out().Print(o.GetKennung())
+				ui.Out().Print(o.GetObjectId())
 				ui.Debug().Print(o.GetTai())
 				ui.Debug().Print(sk.GetTai())
 

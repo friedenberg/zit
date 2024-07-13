@@ -25,7 +25,7 @@ func (c CommitOrganizeFile) ApplyToText(
 
 	if err = t.Transacted.Each(
 		func(sk *sku.Transacted) (err error) {
-			if sk.Metadatei.Bezeichnung.IsEmpty() {
+			if sk.Metadatei.Description.IsEmpty() {
 				return
 			}
 

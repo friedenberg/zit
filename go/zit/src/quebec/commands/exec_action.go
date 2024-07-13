@@ -66,7 +66,7 @@ func (c ExecAction) RunWithQuery(
 	if err = u.GetStore().QueryWithKasten(
 		ms,
 		func(z *sku.Transacted) (err error) {
-			return object_id_provider.Add(z.GetKennung())
+			return object_id_provider.Add(z.GetObjectId())
 		},
 	); err != nil {
 		err = errors.Wrap(err)

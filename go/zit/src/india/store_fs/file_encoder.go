@@ -75,7 +75,7 @@ func (e *fileEncoder) EncodeObjekte(
 	objektePath string,
 	aktePath string,
 ) (err error) {
-	inline := e.ic.IsInlineTyp(z.GetTyp())
+	inline := e.ic.IsInlineTyp(z.GetType())
 
 	var ar sha.ReadCloser
 

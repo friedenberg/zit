@@ -11,18 +11,18 @@ type TextFormat struct {
 }
 
 func MakeTextFormat(
-	akteFactory interfaces.BlobIOFactory,
-	akteFormatter script_config.RemoteScript,
+	blobIOFactory interfaces.BlobIOFactory,
+	blobFormatter script_config.RemoteScript,
 ) TextFormat {
 	return TextFormat{
 		TextParser: MakeTextParser(
-			akteFactory,
-			akteFormatter,
+			blobIOFactory,
+			blobFormatter,
 		),
 		TextFormatter: MakeTextFormatterMetadateiOnly(
 			TextFormatterOptions{},
-			akteFactory,
-			akteFormatter,
+			blobIOFactory,
+			blobFormatter,
 		),
 	}
 }

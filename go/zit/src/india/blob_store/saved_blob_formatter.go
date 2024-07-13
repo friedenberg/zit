@@ -22,7 +22,7 @@ func MakeSavedBlobFormatter(
 
 func (f savedBlobFormatter) FormatSavedBlob(
 	w io.Writer,
-	sh interfaces.ShaLike,
+	sh interfaces.Sha,
 ) (n int64, err error) {
 	var ar sha.ReadCloser
 

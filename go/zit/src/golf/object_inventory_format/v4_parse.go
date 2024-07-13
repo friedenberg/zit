@@ -20,7 +20,7 @@ func (f v4) ParsePersistentMetadatei(
 	c ParserContext,
 	o Options,
 ) (n int64, err error) {
-	m := c.GetMetadatei()
+	m := c.GetMetadata()
 
 	var (
 		g genres.Genre
@@ -75,7 +75,7 @@ func (f v4) ParsePersistentMetadatei(
 			}
 
 		case key.Equal(keyBezeichnung.Bytes()):
-			if err = m.Bezeichnung.Set(val.String()); err != nil {
+			if err = m.Description.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -120,13 +120,13 @@ func (f v4) ParsePersistentMetadatei(
 			}
 
 		case key.Equal(keyTyp.Bytes()):
-			if err = m.Typ.Set(val.String()); err != nil {
+			if err = m.Type.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 		case key.Equal(keyVerzeichnisseArchiviert.Bytes()):
-			if err = m.Verzeichnisse.Schlummernd.Set(val.String()); err != nil {
+			if err = m.Cached.Schlummernd.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -147,7 +147,7 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-			if err = m.Verzeichnisse.AddEtikettImplicitPtr(e); err != nil {
+			if err = m.Cached.AddEtikettImplicitPtr(e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -168,7 +168,7 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-			if err = m.Verzeichnisse.AddEtikettExpandedPtr(e); err != nil {
+			if err = m.Cached.AddEtikettExpandedPtr(e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

@@ -283,7 +283,7 @@ func (bf *binaryDecoder) readFieldKey(
 		}
 
 	case keys.Description:
-		if err = sk.Metadatei.Bezeichnung.Set(bf.Content.String()); err != nil {
+		if err = sk.Metadatei.Description.Set(bf.Content.String()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -314,7 +314,7 @@ func (bf *binaryDecoder) readFieldKey(
 		}
 
 	case keys.Type:
-		if err = sk.Metadatei.Typ.Set(bf.Content.String()); err != nil {
+		if err = sk.Metadatei.Type.Set(bf.Content.String()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -353,7 +353,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-		if err = sk.Metadatei.Verzeichnisse.AddEtikettImplicitPtr(&e); err != nil {
+		if err = sk.Metadatei.Cached.AddEtikettImplicitPtr(&e); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -366,7 +366,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-		if err = sk.Metadatei.Verzeichnisse.AddEtikettExpandedPtr(&e); err != nil {
+		if err = sk.Metadatei.Cached.AddEtikettExpandedPtr(&e); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -379,7 +379,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-		sk.Metadatei.Verzeichnisse.Etiketten.AddPath(&e)
+		sk.Metadatei.Cached.Etiketten.AddPath(&e)
 
 	default:
 		// panic(fmt.Sprintf("unsupported key: %s", key))

@@ -75,8 +75,8 @@ func (c CreateFromPaths) Run(
 		existing, ok := toCreate[k]
 
 		if ok {
-			if err = existing.Metadatei.Bezeichnung.Set(
-				z.Metadatei.Bezeichnung.String(),
+			if err = existing.Metadatei.Description.Set(
+				z.Metadatei.Description.String(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return

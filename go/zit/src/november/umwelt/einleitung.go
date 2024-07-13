@@ -157,7 +157,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 	{
 		err = nil
 
-		var sh interfaces.ShaLike
+		var sh interfaces.Sha
 
 		if sh, _, err = u.GetStore().GetAkten().GetTypeV0().SaveBlobText(
 			&defaultTyp,
@@ -183,7 +183,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 	}
 
 	{
-		var sh interfaces.ShaLike
+		var sh interfaces.Sha
 
 		if sh, err = writeDefaultErworben(u, defaultTypKennung); err != nil {
 			err = errors.Wrap(err)
@@ -205,7 +205,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 func writeDefaultErworben(
 	u *Umwelt,
 	dt ids.Type,
-) (sh interfaces.ShaLike, err error) {
+) (sh interfaces.Sha, err error) {
 	defaultKonfig := mutable_config.Default(dt)
 
 	f := u.GetStore().GetKonfigAkteFormat()

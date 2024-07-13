@@ -78,7 +78,7 @@ func (e *External) SetItem(i item, overwrite bool) (err error) {
 	}
 
 	// TODO make configurable
-	e.Metadatei.Typ = ids.MustType("!toml-bookmark")
+	e.Metadatei.Type = ids.MustType("!toml-bookmark")
 
 	return
 }
@@ -109,7 +109,7 @@ func (a *External) GetKennung() ids.IdLike {
 	return &a.Kennung
 }
 
-func (a *External) GetMetadatei() *object_metadata.Metadatei {
+func (a *External) GetMetadatei() *object_metadata.Metadata {
 	return &a.Metadatei
 }
 
@@ -127,7 +127,7 @@ func (a *External) String() string {
 	)
 }
 
-func (a *External) GetAkteSha() interfaces.ShaLike {
+func (a *External) GetAkteSha() interfaces.Sha {
 	return &a.Metadatei.Akte
 }
 

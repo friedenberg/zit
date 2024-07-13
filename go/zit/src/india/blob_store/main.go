@@ -13,7 +13,7 @@ type Store[
 	A interfaces.Blob[A],
 	APtr interfaces.BlobPtr[A],
 ] interface {
-	SaveBlobText(APtr) (interfaces.ShaLike, int64, error)
+	SaveBlobText(APtr) (interfaces.Sha, int64, error)
 	Format[A, APtr]
 	interfaces.BlobGetterPutter[APtr]
 }

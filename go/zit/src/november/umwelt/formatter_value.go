@@ -44,8 +44,8 @@ func (u *Umwelt) MakeFormatFunc(
 		f = func(tl *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(
 				out,
-				tl.GetKennung(),
-				&tl.Metadatei.Verzeichnisse.Etiketten,
+				tl.GetObjectId(),
+				&tl.Metadatei.Cached.Etiketten,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -58,8 +58,8 @@ func (u *Umwelt) MakeFormatFunc(
 		f = func(tl *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(
 				out,
-				tl.GetKennung(),
-				&tl.Metadatei.Verzeichnisse.Etiketten,
+				tl.GetObjectId(),
+				&tl.Metadatei.Cached.Etiketten,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -72,8 +72,8 @@ func (u *Umwelt) MakeFormatFunc(
 		f = func(tl *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(
 				out,
-				tl.GetKennung(),
-				tl.Metadatei.Verzeichnisse.QueryPath,
+				tl.GetObjectId(),
+				tl.Metadatei.Cached.QueryPath,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -113,15 +113,15 @@ func (u *Umwelt) MakeFormatFunc(
 
 	case "etiketten-all":
 		f = func(tl *sku.Transacted) (err error) {
-			for _, es := range tl.Metadatei.Verzeichnisse.Etiketten.Paths {
-				if _, err = fmt.Fprintf(out, "%s: %s\n", tl.GetKennung(), es); err != nil {
+			for _, es := range tl.Metadatei.Cached.Etiketten.Paths {
+				if _, err = fmt.Fprintf(out, "%s: %s\n", tl.GetObjectId(), es); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 			}
 
-			for _, es := range tl.Metadatei.Verzeichnisse.Etiketten.All {
-				if _, err = fmt.Fprintf(out, "%s: %s -> %s\n", tl.GetKennung(), es.Etikett, es.Parents); err != nil {
+			for _, es := range tl.Metadatei.Cached.Etiketten.All {
+				if _, err = fmt.Fprintf(out, "%s: %s -> %s\n", tl.GetObjectId(), es.Etikett, es.Parents); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -132,7 +132,7 @@ func (u *Umwelt) MakeFormatFunc(
 
 	case "etiketten-expanded":
 		f = func(tl *sku.Transacted) (err error) {
-			esImp := tl.GetMetadatei().Verzeichnisse.GetExpandedEtiketten()
+			esImp := tl.GetMetadata().Cached.GetExpandedEtiketten()
 			// TODO-P3 determine if empty sets should be printed or not
 
 			if _, err = fmt.Fprintln(
@@ -148,7 +148,7 @@ func (u *Umwelt) MakeFormatFunc(
 
 	case "etiketten-implicit":
 		f = func(tl *sku.Transacted) (err error) {
-			esImp := tl.GetMetadatei().Verzeichnisse.GetImplicitEtiketten()
+			esImp := tl.GetMetadata().Cached.GetImplicitEtiketten()
 			// TODO-P3 determine if empty sets should be printed or not
 
 			if _, err = fmt.Fprintln(
@@ -192,7 +192,7 @@ func (u *Umwelt) MakeFormatFunc(
 
 	case "bezeichnung":
 		f = func(tl *sku.Transacted) (err error) {
-			if _, err = fmt.Fprintln(out, tl.GetMetadatei().Bezeichnung); err != nil {
+			if _, err = fmt.Fprintln(out, tl.GetMetadata().Description); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -566,7 +566,7 @@ func (u *Umwelt) MakeFormatFunc(
 			}
 
 			if z, err = u.GetStore().GetVerzeichnisse().ReadOneEnnui(
-				z.GetMetadatei().Mutter(),
+				z.GetMetadata().Mutter(),
 			); err != nil {
 				fmt.Fprintln(out, err)
 				err = nil
@@ -623,7 +623,7 @@ func (u *Umwelt) MakeFormatFunc(
 
 	case "typ":
 		f = func(o *sku.Transacted) (err error) {
-			if _, err = fmt.Fprintln(out, o.GetTyp().String()); err != nil {
+			if _, err = fmt.Fprintln(out, o.GetType().String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -679,7 +679,7 @@ func (u *Umwelt) MakeFormatFunc(
 				return
 			}
 
-			a["description"] = o.Metadatei.Bezeichnung.String()
+			a["description"] = o.Metadatei.Description.String()
 			a["identifier"] = o.Kennung.String()
 
 			if err = e.Encode(&a); err != nil {
@@ -714,7 +714,7 @@ func (u *Umwelt) MakeFormatFunc(
 				return
 			}
 
-			a["description"] = o.Metadatei.Bezeichnung.String()
+			a["description"] = o.Metadatei.Description.String()
 			a["identifier"] = o.Kennung.String()
 
 			e := toml.NewEncoder(out)
@@ -754,7 +754,7 @@ func (u *Umwelt) makeTypFormatter(
 		f = func(o *sku.Transacted) (err error) {
 			var tt *sku.Transacted
 
-			if tt, err = u.GetStore().ReadTransactedFromKennung(o.GetTyp()); err != nil {
+			if tt, err = u.GetStore().ReadTransactedFromKennung(o.GetType()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -859,7 +859,7 @@ func (u *Umwelt) makeTypFormatter(
 		f = func(o *sku.Transacted) (err error) {
 			var t *sku.Transacted
 
-			if t, err = u.GetStore().ReadTransactedFromKennung(o.GetTyp()); err != nil {
+			if t, err = u.GetStore().ReadTransactedFromKennung(o.GetType()); err != nil {
 				if collections.IsErrNotFound(err) {
 					err = nil
 				} else {

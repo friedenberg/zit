@@ -81,8 +81,8 @@ func (op Diff) Run(col sku.CheckedOutLike) (err error) {
 	}
 
 	// sameTyp := il.GetTyp().Equals(el.GetTyp())
-	internalInline := op.GetKonfig().IsInlineTyp(il.GetTyp())
-	externalInline := op.GetKonfig().IsInlineTyp(el.GetTyp())
+	internalInline := op.GetKonfig().IsInlineTyp(il.GetType())
+	externalInline := op.GetKonfig().IsInlineTyp(el.GetType())
 
 	var externalFD *fd.FD
 
@@ -111,7 +111,7 @@ func (op Diff) Run(col sku.CheckedOutLike) (err error) {
 
 	internalLabel := fmt.Sprintf(
 		"%s:%s",
-		il.GetKennung(),
+		il.GetObjectId(),
 		strings.ToLower(il.GetGenre().GetGenreString()),
 	)
 
@@ -180,7 +180,7 @@ func (c Diff) makeDo(
 func (c Diff) makeDoAkte(
 	w io.WriteCloser,
 	arf interfaces.BlobReaderFactory,
-	sh interfaces.ShaLike,
+	sh interfaces.Sha,
 ) interfaces.FuncError {
 	return func() (err error) {
 		defer errors.DeferredCloser(&err, w)

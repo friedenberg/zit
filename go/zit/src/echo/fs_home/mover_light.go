@@ -70,7 +70,7 @@ func (m *MoverLight) ReadFrom(r io.Reader) (n int64, err error) {
 	return m.swc.ReadFrom(r)
 }
 
-func (m *MoverLight) GetShaLike() interfaces.ShaLike {
+func (m *MoverLight) GetShaLike() interfaces.Sha {
 	return m.swc.GetShaLike()
 }
 

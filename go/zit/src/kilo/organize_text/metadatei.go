@@ -35,8 +35,8 @@ func (m Metadatei) RemoveFromTransacted(sk *sku.Transacted) (err error) {
 	return
 }
 
-func (m Metadatei) AsMetadatei() (m1 object_metadata.Metadatei) {
-	m1.Typ = m.Typ
+func (m Metadatei) AsMetadatei() (m1 object_metadata.Metadata) {
+	m1.Type = m.Typ
 	m1.SetEtiketten(m.TagSet)
 	return
 }

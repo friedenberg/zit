@@ -37,7 +37,7 @@ func (u *Umwelt) FormatColorOptionsErr() (o string_format_writer.ColorOptions) {
 
 func (u *Umwelt) StringFormatWriterShaLike(
 	co string_format_writer.ColorOptions,
-) interfaces.StringFormatWriter[interfaces.ShaLike] {
+) interfaces.StringFormatWriter[interfaces.Sha] {
 	return id_fmts.MakeShaCliFormat(
 		u.konfig.PrintOptions,
 		co,
@@ -86,7 +86,7 @@ func (u *Umwelt) StringFormatWriterEtiketten(
 
 func (u *Umwelt) StringFormatWriterMetadatei(
 	co string_format_writer.ColorOptions,
-) interfaces.StringFormatWriter[*object_metadata.Metadatei] {
+) interfaces.StringFormatWriter[*object_metadata.Metadata] {
 	return sku_fmt.MakeCliMetadateiFormat(
 		u.konfig.PrintOptions,
 		u.StringFormatWriterShaLike(co),

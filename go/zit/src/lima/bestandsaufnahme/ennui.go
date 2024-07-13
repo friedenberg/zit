@@ -173,7 +173,7 @@ func (s *ennuiStore) makeWriteMetadateiFunc(
 
 func (s *ennuiStore) MakeFuncSaveOneVerweise(o *sku.Transacted) func() error {
 	return func() (err error) {
-		k := o.GetKennung()
+		k := o.GetObjectId()
 		sh := sha.FromString(k.String())
 		defer sha.GetPool().Put(sh)
 

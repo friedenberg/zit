@@ -20,7 +20,7 @@ type equaler struct {
 const debug = false
 
 // TODO make better diffing facility
-func (e equaler) Equals(a, b *Metadatei) bool {
+func (e equaler) Equals(a, b *Metadata) bool {
 	if e.includeTai && !a.Tai.Equals(b.Tai) {
 		if debug {
 			ui.Debug().Print(&a.Tai, "->", &b.Tai)
@@ -35,9 +35,9 @@ func (e equaler) Equals(a, b *Metadatei) bool {
 		return false
 	}
 
-	if !a.Typ.Equals(b.Typ) {
+	if !a.Type.Equals(b.Type) {
 		if debug {
-			ui.Debug().Print(&a.Typ, "->", &b.Typ)
+			ui.Debug().Print(&a.Type, "->", &b.Type)
 		}
 		return false
 	}
@@ -94,9 +94,9 @@ func (e equaler) Equals(a, b *Metadatei) bool {
 		return false
 	}
 
-	if !a.Bezeichnung.Equals(b.Bezeichnung) {
+	if !a.Description.Equals(b.Description) {
 		if debug {
-			ui.Debug().Print(a.Bezeichnung, "->", b.Bezeichnung)
+			ui.Debug().Print(a.Description, "->", b.Description)
 		}
 		return false
 	}

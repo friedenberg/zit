@@ -14,12 +14,12 @@ func StringMetadateiSansTai(o *sku.Transacted) (str string) {
 	sb.WriteString(o.GetGenre().GetGenreString())
 
 	sb.WriteString(" ")
-	sb.WriteString(o.GetKennung().String())
+	sb.WriteString(o.GetObjectId().String())
 
 	sb.WriteString(" ")
 	sb.WriteString(o.GetAkteSha().String())
 
-	m := o.GetMetadatei()
+	m := o.GetMetadata()
 
 	t := m.GetTyp()
 

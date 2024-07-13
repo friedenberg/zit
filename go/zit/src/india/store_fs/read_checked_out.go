@@ -72,7 +72,7 @@ func (s *Store) ReadIntoCheckedOutFromTransacted(
 	var kfp *KennungFDPair
 
 	if kfp, ok = s.Get(&sk.Kennung); !ok {
-		err = collections.MakeErrNotFound(sk.GetKennung())
+		err = collections.MakeErrNotFound(sk.GetObjectId())
 		return
 	}
 

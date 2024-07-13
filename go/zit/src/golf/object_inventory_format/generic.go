@@ -15,7 +15,7 @@ import (
 )
 
 type (
-	Metadatei = object_metadata.Metadatei
+	Metadatei = object_metadata.Metadata
 	Sha       = sha.Sha
 )
 
@@ -131,7 +131,7 @@ func WriteMetadateiKeyTo(
 	c FormatterContext,
 	key *catgut.String,
 ) (n int64, err error) {
-	m := c.GetMetadatei()
+	m := c.GetMetadata()
 
 	var n1 int
 
@@ -151,7 +151,7 @@ func WriteMetadateiKeyTo(
 		}
 
 	case keyBezeichnung:
-		lines := strings.Split(m.Bezeichnung.String(), "\n")
+		lines := strings.Split(m.Description.String(), "\n")
 
 		for _, line := range lines {
 			if line == "" {
@@ -201,7 +201,7 @@ func WriteMetadateiKeyTo(
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			w,
 			keyGattung.String(),
-			c.GetKennung().GetGenre().GetGenreString(),
+			c.GetObjectId().GetGenre().GetGenreString(),
 		)
 		n += int64(n1)
 
@@ -213,7 +213,7 @@ func WriteMetadateiKeyTo(
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			w,
 			keyKennung.String(),
-			c.GetKennung().String(),
+			c.GetObjectId().String(),
 		)
 		n += int64(n1)
 
@@ -264,7 +264,7 @@ func WriteMetadateiKeyTo(
 		}
 
 	case keyTyp:
-		if !m.Typ.IsEmpty() {
+		if !m.Type.IsEmpty() {
 			n1, err = ohio.WriteKeySpaceValueNewlineString(
 				w,
 				keyTyp.String(),
@@ -308,7 +308,7 @@ func writeShaKeyIfNotNull(
 }
 
 func GetShaForContext(f FormatGeneric, c FormatterContext) (sh *Sha, err error) {
-	m := c.GetMetadatei()
+	m := c.GetMetadata()
 
 	switch f.key {
 	case "Akte", "AkteTyp":
@@ -317,7 +317,7 @@ func GetShaForContext(f FormatGeneric, c FormatterContext) (sh *Sha, err error) 
 		}
 
 	case "AkteBez":
-		if m.Akte.IsNull() && m.Bezeichnung.IsEmpty() {
+		if m.Akte.IsNull() && m.Description.IsEmpty() {
 			return
 		}
 	}

@@ -34,8 +34,8 @@ func (w *Writer) addCommonMatches(
 	mb.AddMatchBytes(parts.Left.Bytes())
 	mb.AddMatchBytes(parts.Right.Bytes())
 
-	mb.AddMatches(z.GetMetadatei().Bezeichnung.String())
-	mb.AddMatches(z.GetTyp().String())
+	mb.AddMatches(z.GetMetadata().Description.String())
+	mb.AddMatches(z.GetType().String())
 	z.Metadatei.GetEtiketten().Each(
 		func(e ids.Tag) (err error) {
 			expansion.ExpanderAll.Expand(
@@ -50,7 +50,7 @@ func (w *Writer) addCommonMatches(
 		},
 	)
 
-	t := z.GetTyp()
+	t := z.GetType()
 
 	expansion.ExpanderAll.Expand(
 		func(v string) (err error) {
@@ -69,7 +69,7 @@ func (w *Writer) zettelToItem(
 ) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
-	a.Title = z.Metadatei.Bezeichnung.String()
+	a.Title = z.Metadatei.Description.String()
 
 	es := iter.StringCommaSeparated(
 		z.Metadatei.GetEtiketten(),
@@ -82,7 +82,7 @@ func (w *Writer) zettelToItem(
 		a.Title = ks
 		a.Subtitle = es
 	} else {
-		a.Subtitle = fmt.Sprintf("%s: %s %s", z.Metadatei.Typ, ks, es)
+		a.Subtitle = fmt.Sprintf("%s: %s %s", z.Metadatei.Type, ks, es)
 	}
 
 	a.Arg = ks

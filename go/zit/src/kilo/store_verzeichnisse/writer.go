@@ -218,7 +218,7 @@ func (pw *writer) writeOne(
 }
 
 func (pw *writer) saveSchwanz(z *sku.Transacted, sigil ids.Sigil) {
-	k := z.GetKennung()
+	k := z.GetObjectId()
 	ks := k.String()
 
 	record := pw.kennungShaMap[ks]
@@ -232,7 +232,7 @@ func (pw *writer) saveSchwanz(z *sku.Transacted, sigil ids.Sigil) {
 
 	record.Sigil = sigil
 
-	if z.Metadatei.Verzeichnisse.Schlummernd.Bool() {
+	if z.Metadatei.Cached.Schlummernd.Bool() {
 		record.Add(ids.SigilHidden)
 	} else {
 		record.Del(ids.SigilHidden)

@@ -20,7 +20,7 @@ func (c *Store) initializeIndex() (err error) {
 	if err = c.externalStoreInfo.FuncQuery(
 		nil,
 		func(sk *sku.Transacted) (err error) {
-			if !sk.GetTyp().Equals(c.typ) {
+			if !sk.GetType().Equals(c.typ) {
 				return
 			}
 

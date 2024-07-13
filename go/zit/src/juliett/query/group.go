@@ -374,7 +374,7 @@ func (qg *Group) String() string {
 }
 
 func (qg *Group) ContainsSku(sk *sku.Transacted) (ok bool) {
-	defer sk.Metadatei.Verzeichnisse.QueryPath.PushOnOk(qg, &ok)
+	defer sk.Metadatei.Cached.QueryPath.PushOnOk(qg, &ok)
 	g := sk.GetGenre()
 
 	q, ok := qg.OptimizedQueries[genres.Must(g)]

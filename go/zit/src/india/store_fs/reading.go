@@ -165,7 +165,7 @@ func (s *Store) ReadOneExternalInto(
 			typFromExtension = ext
 		}
 
-		if err = e.Transacted.Metadatei.Typ.Set(typFromExtension); err != nil {
+		if err = e.Transacted.Metadatei.Type.Set(typFromExtension); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -183,7 +183,7 @@ func (s *Store) ReadOneExternalObjekte(
 	t *sku.Transacted,
 ) (err error) {
 	if t != nil {
-		object_metadata.Resetter.ResetWith(e.GetMetadatei(), t.GetMetadatei())
+		object_metadata.Resetter.ResetWith(e.GetMetadata(), t.GetMetadata())
 	}
 
 	var f *os.File
@@ -219,7 +219,7 @@ func (s *Store) ReadOneExternalAkte(
 	e *External,
 	t *sku.Transacted,
 ) (err error) {
-	object_metadata.Resetter.ResetWith(&e.Metadatei, t.GetMetadatei())
+	object_metadata.Resetter.ResetWith(&e.Metadatei, t.GetMetadata())
 
 	var aw sha.WriteCloser
 
@@ -246,7 +246,7 @@ func (s *Store) ReadOneExternalAkte(
 		return
 	}
 
-	e.GetMetadatei().Akte.SetShaLike(aw)
+	e.GetMetadata().Akte.SetShaLike(aw)
 
 	return
 }

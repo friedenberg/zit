@@ -266,11 +266,11 @@ func (fd *FD) IsDir() bool {
 	return fd.isDir
 }
 
-func (fd *FD) SetShaLike(v interfaces.ShaLike) (err error) {
+func (fd *FD) SetShaLike(v interfaces.Sha) (err error) {
 	return fd.sha.SetShaLike(v)
 }
 
-func (fd *FD) GetShaLike() interfaces.ShaLike {
+func (fd *FD) GetShaLike() interfaces.Sha {
 	return &fd.sha
 }
 

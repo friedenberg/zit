@@ -20,7 +20,7 @@ func (f v0) FormatPersistentMetadatei(
 	c FormatterContext,
 	o Options,
 ) (n int64, err error) {
-	m := c.GetMetadatei()
+	m := c.GetMetadata()
 	w := format.NewLineWriter()
 
 	if o.Tai {
@@ -29,7 +29,7 @@ func (f v0) FormatPersistentMetadatei(
 
 	w.WriteFormat("%s %s", genres.Blob, &m.Akte)
 	w.WriteFormat("%s %s", genres.Type, m.GetTyp())
-	w.WriteFormat("Bezeichnung %s", m.Bezeichnung)
+	w.WriteFormat("Bezeichnung %s", m.Description)
 
 	for _, e := range iter.SortedValues[ids.Tag](m.GetEtiketten()) {
 		w.WriteFormat("%s %s", genres.Tag, e)
@@ -48,13 +48,13 @@ func (f v0) ParsePersistentMetadatei(
 	c ParserContext,
 	_ Options,
 ) (n int64, err error) {
-	m := c.GetMetadatei()
+	m := c.GetMetadata()
 
 	etiketten := ids.MakeTagMutableSet()
 
 	r := bufio.NewReader(r1)
 
-	typLineReader := ohio.MakeLineReaderIgnoreErrors(m.Typ.Set)
+	typLineReader := ohio.MakeLineReaderIgnoreErrors(m.Type.Set)
 
 	esa := iter.MakeFuncSetString[ids.Tag, *ids.Tag](
 		etiketten,
@@ -71,7 +71,7 @@ func (f v0) ParsePersistentMetadatei(
 					genres.Blob.String(): m.Akte.Set,
 					genres.Type.String(): typLineReader,
 					"AkteTyp":            typLineReader,
-					"Bezeichnung":        m.Bezeichnung.Set,
+					"Bezeichnung":        m.Description.Set,
 					genres.Tag.String():  esa,
 				},
 			),

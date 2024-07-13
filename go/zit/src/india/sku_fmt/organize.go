@@ -26,7 +26,7 @@ type KennungAlignedFormat interface {
 
 func MakeFormatOrganize(
 	options erworben_cli_print_options.PrintOptions,
-	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
+	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 	kennungStringFormatWriter id_fmts.Aligned,
 	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description],
@@ -51,7 +51,7 @@ type Organize struct {
 	maxKopf, maxSchwanz int
 	padding             string
 
-	shaStringFormatWriter         interfaces.StringFormatWriter[interfaces.ShaLike]
+	shaStringFormatWriter         interfaces.StringFormatWriter[interfaces.Sha]
 	kennungStringFormatWriter     id_fmts.Aligned
 	typStringFormatWriter         interfaces.StringFormatWriter[*ids.Type]
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description]
@@ -133,7 +133,7 @@ func (f *Organize) WriteStringFormat(
 		}
 	}
 
-	t := o.GetMetadatei().GetTypPtr()
+	t := o.GetMetadata().GetTypPtr()
 
 	if len(t.String()) > 0 {
 		if f.padding == "" {
@@ -158,10 +158,10 @@ func (f *Organize) WriteStringFormat(
 		}
 	}
 
-	b := o.GetMetadatei().GetBezeichnungPtr()
+	b := o.GetMetadata().GetBezeichnungPtr()
 
 	if f.options.PrintEtikettenAlways {
-		b := o.GetMetadatei().GetEtiketten()
+		b := o.GetMetadata().GetEtiketten()
 
 		for _, v := range iter.SortedValues(b) {
 			if f.options.ZittishNewlines {
@@ -241,7 +241,7 @@ func (f *Organize) ReadStringFormat(
 		}
 	}
 
-	if err = o.Metadatei.Bezeichnung.TodoSetSlice(sl); err != nil {
+	if err = o.Metadatei.Description.TodoSetSlice(sl); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -311,7 +311,7 @@ LOOP:
 
 				switch g {
 				case genres.Type:
-					if err = o.Metadatei.Typ.TodoSetFromKennung2(&k); err != nil {
+					if err = o.Metadatei.Type.TodoSetFromKennung2(&k); err != nil {
 						err = errors.Wrap(err)
 						return
 					}

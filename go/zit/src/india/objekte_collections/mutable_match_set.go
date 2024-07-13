@@ -47,8 +47,8 @@ func (s MutableMatchSet) Match(z *sku.Transacted) (err error) {
 	s.lock.RLock()
 	stored, okStored := s.Stored.Get(kStored)
 	akte, okAkte := s.Akten.Get(kAkte)
-	k := z.GetKennung()
-	okHinweis := s.MatchedHinweisen.Contains(z.GetKennung())
+	k := z.GetObjectId()
+	okHinweis := s.MatchedHinweisen.Contains(z.GetObjectId())
 
 	okSchwanz := false
 	schwanz, _ := s.MatchedHinweisenSchwanzen[k.String()]

@@ -61,8 +61,8 @@ func (a *ketikett) Equals(b *ketikett) bool {
 	}
 
 	if !iter.SetEqualsPtr(
-		a.Transacted.Metadatei.Verzeichnisse.GetImplicitEtiketten(),
-		b.Transacted.Metadatei.Verzeichnisse.GetImplicitEtiketten(),
+		a.Transacted.Metadatei.Cached.GetImplicitEtiketten(),
+		b.Transacted.Metadatei.Cached.GetImplicitEtiketten(),
 	) {
 		return false
 	}
@@ -75,7 +75,7 @@ func (e *ketikett) Set(v string) (err error) {
 }
 
 func (e *ketikett) String() string {
-	return e.Transacted.GetKennung().String()
+	return e.Transacted.GetObjectId().String()
 }
 
 func (k *compiled) EachEtikett(

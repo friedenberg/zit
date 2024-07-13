@@ -33,17 +33,17 @@ func MakeWriterComplete(w io.Writer) *WriterComplete {
 	go func(s *WriterComplete) {
 		for z := range s.chTransacted {
 			errors.TodoP4("handle write errors")
-			s.wBuf.WriteString(z.GetKennung().String())
+			s.wBuf.WriteString(z.GetObjectId().String())
 			s.wBuf.WriteByte('\t')
 
-			g := z.GetKennung().GetGenre()
-			s.wBuf.WriteString(z.GetKennung().GetGenre().String())
+			g := z.GetObjectId().GetGenre()
+			s.wBuf.WriteString(z.GetObjectId().GetGenre().String())
 
 			if g == genres.Zettel {
 				s.wBuf.WriteString(": !")
-				s.wBuf.WriteString(z.GetTyp().String())
+				s.wBuf.WriteString(z.GetType().String())
 				s.wBuf.WriteString(" ")
-				s.wBuf.WriteString(z.GetMetadatei().Bezeichnung.String())
+				s.wBuf.WriteString(z.GetMetadata().Description.String())
 			} else {
 				s.wBuf.WriteString(g.String())
 			}
@@ -61,7 +61,7 @@ func MakeWriterComplete(w io.Writer) *WriterComplete {
 func (w *WriterComplete) WriteOne(
 	z *sku.Transacted,
 ) (err error) {
-	if z.GetKennung().String() == "/" {
+	if z.GetObjectId().String() == "/" {
 		err = errors.New("empty sku")
 		return
 	}

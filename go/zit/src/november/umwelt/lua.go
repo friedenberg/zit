@@ -17,7 +17,7 @@ func (s *Umwelt) GetSkuFromString(lv string) (sk *sku.Transacted, err error) {
 			return
 		}
 
-		if err = s.GetStore().ReadOneInto(sk.GetKennung(), sk); err != nil {
+		if err = s.GetStore().ReadOneInto(sk.GetObjectId(), sk); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -73,7 +73,7 @@ func (s *Umwelt) LuaRequire(ls *lua.LState) int {
 
 	defer sku.GetTransactedPool().Put(sk)
 
-	if err = s.GetStore().ReadOneInto(sk.GetKennung(), sk); err != nil {
+	if err = s.GetStore().ReadOneInto(sk.GetObjectId(), sk); err != nil {
 		panic(err)
 	}
 

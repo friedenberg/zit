@@ -165,7 +165,7 @@ func (c *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 	dec := toml.NewDecoder(r)
 
 	if err = dec.Decode(&tb); err != nil {
-		err = errors.Wrapf(err, "Sha: %s, Kennung: %s", sk.GetAkteSha(), sk.GetKennung())
+		err = errors.Wrapf(err, "Sha: %s, Kennung: %s", sk.GetAkteSha(), sk.GetObjectId())
 		return
 	}
 
@@ -181,8 +181,8 @@ func (c *Store) CheckoutOne(
 	options checkout_options.Options,
 	sz *sku.Transacted,
 ) (cz sku.CheckedOutLike, err error) {
-	if !sz.Metadatei.Typ.Equals(c.typ) {
-		err = errors.Wrap(sku.ErrExternalStoreUnsupportedTyp(sz.Metadatei.Typ))
+	if !sz.Metadatei.Type.Equals(c.typ) {
+		err = errors.Wrap(sku.ErrExternalStoreUnsupportedTyp(sz.Metadatei.Type))
 		return
 	}
 
@@ -199,7 +199,7 @@ func (c *Store) CheckoutOne(
 	sku.TransactedResetter.ResetWith(co.GetSku(), sz)
 	sku.TransactedResetter.ResetWith(co.GetSkuExternalLike().GetSku(), sz)
 	co.State = checked_out_state.StateJustCheckedOut
-	co.External.browser.Metadatei.Typ = ids.MustType("!chrome-tab")
+	co.External.browser.Metadatei.Type = ids.MustType("!chrome-tab")
 	co.External.item = map[string]interface{}{"url": u.String()}
 
 	c.l.Lock()

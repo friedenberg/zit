@@ -9,7 +9,7 @@ import (
 
 // TODO decide how this should behave
 func (s *Store) UpdateTransacted(sk *sku.Transacted) (err error) {
-	if !sk.GetTyp().Equals(s.typ) {
+	if !sk.GetType().Equals(s.typ) {
 		return
 	}
 

@@ -41,9 +41,9 @@ func TestReadWithoutBlob(t1 *testing.T) {
 `,
 	)
 
-	expected := &object_metadata.Metadatei{
-		Bezeichnung: descriptions.Make("the title"),
-		Typ:         makeBlobExt(t, "md"),
+	expected := &object_metadata.Metadata{
+		Description: descriptions.Make("the title"),
+		Type:         makeBlobExt(t, "md"),
 	}
 
 	expected.SetEtiketten(makeEtiketten(t,
@@ -81,9 +81,9 @@ func TestReadWithoutBlobWithMultilineBezeichnung(t1 *testing.T) {
 `,
 	)
 
-	expected := &object_metadata.Metadatei{
-		Bezeichnung: descriptions.Make("the title\ncontinues"),
-		Typ:         makeBlobExt(t, "md"),
+	expected := &object_metadata.Metadata{
+		Description: descriptions.Make("the title\ncontinues"),
+		Type:         makeBlobExt(t, "md"),
 	}
 
 	expected.SetEtiketten(makeEtiketten(t,
@@ -127,9 +127,9 @@ the body
 `,
 	)
 
-	expected := &object_metadata.Metadatei{
-		Bezeichnung: descriptions.Make("the title"),
-		Typ:         makeBlobExt(t, "md"),
+	expected := &object_metadata.Metadata{
+		Description: descriptions.Make("the title"),
+		Type:         makeBlobExt(t, "md"),
 	}
 
 	errors.PanicIfError(expected.Akte.Set(

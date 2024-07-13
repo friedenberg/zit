@@ -123,10 +123,10 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 				return
 			}
 
-			zettels[i].SetAkteSha(ow.GetShaLike())
+			zettels[i].SetBlobSha(ow.GetShaLike())
 
 		case shaError == nil:
-			zettels[i].SetAkteSha(&as)
+			zettels[i].SetBlobSha(&as)
 
 		default:
 			err = errors.Errorf("argument is neither sha nor path")
@@ -134,7 +134,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		}
 
 		if c.NewEtiketten.Len() > 0 {
-			m := zettels[i].GetMetadatei()
+			m := zettels[i].GetMetadata()
 			m.SetEtiketten(c.NewEtiketten)
 		}
 	}

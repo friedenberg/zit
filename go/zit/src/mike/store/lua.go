@@ -14,8 +14,8 @@ import (
 func (s *Store) MakeLuaVMPoolWithSku(
 	sk *sku.Transacted,
 ) (lvp sku_fmt.LuaVMPool, err error) {
-	if sk.GetTyp().String() != "lua" {
-		err = errors.Errorf("unsupported typ: %s, Sku: %s", sk.GetTyp(), sk)
+	if sk.GetType().String() != "lua" {
+		err = errors.Errorf("unsupported typ: %s, Sku: %s", sk.GetType(), sk)
 		return
 	}
 

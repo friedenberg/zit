@@ -42,7 +42,7 @@ func (kc *Compiled) recompileEtiketten() (err error) {
 		func(ke *ketikett) (err error) {
 			var e ids.Tag
 
-			if err = e.Set(ke.Transacted.GetKennung().String()); err != nil {
+			if err = e.Set(ke.Transacted.GetObjectId().String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -90,12 +90,12 @@ func (kc *Compiled) recompileTypen(
 			fe := ta.FileExtension
 
 			if fe == "" {
-				fe = ct.GetKennung().String()
+				fe = ct.GetObjectId().String()
 			}
 
 			// TODO-P2 enforce uniqueness
-			kc.ExtensionsToTypen[fe] = ct.GetKennung().String()
-			kc.TypenToExtensions[ct.GetKennung().String()] = fe
+			kc.ExtensionsToTypen[fe] = ct.GetObjectId().String()
+			kc.TypenToExtensions[ct.GetObjectId().String()] = fe
 
 			if ta.InlineAkte {
 				inlineTypen.Add(values.MakeString(ct.Kennung.String()))

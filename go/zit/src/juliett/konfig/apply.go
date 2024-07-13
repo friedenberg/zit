@@ -22,7 +22,7 @@ func (k *Compiled) ApplySchlummerndAndRealizeEtiketten(
 	ui.Log().Print("applying konfig to:", sk)
 	mp := &sk.Metadatei
 
-	mp.Verzeichnisse.SetExpandedEtiketten(ids.ExpandMany(
+	mp.Cached.SetExpandedEtiketten(ids.ExpandMany(
 		mp.GetEtiketten(),
 		expansion.ExpanderRight,
 	))
@@ -39,8 +39,8 @@ func (k *Compiled) ApplySchlummerndAndRealizeEtiketten(
 	// TODO better solution for "realizing" etiketten against Konfig.
 	// Specifically, making this less fragile and dependent on remembering to do
 	// ApplyToSku for each Sku. Maybe a factory?
-	mp.Verzeichnisse.Etiketten.Reset()
-	mp.GetEtiketten().Each(mp.Verzeichnisse.Etiketten.AddEtikettOld)
+	mp.Cached.Etiketten.Reset()
+	mp.GetEtiketten().Each(mp.Cached.Etiketten.AddEtikettOld)
 
 	if isEtikett {
 		ks := sk.Kennung.String()
@@ -49,13 +49,13 @@ func (k *Compiled) ApplySchlummerndAndRealizeEtiketten(
 			return
 		}
 
-		sk.Metadatei.Verzeichnisse.Etiketten.AddSelf(catgut.MakeFromString(ks))
+		sk.Metadatei.Cached.Etiketten.AddSelf(catgut.MakeFromString(ks))
 
 		ids.ExpandOne(
 			&etikett,
 			expansion.ExpanderRight,
 		).EachPtr(
-			mp.Verzeichnisse.GetExpandedEtikettenMutable().AddPtr,
+			mp.Cached.GetExpandedEtikettenMutable().AddPtr,
 		)
 	}
 
@@ -118,15 +118,15 @@ func (k *Compiled) addSuperEtiketten(
 			continue
 		}
 
-		if ek.Metadatei.Verzeichnisse.Etiketten.Paths.Len() <= 1 {
-			ui.Log().Print(ks, ex, ek.Metadatei.Verzeichnisse.Etiketten)
+		if ek.Metadatei.Cached.Etiketten.Paths.Len() <= 1 {
+			ui.Log().Print(ks, ex, ek.Metadatei.Cached.Etiketten)
 			continue
 		}
 
 		prefix := catgut.MakeFromString(ex)
 
-		a := &sk.Metadatei.Verzeichnisse.Etiketten
-		b := &ek.Metadatei.Verzeichnisse.Etiketten
+		a := &sk.Metadatei.Cached.Etiketten
+		b := &ek.Metadatei.Cached.Etiketten
 
 		ui.Log().Print("a", a)
 		ui.Log().Print("b", b)
@@ -161,7 +161,7 @@ func (k *Compiled) addImplicitEtiketten(
 		impl := k.getImplicitEtiketten(e)
 
 		if impl.Len() == 0 {
-			sk.Metadatei.Verzeichnisse.Etiketten.AddPathWithType(p1)
+			sk.Metadatei.Cached.Etiketten.AddPathWithType(p1)
 			return
 		}
 
@@ -171,7 +171,7 @@ func (k *Compiled) addImplicitEtiketten(
 				func(e1 *ids.Tag) (err error) {
 					p2 := p1.Clone()
 					p2.Add(catgut.MakeFromString(e1.String()))
-					sk.Metadatei.Verzeichnisse.Etiketten.AddPathWithType(p2)
+					sk.Metadatei.Cached.Etiketten.AddPathWithType(p2)
 					return
 				},
 			),
@@ -192,13 +192,13 @@ func (k *Compiled) addImplicitEtiketten(
 		typKonfig.GetEtiketten().EachPtr(addImpEts)
 	}
 
-	mp.Verzeichnisse.SetImplicitEtiketten(ie)
+	mp.Cached.SetImplicitEtiketten(ie)
 
 	return
 }
 
 func (k compiled) ApplyToNewMetadatei(
-	ml object_metadata.MetadateiLike,
+	ml object_metadata.MetadataLike,
 	tagp interfaces.BlobGetterPutter[*type_blobs.V0],
 ) (err error) {
 	// m := ml.GetMetadatei()

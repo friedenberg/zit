@@ -67,7 +67,7 @@ func (s *Store) CreateOrUpdateFromTransacted(
 
 func (s *Store) CreateOrUpdateAkteSha(
 	k ids.IdLike,
-	sh interfaces.ShaLike,
+	sh interfaces.Sha,
 ) (t *sku.Transacted, err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
@@ -96,7 +96,7 @@ func (s *Store) CreateOrUpdateAkteSha(
 		}
 	}
 
-	t.SetAkteSha(sh)
+	t.SetBlobSha(sh)
 
 	if err = s.tryRealizeAndOrStore(
 		t,

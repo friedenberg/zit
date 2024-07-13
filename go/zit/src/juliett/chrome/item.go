@@ -15,18 +15,18 @@ import (
 // TODO make more specific
 type item map[string]interface{}
 
-func (item item) WriteToMetadatei(m *object_metadata.Metadatei) (err error) {
+func (item item) WriteToMetadatei(m *object_metadata.Metadata) (err error) {
 	if m.Tai, err = item.GetTai(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if m.Typ, err = item.GetTyp(); err != nil {
+	if m.Type, err = item.GetTyp(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if m.Bezeichnung, err = item.GetBezeichnung(); err != nil {
+	if m.Description, err = item.GetBezeichnung(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

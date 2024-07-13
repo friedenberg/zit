@@ -16,12 +16,12 @@ type cli struct {
 	contentPrefix string
 
 	kennungStringFormatWriter   interfaces.StringFormatWriter[*ids.ObjectId]
-	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadatei]
+	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata]
 }
 
 func MakeCliFormatShort(
 	kennungStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
-	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadatei],
+	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata],
 ) *cli {
 	return &cli{
 		kennungStringFormatWriter:   kennungStringFormatWriter,
@@ -32,7 +32,7 @@ func MakeCliFormatShort(
 func MakeCliFormat(
 	options erworben_cli_print_options.PrintOptions,
 	kennungStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
-	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadatei],
+	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata],
 ) *cli {
 	return &cli{
 		options: options,
@@ -57,7 +57,7 @@ func (f *cli) WriteStringFormat(
 			t := o.GetTai()
 
 			if t.IsZero() {
-				ui.Err().Printf("empty tai: %s", o.GetKennung())
+				ui.Err().Printf("empty tai: %s", o.GetObjectId())
 			} else {
 				bracketPrefix = t.Format(string_format_writer.StringFormatDateTime)
 			}
@@ -101,7 +101,7 @@ func (f *cli) WriteStringFormat(
 		return
 	}
 
-	n2, err = f.metadateiStringFormatWriter.WriteStringFormat(sw, o.GetMetadatei())
+	n2, err = f.metadateiStringFormatWriter.WriteStringFormat(sw, o.GetMetadata())
 	n += n2
 
 	if err != nil {

@@ -147,7 +147,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	if c.Organize {
 		opOrganize := user_ops.Organize{
 			Umwelt:    u,
-			Metadatei: c.Metadatei,
+			Metadata: c.Metadatei,
 		}
 
 		if err = opOrganize.Run(nil, zts); err != nil {

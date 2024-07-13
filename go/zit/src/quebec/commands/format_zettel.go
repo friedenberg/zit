@@ -153,14 +153,14 @@ func (c *FormatZettel) getAkteFormatter(
 	zt *sku.Transacted,
 	formatId string,
 ) (akteFormatter script_config.RemoteScript, err error) {
-	if zt.GetTyp().IsEmpty() {
+	if zt.GetType().IsEmpty() {
 		ui.Log().Print("empty typ")
 		return
 	}
 
 	var typKonfig *sku.Transacted
 
-	if typKonfig, err = u.GetStore().ReadTransactedFromKennung(zt.GetTyp()); err != nil {
+	if typKonfig, err = u.GetStore().ReadTransactedFromKennung(zt.GetType()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -34,7 +34,7 @@ func MakeBlobStore[
 }
 
 func (s *BlobStore[A, APtr]) GetBlob(
-	sh interfaces.ShaLike,
+	sh interfaces.Sha,
 ) (a APtr, err error) {
 	var ar interfaces.ShaReadCloser
 
@@ -70,7 +70,7 @@ func (s *BlobStore[A, APtr]) PutBlob(a APtr) {
 
 func (h *BlobStore[A, APtr]) SaveBlobText(
 	o APtr,
-) (sh interfaces.ShaLike, n int64, err error) {
+) (sh interfaces.Sha, n int64, err error) {
 	var w sha.WriteCloser
 
 	if w, err = h.fs_home.BlobWriter(); err != nil {

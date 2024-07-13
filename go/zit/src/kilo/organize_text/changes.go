@@ -57,7 +57,7 @@ func (sm SkuMapWithOrder) Sort() {
 	sort.Slice(out, func(i, j int) bool {
 		switch {
 		case out[i].Kennung.IsEmpty() && out[j].Kennung.IsEmpty():
-			return out[i].Metadatei.Bezeichnung.String() < out[j].Metadatei.Bezeichnung.String()
+			return out[i].Metadatei.Description.String() < out[j].Metadatei.Description.String()
 
 		case out[i].Kennung.IsEmpty():
 			return true

@@ -42,7 +42,7 @@ type bestandsaufnahmeScanner struct {
 	options    object_inventory_format.Options
 	afterFirst bool
 
-	m  object_metadata.Metadatei
+	m  object_metadata.Metadata
 	g  genres.Genre
 	es ids.TagMutableSet
 	k  string

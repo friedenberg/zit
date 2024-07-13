@@ -19,14 +19,14 @@ type cliMetadatei struct {
 	writeBezeichnung bool
 	writeEtiketten   bool
 
-	shaStringFormatWriter         interfaces.StringFormatWriter[interfaces.ShaLike]
+	shaStringFormatWriter         interfaces.StringFormatWriter[interfaces.Sha]
 	typStringFormatWriter         interfaces.StringFormatWriter[*ids.Type]
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description]
 	etikettenStringFormatWriter   interfaces.StringFormatWriter[*ids.Tag]
 }
 
 func MakeCliMetadateiFormatShort(
-	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
+	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description],
 	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
@@ -44,7 +44,7 @@ func MakeCliMetadateiFormatShort(
 
 func MakeCliMetadateiFormat(
 	options erworben_cli_print_options.PrintOptions,
-	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
+	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description],
 	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
@@ -66,7 +66,7 @@ func MakeCliMetadateiFormat(
 
 func (f *cliMetadatei) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
-	o *object_metadata.Metadatei,
+	o *object_metadata.Metadata,
 ) (n int64, err error) {
 	var n1 int
 	var n2 int64
@@ -92,7 +92,7 @@ func (f *cliMetadatei) WriteStringFormat(
 	}
 
 	if f.writeTyp {
-		t := o.GetMetadatei().GetTypPtr()
+		t := o.GetMetadata().GetTypPtr()
 
 		if len(t.String()) > 0 {
 			n1, err = sw.WriteString(f.contentPrefix)
@@ -123,7 +123,7 @@ func (f *cliMetadatei) WriteStringFormat(
 
 	didWriteBezeichnung := false
 	if f.writeBezeichnung {
-		b := o.GetMetadatei().GetBezeichnungPtr()
+		b := o.GetMetadata().GetBezeichnungPtr()
 
 		if !b.IsEmpty() {
 			didWriteBezeichnung = true
@@ -159,7 +159,7 @@ func (f *cliMetadatei) WriteStringFormat(
 
 func (f *cliMetadatei) writeStringFormatEtiketten(
 	sw interfaces.WriterAndStringWriter,
-	o *object_metadata.Metadatei,
+	o *object_metadata.Metadata,
 	didWriteBezeichnung bool,
 ) (n int64, err error) {
 	if !f.options.PrintEtikettenAlways &&
@@ -167,7 +167,7 @@ func (f *cliMetadatei) writeStringFormatEtiketten(
 		return
 	}
 
-	b := o.GetMetadatei().GetEtiketten()
+	b := o.GetMetadata().GetEtiketten()
 
 	if b.Len() == 0 {
 		return

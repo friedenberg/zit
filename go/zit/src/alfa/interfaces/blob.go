@@ -13,7 +13,7 @@ type (
 	BlobGetter[
 		V any,
 	] interface {
-		GetBlob(ShaLike) (V, error)
+		GetBlob(Sha) (V, error)
 	}
 
 	BlobPutter[

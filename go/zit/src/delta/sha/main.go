@@ -82,7 +82,7 @@ func (src *Sha) WriteTo(w io.Writer) (n int64, err error) {
 	return
 }
 
-func (s *Sha) GetShaLike() interfaces.ShaLike {
+func (s *Sha) GetShaLike() interfaces.Sha {
 	return s
 }
 
@@ -110,7 +110,7 @@ func (a *Sha) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a *Sha) EqualsSha(b interfaces.ShaLike) bool {
+func (a *Sha) EqualsSha(b interfaces.Sha) bool {
 	return a.GetShaString() == b.GetShaString()
 }
 
@@ -259,7 +259,7 @@ func (a *Sha) ResetWith(b *Sha) {
 	}
 }
 
-func (a *Sha) ResetWithShaLike(b interfaces.ShaLike) {
+func (a *Sha) ResetWithShaLike(b interfaces.Sha) {
 	copy(a.data[:], b.GetShaBytes())
 }
 

@@ -12,7 +12,7 @@ import (
 type (
 	FormatterContext interface {
 		object_metadata.PersistentFormatterContext
-		GetKennung() ids.IdLike
+		GetObjectId() *ids.ObjectId
 	}
 
 	ParserContext interface {
@@ -73,6 +73,6 @@ type nopFormatterContext struct {
 	object_metadata.PersistentFormatterContext
 }
 
-func (nopFormatterContext) GetKennung() ids.IdLike {
+func (nopFormatterContext) GetObjectId() *ids.ObjectId {
 	return nil
 }

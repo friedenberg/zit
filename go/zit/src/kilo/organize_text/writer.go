@@ -15,7 +15,7 @@ import (
 type assignmentLineWriter struct {
 	RightAlignedIndents  bool
 	OmitLeadingEmptyLine bool
-	Metadatei            object_metadata.Metadatei
+	Metadatei            object_metadata.Metadata
 	*format.LineWriter
 	maxDepth            int
 	maxKopf, maxSchwanz int
@@ -148,7 +148,7 @@ func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 		sku.TransactedResetter.ResetWith(cursor, &z.Transacted)
 		cursor.Metadatei.Subtract(&av.Metadatei)
 
-		mes := cursor.GetMetadatei().GetEtiketten().CloneMutableSetPtrLike()
+		mes := cursor.GetMetadata().GetEtiketten().CloneMutableSetPtrLike()
 
 		if err = a.SubtractFromSet(mes); err != nil {
 			err = errors.Wrap(err)

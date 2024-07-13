@@ -17,7 +17,7 @@ var (
 )
 
 func init() {
-	transactedKeyerKennung = &KennungKeyer[Transacted, *Transacted]{}
+	transactedKeyerKennung = &ids.ObjectIdKeyer[Transacted, *Transacted]{}
 	gob.Register(transactedKeyerKennung)
 
 	TransactedSetEmpty = MakeTransactedSet()
@@ -58,7 +58,7 @@ func MakeTransactedMutableSet() TransactedMutableSet {
 
 func MakeTransactedMutableSetKennung() TransactedMutableSet {
 	return collections_value.MakeMutableValueSet(
-		KennungKeyer[Transacted, *Transacted]{},
+		ids.ObjectIdKeyer[Transacted, *Transacted]{},
 	)
 }
 
@@ -67,20 +67,4 @@ func MakeCheckedOutLikeMutableSet() CheckedOutLikeMutableSet {
 		nil,
 		// KennungKeyer[CheckedOut, *CheckedOut]{},
 	)
-}
-
-type kennungGetter interface {
-	GetKennung() ids.IdLike
-}
-
-type KennungKeyer[
-	T any,
-	TPtr interface {
-		interfaces.Ptr[T]
-		kennungGetter
-	},
-] struct{}
-
-func (sk KennungKeyer[T, TPtr]) GetKey(e TPtr) string {
-	return e.GetKennung().String()
 }

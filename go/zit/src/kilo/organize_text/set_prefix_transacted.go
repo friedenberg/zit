@@ -58,11 +58,11 @@ func (s *PrefixSet) AddTransacted(z *sku.Transacted) (err error) {
 // this splits on right-expanded
 func (s *PrefixSet) Add(z *obj) (err error) {
 	es := ids.Expanded(
-		z.GetMetadatei().Verzeichnisse.GetImplicitEtiketten(),
+		z.GetMetadata().Cached.GetImplicitEtiketten(),
 		expansion.ExpanderRight,
 	).CloneMutableSetPtrLike()
 
-	if err = z.GetMetadatei().Verzeichnisse.GetExpandedEtiketten().EachPtr(
+	if err = z.GetMetadata().Cached.GetExpandedEtiketten().EachPtr(
 		es.AddPtr,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -235,7 +235,7 @@ func (a PrefixSet) Subset(
 		zSet.Each(
 			func(z *obj) (err error) {
 				ui.Log().Print(e2, z)
-				intersection := z.Metadatei.Verzeichnisse.Etiketten.All.GetMatching(e2)
+				intersection := z.Metadatei.Cached.Etiketten.All.GetMatching(e2)
 				hasDirect := false || len(intersection) == 0
 				type match struct {
 					string

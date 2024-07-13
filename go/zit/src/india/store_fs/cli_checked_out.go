@@ -17,18 +17,18 @@ type cliCheckedOut struct {
 	options erworben_cli_print_options.PrintOptions
 
 	rightAlignedWriter          interfaces.StringFormatWriter[string]
-	shaStringFormatWriter       interfaces.StringFormatWriter[interfaces.ShaLike]
+	shaStringFormatWriter       interfaces.StringFormatWriter[interfaces.Sha]
 	kennungStringFormatWriter   interfaces.StringFormatWriter[*ids.ObjectId]
 	fdStringFormatWriter        interfaces.StringFormatWriter[*fd.FD]
-	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadatei]
+	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata]
 }
 
 func MakeCliCheckedOutFormat(
 	options erworben_cli_print_options.PrintOptions,
-	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
+	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 	fdStringFormatWriter interfaces.StringFormatWriter[*fd.FD],
 	kennungStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
-	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadatei],
+	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata],
 ) *cliCheckedOut {
 	return &cliCheckedOut{
 		options:                     options,
@@ -115,7 +115,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 		return
 	}
 
-	n2, err = f.metadateiStringFormatWriter.WriteStringFormat(sw, o.GetMetadatei())
+	n2, err = f.metadateiStringFormatWriter.WriteStringFormat(sw, o.GetMetadata())
 	n += n2
 
 	if err != nil {

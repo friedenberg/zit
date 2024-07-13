@@ -184,7 +184,7 @@ func (i *indexAbbr) AddMatchable(o *sku.Transacted) (err error) {
 
 	i.indexAbbrEncodableTridexes.Shas.Kennungen.Add(o.GetAkteSha().String())
 
-	ks := o.GetKennung().String()
+	ks := o.GetObjectId().String()
 
 	switch o.GetGenre() {
 	case genres.Zettel:

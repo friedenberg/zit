@@ -34,7 +34,7 @@ func MakeShaCliFormat(
 
 func (f *shaCliFormat) WriteStringFormat(
 	w interfaces.WriterAndStringWriter,
-	s interfaces.ShaLike,
+	s interfaces.Sha,
 ) (n int64, err error) {
 	v := s.String()
 

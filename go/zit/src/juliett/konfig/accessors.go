@@ -63,7 +63,7 @@ func (kc *compiled) getApproximatedTyp(
 		ct.HasValue = true
 		ct.Typ = expandedActual[0]
 
-		if ids.Equals(ct.Typ.GetKennung(), k) {
+		if ids.Equals(ct.Typ.GetObjectId(), k) {
 			ct.IsActual = true
 		}
 	}
@@ -144,9 +144,9 @@ func (c *compiled) getSortedTypenExpanded(
 
 	sort.Slice(expandedActual, func(i, j int) bool {
 		return len(
-			expandedActual[i].GetKennung().String(),
+			expandedActual[i].GetObjectId().String(),
 		) > len(
-			expandedActual[j].GetKennung().String(),
+			expandedActual[j].GetObjectId().String(),
 		)
 	})
 
@@ -189,9 +189,9 @@ func (c *compiled) getSortedEtikettenExpanded(
 
 	sort.Slice(expandedActual, func(i, j int) bool {
 		return len(
-			expandedActual[i].GetKennung().String(),
+			expandedActual[i].GetObjectId().String(),
 		) > len(
-			expandedActual[j].GetKennung().String(),
+			expandedActual[j].GetObjectId().String(),
 		)
 	})
 

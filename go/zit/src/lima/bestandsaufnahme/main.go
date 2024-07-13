@@ -41,7 +41,7 @@ type Store interface {
 	interfaces.BlobGetter[*InventoryList]
 
 	StreamInventoryList(
-		interfaces.ShaLike,
+		interfaces.Sha,
 		interfaces.FuncIter[*sku.Transacted],
 	) error
 }
@@ -130,8 +130,8 @@ func (s *store) Create(
 	t = sku.GetTransactedPool().Get()
 
 	sku.TransactedResetter.Reset(t)
-	t.Metadatei.Bezeichnung = bez
-	t.SetAkteSha(sh)
+	t.Metadatei.Description = bez
+	t.SetBlobSha(sh)
 	tai := s.clock.GetTai()
 
 	if err = t.Kennung.SetWithIdLike(tai); err != nil {
@@ -163,11 +163,11 @@ func (s *store) Create(
 
 	ui.Log().Printf(
 		"saving Bestandsaufnahme with tai: %s -> %s",
-		t.GetKennung().GetGenre(),
+		t.GetObjectId().GetGenre(),
 		sh,
 	)
 
-	t.SetObjekteSha(sh)
+	t.SetObjectSha(sh)
 
 	return
 }
@@ -345,7 +345,7 @@ func (s *store) readOneFromReader(
 	return
 }
 
-func (s *store) populateInventoryList(blobSha interfaces.ShaLike, a *InventoryList) (err error) {
+func (s *store) populateInventoryList(blobSha interfaces.Sha, a *InventoryList) (err error) {
 	var ar interfaces.ShaReadCloser
 
 	if ar, err = s.af.BlobReader(blobSha); err != nil {
@@ -377,7 +377,7 @@ func (s *store) populateInventoryList(blobSha interfaces.ShaLike, a *InventoryLi
 }
 
 func (s *store) StreamInventoryList(
-	akteSha interfaces.ShaLike,
+	akteSha interfaces.Sha,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	var ar interfaces.ShaReadCloser
@@ -412,7 +412,7 @@ func (s *store) StreamInventoryList(
 	return
 }
 
-func (s *store) GetBlob(akteSha interfaces.ShaLike) (a *InventoryList, err error) {
+func (s *store) GetBlob(akteSha interfaces.Sha) (a *InventoryList, err error) {
 	a = MakeInventoryList()
 	err = s.populateInventoryList(akteSha, a)
 	return
@@ -446,7 +446,7 @@ func (s *store) ReadLast() (max *sku.Transacted, err error) {
 		panic(
 			fmt.Sprintf(
 				"did not find last Bestandsaufnahme: %#v",
-				max.GetMetadatei(),
+				max.GetMetadata(),
 			),
 		)
 	}
@@ -534,7 +534,7 @@ func (s *store) ReadAllSkus(
 				err = errors.Wrapf(
 					err,
 					"Bestandsaufnahme: %s",
-					t.GetKennung(),
+					t.GetObjectId(),
 				)
 
 				return

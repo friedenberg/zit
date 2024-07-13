@@ -39,11 +39,11 @@ func (t *External) SetFromSkuLike(sk sku.SkuLike) (err error) {
 	return
 }
 
-func (a *External) GetKennung() ids.IdLike {
+func (a *External) GetObjectId() *ids.ObjectId {
 	return &a.Kennung
 }
 
-func (a *External) GetMetadatei() *object_metadata.Metadatei {
+func (a *External) GetMetadata() *object_metadata.Metadata {
 	return &a.Metadatei
 }
 
@@ -55,17 +55,17 @@ func (a *External) String() string {
 	return fmt.Sprintf(
 		". %s %s %s %s",
 		a.GetGattung(),
-		a.GetKennung(),
+		a.GetObjectId(),
 		a.GetObjekteSha(),
 		a.GetAkteSha(),
 	)
 }
 
-func (a *External) GetAkteSha() interfaces.ShaLike {
+func (a *External) GetAkteSha() interfaces.Sha {
 	return &a.Metadatei.Akte
 }
 
-func (a *External) SetAkteSha(v interfaces.ShaLike) (err error) {
+func (a *External) SetBlobSha(v interfaces.Sha) (err error) {
 	if err = a.Metadatei.Akte.SetShaLike(v); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -116,7 +116,7 @@ func (a *External) ResetWithExternalMaybe(
 }
 
 func (o *External) GetKey() string {
-	return fmt.Sprintf("%s.%s", o.GetGattung(), o.GetKennung())
+	return fmt.Sprintf("%s.%s", o.GetGattung(), o.GetObjectId())
 }
 
 func (e *External) GetCheckoutMode() (m checkout_mode.Mode, err error) {

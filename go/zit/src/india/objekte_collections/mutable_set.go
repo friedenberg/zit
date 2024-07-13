@@ -15,7 +15,7 @@ func (k KeyerHinweis) GetKey(z *store_fs.External) string {
 		return ""
 	}
 
-	return z.GetKennung().String()
+	return z.GetObjectId().String()
 }
 
 func MakeMutableSetUniqueHinweis(zs ...*store_fs.External) MutableSet {

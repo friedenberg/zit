@@ -9,7 +9,7 @@ import (
 
 type (
 	SavedBlobFormatter interface {
-		FormatSavedBlob(io.Writer, interfaces.ShaLike) (int64, error)
+		FormatSavedBlob(io.Writer, interfaces.Sha) (int64, error)
 	}
 
 	ParsedBlobFormatter[T any, TPtr interfaces.Ptr[T]] interface {
@@ -17,7 +17,7 @@ type (
 	}
 
 	ParseSaver[T any, TPtr interfaces.Ptr[T]] interface {
-		ParseSaveBlob(io.Reader, TPtr) (interfaces.ShaLike, int64, error)
+		ParseSaveBlob(io.Reader, TPtr) (interfaces.Sha, int64, error)
 	}
 
 	Parser[T any, TPtr interfaces.Ptr[T]] interface {

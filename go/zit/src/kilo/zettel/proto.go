@@ -16,13 +16,13 @@ import (
 )
 
 type ProtoZettel struct {
-	Metadatei object_metadata.Metadatei
+	Metadatei object_metadata.Metadata
 }
 
 func MakeProtoZettel(k *konfig.Compiled) (p ProtoZettel) {
 	errors.TodoP1("modify konfig to keep etiketten set")
 
-	p.Metadatei.Typ = k.GetErworben().Defaults.Typ
+	p.Metadatei.Type = k.GetErworben().Defaults.Typ
 	p.Metadatei.SetEtiketten(k.DefaultEtiketten)
 
 	return
@@ -36,11 +36,11 @@ func (pz *ProtoZettel) AddToFlagSet(f *flag.FlagSet) {
 	pz.Metadatei.AddToFlagSet(f)
 }
 
-func (pz ProtoZettel) Equals(z *object_metadata.Metadatei) (ok bool) {
+func (pz ProtoZettel) Equals(z *object_metadata.Metadata) (ok bool) {
 	var okTyp, okMet bool
 
-	if !ids.IsEmpty(pz.Metadatei.Typ) &&
-		pz.Metadatei.Typ.Equals(z.GetTyp()) {
+	if !ids.IsEmpty(pz.Metadatei.Type) &&
+		pz.Metadatei.Type.Equals(z.GetTyp()) {
 		okTyp = true
 	}
 
@@ -64,10 +64,10 @@ func (pz ProtoZettel) Make() (z *sku.Transacted) {
 }
 
 func (pz ProtoZettel) Apply(
-	ml object_metadata.MetadateiLike,
+	ml object_metadata.MetadataLike,
 	gg interfaces.GenreGetter,
 ) (ok bool) {
-	z := ml.GetMetadatei()
+	z := ml.GetMetadata()
 
 	g := gg.GetGenre()
 	ui.Log().Print(ml, g)
@@ -75,17 +75,17 @@ func (pz ProtoZettel) Apply(
 	switch g {
 	case genres.Zettel, genres.Unknown:
 		if ids.IsEmpty(z.GetTyp()) &&
-			!ids.IsEmpty(pz.Metadatei.Typ) &&
-			!z.GetTyp().Equals(pz.Metadatei.Typ) {
+			!ids.IsEmpty(pz.Metadatei.Type) &&
+			!z.GetTyp().Equals(pz.Metadatei.Type) {
 			ok = true
-			z.Typ = pz.Metadatei.Typ
+			z.Type = pz.Metadatei.Type
 		}
 	}
 
-	if pz.Metadatei.Bezeichnung.WasSet() &&
-		!z.Bezeichnung.Equals(pz.Metadatei.Bezeichnung) {
+	if pz.Metadatei.Description.WasSet() &&
+		!z.Description.Equals(pz.Metadatei.Description) {
 		ok = true
-		z.Bezeichnung = pz.Metadatei.Bezeichnung
+		z.Description = pz.Metadatei.Description
 	}
 
 	if pz.Metadatei.GetEtiketten().Len() > 0 {
@@ -98,21 +98,21 @@ func (pz ProtoZettel) Apply(
 }
 
 func (pz ProtoZettel) ApplyWithBlobFD(
-	ml object_metadata.MetadateiLike,
+	ml object_metadata.MetadataLike,
 	akteFD *fd.FD,
 ) (err error) {
-	z := ml.GetMetadatei()
+	z := ml.GetMetadata()
 
 	if ids.IsEmpty(z.GetTyp()) &&
-		!ids.IsEmpty(pz.Metadatei.Typ) &&
-		!z.GetTyp().Equals(pz.Metadatei.Typ) {
-		z.Typ = pz.Metadatei.Typ
+		!ids.IsEmpty(pz.Metadatei.Type) &&
+		!z.GetTyp().Equals(pz.Metadatei.Type) {
+		z.Type = pz.Metadatei.Type
 	} else {
 		// TODO-P4 use konfig
 		ext := akteFD.Ext()
 
 		if ext != "" {
-			if err = z.Typ.Set(akteFD.Ext()); err != nil {
+			if err = z.Type.Set(akteFD.Ext()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -121,12 +121,12 @@ func (pz ProtoZettel) ApplyWithBlobFD(
 
 	bez := akteFD.FileNameSansExt()
 
-	if pz.Metadatei.Bezeichnung.WasSet() &&
-		!z.Bezeichnung.Equals(pz.Metadatei.Bezeichnung) {
-		bez = pz.Metadatei.Bezeichnung.String()
+	if pz.Metadatei.Description.WasSet() &&
+		!z.Description.Equals(pz.Metadatei.Description) {
+		bez = pz.Metadatei.Description.String()
 	}
 
-	if err = z.Bezeichnung.Set(bez); err != nil {
+	if err = z.Description.Set(bez); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

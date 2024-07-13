@@ -17,7 +17,7 @@ func MakeHashWriter() (h hash.Hash) {
 	return
 }
 
-func Make(s interfaces.ShaLike) *Sha {
+func Make(s interfaces.Sha) *Sha {
 	switch st := s.(type) {
 	case *Sha:
 		return st

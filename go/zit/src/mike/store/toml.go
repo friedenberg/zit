@@ -8,7 +8,7 @@ func (s *Store) addToTomlIndexIfNecessary(
 	t *sku.Transacted,
 	o ObjekteOptions,
 ) (err error) {
-	if !t.Metadatei.Typ.IsToml() {
+	if !t.Metadatei.Type.IsToml() {
 		return
 	}
 

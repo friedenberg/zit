@@ -7,48 +7,48 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 )
 
-func MakeErrHasInlineAkteAndFilePath(
-	akteFD *fd.FD,
+func MakeErrHasInlineBlobAndFilePath(
+	blobFD *fd.FD,
 	sh *sha.Sha,
-) (err *ErrHasInlineAkteAndFilePath) {
-	err = &ErrHasInlineAkteAndFilePath{}
-	err.AkteFD.ResetWith(akteFD)
+) (err *ErrHasInlineBlobAndFilePath) {
+	err = &ErrHasInlineBlobAndFilePath{}
+	err.BlobFD.ResetWith(blobFD)
 	err.InlineSha.SetShaLike(sh)
 	return
 }
 
-type ErrHasInlineAkteAndFilePath struct {
-	AkteFD    fd.FD
+type ErrHasInlineBlobAndFilePath struct {
+	BlobFD    fd.FD
 	InlineSha sha.Sha
 }
 
-func (e *ErrHasInlineAkteAndFilePath) Error() string {
+func (e *ErrHasInlineBlobAndFilePath) Error() string {
 	return fmt.Sprintf(
-		"text has inline akte and file: \nexternal path: %s\nexternal sha: %s\ninline sha: %s",
-		e.AkteFD.GetPath(),
-		e.AkteFD.GetShaLike(),
+		"text has inline blob and file: \nexternal path: %s\nexternal sha: %s\ninline sha: %s",
+		e.BlobFD.GetPath(),
+		e.BlobFD.GetShaLike(),
 		&e.InlineSha,
 	)
 }
 
-func MakeErrHasInlineAkteAndMetadateiSha(
+func MakeErrHasInlineBlobAndMetadateiSha(
 	inline, object_metadata *sha.Sha,
-) (err *ErrHasInlineAkteAndMetadateiSha) {
-	err = &ErrHasInlineAkteAndMetadateiSha{}
-	err.MetadateiSha.SetShaLike(object_metadata)
+) (err *ErrHasInlineBlobAndMetadateiSha) {
+	err = &ErrHasInlineBlobAndMetadateiSha{}
+	err.MetadataSha.SetShaLike(object_metadata)
 	err.InlineSha.SetShaLike(inline)
 	return
 }
 
-type ErrHasInlineAkteAndMetadateiSha struct {
+type ErrHasInlineBlobAndMetadateiSha struct {
 	InlineSha    sha.Sha
-	MetadateiSha sha.Sha
+	MetadataSha sha.Sha
 }
 
-func (e *ErrHasInlineAkteAndMetadateiSha) Error() string {
+func (e *ErrHasInlineBlobAndMetadateiSha) Error() string {
 	return fmt.Sprintf(
-		"text has inline akte and metadatei sha: \ninline sha: %s\n metadatei sha: %s",
+		"text has inline blob and metadatei sha: \ninline sha: %s\n metadatei sha: %s",
 		&e.InlineSha,
-		&e.MetadateiSha,
+		&e.MetadataSha,
 	)
 }

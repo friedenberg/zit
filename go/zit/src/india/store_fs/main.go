@@ -235,16 +235,16 @@ func (fs *Store) ContainsSku(m *sku.Transacted) bool {
 
 	switch g {
 	case genres.Zettel:
-		return fs.zettelen.ContainsKey(m.GetKennung().String())
+		return fs.zettelen.ContainsKey(m.GetObjectId().String())
 
 	case genres.Type:
-		return fs.typen.ContainsKey(m.GetKennung().String())
+		return fs.typen.ContainsKey(m.GetObjectId().String())
 
 	case genres.Tag:
-		return fs.etiketten.ContainsKey(m.GetKennung().String())
+		return fs.etiketten.ContainsKey(m.GetObjectId().String())
 
 	case genres.Repo:
-		return fs.kisten.ContainsKey(m.GetKennung().String())
+		return fs.kisten.ContainsKey(m.GetObjectId().String())
 	}
 
 	return true

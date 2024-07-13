@@ -77,9 +77,9 @@ func TestMakeEtiketten(t1 *testing.T) {
 func TestEqualitySelf(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	text := &object_metadata.Metadatei{
-		Bezeichnung: descriptions.Make("the title"),
-		Typ:         makeBlobExt(t, "text"),
+	text := &object_metadata.Metadata{
+		Description: descriptions.Make("the title"),
+		Type:         makeBlobExt(t, "text"),
 	}
 
 	text.SetEtiketten(makeEtiketten(t,
@@ -96,9 +96,9 @@ func TestEqualitySelf(t1 *testing.T) {
 func TestEqualityNotSelf(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	text := object_metadata.Metadatei{
-		Bezeichnung: descriptions.Make("the title"),
-		Typ:         makeBlobExt(t, "text"),
+	text := object_metadata.Metadata{
+		Description: descriptions.Make("the title"),
+		Type:         makeBlobExt(t, "text"),
 	}
 
 	text.SetEtiketten(makeEtiketten(t,
@@ -107,9 +107,9 @@ func TestEqualityNotSelf(t1 *testing.T) {
 		"tag3",
 	))
 
-	text1 := &object_metadata.Metadatei{
-		Bezeichnung: descriptions.Make("the title"),
-		Typ:         makeBlobExt(t, "text"),
+	text1 := &object_metadata.Metadata{
+		Description: descriptions.Make("the title"),
+		Type:         makeBlobExt(t, "text"),
 	}
 
 	text1.SetEtiketten(makeEtiketten(t,

@@ -23,36 +23,36 @@ type MetadateiWriterTo interface {
 	HasMetadateiContent() bool
 }
 
-type Metadatei struct {
+type Metadata struct {
 	// StoreVersion values.Int
 	// Domain
-	Kasten      ids.RepoId
-	Bezeichnung descriptions.Description
-	Etiketten   ids.TagMutableSet // public for gob, but should be private
-	Typ         ids.Type
+	RepoId      ids.RepoId
+	Description descriptions.Description
+	Tags   ids.TagMutableSet // public for gob, but should be private
+	Type         ids.Type
 
 	Shas
 	Tai ids.Tai
 
 	Comments      []string
-	Verzeichnisse Verzeichnisse
+	Cached Verzeichnisse
 }
 
-func (m *Metadatei) GetMetadatei() *Metadatei {
+func (m *Metadata) GetMetadata() *Metadata {
 	return m
 }
 
-func (m *Metadatei) Sha() *sha.Sha {
+func (m *Metadata) Sha() *sha.Sha {
 	return &m.SelbstMetadateiKennungMutter
 }
 
-func (m *Metadatei) Mutter() *sha.Sha {
+func (m *Metadata) Mutter() *sha.Sha {
 	return &m.MutterMetadateiKennungMutter
 }
 
-func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {
+func (m *Metadata) AddToFlagSet(f *flag.FlagSet) {
 	f.Var(
-		&m.Bezeichnung,
+		&m.Description,
 		"bezeichnung",
 		"the Bezeichnung to use for created or updated Zettelen",
 	)
@@ -61,7 +61,7 @@ func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {
 	fes := flag2.Make(
 		flag_policy.FlagPolicyAppend,
 		func() string {
-			return m.Verzeichnisse.Etiketten.String()
+			return m.Cached.Etiketten.String()
 		},
 		func(v string) (err error) {
 			vs := strings.Split(v, ",")
@@ -90,28 +90,28 @@ func (m *Metadatei) AddToFlagSet(f *flag.FlagSet) {
 		"typ",
 		"the Typ for the created or updated Objekte",
 		func(v string) (err error) {
-			return m.Typ.Set(v)
+			return m.Type.Set(v)
 		},
 	)
 }
 
-func (z *Metadatei) UserInputIsEmpty() bool {
-	if !z.Bezeichnung.IsEmpty() {
+func (z *Metadata) UserInputIsEmpty() bool {
+	if !z.Description.IsEmpty() {
 		return false
 	}
 
-	if z.Etiketten != nil && z.Etiketten.Len() > 0 {
+	if z.Tags != nil && z.Tags.Len() > 0 {
 		return false
 	}
 
-	if !ids.IsEmpty(z.Typ) {
+	if !ids.IsEmpty(z.Type) {
 		return false
 	}
 
 	return true
 }
 
-func (z *Metadatei) IsEmpty() bool {
+func (z *Metadata) IsEmpty() bool {
 	if !z.Akte.IsNull() {
 		return false
 	}
@@ -127,40 +127,40 @@ func (z *Metadatei) IsEmpty() bool {
 	return true
 }
 
-func (z *Metadatei) SetBezeichnung(b descriptions.Description) {
-	z.Bezeichnung = b
+func (z *Metadata) SetBezeichnung(b descriptions.Description) {
+	z.Description = b
 }
 
-func (z *Metadatei) SetTyp(t ids.Type) {
-	z.Typ = t
+func (z *Metadata) SetTyp(t ids.Type) {
+	z.Type = t
 }
 
-func (z *Metadatei) GetBezeichnung() descriptions.Description {
-	return z.Bezeichnung
+func (z *Metadata) GetBezeichnung() descriptions.Description {
+	return z.Description
 }
 
-func (z *Metadatei) GetBezeichnungPtr() *descriptions.Description {
-	return &z.Bezeichnung
+func (z *Metadata) GetBezeichnungPtr() *descriptions.Description {
+	return &z.Description
 }
 
-func (m *Metadatei) GetEtiketten() ids.TagSet {
-	if m.Etiketten == nil {
-		m.Etiketten = ids.MakeTagMutableSet()
+func (m *Metadata) GetEtiketten() ids.TagSet {
+	if m.Tags == nil {
+		m.Tags = ids.MakeTagMutableSet()
 	}
 
-	return m.Etiketten
+	return m.Tags
 }
 
-func (m *Metadatei) ResetEtiketten() {
-	if m.Etiketten == nil {
-		m.Etiketten = ids.MakeTagMutableSet()
+func (m *Metadata) ResetEtiketten() {
+	if m.Tags == nil {
+		m.Tags = ids.MakeTagMutableSet()
 	}
 
-	m.Etiketten.Reset()
-	m.Verzeichnisse.Etiketten.Reset()
+	m.Tags.Reset()
+	m.Cached.Etiketten.Reset()
 }
 
-func (z *Metadatei) AddEtikettString(es string) (err error) {
+func (z *Metadata) AddEtikettString(es string) (err error) {
 	if es == "" {
 		return
 	}
@@ -180,35 +180,35 @@ func (z *Metadatei) AddEtikettString(es string) (err error) {
 	return
 }
 
-func (m *Metadatei) AddEtikettPtr(e *ids.Tag) (err error) {
+func (m *Metadata) AddEtikettPtr(e *ids.Tag) (err error) {
 	if e == nil || e.String() == "" {
 		return
 	}
 
-	if m.Etiketten == nil {
-		m.Etiketten = ids.MakeTagMutableSet()
+	if m.Tags == nil {
+		m.Tags = ids.MakeTagMutableSet()
 	}
 
-	ids.AddNormalizedEtikett(m.Etiketten, e)
+	ids.AddNormalizedEtikett(m.Tags, e)
 	cs := catgut.MakeFromString(e.String())
-	m.Verzeichnisse.Etiketten.AddEtikett(cs)
+	m.Cached.Etiketten.AddEtikett(cs)
 
 	return
 }
 
-func (m *Metadatei) AddEtikettPtrFast(e *ids.Tag) (err error) {
-	if m.Etiketten == nil {
-		m.Etiketten = ids.MakeTagMutableSet()
+func (m *Metadata) AddEtikettPtrFast(e *ids.Tag) (err error) {
+	if m.Tags == nil {
+		m.Tags = ids.MakeTagMutableSet()
 	}
 
-	if err = m.Etiketten.Add(*e); err != nil {
+	if err = m.Tags.Add(*e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	cs := catgut.MakeFromString(e.String())
 
-	if err = m.Verzeichnisse.Etiketten.AddEtikett(cs); err != nil {
+	if err = m.Cached.Etiketten.AddEtikett(cs); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -216,12 +216,12 @@ func (m *Metadatei) AddEtikettPtrFast(e *ids.Tag) (err error) {
 	return
 }
 
-func (m *Metadatei) SetEtiketten(e ids.TagSet) {
-	if m.Etiketten == nil {
-		m.Etiketten = ids.MakeTagMutableSet()
+func (m *Metadata) SetEtiketten(e ids.TagSet) {
+	if m.Tags == nil {
+		m.Tags = ids.MakeTagMutableSet()
 	}
 
-	iter.ResetMutableSetWithPool(m.Etiketten, ids.GetTagPool())
+	iter.ResetMutableSetWithPool(m.Tags, ids.GetTagPool())
 
 	if e == nil {
 		return
@@ -234,53 +234,53 @@ func (m *Metadatei) SetEtiketten(e ids.TagSet) {
 	errors.PanicIfError(e.EachPtr(m.AddEtikettPtr))
 }
 
-func (z *Metadatei) SetAkteSha(sh interfaces.ShaGetter) {
+func (z *Metadata) SetAkteSha(sh interfaces.ShaGetter) {
 	z.Akte.SetShaLike(sh)
 }
 
-func (z *Metadatei) GetTyp() ids.Type {
-	return z.Typ
+func (z *Metadata) GetTyp() ids.Type {
+	return z.Type
 }
 
-func (z *Metadatei) GetTypPtr() *ids.Type {
-	return &z.Typ
+func (z *Metadata) GetTypPtr() *ids.Type {
+	return &z.Type
 }
 
-func (z *Metadatei) GetTai() ids.Tai {
+func (z *Metadata) GetTai() ids.Tai {
 	return z.Tai
 }
 
 // TODO-P2 remove
-func (b *Metadatei) EqualsSansTai(a *Metadatei) bool {
+func (b *Metadata) EqualsSansTai(a *Metadata) bool {
 	return EqualerSansTai.Equals(a, b)
 }
 
 // TODO-P2 remove
-func (pz *Metadatei) Equals(z1 *Metadatei) bool {
+func (pz *Metadata) Equals(z1 *Metadata) bool {
 	return Equaler.Equals(pz, z1)
 }
 
-func (a *Metadatei) Subtract(
-	b *Metadatei,
+func (a *Metadata) Subtract(
+	b *Metadata,
 ) {
-	if a.Typ.String() == b.Typ.String() {
-		a.Typ = ids.Type{}
+	if a.Type.String() == b.Type.String() {
+		a.Type = ids.Type{}
 	}
 
 	err := b.GetEtiketten().EachPtr(
 		func(e *ids.Tag) (err error) {
-			return a.Etiketten.DelPtr(e)
+			return a.Tags.DelPtr(e)
 		},
 	)
 	errors.PanicIfError(err)
 }
 
-func (mp *Metadatei) AddComment(f string, vals ...interface{}) {
+func (mp *Metadata) AddComment(f string, vals ...interface{}) {
 	mp.Comments = append(mp.Comments, fmt.Sprintf(f, vals...))
 }
 
-func (selbst *Metadatei) SetMutter(mg Getter) (err error) {
-	mutter := mg.GetMetadatei()
+func (selbst *Metadata) SetMutter(mg Getter) (err error) {
+	mutter := mg.GetMetadata()
 
 	if err = selbst.Mutter().SetShaLike(
 		mutter.Sha(),
@@ -299,8 +299,8 @@ func (selbst *Metadatei) SetMutter(mg Getter) (err error) {
 	return
 }
 
-func (m *Metadatei) GenerateExpandedEtiketten() {
-	m.Verzeichnisse.SetExpandedEtiketten(ids.ExpandMany(
+func (m *Metadata) GenerateExpandedEtiketten() {
+	m.Cached.SetExpandedEtiketten(ids.ExpandMany(
 		m.GetEtiketten(),
 		expansion.ExpanderRight,
 	))

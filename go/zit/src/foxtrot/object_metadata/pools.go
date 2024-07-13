@@ -5,15 +5,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 )
 
-var thePool interfaces.Pool[Metadatei, *Metadatei]
+var thePool interfaces.Pool[Metadata, *Metadata]
 
 func init() {
-	thePool = pool.MakePool[Metadatei, *Metadatei](
+	thePool = pool.MakePool[Metadata, *Metadata](
 		nil,
 		Resetter.Reset,
 	)
 }
 
-func GetPool() interfaces.Pool[Metadatei, *Metadatei] {
+func GetPool() interfaces.Pool[Metadata, *Metadata] {
 	return thePool
 }

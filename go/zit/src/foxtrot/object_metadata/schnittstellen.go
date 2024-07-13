@@ -9,23 +9,23 @@ import (
 
 type (
 	Getter interface {
-		GetMetadatei() *Metadatei
+		GetMetadata() *Metadata
 	}
 
 	Setter interface {
-		SetMetadatei(*Metadatei)
+		SetMetadata(*Metadata)
 	}
 
-	MetadateiLike interface {
+	MetadataLike interface {
 		Getter
 	}
 
-	AktePathGetter interface {
-		GetAktePath() string
+	BlobPathGetter interface {
+		GetBlobPath() string
 	}
 
-	AktePathSetter interface {
-		SetAkteFD(*fd.FD) error
+	BlobPathSetter interface {
+		SetBlobFD(*fd.FD) error
 	}
 
 	PersistentFormatterContext interface {
@@ -43,7 +43,7 @@ type (
 
 	TextParserContext interface {
 		PersistentParserContext
-		SetAkteSha(interfaces.ShaLike) error
+		SetBlobSha(interfaces.Sha) error
 	}
 
 	TextFormatOutput struct {

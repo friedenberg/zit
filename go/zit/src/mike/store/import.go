@@ -37,7 +37,7 @@ func (s *Store) Import(sk *sku.Transacted) (co *store_fs.CheckedOut, err error) 
 		return
 	}
 
-	if err = s.ReadOneInto(sk.GetKennung(), &co.Internal); err != nil {
+	if err = s.ReadOneInto(sk.GetObjectId(), &co.Internal); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = s.tryRealizeAndOrStore(
 				sk,

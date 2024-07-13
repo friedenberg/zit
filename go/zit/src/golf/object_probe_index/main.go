@@ -29,16 +29,16 @@ type (
 	Ennui interface {
 		GetEnnui() Ennui
 		commonInterface
-		AddMetadatei(*object_metadata.Metadatei, Loc) error
-		ReadOneKey(string, *object_metadata.Metadatei) (Loc, error)
-		ReadManyKeys(string, *object_metadata.Metadatei, *[]Loc) error
-		ReadAll(*object_metadata.Metadatei, *[]Loc) error
+		AddMetadatei(*object_metadata.Metadata, Loc) error
+		ReadOneKey(string, *object_metadata.Metadata) (Loc, error)
+		ReadManyKeys(string, *object_metadata.Metadata, *[]Loc) error
+		ReadAll(*object_metadata.Metadata, *[]Loc) error
 		PrintAll() error
 		errors.Flusher
 	}
 )
 
-type Metadatei = object_metadata.Metadatei
+type Metadatei = object_metadata.Metadata
 
 const (
 	DigitWidth = 1
@@ -137,7 +137,7 @@ func (e *object_probe_index) ReadMany(sh *Sha, locs *[]Loc) (err error) {
 	return e.pages[i].ReadMany(sh, locs)
 }
 
-func (e *object_probe_index) ReadOneKey(kf string, m *object_metadata.Metadatei) (loc Loc, err error) {
+func (e *object_probe_index) ReadOneKey(kf string, m *object_metadata.Metadata) (loc Loc, err error) {
 	var f object_inventory_format.FormatGeneric
 
 	if f, err = object_inventory_format.FormatForKeyError(kf); err != nil {
@@ -164,7 +164,7 @@ func (e *object_probe_index) ReadOneKey(kf string, m *object_metadata.Metadatei)
 
 func (e *object_probe_index) ReadManyKeys(
 	kf string,
-	m *object_metadata.Metadatei,
+	m *object_metadata.Metadata,
 	h *[]Loc,
 ) (err error) {
 	var f object_inventory_format.FormatGeneric
@@ -184,7 +184,7 @@ func (e *object_probe_index) ReadManyKeys(
 	return e.ReadMany(sh, h)
 }
 
-func (e *object_probe_index) ReadAll(m *object_metadata.Metadatei, h *[]Loc) (err error) {
+func (e *object_probe_index) ReadAll(m *object_metadata.Metadata, h *[]Loc) (err error) {
 	var shas map[string]*sha.Sha
 
 	if shas, err = object_inventory_format.GetShasForMetadatei(m); err != nil {

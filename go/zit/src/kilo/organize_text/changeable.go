@@ -10,7 +10,7 @@ import (
 
 func key(sk *sku.Transacted) string {
 	if sk.Kennung.IsEmpty() {
-		s := sk.Metadatei.Bezeichnung.String()
+		s := sk.Metadatei.Description.String()
 
 		if s == "" {
 			panic("empty key")
@@ -72,7 +72,7 @@ func (a *Assignment) addToSet(
 				}
 
 				if !ot.Metadatei.Typ.IsEmpty() {
-					z.Metadatei.Typ.ResetWith(ot.Metadatei.Typ)
+					z.Metadatei.Type.ResetWith(ot.Metadatei.Typ)
 				}
 
 				out.Add(z)
@@ -81,11 +81,11 @@ func (a *Assignment) addToSet(
 
 				if hasOriginal {
 					z.Metadatei.Akte.ResetWith(&zPrime.Metadatei.Akte)
-					z.Metadatei.Typ.ResetWith(zPrime.Metadatei.Typ)
+					z.Metadatei.Type.ResetWith(zPrime.Metadatei.Type)
 				}
 
 				if !ot.Metadatei.Typ.IsEmpty() {
-					z.Metadatei.Typ.ResetWith(ot.Metadatei.Typ)
+					z.Metadatei.Type.ResetWith(ot.Metadatei.Typ)
 				}
 			}
 
@@ -93,16 +93,16 @@ func (a *Assignment) addToSet(
 				panic(fmt.Sprintf("%s: Kennung is nil", o))
 			}
 
-			if err = z.Metadatei.Bezeichnung.Set(
-				o.Metadatei.Bezeichnung.String(),
+			if err = z.Metadatei.Description.Set(
+				o.Metadatei.Description.String(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if !o.Metadatei.Typ.IsEmpty() {
-				if err = z.Metadatei.Typ.Set(
-					o.Metadatei.Typ.String(),
+			if !o.Metadatei.Type.IsEmpty() {
+				if err = z.Metadatei.Type.Set(
+					o.Metadatei.Type.String(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return

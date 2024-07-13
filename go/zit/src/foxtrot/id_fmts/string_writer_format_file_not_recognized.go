@@ -9,13 +9,13 @@ import (
 
 type fileNotRecognizedStringWriterFormat struct {
 	rightAlignedWriter    interfaces.StringFormatWriter[string]
-	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike]
+	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha]
 	fdStringFormatWriter  interfaces.StringFormatWriter[*fd.FD]
 }
 
 func MakeFileNotRecognizedStringWriterFormat(
 	fdStringFormatWriter interfaces.StringFormatWriter[*fd.FD],
-	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
+	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 ) *fileNotRecognizedStringWriterFormat {
 	return &fileNotRecognizedStringWriterFormat{
 		rightAlignedWriter:    string_format_writer.MakeRightAligned(),

@@ -37,13 +37,13 @@ func (f textParser) ParseMetadatei(
 	r io.Reader,
 	c TextParserContext,
 ) (n int64, err error) {
-	m := c.GetMetadatei()
+	m := c.GetMetadata()
 	Resetter.Reset(m)
 
 	var n1 int64
 
 	defer func() {
-		c.SetAkteSha(&m.Akte)
+		c.SetBlobSha(&m.Akte)
 	}()
 
 	var akteFD fd.FD
@@ -52,7 +52,7 @@ func (f textParser) ParseMetadatei(
 		ohio.MakeLineReaderIterate(
 			ohio.MakeLineReaderKeyValues(
 				map[string]interfaces.FuncSetString{
-					"#": m.Bezeichnung.Set,
+					"#": m.Description.Set,
 					"%": func(v string) (err error) {
 						m.Comments = append(m.Comments, v)
 						return
@@ -109,7 +109,7 @@ func (f textParser) ParseMetadatei(
 
 	if !m.Akte.IsNull() && !akteFD.GetShaLike().IsNull() {
 		err = errors.Wrap(
-			MakeErrHasInlineAkteAndFilePath(
+			MakeErrHasInlineBlobAndFilePath(
 				&akteFD,
 				inlineAkteSha,
 			),
@@ -134,7 +134,7 @@ func (f textParser) ParseMetadatei(
 	case !m.Akte.IsNull() && !inlineAkteSha.IsNull() &&
 		!m.Akte.Equals(inlineAkteSha):
 		err = errors.Wrap(
-			MakeErrHasInlineAkteAndMetadateiSha(
+			MakeErrHasInlineBlobAndMetadateiSha(
 				inlineAkteSha,
 				&m.Akte,
 			),
@@ -147,7 +147,7 @@ func (f textParser) ParseMetadatei(
 }
 
 func (f textParser) readTyp(
-	m *Metadatei,
+	m *Metadata,
 	desc string,
 	akteFD *fd.FD,
 ) (err error) {
@@ -161,7 +161,7 @@ func (f textParser) readTyp(
 	//! <path>.<typ ext>
 	switch {
 	case files.Exists(desc):
-		if err = m.Typ.Set(tail); err != nil {
+		if err = m.Type.Set(tail); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -181,7 +181,7 @@ func (f textParser) readTyp(
 			return
 		}
 
-		if err = m.Typ.Set(tail); err != nil {
+		if err = m.Type.Set(tail); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -198,7 +198,7 @@ func (f textParser) readTyp(
 
 	//! <typ ext>
 	default:
-		if err = m.Typ.Set(head); err != nil {
+		if err = m.Type.Set(head); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -208,7 +208,7 @@ func (f textParser) readTyp(
 }
 
 func (f textParser) setAkteSha(
-	m *Metadatei,
+	m *Metadata,
 	maybeSha string,
 ) (err error) {
 	if err = m.Akte.Set(maybeSha); err != nil {

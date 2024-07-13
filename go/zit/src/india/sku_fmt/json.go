@@ -26,7 +26,7 @@ type Json struct {
 
 func (j *Json) FromStringAndMetadatei(
 	k string,
-	m *object_metadata.Metadatei,
+	m *object_metadata.Metadata,
 	s fs_home.Standort,
 ) (err error) {
 	var r sha.ReadCloser
@@ -47,12 +47,12 @@ func (j *Json) FromStringAndMetadatei(
 
 	j.Akte = out.String()
 	j.AkteSha = m.Akte.String()
-	j.Bezeichnung = m.Bezeichnung.String()
+	j.Bezeichnung = m.Description.String()
 	j.Etiketten = iter.Strings(m.GetEtiketten())
 	j.Kennung = k
 	j.Sha = m.SelbstMetadateiSansTai.String()
 	j.Tai = m.Tai.String()
-	j.Typ = m.Typ.String()
+	j.Typ = m.Type.String()
 
 	return
 }
@@ -61,7 +61,7 @@ func (j *Json) FromTransacted(
 	sk *sku.Transacted,
 	s fs_home.Standort,
 ) (err error) {
-	return j.FromStringAndMetadatei(sk.Kennung.String(), sk.GetMetadatei(), s)
+	return j.FromStringAndMetadatei(sk.Kennung.String(), sk.GetMetadata(), s)
 }
 
 func (j *Json) ToTransacted(sk *sku.Transacted, s fs_home.Standort) (err error) {
@@ -80,7 +80,7 @@ func (j *Json) ToTransacted(sk *sku.Transacted, s fs_home.Standort) (err error) 
 	}
 
 	// TODO-P1 support states of akte vs akte sha
-	sk.SetAkteSha(w.GetShaLike())
+	sk.SetBlobSha(w.GetShaLike())
 
 	// if err = sk.Metadatei.Tai.Set(j.Tai); err != nil {
 	// 	err = errors.Wrap(err)
@@ -92,12 +92,12 @@ func (j *Json) ToTransacted(sk *sku.Transacted, s fs_home.Standort) (err error) 
 		return
 	}
 
-	if err = sk.Metadatei.Typ.Set(j.Typ); err != nil {
+	if err = sk.Metadatei.Type.Set(j.Typ); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = sk.Metadatei.Bezeichnung.Set(j.Bezeichnung); err != nil {
+	if err = sk.Metadatei.Description.Set(j.Bezeichnung); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

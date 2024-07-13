@@ -111,7 +111,7 @@ func (r readCloser) Close() (err error) {
 	return
 }
 
-func (r readCloser) GetShaLike() interfaces.ShaLike {
+func (r readCloser) GetShaLike() interfaces.Sha {
 	return FromHash(r.hash)
 }
 
@@ -134,7 +134,7 @@ func (nrc nopReadCloser) WriteTo(w io.Writer) (n int64, err error) {
 	return io.Copy(w, nrc.ReadCloser)
 }
 
-func (nrc nopReadCloser) GetShaLike() interfaces.ShaLike {
+func (nrc nopReadCloser) GetShaLike() interfaces.Sha {
 	return &Sha{}
 }
 

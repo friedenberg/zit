@@ -558,7 +558,7 @@ func (b *Builder) makeEtikettOrEtikettLua(
 	lb := b.luaVMPoolBuilder.Clone().WithApply(MakeSelbstApply(sk))
 
 	// TODO use repo pattern
-	if sk.GetTyp().String() == "lua" {
+	if sk.GetType().String() == "lua" {
 		var ar sha.ReadCloser
 
 		if ar, err = b.fs_home.BlobReader(sk.GetAkteSha()); err != nil {

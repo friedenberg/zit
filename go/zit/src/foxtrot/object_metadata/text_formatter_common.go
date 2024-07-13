@@ -29,7 +29,7 @@ func (f textFormatterCommon) writeComments(
 ) (n int64, err error) {
 	n1 := 0
 
-	for _, c := range c.GetMetadatei().Comments {
+	for _, c := range c.GetMetadata().Comments {
 		n1, err = io.WriteString(w1, "% ")
 		n += int64(n1)
 
@@ -74,10 +74,10 @@ func (f textFormatterCommon) writeCommonMetadateiFormat(
 	c TextFormatterContext,
 ) (n int64, err error) {
 	w := format.NewLineWriter()
-	m := c.GetMetadatei()
+	m := c.GetMetadata()
 
-	if m.Bezeichnung.String() != "" || !f.DoNotWriteEmptyBezeichnung {
-		sr := bufio.NewReader(strings.NewReader(m.Bezeichnung.String()))
+	if m.Description.String() != "" || !f.DoNotWriteEmptyBezeichnung {
+		sr := bufio.NewReader(strings.NewReader(m.Description.String()))
 
 		for {
 			var line string
@@ -119,21 +119,21 @@ func (f textFormatterCommon) writeTyp(
 	w1 io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {
-	m := c.GetMetadatei()
+	m := c.GetMetadata()
 
-	if m.Typ.IsEmpty() {
+	if m.Type.IsEmpty() {
 		return
 	}
 
-	return ohio.WriteLine(w1, fmt.Sprintf("! %s", m.Typ))
+	return ohio.WriteLine(w1, fmt.Sprintf("! %s", m.Type))
 }
 
 func (f textFormatterCommon) writeShaTyp(
 	w1 io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {
-	m := c.GetMetadatei()
-	return ohio.WriteLine(w1, fmt.Sprintf("! %s.%s", &m.Akte, m.Typ))
+	m := c.GetMetadata()
+	return ohio.WriteLine(w1, fmt.Sprintf("! %s.%s", &m.Akte, m.Type))
 }
 
 func (f textFormatterCommon) writePathTyp(
@@ -142,8 +142,8 @@ func (f textFormatterCommon) writePathTyp(
 ) (n int64, err error) {
 	var ap string
 
-	if apg, ok := c.(AktePathGetter); ok {
-		ap = apg.GetAktePath()
+	if apg, ok := c.(BlobPathGetter); ok {
+		ap = apg.GetBlobPath()
 	} else {
 		err = errors.Errorf("unable to convert %T int %T", c, apg)
 		return
@@ -157,7 +157,7 @@ func (f textFormatterCommon) writeAkte(
 	c TextFormatterContext,
 ) (n int64, err error) {
 	var ar io.ReadCloser
-	m := c.GetMetadatei()
+	m := c.GetMetadata()
 
 	if ar, err = f.akteFactory.BlobReader(&m.Akte); err != nil {
 		err = errors.Wrap(err)

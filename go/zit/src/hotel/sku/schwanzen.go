@@ -39,7 +39,7 @@ func (zws *Schwanzen) Less(zt *Transacted) (ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 
-	t, ok := zws.object_id_provider[zt.GetKennung().String()]
+	t, ok := zws.object_id_provider[zt.GetObjectId().String()]
 
 	switch {
 	case !ok:
@@ -69,7 +69,7 @@ func (zws *Schwanzen) Set(z *Transacted, flush bool) (ok bool) {
 	zws.lock.Lock()
 	defer zws.lock.Unlock()
 
-	h := z.GetKennung()
+	h := z.GetObjectId()
 	t1, found := zws.object_id_provider[h.String()]
 
 	switch {

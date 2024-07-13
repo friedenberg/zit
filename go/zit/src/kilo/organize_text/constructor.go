@@ -59,7 +59,7 @@ func (c *constructor) collectExplicitAndImplicitFor(
 
 	if err = skus.Each(
 		func(sk *sku.Transacted) (err error) {
-			for _, ewp := range sk.Metadatei.Verzeichnisse.Etiketten.All {
+			for _, ewp := range sk.Metadatei.Cached.Etiketten.All {
 				if ewp.Etikett.String() == sk.Kennung.String() {
 					continue
 				}
@@ -338,7 +338,7 @@ func (c *constructor) removeEtikettenIfNecessary(
 		return
 	}
 
-	if o.Metadatei.Bezeichnung.IsEmpty() {
+	if o.Metadatei.Description.IsEmpty() {
 		return
 	}
 

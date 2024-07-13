@@ -52,16 +52,16 @@ type (
 
 		GetKopf() ids.Tai
 		GetTai() ids.Tai
-		GetTyp() ids.Type
-		GetKennung() ids.IdLike
-		GetObjekteSha() interfaces.ShaLike
-		GetAkteSha() interfaces.ShaLike
+		GetType() ids.Type
+		GetObjectId() *ids.ObjectId
+		GetObjekteSha() interfaces.Sha
+		GetAkteSha() interfaces.Sha
 		GetKey() string
 
 		object_metadata.Getter
 
-		SetAkteSha(interfaces.ShaLike) error
-		SetObjekteSha(interfaces.ShaLike) error
+		SetBlobSha(interfaces.Sha) error
+		SetObjectSha(interfaces.Sha) error
 		CalculateObjekteShas() (err error)
 
 		SetTai(ids.Tai)
@@ -115,7 +115,7 @@ type (
 )
 
 func EqualsSkuLike(a, b SkuLike) (ok bool) {
-	if !ids.Equals(a.GetKennung(), b.GetKennung()) {
+	if !ids.Equals(a.GetObjectId(), b.GetObjectId()) {
 		return
 	}
 

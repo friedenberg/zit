@@ -26,7 +26,7 @@ func (f v5) FormatPersistentMetadatei(
 	w.Reset(w1)
 	defer errors.DeferredFlusher(&err, w)
 
-	m := c.GetMetadatei()
+	m := c.GetMetadata()
 
 	var (
 		n1 int
@@ -47,7 +47,7 @@ func (f v5) FormatPersistentMetadatei(
 		}
 	}
 
-	lines := strings.Split(m.Bezeichnung.String(), "\n")
+	lines := strings.Split(m.Description.String(), "\n")
 
 	for _, line := range lines {
 		if line == "" {
@@ -90,7 +90,7 @@ func (f v5) FormatPersistentMetadatei(
 	n1, err = ohio.WriteKeySpaceValueNewlineString(
 		w,
 		keyGattung.String(),
-		c.GetKennung().GetGenre().GetGenreString(),
+		c.GetObjectId().GetGenre().GetGenreString(),
 	)
 	n += int64(n1)
 
@@ -102,7 +102,7 @@ func (f v5) FormatPersistentMetadatei(
 	n1, err = ohio.WriteKeySpaceValueNewlineString(
 		w,
 		keyKennung.String(),
-		c.GetKennung().String(),
+		c.GetObjectId().String(),
 	)
 	n += int64(n1)
 
@@ -139,7 +139,7 @@ func (f v5) FormatPersistentMetadatei(
 		}
 	}
 
-	if !m.Typ.IsEmpty() {
+	if !m.Type.IsEmpty() {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			w,
 			keyTyp.String(),
@@ -154,11 +154,11 @@ func (f v5) FormatPersistentMetadatei(
 	}
 
 	if o.Verzeichnisse {
-		if m.Verzeichnisse.Schlummernd.Bool() {
+		if m.Cached.Schlummernd.Bool() {
 			n1, err = ohio.WriteKeySpaceValueNewlineString(
 				w,
 				keyVerzeichnisseArchiviert.String(),
-				m.Verzeichnisse.Schlummernd.String(),
+				m.Cached.Schlummernd.String(),
 			)
 			n += int64(n1)
 
@@ -168,11 +168,11 @@ func (f v5) FormatPersistentMetadatei(
 			}
 		}
 
-		if m.Verzeichnisse.GetExpandedEtiketten().Len() > 0 {
+		if m.Cached.GetExpandedEtiketten().Len() > 0 {
 			k := keyVerzeichnisseEtikettExpanded.String()
 
 			for _, e := range iter.SortedValues[ids.Tag](
-				m.Verzeichnisse.GetExpandedEtiketten(),
+				m.Cached.GetExpandedEtiketten(),
 			) {
 				n1, err = ohio.WriteKeySpaceValueNewlineString(
 					w,
@@ -188,11 +188,11 @@ func (f v5) FormatPersistentMetadatei(
 			}
 		}
 
-		if m.Verzeichnisse.GetImplicitEtiketten().Len() > 0 {
+		if m.Cached.GetImplicitEtiketten().Len() > 0 {
 			k := keyVerzeichnisseEtikettImplicit.String()
 
 			for _, e := range iter.SortedValues[ids.Tag](
-				m.Verzeichnisse.GetImplicitEtiketten(),
+				m.Cached.GetImplicitEtiketten(),
 			) {
 				n2, err = ohio.WriteKeySpaceValueNewline(
 					w,
@@ -256,7 +256,7 @@ func (f v5) ParsePersistentMetadatei(
 	c ParserContext,
 	o Options,
 ) (n int64, err error) {
-	m := c.GetMetadatei()
+	m := c.GetMetadata()
 
 	var (
 		g genres.Genre
@@ -311,7 +311,7 @@ func (f v5) ParsePersistentMetadatei(
 			}
 
 		case key.Equal(keyBezeichnung.Bytes()):
-			if err = m.Bezeichnung.Set(val.String()); err != nil {
+			if err = m.Description.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -356,13 +356,13 @@ func (f v5) ParsePersistentMetadatei(
 			}
 
 		case key.Equal(keyTyp.Bytes()):
-			if err = m.Typ.Set(val.String()); err != nil {
+			if err = m.Type.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 		case key.Equal(keyVerzeichnisseArchiviert.Bytes()):
-			if err = m.Verzeichnisse.Schlummernd.Set(val.String()); err != nil {
+			if err = m.Cached.Schlummernd.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -383,7 +383,7 @@ func (f v5) ParsePersistentMetadatei(
 				return
 			}
 
-			if err = m.Verzeichnisse.AddEtikettImplicitPtr(e); err != nil {
+			if err = m.Cached.AddEtikettImplicitPtr(e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -404,7 +404,7 @@ func (f v5) ParsePersistentMetadatei(
 				return
 			}
 
-			if err = m.Verzeichnisse.AddEtikettExpandedPtr(e); err != nil {
+			if err = m.Cached.AddEtikettExpandedPtr(e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

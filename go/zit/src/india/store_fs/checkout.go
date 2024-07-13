@@ -172,7 +172,7 @@ func (s *Store) checkoutOne(
 
 	cz.State = checked_out_state.StateJustCheckedOut
 
-	t := cz.Internal.GetTyp()
+	t := cz.Internal.GetType()
 	inlineAkte := s.konfig.IsInlineTyp(t)
 
 	if options.CheckoutMode.IncludesObjekte() {
@@ -276,7 +276,7 @@ func (s *Store) filenameForTransacted(
 	case genres.Zettel:
 		var h ids.ZettelId
 
-		if err = h.Set(sz.GetKennung().String()); err != nil {
+		if err = h.Set(sz.GetObjectId().String()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

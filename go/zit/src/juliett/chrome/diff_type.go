@@ -64,7 +64,7 @@ func (c *Store) getDiff(kinder, mutter *sku.Transacted) (dt diff, err error) {
 func (c *Store) getDiffKinderOnly(kinder *sku.Transacted) (dt diff, err error) {
 	dt.diffType = diffTypeIgnore
 
-	if !kinder.GetTyp().Equals(c.typ) {
+	if !kinder.GetType().Equals(c.typ) {
 		return
 	}
 

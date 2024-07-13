@@ -73,7 +73,7 @@ func (w *writer) setShaLikeIfNecessary() {
 	}
 }
 
-func (w *writer) GetShaLike() (s interfaces.ShaLike) {
+func (w *writer) GetShaLike() (s interfaces.Sha) {
 	w.setShaLikeIfNecessary()
 	s = &w.sh
 

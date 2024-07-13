@@ -246,7 +246,7 @@ func (c *ZettelFromExternalAkte) zettelForAkte(
 		return
 	}
 
-	z.SetAkteSha(akteFD.GetShaLike())
+	z.SetBlobSha(akteFD.GetShaLike())
 
 	return
 }

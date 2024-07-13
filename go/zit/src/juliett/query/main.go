@@ -215,7 +215,7 @@ func (q *Query) ShouldHide(sk *sku.Transacted, k string) bool {
 }
 
 func (q *Query) ContainsSku(sk *sku.Transacted) (ok bool) {
-	defer sk.Metadatei.Verzeichnisse.QueryPath.PushOnOk(q, &ok)
+	defer sk.Metadatei.Cached.QueryPath.PushOnOk(q, &ok)
 	k := sk.Kennung.String()
 
 	if q.ShouldHide(sk, k) {

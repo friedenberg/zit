@@ -71,7 +71,7 @@ func (bf *binaryEncoder) writeFormat(
 			return
 		}
 
-		ui.Debug().Print(sk, bf.Len(), &sk.Metadatei.Verzeichnisse.Etiketten)
+		ui.Debug().Print(sk, bf.Len(), &sk.Metadatei.Cached.Etiketten)
 		panic(r)
 	}()
 	// TODO
@@ -101,7 +101,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		s := sk.Sigil
 		s.Add(bf.Sigil)
 
-		if sk.Metadatei.Verzeichnisse.Schlummernd.Bool() {
+		if sk.Metadatei.Cached.Schlummernd.Bool() {
 			s.Add(ids.SigilHidden)
 		}
 
@@ -117,11 +117,11 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.Description:
-		if sk.Metadatei.Bezeichnung.IsEmpty() {
+		if sk.Metadatei.Description.IsEmpty() {
 			return
 		}
 
-		if n, err = bf.writeFieldBinaryMarshaler(&sk.Metadatei.Bezeichnung); err != nil {
+		if n, err = bf.writeFieldBinaryMarshaler(&sk.Metadatei.Description); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -162,11 +162,11 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.Type:
-		if sk.Metadatei.Typ.IsEmpty() {
+		if sk.Metadatei.Type.IsEmpty() {
 			return
 		}
 
-		if n, err = bf.writeFieldBinaryMarshaler(&sk.Metadatei.Typ); err != nil {
+		if n, err = bf.writeFieldBinaryMarshaler(&sk.Metadatei.Type); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -200,7 +200,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.VerzeichnisseEtikettImplicit:
-		es := sk.Metadatei.Verzeichnisse.GetImplicitEtiketten()
+		es := sk.Metadatei.Cached.GetImplicitEtiketten()
 
 		for _, e := range iter.SortedValues[ids.Tag](es) {
 			var n1 int64
@@ -214,7 +214,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.VerzeichnisseEtikettExpanded:
-		es := sk.Metadatei.Verzeichnisse.GetExpandedEtiketten()
+		es := sk.Metadatei.Cached.GetExpandedEtiketten()
 
 		for _, e := range iter.SortedValues[ids.Tag](es) {
 			var n1 int64
@@ -228,7 +228,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.VerzeichnisseEtiketten:
-		es := sk.Metadatei.Verzeichnisse.Etiketten
+		es := sk.Metadatei.Cached.Etiketten
 
 		for _, e := range es.Paths {
 			var n1 int64

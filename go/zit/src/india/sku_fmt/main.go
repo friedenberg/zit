@@ -21,7 +21,7 @@ func (k KeyerSkuLikeUnique) GetKey(o *sku.Transacted) string {
 		"%s %s %s %s %s",
 		o.GetTai(),
 		o.GetGenre(),
-		o.GetKennung(),
+		o.GetObjectId(),
 		o.GetObjekteSha(),
 		o.GetAkteSha(),
 	)
@@ -32,7 +32,7 @@ func String(o *sku.Transacted) (str string) {
 		"%s %s %s %s %s",
 		o.GetTai(),
 		o.GetGenre(),
-		o.GetKennung(),
+		o.GetObjectId(),
 		o.GetObjekteSha(),
 		o.GetAkteSha(),
 	)

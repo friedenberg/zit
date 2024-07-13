@@ -62,7 +62,7 @@ func MakeFlags() Flags {
 	}
 }
 
-func MakeFlagsWithMetadatei(m object_metadata.Metadatei) Flags {
+func MakeFlagsWithMetadatei(m object_metadata.Metadata) Flags {
 	ui.Debug().Print(m.GetEtiketten())
 
 	return Flags{

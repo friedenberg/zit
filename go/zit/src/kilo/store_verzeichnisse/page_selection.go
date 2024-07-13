@@ -31,7 +31,7 @@ func (i *Store) PageForString(s string) (n uint8, err error) {
 	return i.PageForSha(sh)
 }
 
-func (i *Store) PageForSha(s interfaces.ShaLike) (n uint8, err error) {
+func (i *Store) PageForSha(s interfaces.Sha) (n uint8, err error) {
 	var n1 int64
 	ss := s.String()[:DigitWidth]
 

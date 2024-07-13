@@ -133,11 +133,11 @@ func (c Add) Run(
 
 	opOrganize := user_ops.Organize{
 		Umwelt:    u,
-		Metadatei: c.Metadatei,
+		Metadata: c.Metadatei,
 	}
 
 	if err = u.GetKonfig().DefaultEtiketten.EachPtr(
-		opOrganize.Metadatei.AddEtikettPtr,
+		opOrganize.Metadata.AddEtikettPtr,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
