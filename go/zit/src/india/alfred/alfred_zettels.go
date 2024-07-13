@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/echo/alfred"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -37,7 +37,7 @@ func (w *Writer) addCommonMatches(
 	mb.AddMatches(z.GetMetadatei().Bezeichnung.String())
 	mb.AddMatches(z.GetTyp().String())
 	z.Metadatei.GetEtiketten().Each(
-		func(e kennung.Tag) (err error) {
+		func(e ids.Tag) (err error) {
 			expansion.ExpanderAll.Expand(
 				func(v string) (err error) {
 					mb.AddMatches(v)
@@ -112,7 +112,7 @@ func (w *Writer) zettelToItem(
 
 func (w *Writer) etikettToItem(
 	z *sku.Transacted,
-	e *kennung.Tag,
+	e *ids.Tag,
 ) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
@@ -136,7 +136,7 @@ func (w *Writer) errorToItem(err error) (a *alfred.Item) {
 	return
 }
 
-func (w *Writer) hinweisToItem(e kennung.ZettelId) (a *alfred.Item) {
+func (w *Writer) hinweisToItem(e ids.ZettelId) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
 	a.Title = e.String()

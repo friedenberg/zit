@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type (
@@ -22,20 +22,20 @@ func (s EtikettenWithParentsAndTypes) Len() int {
 }
 
 func (s EtikettenWithParentsAndTypes) ContainsKennungEtikett(
-	k *kennung.ObjectId,
+	k *ids.ObjectId,
 ) (int, bool) {
 	return s.containsKennungEtikett(k, true)
 }
 
 func (s EtikettenWithParentsAndTypes) ContainsKennungEtikettExact(
-	k *kennung.ObjectId,
+	k *ids.ObjectId,
 ) (int, bool) {
 	return s.containsKennungEtikett(k, false)
 }
 
 // TODO make less fragile
 func (s EtikettenWithParentsAndTypes) containsKennungEtikett(
-	k *kennung.ObjectId,
+	k *ids.ObjectId,
 	partial bool,
 ) (int, bool) {
 	e := k.PartsStrings().Right

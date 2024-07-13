@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 )
 
@@ -21,12 +21,12 @@ type fileEncoder struct {
 	mode int
 	perm os.FileMode
 	arf  interfaces.BlobIOFactory
-	ic   kennung.InlineTypChecker
+	ic   ids.InlineTypChecker
 }
 
 func MakeFileEncoder(
 	arf interfaces.BlobIOFactory,
-	ic kennung.InlineTypChecker,
+	ic ids.InlineTypChecker,
 ) *fileEncoder {
 	return &fileEncoder{
 		mode: os.O_WRONLY | os.O_CREATE | os.O_TRUNC,
@@ -38,7 +38,7 @@ func MakeFileEncoder(
 
 func MakeFileEncoderJustOpen(
 	arf interfaces.BlobIOFactory,
-	ic kennung.InlineTypChecker,
+	ic ids.InlineTypChecker,
 ) fileEncoder {
 	return fileEncoder{
 		mode: os.O_WRONLY | os.O_TRUNC,

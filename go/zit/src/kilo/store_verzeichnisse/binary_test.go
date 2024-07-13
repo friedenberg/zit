@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -13,21 +13,21 @@ func TestBinaryOne(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	b := new(bytes.Buffer)
-	coder := binaryEncoder{Sigil: kennung.SigilLatest}
-	decoder := makeBinary(kennung.SigilLatest)
+	coder := binaryEncoder{Sigil: ids.SigilLatest}
+	decoder := makeBinary(ids.SigilLatest)
 	expected := &sku.Transacted{}
 	var expectedN int64
 	var err error
 
 	{
-		t.AssertNoError(expected.Kennung.SetWithIdLike(kennung.MustZettelId("one/uno")))
-		expected.SetTai(kennung.NowTai())
+		t.AssertNoError(expected.Kennung.SetWithIdLike(ids.MustZettelId("one/uno")))
+		expected.SetTai(ids.NowTai())
 		t.AssertNoError(expected.Metadatei.Akte.Set(
 			"ed500e315f33358824203cee073893311e0a80d77989dc55c5d86247d95b2403",
 		))
 		t.AssertNoError(expected.Metadatei.Typ.Set("da-typ"))
 		t.AssertNoError(expected.Metadatei.Bezeichnung.Set("the bez"))
-		t.AssertNoError(expected.AddEtikettPtr(kennung.MustEtikettPtr("tag")))
+		t.AssertNoError(expected.AddEtikettPtr(ids.MustEtikettPtr("tag")))
 		t.AssertNoError(expected.Metadatei.Mutter().Set(
 			"3c5d8b1db2149d279f4d4a6cb9457804aac6944834b62aa283beef99bccd10f0",
 		))

@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type v4 struct{}
@@ -69,7 +69,7 @@ func (f v4) FormatPersistentMetadatei(
 
 	es := m.GetEtiketten()
 
-	for _, e := range iter.SortedValues[kennung.Tag](es) {
+	for _, e := range iter.SortedValues[ids.Tag](es) {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,
 			keyEtikett.String(),
@@ -167,7 +167,7 @@ func (f v4) FormatPersistentMetadatei(
 		if m.Verzeichnisse.GetExpandedEtiketten().Len() > 0 {
 			k := keyVerzeichnisseEtikettExpanded.String()
 
-			for _, e := range iter.SortedValues[kennung.Tag](
+			for _, e := range iter.SortedValues[ids.Tag](
 				m.Verzeichnisse.GetExpandedEtiketten(),
 			) {
 				n1, err = ohio.WriteKeySpaceValueNewlineString(
@@ -187,7 +187,7 @@ func (f v4) FormatPersistentMetadatei(
 		if m.Verzeichnisse.GetImplicitEtiketten().Len() > 0 {
 			k := keyVerzeichnisseEtikettImplicit.String()
 
-			for _, e := range iter.SortedValues[kennung.Tag](
+			for _, e := range iter.SortedValues[ids.Tag](
 				m.Verzeichnisse.GetImplicitEtiketten(),
 			) {
 				n2, err = ohio.WriteKeySpaceValueNewline(

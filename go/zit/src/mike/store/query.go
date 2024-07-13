@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
@@ -30,7 +30,7 @@ func (s *Store) Query(
 		qg,
 		qg.MakeEmitSkuSigilSchwanzen(
 			f,
-			kennung.RepoId{},
+			ids.RepoId{},
 			s.UpdateTransactedWithExternal,
 		),
 	); err != nil {

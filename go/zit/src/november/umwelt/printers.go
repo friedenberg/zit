@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/bezeichnung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/kennung_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -56,7 +56,7 @@ func (u *Umwelt) StringFormatWriterKennungAligned(
 
 func (u *Umwelt) StringFormatWriterKennung(
 	co string_format_writer.ColorOptions,
-) interfaces.StringFormatWriter[*kennung.ObjectId] {
+) interfaces.StringFormatWriter[*ids.ObjectId] {
 	return kennung_fmt.MakeKennungCliFormat(
 		u.konfig.PrintOptions,
 		co,
@@ -66,7 +66,7 @@ func (u *Umwelt) StringFormatWriterKennung(
 
 func (u *Umwelt) StringFormatWriterTyp(
 	co string_format_writer.ColorOptions,
-) interfaces.StringFormatWriter[*kennung.Type] {
+) interfaces.StringFormatWriter[*ids.Type] {
 	return kennung_fmt.MakeTypCliFormat(co)
 }
 
@@ -80,7 +80,7 @@ func (u *Umwelt) StringFormatWriterBezeichnung(
 
 func (u *Umwelt) StringFormatWriterEtiketten(
 	co string_format_writer.ColorOptions,
-) interfaces.StringFormatWriter[*kennung.Tag] {
+) interfaces.StringFormatWriter[*ids.Tag] {
 	return kennung_fmt.MakeEtikettenCliFormat()
 }
 
@@ -311,7 +311,7 @@ func (u *Umwelt) PrinterCheckedOutChrome() interfaces.FuncIter[sku.CheckedOutLik
 }
 
 func (u *Umwelt) PrinterCheckedOutForKasten(
-	k kennung.RepoId,
+	k ids.RepoId,
 ) interfaces.FuncIter[sku.CheckedOutLike] {
 	pcofs := u.PrinterCheckedOutFS()
 	pcochrome := u.PrinterCheckedOutChrome()

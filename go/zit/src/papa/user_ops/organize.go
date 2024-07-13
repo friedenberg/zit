@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/vim_cli_options_builder"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -25,7 +25,7 @@ type Organize struct {
 func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 	if qg == nil {
 		b := u.MakeQueryBuilder(
-			kennung.MakeGenre(gattung.TrueGattung()...),
+			ids.MakeGenre(gattung.TrueGattung()...),
 		).WithTransacted(
 			skus,
 		)

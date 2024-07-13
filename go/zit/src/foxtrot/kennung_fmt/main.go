@@ -2,10 +2,10 @@ package kennung_fmt
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type Aligned interface {
-	interfaces.StringFormatWriter[*kennung.ObjectId]
+	interfaces.StringFormatWriter[*ids.ObjectId]
 	SetMaxKopfUndSchwanz(kop, schwanz int)
 }

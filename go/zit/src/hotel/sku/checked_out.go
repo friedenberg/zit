@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 func InternalAndExternalEqualsSansTai(col CheckedOutLike) bool {
@@ -45,7 +45,7 @@ type CheckedOut struct {
 	Error    error
 }
 
-func (c *CheckedOut) GetKasten() kennung.RepoId {
+func (c *CheckedOut) GetKasten() ids.RepoId {
 	panic(todo.Implement())
 }
 

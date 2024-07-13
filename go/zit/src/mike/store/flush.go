@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/bestandsaufnahme"
 )
@@ -74,7 +74,7 @@ func (c *Store) Flush(
 	wg := iter.MakeErrorWaitGroupParallel()
 
 	if c.GetStandort().GetLockSmith().IsAcquired() {
-		gob.Register(iter.StringerKeyerPtr[kennung.Type, *kennung.Type]{}) // TODO check if can be removed
+		gob.Register(iter.StringerKeyerPtr[ids.Type, *ids.Type]{}) // TODO check if can be removed
 		wg.Do(func() error { return c.verzeichnisse.Flush(printerHeader) })
 		wg.Do(c.GetAbbrStore().Flush)
 		wg.Do(c.typenIndex.Flush)

@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/echo/bezeichnung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 )
 
@@ -20,10 +20,10 @@ func TestMakeEtiketten(t1 *testing.T) {
 		"tag3",
 	}
 
-	var sut kennung.TagSet
+	var sut ids.TagSet
 	var err error
 
-	if sut, err = kennung.MakeTagSetStrings(vs...); err != nil {
+	if sut, err = ids.MakeTagSetStrings(vs...); err != nil {
 		t.Fatalf("%s", err)
 	}
 
@@ -46,7 +46,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 	}
 
 	{
-		ac := iter.SortedStrings[kennung.Tag](sut)
+		ac := iter.SortedStrings[ids.Tag](sut)
 
 		if !reflect.DeepEqual(ac, vs) {
 			t.Fatalf("expected %q but got %q", vs, ac)
@@ -55,7 +55,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 
 	{
 		ex := "tag1, tag2, tag3"
-		ac := iter.StringCommaSeparated[kennung.Tag](sut)
+		ac := iter.StringCommaSeparated[ids.Tag](sut)
 
 		if ac != ex {
 			t.Fatalf("expected %q but got %q", ex, ac)
@@ -64,7 +64,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 
 	{
 		ex := "tag1, tag2, tag3"
-		ac := iter.StringCommaSeparated[kennung.Tag](
+		ac := iter.StringCommaSeparated[ids.Tag](
 			sut.CloneSetLike(),
 		)
 

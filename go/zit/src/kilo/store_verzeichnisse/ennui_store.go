@@ -18,7 +18,7 @@ import (
 type ennuiStore struct {
 	standort                  standort.Standort
 	persistentMetadateiFormat objekte_format.Format
-	kennung                   ennui_shas.Ennui
+	ids                       ennui_shas.Ennui
 	options                   objekte_format.Options
 }
 
@@ -31,7 +31,7 @@ func (s *ennuiStore) Initialize(
 	s.persistentMetadateiFormat = persistentMetadateiFormat
 	s.options = options
 
-	if s.kennung, err = ennui_shas.MakeNoDuplicates(
+	if s.ids, err = ennui_shas.MakeNoDuplicates(
 		s.standort,
 		s.standort.DirVerzeichnisseVerweise(),
 	); err != nil {
@@ -93,7 +93,7 @@ func (s *ennuiStore) ReadOneKennungSha(
 	left := sha.FromString(k.String())
 	defer sha.GetPool().Put(left)
 
-	if sh, err = s.kennung.ReadOne(left); err != nil {
+	if sh, err = s.ids.ReadOne(left); err != nil {
 		err = errors.Wrapf(err, "Kennung: %q, Left: %s", k, left)
 		return
 	}
@@ -173,7 +173,7 @@ func (s *ennuiStore) MakeFuncSaveOneVerweise(o *sku.Transacted) func() error {
 		sh := sha.FromString(k.String())
 		defer sha.GetPool().Put(sh)
 
-		if err = s.kennung.AddSha(sh, o.Metadatei.Sha()); err != nil {
+		if err = s.ids.AddSha(sh, o.Metadatei.Sha()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

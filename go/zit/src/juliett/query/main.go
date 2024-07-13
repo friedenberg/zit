@@ -7,13 +7,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type Query struct {
-	kennung.Sigil
-	kennung.Genre
+	ids.Sigil
+	ids.Genre
 	Exp
 
 	Kennung map[string]Kennung
@@ -22,17 +22,17 @@ type Query struct {
 }
 
 func (a *Query) IsEmpty() bool {
-	return a.Sigil == kennung.SigilUnknown &&
+	return a.Sigil == ids.SigilUnknown &&
 		a.Genre.IsEmpty() &&
 		len(a.Children) == 0 &&
 		len(a.Kennung) == 0
 }
 
-func (a *Query) GetSigil() kennung.Sigil {
+func (a *Query) GetSigil() ids.Sigil {
 	return a.Sigil
 }
 
-func (a *Query) ContainsKennung(k *kennung.ObjectId) bool {
+func (a *Query) ContainsKennung(k *ids.ObjectId) bool {
 	if !a.Genre.Contains(k.GetGenre()) {
 		panic("should never check for wrong gattung")
 	}

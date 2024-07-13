@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
@@ -39,7 +39,7 @@ func (pz *ProtoZettel) AddToFlagSet(f *flag.FlagSet) {
 func (pz ProtoZettel) Equals(z *metadatei.Metadatei) (ok bool) {
 	var okTyp, okMet bool
 
-	if !kennung.IsEmpty(pz.Metadatei.Typ) &&
+	if !ids.IsEmpty(pz.Metadatei.Typ) &&
 		pz.Metadatei.Typ.Equals(z.GetTyp()) {
 		okTyp = true
 	}
@@ -74,8 +74,8 @@ func (pz ProtoZettel) Apply(
 
 	switch g {
 	case gattung.Zettel, gattung.Unknown:
-		if kennung.IsEmpty(z.GetTyp()) &&
-			!kennung.IsEmpty(pz.Metadatei.Typ) &&
+		if ids.IsEmpty(z.GetTyp()) &&
+			!ids.IsEmpty(pz.Metadatei.Typ) &&
 			!z.GetTyp().Equals(pz.Metadatei.Typ) {
 			ok = true
 			z.Typ = pz.Metadatei.Typ
@@ -103,8 +103,8 @@ func (pz ProtoZettel) ApplyWithBlobFD(
 ) (err error) {
 	z := ml.GetMetadatei()
 
-	if kennung.IsEmpty(z.GetTyp()) &&
-		!kennung.IsEmpty(pz.Metadatei.Typ) &&
+	if ids.IsEmpty(z.GetTyp()) &&
+		!ids.IsEmpty(pz.Metadatei.Typ) &&
 		!z.GetTyp().Equals(pz.Metadatei.Typ) {
 		z.Typ = pz.Metadatei.Typ
 	} else {

@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/test_metadatei_io"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -15,21 +15,21 @@ type inlineTypChecker struct {
 	answer bool
 }
 
-func (t inlineTypChecker) IsInlineTyp(k kennung.Type) bool {
+func (t inlineTypChecker) IsInlineTyp(k ids.Type) bool {
 	return t.answer
 }
 
-func makeEtiketten(t test_logz.T, vs ...string) (es kennung.TagSet) {
+func makeEtiketten(t test_logz.T, vs ...string) (es ids.TagSet) {
 	var err error
 
-	if es, err = collections_ptr.MakeValueSetString[kennung.Tag, *kennung.Tag](nil, vs...); err != nil {
+	if es, err = collections_ptr.MakeValueSetString[ids.Tag, *ids.Tag](nil, vs...); err != nil {
 		t.Fatalf("%s", err)
 	}
 
 	return
 }
 
-func makeBlobExt(t test_logz.T, v string) (es kennung.Type) {
+func makeBlobExt(t test_logz.T, v string) (es ids.Type) {
 	if err := es.Set(v); err != nil {
 		t.Fatalf("%s", err)
 	}

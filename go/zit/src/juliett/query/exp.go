@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/zittish"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -48,7 +48,7 @@ func (a *Exp) Clone() (b *Exp) {
 	return b
 }
 
-func (e *Exp) CollectEtiketten(mes kennung.TagMutableSet) {
+func (e *Exp) CollectEtiketten(mes ids.TagMutableSet) {
 	if e.Or || e.Negated {
 		return
 	}
@@ -63,7 +63,7 @@ func (e *Exp) CollectEtiketten(mes kennung.TagMutableSet) {
 				continue
 			}
 
-			e := kennung.MustTag(mt.ObjectId.String())
+			e := ids.MustTag(mt.ObjectId.String())
 			mes.Add(e)
 		}
 	}

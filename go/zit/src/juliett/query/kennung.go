@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -16,7 +16,7 @@ type Kennung struct {
 	Debug    bool
 	External bool
 
-	*kennung.ObjectId
+	*ids.ObjectId
 }
 
 func (k Kennung) Reduce(b *Builder) (err error) {
@@ -64,7 +64,7 @@ func (k Kennung) ContainsSku(sk *sku.Transacted) (ok bool) {
 		return
 
 	case gattung.Typ:
-		if kennung.Contains(me.GetTyp(), k) {
+		if ids.Contains(me.GetTyp(), k) {
 			ok = true
 			return
 		}
@@ -77,7 +77,7 @@ func (k Kennung) ContainsSku(sk *sku.Transacted) (ok bool) {
 
 	idl := &sk.Kennung
 
-	if !kennung.Contains(idl, k) {
+	if !ids.Contains(idl, k) {
 		return
 	}
 
@@ -97,7 +97,7 @@ func (k Kennung) String() string {
 		sb.WriteRune('%')
 	}
 
-	sb.WriteString(kennung.FormattedString(k.ObjectId))
+	sb.WriteString(ids.FormattedString(k.ObjectId))
 
 	return sb.String()
 }

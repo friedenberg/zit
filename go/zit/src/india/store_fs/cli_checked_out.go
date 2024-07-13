@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -18,7 +18,7 @@ type cliCheckedOut struct {
 
 	rightAlignedWriter          interfaces.StringFormatWriter[string]
 	shaStringFormatWriter       interfaces.StringFormatWriter[interfaces.ShaLike]
-	kennungStringFormatWriter   interfaces.StringFormatWriter[*kennung.ObjectId]
+	kennungStringFormatWriter   interfaces.StringFormatWriter[*ids.ObjectId]
 	fdStringFormatWriter        interfaces.StringFormatWriter[*fd.FD]
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*metadatei.Metadatei]
 }
@@ -27,7 +27,7 @@ func MakeCliCheckedOutFormat(
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
 	fdStringFormatWriter interfaces.StringFormatWriter[*fd.FD],
-	kennungStringFormatWriter interfaces.StringFormatWriter[*kennung.ObjectId],
+	kennungStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*metadatei.Metadatei],
 ) *cliCheckedOut {
 	return &cliCheckedOut{

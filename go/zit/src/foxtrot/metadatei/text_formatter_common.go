@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 )
 
@@ -100,7 +100,7 @@ func (f textFormatterCommon) writeCommonMetadateiFormat(
 	}
 
 	for _, e := range iter.SortedValues(m.GetEtiketten()) {
-		if kennung.IsEmpty(e) {
+		if ids.IsEmpty(e) {
 			continue
 		}
 

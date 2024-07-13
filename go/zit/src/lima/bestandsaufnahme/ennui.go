@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/golf/ennui_shas"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
@@ -19,8 +19,8 @@ import (
 type Ennui interface {
 	WriteOneObjekteMetadatei(o *sku.Transacted) (err error)
 	ReadOneEnnui(*sha.Sha) (*sku.Transacted, error)
-	ReadOneKennung(kennung.IdLike) (*sku.Transacted, error)
-	ReadOneKennungSha(kennung.IdLike) (*sha.Sha, error)
+	ReadOneKennung(ids.IdLike) (*sku.Transacted, error)
+	ReadOneKennungSha(ids.IdLike) (*sha.Sha, error)
 }
 
 type ennuiStore struct {
@@ -95,7 +95,7 @@ func (s *ennuiStore) ReadOneEnnui(sh *sha.Sha) (sk *sku.Transacted, err error) {
 	return
 }
 
-func (s *ennuiStore) ReadOneKennungSha(k kennung.IdLike) (sh *sha.Sha, err error) {
+func (s *ennuiStore) ReadOneKennungSha(k ids.IdLike) (sh *sha.Sha, err error) {
 	left := sha.FromString(k.String())
 	defer sha.GetPool().Put(left)
 
@@ -107,7 +107,7 @@ func (s *ennuiStore) ReadOneKennungSha(k kennung.IdLike) (sh *sha.Sha, err error
 	return
 }
 
-func (s *ennuiStore) ReadOneKennung(k kennung.IdLike) (sk *sku.Transacted, err error) {
+func (s *ennuiStore) ReadOneKennung(k ids.IdLike) (sk *sku.Transacted, err error) {
 	sh, err := s.ReadOneKennungSha(k)
 	defer sha.GetPool().Put(sh)
 

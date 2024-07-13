@@ -18,7 +18,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/echo/zittish"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
@@ -39,7 +39,7 @@ type Store struct {
 	metadateiTextParser metadatei.TextParser
 	standort            standort.Standort
 	fileEncoder         FileEncoder
-	ic                  kennung.InlineTypChecker
+	ic                  ids.InlineTypChecker
 	fileExtensions      file_extensions.FileExtensions
 	dir                 string
 	zettelen            interfaces.MutableSetLike[*KennungFDPair]
@@ -181,8 +181,8 @@ func (fs *Store) String() (out string) {
 	return
 }
 
-func (s *Store) GetExternalKennung() (ks interfaces.SetLike[*kennung.ObjectId], err error) {
-	ksm := collections_value.MakeMutableValueSet[*kennung.ObjectId](nil)
+func (s *Store) GetExternalKennung() (ks interfaces.SetLike[*ids.ObjectId], err error) {
+	ksm := collections_value.MakeMutableValueSet[*ids.ObjectId](nil)
 	ks = ksm
 	var l sync.Mutex
 
@@ -209,7 +209,7 @@ func (s *Store) GetExternalKennung() (ks interfaces.SetLike[*kennung.ObjectId], 
 }
 
 // TODO confirm against actual Kennung
-func (fs *Store) GetKennungForString(v string) (k *kennung.ObjectId, err error) {
+func (fs *Store) GetKennungForString(v string) (k *ids.ObjectId, err error) {
 	var fd fd.FD
 
 	if err = fd.Set(v); err != nil {
@@ -217,7 +217,7 @@ func (fs *Store) GetKennungForString(v string) (k *kennung.ObjectId, err error) 
 		return
 	}
 
-	k = kennung.GetObjectIdPool().Get()
+	k = ids.GetObjectIdPool().Get()
 
 	if err = k.SetFromPath(
 		fd.String(),
@@ -283,28 +283,28 @@ func (fs *Store) GetEmptyDirectories() fd.Set {
 }
 
 func (fs *Store) GetZettel(
-	h *kennung.ZettelId,
+	h *ids.ZettelId,
 ) (z *KennungFDPair, ok bool) {
 	z, ok = fs.zettelen.Get(h.String())
 	return
 }
 
 func (fs *Store) GetKasten(
-	h *kennung.RepoId,
+	h *ids.RepoId,
 ) (z *KennungFDPair, ok bool) {
 	z, ok = fs.kisten.Get(h.String())
 	return
 }
 
 func (fs *Store) GetEtikett(
-	k *kennung.Tag,
+	k *ids.Tag,
 ) (e *KennungFDPair, ok bool) {
 	e, ok = fs.etiketten.Get(k.String())
 	return
 }
 
 func (fs *Store) GetTyp(
-	k *kennung.Type,
+	k *ids.Type,
 ) (t *KennungFDPair, ok bool) {
 	t, ok = fs.typen.Get(k.String())
 	return

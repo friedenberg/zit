@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
@@ -25,8 +25,8 @@ func init() {
 	)
 }
 
-func (c Pull) CompletionGattung() kennung.Genre {
-	return kennung.MakeGenre(
+func (c Pull) CompletionGattung() ids.Genre {
+	return ids.MakeGenre(
 		gattung.Zettel,
 		gattung.Etikett,
 		gattung.Typ,
@@ -54,10 +54,10 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		c.CompletionGattung(),
 	)
 
-	var ids *query.Group
+	var qg *query.Group
 
-	if ids, err = builder.BuildQueryGroupWithKasten(
-		kennung.RepoId{},
+	if qg, err = builder.BuildQueryGroupWithKasten(
+		ids.RepoId{},
 		sku.ExternalQueryOptions{},
 		args...,
 	); err != nil {
@@ -81,7 +81,7 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	defer errors.DeferredCloser(&err, client)
 
-	if err = client.PullSkus(ids); err != nil {
+	if err = client.PullSkus(qg); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

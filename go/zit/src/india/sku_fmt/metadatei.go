@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -28,7 +28,7 @@ func StringMetadatei(o *sku.Transacted) (str string) {
 
 	if !t.IsEmpty() {
 		sb.WriteString(" ")
-		sb.WriteString(kennung.FormattedString(m.GetTyp()))
+		sb.WriteString(ids.FormattedString(m.GetTyp()))
 	}
 
 	es := m.GetEtiketten()
@@ -36,7 +36,7 @@ func StringMetadatei(o *sku.Transacted) (str string) {
 	if es.Len() > 0 {
 		sb.WriteString(" ")
 		sb.WriteString(
-			iter.StringDelimiterSeparated[kennung.Tag](
+			iter.StringDelimiterSeparated[ids.Tag](
 				" ",
 				m.GetEtiketten(),
 			),

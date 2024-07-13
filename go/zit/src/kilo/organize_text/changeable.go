@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -44,7 +44,7 @@ func (a *Assignment) addToSet(
 	out SkuMapWithOrder,
 	original sku.TransactedSet,
 ) (err error) {
-	expanded := kennung.MakeTagMutableSet()
+	expanded := ids.MakeTagMutableSet()
 
 	if err = a.AllEtiketten(expanded); err != nil {
 		err = errors.Wrap(err)

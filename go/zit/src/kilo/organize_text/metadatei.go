@@ -9,17 +9,17 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type Metadatei struct {
 	// metadatei.Metadatei
-	kennung.TagSet
+	ids.TagSet
 	Matchers interfaces.SetLike[sku.Query]
 	Comments []string
-	Typ      kennung.Type
+	Typ      ids.Type
 }
 
 func (m Metadatei) RemoveFromTransacted(sk *sku.Transacted) (err error) {
@@ -58,7 +58,7 @@ func (m Metadatei) HasMetadateiContent() bool {
 func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
-	mes := kennung.MakeTagMutableSet()
+	mes := ids.MakeTagMutableSet()
 
 	if n, err = format.ReadLines(
 		r,

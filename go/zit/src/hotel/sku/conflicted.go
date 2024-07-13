@@ -2,7 +2,7 @@ package sku
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type Conflicted struct {
@@ -10,7 +10,7 @@ type Conflicted struct {
 	Left, Middle, Right *Transacted
 }
 
-func (tm Conflicted) IsAllInlineTyp(itc kennung.InlineTypChecker) bool {
+func (tm Conflicted) IsAllInlineTyp(itc ids.InlineTypChecker) bool {
 	if !itc.IsInlineTyp(tm.Left.GetTyp()) {
 		return false
 	}
@@ -31,12 +31,12 @@ func (tm *Conflicted) MergeEtiketten() (err error) {
 	middle := tm.Middle.GetEtiketten().CloneMutableSetPtrLike()
 	right := tm.Right.GetEtiketten().CloneMutableSetPtrLike()
 
-	same := kennung.MakeTagMutableSet()
-	deleted := kennung.MakeTagMutableSet()
+	same := ids.MakeTagMutableSet()
+	deleted := ids.MakeTagMutableSet()
 
 	removeFromAllButAddTo := func(
-		e *kennung.Tag,
-		toAdd kennung.TagMutableSet,
+		e *ids.Tag,
+		toAdd ids.TagMutableSet,
 	) (err error) {
 		if err = toAdd.AddPtr(e); err != nil {
 			err = errors.Wrap(err)
@@ -62,7 +62,7 @@ func (tm *Conflicted) MergeEtiketten() (err error) {
 	}
 
 	if err = middle.EachPtr(
-		func(e *kennung.Tag) (err error) {
+		func(e *ids.Tag) (err error) {
 			if left.ContainsKey(left.KeyPtr(e)) && right.ContainsKey(right.KeyPtr(e)) {
 				return removeFromAllButAddTo(e, same)
 			} else if left.ContainsKey(left.KeyPtr(e)) || right.ContainsKey(right.KeyPtr(e)) {

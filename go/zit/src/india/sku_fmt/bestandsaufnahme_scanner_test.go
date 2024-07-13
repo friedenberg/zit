@@ -9,7 +9,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"github.com/DataDog/zstd"
@@ -26,7 +26,7 @@ func TestOne(t1 *testing.T) {
 	printer := MakeFormatBestandsaufnahmePrinter(w, f, o)
 
 	sk := &sku.Transacted{}
-	t.AssertNoError(sk.Kennung.SetWithIdLike(kennung.MustZettelId("one/uno")))
+	t.AssertNoError(sk.Kennung.SetWithIdLike(ids.MustZettelId("one/uno")))
 
 	n, err := printer.Print(sk)
 
@@ -45,7 +45,7 @@ func TestOne(t1 *testing.T) {
 	}
 
 	sk = &sku.Transacted{}
-	t.AssertNoError(sk.Kennung.SetWithIdLike(kennung.MustZettelId("two/dos")))
+	t.AssertNoError(sk.Kennung.SetWithIdLike(ids.MustZettelId("two/dos")))
 	n, err = printer.Print(sk)
 
 	{
@@ -164,7 +164,7 @@ func TestOffsets(t1 *testing.T) {
 	printer := MakeFormatBestandsaufnahmePrinter(&b, f, op)
 
 	sk := &sku.Transacted{}
-	t.AssertNoError(sk.Kennung.SetWithIdLike(kennung.MustZettelId("one/uno")))
+	t.AssertNoError(sk.Kennung.SetWithIdLike(ids.MustZettelId("one/uno")))
 
 	for _, s := range skus {
 		off := printer.Offset()

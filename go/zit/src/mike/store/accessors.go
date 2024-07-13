@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/golf/ennui"
@@ -58,8 +58,8 @@ func (s *Store) GetTime() thyme.Time {
 	return thyme.Now()
 }
 
-func (s *Store) GetTai() kennung.Tai {
-	return kennung.NowTai()
+func (s *Store) GetTai() ids.Tai {
+	return ids.NowTai()
 }
 
 func (s *Store) GetBestandsaufnahmeStore() bestandsaufnahme.Store {

@@ -17,7 +17,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/bezeichnung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -57,7 +57,7 @@ type store struct {
 	sv                        interfaces.StoreVersion
 	of                        interfaces.ObjectIOFactory
 	af                        interfaces.BlobIOFactory
-	clock                     kennung.Clock
+	clock                     ids.Clock
 	pool                      interfaces.Pool[InventoryList, *InventoryList]
 	persistentMetadateiFormat objekte_format.Format
 	options                   objekte_format.Options
@@ -71,7 +71,7 @@ func MakeStore(
 	of interfaces.ObjectIOFactory,
 	af interfaces.BlobIOFactory,
 	pmf objekte_format.Format,
-	clock kennung.Clock,
+	clock ids.Clock,
 ) (s *store, err error) {
 	p := pool.MakePool(nil, func(a *InventoryList) { Resetter.Reset(a) })
 
@@ -229,7 +229,7 @@ func (s *store) readOnePath(p string) (o *sku.Transacted, err error) {
 
 	if err = o.CalculateObjekteShas(); err != nil {
 		if errors.Is(err, objekte_format.ErrEmptyTai) {
-			var t kennung.Tai
+			var t ids.Tai
 			err1 := t.Set(o.Kennung.String())
 
 			if err1 != nil {

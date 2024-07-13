@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type v0 struct{}
@@ -29,9 +29,9 @@ func (f v0) FormatPersistentMetadatei(
 
 	w.WriteFormat("%s %s", gattung.Akte, &m.Akte)
 	w.WriteFormat("%s %s", gattung.Typ, m.GetTyp())
-	w.WriteFormat("%s %s", gattung.Bezeichnung, m.Bezeichnung)
+	w.WriteFormat("Bezeichnung %s", m.Bezeichnung)
 
-	for _, e := range iter.SortedValues[kennung.Tag](m.GetEtiketten()) {
+	for _, e := range iter.SortedValues[ids.Tag](m.GetEtiketten()) {
 		w.WriteFormat("%s %s", gattung.Etikett, e)
 	}
 
@@ -50,17 +50,17 @@ func (f v0) ParsePersistentMetadatei(
 ) (n int64, err error) {
 	m := c.GetMetadatei()
 
-	etiketten := kennung.MakeTagMutableSet()
+	etiketten := ids.MakeTagMutableSet()
 
 	r := bufio.NewReader(r1)
 
 	typLineReader := ohio.MakeLineReaderIgnoreErrors(m.Typ.Set)
 
-	esa := iter.MakeFuncSetString[kennung.Tag, *kennung.Tag](
+	esa := iter.MakeFuncSetString[ids.Tag, *ids.Tag](
 		etiketten,
 	)
 
-	var g gattung.Gattung
+	var g gattung.Genre
 
 	lr := format.MakeLineReaderConsumeEmpty(
 		ohio.MakeLineReaderIterate(
@@ -71,7 +71,7 @@ func (f v0) ParsePersistentMetadatei(
 					gattung.Akte.String():        m.Akte.Set,
 					gattung.Typ.String():         typLineReader,
 					gattung.AkteTyp.String():     typLineReader,
-					gattung.Bezeichnung.String(): m.Bezeichnung.Set,
+					"Bezeichnung": m.Bezeichnung.Set,
 					gattung.Etikett.String():     esa,
 				},
 			),

@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type Etiketten struct {
@@ -69,7 +69,7 @@ func (a *Etiketten) AddSuperFrom(
 	return
 }
 
-func (es *Etiketten) AddEtikettOld(e kennung.Tag) (err error) {
+func (es *Etiketten) AddEtikettOld(e ids.Tag) (err error) {
 	return es.AddEtikett(catgut.MakeFromString(e.String()))
 }
 
@@ -134,7 +134,7 @@ func (s *Etiketten) Set(v string) (err error) {
 	vs := strings.Split(v, ",")
 
 	for _, v := range vs {
-		var e kennung.Tag
+		var e ids.Tag
 
 		if err = e.Set(v); err != nil {
 			err = errors.Wrap(err)

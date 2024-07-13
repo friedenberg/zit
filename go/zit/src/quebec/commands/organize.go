@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
@@ -53,13 +53,13 @@ func init() {
 
 func (c *Organize) ModifyBuilder(b *query.Builder) {
 	b.
-		WithDefaultSigil(kennung.SigilLatest).
-		WithDefaultGattungen(kennung.MakeGenre(gattung.Zettel)).
+		WithDefaultSigil(ids.SigilLatest).
+		WithDefaultGattungen(ids.MakeGenre(gattung.Zettel)).
 		WithRequireNonEmptyQuery()
 }
 
-func (c *Organize) CompletionGattung() kennung.Genre {
-	return kennung.MakeGenre(
+func (c *Organize) CompletionGattung() ids.Genre {
+	return ids.MakeGenre(
 		gattung.Zettel,
 		gattung.Etikett,
 		gattung.Typ,

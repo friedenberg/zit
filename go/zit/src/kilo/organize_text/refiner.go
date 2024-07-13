@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type Refiner struct {
@@ -40,7 +40,7 @@ func (atc *Refiner) shouldMergeIntoParent(a *Assignment) bool {
 		return false
 	}
 
-	if a.Etiketten.Len() == 1 && kennung.IsEmpty(a.Etiketten.Any()) {
+	if a.Etiketten.Len() == 1 && ids.IsEmpty(a.Etiketten.Any()) {
 		ui.Log().Print("1 Etikett, and it's empty, merging")
 		return true
 	}
@@ -67,12 +67,12 @@ func (atc *Refiner) shouldMergeIntoParent(a *Assignment) bool {
 		return false
 	}
 
-	if kennung.IsDependentLeaf(a.Parent.Etiketten.Any()) {
+	if ids.IsDependentLeaf(a.Parent.Etiketten.Any()) {
 		ui.Log().Print("is prefix joint")
 		return false
 	}
 
-	if kennung.IsDependentLeaf(a.Etiketten.Any()) {
+	if ids.IsDependentLeaf(a.Etiketten.Any()) {
 		ui.Log().Print("is prefix joint")
 		return false
 	}
@@ -103,15 +103,15 @@ func (atc *Refiner) renameForPrefixJoint(a *Assignment) (err error) {
 		return
 	}
 
-	if kennung.IsDependentLeaf(a.Parent.Etiketten.Any()) {
+	if ids.IsDependentLeaf(a.Parent.Etiketten.Any()) {
 		return
 	}
 
-	if kennung.IsDependentLeaf(a.Etiketten.Any()) {
+	if ids.IsDependentLeaf(a.Etiketten.Any()) {
 		return
 	}
 
-	if !kennung.HasParentPrefix(a.Etiketten.Any(), a.Parent.Etiketten.Any()) {
+	if !ids.HasParentPrefix(a.Etiketten.Any(), a.Parent.Etiketten.Any()) {
 		ui.Log().Print("parent is not prefix joint")
 		return
 	}
@@ -124,14 +124,14 @@ func (atc *Refiner) renameForPrefixJoint(a *Assignment) (err error) {
 		return
 	}
 
-	var ls kennung.Tag
+	var ls ids.Tag
 
-	if ls, err = kennung.LeftSubtract(aEtt, pEtt); err != nil {
+	if ls, err = ids.LeftSubtract(aEtt, pEtt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	a.Etiketten = kennung.MakeTagSet(ls)
+	a.Etiketten = ids.MakeTagSet(ls)
 
 	return
 }
@@ -207,7 +207,7 @@ func (atc Refiner) applyPrefixJoints(a *Assignment) (err error) {
 		na = a
 	} else {
 		na = newAssignment(a.GetDepth() + 1)
-		na.Etiketten = kennung.MakeTagSet(groupingPrefix.Tag)
+		na.Etiketten = ids.MakeTagSet(groupingPrefix.Tag)
 		a.addChild(na)
 	}
 
@@ -221,7 +221,7 @@ func (atc Refiner) applyPrefixJoints(a *Assignment) (err error) {
 			na.addChild(c)
 		}
 
-		c.Etiketten = kennung.SubtractPrefix(
+		c.Etiketten = ids.SubtractPrefix(
 			c.Etiketten,
 			groupingPrefix.Tag,
 		)
@@ -231,7 +231,7 @@ func (atc Refiner) applyPrefixJoints(a *Assignment) (err error) {
 }
 
 type etikettBag struct {
-	kennung.Tag
+	ids.Tag
 	assignments []*Assignment
 }
 
@@ -244,10 +244,10 @@ func (a Refiner) childPrefixes(node *Assignment) (out []etikettBag) {
 	}
 
 	for _, c := range node.Children {
-		expanded := kennung.Expanded(c.Etiketten, expansion.ExpanderRight)
+		expanded := ids.Expanded(c.Etiketten, expansion.ExpanderRight)
 
 		expanded.Each(
-			func(e kennung.Tag) (err error) {
+			func(e ids.Tag) (err error) {
 				if e.String() == "" {
 					return
 				}
@@ -270,7 +270,7 @@ func (a Refiner) childPrefixes(node *Assignment) (out []etikettBag) {
 
 	for e, n := range m {
 		if len(n) > 1 {
-			var e1 kennung.Tag
+			var e1 ids.Tag
 
 			errors.PanicIfError(e1.Set(e))
 

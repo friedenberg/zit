@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/hinweisen"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
@@ -83,7 +83,7 @@ func (s *Store) tryRealizeAndOrStore(
 	if o.ContainsAny(
 		objekte_mode.ModeAddToBestandsaufnahme,
 	) && (kinder.Kennung.IsEmpty() || kinder.GetGenre() == gattung.Unknown) {
-		var ken *kennung.ZettelId
+		var ken *ids.ZettelId
 
 		if ken, err = s.kennungIndex.CreateHinweis(); err != nil {
 			err = errors.Wrap(err)
@@ -134,7 +134,7 @@ func (s *Store) tryRealizeAndOrStore(
 
 	if o.Mode != objekte_mode.ModeReindex &&
 		mutter != nil &&
-		kennung.Equals(kinder.GetKennung(), mutter.GetKennung()) &&
+		ids.Equals(kinder.GetKennung(), mutter.GetKennung()) &&
 		kinder.Metadatei.EqualsSansTai(&mutter.Metadatei) {
 
 		if err = kinder.SetFromSkuLike(mutter); err != nil {
@@ -295,7 +295,7 @@ func (s *Store) commitTransacted(
 	return
 }
 
-func (s *Store) AddTypToIndex(t *kennung.Type) (err error) {
+func (s *Store) AddTypToIndex(t *ids.Type) (err error) {
 	if t == nil {
 		return
 	}
@@ -394,12 +394,12 @@ func (s *Store) UpdateKonfig(
 	sh interfaces.ShaLike,
 ) (kt *sku.Transacted, err error) {
 	return s.CreateOrUpdateAkteSha(
-		&kennung.Config{},
+		&ids.Config{},
 		sh,
 	)
 }
 
-func (s *Store) createEtikettOrTyp(k *kennung.ObjectId) (err error) {
+func (s *Store) createEtikettOrTyp(k *ids.ObjectId) (err error) {
 	switch k.GetGenre() {
 	default:
 		err = gattung.MakeErrUnsupportedGattung(k.GetGenre())
@@ -445,7 +445,7 @@ func (s *Store) createEtikettOrTyp(k *kennung.ObjectId) (err error) {
 }
 
 func (s *Store) addTyp(
-	t kennung.Type,
+	t ids.Type,
 ) (err error) {
 	if err = s.GetAbbrStore().Typen().Exists(t.Parts()); err == nil {
 		return
@@ -453,7 +453,7 @@ func (s *Store) addTyp(
 
 	err = nil
 
-	var k kennung.ObjectId
+	var k ids.ObjectId
 
 	if err = k.SetWithIdLike(t); err != nil {
 		err = errors.Wrap(err)
@@ -469,9 +469,9 @@ func (s *Store) addTyp(
 }
 
 func (s *Store) addTypAndExpanded(
-	t kennung.Type,
+	t ids.Type,
 ) (err error) {
-	typenExpanded := kennung.ExpandOneSlice(&t, expansion.ExpanderRight)
+	typenExpanded := ids.ExpandOneSlice(&t, expansion.ExpanderRight)
 
 	for _, t := range typenExpanded {
 		if err = s.addTyp(t); err != nil {
@@ -484,13 +484,13 @@ func (s *Store) addTypAndExpanded(
 }
 
 func (s *Store) addEtikettAndExpanded(
-	e kennung.Tag,
+	e ids.Tag,
 ) (err error) {
 	if e.IsVirtual() {
 		return
 	}
 
-	etikettenExpanded := kennung.ExpandOneSlice(&e, expansion.ExpanderRight)
+	etikettenExpanded := ids.ExpandOneSlice(&e, expansion.ExpanderRight)
 
 	s.etikettenLock.Lock()
 	defer s.etikettenLock.Unlock()
@@ -506,7 +506,7 @@ func (s *Store) addEtikettAndExpanded(
 
 		err = nil
 
-		var k kennung.ObjectId
+		var k ids.ObjectId
 
 		if err = k.SetWithIdLike(e1); err != nil {
 			err = errors.Wrap(err)

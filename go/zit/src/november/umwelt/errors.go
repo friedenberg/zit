@@ -33,7 +33,7 @@ func MakeErrUnsupportedFormatterValue(
 
 type errUnsupportedFormatter struct {
 	format  string
-	gattung gattung.Gattung
+	gattung gattung.Genre
 }
 
 func (e errUnsupportedFormatter) Error() string {

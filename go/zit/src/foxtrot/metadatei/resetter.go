@@ -3,7 +3,7 @@ package metadatei
 import (
 	"slices"
 
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 var Resetter resetter
@@ -15,7 +15,7 @@ func (resetter) Reset(z *Metadatei) {
 	z.Comments = z.Comments[:0]
 	z.ResetEtiketten()
 	ResetterVerzeichnisse.Reset(&z.Verzeichnisse)
-	z.Typ = kennung.Type{}
+	z.Typ = ids.Type{}
 	// z.Gattung = gattung.Unknown
 	z.Tai.Reset()
 	z.Shas.Reset()

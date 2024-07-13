@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
@@ -122,7 +122,7 @@ func (s *Store) flushUrls() (err error) {
 		reqPayload.Deleted = append(reqPayload.Deleted, u.String())
 	}
 
-	lookup := make([][]*kennung.ObjectId, 0, len(s.added))
+	lookup := make([][]*ids.ObjectId, 0, len(s.added))
 
 	for u, k := range s.added {
 		reqPayload.Added = append(

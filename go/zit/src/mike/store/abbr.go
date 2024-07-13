@@ -12,21 +12,21 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/tridex"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 // TODO-P4 make generic
 type AbbrStore interface {
-	Hinweis() AbbrStoreGeneric[kennung.ZettelId, *kennung.ZettelId]
-	Kisten() AbbrStoreGeneric[kennung.RepoId, *kennung.RepoId]
+	Hinweis() AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId]
+	Kisten() AbbrStoreGeneric[ids.RepoId, *ids.RepoId]
 	Shas() AbbrStoreGeneric[sha.Sha, *sha.Sha]
-	Etiketten() AbbrStoreGeneric[kennung.Tag, *kennung.Tag]
-	Typen() AbbrStoreGeneric[kennung.Type, *kennung.Type]
+	Etiketten() AbbrStoreGeneric[ids.Tag, *ids.Tag]
+	Typen() AbbrStoreGeneric[ids.Type, *ids.Type]
 
 	AddMatchable(*sku.Transacted) error
-	GetAbbr() kennung.Abbr
+	GetAbbr() ids.Abbr
 
 	errors.Flusher
 }
@@ -34,9 +34,9 @@ type AbbrStore interface {
 type indexAbbrEncodableTridexes struct {
 	Shas      indexNotHinweis[sha.Sha, *sha.Sha]
 	Hinweis   indexHinweis
-	Etiketten indexNotHinweis[kennung.Tag, *kennung.Tag]
-	Typen     indexNotHinweis[kennung.Type, *kennung.Type]
-	Kisten    indexNotHinweis[kennung.RepoId, *kennung.RepoId]
+	Etiketten indexNotHinweis[ids.Tag, *ids.Tag]
+	Typen     indexNotHinweis[ids.Type, *ids.Type]
+	Kisten    indexNotHinweis[ids.RepoId, *ids.RepoId]
 }
 
 type indexAbbr struct {
@@ -69,13 +69,13 @@ func newIndexAbbr(
 				Kopfen:    tridex.Make(),
 				Schwanzen: tridex.Make(),
 			},
-			Etiketten: indexNotHinweis[kennung.Tag, *kennung.Tag]{
+			Etiketten: indexNotHinweis[ids.Tag, *ids.Tag]{
 				Kennungen: tridex.Make(),
 			},
-			Typen: indexNotHinweis[kennung.Type, *kennung.Type]{
+			Typen: indexNotHinweis[ids.Type, *ids.Type]{
 				Kennungen: tridex.Make(),
 			},
-			Kisten: indexNotHinweis[kennung.RepoId, *kennung.RepoId]{
+			Kisten: indexNotHinweis[ids.RepoId, *ids.RepoId]{
 				Kennungen: tridex.Make(),
 			},
 		},
@@ -164,7 +164,7 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 	return
 }
 
-func (i *indexAbbr) GetAbbr() (out kennung.Abbr) {
+func (i *indexAbbr) GetAbbr() (out ids.Abbr) {
 	out.Hinweis.Expand = i.Hinweis().ExpandStringString
 	out.Sha.Expand = i.Shas().ExpandStringString
 
@@ -188,7 +188,7 @@ func (i *indexAbbr) AddMatchable(o *sku.Transacted) (err error) {
 
 	switch o.GetGenre() {
 	case gattung.Zettel:
-		var h kennung.ZettelId
+		var h ids.ZettelId
 
 		if err = h.Set(ks); err != nil {
 			err = errors.Wrap(err)
@@ -216,7 +216,7 @@ func (i *indexAbbr) AddMatchable(o *sku.Transacted) (err error) {
 }
 
 // TODO switch to using ennui for existence
-func (i *indexAbbr) Exists(k *kennung.ObjectId) (err error) {
+func (i *indexAbbr) Exists(k *ids.ObjectId) (err error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
@@ -244,13 +244,13 @@ func (i *indexAbbr) Exists(k *kennung.ObjectId) (err error) {
 	return
 }
 
-func (i *indexAbbr) Hinweis() (asg AbbrStoreGeneric[kennung.ZettelId, *kennung.ZettelId]) {
+func (i *indexAbbr) Hinweis() (asg AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId]) {
 	asg = &i.indexAbbrEncodableTridexes.Hinweis
 
 	return
 }
 
-func (i *indexAbbr) Kisten() (asg AbbrStoreGeneric[kennung.RepoId, *kennung.RepoId]) {
+func (i *indexAbbr) Kisten() (asg AbbrStoreGeneric[ids.RepoId, *ids.RepoId]) {
 	asg = &i.indexAbbrEncodableTridexes.Kisten
 
 	return
@@ -262,13 +262,13 @@ func (i *indexAbbr) Shas() (asg AbbrStoreGeneric[sha.Sha, *sha.Sha]) {
 	return
 }
 
-func (i *indexAbbr) Etiketten() (asg AbbrStoreGeneric[kennung.Tag, *kennung.Tag]) {
+func (i *indexAbbr) Etiketten() (asg AbbrStoreGeneric[ids.Tag, *ids.Tag]) {
 	asg = &i.indexAbbrEncodableTridexes.Etiketten
 
 	return
 }
 
-func (i *indexAbbr) Typen() (asg AbbrStoreGeneric[kennung.Type, *kennung.Type]) {
+func (i *indexAbbr) Typen() (asg AbbrStoreGeneric[ids.Type, *ids.Type]) {
 	asg = &i.indexAbbrEncodableTridexes.Typen
 
 	return

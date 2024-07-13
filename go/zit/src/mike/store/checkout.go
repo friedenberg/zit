@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
@@ -74,7 +74,7 @@ func (s *Store) CheckoutQuery(
 }
 
 func (s *Store) CheckoutOne(
-	kasten kennung.RepoId,
+	kasten ids.RepoId,
 	options checkout_options.Options,
 	sz *sku.Transacted,
 ) (cz sku.CheckedOutLike, err error) {

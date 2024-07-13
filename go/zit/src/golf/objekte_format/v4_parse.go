@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type key struct {
@@ -23,8 +23,8 @@ func (f v4) ParsePersistentMetadatei(
 	m := c.GetMetadatei()
 
 	var (
-		g gattung.Gattung
-		k *kennung.ObjectId
+		g gattung.Genre
+		k *ids.ObjectId
 	)
 
 	var (
@@ -81,7 +81,7 @@ func (f v4) ParsePersistentMetadatei(
 			}
 
 		case key.Equal(keyEtikett.Bytes()):
-			e := kennung.GetTagPool().Get()
+			e := ids.GetTagPool().Get()
 
 			if err = e.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
@@ -100,8 +100,8 @@ func (f v4) ParsePersistentMetadatei(
 			}
 
 		case key.Equal(keyKennung.Bytes()):
-			k = kennung.GetObjectIdPool().Get()
-			defer kennung.GetObjectIdPool().Put(k)
+			k = ids.GetObjectIdPool().Get()
+			defer ids.GetObjectIdPool().Put(k)
 
 			if err = k.SetWithGenre(val.String(), g); err != nil {
 				err = errors.Wrap(err)
@@ -140,7 +140,7 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-			e := kennung.GetTagPool().Get()
+			e := ids.GetTagPool().Get()
 
 			if err = e.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
@@ -161,7 +161,7 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-			e := kennung.GetTagPool().Get()
+			e := ids.GetTagPool().Get()
 
 			if err = e.Set(val.String()); err != nil {
 				err = errors.Wrap(err)

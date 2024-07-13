@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/type_blob"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -19,7 +19,7 @@ import (
 
 type FormatZettel struct {
 	Format   string
-	Kasten   kennung.RepoId
+	Kasten   ids.RepoId
 	UTIGroup string
 	Mode     checkout_mode.Mode
 }
@@ -117,7 +117,7 @@ func (c *FormatZettel) getSku(
 	u *umwelt.Umwelt,
 	kennungString string,
 ) (sk *sku.Transacted, err error) {
-	b := u.MakeQueryBuilder(kennung.MakeGenre(gattung.Zettel))
+	b := u.MakeQueryBuilder(ids.MakeGenre(gattung.Zettel))
 
 	var qg *query.Group
 
@@ -126,8 +126,8 @@ func (c *FormatZettel) getSku(
 		return
 	}
 
-	var k *kennung.ObjectId
-	var s kennung.Sigil
+	var k *ids.ObjectId
+	var s ids.Sigil
 
 	if k, s, err = qg.GetExactlyOneKennung(
 		gattung.Zettel,

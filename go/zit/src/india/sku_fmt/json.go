@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -102,9 +102,9 @@ func (j *Json) ToTransacted(sk *sku.Transacted, s standort.Standort) (err error)
 		return
 	}
 
-	var es kennung.TagSet
+	var es ids.TagSet
 
-	if es, err = kennung.MakeTagSetStrings(j.Etiketten...); err != nil {
+	if es, err = ids.MakeTagSetStrings(j.Etiketten...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

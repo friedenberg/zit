@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
@@ -236,7 +236,7 @@ func (c *ZettelFromExternalAkte) zettelForAkte(
 
 	z.FDs.Akte.ResetWith(akteFD)
 
-	if err = z.Transacted.Kennung.SetWithIdLike(&kennung.ZettelId{}); err != nil {
+	if err = z.Transacted.Kennung.SetWithIdLike(&ids.ZettelId{}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

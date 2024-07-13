@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/schlussel"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/etiketten_path"
 	"code.linenisgreat.com/zit/go/zit/src/golf/ennui"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -32,11 +32,11 @@ var binaryFieldOrder = []schlussel.Schlussel{
 	schlussel.VerzeichnisseEtiketten,
 }
 
-func makeFlushQueryGroup(ss ...kennung.Sigil) sku.PrimitiveQueryGroup {
-	return &flushQueryGroup{Sigil: kennung.MakeSigil(ss...)}
+func makeFlushQueryGroup(ss ...ids.Sigil) sku.PrimitiveQueryGroup {
+	return &flushQueryGroup{Sigil: ids.MakeSigil(ss...)}
 }
 
-func makeBinary(s kennung.Sigil) binaryDecoder {
+func makeBinary(s ids.Sigil) binaryDecoder {
 	return binaryDecoder{
 		PrimitiveQueryGroup: makeFlushQueryGroup(s),
 		Sigil:               s,
@@ -45,11 +45,11 @@ func makeBinary(s kennung.Sigil) binaryDecoder {
 
 func makeBinaryWithQueryGroup(
 	qg sku.PrimitiveQueryGroup,
-	s kennung.Sigil,
+	s ids.Sigil,
 ) binaryDecoder {
 	ui.Log().Print(qg)
 	if !qg.HasHidden() {
-		s.Add(kennung.SigilHidden)
+		s.Add(ids.SigilHidden)
 	}
 
 	return binaryDecoder{
@@ -61,7 +61,7 @@ func makeBinaryWithQueryGroup(
 type binaryDecoder struct {
 	bytes.Buffer
 	binaryField
-	kennung.Sigil
+	ids.Sigil
 	sku.PrimitiveQueryGroup
 	io.LimitedReader
 }
@@ -196,8 +196,8 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 
 			wantsHidden := qs.IncludesHidden()
 			wantsHistory := qs.IncludesHistory()
-			isSchwanzen := sk.Contains(kennung.SigilLatest)
-			isHidden := sk.Contains(kennung.SigilHidden)
+			isSchwanzen := sk.Contains(ids.SigilLatest)
+			isHidden := sk.Contains(ids.SigilHidden)
 
 			// log.Log().Print(sk)
 			// log.Log().Print("wantsHistory", wantsHistory)
@@ -213,8 +213,8 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 			}
 
 			if q.ContainsKennung(&sk.Kennung) &&
-				(qs.ContainsOneOf(kennung.SigilHistory) ||
-					sk.ContainsOneOf(kennung.SigilLatest)) {
+				(qs.ContainsOneOf(ids.SigilHistory) ||
+					sk.ContainsOneOf(ids.SigilLatest)) {
 				break
 			}
 		}
@@ -289,7 +289,7 @@ func (bf *binaryDecoder) readFieldKey(
 		}
 
 	case schlussel.Etikett:
-		var e kennung.Tag
+		var e ids.Tag
 
 		if err = e.Set(bf.Content.String()); err != nil {
 			err = errors.Wrap(err)
@@ -346,7 +346,7 @@ func (bf *binaryDecoder) readFieldKey(
 		}
 
 	case schlussel.VerzeichnisseEtikettImplicit:
-		var e kennung.Tag
+		var e ids.Tag
 
 		if err = e.Set(bf.Content.String()); err != nil {
 			err = errors.Wrap(err)
@@ -359,7 +359,7 @@ func (bf *binaryDecoder) readFieldKey(
 		}
 
 	case schlussel.VerzeichnisseEtikettExpanded:
-		var e kennung.Tag
+		var e ids.Tag
 
 		if err = e.Set(bf.Content.String()); err != nil {
 			err = errors.Wrap(err)

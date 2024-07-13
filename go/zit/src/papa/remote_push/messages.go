@@ -6,6 +6,6 @@ import (
 )
 
 type messageRequestObjekteData struct {
-	Gattung gattung.Gattung
+	Gattung gattung.Genre
 	Sha     sha.Sha
 }

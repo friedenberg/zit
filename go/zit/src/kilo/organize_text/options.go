@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
@@ -20,7 +20,7 @@ type Flags struct {
 	Options
 
 	once           *sync.Once
-	ExtraEtiketten collections_ptr.Flag[kennung.Tag, *kennung.Tag]
+	ExtraEtiketten collections_ptr.Flag[ids.Tag, *ids.Tag]
 }
 
 type Options struct {
@@ -29,13 +29,13 @@ type Options struct {
 	Konfig *konfig.Compiled
 
 	commentMatchers   interfaces.SetLike[sku.Query]
-	rootEtiketten     kennung.TagSet
-	Typ               kennung.Type
-	GroupingEtiketten kennung.TagSlice
-	ExtraEtiketten    kennung.TagSet
+	rootEtiketten     ids.TagSet
+	Typ               ids.Type
+	GroupingEtiketten ids.TagSlice
+	ExtraEtiketten    ids.TagSet
 	Transacted        interfaces.SetLike[*sku.Transacted]
 
-	Abbr kennung.Abbr
+	Abbr ids.Abbr
 
 	UsePrefixJoints        bool
 	UseRightAlignedIndents bool
@@ -50,13 +50,13 @@ type Options struct {
 func MakeFlags() Flags {
 	return Flags{
 		once: &sync.Once{},
-		ExtraEtiketten: collections_ptr.MakeFlagCommas[kennung.Tag](
+		ExtraEtiketten: collections_ptr.MakeFlagCommas[ids.Tag](
 			collections_ptr.SetterPolicyAppend,
 		),
 
 		Options: Options{
 			wasMade:           true,
-			GroupingEtiketten: kennung.MakeTagSlice(),
+			GroupingEtiketten: ids.MakeTagSlice(),
 			Transacted:        sku.MakeTransactedMutableSet(),
 		},
 	}
@@ -67,14 +67,14 @@ func MakeFlagsWithMetadatei(m metadatei.Metadatei) Flags {
 
 	return Flags{
 		once: &sync.Once{},
-		ExtraEtiketten: collections_ptr.MakeFlagCommas[kennung.Tag](
+		ExtraEtiketten: collections_ptr.MakeFlagCommas[ids.Tag](
 			collections_ptr.SetterPolicyAppend,
 		),
 
 		Options: Options{
 			rootEtiketten:     m.GetEtiketten(),
 			wasMade:           true,
-			GroupingEtiketten: kennung.MakeTagSlice(),
+			GroupingEtiketten: ids.MakeTagSlice(),
 			Transacted:        sku.MakeTransactedMutableSet(),
 		},
 	}
@@ -117,7 +117,7 @@ func (o *Flags) GetOptions(
 	printOptions erworben_cli_print_options.PrintOptions,
 	q sku.QueryGroup,
 	skuFmt *sku_fmt.Organize,
-	abbr kennung.Abbr,
+	abbr ids.Abbr,
 ) Options {
 	o.once.Do(
 		func() {
@@ -128,7 +128,7 @@ func (o *Flags) GetOptions(
 	o.skuFmt = *skuFmt
 
 	if q == nil {
-		o.rootEtiketten = kennung.MakeTagSet()
+		o.rootEtiketten = ids.MakeTagSet()
 	} else {
 		o.rootEtiketten = q.GetEtiketten()
 

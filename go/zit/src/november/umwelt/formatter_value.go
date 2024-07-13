@@ -19,7 +19,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/type_blob"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
@@ -179,7 +179,7 @@ func (u *Umwelt) MakeFormatFunc(
 
 	case "etiketten-newlines":
 		f = func(tl *sku.Transacted) (err error) {
-			if err = tl.Metadatei.GetEtiketten().EachPtr(func(e *kennung.Tag) (err error) {
+			if err = tl.Metadatei.GetEtiketten().EachPtr(func(e *ids.Tag) (err error) {
 				_, err = fmt.Fprintln(out, e)
 				return
 			}); err != nil {

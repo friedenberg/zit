@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
@@ -32,8 +32,8 @@ func init() {
 	)
 }
 
-func (c Mergetool) DefaultGattungen() kennung.Genre {
-	return kennung.MakeGenre(gattung.TrueGattung()...)
+func (c Mergetool) DefaultGattungen() ids.Genre {
+	return ids.MakeGenre(gattung.TrueGattung()...)
 }
 
 func (c Mergetool) RunWithQuery(

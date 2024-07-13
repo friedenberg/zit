@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
@@ -34,8 +34,8 @@ func init() {
 	)
 }
 
-func (c ExecAction) DefaultGattungen() kennung.Genre {
-	return kennung.MakeGenre(
+func (c ExecAction) DefaultGattungen() ids.Genre {
+	return ids.MakeGenre(
 		gattung.Zettel,
 	)
 }
@@ -61,7 +61,7 @@ func (c ExecAction) RunWithQuery(
 		return
 	}
 
-	hinweisen := collections_value.MakeMutableValueSet[kennung.IdLike](nil)
+	hinweisen := collections_value.MakeMutableValueSet[ids.IdLike](nil)
 
 	if err = u.GetStore().QueryWithKasten(
 		ms,
@@ -88,7 +88,7 @@ func (c ExecAction) RunWithQuery(
 func (c ExecAction) runAction(
 	u *umwelt.Umwelt,
 	sc script_config.ScriptConfig,
-	hinweisen interfaces.SetLike[kennung.IdLike],
+	hinweisen interfaces.SetLike[ids.IdLike],
 ) (err error) {
 	var wt io.WriterTo
 
@@ -97,7 +97,7 @@ func (c ExecAction) runAction(
 		map[string]string{
 			"ZIT_BIN": u.Standort().Executable(),
 		},
-		iter.Strings[kennung.IdLike](hinweisen)...,
+		iter.Strings[ids.IdLike](hinweisen)...,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

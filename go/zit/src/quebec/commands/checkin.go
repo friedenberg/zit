@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
@@ -36,8 +36,8 @@ func init() {
 	)
 }
 
-func (c Checkin) DefaultGattungen() kennung.Genre {
-	return kennung.MakeGenre(gattung.TrueGattung()...)
+func (c Checkin) DefaultGattungen() ids.Genre {
+	return ids.MakeGenre(gattung.TrueGattung()...)
 }
 
 func (c Checkin) RunWithQuery(

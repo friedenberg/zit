@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -56,14 +56,14 @@ func init() {
 	)
 }
 
-func (c *OrganizeJSON) DefaultGattungen() kennung.Genre {
-	return kennung.MakeGenre(
+func (c *OrganizeJSON) DefaultGattungen() ids.Genre {
+	return ids.MakeGenre(
 		gattung.Zettel,
 	)
 }
 
-func (c *OrganizeJSON) CompletionGattung() kennung.Genre {
-	return kennung.MakeGenre(
+func (c *OrganizeJSON) CompletionGattung() ids.Genre {
+	return ids.MakeGenre(
 		gattung.Zettel,
 		gattung.Etikett,
 		gattung.Typ,

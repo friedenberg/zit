@@ -8,7 +8,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/echo/bezeichnung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 )
 
@@ -38,7 +38,7 @@ func (item item) WriteToMetadatei(m *metadatei.Metadatei) (err error) {
 		return
 	}
 
-	var e kennung.Tag
+	var e ids.Tag
 
 	els := strings.Split(u.Host, ".")
 	slices.Reverse(els)
@@ -86,10 +86,10 @@ func (tab item) GetUrl() (u *url.URL, err error) {
 	return
 }
 
-func (tab item) GetTai() (t kennung.Tai, err error) {
+func (tab item) GetTai() (t ids.Tai, err error) {
 	switch date := tab["date"].(type) {
 	case nil:
-		t = kennung.NowTai()
+		t = ids.NowTai()
 
 	case string:
 		if err = t.SetFromRFC3339(date); err != nil {
@@ -121,7 +121,7 @@ func (tab item) GetBezeichnung() (b bezeichnung.Bezeichnung, err error) {
 	return
 }
 
-func (tab item) GetTyp() (t kennung.Type, err error) {
+func (tab item) GetTyp() (t ids.Type, err error) {
 	ty, ok := tab["type"].(string)
 
 	if !ok {
@@ -137,22 +137,22 @@ func (tab item) GetTyp() (t kennung.Type, err error) {
 	return
 }
 
-func (ct item) Etiketten() kennung.TagSet {
-	me := kennung.MakeTagMutableSet()
+func (ct item) Etiketten() ids.TagSet {
+	me := ids.MakeTagMutableSet()
 
 	switch ct["type"].(string) {
 	case "history":
 		me.Add(
-			kennung.MustTag(fmt.Sprintf("%%chrome-history-%d", int(ct["id"].(float64)))),
+			ids.MustTag(fmt.Sprintf("%%chrome-history-%d", int(ct["id"].(float64)))),
 		)
 
 	case "tab":
 		me.Add(
-			kennung.MustTag(fmt.Sprintf("%%chrome-window_id-%d", int(ct["windowId"].(float64)))),
+			ids.MustTag(fmt.Sprintf("%%chrome-window_id-%d", int(ct["windowId"].(float64)))),
 		)
 
 		me.Add(
-			kennung.MustTag(fmt.Sprintf("%%chrome-tab_id-%d", int(ct["id"].(float64)))),
+			ids.MustTag(fmt.Sprintf("%%chrome-tab_id-%d", int(ct["id"].(float64)))),
 		)
 
 		v, ok := ct["active"]
@@ -163,13 +163,13 @@ func (ct item) Etiketten() kennung.TagSet {
 
 		if b, _ := v.(bool); b {
 			me.Add(
-				kennung.MustTag("%chrome-active"),
+				ids.MustTag("%chrome-active"),
 			)
 		}
 
 	case "bookmark":
 		me.Add(
-			kennung.MustTag(fmt.Sprintf("%%chrome-bookmark-%d", int(ct["id"].(float64)))),
+			ids.MustTag(fmt.Sprintf("%%chrome-bookmark-%d", int(ct["id"].(float64)))),
 		)
 
 	}

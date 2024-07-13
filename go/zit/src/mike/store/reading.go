@@ -6,12 +6,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 func (s *Store) UpdateTransactedWithExternal(
-	kasten kennung.RepoId,
+	kasten ids.RepoId,
 	z *sku.Transacted,
 ) (err error) {
 	kid := kasten.GetRepoIdString()
@@ -50,8 +50,8 @@ func (s *Store) ReadTransactedFromKennung(
 
 func (s *Store) ReadTransactedFromKennungKastenSigil(
 	k1 interfaces.StringerGenreGetter,
-	ka kennung.RepoId,
-	si kennung.Sigil,
+	ka ids.RepoId,
+	si ids.Sigil,
 ) (sk1 *sku.Transacted, err error) {
 	sk1 = sku.GetTransactedPool().Get()
 
@@ -64,9 +64,9 @@ func (s *Store) ReadTransactedFromKennungKastenSigil(
 		return
 	}
 
-	var k3 *kennung.ObjectIdWithRepoId
+	var k3 *ids.ObjectIdWithRepoId
 
-	if k3, err = kennung.MakeKennung3(k1, ka); err != nil {
+	if k3, err = ids.MakeKennung3(k1, ka); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -92,7 +92,7 @@ func (s *Store) ReadTransactedFromKennungKastenSigil(
 }
 
 func (s *Store) ReadCheckedOutFromTransacted(
-	kasten kennung.RepoId,
+	kasten ids.RepoId,
 	sk *sku.Transacted,
 ) (co sku.CheckedOutLike, err error) {
 	switch kasten.GetRepoIdString() {

@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 var (
@@ -70,7 +70,7 @@ func MakeCheckedOutLikeMutableSet() CheckedOutLikeMutableSet {
 }
 
 type kennungGetter interface {
-	GetKennung() kennung.IdLike
+	GetKennung() ids.IdLike
 }
 
 type KennungKeyer[

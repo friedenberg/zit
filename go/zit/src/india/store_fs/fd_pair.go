@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 var ErrExternalHasConflictMarker = errors.New("external has conflict marker")
@@ -18,8 +18,8 @@ type FDPair struct {
 	Akte    fd.FD
 }
 
-func (ef *FDPair) GetTai() kennung.Tai {
-	return kennung.TaiFromTime(ef.LatestModTime())
+func (ef *FDPair) GetTai() ids.Tai {
+	return ids.TaiFromTime(ef.LatestModTime())
 }
 
 func (ef *FDPair) GetTime() thyme.Time {

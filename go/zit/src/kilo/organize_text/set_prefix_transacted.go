@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/etiketten_path"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -57,7 +57,7 @@ func (s *PrefixSet) AddTransacted(z *sku.Transacted) (err error) {
 
 // this splits on right-expanded
 func (s *PrefixSet) Add(z *obj) (err error) {
-	es := kennung.Expanded(
+	es := ids.Expanded(
 		z.GetMetadatei().Verzeichnisse.GetImplicitEtiketten(),
 		expansion.ExpanderRight,
 	).CloneMutableSetPtrLike()
@@ -75,7 +75,7 @@ func (s *PrefixSet) Add(z *obj) (err error) {
 	}
 
 	if err = es.Each(
-		func(e kennung.Tag) (err error) {
+		func(e ids.Tag) (err error) {
 			s.addPair(e.String(), z)
 			return
 		},
@@ -140,13 +140,13 @@ func (s *PrefixSet) addPair(
 }
 
 func (a PrefixSet) Each(
-	f func(kennung.Tag, objSet) error,
+	f func(ids.Tag, objSet) error,
 ) (err error) {
 	for e, ssz := range a.innerMap {
-		var e1 kennung.Tag
+		var e1 ids.Tag
 
 		if e != "" {
-			e1 = kennung.MustTag(e)
+			e1 = ids.MustTag(e)
 		}
 
 		if err = f(e1, ssz); err != nil {
@@ -167,7 +167,7 @@ func (a PrefixSet) EachZettel(
 	f interfaces.FuncIter[*obj],
 ) error {
 	return a.Each(
-		func(_ kennung.Tag, st objSet) (err error) {
+		func(_ ids.Tag, st objSet) (err error) {
 			err = st.Each(
 				func(z *obj) (err error) {
 					err = f(z)
@@ -181,7 +181,7 @@ func (a PrefixSet) EachZettel(
 }
 
 func (a PrefixSet) Match(
-	e kennung.Tag,
+	e ids.Tag,
 ) (out Segments) {
 	out.Ungrouped = makeObjSet()
 	out.Grouped = MakePrefixSet(len(a.innerMap))
@@ -195,7 +195,7 @@ func (a PrefixSet) Match(
 			func(z *obj) (err error) {
 				es := z.GetEtiketten()
 
-				intersection := kennung.IntersectPrefixes(
+				intersection := ids.IntersectPrefixes(
 					es,
 					e,
 				)
@@ -220,7 +220,7 @@ func (a PrefixSet) Match(
 }
 
 func (a PrefixSet) Subset(
-	e kennung.Tag,
+	e ids.Tag,
 ) (out Segments) {
 	out.Ungrouped = makeObjSet()
 	out.Grouped = MakePrefixSet(len(a.innerMap))

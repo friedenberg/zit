@@ -10,21 +10,21 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 )
 
-type Gattung byte
+type Genre byte
 
 // Do not change this order, various serialization formats rely on the
 // underlying integer values.
 const (
-	Unknown = Gattung(iota)
+	Unknown = Genre(iota)
 	Akte
 	Typ
 	Bezeichnung
 	Etikett
-	Hinweis
-	Transaktion
+	_ //Hinweis
+	_ //Transaktion
 	Zettel
 	Konfig
-	Kennung
+	_ //Kennung
 	Bestandsaufnahme
 	AkteTyp
 	Kasten
@@ -42,21 +42,21 @@ const (
 	kasten
 )
 
-func All() (out []Gattung) {
-	out = make([]Gattung, 0, MaxGattung-1)
+func All() (out []Genre) {
+	out = make([]Genre, 0, MaxGattung-1)
 
 	for i := Unknown + 1; i <= MaxGattung; i++ {
-		out = append(out, Gattung(i))
+		out = append(out, Genre(i))
 	}
 
 	return
 }
 
-func TrueGattung() (out []Gattung) {
-	out = make([]Gattung, 0, MaxGattung-1)
+func TrueGattung() (out []Genre) {
+	out = make([]Genre, 0, MaxGattung-1)
 
 	for i := Unknown + 1; i <= MaxGattung; i++ {
-		g := Gattung(i)
+		g := Genre(i)
 
 		if !g.IsTrueGattung() {
 			continue
@@ -68,15 +68,15 @@ func TrueGattung() (out []Gattung) {
 	return
 }
 
-func Must(g interfaces.GenreGetter) Gattung {
-	return g.GetGenre().(Gattung)
+func Must(g interfaces.GenreGetter) Genre {
+	return g.GetGenre().(Genre)
 }
 
-func Make(g interfaces.Genre) Gattung {
+func Make(g interfaces.Genre) Genre {
 	return Must(g)
 }
 
-func MakeOrUnknown(v string) (g Gattung) {
+func MakeOrUnknown(v string) (g Genre) {
 	if err := g.Set(v); err != nil {
 		g = Unknown
 	}
@@ -84,11 +84,11 @@ func MakeOrUnknown(v string) (g Gattung) {
 	return
 }
 
-func (g Gattung) GetGenre() interfaces.Genre {
+func (g Genre) GetGenre() interfaces.Genre {
 	return g
 }
 
-func (g Gattung) GetGenreBitInt() byte {
+func (g Genre) GetGenreBitInt() byte {
 	switch g {
 	default:
 		return unknown
@@ -107,19 +107,19 @@ func (g Gattung) GetGenreBitInt() byte {
 	}
 }
 
-func (a Gattung) EqualsAny(b any) bool {
+func (a Genre) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a Gattung) Equals(b Gattung) bool {
+func (a Genre) Equals(b Genre) bool {
 	return a == b
 }
 
-func (a Gattung) EqualsGenre(b interfaces.GenreGetter) bool {
+func (a Genre) EqualsGenre(b interfaces.GenreGetter) bool {
 	return a.GetGenreString() == b.GetGenre().GetGenreString()
 }
 
-func (a Gattung) AssertGattung(b interfaces.GenreGetter) (err error) {
+func (a Genre) AssertGattung(b interfaces.GenreGetter) (err error) {
 	if a.GetGenreString() != b.GetGenre().GetGenreString() {
 		err = MakeErrUnsupportedGattung(b)
 		return
@@ -128,11 +128,11 @@ func (a Gattung) AssertGattung(b interfaces.GenreGetter) (err error) {
 	return
 }
 
-func (g Gattung) GetGenreString() string {
+func (g Genre) GetGenreString() string {
 	return g.String()
 }
 
-func (g Gattung) HasParents() bool {
+func (g Genre) HasParents() bool {
 	switch g {
 	case Typ, Etikett, Kasten:
 		return true
@@ -142,7 +142,7 @@ func (g Gattung) HasParents() bool {
 	}
 }
 
-func (g Gattung) IsTrueGattung() bool {
+func (g Genre) IsTrueGattung() bool {
 	switch g {
 	case Typ, Etikett, Zettel, Konfig, Kasten:
 		return true
@@ -152,7 +152,7 @@ func (g Gattung) IsTrueGattung() bool {
 	}
 }
 
-func (g Gattung) GetGenreStringPlural() string {
+func (g Genre) GetGenreStringPlural() string {
 	switch g {
 	case Akte:
 		return "Akten"
@@ -169,12 +169,6 @@ func (g Gattung) GetGenreStringPlural() string {
 	case Bezeichnung:
 		return "Bezeichnungen"
 
-	case Hinweis:
-		return "Hinweisen"
-
-	case Kennung:
-		return "Kennungen"
-
 	case Bestandsaufnahme:
 		return "Bestandsaufnahmen"
 
@@ -186,7 +180,7 @@ func (g Gattung) GetGenreStringPlural() string {
 	}
 }
 
-func (g Gattung) String() string {
+func (g Genre) String() string {
 	errors.TodoP1(
 		"move Bezeichnung, AkteTyp, Kennung, Transaktion, to another place",
 	)
@@ -209,17 +203,8 @@ func (g Gattung) String() string {
 	case Bezeichnung:
 		return "Bezeichnung"
 
-	case Hinweis:
-		return "Hinweis"
-
-	case Transaktion:
-		return "Transaktion"
-
 	case Konfig:
 		return "Konfig"
-
-	case Kennung:
-		return "Kennung"
 
 	case Bestandsaufnahme:
 		return "Bestandsaufnahme"
@@ -236,7 +221,7 @@ func hasPrefixOrEquals(v, p string) bool {
 	return strings.HasPrefix(v, p) || strings.EqualFold(v, p)
 }
 
-func (g *Gattung) Set(v string) (err error) {
+func (g *Genre) Set(v string) (err error) {
 	v = strings.TrimSpace(v)
 
 	switch {
@@ -258,17 +243,8 @@ func (g *Gattung) Set(v string) (err error) {
 	case strings.EqualFold(v, "bezeichnung"):
 		*g = Bezeichnung
 
-	case strings.EqualFold("hinweis", v):
-		*g = Hinweis
-
-	case strings.EqualFold("transaktion", v):
-		*g = Transaktion
-
 	case strings.EqualFold("konfig", v):
 		*g = Konfig
-
-	case strings.EqualFold("kennung", v):
-		*g = Kennung
 
 	case hasPrefixOrEquals("bestandsaufnahme", v):
 		*g = Bestandsaufnahme
@@ -284,11 +260,11 @@ func (g *Gattung) Set(v string) (err error) {
 	return
 }
 
-func (g *Gattung) Reset() {
+func (g *Genre) Reset() {
 	*g = Unknown
 }
 
-func (g *Gattung) ReadFrom(r io.Reader) (n int64, err error) {
+func (g *Genre) ReadFrom(r io.Reader) (n int64, err error) {
 	*g = Unknown
 
 	var b [1]byte
@@ -301,12 +277,12 @@ func (g *Gattung) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	*g = Gattung(b[0])
+	*g = Genre(b[0])
 
 	return
 }
 
-func (g *Gattung) WriteTo(w io.Writer) (n int64, err error) {
+func (g *Genre) WriteTo(w io.Writer) (n int64, err error) {
 	b := [1]byte{byte(*g)}
 
 	var n1 int

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -22,7 +22,7 @@ func TestLuaFalse(t1 *testing.T) {
 
 	sk := &sku.Transacted{}
 
-	if err = sk.Kennung.SetWithIdLike(&kennung.Tag{}); err != nil {
+	if err = sk.Kennung.SetWithIdLike(&ids.Tag{}); err != nil {
 		t.Fatal(err)
 		return
 	}
@@ -46,7 +46,7 @@ func TestMatcherLuaTrue(t1 *testing.T) {
 
 	sk := &sku.Transacted{}
 
-	if err = sk.Kennung.SetWithIdLike(&kennung.Tag{}); err != nil {
+	if err = sk.Kennung.SetWithIdLike(&ids.Tag{}); err != nil {
 		t.Fatal(err)
 	}
 

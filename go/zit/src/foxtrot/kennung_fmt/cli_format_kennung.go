@@ -6,19 +6,19 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type kennungCliFormat struct {
 	options              erworben_cli_print_options.PrintOptions
 	sfwColor, sfwNoColor interfaces.StringFormatWriter[*catgut.String]
-	abbr                 kennung.Abbr
+	abbr                 ids.Abbr
 }
 
 func MakeKennungCliFormat(
 	options erworben_cli_print_options.PrintOptions,
 	co string_format_writer.ColorOptions,
-	abbr kennung.Abbr,
+	abbr ids.Abbr,
 ) *kennungCliFormat {
 	return &kennungCliFormat{
 		options: options,
@@ -34,11 +34,11 @@ func MakeKennungCliFormat(
 
 func (f *kennungCliFormat) WriteStringFormat(
 	w interfaces.WriterAndStringWriter,
-	k *kennung.ObjectId,
+	k *ids.ObjectId,
 ) (n int64, err error) {
 	if f.options.Abbreviations.Hinweisen {
-		k1 := kennung.GetObjectIdPool().Get()
-		defer kennung.GetObjectIdPool().Put(k1)
+		k1 := ids.GetObjectIdPool().Get()
+		defer ids.GetObjectIdPool().Put(k1)
 
 		if err = k1.ResetWithIdLike(k); err != nil {
 			err = errors.Wrap(err)

@@ -3,7 +3,7 @@ package sku
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type (
@@ -19,18 +19,18 @@ type (
 	}
 
 	SigilGetter interface {
-		GetSigil() kennung.Sigil
+		GetSigil() ids.Sigil
 	}
 
 	QueryWithSigilAndKennung interface {
 		Query
 		SigilGetter
-		ContainsKennung(*kennung.ObjectId) bool
+		ContainsKennung(*ids.ObjectId) bool
 	}
 
 	// Used by store_verzeichnisse.binary*
 	PrimitiveQueryGroup interface {
-		Get(gattung.Gattung) (QueryWithSigilAndKennung, bool)
+		Get(gattung.Genre) (QueryWithSigilAndKennung, bool)
 		SigilGetter
 		HasHidden() bool
 	}
@@ -41,32 +41,32 @@ type (
 		SetIncludeHistory()
 		MakeEmitSkuMaybeExternal(
 			f interfaces.FuncIter[*Transacted],
-			k kennung.RepoId,
+			k ids.RepoId,
 			updateTransacted func(
-				kasten kennung.RepoId,
+				kasten ids.RepoId,
 				z *Transacted,
 			) (err error),
 		) interfaces.FuncIter[*Transacted]
 		MakeEmitSkuSigilSchwanzen(
 			f interfaces.FuncIter[*Transacted],
-			k kennung.RepoId,
+			k ids.RepoId,
 			updateTransacted func(
-				kasten kennung.RepoId,
+				kasten ids.RepoId,
 				z *Transacted,
 			) (err error),
 		) interfaces.FuncIter[*Transacted]
-		GetEtiketten() kennung.TagSet
-		GetTypen() kennung.TypeSet
+		GetEtiketten() ids.TagSet
+		GetTypen() ids.TypeSet
 	}
 
 	ExternalQueryOptions struct {
-		kennung.RepoId
+		ids.RepoId
 		ExcludeUntracked  bool
 		IncludeRecognized bool
 	}
 
 	ExternalQuery struct {
-		kennung.RepoId
+		ids.RepoId
 		QueryGroup
 		ExternalQueryOptions
 	}

@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/type_blob"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/etiketten_path"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -22,7 +22,7 @@ func (k *Compiled) ApplySchlummerndAndRealizeEtiketten(
 	ui.Log().Print("applying konfig to:", sk)
 	mp := &sk.Metadatei
 
-	mp.Verzeichnisse.SetExpandedEtiketten(kennung.ExpandMany(
+	mp.Verzeichnisse.SetExpandedEtiketten(ids.ExpandMany(
 		mp.GetEtiketten(),
 		expansion.ExpanderRight,
 	))
@@ -34,7 +34,7 @@ func (k *Compiled) ApplySchlummerndAndRealizeEtiketten(
 	// 	k.SetHasChanges(fmt.Sprintf("adding etikett with parents: %s", sk))
 	// }
 
-	var etikett kennung.Tag
+	var etikett ids.Tag
 
 	// TODO better solution for "realizing" etiketten against Konfig.
 	// Specifically, making this less fragile and dependent on remembering to do
@@ -51,7 +51,7 @@ func (k *Compiled) ApplySchlummerndAndRealizeEtiketten(
 
 		sk.Metadatei.Verzeichnisse.Etiketten.AddSelf(catgut.MakeFromString(ks))
 
-		kennung.ExpandOne(
+		ids.ExpandOne(
 			&etikett,
 			expansion.ExpanderRight,
 		).EachPtr(
@@ -151,9 +151,9 @@ func (k *Compiled) addImplicitEtiketten(
 	sk *sku.Transacted,
 ) (err error) {
 	mp := &sk.Metadatei
-	ie := kennung.MakeTagMutableSet()
+	ie := ids.MakeTagMutableSet()
 
-	addImpEts := func(e *kennung.Tag) (err error) {
+	addImpEts := func(e *ids.Tag) (err error) {
 		p1 := etiketten_path.MakePathWithType()
 		p1.Type = etiketten_path.TypeIndirect
 		p1.Add(catgut.MakeFromString(e.String()))
@@ -168,7 +168,7 @@ func (k *Compiled) addImplicitEtiketten(
 		if err = impl.EachPtr(
 			iter.MakeChain(
 				ie.AddPtr,
-				func(e1 *kennung.Tag) (err error) {
+				func(e1 *ids.Tag) (err error) {
 					p2 := p1.Clone()
 					p2.Add(catgut.MakeFromString(e1.String()))
 					sk.Metadatei.Verzeichnisse.Etiketten.AddPathWithType(p2)

@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/ennui"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -46,8 +46,8 @@ func (pw *writer) Flush() (err error) {
 	defer pw.addedSchwanz.Reset()
 
 	pw.kennungShaMap = make(KennungShaMap)
-	pw.binaryDecoder = makeBinary(kennung.SigilHistory)
-	pw.binaryDecoder.Sigil = kennung.SigilHistory
+	pw.binaryDecoder = makeBinary(ids.SigilHistory)
+	pw.binaryDecoder.Sigil = ids.SigilHistory
 
 	path := pw.Path()
 
@@ -98,7 +98,7 @@ func (pw *writer) flushBoth() (err error) {
 	)
 
 	if err = pw.copyJustHistoryAndAdded(
-		makeFlushQueryGroup(kennung.SigilHistory, kennung.SigilHidden),
+		makeFlushQueryGroup(ids.SigilHistory, ids.SigilHidden),
 		chain,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -134,7 +134,7 @@ func (pw *writer) flushBoth() (err error) {
 }
 
 func (pw *writer) updateSigilWithSchwanzen(st skuWithRangeAndSigil) (err error) {
-	st.Add(kennung.SigilLatest)
+	st.Add(ids.SigilLatest)
 
 	if err = pw.WriteOneObjekteMetadatei(st.Transacted); err != nil {
 		err = errors.Wrap(err)
@@ -154,7 +154,7 @@ func (pw *writer) flushJustSchwanz() (err error) {
 
 	if err = pw.copyJustHistoryFrom(
 		&pw.Reader,
-		makeFlushQueryGroup(kennung.SigilHistory, kennung.SigilHidden),
+		makeFlushQueryGroup(ids.SigilHistory, ids.SigilHidden),
 		func(sk skuWithRangeAndSigil) (err error) {
 			pw.Range = sk.Range
 			pw.saveSchwanz(sk.Transacted, sk.Sigil)
@@ -212,12 +212,12 @@ func (pw *writer) writeOne(
 		return
 	}
 
-	pw.saveSchwanz(z, kennung.SigilHistory)
+	pw.saveSchwanz(z, ids.SigilHistory)
 
 	return
 }
 
-func (pw *writer) saveSchwanz(z *sku.Transacted, sigil kennung.Sigil) {
+func (pw *writer) saveSchwanz(z *sku.Transacted, sigil ids.Sigil) {
 	k := z.GetKennung()
 	ks := k.String()
 
@@ -233,9 +233,9 @@ func (pw *writer) saveSchwanz(z *sku.Transacted, sigil kennung.Sigil) {
 	record.Sigil = sigil
 
 	if z.Metadatei.Verzeichnisse.Schlummernd.Bool() {
-		record.Add(kennung.SigilHidden)
+		record.Add(ids.SigilHidden)
 	} else {
-		record.Del(kennung.SigilHidden)
+		record.Del(ids.SigilHidden)
 	}
 
 	pw.kennungShaMap[ks] = record
@@ -249,7 +249,7 @@ func (pw *writer) removeOldSchwanz(sk *sku.Transacted) (err error) {
 		return
 	}
 
-	st.Del(kennung.SigilLatest)
+	st.Del(ids.SigilLatest)
 
 	if err = pw.updateSigil(pw, st.Sigil, st.Offset); err != nil {
 		err = errors.Wrap(err)

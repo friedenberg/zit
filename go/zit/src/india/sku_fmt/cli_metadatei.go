@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/bezeichnung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 )
 
@@ -20,16 +20,16 @@ type cliMetadatei struct {
 	writeEtiketten   bool
 
 	shaStringFormatWriter         interfaces.StringFormatWriter[interfaces.ShaLike]
-	typStringFormatWriter         interfaces.StringFormatWriter[*kennung.Type]
+	typStringFormatWriter         interfaces.StringFormatWriter[*ids.Type]
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung]
-	etikettenStringFormatWriter   interfaces.StringFormatWriter[*kennung.Tag]
+	etikettenStringFormatWriter   interfaces.StringFormatWriter[*ids.Tag]
 }
 
 func MakeCliMetadateiFormatShort(
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
-	typStringFormatWriter interfaces.StringFormatWriter[*kennung.Type],
+	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung],
-	etikettenStringFormatWriter interfaces.StringFormatWriter[*kennung.Tag],
+	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
 ) *cliMetadatei {
 	return &cliMetadatei{
 		writeTyp:                      false,
@@ -45,9 +45,9 @@ func MakeCliMetadateiFormatShort(
 func MakeCliMetadateiFormat(
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
-	typStringFormatWriter interfaces.StringFormatWriter[*kennung.Type],
+	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung],
-	etikettenStringFormatWriter interfaces.StringFormatWriter[*kennung.Tag],
+	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
 ) *cliMetadatei {
 	return &cliMetadatei{
 		options: options,

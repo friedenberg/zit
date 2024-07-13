@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -17,8 +17,8 @@ type MutableMatchSet struct {
 	Stored                    MutableSet
 	Akten                     MutableSet
 	Matched                   MutableSet
-	MatchedHinweisen          interfaces.MutableSetLike[kennung.IdLike]
-	MatchedHinweisenSchwanzen map[string]kennung.Tai
+	MatchedHinweisen          interfaces.MutableSetLike[ids.IdLike]
+	MatchedHinweisenSchwanzen map[string]ids.Tai
 }
 
 func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
@@ -28,10 +28,10 @@ func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
 		Stored:   MakeMutableSetUniqueStored(),
 		Akten:    MakeMutableSetUniqueAkte(),
 		Matched:  MakeMutableSetUniqueFD(),
-		MatchedHinweisen: collections_value.MakeMutableValueSet[kennung.IdLike](
+		MatchedHinweisen: collections_value.MakeMutableValueSet[ids.IdLike](
 			nil,
 		),
-		MatchedHinweisenSchwanzen: make(map[string]kennung.Tai),
+		MatchedHinweisenSchwanzen: make(map[string]ids.Tai),
 	}
 
 	in.Each(out.Stored.Add)

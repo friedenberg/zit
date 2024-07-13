@@ -3,11 +3,11 @@ package typ
 import (
 	"testing"
 
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 func TestBlobExt(t *testing.T) {
-	var e kennung.Type
+	var e ids.Type
 	var err error
 
 	if err = e.Set("!md"); err != nil {
@@ -23,7 +23,7 @@ func TestBlobExt(t *testing.T) {
 }
 
 func TestBlobExt1(t *testing.T) {
-	var e kennung.Type
+	var e ids.Type
 	var err error
 
 	if err = e.Set("md"); err != nil {

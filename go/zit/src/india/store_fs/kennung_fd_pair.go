@@ -8,11 +8,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type KennungFDPair struct {
-	Kennung kennung.ObjectId
+	Kennung ids.ObjectId
 	FDs     FDPair
 }
 
@@ -32,11 +32,11 @@ func (a *KennungFDPair) Equals(b KennungFDPair) bool {
 	return true
 }
 
-func (e *KennungFDPair) GetKennungLike() kennung.IdLike {
+func (e *KennungFDPair) GetKennungLike() ids.IdLike {
 	return &e.Kennung
 }
 
-func (e *KennungFDPair) GetKennungLikePtr() kennung.IdLikePtr {
+func (e *KennungFDPair) GetKennungLikePtr() ids.IdLikePtr {
 	return &e.Kennung
 }
 

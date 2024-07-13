@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -23,7 +23,7 @@ func (kc *Compiled) GetImmutableConfig() interfaces.ImmutableConfig {
 	return kc.angeboren
 }
 
-func (kc *compiled) getTyp(k kennung.IdLike) (ct *sku.Transacted) {
+func (kc *compiled) getTyp(k ids.IdLike) (ct *sku.Transacted) {
 	if k.GetGenre() != gattung.Typ {
 		return
 	}
@@ -36,7 +36,7 @@ func (kc *compiled) getTyp(k kennung.IdLike) (ct *sku.Transacted) {
 	return
 }
 
-func (kc *compiled) getKasten(k kennung.IdLike) (ct *sku.Transacted) {
+func (kc *compiled) getKasten(k ids.IdLike) (ct *sku.Transacted) {
 	if k.GetGenre() != gattung.Kasten {
 		return
 	}
@@ -52,7 +52,7 @@ func (kc *compiled) getKasten(k kennung.IdLike) (ct *sku.Transacted) {
 // Returns the exactly matching Typ, or if it doesn't exist, returns the parent
 // Typ or nil. (Parent Typ for `md-gdoc` would be `md`.)
 func (kc *compiled) getApproximatedTyp(
-	k kennung.IdLike,
+	k ids.IdLike,
 ) (ct ApproximatedTyp) {
 	if k.GetGenre() != gattung.Typ {
 		return
@@ -63,7 +63,7 @@ func (kc *compiled) getApproximatedTyp(
 		ct.HasValue = true
 		ct.Typ = expandedActual[0]
 
-		if kennung.Equals(ct.Typ.GetKennung(), k) {
+		if ids.Equals(ct.Typ.GetKennung(), k) {
 			ct.IsActual = true
 		}
 	}
@@ -74,7 +74,7 @@ func (kc *compiled) getApproximatedTyp(
 func (kc *compiled) getEtikettOrKastenOrTyp(
 	v string,
 ) (sk *sku.Transacted, err error) {
-	var k kennung.ObjectId
+	var k ids.ObjectId
 
 	if err = k.Set(v); err != nil {
 		err = errors.Wrap(err)
@@ -98,7 +98,7 @@ func (kc *compiled) getEtikettOrKastenOrTyp(
 }
 
 func (kc *compiled) getEtikett(
-	k kennung.IdLike,
+	k ids.IdLike,
 ) (ct *sku.Transacted, ok bool) {
 	if k.GetGenre() != gattung.Etikett {
 		return
@@ -199,12 +199,12 @@ func (c *compiled) getSortedEtikettenExpanded(
 }
 
 func (c *compiled) getImplicitEtiketten(
-	e *kennung.Tag,
-) kennung.TagSet {
+	e *ids.Tag,
+) ids.TagSet {
 	s, ok := c.ImplicitEtiketten[e.String()]
 
 	if !ok || s == nil {
-		return kennung.MakeTagSet()
+		return ids.MakeTagSet()
 	}
 
 	return s

@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
@@ -40,8 +40,8 @@ func init() {
 	)
 }
 
-func (c Edit) CompletionGattung() kennung.Genre {
-	return kennung.MakeGenre(
+func (c Edit) CompletionGattung() ids.Genre {
+	return ids.MakeGenre(
 		gattung.Etikett,
 		gattung.Zettel,
 		gattung.Typ,
@@ -49,8 +49,8 @@ func (c Edit) CompletionGattung() kennung.Genre {
 	)
 }
 
-func (c Edit) DefaultGattungen() kennung.Genre {
-	return kennung.MakeGenre(
+func (c Edit) DefaultGattungen() ids.Genre {
+	return ids.MakeGenre(
 		gattung.Etikett,
 		gattung.Zettel,
 		gattung.Typ,

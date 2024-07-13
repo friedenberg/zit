@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -27,8 +27,8 @@ func init() {
 	)
 }
 
-func (c Test) CompletionGattung() kennung.Genre {
-	return kennung.MakeGenre(
+func (c Test) CompletionGattung() ids.Genre {
+	return ids.MakeGenre(
 		gattung.Zettel,
 		gattung.Etikett,
 		gattung.Typ,
@@ -37,8 +37,8 @@ func (c Test) CompletionGattung() kennung.Genre {
 	)
 }
 
-func (c Test) DefaultGattungen() kennung.Genre {
-	return kennung.MakeGenre(
+func (c Test) DefaultGattungen() ids.Genre {
+	return ids.MakeGenre(
 		gattung.Zettel,
 		gattung.Etikett,
 		gattung.Typ,

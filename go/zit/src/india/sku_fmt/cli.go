@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -15,12 +15,12 @@ type cli struct {
 	options       erworben_cli_print_options.PrintOptions
 	contentPrefix string
 
-	kennungStringFormatWriter   interfaces.StringFormatWriter[*kennung.ObjectId]
+	kennungStringFormatWriter   interfaces.StringFormatWriter[*ids.ObjectId]
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*metadatei.Metadatei]
 }
 
 func MakeCliFormatShort(
-	kennungStringFormatWriter interfaces.StringFormatWriter[*kennung.ObjectId],
+	kennungStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*metadatei.Metadatei],
 ) *cli {
 	return &cli{
@@ -31,7 +31,7 @@ func MakeCliFormatShort(
 
 func MakeCliFormat(
 	options erworben_cli_print_options.PrintOptions,
-	kennungStringFormatWriter interfaces.StringFormatWriter[*kennung.ObjectId],
+	kennungStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*metadatei.Metadatei],
 ) *cli {
 	return &cli{

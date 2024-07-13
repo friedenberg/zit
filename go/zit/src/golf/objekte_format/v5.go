@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type v5 struct{}
@@ -69,7 +69,7 @@ func (f v5) FormatPersistentMetadatei(
 
 	es := m.GetEtiketten()
 
-	for _, e := range iter.SortedValues[kennung.Tag](es) {
+	for _, e := range iter.SortedValues[ids.Tag](es) {
 		if e.IsVirtual() {
 			continue
 		}
@@ -171,7 +171,7 @@ func (f v5) FormatPersistentMetadatei(
 		if m.Verzeichnisse.GetExpandedEtiketten().Len() > 0 {
 			k := keyVerzeichnisseEtikettExpanded.String()
 
-			for _, e := range iter.SortedValues[kennung.Tag](
+			for _, e := range iter.SortedValues[ids.Tag](
 				m.Verzeichnisse.GetExpandedEtiketten(),
 			) {
 				n1, err = ohio.WriteKeySpaceValueNewlineString(
@@ -191,7 +191,7 @@ func (f v5) FormatPersistentMetadatei(
 		if m.Verzeichnisse.GetImplicitEtiketten().Len() > 0 {
 			k := keyVerzeichnisseEtikettImplicit.String()
 
-			for _, e := range iter.SortedValues[kennung.Tag](
+			for _, e := range iter.SortedValues[ids.Tag](
 				m.Verzeichnisse.GetImplicitEtiketten(),
 			) {
 				n2, err = ohio.WriteKeySpaceValueNewline(
@@ -259,8 +259,8 @@ func (f v5) ParsePersistentMetadatei(
 	m := c.GetMetadatei()
 
 	var (
-		g gattung.Gattung
-		k *kennung.ObjectId
+		g gattung.Genre
+		k *ids.ObjectId
 	)
 
 	var (
@@ -317,7 +317,7 @@ func (f v5) ParsePersistentMetadatei(
 			}
 
 		case key.Equal(keyEtikett.Bytes()):
-			e := kennung.GetTagPool().Get()
+			e := ids.GetTagPool().Get()
 
 			if err = e.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
@@ -336,8 +336,8 @@ func (f v5) ParsePersistentMetadatei(
 			}
 
 		case key.Equal(keyKennung.Bytes()):
-			k = kennung.GetObjectIdPool().Get()
-			defer kennung.GetObjectIdPool().Put(k)
+			k = ids.GetObjectIdPool().Get()
+			defer ids.GetObjectIdPool().Put(k)
 
 			if err = k.SetWithGenre(val.String(), g); err != nil {
 				err = errors.Wrap(err)
@@ -376,7 +376,7 @@ func (f v5) ParsePersistentMetadatei(
 				return
 			}
 
-			e := kennung.GetTagPool().Get()
+			e := ids.GetTagPool().Get()
 
 			if err = e.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
@@ -397,7 +397,7 @@ func (f v5) ParsePersistentMetadatei(
 				return
 			}
 
-			e := kennung.GetTagPool().Get()
+			e := ids.GetTagPool().Get()
 
 			if err = e.Set(val.String()); err != nil {
 				err = errors.Wrap(err)

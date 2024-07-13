@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -78,7 +78,7 @@ func (e *External) SetItem(i item, overwrite bool) (err error) {
 	}
 
 	// TODO make configurable
-	e.Metadatei.Typ = kennung.MustType("!toml-bookmark")
+	e.Metadatei.Typ = ids.MustType("!toml-bookmark")
 
 	return
 }
@@ -105,7 +105,7 @@ func (t *External) SetFromSkuLike(sk sku.SkuLike) (err error) {
 	return
 }
 
-func (a *External) GetKennung() kennung.IdLike {
+func (a *External) GetKennung() ids.IdLike {
 	return &a.Kennung
 }
 

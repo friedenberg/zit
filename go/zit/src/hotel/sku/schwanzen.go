@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/kennung_index"
 )
 
@@ -52,7 +52,7 @@ func (zws *Schwanzen) Less(zt *Transacted) (ok bool) {
 	return
 }
 
-func (zws *Schwanzen) Get(h kennung.IdLike) (t kennung.Tai, ok bool) {
+func (zws *Schwanzen) Get(h ids.IdLike) (t ids.Tai, ok bool) {
 	zws.lock.RLock()
 	defer zws.lock.RUnlock()
 

@@ -3,7 +3,7 @@ package metadatei
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 var (
@@ -50,7 +50,7 @@ func (e equaler) Equals(a, b *Metadatei) bool {
 	// }
 
 	if err := aes.EachPtr(
-		func(ea *kennung.Tag) (err error) {
+		func(ea *ids.Tag) (err error) {
 			if (!e.includeVirtual && ea.IsVirtual()) || ea.IsEmpty() {
 				return
 			}
@@ -75,7 +75,7 @@ func (e equaler) Equals(a, b *Metadatei) bool {
 	}
 
 	if err := bes.EachPtr(
-		func(eb *kennung.Tag) (err error) {
+		func(eb *ids.Tag) (err error) {
 			if !e.includeVirtual && eb.IsVirtual() {
 				return
 			}

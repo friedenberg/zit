@@ -10,10 +10,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
-func (i *Store) PageForKennung(h kennung.IdLike) (n uint8, err error) {
+func (i *Store) PageForKennung(h ids.IdLike) (n uint8, err error) {
 	s := sha.FromStringer(h)
 	return sha.PageIndexForSha(DigitWidth, s)
 }

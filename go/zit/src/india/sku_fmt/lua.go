@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -23,7 +23,7 @@ func ToLuaTable(o *sku.Transacted, l *lua.LState, t *LuaTable) {
 	etiketten := t.Etiketten
 
 	o.Metadatei.GetEtiketten().EachPtr(
-		func(e *kennung.Tag) (err error) {
+		func(e *ids.Tag) (err error) {
 			l.SetField(etiketten, e.String(), lua.LBool(true))
 			return
 		},
@@ -32,7 +32,7 @@ func ToLuaTable(o *sku.Transacted, l *lua.LState, t *LuaTable) {
 	etiketten = t.EtikettenImplicit
 
 	o.Metadatei.Verzeichnisse.GetImplicitEtiketten().EachPtr(
-		func(e *kennung.Tag) (err error) {
+		func(e *ids.Tag) (err error) {
 			l.SetField(etiketten, e.String(), lua.LBool(true))
 			return
 		},
@@ -42,7 +42,7 @@ func ToLuaTable(o *sku.Transacted, l *lua.LState, t *LuaTable) {
 func FromLuaTable(o *sku.Transacted, l *lua.LState, lt *LuaTable) (err error) {
 	t := lt.Transacted
 
-	var g gattung.Gattung
+	var g gattung.Genre
 	if err = g.Set(l.GetField(t, "Gattung").String()); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -68,7 +68,7 @@ func FromLuaTable(o *sku.Transacted, l *lua.LState, lt *LuaTable) (err error) {
 
 	ets.ForEach(
 		func(key, value lua.LValue) {
-			var e kennung.Tag
+			var e ids.Tag
 
 			if err = e.Set(key.String()); err != nil {
 				err = errors.Wrap(err)

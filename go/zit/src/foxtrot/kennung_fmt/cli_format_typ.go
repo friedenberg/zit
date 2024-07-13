@@ -3,7 +3,7 @@ package kennung_fmt
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type typCliFormat struct {
@@ -22,7 +22,7 @@ func MakeTypCliFormat(co string_format_writer.ColorOptions) *typCliFormat {
 
 func (f *typCliFormat) WriteStringFormat(
 	w interfaces.WriterAndStringWriter,
-	k *kennung.Type,
+	k *ids.Type,
 ) (n int64, err error) {
 	v := k.String()
 

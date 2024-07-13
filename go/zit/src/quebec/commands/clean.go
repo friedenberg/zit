@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -60,8 +60,8 @@ func init() {
 	)
 }
 
-func (c Clean) DefaultGattungen() kennung.Genre {
-	return kennung.MakeGenre(gattung.TrueGattung()...)
+func (c Clean) DefaultGattungen() ids.Genre {
+	return ids.MakeGenre(gattung.TrueGattung()...)
 }
 
 func (c Clean) shouldClean(

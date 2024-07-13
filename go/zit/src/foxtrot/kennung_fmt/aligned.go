@@ -5,19 +5,19 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 func MakeAligned(
 	options erworben_cli_print_options.PrintOptions,
-	ab kennung.Abbr,
+	ab ids.Abbr,
 ) *aligned {
 	return &aligned{PrintOptions: options, Abbr: ab}
 }
 
 type aligned struct {
 	erworben_cli_print_options.PrintOptions
-	kennung.Abbr
+	ids.Abbr
 	maxKopf, maxSchwanz int
 }
 
@@ -32,7 +32,7 @@ func (f *aligned) SetMaxKopfUndSchwanz(k, s int) {
 
 func (f *aligned) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
-	o *kennung.ObjectId,
+	o *ids.ObjectId,
 ) (n int64, err error) {
 	var n1 int
 
@@ -46,7 +46,7 @@ func (f *aligned) WriteStringFormat(
 	}
 
 	// TODO move to kennung and avoid allocation
-	h := kennung.Aligned(o, f.maxKopf, f.maxSchwanz)
+	h := ids.Aligned(o, f.maxKopf, f.maxSchwanz)
 	n1, err = sw.WriteString(h)
 	n += int64(n1)
 

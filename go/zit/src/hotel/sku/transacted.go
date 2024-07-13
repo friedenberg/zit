@@ -10,16 +10,16 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 )
 
 type Transacted struct {
-	Kennung          kennung.ObjectId
+	Kennung          ids.ObjectId
 	Metadatei        metadatei.Metadatei
 	TransactionIndex values.Int
-	Kopf             kennung.Tai
+	Kopf             ids.Tai
 }
 
 func (t *Transacted) GetSkuLike() SkuLike {
@@ -119,14 +119,14 @@ func (a *Transacted) GetSkuLikePtr() SkuLike {
 	return a
 }
 
-func (a *Transacted) GetEtiketten() kennung.TagSet {
+func (a *Transacted) GetEtiketten() ids.TagSet {
 	return a.Metadatei.GetEtiketten()
 }
 
-func (a *Transacted) AddEtikettPtr(e *kennung.Tag) (err error) {
+func (a *Transacted) AddEtikettPtr(e *ids.Tag) (err error) {
 	if a.Kennung.GetGenre() == gattung.Etikett {
-		e1 := kennung.MustTag(a.Kennung.String())
-		ex := kennung.ExpandOne(&e1, expansion.ExpanderRight)
+		e1 := ids.MustTag(a.Kennung.String())
+		ex := ids.ExpandOne(&e1, expansion.ExpanderRight)
 
 		if ex.ContainsKey(ex.KeyPtr(e)) {
 			return
@@ -147,7 +147,7 @@ func (a *Transacted) AddEtikettPtr(e *kennung.Tag) (err error) {
 	return
 }
 
-func (a *Transacted) AddEtikettPtrFast(e *kennung.Tag) (err error) {
+func (a *Transacted) AddEtikettPtrFast(e *ids.Tag) (err error) {
 	if err = a.GetMetadatei().AddEtikettPtrFast(e); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -156,7 +156,7 @@ func (a *Transacted) AddEtikettPtrFast(e *kennung.Tag) (err error) {
 	return
 }
 
-func (a *Transacted) GetTyp() kennung.Type {
+func (a *Transacted) GetTyp() ids.Type {
 	return a.Metadatei.Typ
 }
 
@@ -164,29 +164,29 @@ func (a *Transacted) GetMetadatei() *metadatei.Metadatei {
 	return &a.Metadatei
 }
 
-func (a *Transacted) GetTai() kennung.Tai {
+func (a *Transacted) GetTai() ids.Tai {
 	return a.Metadatei.GetTai()
 }
 
-func (a *Transacted) GetKopf() kennung.Tai {
+func (a *Transacted) GetKopf() ids.Tai {
 	return a.Kopf
 }
 
-func (a *Transacted) SetTai(t kennung.Tai) {
+func (a *Transacted) SetTai(t ids.Tai) {
 	// log.Debug().Caller(6, "before: %s", a.StringKennungTai())
 	a.GetMetadatei().Tai = t
 	// log.Debug().Caller(6, "after: %s", a.StringKennungTai())
 }
 
-func (a *Transacted) GetKennung() kennung.IdLike {
+func (a *Transacted) GetKennung() ids.IdLike {
 	return &a.Kennung
 }
 
-func (a *Transacted) GetKennungLike() kennung.IdLike {
+func (a *Transacted) GetKennungLike() ids.IdLike {
 	return &a.Kennung
 }
 
-func (a *Transacted) SetKennungLike(kl kennung.IdLike) (err error) {
+func (a *Transacted) SetKennungLike(kl ids.IdLike) (err error) {
 	if err = a.Kennung.SetWithIdLike(kl); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -325,7 +325,7 @@ func (s *Transacted) GetTransactionIndex() values.Int {
 }
 
 func (o *Transacted) GetKey() string {
-	return kennung.FormattedString(o.GetKennung())
+	return ids.FormattedString(o.GetKennung())
 }
 
 type transactedLessor struct{}

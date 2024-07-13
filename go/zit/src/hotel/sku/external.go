@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 )
 
@@ -30,7 +30,7 @@ func (t *External) SetFromSkuLike(sk SkuLike) (err error) {
 	return
 }
 
-func (a *External) GetKennung() kennung.IdLike {
+func (a *External) GetKennung() ids.IdLike {
 	return &a.Kennung
 }
 

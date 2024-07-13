@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/etiketten_path"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -53,7 +53,7 @@ func (c *constructor) Make() (ot *Text, err error) {
 
 func (c *constructor) collectExplicitAndImplicitFor(
 	skus sku.TransactedSet,
-	re kennung.Tag,
+	re ids.Tag,
 ) (explicitCount, implicitCount int, err error) {
 	res := catgut.MakeFromString(re.String())
 
@@ -95,11 +95,11 @@ func (c *constructor) collectExplicitAndImplicitFor(
 }
 
 func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
-	anchored := kennung.MakeMutableTagSet()
-	extras := kennung.MakeMutableTagSet()
+	anchored := ids.MakeMutableTagSet()
+	extras := ids.MakeMutableTagSet()
 
 	if err = c.rootEtiketten.Each(
-		func(re kennung.Tag) (err error) {
+		func(re ids.Tag) (err error) {
 			var explicitCount, implicitCount int
 
 			if explicitCount, implicitCount, err = c.collectExplicitAndImplicitFor(
@@ -202,7 +202,7 @@ func (c *constructor) makeChildrenWithoutGroups(
 func (c *constructor) makeChildrenWithPossibleGroups(
 	parent *Assignment,
 	prefixSet PrefixSet,
-	groupingEtiketten kennung.TagSlice,
+	groupingEtiketten ids.TagSlice,
 	used objSet,
 ) (err error) {
 	if groupingEtiketten.Len() == 0 {
@@ -243,11 +243,11 @@ func (c *constructor) makeChildrenWithPossibleGroups(
 func (c *constructor) addGroupedChildren(
 	parent *Assignment,
 	grouped PrefixSet,
-	groupingEtiketten kennung.TagSlice,
+	groupingEtiketten ids.TagSlice,
 	used objSet,
 ) (err error) {
 	if err = grouped.Each(
-		func(e kennung.Tag, zs objSet) (err error) {
+		func(e ids.Tag, zs objSet) (err error) {
 			if e.IsEmpty() || c.TagSet.Contains(e) {
 				if err = c.makeAndAddUngrouped(parent, zs.Each); err != nil {
 					err = errors.Wrap(err)
@@ -260,7 +260,7 @@ func (c *constructor) addGroupedChildren(
 			}
 
 			child := newAssignment(parent.GetDepth() + 1)
-			child.Etiketten = kennung.MakeTagSet(e)
+			child.Etiketten = ids.MakeTagSet(e)
 			groupingEtiketten.DropFirst()
 
 			psv := MakePrefixSetFrom(zs)

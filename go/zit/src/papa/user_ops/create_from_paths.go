@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/objekte_collections"
@@ -169,7 +169,7 @@ func (c *CreateFromPaths) zettelsFromPath(
 		Objekte: fd,
 	}
 
-	ze.Metadatei.Tai = kennung.TaiFromTime(fd.ModTime())
+	ze.Metadatei.Tai = ids.TaiFromTime(fd.ModTime())
 
 	ze.Kennung.SetGenre(gattung.Zettel)
 

@@ -13,18 +13,18 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/schlussel"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type binaryEncoder struct {
 	bytes.Buffer
 	binaryField
-	kennung.Sigil
+	ids.Sigil
 }
 
 func (bf *binaryEncoder) updateSigil(
 	wa io.WriterAt,
-	s kennung.Sigil,
+	s ids.Sigil,
 	offset int64,
 ) (err error) {
 	s.Add(bf.Sigil)
@@ -102,7 +102,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		s.Add(bf.Sigil)
 
 		if sk.Metadatei.Verzeichnisse.Schlummernd.Bool() {
-			s.Add(kennung.SigilHidden)
+			s.Add(ids.SigilHidden)
 		}
 
 		if n, err = bf.writeFieldByteReader(s); err != nil {
@@ -202,7 +202,7 @@ func (bf *binaryEncoder) writeFieldKey(
 	case schlussel.VerzeichnisseEtikettImplicit:
 		es := sk.Metadatei.Verzeichnisse.GetImplicitEtiketten()
 
-		for _, e := range iter.SortedValues[kennung.Tag](es) {
+		for _, e := range iter.SortedValues[ids.Tag](es) {
 			var n1 int64
 			n1, err = bf.writeFieldBinaryMarshaler(&e)
 			n += n1
@@ -216,7 +216,7 @@ func (bf *binaryEncoder) writeFieldKey(
 	case schlussel.VerzeichnisseEtikettExpanded:
 		es := sk.Metadatei.Verzeichnisse.GetExpandedEtiketten()
 
-		for _, e := range iter.SortedValues[kennung.Tag](es) {
+		for _, e := range iter.SortedValues[ids.Tag](es) {
 			var n1 int64
 			n1, err = bf.writeFieldBinaryMarshaler(&e)
 			n += n1

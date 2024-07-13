@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/type_blob"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -34,13 +34,13 @@ func (kc *Compiled) recompile(
 }
 
 func (kc *Compiled) recompileEtiketten() (err error) {
-	kc.DefaultEtiketten = kennung.MakeTagSet(kc.Defaults.Etiketten...)
+	kc.DefaultEtiketten = ids.MakeTagSet(kc.Defaults.Etiketten...)
 
 	kc.ImplicitEtiketten = make(implicitEtikettenMap)
 
 	if err = kc.compiled.Etiketten.Each(
 		func(ke *ketikett) (err error) {
-			var e kennung.Tag
+			var e ids.Tag
 
 			if err = e.Set(ke.Transacted.GetKennung().String()); err != nil {
 				err = errors.Wrap(err)

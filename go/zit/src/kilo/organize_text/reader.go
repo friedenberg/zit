@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/unicorn"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/etiketten_path"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/kennung_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -120,7 +120,7 @@ func (ar *assignmentLineReader) readOneHeading(
 ) (err error) {
 	depth := unicorn.CountRune(match.Bytes, '#')
 
-	currentEtiketten := kennung.MakeMutableTagSet()
+	currentEtiketten := ids.MakeMutableTagSet()
 
 	reader := kennung_fmt.MakeEtikettenReader()
 
@@ -165,7 +165,7 @@ func (ar *assignmentLineReader) readOneHeading(
 
 func (ar *assignmentLineReader) readOneHeadingLesserDepth(
 	d int,
-	e kennung.TagSet,
+	e ids.TagSet,
 ) (newCurrent *Assignment, err error) {
 	depthDiff := d - ar.currentAssignment.GetDepth()
 
@@ -203,7 +203,7 @@ func (ar *assignmentLineReader) readOneHeadingLesserDepth(
 
 func (ar *assignmentLineReader) readOneHeadingEqualDepth(
 	d int,
-	e kennung.TagSet,
+	e ids.TagSet,
 ) (newCurrent *Assignment, err error) {
 	// logz.Print("depth count is ==")
 
@@ -238,7 +238,7 @@ func (ar *assignmentLineReader) readOneHeadingEqualDepth(
 
 func (ar *assignmentLineReader) readOneHeadingGreaterDepth(
 	d int,
-	e kennung.TagSet,
+	e ids.TagSet,
 ) (newCurrent *Assignment, err error) {
 	// logz.Print("depth count is >")
 	// logz.Print(e)
@@ -309,7 +309,7 @@ func (ar *assignmentLineReader) readOneObj(
 
 	if z.Kennung.IsEmpty() {
 		// set empty hinweis to ensure middle is '/'
-		if err = z.Kennung.SetWithIdLike(kennung.ZettelId{}); err != nil {
+		if err = z.Kennung.SetWithIdLike(ids.ZettelId{}); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

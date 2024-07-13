@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/angeboren"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/typ"
 )
@@ -56,7 +56,7 @@ func (u *Umwelt) Einleitung(e Einleitung) (err error) {
 		return
 	}
 
-	for _, g := range []gattung.Gattung{gattung.Akte, gattung.Bestandsaufnahme} {
+	for _, g := range []gattung.Genre{gattung.Akte, gattung.Bestandsaufnahme} {
 		var d string
 
 		if d, err = s.DirObjektenGattung(
@@ -147,7 +147,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 
 	// var defaultTypTransacted *typ.Transacted
 
-	var k kennung.ObjectId
+	var k ids.ObjectId
 
 	if err = k.SetWithIdLike(defaultTypKennung); err != nil {
 		err = errors.Wrap(err)
@@ -166,7 +166,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 			return
 		}
 
-		var k kennung.ObjectId
+		var k ids.ObjectId
 
 		if err = k.SetWithIdLike(defaultTypKennung); err != nil {
 			err = errors.Wrap(err)
@@ -191,7 +191,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 		}
 
 		if _, err = u.GetStore().CreateOrUpdateAkteSha(
-			&kennung.Config{},
+			&ids.Config{},
 			sh,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -204,7 +204,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 
 func writeDefaultErworben(
 	u *Umwelt,
-	dt kennung.Type,
+	dt ids.Type,
 ) (sh interfaces.ShaLike, err error) {
 	defaultKonfig := mutable_config.Default(dt)
 

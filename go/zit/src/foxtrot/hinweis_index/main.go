@@ -3,21 +3,21 @@ package hinweis_index
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	hinweis_index_v0 "code.linenisgreat.com/zit/go/zit/src/foxtrot/hinweis_index/v0"
 	hinweis_index_v1 "code.linenisgreat.com/zit/go/zit/src/foxtrot/hinweis_index/v1"
 )
 
 type HinweisStore interface {
 	interfaces.Flusher
-	CreateHinweis() (*kennung.ZettelId, error)
+	CreateHinweis() (*ids.ZettelId, error)
 }
 
 type HinweisIndex interface {
 	HinweisStore
 	interfaces.ResetterWithError
-	AddHinweis(kennung.IdLike) error
-	PeekHinweisen(int) ([]*kennung.ZettelId, error)
+	AddHinweis(ids.IdLike) error
+	PeekHinweisen(int) ([]*ids.ZettelId, error)
 }
 
 func MakeIndex(

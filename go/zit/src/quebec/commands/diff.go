@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
@@ -30,8 +30,8 @@ func init() {
 	)
 }
 
-func (c Diff) DefaultGattungen() kennung.Genre {
-	return kennung.MakeGenre(gattung.TrueGattung()...)
+func (c Diff) DefaultGattungen() ids.Genre {
+	return ids.MakeGenre(gattung.TrueGattung()...)
 }
 
 func (c Diff) ModifyBuilder(

@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -20,8 +20,8 @@ type CheckedOut struct {
 	Error    error
 }
 
-func (c *CheckedOut) GetKasten() kennung.RepoId {
-	return *(kennung.MustRepoId(""))
+func (c *CheckedOut) GetKasten() ids.RepoId {
+	return *(ids.MustRepoId(""))
 }
 
 func (c *CheckedOut) GetSkuCheckedOutLike() sku.CheckedOutLike {

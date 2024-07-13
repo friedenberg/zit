@@ -14,12 +14,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type index2[
-	T kennung.IdGeneric[T],
-	TPtr kennung.IdGenericPtr[T],
+	T ids.IdGeneric[T],
+	TPtr ids.IdGenericPtr[T],
 ] struct {
 	path            string
 	vf              interfaces.CacheIOFactory
@@ -27,12 +27,12 @@ type index2[
 	hasChanges      bool
 	lock            *sync.RWMutex
 	IntsToKennungen map[int]TPtr
-	Kennungen       map[string]*kennung.IndexedLike
+	Kennungen       map[string]*ids.IndexedLike
 }
 
 func MakeIndex2[
-	T kennung.IdGeneric[T],
-	TPtr kennung.IdGenericPtr[T],
+	T ids.IdGeneric[T],
+	TPtr ids.IdGenericPtr[T],
 ](
 	vf interfaces.CacheIOFactory,
 	path string,
@@ -43,7 +43,7 @@ func MakeIndex2[
 		readOnce:        &sync.Once{},
 		lock:            &sync.RWMutex{},
 		IntsToKennungen: make(map[int]TPtr),
-		Kennungen:       make(map[string]*kennung.IndexedLike),
+		Kennungen:       make(map[string]*ids.IndexedLike),
 	}
 
 	return
@@ -60,7 +60,7 @@ func (i *index2[T, TPtr]) Reset() error {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
-	i.Kennungen = make(map[string]*kennung.IndexedLike)
+	i.Kennungen = make(map[string]*ids.IndexedLike)
 	i.IntsToKennungen = make(map[int]TPtr)
 	i.readOnce = &sync.Once{}
 	i.hasChanges = false
@@ -165,7 +165,7 @@ func (i *index2[T, TPtr]) ReadFrom(r1 io.Reader) (n int64, err error) {
 }
 
 func (i *index2[T, TPtr]) Each(
-	f interfaces.FuncIter[kennung.IndexedLike],
+	f interfaces.FuncIter[ids.IndexedLike],
 ) (err error) {
 	if err = i.ReadIfNecessary(); err != nil {
 		err = errors.Wrap(err)
@@ -188,7 +188,7 @@ func (i *index2[T, TPtr]) Each(
 }
 
 func (i *index2[T, TPtr]) EachSchwanzen(
-	f interfaces.FuncIter[*kennung.IndexedLike],
+	f interfaces.FuncIter[*ids.IndexedLike],
 ) (err error) {
 	if err = i.ReadIfNecessary(); err != nil {
 		err = errors.Wrap(err)
@@ -214,13 +214,13 @@ func (i *index2[T, TPtr]) EachSchwanzen(
 	return
 }
 
-func (i *index2[T, TPtr]) GetAll() (out []kennung.IdLike, err error) {
+func (i *index2[T, TPtr]) GetAll() (out []ids.IdLike, err error) {
 	if err = i.ReadIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	out = make([]kennung.IdLike, 0, len(i.Kennungen))
+	out = make([]ids.IdLike, 0, len(i.Kennungen))
 
 	for _, ki := range i.Kennungen {
 		out = append(out, ki.GetKennung())
@@ -254,7 +254,7 @@ func (i *index2[T, TPtr]) GetInt(in int) (id T, err error) {
 
 func (i *index2[T, TPtr]) Get(
 	k TPtr,
-) (id *kennung.IndexedLike, err error) {
+) (id *ids.IndexedLike, err error) {
 	if err = i.ReadIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -333,7 +333,7 @@ func (i *index2[T, TPtr]) StoreOne(k T) (err error) {
 		return
 	}
 
-	if kennung.IsEmpty(k) {
+	if ids.IsEmpty(k) {
 		return
 	}
 
@@ -347,7 +347,7 @@ func (i *index2[T, TPtr]) storeOne(k T) (err error) {
 	id, ok := i.Kennungen[k.String()]
 
 	if !ok {
-		id = &kennung.IndexedLike{}
+		id = &ids.IndexedLike{}
 		id.ResetWithKennung(k)
 	}
 

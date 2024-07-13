@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/tag_blob"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/echo/zittish"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -47,11 +47,11 @@ type Builder struct {
 	kasten                     sku.ExternalStoreForQuery
 	cwdFilterEnabled           bool
 	fileExtensionGetter        interfaces.FileExtensionGetter
-	expanders                  kennung.Abbr
+	expanders                  ids.Abbr
 	hidden                     sku.Query
-	defaultGattungen           kennung.Genre
-	defaultSigil               kennung.Sigil
-	permittedSigil             kennung.Sigil
+	defaultGattungen           ids.Genre
+	defaultSigil               ids.Sigil
+	permittedSigil             ids.Sigil
 	virtualEtikettenBeforeInit map[string]string
 	virtualEtiketten           map[string]Lua
 	doNotMatchEmpty            bool
@@ -60,7 +60,7 @@ type Builder struct {
 	eqo                        sku.ExternalQueryOptions
 }
 
-func (b *Builder) WithPermittedSigil(s kennung.Sigil) *Builder {
+func (b *Builder) WithPermittedSigil(s ids.Sigil) *Builder {
 	b.permittedSigil.Add(s)
 	return b
 }
@@ -108,21 +108,21 @@ func (mb *Builder) WithFileExtensionGetter(
 }
 
 func (mb *Builder) WithExpanders(
-	expanders kennung.Abbr,
+	expanders ids.Abbr,
 ) *Builder {
 	mb.expanders = expanders
 	return mb
 }
 
 func (mb *Builder) WithDefaultGattungen(
-	defaultGattungen kennung.Genre,
+	defaultGattungen ids.Genre,
 ) *Builder {
 	mb.defaultGattungen = defaultGattungen
 	return mb
 }
 
 func (mb *Builder) WithDefaultSigil(
-	defaultSigil kennung.Sigil,
+	defaultSigil ids.Sigil,
 ) *Builder {
 	mb.defaultSigil = defaultSigil
 	return mb
@@ -174,7 +174,7 @@ func (b *Builder) WithCheckedOut(
 }
 
 func (b *Builder) BuildQueryGroupWithKasten(
-	k kennung.RepoId,
+	k ids.RepoId,
 	eqo sku.ExternalQueryOptions,
 	vs ...string,
 ) (qg *Group, err error) {
@@ -227,7 +227,7 @@ func (b *Builder) build(vs ...string) (qg *Group, err error) {
 	var remaining []string
 
 	for _, v := range vs {
-		var k *kennung.ObjectId
+		var k *ids.ObjectId
 
 		if b.kasten == nil {
 			remaining = append(remaining, v)
@@ -243,7 +243,7 @@ func (b *Builder) build(vs ...string) (qg *Group, err error) {
 		b.preexistingKennung = append(
 			b.preexistingKennung,
 			Kennung{
-				ObjectId:       k,
+				ObjectId: k,
 				External: true,
 			},
 		)
@@ -308,7 +308,7 @@ func (b *Builder) buildManyFromTokens(
 ) (err error) {
 	if len(tokens) == 1 && tokens[0] == "." {
 		// TODO [ces/mew] switch to marker on query group for Cwd
-		var ks interfaces.SetLike[*kennung.ObjectId]
+		var ks interfaces.SetLike[*ids.ObjectId]
 
 		if ks, err = b.kasten.GetExternalKennung(); err != nil {
 			err = errors.Wrap(err)
@@ -316,11 +316,11 @@ func (b *Builder) buildManyFromTokens(
 		}
 
 		if err = ks.Each(
-			func(k *kennung.ObjectId) (err error) {
+			func(k *ids.ObjectId) (err error) {
 				b.preexistingKennung = append(
 					b.preexistingKennung,
 					Kennung{
-						ObjectId:       k,
+						ObjectId: k,
 						External: true,
 					},
 				)
@@ -354,7 +354,7 @@ func (b *Builder) addDefaultsIfNecessary(qg *Group) {
 		return
 	}
 
-	g := kennung.MakeGenre()
+	g := ids.MakeGenre()
 	dq, ok := qg.UserQueries[g]
 
 	if ok {
@@ -368,7 +368,7 @@ func (b *Builder) addDefaultsIfNecessary(qg *Group) {
 	dq.Genre = b.defaultGattungen
 
 	if b.defaultSigil.IsEmpty() {
-		dq.Sigil = kennung.SigilLatest
+		dq.Sigil = ids.SigilLatest
 	} else {
 		dq.Sigil = b.defaultSigil
 	}
@@ -454,7 +454,7 @@ LOOP:
 			}
 		} else {
 			k := Kennung{
-				ObjectId: kennung.GetObjectIdPool().Get(),
+				ObjectId: ids.GetObjectIdPool().Get(),
 			}
 
 			if err = k.Set(el); err != nil {
@@ -489,7 +489,7 @@ LOOP:
 				stack[len(stack)-1].Add(exp)
 
 			case gattung.Typ:
-				var t kennung.Type
+				var t ids.Type
 
 				if err = t.TodoSetFromKennung2(k.ObjectId); err != nil {
 					err = errors.Wrap(err)
@@ -604,7 +604,7 @@ func (b *Builder) makeEtikettOrEtikettLua(
 
 func (b *Builder) makeEtikettExp(k *Kennung) (exp sku.Query, err error) {
 	// TODO use b.akten to read Etikett Akte and find filter if necessary
-	var e kennung.Tag
+	var e ids.Tag
 
 	if err = e.TodoSetFromKennung2(k.ObjectId); err != nil {
 		err = errors.Wrap(err)
@@ -638,7 +638,7 @@ LOOP:
 			break LOOP
 
 		case ':', '+', '?', '.':
-			var s kennung.Sigil
+			var s ids.Sigil
 
 			if err = s.Set(el); err != nil {
 				err = errors.Wrap(err)

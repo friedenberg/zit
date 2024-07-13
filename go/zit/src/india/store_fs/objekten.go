@@ -8,13 +8,13 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 // TODO combine everyting into one function
 
 func (c *Store) tryEtikett(fi os.FileInfo, dir string) (err error) {
-	var h kennung.Tag
+	var h ids.Tag
 	var f *fd.FD
 
 	if f, err = fd.FileInfo(fi, dir); err != nil {
@@ -46,7 +46,7 @@ func (c *Store) tryEtikett(fi os.FileInfo, dir string) (err error) {
 }
 
 func (c *Store) tryKasten(fi os.FileInfo, dir string) (err error) {
-	var h kennung.RepoId
+	var h ids.RepoId
 	var f *fd.FD
 
 	if f, err = fd.FileInfo(fi, dir); err != nil {
@@ -78,7 +78,7 @@ func (c *Store) tryKasten(fi os.FileInfo, dir string) (err error) {
 }
 
 func (c *Store) tryTyp(fi os.FileInfo, dir string) (err error) {
-	var h kennung.Type
+	var h ids.Type
 	var f *fd.FD
 
 	if f, err = fd.FileInfo(fi, dir); err != nil {
@@ -109,7 +109,7 @@ func (c *Store) tryTyp(fi os.FileInfo, dir string) (err error) {
 	return c.typen.Add(t)
 }
 
-func getHinweis(f *fd.FD, allowErrors bool) (h kennung.ZettelId, err error) {
+func getHinweis(f *fd.FD, allowErrors bool) (h ids.ZettelId, err error) {
 	parts := strings.Split(f.GetPath(), string(filepath.Separator))
 
 	switch len(parts) {
@@ -154,7 +154,7 @@ func (c *Store) tryZettel(
 		return
 	}
 
-	var h kennung.ZettelId
+	var h ids.ZettelId
 
 	if h, err = getHinweis(f, false); err != nil {
 		err = errors.Wrap(err)

@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
@@ -10,13 +10,13 @@ type QueryBuilderModifier interface {
 }
 
 type DefaultSigilGetter interface {
-	DefaultSigil() kennung.Sigil
+	DefaultSigil() ids.Sigil
 }
 
 type DefaultGattungGetter interface {
-	DefaultGattungen() kennung.Genre
+	DefaultGattungen() ids.Genre
 }
 
 type CompletionGattungGetter interface {
-	CompletionGattung() kennung.Genre
+	CompletionGattung() ids.Genre
 }

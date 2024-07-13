@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
@@ -72,7 +72,7 @@ func init() {
 }
 
 func (c Add) ModifyBuilder(b *query.Builder) {
-	b.WithDefaultGattungen(kennung.MakeGenre(gattung.Zettel)).
+	b.WithDefaultGattungen(ids.MakeGenre(gattung.Zettel)).
 		WithDoNotMatchEmpty()
 }
 

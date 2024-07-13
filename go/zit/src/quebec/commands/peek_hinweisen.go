@@ -7,7 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -34,7 +34,7 @@ func (c PeekHinweisen) Run(store *umwelt.Umwelt, args ...string) (err error) {
 		}
 	}
 
-	var hs []*kennung.ZettelId
+	var hs []*ids.ZettelId
 
 	if hs, err = store.GetStore().GetKennungIndex().PeekHinweisen(
 		n,

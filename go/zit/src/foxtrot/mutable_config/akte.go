@@ -8,17 +8,17 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type Defaults struct {
-	Typ       kennung.Type   `toml:"typ"`
-	Etiketten []kennung.Tag `toml:"etiketten"`
+	Typ       ids.Type  `toml:"typ"`
+	Etiketten []ids.Tag `toml:"etiketten"`
 }
 
 type Blob struct {
 	Defaults        Defaults                                `toml:"defaults"`
-	HiddenEtiketten []kennung.Tag                           `toml:"hidden-etiketten"`
+	HiddenEtiketten []ids.Tag                               `toml:"hidden-etiketten"`
 	FileExtensions  file_extensions.FileExtensions          `toml:"file-extensions"`
 	RemoteScripts   map[string]script_config.RemoteScript   `toml:"remote-scripts"`
 	Actions         map[string]script_config.ScriptConfig   `toml:"actions,omitempty"`
@@ -71,9 +71,9 @@ func (a Blob) Equals(b Blob) bool {
 
 func (a *Blob) Reset() {
 	a.FileExtensions.Reset()
-	a.Defaults.Typ = kennung.Type{}
-	a.Defaults.Etiketten = make([]kennung.Tag, 0)
-	a.HiddenEtiketten = make([]kennung.Tag, 0)
+	a.Defaults.Typ = ids.Type{}
+	a.Defaults.Etiketten = make([]ids.Tag, 0)
+	a.HiddenEtiketten = make([]ids.Tag, 0)
 	a.RemoteScripts = make(map[string]script_config.RemoteScript)
 	a.Actions = make(map[string]script_config.ScriptConfig)
 	a.PrintOptions = erworben_cli_print_options.Default()
@@ -85,10 +85,10 @@ func (a *Blob) ResetWith(b *Blob) {
 
 	a.Defaults.Typ = b.Defaults.Typ
 
-	a.Defaults.Etiketten = make([]kennung.Tag, len(b.Defaults.Etiketten))
+	a.Defaults.Etiketten = make([]ids.Tag, len(b.Defaults.Etiketten))
 	copy(a.Defaults.Etiketten, b.Defaults.Etiketten)
 
-	a.HiddenEtiketten = make([]kennung.Tag, len(b.HiddenEtiketten))
+	a.HiddenEtiketten = make([]ids.Tag, len(b.HiddenEtiketten))
 	copy(a.HiddenEtiketten, b.HiddenEtiketten)
 
 	a.RemoteScripts = b.RemoteScripts

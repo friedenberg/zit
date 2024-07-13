@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -91,13 +91,13 @@ type (
 	}
 
 	StoreGetter interface {
-		GetExternalStore(kennung.RepoId) (*Store, bool)
+		GetExternalStore(ids.RepoId) (*Store, bool)
 	}
 )
 
 // Add typ set
 type Store struct {
-	kennung.TypeSet
+	ids.TypeSet
 	Info
 	StoreLike
 	didInit  bool
@@ -249,9 +249,9 @@ func (es *Store) UpdateTransacted(z *Transacted) (err error) {
 	return
 }
 
-func (es *Store) GetExternalKennung() (ks interfaces.SetLike[*kennung.ObjectId], err error) {
+func (es *Store) GetExternalKennung() (ks interfaces.SetLike[*ids.ObjectId], err error) {
 	if es == nil {
-		ks = collections_value.MakeValueSet[*kennung.ObjectId](nil)
+		ks = collections_value.MakeValueSet[*ids.ObjectId](nil)
 		return
 	}
 
@@ -268,7 +268,7 @@ func (es *Store) GetExternalKennung() (ks interfaces.SetLike[*kennung.ObjectId],
 	return
 }
 
-func (es *Store) GetKennungForString(v string) (k *kennung.ObjectId, err error) {
+func (es *Store) GetKennungForString(v string) (k *ids.ObjectId, err error) {
 	if es == nil {
 		err = collections.MakeErrNotFoundString(v)
 		return
@@ -312,7 +312,7 @@ func (es *Store) Open(
 	return
 }
 
-type ErrExternalStoreUnsupportedTyp kennung.Type
+type ErrExternalStoreUnsupportedTyp ids.Type
 
 func (e ErrExternalStoreUnsupportedTyp) Is(target error) bool {
 	_, ok := target.(ErrExternalStoreUnsupportedTyp)
@@ -320,5 +320,5 @@ func (e ErrExternalStoreUnsupportedTyp) Is(target error) bool {
 }
 
 func (e ErrExternalStoreUnsupportedTyp) Error() string {
-	return fmt.Sprintf("unsupported typ: %q", kennung.Type(e))
+	return fmt.Sprintf("unsupported typ: %q", ids.Type(e))
 }

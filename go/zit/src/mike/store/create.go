@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -66,7 +66,7 @@ func (s *Store) CreateOrUpdateFromTransacted(
 }
 
 func (s *Store) CreateOrUpdateAkteSha(
-	k kennung.IdLike,
+	k ids.IdLike,
 	sh interfaces.ShaLike,
 ) (t *sku.Transacted, err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {

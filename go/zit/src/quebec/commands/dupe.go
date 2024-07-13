@@ -11,7 +11,7 @@ package commands
 // 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 // 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 // 	"code.linenisgreat.com/zit/go/zit/src/delta/gattungen"
-// 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+// 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 // 	"code.linenisgreat.com/zit/go/zit/src/juliett/objekte"
 // 	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 // 	"code.linenisgreat.com/zit/go/zit/src/kilo/cwd"

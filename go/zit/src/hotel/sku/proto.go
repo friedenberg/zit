@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 )
 
@@ -23,7 +23,7 @@ func (pz *Proto) AddToFlagSet(f *flag.FlagSet) {
 func (pz Proto) Equals(z *metadatei.Metadatei) (ok bool) {
 	var okTyp, okMet bool
 
-	if !kennung.IsEmpty(pz.Metadatei.Typ) &&
+	if !ids.IsEmpty(pz.Metadatei.Typ) &&
 		pz.Metadatei.Typ.Equals(z.GetTyp()) {
 		okTyp = true
 	}
@@ -54,8 +54,8 @@ func (pz Proto) Apply(
 	z := ml.GetMetadatei()
 
 	if g.GetGenre() == gattung.Zettel {
-		if kennung.IsEmpty(z.GetTyp()) &&
-			!kennung.IsEmpty(pz.Metadatei.Typ) &&
+		if ids.IsEmpty(z.GetTyp()) &&
+			!ids.IsEmpty(pz.Metadatei.Typ) &&
 			!z.GetTyp().Equals(pz.Metadatei.Typ) {
 			ok = true
 			z.Typ = pz.Metadatei.Typ
@@ -83,8 +83,8 @@ func (pz Proto) ApplyWithAkteFD(
 ) (err error) {
 	z := ml.GetMetadatei()
 
-	if kennung.IsEmpty(z.GetTyp()) &&
-		!kennung.IsEmpty(pz.Metadatei.Typ) &&
+	if ids.IsEmpty(z.GetTyp()) &&
+		!ids.IsEmpty(pz.Metadatei.Typ) &&
 		!z.GetTyp().Equals(pz.Metadatei.Typ) {
 		z.Typ = pz.Metadatei.Typ
 	} else {

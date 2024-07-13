@@ -17,10 +17,10 @@ ifeq ($(os), Linux)
 	n_prc := $(shell nproc --all)
 endif
 
-MAKEFLAGS := --jobs=$(n_prc)
+# MAKEFLAGS := --jobs=$(n_prc)
 
 timeout := 10
-cmd_bats := BATS_TEST_TIMEOUT=$(timeout) bats --tap
+cmd_bats := BATS_TEST_TIMEOUT=$(timeout) bats --tap --jobs $(n_prc)
 
 ifeq ($(origin .RECIPEPREFIX), undefined)
 				$(error This Make does not support .RECIPEPREFIX. Please use GNU Make 4.0 or later)

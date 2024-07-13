@@ -50,7 +50,7 @@ func (e errUnrecognizedGattung) Error() string {
 }
 
 type ErrWrongType struct {
-	ExpectedType, ActualType Gattung
+	ExpectedType, ActualType Genre
 }
 
 func (e ErrWrongType) Is(target error) (ok bool) {

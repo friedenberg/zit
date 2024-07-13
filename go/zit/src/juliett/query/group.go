@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -15,32 +15,32 @@ func MakeGroup(
 	b *Builder,
 ) *Group {
 	return &Group{
-		OptimizedQueries: make(map[gattung.Gattung]*Query),
-		UserQueries:      make(map[kennung.Genre]*Query),
+		OptimizedQueries: make(map[gattung.Genre]*Query),
+		UserQueries:      make(map[ids.Genre]*Query),
 		Hidden:           b.hidden,
-		Zettelen:         kennung.MakeZettelIdMutableSet(),
-		Typen:            kennung.MakeMutableTypSet(),
+		Zettelen:         ids.MakeZettelIdMutableSet(),
+		Typen:            ids.MakeMutableTypeSet(),
 	}
 }
 
 type Group struct {
 	Hidden           sku.Query
-	OptimizedQueries map[gattung.Gattung]*Query
-	UserQueries      map[kennung.Genre]*Query
-	Kennungen        []*kennung.ObjectId
-	Zettelen         kennung.ZettelIdMutableSet
-	Typen            kennung.TypeMutableSet
+	OptimizedQueries map[gattung.Genre]*Query
+	UserQueries      map[ids.Genre]*Query
+	Kennungen        []*ids.ObjectId
+	Zettelen         ids.ZettelIdMutableSet
+	Typen            ids.TypeMutableSet
 
 	sku.ExternalQueryOptions
 }
 
 func (qg *Group) SetIncludeHistory() {
 	for _, q := range qg.UserQueries {
-		q.Sigil.Add(kennung.SigilHistory)
+		q.Sigil.Add(ids.SigilHistory)
 	}
 
 	for _, q := range qg.OptimizedQueries {
-		q.Sigil.Add(kennung.SigilHistory)
+		q.Sigil.Add(ids.SigilHistory)
 	}
 }
 
@@ -52,12 +52,12 @@ func (qg *Group) IsEmpty() bool {
 	return len(qg.UserQueries) == 0
 }
 
-func (qg *Group) Get(g gattung.Gattung) (sku.QueryWithSigilAndKennung, bool) {
+func (qg *Group) Get(g gattung.Genre) (sku.QueryWithSigilAndKennung, bool) {
 	q, ok := qg.OptimizedQueries[g]
 	return q, ok
 }
 
-func (qg *Group) GetSigil() (s kennung.Sigil) {
+func (qg *Group) GetSigil() (s ids.Sigil) {
 	for _, q := range qg.OptimizedQueries {
 		s.Add(q.Sigil)
 	}
@@ -66,8 +66,8 @@ func (qg *Group) GetSigil() (s kennung.Sigil) {
 }
 
 func (qg *Group) GetExactlyOneKennung(
-	g gattung.Gattung,
-) (k *kennung.ObjectId, s kennung.Sigil, err error) {
+	g gattung.Genre,
+) (k *ids.ObjectId, s ids.Sigil, err error) {
 	if len(qg.OptimizedQueries) != 1 {
 		err = errors.Errorf(
 			"expected exactly 1 gattung query but got %d",
@@ -98,7 +98,7 @@ func (qg *Group) GetExactlyOneKennung(
 		k = k1.ObjectId
 
 		if k1.External {
-			s.Add(kennung.SigilExternal)
+			s.Add(ids.SigilExternal)
 		}
 
 		break
@@ -107,8 +107,8 @@ func (qg *Group) GetExactlyOneKennung(
 	return
 }
 
-func (qg *Group) GetEtiketten() kennung.TagSet {
-	mes := kennung.MakeMutableTagSet()
+func (qg *Group) GetEtiketten() ids.TagSet {
+	mes := ids.MakeMutableTagSet()
 
 	for _, oq := range qg.OptimizedQueries {
 		oq.CollectEtiketten(mes)
@@ -117,11 +117,11 @@ func (qg *Group) GetEtiketten() kennung.TagSet {
 	return mes
 }
 
-func (qg *Group) GetTypen() kennung.TypeSet {
+func (qg *Group) GetTypen() ids.TypeSet {
 	return qg.Typen
 }
 
-func (qg *Group) GetGattungen() (g kennung.Genre) {
+func (qg *Group) GetGattungen() (g ids.Genre) {
 	for g1 := range qg.OptimizedQueries {
 		g.Add(g1)
 	}
@@ -164,7 +164,7 @@ func (qg *Group) AddExactKennung(
 	qg.Kennungen = append(qg.Kennungen, k.ObjectId)
 
 	q := b.makeQuery()
-	q.Sigil.Add(kennung.SigilLatest)
+	q.Sigil.Add(ids.SigilLatest)
 	q.Kennung[k.ObjectId.String()] = k
 	q.Genre.Add(gattung.Must(k))
 
@@ -211,7 +211,7 @@ func (qg *Group) addOptimized(b *Builder, q *Query) (err error) {
 		if !ok {
 			existing = &Query{
 				Hidden:  qg.Hidden,
-				Genre:   kennung.MakeGenre(g),
+				Genre:   ids.MakeGenre(g),
 				Kennung: make(map[string]Kennung),
 			}
 		}
@@ -417,9 +417,9 @@ func (qg *Group) MakeEmitSku(
 // everything
 func (qg *Group) MakeEmitSkuMaybeExternal(
 	f interfaces.FuncIter[*sku.Transacted],
-	k kennung.RepoId,
+	k ids.RepoId,
 	updateTransacted func(
-		kasten kennung.RepoId,
+		kasten ids.RepoId,
 		z *sku.Transacted,
 	) (err error),
 ) interfaces.FuncIter[*sku.Transacted] {
@@ -430,7 +430,7 @@ func (qg *Group) MakeEmitSkuMaybeExternal(
 	// if !qg.ExcludeUntracked {
 	// }
 
-	if qg.GetSigil() == kennung.SigilExternal {
+	if qg.GetSigil() == ids.SigilExternal {
 		return qg.MakeEmitSkuSigilExternal(f, k, updateTransacted)
 	} else {
 		return qg.MakeEmitSkuSigilSchwanzen(f, k, updateTransacted)
@@ -439,9 +439,9 @@ func (qg *Group) MakeEmitSkuMaybeExternal(
 
 func (qg *Group) MakeEmitSkuSigilSchwanzen(
 	f interfaces.FuncIter[*sku.Transacted],
-	k kennung.RepoId,
+	k ids.RepoId,
 	updateTransacted func(
-		kasten kennung.RepoId,
+		kasten ids.RepoId,
 		z *sku.Transacted,
 	) (err error),
 ) interfaces.FuncIter[*sku.Transacted] {
@@ -475,9 +475,9 @@ func (qg *Group) MakeEmitSkuSigilSchwanzen(
 
 func (qg *Group) MakeEmitSkuSigilExternal(
 	f interfaces.FuncIter[*sku.Transacted],
-	k kennung.RepoId,
+	k ids.RepoId,
 	updateTransacted func(
-		kasten kennung.RepoId,
+		kasten ids.RepoId,
 		z *sku.Transacted,
 	) (err error),
 ) interfaces.FuncIter[*sku.Transacted] {

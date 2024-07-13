@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -25,7 +25,7 @@ func init() {
 
 func (c ExpandHinweis) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	for _, v := range args {
-		var h *kennung.ZettelId
+		var h *ids.ZettelId
 
 		h, err = u.GetStore().GetAbbrStore().Hinweis().ExpandString(v)
 

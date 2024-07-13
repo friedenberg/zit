@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -19,7 +19,7 @@ func (s *Store) ReadOneInto(
 
 	switch k1.GetGenre() {
 	case gattung.Zettel:
-		var h *kennung.ZettelId
+		var h *ids.ZettelId
 
 		if h, err = s.GetAbbrStore().Hinweis().ExpandString(
 			k1.String(),

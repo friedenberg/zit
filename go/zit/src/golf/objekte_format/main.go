@@ -5,19 +5,19 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 )
 
 type (
 	FormatterContext interface {
 		metadatei.PersistentFormatterContext
-		GetKennung() kennung.IdLike
+		GetKennung() ids.IdLike
 	}
 
 	ParserContext interface {
 		metadatei.PersistentParserContext
-		SetKennungLike(kennung.IdLike) error
+		SetKennungLike(ids.IdLike) error
 	}
 
 	Formatter interface {
@@ -73,6 +73,6 @@ type nopFormatterContext struct {
 	metadatei.PersistentFormatterContext
 }
 
-func (nopFormatterContext) GetKennung() kennung.IdLike {
+func (nopFormatterContext) GetKennung() ids.IdLike {
 	return nil
 }

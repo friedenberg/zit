@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/india/alfred"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
@@ -27,16 +27,16 @@ func init() {
 	)
 }
 
-func (c CatAlfred) CompletionGattung() kennung.Genre {
-	return kennung.MakeGenre(
+func (c CatAlfred) CompletionGattung() ids.Genre {
+	return ids.MakeGenre(
 		gattung.Etikett,
 		gattung.Zettel,
 		gattung.Typ,
 	)
 }
 
-func (c CatAlfred) DefaultGattungen() kennung.Genre {
-	return kennung.MakeGenre(
+func (c CatAlfred) DefaultGattungen() ids.Genre {
+	return ids.MakeGenre(
 		gattung.Etikett,
 		gattung.Zettel,
 		gattung.Typ,

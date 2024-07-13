@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -23,8 +23,8 @@ func init() {
 	)
 }
 
-func (c CheckinJson) DefaultGattungen() kennung.Genre {
-	return kennung.MakeGenre()
+func (c CheckinJson) DefaultGattungen() ids.Genre {
+	return ids.MakeGenre()
 }
 
 type TomlBookmark struct {

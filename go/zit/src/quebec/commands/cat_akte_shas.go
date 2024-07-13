@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -24,8 +24,8 @@ func init() {
 	)
 }
 
-func (c CatAkteShas) CompletionGattung() kennung.Genre {
-	return kennung.MakeGenre(
+func (c CatAkteShas) CompletionGattung() ids.Genre {
+	return ids.MakeGenre(
 		gattung.Akte,
 	)
 }

@@ -3,23 +3,23 @@ package store_verzeichnisse
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type flushQueryGroup struct {
-	kennung.Sigil
+	ids.Sigil
 }
 
 func (qg *flushQueryGroup) SetIncludeHistory() {
-	qg.Add(kennung.SigilHistory)
+	qg.Add(ids.SigilHistory)
 }
 
 func (qg *flushQueryGroup) HasHidden() bool {
 	return false
 }
 
-func (qg *flushQueryGroup) Get(_ gattung.Gattung) (sku.QueryWithSigilAndKennung, bool) {
+func (qg *flushQueryGroup) Get(_ gattung.Genre) (sku.QueryWithSigilAndKennung, bool) {
 	return qg, true
 }
 
@@ -27,11 +27,11 @@ func (s *flushQueryGroup) ContainsSku(_ *sku.Transacted) bool {
 	return true
 }
 
-func (s *flushQueryGroup) ContainsKennung(_ *kennung.ObjectId) bool {
+func (s *flushQueryGroup) ContainsKennung(_ *ids.ObjectId) bool {
 	return false
 }
 
-func (s *flushQueryGroup) GetSigil() kennung.Sigil {
+func (s *flushQueryGroup) GetSigil() ids.Sigil {
 	return s.Sigil
 }
 

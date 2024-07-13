@@ -3,14 +3,14 @@ package mutable_config
 import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/erworben_tools"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
-func Default(defaultTyp kennung.Type) (k Blob) {
+func Default(defaultTyp ids.Type) (k Blob) {
 	k = Blob{
 		Defaults: Defaults{
 			Typ:       defaultTyp,
-			Etiketten: make([]kennung.Tag, 0),
+			Etiketten: make([]ids.Tag, 0),
 		},
 		FileExtensions: file_extensions.FileExtensions{
 			Typ:      "typ",

@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -274,7 +274,7 @@ func (s *Store) filenameForTransacted(
 
 	switch sz.GetGenre() {
 	case gattung.Zettel:
-		var h kennung.ZettelId
+		var h ids.ZettelId
 
 		if err = h.Set(sz.GetKennung().String()); err != nil {
 			err = errors.Wrap(err)

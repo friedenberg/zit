@@ -6,8 +6,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
 
-func ConfirmTypeFromReader(t Gattung, r *bufio.Reader) (err error) {
-	var t1 Gattung
+func ConfirmTypeFromReader(t Genre, r *bufio.Reader) (err error) {
+	var t1 Genre
 
 	if t1, err = FromReader(r); err != nil {
 		err = errors.Wrap(err)
@@ -26,7 +26,7 @@ func ConfirmTypeFromReader(t Gattung, r *bufio.Reader) (err error) {
 	return
 }
 
-func FromReader(r *bufio.Reader) (t Gattung, err error) {
+func FromReader(r *bufio.Reader) (t Genre, err error) {
 	var line string
 
 	if line, err = r.ReadString('\n'); err != nil {

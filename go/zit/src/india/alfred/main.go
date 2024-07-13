@@ -8,20 +8,20 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/alfred"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
 type Writer struct {
 	alfredWriter *alfred.Writer
-	abbr         kennung.Abbr
+	abbr         ids.Abbr
 	organizeFmt  interfaces.StringFormatWriter[*sku.Transacted]
 }
 
 func New(
 	out io.Writer,
-	abbr kennung.Abbr,
+	abbr ids.Abbr,
 	organizeFmt interfaces.StringFormatWriter[*sku.Transacted],
 ) (w *Writer, err error) {
 	var aw *alfred.Writer
@@ -49,7 +49,7 @@ func (w *Writer) PrintOne(z *sku.Transacted) (err error) {
 		item = w.zettelToItem(z)
 
 	case gattung.Etikett:
-		var e kennung.Tag
+		var e ids.Tag
 
 		if err = e.Set(z.Kennung.String()); err != nil {
 			err = errors.Wrap(err)
@@ -69,7 +69,7 @@ func (w *Writer) PrintOne(z *sku.Transacted) (err error) {
 	return
 }
 
-func (w *Writer) WriteHinweis(e kennung.ZettelId) (n int64, err error) {
+func (w *Writer) WriteHinweis(e ids.ZettelId) (n int64, err error) {
 	item := w.hinweisToItem(e)
 	w.alfredWriter.WriteItem(item)
 	return

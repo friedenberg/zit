@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	pkg_angeboren "code.linenisgreat.com/zit/go/zit/src/delta/angeboren"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -41,7 +41,7 @@ func init() {
 	)
 
 	gob.Register(iter.StringerKeyer[values.String]{})
-	gob.Register(iter.StringerKeyerPtr[kennung.Type, *kennung.Type]{})
+	gob.Register(iter.StringerKeyerPtr[ids.Type, *ids.Type]{})
 }
 
 type angeboren = pkg_angeboren.Konfig
@@ -87,7 +87,7 @@ type compiled struct {
 	mutable_config.Blob
 
 	// Etiketten
-	DefaultEtiketten  kennung.TagSet
+	DefaultEtiketten  ids.TagSet
 	Etiketten         interfaces.MutableSetLike[*ketikett]
 	ImplicitEtiketten implicitEtikettenMap
 
@@ -143,7 +143,7 @@ func (kc *Compiled) SetCliFromCommander(k mutable_config.Cli) {
 	kc.BasePath = oldBasePath
 }
 
-func (kc *compiled) IsInlineTyp(k kennung.Type) (isInline bool) {
+func (kc *compiled) IsInlineTyp(k ids.Type) (isInline bool) {
 	todo.Change("fix this horrible hack")
 	if k.IsEmpty() {
 		return true

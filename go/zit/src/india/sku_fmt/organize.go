@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/bezeichnung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/zittish"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/kennung_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -28,9 +28,9 @@ func MakeFormatOrganize(
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
 	kennungStringFormatWriter kennung_fmt.Aligned,
-	typStringFormatWriter interfaces.StringFormatWriter[*kennung.Type],
+	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung],
-	etikettenStringFormatWriter interfaces.StringFormatWriter[*kennung.Tag],
+	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
 ) *Organize {
 	options.PrintTime = false
 	options.PrintShas = false
@@ -53,9 +53,9 @@ type Organize struct {
 
 	shaStringFormatWriter         interfaces.StringFormatWriter[interfaces.ShaLike]
 	kennungStringFormatWriter     kennung_fmt.Aligned
-	typStringFormatWriter         interfaces.StringFormatWriter[*kennung.Type]
+	typStringFormatWriter         interfaces.StringFormatWriter[*ids.Type]
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung]
-	etikettenStringFormatWriter   interfaces.StringFormatWriter[*kennung.Tag]
+	etikettenStringFormatWriter   interfaces.StringFormatWriter[*ids.Tag]
 }
 
 func (f *Organize) SetMaxKopfUndSchwanz(k, s int) {
@@ -258,7 +258,7 @@ func (f *Organize) readStringFormatWithinBrackets(
 	rr := catgut.MakeRingBufferRuneScanner(rb)
 
 	state := 0
-	var k kennung.ObjectId
+	var k ids.ObjectId
 	var t catgut.String
 	var eof bool
 	var n int
@@ -317,7 +317,7 @@ LOOP:
 					}
 
 				case gattung.Etikett:
-					var e kennung.Tag
+					var e ids.Tag
 
 					if err = e.TodoSetFromKennung2(&k); err != nil {
 						err = errors.Wrap(err)

@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/bezeichnung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -20,22 +20,22 @@ type cliCheckedOut struct {
 
 	rightAlignedWriter          interfaces.StringFormatWriter[string]
 	shaStringFormatWriter       interfaces.StringFormatWriter[interfaces.ShaLike]
-	kennungStringFormatWriter   interfaces.StringFormatWriter[*kennung.ObjectId]
+	kennungStringFormatWriter   interfaces.StringFormatWriter[*ids.ObjectId]
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*metadatei.Metadatei]
 
-	typStringFormatWriter         interfaces.StringFormatWriter[*kennung.Type]
+	typStringFormatWriter         interfaces.StringFormatWriter[*ids.Type]
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung]
-	etikettenStringFormatWriter   interfaces.StringFormatWriter[*kennung.Tag]
+	etikettenStringFormatWriter   interfaces.StringFormatWriter[*ids.Tag]
 }
 
 func MakeCliCheckedOutFormat(
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
-	kennungStringFormatWriter interfaces.StringFormatWriter[*kennung.ObjectId],
+	kennungStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*metadatei.Metadatei],
-	typStringFormatWriter interfaces.StringFormatWriter[*kennung.Type],
+	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung],
-	etikettenStringFormatWriter interfaces.StringFormatWriter[*kennung.Tag],
+	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
 ) *cliCheckedOut {
 	return &cliCheckedOut{
 		options:                       options,

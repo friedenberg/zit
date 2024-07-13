@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -15,9 +15,9 @@ func init() {
 	collections_value.RegisterGobValue[*ketikett](nil)
 }
 
-type implicitEtikettenMap map[string]kennung.TagMutableSet
+type implicitEtikettenMap map[string]ids.TagMutableSet
 
-func (iem implicitEtikettenMap) Contains(to, imp kennung.Tag) bool {
+func (iem implicitEtikettenMap) Contains(to, imp ids.Tag) bool {
 	s, ok := iem[to.String()]
 
 	if !ok || s == nil {
@@ -31,11 +31,11 @@ func (iem implicitEtikettenMap) Contains(to, imp kennung.Tag) bool {
 	return true
 }
 
-func (iem implicitEtikettenMap) Set(to, imp kennung.Tag) (err error) {
+func (iem implicitEtikettenMap) Set(to, imp ids.Tag) (err error) {
 	s, ok := iem[to.String()]
 
 	if !ok {
-		s = kennung.MakeTagMutableSet()
+		s = ids.MakeTagMutableSet()
 		iem[to.String()] = s
 	}
 
@@ -89,7 +89,7 @@ func (k *compiled) EachEtikett(
 }
 
 func (k *compiled) AccumulateImplicitEtiketten(
-	e kennung.Tag,
+	e ids.Tag,
 ) (err error) {
 	ek, ok := k.Etiketten.Get(e.String())
 
@@ -97,14 +97,14 @@ func (k *compiled) AccumulateImplicitEtiketten(
 		return
 	}
 
-	ees := kennung.MakeTagMutableSet()
+	ees := ids.MakeTagMutableSet()
 
-	kennung.ExpandOne(&e, expansion.ExpanderRight).EachPtr(
+	ids.ExpandOne(&e, expansion.ExpanderRight).EachPtr(
 		ees.AddPtr,
 	)
 
 	if err = ees.Each(
-		func(e1 kennung.Tag) (err error) {
+		func(e1 ids.Tag) (err error) {
 			if e1.Equals(e) {
 				return
 			}
@@ -115,7 +115,7 @@ func (k *compiled) AccumulateImplicitEtiketten(
 			}
 
 			if err = k.getImplicitEtiketten(&e1).Each(
-				func(e2 kennung.Tag) (err error) {
+				func(e2 ids.Tag) (err error) {
 					return k.ImplicitEtiketten.Set(e, e2)
 				},
 			); err != nil {
@@ -131,7 +131,7 @@ func (k *compiled) AccumulateImplicitEtiketten(
 	}
 
 	if err = ek.Transacted.Metadatei.GetEtiketten().Each(
-		func(e1 kennung.Tag) (err error) {
+		func(e1 ids.Tag) (err error) {
 			if k.ImplicitEtiketten.Contains(e1, e) {
 				return
 			}

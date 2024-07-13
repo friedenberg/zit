@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
@@ -13,7 +13,7 @@ import (
 )
 
 type Push struct {
-	gattung.Gattung
+	gattung.Genre
 }
 
 func init() {
@@ -21,18 +21,18 @@ func init() {
 		"push",
 		func(f *flag.FlagSet) Command {
 			c := &Push{
-				Gattung: gattung.Zettel,
+				Genre: gattung.Zettel,
 			}
 
-			f.Var(&c.Gattung, "gattung", "Gattung")
+			f.Var(&c.Genre, "gattung", "Gattung")
 
 			return c
 		},
 	)
 }
 
-func (c Push) CompletionGattung() kennung.Genre {
-	return kennung.MakeGenre(
+func (c Push) CompletionGattung() ids.Genre {
+	return ids.MakeGenre(
 		gattung.Zettel,
 		gattung.Etikett,
 		gattung.Typ,
@@ -57,13 +57,13 @@ func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	builder := u.MakeQueryBuilderExcludingHidden(
-		kennung.MakeGenre(),
+		ids.MakeGenre(),
 	)
 
-	var ids *query.Group
+	var qg *query.Group
 
-	if ids, err = builder.BuildQueryGroupWithKasten(
-		kennung.RepoId{},
+	if qg, err = builder.BuildQueryGroupWithKasten(
+		ids.RepoId{},
 		sku.ExternalQueryOptions{},
 		args...,
 	); err != nil {
@@ -85,7 +85,7 @@ func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	if err = client.SendNeededSkus(ids); err != nil {
+	if err = client.SendNeededSkus(qg); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
@@ -25,7 +25,7 @@ func init() {
 }
 
 func (c Validate) ModifyBuilder(b *query.Builder) {
-	b.WithDefaultGattungen(kennung.MakeGenre(gattung.Zettel)).
+	b.WithDefaultGattungen(ids.MakeGenre(gattung.Zettel)).
 		WithDoNotMatchEmpty()
 }
 

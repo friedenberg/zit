@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/golf/ennui"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
@@ -30,7 +30,7 @@ func MakeFormatBestandsaufnahmeScanner(
 		ringBuffer: catgut.MakeRingBuffer(in, 0),
 		format:     of,
 		options:    op,
-		es:         kennung.MakeTagMutableSet(),
+		es:         ids.MakeTagMutableSet(),
 	}
 }
 
@@ -43,8 +43,8 @@ type bestandsaufnahmeScanner struct {
 	afterFirst bool
 
 	m  metadatei.Metadatei
-	g  gattung.Gattung
-	es kennung.TagMutableSet
+	g  gattung.Genre
+	es ids.TagMutableSet
 	k  string
 
 	err     error

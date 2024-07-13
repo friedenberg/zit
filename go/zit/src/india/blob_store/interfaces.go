@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type (
@@ -32,6 +32,6 @@ type (
 
 	Config interface {
 		interfaces.Config
-		IsInlineTyp(kennung.Type) bool
+		IsInlineTyp(ids.Type) bool
 	}
 )

@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -61,7 +61,7 @@ func (c commandWithQuery) Complete(
 }
 
 func (c commandWithQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	b := u.MakeQueryBuilderExcludingHidden(kennung.MakeGenre())
+	b := u.MakeQueryBuilderExcludingHidden(ids.MakeGenre())
 
 	if dgg, ok := c.CommandWithQuery.(DefaultGattungGetter); ok {
 		b = b.WithDefaultGattungen(dgg.DefaultGattungen())

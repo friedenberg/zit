@@ -3,7 +3,7 @@ package kennung_fmt
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type etikettenCliFormat struct{}
@@ -16,7 +16,7 @@ func MakeEtikettenCliFormat() (f *etikettenCliFormat) {
 
 func (f *etikettenCliFormat) WriteStringFormat(
 	w interfaces.WriterAndStringWriter,
-	k *kennung.Tag,
+	k *ids.Tag,
 ) (n int64, err error) {
 	var n1 int
 

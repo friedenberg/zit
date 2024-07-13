@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 )
 
@@ -81,8 +81,8 @@ type (
 	}
 
 	ExternalStoreForQuery interface {
-		GetExternalKennung() (interfaces.SetLike[*kennung.ObjectId], error)
-		GetKennungForString(string) (*kennung.ObjectId, error)
+		GetExternalKennung() (interfaces.SetLike[*ids.ObjectId], error)
+		GetKennungForString(string) (*ids.ObjectId, error)
 	}
 
 	ExternalStoreLike interface {
@@ -92,18 +92,18 @@ type (
 		// SaveAkte(col CheckedOutLike) (err error)
 		// ExternalStoreCheckoutOne
 		interfaces.Flusher
-		GetExternalKennung() (interfaces.SetLike[*kennung.ObjectId], error)
-		GetKennungForString(string) (*kennung.ObjectId, error)
+		GetExternalKennung() (interfaces.SetLike[*ids.ObjectId], error)
+		GetKennungForString(string) (*ids.ObjectId, error)
 	}
 
 	ExternalStoreForQueryGetter interface {
-		GetExternalStoreForQuery(kennung.RepoId) (ExternalStoreForQuery, bool)
+		GetExternalStoreForQuery(ids.RepoId) (ExternalStoreForQuery, bool)
 	}
 )
 
 // Add typ set
 type ExternalStore struct {
-	kennung.TypeSet
+	ids.TypeSet
 	ExternalStoreInfo
 	ExternalStoreLike
 	didInit  bool
@@ -255,9 +255,9 @@ func (es *ExternalStore) UpdateTransacted(z *Transacted) (err error) {
 	return
 }
 
-func (es *ExternalStore) GetExternalKennung() (ks interfaces.SetLike[*kennung.ObjectId], err error) {
+func (es *ExternalStore) GetExternalKennung() (ks interfaces.SetLike[*ids.ObjectId], err error) {
 	if es == nil {
-		ks = collections_value.MakeValueSet[*kennung.ObjectId](nil)
+		ks = collections_value.MakeValueSet[*ids.ObjectId](nil)
 		return
 	}
 
@@ -274,7 +274,7 @@ func (es *ExternalStore) GetExternalKennung() (ks interfaces.SetLike[*kennung.Ob
 	return
 }
 
-func (es *ExternalStore) GetKennungForString(v string) (k *kennung.ObjectId, err error) {
+func (es *ExternalStore) GetKennungForString(v string) (k *ids.ObjectId, err error) {
 	if es == nil {
 		err = collections.MakeErrNotFoundString(v)
 		return
@@ -318,7 +318,7 @@ func (es *ExternalStore) Open(
 	return
 }
 
-type ErrExternalStoreUnsupportedTyp kennung.Type
+type ErrExternalStoreUnsupportedTyp ids.Type
 
 func (e ErrExternalStoreUnsupportedTyp) Is(target error) bool {
 	_, ok := target.(ErrExternalStoreUnsupportedTyp)
@@ -326,5 +326,5 @@ func (e ErrExternalStoreUnsupportedTyp) Is(target error) bool {
 }
 
 func (e ErrExternalStoreUnsupportedTyp) Error() string {
-	return fmt.Sprintf("unsupported typ: %q", kennung.Type(e))
+	return fmt.Sprintf("unsupported typ: %q", ids.Type(e))
 }

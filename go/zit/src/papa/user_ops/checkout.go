@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
@@ -23,7 +23,7 @@ type Checkout struct {
 func (op Checkout) Run(
 	skus sku.TransactedSet,
 ) (zsc sku.CheckedOutLikeMutableSet, err error) {
-	var k kennung.RepoId
+	var k ids.RepoId
 
 	if zsc, err = op.RunWithKasten(k, skus); err != nil {
 		err = errors.Wrap(err)
@@ -34,11 +34,11 @@ func (op Checkout) Run(
 }
 
 func (op Checkout) RunWithKasten(
-	kasten kennung.RepoId,
+	kasten ids.RepoId,
 	skus sku.TransactedSet,
 ) (zsc sku.CheckedOutLikeMutableSet, err error) {
 	b := op.Umwelt.MakeQueryBuilder(
-		kennung.MakeGenre(gattung.Zettel),
+		ids.MakeGenre(gattung.Zettel),
 	).WithTransacted(
 		skus,
 	)
@@ -119,7 +119,7 @@ func (op Checkout) RunQuery(
 
 		var ms *query.Group
 
-		builder := op.MakeQueryBuilderExcludingHidden(kennung.MakeGenre(gattung.Zettel))
+		builder := op.MakeQueryBuilderExcludingHidden(ids.MakeGenre(gattung.Zettel))
 
 		if ms, err = builder.WithCheckedOut(zsc).BuildQueryGroup(); err != nil {
 			err = errors.Wrap(err)

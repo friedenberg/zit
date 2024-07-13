@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/hinweisen"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type hinweisIndex struct {
@@ -158,13 +158,13 @@ func (i *hinweisIndex) Reset() (err error) {
 	return
 }
 
-func (i *hinweisIndex) AddHinweis(k1 kennung.IdLike) (err error) {
+func (i *hinweisIndex) AddHinweis(k1 ids.IdLike) (err error) {
 	if !k1.GetGenre().EqualsGenre(gattung.Zettel) {
 		err = gattung.MakeErrUnsupportedGattung(k1)
 		return
 	}
 
-	var h kennung.ZettelId
+	var h ids.ZettelId
 
 	if err = h.Set(k1.String()); err != nil {
 		err = errors.Wrap(err)
@@ -206,7 +206,7 @@ func (i *hinweisIndex) AddHinweis(k1 kennung.IdLike) (err error) {
 	return
 }
 
-func (i *hinweisIndex) CreateHinweis() (h *kennung.ZettelId, err error) {
+func (i *hinweisIndex) CreateHinweis() (h *ids.ZettelId, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -272,11 +272,11 @@ func (i *hinweisIndex) CreateHinweis() (h *kennung.ZettelId, err error) {
 
 func (i *hinweisIndex) makeHinweisButDontStore(
 	j int,
-) (h *kennung.ZettelId, err error) {
+) (h *ids.ZettelId, err error) {
 	k := &coordinates.Kennung{}
 	k.SetInt(coordinates.Int(j))
 
-	if h, err = kennung.MakeZettelIdFromProvidersAndCoordinates(
+	if h, err = ids.MakeZettelIdFromProvidersAndCoordinates(
 		k.Id(),
 		i.oldHinweisenStore.Left(),
 		i.oldHinweisenStore.Right(),
@@ -288,7 +288,7 @@ func (i *hinweisIndex) makeHinweisButDontStore(
 	return
 }
 
-func (i *hinweisIndex) PeekHinweisen(m int) (hs []*kennung.ZettelId, err error) {
+func (i *hinweisIndex) PeekHinweisen(m int) (hs []*ids.ZettelId, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -298,7 +298,7 @@ func (i *hinweisIndex) PeekHinweisen(m int) (hs []*kennung.ZettelId, err error) 
 		m = i.bitset.CountOn()
 	}
 
-	hs = make([]*kennung.ZettelId, 0, m)
+	hs = make([]*ids.ZettelId, 0, m)
 	j := 0
 
 	if err = i.bitset.EachOff(
@@ -307,7 +307,7 @@ func (i *hinweisIndex) PeekHinweisen(m int) (hs []*kennung.ZettelId, err error) 
 			k := &coordinates.Kennung{}
 			k.SetInt(coordinates.Int(n))
 
-			var h *kennung.ZettelId
+			var h *ids.ZettelId
 
 			if h, err = i.makeHinweisButDontStore(n); err != nil {
 				err = errors.Wrapf(err, "# %d", n)

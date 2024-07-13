@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 )
@@ -17,16 +17,16 @@ func init() {
 }
 
 type ObjekteOptions struct {
-	kennung.RepoId
+	ids.RepoId
 	objekte_mode.Mode
-	kennung.Clock
+	ids.Clock
 	Proto *Transacted
 }
 
 type (
 	Konfig interface {
 		interfaces.Config
-		kennung.InlineTypChecker // TODO move out of konfig entirely
+		ids.InlineTypChecker // TODO move out of konfig entirely
 		GetTypExtension(string) string
 	}
 
@@ -50,10 +50,10 @@ type (
 		interfaces.Stringer
 		metadatei.Getter
 
-		GetKopf() kennung.Tai
-		GetTai() kennung.Tai
-		GetTyp() kennung.Type
-		GetKennung() kennung.IdLike
+		GetKopf() ids.Tai
+		GetTai() ids.Tai
+		GetTyp() ids.Type
+		GetKennung() ids.IdLike
 		GetObjekteSha() interfaces.ShaLike
 		GetAkteSha() interfaces.ShaLike
 		GetKey() string
@@ -64,8 +64,8 @@ type (
 		SetObjekteSha(interfaces.ShaLike) error
 		CalculateObjekteShas() (err error)
 
-		SetTai(kennung.Tai)
-		SetKennungLike(kennung.IdLike) error
+		SetTai(ids.Tai)
+		SetKennungLike(ids.IdLike) error
 		SetFromSkuLike(SkuLike) error
 
 		GetSkuLike() SkuLike
@@ -89,7 +89,7 @@ type (
 		interfaces.Stringer
 		TransactedGetter
 		ExternalLike
-		GetKasten() kennung.RepoId
+		GetKasten() ids.RepoId
 		GetSkuCheckedOutLike() CheckedOutLike
 		GetState() checked_out_state.State
 		SetState(checked_out_state.State) error
@@ -115,7 +115,7 @@ type (
 )
 
 func EqualsSkuLike(a, b SkuLike) (ok bool) {
-	if !kennung.Equals(a.GetKennung(), b.GetKennung()) {
+	if !ids.Equals(a.GetKennung(), b.GetKennung()) {
 		return
 	}
 

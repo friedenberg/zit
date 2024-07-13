@@ -164,7 +164,7 @@ func (i *Store) flushAdded(
 		}
 	}
 
-	wg.DoAfter(i.kennung.Flush)
+	wg.DoAfter(i.ids.Flush)
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
@@ -228,7 +228,7 @@ func (i *Store) flushEverything(
 		}
 	}
 
-	wg.DoAfter(i.kennung.Flush)
+	wg.DoAfter(i.ids.Flush)
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)

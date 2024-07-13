@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/vim_cli_options_builder"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
@@ -96,7 +96,7 @@ func (c EditSchlummernd) makeTempKonfigFile(
 ) (p string, err error) {
 	var k *sku.Transacted
 
-	if k, err = u.GetStore().ReadTransactedFromKennung(&kennung.Config{}); err != nil {
+	if k, err = u.GetStore().ReadTransactedFromKennung(&ids.Config{}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

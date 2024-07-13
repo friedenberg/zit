@@ -7,22 +7,22 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/collections_delta"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/hinweis_index"
 )
 
 type KennungIndex[
-	T kennung.IdGeneric[T],
-	TPtr kennung.IdGenericPtr[T],
+	T ids.IdGeneric[T],
+	TPtr ids.IdGenericPtr[T],
 ] interface {
 	GetInt(int) (T, error)
-	Get(*T) (*kennung.IndexedLike, error)
+	Get(*T) (*ids.IndexedLike, error)
 	HasChanges() bool
 	Reset() error
-	GetAll() ([]kennung.IdLike, error)
-	Each(interfaces.FuncIter[kennung.IndexedLike]) error
-	EachSchwanzen(interfaces.FuncIter[*kennung.IndexedLike]) error
+	GetAll() ([]ids.IdLike, error)
+	Each(interfaces.FuncIter[ids.IndexedLike]) error
+	EachSchwanzen(interfaces.FuncIter[*ids.IndexedLike]) error
 	StoreDelta(interfaces.Delta[T]) (err error)
 	StoreMany(interfaces.SetLike[T]) (err error)
 	StoreOne(T) (err error)
@@ -32,19 +32,19 @@ type KennungIndex[
 }
 
 type EtikettIndexMutation interface {
-	AddEtikettSet(to kennung.TagSet, from kennung.TagSet) (err error)
-	Add(s kennung.TagSet) (err error)
+	AddEtikettSet(to ids.TagSet, from ids.TagSet) (err error)
+	Add(s ids.TagSet) (err error)
 }
 
 type EtikettIndex interface {
 	EtikettIndexMutation
 
 	EachSchwanzen(
-		interfaces.FuncIter[*kennung.IndexedEtikett],
+		interfaces.FuncIter[*ids.IndexedEtikett],
 	) error
 	GetEtikett(
-		*kennung.Tag,
-	) (*kennung.IndexedLike, error)
+		*ids.Tag,
+	) (*ids.IndexedLike, error)
 }
 
 type Index interface {
@@ -62,7 +62,7 @@ type index struct {
 	hasChanges bool
 	lock       *sync.RWMutex
 
-	etikettenIndex KennungIndex[kennung.Tag, *kennung.Tag]
+	etikettenIndex KennungIndex[ids.Tag, *ids.Tag]
 	hinweisIndex   hinweis_index.HinweisIndex
 }
 
@@ -75,7 +75,7 @@ func MakeIndex(
 		path:           s.FileVerzeichnisseEtiketten(),
 		CacheIOFactory: vf,
 		lock:           &sync.RWMutex{},
-		etikettenIndex: MakeIndex2[kennung.Tag](
+		etikettenIndex: MakeIndex2[ids.Tag](
 			vf,
 			s.DirVerzeichnisse("EtikettenIndexV0"),
 		),
@@ -108,32 +108,32 @@ func (i *index) Flush() (err error) {
 }
 
 func (i *index) AddEtikettSet(
-	to kennung.TagSet,
-	from kennung.TagSet,
+	to ids.TagSet,
+	from ids.TagSet,
 ) (err error) {
 	return i.etikettenIndex.StoreDelta(
-		collections_delta.MakeSetDelta[kennung.Tag](from, to),
+		collections_delta.MakeSetDelta[ids.Tag](from, to),
 	)
 }
 
 func (i *index) GetEtikett(
-	k *kennung.Tag,
-) (id *kennung.IndexedLike, err error) {
+	k *ids.Tag,
+) (id *ids.IndexedLike, err error) {
 	return i.etikettenIndex.Get(k)
 }
 
-func (i *index) Add(s kennung.TagSet) (err error) {
+func (i *index) Add(s ids.TagSet) (err error) {
 	return i.etikettenIndex.StoreMany(s)
 }
 
 func (i *index) Each(
-	f interfaces.FuncIter[kennung.IndexedLike],
+	f interfaces.FuncIter[ids.IndexedLike],
 ) (err error) {
 	return i.etikettenIndex.Each(f)
 }
 
 func (i *index) EachSchwanzen(
-	f interfaces.FuncIter[*kennung.IndexedLike],
+	f interfaces.FuncIter[*ids.IndexedLike],
 ) (err error) {
 	return i.etikettenIndex.EachSchwanzen(f)
 }
@@ -152,7 +152,7 @@ func (i *index) Reset() (err error) {
 	return
 }
 
-func (i *index) AddHinweis(k kennung.IdLike) (err error) {
+func (i *index) AddHinweis(k ids.IdLike) (err error) {
 	if err = i.hinweisIndex.AddHinweis(k); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -161,7 +161,7 @@ func (i *index) AddHinweis(k kennung.IdLike) (err error) {
 	return
 }
 
-func (i *index) CreateHinweis() (h *kennung.ZettelId, err error) {
+func (i *index) CreateHinweis() (h *ids.ZettelId, err error) {
 	if h, err = i.hinweisIndex.CreateHinweis(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -170,7 +170,7 @@ func (i *index) CreateHinweis() (h *kennung.ZettelId, err error) {
 	return
 }
 
-func (i *index) PeekHinweisen(n int) (hs []*kennung.ZettelId, err error) {
+func (i *index) PeekHinweisen(n int) (hs []*ids.ZettelId, err error) {
 	if hs, err = i.hinweisIndex.PeekHinweisen(n); err != nil {
 		err = errors.Wrap(err)
 		return

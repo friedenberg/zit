@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
@@ -80,7 +80,7 @@ func (pt *Page) copyJustHistoryFrom(
 	s sku.PrimitiveQueryGroup,
 	w interfaces.FuncIter[skuWithRangeAndSigil],
 ) (err error) {
-	dec := makeBinaryWithQueryGroup(s, kennung.SigilHistory)
+	dec := makeBinaryWithQueryGroup(s, ids.SigilHistory)
 
 	var sk skuWithRangeAndSigil
 
@@ -154,7 +154,7 @@ func (pt *Page) copyHistoryAndMaybeSchwanz(
 		return
 	}
 
-	dec := makeBinaryWithQueryGroup(qg, kennung.SigilHistory)
+	dec := makeBinaryWithQueryGroup(qg, ids.SigilHistory)
 
 	errors.TodoP3("determine performance of this")
 	added := pt.added.Copy()

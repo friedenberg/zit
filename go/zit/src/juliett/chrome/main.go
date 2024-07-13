@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
@@ -26,13 +26,13 @@ import (
 
 type transacted struct {
 	sync.Mutex
-	interfaces.MutableSetLike[*kennung.ObjectId]
+	interfaces.MutableSetLike[*ids.ObjectId]
 }
 
 type Store struct {
 	konfig            *konfig.Compiled
 	externalStoreInfo external_store.Info
-	typ               kennung.Type
+	typ               ids.Type
 	chrome            chrest.Browser
 
 	tabCache cache
@@ -41,7 +41,7 @@ type Store struct {
 
 	l       sync.Mutex
 	removed map[url.URL]struct{}
-	added   map[url.URL][]*kennung.ObjectId
+	added   map[url.URL][]*ids.ObjectId
 
 	transacted transacted
 
@@ -58,12 +58,12 @@ func MakeChrome(
 ) *Store {
 	c := &Store{
 		konfig:  k,
-		typ:     kennung.MustType("toml-bookmark"),
+		typ:     ids.MustType("toml-bookmark"),
 		removed: make(map[url.URL]struct{}),
-		added:   make(map[url.URL][]*kennung.ObjectId),
+		added:   make(map[url.URL][]*ids.ObjectId),
 		transacted: transacted{
 			MutableSetLike: collections_value.MakeMutableValueSet(
-				iter.StringerKeyer[*kennung.ObjectId]{},
+				iter.StringerKeyer[*ids.ObjectId]{},
 			),
 		},
 		transactedUrlIndex:            make(map[url.URL]sku.TransactedMutableSet),
@@ -78,8 +78,8 @@ func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
 	return fs
 }
 
-func (c *Store) GetExternalKennung() (ks interfaces.SetLike[*kennung.ObjectId], err error) {
-	ksm := collections_value.MakeMutableValueSet[*kennung.ObjectId](nil)
+func (c *Store) GetExternalKennung() (ks interfaces.SetLike[*ids.ObjectId], err error) {
+	ksm := collections_value.MakeMutableValueSet[*ids.ObjectId](nil)
 	ks = ksm
 
 	for u, items := range c.urls {
@@ -101,7 +101,7 @@ func (c *Store) GetExternalKennung() (ks interfaces.SetLike[*kennung.ObjectId], 
 					return
 				}
 			} else {
-				k := kennung.GetObjectIdPool().Get()
+				k := ids.GetObjectIdPool().Get()
 
 				if err = k.SetRaw(u.String()); err != nil {
 					err = errors.Wrap(err)
@@ -120,10 +120,10 @@ func (c *Store) GetExternalKennung() (ks interfaces.SetLike[*kennung.ObjectId], 
 }
 
 // TODO
-func (s *Store) GetKennungForString(v string) (k *kennung.ObjectId, err error) {
+func (s *Store) GetKennungForString(v string) (k *ids.ObjectId, err error) {
 	err = collections.MakeErrNotFoundString(v)
 	return
-	k = kennung.GetObjectIdPool().Get()
+	k = ids.GetObjectIdPool().Get()
 
 	if err = k.SetRaw(v); err != nil {
 		err = errors.Wrap(err)
@@ -199,7 +199,7 @@ func (c *Store) CheckoutOne(
 	sku.TransactedResetter.ResetWith(co.GetSku(), sz)
 	sku.TransactedResetter.ResetWith(co.GetSkuExternalLike().GetSku(), sz)
 	co.State = checked_out_state.StateJustCheckedOut
-	co.External.browser.Metadatei.Typ = kennung.MustType("!chrome-tab")
+	co.External.browser.Metadatei.Typ = ids.MustType("!chrome-tab")
 	co.External.item = map[string]interface{}{"url": u.String()}
 
 	c.l.Lock()

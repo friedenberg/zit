@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/echo/bezeichnung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
@@ -22,16 +22,16 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func makeHinweis(t *testing.T, v string) (k *kennung.ObjectId) {
+func makeHinweis(t *testing.T, v string) (k *ids.ObjectId) {
 	var err error
 
-	var h kennung.ZettelId
+	var h ids.ZettelId
 
 	if err = h.Set(v); err != nil {
 		t.Fatalf("%s", err)
 	}
 
-	return kennung.MustObjectId(h)
+	return ids.MustObjectId(h)
 }
 
 func makeBez(t *testing.T, v string) (b bezeichnung.Bezeichnung) {
@@ -99,7 +99,7 @@ func TestAssignmentLineReaderOneHeadingNoZettels(t1 *testing.T) {
 	t.AssertNoError(err)
 
 	{
-		expected := kennung.MakeTagSet(kennung.MustTag("wow"))
+		expected := ids.MakeTagSet(ids.MustTag("wow"))
 
 		if len(sub.root.Children) < 1 {
 			t.Fatalf("expected exactly 1 child")
@@ -107,7 +107,7 @@ func TestAssignmentLineReaderOneHeadingNoZettels(t1 *testing.T) {
 
 		actual := sub.root.Children[0].Etiketten
 
-		if !kennung.TagSetEquals(
+		if !ids.TagSetEquals(
 			actual,
 			expected,
 		) {
@@ -139,10 +139,10 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := kennung.MakeTagSet(kennung.MustTag("wow"))
+		expected := ids.MakeTagSet(ids.MustTag("wow"))
 		actual := sub.root.Children[0].Etiketten
 
-		if !kennung.TagSetEquals(
+		if !ids.TagSetEquals(
 			actual,
 			expected,
 		) {
@@ -186,10 +186,10 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 	}
 
 	{
-		expected := kennung.MakeTagSet(kennung.MustTag("wow"))
+		expected := ids.MakeTagSet(ids.MustTag("wow"))
 		actual := sub.root.Children[0].Etiketten
 
-		if !kennung.TagSetEquals(
+		if !ids.TagSetEquals(
 			actual,
 			expected,
 		) {
@@ -198,7 +198,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 	}
 
 	{
-		expected := kennung.MakeTagSet(kennung.MustTag("sub-wow"))
+		expected := ids.MakeTagSet(ids.MustTag("sub-wow"))
 
 		if sub.root != sub.root.Children[0].Parent {
 			t.Fatalf("%v, %v", sub.root, sub.root.Children[0].Parent)
@@ -212,7 +212,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 
 		actual := sub.root.Children[0].Children[0].Etiketten
 
-		if !kennung.TagSetEquals(
+		if !ids.TagSetEquals(
 			actual,
 			expected,
 		) {
@@ -264,10 +264,10 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := kennung.MakeTagSet(kennung.MustTag("wow"))
+		expected := ids.MakeTagSet(ids.MustTag("wow"))
 		actual := sub.root.Children[0].Etiketten
 
-		if !kennung.TagSetEquals(
+		if !ids.TagSetEquals(
 			actual,
 			expected,
 		) {
@@ -276,7 +276,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := kennung.MakeTagSet(kennung.MustTag("sub-wow"))
+		expected := ids.MakeTagSet(ids.MustTag("sub-wow"))
 
 		l := len(sub.root.Children[0].Children)
 		if l != 1 {
@@ -285,7 +285,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 
 		actual := sub.root.Children[0].Children[0].Etiketten
 
-		if !kennung.TagSetEquals(
+		if !ids.TagSetEquals(
 			actual,
 			expected,
 		) {
@@ -294,10 +294,10 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := kennung.MakeTagSet(kennung.MustTag("cow"))
+		expected := ids.MakeTagSet(ids.MustTag("cow"))
 		actual := sub.root.Children[1].Etiketten
 
-		if !kennung.TagSetEquals(
+		if !ids.TagSetEquals(
 			actual,
 			expected,
 		) {
@@ -358,16 +358,16 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 	}
 
 	{
-		expected := kennung.MakeTagSet(kennung.MustTag("sub-wow"))
+		expected := ids.MakeTagSet(ids.MustTag("sub-wow"))
 		actual := sub.root.Children[0].Etiketten
 
-		if !kennung.TagSetEquals(actual, expected) {
+		if !ids.TagSetEquals(actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
 	{
-		expected := kennung.MakeTagSet(kennung.MustTag("sub-cow"))
+		expected := ids.MakeTagSet(ids.MustTag("sub-cow"))
 
 		l := len(sub.root.Children)
 		expLen := 2
@@ -377,7 +377,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 
 		actual := sub.root.Children[1].Etiketten
 
-		if !kennung.TagSetEquals(actual, expected) {
+		if !ids.TagSetEquals(actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -434,10 +434,10 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 	// `# task
 	{
-		expected := kennung.MakeTagSet(kennung.MustTag("task"))
+		expected := ids.MakeTagSet(ids.MustTag("task"))
 		actual := sub.root.Children[0].Etiketten
 
-		if !kennung.TagSetEquals(actual, expected) {
+		if !ids.TagSetEquals(actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -456,7 +456,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 	// ## priority-1
 	{
-		expected := kennung.MakeTagSet(kennung.MustTag("priority-1"))
+		expected := ids.MakeTagSet(ids.MustTag("priority-1"))
 
 		e := 2
 		l := len(sub.root.Children[0].Children)
@@ -466,17 +466,17 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 		actual := sub.root.Children[0].Children[0].Etiketten
 
-		if !kennung.TagSetEquals(actual, expected) {
+		if !ids.TagSetEquals(actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
 	// ### w-2022-07-09
 	{
-		expected := kennung.MakeTagSet(kennung.MustTag("w-2022-07-09"))
+		expected := ids.MakeTagSet(ids.MustTag("w-2022-07-09"))
 		actual := sub.root.Children[0].Children[0].Children[0].Etiketten
 
-		if !kennung.TagSetEquals(actual, expected) {
+		if !ids.TagSetEquals(actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}

@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
@@ -210,7 +210,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		u.sonnenaufgang,
 		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
 		u.makeQueryBuilder().
-			WithDefaultGattungen(kennung.MakeGenre(gattung.TrueGattung()...)),
+			WithDefaultGattungen(ids.MakeGenre(gattung.TrueGattung()...)),
 		ofo,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")
@@ -283,8 +283,8 @@ func (u *Umwelt) PrintMatchedArchiviertIfNecessary() {
 	ui.Err().Printf("%d archived objekten matched", c)
 }
 
-func (u *Umwelt) MakeKennungIndex() kennung.Index {
-	return kennung.Index{}
+func (u *Umwelt) MakeKennungIndex() ids.Index {
+	return ids.Index{}
 }
 
 func (u *Umwelt) GetMatcherArchiviert() query.Archiviert {
@@ -292,7 +292,7 @@ func (u *Umwelt) GetMatcherArchiviert() query.Archiviert {
 }
 
 func (u *Umwelt) GetExternalStoreForQuery(
-	k kennung.RepoId,
+	k ids.RepoId,
 ) (sku.ExternalStoreForQuery, bool) {
 	e, ok := u.externalStores[k.String()]
 	return e, ok

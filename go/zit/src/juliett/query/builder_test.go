@@ -6,14 +6,14 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 func TestQuery(t1 *testing.T) {
 	type testCase struct {
 		stackInfo                                test_logz.StackInfo
 		description, expected, expectedOptimized string
-		defaultGattung                           kennung.Genre
+		defaultGattung                           ids.Genre
 		inputs                                   []string
 	}
 
@@ -89,7 +89,7 @@ func TestQuery(t1 *testing.T) {
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
 			expectedOptimized: "one/uno:Zettel",
 			expected:          "one/uno:Zettel",
-			defaultGattung:    kennung.MakeGenre(gattung.Zettel),
+			defaultGattung:    ids.MakeGenre(gattung.Zettel),
 			inputs:            []string{"one/uno"},
 		},
 		{
@@ -132,14 +132,14 @@ func TestQuery(t1 *testing.T) {
 		},
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
-			defaultGattung:    kennung.MakeGenre(gattung.TrueGattung()...),
+			defaultGattung:    ids.MakeGenre(gattung.TrueGattung()...),
 			expectedOptimized: ":Typ :Etikett :Zettel :Konfig :Kasten",
 			expected:          ":Typ,Etikett,Zettel,Konfig,Kasten",
 			inputs:            []string{},
 		},
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
-			defaultGattung:    kennung.MakeGenre(gattung.TrueGattung()...),
+			defaultGattung:    ids.MakeGenre(gattung.TrueGattung()...),
 			expectedOptimized: ":Typ :Etikett :Zettel :Konfig :Kasten",
 			expected:          ":Typ,Etikett,Zettel,Konfig,Kasten",
 			inputs:            []string{":"},

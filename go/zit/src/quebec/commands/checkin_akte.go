@@ -10,14 +10,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
 type CheckinAkte struct {
 	Delete       bool
-	NewEtiketten collections_ptr.Flag[kennung.Tag, *kennung.Tag]
+	NewEtiketten collections_ptr.Flag[ids.Tag, *ids.Tag]
 }
 
 func init() {
@@ -25,7 +25,7 @@ func init() {
 		"checkin-akte",
 		func(f *flag.FlagSet) Command {
 			c := &CheckinAkte{
-				NewEtiketten: collections_ptr.MakeFlagCommas[kennung.Tag](
+				NewEtiketten: collections_ptr.MakeFlagCommas[ids.Tag](
 					collections_ptr.SetterPolicyAppend,
 				),
 			}
@@ -51,7 +51,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	type externalAktePair struct {
-		*kennung.ZettelId
+		*ids.ZettelId
 		path string
 	}
 
@@ -62,7 +62,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		hs := args[i*2]
 		ap := args[(i*2)+1]
 
-		if p.ZettelId, err = kennung.MakeZettelId(hs); err != nil {
+		if p.ZettelId, err = ids.MakeZettelId(hs); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

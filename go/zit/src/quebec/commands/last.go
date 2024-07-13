@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/bestandsaufnahme"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
@@ -18,7 +18,7 @@ import (
 )
 
 type Last struct {
-	Kasten   kennung.RepoId
+	Kasten   ids.RepoId
 	Edit     bool
 	Organize bool
 	Format   string
@@ -40,8 +40,8 @@ func init() {
 	)
 }
 
-func (c Last) CompletionGattung() kennung.Genre {
-	return kennung.MakeGenre(
+func (c Last) CompletionGattung() ids.Genre {
+	return ids.MakeGenre(
 		gattung.Bestandsaufnahme,
 	)
 }
