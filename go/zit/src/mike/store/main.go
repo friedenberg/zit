@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/kennung_index"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/akten"
+	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -31,7 +31,7 @@ type Store struct {
 	standort                  standort.Standort
 	cwdFiles                  *store_fs.Store
 	externalStores            map[string]*external_store.Store
-	akten                     *akten.Akten
+	blob_store                *blob_store.VersionedStores
 	bestandsaufnahmeAkte      bestandsaufnahme.InventoryList
 	options                   objekte_format.Options
 	Abbr                      AbbrStore
@@ -55,7 +55,7 @@ type Store struct {
 	typenIndex kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
 
 	protoZettel      zettel.ProtoZettel
-	konfigAkteFormat akten.Format[erworben.Akte, *erworben.Akte]
+	konfigAkteFormat blob_store.Format[erworben.Akte, *erworben.Akte]
 
 	queryBuilder *query.Builder
 
@@ -78,7 +78,7 @@ func (c *Store) Initialize(
 ) (err error) {
 	c.konfig = k
 	c.standort = st
-	c.akten = akten.Make(st)
+	c.blob_store = blob_store.Make(st)
 	c.persistentMetadateiFormat = pmf
 	c.options = options
 	c.sonnenaufgang = t
@@ -143,11 +143,11 @@ func (c *Store) Initialize(
 
 	c.protoZettel = zettel.MakeProtoZettel(c.GetKonfig())
 
-	c.konfigAkteFormat = akten.MakeAkteFormat(
-		akten.MakeTextParserIgnoreTomlErrors[erworben.Akte](
+	c.konfigAkteFormat = blob_store.MakeBlobFormat(
+		blob_store.MakeTextParserIgnoreTomlErrors[erworben.Akte](
 			c.GetStandort(),
 		),
-		akten.ParsedAkteTomlFormatter[erworben.Akte, *erworben.Akte]{},
+		blob_store.ParsedBlobTomlFormatter[erworben.Akte, *erworben.Akte]{},
 		c.GetStandort(),
 	)
 

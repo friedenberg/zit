@@ -13,20 +13,20 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/echo/zittish"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/akten"
+	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
 func MakeBuilder(
 	s standort.Standort,
-	akten *akten.Akten,
+	blob_store *blob_store.VersionedStores,
 	ennui sku.Ennui,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
 	kastenGetter sku.ExternalStoreForQueryGetter,
 ) (b *Builder) {
 	b = &Builder{
 		standort:                   s,
-		akten:                      akten,
+		blob_store:                 blob_store,
 		ennui:                      ennui,
 		luaVMPoolBuilder:           luaVMPoolBuilder,
 		virtualEtikettenBeforeInit: make(map[string]string),
@@ -39,7 +39,7 @@ func MakeBuilder(
 
 type Builder struct {
 	standort                   standort.Standort
-	akten                      *akten.Akten
+	blob_store                 *blob_store.VersionedStores
 	ennui                      sku.Ennui
 	luaVMPoolBuilder           *lua.VMPoolBuilder
 	preexistingKennung         []Kennung
@@ -537,7 +537,7 @@ func (b *Builder) makeEtikettOrEtikettLua(
 ) (exp sku.Query, err error) {
 	exp = k
 
-	if b.ennui == nil || b.akten == nil {
+	if b.ennui == nil || b.blob_store == nil {
 		return
 	}
 
@@ -572,7 +572,7 @@ func (b *Builder) makeEtikettOrEtikettLua(
 	} else {
 		var akte *etikett_akte.V1
 
-		if akte, err = b.akten.GetEtikettV1().GetBlob(
+		if akte, err = b.blob_store.GetEtikettV1().GetBlob(
 			sk.GetAkteSha(),
 		); err != nil {
 			err = errors.Wrap(err)

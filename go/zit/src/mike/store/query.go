@@ -104,7 +104,7 @@ func (s *Store) QueryCheckedOut(
 // TODO [cot/gl !task project-2021-zit-kasten today zz-inbox] move unsure akten and untracked into kasten interface and store_fs
 func (s *Store) QueryAllMatchingAkten(
 	qg *query.Group,
-	akten fd.Set,
+	blob_store fd.Set,
 	f func(*fd.FD, *sku.Transacted) error,
 ) (err error) {
 	fds := fd.MakeMutableSetSha()
@@ -119,7 +119,7 @@ func (s *Store) QueryAllMatchingAkten(
 		return
 	}
 
-	if err = akten.Each(
+	if err = blob_store.Each(
 		iter.MakeChain(
 			func(fd *fd.FD) (err error) {
 				if fd.GetShaLike().IsNull() {

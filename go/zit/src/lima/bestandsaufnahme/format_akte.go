@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
-type formatAkte struct {
+type format struct {
 	objekteFormat objekte_format.Format
 	options       objekte_format.Options
 }
@@ -18,14 +18,14 @@ type formatAkte struct {
 func MakeFormat(
 	sv interfaces.StoreVersion,
 	op objekte_format.Options,
-) formatAkte {
-	return formatAkte{
+) format {
+	return format{
 		objekteFormat: objekte_format.FormatForVersion(sv),
 		options:       op,
 	}
 }
 
-func (f formatAkte) ParseBlob(
+func (f format) ParseBlob(
 	r io.Reader,
 	o *InventoryList,
 ) (n int64, err error) {
@@ -54,11 +54,11 @@ func (f formatAkte) ParseBlob(
 	return
 }
 
-func (f formatAkte) Format(w io.Writer, o *InventoryList) (n int64, err error) {
+func (f format) Format(w io.Writer, o *InventoryList) (n int64, err error) {
 	return f.FormatParsedInventoryList(w, o)
 }
 
-func (f formatAkte) FormatParsedInventoryList(
+func (f format) FormatParsedInventoryList(
 	w io.Writer,
 	o *InventoryList,
 ) (n int64, err error) {

@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/kennung_index"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/akten"
+	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
@@ -26,8 +26,8 @@ func (u *Store) GetChrestStore() *external_store.Store {
 	return u.externalStores["chrome"]
 }
 
-func (s *Store) GetAkten() *akten.Akten {
-	return s.akten
+func (s *Store) GetAkten() *blob_store.VersionedStores {
+	return s.blob_store
 }
 
 func (s *Store) GetEnnui() ennui.Ennui {
@@ -86,7 +86,7 @@ func (s *Store) GetVerzeichnisse() *store_verzeichnisse.Store {
 	return s.verzeichnisse
 }
 
-func (s *Store) GetKonfigAkteFormat() akten.Format[erworben.Akte, *erworben.Akte] {
+func (s *Store) GetKonfigAkteFormat() blob_store.Format[erworben.Akte, *erworben.Akte] {
 	return s.konfigAkteFormat
 }
 

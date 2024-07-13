@@ -22,7 +22,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/akten"
+	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 )
@@ -201,7 +201,7 @@ func (u *Umwelt) MakeFormatFunc(
 		}
 
 	case "text":
-		fo := akten.MakeTextFormatter(
+		fo := blob_store.MakeTextFormatter(
 			checkout_options.TextFormatterOptions{
 				DoNotWriteEmptyBezeichnung: true,
 			},

@@ -66,9 +66,9 @@ func MakeStore(
 	options objekte_format.Options,
 ) (i *Store, err error) {
 	i = &Store{
-		standort:             s,
-		erworben:             k,
-		path:                 dir,
+		standort:       s,
+		erworben:       k,
+		path:           dir,
 		CacheIOFactory: s,
 	}
 

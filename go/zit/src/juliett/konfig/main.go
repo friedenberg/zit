@@ -19,7 +19,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/erworben"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/akten"
+	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
@@ -154,7 +154,7 @@ func (kc *compiled) IsInlineTyp(k kennung.Typ) (isInline bool) {
 	return
 }
 
-type ApproximatedTyp = akten.ApproximatedTyp
+type ApproximatedTyp = blob_store.ApproximatedTyp
 
 func (k *compiled) setTransacted(
 	kt1 *sku.Transacted,
@@ -227,7 +227,7 @@ func (k *Compiled) GetTypExtension(v string) string {
 func (k *Compiled) AddTransacted(
 	kinder *sku.Transacted,
 	mutter *sku.Transacted,
-	ak *akten.Akten,
+	ak *blob_store.VersionedStores,
 	mode objekte_mode.Mode,
 ) (err error) {
 	didChange := false

@@ -72,9 +72,9 @@ func MakeIndex(
 	vf interfaces.CacheIOFactory,
 ) (i *index, err error) {
 	i = &index{
-		path:                 s.FileVerzeichnisseEtiketten(),
+		path:           s.FileVerzeichnisseEtiketten(),
 		CacheIOFactory: vf,
-		lock:                 &sync.RWMutex{},
+		lock:           &sync.RWMutex{},
 		etikettenIndex: MakeIndex2[kennung.Etikett](
 			vf,
 			s.DirVerzeichnisse("EtikettenIndexV0"),

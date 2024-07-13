@@ -159,7 +159,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 
 		var sh interfaces.ShaLike
 
-		if sh, _, err = u.GetStore().GetAkten().GetTypV0().SaveAkteText(
+		if sh, _, err = u.GetStore().GetAkten().GetTypV0().SaveBlobText(
 			&defaultTyp,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -219,7 +219,7 @@ func writeDefaultErworben(
 
 	defer errors.DeferredCloser(&err, aw)
 
-	if _, err = f.FormatParsedAkte(aw, &defaultKonfig); err != nil {
+	if _, err = f.FormatParsedBlob(aw, &defaultKonfig); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

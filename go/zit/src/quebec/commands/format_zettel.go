@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/typ_akte"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/akten"
+	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
@@ -83,7 +83,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		return
 	}
 
-	f := akten.MakeTextFormatterWithAkteFormatter(
+	f := blob_store.MakeTextFormatterWithBlobFormatter(
 		checkout_options.TextFormatterOptions{
 			DoNotWriteEmptyBezeichnung: true,
 		},

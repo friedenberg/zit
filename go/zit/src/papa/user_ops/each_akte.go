@@ -23,12 +23,12 @@ func (c EachAkte) Run(
 		return
 	}
 
-	var akten []string
+	var blob_store []string
 
 	if err = zsc.Each(
 		func(col sku.CheckedOutLike) (err error) {
 			cofs := col.(*store_fs.CheckedOut)
-			akten = append(akten, cofs.External.GetAkteFD().GetPath())
+			blob_store = append(blob_store, cofs.External.GetAkteFD().GetPath())
 
 			return
 		},
@@ -51,7 +51,7 @@ func (c EachAkte) Run(
 		return
 	}
 
-	args = append(args, akten...)
+	args = append(args, blob_store...)
 
 	cmd := exec.Command(args[0], args[1:]...)
 	cmd.Stdout = c.Out()

@@ -21,7 +21,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/akten"
+	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
@@ -46,15 +46,10 @@ type Store interface {
 	) error
 }
 
-type Format = akten.Format[
+type Format = blob_store.Format[
 	InventoryList,
 	*InventoryList,
 ]
-
-type format interface {
-	FormatParsedInventoryList(io.Writer, *InventoryList) (n int64, err error)
-	akten.Parser[InventoryList, *InventoryList]
-}
 
 type store struct {
 	standort                  standort.Standort
