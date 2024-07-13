@@ -9,13 +9,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 )
 
 // TODO make more specific
 type item map[string]interface{}
 
-func (item item) WriteToMetadatei(m *metadatei.Metadatei) (err error) {
+func (item item) WriteToMetadatei(m *object_metadata.Metadatei) (err error) {
 	if m.Tai, err = item.GetTai(); err != nil {
 		err = errors.Wrap(err)
 		return

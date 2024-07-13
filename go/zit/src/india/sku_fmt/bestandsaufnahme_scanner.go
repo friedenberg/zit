@@ -7,24 +7,24 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit/go/zit/src/golf/ennui"
-	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type FormatBestandsaufnahmeScanner interface {
 	Error() error
 	GetTransacted() *sku.Transacted
-	GetRange() ennui.Range
+	GetRange() object_probe_index.Range
 	Scan() bool
 	SetDebug()
 }
 
 func MakeFormatBestandsaufnahmeScanner(
 	in io.Reader,
-	of objekte_format.Format,
-	op objekte_format.Options,
+	of object_inventory_format.Format,
+	op object_inventory_format.Options,
 ) FormatBestandsaufnahmeScanner {
 	return &bestandsaufnahmeScanner{
 		ringBuffer: catgut.MakeRingBuffer(in, 0),
@@ -35,14 +35,14 @@ func MakeFormatBestandsaufnahmeScanner(
 }
 
 type bestandsaufnahmeScanner struct {
-	ennui.Range
+	object_probe_index.Range
 
 	ringBuffer *catgut.RingBuffer
-	format     objekte_format.Format
-	options    objekte_format.Options
+	format     object_inventory_format.Format
+	options    object_inventory_format.Options
 	afterFirst bool
 
-	m  metadatei.Metadatei
+	m  object_metadata.Metadatei
 	g  genres.Genre
 	es ids.TagMutableSet
 	k  string
@@ -68,7 +68,7 @@ func (scanner *bestandsaufnahmeScanner) GetTransacted() *sku.Transacted {
 	return scanner.lastSku
 }
 
-func (scanner *bestandsaufnahmeScanner) GetRange() ennui.Range {
+func (scanner *bestandsaufnahmeScanner) GetRange() object_probe_index.Range {
 	return scanner.Range
 }
 
@@ -82,7 +82,7 @@ func (scanner *bestandsaufnahmeScanner) Scan() (ok bool) {
 	scanner.lastSku = nil
 
 	if !scanner.afterFirst {
-		_, scanner.err = metadatei.ReadBoundary(scanner.ringBuffer)
+		_, scanner.err = object_metadata.ReadBoundary(scanner.ringBuffer)
 
 		if errors.IsEOF(scanner.err) {
 			return
@@ -94,7 +94,7 @@ func (scanner *bestandsaufnahmeScanner) Scan() (ok bool) {
 		scanner.afterFirst = true
 	}
 
-	scanner.Offset += int64(len(metadatei.Boundary) + 1)
+	scanner.Offset += int64(len(object_metadata.Boundary) + 1)
 	scanner.ContentLength = 0
 
 	scanner.lastSku = sku.GetTransactedPool().Get()
@@ -117,7 +117,7 @@ func (scanner *bestandsaufnahmeScanner) Scan() (ok bool) {
 
 	oldErr := scanner.err
 
-	_, scanner.err = metadatei.ReadBoundary(scanner.ringBuffer)
+	_, scanner.err = object_metadata.ReadBoundary(scanner.ringBuffer)
 
 	if errors.IsNotNilAndNotEOF(scanner.err) {
 		scanner.err = errors.Wrap(errors.MakeMulti(scanner.err, oldErr))

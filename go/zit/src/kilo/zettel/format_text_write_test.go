@@ -10,8 +10,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/test_metadatei_io"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/test_object_metadata_io"
 )
 
 type noopCloser struct {
@@ -42,8 +42,8 @@ func (arf blobReaderFactory) BlobReader(s sha.Sha) (r sha.ReadCloser, err error)
 
 func writeFormat(
 	t test_logz.T,
-	m *metadatei.Metadatei,
-	f metadatei.TextFormatter,
+	m *object_metadata.Metadatei,
+	f object_metadata.TextFormatter,
 	includeBlob bool,
 	blobBody string,
 ) (out string) {
@@ -78,7 +78,7 @@ func writeFormat(
 func TestWriteWithoutBlob(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	z := &metadatei.Metadatei{
+	z := &object_metadata.Metadatei{
 		Bezeichnung: descriptions.Make("the title"),
 		Typ:         makeBlobExt(t, "md"),
 	}
@@ -89,14 +89,14 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 		"tag3",
 	))
 
-	af := test_metadatei_io.FixtureFactoryReadWriteCloser(
+	af := test_object_metadata_io.FixtureFactoryReadWriteCloser(
 		map[string]string{
 			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body\n",
 		},
 	)
 
-	format := metadatei.MakeTextFormatterMetadateiOnly(
-		metadatei.TextFormatterOptions{},
+	format := object_metadata.MakeTextFormatterMetadateiOnly(
+		object_metadata.TextFormatterOptions{},
 		af,
 		nil,
 	)
@@ -120,7 +120,7 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 func TestWriteWithInlineBlob(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	z := &metadatei.Metadatei{
+	z := &object_metadata.Metadatei{
 		Bezeichnung: descriptions.Make("the title"),
 		Typ:         makeBlobExt(t, "md"),
 	}
@@ -131,14 +131,14 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 		"tag3",
 	))
 
-	af := test_metadatei_io.FixtureFactoryReadWriteCloser(
+	af := test_object_metadata_io.FixtureFactoryReadWriteCloser(
 		map[string]string{
 			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body\n",
 		},
 	)
 
-	format := metadatei.MakeTextFormatterMetadateiInlineBlob(
-		metadatei.TextFormatterOptions{},
+	format := object_metadata.MakeTextFormatterMetadateiInlineBlob(
+		object_metadata.TextFormatterOptions{},
 		af,
 		nil,
 	)

@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -26,7 +26,7 @@ type Json struct {
 
 func (j *Json) FromStringAndMetadatei(
 	k string,
-	m *metadatei.Metadatei,
+	m *object_metadata.Metadatei,
 	s fs_home.Standort,
 ) (err error) {
 	var r sha.ReadCloser

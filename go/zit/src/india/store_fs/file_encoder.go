@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 )
 
 type FileEncoder interface {
@@ -88,7 +88,7 @@ func (e *fileEncoder) EncodeObjekte(
 
 	switch {
 	case aktePath != "" && objektePath != "":
-		mtw := metadatei.MakeTextFormatterMetadateiAktePath(
+		mtw := object_metadata.MakeTextFormatterMetadateiAktePath(
 			options,
 			e.arf,
 			nil,
@@ -161,16 +161,16 @@ func (e *fileEncoder) EncodeObjekte(
 		}
 
 	case objektePath != "":
-		var mtw metadatei.TextFormatter
+		var mtw object_metadata.TextFormatter
 
 		if inline {
-			mtw = metadatei.MakeTextFormatterMetadateiInlineBlob(
+			mtw = object_metadata.MakeTextFormatterMetadateiInlineBlob(
 				options,
 				e.arf,
 				nil,
 			)
 		} else {
-			mtw = metadatei.MakeTextFormatterMetadateiOnly(
+			mtw = object_metadata.MakeTextFormatterMetadateiOnly(
 				options,
 				e.arf,
 				nil,

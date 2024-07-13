@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
@@ -24,7 +24,7 @@ import (
 
 type CreateFromPaths struct {
 	*umwelt.Umwelt
-	TextParser  metadatei.TextParser
+	TextParser  object_metadata.TextParser
 	Filter      script_value.ScriptValue
 	ProtoZettel zettel.ProtoZettel
 	Delete      bool

@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
@@ -24,8 +24,8 @@ import (
 
 type Diff struct {
 	*umwelt.Umwelt
-	Inline    metadatei.TextFormatter
-	Metadatei metadatei.TextFormatter
+	Inline    object_metadata.TextFormatter
+	Metadatei object_metadata.TextFormatter
 }
 
 func (op Diff) Run(col sku.CheckedOutLike) (err error) {
@@ -157,8 +157,8 @@ func (op Diff) Run(col sku.CheckedOutLike) (err error) {
 
 func (c Diff) makeDo(
 	w io.WriteCloser,
-	mf metadatei.TextFormatter,
-	m metadatei.TextFormatterContext,
+	mf object_metadata.TextFormatter,
+	m object_metadata.TextFormatterContext,
 ) interfaces.FuncError {
 	return func() (err error) {
 		defer errors.DeferredCloser(&err, w)

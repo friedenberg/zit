@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
@@ -41,7 +41,7 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 
 	r1.stringFormatReader = &t.skuFmt
 
-	mr := metadatei.Reader{
+	mr := object_metadata.Reader{
 		Metadatei: &t.Metadatei,
 		Akte:      r1,
 	}
@@ -129,7 +129,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		return
 	}
 
-	mw := metadatei.Writer{
+	mw := object_metadata.Writer{
 		Akte: lw,
 	}
 

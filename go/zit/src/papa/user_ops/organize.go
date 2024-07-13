@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
@@ -19,7 +19,7 @@ import (
 
 type Organize struct {
 	*umwelt.Umwelt
-	metadatei.Metadatei
+	object_metadata.Metadatei
 }
 
 func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {

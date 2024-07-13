@@ -19,7 +19,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
@@ -59,8 +59,8 @@ type store struct {
 	af                        interfaces.BlobIOFactory
 	clock                     ids.Clock
 	pool                      interfaces.Pool[InventoryList, *InventoryList]
-	persistentMetadateiFormat objekte_format.Format
-	options                   objekte_format.Options
+	persistentMetadateiFormat object_inventory_format.Format
+	options                   object_inventory_format.Options
 	format
 }
 
@@ -70,12 +70,12 @@ func MakeStore(
 	sv interfaces.StoreVersion,
 	of interfaces.ObjectIOFactory,
 	af interfaces.BlobIOFactory,
-	pmf objekte_format.Format,
+	pmf object_inventory_format.Format,
 	clock ids.Clock,
 ) (s *store, err error) {
 	p := pool.MakePool(nil, func(a *InventoryList) { Resetter.Reset(a) })
 
-	op := objekte_format.Options{Tai: true}
+	op := object_inventory_format.Options{Tai: true}
 	fa := MakeFormat(sv, op)
 
 	s = &store{
@@ -153,7 +153,7 @@ func (s *store) Create(
 	if _, err = s.persistentMetadateiFormat.FormatPersistentMetadatei(
 		w,
 		t,
-		objekte_format.Options{Tai: true},
+		object_inventory_format.Options{Tai: true},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -228,7 +228,7 @@ func (s *store) readOnePath(p string) (o *sku.Transacted, err error) {
 	}
 
 	if err = o.CalculateObjekteShas(); err != nil {
-		if errors.Is(err, objekte_format.ErrEmptyTai) {
+		if errors.Is(err, object_inventory_format.ErrEmptyTai) {
 			var t ids.Tai
 			err1 := t.Set(o.Kennung.String())
 
@@ -391,7 +391,7 @@ func (s *store) StreamInventoryList(
 
 	dec := sku_fmt.MakeFormatBestandsaufnahmeScanner(
 		ar,
-		objekte_format.FormatForVersion(s.sv),
+		object_inventory_format.FormatForVersion(s.sv),
 		s.options,
 	)
 

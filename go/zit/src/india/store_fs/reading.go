@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -183,7 +183,7 @@ func (s *Store) ReadOneExternalObjekte(
 	t *sku.Transacted,
 ) (err error) {
 	if t != nil {
-		metadatei.Resetter.ResetWith(e.GetMetadatei(), t.GetMetadatei())
+		object_metadata.Resetter.ResetWith(e.GetMetadatei(), t.GetMetadatei())
 	}
 
 	var f *os.File
@@ -219,7 +219,7 @@ func (s *Store) ReadOneExternalAkte(
 	e *External,
 	t *sku.Transacted,
 ) (err error) {
-	metadatei.Resetter.ResetWith(&e.Metadatei, t.GetMetadatei())
+	object_metadata.Resetter.ResetWith(&e.Metadatei, t.GetMetadatei())
 
 	var aw sha.WriteCloser
 

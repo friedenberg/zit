@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -50,12 +50,12 @@ func (c Diff) RunWithQuery(
 
 	opDiffFS := user_ops.Diff{
 		Umwelt: u,
-		Inline: metadatei.MakeTextFormatterMetadateiInlineBlob(
+		Inline: object_metadata.MakeTextFormatterMetadateiInlineBlob(
 			co,
 			u.Standort(),
 			nil,
 		),
-		Metadatei: metadatei.MakeTextFormatterMetadateiOnly(
+		Metadatei: object_metadata.MakeTextFormatterMetadateiOnly(
 			co,
 			u.Standort(),
 			nil,

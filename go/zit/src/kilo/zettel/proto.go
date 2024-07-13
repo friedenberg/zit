@@ -10,13 +10,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
 )
 
 type ProtoZettel struct {
-	Metadatei metadatei.Metadatei
+	Metadatei object_metadata.Metadatei
 }
 
 func MakeProtoZettel(k *konfig.Compiled) (p ProtoZettel) {
@@ -36,7 +36,7 @@ func (pz *ProtoZettel) AddToFlagSet(f *flag.FlagSet) {
 	pz.Metadatei.AddToFlagSet(f)
 }
 
-func (pz ProtoZettel) Equals(z *metadatei.Metadatei) (ok bool) {
+func (pz ProtoZettel) Equals(z *object_metadata.Metadatei) (ok bool) {
 	var okTyp, okMet bool
 
 	if !ids.IsEmpty(pz.Metadatei.Typ) &&
@@ -64,7 +64,7 @@ func (pz ProtoZettel) Make() (z *sku.Transacted) {
 }
 
 func (pz ProtoZettel) Apply(
-	ml metadatei.MetadateiLike,
+	ml object_metadata.MetadateiLike,
 	gg interfaces.GenreGetter,
 ) (ok bool) {
 	z := ml.GetMetadatei()
@@ -98,7 +98,7 @@ func (pz ProtoZettel) Apply(
 }
 
 func (pz ProtoZettel) ApplyWithBlobFD(
-	ml metadatei.MetadateiLike,
+	ml object_metadata.MetadateiLike,
 	akteFD *fd.FD,
 ) (err error) {
 	z := ml.GetMetadatei()

@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -35,7 +35,7 @@ func (m Metadatei) RemoveFromTransacted(sk *sku.Transacted) (err error) {
 	return
 }
 
-func (m Metadatei) AsMetadatei() (m1 metadatei.Metadatei) {
+func (m Metadatei) AsMetadatei() (m1 object_metadata.Metadatei) {
 	m1.Typ = m.Typ
 	m1.SetEtiketten(m.TagSet)
 	return

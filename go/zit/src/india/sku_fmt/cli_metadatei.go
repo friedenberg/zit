@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 )
 
 type cliMetadatei struct {
@@ -66,7 +66,7 @@ func MakeCliMetadateiFormat(
 
 func (f *cliMetadatei) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
-	o *metadatei.Metadatei,
+	o *object_metadata.Metadatei,
 ) (n int64, err error) {
 	var n1 int
 	var n2 int64
@@ -159,7 +159,7 @@ func (f *cliMetadatei) WriteStringFormat(
 
 func (f *cliMetadatei) writeStringFormatEtiketten(
 	sw interfaces.WriterAndStringWriter,
-	o *metadatei.Metadatei,
+	o *object_metadata.Metadatei,
 	didWriteBezeichnung bool,
 ) (n int64, err error) {
 	if !f.options.PrintEtikettenAlways &&

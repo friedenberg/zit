@@ -6,21 +6,21 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
 type format struct {
-	objekteFormat objekte_format.Format
-	options       objekte_format.Options
+	objekteFormat object_inventory_format.Format
+	options       object_inventory_format.Options
 }
 
 func MakeFormat(
 	sv interfaces.StoreVersion,
-	op objekte_format.Options,
+	op object_inventory_format.Options,
 ) format {
 	return format{
-		objekteFormat: objekte_format.FormatForVersion(sv),
+		objekteFormat: object_inventory_format.FormatForVersion(sv),
 		options:       op,
 	}
 }

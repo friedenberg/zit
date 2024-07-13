@@ -6,8 +6,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/test_metadatei_io"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/test_object_metadata_io"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -39,10 +39,10 @@ func makeBlobExt(t test_logz.T, v string) (es ids.Type) {
 
 func readFormat(
 	t1 test_logz.T,
-	f metadatei.TextFormat,
-	af *test_metadatei_io.BlobIOFactory,
+	f object_metadata.TextFormat,
+	af *test_object_metadata_io.BlobIOFactory,
 	contents string,
-) (z *metadatei.Metadatei, a string) {
+) (z *object_metadata.Metadatei, a string) {
 	var zt sku.Transacted
 
 	t := t1.Skip(1)

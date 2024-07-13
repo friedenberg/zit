@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
@@ -62,7 +62,7 @@ func MakeFlags() Flags {
 	}
 }
 
-func MakeFlagsWithMetadatei(m metadatei.Metadatei) Flags {
+func MakeFlagsWithMetadatei(m object_metadata.Metadatei) Flags {
 	ui.Debug().Print(m.GetEtiketten())
 
 	return Flags{

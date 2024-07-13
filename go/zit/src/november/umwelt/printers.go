@@ -11,8 +11,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/kennung_fmt"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
@@ -38,7 +38,7 @@ func (u *Umwelt) FormatColorOptionsErr() (o string_format_writer.ColorOptions) {
 func (u *Umwelt) StringFormatWriterShaLike(
 	co string_format_writer.ColorOptions,
 ) interfaces.StringFormatWriter[interfaces.ShaLike] {
-	return kennung_fmt.MakeShaCliFormat(
+	return id_fmts.MakeShaCliFormat(
 		u.konfig.PrintOptions,
 		co,
 		u.store.GetAbbrStore().Shas().Abbreviate,
@@ -47,8 +47,8 @@ func (u *Umwelt) StringFormatWriterShaLike(
 
 func (u *Umwelt) StringFormatWriterKennungAligned(
 	co string_format_writer.ColorOptions,
-) kennung_fmt.Aligned {
-	return kennung_fmt.MakeAligned(
+) id_fmts.Aligned {
+	return id_fmts.MakeAligned(
 		u.konfig.PrintOptions,
 		u.GetStore().GetAbbrStore().GetAbbr(),
 	)
@@ -57,7 +57,7 @@ func (u *Umwelt) StringFormatWriterKennungAligned(
 func (u *Umwelt) StringFormatWriterKennung(
 	co string_format_writer.ColorOptions,
 ) interfaces.StringFormatWriter[*ids.ObjectId] {
-	return kennung_fmt.MakeKennungCliFormat(
+	return id_fmts.MakeKennungCliFormat(
 		u.konfig.PrintOptions,
 		co,
 		u.GetStore().GetAbbrStore().GetAbbr(),
@@ -67,7 +67,7 @@ func (u *Umwelt) StringFormatWriterKennung(
 func (u *Umwelt) StringFormatWriterTyp(
 	co string_format_writer.ColorOptions,
 ) interfaces.StringFormatWriter[*ids.Type] {
-	return kennung_fmt.MakeTypCliFormat(co)
+	return id_fmts.MakeTypCliFormat(co)
 }
 
 func (u *Umwelt) StringFormatWriterBezeichnung(
@@ -81,12 +81,12 @@ func (u *Umwelt) StringFormatWriterBezeichnung(
 func (u *Umwelt) StringFormatWriterEtiketten(
 	co string_format_writer.ColorOptions,
 ) interfaces.StringFormatWriter[*ids.Tag] {
-	return kennung_fmt.MakeEtikettenCliFormat()
+	return id_fmts.MakeEtikettenCliFormat()
 }
 
 func (u *Umwelt) StringFormatWriterMetadatei(
 	co string_format_writer.ColorOptions,
-) interfaces.StringFormatWriter[*metadatei.Metadatei] {
+) interfaces.StringFormatWriter[*object_metadata.Metadatei] {
 	return sku_fmt.MakeCliMetadateiFormat(
 		u.konfig.PrintOptions,
 		u.StringFormatWriterShaLike(co),
@@ -165,8 +165,8 @@ func (u *Umwelt) PrinterTransactedLike() interfaces.FuncIter[*sku.Transacted] {
 }
 
 func (u *Umwelt) PrinterFileNotRecognized() interfaces.FuncIter[*fd.FD] {
-	p := kennung_fmt.MakeFileNotRecognizedStringWriterFormat(
-		kennung_fmt.MakeFDCliFormat(
+	p := id_fmts.MakeFileNotRecognizedStringWriterFormat(
+		id_fmts.MakeFDCliFormat(
 			u.FormatColorOptionsOut(),
 			u.fs_home.MakeRelativePathStringFormatWriter(),
 		),
@@ -182,9 +182,9 @@ func (u *Umwelt) PrinterFileNotRecognized() interfaces.FuncIter[*fd.FD] {
 
 // TODO make generic external version
 func (u *Umwelt) PrinterFDDeleted() interfaces.FuncIter[*fd.FD] {
-	p := kennung_fmt.MakeFDDeletedStringWriterFormat(
+	p := id_fmts.MakeFDDeletedStringWriterFormat(
 		u.GetKonfig().DryRun,
-		kennung_fmt.MakeFDCliFormat(
+		id_fmts.MakeFDCliFormat(
 			u.FormatColorOptionsOut(),
 			u.fs_home.MakeRelativePathStringFormatWriter(),
 		),
@@ -229,7 +229,7 @@ func (u *Umwelt) PrinterCheckedOutFS() interfaces.FuncIter[sku.CheckedOutLike] {
 		store_fs.MakeCliCheckedOutFormat(
 			u.konfig.PrintOptions,
 			u.StringFormatWriterShaLike(oo.ColorOptionsErr),
-			kennung_fmt.MakeFDCliFormat(
+			id_fmts.MakeFDCliFormat(
 				oo.ColorOptionsErr,
 				u.fs_home.MakeRelativePathStringFormatWriter(),
 			),
@@ -244,7 +244,7 @@ func (u *Umwelt) PrinterCheckedOutFS() interfaces.FuncIter[sku.CheckedOutLike] {
 		store_fs.MakeCliCheckedOutFormat(
 			u.konfig.PrintOptions,
 			u.StringFormatWriterShaLike(oo.ColorOptionsOut),
-			kennung_fmt.MakeFDCliFormat(
+			id_fmts.MakeFDCliFormat(
 				oo.ColorOptionsOut,
 				u.fs_home.MakeRelativePathStringFormatWriter(),
 			),

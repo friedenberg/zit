@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/kennung_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -27,7 +27,7 @@ type KennungAlignedFormat interface {
 func MakeFormatOrganize(
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.ShaLike],
-	kennungStringFormatWriter kennung_fmt.Aligned,
+	kennungStringFormatWriter id_fmts.Aligned,
 	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description],
 	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
@@ -52,7 +52,7 @@ type Organize struct {
 	padding             string
 
 	shaStringFormatWriter         interfaces.StringFormatWriter[interfaces.ShaLike]
-	kennungStringFormatWriter     kennung_fmt.Aligned
+	kennungStringFormatWriter     id_fmts.Aligned
 	typStringFormatWriter         interfaces.StringFormatWriter[*ids.Type]
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description]
 	etikettenStringFormatWriter   interfaces.StringFormatWriter[*ids.Tag]

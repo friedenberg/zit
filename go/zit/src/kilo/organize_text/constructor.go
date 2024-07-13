@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/etiketten_path"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -76,7 +76,7 @@ func (c *constructor) collectExplicitAndImplicitFor(
 				}
 
 				for _, p := range ewp.Parents {
-					if p.Type == etiketten_path.TypeDirect {
+					if p.Type == tag_paths.TypeDirect {
 						explicitCount++
 					} else {
 						implicitCount++

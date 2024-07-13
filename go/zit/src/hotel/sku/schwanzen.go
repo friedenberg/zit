@@ -7,18 +7,18 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/golf/kennung_index"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_id_index"
 )
 
 type Schwanzen struct {
 	lock               sync.RWMutex
 	object_id_provider map[string]*Transacted
-	etikettIndex       kennung_index.EtikettIndexMutation
+	etikettIndex       object_id_index.EtikettIndexMutation
 	funcFlush          interfaces.FuncIter[*Transacted]
 }
 
 func MakeSchwanzen(
-	ei kennung_index.EtikettIndexMutation,
+	ei object_id_index.EtikettIndexMutation,
 	funcFlush interfaces.FuncIter[*Transacted],
 ) (s *Schwanzen) {
 	s = &Schwanzen{}
@@ -27,7 +27,7 @@ func MakeSchwanzen(
 }
 
 func (s *Schwanzen) Initialize(
-	ei kennung_index.EtikettIndexMutation,
+	ei object_id_index.EtikettIndexMutation,
 	funcFlush interfaces.FuncIter[*Transacted],
 ) {
 	s.object_id_provider = make(map[string]*Transacted)

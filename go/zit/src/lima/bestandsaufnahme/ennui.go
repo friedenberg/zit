@@ -11,8 +11,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/golf/ennui_shas"
-	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
+	"code.linenisgreat.com/zit/go/zit/src/golf/sha_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -25,21 +25,21 @@ type Ennui interface {
 
 type ennuiStore struct {
 	fs_home                   fs_home.Standort
-	persistentMetadateiFormat objekte_format.Format
-	ennuiKennung              ennui_shas.Ennui
-	options                   objekte_format.Options
+	persistentMetadateiFormat object_inventory_format.Format
+	ennuiKennung              sha_probe_index.Ennui
+	options                   object_inventory_format.Options
 }
 
 func (s *ennuiStore) Initialize(
 	fs_home fs_home.Standort,
-	persistentMetadateiFormat objekte_format.Format,
-	options objekte_format.Options,
+	persistentMetadateiFormat object_inventory_format.Format,
+	options object_inventory_format.Options,
 ) (err error) {
 	s.fs_home = fs_home
 	s.persistentMetadateiFormat = persistentMetadateiFormat
 	s.options = options
 
-	if s.ennuiKennung, err = ennui_shas.MakeNoDuplicates(
+	if s.ennuiKennung, err = sha_probe_index.MakeNoDuplicates(
 		s.fs_home,
 		s.fs_home.DirVerzeichnisseVerweise(),
 	); err != nil {
@@ -136,7 +136,7 @@ func (s *ennuiStore) ReadOneKennung(k ids.IdLike) (sk *sku.Transacted, err error
 
 func (s *ennuiStore) makeWriteMetadateiFunc(
 	dir string,
-	fo objekte_format.FormatGeneric,
+	fo object_inventory_format.FormatGeneric,
 	o *sku.Transacted,
 	expected *sha.Sha,
 ) interfaces.FuncError {
@@ -198,14 +198,14 @@ func (s *ennuiStore) WriteOneObjekteMetadatei(o *sku.Transacted) (err error) {
 
 	wg.Do(s.makeWriteMetadateiFunc(
 		s.fs_home.DirVerzeichnisseMetadateiKennungMutter(),
-		objekte_format.Formats.MetadateiKennungMutter(),
+		object_inventory_format.Formats.MetadateiKennungMutter(),
 		o,
 		o.Metadatei.Sha(),
 	))
 
 	wg.Do(s.makeWriteMetadateiFunc(
 		s.fs_home.DirVerzeichnisseMetadatei(),
-		objekte_format.Formats.Metadatei(),
+		object_inventory_format.Formats.Metadatei(),
 		o,
 		&o.Metadatei.SelbstMetadatei,
 	))

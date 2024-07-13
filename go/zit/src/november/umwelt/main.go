@@ -17,7 +17,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
@@ -169,7 +169,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 	var sfs *store_fs.Store
 
 	k := u.GetKonfig()
-	ofo := objekte_format.Options{Tai: true}
+	ofo := object_inventory_format.Options{Tai: true}
 
 	if sfs, err = store_fs.MakeCwdFilesAll(
 		k,
@@ -206,7 +206,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		u.flags,
 		u.GetKonfig(),
 		u.fs_home,
-		objekte_format.FormatForVersion(u.GetKonfig().GetStoreVersion()),
+		object_inventory_format.FormatForVersion(u.GetKonfig().GetStoreVersion()),
 		u.sonnenaufgang,
 		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
 		u.makeQueryBuilder().

@@ -21,8 +21,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
@@ -36,7 +36,7 @@ type Store struct {
 	konfig              sku.Konfig
 	deletedPrinter      interfaces.FuncIter[*fd.FD]
 	externalStoreInfo   external_store.Info
-	metadateiTextParser metadatei.TextParser
+	metadateiTextParser object_metadata.TextParser
 	fs_home             fs_home.Standort
 	fileEncoder         FileEncoder
 	ic                  ids.InlineTypChecker
@@ -50,7 +50,7 @@ type Store struct {
 	unsureAkten         fd.MutableSet
 	emptyDirectories    fd.MutableSet
 
-	objekteFormatOptions objekte_format.Options
+	objekteFormatOptions object_inventory_format.Options
 
 	deleteLock sync.Mutex
 	deleted    fd.MutableSet

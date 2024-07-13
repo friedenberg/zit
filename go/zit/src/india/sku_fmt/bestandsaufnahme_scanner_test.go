@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"github.com/DataDog/zstd"
 )
@@ -19,8 +19,8 @@ func TestOne(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	b := new(bytes.Buffer)
-	f := objekte_format.Default()
-	o := objekte_format.Options{Tai: true}
+	f := object_inventory_format.Default()
+	o := object_inventory_format.Options{Tai: true}
 	w := zstd.NewWriter(b)
 
 	printer := MakeFormatBestandsaufnahmePrinter(w, f, o)
@@ -64,7 +64,7 @@ func TestOne(t1 *testing.T) {
 
 	w.Flush()
 
-	op := objekte_format.Options{}
+	op := object_inventory_format.Options{}
 
 	scanner := MakeFormatBestandsaufnahmeScanner(zstd.NewReader(b), f, op)
 
@@ -103,8 +103,8 @@ func TestBigMac(t1 *testing.T) {
 
 	comp.Flush()
 
-	f := objekte_format.Default()
-	op := objekte_format.Options{}
+	f := object_inventory_format.Default()
+	op := object_inventory_format.Options{}
 
 	scanner := MakeFormatBestandsaufnahmeScanner(
 		zstd.NewReader(dataComp),
@@ -138,8 +138,8 @@ func TestOffsets(t1 *testing.T) {
 
 	dataRaw := getRawData()
 
-	f := objekte_format.Default()
-	op := objekte_format.Options{Tai: true}
+	f := object_inventory_format.Default()
+	op := object_inventory_format.Options{Tai: true}
 
 	scanner := MakeFormatBestandsaufnahmeScanner(
 		strings.NewReader(dataRaw),

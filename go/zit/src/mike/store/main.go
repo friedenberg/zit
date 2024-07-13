@@ -11,10 +11,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/golf/kennung_index"
-	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_id_index"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
@@ -33,9 +33,9 @@ type Store struct {
 	externalStores            map[string]*external_store.Store
 	blob_store                *blob_store.VersionedStores
 	bestandsaufnahmeAkte      bestandsaufnahme.InventoryList
-	options                   objekte_format.Options
+	options                   object_inventory_format.Options
 	Abbr                      AbbrStore
-	persistentMetadateiFormat objekte_format.Format
+	persistentMetadateiFormat object_inventory_format.Format
 	fileEncoder               store_fs.FileEncoder
 	luaVMPoolBuilder          *lua.VMPoolBuilder
 	etikettenLock             sync.Mutex
@@ -46,13 +46,13 @@ type Store struct {
 
 	checkedOutLogPrinter interfaces.FuncIter[sku.CheckedOutLike]
 
-	metadateiTextParser metadatei.TextParser
+	metadateiTextParser object_metadata.TextParser
 
 	bestandsaufnahmeStore bestandsaufnahme.Store
-	kennungIndex          kennung_index.Index
+	kennungIndex          object_id_index.Index
 
 	sku.TransactedAdder
-	typenIndex kennung_index.KennungIndex[ids.Type, *ids.Type]
+	typenIndex object_id_index.KennungIndex[ids.Type, *ids.Type]
 
 	protoZettel      zettel.ProtoZettel
 	konfigAkteFormat blob_store.Format[mutable_config.Blob, *mutable_config.Blob]
@@ -70,11 +70,11 @@ func (c *Store) Initialize(
 	flags *flag.FlagSet,
 	k *konfig.Compiled,
 	st fs_home.Standort,
-	pmf objekte_format.Format,
+	pmf object_inventory_format.Format,
 	t thyme.Time,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
 	qb *query.Builder,
-	options objekte_format.Options,
+	options object_inventory_format.Options,
 ) (err error) {
 	c.konfig = k
 	c.fs_home = st
@@ -86,12 +86,12 @@ func (c *Store) Initialize(
 	c.luaVMPoolBuilder = luaVMPoolBuilder
 	c.queryBuilder = qb
 
-	c.metadateiTextParser = metadatei.MakeTextParser(
+	c.metadateiTextParser = object_metadata.MakeTextParser(
 		c.fs_home,
 		nil, // TODO-P1 make akteFormatter
 	)
 
-	c.typenIndex = kennung_index.MakeIndex2[ids.Type](
+	c.typenIndex = object_id_index.MakeIndex2[ids.Type](
 		c.fs_home,
 		st.DirVerzeichnisse("TypenIndexV0"),
 	)
@@ -121,7 +121,7 @@ func (c *Store) Initialize(
 		return
 	}
 
-	if c.kennungIndex, err = kennung_index.MakeIndex(
+	if c.kennungIndex, err = object_id_index.MakeIndex(
 		c.GetKonfig(),
 		c.GetStandort(),
 		c.GetStandort(),

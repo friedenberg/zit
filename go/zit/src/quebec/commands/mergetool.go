@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
@@ -92,7 +92,7 @@ func (c Mergetool) RunWithQuery(
 
 			s := sku_fmt.MakeFormatBestandsaufnahmeScanner(
 				br,
-				objekte_format.FormatForVersion(u.GetKonfig().GetStoreVersion()),
+				object_inventory_format.FormatForVersion(u.GetKonfig().GetStoreVersion()),
 				u.GetStore().GetObjekteFormatOptions(),
 			)
 

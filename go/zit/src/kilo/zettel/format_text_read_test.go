@@ -6,18 +6,18 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/test_metadatei_io"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/test_object_metadata_io"
 )
 
 func makeTestTextFormat(
-	af *test_metadatei_io.BlobIOFactory,
-) metadatei.TextFormat {
+	af *test_object_metadata_io.BlobIOFactory,
+) object_metadata.TextFormat {
 	if af == nil {
-		af = test_metadatei_io.FixtureFactoryReadWriteCloser(nil)
+		af = test_object_metadata_io.FixtureFactoryReadWriteCloser(nil)
 	}
 
-	return metadatei.MakeTextFormat(
+	return object_metadata.MakeTextFormat(
 		af,
 		nil,
 	)
@@ -25,7 +25,7 @@ func makeTestTextFormat(
 
 func TestReadWithoutBlob(t1 *testing.T) {
 	t := test_logz.T{T: t1}
-	af := test_metadatei_io.FixtureFactoryReadWriteCloser(nil)
+	af := test_object_metadata_io.FixtureFactoryReadWriteCloser(nil)
 
 	actual, blob := readFormat(
 		t,
@@ -41,7 +41,7 @@ func TestReadWithoutBlob(t1 *testing.T) {
 `,
 	)
 
-	expected := &metadatei.Metadatei{
+	expected := &object_metadata.Metadatei{
 		Bezeichnung: descriptions.Make("the title"),
 		Typ:         makeBlobExt(t, "md"),
 	}
@@ -64,7 +64,7 @@ func TestReadWithoutBlob(t1 *testing.T) {
 func TestReadWithoutBlobWithMultilineBezeichnung(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	af := test_metadatei_io.FixtureFactoryReadWriteCloser(nil)
+	af := test_object_metadata_io.FixtureFactoryReadWriteCloser(nil)
 
 	actual, blob := readFormat(
 		t,
@@ -81,7 +81,7 @@ func TestReadWithoutBlobWithMultilineBezeichnung(t1 *testing.T) {
 `,
 	)
 
-	expected := &metadatei.Metadatei{
+	expected := &object_metadata.Metadatei{
 		Bezeichnung: descriptions.Make("the title\ncontinues"),
 		Typ:         makeBlobExt(t, "md"),
 	}
@@ -104,7 +104,7 @@ func TestReadWithoutBlobWithMultilineBezeichnung(t1 *testing.T) {
 func TestReadWithBlob(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	af := test_metadatei_io.FixtureFactoryReadWriteCloser(
+	af := test_object_metadata_io.FixtureFactoryReadWriteCloser(
 		map[string]string{
 			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body\n",
 			"036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064": "the body",
@@ -127,7 +127,7 @@ the body
 `,
 	)
 
-	expected := &metadatei.Metadatei{
+	expected := &object_metadata.Metadatei{
 		Bezeichnung: descriptions.Make("the title"),
 		Typ:         makeBlobExt(t, "md"),
 	}

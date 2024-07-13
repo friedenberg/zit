@@ -20,7 +20,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
@@ -215,8 +215,8 @@ func (u *Umwelt) MakeFormatFunc(
 		}
 
 	case "objekte":
-		fo := objekte_format.FormatForVersion(u.GetKonfig().GetStoreVersion())
-		o := objekte_format.Options{
+		fo := object_inventory_format.FormatForVersion(u.GetKonfig().GetStoreVersion())
+		o := object_inventory_format.Options{
 			Tai: true,
 		}
 
@@ -311,7 +311,7 @@ func (u *Umwelt) MakeFormatFunc(
 		}
 
 	case "metadatei":
-		fo, err := objekte_format.FormatForKeyError("Metadatei")
+		fo, err := object_inventory_format.FormatForKeyError("Metadatei")
 		errors.PanicIfError(err)
 
 		f = func(e *sku.Transacted) (err error) {
@@ -320,7 +320,7 @@ func (u *Umwelt) MakeFormatFunc(
 		}
 
 	case "metadatei-plus-mutter":
-		fo, err := objekte_format.FormatForKeyError("MetadateiMutter")
+		fo, err := object_inventory_format.FormatForKeyError("MetadateiMutter")
 		errors.PanicIfError(err)
 
 		f = func(e *sku.Transacted) (err error) {
@@ -532,8 +532,8 @@ func (u *Umwelt) MakeFormatFunc(
 	case "bestandsaufnahme-sans-tai":
 		be := sku_fmt.MakeFormatBestandsaufnahmePrinter(
 			out,
-			objekte_format.Default(),
-			objekte_format.Options{ExcludeMutter: true},
+			object_inventory_format.Default(),
+			object_inventory_format.Options{ExcludeMutter: true},
 		)
 
 		f = func(o *sku.Transacted) (err error) {
@@ -579,8 +579,8 @@ func (u *Umwelt) MakeFormatFunc(
 	case "bestandsaufnahme":
 		fo := sku_fmt.MakeFormatBestandsaufnahmePrinter(
 			out,
-			objekte_format.Default(),
-			objekte_format.Options{Tai: true},
+			object_inventory_format.Default(),
+			object_inventory_format.Options{Tai: true},
 		)
 
 		f = func(o *sku.Transacted) (err error) {
@@ -595,8 +595,8 @@ func (u *Umwelt) MakeFormatFunc(
 	case "bestandsaufnahme-verzeichnisse":
 		fo := sku_fmt.MakeFormatBestandsaufnahmePrinter(
 			out,
-			objekte_format.Default(),
-			objekte_format.Options{
+			object_inventory_format.Default(),
+			object_inventory_format.Options{
 				Tai:           true,
 				Verzeichnisse: true,
 			},

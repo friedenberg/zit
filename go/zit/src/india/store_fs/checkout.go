@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -229,7 +229,7 @@ func (s *Store) shouldCheckOut(
 		return true
 	}
 
-	eq := metadatei.EqualerSansTai.Equals(&cz.Internal.Metadatei, &cz.External.Metadatei)
+	eq := object_metadata.EqualerSansTai.Equals(&cz.Internal.Metadatei, &cz.External.Metadatei)
 
 	if eq {
 		return true
@@ -240,7 +240,7 @@ func (s *Store) shouldCheckOut(
 	}
 
 	if mutter, err := s.externalStoreInfo.FuncReadSha(cz.Internal.Metadatei.Mutter()); err == nil {
-		if metadatei.EqualerSansTai.Equals(&mutter.Metadatei, &cz.External.Metadatei) {
+		if object_metadata.EqualerSansTai.Equals(&mutter.Metadatei, &cz.External.Metadatei) {
 			return true
 		}
 	}

@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -28,15 +28,15 @@ func MakeTextFormatterWithBlobFormatter(
 ) textFormatter {
 	return textFormatter{
 		k:                 k,
-		fMetadateiAndBlob: metadatei.MakeTextFormatterMetadateiInlineBlob(options, af, formatter),
-		fMetadateiOnly:    metadatei.MakeTextFormatterMetadateiOnly(options, af, formatter),
-		fBlobOnly:         metadatei.MakeTextFormatterExcludeMetadatei(options, af, formatter),
+		fMetadateiAndBlob: object_metadata.MakeTextFormatterMetadateiInlineBlob(options, af, formatter),
+		fMetadateiOnly:    object_metadata.MakeTextFormatterMetadateiOnly(options, af, formatter),
+		fBlobOnly:         object_metadata.MakeTextFormatterExcludeMetadatei(options, af, formatter),
 	}
 }
 
 type textFormatter struct {
 	k                                            Config
-	fMetadateiAndBlob, fMetadateiOnly, fBlobOnly metadatei.TextFormatter
+	fMetadateiAndBlob, fMetadateiOnly, fBlobOnly object_metadata.TextFormatter
 }
 
 func (tf textFormatter) WriteStringFormat(w io.Writer, s *sku.Transacted) (n int64, err error) {

@@ -8,14 +8,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type assignmentLineWriter struct {
 	RightAlignedIndents  bool
 	OmitLeadingEmptyLine bool
-	Metadatei            metadatei.Metadatei
+	Metadatei            object_metadata.Metadatei
 	*format.LineWriter
 	maxDepth            int
 	maxKopf, maxSchwanz int

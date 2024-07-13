@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -34,7 +34,7 @@ func (c *Store) getDiff(kinder, mutter *sku.Transacted) (dt diff, err error) {
 		return
 	}
 
-	if metadatei.EqualerSansTaiIncludeVirtual.Equals(
+	if object_metadata.EqualerSansTaiIncludeVirtual.Equals(
 		&kinder.Metadatei,
 		&mutter.Metadatei,
 	) {

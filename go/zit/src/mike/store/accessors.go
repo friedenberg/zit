@@ -9,9 +9,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/golf/ennui"
-	"code.linenisgreat.com/zit/go/zit/src/golf/kennung_index"
-	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_id_index"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
@@ -30,7 +30,7 @@ func (s *Store) GetAkten() *blob_store.VersionedStores {
 	return s.blob_store
 }
 
-func (s *Store) GetEnnui() ennui.Ennui {
+func (s *Store) GetEnnui() object_probe_index.Ennui {
 	return nil
 }
 
@@ -42,7 +42,7 @@ func (s *Store) GetCwdFiles() *store_fs.Store {
 	return s.cwdFiles
 }
 
-func (s *Store) GetObjekteFormatOptions() objekte_format.Options {
+func (s *Store) GetObjekteFormatOptions() object_inventory_format.Options {
 	return s.options
 }
 
@@ -50,7 +50,7 @@ func (s *Store) GetProtoZettel() zettel.ProtoZettel {
 	return s.protoZettel
 }
 
-func (s *Store) GetPersistentMetadateiFormat() objekte_format.Format {
+func (s *Store) GetPersistentMetadateiFormat() object_inventory_format.Format {
 	return s.persistentMetadateiFormat
 }
 
@@ -70,7 +70,7 @@ func (s *Store) GetAbbrStore() AbbrStore {
 	return s.Abbr
 }
 
-func (s *Store) GetKennungIndex() kennung_index.Index {
+func (s *Store) GetKennungIndex() object_id_index.Index {
 	return s.kennungIndex
 }
 

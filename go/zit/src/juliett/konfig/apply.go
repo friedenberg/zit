@@ -10,8 +10,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/etiketten_path"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -154,8 +154,8 @@ func (k *Compiled) addImplicitEtiketten(
 	ie := ids.MakeTagMutableSet()
 
 	addImpEts := func(e *ids.Tag) (err error) {
-		p1 := etiketten_path.MakePathWithType()
-		p1.Type = etiketten_path.TypeIndirect
+		p1 := tag_paths.MakePathWithType()
+		p1.Type = tag_paths.TypeIndirect
 		p1.Add(catgut.MakeFromString(e.String()))
 
 		impl := k.getImplicitEtiketten(e)
@@ -198,7 +198,7 @@ func (k *Compiled) addImplicitEtiketten(
 }
 
 func (k compiled) ApplyToNewMetadatei(
-	ml metadatei.MetadateiLike,
+	ml object_metadata.MetadateiLike,
 	tagp interfaces.BlobGetterPutter[*type_blobs.V0],
 ) (err error) {
 	// m := ml.GetMetadatei()

@@ -7,8 +7,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -17,7 +17,7 @@ func MakeCwdFilesAll(
 	dp interfaces.FuncIter[*fd.FD],
 	fileExtensions file_extensions.FileExtensions,
 	st fs_home.Standort,
-	ofo objekte_format.Options,
+	ofo object_inventory_format.Options,
 ) (fs *Store, err error) {
 	fs = &Store{
 		konfig:         k,
@@ -49,7 +49,7 @@ func MakeCwdFilesAll(
 			nil,
 		),
 		objekteFormatOptions: ofo,
-		metadateiTextParser: metadatei.MakeTextParser(
+		metadateiTextParser: object_metadata.MakeTextParser(
 			st,
 			nil, // TODO-P1 make akteFormatter
 		),

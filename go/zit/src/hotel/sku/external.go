@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 )
 
 type External struct {
@@ -34,7 +34,7 @@ func (a *External) GetKennung() ids.IdLike {
 	return &a.Kennung
 }
 
-func (a *External) GetMetadatei() *metadatei.Metadatei {
+func (a *External) GetMetadatei() *object_metadata.Metadatei {
 	return &a.Metadatei
 }
 

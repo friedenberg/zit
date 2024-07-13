@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
@@ -127,7 +127,7 @@ func (s *Store) handleMergeResult(
 
 	p := sku_fmt.MakeFormatBestandsaufnahmePrinter(
 		bw,
-		objekte_format.FormatForVersion(s.konfig.GetStoreVersion()),
+		object_inventory_format.FormatForVersion(s.konfig.GetStoreVersion()),
 		s.objekteFormatOptions,
 	)
 

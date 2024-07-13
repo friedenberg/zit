@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
@@ -109,7 +109,7 @@ func (a *External) GetKennung() ids.IdLike {
 	return &a.Kennung
 }
 
-func (a *External) GetMetadatei() *metadatei.Metadatei {
+func (a *External) GetMetadatei() *object_metadata.Metadatei {
 	return &a.Metadatei
 }
 

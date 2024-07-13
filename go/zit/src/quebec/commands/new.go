@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
@@ -101,13 +101,13 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	cotfo := checkout_options.TextFormatterOptions{}
 
-	f := metadatei.TextFormat{
-		TextFormatter: metadatei.MakeTextFormatterMetadateiInlineBlob(
+	f := object_metadata.TextFormat{
+		TextFormatter: object_metadata.MakeTextFormatterMetadateiInlineBlob(
 			cotfo,
 			u.Standort(),
 			nil,
 		),
-		TextParser: metadatei.MakeTextParser(
+		TextParser: object_metadata.MakeTextParser(
 			u.Standort(),
 			nil,
 		),
@@ -161,7 +161,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 func (c New) readExistingFilesAsZettels(
 	u *umwelt.Umwelt,
-	f metadatei.TextParser,
+	f object_metadata.TextParser,
 	args ...string,
 ) (zts sku.TransactedMutableSet, err error) {
 	opCreateFromPath := user_ops.CreateFromPaths{

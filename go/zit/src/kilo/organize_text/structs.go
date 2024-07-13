@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/etiketten_path"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -24,10 +24,10 @@ func makeObjSet() objSet {
 // TODO-P1 migrate obj to sku.Transacted
 type obj struct {
 	sku.Transacted
-	etiketten_path.Type
+	tag_paths.Type
 }
 
-func (a *obj) cloneWithType(t etiketten_path.Type) (b *obj) {
+func (a *obj) cloneWithType(t tag_paths.Type) (b *obj) {
 	b = &obj{Type: t}
 	sku.TransactedResetter.ResetWith(&b.Transacted, &a.Transacted)
 	return

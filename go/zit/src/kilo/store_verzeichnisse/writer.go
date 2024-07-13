@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/golf/ennui"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -31,7 +31,7 @@ type writer struct {
 
 	changesAreHistorical bool
 
-	ennui.Range
+	object_probe_index.Range
 	offsetLast, offset int64
 	kennungShaMap      KennungShaMap
 }

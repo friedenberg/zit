@@ -11,13 +11,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 )
 
 type Transacted struct {
 	Kennung          ids.ObjectId
-	Metadatei        metadatei.Metadatei
+	Metadatei        object_metadata.Metadatei
 	TransactionIndex values.Int
 	Kopf             ids.Tai
 }
@@ -43,7 +43,7 @@ func (t *Transacted) SetFromSkuLike(sk SkuLike) (err error) {
 		return
 	}
 
-	metadatei.Resetter.ResetWith(&t.Metadatei, sk.GetMetadatei())
+	object_metadata.Resetter.ResetWith(&t.Metadatei, sk.GetMetadatei())
 	t.GetMetadatei().Tai = sk.GetTai()
 
 	t.Kopf = sk.GetTai()
@@ -160,7 +160,7 @@ func (a *Transacted) GetTyp() ids.Type {
 	return a.Metadatei.Typ
 }
 
-func (a *Transacted) GetMetadatei() *metadatei.Metadatei {
+func (a *Transacted) GetMetadatei() *object_metadata.Metadatei {
 	return &a.Metadatei
 }
 
@@ -241,8 +241,8 @@ func (s *Transacted) CalculateObjekteShas() (err error) {
 }
 
 func (s *Transacted) makeShaCalcFunc(
-	f func(objekte_format.FormatGeneric, objekte_format.FormatterContext) (*sha.Sha, error),
-	of objekte_format.FormatGeneric,
+	f func(object_inventory_format.FormatGeneric, object_inventory_format.FormatterContext) (*sha.Sha, error),
+	of object_inventory_format.FormatGeneric,
 	sh *sha.Sha,
 ) interfaces.FuncError {
 	return func() (err error) {
@@ -265,10 +265,10 @@ func (s *Transacted) makeShaCalcFunc(
 }
 
 func (s *Transacted) calculateObjekteSha(debug bool) (err error) {
-	f := objekte_format.GetShaForContext
+	f := object_inventory_format.GetShaForContext
 
 	if debug {
-		f = objekte_format.GetShaForContextDebug
+		f = object_inventory_format.GetShaForContextDebug
 	}
 
 	wg := iter.MakeErrorWaitGroupParallel()
@@ -276,7 +276,7 @@ func (s *Transacted) calculateObjekteSha(debug bool) (err error) {
 	wg.Do(
 		s.makeShaCalcFunc(
 			f,
-			objekte_format.Formats.MetadateiKennungMutter(),
+			object_inventory_format.Formats.MetadateiKennungMutter(),
 			s.Metadatei.Sha(),
 		),
 	)
@@ -284,7 +284,7 @@ func (s *Transacted) calculateObjekteSha(debug bool) (err error) {
 	wg.Do(
 		s.makeShaCalcFunc(
 			f,
-			objekte_format.Formats.Metadatei(),
+			object_inventory_format.Formats.Metadatei(),
 			&s.Metadatei.SelbstMetadatei,
 		),
 	)
@@ -292,7 +292,7 @@ func (s *Transacted) calculateObjekteSha(debug bool) (err error) {
 	wg.Do(
 		s.makeShaCalcFunc(
 			f,
-			objekte_format.Formats.MetadateiSansTai(),
+			object_inventory_format.Formats.MetadateiSansTai(),
 			&s.Metadatei.SelbstMetadateiSansTai,
 		),
 	)

@@ -14,14 +14,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/etiketten_path"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 // TODO move implicit etiketten here
 type Etiketten struct {
 	changes   []string
-	etiketten etiketten_path.EtikettenWithParentsAndTypes
+	etiketten tag_paths.EtikettenWithParentsAndTypes
 }
 
 func (sch *Etiketten) GetChanges() (out []string) {
@@ -35,7 +35,7 @@ func (sch *Etiketten) HasChanges() bool {
 	return len(sch.changes) > 0
 }
 
-func (sch *Etiketten) AddEtikett(e *etiketten_path.Etikett) (err error) {
+func (sch *Etiketten) AddEtikett(e *tag_paths.Etikett) (err error) {
 	sch.changes = append(sch.changes, fmt.Sprintf("added %q", e))
 
 	if err = sch.etiketten.Add(e, nil); err != nil {
@@ -46,7 +46,7 @@ func (sch *Etiketten) AddEtikett(e *etiketten_path.Etikett) (err error) {
 	return
 }
 
-func (sch *Etiketten) RemoveSchlummerndEtikett(e *etiketten_path.Etikett) (err error) {
+func (sch *Etiketten) RemoveSchlummerndEtikett(e *tag_paths.Etikett) (err error) {
 	sch.changes = append(sch.changes, fmt.Sprintf("removed %q", e))
 
 	if err = sch.etiketten.Remove(e); err != nil {
@@ -199,7 +199,7 @@ func (s *Etiketten) ReadFrom(r *bufio.Reader) (n int64, err error) {
 			return
 		}
 
-		s.etiketten = append(s.etiketten, etiketten_path.EtikettWithParentsAndTypes{
+		s.etiketten = append(s.etiketten, tag_paths.EtikettWithParentsAndTypes{
 			Etikett: cs,
 		})
 	}

@@ -20,14 +20,14 @@ import (
 func MakeBuilder(
 	s fs_home.Standort,
 	blob_store *blob_store.VersionedStores,
-	ennui sku.Ennui,
+	object_probe_index sku.Ennui,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
 	kastenGetter sku.ExternalStoreForQueryGetter,
 ) (b *Builder) {
 	b = &Builder{
 		fs_home:                    s,
 		blob_store:                 blob_store,
-		ennui:                      ennui,
+		object_probe_index:         object_probe_index,
 		luaVMPoolBuilder:           luaVMPoolBuilder,
 		virtualEtikettenBeforeInit: make(map[string]string),
 		virtualEtiketten:           make(map[string]Lua),
@@ -40,7 +40,7 @@ func MakeBuilder(
 type Builder struct {
 	fs_home                    fs_home.Standort
 	blob_store                 *blob_store.VersionedStores
-	ennui                      sku.Ennui
+	object_probe_index         sku.Ennui
 	luaVMPoolBuilder           *lua.VMPoolBuilder
 	preexistingKennung         []Kennung
 	kastenGetter               sku.ExternalStoreForQueryGetter
@@ -537,13 +537,13 @@ func (b *Builder) makeEtikettOrEtikettLua(
 ) (exp sku.Query, err error) {
 	exp = k
 
-	if b.ennui == nil || b.blob_store == nil {
+	if b.object_probe_index == nil || b.blob_store == nil {
 		return
 	}
 
 	var sk *sku.Transacted
 
-	if sk, err = b.ennui.ReadOneKennung(k); err != nil {
+	if sk, err = b.object_probe_index.ReadOneKennung(k); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {

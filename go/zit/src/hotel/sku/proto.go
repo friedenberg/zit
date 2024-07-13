@@ -9,18 +9,18 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 )
 
 type Proto struct {
-	Metadatei metadatei.Metadatei
+	Metadatei object_metadata.Metadatei
 }
 
 func (pz *Proto) AddToFlagSet(f *flag.FlagSet) {
 	pz.Metadatei.AddToFlagSet(f)
 }
 
-func (pz Proto) Equals(z *metadatei.Metadatei) (ok bool) {
+func (pz Proto) Equals(z *object_metadata.Metadatei) (ok bool) {
 	var okTyp, okMet bool
 
 	if !ids.IsEmpty(pz.Metadatei.Typ) &&
@@ -37,10 +37,10 @@ func (pz Proto) Equals(z *metadatei.Metadatei) (ok bool) {
 	return
 }
 
-func (pz Proto) Make() (z *metadatei.Metadatei) {
+func (pz Proto) Make() (z *object_metadata.Metadatei) {
 	todo.Change("add typ")
 	todo.Change("add Bezeichnung")
-	z = metadatei.GetPool().Get()
+	z = object_metadata.GetPool().Get()
 
 	pz.Apply(z, genres.Zettel)
 
@@ -48,7 +48,7 @@ func (pz Proto) Make() (z *metadatei.Metadatei) {
 }
 
 func (pz Proto) Apply(
-	ml metadatei.MetadateiLike,
+	ml object_metadata.MetadateiLike,
 	g interfaces.GenreGetter,
 ) (ok bool) {
 	z := ml.GetMetadatei()
@@ -78,7 +78,7 @@ func (pz Proto) Apply(
 }
 
 func (pz Proto) ApplyWithAkteFD(
-	ml metadatei.MetadateiLike,
+	ml object_metadata.MetadateiLike,
 	akteFD *fd.FD,
 ) (err error) {
 	z := ml.GetMetadatei()

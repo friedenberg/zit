@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 )
 
 func TestMakeEtiketten(t1 *testing.T) {
@@ -77,7 +77,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 func TestEqualitySelf(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	text := &metadatei.Metadatei{
+	text := &object_metadata.Metadatei{
 		Bezeichnung: descriptions.Make("the title"),
 		Typ:         makeBlobExt(t, "text"),
 	}
@@ -96,7 +96,7 @@ func TestEqualitySelf(t1 *testing.T) {
 func TestEqualityNotSelf(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	text := metadatei.Metadatei{
+	text := object_metadata.Metadatei{
 		Bezeichnung: descriptions.Make("the title"),
 		Typ:         makeBlobExt(t, "text"),
 	}
@@ -107,7 +107,7 @@ func TestEqualityNotSelf(t1 *testing.T) {
 		"tag3",
 	))
 
-	text1 := &metadatei.Metadatei{
+	text1 := &object_metadata.Metadatei{
 		Bezeichnung: descriptions.Make("the title"),
 		Typ:         makeBlobExt(t, "text"),
 	}

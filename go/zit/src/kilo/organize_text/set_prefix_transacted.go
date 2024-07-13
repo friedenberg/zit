@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/etiketten_path"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -239,7 +239,7 @@ func (a PrefixSet) Subset(
 				hasDirect := false || len(intersection) == 0
 				type match struct {
 					string
-					etiketten_path.Type
+					tag_paths.Type
 				}
 				toAddGrouped := make([]match, 0)
 
@@ -254,7 +254,7 @@ func (a PrefixSet) Subset(
 						})
 
 						ui.Log().Print(e3)
-						if e3.Type == etiketten_path.TypeDirect &&
+						if e3.Type == tag_paths.TypeDirect &&
 							e2Match.Etikett.Len() == e2.Len() {
 							hasDirect = true
 							break OUTER

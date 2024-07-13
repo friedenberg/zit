@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
@@ -47,7 +47,7 @@ func makeBez(t *testing.T, v string) (b descriptions.Description) {
 func makeObjWithHinAndBez(t *testing.T, hin string, bez string) (o *obj) {
 	o = &obj{
 		Transacted: sku.Transacted{
-			Metadatei: metadatei.Metadatei{
+			Metadatei: object_metadata.Metadatei{
 				Bezeichnung: makeBez(t, bez),
 			},
 		},

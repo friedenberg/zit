@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
-	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
@@ -74,7 +74,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	coPrinter := u.PrinterCheckedOutLike()
 
-	ofo := objekte_format.Options{Tai: true, Verzeichnisse: true}
+	ofo := object_inventory_format.Options{Tai: true, Verzeichnisse: true}
 
 	bf := bestandsaufnahme.MakeFormat(u.GetKonfig().GetStoreVersion(), ofo)
 

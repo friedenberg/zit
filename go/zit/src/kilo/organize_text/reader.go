@@ -8,8 +8,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/unicorn"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/etiketten_path"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/kennung_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -76,7 +76,7 @@ LOOP:
 				}
 
 			case '%':
-				if err = ar.readOneObj(r, etiketten_path.TypeUnknown); err != nil {
+				if err = ar.readOneObj(r, tag_paths.TypeUnknown); err != nil {
 					if err == io.EOF {
 						err = nil
 					} else {
@@ -86,7 +86,7 @@ LOOP:
 				}
 
 			case '-':
-				if err = ar.readOneObj(r, etiketten_path.TypeDirect); err != nil {
+				if err = ar.readOneObj(r, tag_paths.TypeDirect); err != nil {
 					if err == io.EOF {
 						err = nil
 					} else {
@@ -122,7 +122,7 @@ func (ar *assignmentLineReader) readOneHeading(
 
 	currentEtiketten := ids.MakeMutableTagSet()
 
-	reader := kennung_fmt.MakeEtikettenReader()
+	reader := id_fmts.MakeEtikettenReader()
 
 	if _, err = reader.ReadStringFormat(rb, currentEtiketten); err != nil {
 		err = errors.Wrap(err)
@@ -274,7 +274,7 @@ func (ar *assignmentLineReader) readOneHeadingGreaterDepth(
 
 func (ar *assignmentLineReader) readOneObj(
 	r *catgut.RingBuffer,
-	t etiketten_path.Type,
+	t tag_paths.Type,
 ) (err error) {
 	// logz.Print("reading one zettel", l)
 

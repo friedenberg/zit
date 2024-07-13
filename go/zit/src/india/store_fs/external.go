@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -43,7 +43,7 @@ func (a *External) GetKennung() ids.IdLike {
 	return &a.Kennung
 }
 
-func (a *External) GetMetadatei() *metadatei.Metadatei {
+func (a *External) GetMetadatei() *object_metadata.Metadatei {
 	return &a.Metadatei
 }
 
@@ -109,7 +109,7 @@ func (a *External) ResetWithExternalMaybe(
 ) (err error) {
 	k := b.GetKennungLike()
 	a.Kennung.ResetWithIdLike(k)
-	metadatei.Resetter.Reset(&a.Metadatei)
+	object_metadata.Resetter.Reset(&a.Metadatei)
 	a.FDs.ResetWith(b.GetFDs())
 
 	return

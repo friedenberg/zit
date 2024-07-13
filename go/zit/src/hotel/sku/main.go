@@ -8,8 +8,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
-	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 )
 
 func init() {
@@ -48,7 +48,7 @@ type (
 	SkuLike interface {
 		interfaces.ValueLike
 		interfaces.Stringer
-		metadatei.Getter
+		object_metadata.Getter
 
 		GetKopf() ids.Tai
 		GetTai() ids.Tai
@@ -58,7 +58,7 @@ type (
 		GetAkteSha() interfaces.ShaLike
 		GetKey() string
 
-		metadatei.Getter
+		object_metadata.Getter
 
 		SetAkteSha(interfaces.ShaLike) error
 		SetObjekteSha(interfaces.ShaLike) error
@@ -98,7 +98,7 @@ type (
 	}
 
 	ManyPrinter interface {
-		PrintMany(...objekte_format.FormatterContext) (int64, error)
+		PrintMany(...object_inventory_format.FormatterContext) (int64, error)
 	}
 
 	Scanner interface {

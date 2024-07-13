@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
@@ -62,7 +62,7 @@ func MakePullClient(u *umwelt.Umwelt, from string) (c *client, err error) {
 		return
 	}
 
-	c.pmf = objekte_format.FormatForVersions(ourVersion, theirVersion)
+	c.pmf = object_inventory_format.FormatForVersions(ourVersion, theirVersion)
 
 	return
 }
