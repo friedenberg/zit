@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/delta/typ_akte"
+	"code.linenisgreat.com/zit/go/zit/src/delta/type_blob"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/etiketten_path"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
@@ -199,7 +199,7 @@ func (k *Compiled) addImplicitEtiketten(
 
 func (k compiled) ApplyToNewMetadatei(
 	ml metadatei.MetadateiLike,
-	tagp interfaces.BlobGetterPutter[*typ_akte.V0],
+	tagp interfaces.BlobGetterPutter[*type_blob.V0],
 ) (err error) {
 	// m := ml.GetMetadatei()
 

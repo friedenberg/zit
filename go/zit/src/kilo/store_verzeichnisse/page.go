@@ -38,7 +38,7 @@ func (pt *Page) initialize(
 	pt.PageId = pid
 	pt.added = sku.MakeTransactedHeap()
 	pt.addedSchwanz = sku.MakeTransactedHeap()
-	pt.konfig = i.erworben
+	pt.konfig = i.mutable_config
 	pt.ennuiStore = i.ennuiStore
 }
 

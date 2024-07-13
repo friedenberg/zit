@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/echo/thyme"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/erworben"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
@@ -43,7 +43,7 @@ type Umwelt struct {
 	errIsTty bool
 
 	standort    standort.Standort
-	erworbenCli erworben.Cli
+	erworbenCli mutable_config.Cli
 	konfig      konfig.Compiled
 	schlummernd query.Schlummernd
 
@@ -59,7 +59,7 @@ type Umwelt struct {
 
 func Make(
 	flags *flag.FlagSet,
-	kCli erworben.Cli,
+	kCli mutable_config.Cli,
 	options Options,
 ) (u *Umwelt, err error) {
 	u = &Umwelt{
@@ -155,7 +155,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		}
 	}
 
-	u.konfig.ApplyPrintOptionsKonfig(u.konfig.Akte.PrintOptions)
+	u.konfig.ApplyPrintOptionsConfig(u.konfig.Blob.PrintOptions)
 
 	// for _, rb := range u.konfig.Transacted.Objekte.Akte.Recipients {
 	// 	if err = u.age.AddBech32PivYubikeyEC256(rb); err != nil {

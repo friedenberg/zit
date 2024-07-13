@@ -17,7 +17,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/erworben"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -71,11 +71,11 @@ func (a *compiled) Reset() error {
 	return nil
 }
 
-func (a *Compiled) GetErworben() *erworben.Akte {
-	return &a.Akte
+func (a *Compiled) GetErworben() *mutable_config.Blob {
+	return &a.Blob
 }
 
-type cli = erworben.Cli
+type cli = mutable_config.Cli
 
 type compiled struct {
 	lock sync.Locker
@@ -84,7 +84,7 @@ type compiled struct {
 
 	Sku sku.Transacted
 
-	erworben.Akte
+	mutable_config.Blob
 
 	// Etiketten
 	DefaultEtiketten  kennung.EtikettSet
@@ -104,7 +104,7 @@ type compiled struct {
 
 func (c *Compiled) Initialize(
 	s standort.Standort,
-	kcli erworben.Cli,
+	kcli mutable_config.Cli,
 	schlummernd *query.Schlummernd,
 ) (err error) {
 	c.cli = kcli
@@ -133,11 +133,11 @@ func (c *Compiled) Initialize(
 	return
 }
 
-func (kc *Compiled) SetCli(k erworben.Cli) {
+func (kc *Compiled) SetCli(k mutable_config.Cli) {
 	kc.cli = k
 }
 
-func (kc *Compiled) SetCliFromCommander(k erworben.Cli) {
+func (kc *Compiled) SetCliFromCommander(k mutable_config.Cli) {
 	oldBasePath := kc.BasePath
 	kc.cli = k
 	kc.BasePath = oldBasePath
@@ -158,7 +158,7 @@ type ApproximatedTyp = blob_store.ApproximatedTyp
 
 func (k *compiled) setTransacted(
 	kt1 *sku.Transacted,
-	kag interfaces.BlobGetter[*erworben.Akte],
+	kag interfaces.BlobGetter[*mutable_config.Blob],
 ) (didChange bool, err error) {
 	if !sku.TransactedLessor.LessPtr(&k.Sku, kt1) {
 		return
@@ -176,14 +176,14 @@ func (k *compiled) setTransacted(
 
 	k.setHasChanges(fmt.Sprintf("updated konfig: %s", &k.Sku))
 
-	var a *erworben.Akte
+	var a *mutable_config.Blob
 
 	if a, err = kag.GetBlob(k.Sku.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	k.Akte = *a
+	k.Blob = *a
 
 	return
 }
@@ -252,7 +252,7 @@ func (k *Compiled) AddTransacted(
 		}
 
 	case gattung.Konfig:
-		if didChange, err = k.setTransacted(kinder, ak.GetKonfigV0()); err != nil {
+		if didChange, err = k.setTransacted(kinder, ak.GetConfigV0()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

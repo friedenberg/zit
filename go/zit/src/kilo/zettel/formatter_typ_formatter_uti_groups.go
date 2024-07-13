@@ -5,18 +5,18 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/typ_akte"
+	"code.linenisgreat.com/zit/go/zit/src/delta/type_blob"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type formatterTypFormatterUTIGroups struct {
 	sku.OneReader
-	typBlobGetterPutter interfaces.BlobGetterPutter[*typ_akte.V0]
+	typBlobGetterPutter interfaces.BlobGetterPutter[*type_blob.V0]
 }
 
 func MakeFormatterTypFormatterUTIGroups(
 	sr sku.OneReader,
-	tagp interfaces.BlobGetterPutter[*typ_akte.V0],
+	tagp interfaces.BlobGetterPutter[*type_blob.V0],
 ) *formatterTypFormatterUTIGroups {
 	return &formatterTypFormatterUTIGroups{
 		OneReader:           sr,
@@ -28,7 +28,7 @@ func (e formatterTypFormatterUTIGroups) Format(
 	w io.Writer,
 	z *sku.Transacted,
 ) (n int64, err error) {
-	e1 := typ_akte.MakeFormatterFormatterUTIGroups()
+	e1 := type_blob.MakeFormatterFormatterUTIGroups()
 
 	var skuTyp *sku.Transacted
 
@@ -37,7 +37,7 @@ func (e formatterTypFormatterUTIGroups) Format(
 		return
 	}
 
-	var ta *typ_akte.V0
+	var ta *type_blob.V0
 
 	if ta, err = e.typBlobGetterPutter.GetBlob(skuTyp.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)

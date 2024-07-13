@@ -1,9 +1,9 @@
 package etikett
 
-import "code.linenisgreat.com/zit/go/zit/src/delta/etikett_akte"
+import "code.linenisgreat.com/zit/go/zit/src/delta/tag_blob"
 
-func MakeObjekte() (t *etikett_akte.V1) {
-	t = &etikett_akte.V1{}
+func MakeObjekte() (t *tag_blob.V1) {
+	t = &tag_blob.V1{}
 
 	return
 }

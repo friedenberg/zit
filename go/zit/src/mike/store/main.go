@@ -11,8 +11,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/echo/thyme"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/erworben"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/metadatei"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/golf/kennung_index"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -55,7 +55,7 @@ type Store struct {
 	typenIndex kennung_index.KennungIndex[kennung.Typ, *kennung.Typ]
 
 	protoZettel      zettel.ProtoZettel
-	konfigAkteFormat blob_store.Format[erworben.Akte, *erworben.Akte]
+	konfigAkteFormat blob_store.Format[mutable_config.Blob, *mutable_config.Blob]
 
 	queryBuilder *query.Builder
 
@@ -144,10 +144,10 @@ func (c *Store) Initialize(
 	c.protoZettel = zettel.MakeProtoZettel(c.GetKonfig())
 
 	c.konfigAkteFormat = blob_store.MakeBlobFormat(
-		blob_store.MakeTextParserIgnoreTomlErrors[erworben.Akte](
+		blob_store.MakeTextParserIgnoreTomlErrors[mutable_config.Blob](
 			c.GetStandort(),
 		),
-		blob_store.ParsedBlobTomlFormatter[erworben.Akte, *erworben.Akte]{},
+		blob_store.ParsedBlobTomlFormatter[mutable_config.Blob, *mutable_config.Blob]{},
 		c.GetStandort(),
 	)
 

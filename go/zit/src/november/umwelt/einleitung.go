@@ -17,7 +17,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/erworben"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/typ"
 )
 
@@ -159,7 +159,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 
 		var sh interfaces.ShaLike
 
-		if sh, _, err = u.GetStore().GetAkten().GetTypV0().SaveBlobText(
+		if sh, _, err = u.GetStore().GetAkten().GetTypeV0().SaveBlobText(
 			&defaultTyp,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -206,7 +206,7 @@ func writeDefaultErworben(
 	u *Umwelt,
 	dt kennung.Typ,
 ) (sh interfaces.ShaLike, err error) {
-	defaultKonfig := erworben.Default(dt)
+	defaultKonfig := mutable_config.Default(dt)
 
 	f := u.GetStore().GetKonfigAkteFormat()
 

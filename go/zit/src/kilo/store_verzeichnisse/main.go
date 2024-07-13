@@ -49,9 +49,9 @@ func init() {
 }
 
 type Store struct {
-	standort standort.Standort
-	erworben *konfig.Compiled
-	path     string
+	standort       standort.Standort
+	mutable_config *konfig.Compiled
+	path           string
 	interfaces.CacheIOFactory
 	pages             [PageCount]Page
 	historicalChanges []string
@@ -67,7 +67,7 @@ func MakeStore(
 ) (i *Store, err error) {
 	i = &Store{
 		standort:       s,
-		erworben:       k,
+		mutable_config: k,
 		path:           dir,
 		CacheIOFactory: s,
 	}

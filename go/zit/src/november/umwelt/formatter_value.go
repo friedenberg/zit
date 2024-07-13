@@ -17,7 +17,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/delta/typ_akte"
+	"code.linenisgreat.com/zit/go/zit/src/delta/type_blob"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
@@ -743,7 +743,7 @@ func (u *Umwelt) makeTypFormatter(
 	v string,
 	out io.Writer,
 ) (f interfaces.FuncIter[*sku.Transacted], err error) {
-	agp := u.GetStore().GetAkten().GetTypV0()
+	agp := u.GetStore().GetAkten().GetTypeV0()
 
 	if out == nil {
 		out = u.Out()
@@ -759,7 +759,7 @@ func (u *Umwelt) makeTypFormatter(
 				return
 			}
 
-			var ta *typ_akte.V0
+			var ta *type_blob.V0
 
 			if ta, err = agp.GetBlob(tt.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)
@@ -801,10 +801,10 @@ func (u *Umwelt) makeTypFormatter(
 		}
 
 	case "action-names":
-		fan := typ_akte.MakeFormatterActionNames()
+		fan := type_blob.MakeFormatterActionNames()
 
 		f = func(o *sku.Transacted) (err error) {
-			var akte *typ_akte.V0
+			var akte *type_blob.V0
 
 			if akte, err = agp.GetBlob(o.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)
@@ -823,7 +823,7 @@ func (u *Umwelt) makeTypFormatter(
 
 	case "hooks.on_pre_commit":
 		f = func(o *sku.Transacted) (err error) {
-			var akte *typ_akte.V0
+			var akte *type_blob.V0
 
 			if akte, err = agp.GetBlob(o.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)
@@ -887,16 +887,16 @@ func (u *Umwelt) makeTypFormatter(
 				return
 			}
 
-			var ta *typ_akte.V0
+			var ta *type_blob.V0
 
-			if ta, err = u.GetStore().GetAkten().GetTypV0().GetBlob(
+			if ta, err = u.GetStore().GetAkten().GetTypeV0().GetBlob(
 				t.GetAkteSha(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			defer u.GetStore().GetAkten().GetTypV0().PutBlob(ta)
+			defer u.GetStore().GetAkten().GetTypeV0().PutBlob(ta)
 
 			if _, err = fmt.Fprintln(
 				out,

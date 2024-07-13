@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/erworben"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -210,6 +210,6 @@ func (c *compiled) getImplicitEtiketten(
 	return s
 }
 
-func (kc *Compiled) Cli() erworben.Cli {
+func (kc *Compiled) Cli() mutable_config.Cli {
 	return kc.cli
 }

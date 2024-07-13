@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
-	"code.linenisgreat.com/zit/go/zit/src/delta/typ_akte"
+	"code.linenisgreat.com/zit/go/zit/src/delta/type_blob"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
@@ -94,7 +94,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	if err = u.GetKonfig().ApplyToNewMetadatei(
 		zt,
-		u.GetStore().GetAkten().GetTypV0(),
+		u.GetStore().GetAkten().GetTypeV0(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -165,9 +165,9 @@ func (c *FormatZettel) getAkteFormatter(
 		return
 	}
 
-	var typAkte *typ_akte.V0
+	var typAkte *type_blob.V0
 
-	if typAkte, err = u.GetStore().GetAkten().GetTypV0().GetBlob(
+	if typAkte, err = u.GetStore().GetAkten().GetTypeV0().GetBlob(
 		typKonfig.GetAkteSha(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -188,7 +188,7 @@ func (c *FormatZettel) getAkteFormatter(
 			// return
 		}
 	} else {
-		var g typ_akte.FormatterUTIGroup
+		var g type_blob.FormatterUTIGroup
 		g, ok = typAkte.FormatterUTIGroups[c.UTIGroup]
 
 		if !ok {

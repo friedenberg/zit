@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/erworben"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
@@ -137,7 +137,7 @@ func (c EditKonfig) readTempKonfigFile(
 
 	format := u.GetStore().GetKonfigAkteFormat()
 
-	var k erworben.Akte
+	var k mutable_config.Blob
 
 	var aw interfaces.ShaWriteCloser
 

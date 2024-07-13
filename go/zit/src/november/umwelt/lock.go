@@ -47,7 +47,7 @@ func (u *Umwelt) Unlock() (err error) {
 		ui.Log().Print("will flush konfig")
 		if err = u.konfig.Flush(
 			u.Standort(),
-			u.GetStore().GetAkten().GetTypV0(),
+			u.GetStore().GetAkten().GetTypeV0(),
 			u.PrinterHeader(),
 		); err != nil {
 			err = errors.Wrap(err)

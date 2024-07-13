@@ -14,20 +14,20 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/erworben"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
 type MessageHiCommander struct {
 	DialogueType
-	CliKonfig erworben.Cli
+	CliKonfig mutable_config.Cli
 	Angeboren interfaces.ImmutableConfig
 }
 
 type StageCommander struct {
 	Angeboren           interfaces.ImmutableConfigGetter
 	remoteActorCmd      *exec.Cmd
-	konfigCli           erworben.Cli
+	konfigCli           mutable_config.Cli
 	wg                  *sync.WaitGroup
 	chRemoteCommandDone chan struct{}
 	stage

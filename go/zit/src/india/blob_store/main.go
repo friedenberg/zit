@@ -2,11 +2,11 @@ package blob_store
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/etikett_akte"
-	"code.linenisgreat.com/zit/go/zit/src/delta/typ_akte"
-	"code.linenisgreat.com/zit/go/zit/src/echo/kasten_akte"
+	"code.linenisgreat.com/zit/go/zit/src/delta/tag_blob"
+	"code.linenisgreat.com/zit/go/zit/src/delta/type_blob"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_blob"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/erworben"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 )
 
 type Store[
@@ -19,101 +19,101 @@ type Store[
 }
 
 type VersionedStores struct {
-	etikett_v0 Store[etikett_akte.V0, *etikett_akte.V0]
-	etikett_v1 Store[etikett_akte.V1, *etikett_akte.V1]
-	kasten_v0  Store[kasten_akte.V0, *kasten_akte.V0]
-	konfig_v0  Store[erworben.Akte, *erworben.Akte]
-	typ_v0     Store[typ_akte.V0, *typ_akte.V0]
+	tag_v0    Store[tag_blob.V0, *tag_blob.V0]
+	tag_v1    Store[tag_blob.V1, *tag_blob.V1]
+	repo_v0   Store[repo_blob.V0, *repo_blob.V0]
+	config_v0 Store[mutable_config.Blob, *mutable_config.Blob]
+	type_v0   Store[type_blob.V0, *type_blob.V0]
 }
 
 func Make(
 	st standort.Standort,
 ) *VersionedStores {
 	return &VersionedStores{
-		etikett_v0: MakeBlobStore(
+		tag_v0: MakeBlobStore(
 			st,
 			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[etikett_akte.V0](
+				MakeTextParserIgnoreTomlErrors[tag_blob.V0](
 					st,
 				),
-				ParsedBlobTomlFormatter[etikett_akte.V0, *etikett_akte.V0]{},
+				ParsedBlobTomlFormatter[tag_blob.V0, *tag_blob.V0]{},
 				st,
 			),
-			func(a *etikett_akte.V0) {
+			func(a *tag_blob.V0) {
 				a.Reset()
 			},
 		),
-		etikett_v1: MakeBlobStore(
+		tag_v1: MakeBlobStore(
 			st,
 			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[etikett_akte.V1](
+				MakeTextParserIgnoreTomlErrors[tag_blob.V1](
 					st,
 				),
-				ParsedBlobTomlFormatter[etikett_akte.V1, *etikett_akte.V1]{},
+				ParsedBlobTomlFormatter[tag_blob.V1, *tag_blob.V1]{},
 				st,
 			),
-			func(a *etikett_akte.V1) {
+			func(a *tag_blob.V1) {
 				a.Reset()
 			},
 		),
-		kasten_v0: MakeBlobStore(
+		repo_v0: MakeBlobStore(
 			st,
 			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[kasten_akte.V0](
+				MakeTextParserIgnoreTomlErrors[repo_blob.V0](
 					st,
 				),
-				ParsedBlobTomlFormatter[kasten_akte.V0, *kasten_akte.V0]{},
+				ParsedBlobTomlFormatter[repo_blob.V0, *repo_blob.V0]{},
 				st,
 			),
-			func(a *kasten_akte.V0) {
+			func(a *repo_blob.V0) {
 				a.Reset()
 			},
 		),
-		konfig_v0: MakeBlobStore(
+		config_v0: MakeBlobStore(
 			st,
 			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[erworben.Akte](
+				MakeTextParserIgnoreTomlErrors[mutable_config.Blob](
 					st,
 				),
-				ParsedBlobTomlFormatter[erworben.Akte, *erworben.Akte]{},
+				ParsedBlobTomlFormatter[mutable_config.Blob, *mutable_config.Blob]{},
 				st,
 			),
-			func(a *erworben.Akte) {
+			func(a *mutable_config.Blob) {
 				a.Reset()
 			},
 		),
-		typ_v0: MakeBlobStore(
+		type_v0: MakeBlobStore(
 			st,
 			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[typ_akte.V0](
+				MakeTextParserIgnoreTomlErrors[type_blob.V0](
 					st,
 				),
-				ParsedBlobTomlFormatter[typ_akte.V0, *typ_akte.V0]{},
+				ParsedBlobTomlFormatter[type_blob.V0, *type_blob.V0]{},
 				st,
 			),
-			func(a *typ_akte.V0) {
+			func(a *type_blob.V0) {
 				a.Reset()
 			},
 		),
 	}
 }
 
-func (a *VersionedStores) GetEtikettV0() Store[etikett_akte.V0, *etikett_akte.V0] {
-	return a.etikett_v0
+func (a *VersionedStores) GetTagV0() Store[tag_blob.V0, *tag_blob.V0] {
+	return a.tag_v0
 }
 
-func (a *VersionedStores) GetEtikettV1() Store[etikett_akte.V1, *etikett_akte.V1] {
-	return a.etikett_v1
+func (a *VersionedStores) GetTagV1() Store[tag_blob.V1, *tag_blob.V1] {
+	return a.tag_v1
 }
 
-func (a *VersionedStores) GetKastenV0() Store[kasten_akte.V0, *kasten_akte.V0] {
-	return a.kasten_v0
+func (a *VersionedStores) GetRepoV0() Store[repo_blob.V0, *repo_blob.V0] {
+	return a.repo_v0
 }
 
-func (a *VersionedStores) GetKonfigV0() Store[erworben.Akte, *erworben.Akte] {
-	return a.konfig_v0
+func (a *VersionedStores) GetConfigV0() Store[mutable_config.Blob, *mutable_config.Blob] {
+	return a.config_v0
 }
 
-func (a *VersionedStores) GetTypV0() Store[typ_akte.V0, *typ_akte.V0] {
-	return a.typ_v0
+func (a *VersionedStores) GetTypeV0() Store[type_blob.V0, *type_blob.V0] {
+	return a.type_v0
 }

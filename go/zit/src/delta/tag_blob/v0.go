@@ -1,0 +1,9 @@
+package tag_blob
+
+type V0 struct{}
+
+func (a *V0) Reset() {
+}
+
+func (a *V0) ResetWith(b V0) {
+}

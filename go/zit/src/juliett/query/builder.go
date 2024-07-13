@@ -5,10 +5,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
-	"code.linenisgreat.com/zit/go/zit/src/delta/etikett_akte"
 	"code.linenisgreat.com/zit/go/zit/src/delta/gattung"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/delta/tag_blob"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/echo/zittish"
@@ -570,9 +570,9 @@ func (b *Builder) makeEtikettOrEtikettLua(
 
 		lb.WithReader(ar)
 	} else {
-		var akte *etikett_akte.V1
+		var akte *tag_blob.V1
 
-		if akte, err = b.blob_store.GetEtikettV1().GetBlob(
+		if akte, err = b.blob_store.GetTagV1().GetBlob(
 			sk.GetAkteSha(),
 		); err != nil {
 			err = errors.Wrap(err)

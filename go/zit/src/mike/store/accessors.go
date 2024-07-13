@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/echo/thyme"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/erworben"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/golf/ennui"
 	"code.linenisgreat.com/zit/go/zit/src/golf/kennung_index"
 	"code.linenisgreat.com/zit/go/zit/src/golf/objekte_format"
@@ -86,7 +86,7 @@ func (s *Store) GetVerzeichnisse() *store_verzeichnisse.Store {
 	return s.verzeichnisse
 }
 
-func (s *Store) GetKonfigAkteFormat() blob_store.Format[erworben.Akte, *erworben.Akte] {
+func (s *Store) GetKonfigAkteFormat() blob_store.Format[mutable_config.Blob, *mutable_config.Blob] {
 	return s.konfigAkteFormat
 }
 

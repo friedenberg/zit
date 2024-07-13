@@ -11,14 +11,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/delta/typ_akte"
+	"code.linenisgreat.com/zit/go/zit/src/delta/type_blob"
 	"code.linenisgreat.com/zit/go/zit/src/echo/kennung"
 	"code.linenisgreat.com/zit/go/zit/src/echo/standort"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 func (kc *Compiled) recompile(
-	tagp interfaces.BlobGetterPutter[*typ_akte.V0],
+	tagp interfaces.BlobGetterPutter[*type_blob.V0],
 ) (err error) {
 	if err = kc.recompileEtiketten(); err != nil {
 		err = errors.Wrap(err)
@@ -68,7 +68,7 @@ func (kc *Compiled) recompileEtiketten() (err error) {
 }
 
 func (kc *Compiled) recompileTypen(
-	tagp interfaces.BlobGetterPutter[*typ_akte.V0],
+	tagp interfaces.BlobGetterPutter[*type_blob.V0],
 ) (err error) {
 	inlineTypen := collections_value.MakeMutableValueSet[values.String](nil)
 
@@ -78,7 +78,7 @@ func (kc *Compiled) recompileTypen(
 
 	if err = kc.Typen.Each(
 		func(ct *sku.Transacted) (err error) {
-			var ta *typ_akte.V0
+			var ta *type_blob.V0
 
 			if ta, err = tagp.GetBlob(ct.GetAkteSha()); err != nil {
 				err = errors.Wrap(err)
@@ -183,7 +183,7 @@ func (kc *Compiled) loadKonfigErworben(s standort.Standort) (err error) {
 
 func (kc *Compiled) Flush(
 	s standort.Standort,
-	tagp interfaces.BlobGetterPutter[*typ_akte.V0],
+	tagp interfaces.BlobGetterPutter[*type_blob.V0],
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	if !kc.HasChanges() || kc.DryRun {
@@ -215,7 +215,7 @@ func (kc *Compiled) Flush(
 
 func (kc *Compiled) flushErworben(
 	s standort.Standort,
-	tagp interfaces.BlobGetterPutter[*typ_akte.V0],
+	tagp interfaces.BlobGetterPutter[*type_blob.V0],
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	if err = printerHeader("recompiling konfig"); err != nil {

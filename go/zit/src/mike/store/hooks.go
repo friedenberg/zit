@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
-	"code.linenisgreat.com/zit/go/zit/src/delta/typ_akte"
+	"code.linenisgreat.com/zit/go/zit/src/delta/type_blob"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
@@ -30,9 +30,9 @@ func (s *Store) tryNewHook(
 		return
 	}
 
-	var akte *typ_akte.V0
+	var akte *type_blob.V0
 
-	if akte, err = s.GetAkten().GetTypV0().GetBlob(t.GetAkteSha()); err != nil {
+	if akte, err = s.GetAkten().GetTypeV0().GetBlob(t.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -85,9 +85,9 @@ func (s *Store) TryFormatHook(
 		return
 	}
 
-	var akte *typ_akte.V0
+	var akte *type_blob.V0
 
-	if akte, err = s.GetAkten().GetTypV0().GetBlob(t.GetAkteSha()); err != nil {
+	if akte, err = s.GetAkten().GetTypeV0().GetBlob(t.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -142,9 +142,9 @@ func (s *Store) tryPreCommitHooks(
 		return
 	}
 
-	var akte *typ_akte.V0
+	var akte *type_blob.V0
 
-	if akte, err = s.GetAkten().GetTypV0().GetBlob(t.GetAkteSha()); err != nil {
+	if akte, err = s.GetAkten().GetTypeV0().GetBlob(t.GetAkteSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

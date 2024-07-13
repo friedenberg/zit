@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/erworben"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -58,7 +58,7 @@ func Run(args []string) (exitStatus int) {
 
 	args = os.Args[2:]
 
-	konfigCli := erworben.DefaultCli()
+	konfigCli := mutable_config.DefaultCli()
 	konfigCli.AddToFlags(cmd.FlagSet)
 
 	// TODO add Komment / bestandsaufnahmeBezeichnung
