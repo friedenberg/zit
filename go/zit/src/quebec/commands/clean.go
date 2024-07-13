@@ -60,8 +60,8 @@ func init() {
 	)
 }
 
-func (c Clean) DefaultGattungen() kennung.Gattung {
-	return kennung.MakeGattung(gattung.TrueGattung()...)
+func (c Clean) DefaultGattungen() kennung.Genre {
+	return kennung.MakeGenre(gattung.TrueGattung()...)
 }
 
 func (c Clean) shouldClean(

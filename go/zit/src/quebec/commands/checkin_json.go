@@ -23,8 +23,8 @@ func init() {
 	)
 }
 
-func (c CheckinJson) DefaultGattungen() kennung.Gattung {
-	return kennung.MakeGattung()
+func (c CheckinJson) DefaultGattungen() kennung.Genre {
+	return kennung.MakeGenre()
 }
 
 type TomlBookmark struct {

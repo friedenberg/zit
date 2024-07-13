@@ -210,7 +210,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		u.sonnenaufgang,
 		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
 		u.makeQueryBuilder().
-			WithDefaultGattungen(kennung.MakeGattung(gattung.TrueGattung()...)),
+			WithDefaultGattungen(kennung.MakeGenre(gattung.TrueGattung()...)),
 		ofo,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")
@@ -292,7 +292,7 @@ func (u *Umwelt) GetMatcherArchiviert() query.Archiviert {
 }
 
 func (u *Umwelt) GetExternalStoreForQuery(
-	k kennung.Kasten,
+	k kennung.RepoId,
 ) (sku.ExternalStoreForQuery, bool) {
 	e, ok := u.externalStores[k.String()]
 	return e, ok

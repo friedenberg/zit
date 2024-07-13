@@ -17,7 +17,7 @@ func init() {
 }
 
 type ObjekteOptions struct {
-	kennung.Kasten
+	kennung.RepoId
 	objekte_mode.Mode
 	kennung.Clock
 	Proto *Transacted
@@ -53,7 +53,7 @@ type (
 		GetKopf() kennung.Tai
 		GetTai() kennung.Tai
 		GetTyp() kennung.Typ
-		GetKennung() kennung.Kennung
+		GetKennung() kennung.Id
 		GetObjekteSha() interfaces.ShaLike
 		GetAkteSha() interfaces.ShaLike
 		GetKey() string
@@ -65,7 +65,7 @@ type (
 		CalculateObjekteShas() (err error)
 
 		SetTai(kennung.Tai)
-		SetKennungLike(kennung.Kennung) error
+		SetKennungLike(kennung.Id) error
 		SetFromSkuLike(SkuLike) error
 
 		GetSkuLike() SkuLike
@@ -89,7 +89,7 @@ type (
 		interfaces.Stringer
 		TransactedGetter
 		ExternalLike
-		GetKasten() kennung.Kasten
+		GetKasten() kennung.RepoId
 		GetSkuCheckedOutLike() CheckedOutLike
 		GetState() checked_out_state.State
 		SetState(checked_out_state.State) error

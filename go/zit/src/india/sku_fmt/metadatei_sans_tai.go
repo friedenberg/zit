@@ -33,7 +33,7 @@ func StringMetadateiSansTai(o *sku.Transacted) (str string) {
 	if es.Len() > 0 {
 		sb.WriteString(" ")
 		sb.WriteString(
-			iter.StringDelimiterSeparated[kennung.Etikett](
+			iter.StringDelimiterSeparated[kennung.Tag](
 				" ",
 				m.GetEtiketten(),
 			),

@@ -27,8 +27,8 @@ func init() {
 	)
 }
 
-func (c Test) CompletionGattung() kennung.Gattung {
-	return kennung.MakeGattung(
+func (c Test) CompletionGattung() kennung.Genre {
+	return kennung.MakeGenre(
 		gattung.Zettel,
 		gattung.Etikett,
 		gattung.Typ,
@@ -37,8 +37,8 @@ func (c Test) CompletionGattung() kennung.Gattung {
 	)
 }
 
-func (c Test) DefaultGattungen() kennung.Gattung {
-	return kennung.MakeGattung(
+func (c Test) DefaultGattungen() kennung.Genre {
+	return kennung.MakeGenre(
 		gattung.Zettel,
 		gattung.Etikett,
 		gattung.Typ,

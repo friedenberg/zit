@@ -40,7 +40,7 @@ func (s *Store) CheckoutQuery(
 	qf := func(t *sku.Transacted) (err error) {
 		var col sku.CheckedOutLike
 
-		if col, err = s.CheckoutOne(qg.Kasten, options, t); err != nil {
+		if col, err = s.CheckoutOne(qg.RepoId, options, t); err != nil {
 			if errors.Is(err, sku.ErrExternalStoreUnsupportedTyp{}) {
 				err = nil
 			} else {
@@ -74,7 +74,7 @@ func (s *Store) CheckoutQuery(
 }
 
 func (s *Store) CheckoutOne(
-	kasten kennung.Kasten,
+	kasten kennung.RepoId,
 	options checkout_options.Options,
 	sz *sku.Transacted,
 ) (cz sku.CheckedOutLike, err error) {

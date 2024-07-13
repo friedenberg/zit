@@ -12,12 +12,12 @@ import (
 type (
 	FormatterContext interface {
 		metadatei.PersistentFormatterContext
-		GetKennung() kennung.Kennung
+		GetKennung() kennung.Id
 	}
 
 	ParserContext interface {
 		metadatei.PersistentParserContext
-		SetKennungLike(kennung.Kennung) error
+		SetKennungLike(kennung.Id) error
 	}
 
 	Formatter interface {
@@ -73,6 +73,6 @@ type nopFormatterContext struct {
 	metadatei.PersistentFormatterContext
 }
 
-func (nopFormatterContext) GetKennung() kennung.Kennung {
+func (nopFormatterContext) GetKennung() kennung.Id {
 	return nil
 }

@@ -19,7 +19,7 @@ import (
 
 type FormatZettel struct {
 	Format   string
-	Kasten   kennung.Kasten
+	Kasten   kennung.RepoId
 	UTIGroup string
 	Mode     checkout_mode.Mode
 }
@@ -117,7 +117,7 @@ func (c *FormatZettel) getSku(
 	u *umwelt.Umwelt,
 	kennungString string,
 ) (sk *sku.Transacted, err error) {
-	b := u.MakeQueryBuilder(kennung.MakeGattung(gattung.Zettel))
+	b := u.MakeQueryBuilder(kennung.MakeGenre(gattung.Zettel))
 
 	var qg *query.Group
 

@@ -9,13 +9,13 @@ type IndexedLike struct {
 	Count          int
 }
 
-func MakeIndexed(k Kennung) (i *IndexedLike) {
+func MakeIndexed(k Id) (i *IndexedLike) {
 	i = &IndexedLike{}
 	i.ResetWithKennung(k)
 	return
 }
 
-func (i *IndexedLike) ResetWithKennung(k Kennung) {
+func (i *IndexedLike) ResetWithKennung(k Id) {
 	errors.PanicIfError(i.Kennung.SetWithKennung(k))
 }
 
@@ -23,7 +23,7 @@ func (z *IndexedLike) GetInt() int {
 	return 0
 }
 
-func (z *IndexedLike) GetKennung() Kennung {
+func (z *IndexedLike) GetKennung() Id {
 	return &z.Kennung
 }
 

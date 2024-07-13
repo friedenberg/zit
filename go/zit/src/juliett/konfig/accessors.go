@@ -23,7 +23,7 @@ func (kc *Compiled) GetImmutableConfig() interfaces.ImmutableConfig {
 	return kc.angeboren
 }
 
-func (kc *compiled) getTyp(k kennung.Kennung) (ct *sku.Transacted) {
+func (kc *compiled) getTyp(k kennung.Id) (ct *sku.Transacted) {
 	if k.GetGenre() != gattung.Typ {
 		return
 	}
@@ -36,7 +36,7 @@ func (kc *compiled) getTyp(k kennung.Kennung) (ct *sku.Transacted) {
 	return
 }
 
-func (kc *compiled) getKasten(k kennung.Kennung) (ct *sku.Transacted) {
+func (kc *compiled) getKasten(k kennung.Id) (ct *sku.Transacted) {
 	if k.GetGenre() != gattung.Kasten {
 		return
 	}
@@ -52,7 +52,7 @@ func (kc *compiled) getKasten(k kennung.Kennung) (ct *sku.Transacted) {
 // Returns the exactly matching Typ, or if it doesn't exist, returns the parent
 // Typ or nil. (Parent Typ for `md-gdoc` would be `md`.)
 func (kc *compiled) getApproximatedTyp(
-	k kennung.Kennung,
+	k kennung.Id,
 ) (ct ApproximatedTyp) {
 	if k.GetGenre() != gattung.Typ {
 		return
@@ -98,7 +98,7 @@ func (kc *compiled) getEtikettOrKastenOrTyp(
 }
 
 func (kc *compiled) getEtikett(
-	k kennung.Kennung,
+	k kennung.Id,
 ) (ct *sku.Transacted, ok bool) {
 	if k.GetGenre() != gattung.Etikett {
 		return
@@ -199,12 +199,12 @@ func (c *compiled) getSortedEtikettenExpanded(
 }
 
 func (c *compiled) getImplicitEtiketten(
-	e *kennung.Etikett,
-) kennung.EtikettSet {
+	e *kennung.Tag,
+) kennung.TagSet {
 	s, ok := c.ImplicitEtiketten[e.String()]
 
 	if !ok || s == nil {
-		return kennung.MakeEtikettSet()
+		return kennung.MakeTagSet()
 	}
 
 	return s

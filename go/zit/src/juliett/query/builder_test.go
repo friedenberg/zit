@@ -13,7 +13,7 @@ func TestQuery(t1 *testing.T) {
 	type testCase struct {
 		stackInfo                                test_logz.StackInfo
 		description, expected, expectedOptimized string
-		defaultGattung                           kennung.Gattung
+		defaultGattung                           kennung.Genre
 		inputs                                   []string
 	}
 
@@ -89,7 +89,7 @@ func TestQuery(t1 *testing.T) {
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
 			expectedOptimized: "one/uno:Zettel",
 			expected:          "one/uno:Zettel",
-			defaultGattung:    kennung.MakeGattung(gattung.Zettel),
+			defaultGattung:    kennung.MakeGenre(gattung.Zettel),
 			inputs:            []string{"one/uno"},
 		},
 		{
@@ -132,14 +132,14 @@ func TestQuery(t1 *testing.T) {
 		},
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
-			defaultGattung:    kennung.MakeGattung(gattung.TrueGattung()...),
+			defaultGattung:    kennung.MakeGenre(gattung.TrueGattung()...),
 			expectedOptimized: ":Typ :Etikett :Zettel :Konfig :Kasten",
 			expected:          ":Typ,Etikett,Zettel,Konfig,Kasten",
 			inputs:            []string{},
 		},
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
-			defaultGattung:    kennung.MakeGattung(gattung.TrueGattung()...),
+			defaultGattung:    kennung.MakeGenre(gattung.TrueGattung()...),
 			expectedOptimized: ":Typ :Etikett :Zettel :Konfig :Kasten",
 			expected:          ":Typ,Etikett,Zettel,Konfig,Kasten",
 			inputs:            []string{":"},

@@ -20,9 +20,9 @@ import (
 // TODO-P4 make generic
 type AbbrStore interface {
 	Hinweis() AbbrStoreGeneric[kennung.Hinweis, *kennung.Hinweis]
-	Kisten() AbbrStoreGeneric[kennung.Kasten, *kennung.Kasten]
+	Kisten() AbbrStoreGeneric[kennung.RepoId, *kennung.RepoId]
 	Shas() AbbrStoreGeneric[sha.Sha, *sha.Sha]
-	Etiketten() AbbrStoreGeneric[kennung.Etikett, *kennung.Etikett]
+	Etiketten() AbbrStoreGeneric[kennung.Tag, *kennung.Tag]
 	Typen() AbbrStoreGeneric[kennung.Typ, *kennung.Typ]
 
 	AddMatchable(*sku.Transacted) error
@@ -34,9 +34,9 @@ type AbbrStore interface {
 type indexAbbrEncodableTridexes struct {
 	Shas      indexNotHinweis[sha.Sha, *sha.Sha]
 	Hinweis   indexHinweis
-	Etiketten indexNotHinweis[kennung.Etikett, *kennung.Etikett]
+	Etiketten indexNotHinweis[kennung.Tag, *kennung.Tag]
 	Typen     indexNotHinweis[kennung.Typ, *kennung.Typ]
-	Kisten    indexNotHinweis[kennung.Kasten, *kennung.Kasten]
+	Kisten    indexNotHinweis[kennung.RepoId, *kennung.RepoId]
 }
 
 type indexAbbr struct {
@@ -69,13 +69,13 @@ func newIndexAbbr(
 				Kopfen:    tridex.Make(),
 				Schwanzen: tridex.Make(),
 			},
-			Etiketten: indexNotHinweis[kennung.Etikett, *kennung.Etikett]{
+			Etiketten: indexNotHinweis[kennung.Tag, *kennung.Tag]{
 				Kennungen: tridex.Make(),
 			},
 			Typen: indexNotHinweis[kennung.Typ, *kennung.Typ]{
 				Kennungen: tridex.Make(),
 			},
-			Kisten: indexNotHinweis[kennung.Kasten, *kennung.Kasten]{
+			Kisten: indexNotHinweis[kennung.RepoId, *kennung.RepoId]{
 				Kennungen: tridex.Make(),
 			},
 		},
@@ -250,7 +250,7 @@ func (i *indexAbbr) Hinweis() (asg AbbrStoreGeneric[kennung.Hinweis, *kennung.Hi
 	return
 }
 
-func (i *indexAbbr) Kisten() (asg AbbrStoreGeneric[kennung.Kasten, *kennung.Kasten]) {
+func (i *indexAbbr) Kisten() (asg AbbrStoreGeneric[kennung.RepoId, *kennung.RepoId]) {
 	asg = &i.indexAbbrEncodableTridexes.Kisten
 
 	return
@@ -262,7 +262,7 @@ func (i *indexAbbr) Shas() (asg AbbrStoreGeneric[sha.Sha, *sha.Sha]) {
 	return
 }
 
-func (i *indexAbbr) Etiketten() (asg AbbrStoreGeneric[kennung.Etikett, *kennung.Etikett]) {
+func (i *indexAbbr) Etiketten() (asg AbbrStoreGeneric[kennung.Tag, *kennung.Tag]) {
 	asg = &i.indexAbbrEncodableTridexes.Etiketten
 
 	return

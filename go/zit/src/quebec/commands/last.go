@@ -18,7 +18,7 @@ import (
 )
 
 type Last struct {
-	Kasten   kennung.Kasten
+	Kasten   kennung.RepoId
 	Edit     bool
 	Organize bool
 	Format   string
@@ -40,8 +40,8 @@ func init() {
 	)
 }
 
-func (c Last) CompletionGattung() kennung.Gattung {
-	return kennung.MakeGattung(
+func (c Last) CompletionGattung() kennung.Genre {
+	return kennung.MakeGenre(
 		gattung.Bestandsaufnahme,
 	)
 }

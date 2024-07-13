@@ -11,44 +11,44 @@ import (
 
 func TestNormalize(t *testing.T) {
 	type testEntry struct {
-		ac EtikettSet
-		ex EtikettSet
+		ac TagSet
+		ex TagSet
 	}
 
 	testEntries := map[string]testEntry{
 		"removes all": {
-			ac: MakeEtikettSet(
-				MustEtikett("project-2021-zit"),
-				MustEtikett("project-2021-zit-test"),
-				MustEtikett("project-2021-zit-ewwwwww"),
-				MustEtikett("project-archive-task-done"),
+			ac: MakeTagSet(
+				MustTag("project-2021-zit"),
+				MustTag("project-2021-zit-test"),
+				MustTag("project-2021-zit-ewwwwww"),
+				MustTag("project-archive-task-done"),
 			),
-			ex: MakeEtikettSet(
-				MustEtikett("project-2021-zit-test"),
-				MustEtikett("project-2021-zit-ewwwwww"),
-				MustEtikett("project-archive-task-done"),
+			ex: MakeTagSet(
+				MustTag("project-2021-zit-test"),
+				MustTag("project-2021-zit-ewwwwww"),
+				MustTag("project-archive-task-done"),
 			),
 		},
 		"removes non": {
-			ac: MakeEtikettSet(
-				MustEtikett("project-2021-zit"),
-				MustEtikett("project-2021-zit-test"),
-				MustEtikett("project-2021-zit-ewwwwww"),
-				MustEtikett("zz-archive-task-done"),
+			ac: MakeTagSet(
+				MustTag("project-2021-zit"),
+				MustTag("project-2021-zit-test"),
+				MustTag("project-2021-zit-ewwwwww"),
+				MustTag("zz-archive-task-done"),
 			),
-			ex: MakeEtikettSet(
-				MustEtikett("project-2021-zit-test"),
-				MustEtikett("project-2021-zit-ewwwwww"),
-				MustEtikett("zz-archive-task-done"),
+			ex: MakeTagSet(
+				MustTag("project-2021-zit-test"),
+				MustTag("project-2021-zit-ewwwwww"),
+				MustTag("zz-archive-task-done"),
 			),
 		},
 		"removes right order": {
-			ac: MakeEtikettSet(
-				MustEtikett("priority"),
-				MustEtikett("priority-1"),
+			ac: MakeTagSet(
+				MustTag("priority"),
+				MustTag("priority-1"),
 			),
-			ex: MakeEtikettSet(
-				MustEtikett("priority-1"),
+			ex: MakeTagSet(
+				MustTag("priority-1"),
 			),
 		},
 	}
@@ -60,7 +60,7 @@ func TestNormalize(t *testing.T) {
 				t := test_logz.T{T: t1}
 				ac := WithRemovedCommonPrefixes(te.ac)
 
-				if !EtikettSetEquals(ac, te.ex) {
+				if !TagSetEquals(ac, te.ex) {
 					t.Errorf(
 						"removing prefixes doesn't match:\nexpected: %q\n  actual: %q",
 						te.ex,
@@ -74,60 +74,60 @@ func TestNormalize(t *testing.T) {
 
 func TestRemovePrefixes(t *testing.T) {
 	type testEntry struct {
-		ac     EtikettSet
-		ex     EtikettSet
+		ac     TagSet
+		ex     TagSet
 		prefix string
 	}
 
 	testEntries := map[string]testEntry{
 		"removes all": {
-			ac: MakeEtikettSet(
-				MustEtikett("project-2021-zit"),
-				MustEtikett("project-2021-zit-test"),
-				MustEtikett("project-2021-zit-ewwwwww"),
-				MustEtikett("project-archive-task-done"),
+			ac: MakeTagSet(
+				MustTag("project-2021-zit"),
+				MustTag("project-2021-zit-test"),
+				MustTag("project-2021-zit-ewwwwww"),
+				MustTag("project-archive-task-done"),
 			),
-			ex:     MakeEtikettSet(),
+			ex:     MakeTagSet(),
 			prefix: "project",
 		},
 		"removes non": {
-			ac: MakeEtikettSet(
-				MustEtikett("project-2021-zit"),
-				MustEtikett("project-2021-zit-test"),
-				MustEtikett("project-2021-zit-ewwwwww"),
-				MustEtikett("zz-archive-task-done"),
+			ac: MakeTagSet(
+				MustTag("project-2021-zit"),
+				MustTag("project-2021-zit-test"),
+				MustTag("project-2021-zit-ewwwwww"),
+				MustTag("zz-archive-task-done"),
 			),
-			ex: MakeEtikettSet(
-				MustEtikett("project-2021-zit"),
-				MustEtikett("project-2021-zit-test"),
-				MustEtikett("project-2021-zit-ewwwwww"),
-				MustEtikett("zz-archive-task-done"),
+			ex: MakeTagSet(
+				MustTag("project-2021-zit"),
+				MustTag("project-2021-zit-test"),
+				MustTag("project-2021-zit-ewwwwww"),
+				MustTag("zz-archive-task-done"),
 			),
 			prefix: "xx",
 		},
 		"removes one": {
-			ac: MakeEtikettSet(
-				MustEtikett("project-2021-zit"),
-				MustEtikett("project-2021-zit-test"),
-				MustEtikett("project-2021-zit-ewwwwww"),
-				MustEtikett("zz-archive-task-done"),
+			ac: MakeTagSet(
+				MustTag("project-2021-zit"),
+				MustTag("project-2021-zit-test"),
+				MustTag("project-2021-zit-ewwwwww"),
+				MustTag("zz-archive-task-done"),
 			),
-			ex: MakeEtikettSet(
-				MustEtikett("project-2021-zit"),
-				MustEtikett("project-2021-zit-test"),
-				MustEtikett("project-2021-zit-ewwwwww"),
+			ex: MakeTagSet(
+				MustTag("project-2021-zit"),
+				MustTag("project-2021-zit-test"),
+				MustTag("project-2021-zit-ewwwwww"),
 			),
 			prefix: "zz",
 		},
 		"removes most": {
-			ac: MakeEtikettSet(
-				MustEtikett("project-2021-zit"),
-				MustEtikett("project-2021-zit-test"),
-				MustEtikett("project-2021-zit-ewwwwww"),
-				MustEtikett("zz-archive-task-done"),
+			ac: MakeTagSet(
+				MustTag("project-2021-zit"),
+				MustTag("project-2021-zit-test"),
+				MustTag("project-2021-zit-ewwwwww"),
+				MustTag("zz-archive-task-done"),
 			),
-			ex: MakeEtikettSet(
-				MustEtikett("zz-archive-task-done"),
+			ex: MakeTagSet(
+				MustTag("zz-archive-task-done"),
 			),
 			prefix: "project",
 		},
@@ -144,9 +144,9 @@ func TestRemovePrefixes(t *testing.T) {
 }
 
 func TestExpandedRight(t *testing.T) {
-	s := MakeEtikettSet(
-		MustEtikett("project-2021-zit"),
-		MustEtikett("zz-archive-task-done"),
+	s := MakeTagSet(
+		MustTag("project-2021-zit"),
+		MustTag("zz-archive-task-done"),
 	)
 
 	ex := Expanded(s, expansion.ExpanderRight)
@@ -161,7 +161,7 @@ func TestExpandedRight(t *testing.T) {
 		"zz-archive-task-done",
 	}
 
-	actual := iter.SortedStrings[Etikett](ex)
+	actual := iter.SortedStrings[Tag](ex)
 
 	if !stringSliceEquals(actual, expected) {
 		t.Errorf(
@@ -173,12 +173,12 @@ func TestExpandedRight(t *testing.T) {
 }
 
 func TestPrefixIntersection(t *testing.T) {
-	s := MakeEtikettSet(
-		MustEtikett("project-2021-zit"),
-		MustEtikett("zz-archive-task-done"),
+	s := MakeTagSet(
+		MustTag("project-2021-zit"),
+		MustTag("zz-archive-task-done"),
 	)
 
-	ex := IntersectPrefixes(s, MustEtikett("project"))
+	ex := IntersectPrefixes(s, MustTag("project"))
 
 	expected := []string{
 		"project-2021-zit",
@@ -217,31 +217,31 @@ func TestPrefixIntersection(t *testing.T) {
 // }
 
 func TestDelta1(t *testing.T) {
-	from := MakeEtikettSet(
-		MustEtikett("project-2021-zit"),
-		MustEtikett("task-todo"),
+	from := MakeTagSet(
+		MustTag("project-2021-zit"),
+		MustTag("task-todo"),
 	)
 
-	to := MakeEtikettSet(
-		MustEtikett("project-2021-zit"),
-		MustEtikett("zz-archive-task-done"),
+	to := MakeTagSet(
+		MustTag("project-2021-zit"),
+		MustTag("zz-archive-task-done"),
 	)
 
-	d := collections_delta.MakeSetDelta[Etikett](from, to)
+	d := collections_delta.MakeSetDelta[Tag](from, to)
 
-	c_expected := MakeEtikettSet(
-		MustEtikett("zz-archive-task-done"),
+	c_expected := MakeTagSet(
+		MustTag("zz-archive-task-done"),
 	)
 
-	if !iter.SetEquals[Etikett](c_expected, d.GetAdded()) {
+	if !iter.SetEquals[Tag](c_expected, d.GetAdded()) {
 		t.Errorf("expected\n%s\nactual:\n%s", c_expected, d.GetAdded())
 	}
 
-	d_expected := MakeEtikettSet(
-		MustEtikett("task-todo"),
+	d_expected := MakeTagSet(
+		MustTag("task-todo"),
 	)
 
-	if !iter.SetEquals[Etikett](d_expected, d.GetRemoved()) {
+	if !iter.SetEquals[Tag](d_expected, d.GetRemoved()) {
 		t.Errorf("expected\n%s\nactual:\n%s", d_expected, d.GetRemoved())
 	}
 }

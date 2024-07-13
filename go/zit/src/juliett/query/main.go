@@ -13,7 +13,7 @@ import (
 
 type Query struct {
 	kennung.Sigil
-	kennung.Gattung
+	kennung.Genre
 	Exp
 
 	Kennung map[string]Kennung
@@ -23,7 +23,7 @@ type Query struct {
 
 func (a *Query) IsEmpty() bool {
 	return a.Sigil == kennung.SigilUnknown &&
-		a.Gattung.IsEmpty() &&
+		a.Genre.IsEmpty() &&
 		len(a.Children) == 0 &&
 		len(a.Kennung) == 0
 }
@@ -33,7 +33,7 @@ func (a *Query) GetSigil() kennung.Sigil {
 }
 
 func (a *Query) ContainsKennung(k *kennung.Kennung2) bool {
-	if !a.Gattung.Contains(k.GetGenre()) {
+	if !a.Genre.Contains(k.GetGenre()) {
 		panic("should never check for wrong gattung")
 	}
 
@@ -49,7 +49,7 @@ func (a *Query) ContainsKennung(k *kennung.Kennung2) bool {
 func (a *Query) Clone() (b *Query) {
 	b = &Query{
 		Sigil:   a.Sigil,
-		Gattung: a.Gattung,
+		Genre: a.Genre,
 		Kennung: make(map[string]Kennung, len(a.Kennung)),
 		Hidden:  a.Hidden,
 	}
@@ -71,11 +71,11 @@ func (q *Query) Add(m sku.Query) (err error) {
 		return q.Exp.Add(m)
 	}
 
-	if q1.Gattung != q.Gattung {
+	if q1.Genre != q.Genre {
 		err = errors.Errorf(
 			"expected %q but got %q",
-			q.Gattung,
-			q1.Gattung,
+			q.Genre,
+			q1.Genre,
 		)
 
 		return
@@ -142,7 +142,7 @@ func (q *Query) StringDebug() string {
 		sb.WriteString(q.Sigil.String())
 	} else if !q.IsEmpty() {
 		sb.WriteString(q.Sigil.String())
-		sb.WriteString(q.Gattung.String())
+		sb.WriteString(q.Genre.String())
 	}
 
 	return sb.String()
@@ -194,11 +194,11 @@ func (q *Query) String() string {
 		sb.WriteString("]")
 	}
 
-	if q.Gattung.IsEmpty() && !q.IsSchwanzenOrUnknown() {
+	if q.Genre.IsEmpty() && !q.IsSchwanzenOrUnknown() {
 		sb.WriteString(q.Sigil.String())
-	} else if !q.Gattung.IsEmpty() {
+	} else if !q.Genre.IsEmpty() {
 		sb.WriteString(q.Sigil.String())
-		sb.WriteString(q.Gattung.String())
+		sb.WriteString(q.Genre.String())
 	}
 
 	return sb.String()
@@ -224,7 +224,7 @@ func (q *Query) ContainsSku(sk *sku.Transacted) (ok bool) {
 
 	g := gattung.Must(sk)
 
-	if !q.Gattung.ContainsOneOf(g) {
+	if !q.Genre.ContainsOneOf(g) {
 		return
 	}
 

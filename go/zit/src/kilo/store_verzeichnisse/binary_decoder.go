@@ -289,7 +289,7 @@ func (bf *binaryDecoder) readFieldKey(
 		}
 
 	case schlussel.Etikett:
-		var e kennung.Etikett
+		var e kennung.Tag
 
 		if err = e.Set(bf.Content.String()); err != nil {
 			err = errors.Wrap(err)
@@ -346,7 +346,7 @@ func (bf *binaryDecoder) readFieldKey(
 		}
 
 	case schlussel.VerzeichnisseEtikettImplicit:
-		var e kennung.Etikett
+		var e kennung.Tag
 
 		if err = e.Set(bf.Content.String()); err != nil {
 			err = errors.Wrap(err)
@@ -359,7 +359,7 @@ func (bf *binaryDecoder) readFieldKey(
 		}
 
 	case schlussel.VerzeichnisseEtikettExpanded:
-		var e kennung.Etikett
+		var e kennung.Tag
 
 		if err = e.Set(bf.Content.String()); err != nil {
 			err = errors.Wrap(err)

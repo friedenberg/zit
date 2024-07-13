@@ -73,7 +73,7 @@ func registerCommandWithQuery(
 		CommandWithQuery: c,
 	}
 
-	f.Var(&cweq.Kasten, "kasten", "none or Chrome")
+	f.Var(&cweq.RepoId, "kasten", "none or Chrome")
 	f.BoolVar(&cweq.ExcludeUntracked, "exclude-untracked", false, "")
 	f.BoolVar(&cweq.IncludeRecognized, "include-recognized", false, "")
 

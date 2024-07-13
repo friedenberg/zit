@@ -25,7 +25,7 @@ type cliCheckedOut struct {
 
 	typStringFormatWriter         interfaces.StringFormatWriter[*kennung.Typ]
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung]
-	etikettenStringFormatWriter   interfaces.StringFormatWriter[*kennung.Etikett]
+	etikettenStringFormatWriter   interfaces.StringFormatWriter[*kennung.Tag]
 }
 
 func MakeCliCheckedOutFormat(
@@ -35,7 +35,7 @@ func MakeCliCheckedOutFormat(
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*metadatei.Metadatei],
 	typStringFormatWriter interfaces.StringFormatWriter[*kennung.Typ],
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung],
-	etikettenStringFormatWriter interfaces.StringFormatWriter[*kennung.Etikett],
+	etikettenStringFormatWriter interfaces.StringFormatWriter[*kennung.Tag],
 ) *cliCheckedOut {
 	return &cliCheckedOut{
 		options:                       options,

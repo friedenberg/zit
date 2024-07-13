@@ -16,7 +16,7 @@ import (
 )
 
 type New struct {
-	Kasten kennung.Kasten
+	Kasten kennung.RepoId
 	Delete bool
 	Count  int
 	// TODO combine organize and edit and refactor

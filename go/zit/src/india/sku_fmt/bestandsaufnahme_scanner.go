@@ -30,7 +30,7 @@ func MakeFormatBestandsaufnahmeScanner(
 		ringBuffer: catgut.MakeRingBuffer(in, 0),
 		format:     of,
 		options:    op,
-		es:         kennung.MakeEtikettMutableSet(),
+		es:         kennung.MakeTagMutableSet(),
 	}
 }
 
@@ -44,7 +44,7 @@ type bestandsaufnahmeScanner struct {
 
 	m  metadatei.Metadatei
 	g  gattung.Gattung
-	es kennung.EtikettMutableSet
+	es kennung.TagMutableSet
 	k  string
 
 	err     error

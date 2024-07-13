@@ -36,8 +36,8 @@ func init() {
 	)
 }
 
-func (c Checkin) DefaultGattungen() kennung.Gattung {
-	return kennung.MakeGattung(gattung.TrueGattung()...)
+func (c Checkin) DefaultGattungen() kennung.Genre {
+	return kennung.MakeGenre(gattung.TrueGattung()...)
 }
 
 func (c Checkin) RunWithQuery(

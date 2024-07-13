@@ -20,10 +20,10 @@ func TestMakeEtiketten(t1 *testing.T) {
 		"tag3",
 	}
 
-	var sut kennung.EtikettSet
+	var sut kennung.TagSet
 	var err error
 
-	if sut, err = kennung.MakeEtikettSetStrings(vs...); err != nil {
+	if sut, err = kennung.MakeTagSetStrings(vs...); err != nil {
 		t.Fatalf("%s", err)
 	}
 
@@ -46,7 +46,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 	}
 
 	{
-		ac := iter.SortedStrings[kennung.Etikett](sut)
+		ac := iter.SortedStrings[kennung.Tag](sut)
 
 		if !reflect.DeepEqual(ac, vs) {
 			t.Fatalf("expected %q but got %q", vs, ac)
@@ -55,7 +55,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 
 	{
 		ex := "tag1, tag2, tag3"
-		ac := iter.StringCommaSeparated[kennung.Etikett](sut)
+		ac := iter.StringCommaSeparated[kennung.Tag](sut)
 
 		if ac != ex {
 			t.Fatalf("expected %q but got %q", ex, ac)
@@ -64,7 +64,7 @@ func TestMakeEtiketten(t1 *testing.T) {
 
 	{
 		ex := "tag1, tag2, tag3"
-		ac := iter.StringCommaSeparated[kennung.Etikett](
+		ac := iter.StringCommaSeparated[kennung.Tag](
 			sut.CloneSetLike(),
 		)
 

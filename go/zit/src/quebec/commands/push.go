@@ -31,8 +31,8 @@ func init() {
 	)
 }
 
-func (c Push) CompletionGattung() kennung.Gattung {
-	return kennung.MakeGattung(
+func (c Push) CompletionGattung() kennung.Genre {
+	return kennung.MakeGenre(
 		gattung.Zettel,
 		gattung.Etikett,
 		gattung.Typ,
@@ -57,13 +57,13 @@ func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	builder := u.MakeQueryBuilderExcludingHidden(
-		kennung.MakeGattung(),
+		kennung.MakeGenre(),
 	)
 
 	var ids *query.Group
 
 	if ids, err = builder.BuildQueryGroupWithKasten(
-		kennung.Kasten{},
+		kennung.RepoId{},
 		sku.ExternalQueryOptions{},
 		args...,
 	); err != nil {

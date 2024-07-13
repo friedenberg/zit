@@ -290,14 +290,14 @@ func (fs *Store) GetZettel(
 }
 
 func (fs *Store) GetKasten(
-	h *kennung.Kasten,
+	h *kennung.RepoId,
 ) (z *KennungFDPair, ok bool) {
 	z, ok = fs.kisten.Get(h.String())
 	return
 }
 
 func (fs *Store) GetEtikett(
-	k *kennung.Etikett,
+	k *kennung.Tag,
 ) (e *KennungFDPair, ok bool) {
 	e, ok = fs.etiketten.Get(k.String())
 	return

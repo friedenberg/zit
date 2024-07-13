@@ -56,14 +56,14 @@ func init() {
 	)
 }
 
-func (c *OrganizeJSON) DefaultGattungen() kennung.Gattung {
-	return kennung.MakeGattung(
+func (c *OrganizeJSON) DefaultGattungen() kennung.Genre {
+	return kennung.MakeGenre(
 		gattung.Zettel,
 	)
 }
 
-func (c *OrganizeJSON) CompletionGattung() kennung.Gattung {
-	return kennung.MakeGattung(
+func (c *OrganizeJSON) CompletionGattung() kennung.Genre {
+	return kennung.MakeGenre(
 		gattung.Zettel,
 		gattung.Etikett,
 		gattung.Typ,

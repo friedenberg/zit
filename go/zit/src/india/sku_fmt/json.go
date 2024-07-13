@@ -102,9 +102,9 @@ func (j *Json) ToTransacted(sk *sku.Transacted, s standort.Standort) (err error)
 		return
 	}
 
-	var es kennung.EtikettSet
+	var es kennung.TagSet
 
-	if es, err = kennung.MakeEtikettSetStrings(j.Etiketten...); err != nil {
+	if es, err = kennung.MakeTagSetStrings(j.Etiketten...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

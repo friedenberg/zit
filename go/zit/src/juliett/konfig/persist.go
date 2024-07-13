@@ -34,13 +34,13 @@ func (kc *Compiled) recompile(
 }
 
 func (kc *Compiled) recompileEtiketten() (err error) {
-	kc.DefaultEtiketten = kennung.MakeEtikettSet(kc.Defaults.Etiketten...)
+	kc.DefaultEtiketten = kennung.MakeTagSet(kc.Defaults.Etiketten...)
 
 	kc.ImplicitEtiketten = make(implicitEtikettenMap)
 
 	if err = kc.compiled.Etiketten.Each(
 		func(ke *ketikett) (err error) {
-			var e kennung.Etikett
+			var e kennung.Tag
 
 			if err = e.Set(ke.Transacted.GetKennung().String()); err != nil {
 				err = errors.Wrap(err)

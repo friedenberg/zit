@@ -16,7 +16,7 @@ func MakeEtikettenCliFormat() (f *etikettenCliFormat) {
 
 func (f *etikettenCliFormat) WriteStringFormat(
 	w interfaces.WriterAndStringWriter,
-	k *kennung.Etikett,
+	k *kennung.Tag,
 ) (n int64, err error) {
 	var n1 int
 

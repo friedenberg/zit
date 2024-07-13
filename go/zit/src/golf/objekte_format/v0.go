@@ -31,7 +31,7 @@ func (f v0) FormatPersistentMetadatei(
 	w.WriteFormat("%s %s", gattung.Typ, m.GetTyp())
 	w.WriteFormat("%s %s", gattung.Bezeichnung, m.Bezeichnung)
 
-	for _, e := range iter.SortedValues[kennung.Etikett](m.GetEtiketten()) {
+	for _, e := range iter.SortedValues[kennung.Tag](m.GetEtiketten()) {
 		w.WriteFormat("%s %s", gattung.Etikett, e)
 	}
 
@@ -50,13 +50,13 @@ func (f v0) ParsePersistentMetadatei(
 ) (n int64, err error) {
 	m := c.GetMetadatei()
 
-	etiketten := kennung.MakeEtikettMutableSet()
+	etiketten := kennung.MakeTagMutableSet()
 
 	r := bufio.NewReader(r1)
 
 	typLineReader := ohio.MakeLineReaderIgnoreErrors(m.Typ.Set)
 
-	esa := iter.MakeFuncSetString[kennung.Etikett, *kennung.Etikett](
+	esa := iter.MakeFuncSetString[kennung.Tag, *kennung.Tag](
 		etiketten,
 	)
 

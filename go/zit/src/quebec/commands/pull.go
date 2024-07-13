@@ -25,8 +25,8 @@ func init() {
 	)
 }
 
-func (c Pull) CompletionGattung() kennung.Gattung {
-	return kennung.MakeGattung(
+func (c Pull) CompletionGattung() kennung.Genre {
+	return kennung.MakeGenre(
 		gattung.Zettel,
 		gattung.Etikett,
 		gattung.Typ,
@@ -57,7 +57,7 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	var ids *query.Group
 
 	if ids, err = builder.BuildQueryGroupWithKasten(
-		kennung.Kasten{},
+		kennung.RepoId{},
 		sku.ExternalQueryOptions{},
 		args...,
 	); err != nil {

@@ -96,12 +96,12 @@ func (e *Typ) TodoSetFromKennung2(v *Kennung2) (err error) {
 func (e *Typ) Set(v string) (err error) {
 	v = strings.ToLower(strings.TrimSpace(strings.Trim(v, ".! ")))
 
-	if err = ErrOnKonfig(v); err != nil {
+	if err = ErrOnConfig(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if !EtikettRegex.Match([]byte(v)) {
+	if !TagRegex.Match([]byte(v)) {
 		err = errors.Errorf("not a valid Typ: '%s'", v)
 		return
 	}

@@ -41,32 +41,32 @@ type (
 		SetIncludeHistory()
 		MakeEmitSkuMaybeExternal(
 			f interfaces.FuncIter[*Transacted],
-			k kennung.Kasten,
+			k kennung.RepoId,
 			updateTransacted func(
-				kasten kennung.Kasten,
+				kasten kennung.RepoId,
 				z *Transacted,
 			) (err error),
 		) interfaces.FuncIter[*Transacted]
 		MakeEmitSkuSigilSchwanzen(
 			f interfaces.FuncIter[*Transacted],
-			k kennung.Kasten,
+			k kennung.RepoId,
 			updateTransacted func(
-				kasten kennung.Kasten,
+				kasten kennung.RepoId,
 				z *Transacted,
 			) (err error),
 		) interfaces.FuncIter[*Transacted]
-		GetEtiketten() kennung.EtikettSet
+		GetEtiketten() kennung.TagSet
 		GetTypen() kennung.TypSet
 	}
 
 	ExternalQueryOptions struct {
-		kennung.Kasten
+		kennung.RepoId
 		ExcludeUntracked  bool
 		IncludeRecognized bool
 	}
 
 	ExternalQuery struct {
-		kennung.Kasten
+		kennung.RepoId
 		QueryGroup
 		ExternalQueryOptions
 	}

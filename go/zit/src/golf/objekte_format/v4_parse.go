@@ -81,7 +81,7 @@ func (f v4) ParsePersistentMetadatei(
 			}
 
 		case key.Equal(keyEtikett.Bytes()):
-			e := kennung.GetEtikettPool().Get()
+			e := kennung.GetTagPool().Get()
 
 			if err = e.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
@@ -140,7 +140,7 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-			e := kennung.GetEtikettPool().Get()
+			e := kennung.GetTagPool().Get()
 
 			if err = e.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
@@ -161,7 +161,7 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-			e := kennung.GetEtikettPool().Get()
+			e := kennung.GetTagPool().Get()
 
 			if err = e.Set(val.String()); err != nil {
 				err = errors.Wrap(err)

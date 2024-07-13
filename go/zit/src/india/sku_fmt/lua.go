@@ -23,7 +23,7 @@ func ToLuaTable(o *sku.Transacted, l *lua.LState, t *LuaTable) {
 	etiketten := t.Etiketten
 
 	o.Metadatei.GetEtiketten().EachPtr(
-		func(e *kennung.Etikett) (err error) {
+		func(e *kennung.Tag) (err error) {
 			l.SetField(etiketten, e.String(), lua.LBool(true))
 			return
 		},
@@ -32,7 +32,7 @@ func ToLuaTable(o *sku.Transacted, l *lua.LState, t *LuaTable) {
 	etiketten = t.EtikettenImplicit
 
 	o.Metadatei.Verzeichnisse.GetImplicitEtiketten().EachPtr(
-		func(e *kennung.Etikett) (err error) {
+		func(e *kennung.Tag) (err error) {
 			l.SetField(etiketten, e.String(), lua.LBool(true))
 			return
 		},
@@ -68,7 +68,7 @@ func FromLuaTable(o *sku.Transacted, l *lua.LState, lt *LuaTable) (err error) {
 
 	ets.ForEach(
 		func(key, value lua.LValue) {
-			var e kennung.Etikett
+			var e kennung.Tag
 
 			if err = e.Set(key.String()); err != nil {
 				err = errors.Wrap(err)

@@ -53,7 +53,7 @@ func (c *constructor) Make() (ot *Text, err error) {
 
 func (c *constructor) collectExplicitAndImplicitFor(
 	skus sku.TransactedSet,
-	re kennung.Etikett,
+	re kennung.Tag,
 ) (explicitCount, implicitCount int, err error) {
 	res := catgut.MakeFromString(re.String())
 
@@ -95,11 +95,11 @@ func (c *constructor) collectExplicitAndImplicitFor(
 }
 
 func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
-	anchored := kennung.MakeMutableEtikettSet()
-	extras := kennung.MakeMutableEtikettSet()
+	anchored := kennung.MakeMutableTagSet()
+	extras := kennung.MakeMutableTagSet()
 
 	if err = c.rootEtiketten.Each(
-		func(re kennung.Etikett) (err error) {
+		func(re kennung.Tag) (err error) {
 			var explicitCount, implicitCount int
 
 			if explicitCount, implicitCount, err = c.collectExplicitAndImplicitFor(
@@ -131,7 +131,7 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 		return
 	}
 
-	c.EtikettSet = anchored
+	c.TagSet = anchored
 	c.ExtraEtiketten = extras
 
 	// c.ExtraEtiketten = implicit
@@ -202,7 +202,7 @@ func (c *constructor) makeChildrenWithoutGroups(
 func (c *constructor) makeChildrenWithPossibleGroups(
 	parent *Assignment,
 	prefixSet PrefixSet,
-	groupingEtiketten kennung.EtikettSlice,
+	groupingEtiketten kennung.TagSlice,
 	used objSet,
 ) (err error) {
 	if groupingEtiketten.Len() == 0 {
@@ -243,12 +243,12 @@ func (c *constructor) makeChildrenWithPossibleGroups(
 func (c *constructor) addGroupedChildren(
 	parent *Assignment,
 	grouped PrefixSet,
-	groupingEtiketten kennung.EtikettSlice,
+	groupingEtiketten kennung.TagSlice,
 	used objSet,
 ) (err error) {
 	if err = grouped.Each(
-		func(e kennung.Etikett, zs objSet) (err error) {
-			if e.IsEmpty() || c.EtikettSet.Contains(e) {
+		func(e kennung.Tag, zs objSet) (err error) {
+			if e.IsEmpty() || c.TagSet.Contains(e) {
 				if err = c.makeAndAddUngrouped(parent, zs.Each); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -260,7 +260,7 @@ func (c *constructor) addGroupedChildren(
 			}
 
 			child := newAssignment(parent.GetDepth() + 1)
-			child.Etiketten = kennung.MakeEtikettSet(e)
+			child.Etiketten = kennung.MakeTagSet(e)
 			groupingEtiketten.DropFirst()
 
 			psv := MakePrefixSetFrom(zs)

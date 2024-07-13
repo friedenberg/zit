@@ -26,9 +26,9 @@ type MetadateiWriterTo interface {
 type Metadatei struct {
 	// StoreVersion values.Int
 	// Domain
-	Kasten      kennung.Kasten
+	Kasten      kennung.RepoId
 	Bezeichnung bezeichnung.Bezeichnung
-	Etiketten   kennung.EtikettMutableSet // public for gob, but should be private
+	Etiketten   kennung.TagMutableSet // public for gob, but should be private
 	Typ         kennung.Typ
 
 	Shas
@@ -143,9 +143,9 @@ func (z *Metadatei) GetBezeichnungPtr() *bezeichnung.Bezeichnung {
 	return &z.Bezeichnung
 }
 
-func (m *Metadatei) GetEtiketten() kennung.EtikettSet {
+func (m *Metadatei) GetEtiketten() kennung.TagSet {
 	if m.Etiketten == nil {
-		m.Etiketten = kennung.MakeEtikettMutableSet()
+		m.Etiketten = kennung.MakeTagMutableSet()
 	}
 
 	return m.Etiketten
@@ -153,7 +153,7 @@ func (m *Metadatei) GetEtiketten() kennung.EtikettSet {
 
 func (m *Metadatei) ResetEtiketten() {
 	if m.Etiketten == nil {
-		m.Etiketten = kennung.MakeEtikettMutableSet()
+		m.Etiketten = kennung.MakeTagMutableSet()
 	}
 
 	m.Etiketten.Reset()
@@ -165,7 +165,7 @@ func (z *Metadatei) AddEtikettString(es string) (err error) {
 		return
 	}
 
-	var e kennung.Etikett
+	var e kennung.Tag
 
 	if err = e.Set(es); err != nil {
 		err = errors.Wrap(err)
@@ -180,13 +180,13 @@ func (z *Metadatei) AddEtikettString(es string) (err error) {
 	return
 }
 
-func (m *Metadatei) AddEtikettPtr(e *kennung.Etikett) (err error) {
+func (m *Metadatei) AddEtikettPtr(e *kennung.Tag) (err error) {
 	if e == nil || e.String() == "" {
 		return
 	}
 
 	if m.Etiketten == nil {
-		m.Etiketten = kennung.MakeEtikettMutableSet()
+		m.Etiketten = kennung.MakeTagMutableSet()
 	}
 
 	kennung.AddNormalizedEtikett(m.Etiketten, e)
@@ -196,9 +196,9 @@ func (m *Metadatei) AddEtikettPtr(e *kennung.Etikett) (err error) {
 	return
 }
 
-func (m *Metadatei) AddEtikettPtrFast(e *kennung.Etikett) (err error) {
+func (m *Metadatei) AddEtikettPtrFast(e *kennung.Tag) (err error) {
 	if m.Etiketten == nil {
-		m.Etiketten = kennung.MakeEtikettMutableSet()
+		m.Etiketten = kennung.MakeTagMutableSet()
 	}
 
 	if err = m.Etiketten.Add(*e); err != nil {
@@ -216,12 +216,12 @@ func (m *Metadatei) AddEtikettPtrFast(e *kennung.Etikett) (err error) {
 	return
 }
 
-func (m *Metadatei) SetEtiketten(e kennung.EtikettSet) {
+func (m *Metadatei) SetEtiketten(e kennung.TagSet) {
 	if m.Etiketten == nil {
-		m.Etiketten = kennung.MakeEtikettMutableSet()
+		m.Etiketten = kennung.MakeTagMutableSet()
 	}
 
-	iter.ResetMutableSetWithPool(m.Etiketten, kennung.GetEtikettPool())
+	iter.ResetMutableSetWithPool(m.Etiketten, kennung.GetTagPool())
 
 	if e == nil {
 		return
@@ -268,7 +268,7 @@ func (a *Metadatei) Subtract(
 	}
 
 	err := b.GetEtiketten().EachPtr(
-		func(e *kennung.Etikett) (err error) {
+		func(e *kennung.Tag) (err error) {
 			return a.Etiketten.DelPtr(e)
 		},
 	)

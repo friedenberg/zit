@@ -49,7 +49,7 @@ func (w *Writer) PrintOne(z *sku.Transacted) (err error) {
 		item = w.zettelToItem(z)
 
 	case gattung.Etikett:
-		var e kennung.Etikett
+		var e kennung.Tag
 
 		if err = e.Set(z.Kennung.String()); err != nil {
 			err = errors.Wrap(err)

@@ -30,8 +30,8 @@ func init() {
 	)
 }
 
-func (c Diff) DefaultGattungen() kennung.Gattung {
-	return kennung.MakeGattung(gattung.TrueGattung()...)
+func (c Diff) DefaultGattungen() kennung.Genre {
+	return kennung.MakeGenre(gattung.TrueGattung()...)
 }
 
 func (c Diff) ModifyBuilder(

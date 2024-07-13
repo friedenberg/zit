@@ -14,7 +14,7 @@ import (
 func newAssignment(d int) *Assignment {
 	return &Assignment{
 		Depth:     d,
-		Etiketten: kennung.MakeEtikettSet(),
+		Etiketten: kennung.MakeTagSet(),
 		objekten:  make(map[string]struct{}),
 		Objekten:  make(Objekten, 0),
 		Children:  make([]*Assignment, 0),
@@ -24,7 +24,7 @@ func newAssignment(d int) *Assignment {
 type Assignment struct {
 	IsRoot    bool
 	Depth     int
-	Etiketten kennung.EtikettSet
+	Etiketten kennung.TagSet
 	objekten  map[string]struct{}
 	Objekten
 	Children []*Assignment
@@ -151,14 +151,14 @@ func (a Assignment) String() (s string) {
 	return s + iter.StringCommaSeparated(a.Etiketten)
 }
 
-func (a *Assignment) makeChild(e kennung.Etikett) (b *Assignment) {
+func (a *Assignment) makeChild(e kennung.Tag) (b *Assignment) {
 	b = newAssignment(a.GetDepth() + 1)
-	b.Etiketten = kennung.MakeEtikettSet(e)
+	b.Etiketten = kennung.MakeTagSet(e)
 	a.addChild(b)
 	return
 }
 
-func (a *Assignment) makeChildWithSet(es kennung.EtikettSet) (b *Assignment) {
+func (a *Assignment) makeChildWithSet(es kennung.TagSet) (b *Assignment) {
 	b = newAssignment(a.GetDepth() + 1)
 	b.Etiketten = es
 	a.addChild(b)
@@ -271,12 +271,12 @@ func (a *Assignment) consume(b *Assignment) (err error) {
 	return
 }
 
-func (a *Assignment) AllEtiketten(mes kennung.EtikettMutableSet) (err error) {
+func (a *Assignment) AllEtiketten(mes kennung.TagMutableSet) (err error) {
 	if a == nil {
 		return
 	}
 
-	var es kennung.EtikettSet
+	var es kennung.TagSet
 
 	if es, err = a.expandedEtiketten(); err != nil {
 		err = errors.Wrap(err)
@@ -296,8 +296,8 @@ func (a *Assignment) AllEtiketten(mes kennung.EtikettMutableSet) (err error) {
 	return
 }
 
-func (a *Assignment) expandedEtiketten() (es kennung.EtikettSet, err error) {
-	es = kennung.MakeEtikettSet()
+func (a *Assignment) expandedEtiketten() (es kennung.TagSet, err error) {
+	es = kennung.MakeTagSet()
 
 	if a.Etiketten == nil {
 		panic("etiketten are nil")
@@ -310,7 +310,7 @@ func (a *Assignment) expandedEtiketten() (es kennung.EtikettSet, err error) {
 		e := a.Etiketten.Any()
 
 		if kennung.IsDependentLeaf(e) {
-			var pe kennung.EtikettSet
+			var pe kennung.TagSet
 
 			if pe, err = a.Parent.expandedEtiketten(); err != nil {
 				err = errors.Wrap(err)
@@ -339,17 +339,17 @@ func (a *Assignment) expandedEtiketten() (es kennung.EtikettSet, err error) {
 			}
 		}
 
-		es = kennung.MakeEtikettSet(e)
+		es = kennung.MakeTagSet(e)
 	}
 
 	return
 }
 
-func (a *Assignment) SubtractFromSet(es kennung.EtikettMutableSet) (err error) {
+func (a *Assignment) SubtractFromSet(es kennung.TagMutableSet) (err error) {
 	if err = a.Etiketten.EachPtr(
-		func(e *kennung.Etikett) (err error) {
+		func(e *kennung.Tag) (err error) {
 			if err = es.EachPtr(
-				func(e1 *kennung.Etikett) (err error) {
+				func(e1 *kennung.Tag) (err error) {
 					if !kennung.Contains(e1, e) {
 						return
 					}
@@ -375,7 +375,7 @@ func (a *Assignment) SubtractFromSet(es kennung.EtikettMutableSet) (err error) {
 	return a.Parent.SubtractFromSet(es)
 }
 
-func (a *Assignment) Contains(e *kennung.Etikett) bool {
+func (a *Assignment) Contains(e *kennung.Tag) bool {
 	if a.Etiketten.ContainsKey(e.String()) {
 		return true
 	}

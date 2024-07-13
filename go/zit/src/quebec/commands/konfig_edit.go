@@ -96,7 +96,7 @@ func (c EditKonfig) makeTempKonfigFile(
 ) (p string, err error) {
 	var k *sku.Transacted
 
-	if k, err = u.GetStore().ReadTransactedFromKennung(&kennung.Konfig{}); err != nil {
+	if k, err = u.GetStore().ReadTransactedFromKennung(&kennung.Config{}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -16,29 +16,29 @@ type QueryPrefixer interface {
 	GetQueryPrefix() string
 }
 
-type KennungSansGattung interface {
+type IdWithoutGenre interface {
 	interfaces.Stringer
 	Parts() [3]string
 }
 
-type Kennung interface {
-	KennungSansGattung
+type Id interface {
+	IdWithoutGenre
 	interfaces.GenreGetter
 }
 
 type KennungSansGattungPtr interface {
-	KennungSansGattung
+	IdWithoutGenre
 	interfaces.Resetter
 	interfaces.Setter
 }
 
 type KennungPtr interface {
-	Kennung
+	Id
 	KennungSansGattungPtr
 }
 
 type KennungLike[T any] interface {
-	Kennung
+	Id
 	interfaces.GenreGetter
 	interfaces.Stringer
 }
@@ -59,7 +59,7 @@ func Make(v string) (k KennungPtr, err error) {
 	}
 
 	{
-		var h Konfig
+		var h Config
 
 		if err = h.Set(v); err == nil {
 			k = &h
@@ -68,7 +68,7 @@ func Make(v string) (k KennungPtr, err error) {
 	}
 
 	{
-		var e Etikett
+		var e Tag
 
 		if err = e.Set(v); err == nil {
 			k = &e
@@ -95,7 +95,7 @@ func Make(v string) (k KennungPtr, err error) {
 	}
 
 	{
-		var ka Kasten
+		var ka RepoId
 
 		if err = ka.Set(v); err == nil {
 			k = &ka
@@ -117,7 +117,7 @@ func Make(v string) (k KennungPtr, err error) {
 	return
 }
 
-func Equals(a, b Kennung) (ok bool) {
+func Equals(a, b Id) (ok bool) {
 	if a.GetGenre().GetGenreString() != b.GetGenre().GetGenreString() {
 		return
 	}
@@ -129,7 +129,7 @@ func Equals(a, b Kennung) (ok bool) {
 	return true
 }
 
-func FormattedString(k KennungSansGattung) string {
+func FormattedString(k IdWithoutGenre) string {
 	sb := &strings.Builder{}
 	parts := k.Parts()
 	sb.WriteString(parts[0])
@@ -139,7 +139,7 @@ func FormattedString(k KennungSansGattung) string {
 }
 
 func AlignedParts(
-	id Kennung,
+	id Id,
 	lenLeft, lenRight int,
 ) (string, string, string) {
 	parts := id.Parts()
@@ -160,7 +160,7 @@ func AlignedParts(
 	return left, middle, right
 }
 
-func Aligned(id Kennung, lenLeft, lenRight int) string {
+func Aligned(id Id, lenLeft, lenRight int) string {
 	left, middle, right := AlignedParts(id, lenLeft, lenRight)
 	return fmt.Sprintf("%s%s%s", left, middle, right)
 }
@@ -202,7 +202,7 @@ func ContainsWithoutUnderscoreSuffix[T interfaces.Stringer](a, b T) bool {
 	return true
 }
 
-func ContainsExactly(a, b KennungSansGattung) bool {
+func ContainsExactly(a, b IdWithoutGenre) bool {
 	var (
 		as = a.Parts()
 		bs = b.Parts()
@@ -217,7 +217,7 @@ func ContainsExactly(a, b KennungSansGattung) bool {
 	return true
 }
 
-func Contains(a, b KennungSansGattung) bool {
+func Contains(a, b IdWithoutGenre) bool {
 	var (
 		as = a.Parts()
 		bs = b.Parts()
@@ -232,7 +232,7 @@ func Contains(a, b KennungSansGattung) bool {
 	return true
 }
 
-func Includes(a, b KennungSansGattung) bool {
+func Includes(a, b IdWithoutGenre) bool {
 	return Contains(b, a)
 }
 
@@ -248,25 +248,25 @@ func IsEmpty[T interfaces.Stringer](a T) bool {
 	return len(a.String()) == 0
 }
 
-func SansPrefix(a Etikett) (b Etikett) {
-	b = MustEtikett(strings.TrimPrefix(a.String(), "-"))
+func SansPrefix(a Tag) (b Tag) {
+	b = MustTag(strings.TrimPrefix(a.String(), "-"))
 	return
 }
 
-func IsDependentLeaf(a Etikett) (has bool) {
+func IsDependentLeaf(a Tag) (has bool) {
 	has = strings.HasPrefix(strings.TrimSpace(a.String()), "-")
 	return
 }
 
-func HasParentPrefix(a, b Etikett) (has bool) {
+func HasParentPrefix(a, b Tag) (has bool) {
 	has = strings.HasPrefix(strings.TrimSpace(a.String()), b.String())
 	return
 }
 
-func IntersectPrefixes(haystack EtikettSet, needle Etikett) (s3 EtikettSet) {
-	s4 := MakeEtikettMutableSet()
+func IntersectPrefixes(haystack TagSet, needle Tag) (s3 TagSet) {
+	s4 := MakeTagMutableSet()
 
-	for _, e := range iter.Elements[Etikett](haystack) {
+	for _, e := range iter.Elements[Tag](haystack) {
 		if strings.HasPrefix(e.String(), needle.String()) {
 			s4.Add(e)
 		}
@@ -277,10 +277,10 @@ func IntersectPrefixes(haystack EtikettSet, needle Etikett) (s3 EtikettSet) {
 	return
 }
 
-func SubtractPrefix(s1 EtikettSet, e Etikett) (s2 EtikettSet) {
-	s3 := MakeEtikettMutableSet()
+func SubtractPrefix(s1 TagSet, e Tag) (s2 TagSet) {
+	s3 := MakeTagMutableSet()
 
-	for _, e1 := range iter.Elements[Etikett](s1) {
+	for _, e1 := range iter.Elements[Tag](s1) {
 		e2, _ := LeftSubtract(e1, e)
 
 		if e2.String() == "" {
@@ -295,13 +295,13 @@ func SubtractPrefix(s1 EtikettSet, e Etikett) (s2 EtikettSet) {
 	return
 }
 
-func Description(s EtikettSet) string {
-	return iter.StringCommaSeparated[Etikett](s)
+func Description(s TagSet) string {
+	return iter.StringCommaSeparated[Tag](s)
 }
 
-func WithRemovedCommonPrefixes(s EtikettSet) (s2 EtikettSet) {
-	es1 := iter.SortedValues[Etikett](s)
-	es := make([]Etikett, 0, len(es1))
+func WithRemovedCommonPrefixes(s TagSet) (s2 TagSet) {
+	es1 := iter.SortedValues[Tag](s)
+	es := make([]Tag, 0, len(es1))
 
 	for _, e := range es1 {
 		if len(es) == 0 {
@@ -324,7 +324,7 @@ func WithRemovedCommonPrefixes(s EtikettSet) (s2 EtikettSet) {
 		}
 	}
 
-	s2 = MakeEtikettSet(es...)
+	s2 = MakeTagSet(es...)
 
 	return
 }
@@ -410,16 +410,16 @@ func ExpandOneTo[T KennungLike[T], TPtr KennungLikePtr[T]](
 	return
 }
 
-func Expanded(s EtikettSet, ex expansion.Expander) (out EtikettSet) {
+func Expanded(s TagSet, ex expansion.Expander) (out TagSet) {
 	return ExpandMany(s, ex)
 }
 
-func AddNormalizedEtikett(es EtikettMutableSet, e *Etikett) {
+func AddNormalizedEtikett(es TagMutableSet, e *Tag) {
 	ExpandOne(e, expansion.ExpanderRight).Each(es.Add)
 	errors.PanicIfError(iter.AddClonePool(
 		es,
-		GetEtikettPool(),
-		EtikettResetter,
+		GetTagPool(),
+		TagResetter,
 		e,
 	))
 
@@ -428,7 +428,7 @@ func AddNormalizedEtikett(es EtikettMutableSet, e *Etikett) {
 	WithRemovedCommonPrefixes(c).Each(es.Add)
 }
 
-func RemovePrefixes(es EtikettMutableSet, needle Etikett) {
+func RemovePrefixes(es TagMutableSet, needle Tag) {
 	for _, haystack := range iter.Elements(es) {
 		// TODO-P2 make more efficient
 		if strings.HasPrefix(haystack.String(), needle.String()) {
@@ -437,10 +437,10 @@ func RemovePrefixes(es EtikettMutableSet, needle Etikett) {
 	}
 }
 
-func Withdraw(s1 EtikettMutableSet, e Etikett) (s2 EtikettSet) {
-	s3 := MakeEtikettMutableSet()
+func Withdraw(s1 TagMutableSet, e Tag) (s2 TagSet) {
+	s3 := MakeTagMutableSet()
 
-	for _, e1 := range iter.Elements[Etikett](s1) {
+	for _, e1 := range iter.Elements[Tag](s1) {
 		if Contains(e1, e) {
 			s3.Add(e1)
 		}

@@ -119,13 +119,13 @@ func (a *Transacted) GetSkuLikePtr() SkuLike {
 	return a
 }
 
-func (a *Transacted) GetEtiketten() kennung.EtikettSet {
+func (a *Transacted) GetEtiketten() kennung.TagSet {
 	return a.Metadatei.GetEtiketten()
 }
 
-func (a *Transacted) AddEtikettPtr(e *kennung.Etikett) (err error) {
+func (a *Transacted) AddEtikettPtr(e *kennung.Tag) (err error) {
 	if a.Kennung.GetGenre() == gattung.Etikett {
-		e1 := kennung.MustEtikett(a.Kennung.String())
+		e1 := kennung.MustTag(a.Kennung.String())
 		ex := kennung.ExpandOne(&e1, expansion.ExpanderRight)
 
 		if ex.ContainsKey(ex.KeyPtr(e)) {
@@ -147,7 +147,7 @@ func (a *Transacted) AddEtikettPtr(e *kennung.Etikett) (err error) {
 	return
 }
 
-func (a *Transacted) AddEtikettPtrFast(e *kennung.Etikett) (err error) {
+func (a *Transacted) AddEtikettPtrFast(e *kennung.Tag) (err error) {
 	if err = a.GetMetadatei().AddEtikettPtrFast(e); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -178,15 +178,15 @@ func (a *Transacted) SetTai(t kennung.Tai) {
 	// log.Debug().Caller(6, "after: %s", a.StringKennungTai())
 }
 
-func (a *Transacted) GetKennung() kennung.Kennung {
+func (a *Transacted) GetKennung() kennung.Id {
 	return &a.Kennung
 }
 
-func (a *Transacted) GetKennungLike() kennung.Kennung {
+func (a *Transacted) GetKennungLike() kennung.Id {
 	return &a.Kennung
 }
 
-func (a *Transacted) SetKennungLike(kl kennung.Kennung) (err error) {
+func (a *Transacted) SetKennungLike(kl kennung.Id) (err error) {
 	if err = a.Kennung.SetWithKennung(kl); err != nil {
 		err = errors.Wrap(err)
 		return

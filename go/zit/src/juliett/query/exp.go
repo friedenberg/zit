@@ -48,7 +48,7 @@ func (a *Exp) Clone() (b *Exp) {
 	return b
 }
 
-func (e *Exp) CollectEtiketten(mes kennung.EtikettMutableSet) {
+func (e *Exp) CollectEtiketten(mes kennung.TagMutableSet) {
 	if e.Or || e.Negated {
 		return
 	}
@@ -63,7 +63,7 @@ func (e *Exp) CollectEtiketten(mes kennung.EtikettMutableSet) {
 				continue
 			}
 
-			e := kennung.MustEtikett(mt.Kennung2.String())
+			e := kennung.MustTag(mt.Kennung2.String())
 			mes.Add(e)
 		}
 	}

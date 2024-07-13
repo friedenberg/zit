@@ -97,7 +97,7 @@ type (
 	}
 
 	ExternalStoreForQueryGetter interface {
-		GetExternalStoreForQuery(kennung.Kasten) (ExternalStoreForQuery, bool)
+		GetExternalStoreForQuery(kennung.RepoId) (ExternalStoreForQuery, bool)
 	}
 )
 

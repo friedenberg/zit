@@ -34,8 +34,8 @@ func init() {
 	)
 }
 
-func (c Checkout) DefaultGattungen() kennung.Gattung {
-	return kennung.MakeGattung(
+func (c Checkout) DefaultGattungen() kennung.Genre {
+	return kennung.MakeGenre(
 		gattung.Zettel,
 	)
 }

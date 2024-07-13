@@ -91,7 +91,7 @@ type (
 	}
 
 	StoreGetter interface {
-		GetExternalStore(kennung.Kasten) (*Store, bool)
+		GetExternalStore(kennung.RepoId) (*Store, bool)
 	}
 )
 

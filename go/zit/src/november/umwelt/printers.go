@@ -80,7 +80,7 @@ func (u *Umwelt) StringFormatWriterBezeichnung(
 
 func (u *Umwelt) StringFormatWriterEtiketten(
 	co string_format_writer.ColorOptions,
-) interfaces.StringFormatWriter[*kennung.Etikett] {
+) interfaces.StringFormatWriter[*kennung.Tag] {
 	return kennung_fmt.MakeEtikettenCliFormat()
 }
 
@@ -311,7 +311,7 @@ func (u *Umwelt) PrinterCheckedOutChrome() interfaces.FuncIter[sku.CheckedOutLik
 }
 
 func (u *Umwelt) PrinterCheckedOutForKasten(
-	k kennung.Kasten,
+	k kennung.RepoId,
 ) interfaces.FuncIter[sku.CheckedOutLike] {
 	pcofs := u.PrinterCheckedOutFS()
 	pcochrome := u.PrinterCheckedOutChrome()

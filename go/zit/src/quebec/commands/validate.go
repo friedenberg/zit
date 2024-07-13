@@ -25,7 +25,7 @@ func init() {
 }
 
 func (c Validate) ModifyBuilder(b *query.Builder) {
-	b.WithDefaultGattungen(kennung.MakeGattung(gattung.Zettel)).
+	b.WithDefaultGattungen(kennung.MakeGenre(gattung.Zettel)).
 		WithDoNotMatchEmpty()
 }
 

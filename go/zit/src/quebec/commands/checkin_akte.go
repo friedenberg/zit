@@ -17,7 +17,7 @@ import (
 
 type CheckinAkte struct {
 	Delete       bool
-	NewEtiketten collections_ptr.Flag[kennung.Etikett, *kennung.Etikett]
+	NewEtiketten collections_ptr.Flag[kennung.Tag, *kennung.Tag]
 }
 
 func init() {
@@ -25,7 +25,7 @@ func init() {
 		"checkin-akte",
 		func(f *flag.FlagSet) Command {
 			c := &CheckinAkte{
-				NewEtiketten: collections_ptr.MakeFlagCommas[kennung.Etikett](
+				NewEtiketten: collections_ptr.MakeFlagCommas[kennung.Tag](
 					collections_ptr.SetterPolicyAppend,
 				),
 			}

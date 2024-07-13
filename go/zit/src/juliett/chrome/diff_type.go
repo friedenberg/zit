@@ -79,6 +79,6 @@ func (c *Store) getDiffKinderOnly(kinder *sku.Transacted) (dt diff, err error) {
 	return
 }
 
-func etiketten(sk *sku.Transacted) kennung.EtikettSet {
+func etiketten(sk *sku.Transacted) kennung.TagSet {
 	return kennung.ExpandMany(sk.Metadatei.GetEtiketten(), expansion.ExpanderRight)
 }

@@ -30,7 +30,7 @@ func (s *Store) Query(
 		qg,
 		qg.MakeEmitSkuSigilSchwanzen(
 			f,
-			kennung.Kasten{},
+			kennung.RepoId{},
 			s.UpdateTransactedWithExternal,
 		),
 	); err != nil {
@@ -59,7 +59,7 @@ func (s *Store) QueryWithKasten(
 			qg,
 			qg.MakeEmitSkuMaybeExternal(
 				f,
-				qg.Kasten,
+				qg.RepoId,
 				s.UpdateTransactedWithExternal,
 			),
 		); err != nil {
@@ -82,7 +82,7 @@ func (s *Store) QueryCheckedOut(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	kid := qg.Kasten.GetRepoIdString()
+	kid := qg.RepoId.GetRepoIdString()
 	es, ok := s.externalStores[kid]
 
 	if !ok {

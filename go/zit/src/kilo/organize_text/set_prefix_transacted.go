@@ -75,7 +75,7 @@ func (s *PrefixSet) Add(z *obj) (err error) {
 	}
 
 	if err = es.Each(
-		func(e kennung.Etikett) (err error) {
+		func(e kennung.Tag) (err error) {
 			s.addPair(e.String(), z)
 			return
 		},
@@ -140,13 +140,13 @@ func (s *PrefixSet) addPair(
 }
 
 func (a PrefixSet) Each(
-	f func(kennung.Etikett, objSet) error,
+	f func(kennung.Tag, objSet) error,
 ) (err error) {
 	for e, ssz := range a.innerMap {
-		var e1 kennung.Etikett
+		var e1 kennung.Tag
 
 		if e != "" {
-			e1 = kennung.MustEtikett(e)
+			e1 = kennung.MustTag(e)
 		}
 
 		if err = f(e1, ssz); err != nil {
@@ -167,7 +167,7 @@ func (a PrefixSet) EachZettel(
 	f interfaces.FuncIter[*obj],
 ) error {
 	return a.Each(
-		func(_ kennung.Etikett, st objSet) (err error) {
+		func(_ kennung.Tag, st objSet) (err error) {
 			err = st.Each(
 				func(z *obj) (err error) {
 					err = f(z)
@@ -181,7 +181,7 @@ func (a PrefixSet) EachZettel(
 }
 
 func (a PrefixSet) Match(
-	e kennung.Etikett,
+	e kennung.Tag,
 ) (out Segments) {
 	out.Ungrouped = makeObjSet()
 	out.Grouped = MakePrefixSet(len(a.innerMap))
@@ -220,7 +220,7 @@ func (a PrefixSet) Match(
 }
 
 func (a PrefixSet) Subset(
-	e kennung.Etikett,
+	e kennung.Tag,
 ) (out Segments) {
 	out.Ungrouped = makeObjSet()
 	out.Grouped = MakePrefixSet(len(a.innerMap))

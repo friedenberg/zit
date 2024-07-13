@@ -99,7 +99,7 @@ func TestAssignmentLineReaderOneHeadingNoZettels(t1 *testing.T) {
 	t.AssertNoError(err)
 
 	{
-		expected := kennung.MakeEtikettSet(kennung.MustEtikett("wow"))
+		expected := kennung.MakeTagSet(kennung.MustTag("wow"))
 
 		if len(sub.root.Children) < 1 {
 			t.Fatalf("expected exactly 1 child")
@@ -107,7 +107,7 @@ func TestAssignmentLineReaderOneHeadingNoZettels(t1 *testing.T) {
 
 		actual := sub.root.Children[0].Etiketten
 
-		if !kennung.EtikettSetEquals(
+		if !kennung.TagSetEquals(
 			actual,
 			expected,
 		) {
@@ -139,10 +139,10 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := kennung.MakeEtikettSet(kennung.MustEtikett("wow"))
+		expected := kennung.MakeTagSet(kennung.MustTag("wow"))
 		actual := sub.root.Children[0].Etiketten
 
-		if !kennung.EtikettSetEquals(
+		if !kennung.TagSetEquals(
 			actual,
 			expected,
 		) {
@@ -186,10 +186,10 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 	}
 
 	{
-		expected := kennung.MakeEtikettSet(kennung.MustEtikett("wow"))
+		expected := kennung.MakeTagSet(kennung.MustTag("wow"))
 		actual := sub.root.Children[0].Etiketten
 
-		if !kennung.EtikettSetEquals(
+		if !kennung.TagSetEquals(
 			actual,
 			expected,
 		) {
@@ -198,7 +198,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 	}
 
 	{
-		expected := kennung.MakeEtikettSet(kennung.MustEtikett("sub-wow"))
+		expected := kennung.MakeTagSet(kennung.MustTag("sub-wow"))
 
 		if sub.root != sub.root.Children[0].Parent {
 			t.Fatalf("%v, %v", sub.root, sub.root.Children[0].Parent)
@@ -212,7 +212,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 
 		actual := sub.root.Children[0].Children[0].Etiketten
 
-		if !kennung.EtikettSetEquals(
+		if !kennung.TagSetEquals(
 			actual,
 			expected,
 		) {
@@ -264,10 +264,10 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := kennung.MakeEtikettSet(kennung.MustEtikett("wow"))
+		expected := kennung.MakeTagSet(kennung.MustTag("wow"))
 		actual := sub.root.Children[0].Etiketten
 
-		if !kennung.EtikettSetEquals(
+		if !kennung.TagSetEquals(
 			actual,
 			expected,
 		) {
@@ -276,7 +276,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := kennung.MakeEtikettSet(kennung.MustEtikett("sub-wow"))
+		expected := kennung.MakeTagSet(kennung.MustTag("sub-wow"))
 
 		l := len(sub.root.Children[0].Children)
 		if l != 1 {
@@ -285,7 +285,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 
 		actual := sub.root.Children[0].Children[0].Etiketten
 
-		if !kennung.EtikettSetEquals(
+		if !kennung.TagSetEquals(
 			actual,
 			expected,
 		) {
@@ -294,10 +294,10 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := kennung.MakeEtikettSet(kennung.MustEtikett("cow"))
+		expected := kennung.MakeTagSet(kennung.MustTag("cow"))
 		actual := sub.root.Children[1].Etiketten
 
-		if !kennung.EtikettSetEquals(
+		if !kennung.TagSetEquals(
 			actual,
 			expected,
 		) {
@@ -358,16 +358,16 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 	}
 
 	{
-		expected := kennung.MakeEtikettSet(kennung.MustEtikett("sub-wow"))
+		expected := kennung.MakeTagSet(kennung.MustTag("sub-wow"))
 		actual := sub.root.Children[0].Etiketten
 
-		if !kennung.EtikettSetEquals(actual, expected) {
+		if !kennung.TagSetEquals(actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
 	{
-		expected := kennung.MakeEtikettSet(kennung.MustEtikett("sub-cow"))
+		expected := kennung.MakeTagSet(kennung.MustTag("sub-cow"))
 
 		l := len(sub.root.Children)
 		expLen := 2
@@ -377,7 +377,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 
 		actual := sub.root.Children[1].Etiketten
 
-		if !kennung.EtikettSetEquals(actual, expected) {
+		if !kennung.TagSetEquals(actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -434,10 +434,10 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 	// `# task
 	{
-		expected := kennung.MakeEtikettSet(kennung.MustEtikett("task"))
+		expected := kennung.MakeTagSet(kennung.MustTag("task"))
 		actual := sub.root.Children[0].Etiketten
 
-		if !kennung.EtikettSetEquals(actual, expected) {
+		if !kennung.TagSetEquals(actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
@@ -456,7 +456,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 	// ## priority-1
 	{
-		expected := kennung.MakeEtikettSet(kennung.MustEtikett("priority-1"))
+		expected := kennung.MakeTagSet(kennung.MustTag("priority-1"))
 
 		e := 2
 		l := len(sub.root.Children[0].Children)
@@ -466,17 +466,17 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 		actual := sub.root.Children[0].Children[0].Etiketten
 
-		if !kennung.EtikettSetEquals(actual, expected) {
+		if !kennung.TagSetEquals(actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}
 
 	// ### w-2022-07-09
 	{
-		expected := kennung.MakeEtikettSet(kennung.MustEtikett("w-2022-07-09"))
+		expected := kennung.MakeTagSet(kennung.MustTag("w-2022-07-09"))
 		actual := sub.root.Children[0].Children[0].Children[0].Etiketten
 
-		if !kennung.EtikettSetEquals(actual, expected) {
+		if !kennung.TagSetEquals(actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
 		}
 	}

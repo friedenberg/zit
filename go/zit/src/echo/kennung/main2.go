@@ -43,7 +43,7 @@ func (a *Kennung2) Clone() (b *Kennung2) {
 	return
 }
 
-func MustKennung2(kp Kennung) (k *Kennung2) {
+func MustKennung2(kp Id) (k *Kennung2) {
 	k = &Kennung2{}
 	err := k.SetWithKennung(kp)
 	errors.PanicIfError(err)
@@ -395,7 +395,7 @@ func (k2 *Kennung2) SetFromPath(
 }
 
 func (h *Kennung2) SetWithKennung(
-	k Kennung,
+	k Id,
 ) (err error) {
 	switch kt := k.(type) {
 	case *Kennung2:
@@ -466,7 +466,7 @@ func (h *Kennung2) SetRaw(v string) (err error) {
 }
 
 func (h *Kennung2) Set(v string) (err error) {
-	var k Kennung
+	var k Id
 
 	switch h.g {
 	case gattung.Unknown:
@@ -478,7 +478,7 @@ func (h *Kennung2) Set(v string) (err error) {
 		k = h
 
 	case gattung.Etikett:
-		var h Etikett
+		var h Tag
 		err = h.Set(v)
 		k = h
 
@@ -488,12 +488,12 @@ func (h *Kennung2) Set(v string) (err error) {
 		k = h
 
 	case gattung.Kasten:
-		var h Kasten
+		var h RepoId
 		err = h.Set(v)
 		k = h
 
 	case gattung.Konfig:
-		var h Konfig
+		var h Config
 		err = h.Set(v)
 		k = h
 
@@ -526,7 +526,7 @@ func (a *Kennung2) ResetWith(b *Kennung2) {
 	a.middle = b.middle
 }
 
-func (a *Kennung2) ResetWithKennung(b Kennung) (err error) {
+func (a *Kennung2) ResetWithKennung(b Id) (err error) {
 	return a.SetWithKennung(b)
 }
 

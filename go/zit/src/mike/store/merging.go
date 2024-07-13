@@ -18,7 +18,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 	var col sku.CheckedOutLike
 
 	if col, err = s.ReadCheckedOutFromTransacted(
-		options.Kasten,
+		options.RepoId,
 		mutter,
 	); err != nil {
 		err = nil

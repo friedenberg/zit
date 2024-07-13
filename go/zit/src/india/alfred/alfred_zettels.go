@@ -37,7 +37,7 @@ func (w *Writer) addCommonMatches(
 	mb.AddMatches(z.GetMetadatei().Bezeichnung.String())
 	mb.AddMatches(z.GetTyp().String())
 	z.Metadatei.GetEtiketten().Each(
-		func(e kennung.Etikett) (err error) {
+		func(e kennung.Tag) (err error) {
 			expansion.ExpanderAll.Expand(
 				func(v string) (err error) {
 					mb.AddMatches(v)
@@ -112,7 +112,7 @@ func (w *Writer) zettelToItem(
 
 func (w *Writer) etikettToItem(
 	z *sku.Transacted,
-	e *kennung.Etikett,
+	e *kennung.Tag,
 ) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 

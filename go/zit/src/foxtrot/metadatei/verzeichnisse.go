@@ -10,36 +10,36 @@ import (
 
 type Verzeichnisse struct {
 	Schlummernd       values.Bool
-	ExpandedEtiketten kennung.EtikettMutableSet // public for gob, but should be private
-	ImplicitEtiketten kennung.EtikettMutableSet // public for gob, but should be private
+	ExpandedEtiketten kennung.TagMutableSet // public for gob, but should be private
+	ImplicitEtiketten kennung.TagMutableSet // public for gob, but should be private
 	Etiketten         etiketten_path.Etiketten
 	QueryPath
 }
 
-func (v *Verzeichnisse) GetExpandedEtiketten() kennung.EtikettSet {
+func (v *Verzeichnisse) GetExpandedEtiketten() kennung.TagSet {
 	return v.GetExpandedEtikettenMutable()
 }
 
-func (v *Verzeichnisse) AddEtikettExpandedPtr(e *kennung.Etikett) (err error) {
+func (v *Verzeichnisse) AddEtikettExpandedPtr(e *kennung.Tag) (err error) {
 	return iter.AddClonePool(
 		v.GetExpandedEtikettenMutable(),
-		kennung.GetEtikettPool(),
-		kennung.EtikettResetter,
+		kennung.GetTagPool(),
+		kennung.TagResetter,
 		e,
 	)
 }
 
-func (v *Verzeichnisse) GetExpandedEtikettenMutable() kennung.EtikettMutableSet {
+func (v *Verzeichnisse) GetExpandedEtikettenMutable() kennung.TagMutableSet {
 	if v.ExpandedEtiketten == nil {
-		v.ExpandedEtiketten = kennung.MakeEtikettMutableSet()
+		v.ExpandedEtiketten = kennung.MakeTagMutableSet()
 	}
 
 	return v.ExpandedEtiketten
 }
 
-func (v *Verzeichnisse) SetExpandedEtiketten(e kennung.EtikettSet) {
+func (v *Verzeichnisse) SetExpandedEtiketten(e kennung.TagSet) {
 	es := v.GetExpandedEtikettenMutable()
-	iter.ResetMutableSetWithPool(es, kennung.GetEtikettPool())
+	iter.ResetMutableSetWithPool(es, kennung.GetTagPool())
 
 	if e == nil {
 		return
@@ -48,30 +48,30 @@ func (v *Verzeichnisse) SetExpandedEtiketten(e kennung.EtikettSet) {
 	errors.PanicIfError(e.Each(es.Add))
 }
 
-func (v *Verzeichnisse) GetImplicitEtiketten() kennung.EtikettSet {
+func (v *Verzeichnisse) GetImplicitEtiketten() kennung.TagSet {
 	return v.GetImplicitEtikettenMutable()
 }
 
-func (v *Verzeichnisse) AddEtikettImplicitPtr(e *kennung.Etikett) (err error) {
+func (v *Verzeichnisse) AddEtikettImplicitPtr(e *kennung.Tag) (err error) {
 	return iter.AddClonePool(
 		v.GetImplicitEtikettenMutable(),
-		kennung.GetEtikettPool(),
-		kennung.EtikettResetter,
+		kennung.GetTagPool(),
+		kennung.TagResetter,
 		e,
 	)
 }
 
-func (v *Verzeichnisse) GetImplicitEtikettenMutable() kennung.EtikettMutableSet {
+func (v *Verzeichnisse) GetImplicitEtikettenMutable() kennung.TagMutableSet {
 	if v.ImplicitEtiketten == nil {
-		v.ImplicitEtiketten = kennung.MakeEtikettMutableSet()
+		v.ImplicitEtiketten = kennung.MakeTagMutableSet()
 	}
 
 	return v.ImplicitEtiketten
 }
 
-func (v *Verzeichnisse) SetImplicitEtiketten(e kennung.EtikettSet) {
+func (v *Verzeichnisse) SetImplicitEtiketten(e kennung.TagSet) {
 	es := v.GetImplicitEtikettenMutable()
-	iter.ResetMutableSetWithPool(es, kennung.GetEtikettPool())
+	iter.ResetMutableSetWithPool(es, kennung.GetTagPool())
 
 	if e == nil {
 		return

@@ -20,7 +20,7 @@ type Flags struct {
 	Options
 
 	once           *sync.Once
-	ExtraEtiketten collections_ptr.Flag[kennung.Etikett, *kennung.Etikett]
+	ExtraEtiketten collections_ptr.Flag[kennung.Tag, *kennung.Tag]
 }
 
 type Options struct {
@@ -29,10 +29,10 @@ type Options struct {
 	Konfig *konfig.Compiled
 
 	commentMatchers   interfaces.SetLike[sku.Query]
-	rootEtiketten     kennung.EtikettSet
+	rootEtiketten     kennung.TagSet
 	Typ               kennung.Typ
-	GroupingEtiketten kennung.EtikettSlice
-	ExtraEtiketten    kennung.EtikettSet
+	GroupingEtiketten kennung.TagSlice
+	ExtraEtiketten    kennung.TagSet
 	Transacted        interfaces.SetLike[*sku.Transacted]
 
 	Abbr kennung.Abbr
@@ -50,13 +50,13 @@ type Options struct {
 func MakeFlags() Flags {
 	return Flags{
 		once: &sync.Once{},
-		ExtraEtiketten: collections_ptr.MakeFlagCommas[kennung.Etikett](
+		ExtraEtiketten: collections_ptr.MakeFlagCommas[kennung.Tag](
 			collections_ptr.SetterPolicyAppend,
 		),
 
 		Options: Options{
 			wasMade:           true,
-			GroupingEtiketten: kennung.MakeEtikettSlice(),
+			GroupingEtiketten: kennung.MakeTagSlice(),
 			Transacted:        sku.MakeTransactedMutableSet(),
 		},
 	}
@@ -67,14 +67,14 @@ func MakeFlagsWithMetadatei(m metadatei.Metadatei) Flags {
 
 	return Flags{
 		once: &sync.Once{},
-		ExtraEtiketten: collections_ptr.MakeFlagCommas[kennung.Etikett](
+		ExtraEtiketten: collections_ptr.MakeFlagCommas[kennung.Tag](
 			collections_ptr.SetterPolicyAppend,
 		),
 
 		Options: Options{
 			rootEtiketten:     m.GetEtiketten(),
 			wasMade:           true,
-			GroupingEtiketten: kennung.MakeEtikettSlice(),
+			GroupingEtiketten: kennung.MakeTagSlice(),
 			Transacted:        sku.MakeTransactedMutableSet(),
 		},
 	}
@@ -128,7 +128,7 @@ func (o *Flags) GetOptions(
 	o.skuFmt = *skuFmt
 
 	if q == nil {
-		o.rootEtiketten = kennung.MakeEtikettSet()
+		o.rootEtiketten = kennung.MakeTagSet()
 	} else {
 		o.rootEtiketten = q.GetEtiketten()
 

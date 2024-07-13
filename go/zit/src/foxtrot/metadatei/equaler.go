@@ -50,7 +50,7 @@ func (e equaler) Equals(a, b *Metadatei) bool {
 	// }
 
 	if err := aes.EachPtr(
-		func(ea *kennung.Etikett) (err error) {
+		func(ea *kennung.Tag) (err error) {
 			if (!e.includeVirtual && ea.IsVirtual()) || ea.IsEmpty() {
 				return
 			}
@@ -75,7 +75,7 @@ func (e equaler) Equals(a, b *Metadatei) bool {
 	}
 
 	if err := bes.EachPtr(
-		func(eb *kennung.Etikett) (err error) {
+		func(eb *kennung.Tag) (err error) {
 			if !e.includeVirtual && eb.IsVirtual() {
 				return
 			}

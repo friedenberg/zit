@@ -27,16 +27,16 @@ func init() {
 	)
 }
 
-func (c CatAlfred) CompletionGattung() kennung.Gattung {
-	return kennung.MakeGattung(
+func (c CatAlfred) CompletionGattung() kennung.Genre {
+	return kennung.MakeGenre(
 		gattung.Etikett,
 		gattung.Zettel,
 		gattung.Typ,
 	)
 }
 
-func (c CatAlfred) DefaultGattungen() kennung.Gattung {
-	return kennung.MakeGattung(
+func (c CatAlfred) DefaultGattungen() kennung.Genre {
+	return kennung.MakeGenre(
 		gattung.Etikett,
 		gattung.Zettel,
 		gattung.Typ,

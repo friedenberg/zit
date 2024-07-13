@@ -34,8 +34,8 @@ func init() {
 	)
 }
 
-func (c ExecAction) DefaultGattungen() kennung.Gattung {
-	return kennung.MakeGattung(
+func (c ExecAction) DefaultGattungen() kennung.Genre {
+	return kennung.MakeGenre(
 		gattung.Zettel,
 	)
 }
@@ -61,7 +61,7 @@ func (c ExecAction) RunWithQuery(
 		return
 	}
 
-	hinweisen := collections_value.MakeMutableValueSet[kennung.Kennung](nil)
+	hinweisen := collections_value.MakeMutableValueSet[kennung.Id](nil)
 
 	if err = u.GetStore().QueryWithKasten(
 		ms,
@@ -88,7 +88,7 @@ func (c ExecAction) RunWithQuery(
 func (c ExecAction) runAction(
 	u *umwelt.Umwelt,
 	sc script_config.ScriptConfig,
-	hinweisen interfaces.SetLike[kennung.Kennung],
+	hinweisen interfaces.SetLike[kennung.Id],
 ) (err error) {
 	var wt io.WriterTo
 
@@ -97,7 +97,7 @@ func (c ExecAction) runAction(
 		map[string]string{
 			"ZIT_BIN": u.Standort().Executable(),
 		},
-		iter.Strings[kennung.Kennung](hinweisen)...,
+		iter.Strings[kennung.Id](hinweisen)...,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

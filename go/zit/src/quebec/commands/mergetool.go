@@ -32,8 +32,8 @@ func init() {
 	)
 }
 
-func (c Mergetool) DefaultGattungen() kennung.Gattung {
-	return kennung.MakeGattung(gattung.TrueGattung()...)
+func (c Mergetool) DefaultGattungen() kennung.Genre {
+	return kennung.MakeGenre(gattung.TrueGattung()...)
 }
 
 func (c Mergetool) RunWithQuery(

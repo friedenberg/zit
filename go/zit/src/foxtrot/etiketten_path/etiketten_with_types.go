@@ -69,7 +69,7 @@ func (a *Etiketten) AddSuperFrom(
 	return
 }
 
-func (es *Etiketten) AddEtikettOld(e kennung.Etikett) (err error) {
+func (es *Etiketten) AddEtikettOld(e kennung.Tag) (err error) {
 	return es.AddEtikett(catgut.MakeFromString(e.String()))
 }
 
@@ -134,7 +134,7 @@ func (s *Etiketten) Set(v string) (err error) {
 	vs := strings.Split(v, ",")
 
 	for _, v := range vs {
-		var e kennung.Etikett
+		var e kennung.Tag
 
 		if err = e.Set(v); err != nil {
 			err = errors.Wrap(err)

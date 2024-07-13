@@ -19,10 +19,10 @@ func (u *Umwelt) makeQueryBuilder() *query.Builder {
 }
 
 func (u *Umwelt) MakeQueryBuilderExcludingHidden(
-	dg kennung.Gattung,
+	dg kennung.Genre,
 ) *query.Builder {
 	if dg.IsEmpty() {
-		dg = kennung.MakeGattung(gattung.Zettel)
+		dg = kennung.MakeGenre(gattung.Zettel)
 	}
 
 	return u.makeQueryBuilder().
@@ -35,10 +35,10 @@ func (u *Umwelt) MakeQueryBuilderExcludingHidden(
 }
 
 func (u *Umwelt) MakeQueryBuilder(
-	dg kennung.Gattung,
+	dg kennung.Genre,
 ) *query.Builder {
 	if dg.IsEmpty() {
-		dg = kennung.MakeGattung(gattung.Zettel)
+		dg = kennung.MakeGenre(gattung.Zettel)
 	}
 
 	return u.makeQueryBuilder().

@@ -10,7 +10,7 @@ func Default(defaultTyp kennung.Typ) (k Blob) {
 	k = Blob{
 		Defaults: Defaults{
 			Typ:       defaultTyp,
-			Etiketten: make([]kennung.Etikett, 0),
+			Etiketten: make([]kennung.Tag, 0),
 		},
 		FileExtensions: file_extensions.FileExtensions{
 			Typ:      "typ",

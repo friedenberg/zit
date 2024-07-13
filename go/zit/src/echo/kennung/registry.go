@@ -13,19 +13,19 @@ import (
 var (
 	registerOnce        sync.Once
 	registryLock        *sync.Mutex
-	registryGattung     map[gattung.Gattung]Kennung
-	registryQueryPrefix map[string]Kennung
+	registryGattung     map[gattung.Gattung]Id
+	registryQueryPrefix map[string]Id
 )
 
 func once() {
 	registryLock = &sync.Mutex{}
-	registryGattung = make(map[gattung.Gattung]Kennung)
-	registryQueryPrefix = make(map[string]Kennung)
+	registryGattung = make(map[gattung.Gattung]Id)
+	registryQueryPrefix = make(map[string]Id)
 }
 
-func register[T Kennung, TPtr interface {
+func register[T Id, TPtr interface {
 	interfaces.StringSetterPtr[T]
-	Kennung
+	Id
 }](id T,
 ) {
 	gob.Register(&id)
@@ -37,7 +37,7 @@ func register[T Kennung, TPtr interface {
 	defer registryLock.Unlock()
 
 	ok := false
-	var id1 Kennung
+	var id1 Id
 	g := gattung.Must(id.GetGenre())
 
 	if id1, ok = registryGattung[g]; ok {
@@ -53,7 +53,7 @@ func register[T Kennung, TPtr interface {
 
 	registryGattung[g] = id
 
-	if idQueryPrefix, ok := Kennung(id).(QueryPrefixer); ok {
+	if idQueryPrefix, ok := Id(id).(QueryPrefixer); ok {
 		p := idQueryPrefix.GetQueryPrefix()
 
 		if id1, ok := registryQueryPrefix[p]; ok {

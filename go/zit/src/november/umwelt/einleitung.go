@@ -191,7 +191,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 		}
 
 		if _, err = u.GetStore().CreateOrUpdateAkteSha(
-			&kennung.Konfig{},
+			&kennung.Config{},
 			sh,
 		); err != nil {
 			err = errors.Wrap(err)

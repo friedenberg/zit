@@ -16,7 +16,7 @@ func MakeGroup(
 ) *Group {
 	return &Group{
 		OptimizedQueries: make(map[gattung.Gattung]*Query),
-		UserQueries:      make(map[kennung.Gattung]*Query),
+		UserQueries:      make(map[kennung.Genre]*Query),
 		Hidden:           b.hidden,
 		Zettelen:         kennung.MakeHinweisMutableSet(),
 		Typen:            kennung.MakeMutableTypSet(),
@@ -26,7 +26,7 @@ func MakeGroup(
 type Group struct {
 	Hidden           sku.Query
 	OptimizedQueries map[gattung.Gattung]*Query
-	UserQueries      map[kennung.Gattung]*Query
+	UserQueries      map[kennung.Genre]*Query
 	Kennungen        []*kennung.Kennung2
 	Zettelen         kennung.HinweisMutableSet
 	Typen            kennung.TypMutableSet
@@ -107,8 +107,8 @@ func (qg *Group) GetExactlyOneKennung(
 	return
 }
 
-func (qg *Group) GetEtiketten() kennung.EtikettSet {
-	mes := kennung.MakeMutableEtikettSet()
+func (qg *Group) GetEtiketten() kennung.TagSet {
+	mes := kennung.MakeMutableTagSet()
 
 	for _, oq := range qg.OptimizedQueries {
 		oq.CollectEtiketten(mes)
@@ -121,7 +121,7 @@ func (qg *Group) GetTypen() kennung.TypSet {
 	return qg.Typen
 }
 
-func (qg *Group) GetGattungen() (g kennung.Gattung) {
+func (qg *Group) GetGattungen() (g kennung.Genre) {
 	for g1 := range qg.OptimizedQueries {
 		g.Add(g1)
 	}
@@ -166,7 +166,7 @@ func (qg *Group) AddExactKennung(
 	q := b.makeQuery()
 	q.Sigil.Add(kennung.SigilSchwanzen)
 	q.Kennung[k.Kennung2.String()] = k
-	q.Gattung.Add(gattung.Must(k))
+	q.Genre.Add(gattung.Must(k))
 
 	if err = qg.Add(q); err != nil {
 		err = errors.Wrap(err)
@@ -177,12 +177,12 @@ func (qg *Group) AddExactKennung(
 }
 
 func (qg *Group) Add(q *Query) (err error) {
-	existing, ok := qg.UserQueries[q.Gattung]
+	existing, ok := qg.UserQueries[q.Genre]
 
 	if !ok {
 		existing = &Query{
 			Hidden:  qg.Hidden,
-			Gattung: q.Gattung,
+			Genre: q.Genre,
 			Kennung: make(map[string]Kennung),
 		}
 	}
@@ -192,7 +192,7 @@ func (qg *Group) Add(q *Query) (err error) {
 		return
 	}
 
-	qg.UserQueries[q.Gattung] = existing
+	qg.UserQueries[q.Genre] = existing
 
 	return
 }
@@ -211,7 +211,7 @@ func (qg *Group) addOptimized(b *Builder, q *Query) (err error) {
 		if !ok {
 			existing = &Query{
 				Hidden:  qg.Hidden,
-				Gattung: kennung.MakeGattung(g),
+				Genre: kennung.MakeGenre(g),
 				Kennung: make(map[string]Kennung),
 			}
 		}
@@ -243,7 +243,7 @@ func (qg *Group) SortedUserQueries() []*Query {
 	}
 
 	sort.Slice(out, func(i, j int) bool {
-		l, r := out[i].Gattung, out[j].Gattung
+		l, r := out[i].Genre, out[j].Genre
 
 		if l.IsEmpty() {
 			return false
@@ -417,9 +417,9 @@ func (qg *Group) MakeEmitSku(
 // everything
 func (qg *Group) MakeEmitSkuMaybeExternal(
 	f interfaces.FuncIter[*sku.Transacted],
-	k kennung.Kasten,
+	k kennung.RepoId,
 	updateTransacted func(
-		kasten kennung.Kasten,
+		kasten kennung.RepoId,
 		z *sku.Transacted,
 	) (err error),
 ) interfaces.FuncIter[*sku.Transacted] {
@@ -439,9 +439,9 @@ func (qg *Group) MakeEmitSkuMaybeExternal(
 
 func (qg *Group) MakeEmitSkuSigilSchwanzen(
 	f interfaces.FuncIter[*sku.Transacted],
-	k kennung.Kasten,
+	k kennung.RepoId,
 	updateTransacted func(
-		kasten kennung.Kasten,
+		kasten kennung.RepoId,
 		z *sku.Transacted,
 	) (err error),
 ) interfaces.FuncIter[*sku.Transacted] {
@@ -475,9 +475,9 @@ func (qg *Group) MakeEmitSkuSigilSchwanzen(
 
 func (qg *Group) MakeEmitSkuSigilExternal(
 	f interfaces.FuncIter[*sku.Transacted],
-	k kennung.Kasten,
+	k kennung.RepoId,
 	updateTransacted func(
-		kasten kennung.Kasten,
+		kasten kennung.RepoId,
 		z *sku.Transacted,
 	) (err error),
 ) interfaces.FuncIter[*sku.Transacted] {

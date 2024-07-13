@@ -120,7 +120,7 @@ func (ar *assignmentLineReader) readOneHeading(
 ) (err error) {
 	depth := unicorn.CountRune(match.Bytes, '#')
 
-	currentEtiketten := kennung.MakeMutableEtikettSet()
+	currentEtiketten := kennung.MakeMutableTagSet()
 
 	reader := kennung_fmt.MakeEtikettenReader()
 
@@ -165,7 +165,7 @@ func (ar *assignmentLineReader) readOneHeading(
 
 func (ar *assignmentLineReader) readOneHeadingLesserDepth(
 	d int,
-	e kennung.EtikettSet,
+	e kennung.TagSet,
 ) (newCurrent *Assignment, err error) {
 	depthDiff := d - ar.currentAssignment.GetDepth()
 
@@ -203,7 +203,7 @@ func (ar *assignmentLineReader) readOneHeadingLesserDepth(
 
 func (ar *assignmentLineReader) readOneHeadingEqualDepth(
 	d int,
-	e kennung.EtikettSet,
+	e kennung.TagSet,
 ) (newCurrent *Assignment, err error) {
 	// logz.Print("depth count is ==")
 
@@ -238,7 +238,7 @@ func (ar *assignmentLineReader) readOneHeadingEqualDepth(
 
 func (ar *assignmentLineReader) readOneHeadingGreaterDepth(
 	d int,
-	e kennung.EtikettSet,
+	e kennung.TagSet,
 ) (newCurrent *Assignment, err error) {
 	// logz.Print("depth count is >")
 	// logz.Print(e)

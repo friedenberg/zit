@@ -28,8 +28,8 @@ func init() {
 	)
 }
 
-func (c Status) DefaultGattungen() kennung.Gattung {
-	return kennung.MakeGattung(gattung.TrueGattung()...)
+func (c Status) DefaultGattungen() kennung.Genre {
+	return kennung.MakeGenre(gattung.TrueGattung()...)
 }
 
 func (c Status) ModifyBuilder(
@@ -42,7 +42,7 @@ func (c Status) RunWithQuery(
 	u *umwelt.Umwelt,
 	eqwk *query.Group,
 ) (err error) {
-	pcol := u.PrinterCheckedOutForKasten(eqwk.Kasten)
+	pcol := u.PrinterCheckedOutForKasten(eqwk.RepoId)
 
 	if err = u.GetStore().QueryCheckedOut(
 		eqwk,
@@ -78,7 +78,7 @@ func (c Status) RunWithQuery(
 	// 	return
 	// }
 
-	p := u.PrinterCheckedOutForKasten(eqwk.Kasten)
+	p := u.PrinterCheckedOutForKasten(eqwk.RepoId)
 	qg := eqwk
 
 	// TODO [cot/gl !task project-2021-zit-kasten today zz-inbox] move unsure akten and untracked into kasten interface and store_fs

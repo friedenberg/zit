@@ -23,7 +23,7 @@ type Checkout struct {
 func (op Checkout) Run(
 	skus sku.TransactedSet,
 ) (zsc sku.CheckedOutLikeMutableSet, err error) {
-	var k kennung.Kasten
+	var k kennung.RepoId
 
 	if zsc, err = op.RunWithKasten(k, skus); err != nil {
 		err = errors.Wrap(err)
@@ -34,11 +34,11 @@ func (op Checkout) Run(
 }
 
 func (op Checkout) RunWithKasten(
-	kasten kennung.Kasten,
+	kasten kennung.RepoId,
 	skus sku.TransactedSet,
 ) (zsc sku.CheckedOutLikeMutableSet, err error) {
 	b := op.Umwelt.MakeQueryBuilder(
-		kennung.MakeGattung(gattung.Zettel),
+		kennung.MakeGenre(gattung.Zettel),
 	).WithTransacted(
 		skus,
 	)
@@ -101,7 +101,7 @@ func (op Checkout) RunQuery(
 
 	if op.Open || op.Edit {
 		if err = op.GetStore().Open(
-			eqwk.Kasten,
+			eqwk.RepoId,
 			op.CheckoutMode,
 			op.PrinterHeader(),
 			zsc,
@@ -119,7 +119,7 @@ func (op Checkout) RunQuery(
 
 		var ms *query.Group
 
-		builder := op.MakeQueryBuilderExcludingHidden(kennung.MakeGattung(gattung.Zettel))
+		builder := op.MakeQueryBuilderExcludingHidden(kennung.MakeGenre(gattung.Zettel))
 
 		if ms, err = builder.WithCheckedOut(zsc).BuildQueryGroup(); err != nil {
 			err = errors.Wrap(err)

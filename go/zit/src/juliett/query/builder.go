@@ -49,7 +49,7 @@ type Builder struct {
 	fileExtensionGetter        interfaces.FileExtensionGetter
 	expanders                  kennung.Abbr
 	hidden                     sku.Query
-	defaultGattungen           kennung.Gattung
+	defaultGattungen           kennung.Genre
 	defaultSigil               kennung.Sigil
 	permittedSigil             kennung.Sigil
 	virtualEtikettenBeforeInit map[string]string
@@ -115,7 +115,7 @@ func (mb *Builder) WithExpanders(
 }
 
 func (mb *Builder) WithDefaultGattungen(
-	defaultGattungen kennung.Gattung,
+	defaultGattungen kennung.Genre,
 ) *Builder {
 	mb.defaultGattungen = defaultGattungen
 	return mb
@@ -174,7 +174,7 @@ func (b *Builder) WithCheckedOut(
 }
 
 func (b *Builder) BuildQueryGroupWithKasten(
-	k kennung.Kasten,
+	k kennung.RepoId,
 	eqo sku.ExternalQueryOptions,
 	vs ...string,
 ) (qg *Group, err error) {
@@ -192,7 +192,7 @@ func (b *Builder) BuildQueryGroupWithKasten(
 		return
 	}
 
-	qg.Kasten = k
+	qg.RepoId = k
 	qg.ExternalQueryOptions = eqo
 
 	return
@@ -354,7 +354,7 @@ func (b *Builder) addDefaultsIfNecessary(qg *Group) {
 		return
 	}
 
-	g := kennung.MakeGattung()
+	g := kennung.MakeGenre()
 	dq, ok := qg.UserQueries[g]
 
 	if ok {
@@ -365,7 +365,7 @@ func (b *Builder) addDefaultsIfNecessary(qg *Group) {
 		}
 	}
 
-	dq.Gattung = b.defaultGattungen
+	dq.Genre = b.defaultGattungen
 
 	if b.defaultSigil.IsEmpty() {
 		dq.Sigil = kennung.SigilSchwanzen
@@ -474,7 +474,7 @@ LOOP:
 					k,
 				)
 
-				q.Gattung.Add(gattung.Zettel)
+				q.Genre.Add(gattung.Zettel)
 				q.Kennung[k.Kennung2.String()] = k
 
 			case gattung.Etikett:
@@ -516,8 +516,8 @@ LOOP:
 		return
 	}
 
-	if q.Gattung.IsEmpty() && !b.requireNonEmptyQuery {
-		q.Gattung = b.defaultGattungen
+	if q.Genre.IsEmpty() && !b.requireNonEmptyQuery {
+		q.Genre = b.defaultGattungen
 	}
 
 	if q.Sigil.IsEmpty() {
@@ -604,7 +604,7 @@ func (b *Builder) makeEtikettOrEtikettLua(
 
 func (b *Builder) makeEtikettExp(k *Kennung) (exp sku.Query, err error) {
 	// TODO use b.akten to read Etikett Akte and find filter if necessary
-	var e kennung.Etikett
+	var e kennung.Tag
 
 	if err = e.TodoSetFromKennung2(k.Kennung2); err != nil {
 		err = errors.Wrap(err)

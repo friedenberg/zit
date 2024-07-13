@@ -11,7 +11,7 @@ import (
 )
 
 func (s *Store) UpdateTransactedWithExternal(
-	kasten kennung.Kasten,
+	kasten kennung.RepoId,
 	z *sku.Transacted,
 ) (err error) {
 	kid := kasten.GetRepoIdString()
@@ -50,7 +50,7 @@ func (s *Store) ReadTransactedFromKennung(
 
 func (s *Store) ReadTransactedFromKennungKastenSigil(
 	k1 interfaces.StringerGenreGetter,
-	ka kennung.Kasten,
+	ka kennung.RepoId,
 	si kennung.Sigil,
 ) (sk1 *sku.Transacted, err error) {
 	sk1 = sku.GetTransactedPool().Get()
@@ -92,7 +92,7 @@ func (s *Store) ReadTransactedFromKennungKastenSigil(
 }
 
 func (s *Store) ReadCheckedOutFromTransacted(
-	kasten kennung.Kasten,
+	kasten kennung.RepoId,
 	sk *sku.Transacted,
 ) (co sku.CheckedOutLike, err error) {
 	switch kasten.GetRepoIdString() {

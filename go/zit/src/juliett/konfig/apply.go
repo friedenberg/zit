@@ -34,7 +34,7 @@ func (k *Compiled) ApplySchlummerndAndRealizeEtiketten(
 	// 	k.SetHasChanges(fmt.Sprintf("adding etikett with parents: %s", sk))
 	// }
 
-	var etikett kennung.Etikett
+	var etikett kennung.Tag
 
 	// TODO better solution for "realizing" etiketten against Konfig.
 	// Specifically, making this less fragile and dependent on remembering to do
@@ -151,9 +151,9 @@ func (k *Compiled) addImplicitEtiketten(
 	sk *sku.Transacted,
 ) (err error) {
 	mp := &sk.Metadatei
-	ie := kennung.MakeEtikettMutableSet()
+	ie := kennung.MakeTagMutableSet()
 
-	addImpEts := func(e *kennung.Etikett) (err error) {
+	addImpEts := func(e *kennung.Tag) (err error) {
 		p1 := etiketten_path.MakePathWithType()
 		p1.Type = etiketten_path.TypeIndirect
 		p1.Add(catgut.MakeFromString(e.String()))
@@ -168,7 +168,7 @@ func (k *Compiled) addImplicitEtiketten(
 		if err = impl.EachPtr(
 			iter.MakeChain(
 				ie.AddPtr,
-				func(e1 *kennung.Etikett) (err error) {
+				func(e1 *kennung.Tag) (err error) {
 					p2 := p1.Clone()
 					p2.Add(catgut.MakeFromString(e1.String()))
 					sk.Metadatei.Verzeichnisse.Etiketten.AddPathWithType(p2)

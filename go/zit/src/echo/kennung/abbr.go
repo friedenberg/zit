@@ -49,7 +49,7 @@ func (a Abbr) ExpanderFor(g gattung.Gattung) FuncExpandString {
 }
 
 func (ao abbrOne[V, VPtr]) AbbreviateKennung(
-	k Kennung,
+	k Id,
 ) (v string, err error) {
 	if ao.Abbreviate == nil {
 		v = k.String()
@@ -120,7 +120,7 @@ func (a Abbr) AbbreviateHinweisOnly(
 		return
 	}
 
-	var getAbbr func(Kennung) (string, error)
+	var getAbbr func(Id) (string, error)
 
 	var h Hinweis
 
@@ -179,7 +179,7 @@ func (a Abbr) AbbreviateKennung(
 	in *Kennung2,
 	out *Kennung2,
 ) (err error) {
-	var getAbbr func(Kennung) (string, error)
+	var getAbbr func(Id) (string, error)
 
 	switch in.GetGenre() {
 	case gattung.Zettel:

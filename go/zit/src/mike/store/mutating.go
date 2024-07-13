@@ -394,7 +394,7 @@ func (s *Store) UpdateKonfig(
 	sh interfaces.ShaLike,
 ) (kt *sku.Transacted, err error) {
 	return s.CreateOrUpdateAkteSha(
-		&kennung.Konfig{},
+		&kennung.Config{},
 		sh,
 	)
 }
@@ -484,7 +484,7 @@ func (s *Store) addTypAndExpanded(
 }
 
 func (s *Store) addEtikettAndExpanded(
-	e kennung.Etikett,
+	e kennung.Tag,
 ) (err error) {
 	if e.IsVirtual() {
 		return

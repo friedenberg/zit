@@ -124,14 +124,14 @@ func (atc *Refiner) renameForPrefixJoint(a *Assignment) (err error) {
 		return
 	}
 
-	var ls kennung.Etikett
+	var ls kennung.Tag
 
 	if ls, err = kennung.LeftSubtract(aEtt, pEtt); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	a.Etiketten = kennung.MakeEtikettSet(ls)
+	a.Etiketten = kennung.MakeTagSet(ls)
 
 	return
 }
@@ -203,11 +203,11 @@ func (atc Refiner) applyPrefixJoints(a *Assignment) (err error) {
 	var na *Assignment
 
 	if a.Etiketten.Len() == 1 &&
-		a.Etiketten.Any().Equals(groupingPrefix.Etikett) {
+		a.Etiketten.Any().Equals(groupingPrefix.Tag) {
 		na = a
 	} else {
 		na = newAssignment(a.GetDepth() + 1)
-		na.Etiketten = kennung.MakeEtikettSet(groupingPrefix.Etikett)
+		na.Etiketten = kennung.MakeTagSet(groupingPrefix.Tag)
 		a.addChild(na)
 	}
 
@@ -223,7 +223,7 @@ func (atc Refiner) applyPrefixJoints(a *Assignment) (err error) {
 
 		c.Etiketten = kennung.SubtractPrefix(
 			c.Etiketten,
-			groupingPrefix.Etikett,
+			groupingPrefix.Tag,
 		)
 	}
 
@@ -231,7 +231,7 @@ func (atc Refiner) applyPrefixJoints(a *Assignment) (err error) {
 }
 
 type etikettBag struct {
-	kennung.Etikett
+	kennung.Tag
 	assignments []*Assignment
 }
 
@@ -247,7 +247,7 @@ func (a Refiner) childPrefixes(node *Assignment) (out []etikettBag) {
 		expanded := kennung.Expanded(c.Etiketten, expansion.ExpanderRight)
 
 		expanded.Each(
-			func(e kennung.Etikett) (err error) {
+			func(e kennung.Tag) (err error) {
 				if e.String() == "" {
 					return
 				}
@@ -270,11 +270,11 @@ func (a Refiner) childPrefixes(node *Assignment) (out []etikettBag) {
 
 	for e, n := range m {
 		if len(n) > 1 {
-			var e1 kennung.Etikett
+			var e1 kennung.Tag
 
 			errors.PanicIfError(e1.Set(e))
 
-			out = append(out, etikettBag{Etikett: e1, assignments: n})
+			out = append(out, etikettBag{Tag: e1, assignments: n})
 		}
 	}
 
@@ -283,9 +283,9 @@ func (a Refiner) childPrefixes(node *Assignment) (out []etikettBag) {
 		func(i, j int) bool {
 			if len(out[i].assignments) == len(out[j].assignments) {
 				return len(
-					out[i].Etikett.String(),
+					out[i].Tag.String(),
 				) > len(
-					out[j].Etikett.String(),
+					out[j].Tag.String(),
 				)
 			} else {
 				return len(out[i].assignments) > len(out[j].assignments)

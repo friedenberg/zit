@@ -44,7 +44,7 @@ func (a *Assignment) addToSet(
 	out SkuMapWithOrder,
 	original sku.TransactedSet,
 ) (err error) {
-	expanded := kennung.MakeEtikettMutableSet()
+	expanded := kennung.MakeTagMutableSet()
 
 	if err = a.AllEtiketten(expanded); err != nil {
 		err = errors.Wrap(err)

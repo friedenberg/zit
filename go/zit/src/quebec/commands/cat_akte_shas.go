@@ -24,8 +24,8 @@ func init() {
 	)
 }
 
-func (c CatAkteShas) CompletionGattung() kennung.Gattung {
-	return kennung.MakeGattung(
+func (c CatAkteShas) CompletionGattung() kennung.Genre {
+	return kennung.MakeGenre(
 		gattung.Akte,
 	)
 }

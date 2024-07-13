@@ -25,7 +25,7 @@ type Organize struct {
 func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 	if qg == nil {
 		b := u.MakeQueryBuilder(
-			kennung.MakeGattung(gattung.TrueGattung()...),
+			kennung.MakeGenre(gattung.TrueGattung()...),
 		).WithTransacted(
 			skus,
 		)

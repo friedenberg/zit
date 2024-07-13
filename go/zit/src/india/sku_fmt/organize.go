@@ -30,7 +30,7 @@ func MakeFormatOrganize(
 	kennungStringFormatWriter kennung_fmt.Aligned,
 	typStringFormatWriter interfaces.StringFormatWriter[*kennung.Typ],
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung],
-	etikettenStringFormatWriter interfaces.StringFormatWriter[*kennung.Etikett],
+	etikettenStringFormatWriter interfaces.StringFormatWriter[*kennung.Tag],
 ) *Organize {
 	options.PrintTime = false
 	options.PrintShas = false
@@ -55,7 +55,7 @@ type Organize struct {
 	kennungStringFormatWriter     kennung_fmt.Aligned
 	typStringFormatWriter         interfaces.StringFormatWriter[*kennung.Typ]
 	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*bezeichnung.Bezeichnung]
-	etikettenStringFormatWriter   interfaces.StringFormatWriter[*kennung.Etikett]
+	etikettenStringFormatWriter   interfaces.StringFormatWriter[*kennung.Tag]
 }
 
 func (f *Organize) SetMaxKopfUndSchwanz(k, s int) {
@@ -317,7 +317,7 @@ LOOP:
 					}
 
 				case gattung.Etikett:
-					var e kennung.Etikett
+					var e kennung.Tag
 
 					if err = e.TodoSetFromKennung2(&k); err != nil {
 						err = errors.Wrap(err)

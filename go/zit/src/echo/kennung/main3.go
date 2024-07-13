@@ -37,7 +37,7 @@ type Kennung3 struct {
 	kasten, left, right catgut.String
 }
 
-func MustKennung3(kp Kennung) (k *Kennung3) {
+func MustKennung3(kp Id) (k *Kennung3) {
 	k = &Kennung3{}
 	err := k.SetWithKennung(kp)
 	errors.PanicIfError(err)
@@ -45,7 +45,7 @@ func MustKennung3(kp Kennung) (k *Kennung3) {
 }
 
 func (a *Kennung3) GetRepoId() interfaces.RepoId {
-	return MustKasten(a.kasten.String())
+	return MustRepoId(a.kasten.String())
 }
 
 func (a *Kennung3) IsVirtual() bool {
@@ -309,7 +309,7 @@ func (k3 *Kennung3) GetGenre() interfaces.Genre {
 
 func MakeKennung3(
 	v interfaces.StringerGenreGetter,
-	ka Kasten,
+	ka RepoId,
 ) (k *Kennung3, err error) {
 	k = &Kennung3{
 		g: gattung.Unknown,
@@ -399,7 +399,7 @@ func (k3 *Kennung3) SetFromPath(
 }
 
 func (h *Kennung3) SetWithKennung(
-	k Kennung,
+	k Id,
 ) (err error) {
 	switch kt := k.(type) {
 	case *Kennung3:
@@ -459,7 +459,7 @@ func (h *Kennung3) TodoSetBytes(v *catgut.String) (err error) {
 }
 
 func (h *Kennung3) Set(v string) (err error) {
-	var k Kennung
+	var k Id
 
 	switch h.g {
 	case gattung.Unknown:
@@ -471,7 +471,7 @@ func (h *Kennung3) Set(v string) (err error) {
 		k = h
 
 	case gattung.Etikett:
-		var h Etikett
+		var h Tag
 		err = h.Set(v)
 		k = h
 
@@ -481,12 +481,12 @@ func (h *Kennung3) Set(v string) (err error) {
 		k = h
 
 	case gattung.Kasten:
-		var h Kasten
+		var h RepoId
 		err = h.Set(v)
 		k = h
 
 	case gattung.Konfig:
-		var h Konfig
+		var h Config
 		err = h.Set(v)
 		k = h
 
@@ -519,7 +519,7 @@ func (a *Kennung3) ResetWith(b *Kennung3) {
 	a.middle = b.middle
 }
 
-func (a *Kennung3) ResetWithKennung(b Kennung) (err error) {
+func (a *Kennung3) ResetWithKennung(b Id) (err error) {
 	return a.SetWithKennung(b)
 }
 

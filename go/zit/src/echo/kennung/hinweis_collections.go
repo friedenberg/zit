@@ -6,7 +6,7 @@ import (
 )
 
 func init() {
-	collections_value.RegisterGobValue[Etikett](nil)
+	collections_value.RegisterGobValue[Tag](nil)
 }
 
 type (

@@ -69,7 +69,7 @@ func (f v5) FormatPersistentMetadatei(
 
 	es := m.GetEtiketten()
 
-	for _, e := range iter.SortedValues[kennung.Etikett](es) {
+	for _, e := range iter.SortedValues[kennung.Tag](es) {
 		if e.IsVirtual() {
 			continue
 		}
@@ -171,7 +171,7 @@ func (f v5) FormatPersistentMetadatei(
 		if m.Verzeichnisse.GetExpandedEtiketten().Len() > 0 {
 			k := keyVerzeichnisseEtikettExpanded.String()
 
-			for _, e := range iter.SortedValues[kennung.Etikett](
+			for _, e := range iter.SortedValues[kennung.Tag](
 				m.Verzeichnisse.GetExpandedEtiketten(),
 			) {
 				n1, err = ohio.WriteKeySpaceValueNewlineString(
@@ -191,7 +191,7 @@ func (f v5) FormatPersistentMetadatei(
 		if m.Verzeichnisse.GetImplicitEtiketten().Len() > 0 {
 			k := keyVerzeichnisseEtikettImplicit.String()
 
-			for _, e := range iter.SortedValues[kennung.Etikett](
+			for _, e := range iter.SortedValues[kennung.Tag](
 				m.Verzeichnisse.GetImplicitEtiketten(),
 			) {
 				n2, err = ohio.WriteKeySpaceValueNewline(
@@ -317,7 +317,7 @@ func (f v5) ParsePersistentMetadatei(
 			}
 
 		case key.Equal(keyEtikett.Bytes()):
-			e := kennung.GetEtikettPool().Get()
+			e := kennung.GetTagPool().Get()
 
 			if err = e.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
@@ -376,7 +376,7 @@ func (f v5) ParsePersistentMetadatei(
 				return
 			}
 
-			e := kennung.GetEtikettPool().Get()
+			e := kennung.GetTagPool().Get()
 
 			if err = e.Set(val.String()); err != nil {
 				err = errors.Wrap(err)
@@ -397,7 +397,7 @@ func (f v5) ParsePersistentMetadatei(
 				return
 			}
 
-			e := kennung.GetEtikettPool().Get()
+			e := kennung.GetTagPool().Get()
 
 			if err = e.Set(val.String()); err != nil {
 				err = errors.Wrap(err)

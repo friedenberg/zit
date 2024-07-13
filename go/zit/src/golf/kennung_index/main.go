@@ -20,7 +20,7 @@ type KennungIndex[
 	Get(*T) (*kennung.IndexedLike, error)
 	HasChanges() bool
 	Reset() error
-	GetAll() ([]kennung.Kennung, error)
+	GetAll() ([]kennung.Id, error)
 	Each(interfaces.FuncIter[kennung.IndexedLike]) error
 	EachSchwanzen(interfaces.FuncIter[*kennung.IndexedLike]) error
 	StoreDelta(interfaces.Delta[T]) (err error)
@@ -32,8 +32,8 @@ type KennungIndex[
 }
 
 type EtikettIndexMutation interface {
-	AddEtikettSet(to kennung.EtikettSet, from kennung.EtikettSet) (err error)
-	Add(s kennung.EtikettSet) (err error)
+	AddEtikettSet(to kennung.TagSet, from kennung.TagSet) (err error)
+	Add(s kennung.TagSet) (err error)
 }
 
 type EtikettIndex interface {
@@ -43,7 +43,7 @@ type EtikettIndex interface {
 		interfaces.FuncIter[*kennung.IndexedEtikett],
 	) error
 	GetEtikett(
-		*kennung.Etikett,
+		*kennung.Tag,
 	) (*kennung.IndexedLike, error)
 }
 
@@ -62,7 +62,7 @@ type index struct {
 	hasChanges bool
 	lock       *sync.RWMutex
 
-	etikettenIndex KennungIndex[kennung.Etikett, *kennung.Etikett]
+	etikettenIndex KennungIndex[kennung.Tag, *kennung.Tag]
 	hinweisIndex   hinweis_index.HinweisIndex
 }
 
@@ -75,7 +75,7 @@ func MakeIndex(
 		path:           s.FileVerzeichnisseEtiketten(),
 		CacheIOFactory: vf,
 		lock:           &sync.RWMutex{},
-		etikettenIndex: MakeIndex2[kennung.Etikett](
+		etikettenIndex: MakeIndex2[kennung.Tag](
 			vf,
 			s.DirVerzeichnisse("EtikettenIndexV0"),
 		),
@@ -108,21 +108,21 @@ func (i *index) Flush() (err error) {
 }
 
 func (i *index) AddEtikettSet(
-	to kennung.EtikettSet,
-	from kennung.EtikettSet,
+	to kennung.TagSet,
+	from kennung.TagSet,
 ) (err error) {
 	return i.etikettenIndex.StoreDelta(
-		collections_delta.MakeSetDelta[kennung.Etikett](from, to),
+		collections_delta.MakeSetDelta[kennung.Tag](from, to),
 	)
 }
 
 func (i *index) GetEtikett(
-	k *kennung.Etikett,
+	k *kennung.Tag,
 ) (id *kennung.IndexedLike, err error) {
 	return i.etikettenIndex.Get(k)
 }
 
-func (i *index) Add(s kennung.EtikettSet) (err error) {
+func (i *index) Add(s kennung.TagSet) (err error) {
 	return i.etikettenIndex.StoreMany(s)
 }
 
@@ -152,7 +152,7 @@ func (i *index) Reset() (err error) {
 	return
 }
 
-func (i *index) AddHinweis(k kennung.Kennung) (err error) {
+func (i *index) AddHinweis(k kennung.Id) (err error) {
 	if err = i.hinweisIndex.AddHinweis(k); err != nil {
 		err = errors.Wrap(err)
 		return

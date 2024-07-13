@@ -32,7 +32,7 @@ func (a *KennungFDPair) Equals(b KennungFDPair) bool {
 	return true
 }
 
-func (e *KennungFDPair) GetKennungLike() kennung.Kennung {
+func (e *KennungFDPair) GetKennungLike() kennung.Id {
 	return &e.Kennung
 }
 

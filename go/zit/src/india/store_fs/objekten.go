@@ -13,7 +13,7 @@ import (
 // TODO combine everyting into one function
 
 func (c *Store) tryEtikett(fi os.FileInfo, dir string) (err error) {
-	var h kennung.Etikett
+	var h kennung.Tag
 	var f *fd.FD
 
 	if f, err = fd.FileInfo(fi, dir); err != nil {
@@ -45,7 +45,7 @@ func (c *Store) tryEtikett(fi os.FileInfo, dir string) (err error) {
 }
 
 func (c *Store) tryKasten(fi os.FileInfo, dir string) (err error) {
-	var h kennung.Kasten
+	var h kennung.RepoId
 	var f *fd.FD
 
 	if f, err = fd.FileInfo(fi, dir); err != nil {

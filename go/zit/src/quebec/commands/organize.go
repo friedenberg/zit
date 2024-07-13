@@ -54,12 +54,12 @@ func init() {
 func (c *Organize) ModifyBuilder(b *query.Builder) {
 	b.
 		WithDefaultSigil(kennung.SigilSchwanzen).
-		WithDefaultGattungen(kennung.MakeGattung(gattung.Zettel)).
+		WithDefaultGattungen(kennung.MakeGenre(gattung.Zettel)).
 		WithRequireNonEmptyQuery()
 }
 
-func (c *Organize) CompletionGattung() kennung.Gattung {
-	return kennung.MakeGattung(
+func (c *Organize) CompletionGattung() kennung.Genre {
+	return kennung.MakeGenre(
 		gattung.Zettel,
 		gattung.Etikett,
 		gattung.Typ,

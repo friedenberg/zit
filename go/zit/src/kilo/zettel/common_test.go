@@ -19,10 +19,10 @@ func (t inlineTypChecker) IsInlineTyp(k kennung.Typ) bool {
 	return t.answer
 }
 
-func makeEtiketten(t test_logz.T, vs ...string) (es kennung.EtikettSet) {
+func makeEtiketten(t test_logz.T, vs ...string) (es kennung.TagSet) {
 	var err error
 
-	if es, err = collections_ptr.MakeValueSetString[kennung.Etikett, *kennung.Etikett](nil, vs...); err != nil {
+	if es, err = collections_ptr.MakeValueSetString[kennung.Tag, *kennung.Tag](nil, vs...); err != nil {
 		t.Fatalf("%s", err)
 	}
 

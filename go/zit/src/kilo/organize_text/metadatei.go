@@ -16,7 +16,7 @@ import (
 
 type Metadatei struct {
 	// metadatei.Metadatei
-	kennung.EtikettSet
+	kennung.TagSet
 	Matchers interfaces.SetLike[sku.Query]
 	Comments []string
 	Typ      kennung.Typ
@@ -37,7 +37,7 @@ func (m Metadatei) RemoveFromTransacted(sk *sku.Transacted) (err error) {
 
 func (m Metadatei) AsMetadatei() (m1 metadatei.Metadatei) {
 	m1.Typ = m.Typ
-	m1.SetEtiketten(m.EtikettSet)
+	m1.SetEtiketten(m.TagSet)
 	return
 }
 
@@ -58,7 +58,7 @@ func (m Metadatei) HasMetadateiContent() bool {
 func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 	r := bufio.NewReader(r1)
 
-	mes := kennung.MakeEtikettMutableSet()
+	mes := kennung.MakeTagMutableSet()
 
 	if n, err = format.ReadLines(
 		r,
@@ -79,7 +79,7 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 		return
 	}
 
-	m.EtikettSet = mes.CloneSetPtrLike()
+	m.TagSet = mes.CloneSetPtrLike()
 
 	return
 }
@@ -87,7 +87,7 @@ func (m *Metadatei) ReadFrom(r1 io.Reader) (n int64, err error) {
 func (m Metadatei) WriteTo(w1 io.Writer) (n int64, err error) {
 	w := format.NewLineWriter()
 
-	for _, e := range iter.SortedStrings(m.EtikettSet) {
+	for _, e := range iter.SortedStrings(m.TagSet) {
 		w.WriteFormat("- %s", e)
 	}
 

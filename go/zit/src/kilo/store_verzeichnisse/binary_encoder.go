@@ -202,7 +202,7 @@ func (bf *binaryEncoder) writeFieldKey(
 	case schlussel.VerzeichnisseEtikettImplicit:
 		es := sk.Metadatei.Verzeichnisse.GetImplicitEtiketten()
 
-		for _, e := range iter.SortedValues[kennung.Etikett](es) {
+		for _, e := range iter.SortedValues[kennung.Tag](es) {
 			var n1 int64
 			n1, err = bf.writeFieldBinaryMarshaler(&e)
 			n += n1
@@ -216,7 +216,7 @@ func (bf *binaryEncoder) writeFieldKey(
 	case schlussel.VerzeichnisseEtikettExpanded:
 		es := sk.Metadatei.Verzeichnisse.GetExpandedEtiketten()
 
-		for _, e := range iter.SortedValues[kennung.Etikett](es) {
+		for _, e := range iter.SortedValues[kennung.Tag](es) {
 			var n1 int64
 			n1, err = bf.writeFieldBinaryMarshaler(&e)
 			n += n1

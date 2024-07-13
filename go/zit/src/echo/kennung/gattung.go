@@ -12,58 +12,58 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
-type Gattung byte
+type Genre byte
 
-func MakeGattungAll() Gattung {
-	return MakeGattung(gattung.TrueGattung()...)
+func MakeGenreAll() Genre {
+	return MakeGenre(gattung.TrueGattung()...)
 }
 
-func MakeGattung(vs ...gattung.Gattung) (s Gattung) {
+func MakeGenre(vs ...gattung.Gattung) (s Genre) {
 	s.Add(vs...)
 	return
 }
 
-func (a Gattung) IsEmpty() bool {
+func (a Genre) IsEmpty() bool {
 	return a == 0
 }
 
-func (a Gattung) EqualsAny(b any) bool {
+func (a Genre) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
-func (a Gattung) Equals(b Gattung) bool {
+func (a Genre) Equals(b Genre) bool {
 	return a == b
 }
 
-func (a *Gattung) Reset() {
+func (a *Genre) Reset() {
 	*a = 0
 }
 
-func (a *Gattung) ResetWith(b Gattung) {
+func (a *Genre) ResetWith(b Genre) {
 	*a = b
 }
 
-func (a *Gattung) Add(bs ...gattung.Gattung) {
+func (a *Genre) Add(bs ...gattung.Gattung) {
 	for _, b := range bs {
-		*a |= Gattung(b.GetGenre().GetGenreBitInt())
+		*a |= Genre(b.GetGenre().GetGenreBitInt())
 	}
 }
 
-func (a *Gattung) Del(b interfaces.GenreGetter) {
-	*a &= ^Gattung(b.GetGenre().GetGenreBitInt())
+func (a *Genre) Del(b interfaces.GenreGetter) {
+	*a &= ^Genre(b.GetGenre().GetGenreBitInt())
 }
 
-func (a Gattung) Contains(b interfaces.GenreGetter) bool {
-	bg := Gattung(b.GetGenre().GetGenreBitInt())
+func (a Genre) Contains(b interfaces.GenreGetter) bool {
+	bg := Genre(b.GetGenre().GetGenreBitInt())
 	return byte(a&bg) == byte(bg)
 }
 
-func (a Gattung) ContainsOneOf(b interfaces.GenreGetter) bool {
-	bg := Gattung(b.GetGenre().GetGenreBitInt())
+func (a Genre) ContainsOneOf(b interfaces.GenreGetter) bool {
+	bg := Genre(b.GetGenre().GetGenreBitInt())
 	return a&bg != 0
 }
 
-func (a Gattung) Slice() []gattung.Gattung {
+func (a Genre) Slice() []gattung.Gattung {
 	tg := gattung.TrueGattung()
 	out := make([]gattung.Gattung, 0, len(tg))
 
@@ -78,7 +78,7 @@ func (a Gattung) Slice() []gattung.Gattung {
 	return out
 }
 
-func (a Gattung) String() string {
+func (a Genre) String() string {
 	sb := strings.Builder{}
 
 	first := true
@@ -99,7 +99,7 @@ func (a Gattung) String() string {
 	return sb.String()
 }
 
-func (i *Gattung) AddString(v string) (err error) {
+func (i *Genre) AddString(v string) (err error) {
 	var g gattung.Gattung
 
 	if err = g.Set(v); err != nil {
@@ -112,7 +112,7 @@ func (i *Gattung) AddString(v string) (err error) {
 	return
 }
 
-func (gs *Gattung) Set(v string) (err error) {
+func (gs *Genre) Set(v string) (err error) {
 	v = strings.TrimSpace(v)
 	v = strings.ToLower(v)
 
@@ -126,7 +126,7 @@ func (gs *Gattung) Set(v string) (err error) {
 	return
 }
 
-func (g *Gattung) SetTokens(
+func (g *Genre) SetTokens(
 	tokens ...string,
 ) (remainingTokens []string, err error) {
 	for i, el := range tokens {
@@ -148,19 +148,19 @@ func (g *Gattung) SetTokens(
 	return
 }
 
-func (i Gattung) GetSha() *sha.Sha {
+func (i Genre) GetSha() *sha.Sha {
 	return sha.FromString(i.String())
 }
 
-func (i Gattung) Byte() byte {
+func (i Genre) Byte() byte {
 	return byte(i)
 }
 
-func (i Gattung) ReadByte() (byte, error) {
+func (i Genre) ReadByte() (byte, error) {
 	return byte(i), nil
 }
 
-func (i *Gattung) ReadFrom(r io.Reader) (n int64, err error) {
+func (i *Genre) ReadFrom(r io.Reader) (n int64, err error) {
 	var b [1]byte
 
 	var n1 int
@@ -172,12 +172,12 @@ func (i *Gattung) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	*i = Gattung(b[0])
+	*i = Genre(b[0])
 
 	return
 }
 
-func (i *Gattung) WriteTo(w io.Writer) (n int64, err error) {
+func (i *Genre) WriteTo(w io.Writer) (n int64, err error) {
 	var b byte
 
 	if b, err = i.ReadByte(); err != nil {

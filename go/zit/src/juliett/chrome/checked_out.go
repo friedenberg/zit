@@ -16,8 +16,8 @@ type CheckedOut struct {
 	Error    error
 }
 
-func (c *CheckedOut) GetKasten() kennung.Kasten {
-	return *(kennung.MustKasten("chrome"))
+func (c *CheckedOut) GetKasten() kennung.RepoId {
+	return *(kennung.MustRepoId("chrome"))
 }
 
 func (c *CheckedOut) GetSkuCheckedOutLike() sku.CheckedOutLike {

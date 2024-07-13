@@ -66,7 +66,7 @@ func (s *Store) CreateOrUpdateFromTransacted(
 }
 
 func (s *Store) CreateOrUpdateAkteSha(
-	k kennung.Kennung,
+	k kennung.Id,
 	sh interfaces.ShaLike,
 ) (t *sku.Transacted, err error) {
 	if !s.GetStandort().GetLockSmith().IsAcquired() {

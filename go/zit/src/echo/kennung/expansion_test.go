@@ -63,7 +63,7 @@ func TestStringSliceEquals(t *testing.T) {
 
 func TestExpansionAll(t1 *testing.T) {
 	t := test_logz.T{T: t1}
-	e := MustEtikett("this-is-a-tag")
+	e := MustTag("this-is-a-tag")
 	ex := ExpandOne(&e, expansion.ExpanderAll)
 	expected := []string{
 		"a",
@@ -77,7 +77,7 @@ func TestExpansionAll(t1 *testing.T) {
 		"this-is-a-tag",
 	}
 
-	actual := iter.SortedStrings[Etikett](ex)
+	actual := iter.SortedStrings[Tag](ex)
 
 	if !stringSliceEquals(actual, expected) {
 		t.Errorf(
@@ -89,7 +89,7 @@ func TestExpansionAll(t1 *testing.T) {
 }
 
 func TestExpansionRight(t *testing.T) {
-	e := MustEtikett("this-is-a-tag")
+	e := MustTag("this-is-a-tag")
 	ex := ExpandOne(&e, expansion.ExpanderRight)
 	expected := []string{
 		"this",
@@ -98,7 +98,7 @@ func TestExpansionRight(t *testing.T) {
 		"this-is-a-tag",
 	}
 
-	actual := iter.SortedStrings[Etikett](ex)
+	actual := iter.SortedStrings[Tag](ex)
 
 	if !stringSliceEquals(actual, expected) {
 		t.Errorf(

@@ -45,7 +45,7 @@ type CheckedOut struct {
 	Error    error
 }
 
-func (c *CheckedOut) GetKasten() kennung.Kasten {
+func (c *CheckedOut) GetKasten() kennung.RepoId {
 	panic(todo.Implement())
 }
 

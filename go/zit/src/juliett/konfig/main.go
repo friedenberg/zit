@@ -87,7 +87,7 @@ type compiled struct {
 	mutable_config.Blob
 
 	// Etiketten
-	DefaultEtiketten  kennung.EtikettSet
+	DefaultEtiketten  kennung.TagSet
 	Etiketten         interfaces.MutableSetLike[*ketikett]
 	ImplicitEtiketten implicitEtikettenMap
 

@@ -31,12 +31,12 @@ func (tm *Conflicted) MergeEtiketten() (err error) {
 	middle := tm.Middle.GetEtiketten().CloneMutableSetPtrLike()
 	right := tm.Right.GetEtiketten().CloneMutableSetPtrLike()
 
-	same := kennung.MakeEtikettMutableSet()
-	deleted := kennung.MakeEtikettMutableSet()
+	same := kennung.MakeTagMutableSet()
+	deleted := kennung.MakeTagMutableSet()
 
 	removeFromAllButAddTo := func(
-		e *kennung.Etikett,
-		toAdd kennung.EtikettMutableSet,
+		e *kennung.Tag,
+		toAdd kennung.TagMutableSet,
 	) (err error) {
 		if err = toAdd.AddPtr(e); err != nil {
 			err = errors.Wrap(err)
@@ -62,7 +62,7 @@ func (tm *Conflicted) MergeEtiketten() (err error) {
 	}
 
 	if err = middle.EachPtr(
-		func(e *kennung.Etikett) (err error) {
+		func(e *kennung.Tag) (err error) {
 			if left.ContainsKey(left.KeyPtr(e)) && right.ContainsKey(right.KeyPtr(e)) {
 				return removeFromAllButAddTo(e, same)
 			} else if left.ContainsKey(left.KeyPtr(e)) || right.ContainsKey(right.KeyPtr(e)) {

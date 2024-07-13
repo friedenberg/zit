@@ -20,8 +20,8 @@ type CheckedOut struct {
 	Error    error
 }
 
-func (c *CheckedOut) GetKasten() kennung.Kasten {
-	return *(kennung.MustKasten(""))
+func (c *CheckedOut) GetKasten() kennung.RepoId {
+	return *(kennung.MustRepoId(""))
 }
 
 func (c *CheckedOut) GetSkuCheckedOutLike() sku.CheckedOutLike {

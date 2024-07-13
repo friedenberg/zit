@@ -19,7 +19,7 @@ func MakeEtikettenReader() (f *etikettenReader) {
 
 func (f *etikettenReader) ReadStringFormat(
 	rb *catgut.RingBuffer,
-	k kennung.EtikettMutableSet,
+	k kennung.TagMutableSet,
 ) (n int64, err error) {
 	flag := collections_ptr.MakeFlagCommasFromExisting(
 		collections_ptr.SetterPolicyAppend,

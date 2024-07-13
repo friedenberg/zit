@@ -14,9 +14,9 @@ type DefaultSigilGetter interface {
 }
 
 type DefaultGattungGetter interface {
-	DefaultGattungen() kennung.Gattung
+	DefaultGattungen() kennung.Genre
 }
 
 type CompletionGattungGetter interface {
-	CompletionGattung() kennung.Gattung
+	CompletionGattung() kennung.Genre
 }
