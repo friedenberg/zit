@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type Deinit struct {
@@ -33,19 +33,19 @@ func init() {
 	)
 }
 
-func (c Deinit) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c Deinit) Run(u *env.Env, args ...string) (err error) {
 	if !c.Force && !c.getPermission(u) {
 		return
 	}
 
-	base := path.Join(u.Standort().Dir(), ".zit")
+	base := path.Join(u.GetFSHome().Dir(), ".zit")
 
 	if err = files.SetAllowUserChangesRecursive(base); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = u.Standort().DeleteAll(base); err != nil {
+	if err = u.GetFSHome().DeleteAll(base); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -53,11 +53,11 @@ func (c Deinit) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	return
 }
 
-func (c Deinit) getPermission(u *umwelt.Umwelt) (success bool) {
+func (c Deinit) getPermission(u *env.Env) (success bool) {
 	var err error
 	ui.Err().Printf(
 		"are you sure you want to deinit in %q? (y/*)",
-		u.Standort().Dir(),
+		u.GetFSHome().Dir(),
 	)
 
 	var answer rune

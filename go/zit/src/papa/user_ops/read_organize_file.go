@@ -7,13 +7,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type ReadOrganizeFile struct{}
 
 func (c ReadOrganizeFile) RunWithPath(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	p string,
 ) (ot *organize_text.Text, err error) {
 	var f *os.File
@@ -34,7 +34,7 @@ func (c ReadOrganizeFile) RunWithPath(
 }
 
 func (c ReadOrganizeFile) Run(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	r io.Reader,
 ) (ot *organize_text.Text, err error) {
 	otFlags := organize_text.MakeFlags()
@@ -42,7 +42,7 @@ func (c ReadOrganizeFile) Run(
 
 	if ot, err = organize_text.New(
 		otFlags.GetOptions(
-			u.GetKonfig().PrintOptions,
+			u.GetConfig().PrintOptions,
 			nil,
 			u.SkuFmtOrganize(),
 			u.GetStore().GetAbbrStore().GetAbbr(),

@@ -19,28 +19,28 @@ import (
 type Flags struct {
 	Options
 
-	once           *sync.Once
-	ExtraEtiketten collections_ptr.Flag[ids.Tag, *ids.Tag]
+	once      *sync.Once
+	ExtraTags collections_ptr.Flag[ids.Tag, *ids.Tag]
 }
 
 type Options struct {
 	wasMade bool
 
-	Konfig *config.Compiled
+	Config *config.Compiled
 
-	commentMatchers   interfaces.SetLike[sku.Query]
-	rootEtiketten     ids.TagSet
-	Typ               ids.Type
-	GroupingEtiketten ids.TagSlice
-	ExtraEtiketten    ids.TagSet
-	Transacted        interfaces.SetLike[*sku.Transacted]
+	commentMatchers interfaces.SetLike[sku.Query]
+	rootTags        ids.TagSet
+	Type            ids.Type
+	GroupingTags    ids.TagSlice
+	ExtraTags       ids.TagSet
+	Transacted      interfaces.SetLike[*sku.Transacted]
 
 	Abbr ids.Abbr
 
 	UsePrefixJoints        bool
 	UseRightAlignedIndents bool
 	UseRefiner             bool
-	UseMetadateiHeader     bool
+	UseMetadateaHeader     bool
 
 	PrintOptions       erworben_cli_print_options.PrintOptions
 	skuFmt             sku_fmt.Organize
@@ -50,41 +50,41 @@ type Options struct {
 func MakeFlags() Flags {
 	return Flags{
 		once: &sync.Once{},
-		ExtraEtiketten: collections_ptr.MakeFlagCommas[ids.Tag](
+		ExtraTags: collections_ptr.MakeFlagCommas[ids.Tag](
 			collections_ptr.SetterPolicyAppend,
 		),
 
 		Options: Options{
-			wasMade:           true,
-			GroupingEtiketten: ids.MakeTagSlice(),
-			Transacted:        sku.MakeTransactedMutableSet(),
+			wasMade:      true,
+			GroupingTags: ids.MakeTagSlice(),
+			Transacted:   sku.MakeTransactedMutableSet(),
 		},
 	}
 }
 
-func MakeFlagsWithMetadatei(m object_metadata.Metadata) Flags {
+func MakeFlagsWithMetadata(m object_metadata.Metadata) Flags {
 	ui.Debug().Print(m.GetTags())
 
 	return Flags{
 		once: &sync.Once{},
-		ExtraEtiketten: collections_ptr.MakeFlagCommas[ids.Tag](
+		ExtraTags: collections_ptr.MakeFlagCommas[ids.Tag](
 			collections_ptr.SetterPolicyAppend,
 		),
 
 		Options: Options{
-			rootEtiketten:     m.GetTags(),
-			wasMade:           true,
-			GroupingEtiketten: ids.MakeTagSlice(),
-			Transacted:        sku.MakeTransactedMutableSet(),
+			rootTags:     m.GetTags(),
+			wasMade:      true,
+			GroupingTags: ids.MakeTagSlice(),
+			Transacted:   sku.MakeTransactedMutableSet(),
 		},
 	}
 }
 
 func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
-	f.Var(&o.GroupingEtiketten, "group-by", "etikett prefixes to group zettels")
+	f.Var(&o.GroupingTags, "group-by", "etikett prefixes to group zettels")
 
 	f.Var(
-		o.ExtraEtiketten,
+		o.ExtraTags,
 		"extras",
 		"etiketten to always add to the organize text",
 	)
@@ -106,7 +106,7 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 	f.BoolVar(&o.UseRefiner, "refine", true, "refine the organize tree")
 
 	f.BoolVar(
-		&o.UseMetadateiHeader,
+		&o.UseMetadateaHeader,
 		"metadatei-header",
 		true,
 		"metadatei header",
@@ -121,16 +121,16 @@ func (o *Flags) GetOptions(
 ) Options {
 	o.once.Do(
 		func() {
-			o.Options.ExtraEtiketten = o.ExtraEtiketten.GetSetPtrLike()
+			o.Options.ExtraTags = o.ExtraTags.GetSetPtrLike()
 		},
 	)
 
 	o.skuFmt = *skuFmt
 
 	if q == nil {
-		o.rootEtiketten = ids.MakeTagSet()
+		o.rootTags = ids.MakeTagSet()
 	} else {
-		o.rootEtiketten = q.GetTags()
+		o.rootTags = q.GetTags()
 
 		// TODO handle negated
 		// ks := collections_value.MakeMutableValueSet[sku.Query](nil)

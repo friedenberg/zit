@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/remote_conn"
 )
 
@@ -28,20 +28,20 @@ type PullClient interface {
 }
 
 type client struct {
-	umwelt             *umwelt.Umwelt
+	env                *env.Env
 	stage              *remote_conn.StageCommander
 	chDone             chan struct{}
 	chFilterSkuTickets chan struct{}
 	common
 }
 
-func MakePullClient(u *umwelt.Umwelt, from string) (c *client, err error) {
+func MakePullClient(u *env.Env, from string) (c *client, err error) {
 	c = &client{
-		umwelt:             u,
+		env:                u,
 		chDone:             make(chan struct{}),
 		chFilterSkuTickets: make(chan struct{}, concurrentSkuFilterJobLimit),
 		common: common{
-			Umwelt: u,
+			Env: u,
 		},
 	}
 
@@ -55,7 +55,7 @@ func MakePullClient(u *umwelt.Umwelt, from string) (c *client, err error) {
 	}
 
 	theirVersion := c.stage.MainDialogue().GetAngeboren().GetStoreVersion()
-	ourVersion := u.GetKonfig().GetImmutableConfig().GetStoreVersion()
+	ourVersion := u.GetConfig().GetImmutableConfig().GetStoreVersion()
 
 	if ourVersion.Less(theirVersion) {
 		err = errors.Normal(ErrPullRemoteHasHigherVersion)
@@ -236,7 +236,7 @@ func (c client) AkteReader(
 
 	var ow sha.WriteCloser
 
-	if ow, err = c.umwelt.Standort().BlobWriter(); err != nil {
+	if ow, err = c.env.GetFSHome().BlobWriter(); err != nil {
 		if c.stage.ShouldIgnoreConnectionError(err) {
 			err = nil
 		} else {

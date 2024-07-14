@@ -7,12 +7,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"github.com/google/shlex"
 )
 
 type EachAkte struct {
-	*umwelt.Umwelt
+	*env.Env
 	Utility string
 }
 

@@ -18,16 +18,16 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 // Switch to External store
 type Import struct {
-	Bestandsaufnahme string
-	Akten            string
-	AgeIdentity      age.Identity
-	CompressionType  immutable_config.CompressionType
-	Proto            sku.Proto
+	InventoryList   string
+	Blobs           string
+	AgeIdentity     age.Identity
+	CompressionType immutable_config.CompressionType
+	sku.Proto
 }
 
 func init() {
@@ -38,8 +38,8 @@ func init() {
 				CompressionType: immutable_config.CompressionTypeDefault,
 			}
 
-			f.StringVar(&c.Bestandsaufnahme, "bestandsaufnahme", "", "")
-			f.StringVar(&c.Akten, "akten", "", "")
+			f.StringVar(&c.InventoryList, "bestandsaufnahme", "", "")
+			f.StringVar(&c.Blobs, "akten", "", "")
 			f.Var(&c.AgeIdentity, "age-identity", "")
 			c.CompressionType.AddToFlagSet(f)
 
@@ -50,15 +50,15 @@ func init() {
 	)
 }
 
-func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c Import) Run(u *env.Env, args ...string) (err error) {
 	hasConflicts := false
 
-	if c.Bestandsaufnahme == "" {
+	if c.InventoryList == "" {
 		err = errors.Errorf("empty Bestandsaufnahme")
 		return
 	}
 
-	if c.Akten == "" {
+	if c.Blobs == "" {
 		err = errors.Errorf("empty Akten")
 		return
 	}
@@ -74,7 +74,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	ofo := object_inventory_format.Options{Tai: true, Verzeichnisse: true}
 
-	bf := inventory_list.MakeFormat(u.GetKonfig().GetStoreVersion(), ofo)
+	bf := inventory_list.MakeFormat(u.GetConfig().GetStoreVersion(), ofo)
 
 	var rc io.ReadCloser
 
@@ -82,7 +82,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	{
 		o := fs_home.FileReadOptions{
 			Age:             &ag,
-			Path:            c.Bestandsaufnahme,
+			Path:            c.InventoryList,
 			CompressionType: c.CompressionType,
 		}
 
@@ -165,18 +165,18 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 }
 
 func (c Import) importAkteIfNecessary(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	co *store_fs.CheckedOut,
 	ag *age.Age,
 	coErrPrinter interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	akteSha := co.External.GetBlobSha()
 
-	if u.Standort().HasAkte(u.GetKonfig().GetStoreVersion(), akteSha) {
+	if u.GetFSHome().HasAkte(u.GetConfig().GetStoreVersion(), akteSha) {
 		return
 	}
 
-	p := id.Path(akteSha, c.Akten)
+	p := id.Path(akteSha, c.Blobs)
 
 	o := fs_home.FileReadOptions{
 		Age:             ag,
@@ -201,7 +201,7 @@ func (c Import) importAkteIfNecessary(
 
 	var aw sha.WriteCloser
 
-	if aw, err = u.Standort().BlobWriter(); err != nil {
+	if aw, err = u.GetFSHome().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

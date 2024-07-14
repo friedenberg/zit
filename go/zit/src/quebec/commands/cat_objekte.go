@@ -9,24 +9,24 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
-type CatObjekte struct{}
+type CatBlob struct{}
 
 func init() {
 	registerCommand(
 		"cat-objekte",
 		func(_ *flag.FlagSet) Command {
-			c := &CatObjekte{}
+			c := &CatBlob{}
 
 			return c
 		},
 	)
 }
 
-func (c CatObjekte) Run(
-	u *umwelt.Umwelt,
+func (c CatBlob) Run(
+	u *env.Env,
 	args ...string,
 ) (err error) {
 	akteWriter := iter.MakeSyncSerializer(
@@ -52,7 +52,7 @@ func (c CatObjekte) Run(
 
 		me := errors.MakeMulti()
 
-		if err = c.akte(u, &sh, akteWriter); err == nil {
+		if err = c.blob(u, &sh, akteWriter); err == nil {
 			continue
 		}
 
@@ -83,14 +83,14 @@ func (c CatObjekte) Run(
 	return
 }
 
-func (c CatObjekte) akte(
-	u *umwelt.Umwelt,
+func (c CatBlob) blob(
+	u *env.Env,
 	sh *sha.Sha,
 	akteWriter interfaces.FuncIter[io.ReadCloser],
 ) (err error) {
 	var r io.ReadCloser
 
-	if r, err = u.Standort().BlobReader(sh); err != nil {
+	if r, err = u.GetFSHome().BlobReader(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

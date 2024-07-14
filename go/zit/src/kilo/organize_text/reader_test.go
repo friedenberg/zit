@@ -71,7 +71,7 @@ func makeAssignmentLineReader() assignmentLineReader {
 	}
 }
 
-func assertEqualObjekten(t *test_logz.T, expected, actual Objekten) {
+func assertEqualObjekten(t *test_logz.T, expected, actual Objects) {
 	t = t.Skip(1)
 
 	actual.Sort()
@@ -105,7 +105,7 @@ func TestAssignmentLineReaderOneHeadingNoZettels(t1 *testing.T) {
 			t.Fatalf("expected exactly 1 child")
 		}
 
-		actual := sub.root.Children[0].Etiketten
+		actual := sub.root.Children[0].Tags
 
 		if !ids.TagSetEquals(
 			actual,
@@ -140,7 +140,7 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 
 	{
 		expected := ids.MakeTagSet(ids.MustTag("wow"))
-		actual := sub.root.Children[0].Etiketten
+		actual := sub.root.Children[0].Tags
 
 		if !ids.TagSetEquals(
 			actual,
@@ -151,11 +151,11 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := make(Objekten, 0)
+		expected := make(Objects, 0)
 		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
 		expected.Add(makeObjWithHinAndBez(t, "dos/wow", "two/wow"))
 
-		actual := sub.root.Children[0].Objekten
+		actual := sub.root.Children[0].Objects
 
 		assertEqualObjekten(&t1, expected, actual)
 	}
@@ -187,7 +187,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 
 	{
 		expected := ids.MakeTagSet(ids.MustTag("wow"))
-		actual := sub.root.Children[0].Etiketten
+		actual := sub.root.Children[0].Tags
 
 		if !ids.TagSetEquals(
 			actual,
@@ -210,7 +210,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 			t.Fatalf("\nexpected: %d\n  actual: %d", 1, l)
 		}
 
-		actual := sub.root.Children[0].Children[0].Etiketten
+		actual := sub.root.Children[0].Children[0].Tags
 
 		if !ids.TagSetEquals(
 			actual,
@@ -221,11 +221,11 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 	}
 
 	{
-		expected := make(Objekten, 0)
+		expected := make(Objects, 0)
 		expected.Add(makeObjWithHinAndBez(t.T, "one/wow", "uno"))
 		expected.Add(makeObjWithHinAndBez(t.T, "dos/wow", "two/wow"))
 
-		actual := sub.root.Children[0].Children[0].Objekten
+		actual := sub.root.Children[0].Children[0].Objects
 
 		assertEqualObjekten(&t, expected, actual)
 	}
@@ -265,7 +265,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 
 	{
 		expected := ids.MakeTagSet(ids.MustTag("wow"))
-		actual := sub.root.Children[0].Etiketten
+		actual := sub.root.Children[0].Tags
 
 		if !ids.TagSetEquals(
 			actual,
@@ -283,7 +283,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 			t1.Fatalf("\nexpected: %d\n  actual: %d", 1, l)
 		}
 
-		actual := sub.root.Children[0].Children[0].Etiketten
+		actual := sub.root.Children[0].Children[0].Tags
 
 		if !ids.TagSetEquals(
 			actual,
@@ -295,7 +295,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 
 	{
 		expected := ids.MakeTagSet(ids.MustTag("cow"))
-		actual := sub.root.Children[1].Etiketten
+		actual := sub.root.Children[1].Tags
 
 		if !ids.TagSetEquals(
 			actual,
@@ -306,21 +306,21 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 	}
 
 	{
-		expected := make(Objekten, 0)
+		expected := make(Objects, 0)
 		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
 		expected.Add(makeObjWithHinAndBez(t, "dos/wow", "two/wow"))
 
-		actual := sub.root.Children[0].Objekten
+		actual := sub.root.Children[0].Objects
 
 		assertEqualObjekten(&t1, expected, actual)
 	}
 
 	{
-		expected := make(Objekten, 0)
+		expected := make(Objects, 0)
 		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
 		expected.Add(makeObjWithHinAndBez(t, "dos/wow", "two/wow"))
 
-		actual := sub.root.Children[1].Objekten
+		actual := sub.root.Children[1].Objects
 
 		assertEqualObjekten(&t1, expected, actual)
 	}
@@ -359,7 +359,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 
 	{
 		expected := ids.MakeTagSet(ids.MustTag("sub-wow"))
-		actual := sub.root.Children[0].Etiketten
+		actual := sub.root.Children[0].Tags
 
 		if !ids.TagSetEquals(actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
@@ -375,7 +375,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 			t1.Fatalf("\nexpected: %d\n  actual: %d", expLen, l)
 		}
 
-		actual := sub.root.Children[1].Etiketten
+		actual := sub.root.Children[1].Tags
 
 		if !ids.TagSetEquals(actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
@@ -383,21 +383,21 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 	}
 
 	{
-		expected := make(Objekten, 0)
+		expected := make(Objects, 0)
 		expected.Add(makeObjWithHinAndBez(t, "four/wow", "quatro"))
 		expected.Add(makeObjWithHinAndBez(t, "three/wow", "tres"))
 
-		actual := sub.root.Children[0].Objekten
+		actual := sub.root.Children[0].Objects
 
 		assertEqualObjekten(&t1, expected, actual)
 	}
 
 	{
-		expected := make(Objekten, 0)
+		expected := make(Objects, 0)
 		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
 		expected.Add(makeObjWithHinAndBez(t, "dos/wow", "two/wow"))
 
-		actual := sub.root.Children[1].Objekten
+		actual := sub.root.Children[1].Objects
 
 		assertEqualObjekten(&t1, expected, actual)
 	}
@@ -435,7 +435,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// `# task
 	{
 		expected := ids.MakeTagSet(ids.MustTag("task"))
-		actual := sub.root.Children[0].Etiketten
+		actual := sub.root.Children[0].Tags
 
 		if !ids.TagSetEquals(actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
@@ -445,11 +445,11 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// - [one/wow] uno
 	// - [two/wow] dos/wow
 	{
-		expected := make(Objekten, 0)
+		expected := make(Objects, 0)
 		expected.Add(makeObjWithHinAndBez(t, "one/wow", "uno"))
 		expected.Add(makeObjWithHinAndBez(t, "two/wow", "dos/wow"))
 
-		actual := sub.root.Children[0].Objekten
+		actual := sub.root.Children[0].Objects
 
 		assertEqualObjekten(&t1, expected, actual)
 	}
@@ -464,7 +464,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 			t1.Fatalf("\nexpected: %d\n  actual: %d", e, l)
 		}
 
-		actual := sub.root.Children[0].Children[0].Etiketten
+		actual := sub.root.Children[0].Children[0].Tags
 
 		if !ids.TagSetEquals(actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
@@ -474,7 +474,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// ### w-2022-07-09
 	{
 		expected := ids.MakeTagSet(ids.MustTag("w-2022-07-09"))
-		actual := sub.root.Children[0].Children[0].Children[0].Etiketten
+		actual := sub.root.Children[0].Children[0].Children[0].Tags
 
 		if !ids.TagSetEquals(actual, expected) {
 			t1.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
@@ -483,10 +483,10 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 	// - [three/wow] tres
 	{
-		expected := make(Objekten, 0)
+		expected := make(Objects, 0)
 		expected.Add(makeObjWithHinAndBez(t, "three/wow", "tres"))
 
-		actual := sub.root.Children[0].Children[0].Children[0].Objekten
+		actual := sub.root.Children[0].Children[0].Children[0].Objects
 
 		assertEqualObjekten(&t1, expected, actual)
 	}
@@ -494,10 +494,10 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// ##
 	// - [four/wow] quatro
 	{
-		expected := make(Objekten, 0)
+		expected := make(Objects, 0)
 		expected.Add(makeObjWithHinAndBez(t, "four/wow", "quatro"))
 
-		actual := sub.root.Children[0].Children[0].Objekten
+		actual := sub.root.Children[0].Children[0].Objects
 
 		assertEqualObjekten(&t1, expected, actual)
 	}
@@ -507,11 +507,11 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	// - [six/wow] seis
 	// `
 	{
-		expected := make(Objekten, 0)
+		expected := make(Objects, 0)
 		expected.Add(makeObjWithHinAndBez(t, "five/wow", "cinco"))
 		expected.Add(makeObjWithHinAndBez(t, "six/wow", "seis"))
 
-		actual := sub.root.Children[0].Children[1].Objekten
+		actual := sub.root.Children[0].Children[1].Objects
 
 		assertEqualObjekten(&t1, expected, actual)
 	}

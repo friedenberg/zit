@@ -12,17 +12,17 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
 type Add struct {
-	Dedupe              bool
-	Delete              bool
-	OpenAkten           bool
-	CheckoutAktenAndRun string
-	Organize            bool
-	Filter              script_value.ScriptValue
+	Dedupe             bool
+	Delete             bool
+	OpenBlob           bool
+	CheckoutBlobAndRun string
+	Organize           bool
+	Filter             script_value.ScriptValue
 
 	sku.Proto
 }
@@ -47,10 +47,10 @@ func init() {
 				"delete the zettel and akte after successful checkin",
 			)
 
-			f.BoolVar(&c.OpenAkten, "open-akten", false, "also open the Akten")
+			f.BoolVar(&c.OpenBlob, "open-akten", false, "also open the Akten")
 
 			f.StringVar(
-				&c.CheckoutAktenAndRun,
+				&c.CheckoutBlobAndRun,
 				"each-akte",
 				"",
 				"checkout each Akte and run a utility",
@@ -74,11 +74,11 @@ func (c Add) ModifyBuilder(b *query.Builder) {
 }
 
 func (c Add) Run(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	args ...string,
 ) (err error) {
-	zettelsFromAkteOp := user_ops.ZettelFromExternalAkte{
-		Umwelt: u,
+	zettelsFromAkteOp := user_ops.ZettelFromExternalBlob{
+		Env:    u,
 		Proto:  c.Proto,
 		Filter: c.Filter,
 		Delete: c.Delete,
@@ -119,7 +119,7 @@ func (c Add) Run(
 		return
 	}
 
-	if err = c.openAktenIfNecessary(u, zettelsFromAkteResults); err != nil {
+	if err = c.openBlobIfNecessary(u, zettelsFromAkteResults); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -129,11 +129,11 @@ func (c Add) Run(
 	}
 
 	opOrganize := user_ops.Organize{
-		Umwelt:   u,
+		Env:      u,
 		Metadata: c.Metadata,
 	}
 
-	if err = u.GetKonfig().DefaultTags.EachPtr(
+	if err = u.GetConfig().DefaultTags.EachPtr(
 		opOrganize.Metadata.AddTagPtr,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -148,20 +148,20 @@ func (c Add) Run(
 	return
 }
 
-func (c Add) openAktenIfNecessary(
-	u *umwelt.Umwelt,
+func (c Add) openBlobIfNecessary(
+	u *env.Env,
 	zettels sku.TransactedMutableSet,
 ) (err error) {
-	if !c.OpenAkten && c.CheckoutAktenAndRun == "" {
+	if !c.OpenBlob && c.CheckoutBlobAndRun == "" {
 		return
 	}
 
 	opCheckout := user_ops.Checkout{
-		Umwelt: u,
+		Env: u,
 		Options: checkout_options.Options{
 			CheckoutMode: checkout_mode.ModeAkteOnly,
 		},
-		Utility: c.CheckoutAktenAndRun,
+		Utility: c.CheckoutBlobAndRun,
 	}
 
 	if _, err = opCheckout.Run(

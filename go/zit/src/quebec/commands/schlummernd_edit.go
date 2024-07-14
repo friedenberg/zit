@@ -13,24 +13,24 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
-type EditSchlummernd struct{}
+type DormantEdit struct{}
 
 func init() {
 	registerCommand(
 		"schlummernd-edit",
 		func(f *flag.FlagSet) Command {
-			c := &EditSchlummernd{}
+			c := &DormantEdit{}
 
 			return c
 		},
 	)
 }
 
-func (c EditSchlummernd) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c DormantEdit) Run(u *env.Env, args ...string) (err error) {
 	if len(args) > 0 {
 		ui.Err().Print("Command edit-konfig ignores passed in arguments.")
 	}
@@ -62,8 +62,8 @@ func (c EditSchlummernd) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	return
 }
 
-func (c EditSchlummernd) editInVim(
-	u *umwelt.Umwelt,
+func (c DormantEdit) editInVim(
+	u *env.Env,
 ) (sh interfaces.Sha, err error) {
 	var p string
 
@@ -91,8 +91,8 @@ func (c EditSchlummernd) editInVim(
 	return
 }
 
-func (c EditSchlummernd) makeTempKonfigFile(
-	u *umwelt.Umwelt,
+func (c DormantEdit) makeTempKonfigFile(
+	u *env.Env,
 ) (p string, err error) {
 	var k *sku.Transacted
 
@@ -103,7 +103,7 @@ func (c EditSchlummernd) makeTempKonfigFile(
 
 	var f *os.File
 
-	if f, err = u.Standort().FileTempLocal(); err != nil {
+	if f, err = u.GetFSHome().FileTempLocal(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -122,8 +122,8 @@ func (c EditSchlummernd) makeTempKonfigFile(
 	return
 }
 
-func (c EditSchlummernd) readTempKonfigFile(
-	u *umwelt.Umwelt,
+func (c DormantEdit) readTempKonfigFile(
+	u *env.Env,
 	p string,
 ) (sh interfaces.Sha, err error) {
 	var f *os.File
@@ -141,7 +141,7 @@ func (c EditSchlummernd) readTempKonfigFile(
 
 	var aw interfaces.ShaWriteCloser
 
-	if aw, err = u.Standort().BlobWriter(); err != nil {
+	if aw, err = u.GetFSHome().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

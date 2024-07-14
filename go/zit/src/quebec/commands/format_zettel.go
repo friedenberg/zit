@@ -14,12 +14,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type FormatZettel struct {
-	Format   string
-	Kasten   ids.RepoId
+	Format string
+	ids.RepoId
 	UTIGroup string
 	Mode     checkout_mode.Mode
 }
@@ -34,7 +34,7 @@ func init() {
 
 			f.Var(&c.Mode, "mode", "zettel, akte, or both")
 
-			f.Var(&c.Kasten, "kasten", "none or Chrome")
+			f.Var(&c.RepoId, "kasten", "none or Chrome")
 
 			f.StringVar(
 				&c.UTIGroup,
@@ -48,7 +48,7 @@ func init() {
 	)
 }
 
-func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c *FormatZettel) Run(u *env.Env, args ...string) (err error) {
 	formatId := "text"
 
 	var kennungString string
@@ -87,12 +87,12 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		checkout_options.TextFormatterOptions{
 			DoNotWriteEmptyBezeichnung: true,
 		},
-		u.Standort(),
-		u.GetKonfig(),
+		u.GetFSHome(),
+		u.GetConfig(),
 		akteFormatter,
 	)
 
-	if err = u.GetKonfig().ApplyToNewMetadata(
+	if err = u.GetConfig().ApplyToNewMetadata(
 		zt,
 		u.GetStore().GetAkten().GetTypeV0(),
 	); err != nil {
@@ -114,7 +114,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 }
 
 func (c *FormatZettel) getSku(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	kennungString string,
 ) (sk *sku.Transacted, err error) {
 	b := u.MakeQueryBuilder(ids.MakeGenre(genres.Zettel))
@@ -138,7 +138,7 @@ func (c *FormatZettel) getSku(
 
 	if sk, err = u.GetStore().ReadTransactedFromKennungKastenSigil(
 		k,
-		c.Kasten,
+		c.RepoId,
 		s,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -149,7 +149,7 @@ func (c *FormatZettel) getSku(
 }
 
 func (c *FormatZettel) getAkteFormatter(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	zt *sku.Transacted,
 	formatId string,
 ) (akteFormatter script_config.RemoteScript, err error) {

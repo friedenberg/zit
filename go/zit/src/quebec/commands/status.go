@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type Status struct{}
@@ -28,7 +28,7 @@ func init() {
 	)
 }
 
-func (c Status) DefaultGattungen() ids.Genre {
+func (c Status) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.TrueGenre()...)
 }
 
@@ -39,7 +39,7 @@ func (c Status) ModifyBuilder(
 }
 
 func (c Status) RunWithQuery(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	eqwk *query.Group,
 ) (err error) {
 	pcol := u.PrinterCheckedOutForKasten(eqwk.RepoId)

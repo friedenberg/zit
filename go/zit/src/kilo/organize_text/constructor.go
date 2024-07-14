@@ -39,7 +39,7 @@ func (c *constructor) Make() (ot *Text, err error) {
 		return
 	}
 
-	c.Metadatei.Typ = c.Options.Typ
+	c.Metadata.Typ = c.Options.Type
 
 	if err = ot.Refine(); err != nil {
 		err = errors.Wrap(err)
@@ -98,7 +98,7 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 	anchored := ids.MakeMutableTagSet()
 	extras := ids.MakeMutableTagSet()
 
-	if err = c.rootEtiketten.Each(
+	if err = c.rootTags.Each(
 		func(re ids.Tag) (err error) {
 			var explicitCount, implicitCount int
 
@@ -132,7 +132,7 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 	}
 
 	c.TagSet = anchored
-	c.ExtraEtiketten = extras
+	c.ExtraTags = extras
 
 	// c.ExtraEtiketten = implicit
 	return
@@ -141,7 +141,7 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 func (c *constructor) populate() (err error) {
 	allUsed := makeObjSet()
 
-	for _, e := range iter.Elements(c.ExtraEtiketten) {
+	for _, e := range iter.Elements(c.ExtraTags) {
 		ee := c.makeChild(e)
 
 		segments := c.all.Subset(e)
@@ -149,7 +149,7 @@ func (c *constructor) populate() (err error) {
 		if err = c.makeChildrenWithPossibleGroups(
 			ee,
 			segments.Grouped,
-			c.GroupingEtiketten,
+			c.GroupingTags,
 			allUsed,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -171,7 +171,7 @@ func (c *constructor) populate() (err error) {
 	if err = c.makeChildrenWithPossibleGroups(
 		c.Assignment,
 		c.all,
-		c.GroupingEtiketten,
+		c.GroupingTags,
 		allUsed,
 	); err != nil {
 		err = errors.Wrapf(err, "Assignment: %#v", c.Assignment)
@@ -260,7 +260,7 @@ func (c *constructor) addGroupedChildren(
 			}
 
 			child := newAssignment(parent.GetDepth() + 1)
-			child.Etiketten = ids.MakeTagSet(e)
+			child.Tags = ids.MakeTagSet(e)
 			groupingEtiketten.DropFirst()
 
 			psv := MakePrefixSetFrom(zs)
@@ -300,7 +300,7 @@ func (c *constructor) makeAndAddUngrouped(
 				return
 			}
 
-			parent.AddObjekte(z)
+			parent.AddObject(z)
 
 			return
 		},

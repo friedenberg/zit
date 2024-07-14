@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -40,7 +40,7 @@ func init() {
 	)
 }
 
-func (c Edit) CompletionGattung() ids.Genre {
+func (c Edit) CompletionGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Tag,
 		genres.Zettel,
@@ -49,7 +49,7 @@ func (c Edit) CompletionGattung() ids.Genre {
 	)
 }
 
-func (c Edit) DefaultGattungen() ids.Genre {
+func (c Edit) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Tag,
 		genres.Zettel,
@@ -59,7 +59,7 @@ func (c Edit) DefaultGattungen() ids.Genre {
 }
 
 func (c Edit) RunWithQuery(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	eqwk *query.Group,
 ) (err error) {
 	options := checkout_options.Options{
@@ -67,7 +67,7 @@ func (c Edit) RunWithQuery(
 	}
 
 	opEdit := user_ops.Checkout{
-		Umwelt:  u,
+		Env:     u,
 		Options: options,
 		Edit:    true,
 	}

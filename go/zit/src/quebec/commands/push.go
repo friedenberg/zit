@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/remote_push"
 )
 
@@ -31,7 +31,7 @@ func init() {
 	)
 }
 
-func (c Push) CompletionGattung() ids.Genre {
+func (c Push) CompletionGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Zettel,
 		genres.Tag,
@@ -41,7 +41,7 @@ func (c Push) CompletionGattung() ids.Genre {
 	)
 }
 
-func (c Push) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c Push) Run(u *env.Env, args ...string) (err error) {
 	if len(args) == 0 {
 		err = errors.Normalf("must specify kasten to push from")
 		return

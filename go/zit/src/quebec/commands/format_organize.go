@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -30,8 +30,8 @@ func init() {
 	)
 }
 
-func (c *FormatOrganize) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	c.Flags.Konfig = u.GetKonfig()
+func (c *FormatOrganize) Run(u *env.Env, args ...string) (err error) {
+	c.Flags.Config = u.GetConfig()
 
 	if len(args) != 1 {
 		err = errors.Errorf("expected exactly one input argument")
@@ -58,7 +58,7 @@ func (c *FormatOrganize) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	// TODO move Abbr as required arg
 	ot.Options = c.Flags.GetOptions(
-		u.GetKonfig().PrintOptions,
+		u.GetConfig().PrintOptions,
 		nil,
 		u.SkuFmtOrganize(),
 		u.GetStore().GetAbbrStore().GetAbbr(),

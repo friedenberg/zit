@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type Show struct {
@@ -30,7 +30,7 @@ func init() {
 	)
 }
 
-func (c Show) CompletionGattung() ids.Genre {
+func (c Show) CompletionGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Zettel,
 		genres.Tag,
@@ -40,14 +40,14 @@ func (c Show) CompletionGattung() ids.Genre {
 	)
 }
 
-func (c Show) DefaultGattungen() ids.Genre {
+func (c Show) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Zettel,
 	)
 }
 
 func (c Show) RunWithQuery(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	eqwk *query.Group,
 ) (err error) {
 	var f interfaces.FuncIter[*sku.Transacted]

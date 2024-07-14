@@ -21,7 +21,7 @@ func (s *Store) ReadOneInto(
 	case genres.Zettel:
 		var h *ids.ZettelId
 
-		if h, err = s.GetAbbrStore().Hinweis().ExpandString(
+		if h, err = s.GetAbbrStore().ZettelId().ExpandString(
 			k1.String(),
 		); err == nil {
 			k1 = h

@@ -13,24 +13,24 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
-type EditKonfig struct{}
+type EditConfig struct{}
 
 func init() {
 	registerCommand(
 		"konfig-edit",
 		func(f *flag.FlagSet) Command {
-			c := &EditKonfig{}
+			c := &EditConfig{}
 
 			return c
 		},
 	)
 }
 
-func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c EditConfig) Run(u *env.Env, args ...string) (err error) {
 	if len(args) > 0 {
 		ui.Err().Print("Command edit-konfig ignores passed in arguments.")
 	}
@@ -62,8 +62,8 @@ func (c EditKonfig) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	return
 }
 
-func (c EditKonfig) editInVim(
-	u *umwelt.Umwelt,
+func (c EditConfig) editInVim(
+	u *env.Env,
 ) (sh interfaces.Sha, err error) {
 	var p string
 
@@ -91,8 +91,8 @@ func (c EditKonfig) editInVim(
 	return
 }
 
-func (c EditKonfig) makeTempKonfigFile(
-	u *umwelt.Umwelt,
+func (c EditConfig) makeTempKonfigFile(
+	u *env.Env,
 ) (p string, err error) {
 	var k *sku.Transacted
 
@@ -103,7 +103,7 @@ func (c EditKonfig) makeTempKonfigFile(
 
 	var f *os.File
 
-	if f, err = u.Standort().FileTempLocal(); err != nil {
+	if f, err = u.GetFSHome().FileTempLocal(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -122,8 +122,8 @@ func (c EditKonfig) makeTempKonfigFile(
 	return
 }
 
-func (c EditKonfig) readTempKonfigFile(
-	u *umwelt.Umwelt,
+func (c EditConfig) readTempKonfigFile(
+	u *env.Env,
 	p string,
 ) (sh interfaces.Sha, err error) {
 	var f *os.File
@@ -141,7 +141,7 @@ func (c EditKonfig) readTempKonfigFile(
 
 	var aw interfaces.ShaWriteCloser
 
-	if aw, err = u.Standort().BlobWriter(); err != nil {
+	if aw, err = u.GetFSHome().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -12,27 +12,27 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
-type CheckinAkte struct {
-	Delete       bool
-	NewEtiketten collections_ptr.Flag[ids.Tag, *ids.Tag]
+type CheckinBlob struct {
+	Delete  bool
+	NewTags collections_ptr.Flag[ids.Tag, *ids.Tag]
 }
 
 func init() {
 	registerCommand(
 		"checkin-akte",
 		func(f *flag.FlagSet) Command {
-			c := &CheckinAkte{
-				NewEtiketten: collections_ptr.MakeFlagCommas[ids.Tag](
+			c := &CheckinBlob{
+				NewTags: collections_ptr.MakeFlagCommas[ids.Tag](
 					collections_ptr.SetterPolicyAppend,
 				),
 			}
 
 			f.BoolVar(&c.Delete, "delete", false, "the checked-out file")
 			f.Var(
-				c.NewEtiketten,
+				c.NewTags,
 				"new-etiketten",
 				"comma-separated etiketten (will replace existing Etiketten)",
 			)
@@ -42,7 +42,7 @@ func init() {
 	)
 }
 
-func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c CheckinBlob) Run(u *env.Env, args ...string) (err error) {
 	if len(args)%2 != 0 {
 		err = errors.Errorf(
 			"arguments must come in pairs of hinweis and akte path",
@@ -86,7 +86,7 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	for i, p := range pairs {
 		var ow sha.WriteCloser
 
-		if ow, err = u.Standort().BlobWriter(); err != nil {
+		if ow, err = u.GetFSHome().BlobWriter(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -133,9 +133,9 @@ func (c CheckinAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			return
 		}
 
-		if c.NewEtiketten.Len() > 0 {
+		if c.NewTags.Len() > 0 {
 			m := zettels[i].GetMetadata()
-			m.SetTags(c.NewEtiketten)
+			m.SetTags(c.NewTags)
 		}
 	}
 

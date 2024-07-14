@@ -17,7 +17,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -67,7 +67,7 @@ func (c *Organize) CompletionGattung() ids.Genre {
 }
 
 func (c *Organize) RunWithQuery(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	eqwk *query.Group,
 ) (err error) {
 	ms := eqwk
@@ -75,9 +75,9 @@ func (c *Organize) RunWithQuery(
 	u.ApplyToOrganizeOptions(&c.Options)
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
-		Umwelt: u,
+		Env: u,
 		Options: c.GetOptions(
-			u.GetKonfig().PrintOptions,
+			u.GetConfig().PrintOptions,
 			ms,
 			u.SkuFmtOrganize(),
 			u.GetStore().GetAbbrStore().GetAbbr(),
@@ -87,7 +87,7 @@ func (c *Organize) RunWithQuery(
 	typen := ms.GetTypes()
 
 	if typen.Len() == 1 {
-		createOrganizeFileOp.Typ = typen.Any()
+		createOrganizeFileOp.Type = typen.Any()
 	}
 
 	getResults := sku.MakeTransactedMutableSet()
@@ -116,7 +116,7 @@ func (c *Organize) RunWithQuery(
 		var f *os.File
 
 		if f, err = files.TempFileWithPattern(
-			"*." + u.GetKonfig().FileExtensions.Organize,
+			"*." + u.GetConfig().FileExtensions.Organize,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -148,7 +148,7 @@ func (c *Organize) RunWithQuery(
 		defer errors.Deferred(&err, u.Unlock)
 
 		commitOrganizeTextOp := user_ops.CommitOrganizeFile{
-			Umwelt: u,
+			Env: u,
 		}
 
 		if _, err = commitOrganizeTextOp.Run(
@@ -176,8 +176,8 @@ func (c *Organize) RunWithQuery(
 
 		var f *os.File
 
-		if f, err = u.Standort().FileTempLocalWithTemplate(
-			"*." + u.GetKonfig().FileExtensions.Organize,
+		if f, err = u.GetFSHome().FileTempLocalWithTemplate(
+			"*." + u.GetConfig().FileExtensions.Organize,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -207,7 +207,7 @@ func (c *Organize) RunWithQuery(
 		defer errors.Deferred(&err, u.Unlock)
 
 		commitOrganizeTextOp := user_ops.CommitOrganizeFile{
-			Umwelt: u,
+			Env: u,
 		}
 
 		if _, err = commitOrganizeTextOp.Run(
@@ -229,7 +229,7 @@ func (c *Organize) RunWithQuery(
 }
 
 func (c Organize) readFromVim(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	f string,
 	results *organize_text.Text,
 	q *query.Group,

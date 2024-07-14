@@ -9,7 +9,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -25,7 +25,7 @@ func init() {
 	)
 }
 
-func (c Exec) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c Exec) Run(u *env.Env, args ...string) (err error) {
 	if len(args) == 0 {
 		err = errors.Normalf("needs at least Sku and possibly function name")
 		return
@@ -49,7 +49,7 @@ func (c Exec) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	case strings.HasPrefix(sk.GetType().String(), "lua"):
 		execLuaOp := user_ops.ExecLua{
-			Umwelt: u,
+			Env: u,
 		}
 
 		if err = execLuaOp.Run(sk, args...); err != nil {
@@ -62,7 +62,7 @@ func (c Exec) Run(u *umwelt.Umwelt, args ...string) (err error) {
 }
 
 func (c Exec) runBash(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	tz *sku.Transacted,
 	args ...string,
 ) (err error) {
@@ -71,7 +71,7 @@ func (c Exec) runBash(
 	func() {
 		var ar io.ReadCloser
 
-		if ar, err = u.Standort().BlobReader(
+		if ar, err = u.GetFSHome().BlobReader(
 			tz.GetBlobSha(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -80,7 +80,7 @@ func (c Exec) runBash(
 
 		var f *os.File
 
-		if f, err = u.Standort().FileTempLocal(); err != nil {
+		if f, err = u.GetFSHome().FileTempLocal(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

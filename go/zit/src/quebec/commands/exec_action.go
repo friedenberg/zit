@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type ExecAction struct {
@@ -34,14 +34,14 @@ func init() {
 	)
 }
 
-func (c ExecAction) DefaultGattungen() ids.Genre {
+func (c ExecAction) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Zettel,
 	)
 }
 
 func (c ExecAction) RunWithQuery(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	ms *query.Group,
 ) (err error) {
 	if !c.Action.WasSet() {
@@ -52,7 +52,7 @@ func (c ExecAction) RunWithQuery(
 	var sc script_config.ScriptConfig
 	ok := false
 
-	if sc, ok = u.GetKonfig().Actions[c.Action.String()]; !ok {
+	if sc, ok = u.GetConfig().Actions[c.Action.String()]; !ok {
 		err = errors.Normalf(
 			"Konfig Action '%s' not found",
 			c.Action.String(),
@@ -86,7 +86,7 @@ func (c ExecAction) RunWithQuery(
 }
 
 func (c ExecAction) runAction(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	sc script_config.ScriptConfig,
 	object_id_provider interfaces.SetLike[ids.IdLike],
 ) (err error) {
@@ -95,7 +95,7 @@ func (c ExecAction) runAction(
 	if wt, err = script_config.MakeWriterTo(
 		sc,
 		map[string]string{
-			"ZIT_BIN": u.Standort().Executable(),
+			"ZIT_BIN": u.GetFSHome().Executable(),
 		},
 		iter.Strings[ids.IdLike](object_id_provider)...,
 	); err != nil {

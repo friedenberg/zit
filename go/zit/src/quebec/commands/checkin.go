@@ -7,13 +7,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
 type Checkin struct {
 	Delete     bool
-	IgnoreAkte bool
+	IgnoreBlob bool
 }
 
 func init() {
@@ -25,7 +25,7 @@ func init() {
 			f.BoolVar(&c.Delete, "delete", false, "the checked-out file")
 
 			f.BoolVar(
-				&c.IgnoreAkte,
+				&c.IgnoreBlob,
 				"ignore-akte",
 				false,
 				"do not change the akte",
@@ -36,12 +36,12 @@ func init() {
 	)
 }
 
-func (c Checkin) DefaultGattungen() ids.Genre {
+func (c Checkin) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.TrueGenre()...)
 }
 
 func (c Checkin) RunWithQuery(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	eqwk *query.Group,
 ) (err error) {
 	op := user_ops.Checkin{

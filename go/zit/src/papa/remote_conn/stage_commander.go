@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type MessageHiCommander struct {
@@ -75,7 +75,7 @@ func (c StageCommander) ShouldIgnoreConnectionError(in error) (ok bool) {
 }
 
 func MakeStageCommander(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	from string,
 	command string,
 ) (s *StageCommander, err error) {
@@ -97,14 +97,14 @@ func MakeStageCommander(
 	}()
 
 	s = &StageCommander{
-		Angeboren:           u.GetKonfig(),
+		Angeboren:           u.GetConfig(),
 		wg:                  &sync.WaitGroup{},
-		konfigCli:           u.GetKonfig().Cli(),
+		konfigCli:           u.GetConfig().Cli(),
 		chRemoteCommandDone: make(chan struct{}),
 	}
 
 	s.remoteActorCmd = exec.Command(
-		u.Standort().Executable(),
+		u.GetFSHome().Executable(),
 		"listen",
 		"-dir-zit",
 		from,

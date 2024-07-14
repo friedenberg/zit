@@ -46,7 +46,7 @@ func (a *Assignment) addToSet(
 ) (err error) {
 	expanded := ids.MakeTagMutableSet()
 
-	if err = a.AllEtiketten(expanded); err != nil {
+	if err = a.AllTags(expanded); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -71,8 +71,8 @@ func (a *Assignment) addToSet(
 					return
 				}
 
-				if !ot.Metadatei.Typ.IsEmpty() {
-					z.Metadata.Type.ResetWith(ot.Metadatei.Typ)
+				if !ot.Metadata.Typ.IsEmpty() {
+					z.Metadata.Type.ResetWith(ot.Metadata.Typ)
 				}
 
 				out.Add(z)
@@ -84,8 +84,8 @@ func (a *Assignment) addToSet(
 					z.Metadata.Type.ResetWith(zPrime.Metadata.Type)
 				}
 
-				if !ot.Metadatei.Typ.IsEmpty() {
-					z.Metadata.Type.ResetWith(ot.Metadatei.Typ)
+				if !ot.Metadata.Typ.IsEmpty() {
+					z.Metadata.Type.ResetWith(ot.Metadata.Typ)
 				}
 			}
 

@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 func Run(args []string) (exitStatus int) {
@@ -78,16 +78,16 @@ func Run(args []string) (exitStatus int) {
 
 	cmdArgs := cmd.Args()
 
-	var u *umwelt.Umwelt
+	var u *env.Env
 
-	options := umwelt.OptionsEmpty
+	options := env.OptionsEmpty
 
-	if og, ok := cmd.Command.(umwelt.OptionsGetter); ok {
-		options = og.GetUmweltInitializeOptions()
+	if og, ok := cmd.Command.(env.OptionsGetter); ok {
+		options = og.GetEnvironmentInitializeOptions()
 	}
 
-	if u, err = umwelt.Make(cmd.FlagSet, konfigCli, options); err != nil {
-		if cmd.sansUmwelt {
+	if u, err = env.Make(cmd.FlagSet, konfigCli, options); err != nil {
+		if cmd.withoutEnv {
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -99,7 +99,7 @@ func Run(args []string) (exitStatus int) {
 	defer errors.DeferredFlusher(&err, u)
 
 	switch {
-	case u.GetKonfig().Complete:
+	case u.GetConfig().Complete:
 		var t WithCompletion
 		ok := false
 
@@ -120,7 +120,7 @@ func Run(args []string) (exitStatus int) {
 	}
 
 	if err == nil {
-		if err = u.Standort().ResetTemp(); err != nil {
+		if err = u.GetFSHome().ResetTemp(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

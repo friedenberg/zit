@@ -17,11 +17,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/object_collections"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type CreateFromPaths struct {
-	*umwelt.Umwelt
+	*env.Env
 	sku.Proto
 	TextParser object_metadata.TextParser
 	Filter     script_value.ScriptValue
@@ -118,12 +118,12 @@ func (c CreateFromPaths) Run(
 	if err = toDelete.Each(
 		func(z *store_fs.External) (err error) {
 			// TODO-P2 move to checkout store
-			if err = c.Standort().Delete(z.GetObjekteFD().GetPath()); err != nil {
+			if err = c.GetFSHome().Delete(z.GetObjekteFD().GetPath()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			pathRel := c.Standort().RelToCwdOrSame(z.GetObjekteFD().GetPath())
+			pathRel := c.GetFSHome().RelToCwdOrSame(z.GetObjekteFD().GetPath())
 
 			// TODO-P2 move to printer
 			ui.Out().Printf("[%s] (deleted)", pathRel)

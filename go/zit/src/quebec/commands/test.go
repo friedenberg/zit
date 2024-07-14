@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type Test struct{}
@@ -27,7 +27,7 @@ func init() {
 	)
 }
 
-func (c Test) CompletionGattung() ids.Genre {
+func (c Test) CompletionGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Zettel,
 		genres.Tag,
@@ -37,7 +37,7 @@ func (c Test) CompletionGattung() ids.Genre {
 	)
 }
 
-func (c Test) DefaultGattungen() ids.Genre {
+func (c Test) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Zettel,
 		genres.Tag,
@@ -48,7 +48,7 @@ func (c Test) DefaultGattungen() ids.Genre {
 }
 
 func (c Test) RunWithQuery(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	ms *query.Group,
 ) (err error) {
 	if err = u.GetStore().QueryWithKasten(

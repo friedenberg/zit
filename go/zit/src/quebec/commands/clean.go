@@ -11,14 +11,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type Clean struct {
-	force                     bool
-	includeRecognizedAkten    bool
-	includeRecognizedZettelen bool
-	includeMutter             bool
+	force                    bool
+	includeRecognizedBlobs   bool
+	includeRecognizedZettels bool
+	includeParent            bool
 }
 
 func init() {
@@ -35,21 +35,21 @@ func init() {
 			)
 
 			f.BoolVar(
-				&c.includeMutter,
+				&c.includeParent,
 				"include-mutter",
 				false,
 				"remove Objekten in working directory if they match their Mutter",
 			)
 
 			f.BoolVar(
-				&c.includeRecognizedAkten,
+				&c.includeRecognizedBlobs,
 				"recognized-akten",
 				false,
 				"remove Akten in working directory or args that are recognized",
 			)
 
 			f.BoolVar(
-				&c.includeRecognizedZettelen,
+				&c.includeRecognizedZettels,
 				"recognized-zettelen",
 				false,
 				"remove Zetteln in working directory or args that are recognized",
@@ -60,12 +60,12 @@ func init() {
 	)
 }
 
-func (c Clean) DefaultGattungen() ids.Genre {
+func (c Clean) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.TrueGenre()...)
 }
 
 func (c Clean) shouldClean(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	co sku.CheckedOutLike,
 	eqwk *query.Group,
 ) bool {
@@ -83,7 +83,7 @@ func (c Clean) shouldClean(
 		return eqwk.IncludeRecognized
 	}
 
-	if c.includeMutter {
+	if c.includeParent {
 		mutter, err := u.GetStore().GetVerzeichnisse().ReadOneObjectSha(
 			co.GetSku().Metadata.Mutter(),
 		)
@@ -107,7 +107,7 @@ func (c Clean) ModifyBuilder(b *query.Builder) {
 }
 
 func (c Clean) RunWithQuery(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	eqwk *query.Group,
 ) (err error) {
 	fds := fd.MakeMutableSet()

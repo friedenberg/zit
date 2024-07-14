@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/remote_transfers"
 )
 
@@ -25,7 +25,7 @@ func init() {
 	)
 }
 
-func (c Pull) CompletionGattung() ids.Genre {
+func (c Pull) CompletionGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Zettel,
 		genres.Tag,
@@ -35,7 +35,7 @@ func (c Pull) CompletionGattung() ids.Genre {
 	)
 }
 
-func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c Pull) Run(u *env.Env, args ...string) (err error) {
 	if len(args) == 0 {
 		err = errors.Normalf("must specify kasten to pull from")
 		return
@@ -51,7 +51,7 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	}
 
 	builder := u.MakeQueryBuilderExcludingHidden(
-		c.CompletionGattung(),
+		c.CompletionGenres(),
 	)
 
 	var qg *query.Group

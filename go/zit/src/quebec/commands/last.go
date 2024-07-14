@@ -13,12 +13,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
 type Last struct {
-	Kasten   ids.RepoId
+	RepoId   ids.RepoId
 	Edit     bool
 	Organize bool
 	Format   string
@@ -30,7 +30,7 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Last{}
 
-			f.Var(&c.Kasten, "kasten", "none or Chrome")
+			f.Var(&c.RepoId, "kasten", "none or Chrome")
 			f.StringVar(&c.Format, "format", "log", "format")
 			f.BoolVar(&c.Organize, "organize", false, "")
 			f.BoolVar(&c.Edit, "edit", false, "")
@@ -40,13 +40,13 @@ func init() {
 	)
 }
 
-func (c Last) CompletionGattung() ids.Genre {
+func (c Last) CompletionGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.InventoryList,
 	)
 }
 
-func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c Last) Run(u *env.Env, args ...string) (err error) {
 	if len(args) != 0 {
 		ui.Err().Print("ignoring arguments")
 	}
@@ -80,7 +80,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	if c.Organize {
 		opOrganize := user_ops.Organize{
-			Umwelt: u,
+			Env: u,
 		}
 
 		if err = opOrganize.Run(nil, skus); err != nil {
@@ -92,8 +92,8 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			Options: checkout_options.Options{
 				CheckoutMode: checkout_mode.ModeObjekteAndAkte,
 			},
-			Umwelt: u,
-			Edit:   true,
+			Env:  u,
+			Edit: true,
 		}
 
 		if _, err = opCheckout.Run(skus); err != nil {
@@ -106,7 +106,7 @@ func (c Last) Run(u *umwelt.Umwelt, args ...string) (err error) {
 }
 
 func (c Last) runWithBestandsaufnahme(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	s := u.GetStore()

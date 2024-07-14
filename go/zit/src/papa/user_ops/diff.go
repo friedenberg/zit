@@ -19,13 +19,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type Diff struct {
-	*umwelt.Umwelt
-	Inline    object_metadata.TextFormatter
-	Metadatei object_metadata.TextFormatter
+	*env.Env
+	Inline   object_metadata.TextFormatter
+	Metadata object_metadata.TextFormatter
 }
 
 func (op Diff) Run(col sku.CheckedOutLike) (err error) {
@@ -81,8 +81,8 @@ func (op Diff) Run(col sku.CheckedOutLike) (err error) {
 	}
 
 	// sameTyp := il.GetTyp().Equals(el.GetTyp())
-	internalInline := op.GetKonfig().IsInlineType(il.GetType())
-	externalInline := op.GetKonfig().IsInlineType(el.GetType())
+	internalInline := op.GetConfig().IsInlineType(il.GetType())
+	externalInline := op.GetConfig().IsInlineType(el.GetType())
 
 	var externalFD *fd.FD
 
@@ -92,20 +92,20 @@ func (op Diff) Run(col sku.CheckedOutLike) (err error) {
 			wg.Do(op.makeDo(wLeft, op.Inline, il))
 			wg.Do(op.makeDo(wRight, op.Inline, el))
 		} else {
-			wg.Do(op.makeDo(wLeft, op.Metadatei, il))
-			wg.Do(op.makeDo(wRight, op.Metadatei, el))
+			wg.Do(op.makeDo(wLeft, op.Metadata, il))
+			wg.Do(op.makeDo(wRight, op.Metadata, el))
 		}
 
 		externalFD = el.GetObjekteFD()
 
 	case internalInline && externalInline:
-		wg.Do(op.makeDoAkte(wLeft, op.Standort(), il.GetBlobSha()))
+		wg.Do(op.makeDoAkte(wLeft, op.GetFSHome(), il.GetBlobSha()))
 		wg.Do(op.makeDoFD(wRight, el.GetAkteFD()))
 		externalFD = el.GetAkteFD()
 
 	default:
-		wg.Do(op.makeDo(wLeft, op.Metadatei, il))
-		wg.Do(op.makeDo(wRight, op.Metadatei, el))
+		wg.Do(op.makeDo(wLeft, op.Metadata, il))
+		wg.Do(op.makeDo(wRight, op.Metadata, el))
 		externalFD = el.GetAkteFD()
 	}
 
@@ -115,7 +115,7 @@ func (op Diff) Run(col sku.CheckedOutLike) (err error) {
 		strings.ToLower(il.GetGenre().GetGenreString()),
 	)
 
-	externalLabel := op.Standort().Rel(externalFD.GetPath())
+	externalLabel := op.GetFSHome().Rel(externalFD.GetPath())
 
 	todo.Change("disambiguate internal and external, and objekte / akte")
 	cmd := exec.Command(

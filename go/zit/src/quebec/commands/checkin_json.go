@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type CheckinJson struct{}
@@ -23,7 +23,7 @@ func init() {
 	)
 }
 
-func (c CheckinJson) DefaultGattungen() ids.Genre {
+func (c CheckinJson) DefaultGenres() ids.Genre {
 	return ids.MakeGenre()
 }
 
@@ -34,7 +34,7 @@ type TomlBookmark struct {
 }
 
 func (c CheckinJson) Run(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	args ...string,
 ) (err error) {
 	dec := json.NewDecoder(u.In())

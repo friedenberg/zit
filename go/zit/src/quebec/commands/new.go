@@ -10,12 +10,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
 type New struct {
-	Kasten ids.RepoId
+	ids.RepoId
 	Delete bool
 	Count  int
 	// TODO combine organize and edit and refactor
@@ -33,7 +33,7 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &New{}
 
-			f.Var(&c.Kasten, "kasten", "none or Chrome")
+			f.Var(&c.RepoId, "kasten", "none or Chrome")
 
 			f.BoolVar(
 				&c.Delete,
@@ -77,10 +77,10 @@ func init() {
 }
 
 func (c New) ValidateFlagsAndArgs(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	args ...string,
 ) (err error) {
-	if u.GetKonfig().DryRun && len(args) == 0 {
+	if u.GetConfig().DryRun && len(args) == 0 {
 		err = errors.Errorf(
 			"when -dry-run is set, paths to existing zettels must be provided",
 		)
@@ -90,7 +90,7 @@ func (c New) ValidateFlagsAndArgs(
 	return
 }
 
-func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c New) Run(u *env.Env, args ...string) (err error) {
 	if err = c.ValidateFlagsAndArgs(u, args...); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -101,11 +101,11 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	f := object_metadata.TextFormat{
 		TextFormatter: object_metadata.MakeTextFormatterMetadataInlineBlob(
 			cotfo,
-			u.Standort(),
+			u.GetFSHome(),
 			nil,
 		),
 		TextParser: object_metadata.MakeTextParser(
-			u.Standort(),
+			u.GetFSHome(),
 			nil,
 		),
 	}
@@ -127,7 +127,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	// TODO make mutually exclusive with organize
 	if c.Edit {
 		opCheckout := user_ops.Checkout{
-			Umwelt: u,
+			Env: u,
 			Options: checkout_options.Options{
 				CheckoutMode:         checkout_mode.ModeObjekteAndAkte,
 				TextFormatterOptions: cotfo,
@@ -143,7 +143,7 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	if c.Organize {
 		opOrganize := user_ops.Organize{
-			Umwelt:   u,
+			Env:      u,
 			Metadata: c.Metadata,
 		}
 
@@ -157,12 +157,12 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 }
 
 func (c New) readExistingFilesAsZettels(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	f object_metadata.TextParser,
 	args ...string,
 ) (zts sku.TransactedMutableSet, err error) {
 	opCreateFromPath := user_ops.CreateFromPaths{
-		Umwelt:     u,
+		Env:        u,
 		TextParser: f,
 		Filter:     c.Filter,
 		Delete:     c.Delete,
@@ -178,10 +178,10 @@ func (c New) readExistingFilesAsZettels(
 }
 
 func (c New) writeNewZettels(
-	u *umwelt.Umwelt,
+	u *env.Env,
 ) (zts sku.TransactedMutableSet, err error) {
 	emptyOp := user_ops.WriteNewZettels{
-		Umwelt: u,
+		Env: u,
 	}
 
 	if zts, err = emptyOp.RunMany(c.Proto, c.Count); err != nil {

@@ -5,21 +5,21 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type CommitOrganizeFile struct {
-	*umwelt.Umwelt
+	*env.Env
 	OutputJSON bool
 }
 
 type CommitOrganizeFileResults = organize_text.Changes
 
 func (c CommitOrganizeFile) ApplyToText(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	t *organize_text.Text,
 ) (err error) {
-	if u.GetKonfig().PrintOptions.PrintEtikettenAlways {
+	if u.GetConfig().PrintOptions.PrintEtikettenAlways {
 		return
 	}
 
@@ -42,7 +42,7 @@ func (c CommitOrganizeFile) ApplyToText(
 }
 
 func (op CommitOrganizeFile) Run(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	a, b *organize_text.Text,
 	original sku.TransactedSet,
 ) (results CommitOrganizeFileResults, err error) {
@@ -55,7 +55,7 @@ func (op CommitOrganizeFile) Run(
 }
 
 func (op CommitOrganizeFile) run(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	a, b *organize_text.Text,
 	original sku.TransactedSet,
 ) (cs CommitOrganizeFileResults, err error) {

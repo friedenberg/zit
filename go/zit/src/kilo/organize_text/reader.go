@@ -190,7 +190,7 @@ func (ar *assignmentLineReader) readOneHeadingLesserDepth(
 		// # zz-inbox
 		// `
 		assignment := newAssignment(d)
-		assignment.Etiketten = e.CloneSetPtrLike()
+		assignment.Tags = e.CloneSetPtrLike()
 		newCurrent.addChild(assignment)
 		// logz.Print("adding to parent")
 		// logz.Print("child", assignment.etiketten)
@@ -228,7 +228,7 @@ func (ar *assignmentLineReader) readOneHeadingEqualDepth(
 		// ## priority-2
 		// `
 		assignment := newAssignment(d)
-		assignment.Etiketten = e.CloneSetPtrLike()
+		assignment.Tags = e.CloneSetPtrLike()
 		newCurrent.addChild(assignment)
 		newCurrent = assignment
 	}
@@ -261,7 +261,7 @@ func (ar *assignmentLineReader) readOneHeadingGreaterDepth(
 		// ### priority-2
 		// `
 		assignment := newAssignment(d)
-		assignment.Etiketten = e.CloneSetPtrLike()
+		assignment.Tags = e.CloneSetPtrLike()
 		newCurrent.addChild(assignment)
 		// logz.Print("adding to parent")
 		// logz.Print("child", assignment)
@@ -314,7 +314,7 @@ func (ar *assignmentLineReader) readOneObj(
 			return
 		}
 
-		ar.currentAssignment.AddObjekte(&z)
+		ar.currentAssignment.AddObject(&z)
 
 		return
 	}
@@ -324,7 +324,7 @@ func (ar *assignmentLineReader) readOneObj(
 		return
 	}
 
-	ar.currentAssignment.AddObjekte(&z)
+	ar.currentAssignment.AddObject(&z)
 
 	return
 }

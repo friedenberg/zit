@@ -18,7 +18,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -56,13 +56,13 @@ func init() {
 	)
 }
 
-func (c *OrganizeJSON) DefaultGattungen() ids.Genre {
+func (c *OrganizeJSON) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Zettel,
 	)
 }
 
-func (c *OrganizeJSON) CompletionGattung() ids.Genre {
+func (c *OrganizeJSON) CompletionGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Zettel,
 		genres.Tag,
@@ -71,15 +71,15 @@ func (c *OrganizeJSON) CompletionGattung() ids.Genre {
 }
 
 func (c *OrganizeJSON) RunWithQuery(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	ms *query.Group,
 ) (err error) {
 	u.ApplyToOrganizeOptions(&c.Options)
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
-		Umwelt: u,
+		Env: u,
 		Options: c.GetOptions(
-			u.GetKonfig().PrintOptions,
+			u.GetConfig().PrintOptions,
 			ms,
 			u.SkuFmtOrganize(),
 			u.GetStore().GetAbbrStore().GetAbbr(),
@@ -93,7 +93,7 @@ func (c *OrganizeJSON) RunWithQuery(
 		break
 
 	case 1:
-		createOrganizeFileOp.Typ = typen.Any()
+		createOrganizeFileOp.Type = typen.Any()
 
 	default:
 		err = errors.Errorf(
@@ -103,8 +103,8 @@ func (c *OrganizeJSON) RunWithQuery(
 		return
 	}
 
-	u.GetKonfig().DryRun = true
-	u.GetKonfig().PrintOptions.Abbreviations.Hinweisen = false
+	u.GetConfig().DryRun = true
+	u.GetConfig().PrintOptions.Abbreviations.Hinweisen = false
 
 	var transacted []sku_fmt.Json
 
@@ -120,7 +120,7 @@ func (c *OrganizeJSON) RunWithQuery(
 	for _, j := range transacted {
 		sk := sku.GetTransactedPool().Get()
 
-		if err = j.ToTransacted(sk, u.Standort()); err != nil {
+		if err = j.ToTransacted(sk, u.GetFSHome()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -141,7 +141,7 @@ func (c *OrganizeJSON) RunWithQuery(
 	var f *os.File
 
 	if f, err = files.TempFileWithPattern(
-		"*." + u.GetKonfig().FileExtensions.Organize,
+		"*." + u.GetConfig().FileExtensions.Organize,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -179,7 +179,7 @@ func (c *OrganizeJSON) RunWithQuery(
 	defer errors.Deferred(&err, u.Unlock)
 
 	commitOrganizeTextOp := user_ops.CommitOrganizeFile{
-		Umwelt:     u,
+		Env:        u,
 		OutputJSON: true,
 	}
 
@@ -197,7 +197,7 @@ func (c *OrganizeJSON) RunWithQuery(
 }
 
 func (c OrganizeJSON) readFromVim(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	p string,
 	results *organize_text.Text,
 	q sku.QueryGroup,

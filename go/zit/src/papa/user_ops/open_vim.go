@@ -3,7 +3,7 @@ package user_ops
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type OpenVim struct {
@@ -11,7 +11,7 @@ type OpenVim struct {
 }
 
 func (c OpenVim) Run(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	args ...string,
 ) (err error) {
 	op := store_fs.Open{

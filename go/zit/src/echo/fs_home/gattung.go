@@ -157,7 +157,7 @@ func (s Home) ReadAllShas(
 	return
 }
 
-func (s Home) ReadAllShasForGattung(
+func (s Home) ReadAllShasForGenre(
 	sv interfaces.StoreVersion,
 	g interfaces.GenreGetter,
 	w interfaces.FuncIter[*sha.Sha],

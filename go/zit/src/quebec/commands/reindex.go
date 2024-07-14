@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type Reindex struct{}
@@ -20,11 +20,11 @@ func init() {
 	)
 }
 
-func (c Reindex) GetUmweltInitializeOptions() umwelt.Options {
-	return umwelt.OptionsAllowKonfigReadError
+func (c Reindex) GetEnvInitializeOptions() env.Options {
+	return env.OptionsAllowConfigReadError
 }
 
-func (c Reindex) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c Reindex) Run(u *env.Env, args ...string) (err error) {
 	if len(args) > 0 {
 		err = errors.Errorf("reindex does not support arguments")
 		return
@@ -37,7 +37,7 @@ func (c Reindex) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	defer errors.Deferred(&err, u.Unlock)
 
-	if err = u.GetKonfig().Reset(); err != nil {
+	if err = u.GetConfig().Reset(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -34,18 +34,18 @@ func init() {
 	)
 }
 
-func (c Checkout) DefaultGattungen() ids.Genre {
+func (c Checkout) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Zettel,
 	)
 }
 
 func (c Checkout) RunWithQuery(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	eqwk *query.Group,
 ) (err error) {
 	opCheckout := user_ops.Checkout{
-		Umwelt:  u,
+		Env:     u,
 		Options: c.CheckoutOptions,
 	}
 

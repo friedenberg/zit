@@ -5,23 +5,23 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
-type SchlummerndAdd struct{}
+type DormantAdd struct{}
 
 func init() {
 	registerCommand(
 		"schlummernd-add",
 		func(f *flag.FlagSet) Command {
-			c := &SchlummerndAdd{}
+			c := &DormantAdd{}
 
 			return c
 		},
 	)
 }
 
-func (c SchlummerndAdd) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c DormantAdd) Run(u *env.Env, args ...string) (err error) {
 	if err = u.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return

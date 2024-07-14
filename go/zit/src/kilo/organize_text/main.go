@@ -11,7 +11,7 @@ import (
 
 type Text struct {
 	Options
-	Metadatei
+	Metadata
 	*Assignment
 }
 
@@ -42,7 +42,7 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 	r1.stringFormatReader = &t.skuFmt
 
 	mr := object_metadata.Reader{
-		Metadata: &t.Metadatei,
+		Metadata: &t.Metadata,
 		Blob:     r1,
 	}
 
@@ -86,19 +86,19 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 	lw := format.NewLineWriter()
 
-	kopf, schwanz := ot.MaxKopfUndSchwanz(ot.Options)
+	kopf, schwanz := ot.MaxHeadAndTail(ot.Options)
 
 	l := ot.MaxLen()
 
-	omit := ot.UseMetadateiHeader && ot.HasMetadataContent()
+	omit := ot.UseMetadateaHeader && ot.HasMetadataContent()
 
 	aw := assignmentLineWriter{
 		LineWriter:           lw,
 		maxDepth:             ot.MaxDepth(),
-		maxKopf:              kopf,
-		maxSchwanz:           schwanz,
+		maxHead:              kopf,
+		maxTail:           schwanz,
 		maxLen:               l,
-		Metadatei:            ot.AsMetadatei(),
+		Metadata:            ot.AsMetadatei(),
 		RightAlignedIndents:  ot.UseRightAlignedIndents,
 		OmitLeadingEmptyLine: omit,
 	}
@@ -133,9 +133,9 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		Blob: lw,
 	}
 
-	if ot.UseMetadateiHeader {
+	if ot.UseMetadateaHeader {
 		ot.Matchers = ot.commentMatchers
-		mw.Metadata = ot.Metadatei
+		mw.Metadata = ot.Metadata
 	}
 
 	if n, err = mw.WriteTo(out); err != nil {

@@ -133,7 +133,7 @@ func (ocf optionCommentDryRun) String() string {
 }
 
 func (ocf optionCommentDryRun) ApplyToText(o Options, a *Assignment) (err error) {
-	o.Konfig.DryRun = values.Bool(ocf).Bool()
+	o.Config.DryRun = values.Bool(ocf).Bool()
 	return
 }
 
@@ -141,7 +141,7 @@ func (ocf optionCommentDryRun) ApplyToReader(
 	o Options,
 	a *assignmentLineReader,
 ) (err error) {
-	o.Konfig.DryRun = values.Bool(ocf).Bool()
+	o.Config.DryRun = values.Bool(ocf).Bool()
 	return
 }
 
@@ -149,6 +149,6 @@ func (ocf optionCommentDryRun) ApplyToWriter(
 	f Options,
 	aw *assignmentLineWriter,
 ) (err error) {
-	f.Konfig.DryRun = values.Bool(ocf).Bool()
+	f.Config.DryRun = values.Bool(ocf).Bool()
 	return
 }

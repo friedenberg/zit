@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type Validate struct{}
@@ -30,7 +30,7 @@ func (c Validate) ModifyBuilder(b *query.Builder) {
 }
 
 func (c Validate) RunWithQuery(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	qg *query.Group,
 ) (err error) {
 	var failureCount atomic.Int32

@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type Revert struct {
@@ -30,7 +30,7 @@ func init() {
 	)
 }
 
-func (c Revert) CompletionGattung() ids.Genre {
+func (c Revert) CompletionGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Zettel,
 		genres.Tag,
@@ -40,7 +40,7 @@ func (c Revert) CompletionGattung() ids.Genre {
 	)
 }
 
-func (c Revert) DefaultGattungen() ids.Genre {
+func (c Revert) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Zettel,
 		genres.Tag,
@@ -56,7 +56,7 @@ type revertTuple struct {
 }
 
 func (c Revert) RunWithQuery(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	ms *query.Group,
 ) (err error) {
 	f := func(rt revertTuple) (err error) {
@@ -95,7 +95,7 @@ func (c Revert) RunWithQuery(
 }
 
 func (c Revert) runRevertFromQuery(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	eq *query.Group,
 	f interfaces.FuncIter[revertTuple],
 ) (err error) {
@@ -113,7 +113,7 @@ func (c Revert) runRevertFromQuery(
 }
 
 func (c Revert) runRevertFromLast(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	f interfaces.FuncIter[revertTuple],
 ) (err error) {
 	s := u.GetStore()

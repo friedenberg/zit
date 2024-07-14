@@ -19,7 +19,7 @@ import (
 
 // TODO-P4 make generic
 type AbbrStore interface {
-	Hinweis() AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId]
+	ZettelId() AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId]
 	Kisten() AbbrStoreGeneric[ids.RepoId, *ids.RepoId]
 	Shas() AbbrStoreGeneric[sha.Sha, *sha.Sha]
 	Etiketten() AbbrStoreGeneric[ids.Tag, *ids.Tag]
@@ -165,10 +165,10 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 }
 
 func (i *indexAbbr) GetAbbr() (out ids.Abbr) {
-	out.Hinweis.Expand = i.Hinweis().ExpandStringString
+	out.Hinweis.Expand = i.ZettelId().ExpandStringString
 	out.Sha.Expand = i.Shas().ExpandStringString
 
-	out.Hinweis.Abbreviate = i.Hinweis().Abbreviate
+	out.Hinweis.Abbreviate = i.ZettelId().Abbreviate
 	out.Sha.Abbreviate = i.Shas().Abbreviate
 
 	return
@@ -222,7 +222,7 @@ func (i *indexAbbr) Exists(k *ids.ObjectId) (err error) {
 
 	switch k.GetGenre() {
 	case genres.Zettel:
-		err = i.Hinweis().Exists(k.Parts())
+		err = i.ZettelId().Exists(k.Parts())
 
 	case genres.Type:
 		err = i.Typen().Exists(k.Parts())
@@ -244,7 +244,7 @@ func (i *indexAbbr) Exists(k *ids.ObjectId) (err error) {
 	return
 }
 
-func (i *indexAbbr) Hinweis() (asg AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId]) {
+func (i *indexAbbr) ZettelId() (asg AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId]) {
 	asg = &i.indexAbbrEncodableTridexes.Hinweis
 
 	return

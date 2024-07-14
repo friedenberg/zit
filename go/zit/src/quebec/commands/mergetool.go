@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type Mergetool struct{}
@@ -32,12 +32,12 @@ func init() {
 	)
 }
 
-func (c Mergetool) DefaultGattungen() ids.Genre {
+func (c Mergetool) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.TrueGenre()...)
 }
 
 func (c Mergetool) RunWithQuery(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	qg *query.Group,
 ) (err error) {
 	conflicted := sku.MakeCheckedOutLikeMutableSet()
@@ -92,7 +92,7 @@ func (c Mergetool) RunWithQuery(
 
 			s := sku_fmt.MakeFormatBestandsaufnahmeScanner(
 				br,
-				object_inventory_format.FormatForVersion(u.GetKonfig().GetStoreVersion()),
+				object_inventory_format.FormatForVersion(u.GetConfig().GetStoreVersion()),
 				u.GetStore().GetObjekteFormatOptions(),
 			)
 

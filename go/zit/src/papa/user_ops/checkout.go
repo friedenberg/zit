@@ -9,11 +9,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type Checkout struct {
-	*umwelt.Umwelt
+	*env.Env
 	checkout_options.Options
 	Open    bool
 	Edit    bool
@@ -37,7 +37,7 @@ func (op Checkout) RunWithKasten(
 	kasten ids.RepoId,
 	skus sku.TransactedSet,
 ) (zsc sku.CheckedOutLikeMutableSet, err error) {
-	b := op.Umwelt.MakeQueryBuilder(
+	b := op.Env.MakeQueryBuilder(
 		ids.MakeGenre(genres.Zettel),
 	).WithTransacted(
 		skus,
@@ -66,7 +66,7 @@ func (op Checkout) RunQuery(
 	zsc = sku.MakeCheckedOutLikeMutableSet()
 	var l sync.Mutex
 
-	if err = op.Umwelt.GetStore().CheckoutQuery(
+	if err = op.Env.GetStore().CheckoutQuery(
 		op.Options,
 		eqwk,
 		func(col sku.CheckedOutLike) (err error) {
@@ -90,7 +90,7 @@ func (op Checkout) RunQuery(
 	if op.Utility != "" {
 		eachAkteOp := EachAkte{
 			Utility: op.Utility,
-			Umwelt:  op.Umwelt,
+			Env:     op.Env,
 		}
 
 		if err = eachAkteOp.Run(zsc); err != nil {
@@ -129,7 +129,7 @@ func (op Checkout) RunQuery(
 		checkinOp := Checkin{}
 
 		if err = checkinOp.Run(
-			op.Umwelt,
+			op.Env,
 			ms,
 		); err != nil {
 			err = errors.Wrap(err)

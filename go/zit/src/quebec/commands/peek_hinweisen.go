@@ -8,23 +8,23 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
-type PeekHinweisen struct{}
+type PeekZettelIds struct{}
 
 func init() {
 	registerCommand(
 		"peek-hinweisen",
 		func(f *flag.FlagSet) Command {
-			c := &PeekHinweisen{}
+			c := &PeekZettelIds{}
 
 			return c
 		},
 	)
 }
 
-func (c PeekHinweisen) Run(store *umwelt.Umwelt, args ...string) (err error) {
+func (c PeekZettelIds) Run(store *env.Env, args ...string) (err error) {
 	n := 0
 
 	if len(args) > 0 {

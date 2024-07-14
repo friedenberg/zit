@@ -61,13 +61,13 @@ func sortObjSet(
 	return
 }
 
-type Objekten []*obj
+type Objects []*obj
 
-func (os Objekten) Len() int {
+func (os Objects) Len() int {
 	return len(os)
 }
 
-func (os *Objekten) Each(f interfaces.FuncIter[*obj]) (err error) {
+func (os *Objects) Each(f interfaces.FuncIter[*obj]) (err error) {
 	for _, v := range *os {
 		if err = f(v); err != nil {
 			if iter.IsStopIteration(err) {
@@ -83,7 +83,7 @@ func (os *Objekten) Each(f interfaces.FuncIter[*obj]) (err error) {
 	return
 }
 
-func (os Objekten) Any() *obj {
+func (os Objects) Any() *obj {
 	for _, v := range os {
 		return v
 	}
@@ -91,12 +91,12 @@ func (os Objekten) Any() *obj {
 	return nil
 }
 
-func (os *Objekten) Add(v *obj) error {
+func (os *Objects) Add(v *obj) error {
 	*os = append(*os, v)
 	return nil
 }
 
-func (os *Objekten) Del(v *obj) error {
+func (os *Objects) Del(v *obj) error {
 	for i, v1 := range *os {
 		if v == v1 {
 			*os = append((*os)[:i], (*os)[i+1:]...)
@@ -107,7 +107,7 @@ func (os *Objekten) Del(v *obj) error {
 	return nil
 }
 
-func (os Objekten) Sort() {
+func (os Objects) Sort() {
 	out := os
 
 	sort.Slice(out, func(i, j int) bool {

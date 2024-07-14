@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -30,7 +30,7 @@ func init() {
 	)
 }
 
-func (c Diff) DefaultGattungen() ids.Genre {
+func (c Diff) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.TrueGenre()...)
 }
 
@@ -41,7 +41,7 @@ func (c Diff) ModifyBuilder(
 }
 
 func (c Diff) RunWithQuery(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	qg *query.Group,
 ) (err error) {
 	co := checkout_options.TextFormatterOptions{
@@ -49,15 +49,15 @@ func (c Diff) RunWithQuery(
 	}
 
 	opDiffFS := user_ops.Diff{
-		Umwelt: u,
+		Env: u,
 		Inline: object_metadata.MakeTextFormatterMetadataInlineBlob(
 			co,
-			u.Standort(),
+			u.GetFSHome(),
 			nil,
 		),
-		Metadatei: object_metadata.MakeTextFormatterMetadataOnly(
+		Metadata: object_metadata.MakeTextFormatterMetadataOnly(
 			co,
-			u.Standort(),
+			u.GetFSHome(),
 			nil,
 		),
 	}

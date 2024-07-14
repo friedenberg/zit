@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/remote_conn"
 	"code.linenisgreat.com/zit/go/zit/src/papa/remote_transfers"
 )
@@ -23,7 +23,7 @@ func init() {
 	)
 }
 
-func (c Listen) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c Listen) Run(u *env.Env, args ...string) (err error) {
 	if len(args) == 0 {
 		err = errors.Normalf("must specify command to listen for")
 		return

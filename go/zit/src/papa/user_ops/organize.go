@@ -14,11 +14,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type Organize struct {
-	*umwelt.Umwelt
+	*env.Env
 	object_metadata.Metadata
 }
 
@@ -36,7 +36,7 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 		}
 	}
 
-	otFlags := organize_text.MakeFlagsWithMetadatei(u.Metadata)
+	otFlags := organize_text.MakeFlagsWithMetadata(u.Metadata)
 	u.ApplyToOrganizeOptions(&otFlags.Options)
 	// otFlags.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
 	mwk := sku.MakeTransactedMutableSet()
@@ -48,9 +48,9 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 	otFlags.Transacted = mwk
 
 	createOrganizeFileOp := CreateOrganizeFile{
-		Umwelt: u.Umwelt,
+		Env: u.Env,
 		Options: otFlags.GetOptions(
-			u.GetKonfig().PrintOptions,
+			u.GetConfig().PrintOptions,
 			qg,
 			u.SkuFmtOrganize(),
 			u.GetStore().GetAbbrStore().GetAbbr(),
@@ -61,8 +61,8 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 
 	var f *os.File
 
-	if f, err = u.Standort().FileTempLocalWithTemplate(
-		"*." + u.GetKonfig().FileExtensions.Organize,
+	if f, err = u.GetFSHome().FileTempLocalWithTemplate(
+		"*." + u.GetConfig().FileExtensions.Organize,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -86,7 +86,7 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 				Build(),
 		}
 
-		if err = openVimOp.Run(u.Umwelt, f.Name()); err != nil {
+		if err = openVimOp.Run(u.Env, f.Name()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -103,7 +103,7 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 			return
 		}
 
-		if ot2, err = readOrganizeTextOp.Run(u.Umwelt, f); err != nil {
+		if ot2, err = readOrganizeTextOp.Run(u.Env, f); err != nil {
 			if u.handleReadChangesError(err) {
 				err = nil
 				continue
@@ -117,7 +117,7 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 	}
 
 	commitOrganizeTextOp := CommitOrganizeFile{
-		Umwelt: u.Umwelt,
+		Env: u.Env,
 	}
 
 	if err = u.Lock(); err != nil {
@@ -128,7 +128,7 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 	defer errors.Deferred(&err, u.Unlock)
 
 	if _, err = commitOrganizeTextOp.Run(
-		u.Umwelt,
+		u.Env,
 		createOrganizeFileResults,
 		ot2,
 		mwk,

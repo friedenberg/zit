@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/remote_conn"
 )
 
@@ -24,13 +24,13 @@ type Client interface {
 }
 
 type client struct {
-	umwelt             *umwelt.Umwelt
+	env                *env.Env
 	stage              *remote_conn.StageCommander
 	chDone             chan struct{}
 	chFilterSkuTickets chan struct{}
 }
 
-func MakeClient(u *umwelt.Umwelt, from string) (c *client, err error) {
+func MakeClient(u *env.Env, from string) (c *client, err error) {
 	c = &client{
 		chDone:             make(chan struct{}),
 		chFilterSkuTickets: make(chan struct{}, concurrentSkuFilterJobLimit),

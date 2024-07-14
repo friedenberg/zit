@@ -8,31 +8,31 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
-type CatAkteShas struct{}
+type CatBlobShas struct{}
 
 func init() {
 	registerCommand(
 		"cat-akte-shas",
 		func(f *flag.FlagSet) Command {
-			c := &CatAkteShas{}
+			c := &CatBlobShas{}
 
 			return c
 		},
 	)
 }
 
-func (c CatAkteShas) CompletionGattung() ids.Genre {
+func (c CatBlobShas) CompletionGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Blob,
 	)
 }
 
-func (c CatAkteShas) Run(u *umwelt.Umwelt, _ ...string) (err error) {
-	if err = u.Standort().ReadAllShasForGattung(
-		u.GetKonfig().GetStoreVersion(),
+func (c CatBlobShas) Run(u *env.Env, _ ...string) (err error) {
+	if err = u.GetFSHome().ReadAllShasForGenre(
+		u.GetConfig().GetStoreVersion(),
 		genres.Blob,
 		func(s *sha.Sha) (err error) {
 			_, err = fmt.Fprintln(u.Out(), s)

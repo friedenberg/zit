@@ -12,16 +12,16 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
-type WriteObjekte struct{}
+type WriteBlob struct{}
 
 func init() {
 	registerCommand(
 		"write-objekte",
 		func(f *flag.FlagSet) Command {
-			c := &WriteObjekte{}
+			c := &WriteBlob{}
 
 			return c
 		},
@@ -33,7 +33,7 @@ type answer struct {
 	Path string
 }
 
-func (c WriteObjekte) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c WriteBlob) Run(u *env.Env, args ...string) (err error) {
 	wg := &sync.WaitGroup{}
 	wg.Add(len(args))
 	chCancel := make(chan struct{})
@@ -55,7 +55,7 @@ func (c WriteObjekte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 			chCancel,
 			chError,
 			wg,
-			u.Standort(),
+			u.GetFSHome(),
 			a,
 		)
 	}
@@ -71,7 +71,7 @@ func (c WriteObjekte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	return
 }
 
-func (c WriteObjekte) doOne(
+func (c WriteBlob) doOne(
 	chCancel <-chan struct{},
 	chError chan<- error,
 	wg *sync.WaitGroup,

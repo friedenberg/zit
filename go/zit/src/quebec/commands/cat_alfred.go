@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/india/alfred"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type CatAlfred struct {
@@ -27,7 +27,7 @@ func init() {
 	)
 }
 
-func (c CatAlfred) CompletionGattung() ids.Genre {
+func (c CatAlfred) CompletionGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Tag,
 		genres.Zettel,
@@ -35,7 +35,7 @@ func (c CatAlfred) CompletionGattung() ids.Genre {
 	)
 }
 
-func (c CatAlfred) DefaultGattungen() ids.Genre {
+func (c CatAlfred) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Tag,
 		genres.Zettel,
@@ -44,7 +44,7 @@ func (c CatAlfred) DefaultGattungen() ids.Genre {
 }
 
 func (c CatAlfred) RunWithQuery(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	ms *query.Group,
 ) (err error) {
 	// this command does its own error handling

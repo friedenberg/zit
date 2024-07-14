@@ -8,20 +8,20 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/remote_conn"
 )
 
 type PullServer struct {
-	umwelt *umwelt.Umwelt
-	stage  *remote_conn.StageSoldier
+	env   *env.Env
+	stage *remote_conn.StageSoldier
 }
 
 func MakePullServer(
-	u *umwelt.Umwelt,
+	u *env.Env,
 ) (s PullServer, err error) {
 	s = PullServer{
-		umwelt: u,
+		env: u,
 	}
 
 	if s.stage, err = remote_conn.MakeStageSoldier(u); err != nil {
@@ -78,7 +78,7 @@ func (op PullServer) akteReaderForSha(
 
 	var or io.ReadCloser
 
-	if or, err = op.umwelt.Standort().BlobReader(&sh); err != nil {
+	if or, err = op.env.GetFSHome().BlobReader(&sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -113,7 +113,7 @@ func (op PullServer) objekteReaderForSku(
 
 	ui.Log().Printf("received request: %#v", msg)
 
-	orf := op.umwelt.Standort().ObjekteReaderWriterFactory(msg.Gattung)
+	orf := op.env.GetFSHome().ObjekteReaderWriterFactory(msg.Gattung)
 
 	var or io.ReadCloser
 
@@ -150,7 +150,7 @@ func (op PullServer) skusForFilter(
 		return
 	}
 
-	if err = op.umwelt.GetStore().QueryWithKasten(
+	if err = op.env.GetStore().QueryWithKasten(
 		msg.MetaSet,
 		iter.MakeChain(
 			// zettel.MakeWriterKonfig(

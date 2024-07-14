@@ -14,9 +14,9 @@ import (
 func newAssignment(d int) *Assignment {
 	return &Assignment{
 		Depth:     d,
-		Etiketten: ids.MakeTagSet(),
-		objekten:  make(map[string]struct{}),
-		Objekten:  make(Objekten, 0),
+		Tags: ids.MakeTagSet(),
+		objects:  make(map[string]struct{}),
+		Objects:  make(Objects, 0),
 		Children:  make([]*Assignment, 0),
 	}
 }
@@ -24,24 +24,24 @@ func newAssignment(d int) *Assignment {
 type Assignment struct {
 	IsRoot    bool
 	Depth     int
-	Etiketten ids.TagSet
-	objekten  map[string]struct{}
-	Objekten
+	Tags ids.TagSet
+	objects  map[string]struct{}
+	Objects
 	Children []*Assignment
 	Parent   *Assignment
 }
 
-func (a *Assignment) AddObjekte(v *obj) (err error) {
+func (a *Assignment) AddObject(v *obj) (err error) {
 	k := key(&v.Transacted)
-	_, ok := a.objekten[k]
+	_, ok := a.objects[k]
 
 	if ok {
 		return
 	}
 
-	a.objekten[k] = struct{}{}
+	a.objects[k] = struct{}{}
 
-	return a.Objekten.Add(v)
+	return a.Objects.Add(v)
 }
 
 func (a Assignment) GetDepth() int {
@@ -67,9 +67,9 @@ func (a Assignment) MaxDepth() (d int) {
 }
 
 func (a Assignment) AlignmentSpacing() int {
-	if a.Etiketten.Len() == 1 && ids.IsDependentLeaf(a.Etiketten.Any()) {
+	if a.Tags.Len() == 1 && ids.IsDependentLeaf(a.Tags.Any()) {
 		return a.Parent.AlignmentSpacing() + len(
-			a.Parent.Etiketten.Any().String(),
+			a.Parent.Tags.Any().String(),
 		)
 	}
 
@@ -77,7 +77,7 @@ func (a Assignment) AlignmentSpacing() int {
 }
 
 func (a Assignment) MaxLen() (m int) {
-	a.Objekten.Each(
+	a.Objects.Each(
 		func(z *obj) (err error) {
 			oM := z.ObjectId.Len()
 
@@ -100,10 +100,10 @@ func (a Assignment) MaxLen() (m int) {
 	return
 }
 
-func (a Assignment) MaxKopfUndSchwanz(
+func (a Assignment) MaxHeadAndTail(
 	o Options,
 ) (kopf, schwanz int) {
-	a.Objekten.Each(
+	a.Objects.Each(
 		func(z *obj) (err error) {
 			oKopf, oSchwanz := z.ObjectId.LenHeadAndTail()
 
@@ -129,7 +129,7 @@ func (a Assignment) MaxKopfUndSchwanz(
 	)
 
 	for _, c := range a.Children {
-		zKopf, zSchwanz := c.MaxKopfUndSchwanz(o)
+		zKopf, zSchwanz := c.MaxHeadAndTail(o)
 
 		if zKopf > kopf {
 			kopf = zKopf
@@ -148,19 +148,19 @@ func (a Assignment) String() (s string) {
 		s = a.Parent.String() + "."
 	}
 
-	return s + iter.StringCommaSeparated(a.Etiketten)
+	return s + iter.StringCommaSeparated(a.Tags)
 }
 
 func (a *Assignment) makeChild(e ids.Tag) (b *Assignment) {
 	b = newAssignment(a.GetDepth() + 1)
-	b.Etiketten = ids.MakeTagSet(e)
+	b.Tags = ids.MakeTagSet(e)
 	a.addChild(b)
 	return
 }
 
 func (a *Assignment) makeChildWithSet(es ids.TagSet) (b *Assignment) {
 	b = newAssignment(a.GetDepth() + 1)
-	b.Etiketten = es
+	b.Tags = es
 	a.addChild(b)
 	return
 }
@@ -260,8 +260,8 @@ func (a *Assignment) consume(b *Assignment) (err error) {
 		a.addChild(c)
 	}
 
-	b.Objekten.Each(a.AddObjekte)
-	b.Objekten.Each(b.Objekten.Del)
+	b.Objects.Each(a.AddObject)
+	b.Objects.Each(b.Objects.Del)
 
 	if err = b.removeFromParent(); err != nil {
 		err = errors.Wrap(err)
@@ -271,14 +271,14 @@ func (a *Assignment) consume(b *Assignment) (err error) {
 	return
 }
 
-func (a *Assignment) AllEtiketten(mes ids.TagMutableSet) (err error) {
+func (a *Assignment) AllTags(mes ids.TagMutableSet) (err error) {
 	if a == nil {
 		return
 	}
 
 	var es ids.TagSet
 
-	if es, err = a.expandedEtiketten(); err != nil {
+	if es, err = a.expandedTags(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -288,7 +288,7 @@ func (a *Assignment) AllEtiketten(mes ids.TagMutableSet) (err error) {
 		return
 	}
 
-	if err = a.Parent.AllEtiketten(mes); err != nil {
+	if err = a.Parent.AllTags(mes); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -296,23 +296,23 @@ func (a *Assignment) AllEtiketten(mes ids.TagMutableSet) (err error) {
 	return
 }
 
-func (a *Assignment) expandedEtiketten() (es ids.TagSet, err error) {
+func (a *Assignment) expandedTags() (es ids.TagSet, err error) {
 	es = ids.MakeTagSet()
 
-	if a.Etiketten == nil {
+	if a.Tags == nil {
 		panic("etiketten are nil")
 	}
 
-	if a.Etiketten.Len() != 1 || a.Parent == nil {
-		es = a.Etiketten.CloneSetPtrLike()
+	if a.Tags.Len() != 1 || a.Parent == nil {
+		es = a.Tags.CloneSetPtrLike()
 		return
 	} else {
-		e := a.Etiketten.Any()
+		e := a.Tags.Any()
 
 		if ids.IsDependentLeaf(e) {
 			var pe ids.TagSet
 
-			if pe, err = a.Parent.expandedEtiketten(); err != nil {
+			if pe, err = a.Parent.expandedTags(); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -320,7 +320,7 @@ func (a *Assignment) expandedEtiketten() (es ids.TagSet, err error) {
 			if pe.Len() > 1 {
 				err = errors.Errorf(
 					"cannot infer full etikett for assignment because parent assignment has more than one etiketten: %s",
-					a.Parent.Etiketten,
+					a.Parent.Tags,
 				)
 
 				return
@@ -346,7 +346,7 @@ func (a *Assignment) expandedEtiketten() (es ids.TagSet, err error) {
 }
 
 func (a *Assignment) SubtractFromSet(es ids.TagMutableSet) (err error) {
-	if err = a.Etiketten.EachPtr(
+	if err = a.Tags.EachPtr(
 		func(e *ids.Tag) (err error) {
 			if err = es.EachPtr(
 				func(e1 *ids.Tag) (err error) {
@@ -376,7 +376,7 @@ func (a *Assignment) SubtractFromSet(es ids.TagMutableSet) (err error) {
 }
 
 func (a *Assignment) Contains(e *ids.Tag) bool {
-	if a.Etiketten.ContainsKey(e.String()) {
+	if a.Tags.ContainsKey(e.String()) {
 		return true
 	}
 
@@ -389,8 +389,8 @@ func (a *Assignment) Contains(e *ids.Tag) bool {
 
 func (parent *Assignment) SortChildren() {
 	sort.Slice(parent.Children, func(i, j int) bool {
-		esi := parent.Children[i].Etiketten
-		esj := parent.Children[j].Etiketten
+		esi := parent.Children[i].Tags
+		esj := parent.Children[j].Tags
 
 		if esi.Len() == 1 && esj.Len() == 1 {
 			ei := strings.TrimPrefix(esi.Any().String(), "-")

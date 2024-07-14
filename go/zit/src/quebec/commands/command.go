@@ -3,19 +3,19 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type Command interface {
-	Run(*umwelt.Umwelt, ...string) error
+	Run(*env.Env, ...string) error
 }
 
 type WithCompletion interface {
-	Complete(u *umwelt.Umwelt, args ...string) (err error)
+	Complete(u *env.Env, args ...string) (err error)
 }
 
 type command struct {
-	sansUmwelt bool
+	withoutEnv bool
 	Command
 	*flag.FlagSet
 }
@@ -41,7 +41,7 @@ func registerCommand(n string, makeFunc func(*flag.FlagSet) Command) {
 	}
 }
 
-func registerCommandSansUmwelt(n string, makeFunc func(*flag.FlagSet) Command) {
+func registerCommandWithoutEnvironment(n string, makeFunc func(*flag.FlagSet) Command) {
 	f := flag.NewFlagSet(n, flag.ExitOnError)
 
 	c := makeFunc(f)
@@ -51,7 +51,7 @@ func registerCommandSansUmwelt(n string, makeFunc func(*flag.FlagSet) Command) {
 	}
 
 	commands[n] = command{
-		sansUmwelt: true,
+		withoutEnv: true,
 		Command:    c,
 		FlagSet:    f,
 	}

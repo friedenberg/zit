@@ -5,32 +5,32 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type Init struct {
-	Einleitung umwelt.Einleitung
+	env.BigBang
 }
 
 func init() {
-	registerCommandSansUmwelt(
+	registerCommandWithoutEnvironment(
 		"init",
 		func(f *flag.FlagSet) Command {
 			c := &Init{
-				Einleitung: umwelt.Einleitung{
-					Angeboren: immutable_config.Default(),
+				BigBang: env.BigBang{
+					Config: immutable_config.Default(),
 				},
 			}
 
-			c.Einleitung.AddToFlagSet(f)
+			c.BigBang.AddToFlagSet(f)
 
 			return c
 		},
 	)
 }
 
-func (c Init) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	if err = u.Einleitung(c.Einleitung); err != nil {
+func (c Init) Run(u *env.Env, args ...string) (err error) {
+	if err = u.Start(c.BigBang); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

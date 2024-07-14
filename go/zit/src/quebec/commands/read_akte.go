@@ -9,31 +9,31 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
-type ReadAkte struct{}
+type ReadBlob struct{}
 
 func init() {
 	registerCommand(
 		"read-akte",
 		func(f *flag.FlagSet) Command {
-			c := &ReadAkte{}
+			c := &ReadBlob{}
 
 			return c
 		},
 	)
 }
 
-type readAkteEntry struct {
-	Akte string `json:"akte"`
+type readBlobEntry struct {
+	Blob string `json:"akte"`
 }
 
-func (c ReadAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c ReadBlob) Run(u *env.Env, args ...string) (err error) {
 	dec := json.NewDecoder(u.In())
 
 	for {
-		var entry readAkteEntry
+		var entry readBlobEntry
 
 		if err = dec.Decode(&entry); err != nil {
 			if errors.IsEOF(err) {
@@ -58,17 +58,17 @@ func (c ReadAkte) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	return
 }
 
-func (ReadAkte) readOneAkte(u *umwelt.Umwelt, entry readAkteEntry) (sh *sha.Sha, err error) {
+func (ReadBlob) readOneAkte(u *env.Env, entry readBlobEntry) (sh *sha.Sha, err error) {
 	var aw sha.WriteCloser
 
-	if aw, err = u.Standort().BlobWriter(); err != nil {
+	if aw, err = u.GetFSHome().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	defer errors.DeferredCloser(&err, aw)
 
-	if _, err = io.Copy(aw, strings.NewReader(entry.Akte)); err != nil {
+	if _, err = io.Copy(aw, strings.NewReader(entry.Blob)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

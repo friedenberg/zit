@@ -15,12 +15,12 @@ import (
 type assignmentLineWriter struct {
 	RightAlignedIndents  bool
 	OmitLeadingEmptyLine bool
-	Metadatei            object_metadata.Metadata
+	object_metadata.Metadata
 	*format.LineWriter
-	maxDepth            int
-	maxKopf, maxSchwanz int
-	maxLen              int
-	stringFormatWriter  interfaces.StringFormatWriter[*sku.Transacted]
+	maxDepth           int
+	maxHead, maxTail   int
+	maxLen             int
+	stringFormatWriter interfaces.StringFormatWriter[*sku.Transacted]
 }
 
 func (av assignmentLineWriter) write(a *Assignment) (err error) {
@@ -43,13 +43,13 @@ func (av assignmentLineWriter) writeNormal(a *Assignment) (err error) {
 		tab_prefix = strings.Repeat(" ", a.GetDepth()*2-(a.GetDepth())-1)
 	}
 
-	if a.Etiketten.Len() > 0 {
+	if a.Tags.Len() > 0 {
 		av.WriteLines(
 			fmt.Sprintf(
 				"%s%s %s",
 				tab_prefix,
 				strings.Repeat("#", a.GetDepth()),
-				iter.StringCommaSeparated(a.Etiketten),
+				iter.StringCommaSeparated(a.Tags),
 			),
 		)
 		av.WriteExactlyOneEmpty()
@@ -58,9 +58,9 @@ func (av assignmentLineWriter) writeNormal(a *Assignment) (err error) {
 	cursor := sku.GetTransactedPool().Get()
 	defer sku.GetTransactedPool().Put(cursor)
 
-	a.Objekten.Sort()
+	a.Objects.Sort()
 
-	for _, z := range a.Objekten {
+	for _, z := range a.Objects {
 		var sb strings.Builder
 
 		sb.WriteString(tab_prefix)
@@ -72,7 +72,7 @@ func (av assignmentLineWriter) writeNormal(a *Assignment) (err error) {
 		}
 
 		sku.TransactedResetter.ResetWith(cursor, &z.Transacted)
-		cursor.Metadata.Subtract(&av.Metadatei)
+		cursor.Metadata.Subtract(&av.Metadata)
 
 		if _, err = av.stringFormatWriter.WriteStringFormat(&sb, cursor); err != nil {
 			err = errors.Wrap(err)
@@ -82,7 +82,7 @@ func (av assignmentLineWriter) writeNormal(a *Assignment) (err error) {
 		av.WriteStringers(&sb)
 	}
 
-	if a.Objekten.Len() > 0 {
+	if a.Objects.Len() > 0 {
 		av.WriteExactlyOneEmpty()
 	}
 
@@ -98,7 +98,7 @@ func (av assignmentLineWriter) writeNormal(a *Assignment) (err error) {
 func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 	spaceCount := av.maxDepth
 
-	kopfUndSchwanz := av.maxKopf + av.maxSchwanz
+	kopfUndSchwanz := av.maxHead + av.maxTail
 
 	hinMaxWidth := 4
 
@@ -117,7 +117,7 @@ func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 		return
 	}
 
-	if a.Etiketten != nil && a.Etiketten.Len() > 0 {
+	if a.Tags != nil && a.Tags.Len() > 0 {
 		sharps := strings.Repeat("#", a.GetDepth())
 		alignmentSpacing := strings.Repeat(" ", a.AlignmentSpacing())
 
@@ -127,7 +127,7 @@ func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 				tab_prefix[len(sharps)-1:],
 				sharps,
 				alignmentSpacing,
-				iter.StringCommaSeparated(a.Etiketten),
+				iter.StringCommaSeparated(a.Tags),
 			),
 		)
 		av.WriteExactlyOneEmpty()
@@ -146,7 +146,7 @@ func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 		}
 
 		sku.TransactedResetter.ResetWith(cursor, &z.Transacted)
-		cursor.Metadata.Subtract(&av.Metadatei)
+		cursor.Metadata.Subtract(&av.Metadata)
 
 		mes := cursor.GetMetadata().GetTags().CloneMutableSetPtrLike()
 
@@ -167,16 +167,16 @@ func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 		return
 	}
 
-	a.Objekten.Sort()
+	a.Objects.Sort()
 
-	for _, z := range a.Objekten {
+	for _, z := range a.Objects {
 		if err = write(z); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	if a.Objekten.Len() > 0 {
+	if a.Objects.Len() > 0 {
 		av.WriteExactlyOneEmpty()
 	}
 

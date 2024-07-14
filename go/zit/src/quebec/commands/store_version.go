@@ -5,19 +5,19 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type StoreVersion struct {
-	Angeboren immutable_config.Config
+	immutable_config.Config
 }
 
 func init() {
-	registerCommandSansUmwelt(
+	registerCommandWithoutEnvironment(
 		"store-version",
 		func(f *flag.FlagSet) Command {
 			c := &StoreVersion{
-				Angeboren: immutable_config.Default(),
+				Config: immutable_config.Default(),
 			}
 
 			return c
@@ -25,8 +25,8 @@ func init() {
 	)
 }
 
-func (c StoreVersion) Run(u *umwelt.Umwelt, args ...string) (err error) {
-	ui.Out().Printf("%s\n", c.Angeboren.GetStoreVersion())
+func (c StoreVersion) Run(u *env.Env, args ...string) (err error) {
+	ui.Out().Printf("%s\n", c.Config.GetStoreVersion())
 
 	return
 }

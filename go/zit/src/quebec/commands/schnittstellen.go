@@ -13,10 +13,10 @@ type DefaultSigilGetter interface {
 	DefaultSigil() ids.Sigil
 }
 
-type DefaultGattungGetter interface {
-	DefaultGattungen() ids.Genre
+type DefaultGenresGetter interface {
+	DefaultGenres() ids.Genre
 }
 
-type CompletionGattungGetter interface {
-	CompletionGattung() ids.Genre
+type CompletionGenresGetter interface {
+	CompletionGenres() ids.Genre
 }

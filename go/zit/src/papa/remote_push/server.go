@@ -5,20 +5,20 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/remote_conn"
 )
 
 type Server struct {
-	umwelt *umwelt.Umwelt
-	stage  *remote_conn.StageSoldier
+	env   *env.Env
+	stage *remote_conn.StageSoldier
 }
 
 func MakeServer(
-	u *umwelt.Umwelt,
+	u *env.Env,
 ) (s Server, err error) {
 	s = Server{
-		umwelt: u,
+		env: u,
 	}
 
 	if s.stage, err = remote_conn.MakeStageSoldier(u); err != nil {
@@ -84,8 +84,8 @@ func (op Server) GetNeededSkus(
 			continue
 		}
 
-		if op.umwelt.Standort().HasObjekte(
-			op.umwelt.GetKonfig().GetStoreVersion(),
+		if op.env.GetFSHome().HasObjekte(
+			op.env.GetConfig().GetStoreVersion(),
 			sk.GetGenre(),
 			sk.GetObjectSha(),
 		) {

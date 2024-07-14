@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type Listener interface {
@@ -48,19 +48,19 @@ func (s StageSoldier) Close() (err error) {
 	return
 }
 
-func MakeStageSoldier(u *umwelt.Umwelt) (
+func MakeStageSoldier(u *env.Env) (
 	s *StageSoldier,
 	err error,
 ) {
 	s = &StageSoldier{
-		Angeboren:                 u.GetKonfig(),
+		Angeboren:                 u.GetConfig(),
 		chStopWaitingForDialogues: make(chan struct{}),
 		handlers:                  make(map[DialogueType]func(Dialogue) error),
 	}
 
 	var d string
 
-	if d, err = u.Standort().DirTempOS(); err != nil {
+	if d, err = u.GetFSHome().DirTempOS(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -93,7 +93,7 @@ func MakeStageSoldier(u *umwelt.Umwelt) (
 	}
 
 	s.mainDialogue = el.Dialogue
-	u.GetKonfig().SetCliFromCommander(el.MessageHiCommander.CliKonfig)
+	u.GetConfig().SetCliFromCommander(el.MessageHiCommander.CliKonfig)
 	ui.Log().Printf("set konfig")
 
 	if err = u.Reset(); err != nil {

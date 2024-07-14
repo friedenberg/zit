@@ -9,12 +9,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type CommandWithQuery interface {
 	RunWithQuery(
-		store *umwelt.Umwelt,
+		store *env.Env,
 		ids *query.Group,
 	) error
 }
@@ -26,20 +26,20 @@ type commandWithQuery struct {
 }
 
 func (c commandWithQuery) Complete(
-	u *umwelt.Umwelt,
+	u *env.Env,
 	args ...string,
 ) (err error) {
-	var cgg CompletionGattungGetter
+	var cgg CompletionGenresGetter
 	ok := false
 
-	if cgg, ok = c.CommandWithQuery.(CompletionGattungGetter); !ok {
+	if cgg, ok = c.CommandWithQuery.(CompletionGenresGetter); !ok {
 		return
 	}
 
 	w := sku_fmt.MakeWriterComplete(os.Stdout)
 	defer errors.DeferredCloser(&err, w)
 
-	b := u.MakeQueryBuilderExcludingHidden(cgg.CompletionGattung())
+	b := u.MakeQueryBuilderExcludingHidden(cgg.CompletionGenres())
 
 	if c.Group, err = b.BuildQueryGroupWithRepoId(
 		c.RepoId,
@@ -60,11 +60,11 @@ func (c commandWithQuery) Complete(
 	return
 }
 
-func (c commandWithQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
+func (c commandWithQuery) Run(u *env.Env, args ...string) (err error) {
 	b := u.MakeQueryBuilderExcludingHidden(ids.MakeGenre())
 
-	if dgg, ok := c.CommandWithQuery.(DefaultGattungGetter); ok {
-		b = b.WithDefaultGenres(dgg.DefaultGattungen())
+	if dgg, ok := c.CommandWithQuery.(DefaultGenresGetter); ok {
+		b = b.WithDefaultGenres(dgg.DefaultGenres())
 	}
 
 	if dsg, ok := c.CommandWithQuery.(DefaultSigilGetter); ok {
