@@ -43,7 +43,7 @@ func (s *Store) checkoutOneNew(
 	var e *KennungFDPair
 	ok := false
 
-	if e, ok = s.Get(&sz.Kennung); ok {
+	if e, ok = s.Get(&sz.ObjectId); ok {
 		var cze *External
 
 		if cze, err = s.ReadExternalFromKennungFDPair(
@@ -101,7 +101,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	var e *KennungFDPair
 	ok := false
 
-	if e, ok = s.Get(&sz.Kennung); !ok {
+	if e, ok = s.Get(&sz.ObjectId); !ok {
 		return
 	}
 
@@ -229,7 +229,7 @@ func (s *Store) shouldCheckOut(
 		return true
 	}
 
-	eq := object_metadata.EqualerSansTai.Equals(&cz.Internal.Metadatei, &cz.External.Metadatei)
+	eq := object_metadata.EqualerSansTai.Equals(&cz.Internal.Metadata, &cz.External.Metadata)
 
 	if eq {
 		return true
@@ -239,8 +239,8 @@ func (s *Store) shouldCheckOut(
 		return false
 	}
 
-	if mutter, err := s.externalStoreInfo.FuncReadSha(cz.Internal.Metadatei.Mutter()); err == nil {
-		if object_metadata.EqualerSansTai.Equals(&mutter.Metadatei, &cz.External.Metadatei) {
+	if mutter, err := s.externalStoreInfo.FuncReadSha(cz.Internal.Metadata.Mutter()); err == nil {
+		if object_metadata.EqualerSansTai.Equals(&mutter.Metadata, &cz.External.Metadata) {
 			return true
 		}
 	}
@@ -301,7 +301,7 @@ func (s *Store) PathForTransacted(dir string, tl *sku.Transacted) string {
 		dir,
 		fmt.Sprintf(
 			"%s.%s",
-			&tl.Kennung,
+			&tl.ObjectId,
 			s.FileExtensionForGattung(tl),
 		),
 	)

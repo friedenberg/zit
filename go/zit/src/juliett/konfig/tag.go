@@ -61,8 +61,8 @@ func (a *tag) Equals(b *tag) bool {
 	}
 
 	if !iter.SetEqualsPtr(
-		a.Transacted.Metadatei.Cache.GetImplicitTags(),
-		b.Transacted.Metadatei.Cache.GetImplicitTags(),
+		a.Transacted.Metadata.Cache.GetImplicitTags(),
+		b.Transacted.Metadata.Cache.GetImplicitTags(),
 	) {
 		return false
 	}
@@ -71,7 +71,7 @@ func (a *tag) Equals(b *tag) bool {
 }
 
 func (e *tag) Set(v string) (err error) {
-	return (&e.Transacted.Kennung).Set(v)
+	return (&e.Transacted.ObjectId).Set(v)
 }
 
 func (e *tag) String() string {
@@ -130,7 +130,7 @@ func (k *compiled) AccumulateImplicitTags(
 		return
 	}
 
-	if err = ek.Transacted.Metadatei.GetTags().Each(
+	if err = ek.Transacted.Metadata.GetTags().Each(
 		func(e1 ids.Tag) (err error) {
 			if k.ImplicitTags.Contains(e1, e) {
 				return

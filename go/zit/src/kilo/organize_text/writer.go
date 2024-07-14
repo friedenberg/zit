@@ -72,7 +72,7 @@ func (av assignmentLineWriter) writeNormal(a *Assignment) (err error) {
 		}
 
 		sku.TransactedResetter.ResetWith(cursor, &z.Transacted)
-		cursor.Metadatei.Subtract(&av.Metadatei)
+		cursor.Metadata.Subtract(&av.Metadatei)
 
 		if _, err = av.stringFormatWriter.WriteStringFormat(&sb, cursor); err != nil {
 			err = errors.Wrap(err)
@@ -146,7 +146,7 @@ func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 		}
 
 		sku.TransactedResetter.ResetWith(cursor, &z.Transacted)
-		cursor.Metadatei.Subtract(&av.Metadatei)
+		cursor.Metadata.Subtract(&av.Metadatei)
 
 		mes := cursor.GetMetadata().GetTags().CloneMutableSetPtrLike()
 
@@ -155,7 +155,7 @@ func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 			return
 		}
 
-		cursor.Metadatei.SetTags(mes)
+		cursor.Metadata.SetTags(mes)
 
 		if _, err = av.stringFormatWriter.WriteStringFormat(&sb, cursor); err != nil {
 			err = errors.Wrap(err)

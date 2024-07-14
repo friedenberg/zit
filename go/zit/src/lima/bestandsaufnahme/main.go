@@ -130,11 +130,11 @@ func (s *store) Create(
 	t = sku.GetTransactedPool().Get()
 
 	sku.TransactedResetter.Reset(t)
-	t.Metadatei.Description = bez
+	t.Metadata.Description = bez
 	t.SetBlobSha(sh)
 	tai := s.clock.GetTai()
 
-	if err = t.Kennung.SetWithIdLike(tai); err != nil {
+	if err = t.ObjectId.SetWithIdLike(tai); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -197,7 +197,7 @@ func (s *store) writeInventoryList(o *InventoryList) (sh *sha.Sha, err error) {
 			break
 		}
 
-		if sk.Metadatei.Sha().IsNull() {
+		if sk.Metadata.Sha().IsNull() {
 			err = errors.Errorf("empty sha: %s", sk)
 			return
 		}
@@ -230,7 +230,7 @@ func (s *store) readOnePath(p string) (o *sku.Transacted, err error) {
 	if err = o.CalculateObjectShas(); err != nil {
 		if errors.Is(err, object_inventory_format.ErrEmptyTai) {
 			var t ids.Tai
-			err1 := t.Set(o.Kennung.String())
+			err1 := t.Set(o.ObjectId.String())
 
 			if err1 != nil {
 				err = errors.Wrapf(err, "%#v", o)
@@ -263,7 +263,7 @@ func (s *store) ReadOneSku(besty, sh *sha.Sha) (o *sku.Transacted, err error) {
 
 	var ar interfaces.ShaReadCloser
 
-	if ar, err = s.af.BlobReader(&bestySku.Metadatei.Blob); err != nil {
+	if ar, err = s.af.BlobReader(&bestySku.Metadata.Blob); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -279,7 +279,7 @@ func (s *store) ReadOneSku(besty, sh *sha.Sha) (o *sku.Transacted, err error) {
 	for dec.Scan() {
 		o = dec.GetTransacted()
 
-		if !o.Metadatei.Sha().Equals(sh) {
+		if !o.Metadata.Sha().Equals(sh) {
 			continue
 		}
 

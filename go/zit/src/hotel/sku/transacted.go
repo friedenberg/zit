@@ -1,8 +1,6 @@
 package sku
 
 import (
-	"fmt"
-
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
@@ -16,8 +14,8 @@ import (
 )
 
 type Transacted struct {
-	Kennung   ids.ObjectId
-	Metadatei object_metadata.Metadata
+	ObjectId ids.ObjectId
+	Metadata object_metadata.Metadata
 }
 
 func (t *Transacted) GetSkuLike() SkuLike {
@@ -31,7 +29,7 @@ func (a *Transacted) SetFromTransacted(b *Transacted) (err error) {
 }
 
 func (t *Transacted) SetFromSkuLike(sk SkuLike) (err error) {
-	if err = t.Kennung.SetWithIdLike(sk.GetObjectId()); err != nil {
+	if err = t.ObjectId.SetWithIdLike(sk.GetObjectId()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -41,7 +39,7 @@ func (t *Transacted) SetFromSkuLike(sk SkuLike) (err error) {
 		return
 	}
 
-	object_metadata.Resetter.ResetWith(&t.Metadatei, sk.GetMetadata())
+	object_metadata.Resetter.ResetWith(&t.Metadata, sk.GetMetadata())
 	t.GetMetadata().Tai = sk.GetTai()
 
 	return
@@ -61,67 +59,17 @@ func (a *Transacted) Less(b *Transacted) bool {
 	return less
 }
 
-func (a *Transacted) String() string {
-	return fmt.Sprintf(
-		"%s %s %s",
-		&a.Kennung,
-		a.GetObjectSha(),
-		a.GetBlobSha(),
-	)
-}
-
-func (a *Transacted) StringKennungBezeichnung() string {
-	return fmt.Sprintf(
-		"[%s %q]",
-		&a.Kennung,
-		a.Metadatei.Description,
-	)
-}
-
-func (a *Transacted) StringKennungTai() string {
-	return fmt.Sprintf(
-		"%s@%s",
-		&a.Kennung,
-		a.GetTai().StringDefaultFormat(),
-	)
-}
-
-func (a *Transacted) StringKennungTaiAkte() string {
-	return fmt.Sprintf(
-		"%s@%s@%s",
-		&a.Kennung,
-		a.GetTai().StringDefaultFormat(),
-		a.GetBlobSha(),
-	)
-}
-
-func (a *Transacted) StringKennungSha() string {
-	return fmt.Sprintf(
-		"%s@%s",
-		&a.Kennung,
-		a.GetMetadata().Sha(),
-	)
-}
-
-func (a *Transacted) StringKennungMutter() string {
-	return fmt.Sprintf(
-		"%s^@%s",
-		&a.Kennung,
-		a.GetMetadata().Mutter(),
-	)
-}
-
 func (a *Transacted) GetSkuLikePtr() SkuLike {
 	return a
 }
 
 func (a *Transacted) GetTags() ids.TagSet {
-	return a.Metadatei.GetTags()
+	return a.Metadata.GetTags()
 }
 
 func (a *Transacted) AddTagPtr(e *ids.Tag) (err error) {
-	if a.Kennung.GetGenre() == genres.Tag {
-		e1 := ids.MustTag(a.Kennung.String())
+	if a.ObjectId.GetGenre() == genres.Tag {
+		e1 := ids.MustTag(a.ObjectId.String())
 		ex := ids.ExpandOne(&e1, expansion.ExpanderRight)
 
 		if ex.ContainsKey(ex.KeyPtr(e)) {
@@ -129,9 +77,9 @@ func (a *Transacted) AddTagPtr(e *ids.Tag) (err error) {
 		}
 	}
 
-	ek := a.Metadatei.Cache.GetImplicitTags().KeyPtr(e)
+	ek := a.Metadata.Cache.GetImplicitTags().KeyPtr(e)
 
-	if a.Metadatei.Cache.GetImplicitTags().ContainsKey(ek) {
+	if a.Metadata.Cache.GetImplicitTags().ContainsKey(ek) {
 		return
 	}
 
@@ -153,15 +101,15 @@ func (a *Transacted) AddTagPtrFast(e *ids.Tag) (err error) {
 }
 
 func (a *Transacted) GetType() ids.Type {
-	return a.Metadatei.Type
+	return a.Metadata.Type
 }
 
 func (a *Transacted) GetMetadata() *object_metadata.Metadata {
-	return &a.Metadatei
+	return &a.Metadata
 }
 
 func (a *Transacted) GetTai() ids.Tai {
-	return a.Metadatei.GetTai()
+	return a.Metadata.GetTai()
 }
 
 func (a *Transacted) SetTai(t ids.Tai) {
@@ -171,11 +119,11 @@ func (a *Transacted) SetTai(t ids.Tai) {
 }
 
 func (a *Transacted) GetObjectId() *ids.ObjectId {
-	return &a.Kennung
+	return &a.ObjectId
 }
 
 func (a *Transacted) SetObjectIdLike(kl ids.IdLike) (err error) {
-	if err = a.Kennung.SetWithIdLike(kl); err != nil {
+	if err = a.ObjectId.SetWithIdLike(kl); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -201,7 +149,7 @@ func (a *Transacted) Equals(b *Transacted) (ok bool) {
 	// 	return
 	// }
 
-	if !a.Metadatei.Equals(&b.Metadatei) {
+	if !a.Metadata.Equals(&b.Metadata) {
 		return
 	}
 
@@ -209,11 +157,11 @@ func (a *Transacted) Equals(b *Transacted) (ok bool) {
 }
 
 func (s *Transacted) GetGenre() interfaces.Genre {
-	return s.Kennung.GetGenre()
+	return s.ObjectId.GetGenre()
 }
 
 func (s *Transacted) IsNew() bool {
-	return s.Metadatei.Mutter().IsNull()
+	return s.Metadata.Mutter().IsNull()
 }
 
 func (s *Transacted) CalculateObjectShaDebug() (err error) {
@@ -261,7 +209,7 @@ func (s *Transacted) calculateObjectSha(debug bool) (err error) {
 		s.makeShaCalcFunc(
 			f,
 			object_inventory_format.Formats.MetadateiKennungMutter(),
-			s.Metadatei.Sha(),
+			s.Metadata.Sha(),
 		),
 	)
 
@@ -269,7 +217,7 @@ func (s *Transacted) calculateObjectSha(debug bool) (err error) {
 		s.makeShaCalcFunc(
 			f,
 			object_inventory_format.Formats.Metadatei(),
-			&s.Metadatei.SelfMetadata,
+			&s.Metadata.SelfMetadata,
 		),
 	)
 
@@ -277,7 +225,7 @@ func (s *Transacted) calculateObjectSha(debug bool) (err error) {
 		s.makeShaCalcFunc(
 			f,
 			object_inventory_format.Formats.MetadateiSansTai(),
-			&s.Metadatei.SelfMetadataWithoutTai,
+			&s.Metadata.SelfMetadataWithoutTai,
 		),
 	)
 
@@ -285,7 +233,7 @@ func (s *Transacted) calculateObjectSha(debug bool) (err error) {
 }
 
 func (s *Transacted) SetDormant(v bool) {
-	s.Metadatei.Cache.Dormant.SetBool(v)
+	s.Metadata.Cache.Dormant.SetBool(v)
 }
 
 func (s *Transacted) SetObjectSha(v interfaces.Sha) (err error) {
@@ -297,11 +245,11 @@ func (s *Transacted) GetObjectSha() interfaces.Sha {
 }
 
 func (s *Transacted) GetBlobSha() interfaces.Sha {
-	return &s.Metadatei.Blob
+	return &s.Metadata.Blob
 }
 
 func (s *Transacted) SetBlobSha(sh interfaces.Sha) error {
-	return s.Metadatei.Blob.SetShaLike(sh)
+	return s.Metadata.Blob.SetShaLike(sh)
 }
 
 func (o *Transacted) GetKey() string {

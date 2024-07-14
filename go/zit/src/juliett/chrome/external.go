@@ -55,7 +55,7 @@ func (e *External) SaveAkte(s fs_home.Home) (err error) {
 		}
 	}()
 
-	e.Metadatei.Blob.SetShaLike(aw)
+	e.Metadata.Blob.SetShaLike(aw)
 
 	return
 }
@@ -63,22 +63,22 @@ func (e *External) SaveAkte(s fs_home.Home) (err error) {
 func (e *External) SetItem(i item, overwrite bool) (err error) {
 	e.item = i
 
-	if err = i.WriteToMetadatei(&e.browser.Metadatei); err != nil {
+	if err = i.WriteToMetadatei(&e.browser.Metadata); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	e.Metadatei.Tai = e.browser.Metadatei.GetTai()
+	e.Metadata.Tai = e.browser.Metadata.GetTai()
 
 	if overwrite {
-		if err = i.WriteToMetadatei(&e.Metadatei); err != nil {
+		if err = i.WriteToMetadatei(&e.Metadata); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
 	// TODO make configurable
-	e.Metadatei.Type = ids.MustType("!toml-bookmark")
+	e.Metadata.Type = ids.MustType("!toml-bookmark")
 
 	return
 }
@@ -106,15 +106,15 @@ func (t *External) SetFromSkuLike(sk sku.SkuLike) (err error) {
 }
 
 func (a *External) GetKennung() ids.IdLike {
-	return &a.Kennung
+	return &a.ObjectId
 }
 
 func (a *External) GetMetadatei() *object_metadata.Metadata {
-	return &a.Metadatei
+	return &a.Metadata
 }
 
 func (a *External) GetGattung() interfaces.Genre {
-	return a.Kennung.GetGenre()
+	return a.ObjectId.GetGenre()
 }
 
 func (a *External) String() string {
@@ -128,7 +128,7 @@ func (a *External) String() string {
 }
 
 func (a *External) GetAkteSha() interfaces.Sha {
-	return &a.Metadatei.Blob
+	return &a.Metadata.Blob
 }
 
 // func (a *External) SetAkteSha(v schnittstellen.ShaLike) (err error) {

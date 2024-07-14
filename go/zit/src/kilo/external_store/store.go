@@ -260,7 +260,7 @@ func (es *Store) GetExternalKennung() (ks interfaces.SetLike[*ids.ObjectId], err
 		return
 	}
 
-	if ks, err = es.StoreLike.GetExternalKennung(); err != nil {
+	if ks, err = es.StoreLike.GetExternalObjectId(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -279,7 +279,7 @@ func (es *Store) GetKennungForString(v string) (k *ids.ObjectId, err error) {
 		return
 	}
 
-	if k, err = es.StoreLike.GetKennungForString(v); err != nil {
+	if k, err = es.StoreLike.GetObjectIdForString(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

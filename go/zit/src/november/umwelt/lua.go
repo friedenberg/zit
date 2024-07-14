@@ -23,7 +23,7 @@ func (s *Umwelt) GetSkuFromString(lv string) (sk *sku.Transacted, err error) {
 		}
 	}()
 
-	if err = sk.Kennung.Set(lv); err == nil {
+	if err = sk.ObjectId.Set(lv); err == nil {
 		return
 	}
 

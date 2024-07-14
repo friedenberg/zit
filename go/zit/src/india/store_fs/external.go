@@ -40,15 +40,15 @@ func (t *External) SetFromSkuLike(sk sku.SkuLike) (err error) {
 }
 
 func (a *External) GetObjectId() *ids.ObjectId {
-	return &a.Kennung
+	return &a.ObjectId
 }
 
 func (a *External) GetMetadata() *object_metadata.Metadata {
-	return &a.Metadatei
+	return &a.Metadata
 }
 
 func (a *External) GetGattung() interfaces.Genre {
-	return a.Kennung.GetGenre()
+	return a.ObjectId.GetGenre()
 }
 
 func (a *External) String() string {
@@ -62,11 +62,11 @@ func (a *External) String() string {
 }
 
 func (a *External) GetBlobSha() interfaces.Sha {
-	return &a.Metadatei.Blob
+	return &a.Metadata.Blob
 }
 
 func (a *External) SetBlobSha(v interfaces.Sha) (err error) {
-	if err = a.Metadatei.Blob.SetShaLike(v); err != nil {
+	if err = a.Metadata.Blob.SetShaLike(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -93,7 +93,7 @@ func (a *External) GetAkteFD() *fd.FD {
 
 func (a *External) SetAkteFD(v *fd.FD) {
 	a.FDs.Akte.ResetWith(v)
-	a.Metadatei.Blob.SetShaLike(v.GetShaLike())
+	a.Metadata.Blob.SetShaLike(v.GetShaLike())
 }
 
 func (a *External) GetAktePath() string {
@@ -108,8 +108,8 @@ func (a *External) ResetWithExternalMaybe(
 	b *KennungFDPair,
 ) (err error) {
 	k := b.GetKennungLike()
-	a.Kennung.ResetWithIdLike(k)
-	object_metadata.Resetter.Reset(&a.Metadatei)
+	a.ObjectId.ResetWithIdLike(k)
+	object_metadata.Resetter.Reset(&a.Metadata)
 	a.FDs.ResetWith(b.GetFDs())
 
 	return

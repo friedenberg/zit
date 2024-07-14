@@ -51,7 +51,7 @@ func (w *Writer) PrintOne(z *sku.Transacted) (err error) {
 	case genres.Tag:
 		var e ids.Tag
 
-		if err = e.Set(z.Kennung.String()); err != nil {
+		if err = e.Set(z.ObjectId.String()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

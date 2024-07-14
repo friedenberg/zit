@@ -82,7 +82,7 @@ func (s *Store) CreateOrUpdateAkteSha(
 
 	t = sku.GetTransactedPool().Get()
 
-	if err = t.Kennung.SetWithIdLike(k); err != nil {
+	if err = t.ObjectId.SetWithIdLike(k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -133,7 +133,7 @@ func (s *Store) RevertTo(
 		return
 	}
 
-	mutter.Metadatei.Mutter().ResetWith(sk.Metadatei.Sha())
+	mutter.Metadata.Mutter().ResetWith(sk.Metadata.Sha())
 
 	if err = mutter.CalculateObjectShas(); err != nil {
 		err = errors.Wrap(err)

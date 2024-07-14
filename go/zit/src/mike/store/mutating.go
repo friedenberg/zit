@@ -82,7 +82,7 @@ func (s *Store) tryRealizeAndOrStore(
 
 	if o.ContainsAny(
 		objekte_mode.ModeAddToBestandsaufnahme,
-	) && (kinder.Kennung.IsEmpty() || kinder.GetGenre() == genres.Unknown) {
+	) && (kinder.ObjectId.IsEmpty() || kinder.GetGenre() == genres.Unknown) {
 		var ken *ids.ZettelId
 
 		if ken, err = s.kennungIndex.CreateHinweis(); err != nil {
@@ -90,7 +90,7 @@ func (s *Store) tryRealizeAndOrStore(
 			return
 		}
 
-		if err = kinder.Kennung.SetWithIdLike(ken); err != nil {
+		if err = kinder.ObjectId.SetWithIdLike(ken); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -135,7 +135,7 @@ func (s *Store) tryRealizeAndOrStore(
 	if o.Mode != objekte_mode.ModeReindex &&
 		mutter != nil &&
 		ids.Equals(kinder.GetObjectId(), mutter.GetObjectId()) &&
-		kinder.Metadatei.EqualsSansTai(&mutter.Metadatei) {
+		kinder.Metadata.EqualsSansTai(&mutter.Metadata) {
 
 		if err = kinder.SetFromSkuLike(mutter); err != nil {
 			err = errors.Wrap(err)
@@ -171,7 +171,7 @@ func (s *Store) tryRealizeAndOrStore(
 		}
 
 		if kinder.GetGenre() == genres.Zettel {
-			if err = s.kennungIndex.AddHinweis(&kinder.Kennung); err != nil {
+			if err = s.kennungIndex.AddHinweis(&kinder.ObjectId); err != nil {
 				if errors.Is(err, object_id_provider.ErrDoesNotExist{}) {
 					ui.Log().Printf("kennung does not contain value: %s", err)
 					err = nil
@@ -241,9 +241,9 @@ func (s *Store) fetchMutterIfNecessary(
 	sk *sku.Transacted,
 	ut ObjekteOptions,
 ) (mutter *sku.Transacted, err error) {
-	if !sk.Metadatei.Mutter().IsNull() && false {
+	if !sk.Metadata.Mutter().IsNull() && false {
 		mutter, err = s.GetVerzeichnisse().ReadOneObjectSha(
-			sk.Metadatei.Mutter(),
+			sk.Metadata.Mutter(),
 		)
 	} else {
 		mutter, err = s.GetVerzeichnisse().ReadOneObjectId(
@@ -270,7 +270,7 @@ func (s *Store) fetchMutterIfNecessary(
 	// 	}
 	// }
 
-	sk.Metadatei.Mutter().ResetWith(mutter.Metadatei.Sha())
+	sk.Metadata.Mutter().ResetWith(mutter.Metadata.Sha())
 
 	return
 }
@@ -412,7 +412,7 @@ func (s *Store) createEtikettOrTyp(k *ids.ObjectId) (err error) {
 	t := sku.GetTransactedPool().Get()
 	defer sku.GetTransactedPool().Put(t)
 
-	if err = t.Kennung.SetWithIdLike(k); err != nil {
+	if err = t.ObjectId.SetWithIdLike(k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -532,7 +532,7 @@ func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 		return
 	}
 
-	es := iter.SortedValues(m.Metadatei.GetTags())
+	es := iter.SortedValues(m.Metadata.GetTags())
 
 	for _, e := range es {
 		if err = s.addEtikettAndExpanded(e); err != nil {
@@ -545,7 +545,7 @@ func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 }
 
 func (s *Store) addMatchableCommon(m *sku.Transacted) (err error) {
-	if err = s.AddTypToIndex(&m.Metadatei.Type); err != nil {
+	if err = s.AddTypToIndex(&m.Metadata.Type); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -571,7 +571,7 @@ func (s *Store) reindexOne(besty, sk *sku.Transacted) (err error) {
 		return
 	}
 
-	if err = s.AddTypToIndex(&sk.Metadatei.Type); err != nil {
+	if err = s.AddTypToIndex(&sk.Metadata.Type); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

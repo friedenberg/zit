@@ -113,7 +113,7 @@ func (s *PrefixSet) addPair(
 	e string,
 	z *obj,
 ) {
-	if e == z.Kennung.String() {
+	if e == z.ObjectId.String() {
 		e = ""
 	}
 	// if e != "" {
@@ -235,7 +235,7 @@ func (a PrefixSet) Subset(
 		zSet.Each(
 			func(z *obj) (err error) {
 				ui.Log().Print(e2, z)
-				intersection := z.Metadatei.Cache.TagPaths.All.GetMatching(e2)
+				intersection := z.Metadata.Cache.TagPaths.All.GetMatching(e2)
 				hasDirect := false || len(intersection) == 0
 				type match struct {
 					string

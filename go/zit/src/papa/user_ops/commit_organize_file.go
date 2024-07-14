@@ -25,11 +25,11 @@ func (c CommitOrganizeFile) ApplyToText(
 
 	if err = t.Transacted.Each(
 		func(sk *sku.Transacted) (err error) {
-			if sk.Metadatei.Description.IsEmpty() {
+			if sk.Metadata.Description.IsEmpty() {
 				return
 			}
 
-			sk.Metadatei.ResetTags()
+			sk.Metadata.ResetTags()
 
 			return
 		},

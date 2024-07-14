@@ -98,7 +98,7 @@ func (kc *Compiled) recompileTypes(
 			kc.TypesToExtensions[ct.GetObjectId().String()] = fe
 
 			if ta.InlineAkte {
-				inlineTypen.Add(values.MakeString(ct.Kennung.String()))
+				inlineTypen.Add(values.MakeString(ct.ObjectId.String()))
 			}
 
 			if err = kc.ApplyDormantAndRealizeTags(ct); err != nil {

@@ -231,7 +231,7 @@ func (k *Compiled) AddTransacted(
 ) (err error) {
 	didChange := false
 
-	switch kinder.Kennung.GetGenre() {
+	switch kinder.ObjectId.GetGenre() {
 	case genres.Type:
 		if didChange, err = k.addType(kinder); err != nil {
 			err = errors.Wrap(err)

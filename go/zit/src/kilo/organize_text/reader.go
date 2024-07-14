@@ -307,9 +307,9 @@ func (ar *assignmentLineReader) readOneObj(
 		return
 	}
 
-	if z.Kennung.IsEmpty() {
+	if z.ObjectId.IsEmpty() {
 		// set empty hinweis to ensure middle is '/'
-		if err = z.Kennung.SetWithIdLike(ids.ZettelId{}); err != nil {
+		if err = z.ObjectId.SetWithIdLike(ids.ZettelId{}); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -319,7 +319,7 @@ func (ar *assignmentLineReader) readOneObj(
 		return
 	}
 
-	if err = ar.options.Abbr.ExpandHinweisOnly(&z.Kennung); err != nil {
+	if err = ar.options.Abbr.ExpandHinweisOnly(&z.ObjectId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

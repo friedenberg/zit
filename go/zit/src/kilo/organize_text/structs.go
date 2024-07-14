@@ -44,17 +44,17 @@ func sortObjSet(
 
 	sort.Slice(out, func(i, j int) bool {
 		switch {
-		case out[i].Kennung.IsEmpty() && out[j].Kennung.IsEmpty():
-			return out[i].Metadatei.Description.String() < out[j].Metadatei.Description.String()
+		case out[i].ObjectId.IsEmpty() && out[j].ObjectId.IsEmpty():
+			return out[i].Metadata.Description.String() < out[j].Metadata.Description.String()
 
-		case out[i].Kennung.IsEmpty():
+		case out[i].ObjectId.IsEmpty():
 			return true
 
-		case out[j].Kennung.IsEmpty():
+		case out[j].ObjectId.IsEmpty():
 			return false
 
 		default:
-			return out[i].Kennung.String() < out[j].Kennung.String()
+			return out[i].ObjectId.String() < out[j].ObjectId.String()
 		}
 	})
 
@@ -112,18 +112,18 @@ func (os Objekten) Sort() {
 
 	sort.Slice(out, func(i, j int) bool {
 		switch {
-		case out[i].Kennung.IsEmpty() && out[j].Kennung.IsEmpty():
-			return out[i].Metadatei.Description.String() < out[j].Metadatei.Description.String()
+		case out[i].ObjectId.IsEmpty() && out[j].ObjectId.IsEmpty():
+			return out[i].Metadata.Description.String() < out[j].Metadata.Description.String()
 
-		case out[i].Kennung.IsEmpty():
+		case out[i].ObjectId.IsEmpty():
 			return true
 
-		case out[j].Kennung.IsEmpty():
+		case out[j].ObjectId.IsEmpty():
 			return false
 
 		default:
 			// TODO sort by ints for virtual kennung
-			return out[i].Kennung.String() < out[j].Kennung.String()
+			return out[i].ObjectId.String() < out[j].ObjectId.String()
 		}
 	})
 }

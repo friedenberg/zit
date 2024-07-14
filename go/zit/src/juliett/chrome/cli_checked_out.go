@@ -89,7 +89,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 
 		n2, err = f.kennungStringFormatWriter.WriteStringFormat(
 			sw,
-			&co.Internal.Kennung,
+			&co.Internal.ObjectId,
 		)
 		n += n2
 
@@ -100,7 +100,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 
 		n2, err = f.metadateiStringFormatWriter.WriteStringFormat(
 			sw,
-			&co.Internal.Metadatei,
+			&co.Internal.Metadata,
 		)
 		n += n2
 
@@ -151,7 +151,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 
 		n2, err = f.typStringFormatWriter.WriteStringFormat(
 			sw,
-			&browser.Metadatei.Type,
+			&browser.Metadata.Type,
 		)
 		n += n2
 
@@ -160,7 +160,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 			return
 		}
 
-		if !browser.Metadatei.Description.IsEmpty() {
+		if !browser.Metadata.Description.IsEmpty() {
 			n1, err = sw.WriteString(" ")
 			n += int64(n1)
 
@@ -171,7 +171,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 
 			n2, err = f.bezeichnungStringFormatWriter.WriteStringFormat(
 				sw,
-				&browser.Metadatei.Description,
+				&browser.Metadata.Description,
 			)
 			n += n2
 
@@ -244,7 +244,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 			return
 		}
 
-		for _, v := range iter.SortedValues(browser.Metadatei.GetTags()) {
+		for _, v := range iter.SortedValues(browser.Metadata.GetTags()) {
 			n1, err = sw.WriteString(" ")
 			n += int64(n1)
 

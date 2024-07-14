@@ -11,11 +11,11 @@ var TransactedResetter transactedResetter
 type transactedResetter struct{}
 
 func (transactedResetter) Reset(a *Transacted) {
-	a.Kennung.SetGenre(genres.Unknown)
-	object_metadata.Resetter.Reset(&a.Metadatei)
+	a.ObjectId.SetGenre(genres.Unknown)
+	object_metadata.Resetter.Reset(&a.Metadata)
 }
 
 func (transactedResetter) ResetWith(a *Transacted, b *Transacted) {
-	errors.PanicIfError(a.Kennung.ResetWithIdLike(&b.Kennung))
-	object_metadata.Resetter.ResetWith(&a.Metadatei, &b.Metadatei)
+	errors.PanicIfError(a.ObjectId.ResetWithIdLike(&b.ObjectId))
+	object_metadata.Resetter.ResetWith(&a.Metadata, &b.Metadata)
 }

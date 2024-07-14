@@ -97,10 +97,10 @@ func MakeUnsureMatchMapsCollector(
 
 			switch t {
 			case UnsureMatchTypeMetadateiSansTaiHistory:
-				k = e.Metadatei.Shas.SelfMetadataWithoutTai.GetBytes()
+				k = e.Metadata.Shas.SelfMetadataWithoutTai.GetBytes()
 
 			case UnsureMatchTypeBezeichnung:
-				k = sha.FromString(e.Metadatei.Description.String()).GetBytes()
+				k = sha.FromString(e.Metadata.Description.String()).GetBytes()
 
 			default:
 				continue
@@ -134,10 +134,10 @@ func MakeUnsureMatchMapsMatcher(
 
 			switch t {
 			case UnsureMatchTypeMetadateiSansTaiHistory:
-				k = sk.Metadatei.Shas.SelfMetadataWithoutTai.GetBytes()
+				k = sk.Metadata.Shas.SelfMetadataWithoutTai.GetBytes()
 
 			case UnsureMatchTypeBezeichnung:
-				k = sha.FromString(sk.Metadatei.Description.String()).GetBytes()
+				k = sha.FromString(sk.Metadata.Description.String()).GetBytes()
 
 			default:
 				continue

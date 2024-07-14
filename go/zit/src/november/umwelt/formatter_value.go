@@ -45,7 +45,7 @@ func (u *Umwelt) MakeFormatFunc(
 			if _, err = fmt.Fprintln(
 				out,
 				tl.GetObjectId(),
-				&tl.Metadatei.Cache.TagPaths,
+				&tl.Metadata.Cache.TagPaths,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -59,7 +59,7 @@ func (u *Umwelt) MakeFormatFunc(
 			if _, err = fmt.Fprintln(
 				out,
 				tl.GetObjectId(),
-				&tl.Metadatei.Cache.TagPaths,
+				&tl.Metadata.Cache.TagPaths,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -73,7 +73,7 @@ func (u *Umwelt) MakeFormatFunc(
 			if _, err = fmt.Fprintln(
 				out,
 				tl.GetObjectId(),
-				tl.Metadatei.Cache.QueryPath,
+				tl.Metadata.Cache.QueryPath,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -101,26 +101,26 @@ func (u *Umwelt) MakeFormatFunc(
 
 	case "sha":
 		f = func(tl *sku.Transacted) (err error) {
-			_, err = fmt.Fprintln(out, tl.Metadatei.Sha())
+			_, err = fmt.Fprintln(out, tl.Metadata.Sha())
 			return
 		}
 
 	case "sha-mutter":
 		f = func(tl *sku.Transacted) (err error) {
-			_, err = fmt.Fprintf(out, "%s -> %s\n", tl.Metadatei.Sha(), tl.Metadatei.Mutter())
+			_, err = fmt.Fprintf(out, "%s -> %s\n", tl.Metadata.Sha(), tl.Metadata.Mutter())
 			return
 		}
 
 	case "etiketten-all":
 		f = func(tl *sku.Transacted) (err error) {
-			for _, es := range tl.Metadatei.Cache.TagPaths.Paths {
+			for _, es := range tl.Metadata.Cache.TagPaths.Paths {
 				if _, err = fmt.Fprintf(out, "%s: %s\n", tl.GetObjectId(), es); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 			}
 
-			for _, es := range tl.Metadatei.Cache.TagPaths.All {
+			for _, es := range tl.Metadata.Cache.TagPaths.All {
 				if _, err = fmt.Fprintf(out, "%s: %s -> %s\n", tl.GetObjectId(), es.Etikett, es.Parents); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -167,7 +167,7 @@ func (u *Umwelt) MakeFormatFunc(
 			if _, err = fmt.Fprintln(
 				out,
 				iter.StringCommaSeparated(
-					tl.Metadatei.GetTags(),
+					tl.Metadata.GetTags(),
 				),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -179,7 +179,7 @@ func (u *Umwelt) MakeFormatFunc(
 
 	case "etiketten-newlines":
 		f = func(tl *sku.Transacted) (err error) {
-			if err = tl.Metadatei.GetTags().EachPtr(func(e *ids.Tag) (err error) {
+			if err = tl.Metadata.GetTags().EachPtr(func(e *ids.Tag) (err error) {
 				_, err = fmt.Fprintln(out, e)
 				return
 			}); err != nil {
@@ -234,7 +234,7 @@ func (u *Umwelt) MakeFormatFunc(
 			if _, err = fmt.Fprintf(
 				out,
 				"%s@%s\n",
-				&tl.Kennung,
+				&tl.ObjectId,
 				tl.GetObjectSha(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -257,7 +257,7 @@ func (u *Umwelt) MakeFormatFunc(
 			if _, err = fmt.Fprintf(
 				out,
 				"%s %s\n",
-				&tl.Kennung,
+				&tl.ObjectId,
 				sh,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -271,7 +271,7 @@ func (u *Umwelt) MakeFormatFunc(
 		f = func(e *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(
 				out,
-				&e.Kennung,
+				&e.ObjectId,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -547,13 +547,13 @@ func (u *Umwelt) MakeFormatFunc(
 
 	case "shas":
 		f = func(z *sku.Transacted) (err error) {
-			_, err = fmt.Fprintln(out, &z.Metadatei.Shas)
+			_, err = fmt.Fprintln(out, &z.Metadata.Shas)
 			return
 		}
 
 	case "mutter-sha":
 		f = func(z *sku.Transacted) (err error) {
-			_, err = fmt.Fprintln(out, z.Metadatei.Mutter())
+			_, err = fmt.Fprintln(out, z.Metadata.Mutter())
 			return
 		}
 
@@ -561,7 +561,7 @@ func (u *Umwelt) MakeFormatFunc(
 		p := u.PrinterTransactedLike()
 
 		f = func(z *sku.Transacted) (err error) {
-			if z.Metadatei.Mutter().IsNull() {
+			if z.Metadata.Mutter().IsNull() {
 				return
 			}
 
@@ -638,7 +638,7 @@ func (u *Umwelt) MakeFormatFunc(
 			var sk *sku.Transacted
 
 			if sk, err = u.GetStore().GetVerzeichnisse().ReadOneObjectId(
-				&o.Kennung,
+				&o.ObjectId,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -679,8 +679,8 @@ func (u *Umwelt) MakeFormatFunc(
 				return
 			}
 
-			a["description"] = o.Metadatei.Description.String()
-			a["identifier"] = o.Kennung.String()
+			a["description"] = o.Metadata.Description.String()
+			a["identifier"] = o.ObjectId.String()
 
 			if err = e.Encode(&a); err != nil {
 				err = errors.Wrap(err)
@@ -714,8 +714,8 @@ func (u *Umwelt) MakeFormatFunc(
 				return
 			}
 
-			a["description"] = o.Metadatei.Description.String()
-			a["identifier"] = o.Kennung.String()
+			a["description"] = o.Metadata.Description.String()
+			a["identifier"] = o.ObjectId.String()
 
 			e := toml.NewEncoder(out)
 
@@ -868,7 +868,7 @@ func (u *Umwelt) makeTypFormatter(
 				}
 			}
 
-			if t == nil || t.Kennung.IsEmpty() || t.GetBlobSha().IsNull() {
+			if t == nil || t.ObjectId.IsEmpty() || t.GetBlobSha().IsNull() {
 				ty := ""
 
 				switch o.GetGenre() {

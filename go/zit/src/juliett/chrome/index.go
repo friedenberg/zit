@@ -52,7 +52,7 @@ func (c *Store) initializeIndex() (err error) {
 			}
 
 			{
-				existing, ok := c.tabCache.Rows[sk.Kennung.String()]
+				existing, ok := c.tabCache.Rows[sk.ObjectId.String()]
 
 				if ok {
 					c.transactedTabIdIndex[existing] = cl

@@ -35,8 +35,8 @@ func (c *Store) getDiff(kinder, mutter *sku.Transacted) (dt diff, err error) {
 	}
 
 	if object_metadata.EqualerSansTaiIncludeVirtual.Equals(
-		&kinder.Metadatei,
-		&mutter.Metadatei,
+		&kinder.Metadata,
+		&mutter.Metadata,
 	) {
 		return
 	}
@@ -80,5 +80,5 @@ func (c *Store) getDiffKinderOnly(kinder *sku.Transacted) (dt diff, err error) {
 }
 
 func etiketten(sk *sku.Transacted) ids.TagSet {
-	return ids.ExpandMany(sk.Metadatei.GetTags(), expansion.ExpanderRight)
+	return ids.ExpandMany(sk.Metadata.GetTags(), expansion.ExpanderRight)
 }

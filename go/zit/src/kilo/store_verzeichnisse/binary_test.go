@@ -20,15 +20,15 @@ func TestBinaryOne(t1 *testing.T) {
 	var err error
 
 	{
-		t.AssertNoError(expected.Kennung.SetWithIdLike(ids.MustZettelId("one/uno")))
+		t.AssertNoError(expected.ObjectId.SetWithIdLike(ids.MustZettelId("one/uno")))
 		expected.SetTai(ids.NowTai())
-		t.AssertNoError(expected.Metadatei.Blob.Set(
+		t.AssertNoError(expected.Metadata.Blob.Set(
 			"ed500e315f33358824203cee073893311e0a80d77989dc55c5d86247d95b2403",
 		))
-		t.AssertNoError(expected.Metadatei.Type.Set("da-typ"))
-		t.AssertNoError(expected.Metadatei.Description.Set("the bez"))
+		t.AssertNoError(expected.Metadata.Type.Set("da-typ"))
+		t.AssertNoError(expected.Metadata.Description.Set("the bez"))
 		t.AssertNoError(expected.AddTagPtr(ids.MustEtikettPtr("tag")))
-		t.AssertNoError(expected.Metadatei.Mutter().Set(
+		t.AssertNoError(expected.Metadata.Mutter().Set(
 			"3c5d8b1db2149d279f4d4a6cb9457804aac6944834b62aa283beef99bccd10f0",
 		))
 		t.AssertNoError(expected.CalculateObjectShas())

@@ -23,14 +23,14 @@ type Metadatei struct {
 }
 
 func (m Metadatei) RemoveFromTransacted(sk *sku.Transacted) (err error) {
-	mes := sk.Metadatei.GetTags().CloneMutableSetPtrLike()
+	mes := sk.Metadata.GetTags().CloneMutableSetPtrLike()
 
 	if err = m.Each(mes.Del); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	sk.Metadatei.SetTags(mes)
+	sk.Metadata.SetTags(mes)
 
 	return
 }

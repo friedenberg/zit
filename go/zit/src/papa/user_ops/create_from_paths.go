@@ -63,7 +63,7 @@ func (c CreateFromPaths) Run(
 			return
 		}
 
-		sh := &z.Metadatei.Shas.SelfMetadataWithoutTai
+		sh := &z.Metadata.Shas.SelfMetadataWithoutTai
 
 		if sh.IsNull() {
 			return
@@ -73,8 +73,8 @@ func (c CreateFromPaths) Run(
 		existing, ok := toCreate[k]
 
 		if ok {
-			if err = existing.Metadatei.Description.Set(
-				z.Metadatei.Description.String(),
+			if err = existing.Metadata.Description.Set(
+				z.Metadata.Description.String(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -98,7 +98,7 @@ func (c CreateFromPaths) Run(
 	defer errors.Deferred(&err, c.Unlock)
 
 	for _, z := range toCreate {
-		if z.Metadatei.IsEmpty() {
+		if z.Metadata.IsEmpty() {
 			return
 		}
 
@@ -167,9 +167,9 @@ func (c *CreateFromPaths) zettelsFromPath(
 		Objekte: fd,
 	}
 
-	ze.Metadatei.Tai = ids.TaiFromTime(fd.ModTime())
+	ze.Metadata.Tai = ids.TaiFromTime(fd.ModTime())
 
-	ze.Kennung.SetGenre(genres.Zettel)
+	ze.ObjectId.SetGenre(genres.Zettel)
 
 	if _, err = c.TextParser.ParseMetadata(r, ze); err != nil {
 		err = errors.Wrap(err)

@@ -16,7 +16,7 @@ func (w *Writer) addCommonMatches(
 	z *sku.Transacted,
 	a *alfred.Item,
 ) {
-	k := &z.Kennung
+	k := &z.ObjectId
 	ks := k.StringFromPtr()
 
 	mb := alfred.GetPoolMatchBuilder().Get()
@@ -36,7 +36,7 @@ func (w *Writer) addCommonMatches(
 
 	mb.AddMatches(z.GetMetadata().Description.String())
 	mb.AddMatches(z.GetType().String())
-	z.Metadatei.GetTags().Each(
+	z.Metadata.GetTags().Each(
 		func(e ids.Tag) (err error) {
 			expansion.ExpanderAll.Expand(
 				func(v string) (err error) {
@@ -69,20 +69,20 @@ func (w *Writer) zettelToItem(
 ) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
-	a.Title = z.Metadatei.Description.String()
+	a.Title = z.Metadata.Description.String()
 
 	es := iter.StringCommaSeparated(
-		z.Metadatei.GetTags(),
+		z.Metadata.GetTags(),
 	)
 
-	k := &z.Kennung
+	k := &z.ObjectId
 	ks := k.StringFromPtr()
 
 	if a.Title == "" {
 		a.Title = ks
 		a.Subtitle = es
 	} else {
-		a.Subtitle = fmt.Sprintf("%s: %s %s", z.Metadatei.Type, ks, es)
+		a.Subtitle = fmt.Sprintf("%s: %s %s", z.Metadata.Type, ks, es)
 	}
 
 	a.Arg = ks

@@ -20,7 +20,7 @@ func (s *Store) ReadCheckedOutFromKennungFDPair(
 		if collections.IsErrNotFound(err) || genres.IsErrUnsupportedGattung(err) {
 			// TODO mark status as new
 			err = nil
-			co.Internal.Kennung.ResetWith(&em.Kennung)
+			co.Internal.ObjectId.ResetWith(&em.Kennung)
 			co.State = checked_out_state.StateUntracked
 		} else {
 			err = errors.Wrap(err)
@@ -32,7 +32,7 @@ func (s *Store) ReadCheckedOutFromKennungFDPair(
 		if collections.IsErrNotFound(err) {
 			// TODO mark status as new
 			err = nil
-			co.Internal.Kennung.ResetWith(&em.Kennung)
+			co.Internal.ObjectId.ResetWith(&em.Kennung)
 			co.State = checked_out_state.StateUntracked
 		} else {
 			err = errors.Wrap(err)
@@ -71,7 +71,7 @@ func (s *Store) ReadIntoCheckedOutFromTransacted(
 
 	var kfp *KennungFDPair
 
-	if kfp, ok = s.Get(&sk.Kennung); !ok {
+	if kfp, ok = s.Get(&sk.ObjectId); !ok {
 		err = collections.MakeErrNotFound(sk.GetObjectId())
 		return
 	}
@@ -90,7 +90,7 @@ func (s *Store) ReadIntoCheckedOutFromTransacted(
 			co.State = checked_out_state.StateConflicted
 			co.External.FDs = kfp.FDs
 
-			if err = co.External.Kennung.SetWithIdLike(&sk.Kennung); err != nil {
+			if err = co.External.ObjectId.SetWithIdLike(&sk.ObjectId); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

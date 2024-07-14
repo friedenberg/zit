@@ -90,7 +90,7 @@ func (f *cli) WriteStringFormat(
 		return
 	}
 
-	k := &o.Kennung
+	k := &o.ObjectId
 
 	var n2 int64
 	n2, err = f.kennungStringFormatWriter.WriteStringFormat(sw, k)

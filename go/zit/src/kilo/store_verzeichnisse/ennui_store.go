@@ -117,11 +117,11 @@ func (s *ennuiStore) ReadOneObjectId(
 		return
 	}
 
-	if !sh.Equals(sk.Metadatei.Sha()) {
+	if !sh.Equals(sk.Metadata.Sha()) {
 		err = errors.Errorf(
 			"expected sha %q but got %q",
 			sh,
-			sk.Metadatei.Sha(),
+			sk.Metadata.Sha(),
 		)
 
 		return
@@ -173,7 +173,7 @@ func (s *ennuiStore) MakeFuncSaveOneVerweise(o *sku.Transacted) func() error {
 		sh := sha.FromString(k.String())
 		defer sha.GetPool().Put(sh)
 
-		if err = s.ids.AddSha(sh, o.Metadatei.Sha()); err != nil {
+		if err = s.ids.AddSha(sh, o.Metadata.Sha()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -183,7 +183,7 @@ func (s *ennuiStore) MakeFuncSaveOneVerweise(o *sku.Transacted) func() error {
 }
 
 func (s *ennuiStore) WriteOneObject(o *sku.Transacted) (err error) {
-	if o.Metadatei.Sha().IsNull() {
+	if o.Metadata.Sha().IsNull() {
 		err = errors.Errorf("null sha")
 		return
 	}
@@ -196,14 +196,14 @@ func (s *ennuiStore) WriteOneObject(o *sku.Transacted) (err error) {
 		s.fs_home.DirVerzeichnisseMetadateiKennungMutter(),
 		object_inventory_format.Formats.MetadateiKennungMutter(),
 		o,
-		o.Metadatei.Sha(),
+		o.Metadata.Sha(),
 	))
 
 	wg.Do(s.makeWriteMetadateiFunc(
 		s.fs_home.DirVerzeichnisseMetadatei(),
 		object_inventory_format.Formats.Metadatei(),
 		o,
-		&o.Metadatei.SelfMetadata,
+		&o.Metadata.SelfMetadata,
 	))
 
 	return wg.GetError()

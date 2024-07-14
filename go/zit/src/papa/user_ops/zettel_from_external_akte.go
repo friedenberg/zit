@@ -133,7 +133,7 @@ func (c ZettelFromExternalAkte) Run(
 	)
 
 	for _, z := range sortedToCreated {
-		if z.Metadatei.IsEmpty() {
+		if z.Metadata.IsEmpty() {
 			return
 		}
 
@@ -235,7 +235,7 @@ func (c *ZettelFromExternalAkte) zettelForAkte(
 
 	z.FDs.Akte.ResetWith(akteFD)
 
-	if err = z.Transacted.Kennung.SetWithIdLike(&ids.ZettelId{}); err != nil {
+	if err = z.Transacted.ObjectId.SetWithIdLike(&ids.ZettelId{}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

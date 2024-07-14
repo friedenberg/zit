@@ -81,8 +81,8 @@ type (
 	}
 
 	ExternalStoreForQuery interface {
-		GetExternalKennung() (interfaces.SetLike[*ids.ObjectId], error)
-		GetKennungForString(string) (*ids.ObjectId, error)
+		GetExternalObjectId() (interfaces.SetLike[*ids.ObjectId], error)
+		GetObjectIdForString(string) (*ids.ObjectId, error)
 	}
 
 	ExternalStoreLike interface {
@@ -263,7 +263,7 @@ func (es *ExternalStore) GetExternalKennung() (ks interfaces.SetLike[*ids.Object
 		return
 	}
 
-	if ks, err = es.ExternalStoreLike.GetExternalKennung(); err != nil {
+	if ks, err = es.ExternalStoreLike.GetExternalObjectId(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -282,7 +282,7 @@ func (es *ExternalStore) GetKennungForString(v string) (k *ids.ObjectId, err err
 		return
 	}
 
-	if k, err = es.ExternalStoreLike.GetKennungForString(v); err != nil {
+	if k, err = es.ExternalStoreLike.GetObjectIdForString(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

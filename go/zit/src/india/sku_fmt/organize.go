@@ -99,7 +99,7 @@ func (f *Organize) WriteStringFormat(
 	}
 
 	var n2 int64
-	n2, err = f.kennungStringFormatWriter.WriteStringFormat(sw, &o.Kennung)
+	n2, err = f.kennungStringFormatWriter.WriteStringFormat(sw, &o.ObjectId)
 	n += int64(n2)
 	// var n2 int64
 	// n2, err = f.kennungStringFormatWriter.WriteStringFormat(
@@ -158,7 +158,7 @@ func (f *Organize) WriteStringFormat(
 		}
 	}
 
-	b := &o.Metadatei.Description
+	b := &o.Metadata.Description
 
 	if f.options.PrintEtikettenAlways {
 		b := o.GetMetadata().GetTags()
@@ -241,7 +241,7 @@ func (f *Organize) ReadStringFormat(
 		}
 	}
 
-	if err = o.Metadatei.Description.TodoSetSlice(sl); err != nil {
+	if err = o.Metadata.Description.TodoSetSlice(sl); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -291,8 +291,8 @@ LOOP:
 			state++
 
 		case 1:
-			if err = o.Kennung.TodoSetBytes(&t); err != nil {
-				o.Kennung.Reset()
+			if err = o.ObjectId.TodoSetBytes(&t); err != nil {
+				o.ObjectId.Reset()
 				return
 			}
 
@@ -311,7 +311,7 @@ LOOP:
 
 				switch g {
 				case genres.Type:
-					if err = o.Metadatei.Type.TodoSetFromKennung2(&k); err != nil {
+					if err = o.Metadata.Type.TodoSetFromKennung2(&k); err != nil {
 						err = errors.Wrap(err)
 						return
 					}

@@ -85,15 +85,15 @@ func (c Clean) shouldClean(
 
 	if c.includeMutter {
 		mutter, err := u.GetStore().GetVerzeichnisse().ReadOneObjectSha(
-			co.GetSku().Metadatei.Mutter(),
+			co.GetSku().Metadata.Mutter(),
 		)
 
 		errors.PanicIfError(err)
 
 		if mutter != nil &&
 			object_metadata.EqualerSansTai.Equals(
-				&co.GetSkuExternalLike().GetSku().Metadatei,
-				&mutter.Metadatei,
+				&co.GetSkuExternalLike().GetSku().Metadata,
+				&mutter.Metadata,
 			) {
 			return true
 		}

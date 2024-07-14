@@ -61,7 +61,7 @@ func (j *Json) FromTransacted(
 	sk *sku.Transacted,
 	s fs_home.Home,
 ) (err error) {
-	return j.FromStringAndMetadatei(sk.Kennung.String(), sk.GetMetadata(), s)
+	return j.FromStringAndMetadatei(sk.ObjectId.String(), sk.GetMetadata(), s)
 }
 
 func (j *Json) ToTransacted(sk *sku.Transacted, s fs_home.Home) (err error) {
@@ -87,17 +87,17 @@ func (j *Json) ToTransacted(sk *sku.Transacted, s fs_home.Home) (err error) {
 	// 	return
 	// }
 
-	if err = sk.Kennung.Set(j.Kennung); err != nil {
+	if err = sk.ObjectId.Set(j.Kennung); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = sk.Metadatei.Type.Set(j.Typ); err != nil {
+	if err = sk.Metadata.Type.Set(j.Typ); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = sk.Metadatei.Description.Set(j.Bezeichnung); err != nil {
+	if err = sk.Metadata.Description.Set(j.Bezeichnung); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -109,8 +109,8 @@ func (j *Json) ToTransacted(sk *sku.Transacted, s fs_home.Home) (err error) {
 		return
 	}
 
-	sk.Metadatei.SetTags(es)
-	sk.Metadatei.GenerateExpandedTags()
+	sk.Metadata.SetTags(es)
+	sk.Metadata.GenerateExpandedTags()
 
 	return
 }

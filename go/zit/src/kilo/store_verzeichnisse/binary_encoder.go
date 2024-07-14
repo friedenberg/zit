@@ -71,7 +71,7 @@ func (bf *binaryEncoder) writeFormat(
 			return
 		}
 
-		ui.Debug().Print(sk, bf.Len(), &sk.Metadatei.Cache.TagPaths)
+		ui.Debug().Print(sk, bf.Len(), &sk.Metadata.Cache.TagPaths)
 		panic(r)
 	}()
 	// TODO
@@ -101,7 +101,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		s := sk.Sigil
 		s.Add(bf.Sigil)
 
-		if sk.Metadatei.Cache.Dormant.Bool() {
+		if sk.Metadata.Cache.Dormant.Bool() {
 			s.Add(ids.SigilHidden)
 		}
 
@@ -111,17 +111,17 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.Blob:
-		if n, err = bf.writeSha(&sk.Metadatei.Blob, true); err != nil {
+		if n, err = bf.writeSha(&sk.Metadata.Blob, true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.Description:
-		if sk.Metadatei.Description.IsEmpty() {
+		if sk.Metadata.Description.IsEmpty() {
 			return
 		}
 
-		if n, err = bf.writeFieldBinaryMarshaler(&sk.Metadatei.Description); err != nil {
+		if n, err = bf.writeFieldBinaryMarshaler(&sk.Metadata.Description); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -150,57 +150,57 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.ObjectId:
-		if n, err = bf.writeFieldWriterTo(&sk.Kennung); err != nil {
+		if n, err = bf.writeFieldWriterTo(&sk.ObjectId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.Tai:
-		if n, err = bf.writeFieldWriterTo(&sk.Metadatei.Tai); err != nil {
+		if n, err = bf.writeFieldWriterTo(&sk.Metadata.Tai); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.Type:
-		if sk.Metadatei.Type.IsEmpty() {
+		if sk.Metadata.Type.IsEmpty() {
 			return
 		}
 
-		if n, err = bf.writeFieldBinaryMarshaler(&sk.Metadatei.Type); err != nil {
+		if n, err = bf.writeFieldBinaryMarshaler(&sk.Metadata.Type); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.MutterMetadateiMutterKennung:
-		if n, err = bf.writeSha(sk.Metadatei.Mutter(), true); err != nil {
+		if n, err = bf.writeSha(sk.Metadata.Mutter(), true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.ShaMetadateiSansTai:
-		if n, err = bf.writeSha(&sk.Metadatei.SelfMetadataWithoutTai, true); err != nil {
+		if n, err = bf.writeSha(&sk.Metadata.SelfMetadataWithoutTai, true); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.ShaMetadateiMutterKennung:
-		if n, err = bf.writeSha(sk.Metadatei.Sha(), false); err != nil {
+		if n, err = bf.writeSha(sk.Metadata.Sha(), false); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.ShaMetadatei:
-		if err = sha.MakeErrIsNull(&sk.Metadatei.SelfMetadata); err != nil {
+		if err = sha.MakeErrIsNull(&sk.Metadata.SelfMetadata); err != nil {
 			return
 		}
 
-		if n, err = bf.writeFieldWriterTo(&sk.Metadatei.SelfMetadata); err != nil {
+		if n, err = bf.writeFieldWriterTo(&sk.Metadata.SelfMetadata); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case keys.VerzeichnisseEtikettImplicit:
-		es := sk.Metadatei.Cache.GetImplicitTags()
+		es := sk.Metadata.Cache.GetImplicitTags()
 
 		for _, e := range iter.SortedValues[ids.Tag](es) {
 			var n1 int64
@@ -214,7 +214,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.VerzeichnisseEtikettExpanded:
-		es := sk.Metadatei.Cache.GetExpandedTags()
+		es := sk.Metadata.Cache.GetExpandedTags()
 
 		for _, e := range iter.SortedValues[ids.Tag](es) {
 			var n1 int64
@@ -228,7 +228,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.VerzeichnisseEtiketten:
-		es := sk.Metadatei.Cache.TagPaths
+		es := sk.Metadata.Cache.TagPaths
 
 		for _, e := range es.Paths {
 			var n1 int64

@@ -22,7 +22,7 @@ func TestLuaFalse(t1 *testing.T) {
 
 	sk := &sku.Transacted{}
 
-	if err = sk.Kennung.SetWithIdLike(&ids.Tag{}); err != nil {
+	if err = sk.ObjectId.SetWithIdLike(&ids.Tag{}); err != nil {
 		t.Fatal(err)
 		return
 	}
@@ -46,7 +46,7 @@ func TestMatcherLuaTrue(t1 *testing.T) {
 
 	sk := &sku.Transacted{}
 
-	if err = sk.Kennung.SetWithIdLike(&ids.Tag{}); err != nil {
+	if err = sk.ObjectId.SetWithIdLike(&ids.Tag{}); err != nil {
 		t.Fatal(err)
 	}
 

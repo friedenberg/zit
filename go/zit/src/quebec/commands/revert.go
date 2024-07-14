@@ -102,7 +102,7 @@ func (c Revert) runRevertFromQuery(
 	if err = u.GetStore().QueryWithKasten(
 		eq,
 		func(z *sku.Transacted) (err error) {
-			return f(revertTuple{Transacted: z, Sha: z.Metadatei.Mutter()})
+			return f(revertTuple{Transacted: z, Sha: z.Metadata.Mutter()})
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -128,7 +128,7 @@ func (c Revert) runRevertFromLast(
 	if err = s.GetBestandsaufnahmeStore().StreamInventoryList(
 		b.GetBlobSha(),
 		func(sk *sku.Transacted) (err error) {
-			return f(revertTuple{Transacted: sk, Sha: sk.Metadatei.Mutter()})
+			return f(revertTuple{Transacted: sk, Sha: sk.Metadata.Mutter()})
 		},
 	); err != nil {
 		err = errors.Wrap(err)

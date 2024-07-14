@@ -232,7 +232,7 @@ func (pw *writer) saveSchwanz(z *sku.Transacted, sigil ids.Sigil) {
 
 	record.Sigil = sigil
 
-	if z.Metadatei.Cache.Dormant.Bool() {
+	if z.Metadata.Cache.Dormant.Bool() {
 		record.Add(ids.SigilHidden)
 	} else {
 		record.Del(ids.SigilHidden)
@@ -242,7 +242,7 @@ func (pw *writer) saveSchwanz(z *sku.Transacted, sigil ids.Sigil) {
 }
 
 func (pw *writer) removeOldSchwanz(sk *sku.Transacted) (err error) {
-	ks := sk.Kennung.String()
+	ks := sk.ObjectId.String()
 	st, ok := pw.kennungShaMap[ks]
 
 	if !ok {

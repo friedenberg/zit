@@ -30,7 +30,7 @@ func (k Kennung) Reduce(b *Builder) (err error) {
 
 // TODO support exact
 func (k Kennung) ContainsSku(sk *sku.Transacted) (ok bool) {
-	defer sk.Metadatei.Cache.QueryPath.PushOnOk(k, &ok)
+	defer sk.Metadata.Cache.QueryPath.PushOnOk(k, &ok)
 
 	me := sk.GetMetadata()
 
@@ -57,7 +57,7 @@ func (k Kennung) ContainsSku(sk *sku.Transacted) (ok bool) {
 			// }
 
 			ps := me.Cache.TagPaths.All[idx]
-			sk.Metadatei.Cache.QueryPath.Push(ps.Parents)
+			sk.Metadata.Cache.QueryPath.Push(ps.Parents)
 			return
 		}
 
@@ -75,7 +75,7 @@ func (k Kennung) ContainsSku(sk *sku.Transacted) (ok bool) {
 		// 	}
 	}
 
-	idl := &sk.Kennung
+	idl := &sk.ObjectId
 
 	if !ids.Contains(idl, k) {
 		return

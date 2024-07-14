@@ -78,7 +78,7 @@ func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
 	return fs
 }
 
-func (c *Store) GetExternalKennung() (ks interfaces.SetLike[*ids.ObjectId], err error) {
+func (c *Store) GetExternalObjectId() (ks interfaces.SetLike[*ids.ObjectId], err error) {
 	ksm := collections_value.MakeMutableValueSet[*ids.ObjectId](nil)
 	ks = ksm
 
@@ -96,7 +96,7 @@ func (c *Store) GetExternalKennung() (ks interfaces.SetLike[*ids.ObjectId], err 
 			}
 
 			if trackedFromBefore {
-				if err = ksm.Add(matchingTabId.Kennung.Clone()); err != nil {
+				if err = ksm.Add(matchingTabId.ObjectId.Clone()); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -120,7 +120,7 @@ func (c *Store) GetExternalKennung() (ks interfaces.SetLike[*ids.ObjectId], err 
 }
 
 // TODO
-func (s *Store) GetKennungForString(v string) (k *ids.ObjectId, err error) {
+func (s *Store) GetObjectIdForString(v string) (k *ids.ObjectId, err error) {
 	err = collections.MakeErrNotFoundString(v)
 	return
 	k = ids.GetObjectIdPool().Get()
@@ -181,8 +181,8 @@ func (c *Store) CheckoutOne(
 	options checkout_options.Options,
 	sz *sku.Transacted,
 ) (cz sku.CheckedOutLike, err error) {
-	if !sz.Metadatei.Type.Equals(c.typ) {
-		err = errors.Wrap(sku.ErrExternalStoreUnsupportedTyp(sz.Metadatei.Type))
+	if !sz.Metadata.Type.Equals(c.typ) {
+		err = errors.Wrap(sku.ErrExternalStoreUnsupportedTyp(sz.Metadata.Type))
 		return
 	}
 
@@ -199,14 +199,14 @@ func (c *Store) CheckoutOne(
 	sku.TransactedResetter.ResetWith(co.GetSku(), sz)
 	sku.TransactedResetter.ResetWith(co.GetSkuExternalLike().GetSku(), sz)
 	co.State = checked_out_state.StateJustCheckedOut
-	co.External.browser.Metadatei.Type = ids.MustType("!chrome-tab")
+	co.External.browser.Metadata.Type = ids.MustType("!chrome-tab")
 	co.External.item = map[string]interface{}{"url": u.String()}
 
 	c.l.Lock()
 	defer c.l.Unlock()
 
 	existing := c.added[*u]
-	c.added[*u] = append(existing, sz.Kennung.Clone())
+	c.added[*u] = append(existing, sz.ObjectId.Clone())
 
 	// 	ui.Debug().Print(response)
 
@@ -355,8 +355,8 @@ func (c *Store) tryToEmitOneExplicitlyCheckedOut(
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	sku.TransactedResetter.Reset(&co.External.browser)
-	co.External.browser.Kennung.SetGenre(genres.Zettel)
-	co.External.Kennung.SetGenre(genres.Zettel)
+	co.External.browser.ObjectId.SetGenre(genres.Zettel)
+	co.External.ObjectId.SetGenre(genres.Zettel)
 
 	var uSku *url.URL
 
@@ -407,8 +407,8 @@ func (c *Store) tryToEmitOneRecognized(
 	}
 
 	sku.TransactedResetter.Reset(&co.External.browser)
-	co.External.browser.Kennung.SetGenre(genres.Zettel)
-	co.External.Kennung.SetGenre(genres.Zettel)
+	co.External.browser.ObjectId.SetGenre(genres.Zettel)
+	co.External.ObjectId.SetGenre(genres.Zettel)
 
 	sku.TransactedResetter.ResetWith(&co.Internal, internal)
 	sku.TransactedResetter.ResetWith(&co.External.Transacted, internal)
@@ -440,8 +440,8 @@ func (c *Store) tryToEmitOneUntracked(
 	}
 
 	sku.TransactedResetter.Reset(&co.External.browser)
-	co.External.browser.Kennung.SetGenre(genres.Zettel)
-	co.External.Kennung.SetGenre(genres.Zettel)
+	co.External.browser.ObjectId.SetGenre(genres.Zettel)
+	co.External.ObjectId.SetGenre(genres.Zettel)
 
 	sku.TransactedResetter.Reset(&co.External.Transacted)
 	sku.TransactedResetter.Reset(&co.Internal)

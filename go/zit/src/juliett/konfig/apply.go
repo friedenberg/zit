@@ -20,7 +20,7 @@ func (k *Compiled) ApplyDormantAndRealizeTags(
 	sk *sku.Transacted,
 ) (err error) {
 	ui.Log().Print("applying konfig to:", sk)
-	mp := &sk.Metadatei
+	mp := &sk.Metadata
 
 	mp.Cache.SetExpandedTags(ids.ExpandMany(
 		mp.GetTags(),
@@ -43,13 +43,13 @@ func (k *Compiled) ApplyDormantAndRealizeTags(
 	mp.GetTags().Each(mp.Cache.TagPaths.AddEtikettOld)
 
 	if isEtikett {
-		ks := sk.Kennung.String()
+		ks := sk.ObjectId.String()
 
 		if err = etikett.Set(ks); err != nil {
 			return
 		}
 
-		sk.Metadatei.Cache.TagPaths.AddSelf(catgut.MakeFromString(ks))
+		sk.Metadata.Cache.TagPaths.AddSelf(catgut.MakeFromString(ks))
 
 		ids.ExpandOne(
 			&etikett,
@@ -84,7 +84,7 @@ func (k *Compiled) addSuperTags(
 
 	switch g {
 	case genres.Tag, genres.Type, genres.Repo:
-		ks = sk.Kennung.String()
+		ks = sk.ObjectId.String()
 
 		expansion.ExpanderRight.Expand(
 			func(v string) (err error) {
@@ -118,15 +118,15 @@ func (k *Compiled) addSuperTags(
 			continue
 		}
 
-		if ek.Metadatei.Cache.TagPaths.Paths.Len() <= 1 {
-			ui.Log().Print(ks, ex, ek.Metadatei.Cache.TagPaths)
+		if ek.Metadata.Cache.TagPaths.Paths.Len() <= 1 {
+			ui.Log().Print(ks, ex, ek.Metadata.Cache.TagPaths)
 			continue
 		}
 
 		prefix := catgut.MakeFromString(ex)
 
-		a := &sk.Metadatei.Cache.TagPaths
-		b := &ek.Metadatei.Cache.TagPaths
+		a := &sk.Metadata.Cache.TagPaths
+		b := &ek.Metadata.Cache.TagPaths
 
 		ui.Log().Print("a", a)
 		ui.Log().Print("b", b)
@@ -150,7 +150,7 @@ func (k *Compiled) addSuperTags(
 func (k *Compiled) addImplicitTags(
 	sk *sku.Transacted,
 ) (err error) {
-	mp := &sk.Metadatei
+	mp := &sk.Metadata
 	ie := ids.MakeTagMutableSet()
 
 	addImpEts := func(e *ids.Tag) (err error) {
@@ -161,7 +161,7 @@ func (k *Compiled) addImplicitTags(
 		impl := k.getImplicitTags(e)
 
 		if impl.Len() == 0 {
-			sk.Metadatei.Cache.TagPaths.AddPathWithType(p1)
+			sk.Metadata.Cache.TagPaths.AddPathWithType(p1)
 			return
 		}
 
@@ -171,7 +171,7 @@ func (k *Compiled) addImplicitTags(
 				func(e1 *ids.Tag) (err error) {
 					p2 := p1.Clone()
 					p2.Add(catgut.MakeFromString(e1.String()))
-					sk.Metadatei.Cache.TagPaths.AddPathWithType(p2)
+					sk.Metadata.Cache.TagPaths.AddPathWithType(p2)
 					return
 				},
 			),

@@ -31,15 +31,15 @@ func (t *External) SetFromSkuLike(sk SkuLike) (err error) {
 }
 
 func (a *External) GetObjectIdLike() ids.IdLike {
-	return &a.Kennung
+	return &a.ObjectId
 }
 
 func (a *External) GetMetadatei() *object_metadata.Metadata {
-	return &a.Metadatei
+	return &a.Metadata
 }
 
 func (a *External) GetGenre() interfaces.Genre {
-	return a.Kennung.GetGenre()
+	return a.ObjectId.GetGenre()
 }
 
 func (a *External) String() string {
@@ -53,11 +53,11 @@ func (a *External) String() string {
 }
 
 func (a *External) GetBlobSha() interfaces.Sha {
-	return &a.Metadatei.Blob
+	return &a.Metadata.Blob
 }
 
 func (a *External) SetBlobSha(v interfaces.Sha) (err error) {
-	if err = a.Metadatei.Blob.SetShaLike(v); err != nil {
+	if err = a.Metadata.Blob.SetShaLike(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

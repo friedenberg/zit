@@ -25,7 +25,7 @@ func (s *Store) Import(sk *sku.Transacted) (co *store_fs.CheckedOut, err error) 
 		return
 	}
 
-	_, err = s.GetVerzeichnisse().ReadOneObjectSha(sk.Metadatei.Sha())
+	_, err = s.GetVerzeichnisse().ReadOneObjectSha(sk.Metadata.Sha())
 
 	if err == nil {
 		co.SetError(collections.ErrExists)
@@ -55,14 +55,14 @@ func (s *Store) Import(sk *sku.Transacted) (co *store_fs.CheckedOut, err error) 
 		return
 	}
 
-	if co.Internal.Metadatei.Sha().IsNull() {
+	if co.Internal.Metadata.Sha().IsNull() {
 		err = errors.Errorf("empty sha")
 		return
 	}
 
-	if !co.Internal.Metadatei.Sha().IsNull() &&
-		!co.Internal.Metadatei.Sha().Equals(sk.Metadatei.Mutter()) &&
-		!co.Internal.Metadatei.Sha().Equals(sk.Metadatei.Sha()) {
+	if !co.Internal.Metadata.Sha().IsNull() &&
+		!co.Internal.Metadata.Sha().Equals(sk.Metadata.Mutter()) &&
+		!co.Internal.Metadata.Sha().Equals(sk.Metadata.Sha()) {
 		if err = s.importDoMerge(co); err != nil {
 			err = errors.Wrap(err)
 			return

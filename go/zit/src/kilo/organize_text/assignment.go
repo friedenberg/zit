@@ -79,7 +79,7 @@ func (a Assignment) AlignmentSpacing() int {
 func (a Assignment) MaxLen() (m int) {
 	a.Objekten.Each(
 		func(z *obj) (err error) {
-			oM := z.Kennung.Len()
+			oM := z.ObjectId.Len()
 
 			if oM > m {
 				m = oM
@@ -105,11 +105,11 @@ func (a Assignment) MaxKopfUndSchwanz(
 ) (kopf, schwanz int) {
 	a.Objekten.Each(
 		func(z *obj) (err error) {
-			oKopf, oSchwanz := z.Kennung.LenHeadAndTail()
+			oKopf, oSchwanz := z.ObjectId.LenHeadAndTail()
 
 			if o.PrintOptions.Abbreviations.Hinweisen {
 				if oKopf, oSchwanz, err = o.Abbr.LenKopfUndSchwanz(
-					&z.Kennung,
+					&z.ObjectId,
 				); err != nil {
 					err = errors.Wrap(err)
 					return

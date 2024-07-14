@@ -76,7 +76,7 @@ func (s *Store) ReadOneExternal(
 }
 
 func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
-	e, ok := s.Get(&z.Kennung)
+	e, ok := s.Get(&z.ObjectId)
 
 	if !ok {
 		return
@@ -165,7 +165,7 @@ func (s *Store) ReadOneExternalInto(
 			typFromExtension = ext
 		}
 
-		if err = e.Transacted.Metadatei.Type.Set(typFromExtension); err != nil {
+		if err = e.Transacted.Metadata.Type.Set(typFromExtension); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -219,7 +219,7 @@ func (s *Store) ReadOneExternalAkte(
 	e *External,
 	t *sku.Transacted,
 ) (err error) {
-	object_metadata.Resetter.ResetWith(&e.Metadatei, t.GetMetadata())
+	object_metadata.Resetter.ResetWith(&e.Metadata, t.GetMetadata())
 
 	var aw sha.WriteCloser
 

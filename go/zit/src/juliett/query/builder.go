@@ -143,7 +143,7 @@ func (b *Builder) WithTransacted(
 			b.preexistingKennung = append(
 				b.preexistingKennung,
 				Kennung{
-					ObjectId: t.Kennung.Clone(),
+					ObjectId: t.ObjectId.Clone(),
 				},
 			)
 
@@ -162,7 +162,7 @@ func (b *Builder) WithCheckedOut(
 			b.preexistingKennung = append(
 				b.preexistingKennung,
 				Kennung{
-					ObjectId: co.GetSku().Kennung.Clone(),
+					ObjectId: co.GetSku().ObjectId.Clone(),
 				},
 			)
 
@@ -234,7 +234,7 @@ func (b *Builder) build(vs ...string) (qg *Group, err error) {
 			continue
 		}
 
-		if k, err = b.kasten.GetKennungForString(v); err != nil {
+		if k, err = b.kasten.GetObjectIdForString(v); err != nil {
 			err = nil
 			remaining = append(remaining, v)
 			continue
@@ -310,7 +310,7 @@ func (b *Builder) buildManyFromTokens(
 		// TODO [ces/mew] switch to marker on query group for Cwd
 		var ks interfaces.SetLike[*ids.ObjectId]
 
-		if ks, err = b.kasten.GetExternalKennung(); err != nil {
+		if ks, err = b.kasten.GetExternalObjectId(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

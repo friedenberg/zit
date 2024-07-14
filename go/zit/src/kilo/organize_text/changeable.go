@@ -9,8 +9,8 @@ import (
 )
 
 func key(sk *sku.Transacted) string {
-	if sk.Kennung.IsEmpty() {
-		s := sk.Metadatei.Description.String()
+	if sk.ObjectId.IsEmpty() {
+		s := sk.Metadata.Description.String()
 
 		if s == "" {
 			panic("empty key")
@@ -18,7 +18,7 @@ func key(sk *sku.Transacted) string {
 
 		return s
 	} else {
-		return sk.Kennung.String()
+		return sk.ObjectId.String()
 	}
 }
 
@@ -72,7 +72,7 @@ func (a *Assignment) addToSet(
 				}
 
 				if !ot.Metadatei.Typ.IsEmpty() {
-					z.Metadatei.Type.ResetWith(ot.Metadatei.Typ)
+					z.Metadata.Type.ResetWith(ot.Metadatei.Typ)
 				}
 
 				out.Add(z)
@@ -80,29 +80,29 @@ func (a *Assignment) addToSet(
 				zPrime, hasOriginal := original.Get(original.Key(&o.Transacted))
 
 				if hasOriginal {
-					z.Metadatei.Blob.ResetWith(&zPrime.Metadatei.Blob)
-					z.Metadatei.Type.ResetWith(zPrime.Metadatei.Type)
+					z.Metadata.Blob.ResetWith(&zPrime.Metadata.Blob)
+					z.Metadata.Type.ResetWith(zPrime.Metadata.Type)
 				}
 
 				if !ot.Metadatei.Typ.IsEmpty() {
-					z.Metadatei.Type.ResetWith(ot.Metadatei.Typ)
+					z.Metadata.Type.ResetWith(ot.Metadatei.Typ)
 				}
 			}
 
-			if o.Kennung.String() == "" {
+			if o.ObjectId.String() == "" {
 				panic(fmt.Sprintf("%s: Kennung is nil", o))
 			}
 
-			if err = z.Metadatei.Description.Set(
-				o.Metadatei.Description.String(),
+			if err = z.Metadata.Description.Set(
+				o.Metadata.Description.String(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if !o.Metadatei.Type.IsEmpty() {
-				if err = z.Metadatei.Type.Set(
-					o.Metadatei.Type.String(),
+			if !o.Metadata.Type.IsEmpty() {
+				if err = z.Metadata.Type.Set(
+					o.Metadata.Type.String(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -113,12 +113,12 @@ func (a *Assignment) addToSet(
 				return
 			}
 
-			z.Metadatei.Comments = append(
-				z.Metadatei.Comments,
-				o.Metadatei.Comments...,
+			z.Metadata.Comments = append(
+				z.Metadata.Comments,
+				o.Metadata.Comments...,
 			)
 
-			if err = o.Metadatei.GetTags().EachPtr(
+			if err = o.Metadata.GetTags().EachPtr(
 				z.AddTagPtr,
 			); err != nil {
 				err = errors.Wrap(err)

@@ -181,7 +181,7 @@ func (fs *Store) String() (out string) {
 	return
 }
 
-func (s *Store) GetExternalKennung() (ks interfaces.SetLike[*ids.ObjectId], err error) {
+func (s *Store) GetExternalObjectId() (ks interfaces.SetLike[*ids.ObjectId], err error) {
 	ksm := collections_value.MakeMutableValueSet[*ids.ObjectId](nil)
 	ks = ksm
 	var l sync.Mutex
@@ -209,7 +209,7 @@ func (s *Store) GetExternalKennung() (ks interfaces.SetLike[*ids.ObjectId], err 
 }
 
 // TODO confirm against actual Kennung
-func (fs *Store) GetKennungForString(v string) (k *ids.ObjectId, err error) {
+func (fs *Store) GetObjectIdForString(v string) (k *ids.ObjectId, err error) {
 	var fd fd.FD
 
 	if err = fd.Set(v); err != nil {

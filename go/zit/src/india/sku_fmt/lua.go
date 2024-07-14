@@ -22,7 +22,7 @@ func ToLuaTable(o *sku.Transacted, l *lua.LState, t *LuaTable) {
 
 	etiketten := t.Etiketten
 
-	o.Metadatei.GetTags().EachPtr(
+	o.Metadata.GetTags().EachPtr(
 		func(e *ids.Tag) (err error) {
 			l.SetField(etiketten, e.String(), lua.LBool(true))
 			return
@@ -31,7 +31,7 @@ func ToLuaTable(o *sku.Transacted, l *lua.LState, t *LuaTable) {
 
 	etiketten = t.EtikettenImplicit
 
-	o.Metadatei.Cache.GetImplicitTags().EachPtr(
+	o.Metadata.Cache.GetImplicitTags().EachPtr(
 		func(e *ids.Tag) (err error) {
 			l.SetField(etiketten, e.String(), lua.LBool(true))
 			return
@@ -48,10 +48,10 @@ func FromLuaTable(o *sku.Transacted, l *lua.LState, lt *LuaTable) (err error) {
 		return
 	}
 
-	o.Kennung.SetGenre(g)
+	o.ObjectId.SetGenre(g)
 	k := l.GetField(t, "Kennung").String()
 
-	if err = o.Kennung.Set(k); err != nil {
+	if err = o.ObjectId.Set(k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -64,7 +64,7 @@ func FromLuaTable(o *sku.Transacted, l *lua.LState, lt *LuaTable) (err error) {
 		return
 	}
 
-	o.Metadatei.SetTags(nil)
+	o.Metadata.SetTags(nil)
 
 	ets.ForEach(
 		func(key, value lua.LValue) {
@@ -75,7 +75,7 @@ func FromLuaTable(o *sku.Transacted, l *lua.LState, lt *LuaTable) (err error) {
 				panic(err)
 			}
 
-			errors.PanicIfError(o.Metadatei.AddTagPtr(&e))
+			errors.PanicIfError(o.Metadata.AddTagPtr(&e))
 		},
 	)
 

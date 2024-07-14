@@ -12,8 +12,8 @@ func InternalAndExternalEqualsWithoutTai(col CheckedOutLike) bool {
 	i := col.GetSku()
 	e := col.GetSkuExternalLike().GetSku()
 
-	return e.Metadatei.EqualsSansTai(
-		&i.Metadatei,
+	return e.Metadata.EqualsSansTai(
+		&i.Metadata,
 	)
 }
 
@@ -23,7 +23,7 @@ func DetermineState(c CheckedOutLike, justCheckedOut bool) {
 
 	if i.GetObjectSha().IsNull() {
 		c.SetState(checked_out_state.StateUntracked)
-	} else if i.Metadatei.EqualsSansTai(&e.Metadatei) {
+	} else if i.Metadata.EqualsSansTai(&e.Metadata) {
 		if justCheckedOut {
 			c.SetState(checked_out_state.StateJustCheckedOut)
 		} else {
@@ -79,8 +79,8 @@ func (c *CheckedOut) SetError(err error) {
 }
 
 func (c *CheckedOut) InternalAndExternalEqualsSansTai() bool {
-	return c.External.Metadatei.EqualsSansTai(
-		&c.Internal.Metadatei,
+	return c.External.Metadata.EqualsSansTai(
+		&c.Internal.Metadata,
 	)
 }
 
@@ -96,7 +96,7 @@ func (c *CheckedOut) GetError() error {
 func (c *CheckedOut) DetermineState(justCheckedOut bool) {
 	if c.Internal.GetObjectSha().IsNull() {
 		c.State = checked_out_state.StateUntracked
-	} else if c.Internal.Metadatei.EqualsSansTai(&c.External.Metadatei) {
+	} else if c.Internal.Metadata.EqualsSansTai(&c.External.Metadata) {
 		if justCheckedOut {
 			c.State = checked_out_state.StateJustCheckedOut
 		} else {

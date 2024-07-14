@@ -85,7 +85,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 		fallthrough
 
 	case m == checkout_mode.ModeAkteOnly:
-		n2, err = f.kennungStringFormatWriter.WriteStringFormat(sw, &o.Kennung)
+		n2, err = f.kennungStringFormatWriter.WriteStringFormat(sw, &o.ObjectId)
 		n += n2
 
 		if err != nil {
