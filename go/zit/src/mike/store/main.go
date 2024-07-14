@@ -21,7 +21,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/store_verzeichnisse"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/stream_index"
 	"code.linenisgreat.com/zit/go/zit/src/lima/bestandsaufnahme"
 )
 
@@ -39,7 +39,7 @@ type Store struct {
 	luaVMPoolBuilder          *lua.VMPoolBuilder
 	etikettenLock             sync.Mutex
 
-	verzeichnisse *store_verzeichnisse.Store
+	verzeichnisse *stream_index.Index
 
 	sonnenaufgang thyme.Time
 
@@ -129,7 +129,7 @@ func (c *Store) Initialize(
 		return
 	}
 
-	if c.verzeichnisse, err = store_verzeichnisse.MakeStore(
+	if c.verzeichnisse, err = stream_index.MakeIndex(
 		c.GetStandort(),
 		c.GetKonfig(),
 		c.GetStandort().DirVerzeichnisseObjekten(),

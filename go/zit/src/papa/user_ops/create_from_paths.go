@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/objekte_collections"
+	"code.linenisgreat.com/zit/go/zit/src/india/object_collections"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
@@ -33,7 +33,7 @@ func (c CreateFromPaths) Run(
 	args ...string,
 ) (results sku.TransactedMutableSet, err error) {
 	toCreate := make(map[sha.Bytes]*store_fs.External)
-	toDelete := objekte_collections.MakeMutableSetUniqueFD()
+	toDelete := object_collections.MakeMutableSetUniqueFD()
 
 	o := store.ObjekteOptions{
 		Mode: objekte_mode.ModeRealizeWithProto,

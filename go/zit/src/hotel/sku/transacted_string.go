@@ -11,7 +11,7 @@ func (a *Transacted) String() string {
 	)
 }
 
-func (a *Transacted) StringKennungBezeichnung() string {
+func (a *Transacted) StringObjectIdDescription() string {
 	return fmt.Sprintf(
 		"[%s %q]",
 		&a.ObjectId,
@@ -19,7 +19,7 @@ func (a *Transacted) StringKennungBezeichnung() string {
 	)
 }
 
-func (a *Transacted) StringKennungTai() string {
+func (a *Transacted) StringObjectIdTai() string {
 	return fmt.Sprintf(
 		"%s@%s",
 		&a.ObjectId,
@@ -27,7 +27,7 @@ func (a *Transacted) StringKennungTai() string {
 	)
 }
 
-func (a *Transacted) StringKennungTaiAkte() string {
+func (a *Transacted) StringObjectIdTaiBlob() string {
 	return fmt.Sprintf(
 		"%s@%s@%s",
 		&a.ObjectId,
@@ -36,7 +36,7 @@ func (a *Transacted) StringKennungTaiAkte() string {
 	)
 }
 
-func (a *Transacted) StringKennungSha() string {
+func (a *Transacted) StringObjectIdSha() string {
 	return fmt.Sprintf(
 		"%s@%s",
 		&a.ObjectId,
@@ -44,7 +44,7 @@ func (a *Transacted) StringKennungSha() string {
 	)
 }
 
-func (a *Transacted) StringKennungMutter() string {
+func (a *Transacted) StringObjectIdParent() string {
 	return fmt.Sprintf(
 		"%s^@%s",
 		&a.ObjectId,

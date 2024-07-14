@@ -24,7 +24,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 )
 
 func (u *Umwelt) MakeFormatFunc(
@@ -282,7 +281,7 @@ func (u *Umwelt) MakeFormatFunc(
 
 	case "kennung-tai":
 		f = func(e *sku.Transacted) (err error) {
-			_, err = fmt.Fprintln(out, e.StringKennungTai())
+			_, err = fmt.Fprintln(out, e.StringObjectIdTai())
 			return
 		}
 
@@ -789,7 +788,7 @@ func (u *Umwelt) makeTypFormatter(
 		}
 
 	case "formatter-uti-groups":
-		fo := zettel.MakeFormatterTypFormatterUTIGroups(u.GetStore(), agp)
+		fo := sku_fmt.MakeFormatterTypFormatterUTIGroups(u.GetStore(), agp)
 
 		f = func(o *sku.Transacted) (err error) {
 			if _, err = fo.Format(out, o); err != nil {

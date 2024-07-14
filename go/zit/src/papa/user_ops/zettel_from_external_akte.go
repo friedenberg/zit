@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/objekte_collections"
+	"code.linenisgreat.com/zit/go/zit/src/india/object_collections"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
@@ -37,7 +37,7 @@ func (c ZettelFromExternalAkte) Run(
 
 	defer errors.Deferred(&err, c.Unlock)
 
-	toCreate := objekte_collections.MakeMutableSetUniqueAkte()
+	toCreate := object_collections.MakeMutableSetUniqueAkte()
 	toDelete := fd.MakeMutableSet()
 
 	results = sku.MakeTransactedMutableSet()

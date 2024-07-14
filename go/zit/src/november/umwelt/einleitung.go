@@ -16,9 +16,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/typ"
 )
 
 type Einleitung struct {
@@ -143,13 +143,14 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 
 	defer errors.Deferred(&err, u.Unlock)
 
-	defaultTyp, defaultTypKennung := typ.Default()
+	defaultTypeObjectId := ids.MustType("md")
+	defaultTypeBlob := type_blobs.Default()
 
 	// var defaultTypTransacted *typ.Transacted
 
 	var k ids.ObjectId
 
-	if err = k.SetWithIdLike(defaultTypKennung); err != nil {
+	if err = k.SetWithIdLike(defaultTypeObjectId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -160,7 +161,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 		var sh interfaces.Sha
 
 		if sh, _, err = u.GetStore().GetAkten().GetTypeV0().SaveBlobText(
-			&defaultTyp,
+			&defaultTypeBlob,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -168,7 +169,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 
 		var k ids.ObjectId
 
-		if err = k.SetWithIdLike(defaultTypKennung); err != nil {
+		if err = k.SetWithIdLike(defaultTypeObjectId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -185,7 +186,7 @@ func initDefaultTypAndKonfig(u *Umwelt) (err error) {
 	{
 		var sh interfaces.Sha
 
-		if sh, err = writeDefaultErworben(u, defaultTypKennung); err != nil {
+		if sh, err = writeDefaultErworben(u, defaultTypeObjectId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

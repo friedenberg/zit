@@ -17,7 +17,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/store_verzeichnisse"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/stream_index"
 	"code.linenisgreat.com/zit/go/zit/src/lima/bestandsaufnahme"
 )
 
@@ -81,7 +81,7 @@ func (s *Store) GetKonfig() *konfig.Compiled {
 	return s.konfig
 }
 
-func (s *Store) GetVerzeichnisse() *store_verzeichnisse.Store {
+func (s *Store) GetVerzeichnisse() *stream_index.Index {
 	return s.verzeichnisse
 }
 
