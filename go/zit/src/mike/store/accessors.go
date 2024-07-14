@@ -91,13 +91,13 @@ func (s *Store) GetKonfigAkteFormat() blob_store.Format[mutable_config.Blob, *mu
 }
 
 func (s *Store) ReadOneEnnui(sh *sha.Sha) (*sku.Transacted, error) {
-	return s.GetVerzeichnisse().ReadOneEnnui(sh)
+	return s.GetVerzeichnisse().ReadOneObjectSha(sh)
 }
 
 func (s *Store) ReadOneKennung(
 	k interfaces.StringerGenreGetter,
 ) (sk *sku.Transacted, err error) {
-	return s.GetVerzeichnisse().ReadOneKennung(k)
+	return s.GetVerzeichnisse().ReadOneObjectId(k)
 }
 
 func (s *Store) ReaderFor(sh *sha.Sha) (rc sha.ReadCloser, err error) {

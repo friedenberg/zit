@@ -242,11 +242,11 @@ func (s *Store) fetchMutterIfNecessary(
 	ut ObjekteOptions,
 ) (mutter *sku.Transacted, err error) {
 	if !sk.Metadatei.Mutter().IsNull() && false {
-		mutter, err = s.GetVerzeichnisse().ReadOneEnnui(
+		mutter, err = s.GetVerzeichnisse().ReadOneObjectSha(
 			sk.Metadatei.Mutter(),
 		)
 	} else {
-		mutter, err = s.GetVerzeichnisse().ReadOneKennung(
+		mutter, err = s.GetVerzeichnisse().ReadOneObjectId(
 			sk.GetObjectId(),
 		)
 	}

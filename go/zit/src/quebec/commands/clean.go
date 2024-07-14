@@ -84,7 +84,7 @@ func (c Clean) shouldClean(
 	}
 
 	if c.includeMutter {
-		mutter, err := u.GetStore().GetVerzeichnisse().ReadOneEnnui(
+		mutter, err := u.GetStore().GetVerzeichnisse().ReadOneObjectSha(
 			co.GetSku().Metadatei.Mutter(),
 		)
 

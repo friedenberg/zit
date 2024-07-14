@@ -57,7 +57,7 @@ func (c Test) RunWithQuery(
 			func(o *sku.Transacted) (err error) {
 				var sk *sku.Transacted
 
-				if sk, err = u.GetStore().GetVerzeichnisse().ReadOneKennung(
+				if sk, err = u.GetStore().GetVerzeichnisse().ReadOneObjectId(
 					&o.Kennung,
 				); err != nil {
 					err = errors.Wrap(err)

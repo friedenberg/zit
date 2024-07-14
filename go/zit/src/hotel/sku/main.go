@@ -30,13 +30,13 @@ type (
 		GetTypeExtension(string) string
 	}
 
-	Ennui interface {
+	ObjectProbeIndex interface {
 		WriteOneObjekteMetadatei(o *Transacted) (err error)
-		ReadOneEnnui(*sha.Sha) (*Transacted, error)
-		ReadOneKennung(
+		ReadOneObjectSha(*sha.Sha) (*Transacted, error)
+		ReadOneObjectId(
 			interfaces.StringerGenreGetter,
 		) (*Transacted, error)
-		ReadOneKennungSha(
+		ReadOneObjectIdSha(
 			interfaces.StringerGenreGetter,
 		) (*sha.Sha, error)
 	}
@@ -50,7 +50,6 @@ type (
 		interfaces.Stringer
 		object_metadata.Getter
 
-		GetKopf() ids.Tai
 		GetTai() ids.Tai
 		GetType() ids.Type
 		GetObjectId() *ids.ObjectId
@@ -65,7 +64,8 @@ type (
 		CalculateObjekteShas() (err error)
 
 		SetTai(ids.Tai)
-		SetKennungLike(ids.IdLike) error
+		object_inventory_format.ParserContext
+		object_inventory_format.FormatterContext
 		SetFromSkuLike(SkuLike) error
 
 		GetSkuLike() SkuLike

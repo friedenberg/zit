@@ -565,7 +565,7 @@ func (u *Umwelt) MakeFormatFunc(
 				return
 			}
 
-			if z, err = u.GetStore().GetVerzeichnisse().ReadOneEnnui(
+			if z, err = u.GetStore().GetVerzeichnisse().ReadOneObjectSha(
 				z.GetMetadata().Mutter(),
 			); err != nil {
 				fmt.Fprintln(out, err)
@@ -637,7 +637,7 @@ func (u *Umwelt) MakeFormatFunc(
 		f = func(o *sku.Transacted) (err error) {
 			var sk *sku.Transacted
 
-			if sk, err = u.GetStore().GetVerzeichnisse().ReadOneKennung(
+			if sk, err = u.GetStore().GetVerzeichnisse().ReadOneObjectId(
 				&o.Kennung,
 			); err != nil {
 				err = errors.Wrap(err)

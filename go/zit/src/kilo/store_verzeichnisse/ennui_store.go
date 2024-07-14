@@ -42,7 +42,7 @@ func (s *ennuiStore) Initialize(
 	return
 }
 
-func (s *ennuiStore) ReadOneEnnui(sh *sha.Sha) (sk *sku.Transacted, err error) {
+func (s *ennuiStore) ReadOneObjectSha(sh *sha.Sha) (sk *sku.Transacted, err error) {
 	var r sha.ReadCloser
 
 	if r, err = s.fs_home.BlobReaderFrom(
@@ -87,7 +87,7 @@ func (s *ennuiStore) ReadOneEnnui(sh *sha.Sha) (sk *sku.Transacted, err error) {
 	return
 }
 
-func (s *ennuiStore) ReadOneKennungSha(
+func (s *ennuiStore) ReadOneObjectIdSha(
 	k interfaces.StringerGenreGetter,
 ) (sh *sha.Sha, err error) {
 	left := sha.FromString(k.String())
@@ -101,10 +101,10 @@ func (s *ennuiStore) ReadOneKennungSha(
 	return
 }
 
-func (s *ennuiStore) ReadOneKennung(
+func (s *ennuiStore) ReadOneObjectId(
 	k interfaces.StringerGenreGetter,
 ) (sk *sku.Transacted, err error) {
-	sh, err := s.ReadOneKennungSha(k)
+	sh, err := s.ReadOneObjectIdSha(k)
 	defer sha.GetPool().Put(sh)
 
 	if err != nil {
@@ -112,7 +112,7 @@ func (s *ennuiStore) ReadOneKennung(
 		return
 	}
 
-	if sk, err = s.ReadOneEnnui(sh); err != nil {
+	if sk, err = s.ReadOneObjectSha(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
