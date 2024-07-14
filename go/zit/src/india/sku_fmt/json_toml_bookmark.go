@@ -17,7 +17,7 @@ type JsonWithUrl struct {
 
 func MakeJsonTomlBookmark(
 	sk *sku.Transacted,
-	s fs_home.Standort,
+	s fs_home.Home,
 	chromeTabs []interface{},
 ) (j JsonWithUrl, err error) {
 	if err = j.FromTransacted(sk, s); err != nil {

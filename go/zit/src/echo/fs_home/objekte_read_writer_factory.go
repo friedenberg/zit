@@ -4,13 +4,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
-func (s Standort) ObjekteReaderFactory(
+func (s Home) ObjekteReaderFactory(
 	g interfaces.GenreGetter,
 ) interfaces.ObjectReaderFactory {
 	return s.ObjekteReaderWriterFactory(g)
 }
 
-func (s Standort) ObjekteReaderWriterFactory(
+func (s Home) ObjekteReaderWriterFactory(
 	g interfaces.GenreGetter,
 ) interfaces.ObjectIOFactory {
 	return interfaces.MakeBespokeObjectReadWriterFactory(

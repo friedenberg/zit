@@ -20,12 +20,12 @@ import (
 func (kc *Compiled) recompile(
 	tagp interfaces.BlobGetterPutter[*type_blobs.V0],
 ) (err error) {
-	if err = kc.recompileEtiketten(); err != nil {
+	if err = kc.recompileTags(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = kc.recompileTypen(tagp); err != nil {
+	if err = kc.recompileTypes(tagp); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -33,13 +33,13 @@ func (kc *Compiled) recompile(
 	return
 }
 
-func (kc *Compiled) recompileEtiketten() (err error) {
-	kc.DefaultEtiketten = ids.MakeTagSet(kc.Defaults.Etiketten...)
+func (kc *Compiled) recompileTags() (err error) {
+	kc.DefaultTags = ids.MakeTagSet(kc.Defaults.Etiketten...)
 
-	kc.ImplicitEtiketten = make(implicitEtikettenMap)
+	kc.ImplicitTags = make(implicitTagMap)
 
-	if err = kc.compiled.Etiketten.Each(
-		func(ke *ketikett) (err error) {
+	if err = kc.compiled.Tags.Each(
+		func(ke *tag) (err error) {
 			var e ids.Tag
 
 			if err = e.Set(ke.Transacted.GetObjectId().String()); err != nil {
@@ -47,12 +47,12 @@ func (kc *Compiled) recompileEtiketten() (err error) {
 				return
 			}
 
-			if err = kc.AccumulateImplicitEtiketten(e); err != nil {
+			if err = kc.AccumulateImplicitTags(e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if err = kc.ApplySchlummerndAndRealizeEtiketten(&ke.Transacted); err != nil {
+			if err = kc.ApplyDormantAndRealizeTags(&ke.Transacted); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -67,16 +67,16 @@ func (kc *Compiled) recompileEtiketten() (err error) {
 	return
 }
 
-func (kc *Compiled) recompileTypen(
+func (kc *Compiled) recompileTypes(
 	tagp interfaces.BlobGetterPutter[*type_blobs.V0],
 ) (err error) {
 	inlineTypen := collections_value.MakeMutableValueSet[values.String](nil)
 
 	defer func() {
-		kc.InlineTypen = inlineTypen.CloneSetLike()
+		kc.InlineTypes = inlineTypen.CloneSetLike()
 	}()
 
-	if err = kc.Typen.Each(
+	if err = kc.Types.Each(
 		func(ct *sku.Transacted) (err error) {
 			var ta *type_blobs.V0
 
@@ -94,14 +94,14 @@ func (kc *Compiled) recompileTypen(
 			}
 
 			// TODO-P2 enforce uniqueness
-			kc.ExtensionsToTypen[fe] = ct.GetObjectId().String()
-			kc.TypenToExtensions[ct.GetObjectId().String()] = fe
+			kc.ExtensionsToTypes[fe] = ct.GetObjectId().String()
+			kc.TypesToExtensions[ct.GetObjectId().String()] = fe
 
 			if ta.InlineAkte {
 				inlineTypen.Add(values.MakeString(ct.Kennung.String()))
 			}
 
-			if err = kc.ApplySchlummerndAndRealizeEtiketten(ct); err != nil {
+			if err = kc.ApplyDormantAndRealizeTags(ct); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -150,7 +150,7 @@ func (kc *compiled) setHasChanges(reason string) {
 	kc.changes = append(kc.changes, reason)
 }
 
-func (kc *Compiled) loadKonfigErworben(s fs_home.Standort) (err error) {
+func (kc *Compiled) loadMutableConfig(s fs_home.Home) (err error) {
 	var f *os.File
 
 	p := s.FileKonfigCompiled()
@@ -182,7 +182,7 @@ func (kc *Compiled) loadKonfigErworben(s fs_home.Standort) (err error) {
 }
 
 func (kc *Compiled) Flush(
-	s fs_home.Standort,
+	s fs_home.Home,
 	tagp interfaces.BlobGetterPutter[*type_blobs.V0],
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
@@ -192,7 +192,7 @@ func (kc *Compiled) Flush(
 
 	wg := iter.MakeErrorWaitGroupParallel()
 	wg.Do(func() (err error) {
-		if err = kc.flushErworben(s, tagp, printerHeader); err != nil {
+		if err = kc.flushMutableConfig(s, tagp, printerHeader); err != nil {
 			if errors.IsNotExist(err) {
 				err = nil
 			} else {
@@ -213,8 +213,8 @@ func (kc *Compiled) Flush(
 	return
 }
 
-func (kc *Compiled) flushErworben(
-	s fs_home.Standort,
+func (kc *Compiled) flushMutableConfig(
+	s fs_home.Home,
 	tagp interfaces.BlobGetterPutter[*type_blobs.V0],
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {

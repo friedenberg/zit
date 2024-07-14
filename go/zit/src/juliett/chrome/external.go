@@ -22,7 +22,7 @@ type External struct {
 	item
 }
 
-func (e *External) SaveAkte(s fs_home.Standort) (err error) {
+func (e *External) SaveAkte(s fs_home.Home) (err error) {
 	var aw sha.WriteCloser
 
 	if aw, err = s.BlobWriter(); err != nil {

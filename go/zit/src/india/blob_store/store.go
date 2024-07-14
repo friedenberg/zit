@@ -11,7 +11,7 @@ type BlobStore[
 	A interfaces.Blob[A],
 	APtr interfaces.BlobPtr[A],
 ] struct {
-	fs_home fs_home.Standort
+	fs_home fs_home.Home
 	Format[A, APtr]
 	resetFunc func(APtr)
 }
@@ -20,7 +20,7 @@ func MakeBlobStore[
 	A interfaces.Blob[A],
 	APtr interfaces.BlobPtr[A],
 ](
-	st fs_home.Standort,
+	st fs_home.Home,
 	format Format[A, APtr],
 	resetFunc func(APtr),
 ) (s *BlobStore[A, APtr]) {

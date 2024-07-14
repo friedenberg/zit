@@ -25,7 +25,7 @@ type Einleitung struct {
 	AgeIdentity age.Identity
 	Yin         string
 	Yang        string
-	Angeboren   immutable_config.Konfig
+	Angeboren   immutable_config.Config
 }
 
 func (e *Einleitung) AddToFlagSet(f *flag.FlagSet) {

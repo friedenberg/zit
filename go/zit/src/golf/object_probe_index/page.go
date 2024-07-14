@@ -21,14 +21,14 @@ type page struct {
 	f          *os.File
 	br         bufio.Reader
 	added      *heap.Heap[row, *row]
-	fs_home    fs_home.Standort
+	fs_home    fs_home.Home
 	searchFunc func(*sha.Sha) (mid int64, err error)
 	sha.PageId
 }
 
 func (p *page) initialize(
 	equaler interfaces.Equaler1[*row],
-	s fs_home.Standort,
+	s fs_home.Home,
 	pid sha.PageId,
 ) (err error) {
 	p.added = heap.Make(

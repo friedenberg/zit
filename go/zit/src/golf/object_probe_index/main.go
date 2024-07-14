@@ -49,13 +49,13 @@ type object_probe_index struct {
 	pages [PageCount]page
 }
 
-func MakePermitDuplicates(s fs_home.Standort, path string) (e *object_probe_index, err error) {
+func MakePermitDuplicates(s fs_home.Home, path string) (e *object_probe_index, err error) {
 	e = &object_probe_index{}
 	err = e.initialize(rowEqualerComplete{}, s, path)
 	return
 }
 
-func MakeNoDuplicates(s fs_home.Standort, path string) (e *object_probe_index, err error) {
+func MakeNoDuplicates(s fs_home.Home, path string) (e *object_probe_index, err error) {
 	e = &object_probe_index{}
 	err = e.initialize(rowEqualerShaOnly{}, s, path)
 	return
@@ -63,7 +63,7 @@ func MakeNoDuplicates(s fs_home.Standort, path string) (e *object_probe_index, e
 
 func (e *object_probe_index) initialize(
 	equaler interfaces.Equaler1[*row],
-	s fs_home.Standort,
+	s fs_home.Home,
 	path string,
 ) (err error) {
 	for i := range e.pages {

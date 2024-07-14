@@ -52,7 +52,7 @@ type Format = blob_store.Format[
 ]
 
 type store struct {
-	fs_home                   fs_home.Standort
+	fs_home                   fs_home.Home
 	ls                        interfaces.LockSmith
 	sv                        interfaces.StoreVersion
 	of                        interfaces.ObjectIOFactory
@@ -65,7 +65,7 @@ type store struct {
 }
 
 func MakeStore(
-	fs_home fs_home.Standort,
+	fs_home fs_home.Home,
 	ls interfaces.LockSmith,
 	sv interfaces.StoreVersion,
 	of interfaces.ObjectIOFactory,

@@ -53,7 +53,7 @@ type Store struct {
 
 func MakeChrome(
 	k *konfig.Compiled,
-	s fs_home.Standort,
+	s fs_home.Home,
 	itemDeletedStringFormatWriter interfaces.FuncIter[*CheckedOut],
 ) *Store {
 	c := &Store{

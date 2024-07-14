@@ -173,7 +173,7 @@ func (s *Store) checkoutOne(
 	cz.State = checked_out_state.StateJustCheckedOut
 
 	t := cz.Internal.GetType()
-	inlineAkte := s.konfig.IsInlineTyp(t)
+	inlineAkte := s.konfig.IsInlineType(t)
 
 	if options.CheckoutMode.IncludesObjekte() {
 		if err = cz.External.GetFDsPtr().Objekte.SetPath(filename); err != nil {
@@ -186,7 +186,7 @@ func (s *Store) checkoutOne(
 		!options.ForceInlineAkte) &&
 		options.CheckoutMode.IncludesAkte() {
 
-		fe := s.konfig.GetTypExtension(t.String())
+		fe := s.konfig.GetTypeExtension(t.String())
 
 		if fe == "" {
 			fe = t.String()

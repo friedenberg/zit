@@ -77,7 +77,7 @@ type (
 	ExternalStoreInfo struct {
 		StoreFuncs
 		DirCache string
-		fs_home.Standort
+		fs_home.Home
 	}
 
 	ExternalStoreForQuery interface {

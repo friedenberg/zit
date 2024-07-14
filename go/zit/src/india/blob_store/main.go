@@ -27,7 +27,7 @@ type VersionedStores struct {
 }
 
 func Make(
-	st fs_home.Standort,
+	st fs_home.Home,
 ) *VersionedStores {
 	return &VersionedStores{
 		tag_v0: MakeBlobStore(

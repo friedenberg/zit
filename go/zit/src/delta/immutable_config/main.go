@@ -9,10 +9,10 @@ import (
 )
 
 func init() {
-	gob.RegisterName("KonfigLike", Konfig{})
+	gob.RegisterName("KonfigLike", Config{})
 }
 
-type Konfig struct {
+type Config struct {
 	StoreVersion                        storeVersion
 	Recipients                          []string
 	UseBestandsaufnahme                 bool
@@ -22,8 +22,8 @@ type Konfig struct {
 	LockInternalFiles                   bool
 }
 
-func Default() Konfig {
-	return Konfig{
+func Default() Config {
+	return Config{
 		StoreVersion:                        storeVersion(values.Int(5)),
 		Recipients:                          make([]string, 0),
 		UseBestandsaufnahme:                 true,
@@ -34,15 +34,15 @@ func Default() Konfig {
 	}
 }
 
-func (k Konfig) GetStoreVersion() interfaces.StoreVersion {
+func (k Config) GetStoreVersion() interfaces.StoreVersion {
 	return k.StoreVersion
 }
 
-func (k Konfig) GetUseBestandsaufnahmeForVerzeichnisse() bool {
+func (k Config) GetUseBestandsaufnahmeForVerzeichnisse() bool {
 	return k.UseBestandsaufnahmeForVerzeichnisse
 }
 
-func (k *Konfig) AddToFlagSet(f *flag.FlagSet) {
+func (k *Config) AddToFlagSet(f *flag.FlagSet) {
 	f.BoolVar(
 		&k.UseBestandsaufnahme,
 		"use-bestandsaufnahme",

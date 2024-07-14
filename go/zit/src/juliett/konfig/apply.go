@@ -16,7 +16,7 @@ import (
 )
 
 // TODO
-func (k *Compiled) ApplySchlummerndAndRealizeEtiketten(
+func (k *Compiled) ApplyDormantAndRealizeTags(
 	sk *sku.Transacted,
 ) (err error) {
 	ui.Log().Print("applying konfig to:", sk)
@@ -59,22 +59,22 @@ func (k *Compiled) ApplySchlummerndAndRealizeEtiketten(
 		)
 	}
 
-	if err = k.addSuperEtiketten(sk); err != nil {
+	if err = k.addSuperTags(sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = k.addImplicitEtiketten(sk); err != nil {
+	if err = k.addImplicitTags(sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	sk.SetSchlummernd(k.schlummernd.ContainsSku(sk))
+	sk.SetSchlummernd(k.dormant.ContainsSku(sk))
 
 	return
 }
 
-func (k *Compiled) addSuperEtiketten(
+func (k *Compiled) addSuperTags(
 	sk *sku.Transacted,
 ) (err error) {
 	g := sk.GetGenre()
@@ -105,7 +105,7 @@ func (k *Compiled) addSuperEtiketten(
 
 		var ek *sku.Transacted
 
-		if ek, err = k.getEtikettOrKastenOrTyp(ex); err != nil {
+		if ek, err = k.getTagOrRepoIdOrType(ex); err != nil {
 			err = errors.Wrapf(err, "Expanded: %q", ex)
 			return
 		}
@@ -147,7 +147,7 @@ func (k *Compiled) addSuperEtiketten(
 	return
 }
 
-func (k *Compiled) addImplicitEtiketten(
+func (k *Compiled) addImplicitTags(
 	sk *sku.Transacted,
 ) (err error) {
 	mp := &sk.Metadatei
@@ -158,7 +158,7 @@ func (k *Compiled) addImplicitEtiketten(
 		p1.Type = tag_paths.TypeIndirect
 		p1.Add(catgut.MakeFromString(e.String()))
 
-		impl := k.getImplicitEtiketten(e)
+		impl := k.getImplicitTags(e)
 
 		if impl.Len() == 0 {
 			sk.Metadatei.Cache.TagPaths.AddPathWithType(p1)
@@ -185,7 +185,7 @@ func (k *Compiled) addImplicitEtiketten(
 
 	mp.GetTags().EachPtr(addImpEts)
 
-	typKonfig := k.getApproximatedTyp(mp.GetType()).ApproximatedOrActual()
+	typKonfig := k.getApproximatedType(mp.GetType()).ApproximatedOrActual()
 
 	if typKonfig != nil {
 		typKonfig.GetEtiketten().EachPtr(ie.AddPtr)
@@ -197,7 +197,7 @@ func (k *Compiled) addImplicitEtiketten(
 	return
 }
 
-func (k compiled) ApplyToNewMetadatei(
+func (k compiled) ApplyToNewMetadata(
 	ml object_metadata.MetadataLike,
 	tagp interfaces.BlobGetterPutter[*type_blobs.V0],
 ) (err error) {

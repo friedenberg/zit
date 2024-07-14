@@ -49,7 +49,7 @@ func init() {
 }
 
 type Store struct {
-	fs_home        fs_home.Standort
+	fs_home        fs_home.Home
 	mutable_config *konfig.Compiled
 	path           string
 	interfaces.CacheIOFactory
@@ -59,7 +59,7 @@ type Store struct {
 }
 
 func MakeStore(
-	s fs_home.Standort,
+	s fs_home.Home,
 	k *konfig.Compiled,
 	dir string,
 	persistentMetadateiFormat object_inventory_format.Format,

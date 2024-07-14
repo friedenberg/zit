@@ -23,7 +23,7 @@ func MakeProtoZettel(k *konfig.Compiled) (p ProtoZettel) {
 	errors.TodoP1("modify konfig to keep etiketten set")
 
 	p.Metadatei.Type = k.GetErworben().Defaults.Typ
-	p.Metadatei.SetTags(k.DefaultEtiketten)
+	p.Metadatei.SetTags(k.DefaultTags)
 
 	return
 }

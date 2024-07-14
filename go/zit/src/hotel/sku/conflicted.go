@@ -10,16 +10,16 @@ type Conflicted struct {
 	Left, Middle, Right *Transacted
 }
 
-func (tm Conflicted) IsAllInlineTyp(itc ids.InlineTypChecker) bool {
-	if !itc.IsInlineTyp(tm.Left.GetType()) {
+func (tm Conflicted) IsAllInlineTyp(itc ids.InlineTypeChecker) bool {
+	if !itc.IsInlineType(tm.Left.GetType()) {
 		return false
 	}
 
-	if !itc.IsInlineTyp(tm.Middle.GetType()) {
+	if !itc.IsInlineType(tm.Middle.GetType()) {
 		return false
 	}
 
-	if !itc.IsInlineTyp(tm.Right.GetType()) {
+	if !itc.IsInlineType(tm.Right.GetType()) {
 		return false
 	}
 

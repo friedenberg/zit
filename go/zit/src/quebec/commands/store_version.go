@@ -9,7 +9,7 @@ import (
 )
 
 type StoreVersion struct {
-	Angeboren immutable_config.Konfig
+	Angeboren immutable_config.Config
 }
 
 func init() {

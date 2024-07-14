@@ -21,12 +21,12 @@ type fileEncoder struct {
 	mode int
 	perm os.FileMode
 	arf  interfaces.BlobIOFactory
-	ic   ids.InlineTypChecker
+	ic   ids.InlineTypeChecker
 }
 
 func MakeFileEncoder(
 	arf interfaces.BlobIOFactory,
-	ic ids.InlineTypChecker,
+	ic ids.InlineTypeChecker,
 ) *fileEncoder {
 	return &fileEncoder{
 		mode: os.O_WRONLY | os.O_CREATE | os.O_TRUNC,
@@ -38,7 +38,7 @@ func MakeFileEncoder(
 
 func MakeFileEncoderJustOpen(
 	arf interfaces.BlobIOFactory,
-	ic ids.InlineTypChecker,
+	ic ids.InlineTypeChecker,
 ) fileEncoder {
 	return fileEncoder{
 		mode: os.O_WRONLY | os.O_TRUNC,
@@ -75,7 +75,7 @@ func (e *fileEncoder) EncodeObjekte(
 	objektePath string,
 	aktePath string,
 ) (err error) {
-	inline := e.ic.IsInlineTyp(z.GetType())
+	inline := e.ic.IsInlineType(z.GetType())
 
 	var ar sha.ReadCloser
 

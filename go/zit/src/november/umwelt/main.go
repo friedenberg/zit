@@ -42,10 +42,10 @@ type Umwelt struct {
 	outIsTty bool
 	errIsTty bool
 
-	fs_home     fs_home.Standort
+	fs_home     fs_home.Home
 	erworbenCli mutable_config.Cli
 	konfig      konfig.Compiled
-	schlummernd query.Schlummernd
+	schlummernd query.Dormant
 
 	storesInitialized bool
 	store             store.Store

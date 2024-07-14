@@ -18,8 +18,8 @@ type (
 		value string
 	}
 
-	InlineTypChecker interface {
-		IsInlineTyp(Type) bool
+	InlineTypeChecker interface {
+		IsInlineType(Type) bool
 	}
 )
 

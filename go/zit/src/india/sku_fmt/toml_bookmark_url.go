@@ -18,7 +18,7 @@ type TomlBookmark struct {
 
 func TomlBookmarkUrl(
 	sk *sku.Transacted,
-	s fs_home.Standort,
+	s fs_home.Home,
 ) (ur *url.URL, err error) {
 	var r sha.ReadCloser
 

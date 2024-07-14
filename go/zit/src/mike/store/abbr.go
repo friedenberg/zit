@@ -42,7 +42,7 @@ type indexAbbrEncodableTridexes struct {
 type indexAbbr struct {
 	lock    sync.Locker
 	once    *sync.Once
-	fs_home fs_home.Standort
+	fs_home fs_home.Home
 
 	path string
 
@@ -53,7 +53,7 @@ type indexAbbr struct {
 }
 
 func newIndexAbbr(
-	fs_home fs_home.Standort,
+	fs_home fs_home.Home,
 	p string,
 ) (i *indexAbbr, err error) {
 	i = &indexAbbr{

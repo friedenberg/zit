@@ -27,7 +27,7 @@ type Json struct {
 func (j *Json) FromStringAndMetadatei(
 	k string,
 	m *object_metadata.Metadata,
-	s fs_home.Standort,
+	s fs_home.Home,
 ) (err error) {
 	var r sha.ReadCloser
 
@@ -59,12 +59,12 @@ func (j *Json) FromStringAndMetadatei(
 
 func (j *Json) FromTransacted(
 	sk *sku.Transacted,
-	s fs_home.Standort,
+	s fs_home.Home,
 ) (err error) {
 	return j.FromStringAndMetadatei(sk.Kennung.String(), sk.GetMetadata(), s)
 }
 
-func (j *Json) ToTransacted(sk *sku.Transacted, s fs_home.Standort) (err error) {
+func (j *Json) ToTransacted(sk *sku.Transacted, s fs_home.Home) (err error) {
 	var w sha.WriteCloser
 
 	if w, err = s.BlobWriter(); err != nil {

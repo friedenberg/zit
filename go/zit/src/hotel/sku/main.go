@@ -24,10 +24,10 @@ type ObjekteOptions struct {
 }
 
 type (
-	Konfig interface {
+	Config interface {
 		interfaces.Config
-		ids.InlineTypChecker // TODO move out of konfig entirely
-		GetTypExtension(string) string
+		ids.InlineTypeChecker // TODO move out of konfig entirely
+		GetTypeExtension(string) string
 	}
 
 	Ennui interface {

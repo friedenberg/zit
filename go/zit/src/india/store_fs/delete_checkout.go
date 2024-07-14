@@ -16,7 +16,7 @@ type DeleteCheckout struct{}
 
 func (c DeleteCheckout) Run(
 	dryRun bool,
-	s fs_home.Standort,
+	s fs_home.Home,
 	p interfaces.FuncIter[*fd.FD],
 	fs interfaces.Iterable[*fd.FD],
 ) (err error) {

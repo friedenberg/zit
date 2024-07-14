@@ -79,7 +79,7 @@ type (
 	Info struct {
 		StoreFuncs
 		DirCache string
-		fs_home.Standort
+		fs_home.Home
 	}
 
 	StoreLike interface {

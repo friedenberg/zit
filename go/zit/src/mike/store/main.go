@@ -28,7 +28,7 @@ import (
 
 type Store struct {
 	konfig                    *konfig.Compiled
-	fs_home                   fs_home.Standort
+	fs_home                   fs_home.Home
 	cwdFiles                  *store_fs.Store
 	externalStores            map[string]*external_store.Store
 	blob_store                *blob_store.VersionedStores
@@ -69,7 +69,7 @@ type Logger struct {
 func (c *Store) Initialize(
 	flags *flag.FlagSet,
 	k *konfig.Compiled,
-	st fs_home.Standort,
+	st fs_home.Home,
 	pmf object_inventory_format.Format,
 	t thyme.Time,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
@@ -168,7 +168,7 @@ func (s *Store) SetExternalStores(
 			FuncQuery:       s.Query,
 		}
 
-		es.Standort = s.GetStandort()
+		es.Home = s.GetStandort()
 		es.DirCache = s.GetStandort().DirVerzeichnisseKasten(k)
 
 		if esfs, ok := es.StoreLike.(*store_fs.Store); ok {

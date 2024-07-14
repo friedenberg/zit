@@ -26,7 +26,7 @@ type Page struct {
 	added, addedSchwanz *sku.TransactedHeap
 	flushMode           objekte_mode.Mode
 	hasChanges          bool
-	fs_home             fs_home.Standort
+	fs_home             fs_home.Home
 	konfig              *konfig.Compiled
 }
 

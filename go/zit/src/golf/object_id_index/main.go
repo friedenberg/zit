@@ -68,7 +68,7 @@ type index struct {
 
 func MakeIndex(
 	k interfaces.Config,
-	s fs_home.Standort,
+	s fs_home.Home,
 	vf interfaces.CacheIOFactory,
 ) (i *index, err error) {
 	i = &index{

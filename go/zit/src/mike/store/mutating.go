@@ -152,7 +152,7 @@ func (s *Store) tryRealizeAndOrStore(
 		return
 	}
 
-	if err = s.GetKonfig().ApplySchlummerndAndRealizeEtiketten(
+	if err = s.GetKonfig().ApplyDormantAndRealizeTags(
 		kinder,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -341,7 +341,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	}
 
 	type akteSaver interface {
-		SaveAkte(s fs_home.Standort) (err error)
+		SaveAkte(s fs_home.Home) (err error)
 	}
 
 	if as, ok := co.GetSkuExternalLike().(akteSaver); ok {

@@ -18,7 +18,7 @@ import (
 )
 
 func MakeBuilder(
-	s fs_home.Standort,
+	s fs_home.Home,
 	blob_store *blob_store.VersionedStores,
 	object_probe_index sku.Ennui,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
@@ -38,7 +38,7 @@ func MakeBuilder(
 }
 
 type Builder struct {
-	fs_home                    fs_home.Standort
+	fs_home                    fs_home.Home
 	blob_store                 *blob_store.VersionedStores
 	object_probe_index         sku.Ennui
 	luaVMPoolBuilder           *lua.VMPoolBuilder

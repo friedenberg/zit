@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
 
-func (s Standort) DeleteAll(p string) (err error) {
+func (s Home) DeleteAll(p string) (err error) {
 	if s.dryRun {
 		return
 	}
@@ -24,7 +24,7 @@ func (s Standort) DeleteAll(p string) (err error) {
 	return
 }
 
-func (s Standort) Delete(p string) (err error) {
+func (s Home) Delete(p string) (err error) {
 	if s.dryRun {
 		return
 	}
@@ -37,7 +37,7 @@ func (s Standort) Delete(p string) (err error) {
 	return
 }
 
-func (s Standort) ResetTemp() (err error) {
+func (s Home) ResetTemp() (err error) {
 	if s.debug.NoTempDirCleanup {
 		return
 	}
@@ -50,7 +50,7 @@ func (s Standort) ResetTemp() (err error) {
 	return
 }
 
-func (s Standort) DirTempOS() (d string, err error) {
+func (s Home) DirTempOS() (d string, err error) {
 	if d, err = os.MkdirTemp("", ""); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -59,11 +59,11 @@ func (s Standort) DirTempOS() (d string, err error) {
 	return
 }
 
-func (s Standort) DirTempLocal() string {
+func (s Home) DirTempLocal() string {
 	return s.DirZit(fmt.Sprintf("tmp-%d", s.pid))
 }
 
-func (s Standort) FileTempOS() (f *os.File, err error) {
+func (s Home) FileTempOS() (f *os.File, err error) {
 	if f, err = os.CreateTemp("", ""); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -72,7 +72,7 @@ func (s Standort) FileTempOS() (f *os.File, err error) {
 	return
 }
 
-func (s Standort) FileTempLocal() (f *os.File, err error) {
+func (s Home) FileTempLocal() (f *os.File, err error) {
 	if f, err = s.FileTempLocalWithTemplate(""); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -81,7 +81,7 @@ func (s Standort) FileTempLocal() (f *os.File, err error) {
 	return
 }
 
-func (s Standort) FileTempLocalWithTemplate(t string) (f *os.File, err error) {
+func (s Home) FileTempLocalWithTemplate(t string) (f *os.File, err error) {
 	if f, err = os.CreateTemp(s.DirTempLocal(), t); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -90,7 +90,7 @@ func (s Standort) FileTempLocalWithTemplate(t string) (f *os.File, err error) {
 	return
 }
 
-func (s Standort) FifoPipeWithExtension(ext string) (p string, err error) {
+func (s Home) FifoPipeWithExtension(ext string) (p string, err error) {
 	p = path.Join(
 		s.DirTempLocal(),
 		fmt.Sprintf("%s.%s", strconv.Itoa(rand.Int()), ext),
@@ -109,7 +109,7 @@ func (s Standort) FifoPipeWithExtension(ext string) (p string, err error) {
 	return
 }
 
-func (s Standort) FifoPipe() (p string, err error) {
+func (s Home) FifoPipe() (p string, err error) {
 	p = path.Join(
 		s.DirTempLocal(),
 		strconv.Itoa(rand.Int()),

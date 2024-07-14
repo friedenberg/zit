@@ -40,7 +40,7 @@ type MoverLight struct {
 	errorOnAttemptedOverwrite bool
 }
 
-func (s Standort) NewMoverLight(o MoveOptions) (m *MoverLight, err error) {
+func (s Home) NewMoverLight(o MoveOptions) (m *MoverLight, err error) {
 	m = &MoverLight{
 		lockFile:                  o.LockFile,
 		errorOnAttemptedOverwrite: o.ErrorOnAttemptedOverwrite,

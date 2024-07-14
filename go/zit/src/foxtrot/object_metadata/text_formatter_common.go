@@ -17,7 +17,7 @@ import (
 )
 
 type textFormatterCommon struct {
-	fs_home       fs_home.Standort
+	fs_home       fs_home.Home
 	blobFactory   interfaces.BlobReaderFactory
 	blobFormatter script_config.RemoteScript
 	TextFormatterOptions

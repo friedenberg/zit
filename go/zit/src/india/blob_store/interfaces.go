@@ -32,6 +32,6 @@ type (
 
 	Config interface {
 		interfaces.Config
-		IsInlineTyp(ids.Type) bool
+		ids.InlineTypeChecker
 	}
 )

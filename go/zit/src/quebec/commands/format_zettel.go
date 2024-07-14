@@ -92,7 +92,7 @@ func (c *FormatZettel) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		akteFormatter,
 	)
 
-	if err = u.GetKonfig().ApplyToNewMetadatei(
+	if err = u.GetKonfig().ApplyToNewMetadata(
 		zt,
 		u.GetStore().GetAkten().GetTypeV0(),
 	); err != nil {

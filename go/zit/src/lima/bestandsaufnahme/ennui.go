@@ -24,14 +24,14 @@ type Ennui interface {
 }
 
 type ennuiStore struct {
-	fs_home                   fs_home.Standort
+	fs_home                   fs_home.Home
 	persistentMetadateiFormat object_inventory_format.Format
 	ennuiKennung              sha_probe_index.Ennui
 	options                   object_inventory_format.Options
 }
 
 func (s *ennuiStore) Initialize(
-	fs_home fs_home.Standort,
+	fs_home fs_home.Home,
 	persistentMetadateiFormat object_inventory_format.Format,
 	options object_inventory_format.Options,
 ) (err error) {

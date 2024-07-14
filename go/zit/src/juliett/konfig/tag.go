@@ -1,0 +1,179 @@
+package konfig
+
+import (
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+)
+
+func init() {
+	collections_value.RegisterGobValue[*tag](nil)
+}
+
+type implicitTagMap map[string]ids.TagMutableSet
+
+func (iem implicitTagMap) Contains(to, imp ids.Tag) bool {
+	s, ok := iem[to.String()]
+
+	if !ok || s == nil {
+		return false
+	}
+
+	if !s.Contains(imp) {
+		return false
+	}
+
+	return true
+}
+
+func (iem implicitTagMap) Set(to, imp ids.Tag) (err error) {
+	s, ok := iem[to.String()]
+
+	if !ok {
+		s = ids.MakeTagMutableSet()
+		iem[to.String()] = s
+	}
+
+	return s.Add(imp)
+}
+
+type tag struct {
+	Transacted sku.Transacted
+	Computed   bool
+}
+
+func (a *tag) Less(b *tag) bool {
+	return sku.TransactedLessor.Less(&a.Transacted, &b.Transacted)
+}
+
+func (a *tag) EqualsAny(b any) bool {
+	return values.Equals(a, b)
+}
+
+func (a *tag) Equals(b *tag) bool {
+	if !a.Transacted.Equals(&b.Transacted) {
+		return false
+	}
+
+	if !iter.SetEqualsPtr(
+		a.Transacted.Metadatei.Cache.GetImplicitTags(),
+		b.Transacted.Metadatei.Cache.GetImplicitTags(),
+	) {
+		return false
+	}
+
+	return true
+}
+
+func (e *tag) Set(v string) (err error) {
+	return (&e.Transacted.Kennung).Set(v)
+}
+
+func (e *tag) String() string {
+	return e.Transacted.GetObjectId().String()
+}
+
+func (k *compiled) EachTag(
+	f interfaces.FuncIter[*sku.Transacted],
+) (err error) {
+	return k.Tags.Each(
+		func(ek *tag) (err error) {
+			return f(&ek.Transacted)
+		},
+	)
+}
+
+func (k *compiled) AccumulateImplicitTags(
+	e ids.Tag,
+) (err error) {
+	ek, ok := k.Tags.Get(e.String())
+
+	if !ok {
+		return
+	}
+
+	ees := ids.MakeTagMutableSet()
+
+	ids.ExpandOne(&e, expansion.ExpanderRight).EachPtr(
+		ees.AddPtr,
+	)
+
+	if err = ees.Each(
+		func(e1 ids.Tag) (err error) {
+			if e1.Equals(e) {
+				return
+			}
+
+			if err = k.AccumulateImplicitTags(e1); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = k.getImplicitTags(&e1).Each(
+				func(e2 ids.Tag) (err error) {
+					return k.ImplicitTags.Set(e, e2)
+				},
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = ek.Transacted.Metadatei.GetTags().Each(
+		func(e1 ids.Tag) (err error) {
+			if k.ImplicitTags.Contains(e1, e) {
+				return
+			}
+
+			if err = k.ImplicitTags.Set(e, e1); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = k.AccumulateImplicitTags(e1); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (k *compiled) addTag(
+	kinder *sku.Transacted,
+	mutter *sku.Transacted,
+) (didChange bool, err error) {
+	k.lock.Lock()
+	defer k.lock.Unlock()
+
+	var b tag
+
+	if err = b.Transacted.SetFromSkuLike(kinder); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if didChange, err = iter.AddOrReplaceIfGreater(k.Tags, &b); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}

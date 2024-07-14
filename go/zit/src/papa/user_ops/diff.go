@@ -81,8 +81,8 @@ func (op Diff) Run(col sku.CheckedOutLike) (err error) {
 	}
 
 	// sameTyp := il.GetTyp().Equals(el.GetTyp())
-	internalInline := op.GetKonfig().IsInlineTyp(il.GetType())
-	externalInline := op.GetKonfig().IsInlineTyp(el.GetType())
+	internalInline := op.GetKonfig().IsInlineType(il.GetType())
+	externalInline := op.GetKonfig().IsInlineType(el.GetType())
 
 	var externalFD *fd.FD
 

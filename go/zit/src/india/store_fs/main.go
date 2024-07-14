@@ -33,13 +33,13 @@ func init() {
 
 // TODO support globs and ignores
 type Store struct {
-	konfig              sku.Konfig
+	konfig              sku.Config
 	deletedPrinter      interfaces.FuncIter[*fd.FD]
 	externalStoreInfo   external_store.Info
 	metadateiTextParser object_metadata.TextParser
-	fs_home             fs_home.Standort
+	fs_home             fs_home.Home
 	fileEncoder         FileEncoder
-	ic                  ids.InlineTypChecker
+	ic                  ids.InlineTypeChecker
 	fileExtensions      file_extensions.FileExtensions
 	dir                 string
 	zettelen            interfaces.MutableSetLike[*KennungFDPair]

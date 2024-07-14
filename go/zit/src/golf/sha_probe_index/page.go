@@ -24,14 +24,14 @@ type page struct {
 	br         bufio.Reader
 	equaler    interfaces.Equaler1[*row]
 	added      addedMap
-	fs_home    fs_home.Standort
+	fs_home    fs_home.Home
 	searchFunc func(*sha.Sha) (mid int64, err error)
 	rowSize    int
 }
 
 func (p *page) initialize(
 	equaler interfaces.Equaler1[*row],
-	s fs_home.Standort,
+	s fs_home.Home,
 	pid sha.PageId,
 	rowSize int,
 ) (err error) {

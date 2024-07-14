@@ -86,7 +86,7 @@ func (sch *Etiketten) ContainsSku(sk *sku.Transacted) bool {
 	return false
 }
 
-func (sch *Etiketten) Load(s fs_home.Standort) (err error) {
+func (sch *Etiketten) Load(s fs_home.Home) (err error) {
 	var f *os.File
 
 	p := s.FileEtiketten()
@@ -114,7 +114,7 @@ func (sch *Etiketten) Load(s fs_home.Standort) (err error) {
 }
 
 func (sch *Etiketten) Flush(
-	s fs_home.Standort,
+	s fs_home.Home,
 	printerHeader interfaces.FuncIter[string],
 	dryRun bool,
 ) (err error) {

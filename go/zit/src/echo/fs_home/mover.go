@@ -18,7 +18,7 @@ type Mover struct {
 	errorOnAttemptedOverwrite bool
 }
 
-func (s Standort) NewMover(o MoveOptions) (m *Mover, err error) {
+func (s Home) NewMover(o MoveOptions) (m *Mover, err error) {
 	m = &Mover{
 		lockFile:                  o.LockFile,
 		errorOnAttemptedOverwrite: o.ErrorOnAttemptedOverwrite,

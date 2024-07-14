@@ -42,7 +42,7 @@ type textFormatter struct {
 func (tf textFormatter) WriteStringFormat(w io.Writer, s *sku.Transacted) (n int64, err error) {
 	if genres.Config.EqualsGenre(s.GetGenre()) {
 		n, err = tf.fBlobOnly.FormatMetadata(w, s)
-	} else if tf.k.IsInlineTyp(s.GetType()) {
+	} else if tf.k.IsInlineType(s.GetType()) {
 		n, err = tf.fMetadateiAndBlob.FormatMetadata(w, s)
 	} else {
 		n, err = tf.fMetadateiOnly.FormatMetadata(w, s)
@@ -58,7 +58,7 @@ func (tf textFormatter) WriteStringFormatWithMode(
 ) (n int64, err error) {
 	if genres.Config.EqualsGenre(s.GetGenre()) || mode == checkout_mode.ModeAkteOnly {
 		n, err = tf.fBlobOnly.FormatMetadata(w, s)
-	} else if tf.k.IsInlineTyp(s.GetType()) {
+	} else if tf.k.IsInlineType(s.GetType()) {
 		n, err = tf.fMetadateiAndBlob.FormatMetadata(w, s)
 	} else {
 		n, err = tf.fMetadateiOnly.FormatMetadata(w, s)

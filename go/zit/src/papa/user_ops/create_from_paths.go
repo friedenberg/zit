@@ -16,7 +16,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/objekte"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
@@ -198,20 +197,9 @@ func (c CreateFromPaths) handleStoreError(
 ) {
 	var err error
 
-	var lostError objekte.VerlorenAndGefundenError
 	var normalError errors.StackTracer
 
-	if errors.As(in, &lostError) {
-		var p string
-
-		if p, err = lostError.AddToLostAndFound(c.Standort().DirZit("Verloren+Gefunden")); err != nil {
-			ui.Err().Print(err)
-			return
-		}
-
-		ui.Out().Printf("lost+found: %s: %s", lostError.Error(), p)
-
-	} else if errors.As(in, &normalError) {
+	if errors.As(in, &normalError) {
 		ui.Err().Printf("%s", normalError.Error())
 	} else {
 		err = errors.Errorf("writing zettel failed: %s: %s", f, in)

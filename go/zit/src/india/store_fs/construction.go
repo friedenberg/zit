@@ -13,10 +13,10 @@ import (
 )
 
 func MakeCwdFilesAll(
-	k sku.Konfig,
+	k sku.Config,
 	dp interfaces.FuncIter[*fd.FD],
 	fileExtensions file_extensions.FileExtensions,
-	st fs_home.Standort,
+	st fs_home.Home,
 	ofo object_inventory_format.Options,
 ) (fs *Store, err error) {
 	fs = &Store{

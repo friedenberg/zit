@@ -23,12 +23,12 @@ func (kc *Compiled) GetImmutableConfig() interfaces.ImmutableConfig {
 	return kc.immutable_config
 }
 
-func (kc *compiled) getTyp(k ids.IdLike) (ct *sku.Transacted) {
+func (kc *compiled) getType(k ids.IdLike) (ct *sku.Transacted) {
 	if k.GetGenre() != genres.Type {
 		return
 	}
 
-	if ct1, ok := kc.Typen.Get(k.String()); ok {
+	if ct1, ok := kc.Types.Get(k.String()); ok {
 		ct = sku.GetTransactedPool().Get()
 		errors.PanicIfError(ct.SetFromSkuLike(ct1))
 	}
@@ -36,12 +36,12 @@ func (kc *compiled) getTyp(k ids.IdLike) (ct *sku.Transacted) {
 	return
 }
 
-func (kc *compiled) getKasten(k ids.IdLike) (ct *sku.Transacted) {
+func (kc *compiled) getRepo(k ids.IdLike) (ct *sku.Transacted) {
 	if k.GetGenre() != genres.Repo {
 		return
 	}
 
-	if ct1, ok := kc.Kisten.Get(k.String()); ok {
+	if ct1, ok := kc.Repos.Get(k.String()); ok {
 		ct = sku.GetTransactedPool().Get()
 		errors.PanicIfError(ct.SetFromSkuLike(ct1))
 	}
@@ -51,19 +51,19 @@ func (kc *compiled) getKasten(k ids.IdLike) (ct *sku.Transacted) {
 
 // Returns the exactly matching Typ, or if it doesn't exist, returns the parent
 // Typ or nil. (Parent Typ for `md-gdoc` would be `md`.)
-func (kc *compiled) getApproximatedTyp(
+func (kc *compiled) getApproximatedType(
 	k ids.IdLike,
-) (ct ApproximatedTyp) {
+) (ct ApproximatedType) {
 	if k.GetGenre() != genres.Type {
 		return
 	}
 
-	expandedActual := kc.getSortedTypenExpanded(k.String())
+	expandedActual := kc.getSortedTypesExpanded(k.String())
 	if len(expandedActual) > 0 {
 		ct.HasValue = true
-		ct.Typ = expandedActual[0]
+		ct.Type = expandedActual[0]
 
-		if ids.Equals(ct.Typ.GetObjectId(), k) {
+		if ids.Equals(ct.Type.GetObjectId(), k) {
 			ct.IsActual = true
 		}
 	}
@@ -71,7 +71,7 @@ func (kc *compiled) getApproximatedTyp(
 	return
 }
 
-func (kc *compiled) getEtikettOrKastenOrTyp(
+func (kc *compiled) getTagOrRepoIdOrType(
 	v string,
 ) (sk *sku.Transacted, err error) {
 	var k ids.ObjectId
@@ -83,11 +83,11 @@ func (kc *compiled) getEtikettOrKastenOrTyp(
 
 	switch k.GetGenre() {
 	case genres.Tag:
-		sk, _ = kc.getEtikett(&k)
+		sk, _ = kc.getTag(&k)
 	case genres.Repo:
-		sk = kc.getKasten(&k)
+		sk = kc.getRepo(&k)
 	case genres.Type:
-		sk = kc.getTyp(&k)
+		sk = kc.getType(&k)
 
 	default:
 		err = genres.MakeErrUnsupportedGattung(&k)
@@ -97,14 +97,14 @@ func (kc *compiled) getEtikettOrKastenOrTyp(
 	return
 }
 
-func (kc *compiled) getEtikett(
+func (kc *compiled) getTag(
 	k ids.IdLike,
 ) (ct *sku.Transacted, ok bool) {
 	if k.GetGenre() != genres.Tag {
 		return
 	}
 
-	expandedActual := kc.getSortedEtikettenExpanded(k.String())
+	expandedActual := kc.getSortedTagsExpanded(k.String())
 
 	if len(expandedActual) > 0 {
 		ct = expandedActual[0]
@@ -115,14 +115,14 @@ func (kc *compiled) getEtikett(
 }
 
 // TODO-P3 merge all the below
-func (c *compiled) getSortedTypenExpanded(
+func (c *compiled) getSortedTypesExpanded(
 	v string,
 ) (expandedActual []*sku.Transacted) {
 	expandedMaybe := collections_value.MakeMutableValueSet[values.String](nil)
 
 	sa := iter.MakeFuncSetString(expandedMaybe)
 
-	typExpander.Expand(sa, v)
+	typeExpander.Expand(sa, v)
 	expandedActual = make([]*sku.Transacted, 0)
 
 	expandedMaybe.Each(
@@ -130,7 +130,7 @@ func (c *compiled) getSortedTypenExpanded(
 			c.lock.Lock()
 			defer c.lock.Unlock()
 
-			ct, ok := c.Typen.Get(v.String())
+			ct, ok := c.Types.Get(v.String())
 
 			if !ok {
 				return
@@ -153,7 +153,7 @@ func (c *compiled) getSortedTypenExpanded(
 	return
 }
 
-func (c *compiled) getSortedEtikettenExpanded(
+func (c *compiled) getSortedTagsExpanded(
 	v string,
 ) (expandedActual []*sku.Transacted) {
 	c.lock.Lock()
@@ -163,12 +163,12 @@ func (c *compiled) getSortedEtikettenExpanded(
 	sa := iter.MakeFuncSetString(
 		expandedMaybe,
 	)
-	typExpander.Expand(sa, v)
+	typeExpander.Expand(sa, v)
 	expandedActual = make([]*sku.Transacted, 0)
 
 	expandedMaybe.Each(
 		func(v values.String) (err error) {
-			ct, ok := c.Etiketten.Get(v.String())
+			ct, ok := c.Tags.Get(v.String())
 
 			if !ok {
 				return
@@ -198,10 +198,10 @@ func (c *compiled) getSortedEtikettenExpanded(
 	return
 }
 
-func (c *compiled) getImplicitEtiketten(
+func (c *compiled) getImplicitTags(
 	e *ids.Tag,
 ) ids.TagSet {
-	s, ok := c.ImplicitEtiketten[e.String()]
+	s, ok := c.ImplicitTags[e.String()]
 
 	if !ok || s == nil {
 		return ids.MakeTagSet()

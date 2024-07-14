@@ -23,10 +23,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
-var typExpander expansion.Expander
+var typeExpander expansion.Expander
 
 func init() {
-	typExpander = expansion.MakeExpanderRight(`-`)
+	typeExpander = expansion.MakeExpanderRight(`-`)
 
 	gob.Register(
 		collections_value.MakeMutableValueSet[values.String](
@@ -44,27 +44,27 @@ func init() {
 	gob.Register(iter.StringerKeyerPtr[ids.Type, *ids.Type]{})
 }
 
-type immutable_config = pkg_angeboren.Konfig
+type immutable_config = pkg_angeboren.Config
 
 type Compiled struct {
 	cli
 	compiled
 	immutable_config
-	schlummernd *query.Schlummernd
+	dormant *query.Dormant
 }
 
 func (a *compiled) Reset() error {
-	a.ExtensionsToTypen = make(map[string]string)
-	a.TypenToExtensions = make(map[string]string)
+	a.ExtensionsToTypes = make(map[string]string)
+	a.TypesToExtensions = make(map[string]string)
 
 	a.lock = &sync.Mutex{}
-	a.Etiketten = collections_value.MakeMutableValueSet[*ketikett](nil)
-	a.InlineTypen = collections_value.MakeMutableValueSet[values.String](
+	a.Tags = collections_value.MakeMutableValueSet[*tag](nil)
+	a.InlineTypes = collections_value.MakeMutableValueSet[values.String](
 		nil,
 	)
-	a.ImplicitEtiketten = make(implicitEtikettenMap)
-	a.Kisten = sku.MakeTransactedMutableSet()
-	a.Typen = sku.MakeTransactedMutableSet()
+	a.ImplicitTags = make(implicitTagMap)
+	a.Repos = sku.MakeTransactedMutableSet()
+	a.Types = sku.MakeTransactedMutableSet()
 
 	sku.TransactedResetter.Reset(&a.Sku)
 
@@ -86,35 +86,34 @@ type compiled struct {
 
 	mutable_config.Blob
 
-	// Etiketten
-	DefaultEtiketten  ids.TagSet
-	Etiketten         interfaces.MutableSetLike[*ketikett]
-	ImplicitEtiketten implicitEtikettenMap
+	DefaultTags  ids.TagSet
+	Tags         interfaces.MutableSetLike[*tag]
+	ImplicitTags implicitTagMap
 
 	// Typen
-	ExtensionsToTypen map[string]string
-	TypenToExtensions map[string]string
-	DefaultTyp        sku.Transacted // deprecated
-	Typen             sku.TransactedMutableSet
-	InlineTypen       interfaces.SetLike[values.String]
+	ExtensionsToTypes map[string]string
+	TypesToExtensions map[string]string
+	DefaultType       sku.Transacted // deprecated
+	Types             sku.TransactedMutableSet
+	InlineTypes       interfaces.SetLike[values.String]
 
 	// Kasten
-	Kisten sku.TransactedMutableSet
+	Repos sku.TransactedMutableSet
 }
 
 func (c *Compiled) Initialize(
-	s fs_home.Standort,
+	s fs_home.Home,
 	kcli mutable_config.Cli,
-	schlummernd *query.Schlummernd,
+	dormant *query.Dormant,
 ) (err error) {
 	c.cli = kcli
 	c.Reset()
-	c.immutable_config = s.GetKonfig()
-	c.schlummernd = schlummernd
+	c.immutable_config = s.GetConfig()
+	c.dormant = dormant
 
 	wg := iter.MakeErrorWaitGroupParallel()
 	wg.Do(func() (err error) {
-		if err = c.loadKonfigErworben(s); err != nil {
+		if err = c.loadMutableConfig(s); err != nil {
 			if errors.IsNotExist(err) {
 				err = nil
 			} else {
@@ -143,18 +142,18 @@ func (kc *Compiled) SetCliFromCommander(k mutable_config.Cli) {
 	kc.BasePath = oldBasePath
 }
 
-func (kc *compiled) IsInlineTyp(k ids.Type) (isInline bool) {
+func (kc *compiled) IsInlineType(k ids.Type) (isInline bool) {
 	todo.Change("fix this horrible hack")
 	if k.IsEmpty() {
 		return true
 	}
 
-	isInline = kc.InlineTypen.ContainsKey(k.String())
+	isInline = kc.InlineTypes.ContainsKey(k.String())
 
 	return
 }
 
-type ApproximatedTyp = blob_store.ApproximatedTyp
+type ApproximatedType = blob_store.ApproximatedType
 
 func (k *compiled) setTransacted(
 	kt1 *sku.Transacted,
@@ -188,7 +187,7 @@ func (k *compiled) setTransacted(
 	return
 }
 
-func (k *compiled) addKasten(
+func (k *compiled) addRepo(
 	c *sku.Transacted,
 ) (didChange bool, err error) {
 	k.lock.Lock()
@@ -202,7 +201,7 @@ func (k *compiled) addKasten(
 	}
 
 	if didChange, err = iter.AddOrReplaceIfGreater(
-		k.Kisten,
+		k.Repos,
 		b,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -216,12 +215,12 @@ func (k *Compiled) IsDryRun() bool {
 	return k.DryRun
 }
 
-func (k *Compiled) GetTypStringFromExtension(t string) string {
-	return k.ExtensionsToTypen[t]
+func (k *Compiled) GetTypeStringFromExtension(t string) string {
+	return k.ExtensionsToTypes[t]
 }
 
-func (k *Compiled) GetTypExtension(v string) string {
-	return k.TypenToExtensions[v]
+func (k *Compiled) GetTypeExtension(v string) string {
+	return k.TypesToExtensions[v]
 }
 
 func (k *Compiled) AddTransacted(
@@ -234,19 +233,19 @@ func (k *Compiled) AddTransacted(
 
 	switch kinder.Kennung.GetGenre() {
 	case genres.Type:
-		if didChange, err = k.addTyp(kinder); err != nil {
+		if didChange, err = k.addType(kinder); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case genres.Tag:
-		if didChange, err = k.addEtikett(kinder, mutter); err != nil {
+		if didChange, err = k.addTag(kinder, mutter); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case genres.Repo:
-		if didChange, err = k.addKasten(kinder); err != nil {
+		if didChange, err = k.addRepo(kinder); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -270,7 +269,7 @@ func (k *Compiled) AddTransacted(
 	return
 }
 
-func (k *compiled) addTyp(
+func (k *compiled) addType(
 	b1 *sku.Transacted,
 ) (didChange bool, err error) {
 	if err = genres.Type.AssertGenre(b1); err != nil {
@@ -289,7 +288,7 @@ func (k *compiled) addTyp(
 	defer k.lock.Unlock()
 
 	if didChange, err = iter.AddOrReplaceIfGreater(
-		k.Typen,
+		k.Types,
 		b,
 	); err != nil {
 		err = errors.Wrap(err)

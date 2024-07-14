@@ -18,23 +18,23 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type Schlummernd struct {
+type Dormant struct {
 	changes   []string
 	etiketten tag_paths.EtikettenWithParentsAndTypes
 }
 
-func (sch *Schlummernd) GetChanges() (out []string) {
+func (sch *Dormant) GetChanges() (out []string) {
 	out = make([]string, len(sch.changes))
 	copy(out, sch.changes)
 
 	return
 }
 
-func (sch *Schlummernd) HasChanges() bool {
+func (sch *Dormant) HasChanges() bool {
 	return len(sch.changes) > 0
 }
 
-func (sch *Schlummernd) AddSchlummerndEtikett(e *tag_paths.Etikett) (err error) {
+func (sch *Dormant) AddSchlummerndEtikett(e *tag_paths.Etikett) (err error) {
 	sch.changes = append(sch.changes, fmt.Sprintf("added %q", e))
 
 	if err = sch.etiketten.Add(e, nil); err != nil {
@@ -45,7 +45,7 @@ func (sch *Schlummernd) AddSchlummerndEtikett(e *tag_paths.Etikett) (err error) 
 	return
 }
 
-func (sch *Schlummernd) RemoveSchlummerndEtikett(e *tag_paths.Etikett) (err error) {
+func (sch *Dormant) RemoveSchlummerndEtikett(e *tag_paths.Etikett) (err error) {
 	sch.changes = append(sch.changes, fmt.Sprintf("removed %q", e))
 
 	if err = sch.etiketten.Remove(e); err != nil {
@@ -56,7 +56,7 @@ func (sch *Schlummernd) RemoveSchlummerndEtikett(e *tag_paths.Etikett) (err erro
 	return
 }
 
-func (sch *Schlummernd) ContainsSku(sk *sku.Transacted) bool {
+func (sch *Dormant) ContainsSku(sk *sku.Transacted) bool {
 	for _, e := range sch.etiketten {
 		if e.Len() == 0 {
 			panic("empty schlummernd etikett")
@@ -85,7 +85,7 @@ func (sch *Schlummernd) ContainsSku(sk *sku.Transacted) bool {
 	return false
 }
 
-func (sch *Schlummernd) Load(s fs_home.Standort) (err error) {
+func (sch *Dormant) Load(s fs_home.Home) (err error) {
 	var f *os.File
 
 	p := s.FileSchlummernd()
@@ -112,8 +112,8 @@ func (sch *Schlummernd) Load(s fs_home.Standort) (err error) {
 	return
 }
 
-func (sch *Schlummernd) Flush(
-	s fs_home.Standort,
+func (sch *Dormant) Flush(
+	s fs_home.Home,
 	printerHeader interfaces.FuncIter[string],
 	dryRun bool,
 ) (err error) {
@@ -159,7 +159,7 @@ func (sch *Schlummernd) Flush(
 	return
 }
 
-func (s *Schlummernd) ReadFrom(r *bufio.Reader) (n int64, err error) {
+func (s *Dormant) ReadFrom(r *bufio.Reader) (n int64, err error) {
 	s.etiketten.Reset()
 	var count uint16
 
@@ -206,7 +206,7 @@ func (s *Schlummernd) ReadFrom(r *bufio.Reader) (n int64, err error) {
 	return
 }
 
-func (s Schlummernd) WriteTo(w io.Writer) (n int64, err error) {
+func (s Dormant) WriteTo(w io.Writer) (n int64, err error) {
 	count := uint16(s.etiketten.Len())
 
 	var n1 int

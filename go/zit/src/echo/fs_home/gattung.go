@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
-func (s Standort) DirObjektenGattung(
+func (s Home) DirObjektenGattung(
 	sv interfaces.StoreVersion,
 	g interfaces.GenreGetter,
 ) (p string, err error) {
@@ -22,7 +22,7 @@ func (s Standort) DirObjektenGattung(
 	}
 }
 
-func (s Standort) dirObjektenGattung2(
+func (s Home) dirObjektenGattung2(
 	g1 interfaces.GenreGetter,
 ) (p string, err error) {
 	g := g1.GetGenre()
@@ -37,7 +37,7 @@ func (s Standort) dirObjektenGattung2(
 	return
 }
 
-func (s Standort) dirObjektenGattung(
+func (s Home) dirObjektenGattung(
 	g interfaces.GenreGetter,
 ) (p string, err error) {
 	switch g.GetGenre() {
@@ -70,7 +70,7 @@ func (s Standort) dirObjektenGattung(
 	return
 }
 
-func (s Standort) HasObjekte(
+func (s Home) HasObjekte(
 	sv interfaces.StoreVersion,
 	g interfaces.GenreGetter,
 	sh sha.ShaLike,
@@ -88,7 +88,7 @@ func (s Standort) HasObjekte(
 	return
 }
 
-func (s Standort) HasAkte(
+func (s Home) HasAkte(
 	sv interfaces.StoreVersion,
 	sh sha.ShaLike,
 ) (ok bool) {
@@ -110,11 +110,11 @@ func (s Standort) HasAkte(
 	return
 }
 
-func (s Standort) DirObjektenTransaktion() string {
+func (s Home) DirObjektenTransaktion() string {
 	return s.DirObjekten("Transaktion")
 }
 
-func (s Standort) ReadAllLevel2Files(
+func (s Home) ReadAllLevel2Files(
 	p string,
 	w interfaces.FuncIter[string],
 ) (err error) {
@@ -129,7 +129,7 @@ func (s Standort) ReadAllLevel2Files(
 	return
 }
 
-func (s Standort) ReadAllShas(
+func (s Home) ReadAllShas(
 	p string,
 	w interfaces.FuncIter[*sha.Sha],
 ) (err error) {
@@ -157,7 +157,7 @@ func (s Standort) ReadAllShas(
 	return
 }
 
-func (s Standort) ReadAllShasForGattung(
+func (s Home) ReadAllShasForGattung(
 	sv interfaces.StoreVersion,
 	g interfaces.GenreGetter,
 	w interfaces.FuncIter[*sha.Sha],

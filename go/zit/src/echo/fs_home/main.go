@@ -20,16 +20,16 @@ const (
 )
 
 type Getter interface {
-	GetStandort() Standort
+	GetStandort() Home
 }
 
-type Standort struct {
+type Home struct {
 	store_fs         string
 	basePath         string
 	execPath         string
 	lockSmith        interfaces.LockSmith
 	age              *age.Age
-	immutable_config immutable_config.Konfig
+	immutable_config immutable_config.Config
 	debug            debug.Options
 	dryRun           bool
 	pid              int
@@ -37,7 +37,7 @@ type Standort struct {
 
 func Make(
 	o Options,
-) (s Standort, err error) {
+) (s Home, err error) {
 	s.age = &age.Age{}
 	errors.TodoP3("add 'touched' which can get deleted / cleaned")
 	if err = o.Validate(); err != nil {
@@ -110,23 +110,23 @@ func Make(
 	return
 }
 
-func (a Standort) SansAge() (b Standort) {
+func (a Home) SansAge() (b Home) {
 	b = a
 	b.age = nil
 	return
 }
 
-func (a Standort) SansCompression() (b Standort) {
+func (a Home) SansCompression() (b Home) {
 	b = a
 	b.immutable_config.CompressionType = immutable_config.CompressionTypeNone
 	return
 }
 
-func (s Standort) GetKonfig() immutable_config.Konfig {
+func (s Home) GetConfig() immutable_config.Config {
 	return s.immutable_config
 }
 
-func (s *Standort) loadKonfigAngeboren() (err error) {
+func (s *Home) loadKonfigAngeboren() (err error) {
 	var f *os.File
 
 	if f, err = files.OpenExclusiveReadOnly(s.FileKonfigAngeboren()); err != nil {
@@ -151,23 +151,23 @@ func (s *Standort) loadKonfigAngeboren() (err error) {
 	return
 }
 
-func (s Standort) GetLockSmith() interfaces.LockSmith {
+func (s Home) GetLockSmith() interfaces.LockSmith {
 	return s.lockSmith
 }
 
-func (s *Standort) Age() *age.Age {
+func (s *Home) Age() *age.Age {
 	return s.age
 }
 
-func (s Standort) Cwd() string {
+func (s Home) Cwd() string {
 	return s.store_fs
 }
 
-func (s Standort) Executable() string {
+func (s Home) Executable() string {
 	return s.execPath
 }
 
-func (s Standort) AbsFromCwdOrSame(p string) (p1 string) {
+func (s Home) AbsFromCwdOrSame(p string) (p1 string) {
 	var err error
 	p1, err = filepath.Abs(p)
 	if err != nil {
@@ -177,7 +177,7 @@ func (s Standort) AbsFromCwdOrSame(p string) (p1 string) {
 	return
 }
 
-func (s Standort) RelToCwdOrSame(p string) (p1 string) {
+func (s Home) RelToCwdOrSame(p string) (p1 string) {
 	var err error
 	p1, err = filepath.Rel(s.Cwd(), p)
 	if err != nil {
@@ -191,27 +191,27 @@ func stringSliceJoin(s string, vs []string) []string {
 	return append([]string{s}, vs...)
 }
 
-func (c Standort) FileKonfigCompiled() string {
+func (c Home) FileKonfigCompiled() string {
 	return c.DirZit("KonfigCompiled")
 }
 
-func (c Standort) FileSchlummernd() string {
+func (c Home) FileSchlummernd() string {
 	return c.DirZit("Schlummernd")
 }
 
-func (c Standort) FileEtiketten() string {
+func (c Home) FileEtiketten() string {
 	return c.DirZit("Etiketten")
 }
 
-func (c Standort) FileKonfigAngeboren() string {
+func (c Home) FileKonfigAngeboren() string {
 	return c.DirZit("KonfigAngeboren")
 }
 
-func (c Standort) FileKonfigErworben() string {
+func (c Home) FileKonfigErworben() string {
 	return c.DirZit("KonfigErworben")
 }
 
-func (c Standort) FileKonfigToml() string {
+func (c Home) FileKonfigToml() string {
 	// var usr *user.User
 
 	// if usr, err = user.Current(); err != nil {
@@ -229,43 +229,43 @@ func (c Standort) FileKonfigToml() string {
 	return c.DirZit("Konfig")
 }
 
-func (s Standort) Dir(p ...string) string {
+func (s Home) Dir(p ...string) string {
 	return filepath.Join(stringSliceJoin(s.basePath, p)...)
 }
 
-func (s Standort) DirZit(p ...string) string {
+func (s Home) DirZit(p ...string) string {
 	return s.Dir(stringSliceJoin(".zit", p)...)
 }
 
-func (s Standort) FileAge() string {
+func (s Home) FileAge() string {
 	return s.DirZit("AgeIdentity")
 }
 
-func (s Standort) DirVerzeichnisse(p ...string) string {
+func (s Home) DirVerzeichnisse(p ...string) string {
 	return s.DirZit(append([]string{"Verzeichnisse"}, p...)...)
 }
 
-func (s Standort) DirVerzeichnisseKasten(p ...string) string {
+func (s Home) DirVerzeichnisseKasten(p ...string) string {
 	return s.DirZit(append([]string{"Verzeichnisse", "Kasten"}, p...)...)
 }
 
-func (s Standort) DirVerzeichnisseDurable(p ...string) string {
+func (s Home) DirVerzeichnisseDurable(p ...string) string {
 	return s.DirZit(append([]string{"VerzeichnisseDurable"}, p...)...)
 }
 
-func (s Standort) DirObjekten(p ...string) string {
+func (s Home) DirObjekten(p ...string) string {
 	return s.DirZit(append([]string{"Objekten"}, p...)...)
 }
 
-func (s Standort) DirObjekten2(p ...string) string {
+func (s Home) DirObjekten2(p ...string) string {
 	return s.DirZit(append([]string{"Objekten2"}, p...)...)
 }
 
-func (s Standort) DirVerlorenUndGefunden() string {
+func (s Home) DirVerlorenUndGefunden() string {
 	return s.DirZit("Verloren+Gefunden")
 }
 
-func (s Standort) MakeDir(d string) (err error) {
+func (s Home) MakeDir(d string) (err error) {
 	if err = os.MkdirAll(d, os.ModeDir|0o755); err != nil {
 		err = errors.Wrapf(err, "Dir: %q", d)
 		return
@@ -274,39 +274,39 @@ func (s Standort) MakeDir(d string) (err error) {
 	return
 }
 
-func (s Standort) DirVerzeichnisseObjekten() string {
+func (s Home) DirVerzeichnisseObjekten() string {
 	return s.DirVerzeichnisse("Objekten")
 }
 
-func (s Standort) DirVerzeichnisseMetadatei() string {
+func (s Home) DirVerzeichnisseMetadatei() string {
 	return s.DirVerzeichnisseDurable("Metadatei")
 }
 
-func (s Standort) DirVerzeichnisseMetadateiKennungMutter() string {
+func (s Home) DirVerzeichnisseMetadateiKennungMutter() string {
 	return s.DirVerzeichnisseDurable("MetadateiKennungMutter")
 }
 
-func (s Standort) DirVerzeichnisseVerweise() string {
+func (s Home) DirVerzeichnisseVerweise() string {
 	return s.DirVerzeichnisse("Verweise")
 }
 
-func (s Standort) FileVerzeichnisseEtiketten() string {
+func (s Home) FileVerzeichnisseEtiketten() string {
 	return s.DirVerzeichnisse("Etiketten")
 }
 
-func (s Standort) FileVerzeichnisseKennung() string {
+func (s Home) FileVerzeichnisseKennung() string {
 	return s.DirVerzeichnisse("Kennung")
 }
 
-func (s Standort) FileVerzeichnisseHinweis() string {
+func (s Home) FileVerzeichnisseHinweis() string {
 	return s.DirVerzeichnisse("Hinweis")
 }
 
-func (s Standort) DirKennung() string {
+func (s Home) DirKennung() string {
 	return s.DirZit("Kennung")
 }
 
-func (s Standort) ResetVerzeichnisse() (err error) {
+func (s Home) ResetVerzeichnisse() (err error) {
 	if err = files.SetAllowUserChangesRecursive(s.DirVerzeichnisse()); err != nil {
 		err = errors.Wrap(err)
 		return

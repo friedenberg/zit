@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
-func (s Standort) objekteReader(
+func (s Home) objekteReader(
 	g interfaces.GenreGetter,
 	sh sha.ShaLike,
 ) (rc sha.ReadCloser, err error) {
@@ -42,7 +42,7 @@ func (s Standort) objekteReader(
 	return
 }
 
-func (s Standort) objekteWriter(
+func (s Home) objekteWriter(
 	g interfaces.GenreGetter,
 ) (wc sha.WriteCloser, err error) {
 	var p string
@@ -71,7 +71,7 @@ func (s Standort) objekteWriter(
 	return
 }
 
-func (s Standort) ReadCloserObjekten(p string) (sha.ReadCloser, error) {
+func (s Home) ReadCloserObjekten(p string) (sha.ReadCloser, error) {
 	o := FileReadOptions{
 		Age:             s.age,
 		Path:            p,
@@ -81,7 +81,7 @@ func (s Standort) ReadCloserObjekten(p string) (sha.ReadCloser, error) {
 	return NewFileReader(o)
 }
 
-func (s Standort) ReadCloserCache(p string) (sha.ReadCloser, error) {
+func (s Home) ReadCloserCache(p string) (sha.ReadCloser, error) {
 	o := FileReadOptions{
 		Age:             s.age,
 		Path:            p,
@@ -91,7 +91,7 @@ func (s Standort) ReadCloserCache(p string) (sha.ReadCloser, error) {
 	return NewFileReader(o)
 }
 
-func (s Standort) WriteCloserObjekten(p string) (w sha.WriteCloser, err error) {
+func (s Home) WriteCloserObjekten(p string) (w sha.WriteCloser, err error) {
 	return s.NewMover(
 		MoveOptions{
 			Age:             s.age,
@@ -102,7 +102,7 @@ func (s Standort) WriteCloserObjekten(p string) (w sha.WriteCloser, err error) {
 	)
 }
 
-func (s Standort) WriteCloserCache(
+func (s Home) WriteCloserCache(
 	p string,
 ) (w sha.WriteCloser, err error) {
 	return s.NewMover(
@@ -115,7 +115,7 @@ func (s Standort) WriteCloserCache(
 	)
 }
 
-func (s Standort) AkteWriterTo(p string) (w sha.WriteCloser, err error) {
+func (s Home) AkteWriterTo(p string) (w sha.WriteCloser, err error) {
 	var outer Writer
 
 	mo := MoveOptions{
@@ -136,7 +136,7 @@ func (s Standort) AkteWriterTo(p string) (w sha.WriteCloser, err error) {
 	return
 }
 
-func (s Standort) BlobWriterToLight(p string) (w sha.WriteCloser, err error) {
+func (s Home) BlobWriterToLight(p string) (w sha.WriteCloser, err error) {
 	var outer Writer
 
 	mo := MoveOptions{
@@ -157,7 +157,7 @@ func (s Standort) BlobWriterToLight(p string) (w sha.WriteCloser, err error) {
 	return
 }
 
-func (s Standort) BlobWriter() (w sha.WriteCloser, err error) {
+func (s Home) BlobWriter() (w sha.WriteCloser, err error) {
 	var p string
 
 	if p, err = s.DirObjektenGattung(
@@ -176,7 +176,7 @@ func (s Standort) BlobWriter() (w sha.WriteCloser, err error) {
 	return
 }
 
-func (s Standort) AkteReaderFile(sh sha.ShaLike) (f *os.File, err error) {
+func (s Home) AkteReaderFile(sh sha.ShaLike) (f *os.File, err error) {
 	if sh.GetShaLike().IsNull() {
 		err = errors.Errorf("sha is null")
 		return
@@ -206,7 +206,7 @@ func (s Standort) AkteReaderFile(sh sha.ShaLike) (f *os.File, err error) {
 	return
 }
 
-func (s Standort) BlobReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
+func (s Home) BlobReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
 	if sh.GetShaLike().IsNull() {
 		r = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
 		return
@@ -230,7 +230,7 @@ func (s Standort) BlobReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
 	return
 }
 
-func (s Standort) BlobReaderFrom(
+func (s Home) BlobReaderFrom(
 	sh sha.ShaLike,
 	p string,
 ) (r sha.ReadCloser, err error) {

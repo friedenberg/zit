@@ -74,7 +74,7 @@ func (s *Store) GetKennungIndex() object_id_index.Index {
 	return s.kennungIndex
 }
 
-func (s *Store) GetStandort() fs_home.Standort {
+func (s *Store) GetStandort() fs_home.Home {
 	return s.fs_home
 }
 

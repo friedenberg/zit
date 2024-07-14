@@ -19,7 +19,7 @@ func (u *Umwelt) GetKonfig() *konfig.Compiled {
 	return &u.konfig
 }
 
-func (u *Umwelt) Schlummernd() *query.Schlummernd {
+func (u *Umwelt) Schlummernd() *query.Dormant {
 	return &u.schlummernd
 }
 
@@ -35,7 +35,7 @@ func (u *Umwelt) Err() interfaces.WriterAndStringWriter {
 	return u.err
 }
 
-func (u *Umwelt) Standort() fs_home.Standort {
+func (u *Umwelt) Standort() fs_home.Home {
 	return u.fs_home
 }
 

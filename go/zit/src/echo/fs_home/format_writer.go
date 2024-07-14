@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
-func (s Standort) Rel(
+func (s Home) Rel(
 	p string,
 ) (out string) {
 	out = p
@@ -22,11 +22,11 @@ func (s Standort) Rel(
 	return
 }
 
-func (s Standort) MakeRelativePathStringFormatWriter() interfaces.StringFormatWriter[string] {
+func (s Home) MakeRelativePathStringFormatWriter() interfaces.StringFormatWriter[string] {
 	return relativePathStringFormatWriter(s)
 }
 
-type relativePathStringFormatWriter Standort
+type relativePathStringFormatWriter Home
 
 func (f relativePathStringFormatWriter) WriteStringFormat(
 	w interfaces.WriterAndStringWriter,
@@ -58,7 +58,7 @@ func (f relativePathStringFormatWriter) WriteStringFormat(
 	return
 }
 
-func (s Standort) MakeWriterRelativePath(
+func (s Home) MakeWriterRelativePath(
 	p string,
 ) interfaces.FuncWriter {
 	return func(w io.Writer) (n int64, err error) {
@@ -89,7 +89,7 @@ func (s Standort) MakeWriterRelativePath(
 	}
 }
 
-func (s Standort) MakeWriterRelativePathOr(
+func (s Home) MakeWriterRelativePathOr(
 	p string,
 	or interfaces.FuncWriter,
 ) interfaces.FuncWriter {

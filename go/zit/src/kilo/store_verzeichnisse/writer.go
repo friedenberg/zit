@@ -93,7 +93,7 @@ func (pw *writer) flushBoth() (err error) {
 	ui.Log().Printf("flushing both: %s", pw.Path())
 
 	chain := iter.MakeChain(
-		pw.konfig.ApplySchlummerndAndRealizeEtiketten,
+		pw.konfig.ApplyDormantAndRealizeTags,
 		pw.writeOne,
 	)
 
@@ -166,7 +166,7 @@ func (pw *writer) flushJustSchwanz() (err error) {
 	}
 
 	chain := iter.MakeChain(
-		pw.konfig.ApplySchlummerndAndRealizeEtiketten,
+		pw.konfig.ApplyDormantAndRealizeTags,
 		pw.removeOldSchwanz,
 		pw.writeOne,
 	)
