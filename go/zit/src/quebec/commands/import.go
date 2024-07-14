@@ -16,7 +16,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/lima/bestandsaufnahme"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
@@ -28,7 +27,7 @@ type Import struct {
 	Akten            string
 	AgeIdentity      age.Identity
 	CompressionType  immutable_config.CompressionType
-	Proto            zettel.ProtoZettel
+	Proto            sku.Proto
 }
 
 func init() {
@@ -36,7 +35,6 @@ func init() {
 		"import",
 		func(f *flag.FlagSet) Command {
 			c := &Import{
-				Proto:           zettel.MakeEmptyProtoZettel(),
 				CompressionType: immutable_config.CompressionTypeDefault,
 			}
 

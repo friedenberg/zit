@@ -65,7 +65,7 @@ func (a *Assignment) addToSet(
 				}
 
 				if err = ot.EachPtr(
-					z.AddEtikettPtr,
+					z.AddTagPtr,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -119,14 +119,14 @@ func (a *Assignment) addToSet(
 			)
 
 			if err = o.Metadatei.GetTags().EachPtr(
-				z.AddEtikettPtr,
+				z.AddTagPtr,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 			if err = expanded.EachPtr(
-				z.AddEtikettPtr,
+				z.AddTagPtr,
 			); err != nil {
 				err = errors.Wrap(err)
 				return

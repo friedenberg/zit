@@ -193,7 +193,7 @@ func (a PrefixSet) Match(
 
 		zSet.Each(
 			func(z *obj) (err error) {
-				es := z.GetEtiketten()
+				es := z.GetTags()
 
 				intersection := ids.IntersectPrefixes(
 					es,

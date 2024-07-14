@@ -27,9 +27,9 @@ func (tm Conflicted) IsAllInlineType(itc ids.InlineTypeChecker) bool {
 }
 
 func (tm *Conflicted) MergeTags() (err error) {
-	left := tm.Left.GetEtiketten().CloneMutableSetPtrLike()
-	middle := tm.Middle.GetEtiketten().CloneMutableSetPtrLike()
-	right := tm.Right.GetEtiketten().CloneMutableSetPtrLike()
+	left := tm.Left.GetTags().CloneMutableSetPtrLike()
+	middle := tm.Middle.GetTags().CloneMutableSetPtrLike()
+	right := tm.Right.GetTags().CloneMutableSetPtrLike()
 
 	same := ids.MakeTagMutableSet()
 	deleted := ids.MakeTagMutableSet()

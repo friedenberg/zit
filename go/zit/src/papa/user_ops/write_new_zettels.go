@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
@@ -13,7 +12,7 @@ type WriteNewZettels struct {
 }
 
 func (c WriteNewZettels) RunMany(
-	z zettel.ProtoZettel,
+	z sku.Proto,
 	count int,
 ) (results sku.TransactedMutableSet, err error) {
 	if err = c.Lock(); err != nil {
@@ -44,7 +43,7 @@ func (c WriteNewZettels) RunMany(
 }
 
 func (c WriteNewZettels) RunOne(
-	z zettel.ProtoZettel,
+	z sku.Proto,
 ) (result *sku.Transacted, err error) {
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
@@ -62,7 +61,7 @@ func (c WriteNewZettels) RunOne(
 }
 
 func (c WriteNewZettels) runOneAlreadyLocked(
-	pz zettel.ProtoZettel,
+	pz sku.Proto,
 ) (zt *sku.Transacted, err error) {
 	zt = pz.Make()
 

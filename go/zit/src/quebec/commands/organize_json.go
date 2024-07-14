@@ -86,7 +86,7 @@ func (c *OrganizeJSON) RunWithQuery(
 		),
 	}
 
-	typen := ms.GetTypen()
+	typen := ms.GetTypes()
 
 	switch typen.Len() {
 	case 0:

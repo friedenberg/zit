@@ -27,7 +27,7 @@ func (s *flushQueryGroup) ContainsSku(_ *sku.Transacted) bool {
 	return true
 }
 
-func (s *flushQueryGroup) ContainsKennung(_ *ids.ObjectId) bool {
+func (s *flushQueryGroup) ContainsObjectId(_ *ids.ObjectId) bool {
 	return false
 }
 

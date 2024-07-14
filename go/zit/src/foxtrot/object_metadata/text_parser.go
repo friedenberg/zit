@@ -83,7 +83,7 @@ func (f textParser) ParseMetadata(
 	mr := Reader{
 		// RequireMetadatei: true,
 		Metadata: lr,
-		Blob:      akteWriter,
+		Blob:     akteWriter,
 	}
 
 	// if cmg, ok := c.(checkout_mode.Getter); ok {

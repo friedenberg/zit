@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
@@ -25,16 +24,14 @@ type Add struct {
 	Organize            bool
 	Filter              script_value.ScriptValue
 
-	zettel.ProtoZettel
+	sku.Proto
 }
 
 func init() {
 	registerCommand(
 		"add",
 		func(f *flag.FlagSet) Command {
-			c := &Add{
-				ProtoZettel: zettel.MakeEmptyProtoZettel(),
-			}
+			c := &Add{}
 
 			f.BoolVar(
 				&c.Dedupe,
@@ -81,11 +78,11 @@ func (c Add) Run(
 	args ...string,
 ) (err error) {
 	zettelsFromAkteOp := user_ops.ZettelFromExternalAkte{
-		Umwelt:      u,
-		ProtoZettel: c.ProtoZettel,
-		Filter:      c.Filter,
-		Delete:      c.Delete,
-		Dedupe:      c.Dedupe,
+		Umwelt: u,
+		Proto:  c.Proto,
+		Filter: c.Filter,
+		Delete: c.Delete,
+		Dedupe: c.Dedupe,
 	}
 
 	var zettelsFromAkteResults sku.TransactedMutableSet
@@ -132,8 +129,8 @@ func (c Add) Run(
 	}
 
 	opOrganize := user_ops.Organize{
-		Umwelt:    u,
-		Metadata: c.Metadatei,
+		Umwelt:   u,
+		Metadata: c.Metadata,
 	}
 
 	if err = u.GetKonfig().DefaultTags.EachPtr(

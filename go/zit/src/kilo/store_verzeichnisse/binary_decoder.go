@@ -212,7 +212,7 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 				break
 			}
 
-			if q.ContainsKennung(&sk.Kennung) &&
+			if q.ContainsObjectId(&sk.Kennung) &&
 				(qs.ContainsOneOf(ids.SigilHistory) ||
 					sk.ContainsOneOf(ids.SigilLatest)) {
 				break
@@ -267,7 +267,7 @@ func (bf *binaryDecoder) readSigil(
 		return
 	}
 
-	sk.SetSchlummernd(sk.IncludesHidden())
+	sk.SetDormant(sk.IncludesHidden())
 
 	return
 }
@@ -296,7 +296,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-		if err = sk.AddEtikettPtrFast(&e); err != nil {
+		if err = sk.AddTagPtrFast(&e); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

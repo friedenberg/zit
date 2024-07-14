@@ -16,17 +16,16 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
 type CreateFromPaths struct {
 	*umwelt.Umwelt
-	TextParser  object_metadata.TextParser
-	Filter      script_value.ScriptValue
-	ProtoZettel zettel.ProtoZettel
-	Delete      bool
+	sku.Proto
+	TextParser object_metadata.TextParser
+	Filter     script_value.ScriptValue
+	Delete     bool
 	// ReadHinweisFromPath bool
 }
 

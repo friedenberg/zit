@@ -41,7 +41,7 @@ func MakeErrHasInlineBlobAndMetadateiSha(
 }
 
 type ErrHasInlineBlobAndMetadateiSha struct {
-	InlineSha    sha.Sha
+	InlineSha   sha.Sha
 	MetadataSha sha.Sha
 }
 

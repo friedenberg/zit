@@ -324,7 +324,7 @@ LOOP:
 						return
 					}
 
-					if err = o.AddEtikettPtr(&e); err != nil {
+					if err = o.AddTagPtr(&e); err != nil {
 						err = errors.Wrap(err)
 						return
 					}

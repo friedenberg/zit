@@ -23,7 +23,7 @@ akte
 
 	sut := Writer{
 		Metadata: strings.NewReader("metadatei\n"),
-		Blob:      strings.NewReader("akte\n"),
+		Blob:     strings.NewReader("akte\n"),
 	}
 
 	sut.WriteTo(out)

@@ -10,7 +10,7 @@ import (
 )
 
 type Reader struct {
-	state            readerState
+	state           readerState
 	RequireMetadata bool // TODO-P4 add delimiter
 	Metadata, Blob  io.ReaderFrom
 }

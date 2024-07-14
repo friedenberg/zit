@@ -11,9 +11,9 @@ import (
 
 var (
 	transactedKeyerObjectId interfaces.StringKeyer[*Transacted]
-	TransactedSetEmpty     TransactedSet
-	TransactedLessor       transactedLessor
-	TransactedEqualer      transactedEqualer
+	TransactedSetEmpty      TransactedSet
+	TransactedLessor        transactedLessor
+	TransactedEqualer       transactedEqualer
 )
 
 func init() {

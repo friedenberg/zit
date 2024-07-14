@@ -28,7 +28,7 @@ body
 
 	r := Reader{
 		Metadata: mr,
-		Blob:      ar,
+		Blob:     ar,
 	}
 
 	var n int64
@@ -75,7 +75,7 @@ metadatei
 
 	r := Reader{
 		Metadata: mr,
-		Blob:      ar,
+		Blob:     ar,
 	}
 
 	var n int64

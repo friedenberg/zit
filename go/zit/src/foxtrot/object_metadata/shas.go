@@ -9,11 +9,11 @@ import (
 )
 
 const (
-	ShaKeySelfMetadata              = "SelbstMetadatei"
-	ShaKeySelfMetadataWithouTai       = "SelbstMetadateiMutterSansTai"
-	ShaKeySelfMetadataObjectIdParent = "SelbstMetadateiKennungMutter"
+	ShaKeySelfMetadata                 = "SelbstMetadatei"
+	ShaKeySelfMetadataWithouTai        = "SelbstMetadateiMutterSansTai"
+	ShaKeySelfMetadataObjectIdParent   = "SelbstMetadateiKennungMutter"
 	ShaKeyParentMetadataObjectIdParent = "MutterMetadateiKennungMutter"
-	ShaKeySelf                       = "MetadateiTai"
+	ShaKeySelf                         = "MetadateiTai"
 	ShaKeyParent                       = "MutterMetadateiMutterTai"
 )
 
@@ -25,9 +25,9 @@ type Sha struct {
 // TODO make this a map
 type Shas struct {
 	Blob                         sha.Sha
-	SelfMetadata              sha.Sha
+	SelfMetadata                 sha.Sha
 	SelfMetadataWithoutTai       sha.Sha
-	SelfMetadataObjectIdParent sha.Sha
+	SelfMetadataObjectIdParent   sha.Sha
 	ParentMetadataObjectIdParent sha.Sha
 }
 

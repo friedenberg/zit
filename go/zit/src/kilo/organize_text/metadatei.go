@@ -42,7 +42,7 @@ func (m Metadatei) AsMetadatei() (m1 object_metadata.Metadata) {
 }
 
 func (m Metadatei) GetMetadataWriterTo() object_metadata.MetadataWriterTo {
-  return m
+	return m
 }
 
 func (m Metadatei) HasMetadataContent() bool {

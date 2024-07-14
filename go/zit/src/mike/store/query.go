@@ -28,7 +28,7 @@ func (s *Store) Query(
 
 	if err = s.GetVerzeichnisse().ReadQuery(
 		qg,
-		qg.MakeEmitSkuSigilSchwanzen(
+		qg.MakeEmitSkuSigilLatest(
 			f,
 			ids.RepoId{},
 			s.UpdateTransactedWithExternal,

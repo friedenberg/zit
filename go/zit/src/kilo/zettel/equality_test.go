@@ -79,7 +79,7 @@ func TestEqualitySelf(t1 *testing.T) {
 
 	text := &object_metadata.Metadata{
 		Description: descriptions.Make("the title"),
-		Type:         makeBlobExt(t, "text"),
+		Type:        makeBlobExt(t, "text"),
 	}
 
 	text.SetTags(makeEtiketten(t,
@@ -98,7 +98,7 @@ func TestEqualityNotSelf(t1 *testing.T) {
 
 	text := object_metadata.Metadata{
 		Description: descriptions.Make("the title"),
-		Type:         makeBlobExt(t, "text"),
+		Type:        makeBlobExt(t, "text"),
 	}
 
 	text.SetTags(makeEtiketten(t,
@@ -109,7 +109,7 @@ func TestEqualityNotSelf(t1 *testing.T) {
 
 	text1 := &object_metadata.Metadata{
 		Description: descriptions.Make("the title"),
-		Type:         makeBlobExt(t, "text"),
+		Type:        makeBlobExt(t, "text"),
 	}
 
 	text1.SetTags(makeEtiketten(t,

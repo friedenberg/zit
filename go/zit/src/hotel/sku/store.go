@@ -90,7 +90,7 @@ type (
 		ExternalStoreQueryUnsure
 		ExternalStoreQueryCheckedOut
 		interfaces.Flusher
-    ExternalStoreForQuery
+		ExternalStoreForQuery
 	}
 
 	ExternalStoreForQueryGetter interface {

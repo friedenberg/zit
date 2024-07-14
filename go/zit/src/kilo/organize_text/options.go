@@ -130,7 +130,7 @@ func (o *Flags) GetOptions(
 	if q == nil {
 		o.rootEtiketten = ids.MakeTagSet()
 	} else {
-		o.rootEtiketten = q.GetEtiketten()
+		o.rootEtiketten = q.GetTags()
 
 		// TODO handle negated
 		// ks := collections_value.MakeMutableValueSet[sku.Query](nil)

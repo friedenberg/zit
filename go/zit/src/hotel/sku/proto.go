@@ -6,11 +6,21 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 )
+
+func MakeProto(tipe ids.Type, tags ids.TagSet) (p Proto) {
+	errors.TodoP1("modify konfig to keep etiketten set")
+
+	p.Metadata.Type = tipe
+	p.Metadata.SetTags(tags)
+
+	return
+}
 
 type Proto struct {
 	object_metadata.Metadata
@@ -37,10 +47,10 @@ func (pz Proto) Equals(z *object_metadata.Metadata) (ok bool) {
 	return
 }
 
-func (pz Proto) Make() (z *object_metadata.Metadata) {
+func (pz Proto) Make() (z *Transacted) {
 	todo.Change("add typ")
 	todo.Change("add Bezeichnung")
-	z = object_metadata.GetPool().Get()
+	z = GetTransactedPool().Get()
 
 	pz.Apply(z, genres.Zettel)
 
@@ -49,11 +59,15 @@ func (pz Proto) Make() (z *object_metadata.Metadata) {
 
 func (pz Proto) Apply(
 	ml object_metadata.MetadataLike,
-	g interfaces.GenreGetter,
+	gg interfaces.GenreGetter,
 ) (ok bool) {
 	z := ml.GetMetadata()
 
-	if g.GetGenre() == genres.Zettel {
+	g := gg.GetGenre()
+	ui.Log().Print(ml, g)
+
+	switch g {
+	case genres.Zettel, genres.Unknown:
 		if ids.IsEmpty(z.GetType()) &&
 			!ids.IsEmpty(pz.Metadata.Type) &&
 			!z.GetType().Equals(pz.Metadata.Type) {
@@ -79,7 +93,7 @@ func (pz Proto) Apply(
 
 func (pz Proto) ApplyWithBlobFD(
 	ml object_metadata.MetadataLike,
-	blobFD *fd.FD,
+	akteFD *fd.FD,
 ) (err error) {
 	z := ml.GetMetadata()
 
@@ -89,17 +103,17 @@ func (pz Proto) ApplyWithBlobFD(
 		z.Type = pz.Metadata.Type
 	} else {
 		// TODO-P4 use konfig
-		ext := blobFD.Ext()
+		ext := akteFD.Ext()
 
 		if ext != "" {
-			if err = z.Type.Set(blobFD.Ext()); err != nil {
+			if err = z.Type.Set(akteFD.Ext()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 		}
 	}
 
-	bez := blobFD.FileNameSansExt()
+	bez := akteFD.FileNameSansExt()
 
 	if pz.Metadata.Description.WasSet() &&
 		!z.Description.Equals(pz.Metadata.Description) {

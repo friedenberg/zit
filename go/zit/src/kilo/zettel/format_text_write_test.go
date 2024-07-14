@@ -80,7 +80,7 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 
 	z := &object_metadata.Metadata{
 		Description: descriptions.Make("the title"),
-		Type:         makeBlobExt(t, "md"),
+		Type:        makeBlobExt(t, "md"),
 	}
 
 	z.SetTags(makeEtiketten(t,
@@ -122,7 +122,7 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 
 	z := &object_metadata.Metadata{
 		Description: descriptions.Make("the title"),
-		Type:         makeBlobExt(t, "md"),
+		Type:        makeBlobExt(t, "md"),
 	}
 
 	z.SetTags(makeEtiketten(t,

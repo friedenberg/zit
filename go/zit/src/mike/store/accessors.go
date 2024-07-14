@@ -18,7 +18,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/store_verzeichnisse"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/lima/bestandsaufnahme"
 )
 
@@ -46,7 +45,7 @@ func (s *Store) GetObjekteFormatOptions() object_inventory_format.Options {
 	return s.options
 }
 
-func (s *Store) GetProtoZettel() zettel.ProtoZettel {
+func (s *Store) GetProtoZettel() sku.Proto {
 	return s.protoZettel
 }
 

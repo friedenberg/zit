@@ -25,7 +25,7 @@ type (
 	QueryWithSigilAndObjectId interface {
 		Query
 		SigilGetter
-		ContainsKennung(*ids.ObjectId) bool
+		ContainsObjectId(*ids.ObjectId) bool
 	}
 
 	// Used by store_verzeichnisse.binary*
@@ -47,7 +47,7 @@ type (
 				z *Transacted,
 			) (err error),
 		) interfaces.FuncIter[*Transacted]
-		MakeEmitSkuSigilSchwanzen(
+		MakeEmitSkuSigilLatest(
 			f interfaces.FuncIter[*Transacted],
 			k ids.RepoId,
 			updateTransacted func(
@@ -55,8 +55,8 @@ type (
 				z *Transacted,
 			) (err error),
 		) interfaces.FuncIter[*Transacted]
-		GetEtiketten() ids.TagSet
-		GetTypen() ids.TypeSet
+		GetTags() ids.TagSet
+		GetTypes() ids.TypeSet
 	}
 
 	ExternalQueryOptions struct {

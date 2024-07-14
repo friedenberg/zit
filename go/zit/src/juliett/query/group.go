@@ -107,7 +107,7 @@ func (qg *Group) GetExactlyOneKennung(
 	return
 }
 
-func (qg *Group) GetEtiketten() ids.TagSet {
+func (qg *Group) GetTags() ids.TagSet {
 	mes := ids.MakeMutableTagSet()
 
 	for _, oq := range qg.OptimizedQueries {
@@ -117,7 +117,7 @@ func (qg *Group) GetEtiketten() ids.TagSet {
 	return mes
 }
 
-func (qg *Group) GetTypen() ids.TypeSet {
+func (qg *Group) GetTypes() ids.TypeSet {
 	return qg.Typen
 }
 
@@ -433,11 +433,11 @@ func (qg *Group) MakeEmitSkuMaybeExternal(
 	if qg.GetSigil() == ids.SigilExternal {
 		return qg.MakeEmitSkuSigilExternal(f, k, updateTransacted)
 	} else {
-		return qg.MakeEmitSkuSigilSchwanzen(f, k, updateTransacted)
+		return qg.MakeEmitSkuSigilLatest(f, k, updateTransacted)
 	}
 }
 
-func (qg *Group) MakeEmitSkuSigilSchwanzen(
+func (qg *Group) MakeEmitSkuSigilLatest(
 	f interfaces.FuncIter[*sku.Transacted],
 	k ids.RepoId,
 	updateTransacted func(

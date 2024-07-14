@@ -22,7 +22,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/store_verzeichnisse"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/lima/bestandsaufnahme"
 )
 
@@ -54,7 +53,7 @@ type Store struct {
 	sku.TransactedAdder
 	typenIndex object_id_index.KennungIndex[ids.Type, *ids.Type]
 
-	protoZettel      zettel.ProtoZettel
+	protoZettel      sku.Proto
 	konfigAkteFormat blob_store.Format[mutable_config.Blob, *mutable_config.Blob]
 
 	queryBuilder *query.Builder
@@ -141,7 +140,10 @@ func (c *Store) Initialize(
 		return
 	}
 
-	c.protoZettel = zettel.MakeProtoZettel(c.GetKonfig())
+	c.protoZettel = sku.MakeProto(
+		k.GetErworben().Defaults.Typ,
+		k.DefaultTags,
+	)
 
 	c.konfigAkteFormat = blob_store.MakeBlobFormat(
 		blob_store.MakeTextParserIgnoreTomlErrors[mutable_config.Blob](

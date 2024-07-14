@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
@@ -25,16 +24,14 @@ type New struct {
 	PrintOnly bool
 	Filter    script_value.ScriptValue
 
-	zettel.ProtoZettel
+	sku.Proto
 }
 
 func init() {
 	registerCommand(
 		"new",
 		func(f *flag.FlagSet) Command {
-			c := &New{
-				ProtoZettel: zettel.MakeEmptyProtoZettel(),
-			}
+			c := &New{}
 
 			f.Var(&c.Kasten, "kasten", "none or Chrome")
 
@@ -146,8 +143,8 @@ func (c New) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	if c.Organize {
 		opOrganize := user_ops.Organize{
-			Umwelt:    u,
-			Metadata: c.Metadatei,
+			Umwelt:   u,
+			Metadata: c.Metadata,
 		}
 
 		if err = opOrganize.Run(nil, zts); err != nil {
@@ -165,11 +162,11 @@ func (c New) readExistingFilesAsZettels(
 	args ...string,
 ) (zts sku.TransactedMutableSet, err error) {
 	opCreateFromPath := user_ops.CreateFromPaths{
-		Umwelt:      u,
-		TextParser:  f,
-		Filter:      c.Filter,
-		Delete:      c.Delete,
-		ProtoZettel: c.ProtoZettel,
+		Umwelt:     u,
+		TextParser: f,
+		Filter:     c.Filter,
+		Delete:     c.Delete,
+		Proto:      c.Proto,
 	}
 
 	if zts, err = opCreateFromPath.Run(args...); err != nil {
@@ -187,7 +184,7 @@ func (c New) writeNewZettels(
 		Umwelt: u,
 	}
 
-	if zts, err = emptyOp.RunMany(c.ProtoZettel, c.Count); err != nil {
+	if zts, err = emptyOp.RunMany(c.Proto, c.Count); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

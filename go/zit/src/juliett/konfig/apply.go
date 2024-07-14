@@ -69,7 +69,7 @@ func (k *Compiled) ApplyDormantAndRealizeTags(
 		return
 	}
 
-	sk.SetSchlummernd(k.dormant.ContainsSku(sk))
+	sk.SetDormant(k.dormant.ContainsSku(sk))
 
 	return
 }
@@ -188,8 +188,8 @@ func (k *Compiled) addImplicitTags(
 	typKonfig := k.getApproximatedType(mp.GetType()).ApproximatedOrActual()
 
 	if typKonfig != nil {
-		typKonfig.GetEtiketten().EachPtr(ie.AddPtr)
-		typKonfig.GetEtiketten().EachPtr(addImpEts)
+		typKonfig.GetTags().EachPtr(ie.AddPtr)
+		typKonfig.GetTags().EachPtr(addImpEts)
 	}
 
 	mp.Cache.SetImplicitTags(ie)

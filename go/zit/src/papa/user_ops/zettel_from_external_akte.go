@@ -15,17 +15,16 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/objekte_collections"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/zettel"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
 
 type ZettelFromExternalAkte struct {
 	*umwelt.Umwelt
+	sku.Proto
 	// TODO switch to using ObjekteOptions
-	ProtoZettel zettel.ProtoZettel
-	Filter      script_value.ScriptValue
-	Delete      bool
-	Dedupe      bool
+	Filter script_value.ScriptValue
+	Delete bool
+	Dedupe bool
 }
 
 func (c ZettelFromExternalAkte) Run(
@@ -107,7 +106,7 @@ func (c ZettelFromExternalAkte) Run(
 
 	if err = results.Each(
 		func(z *sku.Transacted) (err error) {
-			if c.ProtoZettel.Apply(z, genres.Zettel) {
+			if c.Proto.Apply(z, genres.Zettel) {
 				if err = c.GetStore().CreateOrUpdateFromTransacted(
 					z,
 					objekte_mode.ModeApplyProto,
@@ -147,7 +146,7 @@ func (c ZettelFromExternalAkte) Run(
 		}
 
 		// TODO switch to using ObjekteOptions
-		if c.ProtoZettel.Apply(z, genres.Zettel) {
+		if c.Proto.Apply(z, genres.Zettel) {
 			if err = c.GetStore().CreateOrUpdateFromTransacted(
 				z.GetSku(),
 				objekte_mode.ModeEmpty,
@@ -241,7 +240,7 @@ func (c *ZettelFromExternalAkte) zettelForAkte(
 		return
 	}
 
-	if err = c.ProtoZettel.ApplyWithBlobFD(z, akteFD); err != nil {
+	if err = c.Proto.ApplyWithBlobFD(z, akteFD); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

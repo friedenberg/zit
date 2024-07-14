@@ -16,8 +16,8 @@ import (
 )
 
 type Transacted struct {
-	Kennung          ids.ObjectId
-	Metadatei        object_metadata.Metadata
+	Kennung   ids.ObjectId
+	Metadatei object_metadata.Metadata
 }
 
 func (t *Transacted) GetSkuLike() SkuLike {
@@ -115,11 +115,11 @@ func (a *Transacted) GetSkuLikePtr() SkuLike {
 	return a
 }
 
-func (a *Transacted) GetEtiketten() ids.TagSet {
+func (a *Transacted) GetTags() ids.TagSet {
 	return a.Metadatei.GetTags()
 }
 
-func (a *Transacted) AddEtikettPtr(e *ids.Tag) (err error) {
+func (a *Transacted) AddTagPtr(e *ids.Tag) (err error) {
 	if a.Kennung.GetGenre() == genres.Tag {
 		e1 := ids.MustTag(a.Kennung.String())
 		ex := ids.ExpandOne(&e1, expansion.ExpanderRight)
@@ -143,7 +143,7 @@ func (a *Transacted) AddEtikettPtr(e *ids.Tag) (err error) {
 	return
 }
 
-func (a *Transacted) AddEtikettPtrFast(e *ids.Tag) (err error) {
+func (a *Transacted) AddTagPtrFast(e *ids.Tag) (err error) {
 	if err = a.GetMetadata().AddTagPtrFast(e); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -171,10 +171,6 @@ func (a *Transacted) SetTai(t ids.Tai) {
 }
 
 func (a *Transacted) GetObjectId() *ids.ObjectId {
-	return &a.Kennung
-}
-
-func (a *Transacted) GetKennungLike() ids.IdLike {
 	return &a.Kennung
 }
 
@@ -220,12 +216,12 @@ func (s *Transacted) IsNew() bool {
 	return s.Metadatei.Mutter().IsNull()
 }
 
-func (s *Transacted) CalculateObjekteShaDebug() (err error) {
-	return s.calculateObjekteSha(true)
+func (s *Transacted) CalculateObjectShaDebug() (err error) {
+	return s.calculateObjectSha(true)
 }
 
 func (s *Transacted) CalculateObjectShas() (err error) {
-	return s.calculateObjekteSha(false)
+	return s.calculateObjectSha(false)
 }
 
 func (s *Transacted) makeShaCalcFunc(
@@ -252,7 +248,7 @@ func (s *Transacted) makeShaCalcFunc(
 	}
 }
 
-func (s *Transacted) calculateObjekteSha(debug bool) (err error) {
+func (s *Transacted) calculateObjectSha(debug bool) (err error) {
 	f := object_inventory_format.GetShaForContext
 
 	if debug {
@@ -288,7 +284,7 @@ func (s *Transacted) calculateObjekteSha(debug bool) (err error) {
 	return wg.GetError()
 }
 
-func (s *Transacted) SetSchlummernd(v bool) {
+func (s *Transacted) SetDormant(v bool) {
 	s.Metadatei.Cache.Dormant.SetBool(v)
 }
 

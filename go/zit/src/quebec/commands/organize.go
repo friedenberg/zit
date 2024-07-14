@@ -84,7 +84,7 @@ func (c *Organize) RunWithQuery(
 		),
 	}
 
-	typen := ms.GetTypen()
+	typen := ms.GetTypes()
 
 	if typen.Len() == 1 {
 		createOrganizeFileOp.Typ = typen.Any()

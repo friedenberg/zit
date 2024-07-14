@@ -32,7 +32,7 @@ func (a *Query) GetSigil() ids.Sigil {
 	return a.Sigil
 }
 
-func (a *Query) ContainsKennung(k *ids.ObjectId) bool {
+func (a *Query) ContainsObjectId(k *ids.ObjectId) bool {
 	if !a.Genre.Contains(k.GetGenre()) {
 		panic("should never check for wrong gattung")
 	}

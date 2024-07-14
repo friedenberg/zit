@@ -127,7 +127,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	case keys.Tag:
-		es := sk.GetEtiketten()
+		es := sk.GetTags()
 
 		for _, e := range iter.SortedValues(es) {
 			if e.IsVirtual() {
