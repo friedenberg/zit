@@ -9,23 +9,23 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
-func MakeSelbstApply(
-	selbst *sku.Transacted,
+func MakeSelfApply(
+	self *sku.Transacted,
 ) interfaces.FuncIter[*lua.VM] {
-	if selbst == nil {
+	if self == nil {
 		return nil
 	}
 
 	return func(vm *lua.VM) (err error) {
 		selbstTable := sku_fmt.MakeLuaTablePool(vm).Get()
-		sku_fmt.ToLuaTable(selbst, vm.LState, selbstTable)
+		sku_fmt.ToLuaTable(self, vm.LState, selbstTable)
 		vm.SetGlobal("Selbst", selbstTable.Transacted)
 		return
 	}
 }
 
 func MakeLua(
-	selbst *sku.Transacted,
+	self *sku.Transacted,
 	script string,
 	require lua.LGFunction,
 ) (ml Lua, err error) {
@@ -33,7 +33,7 @@ func MakeLua(
 		WithScript(script).
 		WithRequire(require)
 
-	if ml, err = MakeLuaFromBuilder(b, selbst); err != nil {
+	if ml, err = MakeLuaFromBuilder(b, self); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -45,7 +45,7 @@ func MakeLuaFromBuilder(
 	b *lua.VMPoolBuilder,
 	selbst *sku.Transacted,
 ) (l Lua, err error) {
-	b = b.Clone().WithApply(MakeSelbstApply(selbst))
+	b = b.Clone().WithApply(MakeSelfApply(selbst))
 
 	var vmp *lua.VMPool
 

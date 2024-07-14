@@ -22,7 +22,7 @@ func MakeBuilder(
 	blob_store *blob_store.VersionedStores,
 	object_probe_index sku.ObjectProbeIndex,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
-	kastenGetter sku.ExternalStoreForQueryGetter,
+	repoGetter sku.ExternalStoreForQueryGetter,
 ) (b *Builder) {
 	b = &Builder{
 		fs_home:                    s,
@@ -31,7 +31,7 @@ func MakeBuilder(
 		luaVMPoolBuilder:           luaVMPoolBuilder,
 		virtualEtikettenBeforeInit: make(map[string]string),
 		virtualEtiketten:           make(map[string]Lua),
-		kastenGetter:               kastenGetter,
+		repoGetter:                 repoGetter,
 	}
 
 	return
@@ -42,14 +42,14 @@ type Builder struct {
 	blob_store                 *blob_store.VersionedStores
 	object_probe_index         sku.ObjectProbeIndex
 	luaVMPoolBuilder           *lua.VMPoolBuilder
-	preexistingKennung         []Kennung
-	kastenGetter               sku.ExternalStoreForQueryGetter
-	kasten                     sku.ExternalStoreForQuery
+	pinnedObjectIds            []ObjectId
+	repoGetter                 sku.ExternalStoreForQueryGetter
+	repo                       sku.ExternalStoreForQuery
 	cwdFilterEnabled           bool
 	fileExtensionGetter        interfaces.FileExtensionGetter
 	expanders                  ids.Abbr
 	hidden                     sku.Query
-	defaultGattungen           ids.Genre
+	defaultGenres              ids.Genre
 	defaultSigil               ids.Sigil
 	permittedSigil             ids.Sigil
 	virtualEtikettenBeforeInit map[string]string
@@ -80,7 +80,7 @@ func (b *Builder) WithRequireNonEmptyQuery() *Builder {
 	return b
 }
 
-func (mb *Builder) WithVirtualEtiketten(vs map[string]string) *Builder {
+func (mb *Builder) WithVirtualTags(vs map[string]string) *Builder {
 	for k, v := range vs {
 		mb.virtualEtikettenBeforeInit["%"+k] = v
 	}
@@ -93,10 +93,10 @@ func (mb *Builder) WithDebug() *Builder {
 	return mb
 }
 
-func (mb *Builder) WithKasten(
-	kasten sku.ExternalStoreForQuery,
+func (mb *Builder) WithRepo(
+	repo sku.ExternalStoreForQuery,
 ) *Builder {
-	mb.kasten = kasten
+	mb.repo = repo
 	return mb
 }
 
@@ -114,10 +114,10 @@ func (mb *Builder) WithExpanders(
 	return mb
 }
 
-func (mb *Builder) WithDefaultGattungen(
-	defaultGattungen ids.Genre,
+func (mb *Builder) WithDefaultGenres(
+	defaultGenres ids.Genre,
 ) *Builder {
-	mb.defaultGattungen = defaultGattungen
+	mb.defaultGenres = defaultGenres
 	return mb
 }
 
@@ -140,9 +140,9 @@ func (b *Builder) WithTransacted(
 ) *Builder {
 	errors.PanicIfError(zts.Each(
 		func(t *sku.Transacted) (err error) {
-			b.preexistingKennung = append(
-				b.preexistingKennung,
-				Kennung{
+			b.pinnedObjectIds = append(
+				b.pinnedObjectIds,
+				ObjectId{
 					ObjectId: t.ObjectId.Clone(),
 				},
 			)
@@ -159,9 +159,9 @@ func (b *Builder) WithCheckedOut(
 ) *Builder {
 	errors.PanicIfError(cos.Each(
 		func(co sku.CheckedOutLike) (err error) {
-			b.preexistingKennung = append(
-				b.preexistingKennung,
-				Kennung{
+			b.pinnedObjectIds = append(
+				b.pinnedObjectIds,
+				ObjectId{
 					ObjectId: co.GetSku().ObjectId.Clone(),
 				},
 			)
@@ -173,14 +173,14 @@ func (b *Builder) WithCheckedOut(
 	return b
 }
 
-func (b *Builder) BuildQueryGroupWithKasten(
+func (b *Builder) BuildQueryGroupWithRepoId(
 	k ids.RepoId,
 	eqo sku.ExternalQueryOptions,
 	vs ...string,
 ) (qg *Group, err error) {
 	ok := false
 	b.eqo = eqo
-	b.kasten, ok = b.kastenGetter.GetExternalStoreForQuery(k)
+	b.repo, ok = b.repoGetter.GetExternalStoreForQuery(k)
 
 	if !ok {
 		err = errors.Errorf("kasten not found: %q", k)
@@ -199,7 +199,7 @@ func (b *Builder) BuildQueryGroupWithKasten(
 }
 
 func (b *Builder) BuildQueryGroup(vs ...string) (qg *Group, err error) {
-	if err = b.realizeVirtualEtiketten(); err != nil {
+	if err = b.realizeVirtualTags(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -229,20 +229,20 @@ func (b *Builder) build(vs ...string) (qg *Group, err error) {
 	for _, v := range vs {
 		var k *ids.ObjectId
 
-		if b.kasten == nil {
+		if b.repo == nil {
 			remaining = append(remaining, v)
 			continue
 		}
 
-		if k, err = b.kasten.GetObjectIdForString(v); err != nil {
+		if k, err = b.repo.GetObjectIdForString(v); err != nil {
 			err = nil
 			remaining = append(remaining, v)
 			continue
 		}
 
-		b.preexistingKennung = append(
-			b.preexistingKennung,
-			Kennung{
+		b.pinnedObjectIds = append(
+			b.pinnedObjectIds,
+			ObjectId{
 				ObjectId: k,
 				External: true,
 			},
@@ -261,8 +261,8 @@ func (b *Builder) build(vs ...string) (qg *Group, err error) {
 		return
 	}
 
-	for _, k := range b.preexistingKennung {
-		if err = qg.AddExactKennung(
+	for _, k := range b.pinnedObjectIds {
+		if err = qg.AddExactObjectId(
 			b,
 			k,
 		); err != nil {
@@ -281,7 +281,7 @@ func (b *Builder) build(vs ...string) (qg *Group, err error) {
 	return
 }
 
-func (b *Builder) realizeVirtualEtiketten() (err error) {
+func (b *Builder) realizeVirtualTags() (err error) {
 	for k, v := range b.virtualEtikettenBeforeInit {
 		var vmp *lua.VMPool
 
@@ -310,16 +310,16 @@ func (b *Builder) buildManyFromTokens(
 		// TODO [ces/mew] switch to marker on query group for Cwd
 		var ks interfaces.SetLike[*ids.ObjectId]
 
-		if ks, err = b.kasten.GetExternalObjectId(); err != nil {
+		if ks, err = b.repo.GetExternalObjectId(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		if err = ks.Each(
 			func(k *ids.ObjectId) (err error) {
-				b.preexistingKennung = append(
-					b.preexistingKennung,
-					Kennung{
+				b.pinnedObjectIds = append(
+					b.pinnedObjectIds,
+					ObjectId{
 						ObjectId: k,
 						External: true,
 					},
@@ -346,7 +346,7 @@ func (b *Builder) buildManyFromTokens(
 }
 
 func (b *Builder) addDefaultsIfNecessary(qg *Group) {
-	if b.defaultGattungen.IsEmpty() || !qg.IsEmpty() {
+	if b.defaultGenres.IsEmpty() || !qg.IsEmpty() {
 		return
 	}
 
@@ -361,11 +361,11 @@ func (b *Builder) addDefaultsIfNecessary(qg *Group) {
 		delete(qg.UserQueries, g)
 	} else {
 		dq = &Query{
-			Kennung: make(map[string]Kennung),
+			ObjectIds: make(map[string]ObjectId),
 		}
 	}
 
-	dq.Genre = b.defaultGattungen
+	dq.Genre = b.defaultGenres
 
 	if b.defaultSigil.IsEmpty() {
 		dq.Sigil = ids.SigilLatest
@@ -373,12 +373,12 @@ func (b *Builder) addDefaultsIfNecessary(qg *Group) {
 		dq.Sigil = b.defaultSigil
 	}
 
-	qg.UserQueries[b.defaultGattungen] = dq
+	qg.UserQueries[b.defaultGenres] = dq
 }
 
 func (b *Builder) makeQuery() *Query {
 	return &Query{
-		Kennung: make(map[string]Kennung),
+		ObjectIds: make(map[string]ObjectId),
 	}
 }
 
@@ -445,7 +445,7 @@ LOOP:
 					return
 				}
 
-				if remainingTokens, err = b.parseSigilsAndGattungen(q, tokens[i:]...); err != nil {
+				if remainingTokens, err = b.parseSigilsAndGenres(q, tokens[i:]...); err != nil {
 					err = errors.Wrapf(err, "%s", tokens[i:])
 					return
 				}
@@ -453,7 +453,7 @@ LOOP:
 				break LOOP
 			}
 		} else {
-			k := Kennung{
+			k := ObjectId{
 				ObjectId: ids.GetObjectIdPool().Get(),
 			}
 
@@ -469,18 +469,18 @@ LOOP:
 
 			switch k.GetGenre() {
 			case genres.Zettel:
-				b.preexistingKennung = append(
-					b.preexistingKennung,
+				b.pinnedObjectIds = append(
+					b.pinnedObjectIds,
 					k,
 				)
 
 				q.Genre.Add(genres.Zettel)
-				q.Kennung[k.ObjectId.String()] = k
+				q.ObjectIds[k.ObjectId.String()] = k
 
 			case genres.Tag:
 				var et sku.Query
 
-				if et, err = b.makeEtikettExp(&k); err != nil {
+				if et, err = b.makeTagExp(&k); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -497,7 +497,7 @@ LOOP:
 				}
 
 				if !isNegated {
-					if err = qg.Typen.Add(t); err != nil {
+					if err = qg.Types.Add(t); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
@@ -517,7 +517,7 @@ LOOP:
 	}
 
 	if q.Genre.IsEmpty() && !b.requireNonEmptyQuery {
-		q.Genre = b.defaultGattungen
+		q.Genre = b.defaultGenres
 	}
 
 	if q.Sigil.IsEmpty() {
@@ -532,8 +532,8 @@ LOOP:
 	return
 }
 
-func (b *Builder) makeEtikettOrEtikettLua(
-	k *Kennung,
+func (b *Builder) makeTagOrLuaTag(
+	k *ObjectId,
 ) (exp sku.Query, err error) {
 	exp = k
 
@@ -555,7 +555,7 @@ func (b *Builder) makeEtikettOrEtikettLua(
 
 	defer sku.GetTransactedPool().Put(sk)
 
-	lb := b.luaVMPoolBuilder.Clone().WithApply(MakeSelbstApply(sk))
+	lb := b.luaVMPoolBuilder.Clone().WithApply(MakeSelfApply(sk))
 
 	// TODO use repo pattern
 	if sk.GetType().String() == "lua" {
@@ -597,12 +597,12 @@ func (b *Builder) makeEtikettOrEtikettLua(
 		LuaVMPool: sku_fmt.MakeLuaVMPool(vmp, nil),
 	}
 
-	exp = &EtikettLua{Lua: &ml, Kennung: k}
+	exp = &TagLua{Lua: &ml, ObjectId: k}
 
 	return
 }
 
-func (b *Builder) makeEtikettExp(k *Kennung) (exp sku.Query, err error) {
+func (b *Builder) makeTagExp(k *ObjectId) (exp sku.Query, err error) {
 	// TODO use b.akten to read Etikett Akte and find filter if necessary
 	var e ids.Tag
 
@@ -611,7 +611,7 @@ func (b *Builder) makeEtikettExp(k *Kennung) (exp sku.Query, err error) {
 		return
 	}
 
-	if exp, err = b.makeEtikettOrEtikettLua(k); err != nil {
+	if exp, err = b.makeTagOrLuaTag(k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -619,7 +619,7 @@ func (b *Builder) makeEtikettExp(k *Kennung) (exp sku.Query, err error) {
 	return
 }
 
-func (b *Builder) parseSigilsAndGattungen(
+func (b *Builder) parseSigilsAndGenres(
 	q *Query,
 	tokens ...string,
 ) (remainingTokens []string, err error) {

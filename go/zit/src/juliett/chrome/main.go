@@ -19,7 +19,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
@@ -30,7 +30,7 @@ type transacted struct {
 }
 
 type Store struct {
-	konfig            *konfig.Compiled
+	config            *config.Compiled
 	externalStoreInfo external_store.Info
 	typ               ids.Type
 	chrome            chrest.Browser
@@ -52,12 +52,12 @@ type Store struct {
 }
 
 func MakeChrome(
-	k *konfig.Compiled,
+	k *config.Compiled,
 	s fs_home.Home,
 	itemDeletedStringFormatWriter interfaces.FuncIter[*CheckedOut],
 ) *Store {
 	c := &Store{
-		konfig:  k,
+		config:  k,
 		typ:     ids.MustType("toml-bookmark"),
 		removed: make(map[url.URL]struct{}),
 		added:   make(map[url.URL][]*ids.ObjectId),
@@ -134,7 +134,7 @@ func (s *Store) GetObjectIdForString(v string) (k *ids.ObjectId, err error) {
 }
 
 func (s *Store) Flush() (err error) {
-	if s.konfig.DryRun {
+	if s.config.DryRun {
 		return
 	}
 

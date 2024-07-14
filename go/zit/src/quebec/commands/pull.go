@@ -56,7 +56,7 @@ func (c Pull) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	var qg *query.Group
 
-	if qg, err = builder.BuildQueryGroupWithKasten(
+	if qg, err = builder.BuildQueryGroupWithRepoId(
 		ids.RepoId{},
 		sku.ExternalQueryOptions{},
 		args...,

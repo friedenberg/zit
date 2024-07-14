@@ -48,7 +48,7 @@ func (a *Exp) Clone() (b *Exp) {
 	return b
 }
 
-func (e *Exp) CollectEtiketten(mes ids.TagMutableSet) {
+func (e *Exp) CollectTags(mes ids.TagMutableSet) {
 	if e.Or || e.Negated {
 		return
 	}
@@ -56,9 +56,9 @@ func (e *Exp) CollectEtiketten(mes ids.TagMutableSet) {
 	for _, m := range e.Children {
 		switch mt := m.(type) {
 		case *Exp:
-			mt.CollectEtiketten(mes)
+			mt.CollectTags(mes)
 
-		case *Kennung:
+		case *ObjectId:
 			if mt.ObjectId.GetGenre() != genres.Tag {
 				continue
 			}
@@ -73,7 +73,7 @@ func (e *Exp) Reduce(b *Builder) (err error) {
 	if e.Exact {
 		for _, child := range e.Children {
 			switch k := child.(type) {
-			case *Kennung:
+			case *ObjectId:
 				k.Exact = true
 
 			case *Exp:
@@ -124,7 +124,7 @@ func (e *Exp) Add(m sku.Query) (err error) {
 	switch mt := m.(type) {
 	case *Exp:
 
-	case *Kennung:
+	case *ObjectId:
 		mt.Exact = e.Exact
 	}
 

@@ -158,7 +158,7 @@ func (s *Store) ReadOneExternalInto(
 	if !e.FDs.Akte.IsEmpty() {
 		aFD := &e.FDs.Akte
 		ext := aFD.ExtSansDot()
-		typFromExtension := s.konfig.GetTypeStringFromExtension(ext)
+		typFromExtension := s.config.GetTypeStringFromExtension(ext)
 
 		if typFromExtension == "" {
 			ui.Err().Printf("typ extension unknown: %s", aFD.ExtSansDot())

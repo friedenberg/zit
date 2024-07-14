@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
 )
 
 type PageId = sha.PageId
@@ -27,7 +27,7 @@ type Page struct {
 	flushMode          objekte_mode.Mode
 	hasChanges         bool
 	fs_home            fs_home.Home
-	config             *konfig.Compiled
+	config             *config.Compiled
 }
 
 func (pt *Page) initialize(

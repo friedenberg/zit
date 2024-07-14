@@ -38,7 +38,7 @@ const (
 	typ
 	etikett
 	zettel
-	konfig
+	config
 	kasten
 )
 
@@ -103,7 +103,7 @@ func (g Genre) GetGenreBitInt() byte {
 	case Type:
 		return typ
 	case Config:
-		return konfig
+		return config
 	}
 }
 

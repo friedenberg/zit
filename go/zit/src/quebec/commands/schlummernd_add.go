@@ -30,7 +30,7 @@ func (c SchlummerndAdd) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	for _, v := range args {
 		cs := catgut.MakeFromString(v)
 
-		if err = u.Schlummernd().AddSchlummerndEtikett(cs); err != nil {
+		if err = u.GetDormantIndex().AddDormantTag(cs); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

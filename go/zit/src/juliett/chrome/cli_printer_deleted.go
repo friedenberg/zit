@@ -15,11 +15,11 @@ type itemDeletedStringFormatWriter struct {
 }
 
 func MakeItemDeletedStringWriterFormat(
-	konfig interfaces.Config,
+	config interfaces.Config,
 	co string_format_writer.ColorOptions,
 ) *itemDeletedStringFormatWriter {
 	return &itemDeletedStringFormatWriter{
-		Config:             konfig,
+		Config:             config,
 		rightAlignedWriter: string_format_writer.MakeRightAligned(),
 		idStringFormatWriter: string_format_writer.MakeColor(
 			co,

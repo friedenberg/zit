@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
 )
 
 type Flags struct {
@@ -26,7 +26,7 @@ type Flags struct {
 type Options struct {
 	wasMade bool
 
-	Konfig *konfig.Compiled
+	Konfig *config.Compiled
 
 	commentMatchers   interfaces.SetLike[sku.Query]
 	rootEtiketten     ids.TagSet

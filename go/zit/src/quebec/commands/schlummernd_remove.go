@@ -30,7 +30,7 @@ func (c SchlummerndRemove) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	for _, v := range args {
 		cs := catgut.MakeFromString(v)
 
-		if err = u.Schlummernd().RemoveSchlummerndEtikett(cs); err != nil {
+		if err = u.GetDormantIndex().RemoveDormantTag(cs); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

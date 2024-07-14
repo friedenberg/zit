@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/lima/bestandsaufnahme"
+	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 )
@@ -74,7 +74,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 
 	ofo := object_inventory_format.Options{Tai: true, Verzeichnisse: true}
 
-	bf := bestandsaufnahme.MakeFormat(u.GetKonfig().GetStoreVersion(), ofo)
+	bf := inventory_list.MakeFormat(u.GetKonfig().GetStoreVersion(), ofo)
 
 	var rc io.ReadCloser
 
@@ -103,7 +103,7 @@ func (c Import) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	// for scanner.Scan() {
 	// }
 
-	besty := bestandsaufnahme.MakeInventoryList()
+	besty := inventory_list.MakeInventoryList()
 
 	if _, err = bf.ParseBlob(rc, besty); err != nil {
 		err = errors.Wrap(err)

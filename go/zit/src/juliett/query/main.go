@@ -16,7 +16,7 @@ type Query struct {
 	ids.Genre
 	Exp
 
-	Kennung map[string]Kennung
+	ObjectIds map[string]ObjectId
 
 	Hidden sku.Query
 }
@@ -25,7 +25,7 @@ func (a *Query) IsEmpty() bool {
 	return a.Sigil == ids.SigilUnknown &&
 		a.Genre.IsEmpty() &&
 		len(a.Children) == 0 &&
-		len(a.Kennung) == 0
+		len(a.ObjectIds) == 0
 }
 
 func (a *Query) GetSigil() ids.Sigil {
@@ -37,28 +37,28 @@ func (a *Query) ContainsObjectId(k *ids.ObjectId) bool {
 		panic("should never check for wrong gattung")
 	}
 
-	if len(a.Kennung) == 0 {
+	if len(a.ObjectIds) == 0 {
 		return false
 	}
 
-	_, ok := a.Kennung[k.String()]
+	_, ok := a.ObjectIds[k.String()]
 
 	return ok
 }
 
 func (a *Query) Clone() (b *Query) {
 	b = &Query{
-		Sigil:   a.Sigil,
-		Genre:   a.Genre,
-		Kennung: make(map[string]Kennung, len(a.Kennung)),
-		Hidden:  a.Hidden,
+		Sigil:     a.Sigil,
+		Genre:     a.Genre,
+		ObjectIds: make(map[string]ObjectId, len(a.ObjectIds)),
+		Hidden:    a.Hidden,
 	}
 
 	bExp := a.Exp.Clone()
 	b.Exp = *bExp
 
-	for k, v := range a.Kennung {
-		b.Kennung[k] = v
+	for k, v := range a.ObjectIds {
+		b.ObjectIds[k] = v
 	}
 
 	return b
@@ -92,12 +92,12 @@ func (q *Query) Add(m sku.Query) (err error) {
 func (a *Query) Merge(b *Query) (err error) {
 	a.Sigil.Add(b.Sigil)
 
-	if a.Kennung == nil {
-		a.Kennung = make(map[string]Kennung)
+	if a.ObjectIds == nil {
+		a.ObjectIds = make(map[string]ObjectId)
 	}
 
-	for _, k := range b.Kennung {
-		a.Kennung[k.ObjectId.String()] = k
+	for _, k := range b.ObjectIds {
+		a.ObjectIds[k.ObjectId.String()] = k
 	}
 
 	a.Children = append(a.Children, b.Children...)
@@ -116,14 +116,14 @@ func (q *Query) MatcherLen() int {
 func (q *Query) StringDebug() string {
 	var sb strings.Builder
 
-	if q.Kennung == nil || len(q.Kennung) == 0 {
+	if q.ObjectIds == nil || len(q.ObjectIds) == 0 {
 		sb.WriteString(q.Exp.StringDebug())
 	} else {
 		sb.WriteString("[[")
 
 		first := true
 
-		for _, k := range q.Kennung {
+		for _, k := range q.ObjectIds {
 			if !first {
 				sb.WriteString(", ")
 			}
@@ -148,10 +148,10 @@ func (q *Query) StringDebug() string {
 	return sb.String()
 }
 
-func (q *Query) SortedKennungen() []string {
-	out := make([]string, 0, len(q.Kennung))
+func (q *Query) SortedObjectIds() []string {
+	out := make([]string, 0, len(q.ObjectIds))
 
-	for k := range q.Kennung {
+	for k := range q.ObjectIds {
 		out = append(out, k)
 	}
 
@@ -165,10 +165,10 @@ func (q *Query) String() string {
 
 	e := q.Exp.String()
 
-	if q.Kennung == nil || len(q.Kennung) == 0 {
+	if q.ObjectIds == nil || len(q.ObjectIds) == 0 {
 		sb.WriteString(e)
-	} else if len(q.Kennung) == 1 && e == "" {
-		for _, k := range q.Kennung {
+	} else if len(q.ObjectIds) == 1 && e == "" {
+		for _, k := range q.ObjectIds {
 			sb.WriteString(k.String())
 		}
 	} else {
@@ -176,7 +176,7 @@ func (q *Query) String() string {
 
 		first := true
 
-		for _, k := range q.SortedKennungen() {
+		for _, k := range q.SortedObjectIds() {
 			if !first {
 				sb.WriteString(", ")
 			}
@@ -205,7 +205,7 @@ func (q *Query) String() string {
 }
 
 func (q *Query) ShouldHide(sk *sku.Transacted, k string) bool {
-	_, ok := q.Kennung[k]
+	_, ok := q.ObjectIds[k]
 
 	if q.IncludesHidden() || q.Hidden == nil || ok {
 		return false
@@ -228,12 +228,12 @@ func (q *Query) ContainsSku(sk *sku.Transacted) (ok bool) {
 		return
 	}
 
-	if _, ok = q.Kennung[k]; ok {
+	if _, ok = q.ObjectIds[k]; ok {
 		return
 	}
 
 	if len(q.Children) == 0 {
-		ok = len(q.Kennung) == 0 && q.MatchOnEmpty
+		ok = len(q.ObjectIds) == 0 && q.MatchOnEmpty
 		return
 	} else if !q.Exp.ContainsSku(sk) {
 		return

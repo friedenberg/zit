@@ -54,7 +54,7 @@ func init() {
 func (c *Organize) ModifyBuilder(b *query.Builder) {
 	b.
 		WithDefaultSigil(ids.SigilLatest).
-		WithDefaultGattungen(ids.MakeGenre(genres.Zettel)).
+		WithDefaultGenres(ids.MakeGenre(genres.Zettel)).
 		WithRequireNonEmptyQuery()
 }
 

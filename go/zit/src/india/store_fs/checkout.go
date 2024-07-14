@@ -36,7 +36,7 @@ func (s *Store) checkoutOneNew(
 		return
 	}
 
-	if s.konfig.IsDryRun() {
+	if s.config.IsDryRun() {
 		return
 	}
 
@@ -156,7 +156,7 @@ func (s *Store) checkoutOne(
 	options checkout_options.Options,
 	cz *CheckedOut,
 ) (err error) {
-	if s.konfig.IsDryRun() {
+	if s.config.IsDryRun() {
 		return
 	}
 
@@ -173,7 +173,7 @@ func (s *Store) checkoutOne(
 	cz.State = checked_out_state.StateJustCheckedOut
 
 	t := cz.Internal.GetType()
-	inlineAkte := s.konfig.IsInlineType(t)
+	inlineAkte := s.config.IsInlineType(t)
 
 	if options.CheckoutMode.IncludesObjekte() {
 		if err = cz.External.GetFDsPtr().Objekte.SetPath(filename); err != nil {
@@ -186,7 +186,7 @@ func (s *Store) checkoutOne(
 		!options.ForceInlineAkte) &&
 		options.CheckoutMode.IncludesAkte() {
 
-		fe := s.konfig.GetTypeExtension(t.String())
+		fe := s.config.GetTypeExtension(t.String())
 
 		if fe == "" {
 			fe = t.String()

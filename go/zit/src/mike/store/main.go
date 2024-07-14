@@ -18,20 +18,20 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/stream_index"
-	"code.linenisgreat.com/zit/go/zit/src/lima/bestandsaufnahme"
+	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list"
 )
 
 type Store struct {
-	konfig                    *konfig.Compiled
+	config                    *config.Compiled
 	fs_home                   fs_home.Home
 	cwdFiles                  *store_fs.Store
 	externalStores            map[string]*external_store.Store
 	blob_store                *blob_store.VersionedStores
-	bestandsaufnahmeAkte      bestandsaufnahme.InventoryList
+	bestandsaufnahmeAkte      inventory_list.InventoryList
 	options                   object_inventory_format.Options
 	Abbr                      AbbrStore
 	persistentMetadateiFormat object_inventory_format.Format
@@ -47,7 +47,7 @@ type Store struct {
 
 	metadateiTextParser object_metadata.TextParser
 
-	bestandsaufnahmeStore bestandsaufnahme.Store
+	bestandsaufnahmeStore inventory_list.Store
 	kennungIndex          object_id_index.Index
 
 	sku.TransactedAdder
@@ -67,7 +67,7 @@ type Logger struct {
 
 func (c *Store) Initialize(
 	flags *flag.FlagSet,
-	k *konfig.Compiled,
+	k *config.Compiled,
 	st fs_home.Home,
 	pmf object_inventory_format.Format,
 	t thyme.Time,
@@ -75,7 +75,7 @@ func (c *Store) Initialize(
 	qb *query.Builder,
 	options object_inventory_format.Options,
 ) (err error) {
-	c.konfig = k
+	c.config = k
 	c.fs_home = st
 	c.blob_store = blob_store.Make(st)
 	c.persistentMetadateiFormat = pmf
@@ -95,7 +95,7 @@ func (c *Store) Initialize(
 		st.DirVerzeichnisse("TypenIndexV0"),
 	)
 
-	c.bestandsaufnahmeAkte = bestandsaufnahme.InventoryList{
+	c.bestandsaufnahmeAkte = inventory_list.InventoryList{
 		Skus: sku.MakeTransactedHeap(),
 	}
 
@@ -107,10 +107,10 @@ func (c *Store) Initialize(
 		return
 	}
 
-	if c.bestandsaufnahmeStore, err = bestandsaufnahme.MakeStore(
+	if c.bestandsaufnahmeStore, err = inventory_list.MakeStore(
 		c.GetStandort(),
 		c.GetStandort().GetLockSmith(),
-		c.konfig.GetStoreVersion(),
+		c.config.GetStoreVersion(),
 		c.fs_home.ObjekteReaderWriterFactory(genres.InventoryList),
 		c.fs_home,
 		pmf,
@@ -141,7 +141,7 @@ func (c *Store) Initialize(
 	}
 
 	c.protoZettel = sku.MakeProto(
-		k.GetErworben().Defaults.Typ,
+		k.GetMutableConfig().Defaults.Typ,
 		k.DefaultTags,
 	)
 

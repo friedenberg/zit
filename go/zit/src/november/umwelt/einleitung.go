@@ -93,10 +93,10 @@ func (u *Umwelt) Einleitung(e Einleitung) (err error) {
 
 	writeFile(s.FileSchlummernd(), "")
 
-	if err = u.schlummernd.Flush(
+	if err = u.dormantIndex.Flush(
 		u.Standort(),
 		u.PrinterHeader(),
-		u.konfig.DryRun,
+		u.config.DryRun,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/lima/bestandsaufnahme"
+	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list"
 	"code.linenisgreat.com/zit/go/zit/src/november/umwelt"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
@@ -118,7 +118,7 @@ func (c Last) runWithBestandsaufnahme(
 		return
 	}
 
-	var a *bestandsaufnahme.InventoryList
+	var a *inventory_list.InventoryList
 
 	if a, err = s.GetBestandsaufnahmeStore().GetBlob(b.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)

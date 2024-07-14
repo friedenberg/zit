@@ -13,7 +13,7 @@ import (
 
 type Etiketten struct {
 	Paths PathsWithTypes // TODO implement
-	All   EtikettenWithParentsAndTypes
+	All   TagsWithParentsAndTypes
 }
 
 func (a *Etiketten) String() string {

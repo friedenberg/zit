@@ -41,7 +41,7 @@ func (c commandWithQuery) Complete(
 
 	b := u.MakeQueryBuilderExcludingHidden(cgg.CompletionGattung())
 
-	if c.Group, err = b.BuildQueryGroupWithKasten(
+	if c.Group, err = b.BuildQueryGroupWithRepoId(
 		c.RepoId,
 		c.ExternalQueryOptions,
 	); err != nil {
@@ -64,7 +64,7 @@ func (c commandWithQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
 	b := u.MakeQueryBuilderExcludingHidden(ids.MakeGenre())
 
 	if dgg, ok := c.CommandWithQuery.(DefaultGattungGetter); ok {
-		b = b.WithDefaultGattungen(dgg.DefaultGattungen())
+		b = b.WithDefaultGenres(dgg.DefaultGattungen())
 	}
 
 	if dsg, ok := c.CommandWithQuery.(DefaultSigilGetter); ok {
@@ -75,7 +75,7 @@ func (c commandWithQuery) Run(u *umwelt.Umwelt, args ...string) (err error) {
 		qbm.ModifyBuilder(b)
 	}
 
-	if c.Group, err = b.BuildQueryGroupWithKasten(
+	if c.Group, err = b.BuildQueryGroupWithRepoId(
 		c.RepoId,
 		c.ExternalQueryOptions,
 		args...,

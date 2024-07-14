@@ -69,7 +69,7 @@ func init() {
 }
 
 func (c Add) ModifyBuilder(b *query.Builder) {
-	b.WithDefaultGattungen(ids.MakeGenre(genres.Zettel)).
+	b.WithDefaultGenres(ids.MakeGenre(genres.Zettel)).
 		WithDoNotMatchEmpty()
 }
 

@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
 )
 
 type State int
@@ -50,7 +50,7 @@ func init() {
 
 type Index struct {
 	fs_home        fs_home.Home
-	mutable_config *konfig.Compiled
+	mutable_config *config.Compiled
 	path           string
 	interfaces.CacheIOFactory
 	pages             [PageCount]Page
@@ -60,7 +60,7 @@ type Index struct {
 
 func MakeIndex(
 	s fs_home.Home,
-	k *konfig.Compiled,
+	k *config.Compiled,
 	dir string,
 	persistentMetadateiFormat object_inventory_format.Format,
 	options object_inventory_format.Options,

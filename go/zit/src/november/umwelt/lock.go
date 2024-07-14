@@ -23,11 +23,11 @@ func (u *Umwelt) Unlock() (err error) {
 
 	if u.storesInitialized {
 		ui.Log().Printf("konfig has changes: %t", u.GetKonfig().HasChanges())
-		ui.Log().Printf("schlummernd has changes: %t", u.Schlummernd().HasChanges())
+		ui.Log().Printf("schlummernd has changes: %t", u.GetDormantIndex().HasChanges())
 
 		var changes []string
 		changes = append(changes, u.GetKonfig().GetChanges()...)
-		changes = append(changes, u.Schlummernd().GetChanges()...)
+		changes = append(changes, u.GetDormantIndex().GetChanges()...)
 		u.GetStore().GetVerzeichnisse().SetNeedsFlushHistory(changes)
 
 		ui.Log().Print("will flush bestandsaufnahme")
@@ -45,7 +45,7 @@ func (u *Umwelt) Unlock() (err error) {
 		}
 
 		ui.Log().Print("will flush konfig")
-		if err = u.konfig.Flush(
+		if err = u.config.Flush(
 			u.Standort(),
 			u.GetStore().GetAkten().GetTypeV0(),
 			u.PrinterHeader(),
@@ -55,10 +55,10 @@ func (u *Umwelt) Unlock() (err error) {
 		}
 
 		ui.Log().Print("will flush schlummernd")
-		if err = u.schlummernd.Flush(
+		if err = u.dormantIndex.Flush(
 			u.Standort(),
 			u.PrinterHeader(),
-			u.konfig.DryRun,
+			u.config.DryRun,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

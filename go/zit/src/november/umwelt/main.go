@@ -19,10 +19,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/chrome"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
@@ -42,17 +43,17 @@ type Umwelt struct {
 	outIsTty bool
 	errIsTty bool
 
-	fs_home     fs_home.Home
-	erworbenCli mutable_config.Cli
-	konfig      konfig.Compiled
-	schlummernd query.Dormant
+	fs_home      fs_home.Home
+	erworbenCli  mutable_config.Cli
+	config       config.Compiled
+	dormantIndex dormant_index.Index
 
 	storesInitialized bool
 	store             store.Store
 	age               *age.Age
 	externalStores    map[string]*external_store.Store
 
-	matcherArchiviert query.Archiviert
+	matcherArchiviert query.DormantCounter
 
 	luaSkuFormat *sku_fmt.Organize
 }
@@ -68,10 +69,10 @@ func Make(
 		err:               os.Stderr,
 		flags:             flags,
 		erworbenCli:       kCli,
-		matcherArchiviert: query.MakeArchiviert(),
+		matcherArchiviert: query.MakeDormantCounter(),
 	}
 
-	u.konfig.Reset()
+	u.config.Reset()
 
 	if files.IsTty(u.in) {
 		u.inIsTty = true
@@ -135,17 +136,17 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		}
 	}
 
-	if err = u.schlummernd.Load(
+	if err = u.dormantIndex.Load(
 		u.fs_home,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = u.konfig.Initialize(
+	if err = u.config.Initialize(
 		u.fs_home,
 		u.erworbenCli,
-		&u.schlummernd,
+		&u.dormantIndex,
 	); err != nil {
 		if options.GetAllowKonfigReadError() {
 			err = nil
@@ -155,7 +156,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		}
 	}
 
-	u.konfig.ApplyPrintOptionsConfig(u.konfig.Blob.PrintOptions)
+	u.config.ApplyPrintOptionsConfig(u.config.Blob.PrintOptions)
 
 	// for _, rb := range u.konfig.Transacted.Objekte.Akte.Recipients {
 	// 	if err = u.age.AddBech32PivYubikeyEC256(rb); err != nil {
@@ -210,7 +211,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		u.sonnenaufgang,
 		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
 		u.makeQueryBuilder().
-			WithDefaultGattungen(ids.MakeGenre(genres.TrueGenre()...)),
+			WithDefaultGenres(ids.MakeGenre(genres.TrueGenre()...)),
 		ofo,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")
@@ -232,7 +233,7 @@ func (u *Umwelt) Initialize(options Options) (err error) {
 		New:     ptl,
 		Updated: ptl,
 		Unchanged: func(sk *sku.Transacted) (err error) {
-			if !u.konfig.PrintOptions.PrintUnchanged {
+			if !u.config.PrintOptions.PrintUnchanged {
 				return
 			}
 
@@ -287,7 +288,7 @@ func (u *Umwelt) MakeKennungIndex() ids.Index {
 	return ids.Index{}
 }
 
-func (u *Umwelt) GetMatcherArchiviert() query.Archiviert {
+func (u *Umwelt) GetMatcherArchiviert() query.DormantCounter {
 	return u.matcherArchiviert
 }
 

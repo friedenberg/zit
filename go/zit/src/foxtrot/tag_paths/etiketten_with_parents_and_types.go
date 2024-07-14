@@ -10,31 +10,31 @@ import (
 )
 
 type (
-	EtikettenWithParentsAndTypes []EtikettWithParentsAndTypes
+	TagsWithParentsAndTypes []EtikettWithParentsAndTypes
 )
 
-func (s *EtikettenWithParentsAndTypes) Reset() {
+func (s *TagsWithParentsAndTypes) Reset() {
 	*s = (*s)[:0]
 }
 
-func (s EtikettenWithParentsAndTypes) Len() int {
+func (s TagsWithParentsAndTypes) Len() int {
 	return len(s)
 }
 
-func (s EtikettenWithParentsAndTypes) ContainsKennungEtikett(
+func (s TagsWithParentsAndTypes) ContainsKennungEtikett(
 	k *ids.ObjectId,
 ) (int, bool) {
 	return s.containsKennungEtikett(k, true)
 }
 
-func (s EtikettenWithParentsAndTypes) ContainsKennungEtikettExact(
+func (s TagsWithParentsAndTypes) ContainsKennungEtikettExact(
 	k *ids.ObjectId,
 ) (int, bool) {
 	return s.containsKennungEtikett(k, false)
 }
 
 // TODO make less fragile
-func (s EtikettenWithParentsAndTypes) containsKennungEtikett(
+func (s TagsWithParentsAndTypes) containsKennungEtikett(
 	k *ids.ObjectId,
 	partial bool,
 ) (int, bool) {
@@ -79,7 +79,7 @@ func (s EtikettenWithParentsAndTypes) containsKennungEtikett(
 	)
 }
 
-func (s EtikettenWithParentsAndTypes) ContainsEtikett(e *Etikett) (int, bool) {
+func (s TagsWithParentsAndTypes) ContainsEtikett(e *Etikett) (int, bool) {
 	return slices.BinarySearchFunc(
 		s,
 		e,
@@ -90,7 +90,7 @@ func (s EtikettenWithParentsAndTypes) ContainsEtikett(e *Etikett) (int, bool) {
 	)
 }
 
-func (s EtikettenWithParentsAndTypes) GetMatching(
+func (s TagsWithParentsAndTypes) GetMatching(
 	e *Etikett,
 ) (matching []EtikettWithParentsAndTypes) {
 	i, ok := s.ContainsEtikett(e)
@@ -113,7 +113,7 @@ func (s EtikettenWithParentsAndTypes) GetMatching(
 }
 
 // TODO return success
-func (s *EtikettenWithParentsAndTypes) Add(
+func (s *TagsWithParentsAndTypes) Add(
 	e1 *Etikett,
 	p *PathWithType,
 ) (err error) {
@@ -147,7 +147,7 @@ func (s *EtikettenWithParentsAndTypes) Add(
 }
 
 // TODO return success
-func (s *EtikettenWithParentsAndTypes) Remove(e1 *Etikett) (err error) {
+func (s *TagsWithParentsAndTypes) Remove(e1 *Etikett) (err error) {
 	var e *Etikett
 
 	if e, err = e1.Clone(); err != nil {
@@ -166,7 +166,7 @@ func (s *EtikettenWithParentsAndTypes) Remove(e1 *Etikett) (err error) {
 	return
 }
 
-func (s EtikettenWithParentsAndTypes) StringCommaSeparatedExplicit() string {
+func (s TagsWithParentsAndTypes) StringCommaSeparatedExplicit() string {
 	var sb strings.Builder
 
 	first := true

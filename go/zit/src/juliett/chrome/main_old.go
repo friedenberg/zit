@@ -11,7 +11,7 @@ import (
 )
 
 func (c *Store) CommitTransacted(kinder, mutter *sku.Transacted) (err error) {
-	if c.konfig.DryRun {
+	if c.config.DryRun {
 		return
 	}
 

@@ -129,7 +129,7 @@ func (c *FormatZettel) getSku(
 	var k *ids.ObjectId
 	var s ids.Sigil
 
-	if k, s, err = qg.GetExactlyOneKennung(
+	if k, s, err = qg.GetExactlyOneObjectId(
 		genres.Zettel,
 	); err != nil {
 		err = errors.Wrap(err)

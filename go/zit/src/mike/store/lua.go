@@ -42,7 +42,7 @@ func (u *Store) MakeLuaVMPool(
 ) (vp sku_fmt.LuaVMPool, err error) {
 	b := u.luaVMPoolBuilder.Clone().
 		WithScript(script).
-		WithApply(query.MakeSelbstApply(selbst))
+		WithApply(query.MakeSelfApply(selbst))
 
 	var lvmp *lua.VMPool
 
@@ -62,7 +62,7 @@ func (u *Store) MakeLuaVMPoolWithReader(
 ) (vp sku_fmt.LuaVMPool, err error) {
 	b := u.luaVMPoolBuilder.Clone().
 		WithReader(r).
-		WithApply(query.MakeSelbstApply(selbst))
+		WithApply(query.MakeSelfApply(selbst))
 
 	var lvmp *lua.VMPool
 

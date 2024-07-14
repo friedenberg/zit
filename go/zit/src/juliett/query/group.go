@@ -18,8 +18,8 @@ func MakeGroup(
 		OptimizedQueries: make(map[genres.Genre]*Query),
 		UserQueries:      make(map[ids.Genre]*Query),
 		Hidden:           b.hidden,
-		Zettelen:         ids.MakeZettelIdMutableSet(),
-		Typen:            ids.MakeMutableTypeSet(),
+		Zettels:          ids.MakeZettelIdMutableSet(),
+		Types:            ids.MakeMutableTypeSet(),
 	}
 }
 
@@ -27,9 +27,9 @@ type Group struct {
 	Hidden           sku.Query
 	OptimizedQueries map[genres.Genre]*Query
 	UserQueries      map[ids.Genre]*Query
-	Kennungen        []*ids.ObjectId
-	Zettelen         ids.ZettelIdMutableSet
-	Typen            ids.TypeMutableSet
+	ObjectIds        []*ids.ObjectId
+	Zettels          ids.ZettelIdMutableSet
+	Types            ids.TypeMutableSet
 
 	sku.ExternalQueryOptions
 }
@@ -65,7 +65,7 @@ func (qg *Group) GetSigil() (s ids.Sigil) {
 	return
 }
 
-func (qg *Group) GetExactlyOneKennung(
+func (qg *Group) GetExactlyOneObjectId(
 	g genres.Genre,
 ) (k *ids.ObjectId, s ids.Sigil, err error) {
 	if len(qg.OptimizedQueries) != 1 {
@@ -84,7 +84,7 @@ func (qg *Group) GetExactlyOneKennung(
 		return
 	}
 
-	kn := q.Kennung
+	kn := q.ObjectIds
 	lk := len(kn)
 
 	if lk != 1 {
@@ -111,22 +111,26 @@ func (qg *Group) GetTags() ids.TagSet {
 	mes := ids.MakeMutableTagSet()
 
 	for _, oq := range qg.OptimizedQueries {
-		oq.CollectEtiketten(mes)
+		oq.CollectTags(mes)
 	}
 
 	return mes
 }
 
 func (qg *Group) GetTypes() ids.TypeSet {
-	return qg.Typen
+	return qg.Types
 }
 
-func (qg *Group) GetGattungen() (g ids.Genre) {
+func (qg *Group) GetGenres() (g ids.Genre) {
 	for g1 := range qg.OptimizedQueries {
 		g.Add(g1)
 	}
 
 	return
+}
+
+type Reducer interface {
+	Reduce(*Builder) error
 }
 
 func (qg *Group) Reduce(b *Builder) (err error) {
@@ -152,20 +156,20 @@ func (qg *Group) Reduce(b *Builder) (err error) {
 	return
 }
 
-func (qg *Group) AddExactKennung(
+func (qg *Group) AddExactObjectId(
 	b *Builder,
-	k Kennung,
+	k ObjectId,
 ) (err error) {
 	if k.ObjectId == nil {
 		err = errors.Errorf("nil kennung")
 		return
 	}
 
-	qg.Kennungen = append(qg.Kennungen, k.ObjectId)
+	qg.ObjectIds = append(qg.ObjectIds, k.ObjectId)
 
 	q := b.makeQuery()
 	q.Sigil.Add(ids.SigilLatest)
-	q.Kennung[k.ObjectId.String()] = k
+	q.ObjectIds[k.ObjectId.String()] = k
 	q.Genre.Add(genres.Must(k))
 
 	if err = qg.Add(q); err != nil {
@@ -181,9 +185,9 @@ func (qg *Group) Add(q *Query) (err error) {
 
 	if !ok {
 		existing = &Query{
-			Hidden:  qg.Hidden,
-			Genre:   q.Genre,
-			Kennung: make(map[string]Kennung),
+			Hidden:    qg.Hidden,
+			Genre:     q.Genre,
+			ObjectIds: make(map[string]ObjectId),
 		}
 	}
 
@@ -202,7 +206,7 @@ func (qg *Group) addOptimized(b *Builder, q *Query) (err error) {
 	gs := q.Slice()
 
 	if len(gs) == 0 {
-		gs = b.defaultGattungen.Slice()
+		gs = b.defaultGenres.Slice()
 	}
 
 	for _, g := range gs {
@@ -210,9 +214,9 @@ func (qg *Group) addOptimized(b *Builder, q *Query) (err error) {
 
 		if !ok {
 			existing = &Query{
-				Hidden:  qg.Hidden,
-				Genre:   ids.MakeGenre(g),
-				Kennung: make(map[string]Kennung),
+				Hidden:    qg.Hidden,
+				Genre:     ids.MakeGenre(g),
+				ObjectIds: make(map[string]ObjectId),
 			}
 		}
 

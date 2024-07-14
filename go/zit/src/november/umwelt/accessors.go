@@ -6,8 +6,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/india/dormant_index"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
@@ -15,12 +15,12 @@ func (u *Umwelt) Sonnenaufgang() thyme.Time {
 	return u.sonnenaufgang
 }
 
-func (u *Umwelt) GetKonfig() *konfig.Compiled {
-	return &u.konfig
+func (u *Umwelt) GetKonfig() *config.Compiled {
+	return &u.config
 }
 
-func (u *Umwelt) Schlummernd() *query.Dormant {
-	return &u.schlummernd
+func (u *Umwelt) GetDormantIndex() *dormant_index.Index {
+	return &u.dormantIndex
 }
 
 func (u *Umwelt) In() io.Reader {

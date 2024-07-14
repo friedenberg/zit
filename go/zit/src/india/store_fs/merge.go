@@ -25,7 +25,7 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 
 	var leftCO, middleCO, rightCO *CheckedOut
 
-	inlineAkte := tm.IsAllInlineType(s.konfig)
+	inlineAkte := tm.IsAllInlineType(s.config)
 
 	mode := checkout_mode.ModeObjekteAndAkte
 
@@ -127,7 +127,7 @@ func (s *Store) handleMergeResult(
 
 	p := sku_fmt.MakeFormatBestandsaufnahmePrinter(
 		bw,
-		object_inventory_format.FormatForVersion(s.konfig.GetStoreVersion()),
+		object_inventory_format.FormatForVersion(s.config.GetStoreVersion()),
 		s.objekteFormatOptions,
 	)
 
@@ -151,7 +151,7 @@ func (s *Store) RunMergeTool(
 	tool []string,
 	tm sku.Conflicted,
 ) (co *CheckedOut, err error) {
-	inlineAkte := tm.IsAllInlineType(s.konfig)
+	inlineAkte := tm.IsAllInlineType(s.config)
 
 	op := checkout_options.Options{
 		CheckoutMode:    checkout_mode.ModeObjekteAndAkte,

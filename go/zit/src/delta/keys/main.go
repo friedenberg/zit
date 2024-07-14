@@ -24,12 +24,12 @@ const (
 	Type                         = 't'
 	ParentMetadataParentObjectId = 'M'
 	ShaMetadataParentObjectId    = 's'
-	ShaMetadataWithoutTai          = 'n'
-	ShaMetadata                 = 'm'
+	ShaMetadataWithoutTai        = 'n'
+	ShaMetadata                  = 'm'
 	VerzeichnisseArchiviert      = 'a'
-	CacheTagImplicit = 'I'
-	CacheTagExpanded = 'e'
-	CacheTags       = 'x'
+	CacheTagImplicit             = 'I'
+	CacheTagExpanded             = 'e'
+	CacheTags                    = 'x'
 	VerzeichnisseEtiketten2      = 'y'
 )
 

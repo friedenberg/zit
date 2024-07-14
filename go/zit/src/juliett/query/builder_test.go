@@ -151,7 +151,7 @@ func TestQuery(t1 *testing.T) {
 			strings.Join(tc.inputs, " "),
 			func(t1 *testing.T) {
 				t := test_logz.T{T: t1}
-				sut := (&Builder{}).WithDefaultGattungen(
+				sut := (&Builder{}).WithDefaultGenres(
 					tc.defaultGattung,
 				)
 

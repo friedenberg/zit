@@ -15,10 +15,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/konfig"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/stream_index"
-	"code.linenisgreat.com/zit/go/zit/src/lima/bestandsaufnahme"
+	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list"
 )
 
 func (u *Store) GetChrestStore() *external_store.Store {
@@ -61,7 +61,7 @@ func (s *Store) GetTai() ids.Tai {
 	return ids.NowTai()
 }
 
-func (s *Store) GetBestandsaufnahmeStore() bestandsaufnahme.Store {
+func (s *Store) GetBestandsaufnahmeStore() inventory_list.Store {
 	return s.bestandsaufnahmeStore
 }
 
@@ -77,8 +77,8 @@ func (s *Store) GetStandort() fs_home.Home {
 	return s.fs_home
 }
 
-func (s *Store) GetKonfig() *konfig.Compiled {
-	return s.konfig
+func (s *Store) GetKonfig() *config.Compiled {
+	return s.config
 }
 
 func (s *Store) GetVerzeichnisse() *stream_index.Index {

@@ -20,7 +20,7 @@ func MakeCwdFilesAll(
 	ofo object_inventory_format.Options,
 ) (fs *Store, err error) {
 	fs = &Store{
-		konfig:         k,
+		config:         k,
 		deletedPrinter: dp,
 		fs_home:        st,
 		fileEncoder:    MakeFileEncoder(st, k),

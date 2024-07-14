@@ -26,9 +26,9 @@ func (u *Umwelt) MakeQueryBuilderExcludingHidden(
 	}
 
 	return u.makeQueryBuilder().
-		WithDefaultGattungen(dg).
-		WithVirtualEtiketten(u.konfig.Filters).
-		WithKasten(u.GetDefaultExternalStore()).
+		WithDefaultGenres(dg).
+		WithVirtualTags(u.config.Filters).
+		WithRepo(u.GetDefaultExternalStore()).
 		WithFileExtensionGetter(u.GetKonfig().FileExtensions).
 		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr()).
 		WithHidden(u.GetMatcherArchiviert())
@@ -42,9 +42,9 @@ func (u *Umwelt) MakeQueryBuilder(
 	}
 
 	return u.makeQueryBuilder().
-		WithDefaultGattungen(dg).
-		WithVirtualEtiketten(u.konfig.Filters).
-		WithKasten(u.GetDefaultExternalStore()).
+		WithDefaultGenres(dg).
+		WithVirtualTags(u.config.Filters).
+		WithRepo(u.GetDefaultExternalStore()).
 		WithFileExtensionGetter(u.GetKonfig().FileExtensions).
 		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr())
 }
