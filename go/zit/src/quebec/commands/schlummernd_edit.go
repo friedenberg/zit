@@ -96,7 +96,7 @@ func (c EditSchlummernd) makeTempKonfigFile(
 ) (p string, err error) {
 	var k *sku.Transacted
 
-	if k, err = u.GetStore().ReadTransactedFromKennung(&ids.Config{}); err != nil {
+	if k, err = u.GetStore().ReadTransactedFromObjectId(&ids.Config{}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

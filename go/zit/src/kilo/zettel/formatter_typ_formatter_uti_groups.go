@@ -32,7 +32,7 @@ func (e formatterTypFormatterUTIGroups) Format(
 
 	var skuTyp *sku.Transacted
 
-	if skuTyp, err = e.ReadTransactedFromKennung(z.Metadatei.GetType()); err != nil {
+	if skuTyp, err = e.ReadTransactedFromObjectId(z.Metadatei.GetType()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

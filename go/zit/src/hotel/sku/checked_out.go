@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
-func InternalAndExternalEqualsSansTai(col CheckedOutLike) bool {
+func InternalAndExternalEqualsWithoutTai(col CheckedOutLike) bool {
 	i := col.GetSku()
 	e := col.GetSkuExternalLike().GetSku()
 
@@ -45,7 +45,7 @@ type CheckedOut struct {
 	Error    error
 }
 
-func (c *CheckedOut) GetKasten() ids.RepoId {
+func (c *CheckedOut) GetRepoId() ids.RepoId {
 	panic(todo.Implement())
 }
 

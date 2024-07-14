@@ -30,7 +30,7 @@ func (s *Store) UpdateTransactedWithExternal(
 	return
 }
 
-func (s *Store) ReadTransactedFromKennung(
+func (s *Store) ReadTransactedFromObjectId(
 	k1 interfaces.StringerGenreGetter,
 ) (sk1 *sku.Transacted, err error) {
 	sk1 = sku.GetTransactedPool().Get()

@@ -11,7 +11,7 @@ import (
 )
 
 func (s *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
-	kid := col.GetKasten().GetRepoIdString()
+	kid := col.GetRepoId().GetRepoIdString()
 	es, ok := s.externalStores[kid]
 
 	if !ok {
@@ -101,7 +101,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	options checkout_options.Options,
 	col sku.CheckedOutLike,
 ) (err error) {
-	switch col.GetKasten().GetRepoIdString() {
+	switch col.GetRepoId().GetRepoIdString() {
 	case "chrome":
 		err = todo.Implement()
 

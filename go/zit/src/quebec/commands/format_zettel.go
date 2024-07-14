@@ -160,7 +160,7 @@ func (c *FormatZettel) getAkteFormatter(
 
 	var typKonfig *sku.Transacted
 
-	if typKonfig, err = u.GetStore().ReadTransactedFromKennung(zt.GetType()); err != nil {
+	if typKonfig, err = u.GetStore().ReadTransactedFromObjectId(zt.GetType()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

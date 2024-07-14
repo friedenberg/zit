@@ -19,7 +19,7 @@ func (qg *flushQueryGroup) HasHidden() bool {
 	return false
 }
 
-func (qg *flushQueryGroup) Get(_ genres.Genre) (sku.QueryWithSigilAndKennung, bool) {
+func (qg *flushQueryGroup) Get(_ genres.Genre) (sku.QueryWithSigilAndObjectId, bool) {
 	return qg, true
 }
 

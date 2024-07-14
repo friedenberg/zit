@@ -13,22 +13,22 @@ import (
 )
 
 type Proto struct {
-	Metadatei object_metadata.Metadata
+	object_metadata.Metadata
 }
 
 func (pz *Proto) AddToFlagSet(f *flag.FlagSet) {
-	pz.Metadatei.AddToFlagSet(f)
+	pz.Metadata.AddToFlagSet(f)
 }
 
 func (pz Proto) Equals(z *object_metadata.Metadata) (ok bool) {
 	var okTyp, okMet bool
 
-	if !ids.IsEmpty(pz.Metadatei.Type) &&
-		pz.Metadatei.Type.Equals(z.GetType()) {
+	if !ids.IsEmpty(pz.Metadata.Type) &&
+		pz.Metadata.Type.Equals(z.GetType()) {
 		okTyp = true
 	}
 
-	if pz.Metadatei.Equals(z) {
+	if pz.Metadata.Equals(z) {
 		okMet = true
 	}
 
@@ -55,55 +55,55 @@ func (pz Proto) Apply(
 
 	if g.GetGenre() == genres.Zettel {
 		if ids.IsEmpty(z.GetType()) &&
-			!ids.IsEmpty(pz.Metadatei.Type) &&
-			!z.GetType().Equals(pz.Metadatei.Type) {
+			!ids.IsEmpty(pz.Metadata.Type) &&
+			!z.GetType().Equals(pz.Metadata.Type) {
 			ok = true
-			z.Type = pz.Metadatei.Type
+			z.Type = pz.Metadata.Type
 		}
 	}
 
-	if pz.Metadatei.Description.WasSet() &&
-		!z.Description.Equals(pz.Metadatei.Description) {
+	if pz.Metadata.Description.WasSet() &&
+		!z.Description.Equals(pz.Metadata.Description) {
 		ok = true
-		z.Description = pz.Metadatei.Description
+		z.Description = pz.Metadata.Description
 	}
 
-	if pz.Metadatei.GetTags().Len() > 0 {
+	if pz.Metadata.GetTags().Len() > 0 {
 		ok = true
 	}
 
-	errors.PanicIfError(pz.Metadatei.GetTags().EachPtr(z.AddTagPtr))
+	errors.PanicIfError(pz.Metadata.GetTags().EachPtr(z.AddTagPtr))
 
 	return
 }
 
-func (pz Proto) ApplyWithAkteFD(
+func (pz Proto) ApplyWithBlobFD(
 	ml object_metadata.MetadataLike,
-	akteFD *fd.FD,
+	blobFD *fd.FD,
 ) (err error) {
 	z := ml.GetMetadata()
 
 	if ids.IsEmpty(z.GetType()) &&
-		!ids.IsEmpty(pz.Metadatei.Type) &&
-		!z.GetType().Equals(pz.Metadatei.Type) {
-		z.Type = pz.Metadatei.Type
+		!ids.IsEmpty(pz.Metadata.Type) &&
+		!z.GetType().Equals(pz.Metadata.Type) {
+		z.Type = pz.Metadata.Type
 	} else {
 		// TODO-P4 use konfig
-		ext := akteFD.Ext()
+		ext := blobFD.Ext()
 
 		if ext != "" {
-			if err = z.Type.Set(akteFD.Ext()); err != nil {
+			if err = z.Type.Set(blobFD.Ext()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 		}
 	}
 
-	bez := akteFD.FileNameSansExt()
+	bez := blobFD.FileNameSansExt()
 
-	if pz.Metadatei.Description.WasSet() &&
-		!z.Description.Equals(pz.Metadatei.Description) {
-		bez = pz.Metadatei.Description.String()
+	if pz.Metadata.Description.WasSet() &&
+		!z.Description.Equals(pz.Metadata.Description) {
+		bez = pz.Metadata.Description.String()
 	}
 
 	if err = z.Description.Set(bez); err != nil {
@@ -111,7 +111,7 @@ func (pz Proto) ApplyWithAkteFD(
 		return
 	}
 
-	errors.PanicIfError(pz.Metadatei.GetTags().EachPtr(z.AddTagPtr))
+	errors.PanicIfError(pz.Metadata.GetTags().EachPtr(z.AddTagPtr))
 
 	return
 }

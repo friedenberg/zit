@@ -186,7 +186,7 @@ func (a *Transacted) GetKennungLike() ids.IdLike {
 	return &a.Kennung
 }
 
-func (a *Transacted) SetKennungLike(kl ids.IdLike) (err error) {
+func (a *Transacted) SetObjectIdLike(kl ids.IdLike) (err error) {
 	if err = a.Kennung.SetWithIdLike(kl); err != nil {
 		err = errors.Wrap(err)
 		return

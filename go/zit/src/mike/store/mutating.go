@@ -379,7 +379,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	}
 
 	if _, err = s.CheckoutOne(
-		co.GetKasten(),
+		co.GetRepoId(),
 		checkout_options.Options{Force: true, CheckoutMode: mode},
 		transactedPtr,
 	); err != nil {

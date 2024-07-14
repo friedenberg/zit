@@ -17,7 +17,7 @@ type (
 
 	ParserContext interface {
 		object_metadata.PersistentParserContext
-		SetKennungLike(ids.IdLike) error
+		SetObjectIdLike(ids.IdLike) error
 	}
 
 	Formatter interface {

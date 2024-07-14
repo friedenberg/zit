@@ -89,11 +89,8 @@ type (
 		Initialize(ExternalStoreInfo) error
 		ExternalStoreQueryUnsure
 		ExternalStoreQueryCheckedOut
-		// SaveAkte(col CheckedOutLike) (err error)
-		// ExternalStoreCheckoutOne
 		interfaces.Flusher
-		GetExternalKennung() (interfaces.SetLike[*ids.ObjectId], error)
-		GetKennungForString(string) (*ids.ObjectId, error)
+    ExternalStoreForQuery
 	}
 
 	ExternalStoreForQueryGetter interface {

@@ -89,7 +89,7 @@ type (
 		interfaces.Stringer
 		TransactedGetter
 		ExternalLike
-		GetKasten() ids.RepoId
+		GetRepoId() ids.RepoId
 		GetSkuCheckedOutLike() CheckedOutLike
 		GetState() checked_out_state.State
 		SetState(checked_out_state.State) error
@@ -108,7 +108,7 @@ type (
 	}
 
 	OneReader interface {
-		ReadTransactedFromKennung(
+		ReadTransactedFromObjectId(
 			k1 interfaces.StringerGenreGetter,
 		) (sk1 *Transacted, err error)
 	}

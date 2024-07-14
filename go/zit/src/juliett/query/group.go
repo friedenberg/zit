@@ -52,7 +52,7 @@ func (qg *Group) IsEmpty() bool {
 	return len(qg.UserQueries) == 0
 }
 
-func (qg *Group) Get(g genres.Genre) (sku.QueryWithSigilAndKennung, bool) {
+func (qg *Group) Get(g genres.Genre) (sku.QueryWithSigilAndObjectId, bool) {
 	q, ok := qg.OptimizedQueries[g]
 	return q, ok
 }

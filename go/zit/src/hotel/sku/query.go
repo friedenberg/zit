@@ -22,7 +22,7 @@ type (
 		GetSigil() ids.Sigil
 	}
 
-	QueryWithSigilAndKennung interface {
+	QueryWithSigilAndObjectId interface {
 		Query
 		SigilGetter
 		ContainsKennung(*ids.ObjectId) bool
@@ -30,7 +30,7 @@ type (
 
 	// Used by store_verzeichnisse.binary*
 	PrimitiveQueryGroup interface {
-		Get(genres.Genre) (QueryWithSigilAndKennung, bool)
+		Get(genres.Genre) (QueryWithSigilAndObjectId, bool)
 		SigilGetter
 		HasHidden() bool
 	}

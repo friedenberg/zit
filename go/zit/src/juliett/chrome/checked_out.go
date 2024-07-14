@@ -16,7 +16,7 @@ type CheckedOut struct {
 	Error    error
 }
 
-func (c *CheckedOut) GetKasten() ids.RepoId {
+func (c *CheckedOut) GetRepoId() ids.RepoId {
 	return *(ids.MustRepoId("chrome"))
 }
 

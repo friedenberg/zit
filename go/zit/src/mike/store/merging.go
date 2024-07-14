@@ -27,7 +27,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 
 	defer s.PutCheckedOutLike(col)
 
-	mutterEqualsExternal := sku.InternalAndExternalEqualsSansTai(col)
+	mutterEqualsExternal := sku.InternalAndExternalEqualsWithoutTai(col)
 
 	if mutterEqualsExternal {
 		op := checkout_options.Options{
@@ -75,7 +75,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 func (s *Store) Merge(
 	tm sku.Conflicted,
 ) (err error) {
-	switch tm.CheckedOutLike.GetKasten().GetRepoIdString() {
+	switch tm.CheckedOutLike.GetRepoId().GetRepoIdString() {
 	case "chrome":
 		err = todo.Implement()
 
@@ -94,7 +94,7 @@ func (s *Store) RunMergeTool(
 ) (err error) {
 	tool := s.GetKonfig().Cli().ToolOptions.Merge
 
-	switch tm.GetKasten().GetRepoIdString() {
+	switch tm.GetRepoId().GetRepoIdString() {
 	case "chrome":
 		err = todo.Implement()
 

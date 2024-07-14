@@ -344,7 +344,7 @@ func (f v5) ParsePersistentMetadatei(
 				return
 			}
 
-			if err = c.SetKennungLike(k); err != nil {
+			if err = c.SetObjectIdLike(k); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
