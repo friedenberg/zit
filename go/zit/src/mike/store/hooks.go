@@ -32,7 +32,7 @@ func (s *Store) tryNewHook(
 
 	var akte *type_blobs.V0
 
-	if akte, err = s.GetAkten().GetTypeV0().GetBlob(t.GetAkteSha()); err != nil {
+	if akte, err = s.GetAkten().GetTypeV0().GetBlob(t.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -87,7 +87,7 @@ func (s *Store) TryFormatHook(
 
 	var akte *type_blobs.V0
 
-	if akte, err = s.GetAkten().GetTypeV0().GetBlob(t.GetAkteSha()); err != nil {
+	if akte, err = s.GetAkten().GetTypeV0().GetBlob(t.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -144,7 +144,7 @@ func (s *Store) tryPreCommitHooks(
 
 	var akte *type_blobs.V0
 
-	if akte, err = s.GetAkten().GetTypeV0().GetBlob(t.GetAkteSha()); err != nil {
+	if akte, err = s.GetAkten().GetTypeV0().GetBlob(t.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

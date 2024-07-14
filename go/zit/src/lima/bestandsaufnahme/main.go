@@ -227,7 +227,7 @@ func (s *store) readOnePath(p string) (o *sku.Transacted, err error) {
 		return
 	}
 
-	if err = o.CalculateObjekteShas(); err != nil {
+	if err = o.CalculateObjectShas(); err != nil {
 		if errors.Is(err, object_inventory_format.ErrEmptyTai) {
 			var t ids.Tai
 			err1 := t.Set(o.Kennung.String())
@@ -239,7 +239,7 @@ func (s *store) readOnePath(p string) (o *sku.Transacted, err error) {
 
 			o.SetTai(t)
 
-			if err = o.CalculateObjekteShas(); err != nil {
+			if err = o.CalculateObjectShas(); err != nil {
 				err = errors.Wrapf(err, "%#v", o)
 				return
 			}
@@ -442,7 +442,7 @@ func (s *store) ReadLast() (max *sku.Transacted, err error) {
 
 	max = &maxSku
 
-	if max.GetObjekteSha().IsNull() {
+	if max.GetObjectSha().IsNull() {
 		panic(
 			fmt.Sprintf(
 				"did not find last Bestandsaufnahme: %#v",
@@ -526,7 +526,7 @@ func (s *store) ReadAllSkus(
 	if err = s.ReadAll(
 		func(t *sku.Transacted) (err error) {
 			if err = s.StreamInventoryList(
-				t.GetAkteSha(),
+				t.GetBlobSha(),
 				func(sk *sku.Transacted) (err error) {
 					return f(t, sk)
 				},

@@ -8,8 +8,8 @@ import (
 )
 
 func (s *Store) ReadTransactedFromKennung(
-	o sku.ObjekteOptions,
-	k1 interfaces.StringerGenreGetter,
+	o sku.ObjectOptions,
+	k1 interfaces.ObjectId,
 	t *sku.Transacted,
 ) (e *External, err error) {
 	k, ok := s.Get(k1)
@@ -27,7 +27,7 @@ func (s *Store) ReadTransactedFromKennung(
 }
 
 func (s *Store) ReadExternalFromKennungFDPair(
-	o sku.ObjekteOptions,
+	o sku.ObjectOptions,
 	em *KennungFDPair,
 	t *sku.Transacted,
 ) (e *External, err error) {
@@ -42,7 +42,7 @@ func (s *Store) ReadExternalFromKennungFDPair(
 }
 
 func (s *Store) ReadIntoExternalFromKennungFDPair(
-	o sku.ObjekteOptions,
+	o sku.ObjectOptions,
 	em *KennungFDPair,
 	t *sku.Transacted,
 	e *External,

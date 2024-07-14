@@ -148,7 +148,7 @@ func (s *Store) QueryAllMatchingAkten(
 	if err = s.GetVerzeichnisse().ReadQuery(
 		qg,
 		func(z *sku.Transacted) (err error) {
-			fd, ok := fds.Get(z.GetAkteSha().String())
+			fd, ok := fds.Get(z.GetBlobSha().String())
 
 			if !ok {
 				return

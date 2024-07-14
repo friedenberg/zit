@@ -22,7 +22,7 @@ func TomlBookmarkUrl(
 ) (ur *url.URL, err error) {
 	var r sha.ReadCloser
 
-	if r, err = s.BlobReader(sk.GetAkteSha()); err != nil {
+	if r, err = s.BlobReader(sk.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

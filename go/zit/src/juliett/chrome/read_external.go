@@ -7,7 +7,7 @@ import (
 )
 
 func (s *Store) ReadIntoExternalFromKennungFDPair(
-	o sku.ObjekteOptions,
+	o sku.ObjectOptions,
 	em *item,
 	t *sku.Transacted,
 	e *External,
@@ -36,7 +36,7 @@ func (s *Store) ReadIntoExternalFromKennungFDPair(
 }
 
 func (s *Store) ReadOneExternalInto(
-	o *sku.ObjekteOptions,
+	o *sku.ObjectOptions,
 	em *item,
 	t *sku.Transacted,
 	e *External,

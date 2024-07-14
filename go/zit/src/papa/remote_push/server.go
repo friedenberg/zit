@@ -87,13 +87,13 @@ func (op Server) GetNeededSkus(
 		if op.umwelt.Standort().HasObjekte(
 			op.umwelt.GetKonfig().GetStoreVersion(),
 			sk.GetGenre(),
-			sk.GetObjekteSha(),
+			sk.GetObjectSha(),
 		) {
-			ui.Log().Printf("already have objekte: %s", sk.GetObjekteSha())
+			ui.Log().Printf("already have objekte: %s", sk.GetObjectSha())
 			return
 		}
 
-		ui.Log().Printf("need objekte: %s", sk.GetObjekteSha())
+		ui.Log().Printf("need objekte: %s", sk.GetObjectSha())
 
 		// TODO-P1 check for akte sha
 		// TODO-P1 write akte

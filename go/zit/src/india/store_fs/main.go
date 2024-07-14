@@ -311,7 +311,7 @@ func (fs *Store) GetTyp(
 }
 
 func (fs *Store) Get(
-	k interfaces.StringerGenreGetter,
+	k interfaces.ObjectId,
 ) (t *KennungFDPair, ok bool) {
 	g := genres.Must(k.GetGenre())
 

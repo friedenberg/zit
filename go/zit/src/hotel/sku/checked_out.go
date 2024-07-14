@@ -21,7 +21,7 @@ func DetermineState(c CheckedOutLike, justCheckedOut bool) {
 	i := c.GetSku()
 	e := c.GetSkuExternalLike().GetSku()
 
-	if i.GetObjekteSha().IsNull() {
+	if i.GetObjectSha().IsNull() {
 		c.SetState(checked_out_state.StateUntracked)
 	} else if i.Metadatei.EqualsSansTai(&e.Metadatei) {
 		if justCheckedOut {
@@ -94,7 +94,7 @@ func (c *CheckedOut) GetError() error {
 }
 
 func (c *CheckedOut) DetermineState(justCheckedOut bool) {
-	if c.Internal.GetObjekteSha().IsNull() {
+	if c.Internal.GetObjectSha().IsNull() {
 		c.State = checked_out_state.StateUntracked
 	} else if c.Internal.Metadatei.EqualsSansTai(&c.External.Metadatei) {
 		if justCheckedOut {

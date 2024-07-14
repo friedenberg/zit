@@ -113,7 +113,7 @@ func (f *Organize) WriteStringFormat(
 		return
 	}
 
-	sh := o.GetAkteSha()
+	sh := o.GetBlobSha()
 
 	if f.options.PrintShas && (!sh.IsNull() || f.options.PrintEmptyShas) {
 		n1, err = sw.WriteString("@")
@@ -124,7 +124,7 @@ func (f *Organize) WriteStringFormat(
 			return
 		}
 
-		n2, err = f.shaStringFormatWriter.WriteStringFormat(sw, o.GetAkteSha())
+		n2, err = f.shaStringFormatWriter.WriteStringFormat(sw, o.GetBlobSha())
 		n += n2
 
 		if err != nil {

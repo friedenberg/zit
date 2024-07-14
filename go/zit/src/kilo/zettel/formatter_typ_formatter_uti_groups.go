@@ -39,7 +39,7 @@ func (e formatterTypFormatterUTIGroups) Format(
 
 	var ta *type_blobs.V0
 
-	if ta, err = e.typBlobGetterPutter.GetBlob(skuTyp.GetAkteSha()); err != nil {
+	if ta, err = e.typBlobGetterPutter.GetBlob(skuTyp.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -91,8 +91,8 @@ func (c Status) RunWithQuery(
 				return
 			}
 
-			os := sha.Make(z.GetObjekteSha())
-			as := sha.Make(z.GetAkteSha())
+			os := sha.Make(z.GetObjectSha())
+			as := sha.Make(z.GetBlobSha())
 
 			fr := store_fs.GetCheckedOutPool().Get()
 			defer store_fs.GetCheckedOutPool().Put(fr)

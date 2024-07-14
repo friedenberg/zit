@@ -41,8 +41,8 @@ func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
 }
 
 func (s MutableMatchSet) Match(z *sku.Transacted) (err error) {
-	kStored := z.GetObjekteSha().String()
-	kAkte := z.GetAkteSha().String()
+	kStored := z.GetObjectSha().String()
+	kAkte := z.GetBlobSha().String()
 
 	s.lock.RLock()
 	stored, okStored := s.Stored.Get(kStored)

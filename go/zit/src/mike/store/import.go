@@ -19,7 +19,7 @@ func (s *Store) Import(sk *sku.Transacted) (co *store_fs.CheckedOut, err error) 
 		panic(err)
 	}
 
-	if err = sk.CalculateObjekteShas(); err != nil {
+	if err = sk.CalculateObjectShas(); err != nil {
 		co.SetError(err)
 		err = nil
 		return

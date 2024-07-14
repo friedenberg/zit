@@ -122,7 +122,7 @@ func (a *External) String() string {
 		". %s %s %s %s",
 		a.GetGattung(),
 		a.GetKennung(),
-		a.GetObjekteSha(),
+		a.GetObjectSha(),
 		a.GetAkteSha(),
 	)
 }

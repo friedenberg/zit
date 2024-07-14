@@ -10,15 +10,15 @@ import (
 )
 
 var (
-	transactedKeyerKennung interfaces.StringKeyer[*Transacted]
+	transactedKeyerObjectId interfaces.StringKeyer[*Transacted]
 	TransactedSetEmpty     TransactedSet
 	TransactedLessor       transactedLessor
 	TransactedEqualer      transactedEqualer
 )
 
 func init() {
-	transactedKeyerKennung = &ids.ObjectIdKeyer[Transacted, *Transacted]{}
-	gob.Register(transactedKeyerKennung)
+	transactedKeyerObjectId = &ids.ObjectIdKeyer[Transacted, *Transacted]{}
+	gob.Register(transactedKeyerObjectId)
 
 	TransactedSetEmpty = MakeTransactedSet()
 	gob.Register(TransactedSetEmpty)
@@ -49,14 +49,14 @@ func MakeTransactedHeap() *TransactedHeap {
 }
 
 func MakeTransactedSet() TransactedSet {
-	return collections_value.MakeValueSet(transactedKeyerKennung)
+	return collections_value.MakeValueSet(transactedKeyerObjectId)
 }
 
 func MakeTransactedMutableSet() TransactedMutableSet {
-	return collections_value.MakeMutableValueSet(transactedKeyerKennung)
+	return collections_value.MakeMutableValueSet(transactedKeyerObjectId)
 }
 
-func MakeTransactedMutableSetKennung() TransactedMutableSet {
+func MakeTransactedMutableSetObjectId() TransactedMutableSet {
 	return collections_value.MakeMutableValueSet(
 		ids.ObjectIdKeyer[Transacted, *Transacted]{},
 	)

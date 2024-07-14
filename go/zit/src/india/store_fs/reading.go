@@ -61,7 +61,7 @@ import (
 // }
 
 func (s *Store) ReadOneExternal(
-	o *sku.ObjekteOptions,
+	o *sku.ObjectOptions,
 	em *KennungFDPair,
 	t *sku.Transacted,
 ) (e *External, err error) {
@@ -85,7 +85,7 @@ func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 	var e2 *External
 
 	if e2, err = s.ReadExternalFromKennungFDPair(
-		sku.ObjekteOptions{
+		sku.ObjectOptions{
 			Mode: objekte_mode.ModeUpdateTai,
 		},
 		e,
@@ -104,7 +104,7 @@ func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 }
 
 func (s *Store) ReadOneExternalInto(
-	o *sku.ObjekteOptions,
+	o *sku.ObjectOptions,
 	em *KennungFDPair,
 	t *sku.Transacted,
 	e *External,

@@ -1,11 +1,11 @@
 package interfaces
 
-type StringerGenreGetter interface {
+type ObjectId interface {
 	GenreGetter
 	Stringer
 }
 
-type StringerGenreRepoIdGetter interface {
+type ObjectIdWithRepoId interface {
 	GenreGetter
 	RepoIdGetter
 	Stringer
@@ -22,7 +22,7 @@ type RepoIdGetter interface {
 }
 
 type Genre interface {
-	StringerGenreGetter
+	ObjectId
 	EqualsGenre(GenreGetter) bool
 	GetGenreBitInt() byte
 	GetGenreString() string

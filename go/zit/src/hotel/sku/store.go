@@ -16,11 +16,11 @@ import (
 )
 
 type (
-	FuncRealize     = func(*Transacted, *Transacted, ObjekteOptions) error
-	FuncCommit      = func(*Transacted, ObjekteOptions) error
+	FuncRealize     = func(*Transacted, *Transacted, ObjectOptions) error
+	FuncCommit      = func(*Transacted, ObjectOptions) error
 	FuncReadSha     = func(*sha.Sha) (*Transacted, error)
 	FuncReadOneInto = func(
-		k1 interfaces.StringerGenreGetter,
+		k1 interfaces.ObjectId,
 		out *Transacted,
 	) (err error)
 

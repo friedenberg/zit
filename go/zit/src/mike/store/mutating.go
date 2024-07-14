@@ -42,7 +42,7 @@ func (s *Store) tryRealize(
 		}
 	}
 
-	if err = kinder.CalculateObjekteShas(); err != nil {
+	if err = kinder.CalculateObjectShas(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -351,7 +351,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		}
 	}
 
-	if err = transactedPtr.SetBlobSha(e.GetAkteSha()); err != nil {
+	if err = transactedPtr.SetBlobSha(e.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

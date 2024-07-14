@@ -95,7 +95,7 @@ func (s *Store) ReadOneEnnui(sh *sha.Sha) (*sku.Transacted, error) {
 }
 
 func (s *Store) ReadOneKennung(
-	k interfaces.StringerGenreGetter,
+	k interfaces.ObjectId,
 ) (sk *sku.Transacted, err error) {
 	return s.GetVerzeichnisse().ReadOneObjectId(k)
 }

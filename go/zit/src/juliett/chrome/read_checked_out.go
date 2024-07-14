@@ -7,8 +7,8 @@ import (
 )
 
 func (s *Store) ReadCheckedOutFromItem(
-	o sku.ObjekteOptions,
-	k interfaces.StringerGenreGetter,
+	o sku.ObjectOptions,
+	k interfaces.ObjectId,
 	em *item,
 ) (co *CheckedOut, err error) {
 	co = GetCheckedOutPool().Get()

@@ -79,7 +79,7 @@ func (s *ennuiStore) ReadOneObjectSha(sh *sha.Sha) (sk *sku.Transacted, err erro
 		return
 	}
 
-	if err = sk.CalculateObjekteShas(); err != nil {
+	if err = sk.CalculateObjectShas(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -88,7 +88,7 @@ func (s *ennuiStore) ReadOneObjectSha(sh *sha.Sha) (sk *sku.Transacted, err erro
 }
 
 func (s *ennuiStore) ReadOneObjectIdSha(
-	k interfaces.StringerGenreGetter,
+	k interfaces.ObjectId,
 ) (sh *sha.Sha, err error) {
 	left := sha.FromString(k.String())
 	defer sha.GetPool().Put(left)
@@ -102,7 +102,7 @@ func (s *ennuiStore) ReadOneObjectIdSha(
 }
 
 func (s *ennuiStore) ReadOneObjectId(
-	k interfaces.StringerGenreGetter,
+	k interfaces.ObjectId,
 ) (sk *sku.Transacted, err error) {
 	sh, err := s.ReadOneObjectIdSha(k)
 	defer sha.GetPool().Put(sh)
@@ -182,7 +182,7 @@ func (s *ennuiStore) MakeFuncSaveOneVerweise(o *sku.Transacted) func() error {
 	}
 }
 
-func (s *ennuiStore) WriteOneObjekteMetadatei(o *sku.Transacted) (err error) {
+func (s *ennuiStore) WriteOneObject(o *sku.Transacted) (err error) {
 	if o.Metadatei.Sha().IsNull() {
 		err = errors.Errorf("null sha")
 		return

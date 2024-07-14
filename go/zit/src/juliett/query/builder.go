@@ -561,7 +561,7 @@ func (b *Builder) makeEtikettOrEtikettLua(
 	if sk.GetType().String() == "lua" {
 		var ar sha.ReadCloser
 
-		if ar, err = b.fs_home.BlobReader(sk.GetAkteSha()); err != nil {
+		if ar, err = b.fs_home.BlobReader(sk.GetBlobSha()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -573,7 +573,7 @@ func (b *Builder) makeEtikettOrEtikettLua(
 		var akte *tag_blobs.V1
 
 		if akte, err = b.blob_store.GetTagV1().GetBlob(
-			sk.GetAkteSha(),
+			sk.GetBlobSha(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

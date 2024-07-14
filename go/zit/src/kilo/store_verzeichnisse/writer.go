@@ -136,7 +136,7 @@ func (pw *writer) flushBoth() (err error) {
 func (pw *writer) updateSigilWithSchwanzen(st skuWithRangeAndSigil) (err error) {
 	st.Add(ids.SigilLatest)
 
-	if err = pw.WriteOneObjekteMetadatei(st.Transacted); err != nil {
+	if err = pw.WriteOneObject(st.Transacted); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -20,7 +20,7 @@ func StringMetadatei(o *sku.Transacted) (str string) {
 	sb.WriteString(o.GetObjectId().String())
 
 	sb.WriteString(" ")
-	sb.WriteString(o.GetAkteSha().String())
+	sb.WriteString(o.GetBlobSha().String())
 
 	m := o.GetMetadata()
 

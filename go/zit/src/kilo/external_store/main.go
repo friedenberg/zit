@@ -4,7 +4,7 @@ import "code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 
 type (
 	Transacted        = sku.Transacted
-	ObjekteOptions    = sku.ObjekteOptions
+	ObjekteOptions    = sku.ObjectOptions
 	CheckedOutLike    = sku.CheckedOutLike
 	CheckedOutLikeSet = sku.CheckedOutLikeSet
 )

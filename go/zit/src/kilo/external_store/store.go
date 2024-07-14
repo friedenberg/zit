@@ -22,7 +22,7 @@ type (
 	FuncCommit      = func(*Transacted, ObjekteOptions) error
 	FuncReadSha     = func(*sha.Sha) (*Transacted, error)
 	FuncReadOneInto = func(
-		k1 interfaces.StringerGenreGetter,
+		k1 interfaces.ObjectId,
 		out *Transacted,
 	) (err error)
 

@@ -72,7 +72,7 @@ func (c Exec) runBash(
 		var ar io.ReadCloser
 
 		if ar, err = u.Standort().BlobReader(
-			tz.GetAkteSha(),
+			tz.GetBlobSha(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

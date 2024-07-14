@@ -12,7 +12,7 @@ import (
 func (s *Store) MakeApplyCheckedOut(
 	qg sku.Queryable,
 	f interfaces.FuncIter[sku.CheckedOutLike],
-	o sku.ObjekteOptions,
+	o sku.ObjectOptions,
 ) interfaces.FuncIter[*KennungFDPair] {
 	return func(em *KennungFDPair) (err error) {
 		if err = s.ApplyCheckedOut(o, qg, em, f); err != nil {
@@ -25,7 +25,7 @@ func (s *Store) MakeApplyCheckedOut(
 }
 
 func (s *Store) ApplyCheckedOut(
-	o sku.ObjekteOptions,
+	o sku.ObjectOptions,
 	qg sku.Queryable,
 	em *KennungFDPair,
 	f interfaces.FuncIter[sku.CheckedOutLike],
@@ -58,7 +58,7 @@ func (s *Store) QueryCheckedOut(
 	wg := iter.MakeErrorWaitGroupParallel()
 
 	{
-		o := sku.ObjekteOptions{
+		o := sku.ObjectOptions{
 			Mode: objekte_mode.ModeRealizeSansProto,
 		}
 
@@ -86,7 +86,7 @@ func (s *Store) QueryUnsure(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	o := sku.ObjekteOptions{
+	o := sku.ObjectOptions{
 		Mode: objekte_mode.ModeRealizeWithProto,
 	}
 

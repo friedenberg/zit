@@ -8,11 +8,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type ObjekteOptions = sku.ObjekteOptions
+type ObjekteOptions = sku.ObjectOptions
 
 func (s *Store) ReadOneKennungExternal(
 	o ObjekteOptions,
-	k1 interfaces.StringerGenreRepoIdGetter,
+	k1 interfaces.ObjectIdWithRepoId,
 	sk *sku.Transacted,
 ) (el sku.ExternalLike, err error) {
 	switch k1.GetRepoId().GetRepoIdString() {

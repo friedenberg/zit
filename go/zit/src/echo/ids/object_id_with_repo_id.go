@@ -308,7 +308,7 @@ func (k3 *ObjectIdWithRepoId) GetGenre() interfaces.Genre {
 }
 
 func MakeKennung3(
-	v interfaces.StringerGenreGetter,
+	v interfaces.ObjectId,
 	ka RepoId,
 ) (k *ObjectIdWithRepoId, err error) {
 	k = &ObjectIdWithRepoId{

@@ -16,7 +16,7 @@ func init() {
 	gob.Register(Transacted{})
 }
 
-type ObjekteOptions struct {
+type ObjectOptions struct {
 	ids.RepoId
 	objekte_mode.Mode
 	ids.Clock
@@ -31,13 +31,13 @@ type (
 	}
 
 	ObjectProbeIndex interface {
-		WriteOneObjekteMetadatei(o *Transacted) (err error)
+		WriteOneObject(o *Transacted) (err error)
 		ReadOneObjectSha(*sha.Sha) (*Transacted, error)
 		ReadOneObjectId(
-			interfaces.StringerGenreGetter,
+			interfaces.ObjectId,
 		) (*Transacted, error)
 		ReadOneObjectIdSha(
-			interfaces.StringerGenreGetter,
+			interfaces.ObjectId,
 		) (*sha.Sha, error)
 	}
 
@@ -53,15 +53,15 @@ type (
 		GetTai() ids.Tai
 		GetType() ids.Type
 		GetObjectId() *ids.ObjectId
-		GetObjekteSha() interfaces.Sha
-		GetAkteSha() interfaces.Sha
+		GetObjectSha() interfaces.Sha
+		GetBlobSha() interfaces.Sha
 		GetKey() string
 
 		object_metadata.Getter
 
 		SetBlobSha(interfaces.Sha) error
 		SetObjectSha(interfaces.Sha) error
-		CalculateObjekteShas() (err error)
+		CalculateObjectShas() (err error)
 
 		SetTai(ids.Tai)
 		object_inventory_format.ParserContext
@@ -109,7 +109,7 @@ type (
 
 	OneReader interface {
 		ReadTransactedFromObjectId(
-			k1 interfaces.StringerGenreGetter,
+			k1 interfaces.ObjectId,
 		) (sk1 *Transacted, err error)
 	}
 )
@@ -119,7 +119,7 @@ func EqualsSkuLike(a, b SkuLike) (ok bool) {
 		return
 	}
 
-	if !a.GetObjekteSha().EqualsSha(b.GetObjekteSha()) {
+	if !a.GetObjectSha().EqualsSha(b.GetObjectSha()) {
 		return
 	}
 

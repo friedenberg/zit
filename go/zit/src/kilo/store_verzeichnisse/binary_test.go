@@ -31,7 +31,7 @@ func TestBinaryOne(t1 *testing.T) {
 		t.AssertNoError(expected.Metadatei.Mutter().Set(
 			"3c5d8b1db2149d279f4d4a6cb9457804aac6944834b62aa283beef99bccd10f0",
 		))
-		t.AssertNoError(expected.CalculateObjekteShas())
+		t.AssertNoError(expected.CalculateObjectShas())
 
 		t.Logf("%s", expected)
 

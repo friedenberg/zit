@@ -168,7 +168,7 @@ func (c *FormatZettel) getAkteFormatter(
 	var typAkte *type_blobs.V0
 
 	if typAkte, err = u.GetStore().GetAkten().GetTypeV0().GetBlob(
-		typKonfig.GetAkteSha(),
+		typKonfig.GetBlobSha(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

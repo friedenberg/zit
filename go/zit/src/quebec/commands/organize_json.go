@@ -115,7 +115,7 @@ func (c *OrganizeJSON) RunWithQuery(
 		return
 	}
 
-	getResults := sku.MakeTransactedMutableSetKennung()
+	getResults := sku.MakeTransactedMutableSetObjectId()
 
 	for _, j := range transacted {
 		sk := sku.GetTransactedPool().Get()

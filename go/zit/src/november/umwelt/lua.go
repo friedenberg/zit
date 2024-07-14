@@ -80,7 +80,7 @@ func (s *Umwelt) LuaRequire(ls *lua.LState) int {
 	var ar sha.ReadCloser
 
 	if ar, err = s.GetStore().GetStandort().BlobReader(
-		sk.GetAkteSha(),
+		sk.GetBlobSha(),
 	); err != nil {
 		panic(err)
 	}

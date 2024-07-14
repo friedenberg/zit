@@ -172,7 +172,7 @@ func (c Import) importAkteIfNecessary(
 	ag *age.Age,
 	coErrPrinter interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	akteSha := co.External.GetAkteSha()
+	akteSha := co.External.GetBlobSha()
 
 	if u.Standort().HasAkte(u.GetKonfig().GetStoreVersion(), akteSha) {
 		return
@@ -225,7 +225,7 @@ func (c Import) importAkteIfNecessary(
 		err = coErrPrinter(co)
 		errors.TodoRecoverable(
 			"sku akte mismatch: sku had %s while akten had %s",
-			co.Internal.GetAkteSha(),
+			co.Internal.GetBlobSha(),
 			shaRc,
 		)
 	}

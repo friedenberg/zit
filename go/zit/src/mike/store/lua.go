@@ -21,7 +21,7 @@ func (s *Store) MakeLuaVMPoolWithSku(
 
 	var ar sha.ReadCloser
 
-	if ar, err = s.GetStandort().BlobReader(sk.GetAkteSha()); err != nil {
+	if ar, err = s.GetStandort().BlobReader(sk.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

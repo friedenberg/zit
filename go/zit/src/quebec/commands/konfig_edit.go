@@ -114,7 +114,7 @@ func (c EditKonfig) makeTempKonfigFile(
 
 	format := u.GetStore().GetKonfigAkteFormat()
 
-	if _, err = format.FormatSavedBlob(f, k.GetAkteSha()); err != nil {
+	if _, err = format.FormatSavedBlob(f, k.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -47,11 +47,11 @@ func (k KeyerStored) GetKey(z *store_fs.External) string {
 		return ""
 	}
 
-	if z.GetObjekteSha().IsNull() {
+	if z.GetObjectSha().IsNull() {
 		return ""
 	}
 
-	return z.GetObjekteSha().String()
+	return z.GetObjectSha().String()
 }
 
 func MakeMutableSetUniqueStored(zs ...*store_fs.External) MutableSet {
@@ -67,7 +67,7 @@ func (k KeyerAkte) GetKey(z *store_fs.External) string {
 		return ""
 	}
 
-	sh := z.GetAkteSha()
+	sh := z.GetBlobSha()
 
 	if sh.IsNull() {
 		return ""

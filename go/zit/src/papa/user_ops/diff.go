@@ -99,7 +99,7 @@ func (op Diff) Run(col sku.CheckedOutLike) (err error) {
 		externalFD = el.GetObjekteFD()
 
 	case internalInline && externalInline:
-		wg.Do(op.makeDoAkte(wLeft, op.Standort(), il.GetAkteSha()))
+		wg.Do(op.makeDoAkte(wLeft, op.Standort(), il.GetBlobSha()))
 		wg.Do(op.makeDoFD(wRight, el.GetAkteFD()))
 		externalFD = el.GetAkteFD()
 

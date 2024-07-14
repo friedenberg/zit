@@ -87,7 +87,7 @@ func (s *ennuiStore) ReadOneEnnui(sh *sha.Sha) (sk *sku.Transacted, err error) {
 		return
 	}
 
-	if err = sk.CalculateObjekteShas(); err != nil {
+	if err = sk.CalculateObjectShas(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

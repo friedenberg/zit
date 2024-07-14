@@ -12,7 +12,7 @@ import (
 // TODO add support for cwd and sigil
 // TODO simplify
 func (s *Store) ReadOneInto(
-	k1 interfaces.StringerGenreGetter,
+	k1 interfaces.ObjectId,
 	out *sku.Transacted,
 ) (err error) {
 	var sk *sku.Transacted

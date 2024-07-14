@@ -18,14 +18,14 @@ import (
 func (s *Store) Merge(tm sku.Conflicted) (err error) {
 	cofs := tm.CheckedOutLike.(*CheckedOut)
 
-	if err = tm.MergeEtiketten(); err != nil {
+	if err = tm.MergeTags(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	var leftCO, middleCO, rightCO *CheckedOut
 
-	inlineAkte := tm.IsAllInlineTyp(s.konfig)
+	inlineAkte := tm.IsAllInlineType(s.konfig)
 
 	mode := checkout_mode.ModeObjekteAndAkte
 
@@ -151,7 +151,7 @@ func (s *Store) RunMergeTool(
 	tool []string,
 	tm sku.Conflicted,
 ) (co *CheckedOut, err error) {
-	inlineAkte := tm.IsAllInlineTyp(s.konfig)
+	inlineAkte := tm.IsAllInlineType(s.konfig)
 
 	op := checkout_options.Options{
 		CheckoutMode:    checkout_mode.ModeObjekteAndAkte,

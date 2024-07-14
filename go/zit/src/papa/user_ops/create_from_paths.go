@@ -177,7 +177,7 @@ func (c *CreateFromPaths) zettelsFromPath(
 		return
 	}
 
-	if err = ze.CalculateObjekteShas(); err != nil {
+	if err = ze.CalculateObjectShas(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

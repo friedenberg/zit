@@ -177,7 +177,7 @@ func (k *compiled) setTransacted(
 
 	var a *mutable_config.Blob
 
-	if a, err = kag.GetBlob(k.Sku.GetAkteSha()); err != nil {
+	if a, err = kag.GetBlob(k.Sku.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

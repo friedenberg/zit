@@ -31,7 +31,7 @@ func (s *Store) UpdateTransactedWithExternal(
 }
 
 func (s *Store) ReadTransactedFromObjectId(
-	k1 interfaces.StringerGenreGetter,
+	k1 interfaces.ObjectId,
 ) (sk1 *sku.Transacted, err error) {
 	sk1 = sku.GetTransactedPool().Get()
 
@@ -49,7 +49,7 @@ func (s *Store) ReadTransactedFromObjectId(
 }
 
 func (s *Store) ReadTransactedFromKennungKastenSigil(
-	k1 interfaces.StringerGenreGetter,
+	k1 interfaces.ObjectId,
 	ka ids.RepoId,
 	si ids.Sigil,
 ) (sk1 *sku.Transacted, err error) {

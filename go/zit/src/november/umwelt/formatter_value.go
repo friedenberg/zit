@@ -235,7 +235,7 @@ func (u *Umwelt) MakeFormatFunc(
 				out,
 				"%s@%s\n",
 				&tl.Kennung,
-				tl.GetObjekteSha(),
+				tl.GetObjectSha(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -248,7 +248,7 @@ func (u *Umwelt) MakeFormatFunc(
 		f = func(tl *sku.Transacted) (err error) {
 			errors.TodoP3("convert into an option")
 
-			sh := tl.GetAkteSha()
+			sh := tl.GetBlobSha()
 
 			if sh.IsNull() {
 				return
@@ -457,7 +457,7 @@ func (u *Umwelt) MakeFormatFunc(
 			var r sha.ReadCloser
 
 			if r, err = u.GetStore().GetStandort().BlobReader(
-				o.GetAkteSha(),
+				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -478,7 +478,7 @@ func (u *Umwelt) MakeFormatFunc(
 			var r sha.ReadCloser
 
 			if r, err = u.GetStore().GetStandort().BlobReader(
-				o.GetAkteSha(),
+				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -501,7 +501,7 @@ func (u *Umwelt) MakeFormatFunc(
 			var r sha.ReadCloser
 
 			if r, err = u.GetStore().GetStandort().BlobReader(
-				o.GetAkteSha(),
+				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -613,7 +613,7 @@ func (u *Umwelt) MakeFormatFunc(
 
 	case "akte-sha":
 		f = func(o *sku.Transacted) (err error) {
-			if _, err = fmt.Fprintln(out, o.GetAkteSha()); err != nil {
+			if _, err = fmt.Fprintln(out, o.GetBlobSha()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -663,7 +663,7 @@ func (u *Umwelt) MakeFormatFunc(
 			var r sha.ReadCloser
 
 			if r, err = u.GetStore().GetStandort().BlobReader(
-				o.GetAkteSha(),
+				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -698,7 +698,7 @@ func (u *Umwelt) MakeFormatFunc(
 			var r sha.ReadCloser
 
 			if r, err = u.GetStore().GetStandort().BlobReader(
-				o.GetAkteSha(),
+				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -761,7 +761,7 @@ func (u *Umwelt) makeTypFormatter(
 
 			var ta *type_blobs.V0
 
-			if ta, err = agp.GetBlob(tt.GetAkteSha()); err != nil {
+			if ta, err = agp.GetBlob(tt.GetBlobSha()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -806,7 +806,7 @@ func (u *Umwelt) makeTypFormatter(
 		f = func(o *sku.Transacted) (err error) {
 			var akte *type_blobs.V0
 
-			if akte, err = agp.GetBlob(o.GetAkteSha()); err != nil {
+			if akte, err = agp.GetBlob(o.GetBlobSha()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -825,7 +825,7 @@ func (u *Umwelt) makeTypFormatter(
 		f = func(o *sku.Transacted) (err error) {
 			var akte *type_blobs.V0
 
-			if akte, err = agp.GetBlob(o.GetAkteSha()); err != nil {
+			if akte, err = agp.GetBlob(o.GetBlobSha()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -868,7 +868,7 @@ func (u *Umwelt) makeTypFormatter(
 				}
 			}
 
-			if t == nil || t.Kennung.IsEmpty() || t.GetAkteSha().IsNull() {
+			if t == nil || t.Kennung.IsEmpty() || t.GetBlobSha().IsNull() {
 				ty := ""
 
 				switch o.GetGenre() {
@@ -890,7 +890,7 @@ func (u *Umwelt) makeTypFormatter(
 			var ta *type_blobs.V0
 
 			if ta, err = u.GetStore().GetAkten().GetTypeV0().GetBlob(
-				t.GetAkteSha(),
+				t.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return

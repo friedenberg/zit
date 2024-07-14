@@ -10,7 +10,7 @@ type Conflicted struct {
 	Left, Middle, Right *Transacted
 }
 
-func (tm Conflicted) IsAllInlineTyp(itc ids.InlineTypeChecker) bool {
+func (tm Conflicted) IsAllInlineType(itc ids.InlineTypeChecker) bool {
 	if !itc.IsInlineType(tm.Left.GetType()) {
 		return false
 	}
@@ -26,7 +26,7 @@ func (tm Conflicted) IsAllInlineTyp(itc ids.InlineTypeChecker) bool {
 	return true
 }
 
-func (tm *Conflicted) MergeEtiketten() (err error) {
+func (tm *Conflicted) MergeTags() (err error) {
 	left := tm.Left.GetEtiketten().CloneMutableSetPtrLike()
 	middle := tm.Middle.GetEtiketten().CloneMutableSetPtrLike()
 	right := tm.Right.GetEtiketten().CloneMutableSetPtrLike()

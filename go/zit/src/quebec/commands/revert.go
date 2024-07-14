@@ -126,7 +126,7 @@ func (c Revert) runRevertFromLast(
 	}
 
 	if err = s.GetBestandsaufnahmeStore().StreamInventoryList(
-		b.GetAkteSha(),
+		b.GetBlobSha(),
 		func(sk *sku.Transacted) (err error) {
 			return f(revertTuple{Transacted: sk, Sha: sk.Metadatei.Mutter()})
 		},

@@ -80,7 +80,7 @@ func (kc *Compiled) recompileTypes(
 		func(ct *sku.Transacted) (err error) {
 			var ta *type_blobs.V0
 
-			if ta, err = tagp.GetBlob(ct.GetAkteSha()); err != nil {
+			if ta, err = tagp.GetBlob(ct.GetBlobSha()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

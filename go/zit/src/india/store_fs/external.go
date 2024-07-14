@@ -56,12 +56,12 @@ func (a *External) String() string {
 		". %s %s %s %s",
 		a.GetGattung(),
 		a.GetObjectId(),
-		a.GetObjekteSha(),
-		a.GetAkteSha(),
+		a.GetObjectSha(),
+		a.GetBlobSha(),
 	)
 }
 
-func (a *External) GetAkteSha() interfaces.Sha {
+func (a *External) GetBlobSha() interfaces.Sha {
 	return &a.Metadatei.Blob
 }
 

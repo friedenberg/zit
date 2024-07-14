@@ -18,8 +18,6 @@ import (
 type Transacted struct {
 	Kennung          ids.ObjectId
 	Metadatei        object_metadata.Metadata
-	TransactionIndex values.Int
-	Kopf             ids.Tai
 }
 
 func (t *Transacted) GetSkuLike() SkuLike {
@@ -38,15 +36,13 @@ func (t *Transacted) SetFromSkuLike(sk SkuLike) (err error) {
 		return
 	}
 
-	if err = t.SetObjectSha(sk.GetObjekteSha()); err != nil {
+	if err = t.SetObjectSha(sk.GetObjectSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	object_metadata.Resetter.ResetWith(&t.Metadatei, sk.GetMetadata())
 	t.GetMetadata().Tai = sk.GetTai()
-
-	t.Kopf = sk.GetTai()
 
 	return
 }
@@ -69,8 +65,8 @@ func (a *Transacted) String() string {
 	return fmt.Sprintf(
 		"%s %s %s",
 		&a.Kennung,
-		a.GetObjekteSha(),
-		a.GetAkteSha(),
+		a.GetObjectSha(),
+		a.GetBlobSha(),
 	)
 }
 
@@ -95,7 +91,7 @@ func (a *Transacted) StringKennungTaiAkte() string {
 		"%s@%s@%s",
 		&a.Kennung,
 		a.GetTai().StringDefaultFormat(),
-		a.GetAkteSha(),
+		a.GetBlobSha(),
 	)
 }
 
@@ -168,10 +164,6 @@ func (a *Transacted) GetTai() ids.Tai {
 	return a.Metadatei.GetTai()
 }
 
-func (a *Transacted) GetKopf() ids.Tai {
-	return a.Kopf
-}
-
 func (a *Transacted) SetTai(t ids.Tai) {
 	// log.Debug().Caller(6, "before: %s", a.StringKennungTai())
 	a.GetMetadata().Tai = t
@@ -204,10 +196,6 @@ func (a *Transacted) EqualsAny(b any) (ok bool) {
 }
 
 func (a *Transacted) Equals(b *Transacted) (ok bool) {
-	if !a.TransactionIndex.Equals(b.TransactionIndex) {
-		return
-	}
-
 	if a.GetObjectId().String() != b.GetObjectId().String() {
 		return
 	}
@@ -236,7 +224,7 @@ func (s *Transacted) CalculateObjekteShaDebug() (err error) {
 	return s.calculateObjekteSha(true)
 }
 
-func (s *Transacted) CalculateObjekteShas() (err error) {
+func (s *Transacted) CalculateObjectShas() (err error) {
 	return s.calculateObjekteSha(false)
 }
 
@@ -308,20 +296,16 @@ func (s *Transacted) SetObjectSha(v interfaces.Sha) (err error) {
 	return s.GetMetadata().Sha().SetShaLike(v)
 }
 
-func (s *Transacted) GetObjekteSha() interfaces.Sha {
+func (s *Transacted) GetObjectSha() interfaces.Sha {
 	return s.GetMetadata().Sha()
 }
 
-func (s *Transacted) GetAkteSha() interfaces.Sha {
+func (s *Transacted) GetBlobSha() interfaces.Sha {
 	return &s.Metadatei.Blob
 }
 
 func (s *Transacted) SetBlobSha(sh interfaces.Sha) error {
 	return s.Metadatei.Blob.SetShaLike(sh)
-}
-
-func (s *Transacted) GetTransactionIndex() values.Int {
-	return s.TransactionIndex
 }
 
 func (o *Transacted) GetKey() string {

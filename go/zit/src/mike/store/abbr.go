@@ -182,7 +182,7 @@ func (i *indexAbbr) AddMatchable(o *sku.Transacted) (err error) {
 
 	i.hasChanges = true
 
-	i.indexAbbrEncodableTridexes.Shas.Kennungen.Add(o.GetAkteSha().String())
+	i.indexAbbrEncodableTridexes.Shas.Kennungen.Add(o.GetBlobSha().String())
 
 	ks := o.GetObjectId().String()
 
