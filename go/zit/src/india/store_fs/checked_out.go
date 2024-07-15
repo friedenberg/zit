@@ -70,18 +70,18 @@ func (a *CheckedOut) String() string {
 
 func (e *CheckedOut) Remove(s interfaces.Directory) (err error) {
 	// TODO check conflict state
-	if err = e.External.FDs.Objekte.Remove(s); err != nil {
+	if err = e.External.FDs.Object.Remove(s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = e.External.FDs.Akte.Remove(s); err != nil {
+	if err = e.External.FDs.Blob.Remove(s); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	e.External.FDs.Akte.Reset()
-	e.External.FDs.Objekte.Reset()
+	e.External.FDs.Blob.Reset()
+	e.External.FDs.Object.Reset()
 
 	return
 }
@@ -135,8 +135,8 @@ func (checkedOutResetter) Reset(a *CheckedOut) {
 
 	sku.TransactedResetter.Reset(&a.Internal)
 	sku.TransactedResetter.Reset(&a.External.Transacted)
-	a.External.FDs.Objekte.Reset()
-	a.External.FDs.Akte.Reset()
+	a.External.FDs.Object.Reset()
+	a.External.FDs.Blob.Reset()
 }
 
 func (checkedOutResetter) ResetWith(a *CheckedOut, b *CheckedOut) {

@@ -71,7 +71,7 @@ func (a *External) SetBlobSha(v interfaces.Sha) (err error) {
 		return
 	}
 
-	if err = a.FDs.Akte.SetShaLike(v); err != nil {
+	if err = a.FDs.Blob.SetShaLike(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -88,20 +88,20 @@ func (a *External) GetFDsPtr() *FDPair {
 }
 
 func (a *External) GetAkteFD() *fd.FD {
-	return &a.FDs.Akte
+	return &a.FDs.Blob
 }
 
 func (a *External) SetAkteFD(v *fd.FD) {
-	a.FDs.Akte.ResetWith(v)
+	a.FDs.Blob.ResetWith(v)
 	a.Metadata.Blob.SetShaLike(v.GetShaLike())
 }
 
 func (a *External) GetAktePath() string {
-	return a.FDs.Akte.GetPath()
+	return a.FDs.Blob.GetPath()
 }
 
 func (a *External) GetObjekteFD() *fd.FD {
-	return &a.FDs.Objekte
+	return &a.FDs.Object
 }
 
 func (a *External) ResetWithExternalMaybe(
@@ -121,14 +121,14 @@ func (o *External) GetKey() string {
 
 func (e *External) GetCheckoutMode() (m checkout_mode.Mode, err error) {
 	switch {
-	case !e.FDs.Objekte.IsEmpty() && !e.FDs.Akte.IsEmpty():
-		m = checkout_mode.ModeObjekteAndAkte
+	case !e.FDs.Object.IsEmpty() && !e.FDs.Blob.IsEmpty():
+		m = checkout_mode.ModeMetadataAndBlob
 
-	case !e.FDs.Akte.IsEmpty():
-		m = checkout_mode.ModeAkteOnly
+	case !e.FDs.Blob.IsEmpty():
+		m = checkout_mode.ModeBlobOnly
 
-	case !e.FDs.Objekte.IsEmpty():
-		m = checkout_mode.ModeObjekteOnly
+	case !e.FDs.Object.IsEmpty():
+		m = checkout_mode.ModeMetadataOnly
 
 	default:
 		err = checkout_mode.MakeErrInvalidCheckoutMode(

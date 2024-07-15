@@ -45,11 +45,11 @@ func (e *KennungFDPair) GetFDs() *FDPair {
 }
 
 func (e *KennungFDPair) GetObjekteFD() *fd.FD {
-	return &e.FDs.Objekte
+	return &e.FDs.Object
 }
 
 func (e *KennungFDPair) GetAkteFD() *fd.FD {
-	return &e.FDs.Akte
+	return &e.FDs.Blob
 }
 
 func (e *KennungFDPair) SetKennungFromFullPath(

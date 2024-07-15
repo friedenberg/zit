@@ -221,15 +221,11 @@ func (kc *Compiled) flushMutableConfig(
 		return
 	}
 
-	p := s.FileKonfigCompiled()
-
-	if kc.UseKonfigErworbenFile {
-		p = s.FileKonfigErworben()
-	}
+	p := s.FileKonfigErworben()
 
 	var f *os.File
 
-	if f, err = files.OpenExclusiveWriteOnlyTruncate(p); err != nil {
+	if f, err = files.OpenCreateWriteOnlyTruncate(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

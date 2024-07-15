@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -18,7 +19,7 @@ type cliCheckedOut struct {
 
 	rightAlignedWriter          interfaces.StringFormatWriter[string]
 	shaStringFormatWriter       interfaces.StringFormatWriter[interfaces.Sha]
-	kennungStringFormatWriter   interfaces.StringFormatWriter[*ids.ObjectId]
+	objectIdStringFormatWriter  interfaces.StringFormatWriter[*ids.ObjectId]
 	fdStringFormatWriter        interfaces.StringFormatWriter[*fd.FD]
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata]
 }
@@ -34,7 +35,7 @@ func MakeCliCheckedOutFormat(
 		options:                     options,
 		rightAlignedWriter:          string_format_writer.MakeRightAligned(),
 		shaStringFormatWriter:       shaStringFormatWriter,
-		kennungStringFormatWriter:   kennungStringFormatWriter,
+		objectIdStringFormatWriter:  kennungStringFormatWriter,
 		fdStringFormatWriter:        fdStringFormatWriter,
 		metadateiStringFormatWriter: metadateiStringFormatWriter,
 	}
@@ -45,6 +46,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 	col sku.CheckedOutLike,
 ) (n int64, err error) {
 	co := col.(*CheckedOut)
+
 	var (
 		n1 int
 		n2 int64
@@ -81,11 +83,22 @@ func (f *cliCheckedOut) WriteStringFormat(
 	m := fds.GetCheckoutMode()
 
 	switch {
+	case co.State == checked_out_state.StateUntracked:
+		n2, err = f.writeStringFormatUntracked(sw, co)
+		n += n2
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+
 	case co.IsImport:
 		fallthrough
 
-	case m == checkout_mode.ModeAkteOnly:
-		n2, err = f.kennungStringFormatWriter.WriteStringFormat(sw, &o.ObjectId)
+	case m == checkout_mode.ModeBlobOnly:
+		n2, err = f.objectIdStringFormatWriter.WriteStringFormat(sw, &o.ObjectId)
 		n += n2
 
 		if err != nil {
@@ -94,7 +107,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 		}
 
 	default:
-		n2, err = f.fdStringFormatWriter.WriteStringFormat(sw, &fds.Objekte)
+		n2, err = f.fdStringFormatWriter.WriteStringFormat(sw, &fds.Object)
 		n += n2
 
 		if err != nil {
@@ -123,7 +136,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 		return
 	}
 
-	if m != checkout_mode.ModeObjekteOnly && m != checkout_mode.ModeNone {
+	if m != checkout_mode.ModeMetadataOnly && m != checkout_mode.ModeNone {
 		n1, err = sw.WriteString("\n")
 		n += int64(n1)
 
@@ -153,7 +166,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 
 		n2, err = f.fdStringFormatWriter.WriteStringFormat(
 			sw,
-			&fds.Akte,
+			&fds.Blob,
 		)
 		n += n2
 
@@ -161,6 +174,54 @@ func (f *cliCheckedOut) WriteStringFormat(
 			err = errors.Wrap(err)
 			return
 		}
+	}
+
+	n1, err = sw.WriteString("]")
+	n += int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (f *cliCheckedOut) writeStringFormatUntracked(
+	sw interfaces.WriterAndStringWriter,
+	co *CheckedOut,
+) (n int64, err error) {
+	var (
+		n1 int
+		n2 int64
+	)
+
+	o := &co.External
+	fds := o.GetFDsPtr()
+
+	fdToPrint := &fds.Blob
+
+	if o.GetGenre() != genres.Zettel {
+		fdToPrint = &fds.Object
+	}
+
+	n2, err = f.fdStringFormatWriter.WriteStringFormat(
+		sw,
+		fdToPrint,
+	)
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n2, err = f.metadateiStringFormatWriter.WriteStringFormat(sw, o.GetMetadata())
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	n1, err = sw.WriteString("]")

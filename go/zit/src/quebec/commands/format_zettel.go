@@ -29,7 +29,7 @@ func init() {
 		"format-zettel",
 		func(f *flag.FlagSet) Command {
 			c := &FormatZettel{
-				Mode: checkout_mode.ModeObjekteAndAkte,
+				Mode: checkout_mode.ModeMetadataAndBlob,
 			}
 
 			f.Var(&c.Mode, "mode", "zettel, akte, or both")

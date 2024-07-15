@@ -176,7 +176,7 @@ func (s *Store) checkoutOne(
 	inlineAkte := s.config.IsInlineType(t)
 
 	if options.CheckoutMode.IncludesObjekte() {
-		if err = cz.External.GetFDsPtr().Objekte.SetPath(filename); err != nil {
+		if err = cz.External.GetFDsPtr().Object.SetPath(filename); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -192,7 +192,7 @@ func (s *Store) checkoutOne(
 			fe = t.String()
 		}
 
-		if err = cz.External.GetFDsPtr().Akte.SetPath(
+		if err = cz.External.GetFDsPtr().Blob.SetPath(
 			originalFilename + "." + fe,
 		); err != nil {
 			err = errors.Wrap(err)

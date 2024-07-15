@@ -14,8 +14,8 @@ import (
 var ErrExternalHasConflictMarker = errors.New("external has conflict marker")
 
 type FDPair struct {
-	Objekte fd.FD
-	Akte    fd.FD
+	Object fd.FD
+	Blob   fd.FD
 }
 
 func (ef *FDPair) GetTai() ids.Tai {
@@ -27,7 +27,7 @@ func (ef *FDPair) GetTime() thyme.Time {
 }
 
 func (ef *FDPair) LatestModTime() thyme.Time {
-	o, a := ef.Objekte.ModTime(), ef.Akte.ModTime()
+	o, a := ef.Object.ModTime(), ef.Blob.ModTime()
 
 	if o.Less(a) {
 		return a
@@ -41,16 +41,16 @@ func (ef *FDPair) LatestModTime() thyme.Time {
 // }
 
 func (dst *FDPair) ResetWith(src *FDPair) {
-	dst.Objekte.ResetWith(&src.Objekte)
-	dst.Akte.ResetWith(&src.Akte)
+	dst.Object.ResetWith(&src.Object)
+	dst.Blob.ResetWith(&src.Blob)
 }
 
 func (a *FDPair) Equals(b *FDPair) bool {
-	if !a.Objekte.Equals(&b.Objekte) {
+	if !a.Object.Equals(&b.Object) {
 		return false
 	}
 
-	if !a.Akte.Equals(&b.Akte) {
+	if !a.Blob.Equals(&b.Blob) {
 		return false
 	}
 
@@ -58,7 +58,7 @@ func (a *FDPair) Equals(b *FDPair) bool {
 }
 
 func (e *FDPair) MakeConflictMarker() (path string) {
-	path = fmt.Sprintf("%s.conflict", e.Objekte.GetPath())
+	path = fmt.Sprintf("%s.conflict", e.Object.GetPath())
 
 	return
 }
@@ -72,13 +72,13 @@ func (e *FDPair) conflictMarkerExists(fd *fd.FD) (ok bool) {
 }
 
 func (e *FDPair) ConflictMarkerError() (err error) {
-	if e.conflictMarkerExists(&e.Objekte) {
-		err = errors.Wrapf(ErrExternalHasConflictMarker, "Objekte: %s", &e.Objekte)
+	if e.conflictMarkerExists(&e.Object) {
+		err = errors.Wrapf(ErrExternalHasConflictMarker, "Objekte: %s", &e.Object)
 		return
 	}
 
-	if e.conflictMarkerExists(&e.Akte) {
-		err = errors.Wrapf(ErrExternalHasConflictMarker, "Akte: %s", &e.Akte)
+	if e.conflictMarkerExists(&e.Blob) {
+		err = errors.Wrapf(ErrExternalHasConflictMarker, "Akte: %s", &e.Blob)
 		return
 	}
 
@@ -87,14 +87,14 @@ func (e *FDPair) ConflictMarkerError() (err error) {
 
 func (e *FDPair) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 	switch {
-	case !e.Objekte.IsEmpty() && !e.Akte.IsEmpty():
-		m = checkout_mode.ModeObjekteAndAkte
+	case !e.Object.IsEmpty() && !e.Blob.IsEmpty():
+		m = checkout_mode.ModeMetadataAndBlob
 
-	case !e.Akte.IsEmpty():
-		m = checkout_mode.ModeAkteOnly
+	case !e.Blob.IsEmpty():
+		m = checkout_mode.ModeBlobOnly
 
-	case !e.Objekte.IsEmpty():
-		m = checkout_mode.ModeObjekteOnly
+	case !e.Object.IsEmpty():
+		m = checkout_mode.ModeMetadataOnly
 
 	default:
 		err = checkout_mode.MakeErrInvalidCheckoutMode(
@@ -107,14 +107,14 @@ func (e *FDPair) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 
 func (e *FDPair) GetCheckoutMode() (m checkout_mode.Mode) {
 	switch {
-	case !e.Objekte.IsEmpty() && !e.Akte.IsEmpty():
-		m = checkout_mode.ModeObjekteAndAkte
+	case !e.Object.IsEmpty() && !e.Blob.IsEmpty():
+		m = checkout_mode.ModeMetadataAndBlob
 
-	case !e.Akte.IsEmpty():
-		m = checkout_mode.ModeAkteOnly
+	case !e.Blob.IsEmpty():
+		m = checkout_mode.ModeBlobOnly
 
-	case !e.Objekte.IsEmpty():
-		m = checkout_mode.ModeObjekteOnly
+	case !e.Object.IsEmpty():
+		m = checkout_mode.ModeMetadataOnly
 	}
 
 	return

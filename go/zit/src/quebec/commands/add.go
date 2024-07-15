@@ -159,7 +159,7 @@ func (c Add) openBlobIfNecessary(
 	opCheckout := user_ops.Checkout{
 		Env: u,
 		Options: checkout_options.Options{
-			CheckoutMode: checkout_mode.ModeAkteOnly,
+			CheckoutMode: checkout_mode.ModeBlobOnly,
 		},
 		Utility: c.CheckoutBlobAndRun,
 	}

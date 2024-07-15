@@ -24,7 +24,7 @@ func init() {
 		"edit",
 		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Edit{
-				CheckoutMode: checkout_mode.ModeObjekteOnly,
+				CheckoutMode: checkout_mode.ModeMetadataOnly,
 			}
 
 			f.BoolVar(

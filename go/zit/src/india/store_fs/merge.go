@@ -27,10 +27,10 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 
 	inlineAkte := tm.IsAllInlineType(s.config)
 
-	mode := checkout_mode.ModeObjekteAndAkte
+	mode := checkout_mode.ModeMetadataAndBlob
 
 	if !inlineAkte {
-		mode = checkout_mode.ModeObjekteOnly
+		mode = checkout_mode.ModeMetadataOnly
 	}
 
 	op := checkout_options.Options{
@@ -56,14 +56,14 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 	}
 
 	p, mergeResult := s.runDiff3(
-		leftCO.External.FDs.Objekte,
-		middleCO.External.FDs.Objekte,
-		rightCO.External.FDs.Objekte,
+		leftCO.External.FDs.Object,
+		middleCO.External.FDs.Object,
+		rightCO.External.FDs.Object,
 	)
 
 	var merged FDPair
 
-	if err = merged.Objekte.SetPath(p); err != nil {
+	if err = merged.Object.SetPath(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -96,8 +96,8 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 	// 	err = errors.Wrap(err)
 	// 	return
 	// }
-	src := merged.Objekte.GetPath()
-	dst := cofs.External.FDs.Objekte.GetPath()
+	src := merged.Object.GetPath()
+	dst := cofs.External.FDs.Object.GetPath()
 
 	if err = files.Rename(src, dst); err != nil {
 		err = errors.Wrap(err)
@@ -154,13 +154,13 @@ func (s *Store) RunMergeTool(
 	inlineAkte := tm.IsAllInlineType(s.config)
 
 	op := checkout_options.Options{
-		CheckoutMode:    checkout_mode.ModeObjekteAndAkte,
+		CheckoutMode:    checkout_mode.ModeMetadataAndBlob,
 		AllowConflicted: true,
 		Path:            checkout_options.PathTempLocal,
 	}
 
 	if !inlineAkte {
-		op.CheckoutMode = checkout_mode.ModeObjekteOnly
+		op.CheckoutMode = checkout_mode.ModeMetadataOnly
 	}
 
 	var leftCO, middleCO, rightCO *CheckedOut
@@ -201,9 +201,9 @@ func (s *Store) RunMergeTool(
 
 	cmdStrings = append(
 		cmdStrings,
-		leftCO.External.FDs.Objekte.GetPath(),
-		middleCO.External.FDs.Objekte.GetPath(),
-		rightCO.External.FDs.Objekte.GetPath(),
+		leftCO.External.FDs.Object.GetPath(),
+		middleCO.External.FDs.Object.GetPath(),
+		rightCO.External.FDs.Object.GetPath(),
 		tmpPath,
 	)
 
@@ -218,9 +218,9 @@ func (s *Store) RunMergeTool(
 	cmd.Stderr = os.Stderr
 
 	cmd.Env = []string{
-		fmt.Sprintf("LOCAL=%s", leftCO.External.FDs.Objekte.GetPath()),
-		fmt.Sprintf("BASE=%s", middleCO.External.FDs.Objekte.GetPath()),
-		fmt.Sprintf("REMOTE=%s", rightCO.External.FDs.Objekte.GetPath()),
+		fmt.Sprintf("LOCAL=%s", leftCO.External.FDs.Object.GetPath()),
+		fmt.Sprintf("BASE=%s", middleCO.External.FDs.Object.GetPath()),
+		fmt.Sprintf("REMOTE=%s", rightCO.External.FDs.Object.GetPath()),
 		fmt.Sprintf("MERGED=%s", tmpPath),
 	}
 

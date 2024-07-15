@@ -129,7 +129,7 @@ func (c New) Run(u *env.Env, args ...string) (err error) {
 		opCheckout := user_ops.Checkout{
 			Env: u,
 			Options: checkout_options.Options{
-				CheckoutMode:         checkout_mode.ModeObjekteAndAkte,
+				CheckoutMode:         checkout_mode.ModeMetadataAndBlob,
 				TextFormatterOptions: cotfo,
 			},
 			Edit: true,

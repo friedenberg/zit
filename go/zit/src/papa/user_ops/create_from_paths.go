@@ -45,7 +45,7 @@ func (c CreateFromPaths) Run(
 
 		t.Kennung.SetGenre(genres.Zettel)
 
-		if err = t.FDs.Objekte.Set(arg); err != nil {
+		if err = t.FDs.Object.Set(arg); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -164,7 +164,7 @@ func (c *CreateFromPaths) zettelsFromPath(
 
 	ze := store_fs.GetExternalPool().Get()
 	ze.FDs = store_fs.FDPair{
-		Objekte: fd,
+		Object: fd,
 	}
 
 	ze.Metadata.Tai = ids.TaiFromTime(fd.ModTime())

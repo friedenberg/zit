@@ -233,7 +233,7 @@ func (c *ZettelFromExternalBlob) zettelForAkte(
 	akteFD := akteFDs[0]
 	z = store_fs.GetExternalPool().Get()
 
-	z.FDs.Akte.ResetWith(akteFD)
+	z.FDs.Blob.ResetWith(akteFD)
 
 	if err = z.Transacted.ObjectId.SetWithIdLike(&ids.ZettelId{}); err != nil {
 		err = errors.Wrap(err)

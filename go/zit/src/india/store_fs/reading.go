@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
@@ -132,14 +131,14 @@ func (s *Store) ReadOneExternalInto(
 	}
 
 	switch m {
-	case checkout_mode.ModeAkteOnly:
+	case checkout_mode.ModeBlobOnly:
 		if err = s.ReadOneExternalAkte(e, t1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case checkout_mode.ModeObjekteOnly, checkout_mode.ModeObjekteAndAkte:
-		if e.FDs.Objekte.IsStdin() {
+	case checkout_mode.ModeMetadataOnly, checkout_mode.ModeMetadataAndBlob:
+		if e.FDs.Object.IsStdin() {
 			if err = s.ReadOneExternalObjekteReader(os.Stdin, e); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -155,19 +154,20 @@ func (s *Store) ReadOneExternalInto(
 		panic(checkout_mode.MakeErrInvalidCheckoutModeMode(m))
 	}
 
-	if !e.FDs.Akte.IsEmpty() {
-		aFD := &e.FDs.Akte
-		ext := aFD.ExtSansDot()
+	if !e.FDs.Blob.IsEmpty() {
+		blobFD := &e.FDs.Blob
+		ext := blobFD.ExtSansDot()
 		typFromExtension := s.config.GetTypeStringFromExtension(ext)
 
 		if typFromExtension == "" {
-			ui.Err().Printf("typ extension unknown: %s", aFD.ExtSansDot())
 			typFromExtension = ext
 		}
 
-		if err = e.Transacted.Metadata.Type.Set(typFromExtension); err != nil {
-			err = errors.Wrap(err)
-			return
+		if typFromExtension != "" {
+			if err = e.Transacted.Metadata.Type.Set(typFromExtension); err != nil {
+				err = errors.Wrapf(err, "Path: %s", blobFD.GetPath())
+				return
+			}
 		}
 	}
 

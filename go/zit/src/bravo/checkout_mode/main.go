@@ -14,9 +14,9 @@ type Getter interface {
 
 const (
 	ModeNone = Mode(iota)
-	ModeObjekteOnly
-	ModeObjekteAndAkte
-	ModeAkteOnly
+	ModeMetadataOnly
+	ModeMetadataAndBlob
+	ModeBlobOnly
 )
 
 func (m Mode) String() string {
@@ -24,13 +24,13 @@ func (m Mode) String() string {
 	case ModeNone:
 		return "none"
 
-	case ModeObjekteOnly:
+	case ModeMetadataOnly:
 		return "objekte-only"
 
-	case ModeAkteOnly:
+	case ModeBlobOnly:
 		return "akte-only"
 
-	case ModeObjekteAndAkte:
+	case ModeMetadataAndBlob:
 		return "both"
 
 	default:
@@ -52,15 +52,15 @@ func (m *Mode) Set(v string) (err error) {
 	case "zettel":
 		fallthrough
 	case "zettel-only":
-		*m = ModeObjekteOnly
+		*m = ModeMetadataOnly
 
 	case "akte":
 		fallthrough
 	case "akte-only":
-		*m = ModeAkteOnly
+		*m = ModeBlobOnly
 
 	case "both":
-		*m = ModeObjekteAndAkte
+		*m = ModeMetadataAndBlob
 
 	default:
 		err = errors.Errorf("unsupported checkout mode: %s", v)
@@ -72,7 +72,7 @@ func (m *Mode) Set(v string) (err error) {
 
 func (m Mode) IncludesAkte() bool {
 	switch m {
-	case ModeObjekteAndAkte, ModeAkteOnly:
+	case ModeMetadataAndBlob, ModeBlobOnly:
 		return true
 
 	default:
@@ -82,7 +82,7 @@ func (m Mode) IncludesAkte() bool {
 
 func (m Mode) IncludesObjekte() bool {
 	switch m {
-	case ModeObjekteAndAkte, ModeObjekteOnly:
+	case ModeMetadataAndBlob, ModeMetadataOnly:
 		return true
 
 	default:

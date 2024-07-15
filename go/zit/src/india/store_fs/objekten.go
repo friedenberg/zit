@@ -40,7 +40,7 @@ func (c *Store) tryEtikett(fi os.FileInfo, dir string) (err error) {
 		return
 	}
 
-	t.FDs.Objekte.ResetWith(f)
+	t.FDs.Object.ResetWith(f)
 
 	return c.etiketten.Add(t)
 }
@@ -72,7 +72,7 @@ func (c *Store) tryKasten(fi os.FileInfo, dir string) (err error) {
 		return
 	}
 
-	t.FDs.Objekte.ResetWith(f)
+	t.FDs.Object.ResetWith(f)
 
 	return c.kisten.Add(t)
 }
@@ -104,7 +104,7 @@ func (c *Store) tryTyp(fi os.FileInfo, dir string) (err error) {
 		return
 	}
 
-	t.FDs.Objekte.ResetWith(f)
+	t.FDs.Object.ResetWith(f)
 
 	return c.typen.Add(t)
 }
@@ -175,12 +175,12 @@ func (c *Store) tryZettel(
 	ext := strings.TrimPrefix(path.Ext(name), ".")
 
 	if ext == c.fileExtensions.Zettel {
-		if err = t.FDs.Objekte.SetPath(fullPath); err != nil {
+		if err = t.FDs.Object.SetPath(fullPath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if err = t.FDs.Akte.SetPath(fullPath); err != nil {
+		if err = t.FDs.Blob.SetPath(fullPath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -212,12 +212,12 @@ func (c *Store) tryZettelUnsure(
 	ext := strings.TrimPrefix(path.Ext(name), ".")
 
 	if ext == c.fileExtensions.Zettel {
-		if err = t.FDs.Objekte.SetPath(fullPath); err != nil {
+		if err = t.FDs.Object.SetPath(fullPath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if err = t.FDs.Akte.SetPath(fullPath); err != nil {
+		if err = t.FDs.Blob.SetPath(fullPath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
