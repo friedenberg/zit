@@ -40,7 +40,7 @@ func (item item) WriteToMetadata(m *object_metadata.Metadata) (err error) {
 
 	var e ids.Tag
 
-	els := strings.Split(u.Host, ".")
+	els := strings.Split(u.Hostname(), ".")
 	slices.Reverse(els)
 	host := strings.Join(els, "-")
 

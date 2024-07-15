@@ -17,27 +17,27 @@ import (
 type cliCheckedOut struct {
 	options erworben_cli_print_options.PrintOptions
 
-	rightAlignedWriter          interfaces.StringFormatWriter[string]
-	shaStringFormatWriter       interfaces.StringFormatWriter[interfaces.Sha]
-	objectIdStringFormatWriter  interfaces.StringFormatWriter[*ids.ObjectId]
-	fdStringFormatWriter        interfaces.StringFormatWriter[*fd.FD]
-	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata]
+	rightAlignedWriter         interfaces.StringFormatWriter[string]
+	shaStringFormatWriter      interfaces.StringFormatWriter[interfaces.Sha]
+	objectIdStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId]
+	fdStringFormatWriter       interfaces.StringFormatWriter[*fd.FD]
+	metadataStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata]
 }
 
 func MakeCliCheckedOutFormat(
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 	fdStringFormatWriter interfaces.StringFormatWriter[*fd.FD],
-	kennungStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
-	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata],
+	objectIdStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
+	metadataStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata],
 ) *cliCheckedOut {
 	return &cliCheckedOut{
-		options:                     options,
-		rightAlignedWriter:          string_format_writer.MakeRightAligned(),
-		shaStringFormatWriter:       shaStringFormatWriter,
-		objectIdStringFormatWriter:  kennungStringFormatWriter,
-		fdStringFormatWriter:        fdStringFormatWriter,
-		metadateiStringFormatWriter: metadateiStringFormatWriter,
+		options:                    options,
+		rightAlignedWriter:         string_format_writer.MakeRightAligned(),
+		shaStringFormatWriter:      shaStringFormatWriter,
+		objectIdStringFormatWriter: objectIdStringFormatWriter,
+		fdStringFormatWriter:       fdStringFormatWriter,
+		metadataStringFormatWriter: metadataStringFormatWriter,
 	}
 }
 
@@ -84,7 +84,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 
 	switch {
 	case co.State == checked_out_state.StateUntracked:
-		n2, err = f.writeStringFormatUntracked(sw, co)
+		n2, err = f.writeStringFormatUntracked(sw, co, m)
 		n += n2
 
 		if err != nil {
@@ -128,7 +128,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 		return
 	}
 
-	n2, err = f.metadateiStringFormatWriter.WriteStringFormat(sw, o.GetMetadata())
+	n2, err = f.metadataStringFormatWriter.WriteStringFormat(sw, o.GetMetadata())
 	n += n2
 
 	if err != nil {
@@ -190,6 +190,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 func (f *cliCheckedOut) writeStringFormatUntracked(
 	sw interfaces.WriterAndStringWriter,
 	co *CheckedOut,
+	mode checkout_mode.Mode,
 ) (n int64, err error) {
 	var (
 		n1 int
@@ -201,7 +202,7 @@ func (f *cliCheckedOut) writeStringFormatUntracked(
 
 	fdToPrint := &fds.Blob
 
-	if o.GetGenre() != genres.Zettel {
+	if o.GetGenre() != genres.Zettel && !fds.Object.IsEmpty() {
 		fdToPrint = &fds.Object
 	}
 
@@ -216,7 +217,7 @@ func (f *cliCheckedOut) writeStringFormatUntracked(
 		return
 	}
 
-	n2, err = f.metadateiStringFormatWriter.WriteStringFormat(sw, o.GetMetadata())
+	n2, err = f.metadataStringFormatWriter.WriteStringFormat(sw, o.GetMetadata())
 	n += n2
 
 	if err != nil {
