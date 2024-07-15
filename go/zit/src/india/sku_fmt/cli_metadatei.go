@@ -16,28 +16,28 @@ type cliMetadatei struct {
 	contentPrefix string
 
 	writeTyp         bool
-	writeBezeichnung bool
+	writeDescription bool
 	writeEtiketten   bool
 
 	shaStringFormatWriter         interfaces.StringFormatWriter[interfaces.Sha]
 	typStringFormatWriter         interfaces.StringFormatWriter[*ids.Type]
-	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description]
+	descriptionStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description]
 	etikettenStringFormatWriter   interfaces.StringFormatWriter[*ids.Tag]
 }
 
 func MakeCliMetadateiFormatShort(
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
-	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description],
+	descriptionStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description],
 	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
 ) *cliMetadatei {
 	return &cliMetadatei{
 		writeTyp:                      false,
-		writeBezeichnung:              false,
+		writeDescription:              false,
 		writeEtiketten:                false,
 		shaStringFormatWriter:         shaStringFormatWriter,
 		typStringFormatWriter:         typStringFormatWriter,
-		bezeichnungStringFormatWriter: bezeichnungStringFormatWriter,
+		descriptionStringFormatWriter: descriptionStringFormatWriter,
 		etikettenStringFormatWriter:   etikettenStringFormatWriter,
 	}
 }
@@ -46,7 +46,7 @@ func MakeCliMetadateiFormat(
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
-	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description],
+	descriptionStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description],
 	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
 ) *cliMetadatei {
 	return &cliMetadatei{
@@ -55,11 +55,11 @@ func MakeCliMetadateiFormat(
 			options,
 		),
 		writeTyp:                      true,
-		writeBezeichnung:              true,
+		writeDescription:              true,
 		writeEtiketten:                true,
 		shaStringFormatWriter:         shaStringFormatWriter,
 		typStringFormatWriter:         typStringFormatWriter,
-		bezeichnungStringFormatWriter: bezeichnungStringFormatWriter,
+		descriptionStringFormatWriter: descriptionStringFormatWriter,
 		etikettenStringFormatWriter:   etikettenStringFormatWriter,
 	}
 }
@@ -121,12 +121,12 @@ func (f *cliMetadatei) WriteStringFormat(
 		}
 	}
 
-	didWriteBezeichnung := false
-	if f.writeBezeichnung {
+	didWriteDescription := false
+	if f.writeDescription {
 		b := &o.Description
 
 		if !b.IsEmpty() {
-			didWriteBezeichnung = true
+			didWriteDescription = true
 
 			n1, err = sw.WriteString(f.contentPrefix)
 			n += int64(n1)
@@ -136,7 +136,7 @@ func (f *cliMetadatei) WriteStringFormat(
 				return
 			}
 
-			n2, err = f.bezeichnungStringFormatWriter.WriteStringFormat(sw, b)
+			n2, err = f.descriptionStringFormatWriter.WriteStringFormat(sw, b)
 			n += n2
 
 			if err != nil {
@@ -146,7 +146,7 @@ func (f *cliMetadatei) WriteStringFormat(
 		}
 	}
 
-	n2, err = f.writeStringFormatEtiketten(sw, o, didWriteBezeichnung)
+	n2, err = f.writeStringFormatEtiketten(sw, o, didWriteDescription)
 	n += n2
 
 	if err != nil {
@@ -160,10 +160,10 @@ func (f *cliMetadatei) WriteStringFormat(
 func (f *cliMetadatei) writeStringFormatEtiketten(
 	sw interfaces.WriterAndStringWriter,
 	o *object_metadata.Metadata,
-	didWriteBezeichnung bool,
+	didWriteDescription bool,
 ) (n int64, err error) {
 	if !f.options.PrintEtikettenAlways &&
-		(!f.writeEtiketten && didWriteBezeichnung) {
+		(!f.writeEtiketten && didWriteDescription) {
 		return
 	}
 

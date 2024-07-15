@@ -48,8 +48,8 @@ func (pz Proto) Equals(z *object_metadata.Metadata) (ok bool) {
 }
 
 func (pz Proto) Make() (z *Transacted) {
-	todo.Change("add typ")
-	todo.Change("add Bezeichnung")
+	todo.Change("add type")
+	todo.Change("add description")
 	z = GetTransactedPool().Get()
 
 	pz.Apply(z, genres.Zettel)
@@ -93,7 +93,7 @@ func (pz Proto) Apply(
 
 func (pz Proto) ApplyWithBlobFD(
 	ml object_metadata.MetadataLike,
-	akteFD *fd.FD,
+	blobFD *fd.FD,
 ) (err error) {
 	z := ml.GetMetadata()
 
@@ -103,24 +103,24 @@ func (pz Proto) ApplyWithBlobFD(
 		z.Type = pz.Metadata.Type
 	} else {
 		// TODO-P4 use konfig
-		ext := akteFD.Ext()
+		ext := blobFD.Ext()
 
 		if ext != "" {
-			if err = z.Type.Set(akteFD.Ext()); err != nil {
+			if err = z.Type.Set(blobFD.Ext()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 		}
 	}
 
-	bez := akteFD.FileNameSansExt()
+	desc := blobFD.FileNameSansExt()
 
 	if pz.Metadata.Description.WasSet() &&
 		!z.Description.Equals(pz.Metadata.Description) {
-		bez = pz.Metadata.Description.String()
+		desc = pz.Metadata.Description.String()
 	}
 
-	if err = z.Description.Set(bez); err != nil {
+	if err = z.Description.Set(desc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

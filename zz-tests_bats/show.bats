@@ -295,7 +295,7 @@ function show_konfig { # @test
 
 		[cli-output]
 		print-include-typen = false
-		print-include-bezeichnungen = false
+		print-include-description = false
 		print-time = false
 		print-etiketten-always = false
 		print-empty-shas = false

@@ -8,46 +8,48 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 )
 
-type Key byte
+type Binary byte
 
 const (
-	Unknown                      = Key(iota)
-	ContentLength                = 'C'
-	Sigil                        = 'S'
-	Blob                         = 'A'
-	Description                  = 'B'
-	Tag                          = 'E'
-	Genre                        = 'G'
-	ObjectId                     = 'K'
-	Comment                      = 'k'
-	Tai                          = 'T'
-	Type                         = 't'
-	ParentMetadataParentObjectId = 'M'
-	ShaMetadataParentObjectId    = 's'
-	ShaMetadataWithoutTai        = 'n'
-	ShaMetadata                  = 'm'
-	VerzeichnisseArchiviert      = 'a'
-	CacheTagImplicit             = 'I'
-	CacheTagExpanded             = 'e'
-	CacheTags                    = 'x'
-	VerzeichnisseEtiketten2      = 'y'
+	Unknown       = Binary(iota)
+	ContentLength = 'C'
+	Sigil         = 'S'
+	Blob          = 'A'
+	Description   = 'B'
+	Tag           = 'E'
+	Genre         = 'G'
+	ObjectId      = 'K'
+	Comment       = 'k'
+	Tai           = 'T'
+	Type          = 't'
+
+	ShaParentMetadataParentObjectId = 'M'
+	ShaMetadataParentObjectId       = 's'
+	ShaMetadataWithoutTai           = 'n'
+	ShaMetadata                     = 'm'
+
+	CacheDormant     = 'a'
+	CacheTagImplicit = 'I'
+	CacheTagExpanded = 'e'
+	CacheTags        = 'x'
+	CacheTags2       = 'y'
 )
 
 var ErrInvalid = errors.New("invalid key")
 
-func (s Key) String() string {
+func (s Binary) String() string {
 	return fmt.Sprintf("%c", byte(s))
 }
 
-func (s *Key) Reset() {
+func (s *Binary) Reset() {
 	*s = 0
 }
 
-func (s *Key) ReadByte() (byte, error) {
+func (s *Binary) ReadByte() (byte, error) {
 	return byte(*s), nil
 }
 
-func (s *Key) WriteTo(w io.Writer) (n int64, err error) {
+func (s *Binary) WriteTo(w io.Writer) (n int64, err error) {
 	b := [1]byte{byte(*s)}
 	var n1 int
 	n1, err = ohio.WriteAllOrDieTrying(w, b[:])
@@ -61,13 +63,13 @@ func (s *Key) WriteTo(w io.Writer) (n int64, err error) {
 	return
 }
 
-func (s *Key) WriteByte(b byte) (err error) {
-	*s = Key(b)
+func (s *Binary) WriteByte(b byte) (err error) {
+	*s = Binary(b)
 
 	return
 }
 
-func (s *Key) ReadFrom(r io.Reader) (n int64, err error) {
+func (s *Binary) ReadFrom(r io.Reader) (n int64, err error) {
 	var b [1]byte
 	var n1 int
 	n1, err = ohio.ReadAllOrDieTrying(r, b[:])

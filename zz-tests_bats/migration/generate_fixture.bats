@@ -23,7 +23,7 @@ function generate { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
-		[konfig@e9412d561f5caaa9219ca6983ed842fefedf85c1aa10a98f271226070b9d1351]
+		[konfig@$(get_konfig_sha)]
 	EOM
 
 	run_zit new "${cmd_def[@]}" -edit=false - <<EOM

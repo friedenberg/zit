@@ -15,18 +15,18 @@ import (
 // TODO make more specific
 type item map[string]interface{}
 
-func (item item) WriteToMetadatei(m *object_metadata.Metadata) (err error) {
+func (item item) WriteToMetadata(m *object_metadata.Metadata) (err error) {
 	if m.Tai, err = item.GetTai(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if m.Type, err = item.GetTyp(); err != nil {
+	if m.Type, err = item.GetType(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if m.Description, err = item.GetBezeichnung(); err != nil {
+	if m.Description, err = item.GetDescription(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -105,7 +105,7 @@ func (tab item) GetTai() (t ids.Tai, err error) {
 	return
 }
 
-func (tab item) GetBezeichnung() (b descriptions.Description, err error) {
+func (tab item) GetDescription() (b descriptions.Description, err error) {
 	t, ok := tab["title"].(string)
 
 	if !ok {
@@ -121,7 +121,7 @@ func (tab item) GetBezeichnung() (b descriptions.Description, err error) {
 	return
 }
 
-func (tab item) GetTyp() (t ids.Type, err error) {
+func (tab item) GetType() (t ids.Type, err error) {
 	ty, ok := tab["type"].(string)
 
 	if !ok {
@@ -137,7 +137,7 @@ func (tab item) GetTyp() (t ids.Type, err error) {
 	return
 }
 
-func (ct item) Etiketten() ids.TagSet {
+func (ct item) GetTagSet() ids.TagSet {
 	me := ids.MakeTagMutableSet()
 
 	switch ct["type"].(string) {

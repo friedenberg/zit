@@ -10,6 +10,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
+	"code.linenisgreat.com/zit/go/zit/src/delta/german_keys"
+	"code.linenisgreat.com/zit/go/zit/src/delta/keys"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 )
@@ -19,23 +21,28 @@ type (
 	Sha       = sha.Sha
 )
 
+const (
+	KeyFormatMetadata               = "Metadatei"
+	KeyFormatMetadataWithoutTai     = "MetadateiSansTai"
+	KeyFormatMetadataObjectIdParent = "MetadateiKennungMutter"
+)
+
 var (
-	keyAkte        = catgut.MakeFromString("Akte")
-	keyBezeichnung = catgut.MakeFromString("Bezeichnung")
-	keyEtikett     = catgut.MakeFromString("Etikett")
-	keyGattung     = catgut.MakeFromString("Gattung")
-	keyKennung     = catgut.MakeFromString("Kennung")
-	keyKomment     = catgut.MakeFromString("Komment")
-	keySigil       = catgut.MakeFromString("Sigil")
-	keyTai         = catgut.MakeFromString("Tai")
-	keyTyp         = catgut.MakeFromString("Typ")
-	keySha         = catgut.MakeFromString("zzSha")
+	keyAkte                             = german_keys.KeyAkte
+	keyBezeichnung                      = german_keys.KeyBezeichnung
+	keyEtikett                          = german_keys.KeyEtikett
+	keyGattung                          = german_keys.KeyGattung
+	keyKennung                          = german_keys.KeyKennung
+	keyKomment                          = german_keys.KeyKomment
+	keyTyp                              = german_keys.KeyTyp
+	keyShasMutterMetadateiKennungMutter = german_keys.KeyShasMutterMetadateiKennungMutter
+	keyVerzeichnisseArchiviert          = german_keys.KeyVerzeichnisseArchiviert
+	keyVerzeichnisseEtikettImplicit     = german_keys.KeyVerzeichnisseEtikettImplicit
+	keyVerzeichnisseEtikettExpanded     = german_keys.KeyVerzeichnisseEtikettExpanded
 
-	keyShasMutterMetadateiKennungMutter = catgut.MakeFromString("Shas" + object_metadata.ShaKeyParentMetadataObjectIdParent)
-
-	keyVerzeichnisseArchiviert      = catgut.MakeFromString("Verzeichnisse-Archiviert")
-	keyVerzeichnisseEtikettImplicit = catgut.MakeFromString("Verzeichnisse-Etikett-Implicit")
-	keyVerzeichnisseEtikettExpanded = catgut.MakeFromString("Verzeichnisse-Etikett-Expanded")
+	keySigil = keys.KeySigil
+	keyTai   = keys.KeyTai
+	keySha   = keys.KeySha
 )
 
 type FormatGeneric struct {
@@ -44,19 +51,14 @@ type FormatGeneric struct {
 }
 
 var FormatsGeneric = map[string][]*catgut.String{
-	// "Akte":                {keyAkte},
-	// "AkteBez":             {keyAkte, keyBezeichnung},
-	// "AkteTyp":             {keyAkte, keyTyp},
-	// "MetadateiSansTai":    {keyAkte, keyBezeichnung, keyEtikett, keyTyp},
-	// "Metadatei":           {keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai},
-	"MetadateiSansTai":       {keyAkte, keyBezeichnung, keyEtikett, keyTyp},
-	"Metadatei":              {keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai},
-	"MetadateiKennungMutter": {keyAkte, keyBezeichnung, keyEtikett, keyKennung, keyTyp, keyTai, keyShasMutterMetadateiKennungMutter},
+	KeyFormatMetadataWithoutTai:     {keyAkte, keyBezeichnung, keyEtikett, keyTyp},
+	KeyFormatMetadata:               {keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai},
+	KeyFormatMetadataObjectIdParent: {keyAkte, keyBezeichnung, keyEtikett, keyKennung, keyTyp, keyTai, keyShasMutterMetadateiKennungMutter},
 }
 
 type formats struct {
 	metadateiSansTai       FormatGeneric
-	object_metadata        FormatGeneric
+	metadatei        FormatGeneric
 	metadateiKennungMutter FormatGeneric
 }
 
@@ -65,7 +67,7 @@ func (fs formats) MetadateiSansTai() FormatGeneric {
 }
 
 func (fs formats) Metadatei() FormatGeneric {
-	return fs.object_metadata
+	return fs.metadatei
 }
 
 func (fs formats) MetadateiKennungMutter() FormatGeneric {
@@ -75,14 +77,14 @@ func (fs formats) MetadateiKennungMutter() FormatGeneric {
 var Formats formats
 
 func init() {
-	Formats.object_metadata.key = "Metadatei"
-	Formats.object_metadata.keys = FormatsGeneric["Metadatei"]
+	Formats.metadatei.key = KeyFormatMetadata
+	Formats.metadatei.keys = FormatsGeneric[KeyFormatMetadata]
 
-	Formats.metadateiSansTai.key = "MetadateiSansTai"
-	Formats.metadateiSansTai.keys = FormatsGeneric["MetadateiSansTai"]
+	Formats.metadateiSansTai.key = KeyFormatMetadataWithoutTai
+	Formats.metadateiSansTai.keys = FormatsGeneric[KeyFormatMetadataWithoutTai]
 
-	Formats.metadateiKennungMutter.key = "MetadateiKennungMutter"
-	Formats.metadateiKennungMutter.keys = FormatsGeneric["MetadateiKennungMutter"]
+	Formats.metadateiKennungMutter.key = KeyFormatMetadataObjectIdParent
+	Formats.metadateiKennungMutter.keys = FormatsGeneric[KeyFormatMetadataObjectIdParent]
 }
 
 func FormatForKeyError(k string) (fo FormatGeneric, err error) {

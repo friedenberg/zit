@@ -62,7 +62,7 @@ func (c Status) RunWithQuery(
 	if err = u.GetStore().QueryUnsure(
 		eqwk,
 		sku.UnsureMatchOptions{
-			UnsureMatchType: sku.UnsureMatchTypeMetadateiSansTaiHistory | sku.UnsureMatchTypeBezeichnung,
+			UnsureMatchType: sku.UnsureMatchTypeMetadataWithoutTaiHistory | sku.UnsureMatchTypeDescription,
 		},
 		u.PrinterMatching(),
 	); err != nil {

@@ -189,7 +189,7 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "bezeichnung":
+	case "description":
 		f = func(tl *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(out, tl.GetMetadata().Description); err != nil {
 				err = errors.Wrap(err)
@@ -202,7 +202,7 @@ func (u *Env) MakeFormatFunc(
 	case "text":
 		fo := blob_store.MakeTextFormatter(
 			checkout_options.TextFormatterOptions{
-				DoNotWriteEmptyBezeichnung: true,
+				DoNotWriteEmptyDescription: true,
 			},
 			u.GetStore().GetStandort(),
 			u.GetConfig(),

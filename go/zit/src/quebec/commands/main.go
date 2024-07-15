@@ -61,7 +61,6 @@ func Run(args []string) (exitStatus int) {
 	konfigCli := mutable_config.DefaultCli()
 	konfigCli.AddToFlags(cmd.FlagSet)
 
-	// TODO add Komment / bestandsaufnahmeBezeichnung
 	if err = cmd.Parse(args); err != nil {
 		err = errors.Wrap(err)
 		return

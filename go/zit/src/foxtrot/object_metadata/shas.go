@@ -5,16 +5,17 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/delta/keys"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
 const (
-	ShaKeySelfMetadata                 = "SelbstMetadatei"
-	ShaKeySelfMetadataWithouTai        = "SelbstMetadateiMutterSansTai"
-	ShaKeySelfMetadataObjectIdParent   = "SelbstMetadateiKennungMutter"
-	ShaKeyParentMetadataObjectIdParent = "MutterMetadateiKennungMutter"
-	ShaKeySelf                         = "MetadateiTai"
-	ShaKeyParent                       = "MutterMetadateiMutterTai"
+	ShaKeySelfMetadata                 = keys.ShaKeySelfMetadata
+	ShaKeySelfMetadataWithouTai        = keys.ShaKeySelfMetadataWithouTai
+	ShaKeySelfMetadataObjectIdParent   = keys.ShaKeySelfMetadataObjectIdParent
+	ShaKeyParentMetadataObjectIdParent = keys.ShaKeyParentMetadataObjectIdParent
+	ShaKeySelf                         = keys.ShaKeySelf
+	ShaKeyParent                       = keys.ShaKeyParent
 )
 
 type Sha struct {

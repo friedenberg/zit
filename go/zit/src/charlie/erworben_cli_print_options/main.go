@@ -12,19 +12,19 @@ type Abbreviations struct {
 }
 
 type PrintOptions struct {
-	Abbreviations             Abbreviations `toml:"abbreviations"`
-	PrintIncludeTypen         bool          `toml:"print-include-typen"`
-	PrintIncludeBezeichnungen bool          `toml:"print-include-bezeichnungen"`
-	PrintTime                 bool          `toml:"print-time"`
-	PrintEtikettenAlways      bool          `toml:"print-etiketten-always"`
-	PrintEmptyShas            bool          `toml:"print-empty-shas"`
-	PrintMatchedArchiviert    bool          `toml:"print-matched-archiviert"`
-	PrintShas                 bool          `toml:"print-shas"`
-	PrintFlush                bool          `toml:"print-flush"`
-	PrintUnchanged            bool          `toml:"print-unchanged"`
-	PrintColors               bool          `toml:"print-colors"`
-	PrintBestandsaufnahme     bool          `toml:"print-bestandsaufnahme"`
-	ZittishNewlines           bool          `toml:"-"`
+	Abbreviations           Abbreviations `toml:"abbreviations"`
+	PrintIncludeTypen       bool          `toml:"print-include-typen"`
+	PrintIncludeDescription bool          `toml:"print-include-description"`
+	PrintTime               bool          `toml:"print-time"`
+	PrintEtikettenAlways    bool          `toml:"print-etiketten-always"`
+	PrintEmptyShas          bool          `toml:"print-empty-shas"`
+	PrintMatchedArchiviert  bool          `toml:"print-matched-archiviert"`
+	PrintShas               bool          `toml:"print-shas"`
+	PrintFlush              bool          `toml:"print-flush"`
+	PrintUnchanged          bool          `toml:"print-unchanged"`
+	PrintColors             bool          `toml:"print-colors"`
+	PrintBestandsaufnahme   bool          `toml:"print-bestandsaufnahme"`
+	ZittishNewlines         bool          `toml:"-"`
 }
 
 func (a *PrintOptions) Merge(b PrintOptions, mask PrintOptions) {
@@ -40,8 +40,8 @@ func (a *PrintOptions) Merge(b PrintOptions, mask PrintOptions) {
 		a.PrintIncludeTypen = b.PrintIncludeTypen
 	}
 
-	if mask.PrintIncludeBezeichnungen {
-		a.PrintIncludeBezeichnungen = b.PrintIncludeBezeichnungen
+	if mask.PrintIncludeDescription {
+		a.PrintIncludeDescription = b.PrintIncludeDescription
 	}
 
 	if mask.PrintTime {
@@ -89,17 +89,17 @@ func Default() PrintOptions {
 			Hinweisen: true,
 			Shas:      true,
 		},
-		PrintIncludeTypen:         true,
-		PrintIncludeBezeichnungen: true,
-		PrintTime:                 true,
-		PrintEtikettenAlways:      true,
-		PrintEmptyShas:            false,
-		PrintMatchedArchiviert:    false,
-		PrintShas:                 true,
-		PrintFlush:                true,
-		PrintUnchanged:            true,
-		PrintColors:               true,
-		PrintBestandsaufnahme:     true,
+		PrintIncludeTypen:       true,
+		PrintIncludeDescription: true,
+		PrintTime:               true,
+		PrintEtikettenAlways:    true,
+		PrintEmptyShas:          false,
+		PrintMatchedArchiviert:  false,
+		PrintShas:               true,
+		PrintFlush:              true,
+		PrintUnchanged:          true,
+		PrintColors:             true,
+		PrintBestandsaufnahme:   true,
 	}
 }
 
@@ -156,9 +156,9 @@ func (c *PrintOptions) AddToFlags(f *flag.FlagSet, m *PrintOptions) {
 
 	boolVarWithMask(
 		f,
-		"print-bezeichnungen",
-		&c.PrintIncludeBezeichnungen,
-		&m.PrintIncludeBezeichnungen,
+		"print-description",
+		&c.PrintIncludeDescription,
+		&m.PrintIncludeDescription,
 		"",
 	)
 

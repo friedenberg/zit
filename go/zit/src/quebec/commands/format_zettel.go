@@ -85,7 +85,7 @@ func (c *FormatZettel) Run(u *env.Env, args ...string) (err error) {
 
 	f := blob_store.MakeTextFormatterWithBlobFormatter(
 		checkout_options.TextFormatterOptions{
-			DoNotWriteEmptyBezeichnung: true,
+			DoNotWriteEmptyDescription: true,
 		},
 		u.GetFSHome(),
 		u.GetConfig(),

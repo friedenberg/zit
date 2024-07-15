@@ -76,7 +76,7 @@ func (f textFormatterCommon) writeCommonMetadataFormat(
 	w := format.NewLineWriter()
 	m := c.GetMetadata()
 
-	if m.Description.String() != "" || !f.DoNotWriteEmptyBezeichnung {
+	if m.Description.String() != "" || !f.DoNotWriteEmptyDescription {
 		sr := bufio.NewReader(strings.NewReader(m.Description.String()))
 
 		for {

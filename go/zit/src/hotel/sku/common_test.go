@@ -27,7 +27,7 @@ func (t inlineTypChecker) IsInlineTyp(k ids.Type) bool {
 	return t.answer
 }
 
-func makeEtiketten(t test_logz.T, vs ...string) (es ids.TagSet) {
+func makeTagSet(t test_logz.T, vs ...string) (es ids.TagSet) {
 	var err error
 
 	if es, err = collections_ptr.MakeValueSetString[ids.Tag, *ids.Tag](nil, vs...); err != nil {
@@ -73,7 +73,7 @@ func readFormat(
 	return
 }
 
-func TestMakeEtiketten(t1 *testing.T) {
+func TestMakeTags(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	vs := []string{
@@ -144,7 +144,7 @@ func TestEqualitySelf(t1 *testing.T) {
 		Type:        makeBlobExt(t, "text"),
 	}
 
-	text.SetTags(makeEtiketten(t,
+	text.SetTags(makeTagSet(t,
 		"tag1",
 		"tag2",
 		"tag3",
@@ -163,7 +163,7 @@ func TestEqualityNotSelf(t1 *testing.T) {
 		Type:        makeBlobExt(t, "text"),
 	}
 
-	text.SetTags(makeEtiketten(t,
+	text.SetTags(makeTagSet(t,
 		"tag1",
 		"tag2",
 		"tag3",
@@ -174,7 +174,7 @@ func TestEqualityNotSelf(t1 *testing.T) {
 		Type:        makeBlobExt(t, "text"),
 	}
 
-	text1.SetTags(makeEtiketten(t,
+	text1.SetTags(makeTagSet(t,
 		"tag1",
 		"tag2",
 		"tag3",
@@ -221,7 +221,7 @@ func TestReadWithoutBlob(t1 *testing.T) {
 		Type:        makeBlobExt(t, "md"),
 	}
 
-	expected.SetTags(makeEtiketten(t,
+	expected.SetTags(makeTagSet(t,
 		"tag1",
 		"tag2",
 		"tag3",
@@ -236,7 +236,7 @@ func TestReadWithoutBlob(t1 *testing.T) {
 	}
 }
 
-func TestReadWithoutBlobWithMultilineBezeichnung(t1 *testing.T) {
+func TestReadWithoutBlobWithMultilineDescription(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	af := test_object_metadata_io.FixtureFactoryReadWriteCloser(nil)
@@ -261,7 +261,7 @@ func TestReadWithoutBlobWithMultilineBezeichnung(t1 *testing.T) {
 		Type:        makeBlobExt(t, "md"),
 	}
 
-	expected.SetTags(makeEtiketten(t,
+	expected.SetTags(makeTagSet(t,
 		"tag1",
 		"tag2",
 		"tag3",
@@ -311,7 +311,7 @@ the body
 		"036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064",
 	))
 
-	expected.SetTags(makeEtiketten(t,
+	expected.SetTags(makeTagSet(t,
 		"tag1",
 		"tag2",
 		"tag3",
@@ -397,7 +397,7 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 		Type:        makeBlobExt(t, "md"),
 	}
 
-	z.SetTags(makeEtiketten(t,
+	z.SetTags(makeTagSet(t,
 		"tag1",
 		"tag2",
 		"tag3",
@@ -439,7 +439,7 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 		Type:        makeBlobExt(t, "md"),
 	}
 
-	z.SetTags(makeEtiketten(t,
+	z.SetTags(makeTagSet(t,
 		"tag1",
 		"tag2",
 		"tag3",

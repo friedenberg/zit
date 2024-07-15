@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-var binaryFieldOrder = []keys.Key{
+var binaryFieldOrder = []keys.Binary{
 	keys.Sigil,
 	keys.ObjectId,
 	keys.Blob,
@@ -23,7 +23,7 @@ var binaryFieldOrder = []keys.Key{
 	keys.Tag,
 	keys.Tai,
 	keys.Type,
-	keys.ParentMetadataParentObjectId,
+	keys.ShaParentMetadataParentObjectId,
 	keys.ShaMetadataParentObjectId,
 	keys.ShaMetadata,
 	keys.ShaMetadataWithoutTai,
@@ -257,8 +257,8 @@ func (bf *binaryDecoder) readSigil(
 		return
 	}
 
-	if bf.Key != keys.Sigil {
-		err = errors.Wrapf(errExpectedSigil, "Key: %s", bf.Key)
+	if bf.Binary != keys.Sigil {
+		err = errors.Wrapf(errExpectedSigil, "Key: %s", bf.Binary)
 		return
 	}
 
@@ -275,7 +275,7 @@ func (bf *binaryDecoder) readSigil(
 func (bf *binaryDecoder) readFieldKey(
 	sk *sku.Transacted,
 ) (err error) {
-	switch bf.Key {
+	switch bf.Binary {
 	case keys.Blob:
 		if _, err = sk.Metadata.Blob.ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
@@ -319,7 +319,7 @@ func (bf *binaryDecoder) readFieldKey(
 			return
 		}
 
-	case keys.ParentMetadataParentObjectId:
+	case keys.ShaParentMetadataParentObjectId:
 		if _, err = sk.Metadata.Mutter().ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return

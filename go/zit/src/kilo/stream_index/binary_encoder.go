@@ -54,7 +54,7 @@ func (bf *binaryEncoder) writeFormat(
 
 	for _, f := range binaryFieldOrder {
 		bf.binaryField.Reset()
-		bf.Key = f
+		bf.Binary = f
 
 		if _, err = bf.writeFieldKey(sk); err != nil {
 			err = errors.Wrapf(err, "Sku: %s", sk)
@@ -96,7 +96,7 @@ func (bf *binaryEncoder) writeFormat(
 func (bf *binaryEncoder) writeFieldKey(
 	sk skuWithSigil,
 ) (n int64, err error) {
-	switch bf.Key {
+	switch bf.Binary {
 	case keys.Sigil:
 		s := sk.Sigil
 		s.Add(bf.Sigil)
@@ -171,7 +171,7 @@ func (bf *binaryEncoder) writeFieldKey(
 			return
 		}
 
-	case keys.ParentMetadataParentObjectId:
+	case keys.ShaParentMetadataParentObjectId:
 		if n, err = bf.writeSha(sk.Metadata.Mutter(), true); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -242,7 +242,7 @@ func (bf *binaryEncoder) writeFieldKey(
 		}
 
 	default:
-		panic(fmt.Sprintf("unsupported key: %s", bf.Key))
+		panic(fmt.Sprintf("unsupported key: %s", bf.Binary))
 	}
 
 	return

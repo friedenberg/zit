@@ -70,7 +70,7 @@ func (u *Env) StringFormatWriterTyp(
 	return id_fmts.MakeTypCliFormat(co)
 }
 
-func (u *Env) StringFormatWriterBezeichnung(
+func (u *Env) StringFormatWriterDescription(
 	truncate descriptions.CliFormatTruncation,
 	co string_format_writer.ColorOptions,
 	quote bool,
@@ -91,7 +91,7 @@ func (u *Env) StringFormatWriterMetadatei(
 		u.config.PrintOptions,
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterTyp(co),
-		u.StringFormatWriterBezeichnung(
+		u.StringFormatWriterDescription(
 			descriptions.CliFormatTruncation66CharEllipsis,
 			co,
 			true,
@@ -109,7 +109,7 @@ func (u *Env) SkuFmtOrganize() *sku_fmt.Organize {
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterKennungAligned(co),
 		u.StringFormatWriterTyp(co),
-		u.StringFormatWriterBezeichnung(descriptions.CliFormatTruncationNone, co, false),
+		u.StringFormatWriterDescription(descriptions.CliFormatTruncationNone, co, false),
 		u.StringFormatWriterEtiketten(co),
 	)
 }
@@ -274,7 +274,7 @@ func (u *Env) PrinterCheckedOutChrome() interfaces.FuncIter[sku.CheckedOutLike] 
 			u.StringFormatWriterKennung(oo.ColorOptionsErr),
 			u.StringFormatWriterMetadatei(oo.ColorOptionsErr),
 			u.StringFormatWriterTyp(oo.ColorOptionsErr),
-			u.StringFormatWriterBezeichnung(
+			u.StringFormatWriterDescription(
 				descriptions.CliFormatTruncation66CharEllipsis,
 				oo.ColorOptionsErr,
 				true,
@@ -292,7 +292,7 @@ func (u *Env) PrinterCheckedOutChrome() interfaces.FuncIter[sku.CheckedOutLike] 
 			u.StringFormatWriterKennung(oo.ColorOptionsOut),
 			u.StringFormatWriterMetadatei(oo.ColorOptionsOut),
 			u.StringFormatWriterTyp(oo.ColorOptionsOut),
-			u.StringFormatWriterBezeichnung(
+			u.StringFormatWriterDescription(
 				descriptions.CliFormatTruncation66CharEllipsis,
 				oo.ColorOptionsOut,
 				true,

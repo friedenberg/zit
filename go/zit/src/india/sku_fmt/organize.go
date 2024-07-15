@@ -29,7 +29,7 @@ func MakeFormatOrganize(
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 	kennungStringFormatWriter id_fmts.Aligned,
 	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
-	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description],
+	descriptionStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description],
 	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
 ) *Organize {
 	options.PrintTime = false
@@ -40,7 +40,7 @@ func MakeFormatOrganize(
 		shaStringFormatWriter:         shaStringFormatWriter,
 		kennungStringFormatWriter:     kennungStringFormatWriter,
 		typStringFormatWriter:         typStringFormatWriter,
-		bezeichnungStringFormatWriter: bezeichnungStringFormatWriter,
+		descriptionStringFormatWriter: descriptionStringFormatWriter,
 		etikettenStringFormatWriter:   etikettenStringFormatWriter,
 	}
 }
@@ -54,7 +54,7 @@ type Organize struct {
 	shaStringFormatWriter         interfaces.StringFormatWriter[interfaces.Sha]
 	kennungStringFormatWriter     id_fmts.Aligned
 	typStringFormatWriter         interfaces.StringFormatWriter[*ids.Type]
-	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description]
+	descriptionStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description]
 	etikettenStringFormatWriter   interfaces.StringFormatWriter[*ids.Tag]
 }
 
@@ -209,7 +209,7 @@ func (f *Organize) WriteStringFormat(
 			return
 		}
 
-		n2, err = f.bezeichnungStringFormatWriter.WriteStringFormat(sw, b)
+		n2, err = f.descriptionStringFormatWriter.WriteStringFormat(sw, b)
 		n += n2
 
 		if err != nil {

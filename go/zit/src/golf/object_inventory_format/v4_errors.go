@@ -13,6 +13,7 @@ var (
 	errV4EmptyKey                  = errors.New("empty key")
 	errV4KeysNotSorted             = errors.New("keys not sorted")
 	errV4InvalidKey                = errors.New("invalid key")
+	errV6InvalidKey                = errors.New("invalid key")
 )
 
 func makeErrWithBytes(err error, bs []byte) error {

@@ -24,7 +24,7 @@ type cliCheckedOut struct {
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata]
 
 	typStringFormatWriter         interfaces.StringFormatWriter[*ids.Type]
-	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description]
+	descriptionStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description]
 	etikettenStringFormatWriter   interfaces.StringFormatWriter[*ids.Tag]
 }
 
@@ -34,7 +34,7 @@ func MakeCliCheckedOutFormat(
 	kennungStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata],
 	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
-	bezeichnungStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description],
+	descriptionStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description],
 	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
 ) *cliCheckedOut {
 	return &cliCheckedOut{
@@ -44,7 +44,7 @@ func MakeCliCheckedOutFormat(
 		kennungStringFormatWriter:     kennungStringFormatWriter,
 		metadateiStringFormatWriter:   metadateiStringFormatWriter,
 		typStringFormatWriter:         typStringFormatWriter,
-		bezeichnungStringFormatWriter: bezeichnungStringFormatWriter,
+		descriptionStringFormatWriter: descriptionStringFormatWriter,
 		etikettenStringFormatWriter:   etikettenStringFormatWriter,
 	}
 }
@@ -169,7 +169,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 				return
 			}
 
-			n2, err = f.bezeichnungStringFormatWriter.WriteStringFormat(
+			n2, err = f.descriptionStringFormatWriter.WriteStringFormat(
 				sw,
 				&browser.Metadata.Description,
 			)

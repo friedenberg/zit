@@ -45,7 +45,7 @@ func (c Diff) RunWithQuery(
 	qg *query.Group,
 ) (err error) {
 	co := checkout_options.TextFormatterOptions{
-		DoNotWriteEmptyBezeichnung: true,
+		DoNotWriteEmptyDescription: true,
 	}
 
 	opDiffFS := user_ops.Diff{
@@ -73,7 +73,7 @@ func (c Diff) RunWithQuery(
 				}
 
 			default:
-				ui.Err().Printf("unsupportted type: %T, %s", cot, cot)
+				ui.Err().Printf("unsupported type: %T, %s", cot, cot)
 			}
 
 			return

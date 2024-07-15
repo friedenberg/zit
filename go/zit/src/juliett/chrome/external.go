@@ -63,7 +63,7 @@ func (e *External) SaveAkte(s fs_home.Home) (err error) {
 func (e *External) SetItem(i item, overwrite bool) (err error) {
 	e.item = i
 
-	if err = i.WriteToMetadatei(&e.browser.Metadata); err != nil {
+	if err = i.WriteToMetadata(&e.browser.Metadata); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -71,7 +71,7 @@ func (e *External) SetItem(i item, overwrite bool) (err error) {
 	e.Metadata.Tai = e.browser.Metadata.GetTai()
 
 	if overwrite {
-		if err = i.WriteToMetadatei(&e.Metadata); err != nil {
+		if err = i.WriteToMetadata(&e.Metadata); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

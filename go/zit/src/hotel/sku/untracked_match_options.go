@@ -12,8 +12,8 @@ type UnsureMatchType byte
 
 const (
 	UnsureMatchTypeNone = UnsureMatchType(iota << 1)
-	UnsureMatchTypeMetadateiSansTaiHistory
-	UnsureMatchTypeBezeichnung
+	UnsureMatchTypeMetadataWithoutTaiHistory
+	UnsureMatchTypeDescription
 
 	UnsureMatchTypeAll = UnsureMatchType(^byte(0))
 )
@@ -27,16 +27,16 @@ func (a UnsureMatchType) MakeMatchMap() UnsureMatchMaps {
 		Lookup: make(map[UnsureMatchType]UnsureMatchMap),
 	}
 
-	if a.Contains(UnsureMatchTypeMetadateiSansTaiHistory) {
-		maps.Lookup[UnsureMatchTypeMetadateiSansTaiHistory] = UnsureMatchMap{
-			UnsureMatchType: UnsureMatchTypeMetadateiSansTaiHistory,
+	if a.Contains(UnsureMatchTypeMetadataWithoutTaiHistory) {
+		maps.Lookup[UnsureMatchTypeMetadataWithoutTaiHistory] = UnsureMatchMap{
+			UnsureMatchType: UnsureMatchTypeMetadataWithoutTaiHistory,
 			Lookup:          make(map[sha.Bytes]CheckedOutLikeMutableSet),
 		}
 	}
 
-	if a.Contains(UnsureMatchTypeBezeichnung) {
-		maps.Lookup[UnsureMatchTypeBezeichnung] = UnsureMatchMap{
-			UnsureMatchType: UnsureMatchTypeBezeichnung,
+	if a.Contains(UnsureMatchTypeDescription) {
+		maps.Lookup[UnsureMatchTypeDescription] = UnsureMatchMap{
+			UnsureMatchType: UnsureMatchTypeDescription,
 			Lookup:          make(map[sha.Bytes]CheckedOutLikeMutableSet),
 		}
 	}
@@ -50,7 +50,7 @@ type UnsureMatchOptions struct {
 
 func UnsureMatchOptionsDefault() UnsureMatchOptions {
 	return UnsureMatchOptions{
-		UnsureMatchType: UnsureMatchTypeMetadateiSansTaiHistory | UnsureMatchTypeBezeichnung,
+		UnsureMatchType: UnsureMatchTypeMetadataWithoutTaiHistory | UnsureMatchTypeDescription,
 	}
 }
 
@@ -96,10 +96,10 @@ func MakeUnsureMatchMapsCollector(
 			var k sha.Bytes
 
 			switch t {
-			case UnsureMatchTypeMetadateiSansTaiHistory:
+			case UnsureMatchTypeMetadataWithoutTaiHistory:
 				k = e.Metadata.Shas.SelfMetadataWithoutTai.GetBytes()
 
-			case UnsureMatchTypeBezeichnung:
+			case UnsureMatchTypeDescription:
 				k = sha.FromString(e.Metadata.Description.String()).GetBytes()
 
 			default:
@@ -133,10 +133,10 @@ func MakeUnsureMatchMapsMatcher(
 			var k sha.Bytes
 
 			switch t {
-			case UnsureMatchTypeMetadateiSansTaiHistory:
+			case UnsureMatchTypeMetadataWithoutTaiHistory:
 				k = sk.Metadata.Shas.SelfMetadataWithoutTai.GetBytes()
 
-			case UnsureMatchTypeBezeichnung:
+			case UnsureMatchTypeDescription:
 				k = sha.FromString(sk.Metadata.Description.String()).GetBytes()
 
 			default:

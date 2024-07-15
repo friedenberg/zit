@@ -13,18 +13,18 @@ import (
 )
 
 type binaryField struct {
-	keys.Key
+	keys.Binary
 	ContentLength [2]uint8
 	Content       bytes.Buffer
 }
 
 func (bf *binaryField) String() string {
 	cl, _, _ := bf.GetContentLength()
-	return fmt.Sprintf("%s:%d:%x", bf.Key, cl, bf.Content.Bytes())
+	return fmt.Sprintf("%s:%d:%x", bf.Binary, cl, bf.Content.Bytes())
 }
 
 func (bf *binaryField) Reset() {
-	bf.Key.Reset()
+	bf.Binary.Reset()
 	bf.ContentLength[0] = 0
 	bf.ContentLength[1] = 0
 	bf.Content.Reset()
@@ -73,7 +73,7 @@ var (
 func (bf *binaryField) ReadFrom(r io.Reader) (n int64, err error) {
 	var n1 int
 	var n2 int64
-	n2, err = bf.Key.ReadFrom(r)
+	n2, err = bf.Binary.ReadFrom(r)
 	n += int64(n2)
 
 	if err != nil {
@@ -123,7 +123,7 @@ func (bf *binaryField) WriteTo(w io.Writer) (n int64, err error) {
 
 	var n1 int
 	var n2 int64
-	n2, err = bf.Key.WriteTo(w)
+	n2, err = bf.Binary.WriteTo(w)
 	n += int64(n2)
 
 	if err != nil {
