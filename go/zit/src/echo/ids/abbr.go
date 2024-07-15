@@ -18,7 +18,7 @@ type (
 			Abbreviate FuncAbbreviateString[sha.Sha, *sha.Sha]
 		}
 		// TODO switch to Kennung2
-		Hinweis abbrOne[ZettelId, *ZettelId]
+		ZettelId abbrOne[ZettelId, *ZettelId]
 	}
 
 	abbrOne[V IdGeneric[V], VPtr IdGenericPtr[V]] struct {
@@ -38,7 +38,7 @@ func DontAbbreviateString[VPtr interfaces.Stringer](k VPtr) (string, error) {
 func (a Abbr) ExpanderFor(g genres.Genre) FuncExpandString {
 	switch g {
 	case genres.Zettel:
-		return a.Hinweis.Expand
+		return a.ZettelId.Expand
 
 	case genres.Tag, genres.Type, genres.Repo:
 		return DontExpandString
@@ -48,7 +48,7 @@ func (a Abbr) ExpanderFor(g genres.Genre) FuncExpandString {
 	}
 }
 
-func (ao abbrOne[V, VPtr]) AbbreviateKennung(
+func (ao abbrOne[V, VPtr]) AbbreviateObjectId(
 	k IdLike,
 ) (v string, err error) {
 	if ao.Abbreviate == nil {
@@ -83,7 +83,7 @@ func (ao abbrOne[V, VPtr]) AbbreviateKennung(
 func (a Abbr) LenKopfUndSchwanz(
 	in *ObjectId,
 ) (kopf, schwanz int, err error) {
-	if in.GetGenre() != genres.Zettel || a.Hinweis.Abbreviate == nil {
+	if in.GetGenre() != genres.Zettel || a.ZettelId.Abbreviate == nil {
 		kopf, schwanz = in.LenHeadAndTail()
 		return
 	}
@@ -97,7 +97,7 @@ func (a Abbr) LenKopfUndSchwanz(
 
 	var abbr string
 
-	if abbr, err = a.Hinweis.AbbreviateKennung(h); err != nil {
+	if abbr, err = a.ZettelId.AbbreviateObjectId(h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -129,7 +129,7 @@ func (a Abbr) AbbreviateHinweisOnly(
 		return
 	}
 
-	getAbbr = a.Hinweis.AbbreviateKennung
+	getAbbr = a.ZettelId.AbbreviateObjectId
 
 	var abbr string
 
@@ -149,7 +149,7 @@ func (a Abbr) AbbreviateHinweisOnly(
 func (a Abbr) ExpandHinweisOnly(
 	in *ObjectId,
 ) (err error) {
-	if in.GetGenre() != genres.Zettel || a.Hinweis.Expand == nil {
+	if in.GetGenre() != genres.Zettel || a.ZettelId.Expand == nil {
 		return
 	}
 
@@ -162,7 +162,7 @@ func (a Abbr) ExpandHinweisOnly(
 
 	var ex string
 
-	if ex, err = a.Hinweis.Expand(h.String()); err != nil {
+	if ex, err = a.ZettelId.Expand(h.String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -175,7 +175,7 @@ func (a Abbr) ExpandHinweisOnly(
 	return
 }
 
-func (a Abbr) AbbreviateKennung(
+func (a Abbr) AbbreviateObjectId(
 	in *ObjectId,
 	out *ObjectId,
 ) (err error) {
@@ -183,7 +183,7 @@ func (a Abbr) AbbreviateKennung(
 
 	switch in.GetGenre() {
 	case genres.Zettel:
-		getAbbr = a.Hinweis.AbbreviateKennung
+		getAbbr = a.ZettelId.AbbreviateObjectId
 
 	case genres.Tag, genres.Type, genres.Repo:
 		getAbbr = DontAbbreviateString

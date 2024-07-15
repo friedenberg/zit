@@ -48,7 +48,7 @@ func (s *Store) ReadTransactedFromObjectId(
 	return
 }
 
-func (s *Store) ReadTransactedFromKennungKastenSigil(
+func (s *Store) ReadTransactedFromObjectIdRepoIdSigil(
 	k1 interfaces.ObjectId,
 	ka ids.RepoId,
 	si ids.Sigil,
@@ -66,14 +66,14 @@ func (s *Store) ReadTransactedFromKennungKastenSigil(
 
 	var k3 *ids.ObjectIdWithRepoId
 
-	if k3, err = ids.MakeKennung3(k1, ka); err != nil {
+	if k3, err = ids.MakeObjectIdWithRepoId(k1, ka); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	var ze sku.ExternalLike
 
-	if ze, err = s.ReadOneKennungExternal(
+	if ze, err = s.ReadOneObjectIdExternal(
 		ObjekteOptions{
 			Mode: objekte_mode.ModeUpdateTai,
 		},

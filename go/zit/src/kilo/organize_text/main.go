@@ -120,7 +120,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		}
 	}
 
-	if aligned, ok := aw.stringFormatWriter.(sku_fmt.KennungAlignedFormat); ok {
+	if aligned, ok := aw.stringFormatWriter.(sku_fmt.ObjectIdAlignedFormat); ok {
 		aligned.SetMaxKopfUndSchwanz(kopf, schwanz)
 	}
 

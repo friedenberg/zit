@@ -307,7 +307,7 @@ func (k3 *ObjectIdWithRepoId) GetGenre() interfaces.Genre {
 	return k3.g
 }
 
-func MakeKennung3(
+func MakeObjectIdWithRepoId(
 	v interfaces.ObjectId,
 	ka RepoId,
 ) (k *ObjectIdWithRepoId, err error) {
@@ -496,7 +496,7 @@ func (h *ObjectIdWithRepoId) Set(v string) (err error) {
 		k = h
 
 	default:
-		err = genres.MakeErrUnrecognizedGattung(h.g.GetGenreString())
+		err = genres.MakeErrUnrecognizedGenre(h.g.GetGenreString())
 	}
 
 	if err != nil {

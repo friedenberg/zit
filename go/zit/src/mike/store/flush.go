@@ -78,7 +78,7 @@ func (c *Store) Flush(
 		wg.Do(func() error { return c.verzeichnisse.Flush(printerHeader) })
 		wg.Do(c.GetAbbrStore().Flush)
 		wg.Do(c.typenIndex.Flush)
-		wg.Do(c.kennungIndex.Flush)
+		wg.Do(c.objectIdIndex.Flush)
 		wg.Do(c.Abbr.Flush)
 	}
 

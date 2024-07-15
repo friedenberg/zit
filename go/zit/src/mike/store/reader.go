@@ -30,13 +30,13 @@ func (s *Store) ReadOneInto(
 			err = nil
 		}
 
-		if sk, err = s.ReadOneKennung(k1); err != nil {
+		if sk, err = s.ReadOneObjectId(k1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case genres.Type, genres.Tag, genres.Repo:
-		if sk, err = s.ReadOneKennung(k1); err != nil {
+		if sk, err = s.ReadOneObjectId(k1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -49,7 +49,7 @@ func (s *Store) ReadOneInto(
 		}
 
 	default:
-		err = genres.MakeErrUnsupportedGattung(k1)
+		err = genres.MakeErrUnsupportedGenre(k1)
 		return
 	}
 

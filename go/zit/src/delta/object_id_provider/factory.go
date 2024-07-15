@@ -9,21 +9,21 @@ import (
 )
 
 const (
-	FilePathKennungYin  = "Yin"
-	FilePathKennungYang = "Yang"
+	FilePathZettelIdYin  = "Yin"
+	FilePathZettelIdYang = "Yang"
 )
 
-type Hinweisen struct {
+type Provider struct {
 	sync.Locker
 	yin  provider
 	yang provider
 }
 
-func New(ps interfaces.Directory) (f *Hinweisen, err error) {
-	providerPathYin := path.Join(ps.DirKennung(), FilePathKennungYin)
-	providerPathYang := path.Join(ps.DirKennung(), FilePathKennungYang)
+func New(ps interfaces.Directory) (f *Provider, err error) {
+	providerPathYin := path.Join(ps.DirKennung(), FilePathZettelIdYin)
+	providerPathYang := path.Join(ps.DirKennung(), FilePathZettelIdYang)
 
-	f = &Hinweisen{
+	f = &Provider{
 		Locker: &sync.Mutex{},
 	}
 
@@ -40,10 +40,10 @@ func New(ps interfaces.Directory) (f *Hinweisen, err error) {
 	return
 }
 
-func (hf *Hinweisen) Left() provider {
+func (hf *Provider) Left() provider {
 	return hf.yin
 }
 
-func (hf *Hinweisen) Right() provider {
+func (hf *Provider) Right() provider {
 	return hf.yang
 }

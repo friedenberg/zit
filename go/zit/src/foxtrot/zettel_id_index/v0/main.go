@@ -28,7 +28,7 @@ type oldIndex struct {
 
 	encodedIds
 
-	oldZettelIdStore *object_id_provider.Hinweisen
+	oldZettelIdStore *object_id_provider.Provider
 
 	didRead    bool
 	hasChanges bool
@@ -173,7 +173,7 @@ func (i *oldIndex) Reset() (err error) {
 
 func (i *oldIndex) AddHinweis(k1 ids.IdLike) (err error) {
 	if !k1.GetGenre().EqualsGenre(genres.Zettel) {
-		err = genres.MakeErrUnsupportedGattung(k1)
+		err = genres.MakeErrUnsupportedGenre(k1)
 		return
 	}
 
@@ -191,12 +191,12 @@ func (i *oldIndex) AddHinweis(k1 ids.IdLike) (err error) {
 
 	var left, right int
 
-	if left, err = i.oldZettelIdStore.Left().Kennung(h.GetHead()); err != nil {
+	if left, err = i.oldZettelIdStore.Left().ZettelId(h.GetHead()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if right, err = i.oldZettelIdStore.Right().Kennung(h.GetTail()); err != nil {
+	if right, err = i.oldZettelIdStore.Right().ZettelId(h.GetTail()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -231,7 +231,7 @@ func (i *oldIndex) CreateHinweis() (h *ids.ZettelId, err error) {
 	}
 
 	if len(i.AvailableIds) == 0 {
-		err = errors.Wrap(object_id_provider.ErrHinweisenExhausted{})
+		err = errors.Wrap(object_id_provider.ErrZettelIdsExhausted{})
 		return
 	}
 

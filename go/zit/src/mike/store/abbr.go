@@ -32,11 +32,11 @@ type AbbrStore interface {
 }
 
 type indexAbbrEncodableTridexes struct {
-	Shas      indexNotHinweis[sha.Sha, *sha.Sha]
-	Hinweis   indexHinweis
-	Etiketten indexNotHinweis[ids.Tag, *ids.Tag]
-	Typen     indexNotHinweis[ids.Type, *ids.Type]
-	Kisten    indexNotHinweis[ids.RepoId, *ids.RepoId]
+	Shas     indexNotZettelId[sha.Sha, *sha.Sha]
+	ZettelId indexZettelId
+	Tags     indexNotZettelId[ids.Tag, *ids.Tag]
+	Types    indexNotZettelId[ids.Type, *ids.Type]
+	RepoIds  indexNotZettelId[ids.RepoId, *ids.RepoId]
 }
 
 type indexAbbr struct {
@@ -62,30 +62,30 @@ func newIndexAbbr(
 		path:    p,
 		fs_home: fs_home,
 		indexAbbrEncodableTridexes: indexAbbrEncodableTridexes{
-			Shas: indexNotHinweis[sha.Sha, *sha.Sha]{
-				Kennungen: tridex.Make(),
+			Shas: indexNotZettelId[sha.Sha, *sha.Sha]{
+				ObjectIds: tridex.Make(),
 			},
-			Hinweis: indexHinweis{
+			ZettelId: indexZettelId{
 				Kopfen:    tridex.Make(),
 				Schwanzen: tridex.Make(),
 			},
-			Etiketten: indexNotHinweis[ids.Tag, *ids.Tag]{
-				Kennungen: tridex.Make(),
+			Tags: indexNotZettelId[ids.Tag, *ids.Tag]{
+				ObjectIds: tridex.Make(),
 			},
-			Typen: indexNotHinweis[ids.Type, *ids.Type]{
-				Kennungen: tridex.Make(),
+			Types: indexNotZettelId[ids.Type, *ids.Type]{
+				ObjectIds: tridex.Make(),
 			},
-			Kisten: indexNotHinweis[ids.RepoId, *ids.RepoId]{
-				Kennungen: tridex.Make(),
+			RepoIds: indexNotZettelId[ids.RepoId, *ids.RepoId]{
+				ObjectIds: tridex.Make(),
 			},
 		},
 	}
 
-	i.indexAbbrEncodableTridexes.Hinweis.readFunc = i.readIfNecessary
-	i.indexAbbrEncodableTridexes.Kisten.readFunc = i.readIfNecessary
+	i.indexAbbrEncodableTridexes.ZettelId.readFunc = i.readIfNecessary
+	i.indexAbbrEncodableTridexes.RepoIds.readFunc = i.readIfNecessary
 	i.indexAbbrEncodableTridexes.Shas.readFunc = i.readIfNecessary
-	i.indexAbbrEncodableTridexes.Etiketten.readFunc = i.readIfNecessary
-	i.indexAbbrEncodableTridexes.Typen.readFunc = i.readIfNecessary
+	i.indexAbbrEncodableTridexes.Tags.readFunc = i.readIfNecessary
+	i.indexAbbrEncodableTridexes.Types.readFunc = i.readIfNecessary
 
 	return
 }
@@ -165,10 +165,10 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 }
 
 func (i *indexAbbr) GetAbbr() (out ids.Abbr) {
-	out.Hinweis.Expand = i.ZettelId().ExpandStringString
+	out.ZettelId.Expand = i.ZettelId().ExpandStringString
 	out.Sha.Expand = i.Shas().ExpandStringString
 
-	out.Hinweis.Abbreviate = i.ZettelId().Abbreviate
+	out.ZettelId.Abbreviate = i.ZettelId().Abbreviate
 	out.Sha.Abbreviate = i.Shas().Abbreviate
 
 	return
@@ -182,7 +182,7 @@ func (i *indexAbbr) AddMatchable(o *sku.Transacted) (err error) {
 
 	i.hasChanges = true
 
-	i.indexAbbrEncodableTridexes.Shas.Kennungen.Add(o.GetBlobSha().String())
+	i.indexAbbrEncodableTridexes.Shas.ObjectIds.Add(o.GetBlobSha().String())
 
 	ks := o.GetObjectId().String()
 
@@ -195,17 +195,17 @@ func (i *indexAbbr) AddMatchable(o *sku.Transacted) (err error) {
 			return
 		}
 
-		i.indexAbbrEncodableTridexes.Hinweis.Kopfen.Add(h.GetHead())
-		i.indexAbbrEncodableTridexes.Hinweis.Schwanzen.Add(h.GetTail())
+		i.indexAbbrEncodableTridexes.ZettelId.Kopfen.Add(h.GetHead())
+		i.indexAbbrEncodableTridexes.ZettelId.Schwanzen.Add(h.GetTail())
 
 	case genres.Type:
-		i.indexAbbrEncodableTridexes.Typen.Kennungen.Add(ks)
+		i.indexAbbrEncodableTridexes.Types.ObjectIds.Add(ks)
 
 	case genres.Tag:
-		i.indexAbbrEncodableTridexes.Etiketten.Kennungen.Add(ks)
+		i.indexAbbrEncodableTridexes.Tags.ObjectIds.Add(ks)
 
 	case genres.Repo:
-		i.indexAbbrEncodableTridexes.Kisten.Kennungen.Add(ks)
+		i.indexAbbrEncodableTridexes.RepoIds.ObjectIds.Add(ks)
 
 		// default:
 		// 	err = errors.Errorf("unsupported objekte: %T", to)
@@ -245,13 +245,13 @@ func (i *indexAbbr) Exists(k *ids.ObjectId) (err error) {
 }
 
 func (i *indexAbbr) ZettelId() (asg AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId]) {
-	asg = &i.indexAbbrEncodableTridexes.Hinweis
+	asg = &i.indexAbbrEncodableTridexes.ZettelId
 
 	return
 }
 
 func (i *indexAbbr) Kisten() (asg AbbrStoreGeneric[ids.RepoId, *ids.RepoId]) {
-	asg = &i.indexAbbrEncodableTridexes.Kisten
+	asg = &i.indexAbbrEncodableTridexes.RepoIds
 
 	return
 }
@@ -263,13 +263,13 @@ func (i *indexAbbr) Shas() (asg AbbrStoreGeneric[sha.Sha, *sha.Sha]) {
 }
 
 func (i *indexAbbr) Etiketten() (asg AbbrStoreGeneric[ids.Tag, *ids.Tag]) {
-	asg = &i.indexAbbrEncodableTridexes.Etiketten
+	asg = &i.indexAbbrEncodableTridexes.Tags
 
 	return
 }
 
 func (i *indexAbbr) Typen() (asg AbbrStoreGeneric[ids.Type, *ids.Type]) {
-	asg = &i.indexAbbrEncodableTridexes.Typen
+	asg = &i.indexAbbrEncodableTridexes.Types
 
 	return
 }

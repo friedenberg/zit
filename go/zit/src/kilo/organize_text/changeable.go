@@ -90,7 +90,7 @@ func (a *Assignment) addToSet(
 			}
 
 			if o.ObjectId.String() == "" {
-				panic(fmt.Sprintf("%s: Kennung is nil", o))
+				panic(fmt.Sprintf("%s: object id is nil", o))
 			}
 
 			if err = z.Metadata.Description.Set(

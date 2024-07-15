@@ -26,7 +26,7 @@ type hinweisIndex struct {
 
 	bitset collections.Bitset
 
-	oldHinweisenStore *object_id_provider.Hinweisen
+	oldHinweisenStore *object_id_provider.Provider
 
 	didRead    bool
 	hasChanges bool
@@ -160,7 +160,7 @@ func (i *hinweisIndex) Reset() (err error) {
 
 func (i *hinweisIndex) AddHinweis(k1 ids.IdLike) (err error) {
 	if !k1.GetGenre().EqualsGenre(genres.Zettel) {
-		err = genres.MakeErrUnsupportedGattung(k1)
+		err = genres.MakeErrUnsupportedGenre(k1)
 		return
 	}
 
@@ -178,12 +178,12 @@ func (i *hinweisIndex) AddHinweis(k1 ids.IdLike) (err error) {
 
 	var left, right int
 
-	if left, err = i.oldHinweisenStore.Left().Kennung(h.GetHead()); err != nil {
+	if left, err = i.oldHinweisenStore.Left().ZettelId(h.GetHead()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if right, err = i.oldHinweisenStore.Right().Kennung(h.GetTail()); err != nil {
+	if right, err = i.oldHinweisenStore.Right().ZettelId(h.GetTail()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -220,7 +220,7 @@ func (i *hinweisIndex) CreateHinweis() (h *ids.ZettelId, err error) {
 	rand.Seed(time.Now().UnixNano())
 
 	if i.bitset.CountOn() == 0 {
-		err = errors.Wrap(object_id_provider.ErrHinweisenExhausted{})
+		err = errors.Wrap(object_id_provider.ErrZettelIdsExhausted{})
 		return
 	}
 

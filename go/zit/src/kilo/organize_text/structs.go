@@ -122,7 +122,7 @@ func (os Objects) Sort() {
 			return false
 
 		default:
-			// TODO sort by ints for virtual kennung
+			// TODO sort by ints for virtual object id
 			return out[i].ObjectId.String() < out[j].ObjectId.String()
 		}
 	})

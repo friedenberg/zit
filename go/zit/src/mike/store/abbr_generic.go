@@ -42,19 +42,19 @@ func (ih indexNoAbbr[V, VPtr]) Abbreviate(h V) (v string, err error) {
 	return
 }
 
-type indexHinweis struct {
+type indexZettelId struct {
 	readFunc  func() error
 	Kopfen    interfaces.MutableTridex
 	Schwanzen interfaces.MutableTridex
 }
 
-func (ih *indexHinweis) Add(h *ids.ZettelId) (err error) {
+func (ih *indexZettelId) Add(h *ids.ZettelId) (err error) {
 	ih.Kopfen.Add(h.GetHead())
 	ih.Schwanzen.Add(h.GetTail())
 	return
 }
 
-func (ih *indexHinweis) Exists(parts [3]string) (err error) {
+func (ih *indexZettelId) Exists(parts [3]string) (err error) {
 	if err = ih.readFunc(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -73,7 +73,7 @@ func (ih *indexHinweis) Exists(parts [3]string) (err error) {
 	return
 }
 
-func (ih *indexHinweis) ExpandStringString(in string) (out string, err error) {
+func (ih *indexZettelId) ExpandStringString(in string) (out string, err error) {
 	var h *ids.ZettelId
 
 	if h, err = ih.ExpandString(in); err != nil {
@@ -86,7 +86,7 @@ func (ih *indexHinweis) ExpandStringString(in string) (out string, err error) {
 	return
 }
 
-func (ih *indexHinweis) ExpandString(s string) (h *ids.ZettelId, err error) {
+func (ih *indexZettelId) ExpandString(s string) (h *ids.ZettelId, err error) {
 	if err = ih.readFunc(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -107,7 +107,7 @@ func (ih *indexHinweis) ExpandString(s string) (h *ids.ZettelId, err error) {
 	return
 }
 
-func (ih *indexHinweis) Expand(
+func (ih *indexZettelId) Expand(
 	hAbbr *ids.ZettelId,
 ) (h *ids.ZettelId, err error) {
 	if err = ih.readFunc(); err != nil {
@@ -126,7 +126,7 @@ func (ih *indexHinweis) Expand(
 	return
 }
 
-func (ih *indexHinweis) Abbreviate(h *ids.ZettelId) (v string, err error) {
+func (ih *indexZettelId) Abbreviate(h *ids.ZettelId) (v string, err error) {
 	if err = ih.readFunc(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -153,26 +153,26 @@ func (ih *indexHinweis) Abbreviate(h *ids.ZettelId) (v string, err error) {
 	return
 }
 
-type indexNotHinweis[
+type indexNotZettelId[
 	K any,
 	KPtr interfaces.StringerSetterPtr[K],
 ] struct {
 	readFunc  func() error
-	Kennungen interfaces.MutableTridex
+	ObjectIds interfaces.MutableTridex
 }
 
-func (ih *indexNotHinweis[K, KPtr]) Add(k KPtr) (err error) {
-	ih.Kennungen.Add(k.String())
+func (ih *indexNotZettelId[K, KPtr]) Add(k KPtr) (err error) {
+	ih.ObjectIds.Add(k.String())
 	return
 }
 
-func (ih *indexNotHinweis[K, KPtr]) Exists(parts [3]string) (err error) {
+func (ih *indexNotZettelId[K, KPtr]) Exists(parts [3]string) (err error) {
 	if err = ih.readFunc(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if !ih.Kennungen.ContainsExpansion(parts[2]) {
+	if !ih.ObjectIds.ContainsExpansion(parts[2]) {
 		err = collections.MakeErrNotFoundString(parts[2])
 		return
 	}
@@ -180,7 +180,7 @@ func (ih *indexNotHinweis[K, KPtr]) Exists(parts [3]string) (err error) {
 	return
 }
 
-func (ih *indexNotHinweis[K, KPtr]) ExpandStringString(
+func (ih *indexNotZettelId[K, KPtr]) ExpandStringString(
 	in string,
 ) (out string, err error) {
 	var k KPtr
@@ -195,7 +195,7 @@ func (ih *indexNotHinweis[K, KPtr]) ExpandStringString(
 	return
 }
 
-func (ih *indexNotHinweis[K, KPtr]) ExpandString(s string) (k KPtr, err error) {
+func (ih *indexNotZettelId[K, KPtr]) ExpandString(s string) (k KPtr, err error) {
 	if err = ih.readFunc(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -217,7 +217,7 @@ func (ih *indexNotHinweis[K, KPtr]) ExpandString(s string) (k KPtr, err error) {
 	return
 }
 
-func (ih *indexNotHinweis[K, KPtr]) Expand(
+func (ih *indexNotZettelId[K, KPtr]) Expand(
 	abbr KPtr,
 ) (exp KPtr, err error) {
 	if err = ih.readFunc(); err != nil {
@@ -225,7 +225,7 @@ func (ih *indexNotHinweis[K, KPtr]) Expand(
 		return
 	}
 
-	ex := ih.Kennungen.Expand(abbr.String())
+	ex := ih.ObjectIds.Expand(abbr.String())
 
 	if ex == "" {
 		// TODO-P4 should try to use the expansion if possible
@@ -243,13 +243,13 @@ func (ih *indexNotHinweis[K, KPtr]) Expand(
 	return
 }
 
-func (ih *indexNotHinweis[K, KPtr]) Abbreviate(k KPtr) (v string, err error) {
+func (ih *indexNotZettelId[K, KPtr]) Abbreviate(k KPtr) (v string, err error) {
 	if err = ih.readFunc(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	v = ih.Kennungen.Abbreviate(k.String())
+	v = ih.ObjectIds.Abbreviate(k.String())
 
 	return
 }

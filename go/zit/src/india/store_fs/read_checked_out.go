@@ -17,7 +17,7 @@ func (s *Store) ReadCheckedOutFromObjectIdFDPair(
 	co = GetCheckedOutPool().Get()
 
 	if err = s.externalStoreInfo.FuncReadOneInto(&em.ObjectId, &co.Internal); err != nil {
-		if collections.IsErrNotFound(err) || genres.IsErrUnsupportedGattung(err) {
+		if collections.IsErrNotFound(err) || genres.IsErrUnsupportedGenre(err) {
 			// TODO mark status as new
 			err = nil
 			co.Internal.ObjectId.ResetWith(&em.ObjectId)

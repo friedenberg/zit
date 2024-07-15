@@ -39,13 +39,13 @@ func (f *aligned) WriteStringFormat(
 	if f.Abbreviations.Hinweisen &&
 		o.GetGenre() == genres.Zettel &&
 		!o.IsVirtual() {
-		if err = f.AbbreviateKennung(o, o); err != nil {
+		if err = f.AbbreviateObjectId(o, o); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	// TODO move to kennung and avoid allocation
+	// TODO move to object id and avoid allocation
 	h := ids.Aligned(o, f.maxKopf, f.maxSchwanz)
 	n1, err = sw.WriteString(h)
 	n += int64(n1)

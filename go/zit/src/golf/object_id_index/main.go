@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/zettel_id_index"
 )
 
-type KennungIndex[
+type ObjectIdIndex[
 	T ids.IdGeneric[T],
 	TPtr ids.IdGenericPtr[T],
 ] interface {
@@ -62,7 +62,7 @@ type index struct {
 	hasChanges bool
 	lock       *sync.RWMutex
 
-	etikettenIndex KennungIndex[ids.Tag, *ids.Tag]
+	etikettenIndex ObjectIdIndex[ids.Tag, *ids.Tag]
 	hinweisIndex   zettel_id_index.HinweisIndex
 }
 

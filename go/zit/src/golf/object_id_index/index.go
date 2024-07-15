@@ -26,8 +26,8 @@ type index2[
 	readOnce        *sync.Once
 	hasChanges      bool
 	lock            *sync.RWMutex
-	IntsToKennungen map[int]TPtr
-	Kennungen       map[string]*ids.IndexedLike
+	IntsToObjectIds map[int]TPtr
+	ObjectIds       map[string]*ids.IndexedLike
 }
 
 func MakeIndex2[
@@ -42,8 +42,8 @@ func MakeIndex2[
 		vf:              vf,
 		readOnce:        &sync.Once{},
 		lock:            &sync.RWMutex{},
-		IntsToKennungen: make(map[int]TPtr),
-		Kennungen:       make(map[string]*ids.IndexedLike),
+		IntsToObjectIds: make(map[int]TPtr),
+		ObjectIds:       make(map[string]*ids.IndexedLike),
 	}
 
 	return
@@ -60,8 +60,8 @@ func (i *index2[T, TPtr]) Reset() error {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
-	i.Kennungen = make(map[string]*ids.IndexedLike)
-	i.IntsToKennungen = make(map[int]TPtr)
+	i.ObjectIds = make(map[string]*ids.IndexedLike)
+	i.IntsToObjectIds = make(map[int]TPtr)
 	i.readOnce = &sync.Once{}
 	i.hasChanges = false
 
@@ -108,7 +108,7 @@ func (i *index2[T, TPtr]) WriteTo(w1 io.Writer) (n int64, err error) {
 
 	enc := gob.NewEncoder(w)
 
-	if err = enc.Encode(i.Kennungen); err != nil {
+	if err = enc.Encode(i.ObjectIds); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -152,7 +152,7 @@ func (i *index2[T, TPtr]) ReadFrom(r1 io.Reader) (n int64, err error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
-	if err = dec.Decode(&i.Kennungen); err != nil {
+	if err = dec.Decode(&i.ObjectIds); err != nil {
 		if errors.IsEOF(err) {
 			err = nil
 		} else {
@@ -172,7 +172,7 @@ func (i *index2[T, TPtr]) Each(
 		return
 	}
 
-	for _, id := range i.Kennungen {
+	for _, id := range i.ObjectIds {
 		if err = f(*id); err != nil {
 			if iter.IsStopIteration(err) {
 				err = nil
@@ -195,7 +195,7 @@ func (i *index2[T, TPtr]) EachSchwanzen(
 		return
 	}
 
-	for _, id := range i.Kennungen {
+	for _, id := range i.ObjectIds {
 		if id.GetSchwanzenCount() == 0 {
 			continue
 		}
@@ -220,10 +220,10 @@ func (i *index2[T, TPtr]) GetAll() (out []ids.IdLike, err error) {
 		return
 	}
 
-	out = make([]ids.IdLike, 0, len(i.Kennungen))
+	out = make([]ids.IdLike, 0, len(i.ObjectIds))
 
-	for _, ki := range i.Kennungen {
-		out = append(out, ki.GetKennung())
+	for _, ki := range i.ObjectIds {
+		out = append(out, ki.GetObjectId())
 	}
 
 	return
@@ -240,7 +240,7 @@ func (i *index2[T, TPtr]) GetInt(in int) (id T, err error) {
 
 	ok := false
 	var id1 TPtr
-	id1, ok = i.IntsToKennungen[in]
+	id1, ok = i.IntsToObjectIds[in]
 
 	if !ok {
 		err = collections.MakeErrNotFoundString(strconv.Itoa(in))
@@ -264,7 +264,7 @@ func (i *index2[T, TPtr]) Get(
 	defer i.lock.RUnlock()
 
 	ok := false
-	id, ok = i.Kennungen[k.String()]
+	id, ok = i.ObjectIds[k.String()]
 
 	if !ok {
 		err = collections.MakeErrNotFound(k)
@@ -292,7 +292,7 @@ func (i *index2[T, TPtr]) StoreDelta(d interfaces.Delta[T]) (err error) {
 
 	if err = d.GetRemoved().Each(
 		func(e T) (err error) {
-			id, ok := i.Kennungen[e.String()]
+			id, ok := i.ObjectIds[e.String()]
 
 			if !ok {
 				err = errors.Errorf("tried to remove %s but it wasn't present", e)
@@ -303,7 +303,7 @@ func (i *index2[T, TPtr]) StoreDelta(d interfaces.Delta[T]) (err error) {
 
 			ui.Log().Printf("new SchwanzenCount: %s -> %d", e, id.SchwanzenCount)
 
-			i.Kennungen[e.String()] = id
+			i.ObjectIds[e.String()] = id
 
 			return
 		},
@@ -344,11 +344,11 @@ func (i *index2[T, TPtr]) StoreOne(k T) (err error) {
 }
 
 func (i *index2[T, TPtr]) storeOne(k T) (err error) {
-	id, ok := i.Kennungen[k.String()]
+	id, ok := i.ObjectIds[k.String()]
 
 	if !ok {
 		id = &ids.IndexedLike{}
-		id.ResetWithKennung(k)
+		id.ResetWithObjectId(k)
 	}
 
 	i.hasChanges = true
@@ -357,7 +357,7 @@ func (i *index2[T, TPtr]) storeOne(k T) (err error) {
 
 	ui.Log().Printf("new SchwanzenCount: %s -> %d", k, id.SchwanzenCount)
 
-	i.Kennungen[k.String()] = id
+	i.ObjectIds[k.String()] = id
 
 	return
 }

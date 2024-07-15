@@ -121,7 +121,7 @@ func (a Genre) EqualsGenre(b interfaces.GenreGetter) bool {
 
 func (a Genre) AssertGenre(b interfaces.GenreGetter) (err error) {
 	if a.GetGenreString() != b.GetGenre().GetGenreString() {
-		err = MakeErrUnsupportedGattung(b)
+		err = MakeErrUnsupportedGenre(b)
 		return
 	}
 
@@ -238,7 +238,7 @@ func (g *Genre) Set(v string) (err error) {
 		*g = Repo
 
 	default:
-		err = errors.Wrap(MakeErrUnrecognizedGattung(v))
+		err = errors.Wrap(MakeErrUnrecognizedGenre(v))
 		return
 	}
 

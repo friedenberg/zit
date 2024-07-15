@@ -85,7 +85,7 @@ func (s *Store) tryRealizeAndOrStore(
 	) && (kinder.ObjectId.IsEmpty() || kinder.GetGenre() == genres.Unknown) {
 		var ken *ids.ZettelId
 
-		if ken, err = s.kennungIndex.CreateHinweis(); err != nil {
+		if ken, err = s.objectIdIndex.CreateHinweis(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -171,7 +171,7 @@ func (s *Store) tryRealizeAndOrStore(
 		}
 
 		if kinder.GetGenre() == genres.Zettel {
-			if err = s.kennungIndex.AddHinweis(&kinder.ObjectId); err != nil {
+			if err = s.objectIdIndex.AddHinweis(&kinder.ObjectId); err != nil {
 				if errors.Is(err, object_id_provider.ErrDoesNotExist{}) {
 					ui.Log().Printf("kennung does not contain value: %s", err)
 					err = nil
@@ -323,11 +323,11 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	updateCheckout bool,
 ) (transactedPtr *sku.Transacted, err error) {
 	e := co.GetSkuExternalLike().GetSku()
-	kennungPtr := e.GetObjectId()
+	objectIdPtr := e.GetObjectId()
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
-			Operation: fmt.Sprintf("create or update %s", kennungPtr),
+			Operation: fmt.Sprintf("create or update %s", objectIdPtr),
 		}
 
 		return
@@ -402,7 +402,7 @@ func (s *Store) UpdateKonfig(
 func (s *Store) createEtikettOrTyp(k *ids.ObjectId) (err error) {
 	switch k.GetGenre() {
 	default:
-		err = genres.MakeErrUnsupportedGattung(k.GetGenre())
+		err = genres.MakeErrUnsupportedGenre(k.GetGenre())
 		return
 
 	case genres.Type, genres.Tag:

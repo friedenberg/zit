@@ -9,43 +9,43 @@ import (
 
 var ErrNoAbbreviation = errors.New("no abbreviation")
 
-func MakeErrUnsupportedGattung(g interfaces.GenreGetter) error {
-	return errors.WrapN(1, errUnsupportedGattung{Genre: g.GetGenre()})
+func MakeErrUnsupportedGenre(g interfaces.GenreGetter) error {
+	return errors.WrapN(1, errUnsupportedGenre{Genre: g.GetGenre()})
 }
 
-func IsErrUnsupportedGattung(err error) bool {
-	return errors.Is(err, errUnsupportedGattung{Genre: Unknown})
+func IsErrUnsupportedGenre(err error) bool {
+	return errors.Is(err, errUnsupportedGenre{Genre: Unknown})
 }
 
-type errUnsupportedGattung struct {
+type errUnsupportedGenre struct {
 	interfaces.Genre
 }
 
-func (e errUnsupportedGattung) Is(target error) (ok bool) {
-	_, ok = target.(errUnsupportedGattung)
+func (e errUnsupportedGenre) Is(target error) (ok bool) {
+	_, ok = target.(errUnsupportedGenre)
 	return
 }
 
-func (e errUnsupportedGattung) Error() string {
+func (e errUnsupportedGenre) Error() string {
 	return fmt.Sprintf("unsupported gattung: %q", e.Genre)
 }
 
-func MakeErrUnrecognizedGattung(v string) errUnrecognizedGattung {
-	return errUnrecognizedGattung(v)
+func MakeErrUnrecognizedGenre(v string) errUnrecognizedGenre {
+	return errUnrecognizedGenre(v)
 }
 
-func IsErrUnrecognizedGattung(err error) bool {
-	return errors.Is(err, errUnrecognizedGattung(""))
+func IsErrUnrecognizedGenre(err error) bool {
+	return errors.Is(err, errUnrecognizedGenre(""))
 }
 
-type errUnrecognizedGattung string
+type errUnrecognizedGenre string
 
-func (e errUnrecognizedGattung) Is(target error) (ok bool) {
-	_, ok = target.(errUnrecognizedGattung)
+func (e errUnrecognizedGenre) Is(target error) (ok bool) {
+	_, ok = target.(errUnrecognizedGenre)
 	return
 }
 
-func (e errUnrecognizedGattung) Error() string {
+func (e errUnrecognizedGenre) Error() string {
 	return fmt.Sprintf("unknown gattung: %q", string(e))
 }
 
@@ -66,13 +66,13 @@ func (e ErrWrongType) Error() string {
 	)
 }
 
-type ErrEmptyKennung struct{}
+type ErrEmptyObjectId struct{}
 
-func (e ErrEmptyKennung) Is(target error) (ok bool) {
-	_, ok = target.(ErrEmptyKennung)
+func (e ErrEmptyObjectId) Is(target error) (ok bool) {
+	_, ok = target.(ErrEmptyObjectId)
 	return
 }
 
-func (e ErrEmptyKennung) Error() string {
-	return fmt.Sprintf("empty kennung")
+func (e ErrEmptyObjectId) Error() string {
+	return fmt.Sprintf("empty object id")
 }

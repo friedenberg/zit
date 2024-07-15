@@ -136,7 +136,7 @@ func (c *FormatZettel) getSku(
 		return
 	}
 
-	if sk, err = u.GetStore().ReadTransactedFromKennungKastenSigil(
+	if sk, err = u.GetStore().ReadTransactedFromObjectIdRepoIdSigil(
 		k,
 		c.RepoId,
 		s,

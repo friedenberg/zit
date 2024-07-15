@@ -65,7 +65,7 @@ func (p provider) Len() int {
 	return len(p)
 }
 
-func (p provider) Kennung(v string) (i int, err error) {
+func (p provider) ZettelId(v string) (i int, err error) {
 	v = Clean(v)
 
 	var s string

@@ -16,7 +16,7 @@ import (
 // type entry struct {
 // 	Sha, Mutter *sha.Sha
 // 	ennui.Range
-// 	kennung.Sigil
+// 	ids.Sigil
 // }
 
 type ObjectIdShaMap map[string]skuWithRangeAndSigil

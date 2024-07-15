@@ -3,28 +3,28 @@ package ids
 import "code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 
 type IndexedLike struct {
-	Int            int
-	Kennung        ObjectId
+	Int int
+	ObjectId
 	SchwanzenCount int
 	Count          int
 }
 
 func MakeIndexed(k IdLike) (i *IndexedLike) {
 	i = &IndexedLike{}
-	i.ResetWithKennung(k)
+	i.ResetWithObjectId(k)
 	return
 }
 
-func (i *IndexedLike) ResetWithKennung(k IdLike) {
-	errors.PanicIfError(i.Kennung.SetWithIdLike(k))
+func (i *IndexedLike) ResetWithObjectId(k IdLike) {
+	errors.PanicIfError(i.ObjectId.SetWithIdLike(k))
 }
 
 func (z *IndexedLike) GetInt() int {
 	return 0
 }
 
-func (z *IndexedLike) GetKennung() IdLike {
-	return &z.Kennung
+func (z *IndexedLike) GetObjectId() IdLike {
+	return &z.ObjectId
 }
 
 func (k *IndexedLike) GetSchwanzenCount() int {
@@ -36,7 +36,7 @@ func (k *IndexedLike) GetCount() int {
 }
 
 func (z *IndexedLike) Reset() {
-	z.Kennung.Reset()
+	z.ObjectId.Reset()
 	z.SchwanzenCount = 0
 	z.Count = 0
 }

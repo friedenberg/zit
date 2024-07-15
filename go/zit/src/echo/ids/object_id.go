@@ -503,7 +503,7 @@ func (h *ObjectId) Set(v string) (err error) {
 		k = h
 
 	default:
-		err = genres.MakeErrUnrecognizedGattung(h.g.GetGenreString())
+		err = genres.MakeErrUnrecognizedGenre(h.g.GetGenreString())
 	}
 
 	if err != nil {

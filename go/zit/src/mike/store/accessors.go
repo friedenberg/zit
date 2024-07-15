@@ -69,8 +69,8 @@ func (s *Store) GetAbbrStore() AbbrStore {
 	return s.Abbr
 }
 
-func (s *Store) GetKennungIndex() object_id_index.Index {
-	return s.kennungIndex
+func (s *Store) GetObjectIdIndex() object_id_index.Index {
+	return s.objectIdIndex
 }
 
 func (s *Store) GetStandort() fs_home.Home {
@@ -93,7 +93,7 @@ func (s *Store) ReadOneEnnui(sh *sha.Sha) (*sku.Transacted, error) {
 	return s.GetVerzeichnisse().ReadOneObjectSha(sh)
 }
 
-func (s *Store) ReadOneKennung(
+func (s *Store) ReadOneObjectId(
 	k interfaces.ObjectId,
 ) (sk *sku.Transacted, err error) {
 	return s.GetVerzeichnisse().ReadOneObjectId(k)

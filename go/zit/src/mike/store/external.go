@@ -10,7 +10,7 @@ import (
 
 type ObjekteOptions = sku.ObjectOptions
 
-func (s *Store) ReadOneKennungExternal(
+func (s *Store) ReadOneObjectIdExternal(
 	o ObjekteOptions,
 	k1 interfaces.ObjectIdWithRepoId,
 	sk *sku.Transacted,

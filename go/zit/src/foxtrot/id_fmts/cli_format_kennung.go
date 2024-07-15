@@ -9,18 +9,18 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
-type kennungCliFormat struct {
+type objectIdCliFormat struct {
 	options              erworben_cli_print_options.PrintOptions
 	sfwColor, sfwNoColor interfaces.StringFormatWriter[*catgut.String]
 	abbr                 ids.Abbr
 }
 
-func MakeKennungCliFormat(
+func MakeObjectIdCliFormat(
 	options erworben_cli_print_options.PrintOptions,
 	co string_format_writer.ColorOptions,
 	abbr ids.Abbr,
-) *kennungCliFormat {
-	return &kennungCliFormat{
+) *objectIdCliFormat {
+	return &objectIdCliFormat{
 		options: options,
 		sfwColor: string_format_writer.MakeColor(
 			co,
@@ -32,7 +32,7 @@ func MakeKennungCliFormat(
 	}
 }
 
-func (f *kennungCliFormat) WriteStringFormat(
+func (f *objectIdCliFormat) WriteStringFormat(
 	w interfaces.WriterAndStringWriter,
 	k *ids.ObjectId,
 ) (n int64, err error) {

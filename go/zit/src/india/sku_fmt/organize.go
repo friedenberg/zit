@@ -20,7 +20,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type KennungAlignedFormat interface {
+type ObjectIdAlignedFormat interface {
 	SetMaxKopfUndSchwanz(kop, schwanz int)
 }
 
@@ -311,7 +311,7 @@ LOOP:
 
 				switch g {
 				case genres.Type:
-					if err = o.Metadata.Type.TodoSetFromKennung2(&k); err != nil {
+					if err = o.Metadata.Type.TodoSetFromObjectId(&k); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
@@ -319,7 +319,7 @@ LOOP:
 				case genres.Tag:
 					var e ids.Tag
 
-					if err = e.TodoSetFromKennung2(&k); err != nil {
+					if err = e.TodoSetFromObjectId(&k); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
@@ -330,7 +330,7 @@ LOOP:
 					}
 
 				default:
-					err = genres.MakeErrUnsupportedGattung(k.GetGenre())
+					err = genres.MakeErrUnsupportedGenre(k.GetGenre())
 					return
 				}
 

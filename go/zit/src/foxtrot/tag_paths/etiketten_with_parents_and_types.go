@@ -21,20 +21,20 @@ func (s TagsWithParentsAndTypes) Len() int {
 	return len(s)
 }
 
-func (s TagsWithParentsAndTypes) ContainsKennungEtikett(
+func (s TagsWithParentsAndTypes) ContainsObjectIdTag(
 	k *ids.ObjectId,
 ) (int, bool) {
-	return s.containsKennungEtikett(k, true)
+	return s.containsObjectIdTag(k, true)
 }
 
-func (s TagsWithParentsAndTypes) ContainsKennungEtikettExact(
+func (s TagsWithParentsAndTypes) ContainsObjectIdTagExact(
 	k *ids.ObjectId,
 ) (int, bool) {
-	return s.containsKennungEtikett(k, false)
+	return s.containsObjectIdTag(k, false)
 }
 
 // TODO make less fragile
-func (s TagsWithParentsAndTypes) containsKennungEtikett(
+func (s TagsWithParentsAndTypes) containsObjectIdTag(
 	k *ids.ObjectId,
 	partial bool,
 ) (int, bool) {

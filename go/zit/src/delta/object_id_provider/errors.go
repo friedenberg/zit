@@ -7,7 +7,7 @@ type ErrDoesNotExist struct {
 }
 
 func (e ErrDoesNotExist) Error() string {
-	return fmt.Sprintf("kennung does not exist: %s", e.Value)
+	return fmt.Sprintf("object id does not exist: %s", e.Value)
 }
 
 func (e ErrDoesNotExist) Is(target error) bool {
@@ -15,13 +15,13 @@ func (e ErrDoesNotExist) Is(target error) bool {
 	return ok
 }
 
-type ErrHinweisenExhausted struct{}
+type ErrZettelIdsExhausted struct{}
 
-func (e ErrHinweisenExhausted) Error() string {
+func (e ErrZettelIdsExhausted) Error() string {
 	return "hinweisen exhausted"
 }
 
-func (e ErrHinweisenExhausted) Is(target error) bool {
-	_, ok := target.(ErrHinweisenExhausted)
+func (e ErrZettelIdsExhausted) Is(target error) bool {
+	_, ok := target.(ErrZettelIdsExhausted)
 	return ok
 }

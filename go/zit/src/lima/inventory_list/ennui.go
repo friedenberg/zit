@@ -16,21 +16,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type Ennui interface {
-	WriteOneObjekteMetadatei(o *sku.Transacted) (err error)
-	ReadOneEnnui(*sha.Sha) (*sku.Transacted, error)
-	ReadOneKennung(ids.IdLike) (*sku.Transacted, error)
-	ReadOneKennungSha(ids.IdLike) (*sha.Sha, error)
-}
-
-type ennuiStore struct {
+type probe_store struct {
 	fs_home                   fs_home.Home
 	persistentMetadateiFormat object_inventory_format.Format
-	ennuiKennung              sha_probe_index.Ennui
+	object_id_probe           sha_probe_index.Ennui
 	options                   object_inventory_format.Options
 }
 
-func (s *ennuiStore) Initialize(
+func (s *probe_store) Initialize(
 	fs_home fs_home.Home,
 	persistentMetadateiFormat object_inventory_format.Format,
 	options object_inventory_format.Options,
@@ -39,7 +32,7 @@ func (s *ennuiStore) Initialize(
 	s.persistentMetadateiFormat = persistentMetadateiFormat
 	s.options = options
 
-	if s.ennuiKennung, err = sha_probe_index.MakeNoDuplicates(
+	if s.object_id_probe, err = sha_probe_index.MakeNoDuplicates(
 		s.fs_home,
 		s.fs_home.DirVerzeichnisseVerweise(),
 	); err != nil {
@@ -50,7 +43,7 @@ func (s *ennuiStore) Initialize(
 	return
 }
 
-func (s *ennuiStore) ReadOneEnnui(sh *sha.Sha) (sk *sku.Transacted, err error) {
+func (s *probe_store) ReadOneEnnui(sh *sha.Sha) (sk *sku.Transacted, err error) {
 	var r sha.ReadCloser
 
 	if r, err = s.fs_home.BlobReaderFrom(
@@ -95,20 +88,20 @@ func (s *ennuiStore) ReadOneEnnui(sh *sha.Sha) (sk *sku.Transacted, err error) {
 	return
 }
 
-func (s *ennuiStore) ReadOneKennungSha(k ids.IdLike) (sh *sha.Sha, err error) {
+func (s *probe_store) ReadOneObjectIdSha(k ids.IdLike) (sh *sha.Sha, err error) {
 	left := sha.FromString(k.String())
 	defer sha.GetPool().Put(left)
 
-	if sh, err = s.ennuiKennung.ReadOne(left); err != nil {
-		err = errors.Wrapf(err, "Kennung: %q, Left: %s", k, left)
+	if sh, err = s.object_id_probe.ReadOne(left); err != nil {
+		err = errors.Wrapf(err, "object id: %q, Left: %s", k, left)
 		return
 	}
 
 	return
 }
 
-func (s *ennuiStore) ReadOneKennung(k ids.IdLike) (sk *sku.Transacted, err error) {
-	sh, err := s.ReadOneKennungSha(k)
+func (s *probe_store) ReadOneObjectId(k ids.IdLike) (sk *sku.Transacted, err error) {
+	sh, err := s.ReadOneObjectIdSha(k)
 	defer sha.GetPool().Put(sh)
 
 	if err != nil {
@@ -134,7 +127,7 @@ func (s *ennuiStore) ReadOneKennung(k ids.IdLike) (sk *sku.Transacted, err error
 	return
 }
 
-func (s *ennuiStore) makeWriteMetadateiFunc(
+func (s *probe_store) makeWriteMetadateiFunc(
 	dir string,
 	fo object_inventory_format.FormatGeneric,
 	o *sku.Transacted,
@@ -171,13 +164,13 @@ func (s *ennuiStore) makeWriteMetadateiFunc(
 	}
 }
 
-func (s *ennuiStore) MakeFuncSaveOneVerweise(o *sku.Transacted) func() error {
+func (s *probe_store) MakeFuncSaveOneVerweise(o *sku.Transacted) func() error {
 	return func() (err error) {
 		k := o.GetObjectId()
 		sh := sha.FromString(k.String())
 		defer sha.GetPool().Put(sh)
 
-		if err = s.ennuiKennung.AddSha(sh, o.Metadata.Sha()); err != nil {
+		if err = s.object_id_probe.AddSha(sh, o.Metadata.Sha()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -186,7 +179,7 @@ func (s *ennuiStore) MakeFuncSaveOneVerweise(o *sku.Transacted) func() error {
 	}
 }
 
-func (s *ennuiStore) WriteOneObjekteMetadatei(o *sku.Transacted) (err error) {
+func (s *probe_store) WriteOneObjekteMetadatei(o *sku.Transacted) (err error) {
 	if o.Metadata.Sha().IsNull() {
 		err = errors.Errorf("null sha")
 		return

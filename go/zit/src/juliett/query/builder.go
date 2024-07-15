@@ -491,7 +491,7 @@ LOOP:
 			case genres.Type:
 				var t ids.Type
 
-				if err = t.TodoSetFromKennung2(k.ObjectId); err != nil {
+				if err = t.TodoSetFromObjectId(k.ObjectId); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -606,7 +606,7 @@ func (b *Builder) makeTagExp(k *ObjectId) (exp sku.Query, err error) {
 	// TODO use b.akten to read Etikett Akte and find filter if necessary
 	var e ids.Tag
 
-	if err = e.TodoSetFromKennung2(k.ObjectId); err != nil {
+	if err = e.TodoSetFromObjectId(k.ObjectId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

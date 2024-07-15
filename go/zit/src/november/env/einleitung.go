@@ -65,7 +65,7 @@ func (u *Env) Start(e BigBang) (err error) {
 			e.Config.GetStoreVersion(),
 			g,
 		); err != nil {
-			if genres.IsErrUnsupportedGattung(err) {
+			if genres.IsErrUnsupportedGenre(err) {
 				err = nil
 				continue
 			} else {

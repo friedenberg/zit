@@ -48,10 +48,10 @@ type Store struct {
 	metadateiTextParser object_metadata.TextParser
 
 	bestandsaufnahmeStore inventory_list.Store
-	kennungIndex          object_id_index.Index
+	objectIdIndex          object_id_index.Index
 
 	sku.TransactedAdder
-	typenIndex object_id_index.KennungIndex[ids.Type, *ids.Type]
+	typenIndex object_id_index.ObjectIdIndex[ids.Type, *ids.Type]
 
 	protoZettel      sku.Proto
 	konfigAkteFormat blob_store.Format[mutable_config.Blob, *mutable_config.Blob]
@@ -120,7 +120,7 @@ func (c *Store) Initialize(
 		return
 	}
 
-	if c.kennungIndex, err = object_id_index.MakeIndex(
+	if c.objectIdIndex, err = object_id_index.MakeIndex(
 		c.GetKonfig(),
 		c.GetStandort(),
 		c.GetStandort(),
@@ -200,7 +200,7 @@ func (s *Store) ResetIndexes() (err error) {
 		return
 	}
 
-	if err = s.kennungIndex.Reset(); err != nil {
+	if err = s.objectIdIndex.Reset(); err != nil {
 		err = errors.Wrapf(err, "failed to reset index kennung")
 		return
 	}

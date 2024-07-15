@@ -20,7 +20,7 @@ func (s *Store) tryNewHook(
 
 	var t *sku.Transacted
 
-	if t, err = s.ReadOneKennung(kinder.GetType()); err != nil {
+	if t, err = s.ReadOneObjectId(kinder.GetType()); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {
@@ -63,7 +63,7 @@ func (s *Store) TryFormatHook(
 ) (err error) {
 	var mutter *sku.Transacted
 
-	if mutter, err = s.ReadOneKennung(kinder.GetObjectId()); err != nil {
+	if mutter, err = s.ReadOneObjectId(kinder.GetObjectId()); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {
@@ -75,7 +75,7 @@ func (s *Store) TryFormatHook(
 
 	var t *sku.Transacted
 
-	if t, err = s.ReadOneKennung(kinder.GetType()); err != nil {
+	if t, err = s.ReadOneObjectId(kinder.GetType()); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {
@@ -132,7 +132,7 @@ func (s *Store) tryPreCommitHooks(
 
 	var t *sku.Transacted
 
-	if t, err = s.ReadOneKennung(kinder.GetType()); err != nil {
+	if t, err = s.ReadOneObjectId(kinder.GetType()); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {

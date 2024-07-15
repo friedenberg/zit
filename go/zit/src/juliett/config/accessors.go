@@ -90,7 +90,7 @@ func (kc *compiled) getTagOrRepoIdOrType(
 		sk = kc.getType(&k)
 
 	default:
-		err = genres.MakeErrUnsupportedGattung(&k)
+		err = genres.MakeErrUnsupportedGenre(&k)
 		return
 	}
 

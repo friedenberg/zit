@@ -28,7 +28,7 @@ func (s Home) dirObjektenGattung2(
 	g := g1.GetGenre()
 
 	if g == genres.Unknown {
-		err = genres.MakeErrUnsupportedGattung(g)
+		err = genres.MakeErrUnsupportedGenre(g)
 		return
 	}
 
@@ -63,7 +63,7 @@ func (s Home) dirObjektenGattung(
 		p = s.DirObjekten("Kasten")
 
 	default:
-		err = genres.MakeErrUnsupportedGattung(g)
+		err = genres.MakeErrUnsupportedGenre(g)
 		return
 	}
 

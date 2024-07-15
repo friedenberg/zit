@@ -57,7 +57,7 @@ func (u *Env) StringFormatWriterKennungAligned(
 func (u *Env) StringFormatWriterKennung(
 	co string_format_writer.ColorOptions,
 ) interfaces.StringFormatWriter[*ids.ObjectId] {
-	return id_fmts.MakeKennungCliFormat(
+	return id_fmts.MakeObjectIdCliFormat(
 		u.config.PrintOptions,
 		co,
 		u.GetStore().GetAbbrStore().GetAbbr(),

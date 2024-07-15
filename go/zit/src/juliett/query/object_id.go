@@ -39,11 +39,11 @@ func (k ObjectId) ContainsSku(sk *sku.Transacted) (ok bool) {
 		var idx int
 
 		if k.Exact {
-			idx, ok = me.Cache.TagPaths.All.ContainsKennungEtikettExact(
+			idx, ok = me.Cache.TagPaths.All.ContainsObjectIdTagExact(
 				k.ObjectId,
 			)
 		} else {
-			idx, ok = me.Cache.TagPaths.All.ContainsKennungEtikett(
+			idx, ok = me.Cache.TagPaths.All.ContainsObjectIdTag(
 				k.ObjectId,
 			)
 		}

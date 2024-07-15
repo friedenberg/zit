@@ -94,7 +94,7 @@ func (s *probe_index) ReadOneObjectIdSha(
 	defer sha.GetPool().Put(left)
 
 	if sh, err = s.ids.ReadOne(left); err != nil {
-		err = errors.Wrapf(err, "Kennung: %q, Left: %s", k, left)
+		err = errors.Wrapf(err, "zettel id: %q, Left: %s", k, left)
 		return
 	}
 

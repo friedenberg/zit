@@ -84,7 +84,7 @@ func (t Type) Parts() [3]string {
 	return [3]string{"", "!", t.value}
 }
 
-func (e *Type) TodoSetFromKennung2(v *ObjectId) (err error) {
+func (e *Type) TodoSetFromObjectId(v *ObjectId) (err error) {
 	return e.Set(v.String())
 }
 
