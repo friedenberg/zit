@@ -189,11 +189,8 @@ func (kc *Compiled) Flush(
 	wg := iter.MakeErrorWaitGroupParallel()
 	wg.Do(func() (err error) {
 		if err = kc.flushMutableConfig(s, tagp, printerHeader); err != nil {
-			if errors.IsNotExist(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
+			err = errors.Wrap(err)
+			return
 		}
 
 		return
