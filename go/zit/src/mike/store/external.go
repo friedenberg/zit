@@ -21,7 +21,7 @@ func (s *Store) ReadOneKennungExternal(
 		ui.Debug().Print("would populate from chrome")
 
 	default:
-		if el, err = s.cwdFiles.ReadTransactedFromKennung(o, k1, sk); err != nil {
+		if el, err = s.cwdFiles.ReadTransactedFromObjectId(o, k1, sk); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

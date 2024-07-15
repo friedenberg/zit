@@ -182,7 +182,7 @@ func (s *store) writeInventoryList(o *InventoryList) (sh *sha.Sha, err error) {
 
 	defer errors.DeferredCloser(&err, sw)
 
-	fo := sku_fmt.MakeFormatBestandsaufnahmePrinter(
+	fo := sku_fmt.MakeFormatInventoryListPrinter(
 		sw,
 		s.object_format,
 		s.options,

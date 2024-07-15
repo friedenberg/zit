@@ -36,21 +36,21 @@ type Store struct {
 	config              sku.Config
 	deletedPrinter      interfaces.FuncIter[*fd.FD]
 	externalStoreInfo   external_store.Info
-	metadateiTextParser object_metadata.TextParser
+	metadataTextParser object_metadata.TextParser
 	fs_home             fs_home.Home
 	fileEncoder         FileEncoder
 	ic                  ids.InlineTypeChecker
 	fileExtensions      file_extensions.FileExtensions
 	dir                 string
-	zettelen            interfaces.MutableSetLike[*KennungFDPair]
-	unsureZettelen      interfaces.MutableSetLike[*KennungFDPair]
-	typen               interfaces.MutableSetLike[*KennungFDPair]
-	kisten              interfaces.MutableSetLike[*KennungFDPair]
-	etiketten           interfaces.MutableSetLike[*KennungFDPair]
-	unsureAkten         fd.MutableSet
+	zettels             interfaces.MutableSetLike[*ObjectIdFDPair]
+	unsureZettels       interfaces.MutableSetLike[*ObjectIdFDPair]
+	types               interfaces.MutableSetLike[*ObjectIdFDPair]
+	repos               interfaces.MutableSetLike[*ObjectIdFDPair]
+	tags                interfaces.MutableSetLike[*ObjectIdFDPair]
+	unsureBlobs         fd.MutableSet
 	emptyDirectories    fd.MutableSet
 
-	objekteFormatOptions object_inventory_format.Options
+	objectFormatOptions object_inventory_format.Options
 
 	deleteLock sync.Mutex
 	deleted    fd.MutableSet
@@ -109,7 +109,7 @@ func (fs *Store) MarkUnsureAkten(f *fd.FD) (err error) {
 		return
 	}
 
-	if err = fs.unsureAkten.Add(f); err != nil {
+	if err = fs.unsureBlobs.Add(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -119,11 +119,11 @@ func (fs *Store) MarkUnsureAkten(f *fd.FD) (err error) {
 
 func (fs *Store) String() (out string) {
 	if iter.Len(
-		fs.zettelen,
-		fs.typen,
-		fs.kisten,
-		fs.etiketten,
-		fs.unsureAkten,
+		fs.zettels,
+		fs.types,
+		fs.repos,
+		fs.tags,
+		fs.unsureBlobs,
 	) == 0 {
 		return
 	}
@@ -145,31 +145,31 @@ func (fs *Store) String() (out string) {
 		return
 	}
 
-	fs.zettelen.Each(
-		func(z *KennungFDPair) (err error) {
+	fs.zettels.Each(
+		func(z *ObjectIdFDPair) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
 
-	fs.typen.Each(
-		func(z *KennungFDPair) (err error) {
+	fs.types.Each(
+		func(z *ObjectIdFDPair) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
 
-	fs.etiketten.Each(
-		func(z *KennungFDPair) (err error) {
+	fs.tags.Each(
+		func(z *ObjectIdFDPair) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
 
-	fs.kisten.Each(
-		func(z *KennungFDPair) (err error) {
+	fs.repos.Each(
+		func(z *ObjectIdFDPair) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
 
-	fs.unsureAkten.Each(
+	fs.unsureBlobs.Each(
 		func(z *fd.FD) (err error) {
 			return writeOneIfNecessary(z)
 		},
@@ -187,8 +187,8 @@ func (s *Store) GetExternalObjectId() (ks interfaces.SetLike[*ids.ObjectId], err
 	var l sync.Mutex
 
 	if err = s.All(
-		func(kfp *KennungFDPair) (err error) {
-			kc := kfp.Kennung.Clone()
+		func(kfp *ObjectIdFDPair) (err error) {
+			kc := kfp.ObjectId.Clone()
 
 			l.Lock()
 			defer l.Unlock()
@@ -235,16 +235,16 @@ func (fs *Store) ContainsSku(m *sku.Transacted) bool {
 
 	switch g {
 	case genres.Zettel:
-		return fs.zettelen.ContainsKey(m.GetObjectId().String())
+		return fs.zettels.ContainsKey(m.GetObjectId().String())
 
 	case genres.Type:
-		return fs.typen.ContainsKey(m.GetObjectId().String())
+		return fs.types.ContainsKey(m.GetObjectId().String())
 
 	case genres.Tag:
-		return fs.etiketten.ContainsKey(m.GetObjectId().String())
+		return fs.tags.ContainsKey(m.GetObjectId().String())
 
 	case genres.Repo:
-		return fs.kisten.ContainsKey(m.GetObjectId().String())
+		return fs.repos.ContainsKey(m.GetObjectId().String())
 	}
 
 	return true
@@ -253,11 +253,11 @@ func (fs *Store) ContainsSku(m *sku.Transacted) bool {
 func (fs *Store) GetCwdFDs() fd.Set {
 	fds := fd.MakeMutableSet()
 
-	SetAddPairs(fs.zettelen, fds)
-	SetAddPairs(fs.typen, fds)
-	SetAddPairs(fs.etiketten, fds)
-	SetAddPairs(fs.unsureZettelen, fds)
-	fs.unsureAkten.Each(fds.Add)
+	SetAddPairs(fs.zettels, fds)
+	SetAddPairs(fs.types, fds)
+	SetAddPairs(fs.tags, fds)
+	SetAddPairs(fs.unsureZettels, fds)
+	fs.unsureBlobs.Each(fds.Add)
 
 	return fds
 }
@@ -265,14 +265,14 @@ func (fs *Store) GetCwdFDs() fd.Set {
 func (fs *Store) GetAktenFDs() fd.Set {
 	fds := fd.MakeMutableSet()
 
-	fs.unsureAkten.Each(fds.Add)
+	fs.unsureBlobs.Each(fds.Add)
 
 	return fds
 }
 
 func (fs *Store) GetUnsureAkten() fd.Set {
 	fds := fd.MakeMutableSet()
-	fs.unsureAkten.Each(fds.Add)
+	fs.unsureBlobs.Each(fds.Add)
 	return fds
 }
 
@@ -284,100 +284,100 @@ func (fs *Store) GetEmptyDirectories() fd.Set {
 
 func (fs *Store) GetZettel(
 	h *ids.ZettelId,
-) (z *KennungFDPair, ok bool) {
-	z, ok = fs.zettelen.Get(h.String())
+) (z *ObjectIdFDPair, ok bool) {
+	z, ok = fs.zettels.Get(h.String())
 	return
 }
 
 func (fs *Store) GetKasten(
 	h *ids.RepoId,
-) (z *KennungFDPair, ok bool) {
-	z, ok = fs.kisten.Get(h.String())
+) (z *ObjectIdFDPair, ok bool) {
+	z, ok = fs.repos.Get(h.String())
 	return
 }
 
 func (fs *Store) GetEtikett(
 	k *ids.Tag,
-) (e *KennungFDPair, ok bool) {
-	e, ok = fs.etiketten.Get(k.String())
+) (e *ObjectIdFDPair, ok bool) {
+	e, ok = fs.tags.Get(k.String())
 	return
 }
 
 func (fs *Store) GetTyp(
 	k *ids.Type,
-) (t *KennungFDPair, ok bool) {
-	t, ok = fs.typen.Get(k.String())
+) (t *ObjectIdFDPair, ok bool) {
+	t, ok = fs.types.Get(k.String())
 	return
 }
 
 func (fs *Store) Get(
 	k interfaces.ObjectId,
-) (t *KennungFDPair, ok bool) {
+) (t *ObjectIdFDPair, ok bool) {
 	g := genres.Must(k.GetGenre())
 
 	switch g {
 	case genres.Repo:
-		return fs.kisten.Get(k.String())
+		return fs.repos.Get(k.String())
 
 	case genres.Zettel:
-		return fs.zettelen.Get(k.String())
+		return fs.zettels.Get(k.String())
 
 	case genres.Type:
-		return fs.typen.Get(k.String())
+		return fs.types.Get(k.String())
 
 	case genres.Tag:
-		return fs.etiketten.Get(k.String())
+		return fs.tags.Get(k.String())
 
 	case genres.Config:
 		// TODO-P3
 		return
 
 	default:
-		return fs.unsureZettelen.Get(k.String())
+		return fs.unsureZettels.Get(k.String())
 	}
 }
 
 func (fs *Store) All(
-	f interfaces.FuncIter[*KennungFDPair],
+	f interfaces.FuncIter[*ObjectIdFDPair],
 ) (err error) {
 	wg := iter.MakeErrorWaitGroupParallel()
 
 	iter.ErrorWaitGroupApply(
 		wg,
-		fs.zettelen,
-		func(e *KennungFDPair) (err error) {
+		fs.zettels,
+		func(e *ObjectIdFDPair) (err error) {
 			return f(e)
 		},
 	)
 
 	iter.ErrorWaitGroupApply(
 		wg,
-		fs.typen,
-		func(e *KennungFDPair) (err error) {
+		fs.types,
+		func(e *ObjectIdFDPair) (err error) {
 			return f(e)
 		},
 	)
 
 	iter.ErrorWaitGroupApply(
 		wg,
-		fs.kisten,
-		func(e *KennungFDPair) (err error) {
+		fs.repos,
+		func(e *ObjectIdFDPair) (err error) {
 			return f(e)
 		},
 	)
 
 	iter.ErrorWaitGroupApply(
 		wg,
-		fs.etiketten,
-		func(e *KennungFDPair) (err error) {
+		fs.tags,
+		func(e *ObjectIdFDPair) (err error) {
 			return f(e)
 		},
 	)
 
 	iter.ErrorWaitGroupApply(
 		wg,
-		fs.unsureZettelen,
-		func(e *KennungFDPair) (err error) {
+		fs.unsureZettels,
+		func(e *ObjectIdFDPair) (err error) {
 			return f(e)
 		},
 	)
@@ -386,14 +386,14 @@ func (fs *Store) All(
 }
 
 func (fs *Store) AllUnsure(
-	f interfaces.FuncIter[*KennungFDPair],
+	f interfaces.FuncIter[*ObjectIdFDPair],
 ) (err error) {
 	wg := iter.MakeErrorWaitGroupParallel()
 
 	iter.ErrorWaitGroupApply(
 		wg,
-		fs.unsureZettelen,
-		func(e *KennungFDPair) (err error) {
+		fs.unsureZettels,
+		func(e *ObjectIdFDPair) (err error) {
 			return f(e)
 		},
 	)
@@ -403,8 +403,8 @@ func (fs *Store) AllUnsure(
 
 func (fs *Store) ZettelFiles() (out []string, err error) {
 	out, err = iter.DerivedValues(
-		fs.zettelen,
-		func(z *KennungFDPair) (p string, err error) {
+		fs.zettels,
+		func(z *ObjectIdFDPair) (p string, err error) {
 			p = z.GetObjectFD().GetPath()
 			return
 		},
@@ -576,10 +576,10 @@ func (s *Store) readAll() (err error) {
 
 func (c *Store) MatcherLen() int {
 	return iter.Len(
-		c.zettelen,
-		c.typen,
-		c.kisten,
-		c.etiketten,
+		c.zettels,
+		c.types,
+		c.repos,
+		c.tags,
 	)
 }
 
@@ -589,10 +589,10 @@ func (*Store) Each(_ interfaces.FuncIter[sku.Query]) error {
 
 func (c *Store) Len() int {
 	return iter.Len(
-		c.zettelen,
-		c.typen,
-		c.kisten,
-		c.etiketten,
+		c.zettels,
+		c.types,
+		c.repos,
+		c.tags,
 	)
 }
 
@@ -620,19 +620,19 @@ func (fs *Store) readNotSecondLevelFile(name string) (err error) {
 
 	switch strings.TrimPrefix(ext, ".") {
 	case fs.fileExtensions.Etikett:
-		if err = fs.tryEtikett(fi, fs.dir); err != nil {
+		if err = fs.tryTag(fi, fs.dir); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case fs.fileExtensions.Kasten:
-		if err = fs.tryKasten(fi, fs.dir); err != nil {
+		if err = fs.tryRepo(fi, fs.dir); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case fs.fileExtensions.Typ:
-		if err = fs.tryTyp(fi, fs.dir); err != nil {
+		if err = fs.tryType(fi, fs.dir); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -670,7 +670,7 @@ func (fs *Store) addUnsureAkten(dir, name string) (err error) {
 		return
 	}
 
-	err = fs.unsureAkten.Add(ut)
+	err = fs.unsureBlobs.Add(ut)
 
 	return
 }

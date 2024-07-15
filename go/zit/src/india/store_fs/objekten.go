@@ -13,7 +13,7 @@ import (
 
 // TODO combine everyting into one function
 
-func (c *Store) tryEtikett(fi os.FileInfo, dir string) (err error) {
+func (c *Store) tryTag(fi os.FileInfo, dir string) (err error) {
 	var h ids.Tag
 	var f *fd.FD
 
@@ -29,23 +29,23 @@ func (c *Store) tryEtikett(fi os.FileInfo, dir string) (err error) {
 		return
 	}
 
-	t, ok := c.etiketten.Get(h.String())
+	t, ok := c.tags.Get(h.String())
 
 	if !ok {
-		t = &KennungFDPair{}
+		t = &ObjectIdFDPair{}
 	}
 
-	if err = t.Kennung.SetWithIdLike(h); err != nil {
+	if err = t.ObjectId.SetWithIdLike(h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	t.FDs.Object.ResetWith(f)
 
-	return c.etiketten.Add(t)
+	return c.tags.Add(t)
 }
 
-func (c *Store) tryKasten(fi os.FileInfo, dir string) (err error) {
+func (c *Store) tryRepo(fi os.FileInfo, dir string) (err error) {
 	var h ids.RepoId
 	var f *fd.FD
 
@@ -61,23 +61,23 @@ func (c *Store) tryKasten(fi os.FileInfo, dir string) (err error) {
 		return
 	}
 
-	t, ok := c.kisten.Get(h.String())
+	t, ok := c.repos.Get(h.String())
 
 	if !ok {
-		t = &KennungFDPair{}
+		t = &ObjectIdFDPair{}
 	}
 
-	if err = t.Kennung.SetWithIdLike(h); err != nil {
+	if err = t.ObjectId.SetWithIdLike(h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	t.FDs.Object.ResetWith(f)
 
-	return c.kisten.Add(t)
+	return c.repos.Add(t)
 }
 
-func (c *Store) tryTyp(fi os.FileInfo, dir string) (err error) {
+func (c *Store) tryType(fi os.FileInfo, dir string) (err error) {
 	var h ids.Type
 	var f *fd.FD
 
@@ -93,23 +93,23 @@ func (c *Store) tryTyp(fi os.FileInfo, dir string) (err error) {
 		return
 	}
 
-	t, ok := c.typen.Get(h.String())
+	t, ok := c.types.Get(h.String())
 
 	if !ok {
-		t = &KennungFDPair{}
+		t = &ObjectIdFDPair{}
 	}
 
-	if err = t.Kennung.SetWithIdLike(h); err != nil {
+	if err = t.ObjectId.SetWithIdLike(h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	t.FDs.Object.ResetWith(f)
 
-	return c.typen.Add(t)
+	return c.types.Add(t)
 }
 
-func getHinweis(f *fd.FD, allowErrors bool) (h ids.ZettelId, err error) {
+func getZettelId(f *fd.FD, allowErrors bool) (h ids.ZettelId, err error) {
 	parts := strings.Split(f.GetPath(), string(filepath.Separator))
 
 	switch len(parts) {
@@ -156,18 +156,18 @@ func (c *Store) tryZettel(
 
 	var h ids.ZettelId
 
-	if h, err = getHinweis(f, false); err != nil {
+	if h, err = getZettelId(f, false); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	t, ok := c.zettelen.Get(h.String())
+	t, ok := c.zettels.Get(h.String())
 
 	if !ok {
-		t = &KennungFDPair{}
+		t = &ObjectIdFDPair{}
 	}
 
-	if err = t.Kennung.SetWithIdLike(h); err != nil {
+	if err = t.ObjectId.SetWithIdLike(h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -186,7 +186,7 @@ func (c *Store) tryZettel(
 		}
 	}
 
-	if err = c.zettelen.Add(t); err != nil {
+	if err = c.zettels.Add(t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -198,13 +198,13 @@ func (c *Store) tryZettelUnsure(
 	name string,
 	fullPath string,
 ) (err error) {
-	t, ok := c.unsureZettelen.Get(fullPath)
+	t, ok := c.unsureZettels.Get(fullPath)
 
 	if !ok {
-		t = &KennungFDPair{}
+		t = &ObjectIdFDPair{}
 	}
 
-	if err = t.Kennung.SetRaw(name); err != nil {
+	if err = t.ObjectId.SetRaw(name); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -223,7 +223,7 @@ func (c *Store) tryZettelUnsure(
 		}
 	}
 
-	if err = c.unsureZettelen.Add(t); err != nil {
+	if err = c.unsureZettels.Add(t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

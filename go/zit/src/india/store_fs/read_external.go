@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func (s *Store) ReadTransactedFromKennung(
+func (s *Store) ReadTransactedFromObjectId(
 	o sku.ObjectOptions,
 	k1 interfaces.ObjectId,
 	t *sku.Transacted,
@@ -18,7 +18,7 @@ func (s *Store) ReadTransactedFromKennung(
 		return
 	}
 
-	if e, err = s.ReadExternalFromKennungFDPair(o, k, t); err != nil {
+	if e, err = s.ReadExternalFromObjectIdFDPair(o, k, t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -26,14 +26,14 @@ func (s *Store) ReadTransactedFromKennung(
 	return
 }
 
-func (s *Store) ReadExternalFromKennungFDPair(
+func (s *Store) ReadExternalFromObjectIdFDPair(
 	o sku.ObjectOptions,
-	em *KennungFDPair,
+	em *ObjectIdFDPair,
 	t *sku.Transacted,
 ) (e *External, err error) {
 	e = GetExternalPool().Get()
 
-	if err = s.ReadIntoExternalFromKennungFDPair(o, em, t, e); err != nil {
+	if err = s.ReadIntoExternalFromObjectIdFDPair(o, em, t, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -41,9 +41,9 @@ func (s *Store) ReadExternalFromKennungFDPair(
 	return
 }
 
-func (s *Store) ReadIntoExternalFromKennungFDPair(
+func (s *Store) ReadIntoExternalFromObjectIdFDPair(
 	o sku.ObjectOptions,
-	em *KennungFDPair,
+	em *ObjectIdFDPair,
 	t *sku.Transacted,
 	e *External,
 ) (err error) {

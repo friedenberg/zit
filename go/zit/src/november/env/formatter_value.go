@@ -529,7 +529,7 @@ func (u *Env) MakeFormatFunc(
 		}
 
 	case "bestandsaufnahme-sans-tai":
-		be := sku_fmt.MakeFormatBestandsaufnahmePrinter(
+		be := sku_fmt.MakeFormatInventoryListPrinter(
 			out,
 			object_inventory_format.Default(),
 			object_inventory_format.Options{ExcludeMutter: true},
@@ -576,7 +576,7 @@ func (u *Env) MakeFormatFunc(
 		}
 
 	case "bestandsaufnahme":
-		fo := sku_fmt.MakeFormatBestandsaufnahmePrinter(
+		fo := sku_fmt.MakeFormatInventoryListPrinter(
 			out,
 			object_inventory_format.Default(),
 			object_inventory_format.Options{Tai: true},
@@ -592,7 +592,7 @@ func (u *Env) MakeFormatFunc(
 		}
 
 	case "bestandsaufnahme-verzeichnisse":
-		fo := sku_fmt.MakeFormatBestandsaufnahmePrinter(
+		fo := sku_fmt.MakeFormatInventoryListPrinter(
 			out,
 			object_inventory_format.Default(),
 			object_inventory_format.Options{

@@ -65,7 +65,7 @@ func (f format) FormatParsedInventoryList(
 	bw := bufio.NewWriter(w)
 	defer errors.DeferredFlusher(&err, bw)
 
-	fo := sku_fmt.MakeFormatBestandsaufnahmePrinter(
+	fo := sku_fmt.MakeFormatInventoryListPrinter(
 		bw,
 		f.objekteFormat,
 		f.options,

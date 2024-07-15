@@ -16,15 +16,15 @@ func (s *Store) Open(
 ) (err error) {
 	wg := iter.MakeErrorWaitGroupParallel()
 
-	if m.IncludesObjekte() {
+	if m.IncludesObject() {
 		wg.Do(func() error {
-			return s.openZettelen(ph, zsc)
+			return s.openZettels(ph, zsc)
 		})
 	}
 
-	if m.IncludesAkte() {
+	if m.IncludesBlob() {
 		wg.Do(func() error {
-			return s.openAkten(ph, zsc)
+			return s.openBlob(ph, zsc)
 		})
 	}
 
@@ -36,13 +36,13 @@ func (s *Store) Open(
 	return
 }
 
-func (s *Store) openZettelen(
+func (s *Store) openZettels(
 	ph interfaces.FuncIter[string],
 	zsc sku.CheckedOutLikeSet,
 ) (err error) {
-	var filesZettelen []string
+	var filesZettels []string
 
-	if filesZettelen, err = ToSliceFilesZettelen(zsc); err != nil {
+	if filesZettels, err = ToSliceFilesZettelen(zsc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -55,7 +55,7 @@ func (s *Store) openZettelen(
 			Build(),
 	}
 
-	if err = openVimOp.Run(ph, filesZettelen...); err != nil {
+	if err = openVimOp.Run(ph, filesZettels...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -63,20 +63,20 @@ func (s *Store) openZettelen(
 	return
 }
 
-func (s *Store) openAkten(
+func (s *Store) openBlob(
 	ph interfaces.FuncIter[string],
 	zsc sku.CheckedOutLikeSet,
 ) (err error) {
-	var filesAkten []string
+	var filesBlobs []string
 
-	if filesAkten, err = ToSliceFilesAkten(zsc); err != nil {
+	if filesBlobs, err = ToSliceFilesBlobs(zsc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	opOpenFiles := OpenFiles{}
 
-	if err = opOpenFiles.Run(ph, filesAkten...); err != nil {
+	if err = opOpenFiles.Run(ph, filesBlobs...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -41,16 +41,16 @@ func (c CreateFromPaths) Run(
 
 	for _, arg := range args {
 		var z *store_fs.External
-		var t store_fs.KennungFDPair
+		var t store_fs.ObjectIdFDPair
 
-		t.Kennung.SetGenre(genres.Zettel)
+		t.ObjectId.SetGenre(genres.Zettel)
 
 		if err = t.FDs.Object.Set(arg); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if z, err = c.GetStore().GetCwdFiles().ReadExternalFromKennungFDPair(
+		if z, err = c.GetStore().GetCwdFiles().ReadExternalFromObjectIdFDPair(
 			o,
 			&t,
 			nil,

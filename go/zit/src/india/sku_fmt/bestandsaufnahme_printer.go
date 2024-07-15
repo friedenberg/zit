@@ -24,7 +24,7 @@ type bestandsaufnahmePrinter struct {
 	firstBoundaryOnce *sync.Once
 }
 
-func MakeFormatBestandsaufnahmePrinter(
+func MakeFormatInventoryListPrinter(
 	out io.Writer,
 	of object_inventory_format.Formatter,
 	op object_inventory_format.Options,

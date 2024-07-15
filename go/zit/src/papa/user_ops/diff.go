@@ -87,7 +87,7 @@ func (op Diff) Run(col sku.CheckedOutLike) (err error) {
 	var externalFD *fd.FD
 
 	switch {
-	case mode.IncludesObjekte():
+	case mode.IncludesObject():
 		if internalInline && externalInline {
 			wg.Do(op.makeDo(wLeft, op.Inline, il))
 			wg.Do(op.makeDo(wRight, op.Inline, el))

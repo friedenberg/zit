@@ -25,17 +25,17 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 
 	var leftCO, middleCO, rightCO *CheckedOut
 
-	inlineAkte := tm.IsAllInlineType(s.config)
+	inlineBlob := tm.IsAllInlineType(s.config)
 
 	mode := checkout_mode.ModeMetadataAndBlob
 
-	if !inlineAkte {
+	if !inlineBlob {
 		mode = checkout_mode.ModeMetadataOnly
 	}
 
 	op := checkout_options.Options{
 		CheckoutMode:    mode,
-		ForceInlineAkte: true,
+		ForceInlineBlob: true,
 		Path:            checkout_options.PathTempLocal,
 		Force:           true,
 	}
@@ -125,10 +125,10 @@ func (s *Store) handleMergeResult(
 	bw := bufio.NewWriter(f)
 	defer errors.DeferredFlusher(&err, bw)
 
-	p := sku_fmt.MakeFormatBestandsaufnahmePrinter(
+	p := sku_fmt.MakeFormatInventoryListPrinter(
 		bw,
 		object_inventory_format.FormatForVersion(s.config.GetStoreVersion()),
-		s.objekteFormatOptions,
+		s.objectFormatOptions,
 	)
 
 	if err = conflicted.WriteConflictMarker(p); err != nil {
@@ -237,7 +237,7 @@ func (s *Store) RunMergeTool(
 		return
 	}
 
-	if err = s.ReadOneExternalObjekteReader(f, e); err != nil {
+	if err = s.ReadOneExternalObjectReader(f, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

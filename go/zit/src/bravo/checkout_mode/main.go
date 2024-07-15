@@ -70,7 +70,7 @@ func (m *Mode) Set(v string) (err error) {
 	return
 }
 
-func (m Mode) IncludesAkte() bool {
+func (m Mode) IncludesBlob() bool {
 	switch m {
 	case ModeMetadataAndBlob, ModeBlobOnly:
 		return true
@@ -80,7 +80,7 @@ func (m Mode) IncludesAkte() bool {
 	}
 }
 
-func (m Mode) IncludesObjekte() bool {
+func (m Mode) IncludesObject() bool {
 	switch m {
 	case ModeMetadataAndBlob, ModeMetadataOnly:
 		return true

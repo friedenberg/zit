@@ -21,8 +21,8 @@ func (s *Store) MakeApplyCheckedOut(
 	qg sku.Queryable,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 	o sku.ObjectOptions,
-) interfaces.FuncIter[*KennungFDPair] {
-	return func(em *KennungFDPair) (err error) {
+) interfaces.FuncIter[*ObjectIdFDPair] {
+	return func(em *ObjectIdFDPair) (err error) {
 		if err = s.ApplyCheckedOut(o, qg, em, f); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -35,12 +35,12 @@ func (s *Store) MakeApplyCheckedOut(
 func (s *Store) ApplyCheckedOut(
 	o sku.ObjectOptions,
 	qg sku.Queryable,
-	em *KennungFDPair,
+	em *ObjectIdFDPair,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	var co *CheckedOut
 
-	if co, err = s.ReadCheckedOutFromKennungFDPair(o, em); err != nil {
+	if co, err = s.ReadCheckedOutFromObjectIdFDPair(o, em); err != nil {
 		err = errors.Wrapf(err, "%v", em)
 		return
 	}
@@ -116,7 +116,7 @@ func (s *Store) QueryUntrackedBlobs(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	if err = s.QueryAllMatchingAkten(
+	if err = s.QueryAllMatchingBlobs(
 		qg,
 		s.GetUnsureAkten(),
 		func(fd *fd.FD, z *sku.Transacted) (err error) {
@@ -127,6 +127,7 @@ func (s *Store) QueryUntrackedBlobs(
 			fr.External.Metadata.Tai = ids.TaiFromTime(fd.ModTime())
 
 			if z == nil {
+				// TODO use ReadOneExternalBlob
 				fr.State = checked_out_state.StateUntracked
 				fr.External.SetBlobSha(fd.GetShaLike())
 
@@ -169,7 +170,7 @@ func (s *Store) QueryUntrackedBlobs(
 	return
 }
 
-func (s *Store) QueryAllMatchingAkten(
+func (s *Store) QueryAllMatchingBlobs(
 	qg *query.Group,
 	blob_store fd.Set,
 	f func(*fd.FD, *sku.Transacted) error,

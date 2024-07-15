@@ -10,17 +10,17 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func (s *Store) ReadCheckedOutFromKennungFDPair(
+func (s *Store) ReadCheckedOutFromObjectIdFDPair(
 	o sku.ObjectOptions,
-	em *KennungFDPair,
+	em *ObjectIdFDPair,
 ) (co *CheckedOut, err error) {
 	co = GetCheckedOutPool().Get()
 
-	if err = s.externalStoreInfo.FuncReadOneInto(&em.Kennung, &co.Internal); err != nil {
+	if err = s.externalStoreInfo.FuncReadOneInto(&em.ObjectId, &co.Internal); err != nil {
 		if collections.IsErrNotFound(err) || genres.IsErrUnsupportedGattung(err) {
 			// TODO mark status as new
 			err = nil
-			co.Internal.ObjectId.ResetWith(&em.Kennung)
+			co.Internal.ObjectId.ResetWith(&em.ObjectId)
 			co.State = checked_out_state.StateUntracked
 		} else {
 			err = errors.Wrap(err)
@@ -32,7 +32,7 @@ func (s *Store) ReadCheckedOutFromKennungFDPair(
 		if collections.IsErrNotFound(err) {
 			// TODO mark status as new
 			err = nil
-			co.Internal.ObjectId.ResetWith(&em.Kennung)
+			co.Internal.ObjectId.ResetWith(&em.ObjectId)
 			co.State = checked_out_state.StateUntracked
 		} else {
 			err = errors.Wrap(err)
@@ -69,14 +69,14 @@ func (s *Store) ReadIntoCheckedOutFromTransacted(
 
 	ok := false
 
-	var kfp *KennungFDPair
+	var kfp *ObjectIdFDPair
 
 	if kfp, ok = s.Get(&sk.ObjectId); !ok {
 		err = collections.MakeErrNotFound(sk.GetObjectId())
 		return
 	}
 
-	if err = s.ReadIntoExternalFromKennungFDPair(
+	if err = s.ReadIntoExternalFromObjectIdFDPair(
 		sku.ObjectOptions{
 			Mode: objekte_mode.ModeUpdateTai,
 		},

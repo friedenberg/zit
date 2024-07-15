@@ -40,13 +40,13 @@ func (s *Store) checkoutOneNew(
 		return
 	}
 
-	var e *KennungFDPair
+	var e *ObjectIdFDPair
 	ok := false
 
 	if e, ok = s.Get(&sz.ObjectId); ok {
 		var cze *External
 
-		if cze, err = s.ReadExternalFromKennungFDPair(
+		if cze, err = s.ReadExternalFromObjectIdFDPair(
 			sku.ObjectOptions{
 				Mode: objekte_mode.ModeRealizeSansProto,
 			},
@@ -98,14 +98,14 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	cofs := col.(*CheckedOut)
 	sz := cofs.GetSku()
 
-	var e *KennungFDPair
+	var e *ObjectIdFDPair
 	ok := false
 
 	if e, ok = s.Get(&sz.ObjectId); !ok {
 		return
 	}
 
-	if err = s.ReadIntoExternalFromKennungFDPair(
+	if err = s.ReadIntoExternalFromObjectIdFDPair(
 		sku.ObjectOptions{
 			Mode: objekte_mode.ModeRealizeSansProto,
 		},
@@ -175,16 +175,16 @@ func (s *Store) checkoutOne(
 	t := cz.Internal.GetType()
 	inlineAkte := s.config.IsInlineType(t)
 
-	if options.CheckoutMode.IncludesObjekte() {
+	if options.CheckoutMode.IncludesObject() {
 		if err = cz.External.GetFDsPtr().Object.SetPath(filename); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	if ((!inlineAkte || !options.CheckoutMode.IncludesObjekte()) &&
-		!options.ForceInlineAkte) &&
-		options.CheckoutMode.IncludesAkte() {
+	if ((!inlineAkte || !options.CheckoutMode.IncludesObject()) &&
+		!options.ForceInlineBlob) &&
+		options.CheckoutMode.IncludesBlob() {
 
 		fe := s.config.GetTypeExtension(t.String())
 

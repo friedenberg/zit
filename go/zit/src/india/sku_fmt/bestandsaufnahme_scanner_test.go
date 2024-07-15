@@ -23,7 +23,7 @@ func TestOne(t1 *testing.T) {
 	o := object_inventory_format.Options{Tai: true}
 	w := zstd.NewWriter(b)
 
-	printer := MakeFormatBestandsaufnahmePrinter(w, f, o)
+	printer := MakeFormatInventoryListPrinter(w, f, o)
 
 	sk := &sku.Transacted{}
 	t.AssertNoError(sk.ObjectId.SetWithIdLike(ids.MustZettelId("one/uno")))
@@ -161,7 +161,7 @@ func TestOffsets(t1 *testing.T) {
 	lookup := make(map[int64]*sku.Transacted)
 	var b bytes.Buffer
 
-	printer := MakeFormatBestandsaufnahmePrinter(&b, f, op)
+	printer := MakeFormatInventoryListPrinter(&b, f, op)
 
 	sk := &sku.Transacted{}
 	t.AssertNoError(sk.ObjectId.SetWithIdLike(ids.MustZettelId("one/uno")))

@@ -61,7 +61,7 @@ import (
 
 func (s *Store) ReadOneExternal(
 	o *sku.ObjectOptions,
-	em *KennungFDPair,
+	em *ObjectIdFDPair,
 	t *sku.Transacted,
 ) (e *External, err error) {
 	e = GetExternalPool().Get()
@@ -83,7 +83,7 @@ func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 
 	var e2 *External
 
-	if e2, err = s.ReadExternalFromKennungFDPair(
+	if e2, err = s.ReadExternalFromObjectIdFDPair(
 		sku.ObjectOptions{
 			Mode: objekte_mode.ModeUpdateTai,
 		},
@@ -104,7 +104,7 @@ func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 
 func (s *Store) ReadOneExternalInto(
 	o *sku.ObjectOptions,
-	em *KennungFDPair,
+	em *ObjectIdFDPair,
 	t *sku.Transacted,
 	e *External,
 ) (err error) {
@@ -132,19 +132,19 @@ func (s *Store) ReadOneExternalInto(
 
 	switch m {
 	case checkout_mode.ModeBlobOnly:
-		if err = s.ReadOneExternalAkte(e, t1); err != nil {
+		if err = s.ReadOneExternalBlob(e, t1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	case checkout_mode.ModeMetadataOnly, checkout_mode.ModeMetadataAndBlob:
 		if e.FDs.Object.IsStdin() {
-			if err = s.ReadOneExternalObjekteReader(os.Stdin, e); err != nil {
+			if err = s.ReadOneExternalObjectReader(os.Stdin, e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 		} else {
-			if err = s.ReadOneExternalObjekte(e, t1); err != nil {
+			if err = s.ReadOneExternalObject(e, t1); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -178,7 +178,7 @@ func (s *Store) ReadOneExternalInto(
 	return
 }
 
-func (s *Store) ReadOneExternalObjekte(
+func (s *Store) ReadOneExternalObject(
 	e *External,
 	t *sku.Transacted,
 ) (err error) {
@@ -195,7 +195,7 @@ func (s *Store) ReadOneExternalObjekte(
 
 	defer errors.DeferredCloser(&err, f)
 
-	if err = s.ReadOneExternalObjekteReader(f, e); err != nil {
+	if err = s.ReadOneExternalObjectReader(f, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -203,11 +203,11 @@ func (s *Store) ReadOneExternalObjekte(
 	return
 }
 
-func (s *Store) ReadOneExternalObjekteReader(
+func (s *Store) ReadOneExternalObjectReader(
 	r io.Reader,
 	e *External,
 ) (err error) {
-	if _, err = s.metadateiTextParser.ParseMetadata(r, e); err != nil {
+	if _, err = s.metadataTextParser.ParseMetadata(r, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -215,7 +215,7 @@ func (s *Store) ReadOneExternalObjekteReader(
 	return
 }
 
-func (s *Store) ReadOneExternalAkte(
+func (s *Store) ReadOneExternalBlob(
 	e *External,
 	t *sku.Transacted,
 ) (err error) {

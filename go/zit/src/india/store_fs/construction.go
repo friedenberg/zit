@@ -26,20 +26,20 @@ func MakeCwdFilesAll(
 		fileEncoder:    MakeFileEncoder(st, k),
 		fileExtensions: fileExtensions,
 		dir:            st.Cwd(),
-		kisten: collections_value.MakeMutableValueSet[*KennungFDPair](
+		repos: collections_value.MakeMutableValueSet[*ObjectIdFDPair](
 			nil,
 		),
-		typen: collections_value.MakeMutableValueSet[*KennungFDPair](nil),
-		zettelen: collections_value.MakeMutableValueSet[*KennungFDPair](
+		types: collections_value.MakeMutableValueSet[*ObjectIdFDPair](nil),
+		zettels: collections_value.MakeMutableValueSet[*ObjectIdFDPair](
 			nil,
 		),
-		unsureZettelen: collections_value.MakeMutableValueSet[*KennungFDPair](
+		unsureZettels: collections_value.MakeMutableValueSet[*ObjectIdFDPair](
 			nil,
 		),
-		etiketten: collections_value.MakeMutableValueSet[*KennungFDPair](
+		tags: collections_value.MakeMutableValueSet[*ObjectIdFDPair](
 			nil,
 		),
-		unsureAkten: collections_value.MakeMutableValueSet[*fd.FD](
+		unsureBlobs: collections_value.MakeMutableValueSet[*fd.FD](
 			nil,
 		),
 		emptyDirectories: collections_value.MakeMutableValueSet[*fd.FD](
@@ -48,8 +48,8 @@ func MakeCwdFilesAll(
 		deleted: collections_value.MakeMutableValueSet[*fd.FD](
 			nil,
 		),
-		objekteFormatOptions: ofo,
-		metadateiTextParser: object_metadata.MakeTextParser(
+		objectFormatOptions: ofo,
+		metadataTextParser: object_metadata.MakeTextParser(
 			st,
 			nil, // TODO-P1 make akteFormatter
 		),

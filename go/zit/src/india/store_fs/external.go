@@ -105,9 +105,9 @@ func (a *External) GetObjekteFD() *fd.FD {
 }
 
 func (a *External) ResetWithExternalMaybe(
-	b *KennungFDPair,
+	b *ObjectIdFDPair,
 ) (err error) {
-	k := b.GetKennungLike()
+	k := b.GetObjectId()
 	a.ObjectId.ResetWithIdLike(k)
 	object_metadata.Resetter.Reset(&a.Metadata)
 	a.FDs.ResetWith(b.GetFDs())

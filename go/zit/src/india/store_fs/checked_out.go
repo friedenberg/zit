@@ -105,7 +105,7 @@ func ToSliceFilesZettelen(
 	)
 }
 
-func ToSliceFilesAkten(
+func ToSliceFilesBlobs(
 	s sku.CheckedOutLikeSet,
 ) (out []string, err error) {
 	return iter.DerivedValues(

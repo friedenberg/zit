@@ -9,7 +9,7 @@ import (
 type Options struct {
 	Force           bool
 	Path            Path
-	ForceInlineAkte bool
+	ForceInlineBlob bool
 	CheckoutMode    checkout_mode.Mode
 	AllowConflicted bool
 	TextFormatterOptions
