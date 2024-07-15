@@ -69,7 +69,7 @@ func (f v4) FormatPersistentMetadatei(
 
 	es := m.GetTags()
 
-	for _, e := range iter.SortedValues[ids.Tag](es) {
+	for _, e := range iter.SortedValues(es) {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,
 			keyEtikett.String(),

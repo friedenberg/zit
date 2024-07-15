@@ -41,29 +41,29 @@ func (atc *Refiner) shouldMergeIntoParent(a *Assignment) bool {
 	}
 
 	if a.Tags.Len() == 1 && ids.IsEmpty(a.Tags.Any()) {
-		ui.Log().Print("1 Etikett, and it's empty, merging")
+		ui.Log().Print("1 tag, and it's empty, merging")
 		return true
 	}
 
 	if a.Tags.Len() == 0 {
-		ui.Log().Print("etiketten length is 0, merging")
+		ui.Log().Print("tags length is 0, merging")
 		return true
 	}
 
 	if a.Parent.Tags.Len() != 1 {
-		ui.Log().Print("parent etiketten length is not 1")
+		ui.Log().Print("parent tags length is not 1")
 		return false
 	}
 
 	if a.Tags.Len() != 1 {
-		ui.Log().Print("etiketten length is not 1")
+		ui.Log().Print("tags length is not 1")
 		return false
 	}
 
 	equal := iter.SetEqualsPtr(a.Tags, a.Parent.Tags)
 
 	if !equal {
-		ui.Log().Print("parent etiketten not equal")
+		ui.Log().Print("parent tags not equal")
 		return false
 	}
 
@@ -230,14 +230,14 @@ func (atc Refiner) applyPrefixJoints(a *Assignment) (err error) {
 	return
 }
 
-type etikettBag struct {
+type tagBag struct {
 	ids.Tag
 	assignments []*Assignment
 }
 
-func (a Refiner) childPrefixes(node *Assignment) (out []etikettBag) {
+func (a Refiner) childPrefixes(node *Assignment) (out []tagBag) {
 	m := make(map[string][]*Assignment)
-	out = make([]etikettBag, 0, len(node.Children))
+	out = make([]tagBag, 0, len(node.Children))
 
 	if node.Tags.Len() == 0 {
 		return
@@ -274,7 +274,7 @@ func (a Refiner) childPrefixes(node *Assignment) (out []etikettBag) {
 
 			errors.PanicIfError(e1.Set(e))
 
-			out = append(out, etikettBag{Tag: e1, assignments: n})
+			out = append(out, tagBag{Tag: e1, assignments: n})
 		}
 	}
 

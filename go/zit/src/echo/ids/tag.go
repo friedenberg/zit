@@ -40,9 +40,9 @@ type tag struct {
 	value         string
 }
 
-type IndexedEtikett = IndexedLike
+type IndexedTag = IndexedLike
 
-func MustEtikettPtr(v string) (e *Tag) {
+func MustTagPtr(v string) (e *Tag) {
 	e = &Tag{}
 	e.init()
 

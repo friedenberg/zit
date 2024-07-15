@@ -31,7 +31,7 @@ func (f v0) FormatPersistentMetadatei(
 	w.WriteFormat("%s %s", genres.Type, m.GetType())
 	w.WriteFormat("Bezeichnung %s", m.Description)
 
-	for _, e := range iter.SortedValues[ids.Tag](m.GetTags()) {
+	for _, e := range iter.SortedValues(m.GetTags()) {
 		w.WriteFormat("%s %s", genres.Tag, e)
 	}
 

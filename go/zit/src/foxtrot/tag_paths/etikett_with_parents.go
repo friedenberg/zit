@@ -6,14 +6,14 @@ import (
 )
 
 type EtikettWithParentsAndTypes struct {
-	*Etikett
+	*Tag
 	Parents PathsWithTypes
 }
 
 func (ewp EtikettWithParentsAndTypes) String() string {
 	var sb strings.Builder
 
-	fmt.Fprintf(&sb, "%s:%s", ewp.Etikett, ewp.Parents)
+	fmt.Fprintf(&sb, "%s:%s", ewp.Tag, ewp.Parents)
 
 	return sb.String()
 }

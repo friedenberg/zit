@@ -120,11 +120,11 @@ func (ar *assignmentLineReader) readOneHeading(
 ) (err error) {
 	depth := unicorn.CountRune(match.Bytes, '#')
 
-	currentEtiketten := ids.MakeMutableTagSet()
+	currentTags := ids.MakeMutableTagSet()
 
-	reader := id_fmts.MakeEtikettenReader()
+	reader := id_fmts.MakeTagsReader()
 
-	if _, err = reader.ReadStringFormat(rb, currentEtiketten); err != nil {
+	if _, err = reader.ReadStringFormat(rb, currentTags); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -134,13 +134,13 @@ func (ar *assignmentLineReader) readOneHeading(
 	if depth < ar.currentAssignment.Depth {
 		newAssignment, err = ar.readOneHeadingLesserDepth(
 			depth,
-			currentEtiketten,
+			currentTags,
 		)
 	} else if depth == ar.currentAssignment.Depth {
-		newAssignment, err = ar.readOneHeadingEqualDepth(depth, currentEtiketten)
+		newAssignment, err = ar.readOneHeadingEqualDepth(depth, currentTags)
 	} else {
-		// always use currentEtiketten.depth + 1 because it corrects movements
-		newAssignment, err = ar.readOneHeadingGreaterDepth(depth, currentEtiketten)
+		// always use currentTags.depth + 1 because it corrects movements
+		newAssignment, err = ar.readOneHeadingGreaterDepth(depth, currentTags)
 	}
 
 	if err != nil {
@@ -192,9 +192,6 @@ func (ar *assignmentLineReader) readOneHeadingLesserDepth(
 		assignment := newAssignment(d)
 		assignment.Tags = e.CloneSetPtrLike()
 		newCurrent.addChild(assignment)
-		// logz.Print("adding to parent")
-		// logz.Print("child", assignment.etiketten)
-		// logz.Print("parent", newCurrent.etiketten)
 		newCurrent = assignment
 	}
 
@@ -280,22 +277,6 @@ func (ar *assignmentLineReader) readOneObj(
 
 	var z obj
 	z.Type = t
-
-	// {
-	// 	var sl catgut.Slice
-
-	// 	if sl, err = r.PeekUpto('['); err != nil {
-	// 		if collections.IsErrNotFound(err) {
-	// 			err = nil
-	// 		} else {
-	// 			err = errors.Wrap(err)
-	// 			return
-	// 		}
-	// 	} else if sl.LastByte() == '%' {
-	// 		z.Type = etiketten_path.TypeUnknown
-	// 		r.AdvanceRead(sl.Len())
-	// 	}
-	// }
 
 	if _, err = ar.stringFormatReader.ReadStringFormat(r, &z.Transacted); err != nil {
 		err = ErrorRead{

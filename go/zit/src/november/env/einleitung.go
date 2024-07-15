@@ -10,6 +10,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
@@ -19,6 +20,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type BigBang struct {
@@ -186,14 +188,26 @@ func initDefaultTypAndKonfig(u *Env) (err error) {
 	{
 		var sh interfaces.Sha
 
-		if sh, err = writeDefaultErworben(u, defaultTypeObjectId); err != nil {
+		if sh, err = writeDefaultMutableConfig(u, defaultTypeObjectId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if _, err = u.GetStore().CreateOrUpdateAkteSha(
-			&ids.Config{},
-			sh,
+		newConfig := sku.GetTransactedPool().Get()
+
+		if err = newConfig.ObjectId.SetWithIdLike(ids.Config{}); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = newConfig.SetBlobSha(sh); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = u.GetStore().CreateOrUpdateFromTransacted(
+			newConfig,
+			objekte_mode.ModeCreate,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -203,7 +217,7 @@ func initDefaultTypAndKonfig(u *Env) (err error) {
 	return
 }
 
-func writeDefaultErworben(
+func writeDefaultMutableConfig(
 	u *Env,
 	dt ids.Type,
 ) (sh interfaces.Sha, err error) {

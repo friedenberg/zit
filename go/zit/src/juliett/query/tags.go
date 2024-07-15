@@ -35,7 +35,7 @@ func (sch *Tags) HasChanges() bool {
 	return len(sch.changes) > 0
 }
 
-func (sch *Tags) AddEtikett(e *tag_paths.Etikett) (err error) {
+func (sch *Tags) AddEtikett(e *tag_paths.Tag) (err error) {
 	sch.changes = append(sch.changes, fmt.Sprintf("added %q", e))
 
 	if err = sch.tags.Add(e, nil); err != nil {
@@ -46,7 +46,7 @@ func (sch *Tags) AddEtikett(e *tag_paths.Etikett) (err error) {
 	return
 }
 
-func (sch *Tags) RemoveSchlummerndEtikett(e *tag_paths.Etikett) (err error) {
+func (sch *Tags) RemoveSchlummerndEtikett(e *tag_paths.Tag) (err error) {
 	sch.changes = append(sch.changes, fmt.Sprintf("removed %q", e))
 
 	if err = sch.tags.Remove(e); err != nil {
@@ -64,7 +64,7 @@ func (sch *Tags) ContainsSku(sk *sku.Transacted) bool {
 		}
 
 		all := sk.Metadata.Cache.TagPaths.All
-		i, ok := all.ContainsEtikett(e.Etikett)
+		i, ok := all.ContainsEtikett(e.Tag)
 
 		if ok {
 			ui.Log().Printf(
@@ -200,7 +200,7 @@ func (s *Tags) ReadFrom(r *bufio.Reader) (n int64, err error) {
 		}
 
 		s.tags = append(s.tags, tag_paths.EtikettWithParentsAndTypes{
-			Etikett: cs,
+			Tag: cs,
 		})
 	}
 

@@ -44,7 +44,7 @@ func (a *Etiketten) ResetWith(b *Etiketten) {
 
 func (a *Etiketten) AddSuperFrom(
 	b *Etiketten,
-	prefix *Etikett,
+	prefix *Tag,
 ) (err error) {
 	for _, ep := range b.Paths {
 		ui.Log().Print("adding", prefix, ep)
@@ -73,7 +73,7 @@ func (es *Etiketten) AddEtikettOld(e ids.Tag) (err error) {
 	return es.AddEtikett(catgut.MakeFromString(e.String()))
 }
 
-func (es *Etiketten) AddEtikett(e *Etikett) (err error) {
+func (es *Etiketten) AddEtikett(e *Tag) (err error) {
 	if e.IsEmpty() {
 		return
 	}
@@ -88,7 +88,7 @@ func (es *Etiketten) AddEtikett(e *Etikett) (err error) {
 	return
 }
 
-func (es *Etiketten) AddSelf(e *Etikett) (err error) {
+func (es *Etiketten) AddSelf(e *Tag) (err error) {
 	if e.IsEmpty() {
 		return
 	}

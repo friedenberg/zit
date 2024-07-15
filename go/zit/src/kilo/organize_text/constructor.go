@@ -32,8 +32,6 @@ func (c *constructor) Make() (ot *Text, err error) {
 		return
 	}
 
-	// c.EtikettSet = c.rootEtiketten
-
 	if err = c.populate(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -60,7 +58,7 @@ func (c *constructor) collectExplicitAndImplicitFor(
 	if err = skus.Each(
 		func(sk *sku.Transacted) (err error) {
 			for _, ewp := range sk.Metadata.Cache.TagPaths.All {
-				if ewp.Etikett.String() == sk.ObjectId.String() {
+				if ewp.Tag.String() == sk.ObjectId.String() {
 					continue
 				}
 
@@ -134,7 +132,6 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 	c.TagSet = anchored
 	c.ExtraTags = extras
 
-	// c.ExtraEtiketten = implicit
 	return
 }
 
@@ -202,10 +199,10 @@ func (c *constructor) makeChildrenWithoutGroups(
 func (c *constructor) makeChildrenWithPossibleGroups(
 	parent *Assignment,
 	prefixSet PrefixSet,
-	groupingEtiketten ids.TagSlice,
+	groupingTags ids.TagSlice,
 	used objSet,
 ) (err error) {
-	if groupingEtiketten.Len() == 0 {
+	if groupingTags.Len() == 0 {
 		if err = c.makeChildrenWithoutGroups(
 			parent,
 			prefixSet.EachZettel,
@@ -218,7 +215,7 @@ func (c *constructor) makeChildrenWithPossibleGroups(
 		return
 	}
 
-	segments := prefixSet.Subset(groupingEtiketten[0])
+	segments := prefixSet.Subset(groupingTags[0])
 
 	if err = c.makeAndAddUngrouped(parent, segments.Ungrouped.Each); err != nil {
 		err = errors.Wrap(err)
@@ -228,7 +225,7 @@ func (c *constructor) makeChildrenWithPossibleGroups(
 	if err = c.addGroupedChildren(
 		parent,
 		segments.Grouped,
-		groupingEtiketten,
+		groupingTags,
 		used,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -243,7 +240,7 @@ func (c *constructor) makeChildrenWithPossibleGroups(
 func (c *constructor) addGroupedChildren(
 	parent *Assignment,
 	grouped PrefixSet,
-	groupingEtiketten ids.TagSlice,
+	groupingTags ids.TagSlice,
 	used objSet,
 ) (err error) {
 	if err = grouped.Each(
@@ -261,14 +258,14 @@ func (c *constructor) addGroupedChildren(
 
 			child := newAssignment(parent.GetDepth() + 1)
 			child.Tags = ids.MakeTagSet(e)
-			groupingEtiketten.DropFirst()
+			groupingTags.DropFirst()
 
 			psv := MakePrefixSetFrom(zs)
 
 			if err = c.makeChildrenWithPossibleGroups(
 				child,
 				psv,
-				groupingEtiketten,
+				groupingTags,
 				used,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -323,7 +320,7 @@ func (c *constructor) cloneObj(
 		return
 	}
 
-	if err = c.removeEtikettenIfNecessary(z); err != nil {
+	if err = c.removeTagsIfNecessary(z); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -331,10 +328,10 @@ func (c *constructor) cloneObj(
 	return
 }
 
-func (c *constructor) removeEtikettenIfNecessary(
+func (c *constructor) removeTagsIfNecessary(
 	o *obj,
 ) (err error) {
-	if c.PrintOptions.PrintEtikettenAlways {
+	if c.PrintOptions.PrintTagsAlways {
 		return
 	}
 

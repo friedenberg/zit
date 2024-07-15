@@ -153,18 +153,14 @@ func (kc *compiled) setHasChanges(reason string) {
 func (kc *Compiled) loadMutableConfig(s fs_home.Home) (err error) {
 	var f *os.File
 
-	p := s.FileKonfigCompiled()
-
-	if kc.UseKonfigErworbenFile {
-		p = s.FileKonfigErworben()
-	}
+	p := s.FileKonfigErworben()
 
 	if f, err = files.Open(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.Deferred(&err, f.Close)
+	defer errors.DeferredCloser(&err, f)
 
 	dec := gob.NewDecoder(f)
 

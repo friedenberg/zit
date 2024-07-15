@@ -40,7 +40,7 @@ type EtikettIndex interface {
 	EtikettIndexMutation
 
 	EachSchwanzen(
-		interfaces.FuncIter[*ids.IndexedEtikett],
+		interfaces.FuncIter[*ids.IndexedTag],
 	) error
 	GetEtikett(
 		*ids.Tag,

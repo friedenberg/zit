@@ -50,8 +50,8 @@ func (s TagsWithParentsAndTypes) containsKennungEtikett(
 		loc, ok := slices.BinarySearchFunc(
 			s,
 			percent,
-			func(ewp EtikettWithParentsAndTypes, e *Etikett) int {
-				cmp := ewp.Etikett.ComparePartial(e)
+			func(ewp EtikettWithParentsAndTypes, e *Tag) int {
+				cmp := ewp.Tag.ComparePartial(e)
 				return cmp
 			},
 		)
@@ -67,9 +67,9 @@ func (s TagsWithParentsAndTypes) containsKennungEtikett(
 	return slices.BinarySearchFunc(
 		s,
 		e,
-		func(ewp EtikettWithParentsAndTypes, e *Etikett) int {
+		func(ewp EtikettWithParentsAndTypes, e *Tag) int {
 			cmp := catgut.CompareUTF8Bytes(
-				ewp.Etikett.Bytes()[offset:],
+				ewp.Tag.Bytes()[offset:],
 				e.Bytes(),
 				partial,
 			)
@@ -79,19 +79,19 @@ func (s TagsWithParentsAndTypes) containsKennungEtikett(
 	)
 }
 
-func (s TagsWithParentsAndTypes) ContainsEtikett(e *Etikett) (int, bool) {
+func (s TagsWithParentsAndTypes) ContainsEtikett(e *Tag) (int, bool) {
 	return slices.BinarySearchFunc(
 		s,
 		e,
-		func(ewp EtikettWithParentsAndTypes, e *Etikett) int {
-			cmp := ewp.Etikett.ComparePartial(e)
+		func(ewp EtikettWithParentsAndTypes, e *Tag) int {
+			cmp := ewp.Tag.ComparePartial(e)
 			return cmp
 		},
 	)
 }
 
 func (s TagsWithParentsAndTypes) GetMatching(
-	e *Etikett,
+	e *Tag,
 ) (matching []EtikettWithParentsAndTypes) {
 	i, ok := s.ContainsEtikett(e)
 
@@ -114,10 +114,10 @@ func (s TagsWithParentsAndTypes) GetMatching(
 
 // TODO return success
 func (s *TagsWithParentsAndTypes) Add(
-	e1 *Etikett,
+	e1 *Tag,
 	p *PathWithType,
 ) (err error) {
-	var e *Etikett
+	var e *Tag
 
 	if e, err = e1.Clone(); err != nil {
 		err = errors.Wrap(err)
@@ -133,7 +133,7 @@ func (s *TagsWithParentsAndTypes) Add(
 		a.Parents.AddNonEmptyPath(p)
 		(*s)[idx] = a
 	} else {
-		a = EtikettWithParentsAndTypes{Etikett: e}
+		a = EtikettWithParentsAndTypes{Tag: e}
 		a.Parents.AddNonEmptyPath(p)
 
 		if idx == s.Len() {
@@ -147,8 +147,8 @@ func (s *TagsWithParentsAndTypes) Add(
 }
 
 // TODO return success
-func (s *TagsWithParentsAndTypes) Remove(e1 *Etikett) (err error) {
-	var e *Etikett
+func (s *TagsWithParentsAndTypes) Remove(e1 *Tag) (err error) {
+	var e *Tag
 
 	if e, err = e1.Clone(); err != nil {
 		err = errors.Wrap(err)
@@ -176,7 +176,7 @@ func (s TagsWithParentsAndTypes) StringCommaSeparatedExplicit() string {
 			continue
 		}
 
-		sb.Write(ewp.Etikett.Bytes())
+		sb.Write(ewp.Tag.Bytes())
 
 		if !first {
 			sb.WriteString(", ")

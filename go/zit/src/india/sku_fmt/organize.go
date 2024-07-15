@@ -160,7 +160,7 @@ func (f *Organize) WriteStringFormat(
 
 	b := &o.Metadata.Description
 
-	if f.options.PrintEtikettenAlways {
+	if f.options.PrintTagsAlways {
 		b := o.GetMetadata().GetTags()
 
 		for _, v := range iter.SortedValues(b) {

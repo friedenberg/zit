@@ -16,7 +16,7 @@ type PrintOptions struct {
 	PrintIncludeTypen       bool          `toml:"print-include-typen"`
 	PrintIncludeDescription bool          `toml:"print-include-description"`
 	PrintTime               bool          `toml:"print-time"`
-	PrintEtikettenAlways    bool          `toml:"print-etiketten-always"`
+	PrintTagsAlways    bool          `toml:"print-etiketten-always"`
 	PrintEmptyShas          bool          `toml:"print-empty-shas"`
 	PrintMatchedArchiviert  bool          `toml:"print-matched-archiviert"`
 	PrintShas               bool          `toml:"print-shas"`
@@ -48,8 +48,8 @@ func (a *PrintOptions) Merge(b PrintOptions, mask PrintOptions) {
 		a.PrintTime = b.PrintTime
 	}
 
-	if mask.PrintEtikettenAlways {
-		a.PrintEtikettenAlways = b.PrintEtikettenAlways
+	if mask.PrintTagsAlways {
+		a.PrintTagsAlways = b.PrintTagsAlways
 	}
 
 	if mask.PrintEmptyShas {
@@ -92,7 +92,7 @@ func Default() PrintOptions {
 		PrintIncludeTypen:       true,
 		PrintIncludeDescription: true,
 		PrintTime:               true,
-		PrintEtikettenAlways:    true,
+		PrintTagsAlways:    true,
 		PrintEmptyShas:          false,
 		PrintMatchedArchiviert:  false,
 		PrintShas:               true,
@@ -173,8 +173,8 @@ func (c *PrintOptions) AddToFlags(f *flag.FlagSet, m *PrintOptions) {
 	boolVarWithMask(
 		f,
 		"print-etiketten",
-		&c.PrintEtikettenAlways,
-		&m.PrintEtikettenAlways,
+		&c.PrintTagsAlways,
+		&m.PrintTagsAlways,
 		"",
 	)
 

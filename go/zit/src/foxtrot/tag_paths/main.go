@@ -11,18 +11,18 @@ import (
 )
 
 type (
-	Etikett = catgut.String
-	Path    []*Etikett
+	Tag  = catgut.String
+	Path []*Tag
 )
 
-func MakePathWithType(els ...*Etikett) *PathWithType {
+func MakePathWithType(els ...*Tag) *PathWithType {
 	return &PathWithType{
 		Path: makePath(els...),
 	}
 }
 
-func makePath(els ...*Etikett) Path {
-	p := Path(make([]*Etikett, 0, len(els)))
+func makePath(els ...*Tag) Path {
+	p := Path(make([]*Tag, 0, len(els)))
 
 	for _, e := range els {
 		p.Add(e)
@@ -57,11 +57,11 @@ func (a *Path) IsEmpty() bool {
 	return a.Len() == 0
 }
 
-func (a *Path) First() *Etikett {
+func (a *Path) First() *Tag {
 	return (*a)[0]
 }
 
-func (a *Path) Last() *Etikett {
+func (a *Path) Last() *Tag {
 	return (*a)[a.Len()-1]
 }
 
@@ -119,7 +119,7 @@ func (p *Path) String() string {
 
 func (a *Path) Copy() (b *Path) {
 	b = &Path{}
-	*b = make([]*Etikett, a.Len())
+	*b = make([]*Tag, a.Len())
 
 	if a == nil {
 		return
@@ -156,7 +156,7 @@ func (p *Path) Less(i, j int) bool {
 
 func (p *Path) Swap(i, j int) {
 	a, b := (*p)[i], (*p)[j]
-	var x Etikett
+	var x Tag
 	x.SetBytes(a.Bytes())
 	a.SetBytes(b.Bytes())
 	b.SetBytes(x.Bytes())
@@ -175,7 +175,7 @@ func (a *Path) AddPath(b *Path) {
 	sort.Sort(a)
 }
 
-func (p *Path) Add(es ...*Etikett) {
+func (p *Path) Add(es ...*Tag) {
 	for _, e := range es {
 		if e.IsEmpty() {
 			return
@@ -206,7 +206,7 @@ func (p *Path) ReadFrom(r io.Reader) (n int64, err error) {
 	*p = (*p)[:p.Cap()]
 
 	if diff := count - uint8(p.Len()); diff > 0 {
-		*p = append(*p, make([]*Etikett, diff)...)
+		*p = append(*p, make([]*Tag, diff)...)
 	}
 
 	for i := uint8(0); i < count; i++ {

@@ -3,6 +3,7 @@ package store
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -40,46 +41,11 @@ func (s *Store) ReadOneInto(
 			return
 		}
 
-	// case gattung.Typ:
-	// 	var k kennung.Typ
-
-	// 	if err = k.Set(k1.String()); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return
-	// 	}
-
-	// 	sk = s.GetKonfig().GetApproximatedTyp(k).ActualOrNil()
-
-	// case gattung.Etikett:
-	// 	var e kennung.Etikett
-
-	// 	if err = e.Set(k1.String()); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return
-	// 	}
-
-	// 	ok := false
-	// 	sk, ok = s.GetKonfig().GetEtikett(e)
-
-	// 	if !ok {
-	// 		sk = nil
-	// 	}
-
-	// case gattung.Kasten:
-	// 	var k kennung.Kasten
-
-	// 	if err = k.Set(k.String()); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return
-	// 	}
-
-	// 	sk = s.GetKonfig().GetKasten(k)
-
 	case genres.Config:
 		sk = &s.GetKonfig().Sku
 
 		if sk.GetTai().IsEmpty() {
-			sk = nil
+      ui.Err().Print("config tai is empty")
 		}
 
 	default:

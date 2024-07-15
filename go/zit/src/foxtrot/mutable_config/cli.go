@@ -114,5 +114,5 @@ func (c Cli) UsePrintTime() bool {
 }
 
 func (c Cli) UsePrintTags() bool {
-	return c.PrintOptions.PrintEtikettenAlways
+	return c.PrintOptions.PrintTagsAlways
 }

@@ -300,7 +300,7 @@ func (a *Assignment) expandedTags() (es ids.TagSet, err error) {
 	es = ids.MakeTagSet()
 
 	if a.Tags == nil {
-		panic("etiketten are nil")
+		panic("tags are nil")
 	}
 
 	if a.Tags.Len() != 1 || a.Parent == nil {
@@ -319,7 +319,7 @@ func (a *Assignment) expandedTags() (es ids.TagSet, err error) {
 
 			if pe.Len() > 1 {
 				err = errors.Errorf(
-					"cannot infer full etikett for assignment because parent assignment has more than one etiketten: %s",
+					"cannot infer full tag for assignment because parent assignment has more than one tags: %s",
 					a.Parent.Tags,
 				)
 
@@ -329,7 +329,7 @@ func (a *Assignment) expandedTags() (es ids.TagSet, err error) {
 			e1 := pe.Any()
 
 			if ids.IsEmpty(e1) {
-				err = errors.Errorf("parent etikett is empty")
+				err = errors.Errorf("parent tag is empty")
 				return
 			}
 

@@ -34,7 +34,7 @@ func (sch *Index) HasChanges() bool {
 	return len(sch.changes) > 0
 }
 
-func (sch *Index) AddDormantTag(e *tag_paths.Etikett) (err error) {
+func (sch *Index) AddDormantTag(e *tag_paths.Tag) (err error) {
 	sch.changes = append(sch.changes, fmt.Sprintf("added %q", e))
 
 	if err = sch.etiketten.Add(e, nil); err != nil {
@@ -45,7 +45,7 @@ func (sch *Index) AddDormantTag(e *tag_paths.Etikett) (err error) {
 	return
 }
 
-func (sch *Index) RemoveDormantTag(e *tag_paths.Etikett) (err error) {
+func (sch *Index) RemoveDormantTag(e *tag_paths.Tag) (err error) {
 	sch.changes = append(sch.changes, fmt.Sprintf("removed %q", e))
 
 	if err = sch.etiketten.Remove(e); err != nil {
@@ -63,7 +63,7 @@ func (sch *Index) ContainsSku(sk *sku.Transacted) bool {
 		}
 
 		all := sk.Metadata.Cache.TagPaths.All
-		i, ok := all.ContainsEtikett(e.Etikett)
+		i, ok := all.ContainsEtikett(e.Tag)
 
 		if ok {
 			ui.Log().Printf(
@@ -199,7 +199,7 @@ func (s *Index) ReadFrom(r *bufio.Reader) (n int64, err error) {
 		}
 
 		s.etiketten = append(s.etiketten, tag_paths.EtikettWithParentsAndTypes{
-			Etikett: cs,
+			Tag: cs,
 		})
 	}
 

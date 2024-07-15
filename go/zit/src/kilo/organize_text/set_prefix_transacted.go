@@ -116,9 +116,6 @@ func (s *PrefixSet) addPair(
 	if e == z.ObjectId.String() {
 		e = ""
 	}
-	// if e != "" {
-	// 	errors.PanicIfError((&kennung.Etikett{}).Set(e))
-	// }
 
 	existingSet, ok := s.innerMap[e]
 
@@ -245,8 +242,8 @@ func (a PrefixSet) Subset(
 
 			OUTER:
 				for _, e2Match := range intersection {
-					e2s := e2Match.Etikett.String()
-					ui.Log().Print(e2Match.Etikett)
+					e2s := e2Match.Tag.String()
+					ui.Log().Print(e2Match.Tag)
 					for _, e3 := range e2Match.Parents {
 						toAddGrouped = append(toAddGrouped, match{
 							string: e2s,
@@ -255,7 +252,7 @@ func (a PrefixSet) Subset(
 
 						ui.Log().Print(e3)
 						if e3.Type == tag_paths.TypeDirect &&
-							e2Match.Etikett.Len() == e2.Len() {
+							e2Match.Tag.Len() == e2.Len() {
 							hasDirect = true
 							break OUTER
 						}

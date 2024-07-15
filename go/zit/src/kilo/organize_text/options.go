@@ -81,26 +81,26 @@ func MakeFlagsWithMetadata(m object_metadata.Metadata) Flags {
 }
 
 func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
-	f.Var(&o.GroupingTags, "group-by", "etikett prefixes to group zettels")
+	f.Var(&o.GroupingTags, "group-by", "tag prefixes to group zettels")
 
 	f.Var(
 		o.ExtraTags,
 		"extras",
-		"etiketten to always add to the organize text",
+		"tags to always add to the organize text",
 	)
 
 	f.BoolVar(
 		&o.UsePrefixJoints,
 		"prefix-joints",
 		true,
-		"split etiketten around hyphens",
+		"split tags around hyphens",
 	)
 
 	f.BoolVar(
 		&o.UseRightAlignedIndents,
 		"right-align",
 		true,
-		"right-align etiketten",
+		"right-align tags",
 	)
 
 	f.BoolVar(&o.UseRefiner, "refine", true, "refine the organize tree")

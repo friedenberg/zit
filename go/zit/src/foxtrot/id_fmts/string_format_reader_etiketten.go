@@ -11,7 +11,7 @@ import (
 
 type etikettenReader struct{}
 
-func MakeEtikettenReader() (f *etikettenReader) {
+func MakeTagsReader() (f *etikettenReader) {
 	f = &etikettenReader{}
 
 	return

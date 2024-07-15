@@ -25,8 +25,8 @@ func MakeJsonTomlBookmark(
 		return
 	}
 
-	if err = toml.Unmarshal([]byte(j.Akte), &j.TomlBookmark); err != nil {
-		err = errors.Wrapf(err, "%q", j.Akte)
+	if err = toml.Unmarshal([]byte(j.BlobString), &j.TomlBookmark); err != nil {
+		err = errors.Wrapf(err, "%q", j.BlobString)
 		return
 	}
 

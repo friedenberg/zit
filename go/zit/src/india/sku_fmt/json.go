@@ -14,13 +14,13 @@ import (
 )
 
 type Json struct {
-	Akte        string   `json:"akte"`
-	AkteSha     string   `json:"akte-sha"`
-	Bezeichnung string   `json:"bezeichnung"`
-	Etiketten   []string `json:"etiketten"`
-	Kennung     string   `json:"kennung"`
+	BlobString  string   `json:"blob-string"`
+	BlobSha     string   `json:"blob-sha"`
+	Description string   `json:"description"`
+	Tags        []string `json:"tags"`
+	ObjectId    string   `json:"object-id"`
 	Sha         string   `json:"sha"`
-	Typ         string   `json:"typ"`
+	Type        string   `json:"type"`
 	Tai         string   `json:"tai"`
 }
 
@@ -45,14 +45,14 @@ func (j *Json) FromStringAndMetadatei(
 		return
 	}
 
-	j.Akte = out.String()
-	j.AkteSha = m.Blob.String()
-	j.Bezeichnung = m.Description.String()
-	j.Etiketten = iter.Strings(m.GetTags())
-	j.Kennung = k
+	j.BlobString = out.String()
+	j.BlobSha = m.Blob.String()
+	j.Description = m.Description.String()
+	j.Tags = iter.Strings(m.GetTags())
+	j.ObjectId = k
 	j.Sha = m.SelfMetadataWithoutTai.String()
 	j.Tai = m.Tai.String()
-	j.Typ = m.Type.String()
+	j.Type = m.Type.String()
 
 	return
 }
@@ -74,7 +74,7 @@ func (j *Json) ToTransacted(sk *sku.Transacted, s fs_home.Home) (err error) {
 
 	defer errors.DeferredCloser(&err, w)
 
-	if _, err = io.Copy(w, strings.NewReader(j.Akte)); err != nil {
+	if _, err = io.Copy(w, strings.NewReader(j.BlobString)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -87,24 +87,24 @@ func (j *Json) ToTransacted(sk *sku.Transacted, s fs_home.Home) (err error) {
 	// 	return
 	// }
 
-	if err = sk.ObjectId.Set(j.Kennung); err != nil {
+	if err = sk.ObjectId.Set(j.ObjectId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = sk.Metadata.Type.Set(j.Typ); err != nil {
+	if err = sk.Metadata.Type.Set(j.Type); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = sk.Metadata.Description.Set(j.Bezeichnung); err != nil {
+	if err = sk.Metadata.Description.Set(j.Description); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	var es ids.TagSet
 
-	if es, err = ids.MakeTagSetStrings(j.Etiketten...); err != nil {
+	if es, err = ids.MakeTagSetStrings(j.Tags...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

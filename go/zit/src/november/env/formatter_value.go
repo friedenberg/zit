@@ -120,7 +120,7 @@ func (u *Env) MakeFormatFunc(
 			}
 
 			for _, es := range tl.Metadata.Cache.TagPaths.All {
-				if _, err = fmt.Fprintf(out, "%s: %s -> %s\n", tl.GetObjectId(), es.Etikett, es.Parents); err != nil {
+				if _, err = fmt.Fprintf(out, "%s: %s -> %s\n", tl.GetObjectId(), es.Tag, es.Parents); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -382,7 +382,7 @@ func (u *Env) MakeFormatFunc(
 				return
 			}
 
-			if err = toml.Unmarshal([]byte(j.Json.Akte), &j.Akte); err != nil {
+			if err = toml.Unmarshal([]byte(j.Json.BlobString), &j.Akte); err != nil {
 				err = nil
 
 				if err = enc.Encode(j.Json); err != nil {

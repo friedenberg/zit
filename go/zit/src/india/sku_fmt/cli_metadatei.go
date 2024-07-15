@@ -162,7 +162,7 @@ func (f *cliMetadatei) writeStringFormatEtiketten(
 	o *object_metadata.Metadata,
 	didWriteDescription bool,
 ) (n int64, err error) {
-	if !f.options.PrintEtikettenAlways &&
+	if !f.options.PrintTagsAlways &&
 		(!f.writeEtiketten && didWriteDescription) {
 		return
 	}
