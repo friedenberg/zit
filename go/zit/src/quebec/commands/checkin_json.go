@@ -28,8 +28,8 @@ func (c CheckinJson) DefaultGenres() ids.Genre {
 }
 
 type TomlBookmark struct {
-	Kennung   string
-	Etiketten []string
+	ObjectId   string
+	Tags []string
 	Url       string
 }
 

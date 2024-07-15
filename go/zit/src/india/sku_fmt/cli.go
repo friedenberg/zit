@@ -15,23 +15,23 @@ type cli struct {
 	options       erworben_cli_print_options.PrintOptions
 	contentPrefix string
 
-	kennungStringFormatWriter   interfaces.StringFormatWriter[*ids.ObjectId]
+	objectIdStringFormatWriter   interfaces.StringFormatWriter[*ids.ObjectId]
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata]
 }
 
 func MakeCliFormatShort(
-	kennungStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
+	objectIdStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata],
 ) *cli {
 	return &cli{
-		kennungStringFormatWriter:   kennungStringFormatWriter,
+		objectIdStringFormatWriter:   objectIdStringFormatWriter,
 		metadateiStringFormatWriter: metadateiStringFormatWriter,
 	}
 }
 
 func MakeCliFormat(
 	options erworben_cli_print_options.PrintOptions,
-	kennungStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
+	objectStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata],
 ) *cli {
 	return &cli{
@@ -39,7 +39,7 @@ func MakeCliFormat(
 		contentPrefix: string_format_writer.StringPrefixFromOptions(
 			options,
 		),
-		kennungStringFormatWriter:   kennungStringFormatWriter,
+		objectIdStringFormatWriter:   objectStringFormatWriter,
 		metadateiStringFormatWriter: metadateiStringFormatWriter,
 	}
 }
@@ -93,7 +93,7 @@ func (f *cli) WriteStringFormat(
 	k := &o.ObjectId
 
 	var n2 int64
-	n2, err = f.kennungStringFormatWriter.WriteStringFormat(sw, k)
+	n2, err = f.objectIdStringFormatWriter.WriteStringFormat(sw, k)
 	n += n2
 
 	if err != nil {

@@ -11,23 +11,23 @@ type (
 	Float = float32
 )
 
-type Kennung struct {
+type ZettelIdCoordinate struct {
 	Left, Right Int
 }
 
-func (p Kennung) Equals(p1 Kennung) bool {
+func (p ZettelIdCoordinate) Equals(p1 ZettelIdCoordinate) bool {
 	return p.Left == p1.Left && p.Right == p1.Right
 }
 
-func Extrema(n Int) Kennung {
+func Extrema(n Int) ZettelIdCoordinate {
 	n1 := Float(n)
-	return Kennung{
+	return ZettelIdCoordinate{
 		Left:  Int(((n1 - 1) * n1 / 2) + 1),
 		Right: Int(n1 * ((n1 + 1) / 2)),
 	}
 }
 
-func (p *Kennung) SetCoordinates(left, right string) (err error) {
+func (p *ZettelIdCoordinate) SetCoordinates(left, right string) (err error) {
 	l, err := strconv.ParseUint(left, 10, 32)
 	if err != nil {
 		return
@@ -44,7 +44,7 @@ func (p *Kennung) SetCoordinates(left, right string) (err error) {
 	return
 }
 
-func (p *Kennung) Set(id string) (err error) {
+func (p *ZettelIdCoordinate) Set(id string) (err error) {
 	i, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
 		return
@@ -55,7 +55,7 @@ func (p *Kennung) Set(id string) (err error) {
 	return
 }
 
-func (p *Kennung) SetInt(id Int) {
+func (p *ZettelIdCoordinate) SetInt(id Int) {
 	n := math.Round(math.Sqrt(float64(id * 2)))
 	ext := Extrema(Int(n))
 
@@ -63,12 +63,12 @@ func (p *Kennung) SetInt(id Int) {
 	p.Right = ext.Right - id
 }
 
-func (p Kennung) Id() Int {
+func (p ZettelIdCoordinate) Id() Int {
 	n := p.Left + p.Right + 1
 	ext := Extrema(n)
 	return ext.Left + p.Left
 }
 
-func (p Kennung) String() string {
+func (p ZettelIdCoordinate) String() string {
 	return fmt.Sprintf("%d/%d: %d", p.Left, p.Right, p.Id())
 }

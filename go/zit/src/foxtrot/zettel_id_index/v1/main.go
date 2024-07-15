@@ -188,7 +188,7 @@ func (i *hinweisIndex) AddHinweis(k1 ids.IdLike) (err error) {
 		return
 	}
 
-	k := coordinates.Kennung{
+	k := coordinates.ZettelIdCoordinate{
 		Left:  coordinates.Int(left),
 		Right: coordinates.Int(right),
 	}
@@ -273,7 +273,7 @@ func (i *hinweisIndex) CreateHinweis() (h *ids.ZettelId, err error) {
 func (i *hinweisIndex) makeHinweisButDontStore(
 	j int,
 ) (h *ids.ZettelId, err error) {
-	k := &coordinates.Kennung{}
+	k := &coordinates.ZettelIdCoordinate{}
 	k.SetInt(coordinates.Int(j))
 
 	if h, err = ids.MakeZettelIdFromProvidersAndCoordinates(
@@ -304,7 +304,7 @@ func (i *hinweisIndex) PeekHinweisen(m int) (hs []*ids.ZettelId, err error) {
 	if err = i.bitset.EachOff(
 		func(n int) (err error) {
 			n += 1
-			k := &coordinates.Kennung{}
+			k := &coordinates.ZettelIdCoordinate{}
 			k.SetInt(coordinates.Int(n))
 
 			var h *ids.ZettelId

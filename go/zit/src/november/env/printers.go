@@ -45,7 +45,7 @@ func (u *Env) StringFormatWriterShaLike(
 	)
 }
 
-func (u *Env) StringFormatWriterKennungAligned(
+func (u *Env) StringFormatWriterObjectIdAligned(
 	co string_format_writer.ColorOptions,
 ) id_fmts.Aligned {
 	return id_fmts.MakeAligned(
@@ -54,7 +54,7 @@ func (u *Env) StringFormatWriterKennungAligned(
 	)
 }
 
-func (u *Env) StringFormatWriterKennung(
+func (u *Env) StringFormatWriterObjectId(
 	co string_format_writer.ColorOptions,
 ) interfaces.StringFormatWriter[*ids.ObjectId] {
 	return id_fmts.MakeObjectIdCliFormat(
@@ -107,7 +107,7 @@ func (u *Env) SkuFmtOrganize() *sku_fmt.Organize {
 	return sku_fmt.MakeFormatOrganize(
 		u.config.PrintOptions,
 		u.StringFormatWriterShaLike(co),
-		u.StringFormatWriterKennungAligned(co),
+		u.StringFormatWriterObjectIdAligned(co),
 		u.StringFormatWriterTyp(co),
 		u.StringFormatWriterDescription(descriptions.CliFormatTruncationNone, co, false),
 		u.StringFormatWriterEtiketten(co),
@@ -124,7 +124,7 @@ func (u *Env) StringFormatWriterSkuTransacted(
 
 	return sku_fmt.MakeCliFormat(
 		u.config.PrintOptions,
-		u.StringFormatWriterKennung(*co),
+		u.StringFormatWriterObjectId(*co),
 		u.StringFormatWriterMetadatei(*co),
 	)
 }
@@ -135,7 +135,7 @@ func (u *Env) StringFormatWriterSkuTransactedShort() interfaces.StringFormatWrit
 	}
 
 	return sku_fmt.MakeCliFormatShort(
-		u.StringFormatWriterKennung(co),
+		u.StringFormatWriterObjectId(co),
 		u.StringFormatWriterMetadatei(co),
 	)
 }
@@ -233,7 +233,7 @@ func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[sku.CheckedOutLike] {
 				oo.ColorOptionsErr,
 				u.fs_home.MakeRelativePathStringFormatWriter(),
 			),
-			u.StringFormatWriterKennung(oo.ColorOptionsErr),
+			u.StringFormatWriterObjectId(oo.ColorOptionsErr),
 			u.StringFormatWriterMetadatei(oo.ColorOptionsErr),
 		),
 	)
@@ -248,7 +248,7 @@ func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[sku.CheckedOutLike] {
 				oo.ColorOptionsOut,
 				u.fs_home.MakeRelativePathStringFormatWriter(),
 			),
-			u.StringFormatWriterKennung(oo.ColorOptionsOut),
+			u.StringFormatWriterObjectId(oo.ColorOptionsOut),
 			u.StringFormatWriterMetadatei(oo.ColorOptionsOut),
 		),
 	)
@@ -271,7 +271,7 @@ func (u *Env) PrinterCheckedOutChrome() interfaces.FuncIter[sku.CheckedOutLike] 
 		chrome.MakeCliCheckedOutFormat(
 			u.config.PrintOptions,
 			u.StringFormatWriterShaLike(oo.ColorOptionsErr),
-			u.StringFormatWriterKennung(oo.ColorOptionsErr),
+			u.StringFormatWriterObjectId(oo.ColorOptionsErr),
 			u.StringFormatWriterMetadatei(oo.ColorOptionsErr),
 			u.StringFormatWriterTyp(oo.ColorOptionsErr),
 			u.StringFormatWriterDescription(
@@ -289,7 +289,7 @@ func (u *Env) PrinterCheckedOutChrome() interfaces.FuncIter[sku.CheckedOutLike] 
 		chrome.MakeCliCheckedOutFormat(
 			u.config.PrintOptions,
 			u.StringFormatWriterShaLike(oo.ColorOptionsOut),
-			u.StringFormatWriterKennung(oo.ColorOptionsOut),
+			u.StringFormatWriterObjectId(oo.ColorOptionsOut),
 			u.StringFormatWriterMetadatei(oo.ColorOptionsOut),
 			u.StringFormatWriterTyp(oo.ColorOptionsOut),
 			u.StringFormatWriterDescription(

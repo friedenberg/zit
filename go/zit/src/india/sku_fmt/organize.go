@@ -27,10 +27,10 @@ type ObjectIdAlignedFormat interface {
 func MakeFormatOrganize(
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
-	kennungStringFormatWriter id_fmts.Aligned,
-	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
+	objectIdStringFormatWriter id_fmts.Aligned,
+	typeStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
 	descriptionStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description],
-	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
+	tagsStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
 ) *Organize {
 	options.PrintTime = false
 	options.PrintShas = false
@@ -38,10 +38,10 @@ func MakeFormatOrganize(
 	return &Organize{
 		options:                       options,
 		shaStringFormatWriter:         shaStringFormatWriter,
-		kennungStringFormatWriter:     kennungStringFormatWriter,
-		typStringFormatWriter:         typStringFormatWriter,
+		objectIdStringFormatWriter:     objectIdStringFormatWriter,
+		typStringFormatWriter:         typeStringFormatWriter,
 		descriptionStringFormatWriter: descriptionStringFormatWriter,
-		etikettenStringFormatWriter:   etikettenStringFormatWriter,
+		etikettenStringFormatWriter:   tagsStringFormatWriter,
 	}
 }
 
@@ -52,7 +52,7 @@ type Organize struct {
 	padding             string
 
 	shaStringFormatWriter         interfaces.StringFormatWriter[interfaces.Sha]
-	kennungStringFormatWriter     id_fmts.Aligned
+	objectIdStringFormatWriter     id_fmts.Aligned
 	typStringFormatWriter         interfaces.StringFormatWriter[*ids.Type]
 	descriptionStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description]
 	etikettenStringFormatWriter   interfaces.StringFormatWriter[*ids.Tag]
@@ -61,7 +61,7 @@ type Organize struct {
 func (f *Organize) SetMaxKopfUndSchwanz(k, s int) {
 	f.maxKopf, f.maxSchwanz = k, s
 	f.padding = strings.Repeat(" ", 5+k+s)
-	f.kennungStringFormatWriter.SetMaxKopfUndSchwanz(k, s)
+	f.objectIdStringFormatWriter.SetMaxKopfUndSchwanz(k, s)
 }
 
 func (f *Organize) WriteStringFormat(
@@ -99,7 +99,7 @@ func (f *Organize) WriteStringFormat(
 	}
 
 	var n2 int64
-	n2, err = f.kennungStringFormatWriter.WriteStringFormat(sw, &o.ObjectId)
+	n2, err = f.objectIdStringFormatWriter.WriteStringFormat(sw, &o.ObjectId)
 	n += int64(n2)
 	// var n2 int64
 	// n2, err = f.kennungStringFormatWriter.WriteStringFormat(

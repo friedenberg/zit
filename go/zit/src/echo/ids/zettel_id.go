@@ -36,7 +36,7 @@ func MakeZettelIdFromProvidersAndCoordinates(
 	pl Provider,
 	pr Provider,
 ) (h *ZettelId, err error) {
-	k := coordinates.Kennung{}
+	k := coordinates.ZettelIdCoordinate{}
 	k.SetInt(i)
 
 	var l, r string

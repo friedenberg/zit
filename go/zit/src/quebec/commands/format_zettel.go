@@ -51,15 +51,15 @@ func init() {
 func (c *FormatZettel) Run(u *env.Env, args ...string) (err error) {
 	formatId := "text"
 
-	var kennungString string
+	var objectIdString string
 
 	switch len(args) {
 	case 1:
-		kennungString = args[0]
+		objectIdString = args[0]
 
 	case 2:
 		formatId = args[0]
-		kennungString = args[1]
+		objectIdString = args[1]
 
 	default:
 		err = errors.Errorf(
@@ -71,7 +71,7 @@ func (c *FormatZettel) Run(u *env.Env, args ...string) (err error) {
 
 	var zt *sku.Transacted
 
-	if zt, err = c.getSku(u, kennungString); err != nil {
+	if zt, err = c.getSku(u, objectIdString); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -115,13 +115,13 @@ func (c *FormatZettel) Run(u *env.Env, args ...string) (err error) {
 
 func (c *FormatZettel) getSku(
 	u *env.Env,
-	kennungString string,
+	objectIdString string,
 ) (sk *sku.Transacted, err error) {
 	b := u.MakeQueryBuilder(ids.MakeGenre(genres.Zettel))
 
 	var qg *query.Group
 
-	if qg, err = b.BuildQueryGroup(kennungString); err != nil {
+	if qg, err = b.BuildQueryGroup(objectIdString); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

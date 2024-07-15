@@ -284,7 +284,7 @@ func (u *Env) PrintMatchedArchiviertIfNecessary() {
 	ui.Err().Printf("%d archived objekten matched", c)
 }
 
-func (u *Env) MakeKennungIndex() ids.Index {
+func (u *Env) MakeObjectIdIndex() ids.Index {
 	return ids.Index{}
 }
 

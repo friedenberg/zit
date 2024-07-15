@@ -252,7 +252,7 @@ func (es *ExternalStore) UpdateTransacted(z *Transacted) (err error) {
 	return
 }
 
-func (es *ExternalStore) GetExternalKennung() (ks interfaces.SetLike[*ids.ObjectId], err error) {
+func (es *ExternalStore) GetExternalObjectIds() (ks interfaces.SetLike[*ids.ObjectId], err error) {
 	if es == nil {
 		ks = collections_value.MakeValueSet[*ids.ObjectId](nil)
 		return
@@ -271,7 +271,7 @@ func (es *ExternalStore) GetExternalKennung() (ks interfaces.SetLike[*ids.Object
 	return
 }
 
-func (es *ExternalStore) GetKennungForString(v string) (k *ids.ObjectId, err error) {
+func (es *ExternalStore) GetObjectIdForString(v string) (k *ids.ObjectId, err error) {
 	if es == nil {
 		err = collections.MakeErrNotFoundString(v)
 		return
