@@ -58,4 +58,8 @@ type (
 	TextParser interface {
 		ParseMetadata(io.Reader, TextParserContext) (int64, error)
 	}
+
+	BlobFDSetter interface {
+		SetBlobFD(*fd.FD)
+	}
 )

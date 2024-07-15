@@ -15,25 +15,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 )
 
-type (
-	ObjekteFDGetter interface {
-		GetObjekteFD() *FD
-	}
-
-	AkteFDGetter interface {
-		GetAkteFD() *FD
-	}
-
-	FDPairGetter interface {
-		ObjekteFDGetter
-		AkteFDGetter
-	}
-
-	AkteFDSetter interface {
-		SetAkteFD(*FD)
-	}
-)
-
 type FD struct {
 	isDir   bool
 	path    string

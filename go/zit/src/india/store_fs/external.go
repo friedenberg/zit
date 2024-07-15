@@ -91,7 +91,7 @@ func (a *External) GetAkteFD() *fd.FD {
 	return &a.FDs.Blob
 }
 
-func (a *External) SetAkteFD(v *fd.FD) {
+func (a *External) SetBlobFD(v *fd.FD) {
 	a.FDs.Blob.ResetWith(v)
 	a.Metadata.Blob.SetShaLike(v.GetShaLike())
 }

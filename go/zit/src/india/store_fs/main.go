@@ -253,10 +253,10 @@ func (fs *Store) ContainsSku(m *sku.Transacted) bool {
 func (fs *Store) GetCwdFDs() fd.Set {
 	fds := fd.MakeMutableSet()
 
-	fd.SetAddPairs(fs.zettelen, fds)
-	fd.SetAddPairs(fs.typen, fds)
-	fd.SetAddPairs(fs.etiketten, fds)
-	fd.SetAddPairs(fs.unsureZettelen, fds)
+	SetAddPairs(fs.zettelen, fds)
+	SetAddPairs(fs.typen, fds)
+	SetAddPairs(fs.etiketten, fds)
+	SetAddPairs(fs.unsureZettelen, fds)
 	fs.unsureAkten.Each(fds.Add)
 
 	return fds
@@ -405,7 +405,7 @@ func (fs *Store) ZettelFiles() (out []string, err error) {
 	out, err = iter.DerivedValues(
 		fs.zettelen,
 		func(z *KennungFDPair) (p string, err error) {
-			p = z.GetObjekteFD().GetPath()
+			p = z.GetObjectFD().GetPath()
 			return
 		},
 	)

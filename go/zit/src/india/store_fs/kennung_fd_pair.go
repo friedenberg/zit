@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -44,11 +45,11 @@ func (e *KennungFDPair) GetFDs() *FDPair {
 	return &e.FDs
 }
 
-func (e *KennungFDPair) GetObjekteFD() *fd.FD {
+func (e *KennungFDPair) GetObjectFD() *fd.FD {
 	return &e.FDs.Object
 }
 
-func (e *KennungFDPair) GetAkteFD() *fd.FD {
+func (e *KennungFDPair) GetBlobFD() *fd.FD {
 	return &e.FDs.Blob
 }
 
@@ -98,4 +99,33 @@ func (e *KennungFDPair) SetKennungFromFullPath(
 	}
 
 	return
+}
+
+func SetAddPairs(
+	in interfaces.SetLike[*KennungFDPair],
+	out fd.MutableSet,
+) (err error) {
+	return in.Each(
+		func(e *KennungFDPair) (err error) {
+			ofd := e.GetObjectFD()
+
+			if !ofd.IsEmpty() {
+				if err = out.Add(ofd); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
+			ofd = e.GetBlobFD()
+
+			if !ofd.IsEmpty() {
+				if err = out.Add(ofd); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+
+			return
+		},
+	)
 }

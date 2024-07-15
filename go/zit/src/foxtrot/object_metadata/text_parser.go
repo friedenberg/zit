@@ -117,8 +117,8 @@ func (f textParser) ParseMetadata(
 
 		return
 	} else if !akteFD.GetShaLike().IsNull() {
-		if afs, ok := c.(fd.AkteFDSetter); ok {
-			afs.SetAkteFD(&akteFD)
+		if afs, ok := c.(BlobFDSetter); ok {
+			afs.SetBlobFD(&akteFD)
 		}
 
 		m.Blob.SetShaLike(akteFD.GetShaLike())
