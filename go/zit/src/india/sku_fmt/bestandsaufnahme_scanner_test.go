@@ -66,7 +66,7 @@ func TestOne(t1 *testing.T) {
 
 	op := object_inventory_format.Options{}
 
-	scanner := MakeFormatBestandsaufnahmeScanner(zstd.NewReader(b), f, op)
+	scanner := MakeFormatInventoryListScanner(zstd.NewReader(b), f, op)
 
 	if !scanner.Scan() {
 		t.Logf("scan error: %q", scanner.Error())
@@ -106,7 +106,7 @@ func TestBigMac(t1 *testing.T) {
 	f := object_inventory_format.Default()
 	op := object_inventory_format.Options{}
 
-	scanner := MakeFormatBestandsaufnahmeScanner(
+	scanner := MakeFormatInventoryListScanner(
 		zstd.NewReader(dataComp),
 		f,
 		op,
@@ -141,7 +141,7 @@ func TestOffsets(t1 *testing.T) {
 	f := object_inventory_format.Default()
 	op := object_inventory_format.Options{Tai: true}
 
-	scanner := MakeFormatBestandsaufnahmeScanner(
+	scanner := MakeFormatInventoryListScanner(
 		strings.NewReader(dataRaw),
 		f,
 		op,

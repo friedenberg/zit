@@ -287,7 +287,7 @@ func (s *Store) commitTransacted(
 		return
 	}
 
-	if err = s.inventoryListBlob.Skus.Add(sk); err != nil {
+	if err = s.inventoryList.Add(sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -304,7 +304,7 @@ func (s *Store) AddTypToIndex(t *ids.Type) (err error) {
 		return
 	}
 
-	if err = s.typenIndex.StoreOne(*t); err != nil {
+	if err = s.typeIndex.StoreOne(*t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -492,8 +492,8 @@ func (s *Store) addEtikettAndExpanded(
 
 	etikettenExpanded := ids.ExpandOneSlice(&e, expansion.ExpanderRight)
 
-	s.etikettenLock.Lock()
-	defer s.etikettenLock.Unlock()
+	s.tagLock.Lock()
+	defer s.tagLock.Unlock()
 
 	for _, e1 := range etikettenExpanded {
 		if e1.IsVirtual() {

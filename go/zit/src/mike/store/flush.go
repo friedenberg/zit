@@ -28,7 +28,7 @@ func (s *Store) FlushBestandsaufnahme(
 	var bestandsaufnahmeSku *sku.Transacted
 
 	if bestandsaufnahmeSku, err = s.GetBestandsaufnahmeStore().Create(
-		&s.inventoryListBlob,
+		s.inventoryList,
 		s.GetKonfig().Description,
 	); err != nil {
 		if errors.Is(err, inventory_list.ErrEmpty) {
@@ -51,7 +51,7 @@ func (s *Store) FlushBestandsaufnahme(
 		}
 	}
 
-	inventory_list.Resetter.Reset(&s.inventoryListBlob)
+	inventory_list.Resetter.Reset(s.inventoryList)
 
 	if err = s.GetBestandsaufnahmeStore().Flush(); err != nil {
 		err = errors.Wrap(err)
@@ -75,9 +75,9 @@ func (c *Store) Flush(
 
 	if c.GetStandort().GetLockSmith().IsAcquired() {
 		gob.Register(iter.StringerKeyerPtr[ids.Type, *ids.Type]{}) // TODO check if can be removed
-		wg.Do(func() error { return c.verzeichnisse.Flush(printerHeader) })
+		wg.Do(func() error { return c.streamIndex.Flush(printerHeader) })
 		wg.Do(c.GetAbbrStore().Flush)
-		wg.Do(c.typenIndex.Flush)
+		wg.Do(c.typeIndex.Flush)
 		wg.Do(c.objectIdIndex.Flush)
 		wg.Do(c.Abbr.Flush)
 	}

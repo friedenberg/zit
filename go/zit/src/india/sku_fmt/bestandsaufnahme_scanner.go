@@ -21,7 +21,7 @@ type FormatBestandsaufnahmeScanner interface {
 	SetDebug()
 }
 
-func MakeFormatBestandsaufnahmeScanner(
+func MakeFormatInventoryListScanner(
 	in io.Reader,
 	of object_inventory_format.Format,
 	op object_inventory_format.Options,

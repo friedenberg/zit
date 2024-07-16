@@ -115,7 +115,7 @@ func (s *store) Create(
 		return
 	}
 
-	if o.Skus.Len() == 0 {
+	if o.Len() == 0 {
 		err = errors.Wrap(ErrEmpty)
 		return
 	}
@@ -188,10 +188,10 @@ func (s *store) writeInventoryList(o *InventoryList) (sh *sha.Sha, err error) {
 		s.options,
 	)
 
-	defer o.Skus.Restore()
+	defer o.Restore()
 
 	for {
-		sk, ok := o.Skus.PopAndSave()
+		sk, ok := o.PopAndSave()
 
 		if !ok {
 			break
@@ -270,7 +270,7 @@ func (s *store) ReadOneSku(besty, sh *sha.Sha) (o *sku.Transacted, err error) {
 
 	defer errors.DeferredCloser(&err, ar)
 
-	dec := sku_fmt.MakeFormatBestandsaufnahmeScanner(
+	dec := sku_fmt.MakeFormatInventoryListScanner(
 		ar,
 		s.object_format,
 		s.options,
@@ -389,7 +389,7 @@ func (s *store) StreamInventoryList(
 
 	defer errors.DeferredCloser(&err, ar)
 
-	dec := sku_fmt.MakeFormatBestandsaufnahmeScanner(
+	dec := sku_fmt.MakeFormatInventoryListScanner(
 		ar,
 		object_inventory_format.FormatForVersion(s.sv),
 		s.options,

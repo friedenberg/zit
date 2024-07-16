@@ -85,7 +85,7 @@ func (e *page) open() (err error) {
 	return
 }
 
-func (e *page) GetEnnuiPage() pageInterface {
+func (e *page) GetIndexPage() pageInterface {
 	return e
 }
 

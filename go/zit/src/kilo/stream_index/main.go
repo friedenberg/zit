@@ -164,7 +164,7 @@ func (i *Index) flushAdded(
 		}
 	}
 
-	wg.DoAfter(i.ids.Flush)
+	wg.DoAfter(i.id_index.Flush)
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
@@ -228,7 +228,7 @@ func (i *Index) flushEverything(
 		}
 	}
 
-	wg.DoAfter(i.ids.Flush)
+	wg.DoAfter(i.id_index.Flush)
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)

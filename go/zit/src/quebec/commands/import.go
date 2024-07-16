@@ -107,7 +107,7 @@ func (c Import) Run(u *env.Env, args ...string) (err error) {
 	var co *store_fs.CheckedOut
 
 	for {
-		sk, ok := list.Skus.Pop()
+		sk, ok := list.Pop()
 
 		if !ok {
 			break

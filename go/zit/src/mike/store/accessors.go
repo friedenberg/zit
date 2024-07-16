@@ -33,10 +33,6 @@ func (s *Store) GetEnnui() object_probe_index.Ennui {
 	return nil
 }
 
-func (s *Store) GetFileEncoder() store_fs.FileEncoder {
-	return s.fileEncoder
-}
-
 func (s *Store) GetCwdFiles() *store_fs.Store {
 	return s.cwdFiles
 }
@@ -50,7 +46,7 @@ func (s *Store) GetProtoZettel() sku.Proto {
 }
 
 func (s *Store) GetPersistentMetadateiFormat() object_inventory_format.Format {
-	return s.persistentMetadateiFormat
+	return s.persistentObjectFormat
 }
 
 func (s *Store) GetTime() thyme.Time {
@@ -62,7 +58,7 @@ func (s *Store) GetTai() ids.Tai {
 }
 
 func (s *Store) GetBestandsaufnahmeStore() inventory_list.Store {
-	return s.bestandsaufnahmeStore
+	return s.inventoryListStore
 }
 
 func (s *Store) GetAbbrStore() AbbrStore {
@@ -82,7 +78,7 @@ func (s *Store) GetKonfig() *config.Compiled {
 }
 
 func (s *Store) GetVerzeichnisse() *stream_index.Index {
-	return s.verzeichnisse
+	return s.streamIndex
 }
 
 func (s *Store) GetConfigBlobFormat() blob_store.Format[mutable_config.Blob, *mutable_config.Blob] {

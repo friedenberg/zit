@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
@@ -31,7 +30,7 @@ import (
 )
 
 type Env struct {
-	sunrise thyme.Time
+	sunrise ids.Tai
 
 	in  *os.File
 	out *os.File
@@ -102,7 +101,7 @@ func (u *Env) Initialize(options Options) (err error) {
 		return
 	}
 
-	u.sunrise = thyme.Now()
+	u.sunrise = ids.NowTai()
 
 	errors.TodoP4("find a better place for this")
 	{

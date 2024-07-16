@@ -18,14 +18,14 @@ type (
 	}
 
 	pageInterface interface {
-		GetEnnuiPage() pageInterface
+		GetIndexPage() pageInterface
 		commonInterface
 		PrintAll() error
 		errors.Flusher
 	}
 
-	Ennui interface {
-		GetEnnui() Ennui
+	Index interface {
+		GetIndex() Index
 		commonInterface
 		PrintAll() error
 		errors.Flusher
@@ -72,7 +72,7 @@ func (e *object_probe_index) initialize(
 	return
 }
 
-func (e *object_probe_index) GetEnnui() Ennui {
+func (e *object_probe_index) GetIndex() Index {
 	return e
 }
 

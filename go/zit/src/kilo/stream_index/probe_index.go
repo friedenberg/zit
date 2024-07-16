@@ -18,7 +18,7 @@ import (
 type probe_index struct {
 	fs_home                   fs_home.Home
 	persistentMetadateiFormat object_inventory_format.Format
-	ids                       sha_probe_index.Ennui
+	id_index                  sha_probe_index.Index
 	options                   object_inventory_format.Options
 }
 
@@ -31,7 +31,7 @@ func (s *probe_index) Initialize(
 	s.persistentMetadateiFormat = persistentMetadateiFormat
 	s.options = options
 
-	if s.ids, err = sha_probe_index.MakeNoDuplicates(
+	if s.id_index, err = sha_probe_index.MakeNoDuplicates(
 		s.fs_home,
 		s.fs_home.DirVerzeichnisseVerweise(),
 	); err != nil {
@@ -93,7 +93,7 @@ func (s *probe_index) ReadOneObjectIdSha(
 	left := sha.FromString(k.String())
 	defer sha.GetPool().Put(left)
 
-	if sh, err = s.ids.ReadOne(left); err != nil {
+	if sh, err = s.id_index.ReadOne(left); err != nil {
 		err = errors.Wrapf(err, "zettel id: %q, Left: %s", k, left)
 		return
 	}
@@ -173,7 +173,7 @@ func (s *probe_index) MakeFuncSaveOneVerweise(o *sku.Transacted) func() error {
 		sh := sha.FromString(k.String())
 		defer sha.GetPool().Put(sh)
 
-		if err = s.ids.AddSha(sh, o.Metadata.Sha()); err != nil {
+		if err = s.id_index.AddSha(sh, o.Metadata.Sha()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

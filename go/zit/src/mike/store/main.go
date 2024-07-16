@@ -8,11 +8,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
-	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_id_index"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -26,38 +24,31 @@ import (
 )
 
 type Store struct {
-	config                    *config.Compiled
-	fs_home                   fs_home.Home
-	cwdFiles                  *store_fs.Store
-	externalStores            map[string]*external_store.Store
-	blob_store                *blob_store.VersionedStores
-	inventoryListBlob         inventory_list.InventoryList
-	options                   object_inventory_format.Options
-	Abbr                      AbbrStore
-	persistentMetadateiFormat object_inventory_format.Format
-	fileEncoder               store_fs.FileEncoder
-	luaVMPoolBuilder          *lua.VMPoolBuilder
-	etikettenLock             sync.Mutex
+	sunrise ids.Tai
+	config  *config.Compiled
+	fs_home fs_home.Home
 
-	verzeichnisse *stream_index.Index
+	cwdFiles           *store_fs.Store
+	externalStores     map[string]*external_store.Store
+	blob_store         *blob_store.VersionedStores
+	inventoryListStore inventory_list.Store
+	Abbr               AbbrStore
 
-	sonnenaufgang thyme.Time
+	inventoryList          *inventory_list.InventoryList
+	options                object_inventory_format.Options
+	persistentObjectFormat object_inventory_format.Format
+	configBlobFormat       blob_store.Format[mutable_config.Blob, *mutable_config.Blob]
+	luaVMPoolBuilder       *lua.VMPoolBuilder
+	tagLock                sync.Mutex
 
-	checkedOutLogPrinter interfaces.FuncIter[sku.CheckedOutLike]
+	streamIndex   *stream_index.Index
+	objectIdIndex object_id_index.Index
+	typeIndex     object_id_index.ObjectIdIndex[ids.Type, *ids.Type]
 
-	metadateiTextParser object_metadata.TextParser
-
-	bestandsaufnahmeStore inventory_list.Store
-	objectIdIndex         object_id_index.Index
-
-	sku.TransactedAdder
-	typenIndex object_id_index.ObjectIdIndex[ids.Type, *ids.Type]
-
-	protoZettel      sku.Proto
-	configBlobFormat blob_store.Format[mutable_config.Blob, *mutable_config.Blob]
-
+	protoZettel  sku.Proto
 	queryBuilder *query.Builder
 
+	checkedOutLogPrinter interfaces.FuncIter[sku.CheckedOutLike]
 	Logger
 }
 
@@ -70,7 +61,7 @@ func (c *Store) Initialize(
 	k *config.Compiled,
 	st fs_home.Home,
 	pmf object_inventory_format.Format,
-	t thyme.Time,
+	t ids.Tai,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
 	qb *query.Builder,
 	options object_inventory_format.Options,
@@ -78,26 +69,18 @@ func (c *Store) Initialize(
 	c.config = k
 	c.fs_home = st
 	c.blob_store = blob_store.Make(st)
-	c.persistentMetadateiFormat = pmf
+	c.persistentObjectFormat = pmf
 	c.options = options
-	c.sonnenaufgang = t
-	c.fileEncoder = store_fs.MakeFileEncoder(st, k)
+	c.sunrise = t
 	c.luaVMPoolBuilder = luaVMPoolBuilder
 	c.queryBuilder = qb
 
-	c.metadateiTextParser = object_metadata.MakeTextParser(
-		c.fs_home,
-		nil,
-	)
-
-	c.typenIndex = object_id_index.MakeIndex2[ids.Type](
+	c.typeIndex = object_id_index.MakeIndex2[ids.Type](
 		c.fs_home,
 		st.DirVerzeichnisse("TypenIndexV0"),
 	)
 
-	c.inventoryListBlob = inventory_list.InventoryList{
-		Skus: sku.MakeTransactedHeap(),
-	}
+	c.inventoryList = inventory_list.MakeInventoryList()
 
 	if c.Abbr, err = newIndexAbbr(
 		c.fs_home,
@@ -107,7 +90,7 @@ func (c *Store) Initialize(
 		return
 	}
 
-	if c.bestandsaufnahmeStore, err = inventory_list.MakeStore(
+	if c.inventoryListStore, err = inventory_list.MakeStore(
 		c.GetStandort(),
 		c.GetStandort().GetLockSmith(),
 		c.config.GetStoreVersion(),
@@ -129,7 +112,7 @@ func (c *Store) Initialize(
 		return
 	}
 
-	if c.verzeichnisse, err = stream_index.MakeIndex(
+	if c.streamIndex, err = stream_index.MakeIndex(
 		c.GetStandort(),
 		c.GetKonfig(),
 		c.GetStandort().DirVerzeichnisseObjekten(),
@@ -195,7 +178,7 @@ func (s *Store) SetCheckedOutLogWriter(
 }
 
 func (s *Store) ResetIndexes() (err error) {
-	if err = s.typenIndex.Reset(); err != nil {
+	if err = s.typeIndex.Reset(); err != nil {
 		err = errors.Wrapf(err, "failed to reset etiketten index")
 		return
 	}

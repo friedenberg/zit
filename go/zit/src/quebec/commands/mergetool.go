@@ -90,7 +90,7 @@ func (c Mergetool) RunWithQuery(
 
 			br := bufio.NewReader(f)
 
-			s := sku_fmt.MakeFormatBestandsaufnahmeScanner(
+			s := sku_fmt.MakeFormatInventoryListScanner(
 				br,
 				object_inventory_format.FormatForVersion(u.GetConfig().GetStoreVersion()),
 				u.GetStore().GetObjekteFormatOptions(),
