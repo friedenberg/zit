@@ -37,23 +37,23 @@ func init() {
 				&c.Dedupe,
 				"dedupe",
 				false,
-				"deduplicate added Zettelen based on Akte sha",
+				"deduplicate added Zettels based on blob sha",
 			)
 
 			f.BoolVar(
 				&c.Delete,
 				"delete",
 				false,
-				"delete the zettel and akte after successful checkin",
+				"delete the zettel and blob after successful checkin",
 			)
 
-			f.BoolVar(&c.OpenBlob, "open-akten", false, "also open the Akten")
+			f.BoolVar(&c.OpenBlob, "open-blobs", false, "also open the blobs")
 
 			f.StringVar(
 				&c.CheckoutBlobAndRun,
-				"each-akte",
+				"each-blob",
 				"",
-				"checkout each Akte and run a utility",
+				"checkout each Blob and run a utility",
 			)
 
 			f.BoolVar(&c.Organize, "organize", false, "")
@@ -77,7 +77,7 @@ func (c Add) Run(
 	u *env.Env,
 	args ...string,
 ) (err error) {
-	zettelsFromAkteOp := user_ops.ZettelFromExternalBlob{
+	zettelsFromBlobOp := user_ops.ZettelFromExternalBlob{
 		Env:    u,
 		Proto:  c.Proto,
 		Filter: c.Filter,
@@ -85,13 +85,13 @@ func (c Add) Run(
 		Dedupe: c.Dedupe,
 	}
 
-	var zettelsFromAkteResults sku.TransactedMutableSet
+	var zettelsFromBlobResults sku.TransactedMutableSet
 
 	fds := fd.MakeMutableSet()
 
 	for _, v := range args {
 		if v == "." {
-			if err = u.GetStore().GetCwdFiles().GetAktenFDs().Each(fds.Add); err != nil {
+			if err = u.GetStore().GetCwdFiles().GetBlobFDs().Each(fds.Add); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -114,12 +114,12 @@ func (c Add) Run(
 		}
 	}
 
-	if zettelsFromAkteResults, err = zettelsFromAkteOp.Run(fds); err != nil {
+	if zettelsFromBlobResults, err = zettelsFromBlobOp.Run(fds); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = c.openBlobIfNecessary(u, zettelsFromAkteResults); err != nil {
+	if err = c.openBlobIfNecessary(u, zettelsFromBlobResults); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -140,7 +140,7 @@ func (c Add) Run(
 		return
 	}
 
-	if err = opOrganize.Run(nil, zettelsFromAkteResults); err != nil {
+	if err = opOrganize.Run(nil, zettelsFromBlobResults); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -366,7 +366,7 @@ func (s *store) populateInventoryList(blobSha interfaces.Sha, a *InventoryList) 
 
 	if !sh.EqualsSha(blobSha) {
 		err = errors.Errorf(
-			"objekte had akte sha %s while akte reader had %s",
+			"objekte had blob sha %s while blob reader had %s",
 			blobSha,
 			sh,
 		)
@@ -377,12 +377,12 @@ func (s *store) populateInventoryList(blobSha interfaces.Sha, a *InventoryList) 
 }
 
 func (s *store) StreamInventoryList(
-	akteSha interfaces.Sha,
+	blobSha interfaces.Sha,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	var ar interfaces.ShaReadCloser
 
-	if ar, err = s.af.BlobReader(akteSha); err != nil {
+	if ar, err = s.af.BlobReader(blobSha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -412,9 +412,9 @@ func (s *store) StreamInventoryList(
 	return
 }
 
-func (s *store) GetBlob(akteSha interfaces.Sha) (a *InventoryList, err error) {
+func (s *store) GetBlob(blobSha interfaces.Sha) (a *InventoryList, err error) {
 	a = MakeInventoryList()
-	err = s.populateInventoryList(akteSha, a)
+	err = s.populateInventoryList(blobSha, a)
 	return
 }
 

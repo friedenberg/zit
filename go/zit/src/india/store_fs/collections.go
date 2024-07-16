@@ -13,6 +13,5 @@ type (
 func MakeCheckedOutMutableSet() CheckedOutMutableSet {
 	return collections_value.MakeMutableValueSet[*CheckedOut](
 		nil,
-		// KennungKeyer[CheckedOut, *CheckedOut]{},
 	)
 }

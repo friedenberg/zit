@@ -152,7 +152,7 @@ func (f textFormatterCommon) writePathType(
 	return ohio.WriteLine(w1, fmt.Sprintf("! %s", ap))
 }
 
-func (f textFormatterCommon) writeAkte(
+func (f textFormatterCommon) writeBlob(
 	w1 io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {
@@ -165,7 +165,7 @@ func (f textFormatterCommon) writeAkte(
 	}
 
 	if ar == nil {
-		err = errors.Errorf("akte reader is nil")
+		err = errors.Errorf("blob reader is nil")
 		return
 	}
 

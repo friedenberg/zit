@@ -16,14 +16,14 @@ func TestWriter1(t1 *testing.T) {
 metadatei
 ---
 
-akte
+blob
 `
 
 	out := &strings.Builder{}
 
 	sut := Writer{
 		Metadata: strings.NewReader("metadatei\n"),
-		Blob:     strings.NewReader("akte\n"),
+		Blob:     strings.NewReader("blob\n"),
 	}
 
 	sut.WriteTo(out)
@@ -61,13 +61,13 @@ func TestWriter3(t1 *testing.T) {
 		T: t1,
 	}
 
-	expectedOut := `akte
+	expectedOut := `blob
 `
 
 	out := &strings.Builder{}
 
 	sut := Writer{
-		Blob: strings.NewReader("akte\n"),
+		Blob: strings.NewReader("blob\n"),
 	}
 
 	sut.WriteTo(out)

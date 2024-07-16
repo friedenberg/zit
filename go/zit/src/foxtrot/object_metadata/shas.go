@@ -51,7 +51,7 @@ func (a *Shas) ResetWith(b *Shas) {
 func (s *Shas) String() string {
 	var sb strings.Builder
 
-	fmt.Fprintf(&sb, "%s: %s\n", "Akte", &s.Blob)
+	fmt.Fprintf(&sb, "%s: %s\n", "Blob", &s.Blob)
 	fmt.Fprintf(&sb, "%s: %s\n", ShaKeySelfMetadata, &s.SelfMetadata)
 	fmt.Fprintf(&sb, "%s: %s\n", ShaKeySelfMetadataWithouTai, &s.SelfMetadataWithoutTai)
 

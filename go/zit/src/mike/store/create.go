@@ -65,7 +65,7 @@ func (s *Store) CreateOrUpdateFromTransacted(
 	return
 }
 
-func (s *Store) CreateOrUpdateAkteSha(
+func (s *Store) CreateOrUpdateBlobSha(
 	k ids.IdLike,
 	sh interfaces.Sha,
 ) (t *sku.Transacted, err error) {

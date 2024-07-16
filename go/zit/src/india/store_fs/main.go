@@ -66,12 +66,12 @@ func (fs *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
 	fs.deleteLock.Lock()
 	defer fs.deleteLock.Unlock()
 
-	if err = fs.deleted.Add(e.GetObjekteFD()); err != nil {
+	if err = fs.deleted.Add(e.GetObjectFD()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = fs.deleted.Add(e.GetAkteFD()); err != nil {
+	if err = fs.deleted.Add(e.GetBlobFD()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -98,7 +98,7 @@ func (fs *Store) Flush() (err error) {
 }
 
 // must accept directories
-func (fs *Store) MarkUnsureAkten(f *fd.FD) (err error) {
+func (fs *Store) MarkUnsureBlob(f *fd.FD) (err error) {
 	if f.IsDir() {
 		// TODO handle recursion
 		return
@@ -208,7 +208,7 @@ func (s *Store) GetExternalObjectId() (ks interfaces.SetLike[*ids.ObjectId], err
 	return
 }
 
-// TODO confirm against actual Kennung
+// TODO confirm against actual Object Id
 func (fs *Store) GetObjectIdForString(v string) (k *ids.ObjectId, err error) {
 	var fd fd.FD
 
@@ -262,7 +262,7 @@ func (fs *Store) GetCwdFDs() fd.Set {
 	return fds
 }
 
-func (fs *Store) GetAktenFDs() fd.Set {
+func (fs *Store) GetBlobFDs() fd.Set {
 	fds := fd.MakeMutableSet()
 
 	fs.unsureBlobs.Each(fds.Add)
@@ -270,7 +270,7 @@ func (fs *Store) GetAktenFDs() fd.Set {
 	return fds
 }
 
-func (fs *Store) GetUnsureAkten() fd.Set {
+func (fs *Store) GetUnsureBlobs() fd.Set {
 	fds := fd.MakeMutableSet()
 	fs.unsureBlobs.Each(fds.Add)
 	return fds
@@ -644,7 +644,7 @@ func (fs *Store) readNotSecondLevelFile(name string) (err error) {
 		}
 
 	default:
-		if err = fs.addUnsureAkten("", fullPath); err != nil {
+		if err = fs.addUnsureBlob("", fullPath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -653,7 +653,7 @@ func (fs *Store) readNotSecondLevelFile(name string) (err error) {
 	return
 }
 
-func (fs *Store) addUnsureAkten(dir, name string) (err error) {
+func (fs *Store) addUnsureBlob(dir, name string) (err error) {
 	var ut *fd.FD
 
 	fullPath := name
@@ -701,10 +701,10 @@ func (fs *Store) readSecondLevelFile(dir string, name string) (err error) {
 	case fs.fileExtensions.Zettel:
 		fallthrough
 
-		// Zettel-Akten can have any extension, and so default is Zettel
+		// Zettel-Blob can have any extension, and so default is Zettel
 	default:
 		if err = fs.tryZettel(dir, name, fullPath); err != nil {
-			if err = fs.addUnsureAkten(dir, name); err != nil {
+			if err = fs.addUnsureBlob(dir, name); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

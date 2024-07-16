@@ -101,12 +101,6 @@ func (f *Organize) WriteStringFormat(
 	var n2 int64
 	n2, err = f.objectIdStringFormatWriter.WriteStringFormat(sw, &o.ObjectId)
 	n += int64(n2)
-	// var n2 int64
-	// n2, err = f.kennungStringFormatWriter.WriteStringFormat(
-	// 	sw,
-	// 	o.Kennung,
-	// )
-	// n += n2
 
 	if err != nil {
 		err = errors.Wrap(err)
@@ -342,15 +336,6 @@ LOOP:
 			return
 		}
 	}
-
-	// if f.options.Abbreviations.Hinweisen {
-	// 	if err = f.ex.AbbreviateHinweisOnly(
-	// 		&o.Kennung,
-	// 	); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return
-	// 	}
-	// }
 
 	rb.AdvanceRead(n)
 

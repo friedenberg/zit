@@ -51,7 +51,7 @@ func (a *FD) Equals(b *FD) bool {
 	return true
 }
 
-func (fd *FD) SetWithAkteWriterFactory(
+func (fd *FD) SetWithBlobWriterFactory(
 	p string,
 	awf interfaces.BlobWriterFactory,
 ) (err error) {
@@ -61,7 +61,7 @@ func (fd *FD) SetWithAkteWriterFactory(
 	}
 
 	if awf == nil {
-		panic("schnittstellen.AkteWriterFactory is nil")
+		panic("BlobWriterFactory is nil")
 	}
 
 	var f *os.File
@@ -73,16 +73,16 @@ func (fd *FD) SetWithAkteWriterFactory(
 
 	defer errors.DeferredCloser(&err, f)
 
-	var akteWriter sha.WriteCloser
+	var blobWriter sha.WriteCloser
 
-	if akteWriter, err = awf.BlobWriter(); err != nil {
+	if blobWriter, err = awf.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, akteWriter)
+	defer errors.DeferredCloser(&err, blobWriter)
 
-	if _, err = io.Copy(akteWriter, f); err != nil {
+	if _, err = io.Copy(blobWriter, f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -100,7 +100,7 @@ func (fd *FD) SetWithAkteWriterFactory(
 	}
 
 	fd.path = p
-	fd.sha.SetShaLike(akteWriter)
+	fd.sha.SetShaLike(blobWriter)
 
 	return
 }

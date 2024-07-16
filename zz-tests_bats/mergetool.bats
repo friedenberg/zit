@@ -86,7 +86,7 @@ function mergetool_conflict_one_local { # @test
 		          deleted [one/]
 	EOM
 
-	run_zit show -format akte one/dos
+	run_zit show -format blob one/dos
 	assert_success
 	assert_output - <<-EOM
 		not another one
@@ -122,7 +122,7 @@ function mergetool_conflict_one_remote { # @test
 		          deleted [one/]
 	EOM
 
-	run_zit show -format akte one/dos
+	run_zit show -format blob one/dos
 	assert_success
 	assert_output - <<-EOM
 		not another one, conflict time

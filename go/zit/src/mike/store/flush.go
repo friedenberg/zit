@@ -28,7 +28,7 @@ func (s *Store) FlushBestandsaufnahme(
 	var bestandsaufnahmeSku *sku.Transacted
 
 	if bestandsaufnahmeSku, err = s.GetBestandsaufnahmeStore().Create(
-		&s.bestandsaufnahmeAkte,
+		&s.inventoryListBlob,
 		s.GetKonfig().Description,
 	); err != nil {
 		if errors.Is(err, inventory_list.ErrEmpty) {
@@ -51,7 +51,7 @@ func (s *Store) FlushBestandsaufnahme(
 		}
 	}
 
-	inventory_list.Resetter.Reset(&s.bestandsaufnahmeAkte)
+	inventory_list.Resetter.Reset(&s.inventoryListBlob)
 
 	if err = s.GetBestandsaufnahmeStore().Flush(); err != nil {
 		err = errors.Wrap(err)

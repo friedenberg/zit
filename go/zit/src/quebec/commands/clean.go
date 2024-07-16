@@ -43,9 +43,9 @@ func init() {
 
 			f.BoolVar(
 				&c.includeRecognizedBlobs,
-				"recognized-akten",
+				"recognized-blobs",
 				false,
-				"remove Akten in working directory or args that are recognized",
+				"remove blobs in working directory or args that are recognized",
 			)
 
 			f.BoolVar(

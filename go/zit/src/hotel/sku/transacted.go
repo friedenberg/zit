@@ -48,14 +48,6 @@ func (t *Transacted) SetFromSkuLike(sk SkuLike) (err error) {
 func (a *Transacted) Less(b *Transacted) bool {
 	less := a.GetTai().Less(b.GetTai())
 
-	// 	op := ">"
-
-	// 	if less {
-	// 		op = "<"
-	// 	}
-
-	// 	log.Debug().Print(a.StringKennungTaiAkte(), op, b.StringKennungTaiAkte())
-
 	return less
 }
 
@@ -113,9 +105,7 @@ func (a *Transacted) GetTai() ids.Tai {
 }
 
 func (a *Transacted) SetTai(t ids.Tai) {
-	// log.Debug().Caller(6, "before: %s", a.StringKennungTai())
 	a.GetMetadata().Tai = t
-	// log.Debug().Caller(6, "after: %s", a.StringKennungTai())
 }
 
 func (a *Transacted) GetObjectId() *ids.ObjectId {

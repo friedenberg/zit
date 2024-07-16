@@ -114,21 +114,3 @@ func (c *CheckedOut) DetermineState(justCheckedOut bool) {
 func (a *CheckedOut) String() string {
 	return fmt.Sprintf("%s %s", &a.Internal, &a.External)
 }
-
-// func (e *CheckedOut) Remove(s schnittstellen.Standort) (err error) {
-// 	// TODO check conflict state
-// 	if err = e.External.FDs.Objekte.Remove(s); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	if err = e.External.FDs.Akte.Remove(s); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	e.External.FDs.Akte.Reset()
-// 	e.External.FDs.Objekte.Reset()
-
-// 	return
-// }

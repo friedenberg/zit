@@ -158,7 +158,7 @@ func (i *hinweisIndex) Reset() (err error) {
 	return
 }
 
-func (i *hinweisIndex) AddHinweis(k1 ids.IdLike) (err error) {
+func (i *hinweisIndex) AddZettelId(k1 ids.IdLike) (err error) {
 	if !k1.GetGenre().EqualsGenre(genres.Zettel) {
 		err = genres.MakeErrUnsupportedGenre(k1)
 		return

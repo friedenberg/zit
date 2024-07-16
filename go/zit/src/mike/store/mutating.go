@@ -163,7 +163,7 @@ func (s *Store) tryRealizeAndOrStore(
 		if err = s.GetKonfig().AddTransacted(
 			kinder,
 			mutter,
-			s.GetAkten(),
+			s.GetBlobStore(),
 			o.Mode,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -171,9 +171,9 @@ func (s *Store) tryRealizeAndOrStore(
 		}
 
 		if kinder.GetGenre() == genres.Zettel {
-			if err = s.objectIdIndex.AddHinweis(&kinder.ObjectId); err != nil {
+			if err = s.objectIdIndex.AddZettelId(&kinder.ObjectId); err != nil {
 				if errors.Is(err, object_id_provider.ErrDoesNotExist{}) {
-					ui.Log().Printf("kennung does not contain value: %s", err)
+					ui.Log().Printf("object id does not contain value: %s", err)
 					err = nil
 				} else {
 					err = errors.Wrapf(err, "failed to write zettel to index: %s", kinder)
@@ -287,7 +287,7 @@ func (s *Store) commitTransacted(
 		return
 	}
 
-	if err = s.bestandsaufnahmeAkte.Skus.Add(sk); err != nil {
+	if err = s.inventoryListBlob.Skus.Add(sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -340,12 +340,12 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	type akteSaver interface {
-		SaveAkte(s fs_home.Home) (err error)
+	type blobSaver interface {
+		SaveBlob(s fs_home.Home) (err error)
 	}
 
-	if as, ok := co.GetSkuExternalLike().(akteSaver); ok {
-		if err = as.SaveAkte(s.GetStandort()); err != nil {
+	if as, ok := co.GetSkuExternalLike().(blobSaver); ok {
+		if err = as.SaveBlob(s.GetStandort()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -393,7 +393,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 func (s *Store) UpdateKonfig(
 	sh interfaces.Sha,
 ) (kt *sku.Transacted, err error) {
-	return s.CreateOrUpdateAkteSha(
+	return s.CreateOrUpdateBlobSha(
 		&ids.Config{},
 		sh,
 	)

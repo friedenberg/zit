@@ -26,9 +26,9 @@ func init() {
 
 			f.BoolVar(
 				&c.IgnoreBlob,
-				"ignore-akte",
+				"ignore-blob",
 				false,
-				"do not change the akte",
+				"do not change the blob",
 			)
 
 			return c

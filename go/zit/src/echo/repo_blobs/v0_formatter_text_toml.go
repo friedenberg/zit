@@ -7,9 +7,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 )
 
-type FormatterAkteTextToml struct{}
+type FormatterBlobTextToml struct{}
 
-func (_ FormatterAkteTextToml) Format(
+func (FormatterBlobTextToml) Format(
 	w io.Writer,
 	t *V0,
 ) (n int64, err error) {

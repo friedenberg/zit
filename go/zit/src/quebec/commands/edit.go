@@ -31,7 +31,7 @@ func init() {
 				&c.Delete,
 				"delete",
 				false,
-				"delete the zettel and akte after successful checkin",
+				"delete the zettel and blob after successful checkin",
 			)
 			f.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
 

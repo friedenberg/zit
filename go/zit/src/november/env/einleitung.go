@@ -36,8 +36,8 @@ func (e *BigBang) AddToFlagSet(f *flag.FlagSet) {
 		"age",
 		"",
 	) // TODO-P3 move to Angeboren
-	f.StringVar(&e.Yin, "yin", "", "File containing list of Kennung")
-	f.StringVar(&e.Yang, "yang", "", "File containing list of Kennung")
+	f.StringVar(&e.Yin, "yin", "", "File containing list of zettel id left parts")
+	f.StringVar(&e.Yang, "yang", "", "File containing list of zettel id right parts")
 	e.Config.AddToFlagSet(f)
 }
 
@@ -162,7 +162,7 @@ func initDefaultTypAndKonfig(u *Env) (err error) {
 
 		var sh interfaces.Sha
 
-		if sh, _, err = u.GetStore().GetAkten().GetTypeV0().SaveBlobText(
+		if sh, _, err = u.GetStore().GetBlobStore().GetTypeV0().SaveBlobText(
 			&defaultTypeBlob,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -176,7 +176,7 @@ func initDefaultTypAndKonfig(u *Env) (err error) {
 			return
 		}
 
-		if _, err = u.GetStore().CreateOrUpdateAkteSha(
+		if _, err = u.GetStore().CreateOrUpdateBlobSha(
 			&k,
 			sh,
 		); err != nil {
@@ -223,7 +223,7 @@ func writeDefaultMutableConfig(
 ) (sh interfaces.Sha, err error) {
 	defaultKonfig := mutable_config.Default(dt)
 
-	f := u.GetStore().GetKonfigAkteFormat()
+	f := u.GetStore().GetConfigBlobFormat()
 
 	var aw sha.WriteCloser
 

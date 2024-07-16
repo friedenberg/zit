@@ -11,7 +11,7 @@ import (
 func (u *Env) makeQueryBuilder() *query.Builder {
 	return query.MakeBuilder(
 		u.GetFSHome(),
-		u.GetStore().GetAkten(),
+		u.GetStore().GetBlobStore(),
 		u.GetStore().GetVerzeichnisse(),
 		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
 		u,

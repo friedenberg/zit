@@ -73,12 +73,12 @@ func (e *FDPair) conflictMarkerExists(fd *fd.FD) (ok bool) {
 
 func (e *FDPair) ConflictMarkerError() (err error) {
 	if e.conflictMarkerExists(&e.Object) {
-		err = errors.Wrapf(ErrExternalHasConflictMarker, "Objekte: %s", &e.Object)
+		err = errors.Wrapf(ErrExternalHasConflictMarker, "Object: %s", &e.Object)
 		return
 	}
 
 	if e.conflictMarkerExists(&e.Blob) {
-		err = errors.Wrapf(ErrExternalHasConflictMarker, "Akte: %s", &e.Blob)
+		err = errors.Wrapf(ErrExternalHasConflictMarker, "Blob: %s", &e.Blob)
 		return
 	}
 

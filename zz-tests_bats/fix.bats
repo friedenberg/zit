@@ -45,7 +45,7 @@ function can_update_akte { # @test
 		echo the body but new
 	} >"$new_akte"
 
-	run_zit checkin-akte -new-etiketten et3 one/uno "$new_akte"
+	run_zit checkin-blob -new-tags et3 one/uno "$new_akte"
 	assert_success
 	assert_output - <<-EOM
 		[et3@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]

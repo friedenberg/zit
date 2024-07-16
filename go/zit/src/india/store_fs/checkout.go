@@ -173,16 +173,16 @@ func (s *Store) checkoutOne(
 	cz.State = checked_out_state.StateJustCheckedOut
 
 	t := cz.Internal.GetType()
-	inlineAkte := s.config.IsInlineType(t)
+	inlineBlob := s.config.IsInlineType(t)
 
-	if options.CheckoutMode.IncludesObject() {
+	if options.CheckoutMode.IncludesMetadata() {
 		if err = cz.External.GetFDsPtr().Object.SetPath(filename); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	if ((!inlineAkte || !options.CheckoutMode.IncludesObject()) &&
+	if ((!inlineBlob || !options.CheckoutMode.IncludesMetadata()) &&
 		!options.ForceInlineBlob) &&
 		options.CheckoutMode.IncludesBlob() {
 

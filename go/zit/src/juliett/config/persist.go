@@ -97,7 +97,7 @@ func (kc *Compiled) recompileTypes(
 			kc.ExtensionsToTypes[fe] = ct.GetObjectId().String()
 			kc.TypesToExtensions[ct.GetObjectId().String()] = fe
 
-			if ta.InlineAkte {
+			if ta.InlineBlob {
 				inlineTypen.Add(values.MakeString(ct.ObjectId.String()))
 			}
 

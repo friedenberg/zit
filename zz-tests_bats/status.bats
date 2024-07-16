@@ -149,7 +149,7 @@ function status_simple_one_zettel_akte_only { # @test
 		          deleted [one/uno.zettel]
 	EOM
 
-	run_zit checkout -mode akte one/uno.zettel
+	run_zit checkout -mode blob one/uno.zettel
 	assert_output - <<-EOM
 		      checked out [one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4
 		                   one/uno.md]
@@ -178,7 +178,7 @@ function status_zettel_akte_checkout { # @test
 
 	dirty_new_zettel
 
-	run_zit checkout -mode akte two/uno
+	run_zit checkout -mode blob two/uno
 	assert_success
 	assert_output - <<-EOM
 		      checked out [two/uno@aeb82efa111ccb5b8c5ca351f12d8b2f8e76d8d7bd0ecebf2efaaa1581d19400 !txt "the new zettel" etikett-one

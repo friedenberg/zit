@@ -87,7 +87,7 @@ func (a *External) GetFDsPtr() *FDPair {
 	return &a.FDs
 }
 
-func (a *External) GetAkteFD() *fd.FD {
+func (a *External) GetBlobFD() *fd.FD {
 	return &a.FDs.Blob
 }
 
@@ -96,11 +96,11 @@ func (a *External) SetBlobFD(v *fd.FD) {
 	a.Metadata.Blob.SetShaLike(v.GetShaLike())
 }
 
-func (a *External) GetAktePath() string {
+func (a *External) GetBlobPath() string {
 	return a.FDs.Blob.GetPath()
 }
 
-func (a *External) GetObjekteFD() *fd.FD {
+func (a *External) GetObjectFD() *fd.FD {
 	return &a.FDs.Object
 }
 

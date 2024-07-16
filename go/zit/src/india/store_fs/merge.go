@@ -88,14 +88,6 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 		return
 	}
 
-	// if merged.Akte.Path, err = s.runDiff3(
-	// 	leftCO.External.FDs.Akte,
-	// 	middleCO.External.FDs.Akte,
-	// 	rightCO.External.FDs.Akte,
-	// ); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
 	src := merged.Object.GetPath()
 	dst := cofs.External.FDs.Object.GetPath()
 
@@ -151,7 +143,7 @@ func (s *Store) RunMergeTool(
 	tool []string,
 	tm sku.Conflicted,
 ) (co *CheckedOut, err error) {
-	inlineAkte := tm.IsAllInlineType(s.config)
+	inlineBlob := tm.IsAllInlineType(s.config)
 
 	op := checkout_options.Options{
 		CheckoutMode:    checkout_mode.ModeMetadataAndBlob,
@@ -159,7 +151,7 @@ func (s *Store) RunMergeTool(
 		Path:            checkout_options.PathTempLocal,
 	}
 
-	if !inlineAkte {
+	if !inlineBlob {
 		op.CheckoutMode = checkout_mode.ModeMetadataOnly
 	}
 

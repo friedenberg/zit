@@ -88,7 +88,7 @@ func (qg *Group) GetExactlyOneObjectId(
 	lk := len(kn)
 
 	if lk != 1 {
-		err = errors.Errorf("expected to exactly 1 kennung but got %d", lk)
+		err = errors.Errorf("expected to exactly 1 object id but got %d", lk)
 		return
 	}
 
@@ -161,7 +161,7 @@ func (qg *Group) AddExactObjectId(
 	k ObjectId,
 ) (err error) {
 	if k.ObjectId == nil {
-		err = errors.Errorf("nil kennung")
+		err = errors.Errorf("nil object id")
 		return
 	}
 

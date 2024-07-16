@@ -13,10 +13,10 @@ type savedBlobFormatter struct {
 }
 
 func MakeSavedBlobFormatter(
-	akteReaderFactory interfaces.BlobReaderFactory,
+	blobReaderFactory interfaces.BlobReaderFactory,
 ) savedBlobFormatter {
 	return savedBlobFormatter{
-		arf: akteReaderFactory,
+		arf: blobReaderFactory,
 	}
 }
 

@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func (s *Store) ReadIntoExternalFromKennungFDPair(
+func (s *Store) ReadIntoExternalFromObjectIdFDPair(
 	o sku.ObjectOptions,
 	em *item,
 	t *sku.Transacted,

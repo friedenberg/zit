@@ -118,12 +118,12 @@ func (c CreateFromPaths) Run(
 	if err = toDelete.Each(
 		func(z *store_fs.External) (err error) {
 			// TODO-P2 move to checkout store
-			if err = c.GetFSHome().Delete(z.GetObjekteFD().GetPath()); err != nil {
+			if err = c.GetFSHome().Delete(z.GetObjectFD().GetPath()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			pathRel := c.GetFSHome().RelToCwdOrSame(z.GetObjekteFD().GetPath())
+			pathRel := c.GetFSHome().RelToCwdOrSame(z.GetObjectFD().GetPath())
 
 			// TODO-P2 move to printer
 			ui.Out().Printf("[%s] (deleted)", pathRel)

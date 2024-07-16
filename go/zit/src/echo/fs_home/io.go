@@ -115,7 +115,7 @@ func (s Home) WriteCloserCache(
 	)
 }
 
-func (s Home) AkteWriterTo(p string) (w sha.WriteCloser, err error) {
+func (s Home) BlobWriterTo(p string) (w sha.WriteCloser, err error) {
 	var outer Writer
 
 	mo := MoveOptions{
@@ -168,7 +168,7 @@ func (s Home) BlobWriter() (w sha.WriteCloser, err error) {
 		return
 	}
 
-	if w, err = s.AkteWriterTo(p); err != nil {
+	if w, err = s.BlobWriterTo(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -176,7 +176,7 @@ func (s Home) BlobWriter() (w sha.WriteCloser, err error) {
 	return
 }
 
-func (s Home) AkteReaderFile(sh sha.ShaLike) (f *os.File, err error) {
+func (s Home) BlobReaderFile(sh sha.ShaLike) (f *os.File, err error) {
 	if sh.GetShaLike().IsNull() {
 		err = errors.Errorf("sha is null")
 		return

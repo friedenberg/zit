@@ -108,7 +108,7 @@ func Make(v string) (k IdLikePtr, err error) {
 		}
 	}
 
-	err = errors.Errorf("%q is not a valid Kennung", v)
+	err = errors.Errorf("%q is not a valid object id", v)
 
 	return
 }

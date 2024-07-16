@@ -21,15 +21,15 @@ type textParser struct {
 
 func MakeTextParser(
 	awf interfaces.BlobWriterFactory,
-	akteFormatter script_config.RemoteScript,
+	blobFormatter script_config.RemoteScript,
 ) TextParser {
 	if awf == nil {
-		panic("nil AkteWriterFactory")
+		panic("nil BlobWriterFactory")
 	}
 
 	return textParser{
 		awf: awf,
-		af:  akteFormatter,
+		af:  blobFormatter,
 	}
 }
 
@@ -46,7 +46,7 @@ func (f textParser) ParseMetadata(
 		c.SetBlobSha(&m.Blob)
 	}()
 
-	var akteFD fd.FD
+	var blobFD fd.FD
 
 	lr := format.MakeLineReaderConsumeEmpty(
 		ohio.MakeLineReaderIterate(
@@ -59,31 +59,31 @@ func (f textParser) ParseMetadata(
 					},
 					"-": m.AddTagString,
 					"!": func(v string) (err error) {
-						return f.readTyp(m, v, &akteFD)
+						return f.readTyp(m, v, &blobFD)
 					},
 				},
 			),
 		),
 	)
 
-	var akteWriter sha.WriteCloser
+	var blobWriter sha.WriteCloser
 
-	if akteWriter, err = f.awf.BlobWriter(); err != nil {
+	if blobWriter, err = f.awf.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if akteWriter == nil {
-		err = errors.Errorf("akte writer is nil")
+	if blobWriter == nil {
+		err = errors.Errorf("blob writer is nil")
 		return
 	}
 
-	defer errors.DeferredCloser(&err, akteWriter)
+	defer errors.DeferredCloser(&err, blobWriter)
 
 	mr := Reader{
 		// RequireMetadatei: true,
 		Metadata: lr,
-		Blob:     akteWriter,
+		Blob:     blobWriter,
 	}
 
 	// if cmg, ok := c.(checkout_mode.Getter); ok {
@@ -105,37 +105,37 @@ func (f textParser) ParseMetadata(
 
 	n += n1
 
-	inlineAkteSha := sha.Make(akteWriter.GetShaLike())
+	inlineBlobSha := sha.Make(blobWriter.GetShaLike())
 
-	if !m.Blob.IsNull() && !akteFD.GetShaLike().IsNull() {
+	if !m.Blob.IsNull() && !blobFD.GetShaLike().IsNull() {
 		err = errors.Wrap(
 			MakeErrHasInlineBlobAndFilePath(
-				&akteFD,
-				inlineAkteSha,
+				&blobFD,
+				inlineBlobSha,
 			),
 		)
 
 		return
-	} else if !akteFD.GetShaLike().IsNull() {
+	} else if !blobFD.GetShaLike().IsNull() {
 		if afs, ok := c.(BlobFDSetter); ok {
-			afs.SetBlobFD(&akteFD)
+			afs.SetBlobFD(&blobFD)
 		}
 
-		m.Blob.SetShaLike(akteFD.GetShaLike())
+		m.Blob.SetShaLike(blobFD.GetShaLike())
 	}
 
 	switch {
-	case m.Blob.IsNull() && !inlineAkteSha.IsNull():
-		m.Blob.SetShaLike(inlineAkteSha)
+	case m.Blob.IsNull() && !inlineBlobSha.IsNull():
+		m.Blob.SetShaLike(inlineBlobSha)
 
-	case !m.Blob.IsNull() && inlineAkteSha.IsNull():
+	case !m.Blob.IsNull() && inlineBlobSha.IsNull():
 		// noop
 
-	case !m.Blob.IsNull() && !inlineAkteSha.IsNull() &&
-		!m.Blob.Equals(inlineAkteSha):
+	case !m.Blob.IsNull() && !inlineBlobSha.IsNull() &&
+		!m.Blob.Equals(inlineBlobSha):
 		err = errors.Wrap(
 			MakeErrHasInlineBlobAndMetadateiSha(
-				inlineAkteSha,
+				inlineBlobSha,
 				&m.Blob,
 			),
 		)
@@ -149,7 +149,7 @@ func (f textParser) ParseMetadata(
 func (f textParser) readTyp(
 	m *Metadata,
 	desc string,
-	akteFD *fd.FD,
+	blobFD *fd.FD,
 ) (err error) {
 	if desc == "" {
 		return
@@ -166,7 +166,7 @@ func (f textParser) readTyp(
 			return
 		}
 
-		if err = akteFD.SetWithAkteWriterFactory(
+		if err = blobFD.SetWithBlobWriterFactory(
 			desc,
 			f.awf,
 		); err != nil {
@@ -176,7 +176,7 @@ func (f textParser) readTyp(
 
 	//! <sha>.<typ ext>
 	case tail != "":
-		if err = f.setAkteSha(m, head); err != nil {
+		if err = f.setBlobSha(m, head); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -188,7 +188,7 @@ func (f textParser) readTyp(
 
 	//! <sha>
 	case tail == "":
-		if err = f.setAkteSha(m, head); err == nil {
+		if err = f.setBlobSha(m, head); err == nil {
 			return
 		}
 
@@ -207,7 +207,7 @@ func (f textParser) readTyp(
 	return
 }
 
-func (f textParser) setAkteSha(
+func (f textParser) setBlobSha(
 	m *Metadata,
 	maybeSha string,
 ) (err error) {

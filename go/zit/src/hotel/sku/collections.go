@@ -65,6 +65,5 @@ func MakeTransactedMutableSetObjectId() TransactedMutableSet {
 func MakeCheckedOutLikeMutableSet() CheckedOutLikeMutableSet {
 	return collections_value.MakeMutableValueSet[CheckedOutLike](
 		nil,
-		// KennungKeyer[CheckedOut, *CheckedOut]{},
 	)
 }

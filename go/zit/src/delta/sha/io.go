@@ -138,17 +138,17 @@ func (nrc nopReadCloser) GetShaLike() interfaces.Sha {
 	return &Sha{}
 }
 
-type nopAkteFactory struct{}
+type nopBlobFactory struct{}
 
-func NopAkteFactory() interfaces.BlobIOFactory {
-	return nopAkteFactory{}
+func NopBlobFactory() interfaces.BlobIOFactory {
+	return nopBlobFactory{}
 }
 
-func (_ nopAkteFactory) BlobWriter() (WriteCloser, error) {
+func (nopBlobFactory) BlobWriter() (WriteCloser, error) {
 	return MakeWriter(nil), nil
 }
 
-func (_ nopAkteFactory) BlobReader(s ShaLike) (ReadCloser, error) {
+func (nopBlobFactory) BlobReader(s ShaLike) (ReadCloser, error) {
 	return MakeNopReadCloser(io.NopCloser(bytes.NewBuffer(nil))), nil
 }
 

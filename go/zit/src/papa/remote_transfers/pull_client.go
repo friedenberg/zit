@@ -190,7 +190,7 @@ func (c *client) ObjekteReader(
 	var d remote_conn.Dialogue
 
 	if d, err = c.stage.StartDialogue(
-		remote_conn.DialogueTypeObjekten,
+		remote_conn.DialogueTypeObjects,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -217,13 +217,13 @@ func (c *client) ObjekteReader(
 	return
 }
 
-func (c client) AkteReader(
+func (c client) BlobReader(
 	sh sha.ShaLike,
 ) (rc sha.ReadCloser, err error) {
 	var d remote_conn.Dialogue
 
 	if d, err = c.stage.StartDialogue(
-		remote_conn.DialogueTypeAkten,
+		remote_conn.DialogueTypeBlobs,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

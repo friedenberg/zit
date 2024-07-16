@@ -82,7 +82,7 @@ func FromLuaTable(o *sku.Transacted, l *lua.LState, lt *LuaTable) (err error) {
 	// TODO Bezeichnung
 	// TODO Typ
 	// TODO Tai
-	// TODO Akte
+	// TODO Blob
 	// TODO Verzeichnisse
 
 	return

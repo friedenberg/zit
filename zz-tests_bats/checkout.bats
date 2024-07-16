@@ -68,7 +68,7 @@ function checkout_simple_zettel_akte_only { # @test
 	run_zit clean .
 	assert_success
 	# TODO fail checkouts if working directly has incompatible checkout
-	run_zit checkout -mode akte-only :z
+	run_zit checkout -mode blob :z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		                   one/dos.md]
@@ -96,7 +96,7 @@ function checkout_simple_typ { # @test
 }
 
 function checkout_zettel_akte_then_objekte { # @test
-	run_zit checkout -mode akte one/uno
+	run_zit checkout -mode blob one/uno
 	assert_success
 	assert_output - <<-EOM
 		      checked out [one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4
@@ -114,7 +114,7 @@ function checkout_zettel_akte_then_objekte { # @test
 		uno.zettel
 	EOM
 
-	run_zit checkout -mode akte one/uno
+	run_zit checkout -mode blob one/uno
 	assert_success
 	assert_output - <<-EOM
 		      checked out [one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4

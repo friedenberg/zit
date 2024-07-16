@@ -37,7 +37,7 @@ func (af format[O, OPtr]) FormatParsedBlob(
 	e OPtr,
 ) (n int64, err error) {
 	if af.ParsedBlobFormatter == nil {
-		err = errors.Errorf("no ParsedAkteFormatter")
+		err = errors.Errorf("no ParsedBlobFormatter")
 	} else {
 		n, err = af.ParsedBlobFormatter.FormatParsedBlob(w, e)
 	}

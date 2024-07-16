@@ -50,17 +50,17 @@ func (op PullServer) addToSoldierStage() {
 	)
 
 	op.stage.RegisterHandler(
-		remote_conn.DialogueTypeObjekten,
+		remote_conn.DialogueTypeObjects,
 		op.objekteReaderForSku,
 	)
 
 	op.stage.RegisterHandler(
-		remote_conn.DialogueTypeAkten,
-		op.akteReaderForSha,
+		remote_conn.DialogueTypeBlobs,
+		op.blobReaderForSha,
 	)
 }
 
-func (op PullServer) akteReaderForSha(
+func (op PullServer) blobReaderForSha(
 	d remote_conn.Dialogue,
 ) (err error) {
 	defer errors.DeferredCloser(&err, d)
@@ -153,10 +153,6 @@ func (op PullServer) skusForFilter(
 	if err = op.env.GetStore().QueryWithKasten(
 		msg.MetaSet,
 		iter.MakeChain(
-			// zettel.MakeWriterKonfig(
-			// 	op.umwelt.Konfig(),
-			// 	op.umwelt.StoreObjekten().GetAkten().GetTypV0(),
-			// ),
 			func(sk *sku.Transacted) (err error) {
 				if err = d.Send(sk); err != nil {
 					err = errors.Wrap(err)

@@ -60,9 +60,9 @@ func MakeMutableSetUniqueStored(zs ...*store_fs.External) MutableSet {
 		zs...)
 }
 
-type KeyerAkte struct{}
+type KeyerBlob struct{}
 
-func (k KeyerAkte) GetKey(z *store_fs.External) string {
+func (k KeyerBlob) GetKey(z *store_fs.External) string {
 	if z == nil {
 		return ""
 	}
@@ -76,8 +76,8 @@ func (k KeyerAkte) GetKey(z *store_fs.External) string {
 	return sh.String()
 }
 
-func MakeMutableSetUniqueAkte(zs ...*store_fs.External) MutableSet {
+func MakeMutableSetUniqueBlob(zs ...*store_fs.External) MutableSet {
 	return collections_value.MakeMutableValueSet[*store_fs.External](
-		KeyerAkte{},
+		KeyerBlob{},
 		zs...)
 }

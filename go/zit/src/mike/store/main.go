@@ -31,7 +31,7 @@ type Store struct {
 	cwdFiles                  *store_fs.Store
 	externalStores            map[string]*external_store.Store
 	blob_store                *blob_store.VersionedStores
-	bestandsaufnahmeAkte      inventory_list.InventoryList
+	inventoryListBlob         inventory_list.InventoryList
 	options                   object_inventory_format.Options
 	Abbr                      AbbrStore
 	persistentMetadateiFormat object_inventory_format.Format
@@ -48,13 +48,13 @@ type Store struct {
 	metadateiTextParser object_metadata.TextParser
 
 	bestandsaufnahmeStore inventory_list.Store
-	objectIdIndex          object_id_index.Index
+	objectIdIndex         object_id_index.Index
 
 	sku.TransactedAdder
 	typenIndex object_id_index.ObjectIdIndex[ids.Type, *ids.Type]
 
 	protoZettel      sku.Proto
-	konfigAkteFormat blob_store.Format[mutable_config.Blob, *mutable_config.Blob]
+	configBlobFormat blob_store.Format[mutable_config.Blob, *mutable_config.Blob]
 
 	queryBuilder *query.Builder
 
@@ -87,7 +87,7 @@ func (c *Store) Initialize(
 
 	c.metadateiTextParser = object_metadata.MakeTextParser(
 		c.fs_home,
-		nil, // TODO-P1 make akteFormatter
+		nil,
 	)
 
 	c.typenIndex = object_id_index.MakeIndex2[ids.Type](
@@ -95,7 +95,7 @@ func (c *Store) Initialize(
 		st.DirVerzeichnisse("TypenIndexV0"),
 	)
 
-	c.bestandsaufnahmeAkte = inventory_list.InventoryList{
+	c.inventoryListBlob = inventory_list.InventoryList{
 		Skus: sku.MakeTransactedHeap(),
 	}
 
@@ -145,7 +145,7 @@ func (c *Store) Initialize(
 		k.DefaultTags,
 	)
 
-	c.konfigAkteFormat = blob_store.MakeBlobFormat(
+	c.configBlobFormat = blob_store.MakeBlobFormat(
 		blob_store.MakeTextParserIgnoreTomlErrors[mutable_config.Blob](
 			c.GetStandort(),
 		),
@@ -201,7 +201,7 @@ func (s *Store) ResetIndexes() (err error) {
 	}
 
 	if err = s.objectIdIndex.Reset(); err != nil {
-		err = errors.Wrapf(err, "failed to reset index kennung")
+		err = errors.Wrapf(err, "failed to reset index object id index")
 		return
 	}
 

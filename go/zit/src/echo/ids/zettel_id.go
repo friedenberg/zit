@@ -42,12 +42,12 @@ func MakeZettelIdFromProvidersAndCoordinates(
 	var l, r string
 
 	if l, err = pl.MakeZettelIdFromCoordinates(k.Left); err != nil {
-		err = errors.Errorf("failed to make left kennung: %s", err)
+		err = errors.Errorf("failed to make left zettel id: %s", err)
 		return
 	}
 
 	if r, err = pr.MakeZettelIdFromCoordinates(k.Right); err != nil {
-		err = errors.Errorf("failed to make right kennung: %s", err)
+		err = errors.Errorf("failed to make right zettel id: %s", err)
 		return
 	}
 

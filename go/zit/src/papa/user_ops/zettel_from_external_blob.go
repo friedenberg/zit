@@ -37,7 +37,7 @@ func (c ZettelFromExternalBlob) Run(
 
 	defer errors.Deferred(&err, c.Unlock)
 
-	toCreate := object_collections.MakeMutableSetUniqueAkte()
+	toCreate := object_collections.MakeMutableSetUniqueBlob()
 	toDelete := fd.MakeMutableSet()
 
 	results = sku.MakeTransactedMutableSet()
@@ -58,7 +58,7 @@ func (c ZettelFromExternalBlob) Run(
 
 		var z *store_fs.External
 
-		if z, err = c.zettelForAkte(fdsForSha); err != nil {
+		if z, err = c.zettelForBlob(fdsForSha); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -128,7 +128,7 @@ func (c ZettelFromExternalBlob) Run(
 	sort.Slice(
 		sortedToCreated,
 		func(i, j int) bool {
-			return sortedToCreated[i].GetAkteFD().String() < sortedToCreated[j].GetAkteFD().String()
+			return sortedToCreated[i].GetBlobFD().String() < sortedToCreated[j].GetBlobFD().String()
 		},
 	)
 
@@ -203,21 +203,21 @@ func (c *ZettelFromExternalBlob) processOneFD(
 
 	defer errors.DeferredCloser(&err, &c.Filter)
 
-	var akteWriter sha.WriteCloser
+	var blobWriter sha.WriteCloser
 
-	if akteWriter, err = c.GetFSHome().BlobWriter(); err != nil {
+	if blobWriter, err = c.GetFSHome().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, akteWriter)
+	defer errors.DeferredCloser(&err, blobWriter)
 
-	if _, err = io.Copy(akteWriter, r); err != nil {
+	if _, err = io.Copy(blobWriter, r); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	f.SetShaLike(akteWriter.GetShaLike())
+	f.SetShaLike(blobWriter.GetShaLike())
 
 	key := sha.Make(f.GetShaLike()).GetBytes()
 	existing := fds[key]
@@ -227,25 +227,25 @@ func (c *ZettelFromExternalBlob) processOneFD(
 	return
 }
 
-func (c *ZettelFromExternalBlob) zettelForAkte(
-	akteFDs []*fd.FD,
+func (c *ZettelFromExternalBlob) zettelForBlob(
+	blobFDs []*fd.FD,
 ) (z *store_fs.External, err error) {
-	akteFD := akteFDs[0]
+	blobFD := blobFDs[0]
 	z = store_fs.GetExternalPool().Get()
 
-	z.FDs.Blob.ResetWith(akteFD)
+	z.FDs.Blob.ResetWith(blobFD)
 
 	if err = z.Transacted.ObjectId.SetWithIdLike(&ids.ZettelId{}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = c.Proto.ApplyWithBlobFD(z, akteFD); err != nil {
+	if err = c.Proto.ApplyWithBlobFD(z, blobFD); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	z.SetBlobSha(akteFD.GetShaLike())
+	z.SetBlobSha(blobFD.GetShaLike())
 
 	return
 }

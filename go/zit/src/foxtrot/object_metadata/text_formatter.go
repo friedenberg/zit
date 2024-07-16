@@ -13,13 +13,13 @@ type textFormatter struct {
 	sequence []interfaces.FuncWriterElementInterface[TextFormatterContext]
 }
 
-func MakeTextFormatterMetadateiAktePath(
+func MakeTextFormatterMetadateiBlobPath(
 	options TextFormatterOptions,
 	blobReaderFactory interfaces.BlobReaderFactory,
 	blobFormatter script_config.RemoteScript,
 ) textFormatter {
 	if blobReaderFactory == nil {
-		panic("akte reader factory is nil")
+		panic("blob reader factory is nil")
 	}
 
 	common := textFormatterCommon{
@@ -46,7 +46,7 @@ func MakeTextFormatterMetadataOnly(
 	blobFormatter script_config.RemoteScript,
 ) textFormatter {
 	if blobReaderFactory == nil {
-		panic("akte reader factory is nil")
+		panic("blob reader factory is nil")
 	}
 
 	common := textFormatterCommon{
@@ -91,7 +91,7 @@ func MakeTextFormatterMetadataInlineBlob(
 			common.writeComments,
 			common.writeBoundary,
 			common.writeNewLine,
-			common.writeAkte,
+			common.writeBlob,
 		},
 	}
 }
@@ -114,7 +114,7 @@ func MakeTextFormatterExcludeMetadata(
 	return textFormatter{
 		textFormatterCommon: common,
 		sequence: []interfaces.FuncWriterElementInterface[TextFormatterContext]{
-			common.writeAkte,
+			common.writeBlob,
 		},
 	}
 }

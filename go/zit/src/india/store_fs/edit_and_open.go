@@ -16,7 +16,7 @@ func (s *Store) Open(
 ) (err error) {
 	wg := iter.MakeErrorWaitGroupParallel()
 
-	if m.IncludesObject() {
+	if m.IncludesMetadata() {
 		wg.Do(func() error {
 			return s.openZettels(ph, zsc)
 		})

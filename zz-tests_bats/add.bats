@@ -371,7 +371,7 @@ function add_each_akte { # @test
 	} >"$f"
 
 	run_zit add \
-		-each-akte "cat" \
+		-each-blob "cat" \
 		-delete \
 		-tags zz-inbox-2022-11-14 \
 		"$f"

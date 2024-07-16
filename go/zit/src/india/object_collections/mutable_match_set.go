@@ -15,7 +15,7 @@ type MutableMatchSet struct {
 	lock                      *sync.RWMutex
 	Original                  MutableSet
 	Stored                    MutableSet
-	Akten                     MutableSet
+	Blobs                     MutableSet
 	Matched                   MutableSet
 	MatchedHinweisen          interfaces.MutableSetLike[ids.IdLike]
 	MatchedHinweisenSchwanzen map[string]ids.Tai
@@ -26,7 +26,7 @@ func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
 		lock:     &sync.RWMutex{},
 		Original: in,
 		Stored:   MakeMutableSetUniqueStored(),
-		Akten:    MakeMutableSetUniqueAkte(),
+		Blobs:    MakeMutableSetUniqueBlob(),
 		Matched:  MakeMutableSetUniqueFD(),
 		MatchedHinweisen: collections_value.MakeMutableValueSet[ids.IdLike](
 			nil,
@@ -35,18 +35,18 @@ func MakeMutableMatchSet(in MutableSet) (out MutableMatchSet) {
 	}
 
 	in.Each(out.Stored.Add)
-	in.Each(out.Akten.Add)
+	in.Each(out.Blobs.Add)
 
 	return
 }
 
 func (s MutableMatchSet) Match(z *sku.Transacted) (err error) {
 	kStored := z.GetObjectSha().String()
-	kAkte := z.GetBlobSha().String()
+	kBlob := z.GetBlobSha().String()
 
 	s.lock.RLock()
 	stored, okStored := s.Stored.Get(kStored)
-	akte, okAkte := s.Akten.Get(kAkte)
+	blob, okBlob := s.Blobs.Get(kBlob)
 	k := z.GetObjectId()
 	okHinweis := s.MatchedHinweisen.Contains(z.GetObjectId())
 
@@ -60,26 +60,26 @@ func (s MutableMatchSet) Match(z *sku.Transacted) (err error) {
 	s.lock.RUnlock()
 
 	// This function gets called out of order for all zettels because it is
-	// parallelized. The only case this does not correctly handle is if the akte
+	// parallelized. The only case this does not correctly handle is if the blob
 	// is mutated or removed at some point in a zettel's history. Then, when
 	// reading verzeichnisse, the _latest_ (highest Schwanz) zettel may pass
 	// through this function _before_ the function has matched on a historical
-	// akte or stored sha. In that case, the zettel would accidentally be
+	// blob or stored sha. In that case, the zettel would accidentally be
 	// reverted.
 	errors.TodoP2("fix history erasure on zettel match")
-	if okStored || okAkte || (okHinweis && okSchwanz) {
+	if okStored || okBlob || (okHinweis && okSchwanz) {
 		s.lock.Lock()
 		defer s.lock.Unlock()
 
 		s.MatchedHinweisen.Add(k)
 		s.MatchedHinweisenSchwanzen[k.String()] = z.GetTai()
 		s.Stored.DelKey(kStored)
-		s.Akten.DelKey(kAkte)
+		s.Blobs.DelKey(kBlob)
 		s.Original.Del(stored)
-		s.Original.Del(akte)
+		s.Original.Del(blob)
 
 		// Only one is necessary
-		s.Matched.Add(akte)
+		s.Matched.Add(blob)
 
 		return
 	}

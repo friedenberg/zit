@@ -88,12 +88,12 @@ func (op Checkout) RunQuery(
 	}
 
 	if op.Utility != "" {
-		eachAkteOp := EachAkte{
+		eachBlobOp := EachBlob{
 			Utility: op.Utility,
 			Env:     op.Env,
 		}
 
-		if err = eachAkteOp.Run(zsc); err != nil {
+		if err = eachBlobOp.Run(zsc); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

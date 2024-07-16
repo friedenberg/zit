@@ -45,24 +45,10 @@ func (s *Store) runDiff3(left, middle, right fd.FD) (path string, err error) {
 		return
 	}
 
-	// merged = sku.GetExternalPool().Get()
-
-	// if err = merged.Kennung.SetWithKennung(tm.right.Kennung); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
-
 	if _, err = io.Copy(f, out); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	// if err = s.ReadOneExternalObjekteReader(out, merged); err != nil {
-	// 	log.Debug().Printf("%s", err)
-	// 	err = nil
-	// 	// err = errors.Wrap(err)
-	// 	// return
-	// }
 
 	if err = cmd.Wait(); err != nil {
 		if cmd.ProcessState.ExitCode() == 1 {

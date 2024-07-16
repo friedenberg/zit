@@ -13,52 +13,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-// func (s *Store) ReadOneCheckedOut(
-// 	o *sku.ObjekteOptions,
-// 	em *KennungFDPair,
-// ) (co *CheckedOut, err error) {
-// 	co = GetCheckedOutPool().Get()
-
-// 	if err = s.ReadOneInto(&em.Kennung, &co.Internal); err != nil {
-// 		if collections.IsErrNotFound(err) {
-// 			// TODO mark status as new
-// 			err = nil
-// 		} else {
-// 			err = errors.Wrap(err)
-// 			return
-// 		}
-// 	}
-
-// 	if err = s.ReadOneExternalInto(
-// 		o,
-// 		em,
-// 		&co.Internal,
-// 		&co.External,
-// 	); err != nil {
-// 		if errors.Is(err, ErrExternalHasConflictMarker) {
-// 			err = nil
-// 			co.State = checked_out_state.StateConflicted
-// 		} else {
-// 			err = errors.Wrap(err)
-// 		}
-
-// 		return
-// 	}
-
-// 	// TODO move upstairs
-// 	if err = s.tryRealizeAndOrStore(
-// 		&co.External.Transacted,
-// 		o,
-// 	); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	co.DetermineState(false)
-
-// 	return
-// }
-
 func (s *Store) ReadOneExternal(
 	o *sku.ObjectOptions,
 	em *ObjectIdFDPair,
@@ -188,7 +142,7 @@ func (s *Store) ReadOneExternalObject(
 
 	var f *os.File
 
-	if f, err = files.Open(e.GetObjekteFD().GetPath()); err != nil {
+	if f, err = files.Open(e.GetObjectFD().GetPath()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -233,7 +187,7 @@ func (s *Store) ReadOneExternalBlob(
 	var f *os.File
 
 	if f, err = files.OpenExclusiveReadOnly(
-		e.GetAkteFD().GetPath(),
+		e.GetBlobFD().GetPath(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -545,13 +545,7 @@ func (t *ObjectId) UnmarshalText(text []byte) (err error) {
 }
 
 func (t *ObjectId) MarshalBinary() (text []byte, err error) {
-	// if t.g == gattung.Unknown {
-	// 	err = errors.Wrapf(gattung.ErrEmptyKennung{}, "Kennung: %s", t)
-	// 	return
-	// }
-
 	text = []byte(FormattedString(t))
-
 	return
 }
 

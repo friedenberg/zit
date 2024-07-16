@@ -79,7 +79,7 @@ func (j *Json) ToTransacted(sk *sku.Transacted, s fs_home.Home) (err error) {
 		return
 	}
 
-	// TODO-P1 support states of akte vs akte sha
+	// TODO-P1 support states of blob vs blob sha
 	sk.SetBlobSha(w.GetShaLike())
 
 	// if err = sk.Metadatei.Tai.Set(j.Tai); err != nil {

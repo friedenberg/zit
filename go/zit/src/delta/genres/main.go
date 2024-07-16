@@ -18,13 +18,13 @@ const (
 	Unknown = Genre(iota)
 	Blob
 	Type
-	_ //Bezeichnung
+	_ // Bezeichnung
 	Tag
-	_ //Hinweis
-	_ //Transaktion
+	_ // Hinweis
+	_ // Transaktion
 	Zettel
 	Config
-	_ //Kennung
+	_ // Kennung
 	InventoryList
 	_ // AkteTyp
 	Repo
@@ -34,12 +34,12 @@ const (
 
 const (
 	unknown = byte(iota)
-	akte    = byte(1 << iota)
-	typ
-	etikett
+	blob    = byte(1 << iota)
+	tipe
+	tag
 	zettel
 	config
-	kasten
+	repo
 )
 
 func All() (out []Genre) {
@@ -93,15 +93,15 @@ func (g Genre) GetGenreBitInt() byte {
 	default:
 		return unknown
 	case Blob:
-		return akte
+		return blob
 	case Zettel:
 		return zettel
 	case Tag:
-		return etikett
+		return tag
 	case Repo:
-		return kasten
+		return repo
 	case Type:
-		return typ
+		return tipe
 	case Config:
 		return config
 	}

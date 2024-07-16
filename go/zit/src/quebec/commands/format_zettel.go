@@ -32,7 +32,7 @@ func init() {
 				Mode: checkout_mode.ModeMetadataAndBlob,
 			}
 
-			f.Var(&c.Mode, "mode", "zettel, akte, or both")
+			f.Var(&c.Mode, "mode", "metadata, blob, or both")
 
 			f.Var(&c.RepoId, "kasten", "none or Chrome")
 
@@ -76,9 +76,9 @@ func (c *FormatZettel) Run(u *env.Env, args ...string) (err error) {
 		return
 	}
 
-	var akteFormatter script_config.RemoteScript
+	var blobFormatter script_config.RemoteScript
 
-	if akteFormatter, err = c.getAkteFormatter(u, zt, formatId); err != nil {
+	if blobFormatter, err = c.getBlobFormatter(u, zt, formatId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -89,12 +89,12 @@ func (c *FormatZettel) Run(u *env.Env, args ...string) (err error) {
 		},
 		u.GetFSHome(),
 		u.GetConfig(),
-		akteFormatter,
+		blobFormatter,
 	)
 
 	if err = u.GetConfig().ApplyToNewMetadata(
 		zt,
-		u.GetStore().GetAkten().GetTypeV0(),
+		u.GetStore().GetBlobStore().GetTypeV0(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -148,11 +148,11 @@ func (c *FormatZettel) getSku(
 	return
 }
 
-func (c *FormatZettel) getAkteFormatter(
+func (c *FormatZettel) getBlobFormatter(
 	u *env.Env,
 	zt *sku.Transacted,
 	formatId string,
-) (akteFormatter script_config.RemoteScript, err error) {
+) (blobFormatter script_config.RemoteScript, err error) {
 	if zt.GetType().IsEmpty() {
 		ui.Log().Print("empty typ")
 		return
@@ -165,9 +165,9 @@ func (c *FormatZettel) getAkteFormatter(
 		return
 	}
 
-	var typAkte *type_blobs.V0
+	var typeBlob *type_blobs.V0
 
-	if typAkte, err = u.GetStore().GetAkten().GetTypeV0().GetBlob(
+	if typeBlob, err = u.GetStore().GetBlobStore().GetTypeV0().GetBlob(
 		typKonfig.GetBlobSha(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -178,18 +178,18 @@ func (c *FormatZettel) getAkteFormatter(
 	ok := false
 
 	if c.UTIGroup == "" {
-		akteFormatter, ok = typAkte.Formatters[actualFormatId]
+		blobFormatter, ok = typeBlob.Formatters[actualFormatId]
 
 		if !ok {
 			ui.Log().Print("no matching format id")
-			akteFormatter = nil
+			blobFormatter = nil
 			// TODO-P2 allow option to error on missing format
 			// err = errors.Normalf("no format id %q", actualFormatId)
 			// return
 		}
 	} else {
 		var g type_blobs.FormatterUTIGroup
-		g, ok = typAkte.FormatterUTIGroups[c.UTIGroup]
+		g, ok = typeBlob.FormatterUTIGroups[c.UTIGroup]
 
 		if !ok {
 			err = errors.Errorf("no uti group: %q", c.UTIGroup)
@@ -210,11 +210,11 @@ func (c *FormatZettel) getAkteFormatter(
 
 		actualFormatId = ft
 
-		akteFormatter, ok = typAkte.Formatters[actualFormatId]
+		blobFormatter, ok = typeBlob.Formatters[actualFormatId]
 
 		if !ok {
 			ui.Log().Print("no matching format id")
-			akteFormatter = nil
+			blobFormatter = nil
 			// TODO-P2 allow option to error on missing format
 			// err = errors.Normalf("no format id %q", actualFormatId)
 			// return

@@ -7,7 +7,7 @@ import (
 )
 
 type V0 struct {
-	InlineAkte    bool                        `toml:"inline-akte,omitempty"`
+	InlineBlob    bool                        `toml:"inline-akte,omitempty"`
 	Archived      bool                        `toml:"archived,omitempty"`
 	FileExtension string                      `toml:"file-extension,omitempty"`
 	ExecCommand   *script_config.ScriptConfig `toml:"exec-command,omitempty"`
@@ -22,7 +22,7 @@ type V0 struct {
 
 func (a *V0) Reset() {
 	a.Archived = false
-	a.InlineAkte = false
+	a.InlineBlob = false
 	a.FileExtension = ""
 	a.ExecCommand = nil
 	a.VimSyntaxType = ""

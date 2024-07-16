@@ -112,7 +112,7 @@ func (c EditConfig) makeTempKonfigFile(
 
 	p = f.Name()
 
-	format := u.GetStore().GetKonfigAkteFormat()
+	format := u.GetStore().GetConfigBlobFormat()
 
 	if _, err = format.FormatSavedBlob(f, k.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
@@ -135,7 +135,7 @@ func (c EditConfig) readTempKonfigFile(
 
 	defer errors.DeferredCloser(&err, f)
 
-	format := u.GetStore().GetKonfigAkteFormat()
+	format := u.GetStore().GetConfigBlobFormat()
 
 	var k mutable_config.Blob
 

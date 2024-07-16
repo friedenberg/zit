@@ -165,7 +165,7 @@ func (c *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 	dec := toml.NewDecoder(r)
 
 	if err = dec.Decode(&tb); err != nil {
-		err = errors.Wrapf(err, "Sha: %s, Kennung: %s", sk.GetBlobSha(), sk.GetObjectId())
+		err = errors.Wrapf(err, "Sha: %s, Object Id: %s", sk.GetBlobSha(), sk.GetObjectId())
 		return
 	}
 

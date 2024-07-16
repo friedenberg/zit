@@ -51,7 +51,7 @@ func MakeCwdFilesAll(
 		objectFormatOptions: ofo,
 		metadataTextParser: object_metadata.MakeTextParser(
 			st,
-			nil, // TODO-P1 make akteFormatter
+			nil,
 		),
 	}
 

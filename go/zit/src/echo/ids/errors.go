@@ -9,7 +9,7 @@ import (
 type ErrInvalidId string
 
 func (e ErrInvalidId) Error() string {
-	return fmt.Sprintf("invalid kennung: %q", string(e))
+	return fmt.Sprintf("invalid object id: %q", string(e))
 }
 
 func (e ErrInvalidId) Is(err error) (ok bool) {

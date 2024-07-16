@@ -171,7 +171,7 @@ func (i *oldIndex) Reset() (err error) {
 	return
 }
 
-func (i *oldIndex) AddHinweis(k1 ids.IdLike) (err error) {
+func (i *oldIndex) AddZettelId(k1 ids.IdLike) (err error) {
 	if !k1.GetGenre().EqualsGenre(genres.Zettel) {
 		err = genres.MakeErrUnsupportedGenre(k1)
 		return

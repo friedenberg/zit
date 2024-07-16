@@ -87,7 +87,7 @@ function reindex_after_changes { # @test
 	EOM
 
 	function verify() {
-		run_zit show -format akte !md+t
+		run_zit show -format blob !md+t
 		assert_success
 		assert_output - <<-EOM
 			inline-akte = true
@@ -97,7 +97,7 @@ function reindex_after_changes { # @test
 			vim-syntax-type = "test"
 		EOM
 
-		run_zit show -format akte !md:t
+		run_zit show -format blob !md:t
 		assert_success
 		assert_output - <<-EOM
 			inline-akte = false

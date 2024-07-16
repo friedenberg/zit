@@ -47,7 +47,7 @@ func (u *Env) Unlock() (err error) {
 		ui.Log().Print("will flush konfig")
 		if err = u.config.Flush(
 			u.GetFSHome(),
-			u.GetStore().GetAkten().GetTypeV0(),
+			u.GetStore().GetBlobStore().GetTypeV0(),
 			u.PrinterHeader(),
 		); err != nil {
 			err = errors.Wrap(err)

@@ -39,7 +39,7 @@ func init() {
 				&c.Delete,
 				"delete",
 				false,
-				"delete the zettel and akte after successful checkin",
+				"delete the zettel and blob after successful checkin",
 			)
 
 			f.BoolVar(

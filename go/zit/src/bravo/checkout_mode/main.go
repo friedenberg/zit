@@ -25,10 +25,10 @@ func (m Mode) String() string {
 		return "none"
 
 	case ModeMetadataOnly:
-		return "objekte-only"
+		return "metadata"
 
 	case ModeBlobOnly:
-		return "akte-only"
+		return "blob"
 
 	case ModeMetadataAndBlob:
 		return "both"
@@ -45,18 +45,10 @@ func (m *Mode) Set(v string) (err error) {
 	case "":
 		*m = ModeNone
 
-	case "objekte-only":
-		fallthrough
-	case "objekte":
-		fallthrough
-	case "zettel":
-		fallthrough
-	case "zettel-only":
+	case "metadata":
 		*m = ModeMetadataOnly
 
-	case "akte":
-		fallthrough
-	case "akte-only":
+	case "blob":
 		*m = ModeBlobOnly
 
 	case "both":
@@ -80,7 +72,7 @@ func (m Mode) IncludesBlob() bool {
 	}
 }
 
-func (m Mode) IncludesObject() bool {
+func (m Mode) IncludesMetadata() bool {
 	switch m {
 	case ModeMetadataAndBlob, ModeMetadataOnly:
 		return true

@@ -138,7 +138,7 @@ function show_zettel_etikett { # @test
 		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 	EOM
 
-	run_zit show -format akte tag-3:z
+	run_zit show -format blob tag-3:z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		last time
@@ -186,7 +186,7 @@ function show_zettel_etikett_complex { # @test
 		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-5]
 	EOM
 
-	run_zit show -format akte [tag-3 tag-5]:z
+	run_zit show -format blob [tag-3 tag-5]:z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		last time
@@ -217,7 +217,7 @@ function show_simple_all { # @test
 		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 	EOM
 
-	run_zit show -format akte :z,t
+	run_zit show -format blob :z,t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		file-extension = 'md'

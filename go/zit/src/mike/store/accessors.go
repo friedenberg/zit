@@ -25,7 +25,7 @@ func (u *Store) GetChrestStore() *external_store.Store {
 	return u.externalStores["chrome"]
 }
 
-func (s *Store) GetAkten() *blob_store.VersionedStores {
+func (s *Store) GetBlobStore() *blob_store.VersionedStores {
 	return s.blob_store
 }
 
@@ -85,8 +85,8 @@ func (s *Store) GetVerzeichnisse() *stream_index.Index {
 	return s.verzeichnisse
 }
 
-func (s *Store) GetKonfigAkteFormat() blob_store.Format[mutable_config.Blob, *mutable_config.Blob] {
-	return s.konfigAkteFormat
+func (s *Store) GetConfigBlobFormat() blob_store.Format[mutable_config.Blob, *mutable_config.Blob] {
+	return s.configBlobFormat
 }
 
 func (s *Store) ReadOneEnnui(sh *sha.Sha) (*sku.Transacted, error) {

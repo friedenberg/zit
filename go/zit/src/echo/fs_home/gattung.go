@@ -88,7 +88,7 @@ func (s Home) HasObjekte(
 	return
 }
 
-func (s Home) HasAkte(
+func (s Home) HasBlob(
 	sv interfaces.StoreVersion,
 	sh sha.ShaLike,
 ) (ok bool) {

@@ -243,7 +243,7 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "kennung-akte-sha":
+	case "kennung-blob-sha":
 		f = func(tl *sku.Transacted) (err error) {
 			errors.TodoP3("convert into an option")
 
@@ -371,7 +371,7 @@ func (u *Env) MakeFormatFunc(
 
 		type tomlJson struct {
 			sku_fmt.Json
-			Akte map[string]interface{} `json:"akte"`
+			Blob map[string]interface{} `json:"blob"`
 		}
 
 		f = func(o *sku.Transacted) (err error) {
@@ -382,7 +382,7 @@ func (u *Env) MakeFormatFunc(
 				return
 			}
 
-			if err = toml.Unmarshal([]byte(j.Json.BlobString), &j.Akte); err != nil {
+			if err = toml.Unmarshal([]byte(j.Json.BlobString), &j.Blob); err != nil {
 				err = nil
 
 				if err = enc.Encode(j.Json); err != nil {
@@ -451,7 +451,7 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "akte":
+	case "blob":
 		f = func(o *sku.Transacted) (err error) {
 			var r sha.ReadCloser
 
@@ -493,7 +493,7 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "akte-sku-prefix":
+	case "blob-sku-prefix":
 		cliFmt := u.StringFormatWriterSkuTransactedShort()
 
 		f = func(o *sku.Transacted) (err error) {
@@ -528,7 +528,7 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "bestandsaufnahme-sans-tai":
+	case "inventory-list-without-tai":
 		be := sku_fmt.MakeFormatInventoryListPrinter(
 			out,
 			object_inventory_format.Default(),
@@ -575,7 +575,7 @@ func (u *Env) MakeFormatFunc(
 			return p(z)
 		}
 
-	case "bestandsaufnahme":
+	case "inventory-list":
 		fo := sku_fmt.MakeFormatInventoryListPrinter(
 			out,
 			object_inventory_format.Default(),
@@ -591,7 +591,7 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "bestandsaufnahme-verzeichnisse":
+	case "inventory-list-cache":
 		fo := sku_fmt.MakeFormatInventoryListPrinter(
 			out,
 			object_inventory_format.Default(),
@@ -610,7 +610,7 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "akte-sha":
+	case "blob-sha":
 		f = func(o *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(out, o.GetBlobSha()); err != nil {
 				err = errors.Wrap(err)
@@ -742,7 +742,7 @@ func (u *Env) makeTypFormatter(
 	v string,
 	out io.Writer,
 ) (f interfaces.FuncIter[*sku.Transacted], err error) {
-	agp := u.GetStore().GetAkten().GetTypeV0()
+	agp := u.GetStore().GetBlobStore().GetTypeV0()
 
 	if out == nil {
 		out = u.Out()
@@ -803,16 +803,16 @@ func (u *Env) makeTypFormatter(
 		fan := type_blobs.MakeFormatterActionNames()
 
 		f = func(o *sku.Transacted) (err error) {
-			var akte *type_blobs.V0
+			var blob *type_blobs.V0
 
-			if akte, err = agp.GetBlob(o.GetBlobSha()); err != nil {
+			if blob, err = agp.GetBlob(o.GetBlobSha()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			defer agp.PutBlob(akte)
+			defer agp.PutBlob(blob)
 
-			if _, err = fan.Format(out, akte); err != nil {
+			if _, err = fan.Format(out, blob); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -822,16 +822,16 @@ func (u *Env) makeTypFormatter(
 
 	case "hooks.on_pre_commit":
 		f = func(o *sku.Transacted) (err error) {
-			var akte *type_blobs.V0
+			var blob *type_blobs.V0
 
-			if akte, err = agp.GetBlob(o.GetBlobSha()); err != nil {
+			if blob, err = agp.GetBlob(o.GetBlobSha()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			defer agp.PutBlob(akte)
+			defer agp.PutBlob(blob)
 
-			script, ok := akte.Hooks.(string)
+			script, ok := blob.Hooks.(string)
 
 			if !ok || script == "" {
 				return
@@ -888,14 +888,14 @@ func (u *Env) makeTypFormatter(
 
 			var ta *type_blobs.V0
 
-			if ta, err = u.GetStore().GetAkten().GetTypeV0().GetBlob(
+			if ta, err = u.GetStore().GetBlobStore().GetTypeV0().GetBlob(
 				t.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			defer u.GetStore().GetAkten().GetTypeV0().PutBlob(ta)
+			defer u.GetStore().GetBlobStore().GetTypeV0().PutBlob(ta)
 
 			if _, err = fmt.Fprintln(
 				out,

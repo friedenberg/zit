@@ -7,7 +7,7 @@ import (
 
 func Default() (t V0) {
 	t = V0{
-		InlineAkte:     true,
+		InlineBlob:     true,
 		FileExtension:  "md",
 		Formatters:     make(map[string]script_config.WithOutputFormat),
 		VimSyntaxType:  "markdown",
@@ -20,7 +20,7 @@ func Default() (t V0) {
 
 func DefaultEtikettLuaV0() (t V0) {
 	t = V0{
-		InlineAkte:     true,
+		InlineBlob:     true,
 		FileExtension:  "lua",
 		Formatters:     make(map[string]script_config.WithOutputFormat),
 		VimSyntaxType:  "lua",

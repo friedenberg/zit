@@ -73,7 +73,7 @@ func (e *fileEncoder) EncodeObjekte(
 	options checkout_options.TextFormatterOptions,
 	z *External,
 	objektePath string,
-	aktePath string,
+	blobPath string,
 ) (err error) {
 	inline := e.ic.IsInlineType(z.GetType())
 
@@ -87,18 +87,18 @@ func (e *fileEncoder) EncodeObjekte(
 	defer errors.DeferredCloser(&err, ar)
 
 	switch {
-	case aktePath != "" && objektePath != "":
-		mtw := object_metadata.MakeTextFormatterMetadateiAktePath(
+	case blobPath != "" && objektePath != "":
+		mtw := object_metadata.MakeTextFormatterMetadateiBlobPath(
 			options,
 			e.arf,
 			nil,
 		)
 
-		var fAkte, fZettel *os.File
+		var fBlob, fZettel *os.File
 
 		{
-			if fAkte, err = e.openOrCreate(
-				aktePath,
+			if fBlob, err = e.openOrCreate(
+				blobPath,
 			); err != nil {
 				if errors.IsExist(err) {
 					var aw sha.WriteCloser
@@ -110,7 +110,7 @@ func (e *fileEncoder) EncodeObjekte(
 
 					defer errors.DeferredCloser(&err, aw)
 
-					if _, err = io.Copy(aw, fAkte); err != nil {
+					if _, err = io.Copy(aw, fBlob); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
@@ -121,9 +121,9 @@ func (e *fileEncoder) EncodeObjekte(
 				}
 			}
 
-			defer errors.DeferredCloser(&err, fAkte)
+			defer errors.DeferredCloser(&err, fBlob)
 
-			if _, err = io.Copy(fAkte, ar); err != nil {
+			if _, err = io.Copy(fBlob, ar); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -143,19 +143,19 @@ func (e *fileEncoder) EncodeObjekte(
 			return
 		}
 
-	case aktePath != "":
-		var fAkte *os.File
+	case blobPath != "":
+		var fBlob *os.File
 
-		if fAkte, err = e.openOrCreate(
-			aktePath,
+		if fBlob, err = e.openOrCreate(
+			blobPath,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		defer errors.DeferredCloser(&err, fAkte)
+		defer errors.DeferredCloser(&err, fBlob)
 
-		if _, err = io.Copy(fAkte, ar); err != nil {
+		if _, err = io.Copy(fBlob, ar); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -204,7 +204,7 @@ func (e *fileEncoder) Encode(
 	return e.EncodeObjekte(
 		options,
 		z,
-		z.GetObjekteFD().GetPath(),
-		z.GetAkteFD().GetPath(),
+		z.GetObjectFD().GetPath(),
+		z.GetBlobFD().GetPath(),
 	)
 }

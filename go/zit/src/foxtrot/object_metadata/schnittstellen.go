@@ -38,7 +38,6 @@ type (
 
 	TextFormatterContext interface {
 		PersistentFormatterContext
-		// GetAktePath() string
 	}
 
 	TextParserContext interface {

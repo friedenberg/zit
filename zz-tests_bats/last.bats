@@ -17,7 +17,7 @@ teardown() {
 function last_after_init { # @test
 	run_zit_init_disable_age
 
-	run_zit last -format bestandsaufnahme-sans-tai
+	run_zit last -format inventory-list-without-tai
 	assert_success
 	assert_output_unsorted - <<-EOM
 		---
@@ -50,7 +50,7 @@ function last_after_typ_mutate { # @test
 	assert_success
 	assert_output '2'
 
-	run_zit last -format bestandsaufnahme-sans-tai
+	run_zit last -format inventory-list-without-tai
 	assert_success
 	assert_output - <<-EOM
 		---

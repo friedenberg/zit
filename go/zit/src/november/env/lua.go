@@ -55,10 +55,10 @@ func (s *Env) LuaSearcher(ls *lua.LState) int {
 	return 1
 }
 
-// TODO modify `package.loaded` to include variations of Kennung
+// TODO modify `package.loaded` to include variations of object id
 func (s *Env) LuaRequire(ls *lua.LState) int {
 	// TODO handle second extra arg
-	// TODO parse lv as kennung/akte
+	// TODO parse lv as object id / blob
 	lv := ls.ToString(1)
 	ls.Pop(1)
 

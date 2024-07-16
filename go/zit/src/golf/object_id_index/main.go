@@ -152,8 +152,8 @@ func (i *index) Reset() (err error) {
 	return
 }
 
-func (i *index) AddHinweis(k ids.IdLike) (err error) {
-	if err = i.hinweisIndex.AddHinweis(k); err != nil {
+func (i *index) AddZettelId(k ids.IdLike) (err error) {
+	if err = i.hinweisIndex.AddZettelId(k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

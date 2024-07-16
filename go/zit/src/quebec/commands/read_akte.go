@@ -16,7 +16,7 @@ type ReadBlob struct{}
 
 func init() {
 	registerCommand(
-		"read-akte",
+		"read-blob",
 		func(f *flag.FlagSet) Command {
 			c := &ReadBlob{}
 
@@ -26,7 +26,7 @@ func init() {
 }
 
 type readBlobEntry struct {
-	Blob string `json:"akte"`
+	Blob string `json:"blob"`
 }
 
 func (c ReadBlob) Run(u *env.Env, args ...string) (err error) {
@@ -47,7 +47,7 @@ func (c ReadBlob) Run(u *env.Env, args ...string) (err error) {
 
 		var sh *sha.Sha
 
-		if sh, err = c.readOneAkte(u, entry); err != nil {
+		if sh, err = c.readOneBlob(u, entry); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -58,7 +58,7 @@ func (c ReadBlob) Run(u *env.Env, args ...string) (err error) {
 	return
 }
 
-func (ReadBlob) readOneAkte(u *env.Env, entry readBlobEntry) (sh *sha.Sha, err error) {
+func (ReadBlob) readOneBlob(u *env.Env, entry readBlobEntry) (sh *sha.Sha, err error) {
 	var aw sha.WriteCloser
 
 	if aw, err = u.GetFSHome().BlobWriter(); err != nil {

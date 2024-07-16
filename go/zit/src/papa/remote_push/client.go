@@ -97,7 +97,7 @@ func (c *client) ObjekteWriter(
 	var d remote_conn.Dialogue
 
 	if d, err = c.stage.StartDialogue(
-		remote_conn.DialogueTypeObjekteWriter,
+		remote_conn.DialogueTypeObjectWriter,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -119,13 +119,13 @@ func (c *client) ObjekteWriter(
 	return
 }
 
-func (c client) AkteWriter(
+func (c client) BlobWriter(
 	sh sha.Sha,
 ) (rc sha.ReadCloser, err error) {
 	var d remote_conn.Dialogue
 
 	if d, err = c.stage.StartDialogue(
-		remote_conn.DialogueTypeAkteWriter,
+		remote_conn.DialogueTypeBlobWriter,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -136,7 +136,7 @@ func (c client) AkteWriter(
 		return
 	}
 
-	// TODO-P1 copy akte data
+	// TODO-P1 copy blob data
 
 	return
 }

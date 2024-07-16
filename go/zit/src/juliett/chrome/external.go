@@ -22,7 +22,7 @@ type External struct {
 	item
 }
 
-func (e *External) SaveAkte(s fs_home.Home) (err error) {
+func (e *External) SaveBlob(s fs_home.Home) (err error) {
 	var aw sha.WriteCloser
 
 	if aw, err = s.BlobWriter(); err != nil {
@@ -105,7 +105,7 @@ func (t *External) SetFromSkuLike(sk sku.SkuLike) (err error) {
 	return
 }
 
-func (a *External) GetKennung() ids.IdLike {
+func (a *External) GetObjectId() ids.IdLike {
 	return &a.ObjectId
 }
 
@@ -121,32 +121,18 @@ func (a *External) String() string {
 	return fmt.Sprintf(
 		". %s %s %s %s",
 		a.GetGattung(),
-		a.GetKennung(),
+		a.GetObjectId(),
 		a.GetObjectSha(),
-		a.GetAkteSha(),
+		a.GetBlobSha(),
 	)
 }
 
-func (a *External) GetAkteSha() interfaces.Sha {
+func (a *External) GetBlobSha() interfaces.Sha {
 	return &a.Metadata.Blob
 }
 
-// func (a *External) SetAkteSha(v schnittstellen.ShaLike) (err error) {
-// 	if err = a.Metadatei.Akte.SetShaLike(v); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	if err = a.FDs.Akte.SetShaLike(v); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	return
-// }
-
 func (o *External) GetKey() string {
-	return fmt.Sprintf("%s.%s", o.GetGattung(), o.GetKennung())
+	return fmt.Sprintf("%s.%s", o.GetGattung(), o.GetObjectId())
 }
 
 type lessorExternal struct{}

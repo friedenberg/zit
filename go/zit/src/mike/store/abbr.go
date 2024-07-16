@@ -115,7 +115,7 @@ func (i *indexAbbr) Flush() (err error) {
 	enc := gob.NewEncoder(w)
 
 	if err = enc.Encode(i.indexAbbrEncodableTridexes); err != nil {
-		err = errors.Wrapf(err, "failed to write encoded kennung")
+		err = errors.Wrapf(err, "failed to write encoded object id")
 		return
 	}
 

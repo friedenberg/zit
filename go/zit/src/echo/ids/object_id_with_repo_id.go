@@ -519,7 +519,7 @@ func (a *ObjectIdWithRepoId) ResetWith(b *ObjectIdWithRepoId) {
 	a.middle = b.middle
 }
 
-func (a *ObjectIdWithRepoId) ResetWithKennung(b IdLike) (err error) {
+func (a *ObjectIdWithRepoId) ResetWithObjectId(b IdLike) (err error) {
 	return a.SetWithIdLike(b)
 }
 
@@ -538,13 +538,7 @@ func (t *ObjectIdWithRepoId) UnmarshalText(text []byte) (err error) {
 }
 
 func (t *ObjectIdWithRepoId) MarshalBinary() (text []byte, err error) {
-	// if t.g == gattung.Unknown {
-	// 	err = errors.Wrapf(gattung.ErrEmptyKennung{}, "Kennung: %s", t)
-	// 	return
-	// }
-
 	text = []byte(FormattedString(t))
-
 	return
 }
 

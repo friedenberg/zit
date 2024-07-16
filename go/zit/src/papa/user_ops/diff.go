@@ -87,7 +87,7 @@ func (op Diff) Run(col sku.CheckedOutLike) (err error) {
 	var externalFD *fd.FD
 
 	switch {
-	case mode.IncludesObject():
+	case mode.IncludesMetadata():
 		if internalInline && externalInline {
 			wg.Do(op.makeDo(wLeft, op.Inline, il))
 			wg.Do(op.makeDo(wRight, op.Inline, el))
@@ -96,17 +96,17 @@ func (op Diff) Run(col sku.CheckedOutLike) (err error) {
 			wg.Do(op.makeDo(wRight, op.Metadata, el))
 		}
 
-		externalFD = el.GetObjekteFD()
+		externalFD = el.GetObjectFD()
 
 	case internalInline && externalInline:
-		wg.Do(op.makeDoAkte(wLeft, op.GetFSHome(), il.GetBlobSha()))
-		wg.Do(op.makeDoFD(wRight, el.GetAkteFD()))
-		externalFD = el.GetAkteFD()
+		wg.Do(op.makeDoBlob(wLeft, op.GetFSHome(), il.GetBlobSha()))
+		wg.Do(op.makeDoFD(wRight, el.GetBlobFD()))
+		externalFD = el.GetBlobFD()
 
 	default:
 		wg.Do(op.makeDo(wLeft, op.Metadata, il))
 		wg.Do(op.makeDo(wRight, op.Metadata, el))
-		externalFD = el.GetAkteFD()
+		externalFD = el.GetBlobFD()
 	}
 
 	internalLabel := fmt.Sprintf(
@@ -117,7 +117,7 @@ func (op Diff) Run(col sku.CheckedOutLike) (err error) {
 
 	externalLabel := op.GetFSHome().Rel(externalFD.GetPath())
 
-	todo.Change("disambiguate internal and external, and objekte / akte")
+	todo.Change("disambiguate internal and external, and object / blob")
 	cmd := exec.Command(
 		"diff",
 		"--color=always",
@@ -177,7 +177,7 @@ func (c Diff) makeDo(
 	}
 }
 
-func (c Diff) makeDoAkte(
+func (c Diff) makeDoBlob(
 	w io.WriteCloser,
 	arf interfaces.BlobReaderFactory,
 	sh interfaces.Sha,

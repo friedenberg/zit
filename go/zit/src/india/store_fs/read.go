@@ -93,7 +93,6 @@ func (s *Store) QueryCheckedOut(
 	return
 }
 
-// TODO [cot/gl !task project-2021-zit-kasten today zz-inbox] move unsure akten and untracked into kasten interface and store_fs
 func (s *Store) QueryUnsure(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.CheckedOutLike],
@@ -118,7 +117,7 @@ func (s *Store) QueryUntrackedBlobs(
 ) (err error) {
 	if err = s.QueryAllMatchingBlobs(
 		qg,
-		s.GetUnsureAkten(),
+		s.GetUnsureBlobs(),
 		func(fd *fd.FD, z *sku.Transacted) (err error) {
 			fr := GetCheckedOutPool().Get()
 			defer GetCheckedOutPool().Put(fr)

@@ -8,16 +8,16 @@ type DialogueType int
 const (
 	DialogueTypeMain = DialogueType(iota)
 	DialogueTypeSkusForFilter
-	DialogueTypeObjekten
-	DialogueTypeAkten
-	DialogueTypeObjekteReader
-	DialogueTypeAkteReader
-	DialogueTypeObjekteWriter
-	DialogueTypeAkteWriter
+	DialogueTypeObjects
+	DialogueTypeBlobs
+	DialogueTypeObjectReader
+	DialogueTypeBlobReader
+	DialogueTypeObjectWriter
+	DialogueTypeBlobWriter
 	DialogueTypePull
-	DialogueTypePullAkte
+	DialogueTypePullBLob
 	DialogueTypePush
-	DialogueTypePushObjekten
-	DialogueTypePushAkte
+	DialogueTypePushObjects
+	DialogueTypePushBlob
 	DialogueTypeGetNeededSkus
 )

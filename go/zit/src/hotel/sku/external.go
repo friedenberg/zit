@@ -74,23 +74,3 @@ func (a *External) AsTransacted() (b Transacted) {
 func (o *External) GetKey() string {
 	return fmt.Sprintf("%s.%s", o.GetGenre(), o.GetObjectIdLike())
 }
-
-// func (e *External) GetCheckoutMode() (m checkout_mode.Mode, err error) {
-// 	switch {
-// 	case !e.FDs.Objekte.IsEmpty() && !e.FDs.Akte.IsEmpty():
-// 		m = checkout_mode.ModeObjekteAndAkte
-
-// 	case !e.FDs.Akte.IsEmpty():
-// 		m = checkout_mode.ModeAkteOnly
-
-// 	case !e.FDs.Objekte.IsEmpty():
-// 		m = checkout_mode.ModeObjekteOnly
-
-// 	default:
-// 		err = checkout_mode.MakeErrInvalidCheckoutMode(
-// 			errors.Errorf("all FD's are empty"),
-// 		)
-// 	}
-
-// 	return
-// }

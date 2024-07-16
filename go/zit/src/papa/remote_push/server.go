@@ -42,13 +42,13 @@ func (op Server) Listen() (err error) {
 
 func (op Server) addToSoldierStage() {
 	op.stage.RegisterHandler(
-		remote_conn.DialogueTypeObjekteWriter,
+		remote_conn.DialogueTypeObjectWriter,
 		op.ObjekteWriter,
 	)
 
 	op.stage.RegisterHandler(
-		remote_conn.DialogueTypeAkteWriter,
-		op.AkteWriter,
+		remote_conn.DialogueTypeBlobWriter,
+		op.BlobWriter,
 	)
 }
 
@@ -58,7 +58,7 @@ func (c Server) ObjekteWriter(
 	return
 }
 
-func (c Server) AkteWriter(
+func (c Server) BlobWriter(
 	d remote_conn.Dialogue,
 ) (err error) {
 	return
@@ -95,8 +95,8 @@ func (op Server) GetNeededSkus(
 
 		ui.Log().Printf("need objekte: %s", sk.GetObjectSha())
 
-		// TODO-P1 check for akte sha
-		// TODO-P1 write akte
+		// TODO-P1 check for blob sha
+		// TODO-P1 write blob
 
 		out = append(out, sk)
 	}

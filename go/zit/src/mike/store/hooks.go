@@ -30,14 +30,14 @@ func (s *Store) tryNewHook(
 		return
 	}
 
-	var akte *type_blobs.V0
+	var blob *type_blobs.V0
 
-	if akte, err = s.GetAkten().GetTypeV0().GetBlob(t.GetBlobSha()); err != nil {
+	if blob, err = s.GetBlobStore().GetTypeV0().GetBlob(t.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	script, ok := akte.Hooks.(string)
+	script, ok := blob.Hooks.(string)
 
 	if !ok || script == "" {
 		return
@@ -85,14 +85,14 @@ func (s *Store) TryFormatHook(
 		return
 	}
 
-	var akte *type_blobs.V0
+	var blob *type_blobs.V0
 
-	if akte, err = s.GetAkten().GetTypeV0().GetBlob(t.GetBlobSha()); err != nil {
+	if blob, err = s.GetBlobStore().GetTypeV0().GetBlob(t.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	script, ok := akte.Hooks.(string)
+	script, ok := blob.Hooks.(string)
 
 	if !ok || script == "" {
 		return
@@ -142,14 +142,14 @@ func (s *Store) tryPreCommitHooks(
 		return
 	}
 
-	var akte *type_blobs.V0
+	var blob *type_blobs.V0
 
-	if akte, err = s.GetAkten().GetTypeV0().GetBlob(t.GetBlobSha()); err != nil {
+	if blob, err = s.GetBlobStore().GetTypeV0().GetBlob(t.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	script, _ := akte.Hooks.(string)
+	script, _ := blob.Hooks.(string)
 
 	hooks = append(hooks, hook{script: script, description: "typ"})
 	hooks = append(hooks, hook{script: s.GetKonfig().Hooks, description: "erworben"})

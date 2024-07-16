@@ -11,12 +11,12 @@ import (
 	"github.com/google/shlex"
 )
 
-type EachAkte struct {
+type EachBlob struct {
 	*env.Env
 	Utility string
 }
 
-func (c EachAkte) Run(
+func (c EachBlob) Run(
 	zsc sku.CheckedOutLikeSet,
 ) (err error) {
 	if zsc.Len() == 0 {
@@ -28,7 +28,7 @@ func (c EachAkte) Run(
 	if err = zsc.Each(
 		func(col sku.CheckedOutLike) (err error) {
 			cofs := col.(*store_fs.CheckedOut)
-			blob_store = append(blob_store, cofs.External.GetAkteFD().GetPath())
+			blob_store = append(blob_store, cofs.External.GetBlobFD().GetPath())
 
 			return
 		},

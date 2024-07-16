@@ -570,20 +570,20 @@ func (b *Builder) makeTagOrLuaTag(
 
 		lb.WithReader(ar)
 	} else {
-		var akte *tag_blobs.V1
+		var blob *tag_blobs.V1
 
-		if akte, err = b.blob_store.GetTagV1().GetBlob(
+		if blob, err = b.blob_store.GetTagV1().GetBlob(
 			sk.GetBlobSha(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if akte.Filter == "" {
+		if blob.Filter == "" {
 			return
 		}
 
-		lb.WithScript(akte.Filter)
+		lb.WithScript(blob.Filter)
 	}
 
 	var vmp *lua.VMPool
@@ -603,7 +603,7 @@ func (b *Builder) makeTagOrLuaTag(
 }
 
 func (b *Builder) makeTagExp(k *ObjectId) (exp sku.Query, err error) {
-	// TODO use b.akten to read Etikett Akte and find filter if necessary
+	// TODO use b.blobs to read tag blob and find filter if necessary
 	var e ids.Tag
 
 	if err = e.TodoSetFromObjectId(k.ObjectId); err != nil {
@@ -649,10 +649,6 @@ LOOP:
 				err = errors.Errorf("cannot contain sigil %s", s)
 				return
 			}
-
-			// if op == '?' {
-			// 	q.Sigil.Add(kennung.SigilSchwanzen)
-			// }
 
 			q.Sigil.Add(s)
 		}

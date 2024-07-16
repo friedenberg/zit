@@ -38,8 +38,8 @@ func init() {
 				CompressionType: immutable_config.CompressionTypeDefault,
 			}
 
-			f.StringVar(&c.InventoryList, "bestandsaufnahme", "", "")
-			f.StringVar(&c.Blobs, "akten", "", "")
+			f.StringVar(&c.InventoryList, "inventory-list", "", "")
+			f.StringVar(&c.Blobs, "blobs", "", "")
 			f.Var(&c.AgeIdentity, "age-identity", "")
 			c.CompressionType.AddToFlagSet(f)
 
@@ -54,12 +54,12 @@ func (c Import) Run(u *env.Env, args ...string) (err error) {
 	hasConflicts := false
 
 	if c.InventoryList == "" {
-		err = errors.Errorf("empty Bestandsaufnahme")
+		err = errors.Errorf("empty inventory list")
 		return
 	}
 
 	if c.Blobs == "" {
-		err = errors.Errorf("empty Akten")
+		err = errors.Errorf("empty blob store")
 		return
 	}
 
@@ -78,7 +78,7 @@ func (c Import) Run(u *env.Env, args ...string) (err error) {
 
 	var rc io.ReadCloser
 
-	// setup besty reader
+	// setup inventory list reader
 	{
 		o := fs_home.FileReadOptions{
 			Age:             &ag,
@@ -94,18 +94,9 @@ func (c Import) Run(u *env.Env, args ...string) (err error) {
 		defer errors.DeferredCloser(&err, rc)
 	}
 
-	// scanner := sku_formats.MakeFormatBestandsaufnahmeScanner(
-	// 	rc,
-	// 	objekte_format.FormatForVersion(u.Konfig().GetStoreVersion()),
-	// 	ofo,
-	// )
+	list := inventory_list.MakeInventoryList()
 
-	// for scanner.Scan() {
-	// }
-
-	besty := inventory_list.MakeInventoryList()
-
-	if _, err = bf.ParseBlob(rc, besty); err != nil {
+	if _, err = bf.ParseBlob(rc, list); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -116,7 +107,7 @@ func (c Import) Run(u *env.Env, args ...string) (err error) {
 	var co *store_fs.CheckedOut
 
 	for {
-		sk, ok := besty.Skus.Pop()
+		sk, ok := list.Skus.Pop()
 
 		if !ok {
 			break
@@ -142,7 +133,7 @@ func (c Import) Run(u *env.Env, args ...string) (err error) {
 			continue
 		}
 
-		if err = c.importAkteIfNecessary(u, co, &ag, coPrinter); err != nil {
+		if err = c.importBlobIfNecessary(u, co, &ag, coPrinter); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -164,19 +155,19 @@ func (c Import) Run(u *env.Env, args ...string) (err error) {
 	return
 }
 
-func (c Import) importAkteIfNecessary(
+func (c Import) importBlobIfNecessary(
 	u *env.Env,
 	co *store_fs.CheckedOut,
 	ag *age.Age,
 	coErrPrinter interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	akteSha := co.External.GetBlobSha()
+	blobSha := co.External.GetBlobSha()
 
-	if u.GetFSHome().HasAkte(u.GetConfig().GetStoreVersion(), akteSha) {
+	if u.GetFSHome().HasBlob(u.GetConfig().GetStoreVersion(), blobSha) {
 		return
 	}
 
-	p := id.Path(akteSha, c.Blobs)
+	p := id.Path(blobSha, c.Blobs)
 
 	o := fs_home.FileReadOptions{
 		Age:             ag,
@@ -188,7 +179,7 @@ func (c Import) importAkteIfNecessary(
 
 	if rc, err = fs_home.NewFileReader(o); err != nil {
 		if errors.IsNotExist(err) {
-			co.SetError(errors.New("akte missing"))
+			co.SetError(errors.New("blob missing"))
 			err = coErrPrinter(co)
 		} else {
 			err = errors.Wrap(err)
@@ -211,24 +202,24 @@ func (c Import) importAkteIfNecessary(
 	var n int64
 
 	if n, err = io.Copy(aw, rc); err != nil {
-		co.SetError(errors.New("akte copy failed"))
+		co.SetError(errors.New("blob copy failed"))
 		err = coErrPrinter(co)
 		return
 	}
 
 	shaRc := rc.GetShaLike()
 
-	if !shaRc.EqualsSha(akteSha) {
-		co.SetError(errors.New("akte sha mismatch"))
+	if !shaRc.EqualsSha(blobSha) {
+		co.SetError(errors.New("blob sha mismatch"))
 		err = coErrPrinter(co)
 		errors.TodoRecoverable(
-			"sku akte mismatch: sku had %s while akten had %s",
+			"sku blob mismatch: sku had %s while blob store had %s",
 			co.Internal.GetBlobSha(),
 			shaRc,
 		)
 	}
 
-	ui.Err().Printf("copied Akte %s (%d bytes)", akteSha, n)
+	ui.Err().Printf("copied Blob %s (%d bytes)", blobSha, n)
 
 	return
 }

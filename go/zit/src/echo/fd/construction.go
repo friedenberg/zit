@@ -22,7 +22,7 @@ func FDFromDir(
 	return
 }
 
-func FDFromPathWithAkteWriterFactory(
+func FDFromPathWithBlobWriterFactory(
 	p string,
 	awf interfaces.BlobWriterFactory,
 ) (fd *FD, err error) {
@@ -32,12 +32,12 @@ func FDFromPathWithAkteWriterFactory(
 	}
 
 	if awf == nil {
-		panic("schnittstellen.AkteWriterFactory is nil")
+		panic("BlobWriterFactory is nil")
 	}
 
 	fd = &FD{}
 
-	if err = fd.SetWithAkteWriterFactory(p, awf); err != nil {
+	if err = fd.SetWithBlobWriterFactory(p, awf); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
