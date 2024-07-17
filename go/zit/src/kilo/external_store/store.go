@@ -62,12 +62,7 @@ type (
 		) (err error)
 	}
 
-	QueryCheckedOut interface {
-		QueryCheckedOut(
-			qg *query.Group,
-			f interfaces.FuncIter[CheckedOutLike],
-		) (err error)
-	}
+	QueryCheckedOut = query.QueryCheckedOut
 
 	Info struct {
 		StoreFuncs
@@ -225,7 +220,7 @@ func (es *Store) GetExternalObjectIds() (ks interfaces.SetLike[*ids.ObjectId], e
 		return
 	}
 
-	if ks, err = es.StoreLike.GetExternalObjectId(); err != nil {
+	if ks, err = es.StoreLike.GetExternalObjectIds(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

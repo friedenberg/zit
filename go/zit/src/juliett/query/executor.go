@@ -4,14 +4,21 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type (
+	QueryCheckedOut interface {
+		QueryCheckedOut(
+			qg *Group,
+			f interfaces.FuncIter[sku.CheckedOutLike],
+		) (err error)
+	}
+
 	ExecutionInfo struct {
-		ExternalStoreUpdateTransacted
-		FuncPrimitiveQuery
+		sku.ExternalStoreUpdateTransacted
+		sku.FuncPrimitiveQuery
+		QueryCheckedOut
 	}
 )
 
@@ -22,7 +29,7 @@ type Executor struct {
 }
 
 func (e *Executor) Execute() (err error) {
-	if e.GetSigil() == ids.SigilExternal {
+	if e.dotOperatorActive {
 		if err = e.executeExternalQuery(); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -37,12 +44,19 @@ func (e *Executor) Execute() (err error) {
 	return
 }
 
-// TODO improve performance by only reading Cwd zettels rather than scanning
-// everything
 func (e *Executor) executeExternalQuery() (err error) {
-	if err = e.FuncPrimitiveQuery(
+	if err = e.QueryCheckedOut.QueryCheckedOut(
 		e.Group,
-		e.makeEmitSkuSigilExternal(),
+		func(col sku.CheckedOutLike) (err error) {
+			z := col.GetSkuExternalLike().GetSku()
+
+			if err = e.Out(z); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -101,33 +115,6 @@ func (e *Executor) makeEmitSkuSigilLatest() interfaces.FuncIter[*sku.Transacted]
 				err = errors.Wrap(err)
 				return
 			}
-		}
-
-		if !m.ContainsSku(z) {
-			return
-		}
-
-		if err = e.Out(z); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-}
-
-func (e *Executor) makeEmitSkuSigilExternal() interfaces.FuncIter[*sku.Transacted] {
-	return func(z *sku.Transacted) (err error) {
-		g := genres.Must(z.GetGenre())
-		m, ok := e.Get(g)
-
-		if !ok {
-			return
-		}
-
-		if err = e.UpdateTransacted(z); err != nil {
-			err = errors.Wrap(err)
-			return
 		}
 
 		if !m.ContainsSku(z) {

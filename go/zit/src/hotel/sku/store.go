@@ -20,7 +20,7 @@ type (
 	}
 
 	ExternalStoreForQuery interface {
-		GetExternalObjectId() (interfaces.SetLike[*ids.ObjectId], error)
+		GetExternalObjectIds() (interfaces.SetLike[*ids.ObjectId], error)
 		GetObjectIdForString(string) (*ids.ObjectId, error)
 	}
 

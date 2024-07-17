@@ -310,7 +310,7 @@ func (b *Builder) buildManyFromTokens(
 		// TODO [ces/mew] switch to marker on query group for Cwd
 		var ks interfaces.SetLike[*ids.ObjectId]
 
-		if ks, err = b.repo.GetExternalObjectId(); err != nil {
+		if ks, err = b.repo.GetExternalObjectIds(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -331,6 +331,8 @@ func (b *Builder) buildManyFromTokens(
 			err = errors.Wrap(err)
 			return
 		}
+
+		qg.dotOperatorActive = true
 
 		return
 	}

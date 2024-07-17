@@ -24,9 +24,10 @@ func (s *Store) QueryWithKasten(
 
 	e := &query.Executor{
 		Group: qg,
-		QueryExecutionInfo: sku.QueryExecutionInfo{
+		ExecutionInfo: query.ExecutionInfo{
 			FuncPrimitiveQuery:            s.GetVerzeichnisse().ReadQuery,
 			ExternalStoreUpdateTransacted: es,
+			QueryCheckedOut:               es,
 		},
 		Out: f,
 	}

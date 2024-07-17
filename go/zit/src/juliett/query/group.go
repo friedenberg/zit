@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -29,6 +30,8 @@ type Group struct {
 	UserQueries      map[ids.Genre]*Query
 	Zettels          ids.ZettelIdMutableSet
 	Types            ids.TypeMutableSet
+
+	dotOperatorActive bool
 
 	sku.ExternalQueryOptions
 }
@@ -386,6 +389,44 @@ func (qg *Group) ContainsSku(sk *sku.Transacted) (ok bool) {
 	}
 
 	ok = true
+
+	return
+}
+
+func (qg *Group) ContainsExternalSku(
+	sk *sku.Transacted,
+	state checked_out_state.State,
+) (ok bool) {
+	defer sk.Metadata.Cache.QueryPath.PushOnOk(qg, &ok)
+
+	if qg.dotOperatorActive {
+		ok = true
+		return
+	}
+
+	if !qg.ContainsSkuCheckedOutState(state) {
+		return
+	}
+
+	if qg.ContainsSku(sk) {
+		ok = true
+		return
+	}
+
+	return
+}
+
+func (qg *Group) ContainsSkuCheckedOutState(state checked_out_state.State) (ok bool) {
+	switch state {
+	case checked_out_state.StateUntracked:
+		ok = !qg.ExcludeUntracked
+
+	case checked_out_state.StateRecognized:
+		ok = qg.IncludeRecognized
+
+	default:
+		ok = true
+	}
 
 	return
 }

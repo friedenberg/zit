@@ -45,11 +45,6 @@ type (
 		interfaces.FuncIter[*Transacted],
 	) (err error)
 
-	QueryExecutionInfo struct {
-		ExternalStoreUpdateTransacted
-		FuncPrimitiveQuery
-	}
-
 	QueryGroup interface {
 		PrimitiveQueryGroup
 		Query

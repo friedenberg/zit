@@ -181,7 +181,7 @@ func (fs *Store) String() (out string) {
 	return
 }
 
-func (s *Store) GetExternalObjectId() (ks interfaces.SetLike[*ids.ObjectId], err error) {
+func (s *Store) GetExternalObjectIds() (ks interfaces.SetLike[*ids.ObjectId], err error) {
 	ksm := collections_value.MakeMutableValueSet[*ids.ObjectId](nil)
 	ks = ksm
 	var l sync.Mutex

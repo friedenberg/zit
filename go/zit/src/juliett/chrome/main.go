@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
@@ -79,7 +78,7 @@ func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
 	return fs
 }
 
-func (c *Store) GetExternalObjectId() (ks interfaces.SetLike[*ids.ObjectId], err error) {
+func (c *Store) GetExternalObjectIds() (ks interfaces.SetLike[*ids.ObjectId], err error) {
 	ksm := collections_value.MakeMutableValueSet[*ids.ObjectId](nil)
 	ks = ksm
 
@@ -218,7 +217,6 @@ func (c *Store) QueryCheckedOut(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	ui.Debug().Print(qg)
 	// o := sku.ObjekteOptions{
 	// 	Mode: objekte_mode.ModeRealizeSansProto,
 	// }
@@ -343,7 +341,9 @@ func (c *Store) tryToEmitOneRecognized(
 	item item,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	if !qg.IncludeRecognized {
+	co.State = checked_out_state.StateRecognized
+
+	if !qg.ContainsSkuCheckedOutState(co.State) {
 		return
 	}
 
@@ -376,8 +376,9 @@ func (c *Store) tryToEmitOneUntracked(
 	item item,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	ui.Debug().Print(co, qg)
-	if qg.ExcludeUntracked {
+	co.State = checked_out_state.StateUntracked
+
+	if !qg.ContainsSkuCheckedOutState(co.State) {
 		return
 	}
 
@@ -387,7 +388,6 @@ func (c *Store) tryToEmitOneUntracked(
 
 	sku.TransactedResetter.Reset(&co.External.Transacted)
 	sku.TransactedResetter.Reset(&co.Internal)
-	co.State = checked_out_state.StateUntracked
 
 	if err = c.tryToEmitOneCommon(
 		qg,
@@ -417,9 +417,8 @@ func (c *Store) tryToEmitOneCommon(
 		return
 	}
 
-	ui.Debug().Print(browser, qg)
-
-	if !qg.ContainsSku(browser) && !qg.ContainsSku(co.GetSku()) {
+	if !qg.ContainsExternalSku(browser, co.State) &&
+		!qg.ContainsExternalSku(co.GetSku(), co.State) {
 		return
 	}
 
