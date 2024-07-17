@@ -87,11 +87,7 @@ func (u *Env) Start(e BigBang) (err error) {
 
 	writeFile(s.FileKonfigAngeboren(), e.Config)
 
-	if e.Config.UseKonfigErworbenFile {
-		writeFile(s.FileKonfigErworben(), "")
-	} else {
-		writeFile(s.FileKonfigCompiled(), "")
-	}
+	writeFile(s.FileKonfigErworben(), "")
 
 	writeFile(s.FileSchlummernd(), "")
 

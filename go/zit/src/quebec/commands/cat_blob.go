@@ -50,34 +50,23 @@ func (c CatBlob) Run(
 			return
 		}
 
-		me := errors.MakeMulti()
-
 		if err = c.blob(u, &sh, blobWriter); err == nil {
 			continue
 		}
-
-		me.Add(err)
-
-		// if sk, err = u.StoreUtil().GetVerzeichnisse().ReadOneShas(&sh); err == nil {
-		// 	log.Out().Printf("%s", sk)
-		// 	continue
-		// }
-
-		// me.Add(err)
 
 		var rc sha.ReadCloser
 
 		if rc, err = u.GetStore().ReaderFor(&sh); err == nil {
 			if err = blobWriter(rc); err != nil {
-				err = errors.Wrap(err)
-				return
+				ui.Err().Print(err)
+				err = nil
+				continue
 			}
 
 			continue
 		}
 
-		me.Add(err)
-		ui.Err().Print(me)
+		ui.Err().Print(err)
 	}
 
 	return

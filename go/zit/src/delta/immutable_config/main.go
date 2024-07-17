@@ -15,9 +15,9 @@ func init() {
 type Config struct {
 	StoreVersion                        storeVersion
 	Recipients                          []string
-	UseBestandsaufnahme                 bool
-	UseKonfigErworbenFile               bool
-	UseBestandsaufnahmeForVerzeichnisse bool
+	UseBestandsaufnahme                 bool // deprecated
+	UseKonfigErworbenFile               bool // deprecated
+	UseBestandsaufnahmeForVerzeichnisse bool // deprecated
 	CompressionType                     CompressionType
 	LockInternalFiles                   bool
 }
@@ -38,25 +38,7 @@ func (k Config) GetStoreVersion() interfaces.StoreVersion {
 	return k.StoreVersion
 }
 
-func (k Config) GetUseBestandsaufnahmeForVerzeichnisse() bool {
-	return k.UseBestandsaufnahmeForVerzeichnisse
-}
-
 func (k *Config) AddToFlagSet(f *flag.FlagSet) {
-	f.BoolVar(
-		&k.UseBestandsaufnahme,
-		"use-bestandsaufnahme",
-		k.UseBestandsaufnahme,
-		"use bestandsaufnahme",
-	)
-
-	f.BoolVar(
-		&k.UseBestandsaufnahmeForVerzeichnisse,
-		"use-bestandsaufnahme-for-verzeichnisse",
-		k.UseBestandsaufnahmeForVerzeichnisse,
-		"use bestandsaufnahme for verzeichnisse",
-	)
-
 	k.CompressionType.AddToFlagSet(f)
 
 	f.BoolVar(
