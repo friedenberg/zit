@@ -14,7 +14,7 @@ import (
 )
 
 func (s *Store) ReadOneExternal(
-	o *sku.ObjectOptions,
+	o *sku.CommitOptions,
 	em *ObjectIdFDPair,
 	t *sku.Transacted,
 ) (e *External, err error) {
@@ -38,7 +38,7 @@ func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 	var e2 *External
 
 	if e2, err = s.ReadExternalFromObjectIdFDPair(
-		sku.ObjectOptions{
+		sku.CommitOptions{
 			Mode: objekte_mode.ModeUpdateTai,
 		},
 		e,
@@ -57,7 +57,7 @@ func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 }
 
 func (s *Store) ReadOneExternalInto(
-	o *sku.ObjectOptions,
+	o *sku.CommitOptions,
 	em *ObjectIdFDPair,
 	t *sku.Transacted,
 	e *External,

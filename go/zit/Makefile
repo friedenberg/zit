@@ -36,14 +36,14 @@ build: build/zit | build_dir;
 build_dir:
 > mkdir -p build
 
-files_go_generate := $(shell ag 'go:generate' -l src/)
+files_go_generate := $(shell grep go:generate -R src/ --include '*.go' -l)
 
 build/go_generate: $(files_go_generate) | build_dir
 > go generate ./...
 > touch "$@"
 
 gomod2nix.toml: go.mod go.sum
-> gomod2nix
+> gomod2nix || true
 
 files_go := $(shell find src -type f)
 

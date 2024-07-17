@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
@@ -182,7 +183,7 @@ func (c *Store) CheckoutOne(
 	sz *sku.Transacted,
 ) (cz sku.CheckedOutLike, err error) {
 	if !sz.Metadata.Type.Equals(c.typ) {
-		err = errors.Wrap(sku.ErrExternalStoreUnsupportedTyp(sz.Metadata.Type))
+		err = errors.Wrap(external_store.ErrUnsupportedTyp(sz.Metadata.Type))
 		return
 	}
 
@@ -217,6 +218,7 @@ func (c *Store) QueryCheckedOut(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
+	ui.Debug().Print(qg)
 	// o := sku.ObjekteOptions{
 	// 	Mode: objekte_mode.ModeRealizeSansProto,
 	// }
@@ -250,67 +252,6 @@ func (c *Store) QueryCheckedOut(
 					return
 				}
 			} else if !exactIndexURLMatch {
-				if err = c.tryToEmitOneUntracked(
-					qg,
-					&co,
-					item,
-					f,
-				); err != nil {
-					err = errors.Wrapf(err, "Item: %#v", item)
-					return
-				}
-			} else if exactIndexURLMatch {
-				if err = matchingUrls.Each(
-					func(matching *sku.Transacted) (err error) {
-						if err = c.tryToEmitOneRecognized(
-							qg,
-							matching,
-							&co,
-							item,
-							f,
-						); err != nil {
-							err = errors.Wrapf(err, "Item: %#v", item)
-							return
-						}
-
-						return
-					},
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-		}
-	}
-
-	return
-}
-
-func (c *Store) QueryUnsure(
-	qg *query.Group,
-	f interfaces.FuncIter[sku.CheckedOutLike],
-) (err error) {
-	// o := sku.ObjekteOptions{
-	// 	Mode: objekte_mode.ModeRealizeSansProto,
-	// }
-
-	var co CheckedOut
-
-	for u, items := range c.urls {
-		matchingUrls, exactIndexURLMatch := c.transactedUrlIndex[u]
-
-		for _, item := range items {
-			{
-				tabId, okTabId := item.GetTabId()
-
-				if okTabId {
-					if _, trackedFromBefore := c.transactedTabIdIndex[tabId]; trackedFromBefore {
-						continue
-					}
-				}
-			}
-
-			if !exactIndexURLMatch {
 				if err = c.tryToEmitOneUntracked(
 					qg,
 					&co,
@@ -435,6 +376,7 @@ func (c *Store) tryToEmitOneUntracked(
 	item item,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
+	ui.Debug().Print(co, qg)
 	if qg.ExcludeUntracked {
 		return
 	}
@@ -474,6 +416,8 @@ func (c *Store) tryToEmitOneCommon(
 		err = errors.Wrap(err)
 		return
 	}
+
+	ui.Debug().Print(browser, qg)
 
 	if !qg.ContainsSku(browser) && !qg.ContainsSku(co.GetSku()) {
 		return

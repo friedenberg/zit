@@ -98,7 +98,7 @@ func (pw *writer) flushBoth() (err error) {
 	)
 
 	if err = pw.copyJustHistoryAndAdded(
-		makeFlushQueryGroup(ids.SigilHistory, ids.SigilHidden),
+		makeQueryGroupForFlush(),
 		chain,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -154,7 +154,7 @@ func (pw *writer) flushJustLatest() (err error) {
 
 	if err = pw.copyJustHistoryFrom(
 		&pw.Reader,
-		makeFlushQueryGroup(ids.SigilHistory, ids.SigilHidden),
+		makeQueryGroupForFlush(),
 		func(sk skuWithRangeAndSigil) (err error) {
 			pw.Range = sk.Range
 			pw.saveSchwanz(sk.Transacted, sk.Sigil)

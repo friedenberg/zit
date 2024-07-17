@@ -7,7 +7,7 @@ import (
 )
 
 func (s *Store) ReadCheckedOutFromItem(
-	o sku.ObjectOptions,
+	o sku.CommitOptions,
 	k interfaces.ObjectId,
 	em *item,
 ) (co *CheckedOut, err error) {

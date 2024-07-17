@@ -17,7 +17,7 @@ func (c *Store) initializeIndex() (err error) {
 
 	var l sync.Mutex
 
-	if err = c.externalStoreInfo.FuncQuery(
+	if err = c.externalStoreInfo.FuncPrimitiveQuery(
 		nil,
 		func(sk *sku.Transacted) (err error) {
 			if !sk.GetType().Equals(c.typ) {

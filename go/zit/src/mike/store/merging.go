@@ -9,7 +9,7 @@ import (
 
 func (s *Store) readExternalAndMergeIfNecessary(
 	kinder, mutter *sku.Transacted,
-	options sku.ObjectOptions,
+	options sku.CommitOptions,
 ) (err error) {
 	if mutter == nil {
 		return

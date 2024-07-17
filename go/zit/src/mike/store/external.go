@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type ObjekteOptions = sku.ObjectOptions
+type ObjekteOptions = sku.CommitOptions
 
 func (s *Store) ReadOneObjectIdExternal(
 	o ObjekteOptions,

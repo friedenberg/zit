@@ -47,7 +47,7 @@ func (s *Store) checkoutOneNew(
 		var cze *External
 
 		if cze, err = s.ReadExternalFromObjectIdFDPair(
-			sku.ObjectOptions{
+			sku.CommitOptions{
 				Mode: objekte_mode.ModeRealizeSansProto,
 			},
 			e,
@@ -106,7 +106,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	}
 
 	if err = s.ReadIntoExternalFromObjectIdFDPair(
-		sku.ObjectOptions{
+		sku.CommitOptions{
 			Mode: objekte_mode.ModeRealizeSansProto,
 		},
 		e,

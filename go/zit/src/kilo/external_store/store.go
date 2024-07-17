@@ -18,8 +18,8 @@ import (
 )
 
 type (
-	FuncRealize     = func(*Transacted, *Transacted, ObjekteOptions) error
-	FuncCommit      = func(*Transacted, ObjekteOptions) error
+	FuncRealize     = func(*Transacted, *Transacted, CommitOptions) error
+	FuncCommit      = func(*Transacted, CommitOptions) error
 	FuncReadSha     = func(*sha.Sha) (*Transacted, error)
 	FuncReadOneInto = func(
 		k1 interfaces.ObjectId,
@@ -31,7 +31,7 @@ type (
 		FuncCommit
 		FuncReadSha
 		FuncReadOneInto
-		sku.FuncQuery
+		sku.FuncPrimitiveQuery
 	}
 
 	QueryOptions struct {
@@ -69,13 +69,6 @@ type (
 		) (err error)
 	}
 
-	QueryUnsure interface {
-		QueryUnsure(
-			qg *query.Group,
-			f interfaces.FuncIter[CheckedOutLike],
-		) (err error)
-	}
-
 	Info struct {
 		StoreFuncs
 		DirCache string
@@ -84,7 +77,6 @@ type (
 
 	StoreLike interface {
 		Initialize(Info) error
-		QueryUnsure
 		QueryCheckedOut
 		interfaces.Flusher
 		sku.ExternalStoreForQuery
@@ -143,33 +135,6 @@ func (es *Store) QueryCheckedOut(
 	}
 
 	if err = esqco.QueryCheckedOut(
-		qg,
-		f,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (es *Store) QueryUnsure(
-	qg *query.Group,
-	f interfaces.FuncIter[CheckedOutLike],
-) (err error) {
-	esqu, ok := es.StoreLike.(QueryUnsure)
-
-	if !ok {
-		err = errors.Errorf("store does not support %T", esqu)
-		return
-	}
-
-	if err = es.Initialize(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = esqu.QueryUnsure(
 		qg,
 		f,
 	); err != nil {
@@ -312,13 +277,13 @@ func (es *Store) Open(
 	return
 }
 
-type ErrExternalStoreUnsupportedTyp ids.Type
+type ErrUnsupportedTyp ids.Type
 
-func (e ErrExternalStoreUnsupportedTyp) Is(target error) bool {
-	_, ok := target.(ErrExternalStoreUnsupportedTyp)
+func (e ErrUnsupportedTyp) Is(target error) bool {
+	_, ok := target.(ErrUnsupportedTyp)
 	return ok
 }
 
-func (e ErrExternalStoreUnsupportedTyp) Error() string {
+func (e ErrUnsupportedTyp) Error() string {
 	return fmt.Sprintf("unsupported typ: %q", ids.Type(e))
 }

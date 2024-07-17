@@ -16,9 +16,9 @@ func init() {
 	gob.Register(Transacted{})
 }
 
-type ObjectOptions struct {
+type CommitOptions struct {
 	ids.RepoId
-	objekte_mode.Mode
+	objekte_mode.Mode // TODO rename
 	ids.Clock
 	Proto *Transacted
 }

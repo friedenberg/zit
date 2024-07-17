@@ -35,26 +35,25 @@ type (
 		HasHidden() bool
 	}
 
+	FuncQuery = func(
+		QueryGroup,
+		interfaces.FuncIter[*Transacted],
+	) (err error)
+
+	FuncPrimitiveQuery = func(
+		PrimitiveQueryGroup,
+		interfaces.FuncIter[*Transacted],
+	) (err error)
+
+	QueryExecutionInfo struct {
+		ExternalStoreUpdateTransacted
+		FuncPrimitiveQuery
+	}
+
 	QueryGroup interface {
 		PrimitiveQueryGroup
 		Query
 		SetIncludeHistory()
-		MakeEmitSkuMaybeExternal(
-			f interfaces.FuncIter[*Transacted],
-			k ids.RepoId,
-			updateTransacted func(
-				kasten ids.RepoId,
-				z *Transacted,
-			) (err error),
-		) interfaces.FuncIter[*Transacted]
-		MakeEmitSkuSigilLatest(
-			f interfaces.FuncIter[*Transacted],
-			k ids.RepoId,
-			updateTransacted func(
-				kasten ids.RepoId,
-				z *Transacted,
-			) (err error),
-		) interfaces.FuncIter[*Transacted]
 		GetTags() ids.TagSet
 		GetTypes() ids.TypeSet
 	}

@@ -146,11 +146,11 @@ func (s *Store) SetExternalStores(
 
 	for k, es := range s.externalStores {
 		es.StoreFuncs = external_store.StoreFuncs{
-			FuncRealize:     s.tryRealize,
-			FuncCommit:      s.tryRealizeAndOrStore,
-			FuncReadSha:     s.ReadOneEnnui,
-			FuncReadOneInto: s.ReadOneInto,
-			FuncQuery:       s.Query,
+			FuncRealize:        s.tryRealize,
+			FuncCommit:         s.tryRealizeAndOrStore,
+			FuncReadSha:        s.ReadOneEnnui,
+			FuncReadOneInto:    s.ReadOneInto,
+			FuncPrimitiveQuery: s.GetVerzeichnisse().ReadQuery,
 		}
 
 		es.Home = s.GetStandort()

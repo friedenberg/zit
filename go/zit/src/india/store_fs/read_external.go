@@ -8,7 +8,7 @@ import (
 )
 
 func (s *Store) ReadTransactedFromObjectId(
-	o sku.ObjectOptions,
+	o sku.CommitOptions,
 	k1 interfaces.ObjectId,
 	t *sku.Transacted,
 ) (e *External, err error) {
@@ -27,7 +27,7 @@ func (s *Store) ReadTransactedFromObjectId(
 }
 
 func (s *Store) ReadExternalFromObjectIdFDPair(
-	o sku.ObjectOptions,
+	o sku.CommitOptions,
 	em *ObjectIdFDPair,
 	t *sku.Transacted,
 ) (e *External, err error) {
@@ -42,7 +42,7 @@ func (s *Store) ReadExternalFromObjectIdFDPair(
 }
 
 func (s *Store) ReadIntoExternalFromObjectIdFDPair(
-	o sku.ObjectOptions,
+	o sku.CommitOptions,
 	em *ObjectIdFDPair,
 	t *sku.Transacted,
 	e *External,

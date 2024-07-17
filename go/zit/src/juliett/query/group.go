@@ -27,7 +27,6 @@ type Group struct {
 	Hidden           sku.Query
 	OptimizedQueries map[genres.Genre]*Query
 	UserQueries      map[ids.Genre]*Query
-	ObjectIds        []*ids.ObjectId
 	Zettels          ids.ZettelIdMutableSet
 	Types            ids.TypeMutableSet
 
@@ -164,8 +163,6 @@ func (qg *Group) AddExactObjectId(
 		err = errors.Errorf("nil object id")
 		return
 	}
-
-	qg.ObjectIds = append(qg.ObjectIds, k.ObjectId)
 
 	q := b.makeQuery()
 	q.Sigil.Add(ids.SigilLatest)
@@ -391,122 +388,4 @@ func (qg *Group) ContainsSku(sk *sku.Transacted) (ok bool) {
 	ok = true
 
 	return
-}
-
-func (qg *Group) MakeEmitSku(
-	f interfaces.FuncIter[*sku.Transacted],
-) interfaces.FuncIter[*sku.Transacted] {
-	return func(z *sku.Transacted) (err error) {
-		g := genres.Must(z.GetGenre())
-		m, ok := qg.Get(g)
-
-		if !ok {
-			return
-		}
-
-		if !m.ContainsSku(z) {
-			return
-		}
-
-		if err = f(z); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-}
-
-// TODO improve performance by only reading Cwd zettels rather than scanning
-// everything
-func (qg *Group) MakeEmitSkuMaybeExternal(
-	f interfaces.FuncIter[*sku.Transacted],
-	k ids.RepoId,
-	updateTransacted func(
-		kasten ids.RepoId,
-		z *sku.Transacted,
-	) (err error),
-) interfaces.FuncIter[*sku.Transacted] {
-	// TODO add untracked and recognized
-	// if qg.IncludeRecognized {
-	// }
-
-	// if !qg.ExcludeUntracked {
-	// }
-
-	if qg.GetSigil() == ids.SigilExternal {
-		return qg.MakeEmitSkuSigilExternal(f, k, updateTransacted)
-	} else {
-		return qg.MakeEmitSkuSigilLatest(f, k, updateTransacted)
-	}
-}
-
-func (qg *Group) MakeEmitSkuSigilLatest(
-	f interfaces.FuncIter[*sku.Transacted],
-	k ids.RepoId,
-	updateTransacted func(
-		kasten ids.RepoId,
-		z *sku.Transacted,
-	) (err error),
-) interfaces.FuncIter[*sku.Transacted] {
-	return func(z *sku.Transacted) (err error) {
-		g := genres.Must(z.GetGenre())
-		m, ok := qg.Get(g)
-
-		if !ok {
-			return
-		}
-
-		if m.GetSigil().IncludesExternal() {
-			if err = updateTransacted(k, z); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
-		if !m.ContainsSku(z) {
-			return
-		}
-
-		if err = f(z); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-}
-
-func (qg *Group) MakeEmitSkuSigilExternal(
-	f interfaces.FuncIter[*sku.Transacted],
-	k ids.RepoId,
-	updateTransacted func(
-		kasten ids.RepoId,
-		z *sku.Transacted,
-	) (err error),
-) interfaces.FuncIter[*sku.Transacted] {
-	return func(z *sku.Transacted) (err error) {
-		g := genres.Must(z.GetGenre())
-		m, ok := qg.Get(g)
-
-		if !ok {
-			return
-		}
-
-		if err = updateTransacted(k, z); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if !m.ContainsSku(z) {
-			return
-		}
-
-		if err = f(z); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
 }

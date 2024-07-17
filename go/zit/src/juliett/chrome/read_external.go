@@ -7,7 +7,7 @@ import (
 )
 
 func (s *Store) ReadIntoExternalFromObjectIdFDPair(
-	o sku.ObjectOptions,
+	o sku.CommitOptions,
 	em *item,
 	t *sku.Transacted,
 	e *External,
@@ -36,7 +36,7 @@ func (s *Store) ReadIntoExternalFromObjectIdFDPair(
 }
 
 func (s *Store) ReadOneExternalInto(
-	o *sku.ObjectOptions,
+	o *sku.CommitOptions,
 	em *item,
 	t *sku.Transacted,
 	e *External,

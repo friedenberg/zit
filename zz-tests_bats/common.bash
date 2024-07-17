@@ -11,10 +11,10 @@ DIR="$(cd "$(dirname "$BATS_TEST_FILENAME")" >/dev/null 2>&1 && pwd)"
 # make executables in build/ visible to PATH
 PATH="$BATS_CWD/build:$PATH"
 
-{
-  pushd "$BATS_CWD" >/dev/null 2>&1
-  make build/zit || exit 1
-}
+# {
+#   pushd "$BATS_CWD" >/dev/null 2>&1
+#   gmake build/zit || exit 1
+# }
 
 {
   pushd "$BATS_TEST_TMPDIR" || exit 1

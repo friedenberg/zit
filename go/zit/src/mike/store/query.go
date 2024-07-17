@@ -4,36 +4,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
-
-func (s *Store) Query(
-	qg sku.QueryGroup,
-	f interfaces.FuncIter[*sku.Transacted],
-) (err error) {
-	if qg == nil {
-		if qg, err = s.queryBuilder.BuildQueryGroup(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if err = s.GetVerzeichnisse().ReadQuery(
-		qg,
-		qg.MakeEmitSkuSigilLatest(
-			f,
-			ids.RepoId{},
-			s.UpdateTransactedWithExternal,
-		),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
 
 func (s *Store) QueryWithKasten(
 	qg *query.Group,
@@ -47,22 +20,18 @@ func (s *Store) QueryWithKasten(
 	}
 
 	wg := iter.MakeErrorWaitGroupParallel()
+	es := s.externalStores[qg.RepoId.String()]
 
-	wg.Do(func() (err error) {
-		if err = s.GetVerzeichnisse().ReadQuery(
-			qg,
-			qg.MakeEmitSkuMaybeExternal(
-				f,
-				qg.RepoId,
-				s.UpdateTransactedWithExternal,
-			),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	e := &query.Executor{
+		Group: qg,
+		QueryExecutionInfo: sku.QueryExecutionInfo{
+			FuncPrimitiveQuery:            s.GetVerzeichnisse().ReadQuery,
+			ExternalStoreUpdateTransacted: es,
+		},
+		Out: f,
+	}
 
-		return
-	})
+	wg.Do(e.Execute)
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)

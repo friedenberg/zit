@@ -20,7 +20,7 @@ import (
 func (s *Store) MakeApplyCheckedOut(
 	qg sku.Queryable,
 	f interfaces.FuncIter[sku.CheckedOutLike],
-	o sku.ObjectOptions,
+	o sku.CommitOptions,
 ) interfaces.FuncIter[*ObjectIdFDPair] {
 	return func(em *ObjectIdFDPair) (err error) {
 		if err = s.ApplyCheckedOut(o, qg, em, f); err != nil {
@@ -33,7 +33,7 @@ func (s *Store) MakeApplyCheckedOut(
 }
 
 func (s *Store) ApplyCheckedOut(
-	o sku.ObjectOptions,
+	o sku.CommitOptions,
 	qg sku.Queryable,
 	em *ObjectIdFDPair,
 	f interfaces.FuncIter[sku.CheckedOutLike],
@@ -66,7 +66,7 @@ func (s *Store) QueryCheckedOut(
 	wg := iter.MakeErrorWaitGroupParallel()
 
 	{
-		o := sku.ObjectOptions{
+		o := sku.CommitOptions{
 			Mode: objekte_mode.ModeRealizeSansProto,
 		}
 
@@ -97,7 +97,7 @@ func (s *Store) QueryUnsure(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	o := sku.ObjectOptions{
+	o := sku.CommitOptions{
 		Mode: objekte_mode.ModeRealizeWithProto,
 	}
 
@@ -212,7 +212,7 @@ func (s *Store) QueryAllMatchingBlobs(
 	observed := fd.MakeMutableSet()
 	var l sync.Mutex
 
-	if err = s.externalStoreInfo.FuncQuery(
+	if err = s.externalStoreInfo.FuncPrimitiveQuery(
 		qg,
 		func(z *sku.Transacted) (err error) {
 			fd, ok := fds.Get(z.GetBlobSha().String())

@@ -11,7 +11,7 @@ import (
 )
 
 func (s *Store) ReadCheckedOutFromObjectIdFDPair(
-	o sku.ObjectOptions,
+	o sku.CommitOptions,
 	em *ObjectIdFDPair,
 ) (co *CheckedOut, err error) {
 	co = GetCheckedOutPool().Get()
@@ -77,7 +77,7 @@ func (s *Store) ReadIntoCheckedOutFromTransacted(
 	}
 
 	if err = s.ReadIntoExternalFromObjectIdFDPair(
-		sku.ObjectOptions{
+		sku.CommitOptions{
 			Mode: objekte_mode.ModeUpdateTai,
 		},
 		kfp,

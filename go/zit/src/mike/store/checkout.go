@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
 func (s *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
@@ -41,7 +42,7 @@ func (s *Store) CheckoutQuery(
 		var col sku.CheckedOutLike
 
 		if col, err = s.CheckoutOne(qg.RepoId, options, t); err != nil {
-			if errors.Is(err, sku.ErrExternalStoreUnsupportedTyp{}) {
+			if errors.Is(err, external_store.ErrUnsupportedTyp{}) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
