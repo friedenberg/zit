@@ -12,7 +12,7 @@ func (u *Env) makeQueryBuilder() *query.Builder {
 	return query.MakeBuilder(
 		u.GetFSHome(),
 		u.GetStore().GetBlobStore(),
-		u.GetStore().GetVerzeichnisse(),
+		u.GetStore().GetStreamIndex(),
 		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
 		u,
 	)

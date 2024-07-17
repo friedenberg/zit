@@ -20,11 +20,11 @@ const (
 )
 
 type Getter interface {
-	GetStandort() Home
+	GetFSHome() Home
 }
 
 type Home struct {
-	store_fs         string
+	cwd              string
 	basePath         string
 	execPath         string
 	lockSmith        interfaces.LockSmith
@@ -36,6 +36,7 @@ type Home struct {
 }
 
 func Make(
+	// config immutable_config.Config,
 	o Options,
 ) (s Home, err error) {
 	s.age = &age.Age{}
@@ -59,7 +60,7 @@ func Make(
 	s.dryRun = o.DryRun
 	s.basePath = o.BasePath
 	s.debug = o.Debug
-	s.store_fs = o.store_fs
+	s.cwd = o.store_fs
 	s.pid = os.Getpid()
 
 	if ok := files.Exists(s.DirZit()); !ok {
@@ -160,7 +161,7 @@ func (s *Home) Age() *age.Age {
 }
 
 func (s Home) Cwd() string {
-	return s.store_fs
+	return s.cwd
 }
 
 func (s Home) Executable() string {

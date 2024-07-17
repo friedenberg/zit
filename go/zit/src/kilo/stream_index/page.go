@@ -4,15 +4,18 @@ import (
 	"bufio"
 	"bytes"
 	"io"
+	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
 )
@@ -21,7 +24,7 @@ type PageId = sha.PageId
 
 type Page struct {
 	PageId
-	probe_index
+	*probe_index
 	// All, Schwanzen  Page
 	added, addedLatest *sku.TransactedHeap
 	flushMode          objekte_mode.Mode
@@ -39,7 +42,44 @@ func (pt *Page) initialize(
 	pt.added = sku.MakeTransactedHeap()
 	pt.addedLatest = sku.MakeTransactedHeap()
 	pt.config = i.mutable_config
-	pt.probe_index = i.probe_index
+	pt.probe_index = &i.probe_index
+}
+
+func (s *Page) readOneRange(
+	ra object_probe_index.Range,
+) (sk *sku.Transacted, err error) {
+	var f *os.File
+
+	if f, err = files.Open(s.Path()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, f)
+
+	b := make([]byte, ra.ContentLength)
+
+	if _, err = f.ReadAt(b, ra.Offset); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	dec := makeBinaryWithQueryGroup(nil, ids.SigilHistory)
+	sk = sku.GetTransactedPool().Get()
+
+	skWR := skuWithRangeAndSigil{
+		skuWithSigil: skuWithSigil{
+			Transacted: sk,
+		},
+		Range: ra,
+	}
+
+	if _, err = dec.readFormatExactly(f, &skWR); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (pt *Page) add(
@@ -206,10 +246,13 @@ func (pt *Page) copyHistoryAndMaybeLatest(
 	return
 }
 
-func (pt *Page) MakeFlush(changesAreHistorical bool) func() error {
+func (pt *Page) MakeFlush(
+	changesAreHistorical bool,
+) func() error {
 	return func() (err error) {
 		pw := &writer{
-			Page: pt,
+			Page:        pt,
+			probe_index: pt.probe_index,
 		}
 
 		if changesAreHistorical {

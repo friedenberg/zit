@@ -13,7 +13,7 @@ func (s Home) Rel(
 ) (out string) {
 	out = p
 
-	p1, _ := filepath.Rel(s.store_fs, p)
+	p1, _ := filepath.Rel(s.cwd, p)
 
 	if p1 != "" {
 		out = p1
@@ -40,7 +40,7 @@ func (f relativePathStringFormatWriter) WriteStringFormat(
 		// 	return
 		// }
 
-		p1, _ := filepath.Rel(f.store_fs, p)
+		p1, _ := filepath.Rel(f.cwd, p)
 
 		if p1 != "" {
 			p = p1
@@ -70,7 +70,7 @@ func (s Home) MakeWriterRelativePath(
 			// 	return
 			// }
 
-			p1, _ := filepath.Rel(s.store_fs, p)
+			p1, _ := filepath.Rel(s.cwd, p)
 
 			if p1 != "" {
 				p = p1
@@ -106,7 +106,7 @@ func (s Home) MakeWriterRelativePathOr(
 			// 	return
 			// }
 
-			p1, _ := filepath.Rel(s.store_fs, p)
+			p1, _ := filepath.Rel(s.cwd, p)
 
 			if p1 != "" {
 				p = p1

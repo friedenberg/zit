@@ -114,6 +114,20 @@ func ReadInt64(r io.Reader) (n int64, read int, err error) {
 	return
 }
 
+func ReadFixedInt64(r io.Reader) (n int, val int64, err error) {
+	cl := [8]byte{}
+
+	n, err = ReadAllOrDieTrying(r, cl[:])
+	if err != nil {
+		err = errors.WrapExcept(err, io.EOF)
+		return
+	}
+
+	val = ByteArrayToInt64(cl)
+
+	return
+}
+
 func MakeLineReaderIterateStrict(
 	rffs ...interfaces.FuncSetString,
 ) interfaces.FuncSetString {

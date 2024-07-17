@@ -3,13 +3,8 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
@@ -51,36 +46,6 @@ func (c Test) RunWithQuery(
 	u *env.Env,
 	ms *query.Group,
 ) (err error) {
-	if err = u.GetStore().QueryWithKasten(
-		ms,
-		iter.MakeSyncSerializer(
-			func(o *sku.Transacted) (err error) {
-				var sk *sku.Transacted
-
-				if sk, err = u.GetStore().GetVerzeichnisse().ReadOneObjectId(
-					&o.ObjectId,
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				defer sku.GetTransactedPool().Put(sk)
-
-				if object_metadata.EqualerSansTai.Equals(o.GetMetadata(), sk.GetMetadata()) {
-					return
-				}
-
-				ui.Out().Print(o.GetObjectId())
-				ui.Debug().Print(o.GetTai())
-				ui.Debug().Print(sk.GetTai())
-
-				return
-			},
-		),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
+	u.GetStore().GetStreamIndex().GetProbeIndex().PrintAll()
 	return
 }

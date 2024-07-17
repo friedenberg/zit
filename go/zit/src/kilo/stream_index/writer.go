@@ -13,12 +13,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-// type entry struct {
-// 	Sha, Mutter *sha.Sha
-// 	ennui.Range
-// 	ids.Sigil
-// }
-
 type ObjectIdShaMap map[string]skuWithRangeAndSigil
 
 type writer struct {
@@ -31,9 +25,10 @@ type writer struct {
 
 	changesAreHistorical bool
 
+	*probe_index
 	object_probe_index.Range
-	offsetLast, offset int64
-	ObjectIdShaMap     ObjectIdShaMap
+	offsetLast     int64
+	ObjectIdShaMap ObjectIdShaMap
 }
 
 func (pw *writer) Flush() (err error) {
@@ -75,7 +70,7 @@ func (pw *writer) Flush() (err error) {
 
 		return pw.flushJustLatest()
 	} else {
-		if pw.File, err = pw.fs_home.FileTempLocal(); err != nil {
+		if pw.File, err = pw.Page.fs_home.FileTempLocal(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -136,11 +131,6 @@ func (pw *writer) flushBoth() (err error) {
 func (pw *writer) updateSigilWithLatest(st skuWithRangeAndSigil) (err error) {
 	st.Add(ids.SigilLatest)
 
-	if err = pw.WriteOneObject(st.Transacted); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if err = pw.updateSigil(pw, st.Sigil, st.Offset); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -157,7 +147,7 @@ func (pw *writer) flushJustLatest() (err error) {
 		makeQueryGroupForFlush(),
 		func(sk skuWithRangeAndSigil) (err error) {
 			pw.Range = sk.Range
-			pw.saveSchwanz(sk.Transacted, sk.Sigil)
+			pw.saveToLatestMap(sk.Transacted, sk.Sigil)
 			return
 		},
 	); err != nil {
@@ -212,12 +202,29 @@ func (pw *writer) writeOne(
 		return
 	}
 
-	pw.saveSchwanz(z, ids.SigilHistory)
+	if err = pw.saveToLatestMap(z, ids.SigilHistory); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = pw.probe_index.saveOneLoc(
+		z,
+		object_probe_index.Loc{
+			Page:  pw.PageId.Index,
+			Range: pw.Range,
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
 
-func (pw *writer) saveSchwanz(z *sku.Transacted, sigil ids.Sigil) {
+func (pw *writer) saveToLatestMap(
+	z *sku.Transacted,
+	sigil ids.Sigil,
+) (err error) {
 	k := z.GetObjectId()
 	ks := k.String()
 
@@ -239,6 +246,8 @@ func (pw *writer) saveSchwanz(z *sku.Transacted, sigil ids.Sigil) {
 	}
 
 	pw.ObjectIdShaMap[ks] = record
+
+	return
 }
 
 func (pw *writer) removeOldLatest(sk *sku.Transacted) (err error) {

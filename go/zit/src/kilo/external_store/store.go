@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
-	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -20,7 +19,7 @@ import (
 type (
 	FuncRealize     = func(*Transacted, *Transacted, CommitOptions) error
 	FuncCommit      = func(*Transacted, CommitOptions) error
-	FuncReadSha     = func(*sha.Sha) (*Transacted, error)
+	FuncReadSha     = func(interfaces.ObjectId) (*Transacted, error)
 	FuncReadOneInto = func(
 		k1 interfaces.ObjectId,
 		out *Transacted,

@@ -106,6 +106,7 @@ func (s *Store) tryRealizeAndOrStore(
 
 	if mutter != nil {
 		defer sku.GetTransactedPool().Put(mutter)
+		kinder.Metadata.Cache.ParentTai = mutter.GetTai()
 	}
 
 	if err = s.tryRealize(kinder, mutter, o); err != nil {
@@ -200,7 +201,7 @@ func (s *Store) tryRealizeAndOrStore(
 	}
 
 	if o.Contains(objekte_mode.ModeSchwanz) {
-		if err = s.GetVerzeichnisse().Add(
+		if err = s.GetStreamIndex().Add(
 			kinder,
 			kinder.GetObjectId().String(),
 			o.Mode,
@@ -241,19 +242,14 @@ func (s *Store) fetchMutterIfNecessary(
 	sk *sku.Transacted,
 	ut ObjekteOptions,
 ) (mutter *sku.Transacted, err error) {
-	if !sk.Metadata.Mutter().IsNull() && false {
-		mutter, err = s.GetVerzeichnisse().ReadOneObjectSha(
-			sk.Metadata.Mutter(),
-		)
-	} else {
-		mutter, err = s.GetVerzeichnisse().ReadOneObjectId(
-			sk.GetObjectId(),
-		)
-	}
-
+	mutter, err = s.GetStreamIndex().ReadOneObjectId(
+		sk.GetObjectId(),
+	)
 	if err != nil {
 		if collections.IsErrNotFound(err) {
 			// TODO decide if this should continue to virtual stores
+			err = nil
+		} else if errors.IsNotExist(err) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)

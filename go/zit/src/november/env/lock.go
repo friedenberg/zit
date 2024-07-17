@@ -28,7 +28,7 @@ func (u *Env) Unlock() (err error) {
 		var changes []string
 		changes = append(changes, u.GetConfig().GetChanges()...)
 		changes = append(changes, u.GetDormantIndex().GetChanges()...)
-		u.GetStore().GetVerzeichnisse().SetNeedsFlushHistory(changes)
+		u.GetStore().GetStreamIndex().SetNeedsFlushHistory(changes)
 
 		ui.Log().Print("will flush bestandsaufnahme")
 		if err = u.store.FlushBestandsaufnahme(ptl); err != nil {
@@ -64,7 +64,7 @@ func (u *Env) Unlock() (err error) {
 			return
 		}
 
-		u.GetStore().GetVerzeichnisse().SetNeedsFlushHistory(changes)
+		u.GetStore().GetStreamIndex().SetNeedsFlushHistory(changes)
 
 		wg := iter.MakeErrorWaitGroupParallel()
 		wg.Do(

@@ -20,19 +20,15 @@ type (
 	}
 
 	pageInterface interface {
-		GetEnnuiPage() pageInterface
+		GetObjectProbeIndexPage() pageInterface
 		commonInterface
 		PrintAll() error
 		errors.Flusher
 	}
 
-	Ennui interface {
-		GetEnnui() Ennui
+	Index interface {
+		GetObjectProbeIndex() Index
 		commonInterface
-		AddMetadatei(*object_metadata.Metadata, Loc) error
-		ReadOneKey(string, *object_metadata.Metadata) (Loc, error)
-		ReadManyKeys(string, *object_metadata.Metadata, *[]Loc) error
-		ReadAll(*object_metadata.Metadata, *[]Loc) error
 		PrintAll() error
 		errors.Flusher
 	}
@@ -74,7 +70,7 @@ func (e *object_probe_index) initialize(
 	return
 }
 
-func (e *object_probe_index) GetEnnui() Ennui {
+func (e *object_probe_index) GetObjectProbeIndex() Index {
 	return e
 }
 
@@ -216,6 +212,12 @@ func (e *object_probe_index) ReadAll(m *object_metadata.Metadata, h *[]Loc) (err
 }
 
 func (e *object_probe_index) PrintAll() (err error) {
+	for _, p := range e.pages {
+		if err = p.PrintAll(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 	return
 }
 

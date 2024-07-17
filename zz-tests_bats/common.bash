@@ -63,7 +63,6 @@ function copy_from_version {
 
 function rm_from_version {
   version="${2:-v$(zit store-version)}"
-  # chflags -R nouchg "$BATS_TEST_TMPDIR/$version"
   chflags_and_rm
 }
 

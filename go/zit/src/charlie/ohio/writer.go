@@ -3,6 +3,7 @@ package ohio
 import (
 	"encoding/binary"
 	"io"
+	"unsafe"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
@@ -98,4 +99,31 @@ func WriteInt64(w io.Writer, n int64) (written int, err error) {
 	}
 
 	return
+}
+
+func WriteFixedInt64(w io.Writer, n int64) (written int, err error) {
+	b := Int64ToByteArray(n)
+
+	written, err = WriteAllOrDieTrying(w, b[:])
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func Int64ToByteArray(i int64) [8]byte {
+	return *(*[unsafe.Sizeof(i)]byte)(unsafe.Pointer(&i))
+}
+
+func ByteArrayToInt64(arr [8]byte) int64 {
+	val := int64(0)
+	size := len(arr)
+
+	for i := 0; i < size; i++ {
+		*(*uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(&val)) + uintptr(i))) = arr[i]
+	}
+
+	return val
 }

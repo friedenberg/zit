@@ -29,7 +29,7 @@ func (s *Store) GetBlobStore() *blob_store.VersionedStores {
 	return s.blob_store
 }
 
-func (s *Store) GetEnnui() object_probe_index.Ennui {
+func (s *Store) GetEnnui() object_probe_index.Index {
 	return nil
 }
 
@@ -57,7 +57,7 @@ func (s *Store) GetTai() ids.Tai {
 	return ids.NowTai()
 }
 
-func (s *Store) GetBestandsaufnahmeStore() inventory_list.Store {
+func (s *Store) GetInventoryListStore() inventory_list.Store {
 	return s.inventoryListStore
 }
 
@@ -77,7 +77,7 @@ func (s *Store) GetKonfig() *config.Compiled {
 	return s.config
 }
 
-func (s *Store) GetVerzeichnisse() *stream_index.Index {
+func (s *Store) GetStreamIndex() *stream_index.Index {
 	return s.streamIndex
 }
 
@@ -85,14 +85,10 @@ func (s *Store) GetConfigBlobFormat() blob_store.Format[mutable_config.Blob, *mu
 	return s.configBlobFormat
 }
 
-func (s *Store) ReadOneEnnui(sh *sha.Sha) (*sku.Transacted, error) {
-	return s.GetVerzeichnisse().ReadOneObjectSha(sh)
-}
-
 func (s *Store) ReadOneObjectId(
 	k interfaces.ObjectId,
 ) (sk *sku.Transacted, err error) {
-	return s.GetVerzeichnisse().ReadOneObjectId(k)
+	return s.GetStreamIndex().ReadOneObjectId(k)
 }
 
 func (s *Store) ReaderFor(sh *sha.Sha) (rc sha.ReadCloser, err error) {

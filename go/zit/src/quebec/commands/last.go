@@ -113,14 +113,14 @@ func (c Last) runWithBestandsaufnahme(
 
 	var b *sku.Transacted
 
-	if b, err = s.GetBestandsaufnahmeStore().ReadLast(); err != nil {
+	if b, err = s.GetInventoryListStore().ReadLast(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	var a *inventory_list.InventoryList
 
-	if a, err = s.GetBestandsaufnahmeStore().GetBlob(b.GetBlobSha()); err != nil {
+	if a, err = s.GetInventoryListStore().GetBlob(b.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

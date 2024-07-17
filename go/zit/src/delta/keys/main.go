@@ -28,6 +28,7 @@ const (
 	ShaMetadataWithoutTai           = 'n'
 	ShaMetadata                     = 'm'
 
+	CacheParentTai   = 'p'
 	CacheDormant     = 'a'
 	CacheTagImplicit = 'I'
 	CacheTagExpanded = 'e'

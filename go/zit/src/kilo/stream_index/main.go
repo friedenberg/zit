@@ -12,7 +12,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
 )
@@ -62,8 +64,6 @@ func MakeIndex(
 	s fs_home.Home,
 	k *config.Compiled,
 	dir string,
-	persistentMetadateiFormat object_inventory_format.Format,
-	options object_inventory_format.Options,
 ) (i *Index, err error) {
 	i = &Index{
 		fs_home:        s,
@@ -74,8 +74,6 @@ func MakeIndex(
 
 	if err = i.probe_index.Initialize(
 		s,
-		persistentMetadateiFormat,
-		options,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -110,6 +108,10 @@ func (i *Index) Initialize() (err error) {
 func (i *Index) GetPagePair(n uint8) (p *Page) {
 	p = &i.pages[n]
 	return
+}
+
+func (i *Index) GetProbeIndex() *probe_index {
+	return &i.probe_index
 }
 
 func (i *Index) SetNeedsFlushHistory(changes []string) {
@@ -164,7 +166,7 @@ func (i *Index) flushAdded(
 		}
 	}
 
-	wg.DoAfter(i.id_index.Flush)
+	wg.DoAfter(i.Index.Flush)
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
@@ -228,7 +230,7 @@ func (i *Index) flushEverything(
 		}
 	}
 
-	wg.DoAfter(i.id_index.Flush)
+	wg.DoAfter(i.Index.Flush)
 
 	if err = wg.GetError(); err != nil {
 		err = errors.Wrap(err)
@@ -263,6 +265,66 @@ func (i *Index) Add(
 	p := i.GetPagePair(n)
 
 	if err = p.add(z, mode); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Index) ReadOneSha(
+	sh *sha.Sha,
+) (sk *sku.Transacted, err error) {
+	var loc object_probe_index.Loc
+
+	if loc, err = s.readOneShaLoc(sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if sk, err = s.readOneLoc(loc); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Index) ReadOneObjectId(
+	k interfaces.ObjectId,
+) (sk *sku.Transacted, err error) {
+	sh := sha.FromString(k.String())
+	defer sha.GetPool().Put(sh)
+
+	if sk, err = s.ReadOneSha(sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Index) ReadOneObjectIdTai(
+	k interfaces.ObjectId,
+	t ids.Tai,
+) (sk *sku.Transacted, err error) {
+	sh := sha.FromString(k.String() + t.String())
+	defer sha.GetPool().Put(sh)
+
+	if sk, err = s.ReadOneSha(sh); err != nil {
+		err = errors.Wrapf(err, "ObjectId: %q, Tai: %q", k, t)
+		return
+	}
+
+	return
+}
+
+func (s *Index) readOneLoc(
+	loc object_probe_index.Loc,
+) (sk *sku.Transacted, err error) {
+	p := s.pages[loc.Page]
+
+	if sk, err = p.readOneRange(loc.Range); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

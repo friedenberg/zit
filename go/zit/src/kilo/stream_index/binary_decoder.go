@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/keys"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
-	"code.linenisgreat.com/zit/go/zit/src/golf/object_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -27,6 +26,7 @@ var binaryFieldOrder = []keys.Binary{
 	keys.ShaMetadataParentObjectId,
 	keys.ShaMetadata,
 	keys.ShaMetadataWithoutTai,
+	keys.CacheParentTai,
 	keys.CacheTagImplicit,
 	keys.CacheTagExpanded,
 	keys.CacheTags,
@@ -76,7 +76,6 @@ type binaryDecoder struct {
 
 func (bf *binaryDecoder) readFormatExactly(
 	r io.ReaderAt,
-	loc object_probe_index.Loc,
 	sk *skuWithRangeAndSigil,
 ) (n int64, err error) {
 	bf.binaryField.Reset()
@@ -85,9 +84,9 @@ func (bf *binaryDecoder) readFormatExactly(
 	var n1 int
 	var n2 int64
 
-	b := make([]byte, loc.ContentLength)
+	b := make([]byte, sk.ContentLength)
 
-	n1, err = r.ReadAt(b, loc.Offset)
+	n1, err = r.ReadAt(b, sk.Offset)
 	n += int64(n1)
 
 	if err == io.EOF {
@@ -317,6 +316,12 @@ func (bf *binaryDecoder) readFieldKey(
 
 	case keys.Tai:
 		if _, err = sk.Metadata.Tai.ReadFrom(&bf.Content); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	case keys.CacheParentTai:
+		if _, err = sk.Metadata.Cache.ParentTai.ReadFrom(&bf.Content); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

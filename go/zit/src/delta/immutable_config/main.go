@@ -24,13 +24,10 @@ type Config struct {
 
 func Default() Config {
 	return Config{
-		StoreVersion:                        storeVersion(values.Int(5)),
-		Recipients:                          make([]string, 0),
-		UseBestandsaufnahme:                 true,
-		UseBestandsaufnahmeForVerzeichnisse: true,
-		UseKonfigErworbenFile:               true,
-		CompressionType:                     CompressionTypeDefault,
-		LockInternalFiles:                   true,
+		StoreVersion:      storeVersion(values.Int(6)),
+		Recipients:        make([]string, 0),
+		CompressionType:   CompressionTypeDefault,
+		LockInternalFiles: true,
 	}
 }
 

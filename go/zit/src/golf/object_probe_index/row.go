@@ -2,7 +2,6 @@ package object_probe_index
 
 import (
 	"bytes"
-	"encoding/binary"
 	"fmt"
 	"io"
 
@@ -10,9 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
-const RowSize = sha.ByteSize + 1 + binary.MaxVarintLen64 + binary.MaxVarintLen64
-
-type int64Bytes [binary.MaxVarintLen64]byte
+const RowSize = sha.ByteSize + 1 + 8 + 8
 
 type row struct {
 	sha sha.Sha
@@ -27,7 +24,7 @@ func (r *row) String() string {
 	return fmt.Sprintf(
 		"%s %s",
 		&r.Loc,
-		r.sha.GetShaString()[:4],
+		r.sha.GetShaString(),
 	)
 }
 
@@ -79,7 +76,7 @@ func (r *row) WriteTo(w io.Writer) (n int64, err error) {
 	}
 
 	if n != RowSize {
-		err = errors.Errorf("expected to write %d but read %d", RowSize, n)
+		err = errors.Errorf("expected to write %d but wrote %d", RowSize, n)
 		return
 	}
 

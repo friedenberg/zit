@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
-	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
@@ -31,14 +30,9 @@ type (
 	}
 
 	ObjectProbeIndex interface {
-		WriteOneObject(o *Transacted) (err error)
-		ReadOneObjectSha(*sha.Sha) (*Transacted, error)
 		ReadOneObjectId(
 			interfaces.ObjectId,
 		) (*Transacted, error)
-		ReadOneObjectIdSha(
-			interfaces.ObjectId,
-		) (*sha.Sha, error)
 	}
 
 	TransactedAdder interface {

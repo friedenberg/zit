@@ -41,6 +41,7 @@ var ResetterVerzeichnisse resetterVerzeichnisse
 type resetterVerzeichnisse struct{}
 
 func (resetterVerzeichnisse) Reset(a *Cache) {
+	a.ParentTai.Reset()
 	a.TagPaths.Reset()
 	a.Dormant.Reset()
 	a.SetExpandedTags(nil)
@@ -49,6 +50,7 @@ func (resetterVerzeichnisse) Reset(a *Cache) {
 }
 
 func (resetterVerzeichnisse) ResetWith(a, b *Cache) {
+	a.ParentTai.ResetWith(b.ParentTai)
 	a.TagPaths.ResetWith(&b.TagPaths)
 	a.Dormant.ResetWith(b.Dormant)
 	a.SetExpandedTags(b.GetExpandedTags())

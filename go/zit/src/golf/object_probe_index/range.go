@@ -1,7 +1,6 @@
 package object_probe_index
 
 import (
-	"encoding/binary"
 	"fmt"
 	"io"
 
@@ -14,7 +13,7 @@ type Range struct {
 }
 
 func (l *Range) Size() int {
-	return binary.MaxVarintLen64 * 2
+	return 8 * 2
 }
 
 func (l Range) IsEmpty() bool {
@@ -27,7 +26,7 @@ func (l Range) String() string {
 
 func (l *Range) ReadFrom(r io.Reader) (n int64, err error) {
 	var n1 int
-	l.Offset, n1, err = ohio.ReadInt64(r)
+	n1, l.Offset, err = ohio.ReadFixedInt64(r)
 	n += int64(n1)
 
 	if err != nil {
@@ -35,7 +34,7 @@ func (l *Range) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	l.ContentLength, n1, err = ohio.ReadInt64(r)
+	n1, l.ContentLength, err = ohio.ReadFixedInt64(r)
 	n += int64(n1)
 
 	if err != nil {
@@ -48,7 +47,7 @@ func (l *Range) ReadFrom(r io.Reader) (n int64, err error) {
 
 func (l *Range) WriteTo(w io.Writer) (n int64, err error) {
 	var n1 int
-	n1, err = ohio.WriteInt64(w, l.Offset)
+	n1, err = ohio.WriteFixedInt64(w, l.Offset)
 	n += int64(n1)
 
 	if err != nil {
@@ -56,7 +55,7 @@ func (l *Range) WriteTo(w io.Writer) (n int64, err error) {
 		return
 	}
 
-	n1, err = ohio.WriteInt64(w, l.ContentLength)
+	n1, err = ohio.WriteFixedInt64(w, l.ContentLength)
 	n += int64(n1)
 
 	if err != nil {

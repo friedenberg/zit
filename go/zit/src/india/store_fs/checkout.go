@@ -239,7 +239,7 @@ func (s *Store) shouldCheckOut(
 		return false
 	}
 
-	if mutter, err := s.externalStoreInfo.FuncReadSha(cz.Internal.Metadata.Mutter()); err == nil {
+	if mutter, err := s.externalStoreInfo.FuncReadSha(cz.Internal.GetObjectId()); err == nil {
 		if object_metadata.EqualerSansTai.Equals(&mutter.Metadata, &cz.External.Metadata) {
 			return true
 		}

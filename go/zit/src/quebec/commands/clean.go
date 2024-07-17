@@ -84,8 +84,8 @@ func (c Clean) shouldClean(
 	}
 
 	if c.includeParent {
-		mutter, err := u.GetStore().GetVerzeichnisse().ReadOneObjectSha(
-			co.GetSku().Metadata.Mutter(),
+		mutter, err := u.GetStore().GetStreamIndex().ReadOneObjectId(
+			co.GetSku().GetObjectId(),
 		)
 
 		errors.PanicIfError(err)

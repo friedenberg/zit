@@ -9,6 +9,7 @@ import (
 )
 
 type Cache struct {
+	ParentTai    ids.Tai
 	Dormant      values.Bool
 	ExpandedTags ids.TagMutableSet // public for gob, but should be private
 	ImplicitTags ids.TagMutableSet // public for gob, but should be private

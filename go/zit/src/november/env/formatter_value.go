@@ -556,6 +556,16 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
+	case "probe-shas":
+		f = func(z *sku.Transacted) (err error) {
+			sh1 := sha.FromString(z.GetObjectId().String())
+			sh2 := sha.FromString(z.GetObjectId().String() + z.GetTai().String())
+			defer sha.GetPool().Put(sh1)
+			defer sha.GetPool().Put(sh2)
+			_, err = fmt.Fprintln(out, z.GetObjectId(), sh1, sh2)
+			return
+		}
+
 	case "mutter":
 		p := u.PrinterTransactedLike()
 
@@ -564,8 +574,9 @@ func (u *Env) MakeFormatFunc(
 				return
 			}
 
-			if z, err = u.GetStore().GetVerzeichnisse().ReadOneObjectSha(
-				z.GetMetadata().Mutter(),
+			if z, err = u.GetStore().GetStreamIndex().ReadOneObjectIdTai(
+				z.GetObjectId(),
+				z.Metadata.Cache.ParentTai,
 			); err != nil {
 				fmt.Fprintln(out, err)
 				err = nil
@@ -636,7 +647,7 @@ func (u *Env) MakeFormatFunc(
 		f = func(o *sku.Transacted) (err error) {
 			var sk *sku.Transacted
 
-			if sk, err = u.GetStore().GetVerzeichnisse().ReadOneObjectId(
+			if sk, err = u.GetStore().GetStreamIndex().ReadOneObjectId(
 				&o.ObjectId,
 			); err != nil {
 				err = errors.Wrap(err)

@@ -11,21 +11,24 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
 )
 
-func (s *Store) Import(sk *sku.Transacted) (co *store_fs.CheckedOut, err error) {
+func (s *Store) Import(external *sku.Transacted) (co *store_fs.CheckedOut, err error) {
 	co = store_fs.GetCheckedOutPool().Get()
 	co.IsImport = true
 
-	if err = co.External.Transacted.SetFromSkuLike(sk); err != nil {
+	if err = co.External.Transacted.SetFromSkuLike(external); err != nil {
 		panic(err)
 	}
 
-	if err = sk.CalculateObjectShas(); err != nil {
+	if err = external.CalculateObjectShas(); err != nil {
 		co.SetError(err)
 		err = nil
 		return
 	}
 
-	_, err = s.GetVerzeichnisse().ReadOneObjectSha(sk.Metadata.Sha())
+	_, err = s.GetStreamIndex().ReadOneObjectIdTai(
+		external.GetObjectId(),
+		external.GetTai(),
+	)
 
 	if err == nil {
 		co.SetError(collections.ErrExists)
@@ -37,10 +40,10 @@ func (s *Store) Import(sk *sku.Transacted) (co *store_fs.CheckedOut, err error) 
 		return
 	}
 
-	if err = s.ReadOneInto(sk.GetObjectId(), &co.Internal); err != nil {
+	if err = s.ReadOneInto(external.GetObjectId(), &co.Internal); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = s.tryRealizeAndOrStore(
-				sk,
+				external,
 				ObjekteOptions{
 					Clock: &co.External.Transacted,
 					Mode:  objekte_mode.ModeCommit,
@@ -61,8 +64,8 @@ func (s *Store) Import(sk *sku.Transacted) (co *store_fs.CheckedOut, err error) 
 	}
 
 	if !co.Internal.Metadata.Sha().IsNull() &&
-		!co.Internal.Metadata.Sha().Equals(sk.Metadata.Mutter()) &&
-		!co.Internal.Metadata.Sha().Equals(sk.Metadata.Sha()) {
+		!co.Internal.Metadata.Sha().Equals(external.Metadata.Mutter()) &&
+		!co.Internal.Metadata.Sha().Equals(external.Metadata.Sha()) {
 		if err = s.importDoMerge(co); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -73,7 +76,7 @@ func (s *Store) Import(sk *sku.Transacted) (co *store_fs.CheckedOut, err error) 
 		err = errors.Wrap(file_lock.ErrLockRequired{
 			Operation: fmt.Sprintf(
 				"import %s",
-				sk.GetGenre(),
+				external.GetGenre(),
 			),
 		})
 
@@ -81,7 +84,7 @@ func (s *Store) Import(sk *sku.Transacted) (co *store_fs.CheckedOut, err error) 
 	}
 
 	if err = s.tryRealizeAndOrStore(
-		sk,
+		external,
 		ObjekteOptions{
 			Mode: objekte_mode.ModeCommit,
 		},

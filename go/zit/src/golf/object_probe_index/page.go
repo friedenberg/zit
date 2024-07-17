@@ -75,7 +75,7 @@ func (e *page) open() (err error) {
 	return
 }
 
-func (e *page) GetEnnuiPage() pageInterface {
+func (e *page) GetObjectProbeIndexPage() pageInterface {
 	return e
 }
 

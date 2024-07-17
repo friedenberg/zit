@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
-	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -33,12 +32,12 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	if err = s.GetVerzeichnisse().Initialize(); err != nil {
+	if err = s.GetStreamIndex().Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.GetBestandsaufnahmeStore().ReadAllSkus(
+	if err = s.GetInventoryListStore().ReadAllSkus(
 		s.reindexOne,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -109,12 +108,15 @@ func (s *Store) CreateOrUpdateBlobSha(
 	return
 }
 
+type RevertId struct {
+	*ids.ObjectId
+	ids.Tai
+}
+
 func (s *Store) RevertTo(
-	sk *sku.Transacted,
-	sh *sha.Sha,
+	ri RevertId,
 ) (err error) {
-	if sh.IsNull() {
-		err = errors.Errorf("cannot revert to null")
+	if ri.Tai.IsEmpty() {
 		return
 	}
 
@@ -128,14 +130,10 @@ func (s *Store) RevertTo(
 
 	var mutter *sku.Transacted
 
-	if mutter, err = s.ReadOneEnnui(sh); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	mutter.Metadata.Mutter().ResetWith(sk.Metadata.Sha())
-
-	if err = mutter.CalculateObjectShas(); err != nil {
+	if mutter, err = s.GetStreamIndex().ReadOneObjectIdTai(
+		ri.ObjectId,
+		ri.Tai,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

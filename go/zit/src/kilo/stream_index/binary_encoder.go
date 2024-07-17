@@ -126,6 +126,12 @@ func (bf *binaryEncoder) writeFieldKey(
 			return
 		}
 
+	case keys.CacheParentTai:
+		if n, err = bf.writeFieldWriterTo(&sk.Metadata.Cache.ParentTai); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 	case keys.Tag:
 		es := sk.GetTags()
 

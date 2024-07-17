@@ -121,7 +121,10 @@ func (u *Env) Initialize(options Options) (err error) {
 			DryRun:   u.cliConfig.DryRun,
 		}
 
-		if u.fs_home, err = fs_home.Make(standortOptions); err != nil {
+		if u.fs_home, err = fs_home.Make(
+			// immutableConfig,
+			standortOptions,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

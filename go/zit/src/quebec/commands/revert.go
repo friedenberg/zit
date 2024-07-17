@@ -6,10 +6,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
@@ -50,22 +50,13 @@ func (c Revert) DefaultGenres() ids.Genre {
 	)
 }
 
-type revertTuple struct {
-	*sku.Transacted
-	*sha.Sha
-}
-
 func (c Revert) RunWithQuery(
 	u *env.Env,
 	ms *query.Group,
 ) (err error) {
-	f := func(rt revertTuple) (err error) {
-		if rt.IsNull() {
-			return
-		}
-
-		if err = u.GetStore().RevertTo(rt.Transacted, rt.Sha); err != nil {
-			err = errors.Wrapf(err, "Sha %s", rt.Sha)
+	f := func(rt store.RevertId) (err error) {
+		if err = u.GetStore().RevertTo(rt); err != nil {
+			err = errors.Wrap(err)
 			return
 		}
 
@@ -97,12 +88,15 @@ func (c Revert) RunWithQuery(
 func (c Revert) runRevertFromQuery(
 	u *env.Env,
 	eq *query.Group,
-	f interfaces.FuncIter[revertTuple],
+	f interfaces.FuncIter[store.RevertId],
 ) (err error) {
 	if err = u.GetStore().QueryWithKasten(
 		eq,
 		func(z *sku.Transacted) (err error) {
-			return f(revertTuple{Transacted: z, Sha: z.Metadata.Mutter()})
+			return f(store.RevertId{
+				ObjectId: z.GetObjectId(),
+				Tai:      z.Metadata.Cache.ParentTai,
+			})
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -114,21 +108,36 @@ func (c Revert) runRevertFromQuery(
 
 func (c Revert) runRevertFromLast(
 	u *env.Env,
-	f interfaces.FuncIter[revertTuple],
+	f interfaces.FuncIter[store.RevertId],
 ) (err error) {
 	s := u.GetStore()
 
 	var b *sku.Transacted
 
-	if b, err = s.GetBestandsaufnahmeStore().ReadLast(); err != nil {
+	if b, err = s.GetInventoryListStore().ReadLast(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.GetBestandsaufnahmeStore().StreamInventoryList(
+	if err = s.GetInventoryListStore().StreamInventoryList(
 		b.GetBlobSha(),
-		func(sk *sku.Transacted) (err error) {
-			return f(revertTuple{Transacted: sk, Sha: sk.Metadata.Mutter()})
+		func(z *sku.Transacted) (err error) {
+			var cachedSku *sku.Transacted
+
+			if cachedSku, err = u.GetStore().GetStreamIndex().ReadOneObjectIdTai(
+				z.GetObjectId(),
+				z.GetTai(),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			defer sku.GetTransactedPool().Put(cachedSku)
+
+			return f(store.RevertId{
+				ObjectId: cachedSku.GetObjectId(),
+				Tai:      cachedSku.Metadata.Cache.ParentTai,
+			})
 		},
 	); err != nil {
 		err = errors.Wrap(err)

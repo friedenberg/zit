@@ -116,8 +116,6 @@ func (c *Store) Initialize(
 		c.GetStandort(),
 		c.GetKonfig(),
 		c.GetStandort().DirVerzeichnisseObjekten(),
-		pmf,
-		c.options,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -148,9 +146,9 @@ func (s *Store) SetExternalStores(
 		es.StoreFuncs = external_store.StoreFuncs{
 			FuncRealize:        s.tryRealize,
 			FuncCommit:         s.tryRealizeAndOrStore,
-			FuncReadSha:        s.ReadOneEnnui,
+			FuncReadSha:        s.GetStreamIndex().ReadOneObjectId,
 			FuncReadOneInto:    s.ReadOneInto,
-			FuncPrimitiveQuery: s.GetVerzeichnisse().ReadQuery,
+			FuncPrimitiveQuery: s.GetStreamIndex().ReadQuery,
 		}
 
 		es.Home = s.GetStandort()
