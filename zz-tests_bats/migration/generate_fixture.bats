@@ -19,6 +19,10 @@ cmd_def=(
 function generate { # @test
 	run_zit_init_disable_age
 
+	run_zit store-version
+	assert_success
+	assert_output 5
+
 	run_zit show "${cmd_def[@]}" !md:t :konfig
 	assert_success
 	assert_output_unsorted - <<-EOM
