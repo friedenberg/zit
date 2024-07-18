@@ -64,20 +64,14 @@ func (s *Store) ReadTransactedFromObjectIdRepoIdSigil(
 		return
 	}
 
-	var k3 *ids.ObjectIdWithRepoId
-
-	if k3, err = ids.MakeObjectIdWithRepoId(k1, ka); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	var ze sku.ExternalLike
 
 	if ze, err = s.ReadOneObjectIdExternal(
 		ObjekteOptions{
 			Mode: objekte_mode.ModeUpdateTai,
 		},
-		k3,
+		k1,
+		ka,
 		sk1,
 	); err != nil {
 		err = errors.Wrap(err)

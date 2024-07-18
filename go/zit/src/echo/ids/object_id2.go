@@ -16,41 +16,35 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 )
 
-var poolObjectId interfaces.Pool[ObjectId, *ObjectId]
+var poolObjectId2 interfaces.Pool[objectId2, *objectId2]
 
 func init() {
-	poolObjectId = pool.MakePool(
+	poolObjectId2 = pool.MakePool(
 		nil,
-		func(k *ObjectId) {
+		func(k *objectId2) {
 			k.Reset()
 		},
 	)
 }
 
-func getObjectIdPool() interfaces.Pool[objectId, *objectId] {
-	return poolObjectId
+func getObjectIdPool2() interfaces.Pool[objectId2, *objectId2] {
+	return poolObjectId2
 }
 
-type objectId struct {
+type objectId2 struct {
 	g           genres.Genre
 	middle      byte // remove and replace with virtual
 	left, right catgut.String
+	repoId      catgut.String
 }
 
-func (a *objectId) Clone() (b *objectId) {
-	b = GetObjectIdPool().Get()
+func (a *objectId2) Clone() (b *objectId2) {
+	b = getObjectIdPool2().Get()
 	b.ResetWithIdLike(a)
 	return
 }
 
-func MustObjectId(kp IdLike) (k *objectId) {
-	k = &objectId{}
-	err := k.SetWithIdLike(kp)
-	errors.PanicIfError(err)
-	return
-}
-
-func (a *objectId) IsVirtual() bool {
+func (a *objectId2) IsVirtual() bool {
 	switch a.g {
 	case genres.Zettel:
 		return slices.Equal(a.left.Bytes(), []byte{'%'})
@@ -63,7 +57,7 @@ func (a *objectId) IsVirtual() bool {
 	}
 }
 
-func (a *objectId) Equals(b *objectId) bool {
+func (a *objectId2) Equals(b *objectId2) bool {
 	if a.g != b.g {
 		return false
 	}
@@ -83,7 +77,7 @@ func (a *objectId) Equals(b *objectId) bool {
 	return true
 }
 
-func (k2 *objectId) WriteTo(w io.Writer) (n int64, err error) {
+func (k2 *objectId2) WriteTo(w io.Writer) (n int64, err error) {
 	if k2.Len() > math.MaxUint8 {
 		err = errors.Errorf(
 			"%q is greater than max uint8 (%d)",
@@ -143,7 +137,7 @@ func (k2 *objectId) WriteTo(w io.Writer) (n int64, err error) {
 	return
 }
 
-func (k2 *objectId) ReadFrom(r io.Reader) (n int64, err error) {
+func (k2 *objectId2) ReadFrom(r io.Reader) (n int64, err error) {
 	var n1 int64
 	n1, err = k2.g.ReadFrom(r)
 	n += n1
@@ -201,7 +195,7 @@ func (k2 *objectId) ReadFrom(r io.Reader) (n int64, err error) {
 	return
 }
 
-func (k2 *objectId) SetGenre(g interfaces.GenreGetter) {
+func (k2 *objectId2) SetGenre(g interfaces.GenreGetter) {
 	if g == nil {
 		k2.g = genres.Unknown
 	} else {
@@ -213,7 +207,7 @@ func (k2 *objectId) SetGenre(g interfaces.GenreGetter) {
 	}
 }
 
-func (k2 *objectId) StringFromPtr() string {
+func (k2 *objectId2) StringFromPtr() string {
 	var sb strings.Builder
 
 	switch k2.g {
@@ -242,7 +236,7 @@ func (k2 *objectId) StringFromPtr() string {
 	return sb.String()
 }
 
-func (k2 *objectId) IsEmpty() bool {
+func (k2 *objectId2) IsEmpty() bool {
 	if k2.g == genres.Zettel {
 		if k2.left.IsEmpty() && k2.right.IsEmpty() {
 			return true
@@ -252,33 +246,33 @@ func (k2 *objectId) IsEmpty() bool {
 	return k2.left.Len() == 0 && k2.middle == 0 && k2.right.Len() == 0
 }
 
-func (k2 *objectId) Len() int {
+func (k2 *objectId2) Len() int {
 	return k2.left.Len() + 1 + k2.right.Len()
 }
 
-func (k2 *objectId) GetHeadAndTail() (head, tail string) {
+func (k2 *objectId2) GetHeadAndTail() (head, tail string) {
 	head = k2.left.String()
 	tail = k2.right.String()
 
 	return
 }
 
-func (k2 *objectId) LenHeadAndTail() (int, int) {
+func (k2 *objectId2) LenHeadAndTail() (int, int) {
 	return k2.left.Len(), k2.right.Len()
 }
 
-func (k2 *objectId) String() string {
+func (k2 *objectId2) String() string {
 	return k2.StringFromPtr()
 }
 
-func (k2 *objectId) Reset() {
+func (k2 *objectId2) Reset() {
 	k2.g = genres.Unknown
 	k2.left.Reset()
 	k2.middle = 0
 	k2.right.Reset()
 }
 
-func (k2 *objectId) PartsStrings() IdParts {
+func (k2 *objectId2) PartsStrings() IdParts {
 	return IdParts{
 		Left:   &k2.left,
 		Middle: k2.middle,
@@ -286,7 +280,7 @@ func (k2 *objectId) PartsStrings() IdParts {
 	}
 }
 
-func (k2 *objectId) Parts() [3]string {
+func (k2 *objectId2) Parts() [3]string {
 	var mid string
 
 	if k2.middle != 0 {
@@ -300,11 +294,11 @@ func (k2 *objectId) Parts() [3]string {
 	}
 }
 
-func (k2 *objectId) GetGenre() interfaces.Genre {
+func (k2 *objectId2) GetGenre() interfaces.Genre {
 	return k2.g
 }
 
-func (k2 *objectId) Expand(
+func (k2 *objectId2) Expand(
 	a Abbr,
 ) (err error) {
 	ex := a.ExpanderFor(k2.g)
@@ -328,13 +322,13 @@ func (k2 *objectId) Expand(
 	return
 }
 
-func (k2 *objectId) Abbreviate(
+func (k2 *objectId2) Abbreviate(
 	a Abbr,
 ) (err error) {
 	return
 }
 
-func (k2 *objectId) SetFromPath(
+func (k2 *objectId2) SetFromPath(
 	path string,
 	fe file_extensions.FileExtensions,
 ) (err error) {
@@ -379,11 +373,11 @@ func (k2 *objectId) SetFromPath(
 	return
 }
 
-func (h *objectId) SetWithIdLike(
+func (h *objectId2) SetWithIdLike(
 	k IdLike,
 ) (err error) {
 	switch kt := k.(type) {
-	case *objectId:
+	case *objectId2:
 		if err = kt.left.CopyTo(&h.left); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -421,7 +415,7 @@ func (h *objectId) SetWithIdLike(
 	return
 }
 
-func (h *objectId) SetWithGenre(
+func (h *objectId2) SetWithGenre(
 	v string,
 	g interfaces.GenreGetter,
 ) (err error) {
@@ -435,11 +429,11 @@ func (h *objectId) SetWithGenre(
 	return
 }
 
-func (h *objectId) TodoSetBytes(v *catgut.String) (err error) {
+func (h *objectId2) TodoSetBytes(v *catgut.String) (err error) {
 	return h.Set(v.String())
 }
 
-func (h *objectId) SetRaw(v string) (err error) {
+func (h *objectId2) SetRaw(v string) (err error) {
 	h.g = genres.Unknown
 
 	if err = h.left.Set(v); err != nil {
@@ -450,7 +444,7 @@ func (h *objectId) SetRaw(v string) (err error) {
 	return
 }
 
-func (h *objectId) Set(v string) (err error) {
+func (h *objectId2) Set(v string) (err error) {
 	var k IdLike
 
 	switch h.g {
@@ -504,23 +498,23 @@ func (h *objectId) Set(v string) (err error) {
 	return
 }
 
-func (a *objectId) ResetWith(b *objectId) {
+func (a *objectId2) ResetWith(b *objectId2) {
 	a.g = b.g
 	b.left.CopyTo(&a.left)
 	b.right.CopyTo(&a.right)
 	a.middle = b.middle
 }
 
-func (a *objectId) ResetWithIdLike(b IdLike) (err error) {
+func (a *objectId2) ResetWithIdLike(b IdLike) (err error) {
 	return a.SetWithIdLike(b)
 }
 
-func (t *objectId) MarshalText() (text []byte, err error) {
+func (t *objectId2) MarshalText() (text []byte, err error) {
 	text = []byte(FormattedString(t))
 	return
 }
 
-func (t *objectId) UnmarshalText(text []byte) (err error) {
+func (t *objectId2) UnmarshalText(text []byte) (err error) {
 	if err = t.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -529,12 +523,12 @@ func (t *objectId) UnmarshalText(text []byte) (err error) {
 	return
 }
 
-func (t *objectId) MarshalBinary() (text []byte, err error) {
+func (t *objectId2) MarshalBinary() (text []byte, err error) {
 	text = []byte(FormattedString(t))
 	return
 }
 
-func (t *objectId) UnmarshalBinary(text []byte) (err error) {
+func (t *objectId2) UnmarshalBinary(text []byte) (err error) {
 	if err = t.Set(string(text)); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"slices"
+	"strconv"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -42,6 +43,11 @@ func (item item) WriteToMetadata(m *object_metadata.Metadata) (err error) {
 
 	els := strings.Split(u.Hostname(), ".")
 	slices.Reverse(els)
+
+	if els[0] == "www" {
+		els = els[1:]
+	}
+
 	host := strings.Join(els, "-")
 
 	if err = e.Set("zz-site-" + host); err != nil {
@@ -55,6 +61,25 @@ func (item item) WriteToMetadata(m *object_metadata.Metadata) (err error) {
 	}
 
 	// TODO add etiketten
+
+	return
+}
+
+func (tab item) WriteToObjectId(oi *ids.ObjectId) (err error) {
+	ty, ok := tab["type"].(string)
+
+	if !ok {
+		err = errors.Errorf("expected string but got %T, %q", tab["type"], tab["type"])
+		return
+	}
+
+	var id float64
+	id, ok = tab["id"].(float64)
+
+	if err = oi.SetRaw(fmt.Sprintf("%s-%s", ty, strconv.Itoa(int(id)))); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

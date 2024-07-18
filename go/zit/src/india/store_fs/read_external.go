@@ -11,7 +11,7 @@ func (s *Store) ReadTransactedFromObjectId(
 	o sku.CommitOptions,
 	k1 interfaces.ObjectId,
 	t *sku.Transacted,
-) (e *External, err error) {
+) (e sku.ExternalLike, err error) {
 	k, ok := s.Get(k1)
 
 	if !ok {

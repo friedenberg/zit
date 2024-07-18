@@ -194,6 +194,12 @@ func (pw *writer) writeOne(
 ) (err error) {
 	pw.Offset += pw.ContentLength
 
+	previous := pw.ObjectIdShaMap[z.GetObjectId().String()]
+
+	if previous.Transacted != nil {
+		z.Metadata.Cache.ParentTai = previous.GetTai()
+	}
+
 	if pw.ContentLength, err = pw.writeFormat(
 		&pw.Writer,
 		skuWithSigil{Transacted: z},

@@ -87,7 +87,7 @@ func (i *hinweisIndex) Flush() (err error) {
 	enc := gob.NewEncoder(w)
 
 	if err = enc.Encode(i.bitset); err != nil {
-		err = errors.Wrapf(err, "failed to write encoded kennung")
+		err = errors.Wrapf(err, "failed to write encoded zettel id")
 		return
 	}
 
@@ -142,12 +142,12 @@ func (i *hinweisIndex) Reset() (err error) {
 	rMax := i.oldHinweisenStore.Right().Len() - 1
 
 	if lMax == 0 {
-		err = errors.Errorf("left kennung are empty")
+		err = errors.Errorf("left zettel id are empty")
 		return
 	}
 
 	if rMax == 0 {
-		err = errors.Errorf("right kennung are empty")
+		err = errors.Errorf("right zettel id are empty")
 		return
 	}
 
@@ -213,7 +213,7 @@ func (i *hinweisIndex) CreateHinweis() (h *ids.ZettelId, err error) {
 	}
 
 	if i.bitset.CountOn() == 0 {
-		err = errors.Errorf("no available kennung")
+		err = errors.Errorf("no available zettel ids")
 		return
 	}
 

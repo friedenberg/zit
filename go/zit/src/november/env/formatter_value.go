@@ -228,7 +228,22 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "kennung-sha":
+	case "object-id-parent-tai":
+		f = func(tl *sku.Transacted) (err error) {
+			if _, err = fmt.Fprintf(
+				out,
+				"%s^@%s\n",
+				&tl.ObjectId,
+				tl.Metadata.Cache.ParentTai,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
+	case "object-id-sha":
 		f = func(tl *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintf(
 				out,
@@ -243,7 +258,7 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "kennung-blob-sha":
+	case "object-id-blob-sha":
 		f = func(tl *sku.Transacted) (err error) {
 			errors.TodoP3("convert into an option")
 
@@ -266,7 +281,7 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "kennung":
+	case "object-id":
 		f = func(e *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(
 				out,
@@ -279,7 +294,7 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "kennung-tai":
+	case "object-id-tai":
 		f = func(e *sku.Transacted) (err error) {
 			_, err = fmt.Fprintln(out, e.StringObjectIdTai())
 			return

@@ -17,7 +17,7 @@ type (
 			Expand     FuncExpandString
 			Abbreviate FuncAbbreviateString[sha.Sha, *sha.Sha]
 		}
-		// TODO switch to Kennung2
+		// TODO switch to ObjectId
 		ZettelId abbrOne[ZettelId, *ZettelId]
 	}
 
@@ -193,7 +193,7 @@ func (a Abbr) AbbreviateObjectId(
 		return
 
 	default:
-		err = errors.Errorf("unsupported Kennung: %q, %T", in, in)
+		err = errors.Errorf("unsupported object id: %q, %T", in, in)
 		return
 	}
 

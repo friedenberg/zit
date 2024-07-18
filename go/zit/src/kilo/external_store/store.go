@@ -38,6 +38,14 @@ type (
 		IncludeRecognized bool
 	}
 
+	ReadTransactedFromObjectId interface {
+		ReadTransactedFromObjectId(
+			o sku.CommitOptions,
+			k1 interfaces.ObjectId,
+			t *sku.Transacted,
+		) (e sku.ExternalLike, err error)
+	}
+
 	CheckoutOne interface {
 		CheckoutOne(
 			options checkout_options.Options,
@@ -131,6 +139,35 @@ func (es *Store) QueryCheckedOut(
 	if err = esqco.QueryCheckedOut(
 		qg,
 		f,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (es *Store) ReadTransactedFromObjectId(
+	o sku.CommitOptions,
+	k1 interfaces.ObjectId,
+	t *sku.Transacted,
+) (e sku.ExternalLike, err error) {
+	esrtfoi, ok := es.StoreLike.(ReadTransactedFromObjectId)
+
+	if !ok {
+		err = errors.Errorf("store does not support %T", esrtfoi)
+		return
+	}
+
+	if err = es.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if e, err = esrtfoi.ReadTransactedFromObjectId(
+		o,
+		k1,
+		t,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

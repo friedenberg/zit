@@ -92,14 +92,6 @@ func (c *FormatZettel) Run(u *env.Env, args ...string) (err error) {
 		blobFormatter,
 	)
 
-	if err = u.GetConfig().ApplyToNewMetadata(
-		zt,
-		u.GetStore().GetBlobStore().GetTypeV0(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if err = u.GetStore().TryFormatHook(zt); err != nil {
 		err = errors.Wrap(err)
 		return

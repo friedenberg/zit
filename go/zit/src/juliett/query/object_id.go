@@ -68,11 +68,6 @@ func (k ObjectId) ContainsSku(sk *sku.Transacted) (ok bool) {
 			ok = true
 			return
 		}
-
-		// case kennung.ShaLike:
-		// 	if Sha(kt.GetSha()).ContainsMatchable(m) {
-		// 		return true
-		// 	}
 	}
 
 	idl := &sk.ObjectId

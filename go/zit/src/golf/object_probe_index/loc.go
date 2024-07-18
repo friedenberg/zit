@@ -23,7 +23,7 @@ func (l Loc) String() string {
 
 func (l *Loc) ReadFrom(r io.Reader) (n int64, err error) {
 	var n1 int
-	l.Page, n1, err = ohio.ReadUint8(r)
+	l.Page, n1, err = ohio.ReadFixedUint8(r)
 	n += int64(n1)
 
 	if err != nil {

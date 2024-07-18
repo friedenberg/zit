@@ -308,6 +308,11 @@ func (s *Index) ReadOneObjectIdTai(
 	k interfaces.ObjectId,
 	t ids.Tai,
 ) (sk *sku.Transacted, err error) {
+	if t.IsEmpty() {
+		err = errors.Errorf("empty tai")
+		return
+	}
+
 	sh := sha.FromString(k.String() + t.String())
 	defer sha.GetPool().Put(sh)
 

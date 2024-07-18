@@ -2,15 +2,12 @@ package config
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -133,9 +130,6 @@ func (k *Compiled) addSuperTags(
 
 		ui.Log().Print("prefix", prefix)
 
-		// ui.Log().Print("before", sk.GetKennung(), ex, prefix, a, b)
-		// defer ui.Log().Print("after ", sk.GetKennung(), ex, prefix, a, b)
-
 		if err = a.AddSuperFrom(b, prefix); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -193,18 +187,6 @@ func (k *Compiled) addImplicitTags(
 	}
 
 	mp.Cache.SetImplicitTags(ie)
-
-	return
-}
-
-func (k compiled) ApplyToNewMetadata(
-	ml object_metadata.MetadataLike,
-	tagp interfaces.BlobGetterPutter[*type_blobs.V0],
-) (err error) {
-	// m := ml.GetMetadatei()
-
-	// normalized := kennung.WithRemovedCommonPrefixes(m.GetEtiketten())
-	// m.SetEtiketten(normalized)
 
 	return
 }

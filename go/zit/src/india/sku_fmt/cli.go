@@ -15,7 +15,7 @@ type cli struct {
 	options       erworben_cli_print_options.PrintOptions
 	contentPrefix string
 
-	objectIdStringFormatWriter   interfaces.StringFormatWriter[*ids.ObjectId]
+	objectIdStringFormatWriter  interfaces.StringFormatWriter[*ids.ObjectId]
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata]
 }
 
@@ -24,7 +24,7 @@ func MakeCliFormatShort(
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata],
 ) *cli {
 	return &cli{
-		objectIdStringFormatWriter:   objectIdStringFormatWriter,
+		objectIdStringFormatWriter:  objectIdStringFormatWriter,
 		metadateiStringFormatWriter: metadateiStringFormatWriter,
 	}
 }
@@ -39,7 +39,7 @@ func MakeCliFormat(
 		contentPrefix: string_format_writer.StringPrefixFromOptions(
 			options,
 		),
-		objectIdStringFormatWriter:   objectStringFormatWriter,
+		objectIdStringFormatWriter:  objectStringFormatWriter,
 		metadateiStringFormatWriter: metadateiStringFormatWriter,
 	}
 }

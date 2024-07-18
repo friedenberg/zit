@@ -257,11 +257,6 @@ func (k *Compiled) AddTransacted(
 		}
 	}
 
-	// switch kinder.Kennung.GetGattung() {
-	// case gattung.Typ, gattung.Etikett, gattung.Kasten:
-	// 	didChange = didChange && mutter != nil
-	// }
-
 	if didChange && (mutter != nil || mode.Contains(objekte_mode.ModeSchwanz)) {
 		k.SetHasChanges(fmt.Sprintf("added: %s", kinder))
 	}

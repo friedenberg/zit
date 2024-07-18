@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -12,19 +12,20 @@ type ObjekteOptions = sku.CommitOptions
 
 func (s *Store) ReadOneObjectIdExternal(
 	o ObjekteOptions,
-	k1 interfaces.ObjectIdWithRepoId,
+	oid interfaces.ObjectId,
+	kid ids.RepoId,
 	sk *sku.Transacted,
 ) (el sku.ExternalLike, err error) {
-	switch k1.GetRepoId().GetRepoIdString() {
-	case "chrome":
-		// TODO populate with chrome kasten
-		ui.Debug().Print("would populate from chrome")
+	es, ok := s.externalStores[kid.GetRepoIdString()]
 
-	default:
-		if el, err = s.cwdFiles.ReadTransactedFromObjectId(o, k1, sk); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if !ok {
+		err = errors.Errorf("no kasten with id %q", kid)
+		return
+	}
+
+	if el, err = es.ReadTransactedFromObjectId(o, oid, sk); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

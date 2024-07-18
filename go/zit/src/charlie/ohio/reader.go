@@ -60,6 +60,20 @@ func ReadUint8(r io.Reader) (n uint8, read int, err error) {
 	return
 }
 
+func ReadFixedUint8(r io.Reader) (n uint8, read int, err error) {
+	cl := [1]byte{}
+
+	read, err = ReadAllOrDieTrying(r, cl[:])
+	if err != nil {
+		err = errors.WrapExcept(err, io.EOF)
+		return
+	}
+
+	n = cl[0]
+
+	return
+}
+
 func ReadInt8(r io.Reader) (n int8, read int, err error) {
 	cl := [1]byte{}
 

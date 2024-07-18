@@ -348,8 +348,13 @@ func (c *Store) tryToEmitOneRecognized(
 	}
 
 	sku.TransactedResetter.Reset(&co.External.browser)
-	co.External.browser.ObjectId.SetGenre(genres.Zettel)
-	co.External.ObjectId.SetGenre(genres.Zettel)
+	co.External.browser.ObjectId.SetGenre(genres.Unknown)
+	co.External.ObjectId.SetGenre(genres.Unknown)
+
+	if err = item.WriteToObjectId(&co.External.ObjectId); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	sku.TransactedResetter.ResetWith(&co.Internal, internal)
 	sku.TransactedResetter.ResetWith(&co.External.Transacted, internal)
@@ -383,8 +388,13 @@ func (c *Store) tryToEmitOneUntracked(
 	}
 
 	sku.TransactedResetter.Reset(&co.External.browser)
-	co.External.browser.ObjectId.SetGenre(genres.Zettel)
-	co.External.ObjectId.SetGenre(genres.Zettel)
+	co.External.browser.ObjectId.SetGenre(genres.Unknown)
+	co.External.ObjectId.SetGenre(genres.Unknown)
+
+	if err = item.WriteToObjectId(&co.External.ObjectId); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	sku.TransactedResetter.Reset(&co.External.Transacted)
 	sku.TransactedResetter.Reset(&co.Internal)

@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+// TODO setup versions of LuaTable
 type LuaTable struct {
 	Transacted        *lua.LTable
 	Etiketten         *lua.LTable
