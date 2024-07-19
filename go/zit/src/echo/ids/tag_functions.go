@@ -3,7 +3,6 @@ package ids
 import (
 	"strings"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 )
@@ -81,13 +80,12 @@ func WithRemovedCommonPrefixes(s TagSet) (s2 TagSet) {
 }
 
 func AddNormalizedTag(es TagMutableSet, e *Tag) {
-	ExpandOne(e, expansion.ExpanderRight).Each(es.Add)
-	errors.PanicIfError(iter.AddClonePool(
+	ExpandOneInto(
+		*e,
+		MakeTag,
+		expansion.ExpanderRight,
 		es,
-		GetTagPool(),
-		TagResetter,
-		e,
-	))
+	)
 
 	c := es.CloneSetPtrLike()
 	es.Reset()

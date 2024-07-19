@@ -1,6 +1,7 @@
 package ids
 
 import (
+	"reflect"
 	"testing"
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
@@ -22,7 +23,9 @@ func stringSliceEquals(a, b []string) bool {
 	return true
 }
 
-func TestStringSliceUnequal(t *testing.T) {
+func TestStringSliceUnequal(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
 	expected := []string{
 		"this",
 		"is",
@@ -41,7 +44,9 @@ func TestStringSliceUnequal(t *testing.T) {
 	}
 }
 
-func TestStringSliceEquals(t *testing.T) {
+func TestStringSliceEquals(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
 	expected := []string{
 		"this",
 		"is",
@@ -64,13 +69,52 @@ func TestStringSliceEquals(t *testing.T) {
 func TestExpansionAll(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 	e := MustTag("this-is-a-tag")
-	ex := ExpandOne(&e, expansion.ExpanderAll)
+	ex := MakeMutableTagSet()
+
+	ExpandOneInto(
+		e,
+		MakeTag,
+		expansion.ExpanderAll,
+		ex,
+	)
+
 	expected := []string{
 		"a",
 		"a-tag",
 		"is",
 		"is-a-tag",
 		"tag",
+		"this",
+		"this-is",
+		"this-is-a",
+		"this-is-a-tag",
+	}
+
+	actual := iter.SortedStrings(ex)
+
+	if !stringSliceEquals(actual, expected) {
+		t.Errorf(
+			"expanded tags don't match:\nexpected: %q\n  actual: %q",
+			expected,
+			actual,
+		)
+	}
+}
+
+func TestExpansionRight(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
+	e := MustTag("this-is-a-tag")
+	ex := MakeMutableTagSet()
+
+	ExpandOneInto(
+		e,
+		MakeTag,
+		expansion.ExpanderRight,
+		ex,
+	)
+
+	expected := []string{
 		"this",
 		"this-is",
 		"this-is-a",
@@ -88,19 +132,21 @@ func TestExpansionAll(t1 *testing.T) {
 	}
 }
 
-func TestExpansionRight(t *testing.T) {
-	e := MustTag("this-is-a-tag")
-	ex := ExpandOne(&e, expansion.ExpanderRight)
-	expected := []string{
-		"this",
-		"this-is",
-		"this-is-a",
-		"this-is-a-tag",
+func TestExpansionRightTypeNone(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+	e := MustType("md")
+
+	actual := ExpandOneSlice(
+		e,
+		MakeType,
+		expansion.ExpanderRight,
+	)
+
+	expected := []Type{
+		MustType("md"),
 	}
 
-	actual := iter.SortedStrings[Tag](ex)
-
-	if !stringSliceEquals(actual, expected) {
+	if !reflect.DeepEqual(actual, expected) {
 		t.Errorf(
 			"expanded tags don't match:\nexpected: %q\n  actual: %q",
 			expected,

@@ -31,22 +31,30 @@ func expandOne[T idGeneric[T], TPtr idGenericPtr[T]](
 	ex.Expand(f, k.String())
 }
 
-func expandOne2[T IdLikePtr](
+func ExpandOneInto[T IdLikePtr](
 	k T,
 	mf func(string) (T, error),
 	ex expansion.Expander,
 	acc interfaces.Adder[T],
-) (err error) {
-	f := iter.MakeFuncSetString[T, TPtr](acc)
-	if err = ex.Expand(
-		f,
-		k.String(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+) {
+	ex.Expand(
+		func(v string) (err error) {
+			var e T
 
-	return
+			if e, err = mf(v); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = acc.Add(e); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+		k.String(),
+	)
 }
 
 func ExpandOneSlice[T IdLikePtr](
@@ -61,7 +69,7 @@ func ExpandOneSlice[T IdLikePtr](
 	}
 
 	for _, ex := range exes {
-		expandOne(k, ex, s1)
+		ExpandOneInto(k, mf, ex, s1)
 	}
 
 	out = iter.SortedValuesBy(

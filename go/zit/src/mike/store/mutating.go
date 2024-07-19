@@ -378,7 +378,7 @@ func (s *Store) UpdateKonfig(
 	)
 }
 
-func (s *Store) createEtikettOrTyp(k *ids.ObjectId) (err error) {
+func (s *Store) createTagsOrType(k *ids.ObjectId) (err error) {
 	switch k.GetGenre() {
 	default:
 		err = genres.MakeErrUnsupportedGenre(k.GetGenre())
@@ -426,6 +426,11 @@ func (s *Store) createEtikettOrTyp(k *ids.ObjectId) (err error) {
 func (s *Store) addTyp(
 	t ids.Type,
 ) (err error) {
+	if t.IsEmpty() {
+		err = errors.Errorf("attempting to add empty type")
+		return
+	}
+
 	if err = s.GetAbbrStore().Typen().Exists(t.Parts()); err == nil {
 		return
 	}
@@ -439,7 +444,7 @@ func (s *Store) addTyp(
 		return
 	}
 
-	if err = s.createEtikettOrTyp(&k); err != nil {
+	if err = s.createTagsOrType(&k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -447,10 +452,18 @@ func (s *Store) addTyp(
 	return
 }
 
-func (s *Store) addTypAndExpanded(
-	t ids.Type,
+func (s *Store) addTypAndExpandedIfNecessary(
+	t1 ids.Type,
 ) (err error) {
-	typenExpanded := ids.ExpandOneSlice(&t, expansion.ExpanderRight)
+	if t1.IsEmpty() {
+		return
+	}
+
+	typenExpanded := ids.ExpandOneSlice(
+		t1,
+		ids.MakeType,
+		expansion.ExpanderRight,
+	)
 
 	for _, t := range typenExpanded {
 		if err = s.addTyp(t); err != nil {
@@ -469,7 +482,11 @@ func (s *Store) addEtikettAndExpanded(
 		return
 	}
 
-	etikettenExpanded := ids.ExpandOneSlice(&e, expansion.ExpanderRight)
+	etikettenExpanded := ids.ExpandOneSlice(
+		e,
+		ids.MakeTag,
+		expansion.ExpanderRight,
+	)
 
 	s.tagLock.Lock()
 	defer s.tagLock.Unlock()
@@ -492,7 +509,7 @@ func (s *Store) addEtikettAndExpanded(
 			return
 		}
 
-		if err = s.createEtikettOrTyp(&k); err != nil {
+		if err = s.createTagsOrType(&k); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -506,7 +523,7 @@ func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 ) (err error) {
 	t := m.GetType()
 
-	if err = s.addTypAndExpanded(t); err != nil {
+	if err = s.addTypAndExpandedIfNecessary(t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
