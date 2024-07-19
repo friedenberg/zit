@@ -38,7 +38,7 @@ func MakeFormatOrganize(
 	return &Organize{
 		options:                       options,
 		shaStringFormatWriter:         shaStringFormatWriter,
-		objectIdStringFormatWriter:     objectIdStringFormatWriter,
+		objectIdStringFormatWriter:    objectIdStringFormatWriter,
 		typStringFormatWriter:         typeStringFormatWriter,
 		descriptionStringFormatWriter: descriptionStringFormatWriter,
 		etikettenStringFormatWriter:   tagsStringFormatWriter,
@@ -52,7 +52,7 @@ type Organize struct {
 	padding             string
 
 	shaStringFormatWriter         interfaces.StringFormatWriter[interfaces.Sha]
-	objectIdStringFormatWriter     id_fmts.Aligned
+	objectIdStringFormatWriter    id_fmts.Aligned
 	typStringFormatWriter         interfaces.StringFormatWriter[*ids.Type]
 	descriptionStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description]
 	etikettenStringFormatWriter   interfaces.StringFormatWriter[*ids.Tag]

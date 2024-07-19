@@ -24,18 +24,9 @@ type IdLike interface {
 	// interfaces.Setter
 }
 
-type IdLikeWithoutGenrePtr interface {
-	IdWithParts
-}
-
-type IdLikePtr interface {
-	IdLike
-	IdLikeWithoutGenrePtr
-}
-
 type Index struct{}
 
-func Make(v string) (k IdLikePtr, err error) {
+func Make(v string) (k IdLike, err error) {
 	if v == "" {
 		k = &ObjectId{}
 		return

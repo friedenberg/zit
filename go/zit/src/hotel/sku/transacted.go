@@ -1,9 +1,10 @@
 package sku
 
 import (
+	"strings"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -60,13 +61,9 @@ func (a *Transacted) GetTags() ids.TagSet {
 }
 
 func (a *Transacted) AddTagPtr(e *ids.Tag) (err error) {
-	if a.ObjectId.GetGenre() == genres.Tag {
-		e1 := ids.MustTag(a.ObjectId.String())
-		ex := ids.ExpandOne(&e1, expansion.ExpanderRight)
-
-		if ex.ContainsKey(ex.KeyPtr(e)) {
-			return
-		}
+	if a.ObjectId.GetGenre() == genres.Tag &&
+		strings.HasPrefix(a.ObjectId.String(), e.String()) {
+		return
 	}
 
 	ek := a.Metadata.Cache.GetImplicitTags().KeyPtr(e)

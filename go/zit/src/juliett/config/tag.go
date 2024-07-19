@@ -99,8 +99,11 @@ func (k *compiled) AccumulateImplicitTags(
 
 	ees := ids.MakeTagMutableSet()
 
-	ids.ExpandOne(&e, expansion.ExpanderRight).EachPtr(
-		ees.AddPtr,
+	ids.ExpandOneInto(
+		e,
+		ids.MakeTag,
+		expansion.ExpanderRight,
+		ees,
 	)
 
 	if err = ees.Each(

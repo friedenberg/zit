@@ -25,13 +25,13 @@ func (k *Compiled) ApplyDormantAndRealizeTags(
 	))
 
 	g := genres.Must(sk.GetGenre())
-	isEtikett := g == genres.Tag
+	isTag := g == genres.Tag
 
 	// if g.HasParents() {
 	// 	k.SetHasChanges(fmt.Sprintf("adding etikett with parents: %s", sk))
 	// }
 
-	var etikett ids.Tag
+	var tag ids.Tag
 
 	// TODO better solution for "realizing" etiketten against Konfig.
 	// Specifically, making this less fragile and dependent on remembering to do
@@ -39,20 +39,20 @@ func (k *Compiled) ApplyDormantAndRealizeTags(
 	mp.Cache.TagPaths.Reset()
 	mp.GetTags().Each(mp.Cache.TagPaths.AddEtikettOld)
 
-	if isEtikett {
+	if isTag {
 		ks := sk.ObjectId.String()
 
-		if err = etikett.Set(ks); err != nil {
+		if err = tag.Set(ks); err != nil {
 			return
 		}
 
 		sk.Metadata.Cache.TagPaths.AddSelf(catgut.MakeFromString(ks))
 
-		ids.ExpandOne(
-			&etikett,
+		ids.ExpandOneInto(
+			tag,
+			ids.MakeTag,
 			expansion.ExpanderRight,
-		).EachPtr(
-			mp.Cache.GetExpandedTagsMutable().AddPtr,
+			mp.Cache.GetExpandedTagsMutable(),
 		)
 	}
 

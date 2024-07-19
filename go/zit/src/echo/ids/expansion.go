@@ -9,20 +9,20 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 )
 
-type idGeneric[T any] interface {
+type idExpandable[T any] interface {
 	IdLike
 	interfaces.GenreGetter
 	interfaces.Stringer
 }
 
-type idGenericPtr[T idGeneric[T]] interface {
+type idExpandablePtr[T idExpandable[T]] interface {
 	interfaces.Ptr[T]
-	idGeneric[T]
-	IdLikePtr
+	idExpandable[T]
+	IdLike
 	interfaces.SetterPtr[T]
 }
 
-func expandOne[T idGeneric[T], TPtr idGenericPtr[T]](
+func expandOne[T idExpandable[T], TPtr idExpandablePtr[T]](
 	k TPtr,
 	ex expansion.Expander,
 	acc interfaces.Adder[T],
@@ -31,7 +31,7 @@ func expandOne[T idGeneric[T], TPtr idGenericPtr[T]](
 	ex.Expand(f, k.String())
 }
 
-func ExpandOneInto[T IdLikePtr](
+func ExpandOneInto[T IdLike](
 	k T,
 	mf func(string) (T, error),
 	ex expansion.Expander,
@@ -57,7 +57,7 @@ func ExpandOneInto[T IdLikePtr](
 	)
 }
 
-func ExpandOneSlice[T IdLikePtr](
+func ExpandOneSlice[T IdLike](
 	k T,
 	mf func(string) (T, error),
 	exes ...expansion.Expander,
@@ -82,26 +82,7 @@ func ExpandOneSlice[T IdLikePtr](
 	return
 }
 
-func ExpandOne[T idGeneric[T], TPtr idGenericPtr[T]](
-	k TPtr,
-	exes ...expansion.Expander,
-) (out interfaces.SetPtrLike[T, TPtr]) {
-	s1 := collections_ptr.MakeMutableValueSetValue[T, TPtr](nil)
-
-	if len(exes) == 0 {
-		exes = []expansion.Expander{expansion.ExpanderAll}
-	}
-
-	for _, ex := range exes {
-		expandOne(k, ex, s1)
-	}
-
-	out = s1.CloneSetPtrLike()
-
-	return
-}
-
-func ExpandMany[T idGeneric[T], TPtr idGenericPtr[T]](
+func ExpandMany[T idExpandable[T], TPtr idExpandablePtr[T]](
 	ks interfaces.SetPtrLike[T, TPtr],
 	ex expansion.Expander,
 ) (out interfaces.SetPtrLike[T, TPtr]) {
