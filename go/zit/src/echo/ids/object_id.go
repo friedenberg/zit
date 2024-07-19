@@ -460,32 +460,32 @@ func (h *objectId) Set(v string) (err error) {
 	case genres.Zettel:
 		var h ZettelId
 		err = h.Set(v)
-		k = h
+		k = &h
 
 	case genres.Tag:
 		var h Tag
 		err = h.Set(v)
-		k = h
+		k = &h
 
 	case genres.Type:
 		var h Type
 		err = h.Set(v)
-		k = h
+		k = &h
 
 	case genres.Repo:
 		var h RepoId
 		err = h.Set(v)
-		k = h
+		k = &h
 
 	case genres.Config:
 		var h Config
 		err = h.Set(v)
-		k = h
+		k = &h
 
 	case genres.InventoryList:
 		var h Tai
 		err = h.Set(v)
-		k = h
+		k = &h
 
 	default:
 		err = genres.MakeErrUnrecognizedGenre(h.g.GetGenreString())

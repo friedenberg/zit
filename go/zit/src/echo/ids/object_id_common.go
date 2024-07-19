@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 )
 
 func GetObjectIdPool() interfaces.Pool[ObjectId, *ObjectId] {
@@ -12,14 +11,6 @@ func GetObjectIdPool() interfaces.Pool[ObjectId, *ObjectId] {
 }
 
 type ObjectId = objectId2
-
-func MakeId(v string) (IdLikePtr, error) {
-	k := &ObjectId{
-		g: genres.Unknown,
-	}
-
-	return k, k.Set(v)
-}
 
 type IdParts struct {
 	Middle              byte

@@ -1,0 +1,117 @@
+package ids
+
+import (
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
+)
+
+type idGeneric[T any] interface {
+	IdLike
+	interfaces.GenreGetter
+	interfaces.Stringer
+}
+
+type idGenericPtr[T idGeneric[T]] interface {
+	interfaces.Ptr[T]
+	idGeneric[T]
+	IdLikePtr
+	interfaces.SetterPtr[T]
+}
+
+func expandOne[T idGeneric[T], TPtr idGenericPtr[T]](
+	k TPtr,
+	ex expansion.Expander,
+	acc interfaces.Adder[T],
+) {
+	f := iter.MakeFuncSetString[T, TPtr](acc)
+	ex.Expand(f, k.String())
+}
+
+func expandOne2[T IdLikePtr](
+	k T,
+	mf func(string) (T, error),
+	ex expansion.Expander,
+	acc interfaces.Adder[T],
+) (err error) {
+	f := iter.MakeFuncSetString[T, TPtr](acc)
+	if err = ex.Expand(
+		f,
+		k.String(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func ExpandOneSlice[T IdLikePtr](
+	k T,
+	mf func(string) (T, error),
+	exes ...expansion.Expander,
+) (out []T) {
+	s1 := collections_value.MakeMutableValueSet[T](nil)
+
+	if len(exes) == 0 {
+		exes = []expansion.Expander{expansion.ExpanderAll}
+	}
+
+	for _, ex := range exes {
+		expandOne(k, ex, s1)
+	}
+
+	out = iter.SortedValuesBy(
+		s1,
+		func(a, b T) bool {
+			return len(a.String()) < len(b.String())
+		},
+	)
+
+	return
+}
+
+func ExpandOne[T idGeneric[T], TPtr idGenericPtr[T]](
+	k TPtr,
+	exes ...expansion.Expander,
+) (out interfaces.SetPtrLike[T, TPtr]) {
+	s1 := collections_ptr.MakeMutableValueSetValue[T, TPtr](nil)
+
+	if len(exes) == 0 {
+		exes = []expansion.Expander{expansion.ExpanderAll}
+	}
+
+	for _, ex := range exes {
+		expandOne(k, ex, s1)
+	}
+
+	out = s1.CloneSetPtrLike()
+
+	return
+}
+
+func ExpandMany[T idGeneric[T], TPtr idGenericPtr[T]](
+	ks interfaces.SetPtrLike[T, TPtr],
+	ex expansion.Expander,
+) (out interfaces.SetPtrLike[T, TPtr]) {
+	s1 := collections_ptr.MakeMutableValueSetValue[T, TPtr](nil)
+
+	ks.EachPtr(
+		func(k TPtr) (err error) {
+			expandOne[T, TPtr](k, ex, s1)
+
+			return
+		},
+	)
+
+	out = s1.CloneSetPtrLike()
+
+	return
+}
+
+func Expanded(s TagSet, ex expansion.Expander) (out TagSet) {
+	return ExpandMany(s, ex)
+}

@@ -172,7 +172,7 @@ func (m *Metadata) AddTagPtr(e *ids.Tag) (err error) {
 		m.Tags = ids.MakeTagMutableSet()
 	}
 
-	ids.AddNormalizedEtikett(m.Tags, e)
+	ids.AddNormalizedTag(m.Tags, e)
 	cs := catgut.MakeFromString(e.String())
 	m.Cache.TagPaths.AddEtikett(cs)
 
