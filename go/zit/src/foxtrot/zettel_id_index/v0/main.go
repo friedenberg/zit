@@ -20,7 +20,7 @@ type encodedIds struct {
 	AvailableIds map[int]bool
 }
 
-type oldIndex struct {
+type index struct {
 	su interfaces.CacheIOFactory
 
 	lock sync.Mutex
@@ -40,8 +40,8 @@ func MakeIndex(
 	k interfaces.Config,
 	s interfaces.Directory,
 	su interfaces.CacheIOFactory,
-) (i *oldIndex, err error) {
-	i = &oldIndex{
+) (i *index, err error) {
+	i = &index{
 		path:               s.FileVerzeichnisseKennung(),
 		nonRandomSelection: k.UsePredictableHinweisen(),
 		su:                 su,
@@ -63,7 +63,7 @@ func MakeIndex(
 	return
 }
 
-func (i *oldIndex) Flush() (err error) {
+func (i *index) Flush() (err error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
@@ -95,7 +95,7 @@ func (i *oldIndex) Flush() (err error) {
 	return
 }
 
-func (i *oldIndex) readIfNecessary() (err error) {
+func (i *index) readIfNecessary() (err error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
@@ -133,7 +133,7 @@ func (i *oldIndex) readIfNecessary() (err error) {
 	return
 }
 
-func (i *oldIndex) Reset() (err error) {
+func (i *index) Reset() (err error) {
 	i.lock.Lock()
 	defer i.lock.Unlock()
 
@@ -171,7 +171,7 @@ func (i *oldIndex) Reset() (err error) {
 	return
 }
 
-func (i *oldIndex) AddZettelId(k1 ids.IdLike) (err error) {
+func (i *index) AddZettelId(k1 ids.IdLike) (err error) {
 	if !k1.GetGenre().EqualsGenre(genres.Zettel) {
 		err = genres.MakeErrUnsupportedGenre(k1)
 		return
@@ -219,7 +219,7 @@ func (i *oldIndex) AddZettelId(k1 ids.IdLike) (err error) {
 	return
 }
 
-func (i *oldIndex) CreateHinweis() (h *ids.ZettelId, err error) {
+func (i *index) CreateZettelId() (h *ids.ZettelId, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -273,7 +273,7 @@ func (i *oldIndex) CreateHinweis() (h *ids.ZettelId, err error) {
 	return i.makeZettelIdButDontStore(m)
 }
 
-func (i *oldIndex) makeZettelIdButDontStore(
+func (i *index) makeZettelIdButDontStore(
 	j int,
 ) (h *ids.ZettelId, err error) {
 	k := &coordinates.ZettelIdCoordinate{}
@@ -292,7 +292,7 @@ func (i *oldIndex) makeZettelIdButDontStore(
 	return
 }
 
-func (i *oldIndex) PeekHinweisen(m int) (hs []*ids.ZettelId, err error) {
+func (i *index) PeekZettelIds(m int) (hs []*ids.ZettelId, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return

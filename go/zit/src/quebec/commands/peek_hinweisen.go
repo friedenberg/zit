@@ -36,7 +36,7 @@ func (c PeekZettelIds) Run(store *env.Env, args ...string) (err error) {
 
 	var hs []*ids.ZettelId
 
-	if hs, err = store.GetStore().GetObjectIdIndex().PeekHinweisen(
+	if hs, err = store.GetStore().GetZettelIdIndex().PeekZettelIds(
 		n,
 	); err != nil {
 		err = errors.Wrap(err)

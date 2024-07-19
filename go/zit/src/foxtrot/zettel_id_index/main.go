@@ -8,23 +8,19 @@ import (
 	hinweis_index_v1 "code.linenisgreat.com/zit/go/zit/src/foxtrot/zettel_id_index/v1"
 )
 
-type HinweisStore interface {
+type Index interface {
 	interfaces.Flusher
-	CreateHinweis() (*ids.ZettelId, error)
-}
-
-type HinweisIndex interface {
-	HinweisStore
+	CreateZettelId() (*ids.ZettelId, error)
 	interfaces.ResetterWithError
 	AddZettelId(ids.IdLike) error
-	PeekHinweisen(int) ([]*ids.ZettelId, error)
+	PeekZettelIds(int) ([]*ids.ZettelId, error)
 }
 
 func MakeIndex(
 	k interfaces.Config,
 	s interfaces.Directory,
 	su interfaces.CacheIOFactory,
-) (i HinweisIndex, err error) {
+) (i Index, err error) {
 	switch v := k.GetStoreVersion().GetInt(); {
 	case v >= 1 && false:
 		errors.TodoP3("investigate using bitsets")

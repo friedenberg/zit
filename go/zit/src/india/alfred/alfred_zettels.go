@@ -28,7 +28,7 @@ func (w *Writer) addCommonMatches(
 	mb.AddMatchBytes(parts.Left.Bytes())
 	mb.AddMatchBytes(parts.Right.Bytes())
 
-	errors.PanicIfError(w.abbr.AbbreviateHinweisOnly(k))
+	errors.PanicIfError(w.abbr.AbbreviateZettelIdOnly(k))
 	mb.AddMatches(k.StringFromPtr())
 	parts = k.PartsStrings()
 	mb.AddMatchBytes(parts.Left.Bytes())

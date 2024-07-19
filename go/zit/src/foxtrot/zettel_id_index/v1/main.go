@@ -18,7 +18,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
-type hinweisIndex struct {
+type index struct {
 	su interfaces.CacheIOFactory
 
 	lock *sync.RWMutex
@@ -38,8 +38,8 @@ func MakeIndex(
 	k interfaces.Config,
 	s interfaces.Directory,
 	su interfaces.CacheIOFactory,
-) (i *hinweisIndex, err error) {
-	i = &hinweisIndex{
+) (i *index, err error) {
+	i = &index{
 		lock:               &sync.RWMutex{},
 		path:               s.FileVerzeichnisseHinweis(),
 		nonRandomSelection: k.UsePredictableHinweisen(),
@@ -60,7 +60,7 @@ func MakeIndex(
 	return
 }
 
-func (i *hinweisIndex) Flush() (err error) {
+func (i *index) Flush() (err error) {
 	i.lock.RLock()
 
 	if !i.hasChanges {
@@ -94,7 +94,7 @@ func (i *hinweisIndex) Flush() (err error) {
 	return
 }
 
-func (i *hinweisIndex) readIfNecessary() (err error) {
+func (i *index) readIfNecessary() (err error) {
 	i.lock.RLock()
 
 	if i.didRead {
@@ -137,7 +137,7 @@ func (i *hinweisIndex) readIfNecessary() (err error) {
 	return
 }
 
-func (i *hinweisIndex) Reset() (err error) {
+func (i *index) Reset() (err error) {
 	lMax := i.oldHinweisenStore.Left().Len() - 1
 	rMax := i.oldHinweisenStore.Right().Len() - 1
 
@@ -158,7 +158,7 @@ func (i *hinweisIndex) Reset() (err error) {
 	return
 }
 
-func (i *hinweisIndex) AddZettelId(k1 ids.IdLike) (err error) {
+func (i *index) AddZettelId(k1 ids.IdLike) (err error) {
 	if !k1.GetGenre().EqualsGenre(genres.Zettel) {
 		err = genres.MakeErrUnsupportedGenre(k1)
 		return
@@ -206,7 +206,7 @@ func (i *hinweisIndex) AddZettelId(k1 ids.IdLike) (err error) {
 	return
 }
 
-func (i *hinweisIndex) CreateHinweis() (h *ids.ZettelId, err error) {
+func (i *index) CreateZettelId() (h *ids.ZettelId, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -270,7 +270,7 @@ func (i *hinweisIndex) CreateHinweis() (h *ids.ZettelId, err error) {
 	return i.makeHinweisButDontStore(m)
 }
 
-func (i *hinweisIndex) makeHinweisButDontStore(
+func (i *index) makeHinweisButDontStore(
 	j int,
 ) (h *ids.ZettelId, err error) {
 	k := &coordinates.ZettelIdCoordinate{}
@@ -288,7 +288,7 @@ func (i *hinweisIndex) makeHinweisButDontStore(
 	return
 }
 
-func (i *hinweisIndex) PeekHinweisen(m int) (hs []*ids.ZettelId, err error) {
+func (i *index) PeekZettelIds(m int) (hs []*ids.ZettelId, err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return

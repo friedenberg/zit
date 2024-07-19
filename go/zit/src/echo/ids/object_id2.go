@@ -3,7 +3,6 @@ package ids
 import (
 	"io"
 	"math"
-	"slices"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -32,6 +31,7 @@ func getObjectIdPool2() interfaces.Pool[objectId2, *objectId2] {
 }
 
 type objectId2 struct {
+	virtual     bool
 	g           genres.Genre
 	middle      byte // remove and replace with virtual
 	left, right catgut.String
@@ -45,16 +45,7 @@ func (a *objectId2) Clone() (b *objectId2) {
 }
 
 func (a *objectId2) IsVirtual() bool {
-	switch a.g {
-	case genres.Zettel:
-		return slices.Equal(a.left.Bytes(), []byte{'%'})
-
-	case genres.Tag:
-		return a.middle == '%' || slices.Equal(a.left.Bytes(), []byte{'%'})
-
-	default:
-		return false
-	}
+	return a.virtual
 }
 
 func (a *objectId2) Equals(b *objectId2) bool {
@@ -270,6 +261,7 @@ func (k2 *objectId2) Reset() {
 	k2.left.Reset()
 	k2.middle = 0
 	k2.right.Reset()
+	k2.repoId.Reset()
 }
 
 func (k2 *objectId2) PartsStrings() IdParts {
@@ -376,19 +368,12 @@ func (k2 *objectId2) SetFromPath(
 func (h *objectId2) SetWithIdLike(
 	k IdLike,
 ) (err error) {
+	h.Reset()
+
 	switch kt := k.(type) {
 	case *objectId2:
-		if err = kt.left.CopyTo(&h.left); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		h.middle = kt.middle
-
-		if err = kt.right.CopyTo(&h.right); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		h.ResetWith(kt)
+		return
 
 	default:
 		p := k.Parts()
@@ -503,6 +488,7 @@ func (a *objectId2) ResetWith(b *objectId2) {
 	b.left.CopyTo(&a.left)
 	b.right.CopyTo(&a.right)
 	a.middle = b.middle
+	a.repoId = b.repoId
 }
 
 func (a *objectId2) ResetWithIdLike(b IdLike) (err error) {

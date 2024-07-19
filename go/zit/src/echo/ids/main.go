@@ -12,18 +12,22 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 )
 
-type IdWithoutGenre interface {
+type Abbreviatable interface {
+	interfaces.Stringer
+}
+
+type IdWithParts interface {
 	interfaces.Stringer
 	Parts() [3]string
 }
 
 type IdLike interface {
-	IdWithoutGenre
+	IdWithParts
 	interfaces.GenreGetter
 }
 
 type IdLikeWithoutGenrePtr interface {
-	IdWithoutGenre
+	IdWithParts
 	interfaces.Resetter
 	interfaces.Setter
 }
@@ -125,7 +129,7 @@ func Equals(a, b IdLike) (ok bool) {
 	return true
 }
 
-func FormattedString(k IdWithoutGenre) string {
+func FormattedString(k IdWithParts) string {
 	sb := &strings.Builder{}
 	parts := k.Parts()
 	sb.WriteString(parts[0])
@@ -198,7 +202,7 @@ func ContainsWithoutUnderscoreSuffix[T interfaces.Stringer](a, b T) bool {
 	return true
 }
 
-func ContainsExactly(a, b IdWithoutGenre) bool {
+func ContainsExactly(a, b IdWithParts) bool {
 	var (
 		as = a.Parts()
 		bs = b.Parts()
@@ -213,7 +217,7 @@ func ContainsExactly(a, b IdWithoutGenre) bool {
 	return true
 }
 
-func Contains(a, b IdWithoutGenre) bool {
+func Contains(a, b IdWithParts) bool {
 	var (
 		as = a.Parts()
 		bs = b.Parts()
@@ -228,7 +232,7 @@ func Contains(a, b IdWithoutGenre) bool {
 	return true
 }
 
-func Includes(a, b IdWithoutGenre) bool {
+func Includes(a, b IdWithParts) bool {
 	return Contains(b, a)
 }
 

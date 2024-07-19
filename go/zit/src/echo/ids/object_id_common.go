@@ -7,12 +7,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 )
 
-
 func GetObjectIdPool() interfaces.Pool[ObjectId, *ObjectId] {
-	return getObjectIdPool()
+	return getObjectIdPool2()
 }
 
-type ObjectId = objectId
+type ObjectId = objectId2
 
 func MakeId(v string) (IdLikePtr, error) {
 	k := &ObjectId{

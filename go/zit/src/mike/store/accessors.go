@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/golf/object_id_index"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/zettel_id_index"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -65,8 +65,8 @@ func (s *Store) GetAbbrStore() AbbrStore {
 	return s.Abbr
 }
 
-func (s *Store) GetObjectIdIndex() object_id_index.Index {
-	return s.objectIdIndex
+func (s *Store) GetZettelIdIndex() zettel_id_index.Index {
+	return s.zettelIdIndex
 }
 
 func (s *Store) GetStandort() fs_home.Home {

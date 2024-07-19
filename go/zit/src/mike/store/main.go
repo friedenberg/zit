@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/golf/object_id_index"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/zettel_id_index"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
@@ -42,8 +42,7 @@ type Store struct {
 	tagLock                sync.Mutex
 
 	streamIndex   *stream_index.Index
-	objectIdIndex object_id_index.Index
-	typeIndex     object_id_index.ObjectIdIndex[ids.Type, *ids.Type]
+	zettelIdIndex zettel_id_index.Index
 
 	protoZettel  sku.Proto
 	queryBuilder *query.Builder
@@ -75,11 +74,6 @@ func (c *Store) Initialize(
 	c.luaVMPoolBuilder = luaVMPoolBuilder
 	c.queryBuilder = qb
 
-	c.typeIndex = object_id_index.MakeIndex2[ids.Type](
-		c.fs_home,
-		st.DirVerzeichnisse("TypenIndexV0"),
-	)
-
 	c.inventoryList = inventory_list.MakeInventoryList()
 
 	if c.Abbr, err = newIndexAbbr(
@@ -103,12 +97,12 @@ func (c *Store) Initialize(
 		return
 	}
 
-	if c.objectIdIndex, err = object_id_index.MakeIndex(
+	if c.zettelIdIndex, err = zettel_id_index.MakeIndex(
 		c.GetKonfig(),
 		c.GetStandort(),
 		c.GetStandort(),
 	); err != nil {
-		err = errors.Wrapf(err, "failed to init zettel index")
+		err = errors.Wrap(err)
 		return
 	}
 
@@ -176,12 +170,7 @@ func (s *Store) SetCheckedOutLogWriter(
 }
 
 func (s *Store) ResetIndexes() (err error) {
-	if err = s.typeIndex.Reset(); err != nil {
-		err = errors.Wrapf(err, "failed to reset etiketten index")
-		return
-	}
-
-	if err = s.objectIdIndex.Reset(); err != nil {
+	if err = s.zettelIdIndex.Reset(); err != nil {
 		err = errors.Wrapf(err, "failed to reset index object id index")
 		return
 	}

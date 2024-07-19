@@ -4,26 +4,21 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
 type (
 	// TODO use catgut.String
-	FuncExpandString                                    func(string) (string, error)
-	FuncAbbreviateString[V any, VPtr interfaces.Ptr[V]] func(VPtr) (string, error)
+	FuncExpandString     func(string) (string, error)
+	FuncAbbreviateString func(Abbreviatable) (string, error)
 
 	Abbr struct {
-		Sha struct {
-			Expand     FuncExpandString
-			Abbreviate FuncAbbreviateString[sha.Sha, *sha.Sha]
-		}
-		// TODO switch to ObjectId
-		ZettelId abbrOne[ZettelId, *ZettelId]
+		Sha      abbrOne
+		ZettelId abbrOne
 	}
 
-	abbrOne[V IdGeneric[V], VPtr IdGenericPtr[V]] struct {
+	abbrOne struct {
 		Expand     FuncExpandString
-		Abbreviate FuncAbbreviateString[V, VPtr]
+		Abbreviate FuncAbbreviateString
 	}
 )
 
@@ -40,44 +35,13 @@ func (a Abbr) ExpanderFor(g genres.Genre) FuncExpandString {
 	case genres.Zettel:
 		return a.ZettelId.Expand
 
+		// TODO add repo abbreviation
 	case genres.Tag, genres.Type, genres.Repo:
 		return DontExpandString
 
 	default:
 		return nil
 	}
-}
-
-func (ao abbrOne[V, VPtr]) AbbreviateObjectId(
-	k IdLike,
-) (v string, err error) {
-	if ao.Abbreviate == nil {
-		v = k.String()
-		return
-	}
-
-	var ka1 V
-
-	if ka1.GetGenre() != k.GetGenre() {
-		err = genres.ErrWrongType{
-			ExpectedType: genres.Must(ka1.GetGenre()),
-			ActualType:   genres.Must(k.GetGenre()),
-		}
-
-		return
-	}
-
-	if err = VPtr(&ka1).Set(k.String()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if v, err = ao.Abbreviate(&ka1); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }
 
 func (a Abbr) LenKopfUndSchwanz(
@@ -97,7 +61,7 @@ func (a Abbr) LenKopfUndSchwanz(
 
 	var abbr string
 
-	if abbr, err = a.ZettelId.AbbreviateObjectId(h); err != nil {
+	if abbr, err = a.ZettelId.Abbreviate(h); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -113,14 +77,14 @@ func (a Abbr) LenKopfUndSchwanz(
 	return
 }
 
-func (a Abbr) AbbreviateHinweisOnly(
+func (a Abbr) AbbreviateZettelIdOnly(
 	in *ObjectId,
 ) (err error) {
 	if in.GetGenre() != genres.Zettel || in.IsVirtual() {
 		return
 	}
 
-	var getAbbr func(IdLike) (string, error)
+	var getAbbr FuncAbbreviateString
 
 	var h ZettelId
 
@@ -129,7 +93,7 @@ func (a Abbr) AbbreviateHinweisOnly(
 		return
 	}
 
-	getAbbr = a.ZettelId.AbbreviateObjectId
+	getAbbr = a.ZettelId.Abbreviate
 
 	var abbr string
 
@@ -146,7 +110,7 @@ func (a Abbr) AbbreviateHinweisOnly(
 	return
 }
 
-func (a Abbr) ExpandHinweisOnly(
+func (a Abbr) ExpandZettelIdOnly(
 	in *ObjectId,
 ) (err error) {
 	if in.GetGenre() != genres.Zettel || a.ZettelId.Expand == nil {
@@ -179,11 +143,11 @@ func (a Abbr) AbbreviateObjectId(
 	in *ObjectId,
 	out *ObjectId,
 ) (err error) {
-	var getAbbr func(IdLike) (string, error)
+	var getAbbr FuncAbbreviateString
 
 	switch in.GetGenre() {
 	case genres.Zettel:
-		getAbbr = a.ZettelId.AbbreviateObjectId
+		getAbbr = a.ZettelId.Abbreviate
 
 	case genres.Tag, genres.Type, genres.Repo:
 		getAbbr = DontAbbreviateString

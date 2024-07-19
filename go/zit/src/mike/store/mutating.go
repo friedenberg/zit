@@ -85,7 +85,7 @@ func (s *Store) tryRealizeAndOrStore(
 	) && (kinder.ObjectId.IsEmpty() || kinder.GetGenre() == genres.Unknown) {
 		var ken *ids.ZettelId
 
-		if ken, err = s.objectIdIndex.CreateHinweis(); err != nil {
+		if ken, err = s.zettelIdIndex.CreateZettelId(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -172,7 +172,7 @@ func (s *Store) tryRealizeAndOrStore(
 		}
 
 		if kinder.GetGenre() == genres.Zettel {
-			if err = s.objectIdIndex.AddZettelId(&kinder.ObjectId); err != nil {
+			if err = s.zettelIdIndex.AddZettelId(&kinder.ObjectId); err != nil {
 				if errors.Is(err, object_id_provider.ErrDoesNotExist{}) {
 					ui.Log().Printf("object id does not contain value: %s", err)
 					err = nil
@@ -284,23 +284,6 @@ func (s *Store) commitTransacted(
 	}
 
 	if err = s.inventoryList.Add(sk); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) AddTypToIndex(t *ids.Type) (err error) {
-	if t == nil {
-		return
-	}
-
-	if t.IsEmpty() {
-		return
-	}
-
-	if err = s.typeIndex.StoreOne(*t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -541,11 +524,6 @@ func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 }
 
 func (s *Store) addMatchableCommon(m *sku.Transacted) (err error) {
-	if err = s.AddTypToIndex(&m.Metadata.Type); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if err = s.GetAbbrStore().AddMatchable(m); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -563,11 +541,6 @@ func (s *Store) reindexOne(besty, sk *sku.Transacted) (err error) {
 		sk,
 		o,
 	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.AddTypToIndex(&sk.Metadata.Type); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

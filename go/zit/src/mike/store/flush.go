@@ -77,8 +77,7 @@ func (c *Store) Flush(
 		gob.Register(iter.StringerKeyerPtr[ids.Type, *ids.Type]{}) // TODO check if can be removed
 		wg.Do(func() error { return c.streamIndex.Flush(printerHeader) })
 		wg.Do(c.GetAbbrStore().Flush)
-		wg.Do(c.typeIndex.Flush)
-		wg.Do(c.objectIdIndex.Flush)
+		wg.Do(c.zettelIdIndex.Flush)
 		wg.Do(c.Abbr.Flush)
 	}
 

@@ -47,7 +47,7 @@ func (f *objectIdCliFormat) WriteStringFormat(
 
 		k = k1
 
-		if err = f.abbr.AbbreviateHinweisOnly(k1); err != nil {
+		if err = f.abbr.AbbreviateZettelIdOnly(k1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -300,7 +300,7 @@ func (ar *assignmentLineReader) readOneObj(
 		return
 	}
 
-	if err = ar.options.Abbr.ExpandHinweisOnly(&z.ObjectId); err != nil {
+	if err = ar.options.Abbr.ExpandZettelIdOnly(&z.ObjectId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

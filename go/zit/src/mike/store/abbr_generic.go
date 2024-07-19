@@ -18,7 +18,7 @@ type AbbrStoreGeneric[V any, VPtr interfaces.Ptr[V]] interface {
 	ExpandStringString(string) (string, error)
 	ExpandString(string) (VPtr, error)
 	Expand(VPtr) (VPtr, error)
-	Abbreviate(VPtr) (string, error)
+	Abbreviate(ids.Abbreviatable) (string, error)
 }
 
 type AbbrStoreMutableGeneric[V any, VPtr interfaces.Ptr[V]] interface {
@@ -126,7 +126,14 @@ func (ih *indexZettelId) Expand(
 	return
 }
 
-func (ih *indexZettelId) Abbreviate(h *ids.ZettelId) (v string, err error) {
+func (ih *indexZettelId) Abbreviate(id ids.Abbreviatable) (v string, err error) {
+	h, ok := id.(*ids.ZettelId)
+
+	if !ok {
+		err = errors.Errorf("expected %T but got %T: %q", h, id, id)
+		return
+	}
+
 	if err = ih.readFunc(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -243,7 +250,9 @@ func (ih *indexNotZettelId[K, KPtr]) Expand(
 	return
 }
 
-func (ih *indexNotZettelId[K, KPtr]) Abbreviate(k KPtr) (v string, err error) {
+func (ih *indexNotZettelId[K, KPtr]) Abbreviate(
+	k ids.Abbreviatable,
+) (v string, err error) {
 	if err = ih.readFunc(); err != nil {
 		err = errors.Wrap(err)
 		return

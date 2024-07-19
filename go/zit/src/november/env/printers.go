@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
+	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
@@ -41,7 +42,9 @@ func (u *Env) StringFormatWriterShaLike(
 	return id_fmts.MakeShaCliFormat(
 		u.config.PrintOptions,
 		co,
-		u.store.GetAbbrStore().Shas().Abbreviate,
+		func(s *sha.Sha) (string, error) {
+			return u.store.GetAbbrStore().Shas().Abbreviate(s)
+		},
 	)
 }
 

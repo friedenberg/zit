@@ -16,12 +16,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 )
 
-var poolObjectId interfaces.Pool[ObjectId, *ObjectId]
+var poolObjectId interfaces.Pool[objectId, *objectId]
 
 func init() {
 	poolObjectId = pool.MakePool(
 		nil,
-		func(k *ObjectId) {
+		func(k *objectId) {
 			k.Reset()
 		},
 	)
@@ -38,13 +38,13 @@ type objectId struct {
 }
 
 func (a *objectId) Clone() (b *objectId) {
-	b = GetObjectIdPool().Get()
+	b = getObjectIdPool().Get()
 	b.ResetWithIdLike(a)
 	return
 }
 
-func MustObjectId(kp IdLike) (k *objectId) {
-	k = &objectId{}
+func MustObjectId(kp IdLike) (k *ObjectId) {
+	k = &ObjectId{}
 	err := k.SetWithIdLike(kp)
 	errors.PanicIfError(err)
 	return

@@ -22,7 +22,7 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func makeHinweis(t *testing.T, v string) (k *ids.ObjectId) {
+func makeZettelId(t *testing.T, v string) (k *ids.ObjectId) {
 	var err error
 
 	var h ids.ZettelId
@@ -53,7 +53,7 @@ func makeObjWithHinAndBez(t *testing.T, hin string, bez string) (o *obj) {
 		},
 	}
 
-	o.ObjectId.SetWithIdLike(makeHinweis(t, hin))
+	o.ObjectId.SetWithIdLike(makeZettelId(t, hin))
 
 	return
 }
