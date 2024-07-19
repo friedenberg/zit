@@ -77,12 +77,13 @@ type (
 		interfaces.Stringer
 		TransactedGetter
 		ExternalLikeGetter
+		Clone() ExternalLike
 	}
 
 	CheckedOutLike interface {
 		interfaces.Stringer
 		TransactedGetter
-		ExternalLike
+		ExternalLikeGetter
 		GetRepoId() ids.RepoId
 		GetSkuCheckedOutLike() CheckedOutLike
 		GetState() checked_out_state.State

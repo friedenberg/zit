@@ -20,7 +20,7 @@ type assignmentLineWriter struct {
 	maxDepth           int
 	maxHead, maxTail   int
 	maxLen             int
-	stringFormatWriter interfaces.StringFormatWriter[*sku.Transacted]
+	stringFormatWriter interfaces.StringFormatWriter[skuType]
 }
 
 func (av assignmentLineWriter) write(a *Assignment) (err error) {
@@ -71,7 +71,7 @@ func (av assignmentLineWriter) writeNormal(a *Assignment) (err error) {
 			sb.WriteString("% ")
 		}
 
-		sku.TransactedResetter.ResetWith(cursor, &z.Transacted)
+		sku.TransactedResetter.ResetWith(cursor, z.Transacted)
 		cursor.Metadata.Subtract(&av.Metadata)
 
 		if _, err = av.stringFormatWriter.WriteStringFormat(&sb, cursor); err != nil {
@@ -145,7 +145,7 @@ func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 			sb.WriteString("% ")
 		}
 
-		sku.TransactedResetter.ResetWith(cursor, &z.Transacted)
+		sku.TransactedResetter.ResetWith(cursor, z.Transacted)
 		cursor.Metadata.Subtract(&av.Metadata)
 
 		mes := cursor.GetMetadata().GetTags().CloneMutableSetPtrLike()

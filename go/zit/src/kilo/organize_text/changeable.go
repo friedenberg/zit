@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func key(sk *sku.Transacted) string {
+func key(sk skuType) string {
 	if sk.ObjectId.IsEmpty() {
 		s := sk.Metadata.Description.String()
 
@@ -53,13 +53,13 @@ func (a *Assignment) addToSet(
 
 	if err = a.Each(
 		func(o *obj) (err error) {
-			var z *sku.Transacted
+			var z skuType
 			ok := false
 
-			if z, ok = out.m[key(&o.Transacted)]; !ok {
+			if z, ok = out.m[key(o.Transacted)]; !ok {
 				z = sku.GetTransactedPool().Get()
 
-				if err = z.SetFromSkuLike(&o.Transacted); err != nil {
+				if err = z.SetFromSkuLike(o.Transacted); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -77,7 +77,7 @@ func (a *Assignment) addToSet(
 
 				out.Add(z)
 
-				zPrime, hasOriginal := original.Get(original.Key(&o.Transacted))
+				zPrime, hasOriginal := original.Get(original.Key(o.Transacted))
 
 				if hasOriginal {
 					z.Metadata.Blob.ResetWith(&zPrime.Metadata.Blob)
@@ -89,20 +89,20 @@ func (a *Assignment) addToSet(
 				}
 			}
 
-			if o.ObjectId.String() == "" {
+			if o.Transacted.ObjectId.String() == "" {
 				panic(fmt.Sprintf("%s: object id is nil", o))
 			}
 
 			if err = z.Metadata.Description.Set(
-				o.Metadata.Description.String(),
+				o.Transacted.Metadata.Description.String(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if !o.Metadata.Type.IsEmpty() {
+			if !o.Transacted.Metadata.Type.IsEmpty() {
 				if err = z.Metadata.Type.Set(
-					o.Metadata.Type.String(),
+					o.Transacted.Metadata.Type.String(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -115,10 +115,10 @@ func (a *Assignment) addToSet(
 
 			z.Metadata.Comments = append(
 				z.Metadata.Comments,
-				o.Metadata.Comments...,
+				o.Transacted.Metadata.Comments...,
 			)
 
-			if err = o.Metadata.GetTags().EachPtr(
+			if err = o.Transacted.Metadata.GetTags().EachPtr(
 				z.AddTagPtr,
 			); err != nil {
 				err = errors.Wrap(err)

@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
@@ -96,9 +97,9 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		LineWriter:           lw,
 		maxDepth:             ot.MaxDepth(),
 		maxHead:              kopf,
-		maxTail:           schwanz,
+		maxTail:              schwanz,
 		maxLen:               l,
-		Metadata:            ot.AsMetadatei(),
+		Metadata:             ot.AsMetadatei(),
 		RightAlignedIndents:  ot.UseRightAlignedIndents,
 		OmitLeadingEmptyLine: omit,
 	}
@@ -111,6 +112,10 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 	if ocs, err = ot.GetOptionComments(ocf); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	if ot.Config.DryRun {
+		ocs = append(ocs, optionCommentDryRun(values.MakeBool(true)))
 	}
 
 	for _, oc := range ocs {

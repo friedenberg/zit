@@ -17,7 +17,7 @@ func (w *Writer) addCommonMatches(
 	a *alfred.Item,
 ) {
 	k := &z.ObjectId
-	ks := k.StringFromPtr()
+	ks := k.String()
 
 	mb := alfred.GetPoolMatchBuilder().Get()
 	defer alfred.GetPoolMatchBuilder().Put(mb)
@@ -29,7 +29,7 @@ func (w *Writer) addCommonMatches(
 	mb.AddMatchBytes(parts.Right.Bytes())
 
 	errors.PanicIfError(w.abbr.AbbreviateZettelIdOnly(k))
-	mb.AddMatches(k.StringFromPtr())
+	mb.AddMatches(k.String())
 	parts = k.PartsStrings()
 	mb.AddMatchBytes(parts.Left.Bytes())
 	mb.AddMatchBytes(parts.Right.Bytes())
@@ -76,7 +76,7 @@ func (w *Writer) zettelToItem(
 	)
 
 	k := &z.ObjectId
-	ks := k.StringFromPtr()
+	ks := k.String()
 
 	if a.Title == "" {
 		a.Title = ks

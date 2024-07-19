@@ -148,6 +148,11 @@ func (s *Store) SetExternalStores(
 		es.Home = s.GetStandort()
 		es.DirCache = s.GetStandort().DirVerzeichnisseKasten(k)
 
+		if err = es.RepoId.Set(k); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		if esfs, ok := es.StoreLike.(*store_fs.Store); ok {
 			s.cwdFiles = esfs
 

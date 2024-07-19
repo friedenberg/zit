@@ -198,35 +198,6 @@ func (k2 *objectId2) SetGenre(g interfaces.GenreGetter) {
 	}
 }
 
-func (k2 *objectId2) StringFromPtr() string {
-	var sb strings.Builder
-
-	switch k2.g {
-	case genres.Zettel:
-		sb.Write(k2.left.Bytes())
-		sb.WriteByte(k2.middle)
-		sb.Write(k2.right.Bytes())
-
-	case genres.Type:
-		sb.Write(k2.right.Bytes())
-
-	default:
-		if k2.left.Len() > 0 {
-			sb.Write(k2.left.Bytes())
-		}
-
-		if k2.middle != '\x00' {
-			sb.WriteByte(k2.middle)
-		}
-
-		if k2.right.Len() > 0 {
-			sb.Write(k2.right.Bytes())
-		}
-	}
-
-	return sb.String()
-}
-
 func (k2 *objectId2) IsEmpty() bool {
 	if k2.g == genres.Zettel {
 		if k2.left.IsEmpty() && k2.right.IsEmpty() {
@@ -252,8 +223,53 @@ func (k2 *objectId2) LenHeadAndTail() (int, int) {
 	return k2.left.Len(), k2.right.Len()
 }
 
+func (k2 *objectId2) GetRepoId() string {
+	return k2.repoId.String()
+}
+
+// TODO perform validation
+func (k2 *objectId2) SetRepoId(v string) (err error) {
+	if err = k2.repoId.Set(v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (k2 *objectId2) String() string {
-	return k2.StringFromPtr()
+	var sb strings.Builder
+
+	if k2.repoId.Len() > 0 {
+		sb.WriteRune('/')
+		k2.repoId.WriteTo(&sb)
+		sb.WriteRune('/')
+	}
+
+	switch k2.g {
+	case genres.Zettel:
+		sb.Write(k2.left.Bytes())
+		sb.WriteByte(k2.middle)
+		sb.Write(k2.right.Bytes())
+
+	case genres.Type:
+		sb.Write(k2.right.Bytes())
+
+	default:
+		if k2.left.Len() > 0 {
+			sb.Write(k2.left.Bytes())
+		}
+
+		if k2.middle != '\x00' {
+			sb.WriteByte(k2.middle)
+		}
+
+		if k2.right.Len() > 0 {
+			sb.Write(k2.right.Bytes())
+		}
+	}
+
+	return sb.String()
 }
 
 func (k2 *objectId2) Reset() {
@@ -429,7 +445,34 @@ func (h *objectId2) SetRaw(v string) (err error) {
 	return
 }
 
+// TODO parse this directly
+// one/uno
+// /chrome/one/uno
+// /chrome/bookmark-1
+// /chrome/!md
+// /chrome/!md
 func (h *objectId2) Set(v string) (err error) {
+	if v == "/" {
+		h.g = genres.Zettel
+		return
+	}
+
+	if strings.HasPrefix(v, "/") {
+		els := strings.SplitAfterN(v[1:], "/", 2)
+
+		if len(els) != 2 {
+			err = errors.Errorf("invalid object id format: %q", v)
+			return
+		}
+
+		v = els[1]
+
+		if err = h.SetRepoId(strings.TrimSuffix(els[0], "/")); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	var k IdLike
 
 	switch h.g {
@@ -488,7 +531,7 @@ func (a *objectId2) ResetWith(b *objectId2) {
 	b.left.CopyTo(&a.left)
 	b.right.CopyTo(&a.right)
 	a.middle = b.middle
-	a.repoId = b.repoId
+	b.repoId.CopyTo(&a.repoId)
 }
 
 func (a *objectId2) ResetWithIdLike(b IdLike) (err error) {

@@ -33,7 +33,7 @@ type Options struct {
 	Type            ids.Type
 	GroupingTags    ids.TagSlice
 	ExtraTags       ids.TagSet
-	Transacted      interfaces.SetLike[*sku.Transacted]
+	Transacted      interfaces.SetLike[skuType]
 
 	Abbr ids.Abbr
 
@@ -44,7 +44,7 @@ type Options struct {
 
 	PrintOptions       erworben_cli_print_options.PrintOptions
 	skuFmt             sku_fmt.Organize
-	stringFormatWriter interfaces.StringFormatWriter[*sku.Transacted]
+	stringFormatWriter interfaces.StringFormatWriter[skuType]
 }
 
 func MakeFlags() Flags {

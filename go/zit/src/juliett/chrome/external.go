@@ -87,6 +87,14 @@ func (t *External) GetSkuExternalLike() sku.ExternalLike {
 	return t
 }
 
+func (a *External) Clone() sku.ExternalLike {
+  b := GetExternalPool().Get()
+  sku.TransactedResetter.ResetWith(&b.Transacted, &a.Transacted)
+  sku.TransactedResetter.ResetWith(&b.browser, &a.browser)
+  b.item = a.item
+	return b
+}
+
 func (c *External) GetSku() *sku.Transacted {
 	return &c.Transacted
 }

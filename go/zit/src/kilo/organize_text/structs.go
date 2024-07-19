@@ -12,7 +12,8 @@ import (
 )
 
 type (
-	objSet = interfaces.MutableSetLike[*obj]
+	objSet  = interfaces.MutableSetLike[*obj]
+	skuType = *sku.Transacted
 )
 
 var objKeyer interfaces.StringKeyer[*obj]
@@ -23,13 +24,13 @@ func makeObjSet() objSet {
 
 // TODO-P1 migrate obj to sku.Transacted
 type obj struct {
-	sku.Transacted
+	Transacted skuType
 	tag_paths.Type
 }
 
 func (a *obj) cloneWithType(t tag_paths.Type) (b *obj) {
-	b = &obj{Type: t}
-	sku.TransactedResetter.ResetWith(&b.Transacted, &a.Transacted)
+	b = &obj{Type: t, Transacted: sku.GetTransactedPool().Get()}
+	sku.TransactedResetter.ResetWith(b.Transacted, a.Transacted)
 	return
 }
 
@@ -44,17 +45,17 @@ func sortObjSet(
 
 	sort.Slice(out, func(i, j int) bool {
 		switch {
-		case out[i].ObjectId.IsEmpty() && out[j].ObjectId.IsEmpty():
-			return out[i].Metadata.Description.String() < out[j].Metadata.Description.String()
+		case out[i].Transacted.ObjectId.IsEmpty() && out[j].Transacted.ObjectId.IsEmpty():
+			return out[i].Transacted.Metadata.Description.String() < out[j].Transacted.Metadata.Description.String()
 
-		case out[i].ObjectId.IsEmpty():
+		case out[i].Transacted.ObjectId.IsEmpty():
 			return true
 
-		case out[j].ObjectId.IsEmpty():
+		case out[j].Transacted.ObjectId.IsEmpty():
 			return false
 
 		default:
-			return out[i].ObjectId.String() < out[j].ObjectId.String()
+			return out[i].Transacted.ObjectId.String() < out[j].Transacted.ObjectId.String()
 		}
 	})
 
@@ -112,18 +113,18 @@ func (os Objects) Sort() {
 
 	sort.Slice(out, func(i, j int) bool {
 		switch {
-		case out[i].ObjectId.IsEmpty() && out[j].ObjectId.IsEmpty():
-			return out[i].Metadata.Description.String() < out[j].Metadata.Description.String()
+		case out[i].Transacted.ObjectId.IsEmpty() && out[j].Transacted.ObjectId.IsEmpty():
+			return out[i].Transacted.Metadata.Description.String() < out[j].Transacted.Metadata.Description.String()
 
-		case out[i].ObjectId.IsEmpty():
+		case out[i].Transacted.ObjectId.IsEmpty():
 			return true
 
-		case out[j].ObjectId.IsEmpty():
+		case out[j].Transacted.ObjectId.IsEmpty():
 			return false
 
 		default:
 			// TODO sort by ints for virtual object id
-			return out[i].ObjectId.String() < out[j].ObjectId.String()
+			return out[i].Transacted.ObjectId.String() < out[j].Transacted.ObjectId.String()
 		}
 	})
 }

@@ -13,26 +13,26 @@ import (
 
 func newAssignment(d int) *Assignment {
 	return &Assignment{
-		Depth:     d,
-		Tags: ids.MakeTagSet(),
+		Depth:    d,
+		Tags:     ids.MakeTagSet(),
 		objects:  make(map[string]struct{}),
 		Objects:  make(Objects, 0),
-		Children:  make([]*Assignment, 0),
+		Children: make([]*Assignment, 0),
 	}
 }
 
 type Assignment struct {
-	IsRoot    bool
-	Depth     int
-	Tags ids.TagSet
-	objects  map[string]struct{}
+	IsRoot  bool
+	Depth   int
+	Tags    ids.TagSet
+	objects map[string]struct{}
 	Objects
 	Children []*Assignment
 	Parent   *Assignment
 }
 
 func (a *Assignment) AddObject(v *obj) (err error) {
-	k := key(&v.Transacted)
+	k := key(v.Transacted)
 	_, ok := a.objects[k]
 
 	if ok {
@@ -79,7 +79,7 @@ func (a Assignment) AlignmentSpacing() int {
 func (a Assignment) MaxLen() (m int) {
 	a.Objects.Each(
 		func(z *obj) (err error) {
-			oM := z.ObjectId.Len()
+			oM := z.Transacted.ObjectId.Len()
 
 			if oM > m {
 				m = oM
@@ -105,11 +105,11 @@ func (a Assignment) MaxHeadAndTail(
 ) (kopf, schwanz int) {
 	a.Objects.Each(
 		func(z *obj) (err error) {
-			oKopf, oSchwanz := z.ObjectId.LenHeadAndTail()
+			oKopf, oSchwanz := z.Transacted.ObjectId.LenHeadAndTail()
 
 			if o.PrintOptions.Abbreviations.Hinweisen {
 				if oKopf, oSchwanz, err = o.Abbr.LenKopfUndSchwanz(
-					&z.ObjectId,
+					&z.Transacted.ObjectId,
 				); err != nil {
 					err = errors.Wrap(err)
 					return

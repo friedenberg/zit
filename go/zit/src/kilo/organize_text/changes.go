@@ -10,22 +10,22 @@ import (
 )
 
 func MakeSkuMapWithOrder(c int) (out SkuMapWithOrder) {
-	out.m = make(map[string]*sku.Transacted, c)
-	out.o = make([]*sku.Transacted, 0, c)
+	out.m = make(map[string]skuType, c)
+	out.o = make([]skuType, 0, c)
 	return
 }
 
 type SkuMapWithOrder struct {
-	m map[string]*sku.Transacted
-	o []*sku.Transacted
+	m map[string]skuType
+	o []skuType
 }
 
-func (sm *SkuMapWithOrder) Del(sk *sku.Transacted) error {
+func (sm *SkuMapWithOrder) Del(sk skuType) error {
 	delete(sm.m, key(sk))
 	return nil
 }
 
-func (sm *SkuMapWithOrder) Add(sk *sku.Transacted) error {
+func (sm *SkuMapWithOrder) Add(sk skuType) error {
 	k := key(sk)
 	_, ok := sm.m[k]
 
@@ -72,7 +72,7 @@ func (sm SkuMapWithOrder) Sort() {
 }
 
 func (sm *SkuMapWithOrder) Each(
-	f interfaces.FuncIter[*sku.Transacted],
+	f interfaces.FuncIter[skuType],
 ) (err error) {
 	sm.Sort()
 

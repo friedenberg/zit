@@ -47,6 +47,26 @@ func (s *Store) Reindex() (err error) {
 	return
 }
 
+func (s *Store) CreateOrUpdateFromExternal(
+	in sku.ExternalLike,
+	mode objekte_mode.Mode,
+) (err error) {
+	mode.Add(
+		objekte_mode.ModeCommit,
+		objekte_mode.ModeApplyProto,
+	)
+
+	if err = s.tryRealizeAndOrStore(
+		in.GetSku(),
+		ObjekteOptions{Mode: mode},
+	); err != nil {
+		err = errors.WrapExcept(err, collections.ErrExists)
+		return
+	}
+
+	return
+}
+
 func (s *Store) CreateOrUpdateFromTransacted(
 	in *sku.Transacted,
 	mode objekte_mode.Mode,

@@ -432,6 +432,20 @@ func (c *Store) tryToEmitOneCommon(
 		return
 	}
 
+	if err = co.External.ObjectId.SetRepoId(
+		c.externalStoreInfo.RepoId.String(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = co.Internal.ObjectId.SetRepoId(
+		c.externalStoreInfo.RepoId.String(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = f(co); err != nil {
 		err = errors.Wrap(err)
 		return

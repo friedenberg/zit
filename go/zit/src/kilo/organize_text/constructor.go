@@ -56,7 +56,7 @@ func (c *constructor) collectExplicitAndImplicitFor(
 	res := catgut.MakeFromString(re.String())
 
 	if err = skus.Each(
-		func(sk *sku.Transacted) (err error) {
+		func(sk skuType) (err error) {
 			for _, ewp := range sk.Metadata.Cache.TagPaths.All {
 				if ewp.Tag.String() == sk.ObjectId.String() {
 					continue
@@ -313,9 +313,9 @@ func (c *constructor) cloneObj(
 ) (z *obj, err error) {
 	errors.TodoP4("add bez in a better way")
 
-	z = &obj{Type: named.Type}
+	z = &obj{Type: named.Type, Transacted: sku.GetTransactedPool().Get()}
 
-	if err = z.SetFromSkuLike(named); err != nil {
+	if err = z.Transacted.SetFromSkuLike(named.Transacted); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -335,11 +335,11 @@ func (c *constructor) removeTagsIfNecessary(
 		return
 	}
 
-	if o.Metadata.Description.IsEmpty() {
+	if o.Transacted.Metadata.Description.IsEmpty() {
 		return
 	}
 
-	o.Metadata.ResetTags()
+	o.Transacted.Metadata.ResetTags()
 
 	return
 }

@@ -81,6 +81,7 @@ func (op CommitOrganizeFile) run(
 
 	if err = cs.Changed.Each(
 		func(changed *sku.Transacted) (err error) {
+      // TODO switch to external
 			if err = u.GetStore().CreateOrUpdateFromTransacted(
 				changed,
 				objekte_mode.Make(

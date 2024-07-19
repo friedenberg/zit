@@ -46,14 +46,14 @@ func makeBez(t *testing.T, v string) (b descriptions.Description) {
 
 func makeObjWithHinAndBez(t *testing.T, hin string, bez string) (o *obj) {
 	o = &obj{
-		Transacted: sku.Transacted{
+		Transacted: &sku.Transacted{
 			Metadata: object_metadata.Metadata{
 				Description: makeBez(t, bez),
 			},
 		},
 	}
 
-	o.ObjectId.SetWithIdLike(makeZettelId(t, hin))
+	o.Transacted.ObjectId.SetWithIdLike(makeZettelId(t, hin))
 
 	return
 }

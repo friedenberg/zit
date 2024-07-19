@@ -18,7 +18,7 @@ type assignmentLineReader struct {
 	lineNo             int
 	root               *Assignment
 	currentAssignment  *Assignment
-	stringFormatReader catgut.StringFormatReader[*sku.Transacted]
+	stringFormatReader catgut.StringFormatReader[skuType]
 }
 
 func (ar *assignmentLineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
@@ -276,9 +276,10 @@ func (ar *assignmentLineReader) readOneObj(
 	// logz.Print("reading one zettel", l)
 
 	var z obj
+  z.Transacted = sku.GetTransactedPool().Get()
 	z.Type = t
 
-	if _, err = ar.stringFormatReader.ReadStringFormat(r, &z.Transacted); err != nil {
+	if _, err = ar.stringFormatReader.ReadStringFormat(r, z.Transacted); err != nil {
 		err = ErrorRead{
 			error:  err,
 			line:   ar.lineNo,
@@ -288,9 +289,9 @@ func (ar *assignmentLineReader) readOneObj(
 		return
 	}
 
-	if z.ObjectId.IsEmpty() {
+	if z.Transacted.ObjectId.IsEmpty() {
 		// set empty hinweis to ensure middle is '/'
-		if err = z.ObjectId.SetWithIdLike(ids.ZettelId{}); err != nil {
+		if err = z.Transacted.ObjectId.SetWithIdLike(ids.ZettelId{}); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -300,7 +301,7 @@ func (ar *assignmentLineReader) readOneObj(
 		return
 	}
 
-	if err = ar.options.Abbr.ExpandZettelIdOnly(&z.ObjectId); err != nil {
+	if err = ar.options.Abbr.ExpandZettelIdOnly(&z.Transacted.ObjectId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

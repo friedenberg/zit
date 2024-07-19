@@ -18,7 +18,7 @@ func MakeAligned(
 type aligned struct {
 	erworben_cli_print_options.PrintOptions
 	ids.Abbr
-	maxKopf, maxSchwanz int
+	maxHead, maxTail int
 }
 
 func (f *aligned) GetAligned() Aligned {
@@ -26,8 +26,8 @@ func (f *aligned) GetAligned() Aligned {
 }
 
 func (f *aligned) SetMaxKopfUndSchwanz(k, s int) {
-	f.maxKopf = k
-	f.maxSchwanz = s
+	f.maxHead = k
+	f.maxTail = s
 }
 
 func (f *aligned) WriteStringFormat(
@@ -45,10 +45,22 @@ func (f *aligned) WriteStringFormat(
 		}
 	}
 
-	// TODO move to object id and avoid allocation
-	h := ids.Aligned(o, f.maxKopf, f.maxSchwanz)
-	n1, err = sw.WriteString(h)
-	n += int64(n1)
+	rid := o.GetRepoId()
+
+	if len(rid) > 0 {
+		n1, err = sw.WriteString(o.String())
+		n += int64(n1)
+	} else {
+		// TODO move to object id and avoid allocation
+		h := ids.Aligned(o, f.maxHead, f.maxTail)
+		n1, err = sw.WriteString(h)
+		n += int64(n1)
+	}
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

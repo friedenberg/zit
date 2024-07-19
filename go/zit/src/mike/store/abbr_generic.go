@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
@@ -127,10 +128,25 @@ func (ih *indexZettelId) Expand(
 }
 
 func (ih *indexZettelId) Abbreviate(id ids.Abbreviatable) (v string, err error) {
-	h, ok := id.(*ids.ZettelId)
+	var h ids.ZettelId
 
-	if !ok {
-		err = errors.Errorf("expected %T but got %T: %q", h, id, id)
+	switch idt := id.(type) {
+	case ids.ZettelId:
+		h = idt
+
+	case *ids.ObjectId:
+		if idt.GetGenre() != genres.Zettel {
+			err = genres.MakeErrUnsupportedGenre(idt)
+			return
+		}
+
+		if err = h.Set(idt.String()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	default:
+		err = errors.Errorf("unsupported type %T: %q", idt, idt)
 		return
 	}
 
@@ -139,23 +155,20 @@ func (ih *indexZettelId) Abbreviate(id ids.Abbreviatable) (v string, err error) 
 		return
 	}
 
-	kopf := h.GetHead()
-	schwanz := h.GetTail()
+	head := ih.Kopfen.Abbreviate(h.GetHead())
+	tail := ih.Schwanzen.Abbreviate(h.GetTail())
 
-	kopf = ih.Kopfen.Abbreviate(h.GetHead())
-	schwanz = ih.Schwanzen.Abbreviate(h.GetTail())
-
-	if kopf == "" {
+	if head == "" {
 		v = h.String()
 		return
 	}
 
-	if schwanz == "" {
+	if tail == "" {
 		v = h.String()
 		return
 	}
 
-	v = fmt.Sprintf("%s/%s", kopf, schwanz)
+	v = fmt.Sprintf("%s/%s", head, tail)
 
 	return
 }

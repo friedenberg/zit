@@ -39,8 +39,10 @@ func (s PrefixSet) Len() int {
 	return s.count
 }
 
-func (s *PrefixSet) AddTransacted(z *sku.Transacted) (err error) {
-	var o obj
+func (s *PrefixSet) AddTransacted(z skuType) (err error) {
+  o := obj{
+    Transacted: sku.GetTransactedPool().Get(),
+  }
 
 	if err = o.Transacted.SetFromSkuLike(z); err != nil {
 		err = errors.Wrap(err)
@@ -58,11 +60,11 @@ func (s *PrefixSet) AddTransacted(z *sku.Transacted) (err error) {
 // this splits on right-expanded
 func (s *PrefixSet) Add(z *obj) (err error) {
 	es := ids.Expanded(
-		z.GetMetadata().Cache.GetImplicitTags(),
+		z.Transacted.GetMetadata().Cache.GetImplicitTags(),
 		expansion.ExpanderRight,
 	).CloneMutableSetPtrLike()
 
-	if err = z.GetMetadata().Cache.GetExpandedTags().EachPtr(
+	if err = z.Transacted.GetMetadata().Cache.GetExpandedTags().EachPtr(
 		es.AddPtr,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -113,7 +115,7 @@ func (s *PrefixSet) addPair(
 	e string,
 	z *obj,
 ) {
-	if e == z.ObjectId.String() {
+	if e == z.Transacted.ObjectId.String() {
 		e = ""
 	}
 
@@ -190,7 +192,7 @@ func (a PrefixSet) Match(
 
 		zSet.Each(
 			func(z *obj) (err error) {
-				es := z.GetTags()
+				es := z.Transacted.GetTags()
 
 				intersection := ids.IntersectPrefixes(
 					es,
@@ -232,7 +234,7 @@ func (a PrefixSet) Subset(
 		zSet.Each(
 			func(z *obj) (err error) {
 				ui.Log().Print(e2, z)
-				intersection := z.Metadata.Cache.TagPaths.All.GetMatching(e2)
+				intersection := z.Transacted.Metadata.Cache.TagPaths.All.GetMatching(e2)
 				hasDirect := false || len(intersection) == 0
 				type match struct {
 					string
