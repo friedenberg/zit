@@ -1,30 +1,12 @@
-package ohio
+package delim_io
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 )
-
-var (
-	poolPrefixOnDelimReader interfaces.Pool[bufio.Reader, *bufio.Reader]
-	poolPrefixOnDelimWriter interfaces.Pool[bufio.Writer, *bufio.Writer]
-)
-
-func init() {
-	poolPrefixOnDelimReader = pool.MakePool[bufio.Reader, *bufio.Reader](
-		nil,
-		nil,
-	)
-	poolPrefixOnDelimWriter = pool.MakePool[bufio.Writer, *bufio.Writer](
-		nil,
-		nil,
-	)
-}
 
 func CopyWithPrefixOnDelim(
 	delim byte,
@@ -32,12 +14,12 @@ func CopyWithPrefixOnDelim(
 	dst io.Writer,
 	src io.Reader,
 ) (n int64, err error) {
-	br := poolPrefixOnDelimReader.Get()
-	defer poolPrefixOnDelimReader.Put(br)
+	br := pool.GetBufioReader().Get()
+	defer pool.GetBufioReader().Put(br)
 	br.Reset(src)
 
-	bw := poolPrefixOnDelimWriter.Get()
-	defer poolPrefixOnDelimWriter.Put(bw)
+	bw := pool.GetBufioWriter().Get()
+	defer pool.GetBufioWriter().Put(bw)
 	defer errors.DeferredFlusher(&err, bw)
 	bw.Reset(dst)
 

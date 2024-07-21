@@ -14,6 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/delim_io"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -122,8 +123,8 @@ func (t *Tai) SetFromRFC3339(v string) (err error) {
 func (t *Tai) Set(v string) (err error) {
 	t.wasSet = true
 
-	dr := ohio.MakeDelimReader('.', strings.NewReader(v))
-	defer ohio.PutDelimReader(dr)
+	dr := delim_io.Make('.', strings.NewReader(v))
+	defer delim_io.PutReader(dr)
 
 	idx := 0
 	var val string

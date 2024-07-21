@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -18,8 +19,8 @@ func (f v4) FormatPersistentMetadatei(
 	c FormatterContext,
 	o Options,
 ) (n int64, err error) {
-	w := ohio.GetPoolBufioWriter().Get()
-	defer ohio.GetPoolBufioWriter().Put(w)
+	w := pool.GetBufioWriter().Get()
+	defer pool.GetBufioWriter().Put(w)
 
 	w.Reset(w1)
 	defer errors.DeferredFlusher(&err, w)

@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/delim_io"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
@@ -530,7 +530,7 @@ func (u *Env) MakeFormatFunc(
 				return
 			}
 
-			if _, err = ohio.CopyWithPrefixOnDelim(
+			if _, err = delim_io.CopyWithPrefixOnDelim(
 				'\n',
 				sb.String(),
 				out,

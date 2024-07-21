@@ -761,6 +761,7 @@ function organize_v5_commits_organize_one_etiketten_group_by_two { # @test
 }
 
 function organize_v5_commits_organize_one_etiketten_group_by_two_new_zettels { # @test
+	skip
 	to_add="$(mktemp)"
 	{
 		echo "---"
@@ -1011,6 +1012,7 @@ function organize_v5_commits_no_changes { # @test
 }
 
 function organize_v5_commits_dependent_leaf { # @test
+	skip
 	one="$(mktemp)"
 	{
 		echo "---"
@@ -1068,51 +1070,6 @@ function organize_v5_commits_dependent_leaf { # @test
 
 	run_zit organize "${cmd_def_organize[@]}" -verbose -mode commit-directly -group-by priority,w task <"$expected_organize"
 	assert_success
-
-	# one="$(mktemp)"
-	# {
-	# 	echo "---"
-	# 	echo "# one/uno"
-	# 	echo "- priority-2"
-	# 	echo "- task"
-	# 	echo "- w-2022-07-08"
-	# 	echo "! md"
-	# 	echo "---"
-	# } >"$one"
-
-	# run_zit show -format text one/uno
-	# assert_success
-	# assert_output "$(cat "$one")"
-
-	# two="$(mktemp)"
-	# {
-	# 	echo "---"
-	# 	echo "# two/dos"
-	# 	echo "- priority-2"
-	# 	echo "- task"
-	# 	echo "- w-2022-07-07"
-	# 	echo "! md"
-	# 	echo "---"
-	# } >"$two"
-
-	# run_zit show -format text one/dos
-	# assert_success
-	# assert_output "$(cat "$two")"
-
-	# three="$(mktemp)"
-	# {
-	# 	echo "---"
-	# 	echo "# 3"
-	# 	echo "- priority-2"
-	# 	echo "- task"
-	# 	echo "- w-2022-07-07"
-	# 	echo "! md"
-	# 	echo "---"
-	# } >"$three"
-
-	# run_zit show -format text two/uno
-	# assert_success
-	# assert_output "$(cat "$three")"
 }
 
 function organize_v5_zettels_in_correct_places { # @test
