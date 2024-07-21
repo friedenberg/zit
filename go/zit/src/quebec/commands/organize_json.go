@@ -115,7 +115,7 @@ func (c *OrganizeJSON) RunWithQuery(
 		return
 	}
 
-	getResults := sku.MakeTransactedMutableSetObjectId()
+	getResults := sku.MakeExternalLikeMutableSet()
 
 	for _, j := range transacted {
 		sk := sku.GetTransactedPool().Get()

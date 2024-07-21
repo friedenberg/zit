@@ -88,10 +88,10 @@ func (t *External) GetSkuExternalLike() sku.ExternalLike {
 }
 
 func (a *External) Clone() sku.ExternalLike {
-  b := GetExternalPool().Get()
-  sku.TransactedResetter.ResetWith(&b.Transacted, &a.Transacted)
-  sku.TransactedResetter.ResetWith(&b.browser, &a.browser)
-  b.item = a.item
+	b := GetExternalPool().Get()
+	sku.TransactedResetter.ResetWith(&b.Transacted, &a.Transacted)
+	sku.TransactedResetter.ResetWith(&b.browser, &a.browser)
+	b.item = a.item
 	return b
 }
 
@@ -111,10 +111,6 @@ func (t *External) SetFromSkuLike(sk sku.SkuLike) (err error) {
 	}
 
 	return
-}
-
-func (a *External) GetObjectId() ids.IdLike {
-	return &a.ObjectId
 }
 
 func (a *External) GetMetadatei() *object_metadata.Metadata {

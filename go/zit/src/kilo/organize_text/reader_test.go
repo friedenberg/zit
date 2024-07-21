@@ -2,7 +2,6 @@ package organize_text
 
 import (
 	"os"
-	"reflect"
 	"strings"
 	"testing"
 
@@ -46,14 +45,16 @@ func makeBez(t *testing.T, v string) (b descriptions.Description) {
 
 func makeObjWithHinAndBez(t *testing.T, hin string, bez string) (o *obj) {
 	o = &obj{
-		Transacted: &sku.Transacted{
-			Metadata: object_metadata.Metadata{
-				Description: makeBez(t, bez),
+		Transacted: &sku.External{
+			Transacted: sku.Transacted{
+				Metadata: object_metadata.Metadata{
+					Description: makeBez(t, bez),
+				},
 			},
 		},
 	}
 
-	o.Transacted.ObjectId.SetWithIdLike(makeZettelId(t, hin))
+	o.Transacted.GetSku().ObjectId.SetWithIdLike(makeZettelId(t, hin))
 
 	return
 }
@@ -77,8 +78,16 @@ func assertEqualObjekten(t *test_logz.T, expected, actual Objects) {
 	actual.Sort()
 	expected.Sort()
 
-	if !reflect.DeepEqual(actual, expected) {
+	if len(actual) != len(expected) {
 		t.Errorf("\nexpected: %s\n  actual: %s", expected, actual)
+	}
+
+	for i := range actual {
+		actualObj, expectedObj := actual[i], expected[i]
+
+		if !actualObj.Transacted.GetSku().Equals(expectedObj.Transacted.GetSku()) {
+			t.Errorf("\nexpected: %s\n  actual: %s", expectedObj, actualObj)
+		}
 	}
 }
 

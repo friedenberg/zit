@@ -1,4 +1,4 @@
-package sku_fmt
+package sku
 
 import (
 	"fmt"
@@ -17,7 +17,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type ObjectIdAlignedFormat interface {
@@ -66,10 +65,8 @@ func (f *Organize) SetMaxKopfUndSchwanz(k, s int) {
 
 func (f *Organize) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
-	el sku.ExternalLike,
+	o *Transacted,
 ) (n int64, err error) {
-	o := el.GetSku()
-
 	var n1 int
 
 	if f.options.PrintTime {
@@ -219,9 +216,9 @@ func (f *Organize) WriteStringFormat(
 
 func (f *Organize) ReadStringFormat(
 	rb *catgut.RingBuffer,
-	el sku.ExternalLike,
+	o *Transacted,
 ) (n int64, err error) {
-	if err = f.readStringFormatWithinBrackets(rb, el); err != nil {
+	if err = f.readStringFormatWithinBrackets(rb, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -237,8 +234,6 @@ func (f *Organize) ReadStringFormat(
 		}
 	}
 
-	o := el.GetSku()
-
 	if err = o.Metadata.Description.TodoSetSlice(sl); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -251,10 +246,8 @@ func (f *Organize) ReadStringFormat(
 
 func (f *Organize) readStringFormatWithinBrackets(
 	rb *catgut.RingBuffer,
-	el sku.ExternalLike,
+	o *Transacted,
 ) (err error) {
-	o := el.GetSku()
-
 	rr := catgut.MakeRingBufferRuneScanner(rb)
 
 	state := 0

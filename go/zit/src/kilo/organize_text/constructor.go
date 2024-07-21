@@ -50,13 +50,15 @@ func (c *constructor) Make() (ot *Text, err error) {
 }
 
 func (c *constructor) collectExplicitAndImplicitFor(
-	skus sku.TransactedSet,
+	skus sku.ExternalLikeSet,
 	re ids.Tag,
 ) (explicitCount, implicitCount int, err error) {
 	res := catgut.MakeFromString(re.String())
 
 	if err = skus.Each(
-		func(sk skuType) (err error) {
+		func(st skuType) (err error) {
+			sk := st.GetSku()
+
 			for _, ewp := range sk.Metadata.Cache.TagPaths.All {
 				if ewp.Tag.String() == sk.ObjectId.String() {
 					continue
@@ -313,11 +315,9 @@ func (c *constructor) cloneObj(
 ) (z *obj, err error) {
 	errors.TodoP4("add bez in a better way")
 
-	z = &obj{Type: named.Type, Transacted: sku.GetTransactedPool().Get()}
-
-	if err = z.Transacted.SetFromSkuLike(named.Transacted); err != nil {
-		err = errors.Wrap(err)
-		return
+	z = &obj{
+		Type:       named.Type,
+		Transacted: named.Transacted.Clone(),
 	}
 
 	if err = c.removeTagsIfNecessary(z); err != nil {
@@ -335,11 +335,11 @@ func (c *constructor) removeTagsIfNecessary(
 		return
 	}
 
-	if o.Transacted.Metadata.Description.IsEmpty() {
+	if o.Transacted.GetSku().Metadata.Description.IsEmpty() {
 		return
 	}
 
-	o.Transacted.Metadata.ResetTags()
+	o.Transacted.GetSku().Metadata.ResetTags()
 
 	return
 }

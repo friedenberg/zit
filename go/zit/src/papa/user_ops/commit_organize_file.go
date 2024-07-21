@@ -24,7 +24,9 @@ func (c CommitOrganizeFile) ApplyToText(
 	}
 
 	if err = t.Transacted.Each(
-		func(sk *sku.Transacted) (err error) {
+		func(el sku.ExternalLike) (err error) {
+			sk := el.GetSku()
+
 			if sk.Metadata.Description.IsEmpty() {
 				return
 			}
@@ -44,20 +46,7 @@ func (c CommitOrganizeFile) ApplyToText(
 func (op CommitOrganizeFile) Run(
 	u *env.Env,
 	a, b *organize_text.Text,
-	original sku.TransactedSet,
-) (results CommitOrganizeFileResults, err error) {
-	if results, err = op.run(u, a, b, original); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (op CommitOrganizeFile) run(
-	u *env.Env,
-	a, b *organize_text.Text,
-	original sku.TransactedSet,
+	original sku.ExternalLikeSet,
 ) (cs CommitOrganizeFileResults, err error) {
 	if err = op.ApplyToText(u, a); err != nil {
 		err = errors.Wrap(err)
@@ -80,10 +69,10 @@ func (op CommitOrganizeFile) run(
 	// }
 
 	if err = cs.Changed.Each(
-		func(changed *sku.Transacted) (err error) {
-      // TODO switch to external
+		func(changed sku.ExternalLike) (err error) {
+			// TODO switch to external
 			if err = u.GetStore().CreateOrUpdateFromTransacted(
-				changed,
+				changed.GetSku(),
 				objekte_mode.Make(
 					objekte_mode.ModeMergeCheckedOut,
 				),

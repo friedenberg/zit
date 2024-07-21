@@ -22,3 +22,11 @@ func MakeAddClonePoolPtrFunc[E any, EPtr interfaces.Ptr[E]](
 		return AddClonePoolPtr(s, p, r, e)
 	})
 }
+
+func MakeAddClonerPtrFunc[E interfaces.Cloner[E]](
+	s interfaces.Adder[E],
+) interfaces.FuncIter[E] {
+	return MakeSyncSerializer(func(e E) (err error) {
+		return s.Add(e.Clone())
+	})
+}

@@ -39,12 +39,13 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 	otFlags := organize_text.MakeFlagsWithMetadata(u.Metadata)
 	u.ApplyToOrganizeOptions(&otFlags.Options)
 	// otFlags.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
-	mwk := sku.MakeTransactedMutableSet()
+	mwk := sku.MakeExternalLikeMutableSet()
 	skus.Each(
 		func(z *sku.Transacted) (err error) {
 			return mwk.Add(z)
 		},
 	)
+
 	otFlags.Transacted = mwk
 
 	createOrganizeFileOp := CreateOrganizeFile{

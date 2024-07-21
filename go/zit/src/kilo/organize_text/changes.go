@@ -56,17 +56,17 @@ func (sm SkuMapWithOrder) Sort() {
 
 	sort.Slice(out, func(i, j int) bool {
 		switch {
-		case out[i].ObjectId.IsEmpty() && out[j].ObjectId.IsEmpty():
-			return out[i].Metadata.Description.String() < out[j].Metadata.Description.String()
+		case out[i].GetSku().ObjectId.IsEmpty() && out[j].GetSku().ObjectId.IsEmpty():
+			return out[i].GetSku().Metadata.Description.String() < out[j].GetSku().Metadata.Description.String()
 
-		case out[i].ObjectId.IsEmpty():
+		case out[i].GetSku().ObjectId.IsEmpty():
 			return true
 
-		case out[j].ObjectId.IsEmpty():
+		case out[j].GetSku().ObjectId.IsEmpty():
 			return false
 
 		default:
-			return out[i].ObjectId.String() < out[j].ObjectId.String()
+			return out[i].GetSku().ObjectId.String() < out[j].GetSku().ObjectId.String()
 		}
 	})
 }
@@ -105,7 +105,7 @@ type Changes struct {
 
 func ChangesFrom(
 	a, b *Text,
-	original sku.TransactedSet,
+	original sku.ExternalLikeSet,
 ) (c Changes, err error) {
 	if c.a, err = a.GetSkus(original); err != nil {
 		err = errors.Wrap(err)

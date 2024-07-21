@@ -19,6 +19,20 @@ type Transacted struct {
 	Metadata object_metadata.Metadata
 }
 
+func (t *Transacted) GetSkuExternalLike() ExternalLike {
+	return t
+}
+
+func (a *Transacted) Clone() ExternalLike {
+	b := GetTransactedPool().Get()
+	TransactedResetter.ResetWith(b, a)
+	return b
+}
+
+func (t *Transacted) GetSku() *Transacted {
+	return t
+}
+
 func (t *Transacted) GetSkuLike() SkuLike {
 	return t
 }

@@ -4,10 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/vim_cli_options_builder"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/organize_text_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
@@ -90,15 +90,16 @@ func (c *Organize) RunWithQuery(
 		createOrganizeFileOp.Type = typen.Any()
 	}
 
-	getResults := sku.MakeTransactedMutableSet()
+	getResults := sku.MakeExternalLikeMutableSet()
+	var l sync.Mutex
 
 	if err = u.GetStore().QueryWithKasten(
 		eqwk,
-		iter.MakeAddClonePoolPtrFunc(
-			getResults,
-			sku.GetTransactedPool(),
-			sku.TransactedResetter,
-		),
+		func(sk *sku.Transacted) (err error) {
+			l.Lock()
+			defer l.Unlock()
+			return getResults.Add(sk.Clone())
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return

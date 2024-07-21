@@ -93,6 +93,10 @@ type Adder[E any] interface {
 	Add(E) error
 }
 
+type Cloner[E any] interface {
+	Clone() E
+}
+
 type AdderPtr[E any, EPtr Ptr[E]] interface {
 	AddPtr(EPtr) error
 }

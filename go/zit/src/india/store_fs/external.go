@@ -24,7 +24,7 @@ func (t *External) GetSkuExternalLike() sku.ExternalLike {
 func (a *External) Clone() sku.ExternalLike {
 	b := GetExternalPool().Get()
 	sku.TransactedResetter.ResetWith(&b.Transacted, &a.Transacted)
-  b.FDs.ResetWith(&a.FDs)
+	b.FDs.ResetWith(&a.FDs)
 	return b
 }
 

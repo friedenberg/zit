@@ -9,8 +9,8 @@ import (
 )
 
 func key(sk skuType) string {
-	if sk.ObjectId.IsEmpty() {
-		s := sk.Metadata.Description.String()
+	if sk.GetSku().ObjectId.IsEmpty() {
+		s := sk.GetSku().Metadata.Description.String()
 
 		if s == "" {
 			panic("empty key")
@@ -18,12 +18,12 @@ func key(sk skuType) string {
 
 		return s
 	} else {
-		return sk.ObjectId.String()
+		return sk.GetSku().ObjectId.String()
 	}
 }
 
 func (ot *Text) GetSkus(
-	original sku.TransactedSet,
+	original sku.ExternalLikeSet,
 ) (out SkuMapWithOrder, err error) {
 	out = MakeSkuMapWithOrder(original.Len())
 
@@ -42,7 +42,7 @@ func (ot *Text) GetSkus(
 func (a *Assignment) addToSet(
 	ot *Text,
 	out SkuMapWithOrder,
-	original sku.TransactedSet,
+	original sku.ExternalLikeSet,
 ) (err error) {
 	expanded := ids.MakeTagMutableSet()
 
@@ -59,20 +59,20 @@ func (a *Assignment) addToSet(
 			if z, ok = out.m[key(o.Transacted)]; !ok {
 				z = sku.GetTransactedPool().Get()
 
-				if err = z.SetFromSkuLike(o.Transacted); err != nil {
+				if err = z.GetSku().SetFromSkuLike(o.Transacted.GetSku()); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 
 				if err = ot.EachPtr(
-					z.AddTagPtr,
+					z.GetSku().AddTagPtr,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 
 				if !ot.Metadata.Typ.IsEmpty() {
-					z.Metadata.Type.ResetWith(ot.Metadata.Typ)
+					z.GetSku().Metadata.Type.ResetWith(ot.Metadata.Typ)
 				}
 
 				out.Add(z)
@@ -80,29 +80,29 @@ func (a *Assignment) addToSet(
 				zPrime, hasOriginal := original.Get(original.Key(o.Transacted))
 
 				if hasOriginal {
-					z.Metadata.Blob.ResetWith(&zPrime.Metadata.Blob)
-					z.Metadata.Type.ResetWith(zPrime.Metadata.Type)
+					z.GetSku().Metadata.Blob.ResetWith(&zPrime.GetSku().Metadata.Blob)
+					z.GetSku().Metadata.Type.ResetWith(zPrime.GetSku().Metadata.Type)
 				}
 
 				if !ot.Metadata.Typ.IsEmpty() {
-					z.Metadata.Type.ResetWith(ot.Metadata.Typ)
+					z.GetSku().Metadata.Type.ResetWith(ot.Metadata.Typ)
 				}
 			}
 
-			if o.Transacted.ObjectId.String() == "" {
+			if o.Transacted.GetSku().ObjectId.String() == "" {
 				panic(fmt.Sprintf("%s: object id is nil", o))
 			}
 
-			if err = z.Metadata.Description.Set(
-				o.Transacted.Metadata.Description.String(),
+			if err = z.GetSku().Metadata.Description.Set(
+				o.Transacted.GetSku().Metadata.Description.String(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if !o.Transacted.Metadata.Type.IsEmpty() {
-				if err = z.Metadata.Type.Set(
-					o.Transacted.Metadata.Type.String(),
+			if !o.Transacted.GetSku().Metadata.Type.IsEmpty() {
+				if err = z.GetSku().Metadata.Type.Set(
+					o.Transacted.GetSku().Metadata.Type.String(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -113,20 +113,20 @@ func (a *Assignment) addToSet(
 				return
 			}
 
-			z.Metadata.Comments = append(
-				z.Metadata.Comments,
-				o.Transacted.Metadata.Comments...,
+			z.GetSku().Metadata.Comments = append(
+				z.GetSku().Metadata.Comments,
+				o.Transacted.GetSku().Metadata.Comments...,
 			)
 
-			if err = o.Transacted.Metadata.GetTags().EachPtr(
-				z.AddTagPtr,
+			if err = o.Transacted.GetSku().Metadata.GetTags().EachPtr(
+				z.GetSku().AddTagPtr,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 			if err = expanded.EachPtr(
-				z.AddTagPtr,
+				z.GetSku().AddTagPtr,
 			); err != nil {
 				err = errors.Wrap(err)
 				return

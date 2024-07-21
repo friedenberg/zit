@@ -11,7 +11,9 @@ import (
 )
 
 func (s *Env) GetSkuFromString(lv string) (sk *sku.Transacted, err error) {
-	sk = sku.GetTransactedPool().Get()
+	e := sku.GetExternalPool().Get()
+	sk = e.GetSku()
+
 	defer func() {
 		if err != nil {
 			return
@@ -29,7 +31,7 @@ func (s *Env) GetSkuFromString(lv string) (sk *sku.Transacted, err error) {
 
 	rb := catgut.MakeRingBuffer(strings.NewReader(lv), 0)
 
-	if _, err = s.luaSkuFormat.ReadStringFormat(rb, sk); err == nil {
+	if _, err = s.luaSkuFormat.ReadStringFormat(rb, e); err == nil {
 		return
 	}
 

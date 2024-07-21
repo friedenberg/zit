@@ -46,7 +46,7 @@ type (
 
 		GetTai() ids.Tai
 		GetType() ids.Type
-		GetObjectId() *ids.ObjectId
+		ids.ObjectIdGetter
 		GetObjectSha() interfaces.Sha
 		GetBlobSha() interfaces.Sha
 		GetKey() string
@@ -69,15 +69,16 @@ type (
 		GetSku() *Transacted
 	}
 
-	ExternalLikeGetter interface {
-		GetSkuExternalLike() ExternalLike
-	}
-
 	ExternalLike interface {
+		ids.ObjectIdGetter
 		interfaces.Stringer
 		TransactedGetter
 		ExternalLikeGetter
 		Clone() ExternalLike
+	}
+
+	ExternalLikeGetter interface {
+		GetSkuExternalLike() ExternalLike
 	}
 
 	CheckedOutLike interface {

@@ -23,14 +23,14 @@ type Metadata struct {
 }
 
 func (m Metadata) RemoveFromTransacted(sk skuType) (err error) {
-	mes := sk.Metadata.GetTags().CloneMutableSetPtrLike()
+	mes := sk.GetSku().Metadata.GetTags().CloneMutableSetPtrLike()
 
 	if err = m.Each(mes.Del); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	sk.Metadata.SetTags(mes)
+	sk.GetSku().Metadata.SetTags(mes)
 
 	return
 }

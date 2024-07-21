@@ -57,7 +57,7 @@ func MakeFlags() Flags {
 		Options: Options{
 			wasMade:      true,
 			GroupingTags: ids.MakeTagSlice(),
-			Transacted:   sku.MakeTransactedMutableSet(),
+			Transacted:   sku.MakeExternalLikeMutableSet(),
 		},
 	}
 }
@@ -75,7 +75,7 @@ func MakeFlagsWithMetadata(m object_metadata.Metadata) Flags {
 			rootTags:     m.GetTags(),
 			wasMade:      true,
 			GroupingTags: ids.MakeTagSlice(),
-			Transacted:   sku.MakeTransactedMutableSet(),
+			Transacted:   sku.MakeExternalLikeMutableSet(),
 		},
 	}
 }

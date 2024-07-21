@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type PrefixSet struct {
@@ -40,13 +39,8 @@ func (s PrefixSet) Len() int {
 }
 
 func (s *PrefixSet) AddTransacted(z skuType) (err error) {
-  o := obj{
-    Transacted: sku.GetTransactedPool().Get(),
-  }
-
-	if err = o.Transacted.SetFromSkuLike(z); err != nil {
-		err = errors.Wrap(err)
-		return
+	o := obj{
+		Transacted: z.Clone(),
 	}
 
 	if err = s.Add(&o); err != nil {
@@ -60,11 +54,11 @@ func (s *PrefixSet) AddTransacted(z skuType) (err error) {
 // this splits on right-expanded
 func (s *PrefixSet) Add(z *obj) (err error) {
 	es := ids.Expanded(
-		z.Transacted.GetMetadata().Cache.GetImplicitTags(),
+		z.Transacted.GetSku().GetMetadata().Cache.GetImplicitTags(),
 		expansion.ExpanderRight,
 	).CloneMutableSetPtrLike()
 
-	if err = z.Transacted.GetMetadata().Cache.GetExpandedTags().EachPtr(
+	if err = z.Transacted.GetSku().GetMetadata().Cache.GetExpandedTags().EachPtr(
 		es.AddPtr,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -115,7 +109,7 @@ func (s *PrefixSet) addPair(
 	e string,
 	z *obj,
 ) {
-	if e == z.Transacted.ObjectId.String() {
+	if e == z.Transacted.GetSku().ObjectId.String() {
 		e = ""
 	}
 
@@ -192,7 +186,7 @@ func (a PrefixSet) Match(
 
 		zSet.Each(
 			func(z *obj) (err error) {
-				es := z.Transacted.GetTags()
+				es := z.Transacted.GetSku().GetTags()
 
 				intersection := ids.IntersectPrefixes(
 					es,
@@ -234,7 +228,7 @@ func (a PrefixSet) Subset(
 		zSet.Each(
 			func(z *obj) (err error) {
 				ui.Log().Print(e2, z)
-				intersection := z.Transacted.Metadata.Cache.TagPaths.All.GetMatching(e2)
+				intersection := z.Transacted.GetSku().Metadata.Cache.TagPaths.All.GetMatching(e2)
 				hasDirect := false || len(intersection) == 0
 				type match struct {
 					string

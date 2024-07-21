@@ -10,14 +10,14 @@ import (
 )
 
 var (
-	transactedKeyerObjectId interfaces.StringKeyer[*Transacted]
-	TransactedSetEmpty      TransactedSet
-	TransactedLessor        transactedLessor
-	TransactedEqualer       transactedEqualer
+	transactedKeyerObjectId   ids.ObjectIdKeyer[*Transacted]
+	externalLikeKeyerObjectId ids.ObjectIdKeyer[ExternalLike]
+	TransactedSetEmpty        TransactedSet
+	TransactedLessor          transactedLessor
+	TransactedEqualer         transactedEqualer
 )
 
 func init() {
-	transactedKeyerObjectId = &ids.ObjectIdKeyer[Transacted, *Transacted]{}
 	gob.Register(transactedKeyerObjectId)
 
 	TransactedSetEmpty = MakeTransactedSet()
@@ -29,6 +29,9 @@ type (
 	TransactedSet        = interfaces.SetLike[*Transacted]
 	TransactedMutableSet = interfaces.MutableSetLike[*Transacted]
 	TransactedHeap       = heap.Heap[Transacted, *Transacted]
+
+	ExternalLikeSet        = interfaces.SetLike[ExternalLike]
+	ExternalLikeMutableSet = interfaces.MutableSetLike[ExternalLike]
 
 	CheckedOutSet            = interfaces.SetLike[*CheckedOut]
 	CheckedOutMutableSet     = interfaces.MutableSetLike[*CheckedOut]
@@ -56,10 +59,12 @@ func MakeTransactedMutableSet() TransactedMutableSet {
 	return collections_value.MakeMutableValueSet(transactedKeyerObjectId)
 }
 
-func MakeTransactedMutableSetObjectId() TransactedMutableSet {
-	return collections_value.MakeMutableValueSet(
-		ids.ObjectIdKeyer[Transacted, *Transacted]{},
-	)
+func MakeExternalLikeSet() ExternalLikeSet {
+	return collections_value.MakeValueSet(externalLikeKeyerObjectId)
+}
+
+func MakeExternalLikeMutableSet() ExternalLikeMutableSet {
+	return collections_value.MakeMutableValueSet(externalLikeKeyerObjectId)
 }
 
 func MakeCheckedOutLikeMutableSet() CheckedOutLikeMutableSet {

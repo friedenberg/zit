@@ -1,19 +1,13 @@
 package ids
 
-import "code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-
 type ObjectIdGetter interface {
 	GetObjectId() *ObjectId
 }
 
 type ObjectIdKeyer[
-	T any,
-	TPtr interface {
-		interfaces.Ptr[T]
-		ObjectIdGetter
-	},
+	T ObjectIdGetter,
 ] struct{}
 
-func (sk ObjectIdKeyer[T, TPtr]) GetKey(e TPtr) string {
+func (sk ObjectIdKeyer[T]) GetKey(e T) string {
 	return e.GetObjectId().String()
 }

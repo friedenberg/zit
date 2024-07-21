@@ -276,7 +276,7 @@ func (ar *assignmentLineReader) readOneObj(
 	// logz.Print("reading one zettel", l)
 
 	var z obj
-  z.Transacted = sku.GetTransactedPool().Get()
+	z.Transacted = sku.GetTransactedPool().Get()
 	z.Type = t
 
 	if _, err = ar.stringFormatReader.ReadStringFormat(r, z.Transacted); err != nil {
@@ -289,9 +289,9 @@ func (ar *assignmentLineReader) readOneObj(
 		return
 	}
 
-	if z.Transacted.ObjectId.IsEmpty() {
+	if z.Transacted.GetSku().ObjectId.IsEmpty() {
 		// set empty hinweis to ensure middle is '/'
-		if err = z.Transacted.ObjectId.SetWithIdLike(ids.ZettelId{}); err != nil {
+		if err = z.Transacted.GetSku().ObjectId.SetWithIdLike(ids.ZettelId{}); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -301,7 +301,7 @@ func (ar *assignmentLineReader) readOneObj(
 		return
 	}
 
-	if err = ar.options.Abbr.ExpandZettelIdOnly(&z.Transacted.ObjectId); err != nil {
+	if err = ar.options.Abbr.ExpandZettelIdOnly(&z.Transacted.GetSku().ObjectId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

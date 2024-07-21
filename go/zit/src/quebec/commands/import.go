@@ -134,7 +134,7 @@ func (c Import) Run(u *env.Env, args ...string) (err error) {
 		}
 
 		if err = c.importBlobIfNecessary(u, co, &ag, coPrinter); err != nil {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(err, "Checked Out: %q", co)
 			return
 		}
 
@@ -182,7 +182,7 @@ func (c Import) importBlobIfNecessary(
 			co.SetError(errors.New("blob missing"))
 			err = coErrPrinter(co)
 		} else {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(err, "Path: %q", p)
 		}
 
 		return
