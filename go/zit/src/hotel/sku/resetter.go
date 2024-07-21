@@ -33,3 +33,19 @@ func (externalResetter) ResetWith(a *External, b *External) {
 	errors.PanicIfError(a.ObjectId.ResetWithIdLike(&b.ObjectId))
 	object_metadata.Resetter.ResetWith(&a.Metadata, &b.Metadata)
 }
+
+var Resetter resetter
+
+type resetter struct{}
+
+func (resetter) Reset(sl TransactedGetter) {
+	a := sl.GetSku()
+	a.ObjectId.SetGenre(genres.Unknown)
+	object_metadata.Resetter.Reset(&a.Metadata)
+}
+
+func (resetter) ResetWith(asl, bsl TransactedGetter) {
+	a, b := asl.GetSku(), bsl.GetSku()
+	errors.PanicIfError(a.ObjectId.ResetWithIdLike(&b.ObjectId))
+	object_metadata.Resetter.ResetWith(&a.Metadata, &b.Metadata)
+}

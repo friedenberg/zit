@@ -138,10 +138,7 @@ func (s *Store) tryRealizeAndOrStore(
 		ids.Equals(kinder.GetObjectId(), mutter.GetObjectId()) &&
 		kinder.Metadata.EqualsSansTai(&mutter.Metadata) {
 
-		if err = kinder.SetFromSkuLike(mutter); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		sku.TransactedResetter.ResetWith(kinder, mutter)
 
 		if o.Mode.Contains(objekte_mode.ModeSchwanz) {
 			if err = s.Unchanged(kinder); err != nil {
@@ -278,10 +275,7 @@ func (s *Store) commitTransacted(
 ) (err error) {
 	sk := sku.GetTransactedPool().Get()
 
-	if err = sk.SetFromSkuLike(kinder); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	sku.TransactedResetter.ResetWith(sk, kinder)
 
 	if err = s.inventoryList.Add(sk); err != nil {
 		err = errors.Wrap(err)
@@ -314,10 +308,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 
 	transactedPtr = sku.GetTransactedPool().Get()
 
-	if err = transactedPtr.SetFromSkuLike(e); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	sku.TransactedResetter.ResetWith(transactedPtr, e)
 
 	type blobSaver interface {
 		SaveBlob(s fs_home.Home) (err error)

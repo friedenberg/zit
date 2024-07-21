@@ -18,7 +18,7 @@ func (t *External) GetSkuExternalLike() ExternalLike {
 }
 
 func (a *External) Clone() ExternalLike {
-	b := &External{}
+	b := GetExternalPool().Get()
 	TransactedResetter.ResetWith(&b.Transacted, &a.Transacted)
 	return b
 }

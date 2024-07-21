@@ -366,10 +366,7 @@ func (u *Env) PrinterMatching() sku.IterMatching {
 					return
 				}
 
-				if err = co.GetSku().SetFromSkuLike(sk); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+        sku.TransactedResetter.ResetWith(co.GetSku(), sk)
 
 				if err = pco(co); err != nil {
 					err = errors.Wrap(err)

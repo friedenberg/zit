@@ -36,6 +36,7 @@ type objectId2 struct {
 	middle      byte // remove and replace with virtual
 	left, right catgut.String
 	repoId      catgut.String
+	// Domain
 }
 
 func (a *objectId2) Clone() (b *objectId2) {

@@ -45,7 +45,7 @@ func (s *Store) ReadOneInto(
 		sk = &s.GetKonfig().Sku
 
 		if sk.GetTai().IsEmpty() {
-      ui.Err().Print("config tai is empty")
+			ui.Err().Print("config tai is empty")
 		}
 
 	default:
@@ -58,10 +58,7 @@ func (s *Store) ReadOneInto(
 		return
 	}
 
-	if err = out.SetFromSkuLike(sk); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	sku.TransactedResetter.ResetWith(out, sk)
 
 	return
 }

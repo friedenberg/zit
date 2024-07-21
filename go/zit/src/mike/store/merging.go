@@ -52,10 +52,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 	transactedPtrCopy := sku.GetTransactedPool().Get()
 	defer sku.GetTransactedPool().Put(transactedPtrCopy)
 
-	if err = transactedPtrCopy.SetFromSkuLike(kinder); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	sku.TransactedResetter.ResetWith(transactedPtrCopy, kinder)
 
 	tm := sku.Conflicted{
 		CheckedOutLike: col,
