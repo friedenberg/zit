@@ -33,29 +33,8 @@ func (t *Transacted) GetSku() *Transacted {
 	return t
 }
 
-func (t *Transacted) GetSkuLike() SkuLike {
-	return t
-}
-
 func (a *Transacted) SetFromTransacted(b *Transacted) (err error) {
 	TransactedResetter.ResetWith(a, b)
-
-	return
-}
-
-func (t *Transacted) SetFromSkuLike(sk SkuLike) (err error) {
-	if err = t.ObjectId.SetWithIdLike(sk.GetObjectId()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = t.SetObjectSha(sk.GetObjectSha()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	object_metadata.Resetter.ResetWith(&t.Metadata, sk.GetMetadata())
-	t.GetMetadata().Tai = sk.GetTai()
 
 	return
 }
@@ -64,10 +43,6 @@ func (a *Transacted) Less(b *Transacted) bool {
 	less := a.GetTai().Less(b.GetTai())
 
 	return less
-}
-
-func (a *Transacted) GetSkuLikePtr() SkuLike {
-	return a
 }
 
 func (a *Transacted) GetTags() ids.TagSet {
@@ -130,10 +105,6 @@ func (a *Transacted) SetObjectIdLike(kl ids.IdLike) (err error) {
 	}
 
 	return
-}
-
-func (a *Transacted) EqualsSkuLikePtr(b SkuLike) bool {
-	return values.Equals(a, b) || values.EqualsPtr(a, b)
 }
 
 func (a *Transacted) EqualsAny(b any) (ok bool) {
@@ -271,8 +242,4 @@ type transactedEqualer struct{}
 
 func (transactedEqualer) Equals(a, b *Transacted) bool {
 	return a.Equals(b)
-}
-
-func (transactedEqualer) EqualsPtr(a, b *Transacted) bool {
-	return a.EqualsSkuLikePtr(b)
 }

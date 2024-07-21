@@ -15,9 +15,7 @@ func (s *Store) Import(external *sku.Transacted) (co *store_fs.CheckedOut, err e
 	co = store_fs.GetCheckedOutPool().Get()
 	co.IsImport = true
 
-	if err = co.External.Transacted.SetFromSkuLike(external); err != nil {
-		panic(err)
-	}
+	sku.Resetter.ResetWith(&co.External, external)
 
 	if err = external.CalculateObjectShas(); err != nil {
 		co.SetError(err)

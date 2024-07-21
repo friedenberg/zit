@@ -168,10 +168,7 @@ func (k *compiled) addTag(
 
 	var b tag
 
-	if err = b.Transacted.SetFromSkuLike(kinder); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+  sku.Resetter.ResetWith(&b.Transacted, kinder)
 
 	if didChange, err = iter.AddOrReplaceIfGreater(k.Tags, &b); err != nil {
 		err = errors.Wrap(err)

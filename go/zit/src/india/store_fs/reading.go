@@ -48,10 +48,7 @@ func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 		return
 	}
 
-	if err = z.SetFromSkuLike(&e2.Transacted); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	sku.Resetter.ResetWith(z, e2)
 
 	return
 }

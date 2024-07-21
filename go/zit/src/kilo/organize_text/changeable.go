@@ -59,10 +59,7 @@ func (a *Assignment) addToSet(
 			if z, ok = out.m[key(o.Transacted)]; !ok {
 				z = sku.GetTransactedPool().Get()
 
-				if err = z.GetSku().SetFromSkuLike(o.Transacted.GetSku()); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+				sku.TransactedResetter.ResetWith(z.GetSku(), o.Transacted.GetSku())
 
 				if err = ot.EachPtr(
 					z.GetSku().AddTagPtr,

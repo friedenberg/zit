@@ -224,10 +224,7 @@ func (s *Store) RunMergeTool(
 	e := GetExternalPool().Get()
 	defer GetExternalPool().Put(e)
 
-	if err = e.SetFromSkuLike(&leftCO.External); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+  e.ResetWith(&leftCO.External)
 
 	if err = s.ReadOneExternalObjectReader(f, e); err != nil {
 		err = errors.Wrap(err)
@@ -241,10 +238,7 @@ func (s *Store) RunMergeTool(
 
 	co = GetCheckedOutPool().Get()
 
-	if err = co.External.SetFromSkuLike(e); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+  co.External.ResetWith(e)
 
 	return
 }

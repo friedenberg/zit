@@ -32,18 +32,9 @@ func (c *External) GetSku() *sku.Transacted {
 	return &c.Transacted
 }
 
-func (t *External) SetFromSkuLike(sk sku.SkuLike) (err error) {
-	switch skt := sk.(type) {
-	case *External:
-		t.FDs.ResetWith(skt.GetFDs())
-	}
-
-	if err = t.Transacted.SetFromSkuLike(sk); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
+func (a *External) ResetWith(b *External) {
+	a.FDs.ResetWith(b.GetFDs())
+	sku.Resetter.ResetWith(a, b)
 }
 
 func (a *External) GetObjectId() *ids.ObjectId {
@@ -160,8 +151,4 @@ type equalerExternal struct{}
 
 func (equalerExternal) Equals(a, b External) bool {
 	panic("not supported")
-}
-
-func (equalerExternal) EqualsPtr(a, b *External) bool {
-	return a.EqualsSkuLikePtr(b)
 }

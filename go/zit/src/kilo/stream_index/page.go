@@ -88,10 +88,7 @@ func (pt *Page) add(
 ) (err error) {
 	z := sku.GetTransactedPool().Get()
 
-	if err = z.SetFromSkuLike(z1); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	sku.TransactedResetter.ResetWith(z, z1)
 
 	if mode.Contains(objekte_mode.ModeSchwanz) {
 		pt.addedLatest.Add(z)

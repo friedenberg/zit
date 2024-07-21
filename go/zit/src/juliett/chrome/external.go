@@ -99,20 +99,6 @@ func (c *External) GetSku() *sku.Transacted {
 	return &c.Transacted
 }
 
-func (t *External) SetFromSkuLike(sk sku.SkuLike) (err error) {
-	// switch skt := sk.(type) {
-	// case *External:
-	// TODO reset item with other item
-	// }
-
-	if err = t.Transacted.SetFromSkuLike(sk); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (a *External) GetMetadatei() *object_metadata.Metadata {
 	return &a.Metadata
 }
@@ -153,8 +139,4 @@ type equalerExternal struct{}
 
 func (equalerExternal) Equals(a, b External) bool {
 	panic("not supported")
-}
-
-func (equalerExternal) EqualsPtr(a, b *External) bool {
-	return a.EqualsSkuLikePtr(&b.Transacted)
 }

@@ -168,10 +168,7 @@ func (k *compiled) setTransacted(
 
 	didChange = true
 
-	if err = k.Sku.SetFromSkuLike(kt1); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	sku.Resetter.ResetWith(&k.Sku, kt1)
 
 	k.setHasChanges(fmt.Sprintf("updated konfig: %s", &k.Sku))
 
@@ -195,10 +192,7 @@ func (k *compiled) addRepo(
 
 	b := sku.GetTransactedPool().Get()
 
-	if err = b.SetFromSkuLike(c); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	sku.Resetter.ResetWith(b, c)
 
 	if didChange, err = iter.AddOrReplaceIfGreater(
 		k.Repos,
@@ -274,10 +268,7 @@ func (k *compiled) addType(
 
 	b := sku.GetTransactedPool().Get()
 
-	if err = b.SetFromSkuLike(b1); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	sku.Resetter.ResetWith(b, b1)
 
 	k.lock.Lock()
 	defer k.lock.Unlock()

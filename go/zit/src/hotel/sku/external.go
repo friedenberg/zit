@@ -27,15 +27,6 @@ func (c *External) GetSku() *Transacted {
 	return &c.Transacted
 }
 
-func (t *External) SetFromSkuLike(sk SkuLike) (err error) {
-	if err = t.Transacted.SetFromSkuLike(sk); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (a *External) GetObjectIdLike() ids.IdLike {
 	return &a.ObjectId
 }

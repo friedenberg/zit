@@ -138,11 +138,7 @@ func (s *Store) QueryUntrackedBlobs(
 				fr.External.SetBlobSha(z.GetBlobSha())
 				fr.State = checked_out_state.StateRecognized
 
-				if err = fr.Internal.SetFromSkuLike(z); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
+				sku.Resetter.ResetWith(&fr.Internal, z)
 				sku.Resetter.ResetWith(&fr.External, z)
 
 				if err = fr.External.SetObjectSha(z.GetObjectSha()); err != nil {

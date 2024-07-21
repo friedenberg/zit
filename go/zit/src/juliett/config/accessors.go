@@ -29,8 +29,7 @@ func (kc *compiled) getType(k ids.IdLike) (ct *sku.Transacted) {
 	}
 
 	if ct1, ok := kc.Types.Get(k.String()); ok {
-		ct = sku.GetTransactedPool().Get()
-		errors.PanicIfError(ct.SetFromSkuLike(ct1))
+		ct = ct1.Clone().GetSku()
 	}
 
 	return
@@ -42,8 +41,7 @@ func (kc *compiled) getRepo(k ids.IdLike) (ct *sku.Transacted) {
 	}
 
 	if ct1, ok := kc.Repos.Get(k.String()); ok {
-		ct = sku.GetTransactedPool().Get()
-		errors.PanicIfError(ct.SetFromSkuLike(ct1))
+		ct = ct1.Clone().GetSku()
 	}
 
 	return
@@ -176,10 +174,7 @@ func (c *compiled) getSortedTagsExpanded(
 
 			ct1 := sku.GetTransactedPool().Get()
 
-			if err = ct1.SetFromSkuLike(&ct.Transacted); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+			sku.Resetter.ResetWith(ct1, &ct.Transacted)
 
 			expandedActual = append(expandedActual, ct1)
 

@@ -56,10 +56,7 @@ func (s *Store) checkoutOneNew(
 				return
 			}
 		} else {
-			if err = cz.External.SetFromSkuLike(cze); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+			cz.External.ResetWith(cze)
 
 			sku.DetermineState(cz, true)
 
@@ -196,10 +193,7 @@ func (s *Store) checkoutOne(
 		}
 	}
 
-	if err = cz.External.SetFromSkuLike(&cz.Internal); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	sku.Resetter.ResetWith(&cz.External, &cz.Internal)
 
 	if err = s.fileEncoder.Encode(
 		options.TextFormatterOptions,
