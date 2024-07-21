@@ -24,8 +24,6 @@ type MetadataWriterTo interface {
 
 type Metadata struct {
 	// StoreVersion values.Int
-	// Domain
-	RepoId      ids.RepoId
 	Description descriptions.Description
 	Tags        ids.TagMutableSet // public for gob, but should be private
 	Type        ids.Type
