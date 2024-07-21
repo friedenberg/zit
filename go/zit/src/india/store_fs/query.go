@@ -143,10 +143,7 @@ func (s *Store) QueryUntrackedBlobs(
 					return
 				}
 
-				if err = fr.External.SetFromSkuLike(z); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+				sku.Resetter.ResetWith(&fr.External, z)
 
 				if err = fr.External.SetObjectSha(z.GetObjectSha()); err != nil {
 					err = errors.Wrap(err)

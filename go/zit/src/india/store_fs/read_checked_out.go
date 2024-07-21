@@ -61,10 +61,7 @@ func (s *Store) ReadIntoCheckedOutFromTransacted(
 	co *CheckedOut,
 ) (err error) {
 	if &co.Internal != sk {
-		if err = co.Internal.SetFromSkuLike(sk); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		sku.Resetter.ResetWith(&co.Internal, sk)
 	}
 
 	ok := false
