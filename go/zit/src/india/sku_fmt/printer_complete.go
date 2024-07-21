@@ -67,11 +67,7 @@ func (w *WriterComplete) WriteOne(
 	}
 
 	sk := w.pool.Get()
-
-	if err = sk.SetFromSkuLike(z); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	sku.Resetter.ResetWith(sk, z)
 
 	select {
 	case <-w.chDone:

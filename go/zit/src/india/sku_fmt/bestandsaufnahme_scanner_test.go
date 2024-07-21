@@ -152,7 +152,7 @@ func TestOffsets(t1 *testing.T) {
 	for scanner.Scan() {
 		sk := scanner.GetTransacted()
 		sk2 := &sku.Transacted{}
-		t.AssertNoError(sk2.SetFromSkuLike(sk))
+		sku.Resetter.ResetWith(sk2, sk)
 		skus = append(skus, sk2)
 	}
 

@@ -30,11 +30,7 @@ func (s *Store) checkoutOneNew(
 	sz *sku.Transacted,
 ) (cz *CheckedOut, err error) {
 	cz = GetCheckedOutPool().Get()
-
-	if err = cz.Internal.SetFromSkuLike(sz); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	sku.Resetter.ResetWith(&cz.Internal, sz)
 
 	if s.config.IsDryRun() {
 		return
