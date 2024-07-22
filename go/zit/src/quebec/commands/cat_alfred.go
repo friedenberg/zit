@@ -45,7 +45,7 @@ func (c CatAlfred) DefaultGenres() ids.Genre {
 
 func (c CatAlfred) RunWithQuery(
 	u *env.Env,
-	ms *query.Group,
+	qg *query.Group,
 ) (err error) {
 	// this command does its own error handling
 	wo := bufio.NewWriter(u.Out())
@@ -56,7 +56,7 @@ func (c CatAlfred) RunWithQuery(
 	if aw, err = alfred.New(
 		wo,
 		u.GetStore().GetAbbrStore().GetAbbr(),
-		u.SkuFmtOrganize(),
+		u.SkuFmtOrganize(qg.RepoId),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -65,7 +65,7 @@ func (c CatAlfred) RunWithQuery(
 	defer errors.DeferredCloser(&err, aw)
 
 	if err = u.GetStore().QueryWithKasten(
-		ms,
+		qg,
 		aw.PrintOne,
 	); err != nil {
 		aw.WriteError(err)

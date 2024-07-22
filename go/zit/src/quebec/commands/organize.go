@@ -68,9 +68,9 @@ func (c *Organize) CompletionGattung() ids.Genre {
 
 func (c *Organize) RunWithQuery(
 	u *env.Env,
-	eqwk *query.Group,
+	qg *query.Group,
 ) (err error) {
-	ms := eqwk
+	ms := qg
 
 	u.ApplyToOrganizeOptions(&c.Options)
 
@@ -79,7 +79,7 @@ func (c *Organize) RunWithQuery(
 		Options: c.GetOptions(
 			u.GetConfig().PrintOptions,
 			ms,
-			u.SkuFmtOrganize(),
+			u.SkuFmtOrganize(qg.RepoId),
 			u.GetStore().GetAbbrStore().GetAbbr(),
 		),
 	}
@@ -94,7 +94,7 @@ func (c *Organize) RunWithQuery(
 	var l sync.Mutex
 
 	if err = u.GetStore().QueryWithKasten(
-		eqwk,
+		qg,
 		func(sk *sku.Transacted) (err error) {
 			l.Lock()
 			defer l.Unlock()
@@ -136,7 +136,7 @@ func (c *Organize) RunWithQuery(
 
 		readOrganizeTextOp := user_ops.ReadOrganizeFile{}
 
-		if ot2, err = readOrganizeTextOp.Run(u, os.Stdin); err != nil {
+		if ot2, err = readOrganizeTextOp.Run(u, os.Stdin, qg.RepoId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -233,7 +233,7 @@ func (c Organize) readFromVim(
 	u *env.Env,
 	f string,
 	results *organize_text.Text,
-	q *query.Group,
+	qg *query.Group,
 ) (ot *organize_text.Text, err error) {
 	openVimOp := user_ops.OpenVim{
 		Options: vim_cli_options_builder.New().
@@ -248,10 +248,10 @@ func (c Organize) readFromVim(
 
 	readOrganizeTextOp := user_ops.ReadOrganizeFile{}
 
-	if ot, err = readOrganizeTextOp.RunWithPath(u, f); err != nil {
+	if ot, err = readOrganizeTextOp.RunWithPath(u, f, qg.RepoId); err != nil {
 		if c.handleReadChangesError(err) {
 			err = nil
-			ot, err = c.readFromVim(u, f, results, q)
+			ot, err = c.readFromVim(u, f, results, qg)
 		} else {
 			ui.Err().Printf("aborting organize")
 			return

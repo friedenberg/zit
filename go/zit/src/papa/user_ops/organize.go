@@ -53,7 +53,7 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 		Options: otFlags.GetOptions(
 			u.GetConfig().PrintOptions,
 			qg,
-			u.SkuFmtOrganize(),
+			u.SkuFmtOrganize(qg.RepoId),
 			u.GetStore().GetAbbrStore().GetAbbr(),
 		),
 	}
@@ -104,7 +104,7 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 			return
 		}
 
-		if ot2, err = readOrganizeTextOp.Run(u.Env, f); err != nil {
+		if ot2, err = readOrganizeTextOp.Run(u.Env, f, qg.RepoId); err != nil {
 			if u.handleReadChangesError(err) {
 				err = nil
 				continue

@@ -82,7 +82,7 @@ func (u *Env) MakeFormatFunc(
 		}
 
 	case "organize":
-		p := u.SkuFmtOrganize()
+		p := u.SkuFmtOrganize(ids.RepoId{})
 
 		f = func(tl *sku.Transacted) (err error) {
 			if _, err = p.WriteStringFormat(out, tl); err != nil {

@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
@@ -15,6 +16,7 @@ type ReadOrganizeFile struct{}
 func (c ReadOrganizeFile) RunWithPath(
 	u *env.Env,
 	p string,
+	repoId ids.RepoId,
 ) (ot *organize_text.Text, err error) {
 	var f *os.File
 
@@ -25,7 +27,7 @@ func (c ReadOrganizeFile) RunWithPath(
 
 	defer errors.DeferredCloser(&err, f)
 
-	if ot, err = c.Run(u, f); err != nil {
+	if ot, err = c.Run(u, f, repoId); err != nil {
 		err = errors.Wrapf(err, "Path: %q", p)
 		return
 	}
@@ -36,6 +38,7 @@ func (c ReadOrganizeFile) RunWithPath(
 func (c ReadOrganizeFile) Run(
 	u *env.Env,
 	r io.Reader,
+	repoId ids.RepoId,
 ) (ot *organize_text.Text, err error) {
 	otFlags := organize_text.MakeFlags()
 	u.ApplyToOrganizeOptions(&otFlags.Options)
@@ -44,7 +47,7 @@ func (c ReadOrganizeFile) Run(
 		otFlags.GetOptions(
 			u.GetConfig().PrintOptions,
 			nil,
-			u.SkuFmtOrganize(),
+			u.SkuFmtOrganize(repoId),
 			u.GetStore().GetAbbrStore().GetAbbr(),
 		),
 	); err != nil {

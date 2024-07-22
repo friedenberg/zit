@@ -248,7 +248,7 @@ func (u *Env) Initialize(options Options) (err error) {
 
 	u.storesInitialized = true
 
-	u.luaSkuFormat = u.SkuFmtOrganize()
+	u.luaSkuFormat = u.SkuFmtOrganize(ids.RepoId{})
 
 	return
 }

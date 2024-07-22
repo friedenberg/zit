@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
@@ -51,7 +52,9 @@ func (c *FormatOrganize) Run(u *env.Env, args ...string) (err error) {
 
 	readOrganizeTextOp := user_ops.ReadOrganizeFile{}
 
-	if ot, err = readOrganizeTextOp.Run(u, f); err != nil {
+	var repoId ids.RepoId
+
+	if ot, err = readOrganizeTextOp.Run(u, f, repoId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -60,7 +63,7 @@ func (c *FormatOrganize) Run(u *env.Env, args ...string) (err error) {
 	ot.Options = c.Flags.GetOptions(
 		u.GetConfig().PrintOptions,
 		nil,
-		u.SkuFmtOrganize(),
+		u.SkuFmtOrganize(repoId),
 		u.GetStore().GetAbbrStore().GetAbbr(),
 	)
 

@@ -72,7 +72,7 @@ func (c *OrganizeJSON) CompletionGenres() ids.Genre {
 
 func (c *OrganizeJSON) RunWithQuery(
 	u *env.Env,
-	ms *query.Group,
+	qg *query.Group,
 ) (err error) {
 	u.ApplyToOrganizeOptions(&c.Options)
 
@@ -80,13 +80,13 @@ func (c *OrganizeJSON) RunWithQuery(
 		Env: u,
 		Options: c.GetOptions(
 			u.GetConfig().PrintOptions,
-			ms,
-			u.SkuFmtOrganize(),
+			qg,
+			u.SkuFmtOrganize(qg.RepoId),
 			u.GetStore().GetAbbrStore().GetAbbr(),
 		),
 	}
 
-	typen := ms.GetTypes()
+	typen := qg.GetTypes()
 
 	switch typen.Len() {
 	case 0:
@@ -160,7 +160,7 @@ func (c *OrganizeJSON) RunWithQuery(
 		u,
 		f.Name(),
 		createOrganizeFileResults,
-		ms,
+		qg,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -200,7 +200,7 @@ func (c OrganizeJSON) readFromVim(
 	u *env.Env,
 	p string,
 	results *organize_text.Text,
-	q sku.QueryGroup,
+	qg *query.Group,
 ) (ot *organize_text.Text, err error) {
 	openVimOp := user_ops.OpenVim{
 		Options: vim_cli_options_builder.New().
@@ -215,10 +215,10 @@ func (c OrganizeJSON) readFromVim(
 
 	readOrganizeTextOp := user_ops.ReadOrganizeFile{}
 
-	if ot, err = readOrganizeTextOp.RunWithPath(u, p); err != nil {
+	if ot, err = readOrganizeTextOp.RunWithPath(u, p, qg.RepoId); err != nil {
 		if c.handleReadChangesError(err) {
 			err = nil
-			ot, err = c.readFromVim(u, p, results, q)
+			ot, err = c.readFromVim(u, p, results, qg)
 		} else {
 			ui.Err().Printf("aborting organize")
 			return

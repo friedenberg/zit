@@ -13,6 +13,8 @@ type (
 	X25519Recipient = age.X25519Recipient
 )
 
+type NoIdentityMatchError = age.NoIdentityMatchError
+
 type Age struct {
 	recipients []Recipient
 	identities []age.Identity

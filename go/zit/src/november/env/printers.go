@@ -103,7 +103,7 @@ func (u *Env) StringFormatWriterMetadatei(
 	)
 }
 
-func (u *Env) SkuFmtOrganize() *sku_fmt.Organize {
+func (u *Env) SkuFmtOrganize(repoId ids.RepoId) *sku_fmt.Organize {
 	co := u.FormatColorOptionsOut()
 	co.OffEntirely = true
 
@@ -366,7 +366,7 @@ func (u *Env) PrinterMatching() sku.IterMatching {
 					return
 				}
 
-        sku.TransactedResetter.ResetWith(co.GetSku(), sk)
+				sku.TransactedResetter.ResetWith(co.GetSku(), sk)
 
 				if err = pco(co); err != nil {
 					err = errors.Wrap(err)

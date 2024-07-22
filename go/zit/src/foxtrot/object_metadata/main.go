@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/flag_policy"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	flag2 "code.linenisgreat.com/zit/go/zit/src/bravo/flag"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
@@ -202,7 +201,7 @@ func (m *Metadata) SetTags(e ids.TagSet) {
 		m.Tags = ids.MakeTagMutableSet()
 	}
 
-	iter.ResetMutableSetWithPool(m.Tags, ids.GetTagPool())
+	m.Tags.Reset()
 
 	if e == nil {
 		return

@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
+	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -42,9 +43,8 @@ type Options struct {
 	UseRefiner             bool
 	UseMetadateaHeader     bool
 
-	PrintOptions       erworben_cli_print_options.PrintOptions
-	skuFmt             sku_fmt.Organize
-	stringFormatWriter interfaces.StringFormatWriter[skuType]
+	PrintOptions           erworben_cli_print_options.PrintOptions
+	stringFormatReadWriter catgut.StringFormatReadWriter[skuType]
 }
 
 func MakeFlags() Flags {
@@ -125,7 +125,7 @@ func (o *Flags) GetOptions(
 		},
 	)
 
-	o.skuFmt = *skuFmt
+	o.stringFormatReadWriter = skuFmt
 
 	if q == nil {
 		o.rootTags = ids.MakeTagSet()
