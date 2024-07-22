@@ -1,74 +1,39 @@
-package sku_fmt
+package chrome
 
 import (
 	"fmt"
 	"io"
-	"strings"
+	"net/url"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
-type ObjectIdAlignedFormat interface {
-	SetMaxKopfUndSchwanz(kop, schwanz int)
-}
-
 func MakeFormatOrganize(
-	options erworben_cli_print_options.PrintOptions,
-	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
-	objectIdStringFormatWriter id_fmts.Aligned,
-	typeStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
-	descriptionStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description],
-	tagsStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
+	f *sku_fmt.Organize,
 ) *Organize {
-	options.PrintTime = false
-	options.PrintShas = false
-
-	return &Organize{
-		Options:                       options,
-		ShaStringFormatWriter:         shaStringFormatWriter,
-		ObjectIdStringFormatWriter:    objectIdStringFormatWriter,
-		TypeStringFormatWriter:        typeStringFormatWriter,
-		DescriptionStringFormatWriter: descriptionStringFormatWriter,
-		TagStringFormatWriter:         tagsStringFormatWriter,
-	}
+	return &Organize{}
 }
 
 type Organize struct {
-	Options erworben_cli_print_options.PrintOptions
-
-	MaxHead, MaxTail int
-	Padding          string
-
-	ShaStringFormatWriter         interfaces.StringFormatWriter[interfaces.Sha]
-	ObjectIdStringFormatWriter    id_fmts.Aligned
-	TypeStringFormatWriter        interfaces.StringFormatWriter[*ids.Type]
-	DescriptionStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description]
-	TagStringFormatWriter         interfaces.StringFormatWriter[*ids.Tag]
-}
-
-func (f *Organize) SetMaxKopfUndSchwanz(k, s int) {
-	f.MaxHead, f.MaxTail = k, s
-	f.Padding = strings.Repeat(" ", 5+k+s)
-	f.ObjectIdStringFormatWriter.SetMaxKopfUndSchwanz(k, s)
+	*sku_fmt.Organize
 }
 
 func (f *Organize) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
 	el sku.ExternalLike,
 ) (n int64, err error) {
-	o := el.GetSku()
+	e := el.(*External)
+	o := e.GetSku()
 
 	var n1 int
 
@@ -166,6 +131,110 @@ func (f *Organize) WriteStringFormat(
 				n1, err = sw.WriteString(" ")
 			}
 
+			n += int64(n1)
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			n2, err = f.TagStringFormatWriter.WriteStringFormat(sw, &v)
+			n += n2
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+	}
+
+	item := e.item
+	browser := &e.browser
+
+	{
+		n1, err = sw.WriteString("!")
+		n += int64(n1)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		n2, err = f.TypeStringFormatWriter.WriteStringFormat(
+			sw,
+			&browser.Metadata.Type,
+		)
+		n += n2
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if !browser.Metadata.Description.IsEmpty() {
+			n1, err = sw.WriteString(" ")
+			n += int64(n1)
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			n2, err = f.DescriptionStringFormatWriter.WriteStringFormat(
+				sw,
+				&browser.Metadata.Description,
+			)
+			n += n2
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+	}
+
+	{
+		n1, err = sw.WriteString("\n")
+		n += int64(n1)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		n1, err = sw.WriteString(" ")
+		n += int64(n1)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		var u *url.URL
+
+		if u, err = item.GetUrl(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		n1, err = sw.WriteString(u.String())
+		n += int64(n1)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		n1, err = sw.WriteString("\n")
+		n += int64(n1)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		for _, v := range iter.SortedValues(browser.Metadata.GetTags()) {
+			n1, err = sw.WriteString(" ")
 			n += int64(n1)
 
 			if err != nil {

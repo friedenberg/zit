@@ -18,34 +18,34 @@ import (
 type cliCheckedOut struct {
 	options erworben_cli_print_options.PrintOptions
 
-	rightAlignedWriter          interfaces.StringFormatWriter[string]
-	shaStringFormatWriter       interfaces.StringFormatWriter[interfaces.Sha]
-	objectIdStringFormatWriter  interfaces.StringFormatWriter[*ids.ObjectId]
-	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata]
+	rightAlignedWriter         interfaces.StringFormatWriter[string]
+	shaStringFormatWriter      interfaces.StringFormatWriter[interfaces.Sha]
+	objectIdStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId]
+	metadataStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata]
 
-	typStringFormatWriter         interfaces.StringFormatWriter[*ids.Type]
+	typeStringFormatWriter        interfaces.StringFormatWriter[*ids.Type]
 	descriptionStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description]
-	etikettenStringFormatWriter   interfaces.StringFormatWriter[*ids.Tag]
+	tagsStringFormatWriter        interfaces.StringFormatWriter[*ids.Tag]
 }
 
 func MakeCliCheckedOutFormat(
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 	objectIdStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
-	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata],
-	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
+	metadataStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata],
+	typeStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
 	descriptionStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description],
-	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
+	tagsStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
 ) *cliCheckedOut {
 	return &cliCheckedOut{
 		options:                       options,
 		rightAlignedWriter:            string_format_writer.MakeRightAligned(),
 		shaStringFormatWriter:         shaStringFormatWriter,
 		objectIdStringFormatWriter:    objectIdStringFormatWriter,
-		metadateiStringFormatWriter:   metadateiStringFormatWriter,
-		typStringFormatWriter:         typStringFormatWriter,
+		metadataStringFormatWriter:    metadataStringFormatWriter,
+		typeStringFormatWriter:        typeStringFormatWriter,
 		descriptionStringFormatWriter: descriptionStringFormatWriter,
-		etikettenStringFormatWriter:   etikettenStringFormatWriter,
+		tagsStringFormatWriter:        tagsStringFormatWriter,
 	}
 }
 
@@ -98,7 +98,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 			return
 		}
 
-		n2, err = f.metadateiStringFormatWriter.WriteStringFormat(
+		n2, err = f.metadataStringFormatWriter.WriteStringFormat(
 			sw,
 			&co.Internal.Metadata,
 		)
@@ -149,7 +149,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 			return
 		}
 
-		n2, err = f.typStringFormatWriter.WriteStringFormat(
+		n2, err = f.typeStringFormatWriter.WriteStringFormat(
 			sw,
 			&browser.Metadata.Type,
 		)
@@ -253,7 +253,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 				return
 			}
 
-			n2, err = f.etikettenStringFormatWriter.WriteStringFormat(sw, &v)
+			n2, err = f.tagsStringFormatWriter.WriteStringFormat(sw, &v)
 			n += n2
 
 			if err != nil {
