@@ -20,12 +20,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
-	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/chrome"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
+	"code.linenisgreat.com/zit/go/zit/src/lima/chrome"
+	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 

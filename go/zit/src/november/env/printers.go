@@ -11,8 +11,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/chrome"
+	"code.linenisgreat.com/zit/go/zit/src/lima/chrome"
+	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 )
 
 func (u *Env) PrinterSkuTransacted() interfaces.FuncIter[*sku.Transacted] {

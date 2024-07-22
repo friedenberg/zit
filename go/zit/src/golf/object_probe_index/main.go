@@ -213,7 +213,7 @@ func (e *object_probe_index) ReadAll(m *object_metadata.Metadata, h *[]Loc) (err
 
 func (e *object_probe_index) PrintAll() (err error) {
 	for i := range e.pages {
-    p := &e.pages[i]
+		p := &e.pages[i]
 
 		if err = p.PrintAll(); err != nil {
 			err = errors.Wrap(err)

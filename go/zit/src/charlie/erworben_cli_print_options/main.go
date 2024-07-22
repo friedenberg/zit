@@ -16,7 +16,7 @@ type PrintOptions struct {
 	PrintIncludeTypen       bool          `toml:"print-include-typen"`
 	PrintIncludeDescription bool          `toml:"print-include-description"`
 	PrintTime               bool          `toml:"print-time"`
-	PrintTagsAlways    bool          `toml:"print-etiketten-always"`
+	PrintTagsAlways         bool          `toml:"print-etiketten-always"`
 	PrintEmptyShas          bool          `toml:"print-empty-shas"`
 	PrintMatchedArchiviert  bool          `toml:"print-matched-archiviert"`
 	PrintShas               bool          `toml:"print-shas"`
@@ -92,7 +92,7 @@ func Default() PrintOptions {
 		PrintIncludeTypen:       true,
 		PrintIncludeDescription: true,
 		PrintTime:               true,
-		PrintTagsAlways:    true,
+		PrintTagsAlways:         true,
 		PrintEmptyShas:          false,
 		PrintMatchedArchiviert:  false,
 		PrintShas:               true,

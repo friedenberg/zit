@@ -36,32 +36,32 @@ func MakeFormatOrganize(
 	options.PrintShas = false
 
 	return &Organize{
-		options:                       options,
-		shaStringFormatWriter:         shaStringFormatWriter,
-		objectIdStringFormatWriter:    objectIdStringFormatWriter,
-		typStringFormatWriter:         typeStringFormatWriter,
-		descriptionStringFormatWriter: descriptionStringFormatWriter,
-		etikettenStringFormatWriter:   tagsStringFormatWriter,
+		Options:                       options,
+		ShaStringFormatWriter:         shaStringFormatWriter,
+		ObjectIdStringFormatWriter:    objectIdStringFormatWriter,
+		TypeStringFormatWriter:        typeStringFormatWriter,
+		DescriptionStringFormatWriter: descriptionStringFormatWriter,
+		TagStringFormatWriter:         tagsStringFormatWriter,
 	}
 }
 
 type Organize struct {
-	options erworben_cli_print_options.PrintOptions
+	Options erworben_cli_print_options.PrintOptions
 
 	maxKopf, maxSchwanz int
 	padding             string
 
-	shaStringFormatWriter         interfaces.StringFormatWriter[interfaces.Sha]
-	objectIdStringFormatWriter    id_fmts.Aligned
-	typStringFormatWriter         interfaces.StringFormatWriter[*ids.Type]
-	descriptionStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description]
-	etikettenStringFormatWriter   interfaces.StringFormatWriter[*ids.Tag]
+	ShaStringFormatWriter         interfaces.StringFormatWriter[interfaces.Sha]
+	ObjectIdStringFormatWriter    id_fmts.Aligned
+	TypeStringFormatWriter        interfaces.StringFormatWriter[*ids.Type]
+	DescriptionStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description]
+	TagStringFormatWriter         interfaces.StringFormatWriter[*ids.Tag]
 }
 
 func (f *Organize) SetMaxKopfUndSchwanz(k, s int) {
 	f.maxKopf, f.maxSchwanz = k, s
 	f.padding = strings.Repeat(" ", 5+k+s)
-	f.objectIdStringFormatWriter.SetMaxKopfUndSchwanz(k, s)
+	f.ObjectIdStringFormatWriter.SetMaxKopfUndSchwanz(k, s)
 }
 
 func (f *Organize) WriteStringFormat(
@@ -72,7 +72,7 @@ func (f *Organize) WriteStringFormat(
 
 	var n1 int
 
-	if f.options.PrintTime {
+	if f.Options.PrintTime {
 		t := o.GetTai()
 
 		n1, err = sw.WriteString(t.Format(string_format_writer.StringFormatDateTime))
@@ -101,7 +101,7 @@ func (f *Organize) WriteStringFormat(
 	}
 
 	var n2 int64
-	n2, err = f.objectIdStringFormatWriter.WriteStringFormat(sw, &o.ObjectId)
+	n2, err = f.ObjectIdStringFormatWriter.WriteStringFormat(sw, &o.ObjectId)
 	n += int64(n2)
 
 	if err != nil {
@@ -111,7 +111,7 @@ func (f *Organize) WriteStringFormat(
 
 	sh := o.GetBlobSha()
 
-	if f.options.PrintShas && (!sh.IsNull() || f.options.PrintEmptyShas) {
+	if f.Options.PrintShas && (!sh.IsNull() || f.Options.PrintEmptyShas) {
 		n1, err = sw.WriteString("@")
 		n += int64(n1)
 
@@ -120,7 +120,7 @@ func (f *Organize) WriteStringFormat(
 			return
 		}
 
-		n2, err = f.shaStringFormatWriter.WriteStringFormat(sw, o.GetBlobSha())
+		n2, err = f.ShaStringFormatWriter.WriteStringFormat(sw, o.GetBlobSha())
 		n += n2
 
 		if err != nil {
@@ -145,7 +145,7 @@ func (f *Organize) WriteStringFormat(
 			return
 		}
 
-		n2, err = f.typStringFormatWriter.WriteStringFormat(sw, t)
+		n2, err = f.TypeStringFormatWriter.WriteStringFormat(sw, t)
 		n += n2
 
 		if err != nil {
@@ -156,11 +156,11 @@ func (f *Organize) WriteStringFormat(
 
 	b := &o.Metadata.Description
 
-	if f.options.PrintTagsAlways {
+	if f.Options.PrintTagsAlways {
 		b := o.GetMetadata().GetTags()
 
 		for _, v := range iter.SortedValues(b) {
-			if f.options.ZittishNewlines {
+			if f.Options.ZittishNewlines {
 				n1, err = fmt.Fprintf(sw, "\n%s", f.padding)
 			} else {
 				n1, err = sw.WriteString(" ")
@@ -173,7 +173,7 @@ func (f *Organize) WriteStringFormat(
 				return
 			}
 
-			n2, err = f.etikettenStringFormatWriter.WriteStringFormat(sw, &v)
+			n2, err = f.TagStringFormatWriter.WriteStringFormat(sw, &v)
 			n += n2
 
 			if err != nil {
@@ -183,7 +183,7 @@ func (f *Organize) WriteStringFormat(
 		}
 	}
 
-	if f.options.ZittishNewlines {
+	if f.Options.ZittishNewlines {
 		n1, err = fmt.Fprintf(sw, "\n%s]", f.padding)
 	} else {
 		n1, err = sw.WriteString("]")
@@ -205,7 +205,7 @@ func (f *Organize) WriteStringFormat(
 			return
 		}
 
-		n2, err = f.descriptionStringFormatWriter.WriteStringFormat(sw, b)
+		n2, err = f.DescriptionStringFormatWriter.WriteStringFormat(sw, b)
 		n += n2
 
 		if err != nil {

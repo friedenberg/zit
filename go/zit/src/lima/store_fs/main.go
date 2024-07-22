@@ -33,22 +33,22 @@ func init() {
 
 // TODO support globs and ignores
 type Store struct {
-	config              sku.Config
-	deletedPrinter      interfaces.FuncIter[*fd.FD]
-	externalStoreInfo   external_store.Info
+	config             sku.Config
+	deletedPrinter     interfaces.FuncIter[*fd.FD]
+	externalStoreInfo  external_store.Info
 	metadataTextParser object_metadata.TextParser
-	fs_home             fs_home.Home
-	fileEncoder         FileEncoder
-	ic                  ids.InlineTypeChecker
-	fileExtensions      file_extensions.FileExtensions
-	dir                 string
-	zettels             interfaces.MutableSetLike[*ObjectIdFDPair]
-	unsureZettels       interfaces.MutableSetLike[*ObjectIdFDPair]
-	types               interfaces.MutableSetLike[*ObjectIdFDPair]
-	repos               interfaces.MutableSetLike[*ObjectIdFDPair]
-	tags                interfaces.MutableSetLike[*ObjectIdFDPair]
-	unsureBlobs         fd.MutableSet
-	emptyDirectories    fd.MutableSet
+	fs_home            fs_home.Home
+	fileEncoder        FileEncoder
+	ic                 ids.InlineTypeChecker
+	fileExtensions     file_extensions.FileExtensions
+	dir                string
+	zettels            interfaces.MutableSetLike[*ObjectIdFDPair]
+	unsureZettels      interfaces.MutableSetLike[*ObjectIdFDPair]
+	types              interfaces.MutableSetLike[*ObjectIdFDPair]
+	repos              interfaces.MutableSetLike[*ObjectIdFDPair]
+	tags               interfaces.MutableSetLike[*ObjectIdFDPair]
+	unsureBlobs        fd.MutableSet
+	emptyDirectories   fd.MutableSet
 
 	objectFormatOptions object_inventory_format.Options
 

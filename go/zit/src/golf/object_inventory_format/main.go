@@ -61,8 +61,8 @@ func FormatForVersion(sv interfaces.StoreVersion) Format {
 	default:
 		return v5{}
 
-// 	default:
-// 		return v6{}
+		// 	default:
+		// 		return v6{}
 	}
 }
 

@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/india/store_fs"
+	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 )
 
 func (u *Env) DeleteFiles(fs interfaces.Iterable[*fd.FD]) (err error) {
