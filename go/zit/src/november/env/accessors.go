@@ -2,6 +2,7 @@ package env
 
 import (
 	"io"
+	"time"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
@@ -9,6 +10,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
+
+func (u *Env) GetTime() time.Time {
+	return time.Now()
+}
 
 func (u *Env) GetConfig() *config.Compiled {
 	return &u.config

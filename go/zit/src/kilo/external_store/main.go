@@ -1,7 +1,6 @@
 package external_store
 
 import (
-	"fmt"
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -10,9 +9,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
+	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
@@ -65,6 +66,12 @@ type (
 			ph interfaces.FuncIter[string],
 			zsc sku.CheckedOutLikeSet,
 		) (err error)
+	}
+
+	OrganizeFormatGetter interface {
+		GetExternalStoreOrganizeFormat(
+			*sku_fmt.Organize,
+		) catgut.StringFormatReadWriter[sku.ExternalLike]
 	}
 
 	QueryCheckedOut = query.QueryCheckedOut
@@ -307,13 +314,8 @@ func (es *Store) Open(
 	return
 }
 
-type ErrUnsupportedTyp ids.Type
-
-func (e ErrUnsupportedTyp) Is(target error) bool {
-	_, ok := target.(ErrUnsupportedTyp)
-	return ok
-}
-
-func (e ErrUnsupportedTyp) Error() string {
-	return fmt.Sprintf("unsupported typ: %q", ids.Type(e))
+func (s *Store) GetExternalStoreOrganizeFormat(
+	f *sku_fmt.Organize,
+) catgut.StringFormatReadWriter[sku.ExternalLike] {
+	return f
 }

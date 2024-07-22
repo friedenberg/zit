@@ -134,7 +134,7 @@ func (c Import) Run(u *env.Env, args ...string) (err error) {
 		}
 
 		if err = c.importBlobIfNecessary(u, co, &ag, coPrinter); err != nil {
-			if errors.Is(err, &age.NoIdentityMatchError{}) {
+			if age.IsNoIdentityMatchError(err) {
 				err = nil
 			} else {
 				err = errors.Wrapf(err, "Checked Out: %q", co)

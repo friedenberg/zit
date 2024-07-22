@@ -54,7 +54,7 @@ type Env struct {
 
 	DormantCounter query.DormantCounter
 
-	luaSkuFormat *sku_fmt.Organize
+	luaSkuFormat sku_fmt.ExternalLikeFormatter
 }
 
 func Make(

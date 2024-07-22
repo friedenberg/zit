@@ -116,7 +116,7 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 func (o *Flags) GetOptions(
 	printOptions erworben_cli_print_options.PrintOptions,
 	q sku.QueryGroup,
-	skuFmt *sku_fmt.Organize,
+	skuFmt sku_fmt.ExternalLikeFormatter,
 	abbr ids.Abbr,
 ) Options {
 	o.once.Do(
