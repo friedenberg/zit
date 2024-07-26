@@ -29,6 +29,47 @@ func (s *Store) QueryWithKasten(
 			ExternalStoreUpdateTransacted: es,
 			QueryCheckedOut:               es,
 		},
+		Out: func(el sku.ExternalLike) (err error) {
+			if err = f(el.GetSku()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	}
+
+	wg.Do(e.Execute)
+
+	if err = wg.GetError(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) QueryWithKasten2(
+	qg *query.Group,
+	f interfaces.FuncIter[sku.ExternalLike],
+) (err error) {
+	if qg == nil {
+		if qg, err = s.queryBuilder.BuildQueryGroup(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	wg := iter.MakeErrorWaitGroupParallel()
+	es := s.externalStores[qg.RepoId.String()]
+
+	e := &query.Executor{
+		Group: qg,
+		ExecutionInfo: query.ExecutionInfo{
+			FuncPrimitiveQuery:            s.GetStreamIndex().ReadQuery,
+			ExternalStoreUpdateTransacted: es,
+			QueryCheckedOut:               es,
+		},
 		Out: f,
 	}
 

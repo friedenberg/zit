@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
@@ -43,10 +44,11 @@ func (c CommitOrganizeFile) ApplyToText(
 	return
 }
 
-func (op CommitOrganizeFile) Run(
+func (op CommitOrganizeFile) RunCommit(
 	u *env.Env,
 	a, b *organize_text.Text,
 	original sku.ExternalLikeSet,
+	qg *query.Group,
 ) (cs CommitOrganizeFileResults, err error) {
 	if err = op.ApplyToText(u, a); err != nil {
 		err = errors.Wrap(err)
@@ -70,9 +72,8 @@ func (op CommitOrganizeFile) Run(
 
 	if err = cs.Changed.Each(
 		func(changed sku.ExternalLike) (err error) {
-			// TODO switch to external
-			if err = u.GetStore().CreateOrUpdateFromTransacted(
-				changed.GetSku(),
+			if err = u.GetStore().CreateOrUpdate(
+				changed,
 				objekte_mode.Make(
 					objekte_mode.ModeMergeCheckedOut,
 				),

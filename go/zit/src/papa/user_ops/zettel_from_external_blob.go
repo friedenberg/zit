@@ -11,9 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/object_collections"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
@@ -37,19 +35,19 @@ func (c ZettelFromExternalBlob) Run(
 
 	defer errors.Deferred(&err, c.Unlock)
 
-	toCreate := object_collections.MakeMutableSetUniqueBlob()
-	toDelete := fd.MakeMutableSet()
-
 	results = sku.MakeTransactedMutableSet()
+	toDelete := fd.MakeMutableSet()
 
 	fds := make(map[sha.Bytes][]*fd.FD)
 
 	for _, fd := range iter.SortedValues(fdSet) {
-		if err = c.processOneFD(fd, fds); err != nil {
+		if err = c.addToMapAndWriteToBlobStore(fd, fds); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
+
+	toCreate := make([]*store_fs.External, 0, len(fds))
 
 	for _, fdsForSha := range fds {
 		sort.Slice(fdsForSha, func(i, j int) bool {
@@ -58,18 +56,15 @@ func (c ZettelFromExternalBlob) Run(
 
 		var z *store_fs.External
 
-		if z, err = c.zettelForBlob(fdsForSha); err != nil {
+		if z, err = c.createZettelForBlobs(fdsForSha); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = toCreate.Add(z); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		toCreate = append(toCreate, z)
 
 		if !c.Delete {
-			return
+			continue
 		}
 
 		for _, fd := range fdsForSha {
@@ -80,65 +75,20 @@ func (c ZettelFromExternalBlob) Run(
 		}
 	}
 
-	// if c.Dedupe {
-	// 	matcher := objekte_collections.MakeMutableMatchSet(toCreate)
-
-	// 	if err = c.GetStore().Query(
-	// 		qg,
-	// 		iter.MakeChain(
-	// 			matcher.Match,
-	// 			func(sk *sku.Transacted) (err error) {
-	// 				z := &sku.Transacted{}
-
-	// 				if err = z.SetFromSkuLike(sk); err != nil {
-	// 					err = errors.Wrap(err)
-	// 					return
-	// 				}
-
-	// 				return results.Add(z)
-	// 			},
-	// 		),
-	// 	); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return
-	// 	}
-	// }
-
-	if err = results.Each(
-		func(z *sku.Transacted) (err error) {
-			if c.Proto.Apply(z, genres.Zettel) {
-				if err = c.GetStore().CreateOrUpdateFromTransacted(
-					z,
-					objekte_mode.ModeApplyProto,
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	sortedToCreated := iter.Elements[*store_fs.External](toCreate)
-
 	sort.Slice(
-		sortedToCreated,
+		toCreate,
 		func(i, j int) bool {
-			return sortedToCreated[i].GetBlobFD().String() < sortedToCreated[j].GetBlobFD().String()
+			return toCreate[i].GetBlobFD().String() < toCreate[j].GetBlobFD().String()
 		},
 	)
 
-	for _, z := range sortedToCreated {
+	for _, z := range toCreate {
 		if z.Metadata.IsEmpty() {
 			return
 		}
 
-		if err = c.GetStore().CreateOrUpdateFromTransacted(
-			z.GetSku(),
+		if err = c.GetStore().CreateOrUpdate(
+			z,
 			objekte_mode.ModeApplyProto,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -147,7 +97,7 @@ func (c ZettelFromExternalBlob) Run(
 
 		// TODO switch to using ObjekteOptions
 		if c.Proto.Apply(z, genres.Zettel) {
-			if err = c.GetStore().CreateOrUpdateFromTransacted(
+			if err = c.GetStore().CreateOrUpdate(
 				z.GetSku(),
 				objekte_mode.ModeEmpty,
 			); err != nil {
@@ -190,7 +140,7 @@ func (c ZettelFromExternalBlob) Run(
 	return
 }
 
-func (c *ZettelFromExternalBlob) processOneFD(
+func (c *ZettelFromExternalBlob) addToMapAndWriteToBlobStore(
 	f *fd.FD,
 	fds map[sha.Bytes][]*fd.FD,
 ) (err error) {
@@ -227,18 +177,16 @@ func (c *ZettelFromExternalBlob) processOneFD(
 	return
 }
 
-func (c *ZettelFromExternalBlob) zettelForBlob(
+func (c *ZettelFromExternalBlob) createZettelForBlobs(
 	blobFDs []*fd.FD,
 ) (z *store_fs.External, err error) {
+	// TODO handle other FD's
 	blobFD := blobFDs[0]
 	z = store_fs.GetExternalPool().Get()
 
 	z.FDs.Blob.ResetWith(blobFD)
 
-	if err = z.Transacted.ObjectId.SetWithIdLike(&ids.ZettelId{}); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	z.Transacted.ObjectId.SetGenre(genres.Zettel)
 
 	if err = c.Proto.ApplyWithBlobFD(z, blobFD); err != nil {
 		err = errors.Wrap(err)

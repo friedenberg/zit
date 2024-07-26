@@ -12,7 +12,7 @@ import (
 
 func (s *Store) tryNewHook(
 	kinder *sku.Transacted,
-	o ObjekteOptions,
+	o sku.CommitOptions,
 ) (err error) {
 	if !o.Mode.Contains(objekte_mode.ModeHooks) {
 		return
@@ -101,7 +101,7 @@ func (s *Store) TryFormatHook(
 	if err = s.tryHookWithName(
 		kinder,
 		mutter,
-		ObjekteOptions{},
+		sku.CommitOptions{},
 		t,
 		script,
 		"on_format",
@@ -116,7 +116,7 @@ func (s *Store) TryFormatHook(
 func (s *Store) tryPreCommitHooks(
 	kinder *sku.Transacted,
 	mutter *sku.Transacted,
-	o ObjekteOptions,
+	o sku.CommitOptions,
 ) (err error) {
 	if !o.Mode.Contains(objekte_mode.ModeHooks) &&
 		!o.Mode.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
@@ -259,7 +259,7 @@ func (s *Store) tryPreCommitHook(
 func (s *Store) tryHookWithName(
 	kinder *sku.Transacted,
 	mutter *sku.Transacted,
-	o ObjekteOptions,
+	o sku.CommitOptions,
 	selbst *sku.Transacted,
 	script string,
 	name string,

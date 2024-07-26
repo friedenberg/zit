@@ -140,7 +140,10 @@ func (c Add) Run(
 		return
 	}
 
-	if err = opOrganize.Run(nil, zettelsFromBlobResults); err != nil {
+	if err = opOrganize.Run(
+		nil,
+		zettelsFromBlobResults,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -150,7 +153,7 @@ func (c Add) Run(
 
 func (c Add) openBlobIfNecessary(
 	u *env.Env,
-	zettels sku.TransactedMutableSet,
+	zettels sku.TransactedSet,
 ) (err error) {
 	if !c.OpenBlob && c.CheckoutBlobAndRun == "" {
 		return

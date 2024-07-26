@@ -183,11 +183,12 @@ func (c *OrganizeJSON) RunWithQuery(
 		OutputJSON: true,
 	}
 
-	if _, err = commitOrganizeTextOp.Run(
+	if _, err = commitOrganizeTextOp.RunCommit(
 		u,
 		createOrganizeFileResults,
 		ot2,
 		getResults,
+    qg,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

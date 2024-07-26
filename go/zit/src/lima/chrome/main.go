@@ -453,3 +453,7 @@ func (c *Store) tryToEmitOneCommon(
 
 	return
 }
+
+func (c *Store) GetExternalStoreOrganizeFormat(f *sku_fmt.Organize) sku_fmt.ExternalLike {
+	return MakeFormatOrganize(f)
+}

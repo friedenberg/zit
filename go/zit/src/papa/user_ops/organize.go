@@ -22,7 +22,10 @@ type Organize struct {
 	object_metadata.Metadata
 }
 
-func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
+func (u Organize) Run(
+	qg *query.Group,
+	skus sku.TransactedSet,
+) (err error) {
 	if qg == nil {
 		b := u.MakeQueryBuilder(
 			ids.MakeGenre(genres.TrueGenre()...),
@@ -36,8 +39,6 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 		}
 	}
 
-	otFlags := organize_text.MakeFlagsWithMetadata(u.Metadata)
-	u.ApplyToOrganizeOptions(&otFlags.Options)
 	// otFlags.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
 	mwk := sku.MakeExternalLikeMutableSet()
 	skus.Each(
@@ -46,6 +47,8 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 		},
 	)
 
+	otFlags := organize_text.MakeFlagsWithMetadata(u.Metadata)
+	u.ApplyToOrganizeOptions(&otFlags.Options)
 	otFlags.Transacted = mwk
 
 	createOrganizeFileOp := CreateOrganizeFile{
@@ -128,11 +131,12 @@ func (u Organize) Run(qg *query.Group, skus sku.TransactedSet) (err error) {
 
 	defer errors.Deferred(&err, u.Unlock)
 
-	if _, err = commitOrganizeTextOp.Run(
+	if _, err = commitOrganizeTextOp.RunCommit(
 		u.Env,
 		createOrganizeFileResults,
 		ot2,
 		mwk,
+		qg,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

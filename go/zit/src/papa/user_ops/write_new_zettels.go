@@ -65,7 +65,7 @@ func (c WriteNewZettels) runOneAlreadyLocked(
 ) (zt *sku.Transacted, err error) {
 	zt = pz.Make()
 
-	if err = c.GetStore().CreateOrUpdateFromTransacted(
+	if err = c.GetStore().CreateOrUpdate(
 		zt,
 		objekte_mode.ModeApplyProto,
 	); err != nil {

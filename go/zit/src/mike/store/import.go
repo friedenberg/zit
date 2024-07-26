@@ -42,7 +42,7 @@ func (s *Store) Import(external *sku.Transacted) (co *store_fs.CheckedOut, err e
 		if collections.IsErrNotFound(err) {
 			err = s.tryRealizeAndOrStore(
 				external,
-				ObjekteOptions{
+				sku.CommitOptions{
 					Clock: &co.External.Transacted,
 					Mode:  objekte_mode.ModeCommit,
 				},
@@ -83,7 +83,7 @@ func (s *Store) Import(external *sku.Transacted) (co *store_fs.CheckedOut, err e
 
 	if err = s.tryRealizeAndOrStore(
 		external,
-		ObjekteOptions{
+		sku.CommitOptions{
 			Mode: objekte_mode.ModeCommit,
 		},
 	); err == collections.ErrExists {

@@ -25,7 +25,7 @@ type (
 type Executor struct {
 	*Group
 	ExecutionInfo
-	Out interfaces.FuncIter[*sku.Transacted]
+	Out interfaces.FuncIter[sku.ExternalLike]
 }
 
 func (e *Executor) Execute() (err error) {
@@ -48,7 +48,7 @@ func (e *Executor) executeExternalQuery() (err error) {
 	if err = e.QueryCheckedOut.QueryCheckedOut(
 		e.Group,
 		func(col sku.CheckedOutLike) (err error) {
-			z := col.GetSkuExternalLike().GetSku()
+			z := col.GetSkuExternalLike()
 
 			if err = e.Out(z); err != nil {
 				err = errors.Wrap(err)

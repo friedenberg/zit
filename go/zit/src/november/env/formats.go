@@ -95,11 +95,12 @@ func (u *Env) StringFormatWriterMetadatei(
 	)
 }
 
-func (u *Env) SkuFmtOrganize(repoId ids.RepoId) sku_fmt.ExternalLikeFormatter {
+func (u *Env) SkuFmtOrganize(repoId ids.RepoId) sku_fmt.ExternalLike {
 	co := u.FormatColorOptionsOut()
 	co.OffEntirely = true
 
 	f := sku_fmt.MakeFormatOrganize(
+    co,
 		u.config.PrintOptions,
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterObjectIdAligned(co),

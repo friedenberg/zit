@@ -147,7 +147,7 @@ func (c CheckinBlob) Run(u *env.Env, args ...string) (err error) {
 	defer errors.Deferred(&err, u.Unlock)
 
 	for _, z := range zettels {
-		if err = u.GetStore().CreateOrUpdateFromTransacted(
+		if err = u.GetStore().CreateOrUpdate(
 			z,
 			objekte_mode.Make(
 				objekte_mode.ModeMergeCheckedOut,

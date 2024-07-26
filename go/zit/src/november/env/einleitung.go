@@ -201,7 +201,7 @@ func initDefaultTypAndKonfig(u *Env) (err error) {
 			return
 		}
 
-		if err = u.GetStore().CreateOrUpdateFromTransacted(
+		if err = u.GetStore().CreateOrUpdate(
 			newConfig,
 			objekte_mode.ModeCreate,
 		); err != nil {

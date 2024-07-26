@@ -67,7 +67,7 @@ func (s *Store) ReadTransactedFromObjectIdRepoIdSigil(
 	var ze sku.ExternalLike
 
 	if ze, err = s.ReadOneObjectIdExternal(
-		ObjekteOptions{
+		sku.CommitOptions{
 			Mode: objekte_mode.ModeUpdateTai,
 		},
 		k1,

@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
-	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
@@ -130,7 +129,7 @@ func (es *Store) CheckoutOne(
 }
 
 func (es *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
-	esdc, ok := es.StoreLike.(DeleteCheckout)
+	esdc, ok := es.StoreLike.(DeleteExternal)
 
 	if !ok {
 		err = errors.Errorf("store does not support DeleteCheckout")
@@ -236,7 +235,7 @@ func (es *Store) Open(
 
 func (s *Store) GetExternalStoreOrganizeFormat(
 	f *sku_fmt.Organize,
-) catgut.StringFormatReadWriter[sku.ExternalLike] {
+) sku_fmt.ExternalLike {
 	esof, ok := s.StoreLike.(OrganizeFormatGetter)
 
 	if !ok {

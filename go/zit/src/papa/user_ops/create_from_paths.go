@@ -14,9 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/object_collections"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
-	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
@@ -33,9 +31,9 @@ func (c CreateFromPaths) Run(
 	args ...string,
 ) (results sku.TransactedMutableSet, err error) {
 	toCreate := make(map[sha.Bytes]*store_fs.External)
-	toDelete := object_collections.MakeMutableSetUniqueFD()
+	toDelete := fd.MakeMutableSet()
 
-	o := store.ObjekteOptions{
+	o := sku.CommitOptions{
 		Mode: objekte_mode.ModeRealizeWithProto,
 	}
 
@@ -84,7 +82,17 @@ func (c CreateFromPaths) Run(
 		}
 
 		if c.Delete {
-			toDelete.Add(z)
+			{
+				var f fd.FD
+				f.ResetWith(&z.FDs.Object)
+				toDelete.Add(&f)
+			}
+
+			{
+				var f fd.FD
+				f.ResetWith(&z.FDs.Blob)
+				toDelete.Add(&f)
+			}
 		}
 	}
 
@@ -102,7 +110,7 @@ func (c CreateFromPaths) Run(
 			return
 		}
 
-		if err = c.GetStore().CreateOrUpdateFromTransacted(
+		if err = c.GetStore().CreateOrUpdate(
 			&z.Transacted,
 			objekte_mode.ModeApplyProto,
 		); err != nil {
@@ -116,14 +124,14 @@ func (c CreateFromPaths) Run(
 	}
 
 	if err = toDelete.Each(
-		func(z *store_fs.External) (err error) {
+		func(f *fd.FD) (err error) {
 			// TODO-P2 move to checkout store
-			if err = c.GetFSHome().Delete(z.GetObjectFD().GetPath()); err != nil {
+			if err = c.GetFSHome().Delete(f.GetPath()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			pathRel := c.GetFSHome().RelToCwdOrSame(z.GetObjectFD().GetPath())
+			pathRel := c.GetFSHome().RelToCwdOrSame(f.GetPath())
 
 			// TODO-P2 move to printer
 			ui.Out().Printf("[%s] (deleted)", pathRel)

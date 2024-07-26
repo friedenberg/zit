@@ -93,12 +93,12 @@ func (c *Organize) RunWithQuery(
 	getResults := sku.MakeExternalLikeMutableSet()
 	var l sync.Mutex
 
-	if err = u.GetStore().QueryWithKasten(
+	if err = u.GetStore().QueryWithKasten2(
 		qg,
-		func(sk *sku.Transacted) (err error) {
+		func(el sku.ExternalLike) (err error) {
 			l.Lock()
 			defer l.Unlock()
-			return getResults.Add(sk.Clone())
+			return getResults.Add(el.Clone())
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -152,11 +152,12 @@ func (c *Organize) RunWithQuery(
 			Env: u,
 		}
 
-		if _, err = commitOrganizeTextOp.Run(
+		if _, err = commitOrganizeTextOp.RunCommit(
 			u,
 			createOrganizeFileResults,
 			ot2,
 			getResults,
+			qg,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -211,11 +212,12 @@ func (c *Organize) RunWithQuery(
 			Env: u,
 		}
 
-		if _, err = commitOrganizeTextOp.Run(
+		if _, err = commitOrganizeTextOp.RunCommit(
 			u,
 			createOrganizeFileResults,
 			ot2,
 			getResults,
+			qg,
 		); err != nil {
 			err = errors.Wrapf(err, "Organize File: %q", f.Name())
 			return

@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
+	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
@@ -62,6 +63,7 @@ func makeObjWithHinAndBez(t *testing.T, hin string, bez string) (o *obj) {
 func makeAssignmentLineReader() assignmentLineReader {
 	return assignmentLineReader{
 		stringFormatReadWriter: sku_fmt.MakeFormatOrganize(
+      string_format_writer.ColorOptions{},
 			erworben_cli_print_options.PrintOptions{},
 			nil,
 			nil,

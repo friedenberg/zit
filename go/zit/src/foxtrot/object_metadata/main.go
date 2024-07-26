@@ -243,11 +243,16 @@ func (a *Metadata) Subtract(
 		a.Type = ids.Type{}
 	}
 
+	if a.Tags == nil {
+		return
+	}
+
 	err := b.GetTags().EachPtr(
 		func(e *ids.Tag) (err error) {
 			return a.Tags.DelPtr(e)
 		},
 	)
+
 	errors.PanicIfError(err)
 }
 

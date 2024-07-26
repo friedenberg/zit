@@ -3,81 +3,29 @@ package object_collections
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
-	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type MutableSet = interfaces.MutableSetLike[*store_fs.External]
+type MutableSet = interfaces.MutableSetLike[sku.ExternalLike]
 
-type KeyerHinweis struct{}
-
-func (k KeyerHinweis) GetKey(z *store_fs.External) string {
-	if z == nil {
-		return ""
-	}
-
-	return z.GetObjectId().String()
+func MakeMutableSetUniqueHinweis(zs ...sku.ExternalLike) MutableSet {
+	return collections_value.MakeMutableValueSet(
+		ids.ObjectIdKeyer[sku.ExternalLike]{},
+		zs...,
+	)
 }
 
-func MakeMutableSetUniqueHinweis(zs ...*store_fs.External) MutableSet {
-	return collections_value.MakeMutableValueSet[*store_fs.External](
-		KeyerHinweis{},
-		zs...)
-}
-
-type KeyerFD struct{}
-
-func (k KeyerFD) GetKey(z *store_fs.External) string {
-	if z == nil {
-		return ""
-	}
-
-	return z.String()
-}
-
-func MakeMutableSetUniqueFD(zs ...*store_fs.External) MutableSet {
-	return collections_value.MakeMutableValueSet[*store_fs.External](
+func MakeMutableSetUniqueFD(zs ...sku.ExternalLike) MutableSet {
+	return collections_value.MakeMutableValueSet(
 		KeyerFD{},
-		zs...)
+		zs...,
+	)
 }
 
-type KeyerStored struct{}
-
-func (k KeyerStored) GetKey(z *store_fs.External) string {
-	if z == nil {
-		return ""
-	}
-
-	if z.GetObjectSha().IsNull() {
-		return ""
-	}
-
-	return z.GetObjectSha().String()
-}
-
-func MakeMutableSetUniqueStored(zs ...*store_fs.External) MutableSet {
-	return collections_value.MakeMutableValueSet[*store_fs.External](
-		KeyerStored{},
-		zs...)
-}
-
-type KeyerBlob struct{}
-
-func (k KeyerBlob) GetKey(z *store_fs.External) string {
-	if z == nil {
-		return ""
-	}
-
-	sh := z.GetBlobSha()
-
-	if sh.IsNull() {
-		return ""
-	}
-
-	return sh.String()
-}
-
-func MakeMutableSetUniqueBlob(zs ...*store_fs.External) MutableSet {
-	return collections_value.MakeMutableValueSet[*store_fs.External](
+func MakeMutableSetUniqueBlob(zs ...sku.ExternalLike) MutableSet {
+	return collections_value.MakeMutableValueSet(
 		KeyerBlob{},
-		zs...)
+		zs...,
+	)
 }

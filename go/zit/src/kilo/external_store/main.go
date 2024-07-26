@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
-	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -49,7 +48,7 @@ type (
 		) (cz sku.CheckedOutLike, err error)
 	}
 
-	DeleteCheckout interface {
+	DeleteExternal interface {
 		DeleteCheckout(col sku.CheckedOutLike) (err error)
 	}
 
@@ -66,7 +65,7 @@ type (
 	OrganizeFormatGetter interface {
 		GetExternalStoreOrganizeFormat(
 			*sku_fmt.Organize,
-		) catgut.StringFormatReadWriter[sku.ExternalLike]
+		) sku_fmt.ExternalLike
 	}
 
 	QueryCheckedOut = query.QueryCheckedOut

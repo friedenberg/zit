@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
+	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -21,11 +22,19 @@ import (
 func MakeFormatOrganize(
 	f *sku_fmt.Organize,
 ) *Organize {
-	return &Organize{}
+	return &Organize{
+		Organize: f,
+		descriptionStringFormatWriter: descriptions.MakeCliFormat(
+			descriptions.CliFormatTruncation66CharEllipsis,
+			f.ColorOptions,
+			true,
+		),
+	}
 }
 
 type Organize struct {
 	*sku_fmt.Organize
+	descriptionStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description]
 }
 
 func (f *Organize) WriteStringFormat(
@@ -152,7 +161,7 @@ func (f *Organize) WriteStringFormat(
 	browser := &e.browser
 
 	{
-		n1, err = sw.WriteString("!")
+		n1, err = sw.WriteString(" !")
 		n += int64(n1)
 
 		if err != nil {
@@ -180,7 +189,7 @@ func (f *Organize) WriteStringFormat(
 				return
 			}
 
-			n2, err = f.DescriptionStringFormatWriter.WriteStringFormat(
+			n2, err = f.descriptionStringFormatWriter.WriteStringFormat(
 				sw,
 				&browser.Metadata.Description,
 			)
@@ -217,7 +226,7 @@ func (f *Organize) WriteStringFormat(
 			return
 		}
 
-		n1, err = sw.WriteString(u.String())
+		n1, err = fmt.Fprintf(sw, "url=%q", u)
 		n += int64(n1)
 
 		if err != nil {

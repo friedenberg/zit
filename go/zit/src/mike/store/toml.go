@@ -6,7 +6,7 @@ import (
 
 func (s *Store) addToTomlIndexIfNecessary(
 	t *sku.Transacted,
-	o ObjekteOptions,
+	o sku.CommitOptions,
 ) (err error) {
 	if !t.Metadata.Type.IsToml() {
 		return

@@ -23,7 +23,7 @@ import (
 
 func (s *Store) tryRealize(
 	kinder, mutter *sku.Transacted,
-	o ObjekteOptions,
+	o sku.CommitOptions,
 ) (err error) {
 	if mutter == nil && o.Contains(objekte_mode.ModeApplyProto) {
 		s.protoZettel.Apply(kinder, kinder)
@@ -53,7 +53,7 @@ func (s *Store) tryRealize(
 // TODO add RealizeAndOrStore result
 func (s *Store) tryRealizeAndOrStore(
 	kinder *sku.Transacted,
-	o ObjekteOptions,
+	o sku.CommitOptions,
 ) (err error) {
 	ui.Log().Printf("%s -> %s", o, kinder)
 
@@ -237,7 +237,7 @@ func (s *Store) tryRealizeAndOrStore(
 
 func (s *Store) fetchMutterIfNecessary(
 	sk *sku.Transacted,
-	ut ObjekteOptions,
+	ut sku.CommitOptions,
 ) (mutter *sku.Transacted, err error) {
 	mutter, err = s.GetStreamIndex().ReadOneObjectId(
 		sk.GetObjectId(),
@@ -328,7 +328,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 
 	if err = s.tryRealizeAndOrStore(
 		transactedPtr,
-		ObjekteOptions{Mode: objekte_mode.ModeCreate},
+		sku.CommitOptions{Mode: objekte_mode.ModeCreate},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -405,7 +405,7 @@ func (s *Store) createTagsOrType(k *ids.ObjectId) (err error) {
 
 	if err = s.tryRealizeAndOrStore(
 		t,
-		ObjekteOptions{Mode: objekte_mode.ModeCommit},
+		sku.CommitOptions{Mode: objekte_mode.ModeCommit},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -541,7 +541,7 @@ func (s *Store) addMatchableCommon(m *sku.Transacted) (err error) {
 }
 
 func (s *Store) reindexOne(besty, sk *sku.Transacted) (err error) {
-	o := ObjekteOptions{
+	o := sku.CommitOptions{
 		Mode: objekte_mode.ModeReindex,
 	}
 

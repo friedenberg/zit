@@ -25,6 +25,7 @@ type ObjectIdAlignedFormat interface {
 }
 
 func MakeFormatOrganize(
+	co string_format_writer.ColorOptions,
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 	objectIdStringFormatWriter id_fmts.Aligned,
@@ -36,6 +37,7 @@ func MakeFormatOrganize(
 	options.PrintShas = false
 
 	return &Organize{
+		ColorOptions:                  co,
 		Options:                       options,
 		ShaStringFormatWriter:         shaStringFormatWriter,
 		ObjectIdStringFormatWriter:    objectIdStringFormatWriter,
@@ -46,6 +48,7 @@ func MakeFormatOrganize(
 }
 
 type Organize struct {
+	string_format_writer.ColorOptions
 	Options erworben_cli_print_options.PrintOptions
 
 	MaxHead, MaxTail int

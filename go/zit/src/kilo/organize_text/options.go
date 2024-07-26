@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
@@ -63,8 +62,6 @@ func MakeFlags() Flags {
 }
 
 func MakeFlagsWithMetadata(m object_metadata.Metadata) Flags {
-	ui.Debug().Print(m.GetTags())
-
 	return Flags{
 		once: &sync.Once{},
 		ExtraTags: collections_ptr.MakeFlagCommas[ids.Tag](
@@ -116,7 +113,7 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 func (o *Flags) GetOptions(
 	printOptions erworben_cli_print_options.PrintOptions,
 	q sku.QueryGroup,
-	skuFmt sku_fmt.ExternalLikeFormatter,
+	skuFmt sku_fmt.ExternalLike,
 	abbr ids.Abbr,
 ) Options {
 	o.once.Do(

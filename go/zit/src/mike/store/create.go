@@ -47,7 +47,7 @@ func (s *Store) Reindex() (err error) {
 	return
 }
 
-func (s *Store) CreateOrUpdateFromExternal(
+func (s *Store) CreateOrUpdate(
 	in sku.ExternalLike,
 	mode objekte_mode.Mode,
 ) (err error) {
@@ -58,25 +58,10 @@ func (s *Store) CreateOrUpdateFromExternal(
 
 	if err = s.tryRealizeAndOrStore(
 		in.GetSku(),
-		ObjekteOptions{Mode: mode},
+		sku.CommitOptions{
+			Mode: mode,
+		},
 	); err != nil {
-		err = errors.WrapExcept(err, collections.ErrExists)
-		return
-	}
-
-	return
-}
-
-func (s *Store) CreateOrUpdateFromTransacted(
-	in *sku.Transacted,
-	mode objekte_mode.Mode,
-) (err error) {
-	mode.Add(
-		objekte_mode.ModeCommit,
-		objekte_mode.ModeApplyProto,
-	)
-
-	if err = s.tryRealizeAndOrStore(in, ObjekteOptions{Mode: mode}); err != nil {
 		err = errors.WrapExcept(err, collections.ErrExists)
 		return
 	}
@@ -119,7 +104,7 @@ func (s *Store) CreateOrUpdateBlobSha(
 
 	if err = s.tryRealizeAndOrStore(
 		t,
-		ObjekteOptions{Mode: objekte_mode.ModeCommit},
+		sku.CommitOptions{Mode: objekte_mode.ModeCommit},
 	); err != nil {
 		err = errors.WrapExcept(err, collections.ErrExists)
 		return
@@ -162,7 +147,7 @@ func (s *Store) RevertTo(
 
 	if err = s.tryRealizeAndOrStore(
 		mutter,
-		ObjekteOptions{Mode: objekte_mode.ModeCommit},
+		sku.CommitOptions{Mode: objekte_mode.ModeCommit},
 	); err != nil {
 		err = errors.WrapExcept(err, collections.ErrExists)
 		return

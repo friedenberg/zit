@@ -135,6 +135,25 @@ func (mb *Builder) WithHidden(
 	return mb
 }
 
+func (b *Builder) WithExternalLike(
+	zts sku.ExternalLikeSet,
+) *Builder {
+	errors.PanicIfError(zts.Each(
+		func(t sku.ExternalLike) (err error) {
+			b.pinnedObjectIds = append(
+				b.pinnedObjectIds,
+				ObjectId{
+					ObjectId: t.GetSku().ObjectId.Clone(),
+				},
+			)
+
+			return
+		},
+	))
+
+	return b
+}
+
 func (b *Builder) WithTransacted(
 	zts sku.TransactedSet,
 ) *Builder {

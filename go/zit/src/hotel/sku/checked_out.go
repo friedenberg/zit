@@ -40,7 +40,7 @@ func DetermineState(c CheckedOutLike, justCheckedOut bool) {
 
 type CheckedOut struct {
 	Internal Transacted
-	External External
+	External ExternalLike
 	State    checked_out_state.State
 	Error    error
 }
@@ -54,7 +54,7 @@ func (c *CheckedOut) GetSkuCheckedOutLike() CheckedOutLike {
 }
 
 func (c *CheckedOut) GetSkuExternalLike() ExternalLike {
-	return &c.External
+	return c.External
 }
 
 func (c *CheckedOut) GetSku() *Transacted {
@@ -79,7 +79,7 @@ func (c *CheckedOut) SetError(err error) {
 }
 
 func (c *CheckedOut) InternalAndExternalEqualsSansTai() bool {
-	return c.External.Metadata.EqualsSansTai(
+	return c.External.GetSku().GetMetadata().EqualsSansTai(
 		&c.Internal.Metadata,
 	)
 }
@@ -93,24 +93,6 @@ func (c *CheckedOut) GetError() error {
 	return c.Error
 }
 
-func (c *CheckedOut) DetermineState(justCheckedOut bool) {
-	if c.Internal.GetObjectSha().IsNull() {
-		c.State = checked_out_state.StateUntracked
-	} else if c.Internal.Metadata.EqualsSansTai(&c.External.Metadata) {
-		if justCheckedOut {
-			c.State = checked_out_state.StateJustCheckedOut
-		} else {
-			c.State = checked_out_state.StateExistsAndSame
-		}
-	} else {
-		if justCheckedOut {
-			c.State = checked_out_state.StateJustCheckedOutButDifferent
-		} else {
-			c.State = checked_out_state.StateExistsAndDifferent
-		}
-	}
-}
-
 func (a *CheckedOut) String() string {
-	return fmt.Sprintf("%s %s", &a.Internal, &a.External)
+	return fmt.Sprintf("%s %s", &a.Internal, a.External)
 }
