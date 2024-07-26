@@ -56,7 +56,7 @@ func (c *constructor) collectExplicitAndImplicitFor(
 	res := catgut.MakeFromString(re.String())
 
 	if err = skus.Each(
-		func(st skuType) (err error) {
+		func(st sku.ExternalLike) (err error) {
 			sk := st.GetSku()
 
 			for _, ewp := range sk.Metadata.Cache.TagPaths.All {
@@ -313,11 +313,9 @@ func (c *constructor) makeAndAddUngrouped(
 func (c *constructor) cloneObj(
 	named *obj,
 ) (z *obj, err error) {
-	errors.TodoP4("add bez in a better way")
-
 	z = &obj{
-		Type:       named.Type,
-		Transacted: named.Transacted.Clone(),
+		Type:         named.Type,
+		ExternalLike: named.ExternalLike.Clone(),
 	}
 
 	if err = c.removeTagsIfNecessary(z); err != nil {
@@ -335,11 +333,11 @@ func (c *constructor) removeTagsIfNecessary(
 		return
 	}
 
-	if o.Transacted.GetSku().Metadata.Description.IsEmpty() {
+	if o.ExternalLike.GetSku().Metadata.Description.IsEmpty() {
 		return
 	}
 
-	o.Transacted.GetSku().Metadata.ResetTags()
+	o.ExternalLike.GetSku().Metadata.ResetTags()
 
 	return
 }

@@ -18,7 +18,7 @@ type assignmentLineReader struct {
 	lineNo                 int
 	root                   *Assignment
 	currentAssignment      *Assignment
-	stringFormatReadWriter catgut.StringFormatReadWriter[skuType]
+	stringFormatReadWriter catgut.StringFormatReadWriter[sku.ExternalLike]
 }
 
 func (ar *assignmentLineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
@@ -276,10 +276,10 @@ func (ar *assignmentLineReader) readOneObj(
 	// logz.Print("reading one zettel", l)
 
 	var z obj
-	z.Transacted = sku.GetTransactedPool().Get()
+	z.ExternalLike = sku.GetTransactedPool().Get()
 	z.Type = t
 
-	if _, err = ar.stringFormatReadWriter.ReadStringFormat(r, z.Transacted); err != nil {
+	if _, err = ar.stringFormatReadWriter.ReadStringFormat(r, z.ExternalLike); err != nil {
 		err = ErrorRead{
 			error:  err,
 			line:   ar.lineNo,
@@ -289,9 +289,9 @@ func (ar *assignmentLineReader) readOneObj(
 		return
 	}
 
-	if z.Transacted.GetSku().ObjectId.IsEmpty() {
+	if z.ExternalLike.GetSku().ObjectId.IsEmpty() {
 		// set empty hinweis to ensure middle is '/'
-		if err = z.Transacted.GetSku().ObjectId.SetWithIdLike(ids.ZettelId{}); err != nil {
+		if err = z.ExternalLike.GetSku().ObjectId.SetWithIdLike(ids.ZettelId{}); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -301,7 +301,7 @@ func (ar *assignmentLineReader) readOneObj(
 		return
 	}
 
-	if err = ar.options.Abbr.ExpandZettelIdOnly(&z.Transacted.GetSku().ObjectId); err != nil {
+	if err = ar.options.Abbr.ExpandZettelIdOnly(&z.ExternalLike.GetSku().ObjectId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

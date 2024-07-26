@@ -8,7 +8,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/keys"
@@ -63,18 +62,6 @@ func (bf *binaryEncoder) writeFormat(
 	}
 
 	bf.binaryField.Reset()
-
-	defer func() {
-		r := recover()
-
-		if r == nil {
-			return
-		}
-
-		ui.Debug().Print(sk, bf.Len(), &sk.Metadata.Cache.TagPaths)
-		panic(r)
-	}()
-	// TODO
 	bf.SetContentLength(bf.Len())
 
 	var n1 int

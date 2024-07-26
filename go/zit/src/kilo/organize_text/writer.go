@@ -20,7 +20,7 @@ type assignmentLineWriter struct {
 	maxDepth           int
 	maxHead, maxTail   int
 	maxLen             int
-	stringFormatWriter interfaces.StringFormatWriter[skuType]
+	stringFormatWriter interfaces.StringFormatWriter[sku.ExternalLike]
 }
 
 func (av assignmentLineWriter) write(a *Assignment) (err error) {
@@ -71,7 +71,7 @@ func (av assignmentLineWriter) writeNormal(a *Assignment) (err error) {
 			sb.WriteString("% ")
 		}
 
-		sku.TransactedResetter.ResetWith(cursor, z.Transacted.GetSku())
+		sku.TransactedResetter.ResetWith(cursor, z.ExternalLike.GetSku())
 		cursor.Metadata.Subtract(&av.Metadata)
 
 		if _, err = av.stringFormatWriter.WriteStringFormat(&sb, cursor); err != nil {
@@ -133,8 +133,8 @@ func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 		av.WriteExactlyOneEmpty()
 	}
 
-	backup := sku.GetTransactedPool().Get()
-	defer sku.GetTransactedPool().Put(backup)
+	cursor := sku.GetTransactedPool().Get()
+	defer sku.GetTransactedPool().Put(cursor)
 
 	write := func(z *obj) (err error) {
 		var sb strings.Builder
@@ -145,25 +145,19 @@ func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 			sb.WriteString("% ")
 		}
 
-		sk := z.Transacted.GetSku()
-		sku.TransactedResetter.ResetWith(backup, sk)
-		defer sku.TransactedResetter.ResetWith(sk, backup)
+		sku.TransactedResetter.ResetWith(cursor, z.ExternalLike.GetSku())
+		cursor.Metadata.Subtract(&av.Metadata)
 
-		sk.Metadata.Subtract(&av.Metadata)
-
-		mes := sk.GetMetadata().GetTags().CloneMutableSetPtrLike()
+		mes := cursor.GetMetadata().GetTags().CloneMutableSetPtrLike()
 
 		if err = a.SubtractFromSet(mes); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		sk.Metadata.SetTags(mes)
+		cursor.Metadata.SetTags(mes)
 
-		if _, err = av.stringFormatWriter.WriteStringFormat(
-			&sb,
-			z.Transacted,
-		); err != nil {
+		if _, err = av.stringFormatWriter.WriteStringFormat(&sb, cursor); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

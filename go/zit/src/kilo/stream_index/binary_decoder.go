@@ -197,7 +197,7 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 
 		q, ok := bf.Get(genres.Must(sk.Transacted))
 
-		// TODO use query to decide whether to read and inflate or skip
+		// TODO-D4 use query to decide whether to read and inflate or skip
 		if ok {
 			qs := q.GetSigil()
 
@@ -226,7 +226,7 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 			}
 		}
 
-		// TODO-P2 replace with buffered seeker
+		// TODO-D4 replace with buffered seeker
 		// discard the next record
 		if _, err = io.Copy(io.Discard, &bf.LimitedReader); err != nil {
 			err = errors.Wrap(err)

@@ -12,8 +12,7 @@ import (
 )
 
 type (
-	objSet  = interfaces.MutableSetLike[*obj]
-	skuType = sku.ExternalLike
+	objSet = interfaces.MutableSetLike[*obj]
 )
 
 var objKeyer interfaces.StringKeyer[*obj]
@@ -22,19 +21,22 @@ func makeObjSet() objSet {
 	return collections_value.MakeMutableValueSet(objKeyer)
 }
 
-// TODO-P1 migrate obj to sku.Transacted
 type obj struct {
-	Transacted skuType
+	ExternalLike sku.ExternalLike
 	tag_paths.Type
 }
 
 func (a *obj) cloneWithType(t tag_paths.Type) (b *obj) {
-	b = &obj{Type: t, Transacted: a.Transacted.Clone()}
+	b = &obj{
+		Type:         t,
+		ExternalLike: a.ExternalLike.Clone(),
+	}
+
 	return
 }
 
 func (a *obj) String() string {
-	return a.Transacted.String()
+	return a.ExternalLike.String()
 }
 
 func sortObjSet(
@@ -44,17 +46,17 @@ func sortObjSet(
 
 	sort.Slice(out, func(i, j int) bool {
 		switch {
-		case out[i].Transacted.GetSku().ObjectId.IsEmpty() && out[j].Transacted.GetSku().ObjectId.IsEmpty():
-			return out[i].Transacted.GetSku().Metadata.Description.String() < out[j].Transacted.GetSku().Metadata.Description.String()
+		case out[i].ExternalLike.GetSku().ObjectId.IsEmpty() && out[j].ExternalLike.GetSku().ObjectId.IsEmpty():
+			return out[i].ExternalLike.GetSku().Metadata.Description.String() < out[j].ExternalLike.GetSku().Metadata.Description.String()
 
-		case out[i].Transacted.GetSku().ObjectId.IsEmpty():
+		case out[i].ExternalLike.GetSku().ObjectId.IsEmpty():
 			return true
 
-		case out[j].Transacted.GetSku().ObjectId.IsEmpty():
+		case out[j].ExternalLike.GetSku().ObjectId.IsEmpty():
 			return false
 
 		default:
-			return out[i].Transacted.GetSku().ObjectId.String() < out[j].Transacted.GetSku().ObjectId.String()
+			return out[i].ExternalLike.GetSku().ObjectId.String() < out[j].ExternalLike.GetSku().ObjectId.String()
 		}
 	})
 
@@ -112,18 +114,18 @@ func (os Objects) Sort() {
 
 	sort.Slice(out, func(i, j int) bool {
 		switch {
-		case out[i].Transacted.GetSku().ObjectId.IsEmpty() && out[j].Transacted.GetSku().ObjectId.IsEmpty():
-			return out[i].Transacted.GetSku().Metadata.Description.String() < out[j].Transacted.GetSku().Metadata.Description.String()
+		case out[i].ExternalLike.GetSku().ObjectId.IsEmpty() && out[j].ExternalLike.GetSku().ObjectId.IsEmpty():
+			return out[i].ExternalLike.GetSku().Metadata.Description.String() < out[j].ExternalLike.GetSku().Metadata.Description.String()
 
-		case out[i].Transacted.GetSku().ObjectId.IsEmpty():
+		case out[i].ExternalLike.GetSku().ObjectId.IsEmpty():
 			return true
 
-		case out[j].Transacted.GetSku().ObjectId.IsEmpty():
+		case out[j].ExternalLike.GetSku().ObjectId.IsEmpty():
 			return false
 
 		default:
 			// TODO sort by ints for virtual object id
-			return out[i].Transacted.GetSku().ObjectId.String() < out[j].Transacted.GetSku().ObjectId.String()
+			return out[i].ExternalLike.GetSku().ObjectId.String() < out[j].ExternalLike.GetSku().ObjectId.String()
 		}
 	})
 }

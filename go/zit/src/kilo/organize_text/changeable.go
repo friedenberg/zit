@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func key(sk skuType) string {
+func key(sk sku.ExternalLike) string {
 	if sk.GetSku().ObjectId.IsEmpty() {
 		s := sk.GetSku().Metadata.Description.String()
 
@@ -53,13 +53,13 @@ func (a *Assignment) addToSet(
 
 	if err = a.Each(
 		func(o *obj) (err error) {
-			var z skuType
+			var z sku.ExternalLike
 			ok := false
 
-			if z, ok = out.m[key(o.Transacted)]; !ok {
+			if z, ok = out.m[key(o.ExternalLike)]; !ok {
 				z = sku.GetTransactedPool().Get()
 
-				sku.TransactedResetter.ResetWith(z.GetSku(), o.Transacted.GetSku())
+				sku.TransactedResetter.ResetWith(z.GetSku(), o.ExternalLike.GetSku())
 
 				if err = ot.EachPtr(
 					z.GetSku().AddTagPtr,
@@ -74,7 +74,7 @@ func (a *Assignment) addToSet(
 
 				out.Add(z)
 
-				zPrime, hasOriginal := original.Get(original.Key(o.Transacted))
+				zPrime, hasOriginal := original.Get(original.Key(o.ExternalLike))
 
 				if hasOriginal {
 					z.GetSku().Metadata.Blob.ResetWith(&zPrime.GetSku().Metadata.Blob)
@@ -86,20 +86,20 @@ func (a *Assignment) addToSet(
 				}
 			}
 
-			if o.Transacted.GetSku().ObjectId.String() == "" {
+			if o.ExternalLike.GetSku().ObjectId.String() == "" {
 				panic(fmt.Sprintf("%s: object id is nil", o))
 			}
 
 			if err = z.GetSku().Metadata.Description.Set(
-				o.Transacted.GetSku().Metadata.Description.String(),
+				o.ExternalLike.GetSku().Metadata.Description.String(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if !o.Transacted.GetSku().Metadata.Type.IsEmpty() {
+			if !o.ExternalLike.GetSku().Metadata.Type.IsEmpty() {
 				if err = z.GetSku().Metadata.Type.Set(
-					o.Transacted.GetSku().Metadata.Type.String(),
+					o.ExternalLike.GetSku().Metadata.Type.String(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -112,10 +112,10 @@ func (a *Assignment) addToSet(
 
 			z.GetSku().Metadata.Comments = append(
 				z.GetSku().Metadata.Comments,
-				o.Transacted.GetSku().Metadata.Comments...,
+				o.ExternalLike.GetSku().Metadata.Comments...,
 			)
 
-			if err = o.Transacted.GetSku().Metadata.GetTags().EachPtr(
+			if err = o.ExternalLike.GetSku().Metadata.GetTags().EachPtr(
 				z.GetSku().AddTagPtr,
 			); err != nil {
 				err = errors.Wrap(err)

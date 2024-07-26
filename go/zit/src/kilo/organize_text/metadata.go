@@ -22,7 +22,7 @@ type Metadata struct {
 	Typ      ids.Type
 }
 
-func (m Metadata) RemoveFromTransacted(sk skuType) (err error) {
+func (m Metadata) RemoveFromTransacted(sk sku.ExternalLike) (err error) {
 	mes := sk.GetSku().Metadata.GetTags().CloneMutableSetPtrLike()
 
 	if err = m.Each(mes.Del); err != nil {

@@ -33,7 +33,7 @@ type Options struct {
 	Type            ids.Type
 	GroupingTags    ids.TagSlice
 	ExtraTags       ids.TagSet
-	Transacted      interfaces.SetLike[skuType]
+	Transacted      interfaces.SetLike[sku.ExternalLike]
 
 	Abbr ids.Abbr
 
@@ -43,7 +43,7 @@ type Options struct {
 	UseMetadateaHeader     bool
 
 	PrintOptions           erworben_cli_print_options.PrintOptions
-	stringFormatReadWriter catgut.StringFormatReadWriter[skuType]
+	stringFormatReadWriter catgut.StringFormatReadWriter[sku.ExternalLike]
 }
 
 func MakeFlags() Flags {
@@ -128,25 +128,6 @@ func (o *Flags) GetOptions(
 		o.rootTags = ids.MakeTagSet()
 	} else {
 		o.rootTags = q.GetTags()
-
-		// TODO handle negated
-		// ks := collections_value.MakeMutableValueSet[sku.Query](nil)
-
-		// if err := query.VisitAllMatchers(
-		// 	func(m sku.Query) (err error) {
-		// 		if e, ok := m.(*query.Exp); ok && e.Negated {
-		// 			return ks.Add(e)
-		// 		}
-
-		// 		return
-		// 	},
-		// 	// TODO-P1 modify sigil matcher to allow child traversal
-		// 	q,
-		// ); err != nil {
-		// 	errors.PanicIfError(err)
-		// }
-
-		// o.commentMatchers = ks
 	}
 
 	o.PrintOptions = printOptions
