@@ -7,22 +7,71 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 // TODO combine everyting into one function
 
+func (s *Store) tryFD(f *fd.FD) (oidPair *ObjectIdFDPair, err error) {
+	return
+	depth := f.DepthRelativeTo(s.dir)
+	key := f.FileNameSansExt()
+	var g genres.Genre
+
+	switch f.ExtSansDot() {
+	case s.fileExtensions.Zettel:
+		g = genres.Zettel
+
+		if depth == 1 {
+			key = strings.ToLower(key)
+		} else {
+			// recognized
+		}
+
+	case s.fileExtensions.Typ:
+		g = genres.Type
+		key = strings.ToLower(key)
+
+	case s.fileExtensions.Etikett:
+		g = genres.Tag
+		key = strings.ToLower(key)
+
+	case s.fileExtensions.Kasten:
+		g = genres.Repo
+		key = strings.ToLower(key)
+
+	default: // blobs
+	}
+
+	t, ok := s.objects.Get(key)
+
+	if !ok {
+		t = &ObjectIdFDPair{}
+
+		if err = t.ObjectId.SetWithGenre(key, g); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	t.FDs.Object.ResetWith(f)
+
+	return
+}
+
 func (c *Store) tryTag(fi os.FileInfo, dir string) (err error) {
-	var h ids.Tag
 	var f *fd.FD
 
-	if f, err = fd.FileInfo(fi, dir); err != nil {
+	if f, err = fd.MakeFromFileInfoWithDir(fi, dir); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	pathMinusExt := strings.ToLower(f.FileNameSansExt())
+
+	var h ids.Tag
 
 	if err = h.Set(pathMinusExt); err != nil {
 		err = errors.Wrap(err)
@@ -49,7 +98,7 @@ func (c *Store) tryRepo(fi os.FileInfo, dir string) (err error) {
 	var h ids.RepoId
 	var f *fd.FD
 
-	if f, err = fd.FileInfo(fi, dir); err != nil {
+	if f, err = fd.MakeFromFileInfoWithDir(fi, dir); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -81,7 +130,7 @@ func (c *Store) tryType(fi os.FileInfo, dir string) (err error) {
 	var h ids.Type
 	var f *fd.FD
 
-	if f, err = fd.FileInfo(fi, dir); err != nil {
+	if f, err = fd.MakeFromFileInfoWithDir(fi, dir); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -93,7 +142,7 @@ func (c *Store) tryType(fi os.FileInfo, dir string) (err error) {
 		return
 	}
 
-	t, ok := c.types.Get(h.String())
+	t, ok := c.objects.Get(h.String())
 
 	if !ok {
 		t = &ObjectIdFDPair{}
@@ -106,7 +155,7 @@ func (c *Store) tryType(fi os.FileInfo, dir string) (err error) {
 
 	t.FDs.Object.ResetWith(f)
 
-	return c.types.Add(t)
+	return c.objects.Add(t)
 }
 
 func getZettelId(f *fd.FD, allowErrors bool) (h ids.ZettelId, err error) {
@@ -149,7 +198,7 @@ func (c *Store) tryZettel(
 ) (err error) {
 	var f *fd.FD
 
-	if f, err = fd.FDFromPath(fullPath); err != nil {
+	if f, err = fd.MakeFromPath(fullPath); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

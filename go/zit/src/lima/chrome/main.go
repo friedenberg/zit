@@ -120,12 +120,12 @@ func (c *Store) GetExternalObjectIds() (ks interfaces.SetLike[*ids.ObjectId], er
 }
 
 // TODO
-func (s *Store) GetObjectIdForString(v string) (k *ids.ObjectId, err error) {
+func (s *Store) GetObjectIdsForString(v string) (k []*ids.ObjectId, err error) {
 	err = collections.MakeErrNotFoundString(v)
 	return
-	k = ids.GetObjectIdPool().Get()
+	k = []*ids.ObjectId{ids.GetObjectIdPool().Get()}
 
-	if err = k.SetRaw(v); err != nil {
+	if err = k[0].SetRaw(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

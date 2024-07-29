@@ -189,7 +189,7 @@ func (es *Store) GetExternalObjectIds() (ks interfaces.SetLike[*ids.ObjectId], e
 	return
 }
 
-func (es *Store) GetObjectIdForString(v string) (k *ids.ObjectId, err error) {
+func (es *Store) GetObjectsIdForString(v string) (k []*ids.ObjectId, err error) {
 	if es == nil {
 		err = collections.MakeErrNotFoundString(v)
 		return
@@ -200,7 +200,7 @@ func (es *Store) GetObjectIdForString(v string) (k *ids.ObjectId, err error) {
 		return
 	}
 
-	if k, err = es.StoreLike.GetObjectIdForString(v); err != nil {
+	if k, err = es.StoreLike.GetObjectIdsForString(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -245,27 +245,29 @@ func (b *Builder) build(vs ...string) (qg *Group, err error) {
 
 	var remaining []string
 
-	for _, v := range vs {
-		var k *ids.ObjectId
+	if b.repo == nil {
+		remaining = vs
+	} else {
+		for _, v := range vs {
+			var k []*ids.ObjectId
 
-		if b.repo == nil {
-			remaining = append(remaining, v)
-			continue
+			if k, err = b.repo.GetObjectIdsForString(v); err != nil {
+				// ui.Debug().Print(k, err)
+				err = nil
+				remaining = append(remaining, v)
+				continue
+			}
+
+			for _, k := range k {
+				b.pinnedObjectIds = append(
+					b.pinnedObjectIds,
+					ObjectId{
+						ObjectId: k,
+						External: true,
+					},
+				)
+			}
 		}
-
-		if k, err = b.repo.GetObjectIdForString(v); err != nil {
-			err = nil
-			remaining = append(remaining, v)
-			continue
-		}
-
-		b.pinnedObjectIds = append(
-			b.pinnedObjectIds,
-			ObjectId{
-				ObjectId: k,
-				External: true,
-			},
-		)
 	}
 
 	var tokens []string

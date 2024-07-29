@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
-func FDFromDir(
+func MakeFromDirPath(
 	p string,
 ) (fd *FD, err error) {
 	fd = &FD{}
@@ -22,30 +22,7 @@ func FDFromDir(
 	return
 }
 
-func FDFromPathWithBlobWriterFactory(
-	p string,
-	awf interfaces.BlobWriterFactory,
-) (fd *FD, err error) {
-	if p == "" {
-		err = errors.Errorf("empty path")
-		return
-	}
-
-	if awf == nil {
-		panic("BlobWriterFactory is nil")
-	}
-
-	fd = &FD{}
-
-	if err = fd.SetWithBlobWriterFactory(p, awf); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func FDFromPath(p string) (fd *FD, err error) {
+func MakeFromPath(p string) (fd *FD, err error) {
 	if p == "" {
 		err = errors.Errorf("nil file desriptor")
 		return
@@ -63,7 +40,7 @@ func FDFromPath(p string) (fd *FD, err error) {
 		return
 	}
 
-	if fd, err = FileInfo(fi, path.Dir(p)); err != nil {
+	if fd, err = MakeFromFileInfoWithDir(fi, path.Dir(p)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -71,34 +48,13 @@ func FDFromPath(p string) (fd *FD, err error) {
 	return
 }
 
-func File(f *os.File) (fd *FD, err error) {
-	if f == nil {
-		err = errors.Errorf("nil file desriptor")
-		return
-	}
-
-	var fi os.FileInfo
-
-	if fi, err = f.Stat(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if fd, err = FileInfo(fi, path.Dir(f.Name())); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func FileInfo(fi os.FileInfo, dir string) (fd *FD, err error) {
+func MakeFromFileInfoWithDir(fi os.FileInfo, dir string) (fd *FD, err error) {
 	fd = &FD{}
-	err = fd.SetFileInfo(fi, dir)
+	err = fd.SetFileInfoWithDir(fi, dir)
 	return
 }
 
-func MakeFileFromFD(
+func MakeFromFileFromFD(
 	fd *FD,
 	awf interfaces.BlobWriterFactory,
 ) (ut *FD, err error) {
@@ -133,35 +89,7 @@ func MakeFileFromFD(
 	return
 }
 
-func MakeFileRelativeTo(
-	dir string,
-	p string,
-	awf interfaces.BlobWriterFactory,
-) (ut *FD, err error) {
-	todo.Remove()
-	ut = &FD{}
-
-	p = path.Join(dir, p)
-
-	if err = ut.Set(p); err != nil {
-		err = errors.Wrapf(err, "path: %q", p)
-		return
-	}
-
-	if err = ut.SetPathRel(ut.GetPath(), dir); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if ut, err = MakeFileFromFD(ut, awf); err != nil {
-		err = errors.Wrapf(err, "Path: %q, Dir: %q, FDPath: %q", p, dir, ut.GetPath())
-		return
-	}
-
-	return
-}
-
-func MakeFile(
+func MakeFromPathWithBlobWriterFactory(
 	p string,
 	awf interfaces.BlobWriterFactory,
 ) (ut *FD, err error) {
@@ -173,7 +101,7 @@ func MakeFile(
 		return
 	}
 
-	if ut, err = MakeFileFromFD(ut, awf); err != nil {
+	if ut, err = MakeFromFileFromFD(ut, awf); err != nil {
 		err = errors.Wrapf(err, "Path: %q", p)
 		return
 	}

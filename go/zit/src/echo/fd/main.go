@@ -94,7 +94,7 @@ func (fd *FD) SetWithBlobWriterFactory(
 		return
 	}
 
-	if err = fd.SetFileInfo(fi, path.Dir(p)); err != nil {
+	if err = fd.SetFileInfoWithDir(fi, path.Dir(p)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -105,7 +105,7 @@ func (fd *FD) SetWithBlobWriterFactory(
 	return
 }
 
-func (f *FD) SetFileInfo(fi os.FileInfo, dir string) (err error) {
+func (f *FD) SetFileInfoWithDir(fi os.FileInfo, dir string) (err error) {
 	f.Reset()
 	f.isDir = fi.IsDir()
 	f.modTime = thyme.Tyme(fi.ModTime())
@@ -140,7 +140,7 @@ func (fd *FD) Set(v string) (err error) {
 		return
 	}
 
-	if err = fd.SetFileInfo(fi, path.Dir(v)); err != nil {
+	if err = fd.SetFileInfoWithDir(fi, path.Dir(v)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -183,13 +183,24 @@ func (f *FD) String() string {
 	}
 }
 
+func (f *FD) DepthRelativeTo(dir string) int {
+	dir = filepath.Clean(dir)
+	rel, err := filepath.Rel(dir, f.GetPath())
+
+	if err != nil || strings.HasPrefix(rel, "..") {
+		return -1
+	}
+
+	return strings.Count(rel, string(filepath.Separator))
+}
+
 func (e *FD) Ext() string {
 	// TODO is this safe?
 	return strings.ToLower(path.Ext(e.path))
 }
 
 func (e *FD) ExtSansDot() string {
-	return strings.TrimPrefix(path.Ext(e.path), ".")
+	return strings.ToLower(strings.TrimPrefix(path.Ext(e.path), "."))
 }
 
 func (e *FD) FilePathSansExt() string {

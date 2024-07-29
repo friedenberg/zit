@@ -55,7 +55,7 @@ func (e *ObjectIdFDPair) SetObjectIdFromFullPath(
 ) (err error) {
 	var f *fd.FD
 
-	if f, err = fd.FDFromPath(fullPath); err != nil {
+	if f, err = fd.MakeFromPath(fullPath); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

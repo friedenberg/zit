@@ -105,7 +105,7 @@ func (c DeleteCheckout) Run(
 
 		var f *fd.FD
 
-		if f, err = fd.FDFromDir(d); err != nil {
+		if f, err = fd.MakeFromDirPath(d); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

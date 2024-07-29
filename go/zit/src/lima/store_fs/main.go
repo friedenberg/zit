@@ -44,7 +44,7 @@ type Store struct {
 	dir                string
 	zettels            interfaces.MutableSetLike[*ObjectIdFDPair]
 	unsureZettels      interfaces.MutableSetLike[*ObjectIdFDPair]
-	types              interfaces.MutableSetLike[*ObjectIdFDPair]
+	objects            interfaces.MutableSetLike[*ObjectIdFDPair]
 	repos              interfaces.MutableSetLike[*ObjectIdFDPair]
 	tags               interfaces.MutableSetLike[*ObjectIdFDPair]
 	unsureBlobs        fd.MutableSet
@@ -104,7 +104,7 @@ func (fs *Store) MarkUnsureBlob(f *fd.FD) (err error) {
 		return
 	}
 
-	if f, err = fd.MakeFileFromFD(f, fs.fs_home); err != nil {
+	if f, err = fd.MakeFromFileFromFD(f, fs.fs_home); err != nil {
 		err = errors.Wrapf(err, "%q", f)
 		return
 	}
@@ -120,7 +120,7 @@ func (fs *Store) MarkUnsureBlob(f *fd.FD) (err error) {
 func (fs *Store) String() (out string) {
 	if iter.Len(
 		fs.zettels,
-		fs.types,
+		fs.objects,
 		fs.repos,
 		fs.tags,
 		fs.unsureBlobs,
@@ -151,7 +151,7 @@ func (fs *Store) String() (out string) {
 		},
 	)
 
-	fs.types.Each(
+	fs.objects.Each(
 		func(z *ObjectIdFDPair) (err error) {
 			return writeOneIfNecessary(z)
 		},
@@ -208,8 +208,19 @@ func (s *Store) GetExternalObjectIds() (ks interfaces.SetLike[*ids.ObjectId], er
 	return
 }
 
+func (s *Store) GetObjectIdsForDir(fd *fd.FD) (k []*ids.ObjectId, err error) {
+	if !fd.IsDir() {
+		err = errors.Errorf("not a directory: %q", fd)
+		return
+	}
+
+	// TODO implement traversal
+
+	return
+}
+
 // TODO confirm against actual Object Id
-func (fs *Store) GetObjectIdForString(v string) (k *ids.ObjectId, err error) {
+func (s *Store) GetObjectIdsForString(v string) (k []*ids.ObjectId, err error) {
 	var fd fd.FD
 
 	if err = fd.Set(v); err != nil {
@@ -217,14 +228,26 @@ func (fs *Store) GetObjectIdForString(v string) (k *ids.ObjectId, err error) {
 		return
 	}
 
-	k = ids.GetObjectIdPool().Get()
-
-	if err = k.SetFromPath(
-		fd.String(),
-		fs.fileExtensions,
-	); err != nil {
+	if _, err = s.tryFD(&fd); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	if fd.IsDir() {
+		if k, err = s.GetObjectIdsForDir(&fd); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		k = []*ids.ObjectId{ids.GetObjectIdPool().Get()}
+
+		if err = k[0].SetFromPath(
+			fd.String(),
+			s.fileExtensions,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
@@ -238,7 +261,7 @@ func (fs *Store) ContainsSku(m *sku.Transacted) bool {
 		return fs.zettels.ContainsKey(m.GetObjectId().String())
 
 	case genres.Type:
-		return fs.types.ContainsKey(m.GetObjectId().String())
+		return fs.objects.ContainsKey(m.GetObjectId().String())
 
 	case genres.Tag:
 		return fs.tags.ContainsKey(m.GetObjectId().String())
@@ -254,7 +277,7 @@ func (fs *Store) GetCwdFDs() fd.Set {
 	fds := fd.MakeMutableSet()
 
 	SetAddPairs(fs.zettels, fds)
-	SetAddPairs(fs.types, fds)
+	SetAddPairs(fs.objects, fds)
 	SetAddPairs(fs.tags, fds)
 	SetAddPairs(fs.unsureZettels, fds)
 	fs.unsureBlobs.Each(fds.Add)
@@ -282,34 +305,6 @@ func (fs *Store) GetEmptyDirectories() fd.Set {
 	return fds
 }
 
-func (fs *Store) GetZettel(
-	h *ids.ZettelId,
-) (z *ObjectIdFDPair, ok bool) {
-	z, ok = fs.zettels.Get(h.String())
-	return
-}
-
-func (fs *Store) GetKasten(
-	h *ids.RepoId,
-) (z *ObjectIdFDPair, ok bool) {
-	z, ok = fs.repos.Get(h.String())
-	return
-}
-
-func (fs *Store) GetEtikett(
-	k *ids.Tag,
-) (e *ObjectIdFDPair, ok bool) {
-	e, ok = fs.tags.Get(k.String())
-	return
-}
-
-func (fs *Store) GetTyp(
-	k *ids.Type,
-) (t *ObjectIdFDPair, ok bool) {
-	t, ok = fs.types.Get(k.String())
-	return
-}
-
 func (fs *Store) Get(
 	k interfaces.ObjectId,
 ) (t *ObjectIdFDPair, ok bool) {
@@ -323,7 +318,7 @@ func (fs *Store) Get(
 		return fs.zettels.Get(k.String())
 
 	case genres.Type:
-		return fs.types.Get(k.String())
+		return fs.objects.Get(k.String())
 
 	case genres.Tag:
 		return fs.tags.Get(k.String())
@@ -352,7 +347,7 @@ func (fs *Store) All(
 
 	iter.ErrorWaitGroupApply(
 		wg,
-		fs.types,
+		fs.objects,
 		func(e *ObjectIdFDPair) (err error) {
 			return f(e)
 		},
@@ -536,7 +531,7 @@ func (s *Store) readAll() (err error) {
 
 		var f *fd.FD
 
-		if f, err = fd.FileInfo(fi, s.dir); err != nil {
+		if f, err = fd.MakeFromFileInfoWithDir(fi, s.dir); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -574,34 +569,21 @@ func (s *Store) readAll() (err error) {
 	return
 }
 
-func (c *Store) MatcherLen() int {
-	return iter.Len(
-		c.zettels,
-		c.types,
-		c.repos,
-		c.tags,
-	)
-}
-
-func (*Store) Each(_ interfaces.FuncIter[sku.Query]) error {
-	return nil
-}
-
 func (c *Store) Len() int {
 	return iter.Len(
 		c.zettels,
-		c.types,
+		c.objects,
 		c.repos,
 		c.tags,
 	)
 }
 
-func (fs *Store) readNotSecondLevelFile(name string) (err error) {
+func (s *Store) readNotSecondLevelFile(name string) (err error) {
 	if strings.HasPrefix(name, ".") {
 		return
 	}
 
-	fullPath := path.Join(fs.dir, name)
+	fullPath := path.Join(s.dir, name)
 
 	var fi os.FileInfo
 
@@ -618,33 +600,45 @@ func (fs *Store) readNotSecondLevelFile(name string) (err error) {
 	ext = strings.ToLower(ext)
 	ext = strings.TrimSpace(ext)
 
+	var f *fd.FD
+
+	if f, err = fd.MakeFromFileInfoWithDir(fi, s.dir); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, err = s.tryFD(f); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	switch strings.TrimPrefix(ext, ".") {
-	case fs.fileExtensions.Etikett:
-		if err = fs.tryTag(fi, fs.dir); err != nil {
+	case s.fileExtensions.Etikett:
+		if err = s.tryTag(fi, s.dir); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case fs.fileExtensions.Kasten:
-		if err = fs.tryRepo(fi, fs.dir); err != nil {
+	case s.fileExtensions.Kasten:
+		if err = s.tryRepo(fi, s.dir); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case fs.fileExtensions.Typ:
-		if err = fs.tryType(fi, fs.dir); err != nil {
+	case s.fileExtensions.Typ:
+		if err = s.tryType(fi, s.dir); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case fs.fileExtensions.Zettel:
-		if err = fs.tryZettelUnsure(name, fullPath); err != nil {
+	case s.fileExtensions.Zettel:
+		if err = s.tryZettelUnsure(name, fullPath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	default:
-		if err = fs.addUnsureBlob("", fullPath); err != nil {
+		if err = s.addUnsureBlob("", fullPath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -662,7 +656,7 @@ func (fs *Store) addUnsureBlob(dir, name string) (err error) {
 		fullPath = path.Join(dir, fullPath)
 	}
 
-	if ut, err = fd.MakeFile(
+	if ut, err = fd.MakeFromPathWithBlobWriterFactory(
 		fullPath,
 		fs.fs_home,
 	); err != nil {
@@ -675,7 +669,7 @@ func (fs *Store) addUnsureBlob(dir, name string) (err error) {
 	return
 }
 
-func (fs *Store) readSecondLevelFile(dir string, name string) (err error) {
+func (s *Store) readSecondLevelFile(dir string, name string) (err error) {
 	if strings.HasPrefix(name, ".") {
 		return
 	}
@@ -697,14 +691,26 @@ func (fs *Store) readSecondLevelFile(dir string, name string) (err error) {
 	ext = strings.ToLower(ext)
 	ext = strings.TrimSpace(ext)
 
+	var f *fd.FD
+
+	if f, err = fd.MakeFromFileInfoWithDir(fi, dir); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, err = s.tryFD(f); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	switch strings.TrimPrefix(ext, ".") {
-	case fs.fileExtensions.Zettel:
+	case s.fileExtensions.Zettel:
 		fallthrough
 
 		// Zettel-Blob can have any extension, and so default is Zettel
 	default:
-		if err = fs.tryZettel(dir, name, fullPath); err != nil {
-			if err = fs.addUnsureBlob(dir, name); err != nil {
+		if err = s.tryZettel(dir, name, fullPath); err != nil {
+			if err = s.addUnsureBlob(dir, name); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

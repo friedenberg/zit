@@ -29,7 +29,7 @@ func MakeCwdFilesAll(
 		repos: collections_value.MakeMutableValueSet[*ObjectIdFDPair](
 			nil,
 		),
-		types: collections_value.MakeMutableValueSet[*ObjectIdFDPair](nil),
+		objects: collections_value.MakeMutableValueSet[*ObjectIdFDPair](nil),
 		zettels: collections_value.MakeMutableValueSet[*ObjectIdFDPair](
 			nil,
 		),
