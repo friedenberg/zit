@@ -31,6 +31,12 @@ func init() {
 	gob.Register(External{})
 }
 
+type objectsAndBlobs struct {
+	unsureZettels interfaces.MutableSetLike[*ObjectIdFDPair]
+	objects       interfaces.MutableSetLike[*ObjectIdFDPair]
+	blobs         fd.MutableSet
+}
+
 // TODO support globs and ignores
 type Store struct {
 	config             sku.Config
@@ -42,13 +48,8 @@ type Store struct {
 	ic                 ids.InlineTypeChecker
 	fileExtensions     file_extensions.FileExtensions
 	dir                string
-	zettels            interfaces.MutableSetLike[*ObjectIdFDPair]
-	unsureZettels      interfaces.MutableSetLike[*ObjectIdFDPair]
-	objects            interfaces.MutableSetLike[*ObjectIdFDPair]
-	repos              interfaces.MutableSetLike[*ObjectIdFDPair]
-	tags               interfaces.MutableSetLike[*ObjectIdFDPair]
-	unsureBlobs        fd.MutableSet
-	emptyDirectories   fd.MutableSet
+	objectsAndBlobs
+	emptyDirectories fd.MutableSet
 
 	objectFormatOptions object_inventory_format.Options
 
@@ -109,7 +110,7 @@ func (fs *Store) MarkUnsureBlob(f *fd.FD) (err error) {
 		return
 	}
 
-	if err = fs.unsureBlobs.Add(f); err != nil {
+	if err = fs.blobs.Add(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -119,11 +120,8 @@ func (fs *Store) MarkUnsureBlob(f *fd.FD) (err error) {
 
 func (fs *Store) String() (out string) {
 	if iter.Len(
-		fs.zettels,
 		fs.objects,
-		fs.repos,
-		fs.tags,
-		fs.unsureBlobs,
+		fs.blobs,
 	) == 0 {
 		return
 	}
@@ -145,31 +143,13 @@ func (fs *Store) String() (out string) {
 		return
 	}
 
-	fs.zettels.Each(
-		func(z *ObjectIdFDPair) (err error) {
-			return writeOneIfNecessary(z)
-		},
-	)
-
 	fs.objects.Each(
 		func(z *ObjectIdFDPair) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
 
-	fs.tags.Each(
-		func(z *ObjectIdFDPair) (err error) {
-			return writeOneIfNecessary(z)
-		},
-	)
-
-	fs.repos.Each(
-		func(z *ObjectIdFDPair) (err error) {
-			return writeOneIfNecessary(z)
-		},
-	)
-
-	fs.unsureBlobs.Each(
+	fs.blobs.Each(
 		func(z *fd.FD) (err error) {
 			return writeOneIfNecessary(z)
 		},
@@ -228,74 +208,40 @@ func (s *Store) GetObjectIdsForString(v string) (k []*ids.ObjectId, err error) {
 		return
 	}
 
-	if _, err = s.tryFD(&fd); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if fd.IsDir() {
 		if k, err = s.GetObjectIdsForDir(&fd); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		k = []*ids.ObjectId{ids.GetObjectIdPool().Get()}
+		var oid *ObjectIdFDPair
 
-		if err = k[0].SetFromPath(
-			fd.String(),
-			s.fileExtensions,
-		); err != nil {
+		if oid, err = s.tryFD(&fd, s.objectsAndBlobs); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+
+		k = []*ids.ObjectId{&oid.ObjectId}
 	}
 
 	return
 }
 
 func (fs *Store) ContainsSku(m *sku.Transacted) bool {
-	g := genres.Must(m)
-
-	switch g {
-	case genres.Zettel:
-		return fs.zettels.ContainsKey(m.GetObjectId().String())
-
-	case genres.Type:
-		return fs.objects.ContainsKey(m.GetObjectId().String())
-
-	case genres.Tag:
-		return fs.tags.ContainsKey(m.GetObjectId().String())
-
-	case genres.Repo:
-		return fs.repos.ContainsKey(m.GetObjectId().String())
-	}
-
-	return true
-}
-
-func (fs *Store) GetCwdFDs() fd.Set {
-	fds := fd.MakeMutableSet()
-
-	SetAddPairs(fs.zettels, fds)
-	SetAddPairs(fs.objects, fds)
-	SetAddPairs(fs.tags, fds)
-	SetAddPairs(fs.unsureZettels, fds)
-	fs.unsureBlobs.Each(fds.Add)
-
-	return fds
+	return fs.objects.ContainsKey(m.GetObjectId().String())
 }
 
 func (fs *Store) GetBlobFDs() fd.Set {
 	fds := fd.MakeMutableSet()
 
-	fs.unsureBlobs.Each(fds.Add)
+	fs.blobs.Each(fds.Add)
 
 	return fds
 }
 
 func (fs *Store) GetUnsureBlobs() fd.Set {
 	fds := fd.MakeMutableSet()
-	fs.unsureBlobs.Each(fds.Add)
+	fs.blobs.Each(fds.Add)
 	return fds
 }
 
@@ -308,28 +254,7 @@ func (fs *Store) GetEmptyDirectories() fd.Set {
 func (fs *Store) Get(
 	k interfaces.ObjectId,
 ) (t *ObjectIdFDPair, ok bool) {
-	g := genres.Must(k.GetGenre())
-
-	switch g {
-	case genres.Repo:
-		return fs.repos.Get(k.String())
-
-	case genres.Zettel:
-		return fs.zettels.Get(k.String())
-
-	case genres.Type:
-		return fs.objects.Get(k.String())
-
-	case genres.Tag:
-		return fs.tags.Get(k.String())
-
-	case genres.Config:
-		// TODO-P3
-		return
-
-	default:
-		return fs.unsureZettels.Get(k.String())
-	}
+	return fs.objects.Get(k.String())
 }
 
 func (fs *Store) All(
@@ -339,31 +264,7 @@ func (fs *Store) All(
 
 	iter.ErrorWaitGroupApply(
 		wg,
-		fs.zettels,
-		func(e *ObjectIdFDPair) (err error) {
-			return f(e)
-		},
-	)
-
-	iter.ErrorWaitGroupApply(
-		wg,
 		fs.objects,
-		func(e *ObjectIdFDPair) (err error) {
-			return f(e)
-		},
-	)
-
-	iter.ErrorWaitGroupApply(
-		wg,
-		fs.repos,
-		func(e *ObjectIdFDPair) (err error) {
-			return f(e)
-		},
-	)
-
-	iter.ErrorWaitGroupApply(
-		wg,
-		fs.tags,
 		func(e *ObjectIdFDPair) (err error) {
 			return f(e)
 		},
@@ -394,18 +295,6 @@ func (fs *Store) AllUnsure(
 	)
 
 	return wg.GetError()
-}
-
-func (fs *Store) ZettelFiles() (out []string, err error) {
-	out, err = iter.DerivedValues(
-		fs.zettels,
-		func(z *ObjectIdFDPair) (p string, err error) {
-			p = z.GetObjectFD().GetPath()
-			return
-		},
-	)
-
-	return
 }
 
 func (fs *Store) readInputFiles(args ...string) (err error) {
@@ -458,6 +347,10 @@ func (s *Store) Initialize(esi external_store.Info) (err error) {
 }
 
 func (s *Store) readAll() (err error) {
+	{
+		_, err := makeDir(s.dir, s.fileExtensions)
+		errors.PanicIfError(err)
+	}
 	// TODO use walkdir instead
 	// check for empty directories
 	if err = filepath.WalkDir(
@@ -571,10 +464,7 @@ func (s *Store) readAll() (err error) {
 
 func (c *Store) Len() int {
 	return iter.Len(
-		c.zettels,
 		c.objects,
-		c.repos,
-		c.tags,
 	)
 }
 
@@ -607,41 +497,16 @@ func (s *Store) readNotSecondLevelFile(name string) (err error) {
 		return
 	}
 
-	if _, err = s.tryFD(f); err != nil {
+	var oid *ObjectIdFDPair
+
+	if oid, err = s.tryFD(f, s.objectsAndBlobs); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	switch strings.TrimPrefix(ext, ".") {
-	case s.fileExtensions.Etikett:
-		if err = s.tryTag(fi, s.dir); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case s.fileExtensions.Kasten:
-		if err = s.tryRepo(fi, s.dir); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case s.fileExtensions.Typ:
-		if err = s.tryType(fi, s.dir); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	case s.fileExtensions.Zettel:
-		if err = s.tryZettelUnsure(name, fullPath); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	default:
-		if err = s.addUnsureBlob("", fullPath); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = s.objects.Add(oid); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
@@ -664,7 +529,7 @@ func (fs *Store) addUnsureBlob(dir, name string) (err error) {
 		return
 	}
 
-	err = fs.unsureBlobs.Add(ut)
+	err = fs.blobs.Add(ut)
 
 	return
 }
@@ -687,10 +552,6 @@ func (s *Store) readSecondLevelFile(dir string, name string) (err error) {
 		return
 	}
 
-	ext := filepath.Ext(fullPath)
-	ext = strings.ToLower(ext)
-	ext = strings.TrimSpace(ext)
-
 	var f *fd.FD
 
 	if f, err = fd.MakeFromFileInfoWithDir(fi, dir); err != nil {
@@ -698,24 +559,81 @@ func (s *Store) readSecondLevelFile(dir string, name string) (err error) {
 		return
 	}
 
-	if _, err = s.tryFD(f); err != nil {
+	var oid *ObjectIdFDPair
+
+	if oid, err = s.tryFD(f, s.objectsAndBlobs); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	switch strings.TrimPrefix(ext, ".") {
-	case s.fileExtensions.Zettel:
-		fallthrough
+	if err = s.objects.Add(oid); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-		// Zettel-Blob can have any extension, and so default is Zettel
-	default:
-		if err = s.tryZettel(dir, name, fullPath); err != nil {
-			if err = s.addUnsureBlob(dir, name); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+	return
+}
+
+func (s *Store) tryFD(
+	f *fd.FD,
+	prior objectsAndBlobs,
+) (oidPair *ObjectIdFDPair, err error) {
+	depth := f.DepthRelativeTo(s.dir)
+	key := f.FileNameSansExt()
+	var g genres.Genre
+	ext := f.ExtSansDot()
+	isConflict := false
+
+	if ext == "conflict" {
+		isConflict = true
+		ext = fd.ExtSansDot(strings.TrimSuffix(f.GetPath(), f.Ext()))
+	}
+
+	switch ext {
+	case s.fileExtensions.Zettel:
+		g = genres.Zettel
+
+		if depth == 1 {
+			key = strings.ToLower(filepath.Join(f.DirBaseOnly(), key))
+		} else {
+			// recognized
+		}
+
+	case s.fileExtensions.Typ:
+		g = genres.Type
+		key = strings.ToLower(key)
+
+	case s.fileExtensions.Etikett:
+		g = genres.Tag
+		key = strings.ToLower(key)
+
+	case s.fileExtensions.Kasten:
+		g = genres.Repo
+		key = strings.ToLower(key)
+
+	default: // blobs
+		// TODO
+	}
+
+	if isConflict {
+	}
+
+	var ok bool
+
+	if prior.objects != nil {
+		oidPair, ok = prior.objects.Get(key)
+	}
+
+	if !ok {
+		oidPair = &ObjectIdFDPair{}
+
+		if err = oidPair.ObjectId.SetWithGenre(key, g); err != nil {
+			err = errors.Wrapf(err, "FD: %q", f)
+			return
 		}
 	}
+
+	oidPair.FDs.Object.ResetWith(f)
 
 	return
 }

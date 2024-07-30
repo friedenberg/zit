@@ -195,12 +195,11 @@ func (f *FD) DepthRelativeTo(dir string) int {
 }
 
 func (e *FD) Ext() string {
-	// TODO is this safe?
-	return strings.ToLower(path.Ext(e.path))
+	return Ext(e.path)
 }
 
 func (e *FD) ExtSansDot() string {
-	return strings.ToLower(strings.TrimPrefix(path.Ext(e.path), "."))
+	return ExtSansDot(e.path)
 }
 
 func (e *FD) FilePathSansExt() string {
@@ -210,9 +209,15 @@ func (e *FD) FilePathSansExt() string {
 }
 
 func (e *FD) FileNameSansExt() string {
-	base := filepath.Base(e.path)
-	ext := e.Ext()
-	return base[:len(base)-len(ext)]
+	return FileNameSansExt(e.path)
+}
+
+func (e *FD) FileNameSansExtRelTo(d string) (string, error) {
+	return FileNameSansExtRelTo(e.path, d)
+}
+
+func (e *FD) DirBaseOnly() string {
+	return DirBaseOnly(e.path)
 }
 
 func (f *FD) IsEmpty() bool {

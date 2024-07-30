@@ -26,22 +26,15 @@ func MakeCwdFilesAll(
 		fileEncoder:    MakeFileEncoder(st, k),
 		fileExtensions: fileExtensions,
 		dir:            st.Cwd(),
-		repos: collections_value.MakeMutableValueSet[*ObjectIdFDPair](
-			nil,
-		),
-		objects: collections_value.MakeMutableValueSet[*ObjectIdFDPair](nil),
-		zettels: collections_value.MakeMutableValueSet[*ObjectIdFDPair](
-			nil,
-		),
-		unsureZettels: collections_value.MakeMutableValueSet[*ObjectIdFDPair](
-			nil,
-		),
-		tags: collections_value.MakeMutableValueSet[*ObjectIdFDPair](
-			nil,
-		),
-		unsureBlobs: collections_value.MakeMutableValueSet[*fd.FD](
-			nil,
-		),
+		objectsAndBlobs: objectsAndBlobs{
+			objects: collections_value.MakeMutableValueSet[*ObjectIdFDPair](nil),
+			unsureZettels: collections_value.MakeMutableValueSet[*ObjectIdFDPair](
+				nil,
+			),
+			blobs: collections_value.MakeMutableValueSet[*fd.FD](
+				nil,
+			),
+		},
 		emptyDirectories: collections_value.MakeMutableValueSet[*fd.FD](
 			nil,
 		),

@@ -2,6 +2,7 @@ package fd
 
 import (
 	"io"
+	"io/fs"
 	"os"
 	"path"
 
@@ -18,6 +19,32 @@ func MakeFromDirPath(
 	fd = &FD{}
 	fd.isDir = true
 	fd.path = p
+
+	return
+}
+
+func MakeFromPathAndDirEntry(p string, de fs.DirEntry) (fd *FD, err error) {
+	if p == "" {
+		err = errors.Errorf("nil file desriptor")
+		return
+	}
+
+	if p == "." {
+		err = errors.Errorf("'.' not supported")
+		return
+	}
+
+	var fi os.FileInfo
+
+	if fi, err = de.Info(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if fd, err = MakeFromFileInfoWithDir(fi, path.Dir(p)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
