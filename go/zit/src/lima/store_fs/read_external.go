@@ -28,7 +28,7 @@ func (s *Store) ReadTransactedFromObjectId(
 
 func (s *Store) ReadExternalFromObjectIdFDPair(
 	o sku.CommitOptions,
-	em *ObjectIdFDPair,
+	em *FDSet,
 	t *sku.Transacted,
 ) (e *External, err error) {
 	e = GetExternalPool().Get()
@@ -43,7 +43,7 @@ func (s *Store) ReadExternalFromObjectIdFDPair(
 
 func (s *Store) ReadIntoExternalFromObjectIdFDPair(
 	o sku.CommitOptions,
-	em *ObjectIdFDPair,
+	em *FDSet,
 	t *sku.Transacted,
 	e *External,
 ) (err error) {

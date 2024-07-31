@@ -36,7 +36,7 @@ func (s *Store) checkoutOneNew(
 		return
 	}
 
-	var e *ObjectIdFDPair
+	var e *FDSet
 	ok := false
 
 	if e, ok = s.Get(&sz.ObjectId); ok {
@@ -91,7 +91,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	cofs := col.(*CheckedOut)
 	sz := cofs.GetSku()
 
-	var e *ObjectIdFDPair
+	var e *FDSet
 	ok := false
 
 	if e, ok = s.Get(&sz.ObjectId); !ok {
@@ -169,7 +169,7 @@ func (s *Store) checkoutOne(
 	inlineBlob := s.config.IsInlineType(t)
 
 	if options.CheckoutMode.IncludesMetadata() {
-		if err = cz.External.GetFDsPtr().Object.SetPath(filename); err != nil {
+		if err = cz.External.GetFDs().Object.SetPath(filename); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -185,7 +185,7 @@ func (s *Store) checkoutOne(
 			fe = t.String()
 		}
 
-		if err = cz.External.GetFDsPtr().Blob.SetPath(
+		if err = cz.External.GetFDs().Blob.SetPath(
 			originalFilename + "." + fe,
 		); err != nil {
 			err = errors.Wrap(err)

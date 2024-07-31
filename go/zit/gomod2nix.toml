@@ -34,6 +34,9 @@ schema = 3
   [mod."golang.org/x/term"]
     version = "v0.21.0"
     hash = "sha256-zRm7uPBM1+TJkODYHkk/BtN3la5QAaSgslE2hSTm27Y="
+  [mod."golang.org/x/text"]
+    version = "v0.14.0"
+    hash = "sha256-yh3B0tom1RfzQBf1RNmfdNWF1PtiqxV41jW1GVS6JAg="
   [mod."golang.org/x/xerrors"]
     version = "v0.0.0-20231012003039-104605ab7028"
     hash = "sha256-IsFTm5WZQ6W1ZDF8WOP+6xiOAc7pIq8r9Afvkjp3PRQ="

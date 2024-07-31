@@ -452,9 +452,9 @@ func (h *objectId2) SetRaw(v string) (err error) {
 // /chrome/bookmark-1
 // /chrome/!md
 // /chrome/!md
-func (h *objectId2) Set(v string) (err error) {
+func (oid *objectId2) Set(v string) (err error) {
 	if v == "/" {
-		h.g = genres.Zettel
+		oid.g = genres.Zettel
 		return
 	}
 
@@ -468,7 +468,7 @@ func (h *objectId2) Set(v string) (err error) {
 
 		v = els[1]
 
-		if err = h.SetRepoId(strings.TrimSuffix(els[0], "/")); err != nil {
+		if err = oid.SetRepoId(strings.TrimSuffix(els[0], "/")); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -476,7 +476,7 @@ func (h *objectId2) Set(v string) (err error) {
 
 	var k IdLike
 
-	switch h.g {
+	switch oid.g {
 	case genres.Unknown:
 		k, err = Make(v)
 
@@ -510,8 +510,16 @@ func (h *objectId2) Set(v string) (err error) {
 		err = h.Set(v)
 		k = &h
 
+	case genres.Blob:
+		if err = oid.left.Set(v); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+
 	default:
-		err = genres.MakeErrUnrecognizedGenre(h.g.GetGenreString())
+		err = genres.MakeErrUnrecognizedGenre(oid.g.GetGenreString())
 	}
 
 	if err != nil {
@@ -519,7 +527,7 @@ func (h *objectId2) Set(v string) (err error) {
 		return
 	}
 
-	if err = h.SetWithIdLike(k); err != nil {
+	if err = oid.SetWithIdLike(k); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

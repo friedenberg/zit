@@ -6,25 +6,51 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 )
 
-type fdExtSet map[string]*fd.FD
-
-type dir struct {
+type objects struct {
 	root string
 	file_extensions.FileExtensions
-	files map[string]fdExtSet
+	fds map[string]*FDSet
+
+	unsureZettels interfaces.MutableSetLike[*FDSet]
+	objects       interfaces.MutableSetLike[*FDSet]
+	blobs         fd.MutableSet
 }
 
-func makeDir(p string, fe file_extensions.FileExtensions) (d dir, err error) {
+func makeObjectsWithDir(
+	p string,
+	fe file_extensions.FileExtensions,
+) (d objects) {
 	d.root = p
 	d.FileExtensions = fe
-	d.files = make(map[string]fdExtSet)
+	d.fds = make(map[string]*FDSet)
+	d.objects = collections_value.MakeMutableValueSet[*FDSet](nil)
+	d.unsureZettels = collections_value.MakeMutableValueSet[*FDSet](nil)
+	d.blobs = collections_value.MakeMutableValueSet[*fd.FD](nil)
 
+	return
+}
+
+func (d *objects) walkRootDir() (err error) {
+	if err = d.walkDir(d.root, nil); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (d *objects) walkDir(
+	p string,
+	f interfaces.FuncIter[*FDSet],
+) (err error) {
 	if err = filepath.WalkDir(
 		p,
 		func(p string, de fs.DirEntry, in error) (err error) {
@@ -45,14 +71,25 @@ func makeDir(p string, fe file_extensions.FileExtensions) (d dir, err error) {
 				return
 			}
 
-			var f *fd.FD
+			var fdee *fd.FD
 
-			if f, err = fd.MakeFromPathAndDirEntry(p, de); err != nil {
+			if fdee, err = fd.MakeFromPathAndDirEntry(p, de); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if err = d.addFD(f); err != nil {
+			var fds *FDSet
+
+			if _, fds, err = d.addFD(fdee); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if f == nil || fds == nil {
+				return
+			}
+
+			if err = f(fds); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -64,19 +101,12 @@ func makeDir(p string, fe file_extensions.FileExtensions) (d dir, err error) {
 		return
 	}
 
-	ui.Debug().Print(d.files)
-
-	if err = d.processGroups(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	return
 }
 
-func (d *dir) addFD(
+func (d *objects) addFD(
 	f *fd.FD,
-) (err error) {
+) (key string, fds *FDSet, err error) {
 	if f.IsDir() {
 		return
 	}
@@ -89,98 +119,122 @@ func (d *dir) addFD(
 	}
 
 	ext := filepath.Ext(rel)
+	key = strings.TrimSuffix(rel, ext)
 
-	if ext == ".conflict" {
-		rel = strings.TrimSuffix(rel, ext)
-	}
-
-	ext = filepath.Ext(rel)
-	key := strings.TrimSuffix(rel, ext)
-
-	existing, ok := d.files[key]
+	var ok bool
+	fds, ok = d.fds[key]
 
 	if !ok {
-		existing = make(fdExtSet)
-		d.files[key] = existing
+		fds = &FDSet{
+			MutableSetLike: collections_value.MakeMutableValueSet[*fd.FD](nil),
+		}
+
+		d.fds[key] = fds
 	}
 
-	existing[rel] = f
-	d.files[key] = existing
+	fds.Add(f)
+	d.fds[key] = fds
 
 	return
 }
 
-func (d *dir) processGroups() (err error) {
-	blobs := make(map[string]*fd.FD)
-	objects := make(map[string]*fd.FD)
+func (d *objects) processFDSet(objectIdString string, fds *FDSet) (err error) {
+	var blobCount, objectCount int
 
-	for objectIdString, fds := range d.files {
-		clear(blobs)
-		clear(objects)
-
-		var g genres.Genre
-		var oneAndOnlyObject, oneAndOnlyBlob *fd.FD
-
-		for _, f := range fds {
+	if err = fds.Each(
+		func(f *fd.FD) (err error) {
 			ext := f.ExtSansDot()
-
-			var g1 genres.Genre
 
 			switch ext {
 			case d.Zettel:
-				g1 = genres.Zettel
+				fds.SetGenre(genres.Zettel)
 
 			case d.Typ:
-				g1 = genres.Type
+				fds.SetGenre(genres.Type)
 
 			case d.Etikett:
-				g1 = genres.Tag
+				fds.SetGenre(genres.Tag)
 
 			case d.Kasten:
-				g1 = genres.Repo
+				fds.SetGenre(genres.Repo)
+
+			case "conflict":
+				fds.Conflict.ResetWith(f)
+				return
 
 			default: // blobs
-				oneAndOnlyBlob = f
-				blobs[ext] = f
-				continue
+				d.blobs.Add(f)
+				fds.Blob.ResetWith(f)
+				blobCount++
+				return
 			}
 
-			objects[ext] = f
+			fds.Object.ResetWith(f)
+			objectCount++
 
-			if g == genres.Unknown {
-				g = g1
-			} else if g == g1 {
-				// duplicate
-			} else {
-			}
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-			oneAndOnlyObject = f
-		}
-
-		if g == genres.Unknown {
-			// just blobs
-		} else if len(blobs) > 1 {
-			// invalid blobs
+	if fds.GetGenre() != genres.Unknown {
+		if blobCount > 1 {
 			err = errors.Errorf(
 				"several blobs matching object id %q: %q",
 				objectIdString,
-				blobs,
+				fds.MutableSetLike,
 			)
-		} else if len(objects) > 1 {
+
+			return
+		} else if objectCount > 1 {
 			err = errors.Errorf(
-				"found more than one object: %q:%s, %q:%s",
-				objects,
+				"found more than one object: %q",
+				fds.MutableSetLike,
 			)
 
 			return
 		}
-
-		ui.Debug().Print(oneAndOnlyObject, oneAndOnlyBlob)
 	}
+
+	if fds.GetGenre() == genres.Unknown {
+		ui.Log().Print(fds.GetGenre())
+		if err = fds.ObjectId.SetWithGenre(
+			objectIdString,
+			genres.Blob,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+		ui.Log().Print(fds.GetGenre())
+	} else {
+		if err = fds.ObjectId.SetWithGenre(
+			objectIdString,
+			fds.GetGenre(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	ui.Log().Print(fds.GetGenre(), fds)
 
 	return
 }
 
-// collect all files and directories
-// match pairs
-// return pairs
+func (d *objects) ReadObjectsAndBlobs(f interfaces.FuncIter[*FDSet]) (err error) {
+	for objectIdString, fds := range d.fds {
+		if err = d.processFDSet(objectIdString, fds); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = f(fds); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}

@@ -71,7 +71,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 	}
 
 	o := &co.External
-	fds := o.GetFDsPtr()
+	fds := o.GetFDs()
 	n1, err = sw.WriteString("[")
 	n += int64(n1)
 
@@ -198,7 +198,7 @@ func (f *cliCheckedOut) writeStringFormatUntracked(
 	)
 
 	o := &co.External
-	fds := o.GetFDsPtr()
+	fds := o.GetFDs()
 
 	fdToPrint := &fds.Blob
 

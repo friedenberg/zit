@@ -21,8 +21,8 @@ func (s *Store) MakeApplyCheckedOut(
 	qg sku.Queryable,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 	o sku.CommitOptions,
-) interfaces.FuncIter[*ObjectIdFDPair] {
-	return func(em *ObjectIdFDPair) (err error) {
+) interfaces.FuncIter[*FDSet] {
+	return func(em *FDSet) (err error) {
 		if err = s.ApplyCheckedOut(o, qg, em, f); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -35,7 +35,7 @@ func (s *Store) MakeApplyCheckedOut(
 func (s *Store) ApplyCheckedOut(
 	o sku.CommitOptions,
 	qg sku.Queryable,
-	em *ObjectIdFDPair,
+	em *FDSet,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	var co *CheckedOut
@@ -44,8 +44,6 @@ func (s *Store) ApplyCheckedOut(
 		err = errors.Wrapf(err, "%v", em)
 		return
 	}
-
-	// ui.Debug().Print(qg, qg.ContainsSku(&co.External.Transacted), co)
 
 	if !qg.ContainsSku(&co.External.Transacted) {
 		return

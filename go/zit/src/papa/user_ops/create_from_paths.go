@@ -39,11 +39,11 @@ func (c CreateFromPaths) Run(
 
 	for _, arg := range args {
 		var z *store_fs.External
-		var t store_fs.ObjectIdFDPair
+		var t store_fs.FDSet
 
 		t.ObjectId.SetGenre(genres.Zettel)
 
-		if err = t.FDs.Object.Set(arg); err != nil {
+		if err = t.Object.Set(arg); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -171,7 +171,7 @@ func (c *CreateFromPaths) zettelsFromPath(
 	}
 
 	ze := store_fs.GetExternalPool().Get()
-	ze.FDs = store_fs.FDPair{
+	ze.FDs = store_fs.FDSet{
 		Object: fd,
 	}
 

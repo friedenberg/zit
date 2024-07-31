@@ -15,7 +15,7 @@ import (
 
 func (s *Store) ReadOneExternal(
 	o *sku.CommitOptions,
-	em *ObjectIdFDPair,
+	em *FDSet,
 	t *sku.Transacted,
 ) (e *External, err error) {
 	e = GetExternalPool().Get()
@@ -55,7 +55,7 @@ func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 
 func (s *Store) ReadOneExternalInto(
 	o *sku.CommitOptions,
-	em *ObjectIdFDPair,
+	em *FDSet,
 	t *sku.Transacted,
 	e *External,
 ) (err error) {
@@ -64,14 +64,18 @@ func (s *Store) ReadOneExternalInto(
 		return
 	}
 
+	if t != nil {
+		e.ObjectId.ResetWith(&t.ObjectId)
+	}
+
 	var m checkout_mode.Mode
 
-	if m, err = em.GetFDs().GetCheckoutModeOrError(); err != nil {
+	if m, err = em.GetCheckoutModeOrError(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = em.FDs.ConflictMarkerError(); err != nil {
+	if err = em.ConflictMarkerError(); err != nil {
 		return
 	}
 

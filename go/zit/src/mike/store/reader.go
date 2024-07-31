@@ -48,6 +48,19 @@ func (s *Store) ReadOneInto(
 			ui.Err().Print("config tai is empty")
 		}
 
+	case genres.Blob:
+		var oid ids.ObjectId
+
+		if err = oid.SetWithGenre(k1.String(), genres.Zettel); err != nil {
+			err = collections.MakeErrNotFound(k1)
+			return
+		}
+
+		if sk, err = s.ReadOneObjectId(k1); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 	default:
 		err = genres.MakeErrUnsupportedGenre(k1)
 		return

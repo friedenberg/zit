@@ -26,15 +26,7 @@ func MakeCwdFilesAll(
 		fileEncoder:    MakeFileEncoder(st, k),
 		fileExtensions: fileExtensions,
 		dir:            st.Cwd(),
-		objectsAndBlobs: objectsAndBlobs{
-			objects: collections_value.MakeMutableValueSet[*ObjectIdFDPair](nil),
-			unsureZettels: collections_value.MakeMutableValueSet[*ObjectIdFDPair](
-				nil,
-			),
-			blobs: collections_value.MakeMutableValueSet[*fd.FD](
-				nil,
-			),
-		},
+		objects: makeObjectsWithDir(st.Cwd(), fileExtensions),
 		emptyDirectories: collections_value.MakeMutableValueSet[*fd.FD](
 			nil,
 		),

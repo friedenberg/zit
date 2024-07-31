@@ -252,7 +252,6 @@ func (b *Builder) build(vs ...string) (qg *Group, err error) {
 			var k []*ids.ObjectId
 
 			if k, err = b.repo.GetObjectIdsForString(v); err != nil {
-				// ui.Debug().Print(k, err)
 				err = nil
 				remaining = append(remaining, v)
 				continue

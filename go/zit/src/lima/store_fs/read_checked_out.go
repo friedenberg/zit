@@ -12,7 +12,7 @@ import (
 
 func (s *Store) ReadCheckedOutFromObjectIdFDPair(
 	o sku.CommitOptions,
-	em *ObjectIdFDPair,
+	em *FDSet,
 ) (co *CheckedOut, err error) {
 	co = GetCheckedOutPool().Get()
 
@@ -28,7 +28,11 @@ func (s *Store) ReadCheckedOutFromObjectIdFDPair(
 		}
 	}
 
-	if err = s.ReadIntoCheckedOutFromTransacted(&co.Internal, co); err != nil {
+	if err = s.ReadIntoCheckedOutFromTransactedAndFDSet(
+		&co.Internal,
+		em,
+		co,
+	); err != nil {
 		if collections.IsErrNotFound(err) {
 			// TODO mark status as new
 			err = nil
@@ -66,7 +70,7 @@ func (s *Store) ReadIntoCheckedOutFromTransacted(
 
 	ok := false
 
-	var kfp *ObjectIdFDPair
+	var kfp *FDSet
 
 	if kfp, ok = s.Get(&sk.ObjectId); !ok {
 		err = collections.MakeErrNotFound(sk.GetObjectId())
@@ -85,7 +89,7 @@ func (s *Store) ReadIntoCheckedOutFromTransacted(
 			err = iter.MakeErrStopIteration()
 		} else if errors.Is(err, ErrExternalHasConflictMarker) {
 			co.State = checked_out_state.StateConflicted
-			co.External.FDs = kfp.FDs
+			co.External.FDs.ResetWith(kfp)
 
 			if err = co.External.ObjectId.SetWithIdLike(&sk.ObjectId); err != nil {
 				err = errors.Wrap(err)
@@ -95,6 +99,47 @@ func (s *Store) ReadIntoCheckedOutFromTransacted(
 			return
 		} else {
 			err = errors.Wrapf(err, "Cwd: %#v", kfp)
+		}
+
+		return
+	}
+
+	sku.DetermineState(co, false)
+
+	return
+}
+
+func (s *Store) ReadIntoCheckedOutFromTransactedAndFDSet(
+	sk *sku.Transacted,
+	fds *FDSet,
+	co *CheckedOut,
+) (err error) {
+	if &co.Internal != sk {
+		sku.Resetter.ResetWith(&co.Internal, sk)
+	}
+
+	if err = s.ReadIntoExternalFromObjectIdFDPair(
+		sku.CommitOptions{
+			Mode: objekte_mode.ModeUpdateTai,
+		},
+		fds,
+		sk,
+		&co.External,
+	); err != nil {
+		if errors.IsNotExist(err) {
+			err = iter.MakeErrStopIteration()
+		} else if errors.Is(err, ErrExternalHasConflictMarker) {
+			co.State = checked_out_state.StateConflicted
+			co.External.FDs.ResetWith(fds)
+
+			if err = co.External.ObjectId.SetWithIdLike(&sk.ObjectId); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		} else {
+			err = errors.Wrapf(err, "Cwd: %#v", fds)
 		}
 
 		return

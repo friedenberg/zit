@@ -14,7 +14,7 @@ import (
 
 type External struct {
 	sku.Transacted
-	FDs FDPair
+	FDs FDSet
 }
 
 func (t *External) GetSkuExternalLike() sku.ExternalLike {
@@ -77,11 +77,7 @@ func (a *External) SetBlobSha(v interfaces.Sha) (err error) {
 	return
 }
 
-func (a *External) GetFDs() *FDPair {
-	return &a.FDs
-}
-
-func (a *External) GetFDsPtr() *FDPair {
+func (a *External) GetFDs() *FDSet {
 	return &a.FDs
 }
 
@@ -103,12 +99,12 @@ func (a *External) GetObjectFD() *fd.FD {
 }
 
 func (a *External) ResetWithExternalMaybe(
-	b *ObjectIdFDPair,
+	b *FDSet,
 ) (err error) {
-	k := b.GetObjectId()
+	k := &b.ObjectId
 	a.ObjectId.ResetWithIdLike(k)
 	object_metadata.Resetter.Reset(&a.Metadata)
-	a.FDs.ResetWith(b.GetFDs())
+	a.FDs.ResetWith(b)
 
 	return
 }
