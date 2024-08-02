@@ -12,13 +12,14 @@ import (
 type Cli struct {
 	BasePath string
 
-	Debug    debug.Options
-	Verbose  bool
-	Quiet    bool
-	Todo     bool
-	DryRun   bool
-	Complete bool
-	Hooks    string
+	Debug            debug.Options
+	Verbose          bool
+	Quiet            bool
+	Todo             bool
+	DryRun           bool
+	Complete         bool
+	IgnoreHookErrors bool
+	Hooks            string
 
 	IncludeCwd    bool
 	IncludeHidden bool
@@ -84,6 +85,13 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 		"zittish-newlines",
 		false,
 		"add extra newlines to zittish to improve readability",
+	)
+
+	f.BoolVar(
+		&c.IgnoreHookErrors,
+		"ignore-hook-errors",
+		false,
+		"ignores errors coming out of hooks",
 	)
 
 	f.StringVar(&c.Hooks, "hooks", "", "")

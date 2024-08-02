@@ -30,15 +30,23 @@ func (s *Store) tryRealize(
 	}
 
 	if err = s.tryPreCommitHooks(kinder, mutter, o); err != nil {
-		err = errors.Wrap(err)
-		return
+		if s.config.IgnoreHookErrors {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	// TODO just just mutter == nil
 	if mutter == nil {
 		if err = s.tryNewHook(kinder, o); err != nil {
-			err = errors.Wrap(err)
-			return
+			if s.config.IgnoreHookErrors {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 	}
 

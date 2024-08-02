@@ -82,6 +82,16 @@ type Pool[T Poolable[T], TPtr PoolablePtr[T]] interface {
 	PutMany(...TPtr) error
 }
 
+type PoolValue2[T any] interface {
+	Get() (T, error)
+	Put(i T) (err error)
+}
+
+type Pool2[T Poolable[T], TPtr PoolablePtr[T]] interface {
+	PoolValue2[TPtr]
+	PutMany(...TPtr) error
+}
+
 //  __     __    _              ____       _
 //  \ \   / /_ _| |_   _  ___  / ___|  ___| |_ ___
 //   \ \ / / _` | | | | |/ _ \ \___ \ / _ \ __/ __|

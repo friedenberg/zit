@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/pool2"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -19,7 +20,11 @@ func PushTopFunc(
 	lvm LuaVMPool,
 	args []string,
 ) (vm *LuaVM, argsOut []string, err error) {
-	vm = lvm.Get()
+	if vm, err = lvm.Get(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	vm.LValue = vm.Top
 
 	var f *lua.LFunction
@@ -37,14 +42,20 @@ func PushTopFunc(
 }
 
 type (
-	LuaVMPool    interfaces.Pool[LuaVM, *LuaVM]
+	LuaVMPool    interfaces.Pool2[LuaVM, *LuaVM]
 	LuaTablePool = interfaces.Pool[LuaTable, *LuaTable]
 )
 
 func MakeLuaVMPool(lvp *lua.VMPool, selbst *sku.Transacted) LuaVMPool {
-	return pool.MakePool(
-		func() (out *LuaVM) {
-			vm := lvp.Pool.Get()
+	return pool2.MakePool(
+		func() (out *LuaVM, err error) {
+      var vm *lua.VM
+
+			if vm, err = lvp.Pool2.Get(); err != nil {
+        err = errors.Wrap(err)
+        return
+      }
+
 			out = &LuaVM{
 				VM:        vm,
 				TablePool: MakeLuaTablePool(vm),

@@ -193,7 +193,13 @@ func (s *Store) tryPreCommitHook(
 		return
 	}
 
-	vm := vp.Get()
+	var vm *sku_fmt.LuaVM
+
+	if vm, err = vp.Get(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	defer vp.Put(vm)
 
 	var tt *lua.LTable
@@ -271,7 +277,17 @@ func (s *Store) tryHookWithName(
 		return
 	}
 
-	vm := vp.Get()
+	var vm *sku_fmt.LuaVM
+
+	if vm, err = vp.Get(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err != nil {
+		return
+	}
+
 	defer vp.Put(vm)
 
 	var tt *lua.LTable

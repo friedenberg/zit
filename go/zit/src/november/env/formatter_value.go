@@ -870,7 +870,13 @@ func (u *Env) makeTypFormatter(
 				return
 			}
 
-			vm := vp.Get()
+			var vm *sku_fmt.LuaVM
+
+			if vm, err = vp.Get(); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
 			defer vp.Put(vm)
 
 			f := vm.GetField(vm.Top, "on_pre_commit")

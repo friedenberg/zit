@@ -23,7 +23,7 @@ endfunction
 
 noremap <buffer> gf :call GfZettel()<CR>
 
-" TODO support external akte
+" TODO support external blob
 function! ZitAction()
   let [l:items, l:processedItems] = ZitGetActionNames()
 
@@ -60,7 +60,7 @@ function! ZitMakeUTIGroupCommand(uti_group, cmd_args_unprocessed_list)
     call add(l:cmd_args_list, "-i")
     call add(l:cmd_args_list, l:uti)
     let l:cmd_sub_args = [
-          \ "$BIN_ZIT", "format-zettel", "-mode akte",
+          \ "$BIN_ZIT", "format-zettel", "-mode blob",
           \ "-uti-group", a:uti_group,
           \ l:uti,
           \ GetKennung(),
@@ -123,7 +123,7 @@ function! ZitPreview()
     let l:tempfile = tempname() .. "." .. l:format
 
     let l:cmd_args_list = [
-          \ "zit format-zettel -mode akte",
+          \ "zit format-zettel -mode blob",
           \ l:format,
           \ l:hinweis,
           \ ">",

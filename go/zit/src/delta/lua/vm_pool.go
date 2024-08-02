@@ -6,11 +6,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/pool2"
 	lua "github.com/yuin/gopher-lua"
 )
 
 type VMPool struct {
-	interfaces.Pool[VM, *VM]
+	interfaces.Pool2[VM, *VM]
 	Require  LGFunction
 	Searcher LGFunction
 	compiled *lua.FunctionProto
@@ -69,7 +70,11 @@ func (sp *VMPool) PrepareVM(
 
 	lfunc := vm.NewFunctionFromProto(sp.compiled)
 	vm.Push(lfunc)
-	errors.PanicIfError(vm.PCall(0, 1, nil))
+
+	if err = vm.PCall(0, 1, nil); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	vm.Top = vm.LState.Get(1)
 	vm.Pop(1)
@@ -86,15 +91,18 @@ func (sp *VMPool) SetReader(
 		return
 	}
 
-	sp.Pool = pool.MakePool(
-		func() (vm *VM) {
+	sp.Pool2 = pool2.MakePool(
+		func() (vm *VM, err error) {
 			vm = &VM{
 				LState: lua.NewState(),
 			}
 
-			errors.PanicIfError(sp.PrepareVM(vm, apply))
+			if err = sp.PrepareVM(vm, apply); err != nil {
+        err = errors.Wrap(err)
+        return
+      }
 
-			return vm
+			return
 		},
 		func(vm *VM) {
 			vm.SetTop(0)

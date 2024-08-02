@@ -64,11 +64,16 @@ type Lua struct {
 }
 
 func (matcher Lua) ContainsSku(sk *sku.Transacted) bool {
-	vm := matcher.Get()
+	vm, err := matcher.Get()
+
+  if err != nil {
+    ui.Err().Printf("lua script error: %s", err)
+    return false
+  }
+
 	defer matcher.Put(vm)
 
 	var t *lua.LTable
-	var err error
 
 	t, err = vm.VM.GetTopTableOrError()
 	if err != nil {
