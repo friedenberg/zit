@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
@@ -20,6 +21,17 @@ type FDSet struct {
 	Conflict fd.FD
 
 	interfaces.MutableSetLike[*fd.FD]
+}
+
+func (ef *FDSet) Debug() string {
+	return fmt.Sprintf(
+		"ObjectId: %q, Object: %q, Blob: %q, Conflict: %q, All: %q",
+		&ef.ObjectId,
+		&ef.Object,
+		&ef.Blob,
+		&ef.Conflict,
+		ef.MutableSetLike,
+	)
 }
 
 func (ef *FDSet) GetTai() ids.Tai {
@@ -44,6 +56,14 @@ func (dst *FDSet) ResetWith(src *FDSet) {
 	dst.Object.ResetWith(&src.Object)
 	dst.Blob.ResetWith(&src.Blob)
 	dst.Conflict.ResetWith(&src.Conflict)
+
+	if dst.MutableSetLike == nil {
+		dst.MutableSetLike = collections_value.MakeMutableValueSet[*fd.FD](nil)
+	}
+
+	if src.MutableSetLike != nil {
+		src.MutableSetLike.Each(dst.MutableSetLike.Add)
+	}
 }
 
 func (a *FDSet) Equals(b *FDSet) bool {
@@ -73,6 +93,11 @@ func (e *FDSet) conflictMarkerExists(fd *fd.FD) (ok bool) {
 }
 
 func (e *FDSet) ConflictMarkerError() (err error) {
+	if files.Exists(e.Conflict.GetPath()) {
+		err = errors.Wrapf(ErrExternalHasConflictMarker, "Conflict: %s", &e.Conflict)
+		return
+	}
+
 	if e.conflictMarkerExists(&e.Object) {
 		err = errors.Wrapf(ErrExternalHasConflictMarker, "Object: %s", &e.Object)
 		return
@@ -87,6 +112,11 @@ func (e *FDSet) ConflictMarkerError() (err error) {
 }
 
 func (e *FDSet) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
+	if err = e.ConflictMarkerError(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	switch {
 	case !e.Object.IsEmpty() && !e.Blob.IsEmpty():
 		m = checkout_mode.ModeMetadataAndBlob
@@ -99,7 +129,7 @@ func (e *FDSet) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 
 	default:
 		err = checkout_mode.MakeErrInvalidCheckoutMode(
-			errors.Errorf("all FD's are empty"),
+			errors.Errorf("all FD's are empty: %v", e.MutableSetLike),
 		)
 	}
 

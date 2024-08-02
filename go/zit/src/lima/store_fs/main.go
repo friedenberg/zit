@@ -56,6 +56,11 @@ func (fs *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
 	fs.deleteLock.Lock()
 	defer fs.deleteLock.Unlock()
 
+	if err = fs.deleted.Add(&e.FDs.Conflict); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = fs.deleted.Add(e.GetObjectFD()); err != nil {
 		err = errors.Wrap(err)
 		return

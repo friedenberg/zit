@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -40,6 +41,7 @@ func (s *Store) checkoutOneNew(
 	ok := false
 
 	if e, ok = s.Get(&sz.ObjectId); ok {
+		ui.Log().Print("E", e.MutableSetLike)
 		var cze *External
 
 		if cze, err = s.ReadExternalFromObjectIdFDPair(
@@ -50,6 +52,8 @@ func (s *Store) checkoutOneNew(
 			sz,
 		); err != nil {
 			if errors.Is(err, ErrExternalHasConflictMarker) && options.AllowConflicted {
+				cz.External.ResetWith(cze)
+				sku.DetermineState(cz, true)
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -71,6 +75,8 @@ func (s *Store) checkoutOneNew(
 				}
 			}
 		}
+
+		ui.Log().Print("EQUAL", cz.External.FDs.MutableSetLike, cze.FDs.MutableSetLike)
 	}
 
 	if err = s.checkoutOne(

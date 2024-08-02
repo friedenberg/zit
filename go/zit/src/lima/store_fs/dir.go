@@ -7,7 +7,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -119,6 +118,12 @@ func (d *objects) addFD(
 	}
 
 	ext := filepath.Ext(rel)
+
+	if ext == ".conflict" {
+		rel = strings.TrimSuffix(rel, ext)
+		ext = filepath.Ext(rel)
+	}
+
 	key = strings.TrimSuffix(rel, ext)
 
 	var ok bool
@@ -199,7 +204,6 @@ func (d *objects) processFDSet(objectIdString string, fds *FDSet) (err error) {
 	}
 
 	if fds.GetGenre() == genres.Unknown {
-		ui.Log().Print(fds.GetGenre())
 		if err = fds.ObjectId.SetWithGenre(
 			objectIdString,
 			genres.Blob,
@@ -207,7 +211,6 @@ func (d *objects) processFDSet(objectIdString string, fds *FDSet) (err error) {
 			err = errors.Wrap(err)
 			return
 		}
-		ui.Log().Print(fds.GetGenre())
 	} else {
 		if err = fds.ObjectId.SetWithGenre(
 			objectIdString,
@@ -217,8 +220,6 @@ func (d *objects) processFDSet(objectIdString string, fds *FDSet) (err error) {
 			return
 		}
 	}
-
-	ui.Log().Print(fds.GetGenre(), fds)
 
 	return
 }

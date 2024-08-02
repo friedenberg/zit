@@ -75,9 +75,9 @@ func (s *Store) ReadOneExternalInto(
 		return
 	}
 
-	if err = em.ConflictMarkerError(); err != nil {
-		return
-	}
+	// if err = em.ConflictMarkerError(); err != nil {
+	// 	return
+	// }
 
 	var t1 *sku.Transacted
 

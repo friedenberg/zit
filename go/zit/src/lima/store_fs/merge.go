@@ -143,6 +143,8 @@ func (s *Store) RunMergeTool(
 	tool []string,
 	tm sku.Conflicted,
 ) (co *CheckedOut, err error) {
+	co = tm.CheckedOutLike.(*CheckedOut)
+
 	inlineBlob := tm.IsAllInlineType(s.config)
 
 	op := checkout_options.Options{

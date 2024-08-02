@@ -111,7 +111,6 @@ function checkout_zettel_akte_then_objekte { # @test
 
 	run ls one/
 	assert_output - <<-EOM
-		uno.md
 		uno.zettel
 	EOM
 
