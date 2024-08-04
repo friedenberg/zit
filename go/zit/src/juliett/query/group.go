@@ -378,7 +378,13 @@ func (qg *Group) String() string {
 }
 
 func (qg *Group) ContainsSku(sk *sku.Transacted) (ok bool) {
-	defer sk.Metadata.Cache.QueryPath.PushOnOk(qg, &ok)
+	defer sk.Metadata.Cache.QueryPath.PushOnReturn(qg, &ok)
+
+	if len(qg.OptimizedQueries) == 0 {
+		ok = true
+		return
+	}
+
 	g := sk.GetGenre()
 
 	q, ok := qg.OptimizedQueries[genres.Must(g)]
@@ -397,7 +403,7 @@ func (qg *Group) ContainsExternalSku(
 	sk *sku.Transacted,
 	state checked_out_state.State,
 ) (ok bool) {
-	defer sk.Metadata.Cache.QueryPath.PushOnOk(qg, &ok)
+	defer sk.Metadata.Cache.QueryPath.PushOnReturn(qg, &ok)
 
 	if qg.dotOperatorActive {
 		ok = true

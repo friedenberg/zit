@@ -133,9 +133,6 @@ func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 		av.WriteExactlyOneEmpty()
 	}
 
-	cursor := sku.GetTransactedPool().Get()
-	defer sku.GetTransactedPool().Put(cursor)
-
 	write := func(z *obj) (err error) {
 		var sb strings.Builder
 
@@ -145,17 +142,17 @@ func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 			sb.WriteString("% ")
 		}
 
-		sku.TransactedResetter.ResetWith(cursor, z.ExternalLike.GetSku())
-		cursor.Metadata.Subtract(&av.Metadata)
-
-		mes := cursor.GetMetadata().GetTags().CloneMutableSetPtrLike()
+		cursor := z.ExternalLike.Clone()
+		sk := cursor.GetSku()
+		sk.Metadata.Subtract(&av.Metadata)
+		mes := sk.GetMetadata().GetTags().CloneMutableSetPtrLike()
 
 		if err = a.SubtractFromSet(mes); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		cursor.Metadata.SetTags(mes)
+		sk.Metadata.SetTags(mes)
 
 		if _, err = av.stringFormatWriter.WriteStringFormat(&sb, cursor); err != nil {
 			err = errors.Wrap(err)

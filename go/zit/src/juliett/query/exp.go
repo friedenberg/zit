@@ -14,23 +14,21 @@ import (
 )
 
 type Exp struct {
-	MatchOnEmpty bool
-	Or           bool
-	Negated      bool
-	Exact        bool
-	Hidden       bool
-	Debug        bool
-	Children     []sku.Query
+	Or       bool
+	Negated  bool
+	Exact    bool
+	Hidden   bool
+	Debug    bool
+	Children []sku.Query
 }
 
 func (a *Exp) Clone() (b *Exp) {
 	b = &Exp{
-		MatchOnEmpty: a.MatchOnEmpty,
-		Or:           a.Or,
-		Negated:      a.Negated,
-		Exact:        a.Exact,
-		Hidden:       a.Hidden,
-		Debug:        a.Debug,
+		Or:      a.Or,
+		Negated: a.Negated,
+		Exact:   a.Exact,
+		Hidden:  a.Hidden,
+		Debug:   a.Debug,
 	}
 
 	b.Children = make([]sku.Query, len(a.Children))
@@ -85,7 +83,6 @@ func (e *Exp) Reduce(b *Builder) (err error) {
 		}
 	}
 
-	e.MatchOnEmpty = !b.doNotMatchEmpty
 	chillen := make([]sku.Query, 0, len(e.Children))
 
 	for _, m := range e.Children {
@@ -216,10 +213,10 @@ func (m *Exp) negateIfNecessary(v bool) bool {
 
 func (e *Exp) ContainsSku(sk *sku.Transacted) (ok bool) {
 	ui.Log().Printf("%s in %s", sk, e)
-	defer sk.Metadata.Cache.QueryPath.PushOnOk(e, &ok)
+	defer sk.Metadata.Cache.QueryPath.PushOnReturn(e, &ok)
 
 	if len(e.Children) == 0 {
-		ok = e.negateIfNecessary(e.MatchOnEmpty)
+		ok = e.negateIfNecessary(true)
 		return
 	}
 

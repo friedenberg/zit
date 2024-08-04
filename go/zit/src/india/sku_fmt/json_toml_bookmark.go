@@ -18,7 +18,7 @@ type JsonWithUrl struct {
 func MakeJsonTomlBookmark(
 	sk *sku.Transacted,
 	s fs_home.Home,
-	chromeTabs []interface{},
+	tabs []interface{},
 ) (j JsonWithUrl, err error) {
 	if err = j.FromTransacted(sk, s); err != nil {
 		err = errors.Wrap(err)
@@ -37,7 +37,7 @@ func MakeJsonTomlBookmark(
 		return
 	}
 
-	for _, tabRaw := range chromeTabs {
+	for _, tabRaw := range tabs {
 		tab := tabRaw.(map[string]interface{})
 		var u *url.URL
 

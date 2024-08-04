@@ -272,7 +272,8 @@ func (c Organize) handleReadChangesError(err error) (tryAgain bool) {
 		return
 	}
 
-	ui.Err().Printf("reading changes failed: %q", err)
+	ui.Err().Printf("reading changes failed:")
+	ui.Err().Print(err)
 	ui.Err().Printf("would you like to edit and try again? (y/*)")
 
 	var answer rune

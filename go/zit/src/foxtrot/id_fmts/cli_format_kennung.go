@@ -25,7 +25,7 @@ func MakeObjectIdCliFormat(
 		sfwColor: string_format_writer.MakeColor(
 			co,
 			catgut.StringFormatWriter,
-			string_format_writer.ColorTypePointer,
+			string_format_writer.ColorTypeId,
 		),
 		sfwNoColor: catgut.StringFormatWriter,
 		abbr:       abbr,

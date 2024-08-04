@@ -27,7 +27,7 @@ func MakeShaCliFormat(
 		stringFormatWriter: string_format_writer.MakeColor[string](
 			co,
 			string_format_writer.MakeString[string](),
-			string_format_writer.ColorTypeConstant,
+			string_format_writer.ColorTypeHash,
 		),
 	}
 }

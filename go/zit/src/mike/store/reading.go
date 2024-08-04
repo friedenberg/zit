@@ -90,7 +90,7 @@ func (s *Store) ReadCheckedOutFromTransacted(
 	sk *sku.Transacted,
 ) (co sku.CheckedOutLike, err error) {
 	switch kasten.GetRepoIdString() {
-	case "chrome":
+	case "browser":
 		err = todo.Implement()
 
 	default:

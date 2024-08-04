@@ -326,36 +326,36 @@ func (b *Builder) buildManyFromTokens(
 	qg *Group,
 	tokens ...string,
 ) (err error) {
-	if len(tokens) == 1 && tokens[0] == "." {
-		// TODO [ces/mew] switch to marker on query group for Cwd
-		var ks interfaces.SetLike[*ids.ObjectId]
+	// if len(tokens) == 1 && tokens[0] == "." {
+	// 	// TODO [ces/mew] switch to marker on query group for Cwd
+	// 	var ks interfaces.SetLike[*ids.ObjectId]
 
-		if ks, err = b.repo.GetExternalObjectIds(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	// 	if ks, err = b.repo.GetExternalObjectIds(); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return
+	// 	}
 
-		if err = ks.Each(
-			func(k *ids.ObjectId) (err error) {
-				b.pinnedObjectIds = append(
-					b.pinnedObjectIds,
-					ObjectId{
-						ObjectId: k,
-						External: true,
-					},
-				)
+	// 	if err = ks.Each(
+	// 		func(k *ids.ObjectId) (err error) {
+	// 			b.pinnedObjectIds = append(
+	// 				b.pinnedObjectIds,
+	// 				ObjectId{
+	// 					ObjectId: k,
+	// 					External: true,
+	// 				},
+	// 			)
 
-				return
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	// 			return
+	// 		},
+	// 	); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return
+	// 	}
 
-		qg.dotOperatorActive = true
+	// 	qg.dotOperatorActive = true
 
-		return
-	}
+	// 	return
+	// }
 
 	for len(tokens) > 0 {
 		if tokens, err = b.parseOneFromTokens(qg, tokens...); err != nil {

@@ -30,7 +30,7 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Last{}
 
-			f.Var(&c.RepoId, "kasten", "none or Chrome")
+			f.Var(&c.RepoId, "kasten", "none or Browser")
 			f.StringVar(&c.Format, "format", "log", "format")
 			f.BoolVar(&c.Organize, "organize", false, "")
 			f.BoolVar(&c.Edit, "edit", false, "")

@@ -4,7 +4,6 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
@@ -87,7 +86,6 @@ func (c commandWithQuery) Run(u *env.Env, args ...string) (err error) {
 	c.Group.ExternalQueryOptions = c.ExternalQueryOptions
 
 	if err = c.RunWithQuery(u, c.Group); err != nil {
-		ui.Debug().Printf("%#v", err)
 		err = errors.Wrap(err)
 		return
 	}

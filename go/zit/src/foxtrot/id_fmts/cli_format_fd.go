@@ -19,7 +19,7 @@ func MakeFDCliFormat(
 		stringFormatWriter: string_format_writer.MakeColor[string](
 			co,
 			relativePathStringFormatWriter,
-			string_format_writer.ColorTypePointer,
+			string_format_writer.ColorTypeId,
 		),
 	}
 }

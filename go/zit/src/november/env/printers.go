@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/lima/chrome"
+	"code.linenisgreat.com/zit/go/zit/src/lima/browser"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 )
 
@@ -82,7 +82,7 @@ func (u *Env) PrinterHeader() interfaces.FuncIter[string] {
 				string_format_writer.MakeColor(
 					u.FormatColorOptionsOut(),
 					string_format_writer.MakeString[string](),
-					string_format_writer.ColorTypeTitle,
+					string_format_writer.ColorTypeHeading,
 				),
 			),
 		)
@@ -133,13 +133,13 @@ func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[sku.CheckedOutLike] {
 	}
 }
 
-func (u *Env) PrinterCheckedOutChrome() interfaces.FuncIter[sku.CheckedOutLike] {
+func (u *Env) PrinterCheckedOutBrowser() interfaces.FuncIter[sku.CheckedOutLike] {
 	oo := u.FormatOutputOptions()
 
 	err := string_format_writer.MakeDelim(
 		"\n",
 		u.Err(),
-		chrome.MakeCliCheckedOutFormat(
+		browser.MakeCliCheckedOutFormat(
 			u.config.PrintOptions,
 			u.StringFormatWriterShaLike(oo.ColorOptionsErr),
 			u.StringFormatWriterObjectId(oo.ColorOptionsErr),
@@ -151,13 +151,17 @@ func (u *Env) PrinterCheckedOutChrome() interfaces.FuncIter[sku.CheckedOutLike] 
 				true,
 			),
 			u.StringFormatWriterEtiketten(oo.ColorOptionsErr),
+			u.StringFormatWriterField(
+        66,
+				oo.ColorOptionsErr,
+			),
 		),
 	)
 
 	out := string_format_writer.MakeDelim(
 		"\n",
 		u.Out(),
-		chrome.MakeCliCheckedOutFormat(
+		browser.MakeCliCheckedOutFormat(
 			u.config.PrintOptions,
 			u.StringFormatWriterShaLike(oo.ColorOptionsOut),
 			u.StringFormatWriterObjectId(oo.ColorOptionsOut),
@@ -169,6 +173,10 @@ func (u *Env) PrinterCheckedOutChrome() interfaces.FuncIter[sku.CheckedOutLike] 
 				true,
 			),
 			u.StringFormatWriterEtiketten(oo.ColorOptionsOut),
+			u.StringFormatWriterField(
+        66,
+				oo.ColorOptionsErr,
+			),
 		),
 	)
 
@@ -185,11 +193,11 @@ func (u *Env) PrinterCheckedOutForKasten(
 	k ids.RepoId,
 ) interfaces.FuncIter[sku.CheckedOutLike] {
 	pcofs := u.PrinterCheckedOutFS()
-	pcochrome := u.PrinterCheckedOutChrome()
+	pcobrowser := u.PrinterCheckedOutBrowser()
 
 	switch k.GetRepoIdString() {
-	case "chrome":
-		return pcochrome
+	case "browser":
+		return pcobrowser
 
 	default:
 		return pcofs
@@ -198,12 +206,12 @@ func (u *Env) PrinterCheckedOutForKasten(
 
 func (u *Env) PrinterCheckedOutLike() interfaces.FuncIter[sku.CheckedOutLike] {
 	pcofs := u.PrinterCheckedOutFS()
-	pcochrome := u.PrinterCheckedOutChrome()
+	pcobrowser := u.PrinterCheckedOutBrowser()
 
 	return func(co sku.CheckedOutLike) (err error) {
 		switch co.GetRepoId().GetRepoIdString() {
-		case "chrome":
-			return pcochrome(co)
+		case "browser":
+			return pcobrowser(co)
 
 		default:
 			return pcofs(co)

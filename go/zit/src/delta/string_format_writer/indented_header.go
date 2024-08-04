@@ -12,7 +12,7 @@ func MakeIndentedHeader(
 		stringFormatWriter: MakeColor[string](
 			o,
 			MakeRightAligned(),
-			ColorTypeTitle,
+			ColorTypeHeading,
 		),
 	}
 }

@@ -448,10 +448,10 @@ func (h *objectId2) SetRaw(v string) (err error) {
 
 // TODO parse this directly
 // one/uno
-// /chrome/one/uno
-// /chrome/bookmark-1
-// /chrome/!md
-// /chrome/!md
+// /browser/one/uno
+// /browser/bookmark-1
+// /browser/!md
+// /browser/!md
 func (oid *objectId2) Set(v string) (err error) {
 	if v == "/" {
 		oid.g = genres.Zettel

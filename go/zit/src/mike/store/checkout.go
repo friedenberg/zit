@@ -103,7 +103,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	col sku.CheckedOutLike,
 ) (err error) {
 	switch col.GetRepoId().GetRepoIdString() {
-	case "chrome":
+	case "browser":
 		err = todo.Implement()
 
 	default:

@@ -30,7 +30,7 @@ func (k ObjectId) Reduce(b *Builder) (err error) {
 
 // TODO support exact
 func (k ObjectId) ContainsSku(sk *sku.Transacted) (ok bool) {
-	defer sk.Metadata.Cache.QueryPath.PushOnOk(k, &ok)
+	defer sk.Metadata.Cache.QueryPath.PushOnReturn(k, &ok)
 
 	me := sk.GetMetadata()
 

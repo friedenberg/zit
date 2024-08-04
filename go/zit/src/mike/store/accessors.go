@@ -21,8 +21,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 )
 
-func (u *Store) GetChrestStore() *external_store.Store {
-	return u.externalStores["chrome"]
+func (u *Store) GetBrowserStore() *external_store.Store {
+	return u.externalStores["browser"]
 }
 
 func (s *Store) GetBlobStore() *blob_store.VersionedStores {

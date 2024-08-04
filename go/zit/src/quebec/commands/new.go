@@ -33,7 +33,7 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &New{}
 
-			f.Var(&c.RepoId, "kasten", "none or Chrome")
+			f.Var(&c.RepoId, "kasten", "none or Browser")
 
 			f.BoolVar(
 				&c.Delete,

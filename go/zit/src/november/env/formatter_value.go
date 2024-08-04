@@ -438,7 +438,7 @@ func (u *Env) MakeFormatFunc(
 			errors.PanicIfError(err)
 		}
 
-		chromeTabs := resp.ParsedJSONBody.([]interface{})
+		tabs := resp.ParsedJSONBody.([]interface{})
 
 		f = func(o *sku.Transacted) (err error) {
 			var j sku_fmt.JsonWithUrl
@@ -446,7 +446,7 @@ func (u *Env) MakeFormatFunc(
 			if j, err = sku_fmt.MakeJsonTomlBookmark(
 				o,
 				u.GetStore().GetStandort(),
-				chromeTabs,
+				tabs,
 			); err != nil {
 				err = errors.Wrap(err)
 				return

@@ -73,7 +73,7 @@ func (s *Store) Merge(
 	tm sku.Conflicted,
 ) (err error) {
 	switch tm.CheckedOutLike.GetRepoId().GetRepoIdString() {
-	case "chrome":
+	case "browser":
 		err = todo.Implement()
 
 	default:
@@ -92,7 +92,7 @@ func (s *Store) RunMergeTool(
 	tool := s.GetKonfig().Cli().ToolOptions.Merge
 
 	switch tm.GetRepoId().GetRepoIdString() {
-	case "chrome":
+	case "browser":
 		err = todo.Implement()
 
 	default:

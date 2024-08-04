@@ -215,7 +215,7 @@ func (q *Query) ShouldHide(sk *sku.Transacted, k string) bool {
 }
 
 func (q *Query) ContainsSku(sk *sku.Transacted) (ok bool) {
-	defer sk.Metadata.Cache.QueryPath.PushOnOk(q, &ok)
+	defer sk.Metadata.Cache.QueryPath.PushOnReturn(q, &ok)
 	k := sk.ObjectId.String()
 
 	if q.ShouldHide(sk, k) {
@@ -233,7 +233,7 @@ func (q *Query) ContainsSku(sk *sku.Transacted) (ok bool) {
 	}
 
 	if len(q.Children) == 0 {
-		ok = len(q.ObjectIds) == 0 && q.MatchOnEmpty
+		ok = len(q.ObjectIds) == 0
 		return
 	} else if !q.Exp.ContainsSku(sk) {
 		return

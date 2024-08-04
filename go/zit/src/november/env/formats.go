@@ -73,6 +73,13 @@ func (u *Env) StringFormatWriterDescription(
 	return descriptions.MakeCliFormat(truncate, co, quote)
 }
 
+func (u *Env) StringFormatWriterField(
+	truncate int,
+	co string_format_writer.ColorOptions,
+) interfaces.StringFormatWriter[string_format_writer.Field] {
+	return string_format_writer.MakeCliFormatField(truncate, co)
+}
+
 func (u *Env) StringFormatWriterEtiketten(
 	co string_format_writer.ColorOptions,
 ) interfaces.StringFormatWriter[*ids.Tag] {
@@ -100,7 +107,7 @@ func (u *Env) SkuFmtOrganize(repoId ids.RepoId) sku_fmt.ExternalLike {
 	co.OffEntirely = true
 
 	f := sku_fmt.MakeFormatOrganize(
-    co,
+		co,
 		u.config.PrintOptions,
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterObjectIdAligned(co),

@@ -34,7 +34,7 @@ func init() {
 
 			f.Var(&c.Mode, "mode", "metadata, blob, or both")
 
-			f.Var(&c.RepoId, "kasten", "none or Chrome")
+			f.Var(&c.RepoId, "kasten", "none or Browser")
 
 			f.StringVar(
 				&c.UTIGroup,
