@@ -7,26 +7,28 @@ import (
 	"syscall"
 )
 
-func As(err error, target any) bool {
-	es := Split(err)
+var As = errors.As
 
-	switch len(es) {
-	case 0:
-		return false
+// func As(err error, target any) bool {
+// 	es := Split(err)
 
-	case 1:
-		return errors.As(Unwrap(es[0]), target)
+// 	switch len(es) {
+// 	case 0:
+// 		return false
 
-	default:
-		for _, e := range es {
-			if As(e, target) {
-				return true
-			}
-		}
-	}
+// 	case 1:
+// 		return errors.As(Unwrap(es[0]), target)
 
-	return false
-}
+// 	default:
+// 		for _, e := range es {
+// 			if As(e, target) {
+// 				return true
+// 			}
+// 		}
+// 	}
+
+// 	return false
+// }
 
 func Is(err, target error) bool {
 	es := Split(err)

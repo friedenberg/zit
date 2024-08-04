@@ -112,41 +112,19 @@ func (si StackInfo) String() string {
 	)
 }
 
-func (si StackInfo) Wrap(in error) (err errer) {
-	se := stackWrapError{StackInfo: si}
-
-	if As(in, &err) {
-		in = se
-	} else {
-		in = wrapped{
-			outer: se,
-			inner: in,
-		}
-	}
-
-	err.errers = append(err.errers, in)
-
+func (si StackInfo) Wrap(in error) (est errorStackTrace) {
+	est.add(stackWrapError{StackInfo: si, error: in})
 	return
 }
 
-func (si StackInfo) Wrapf(in error, f string, values ...interface{}) (err errer) {
-	se := stackWrapError{StackInfo: si}
-	err = wrapf(se, in, f, values...)
-
-	se, _ = newStackWrapError(1)
-	err = wrapf(se, err, "")
-
+func (si StackInfo) Wrapf(in error, f string, values ...interface{}) (est errorStackTrace) {
+	est.add(stackWrapError{StackInfo: si, error: in})
+	est.add(stackWrapError{StackInfo: si, error: fmt.Errorf(f, values...)})
 	return
 }
 
-func (si StackInfo) Errorf(f string, values ...interface{}) (err errer) {
-	e := New(fmt.Sprintf(f, values...))
-	se := stackWrapError{StackInfo: si}
-	err = wrapf(se, e, "")
-
-	se, _ = newStackWrapError(1)
-	err = wrapf(se, err, "")
-
+func (si StackInfo) Errorf(f string, values ...interface{}) (est errorStackTrace) {
+	est.add(stackWrapError{StackInfo: si, error: fmt.Errorf(f, values...)})
 	return
 }
 
@@ -155,7 +133,7 @@ type stackWrapError struct {
 	error
 }
 
-func newStackWrapError(skip int) (err stackWrapError, ok bool) {
+func newStackWrapError(skip int, in error) (err stackWrapError, ok bool) {
 	var si StackInfo
 
 	if si, ok = MakeStackInfo(skip + 1); !ok {
@@ -164,6 +142,7 @@ func newStackWrapError(skip int) (err stackWrapError, ok bool) {
 
 	err = stackWrapError{
 		StackInfo: si,
+		error:     in,
 	}
 
 	return
@@ -173,7 +152,6 @@ func (se stackWrapError) Unwrap() error {
 	return se.error
 }
 
-// TODO use StackInfo.String() method
 func (se stackWrapError) Error() string {
 	sb := &strings.Builder{}
 

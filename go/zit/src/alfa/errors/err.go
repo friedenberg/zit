@@ -5,8 +5,19 @@ import (
 )
 
 func WrapN(n int, in error) (err error) {
-	se, _ := newStackWrapError(1 + n)
-	err = wrapf(se, in, "")
+	if in == nil {
+		return
+	}
+
+	var est errorStackTrace
+
+	if As(in, &est) {
+		in = nil
+	}
+
+	est.addError(2+n, in)
+	err = &est
+
 	return
 }
 
@@ -15,8 +26,15 @@ func Wrap(in error) (err error) {
 		return
 	}
 
-	se, _ := newStackWrapError(1)
-	err = wrapf(se, in, "")
+	var est errorStackTrace
+
+	if As(in, &est) {
+		in = nil
+	}
+
+	est.addError(2, in)
+	err = &est
+
 	return
 }
 
@@ -31,8 +49,15 @@ func WrapExceptAsNil(in error, except ...error) (err error) {
 		}
 	}
 
-	se, _ := newStackWrapError(1)
-	err = wrapf(se, in, "")
+	var est errorStackTrace
+
+	if As(in, &est) {
+		in = nil
+	}
+
+	est.addError(2, in)
+	err = est
+
 	return
 }
 
@@ -47,63 +72,30 @@ func WrapExcept(in error, except ...error) (err error) {
 		}
 	}
 
-	se, _ := newStackWrapError(1)
-	err = wrapf(se, in, "")
-	return
-}
+	var est errorStackTrace
 
-func Wrapf(in error, f string, values ...interface{}) (err error) {
-	se, _ := newStackWrapError(1)
-	err = wrapf(se, in, f, values...)
-	return
-}
-
-func Errorf(f string, values ...interface{}) (err errer) {
-	e := fmt.Errorf(f, values...)
-	se, _ := newStackWrapError(1)
-	err = wrapf(se, e, "")
-	return
-}
-
-func wrapf(
-	se stackWrapError,
-	in error,
-	f string,
-	values ...interface{},
-) (err errer) {
-	// TODO-P2 case where values are present but f is ""
-	if f != "" {
-		se.error = fmt.Errorf(f, values...)
+	if As(in, &est) {
+		in = nil
 	}
 
-	if As(in, &err) {
-		in = se
-	} else {
-		in = wrapped{
-			outer: se,
-			inner: in,
-		}
-	}
-
-	err.errers = append(err.errers, in)
+	est.addError(2, in)
+	err = est
 
 	return
 }
 
-func wrapWithStack(
-	se stackWrapError,
-	in error,
-) (err errer) {
-	if As(in, &err) {
-		in = se
-	} else {
-		in = wrapped{
-			outer: se,
-			inner: in,
-		}
+func Wrapf(in error, f string, values ...interface{}) (est errorStackTrace) {
+	if As(in, &est) {
+		in = nil
 	}
 
-	err.errers = append(err.errers, in)
+	est.addError(1, in)
+	est.addError(1, fmt.Errorf(f, values...))
 
+	return
+}
+
+func Errorf(f string, values ...interface{}) (est errorStackTrace) {
+	est.addError(2, fmt.Errorf(f, values...))
 	return
 }

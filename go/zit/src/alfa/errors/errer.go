@@ -5,23 +5,33 @@ import (
 	"strings"
 )
 
-type errer struct {
-	errers []error
+type errorStackTrace struct {
+	errors []stackWrapError
 }
 
-func (ers errer) Unwrap() error {
-	if len(ers.errers) == 0 {
+func (ers *errorStackTrace) add(e stackWrapError) {
+	ers.errors = append(ers.errors, e)
+}
+
+func (ers *errorStackTrace) addError(skip int, e error) {
+	err, _ := newStackWrapError(skip+1, e)
+	ers.errors = append(ers.errors, err)
+}
+
+func (ers errorStackTrace) Unwrap() error {
+	if len(ers.errors) == 0 {
 		return nil
 	}
 
-	return ers.errers[0]
+	return ers.errors[0]
 }
 
-func (e errer) Error() string {
+func (e errorStackTrace) Error() string {
 	sb := &strings.Builder{}
 
-	for _, e := range e.errers {
-		sb.WriteString(fmt.Sprintf("%v\n", e))
+	for i := len(e.errors) - 1; i >= 0; i-- {
+		e := e.errors[i]
+		fmt.Fprintf(sb, "%v\n", e)
 	}
 
 	return sb.String()
