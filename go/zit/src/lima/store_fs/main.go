@@ -191,6 +191,15 @@ func (s *Store) GetObjectIdsForDir(fd *fd.FD) (k []*ids.ObjectId, err error) {
 	if err = s.objects.walkDir(
 		fd.GetPath(),
 		func(fds *FDSet) (err error) {
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.objects.ReadObjectsAndBlobs(
+		func(fds *FDSet) (err error) {
 			k = append(k, fds.ObjectId.Clone())
 			return
 		},

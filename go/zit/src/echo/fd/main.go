@@ -110,7 +110,13 @@ func (f *FD) SetFileInfoWithDir(fi os.FileInfo, dir string) (err error) {
 	f.isDir = fi.IsDir()
 	f.modTime = thyme.Tyme(fi.ModTime())
 
-	if f.path, err = filepath.Abs(path.Join(dir, fi.Name())); err != nil {
+	p := dir
+
+	if !f.isDir {
+		p = path.Join(dir, fi.Name())
+	}
+
+	if f.path, err = filepath.Abs(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

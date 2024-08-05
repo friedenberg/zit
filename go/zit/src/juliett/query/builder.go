@@ -223,8 +223,11 @@ func (b *Builder) BuildQueryGroup(vs ...string) (qg *Group, err error) {
 		return
 	}
 
-	if qg, err = b.build(vs...); err != nil {
-		err = errors.Wrapf(err, "Query: %q", vs)
+	var latent errors.Multi
+
+	if qg, err, latent = b.build(vs...); err != nil {
+		latent.Add(errors.Wrapf(err, "Query: %q", vs))
+		err = latent
 		return
 	}
 
@@ -240,7 +243,12 @@ func (b *Builder) BuildQueryGroup(vs ...string) (qg *Group, err error) {
 //  |____/ \__,_|_|_|\__,_|_|_| |_|\__, |
 //                                 |___/
 
-func (b *Builder) build(vs ...string) (qg *Group, err error) {
+func (b *Builder) build(
+	vs ...string,
+) (qg *Group, err error, latent errors.Multi) {
+	em := errors.MakeMulti()
+	latent = em
+
 	qg = MakeGroup(b)
 
 	var remaining []string
@@ -252,6 +260,7 @@ func (b *Builder) build(vs ...string) (qg *Group, err error) {
 			var k []*ids.ObjectId
 
 			if k, err = b.repo.GetObjectIdsForString(v); err != nil {
+				em.Add(err)
 				err = nil
 				remaining = append(remaining, v)
 				continue

@@ -4,37 +4,31 @@ import (
 	"fmt"
 )
 
-func WrapN(n int, in error) (err error) {
+func wrapSkip(skip int, in error) error {
 	if in == nil {
-		return
+		return nil
 	}
 
-	var est errorStackTrace
+	est, ok := in.(*errorStackTrace)
 
-	if As(in, &est) {
+	if ok {
 		in = nil
+	} else {
+		est = &errorStackTrace{}
 	}
 
-	est.addError(2+n, in)
-	err = &est
+	est.addError(1+skip, in)
 
+	return est
+}
+
+func WrapN(n int, in error) (err error) {
+	err = wrapSkip(n+1, in)
 	return
 }
 
 func Wrap(in error) (err error) {
-	if in == nil {
-		return
-	}
-
-	var est errorStackTrace
-
-	if As(in, &est) {
-		in = nil
-	}
-
-	est.addError(2, in)
-	err = &est
-
+	err = wrapSkip(1, in)
 	return
 }
 
@@ -49,14 +43,7 @@ func WrapExceptAsNil(in error, except ...error) (err error) {
 		}
 	}
 
-	var est errorStackTrace
-
-	if As(in, &est) {
-		in = nil
-	}
-
-	est.addError(2, in)
-	err = est
+	err = wrapSkip(1, in)
 
 	return
 }
@@ -72,30 +59,31 @@ func WrapExcept(in error, except ...error) (err error) {
 		}
 	}
 
-	var est errorStackTrace
-
-	if As(in, &est) {
-		in = nil
-	}
-
-	est.addError(2, in)
-	err = est
+	err = wrapSkip(1, in)
 
 	return
 }
 
-func Wrapf(in error, f string, values ...interface{}) (est errorStackTrace) {
-	if As(in, &est) {
-		in = nil
+func Wrapf(in error, f string, values ...interface{}) (err error) {
+	if in == nil {
+		return nil
 	}
 
-	est.addError(1, in)
+	est, ok := in.(*errorStackTrace)
+
+	if ok {
+		in = nil
+	} else {
+		est = &errorStackTrace{}
+	}
+
 	est.addError(1, fmt.Errorf(f, values...))
+	est.addError(1, in)
 
-	return
+	return est
 }
 
-func Errorf(f string, values ...interface{}) (est errorStackTrace) {
-	est.addError(2, fmt.Errorf(f, values...))
+func Errorf(f string, values ...interface{}) (err error) {
+	err = wrapSkip(1, fmt.Errorf(f, values...))
 	return
 }

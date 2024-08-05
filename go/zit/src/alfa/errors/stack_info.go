@@ -112,19 +112,25 @@ func (si StackInfo) String() string {
 	)
 }
 
-func (si StackInfo) Wrap(in error) (est errorStackTrace) {
+func (si StackInfo) Wrap(in error) (err error) {
+	var est errorStackTrace
 	est.add(stackWrapError{StackInfo: si, error: in})
+	err = &est
 	return
 }
 
-func (si StackInfo) Wrapf(in error, f string, values ...interface{}) (est errorStackTrace) {
+func (si StackInfo) Wrapf(in error, f string, values ...interface{}) (err error) {
+	var est errorStackTrace
 	est.add(stackWrapError{StackInfo: si, error: in})
 	est.add(stackWrapError{StackInfo: si, error: fmt.Errorf(f, values...)})
+	err = &est
 	return
 }
 
-func (si StackInfo) Errorf(f string, values ...interface{}) (est errorStackTrace) {
+func (si StackInfo) Errorf(f string, values ...interface{}) (err error) {
+	var est errorStackTrace
 	est.add(stackWrapError{StackInfo: si, error: fmt.Errorf(f, values...)})
+	err = &est
 	return
 }
 

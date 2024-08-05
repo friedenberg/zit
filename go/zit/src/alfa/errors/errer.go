@@ -18,7 +18,7 @@ func (ers *errorStackTrace) addError(skip int, e error) {
 	ers.errors = append(ers.errors, err)
 }
 
-func (ers errorStackTrace) Unwrap() error {
+func (ers *errorStackTrace) Unwrap() error {
 	if len(ers.errors) == 0 {
 		return nil
 	}
@@ -26,7 +26,7 @@ func (ers errorStackTrace) Unwrap() error {
 	return ers.errors[0]
 }
 
-func (e errorStackTrace) Error() string {
+func (e *errorStackTrace) Error() string {
 	sb := &strings.Builder{}
 
 	for i := len(e.errors) - 1; i >= 0; i-- {

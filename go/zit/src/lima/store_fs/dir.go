@@ -216,8 +216,12 @@ func (d *objects) processFDSet(objectIdString string, fds *FDSet) (err error) {
 			objectIdString,
 			fds.GetGenre(),
 		); err != nil {
-			err = errors.Wrap(err)
-			return
+			fds.ObjectId.SetGenre(fds.GetGenre())
+
+			if err = fds.ObjectId.SetRaw(objectIdString); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 	}
 
