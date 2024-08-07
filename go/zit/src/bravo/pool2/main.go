@@ -23,12 +23,12 @@ func MakePool[T any, TPtr interfaces.Ptr[T]](
 				if New == nil {
 					o = new(T)
 				} else {
-          var err error
+					var err error
 					o, err = New()
 
-          if err != nil {
-            panic(err)
-          }
+					if err != nil {
+						panic(err)
+					}
 				}
 
 				return
@@ -42,17 +42,17 @@ func (ip pool[T, TPtr]) GetPool() interfaces.Pool2[T, TPtr] {
 }
 
 func (ip pool[T, TPtr]) Get() (e TPtr, err error) {
-  defer func() {
-    if r := recover(); r != nil {
-      switch rt := r.(type) {
-      case error:
-        err = rt
+	defer func() {
+		if r := recover(); r != nil {
+			switch rt := r.(type) {
+			case error:
+				err = rt
 
-      default:
-        err = errors.Errorf("panicked during pool new: %w", err)
-      }
-    }
-  }()
+			default:
+				err = errors.Errorf("panicked during pool new: %w", err)
+			}
+		}
+	}()
 
 	return ip.inner.Get().(TPtr), nil
 }

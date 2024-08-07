@@ -8,10 +8,10 @@ import (
 )
 
 func (s *Store) readExternalAndMergeIfNecessary(
-	kinder, mutter *sku.Transacted,
+	left, parent *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
-	if mutter == nil {
+	if parent == nil {
 		return
 	}
 
@@ -19,7 +19,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 
 	if col, err = s.ReadCheckedOutFromTransacted(
 		options.RepoId,
-		mutter,
+		parent,
 	); err != nil {
 		err = nil
 		return
@@ -27,38 +27,30 @@ func (s *Store) readExternalAndMergeIfNecessary(
 
 	defer s.PutCheckedOutLike(col)
 
-	mutterEqualsExternal := sku.InternalAndExternalEqualsWithoutTai(col)
+	right := col.GetSkuExternalLike().GetSku()
 
-	if mutterEqualsExternal {
+	parentEqualsExternal := right.Metadata.EqualsSansTai(&col.GetSku().Metadata)
+
+	if parentEqualsExternal {
 		op := checkout_options.Options{
 			Force: true,
 		}
 
-		sku.TransactedResetter.ResetWith(col.GetSku(), kinder)
+		sku.TransactedResetter.ResetWith(right, left)
 
-		if err = s.UpdateCheckoutFromCheckedOut(
-			op,
-			col,
-		); err != nil {
+		if err = s.UpdateCheckoutFromCheckedOut(op, col); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		s.PutCheckedOutLike(col)
-
 		return
 	}
 
-	transactedPtrCopy := sku.GetTransactedPool().Get()
-	defer sku.GetTransactedPool().Put(transactedPtrCopy)
-
-	sku.TransactedResetter.ResetWith(transactedPtrCopy, kinder)
-
 	tm := sku.Conflicted{
 		CheckedOutLike: col,
-		Left:           transactedPtrCopy,
-		Middle:         col.GetSku(),
-		Right:          col.GetSkuExternalLike().GetSku(),
+		Left:           left,
+		Middle:         parent,
+		Right:          right,
 	}
 
 	if err = s.Merge(tm); err != nil {

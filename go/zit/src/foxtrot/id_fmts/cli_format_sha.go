@@ -3,6 +3,7 @@ package id_fmts
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -51,7 +52,7 @@ func (f *shaCliFormat) WriteStringFormat(
 		if v1 != "" {
 			v = v1
 		} else {
-			errors.Todo("abbreviate sha produced empty string")
+			ui.Todo("abbreviate sha produced empty string")
 		}
 	}
 

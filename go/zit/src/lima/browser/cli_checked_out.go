@@ -66,7 +66,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 	{
 		var stateString string
 
-		if co.State == checked_out_state.StateError {
+		if co.State == checked_out_state.Error {
 			stateString = co.Error.Error()
 		} else {
 			stateString = co.State.String()
@@ -89,7 +89,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 		return
 	}
 
-	if co.State != checked_out_state.StateUntracked {
+	if co.State != checked_out_state.Untracked {
 		n2, err = f.objectIdStringFormatWriter.WriteStringFormat(
 			sw,
 			&co.Internal.ObjectId,

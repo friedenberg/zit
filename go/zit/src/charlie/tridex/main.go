@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
 func init() {
@@ -52,10 +53,10 @@ func Make(vs ...string) (t interfaces.MutableTridex) {
 }
 
 func (a *Tridex) MutableClone() (b interfaces.MutableTridex) {
-	errors.TodoP4("improve the performance of this")
-	errors.TodoP4("collections-copy")
-	errors.TodoP4("collections-reset")
-	errors.TodoP4("collections-recycle")
+	ui.TodoP4("improve the performance of this")
+	ui.TodoP4("collections-copy")
+	ui.TodoP4("collections-reset")
+	ui.TodoP4("collections-recycle")
 
 	a.lock.RLock()
 	defer a.lock.RUnlock()

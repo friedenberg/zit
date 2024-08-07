@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 )
 
+// TODO split into options with and without mode
 type Options struct {
 	Force           bool
 	Path            Path

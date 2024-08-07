@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
 const (
@@ -126,7 +127,7 @@ func (b bitset) Get(idx int) bool {
 }
 
 func (b bitset) EachOff(f interfaces.FuncIter[int]) (err error) {
-	errors.TodoP4("measure and improve performance if necessary")
+	ui.TodoP4("measure and improve performance if necessary")
 
 	b.lock.Lock()
 	defer b.lock.Unlock()
@@ -151,7 +152,7 @@ func (b bitset) EachOff(f interfaces.FuncIter[int]) (err error) {
 }
 
 func (b bitset) EachOn(f interfaces.FuncIter[int]) (err error) {
-	errors.TodoP4("measure and improve performance if necessary")
+	ui.TodoP4("measure and improve performance if necessary")
 
 	b.lock.Lock()
 	defer b.lock.Unlock()
@@ -179,7 +180,7 @@ func (a bitset) Equals(b Bitset) bool {
 	a.lock.Lock()
 	defer a.lock.Unlock()
 
-	errors.TodoP4("should lock b beyond len call")
+	ui.TodoP4("should lock b beyond len call")
 	if bb, ok := b.(*bitset); ok {
 		bb.lock.Lock()
 		defer bb.lock.Unlock()
@@ -194,7 +195,7 @@ func (a bitset) Equals(b Bitset) bool {
 			}
 		}
 	} else {
-		errors.TodoP4("improve performance of this")
+		ui.TodoP4("improve performance of this")
 		if bb.Len() != a.len() {
 			return false
 		}

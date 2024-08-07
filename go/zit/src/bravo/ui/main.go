@@ -103,8 +103,8 @@ func Debug() DevPrinter {
 	return printerDebug
 }
 
-func DebugAllowCommit() errors.DevPrinter {
-	return errors.Debug()
+func DebugAllowCommit() DevPrinter {
+	return printerDebug
 }
 
 func (p prodPrinter) Print(a ...interface{}) (err error) {

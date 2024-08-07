@@ -5,7 +5,7 @@ import (
 	"encoding/gob"
 	"strings"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
 type Trie struct {
@@ -107,7 +107,8 @@ func (n node) Any() byte {
 }
 
 func (n node) Expand(v string, sb *strings.Builder) (ok bool) {
-	errors.PrintErrf("v: %q, sb %q", v, sb.String())
+	ui.Err().Printf("v: %q, sb %q", v, sb.String())
+
 	var c byte
 	var rem string
 

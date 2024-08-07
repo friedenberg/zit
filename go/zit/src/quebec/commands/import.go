@@ -116,11 +116,11 @@ func (c Import) Run(u *env.Env, args ...string) (err error) {
 		if co, err = u.GetStore().Import(
 			sk,
 		); err != nil {
-			err = errors.Wrapf(err, "Sku: %s", sk)
+			err = errors.Wrapf(err, "Sku: %s, %#v", sk, err)
 			return
 		}
 
-		if co.State == checked_out_state.StateError {
+		if co.State == checked_out_state.Error {
 			if co.Error == store.ErrNeedsMerge {
 				hasConflicts = true
 			}
@@ -142,7 +142,7 @@ func (c Import) Run(u *env.Env, args ...string) (err error) {
 			}
 		}
 
-		if co.State == checked_out_state.StateError {
+		if co.State == checked_out_state.Error {
 			if err = coPrinter(co); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -216,7 +216,7 @@ func (c Import) importBlobIfNecessary(
 	if !shaRc.EqualsSha(blobSha) {
 		co.SetError(errors.New("blob sha mismatch"))
 		err = coErrPrinter(co)
-		errors.TodoRecoverable(
+		ui.TodoRecoverable(
 			"sku blob mismatch: sku had %s while blob store had %s",
 			co.Internal.GetBlobSha(),
 			shaRc,

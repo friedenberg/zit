@@ -7,7 +7,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
@@ -31,6 +30,7 @@ func (s *Store) checkoutOneNew(
 	sz *sku.Transacted,
 ) (cz *CheckedOut, err error) {
 	cz = GetCheckedOutPool().Get()
+
 	sku.Resetter.ResetWith(&cz.Internal, sz)
 
 	if s.config.IsDryRun() {
@@ -40,6 +40,7 @@ func (s *Store) checkoutOneNew(
 	var e *FDSet
 	ok := false
 
+	ui.TodoP4("cleanup")
 	if e, ok = s.Get(&sz.ObjectId); ok {
 		ui.Log().Print("E", e.MutableSetLike)
 		var cze *External
@@ -64,9 +65,11 @@ func (s *Store) checkoutOneNew(
 
 			sku.DetermineState(cz, true)
 
-			if !s.shouldCheckOut(options, cz, false) {
+			if !s.shouldCheckOut(options, cz, true) {
+				ui.Log().Print("")
 				return
 			}
+			ui.Log().Print("")
 
 			if options.Path == checkout_options.PathDefault {
 				if err = cz.Remove(s.fs_home); err != nil {
@@ -74,10 +77,13 @@ func (s *Store) checkoutOneNew(
 					return
 				}
 			}
+			ui.Log().Print("")
 		}
 
 		ui.Log().Print("EQUAL", cz.External.FDs.MutableSetLike, cze.FDs.MutableSetLike)
 	}
+
+	ui.Log().Print("")
 
 	if err = s.checkoutOne(
 		options,
@@ -95,57 +101,47 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	col sku.CheckedOutLike,
 ) (err error) {
 	cofs := col.(*CheckedOut)
-	sz := cofs.GetSku()
 
-	var e *FDSet
-	ok := false
-
-	if e, ok = s.Get(&sz.ObjectId); !ok {
+	if options.CheckoutMode, err = cofs.External.FDs.GetCheckoutModeOrError(); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.ReadIntoExternalFromObjectIdFDPair(
-		sku.CommitOptions{
-			Mode: objekte_mode.ModeRealizeSansProto,
-		},
-		e,
-		sz,
-		&cofs.External,
-	); err != nil {
-		if errors.Is(err, ErrExternalHasConflictMarker) && options.AllowConflicted {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		sku.DetermineState(cofs, true)
+	options.Path = checkout_options.PathTempLocal
 
-		if !s.shouldCheckOut(options, cofs, true) {
-			return
-		}
+	var replacement *CheckedOut
 
-		var mode checkout_mode.Mode
-
-		if mode, err = cofs.External.GetCheckoutMode(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		options.CheckoutMode = mode
-
-		if err = cofs.Remove(s.fs_home); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if err = s.checkoutOne(
+	if replacement, err = s.checkoutOneNew(
 		options,
-		cofs,
+		cofs.GetSkuExternalLike().GetSku(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	defer GetCheckedOutPool().Put(replacement)
+
+	newFDs := replacement.External.FDs
+	oldFDs := cofs.External.FDs
+
+	if !oldFDs.Object.IsEmpty() {
+		if err = os.Rename(
+			newFDs.Object.GetPath(),
+			oldFDs.Object.GetPath(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if !oldFDs.Blob.IsEmpty() {
+		if err = os.Rename(
+			newFDs.Blob.GetPath(),
+			oldFDs.Blob.GetPath(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
@@ -169,7 +165,7 @@ func (s *Store) checkoutOne(
 		return
 	}
 
-	cz.State = checked_out_state.StateJustCheckedOut
+	cz.State = checked_out_state.JustCheckedOut
 
 	t := cz.Internal.GetType()
 	inlineBlob := s.config.IsInlineType(t)
@@ -221,17 +217,17 @@ func (s *Store) shouldCheckOut(
 		return true
 	}
 
-	if cz.State == checked_out_state.StateEmpty {
-		return true
-	}
-
-	eq := object_metadata.EqualerSansTai.Equals(&cz.Internal.Metadata, &cz.External.Metadata)
+	eq := object_metadata.EqualerSansTai.Equals(
+		&cz.Internal.Metadata,
+		&cz.External.Metadata,
+	)
 
 	if eq {
 		return true
 	}
 
 	if !allowMutterMatch {
+		ui.Log().Print("")
 		return false
 	}
 
@@ -240,6 +236,8 @@ func (s *Store) shouldCheckOut(
 			return true
 		}
 	}
+
+	ui.Log().Print("")
 
 	return false
 }

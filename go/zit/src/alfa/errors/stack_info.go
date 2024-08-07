@@ -26,7 +26,7 @@ func MakeStackInfoFromFrame(frame runtime.Frame) (si StackInfo) {
 	si.Function = frame.Function
 	si.Package, si.Function = getPackageAndFunctionName(si.Function)
 
-	si.RelFilename, _ = filepath.Rel(store_fs, si.Filename)
+	si.RelFilename, _ = filepath.Rel(cwd, si.Filename)
 
 	return
 }
@@ -132,27 +132,6 @@ type stackWrapError struct {
 	error
 
 	next *stackWrapError
-}
-
-func newStackWrapError(
-	skip int,
-	in error,
-	next *stackWrapError,
-) (err *stackWrapError) {
-	var si StackInfo
-	var ok bool
-
-	if si, ok = MakeStackInfo(skip + 1); !ok {
-		panic("failed to get stack info")
-	}
-
-	err = &stackWrapError{
-		StackInfo: si,
-		error:     in,
-		next:      next,
-	}
-
-	return
 }
 
 func (se *stackWrapError) Unwrap() error {

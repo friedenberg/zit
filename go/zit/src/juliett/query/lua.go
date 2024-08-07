@@ -66,10 +66,10 @@ type Lua struct {
 func (matcher Lua) ContainsSku(sk *sku.Transacted) bool {
 	vm, err := matcher.Get()
 
-  if err != nil {
-    ui.Err().Printf("lua script error: %s", err)
-    return false
-  }
+	if err != nil {
+		ui.Err().Printf("lua script error: %s", err)
+		return false
+	}
 
 	defer matcher.Put(vm)
 

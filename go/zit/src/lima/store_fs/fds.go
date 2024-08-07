@@ -77,6 +77,15 @@ func (a *FDSet) Equals(b *FDSet) bool {
 	return true
 }
 
+func (e *FDSet) GenerateConflictFD() (err error) {
+	if err = e.Conflict.SetPath(e.Object.String() + ".conflict"); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (e *FDSet) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 	switch {
 	case !e.Object.IsEmpty() && !e.Blob.IsEmpty():

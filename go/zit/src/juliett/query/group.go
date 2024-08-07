@@ -424,10 +424,10 @@ func (qg *Group) ContainsExternalSku(
 
 func (qg *Group) ContainsSkuCheckedOutState(state checked_out_state.State) (ok bool) {
 	switch state {
-	case checked_out_state.StateUntracked:
+	case checked_out_state.Untracked:
 		ok = !qg.ExcludeUntracked
 
-	case checked_out_state.StateRecognized:
+	case checked_out_state.Recognized:
 		ok = qg.IncludeRecognized
 
 	default:

@@ -6,25 +6,8 @@ import (
 	"os"
 )
 
-type Logger interface {
-	// Fatal(v ...interface{})
-	// Fatalf(format string, v ...interface{})
-
-	// Panic(v ...interface{})
-	// Panicf(format string, v ...interface{})
-	// Panicln(v ...interface{})
-
-	Print(v ...interface{})
-	Printf(format string, v ...interface{})
-
-	// Output(calldepth int, s string) error
-
-	// Prefix() string
-	// SetPrefix(prefix string)
-}
-
 var (
-	store_fs     string
+	cwd          string
 	isTest       bool
 	maxCallDepth int
 )
@@ -32,7 +15,7 @@ var (
 func init() {
 	var err error
 
-	if store_fs, err = os.Getwd(); err != nil {
+	if cwd, err = os.Getwd(); err != nil {
 		log_package.Panic(err)
 	}
 

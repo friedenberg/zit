@@ -110,7 +110,7 @@ func (u *Env) Start(e BigBang) (err error) {
 		return
 	}
 
-	errors.TodoP2("determine if this should be an Einleitung option")
+	ui.TodoP2("determine if this should be an Einleitung option")
 	if err = initDefaultTypAndKonfig(u); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -271,7 +271,7 @@ func writeFile(p string, contents any) {
 }
 
 func readAndTransferLines(in, out string) (err error) {
-	errors.TodoP4("move to user operations")
+	ui.TodoP4("move to user operations")
 
 	if in == "" {
 		return

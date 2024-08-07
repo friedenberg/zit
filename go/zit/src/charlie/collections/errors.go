@@ -16,11 +16,11 @@ var (
 )
 
 func MakeErrNotFound(value interfaces.Stringer) error {
-	return errors.WrapN(1, errNotFound(value.String()))
+	return errors.WrapSkip(1, errNotFound(value.String()))
 }
 
 func MakeErrNotFoundString(s string) error {
-	return errors.WrapN(1, errNotFound(s))
+	return errors.WrapSkip(1, errNotFound(s))
 }
 
 func IsErrNotFound(err error) bool {

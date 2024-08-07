@@ -14,7 +14,7 @@ import (
 )
 
 func MakeProto(tipe ids.Type, tags ids.TagSet) (p Proto) {
-	errors.TodoP1("modify konfig to keep etiketten set")
+	ui.TodoP1("modify konfig to keep etiketten set")
 
 	p.Metadata.Type = tipe
 	p.Metadata.SetTags(tags)

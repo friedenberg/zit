@@ -103,7 +103,7 @@ func (u *Env) Initialize(options Options) (err error) {
 
 	u.sunrise = ids.NowTai()
 
-	errors.TodoP4("find a better place for this")
+	ui.TodoP4("find a better place for this")
 	{
 		if u.cliConfig.Verbose && !u.cliConfig.Quiet {
 			ui.SetVerbose()
@@ -112,7 +112,7 @@ func (u *Env) Initialize(options Options) (err error) {
 		}
 
 		if u.cliConfig.Todo {
-			errors.SetTodoOn()
+			ui.SetTodoOn()
 		}
 
 		standortOptions := fs_home.Options{

@@ -10,7 +10,7 @@ var ErrIsNull = errors.New("sha is null")
 
 func MakeErrIsNull(s *Sha) error {
 	if s.IsNull() {
-		return errors.WrapN(1, ErrIsNull)
+		return errors.WrapSkip(1, ErrIsNull)
 	}
 
 	return nil

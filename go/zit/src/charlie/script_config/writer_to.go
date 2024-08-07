@@ -49,7 +49,7 @@ func MakeWriterTo(
 		}
 	}
 
-	errors.TodoP2("determine how stderr and env should be handled")
+	ui.TodoP2("determine how stderr and env should be handled")
 	wt.cmd.Stderr = os.Stderr
 	wt.cmd.Env = envCollapsed
 

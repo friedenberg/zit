@@ -1,8 +1,10 @@
-package errors
+package ui
 
 import (
 	"fmt"
 	"os"
+
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
 
 var todo todoPrinter
@@ -75,7 +77,7 @@ func (p todoPrinter) Printf(
 }
 
 func (p todoPrinter) printf(
-	depth int,
+	skip int,
 	pr Priority,
 	f string,
 	a ...interface{},
@@ -85,7 +87,7 @@ func (p todoPrinter) printf(
 	}
 
 	if p.includesStack {
-		si, _ := MakeStackInfo(1 + depth)
+		si, _ := errors.MakeStackInfo(1 + skip)
 		f = "%s %s" + f
 		a = append([]interface{}{pr, si}, a...)
 	}

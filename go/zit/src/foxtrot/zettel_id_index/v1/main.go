@@ -49,7 +49,7 @@ func MakeIndex(
 
 	if i.oldHinweisenStore, err = object_id_provider.New(s); err != nil {
 		if errors.IsNotExist(err) {
-			errors.TodoP4("determine which layer handles no-create kasten")
+			ui.TodoP4("determine which layer handles no-create kasten")
 			err = nil
 		} else {
 			err = errors.Wrap(err)

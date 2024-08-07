@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
@@ -40,7 +41,7 @@ func Make(
 	o Options,
 ) (s Home, err error) {
 	s.age = &age.Age{}
-	errors.TodoP3("add 'touched' which can get deleted / cleaned")
+	ui.TodoP3("add 'touched' which can get deleted / cleaned")
 	if err = o.Validate(); err != nil {
 		err = errors.Wrap(err)
 		return

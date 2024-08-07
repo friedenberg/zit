@@ -76,10 +76,10 @@ func (c Clean) shouldClean(
 	state := co.GetState()
 
 	switch state {
-	case checked_out_state.StateExistsAndSame:
+	case checked_out_state.ExistsAndSame:
 		return true
 
-	case checked_out_state.StateRecognized:
+	case checked_out_state.Recognized:
 		return eqwk.IncludeRecognized
 	}
 

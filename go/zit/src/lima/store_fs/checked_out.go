@@ -60,7 +60,7 @@ func (c *CheckedOut) SetError(err error) {
 		return
 	}
 
-	c.State = checked_out_state.StateError
+	c.State = checked_out_state.Error
 	c.Error = err
 }
 
@@ -129,7 +129,7 @@ var CheckedOutResetter checkedOutResetter
 type checkedOutResetter struct{}
 
 func (checkedOutResetter) Reset(a *CheckedOut) {
-	a.State = checked_out_state.StateUnknown
+	a.State = checked_out_state.Unknown
 	a.IsImport = false
 	a.Error = nil
 

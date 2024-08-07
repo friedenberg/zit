@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
 type tomlBlobParseSaver[
@@ -75,7 +76,7 @@ func (f tomlBlobParseSaver[O, OPtr]) ParseBlob(
 			}
 		}
 
-		errors.TodoP1("handle url parsing / validation")
+		ui.TodoP1("handle url parsing / validation")
 	}(pr)
 
 	if n, err = io.Copy(pw, r); err != nil {

@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/reset"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/equality"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
 type ScriptConfig struct {
@@ -17,7 +18,7 @@ type ScriptConfig struct {
 }
 
 func (a *ScriptConfig) Environ() map[string]string {
-	errors.TodoP4("copy")
+	ui.TodoP4("copy")
 	return a.Env
 }
 

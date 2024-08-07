@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -38,20 +39,21 @@ func (s *Store) Import(external *sku.Transacted) (co *store_fs.CheckedOut, err e
 		return
 	}
 
+	ui.TodoP4("cleanup")
 	if err = s.ReadOneInto(external.GetObjectId(), &co.Internal); err != nil {
 		if collections.IsErrNotFound(err) {
-			err = s.tryRealizeAndOrStore(
+			if err = s.tryRealizeAndOrStore(
 				external,
 				sku.CommitOptions{
 					Clock: &co.External.Transacted,
 					Mode:  objekte_mode.ModeCommit,
 				},
-			)
-
-			err = errors.WrapExcept(err, collections.ErrExists)
+			); err != nil {
+				err = errors.WrapExcept(err, collections.ErrExists)
+			}
+		} else {
+			err = errors.Wrap(err)
 		}
-
-		err = errors.Wrap(err)
 
 		return
 	}

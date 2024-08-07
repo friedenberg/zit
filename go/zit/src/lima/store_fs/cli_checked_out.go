@@ -55,7 +55,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 	{
 		var stateString string
 
-		if co.State == checked_out_state.StateError {
+		if co.State == checked_out_state.Error {
 			stateString = co.Error.Error()
 		} else {
 			stateString = co.State.String()
@@ -83,7 +83,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 	m := fds.GetCheckoutMode()
 
 	switch {
-	case co.State == checked_out_state.StateUntracked:
+	case co.State == checked_out_state.Untracked:
 		n2, err = f.writeStringFormatUntracked(sw, co, m)
 		n += n2
 
@@ -116,7 +116,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 		}
 	}
 
-	if co.State == checked_out_state.StateConflicted {
+	if co.State == checked_out_state.Conflicted {
 		n1, err = sw.WriteString("]")
 		n += int64(n1)
 

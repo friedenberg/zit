@@ -9,42 +9,40 @@ import (
 type State int
 
 const (
-	StateUnknown = State(iota)
-	StateEmpty
-	StateJustCheckedOut
-	StateJustCheckedOutButDifferent
-	StateExistsAndSame
-	StateExistsAndDifferent
-	StateUntracked
-	StateRecognized
-	StateSimilar
-	StateConflicted
-	StateError
+	Unknown = State(iota)
+	JustCheckedOut
+	JustCheckedOutButDifferent
+	ExistsAndSame
+	ExistsAndDifferent
+	Untracked
+	Recognized
+	Conflicted
+	Error
 )
 
 func (s State) String() string {
 	switch s {
-	case StateJustCheckedOut:
+	case JustCheckedOut:
 		return string_format_writer.StringCheckedOut
 
-	case StateExistsAndSame:
+	case ExistsAndSame:
 		return string_format_writer.StringSame
 
-	case StateJustCheckedOutButDifferent:
+	case JustCheckedOutButDifferent:
 		fallthrough
-	case StateExistsAndDifferent:
+	case ExistsAndDifferent:
 		return string_format_writer.StringChanged
 
-	case StateUntracked:
+	case Untracked:
 		return string_format_writer.StringUntracked
 
-	case StateRecognized:
+	case Recognized:
 		return string_format_writer.StringRecognized
 
-	case StateConflicted:
+	case Conflicted:
 		return string_format_writer.StringConflicted
 
-	case StateError:
+	case Error:
 		return "error"
 
 	default:

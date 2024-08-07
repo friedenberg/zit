@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
@@ -193,7 +194,7 @@ func (pt *Page) copyHistoryAndMaybeLatest(
 
 	dec := makeBinaryWithQueryGroup(qg, ids.SigilHistory)
 
-	errors.TodoP3("determine performance of this")
+	ui.TodoP3("determine performance of this")
 	added := pt.added.Copy()
 
 	var sk skuWithRangeAndSigil

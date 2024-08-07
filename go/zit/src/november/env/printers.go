@@ -125,7 +125,7 @@ func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[sku.CheckedOutLike] {
 	)
 
 	return func(co sku.CheckedOutLike) error {
-		if co.GetState() == checked_out_state.StateError {
+		if co.GetState() == checked_out_state.Error {
 			return err(co)
 		} else {
 			return out(co)
@@ -152,7 +152,7 @@ func (u *Env) PrinterCheckedOutBrowser() interfaces.FuncIter[sku.CheckedOutLike]
 			),
 			u.StringFormatWriterEtiketten(oo.ColorOptionsErr),
 			u.StringFormatWriterField(
-        66,
+				66,
 				oo.ColorOptionsErr,
 			),
 		),
@@ -174,14 +174,14 @@ func (u *Env) PrinterCheckedOutBrowser() interfaces.FuncIter[sku.CheckedOutLike]
 			),
 			u.StringFormatWriterEtiketten(oo.ColorOptionsOut),
 			u.StringFormatWriterField(
-        66,
+				66,
 				oo.ColorOptionsErr,
 			),
 		),
 	)
 
 	return func(co sku.CheckedOutLike) error {
-		if co.GetState() == checked_out_state.StateError {
+		if co.GetState() == checked_out_state.Error {
 			return err(co)
 		} else {
 			return out(co)
@@ -236,7 +236,7 @@ func (u *Env) PrinterMatching() sku.IterMatching {
 		if err = existing.Each(
 			func(co sku.CheckedOutLike) (err error) {
 				if err = co.SetState(
-					checked_out_state.StateRecognized,
+					checked_out_state.Recognized,
 				); err != nil {
 					err = errors.Wrap(err)
 					return

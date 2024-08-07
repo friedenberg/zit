@@ -125,7 +125,7 @@ func (c Last) runWithBestandsaufnahme(
 		return
 	}
 
-	errors.TodoP3("support log line format for skus")
+	ui.TodoP3("support log line format for skus")
 	if err = a.EachPtr(
 		func(sk *sku.Transacted) (err error) {
 			return f(sk)

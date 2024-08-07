@@ -25,7 +25,7 @@ var (
 )
 
 func init() {
-	errors.TodoP1("refactor into common")
+	ui.TodoP1("refactor into common")
 	gob.Register(Time{})
 	collections_value.RegisterGobValue[Time](nil)
 }

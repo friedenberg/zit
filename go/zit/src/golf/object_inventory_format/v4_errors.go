@@ -18,7 +18,7 @@ var (
 
 func makeErrWithBytes(err error, bs []byte) error {
 	if ui.IsVerbose() {
-		return errors.WrapN(1, errWithBytes{error: err, bytes: bs})
+		return errors.WrapSkip(1, errWithBytes{error: err, bytes: bs})
 	}
 
 	return err

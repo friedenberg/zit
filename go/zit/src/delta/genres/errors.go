@@ -10,7 +10,7 @@ import (
 var ErrNoAbbreviation = errors.New("no abbreviation")
 
 func MakeErrUnsupportedGenre(g interfaces.GenreGetter) error {
-	return errors.WrapN(1, errUnsupportedGenre{Genre: g.GetGenre()})
+	return errors.WrapSkip(1, errUnsupportedGenre{Genre: g.GetGenre()})
 }
 
 func IsErrUnsupportedGenre(err error) bool {

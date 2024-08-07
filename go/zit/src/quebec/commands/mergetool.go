@@ -45,7 +45,7 @@ func (c Mergetool) RunWithQuery(
 	if err = u.GetStore().QueryCheckedOut(
 		qg,
 		func(co sku.CheckedOutLike) (err error) {
-			if co.GetState() != checked_out_state.StateConflicted {
+			if co.GetState() != checked_out_state.Conflicted {
 				return
 			}
 
@@ -73,7 +73,6 @@ func (c Mergetool) RunWithQuery(
 	if err = conflicted.Each(
 		func(col sku.CheckedOutLike) (err error) {
 			cofs := col.(*store_fs.CheckedOut)
-			ui.Debug().Print(&cofs.External.FDs.Conflict)
 
 			tm := sku.Conflicted{
 				CheckedOutLike: col.Clone(),

@@ -198,7 +198,7 @@ func (c *Store) CheckoutOne(
 
 	sku.TransactedResetter.ResetWith(co.GetSku(), sz)
 	sku.TransactedResetter.ResetWith(co.GetSkuExternalLike().GetSku(), sz)
-	co.State = checked_out_state.StateJustCheckedOut
+	co.State = checked_out_state.JustCheckedOut
 	co.External.browser.Metadata.Type = ids.MustType("!browser-tab")
 	co.External.item = map[string]interface{}{"url": u.String()}
 
@@ -315,9 +315,9 @@ func (c *Store) tryToEmitOneExplicitlyCheckedOut(
 	sku.TransactedResetter.ResetWith(&co.External.Transacted, internal)
 
 	if *uSku == *uBrowser {
-		co.State = checked_out_state.StateExistsAndSame
+		co.State = checked_out_state.ExistsAndSame
 	} else {
-		co.State = checked_out_state.StateExistsAndDifferent
+		co.State = checked_out_state.ExistsAndDifferent
 	}
 
 	if err = c.tryToEmitOneCommon(
@@ -341,7 +341,7 @@ func (c *Store) tryToEmitOneRecognized(
 	item item,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	co.State = checked_out_state.StateRecognized
+	co.State = checked_out_state.Recognized
 
 	if !qg.ContainsSkuCheckedOutState(co.State) {
 		return
@@ -359,7 +359,7 @@ func (c *Store) tryToEmitOneRecognized(
 	sku.TransactedResetter.ResetWith(&co.Internal, internal)
 	sku.TransactedResetter.ResetWith(&co.External.Transacted, internal)
 
-	co.State = checked_out_state.StateRecognized
+	co.State = checked_out_state.Recognized
 
 	if err = c.tryToEmitOneCommon(
 		qg,
@@ -381,7 +381,7 @@ func (c *Store) tryToEmitOneUntracked(
 	item item,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	co.State = checked_out_state.StateUntracked
+	co.State = checked_out_state.Untracked
 
 	if !qg.ContainsSkuCheckedOutState(co.State) {
 		return

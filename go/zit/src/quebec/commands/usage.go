@@ -6,16 +6,16 @@ import (
 	"flag"
 	"sort"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
 func (c command) PrintUsage(in error) (exitStatus int) {
 	if in != nil {
 		exitStatus = 1
-		errors.PrintErr(in)
+		ui.Err().Print(in)
 	}
 
-	errors.PrintErr("Usage for z:")
+	ui.Err().Print("Usage for z:")
 
 	fs := make([]flag.FlagSet, 0, len(Commands()))
 
@@ -36,7 +36,7 @@ func (c command) PrintUsage(in error) (exitStatus int) {
 
 func (c command) PrintSubcommandUsage(flags flag.FlagSet) {
 	printTabbed := func(s string) {
-		errors.PrintErrf("  %s", s)
+		ui.Err().Printf("  %s", s)
 	}
 
 	var b bytes.Buffer
@@ -53,6 +53,6 @@ func (c command) PrintSubcommandUsage(flags flag.FlagSet) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		errors.PrintErr(err)
+		ui.Err().Print(err)
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
 func ReadDir(ps ...string) (dirEntries []os.DirEntry, err error) {
@@ -74,8 +75,8 @@ func ReadDirNamesLevel2(
 	wf func(string) error,
 	p string,
 ) (err error) {
-	errors.TodoP3("support ErrStopIteration")
-	errors.TodoP2("support concurrency")
+	ui.TodoP3("support ErrStopIteration")
+	ui.TodoP2("support concurrency")
 
 	wfLevel2 := func(p2 string) (err error) {
 		return wf(p2)

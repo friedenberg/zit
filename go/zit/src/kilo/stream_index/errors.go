@@ -5,5 +5,5 @@ import "code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 var errConcurrentPageAccess = errors.New("concurrent page access")
 
 func MakeErrConcurrentPageAccess() error {
-	return errors.WrapN(2, errConcurrentPageAccess)
+	return errors.WrapSkip(2, errConcurrentPageAccess)
 }

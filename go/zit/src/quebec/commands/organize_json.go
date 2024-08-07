@@ -188,7 +188,7 @@ func (c *OrganizeJSON) RunWithQuery(
 		createOrganizeFileResults,
 		ot2,
 		getResults,
-    qg,
+		qg,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

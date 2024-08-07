@@ -12,27 +12,6 @@ var (
 	Unwrap = errors.Unwrap
 )
 
-// func As(err error, target any) bool {
-// 	es := Split(err)
-
-// 	switch len(es) {
-// 	case 0:
-// 		return false
-
-// 	case 1:
-// 		return errors.As(Unwrap(es[0]), target)
-
-// 	default:
-// 		for _, e := range es {
-// 			if As(e, target) {
-// 				return true
-// 			}
-// 		}
-// 	}
-
-// 	return false
-// }
-
 func Is(err, target error) bool {
 	if errors.Is(err, target) {
 		return true

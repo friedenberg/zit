@@ -260,7 +260,7 @@ func (u *Env) MakeFormatFunc(
 
 	case "object-id-blob-sha":
 		f = func(tl *sku.Transacted) (err error) {
-			errors.TodoP3("convert into an option")
+			ui.TodoP3("convert into an option")
 
 			sh := tl.GetBlobSha()
 
@@ -716,7 +716,7 @@ func (u *Env) MakeFormatFunc(
 		}
 
 	case "toml":
-		errors.TodoP3("limit to only zettels supporting toml")
+		ui.TodoP3("limit to only zettels supporting toml")
 		f = func(o *sku.Transacted) (err error) {
 			var a map[string]interface{}
 

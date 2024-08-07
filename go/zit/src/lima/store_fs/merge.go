@@ -8,20 +8,22 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
+	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
 func (s *Store) Merge(tm sku.Conflicted) (err error) {
-	cofs := tm.CheckedOutLike.(*CheckedOut)
-
 	if err = tm.MergeTags(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	cofs := tm.CheckedOutLike.(*CheckedOut)
 
 	var leftCO, middleCO, rightCO *CheckedOut
 
@@ -33,24 +35,17 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 		mode = checkout_mode.ModeMetadataOnly
 	}
 
-	op := checkout_options.Options{
-		CheckoutMode:    mode,
-		ForceInlineBlob: true,
-		Path:            checkout_options.PathTempLocal,
-		Force:           true,
-	}
-
-	if leftCO, err = s.checkoutOneNew(op, tm.Left); err != nil {
+	if leftCO, err = s.checkoutOneForMerge(mode, tm.Left); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if middleCO, err = s.checkoutOneNew(op, tm.Middle); err != nil {
+	if middleCO, err = s.checkoutOneForMerge(mode, tm.Middle); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if rightCO, err = s.checkoutOneNew(op, tm.Right); err != nil {
+	if rightCO, err = s.checkoutOneForMerge(mode, tm.Right); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -76,7 +71,6 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 				tm,
 				cofs,
 				mergeConflict,
-				merged,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -99,11 +93,39 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 	return
 }
 
+func (s *Store) checkoutOneForMerge(
+	mode checkout_mode.Mode,
+	sz *sku.Transacted,
+) (cz *CheckedOut, err error) {
+	options := checkout_options.Options{
+		CheckoutMode:    mode,
+		AllowConflicted: true,
+		Path:            checkout_options.PathTempLocal,
+		ForceInlineBlob: true,
+		Force:           true,
+	}
+
+	cz = GetCheckedOutPool().Get()
+	sku.Resetter.ResetWith(&cz.Internal, sz)
+
+	if err = s.checkoutOne(
+		options,
+		cz,
+	); err != nil {
+		ui.Log().Print(&cz.External.FDs.Object, &cz.External.FDs.Blob)
+		err = errors.Wrap(err)
+		return
+	}
+
+	ui.Log().Print(&cz.External.FDs.Object, &cz.External.FDs.Blob)
+
+	return
+}
+
 func (s *Store) handleMergeResult(
 	conflicted sku.Conflicted,
 	cofs *CheckedOut,
 	mergeResult *ErrMergeConflict,
-	merged FDPair,
 ) (err error) {
 	var f *os.File
 
@@ -128,13 +150,20 @@ func (s *Store) handleMergeResult(
 		return
 	}
 
+	if err = cofs.External.FDs.GenerateConflictFD(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if err = os.Rename(
 		f.Name(),
 		cofs.External.FDs.Conflict.GetPath(),
 	); err != nil {
-    err = errors.Wrapf(err, "StackInfo: %s", errors.MustStackInfo(0))
+		err = errors.Wrap(err)
 		return
 	}
+
+	cofs.State = checked_out_state.Conflicted
 
 	return
 }
@@ -143,33 +172,34 @@ func (s *Store) RunMergeTool(
 	tool []string,
 	tm sku.Conflicted,
 ) (co *CheckedOut, err error) {
+	if len(tool) == 0 {
+		err = errors.Errorf("no utility provided")
+		return
+	}
+
 	co = tm.CheckedOutLike.(*CheckedOut)
 
 	inlineBlob := tm.IsAllInlineType(s.config)
 
-	op := checkout_options.Options{
-		CheckoutMode:    checkout_mode.ModeMetadataAndBlob,
-		AllowConflicted: true,
-		Path:            checkout_options.PathTempLocal,
-	}
+	mode := checkout_mode.ModeMetadataAndBlob
 
 	if !inlineBlob {
-		op.CheckoutMode = checkout_mode.ModeMetadataOnly
+		mode = checkout_mode.ModeMetadataOnly
 	}
 
 	var leftCO, middleCO, rightCO *CheckedOut
 
-	if leftCO, err = s.checkoutOneNew(op, tm.Left); err != nil {
+	if leftCO, err = s.checkoutOneForMerge(mode, tm.Left); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if middleCO, err = s.checkoutOneNew(op, tm.Middle); err != nil {
+	if middleCO, err = s.checkoutOneForMerge(mode, tm.Middle); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if rightCO, err = s.checkoutOneNew(op, tm.Right); err != nil {
+	if rightCO, err = s.checkoutOneForMerge(mode, tm.Right); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -185,28 +215,7 @@ func (s *Store) RunMergeTool(
 
 	defer errors.DeferredCloser(&err, f)
 
-	var cmdStrings []string
-
-	if len(tool) > 1 {
-		toolArgs := tool[1:]
-		cmdStrings = make([]string, 3+len(toolArgs))
-		copy(cmdStrings, toolArgs)
-	}
-
-	cmdStrings = append(
-		cmdStrings,
-		leftCO.External.FDs.Object.GetPath(),
-		middleCO.External.FDs.Object.GetPath(),
-		rightCO.External.FDs.Object.GetPath(),
-		tmpPath,
-	)
-
-	if len(tool) == 0 {
-		err = errors.Errorf("no utility provided")
-		return
-	}
-
-	cmd := exec.Command(tool[0], cmdStrings...)
+	cmd := exec.Command(tool[0], tool[1:]...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -217,6 +226,8 @@ func (s *Store) RunMergeTool(
 		fmt.Sprintf("REMOTE=%s", rightCO.External.FDs.Object.GetPath()),
 		fmt.Sprintf("MERGED=%s", tmpPath),
 	}
+
+	ui.Log().Print(cmd.Env)
 
 	if err = cmd.Run(); err != nil {
 		err = errors.Wrap(err)
@@ -265,5 +276,9 @@ func (e *ErrMergeConflict) Is(target error) bool {
 }
 
 func (e *ErrMergeConflict) Error() string {
-	return fmt.Sprintf("merge conflict for fds: %v", &e.FDPair)
+	return fmt.Sprintf(
+		"merge conflict for fds: Object: %q, Blob: %q",
+		&e.FDPair.Object,
+		&e.FDPair.Blob,
+	)
 }

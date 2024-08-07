@@ -98,9 +98,9 @@ func (sp *VMPool) SetReader(
 			}
 
 			if err = sp.PrepareVM(vm, apply); err != nil {
-        err = errors.Wrap(err)
-        return
-      }
+				err = errors.Wrap(err)
+				return
+			}
 
 			return
 		},

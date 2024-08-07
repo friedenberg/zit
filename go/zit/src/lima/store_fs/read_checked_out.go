@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -21,7 +22,7 @@ func (s *Store) ReadCheckedOutFromObjectIdFDPair(
 			// TODO mark status as new
 			err = nil
 			co.Internal.ObjectId.ResetWith(&em.ObjectId)
-			co.State = checked_out_state.StateUntracked
+			co.State = checked_out_state.Untracked
 		} else {
 			err = errors.Wrap(err)
 			return
@@ -37,7 +38,7 @@ func (s *Store) ReadCheckedOutFromObjectIdFDPair(
 			// TODO mark status as new
 			err = nil
 			co.Internal.ObjectId.ResetWith(&em.ObjectId)
-			co.State = checked_out_state.StateUntracked
+			co.State = checked_out_state.Untracked
 		} else {
 			err = errors.Wrap(err)
 			return
@@ -45,7 +46,7 @@ func (s *Store) ReadCheckedOutFromObjectIdFDPair(
 	}
 
 	if !em.Conflict.IsEmpty() {
-		co.State = checked_out_state.StateConflicted
+		co.State = checked_out_state.Conflicted
 	}
 
 	return
@@ -92,8 +93,10 @@ func (s *Store) ReadIntoCheckedOutFromTransacted(
 		if errors.IsNotExist(err) {
 			err = iter.MakeErrStopIteration()
 		} else if errors.Is(err, ErrExternalHasConflictMarker) {
-			co.State = checked_out_state.StateConflicted
+			co.State = checked_out_state.Conflicted
 			co.External.FDs.ResetWith(kfp)
+
+			ui.Debug().Print(&sk.ObjectId, kfp)
 
 			if err = co.External.ObjectId.SetWithIdLike(&sk.ObjectId); err != nil {
 				err = errors.Wrap(err)
@@ -133,7 +136,7 @@ func (s *Store) ReadIntoCheckedOutFromTransactedAndFDSet(
 		if errors.IsNotExist(err) {
 			err = iter.MakeErrStopIteration()
 		} else if errors.Is(err, ErrExternalHasConflictMarker) {
-			co.State = checked_out_state.StateConflicted
+			co.State = checked_out_state.Conflicted
 			co.External.FDs.ResetWith(fds)
 
 			if err = co.External.ObjectId.SetWithIdLike(&sk.ObjectId); err != nil {

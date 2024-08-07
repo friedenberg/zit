@@ -22,18 +22,18 @@ func DetermineState(c CheckedOutLike, justCheckedOut bool) {
 	e := c.GetSkuExternalLike().GetSku()
 
 	if i.GetObjectSha().IsNull() {
-		c.SetState(checked_out_state.StateUntracked)
+		c.SetState(checked_out_state.Untracked)
 	} else if i.Metadata.EqualsSansTai(&e.Metadata) {
 		if justCheckedOut {
-			c.SetState(checked_out_state.StateJustCheckedOut)
+			c.SetState(checked_out_state.JustCheckedOut)
 		} else {
-			c.SetState(checked_out_state.StateExistsAndSame)
+			c.SetState(checked_out_state.ExistsAndSame)
 		}
 	} else {
 		if justCheckedOut {
-			c.SetState(checked_out_state.StateJustCheckedOutButDifferent)
+			c.SetState(checked_out_state.JustCheckedOutButDifferent)
 		} else {
-			c.SetState(checked_out_state.StateExistsAndDifferent)
+			c.SetState(checked_out_state.ExistsAndDifferent)
 		}
 	}
 }
@@ -74,7 +74,7 @@ func (c *CheckedOut) SetError(err error) {
 		return
 	}
 
-	c.State = checked_out_state.StateError
+	c.State = checked_out_state.Error
 	c.Error = err
 }
 

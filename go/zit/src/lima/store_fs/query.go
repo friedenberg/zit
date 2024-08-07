@@ -125,7 +125,7 @@ func (s *Store) QueryUntrackedBlobs(
 
 			if z == nil {
 				// TODO use ReadOneExternalBlob
-				fr.State = checked_out_state.StateUntracked
+				fr.State = checked_out_state.Untracked
 				fr.External.SetBlobSha(fd.GetShaLike())
 
 				if err = fr.External.Transacted.CalculateObjectShas(); err != nil {
@@ -134,7 +134,7 @@ func (s *Store) QueryUntrackedBlobs(
 				}
 			} else {
 				fr.External.SetBlobSha(z.GetBlobSha())
-				fr.State = checked_out_state.StateRecognized
+				fr.State = checked_out_state.Recognized
 
 				sku.Resetter.ResetWith(&fr.Internal, z)
 				sku.Resetter.ResetWith(&fr.External, z)

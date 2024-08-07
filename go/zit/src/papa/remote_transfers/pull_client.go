@@ -174,7 +174,7 @@ func (c *client) makeAndProcessOneSkuWithFilter(
 		if iter.IsStopIteration(err) {
 			err = nil
 		} else {
-			errors.TodoP1("support net.ErrClosed downstream")
+			ui.TodoP1("support net.ErrClosed downstream")
 			err = errors.Wrap(err)
 			errMulti.Add(err)
 		}

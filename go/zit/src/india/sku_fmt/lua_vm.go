@@ -49,12 +49,12 @@ type (
 func MakeLuaVMPool(lvp *lua.VMPool, selbst *sku.Transacted) LuaVMPool {
 	return pool2.MakePool(
 		func() (out *LuaVM, err error) {
-      var vm *lua.VM
+			var vm *lua.VM
 
 			if vm, err = lvp.Pool2.Get(); err != nil {
-        err = errors.Wrap(err)
-        return
-      }
+				err = errors.Wrap(err)
+				return
+			}
 
 			out = &LuaVM{
 				VM:        vm,
