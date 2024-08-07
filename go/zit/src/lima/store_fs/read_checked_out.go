@@ -44,6 +44,10 @@ func (s *Store) ReadCheckedOutFromObjectIdFDPair(
 		}
 	}
 
+	if !em.Conflict.IsEmpty() {
+		co.State = checked_out_state.StateConflicted
+	}
+
 	return
 }
 

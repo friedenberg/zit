@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -36,16 +37,6 @@ func MakeMulti(errs ...error) (em *multi) {
 
 	return
 }
-
-// TODO-P4 determine why this didn't work
-// func (e *multi) Combine(
-// 	err *error,
-// ) {
-// 	if !e.Empty() && *err != nil {
-// 		e.Add(*err)
-// 		*err = e
-// 	}
-// }
 
 func (e *multi) ChanOnErr() <-chan struct{} {
 	return e.chOnErr
@@ -105,7 +96,7 @@ func (e *multi) Add(err error) {
 		panic("trying to add to nil multi error")
 	}
 
-	switch e1 := Unwrap(err).(type) {
+	switch e1 := errors.Unwrap(err).(type) {
 	case *multi:
 		e.merge(e1)
 
@@ -148,23 +139,13 @@ func (e *multi) Error() string {
 	e.lock.Lock()
 	defer e.lock.Unlock()
 
-	switch len(e.slice) {
-	case 0:
-		return ""
-
-	case 1:
-		return e.slice[0].Error()
-
-	default:
-	}
-
 	sb := &strings.Builder{}
 
-	sb.WriteString(fmt.Sprintf("# %d Errors", len(e.slice)))
+	fmt.Fprintf(sb, "# %d Errors", len(e.slice))
 	sb.WriteString("\n")
 
 	for i, err := range e.slice {
-		sb.WriteString(fmt.Sprintf("Error %d:\n", i+1))
+		fmt.Fprintf(sb, "Error %d:\n", i+1)
 		sb.WriteString(err.Error())
 		sb.WriteString("\n")
 	}

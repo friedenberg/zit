@@ -9,26 +9,26 @@ func wrapSkip(skip int, in error) error {
 		return nil
 	}
 
-	est, ok := in.(*errorStackTrace)
+	var out *stackWrapError
 
-	if ok {
-		in = nil
+	if swe, ok := in.(*stackWrapError); ok {
+		out = newStackWrapError(skip+1, nil, swe)
 	} else {
-		est = &errorStackTrace{}
+		out = newStackWrapError(skip+1, in, nil)
 	}
 
-	est.addError(1+skip, in)
-
-	return est
+	return out
 }
 
+const thisSkip = 1
+
 func WrapN(n int, in error) (err error) {
-	err = wrapSkip(n+1, in)
+	err = wrapSkip(n+thisSkip, in)
 	return
 }
 
 func Wrap(in error) (err error) {
-	err = wrapSkip(1, in)
+	err = wrapSkip(thisSkip, in)
 	return
 }
 
@@ -43,7 +43,7 @@ func WrapExceptAsNil(in error, except ...error) (err error) {
 		}
 	}
 
-	err = wrapSkip(1, in)
+	err = wrapSkip(thisSkip, in)
 
 	return
 }
@@ -59,31 +59,28 @@ func WrapExcept(in error, except ...error) (err error) {
 		}
 	}
 
-	err = wrapSkip(1, in)
+	err = wrapSkip(thisSkip, in)
 
 	return
 }
 
-func Wrapf(in error, f string, values ...interface{}) (err error) {
+func Wrapf(in error, f string, values ...interface{}) error {
 	if in == nil {
 		return nil
 	}
 
-	est, ok := in.(*errorStackTrace)
+	var inner *stackWrapError
 
-	if ok {
-		in = nil
+	if swe, ok := in.(*stackWrapError); ok {
+		inner = newStackWrapError(1, nil, swe)
 	} else {
-		est = &errorStackTrace{}
+		inner = newStackWrapError(1, in, nil)
 	}
 
-	est.addError(1, fmt.Errorf(f, values...))
-	est.addError(1, in)
-
-	return est
+	return newStackWrapError(1, fmt.Errorf(f, values...), inner)
 }
 
 func Errorf(f string, values ...interface{}) (err error) {
-	err = wrapSkip(1, fmt.Errorf(f, values...))
+	err = wrapSkip(thisSkip, fmt.Errorf(f, values...))
 	return
 }

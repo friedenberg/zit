@@ -73,7 +73,7 @@ func (c Mergetool) RunWithQuery(
 	if err = conflicted.Each(
 		func(col sku.CheckedOutLike) (err error) {
 			cofs := col.(*store_fs.CheckedOut)
-			p1 := cofs.External.FDs.MakeConflictMarker()
+			ui.Debug().Print(&cofs.External.FDs.Conflict)
 
 			tm := sku.Conflicted{
 				CheckedOutLike: col.Clone(),
@@ -81,7 +81,7 @@ func (c Mergetool) RunWithQuery(
 
 			var f *os.File
 
-			if f, err = files.Open(p1); err != nil {
+			if f, err = files.Open(cofs.External.FDs.Conflict.GetPath()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

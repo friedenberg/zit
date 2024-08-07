@@ -16,14 +16,6 @@ func unwrapOnce(err error) error {
 	return err
 }
 
-func Unwrap(err error) error {
-	if e, ok := err.(Unwrapper); ok {
-		return Unwrap(e.Unwrap())
-	}
-
-	return err
-}
-
 func Split(err error) (out []error) {
 	switch e := err.(type) {
 	case nil:

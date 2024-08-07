@@ -7,7 +7,10 @@ import (
 	"syscall"
 )
 
-var As = errors.As
+var (
+	As     = errors.As
+	Unwrap = errors.Unwrap
+)
 
 // func As(err error, target any) bool {
 // 	es := Split(err)
@@ -31,20 +34,27 @@ var As = errors.As
 // }
 
 func Is(err, target error) bool {
-	es := Split(err)
+	if errors.Is(err, target) {
+		return true
+	}
 
-	switch len(es) {
-	case 0:
-		return false
+	switch u := err.(type) {
+	case interface{ Unwrap() error }:
+		if Is(u.Unwrap(), target) {
+			return true
+		}
 
-	case 1:
-		return errors.Is(Unwrap(es[0]), target)
+	case interface{ Unwrap() []error }:
 
-	default:
-		for _, e := range es {
+		for _, e := range u.Unwrap() {
 			if Is(e, target) {
 				return true
 			}
+		}
+
+	default:
+		if errors.Is(u, target) {
+			return true
 		}
 	}
 
@@ -68,7 +78,7 @@ func IsBrokenPipe(err error) bool {
 }
 
 func IsTooManyOpenFiles(err error) bool {
-	e := Unwrap(err)
+	e := errors.Unwrap(err)
 	return e.Error() == "too many open files"
 }
 
@@ -89,12 +99,12 @@ func IsEOF(err error) bool {
 }
 
 func IsExist(err error) bool {
-	e := Unwrap(err)
+	e := errors.Unwrap(err)
 	return os.IsExist(e)
 }
 
 func IsNotExist(err error) bool {
-	e := Unwrap(err)
+	e := errors.Unwrap(err)
 	return os.IsNotExist(e)
 }
 

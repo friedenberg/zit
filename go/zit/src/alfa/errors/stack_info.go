@@ -20,30 +20,6 @@ type StackInfo struct {
 	Line        int
 }
 
-func MakeStackInfos(depth, count int) (si []StackInfo) {
-	pcs := make([]uintptr, count)
-
-	n := runtime.Callers(depth+1, pcs)
-
-	if n <= 0 {
-		return
-	}
-
-	frames := runtime.CallersFrames(pcs)
-
-	for {
-		frame, more := frames.Next()
-
-		si = append(si, MakeStackInfoFromFrame(frame))
-
-		if !more {
-			break
-		}
-	}
-
-	return
-}
-
 func MakeStackInfoFromFrame(frame runtime.Frame) (si StackInfo) {
 	si.Filename = filepath.Clean(frame.File)
 	si.Line = frame.Line
@@ -55,9 +31,19 @@ func MakeStackInfoFromFrame(frame runtime.Frame) (si StackInfo) {
 	return
 }
 
+func MustStackInfo(skip int) StackInfo {
+	si, ok := MakeStackInfo(skip + 1)
+
+	if !ok {
+		panic("stack unavailable")
+	}
+
+	return si
+}
+
 func MakeStackInfo(skip int) (si StackInfo, ok bool) {
 	var pc uintptr
-	pc, _, _, ok = runtime.Caller(skip + 1)
+	pc, _, _, ok = runtime.Caller(skip + 1) // 0 is self
 
 	if !ok {
 		return
@@ -67,6 +53,10 @@ func MakeStackInfo(skip int) (si StackInfo, ok bool) {
 
 	frame, _ := frames.Next()
 	si = MakeStackInfoFromFrame(frame)
+
+	if si.Function == "Wrap" {
+		panic(fmt.Sprintf("Parent Wrap included in stack. Skip: %d", skip))
+	}
 
 	return
 }
@@ -113,54 +103,83 @@ func (si StackInfo) String() string {
 }
 
 func (si StackInfo) Wrap(in error) (err error) {
-	var est errorStackTrace
-	est.add(stackWrapError{StackInfo: si, error: in})
-	err = &est
-	return
+	return &stackWrapError{
+		StackInfo: si,
+		error:     in,
+	}
 }
 
 func (si StackInfo) Wrapf(in error, f string, values ...interface{}) (err error) {
-	var est errorStackTrace
-	est.add(stackWrapError{StackInfo: si, error: in})
-	est.add(stackWrapError{StackInfo: si, error: fmt.Errorf(f, values...)})
-	err = &est
-	return
+	return &stackWrapError{
+		StackInfo: si,
+		error:     fmt.Errorf(f, values...),
+		next: &stackWrapError{
+			StackInfo: si,
+			error:     in,
+		},
+	}
 }
 
 func (si StackInfo) Errorf(f string, values ...interface{}) (err error) {
-	var est errorStackTrace
-	est.add(stackWrapError{StackInfo: si, error: fmt.Errorf(f, values...)})
-	err = &est
-	return
+	return &stackWrapError{
+		StackInfo: si,
+		error:     fmt.Errorf(f, values...),
+	}
 }
 
 type stackWrapError struct {
 	StackInfo
 	error
+
+	next *stackWrapError
 }
 
-func newStackWrapError(skip int, in error) (err stackWrapError, ok bool) {
+func newStackWrapError(
+	skip int,
+	in error,
+	next *stackWrapError,
+) (err *stackWrapError) {
 	var si StackInfo
+	var ok bool
 
 	if si, ok = MakeStackInfo(skip + 1); !ok {
-		return
+		panic("failed to get stack info")
 	}
 
-	err = stackWrapError{
+	err = &stackWrapError{
 		StackInfo: si,
 		error:     in,
+		next:      next,
 	}
 
 	return
 }
 
-func (se stackWrapError) Unwrap() error {
-	return se.error
+func (se *stackWrapError) Unwrap() error {
+	if se.next == nil {
+		return se.error
+	} else {
+		return se.next.Unwrap()
+	}
 }
 
-func (se stackWrapError) Error() string {
-	sb := &strings.Builder{}
+func (se *stackWrapError) UnwrapAll() []error {
+	switch {
+	case se.next != nil && se.error != nil:
+		return []error{se.error, se.next}
 
+	case se.next != nil:
+		return []error{se.next}
+
+	case se.error != nil:
+		return []error{se.error}
+
+	default:
+		return nil
+	}
+}
+
+func (se *stackWrapError) writeError(sb *strings.Builder) {
 	sb.WriteString(se.StackInfo.String())
 
 	if se.error != nil {
@@ -168,5 +187,18 @@ func (se stackWrapError) Error() string {
 		sb.WriteString(se.error.Error())
 	}
 
+	if se.next != nil {
+		sb.WriteString("\n")
+		se.next.writeError(sb)
+	}
+
+	if se.next == nil && se.error == nil {
+		sb.WriteString("both nil!!!!")
+	}
+}
+
+func (se stackWrapError) Error() string {
+	sb := &strings.Builder{}
+	se.writeError(sb)
 	return sb.String()
 }

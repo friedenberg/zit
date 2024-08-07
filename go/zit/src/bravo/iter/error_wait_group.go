@@ -36,16 +36,14 @@ type errorWaitGroupParallel struct {
 func (wg *errorWaitGroupParallel) GetError() (err error) {
 	wg.wait()
 
-	me := errors.MakeMulti(wg.err)
-
 	defer func() {
-		if !me.Empty() {
-			err = me
+		if !wg.err.Empty() {
+			err = wg.err
 		}
 	}()
 
 	for i := len(wg.doAfter) - 1; i >= 0; i-- {
-		me.Add(wg.doAfter[i]())
+		wg.err.Add(wg.doAfter[i]())
 	}
 
 	return
@@ -90,7 +88,8 @@ func (wg *errorWaitGroupParallel) Do(f interfaces.FuncError) (d bool) {
 	si, _ := errors.MakeStackInfo(2)
 
 	go func() {
-		wg.doneWith(si, f())
+		err := f()
+		wg.doneWith(si, err)
 	}()
 
 	return true

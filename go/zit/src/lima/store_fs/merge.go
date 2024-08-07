@@ -130,9 +130,9 @@ func (s *Store) handleMergeResult(
 
 	if err = os.Rename(
 		f.Name(),
-		cofs.External.FDs.MakeConflictMarker(),
+		cofs.External.FDs.Conflict.GetPath(),
 	); err != nil {
-		err = errors.Wrap(err)
+    err = errors.Wrapf(err, "StackInfo: %s", errors.MustStackInfo(0))
 		return
 	}
 

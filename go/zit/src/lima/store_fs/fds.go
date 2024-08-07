@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -78,45 +77,7 @@ func (a *FDSet) Equals(b *FDSet) bool {
 	return true
 }
 
-func (e *FDSet) MakeConflictMarker() (path string) {
-	path = fmt.Sprintf("%s.conflict", e.Object.GetPath())
-
-	return
-}
-
-func (e *FDSet) conflictMarkerExists(fd *fd.FD) (ok bool) {
-	if files.Exists(fmt.Sprintf("%s.conflict", fd)) {
-		ok = true
-	}
-
-	return
-}
-
-func (e *FDSet) ConflictMarkerError() (err error) {
-	if files.Exists(e.Conflict.GetPath()) {
-		err = errors.Wrapf(ErrExternalHasConflictMarker, "Conflict: %s", &e.Conflict)
-		return
-	}
-
-	if e.conflictMarkerExists(&e.Object) {
-		err = errors.Wrapf(ErrExternalHasConflictMarker, "Object: %s", &e.Object)
-		return
-	}
-
-	if e.conflictMarkerExists(&e.Blob) {
-		err = errors.Wrapf(ErrExternalHasConflictMarker, "Blob: %s", &e.Blob)
-		return
-	}
-
-	return
-}
-
 func (e *FDSet) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
-	if err = e.ConflictMarkerError(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	switch {
 	case !e.Object.IsEmpty() && !e.Blob.IsEmpty():
 		m = checkout_mode.ModeMetadataAndBlob
