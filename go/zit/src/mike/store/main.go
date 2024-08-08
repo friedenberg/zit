@@ -140,8 +140,7 @@ func (s *Store) SetExternalStores(
 		es.StoreFuncs = external_store.StoreFuncs{
 			FuncRealize:        s.tryRealize,
 			FuncCommit:         s.tryRealizeAndOrStore,
-			FuncReadSha:        s.GetStreamIndex().ReadOneObjectId,
-			FuncReadOneInto:    s.ReadOneInto,
+			FuncReadOneInto:    s.GetStreamIndex().ReadOneObjectId,
 			FuncPrimitiveQuery: s.GetStreamIndex().ReadQuery,
 		}
 

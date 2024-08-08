@@ -274,7 +274,8 @@ func (i *Index) Add(
 
 func (s *Index) ReadOneSha(
 	sh *sha.Sha,
-) (sk *sku.Transacted, err error) {
+	sk *sku.Transacted,
+) (err error) {
 	var loc object_probe_index.Loc
 
 	if loc, err = s.readOneShaLoc(sh); err != nil {
@@ -282,7 +283,7 @@ func (s *Index) ReadOneSha(
 		return
 	}
 
-	if sk, err = s.readOneLoc(loc); err != nil {
+	if err = s.readOneLoc(loc, sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -291,12 +292,13 @@ func (s *Index) ReadOneSha(
 }
 
 func (s *Index) ReadOneObjectId(
-	k interfaces.ObjectId,
-) (sk *sku.Transacted, err error) {
-	sh := sha.FromString(k.String())
+	id string,
+	sk *sku.Transacted,
+) (err error) {
+	sh := sha.FromString(id)
 	defer sha.GetPool().Put(sh)
 
-	if sk, err = s.ReadOneSha(sh); err != nil {
+	if err = s.ReadOneSha(sh, sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -316,7 +318,9 @@ func (s *Index) ReadOneObjectIdTai(
 	sh := sha.FromString(k.String() + t.String())
 	defer sha.GetPool().Put(sh)
 
-	if sk, err = s.ReadOneSha(sh); err != nil {
+	sk = sku.GetTransactedPool().Get()
+
+	if err = s.ReadOneSha(sh, sk); err != nil {
 		err = errors.Wrapf(err, "ObjectId: %q, Tai: %q", k, t)
 		return
 	}
@@ -326,10 +330,11 @@ func (s *Index) ReadOneObjectIdTai(
 
 func (s *Index) readOneLoc(
 	loc object_probe_index.Loc,
-) (sk *sku.Transacted, err error) {
+	sk *sku.Transacted,
+) (err error) {
 	p := s.pages[loc.Page]
 
-	if sk, err = p.readOneRange(loc.Range); err != nil {
+	if err = p.readOneRange(loc.Range, sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

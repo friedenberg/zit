@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -162,25 +161,6 @@ func (es *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 	}
 
 	if err = esut.UpdateTransacted(z); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (es *Store) GetExternalObjectIds() (ks interfaces.SetLike[sku.ExternalObjectId], err error) {
-	if es == nil {
-		ks = collections_value.MakeValueSet[sku.ExternalObjectId](nil)
-		return
-	}
-
-	if err = es.Initialize(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if ks, err = es.StoreLike.GetExternalObjectIds(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

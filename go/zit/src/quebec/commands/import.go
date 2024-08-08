@@ -120,10 +120,8 @@ func (c Import) Run(u *env.Env, args ...string) (err error) {
 			return
 		}
 
-		if co.State == checked_out_state.Error {
-			if co.Error == store.ErrNeedsMerge {
-				hasConflicts = true
-			}
+		if co.State == checked_out_state.Conflicted {
+			hasConflicts = true
 
 			if err = coPrinter(co); err != nil {
 				err = errors.Wrap(err)

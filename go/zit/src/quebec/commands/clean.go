@@ -84,17 +84,20 @@ func (c Clean) shouldClean(
 	}
 
 	if c.includeParent {
-		mutter, err := u.GetStore().GetStreamIndex().ReadOneObjectId(
-			co.GetSku().GetObjectId(),
+		mutter := sku.GetTransactedPool().Get()
+		defer sku.GetTransactedPool().Put(mutter)
+
+		err := u.GetStore().GetStreamIndex().ReadOneObjectId(
+			co.GetSku().GetObjectId().String(),
+			mutter,
 		)
 
 		errors.PanicIfError(err)
 
-		if mutter != nil &&
-			object_metadata.EqualerSansTai.Equals(
-				&co.GetSkuExternalLike().GetSku().Metadata,
-				&mutter.Metadata,
-			) {
+		if object_metadata.EqualerSansTai.Equals(
+			&co.GetSkuExternalLike().GetSku().Metadata,
+			&mutter.Metadata,
+		) {
 			return true
 		}
 	}

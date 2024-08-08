@@ -13,15 +13,12 @@ func (s *Store) ReadCheckedOutFromItem(
 ) (co *CheckedOut, err error) {
 	co = GetCheckedOutPool().Get()
 
-	if err = s.externalStoreInfo.FuncReadOneInto(k, &co.Internal); err != nil {
-		// if collections.IsErrNotFound(err) {
-		// 	// TODO mark status as new
-		// 	err = nil
-		// 	co.Internal.Kennung.ResetWith(&em.Kennung)
-		// } else {
-		// 	err = errors.Wrap(err)
-		// 	return
-		// }
+	if err = s.externalStoreInfo.FuncReadOneInto(
+		k.String(),
+		&co.Internal,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if err = s.ReadIntoCheckedOutFromTransacted(&co.Internal, co); err != nil {

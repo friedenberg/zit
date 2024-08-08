@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
@@ -28,7 +27,6 @@ func init() {
 type Store struct {
 	config              sku.Config
 	deletedPrinter      interfaces.FuncIter[*fd.FD]
-	externalStoreInfo   external_store.Info
 	metadataTextParser  object_metadata.TextParser
 	fs_home             fs_home.Home
 	fileEncoder         FileEncoder
@@ -132,9 +130,8 @@ func (fs *Store) String() (out string) {
 	return
 }
 
-func (s *Store) GetExternalObjectIds() (ks interfaces.SetLike[sku.ExternalObjectId], err error) {
-	ksm := collections_value.MakeMutableValueSet[sku.ExternalObjectId](nil)
-	ks = ksm
+func (s *Store) GetExternalObjectIds() (ks []sku.ExternalObjectId, err error) {
+	ks = make([]sku.ExternalObjectId, 0)
 	var l sync.Mutex
 
 	if err = s.All(
@@ -142,10 +139,7 @@ func (s *Store) GetExternalObjectIds() (ks interfaces.SetLike[sku.ExternalObject
 			l.Lock()
 			defer l.Unlock()
 
-			if err = ksm.Add(kfp); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+			ks = append(ks, kfp)
 
 			return
 		},
@@ -186,7 +180,12 @@ func (s *Store) GetObjectIdsForDir(
 // TODO confirm against actual Object Id
 func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err error) {
 	if v == "." {
-		v = s.dir
+		if k, err = s.GetExternalObjectIds(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
 	}
 
 	var fdee *fd.FD
@@ -202,7 +201,7 @@ func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err e
 			return
 		}
 	} else {
-		// TODO walk dir to find other blobs and objects that might conflicgTgt
+		// TODO walk dir to find other blobs and objects that might conflict
 		var objectIdString string
 		var fds *FDSet
 
@@ -211,12 +210,18 @@ func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err e
 			return
 		}
 
-		if err = s.processFDSet(objectIdString, fds); err != nil {
+		var results []*FDSet
+
+		if results, err = s.processFDSet(objectIdString, fds); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		k = []sku.ExternalObjectId{fds}
+		k = make([]sku.ExternalObjectId, 0, len(results))
+
+		for _, r := range results {
+			k = append(k, r)
+		}
 	}
 
 	return
@@ -252,6 +257,12 @@ func (fs *Store) Get(
 
 func (s *Store) Initialize(esi external_store.Info) (err error) {
 	s.externalStoreInfo = esi
+
+	if err = s.readAll(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 

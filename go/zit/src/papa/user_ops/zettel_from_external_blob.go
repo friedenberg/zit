@@ -2,16 +2,15 @@ package user_ops
 
 import (
 	"io"
-	"sort"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
@@ -26,7 +25,7 @@ type ZettelFromExternalBlob struct {
 }
 
 func (c ZettelFromExternalBlob) Run(
-	fdSet fd.Set,
+	qg *query.Group,
 ) (results sku.TransactedMutableSet, err error) {
 	if err = c.Lock(); err != nil {
 		err = errors.Wrap(err)
@@ -38,78 +37,57 @@ func (c ZettelFromExternalBlob) Run(
 	results = sku.MakeTransactedMutableSet()
 	toDelete := fd.MakeMutableSet()
 
-	fds := make(map[sha.Bytes][]*fd.FD)
+	if err = c.GetStore().QueryCheckedOut(
+		qg,
+		func(col sku.CheckedOutLike) (err error) {
+			cofs := col.(*store_fs.CheckedOut)
+			z := col.GetSkuExternalLike().GetSku()
 
-	for _, fd := range iter.SortedValues(fdSet) {
-		if err = c.addToMapAndWriteToBlobStore(fd, fds); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
+			if z.Metadata.IsEmpty() {
+				return
+			}
 
-	toCreate := make([]*store_fs.External, 0, len(fds))
+			desc := cofs.External.FDs.Blob.FileNameSansExt()
 
-	for _, fdsForSha := range fds {
-		sort.Slice(fdsForSha, func(i, j int) bool {
-			return fdsForSha[i].String() < fdsForSha[j].String()
-		})
-
-		var z *store_fs.External
-
-		if z, err = c.createZettelForBlobs(fdsForSha); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		toCreate = append(toCreate, z)
-
-		if !c.Delete {
-			continue
-		}
-
-		for _, fd := range fdsForSha {
-			if err = toDelete.Add(fd); err != nil {
+			if err = z.Metadata.Description.Set(desc); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
-		}
-	}
 
-	sort.Slice(
-		toCreate,
-		func(i, j int) bool {
-			return toCreate[i].GetBlobFD().String() < toCreate[j].GetBlobFD().String()
-		},
-	)
+			z.ObjectId.Reset()
 
-	for _, z := range toCreate {
-		if z.Metadata.IsEmpty() {
-			return
-		}
-
-		if err = c.GetStore().CreateOrUpdate(
-			z,
-			objekte_mode.ModeApplyProto,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		// TODO switch to using ObjekteOptions
-		if c.Proto.Apply(z, genres.Zettel) {
 			if err = c.GetStore().CreateOrUpdate(
-				z.GetSku(),
-				objekte_mode.ModeEmpty,
+				z,
+				objekte_mode.ModeApplyProto,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
-		}
 
-		results.Add(z.GetSku())
-	}
+			// TODO switch to using ObjekteOptions
+			if c.Proto.Apply(z, genres.Zettel) {
+				if err = c.GetStore().CreateOrUpdate(
+					z.GetSku(),
+					objekte_mode.ModeEmpty,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
 
-	if err != nil {
+			if err = results.Add(z.GetSku()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = cofs.External.FDs.Each(toDelete.Add); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

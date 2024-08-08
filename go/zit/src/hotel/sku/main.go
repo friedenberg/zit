@@ -30,9 +30,7 @@ type (
 	}
 
 	ObjectProbeIndex interface {
-		ReadOneObjectId(
-			interfaces.ObjectId,
-		) (*Transacted, error)
+		ReadOneObjectId(string, *Transacted) error
 	}
 
 	TransactedGetter interface {
@@ -45,7 +43,7 @@ type (
 		TransactedGetter
 		ExternalLikeGetter
 		Clone() ExternalLike
-    GetExternalState() external_state.State
+		GetExternalState() external_state.State
 	}
 
 	ExternalLikeGetter interface {

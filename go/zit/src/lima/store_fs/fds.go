@@ -120,7 +120,7 @@ func (e *FDSet) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 		}
 
 		err = checkout_mode.MakeErrInvalidCheckoutMode(
-			errors.Errorf("all FD's are empty: %v", e.MutableSetLike),
+			errors.Errorf("all FD's are empty: %s", e.Debug()),
 		)
 	}
 

@@ -1,6 +1,8 @@
 package store_fs
 
 import (
+	"sort"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
@@ -141,22 +143,34 @@ func (s *Store) QueryBlobs(
 		return
 	}
 
+	blobs := make([]*FDSet, 0, s.dirFDs.blobs.Len())
+
 	if err = s.dirFDs.blobs.Each(
 		func(fds *FDSet) (err error) {
-			if fds.State == external_state.Recognized {
-				return
-			}
-
-			if err = aco(fds); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+			blobs = append(blobs, fds)
 			return
 		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	sort.Slice(
+		blobs,
+		func(i, j int) bool {
+			return blobs[i].ObjectId.String() < blobs[j].ObjectId.String()
+		},
+	)
+
+	for _, fds := range blobs {
+		if fds.State == external_state.Recognized {
+			return
+		}
+
+		if err = aco(fds); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	for _, fds := range allRecognized {

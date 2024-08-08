@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -29,9 +28,9 @@ type Add struct {
 }
 
 func init() {
-	registerCommand(
+	registerCommandWithQuery(
 		"add",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Add{}
 
 			f.BoolVar(
@@ -64,6 +63,7 @@ func init() {
 			ui.TodoP2(
 				"add support for restricted query to specific gattung",
 			)
+
 			return c
 		},
 	)
@@ -74,9 +74,9 @@ func (c Add) ModifyBuilder(b *query.Builder) {
 		WithDoNotMatchEmpty()
 }
 
-func (c Add) Run(
+func (c Add) RunWithQuery(
 	u *env.Env,
-	args ...string,
+	qg *query.Group,
 ) (err error) {
 	zettelsFromBlobOp := user_ops.ZettelFromExternalBlob{
 		Env:    u,
@@ -88,34 +88,7 @@ func (c Add) Run(
 
 	var zettelsFromBlobResults sku.TransactedMutableSet
 
-	fds := fd.MakeMutableSet()
-
-	for _, v := range args {
-		if v == "." {
-			if err = u.GetStore().GetCwdFiles().GetBlobFDs().Each(fds.Add); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			break
-		} else if v == "" {
-			continue
-		}
-
-		var f fd.FD
-
-		if err = f.Set(v); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = fds.Add(&f); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if zettelsFromBlobResults, err = zettelsFromBlobOp.Run(fds); err != nil {
+	if zettelsFromBlobResults, err = zettelsFromBlobOp.Run(qg); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

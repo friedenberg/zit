@@ -77,47 +77,6 @@ func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
 	return fs
 }
 
-func (c *Store) GetExternalObjectIds() (ks interfaces.SetLike[sku.ExternalObjectId], err error) {
-	ksm := collections_value.MakeMutableValueSet[sku.ExternalObjectId](nil)
-	ks = ksm
-
-	for u, items := range c.urls {
-		for _, item := range items {
-			var matchingTabId *sku.Transacted
-			var trackedFromBefore bool
-
-			{
-				tabId, okTabId := item.GetTabId()
-
-				if okTabId {
-					matchingTabId, trackedFromBefore = c.transactedTabIdIndex[tabId]
-				}
-			}
-
-			if trackedFromBefore {
-				if err = ksm.Add(matchingTabId.ObjectId.Clone()); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			} else {
-				k := ids.GetObjectIdPool().Get()
-
-				if err = k.SetRaw(u.String()); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				if err = ksm.Add(k); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-		}
-	}
-
-	return
-}
-
 // TODO
 func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err error) {
 	err = errors.Implement()

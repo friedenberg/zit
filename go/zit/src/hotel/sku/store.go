@@ -25,7 +25,6 @@ type (
 	}
 
 	ExternalStoreForQuery interface {
-		GetExternalObjectIds() (interfaces.SetLike[ExternalObjectId], error)
 		GetObjectIdsForString(string) ([]ExternalObjectId, error)
 	}
 

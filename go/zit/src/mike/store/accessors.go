@@ -88,7 +88,14 @@ func (s *Store) GetConfigBlobFormat() blob_store.Format[mutable_config.Blob, *mu
 func (s *Store) ReadOneObjectId(
 	k interfaces.ObjectId,
 ) (sk *sku.Transacted, err error) {
-	return s.GetStreamIndex().ReadOneObjectId(k)
+	sk = sku.GetTransactedPool().Get()
+
+	if err = s.GetStreamIndex().ReadOneObjectId(k.String(), sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (s *Store) ReaderFor(sh *sha.Sha) (rc sha.ReadCloser, err error) {

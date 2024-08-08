@@ -48,7 +48,8 @@ func (pt *Page) initialize(
 
 func (s *Page) readOneRange(
 	ra object_probe_index.Range,
-) (sk *sku.Transacted, err error) {
+	sk *sku.Transacted,
+) (err error) {
 	var f *os.File
 
 	if f, err = files.Open(s.Path()); err != nil {
@@ -66,7 +67,6 @@ func (s *Page) readOneRange(
 	}
 
 	dec := makeBinaryWithQueryGroup(nil, ids.SigilHistory)
-	sk = sku.GetTransactedPool().Get()
 
 	skWR := skuWithRangeAndSigil{
 		skuWithSigil: skuWithSigil{

@@ -660,16 +660,16 @@ func (u *Env) MakeFormatFunc(
 		p := u.PrinterTransactedLike()
 
 		f = func(o *sku.Transacted) (err error) {
-			var sk *sku.Transacted
+			sk := sku.GetTransactedPool().Get()
+			defer sku.GetTransactedPool().Put(sk)
 
-			if sk, err = u.GetStore().GetStreamIndex().ReadOneObjectId(
-				&o.ObjectId,
+			if err = u.GetStore().GetStreamIndex().ReadOneObjectId(
+				o.ObjectId.String(),
+				sk,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
-
-			defer sku.GetTransactedPool().Put(sk)
 
 			if err = p(sk); err != nil {
 				err = errors.Wrap(err)

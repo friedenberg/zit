@@ -1,7 +1,6 @@
 package store_fs
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
@@ -35,11 +34,6 @@ func MakeCwdFilesAll(
 			st,
 			nil,
 		),
-	}
-
-	if err = fs.readAll(); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	return

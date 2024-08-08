@@ -14,16 +14,11 @@ import (
 type (
 	FuncRealize     = func(*sku.Transacted, *sku.Transacted, sku.CommitOptions) error
 	FuncCommit      = func(*sku.Transacted, sku.CommitOptions) error
-	FuncReadSha     = func(interfaces.ObjectId) (*sku.Transacted, error)
-	FuncReadOneInto = func(
-		k1 interfaces.ObjectId,
-		out *sku.Transacted,
-	) (err error)
+	FuncReadOneInto = func(string, *sku.Transacted) error
 
 	StoreFuncs struct {
 		FuncRealize
 		FuncCommit
-		FuncReadSha
 		FuncReadOneInto
 		sku.FuncPrimitiveQuery
 	}

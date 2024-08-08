@@ -83,8 +83,13 @@ func (f *cliCheckedOut) WriteStringFormat(
 	var m checkout_mode.Mode
 
 	if m, err = fds.GetCheckoutModeOrError(); err != nil {
-		err = errors.Wrap(err)
-		return
+		if co.State == checked_out_state.Conflicted {
+			err = nil
+			m = checkout_mode.BlobOnly
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	switch {

@@ -247,14 +247,15 @@ func (s *Store) fetchMutterIfNecessary(
 	sk *sku.Transacted,
 	ut sku.CommitOptions,
 ) (mutter *sku.Transacted, err error) {
-	mutter, err = s.GetStreamIndex().ReadOneObjectId(
-		sk.GetObjectId(),
-	)
-	if err != nil {
-		if collections.IsErrNotFound(err) {
+	mutter = sku.GetTransactedPool().Get()
+	if err = s.GetStreamIndex().ReadOneObjectId(
+		sk.GetObjectId().String(),
+		mutter,
+	); err != nil {
+		if collections.IsErrNotFound(err) || errors.IsNotExist(err) {
 			// TODO decide if this should continue to virtual stores
-			err = nil
-		} else if errors.IsNotExist(err) {
+			sku.GetTransactedPool().Put(mutter)
+			mutter = nil
 			err = nil
 		} else {
 			err = errors.Wrap(err)

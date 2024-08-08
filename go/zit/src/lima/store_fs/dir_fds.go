@@ -8,12 +8,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
 type fdSetWithError struct {
@@ -24,7 +27,8 @@ type fdSetWithError struct {
 type dirFDs struct {
 	root string
 	file_extensions.FileExtensions
-	fs_home fs_home.Home
+	fs_home           fs_home.Home
+	externalStoreInfo external_store.Info
 
 	rawFDs map[string]*FDSet
 
@@ -191,7 +195,31 @@ func (d *dirFDs) processRootDir() (err error) {
 	return
 }
 
-func (d *dirFDs) processFDSet(objectIdString string, fds *FDSet) (err error) {
+func (d *dirFDs) processFDSet(
+	objectIdString string,
+	fds *FDSet,
+) (results []*FDSet, err error) {
+	var recognizedGenre genres.Genre
+
+	{
+		recognized := sku.GetTransactedPool().Get()
+		defer sku.GetTransactedPool().Put(recognized)
+
+		if err = d.externalStoreInfo.FuncReadOneInto(
+			objectIdString,
+			recognized,
+		); err != nil {
+			if collections.IsErrNotFound(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
+		} else {
+			recognizedGenre = genres.Must(recognized.GetGenre())
+		}
+	}
+
 	var blobCount, objectCount int
 
 	if err = fds.Each(
@@ -254,7 +282,11 @@ func (d *dirFDs) processFDSet(objectIdString string, fds *FDSet) (err error) {
 	}
 
 	if fds.GetGenre() == genres.Unknown {
-		if err = d.addOneOrMoreBlobs(
+		fds.ObjectId.SetGenre(recognizedGenre)
+	}
+
+	if fds.GetGenre() == genres.Unknown {
+		if results, err = d.addOneOrMoreBlobs(
 			fds,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -268,6 +300,8 @@ func (d *dirFDs) processFDSet(objectIdString string, fds *FDSet) (err error) {
 			err = errors.Wrap(err)
 			return
 		}
+
+		results = []*FDSet{fds}
 	}
 
 	return
@@ -275,14 +309,19 @@ func (d *dirFDs) processFDSet(objectIdString string, fds *FDSet) (err error) {
 
 func (d *dirFDs) addOneBlob(
 	f *fd.FD,
-) (err error) {
-	fds := &FDSet{
+) (result *FDSet, err error) {
+	result = &FDSet{
 		MutableSetLike: collections_value.MakeMutableValueSet[*fd.FD](nil),
 	}
 
-	fds.Blob.ResetWith(f)
+	result.Blob.ResetWith(f)
 
-	if err = fds.ObjectId.SetWithGenre(
+	if err = result.MutableSetLike.Add(&result.Blob); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = result.ObjectId.SetWithGenre(
 		f.GetPath(),
 		genres.Blob,
 	); err != nil {
@@ -290,7 +329,7 @@ func (d *dirFDs) addOneBlob(
 		return
 	}
 
-	if err = d.blobs.Add(fds); err != nil {
+	if err = d.blobs.Add(result); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -309,7 +348,7 @@ func (d *dirFDs) addOneBlob(
 		existing = collections_value.MakeMutableValueSet[*FDSet](nil)
 	}
 
-	if err = existing.Add(fds); err != nil {
+	if err = existing.Add(result); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -321,20 +360,37 @@ func (d *dirFDs) addOneBlob(
 
 func (d *dirFDs) addOneOrMoreBlobs(
 	fds *FDSet,
-) (err error) {
+) (results []*FDSet, err error) {
 	if fds.MutableSetLike.Len() == 1 {
-		if err = d.addOneBlob(
+		var fdsOne *FDSet
+
+		if fdsOne, err = d.addOneBlob(
 			fds.Any(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
+		results = []*FDSet{fdsOne}
+
 		return
 	}
 
 	if err = fds.MutableSetLike.Each(
-		d.addOneBlob,
+		func(fd *fd.FD) (err error) {
+			var fdsOne *FDSet
+
+			if fdsOne, err = d.addOneBlob(
+				fds.Any(),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			results = append(results, fdsOne)
+
+			return
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -369,7 +425,7 @@ func (d *dirFDs) addOneObject(
 
 func (d *dirFDs) processAll() (err error) {
 	for objectIdString, fds := range d.rawFDs {
-		if err = d.processFDSet(objectIdString, fds); err != nil {
+		if _, err = d.processFDSet(objectIdString, fds); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

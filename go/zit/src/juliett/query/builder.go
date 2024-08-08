@@ -337,37 +337,6 @@ func (b *Builder) buildManyFromTokens(
 	qg *Group,
 	tokens ...string,
 ) (err error) {
-	// if len(tokens) == 1 && tokens[0] == "." {
-	// 	// TODO [ces/mew] switch to marker on query group for Cwd
-	// 	var ks interfaces.SetLike[*ids.ObjectId]
-
-	// 	if ks, err = b.repo.GetExternalObjectIds(); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return
-	// 	}
-
-	// 	if err = ks.Each(
-	// 		func(k *ids.ObjectId) (err error) {
-	// 			b.pinnedObjectIds = append(
-	// 				b.pinnedObjectIds,
-	// 				ObjectId{
-	// 					ObjectId: k,
-	// 					External: true,
-	// 				},
-	// 			)
-
-	// 			return
-	// 		},
-	// 	); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return
-	// 	}
-
-	// 	qg.dotOperatorActive = true
-
-	// 	return
-	// }
-
 	for len(tokens) > 0 {
 		if tokens, err = b.parseOneFromTokens(qg, tokens...); err != nil {
 			err = errors.Wrap(err)
@@ -574,9 +543,13 @@ func (b *Builder) makeTagOrLuaTag(
 		return
 	}
 
-	var sk *sku.Transacted
+	sk := sku.GetTransactedPool().Get()
+	defer sku.GetTransactedPool().Put(sk)
 
-	if sk, err = b.object_probe_index.ReadOneObjectId(k); err != nil {
+	if err = b.object_probe_index.ReadOneObjectId(
+		k.String(),
+		sk,
+	); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = nil
 		} else {
@@ -585,8 +558,6 @@ func (b *Builder) makeTagOrLuaTag(
 
 		return
 	}
-
-	defer sku.GetTransactedPool().Put(sk)
 
 	lb := b.luaVMPoolBuilder.Clone().WithApply(MakeSelfApply(sk))
 

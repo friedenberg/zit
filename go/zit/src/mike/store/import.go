@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
+	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
@@ -99,6 +100,6 @@ func (s *Store) Import(external *sku.Transacted) (co *store_fs.CheckedOut, err e
 var ErrNeedsMerge = errors.New("needs merge")
 
 func (s *Store) importDoMerge(co *store_fs.CheckedOut) (err error) {
-	co.SetError(ErrNeedsMerge)
+	co.State = checked_out_state.Conflicted
 	return
 }
