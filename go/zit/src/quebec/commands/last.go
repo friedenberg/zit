@@ -90,7 +90,7 @@ func (c Last) Run(u *env.Env, args ...string) (err error) {
 	} else if c.Edit {
 		opCheckout := user_ops.Checkout{
 			Options: checkout_options.Options{
-				CheckoutMode: checkout_mode.ModeMetadataAndBlob,
+				CheckoutMode: checkout_mode.MetadataAndBlob,
 			},
 			Env:  u,
 			Edit: true,

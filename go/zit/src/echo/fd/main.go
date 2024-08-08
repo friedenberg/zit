@@ -273,6 +273,10 @@ func (fd *FD) SetShaLike(v interfaces.Sha) (err error) {
 	return fd.sha.SetShaLike(v)
 }
 
+func (fd *FD) GetSha() *sha.Sha {
+	return &fd.sha
+}
+
 func (fd *FD) GetShaLike() interfaces.Sha {
 	return &fd.sha
 }
@@ -321,4 +325,14 @@ func (dst *FD) ResetWith(src *FD) {
 	dst.path = src.path
 	dst.modTime = src.modTime
 	errors.PanicIfError(dst.sha.SetShaLike(&src.sha))
+}
+
+func (src *FD) Clone() (dst *FD) {
+	dst = &FD{}
+	dst.state = src.state
+	dst.isDir = src.isDir
+	dst.path = src.path
+	dst.modTime = src.modTime
+	errors.PanicIfError(dst.sha.SetShaLike(&src.sha))
+	return
 }

@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -20,6 +21,10 @@ type External struct {
 	sku.Transacted
 	browser sku.Transacted
 	item
+}
+
+func (e *External) GetExternalState() external_state.State {
+	return external_state.Unknown
 }
 
 func (e *External) SaveBlob(s fs_home.Home) (err error) {

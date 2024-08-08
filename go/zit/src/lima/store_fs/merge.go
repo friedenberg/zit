@@ -29,10 +29,10 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 
 	inlineBlob := tm.IsAllInlineType(s.config)
 
-	mode := checkout_mode.ModeMetadataAndBlob
+	mode := checkout_mode.MetadataAndBlob
 
 	if !inlineBlob {
-		mode = checkout_mode.ModeMetadataOnly
+		mode = checkout_mode.MetadataOnly
 	}
 
 	if leftCO, err = s.checkoutOneForMerge(mode, tm.Left); err != nil {
@@ -181,10 +181,10 @@ func (s *Store) RunMergeTool(
 
 	inlineBlob := tm.IsAllInlineType(s.config)
 
-	mode := checkout_mode.ModeMetadataAndBlob
+	mode := checkout_mode.MetadataAndBlob
 
 	if !inlineBlob {
-		mode = checkout_mode.ModeMetadataOnly
+		mode = checkout_mode.MetadataOnly
 	}
 
 	var leftCO, middleCO, rightCO *CheckedOut

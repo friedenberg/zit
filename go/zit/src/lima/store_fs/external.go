@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
@@ -19,6 +20,10 @@ type External struct {
 
 func (t *External) GetSkuExternalLike() sku.ExternalLike {
 	return t
+}
+
+func (t *External) GetExternalState() external_state.State {
+	return t.FDs.State
 }
 
 func (a *External) Clone() sku.ExternalLike {
@@ -116,13 +121,13 @@ func (o *External) GetKey() string {
 func (e *External) GetCheckoutMode() (m checkout_mode.Mode, err error) {
 	switch {
 	case !e.FDs.Object.IsEmpty() && !e.FDs.Blob.IsEmpty():
-		m = checkout_mode.ModeMetadataAndBlob
+		m = checkout_mode.MetadataAndBlob
 
 	case !e.FDs.Blob.IsEmpty():
-		m = checkout_mode.ModeBlobOnly
+		m = checkout_mode.BlobOnly
 
 	case !e.FDs.Object.IsEmpty():
-		m = checkout_mode.ModeMetadataOnly
+		m = checkout_mode.MetadataOnly
 
 	default:
 		err = checkout_mode.MakeErrInvalidCheckoutMode(

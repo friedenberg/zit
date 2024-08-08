@@ -23,7 +23,7 @@ func init() {
 		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Checkout{
 				CheckoutOptions: checkout_options.Options{
-					CheckoutMode: checkout_mode.ModeMetadataOnly,
+					CheckoutMode: checkout_mode.MetadataOnly,
 				},
 			}
 

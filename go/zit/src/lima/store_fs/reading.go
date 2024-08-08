@@ -75,10 +75,6 @@ func (s *Store) ReadOneExternalInto(
 		return
 	}
 
-	// if err = em.ConflictMarkerError(); err != nil {
-	// 	return
-	// }
-
 	var t1 *sku.Transacted
 
 	if t != nil {
@@ -86,13 +82,13 @@ func (s *Store) ReadOneExternalInto(
 	}
 
 	switch m {
-	case checkout_mode.ModeBlobOnly:
+	case checkout_mode.BlobOnly:
 		if err = s.ReadOneExternalBlob(e, t1); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case checkout_mode.ModeMetadataOnly, checkout_mode.ModeMetadataAndBlob:
+	case checkout_mode.MetadataOnly, checkout_mode.MetadataAndBlob:
 		if e.FDs.Object.IsStdin() {
 			if err = s.ReadOneExternalObjectReader(os.Stdin, e); err != nil {
 				err = errors.Wrap(err)
@@ -104,6 +100,9 @@ func (s *Store) ReadOneExternalInto(
 				return
 			}
 		}
+
+	case checkout_mode.BlobRecognized:
+		object_metadata.Resetter.ResetWith(e.GetMetadata(), t1.GetMetadata())
 
 	default:
 		panic(checkout_mode.MakeErrInvalidCheckoutModeMode(m))
@@ -176,32 +175,35 @@ func (s *Store) ReadOneExternalBlob(
 ) (err error) {
 	object_metadata.Resetter.ResetWith(&e.Metadata, t.GetMetadata())
 
-	var aw sha.WriteCloser
+	// TODO use cache
+	{
+		var aw sha.WriteCloser
 
-	if aw, err = s.fs_home.BlobWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
+		if aw, err = s.fs_home.BlobWriter(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer errors.DeferredCloser(&err, aw)
+
+		var f *os.File
+
+		if f, err = files.OpenExclusiveReadOnly(
+			e.GetBlobFD().GetPath(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer errors.DeferredCloser(&err, f)
+
+		if _, err = io.Copy(aw, f); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		e.GetMetadata().Blob.SetShaLike(aw)
 	}
-
-	defer errors.DeferredCloser(&err, aw)
-
-	var f *os.File
-
-	if f, err = files.OpenExclusiveReadOnly(
-		e.GetBlobFD().GetPath(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, f)
-
-	if _, err = io.Copy(aw, f); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	e.GetMetadata().Blob.SetShaLike(aw)
 
 	return
 }

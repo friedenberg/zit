@@ -80,7 +80,12 @@ func (f *cliCheckedOut) WriteStringFormat(
 		return
 	}
 
-	m := fds.GetCheckoutMode()
+	var m checkout_mode.Mode
+
+	if m, err = fds.GetCheckoutModeOrError(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	switch {
 	case co.State == checked_out_state.Untracked:
@@ -97,7 +102,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 	case co.IsImport:
 		fallthrough
 
-	case m == checkout_mode.ModeBlobOnly:
+	case m == checkout_mode.BlobOnly || m == checkout_mode.BlobRecognized:
 		n2, err = f.objectIdStringFormatWriter.WriteStringFormat(sw, &o.ObjectId)
 		n += n2
 
@@ -136,38 +141,27 @@ func (f *cliCheckedOut) WriteStringFormat(
 		return
 	}
 
-	if m != checkout_mode.ModeMetadataOnly && m != checkout_mode.ModeNone {
-		n1, err = sw.WriteString("\n")
-		n += int64(n1)
+	if m == checkout_mode.BlobRecognized {
+		if err = fds.MutableSetLike.Each(
+			func(fd *fd.FD) (err error) {
+				n2, err = f.writeStringFormatBlobFD(sw, fd)
+				n += n2
 
-		if err != nil {
-			err = errors.Wrap(err)
-			return
+				if err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
+			},
+		); err != nil {
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
-
-		n2, err = f.rightAlignedWriter.WriteStringFormat(
-			sw,
-			"",
-		)
-		n += n2
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		n1, err = sw.WriteString(" ")
-		n += int64(n1)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		n2, err = f.fdStringFormatWriter.WriteStringFormat(
-			sw,
-			&fds.Blob,
-		)
+	} else if m != checkout_mode.MetadataOnly && m != checkout_mode.None {
+		n2, err = f.writeStringFormatBlobFD(sw, &fds.Blob)
 		n += n2
 
 		if err != nil {
@@ -178,6 +172,51 @@ func (f *cliCheckedOut) WriteStringFormat(
 
 	n1, err = sw.WriteString("]")
 	n += int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (f *cliCheckedOut) writeStringFormatBlobFD(
+	sw interfaces.WriterAndStringWriter,
+	fd *fd.FD,
+) (n int64, err error) {
+	var n1 int
+	var n2 int64
+
+	n1, err = sw.WriteString("\n")
+	n += int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n2, err = f.rightAlignedWriter.WriteStringFormat(
+		sw,
+		"",
+	)
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n1, err = sw.WriteString(" ")
+	n += int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n2, err = f.fdStringFormatWriter.WriteStringFormat(sw, fd)
+	n += n2
 
 	if err != nil {
 		err = errors.Wrap(err)

@@ -7,6 +7,11 @@ import (
 )
 
 type (
+	ExternalObjectId interface {
+		ids.ObjectIdLike
+		GetExternalObjectId() *ids.ObjectId
+	}
+
 	FuncRealize     = func(*Transacted, *Transacted, CommitOptions) error
 	FuncCommit      = func(*Transacted, CommitOptions) error
 	FuncReadSha     = func(*sha.Sha) (*Transacted, error)
@@ -20,8 +25,8 @@ type (
 	}
 
 	ExternalStoreForQuery interface {
-		GetExternalObjectIds() (interfaces.SetLike[*ids.ObjectId], error)
-		GetObjectIdsForString(string) ([]*ids.ObjectId, error)
+		GetExternalObjectIds() (interfaces.SetLike[ExternalObjectId], error)
+		GetObjectIdsForString(string) ([]ExternalObjectId, error)
 	}
 
 	ExternalStoreForQueryGetter interface {

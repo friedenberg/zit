@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
@@ -17,7 +18,17 @@ func InternalAndExternalEqualsWithoutTai(col CheckedOutLike) bool {
 	)
 }
 
-func DetermineState(c CheckedOutLike, justCheckedOut bool) {
+func DetermineState(
+	c CheckedOutLike,
+	justCheckedOut bool,
+) {
+	es := c.GetSkuExternalLike().GetExternalState()
+
+	if es == external_state.Recognized {
+		c.SetState(checked_out_state.Recognized)
+		return
+	}
+
 	i := c.GetSku()
 	e := c.GetSkuExternalLike().GetSku()
 

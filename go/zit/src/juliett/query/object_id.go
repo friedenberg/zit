@@ -16,11 +16,11 @@ type ObjectId struct {
 	Debug    bool
 	External bool
 
-	*ids.ObjectId
+	ids.ObjectIdLike
 }
 
 func (k ObjectId) Reduce(b *Builder) (err error) {
-	if err = k.Expand(b.expanders); err != nil {
+	if err = k.GetObjectId().Expand(b.expanders); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -40,11 +40,11 @@ func (k ObjectId) ContainsSku(sk *sku.Transacted) (ok bool) {
 
 		if k.Exact {
 			idx, ok = me.Cache.TagPaths.All.ContainsObjectIdTagExact(
-				k.ObjectId,
+				k.GetObjectId(),
 			)
 		} else {
 			idx, ok = me.Cache.TagPaths.All.ContainsObjectIdTag(
-				k.ObjectId,
+				k.GetObjectId(),
 			)
 		}
 
@@ -92,7 +92,7 @@ func (k ObjectId) String() string {
 		sb.WriteRune('%')
 	}
 
-	sb.WriteString(ids.FormattedString(k.ObjectId))
+	sb.WriteString(ids.FormattedString(k.GetObjectId()))
 
 	return sb.String()
 }

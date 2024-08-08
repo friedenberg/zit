@@ -1,49 +1,42 @@
 package store
 
-import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-)
+// type UnsureMatchMap struct {
+// 	sku.UnsureMatchType
+// 	lookup map[sha.Bytes]sku.CheckedOutLikeMutableSet
+// }
 
-type UnsureMatchMap struct {
-	sku.UnsureMatchType
-	lookup map[sha.Bytes]sku.CheckedOutLikeMutableSet
-}
+// func (s *Store) QueryUnsure(
+// 	qg *query.Group,
+// 	o sku.UnsureMatchOptions,
+// 	f sku.IterMatching,
+// ) (err error) {
+// 	matchMaps := o.MakeMatchMap()
 
-func (s *Store) QueryUnsure(
-	qg *query.Group,
-	o sku.UnsureMatchOptions,
-	f sku.IterMatching,
-) (err error) {
-	matchMaps := o.MakeMatchMap()
+// 	if err = s.cwdFiles.QueryUnsure(
+// 		qg,
+// 		sku.MakeUnsureMatchMapsCollector(matchMaps),
+// 	); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	if err = s.cwdFiles.QueryUnsure(
-		qg,
-		sku.MakeUnsureMatchMapsCollector(matchMaps),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+// 	// TODO create a new query group for all of history
+// 	qg.SetIncludeHistory()
 
-	// TODO create a new query group for all of history
-	qg.SetIncludeHistory()
+// 	if matchMaps.Len() == 0 {
+// 		return
+// 	}
 
-	if matchMaps.Len() == 0 {
-		return
-	}
+// 	if err = s.QueryWithKasten(
+// 		qg,
+// 		sku.MakeUnsureMatchMapsMatcher(
+// 			matchMaps,
+// 			f,
+// 		),
+// 	); err != nil {
+// 		err = errors.Wrap(err)
+// 		return
+// 	}
 
-	if err = s.QueryWithKasten(
-		qg,
-		sku.MakeUnsureMatchMapsMatcher(
-			matchMaps,
-			f,
-		),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
+// 	return
+// }

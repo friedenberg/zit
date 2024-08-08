@@ -16,20 +16,20 @@ func MakeGroup(
 	b *Builder,
 ) *Group {
 	return &Group{
-		OptimizedQueries: make(map[genres.Genre]*Query),
-		UserQueries:      make(map[ids.Genre]*Query),
-		Hidden:           b.hidden,
-		Zettels:          ids.MakeZettelIdMutableSet(),
-		Types:            ids.MakeMutableTypeSet(),
+		Hidden:            b.hidden,
+		OptimizedQueries:  make(map[genres.Genre]*Query),
+		UserQueries:       make(map[ids.Genre]*Query),
+		ExternalObjectIds: make(map[string]ObjectId),
+		Types:             ids.MakeMutableTypeSet(),
 	}
 }
 
 type Group struct {
-	Hidden           sku.Query
-	OptimizedQueries map[genres.Genre]*Query
-	UserQueries      map[ids.Genre]*Query
-	Zettels          ids.ZettelIdMutableSet
-	Types            ids.TypeMutableSet
+	Hidden            sku.Query
+	OptimizedQueries  map[genres.Genre]*Query
+	UserQueries       map[ids.Genre]*Query
+	ExternalObjectIds map[string]ObjectId
+	Types             ids.TypeMutableSet
 
 	dotOperatorActive bool
 
@@ -97,7 +97,7 @@ func (qg *Group) GetExactlyOneObjectId(
 	s = q.GetSigil()
 
 	for _, k1 := range kn {
-		k = k1.ObjectId
+		k = k1.GetObjectId()
 
 		if k1.External {
 			s.Add(ids.SigilExternal)
@@ -162,20 +162,22 @@ func (qg *Group) AddExactObjectId(
 	b *Builder,
 	k ObjectId,
 ) (err error) {
-	if k.ObjectId == nil {
+	if k.ObjectIdLike == nil {
 		err = errors.Errorf("nil object id")
 		return
 	}
 
 	q := b.makeQuery()
 	q.Sigil.Add(ids.SigilLatest)
-	q.ObjectIds[k.ObjectId.String()] = k
+	q.ObjectIds[k.GetObjectId().String()] = k
 	q.Genre.Add(genres.Must(k))
 
 	if err = qg.Add(q); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	qg.ExternalObjectIds[k.GetObjectId().String()] = k
 
 	return
 }
@@ -407,6 +409,10 @@ func (qg *Group) ContainsExternalSku(
 
 	if qg.dotOperatorActive {
 		ok = true
+		return
+	}
+
+	if _, ok = qg.ExternalObjectIds[sk.GetObjectId().String()]; ok {
 		return
 	}
 

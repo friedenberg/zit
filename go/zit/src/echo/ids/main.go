@@ -24,6 +24,12 @@ type IdLike interface {
 	// interfaces.Setter
 }
 
+type ObjectIdLike interface {
+	IdWithParts
+	interfaces.GenreGetter
+	GetObjectId() *ObjectId
+}
+
 type Index struct{}
 
 func Make(v string) (k IdLike, err error) {

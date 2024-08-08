@@ -1,24 +1,19 @@
 package store_fs
 
 import (
-	"sync"
-
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
-	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
 func (s *Store) MakeApplyCheckedOut(
-	qg sku.Queryable,
+	qg *query.Group,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 	o sku.CommitOptions,
 ) interfaces.FuncIter[*FDSet] {
@@ -34,7 +29,7 @@ func (s *Store) MakeApplyCheckedOut(
 
 func (s *Store) ApplyCheckedOut(
 	o sku.CommitOptions,
-	qg sku.Queryable,
+	qg *query.Group,
 	em *FDSet,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
@@ -45,7 +40,11 @@ func (s *Store) ApplyCheckedOut(
 		return
 	}
 
-	if !qg.ContainsSku(&co.External.Transacted) {
+	if co.External.FDs.State != external_state.Recognized &&
+		!qg.ContainsExternalSku(
+			&co.External.Transacted,
+			co.State,
+		) {
 		return
 	}
 
@@ -63,23 +62,23 @@ func (s *Store) QueryCheckedOut(
 ) (err error) {
 	wg := iter.MakeErrorWaitGroupParallel()
 
-	{
-		o := sku.CommitOptions{
-			Mode: objekte_mode.ModeRealizeSansProto,
-		}
-
-		wg.Do(func() error {
-			return s.All(s.MakeApplyCheckedOut(qg, f, o))
-		})
+	o := sku.CommitOptions{
+		Mode: objekte_mode.ModeRealizeSansProto,
 	}
 
+	aco := s.MakeApplyCheckedOut(qg, f, o)
+
+	wg.Do(func() error {
+		return s.AllObjects(aco)
+	})
+
 	if !qg.ExcludeUntracked {
-		wg.Do(func() error {
-			return s.QueryUnsure(qg, f)
-		})
+		// wg.Do(func() error {
+		// 	return s.QueryUnsure(qg, f)
+		// })
 
 		wg.Do(func() error {
-			return s.QueryUntrackedBlobs(qg, f)
+			return s.QueryBlobs(qg, aco, f)
 		})
 	}
 
@@ -91,61 +90,64 @@ func (s *Store) QueryCheckedOut(
 	return
 }
 
-func (s *Store) QueryUnsure(
+func (s *Store) QueryBlobs(
 	qg *query.Group,
-	f interfaces.FuncIter[sku.CheckedOutLike],
+	aco interfaces.FuncIter[*FDSet],
+	f func(sku.CheckedOutLike) error,
 ) (err error) {
-	o := sku.CommitOptions{
-		Mode: objekte_mode.ModeRealizeWithProto,
-	}
+	allRecognized := make([]*FDSet, 0)
+	qg.SetIncludeHistory()
 
-	if err = s.AllUnsure(
-		s.MakeApplyCheckedOut(qg, f, o),
+	if err = s.externalStoreInfo.FuncPrimitiveQuery(
+		qg,
+		func(sk *sku.Transacted) (err error) {
+			shaBlob := sk.Metadata.Blob
+
+			if shaBlob.IsNull() {
+				return
+			}
+
+			key := shaBlob.GetBytes()
+			recognized, ok := s.shasToBlobFDs[key]
+
+			if !ok {
+				return
+			}
+
+			recognizedFDS := &FDSet{
+				State:          external_state.Recognized,
+				MutableSetLike: collections_value.MakeMutableValueSet[*fd.FD](nil),
+			}
+
+			recognizedFDS.ObjectId.ResetWith(&sk.ObjectId)
+
+			if err = recognized.Each(
+				func(fds *FDSet) (err error) {
+					fds.State = external_state.Recognized
+					recognizedFDS.Add(fds.Blob.Clone())
+					return
+				},
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			allRecognized = append(allRecognized, recognizedFDS)
+
+			return
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	return
-}
-
-func (s *Store) QueryUntrackedBlobs(
-	qg *query.Group,
-	f interfaces.FuncIter[sku.CheckedOutLike],
-) (err error) {
-	if err = s.QueryAllMatchingBlobs(
-		qg,
-		s.GetUnsureBlobs(),
-		func(fd *fd.FD, z *sku.Transacted) (err error) {
-			fr := GetCheckedOutPool().Get()
-			defer GetCheckedOutPool().Put(fr)
-
-			fr.External.FDs.Blob.ResetWith(fd)
-			fr.External.Metadata.Tai = ids.TaiFromTime(fd.ModTime())
-
-			if z == nil {
-				// TODO use ReadOneExternalBlob
-				fr.State = checked_out_state.Untracked
-				fr.External.SetBlobSha(fd.GetShaLike())
-
-				if err = fr.External.Transacted.CalculateObjectShas(); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			} else {
-				fr.External.SetBlobSha(z.GetBlobSha())
-				fr.State = checked_out_state.Recognized
-
-				sku.Resetter.ResetWith(&fr.Internal, z)
-				sku.Resetter.ResetWith(&fr.External, z)
-
-				if err = fr.External.SetObjectSha(z.GetObjectSha()); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+	if err = s.dirFDs.blobs.Each(
+		func(fds *FDSet) (err error) {
+			if fds.State == external_state.Recognized {
+				return
 			}
 
-			if err = f(fr); err != nil {
+			if err = aco(fds); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -157,92 +159,11 @@ func (s *Store) QueryUntrackedBlobs(
 		return
 	}
 
-	return
-}
-
-func (s *Store) QueryAllMatchingBlobs(
-	qg *query.Group,
-	blob_store fd.Set,
-	f func(*fd.FD, *sku.Transacted) error,
-) (err error) {
-	fds := fd.MakeMutableSetSha()
-
-	var pa string
-
-	if pa, err = s.externalStoreInfo.Home.DirObjektenGattung(
-		s.config.GetStoreVersion(),
-		genres.Blob,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = blob_store.Each(
-		iter.MakeChain(
-			func(fd *fd.FD) (err error) {
-				if fd.GetShaLike().IsNull() {
-					return iter.MakeErrStopIteration()
-				}
-
-				p := id.Path(fd.GetShaLike(), pa)
-
-				if !files.Exists(p) {
-					return iter.MakeErrStopIteration()
-				}
-
-				return
-			},
-			// TODO-P2 handle files with the same sha
-			fds.Add,
-		),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	observed := fd.MakeMutableSet()
-	var l sync.Mutex
-
-	if err = s.externalStoreInfo.FuncPrimitiveQuery(
-		qg,
-		func(z *sku.Transacted) (err error) {
-			fd, ok := fds.Get(z.GetBlobSha().String())
-
-			if !ok {
-				return
-			}
-
-			if err = f(fd, z); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			l.Lock()
-			defer l.Unlock()
-
-			return observed.Add(fd)
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = fds.Each(
-		func(fd *fd.FD) (err error) {
-			if observed.Contains(fd) {
-				return
-			}
-
-			if err = f(fd, nil); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return observed.Add(fd)
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	for _, fds := range allRecognized {
+		if err = aco(fds); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

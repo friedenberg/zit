@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -170,9 +169,9 @@ func (es *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 	return
 }
 
-func (es *Store) GetExternalObjectIds() (ks interfaces.SetLike[*ids.ObjectId], err error) {
+func (es *Store) GetExternalObjectIds() (ks interfaces.SetLike[sku.ExternalObjectId], err error) {
 	if es == nil {
-		ks = collections_value.MakeValueSet[*ids.ObjectId](nil)
+		ks = collections_value.MakeValueSet[sku.ExternalObjectId](nil)
 		return
 	}
 
@@ -189,7 +188,7 @@ func (es *Store) GetExternalObjectIds() (ks interfaces.SetLike[*ids.ObjectId], e
 	return
 }
 
-func (es *Store) GetObjectsIdForString(v string) (k []*ids.ObjectId, err error) {
+func (es *Store) GetObjectsIdForString(v string) (k []sku.ExternalObjectId, err error) {
 	if es == nil {
 		err = collections.MakeErrNotFoundString(v)
 		return

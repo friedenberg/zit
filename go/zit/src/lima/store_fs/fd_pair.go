@@ -88,13 +88,13 @@ func (e *FDPair) ConflictMarkerError() (err error) {
 func (e *FDPair) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 	switch {
 	case !e.Object.IsEmpty() && !e.Blob.IsEmpty():
-		m = checkout_mode.ModeMetadataAndBlob
+		m = checkout_mode.MetadataAndBlob
 
 	case !e.Blob.IsEmpty():
-		m = checkout_mode.ModeBlobOnly
+		m = checkout_mode.BlobOnly
 
 	case !e.Object.IsEmpty():
-		m = checkout_mode.ModeMetadataOnly
+		m = checkout_mode.MetadataOnly
 
 	default:
 		err = checkout_mode.MakeErrInvalidCheckoutMode(
@@ -108,13 +108,13 @@ func (e *FDPair) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 func (e *FDPair) GetCheckoutMode() (m checkout_mode.Mode) {
 	switch {
 	case !e.Object.IsEmpty() && !e.Blob.IsEmpty():
-		m = checkout_mode.ModeMetadataAndBlob
+		m = checkout_mode.MetadataAndBlob
 
 	case !e.Blob.IsEmpty():
-		m = checkout_mode.ModeBlobOnly
+		m = checkout_mode.BlobOnly
 
 	case !e.Object.IsEmpty():
-		m = checkout_mode.ModeMetadataOnly
+		m = checkout_mode.MetadataOnly
 	}
 
 	return

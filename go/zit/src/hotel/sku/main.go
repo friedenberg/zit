@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
@@ -44,6 +45,7 @@ type (
 		TransactedGetter
 		ExternalLikeGetter
 		Clone() ExternalLike
+    GetExternalState() external_state.State
 	}
 
 	ExternalLikeGetter interface {

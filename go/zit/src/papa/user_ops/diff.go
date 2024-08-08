@@ -35,7 +35,7 @@ func (op Diff) Run(col sku.CheckedOutLike) (err error) {
 		if col, err = op.GetStore().GetCwdFiles().CheckoutOne(
 			checkout_options.Options{
 				Path:         checkout_options.PathTempLocal,
-				CheckoutMode: checkout_mode.ModeMetadataAndBlob,
+				CheckoutMode: checkout_mode.MetadataAndBlob,
 			},
 			col.GetSku(),
 		); err != nil {

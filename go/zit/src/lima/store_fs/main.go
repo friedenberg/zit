@@ -2,7 +2,6 @@ package store_fs
 
 import (
 	"encoding/gob"
-	"path"
 	"strings"
 	"sync"
 
@@ -27,20 +26,18 @@ func init() {
 
 // TODO support globs and ignores
 type Store struct {
-	config             sku.Config
-	deletedPrinter     interfaces.FuncIter[*fd.FD]
-	externalStoreInfo  external_store.Info
-	metadataTextParser object_metadata.TextParser
-	fs_home            fs_home.Home
-	fileEncoder        FileEncoder
-	ic                 ids.InlineTypeChecker
-	fileExtensions     file_extensions.FileExtensions
-	dir                string
-	emptyDirectories   fd.MutableSet
-
+	config              sku.Config
+	deletedPrinter      interfaces.FuncIter[*fd.FD]
+	externalStoreInfo   external_store.Info
+	metadataTextParser  object_metadata.TextParser
+	fs_home             fs_home.Home
+	fileEncoder         FileEncoder
+	ic                  ids.InlineTypeChecker
+	fileExtensions      file_extensions.FileExtensions
+	dir                 string
 	objectFormatOptions object_inventory_format.Options
 
-	objects
+	dirFDs
 
 	deleteLock sync.Mutex
 	deleted    fd.MutableSet
@@ -92,29 +89,9 @@ func (fs *Store) Flush() (err error) {
 	return
 }
 
-// must accept directories
-func (fs *Store) MarkUnsureBlob(f *fd.FD) (err error) {
-	if f.IsDir() {
-		// TODO handle recursion
-		return
-	}
-
-	if f, err = fd.MakeFromFileFromFD(f, fs.fs_home); err != nil {
-		err = errors.Wrapf(err, "%q", f)
-		return
-	}
-
-	if err = fs.blobs.Add(f); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (fs *Store) String() (out string) {
 	if iter.Len(
-		fs.objects.objects,
+		fs.dirFDs.objects,
 		fs.blobs,
 	) == 0 {
 		return
@@ -137,14 +114,14 @@ func (fs *Store) String() (out string) {
 		return
 	}
 
-	fs.objects.objects.Each(
+	fs.dirFDs.objects.Each(
 		func(z *FDSet) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
 
 	fs.blobs.Each(
-		func(z *fd.FD) (err error) {
+		func(z *FDSet) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
@@ -155,19 +132,17 @@ func (fs *Store) String() (out string) {
 	return
 }
 
-func (s *Store) GetExternalObjectIds() (ks interfaces.SetLike[*ids.ObjectId], err error) {
-	ksm := collections_value.MakeMutableValueSet[*ids.ObjectId](nil)
+func (s *Store) GetExternalObjectIds() (ks interfaces.SetLike[sku.ExternalObjectId], err error) {
+	ksm := collections_value.MakeMutableValueSet[sku.ExternalObjectId](nil)
 	ks = ksm
 	var l sync.Mutex
 
 	if err = s.All(
 		func(kfp *FDSet) (err error) {
-			kc := kfp.ObjectId.Clone()
-
 			l.Lock()
 			defer l.Unlock()
 
-			if err = ksm.Add(kc); err != nil {
+			if err = ksm.Add(kfp); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -182,25 +157,22 @@ func (s *Store) GetExternalObjectIds() (ks interfaces.SetLike[*ids.ObjectId], er
 	return
 }
 
-func (s *Store) GetObjectIdsForDir(fd *fd.FD) (k []*ids.ObjectId, err error) {
+func (s *Store) GetObjectIdsForDir(
+	fd *fd.FD,
+) (k []sku.ExternalObjectId, err error) {
 	if !fd.IsDir() {
 		err = errors.Errorf("not a directory: %q", fd)
 		return
 	}
 
-	if err = s.objects.walkDir(
-		fd.GetPath(),
-		func(fds *FDSet) (err error) {
-			return
-		},
-	); err != nil {
+	if err = s.dirFDs.processDir(fd.GetPath()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.objects.ReadObjectsAndBlobs(
+	if err = s.dirFDs.All(
 		func(fds *FDSet) (err error) {
-			k = append(k, fds.ObjectId.Clone())
+			k = append(k, fds)
 			return
 		},
 	); err != nil {
@@ -212,28 +184,29 @@ func (s *Store) GetObjectIdsForDir(fd *fd.FD) (k []*ids.ObjectId, err error) {
 }
 
 // TODO confirm against actual Object Id
-func (s *Store) GetObjectIdsForString(v string) (k []*ids.ObjectId, err error) {
+func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err error) {
 	if v == "." {
 		v = s.dir
 	}
 
-	var fd fd.FD
+	var fdee *fd.FD
 
-	if err = fd.Set(v); err != nil {
+	if fdee, err = fd.MakeFromPath(v, s.fs_home); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if fd.IsDir() {
-		if k, err = s.GetObjectIdsForDir(&fd); err != nil {
+	if fdee.IsDir() {
+		if k, err = s.GetObjectIdsForDir(fdee); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
+		// TODO walk dir to find other blobs and objects that might conflicgTgt
 		var objectIdString string
 		var fds *FDSet
 
-		if objectIdString, fds, err = s.addFD(&fd); err != nil {
+		if objectIdString, fds, err = s.addFD(fdee); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -243,27 +216,25 @@ func (s *Store) GetObjectIdsForString(v string) (k []*ids.ObjectId, err error) {
 			return
 		}
 
-		k = []*ids.ObjectId{&fds.ObjectId}
+		k = []sku.ExternalObjectId{fds}
 	}
 
 	return
 }
 
 func (fs *Store) ContainsSku(m *sku.Transacted) bool {
-	return fs.objects.objects.ContainsKey(m.GetObjectId().String())
+	return fs.dirFDs.objects.ContainsKey(m.GetObjectId().String())
 }
 
 func (fs *Store) GetBlobFDs() fd.Set {
 	fds := fd.MakeMutableSet()
 
-	fs.blobs.Each(fds.Add)
+	fs.blobs.Each(
+		func(fds *FDSet) error {
+			return fds.Each(fds.Add)
+		},
+	)
 
-	return fds
-}
-
-func (fs *Store) GetUnsureBlobs() fd.Set {
-	fds := fd.MakeMutableSet()
-	fs.blobs.Each(fds.Add)
 	return fds
 }
 
@@ -276,35 +247,7 @@ func (fs *Store) GetEmptyDirectories() fd.Set {
 func (fs *Store) Get(
 	k interfaces.ObjectId,
 ) (t *FDSet, ok bool) {
-	return fs.objects.objects.Get(k.String())
-}
-
-func (fs *Store) All(
-	f interfaces.FuncIter[*FDSet],
-) (err error) {
-	wg := iter.MakeErrorWaitGroupParallel()
-
-	iter.ErrorWaitGroupApply(wg, fs.objects.objects, f)
-
-	iter.ErrorWaitGroupApply(wg, fs.unsureZettels, f)
-
-	return wg.GetError()
-}
-
-func (fs *Store) AllUnsure(
-	f interfaces.FuncIter[*FDSet],
-) (err error) {
-	wg := iter.MakeErrorWaitGroupParallel()
-
-	iter.ErrorWaitGroupApply(
-		wg,
-		fs.unsureZettels,
-		func(e *FDSet) (err error) {
-			return f(e)
-		},
-	)
-
-	return wg.GetError()
+	return fs.dirFDs.objects.Get(k.String())
 }
 
 func (s *Store) Initialize(esi external_store.Info) (err error) {
@@ -313,21 +256,7 @@ func (s *Store) Initialize(esi external_store.Info) (err error) {
 }
 
 func (s *Store) readAll() (err error) {
-	if err = s.objects.walkRootDir(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.objects.ReadObjectsAndBlobs(
-		func(oidPair *FDSet) (err error) {
-			if err = s.objects.objects.Add(oidPair); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
-	); err != nil {
+	if err = s.dirFDs.processRootDir(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -337,28 +266,6 @@ func (s *Store) readAll() (err error) {
 
 func (c *Store) Len() int {
 	return iter.Len(
-		c.objects.objects,
+		c.dirFDs.objects,
 	)
-}
-
-func (fs *Store) addUnsureBlob(dir, name string) (err error) {
-	var ut *fd.FD
-
-	fullPath := name
-
-	if dir != "" {
-		fullPath = path.Join(dir, fullPath)
-	}
-
-	if ut, err = fd.MakeFromPathWithBlobWriterFactory(
-		fullPath,
-		fs.fs_home,
-	); err != nil {
-		err = errors.Wrapf(err, "Dir: %q, Name: %q", dir, name)
-		return
-	}
-
-	err = fs.blobs.Add(ut)
-
-	return
 }

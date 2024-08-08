@@ -13,24 +13,26 @@ type Getter interface {
 }
 
 const (
-	ModeNone = Mode(iota)
-	ModeMetadataOnly
-	ModeMetadataAndBlob
-	ModeBlobOnly
+	None = Mode(iota)
+	MetadataOnly
+	MetadataAndBlob
+	BlobOnly
+
+	BlobRecognized // should never be set via flags
 )
 
 func (m Mode) String() string {
 	switch m {
-	case ModeNone:
+	case None:
 		return "none"
 
-	case ModeMetadataOnly:
+	case MetadataOnly:
 		return "metadata"
 
-	case ModeBlobOnly:
+	case BlobOnly:
 		return "blob"
 
-	case ModeMetadataAndBlob:
+	case MetadataAndBlob:
 		return "both"
 
 	default:
@@ -43,16 +45,16 @@ func (m *Mode) Set(v string) (err error) {
 
 	switch v {
 	case "":
-		*m = ModeNone
+		*m = None
 
 	case "metadata":
-		*m = ModeMetadataOnly
+		*m = MetadataOnly
 
 	case "blob":
-		*m = ModeBlobOnly
+		*m = BlobOnly
 
 	case "both":
-		*m = ModeMetadataAndBlob
+		*m = MetadataAndBlob
 
 	default:
 		err = errors.Errorf("unsupported checkout mode: %s", v)
@@ -64,7 +66,7 @@ func (m *Mode) Set(v string) (err error) {
 
 func (m Mode) IncludesBlob() bool {
 	switch m {
-	case ModeMetadataAndBlob, ModeBlobOnly:
+	case MetadataAndBlob, BlobOnly:
 		return true
 
 	default:
@@ -74,7 +76,7 @@ func (m Mode) IncludesBlob() bool {
 
 func (m Mode) IncludesMetadata() bool {
 	switch m {
-	case ModeMetadataAndBlob, ModeMetadataOnly:
+	case MetadataAndBlob, MetadataOnly:
 		return true
 
 	default:

@@ -143,7 +143,7 @@ func (b *Builder) WithExternalLike(
 			b.pinnedObjectIds = append(
 				b.pinnedObjectIds,
 				ObjectId{
-					ObjectId: t.GetSku().ObjectId.Clone(),
+					ObjectIdLike: t.GetSku().ObjectId.Clone(),
 				},
 			)
 
@@ -162,7 +162,7 @@ func (b *Builder) WithTransacted(
 			b.pinnedObjectIds = append(
 				b.pinnedObjectIds,
 				ObjectId{
-					ObjectId: t.ObjectId.Clone(),
+					ObjectIdLike: t.ObjectId.Clone(),
 				},
 			)
 
@@ -181,7 +181,7 @@ func (b *Builder) WithCheckedOut(
 			b.pinnedObjectIds = append(
 				b.pinnedObjectIds,
 				ObjectId{
-					ObjectId: co.GetSku().ObjectId.Clone(),
+					ObjectIdLike: co.GetSku().ObjectId.Clone(),
 				},
 			)
 
@@ -257,7 +257,7 @@ func (b *Builder) build(
 		remaining = vs
 	} else {
 		for _, v := range vs {
-			var k []*ids.ObjectId
+			var k []sku.ExternalObjectId
 
 			if k, err = b.repo.GetObjectIdsForString(v); err != nil {
 				em.Add(err)
@@ -267,11 +267,13 @@ func (b *Builder) build(
 			}
 
 			for _, k := range k {
+				// b.defaultGenres.Add(genres.Must(k.GetObjectId().GetGenre()))
+
 				b.pinnedObjectIds = append(
 					b.pinnedObjectIds,
 					ObjectId{
-						ObjectId: k,
-						External: true,
+						ObjectIdLike: k,
+						External:     true,
 					},
 				)
 			}
@@ -485,10 +487,10 @@ LOOP:
 			}
 		} else {
 			k := ObjectId{
-				ObjectId: ids.GetObjectIdPool().Get(),
+				ObjectIdLike: ids.GetObjectIdPool().Get(),
 			}
 
-			if err = k.Set(el); err != nil {
+			if err = k.GetObjectId().Set(el); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -506,7 +508,7 @@ LOOP:
 				)
 
 				q.Genre.Add(genres.Zettel)
-				q.ObjectIds[k.ObjectId.String()] = k
+				q.ObjectIds[k.ObjectIdLike.String()] = k
 
 			case genres.Tag:
 				var et sku.Query
@@ -522,7 +524,7 @@ LOOP:
 			case genres.Type:
 				var t ids.Type
 
-				if err = t.TodoSetFromObjectId(k.ObjectId); err != nil {
+				if err = t.TodoSetFromObjectId(k.GetObjectId()); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -637,7 +639,7 @@ func (b *Builder) makeTagExp(k *ObjectId) (exp sku.Query, err error) {
 	// TODO use b.blobs to read tag blob and find filter if necessary
 	var e ids.Tag
 
-	if err = e.TodoSetFromObjectId(k.ObjectId); err != nil {
+	if err = e.TodoSetFromObjectId(k.GetObjectId()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

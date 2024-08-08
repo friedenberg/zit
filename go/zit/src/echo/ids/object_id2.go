@@ -39,6 +39,14 @@ type objectId2 struct {
 	// Domain
 }
 
+func (a *objectId2) GetObjectId() *objectId2 {
+	return a
+}
+
+func (a *objectId2) GetExternalObjectId() *objectId2 {
+	return a
+}
+
 func (a *objectId2) Clone() (b *objectId2) {
 	b = getObjectIdPool2().Get()
 	b.ResetWithIdLike(a)

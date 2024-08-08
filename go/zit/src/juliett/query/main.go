@@ -97,7 +97,7 @@ func (a *Query) Merge(b *Query) (err error) {
 	}
 
 	for _, k := range b.ObjectIds {
-		a.ObjectIds[k.ObjectId.String()] = k
+		a.ObjectIds[k.GetObjectId().String()] = k
 	}
 
 	a.Children = append(a.Children, b.Children...)

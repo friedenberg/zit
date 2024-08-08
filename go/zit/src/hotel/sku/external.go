@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 )
@@ -16,6 +17,10 @@ type External struct {
 
 func (t *External) GetSkuExternalLike() ExternalLike {
 	return t
+}
+
+func (t *External) GetExternalState() external_state.State {
+	return external_state.Unknown
 }
 
 func (a *External) Clone() ExternalLike {

@@ -57,11 +57,11 @@ func (e *Exp) CollectTags(mes ids.TagMutableSet) {
 			mt.CollectTags(mes)
 
 		case *ObjectId:
-			if mt.ObjectId.GetGenre() != genres.Tag {
+			if mt.GetGenre() != genres.Tag {
 				continue
 			}
 
-			e := ids.MustTag(mt.ObjectId.String())
+			e := ids.MustTag(mt.GetObjectId().String())
 			mes.Add(e)
 		}
 	}

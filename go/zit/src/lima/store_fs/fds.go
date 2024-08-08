@@ -7,12 +7,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type FDSet struct {
+	external_state.State
+
 	ids.ObjectId
 
 	Object   fd.FD
@@ -20,6 +23,18 @@ type FDSet struct {
 	Conflict fd.FD
 
 	interfaces.MutableSetLike[*fd.FD]
+}
+
+func (ef *FDSet) String() string {
+	return ef.ObjectId.String()
+}
+
+func (ef *FDSet) GetObjectId() *ids.ObjectId {
+	return &ef.ObjectId
+}
+
+func (ef *FDSet) GetExternalObjectId() *ids.ObjectId {
+	return &ef.ObjectId
 }
 
 func (ef *FDSet) Debug() string {
@@ -52,6 +67,7 @@ func (ef *FDSet) LatestModTime() thyme.Time {
 }
 
 func (dst *FDSet) ResetWith(src *FDSet) {
+	dst.State = src.State
 	dst.Object.ResetWith(&src.Object)
 	dst.Blob.ResetWith(&src.Blob)
 	dst.Conflict.ResetWith(&src.Conflict)
@@ -89,33 +105,23 @@ func (e *FDSet) GenerateConflictFD() (err error) {
 func (e *FDSet) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 	switch {
 	case !e.Object.IsEmpty() && !e.Blob.IsEmpty():
-		m = checkout_mode.ModeMetadataAndBlob
+		m = checkout_mode.MetadataAndBlob
 
 	case !e.Blob.IsEmpty():
-		m = checkout_mode.ModeBlobOnly
+		m = checkout_mode.BlobOnly
 
 	case !e.Object.IsEmpty():
-		m = checkout_mode.ModeMetadataOnly
+		m = checkout_mode.MetadataOnly
 
 	default:
+		if e.State == external_state.Recognized {
+			m = checkout_mode.BlobRecognized
+			return
+		}
+
 		err = checkout_mode.MakeErrInvalidCheckoutMode(
 			errors.Errorf("all FD's are empty: %v", e.MutableSetLike),
 		)
-	}
-
-	return
-}
-
-func (e *FDSet) GetCheckoutMode() (m checkout_mode.Mode) {
-	switch {
-	case !e.Object.IsEmpty() && !e.Blob.IsEmpty():
-		m = checkout_mode.ModeMetadataAndBlob
-
-	case !e.Blob.IsEmpty():
-		m = checkout_mode.ModeBlobOnly
-
-	case !e.Object.IsEmpty():
-		m = checkout_mode.ModeMetadataOnly
 	}
 
 	return

@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -78,8 +77,8 @@ func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
 	return fs
 }
 
-func (c *Store) GetExternalObjectIds() (ks interfaces.SetLike[*ids.ObjectId], err error) {
-	ksm := collections_value.MakeMutableValueSet[*ids.ObjectId](nil)
+func (c *Store) GetExternalObjectIds() (ks interfaces.SetLike[sku.ExternalObjectId], err error) {
+	ksm := collections_value.MakeMutableValueSet[sku.ExternalObjectId](nil)
 	ks = ksm
 
 	for u, items := range c.urls {
@@ -120,17 +119,17 @@ func (c *Store) GetExternalObjectIds() (ks interfaces.SetLike[*ids.ObjectId], er
 }
 
 // TODO
-func (s *Store) GetObjectIdsForString(v string) (k []*ids.ObjectId, err error) {
-	err = collections.MakeErrNotFoundString(v)
+func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err error) {
+	err = errors.Implement()
 	return
-	k = []*ids.ObjectId{ids.GetObjectIdPool().Get()}
+	// k = []sku.ExternalObjectId{ids.GetObjectIdPool().Get()}
 
-	if err = k[0].SetRaw(v); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	// if err = k[0].SetRaw(v); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
-	return
+	// return
 }
 
 func (s *Store) Flush() (err error) {

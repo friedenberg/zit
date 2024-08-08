@@ -64,6 +64,7 @@ function mergetool_conflict_base {
 		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again" new-etikett-for-all tag-3 tag-4]
 	EOM
 
+	# TODO add better conflict printing output
 	run_zit status one/dos.zettel
 	assert_success
 	assert_output - <<-EOM

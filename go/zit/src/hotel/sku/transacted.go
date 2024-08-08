@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -21,6 +22,10 @@ type Transacted struct {
 
 func (t *Transacted) GetSkuExternalLike() ExternalLike {
 	return t
+}
+
+func (t *Transacted) GetExternalState() external_state.State {
+	return external_state.Unknown
 }
 
 func (a *Transacted) Clone() ExternalLike {

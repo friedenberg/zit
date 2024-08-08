@@ -56,7 +56,7 @@ func (tf textFormatter) WriteStringFormatWithMode(
 	s *sku.Transacted,
 	mode checkout_mode.Mode,
 ) (n int64, err error) {
-	if genres.Config.EqualsGenre(s.GetGenre()) || mode == checkout_mode.ModeBlobOnly {
+	if genres.Config.EqualsGenre(s.GetGenre()) || mode == checkout_mode.BlobOnly {
 		n, err = tf.fBlobOnly.FormatMetadata(w, s)
 	} else if tf.k.IsInlineType(s.GetType()) {
 		n, err = tf.fMetadateiAndBlob.FormatMetadata(w, s)
