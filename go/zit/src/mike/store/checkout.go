@@ -20,11 +20,6 @@ func (s *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
 		return
 	}
 
-	if err = es.Initialize(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if err = es.DeleteCheckout(col); err != nil {
 		err = errors.Wrap(err)
 		return

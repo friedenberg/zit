@@ -164,7 +164,7 @@ func (s *Store) QueryBlobs(
 
 	for _, fds := range blobs {
 		if fds.State == external_state.Recognized {
-			return
+			continue
 		}
 
 		if err = aco(fds); err != nil {

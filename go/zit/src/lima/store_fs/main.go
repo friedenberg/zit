@@ -66,6 +66,11 @@ func (fs *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
 		return
 	}
 
+	if err = e.FDs.MutableSetLike.Each(fs.deleted.Add); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
