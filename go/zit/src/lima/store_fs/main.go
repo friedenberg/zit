@@ -206,18 +206,9 @@ func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err e
 			return
 		}
 	} else {
-		// TODO walk dir to find other blobs and objects that might conflict
-		var objectIdString string
-		var fds *FDSet
-
-		if objectIdString, fds, err = s.addFD(nil, fdee); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
 		var results []*FDSet
 
-		if results, err = s.processFDSet(objectIdString, fds); err != nil {
+		if _, results, err = s.dirFDs.processFD(fdee); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -220,7 +220,7 @@ func (d *dirFDs) processDir(p string) (err error) {
 
 func (d *dirFDs) processFD(
 	fdee *fd.FD,
-) (objectIdString string, fds *FDSet, err error) {
+) (objectIdString string, fds []*FDSet, err error) {
 	cache := make(map[string]*FDSet)
 
 	if objectIdString, err = d.keyForFD(fdee); err != nil {
@@ -236,12 +236,10 @@ func (d *dirFDs) processFD(
 		return
 	}
 
-	if err = d.processAll(cache); err != nil {
+	if fds, err = d.processFDSet(objectIdString, cache[objectIdString]); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	fds = cache[objectIdString]
 
 	return
 }
