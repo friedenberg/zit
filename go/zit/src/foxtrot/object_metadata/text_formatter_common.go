@@ -143,6 +143,7 @@ func (f textFormatterCommon) writePathType(
 	var ap string
 
 	if apg, ok := c.(BlobPathGetter); ok {
+		// TODO make relative path
 		ap = apg.GetBlobPath()
 	} else {
 		err = errors.Errorf("unable to convert %T int %T", c, apg)

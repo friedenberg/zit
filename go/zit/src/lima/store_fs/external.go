@@ -110,7 +110,6 @@ func (a *External) ResetWithExternalMaybe(
 	a.ObjectId.ResetWithIdLike(k)
 	object_metadata.Resetter.Reset(&a.Metadata)
 	a.FDs.ResetWith(b)
-
 	return
 }
 

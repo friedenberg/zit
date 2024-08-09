@@ -134,6 +134,20 @@ func (d *dirFDs) addPathAndDirEntry(
 	return
 }
 
+func (d *dirFDs) keyForFD(fdee *fd.FD) (key string, err error) {
+	var rel string
+
+	if rel, err = filepath.Rel(d.root, fdee.GetPath()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	ext := filepath.Ext(rel)
+	key = strings.TrimSuffix(rel, ext)
+
+	return
+}
+
 func (d *dirFDs) addFD(
 	cache map[string]*FDSet,
 	f *fd.FD,
@@ -142,21 +156,10 @@ func (d *dirFDs) addFD(
 		return
 	}
 
-	var rel string
-
-	if rel, err = filepath.Rel(d.root, f.GetPath()); err != nil {
+	if key, err = d.keyForFD(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	ext := filepath.Ext(rel)
-
-	if ext == ".conflict" {
-		rel = strings.TrimSuffix(rel, ext)
-		ext = filepath.Ext(rel)
-	}
-
-	key = strings.TrimSuffix(rel, ext)
 
 	if cache == nil {
 		fds = &FDSet{
@@ -211,6 +214,34 @@ func (d *dirFDs) processDir(p string) (err error) {
 		err = errors.Wrap(err)
 		return
 	}
+
+	return
+}
+
+func (d *dirFDs) processFD(
+	fdee *fd.FD,
+) (objectIdString string, fds *FDSet, err error) {
+	cache := make(map[string]*FDSet)
+
+	if objectIdString, err = d.keyForFD(fdee); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	p := filepath.Dir(fdee.GetPath())
+
+	// TODO add filter for just matching fdee
+	if err = d.walkDir(cache, p); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = d.processAll(cache); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	fds = cache[objectIdString]
 
 	return
 }

@@ -68,6 +68,7 @@ func (ef *FDSet) LatestModTime() thyme.Time {
 
 func (dst *FDSet) ResetWith(src *FDSet) {
 	dst.State = src.State
+	dst.ObjectId.ResetWith(&src.ObjectId)
 	dst.Object.ResetWith(&src.Object)
 	dst.Blob.ResetWith(&src.Blob)
 	dst.Conflict.ResetWith(&src.Conflict)
