@@ -3,13 +3,13 @@ package object_metadata
 import (
 	"io"
 	"path"
+	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/delim_reader"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 )
 
 type textParser2 struct {
@@ -22,27 +22,51 @@ func (f *textParser2) ReadFrom(r io.Reader) (n int64, err error) {
 	m := f.GetMetadata()
 	Resetter.Reset(m)
 
-	lr := format.MakeLineReaderConsumeEmpty(
-		ohio.MakeLineReaderIterate(
-			ohio.MakeLineReaderKeyValues(
-				map[string]interfaces.FuncSetString{
-					"#": m.Description.Set,
-					"%": func(v string) (err error) {
-						m.Comments = append(m.Comments, v)
-						return
-					},
-					"-": m.AddTagString,
-					"!": func(v string) (err error) {
-						return f.readTyp(m, v)
-					},
-				},
-			),
-		),
-	)
+	dr := delim_reader.MakeDelimReader('\n', r)
+	defer delim_reader.PutDelimReader(dr)
 
-	if n, err = lr.ReadFrom(r); err != nil {
-		err = errors.Wrap(err)
-		return
+	for {
+		var line string
+
+		line, err = dr.ReadOneString()
+
+		if err == io.EOF {
+			err = nil
+			break
+		} else if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		trimmed := strings.TrimSpace(line)
+
+		if len(trimmed) == 0 {
+			continue
+		}
+
+		key, remainder := trimmed[0], strings.TrimSpace(trimmed[1:])
+
+		switch key {
+		case '#':
+			err = m.Description.Set(remainder)
+
+		case '%':
+			m.Comments = append(m.Comments, remainder)
+
+		case '-':
+			m.AddTagString(remainder)
+
+		case '!':
+			err = f.readTyp(m, remainder)
+
+		default:
+			err = errors.Errorf("unsupported entry: %q", line)
+		}
+
+		if err != nil {
+			err = errors.Wrapf(err, "Line: %q, Key: %q, Value: %q", line, key, remainder)
+			return
+		}
 	}
 
 	return

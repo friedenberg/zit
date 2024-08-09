@@ -1,4 +1,4 @@
-package ohio
+package delim_reader
 
 import (
 	"bufio"
@@ -95,13 +95,12 @@ func (lr *delimReader) ReadOneBytes() (str []byte, err error) {
 	lr.lastReadN = len(rawLine)
 	lr.n += int64(lr.lastReadN)
 
-	if err != nil && err != io.EOF {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if err == io.EOF {
 		lr.eof = true
+		err = nil
+	} else if err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	str = bytes.TrimSuffix(rawLine, []byte{lr.delim})
@@ -124,13 +123,12 @@ func (lr *delimReader) ReadOneString() (str string, err error) {
 	lr.lastReadN = len(rawLine)
 	lr.n += int64(lr.lastReadN)
 
-	if err != nil && err != io.EOF {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if err == io.EOF {
 		lr.eof = true
+		err = nil
+	} else if err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	str = strings.TrimSuffix(rawLine, string([]byte{lr.delim}))
