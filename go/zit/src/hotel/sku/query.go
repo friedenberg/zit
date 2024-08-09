@@ -56,7 +56,7 @@ type (
 	ExternalQueryOptions struct {
 		ids.RepoId
 		ExcludeUntracked  bool
-		IncludeRecognized bool
+		ExcludeRecognized bool
 	}
 
 	ExternalQuery struct {
