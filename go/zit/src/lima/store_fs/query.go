@@ -38,7 +38,7 @@ func (s *Store) ApplyCheckedOut(
 	var co *CheckedOut
 
 	if co, err = s.ReadCheckedOutFromObjectIdFDPair(o, em); err != nil {
-		err = errors.Wrapf(err, "%v", em)
+		err = errors.Wrapf(err, "%s", em.Debug())
 		return
 	}
 

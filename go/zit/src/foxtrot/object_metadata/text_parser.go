@@ -2,16 +2,11 @@ package object_metadata
 
 import (
 	"io"
-	"path"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 )
 
 type textParser struct {
@@ -46,25 +41,10 @@ func (f textParser) ParseMetadata(
 		c.SetBlobSha(&m.Blob)
 	}()
 
-	var blobFD fd.FD
-
-	lr := format.MakeLineReaderConsumeEmpty(
-		ohio.MakeLineReaderIterate(
-			ohio.MakeLineReaderKeyValues(
-				map[string]interfaces.FuncSetString{
-					"#": m.Description.Set,
-					"%": func(v string) (err error) {
-						m.Comments = append(m.Comments, v)
-						return
-					},
-					"-": m.AddTagString,
-					"!": func(v string) (err error) {
-						return f.readTyp(m, v, &blobFD)
-					},
-				},
-			),
-		),
-	)
+	mp := &textParser2{
+		BlobWriterFactory: f.awf,
+		TextParserContext: c,
+	}
 
 	var blobWriter sha.WriteCloser
 
@@ -82,7 +62,7 @@ func (f textParser) ParseMetadata(
 
 	mr := Reader{
 		// RequireMetadatei: true,
-		Metadata: lr,
+		Metadata: mp,
 		Blob:     blobWriter,
 	}
 
@@ -107,21 +87,21 @@ func (f textParser) ParseMetadata(
 
 	inlineBlobSha := sha.Make(blobWriter.GetShaLike())
 
-	if !m.Blob.IsNull() && !blobFD.GetShaLike().IsNull() {
+	if !m.Blob.IsNull() && !mp.Blob.GetShaLike().IsNull() {
 		err = errors.Wrap(
 			MakeErrHasInlineBlobAndFilePath(
-				&blobFD,
+				&mp.Blob,
 				inlineBlobSha,
 			),
 		)
 
 		return
-	} else if !blobFD.GetShaLike().IsNull() {
+	} else if !mp.Blob.GetShaLike().IsNull() {
 		if afs, ok := c.(BlobFDSetter); ok {
-			afs.SetBlobFD(&blobFD)
+			afs.SetBlobFD(&mp.Blob)
 		}
 
-		m.Blob.SetShaLike(blobFD.GetShaLike())
+		m.Blob.SetShaLike(mp.Blob.GetShaLike())
 	}
 
 	switch {
@@ -146,75 +126,3 @@ func (f textParser) ParseMetadata(
 	return
 }
 
-func (f textParser) readTyp(
-	m *Metadata,
-	desc string,
-	blobFD *fd.FD,
-) (err error) {
-	if desc == "" {
-		return
-	}
-
-	tail := path.Ext(desc)
-	head := desc[:len(desc)-len(tail)]
-
-	//! <path>.<typ ext>
-	switch {
-	case files.Exists(desc):
-		if err = m.Type.Set(tail); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = blobFD.SetWithBlobWriterFactory(
-			desc,
-			f.awf,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	//! <sha>.<typ ext>
-	case tail != "":
-		if err = f.setBlobSha(m, head); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = m.Type.Set(tail); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	//! <sha>
-	case tail == "":
-		if err = f.setBlobSha(m, head); err == nil {
-			return
-		}
-
-		err = nil
-
-		fallthrough
-
-	//! <typ ext>
-	default:
-		if err = m.Type.Set(head); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
-func (f textParser) setBlobSha(
-	m *Metadata,
-	maybeSha string,
-) (err error) {
-	if err = m.Blob.Set(maybeSha); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
