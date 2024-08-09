@@ -82,8 +82,8 @@ function mergetool_conflict_one_local { # @test
 	assert_output - <<-EOM
 		[get_this_shit_merged@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/dos@2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again" get_this_shit_merged new-etikett-for-all tag-3 tag-4]
+		          deleted [one/dos.conflict]
 		          deleted [one/dos.zettel]
-		          deleted [one/dos.zettel.conflict]
 		          deleted [one/]
 	EOM
 
@@ -118,8 +118,8 @@ function mergetool_conflict_one_remote { # @test
 		[!txt@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[get_this_shit_merged@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/dos@9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged new-etikett-for-all tag-3 tag-4]
+		          deleted [one/dos.conflict]
 		          deleted [one/dos.zettel]
-		          deleted [one/dos.zettel.conflict]
 		          deleted [one/]
 	EOM
 

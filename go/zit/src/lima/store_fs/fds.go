@@ -95,7 +95,7 @@ func (a *FDSet) Equals(b *FDSet) bool {
 }
 
 func (e *FDSet) GenerateConflictFD() (err error) {
-	if err = e.Conflict.SetPath(e.Object.String() + ".conflict"); err != nil {
+	if err = e.Conflict.SetPath(e.ObjectId.String() + ".conflict"); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
