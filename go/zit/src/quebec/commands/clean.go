@@ -80,7 +80,7 @@ func (c Clean) shouldClean(
 		return true
 
 	case checked_out_state.Recognized:
-		return eqwk.IncludeRecognized
+		return !eqwk.ExcludeRecognized
 	}
 
 	if c.includeParent {

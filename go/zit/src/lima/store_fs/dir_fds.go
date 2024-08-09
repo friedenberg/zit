@@ -30,12 +30,13 @@ type dirFDs struct {
 	fs_home           fs_home.Home
 	externalStoreInfo external_store.Info
 
-	rawFDs map[string]*FDSet
+	objects         interfaces.MutableSetLike[*FDSet]
+	blobs           interfaces.MutableSetLike[*FDSet]
+	shasToBlobFDs   map[sha.Bytes]interfaces.MutableSetLike[*FDSet]
+	shasToObjectFDs map[sha.Bytes]interfaces.MutableSetLike[*FDSet]
 
-	objects          interfaces.MutableSetLike[*FDSet]
-	blobs            interfaces.MutableSetLike[*FDSet]
-	shasToBlobFDs    map[sha.Bytes]interfaces.MutableSetLike[*FDSet]
-	errors           interfaces.MutableSetLike[fdSetWithError]
+	errors interfaces.MutableSetLike[fdSetWithError]
+
 	emptyDirectories fd.MutableSet
 }
 
@@ -47,10 +48,10 @@ func makeObjectsWithDir(
 	d.root = p
 	d.FileExtensions = fe
 	d.fs_home = fs_home
-	d.rawFDs = make(map[string]*FDSet)
 	d.objects = collections_value.MakeMutableValueSet[*FDSet](nil)
 	d.blobs = collections_value.MakeMutableValueSet[*FDSet](nil)
 	d.shasToBlobFDs = make(map[sha.Bytes]interfaces.MutableSetLike[*FDSet])
+	d.shasToObjectFDs = make(map[sha.Bytes]interfaces.MutableSetLike[*FDSet])
 	d.errors = collections_value.MakeMutableValueSet[fdSetWithError](nil)
 	d.emptyDirectories = collections_value.MakeMutableValueSet[*fd.FD](
 		nil,
@@ -67,6 +68,7 @@ func makeObjectsWithDir(
 //                                 |___/
 
 func (d *dirFDs) walkDir(
+	cache map[string]*FDSet,
 	p string,
 ) (err error) {
 	if err = filepath.WalkDir(
@@ -89,7 +91,11 @@ func (d *dirFDs) walkDir(
 				return
 			}
 
-			if _, _, err = d.addPathAndDirEntry(p, de); err != nil {
+			// if de.IsDir() {
+			// 	return
+			// }
+
+			if _, _, err = d.addPathAndDirEntry(cache, p, de); err != nil {
 				err = errors.Wrap(in)
 				return
 			}
@@ -105,6 +111,7 @@ func (d *dirFDs) walkDir(
 }
 
 func (d *dirFDs) addPathAndDirEntry(
+	cache map[string]*FDSet,
 	p string,
 	de fs.DirEntry,
 ) (key string, fds *FDSet, err error) {
@@ -119,7 +126,7 @@ func (d *dirFDs) addPathAndDirEntry(
 		return
 	}
 
-	if key, fds, err = d.addFD(fdee); err != nil {
+	if key, fds, err = d.addFD(cache, fdee); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -128,6 +135,7 @@ func (d *dirFDs) addPathAndDirEntry(
 }
 
 func (d *dirFDs) addFD(
+	cache map[string]*FDSet,
 	f *fd.FD,
 ) (key string, fds *FDSet, err error) {
 	if f.IsDir() {
@@ -150,17 +158,25 @@ func (d *dirFDs) addFD(
 
 	key = strings.TrimSuffix(rel, ext)
 
-	var ok bool
-	fds, ok = d.rawFDs[key]
-
-	if !ok {
+	if cache == nil {
 		fds = &FDSet{
 			MutableSetLike: collections_value.MakeMutableValueSet[*fd.FD](nil),
 		}
-	}
 
-	fds.Add(f)
-	d.rawFDs[key] = fds
+		fds.Add(f)
+	} else {
+		var ok bool
+		fds, ok = cache[key]
+
+		if !ok {
+			fds = &FDSet{
+				MutableSetLike: collections_value.MakeMutableValueSet[*fd.FD](nil),
+			}
+		}
+
+		fds.Add(f)
+		cache[key] = fds
+	}
 
 	return
 }
@@ -172,13 +188,26 @@ func (d *dirFDs) addFD(
 //  |_|   |_|  \___/ \___\___||___/___/_|_| |_|\__, |
 //                                             |___/
 
+func (d *dirFDs) processAll(cache map[string]*FDSet) (err error) {
+	for objectIdString, fds := range cache {
+		if _, err = d.processFDSet(objectIdString, fds); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
 func (d *dirFDs) processDir(p string) (err error) {
-	if err = d.walkDir(p); err != nil {
+	cache := make(map[string]*FDSet)
+
+	if err = d.walkDir(cache, p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = d.processAll(); err != nil {
+	if err = d.processAll(cache); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -340,6 +369,8 @@ func (d *dirFDs) addOneBlob(
 		return
 	}
 
+	// TODO try reading as object
+
 	// TODO add sha cache
 	key := sh.GetBytes()
 	existing, ok := d.shasToBlobFDs[key]
@@ -418,17 +449,6 @@ func (d *dirFDs) addOneObject(
 	if err = d.objects.Add(fds); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	return
-}
-
-func (d *dirFDs) processAll() (err error) {
-	for objectIdString, fds := range d.rawFDs {
-		if _, err = d.processFDSet(objectIdString, fds); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
 	}
 
 	return

@@ -80,7 +80,7 @@ func (s *Store) QueryCheckedOut(
 		// })
 
 		wg.Do(func() error {
-			return s.QueryBlobs(qg, aco, f)
+			return s.QueryBlobs(aco, f)
 		})
 	}
 
@@ -93,15 +93,14 @@ func (s *Store) QueryCheckedOut(
 }
 
 func (s *Store) QueryBlobs(
-	qg *query.Group,
 	aco interfaces.FuncIter[*FDSet],
 	f func(sku.CheckedOutLike) error,
 ) (err error) {
 	allRecognized := make([]*FDSet, 0)
-	qg.SetIncludeHistory()
 
 	if err = s.externalStoreInfo.FuncPrimitiveQuery(
-		qg,
+		// TODO make permissive all history query group
+		nil,
 		func(sk *sku.Transacted) (err error) {
 			shaBlob := sk.Metadata.Blob
 

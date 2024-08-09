@@ -210,7 +210,7 @@ func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err e
 		var objectIdString string
 		var fds *FDSet
 
-		if objectIdString, fds, err = s.addFD(fdee); err != nil {
+		if objectIdString, fds, err = s.addFD(nil, fdee); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

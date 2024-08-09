@@ -434,7 +434,7 @@ func (qg *Group) ContainsSkuCheckedOutState(state checked_out_state.State) (ok b
 		ok = !qg.ExcludeUntracked
 
 	case checked_out_state.Recognized:
-		ok = qg.IncludeRecognized
+		ok = !qg.ExcludeRecognized
 
 	default:
 		ok = true

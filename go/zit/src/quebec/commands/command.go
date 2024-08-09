@@ -75,7 +75,7 @@ func registerCommandWithQuery(
 
 	f.Var(&cweq.RepoId, "kasten", "none or Browser")
 	f.BoolVar(&cweq.ExcludeUntracked, "exclude-untracked", false, "")
-	f.BoolVar(&cweq.IncludeRecognized, "include-recognized", false, "")
+	f.BoolVar(&cweq.ExcludeRecognized, "exclude-recognized", false, "")
 
 	co := command{
 		Command: cweq,
