@@ -16,13 +16,11 @@ type textFormatter struct {
 
 func MakeTextFormatterMetadateiBlobPath(
 	fs_home fs_home.Home,
-	options TextFormatterOptions,
 	blobFormatter script_config.RemoteScript,
 ) textFormatter {
 	common := textFormatterCommon{
-		fs_home:              fs_home,
-		blobFormatter:        blobFormatter,
-		TextFormatterOptions: options,
+		fs_home:       fs_home,
+		blobFormatter: blobFormatter,
 	}
 
 	return textFormatter{
@@ -39,13 +37,11 @@ func MakeTextFormatterMetadateiBlobPath(
 
 func MakeTextFormatterMetadataOnly(
 	fs_home fs_home.Home,
-	options TextFormatterOptions,
 	blobFormatter script_config.RemoteScript,
 ) textFormatter {
 	common := textFormatterCommon{
-		fs_home:              fs_home,
-		blobFormatter:        blobFormatter,
-		TextFormatterOptions: options,
+		fs_home:       fs_home,
+		blobFormatter: blobFormatter,
 	}
 
 	return textFormatter{
@@ -62,13 +58,11 @@ func MakeTextFormatterMetadataOnly(
 
 func MakeTextFormatterMetadataInlineBlob(
 	fs_home fs_home.Home,
-	options TextFormatterOptions,
 	blobFormatter script_config.RemoteScript,
 ) textFormatter {
 	common := textFormatterCommon{
-		fs_home:              fs_home,
-		blobFormatter:        blobFormatter,
-		TextFormatterOptions: options,
+		fs_home:       fs_home,
+		blobFormatter: blobFormatter,
 	}
 
 	return textFormatter{
@@ -87,13 +81,11 @@ func MakeTextFormatterMetadataInlineBlob(
 
 func MakeTextFormatterExcludeMetadata(
 	fs_home fs_home.Home,
-	options TextFormatterOptions,
 	blobFormatter script_config.RemoteScript,
 ) textFormatter {
 	common := textFormatterCommon{
-		fs_home:              fs_home,
-		blobFormatter:        blobFormatter,
-		TextFormatterOptions: options,
+		fs_home:       fs_home,
+		blobFormatter: blobFormatter,
 	}
 
 	return textFormatter{

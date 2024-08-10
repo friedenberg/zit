@@ -357,6 +357,7 @@ func writeFormat(
 	f object_metadata.TextFormatter,
 	includeBlob bool,
 	blobBody string,
+	options object_metadata.TextFormatterOptions,
 ) (out string) {
 	hash := sha256.New()
 	_, err := io.Copy(hash, strings.NewReader(blobBody))
@@ -377,7 +378,13 @@ func writeFormat(
 
 	sb := &strings.Builder{}
 
-	if _, err := f.FormatMetadata(sb, m); err != nil {
+	if _, err := f.FormatMetadata(
+		sb,
+		object_metadata.TextFormatterContext{
+			PersistentFormatterContext: m,
+			TextFormatterOptions:       options,
+		},
+	); err != nil {
 		t.Errorf("%s", err)
 	}
 
@@ -409,11 +416,10 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 
 	format := object_metadata.MakeTextFormatterMetadataOnly(
 		af,
-		object_metadata.TextFormatterOptions{},
 		nil,
 	)
 
-	actual := writeFormat(t, z, format, false, "the body")
+	actual := writeFormat(t, z, format, false, "the body", object_metadata.TextFormatterOptions{})
 
 	expected := `---
 # the title
@@ -452,11 +458,12 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 
 	format := object_metadata.MakeTextFormatterMetadataInlineBlob(
 		af,
-		object_metadata.TextFormatterOptions{},
 		nil,
 	)
 
-	actual := writeFormat(t, z, format, true, "the body")
+	actual := writeFormat(t, z, format, true, "the body",
+		object_metadata.TextFormatterOptions{},
+	)
 
 	expected := `---
 # the title

@@ -18,7 +18,6 @@ import (
 type textFormatterCommon struct {
 	fs_home       fs_home.Home
 	blobFormatter script_config.RemoteScript
-	TextFormatterOptions
 }
 
 func (f textFormatterCommon) writeComments(
@@ -74,7 +73,7 @@ func (f textFormatterCommon) writeCommonMetadataFormat(
 	w := format.NewLineWriter()
 	m := c.GetMetadata()
 
-	if m.Description.String() != "" || !f.DoNotWriteEmptyDescription {
+	if m.Description.String() != "" || !c.DoNotWriteEmptyDescription {
 		sr := bufio.NewReader(strings.NewReader(m.Description.String()))
 
 		for {
@@ -140,7 +139,7 @@ func (f textFormatterCommon) writePathType(
 ) (n int64, err error) {
 	var ap string
 
-	if apg, ok := c.(BlobPathGetter); ok {
+	if apg, ok := c.PersistentFormatterContext.(BlobPathGetter); ok {
 		ap = f.fs_home.RelToCwdOrSame(apg.GetBlobPath())
 	} else {
 		err = errors.Errorf("unable to convert %T int %T", c, apg)

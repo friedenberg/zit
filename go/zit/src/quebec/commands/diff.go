@@ -44,22 +44,16 @@ func (c Diff) RunWithQuery(
 	u *env.Env,
 	qg *query.Group,
 ) (err error) {
-	co := checkout_options.TextFormatterOptions{
+	o := checkout_options.TextFormatterOptions{
 		DoNotWriteEmptyDescription: true,
 	}
 
 	opDiffFS := user_ops.Diff{
 		Env: u,
-		Inline: object_metadata.MakeTextFormatterMetadataInlineBlob(
-			u.GetFSHome(),
-			co,
-			nil,
-		),
-		Metadata: object_metadata.MakeTextFormatterMetadataOnly(
-			u.GetFSHome(),
-			co,
-			nil,
-		),
+    TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
+      u.GetFSHome(),
+      nil,
+    ),
 	}
 
 	if err = u.GetStore().QueryCheckedOut(
@@ -67,7 +61,7 @@ func (c Diff) RunWithQuery(
 		func(co sku.CheckedOutLike) (err error) {
 			switch cot := co.(type) {
 			case *store_fs.CheckedOut:
-				if err = opDiffFS.Run(cot); err != nil {
+				if err = opDiffFS.Run(cot, o); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

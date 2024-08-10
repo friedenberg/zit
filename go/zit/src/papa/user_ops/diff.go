@@ -24,11 +24,14 @@ import (
 
 type Diff struct {
 	*env.Env
-	Inline   object_metadata.TextFormatter
-	Metadata object_metadata.TextFormatter
+
+	object_metadata.TextFormatterFamily
 }
 
-func (op Diff) Run(col sku.CheckedOutLike) (err error) {
+func (op Diff) Run(
+	col sku.CheckedOutLike,
+	options object_metadata.TextFormatterOptions,
+) (err error) {
 	cofs, ok := col.(*store_fs.CheckedOut)
 
 	if !ok {
@@ -59,7 +62,16 @@ func (op Diff) Run(col sku.CheckedOutLike) (err error) {
 	var mode checkout_mode.Mode
 
 	il := &cofs.Internal
+	ilCtx := object_metadata.TextFormatterContext{
+		PersistentFormatterContext: il,
+		TextFormatterOptions:       options,
+	}
+
 	el := &cofs.External
+	elCtx := object_metadata.TextFormatterContext{
+		PersistentFormatterContext: el,
+		TextFormatterOptions:       options,
+	}
 
 	if mode, err = el.GetFDs().GetCheckoutModeOrError(); err != nil {
 		err = errors.Wrap(err)
@@ -89,11 +101,11 @@ func (op Diff) Run(col sku.CheckedOutLike) (err error) {
 	switch {
 	case mode.IncludesMetadata():
 		if internalInline && externalInline {
-			wg.Do(op.makeDo(wLeft, op.Inline, il))
-			wg.Do(op.makeDo(wRight, op.Inline, el))
+			wg.Do(op.makeDo(wLeft, op.InlineBlob, ilCtx))
+			wg.Do(op.makeDo(wRight, op.InlineBlob, elCtx))
 		} else {
-			wg.Do(op.makeDo(wLeft, op.Metadata, il))
-			wg.Do(op.makeDo(wRight, op.Metadata, el))
+			wg.Do(op.makeDo(wLeft, op.MetadataOnly, ilCtx))
+			wg.Do(op.makeDo(wRight, op.MetadataOnly, elCtx))
 		}
 
 		externalFD = el.GetObjectFD()
@@ -104,8 +116,8 @@ func (op Diff) Run(col sku.CheckedOutLike) (err error) {
 		externalFD = el.GetBlobFD()
 
 	default:
-		wg.Do(op.makeDo(wLeft, op.Metadata, il))
-		wg.Do(op.makeDo(wRight, op.Metadata, el))
+		wg.Do(op.makeDo(wLeft, op.MetadataOnly, ilCtx))
+		wg.Do(op.makeDo(wRight, op.MetadataOnly, elCtx))
 		externalFD = el.GetBlobFD()
 	}
 

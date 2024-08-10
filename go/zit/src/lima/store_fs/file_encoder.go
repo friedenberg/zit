@@ -22,6 +22,8 @@ type fileEncoder struct {
 	perm    os.FileMode
 	fs_home fs_home.Home
 	ic      ids.InlineTypeChecker
+
+	object_metadata.TextFormatterFamily
 }
 
 func MakeFileEncoder(
@@ -33,18 +35,10 @@ func MakeFileEncoder(
 		perm:    0o666,
 		fs_home: fs_home,
 		ic:      ic,
-	}
-}
-
-func MakeFileEncoderJustOpen(
-	fs_home fs_home.Home,
-	ic ids.InlineTypeChecker,
-) fileEncoder {
-	return fileEncoder{
-		mode:    os.O_WRONLY | os.O_TRUNC,
-		perm:    0o666,
-		fs_home: fs_home,
-		ic:      ic,
+		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
+			fs_home,
+			nil,
+		),
 	}
 }
 
@@ -75,6 +69,11 @@ func (e *fileEncoder) EncodeObject(
 	objectPath string,
 	blobPath string,
 ) (err error) {
+	ctx := object_metadata.TextFormatterContext{
+		PersistentFormatterContext: z,
+		TextFormatterOptions:       options,
+	}
+
 	inline := e.ic.IsInlineType(z.GetType())
 
 	var ar sha.ReadCloser
@@ -88,12 +87,6 @@ func (e *fileEncoder) EncodeObject(
 
 	switch {
 	case blobPath != "" && objectPath != "":
-		mtw := object_metadata.MakeTextFormatterMetadateiBlobPath(
-			e.fs_home,
-			options,
-			nil,
-		)
-
 		var fBlob, fZettel *os.File
 
 		{
@@ -138,7 +131,7 @@ func (e *fileEncoder) EncodeObject(
 
 		defer errors.DeferredCloser(&err, fZettel)
 
-		if _, err = mtw.FormatMetadata(fZettel, z); err != nil {
+		if _, err = e.BlobPath.FormatMetadata(fZettel, ctx); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -164,17 +157,9 @@ func (e *fileEncoder) EncodeObject(
 		var mtw object_metadata.TextFormatter
 
 		if inline {
-			mtw = object_metadata.MakeTextFormatterMetadataInlineBlob(
-				e.fs_home,
-				options,
-				nil,
-			)
+			mtw = e.InlineBlob
 		} else {
-			mtw = object_metadata.MakeTextFormatterMetadataOnly(
-				e.fs_home,
-				options,
-				nil,
-			)
+			mtw = e.MetadataOnly
 		}
 
 		var fZettel *os.File
@@ -188,7 +173,7 @@ func (e *fileEncoder) EncodeObject(
 
 		defer errors.DeferredCloser(&err, fZettel)
 
-		if _, err = mtw.FormatMetadata(fZettel, z); err != nil {
+		if _, err = mtw.FormatMetadata(fZettel, ctx); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

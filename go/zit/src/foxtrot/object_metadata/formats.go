@@ -6,7 +6,7 @@ import (
 )
 
 type TextFormat struct {
-	TextFormatter
+	TextFormatterFamily
 	TextParser
 }
 
@@ -19,9 +19,8 @@ func MakeTextFormat(
 			fs_home,
 			blobFormatter,
 		),
-		TextFormatter: MakeTextFormatterMetadataOnly(
+		TextFormatterFamily: MakeTextFormatterFamily(
 			fs_home,
-			TextFormatterOptions{},
 			blobFormatter,
 		),
 	}

@@ -27,25 +27,32 @@ func MakeTextFormatterWithBlobFormatter(
 	formatter script_config.RemoteScript,
 ) textFormatter {
 	return textFormatter{
-		k:                 k,
-		fMetadateiAndBlob: object_metadata.MakeTextFormatterMetadataInlineBlob(fs_home, options, formatter),
-		fMetadateiOnly:    object_metadata.MakeTextFormatterMetadataOnly(fs_home, options, formatter),
-		fBlobOnly:         object_metadata.MakeTextFormatterExcludeMetadata(fs_home, options, formatter),
+		options: options,
+		k:       k,
+		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
+			fs_home,
+			formatter,
+		),
 	}
 }
 
 type textFormatter struct {
-	k                                            Config
-	fMetadateiAndBlob, fMetadateiOnly, fBlobOnly object_metadata.TextFormatter
+	k       Config
+	options checkout_options.TextFormatterOptions
+	object_metadata.TextFormatterFamily
 }
 
-func (tf textFormatter) WriteStringFormat(w io.Writer, s *sku.Transacted) (n int64, err error) {
-	if genres.Config.EqualsGenre(s.GetGenre()) {
-		n, err = tf.fBlobOnly.FormatMetadata(w, s)
-	} else if tf.k.IsInlineType(s.GetType()) {
-		n, err = tf.fMetadateiAndBlob.FormatMetadata(w, s)
+func (tf textFormatter) WriteStringFormat(w io.Writer, z *sku.Transacted) (n int64, err error) {
+	s := object_metadata.TextFormatterContext{
+		PersistentFormatterContext: z,
+		TextFormatterOptions:       tf.options,
+	}
+	if genres.Config.EqualsGenre(z.GetGenre()) {
+		n, err = tf.BlobOnly.FormatMetadata(w, s)
+	} else if tf.k.IsInlineType(z.GetType()) {
+		n, err = tf.InlineBlob.FormatMetadata(w, s)
 	} else {
-		n, err = tf.fMetadateiOnly.FormatMetadata(w, s)
+		n, err = tf.MetadataOnly.FormatMetadata(w, s)
 	}
 
 	return
@@ -53,15 +60,20 @@ func (tf textFormatter) WriteStringFormat(w io.Writer, s *sku.Transacted) (n int
 
 func (tf textFormatter) WriteStringFormatWithMode(
 	w io.Writer,
-	s *sku.Transacted,
+	sk *sku.Transacted,
 	mode checkout_mode.Mode,
 ) (n int64, err error) {
-	if genres.Config.EqualsGenre(s.GetGenre()) || mode == checkout_mode.BlobOnly {
-		n, err = tf.fBlobOnly.FormatMetadata(w, s)
-	} else if tf.k.IsInlineType(s.GetType()) {
-		n, err = tf.fMetadateiAndBlob.FormatMetadata(w, s)
+	ctx := object_metadata.TextFormatterContext{
+		PersistentFormatterContext: sk,
+		TextFormatterOptions:       tf.options,
+	}
+
+	if genres.Config.EqualsGenre(sk.GetGenre()) || mode == checkout_mode.BlobOnly {
+		n, err = tf.BlobOnly.FormatMetadata(w, ctx)
+	} else if tf.k.IsInlineType(sk.GetType()) {
+		n, err = tf.InlineBlob.FormatMetadata(w, ctx)
 	} else {
-		n, err = tf.fMetadateiOnly.FormatMetadata(w, s)
+		n, err = tf.MetadataOnly.FormatMetadata(w, ctx)
 	}
 
 	return

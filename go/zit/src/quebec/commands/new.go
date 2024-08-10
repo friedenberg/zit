@@ -98,17 +98,10 @@ func (c New) Run(u *env.Env, args ...string) (err error) {
 
 	cotfo := checkout_options.TextFormatterOptions{}
 
-	f := object_metadata.TextFormat{
-		TextFormatter: object_metadata.MakeTextFormatterMetadataInlineBlob(
-			u.GetFSHome(),
-			cotfo,
-			nil,
-		),
-		TextParser: object_metadata.MakeTextParser(
-			u.GetFSHome(),
-			nil,
-		),
-	}
+	f := object_metadata.MakeTextFormat(
+		u.GetFSHome(),
+		nil,
+	)
 
 	var zts sku.TransactedMutableSet
 

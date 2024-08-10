@@ -36,7 +36,8 @@ type (
 		Getter
 	}
 
-	TextFormatterContext interface {
+	TextFormatterContext struct {
+		TextFormatterOptions
 		PersistentFormatterContext
 	}
 
