@@ -106,6 +106,14 @@ func (s *Sha) GetTail() string {
 	return s.String()[2:]
 }
 
+func (a *Sha) AssertEqualsShaLike(b interfaces.Sha) error {
+	if !a.EqualsSha(b) {
+		return MakeErrNotEqual(a, b)
+	}
+
+	return nil
+}
+
 func (a *Sha) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }

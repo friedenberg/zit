@@ -51,13 +51,13 @@ func (c Diff) RunWithQuery(
 	opDiffFS := user_ops.Diff{
 		Env: u,
 		Inline: object_metadata.MakeTextFormatterMetadataInlineBlob(
-			co,
 			u.GetFSHome(),
+			co,
 			nil,
 		),
 		Metadata: object_metadata.MakeTextFormatterMetadataOnly(
-			co,
 			u.GetFSHome(),
+			co,
 			nil,
 		),
 	}

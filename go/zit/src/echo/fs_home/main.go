@@ -64,9 +64,11 @@ func Make(
 	s.cwd = o.store_fs
 	s.pid = os.Getpid()
 
-	if ok := files.Exists(s.DirZit()); !ok {
-		err = errors.Wrap(ErrNotInZitDir{})
-		return
+	if !o.PermitNoZitDirectory {
+		if ok := files.Exists(s.DirZit()); !ok {
+			err = errors.Wrap(ErrNotInZitDir{})
+			return
+		}
 	}
 
 	s.lockSmith = file_lock.New(s.DirZit("Lock"))
@@ -141,7 +143,7 @@ func (s *Home) loadKonfigAngeboren() (err error) {
 		return
 	}
 
-	defer errors.Deferred(&err, f.Close)
+	defer errors.DeferredCloser(&err, f)
 
 	dec := gob.NewDecoder(f)
 
@@ -181,8 +183,8 @@ func (s Home) AbsFromCwdOrSame(p string) (p1 string) {
 
 func (s Home) RelToCwdOrSame(p string) (p1 string) {
 	var err error
-	p1, err = filepath.Rel(s.Cwd(), p)
-	if err != nil {
+
+	if p1, err = filepath.Rel(s.Cwd(), p); err != nil {
 		p1 = p
 	}
 
@@ -308,7 +310,7 @@ func (s Home) DirKennung() string {
 	return s.DirZit("Kennung")
 }
 
-func (s Home) ResetVerzeichnisse() (err error) {
+func (s Home) ResetCache() (err error) {
 	if err = files.SetAllowUserChangesRecursive(s.DirVerzeichnisse()); err != nil {
 		err = errors.Wrap(err)
 		return

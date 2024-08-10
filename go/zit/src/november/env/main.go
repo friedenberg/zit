@@ -122,7 +122,6 @@ func (u *Env) Initialize(options Options) (err error) {
 		}
 
 		if u.fs_home, err = fs_home.Make(
-			// immutableConfig,
 			standortOptions,
 		); err != nil {
 			err = errors.Wrap(err)

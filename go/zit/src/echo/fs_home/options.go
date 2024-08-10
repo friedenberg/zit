@@ -8,10 +8,11 @@ import (
 )
 
 type Options struct {
-	BasePath string
-	Debug    debug.Options
-	DryRun   bool
-	store_fs string
+	BasePath             string
+	Debug                debug.Options
+	DryRun               bool
+	PermitNoZitDirectory bool
+	store_fs             string
 }
 
 func (o *Options) Validate() (err error) {
@@ -22,3 +23,4 @@ func (o *Options) Validate() (err error) {
 
 	return
 }
+

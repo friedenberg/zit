@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 )
 
 type textFormatter struct {
@@ -14,16 +15,12 @@ type textFormatter struct {
 }
 
 func MakeTextFormatterMetadateiBlobPath(
+	fs_home fs_home.Home,
 	options TextFormatterOptions,
-	blobReaderFactory interfaces.BlobReaderFactory,
 	blobFormatter script_config.RemoteScript,
 ) textFormatter {
-	if blobReaderFactory == nil {
-		panic("blob reader factory is nil")
-	}
-
 	common := textFormatterCommon{
-		blobFactory:          blobReaderFactory,
+		fs_home:              fs_home,
 		blobFormatter:        blobFormatter,
 		TextFormatterOptions: options,
 	}
@@ -41,16 +38,12 @@ func MakeTextFormatterMetadateiBlobPath(
 }
 
 func MakeTextFormatterMetadataOnly(
+	fs_home fs_home.Home,
 	options TextFormatterOptions,
-	blobReaderFactory interfaces.BlobReaderFactory,
 	blobFormatter script_config.RemoteScript,
 ) textFormatter {
-	if blobReaderFactory == nil {
-		panic("blob reader factory is nil")
-	}
-
 	common := textFormatterCommon{
-		blobFactory:          blobReaderFactory,
+		fs_home:              fs_home,
 		blobFormatter:        blobFormatter,
 		TextFormatterOptions: options,
 	}
@@ -68,16 +61,12 @@ func MakeTextFormatterMetadataOnly(
 }
 
 func MakeTextFormatterMetadataInlineBlob(
+	fs_home fs_home.Home,
 	options TextFormatterOptions,
-	blobReaderFactory interfaces.BlobReaderFactory,
 	blobFormatter script_config.RemoteScript,
 ) textFormatter {
-	if blobReaderFactory == nil {
-		panic("blob reader factory is nil")
-	}
-
 	common := textFormatterCommon{
-		blobFactory:          blobReaderFactory,
+		fs_home:              fs_home,
 		blobFormatter:        blobFormatter,
 		TextFormatterOptions: options,
 	}
@@ -97,16 +86,12 @@ func MakeTextFormatterMetadataInlineBlob(
 }
 
 func MakeTextFormatterExcludeMetadata(
+	fs_home fs_home.Home,
 	options TextFormatterOptions,
-	blobFactory interfaces.BlobReaderFactory,
 	blobFormatter script_config.RemoteScript,
 ) textFormatter {
-	if blobFactory == nil {
-		panic("blob reader factory is nil")
-	}
-
 	common := textFormatterCommon{
-		blobFactory:          blobFactory,
+		fs_home:              fs_home,
 		blobFormatter:        blobFormatter,
 		TextFormatterOptions: options,
 	}

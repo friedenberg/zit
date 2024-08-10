@@ -100,8 +100,8 @@ func (c New) Run(u *env.Env, args ...string) (err error) {
 
 	f := object_metadata.TextFormat{
 		TextFormatter: object_metadata.MakeTextFormatterMetadataInlineBlob(
-			cotfo,
 			u.GetFSHome(),
+			cotfo,
 			nil,
 		),
 		TextParser: object_metadata.MakeTextParser(

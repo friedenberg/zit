@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
-func (s Home) objekteReader(
+func (s Home) objectReader(
 	g interfaces.GenreGetter,
 	sh sha.ShaLike,
 ) (rc sha.ReadCloser, err error) {
@@ -42,7 +42,7 @@ func (s Home) objekteReader(
 	return
 }
 
-func (s Home) objekteWriter(
+func (s Home) objectWriter(
 	g interfaces.GenreGetter,
 ) (wc sha.WriteCloser, err error) {
 	var p string

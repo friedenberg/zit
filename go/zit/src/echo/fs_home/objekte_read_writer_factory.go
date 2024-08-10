@@ -16,12 +16,12 @@ func (s Home) ObjekteReaderWriterFactory(
 	return interfaces.MakeBespokeObjectReadWriterFactory(
 		interfaces.MakeBespokeObjectReadFactory(
 			func(sh interfaces.ShaGetter) (interfaces.ShaReadCloser, error) {
-				return s.objekteReader(g, sh)
+				return s.objectReader(g, sh)
 			},
 		),
 		interfaces.MakeBespokeObjectWriteFactory(
 			func() (interfaces.ShaWriteCloser, error) {
-				return s.objekteWriter(g)
+				return s.objectWriter(g)
 			},
 		),
 	)

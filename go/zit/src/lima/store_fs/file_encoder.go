@@ -5,10 +5,10 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 )
@@ -18,33 +18,33 @@ type FileEncoder interface {
 }
 
 type fileEncoder struct {
-	mode int
-	perm os.FileMode
-	arf  interfaces.BlobIOFactory
-	ic   ids.InlineTypeChecker
+	mode    int
+	perm    os.FileMode
+	fs_home fs_home.Home
+	ic      ids.InlineTypeChecker
 }
 
 func MakeFileEncoder(
-	arf interfaces.BlobIOFactory,
+	fs_home fs_home.Home,
 	ic ids.InlineTypeChecker,
 ) *fileEncoder {
 	return &fileEncoder{
-		mode: os.O_WRONLY | os.O_CREATE | os.O_TRUNC,
-		perm: 0o666,
-		arf:  arf,
-		ic:   ic,
+		mode:    os.O_WRONLY | os.O_CREATE | os.O_TRUNC,
+		perm:    0o666,
+		fs_home: fs_home,
+		ic:      ic,
 	}
 }
 
 func MakeFileEncoderJustOpen(
-	arf interfaces.BlobIOFactory,
+	fs_home fs_home.Home,
 	ic ids.InlineTypeChecker,
 ) fileEncoder {
 	return fileEncoder{
-		mode: os.O_WRONLY | os.O_TRUNC,
-		perm: 0o666,
-		arf:  arf,
-		ic:   ic,
+		mode:    os.O_WRONLY | os.O_TRUNC,
+		perm:    0o666,
+		fs_home: fs_home,
+		ic:      ic,
 	}
 }
 
@@ -69,17 +69,17 @@ func (e *fileEncoder) openOrCreate(p string) (f *os.File, err error) {
 	return
 }
 
-func (e *fileEncoder) EncodeObjekte(
+func (e *fileEncoder) EncodeObject(
 	options checkout_options.TextFormatterOptions,
 	z *External,
-	objektePath string,
+	objectPath string,
 	blobPath string,
 ) (err error) {
 	inline := e.ic.IsInlineType(z.GetType())
 
 	var ar sha.ReadCloser
 
-	if ar, err = e.arf.BlobReader(z.GetBlobSha()); err != nil {
+	if ar, err = e.fs_home.BlobReader(z.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -87,10 +87,10 @@ func (e *fileEncoder) EncodeObjekte(
 	defer errors.DeferredCloser(&err, ar)
 
 	switch {
-	case blobPath != "" && objektePath != "":
+	case blobPath != "" && objectPath != "":
 		mtw := object_metadata.MakeTextFormatterMetadateiBlobPath(
+			e.fs_home,
 			options,
-			e.arf,
 			nil,
 		)
 
@@ -103,7 +103,7 @@ func (e *fileEncoder) EncodeObjekte(
 				if errors.IsExist(err) {
 					var aw sha.WriteCloser
 
-					if aw, err = e.arf.BlobWriter(); err != nil {
+					if aw, err = e.fs_home.BlobWriter(); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
@@ -130,7 +130,7 @@ func (e *fileEncoder) EncodeObjekte(
 		}
 
 		if fZettel, err = e.openOrCreate(
-			objektePath,
+			objectPath,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -160,19 +160,19 @@ func (e *fileEncoder) EncodeObjekte(
 			return
 		}
 
-	case objektePath != "":
+	case objectPath != "":
 		var mtw object_metadata.TextFormatter
 
 		if inline {
 			mtw = object_metadata.MakeTextFormatterMetadataInlineBlob(
+				e.fs_home,
 				options,
-				e.arf,
 				nil,
 			)
 		} else {
 			mtw = object_metadata.MakeTextFormatterMetadataOnly(
+				e.fs_home,
 				options,
-				e.arf,
 				nil,
 			)
 		}
@@ -180,7 +180,7 @@ func (e *fileEncoder) EncodeObjekte(
 		var fZettel *os.File
 
 		if fZettel, err = e.openOrCreate(
-			objektePath,
+			objectPath,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -201,7 +201,7 @@ func (e *fileEncoder) Encode(
 	options checkout_options.TextFormatterOptions,
 	z *External,
 ) (err error) {
-	return e.EncodeObjekte(
+	return e.EncodeObject(
 		options,
 		z,
 		z.GetObjectFD().GetPath(),

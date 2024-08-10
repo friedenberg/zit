@@ -27,7 +27,7 @@ func (s *Store) Reindex() (err error) {
 		return
 	}
 
-	if err = s.GetStandort().ResetVerzeichnisse(); err != nil {
+	if err = s.GetStandort().ResetCache(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

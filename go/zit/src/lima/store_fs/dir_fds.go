@@ -24,6 +24,7 @@ type fdSetWithError struct {
 	*FDSet
 }
 
+// TODO support globs and ignores
 type dirFDs struct {
 	root string
 	file_extensions.FileExtensions
@@ -202,17 +203,25 @@ func (d *dirFDs) processAll(cache map[string]*FDSet) (err error) {
 	return
 }
 
-func (d *dirFDs) processDir(p string) (err error) {
+func (d *dirFDs) processDir(p string) (results []*FDSet, err error) {
 	cache := make(map[string]*FDSet)
+
+	results = make([]*FDSet, 0)
 
 	if err = d.walkDir(cache, p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = d.processAll(cache); err != nil {
-		err = errors.Wrap(err)
-		return
+	for objectIdString, fds := range cache {
+		var someResult []*FDSet
+
+		if someResult, err = d.processFDSet(objectIdString, fds); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		results = append(results, someResult...)
 	}
 
 	return
@@ -245,7 +254,7 @@ func (d *dirFDs) processFD(
 }
 
 func (d *dirFDs) processRootDir() (err error) {
-	if err = d.processDir(d.root); err != nil {
+	if _, err = d.processDir(d.root); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

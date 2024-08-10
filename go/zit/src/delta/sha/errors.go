@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 var ErrIsNull = errors.New("sha is null")
@@ -28,4 +29,26 @@ func makeErrLength(expected, actual int) error {
 
 func (e errLength) Error() string {
 	return fmt.Sprintf("expected %d but got %d", e[0], e[1])
+}
+
+type ErrNotEqual struct {
+	Expected, Actual interfaces.Sha
+}
+
+func MakeErrNotEqual(expected, actual interfaces.Sha) *ErrNotEqual {
+	err := &ErrNotEqual{
+		Expected: expected,
+		Actual:   actual,
+	}
+
+	return err
+}
+
+func (e *ErrNotEqual) Error() string {
+	return fmt.Sprintf("expected sha %s but got %s", e.Expected, e.Actual)
+}
+
+func (e *ErrNotEqual) Is(target error) bool {
+	_, ok := target.(*ErrNotEqual)
+	return ok
 }

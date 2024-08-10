@@ -3,34 +3,34 @@ package blob_store
 import (
 	"io"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 func MakeTextFormatter(
+	fs_home fs_home.Home,
 	options checkout_options.TextFormatterOptions,
-	af interfaces.BlobReaderFactory,
 	k Config,
 ) textFormatter {
-	return MakeTextFormatterWithBlobFormatter(options, af, k, nil)
+	return MakeTextFormatterWithBlobFormatter(fs_home, options, k, nil)
 }
 
 func MakeTextFormatterWithBlobFormatter(
+	fs_home fs_home.Home,
 	options checkout_options.TextFormatterOptions,
-	af interfaces.BlobReaderFactory,
 	k Config,
 	formatter script_config.RemoteScript,
 ) textFormatter {
 	return textFormatter{
 		k:                 k,
-		fMetadateiAndBlob: object_metadata.MakeTextFormatterMetadataInlineBlob(options, af, formatter),
-		fMetadateiOnly:    object_metadata.MakeTextFormatterMetadataOnly(options, af, formatter),
-		fBlobOnly:         object_metadata.MakeTextFormatterExcludeMetadata(options, af, formatter),
+		fMetadateiAndBlob: object_metadata.MakeTextFormatterMetadataInlineBlob(fs_home, options, formatter),
+		fMetadateiOnly:    object_metadata.MakeTextFormatterMetadataOnly(fs_home, options, formatter),
+		fBlobOnly:         object_metadata.MakeTextFormatterExcludeMetadata(fs_home, options, formatter),
 	}
 }
 

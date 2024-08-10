@@ -8,12 +8,12 @@ import (
 	"strings"
 	"testing"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/test_object_metadata_io"
@@ -48,9 +48,8 @@ func makeBlobExt(t test_logz.T, v string) (es ids.Type) {
 func readFormat(
 	t1 test_logz.T,
 	f object_metadata.TextFormat,
-	af *test_object_metadata_io.BlobIOFactory,
 	contents string,
-) (z *object_metadata.Metadata, a string) {
+) (z *object_metadata.Metadata) {
 	var zt Transacted
 
 	t := t1.Skip(1)
@@ -68,7 +67,6 @@ func readFormat(
 	}
 
 	z = zt.GetMetadata()
-	a = af.CurrentBufferString()
 
 	return
 }
@@ -185,27 +183,40 @@ func TestEqualityNotSelf(t1 *testing.T) {
 	}
 }
 
-func makeTestTextFormat(
-	af *test_object_metadata_io.BlobIOFactory,
-) object_metadata.TextFormat {
-	if af == nil {
-		af = test_object_metadata_io.FixtureFactoryReadWriteCloser(nil)
+func makeTestFSHome(
+	t *testing.T,
+	contents map[string]string,
+) fs_home.Home {
+	p := t.TempDir()
+
+	f, err := fs_home.Make(
+		fs_home.Options{
+			BasePath: p,
+		},
+	)
+	if err != nil {
+		t.Fatalf("failed to make fs_home: %s", err)
 	}
 
+	return f
+}
+
+func makeTestTextFormat(
+	fs_home fs_home.Home,
+) object_metadata.TextFormat {
 	return object_metadata.MakeTextFormat(
-		af,
+		fs_home,
 		nil,
 	)
 }
 
 func TestReadWithoutBlob(t1 *testing.T) {
 	t := test_logz.T{T: t1}
-	af := test_object_metadata_io.FixtureFactoryReadWriteCloser(nil)
+	af := test_object_metadata_io.Make(t, nil)
 
-	actual, blob := readFormat(
+	actual := readFormat(
 		t,
 		makeTestTextFormat(af),
-		af,
 		`---
 # the title
 - tag1
@@ -231,20 +242,19 @@ func TestReadWithoutBlob(t1 *testing.T) {
 		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)
 	}
 
-	if blob != "" {
-		t.Fatalf("blob:\nexpected empty but got %q", blob)
+	if !actual.Blob.IsNull() {
+		t.Fatalf("blob:\nexpected empty but got %q", &actual.Blob)
 	}
 }
 
 func TestReadWithoutBlobWithMultilineDescription(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	af := test_object_metadata_io.FixtureFactoryReadWriteCloser(nil)
+	af := test_object_metadata_io.Make(t, nil)
 
-	actual, blob := readFormat(
+	actual := readFormat(
 		t,
 		makeTestTextFormat(af),
-		af,
 		`---
 # the title
 # continues
@@ -271,25 +281,19 @@ func TestReadWithoutBlobWithMultilineDescription(t1 *testing.T) {
 		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)
 	}
 
-	if blob != "" {
-		t.Fatalf("blob:\nexpected empty but got %q", blob)
+	if !actual.Blob.IsNull() {
+		t.Fatalf("blob:\nexpected empty but got %q", &actual.Blob)
 	}
 }
 
 func TestReadWithBlob(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	af := test_object_metadata_io.FixtureFactoryReadWriteCloser(
-		map[string]string{
-			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body\n",
-			"036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064": "the body",
-		},
-	)
+	af := test_object_metadata_io.Make(t, nil)
 
-	actual, blob := readFormat(
+	actual := readFormat(
 		t,
 		makeTestTextFormat(af),
-		af,
 		`---
 # the title
 - tag1
@@ -298,18 +302,17 @@ func TestReadWithBlob(t1 *testing.T) {
 ! md
 ---
 
-the body
-`,
+the body`,
 	)
+
+	expectedSha := sha.Must("fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e")
 
 	expected := &object_metadata.Metadata{
 		Description: descriptions.Make("the title"),
 		Type:        makeBlobExt(t, "md"),
 	}
 
-	errors.PanicIfError(expected.Blob.Set(
-		"036a8e44e472523c0306946f2712f372c234f8a24532e933f1509ae4db0da064",
-	))
+	expected.Blob.ResetWith(expectedSha)
 
 	expected.SetTags(makeTagSet(t,
 		"tag1",
@@ -319,12 +322,6 @@ the body
 
 	if !actual.Equals(expected) {
 		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)
-	}
-
-	expectedBlob := "the body\n"
-
-	if expectedBlob != blob {
-		t.Fatalf("blob:\nexpected: %#v\n  actual: %#v", expectedBlob, blob)
 	}
 }
 
@@ -403,19 +400,20 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 		"tag3",
 	))
 
-	af := test_object_metadata_io.FixtureFactoryReadWriteCloser(
+	af := test_object_metadata_io.Make(
+		t,
 		map[string]string{
-			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body\n",
+			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body",
 		},
 	)
 
 	format := object_metadata.MakeTextFormatterMetadataOnly(
-		object_metadata.TextFormatterOptions{},
 		af,
+		object_metadata.TextFormatterOptions{},
 		nil,
 	)
 
-	actual := writeFormat(t, z, format, false, `the body`)
+	actual := writeFormat(t, z, format, false, "the body")
 
 	expected := `---
 # the title
@@ -445,19 +443,20 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 		"tag3",
 	))
 
-	af := test_object_metadata_io.FixtureFactoryReadWriteCloser(
+	af := test_object_metadata_io.Make(
+		t,
 		map[string]string{
-			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body\n",
+			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body",
 		},
 	)
 
 	format := object_metadata.MakeTextFormatterMetadataInlineBlob(
-		object_metadata.TextFormatterOptions{},
 		af,
+		object_metadata.TextFormatterOptions{},
 		nil,
 	)
 
-	actual := writeFormat(t, z, format, true, `the body`)
+	actual := writeFormat(t, z, format, true, "the body")
 
 	expected := `---
 # the title
@@ -467,8 +466,7 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 ! md
 ---
 
-the body
-`
+the body`
 
 	if expected != actual {
 		t.Fatalf("zettel:\nexpected: %#v\n  actual: %#v", expected, actual)

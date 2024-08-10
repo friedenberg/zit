@@ -1,8 +1,8 @@
 package object_metadata
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 )
 
 type TextFormat struct {
@@ -11,17 +11,17 @@ type TextFormat struct {
 }
 
 func MakeTextFormat(
-	blobIOFactory interfaces.BlobIOFactory,
+	fs_home fs_home.Home,
 	blobFormatter script_config.RemoteScript,
 ) TextFormat {
 	return TextFormat{
 		TextParser: MakeTextParser(
-			blobIOFactory,
+			fs_home,
 			blobFormatter,
 		),
 		TextFormatter: MakeTextFormatterMetadataOnly(
+			fs_home,
 			TextFormatterOptions{},
-			blobIOFactory,
 			blobFormatter,
 		),
 	}

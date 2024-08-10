@@ -201,10 +201,10 @@ func (u *Env) MakeFormatFunc(
 
 	case "text":
 		fo := blob_store.MakeTextFormatter(
+			u.GetStore().GetStandort(),
 			checkout_options.TextFormatterOptions{
 				DoNotWriteEmptyDescription: true,
 			},
-			u.GetStore().GetStandort(),
 			u.GetConfig(),
 		)
 

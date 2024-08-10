@@ -80,7 +80,7 @@ func (s *Store) QueryCheckedOut(
 		// })
 
 		wg.Do(func() error {
-			return s.QueryBlobs(aco, f)
+			return s.QueryBlobs(qg, aco, f)
 		})
 	}
 
@@ -93,6 +93,7 @@ func (s *Store) QueryCheckedOut(
 }
 
 func (s *Store) QueryBlobs(
+	qg *query.Group,
 	aco interfaces.FuncIter[*FDSet],
 	f func(sku.CheckedOutLike) error,
 ) (err error) {

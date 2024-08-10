@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
@@ -18,7 +17,6 @@ import (
 
 type textFormatterCommon struct {
 	fs_home       fs_home.Home
-	blobFactory   interfaces.BlobReaderFactory
 	blobFormatter script_config.RemoteScript
 	TextFormatterOptions
 }
@@ -143,8 +141,7 @@ func (f textFormatterCommon) writePathType(
 	var ap string
 
 	if apg, ok := c.(BlobPathGetter); ok {
-		// TODO make relative path
-		ap = apg.GetBlobPath()
+		ap = f.fs_home.RelToCwdOrSame(apg.GetBlobPath())
 	} else {
 		err = errors.Errorf("unable to convert %T int %T", c, apg)
 		return
@@ -160,7 +157,7 @@ func (f textFormatterCommon) writeBlob(
 	var ar io.ReadCloser
 	m := c.GetMetadata()
 
-	if ar, err = f.blobFactory.BlobReader(&m.Blob); err != nil {
+	if ar, err = f.fs_home.BlobReader(&m.Blob); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

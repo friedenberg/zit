@@ -13,13 +13,7 @@ func (s Home) DirObjektenGattung(
 	sv interfaces.StoreVersion,
 	g interfaces.GenreGetter,
 ) (p string, err error) {
-	switch sv.GetInt() {
-	case 0, 1:
-		return s.dirObjektenGattung(g)
-
-	default:
-		return s.dirObjektenGattung2(g)
-	}
+	return s.dirObjektenGattung2(g)
 }
 
 func (s Home) dirObjektenGattung2(
@@ -33,39 +27,6 @@ func (s Home) dirObjektenGattung2(
 	}
 
 	p = s.DirObjekten2(g.GetGenreStringPlural())
-
-	return
-}
-
-func (s Home) dirObjektenGattung(
-	g interfaces.GenreGetter,
-) (p string, err error) {
-	switch g.GetGenre() {
-	case genres.Blob:
-		p = s.DirObjekten("Akten")
-
-	case genres.Config:
-		p = s.DirObjekten("Konfig")
-
-	case genres.Tag:
-		p = s.DirObjekten("Etiketten")
-
-	case genres.Type:
-		p = s.DirObjekten("Typen")
-
-	case genres.Zettel:
-		p = s.DirObjekten("Zettelen")
-
-	case genres.InventoryList:
-		p = s.DirObjekten("Bestandsaufnahme")
-
-	case genres.Repo:
-		p = s.DirObjekten("Kasten")
-
-	default:
-		err = genres.MakeErrUnsupportedGenre(g)
-		return
-	}
 
 	return
 }

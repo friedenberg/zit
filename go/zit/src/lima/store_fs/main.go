@@ -23,7 +23,6 @@ func init() {
 	gob.Register(External{})
 }
 
-// TODO support globs and ignores
 type Store struct {
 	config              sku.Config
 	deletedPrinter      interfaces.FuncIter[*fd.FD]
@@ -164,19 +163,15 @@ func (s *Store) GetObjectIdsForDir(
 		return
 	}
 
-	if err = s.dirFDs.processDir(fd.GetPath()); err != nil {
+	var results []*FDSet
+
+	if results, err = s.dirFDs.processDir(fd.GetPath()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.dirFDs.All(
-		func(fds *FDSet) (err error) {
-			k = append(k, fds)
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	for _, r := range results {
+		k = append(k, r)
 	}
 
 	return

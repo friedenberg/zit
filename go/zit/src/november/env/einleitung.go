@@ -105,7 +105,7 @@ func (u *Env) Start(e BigBang) (err error) {
 		return
 	}
 
-	if err = u.GetFSHome().ResetVerzeichnisse(); err != nil {
+	if err = u.GetFSHome().ResetCache(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
