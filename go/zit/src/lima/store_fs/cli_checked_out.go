@@ -92,6 +92,8 @@ func (f *cliCheckedOut) WriteStringFormat(
 		}
 	}
 
+	var fdAlreadyWritten *fd.FD
+
 	switch {
 	case co.State == checked_out_state.Untracked:
 		n2, err = f.writeStringFormatUntracked(sw, co, m)
@@ -124,6 +126,8 @@ func (f *cliCheckedOut) WriteStringFormat(
 			err = errors.Wrap(err)
 			return
 		}
+
+		fdAlreadyWritten = &fds.Object
 	}
 
 	if co.State == checked_out_state.Conflicted {
@@ -146,27 +150,9 @@ func (f *cliCheckedOut) WriteStringFormat(
 		return
 	}
 
-	if m == checkout_mode.BlobRecognized {
-		if err = fds.MutableSetLike.Each(
-			func(fd *fd.FD) (err error) {
-				n2, err = f.writeStringFormatBlobFD(sw, fd)
-				n += n2
-
-				if err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				return
-			},
-		); err != nil {
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-	} else if m != checkout_mode.MetadataOnly && m != checkout_mode.None {
-		n2, err = f.writeStringFormatBlobFD(sw, &fds.Blob)
+	if m == checkout_mode.BlobRecognized ||
+		(m != checkout_mode.MetadataOnly && m != checkout_mode.None) {
+		n2, err = f.writeStringFormatBlobFDsExcept(sw, fds, fdAlreadyWritten)
 		n += n2
 
 		if err != nil {
@@ -181,6 +167,44 @@ func (f *cliCheckedOut) WriteStringFormat(
 	if err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	return
+}
+
+func (f *cliCheckedOut) writeStringFormatBlobFDsExcept(
+	sw interfaces.WriterAndStringWriter,
+	fds *FDSet,
+	except *fd.FD,
+) (n int64, err error) {
+	var n2 int64
+
+	if fds.MutableSetLike == nil {
+		err = errors.Errorf("FDSet.MutableSetLike was nil")
+		return
+	}
+
+	if err = fds.MutableSetLike.Each(
+		func(fd *fd.FD) (err error) {
+			if except != nil && fd.Equals(except) {
+				return
+			}
+
+			n2, err = f.writeStringFormatBlobFD(sw, fd)
+			n += n2
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
@@ -262,6 +286,14 @@ func (f *cliCheckedOut) writeStringFormatUntracked(
 	}
 
 	n2, err = f.metadataStringFormatWriter.WriteStringFormat(sw, o.GetMetadata())
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n2, err = f.writeStringFormatBlobFDsExcept(sw, fds, fdToPrint)
 	n += n2
 
 	if err != nil {

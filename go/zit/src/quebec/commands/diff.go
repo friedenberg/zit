@@ -50,10 +50,10 @@ func (c Diff) RunWithQuery(
 
 	opDiffFS := user_ops.Diff{
 		Env: u,
-    TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
-      u.GetFSHome(),
-      nil,
-    ),
+		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
+			u.GetFSHome(),
+			nil,
+		),
 	}
 
 	if err = u.GetStore().QueryCheckedOut(

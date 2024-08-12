@@ -153,7 +153,7 @@ func (a Abbr) AbbreviateObjectId(
 		getAbbr = DontAbbreviateString
 
 	case genres.Config:
-		out = in
+		out.ResetWith(in)
 		return
 
 	default:
@@ -164,7 +164,9 @@ func (a Abbr) AbbreviateObjectId(
 	var abbr string
 
 	if abbr, err = getAbbr(in); err != nil {
-		err = errors.Wrap(err)
+		err = nil
+		out.ResetWith(in)
+		// err = errors.Wrap(err)
 		return
 	}
 

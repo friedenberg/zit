@@ -36,12 +36,12 @@ func (c Status) ModifyBuilder(
 
 func (c Status) RunWithQuery(
 	u *env.Env,
-	eqwk *query.Group,
+	qg *query.Group,
 ) (err error) {
-	pcol := u.PrinterCheckedOutForKasten(eqwk.RepoId)
+	pcol := u.PrinterCheckedOutForKasten(qg.RepoId)
 
 	if err = u.GetStore().QueryCheckedOut(
-		eqwk,
+		qg,
 		func(co sku.CheckedOutLike) (err error) {
 			if err = pcol(co); err != nil {
 				err = errors.Wrap(err)

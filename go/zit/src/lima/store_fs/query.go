@@ -143,6 +143,11 @@ func (s *Store) QueryBlobs(
 		return
 	}
 
+	if err = s.dirFDs.ConsolidateDuplicateBlobs(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	blobs := make([]*FDSet, 0, s.dirFDs.blobs.Len())
 
 	if err = s.dirFDs.blobs.Each(

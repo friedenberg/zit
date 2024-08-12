@@ -6,26 +6,42 @@
 let m = expand("<sfile>:h") . "/zit-metadatei.vim"
 exec "source " . m
 
-syn match zitEtikett /\v[^#,]+/ contained contains=@NoSpell
-syn match zitEtikettPrefix /\v#+/ contained
-syn region zitEtikettRegion start=/\v^\s*#+ / end=/$/
-      \ contains=zitEtikett,zitEtikettPrefix
+" syn match zitSkuTagComponent '\w\+' contained
+" syn region zitSkuTag start=/\w/ end=' ' contained contains=@NoSpell,zitSkuTagComponent
 
-syn match zitZettelHinweis /\v\w+/ contained contains=@NoSpell
-syn match zitZettelSeparator /\v\// contained
-syn match zitZettelPrefix /\v^\s*- / contained
+syn match zitSkuFieldValue /.\+/ contained
+syn match zitSkuFieldEscape /\\./ contained
+syn region zitSkuField start=/"/ skip=/\\./ end=/"/ keepend contained 
+      \ contains=zitSkuFieldValue,zitSkuFieldEscape
+
+syn match zitSkuTypeComponent '\w\+' contained
+syn region zitSkuType start=/!/ms=e+1 end=' ' contained contains=@NoSpell,zitSkuTypeComponent
+
 " don't include the newline because this is within a region
-syn match zitZettelBezeichnung /\v.*/ contained contains=@NoSpell
+syn match zitSkuDescription /\v.*/ contained
 
-syn region zitZettelHinweisRegion start=/\v\[/ end=/]/
-      \ contains=zitZettelHinweis,zitZettelHinweisSeparator
-      \ nextgroup=zitZettelBezeichnung
+syn match zitSkuObjectIdComponent '\w\+' contained
+syn region zitSkuObjectId start='\[\s*'ms=e+1 end=' ' contained 
+      \ contains=zitSkuObjectIdComponent
 
-syn region zitZettelRegion start=/\v^\s*- / end=/$/
-      \ contains=zitZettelHinweisRegion ",zitZettelBezeichnung
+syn region zitSkuMetadataRegion start='\[' end='\]' keepend
+      \ contains=zitSkuObjectId,zitSkuField,zitSkuType
+      \ nextgroup=zitSkuDescription
 
-highlight default link zitEtikett Title
-highlight default link zitZettelHinweis Identifier
-highlight default link zitZettelBezeichnung String
+syn match zitTag /\v[^#,]+/ contained contains=@NoSpell
+syn match zitTagPrefix /\v#+/ contained
+syn region zitTagRegion start=/\v^\s*#+ / end=/$/
+      \ contains=zitTag,zitTagPrefix
+
+highlight default link zitTag Title
+highlight default link zitSkuObjectIdComponent Identifier
+highlight default link zitSkuTypeComponent Type
+highlight default link zitSkuFieldValue Constant
+highlight default link zitSkuSyntax Normal
+highlight default link zitSkuFieldEscape SpecialChar
+highlight default link zitSkuDescription String
+
+" debug
+" highlight default link zitSkuMetadataRegion Underlined
 
 let b:current_syntax = 'zit-organize'

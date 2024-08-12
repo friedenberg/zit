@@ -492,6 +492,36 @@ func (d *dirFDs) addOneObject(
 	return
 }
 
+func (d *dirFDs) ConsolidateDuplicateBlobs() (err error) {
+	replacement := collections_value.MakeMutableValueSet[*FDSet](nil)
+
+	for _, fds := range d.shasToBlobFDs {
+		if fds.Len() == 1 {
+			replacement.Add(fds.Any())
+		}
+
+		sorted := iter.ElementsSorted(
+			fds,
+			func(a, b *FDSet) bool {
+				return a.ObjectId.String() < b.ObjectId.String()
+			},
+		)
+
+		top := sorted[0]
+
+		for _, other := range sorted[1:] {
+			other.MutableSetLike.Each(top.MutableSetLike.Add)
+		}
+
+		replacement.Add(top)
+	}
+
+	// TODO make less leaky
+	d.blobs = replacement
+
+	return
+}
+
 //   ___ _                 _   _
 //  |_ _| |_ ___ _ __ __ _| |_(_) ___  _ __
 //   | || __/ _ \ '__/ _` | __| |/ _ \| '_ \

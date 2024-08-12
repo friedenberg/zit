@@ -23,4 +23,3 @@ func (o *Options) Validate() (err error) {
 
 	return
 }
-

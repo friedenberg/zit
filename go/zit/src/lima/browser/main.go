@@ -182,6 +182,8 @@ func (c *Store) QueryCheckedOut(
 	var co CheckedOut
 
 	for u, items := range c.urls {
+		co.External.ObjectId.Reset()
+
 		matchingUrls, exactIndexURLMatch := c.transactedUrlIndex[u]
 
 		for _, item := range items {

@@ -75,6 +75,11 @@ func (tab item) WriteToObjectId(oi *ids.ObjectId) (err error) {
 	var id string
 	id, ok = tab["id"].(string)
 
+	if !ok {
+		err = errors.Errorf("unsupported id format: %#v", id)
+		return
+	}
+
 	if err = oi.SetRaw(fmt.Sprintf("%s-%s", ty, id)); err != nil {
 		err = errors.Wrap(err)
 		return

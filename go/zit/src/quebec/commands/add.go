@@ -17,7 +17,7 @@ import (
 )
 
 type Add struct {
-	Dedupe             bool
+	AllowDupes         bool
 	Delete             bool
 	OpenBlob           bool
 	CheckoutBlobAndRun string
@@ -34,10 +34,10 @@ func init() {
 			c := &Add{}
 
 			f.BoolVar(
-				&c.Dedupe,
-				"dedupe",
+				&c.AllowDupes,
+				"allow-dupes",
 				false,
-				"deduplicate added Zettels based on blob sha",
+				"permit added blobs to be duplicates (have the same exact content)",
 			)
 
 			f.BoolVar(
@@ -79,11 +79,11 @@ func (c Add) RunWithQuery(
 	qg *query.Group,
 ) (err error) {
 	zettelsFromBlobOp := user_ops.ZettelFromExternalBlob{
-		Env:    u,
-		Proto:  c.Proto,
-		Filter: c.Filter,
-		Delete: c.Delete,
-		Dedupe: c.Dedupe,
+		Env:        u,
+		Proto:      c.Proto,
+		Filter:     c.Filter,
+		Delete:     c.Delete,
+		AllowDupes: c.AllowDupes,
 	}
 
 	var zettelsFromBlobResults sku.TransactedMutableSet

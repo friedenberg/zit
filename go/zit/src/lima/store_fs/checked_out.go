@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -70,18 +71,21 @@ func (a *CheckedOut) String() string {
 
 func (e *CheckedOut) Remove(s interfaces.Directory) (err error) {
 	// TODO check conflict state
-	if err = e.External.FDs.Object.Remove(s); err != nil {
+	if err = e.External.FDs.MutableSetLike.Each(
+		func(f *fd.FD) (err error) {
+			if err = f.Remove(s); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = e.External.FDs.Blob.Remove(s); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	e.External.FDs.Blob.Reset()
-	e.External.FDs.Object.Reset()
+	e.External.FDs.Reset()
 
 	return
 }

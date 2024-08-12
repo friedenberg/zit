@@ -17,7 +17,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-// TODO-P4 make generic
+// TODO-P4 make generic to just ObjectIds
 type AbbrStore interface {
 	ZettelId() AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId]
 	Kisten() AbbrStoreGeneric[ids.RepoId, *ids.RepoId]

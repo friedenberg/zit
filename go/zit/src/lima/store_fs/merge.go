@@ -85,6 +85,7 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 	src := merged.Object.GetPath()
 	dst := cofs.External.FDs.Object.GetPath()
 
+	// TODO determine why dst is sometimes ""
 	if err = files.Rename(src, dst); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -106,6 +107,7 @@ func (s *Store) checkoutOneForMerge(
 	}
 
 	cz = GetCheckedOutPool().Get()
+	cz.External.FDs.Reset()
 	sku.Resetter.ResetWith(&cz.Internal, sz)
 
 	if err = s.checkoutOne(

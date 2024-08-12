@@ -3,7 +3,6 @@ package store
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
@@ -12,24 +11,9 @@ func (s *Store) QueryWithKasten(
 	qg *query.Group,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	if qg == nil {
-		if qg, err = s.queryBuilder.BuildQueryGroup(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	wg := iter.MakeErrorWaitGroupParallel()
-	es := s.externalStores[qg.RepoId.String()]
-
-	e := &query.Executor{
-		Group: qg,
-		ExecutionInfo: query.ExecutionInfo{
-			FuncPrimitiveQuery:            s.GetStreamIndex().ReadQuery,
-			ExternalStoreUpdateTransacted: es,
-			QueryCheckedOut:               es,
-		},
-		Out: func(el sku.ExternalLike) (err error) {
+	if err = s.QueryWithKasten2(
+		qg,
+		func(el sku.ExternalLike) (err error) {
 			if err = f(el.GetSku()); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -37,11 +21,7 @@ func (s *Store) QueryWithKasten(
 
 			return
 		},
-	}
-
-	wg.Do(e.Execute)
-
-	if err = wg.GetError(); err != nil {
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -53,6 +33,24 @@ func (s *Store) QueryWithKasten2(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.ExternalLike],
 ) (err error) {
+	var e query.Executor
+
+	if e, err = s.MakeQueryExecutor(qg); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = e.ExecuteExternalLike(f); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) MakeQueryExecutor(
+	qg *query.Group,
+) (e query.Executor, err error) {
 	if qg == nil {
 		if qg, err = s.queryBuilder.BuildQueryGroup(); err != nil {
 			err = errors.Wrap(err)
@@ -60,25 +58,13 @@ func (s *Store) QueryWithKasten2(
 		}
 	}
 
-	wg := iter.MakeErrorWaitGroupParallel()
 	es := s.externalStores[qg.RepoId.String()]
 
-	e := &query.Executor{
-		Group: qg,
-		ExecutionInfo: query.ExecutionInfo{
-			FuncPrimitiveQuery:            s.GetStreamIndex().ReadQuery,
-			ExternalStoreUpdateTransacted: es,
-			QueryCheckedOut:               es,
-		},
-		Out: f,
-	}
-
-	wg.Do(e.Execute)
-
-	if err = wg.GetError(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	e = query.MakeExecutorWithExternalStore(
+		qg,
+		s.GetStreamIndex().ReadQuery,
+		es,
+	)
 
 	return
 }

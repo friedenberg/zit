@@ -30,6 +30,7 @@ func (s *Store) checkoutOneNew(
 	sz *sku.Transacted,
 ) (cz *CheckedOut, err error) {
 	cz = GetCheckedOutPool().Get()
+	cz.External.FDs.Reset()
 
 	sku.Resetter.ResetWith(&cz.Internal, sz)
 
@@ -175,6 +176,11 @@ func (s *Store) checkoutOne(
 			err = errors.Wrap(err)
 			return
 		}
+
+		cz.External.FDs.Add(&cz.External.FDs.Object)
+	} else {
+		cz.External.FDs.MutableSetLike.Del(&cz.External.FDs.Object)
+		cz.External.FDs.Object.Reset()
 	}
 
 	if ((!inlineBlob || !options.CheckoutMode.IncludesMetadata()) &&
@@ -193,6 +199,11 @@ func (s *Store) checkoutOne(
 			err = errors.Wrap(err)
 			return
 		}
+
+		cz.External.FDs.Add(&cz.External.FDs.Blob)
+	} else {
+		cz.External.FDs.MutableSetLike.Del(&cz.External.FDs.Blob)
+		cz.External.FDs.Blob.Reset()
 	}
 
 	sku.Resetter.ResetWith(&cz.External, &cz.Internal)

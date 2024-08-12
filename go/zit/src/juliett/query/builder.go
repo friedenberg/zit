@@ -257,6 +257,11 @@ func (b *Builder) build(
 		remaining = vs
 	} else {
 		for _, v := range vs {
+			if v == "." {
+				qg.dotOperatorActive = true
+				remaining = append(remaining, v)
+			}
+
 			var k []sku.ExternalObjectId
 
 			if k, err = b.repo.GetObjectIdsForString(v); err != nil {
@@ -410,6 +415,7 @@ func (b *Builder) parseOneFromTokens(
 
 LOOP:
 	for i, el := range tokens {
+		// TODO refactor into separate functions
 		if len(el) == 1 && query_spec.IsMatcherOperator([]rune(el)[0]) {
 			op := el[0]
 			switch op {

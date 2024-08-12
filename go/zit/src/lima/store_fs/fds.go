@@ -67,6 +67,20 @@ func (ef *FDSet) LatestModTime() thyme.Time {
 	}
 }
 
+func (dst *FDSet) Reset() {
+	dst.State = 0
+	dst.ObjectId.Reset()
+	dst.Object.Reset()
+	dst.Blob.Reset()
+	dst.Conflict.Reset()
+
+	if dst.MutableSetLike == nil {
+		dst.MutableSetLike = collections_value.MakeMutableValueSet[*fd.FD](nil)
+	} else {
+		dst.MutableSetLike.Reset()
+	}
+}
+
 func (dst *FDSet) ResetWith(src *FDSet) {
 	dst.State = src.State
 	dst.ObjectId.ResetWith(&src.ObjectId)

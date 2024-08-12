@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
@@ -19,9 +20,9 @@ type ZettelFromExternalBlob struct {
 	*env.Env
 	sku.Proto
 	// TODO switch to using ObjekteOptions
-	Filter script_value.ScriptValue
-	Delete bool
-	Dedupe bool
+	Filter     script_value.ScriptValue
+	Delete     bool
+	AllowDupes bool
 }
 
 func (c ZettelFromExternalBlob) Run(
@@ -37,9 +38,12 @@ func (c ZettelFromExternalBlob) Run(
 	results = sku.MakeTransactedMutableSet()
 	toDelete := fd.MakeMutableSet()
 
+	// TODO consolidate dupes
+
 	if err = c.GetStore().QueryCheckedOut(
 		qg,
 		func(col sku.CheckedOutLike) (err error) {
+			// TODO support other repos
 			cofs := col.(*store_fs.CheckedOut)
 			z := col.GetSkuExternalLike().GetSku()
 
@@ -47,11 +51,20 @@ func (c ZettelFromExternalBlob) Run(
 				return
 			}
 
-			desc := cofs.External.FDs.Blob.FileNameSansExt()
+			sorted := iter.ElementsSorted(
+				cofs.External.FDs.MutableSetLike,
+				func(a, b *fd.FD) bool {
+					return a.GetPath() < b.GetPath()
+				},
+			)
 
-			if err = z.Metadata.Description.Set(desc); err != nil {
-				err = errors.Wrap(err)
-				return
+			for _, f := range sorted {
+				desc := f.FileNameSansExt()
+
+				if err = z.Metadata.Description.Set(desc); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 
 			z.ObjectId.Reset()

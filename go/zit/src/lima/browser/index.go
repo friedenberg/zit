@@ -27,7 +27,7 @@ func (c *Store) initializeIndex() (err error) {
 			var u *url.URL
 
 			if u, err = c.getUrl(sk); err != nil {
-				err = errors.Wrap(err)
+				err = nil
 				return
 			}
 
