@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
+	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -80,7 +81,7 @@ func (s *Store) QueryCheckedOut(
 		// })
 
 		wg.Do(func() error {
-			return s.QueryBlobs(qg, aco, f)
+			return s.QueryUntracked(qg, aco, f)
 		})
 	}
 
@@ -92,49 +93,79 @@ func (s *Store) QueryCheckedOut(
 	return
 }
 
-func (s *Store) QueryBlobs(
+func (s *Store) QueryUntracked(
 	qg *query.Group,
 	aco interfaces.FuncIter[*FDSet],
 	f func(sku.CheckedOutLike) error,
 ) (err error) {
-	allRecognized := make([]*FDSet, 0)
+	allRecognizedBlobs := make([]*FDSet, 0)
+	allRecognizedObjects := make([]*FDSet, 0)
+
+	addRecognizedIfNecessary := func(
+		sk *sku.Transacted,
+		shaBlob *sha.Sha,
+		shaCache map[sha.Bytes]interfaces.MutableSetLike[*FDSet],
+		allRecognized *[]*FDSet,
+		fdSetToFD func(*FDSet) *fd.FD,
+	) (err error) {
+		if shaBlob.IsNull() {
+			return
+		}
+
+		key := shaBlob.GetBytes()
+		recognized, ok := shaCache[key]
+
+		if !ok {
+			return
+		}
+
+		recognizedFDS := &FDSet{
+			State:          external_state.Recognized,
+			MutableSetLike: collections_value.MakeMutableValueSet[*fd.FD](nil),
+		}
+
+		recognizedFDS.ObjectId.ResetWith(&sk.ObjectId)
+
+		if err = recognized.Each(
+			func(fds *FDSet) (err error) {
+				fds.State = external_state.Recognized
+				recognizedFDS.Add(fdSetToFD(fds).Clone())
+				return
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		*allRecognized = append(*allRecognized, recognizedFDS)
+
+		return
+	}
 
 	if err = s.externalStoreInfo.FuncPrimitiveQuery(
-		// TODO make permissive all history query group
 		nil,
 		func(sk *sku.Transacted) (err error) {
-			shaBlob := sk.Metadata.Blob
-
-			if shaBlob.IsNull() {
-				return
-			}
-
-			key := shaBlob.GetBytes()
-			recognized, ok := s.shasToBlobFDs[key]
-
-			if !ok {
-				return
-			}
-
-			recognizedFDS := &FDSet{
-				State:          external_state.Recognized,
-				MutableSetLike: collections_value.MakeMutableValueSet[*fd.FD](nil),
-			}
-
-			recognizedFDS.ObjectId.ResetWith(&sk.ObjectId)
-
-			if err = recognized.Each(
-				func(fds *FDSet) (err error) {
-					fds.State = external_state.Recognized
-					recognizedFDS.Add(fds.Blob.Clone())
-					return
-				},
+			if err = addRecognizedIfNecessary(
+				sk,
+				&sk.Metadata.Blob,
+				s.shasToBlobFDs,
+				&allRecognizedBlobs,
+				func(fds *FDSet) *fd.FD { return &fds.Blob },
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			allRecognized = append(allRecognized, recognizedFDS)
+			if err = addRecognizedIfNecessary(
+				sk,
+				&sk.Metadata.SelfMetadataWithoutTai,
+				s.shasToObjectFDs,
+				&allRecognizedObjects,
+				func(fds *FDSet) *fd.FD { return &fds.Object },
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 
 			return
 		},
@@ -148,40 +179,81 @@ func (s *Store) QueryBlobs(
 		return
 	}
 
-	blobs := make([]*FDSet, 0, s.dirFDs.blobs.Len())
+	{
+		blobs := make([]*FDSet, 0, s.dirFDs.blobs.Len())
 
-	if err = s.dirFDs.blobs.Each(
-		func(fds *FDSet) (err error) {
-			blobs = append(blobs, fds)
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	sort.Slice(
-		blobs,
-		func(i, j int) bool {
-			return blobs[i].ObjectId.String() < blobs[j].ObjectId.String()
-		},
-	)
-
-	for _, fds := range blobs {
-		if fds.State == external_state.Recognized {
-			continue
-		}
-
-		if err = aco(fds); err != nil {
+		if err = s.dirFDs.blobs.Each(
+			func(fds *FDSet) (err error) {
+				blobs = append(blobs, fds)
+				return
+			},
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+
+		sort.Slice(
+			blobs,
+			func(i, j int) bool {
+				return blobs[i].ObjectId.String() < blobs[j].ObjectId.String()
+			},
+		)
+
+		for _, fds := range blobs {
+			if fds.State == external_state.Recognized {
+				continue
+			}
+
+			if err = aco(fds); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+		for _, fds := range allRecognizedBlobs {
+			if err = aco(fds); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
 	}
 
-	for _, fds := range allRecognized {
-		if err = aco(fds); err != nil {
+	if false {
+		objects := make([]*FDSet, 0, s.dirFDs.objects.Len())
+
+		if err = s.dirFDs.objects.Each(
+			func(fds *FDSet) (err error) {
+				objects = append(objects, fds)
+				return
+			},
+		); err != nil {
 			err = errors.Wrap(err)
 			return
+		}
+
+		sort.Slice(
+			objects,
+			func(i, j int) bool {
+				return objects[i].ObjectId.String() < objects[j].ObjectId.String()
+			},
+		)
+
+		for _, fds := range objects {
+			if fds.State == external_state.Recognized {
+				continue
+			}
+
+			if err = aco(fds); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+		for _, fds := range allRecognizedObjects {
+			if err = aco(fds); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 	}
 
