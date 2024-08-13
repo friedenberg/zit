@@ -472,10 +472,14 @@ func (d *dirFDs) addOneObject(
 	objectIdString string,
 	fds *FDSet,
 ) (err error) {
-	if err = fds.ObjectId.SetWithGenre(
-		objectIdString,
-		fds.GetGenre(),
-	); err != nil {
+	g := fds.GetGenre()
+	if g == genres.Zettel {
+		err = fds.ObjectId.SetWithGenre(fd.ZettelId(objectIdString), g)
+	} else {
+		err = fds.ObjectId.SetWithGenre(objectIdString, g)
+	}
+
+	if err != nil {
 		fds.ObjectId.SetGenre(fds.GetGenre())
 
 		if err = fds.ObjectId.SetRaw(objectIdString); err != nil {

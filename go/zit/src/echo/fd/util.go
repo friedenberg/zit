@@ -1,6 +1,7 @@
 package fd
 
 import (
+	"fmt"
 	"path"
 	"path/filepath"
 	"strings"
@@ -34,4 +35,8 @@ func FileNameSansExtRelTo(p, d string) (string, error) {
 
 func DirBaseOnly(p string) string {
 	return filepath.Base(filepath.Dir(p))
+}
+
+func ZettelId(p string) string {
+	return fmt.Sprintf("%s/%s", DirBaseOnly(p), FileNameSansExt(p))
 }
