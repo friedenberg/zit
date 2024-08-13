@@ -48,7 +48,7 @@ func (c Show) DefaultGenres() ids.Genre {
 
 func (c Show) RunWithQuery(
 	u *env.Env,
-	eqwk *query.Group,
+	qg *query.Group,
 ) (err error) {
 	var f interfaces.FuncIter[*sku.Transacted]
 
@@ -58,7 +58,7 @@ func (c Show) RunWithQuery(
 	}
 
 	if err = u.GetStore().QueryWithKasten(
-		eqwk,
+		qg,
 		iter.MakeSyncSerializer(f),
 	); err != nil {
 		err = errors.Wrap(err)

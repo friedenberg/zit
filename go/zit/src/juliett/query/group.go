@@ -168,6 +168,11 @@ func (qg *Group) AddExactObjectId(
 	}
 
 	q := b.makeQuery()
+
+	if k.External {
+		q.Sigil.Add(ids.SigilExternal)
+	}
+
 	q.Sigil.Add(ids.SigilLatest)
 	q.ObjectIds[k.GetObjectId().String()] = k
 	q.Genre.Add(genres.Must(k))

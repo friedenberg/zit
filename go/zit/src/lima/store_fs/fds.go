@@ -39,8 +39,9 @@ func (ef *FDSet) GetExternalObjectId() *ids.ObjectId {
 
 func (ef *FDSet) Debug() string {
 	return fmt.Sprintf(
-		"State: %q, ObjectId: %q, Object: %q, Blob: %q, Conflict: %q, All: %q",
+		"State: %q, Genre: %q, ObjectId: %q, Object: %q, Blob: %q, Conflict: %q, All: %q",
 		ef.State,
+		ef.GetGenre(),
 		&ef.ObjectId,
 		&ef.Object,
 		&ef.Blob,
