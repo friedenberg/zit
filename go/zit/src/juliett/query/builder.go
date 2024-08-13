@@ -30,7 +30,6 @@ func MakeBuilder(
 		object_probe_index:         object_probe_index,
 		luaVMPoolBuilder:           luaVMPoolBuilder,
 		virtualEtikettenBeforeInit: make(map[string]string),
-		virtualEtiketten:           make(map[string]Lua),
 		repoGetter:                 repoGetter,
 	}
 
@@ -45,19 +44,47 @@ type Builder struct {
 	pinnedObjectIds            []ObjectId
 	repoGetter                 sku.ExternalStoreForQueryGetter
 	repo                       sku.ExternalStoreForQuery
-	cwdFilterEnabled           bool
+	virtualEtikettenBeforeInit map[string]string
 	fileExtensionGetter        interfaces.FileExtensionGetter
 	expanders                  ids.Abbr
 	hidden                     sku.Query
 	defaultGenres              ids.Genre
 	defaultSigil               ids.Sigil
 	permittedSigil             ids.Sigil
-	virtualEtikettenBeforeInit map[string]string
-	virtualEtiketten           map[string]Lua
 	doNotMatchEmpty            bool
 	debug                      bool
 	requireNonEmptyQuery       bool
-	eqo                        sku.ExternalQueryOptions
+}
+
+type builderState struct {
+	builder      *Builder
+	qg           *Group
+	latentErrors errors.Multi
+
+	luaVMPoolBuilder *lua.VMPoolBuilder
+	pinnedObjectIds  []ObjectId
+	repo             sku.ExternalStoreForQuery
+	virtualEtiketten map[string]Lua
+	eqo              sku.ExternalQueryOptions
+}
+
+func (b *Builder) makeState() *builderState {
+	state := &builderState{
+		builder:          b,
+		latentErrors:     errors.MakeMulti(),
+		virtualEtiketten: make(map[string]Lua),
+	}
+
+	if b.luaVMPoolBuilder != nil {
+		state.luaVMPoolBuilder = b.luaVMPoolBuilder.Clone()
+	}
+
+	state.qg = state.makeGroup()
+
+	state.pinnedObjectIds = make([]ObjectId, len(b.pinnedObjectIds))
+	copy(state.pinnedObjectIds, b.pinnedObjectIds)
+
+	return state
 }
 
 func (b *Builder) WithPermittedSigil(s ids.Sigil) *Builder {
@@ -67,11 +94,6 @@ func (b *Builder) WithPermittedSigil(s ids.Sigil) *Builder {
 
 func (b *Builder) WithDoNotMatchEmpty() *Builder {
 	b.doNotMatchEmpty = true
-	return b
-}
-
-func (b *Builder) WithCwdFilterEnabled() *Builder {
-	b.cwdFilterEnabled = true
 	return b
 }
 
@@ -197,41 +219,53 @@ func (b *Builder) BuildQueryGroupWithRepoId(
 	eqo sku.ExternalQueryOptions,
 	vs ...string,
 ) (qg *Group, err error) {
+	state := b.makeState()
+
 	ok := false
-	b.eqo = eqo
-	b.repo, ok = b.repoGetter.GetExternalStoreForQuery(k)
+	state.eqo = eqo
+	state.repo, ok = b.repoGetter.GetExternalStoreForQuery(k)
+
+	state.qg.RepoId = k
+	state.qg.ExternalQueryOptions = eqo
 
 	if !ok {
 		err = errors.Errorf("kasten not found: %q", k)
 		return
 	}
 
-	if qg, err = b.BuildQueryGroup(vs...); err != nil {
+	if err = b.build(state, vs...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	qg.RepoId = k
-	qg.ExternalQueryOptions = eqo
+	qg = state.qg
 
 	return
 }
 
 func (b *Builder) BuildQueryGroup(vs ...string) (qg *Group, err error) {
-	if err = b.realizeVirtualTags(); err != nil {
+	state := b.makeState()
+
+	if err = b.build(state, vs...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
+	qg = state.qg
+
+	return
+}
+
+func (b *Builder) build(state *builderState, vs ...string) (err error) {
 	var latent errors.Multi
 
-	if qg, err, latent = b.build(vs...); err != nil {
+	if err, latent = state.build(vs...); err != nil {
 		latent.Add(errors.Wrapf(err, "Query: %q", vs))
 		err = latent
 		return
 	}
 
-	ui.Log().Print(qg.StringDebug())
+	ui.Log().Print(state.qg.StringDebug())
 
 	return
 }
@@ -243,13 +277,26 @@ func (b *Builder) BuildQueryGroup(vs ...string) (qg *Group, err error) {
 //  |____/ \__,_|_|_|\__,_|_|_| |_|\__, |
 //                                 |___/
 
-func (b *Builder) build(
+func (b *builderState) makeGroup() *Group {
+	return &Group{
+		Hidden:            b.builder.hidden,
+		OptimizedQueries:  make(map[genres.Genre]*Query),
+		UserQueries:       make(map[ids.Genre]*Query),
+		ExternalObjectIds: make(map[string]ObjectId),
+		Types:             ids.MakeMutableTypeSet(),
+	}
+}
+
+func (b *builderState) build(
 	vs ...string,
-) (qg *Group, err error, latent errors.Multi) {
+) (err error, latent errors.Multi) {
+	if err = b.realizeVirtualTags(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	em := errors.MakeMulti()
 	latent = em
-
-	qg = MakeGroup(b)
 
 	var remaining []string
 
@@ -258,7 +305,7 @@ func (b *Builder) build(
 	} else {
 		for _, v := range vs {
 			if v == "." {
-				qg.dotOperatorActive = true
+				b.qg.dotOperatorActive = true
 				remaining = append(remaining, v)
 			}
 
@@ -292,24 +339,21 @@ func (b *Builder) build(
 		return
 	}
 
-	if err = b.buildManyFromTokens(qg, tokens...); err != nil {
+	if err = b.buildManyFromTokens(tokens...); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	for _, k := range b.pinnedObjectIds {
-		if err = qg.AddExactObjectId(
-			b,
-			k,
-		); err != nil {
+		if err = b.qg.addExactObjectId(b, k); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	b.addDefaultsIfNecessary(qg)
+	b.addDefaultsIfNecessary()
 
-	if err = qg.Reduce(b); err != nil {
+	if err = b.qg.Reduce(b.builder); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -317,8 +361,8 @@ func (b *Builder) build(
 	return
 }
 
-func (b *Builder) realizeVirtualTags() (err error) {
-	for k, v := range b.virtualEtikettenBeforeInit {
+func (b *builderState) realizeVirtualTags() (err error) {
+	for k, v := range b.builder.virtualEtikettenBeforeInit {
 		var vmp *lua.VMPool
 
 		lb := b.luaVMPoolBuilder.Clone().WithScript(v)
@@ -338,12 +382,11 @@ func (b *Builder) realizeVirtualTags() (err error) {
 	return
 }
 
-func (b *Builder) buildManyFromTokens(
-	qg *Group,
+func (b *builderState) buildManyFromTokens(
 	tokens ...string,
 ) (err error) {
 	for len(tokens) > 0 {
-		if tokens, err = b.parseOneFromTokens(qg, tokens...); err != nil {
+		if tokens, err = b.parseOneFromTokens(tokens...); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -352,44 +395,90 @@ func (b *Builder) buildManyFromTokens(
 	return
 }
 
-func (b *Builder) addDefaultsIfNecessary(qg *Group) {
-	if b.defaultGenres.IsEmpty() || !qg.IsEmpty() {
+func (b *builderState) addDefaultsIfNecessary() {
+	// defer b.addDotOperatorIfNecessary()
+
+	if b.builder.defaultGenres.IsEmpty() || !b.qg.IsEmpty() {
 		return
 	}
 
-	if b.requireNonEmptyQuery && qg.IsEmpty() {
+	if b.builder.requireNonEmptyQuery && b.qg.IsEmpty() {
 		return
 	}
 
 	g := ids.MakeGenre()
-	dq, ok := qg.UserQueries[g]
+	dq, ok := b.qg.UserQueries[g]
 
 	if ok {
-		delete(qg.UserQueries, g)
+		delete(b.qg.UserQueries, g)
 	} else {
-		dq = &Query{
-			ObjectIds: make(map[string]ObjectId),
+		dq = b.makeQuery()
+	}
+
+	dq.Genre = b.builder.defaultGenres
+
+	if b.builder.defaultSigil.IsEmpty() {
+		dq.Sigil = ids.SigilLatest
+	} else {
+		dq.Sigil = b.builder.defaultSigil
+	}
+
+	b.qg.UserQueries[b.builder.defaultGenres] = dq
+}
+
+func (b *builderState) addDotOperatorIfNecessary() {
+	if b.qg.dotOperatorActive {
+		return
+	}
+
+	permitted := false
+
+	for _, q := range b.qg.UserQueries {
+		if q.Sigil.IncludesExternal() {
+			permitted = true
+			break
 		}
 	}
 
-	dq.Genre = b.defaultGenres
-
-	if b.defaultSigil.IsEmpty() {
-		dq.Sigil = ids.SigilLatest
-	} else {
-		dq.Sigil = b.defaultSigil
+	if !permitted {
+		return
 	}
 
-	qg.UserQueries[b.defaultGenres] = dq
+	b.qg.dotOperatorActive = true
+
+	var k []sku.ExternalObjectId
+	var err error
+
+	if k, err = b.repo.GetObjectIdsForString("."); err != nil {
+		b.latentErrors.Add(err)
+		err = nil
+	}
+
+	for _, k := range k {
+		// b.defaultGenres.Add(genres.Must(k.GetObjectId().GetGenre()))
+		if err = b.qg.addExactObjectId(
+			b,
+			ObjectId{
+				ObjectIdLike: k,
+				External:     true,
+			},
+		); err != nil {
+			b.latentErrors.Add(err)
+			err = nil
+		}
+	}
 }
 
-func (b *Builder) makeQuery() *Query {
+func (b *builderState) makeQuery() *Query {
 	return &Query{
 		ObjectIds: make(map[string]ObjectId),
 	}
 }
 
-func (b *Builder) makeExp(negated, exact bool, children ...sku.Query) *Exp {
+func (b *builderState) makeExp(
+	negated, exact bool,
+	children ...sku.Query,
+) *Exp {
 	return &Exp{
 		// MatchOnEmpty: !b.doNotMatchEmpty,
 		Negated:  negated,
@@ -398,8 +487,7 @@ func (b *Builder) makeExp(negated, exact bool, children ...sku.Query) *Exp {
 	}
 }
 
-func (b *Builder) parseOneFromTokens(
-	qg *Group,
+func (b *builderState) parseOneFromTokens(
 	tokens ...string,
 ) (remainingTokens []string, err error) {
 	type stackEl interface {
@@ -453,7 +541,10 @@ LOOP:
 					return
 				}
 
-				if remainingTokens, err = b.parseSigilsAndGenres(q, tokens[i:]...); err != nil {
+				if remainingTokens, err = b.parseSigilsAndGenres(
+					q,
+					tokens[i:]...,
+				); err != nil {
 					err = errors.Wrapf(err, "%s", tokens[i:])
 					return
 				}
@@ -470,7 +561,7 @@ LOOP:
 				return
 			}
 
-			if err = k.Reduce(b); err != nil {
+			if err = k.Reduce(b.builder); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -505,7 +596,7 @@ LOOP:
 				}
 
 				if !isNegated {
-					if err = qg.Types.Add(t); err != nil {
+					if err = b.qg.Types.Add(t); err != nil {
 						err = errors.Wrap(err)
 						return
 					}
@@ -524,15 +615,15 @@ LOOP:
 		return
 	}
 
-	if q.Genre.IsEmpty() && !b.requireNonEmptyQuery {
-		q.Genre = b.defaultGenres
+	if q.Genre.IsEmpty() && !b.builder.requireNonEmptyQuery {
+		q.Genre = b.builder.defaultGenres
 	}
 
 	if q.Sigil.IsEmpty() {
-		q.Sigil = b.defaultSigil
+		q.Sigil = b.builder.defaultSigil
 	}
 
-	if err = qg.Add(q); err != nil {
+	if err = b.qg.Add(q); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -540,19 +631,19 @@ LOOP:
 	return
 }
 
-func (b *Builder) makeTagOrLuaTag(
+func (b *builderState) makeTagOrLuaTag(
 	k *ObjectId,
 ) (exp sku.Query, err error) {
 	exp = k
 
-	if b.object_probe_index == nil || b.blob_store == nil {
+	if b.builder.object_probe_index == nil || b.builder.blob_store == nil {
 		return
 	}
 
 	sk := sku.GetTransactedPool().Get()
 	defer sku.GetTransactedPool().Put(sk)
 
-	if err = b.object_probe_index.ReadOneObjectId(
+	if err = b.builder.object_probe_index.ReadOneObjectId(
 		k.String(),
 		sk,
 	); err != nil {
@@ -571,7 +662,7 @@ func (b *Builder) makeTagOrLuaTag(
 	if sk.GetType().String() == "lua" {
 		var ar sha.ReadCloser
 
-		if ar, err = b.fs_home.BlobReader(sk.GetBlobSha()); err != nil {
+		if ar, err = b.builder.fs_home.BlobReader(sk.GetBlobSha()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -582,7 +673,7 @@ func (b *Builder) makeTagOrLuaTag(
 	} else {
 		var blob *tag_blobs.V1
 
-		if blob, err = b.blob_store.GetTagV1().GetBlob(
+		if blob, err = b.builder.blob_store.GetTagV1().GetBlob(
 			sk.GetBlobSha(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -612,7 +703,7 @@ func (b *Builder) makeTagOrLuaTag(
 	return
 }
 
-func (b *Builder) makeTagExp(k *ObjectId) (exp sku.Query, err error) {
+func (b *builderState) makeTagExp(k *ObjectId) (exp sku.Query, err error) {
 	// TODO use b.blobs to read tag blob and find filter if necessary
 	var e ids.Tag
 
@@ -629,7 +720,7 @@ func (b *Builder) makeTagExp(k *ObjectId) (exp sku.Query, err error) {
 	return
 }
 
-func (b *Builder) parseSigilsAndGenres(
+func (b *builderState) parseSigilsAndGenres(
 	q *Query,
 	tokens ...string,
 ) (remainingTokens []string, err error) {
@@ -655,7 +746,7 @@ LOOP:
 				return
 			}
 
-			if !b.permittedSigil.IsEmpty() && !b.permittedSigil.ContainsOneOf(s) {
+			if !b.builder.permittedSigil.IsEmpty() && !b.builder.permittedSigil.ContainsOneOf(s) {
 				err = errors.Errorf("cannot contain sigil %s", s)
 				return
 			}

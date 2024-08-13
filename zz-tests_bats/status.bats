@@ -261,7 +261,7 @@ function status_complex_zettel_etikett_negation { # @test
 }
 
 function status_simple_all { # @test
-	run_zit status .
+	run_zit status
 	assert_success
 	assert_output_unsorted - <<-EOM
 		             same [md.typ@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]

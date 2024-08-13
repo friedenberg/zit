@@ -155,7 +155,7 @@ func TestQuery(t1 *testing.T) {
 					tc.defaultGattung,
 				)
 
-				m, err, _ := sut.build(tc.inputs...)
+				m, err := sut.BuildQueryGroup(tc.inputs...)
 
 				t.AssertNoError(err)
 				actual := m.String()

@@ -12,18 +12,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func MakeGroup(
-	b *Builder,
-) *Group {
-	return &Group{
-		Hidden:            b.hidden,
-		OptimizedQueries:  make(map[genres.Genre]*Query),
-		UserQueries:       make(map[ids.Genre]*Query),
-		ExternalObjectIds: make(map[string]ObjectId),
-		Types:             ids.MakeMutableTypeSet(),
-	}
-}
-
 type Group struct {
 	Hidden            sku.Query
 	OptimizedQueries  map[genres.Genre]*Query
@@ -158,8 +146,8 @@ func (qg *Group) Reduce(b *Builder) (err error) {
 	return
 }
 
-func (qg *Group) AddExactObjectId(
-	b *Builder,
+func (qg *Group) addExactObjectId(
+	b *builderState,
 	k ObjectId,
 ) (err error) {
 	if k.ObjectIdLike == nil {

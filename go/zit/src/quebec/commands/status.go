@@ -31,7 +31,8 @@ func (c Status) DefaultGenres() ids.Genre {
 func (c Status) ModifyBuilder(
 	b *query.Builder,
 ) {
-	b.WithHidden(nil)
+	b.WithHidden(nil).
+		WithDefaultSigil(ids.SigilExternal)
 }
 
 func (c Status) RunWithQuery(

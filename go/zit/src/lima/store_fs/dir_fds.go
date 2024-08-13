@@ -192,17 +192,6 @@ func (d *dirFDs) addFD(
 //  |_|   |_|  \___/ \___\___||___/___/_|_| |_|\__, |
 //                                             |___/
 
-func (d *dirFDs) processAll(cache map[string]*FDSet) (err error) {
-	for objectIdString, fds := range cache {
-		if _, err = d.processFDSet(objectIdString, fds); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
 func (d *dirFDs) processDir(p string) (results []*FDSet, err error) {
 	cache := make(map[string]*FDSet)
 

@@ -3,6 +3,10 @@
 "   finish
 " endif
 
+if $BIN_ZIT == ""
+  let BIN_ZIT = "zit"
+endif
+
 let zettel = expand("%")
 
 let g:markdown_syntax_conceal = 0
