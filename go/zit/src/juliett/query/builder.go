@@ -50,8 +50,8 @@ type Builder struct {
 	requireNonEmptyQuery       bool
 }
 
-func (b *Builder) makeState() *builderState {
-	state := &builderState{
+func (b *Builder) makeState() *buildState {
+	state := &buildState{
 		builder:          b,
 		latentErrors:     errors.MakeMulti(),
 		virtualEtiketten: make(map[string]Lua),
@@ -238,7 +238,7 @@ func (b *Builder) BuildQueryGroup(vs ...string) (qg *Group, err error) {
 	return
 }
 
-func (b *Builder) build(state *builderState, vs ...string) (err error) {
+func (b *Builder) build(state *buildState, vs ...string) (err error) {
 	var latent errors.Multi
 
 	if err, latent = state.build(vs...); err != nil {

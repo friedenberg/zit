@@ -50,7 +50,7 @@ func (es *Store) QueryCheckedOut(
 	esqco, ok := es.StoreLike.(QueryCheckedOut)
 
 	if !ok {
-		err = errors.Errorf("store does not support %T", esqco)
+		err = errors.Errorf("store does not support %T", &esqco)
 		return
 	}
 
@@ -74,7 +74,7 @@ func (es *Store) ApplyDotOperator() (err error) {
 	esado, ok := es.StoreLike.(sku.ExternalStoreApplyDotOperator)
 
 	if !ok {
-		err = errors.Errorf("store does not support %T", esado)
+		err = errors.Errorf("store does not support %T", &esado)
 		return
 	}
 
@@ -99,7 +99,7 @@ func (es *Store) ReadExternalLikeFromObjectId(
 	esrtfoi, ok := es.StoreLike.(sku.ExternalStoreReadExternalLikeFromObjectId)
 
 	if !ok {
-		err = errors.Errorf("store does not support %T", esrtfoi)
+		err = errors.Errorf("store does not support %T", &esrtfoi)
 		return
 	}
 
@@ -127,7 +127,7 @@ func (es *Store) CheckoutOne(
 	escoo, ok := es.StoreLike.(CheckoutOne)
 
 	if !ok {
-		err = errors.Errorf("store does not support %T", escoo)
+		err = errors.Errorf("store does not support %T", &escoo)
 		return
 	}
 
@@ -151,7 +151,7 @@ func (es *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
 	esdc, ok := es.StoreLike.(DeleteExternal)
 
 	if !ok {
-		err = errors.Errorf("store does not support DeleteCheckout")
+		err = errors.Errorf("store does not support %T", &esdc)
 		return
 	}
 
@@ -172,7 +172,7 @@ func (es *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 	esut, ok := es.StoreLike.(UpdateTransacted)
 
 	if !ok {
-		err = errors.Errorf("store does not support UpdateTransacted")
+		err = errors.Errorf("store does not support %T", &esut)
 		return
 	}
 
@@ -216,7 +216,7 @@ func (es *Store) Open(
 	eso, ok := es.StoreLike.(Open)
 
 	if !ok {
-		err = errors.Errorf("store does not support UpdateTransacted")
+		err = errors.Errorf("store does not support %T", &eso)
 		return
 	}
 

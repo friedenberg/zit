@@ -83,6 +83,7 @@ func (e *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
 		return
 	}
 
+	// TODO only apply dot operator when necessary
 	if err = e.ExternalStore.ApplyDotOperator(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -111,15 +112,11 @@ func (e *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
 func (e *Executor) ExecuteCheckedOutLike(
 	out interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
+	// TODO only apply dot operator when necessary
 	if err = e.ExternalStore.ApplyDotOperator(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	// if !e.dotOperatorActive {
-	// 	err = errors.Errorf("checked out queries must include dot operator")
-	// 	return
-	// }
 
 	if err = e.executeExternalQueryCheckedOutLike(out); err != nil {
 		err = errors.Wrap(err)
@@ -132,6 +129,7 @@ func (e *Executor) ExecuteCheckedOutLike(
 func (e *Executor) ExecuteExternalLike(
 	out interfaces.FuncIter[sku.ExternalLike],
 ) (err error) {
+	// TODO only apply dot operator when necessary
 	if err = e.ExternalStore.ApplyDotOperator(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -155,6 +153,7 @@ func (e *Executor) ExecuteExternalLike(
 func (e *Executor) ExecuteTransacted(
 	out interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
+	// TODO only apply dot operator when necessary
 	if err = e.ExternalStore.ApplyDotOperator(); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
-type builderState struct {
+type buildState struct {
 	builder      *Builder
 	qg           *Group
 	latentErrors errors.Multi
@@ -23,9 +23,11 @@ type builderState struct {
 	repo             sku.ExternalStoreForQuery
 	virtualEtiketten map[string]Lua
 	eqo              sku.ExternalQueryOptions
+
+	externalStoreAcceptedQueryComponent bool
 }
 
-func (b *builderState) makeGroup() *Group {
+func (b *buildState) makeGroup() *Group {
 	return &Group{
 		Hidden:            b.builder.hidden,
 		OptimizedQueries:  make(map[genres.Genre]*Query),
@@ -35,7 +37,7 @@ func (b *builderState) makeGroup() *Group {
 	}
 }
 
-func (b *builderState) build(
+func (b *buildState) build(
 	vs ...string,
 ) (err error, latent errors.Multi) {
 	if err = b.realizeVirtualTags(); err != nil {
@@ -65,6 +67,8 @@ func (b *builderState) build(
 				remaining = append(remaining, v)
 				continue
 			}
+
+			b.externalStoreAcceptedQueryComponent = true
 
 			for _, k := range k {
 				b.pinnedObjectIds = append(
@@ -107,7 +111,7 @@ func (b *builderState) build(
 	return
 }
 
-func (b *builderState) realizeVirtualTags() (err error) {
+func (b *buildState) realizeVirtualTags() (err error) {
 	for k, v := range b.builder.virtualEtikettenBeforeInit {
 		var vmp *lua.VMPool
 
@@ -128,7 +132,7 @@ func (b *builderState) realizeVirtualTags() (err error) {
 	return
 }
 
-func (b *builderState) buildManyFromTokens(
+func (b *buildState) buildManyFromTokens(
 	tokens ...string,
 ) (err error) {
 	for len(tokens) > 0 {
@@ -141,7 +145,7 @@ func (b *builderState) buildManyFromTokens(
 	return
 }
 
-func (b *builderState) addDefaultsIfNecessary() {
+func (b *buildState) addDefaultsIfNecessary() {
 	if b.builder.defaultGenres.IsEmpty() || !b.qg.IsEmpty() {
 		return
 	}
@@ -149,6 +153,12 @@ func (b *builderState) addDefaultsIfNecessary() {
 	if b.builder.requireNonEmptyQuery && b.qg.IsEmpty() {
 		return
 	}
+
+	if b.externalStoreAcceptedQueryComponent {
+		return
+	}
+
+  b.qg.matchOnEmpty = true
 
 	g := ids.MakeGenre()
 	dq, ok := b.qg.UserQueries[g]
@@ -170,13 +180,13 @@ func (b *builderState) addDefaultsIfNecessary() {
 	b.qg.UserQueries[b.builder.defaultGenres] = dq
 }
 
-func (b *builderState) makeQuery() *Query {
+func (b *buildState) makeQuery() *Query {
 	return &Query{
 		ObjectIds: make(map[string]ObjectId),
 	}
 }
 
-func (b *builderState) makeExp(
+func (b *buildState) makeExp(
 	negated, exact bool,
 	children ...sku.Query,
 ) *Exp {
@@ -188,7 +198,7 @@ func (b *builderState) makeExp(
 	}
 }
 
-func (b *builderState) parseOneFromTokens(
+func (b *buildState) parseOneFromTokens(
 	tokens ...string,
 ) (remainingTokens []string, err error) {
 	type stackEl interface {
@@ -332,7 +342,7 @@ LOOP:
 	return
 }
 
-func (b *builderState) makeTagOrLuaTag(
+func (b *buildState) makeTagOrLuaTag(
 	k *ObjectId,
 ) (exp sku.Query, err error) {
 	exp = k
@@ -404,7 +414,7 @@ func (b *builderState) makeTagOrLuaTag(
 	return
 }
 
-func (b *builderState) makeTagExp(k *ObjectId) (exp sku.Query, err error) {
+func (b *buildState) makeTagExp(k *ObjectId) (exp sku.Query, err error) {
 	// TODO use b.blobs to read tag blob and find filter if necessary
 	var e ids.Tag
 
@@ -421,7 +431,7 @@ func (b *builderState) makeTagExp(k *ObjectId) (exp sku.Query, err error) {
 	return
 }
 
-func (b *builderState) parseSigilsAndGenres(
+func (b *buildState) parseSigilsAndGenres(
 	q *Query,
 	tokens ...string,
 ) (remainingTokens []string, err error) {

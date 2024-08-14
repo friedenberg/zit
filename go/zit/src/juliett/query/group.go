@@ -20,6 +20,7 @@ type Group struct {
 	Types             ids.TypeMutableSet
 
 	dotOperatorActive bool
+	matchOnEmpty      bool
 
 	sku.ExternalQueryOptions
 }
@@ -151,7 +152,7 @@ func (qg *Group) Reduce(b *Builder) (err error) {
 }
 
 func (qg *Group) addExactObjectId(
-	b *builderState,
+	b *buildState,
 	k ObjectId,
 ) (err error) {
 	if k.ObjectIdLike == nil {
@@ -379,7 +380,7 @@ func (qg *Group) String() string {
 func (qg *Group) ContainsSku(sk *sku.Transacted) (ok bool) {
 	defer sk.Metadata.Cache.QueryPath.PushOnReturn(qg, &ok)
 
-	if len(qg.OptimizedQueries) == 0 {
+	if len(qg.OptimizedQueries) == 0 && qg.matchOnEmpty {
 		ok = true
 		return
 	}
