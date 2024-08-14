@@ -26,7 +26,9 @@ type fdSetWithError struct {
 
 // TODO support globs and ignores
 type dirFDs struct {
-	root string
+	root          string
+	rootProcessed bool
+
 	file_extensions.FileExtensions
 	fs_home           fs_home.Home
 	externalStoreInfo external_store.Info
@@ -243,10 +245,16 @@ func (d *dirFDs) processFD(
 }
 
 func (d *dirFDs) processRootDir() (err error) {
+	if d.rootProcessed {
+		return
+	}
+
 	if _, err = d.processDir(d.root); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	d.rootProcessed = true
 
 	return
 }

@@ -135,6 +135,11 @@ func (fs *Store) String() (out string) {
 }
 
 func (s *Store) GetExternalObjectIds() (ks []sku.ExternalObjectId, err error) {
+	if err = s.dirFDs.processRootDir(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	ks = make([]sku.ExternalObjectId, 0)
 	var l sync.Mutex
 
