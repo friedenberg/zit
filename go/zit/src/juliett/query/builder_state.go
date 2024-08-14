@@ -142,8 +142,6 @@ func (b *builderState) buildManyFromTokens(
 }
 
 func (b *builderState) addDefaultsIfNecessary() {
-	// defer b.addDotOperatorIfNecessary()
-
 	if b.builder.defaultGenres.IsEmpty() || !b.qg.IsEmpty() {
 		return
 	}
@@ -170,49 +168,6 @@ func (b *builderState) addDefaultsIfNecessary() {
 	}
 
 	b.qg.UserQueries[b.builder.defaultGenres] = dq
-}
-
-func (b *builderState) addDotOperatorIfNecessary() {
-	if b.qg.dotOperatorActive {
-		return
-	}
-
-	permitted := false
-
-	for _, q := range b.qg.UserQueries {
-		if q.Sigil.IncludesExternal() {
-			permitted = true
-			break
-		}
-	}
-
-	if !permitted {
-		return
-	}
-
-	b.qg.dotOperatorActive = true
-
-	var k []sku.ExternalObjectId
-	var err error
-
-	if k, err = b.repo.GetObjectIdsForString("."); err != nil {
-		b.latentErrors.Add(err)
-		err = nil
-	}
-
-	for _, k := range k {
-		// b.defaultGenres.Add(genres.Must(k.GetObjectId().GetGenre()))
-		if err = b.qg.addExactObjectId(
-			b,
-			ObjectId{
-				ObjectIdLike: k,
-				External:     true,
-			},
-		); err != nil {
-			b.latentErrors.Add(err)
-			err = nil
-		}
-	}
 }
 
 func (b *builderState) makeQuery() *Query {

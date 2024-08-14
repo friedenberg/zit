@@ -24,6 +24,10 @@ type Group struct {
 	sku.ExternalQueryOptions
 }
 
+func (qg *Group) DotOperatorActive() bool {
+	return qg.dotOperatorActive
+}
+
 func (qg *Group) SetIncludeHistory() {
 	for _, q := range qg.UserQueries {
 		q.Sigil.Add(ids.SigilHistory)

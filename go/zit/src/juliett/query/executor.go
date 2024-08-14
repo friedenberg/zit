@@ -3,7 +3,9 @@ package query
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -16,13 +18,16 @@ type (
 	}
 
 	ExternalStore interface {
+		sku.ExternalStoreApplyDotOperator
 		sku.ExternalStoreUpdateTransacted
+		sku.ExternalStoreReadExternalLikeFromObjectId
 		QueryCheckedOut
 	}
 
 	ExecutionInfo struct {
 		ExternalStore
 		sku.FuncPrimitiveQuery
+		sku.FuncReadOneInto
 	}
 )
 
@@ -34,32 +39,87 @@ type Executor struct {
 
 func MakeExecutor(
 	qg *Group,
-	f sku.FuncPrimitiveQuery,
+	fpq sku.FuncPrimitiveQuery,
+	froi sku.FuncReadOneInto,
 ) Executor {
-	return MakeExecutorWithExternalStore(qg, f, nil)
+	return MakeExecutorWithExternalStore(qg, fpq, froi, nil)
 }
 
 func MakeExecutorWithExternalStore(
 	qg *Group,
-	f sku.FuncPrimitiveQuery,
+	fpq sku.FuncPrimitiveQuery,
+	froi sku.FuncReadOneInto,
 	es ExternalStore,
 ) Executor {
 	return Executor{
 		Group: qg,
 		ExecutionInfo: ExecutionInfo{
-			FuncPrimitiveQuery: f,
+			FuncPrimitiveQuery: fpq,
+			FuncReadOneInto:    froi,
 			ExternalStore:      es,
 		},
 	}
 }
 
+func (e *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
+	var k *ids.ObjectId
+	var s ids.Sigil
+
+	if k, s, err = e.Group.GetExactlyOneObjectId(
+		genres.Zettel,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	sk = sku.GetTransactedPool().Get()
+
+	if err = e.ExecutionInfo.FuncReadOneInto(k, sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if !s.IncludesExternal() {
+		return
+	}
+
+	if err = e.ExternalStore.ApplyDotOperator(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var ze sku.ExternalLike
+
+	if ze, err = e.ExecutionInfo.ReadExternalLikeFromObjectId(
+		sku.CommitOptions{
+			Mode: objekte_mode.ModeUpdateTai,
+		},
+		k,
+		sk,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if ze != nil {
+		sku.TransactedResetter.ResetWith(sk, ze.GetSku())
+	}
+
+	return
+}
+
 func (e *Executor) ExecuteCheckedOutLike(
 	out interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	if !e.dotOperatorActive {
-		err = errors.Errorf("checked out queries must include dot operator")
+	if err = e.ExternalStore.ApplyDotOperator(); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
+
+	// if !e.dotOperatorActive {
+	// 	err = errors.Errorf("checked out queries must include dot operator")
+	// 	return
+	// }
 
 	if err = e.executeExternalQueryCheckedOutLike(out); err != nil {
 		err = errors.Wrap(err)
@@ -72,6 +132,11 @@ func (e *Executor) ExecuteCheckedOutLike(
 func (e *Executor) ExecuteExternalLike(
 	out interfaces.FuncIter[sku.ExternalLike],
 ) (err error) {
+	if err = e.ExternalStore.ApplyDotOperator(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if e.dotOperatorActive {
 		if err = e.executeExternalQueryExternalLike(out); err != nil {
 			err = errors.Wrap(err)
@@ -90,6 +155,11 @@ func (e *Executor) ExecuteExternalLike(
 func (e *Executor) ExecuteTransacted(
 	out interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
+	if err = e.ExternalStore.ApplyDotOperator(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	out1 := func(el sku.ExternalLike) (err error) {
 		sk := el.GetSku()
 

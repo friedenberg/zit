@@ -254,6 +254,15 @@ func (fs *Store) Get(
 func (s *Store) Initialize(esi external_store.Info) (err error) {
 	s.externalStoreInfo = esi
 
+	// if err = s.ApplyDotOperator(); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
+
+	return
+}
+
+func (s *Store) ApplyDotOperator() (err error) {
 	if err = s.dirFDs.processRootDir(); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -118,21 +118,14 @@ func (c *FormatZettel) getSku(
 		return
 	}
 
-	var k *ids.ObjectId
-	var s ids.Sigil
+	var e query.Executor
 
-	if k, s, err = qg.GetExactlyOneObjectId(
-		genres.Zettel,
-	); err != nil {
+	if e, err = u.GetStore().MakeQueryExecutor(qg); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if sk, err = u.GetStore().ReadTransactedFromObjectIdRepoIdSigil(
-		k,
-		c.RepoId,
-		s,
-	); err != nil {
+	if sk, err = e.ExecuteExactlyOne(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

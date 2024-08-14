@@ -28,14 +28,6 @@ type (
 		IncludeRecognized bool
 	}
 
-	ReadTransactedFromObjectId interface {
-		ReadTransactedFromObjectId(
-			o sku.CommitOptions,
-			k1 interfaces.ObjectId,
-			t *sku.Transacted,
-		) (e sku.ExternalLike, err error)
-	}
-
 	CheckoutOne interface {
 		CheckoutOne(
 			options checkout_options.Options,

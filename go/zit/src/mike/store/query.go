@@ -63,6 +63,7 @@ func (s *Store) MakeQueryExecutor(
 	e = query.MakeExecutorWithExternalStore(
 		qg,
 		s.GetStreamIndex().ReadQuery,
+		s.ReadOneInto,
 		es,
 	)
 
@@ -73,18 +74,14 @@ func (s *Store) QueryCheckedOut(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	kid := qg.RepoId.GetRepoIdString()
-	es, ok := s.externalStores[kid]
+	var e query.Executor
 
-	if !ok {
-		err = errors.Errorf("no kasten with id %q", kid)
+	if e, err = s.MakeQueryExecutor(qg); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	if err = es.QueryCheckedOut(
-		qg,
-		f,
-	); err != nil {
+	if err = e.ExecuteCheckedOutLike(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func (s *Store) ReadTransactedFromObjectId(
+func (s *Store) ReadExternalLikeFromObjectId(
 	o sku.CommitOptions,
 	k1 interfaces.ObjectId,
 	t *sku.Transacted,

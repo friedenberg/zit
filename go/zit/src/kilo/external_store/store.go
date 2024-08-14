@@ -70,12 +70,33 @@ func (es *Store) QueryCheckedOut(
 	return
 }
 
-func (es *Store) ReadTransactedFromObjectId(
+func (es *Store) ApplyDotOperator() (err error) {
+	esado, ok := es.StoreLike.(sku.ExternalStoreApplyDotOperator)
+
+	if !ok {
+		err = errors.Errorf("store does not support %T", esado)
+		return
+	}
+
+	if err = es.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = esado.ApplyDotOperator(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (es *Store) ReadExternalLikeFromObjectId(
 	o sku.CommitOptions,
 	k1 interfaces.ObjectId,
 	t *sku.Transacted,
 ) (e sku.ExternalLike, err error) {
-	esrtfoi, ok := es.StoreLike.(ReadTransactedFromObjectId)
+	esrtfoi, ok := es.StoreLike.(sku.ExternalStoreReadExternalLikeFromObjectId)
 
 	if !ok {
 		err = errors.Errorf("store does not support %T", esrtfoi)
@@ -87,7 +108,7 @@ func (es *Store) ReadTransactedFromObjectId(
 		return
 	}
 
-	if e, err = esrtfoi.ReadTransactedFromObjectId(
+	if e, err = esrtfoi.ReadExternalLikeFromObjectId(
 		o,
 		k1,
 		t,

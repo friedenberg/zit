@@ -24,6 +24,18 @@ type (
 		UpdateTransacted(z *Transacted) (err error)
 	}
 
+	ExternalStoreReadExternalLikeFromObjectId interface {
+		ReadExternalLikeFromObjectId(
+			o CommitOptions,
+			k1 interfaces.ObjectId,
+			t *Transacted,
+		) (e ExternalLike, err error)
+	}
+
+	ExternalStoreApplyDotOperator interface {
+		ApplyDotOperator() error
+	}
+
 	ExternalStoreForQuery interface {
 		GetObjectIdsForString(string) ([]ExternalObjectId, error)
 	}
