@@ -18,43 +18,7 @@ import (
 )
 
 func (s *Store) Merge(tm sku.Conflicted) (err error) {
-	if err = tm.MergeTags(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	cofs := tm.CheckedOutLike.(*CheckedOut)
-
-	var leftCO, middleCO, rightCO *CheckedOut
-
-	inlineBlob := tm.IsAllInlineType(s.config)
-
-	mode := checkout_mode.MetadataAndBlob
-
-	if !inlineBlob {
-		mode = checkout_mode.MetadataOnly
-	}
-
-	if leftCO, err = s.checkoutOneForMerge(mode, tm.Left); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if middleCO, err = s.checkoutOneForMerge(mode, tm.Middle); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if rightCO, err = s.checkoutOneForMerge(mode, tm.Right); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	p, mergeResult := s.runDiff3(
-		leftCO.External.FDs.Object,
-		middleCO.External.FDs.Object,
-		rightCO.External.FDs.Object,
-	)
+	p, mergeResult := s.tryMergeIgnoringConflicts(tm)
 
 	var merged FDPair
 
@@ -62,6 +26,8 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 		err = errors.Wrap(err)
 		return
 	}
+
+	cofs := tm.CheckedOutLike.(*CheckedOut)
 
 	if mergeResult != nil {
 		mergeConflict := &ErrMergeConflict{}
@@ -90,6 +56,48 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 		err = errors.Wrap(err)
 		return
 	}
+
+	return
+}
+
+func (s *Store) tryMergeIgnoringConflicts(
+	tm sku.Conflicted,
+) (path string, err error) {
+	if err = tm.MergeTags(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var leftCO, middleCO, rightCO *CheckedOut
+
+	inlineBlob := tm.IsAllInlineType(s.config)
+
+	mode := checkout_mode.MetadataAndBlob
+
+	if !inlineBlob {
+		mode = checkout_mode.MetadataOnly
+	}
+
+	if leftCO, err = s.checkoutOneForMerge(mode, tm.Left); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if middleCO, err = s.checkoutOneForMerge(mode, tm.Middle); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if rightCO, err = s.checkoutOneForMerge(mode, tm.Right); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	path, err = s.runDiff3(
+		leftCO.External.FDs.Object,
+		middleCO.External.FDs.Object,
+		rightCO.External.FDs.Object,
+	)
 
 	return
 }
@@ -206,33 +214,29 @@ func (s *Store) RunMergeTool(
 		return
 	}
 
-	var f *os.File
+	tmpPath, mergeResult := s.tryMergeIgnoringConflicts(tm)
 
-	if f, err = s.fs_home.FileTempLocal(); err != nil {
-		err = errors.Wrap(err)
+	if !errors.Is(mergeResult, &ErrMergeConflict{}) {
+		err = errors.Wrap(mergeResult)
 		return
 	}
 
-	tmpPath := f.Name()
-
-	defer errors.DeferredCloser(&err, f)
+	tool = append(tool,
+		leftCO.External.FDs.Object.GetPath(),
+		middleCO.External.FDs.Object.GetPath(),
+		rightCO.External.FDs.Object.GetPath(),
+		tmpPath,
+	)
 
 	cmd := exec.Command(tool[0], tool[1:]...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	cmd.Env = []string{
-		fmt.Sprintf("LOCAL=%s", leftCO.External.FDs.Object.GetPath()),
-		fmt.Sprintf("BASE=%s", middleCO.External.FDs.Object.GetPath()),
-		fmt.Sprintf("REMOTE=%s", rightCO.External.FDs.Object.GetPath()),
-		fmt.Sprintf("MERGED=%s", tmpPath),
-	}
-
 	ui.Log().Print(cmd.Env)
 
 	if err = cmd.Run(); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Cmd: %q", tool)
 		return
 	}
 
@@ -240,6 +244,15 @@ func (s *Store) RunMergeTool(
 	defer GetExternalPool().Put(e)
 
 	e.ResetWith(&leftCO.External)
+
+	var f *os.File
+
+	if f, err = files.Open(tmpPath); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, f)
 
 	if err = s.ReadOneExternalObjectReader(f, e); err != nil {
 		err = errors.Wrap(err)

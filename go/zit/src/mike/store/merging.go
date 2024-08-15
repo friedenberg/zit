@@ -81,7 +81,7 @@ func (s *Store) Merge(
 func (s *Store) RunMergeTool(
 	tm sku.Conflicted,
 ) (err error) {
-	tool := s.GetKonfig().Cli().ToolOptions.Merge
+	tool := s.GetKonfig().ToolOptions.Merge
 
 	switch tm.GetRepoId().GetRepoIdString() {
 	case "browser":

@@ -145,7 +145,7 @@ func (s *Store) tryPreCommitHooks(
 	var blob *type_blobs.V0
 
 	if blob, err = s.GetBlobStore().GetTypeV0().GetBlob(t.GetBlobSha()); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Type: %q", kinder.GetType())
 		return
 	}
 
@@ -168,6 +168,7 @@ func (s *Store) tryPreCommitHooks(
 			"on_pre_commit",
 		); err != nil {
 			err = errors.Wrapf(err, "Hook: %#v", h)
+			err = errors.Wrapf(err, "Type: %q", kinder.GetType())
 			return
 		}
 	}

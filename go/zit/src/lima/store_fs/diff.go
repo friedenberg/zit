@@ -11,12 +11,12 @@ import (
 
 func (s *Store) runDiff3(left, middle, right fd.FD) (path string, err error) {
 	cmd := exec.Command(
-		"diff3",
-		"--text",
-		"--merge",
-		"--label=left",
-		"--label=middle",
-		"--label=right",
+		"git",
+		"merge-file",
+		"-p",
+		"-L=left",
+		"-L=middle",
+		"-L=right",
 		left.GetPath(),
 		middle.GetPath(),
 		right.GetPath(),
