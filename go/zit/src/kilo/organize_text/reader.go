@@ -96,7 +96,7 @@ LOOP:
 				}
 
 			default:
-				err = errors.Errorf("unsupported verb. slice: %q", sl)
+				err = errors.Errorf("unsupported verb: %c. slice: %q", pr, sl)
 				return
 			}
 		}
@@ -279,7 +279,10 @@ func (ar *assignmentLineReader) readOneObj(
 	z.ExternalLike = sku.GetTransactedPool().Get()
 	z.Type = t
 
-	if _, err = ar.stringFormatReadWriter.ReadStringFormat(r, z.ExternalLike); err != nil {
+	if _, err = ar.stringFormatReadWriter.ReadStringFormat(
+		r,
+		z.ExternalLike,
+	); err != nil {
 		err = ErrorRead{
 			error:  err,
 			line:   ar.lineNo,

@@ -7,6 +7,8 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
 var (
@@ -43,9 +45,9 @@ func (t *T) ui(skip int, args ...interface{}) {
 
 func (t *T) logf(skip int, format string, args ...interface{}) {
 	errors.SetTesting()
-	si := MakeStackInfo(t, t.skip+1+skip)
+	si := MakeStackInfo(t, t.skip+1+skip).StringNoFunctionName()
 	args = append([]interface{}{si}, args...)
-	fmt.Fprintf(os.Stderr, "%s"+format+"\n", args...)
+	fmt.Fprintf(os.Stderr, "%s "+format+"\n", args...)
 }
 
 func (t *T) errorf(skip int, format string, args ...interface{}) {
@@ -78,13 +80,27 @@ func (t *T) Fatalf(format string, args ...interface{}) {
 
 // TODO-P3 move to AssertNotEqual
 func (t *T) NotEqual(a, b any) {
-	format := "\nexpected: %q\n  actual: %q"
-	t.errorf(1, format, a, b)
+	t.errorf(1, "%s", cmp.Diff(a, b, cmpopts.IgnoreUnexported(a)))
 }
 
-func (t *T) AssertEqual(a, b any) {
-	format := "\nexpected: %q\n  actual: %q"
-	t.errorf(1, format, a, b)
+func (t *T) AssertNotEqual(a, b any, o ...cmp.Option) {
+	diff := cmp.Diff(a, b, o...)
+
+	if diff == "" {
+		return
+	}
+
+	t.errorf(1, "%s", diff)
+}
+
+func (t *T) AssertEqual(a, b any, o ...cmp.Option) {
+	diff := cmp.Diff(a, b, o...)
+
+	if diff == "" {
+		return
+	}
+
+	t.errorf(1, "%s", diff)
 }
 
 func (t *T) AssertEqualStrings(a, b string) {
@@ -102,7 +118,7 @@ func (t *T) AssertNoError(err error) {
 	t.Helper()
 
 	if err != nil {
-		t.fatalf(1, "expected no error but got %q", err)
+    t.fatalf(1, "expected no error but got: %s", err)
 	}
 }
 

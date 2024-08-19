@@ -3,6 +3,7 @@ package query
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
+	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -25,6 +26,7 @@ type buildState struct {
 	eqo              sku.ExternalQueryOptions
 
 	externalStoreAcceptedQueryComponent bool
+	ts                                  query_spec.TokenScanner
 }
 
 func (b *buildState) makeGroup() *Group {
@@ -82,16 +84,24 @@ func (b *buildState) build(
 		}
 	}
 
-	var tokens []string
+	remainingWithSpaces := make([]string, 0, len(remaining)*2)
 
-	if tokens, err = query_spec.GetTokensFromStrings(remaining...); err != nil {
-		err = errors.Wrap(err)
-		return
+	for i, s := range remaining {
+		if i > 0 {
+			remainingWithSpaces = append(remainingWithSpaces, " ")
+		}
+
+		remainingWithSpaces = append(remainingWithSpaces, s)
 	}
 
-	if err = b.buildManyFromTokens(tokens...); err != nil {
-		err = errors.Wrap(err)
-		return
+	reader := catgut.MakeMultiRuneReader(remainingWithSpaces...)
+	b.ts.Reset(reader)
+
+	for b.ts.CanScan() {
+		if err = b.parseTokens(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	for _, k := range b.pinnedObjectIds {
@@ -132,19 +142,6 @@ func (b *buildState) realizeVirtualTags() (err error) {
 	return
 }
 
-func (b *buildState) buildManyFromTokens(
-	tokens ...string,
-) (err error) {
-	for len(tokens) > 0 {
-		if tokens, err = b.parseOneFromTokens(tokens...); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
 func (b *buildState) addDefaultsIfNecessary() {
 	if b.builder.defaultGenres.IsEmpty() || !b.qg.IsEmpty() {
 		return
@@ -158,7 +155,7 @@ func (b *buildState) addDefaultsIfNecessary() {
 		return
 	}
 
-  b.qg.matchOnEmpty = true
+	b.qg.matchOnEmpty = true
 
 	g := ids.MakeGenre()
 	dq, ok := b.qg.UserQueries[g]
@@ -180,27 +177,7 @@ func (b *buildState) addDefaultsIfNecessary() {
 	b.qg.UserQueries[b.builder.defaultGenres] = dq
 }
 
-func (b *buildState) makeQuery() *Query {
-	return &Query{
-		ObjectIds: make(map[string]ObjectId),
-	}
-}
-
-func (b *buildState) makeExp(
-	negated, exact bool,
-	children ...sku.Query,
-) *Exp {
-	return &Exp{
-		// MatchOnEmpty: !b.doNotMatchEmpty,
-		Negated:  negated,
-		Exact:    exact,
-		Children: children,
-	}
-}
-
-func (b *buildState) parseOneFromTokens(
-	tokens ...string,
-) (remainingTokens []string, err error) {
+func (b *buildState) parseTokens() (err error) {
 	type stackEl interface {
 		sku.Query
 		Add(sku.Query) error
@@ -213,10 +190,12 @@ func (b *buildState) parseOneFromTokens(
 	isExact := false
 
 LOOP:
-	for i, el := range tokens {
-		// TODO refactor into separate functions
-		if len(el) == 1 && query_spec.IsMatcherOperator([]rune(el)[0]) {
-			op := el[0]
+	for b.ts.Scan() {
+		token, tokenType := b.ts.GetTokenAndType()
+
+		if tokenType == query_spec.TokenTypeOperator {
+			op := token.String()[0]
+
 			switch op {
 			case '=':
 				isExact = true
@@ -225,6 +204,9 @@ LOOP:
 				isNegated = true
 
 			case ' ':
+				if len(stack) == 1 {
+					break LOOP
+				}
 
 			case ',':
 				last := stack[len(stack)-1].(*Exp)
@@ -252,22 +234,21 @@ LOOP:
 					return
 				}
 
-				if remainingTokens, err = b.parseSigilsAndGenres(
-					q,
-					tokens[i:]...,
-				); err != nil {
-					err = errors.Wrapf(err, "%s", tokens[i:])
+				b.ts.Unscan()
+
+				if err = b.parseSigilsAndGenres(q); err != nil {
+					err = errors.Wrapf(err, "Token: %q", token)
 					return
 				}
 
-				break LOOP
+				continue LOOP
 			}
 		} else {
 			k := ObjectId{
 				ObjectIdLike: ids.GetObjectIdPool().Get(),
 			}
 
-			if err = k.GetObjectId().Set(el); err != nil {
+			if err = k.GetObjectId().Set(token.String()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -322,6 +303,11 @@ LOOP:
 		}
 	}
 
+	if err = b.ts.Error(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if q.IsEmpty() {
 		return
 	}
@@ -335,6 +321,49 @@ LOOP:
 	}
 
 	if err = b.qg.Add(q); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (b *buildState) parseSigilsAndGenres(
+	q *Query,
+) (err error) {
+	for b.ts.ScanOnly(query_spec.TokenTypeOperator) {
+		token := b.ts.GetToken()
+
+		op := token.String()[0]
+
+		switch op {
+		default:
+			err = errors.Errorf("unsupported sigil: %s", token)
+			return
+
+		case ':', '+', '?', '.':
+			var s ids.Sigil
+
+			if err = s.Set(token.String()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if !b.builder.permittedSigil.IsEmpty() && !b.builder.permittedSigil.ContainsOneOf(s) {
+				err = errors.Errorf("cannot contain sigil %s", s)
+				return
+			}
+
+			q.Sigil.Add(s)
+		}
+	}
+
+	if err = b.ts.Error(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = q.ReadFromTokenScanner(&b.ts); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -431,45 +460,20 @@ func (b *buildState) makeTagExp(k *ObjectId) (exp sku.Query, err error) {
 	return
 }
 
-func (b *buildState) parseSigilsAndGenres(
-	q *Query,
-	tokens ...string,
-) (remainingTokens []string, err error) {
-LOOP:
-	for i, el := range tokens {
-		if len(el) != 1 {
-			remainingTokens = tokens[i:]
-			break
-		}
-
-		op := []rune(el)[0]
-
-		switch op {
-		default:
-			remainingTokens = tokens[i:]
-			break LOOP
-
-		case ':', '+', '?', '.':
-			var s ids.Sigil
-
-			if err = s.Set(el); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if !b.builder.permittedSigil.IsEmpty() && !b.builder.permittedSigil.ContainsOneOf(s) {
-				err = errors.Errorf("cannot contain sigil %s", s)
-				return
-			}
-
-			q.Sigil.Add(s)
-		}
+func (b *buildState) makeExp(
+	negated, exact bool,
+	children ...sku.Query,
+) *Exp {
+	return &Exp{
+		// MatchOnEmpty: !b.doNotMatchEmpty,
+		Negated:  negated,
+		Exact:    exact,
+		Children: children,
 	}
+}
 
-	if remainingTokens, err = q.SetTokens(remainingTokens...); err != nil {
-		err = errors.Wrap(err)
-		return
+func (b *buildState) makeQuery() *Query {
+	return &Query{
+		ObjectIds: make(map[string]ObjectId),
 	}
-
-	return
 }

@@ -16,41 +16,80 @@ func MakeRingBufferRuneScanner(rb *RingBuffer) (s *RingBufferRuneScanner) {
 
 type RingBufferRuneScanner struct {
 	rb *RingBuffer
-	SliceRuneScanner
-}
 
-func (s *RingBufferRuneScanner) Reset() {
-	s.SliceRuneScanner.Reset()
+	overlap                     [6]byte // three bytes from first, three bytes from second
+	overlapFirst, overlapSecond int
+
+	lastRuneSize int
 }
 
 func (s *RingBufferRuneScanner) ResetWith(rb *RingBuffer) {
 	s.rb = rb
-	s.SliceRuneScanner.ResetWith(rb.PeekReadable())
+	s.resetSliceOnly()
 }
 
-func (s *RingBufferRuneScanner) UnreadRune() (err error) {
-	return s.SliceRuneScanner.UnreadRune()
+func (s *RingBufferRuneScanner) resetSliceOnly() {
+	s.overlap, s.overlapFirst, s.overlapSecond = s.rb.PeekReadable().Overlap()
 }
 
-func (s *RingBufferRuneScanner) ReadRune() (r rune, size int, err error) {
-	if s.Remaining() <= utf8.UTFMax {
-		var n int64
-
-		if n, err = s.rb.Fill(); err != nil {
-			if err == io.EOF {
-				if n > 0 || s.Remaining() > 0 {
-					err = nil
-				} else {
-					return
-				}
-			} else {
+func (s *RingBufferRuneScanner) ReadRune() (r rune, width int, err error) {
+	if s.rb.Len() <= utf8.UTFMax {
+		if _, err = s.rb.Fill(); err != nil {
+			if err != io.EOF {
 				err = errors.Wrap(err)
+				return
+			}
+
+			if s.rb.Len() >= 0 {
+				err = nil
+			} else {
 				return
 			}
 		}
 
-		s.ResetSliceOnly(s.rb.PeekReadable())
+		s.resetSliceOnly()
 	}
 
-	return s.SliceRuneScanner.ReadRune()
+	slice := s.rb.PeekReadable()
+	first := slice.First()
+	firstLen := len(first)
+
+	switch {
+	case firstLen >= utf8.UTFMax:
+		r, width = utf8.DecodeRune(slice.First())
+
+	case firstLen > 0:
+		r, width = utf8.DecodeRune(s.overlap[s.overlapFirst-firstLen:])
+
+	case len(slice.Second()) > 0:
+		r, width = utf8.DecodeRune(slice.Second())
+
+	default:
+		err = io.EOF
+		return
+	}
+
+	s.lastRuneSize = width
+
+	if r == utf8.RuneError {
+		err = errInvalidRune
+		return
+	}
+
+	if width > 0 {
+		s.rb.AdvanceRead(width)
+	}
+
+	return
+}
+
+func (s *RingBufferRuneScanner) UnreadRune() (err error) {
+	actuallyUnread := s.rb.Unread(s.lastRuneSize)
+
+	if actuallyUnread != s.lastRuneSize {
+		err = errors.Errorf("tried to unread %d bytes but actually unread %d", s.lastRuneSize, actuallyUnread)
+		return
+	}
+
+	return
 }

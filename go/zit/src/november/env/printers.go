@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/lima/browser"
+	"code.linenisgreat.com/zit/go/zit/src/lima/store_browser"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 )
 
@@ -139,7 +139,7 @@ func (u *Env) PrinterCheckedOutBrowser() interfaces.FuncIter[sku.CheckedOutLike]
 	err := string_format_writer.MakeDelim(
 		"\n",
 		u.Err(),
-		browser.MakeCliCheckedOutFormat(
+		store_browser.MakeCliCheckedOutFormat(
 			u.config.PrintOptions,
 			u.StringFormatWriterShaLike(oo.ColorOptionsErr),
 			u.StringFormatWriterObjectId(oo.ColorOptionsErr),
@@ -161,7 +161,7 @@ func (u *Env) PrinterCheckedOutBrowser() interfaces.FuncIter[sku.CheckedOutLike]
 	out := string_format_writer.MakeDelim(
 		"\n",
 		u.Out(),
-		browser.MakeCliCheckedOutFormat(
+		store_browser.MakeCliCheckedOutFormat(
 			u.config.PrintOptions,
 			u.StringFormatWriterShaLike(oo.ColorOptionsOut),
 			u.StringFormatWriterObjectId(oo.ColorOptionsOut),

@@ -24,7 +24,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/lima/browser"
+	"code.linenisgreat.com/zit/go/zit/src/lima/store_browser"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
@@ -189,13 +189,13 @@ func (u *Env) Initialize(options Options) (err error) {
 			StoreLike: sfs,
 		},
 		"browser": {
-			StoreLike: browser.Make(
+			StoreLike: store_browser.Make(
 				k,
 				u.GetFSHome(),
 				string_format_writer.MakeDelim(
 					"\n",
 					u.Out(),
-					browser.MakeItemDeletedStringWriterFormat(
+					store_browser.MakeItemDeletedStringWriterFormat(
 						k,
 						u.FormatColorOptionsOut(),
 					),

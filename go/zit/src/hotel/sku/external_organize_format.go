@@ -2,12 +2,12 @@ package sku
 
 import (
 	"fmt"
-	"io"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
@@ -248,27 +248,16 @@ func (f *Organize) readStringFormatWithinBrackets(
 	rb *catgut.RingBuffer,
 	o *Transacted,
 ) (err error) {
-	rr := catgut.MakeRingBufferRuneScanner(rb)
+	var ts query_spec.TokenScanner
+	ts.Reset(catgut.MakeRingBufferRuneScanner(rb))
 
 	state := 0
 	var k ids.ObjectId
-	var t catgut.String
-	var eof bool
 	var n int
 
 LOOP:
-	for !eof {
-		t.Reset()
-		err = query_spec.NextToken(rr, &t)
-
-		if err == io.EOF {
-			err = nil
-			eof = true
-		} else if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
+	for ts.Scan() {
+		t, tokenType, tokenParts := ts.GetTokenAndTypeAndParts()
 		n += t.Len()
 
 		if t.EqualsString(" ") || t.EqualsString("\n") {
@@ -284,7 +273,7 @@ LOOP:
 			state++
 
 		case 1:
-			if err = o.ObjectId.TodoSetBytes(&t); err != nil {
+			if err = o.ObjectId.TodoSetBytes(t); err != nil {
 				o.ObjectId.Reset()
 				return
 			}
@@ -295,7 +284,12 @@ LOOP:
 			if t.EqualsString("]") {
 				break LOOP
 			} else {
-				if err = k.TodoSetBytes(&t); err != nil {
+				if tokenType == query_spec.TokenTypeField {
+					ui.Debug().Print(tokenParts)
+					continue
+				}
+
+				if err = k.TodoSetBytes(t); err != nil {
 					err = errors.Wrapf(err, "Readable: %q", rb.PeekReadable())
 					return
 				}

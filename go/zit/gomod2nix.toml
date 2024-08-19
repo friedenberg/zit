@@ -13,6 +13,9 @@ schema = 3
   [mod."github.com/brandondube/tai"]
     version = "v0.1.0"
     hash = "sha256-o32wvMW6waT/vJJkpjiCGxBNBUsqeAvnARhbsikRk50="
+  [mod."github.com/google/go-cmp"]
+    version = "v0.6.0"
+    hash = "sha256-qgra5jze4iPGP0JSTVeY5qV5AvEnEu39LYAuUCIkMtg="
   [mod."github.com/google/shlex"]
     version = "v0.0.0-20191202100458-e7afc7fbc510"
     hash = "sha256-1f392pCmS7AXVKXIC1SvKlYtK/rvW47F5CCkGT2G6JM="

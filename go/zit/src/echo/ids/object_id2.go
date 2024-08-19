@@ -443,6 +443,21 @@ func (h *objectId2) TodoSetBytes(v *catgut.String) (err error) {
 	return h.Set(v.String())
 }
 
+func (h *objectId2) TodoSetBytesForgiving(v *catgut.String) (err error) {
+	if err = h.Set(v.String()); err != nil {
+		h.g = genres.Unknown
+
+		if err = v.CopyTo(&h.left); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+
+	return
+}
+
 func (h *objectId2) SetRaw(v string) (err error) {
 	h.g = genres.Unknown
 

@@ -370,7 +370,7 @@ function show_etiketten_paths { # @test
 }
 
 function show_etiketten_exact { # @test
-	run_zit show =tag :e
+	run_zit show =tag:e
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[tag@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]

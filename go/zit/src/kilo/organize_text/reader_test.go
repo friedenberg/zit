@@ -85,10 +85,10 @@ func assertEqualObjekten(t *test_logz.T, expected, actual Objects) {
 	}
 
 	for i := range actual {
-		actualObj, expectedObj := actual[i], expected[i]
+		actualObj, expectedObj := actual[i].ExternalLike.GetSku(), expected[i].ExternalLike.GetSku()
 
-		if !actualObj.ExternalLike.GetSku().Equals(expectedObj.ExternalLike.GetSku()) {
-			t.Errorf("\nexpected: %s\n  actual: %s", expectedObj, actualObj)
+		if !actualObj.Equals(expectedObj) {
+			t.Errorf("\nexpected: %#v\n  actual: %#v", expectedObj, actualObj)
 		}
 	}
 }

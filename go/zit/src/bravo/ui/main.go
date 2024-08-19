@@ -127,7 +127,7 @@ func (p devPrinter) Print(a ...interface{}) (err error) {
 
 	if p.includesStack {
 		si, _ := errors.MakeStackInfo(1)
-		a = append([]interface{}{si}, a...)
+		a = append([]interface{}{si.StringNoFunctionName()}, a...)
 	}
 
 	return p.prodPrinter.Print(a...)
@@ -170,8 +170,8 @@ func (p devPrinter) Printf(f string, a ...interface{}) (err error) {
 
 	if p.includesStack {
 		si, _ := errors.MakeStackInfo(1)
-		f = "%s" + f
-		a = append([]interface{}{si}, a...)
+		f = "%s " + f
+		a = append([]interface{}{si.StringNoFunctionName()}, a...)
 	}
 
 	return p.prodPrinter.Printf(f, a...)

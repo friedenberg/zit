@@ -1,10 +1,12 @@
 package descriptions
 
 import (
+	"bytes"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
+	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 )
 
 // TODO-P1 move to catgut.String
@@ -39,6 +41,29 @@ func (b *Description) TodoSetManyCatgutStrings(
 
 func (b *Description) TodoSetSlice(v catgut.Slice) (err error) {
 	return b.Set(v.String())
+}
+
+func (b *Description) ReadFromTokenScanner(ts *query_spec.TokenScanner) (err error) {
+	var sb strings.Builder
+
+	for ts.Scan() {
+		token, tokenType := ts.GetTokenAndType()
+
+		if tokenType == query_spec.TokenTypeOperator &&
+			bytes.Equal(token.Bytes(), []byte{'\n'}) {
+			ts.Unscan()
+			break
+		}
+
+		sb.Write(ts.GetToken().Bytes())
+	}
+
+	if err = b.Set(sb.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (b *Description) Set(v string) (err error) {

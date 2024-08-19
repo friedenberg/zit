@@ -102,6 +102,20 @@ func (si StackInfo) String() string {
 	)
 }
 
+func (si StackInfo) StringNoFunctionName() string {
+	filename := si.Filename
+
+	if si.RelFilename != "" {
+		filename = si.RelFilename
+	}
+
+	return fmt.Sprintf(
+		"%s|%d|",
+		filename,
+		si.Line,
+	)
+}
+
 func (si StackInfo) Wrap(in error) (err error) {
 	return &stackWrapError{
 		StackInfo: si,

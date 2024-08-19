@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 )
 
 type Genre byte
@@ -126,23 +127,36 @@ func (gs *Genre) Set(v string) (err error) {
 	return
 }
 
-func (g *Genre) SetTokens(
-	tokens ...string,
-) (remainingTokens []string, err error) {
-	for i, el := range tokens {
-		if el == " " {
-			remainingTokens = tokens[i:]
-			return
-		}
+func (g *Genre) ReadFromTokenScanner(
+	ts *query_spec.TokenScanner,
+) (err error) {
+	for ts.Scan() {
+		token, tokenType := ts.GetTokenAndType()
 
-		if el == "," {
-			continue
-		}
+		switch tokenType {
+		case query_spec.TokenTypeOperator:
+			el := token.String()
 
-		if err = g.AddString(el); err != nil {
-			err = errors.Wrap(err)
-			return
+			if el == " " {
+				ts.Unscan()
+				return
+			}
+
+			if el == "," {
+				continue
+			}
+
+		case query_spec.TokenTypeIdentifier:
+			if err = g.AddString(token.String()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
+	}
+
+	if err = ts.Error(); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

@@ -319,6 +319,7 @@ func (rb *RingBuffer) Unread(toUnread int) (actuallyUnread int) {
 	}
 
 	rb.readLength -= int64(actuallyUnread)
+	rb.dataLength += actuallyUnread
 
 	return
 }
