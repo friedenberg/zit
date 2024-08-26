@@ -354,3 +354,101 @@ func TestTokenScannerWithTypesAndPartsRingBufferEdition(t1 *testing.T) {
 
 	t.AssertEqual(expected, actual, cmpopts.EquateEmpty())
 }
+
+func getTokenScannerTestCasesIdentifierLikeOnlySkipSpaces() []tokenScannerTestCase {
+	return []tokenScannerTestCase{
+		{
+			input: "testing:e,t,k",
+			expected: []string{
+        "testing:e,t,k",
+			},
+		},
+		{
+			input: "[area-personal, area-work]:etikett",
+			expected: []string{
+				"[",
+        "area-personal,",
+        "area-work",
+        "]",
+        ":etikett",
+			},
+		},
+		{
+			input: " [ uno/dos ] bez",
+			expected: []string{
+				"[",
+				"uno/dos",
+				"]",
+				"bez",
+			},
+		},
+		{
+			input: " [ uno/dos ] bez with spaces and more  spaces",
+			expected: []string{
+				"[",
+				"uno/dos",
+				"]",
+				"bez",
+				"with",
+				"spaces",
+				"and",
+				"more",
+				"spaces",
+			},
+		},
+		{
+			input: "[uno/dos    !pdf     zz-inbox]",
+			expected: []string{
+				"[",
+				"uno/dos",
+				"!pdf",
+				"zz-inbox",
+				"]",
+			},
+		},
+		{
+			input: `[
+      /browser/bookmark-1FuOLQOYZAsP/ !toml-bookmark
+      zz-site-org-mozilla-support
+      !browser-bookmark "Get Help"
+      url="https://support.\"mozilla.org/products/firefox"
+      zz-site-org-mozilla-support] Get Help`,
+			expected: []string{
+				"[",
+				"/browser/bookmark-1FuOLQOYZAsP/",
+				"!toml-bookmark",
+				"zz-site-org-mozilla-support",
+				"!browser-bookmark",
+				`"Get Help"`,
+				`url="https://support.\"mozilla.org/products/firefox"`,
+				"zz-site-org-mozilla-support",
+				"]",
+				"Get",
+				"Help",
+			},
+		},
+	}
+}
+
+func TestTokenScannerIdentifierLikeOnlySkipSpaces(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
+	var scanner TokenScanner
+
+	for _, tc := range getTokenScannerTestCasesIdentifierLikeOnlySkipSpaces() {
+		scanner.Reset(strings.NewReader(tc.input))
+
+		actual := make([]string, 0)
+
+		for scanner.ScanIdentifierLikeSkipSpaces() {
+			t1 := scanner.GetToken().String()
+			actual = append(actual, t1)
+		}
+
+		if err := scanner.Error(); err != nil {
+			t.AssertNoError(err)
+		}
+
+		t.AssertNotEqual(tc.expected, actual)
+	}
+}

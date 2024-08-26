@@ -25,7 +25,6 @@ type IdLike interface {
 }
 
 type ObjectIdLike interface {
-	IdWithParts
 	interfaces.GenreGetter
 	GetObjectId() *ObjectId
 }

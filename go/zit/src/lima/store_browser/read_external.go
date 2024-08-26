@@ -8,7 +8,7 @@ import (
 
 func (s *Store) ReadIntoExternalFromObjectIdFDPair(
 	o sku.CommitOptions,
-	em *item,
+	em *browserItemRaw,
 	t *sku.Transacted,
 	e *External,
 ) (err error) {
@@ -37,7 +37,7 @@ func (s *Store) ReadIntoExternalFromObjectIdFDPair(
 
 func (s *Store) ReadOneExternalInto(
 	o *sku.CommitOptions,
-	em *item,
+	em *browserItemRaw,
 	t *sku.Transacted,
 	e *External,
 ) (err error) {

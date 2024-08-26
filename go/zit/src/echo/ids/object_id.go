@@ -43,13 +43,6 @@ func (a *objectId) Clone() (b *objectId) {
 	return
 }
 
-func MustObjectId(kp IdLike) (k *ObjectId) {
-	k = &ObjectId{}
-	err := k.SetWithIdLike(kp)
-	errors.PanicIfError(err)
-	return
-}
-
 func (a *objectId) IsVirtual() bool {
 	switch a.g {
 	case genres.Zettel:

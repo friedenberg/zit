@@ -64,9 +64,13 @@ func (b *buildState) build(
 			var k []sku.ExternalObjectId
 
 			if k, err = b.repo.GetObjectIdsForString(v); err != nil {
+				if v != "." {
+					remaining = append(remaining, v)
+				}
+
 				em.Add(err)
 				err = nil
-				remaining = append(remaining, v)
+
 				continue
 			}
 
@@ -266,7 +270,7 @@ LOOP:
 				)
 
 				q.Genre.Add(genres.Zettel)
-				q.ObjectIds[k.ObjectIdLike.String()] = k
+				q.ObjectIds[k.ObjectIdLike.GetObjectId().String()] = k
 
 			case genres.Tag:
 				var et sku.Query
@@ -338,7 +342,7 @@ func (b *buildState) parseSigilsAndGenres(
 
 		switch op {
 		default:
-			err = errors.Errorf("unsupported sigil: %s", token)
+			b.ts.Unscan()
 			return
 
 		case ':', '+', '?', '.':
@@ -439,6 +443,15 @@ func (b *buildState) makeTagOrLuaTag(
 	}
 
 	exp = &TagLua{Lua: &ml, ObjectId: k}
+
+	// try initializing a lua vm to make sure there are no errors
+	vm, err := ml.Get()
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	ml.Put(vm)
 
 	return
 }

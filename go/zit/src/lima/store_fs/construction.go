@@ -17,6 +17,7 @@ func MakeCwdFilesAll(
 	fileExtensions file_extensions.FileExtensions,
 	st fs_home.Home,
 	ofo object_inventory_format.Options,
+	formatExternal *CliExternal,
 ) (fs *Store, err error) {
 	fs = &Store{
 		config:         k,
@@ -34,6 +35,7 @@ func MakeCwdFilesAll(
 			st,
 			nil,
 		),
+		formatExternal: formatExternal,
 	}
 
 	return

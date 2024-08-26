@@ -19,8 +19,12 @@ import (
 
 type External struct {
 	sku.Transacted
-	store_browser sku.Transacted
-	item
+	browser sku.Transacted
+	browserItem
+}
+
+func (e *External) GetObjectId() *ids.ObjectId {
+  return e.Transacted.GetObjectId()
 }
 
 func (e *External) GetExternalState() external_state.State {
@@ -65,15 +69,15 @@ func (e *External) SaveBlob(s fs_home.Home) (err error) {
 	return
 }
 
-func (e *External) SetItem(i item, overwrite bool) (err error) {
-	e.item = i
+func (e *External) SetItem(i browserItem, overwrite bool) (err error) {
+	e.browserItem = i
 
-	if err = i.WriteToMetadata(&e.store_browser.Metadata); err != nil {
+	if err = i.WriteToMetadata(&e.browser.Metadata); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	e.Metadata.Tai = e.store_browser.Metadata.GetTai()
+	e.Metadata.Tai = e.browser.Metadata.GetTai()
 
 	if overwrite {
 		if err = i.WriteToMetadata(&e.Metadata); err != nil {
@@ -95,8 +99,8 @@ func (t *External) GetSkuExternalLike() sku.ExternalLike {
 func (a *External) Clone() sku.ExternalLike {
 	b := GetExternalPool().Get()
 	sku.TransactedResetter.ResetWith(&b.Transacted, &a.Transacted)
-	sku.TransactedResetter.ResetWith(&b.store_browser, &a.store_browser)
-	b.item = a.item
+	sku.TransactedResetter.ResetWith(&b.browser, &a.browser)
+	b.browserItem = a.browserItem
 	return b
 }
 

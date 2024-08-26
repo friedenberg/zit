@@ -179,7 +179,7 @@ func (i *index) AddZettelId(k1 ids.IdLike) (err error) {
 
 	var h ids.ZettelId
 
-	if err = h.Set(k1.String()); err != nil {
+	if err = h.SetFromIdParts(k1.Parts()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

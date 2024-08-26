@@ -190,7 +190,7 @@ func (i *indexAbbr) AddMatchable(o *sku.Transacted) (err error) {
 	case genres.Zettel:
 		var h ids.ZettelId
 
-		if err = h.Set(ks); err != nil {
+		if err = h.SetFromIdParts(o.GetObjectId().Parts()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

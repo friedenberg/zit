@@ -12,17 +12,14 @@ func (s *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
 
 	var u *url.URL
 
-	if u, err = coc.External.item.GetUrl(); err != nil {
+	if u, err = coc.External.browserItem.GetUrl(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	s.removed[*u] = struct{}{}
-
-	if err = s.itemDeletedStringFormatWriter(coc); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+  bi := coc.External.browserItem
+  bi.ExternalId = coc.GetSku().ObjectId.String()
+	s.removed[*u] = append(s.removed[*u], bi)
 
 	return
 }

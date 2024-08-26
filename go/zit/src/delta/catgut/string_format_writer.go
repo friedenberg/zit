@@ -7,14 +7,13 @@ import (
 
 type stringFormatWriter struct{}
 
-var StringFormatWriter stringFormatWriter
+var StringFormatWriterString stringFormatWriter
 
 func (stringFormatWriter) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
 	e *String,
 ) (n int64, err error) {
 	n, err = e.WriteTo(sw)
-
 	if err != nil {
 		err = errors.Wrap(err)
 		return

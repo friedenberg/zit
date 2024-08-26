@@ -6,34 +6,82 @@ import (
 	"slices"
 	"strings"
 
+	"code.linenisgreat.com/chrest/go/chrest/src/charlie/browser_items"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-// TODO make more specific
-type item map[string]interface{}
+type browserItem struct {
+	browser_items.Item
+}
 
-func (item item) WriteToMetadata(m *object_metadata.Metadata) (err error) {
-	if m.Tai, err = item.GetTai(); err != nil {
+func (i *browserItem) getExternalObjectId() sku.ExternalObjectId {
+	return i
+}
+
+func (i *browserItem) GetExternalObjectId() *ids.ObjectId {
+	return i.GetObjectId()
+}
+
+func (i *browserItem) GetKey() string {
+	return fmt.Sprintf("%s-%s", i.Id.Type, i.Id.Id)
+}
+
+func (i *browserItem) GetObjectId() *ids.ObjectId {
+	var oid ids.ObjectId
+	errors.PanicIfError(oid.SetLeft(i.GetKey()))
+	errors.PanicIfError(oid.SetRepoId("browser"))
+	return &oid
+}
+
+func (i *browserItem) GetType() (t ids.Type, err error) {
+	if err = t.Set("browser-" + i.Id.Type); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if m.Type, err = item.GetType(); err != nil {
+	return
+}
+
+func (i *browserItem) GetGenre() interfaces.Genre {
+	return genres.Zettel
+}
+
+func (dst *browserItem) readFromRaw(src map[string]interface{}) (err error) {
+	// TODO BrowserId
+	dst.Id.Id = src["id"].(string)
+	dst.Id.Type = src["type"].(string)
+	dst.Url = src["url"].(string)
+	dst.Date = src["date"].(string)
+	dst.Title, _ = src["title"].(string)
+	dst.ExternalId, _ = src["external-id"].(string)
+	return
+}
+
+func (i browserItem) WriteToMetadata(m *object_metadata.Metadata) (err error) {
+	if m.Tai, err = i.GetTai(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if m.Description, err = item.GetDescription(); err != nil {
+	if m.Type, err = i.GetType(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if m.Description, err = i.GetDescription(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	var u *url.URL
 
-	if u, err = item.GetUrl(); err != nil {
+	if u, err = i.GetUrl(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -64,102 +112,28 @@ func (item item) WriteToMetadata(m *object_metadata.Metadata) (err error) {
 	return
 }
 
-func (tab item) WriteToObjectId(oi *ids.ObjectId) (err error) {
-	ty, ok := tab["type"].(string)
-
-	if !ok {
-		err = errors.Errorf("expected string but got %T, %q", tab["type"], tab["type"])
-		return
-	}
-
-	var id string
-	id, ok = tab["id"].(string)
-
-	if !ok {
-		err = errors.Errorf("unsupported id format: %#v", id)
-		return
-	}
-
-	if err = oi.SetRaw(fmt.Sprintf("%s-%s", ty, id)); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (tab item) GetTabId() (id float64, ok bool) {
-	switch tab["type"].(string) {
-	case "history", "bookmark":
-		return
-	}
-
-	id, ok = tab["id"].(float64)
-
-	return
-}
-
-func (tab item) GetUrl() (u *url.URL, err error) {
-	ur := tab["url"]
-
-	if ur == nil {
-		err = errors.Errorf("no url: %#v", tab)
-		return
-	}
-
-	if u, err = url.Parse(ur.(string)); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (tab item) GetTai() (t ids.Tai, err error) {
-	switch date := tab["date"].(type) {
-	case nil:
-		t = ids.NowTai()
-
-	case string:
-		if err = t.SetFromRFC3339(date); err != nil {
+func (i browserItem) WriteToObjectIds(oids ...*ids.ObjectId) (err error) {
+	for _, oid := range oids {
+		if err = i.WriteToObjectId(oid); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-
-	default:
-		err = errors.Errorf("expected string but got %T, %q", tab["date"], tab["date"])
-		return
 	}
 
 	return
 }
 
-func (tab item) GetDescription() (b descriptions.Description, err error) {
-	switch t := tab["title"].(type) {
-	case nil:
-	case string:
-		if err = b.Set(t); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-	default:
-		err = errors.Errorf("expected string but got %T, %q", t, t)
-		return
-	}
-
+func (i browserItem) WriteToObjectId(oi *ids.ObjectId) (err error) {
+	oi.ResetWith(i.GetObjectId())
 	return
 }
 
-func (tab item) GetType() (t ids.Type, err error) {
-	ty, ok := tab["type"].(string)
-
-	if !ok {
-		err = errors.Errorf("expected string but got %T, %q", tab["type"], tab["type"])
+func (i browserItem) GetTai() (t ids.Tai, err error) {
+	if i.Date == "" {
 		return
 	}
 
-	if err = t.Set("browser-" + ty); err != nil {
+	if err = t.SetFromRFC3339(i.Date); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -167,42 +141,27 @@ func (tab item) GetType() (t ids.Type, err error) {
 	return
 }
 
-func (ct item) GetTagSet() ids.TagSet {
-	me := ids.MakeTagMutableSet()
+func (i browserItem) GetUrl() (u *url.URL, err error) {
+	ur := i.Url
 
-	switch ct["type"].(string) {
-	case "history":
-		me.Add(
-			ids.MustTag(fmt.Sprintf("%%browser-history-%d", int(ct["id"].(float64)))),
-		)
-
-	case "tab":
-		me.Add(
-			ids.MustTag(fmt.Sprintf("%%browser-window_id-%d", int(ct["windowId"].(float64)))),
-		)
-
-		me.Add(
-			ids.MustTag(fmt.Sprintf("%%browser-tab_id-%d", int(ct["id"].(float64)))),
-		)
-
-		v, ok := ct["active"]
-
-		if !ok {
-			break
-		}
-
-		if b, _ := v.(bool); b {
-			me.Add(
-				ids.MustTag("%browser-active"),
-			)
-		}
-
-	case "bookmark":
-		me.Add(
-			ids.MustTag(fmt.Sprintf("%%browser-bookmark-%d", int(ct["id"].(float64)))),
-		)
-
+	if ur == "" {
+		err = errors.Errorf("empty url")
+		return
 	}
 
-	return me
+	if u, err = url.Parse(ur); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (i browserItem) GetDescription() (b descriptions.Description, err error) {
+	if err = b.Set(i.Title); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }

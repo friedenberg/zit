@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"sync"
 
-	"code.linenisgreat.com/chrest/go/chrest"
+	"code.linenisgreat.com/chrest/go/chrest/src/charlie/browser_items"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
-	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -32,41 +31,44 @@ type Store struct {
 	config            *config.Compiled
 	externalStoreInfo external_store.Info
 	typ               ids.Type
-	store_browser     chrest.Browser
+	browser           browser_items.BrowserProxy
 
 	tabCache cache
 
-	urls map[url.URL][]item
+	urls map[url.URL][]browserItem
 
 	l       sync.Mutex
-	removed map[url.URL]struct{}
-	added   map[url.URL][]*ids.ObjectId
+	removed map[url.URL][]browserItem
+	added   map[url.URL][]browserItem
+
+	itemsById map[string]browserItem
 
 	transacted transacted
 
-	transactedUrlIndex   map[url.URL]sku.TransactedMutableSet
-	transactedTabIdIndex map[float64]*sku.Transacted
+	transactedUrlIndex  map[url.URL]sku.TransactedMutableSet
+	transactedItemIndex map[browser_items.ItemId]*sku.Transacted
 
-	itemDeletedStringFormatWriter interfaces.FuncIter[*CheckedOut]
+	itemDeletedStringFormatWriter interfaces.FuncIter[browserItem]
 }
 
 func Make(
 	k *config.Compiled,
 	s fs_home.Home,
-	itemDeletedStringFormatWriter interfaces.FuncIter[*CheckedOut],
+	itemDeletedStringFormatWriter interfaces.FuncIter[browserItem],
 ) *Store {
 	c := &Store{
-		config:  k,
-		typ:     ids.MustType("toml-bookmark"),
-		removed: make(map[url.URL]struct{}),
-		added:   make(map[url.URL][]*ids.ObjectId),
+		config:    k,
+		typ:       ids.MustType("toml-bookmark"),
+		removed:   make(map[url.URL][]browserItem),
+		added:     make(map[url.URL][]browserItem),
+		itemsById: make(map[string]browserItem),
 		transacted: transacted{
 			MutableSetLike: collections_value.MakeMutableValueSet(
 				iter.StringerKeyer[*ids.ObjectId]{},
 			),
 		},
 		transactedUrlIndex:            make(map[url.URL]sku.TransactedMutableSet),
-		transactedTabIdIndex:          make(map[float64]*sku.Transacted),
+		transactedItemIndex:           make(map[browser_items.ItemId]*sku.Transacted),
 		itemDeletedStringFormatWriter: itemDeletedStringFormatWriter,
 	}
 
@@ -81,18 +83,17 @@ func (s *Store) ApplyDotOperator() error {
 	return nil
 }
 
-// TODO
 func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err error) {
-	err = errors.Implement()
+	item, ok := s.itemsById[v]
+
+	if !ok {
+		err = errors.Errorf("not a browser item id")
+		return
+	}
+
+	k = append(k, &item)
+
 	return
-	// k = []sku.ExternalObjectId{ids.GetObjectIdPool().Get()}
-
-	// if err = k[0].SetRaw(v); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
-
-	// return
 }
 
 func (s *Store) Flush() (err error) {
@@ -161,14 +162,16 @@ func (c *Store) CheckoutOne(
 	sku.TransactedResetter.ResetWith(co.GetSku(), sz)
 	sku.TransactedResetter.ResetWith(co.GetSkuExternalLike().GetSku(), sz)
 	co.State = checked_out_state.JustCheckedOut
-	co.External.store_browser.Metadata.Type = ids.MustType("!browser-tab")
-	co.External.item = map[string]interface{}{"url": u.String()}
+	co.External.browser.Metadata.Type = ids.MustType("!browser-tab")
+	co.External.browserItem.Url = u.String()
+	co.External.browserItem.ExternalId = sz.ObjectId.String()
+	co.External.browserItem.Id.Type = "tab"
 
 	c.l.Lock()
 	defer c.l.Unlock()
 
 	existing := c.added[*u]
-	c.added[*u] = append(existing, sz.ObjectId.Clone())
+	c.added[*u] = append(existing, co.External.browserItem)
 
 	// 	ui.Debug().Print(response)
 
@@ -183,55 +186,41 @@ func (c *Store) QueryCheckedOut(
 	// 	Mode: objekte_mode.ModeRealizeSansProto,
 	// }
 
-	var co CheckedOut
+	ex := executor{
+		store: c,
+		qg:    qg,
+		out:   f,
+	}
 
 	for u, items := range c.urls {
-		co.External.ObjectId.Reset()
-
 		matchingUrls, exactIndexURLMatch := c.transactedUrlIndex[u]
 
 		for _, item := range items {
 			var matchingTabId *sku.Transacted
 			var trackedFromBefore bool
 
-			{
-				tabId, okTabId := item.GetTabId()
-
-				if okTabId {
-					matchingTabId, trackedFromBefore = c.transactedTabIdIndex[tabId]
-				}
-			}
+			tabId := item.Id
+			matchingTabId, trackedFromBefore = c.transactedItemIndex[tabId]
 
 			if trackedFromBefore {
-				if err = c.tryToEmitOneExplicitlyCheckedOut(
-					qg,
+				if err = ex.tryToEmitOneExplicitlyCheckedOut(
 					matchingTabId,
-					&co,
 					item,
-					f,
 				); err != nil {
 					err = errors.Wrapf(err, "Item: %#v", item)
 					return
 				}
 			} else if !exactIndexURLMatch {
-				if err = c.tryToEmitOneUntracked(
-					qg,
-					&co,
-					item,
-					f,
-				); err != nil {
+				if err = ex.tryToEmitOneUntracked(item); err != nil {
 					err = errors.Wrapf(err, "Item: %#v", item)
 					return
 				}
 			} else if exactIndexURLMatch {
 				if err = matchingUrls.Each(
 					func(matching *sku.Transacted) (err error) {
-						if err = c.tryToEmitOneRecognized(
-							qg,
+						if err = ex.tryToEmitOneRecognized(
 							matching,
-							&co,
 							item,
-							f,
 						); err != nil {
 							err = errors.Wrapf(err, "Item: %#v", item)
 							return
@@ -250,177 +239,8 @@ func (c *Store) QueryCheckedOut(
 	return
 }
 
-func (c *Store) tryToEmitOneExplicitlyCheckedOut(
-	qg *query.Group,
-	internal *sku.Transacted,
-	co *CheckedOut,
-	item item,
-	f interfaces.FuncIter[sku.CheckedOutLike],
-) (err error) {
-	sku.TransactedResetter.Reset(&co.External.store_browser)
-	co.External.store_browser.ObjectId.SetGenre(genres.Zettel)
-	co.External.ObjectId.SetGenre(genres.Zettel)
-
-	var uSku *url.URL
-
-	if uSku, err = c.getUrl(internal); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var uBrowser *url.URL
-
-	if uBrowser, err = item.GetUrl(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	sku.TransactedResetter.ResetWith(&co.Internal, internal)
-	sku.TransactedResetter.ResetWith(&co.External.Transacted, internal)
-
-	if *uSku == *uBrowser {
-		co.State = checked_out_state.ExistsAndSame
-	} else {
-		co.State = checked_out_state.ExistsAndDifferent
-	}
-
-	if err = c.tryToEmitOneCommon(
-		qg,
-		co,
-		item,
-		false,
-		f,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (c *Store) tryToEmitOneRecognized(
-	qg *query.Group,
-	internal *sku.Transacted,
-	co *CheckedOut,
-	item item,
-	f interfaces.FuncIter[sku.CheckedOutLike],
-) (err error) {
-	co.State = checked_out_state.Recognized
-
-	if !qg.ContainsSkuCheckedOutState(co.State) {
-		return
-	}
-
-	sku.TransactedResetter.Reset(&co.External.store_browser)
-	co.External.store_browser.ObjectId.SetGenre(genres.Unknown)
-	co.External.ObjectId.SetGenre(genres.Unknown)
-
-	if err = item.WriteToObjectId(&co.External.ObjectId); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	sku.TransactedResetter.ResetWith(&co.Internal, internal)
-	sku.TransactedResetter.ResetWith(&co.External.Transacted, internal)
-
-	co.State = checked_out_state.Recognized
-
-	if err = c.tryToEmitOneCommon(
-		qg,
-		co,
-		item,
-		true,
-		f,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (c *Store) tryToEmitOneUntracked(
-	qg *query.Group,
-	co *CheckedOut,
-	item item,
-	f interfaces.FuncIter[sku.CheckedOutLike],
-) (err error) {
-	co.State = checked_out_state.Untracked
-
-	if !qg.ContainsSkuCheckedOutState(co.State) {
-		return
-	}
-
-	sku.TransactedResetter.Reset(&co.External.store_browser)
-
-	if err = item.WriteToObjectId(&co.External.ObjectId); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	co.External.store_browser.ObjectId.SetGenre(genres.Zettel)
-	co.External.ObjectId.SetGenre(genres.Zettel)
-
-	sku.TransactedResetter.Reset(&co.External.Transacted)
-	sku.TransactedResetter.Reset(&co.Internal)
-
-	if err = c.tryToEmitOneCommon(
-		qg,
-		co,
-		item,
-		true,
-		f,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (c *Store) tryToEmitOneCommon(
-	qg *query.Group,
-	co *CheckedOut,
-	i item,
-	overwrite bool,
-	f interfaces.FuncIter[sku.CheckedOutLike],
-) (err error) {
-	store_browser := &co.External.store_browser
-
-	if err = co.External.SetItem(i, overwrite); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if !qg.ContainsExternalSku(store_browser, co.State) &&
-		!qg.ContainsExternalSku(co.GetSku(), co.State) {
-		return
-	}
-
-	if err = co.External.ObjectId.SetRepoId(
-		c.externalStoreInfo.RepoId.String(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = co.Internal.ObjectId.SetRepoId(
-		c.externalStoreInfo.RepoId.String(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = f(co); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (c *Store) GetExternalStoreOrganizeFormat(
 	f *sku_fmt.Organize,
-) sku_fmt.ExternalLike {
+) sku_fmt.ReaderExternalLike {
 	return MakeFormatOrganize(f)
 }

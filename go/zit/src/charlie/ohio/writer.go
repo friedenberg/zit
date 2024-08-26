@@ -100,6 +100,18 @@ func WriteInt64(w io.Writer, n int64) (written int, err error) {
 	return
 }
 
+func WriteFixedUInt16(w io.Writer, n uint16) (written int, err error) {
+	b := UInt16ToByteArray(n)
+
+	written, err = WriteAllOrDieTrying(w, b[:])
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func WriteFixedInt32(w io.Writer, n int32) (written int, err error) {
 	b := Int32ToByteArray(n)
 

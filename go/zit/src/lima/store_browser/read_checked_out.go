@@ -9,7 +9,7 @@ import (
 func (s *Store) ReadCheckedOutFromItem(
 	o sku.CommitOptions,
 	k interfaces.ObjectId,
-	em *item,
+	em *browserItemRaw,
 ) (co *CheckedOut, err error) {
 	co = GetCheckedOutPool().Get()
 

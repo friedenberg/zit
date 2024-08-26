@@ -6,7 +6,7 @@ import (
 	"io"
 	"strings"
 
-	"code.linenisgreat.com/chrest/go/chrest"
+	"code.linenisgreat.com/chrest/go/chrest/src/bravo/client"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
@@ -421,14 +421,14 @@ func (u *Env) MakeFormatFunc(
 	case "json-toml-bookmark":
 		enc := json.NewEncoder(out)
 
-		var resp chrest.ResponseWithParsedJSONBody
+		var resp client.ResponseWithParsedJSONBody
 
-		req := chrest.BrowserRequest{
+		req := client.BrowserRequest{
 			Method: "GET",
 			Path:   "/tabs",
 		}
 
-		var b chrest.Browser
+		var b client.BrowserProxy
 
 		if err = b.Read(); err != nil {
 			errors.PanicIfError(err)

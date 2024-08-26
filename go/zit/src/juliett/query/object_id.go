@@ -29,26 +29,26 @@ func (k ObjectId) Reduce(b *Builder) (err error) {
 }
 
 // TODO support exact
-func (k ObjectId) ContainsSku(sk *sku.Transacted) (ok bool) {
-	defer sk.Metadata.Cache.QueryPath.PushOnReturn(k, &ok)
+func (exp ObjectId) ContainsSku(sk *sku.Transacted) (ok bool) {
+	defer sk.Metadata.Cache.QueryPath.PushOnReturn(exp, &ok)
 
-	me := sk.GetMetadata()
+	skMe := sk.GetMetadata()
 
-	switch k.GetGenre() {
+	switch exp.GetGenre() {
 	case genres.Tag:
 		var idx int
 
-		if k.Exact {
-			idx, ok = me.Cache.TagPaths.All.ContainsObjectIdTagExact(
-				k.GetObjectId(),
+		if exp.Exact {
+			idx, ok = skMe.Cache.TagPaths.All.ContainsObjectIdTagExact(
+				exp.GetObjectId(),
 			)
 		} else {
-			idx, ok = me.Cache.TagPaths.All.ContainsObjectIdTag(
-				k.GetObjectId(),
+			idx, ok = skMe.Cache.TagPaths.All.ContainsObjectIdTag(
+				exp.GetObjectId(),
 			)
 		}
 
-		ui.Log().Print(k, idx, ok, me.Cache.TagPaths.All, sk)
+		ui.Log().Print(exp, idx, ok, skMe.Cache.TagPaths.All, sk)
 
 		if ok {
 			// if k.Exact {
@@ -56,7 +56,7 @@ func (k ObjectId) ContainsSku(sk *sku.Transacted) (ok bool) {
 			// 	ui.Debug().Print(ewp, sk)
 			// }
 
-			ps := me.Cache.TagPaths.All[idx]
+			ps := skMe.Cache.TagPaths.All[idx]
 			sk.Metadata.Cache.QueryPath.Push(ps.Parents)
 			return
 		}
@@ -64,7 +64,7 @@ func (k ObjectId) ContainsSku(sk *sku.Transacted) (ok bool) {
 		return
 
 	case genres.Type:
-		if ids.Contains(me.GetType(), k) {
+		if ids.Contains(skMe.GetType(), exp.GetObjectId()) {
 			ok = true
 			return
 		}
@@ -72,7 +72,7 @@ func (k ObjectId) ContainsSku(sk *sku.Transacted) (ok bool) {
 
 	idl := &sk.ObjectId
 
-	if !ids.Contains(idl, k) {
+	if !ids.Contains(idl, exp.GetObjectId()) {
 		return
 	}
 

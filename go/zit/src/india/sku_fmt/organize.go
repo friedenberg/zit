@@ -255,7 +255,7 @@ func (f *Organize) readStringFormatWithinBrackets(
 	var k ids.ObjectId
 
 LOOP:
-	for ts.Scan() {
+	for ts.ScanIdentifierLikeSkipSpaces() {
 		t, tokenType, tokenParts := ts.GetTokenAndTypeAndParts()
 
 		if t.EqualsString(" ") || t.EqualsString("\n") {
@@ -272,7 +272,7 @@ LOOP:
 			state++
 
 		case 1:
-			if err = o.ObjectId.TodoSetBytes(t); err != nil {
+			if err = o.ObjectId.ReadFromToken(t); err != nil {
 				o.ObjectId.Reset()
 				return
 			}
@@ -317,6 +317,7 @@ LOOP:
 
 				default:
 					err = genres.MakeErrUnsupportedGenre(k.GetGenre())
+					err = errors.Wrapf(err, "Token: %q", t)
 					return
 				}
 

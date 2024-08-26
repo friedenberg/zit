@@ -16,6 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
@@ -38,6 +39,8 @@ type Store struct {
 
 	deleteLock sync.Mutex
 	deleted    fd.MutableSet
+
+	formatExternal *CliExternal
 }
 
 func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
@@ -269,4 +272,16 @@ func (c *Store) Len() int {
 	return iter.Len(
 		c.dirFDs.objects,
 	)
+}
+
+func (c *Store) GetExternalStoreOrganizeFormat(
+	f *sku_fmt.Organize,
+) sku_fmt.ExternalLike {
+  formatExternal := *c.formatExternal
+	formatExternal.transactedWriter = f
+
+	return sku_fmt.ExternalLike{
+		ReaderExternalLike: f,
+		WriterExternalLike: &formatExternal,
+	}
 }

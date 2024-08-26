@@ -42,8 +42,9 @@ type Options struct {
 	UseRefiner             bool
 	UseMetadateaHeader     bool
 
-	PrintOptions           erworben_cli_print_options.PrintOptions
-	stringFormatReadWriter catgut.StringFormatReadWriter[sku.ExternalLike]
+	PrintOptions       erworben_cli_print_options.PrintOptions
+	stringFormatReader catgut.StringFormatReader[sku.ExternalLike]
+	stringFormatWriter catgut.StringFormatWriter[sku.ExternalLike]
 }
 
 func MakeFlags() Flags {
@@ -122,7 +123,8 @@ func (o *Flags) GetOptions(
 		},
 	)
 
-	o.stringFormatReadWriter = skuFmt
+	o.stringFormatReader = skuFmt.ReaderExternalLike
+	o.stringFormatWriter = skuFmt.WriterExternalLike
 
 	if q == nil {
 		o.rootTags = ids.MakeTagSet()

@@ -120,7 +120,10 @@ func (u *Env) SkuFmtOrganize(repoId ids.RepoId) sku_fmt.ExternalLike {
 	es, ok := u.externalStores[kid]
 
 	if !ok {
-		return f
+		return sku_fmt.ExternalLike{
+			ReaderExternalLike: f,
+			WriterExternalLike: f,
+		}
 	}
 
 	return es.GetExternalStoreOrganizeFormat(f)

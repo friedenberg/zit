@@ -91,6 +91,28 @@ func (u *Env) PrinterHeader() interfaces.FuncIter[string] {
 	}
 }
 
+func (u *Env) PrinterExternalLikeFS() *store_fs.CliExternal {
+	oo := string_format_writer.OutputOptions{
+		ColorOptionsOut: string_format_writer.ColorOptions{
+			OffEntirely: true,
+		},
+		ColorOptionsErr: string_format_writer.ColorOptions{
+			OffEntirely: true,
+		},
+	}
+
+	return store_fs.MakeCliExternalFormat(
+		u.config.PrintOptions,
+		u.StringFormatWriterShaLike(oo.ColorOptionsErr),
+		id_fmts.MakeFDCliFormat(
+			oo.ColorOptionsOut,
+			u.fs_home.MakeRelativePathStringFormatWriter(),
+		),
+		u.StringFormatWriterObjectId(oo.ColorOptionsErr),
+		u.StringFormatWriterMetadatei(oo.ColorOptionsErr),
+	)
+}
+
 func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[sku.CheckedOutLike] {
 	oo := u.FormatOutputOptions()
 

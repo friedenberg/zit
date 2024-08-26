@@ -140,8 +140,8 @@ func (f *cliCheckedOut) WriteStringFormat(
 		}
 	}
 
-	item := co.External.item
-	store_browser := &co.External.store_browser
+	item := co.External.browserItem
+	store_browser := &co.External.browser
 
 	prefix := "\n" + string_format_writer.StringIndentWithSpace
 
@@ -151,26 +151,8 @@ func (f *cliCheckedOut) WriteStringFormat(
 				sw,
 				string_format_writer.Field{
 					Key:       "id",
-					Value:     co.External.ObjectId.String(),
+					Value:     item.Id.String(),
 					ColorType: string_format_writer.ColorTypeId,
-					Prefix:    prefix,
-				},
-			)
-			n += n2
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
-		{
-			n2, err = f.fieldFormatWriter.WriteStringFormat(
-				sw,
-				string_format_writer.Field{
-					Key:       "type",
-					Value:     store_browser.Metadata.Type.String(),
-					ColorType: string_format_writer.ColorTypeType,
 					Prefix:    prefix,
 				},
 			)

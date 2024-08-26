@@ -40,7 +40,7 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 		options: t.Options,
 	}
 
-	r1.stringFormatReadWriter = t.stringFormatReadWriter
+	r1.stringFormatReader = t.stringFormatReader
 
 	mr := object_metadata.Reader{
 		Metadata: &t.Metadata,
@@ -104,7 +104,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		OmitLeadingEmptyLine: omit,
 	}
 
-	aw.stringFormatWriter = ot.stringFormatReadWriter
+	aw.stringFormatWriter = ot.stringFormatWriter
 
 	ocf := optionCommentFactory{}
 	var ocs []Option

@@ -80,6 +80,101 @@ func (ts *TokenScanner) CanScan() (ok bool) {
 	return ts.err == nil
 }
 
+func (ts *TokenScanner) ScanIdentifierLikeSkipSpaces() (ok bool) {
+	if ts.unscan {
+		ok = true
+		ts.unscan = false
+		return
+	}
+
+	if ts.err == io.EOF {
+		return
+	}
+
+	afterFirst := false
+	ok = true
+
+	ts.token.Reset()
+	ts.tokenType = TokenTypeIncomplete
+	ts.tokenTypeProbably = TokenTypeIncomplete
+	ts.parts.Reset()
+
+	for {
+		var r rune
+		var n int
+
+		r, n, ts.err = ts.rs.ReadRune()
+		ts.n += int64(n)
+
+		if ts.err != nil {
+			if ts.err == io.EOF {
+				ok = ts.token.Len() > 0
+				ts.tokenType = ts.tokenTypeProbably
+				ts.parts.Left = ts.token.Bytes()
+			}
+
+			return
+		}
+
+		isOperator := unicode.IsSpace(r) || r == '[' || r == ']'
+		isSpace := unicode.IsSpace(r)
+
+		switch {
+		case r == '"' || r == '\'':
+			ts.tokenType = TokenTypeLiteral
+
+			if !ts.consumeLiteralOrFieldValue(r, TokenTypeLiteral, &ts.parts.Left) {
+				ok = false
+				return
+			}
+
+			return
+
+		case !afterFirst && isOperator:
+			if isSpace {
+				if !ts.consumeSpaces() {
+					ok = false
+					return
+				}
+
+				continue
+			} else {
+				ts.token.WriteRune(r)
+				ts.tokenType = TokenTypeOperator
+				return
+			}
+
+		case !isOperator:
+			ts.tokenTypeProbably = TokenTypeIdentifier
+			ts.token.WriteRune(r)
+			afterFirst = true
+			continue
+
+		default: // wasSplitRune && afterFirst
+			ts.parts.Left = ts.token.Bytes()
+
+			if r == '=' {
+				if !ts.consumeField(r) {
+					ok = false
+					return
+				}
+
+				return
+			}
+
+			if ts.err = ts.rs.UnreadRune(); ts.err != nil {
+				ts.err = errors.Wrapf(ts.err, "%c", r)
+				ok = false
+			}
+
+			ts.n -= int64(utf8.RuneLen(r))
+			ts.tokenType = TokenTypeIdentifier
+
+			return
+		}
+	}
+}
+
 func (ts *TokenScanner) Scan() (ok bool) {
 	if ts.unscan {
 		ok = true

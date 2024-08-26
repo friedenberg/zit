@@ -2,67 +2,30 @@ package stream_index
 
 import (
 	"bytes"
-	"encoding/binary"
 	"fmt"
 	"io"
 	"math"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/keys"
 )
 
 type binaryField struct {
 	keys.Binary
-	ContentLength [2]uint8
+	ContentLength uint16
 	Content       bytes.Buffer
 }
 
 func (bf *binaryField) String() string {
-	cl, _, _ := bf.GetContentLength()
-	return fmt.Sprintf("%s:%d:%x", bf.Binary, cl, bf.Content.Bytes())
+	return fmt.Sprintf("%s:%d:%x", bf.Binary, bf.ContentLength, bf.Content.Bytes())
 }
 
 func (bf *binaryField) Reset() {
 	bf.Binary.Reset()
-	bf.ContentLength[0] = 0
-	bf.ContentLength[1] = 0
+	bf.ContentLength = 0
 	bf.Content.Reset()
-}
-
-func (bf *binaryField) GetContentLength() (contentLength int, contentLength64 int64, err error) {
-	var n int
-	contentLength64, n = binary.Varint(bf.ContentLength[:])
-
-	if n <= 0 {
-		err = errors.Errorf("error in content length: %d", n)
-		return
-	}
-
-	if contentLength64 > math.MaxUint16 {
-		err = errContentLengthTooLarge
-		return
-	}
-
-	if contentLength64 < 0 {
-		err = errContentLengthNegative
-		return
-	}
-
-	return int(contentLength64), contentLength64, nil
-}
-
-func (bf *binaryField) SetContentLength(v int) {
-	if v < 0 {
-		panic(errContentLengthNegative)
-	}
-
-	if v > math.MaxUint16 {
-		panic(errContentLengthTooLarge)
-	}
-
-	// TODO
-	binary.PutVarint(bf.ContentLength[:], int64(v))
 }
 
 var (
@@ -81,7 +44,7 @@ func (bf *binaryField) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	n1, err = ohio.ReadAllOrDieTrying(r, bf.ContentLength[:])
+	n1, bf.ContentLength, err = ohio.ReadFixedUInt16(r)
 	n += int64(n1)
 
 	if err != nil {
@@ -89,16 +52,10 @@ func (bf *binaryField) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	contentLength, contentLength64, err := bf.GetContentLength()
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	bf.Content.Grow(contentLength)
+	bf.Content.Grow(int(bf.ContentLength))
 	bf.Content.Reset()
 
-	n2, err = io.CopyN(&bf.Content, r, contentLength64)
+	n2, err = io.CopyN(&bf.Content, r, int64(bf.ContentLength))
 	n += n2
 
 	if err != nil {
@@ -114,12 +71,23 @@ var errContentLengthDoesNotMatchContent = errors.New(
 )
 
 func (bf *binaryField) WriteTo(w io.Writer) (n int64, err error) {
+	defer func() {
+		r := recover()
+
+		if r == nil {
+			return
+		}
+
+		ui.Debug().Print(bf.Content.Len(), bf.ContentLength)
+		panic(r)
+	}()
+
 	if bf.Content.Len() > math.MaxUint16 {
 		err = errContentLengthTooLarge
 		return
 	}
 
-	bf.SetContentLength(bf.Content.Len())
+	bf.ContentLength = uint16(bf.Content.Len())
 
 	var n1 int
 	var n2 int64
@@ -131,7 +99,7 @@ func (bf *binaryField) WriteTo(w io.Writer) (n int64, err error) {
 		return
 	}
 
-	n1, err = ohio.WriteAllOrDieTrying(w, bf.ContentLength[:])
+  n1, err = ohio.WriteFixedUInt16(w, bf.ContentLength)
 	n += int64(n1)
 
 	if err != nil {

@@ -5,4 +5,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type ExternalLike = catgut.StringFormatReadWriter[sku.ExternalLike]
+type (
+	ReaderExternalLike = catgut.StringFormatReader[sku.ExternalLike]
+	WriterExternalLike = catgut.StringFormatWriter[sku.ExternalLike]
+
+	ExternalLike       struct {
+		ReaderExternalLike
+		WriterExternalLike
+	}
+)

@@ -160,8 +160,8 @@ func (f *Organize) WriteStringFormat(
 
 	if hasNative {
 
-		item := e.item
-		store_browser := &e.store_browser
+		item := e.browserItem
+		store_browser := &e.browser
 
 		{
 			n1, err = sw.WriteString(" !")

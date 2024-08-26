@@ -54,7 +54,7 @@ type Env struct {
 
 	DormantCounter query.DormantCounter
 
-	luaSkuFormat sku_fmt.ExternalLike
+	luaSkuFormat sku_fmt.ReaderExternalLike
 }
 
 func Make(
@@ -165,13 +165,28 @@ func (u *Env) Initialize(options Options) (err error) {
 	// 		return
 	// 	}
 	// }
+	ofo := object_inventory_format.Options{Tai: true}
+
+	if err = u.store.Initialize(
+		u.flags,
+		u.GetConfig(),
+		u.fs_home,
+		object_inventory_format.FormatForVersion(u.GetConfig().GetStoreVersion()),
+		u.sunrise,
+		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
+		u.makeQueryBuilder().
+			WithDefaultGenres(ids.MakeGenre(genres.TrueGenre()...)),
+		ofo,
+	); err != nil {
+		err = errors.Wrapf(err, "failed to initialize store util")
+		return
+	}
 
 	ui.Log().Printf("store version: %s", u.GetConfig().GetStoreVersion())
 
 	var sfs *store_fs.Store
 
 	k := u.GetConfig()
-	ofo := object_inventory_format.Options{Tai: true}
 
 	if sfs, err = store_fs.MakeCwdFilesAll(
 		k,
@@ -179,6 +194,7 @@ func (u *Env) Initialize(options Options) (err error) {
 		k.FileExtensions,
 		u.GetFSHome(),
 		ofo,
+		u.PrinterExternalLikeFS(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -198,25 +214,14 @@ func (u *Env) Initialize(options Options) (err error) {
 					store_browser.MakeItemDeletedStringWriterFormat(
 						k,
 						u.FormatColorOptionsOut(),
+						u.StringFormatWriterField(
+							66,
+							u.FormatColorOptionsOut(),
+						),
 					),
 				),
 			),
 		},
-	}
-
-	if err = u.store.Initialize(
-		u.flags,
-		u.GetConfig(),
-		u.fs_home,
-		object_inventory_format.FormatForVersion(u.GetConfig().GetStoreVersion()),
-		u.sunrise,
-		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
-		u.makeQueryBuilder().
-			WithDefaultGenres(ids.MakeGenre(genres.TrueGenre()...)),
-		ofo,
-	); err != nil {
-		err = errors.Wrapf(err, "failed to initialize store util")
-		return
 	}
 
 	if err = u.store.SetExternalStores(

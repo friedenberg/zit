@@ -1,5 +1,13 @@
+code.linenisgreat.com/chrest v0.0.0-20240803113356-5498bfc65ae1 h1:CAFqSkL3NXCaWkJt0rFGmT+bOb828VF+CVmDfM2S4HY=
+code.linenisgreat.com/chrest v0.0.0-20240803113356-5498bfc65ae1/go.mod h1:RlMRYvuISt0/0EvS2gq4p6x1RV7fDdGLRUid58sM+p4=
+code.linenisgreat.com/chrest v0.0.0-20240824123826-4875e6924907 h1:fI4dPbDl9P1kKjDzbvQWc2spZjcwTj1qpjSF34TxZk8=
+code.linenisgreat.com/chrest v0.0.0-20240824123826-4875e6924907/go.mod h1:RlMRYvuISt0/0EvS2gq4p6x1RV7fDdGLRUid58sM+p4=
 code.linenisgreat.com/chrest/go/chrest v0.0.0-20240706144420-44dc626ba09e h1:Ega5OpbV3+sbAuZhWOXKTzR8TluidIh5nbywEQXgIZE=
 code.linenisgreat.com/chrest/go/chrest v0.0.0-20240706144420-44dc626ba09e/go.mod h1:CKYwqqEVfxCJXHYKnWPGwfUtQQZMxtAC8aeH0Q/YhgM=
+code.linenisgreat.com/chrest/go/chrest v0.0.0-20240824123826-4875e6924907 h1:IHdqX1ykFwnByAVNRLfsrz//bm85gaLLK8p8If08x8Q=
+code.linenisgreat.com/chrest/go/chrest v0.0.0-20240824123826-4875e6924907/go.mod h1:o7t5frvzPwu67SuoT2Iykp1JF0z7vyoayIfZ0+/NyBA=
+code.linenisgreat.com/chrest/go/chrest v0.0.0-20240824132247-74aa7f1dc1b2 h1:e4flKKdmBuFOtmc25WDIux7pKlMhWFJkmOfVey+K060=
+code.linenisgreat.com/chrest/go/chrest v0.0.0-20240824132247-74aa7f1dc1b2/go.mod h1:o7t5frvzPwu67SuoT2Iykp1JF0z7vyoayIfZ0+/NyBA=
 filippo.io/age v1.1.1 h1:pIpO7l151hCnQ4BdyBujnGP2YlUo0uj6sAVNHGBvXHg=
 filippo.io/age v1.1.1/go.mod h1:l03SrzDUrBkdBx8+IILdnn2KZysqQdbEBUQ4p3sqEQE=
 github.com/DataDog/zstd v1.5.5 h1:oWf5W7GtOLgp6bciQYDmhHHjdhYkALu6S/5Ni9ZgSvQ=

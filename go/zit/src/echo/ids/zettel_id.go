@@ -144,6 +144,12 @@ func (i ZettelId) Less(j ZettelId) bool {
 	return i.String() < j.String()
 }
 
+func (h *ZettelId) SetFromIdParts(parts [3]string) (err error) {
+	h.left = parts[0]
+	h.right = parts[2]
+	return
+}
+
 func (h *ZettelId) Set(v string) (err error) {
 	v = strings.TrimSpace(v)
 	v = strings.ToLower(v)

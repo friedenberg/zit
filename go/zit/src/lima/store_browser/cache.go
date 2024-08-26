@@ -3,9 +3,11 @@ package store_browser
 import (
 	"bufio"
 	"encoding/gob"
+	"net/http"
 	"os"
 	"path"
 
+	"code.linenisgreat.com/chrest/go/chrest/src/charlie/browser_items"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
@@ -14,7 +16,7 @@ import (
 
 type cache struct {
 	LaunchTime ids.Tai
-	Rows       map[string]float64
+	Rows       map[string]browser_items.ItemId // map[browserItem.ExternalId]browserItemId
 }
 
 func (c *Store) getCachePath() string {
@@ -22,7 +24,7 @@ func (c *Store) getCachePath() string {
 }
 
 func (c *Store) initializeCache() (err error) {
-	c.tabCache.Rows = make(map[string]float64)
+	c.tabCache.Rows = make(map[string]browser_items.ItemId)
 
 	var f *os.File
 
@@ -48,6 +50,28 @@ func (c *Store) initializeCache() (err error) {
 		err = nil
 		return
 	}
+
+	return
+}
+
+func (c *Store) resetCacheIfNecessary(
+	resp *http.Response,
+) (err error) {
+	timeRaw := resp.Header.Get("X-Chrest-Startup-Time")
+
+	var newLaunchTime ids.Tai
+
+	if err = newLaunchTime.SetFromRFC3339(timeRaw); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if newLaunchTime.Equals(c.tabCache.LaunchTime) {
+		return
+	}
+
+	c.tabCache.LaunchTime = newLaunchTime
+	clear(c.tabCache.Rows)
 
 	return
 }

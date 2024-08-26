@@ -24,10 +24,10 @@ func MakeObjectIdCliFormat(
 		options: options,
 		sfwColor: string_format_writer.MakeColor(
 			co,
-			catgut.StringFormatWriter,
+			catgut.StringFormatWriterString,
 			string_format_writer.ColorTypeId,
 		),
-		sfwNoColor: catgut.StringFormatWriter,
+		sfwNoColor: catgut.StringFormatWriterString,
 		abbr:       abbr,
 	}
 }
@@ -65,15 +65,17 @@ func (f *objectIdCliFormat) WriteStringFormat(
 		return
 	}
 
-	sm := catgut.GetPool().Get()
-	defer catgut.GetPool().Put(sm)
-	sm.WriteRune(rune(parts.Middle))
-	n1, err = f.sfwNoColor.WriteStringFormat(w, sm)
-	n += n1
+	if parts.Middle != '\x00' {
+		sm := catgut.GetPool().Get()
+		defer catgut.GetPool().Put(sm)
+		sm.WriteRune(rune(parts.Middle))
+		n1, err = f.sfwNoColor.WriteStringFormat(w, sm)
+		n += n1
 
-	if err != nil {
-		err = errors.Wrap(err)
-		return
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	n1, err = f.sfwColor.WriteStringFormat(w, parts.Right)

@@ -7,8 +7,12 @@ type (
 		ReadStringFormat(*RingBuffer, T) (int64, error)
 	}
 
+	StringFormatWriter[T any] interface {
+		interfaces.StringFormatWriter[T]
+	}
+
 	StringFormatReadWriter[T any] interface {
 		StringFormatReader[T]
-		interfaces.StringFormatWriter[T]
+		StringFormatWriter[T]
 	}
 )

@@ -126,6 +126,20 @@ func ReadInt64(r io.Reader) (n int64, read int, err error) {
 	return
 }
 
+func ReadFixedUInt16(r io.Reader) (n int, val uint16, err error) {
+	cl := [2]byte{}
+
+	n, err = ReadAllOrDieTrying(r, cl[:])
+	if err != nil {
+		err = errors.WrapExcept(err, io.EOF)
+		return
+	}
+
+	val = ByteArrayToUInt16(cl)
+
+	return
+}
+
 func ReadFixedInt32(r io.Reader) (n int, val int32, err error) {
 	cl := [4]byte{}
 

@@ -8,7 +8,8 @@ import (
 
 type (
 	ExternalObjectId interface {
-		ids.ObjectIdLike
+		interfaces.GenreGetter
+		GetObjectId() *ids.ObjectId
 		GetExternalObjectId() *ids.ObjectId
 	}
 

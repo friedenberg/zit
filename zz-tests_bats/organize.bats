@@ -50,14 +50,14 @@ function organize_simple { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 
-		- [   !md   ]
-		- [   tag  ]
-		- [   tag-1]
-		- [   tag-2]
-		- [   tag-3]
-		- [   tag-4]
-		- [one/dos    !md tag-3 tag-4] wow ok again
-		- [one/uno    !md tag-3 tag-4] wow the first
+		- [!md]
+		- [one/dos !md tag-3 tag-4] wow ok again
+		- [one/uno !md tag-3 tag-4] wow the first
+		- [tag-1]
+		- [tag-2]
+		- [tag-3]
+		- [tag-4]
+		- [tag]
 	EOM
 }
 
@@ -483,7 +483,7 @@ function organize_v5_outputs_organize_one_etikett { # @test
 		- ok
 		---
 
-		- [two/uno  !md] wow
+		- [two/uno !md] wow
 	EOM
 }
 
@@ -514,7 +514,7 @@ function organize_v5_outputs_organize_two_etiketten { # @test
 		- ok
 		---
 
-		- [two/uno  !md] wow
+		- [two/uno !md] wow
 	EOM
 
 	run_zit organize "${cmd_def_organize[@]}" \
@@ -574,11 +574,11 @@ function organize_v5_outputs_organize_one_etiketten_group_by_one { # @test
 
 		          # priority-1
 
-		- [two/uno  !md priority-2] wow
+		- [two/uno !md priority-2] wow
 
 		          # priority-2
 
-		- [two/uno  !md priority-1] wow
+		- [two/uno !md priority-1] wow
 	EOM
 
 	return
@@ -655,11 +655,11 @@ function organize_v5_outputs_organize_two_zettels_one_etiketten_group_by_one { #
 
 		           # priority-1
 
-		- [two/uno   !md] one/uno
+		- [two/uno !md] one/uno
 
 		           # priority-2
 
-		- [one/tres  !md] two/dos
+		- [one/tres !md] two/dos
 	EOM
 }
 
@@ -969,12 +969,12 @@ function organize_v5_commits_no_changes { # @test
 
 		          ## w-2022-07-06
 
-		- [one/tres  !md] two/dos
-		- [two/dos   !md] 3
+		- [one/tres !md] two/dos
+		- [two/dos !md] 3
 
 		          ## w-2022-07-07
 
-		- [two/uno   !md] one/uno
+		- [two/uno !md] one/uno
 	EOM
 
 	run_zit organize "${cmd_def_organize[@]}" \
@@ -1094,7 +1094,7 @@ function organize_v5_zettels_in_correct_places { # @test
 		- inventory-pipe_shelves-atheist_shoes_box-jabra_yellow_box_2
 		---
 
-		- [two/uno  !md] jabra coral usb_a-to-usb_c cable
+		- [two/uno !md] jabra coral usb_a-to-usb_c cable
 	EOM
 }
 

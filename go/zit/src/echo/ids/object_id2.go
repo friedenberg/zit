@@ -1,6 +1,7 @@
 package ids
 
 import (
+	"bytes"
 	"io"
 	"math"
 	"strings"
@@ -13,6 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
 var poolObjectId2 interfaces.Pool[objectId2, *objectId2]
@@ -36,6 +38,7 @@ type objectId2 struct {
 	middle      byte // remove and replace with virtual
 	left, right catgut.String
 	repoId      catgut.String
+	sha         sha.Sha
 	// Domain
 }
 
@@ -258,7 +261,11 @@ func (k2 *objectId2) String() string {
 	switch k2.g {
 	case genres.Zettel:
 		sb.Write(k2.left.Bytes())
-		sb.WriteByte(k2.middle)
+
+		if k2.middle != '\x00' {
+			sb.WriteByte(k2.middle)
+		}
+
 		sb.Write(k2.right.Bytes())
 
 	case genres.Type:
@@ -469,12 +476,76 @@ func (h *objectId2) SetRaw(v string) (err error) {
 	return
 }
 
+func (h *objectId2) SetLeft(v string) (err error) {
+	h.g = genres.Zettel
+
+	if err = h.left.Set(v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 // TODO parse this directly
 // one/uno
 // /browser/one/uno
 // /browser/bookmark-1
 // /browser/!md
 // /browser/!md
+func (oid *objectId2) ReadFromToken(s *catgut.String) (err error) {
+	if s.Len() == 0 {
+		err = errors.Errorf("empty token")
+		return
+	}
+
+	b := s.Bytes()
+
+	if b[0] == '/' {
+		oid.g = genres.Zettel
+		return
+	}
+
+	if bytes.HasPrefix(b, []byte{'/'}) {
+		els := bytes.SplitAfterN(b[1:], []byte{'/'}, 2)
+
+		if len(els) != 2 {
+			err = errors.Errorf("invalid object id format: %q", s)
+			return
+		}
+
+		b = els[1]
+
+		repoId := bytes.TrimSuffix(els[0], []byte{'/'})
+
+		if err = oid.repoId.SetBytes(repoId); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	idx := bytes.LastIndexByte(b, '@')
+
+	if idx > -1 {
+		tail := b[idx+1:]
+		b = b[:idx]
+
+		if len(tail) > 0 {
+			if err = oid.sha.SetHexBytes(tail); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+	}
+
+	if err = oid.Set(string(b)); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (oid *objectId2) Set(v string) (err error) {
 	if v == "/" {
 		oid.g = genres.Zettel

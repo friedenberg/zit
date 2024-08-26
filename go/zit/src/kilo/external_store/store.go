@@ -189,7 +189,7 @@ func (es *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 	return
 }
 
-func (es *Store) GetObjectsIdForString(v string) (k []sku.ExternalObjectId, err error) {
+func (es *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err error) {
 	if es == nil {
 		err = collections.MakeErrNotFoundString(v)
 		return
@@ -239,7 +239,10 @@ func (s *Store) GetExternalStoreOrganizeFormat(
 	esof, ok := s.StoreLike.(OrganizeFormatGetter)
 
 	if !ok {
-		return f
+		return sku_fmt.ExternalLike{
+			ReaderExternalLike: f,
+			WriterExternalLike: f,
+		}
 	}
 
 	return esof.GetExternalStoreOrganizeFormat(f)

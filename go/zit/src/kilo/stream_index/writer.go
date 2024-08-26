@@ -192,6 +192,16 @@ func (pw *writer) flushJustLatest() (err error) {
 func (pw *writer) writeOne(
 	z *sku.Transacted,
 ) (err error) {
+	defer func() {
+		r := recover()
+
+		if r == nil {
+			return
+		}
+
+		ui.Debug().Print(z)
+		panic(r)
+	}()
 	pw.Offset += pw.ContentLength
 
 	previous := pw.ObjectIdShaMap[z.GetObjectId().String()]

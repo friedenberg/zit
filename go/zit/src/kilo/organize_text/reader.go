@@ -14,11 +14,11 @@ import (
 )
 
 type assignmentLineReader struct {
-	options                Options
-	lineNo                 int
-	root                   *Assignment
-	currentAssignment      *Assignment
-	stringFormatReadWriter catgut.StringFormatReadWriter[sku.ExternalLike]
+	options            Options
+	lineNo             int
+	root               *Assignment
+	currentAssignment  *Assignment
+	stringFormatReader catgut.StringFormatReader[sku.ExternalLike]
 }
 
 func (ar *assignmentLineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
@@ -279,7 +279,7 @@ func (ar *assignmentLineReader) readOneObj(
 	z.ExternalLike = sku.GetTransactedPool().Get()
 	z.Type = t
 
-	if _, err = ar.stringFormatReadWriter.ReadStringFormat(
+	if _, err = ar.stringFormatReader.ReadStringFormat(
 		r,
 		z.ExternalLike,
 	); err != nil {

@@ -98,15 +98,9 @@ func (bf *binaryDecoder) readFormatExactly(
 
 	buf := bytes.NewBuffer(b)
 
-	n1, err = ohio.ReadAllOrDieTrying(buf, bf.ContentLength[:])
+  n1, bf.ContentLength, err = ohio.ReadFixedUInt16(buf)
 	n += int64(n1)
 
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	_, _, err = bf.GetContentLength()
 	if err != nil {
 		err = errors.Wrap(err)
 		return
@@ -151,7 +145,7 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 	// loop thru entries to find the next one that matches the current sigil
 	// when found, break the loop and deserialize it and return
 	for {
-		n1, err = ohio.ReadAllOrDieTrying(r, bf.ContentLength[:])
+    n1, bf.ContentLength, err = ohio.ReadFixedUInt16(r)
 		n += int64(n1)
 
 		if err != nil {
@@ -164,12 +158,7 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 			return
 		}
 
-		var contentLength64 int64
-		_, contentLength64, err = bf.GetContentLength()
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+    contentLength64 := int64(bf.ContentLength)
 
 		bf.R = r
 		bf.N = contentLength64
