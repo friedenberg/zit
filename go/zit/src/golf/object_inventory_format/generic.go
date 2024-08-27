@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/german_keys"
 	"code.linenisgreat.com/zit/go/zit/src/delta/keys"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 )
 
@@ -201,8 +202,17 @@ func WriteMetadateiKeyTo(
 			break
 		}
 
-		// TODO fix issue with es being nil sometimes
-		for _, e := range iter.SortedValues(es) {
+		var sortedValues []ids.Tag
+
+		func() {
+			defer func() {
+				_ = recover()
+			}()
+
+			sortedValues = iter.SortedValues(es)
+		}()
+
+		for _, e := range sortedValues {
 			if e.IsVirtual() {
 				continue
 			}

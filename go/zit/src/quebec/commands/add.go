@@ -16,6 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
+// fold into Checkin
 type Add struct {
 	AllowDupes         bool
 	Delete             bool

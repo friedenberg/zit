@@ -28,6 +28,10 @@ func (t *Transacted) GetExternalState() external_state.State {
 	return external_state.Unknown
 }
 
+func (a *Transacted) GetExternalObjectId() ExternalObjectId {
+	return a
+}
+
 func (a *Transacted) Clone() ExternalLike {
 	b := GetTransactedPool().Get()
 	TransactedResetter.ResetWith(b, a)

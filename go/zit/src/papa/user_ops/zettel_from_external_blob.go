@@ -38,8 +38,6 @@ func (c ZettelFromExternalBlob) Run(
 	results = sku.MakeTransactedMutableSet()
 	toDelete := fd.MakeMutableSet()
 
-	// TODO consolidate dupes
-
 	if err = c.GetStore().QueryCheckedOut(
 		qg,
 		func(col sku.CheckedOutLike) (err error) {

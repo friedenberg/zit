@@ -123,6 +123,7 @@ func (z *Metadata) IsEmpty() bool {
 	return true
 }
 
+// TODO fix issue with GetTags being nil sometimes
 func (m *Metadata) GetTags() ids.TagSet {
 	if m.Tags == nil {
 		m.Tags = ids.MakeTagMutableSet()

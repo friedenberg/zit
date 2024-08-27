@@ -96,6 +96,10 @@ func (t *External) GetSkuExternalLike() sku.ExternalLike {
 	return t
 }
 
+func (t *External) GetExternalObjectId() sku.ExternalObjectId {
+	return &t.browserItem
+}
+
 func (a *External) Clone() sku.ExternalLike {
 	b := GetExternalPool().Get()
 	sku.TransactedResetter.ResetWith(&b.Transacted, &a.Transacted)

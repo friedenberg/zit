@@ -35,6 +35,10 @@ func (a *obj) cloneWithType(t tag_paths.Type) (b *obj) {
 	return
 }
 
+func (a *obj) GetExternalObjectId() sku.ExternalObjectId {
+	return a.ExternalLike.GetExternalObjectId()
+}
+
 func (a *obj) String() string {
 	return a.ExternalLike.String()
 }
