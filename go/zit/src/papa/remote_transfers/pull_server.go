@@ -150,7 +150,7 @@ func (op PullServer) skusForFilter(
 		return
 	}
 
-	if err = op.env.GetStore().QueryWithKasten(
+	if err = op.env.GetStore().QueryTransacted(
 		msg.MetaSet,
 		iter.MakeChain(
 			func(sk *sku.Transacted) (err error) {

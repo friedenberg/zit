@@ -241,6 +241,11 @@ func (c *Store) QueryCheckedOut(
 
 func (c *Store) GetExternalStoreOrganizeFormat(
 	f *sku_fmt.Organize,
-) sku_fmt.ReaderExternalLike {
-	return MakeFormatOrganize(f)
+) sku_fmt.ExternalLike {
+	fo := MakeFormatOrganize(f)
+
+	return sku_fmt.ExternalLike{
+		ReaderExternalLike: fo,
+		WriterExternalLike: fo,
+	}
 }

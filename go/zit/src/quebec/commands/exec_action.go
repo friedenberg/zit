@@ -63,7 +63,7 @@ func (c ExecAction) RunWithQuery(
 
 	object_id_provider := collections_value.MakeMutableValueSet[ids.IdLike](nil)
 
-	if err = u.GetStore().QueryWithKasten(
+	if err = u.GetStore().QueryTransacted(
 		ms,
 		func(z *sku.Transacted) (err error) {
 			return object_id_provider.Add(z.GetObjectId())

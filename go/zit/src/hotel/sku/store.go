@@ -13,6 +13,10 @@ type (
 		GetExternalObjectId() *ids.ObjectId
 	}
 
+	ExternalObjectIdGetter interface {
+		GetExternalObjectId() ExternalObjectId
+	}
+
 	FuncRealize     = func(*Transacted, *Transacted, CommitOptions) error
 	FuncCommit      = func(*Transacted, CommitOptions) error
 	FuncReadSha     = func(*sha.Sha) (*Transacted, error)

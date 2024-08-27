@@ -79,12 +79,12 @@ func (e *External) SetItem(i browserItem, overwrite bool) (err error) {
 
 	e.Metadata.Tai = e.browser.Metadata.GetTai()
 
-	if overwrite {
-		if err = i.WriteToMetadata(&e.Metadata); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
+	// if overwrite {
+	// 	if err = i.WriteToMetadata(&e.Metadata); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return
+	// 	}
+	// }
 
 	// TODO make configurable
 	e.Metadata.Type = ids.MustType("!toml-bookmark")

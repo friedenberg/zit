@@ -64,7 +64,7 @@ func (c CatAlfred) RunWithQuery(
 
 	defer errors.DeferredCloser(&err, aw)
 
-	if err = u.GetStore().QueryWithKasten(
+	if err = u.GetStore().QueryTransacted(
 		qg,
 		aw.PrintOne,
 	); err != nil {

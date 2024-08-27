@@ -141,11 +141,13 @@ func (i browserItem) GetTai() (t ids.Tai, err error) {
 	return
 }
 
+var errEmptyUrl = errors.New("empty url")
+
 func (i browserItem) GetUrl() (u *url.URL, err error) {
 	ur := i.Url
 
 	if ur == "" {
-		err = errors.Errorf("empty url")
+		err = errEmptyUrl
 		return
 	}
 

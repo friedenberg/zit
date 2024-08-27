@@ -48,7 +48,7 @@ func (c commandWithQuery) Complete(
 		return
 	}
 
-	if err = u.GetStore().QueryWithKasten(
+	if err = u.GetStore().QueryTransacted(
 		c.Group,
 		w.WriteOne,
 	); err != nil {

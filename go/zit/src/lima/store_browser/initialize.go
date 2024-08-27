@@ -62,8 +62,13 @@ func (s *Store) initializeUrls() (err error) {
 		var u *url.URL
 
 		if u, err = i.GetUrl(); err != nil {
-			err = errors.Wrap(err)
-			return
+			if errors.Is(err, errEmptyUrl) {
+				err = nil
+				continue
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 
 		s.urls[*u] = append(s.urls[*u], i)

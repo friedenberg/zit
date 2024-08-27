@@ -403,7 +403,7 @@ func (qg *Group) ContainsExternalSku(
 	sk *sku.Transacted,
 	state checked_out_state.State,
 ) (ok bool) {
-	defer sk.Metadata.Cache.QueryPath.PushOnReturn(qg, &ok)
+	defer sk.GetSku().GetMetadata().Cache.QueryPath.PushOnReturn(qg, &ok)
 
 	if qg.dotOperatorActive {
 		ok = true

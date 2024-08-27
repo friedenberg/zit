@@ -91,7 +91,7 @@ func (c *Organize) RunWithQuery(
 	getResults := sku.MakeExternalLikeMutableSet()
 	var l sync.Mutex
 
-	if err = u.GetStore().QueryWithKasten2(
+	if err = u.GetStore().Query(
 		qg,
 		func(el sku.ExternalLike) (err error) {
 			l.Lock()

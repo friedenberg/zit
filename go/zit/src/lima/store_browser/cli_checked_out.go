@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -90,60 +89,102 @@ func (f *cliCheckedOut) WriteStringFormat(
 	}
 
 	if co.State != checked_out_state.Untracked {
-		n2, err = f.objectIdStringFormatWriter.WriteStringFormat(
-			sw,
-			&co.Internal.ObjectId,
-		)
-		n += n2
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		n2, err = f.metadataStringFormatWriter.WriteStringFormat(
-			sw,
-			&co.Internal.Metadata,
-		)
-		n += n2
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		n1, err = sw.WriteString("\n")
-		n += int64(n1)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		n2, err = f.rightAlignedWriter.WriteStringFormat(
-			sw,
-			"",
-		)
-		n += n2
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		n1, err = sw.WriteString(" ")
-		n += int64(n1)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
 	}
 
-	item := co.External.browserItem
-	store_browser := &co.External.browser
+	n2, err = f.writeStringFormatExternal(sw, &co.External)
+	n += int64(n1)
 
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n1, err = sw.WriteString("\n")
+	n += int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n2, err = f.rightAlignedWriter.WriteStringFormat(sw, "")
+	n += int64(n2)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n1, err = sw.WriteString("]")
+	n += int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (f *cliCheckedOut) writeStringFormatExternal(
+	sw interfaces.WriterAndStringWriter,
+	e *External,
+) (n int64, err error) {
+	var n2 int64
+	var n1 int
+
+	n2, err = f.objectIdStringFormatWriter.WriteStringFormat(
+		sw,
+		&e.ObjectId,
+	)
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n2, err = f.metadataStringFormatWriter.WriteStringFormat(
+		sw,
+		&e.Metadata,
+	)
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n1, err = sw.WriteString("\n")
+	n += int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n2, err = f.rightAlignedWriter.WriteStringFormat(
+		sw,
+		"",
+	)
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n1, err = sw.WriteString(" ")
+	n += int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	item := &e.browserItem
 	prefix := "\n" + string_format_writer.StringIndentWithSpace
+	prefix = " "
 
 	{
 		{
@@ -164,12 +205,12 @@ func (f *cliCheckedOut) WriteStringFormat(
 			}
 		}
 
-		if !store_browser.Metadata.Description.IsEmpty() {
+		if item.Title != "" {
 			n2, err = f.fieldFormatWriter.WriteStringFormat(
 				sw,
 				string_format_writer.Field{
 					Key:       "title",
-					Value:     store_browser.Metadata.Description.String(),
+					Value:     item.Title,
 					ColorType: string_format_writer.ColorTypeUserData,
 					Prefix:    prefix,
 				},
@@ -209,55 +250,31 @@ func (f *cliCheckedOut) WriteStringFormat(
 			}
 		}
 
-		tags := store_browser.Metadata.GetTags()
-		first := true
+		// tags := e.Metadata.GetTags()
+		// first := true
 
-		if tags.Len() > 0 {
-			for _, v := range iter.SortedValues(store_browser.Metadata.GetTags()) {
-				field := string_format_writer.Field{
-					Value:  v.String(),
-					Prefix: " ",
-				}
+		// if tags.Len() > 0 {
+		// 	for _, v := range iter.SortedValues(e.Metadata.GetTags()) {
+		// 		field := string_format_writer.Field{
+		// 			Value:  v.String(),
+		// 			Prefix: " ",
+		// 		}
 
-				if first {
-					field.Prefix = prefix
-				}
+		// 		if first {
+		// 			field.Prefix = prefix
+		// 		}
 
-				n2, err = f.fieldFormatWriter.WriteStringFormat(sw, field)
-				n += int64(n2)
+		// 		n2, err = f.fieldFormatWriter.WriteStringFormat(sw, field)
+		// 		n += int64(n2)
 
-				if err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+		// 		if err != nil {
+		// 			err = errors.Wrap(err)
+		// 			return
+		// 		}
 
-				first = false
-			}
-		}
-	}
-
-	n1, err = sw.WriteString("\n")
-	n += int64(n1)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	n2, err = f.rightAlignedWriter.WriteStringFormat(sw, "")
-	n += int64(n2)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	n1, err = sw.WriteString("]")
-	n += int64(n1)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
+		// 		first = false
+		// 	}
+		// }
 	}
 
 	return

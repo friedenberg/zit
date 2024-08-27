@@ -57,7 +57,7 @@ func (c Show) RunWithQuery(
 		return
 	}
 
-	if err = u.GetStore().QueryWithKasten(
+	if err = u.GetStore().QueryTransacted(
 		qg,
 		iter.MakeSyncSerializer(f),
 	); err != nil {

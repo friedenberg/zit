@@ -7,21 +7,18 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
-func (s *Store) QueryWithKasten(
+func (s *Store) QueryTransacted(
 	qg *query.Group,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	if err = s.QueryWithKasten2(
-		qg,
-		func(el sku.ExternalLike) (err error) {
-			if err = f(el.GetSku()); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+	var e query.Executor
 
-			return
-		},
-	); err != nil {
+	if e, err = s.MakeQueryExecutor(qg); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = e.ExecuteTransacted(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -29,7 +26,7 @@ func (s *Store) QueryWithKasten(
 	return
 }
 
-func (s *Store) QueryWithKasten2(
+func (s *Store) Query(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.ExternalLike],
 ) (err error) {

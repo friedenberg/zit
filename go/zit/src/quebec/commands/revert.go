@@ -90,7 +90,7 @@ func (c Revert) runRevertFromQuery(
 	eq *query.Group,
 	f interfaces.FuncIter[store.RevertId],
 ) (err error) {
-	if err = u.GetStore().QueryWithKasten(
+	if err = u.GetStore().QueryTransacted(
 		eq,
 		func(z *sku.Transacted) (err error) {
 			return f(store.RevertId{
