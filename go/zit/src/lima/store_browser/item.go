@@ -20,12 +20,16 @@ type browserItem struct {
 	browser_items.Item
 }
 
-func (i *browserItem) getExternalObjectId() sku.ExternalObjectId {
+func (i *browserItem) GetExternalObjectId() sku.ExternalObjectId {
 	return i
 }
 
-func (i *browserItem) GetExternalObjectId() *ids.ObjectId {
-	return i.GetObjectId()
+func (i *browserItem) GetGenre() interfaces.Genre {
+	return genres.Zettel
+}
+
+func (i *browserItem) String() string {
+	return i.GetKey()
 }
 
 func (i *browserItem) GetKey() string {
@@ -46,10 +50,6 @@ func (i *browserItem) GetType() (t ids.Type, err error) {
 	}
 
 	return
-}
-
-func (i *browserItem) GetGenre() interfaces.Genre {
-	return genres.Zettel
 }
 
 func (dst *browserItem) readFromRaw(src map[string]interface{}) (err error) {

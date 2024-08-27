@@ -11,16 +11,15 @@ import (
 )
 
 type ObjectId struct {
-	Exact    bool
-	Virtual  bool
-	Debug    bool
-	External bool
+	Exact   bool
+	Virtual bool
+	Debug   bool
 
 	ids.ObjectIdLike
 }
 
-func (k ObjectId) Reduce(b *Builder) (err error) {
-	if err = k.GetObjectId().Expand(b.expanders); err != nil {
+func (k ObjectId) reduce(b *buildState) (err error) {
+	if err = k.GetObjectId().Expand(b.builder.expanders); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

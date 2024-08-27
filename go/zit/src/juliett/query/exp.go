@@ -67,7 +67,7 @@ func (e *Exp) CollectTags(mes ids.TagMutableSet) {
 	}
 }
 
-func (e *Exp) Reduce(b *Builder) (err error) {
+func (e *Exp) reduce(b *buildState) (err error) {
 	if e.Exact {
 		for _, child := range e.Children {
 			switch k := child.(type) {
@@ -88,7 +88,7 @@ func (e *Exp) Reduce(b *Builder) (err error) {
 	for _, m := range e.Children {
 		switch mt := m.(type) {
 		case *Exp:
-			if err = mt.Reduce(b); err != nil {
+			if err = mt.reduce(b); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -102,8 +102,8 @@ func (e *Exp) Reduce(b *Builder) (err error) {
 				continue
 			}
 
-		case Reducer:
-			if err = mt.Reduce(b); err != nil {
+		case reducer:
+			if err = mt.reduce(b); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

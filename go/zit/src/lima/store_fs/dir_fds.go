@@ -385,9 +385,8 @@ func (d *dirFDs) addOneBlob(
 		return
 	}
 
-	if err = result.ObjectId.SetWithGenre(
+	if err = result.ObjectId.SetLeft(
 		f.GetPath(),
-		genres.Blob,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

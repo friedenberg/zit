@@ -13,11 +13,10 @@ import (
 )
 
 type Group struct {
-	Hidden            sku.Query
-	OptimizedQueries  map[genres.Genre]*Query
-	UserQueries       map[ids.Genre]*Query
-	ExternalObjectIds map[string]ObjectId
-	Types             ids.TypeMutableSet
+	Hidden           sku.Query
+	OptimizedQueries map[genres.Genre]*Query
+	UserQueries      map[ids.Genre]*Query
+	Types            ids.TypeMutableSet
 
 	dotOperatorActive bool
 	matchOnEmpty      bool
@@ -47,6 +46,7 @@ func (qg *Group) IsEmpty() bool {
 	return len(qg.UserQueries) == 0
 }
 
+// TODO migrate this to the query executor
 func (qg *Group) Get(g genres.Genre) (sku.QueryWithSigilAndObjectId, bool) {
 	q, ok := qg.OptimizedQueries[g]
 	return q, ok
@@ -92,9 +92,10 @@ func (qg *Group) GetExactlyOneObjectId(
 	for _, k1 := range kn {
 		k = k1.GetObjectId()
 
-		if k1.External {
-			s.Add(ids.SigilExternal)
-		}
+		// TODO
+		// if k1.External {
+		// 	s.Add(ids.SigilExternal)
+		// }
 
 		break
 	}
@@ -124,13 +125,13 @@ func (qg *Group) GetGenres() (g ids.Genre) {
 	return
 }
 
-type Reducer interface {
-	Reduce(*Builder) error
+type reducer interface {
+	reduce(*buildState) error
 }
 
-func (qg *Group) Reduce(b *Builder) (err error) {
+func (qg *Group) reduce(b *buildState) (err error) {
 	for _, q := range qg.UserQueries {
-		if err = q.Reduce(b); err != nil {
+		if err = q.reduce(b); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -142,7 +143,7 @@ func (qg *Group) Reduce(b *Builder) (err error) {
 	}
 
 	for _, q := range qg.OptimizedQueries {
-		if err = q.Reduce(b); err != nil {
+		if err = q.reduce(b); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -151,31 +152,26 @@ func (qg *Group) Reduce(b *Builder) (err error) {
 	return
 }
 
-func (qg *Group) addExactObjectId(
+func (qg *Group) addExactExternalObjectId(
 	b *buildState,
-	k ObjectId,
+	k sku.ExternalObjectId,
 ) (err error) {
-	if k.ObjectIdLike == nil {
+	if k == nil {
 		err = errors.Errorf("nil object id")
 		return
 	}
 
 	q := b.makeQuery()
 
-	if k.External {
-		q.Sigil.Add(ids.SigilExternal)
-	}
-
+	q.Sigil.Add(ids.SigilExternal)
 	q.Sigil.Add(ids.SigilLatest)
-	q.ObjectIds[k.GetObjectId().String()] = k
 	q.Genre.Add(genres.Must(k))
+	q.ExternalObjectIds[k.String()] = k
 
 	if err = qg.Add(q); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	qg.ExternalObjectIds[k.GetObjectId().String()] = k
 
 	return
 }
@@ -201,23 +197,20 @@ func (qg *Group) Add(q *Query) (err error) {
 	return
 }
 
-func (qg *Group) addOptimized(b *Builder, q *Query) (err error) {
+func (qg *Group) addOptimized(b *buildState, q *Query) (err error) {
 	q = q.Clone()
 	gs := q.Slice()
 
 	if len(gs) == 0 {
-		gs = b.defaultGenres.Slice()
+		gs = b.builder.defaultGenres.Slice()
 	}
 
 	for _, g := range gs {
 		existing, ok := qg.OptimizedQueries[g]
 
 		if !ok {
-			existing = &Query{
-				Hidden:    qg.Hidden,
-				Genre:     ids.MakeGenre(g),
-				ObjectIds: make(map[string]ObjectId),
-			}
+			existing = b.makeQuery()
+			existing.Genre = ids.MakeGenre(g)
 		}
 
 		if err = existing.Merge(q); err != nil {
@@ -400,23 +393,31 @@ func (qg *Group) ContainsSku(sk *sku.Transacted) (ok bool) {
 }
 
 func (qg *Group) ContainsExternalSku(
-	sk *sku.Transacted,
+	el sku.ExternalLike,
 	state checked_out_state.State,
 ) (ok bool) {
-	defer sk.GetSku().GetMetadata().Cache.QueryPath.PushOnReturn(qg, &ok)
-
-	if _, ok = qg.ExternalObjectIds[sk.GetObjectId().String()]; ok {
-		return
-	}
+	sk := el.GetSku()
+	defer sk.Metadata.Cache.QueryPath.PushOnReturn(qg, &ok)
 
 	if !qg.ContainsSkuCheckedOutState(state) {
 		return
 	}
 
-	if qg.ContainsSku(sk) {
+	if len(qg.OptimizedQueries) == 0 && qg.matchOnEmpty {
 		ok = true
 		return
 	}
+
+	g := sk.GetGenre()
+
+	q, ok := qg.OptimizedQueries[genres.Must(g)]
+
+	if !ok || !q.ContainsExternalSku(el) {
+		ok = false
+		return
+	}
+
+	ok = true
 
 	return
 }

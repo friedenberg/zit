@@ -9,8 +9,8 @@ import (
 type (
 	ExternalObjectId interface {
 		interfaces.GenreGetter
-		GetObjectId() *ids.ObjectId
-		GetExternalObjectId() *ids.ObjectId
+		interfaces.Stringer
+		ExternalObjectIdGetter
 	}
 
 	ExternalObjectIdGetter interface {

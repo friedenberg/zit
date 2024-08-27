@@ -98,7 +98,7 @@ func (bf *binaryDecoder) readFormatExactly(
 
 	buf := bytes.NewBuffer(b)
 
-  n1, bf.ContentLength, err = ohio.ReadFixedUInt16(buf)
+	n1, bf.ContentLength, err = ohio.ReadFixedUInt16(buf)
 	n += int64(n1)
 
 	if err != nil {
@@ -145,7 +145,7 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 	// loop thru entries to find the next one that matches the current sigil
 	// when found, break the loop and deserialize it and return
 	for {
-    n1, bf.ContentLength, err = ohio.ReadFixedUInt16(r)
+		n1, bf.ContentLength, err = ohio.ReadFixedUInt16(r)
 		n += int64(n1)
 
 		if err != nil {
@@ -158,7 +158,7 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 			return
 		}
 
-    contentLength64 := int64(bf.ContentLength)
+		contentLength64 := int64(bf.ContentLength)
 
 		bf.R = r
 		bf.N = contentLength64
@@ -184,7 +184,8 @@ func (bf *binaryDecoder) readFormatAndMatchSigil(
 			return
 		}
 
-		q, ok := bf.Get(genres.Must(sk.Transacted))
+		g := genres.Must(sk.Transacted)
+		q, ok := bf.Get(g)
 
 		// TODO-D4 use query to decide whether to read and inflate or skip
 		if ok {

@@ -19,11 +19,12 @@ type buildState struct {
 	qg           *Group
 	latentErrors errors.Multi
 
-	luaVMPoolBuilder *lua.VMPoolBuilder
-	pinnedObjectIds  []ObjectId
-	repo             sku.ExternalStoreForQuery
-	virtualEtiketten map[string]Lua
-	eqo              sku.ExternalQueryOptions
+	luaVMPoolBuilder        *lua.VMPoolBuilder
+	pinnedObjectIds         []ObjectId
+	pinnedExternalObjectIds []sku.ExternalObjectId
+	repo                    sku.ExternalStoreForQuery
+	virtualEtiketten        map[string]Lua
+	eqo                     sku.ExternalQueryOptions
 
 	externalStoreAcceptedQueryComponent bool
 	ts                                  query_spec.TokenScanner
@@ -31,11 +32,10 @@ type buildState struct {
 
 func (b *buildState) makeGroup() *Group {
 	return &Group{
-		Hidden:            b.builder.hidden,
-		OptimizedQueries:  make(map[genres.Genre]*Query),
-		UserQueries:       make(map[ids.Genre]*Query),
-		ExternalObjectIds: make(map[string]ObjectId),
-		Types:             ids.MakeMutableTypeSet(),
+		Hidden:           b.builder.hidden,
+		OptimizedQueries: make(map[genres.Genre]*Query),
+		UserQueries:      make(map[ids.Genre]*Query),
+		Types:            ids.MakeMutableTypeSet(),
 	}
 }
 
@@ -77,12 +77,9 @@ func (b *buildState) build(
 			b.externalStoreAcceptedQueryComponent = true
 
 			for _, k := range k {
-				b.pinnedObjectIds = append(
-					b.pinnedObjectIds,
-					ObjectId{
-						ObjectIdLike: k,
-						External:     true,
-					},
+				b.pinnedExternalObjectIds = append(
+					b.pinnedExternalObjectIds,
+					k,
 				)
 			}
 		}
@@ -108,8 +105,8 @@ func (b *buildState) build(
 		}
 	}
 
-	for _, k := range b.pinnedObjectIds {
-		if err = b.qg.addExactObjectId(b, k); err != nil {
+	for _, k := range b.pinnedExternalObjectIds {
+		if err = b.qg.addExactExternalObjectId(b, k); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -117,7 +114,7 @@ func (b *buildState) build(
 
 	b.addDefaultsIfNecessary()
 
-	if err = b.qg.Reduce(b.builder); err != nil {
+	if err = b.qg.reduce(b); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -257,7 +254,7 @@ LOOP:
 				return
 			}
 
-			if err = k.Reduce(b.builder); err != nil {
+			if err = k.reduce(b); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -269,8 +266,10 @@ LOOP:
 					k,
 				)
 
-				q.Genre.Add(genres.Zettel)
-				q.ObjectIds[k.ObjectIdLike.GetObjectId().String()] = k
+				if err = q.addExactObjectId(b, k); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 
 			case genres.Tag:
 				var et sku.Query
@@ -491,6 +490,7 @@ func (b *buildState) makeExp(
 
 func (b *buildState) makeQuery() *Query {
 	return &Query{
-		ObjectIds: make(map[string]ObjectId),
+		ObjectIds:         make(map[string]ObjectId),
+		ExternalObjectIds: make(map[string]sku.ExternalObjectId),
 	}
 }

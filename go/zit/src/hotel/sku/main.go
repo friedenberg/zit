@@ -44,6 +44,7 @@ type (
 		ExternalLikeGetter
 		Clone() ExternalLike
 		GetExternalState() external_state.State
+		// ExternalObjectIdGetter
 	}
 
 	ExternalLikeGetter interface {

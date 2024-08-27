@@ -11,11 +11,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type FDSet struct {
 	external_state.State
 
+	// TODO refactor this to be a string and a genre that is tied to the state
 	ids.ObjectId
 
 	Object   fd.FD
@@ -29,12 +31,8 @@ func (ef *FDSet) String() string {
 	return ef.ObjectId.String()
 }
 
-func (ef *FDSet) GetObjectId() *ids.ObjectId {
-	return &ef.ObjectId
-}
-
-func (ef *FDSet) GetExternalObjectId() *ids.ObjectId {
-	return &ef.ObjectId
+func (ef *FDSet) GetExternalObjectId() sku.ExternalObjectId {
+	return ef
 }
 
 func (ef *FDSet) Debug() string {
