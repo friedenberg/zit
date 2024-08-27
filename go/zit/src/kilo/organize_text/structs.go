@@ -18,7 +18,7 @@ type (
 var objKeyer interfaces.StringKeyer[*obj]
 
 func makeObjSet() objSet {
-	return collections_value.MakeMutableValueSet(objKeyer)
+	return collections_value.MakeMutableValueSet(sku.ExternalObjectIdKeyer[*obj]{})
 }
 
 type obj struct {

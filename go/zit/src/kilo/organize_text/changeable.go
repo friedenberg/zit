@@ -9,17 +9,19 @@ import (
 )
 
 func key(sk sku.ExternalLike) string {
-	if sk.GetSku().ObjectId.IsEmpty() {
-		s := sk.GetSku().Metadata.Description.String()
-
-		if s == "" {
-			panic("empty key")
-		}
-
-		return s
-	} else {
+	if !sk.GetSku().ObjectId.IsEmpty() {
 		return sk.GetSku().ObjectId.String()
 	}
+
+	if sk.GetSku().Metadata.Description.String() != "" {
+		return sk.GetSku().Metadata.Description.String()
+	}
+
+	if sk.GetExternalObjectId().String() != "" {
+		return sk.GetExternalObjectId().String()
+	}
+
+	panic("empty key")
 }
 
 func (ot *Text) GetSkus(
