@@ -9,22 +9,27 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 func newAssignment(d int) *Assignment {
-	return &Assignment{
+	a := &Assignment{
 		Depth:    d,
-		Tags:     ids.MakeTagSet(),
 		objects:  make(map[string]struct{}),
 		Objects:  make(Objects, 0),
 		Children: make([]*Assignment, 0),
 	}
+
+	sku.TransactedResetter.Reset(&a.Transacted)
+
+	return a
 }
 
 type Assignment struct {
+	sku.Transacted
+
 	IsRoot  bool
 	Depth   int
-	Tags    ids.TagSet
 	objects map[string]struct{}
 	Objects
 	Children []*Assignment
@@ -67,9 +72,9 @@ func (a Assignment) MaxDepth() (d int) {
 }
 
 func (a Assignment) AlignmentSpacing() int {
-	if a.Tags.Len() == 1 && ids.IsDependentLeaf(a.Tags.Any()) {
+	if a.Transacted.Metadata.Tags.Len() == 1 && ids.IsDependentLeaf(a.Transacted.Metadata.Tags.Any()) {
 		return a.Parent.AlignmentSpacing() + len(
-			a.Parent.Tags.Any().String(),
+			a.Parent.Transacted.Metadata.Tags.Any().String(),
 		)
 	}
 
@@ -148,19 +153,19 @@ func (a Assignment) String() (s string) {
 		s = a.Parent.String() + "."
 	}
 
-	return s + iter.StringCommaSeparated(a.Tags)
+	return s + iter.StringCommaSeparated(a.Transacted.Metadata.Tags)
 }
 
 func (a *Assignment) makeChild(e ids.Tag) (b *Assignment) {
 	b = newAssignment(a.GetDepth() + 1)
-	b.Tags = ids.MakeTagSet(e)
+	b.Transacted.Metadata.Tags = ids.MakeMutableTagSet(e)
 	a.addChild(b)
 	return
 }
 
-func (a *Assignment) makeChildWithSet(es ids.TagSet) (b *Assignment) {
+func (a *Assignment) makeChildWithSet(es ids.TagMutableSet) (b *Assignment) {
 	b = newAssignment(a.GetDepth() + 1)
-	b.Tags = es
+	b.Transacted.Metadata.Tags = es
 	a.addChild(b)
 	return
 }
@@ -299,15 +304,15 @@ func (a *Assignment) AllTags(mes ids.TagMutableSet) (err error) {
 func (a *Assignment) expandedTags() (es ids.TagSet, err error) {
 	es = ids.MakeTagSet()
 
-	if a.Tags == nil {
+	if a.Transacted.Metadata.Tags == nil {
 		panic("tags are nil")
 	}
 
-	if a.Tags.Len() != 1 || a.Parent == nil {
-		es = a.Tags.CloneSetPtrLike()
+	if a.Transacted.Metadata.Tags.Len() != 1 || a.Parent == nil {
+		es = a.Transacted.Metadata.Tags.CloneSetPtrLike()
 		return
 	} else {
-		e := a.Tags.Any()
+		e := a.Transacted.Metadata.Tags.Any()
 
 		if ids.IsDependentLeaf(e) {
 			var pe ids.TagSet
@@ -320,7 +325,7 @@ func (a *Assignment) expandedTags() (es ids.TagSet, err error) {
 			if pe.Len() > 1 {
 				err = errors.Errorf(
 					"cannot infer full tag for assignment because parent assignment has more than one tags: %s",
-					a.Parent.Tags,
+					a.Parent.Transacted.Metadata.Tags,
 				)
 
 				return
@@ -346,7 +351,7 @@ func (a *Assignment) expandedTags() (es ids.TagSet, err error) {
 }
 
 func (a *Assignment) SubtractFromSet(es ids.TagMutableSet) (err error) {
-	if err = a.Tags.EachPtr(
+	if err = a.Transacted.Metadata.Tags.EachPtr(
 		func(e *ids.Tag) (err error) {
 			if err = es.EachPtr(
 				func(e1 *ids.Tag) (err error) {
@@ -376,7 +381,7 @@ func (a *Assignment) SubtractFromSet(es ids.TagMutableSet) (err error) {
 }
 
 func (a *Assignment) Contains(e *ids.Tag) bool {
-	if a.Tags.ContainsKey(e.String()) {
+	if a.Transacted.Metadata.Tags.ContainsKey(e.String()) {
 		return true
 	}
 
@@ -389,8 +394,8 @@ func (a *Assignment) Contains(e *ids.Tag) bool {
 
 func (parent *Assignment) SortChildren() {
 	sort.Slice(parent.Children, func(i, j int) bool {
-		esi := parent.Children[i].Tags
-		esj := parent.Children[j].Tags
+		esi := parent.Children[i].Transacted.Metadata.Tags
+		esj := parent.Children[j].Transacted.Metadata.Tags
 
 		if esi.Len() == 1 && esj.Len() == 1 {
 			ei := strings.TrimPrefix(esi.Any().String(), "-")

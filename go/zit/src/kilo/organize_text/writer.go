@@ -43,13 +43,13 @@ func (av assignmentLineWriter) writeNormal(a *Assignment) (err error) {
 		tab_prefix = strings.Repeat(" ", a.GetDepth()*2-(a.GetDepth())-1)
 	}
 
-	if a.Tags.Len() > 0 {
+	if a.Transacted.Metadata.Tags.Len() > 0 {
 		av.WriteLines(
 			fmt.Sprintf(
 				"%s%s %s",
 				tab_prefix,
 				strings.Repeat("#", a.GetDepth()),
-				iter.StringCommaSeparated(a.Tags),
+				iter.StringCommaSeparated(a.Transacted.Metadata.Tags),
 			),
 		)
 		av.WriteExactlyOneEmpty()
@@ -117,7 +117,7 @@ func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 		return
 	}
 
-	if a.Tags != nil && a.Tags.Len() > 0 {
+	if a.Transacted.Metadata.Tags != nil && a.Transacted.Metadata.Tags.Len() > 0 {
 		sharps := strings.Repeat("#", a.GetDepth())
 		alignmentSpacing := strings.Repeat(" ", a.AlignmentSpacing())
 
@@ -127,7 +127,7 @@ func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
 				tab_prefix[len(sharps)-1:],
 				sharps,
 				alignmentSpacing,
-				iter.StringCommaSeparated(a.Tags),
+				iter.StringCommaSeparated(a.Transacted.Metadata.Tags),
 			),
 		)
 		av.WriteExactlyOneEmpty()

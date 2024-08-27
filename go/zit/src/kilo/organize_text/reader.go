@@ -190,7 +190,7 @@ func (ar *assignmentLineReader) readOneHeadingLesserDepth(
 		// # zz-inbox
 		// `
 		assignment := newAssignment(d)
-		assignment.Tags = e.CloneSetPtrLike()
+		assignment.Transacted.Metadata.Tags = e.CloneMutableSetPtrLike()
 		newCurrent.addChild(assignment)
 		newCurrent = assignment
 	}
@@ -225,7 +225,7 @@ func (ar *assignmentLineReader) readOneHeadingEqualDepth(
 		// ## priority-2
 		// `
 		assignment := newAssignment(d)
-		assignment.Tags = e.CloneSetPtrLike()
+		assignment.Transacted.Metadata.Tags = e.CloneMutableSetPtrLike()
 		newCurrent.addChild(assignment)
 		newCurrent = assignment
 	}
@@ -258,7 +258,7 @@ func (ar *assignmentLineReader) readOneHeadingGreaterDepth(
 		// ### priority-2
 		// `
 		assignment := newAssignment(d)
-		assignment.Tags = e.CloneSetPtrLike()
+		assignment.Transacted.Metadata.Tags = e.CloneMutableSetPtrLike()
 		newCurrent.addChild(assignment)
 		// logz.Print("adding to parent")
 		// logz.Print("child", assignment)

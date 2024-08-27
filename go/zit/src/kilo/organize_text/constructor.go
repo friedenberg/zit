@@ -22,7 +22,7 @@ func (c *constructor) Make() (ot *Text, err error) {
 	c.Assignment = newAssignment(0)
 	c.IsRoot = true
 
-	if err = c.Transacted.Each(c.all.AddTransacted); err != nil {
+	if err = c.Options.Transacted.Each(c.all.AddTransacted); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -103,7 +103,7 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 			var explicitCount, implicitCount int
 
 			if explicitCount, implicitCount, err = c.collectExplicitAndImplicitFor(
-				c.Transacted,
+				c.Options.Transacted,
 				re,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -112,7 +112,7 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 
 			ui.Log().Print(re, "explicit", explicitCount, "implicit", implicitCount)
 
-			if explicitCount == c.Transacted.Len() {
+			if explicitCount == c.Options.Transacted.Len() {
 				if err = anchored.Add(re); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -259,7 +259,7 @@ func (c *constructor) addGroupedChildren(
 			}
 
 			child := newAssignment(parent.GetDepth() + 1)
-			child.Tags = ids.MakeTagSet(e)
+			child.Transacted.Metadata.Tags = ids.MakeMutableTagSet(e)
 			groupingTags.DropFirst()
 
 			psv := MakePrefixSetFrom(zs)
