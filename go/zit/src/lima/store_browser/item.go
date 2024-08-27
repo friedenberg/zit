@@ -79,14 +79,28 @@ func (i browserItem) WriteToMetadata(m *object_metadata.Metadata) (err error) {
 		return
 	}
 
+	var e ids.Tag
+
+	if e, err = i.GetUrlPathTag(); err == nil {
+		if err = m.AddTagPtr(&e); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	err = nil
+
+	return
+}
+
+// TODO move below to !toml-bookmark type
+func (i browserItem) GetUrlPathTag() (e ids.Tag, err error) {
 	var u *url.URL
 
 	if u, err = i.GetUrl(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	var e ids.Tag
 
 	els := strings.Split(u.Hostname(), ".")
 	slices.Reverse(els)
@@ -97,16 +111,14 @@ func (i browserItem) WriteToMetadata(m *object_metadata.Metadata) (err error) {
 
 	host := strings.Join(els, "-")
 
-	if len(host) > 0 {
-		if err = e.Set("zz-site-" + host); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if len(host) == 0 {
+		err = errors.Errorf("empty host: %q", els)
+		return
+	}
 
-		if err = m.AddTagPtr(&e); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = e.Set("zz-site-" + host); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

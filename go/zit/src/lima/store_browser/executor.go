@@ -106,7 +106,6 @@ func (c *executor) tryToEmitOneUntracked(
 	sku.TransactedResetter.Reset(&c.co.Internal)
 
 	if err = item.WriteToObjectIds(
-		&c.co.External.ObjectId,
 		&c.co.External.browser.ObjectId,
 	); err != nil {
 		err = errors.Wrap(err)
