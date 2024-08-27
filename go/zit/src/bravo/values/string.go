@@ -25,7 +25,7 @@ func (sv *String) Set(v string) (err error) {
 
 func (sv String) Match(v string) (err error) {
 	if sv.string != v {
-		err = errors.Normalf("expected %q but got %q", sv.string, v)
+		err = errors.BadRequestf("expected %q but got %q", sv.string, v)
 		return
 	}
 

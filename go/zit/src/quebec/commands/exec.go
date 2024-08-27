@@ -27,7 +27,7 @@ func init() {
 
 func (c Exec) Run(u *env.Env, args ...string) (err error) {
 	if len(args) == 0 {
-		err = errors.Normalf("needs at least Sku and possibly function name")
+		err = errors.BadRequestf("needs at least Sku and possibly function name")
 		return
 	}
 

@@ -58,7 +58,7 @@ func MakePullClient(u *env.Env, from string) (c *client, err error) {
 	ourVersion := u.GetConfig().GetImmutableConfig().GetStoreVersion()
 
 	if ourVersion.Less(theirVersion) {
-		err = errors.Normal(ErrPullRemoteHasHigherVersion)
+		err = errors.BadRequest(ErrPullRemoteHasHigherVersion)
 		return
 	}
 

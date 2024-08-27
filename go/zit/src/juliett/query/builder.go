@@ -242,8 +242,13 @@ func (b *Builder) build(state *buildState, vs ...string) (err error) {
 	var latent errors.Multi
 
 	if err, latent = state.build(vs...); err != nil {
-		latent.Add(errors.Wrapf(err, "Query: %q", vs))
-		err = latent
+		if !errors.IsBadRequest(err) {
+			latent.Add(errors.Wrapf(err, "Query String: %q", vs))
+			err = latent
+		}
+
+		errors.Wrap(err)
+
 		return
 	}
 

@@ -345,7 +345,11 @@ func (b *buildState) parseSigilsAndGenres(
 			b.ts.Unscan()
 			return
 
-		case ':', '+', '?', '.':
+		case '.':
+			b.qg.dotOperatorActive = true
+			fallthrough
+
+		case ':', '+', '?':
 			var s ids.Sigil
 
 			if err = s.Set(token.String()); err != nil {
@@ -354,7 +358,7 @@ func (b *buildState) parseSigilsAndGenres(
 			}
 
 			if !b.builder.permittedSigil.IsEmpty() && !b.builder.permittedSigil.ContainsOneOf(s) {
-				err = errors.Errorf("cannot contain sigil %s", s)
+				err = errors.BadRequestf("this query cannot contain the %q sigil", s)
 				return
 			}
 

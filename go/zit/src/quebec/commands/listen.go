@@ -25,7 +25,7 @@ func init() {
 
 func (c Listen) Run(u *env.Env, args ...string) (err error) {
 	if len(args) == 0 {
-		err = errors.Normalf("must specify command to listen for")
+		err = errors.BadRequestf("must specify command to listen for")
 		return
 	}
 
@@ -40,7 +40,7 @@ func (c Listen) Run(u *env.Env, args ...string) (err error) {
 		}
 
 	default:
-		err = errors.Normalf("unsupported command: %q", command)
+		err = errors.BadRequestf("unsupported command: %q", command)
 		return
 	}
 

@@ -2,22 +2,31 @@ package errors
 
 import "golang.org/x/xerrors"
 
-type normalError struct {
+type errBadRequest struct {
 	error
 }
 
-func (e normalError) ShouldShowStackTrace() bool {
+func (e errBadRequest) ShouldShowStackTrace() bool {
 	return false
 }
 
-func (e normalError) Error() string {
+func (e errBadRequest) Is(target error) bool {
+	_, ok := target.(errBadRequest)
+	return ok
+}
+
+func (e errBadRequest) Error() string {
 	return e.error.Error()
 }
 
-func Normal(err error) *normalError {
-	return &normalError{err}
+func BadRequest(err error) *errBadRequest {
+	return &errBadRequest{err}
 }
 
-func Normalf(fmt string, args ...interface{}) *normalError {
-	return &normalError{xerrors.Errorf(fmt, args...)}
+func BadRequestf(fmt string, args ...interface{}) *errBadRequest {
+	return &errBadRequest{xerrors.Errorf(fmt, args...)}
+}
+
+func IsBadRequest(err error) bool {
+	return Is(err, errBadRequest{})
 }

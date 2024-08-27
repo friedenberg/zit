@@ -405,11 +405,6 @@ func (qg *Group) ContainsExternalSku(
 ) (ok bool) {
 	defer sk.GetSku().GetMetadata().Cache.QueryPath.PushOnReturn(qg, &ok)
 
-	if qg.dotOperatorActive {
-		ok = true
-		return
-	}
-
 	if _, ok = qg.ExternalObjectIds[sk.GetObjectId().String()]; ok {
 		return
 	}

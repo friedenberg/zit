@@ -45,7 +45,7 @@ func (c ExecAction) RunWithQuery(
 	ms *query.Group,
 ) (err error) {
 	if !c.Action.WasSet() {
-		err = errors.Normal(errors.Errorf("Action must be provided"))
+		err = errors.BadRequest(errors.Errorf("Action must be provided"))
 		return
 	}
 
@@ -53,7 +53,7 @@ func (c ExecAction) RunWithQuery(
 	ok := false
 
 	if sc, ok = u.GetConfig().Actions[c.Action.String()]; !ok {
-		err = errors.Normalf(
+		err = errors.BadRequestf(
 			"Konfig Action '%s' not found",
 			c.Action.String(),
 		)

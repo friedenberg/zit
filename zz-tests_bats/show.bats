@@ -15,7 +15,7 @@ teardown() {
 }
 
 function show_simple_one_zettel { # @test
-	run_zit show -format text one/uno.zettel
+	run_zit show -format text one/uno
 	assert_success
 	assert_output - <<-EOM
 		---

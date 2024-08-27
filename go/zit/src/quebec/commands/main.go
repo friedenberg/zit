@@ -52,7 +52,7 @@ func Run(args []string) (exitStatus int) {
 
 	if cmd, ok = cmds[specifiedSubcommand]; !ok {
 		return cmd.PrintUsage(
-			errors.Normalf("No subcommand '%s'", specifiedSubcommand),
+			errors.BadRequestf("No subcommand '%s'", specifiedSubcommand),
 		)
 	}
 
@@ -103,7 +103,7 @@ func Run(args []string) (exitStatus int) {
 		ok := false
 
 		if t, ok = cmd.Command.(WithCompletion); !ok {
-			err = errors.Normalf("Command does not support completion")
+			err = errors.BadRequestf("Command does not support completion")
 			return
 		}
 

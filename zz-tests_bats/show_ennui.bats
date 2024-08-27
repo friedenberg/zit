@@ -19,7 +19,7 @@ function format_mutter_sha_one { # @test
 	assert_success
 	sha="$(echo -n "$output" | head -n1)"
 
-	run_zit show -format mutter-sha one/uno.zettel
+	run_zit show -format mutter-sha one/uno
 	assert_success
 	assert_output - <<-EOM
 		$sha
@@ -27,7 +27,7 @@ function format_mutter_sha_one { # @test
 }
 
 function format_mutter_one { # @test
-	run_zit show -format mutter one/uno.zettel
+	run_zit show -format mutter one/uno
 	assert_success
 	assert_output - <<-EOM
 		[one/uno@3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]

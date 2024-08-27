@@ -43,7 +43,7 @@ func (c Push) CompletionGenres() ids.Genre {
 
 func (c Push) Run(u *env.Env, args ...string) (err error) {
 	if len(args) == 0 {
-		err = errors.Normalf("must specify kasten to push from")
+		err = errors.BadRequestf("must specify kasten to push from")
 		return
 	}
 
@@ -52,7 +52,7 @@ func (c Push) Run(u *env.Env, args ...string) (err error) {
 	if len(args) > 1 {
 		args = args[1:]
 	} else {
-		err = errors.Normalf("Nothing to push.")
+		err = errors.BadRequestf("Nothing to push.")
 		return
 	}
 

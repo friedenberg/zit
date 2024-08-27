@@ -40,16 +40,24 @@ func (c Checkout) DefaultGenres() ids.Genre {
 	)
 }
 
+func (c Checkout) ModifyBuilder(b *query.Builder) {
+	b.
+		WithPermittedSigil(ids.SigilLatest).
+		WithPermittedSigil(ids.SigilHidden).
+		WithDefaultGenres(ids.MakeGenre(genres.Zettel)).
+		WithRequireNonEmptyQuery()
+}
+
 func (c Checkout) RunWithQuery(
 	u *env.Env,
-	eqwk *query.Group,
+	qg *query.Group,
 ) (err error) {
 	opCheckout := user_ops.Checkout{
 		Env:     u,
 		Options: c.CheckoutOptions,
 	}
 
-	if _, err = opCheckout.RunQuery(eqwk); err != nil {
+	if _, err = opCheckout.RunQuery(qg); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
