@@ -29,7 +29,7 @@ func (t *Transacted) GetExternalState() external_state.State {
 }
 
 func (a *Transacted) GetExternalObjectId() ExternalObjectId {
-	return a
+	return &a.ObjectId
 }
 
 func (a *Transacted) Clone() ExternalLike {

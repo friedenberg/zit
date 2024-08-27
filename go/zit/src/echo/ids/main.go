@@ -24,10 +24,22 @@ type IdLike interface {
 	// interfaces.Setter
 }
 
-type ObjectIdLike interface {
-	interfaces.GenreGetter
-	GetObjectId() *ObjectId
-}
+type (
+	ObjectIdLike interface {
+		interfaces.GenreGetter
+		GetObjectId() *ObjectId
+	}
+
+	ExternalObjectId interface {
+		interfaces.GenreGetter
+		interfaces.Stringer
+		ExternalObjectIdGetter
+	}
+
+	ExternalObjectIdGetter interface {
+		GetExternalObjectId() ExternalObjectId
+	}
+)
 
 type Index struct{}
 

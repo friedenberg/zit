@@ -7,15 +7,8 @@ import (
 )
 
 type (
-	ExternalObjectId interface {
-		interfaces.GenreGetter
-		interfaces.Stringer
-		ExternalObjectIdGetter
-	}
-
-	ExternalObjectIdGetter interface {
-		GetExternalObjectId() ExternalObjectId
-	}
+	ExternalObjectId       = ids.ExternalObjectId
+	ExternalObjectIdGetter = ids.ExternalObjectIdGetter
 
 	FuncRealize     = func(*Transacted, *Transacted, CommitOptions) error
 	FuncCommit      = func(*Transacted, CommitOptions) error

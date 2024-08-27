@@ -46,7 +46,7 @@ func (a *objectId2) GetObjectId() *objectId2 {
 	return a
 }
 
-func (a *objectId2) GetExternalObjectId() *objectId2 {
+func (a *objectId2) GetExternalObjectId() ExternalObjectId {
 	return a
 }
 

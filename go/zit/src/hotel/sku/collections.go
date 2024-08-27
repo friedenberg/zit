@@ -11,11 +11,19 @@ import (
 
 var (
 	transactedKeyerObjectId   ids.ObjectIdKeyer[*Transacted]
-	externalLikeKeyerObjectId ids.ObjectIdKeyer[ExternalLike]
+	externalLikeKeyerObjectId ExternalObjectIdKeyer[ExternalLike]
 	TransactedSetEmpty        TransactedSet
 	TransactedLessor          transactedLessor
 	TransactedEqualer         transactedEqualer
 )
+
+type ExternalObjectIdKeyer[
+	T ExternalObjectIdGetter,
+] struct{}
+
+func (ExternalObjectIdKeyer[T]) GetKey(e T) string {
+	return e.GetExternalObjectId().String()
+}
 
 func init() {
 	gob.Register(transactedKeyerObjectId)
