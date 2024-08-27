@@ -24,7 +24,7 @@ type External struct {
 }
 
 func (e *External) GetObjectId() *ids.ObjectId {
-  return e.Transacted.GetObjectId()
+	return e.Transacted.GetObjectId()
 }
 
 func (e *External) GetExternalState() external_state.State {

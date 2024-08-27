@@ -12,7 +12,6 @@ import (
 
 type External struct {
 	Transacted
-	Fields map[string]Field
 }
 
 func (t *External) GetSkuExternalLike() ExternalLike {

@@ -70,21 +70,19 @@ func (c *Organize) RunWithQuery(
 	u *env.Env,
 	qg *query.Group,
 ) (err error) {
-	ms := qg
-
 	u.ApplyToOrganizeOptions(&c.Options)
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Env: u,
 		Options: c.GetOptions(
 			u.GetConfig().PrintOptions,
-			ms,
+			qg,
 			u.SkuFmtOrganize(qg.RepoId),
 			u.GetStore().GetAbbrStore().GetAbbr(),
 		),
 	}
 
-	typen := ms.GetTypes()
+	typen := qg.GetTypes()
 
 	if typen.Len() == 1 {
 		createOrganizeFileOp.Type = typen.Any()
@@ -196,7 +194,7 @@ func (c *Organize) RunWithQuery(
 
 		var ot2 *organize_text.Text
 
-		if ot2, err = c.readFromVim(u, f.Name(), createOrganizeFileResults, ms); err != nil {
+		if ot2, err = c.readFromVim(u, f.Name(), createOrganizeFileResults, qg); err != nil {
 			err = errors.Wrapf(err, "Organize File: %q", f.Name())
 			return
 		}
