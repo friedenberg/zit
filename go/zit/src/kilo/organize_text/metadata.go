@@ -19,7 +19,17 @@ type Metadata struct {
 	ids.TagSet
 	Matchers interfaces.SetLike[sku.Query]
 	Comments []string
-	Typ      ids.Type
+	Type     ids.Type
+}
+
+func (m *Metadata) SetFromObjectMetadata(
+	om *object_metadata.Metadata,
+) (err error) {
+	m.TagSet = om.Tags.CloneSetPtrLike()
+	m.Comments = make([]string, len(om.Comments))
+	copy(m.Comments, om.Comments)
+  m.Type = om.Type
+	return
 }
 
 func (m Metadata) RemoveFromTransacted(sk sku.ExternalLike) (err error) {
@@ -36,7 +46,7 @@ func (m Metadata) RemoveFromTransacted(sk sku.ExternalLike) (err error) {
 }
 
 func (m Metadata) AsMetadatei() (m1 object_metadata.Metadata) {
-	m1.Type = m.Typ
+	m1.Type = m.Type
 	m1.SetTags(m.TagSet)
 	return
 }
@@ -50,7 +60,7 @@ func (m Metadata) HasMetadataContent() bool {
 		return true
 	}
 
-	tString := m.Typ.String()
+	tString := m.Type.String()
 
 	if tString != "" {
 		return true
@@ -74,7 +84,7 @@ func (m *Metadata) ReadFrom(r1 io.Reader) (n int64, err error) {
 						return
 					},
 					"-": iter.MakeFuncSetString(mes),
-					"!": m.Typ.Set,
+					"!": m.Type.Set,
 				},
 			),
 		),
@@ -95,7 +105,7 @@ func (m Metadata) WriteTo(w1 io.Writer) (n int64, err error) {
 		w.WriteFormat("- %s", e)
 	}
 
-	tString := m.Typ.String()
+	tString := m.Type.String()
 
 	if tString != "" {
 		w.WriteFormat("! %s", tString)

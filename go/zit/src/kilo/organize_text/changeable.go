@@ -71,8 +71,8 @@ func (a *Assignment) addToSet(
 					return
 				}
 
-				if !ot.Metadata.Typ.IsEmpty() {
-					z.GetSku().Metadata.Type.ResetWith(ot.Metadata.Typ)
+				if !ot.Metadata.Type.IsEmpty() {
+					z.GetSku().Metadata.Type.ResetWith(ot.Metadata.Type)
 				}
 
 				out.Add(z)
@@ -84,8 +84,8 @@ func (a *Assignment) addToSet(
 					z.GetSku().Metadata.Type.ResetWith(zPrime.GetSku().Metadata.Type)
 				}
 
-				if !ot.Metadata.Typ.IsEmpty() {
-					z.GetSku().Metadata.Type.ResetWith(ot.Metadata.Typ)
+				if !ot.Metadata.Type.IsEmpty() {
+					z.GetSku().Metadata.Type.ResetWith(ot.Metadata.Type)
 				}
 			}
 

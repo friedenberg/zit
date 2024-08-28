@@ -37,7 +37,7 @@ func (c *constructor) Make() (ot *Text, err error) {
 		return
 	}
 
-	c.Metadata.Typ = c.Options.Type
+	c.Metadata.Type = c.Options.Type
 
 	if err = ot.Refine(); err != nil {
 		err = errors.Wrap(err)
