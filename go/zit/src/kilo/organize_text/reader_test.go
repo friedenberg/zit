@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -62,9 +63,21 @@ func makeObjWithHinAndBez(t *testing.T, hin string, bez string) (o *obj) {
 
 func makeAssignmentLineReader() assignmentLineReader {
 	return assignmentLineReader{
+		options: Options{
+			SkuPool: pool.ManualPool[sku.ExternalLike]{
+				FuncGet: func() sku.ExternalLike {
+					return sku.GetTransactedPool().Get()
+				},
+				FuncPut: func(e sku.ExternalLike) {
+					sku.GetTransactedPool().Put(e.(*sku.Transacted))
+				},
+			},
+		},
 		stringFormatReader: sku_fmt.MakeFormatOrganize(
 			string_format_writer.ColorOptions{},
 			erworben_cli_print_options.PrintOptions{},
+			nil,
+			nil,
 			nil,
 			nil,
 			nil,

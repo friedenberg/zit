@@ -91,9 +91,10 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 
 	l := ot.MaxLen()
 
-	omit := ot.UseMetadateaHeader && ot.HasMetadataContent()
+	omit := ot.UseMetadataHeader && ot.HasMetadataContent()
 
 	aw := assignmentLineWriter{
+		SkuPool:              ot.SkuPool,
 		LineWriter:           lw,
 		maxDepth:             ot.MaxDepth(),
 		maxHead:              kopf,
@@ -138,7 +139,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		Blob: lw,
 	}
 
-	if ot.UseMetadateaHeader {
+	if ot.UseMetadataHeader {
 		ot.Matchers = ot.commentMatchers
 		mw.Metadata = ot.Metadata
 	}

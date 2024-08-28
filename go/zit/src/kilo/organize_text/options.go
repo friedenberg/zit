@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
@@ -33,14 +34,16 @@ type Options struct {
 	Type            ids.Type
 	GroupingTags    ids.TagSlice
 	ExtraTags       ids.TagSet
-	Transacted      interfaces.SetLike[sku.ExternalLike]
+	Skus            interfaces.SetLike[sku.ExternalLike]
+
+	SkuPool interfaces.PoolValue[sku.ExternalLike]
 
 	Abbr ids.Abbr
 
 	UsePrefixJoints        bool
 	UseRightAlignedIndents bool
 	UseRefiner             bool
-	UseMetadateaHeader     bool
+	UseMetadataHeader      bool
 
 	PrintOptions       erworben_cli_print_options.PrintOptions
 	stringFormatReader catgut.StringFormatReader[sku.ExternalLike]
@@ -57,7 +60,7 @@ func MakeFlags() Flags {
 		Options: Options{
 			wasMade:      true,
 			GroupingTags: ids.MakeTagSlice(),
-			Transacted:   sku.MakeExternalLikeMutableSet(),
+			Skus:         sku.MakeExternalLikeMutableSet(),
 		},
 	}
 }
@@ -73,7 +76,7 @@ func MakeFlagsWithMetadata(m object_metadata.Metadata) Flags {
 			rootTags:     m.GetTags(),
 			wasMade:      true,
 			GroupingTags: ids.MakeTagSlice(),
-			Transacted:   sku.MakeExternalLikeMutableSet(),
+			Skus:         sku.MakeExternalLikeMutableSet(),
 		},
 	}
 }
@@ -104,7 +107,7 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 	f.BoolVar(&o.UseRefiner, "refine", true, "refine the organize tree")
 
 	f.BoolVar(
-		&o.UseMetadateaHeader,
+		&o.UseMetadataHeader,
 		"metadatei-header",
 		true,
 		"metadatei header",
@@ -116,6 +119,7 @@ func (o *Flags) GetOptions(
 	q sku.QueryGroup,
 	skuFmt sku_fmt.ExternalLike,
 	abbr ids.Abbr,
+	skuPool interfaces.PoolValue[sku.ExternalLike],
 ) Options {
 	o.once.Do(
 		func() {
@@ -132,6 +136,18 @@ func (o *Flags) GetOptions(
 		o.rootTags = q.GetTags()
 	}
 
+	if skuPool == nil {
+		skuPool = pool.ManualPool[sku.ExternalLike]{
+			FuncGet: func() sku.ExternalLike {
+				return sku.GetTransactedPool().Get()
+			},
+			FuncPut: func(e sku.ExternalLike) {
+				sku.GetTransactedPool().Put(e.(*sku.Transacted))
+			},
+		}
+	}
+
+	o.SkuPool = skuPool
 	o.PrintOptions = printOptions
 	o.Abbr = abbr
 

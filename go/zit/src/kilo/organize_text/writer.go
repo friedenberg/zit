@@ -13,6 +13,7 @@ import (
 )
 
 type assignmentLineWriter struct {
+	SkuPool              interfaces.PoolValue[sku.ExternalLike]
 	RightAlignedIndents  bool
 	OmitLeadingEmptyLine bool
 	object_metadata.Metadata
@@ -55,8 +56,8 @@ func (av assignmentLineWriter) writeNormal(a *Assignment) (err error) {
 		av.WriteExactlyOneEmpty()
 	}
 
-	cursor := sku.GetTransactedPool().Get()
-	defer sku.GetTransactedPool().Put(cursor)
+	// cursor := a.SkuPool.Get()
+	// defer sku.GetTransactedPool().Put(cursor)
 
 	a.Objects.Sort()
 
@@ -71,10 +72,10 @@ func (av assignmentLineWriter) writeNormal(a *Assignment) (err error) {
 			sb.WriteString("% ")
 		}
 
-		sku.TransactedResetter.ResetWith(cursor, z.ExternalLike.GetSku())
-		cursor.Metadata.Subtract(&av.Metadata)
+		// sku.TransactedResetter.ResetWith(cursor, z.ExternalLike.GetSku())
+		z.ExternalLike.GetSku().Metadata.Subtract(&av.Metadata)
 
-		if _, err = av.stringFormatWriter.WriteStringFormat(&sb, cursor); err != nil {
+		if _, err = av.stringFormatWriter.WriteStringFormat(&sb, z.ExternalLike); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

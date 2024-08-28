@@ -10,7 +10,7 @@ type formatCli[T interfaces.Stringer] struct {
 }
 
 func MakeCliFormat(
-	truncate CliFormatTruncation,
+	truncate string_format_writer.CliFormatTruncation,
 	co string_format_writer.ColorOptions,
 	quote bool,
 ) *formatCli[*Description] {
@@ -22,7 +22,7 @@ func MakeCliFormat(
 }
 
 func MakeCliFormatGeneric[T interfaces.Stringer](
-	truncate CliFormatTruncation,
+	truncate string_format_writer.CliFormatTruncation,
 	co string_format_writer.ColorOptions,
 	quote bool,
 ) *formatCli[T] {

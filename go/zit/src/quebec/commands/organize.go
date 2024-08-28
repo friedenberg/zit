@@ -79,6 +79,7 @@ func (c *Organize) RunWithQuery(
 			qg,
 			u.SkuFmtOrganize(qg.RepoId),
 			u.GetStore().GetAbbrStore().GetAbbr(),
+		u.GetExternalLikePoolForRepoId(qg.RepoId),
 		),
 	}
 
@@ -103,7 +104,7 @@ func (c *Organize) RunWithQuery(
 		return
 	}
 
-	createOrganizeFileOp.Transacted = getResults
+	createOrganizeFileOp.Skus = getResults
 
 	switch c.Mode {
 	case organize_text_mode.ModeCommitDirectly:

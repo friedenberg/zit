@@ -6,13 +6,11 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -24,17 +22,11 @@ func MakeFormatOrganize(
 ) *Organize {
 	return &Organize{
 		Organize: f,
-		descriptionStringFormatWriter: descriptions.MakeCliFormat(
-			descriptions.CliFormatTruncation66CharEllipsis,
-			f.ColorOptions,
-			true,
-		),
 	}
 }
 
 type Organize struct {
 	*sku_fmt.Organize
-	descriptionStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description]
 }
 
 func (f *Organize) WriteStringFormat(
@@ -42,50 +34,11 @@ func (f *Organize) WriteStringFormat(
 	el sku.ExternalLike,
 ) (n int64, err error) {
 	o := el.GetSku()
-
-	var n1 int
-
-	if f.Options.PrintTime {
-		t := o.GetTai()
-
-		n1, err = sw.WriteString(t.Format(string_format_writer.StringFormatDateTime))
-		n += int64(n1)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		n1, err = sw.WriteString(" ")
-		n += int64(n1)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	n1, err = sw.WriteString("[")
-	n += int64(n1)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	var n2 int64
-	n2, err = f.ObjectIdStringFormatWriter.WriteStringFormat(sw, &o.ObjectId)
-	n += int64(n2)
 
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	sh := o.GetBlobSha()
-
-	if f.Options.PrintShas && (!sh.IsNull() || f.Options.PrintEmptyShas) {
-		n1, err = sw.WriteString("@")
+	if e, hasNative := el.(*External); hasNative {
+		var n1 int
+		n1, err = sw.WriteString("[")
 		n += int64(n1)
 
 		if err != nil {
@@ -93,22 +46,18 @@ func (f *Organize) WriteStringFormat(
 			return
 		}
 
-		n2, err = f.ShaStringFormatWriter.WriteStringFormat(sw, o.GetBlobSha())
-		n += n2
+		n2, err = f.writeStringFormatExternal(sw, e)
+		n += int64(n2)
 
 		if err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-	}
 
-	t := o.GetMetadata().GetTypePtr()
-
-	if len(t.String()) > 0 {
-		if f.Padding == "" {
-			n1, err = sw.WriteString(" !")
+		if f.Options.ZittishNewlines {
+			n1, err = fmt.Fprintf(sw, "\n%s]", f.Padding)
 		} else {
-			n1, err = sw.WriteString("  !")
+			n1, err = sw.WriteString("]")
 		}
 
 		n += int64(n1)
@@ -118,102 +67,9 @@ func (f *Organize) WriteStringFormat(
 			return
 		}
 
-		n2, err = f.TypeStringFormatWriter.WriteStringFormat(sw, t)
-		n += n2
+		b := &e.Transacted.Metadata.Description
 
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	b := &o.Metadata.Description
-
-	if f.Options.PrintTagsAlways {
-		b := o.GetMetadata().GetTags()
-
-		for _, v := range iter.SortedValues(b) {
-			if f.Options.ZittishNewlines {
-				n1, err = fmt.Fprintf(sw, "\n%s", f.Padding)
-			} else {
-				n1, err = sw.WriteString(" ")
-			}
-
-			n += int64(n1)
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			n2, err = f.TagStringFormatWriter.WriteStringFormat(sw, &v)
-			n += n2
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-	}
-
-	e, hasNative := el.(*External)
-
-	if hasNative {
-
-		item := e.browserItem
-		store_browser := &e.browser
-
-		{
-			n1, err = sw.WriteString(" !")
-			n += int64(n1)
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			n2, err = f.TypeStringFormatWriter.WriteStringFormat(
-				sw,
-				&store_browser.Metadata.Type,
-			)
-			n += n2
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if !store_browser.Metadata.Description.IsEmpty() {
-				n1, err = sw.WriteString(" ")
-				n += int64(n1)
-
-				if err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				n2, err = f.descriptionStringFormatWriter.WriteStringFormat(
-					sw,
-					&store_browser.Metadata.Description,
-				)
-				n += n2
-
-				if err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-		}
-
-		{
-			n1, err = sw.WriteString("\n")
-			n += int64(n1)
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+		if !b.IsEmpty() {
 			n1, err = sw.WriteString(" ")
 			n += int64(n1)
 
@@ -222,72 +78,17 @@ func (f *Organize) WriteStringFormat(
 				return
 			}
 
-			var u *url.URL
-
-			if u, err = item.GetUrl(); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			n1, err = fmt.Fprintf(sw, "url=%q", u)
-			n += int64(n1)
+			n2, err = f.Description.WriteStringFormat(sw, b)
+			n += n2
 
 			if err != nil {
 				err = errors.Wrap(err)
 				return
-			}
-
-			n1, err = sw.WriteString("\n")
-			n += int64(n1)
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			for _, v := range iter.SortedValues(store_browser.Metadata.GetTags()) {
-				n1, err = sw.WriteString(" ")
-				n += int64(n1)
-
-				if err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				n2, err = f.TagStringFormatWriter.WriteStringFormat(sw, &v)
-				n += n2
-
-				if err != nil {
-					err = errors.Wrap(err)
-					return
-				}
 			}
 		}
-	}
-
-	if f.Options.ZittishNewlines {
-		n1, err = fmt.Fprintf(sw, "\n%s]", f.Padding)
 	} else {
-		n1, err = sw.WriteString("]")
-	}
+		n2, err = f.Organize.WriteStringFormat(sw, o)
 
-	n += int64(n1)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if !b.IsEmpty() {
-		n1, err = sw.WriteString(" ")
-		n += int64(n1)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		n2, err = f.DescriptionStringFormatWriter.WriteStringFormat(sw, b)
 		n += n2
 
 		if err != nil {
@@ -377,8 +178,40 @@ LOOP:
 				// TODO add field parsing
 				switch tokenType {
 				case query_spec.TokenTypeField, query_spec.TokenTypeLiteral:
-					ui.Debug().Print(t, string(tokenParts.Left), string(tokenParts.Right))
-					continue LOOP
+					e, hasNative := el.(*External)
+
+					if !hasNative {
+						err = errors.Errorf("unsupported type: %T", el)
+						return
+					}
+
+					left := string(tokenParts.Left)
+					right := string(tokenParts.Right)
+
+					switch left {
+					case "id":
+						if err = e.browserItem.SetId(right); err != nil {
+							err = errors.Wrap(err)
+							return
+						}
+
+						ui.Debug().Printf("%#v", e.browserItem)
+						continue LOOP
+
+					case "url":
+						e.browserItem.Url = right
+						ui.Debug().Printf("%#v", e.browserItem)
+						continue LOOP
+
+					case "title":
+						e.browserItem.Title = right
+						ui.Debug().Printf("%#v", e.browserItem)
+						continue LOOP
+
+					default:
+						err = errors.Errorf("unsupported field type: %q", tokenParts.Left)
+						return
+					}
 				}
 
 				if err = k.TodoSetBytes(t); err != nil {
@@ -421,6 +254,123 @@ LOOP:
 			return
 		}
 	}
+
+	return
+}
+
+func (f *Organize) writeStringFormatExternal(
+	sw interfaces.WriterAndStringWriter,
+	e *External,
+) (n int64, err error) {
+	var n2 int64
+
+	n2, err = f.ObjectId.WriteStringFormat(
+		sw,
+		&e.ObjectId,
+	)
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n2, err = f.Metadata.WriteStringFormat(
+		sw,
+		&e.Metadata,
+	)
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	item := &e.browserItem
+	prefix := " "
+
+	n2, err = f.Field.WriteStringFormat(
+		sw,
+		string_format_writer.Field{
+			Key:       "id",
+			Value:     item.Id.String(),
+			ColorType: string_format_writer.ColorTypeId,
+			Prefix:    prefix,
+		},
+	)
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if item.Title != "" {
+		n2, err = f.Field.WriteStringFormat(
+			sw,
+			string_format_writer.Field{
+				Key:       "title",
+				Value:     item.Title,
+				ColorType: string_format_writer.ColorTypeUserData,
+				Prefix:    prefix,
+			},
+		)
+		n += n2
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	var u *url.URL
+
+	if u, err = item.GetUrl(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n2, err = f.Field.WriteStringFormat(
+		sw,
+		string_format_writer.Field{
+			Key:       "url",
+			Value:     u.String(),
+			ColorType: string_format_writer.ColorTypeUserData,
+			Prefix:    prefix,
+		},
+	)
+	n += int64(n2)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	// tags := e.Metadata.GetTags()
+	// first := true
+
+	// if tags.Len() > 0 {
+	// 	for _, v := range iter.SortedValues(e.Metadata.GetTags()) {
+	// 		field := string_format_writer.Field{
+	// 			Value:  v.String(),
+	// 			Prefix: " ",
+	// 		}
+
+	// 		if first {
+	// 			field.Prefix = prefix
+	// 		}
+
+	// 		n2, err = f.fieldFormatWriter.WriteStringFormat(sw, field)
+	// 		n += int64(n2)
+
+	// 		if err != nil {
+	// 			err = errors.Wrap(err)
+	// 			return
+	// 		}
+
+	// 		first = false
+	// 	}
+	// }
 
 	return
 }

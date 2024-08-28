@@ -41,4 +41,8 @@ type (
 	ExternalStoreForQueryGetter interface {
 		GetExternalStoreForQuery(ids.RepoId) (ExternalStoreForQuery, bool)
 	}
+
+	ExternalLikePoolGetter interface {
+		GetExternalLikePool() interfaces.PoolValue[ExternalLike]
+	}
 )

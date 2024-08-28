@@ -43,6 +43,23 @@ func (i *browserItem) GetObjectId() *ids.ObjectId {
 	return &oid
 }
 
+func (i *browserItem) SetId(v string) (err error) {
+	// /browser/bookmark-aBljQkGWNl2
+	v = strings.TrimPrefix(v, "/browser/")
+
+	head, tail, ok := strings.Cut(v, "-")
+
+	if !ok {
+		err = errors.Errorf("unsupported id: %q", v)
+		return
+	}
+
+	i.Id.Type = head
+	i.Id.Id = tail
+
+	return
+}
+
 func (i *browserItem) GetType() (t ids.Type, err error) {
 	if err = t.Set("browser-" + i.Id.Type); err != nil {
 		err = errors.Wrap(err)

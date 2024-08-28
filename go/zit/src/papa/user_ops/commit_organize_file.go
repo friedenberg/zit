@@ -25,7 +25,7 @@ func (c CommitOrganizeFile) ApplyToText(
 		return
 	}
 
-	if err = t.Options.Transacted.Each(
+	if err = t.Options.Skus.Each(
 		func(el sku.ExternalLike) (err error) {
 			sk := el.GetSku()
 

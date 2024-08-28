@@ -44,6 +44,10 @@ type RepoId struct {
 	value string
 }
 
+func (k RepoId) IsEmpty() bool {
+	return k.value == ""
+}
+
 func (k RepoId) GetRepoId() interfaces.RepoId {
 	return k
 }

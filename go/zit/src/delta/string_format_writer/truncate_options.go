@@ -1,4 +1,4 @@
-package descriptions
+package string_format_writer
 
 type CliFormatTruncation int
 

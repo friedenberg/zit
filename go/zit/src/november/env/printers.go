@@ -6,12 +6,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/lima/store_browser"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 )
 
@@ -156,50 +154,18 @@ func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[sku.CheckedOutLike] {
 }
 
 func (u *Env) PrinterCheckedOutBrowser() interfaces.FuncIter[sku.CheckedOutLike] {
-	oo := u.FormatOutputOptions()
+	sfw := u.StringFormatWriterStoreBrowserCheckedOut()
 
 	err := string_format_writer.MakeDelim(
 		"\n",
 		u.Err(),
-		store_browser.MakeCliCheckedOutFormat(
-			u.config.PrintOptions,
-			u.StringFormatWriterShaLike(oo.ColorOptionsErr),
-			u.StringFormatWriterObjectId(oo.ColorOptionsErr),
-			u.StringFormatWriterMetadatei(oo.ColorOptionsErr),
-			u.StringFormatWriterTyp(oo.ColorOptionsErr),
-			u.StringFormatWriterDescription(
-				descriptions.CliFormatTruncation66CharEllipsis,
-				oo.ColorOptionsErr,
-				true,
-			),
-			u.StringFormatWriterEtiketten(oo.ColorOptionsErr),
-			u.StringFormatWriterField(
-				66,
-				oo.ColorOptionsErr,
-			),
-		),
+		sfw,
 	)
 
 	out := string_format_writer.MakeDelim(
 		"\n",
 		u.Out(),
-		store_browser.MakeCliCheckedOutFormat(
-			u.config.PrintOptions,
-			u.StringFormatWriterShaLike(oo.ColorOptionsOut),
-			u.StringFormatWriterObjectId(oo.ColorOptionsOut),
-			u.StringFormatWriterMetadatei(oo.ColorOptionsOut),
-			u.StringFormatWriterTyp(oo.ColorOptionsOut),
-			u.StringFormatWriterDescription(
-				descriptions.CliFormatTruncation66CharEllipsis,
-				oo.ColorOptionsOut,
-				true,
-			),
-			u.StringFormatWriterEtiketten(oo.ColorOptionsOut),
-			u.StringFormatWriterField(
-				66,
-				oo.ColorOptionsErr,
-			),
-		),
+		sfw,
 	)
 
 	return func(co sku.CheckedOutLike) error {

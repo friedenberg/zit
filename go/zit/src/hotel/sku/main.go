@@ -45,6 +45,7 @@ type (
 		Clone() ExternalLike
 		GetExternalState() external_state.State
 		ExternalObjectIdGetter
+		// GetRepoId() ids.RepoId
 	}
 
 	ExternalLikeGetter interface {

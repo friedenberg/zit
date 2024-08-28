@@ -65,6 +65,7 @@ func (c *FormatOrganize) Run(u *env.Env, args ...string) (err error) {
 		nil,
 		u.SkuFmtOrganize(repoId),
 		u.GetStore().GetAbbrStore().GetAbbr(),
+		u.GetExternalLikePoolForRepoId(repoId),
 	)
 
 	if err = ot.Refine(); err != nil {

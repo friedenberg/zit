@@ -70,6 +70,7 @@ type (
 		QueryCheckedOut
 		interfaces.Flusher
 		sku.ExternalStoreForQuery
+		sku.ExternalLikePoolGetter
 	}
 
 	StoreGetter interface {

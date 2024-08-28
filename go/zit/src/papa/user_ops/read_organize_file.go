@@ -49,6 +49,7 @@ func (c ReadOrganizeFile) Run(
 			nil,
 			u.SkuFmtOrganize(repoId),
 			u.GetStore().GetAbbrStore().GetAbbr(),
+      u.GetExternalLikePoolForRepoId(repoId),
 		),
 	); err != nil {
 		err = errors.Wrap(err)

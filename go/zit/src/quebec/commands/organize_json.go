@@ -83,6 +83,7 @@ func (c *OrganizeJSON) RunWithQuery(
 			qg,
 			u.SkuFmtOrganize(qg.RepoId),
 			u.GetStore().GetAbbrStore().GetAbbr(),
+      u.GetExternalLikePoolForRepoId(qg.RepoId),
 		),
 	}
 
@@ -131,7 +132,7 @@ func (c *OrganizeJSON) RunWithQuery(
 		}
 	}
 
-	createOrganizeFileOp.Transacted = getResults
+	createOrganizeFileOp.Skus = getResults
 
 	ui.Log().Print(
 		"generate temp file, write organize, open vim to edit, commit results",

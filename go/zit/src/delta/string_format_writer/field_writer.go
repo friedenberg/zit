@@ -16,11 +16,11 @@ type Field struct {
 
 type formatCliField struct {
 	ColorOptions
-	truncate int
+	truncate CliFormatTruncation
 }
 
 func MakeCliFormatField(
-	truncate int,
+	truncate CliFormatTruncation,
 	co ColorOptions,
 ) *formatCliField {
 	return &formatCliField{
@@ -68,7 +68,7 @@ func (f *formatCliField) WriteStringFormat(
 	if field.ColorType == ColorTypeUserData {
 		format = "%s%q%s%s"
 
-		if f.truncate > 0 && len(field.Value) > f.truncate {
+		if f.truncate > 0 && len(field.Value) > int(f.truncate) {
 			field.Value = field.Value[:f.truncate+1]
 			ellipsis = "…"
 		}

@@ -16,6 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -23,6 +24,7 @@ type ObjectIdAlignedFormat interface {
 	SetMaxKopfUndSchwanz(kop, schwanz int)
 }
 
+// TODO rename from organize
 func MakeFormatOrganize(
 	co string_format_writer.ColorOptions,
 	options erworben_cli_print_options.PrintOptions,
@@ -31,18 +33,25 @@ func MakeFormatOrganize(
 	typeStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
 	descriptionStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description],
 	tagsStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
+	fieldFormatWriter interfaces.StringFormatWriter[string_format_writer.Field],
+	metadata interfaces.StringFormatWriter[*object_metadata.Metadata],
 ) *Organize {
 	options.PrintTime = false
 	options.PrintShas = false
 
+  co.OffEntirely = true
+
 	return &Organize{
-		ColorOptions:                  co,
-		Options:                       options,
-		ShaStringFormatWriter:         shaStringFormatWriter,
-		ObjectIdStringFormatWriter:    objectIdStringFormatWriter,
-		TypeStringFormatWriter:        typeStringFormatWriter,
-		DescriptionStringFormatWriter: descriptionStringFormatWriter,
-		TagStringFormatWriter:         tagsStringFormatWriter,
+		ColorOptions: co,
+		Options:      options,
+		ShaString:    shaStringFormatWriter,
+		ObjectId:     objectIdStringFormatWriter,
+		Type:         typeStringFormatWriter,
+		Description:  descriptionStringFormatWriter,
+		TagString:    tagsStringFormatWriter,
+		Field:        fieldFormatWriter,
+		Metadata:     metadata,
+		RightAligned: string_format_writer.MakeRightAligned(),
 	}
 }
 
@@ -53,17 +62,21 @@ type Organize struct {
 	MaxHead, MaxTail int
 	Padding          string
 
-	ShaStringFormatWriter         interfaces.StringFormatWriter[interfaces.Sha]
-	ObjectIdStringFormatWriter    id_fmts.Aligned
-	TypeStringFormatWriter        interfaces.StringFormatWriter[*ids.Type]
-	DescriptionStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description]
-	TagStringFormatWriter         interfaces.StringFormatWriter[*ids.Tag]
+	RightAligned interfaces.StringFormatWriter[string]
+
+	ShaString   interfaces.StringFormatWriter[interfaces.Sha]
+	ObjectId    id_fmts.Aligned
+	Type        interfaces.StringFormatWriter[*ids.Type]
+	Description interfaces.StringFormatWriter[*descriptions.Description]
+	TagString   interfaces.StringFormatWriter[*ids.Tag]
+	Field       interfaces.StringFormatWriter[string_format_writer.Field]
+	Metadata    interfaces.StringFormatWriter[*object_metadata.Metadata]
 }
 
 func (f *Organize) SetMaxKopfUndSchwanz(k, s int) {
 	f.MaxHead, f.MaxTail = k, s
 	f.Padding = strings.Repeat(" ", 5+k+s)
-	f.ObjectIdStringFormatWriter.SetMaxKopfUndSchwanz(k, s)
+	f.ObjectId.SetMaxKopfUndSchwanz(k, s)
 }
 
 func (f *Organize) WriteStringFormat(
@@ -103,7 +116,7 @@ func (f *Organize) WriteStringFormat(
 	}
 
 	var n2 int64
-	n2, err = f.ObjectIdStringFormatWriter.WriteStringFormat(sw, &o.ObjectId)
+	n2, err = f.ObjectId.WriteStringFormat(sw, &o.ObjectId)
 	n += int64(n2)
 
 	if err != nil {
@@ -122,7 +135,7 @@ func (f *Organize) WriteStringFormat(
 			return
 		}
 
-		n2, err = f.ShaStringFormatWriter.WriteStringFormat(sw, o.GetBlobSha())
+		n2, err = f.ShaString.WriteStringFormat(sw, o.GetBlobSha())
 		n += n2
 
 		if err != nil {
@@ -147,7 +160,7 @@ func (f *Organize) WriteStringFormat(
 			return
 		}
 
-		n2, err = f.TypeStringFormatWriter.WriteStringFormat(sw, t)
+		n2, err = f.Type.WriteStringFormat(sw, t)
 		n += n2
 
 		if err != nil {
@@ -175,7 +188,7 @@ func (f *Organize) WriteStringFormat(
 				return
 			}
 
-			n2, err = f.TagStringFormatWriter.WriteStringFormat(sw, &v)
+			n2, err = f.TagString.WriteStringFormat(sw, &v)
 			n += n2
 
 			if err != nil {
@@ -207,7 +220,7 @@ func (f *Organize) WriteStringFormat(
 			return
 		}
 
-		n2, err = f.DescriptionStringFormatWriter.WriteStringFormat(sw, b)
+		n2, err = f.Description.WriteStringFormat(sw, b)
 		n += n2
 
 		if err != nil {

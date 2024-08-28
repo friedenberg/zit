@@ -276,7 +276,7 @@ func (ar *assignmentLineReader) readOneObj(
 	// logz.Print("reading one zettel", l)
 
 	var z obj
-	z.ExternalLike = sku.GetTransactedPool().Get()
+	z.ExternalLike = ar.options.SkuPool.Get()
 	z.Type = t
 
 	if _, err = ar.stringFormatReader.ReadStringFormat(

@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/lima/store_browser"
 )
 
 func (u *Env) FormatOutputOptions() (o string_format_writer.OutputOptions) {
@@ -66,7 +67,7 @@ func (u *Env) StringFormatWriterTyp(
 }
 
 func (u *Env) StringFormatWriterDescription(
-	truncate descriptions.CliFormatTruncation,
+	truncate string_format_writer.CliFormatTruncation,
 	co string_format_writer.ColorOptions,
 	quote bool,
 ) interfaces.StringFormatWriter[*descriptions.Description] {
@@ -74,7 +75,7 @@ func (u *Env) StringFormatWriterDescription(
 }
 
 func (u *Env) StringFormatWriterField(
-	truncate int,
+	truncate string_format_writer.CliFormatTruncation,
 	co string_format_writer.ColorOptions,
 ) interfaces.StringFormatWriter[string_format_writer.Field] {
 	return string_format_writer.MakeCliFormatField(truncate, co)
@@ -94,7 +95,7 @@ func (u *Env) StringFormatWriterMetadatei(
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterTyp(co),
 		u.StringFormatWriterDescription(
-			descriptions.CliFormatTruncation66CharEllipsis,
+			string_format_writer.CliFormatTruncation66CharEllipsis,
 			co,
 			true,
 		),
@@ -102,19 +103,30 @@ func (u *Env) StringFormatWriterMetadatei(
 	)
 }
 
-func (u *Env) SkuFmtOrganize(repoId ids.RepoId) sku_fmt.ExternalLike {
+func (u *Env) StringFormatWriterSku(
+	truncation string_format_writer.CliFormatTruncation,
+) *sku_fmt.Organize {
 	co := u.FormatColorOptionsOut()
 	co.OffEntirely = true
 
-	f := sku_fmt.MakeFormatOrganize(
+	return sku_fmt.MakeFormatOrganize(
 		co,
 		u.config.PrintOptions,
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterObjectIdAligned(co),
 		u.StringFormatWriterTyp(co),
-		u.StringFormatWriterDescription(descriptions.CliFormatTruncationNone, co, false),
+		u.StringFormatWriterDescription(truncation, co, false),
 		u.StringFormatWriterEtiketten(co),
+		u.StringFormatWriterField(truncation, co),
+		u.StringFormatWriterMetadatei(co),
 	)
+}
+
+func (u *Env) SkuFmtOrganize(repoId ids.RepoId) sku_fmt.ExternalLike {
+	co := u.FormatColorOptionsOut()
+	co.OffEntirely = true
+
+	f := u.StringFormatWriterSku(string_format_writer.CliFormatTruncationNone)
 
 	kid := repoId.GetRepoIdString()
 	es, ok := u.externalStores[kid]
@@ -152,5 +164,14 @@ func (u *Env) StringFormatWriterSkuTransactedShort() interfaces.StringFormatWrit
 	return sku_fmt.MakeCliFormatShort(
 		u.StringFormatWriterObjectId(co),
 		u.StringFormatWriterMetadatei(co),
+	)
+}
+
+func (u *Env) StringFormatWriterStoreBrowserCheckedOut() interfaces.StringFormatWriter[sku.CheckedOutLike] {
+	return store_browser.MakeCliCheckedOutFormat(
+		u.config.PrintOptions,
+		store_browser.MakeFormatOrganize(
+			u.StringFormatWriterSku(string_format_writer.CliFormatTruncation66CharEllipsis),
+		),
 	)
 }

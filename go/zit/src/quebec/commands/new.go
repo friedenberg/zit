@@ -140,7 +140,7 @@ func (c New) Run(u *env.Env, args ...string) (err error) {
 			Metadata: c.Metadata,
 		}
 
-		if err = opOrganize.RunWithTransacted(nil, zts); err != nil {
+		if err = opOrganize.RunWithTransacted(nil, zts, nil); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

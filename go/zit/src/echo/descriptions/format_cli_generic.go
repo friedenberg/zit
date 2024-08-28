@@ -6,12 +6,12 @@ import (
 )
 
 type formatCliStringer struct {
-	truncate           CliFormatTruncation
+	truncate           string_format_writer.CliFormatTruncation
 	stringFormatWriter interfaces.StringFormatWriter[string]
 }
 
 func MakeCliFormatStringer(
-	truncate CliFormatTruncation,
+	truncate string_format_writer.CliFormatTruncation,
 	co string_format_writer.ColorOptions,
 	quote bool,
 ) *formatCliStringer {
@@ -38,7 +38,7 @@ func (f *formatCliStringer) WriteStringFormat(
 	v := k.String()
 
 	// TODO format ellipsis as outside quotes and not styled
-	if f.truncate == CliFormatTruncation66CharEllipsis && len(v) > 66 {
+	if f.truncate == string_format_writer.CliFormatTruncation66CharEllipsis && len(v) > 66 {
 		v = v[:66] + "…"
 	}
 

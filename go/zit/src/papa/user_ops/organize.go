@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/vim_cli_options_builder"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -25,6 +26,7 @@ type Organize struct {
 
 func (u Organize) RunWithQueryGroup(
 	qg *query.Group,
+	onChanged interfaces.FuncIter[sku.ExternalLike],
 ) (err error) {
 	skus := sku.MakeExternalLikeMutableSet()
 	var l sync.Mutex
@@ -41,7 +43,7 @@ func (u Organize) RunWithQueryGroup(
 		return
 	}
 
-	if err = u.RunWithExternalLike(qg, skus); err != nil {
+	if err = u.RunWithExternalLike(qg, skus, onChanged); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -51,16 +53,17 @@ func (u Organize) RunWithQueryGroup(
 
 func (u Organize) RunWithTransacted(
 	qg *query.Group,
-	skus sku.TransactedSet,
+	transacted sku.TransactedSet,
+	onChanged interfaces.FuncIter[sku.ExternalLike],
 ) (err error) {
-	skusExternalLike := sku.MakeExternalLikeMutableSet()
-	skus.Each(
+	skus := sku.MakeExternalLikeMutableSet()
+	transacted.Each(
 		func(z *sku.Transacted) (err error) {
-			return skusExternalLike.Add(z)
+			return skus.Add(z)
 		},
 	)
 
-	if err = u.RunWithExternalLike(qg, skusExternalLike); err != nil {
+	if err = u.RunWithExternalLike(qg, skus, onChanged); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -71,6 +74,7 @@ func (u Organize) RunWithTransacted(
 func (u Organize) RunWithExternalLike(
 	qg *query.Group,
 	skus sku.ExternalLikeSet,
+	onChanged interfaces.FuncIter[sku.ExternalLike],
 ) (err error) {
 	if qg == nil {
 		b := u.MakeQueryBuilder(
@@ -88,7 +92,7 @@ func (u Organize) RunWithExternalLike(
 	// otFlags.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
 	organizeFlags := organize_text.MakeFlagsWithMetadata(u.Metadata)
 	u.ApplyToOrganizeOptions(&organizeFlags.Options)
-	organizeFlags.Transacted = skus
+	organizeFlags.Skus = skus
 
 	createOrganizeFileOp := CreateOrganizeFile{
 		Env: u.Env,
@@ -97,6 +101,7 @@ func (u Organize) RunWithExternalLike(
 			qg,
 			u.SkuFmtOrganize(qg.RepoId),
 			u.GetStore().GetAbbrStore().GetAbbr(),
+      u.GetExternalLikePoolForRepoId(qg.RepoId),
 		),
 	}
 
@@ -182,7 +187,7 @@ func (u Organize) RunWithExternalLike(
 		organizeText,
 		skus,
 		qg,
-		nil,
+		onChanged,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

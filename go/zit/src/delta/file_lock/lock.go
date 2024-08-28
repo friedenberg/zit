@@ -62,7 +62,7 @@ func (l *Lock) Unlock() (err error) {
 	// the location of this
 	ui.Log().Caller(2, "unlocking "+l.Path())
 	if err = files.Close(l.f); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "File: %v", l.f)
 		return
 	}
 

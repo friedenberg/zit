@@ -48,7 +48,8 @@ func (c Checkin) RunWithQuery(
 	qg *query.Group,
 ) (err error) {
 	op := user_ops.Checkin{
-		Delete: c.Delete,
+		Delete:   c.Delete,
+		Organize: c.Organize,
 	}
 
 	if err = op.Run(

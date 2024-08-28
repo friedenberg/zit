@@ -304,7 +304,8 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	co sku.CheckedOutLike,
 	updateCheckout bool,
 ) (transactedPtr *sku.Transacted, err error) {
-	e := co.GetSkuExternalLike().GetSku()
+	el := co.GetSkuExternalLike()
+	e := el.GetSku()
 	objectIdPtr := e.GetObjectId()
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
@@ -323,7 +324,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		SaveBlob(s fs_home.Home) (err error)
 	}
 
-	if as, ok := co.GetSkuExternalLike().(blobSaver); ok {
+	if as, ok := el.(blobSaver); ok {
 		if err = as.SaveBlob(s.GetStandort()); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -350,8 +351,8 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	var mode checkout_mode.Mode
 
 	// TODO [radi/kof !task project-2021-zit-features zz-inbox] add support for kasten in checkouts and external
-	if cofs, ok := co.(*store_fs.CheckedOut); ok {
-		if mode, err = cofs.External.FDs.GetCheckoutModeOrError(); err != nil {
+	if efs, ok := el.(*store_fs.External); ok {
+		if mode, err = efs.FDs.GetCheckoutModeOrError(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

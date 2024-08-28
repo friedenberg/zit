@@ -300,6 +300,7 @@ func (ts *TokenScanner) consumeSpaces() (ok bool) {
 	}
 }
 
+// TODO add support for ellipis
 func (ts *TokenScanner) consumeLiteralOrFieldValue(
 	start rune,
 	tt TokenType,
@@ -344,11 +345,14 @@ func (ts *TokenScanner) consumeField(start rune) bool {
 	return ok
 }
 
+// TODO add support for ellipsis
 func (ts *TokenScanner) consumeIdentifierLike(
 	tt TokenType,
 	partLocation *[]byte,
 ) (ok bool) {
 	ok = true
+
+	idx := ts.token.Len()
 
 	for {
 		var r rune
@@ -384,6 +388,8 @@ func (ts *TokenScanner) consumeIdentifierLike(
 			continue
 
 		default: // wasSplitRune && afterFirst
+			*partLocation = ts.token.Bytes()[idx : ts.token.Len()-1]
+
 			if ts.err = ts.rs.UnreadRune(); ts.err != nil {
 				ts.err = errors.Wrapf(ts.err, "%c", r)
 				ok = false

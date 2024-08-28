@@ -13,12 +13,13 @@ func key(sk sku.ExternalLike) string {
 		return sk.GetSku().ObjectId.String()
 	}
 
-	if sk.GetSku().Metadata.Description.String() != "" {
-		return sk.GetSku().Metadata.Description.String()
+	eoid := sk.GetExternalObjectId().String()
+	if eoid != "" && eoid != "/" && eoid != "-" {
+		return eoid
 	}
 
-	if sk.GetExternalObjectId().String() != "" {
-		return sk.GetExternalObjectId().String()
+	if sk.GetSku().Metadata.Description.String() != "" {
+		return sk.GetSku().Metadata.Description.String()
 	}
 
 	panic("empty key")
@@ -59,8 +60,9 @@ func (a *Assignment) addToSet(
 			ok := false
 
 			if z, ok = out.m[key(o.ExternalLike)]; !ok {
-				z = sku.GetTransactedPool().Get()
+				z = ot.SkuPool.Get()
 
+				// TODO handle external fields
 				sku.TransactedResetter.ResetWith(z.GetSku(), o.ExternalLike.GetSku())
 
 				if err = ot.EachPtr(

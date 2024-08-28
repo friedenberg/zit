@@ -360,17 +360,17 @@ func getTokenScannerTestCasesIdentifierLikeOnlySkipSpaces() []tokenScannerTestCa
 		{
 			input: "testing:e,t,k",
 			expected: []string{
-        "testing:e,t,k",
+				"testing:e,t,k",
 			},
 		},
 		{
 			input: "[area-personal, area-work]:etikett",
 			expected: []string{
 				"[",
-        "area-personal,",
-        "area-work",
-        "]",
-        ":etikett",
+				"area-personal,",
+				"area-work",
+				"]",
+				":etikett",
 			},
 		},
 		{
@@ -425,6 +425,20 @@ func getTokenScannerTestCasesIdentifierLikeOnlySkipSpaces() []tokenScannerTestCa
 				"]",
 				"Get",
 				"Help",
+			},
+		},
+		{
+			input: `[/ !toml-bookmark id=/browser/bookmark-qLdetuIXNTYV title="Da"… url="ht"…]`,
+			expected: []string{
+				"[",
+				"/",
+				"!toml-bookmark",
+				"id=/browser/bookmark-qLdetuIXNTYV",
+				`title="Da"`,
+				"…",
+				`url="ht"`,
+				"…",
+				"]",
 			},
 		},
 	}

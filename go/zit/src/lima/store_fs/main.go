@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
@@ -277,11 +278,22 @@ func (c *Store) Len() int {
 func (c *Store) GetExternalStoreOrganizeFormat(
 	f *sku_fmt.Organize,
 ) sku_fmt.ExternalLike {
-  formatExternal := *c.formatExternal
+	formatExternal := *c.formatExternal
 	formatExternal.transactedWriter = f
 
 	return sku_fmt.ExternalLike{
 		ReaderExternalLike: f,
 		WriterExternalLike: &formatExternal,
+	}
+}
+
+func (c *Store) GetExternalLikePool() interfaces.PoolValue[sku.ExternalLike] {
+	return pool.ManualPool[sku.ExternalLike]{
+		FuncGet: func() sku.ExternalLike {
+			return poolExternal.Get()
+		},
+		FuncPut: func(e sku.ExternalLike) {
+			poolExternal.Put(e.(*External))
+		},
 	}
 }
