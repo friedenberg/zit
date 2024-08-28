@@ -18,6 +18,7 @@ import (
 )
 
 type External struct {
+	external_state.State
 	sku.Transacted
 	browser sku.Transacted
 	browserItem
@@ -28,7 +29,7 @@ func (e *External) GetObjectId() *ids.ObjectId {
 }
 
 func (e *External) GetExternalState() external_state.State {
-	return external_state.Unknown
+	return e.State
 }
 
 func (e *External) SaveBlob(s fs_home.Home) (err error) {
@@ -105,6 +106,7 @@ func (a *External) Clone() sku.ExternalLike {
 	sku.TransactedResetter.ResetWith(&b.Transacted, &a.Transacted)
 	sku.TransactedResetter.ResetWith(&b.browser, &a.browser)
 	b.browserItem = a.browserItem
+  b.State = a.State
 	return b
 }
 

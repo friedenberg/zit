@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -271,15 +272,17 @@ func (f *Organize) writeStringFormatExternal(
 		return
 	}
 
-	n2, err = f.Metadata.WriteStringFormat(
-		sw,
-		&e.Metadata,
-	)
-	n += n2
+	if e.State != external_state.Untracked {
+		n2, err = f.Metadata.WriteStringFormat(
+			sw,
+			&e.Metadata,
+		)
+		n += n2
 
-	if err != nil {
-		err = errors.Wrap(err)
-		return
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	item := &e.browserItem

@@ -1,30 +1,33 @@
 package store
 
 import (
-	"fmt"
-
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/object_id_provider"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 )
 
 func (s *Store) tryRealize(
-	kinder, mutter *sku.Transacted,
+	el sku.ExternalLike, mutter *sku.Transacted,
 	o sku.CommitOptions,
 ) (err error) {
+	if as, ok := el.(sku.BlobSaver); ok {
+		if err = as.SaveBlob(s.GetStandort()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	kinder := el.GetSku()
+
 	if mutter == nil && o.Contains(objekte_mode.ModeApplyProto) {
 		s.protoZettel.Apply(kinder, kinder)
 	}
@@ -60,9 +63,11 @@ func (s *Store) tryRealize(
 
 // TODO add RealizeAndOrStore result
 func (s *Store) tryRealizeAndOrStore(
-	kinder *sku.Transacted,
+	el sku.ExternalLike,
 	o sku.CommitOptions,
 ) (err error) {
+	kinder := el.GetSku()
+
 	ui.Log().Printf("%s -> %s", o, kinder)
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() &&
@@ -117,7 +122,7 @@ func (s *Store) tryRealizeAndOrStore(
 		kinder.Metadata.Cache.ParentTai = mutter.GetTai()
 	}
 
-	if err = s.tryRealize(kinder, mutter, o); err != nil {
+	if err = s.tryRealize(el, mutter, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -298,76 +303,6 @@ func (s *Store) handleUnchanged(
 	t *sku.Transacted,
 ) (err error) {
 	return s.Unchanged(t)
-}
-
-func (s *Store) CreateOrUpdateCheckedOut(
-	co sku.CheckedOutLike,
-	updateCheckout bool,
-) (transactedPtr *sku.Transacted, err error) {
-	el := co.GetSkuExternalLike()
-	e := el.GetSku()
-	objectIdPtr := e.GetObjectId()
-
-	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = file_lock.ErrLockRequired{
-			Operation: fmt.Sprintf("create or update %s", objectIdPtr),
-		}
-
-		return
-	}
-
-	transactedPtr = sku.GetTransactedPool().Get()
-
-	sku.TransactedResetter.ResetWith(transactedPtr, e)
-
-	type blobSaver interface {
-		SaveBlob(s fs_home.Home) (err error)
-	}
-
-	if as, ok := el.(blobSaver); ok {
-		if err = as.SaveBlob(s.GetStandort()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if err = transactedPtr.SetBlobSha(e.GetBlobSha()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.tryRealizeAndOrStore(
-		transactedPtr,
-		sku.CommitOptions{Mode: objekte_mode.ModeCreate},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if !updateCheckout {
-		return
-	}
-
-	var mode checkout_mode.Mode
-
-	// TODO [radi/kof !task project-2021-zit-features zz-inbox] add support for kasten in checkouts and external
-	if efs, ok := el.(*store_fs.External); ok {
-		if mode, err = efs.FDs.GetCheckoutModeOrError(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if _, err = s.CheckoutOne(
-		co.GetRepoId(),
-		checkout_options.Options{Force: true, CheckoutMode: mode},
-		transactedPtr,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }
 
 func (s *Store) UpdateKonfig(

@@ -21,6 +21,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
+// Refactor and fold components into userops
 type Organize struct {
 	organize_text.Flags
 	Mode organize_text_mode.Mode
@@ -79,7 +80,7 @@ func (c *Organize) RunWithQuery(
 			qg,
 			u.SkuFmtOrganize(qg.RepoId),
 			u.GetStore().GetAbbrStore().GetAbbr(),
-		u.GetExternalLikePoolForRepoId(qg.RepoId),
+			u.GetExternalLikePoolForRepoId(qg.RepoId),
 		),
 	}
 

@@ -5,11 +5,14 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 )
 
 // TODO-P2 add support for quiet reindexing
@@ -57,7 +60,7 @@ func (s *Store) CreateOrUpdate(
 	)
 
 	if err = s.tryRealizeAndOrStore(
-		in.GetSku(),
+		in,
 		sku.CommitOptions{
 			Mode: mode,
 		},
@@ -150,6 +153,56 @@ func (s *Store) RevertTo(
 		sku.CommitOptions{Mode: objekte_mode.ModeCommit},
 	); err != nil {
 		err = errors.WrapExcept(err, collections.ErrExists)
+		return
+	}
+
+	return
+}
+
+func (s *Store) CreateOrUpdateCheckedOut(
+	co sku.CheckedOutLike,
+	updateCheckout bool,
+) (err error) {
+	el := co.GetSkuExternalLike()
+	e := el.GetSku()
+	objectIdPtr := e.GetObjectId()
+
+	if !s.GetStandort().GetLockSmith().IsAcquired() {
+		err = file_lock.ErrLockRequired{
+			Operation: fmt.Sprintf("create or update %s", objectIdPtr),
+		}
+
+		return
+	}
+
+	if err = s.tryRealizeAndOrStore(
+		el,
+		sku.CommitOptions{Mode: objekte_mode.ModeCreate},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if !updateCheckout {
+		return
+	}
+
+	var mode checkout_mode.Mode
+
+	// TODO [radi/kof !task project-2021-zit-features zz-inbox] add support for kasten in checkouts and external
+	if efs, ok := el.(*store_fs.External); ok {
+		if mode, err = efs.FDs.GetCheckoutModeOrError(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if _, err = s.CheckoutOne(
+		co.GetRepoId(),
+		checkout_options.Options{Force: true, CheckoutMode: mode},
+		el.GetSku(),
+	); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

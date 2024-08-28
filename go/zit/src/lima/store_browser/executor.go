@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -53,6 +54,8 @@ func (c *executor) tryToEmitOneExplicitlyCheckedOut(
 		c.co.State = checked_out_state.ExistsAndDifferent
 	}
 
+	c.co.External.State = external_state.Tracked
+
 	if err = c.tryToEmitOneCommon(item, false); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -82,6 +85,7 @@ func (c *executor) tryToEmitOneRecognized(
 	}
 
 	c.co.State = checked_out_state.Recognized
+	c.co.External.State = external_state.Recognized
 
 	if err = c.tryToEmitOneCommon(item, true); err != nil {
 		err = errors.Wrap(err)
@@ -101,9 +105,13 @@ func (c *executor) tryToEmitOneUntracked(
 	}
 
 	sku.TransactedResetter.Reset(&c.co.External.browser)
-
 	sku.TransactedResetter.Reset(&c.co.External.Transacted)
 	sku.TransactedResetter.Reset(&c.co.Internal)
+
+	if err = c.co.External.Metadata.Description.Set(item.Title); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = item.WriteToObjectIds(
 		&c.co.External.browser.ObjectId,
@@ -111,6 +119,8 @@ func (c *executor) tryToEmitOneUntracked(
 		err = errors.Wrap(err)
 		return
 	}
+
+	c.co.External.State = external_state.Untracked
 
 	if err = c.tryToEmitOneCommon(item, true); err != nil {
 		err = errors.Wrap(err)

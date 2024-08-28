@@ -75,7 +75,7 @@ func (c Checkin) runNoOrganize(
 	if err = u.GetStore().QueryCheckedOut(
 		qg,
 		func(col sku.CheckedOutLike) (err error) {
-			if _, err = u.GetStore().CreateOrUpdateCheckedOut(
+			if err = u.GetStore().CreateOrUpdateCheckedOut(
 				col,
 				true,
 			); err != nil {
