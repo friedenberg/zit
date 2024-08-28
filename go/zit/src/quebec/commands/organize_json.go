@@ -154,9 +154,9 @@ func (c *OrganizeJSON) RunWithQuery(
 		return
 	}
 
-	var ot2 *organize_text.Text
+	var organizeText *organize_text.Text
 
-	if ot2, err = c.readFromVim(
+	if organizeText, err = c.readFromVim(
 		u,
 		f.Name(),
 		createOrganizeFileResults,
@@ -186,9 +186,10 @@ func (c *OrganizeJSON) RunWithQuery(
 	if _, err = commitOrganizeTextOp.RunCommit(
 		u,
 		createOrganizeFileResults,
-		ot2,
+		organizeText,
 		getResults,
 		qg,
+		nil,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

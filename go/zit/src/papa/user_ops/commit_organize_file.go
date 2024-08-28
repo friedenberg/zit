@@ -2,6 +2,7 @@ package user_ops
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -49,17 +50,14 @@ func (op CommitOrganizeFile) RunCommit(
 	a, b *organize_text.Text,
 	original sku.ExternalLikeSet,
 	qg *query.Group,
+	onChanged interfaces.FuncIter[sku.ExternalLike],
 ) (cs CommitOrganizeFileResults, err error) {
 	if err = op.ApplyToText(u, a); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if cs, err = organize_text.ChangesFrom(
-		a,
-		b,
-		original,
-	); err != nil {
+	if cs, err = organize_text.ChangesFrom(a, b, original); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -70,8 +68,8 @@ func (op CommitOrganizeFile) RunCommit(
 	// 	return
 	// }
 
-	if err = cs.Changed.Each(
-		func(changed sku.ExternalLike) (err error) {
+	if onChanged == nil {
+		onChanged = func(changed sku.ExternalLike) (err error) {
 			if err = u.GetStore().CreateOrUpdate(
 				changed,
 				objekte_mode.Make(
@@ -83,8 +81,10 @@ func (op CommitOrganizeFile) RunCommit(
 			}
 
 			return
-		},
-	); err != nil {
+		}
+	}
+
+	if err = cs.Changed.Each(onChanged); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

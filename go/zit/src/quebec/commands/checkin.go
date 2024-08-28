@@ -14,6 +14,7 @@ import (
 type Checkin struct {
 	Delete     bool
 	IgnoreBlob bool
+	Organize   bool
 }
 
 func init() {
@@ -31,6 +32,8 @@ func init() {
 				"do not change the blob",
 			)
 
+			f.BoolVar(&c.Organize, "organize", false, "")
+
 			return c
 		},
 	)
@@ -42,7 +45,7 @@ func (c Checkin) DefaultGenres() ids.Genre {
 
 func (c Checkin) RunWithQuery(
 	u *env.Env,
-	eqwk *query.Group,
+	qg *query.Group,
 ) (err error) {
 	op := user_ops.Checkin{
 		Delete: c.Delete,
@@ -50,7 +53,7 @@ func (c Checkin) RunWithQuery(
 
 	if err = op.Run(
 		u,
-		eqwk,
+		qg,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/vim_cli_options_builder"
@@ -22,14 +23,59 @@ type Organize struct {
 	object_metadata.Metadata
 }
 
-func (u Organize) Run(
+func (u Organize) RunWithQueryGroup(
+	qg *query.Group,
+) (err error) {
+	skus := sku.MakeExternalLikeMutableSet()
+	var l sync.Mutex
+
+	if err = u.GetStore().Query(
+		qg,
+		func(el sku.ExternalLike) (err error) {
+			l.Lock()
+			defer l.Unlock()
+			return skus.Add(el.Clone())
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = u.RunWithExternalLike(qg, skus); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (u Organize) RunWithTransacted(
 	qg *query.Group,
 	skus sku.TransactedSet,
+) (err error) {
+	skusExternalLike := sku.MakeExternalLikeMutableSet()
+	skus.Each(
+		func(z *sku.Transacted) (err error) {
+			return skusExternalLike.Add(z)
+		},
+	)
+
+	if err = u.RunWithExternalLike(qg, skusExternalLike); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (u Organize) RunWithExternalLike(
+	qg *query.Group,
+	skus sku.ExternalLikeSet,
 ) (err error) {
 	if qg == nil {
 		b := u.MakeQueryBuilder(
 			ids.MakeGenre(genres.TrueGenre()...),
-		).WithTransacted(
+		).WithExternalLike(
 			skus,
 		)
 
@@ -40,25 +86,24 @@ func (u Organize) Run(
 	}
 
 	// otFlags.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
-	mwk := sku.MakeExternalLikeMutableSet()
-	skus.Each(
-		func(z *sku.Transacted) (err error) {
-			return mwk.Add(z)
-		},
-	)
-
-	otFlags := organize_text.MakeFlagsWithMetadata(u.Metadata)
-	u.ApplyToOrganizeOptions(&otFlags.Options)
-	otFlags.Transacted = mwk
+	organizeFlags := organize_text.MakeFlagsWithMetadata(u.Metadata)
+	u.ApplyToOrganizeOptions(&organizeFlags.Options)
+	organizeFlags.Transacted = skus
 
 	createOrganizeFileOp := CreateOrganizeFile{
 		Env: u.Env,
-		Options: otFlags.GetOptions(
+		Options: organizeFlags.GetOptions(
 			u.GetConfig().PrintOptions,
 			qg,
 			u.SkuFmtOrganize(qg.RepoId),
 			u.GetStore().GetAbbrStore().GetAbbr(),
 		),
+	}
+
+	typen := qg.GetTypes()
+
+	if typen.Len() == 1 {
+		createOrganizeFileOp.Type = typen.Any()
 	}
 
 	var createOrganizeFileResults *organize_text.Text
@@ -81,7 +126,7 @@ func (u Organize) Run(
 		return
 	}
 
-	var ot2 *organize_text.Text
+	var organizeText *organize_text.Text
 
 	for {
 		openVimOp := OpenVim{
@@ -107,7 +152,7 @@ func (u Organize) Run(
 			return
 		}
 
-		if ot2, err = readOrganizeTextOp.Run(u.Env, f, qg.RepoId); err != nil {
+		if organizeText, err = readOrganizeTextOp.Run(u.Env, f, qg.RepoId); err != nil {
 			if u.handleReadChangesError(err) {
 				err = nil
 				continue
@@ -134,9 +179,10 @@ func (u Organize) Run(
 	if _, err = commitOrganizeTextOp.RunCommit(
 		u.Env,
 		createOrganizeFileResults,
-		ot2,
-		mwk,
+		organizeText,
+		skus,
 		qg,
+		nil,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

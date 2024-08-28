@@ -130,11 +130,11 @@ func (c *Organize) RunWithQuery(
 			return
 		}
 
-		var ot2 *organize_text.Text
+		var organizeTet *organize_text.Text
 
 		readOrganizeTextOp := user_ops.ReadOrganizeFile{}
 
-		if ot2, err = readOrganizeTextOp.Run(u, os.Stdin, qg.RepoId); err != nil {
+		if organizeTet, err = readOrganizeTextOp.Run(u, os.Stdin, qg.RepoId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -153,9 +153,10 @@ func (c *Organize) RunWithQuery(
 		if _, err = commitOrganizeTextOp.RunCommit(
 			u,
 			createOrganizeFileResults,
-			ot2,
+			organizeTet,
 			getResults,
 			qg,
+			nil,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -192,9 +193,9 @@ func (c *Organize) RunWithQuery(
 			return
 		}
 
-		var ot2 *organize_text.Text
+		var organizeText *organize_text.Text
 
-		if ot2, err = c.readFromVim(u, f.Name(), createOrganizeFileResults, qg); err != nil {
+		if organizeText, err = c.readFromVim(u, f.Name(), createOrganizeFileResults, qg); err != nil {
 			err = errors.Wrapf(err, "Organize File: %q", f.Name())
 			return
 		}
@@ -213,9 +214,10 @@ func (c *Organize) RunWithQuery(
 		if _, err = commitOrganizeTextOp.RunCommit(
 			u,
 			createOrganizeFileResults,
-			ot2,
+			organizeText,
 			getResults,
 			qg,
+      nil,
 		); err != nil {
 			err = errors.Wrapf(err, "Organize File: %q", f.Name())
 			return

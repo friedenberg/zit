@@ -115,7 +115,7 @@ func (c Add) RunWithQuery(
 		return
 	}
 
-	if err = opOrganize.Run(
+	if err = opOrganize.RunWithTransacted(
 		nil,
 		zettelsFromBlobResults,
 	); err != nil {

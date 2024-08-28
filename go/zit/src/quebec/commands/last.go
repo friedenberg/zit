@@ -83,7 +83,7 @@ func (c Last) Run(u *env.Env, args ...string) (err error) {
 			Env: u,
 		}
 
-		if err = opOrganize.Run(nil, skus); err != nil {
+		if err = opOrganize.RunWithTransacted(nil, skus); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
