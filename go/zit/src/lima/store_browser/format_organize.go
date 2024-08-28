@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -195,17 +194,14 @@ LOOP:
 							return
 						}
 
-						ui.Debug().Printf("%#v", e.browserItem)
 						continue LOOP
 
 					case "url":
 						e.browserItem.Url = right
-						ui.Debug().Printf("%#v", e.browserItem)
 						continue LOOP
 
 					case "title":
 						e.browserItem.Title = right
-						ui.Debug().Printf("%#v", e.browserItem)
 						continue LOOP
 
 					default:

@@ -64,12 +64,22 @@ func makeObjWithHinAndBez(t *testing.T, hin string, bez string) (o *obj) {
 func makeAssignmentLineReader() assignmentLineReader {
 	return assignmentLineReader{
 		options: Options{
-			SkuPool: pool.ManualPool[sku.ExternalLike]{
-				FuncGet: func() sku.ExternalLike {
-					return sku.GetTransactedPool().Get()
+			ObjectFactory: ObjectFactory{
+				PoolValue: pool.Bespoke[sku.ExternalLike]{
+					FuncGet: func() sku.ExternalLike {
+						return sku.GetTransactedPool().Get()
+					},
+					FuncPut: func(e sku.ExternalLike) {
+						sku.GetTransactedPool().Put(e.(*sku.Transacted))
+					},
 				},
-				FuncPut: func(e sku.ExternalLike) {
-					sku.GetTransactedPool().Put(e.(*sku.Transacted))
+				Resetter3: pool.BespokeResetter[sku.ExternalLike]{
+					FuncReset: func(e sku.ExternalLike) {
+						sku.TransactedResetter.Reset(e.GetSku())
+					},
+					FuncResetWith: func(dst, src sku.ExternalLike) {
+						sku.TransactedResetter.ResetWith(dst.GetSku(), src.GetSku())
+					},
 				},
 			},
 		},

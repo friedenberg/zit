@@ -45,4 +45,8 @@ type (
 	ExternalLikePoolGetter interface {
 		GetExternalLikePool() interfaces.PoolValue[ExternalLike]
 	}
+
+	ExternalLikeResetter3Getter interface {
+		GetExternalLikeResetter3() interfaces.Resetter3[ExternalLike]
+	}
 )

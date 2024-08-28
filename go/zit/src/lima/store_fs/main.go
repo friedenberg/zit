@@ -288,12 +288,27 @@ func (c *Store) GetExternalStoreOrganizeFormat(
 }
 
 func (c *Store) GetExternalLikePool() interfaces.PoolValue[sku.ExternalLike] {
-	return pool.ManualPool[sku.ExternalLike]{
+	return pool.Bespoke[sku.ExternalLike]{
 		FuncGet: func() sku.ExternalLike {
 			return poolExternal.Get()
 		},
 		FuncPut: func(e sku.ExternalLike) {
 			poolExternal.Put(e.(*External))
+		},
+	}
+}
+
+func (c *Store) GetExternalLikeResetter3() interfaces.Resetter3[sku.ExternalLike] {
+	return pool.BespokeResetter[sku.ExternalLike]{
+		FuncReset: func(el sku.ExternalLike) {
+			a := el.(*External)
+			sku.TransactedResetter.Reset(&a.Transacted)
+			a.FDs.Reset()
+		},
+		FuncResetWith: func(eldst, elsrc sku.ExternalLike) {
+			dst, src := eldst.(*External), elsrc.(*External)
+			sku.TransactedResetter.ResetWith(&dst.Transacted, &src.Transacted)
+			dst.FDs.ResetWith(&src.FDs)
 		},
 	}
 }

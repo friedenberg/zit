@@ -2,10 +2,10 @@ package user_ops
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
@@ -43,24 +43,19 @@ func (c Checkin) runOrganize(
 
 	ui.Log().Print(qg)
 
-	if err = opOrganize.RunWithQueryGroup(
+	var organizeResults organize_text.OrganizeResults
+
+	if organizeResults, err = opOrganize.RunWithQueryGroup(
 		qg,
-		func(changed sku.ExternalLike) (err error) {
-			if err = u.GetStore().CreateOrUpdate(
-				changed,
-				objekte_mode.Make(
-					objekte_mode.ModeMergeCheckedOut,
-				),
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-      // TODO mark for deletion
-
-			return
-		},
 	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	u.Lock()
+	defer errors.Deferred(&err, u.Unlock)
+
+	if _, err = u.CommitRemainingOrganizeResults(organizeResults); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

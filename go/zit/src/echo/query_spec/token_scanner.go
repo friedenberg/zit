@@ -388,7 +388,7 @@ func (ts *TokenScanner) consumeIdentifierLike(
 			continue
 
 		default: // wasSplitRune && afterFirst
-			*partLocation = ts.token.Bytes()[idx : ts.token.Len()-1]
+			*partLocation = ts.token.Bytes()[idx:ts.token.Len()]
 
 			if ts.err = ts.rs.UnreadRune(); ts.err != nil {
 				ts.err = errors.Wrapf(ts.err, "%c", r)

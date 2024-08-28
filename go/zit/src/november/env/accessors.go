@@ -5,12 +5,11 @@ import (
 	"time"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
@@ -48,24 +47,18 @@ func (u *Env) GetStore() *store.Store {
 
 func (u *Env) GetExternalLikePoolForRepoId(
 	repoId ids.RepoId,
-) interfaces.PoolValue[sku.ExternalLike] {
+) (of organize_text.ObjectFactory) {
 	if repoId.IsEmpty() {
-		return nil
+		return
 	}
 
 	kid := repoId.GetRepoIdString()
 	es, ok := u.externalStores[kid]
 
-	if !ok {
-		return pool.ManualPool[sku.ExternalLike]{
-			FuncGet: func() sku.ExternalLike {
-				return sku.GetTransactedPool().Get()
-			},
-			FuncPut: func(e sku.ExternalLike) {
-				sku.GetTransactedPool().Put(e.(*sku.Transacted))
-			},
-		}
-	} else {
-		return es.GetExternalLikePool()
+	if ok {
+		of.PoolValue = es.GetExternalLikePool()
+		of.Resetter3 = es.GetExternalLikeResetter3()
 	}
+
+	return
 }

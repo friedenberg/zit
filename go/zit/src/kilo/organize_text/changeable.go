@@ -14,7 +14,7 @@ func key(sk sku.ExternalLike) string {
 	}
 
 	eoid := sk.GetExternalObjectId().String()
-	if eoid != "" && eoid != "/" && eoid != "-" {
+	if len(eoid) > 1 {
 		return eoid
 	}
 
@@ -60,10 +60,9 @@ func (a *Assignment) addToSet(
 			ok := false
 
 			if z, ok = out.m[key(o.ExternalLike)]; !ok {
-				z = ot.SkuPool.Get()
+				z = ot.ObjectFactory.Get()
 
-				// TODO handle external fields
-				sku.TransactedResetter.ResetWith(z.GetSku(), o.ExternalLike.GetSku())
+				ot.ObjectFactory.ResetWith(z, o.ExternalLike)
 
 				if err = ot.EachPtr(
 					z.GetSku().AddTagPtr,

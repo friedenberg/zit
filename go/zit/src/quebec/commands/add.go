@@ -103,7 +103,7 @@ func (c Add) RunWithQuery(
 		return
 	}
 
-	opOrganize := user_ops.Organize{
+	opOrganize := user_ops.OrganizeAndCommit{
 		Env:      u,
 		Metadata: c.Metadata,
 	}
@@ -115,10 +115,9 @@ func (c Add) RunWithQuery(
 		return
 	}
 
-	if err = opOrganize.RunWithTransacted(
+	if _, err = opOrganize.RunWithTransacted(
 		nil,
 		zettelsFromBlobResults,
-    nil,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

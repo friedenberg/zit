@@ -71,6 +71,7 @@ type (
 		interfaces.Flusher
 		sku.ExternalStoreForQuery
 		sku.ExternalLikePoolGetter
+		sku.ExternalLikeResetter3Getter
 	}
 
 	StoreGetter interface {

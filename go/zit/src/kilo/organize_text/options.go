@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
@@ -36,7 +35,7 @@ type Options struct {
 	ExtraTags       ids.TagSet
 	Skus            interfaces.SetLike[sku.ExternalLike]
 
-	SkuPool interfaces.PoolValue[sku.ExternalLike]
+	ObjectFactory
 
 	Abbr ids.Abbr
 
@@ -119,7 +118,7 @@ func (o *Flags) GetOptions(
 	q sku.QueryGroup,
 	skuFmt sku_fmt.ExternalLike,
 	abbr ids.Abbr,
-	skuPool interfaces.PoolValue[sku.ExternalLike],
+	of ObjectFactory,
 ) Options {
 	o.once.Do(
 		func() {
@@ -136,18 +135,9 @@ func (o *Flags) GetOptions(
 		o.rootTags = q.GetTags()
 	}
 
-	if skuPool == nil {
-		skuPool = pool.ManualPool[sku.ExternalLike]{
-			FuncGet: func() sku.ExternalLike {
-				return sku.GetTransactedPool().Get()
-			},
-			FuncPut: func(e sku.ExternalLike) {
-				sku.GetTransactedPool().Put(e.(*sku.Transacted))
-			},
-		}
-	}
+	of.SetDefaultsIfNecessary()
 
-	o.SkuPool = skuPool
+	o.ObjectFactory = of
 	o.PrintOptions = printOptions
 	o.Abbr = abbr
 

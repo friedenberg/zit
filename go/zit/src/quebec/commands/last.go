@@ -79,11 +79,11 @@ func (c Last) Run(u *env.Env, args ...string) (err error) {
 	}
 
 	if c.Organize {
-		opOrganize := user_ops.Organize{
+		opOrganize := user_ops.OrganizeAndCommit{
 			Env: u,
 		}
 
-		if err = opOrganize.RunWithTransacted(nil, skus, nil); err != nil {
+		if _, err = opOrganize.RunWithTransacted(nil, skus); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

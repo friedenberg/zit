@@ -13,7 +13,7 @@ import (
 )
 
 type assignmentLineWriter struct {
-	SkuPool              interfaces.PoolValue[sku.ExternalLike]
+	ObjectFactory
 	RightAlignedIndents  bool
 	OmitLeadingEmptyLine bool
 	object_metadata.Metadata

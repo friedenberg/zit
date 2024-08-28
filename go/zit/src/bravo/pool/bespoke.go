@@ -8,16 +8,16 @@ package pool
 // 	return
 // }
 
-type ManualPool[T any] struct {
+type Bespoke[T any] struct {
 	FuncGet func() T
 	FuncPut func(T)
 }
 
-func (ip ManualPool[T]) Get() T {
+func (ip Bespoke[T]) Get() T {
 	return ip.FuncGet()
 }
 
-func (ip ManualPool[T]) Put(i T) (err error) {
+func (ip Bespoke[T]) Put(i T) (err error) {
 	ip.FuncPut(i)
 	return
 }

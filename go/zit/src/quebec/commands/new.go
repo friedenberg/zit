@@ -135,12 +135,12 @@ func (c New) Run(u *env.Env, args ...string) (err error) {
 	}
 
 	if c.Organize {
-		opOrganize := user_ops.Organize{
+		opOrganize := user_ops.OrganizeAndCommit{
 			Env:      u,
 			Metadata: c.Metadata,
 		}
 
-		if err = opOrganize.RunWithTransacted(nil, zts, nil); err != nil {
+		if _, err = opOrganize.RunWithTransacted(nil, zts); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

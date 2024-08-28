@@ -27,6 +27,10 @@ func New(options Options) (ot *Text, err error) {
 }
 
 func (t *Text) Refine() (err error) {
+	if !t.Options.wasMade {
+		panic("options not initialized")
+	}
+
 	if err = t.Options.refiner().Refine(t.Assignment); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -36,6 +40,10 @@ func (t *Text) Refine() (err error) {
 }
 
 func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
+	if !t.Options.wasMade {
+		panic("options not initialized")
+	}
+
 	r1 := &assignmentLineReader{
 		options: t.Options,
 	}
@@ -85,6 +93,10 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 }
 
 func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
+	if !ot.Options.wasMade {
+		panic("options not initialized")
+	}
+
 	lw := format.NewLineWriter()
 
 	kopf, schwanz := ot.MaxHeadAndTail(ot.Options)
@@ -94,7 +106,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 	omit := ot.UseMetadataHeader && ot.HasMetadataContent()
 
 	aw := assignmentLineWriter{
-		SkuPool:              ot.SkuPool,
+		ObjectFactory:        ot.ObjectFactory,
 		LineWriter:           lw,
 		maxDepth:             ot.MaxDepth(),
 		maxHead:              kopf,

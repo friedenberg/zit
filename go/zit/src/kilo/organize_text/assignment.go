@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+// TODO move to object_factory
 func newAssignment(d int) *Assignment {
 	a := &Assignment{
 		Depth:    d,

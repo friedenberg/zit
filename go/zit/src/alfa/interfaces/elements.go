@@ -71,3 +71,8 @@ type Resetter2[T any, TPtr Ptr[T]] interface {
 	Reset(TPtr)
 	ResetWith(TPtr, TPtr)
 }
+
+type Resetter3[T any] interface {
+	Reset(T)
+	ResetWith(T, T)
+}

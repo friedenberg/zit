@@ -40,6 +40,11 @@ func (l *Lock) Lock() (err error) {
 	l.mutex.Lock()
 	defer l.mutex.Unlock()
 
+	if l.f != nil {
+		err = errors.Errorf("already locked")
+		return
+	}
+
 	ui.Log().Caller(2, "locking "+l.Path())
 	if l.f, err = files.OpenFile(l.Path(), os.O_RDONLY|os.O_EXCL|os.O_CREATE, 755); err != nil {
 		if errors.Is(err, fs.ErrExist) {

@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/vim_cli_options_builder"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -19,14 +18,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
-type Organize struct {
+type OrganizeAndCommit struct {
 	*env.Env
 	object_metadata.Metadata
 }
 
-func (u Organize) RunWithQueryGroup(
+func (u OrganizeAndCommit) RunWithQueryGroup(
 	qg *query.Group,
-) (organizeResults organize_text.OrganizeResults, err error) {
+) (results organize_text.OrganizeResults, err error) {
 	skus := sku.MakeExternalLikeMutableSet()
 	var l sync.Mutex
 
@@ -42,7 +41,7 @@ func (u Organize) RunWithQueryGroup(
 		return
 	}
 
-	if organizeResults, err = u.RunWithExternalLike(qg, skus); err != nil {
+	if results, err = u.RunWithExternalLike(qg, skus); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -50,11 +49,10 @@ func (u Organize) RunWithQueryGroup(
 	return
 }
 
-func (u Organize) RunWithTransacted(
+func (u OrganizeAndCommit) RunWithTransacted(
 	qg *query.Group,
 	transacted sku.TransactedSet,
-	onChanged interfaces.FuncIter[sku.ExternalLike],
-) (organizeResults organize_text.OrganizeResults, err error) {
+) (results organize_text.OrganizeResults, err error) {
 	skus := sku.MakeExternalLikeMutableSet()
 	transacted.Each(
 		func(z *sku.Transacted) (err error) {
@@ -62,7 +60,7 @@ func (u Organize) RunWithTransacted(
 		},
 	)
 
-	if organizeResults, err = u.RunWithExternalLike(qg, skus); err != nil {
+	if results, err = u.RunWithExternalLike(qg, skus); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -70,21 +68,18 @@ func (u Organize) RunWithTransacted(
 	return
 }
 
-func (u Organize) RunWithExternalLike(
+func (u OrganizeAndCommit) RunWithExternalLike(
 	qg *query.Group,
 	skus sku.ExternalLikeSet,
-) (organizeResults organize_text.OrganizeResults, err error) {
-	organizeResults.Original = skus
-	organizeResults.QueryGroup = qg
-
-	if organizeResults.QueryGroup == nil {
+) (results organize_text.OrganizeResults, err error) {
+	if qg == nil {
 		b := u.MakeQueryBuilder(
 			ids.MakeGenre(genres.TrueGenre()...),
 		).WithExternalLike(
 			skus,
 		)
 
-		if organizeResults.QueryGroup, err = b.BuildQueryGroup(); err != nil {
+		if qg, err = b.BuildQueryGroup(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -123,7 +118,7 @@ func (u Organize) RunWithExternalLike(
 
 	defer errors.DeferredCloser(&err, f)
 
-	if organizeResults.Before, err = createOrganizeFileOp.RunAndWrite(
+	if results.Before, err = createOrganizeFileOp.RunAndWrite(
 		f,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -154,7 +149,7 @@ func (u Organize) RunWithExternalLike(
 			return
 		}
 
-		if organizeResults.After, err = readOrganizeTextOp.Run(u.Env, f, qg.RepoId); err != nil {
+		if results.After, err = readOrganizeTextOp.Run(u.Env, f, qg.RepoId); err != nil {
 			if u.handleReadChangesError(err) {
 				err = nil
 				continue
@@ -167,10 +162,18 @@ func (u Organize) RunWithExternalLike(
 		break
 	}
 
+	results.Original = skus
+	results.QueryGroup = qg
+
+	if _, err = u.CommitOrganizeResults(results); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
-func (c Organize) handleReadChangesError(err error) (tryAgain bool) {
+func (c OrganizeAndCommit) handleReadChangesError(err error) (tryAgain bool) {
 	var errorRead organize_text.ErrorRead
 
 	if err != nil && !errors.As(err, &errorRead) {

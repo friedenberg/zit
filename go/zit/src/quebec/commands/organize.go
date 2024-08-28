@@ -151,13 +151,12 @@ func (c *Organize) RunWithQuery(
 			Env: u,
 		}
 
-		if _, err = commitOrganizeTextOp.RunCommit(
+		if _, err = commitOrganizeTextOp.RunTraditionalCommit(
 			u,
 			createOrganizeFileResults,
 			organizeTet,
 			getResults,
 			qg,
-			nil,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -212,13 +211,12 @@ func (c *Organize) RunWithQuery(
 			Env: u,
 		}
 
-		if _, err = commitOrganizeTextOp.RunCommit(
+		if _, err = commitOrganizeTextOp.RunTraditionalCommit(
 			u,
 			createOrganizeFileResults,
 			organizeText,
 			getResults,
 			qg,
-      nil,
 		); err != nil {
 			err = errors.Wrapf(err, "Organize File: %q", f.Name())
 			return

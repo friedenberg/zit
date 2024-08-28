@@ -276,7 +276,7 @@ func (ar *assignmentLineReader) readOneObj(
 	// logz.Print("reading one zettel", l)
 
 	var z obj
-	z.ExternalLike = ar.options.SkuPool.Get()
+	z.ExternalLike = ar.options.ObjectFactory.Get()
 	z.Type = t
 
 	if _, err = ar.stringFormatReader.ReadStringFormat(
