@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type assignmentLineReader struct {
+type reader struct {
 	options            Options
 	lineNo             int
 	root               *Assignment
@@ -21,7 +21,7 @@ type assignmentLineReader struct {
 	stringFormatReader catgut.StringFormatReader[sku.ExternalLike]
 }
 
-func (ar *assignmentLineReader) ReadFrom(r1 io.Reader) (n int64, err error) {
+func (ar *reader) ReadFrom(r1 io.Reader) (n int64, err error) {
 	r := catgut.MakeRingBuffer(r1, 0)
 	rbs := catgut.MakeRingBufferScanner(r)
 
@@ -114,7 +114,7 @@ LOOP:
 	return
 }
 
-func (ar *assignmentLineReader) readOneHeading(
+func (ar *reader) readOneHeading(
 	rb *catgut.RingBuffer,
 	match catgut.SliceBytes,
 ) (err error) {
@@ -163,7 +163,7 @@ func (ar *assignmentLineReader) readOneHeading(
 	return
 }
 
-func (ar *assignmentLineReader) readOneHeadingLesserDepth(
+func (ar *reader) readOneHeadingLesserDepth(
 	d int,
 	e ids.TagSet,
 ) (newCurrent *Assignment, err error) {
@@ -198,7 +198,7 @@ func (ar *assignmentLineReader) readOneHeadingLesserDepth(
 	return
 }
 
-func (ar *assignmentLineReader) readOneHeadingEqualDepth(
+func (ar *reader) readOneHeadingEqualDepth(
 	d int,
 	e ids.TagSet,
 ) (newCurrent *Assignment, err error) {
@@ -233,7 +233,7 @@ func (ar *assignmentLineReader) readOneHeadingEqualDepth(
 	return
 }
 
-func (ar *assignmentLineReader) readOneHeadingGreaterDepth(
+func (ar *reader) readOneHeadingGreaterDepth(
 	d int,
 	e ids.TagSet,
 ) (newCurrent *Assignment, err error) {
@@ -269,7 +269,7 @@ func (ar *assignmentLineReader) readOneHeadingGreaterDepth(
 	return
 }
 
-func (ar *assignmentLineReader) readOneObj(
+func (ar *reader) readOneObj(
 	r *catgut.RingBuffer,
 	t tag_paths.Type,
 ) (err error) {

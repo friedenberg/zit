@@ -10,10 +10,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
 type Flags struct {
@@ -26,16 +25,19 @@ type Flags struct {
 type Options struct {
 	wasMade bool
 
-	Config *config.Compiled
+	Config interface {
+    interfaces.ConfigDryRun
+    interfaces.ConfigGetFilters
+  }
+
+	Metadata
 
 	commentMatchers interfaces.SetLike[sku.Query]
-	rootTags        ids.TagSet
-	Type            ids.Type
 	GroupingTags    ids.TagSlice
 	ExtraTags       ids.TagSet
 	Skus            interfaces.SetLike[sku.ExternalLike]
 
-	ObjectFactory
+	external_store.ObjectFactory
 
 	Abbr ids.Abbr
 
@@ -64,7 +66,7 @@ func MakeFlags() Flags {
 	}
 }
 
-func MakeFlagsWithMetadata(m object_metadata.Metadata) Flags {
+func MakeFlagsWithMetadata(m Metadata) Flags {
 	return Flags{
 		once: &sync.Once{},
 		ExtraTags: collections_ptr.MakeFlagCommas[ids.Tag](
@@ -72,7 +74,7 @@ func MakeFlagsWithMetadata(m object_metadata.Metadata) Flags {
 		),
 
 		Options: Options{
-			rootTags:     m.GetTags(),
+			Metadata:     m,
 			wasMade:      true,
 			GroupingTags: ids.MakeTagSlice(),
 			Skus:         sku.MakeExternalLikeMutableSet(),
@@ -113,12 +115,12 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 	)
 }
 
-func (o *Flags) GetOptions(
+func (o *Flags) GetOptionsWithMetadata(
 	printOptions erworben_cli_print_options.PrintOptions,
-	q sku.QueryGroup,
 	skuFmt sku_fmt.ExternalLike,
 	abbr ids.Abbr,
-	of ObjectFactory,
+	of external_store.ObjectFactory,
+	m Metadata,
 ) Options {
 	o.once.Do(
 		func() {
@@ -129,19 +131,36 @@ func (o *Flags) GetOptions(
 	o.stringFormatReader = skuFmt.ReaderExternalLike
 	o.stringFormatWriter = skuFmt.WriterExternalLike
 
-	if q == nil {
-		o.rootTags = ids.MakeTagSet()
-	} else {
-		o.rootTags = q.GetTags()
-	}
-
 	of.SetDefaultsIfNecessary()
 
 	o.ObjectFactory = of
 	o.PrintOptions = printOptions
 	o.Abbr = abbr
+	o.Metadata = m
 
 	return o.Options
+}
+
+func (o *Flags) GetOptions(
+	printOptions erworben_cli_print_options.PrintOptions,
+	q TagSetGetter,
+	skuFmt sku_fmt.ExternalLike,
+	abbr ids.Abbr, // TODO move Abbr as required arg
+	of external_store.ObjectFactory,
+) Options {
+	m := NewMetadata()
+
+	if q != nil {
+		m.TagSet = q.GetTags()
+	}
+
+	return o.GetOptionsWithMetadata(
+		printOptions,
+		skuFmt,
+		abbr,
+		of,
+		m,
+	)
 }
 
 func (o Options) Make() (ot *Text, err error) {
@@ -151,10 +170,39 @@ func (o Options) Make() (ot *Text, err error) {
 		},
 	}
 
-	if ot, err = c.Make(); err != nil {
+	ot = &c.Text
+
+	c.all = MakePrefixSet(0)
+	c.Assignment = newAssignment(0)
+	c.IsRoot = true
+
+	if c.TagSet == nil {
+		c.TagSet = ids.MakeTagSet()
+	}
+
+	if err = c.Options.Skus.Each(c.all.AddTransacted); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	if err = c.preparePrefixSetsAndRootsAndExtras(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = c.populate(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	c.Metadata.Type = c.Options.Type
+
+	if err = ot.Refine(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	ot.SortChildren()
 
 	return
 }

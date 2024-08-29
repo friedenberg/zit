@@ -75,7 +75,7 @@ func (c Add) ModifyBuilder(b *query.Builder) {
 		WithDoNotMatchEmpty()
 }
 
-func (c Add) RunWithQuery(
+func (c *Add) RunWithQuery(
 	u *env.Env,
 	qg *query.Group,
 ) (err error) {
@@ -104,16 +104,15 @@ func (c Add) RunWithQuery(
 	}
 
 	opOrganize := user_ops.OrganizeAndCommit{
-		Env:      u,
-		Metadata: c.Metadata,
+		Env: u,
 	}
 
-	if err = u.GetConfig().DefaultTags.EachPtr(
-		opOrganize.Metadata.AddTagPtr,
-	); err != nil {
+	if err = opOrganize.Metadata.SetFromObjectMetadata(&c.Metadata); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	opOrganize.Metadata.TagSet = u.GetConfig().DefaultTags.CloneSetPtrLike()
 
 	if _, err = opOrganize.RunWithTransacted(
 		nil,

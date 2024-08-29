@@ -59,13 +59,12 @@ func (c *FormatOrganize) Run(u *env.Env, args ...string) (err error) {
 		return
 	}
 
-	// TODO move Abbr as required arg
-	ot.Options = c.Flags.GetOptions(
+	ot.Options = c.Flags.GetOptionsWithMetadata(
 		u.GetConfig().PrintOptions,
-		nil,
 		u.SkuFmtOrganize(repoId),
 		u.GetStore().GetAbbrStore().GetAbbr(),
 		u.GetExternalLikePoolForRepoId(repoId),
+		ot.Metadata,
 	)
 
 	if err = ot.Refine(); err != nil {

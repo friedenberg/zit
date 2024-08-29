@@ -12,7 +12,6 @@ import (
 
 type Text struct {
 	Options
-	Metadata
 	*Assignment
 }
 
@@ -44,7 +43,7 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 		panic("options not initialized")
 	}
 
-	r1 := &assignmentLineReader{
+	r1 := &reader{
 		options: t.Options,
 	}
 
@@ -105,7 +104,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 
 	omit := ot.UseMetadataHeader && ot.HasMetadataContent()
 
-	aw := assignmentLineWriter{
+	aw := writer{
 		ObjectFactory:        ot.ObjectFactory,
 		LineWriter:           lw,
 		maxDepth:             ot.MaxDepth(),
@@ -127,7 +126,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		return
 	}
 
-	if ot.Config.DryRun {
+	if ot.Config.IsDryRun() {
 		ocs = append(ocs, optionCommentDryRun(values.MakeBool(true)))
 	}
 

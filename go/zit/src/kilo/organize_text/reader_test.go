@@ -15,6 +15,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/test_config"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
 func TestMain(m *testing.M) {
@@ -61,10 +63,12 @@ func makeObjWithHinAndBez(t *testing.T, hin string, bez string) (o *obj) {
 	return
 }
 
-func makeAssignmentLineReader() assignmentLineReader {
-	return assignmentLineReader{
+func makeAssignmentLineReader() reader {
+	return reader{
 		options: Options{
-			ObjectFactory: ObjectFactory{
+			wasMade: true,
+			Config:  &test_config.Config{},
+			ObjectFactory: external_store.ObjectFactory{
 				PoolValue: pool.Bespoke[sku.ExternalLike]{
 					FuncGet: func() sku.ExternalLike {
 						return sku.GetTransactedPool().Get()
@@ -192,6 +196,20 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 		actual := sub.root.Children[0].Objects
 
 		assertEqualObjekten(&t1, expected, actual)
+	}
+
+	if false {
+		t := test_logz.T{T: t}
+		var actualOut strings.Builder
+		sut := Text{
+			Options:    sub.options,
+			Assignment: sub.root,
+		}
+
+		_, err := sut.WriteTo(&actualOut)
+		t.AssertNoError(err)
+
+		t.AssertEqual(input, actualOut.String())
 	}
 }
 

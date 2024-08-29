@@ -14,6 +14,16 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+type TagSetGetter interface {
+	GetTags() ids.TagSet
+}
+
+func NewMetadata() Metadata {
+	return Metadata{
+		TagSet: ids.MakeTagSet(),
+	}
+}
+
 type Metadata struct {
 	// metadatei.Metadatei
 	ids.TagSet
@@ -22,13 +32,17 @@ type Metadata struct {
 	Type     ids.Type
 }
 
+func (m *Metadata) GetTags() ids.TagSet {
+	return m.TagSet
+}
+
 func (m *Metadata) SetFromObjectMetadata(
 	om *object_metadata.Metadata,
 ) (err error) {
 	m.TagSet = om.Tags.CloneSetPtrLike()
 	m.Comments = make([]string, len(om.Comments))
 	copy(m.Comments, om.Comments)
-  m.Type = om.Type
+	m.Type = om.Type
 	return
 }
 

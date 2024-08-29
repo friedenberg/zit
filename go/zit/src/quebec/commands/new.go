@@ -90,7 +90,7 @@ func (c New) ValidateFlagsAndArgs(
 	return
 }
 
-func (c New) Run(u *env.Env, args ...string) (err error) {
+func (c *New) Run(u *env.Env, args ...string) (err error) {
 	if err = c.ValidateFlagsAndArgs(u, args...); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -136,8 +136,12 @@ func (c New) Run(u *env.Env, args ...string) (err error) {
 
 	if c.Organize {
 		opOrganize := user_ops.OrganizeAndCommit{
-			Env:      u,
-			Metadata: c.Metadata,
+			Env: u,
+		}
+
+		if err = opOrganize.Metadata.SetFromObjectMetadata(&c.Metadata); err != nil {
+			err = errors.Wrap(err)
+			return
 		}
 
 		if _, err = opOrganize.RunWithTransacted(nil, zts); err != nil {

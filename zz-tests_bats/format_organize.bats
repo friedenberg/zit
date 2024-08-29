@@ -43,7 +43,7 @@ function format_organize_right_align { # @test
 		            ###        -2
 	EOM
 
-	run_zit format-organize -prefix-joints=true -refine "$to_add"
+	run_zit format-organize -prefix-joints=true -refine=true "$to_add"
 	assert_success
 	assert_output "$(cat "$expected")"
 }

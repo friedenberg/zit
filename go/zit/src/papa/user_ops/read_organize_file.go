@@ -43,15 +43,15 @@ func (c ReadOrganizeFile) Run(
 	otFlags := organize_text.MakeFlags()
 	u.ApplyToOrganizeOptions(&otFlags.Options)
 
-	if ot, err = organize_text.New(
-		otFlags.GetOptions(
-			u.GetConfig().PrintOptions,
-			nil,
-			u.SkuFmtOrganize(repoId),
-			u.GetStore().GetAbbrStore().GetAbbr(),
-      u.GetExternalLikePoolForRepoId(repoId),
-		),
-	); err != nil {
+	o := otFlags.GetOptions(
+		u.GetConfig().PrintOptions,
+		nil,
+		u.SkuFmtOrganize(repoId),
+		u.GetStore().GetAbbrStore().GetAbbr(),
+		u.GetExternalLikePoolForRepoId(repoId),
+	)
+
+	if ot, err = organize_text.New(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -61,10 +61,10 @@ func (c ReadOrganizeFile) Run(
 		return
 	}
 
-	if err = ot.Refine(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	// if err = ot.Refine(); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
 	return
 }

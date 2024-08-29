@@ -12,11 +12,21 @@ type ImmutableConfig interface {
 	GetStoreVersion() StoreVersion
 }
 
+type ConfigDryRun interface {
+	IsDryRun() bool
+	SetDryRun(bool)
+}
+
+type ConfigGetFilters interface {
+	GetFilters() map[string]string
+}
+
 type Config interface {
 	ImmutableConfig
 	UsePredictableHinweisen() bool
 	UsePrintTime() bool
 	GetFilters() map[string]string
-	IsDryRun() bool
 	GetTypeStringFromExtension(t string) string
+	ConfigDryRun
+	ConfigGetFilters
 }

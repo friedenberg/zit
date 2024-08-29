@@ -352,13 +352,6 @@ function organize_hides_hidden_etiketten_from_organize { # @test
 		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "split hinweis for usability" project-2021-zit zz-archive-task-done]
 	EOM
 
-	expected_organize="$(mktemp)"
-	{
-		echo
-		echo "# project-2021-zit"
-		echo
-	} >"$expected_organize"
-
 	run_zit organize -mode output-only project-2021-zit:z
 	assert_success
 	assert_output - <<-EOM

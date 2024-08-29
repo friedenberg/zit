@@ -14,8 +14,8 @@ type Option interface {
 	GetOption() Option
 	interfaces.Stringer
 	ApplyToText(Options, *Assignment) error
-	ApplyToReader(Options, *assignmentLineReader) error
-	ApplyToWriter(Options, *assignmentLineWriter) error
+	ApplyToReader(Options, *reader) error
+	ApplyToWriter(Options, *writer) error
 }
 
 type optionCommentFactory struct{}
@@ -73,14 +73,14 @@ func (ocf optionCommentFormat) ApplyToText(Options, *Assignment) (err error) {
 
 func (ocf optionCommentFormat) ApplyToReader(
 	Options,
-	*assignmentLineReader,
+	*reader,
 ) (err error) {
 	return
 }
 
 func (ocf optionCommentFormat) ApplyToWriter(
 	f Options,
-	aw *assignmentLineWriter,
+	aw *writer,
 ) (err error) {
 	switch string(ocf) {
 	case "new":
@@ -110,14 +110,14 @@ func (ocf optionCommentHide) ApplyToText(Options, *Assignment) (err error) {
 
 func (ocf optionCommentHide) ApplyToReader(
 	Options,
-	*assignmentLineReader,
+	*reader,
 ) (err error) {
 	return
 }
 
 func (ocf optionCommentHide) ApplyToWriter(
 	f Options,
-	aw *assignmentLineWriter,
+	aw *writer,
 ) (err error) {
 	return
 }
@@ -133,23 +133,23 @@ func (ocf optionCommentDryRun) String() string {
 }
 
 func (ocf optionCommentDryRun) ApplyToText(o Options, a *Assignment) (err error) {
-	o.Config.DryRun = values.Bool(ocf).Bool()
+	o.Config.SetDryRun(values.Bool(ocf).Bool())
 	return
 }
 
 func (ocf optionCommentDryRun) ApplyToReader(
 	o Options,
-	a *assignmentLineReader,
+	a *reader,
 ) (err error) {
-	o.Config.DryRun = values.Bool(ocf).Bool()
+	o.Config.SetDryRun(values.Bool(ocf).Bool())
 	return
 }
 
 func (ocf optionCommentDryRun) ApplyToWriter(
 	f Options,
-	aw *assignmentLineWriter,
+	aw *writer,
 ) (err error) {
-	f.Config.DryRun = values.Bool(ocf).Bool()
+	f.Config.SetDryRun(values.Bool(ocf).Bool())
 	return
 }
 
@@ -172,14 +172,14 @@ func (ocf optionCommentInstruction) ApplyToText(
 
 func (ocf optionCommentInstruction) ApplyToReader(
 	o Options,
-	a *assignmentLineReader,
+	a *reader,
 ) (err error) {
 	return
 }
 
 func (ocf optionCommentInstruction) ApplyToWriter(
 	f Options,
-	aw *assignmentLineWriter,
+	aw *writer,
 ) (err error) {
 	return
 }

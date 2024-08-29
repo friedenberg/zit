@@ -10,10 +10,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
-type assignmentLineWriter struct {
-	ObjectFactory
+type writer struct {
+	external_store.ObjectFactory
 	RightAlignedIndents  bool
 	OmitLeadingEmptyLine bool
 	object_metadata.Metadata
@@ -24,7 +25,7 @@ type assignmentLineWriter struct {
 	stringFormatWriter interfaces.StringFormatWriter[sku.ExternalLike]
 }
 
-func (av assignmentLineWriter) write(a *Assignment) (err error) {
+func (av writer) write(a *Assignment) (err error) {
 	if av.RightAlignedIndents {
 		return av.writeRightAligned(a)
 	} else {
@@ -32,7 +33,7 @@ func (av assignmentLineWriter) write(a *Assignment) (err error) {
 	}
 }
 
-func (av assignmentLineWriter) writeNormal(a *Assignment) (err error) {
+func (av writer) writeNormal(a *Assignment) (err error) {
 	tab_prefix := ""
 
 	if a.GetDepth() == 0 && !av.OmitLeadingEmptyLine {
@@ -96,7 +97,7 @@ func (av assignmentLineWriter) writeNormal(a *Assignment) (err error) {
 	return
 }
 
-func (av assignmentLineWriter) writeRightAligned(a *Assignment) (err error) {
+func (av writer) writeRightAligned(a *Assignment) (err error) {
 	spaceCount := av.maxDepth
 
 	kopfUndSchwanz := av.maxHead + av.maxTail

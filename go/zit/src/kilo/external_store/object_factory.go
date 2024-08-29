@@ -1,4 +1,4 @@
-package organize_text
+package external_store
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"

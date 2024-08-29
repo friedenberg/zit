@@ -16,39 +16,6 @@ type constructor struct {
 	all PrefixSet
 }
 
-func (c *constructor) Make() (ot *Text, err error) {
-	ot = &c.Text
-	c.all = MakePrefixSet(0)
-	c.Assignment = newAssignment(0)
-	c.IsRoot = true
-
-	if err = c.Options.Skus.Each(c.all.AddTransacted); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = c.preparePrefixSetsAndRootsAndExtras(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = c.populate(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	c.Metadata.Type = c.Options.Type
-
-	if err = ot.Refine(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	ot.SortChildren()
-
-	return
-}
-
 func (c *constructor) collectExplicitAndImplicitFor(
 	skus sku.ExternalLikeSet,
 	re ids.Tag,
@@ -98,7 +65,7 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 	anchored := ids.MakeMutableTagSet()
 	extras := ids.MakeMutableTagSet()
 
-	if err = c.rootTags.Each(
+	if err = c.TagSet.Each(
 		func(re ids.Tag) (err error) {
 			var explicitCount, implicitCount int
 
