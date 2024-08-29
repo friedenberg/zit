@@ -14,7 +14,10 @@ import (
 )
 
 func (u *Env) PrinterSkuTransacted() interfaces.FuncIter[*sku.Transacted] {
-	sw := u.StringFormatWriterSkuTransacted(nil)
+	sw := u.StringFormatWriterSkuTransacted(
+		nil,
+		string_format_writer.CliFormatTruncation66CharEllipsis,
+	)
 
 	return string_format_writer.MakeDelim(
 		"\n",
@@ -24,7 +27,10 @@ func (u *Env) PrinterSkuTransacted() interfaces.FuncIter[*sku.Transacted] {
 }
 
 func (u *Env) PrinterTransactedLike() interfaces.FuncIter[*sku.Transacted] {
-	sw := u.StringFormatWriterSkuTransacted(nil)
+	sw := u.StringFormatWriterSkuTransacted(
+		nil,
+		string_format_writer.CliFormatTruncation66CharEllipsis,
+	)
 
 	return string_format_writer.MakeDelim(
 		"\n",
@@ -107,7 +113,10 @@ func (u *Env) PrinterExternalLikeFS() *store_fs.CliExternal {
 			u.fs_home.MakeRelativePathStringFormatWriter(),
 		),
 		u.StringFormatWriterObjectId(oo.ColorOptionsErr),
-		u.StringFormatWriterMetadatei(oo.ColorOptionsErr),
+		u.StringFormatWriterMetadatei(
+			oo.ColorOptionsErr,
+			string_format_writer.CliFormatTruncation66CharEllipsis,
+		),
 	)
 }
 
@@ -125,7 +134,10 @@ func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[sku.CheckedOutLike] {
 				u.fs_home.MakeRelativePathStringFormatWriter(),
 			),
 			u.StringFormatWriterObjectId(oo.ColorOptionsErr),
-			u.StringFormatWriterMetadatei(oo.ColorOptionsErr),
+			u.StringFormatWriterMetadatei(
+				oo.ColorOptionsErr,
+				string_format_writer.CliFormatTruncation66CharEllipsis,
+			),
 		),
 	)
 
@@ -140,7 +152,10 @@ func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[sku.CheckedOutLike] {
 				u.fs_home.MakeRelativePathStringFormatWriter(),
 			),
 			u.StringFormatWriterObjectId(oo.ColorOptionsOut),
-			u.StringFormatWriterMetadatei(oo.ColorOptionsOut),
+			u.StringFormatWriterMetadatei(
+				oo.ColorOptionsErr,
+				string_format_writer.CliFormatTruncation66CharEllipsis,
+			),
 		),
 	)
 

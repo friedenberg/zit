@@ -41,7 +41,7 @@ func (op Checkout) RunWithKasten(
 		ids.MakeGenre(genres.Zettel),
 	).WithTransacted(
 		skus,
-	)
+	).WithRequireNonEmptyQuery()
 
 	var qg *query.Group
 
@@ -61,14 +61,14 @@ func (op Checkout) RunWithKasten(
 }
 
 func (op Checkout) RunQuery(
-	eqwk *query.Group,
+	qg *query.Group,
 ) (zsc sku.CheckedOutLikeMutableSet, err error) {
 	zsc = sku.MakeCheckedOutLikeMutableSet()
 	var l sync.Mutex
 
 	if err = op.Env.GetStore().CheckoutQuery(
 		op.Options,
-		eqwk,
+		qg,
 		func(col sku.CheckedOutLike) (err error) {
 			l.Lock()
 			defer l.Unlock()
@@ -101,7 +101,7 @@ func (op Checkout) RunQuery(
 
 	if op.Open || op.Edit {
 		if err = op.GetStore().Open(
-			eqwk.RepoId,
+			qg.RepoId,
 			op.CheckoutMode,
 			op.PrinterHeader(),
 			zsc,

@@ -8,7 +8,8 @@ import (
 )
 
 type Field struct {
-	Key, Value string
+	Key, Value         string
+	DisableValueQuotes bool
 	ColorType
 	Prefix    string
 	Separator rune
@@ -63,15 +64,21 @@ func (f *formatCliField) WriteStringFormat(
 		preColor, postColor = "", ""
 	}
 
+	trunc := f.truncate
+
+	if trunc == CliFormatTruncation66CharEllipsis {
+		trunc = 66
+	}
+
+	if trunc > 0 && len(field.Value) > int(trunc) {
+		field.Value = field.Value[:trunc+1]
+		ellipsis = "…"
+	}
+
 	format := "%s%s%s%s"
 
-	if field.ColorType == ColorTypeUserData {
+	if field.ColorType == ColorTypeUserData && !field.DisableValueQuotes {
 		format = "%s%q%s%s"
-
-		if f.truncate > 0 && len(field.Value) > int(f.truncate) {
-			field.Value = field.Value[:f.truncate+1]
-			ellipsis = "…"
-		}
 	}
 
 	n1, err = fmt.Fprintf(w, format, preColor, field.Value, postColor, ellipsis)

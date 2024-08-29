@@ -1,18 +1,5 @@
 package string_format_writer
 
-type (
-	ColorType string
-
-	ColorOptions struct {
-		OffEntirely bool
-	}
-
-	OutputOptions struct {
-		ColorOptionsOut ColorOptions
-		ColorOptionsErr ColorOptions
-	}
-)
-
 const (
 	StringDRArrow         = "↳"
 	StringNew             = "new"

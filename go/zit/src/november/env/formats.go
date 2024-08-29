@@ -89,36 +89,33 @@ func (u *Env) StringFormatWriterEtiketten(
 
 func (u *Env) StringFormatWriterMetadatei(
 	co string_format_writer.ColorOptions,
+	truncation string_format_writer.CliFormatTruncation,
 ) interfaces.StringFormatWriter[*object_metadata.Metadata] {
 	return sku_fmt.MakeCliMetadateiFormat(
 		u.config.PrintOptions,
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterTyp(co),
-		u.StringFormatWriterDescription(
-			string_format_writer.CliFormatTruncation66CharEllipsis,
-			co,
-			true,
-		),
+		u.StringFormatWriterField(truncation, co),
 		u.StringFormatWriterEtiketten(co),
 	)
 }
 
 func (u *Env) StringFormatWriterSku(
+	co string_format_writer.ColorOptions,
 	truncation string_format_writer.CliFormatTruncation,
 ) *sku_fmt.Organize {
-	co := u.FormatColorOptionsOut()
-	co.OffEntirely = true
-
 	return sku_fmt.MakeFormatOrganize(
 		co,
 		u.config.PrintOptions,
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterObjectIdAligned(co),
 		u.StringFormatWriterTyp(co),
-		u.StringFormatWriterDescription(truncation, co, false),
 		u.StringFormatWriterEtiketten(co),
 		u.StringFormatWriterField(truncation, co),
-		u.StringFormatWriterMetadatei(co),
+		u.StringFormatWriterMetadatei(
+			co,
+			truncation,
+		),
 	)
 }
 
@@ -126,7 +123,10 @@ func (u *Env) SkuFmtOrganize(repoId ids.RepoId) sku_fmt.ExternalLike {
 	co := u.FormatColorOptionsOut()
 	co.OffEntirely = true
 
-	f := u.StringFormatWriterSku(string_format_writer.CliFormatTruncationNone)
+	f := u.StringFormatWriterSku(
+		co,
+		string_format_writer.CliFormatTruncationNone,
+	)
 
 	kid := repoId.GetRepoIdString()
 	es, ok := u.externalStores[kid]
@@ -143,6 +143,7 @@ func (u *Env) SkuFmtOrganize(repoId ids.RepoId) sku_fmt.ExternalLike {
 
 func (u *Env) StringFormatWriterSkuTransacted(
 	co *string_format_writer.ColorOptions,
+	truncate string_format_writer.CliFormatTruncation,
 ) interfaces.StringFormatWriter[*sku.Transacted] {
 	if co == nil {
 		co1 := u.FormatColorOptionsOut()
@@ -152,7 +153,7 @@ func (u *Env) StringFormatWriterSkuTransacted(
 	return sku_fmt.MakeCliFormat(
 		u.config.PrintOptions,
 		u.StringFormatWriterObjectId(*co),
-		u.StringFormatWriterMetadatei(*co),
+		u.StringFormatWriterMetadatei(*co, truncate),
 	)
 }
 
@@ -163,7 +164,10 @@ func (u *Env) StringFormatWriterSkuTransactedShort() interfaces.StringFormatWrit
 
 	return sku_fmt.MakeCliFormatShort(
 		u.StringFormatWriterObjectId(co),
-		u.StringFormatWriterMetadatei(co),
+		u.StringFormatWriterMetadatei(
+			co,
+			string_format_writer.CliFormatTruncation66CharEllipsis,
+		),
 	)
 }
 
@@ -171,7 +175,10 @@ func (u *Env) StringFormatWriterStoreBrowserCheckedOut() interfaces.StringFormat
 	return store_browser.MakeCliCheckedOutFormat(
 		u.config.PrintOptions,
 		store_browser.MakeFormatOrganize(
-			u.StringFormatWriterSku(string_format_writer.CliFormatTruncation66CharEllipsis),
+			u.StringFormatWriterSku(
+				u.FormatColorOptionsOut(),
+				string_format_writer.CliFormatTruncation66CharEllipsis,
+			),
 		),
 	)
 }

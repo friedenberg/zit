@@ -61,10 +61,5 @@ func (c ReadOrganizeFile) Run(
 		return
 	}
 
-	// if err = ot.Refine(); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
-
 	return
 }

@@ -36,16 +36,16 @@ func (f *aligned) WriteStringFormat(
 ) (n int64, err error) {
 	var n1 int
 
+	rid := o.GetRepoId()
+
 	if f.Abbreviations.Hinweisen &&
 		o.GetGenre() == genres.Zettel &&
-		!o.IsVirtual() {
+		!o.IsVirtual() && rid == "" {
 		if err = f.AbbreviateObjectId(o, o); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
-
-	rid := o.GetRepoId()
 
 	if len(rid) > 0 {
 		n1, err = sw.WriteString(o.String())

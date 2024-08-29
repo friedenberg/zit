@@ -66,7 +66,11 @@ func (f *cliCheckedOut) WriteStringFormat(
 	if co.State != checked_out_state.Untracked {
 	}
 
-	n2, err = f.stringFormatExternal.writeStringFormatExternal(sw, &co.External)
+	n2, err = f.stringFormatExternal.writeStringFormatExternal(
+    sw,
+    &co.Internal,
+    &co.External,
+  )
 	n += int64(n1)
 
 	if err != nil {

@@ -112,6 +112,20 @@ func (b *buildState) build(
 		}
 	}
 
+	for _, k := range b.pinnedObjectIds {
+		q := b.makeQuery()
+
+		if err = q.addExactObjectId(b, k); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = b.qg.Add(q); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	b.addDefaultsIfNecessary()
 
 	if err = b.qg.reduce(b); err != nil {

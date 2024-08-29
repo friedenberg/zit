@@ -96,7 +96,6 @@ func makeAssignmentLineReader() reader {
 			nil,
 			nil,
 			nil,
-			nil,
 		),
 	}
 }

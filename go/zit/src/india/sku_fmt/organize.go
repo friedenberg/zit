@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
@@ -31,7 +30,6 @@ func MakeFormatOrganize(
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 	objectIdStringFormatWriter id_fmts.Aligned,
 	typeStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
-	descriptionStringFormatWriter interfaces.StringFormatWriter[*descriptions.Description],
 	tagsStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
 	fieldFormatWriter interfaces.StringFormatWriter[string_format_writer.Field],
 	metadata interfaces.StringFormatWriter[*object_metadata.Metadata],
@@ -39,7 +37,7 @@ func MakeFormatOrganize(
 	options.PrintTime = false
 	options.PrintShas = false
 
-  co.OffEntirely = true
+	co.OffEntirely = true
 
 	return &Organize{
 		ColorOptions: co,
@@ -47,7 +45,6 @@ func MakeFormatOrganize(
 		ShaString:    shaStringFormatWriter,
 		ObjectId:     objectIdStringFormatWriter,
 		Type:         typeStringFormatWriter,
-		Description:  descriptionStringFormatWriter,
 		TagString:    tagsStringFormatWriter,
 		Field:        fieldFormatWriter,
 		Metadata:     metadata,
@@ -64,13 +61,12 @@ type Organize struct {
 
 	RightAligned interfaces.StringFormatWriter[string]
 
-	ShaString   interfaces.StringFormatWriter[interfaces.Sha]
-	ObjectId    id_fmts.Aligned
-	Type        interfaces.StringFormatWriter[*ids.Type]
-	Description interfaces.StringFormatWriter[*descriptions.Description]
-	TagString   interfaces.StringFormatWriter[*ids.Tag]
-	Field       interfaces.StringFormatWriter[string_format_writer.Field]
-	Metadata    interfaces.StringFormatWriter[*object_metadata.Metadata]
+	ShaString interfaces.StringFormatWriter[interfaces.Sha]
+	ObjectId  id_fmts.Aligned
+	Type      interfaces.StringFormatWriter[*ids.Type]
+	TagString interfaces.StringFormatWriter[*ids.Tag]
+	Field     interfaces.StringFormatWriter[string_format_writer.Field]
+	Metadata  interfaces.StringFormatWriter[*object_metadata.Metadata]
 }
 
 func (f *Organize) SetMaxKopfUndSchwanz(k, s int) {
@@ -220,7 +216,14 @@ func (f *Organize) WriteStringFormat(
 			return
 		}
 
-		n2, err = f.Description.WriteStringFormat(sw, b)
+		n2, err = f.Field.WriteStringFormat(
+			sw,
+			string_format_writer.Field{
+				Value:              b.String(),
+				DisableValueQuotes: true,
+				ColorType:          string_format_writer.ColorTypeUserData,
+			},
+		)
 		n += n2
 
 		if err != nil {

@@ -46,7 +46,7 @@ func (f *Organize) WriteStringFormat(
 			return
 		}
 
-		n2, err = f.writeStringFormatExternal(sw, e)
+		n2, err = f.writeStringFormatExternal(sw, nil, e)
 		n += int64(n2)
 
 		if err != nil {
@@ -78,7 +78,13 @@ func (f *Organize) WriteStringFormat(
 				return
 			}
 
-			n2, err = f.Description.WriteStringFormat(sw, b)
+			n2, err = f.Field.WriteStringFormat(
+				sw,
+				string_format_writer.Field{
+					Value:     b.String(),
+					ColorType: string_format_writer.ColorTypeUserData,
+				},
+			)
 			n += n2
 
 			if err != nil {
@@ -257,14 +263,21 @@ LOOP:
 
 func (f *Organize) writeStringFormatExternal(
 	sw interfaces.WriterAndStringWriter,
+	i *sku.Transacted,
 	e *External,
 ) (n int64, err error) {
 	var n2 int64
 
-	n2, err = f.ObjectId.WriteStringFormat(
-		sw,
-		&e.ObjectId,
-	)
+	oid := &e.ObjectId
+
+	switch e.State {
+	case external_state.Tracked, external_state.Recognized:
+		if i != nil {
+			oid = &i.ObjectId
+		}
+	}
+
+	n2, err = f.ObjectId.WriteStringFormat(sw, oid)
 	n += n2
 
 	if err != nil {
