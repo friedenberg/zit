@@ -34,18 +34,39 @@ func (f *aligned) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
 	o *ids.ObjectId,
 ) (n int64, err error) {
-	var n1 int
-
 	rid := o.GetRepoId()
+	var n2 int64
 
-	if f.Abbreviations.Hinweisen &&
-		o.GetGenre() == genres.Zettel &&
-		!o.IsVirtual() && rid == "" {
-		if err = f.AbbreviateObjectId(o, o); err != nil {
+	switch o.GetGenre() {
+	case genres.Zettel:
+		if f.Abbreviations.Hinweisen && !o.IsVirtual() && rid == "" {
+			if err = f.AbbreviateObjectId(o, o); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+		fallthrough
+
+	default:
+		n2, err = f.writeId(sw, o)
+		n += n2
+
+		if err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
+
+	return
+}
+
+func (f *aligned) writeId(
+	sw interfaces.WriterAndStringWriter,
+	o *ids.ObjectId,
+) (n int64, err error) {
+	var n1 int
+	rid := o.GetRepoId()
 
 	if len(rid) > 0 {
 		n1, err = sw.WriteString(o.String())

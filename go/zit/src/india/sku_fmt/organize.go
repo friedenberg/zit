@@ -31,7 +31,7 @@ func MakeFormatOrganize(
 	objectIdStringFormatWriter id_fmts.Aligned,
 	typeStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
 	tagsStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
-	fieldFormatWriter interfaces.StringFormatWriter[string_format_writer.Field],
+	fieldsFormatWriter interfaces.StringFormatWriter[[]string_format_writer.Field],
 	metadata interfaces.StringFormatWriter[*object_metadata.Metadata],
 ) *Organize {
 	options.PrintTime = false
@@ -46,7 +46,7 @@ func MakeFormatOrganize(
 		ObjectId:     objectIdStringFormatWriter,
 		Type:         typeStringFormatWriter,
 		TagString:    tagsStringFormatWriter,
-		Field:        fieldFormatWriter,
+		Fields:       fieldsFormatWriter,
 		Metadata:     metadata,
 		RightAligned: string_format_writer.MakeRightAligned(),
 	}
@@ -65,7 +65,7 @@ type Organize struct {
 	ObjectId  id_fmts.Aligned
 	Type      interfaces.StringFormatWriter[*ids.Type]
 	TagString interfaces.StringFormatWriter[*ids.Tag]
-	Field     interfaces.StringFormatWriter[string_format_writer.Field]
+	Fields    interfaces.StringFormatWriter[[]string_format_writer.Field]
 	Metadata  interfaces.StringFormatWriter[*object_metadata.Metadata]
 }
 
@@ -208,20 +208,15 @@ func (f *Organize) WriteStringFormat(
 	}
 
 	if !b.IsEmpty() {
-		n1, err = sw.WriteString(" ")
-		n += int64(n1)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		n2, err = f.Field.WriteStringFormat(
+		n2, err = f.Fields.WriteStringFormat(
 			sw,
-			string_format_writer.Field{
-				Value:              b.String(),
-				DisableValueQuotes: true,
-				ColorType:          string_format_writer.ColorTypeUserData,
+			[]string_format_writer.Field{
+				{
+					Value:              b.String(),
+					DisableValueQuotes: true,
+					ColorType:          string_format_writer.ColorTypeUserData,
+					Prefix:             " ",
+				},
 			},
 		)
 		n += n2

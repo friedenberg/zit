@@ -214,7 +214,7 @@ func (u *Env) Initialize(options Options) (err error) {
 					store_browser.MakeItemDeletedStringWriterFormat(
 						k,
 						u.FormatColorOptionsOut(),
-						u.StringFormatWriterField(
+						u.StringFormatWriterFields(
 							66,
 							u.FormatColorOptionsOut(),
 						),

@@ -70,19 +70,14 @@ func (f *Organize) WriteStringFormat(
 		b := &e.Transacted.Metadata.Description
 
 		if !b.IsEmpty() {
-			n1, err = sw.WriteString(" ")
-			n += int64(n1)
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			n2, err = f.Field.WriteStringFormat(
+			n2, err = f.Fields.WriteStringFormat(
 				sw,
-				string_format_writer.Field{
-					Value:     b.String(),
-					ColorType: string_format_writer.ColorTypeUserData,
+				[]string_format_writer.Field{
+					{
+						Value:              b.String(),
+						ColorType:          string_format_writer.ColorTypeUserData,
+						DisableValueQuotes: true,
+					},
 				},
 			)
 			n += n2
@@ -266,26 +261,33 @@ func (f *Organize) writeStringFormatExternal(
 	i *sku.Transacted,
 	e *External,
 ) (n int64, err error) {
+	fields := []string_format_writer.Field{}
+
+	idFieldValue := e.ObjectId.String()
 	var n2 int64
 
-	oid := &e.ObjectId
-
+	// TODO make this more robust
 	switch e.State {
 	case external_state.Tracked, external_state.Recognized:
 		if i != nil {
-			oid = &i.ObjectId
+			idFieldValue = i.ObjectId.String()
 		}
+
+	case external_state.Untracked:
+		idFieldValue = "/"
 	}
 
-	n2, err = f.ObjectId.WriteStringFormat(sw, oid)
-	n += n2
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	fields = append(
+		fields,
+		string_format_writer.Field{
+			Value:              idFieldValue,
+			DisableValueQuotes: true,
+			ColorType:          string_format_writer.ColorTypeId,
+		},
+	)
 
 	if e.State != external_state.Untracked {
+		// TODO extract and add to fields
 		n2, err = f.Metadata.WriteStringFormat(
 			sw,
 			&e.Metadata,
@@ -299,40 +301,24 @@ func (f *Organize) writeStringFormatExternal(
 	}
 
 	item := &e.browserItem
-	prefix := " "
 
-	n2, err = f.Field.WriteStringFormat(
-		sw,
+	fields = append(
+		fields,
 		string_format_writer.Field{
 			Key:       "id",
 			Value:     item.Id.String(),
 			ColorType: string_format_writer.ColorTypeId,
-			Prefix:    prefix,
 		},
 	)
-	n += n2
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	if item.Title != "" {
-		n2, err = f.Field.WriteStringFormat(
-			sw,
+		fields = append(fields,
 			string_format_writer.Field{
 				Key:       "title",
 				Value:     item.Title,
 				ColorType: string_format_writer.ColorTypeUserData,
-				Prefix:    prefix,
 			},
 		)
-		n += n2
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
 	}
 
 	var u *url.URL
@@ -342,47 +328,22 @@ func (f *Organize) writeStringFormatExternal(
 		return
 	}
 
-	n2, err = f.Field.WriteStringFormat(
-		sw,
+	fields = append(
+		fields,
 		string_format_writer.Field{
 			Key:       "url",
 			Value:     u.String(),
 			ColorType: string_format_writer.ColorTypeUserData,
-			Prefix:    prefix,
 		},
 	)
-	n += int64(n2)
+
+	n2, err = f.Fields.WriteStringFormat(sw, fields)
+	n += n2
 
 	if err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	// tags := e.Metadata.GetTags()
-	// first := true
-
-	// if tags.Len() > 0 {
-	// 	for _, v := range iter.SortedValues(e.Metadata.GetTags()) {
-	// 		field := string_format_writer.Field{
-	// 			Value:  v.String(),
-	// 			Prefix: " ",
-	// 		}
-
-	// 		if first {
-	// 			field.Prefix = prefix
-	// 		}
-
-	// 		n2, err = f.fieldFormatWriter.WriteStringFormat(sw, field)
-	// 		n += int64(n2)
-
-	// 		if err != nil {
-	// 			err = errors.Wrap(err)
-	// 			return
-	// 		}
-
-	// 		first = false
-	// 	}
-	// }
 
 	return
 }

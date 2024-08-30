@@ -15,7 +15,7 @@ type Field struct {
 	Separator rune
 }
 
-type formatCliField struct {
+type fieldWriter struct {
 	ColorOptions
 	truncate CliFormatTruncation
 }
@@ -23,14 +23,14 @@ type formatCliField struct {
 func MakeCliFormatField(
 	truncate CliFormatTruncation,
 	co ColorOptions,
-) *formatCliField {
-	return &formatCliField{
+) *fieldWriter {
+	return &fieldWriter{
 		truncate:     truncate,
 		ColorOptions: co,
 	}
 }
 
-func (f *formatCliField) WriteStringFormat(
+func (f *fieldWriter) WriteStringFormat(
 	w interfaces.WriterAndStringWriter,
 	field Field,
 ) (n int64, err error) {

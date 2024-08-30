@@ -26,9 +26,9 @@ type Options struct {
 	wasMade bool
 
 	Config interface {
-    interfaces.ConfigDryRun
-    interfaces.ConfigGetFilters
-  }
+		interfaces.ConfigDryRun
+		interfaces.ConfigGetFilters
+	}
 
 	Metadata
 
@@ -67,6 +67,10 @@ func MakeFlags() Flags {
 }
 
 func MakeFlagsWithMetadata(m Metadata) Flags {
+	if m.TagSet == nil {
+		m.TagSet = ids.MakeTagSet()
+	}
+
 	return Flags{
 		once: &sync.Once{},
 		ExtraTags: collections_ptr.MakeFlagCommas[ids.Tag](
@@ -148,7 +152,7 @@ func (o *Flags) GetOptions(
 	abbr ids.Abbr, // TODO move Abbr as required arg
 	of external_store.ObjectFactory,
 ) Options {
-	m := NewMetadata()
+	m := o.Metadata
 
 	if q != nil {
 		m.TagSet = q.GetTags()

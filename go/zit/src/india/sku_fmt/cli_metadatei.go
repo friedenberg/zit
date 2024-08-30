@@ -20,14 +20,14 @@ type cliMetadatei struct {
 
 	shaStringFormatWriter       interfaces.StringFormatWriter[interfaces.Sha]
 	typStringFormatWriter       interfaces.StringFormatWriter[*ids.Type]
-	fieldStringFormatWriter     interfaces.StringFormatWriter[string_format_writer.Field]
+	fieldsStringFormatWriter    interfaces.StringFormatWriter[[]string_format_writer.Field]
 	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag]
 }
 
 func MakeCliMetadateiFormatShort(
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
-	fieldFormatWriter interfaces.StringFormatWriter[string_format_writer.Field],
+	fieldsFormatWriter interfaces.StringFormatWriter[[]string_format_writer.Field],
 	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
 ) *cliMetadatei {
 	return &cliMetadatei{
@@ -36,7 +36,7 @@ func MakeCliMetadateiFormatShort(
 		writeEtiketten:              false,
 		shaStringFormatWriter:       shaStringFormatWriter,
 		typStringFormatWriter:       typStringFormatWriter,
-		fieldStringFormatWriter:     fieldFormatWriter,
+		fieldsStringFormatWriter:    fieldsFormatWriter,
 		etikettenStringFormatWriter: etikettenStringFormatWriter,
 	}
 }
@@ -45,7 +45,7 @@ func MakeCliMetadateiFormat(
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
-	fieldFormatWriter interfaces.StringFormatWriter[string_format_writer.Field],
+	fieldsFormatWriter interfaces.StringFormatWriter[[]string_format_writer.Field],
 	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
 ) *cliMetadatei {
 	return &cliMetadatei{
@@ -58,7 +58,7 @@ func MakeCliMetadateiFormat(
 		writeEtiketten:              true,
 		shaStringFormatWriter:       shaStringFormatWriter,
 		typStringFormatWriter:       typStringFormatWriter,
-		fieldStringFormatWriter:     fieldFormatWriter,
+		fieldsStringFormatWriter:    fieldsFormatWriter,
 		etikettenStringFormatWriter: etikettenStringFormatWriter,
 	}
 }
@@ -135,11 +135,13 @@ func (f *cliMetadatei) WriteStringFormat(
 				return
 			}
 
-			n2, err = f.fieldStringFormatWriter.WriteStringFormat(
+			n2, err = f.fieldsStringFormatWriter.WriteStringFormat(
 				sw,
-				string_format_writer.Field{
-					Value:     b.String(),
-					ColorType: string_format_writer.ColorTypeUserData,
+				[]string_format_writer.Field{
+					{
+						Value:     b.String(),
+						ColorType: string_format_writer.ColorTypeUserData,
+					},
 				},
 			)
 			n += n2

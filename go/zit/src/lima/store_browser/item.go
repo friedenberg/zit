@@ -39,7 +39,7 @@ func (i *browserItem) GetKey() string {
 func (i *browserItem) GetObjectId() *ids.ObjectId {
 	var oid ids.ObjectId
 	errors.PanicIfError(oid.SetLeft(i.GetKey()))
-	errors.PanicIfError(oid.SetRepoId("browser"))
+	// errors.PanicIfError(oid.SetRepoId("browser"))
 	return &oid
 }
 

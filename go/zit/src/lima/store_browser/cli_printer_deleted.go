@@ -12,13 +12,13 @@ type itemDeletedStringFormatWriter struct {
 	interfaces.Config
 	rightAlignedWriter   interfaces.StringFormatWriter[string]
 	idStringFormatWriter interfaces.StringFormatWriter[string]
-	fieldFormatWriter    interfaces.StringFormatWriter[string_format_writer.Field]
+	fieldsFormatWriter   interfaces.StringFormatWriter[[]string_format_writer.Field]
 }
 
 func MakeItemDeletedStringWriterFormat(
 	config interfaces.Config,
 	co string_format_writer.ColorOptions,
-	fieldFormatWriter interfaces.StringFormatWriter[string_format_writer.Field],
+	fieldsFormatWriter interfaces.StringFormatWriter[[]string_format_writer.Field],
 ) *itemDeletedStringFormatWriter {
 	return &itemDeletedStringFormatWriter{
 		Config:             config,
@@ -28,7 +28,7 @@ func MakeItemDeletedStringWriterFormat(
 			string_format_writer.MakeString[string](),
 			string_format_writer.ColorTypeId,
 		),
-		fieldFormatWriter: fieldFormatWriter,
+		fieldsFormatWriter: fieldsFormatWriter,
 	}
 }
 
@@ -63,28 +63,19 @@ func (f *itemDeletedStringFormatWriter) WriteStringFormat(
 		return
 	}
 
-	{
-		n2, err = f.fieldFormatWriter.WriteStringFormat(
-			sw,
-			string_format_writer.Field{
-				Key:       "id",
-				Value:     item.Id.String(),
-				ColorType: string_format_writer.ColorTypeId,
-			},
-		)
-		n += n2
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	fields := []string_format_writer.Field{
+		{
+			Key:       "id",
+			Value:     item.Id.String(),
+			ColorType: string_format_writer.ColorTypeId,
+		},
 	}
 
 	prefix := "\n" + string_format_writer.StringIndentWithSpace
 
 	if item.Title != "" {
-		n2, err = f.fieldFormatWriter.WriteStringFormat(
-			sw,
+		fields = append(
+			fields,
 			string_format_writer.Field{
 				Key:       "title",
 				Value:     item.Title,
@@ -92,37 +83,31 @@ func (f *itemDeletedStringFormatWriter) WriteStringFormat(
 				Prefix:    prefix,
 			},
 		)
-		n += n2
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
 	}
 
-	{
-		var u *url.URL
+	var u *url.URL
 
-		if u, err = item.GetUrl(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if u, err = item.GetUrl(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-		n2, err = f.fieldFormatWriter.WriteStringFormat(
-			sw,
-			string_format_writer.Field{
-				Key:       "url",
-				Value:     u.String(),
-				ColorType: string_format_writer.ColorTypeUserData,
-				Prefix:    prefix,
-			},
-		)
-		n += int64(n2)
+	fields = append(
+		fields,
+		string_format_writer.Field{
+			Key:       "url",
+			Value:     u.String(),
+			ColorType: string_format_writer.ColorTypeUserData,
+			Prefix:    prefix,
+		},
+	)
 
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	n2, err = f.fieldsFormatWriter.WriteStringFormat(sw, fields)
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	n1, err = sw.WriteString("]")

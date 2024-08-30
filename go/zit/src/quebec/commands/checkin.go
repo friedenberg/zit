@@ -43,6 +43,12 @@ func (c Checkin) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.TrueGenre()...)
 }
 
+func (c *Checkin) ModifyBuilder(b *query.Builder) {
+	b.
+		WithDefaultSigil(ids.SigilExternal).
+		WithRequireNonEmptyQuery()
+}
+
 func (c Checkin) RunWithQuery(
 	u *env.Env,
 	qg *query.Group,
@@ -52,10 +58,8 @@ func (c Checkin) RunWithQuery(
 		Organize: c.Organize,
 	}
 
-	if err = op.Run(
-		u,
-		qg,
-	); err != nil {
+	// TODO add auto dot operator
+	if err = op.Run(u, qg); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

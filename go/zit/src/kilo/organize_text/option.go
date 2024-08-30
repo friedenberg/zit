@@ -152,34 +152,3 @@ func (ocf optionCommentDryRun) ApplyToWriter(
 	f.Config.SetDryRun(values.Bool(ocf).Bool())
 	return
 }
-
-type optionCommentInstruction string
-
-func (ocf optionCommentInstruction) GetOption() Option {
-	return ocf
-}
-
-func (ocf optionCommentInstruction) String() string {
-	return fmt.Sprintf("instructions: %s", string(ocf))
-}
-
-func (ocf optionCommentInstruction) ApplyToText(
-	o Options,
-	a *Assignment,
-) (err error) {
-	return
-}
-
-func (ocf optionCommentInstruction) ApplyToReader(
-	o Options,
-	a *reader,
-) (err error) {
-	return
-}
-
-func (ocf optionCommentInstruction) ApplyToWriter(
-	f Options,
-	aw *writer,
-) (err error) {
-	return
-}

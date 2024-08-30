@@ -102,7 +102,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 
 	l := ot.MaxLen()
 
-	omit := ot.UseMetadataHeader && ot.HasMetadataContent()
+	omit := ot.HasMetadataContent()
 
 	aw := writer{
 		ObjectFactory:        ot.ObjectFactory,
@@ -150,10 +150,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		Blob: lw,
 	}
 
-	if ot.UseMetadataHeader {
-		ot.Matchers = ot.commentMatchers
-		mw.Metadata = ot.Metadata
-	}
+	mw.Metadata = ot.Metadata
 
 	if n, err = mw.WriteTo(out); err != nil {
 		err = errors.Wrap(err)

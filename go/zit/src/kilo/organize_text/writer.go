@@ -36,12 +36,11 @@ func (av writer) write(a *Assignment) (err error) {
 func (av writer) writeNormal(a *Assignment) (err error) {
 	tab_prefix := ""
 
-	if a.GetDepth() == 0 && !av.OmitLeadingEmptyLine {
+	if !av.OmitLeadingEmptyLine {
 		av.WriteExactlyOneEmpty()
-	} else if a.GetDepth() < 0 {
-		err = errors.Errorf("negative depth: %d", a.GetDepth())
-		return
-	} else {
+	}
+
+	if a.GetDepth() > 0 {
 		tab_prefix = strings.Repeat(" ", a.GetDepth()*2-(a.GetDepth())-1)
 	}
 

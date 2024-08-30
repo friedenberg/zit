@@ -148,9 +148,9 @@ func (m Metadata) GetOptionComments(
 
 		oc, err = f.Make(c)
 
-		if err == nil {
+		if err == nil && oc != nil {
 			ocs = append(ocs, oc)
-		} else {
+		} else if err != nil {
 			em.Add(err)
 		}
 	}

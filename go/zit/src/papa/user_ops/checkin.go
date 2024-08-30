@@ -39,6 +39,11 @@ func (c Checkin) runOrganize(
 ) (err error) {
 	opOrganize := Organize{
 		Env: u,
+		Metadata: organize_text.Metadata{
+			Comments: []string{
+				"instructions: to prevent an object from being checked in, delete it entirely",
+			},
+		},
 	}
 
 	ui.Log().Print(qg)

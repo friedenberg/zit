@@ -74,11 +74,11 @@ func (u *Env) StringFormatWriterDescription(
 	return descriptions.MakeCliFormat(truncate, co, quote)
 }
 
-func (u *Env) StringFormatWriterField(
+func (u *Env) StringFormatWriterFields(
 	truncate string_format_writer.CliFormatTruncation,
 	co string_format_writer.ColorOptions,
-) interfaces.StringFormatWriter[string_format_writer.Field] {
-	return string_format_writer.MakeCliFormatField(truncate, co)
+) interfaces.StringFormatWriter[[]string_format_writer.Field] {
+	return string_format_writer.MakeCliFormatFields(truncate, co)
 }
 
 func (u *Env) StringFormatWriterEtiketten(
@@ -95,7 +95,7 @@ func (u *Env) StringFormatWriterMetadatei(
 		u.config.PrintOptions,
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterTyp(co),
-		u.StringFormatWriterField(truncation, co),
+		u.StringFormatWriterFields(truncation, co),
 		u.StringFormatWriterEtiketten(co),
 	)
 }
@@ -111,7 +111,7 @@ func (u *Env) StringFormatWriterSku(
 		u.StringFormatWriterObjectIdAligned(co),
 		u.StringFormatWriterTyp(co),
 		u.StringFormatWriterEtiketten(co),
-		u.StringFormatWriterField(truncation, co),
+		u.StringFormatWriterFields(truncation, co),
 		u.StringFormatWriterMetadatei(
 			co,
 			truncation,
