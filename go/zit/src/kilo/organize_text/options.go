@@ -159,7 +159,7 @@ func (o *Flags) GetOptions(
 		m.TagSet = q.GetTags()
 	}
 
-	if m.Lookup == nil {
+	if m.prototype == nil {
 		panic("Metadata not initalized")
 	}
 

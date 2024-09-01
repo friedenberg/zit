@@ -29,33 +29,61 @@ func MakeOptionCommentSet(
 	options ...OptionComment,
 ) OptionCommentSet {
 	ocs := OptionCommentSet{
-		Lookup:         make(map[string]OptionComment),
+		prototype:      make(PrototypeOptionComments),
 		OptionComments: options,
 	}
 
 	if elements != nil {
 		for k, el := range elements {
-			ocs.Lookup[k] = el
+			ocs.AddPrototype(k, el)
 		}
 	}
 
-	ocs.Lookup["format"] = optionCommentFormat("")
-	ocs.Lookup["hide"] = optionCommentHide("")
-	ocs.Lookup["dry-run"] = optionCommentDryRun(values.MakeBool(false))
-	ocs.Lookup[""] = OptionCommentUnknown("")
+	ocs.AddPrototype("format", optionCommentFormat(""))
+	ocs.AddPrototype("hide", optionCommentHide(""))
+	ocs.AddPrototype("", optionCommentHide(""))
 
 	return ocs
 }
 
+type PrototypeOptionComments map[string]OptionComment
+
 type OptionCommentSet struct {
-	Lookup         map[string]OptionComment
+	prototype      PrototypeOptionComments
 	OptionComments []OptionComment
+}
+
+func (ocs *OptionCommentSet) GetPrototypeOptionComments() PrototypeOptionComments {
+	return ocs.prototype
+}
+
+func (ocs *OptionCommentSet) AddPrototype(
+	key string,
+	o OptionComment,
+) OptionComment {
+	o = OptionCommentWithKey{
+		Key:           key,
+		OptionComment: o,
+	}
+
+	ocs.prototype[key] = o
+
+	return o
+}
+
+func (ocs *OptionCommentSet) AddPrototypeAndOption(
+	key string,
+	o OptionComment,
+) OptionComment {
+	o = ocs.AddPrototype(key, o)
+	ocs.OptionComments = append(ocs.OptionComments, o)
+	return o
 }
 
 func (ocs *OptionCommentSet) Set(v string) (err error) {
 	head, tail, _ := strings.Cut(v, ":")
 
-	oc, ok := ocs.Lookup[head]
+	oc, ok := ocs.prototype[head]
 
 	if ok {
 		oc = oc.CloneOptionComment()
@@ -81,6 +109,7 @@ func (ocs *OptionCommentSet) Set(v string) (err error) {
 	return
 }
 
+// TODO add support for ApplyTo*
 type OptionCommentWithKey struct {
 	Key string
 	OptionComment
@@ -176,39 +205,29 @@ func (ocf optionCommentHide) ApplyToWriter(
 	return
 }
 
-type optionCommentDryRun values.Bool
+type OptionCommentDryRun struct {
+	interfaces.ConfigDryRun
+}
 
-func (ocf optionCommentDryRun) CloneOptionComment() OptionComment {
+func (ocf *OptionCommentDryRun) CloneOptionComment() OptionComment {
 	return ocf
 }
 
-func (ocf optionCommentDryRun) Set(v string) (err error) {
-	return todo.Implement()
-}
+func (ocf *OptionCommentDryRun) Set(v string) (err error) {
+	var b values.Bool
 
-func (ocf optionCommentDryRun) String() string {
-	return fmt.Sprintf("dry-run:%s", values.Bool(ocf))
-}
+	if err = b.Set(v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-func (ocf optionCommentDryRun) ApplyToText(o Options, a *Assignment) (err error) {
-	o.Config.SetDryRun(values.Bool(ocf).Bool())
+	ocf.SetDryRun(b.Bool())
+
 	return
 }
 
-func (ocf optionCommentDryRun) ApplyToReader(
-	o Options,
-	a *reader,
-) (err error) {
-	o.Config.SetDryRun(values.Bool(ocf).Bool())
-	return
-}
-
-func (ocf optionCommentDryRun) ApplyToWriter(
-	f Options,
-	aw *writer,
-) (err error) {
-	f.Config.SetDryRun(values.Bool(ocf).Bool())
-	return
+func (ocf *OptionCommentDryRun) String() string {
+	return fmt.Sprintf("%t", ocf.IsDryRun())
 }
 
 type OptionCommentUnknown string

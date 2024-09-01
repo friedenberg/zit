@@ -19,12 +19,6 @@ func (e *Env) CommitOrganizeResults(
 		return
 	}
 
-	// TODO move to bestandsaufnahme flush
-	// if cs.GetAddedUnnamed().Len() == 0 && cs.GetAddedNamed().Len() == 0 {
-	// 	errors.Err().Print("no changes")
-	// 	return
-	// }
-
 	if err = changeResults.Changed.Each(
 		func(changed sku.ExternalLike) (err error) {
 			if err = e.GetStore().CreateOrUpdate(
@@ -109,4 +103,18 @@ func (e *Env) CommitRemainingOrganizeResults(
 	}
 
 	return
+}
+
+func (e *Env) ApplyToOrganizeOptions(oo *organize_text.Options) {
+	oo.Config = e.GetConfig()
+	oo.Abbr = e.GetStore().GetAbbrStore().GetAbbr()
+
+	if !e.GetConfig().DryRun {
+		return
+	}
+
+	oo.AddPrototypeAndOption(
+		"dry-run",
+		&organize_text.OptionCommentDryRun{ConfigDryRun: e.GetConfig()},
+	)
 }

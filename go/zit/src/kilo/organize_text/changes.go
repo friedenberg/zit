@@ -26,6 +26,12 @@ type SkuMapWithOrder struct {
 	next int
 }
 
+func (smwo *SkuMapWithOrder) AsExternalLikeSet() sku.ExternalLikeMutableSet {
+	elms := sku.MakeExternalLikeMutableSet()
+	errors.PanicIfError(smwo.Each(elms.Add))
+	return elms
+}
+
 func (sm *SkuMapWithOrder) Del(sk sku.ExternalLike) error {
 	delete(sm.m, key(sk))
 	return nil

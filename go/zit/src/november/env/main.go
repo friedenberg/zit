@@ -23,7 +23,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_browser"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
@@ -303,9 +302,4 @@ func (u *Env) GetExternalStoreForQuery(
 ) (sku.ExternalStoreForQuery, bool) {
 	e, ok := u.externalStores[k.String()]
 	return e, ok
-}
-
-func (u *Env) ApplyToOrganizeOptions(oo *organize_text.Options) {
-	oo.Config = u.GetConfig()
-	oo.Abbr = u.GetStore().GetAbbrStore().GetAbbr()
 }

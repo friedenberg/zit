@@ -97,6 +97,10 @@ func (m Metadata) HasMetadataContent() bool {
 		return true
 	}
 
+	if len(m.OptionCommentSet.OptionComments) > 0 {
+		return true
+	}
+
 	return false
 }
 

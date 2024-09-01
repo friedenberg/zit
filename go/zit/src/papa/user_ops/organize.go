@@ -21,6 +21,7 @@ import (
 type Organize struct {
 	*env.Env
 	organize_text.Metadata
+	DontUseQueryGroupForOrganizeMetadata bool
 }
 
 func (op Organize) RunWithQueryGroup(
@@ -76,7 +77,8 @@ func (op Organize) RunWithExternalLike(
 	organizeResults.Original = skus
 	organizeResults.QueryGroup = qg
 
-	if organizeResults.QueryGroup == nil {
+	if organizeResults.QueryGroup == nil ||
+		op.DontUseQueryGroupForOrganizeMetadata {
 		b := op.MakeQueryBuilder(
 			ids.MakeGenre(genres.TrueGenre()...),
 		).WithExternalLike(
@@ -98,14 +100,14 @@ func (op Organize) RunWithExternalLike(
 		Env: op.Env,
 		Options: organizeFlags.GetOptions(
 			op.GetConfig().PrintOptions,
-			qg,
+			organizeResults.QueryGroup,
 			op.SkuFmtOrganize(qg.RepoId),
 			op.GetStore().GetAbbrStore().GetAbbr(),
 			op.GetExternalLikePoolForRepoId(qg.RepoId),
 		),
 	}
 
-	typen := qg.GetTypes()
+	typen := organizeResults.QueryGroup.GetTypes()
 
 	if typen.Len() == 1 {
 		createOrganizeFileOp.Type = typen.Any()
@@ -157,7 +159,9 @@ func (op Organize) RunWithExternalLike(
 			op.Env,
 			f,
 			qg.RepoId,
-			organize_text.NewMetadataWithOptionCommentLookup(op.Metadata.Lookup),
+			organize_text.NewMetadataWithOptionCommentLookup(
+				op.GetPrototypeOptionComments(),
+			),
 		); err != nil {
 			if op.handleReadChangesError(err) {
 				err = nil
