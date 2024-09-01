@@ -259,7 +259,9 @@ func (s *Store) RunMergeTool(
 		return
 	}
 
-	if err = s.DeleteCheckout(tm.CheckedOutLike); err != nil {
+	if err = s.DeleteExternalLike(
+		tm.CheckedOutLike.GetSkuExternalLike(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

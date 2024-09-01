@@ -48,8 +48,8 @@ func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
 	return fs
 }
 
-func (fs *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
-	e := col.GetSkuExternalLike().(*External)
+func (fs *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
+	e := el.(*External)
 
 	fs.deleteLock.Lock()
 	defer fs.deleteLock.Unlock()

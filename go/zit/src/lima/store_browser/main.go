@@ -39,7 +39,7 @@ type Store struct {
 	urls map[url.URL][]browserItem
 
 	l       sync.Mutex
-	removed map[url.URL][]browserItem
+	deleted map[url.URL][]browserItem
 	added   map[url.URL][]browserItem
 
 	itemsById map[string]browserItem
@@ -60,7 +60,7 @@ func Make(
 	c := &Store{
 		config:    k,
 		typ:       ids.MustType("toml-bookmark"),
-		removed:   make(map[url.URL][]browserItem),
+		deleted:   make(map[url.URL][]browserItem),
 		added:     make(map[url.URL][]browserItem),
 		itemsById: make(map[string]browserItem),
 		transacted: transacted{
@@ -98,10 +98,6 @@ func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err e
 }
 
 func (s *Store) Flush() (err error) {
-	if s.config.DryRun {
-		return
-	}
-
 	wg := iter.MakeErrorWaitGroupParallel()
 
 	wg.Do(s.flushUrls)

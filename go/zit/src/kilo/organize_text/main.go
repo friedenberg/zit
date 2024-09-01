@@ -63,18 +63,14 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 		return
 	}
 
-	ocf := optionCommentFactory{}
-	var ocs []Option
-
-	if ocs, err = t.GetOptionComments(ocf); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	ocs := t.OptionComments
 
 	for _, oc := range ocs {
-		if err = oc.ApplyToReader(t.Options, r1); err != nil {
-			err = errors.Wrapf(err, "OptionComment: %s", oc)
-			return
+		if ocwa, ok := oc.(OptionCommentWithApply); ok {
+			if err = ocwa.ApplyToReader(t.Options, r1); err != nil {
+				err = errors.Wrapf(err, "OptionComment: %s", oc)
+				return
+			}
 		}
 	}
 
@@ -118,22 +114,18 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 
 	aw.stringFormatWriter = ot.stringFormatWriter
 
-	ocf := optionCommentFactory{}
-	var ocs []Option
-
-	if ocs, err = ot.GetOptionComments(ocf); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	ocs := ot.OptionComments
 
 	if ot.Config.IsDryRun() {
 		ocs = append(ocs, optionCommentDryRun(values.MakeBool(true)))
 	}
 
 	for _, oc := range ocs {
-		if err = oc.ApplyToWriter(ot.Options, &aw); err != nil {
-			err = errors.Wrapf(err, "OptionComment: %s", oc)
-			return
+		if ocwa, ok := oc.(OptionCommentWithApply); ok {
+			if err = ocwa.ApplyToWriter(ot.Options, &aw); err != nil {
+				err = errors.Wrapf(err, "OptionComment: %s", oc)
+				return
+			}
 		}
 	}
 

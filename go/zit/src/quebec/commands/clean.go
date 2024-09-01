@@ -133,7 +133,7 @@ func (c Clean) RunWithQuery(
 				return
 			}
 
-			if err = u.GetStore().DeleteCheckout(co); err != nil {
+			if err = u.GetStore().DeleteCheckedOutLike(co); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

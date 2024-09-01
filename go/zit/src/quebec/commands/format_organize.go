@@ -54,7 +54,12 @@ func (c *FormatOrganize) Run(u *env.Env, args ...string) (err error) {
 
 	var repoId ids.RepoId
 
-	if ot, err = readOrganizeTextOp.Run(u, f, repoId); err != nil {
+	if ot, err = readOrganizeTextOp.Run(
+    u,
+    f,
+    repoId,
+    organize_text.NewMetadata(),
+  ); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

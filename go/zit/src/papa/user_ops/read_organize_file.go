@@ -27,7 +27,12 @@ func (c ReadOrganizeFile) RunWithPath(
 
 	defer errors.DeferredCloser(&err, f)
 
-	if ot, err = c.Run(u, f, repoId); err != nil {
+	if ot, err = c.Run(
+		u,
+		f,
+		repoId,
+		organize_text.NewMetadata(),
+	); err != nil {
 		err = errors.Wrapf(err, "Path: %q", p)
 		return
 	}
@@ -39,16 +44,17 @@ func (c ReadOrganizeFile) Run(
 	u *env.Env,
 	r io.Reader,
 	repoId ids.RepoId,
+	om organize_text.Metadata,
 ) (ot *organize_text.Text, err error) {
 	otFlags := organize_text.MakeFlags()
 	u.ApplyToOrganizeOptions(&otFlags.Options)
 
-	o := otFlags.GetOptions(
+	o := otFlags.GetOptionsWithMetadata(
 		u.GetConfig().PrintOptions,
-		nil,
 		u.SkuFmtOrganize(repoId),
 		u.GetStore().GetAbbrStore().GetAbbr(),
 		u.GetExternalLikePoolForRepoId(repoId),
+		om,
 	)
 
 	if ot, err = organize_text.New(o); err != nil {

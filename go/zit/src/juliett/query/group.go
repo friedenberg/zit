@@ -173,6 +173,8 @@ func (qg *Group) addExactExternalObjectId(
 		return
 	}
 
+  qg.dotOperatorActive = true
+
 	return
 }
 

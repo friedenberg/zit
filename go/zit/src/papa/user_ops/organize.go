@@ -23,13 +23,13 @@ type Organize struct {
 	organize_text.Metadata
 }
 
-func (u Organize) RunWithQueryGroup(
+func (op Organize) RunWithQueryGroup(
 	qg *query.Group,
 ) (organizeResults organize_text.OrganizeResults, err error) {
 	skus := sku.MakeExternalLikeMutableSet()
 	var l sync.Mutex
 
-	if err = u.GetStore().Query(
+	if err = op.GetStore().Query(
 		qg,
 		func(el sku.ExternalLike) (err error) {
 			l.Lock()
@@ -41,7 +41,7 @@ func (u Organize) RunWithQueryGroup(
 		return
 	}
 
-	if organizeResults, err = u.RunWithExternalLike(qg, skus); err != nil {
+	if organizeResults, err = op.RunWithExternalLike(qg, skus); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -49,7 +49,7 @@ func (u Organize) RunWithQueryGroup(
 	return
 }
 
-func (u Organize) RunWithTransacted(
+func (op Organize) RunWithTransacted(
 	qg *query.Group,
 	transacted sku.TransactedSet,
 	onChanged interfaces.FuncIter[sku.ExternalLike],
@@ -61,7 +61,7 @@ func (u Organize) RunWithTransacted(
 		},
 	)
 
-	if organizeResults, err = u.RunWithExternalLike(qg, skus); err != nil {
+	if organizeResults, err = op.RunWithExternalLike(qg, skus); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -69,7 +69,7 @@ func (u Organize) RunWithTransacted(
 	return
 }
 
-func (u Organize) RunWithExternalLike(
+func (op Organize) RunWithExternalLike(
 	qg *query.Group,
 	skus sku.ExternalLikeSet,
 ) (organizeResults organize_text.OrganizeResults, err error) {
@@ -77,7 +77,7 @@ func (u Organize) RunWithExternalLike(
 	organizeResults.QueryGroup = qg
 
 	if organizeResults.QueryGroup == nil {
-		b := u.MakeQueryBuilder(
+		b := op.MakeQueryBuilder(
 			ids.MakeGenre(genres.TrueGenre()...),
 		).WithExternalLike(
 			skus,
@@ -90,18 +90,18 @@ func (u Organize) RunWithExternalLike(
 	}
 
 	// otFlags.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
-	organizeFlags := organize_text.MakeFlagsWithMetadata(u.Metadata)
-	u.ApplyToOrganizeOptions(&organizeFlags.Options)
+	organizeFlags := organize_text.MakeFlagsWithMetadata(op.Metadata)
+	op.ApplyToOrganizeOptions(&organizeFlags.Options)
 	organizeFlags.Skus = skus
 
 	createOrganizeFileOp := CreateOrganizeFile{
-		Env: u.Env,
+		Env: op.Env,
 		Options: organizeFlags.GetOptions(
-			u.GetConfig().PrintOptions,
+			op.GetConfig().PrintOptions,
 			qg,
-			u.SkuFmtOrganize(qg.RepoId),
-			u.GetStore().GetAbbrStore().GetAbbr(),
-			u.GetExternalLikePoolForRepoId(qg.RepoId),
+			op.SkuFmtOrganize(qg.RepoId),
+			op.GetStore().GetAbbrStore().GetAbbr(),
+			op.GetExternalLikePoolForRepoId(qg.RepoId),
 		),
 	}
 
@@ -113,8 +113,8 @@ func (u Organize) RunWithExternalLike(
 
 	var f *os.File
 
-	if f, err = u.GetFSHome().FileTempLocalWithTemplate(
-		"*." + u.GetConfig().FileExtensions.Organize,
+	if f, err = op.GetFSHome().FileTempLocalWithTemplate(
+		"*." + op.GetConfig().FileExtensions.Organize,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -136,12 +136,12 @@ func (u Organize) RunWithExternalLike(
 				Build(),
 		}
 
-		if err = openVimOp.Run(u.Env, f.Name()); err != nil {
+		if err = openVimOp.Run(op.Env, f.Name()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = u.Reset(); err != nil {
+		if err = op.Reset(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -153,8 +153,13 @@ func (u Organize) RunWithExternalLike(
 			return
 		}
 
-		if organizeResults.After, err = readOrganizeTextOp.Run(u.Env, f, qg.RepoId); err != nil {
-			if u.handleReadChangesError(err) {
+		if organizeResults.After, err = readOrganizeTextOp.Run(
+			op.Env,
+			f,
+			qg.RepoId,
+			organize_text.NewMetadataWithOptionCommentLookup(op.Metadata.Lookup),
+		); err != nil {
+			if op.handleReadChangesError(err) {
 				err = nil
 				continue
 			} else {

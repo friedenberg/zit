@@ -29,6 +29,50 @@ function show_simple_one_zettel { # @test
 	EOM
 }
 
+function show_simple_one_zettel_with_sigil { # @test
+	run_zit show -format text one/uno:
+	assert_success
+	assert_output - <<-EOM
+		---
+		# wow the first
+		- tag-3
+		- tag-4
+		! md
+		---
+
+		last time
+	EOM
+}
+
+function show_simple_one_zettel_with_sigil_and_genre { # @test
+	run_zit show -format text one/uno:zettel
+	assert_success
+	assert_output - <<-EOM
+		---
+		# wow the first
+		- tag-3
+		- tag-4
+		! md
+		---
+
+		last time
+	EOM
+}
+
+function show_simple_one_zettel_checked_out { # @test
+	run_zit checkout one/uno
+	assert_success
+	assert_output - <<-EOM
+		      checked out [one/uno.zettel@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+	EOM
+
+	run_zit show one/uno.zettel
+	assert_success
+	assert_output - <<-EOM
+		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+	EOM
+}
+
 function show_simple_one_zettel_hidden { # @test
 	run_zit schlummernd-add tag-3
 	assert_success

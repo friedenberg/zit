@@ -62,6 +62,7 @@ func MakeFlags() Flags {
 			wasMade:      true,
 			GroupingTags: ids.MakeTagSlice(),
 			Skus:         sku.MakeExternalLikeMutableSet(),
+			Metadata:     NewMetadata(),
 		},
 	}
 }
@@ -156,6 +157,10 @@ func (o *Flags) GetOptions(
 
 	if q != nil {
 		m.TagSet = q.GetTags()
+	}
+
+	if m.Lookup == nil {
+		panic("Metadata not initalized")
 	}
 
 	return o.GetOptionsWithMetadata(

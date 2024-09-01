@@ -20,7 +20,17 @@ type TagSetGetter interface {
 
 func NewMetadata() Metadata {
 	return Metadata{
-		TagSet: ids.MakeTagSet(),
+		TagSet:           ids.MakeTagSet(),
+		OptionCommentSet: MakeOptionCommentSet(nil),
+	}
+}
+
+func NewMetadataWithOptionCommentLookup(
+	elements map[string]OptionComment,
+) Metadata {
+	return Metadata{
+		TagSet:           ids.MakeTagSet(),
+		OptionCommentSet: MakeOptionCommentSet(elements),
 	}
 }
 
@@ -28,8 +38,8 @@ type Metadata struct {
 	// metadatei.Metadatei
 	ids.TagSet
 	Matchers interfaces.SetLike[sku.Query]
-	Comments []string
-	Type     ids.Type
+	OptionCommentSet
+	Type ids.Type
 }
 
 func (m *Metadata) GetTags() ids.TagSet {
@@ -40,9 +50,16 @@ func (m *Metadata) SetFromObjectMetadata(
 	om *object_metadata.Metadata,
 ) (err error) {
 	m.TagSet = om.Tags.CloneSetPtrLike()
-	m.Comments = make([]string, len(om.Comments))
-	copy(m.Comments, om.Comments)
+
+	for _, c := range om.Comments {
+		if err = m.OptionCommentSet.Set(c); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	m.Type = om.Type
+
 	return
 }
 
@@ -93,10 +110,7 @@ func (m *Metadata) ReadFrom(r1 io.Reader) (n int64, err error) {
 		ohio.MakeLineReaderRepeat(
 			ohio.MakeLineReaderKeyValues(
 				map[string]interfaces.FuncSetString{
-					"%": func(v string) (err error) {
-						m.Comments = append(m.Comments, v)
-						return
-					},
+					"%": m.OptionCommentSet.Set,
 					"-": iter.MakeFuncSetString(mes),
 					"!": m.Type.Set,
 				},
@@ -131,33 +145,9 @@ func (m Metadata) WriteTo(w1 io.Writer) (n int64, err error) {
 		}
 	}
 
-	for _, c := range m.Comments {
-		w.WriteFormat("%% %s", c)
+	for _, o := range m.OptionCommentSet.OptionComments {
+		w.WriteFormat("%% %s", o)
 	}
 
 	return w.WriteTo(w1)
-}
-
-func (m Metadata) GetOptionComments(
-	f optionCommentFactory,
-) (ocs []Option, err error) {
-	em := errors.MakeMulti()
-
-	for _, c := range m.Comments {
-		var oc Option
-
-		oc, err = f.Make(c)
-
-		if err == nil && oc != nil {
-			ocs = append(ocs, oc)
-		} else if err != nil {
-			em.Add(err)
-		}
-	}
-
-	if em.Len() > 0 {
-		err = em
-	}
-
-	return
 }

@@ -3,6 +3,7 @@ package env
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
 )
@@ -48,6 +49,8 @@ func (e *Env) CommitOrganizeResults(
 
 func (e *Env) CommitRemainingOrganizeResults(
 	results organize_text.OrganizeResults,
+	repoId ids.RepoId,
+	shouldDelete bool,
 ) (changeResults organize_text.Changes, err error) {
 	if changeResults, err = organize_text.ChangesFromResults(
 		e.GetConfig().PrintOptions,
@@ -63,20 +66,43 @@ func (e *Env) CommitRemainingOrganizeResults(
 	// 	return
 	// }
 
-	if err = changeResults.After.Each(
-		func(changed sku.ExternalLike) (err error) {
-			if err = e.GetStore().CreateOrUpdate(
+	onChanged := func(changed sku.ExternalLike) (err error) {
+		if err = e.GetStore().CreateOrUpdate(
+			changed,
+			objekte_mode.Make(
+				objekte_mode.ModeMergeCheckedOut,
+			),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+
+	if shouldDelete {
+		withoutDelete := onChanged
+
+		onChanged = func(changed sku.ExternalLike) (err error) {
+			if err = withoutDelete(changed); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = e.GetStore().DeleteExternalLike(
+				repoId,
 				changed,
-				objekte_mode.Make(
-					objekte_mode.ModeMergeCheckedOut,
-				),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 			return
-		},
+		}
+	}
+
+	if err = changeResults.After.Each(
+		onChanged,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

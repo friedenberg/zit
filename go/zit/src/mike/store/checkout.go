@@ -11,8 +11,23 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
-func (s *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
-	kid := col.GetRepoId().GetRepoIdString()
+func (s *Store) DeleteCheckedOutLike(col sku.CheckedOutLike) (err error) {
+	if err = s.DeleteExternalLike(
+		col.GetRepoId(),
+		col.GetSkuExternalLike(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) DeleteExternalLike(
+	repoId ids.RepoId,
+	el sku.ExternalLike,
+) (err error) {
+	kid := repoId.GetRepoIdString()
 	es, ok := s.externalStores[kid]
 
 	if !ok {
@@ -20,7 +35,7 @@ func (s *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
 		return
 	}
 
-	if err = es.DeleteCheckout(col); err != nil {
+	if err = es.DeleteExternalLike(el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

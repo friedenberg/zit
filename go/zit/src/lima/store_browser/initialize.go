@@ -79,43 +79,59 @@ func (s *Store) initializeUrls() (err error) {
 }
 
 func (s *Store) flushUrls() (err error) {
-	if len(s.removed) == 0 && len(s.added) == 0 {
+	if len(s.deleted) == 0 && len(s.added) == 0 {
 		return
-	}
-
-	var req browser_items.BrowserRequestPut
-	req.Deleted = make([]browser_items.Item, 0, len(s.removed))
-
-	for _, is := range s.removed {
-		for _, i := range is {
-			req.Deleted = append(req.Deleted, i.Item)
-		}
-	}
-
-	for _, is := range s.added {
-		for _, i := range is {
-			req.Added = append(req.Added, i.Item)
-		}
 	}
 
 	var resp browser_items.HTTPResponseWithRequestPayloadPut
 
-	if resp, err = s.browser.Put(req); err != nil {
-		if errors.IsErrno(err, syscall.ECONNREFUSED) {
-			ui.Err().Print("chrest offline")
-			err = nil
-		} else {
+	if !s.config.DryRun {
+		var req browser_items.BrowserRequestPut
+		req.Deleted = make([]browser_items.Item, 0, len(s.deleted))
+
+		for _, is := range s.deleted {
+			for _, i := range is {
+				req.Deleted = append(req.Deleted, i.Item)
+			}
+		}
+
+		for _, is := range s.added {
+			for _, i := range is {
+				req.Added = append(req.Added, i.Item)
+			}
+		}
+
+		if resp, err = s.browser.Put(req); err != nil {
+			if errors.IsErrno(err, syscall.ECONNREFUSED) {
+				ui.Err().Print("chrest offline")
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+		if err = s.resetCacheIfNecessary(resp.Response); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-	}
+	} else {
+		for _, is := range s.deleted {
+			for _, i := range is {
+				resp.Deleted = append(resp.Deleted, i.Item)
+			}
+		}
 
-	if err = s.resetCacheIfNecessary(resp.Response); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+		for _, is := range s.added {
+			for _, i := range is {
+				resp.Added = append(resp.Added, i.Item)
+			}
+		}
+
+  }
 
 	for _, i := range resp.RequestPayloadPut.Added {
+		// TODO emit changes
 		s.tabCache.Rows[i.ExternalId] = i.Id
 	}
 
@@ -129,7 +145,7 @@ func (s *Store) flushUrls() (err error) {
 	}
 
 	clear(s.added)
-	clear(s.removed)
+	clear(s.deleted)
 
 	if err = s.flushCache(); err != nil {
 		err = errors.Wrap(err)

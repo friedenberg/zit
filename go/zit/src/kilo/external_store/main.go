@@ -36,7 +36,7 @@ type (
 	}
 
 	DeleteExternal interface {
-		DeleteCheckout(col sku.CheckedOutLike) (err error)
+		DeleteExternalLike(el sku.ExternalLike) (err error)
 	}
 
 	UpdateTransacted = sku.ExternalStoreUpdateTransacted

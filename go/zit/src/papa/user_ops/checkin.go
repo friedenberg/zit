@@ -33,16 +33,30 @@ func (c Checkin) Run(
 	return
 }
 
-func (c Checkin) runOrganize(
+func (op Checkin) runOrganize(
 	u *env.Env,
 	qg *query.Group,
 ) (err error) {
+	flagDelete := organize_text.OptionCommentBooleanFlag{
+		Value:   &op.Delete,
+		Comment: "delete once checked in",
+	}
+
 	opOrganize := Organize{
 		Env: u,
 		Metadata: organize_text.Metadata{
-			Comments: []string{
-				"instructions: to prevent an object from being checked in, delete it entirely",
-			},
+			OptionCommentSet: organize_text.MakeOptionCommentSet(
+				map[string]organize_text.OptionComment{
+					"delete": flagDelete,
+				},
+				organize_text.OptionCommentUnknown(
+					"instructions: to prevent an object from being checked in, delete it entirely",
+				),
+				organize_text.OptionCommentWithKey{
+					Key:           "delete",
+					OptionComment: flagDelete,
+				},
+			),
 		},
 	}
 
@@ -60,7 +74,11 @@ func (c Checkin) runOrganize(
 	u.Lock()
 	defer errors.Deferred(&err, u.Unlock)
 
-	if _, err = u.CommitRemainingOrganizeResults(organizeResults); err != nil {
+	if _, err = u.CommitRemainingOrganizeResults(
+		organizeResults,
+		qg.RepoId,
+		op.Delete,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -93,7 +111,7 @@ func (c Checkin) runNoOrganize(
 				return
 			}
 
-			if err = u.GetStore().DeleteCheckout(col); err != nil {
+			if err = u.GetStore().DeleteCheckedOutLike(col); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

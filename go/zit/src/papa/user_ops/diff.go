@@ -49,7 +49,9 @@ func (op Diff) Run(
 		cofs = col.(*store_fs.CheckedOut)
 
 		defer errors.Deferred(&err, func() (err error) {
-			if err = op.GetStore().GetCwdFiles().DeleteCheckout(cofs); err != nil {
+			if err = op.GetStore().GetCwdFiles().DeleteExternalLike(
+				cofs.GetSkuExternalLike(),
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

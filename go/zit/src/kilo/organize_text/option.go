@@ -6,61 +6,111 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 )
 
-type Option interface {
-	GetOption() Option
-	interfaces.Stringer
+type OptionComment interface {
+	CloneOptionComment() OptionComment
+	interfaces.StringerSetter
+}
+
+type OptionCommentWithApply interface {
+	OptionComment
 	ApplyToText(Options, *Assignment) error
 	ApplyToReader(Options, *reader) error
 	ApplyToWriter(Options, *writer) error
 }
 
-type optionCommentFactory struct{}
+// TODO add config to automatically add dry run if necessary
+func MakeOptionCommentSet(
+	elements map[string]OptionComment,
+	options ...OptionComment,
+) OptionCommentSet {
+	ocs := OptionCommentSet{
+		Lookup:         make(map[string]OptionComment),
+		OptionComments: options,
+	}
 
-func (ocf optionCommentFactory) Make(c string) (oc Option, err error) {
-	c = strings.TrimSpace(c)
-
-	head, tail, found := strings.Cut(c, ":")
-
-	if !found {
-		if c == "abort" {
-			err = errors.New("aborting!")
-			return
+	if elements != nil {
+		for k, el := range elements {
+			ocs.Lookup[k] = el
 		}
-		// err = errors.New("':' not found")
+	}
+
+	ocs.Lookup["format"] = optionCommentFormat("")
+	ocs.Lookup["hide"] = optionCommentHide("")
+	ocs.Lookup["dry-run"] = optionCommentDryRun(values.MakeBool(false))
+	ocs.Lookup[""] = OptionCommentUnknown("")
+
+	return ocs
+}
+
+type OptionCommentSet struct {
+	Lookup         map[string]OptionComment
+	OptionComments []OptionComment
+}
+
+func (ocs *OptionCommentSet) Set(v string) (err error) {
+	head, tail, _ := strings.Cut(v, ":")
+
+	oc, ok := ocs.Lookup[head]
+
+	if ok {
+		oc = oc.CloneOptionComment()
+	} else {
+		oc = OptionCommentUnknown("")
+	}
+
+	oc = OptionCommentWithKey{
+		Key:           head,
+		OptionComment: oc,
+	}
+
+	if err = oc.Set(tail); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	switch head {
-	case "format":
-		oc = optionCommentFormat(tail)
+	ocs.OptionComments = append(
+		ocs.OptionComments,
+		oc,
+	)
 
-	case "hide":
-		oc = optionCommentHide(tail)
+	return
+}
 
-	case "dry-run":
-		var b values.Bool
+type OptionCommentWithKey struct {
+	Key string
+	OptionComment
+}
 
-		if err = b.Set(tail); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+func (ocf OptionCommentWithKey) CloneOptionComment() OptionComment {
+	return ocf
+}
 
-		oc = optionCommentDryRun(b)
-
-	default:
+func (ocf OptionCommentWithKey) Set(v string) (err error) {
+	if err = ocf.OptionComment.Set(v); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
 }
 
+func (ocf OptionCommentWithKey) String() string {
+	return fmt.Sprintf("%s:%s", ocf.Key, ocf.OptionComment)
+}
+
 type optionCommentFormat string
 
-func (ocf optionCommentFormat) GetOption() Option {
+func (ocf optionCommentFormat) CloneOptionComment() OptionComment {
 	return ocf
+}
+
+func (ocf optionCommentFormat) Set(v string) (err error) {
+	return todo.Implement()
 }
 
 func (ocf optionCommentFormat) String() string {
@@ -96,8 +146,12 @@ func (ocf optionCommentFormat) ApplyToWriter(
 
 type optionCommentHide string
 
-func (ocf optionCommentHide) GetOption() Option {
+func (ocf optionCommentHide) CloneOptionComment() OptionComment {
 	return ocf
+}
+
+func (ocf optionCommentHide) Set(v string) (err error) {
+	return todo.Implement()
 }
 
 func (ocf optionCommentHide) String() string {
@@ -124,8 +178,12 @@ func (ocf optionCommentHide) ApplyToWriter(
 
 type optionCommentDryRun values.Bool
 
-func (ocf optionCommentDryRun) GetOption() Option {
+func (ocf optionCommentDryRun) CloneOptionComment() OptionComment {
 	return ocf
+}
+
+func (ocf optionCommentDryRun) Set(v string) (err error) {
+	return todo.Implement()
 }
 
 func (ocf optionCommentDryRun) String() string {
@@ -151,4 +209,53 @@ func (ocf optionCommentDryRun) ApplyToWriter(
 ) (err error) {
 	f.Config.SetDryRun(values.Bool(ocf).Bool())
 	return
+}
+
+type OptionCommentUnknown string
+
+func (ocf OptionCommentUnknown) CloneOptionComment() OptionComment {
+	return ocf
+}
+
+func (ocf OptionCommentUnknown) Set(v string) (err error) {
+	ocf = OptionCommentUnknown(strings.TrimSpace(v))
+	return
+}
+
+func (ocf OptionCommentUnknown) String() string {
+	return string(ocf)
+}
+
+type OptionCommentBooleanFlag struct {
+	Value   *bool
+	Comment string
+}
+
+func (ocf OptionCommentBooleanFlag) CloneOptionComment() OptionComment {
+	return ocf
+}
+
+func (ocf OptionCommentBooleanFlag) Set(v string) (err error) {
+	head, tail, _ := strings.Cut(v, " ")
+
+	var b values.Bool
+
+	if err = b.Set(head); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	*ocf.Value = b.Bool()
+
+	ocf.Comment = tail
+
+	return
+}
+
+func (ocf OptionCommentBooleanFlag) String() string {
+	if ocf.Comment != "" {
+		return fmt.Sprintf("%t %s", *ocf.Value, ocf.Comment)
+	} else {
+		return fmt.Sprintf("%t", *ocf.Value)
+	}
 }

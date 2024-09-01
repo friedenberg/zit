@@ -7,19 +7,19 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func (s *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
-	coc := col.(*CheckedOut)
+func (s *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
+	e := el.(*External)
 
 	var u *url.URL
 
-	if u, err = coc.External.browserItem.GetUrl(); err != nil {
+	if u, err = e.browserItem.GetUrl(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-  bi := coc.External.browserItem
-  bi.ExternalId = coc.GetSku().ObjectId.String()
-	s.removed[*u] = append(s.removed[*u], bi)
+	bi := e.browserItem
+	bi.ExternalId = e.GetSku().ObjectId.String()
+	s.deleted[*u] = append(s.deleted[*u], bi)
 
 	return
 }

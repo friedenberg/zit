@@ -136,7 +136,12 @@ func (c *Organize) RunWithQuery(
 
 		readOrganizeTextOp := user_ops.ReadOrganizeFile{}
 
-		if organizeTet, err = readOrganizeTextOp.Run(u, os.Stdin, qg.RepoId); err != nil {
+		if organizeTet, err = readOrganizeTextOp.Run(
+			u,
+			os.Stdin,
+			qg.RepoId,
+			organize_text.NewMetadata(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

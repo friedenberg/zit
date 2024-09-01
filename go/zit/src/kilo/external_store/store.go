@@ -147,7 +147,7 @@ func (es *Store) CheckoutOne(
 	return
 }
 
-func (es *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
+func (es *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
 	esdc, ok := es.StoreLike.(DeleteExternal)
 
 	if !ok {
@@ -160,7 +160,7 @@ func (es *Store) DeleteCheckout(col sku.CheckedOutLike) (err error) {
 		return
 	}
 
-	if err = esdc.DeleteCheckout(col); err != nil {
+	if err = esdc.DeleteExternalLike(el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

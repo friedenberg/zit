@@ -148,7 +148,12 @@ func (u OrganizeAndCommit) RunWithExternalLike(
 			return
 		}
 
-		if results.After, err = readOrganizeTextOp.Run(u.Env, f, qg.RepoId); err != nil {
+		if results.After, err = readOrganizeTextOp.Run(
+			u.Env,
+			f,
+			qg.RepoId,
+			organize_text.NewMetadata(),
+		); err != nil {
 			if u.handleReadChangesError(err) {
 				err = nil
 				continue
