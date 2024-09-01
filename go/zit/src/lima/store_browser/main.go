@@ -159,16 +159,16 @@ func (c *Store) CheckoutOne(
 	sku.TransactedResetter.ResetWith(co.GetSku(), sz)
 	sku.TransactedResetter.ResetWith(co.GetSkuExternalLike().GetSku(), sz)
 	co.State = checked_out_state.JustCheckedOut
-	co.External.browser.Metadata.Type = ids.MustType("!browser-tab")
-	co.External.browserItem.Url = u.String()
-	co.External.browserItem.ExternalId = sz.ObjectId.String()
-	co.External.browserItem.Id.Type = "tab"
+	co.External.Browser.Metadata.Type = ids.MustType("!browser-tab")
+	co.External.Item.Url = u.String()
+	co.External.Item.ExternalId = sz.ObjectId.String()
+	co.External.Item.Id.Type = "tab"
 
 	c.l.Lock()
 	defer c.l.Unlock()
 
 	existing := c.added[*u]
-	c.added[*u] = append(existing, co.External.browserItem)
+	c.added[*u] = append(existing, co.External.Item)
 
 	// 	ui.Debug().Print(response)
 
@@ -263,14 +263,14 @@ func (c *Store) GetExternalLikeResetter3() interfaces.Resetter3[sku.ExternalLike
 		FuncReset: func(el sku.ExternalLike) {
 			a := el.(*External)
 			sku.TransactedResetter.Reset(&a.Transacted)
-			sku.TransactedResetter.Reset(&a.browser)
-			a.browserItem = browserItem{}
+			sku.TransactedResetter.Reset(&a.Browser)
+			a.Item = browserItem{}
 		},
 		FuncResetWith: func(eldst, elsrc sku.ExternalLike) {
 			dst, src := eldst.(*External), elsrc.(*External)
 			sku.TransactedResetter.ResetWith(&dst.Transacted, &src.Transacted)
-			sku.TransactedResetter.ResetWith(&dst.browser, &src.browser)
-			dst.browserItem = src.browserItem
+			sku.TransactedResetter.ResetWith(&dst.Browser, &src.Browser)
+			dst.Item = src.Item
 		},
 	}
 }

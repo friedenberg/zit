@@ -12,12 +12,12 @@ func (s *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
 
 	var u *url.URL
 
-	if u, err = e.browserItem.GetUrl(); err != nil {
+	if u, err = e.Item.GetUrl(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	bi := e.browserItem
+	bi := e.Item
 	bi.ExternalId = e.GetSku().ObjectId.String()
 	s.deleted[*u] = append(s.deleted[*u], bi)
 

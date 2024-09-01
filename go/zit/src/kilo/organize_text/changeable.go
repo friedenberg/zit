@@ -9,13 +9,13 @@ import (
 )
 
 func key(sk sku.ExternalLike) string {
-	if !sk.GetSku().ObjectId.IsEmpty() {
-		return sk.GetSku().ObjectId.String()
-	}
-
 	eoid := sk.GetExternalObjectId().String()
 	if len(eoid) > 1 {
 		return eoid
+	}
+
+	if !sk.GetSku().ObjectId.IsEmpty() {
+		return sk.GetSku().ObjectId.String()
 	}
 
 	if sk.GetSku().Metadata.Description.String() != "" {

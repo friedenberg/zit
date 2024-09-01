@@ -23,7 +23,7 @@ func (c *executor) tryToEmitOneExplicitlyCheckedOut(
 	internal *sku.Transacted,
 	item browserItem,
 ) (err error) {
-	sku.TransactedResetter.Reset(&c.co.External.browser)
+	sku.TransactedResetter.Reset(&c.co.External.Browser)
 	c.co.External.ObjectId.Reset()
 
 	var uSku *url.URL
@@ -43,7 +43,7 @@ func (c *executor) tryToEmitOneExplicitlyCheckedOut(
 	sku.TransactedResetter.ResetWith(&c.co.Internal, internal)
 	sku.TransactedResetter.ResetWith(&c.co.External.Transacted, internal)
 
-	if err = item.WriteToObjectId(&c.co.External.browser.ObjectId); err != nil {
+	if err = item.WriteToObjectId(&c.co.External.Browser.ObjectId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -74,7 +74,7 @@ func (c *executor) tryToEmitOneRecognized(
 		return
 	}
 
-	sku.TransactedResetter.Reset(&c.co.External.browser)
+	sku.TransactedResetter.Reset(&c.co.External.Browser)
 
 	sku.TransactedResetter.ResetWith(&c.co.Internal, internal)
 	sku.TransactedResetter.ResetWith(&c.co.External.Transacted, internal)
@@ -104,7 +104,7 @@ func (c *executor) tryToEmitOneUntracked(
 		return
 	}
 
-	sku.TransactedResetter.Reset(&c.co.External.browser)
+	sku.TransactedResetter.Reset(&c.co.External.Browser)
 	sku.TransactedResetter.Reset(&c.co.External.Transacted)
 	sku.TransactedResetter.Reset(&c.co.Internal)
 
@@ -114,7 +114,7 @@ func (c *executor) tryToEmitOneUntracked(
 	}
 
 	if err = item.WriteToObjectIds(
-		&c.co.External.browser.ObjectId,
+		&c.co.External.Browser.ObjectId,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -134,14 +134,14 @@ func (c *executor) tryToEmitOneCommon(
 	i browserItem,
 	overwrite bool,
 ) (err error) {
-	browser := &c.co.External.browser
+	browser := &c.co.External.Browser
 
 	if err = c.co.External.SetItem(i, overwrite); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	c.co.External.browser.ObjectId.SetGenre(genres.Zettel)
+	c.co.External.Browser.ObjectId.SetGenre(genres.Zettel)
 	c.co.External.ObjectId.SetGenre(genres.Zettel)
 
 	if !c.qg.ContainsExternalSku(browser, c.co.State) &&

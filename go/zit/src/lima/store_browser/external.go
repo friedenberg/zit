@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"net/url"
+	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
@@ -20,8 +21,18 @@ import (
 type External struct {
 	external_state.State
 	sku.Transacted
-	browser sku.Transacted
-	browserItem
+	Browser sku.Transacted
+	Item    browserItem
+}
+
+func (e *External) Validate(k string) {
+	k = strings.TrimSuffix(k, "/")
+	expected := k
+	actual := strings.TrimSuffix(e.Browser.GetObjectId().String(), "/")
+
+	if expected != actual {
+		panic(fmt.Sprintf("expected %q but got %q", expected, actual))
+	}
 }
 
 func (e *External) GetObjectId() *ids.ObjectId {
@@ -44,7 +55,7 @@ func (e *External) SaveBlob(s fs_home.Home) (err error) {
 
 	var u *url.URL
 
-	if u, err = e.GetUrl(); err != nil {
+	if u, err = e.Item.GetUrl(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -71,14 +82,14 @@ func (e *External) SaveBlob(s fs_home.Home) (err error) {
 }
 
 func (e *External) SetItem(i browserItem, overwrite bool) (err error) {
-	e.browserItem = i
+	e.Item = i
 
-	if err = i.WriteToMetadata(&e.browser.Metadata); err != nil {
+	if err = i.WriteToMetadata(&e.Browser.Metadata); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	e.Metadata.Tai = e.browser.Metadata.GetTai()
+	e.Metadata.Tai = e.Browser.Metadata.GetTai()
 
 	// if overwrite {
 	// 	if err = i.WriteToMetadata(&e.Metadata); err != nil {
@@ -98,15 +109,15 @@ func (t *External) GetSkuExternalLike() sku.ExternalLike {
 }
 
 func (t *External) GetExternalObjectId() sku.ExternalObjectId {
-	return &t.browserItem
+	return &t.Item
 }
 
 func (a *External) Clone() sku.ExternalLike {
 	b := GetExternalPool().Get()
 	sku.TransactedResetter.ResetWith(&b.Transacted, &a.Transacted)
-	sku.TransactedResetter.ResetWith(&b.browser, &a.browser)
-	b.browserItem = a.browserItem
-  b.State = a.State
+	sku.TransactedResetter.ResetWith(&b.Browser, &a.Browser)
+	b.Item = a.Item
+	b.State = a.State
 	return b
 }
 

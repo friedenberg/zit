@@ -192,7 +192,7 @@ LOOP:
 
 					switch left {
 					case "id":
-						if err = e.browserItem.SetId(right); err != nil {
+						if err = e.Item.SetId(right); err != nil {
 							err = errors.Wrap(err)
 							return
 						}
@@ -200,11 +200,11 @@ LOOP:
 						continue LOOP
 
 					case "url":
-						e.browserItem.Url = right
+						e.Item.Url = right
 						continue LOOP
 
 					case "title":
-						e.browserItem.Title = right
+						e.Item.Title = right
 						continue LOOP
 
 					default:
@@ -301,7 +301,7 @@ func (f *Organize) writeStringFormatExternal(
 		}
 	}
 
-	item := &e.browserItem
+	item := &e.Item
 
 	fields = append(
 		fields,
