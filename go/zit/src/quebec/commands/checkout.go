@@ -15,6 +15,7 @@ import (
 
 type Checkout struct {
 	CheckoutOptions checkout_options.Options
+	Organize        bool
 }
 
 func init() {
@@ -26,6 +27,8 @@ func init() {
 					CheckoutMode: checkout_mode.MetadataOnly,
 				},
 			}
+
+			f.BoolVar(&c.Organize, "organize", false, "")
 
 			c.CheckoutOptions.AddToFlagSet(f)
 
@@ -53,8 +56,9 @@ func (c Checkout) RunWithQuery(
 	qg *query.Group,
 ) (err error) {
 	opCheckout := user_ops.Checkout{
-		Env:     u,
-		Options: c.CheckoutOptions,
+		Env:      u,
+		Organize: c.Organize,
+		Options:  c.CheckoutOptions,
 	}
 
 	if _, err = opCheckout.RunQuery(qg); err != nil {

@@ -7,7 +7,7 @@ if $BIN_ZIT == ""
   let BIN_ZIT = "zit"
 endif
 
-let zettel = expand("%")
+let zettel = expand("%:r")
 
 let g:markdown_syntax_conceal = 0
 
@@ -23,10 +23,8 @@ if zettel != ""
     let zettelTypSyntax = "markdown"
   endif
 
-  " let syntaxFile = $VIMRUNTIME . "/syntax/" . zettelTypSyntax . ".vim"
-  " let ftpluginFile = $VIMRUNTIME . "/ftplugin/" . zettelTypSyntax . ".vim"
-
-  execute "syntax include @akte" "syntax/" . zettelTypSyntax . ".vim"
+  let zitSyntaxFile = "$HOME/.local/share/zit/vim/syntax/".zettelTypSyntax.".vim"
+  execute "syntax include @akte" zitSyntaxFile
   " if filereadable(syntaxFile)
   "   exec "source " . syntaxFile
   "   " TODO-P3

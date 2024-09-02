@@ -57,8 +57,8 @@ func (s *Store) GetTai() ids.Tai {
 	return ids.NowTai()
 }
 
-func (s *Store) GetInventoryListStore() inventory_list.Store {
-	return s.inventoryListStore
+func (s *Store) GetInventoryListStore() *inventory_list.Store {
+	return &s.inventoryListStore
 }
 
 func (s *Store) GetAbbrStore() AbbrStore {

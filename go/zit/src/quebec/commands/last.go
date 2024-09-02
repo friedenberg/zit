@@ -73,7 +73,7 @@ func (c Last) Run(u *env.Env, args ...string) (err error) {
 
 	f = iter.MakeSyncSerializer(f)
 
-	if err = c.runWithBestandsaufnahme(u, f); err != nil {
+	if err = c.runWithInventoryList(u, f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -105,7 +105,7 @@ func (c Last) Run(u *env.Env, args ...string) (err error) {
 	return
 }
 
-func (c Last) runWithBestandsaufnahme(
+func (c Last) runWithInventoryList(
 	u *env.Env,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
@@ -121,7 +121,7 @@ func (c Last) runWithBestandsaufnahme(
 	var a *inventory_list.InventoryList
 
 	if a, err = s.GetInventoryListStore().GetBlob(b.GetBlobSha()); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "InventoryList: %q", b)
 		return
 	}
 

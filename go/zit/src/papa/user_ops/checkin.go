@@ -14,20 +14,20 @@ type Checkin struct {
 	Organize bool
 }
 
-func (c Checkin) Run(
+func (op Checkin) Run(
 	u *env.Env,
 	qg *query.Group,
 ) (err error) {
-	if c.Organize {
-		if err = c.runOrganize(u, qg); err != nil {
+	if op.Organize {
+		if qg, err = op.runOrganize(u, qg); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-	} else {
-		if err = c.runNoOrganize(u, qg); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	}
+
+	if err = op.runNoOrganize(u, qg); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
@@ -35,8 +35,8 @@ func (c Checkin) Run(
 
 func (op Checkin) runOrganize(
 	u *env.Env,
-	qg *query.Group,
-) (err error) {
+	qgOriginal *query.Group,
+) (qgModified *query.Group, err error) {
 	flagDelete := organize_text.OptionCommentBooleanFlag{
 		Value:   &op.Delete,
 		Comment: "delete once checked in",
@@ -58,14 +58,15 @@ func (op Checkin) runOrganize(
 				},
 			),
 		},
+		DontUseQueryGroupForOrganizeMetadata: true,
 	}
 
-	ui.Log().Print(qg)
+	ui.Log().Print(qgOriginal)
 
 	var organizeResults organize_text.OrganizeResults
 
 	if organizeResults, err = opOrganize.RunWithQueryGroup(
-		qg,
+		qgOriginal,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -74,10 +75,9 @@ func (op Checkin) runOrganize(
 	u.Lock()
 	defer errors.Deferred(&err, u.Unlock)
 
-	if _, err = u.CommitRemainingOrganizeResults(
+	if qgModified, _, err = u.QueryGroupFromRemainingOrganizeResults(
 		organizeResults,
-		qg.RepoId,
-		op.Delete,
+		qgOriginal.RepoId,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

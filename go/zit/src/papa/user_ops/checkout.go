@@ -4,16 +4,20 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type Checkout struct {
 	*env.Env
+	Organize bool
 	checkout_options.Options
 	Open    bool
 	Edit    bool
@@ -66,22 +70,31 @@ func (op Checkout) RunQuery(
 	zsc = sku.MakeCheckedOutLikeMutableSet()
 	var l sync.Mutex
 
+	onCheckedOut := func(col sku.CheckedOutLike) (err error) {
+		l.Lock()
+		defer l.Unlock()
+
+		cl := col.Clone()
+
+		if err = zsc.Add(cl); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+
+	if op.Organize {
+		if qg, err = op.runOrganize(qg, onCheckedOut); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	if err = op.Env.GetStore().CheckoutQuery(
 		op.Options,
 		qg,
-		func(col sku.CheckedOutLike) (err error) {
-			l.Lock()
-			defer l.Unlock()
-
-			cl := col.Clone()
-
-			if err = zsc.Add(cl); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
+		onCheckedOut,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -121,7 +134,9 @@ func (op Checkout) RunQuery(
 
 		builder := op.MakeQueryBuilderExcludingHidden(ids.MakeGenre(genres.Zettel))
 
-		if ms, err = builder.WithCheckedOut(zsc).BuildQueryGroup(); err != nil {
+		if ms, err = builder.WithCheckedOut(
+			zsc,
+		).BuildQueryGroup(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -136,6 +151,51 @@ func (op Checkout) RunQuery(
 			return
 		}
 	}
+
+	return
+}
+
+func (op Checkout) runOrganize(
+	qgOriginal *query.Group,
+	onCheckedOut interfaces.FuncIter[sku.CheckedOutLike],
+) (qgModified *query.Group, err error) {
+	opOrganize := Organize{
+		Env: op.Env,
+		Metadata: organize_text.Metadata{
+			OptionCommentSet: organize_text.MakeOptionCommentSet(
+				// TODO add other OptionComments
+				nil,
+				organize_text.OptionCommentUnknown(
+					"instructions: to prevent an object from being checked out, delete it entirely",
+				),
+			),
+		},
+		DontUseQueryGroupForOrganizeMetadata: true,
+	}
+
+	ui.Log().Print(qgOriginal)
+
+	originalRepoId := qgOriginal.RepoId
+	qgOriginal.RepoId.Reset()
+
+	var organizeResults organize_text.OrganizeResults
+
+	if organizeResults, err = opOrganize.RunWithQueryGroup(
+		qgOriginal,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if qgModified, _, err = op.QueryGroupFromRemainingOrganizeResults(
+		organizeResults,
+		qgOriginal.RepoId,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	qgModified.RepoId = originalRepoId
 
 	return
 }

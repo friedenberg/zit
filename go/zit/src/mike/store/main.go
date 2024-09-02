@@ -84,7 +84,7 @@ func (c *Store) Initialize(
 		return
 	}
 
-	if c.inventoryListStore, err = inventory_list.MakeStore(
+	if err = c.inventoryListStore.Initialize(
 		c.GetStandort(),
 		c.GetStandort().GetLockSmith(),
 		c.config.GetStoreVersion(),

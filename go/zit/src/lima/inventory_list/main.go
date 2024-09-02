@@ -25,33 +25,33 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
-type Store interface {
-	errors.Flusher
-	GetStore() Store
+// type Store interface {
+// 	errors.Flusher
+// 	GetStore() Store
 
-	Create(
-		*InventoryList,
-		descriptions.Description,
-	) (*sku.Transacted, error)
-	ReadLast() (*sku.Transacted, error)
-	ReadOne(interfaces.Stringer) (*sku.Transacted, error)
-	ReadOneSku(besty, sk *sha.Sha) (*sku.Transacted, error)
-	ReadAll(interfaces.FuncIter[*sku.Transacted]) error
-	ReadAllSkus(func(besty, sk *sku.Transacted) error) error
-	interfaces.BlobGetter[*InventoryList]
+// 	Create(
+// 		*InventoryList,
+// 		descriptions.Description,
+// 	) (*sku.Transacted, error)
+// 	ReadLast() (*sku.Transacted, error)
+// 	ReadOne(interfaces.Stringer) (*sku.Transacted, error)
+// 	ReadOneSku(besty, sk *sha.Sha) (*sku.Transacted, error)
+// 	ReadAll(interfaces.FuncIter[*sku.Transacted]) error
+// 	ReadAllSkus(func(besty, sk *sku.Transacted) error) error
+// 	interfaces.BlobGetter[*InventoryList]
 
-	StreamInventoryList(
-		interfaces.Sha,
-		interfaces.FuncIter[*sku.Transacted],
-	) error
-}
+// 	StreamInventoryList(
+// 		interfaces.Sha,
+// 		interfaces.FuncIter[*sku.Transacted],
+// 	) error
+// }
 
 type Format = blob_store.Format[
 	InventoryList,
 	*InventoryList,
 ]
 
-type store struct {
+type Store struct {
 	fs_home       fs_home.Home
 	ls            interfaces.LockSmith
 	sv            interfaces.StoreVersion
@@ -64,7 +64,7 @@ type store struct {
 	format
 }
 
-func MakeStore(
+func (s *Store) Initialize(
 	fs_home fs_home.Home,
 	ls interfaces.LockSmith,
 	sv interfaces.StoreVersion,
@@ -72,13 +72,13 @@ func MakeStore(
 	af interfaces.BlobIOFactory,
 	pmf object_inventory_format.Format,
 	clock ids.Clock,
-) (s *store, err error) {
+) (err error) {
 	p := pool.MakePool(nil, func(a *InventoryList) { Resetter.Reset(a) })
 
 	op := object_inventory_format.Options{Tai: true}
 	fa := MakeFormat(sv, op)
 
-	s = &store{
+	*s = Store{
 		fs_home:       fs_home,
 		ls:            ls,
 		sv:            sv,
@@ -94,16 +94,12 @@ func MakeStore(
 	return
 }
 
-func (s *store) GetStore() Store {
-	return s
-}
-
-func (s *store) Flush() (err error) {
+func (s *Store) Flush() (err error) {
 	wg := iter.MakeErrorWaitGroupParallel()
 	return wg.GetError()
 }
 
-func (s *store) Create(
+func (s *Store) Create(
 	o *InventoryList,
 	bez descriptions.Description,
 ) (t *sku.Transacted, err error) {
@@ -172,7 +168,9 @@ func (s *store) Create(
 	return
 }
 
-func (s *store) writeInventoryList(o *InventoryList) (sh *sha.Sha, err error) {
+func (s *Store) writeInventoryList(
+	o *InventoryList,
+) (sh *sha.Sha, err error) {
 	var sw sha.WriteCloser
 
 	if sw, err = s.fs_home.BlobWriter(); err != nil {
@@ -180,41 +178,48 @@ func (s *store) writeInventoryList(o *InventoryList) (sh *sha.Sha, err error) {
 		return
 	}
 
-	defer errors.DeferredCloser(&err, sw)
+	func() {
+		defer errors.DeferredCloser(&err, sw)
 
-	fo := sku_fmt.MakeFormatInventoryListPrinter(
-		sw,
-		s.object_format,
-		s.options,
-	)
+		fo := sku_fmt.MakeFormatInventoryListPrinter(
+			sw,
+			s.object_format,
+			s.options,
+		)
 
-	defer o.Restore()
+		defer o.Restore()
 
-	for {
-		sk, ok := o.PopAndSave()
+		for {
+			sk, ok := o.PopAndSave()
 
-		if !ok {
-			break
+			if !ok {
+				break
+			}
+
+			if sk.Metadata.Sha().IsNull() {
+				err = errors.Errorf("empty sha: %s", sk)
+				return
+			}
+
+			_, err = fo.Print(sk)
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
-
-		if sk.Metadata.Sha().IsNull() {
-			err = errors.Errorf("empty sha: %s", sk)
-			return
-		}
-
-		_, err = fo.Print(sk)
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
+	}()
 
 	sh = sha.Make(sw.GetShaLike())
+
+	if _, err = s.GetBlob(sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
 
-func (s *store) readOnePath(p string) (o *sku.Transacted, err error) {
+func (s *Store) readOnePath(p string) (o *sku.Transacted, err error) {
 	var sh *sha.Sha
 
 	if sh, err = sha.MakeShaFromPath(p); err != nil {
@@ -253,7 +258,7 @@ func (s *store) readOnePath(p string) (o *sku.Transacted, err error) {
 	return
 }
 
-func (s *store) ReadOneSku(besty, sh *sha.Sha) (o *sku.Transacted, err error) {
+func (s *Store) ReadOneSku(besty, sh *sha.Sha) (o *sku.Transacted, err error) {
 	var bestySku *sku.Transacted
 
 	if bestySku, err = s.ReadOne(besty); err != nil {
@@ -296,7 +301,7 @@ func (s *store) ReadOneSku(besty, sh *sha.Sha) (o *sku.Transacted, err error) {
 	return
 }
 
-func (s *store) ReadOne(
+func (s *Store) ReadOne(
 	k interfaces.Stringer,
 ) (o *sku.Transacted, err error) {
 	var sh sha.Sha
@@ -324,7 +329,7 @@ func (s *store) ReadOne(
 	return
 }
 
-func (s *store) readOneFromReader(
+func (s *Store) readOneFromReader(
 	r io.Reader,
 ) (n int64, o *sku.Transacted, err error) {
 	o = sku.GetTransactedPool().Get()
@@ -345,7 +350,10 @@ func (s *store) readOneFromReader(
 	return
 }
 
-func (s *store) populateInventoryList(blobSha interfaces.Sha, a *InventoryList) (err error) {
+func (s *Store) populateInventoryList(
+	blobSha interfaces.Sha,
+	a *InventoryList,
+) (err error) {
 	var ar interfaces.ShaReadCloser
 
 	if ar, err = s.af.BlobReader(blobSha); err != nil {
@@ -376,7 +384,7 @@ func (s *store) populateInventoryList(blobSha interfaces.Sha, a *InventoryList) 
 	return
 }
 
-func (s *store) StreamInventoryList(
+func (s *Store) StreamInventoryList(
 	blobSha interfaces.Sha,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
@@ -412,13 +420,13 @@ func (s *store) StreamInventoryList(
 	return
 }
 
-func (s *store) GetBlob(blobSha interfaces.Sha) (a *InventoryList, err error) {
+func (s *Store) GetBlob(blobSha interfaces.Sha) (a *InventoryList, err error) {
 	a = MakeInventoryList()
 	err = s.populateInventoryList(blobSha, a)
 	return
 }
 
-func (s *store) ReadLast() (max *sku.Transacted, err error) {
+func (s *Store) ReadLast() (max *sku.Transacted, err error) {
 	l := &sync.Mutex{}
 
 	var maxSku sku.Transacted
@@ -454,7 +462,7 @@ func (s *store) ReadLast() (max *sku.Transacted, err error) {
 	return
 }
 
-func (s *store) ReadAll(
+func (s *Store) ReadAll(
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	var p string
@@ -492,7 +500,7 @@ func (s *store) ReadAll(
 	return
 }
 
-func (s *store) ReadAllSorted(
+func (s *Store) ReadAllSorted(
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	var skus []*sku.Transacted
@@ -520,7 +528,7 @@ func (s *store) ReadAllSorted(
 	return
 }
 
-func (s *store) ReadAllSkus(
+func (s *Store) ReadAllSkus(
 	f func(besty, sk *sku.Transacted) error,
 ) (err error) {
 	if err = s.ReadAll(

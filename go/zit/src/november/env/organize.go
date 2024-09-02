@@ -3,8 +3,10 @@ package env
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
 )
 
@@ -34,6 +36,32 @@ func (e *Env) CommitOrganizeResults(
 			return
 		},
 	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (e *Env) QueryGroupFromRemainingOrganizeResults(
+	results organize_text.OrganizeResults,
+	repoId ids.RepoId,
+) (qg *query.Group, changeResults organize_text.Changes, err error) {
+	if changeResults, err = organize_text.ChangesFromResults(
+		e.GetConfig().PrintOptions,
+		results,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	b := e.MakeQueryBuilder(
+		ids.MakeGenre(genres.TrueGenre()...),
+	).WithExternalLike(
+		changeResults.After.AsExternalLikeSet(),
+	)
+
+	if qg, err = b.BuildQueryGroup(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
