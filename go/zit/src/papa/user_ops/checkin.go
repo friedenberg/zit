@@ -2,6 +2,7 @@ package user_ops
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -23,37 +24,36 @@ func (op Checkin) Run(
 			err = errors.Wrap(err)
 			return
 		}
-	}
+	} else {
+		u.Lock()
+		defer errors.Deferred(&err, u.Unlock)
 
-	u.Lock()
-	defer errors.Deferred(&err, u.Unlock)
+		if err = u.GetStore().QueryCheckedOut(
+			qg,
+			func(col sku.CheckedOutLike) (err error) {
+				if err = u.GetStore().CreateOrUpdateCheckedOut(
+					col,
+					true,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 
-	if err = u.GetStore().QueryCheckedOut(
-		qg,
-		func(col sku.CheckedOutLike) (err error) {
-			if err = u.GetStore().CreateOrUpdateCheckedOut(
-				col,
-				true,
-			); err != nil {
-				ui.Debug().Print(err)
-				err = errors.Wrap(err)
+				if !op.Delete {
+					return
+				}
+
+				if err = u.GetStore().DeleteCheckedOutLike(col); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
 				return
-			}
-
-			if !op.Delete {
-				return
-			}
-
-			if err = u.GetStore().DeleteCheckedOutLike(col); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+			},
+		); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
 	}
 
 	return
@@ -98,12 +98,43 @@ func (op Checkin) runOrganize(
 		return
 	}
 
+	var changes organize_text.Changes
+
+	if qgModified, changes, err = u.QueryGroupFromRemainingOrganizeResults(
+		organizeResults,
+		qgOriginal.RepoId,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	u.Lock()
 	defer errors.Deferred(&err, u.Unlock)
 
-	if qgModified, _, err = u.QueryGroupFromRemainingOrganizeResults(
-		organizeResults,
-		qgOriginal.RepoId,
+	if err = changes.After.Each(
+		func(el sku.ExternalLike) (err error) {
+			if err = u.GetStore().CreateOrUpdate(
+				el,
+				objekte_mode.ModeCreate,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if !op.Delete {
+				return
+			}
+
+			if err = u.GetStore().DeleteExternalLike(
+				qgOriginal.RepoId,
+				el,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
