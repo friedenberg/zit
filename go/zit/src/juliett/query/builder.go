@@ -36,6 +36,7 @@ type Builder struct {
 	object_probe_index         sku.ObjectProbeIndex
 	luaVMPoolBuilder           *lua.VMPoolBuilder
 	pinnedObjectIds            []ObjectId
+	pinnedExternalObjectIds    []sku.ExternalObjectId
 	repoGetter                 sku.ExternalStoreForQueryGetter
 	repo                       sku.ExternalStoreForQuery
 	virtualEtikettenBeforeInit map[string]string
@@ -65,6 +66,13 @@ func (b *Builder) makeState() *buildState {
 
 	state.pinnedObjectIds = make([]ObjectId, len(b.pinnedObjectIds))
 	copy(state.pinnedObjectIds, b.pinnedObjectIds)
+
+	state.pinnedExternalObjectIds = make(
+		[]sku.ExternalObjectId,
+		len(b.pinnedExternalObjectIds),
+	)
+
+	copy(state.pinnedExternalObjectIds, b.pinnedExternalObjectIds)
 
 	return state
 }
@@ -144,11 +152,9 @@ func (b *Builder) WithExternalLike(
 ) *Builder {
 	errors.PanicIfError(zts.Each(
 		func(t sku.ExternalLike) (err error) {
-			b.pinnedObjectIds = append(
-				b.pinnedObjectIds,
-				ObjectId{
-					ObjectIdLike: t.GetSku().ObjectId.Clone(),
-				},
+			b.pinnedExternalObjectIds = append(
+				b.pinnedExternalObjectIds,
+				t.GetExternalObjectId(),
 			)
 
 			return
@@ -193,6 +199,13 @@ func (b *Builder) WithCheckedOut(
 		},
 	))
 
+	return b
+}
+
+func (b *Builder) WithOptionsFromOriginalQuery(
+	qg *Group,
+) *Builder {
+	b.doNotMatchEmpty = !qg.matchOnEmpty
 	return b
 }
 

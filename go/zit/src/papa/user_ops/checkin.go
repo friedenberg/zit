@@ -25,7 +25,33 @@ func (op Checkin) Run(
 		}
 	}
 
-	if err = op.runNoOrganize(u, qg); err != nil {
+	u.Lock()
+	defer errors.Deferred(&err, u.Unlock)
+
+	if err = u.GetStore().QueryCheckedOut(
+		qg,
+		func(col sku.CheckedOutLike) (err error) {
+			if err = u.GetStore().CreateOrUpdateCheckedOut(
+				col,
+				true,
+			); err != nil {
+				ui.Debug().Print(err)
+				err = errors.Wrap(err)
+				return
+			}
+
+			if !op.Delete {
+				return
+			}
+
+			if err = u.GetStore().DeleteCheckedOutLike(col); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -78,46 +104,6 @@ func (op Checkin) runOrganize(
 	if qgModified, _, err = u.QueryGroupFromRemainingOrganizeResults(
 		organizeResults,
 		qgOriginal.RepoId,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (c Checkin) runNoOrganize(
-	u *env.Env,
-	qg *query.Group,
-) (err error) {
-	u.Lock()
-	defer errors.Deferred(&err, u.Unlock)
-
-	ui.Log().Print(qg)
-
-	if err = u.GetStore().QueryCheckedOut(
-		qg,
-		func(col sku.CheckedOutLike) (err error) {
-			if err = u.GetStore().CreateOrUpdateCheckedOut(
-				col,
-				true,
-			); err != nil {
-				ui.Debug().Print(err)
-				err = errors.Wrap(err)
-				return
-			}
-
-			if !c.Delete {
-				return
-			}
-
-			if err = u.GetStore().DeleteCheckedOutLike(col); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return

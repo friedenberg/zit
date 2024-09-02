@@ -122,6 +122,7 @@ type Changes struct {
 	Changed        SkuMapWithOrder
 }
 
+// TODO combine with above
 type OrganizeResults struct {
 	Before, After *Text
 	Original      sku.ExternalLikeSet

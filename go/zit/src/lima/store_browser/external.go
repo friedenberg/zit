@@ -109,7 +109,7 @@ func (t *External) GetSkuExternalLike() sku.ExternalLike {
 }
 
 func (t *External) GetExternalObjectId() sku.ExternalObjectId {
-	return &t.Item
+	return t.Item.GetExternalObjectId()
 }
 
 func (a *External) Clone() sku.ExternalLike {

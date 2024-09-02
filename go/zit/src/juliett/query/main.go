@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -280,6 +281,7 @@ func (q *Query) ContainsExternalSku(el sku.ExternalLike) (ok bool) {
 	g := genres.Must(sk)
 
 	if !q.Genre.ContainsOneOf(g) {
+		ui.Debug().Print(g, q.Genre)
 		return
 	}
 
@@ -289,7 +291,8 @@ func (q *Query) ContainsExternalSku(el sku.ExternalLike) (ok bool) {
 		return
 	}
 
-	if _, ok = q.ExternalObjectIds[el.GetObjectId().String()]; ok {
+	eoid := el.GetExternalObjectId().String()
+	if _, ok = q.ExternalObjectIds[eoid]; ok {
 		return
 	}
 

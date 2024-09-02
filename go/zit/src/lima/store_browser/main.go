@@ -84,7 +84,9 @@ func (s *Store) ApplyDotOperator() error {
 	return nil
 }
 
-func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err error) {
+func (s *Store) GetObjectIdsForString(
+	v string,
+) (k []sku.ExternalObjectId, err error) {
 	item, ok := s.itemsById[v]
 
 	if !ok {
@@ -92,7 +94,7 @@ func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err e
 		return
 	}
 
-	k = append(k, &item)
+	k = append(k, item.GetExternalObjectId())
 
 	return
 }

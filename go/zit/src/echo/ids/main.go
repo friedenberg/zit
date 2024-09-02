@@ -34,10 +34,15 @@ type (
 		interfaces.GenreGetter
 		interfaces.Stringer
 		ExternalObjectIdGetter
+		ExternalObjectIdCloner
 	}
 
 	ExternalObjectIdGetter interface {
 		GetExternalObjectId() ExternalObjectId
+	}
+
+	ExternalObjectIdCloner interface {
+		CloneExternalObjectId() ExternalObjectId
 	}
 )
 

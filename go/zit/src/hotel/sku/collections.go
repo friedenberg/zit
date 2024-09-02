@@ -22,7 +22,8 @@ type ExternalObjectIdKeyer[
 ] struct{}
 
 func (ExternalObjectIdKeyer[T]) GetKey(e T) string {
-	return e.GetExternalObjectId().String()
+	k := e.GetExternalObjectId().String()
+	return k
 }
 
 func init() {

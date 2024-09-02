@@ -21,7 +21,10 @@ type browserItem struct {
 }
 
 func (i *browserItem) GetExternalObjectId() sku.ExternalObjectId {
-	return i
+	return &ids.DumbObjectId{
+		Value: i.String(),
+		Genre: genres.Zettel,
+	}
 }
 
 func (i *browserItem) GetGenre() interfaces.Genre {
@@ -138,22 +141,6 @@ func (i browserItem) GetUrlPathTag() (e ids.Tag, err error) {
 		return
 	}
 
-	return
-}
-
-func (i browserItem) WriteToObjectIds(oids ...*ids.ObjectId) (err error) {
-	for _, oid := range oids {
-		if err = i.WriteToObjectId(oid); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
-func (i browserItem) WriteToObjectId(oi *ids.ObjectId) (err error) {
-	oi.ResetWith(i.GetObjectId())
 	return
 }
 

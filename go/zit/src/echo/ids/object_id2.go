@@ -50,6 +50,10 @@ func (a *objectId2) GetExternalObjectId() ExternalObjectId {
 	return a
 }
 
+func (a *objectId2) CloneExternalObjectId() ExternalObjectId {
+	return a.Clone()
+}
+
 func (a *objectId2) Clone() (b *objectId2) {
 	b = getObjectIdPool2().Get()
 	b.ResetWithIdLike(a)

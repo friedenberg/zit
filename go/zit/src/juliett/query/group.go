@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -173,7 +174,7 @@ func (qg *Group) addExactExternalObjectId(
 		return
 	}
 
-  qg.dotOperatorActive = true
+	qg.dotOperatorActive = true
 
 	return
 }
@@ -402,6 +403,7 @@ func (qg *Group) ContainsExternalSku(
 	defer sk.Metadata.Cache.QueryPath.PushOnReturn(qg, &ok)
 
 	if !qg.ContainsSkuCheckedOutState(state) {
+		ui.Debug().Print(state)
 		return
 	}
 
@@ -410,9 +412,9 @@ func (qg *Group) ContainsExternalSku(
 		return
 	}
 
-	g := sk.GetGenre()
+	g := genres.Must(sk.GetGenre())
 
-	q, ok := qg.OptimizedQueries[genres.Must(g)]
+	q, ok := qg.OptimizedQueries[g]
 
 	if !ok || !q.ContainsExternalSku(el) {
 		ok = false

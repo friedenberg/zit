@@ -43,11 +43,6 @@ func (c *executor) tryToEmitOneExplicitlyCheckedOut(
 	sku.TransactedResetter.ResetWith(&c.co.Internal, internal)
 	sku.TransactedResetter.ResetWith(&c.co.External.Transacted, internal)
 
-	if err = item.WriteToObjectId(&c.co.External.Browser.ObjectId); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if *uSku == *uBrowser {
 		c.co.State = checked_out_state.ExistsAndSame
 	} else {
@@ -79,10 +74,10 @@ func (c *executor) tryToEmitOneRecognized(
 	sku.TransactedResetter.ResetWith(&c.co.Internal, internal)
 	sku.TransactedResetter.ResetWith(&c.co.External.Transacted, internal)
 
-	if err = item.WriteToObjectId(&c.co.External.ObjectId); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	// if err = item.WriteToObjectId(&c.co.External.ObjectId); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
 	c.co.State = checked_out_state.Recognized
 	c.co.External.State = external_state.Recognized
@@ -113,13 +108,6 @@ func (c *executor) tryToEmitOneUntracked(
 		return
 	}
 
-	if err = item.WriteToObjectIds(
-		&c.co.External.Browser.ObjectId,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	c.co.External.State = external_state.Untracked
 
 	if err = c.tryToEmitOneCommon(item, true); err != nil {
@@ -135,17 +123,20 @@ func (c *executor) tryToEmitOneCommon(
 	overwrite bool,
 ) (err error) {
 	browser := &c.co.External.Browser
+	external := &c.co.External
 
-	if err = c.co.External.SetItem(i, overwrite); err != nil {
+	if err = external.SetItem(i, overwrite); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	c.co.External.Browser.ObjectId.SetGenre(genres.Zettel)
-	c.co.External.ObjectId.SetGenre(genres.Zettel)
+	browser.ObjectId.SetGenre(genres.Zettel)
+	external.ObjectId.SetGenre(genres.Zettel)
+
+	// ui.Debug().Print(browser.GetExternalObjectId(), external.GetExternalObjectId())
 
 	if !c.qg.ContainsExternalSku(browser, c.co.State) &&
-		!c.qg.ContainsExternalSku(c.co.GetSku(), c.co.State) {
+		!c.qg.ContainsExternalSku(external, c.co.State) {
 		return
 	}
 

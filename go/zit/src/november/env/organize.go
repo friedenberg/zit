@@ -59,12 +59,14 @@ func (e *Env) QueryGroupFromRemainingOrganizeResults(
 		ids.MakeGenre(genres.TrueGenre()...),
 	).WithExternalLike(
 		changeResults.After.AsExternalLikeSet(),
-	)
+	).WithDoNotMatchEmpty()
 
 	if qg, err = b.BuildQueryGroup(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	qg.RepoId = repoId
 
 	return
 }
