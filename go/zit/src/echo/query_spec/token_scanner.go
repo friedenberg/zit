@@ -9,29 +9,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 )
 
-type TokenParts struct {
-	Left, Right []byte
-}
-
-func (tp *TokenParts) Reset() {
-	tp.Left = nil
-	tp.Right = nil
-}
-
-func (src TokenParts) Clone() (dst TokenParts) {
-	dst = TokenParts{
-		Left:  make([]byte, len(src.Left)),
-		Right: make([]byte, len(src.Right)),
-	}
-
-	copy(dst.Left, src.Left)
-	copy(dst.Right, src.Right)
-
-	return
-}
-
 type TokenScanner struct {
-	rs                io.RuneScanner
+	io.RuneScanner
 	tokenTypeProbably TokenType
 	tokenType         TokenType
 	token             catgut.String
@@ -39,10 +18,11 @@ type TokenScanner struct {
 	err               error
 	unscan            bool
 	n                 int64
+	lastRune          rune
 }
 
 func (ts *TokenScanner) Reset(r io.RuneScanner) {
-	ts.rs = r
+	ts.RuneScanner = r
 	ts.token.Reset()
 	ts.tokenType = TokenTypeIncomplete
 	ts.tokenTypeProbably = TokenTypeIncomplete
@@ -50,6 +30,22 @@ func (ts *TokenScanner) Reset(r io.RuneScanner) {
 	ts.err = nil
 	ts.unscan = false
 	ts.n = 0
+}
+
+func (ts *TokenScanner) ReadRune() (r rune, n int, err error) {
+	ts.lastRune, n, err = ts.RuneScanner.ReadRune()
+	ts.n += int64(n)
+	return ts.lastRune, n, err
+}
+
+func (ts *TokenScanner) UnreadRune() (err error) {
+	err = ts.RuneScanner.UnreadRune()
+
+  if err == nil {
+    ts.n -= int64(utf8.RuneLen(ts.lastRune))
+  }
+
+  return
 }
 
 func (ts *TokenScanner) Unscan() {
@@ -101,10 +97,8 @@ func (ts *TokenScanner) ScanIdentifierLikeSkipSpaces() (ok bool) {
 
 	for {
 		var r rune
-		var n int
 
-		r, n, ts.err = ts.rs.ReadRune()
-		ts.n += int64(n)
+		r, _, ts.err = ts.ReadRune()
 
 		if ts.err != nil {
 			if ts.err == io.EOF {
@@ -162,12 +156,11 @@ func (ts *TokenScanner) ScanIdentifierLikeSkipSpaces() (ok bool) {
 				return
 			}
 
-			if ts.err = ts.rs.UnreadRune(); ts.err != nil {
+			if ts.err = ts.UnreadRune(); ts.err != nil {
 				ts.err = errors.Wrapf(ts.err, "%c", r)
 				ok = false
 			}
 
-			ts.n -= int64(utf8.RuneLen(r))
 			ts.tokenType = TokenTypeIdentifier
 
 			return
@@ -196,10 +189,8 @@ func (ts *TokenScanner) Scan() (ok bool) {
 
 	for {
 		var r rune
-		var n int
 
-		r, n, ts.err = ts.rs.ReadRune()
-		ts.n += int64(n)
+		r, _, ts.err = ts.ReadRune()
 
 		if ts.err != nil {
 			if ts.err == io.EOF {
@@ -257,12 +248,11 @@ func (ts *TokenScanner) Scan() (ok bool) {
 				return
 			}
 
-			if ts.err = ts.rs.UnreadRune(); ts.err != nil {
+			if ts.err = ts.UnreadRune(); ts.err != nil {
 				ts.err = errors.Wrapf(ts.err, "%c", r)
 				ok = false
 			}
 
-			ts.n -= int64(utf8.RuneLen(r))
 			ts.tokenType = TokenTypeIdentifier
 
 			return
@@ -275,10 +265,8 @@ func (ts *TokenScanner) consumeSpaces() (ok bool) {
 
 	for {
 		var r rune
-		var n int
 
-		r, n, ts.err = ts.rs.ReadRune()
-		ts.n += int64(n)
+		r, _, ts.err = ts.ReadRune()
 
 		if ts.err != nil {
 			ok = false
@@ -289,12 +277,10 @@ func (ts *TokenScanner) consumeSpaces() (ok bool) {
 			continue
 		}
 
-		if ts.err = ts.rs.UnreadRune(); ts.err != nil {
+		if ts.err = ts.UnreadRune(); ts.err != nil {
 			ok = false
 			ts.err = errors.Wrapf(ts.err, "%c", r)
 		}
-
-		ts.n -= int64(utf8.RuneLen(r))
 
 		return
 	}
@@ -315,10 +301,8 @@ func (ts *TokenScanner) consumeLiteralOrFieldValue(
 
 	for {
 		var r rune
-		var n int
 
-		r, n, ts.err = ts.rs.ReadRune()
-		ts.n += int64(n)
+		r, _, ts.err = ts.ReadRune()
 
 		if ts.err != nil {
 			ok = false
@@ -356,10 +340,8 @@ func (ts *TokenScanner) consumeIdentifierLike(
 
 	for {
 		var r rune
-		var n int
 
-		r, n, ts.err = ts.rs.ReadRune()
-		ts.n += int64(n)
+		r, _, ts.err = ts.ReadRune()
 
 		if ts.err != nil {
 			if ts.err == io.EOF {
@@ -390,12 +372,11 @@ func (ts *TokenScanner) consumeIdentifierLike(
 		default: // wasSplitRune && afterFirst
 			*partLocation = ts.token.Bytes()[idx:ts.token.Len()]
 
-			if ts.err = ts.rs.UnreadRune(); ts.err != nil {
+			if ts.err = ts.UnreadRune(); ts.err != nil {
 				ts.err = errors.Wrapf(ts.err, "%c", r)
 				ok = false
 			}
 
-			ts.n -= int64(utf8.RuneLen(r))
 			ts.tokenType = tt
 
 			return

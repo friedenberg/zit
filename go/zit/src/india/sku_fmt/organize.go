@@ -246,7 +246,7 @@ func (f *Organize) ReadStringFormat(
 
 	o := el.GetSku()
 
-	if err = o.Metadata.Description.ReadFromTokenScanner(&ts); err != nil {
+	if err = o.Metadata.Description.ReadFromRuneScanner(&ts); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

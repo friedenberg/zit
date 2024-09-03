@@ -1,12 +1,12 @@
 package descriptions
 
 import (
-	"bytes"
+	"io"
 	"strings"
+	"unicode/utf8"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 )
 
 // TODO-P1 move to catgut.String
@@ -43,19 +43,39 @@ func (b *Description) TodoSetSlice(v catgut.Slice) (err error) {
 	return b.Set(v.String())
 }
 
-func (b *Description) ReadFromTokenScanner(ts *query_spec.TokenScanner) (err error) {
+func (b *Description) ReadFromRuneScanner(rs io.RuneScanner) (err error) {
 	var sb strings.Builder
 
-	for ts.Scan() {
-		token, tokenType := ts.GetTokenAndType()
+	for {
+		var r rune
 
-		if tokenType == query_spec.TokenTypeOperator &&
-			bytes.Equal(token.Bytes(), []byte{'\n'}) {
-			ts.Unscan()
+		r, _, err = rs.ReadRune()
+		isEOF := err == io.EOF
+
+		if err != nil && !isEOF {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if r == '\n' {
+			err = rs.UnreadRune()
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
 			break
 		}
 
-		sb.Write(ts.GetToken().Bytes())
+		if isEOF {
+			if r != utf8.RuneError {
+				sb.WriteRune(r)
+			}
+
+			break
+		}
+
+		sb.WriteRune(r)
 	}
 
 	if err = b.Set(sb.String()); err != nil {
