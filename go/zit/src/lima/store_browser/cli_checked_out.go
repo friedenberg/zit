@@ -67,10 +67,11 @@ func (f *cliCheckedOut) WriteStringFormat(
 	}
 
 	n2, err = f.stringFormatExternal.writeStringFormatExternal(
-    sw,
-    &co.Internal,
-    &co.External,
-  )
+		sw,
+		&co.Internal,
+		&co.External,
+		true,
+	)
 	n += int64(n1)
 
 	if err != nil {

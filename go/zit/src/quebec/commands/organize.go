@@ -132,11 +132,11 @@ func (c *Organize) RunWithQuery(
 			return
 		}
 
-		var organizeTet *organize_text.Text
+		var organizeText *organize_text.Text
 
 		readOrganizeTextOp := user_ops.ReadOrganizeFile{}
 
-		if organizeTet, err = readOrganizeTextOp.Run(
+		if organizeText, err = readOrganizeTextOp.Run(
 			u,
 			os.Stdin,
 			qg.RepoId,
@@ -160,7 +160,7 @@ func (c *Organize) RunWithQuery(
 		if _, err = commitOrganizeTextOp.RunTraditionalCommit(
 			u,
 			createOrganizeFileResults,
-			organizeTet,
+			organizeText,
 			getResults,
 			qg,
 		); err != nil {

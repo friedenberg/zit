@@ -20,7 +20,7 @@ func (op Checkin) Run(
 	qg *query.Group,
 ) (err error) {
 	if op.Organize {
-		if qg, err = op.runOrganize(u, qg); err != nil {
+		if err = op.runOrganize(u, qg); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -61,8 +61,8 @@ func (op Checkin) Run(
 
 func (op Checkin) runOrganize(
 	u *env.Env,
-	qgOriginal *query.Group,
-) (qgModified *query.Group, err error) {
+	qg *query.Group,
+) (err error) {
 	flagDelete := organize_text.OptionCommentBooleanFlag{
 		Value:   &op.Delete,
 		Comment: "delete once checked in",
@@ -87,12 +87,12 @@ func (op Checkin) runOrganize(
 		DontUseQueryGroupForOrganizeMetadata: true,
 	}
 
-	ui.Log().Print(qgOriginal)
+	ui.Log().Print(qg)
 
 	var organizeResults organize_text.OrganizeResults
 
 	if organizeResults, err = opOrganize.RunWithQueryGroup(
-		qgOriginal,
+		qg,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -100,9 +100,9 @@ func (op Checkin) runOrganize(
 
 	var changes organize_text.Changes
 
-	if qgModified, changes, err = u.QueryGroupFromRemainingOrganizeResults(
+	if changes, err = organize_text.ChangesFromResults(
+		u.GetConfig().PrintOptions,
 		organizeResults,
-		qgOriginal.RepoId,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -126,7 +126,7 @@ func (op Checkin) runOrganize(
 			}
 
 			if err = u.GetStore().DeleteExternalLike(
-				qgOriginal.RepoId,
+				qg.RepoId,
 				el,
 			); err != nil {
 				err = errors.Wrap(err)

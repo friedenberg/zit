@@ -32,6 +32,14 @@ func (smwo *SkuMapWithOrder) AsExternalLikeSet() sku.ExternalLikeMutableSet {
 	return elms
 }
 
+func (smwo *SkuMapWithOrder) AsTransactedSet() sku.TransactedMutableSet {
+	tms := sku.MakeTransactedMutableSet()
+	errors.PanicIfError(smwo.Each(func(el sku.ExternalLike) (err error) {
+		return tms.Add(el.GetSku())
+	}))
+	return tms
+}
+
 func (sm *SkuMapWithOrder) Del(sk sku.ExternalLike) error {
 	delete(sm.m, key(sk))
 	return nil

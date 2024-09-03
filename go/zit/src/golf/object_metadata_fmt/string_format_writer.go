@@ -1,4 +1,4 @@
-package sku_fmt
+package object_metadata_fmt
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -22,23 +22,6 @@ type cliMetadatei struct {
 	typStringFormatWriter       interfaces.StringFormatWriter[*ids.Type]
 	fieldsStringFormatWriter    interfaces.StringFormatWriter[[]string_format_writer.Field]
 	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag]
-}
-
-func MakeCliMetadateiFormatShort(
-	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
-	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
-	fieldsFormatWriter interfaces.StringFormatWriter[[]string_format_writer.Field],
-	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
-) *cliMetadatei {
-	return &cliMetadatei{
-		writeTyp:                    false,
-		writeDescription:            false,
-		writeEtiketten:              false,
-		shaStringFormatWriter:       shaStringFormatWriter,
-		typStringFormatWriter:       typStringFormatWriter,
-		fieldsStringFormatWriter:    fieldsFormatWriter,
-		etikettenStringFormatWriter: etikettenStringFormatWriter,
-	}
 }
 
 func MakeCliMetadateiFormat(

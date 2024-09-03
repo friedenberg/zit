@@ -57,6 +57,10 @@ func (c *Store) initializeCache() (err error) {
 func (c *Store) resetCacheIfNecessary(
 	resp *http.Response,
 ) (err error) {
+	if resp == nil {
+		return
+	}
+
 	timeRaw := resp.Header.Get("X-Chrest-Startup-Time")
 
 	var newLaunchTime ids.Tai

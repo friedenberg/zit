@@ -1,6 +1,7 @@
 package store_browser
 
 import (
+	"bytes"
 	"fmt"
 	"net/url"
 
@@ -13,6 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
@@ -46,7 +48,7 @@ func (f *Organize) WriteStringFormat(
 			return
 		}
 
-		n2, err = f.writeStringFormatExternal(sw, nil, e)
+		n2, err = f.writeStringFormatExternal(sw, nil, e, false)
 		n += int64(n2)
 
 		if err != nil {
@@ -177,7 +179,6 @@ LOOP:
 			if t.EqualsString("]") {
 				break LOOP
 			} else {
-				// TODO add field parsing
 				switch tokenType {
 				case query_spec.TokenTypeField, query_spec.TokenTypeLiteral:
 					e, hasNative := el.(*External)
@@ -207,15 +208,27 @@ LOOP:
 						e.Item.Title = right
 						continue LOOP
 
+					case "":
+						if err = e.Metadata.Description.Set(right); err != nil {
+							err = errors.Wrap(err)
+							return
+						}
+
+						continue LOOP
+
 					default:
 						err = errors.Errorf("unsupported field type: %q", tokenParts.Left)
 						return
 					}
 				}
 
-				if err = k.TodoSetBytes(t); err != nil {
-					err = errors.Wrap(err)
-					return
+				if bytes.HasPrefix(t.Bytes(), []byte("@")) {
+					continue LOOP
+				} else {
+					if err = k.TodoSetBytes(t); err != nil {
+						err = errors.Wrap(err)
+						return
+					}
 				}
 
 				g := k.GetGenre()
@@ -261,6 +274,7 @@ func (f *Organize) writeStringFormatExternal(
 	sw interfaces.WriterAndStringWriter,
 	i *sku.Transacted,
 	e *External,
+	includeDescriptionInBox bool,
 ) (n int64, err error) {
 	fields := []string_format_writer.Field{}
 
@@ -288,16 +302,18 @@ func (f *Organize) writeStringFormatExternal(
 	)
 
 	if e.State != external_state.Untracked {
-		// TODO extract and add to fields
-		n2, err = f.Metadata.WriteStringFormat(
-			sw,
-			&e.Metadata,
+		m := &e.Metadata
+		fields = append(
+			fields,
+			object_metadata_fmt.MetadataFieldSha(m),
+			object_metadata_fmt.MetadataFieldType(m),
 		)
-		n += n2
 
-		if err != nil {
-			err = errors.Wrap(err)
-			return
+		if includeDescriptionInBox {
+			fields = append(
+				fields,
+				object_metadata_fmt.MetadataFieldDescription(m),
+			)
 		}
 	}
 

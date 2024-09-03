@@ -187,10 +187,23 @@ func (op Checkout) runOrganize(
 		return
 	}
 
-	if qgModified, _, err = op.QueryGroupFromRemainingOrganizeResults(
+	var changeResults organize_text.Changes
+
+	if changeResults, err = organize_text.ChangesFromResults(
+		op.GetConfig().PrintOptions,
 		organizeResults,
-		qgOriginal.RepoId,
 	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	b := op.MakeQueryBuilder(
+		ids.MakeGenre(genres.TrueGenre()...),
+	).WithTransacted(
+		changeResults.After.AsTransactedSet(),
+	).WithDoNotMatchEmpty()
+
+	if qgModified, err = b.BuildQueryGroup(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
