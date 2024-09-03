@@ -4,10 +4,10 @@
 " endif
 
 if $BIN_ZIT == ""
-  let BIN_ZIT = "zit"
+  let $BIN_ZIT = "zit"
 endif
 
-let zettel = expand("%:r")
+let zettel = expand("%")
 
 let g:markdown_syntax_conceal = 0
 
@@ -23,24 +23,18 @@ if zettel != ""
     let zettelTypSyntax = "markdown"
   endif
 
-  let zitSyntaxFile = "$HOME/.local/share/zit/vim/syntax/".zettelTypSyntax.".vim"
-  execute "syntax include @akte" zitSyntaxFile
-  " if filereadable(syntaxFile)
-  "   exec "source " . syntaxFile
-  "   " TODO-P3
-  "   " exec "source " . ftpluginFile
-  " else
-  "   let syntaxFile = $VIMRUNTIME . "/syntax/markdown.vim"
-  "   let ftpluginFile = $VIMRUNTIME . "/ftplugin/markdown.vim"
+  let zit_syntax_path = $HOME."/.local/share/zit/vim/syntax/".zettelTypSyntax.".vim"
+  let vim_syntax_path = $VIMRUNTIME."/syntax/" . zettelTypSyntax . ".vim"
 
-  "   exec "source " . syntaxFile
-  "   " TODO-P3
-  "   " exec "source " . ftpluginFile
-  " endif
+  if filereadable(zit_syntax_path)
+    execute "syntax include @akte" zit_syntax_path
+  elseif filereadable(vim_syntax_path)
+    execute "syntax include @akte" vim_syntax_path
+  else
+    echom "could not find syntax file for ".zettelTypSyntax
+  endif
 endif
 
-" syn case match
-"
 syn region zitAkte start=// end=// contains=@akte
 
 let m = expand("<sfile>:h") . "/zit-metadatei.vim"
