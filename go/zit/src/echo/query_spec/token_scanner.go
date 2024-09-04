@@ -16,7 +16,7 @@ type TokenScanner struct {
 	token             catgut.String
 	parts             TokenParts
 	err               error
-	unscan            bool
+	unscan            []rune
 	n                 int64
 	lastRune          rune
 }
@@ -28,28 +28,36 @@ func (ts *TokenScanner) Reset(r io.RuneScanner) {
 	ts.tokenTypeProbably = TokenTypeIncomplete
 	ts.parts.Reset()
 	ts.err = nil
-	ts.unscan = false
+	ts.unscan = nil
 	ts.n = 0
 }
 
 func (ts *TokenScanner) ReadRune() (r rune, n int, err error) {
+	if len(ts.unscan) > 0 {
+		r = ts.unscan[0]
+		n = utf8.RuneLen(r)
+		ts.unscan = ts.unscan[1:]
+		return
+	}
+
 	ts.lastRune, n, err = ts.RuneScanner.ReadRune()
 	ts.n += int64(n)
 	return ts.lastRune, n, err
 }
 
+// TODO add support for unscan
 func (ts *TokenScanner) UnreadRune() (err error) {
 	err = ts.RuneScanner.UnreadRune()
 
-  if err == nil {
-    ts.n -= int64(utf8.RuneLen(ts.lastRune))
-  }
+	if err == nil {
+		ts.n -= int64(utf8.RuneLen(ts.lastRune))
+	}
 
-  return
+	return
 }
 
 func (ts *TokenScanner) Unscan() {
-	ts.unscan = true
+	ts.unscan = []rune(string(ts.token.Bytes()))
 }
 
 func (ts *TokenScanner) ScanOnly(tokenType TokenType) (ok bool) {
@@ -61,7 +69,7 @@ func (ts *TokenScanner) ScanOnly(tokenType TokenType) (ok bool) {
 
 	if ts.tokenType != tokenType {
 		ok = false
-		ts.unscan = true
+		ts.unscan = []rune(string(ts.token.Bytes()))
 		return
 	}
 
@@ -69,7 +77,7 @@ func (ts *TokenScanner) ScanOnly(tokenType TokenType) (ok bool) {
 }
 
 func (ts *TokenScanner) CanScan() (ok bool) {
-	if ts.unscan {
+	if len(ts.unscan) > 0 {
 		return true
 	}
 
@@ -77,9 +85,9 @@ func (ts *TokenScanner) CanScan() (ok bool) {
 }
 
 func (ts *TokenScanner) ScanIdentifierLikeSkipSpaces() (ok bool) {
-	if ts.unscan {
+	if len(ts.unscan) > 0 {
 		ok = true
-		ts.unscan = false
+		ts.unscan = nil
 		return
 	}
 
@@ -169,9 +177,9 @@ func (ts *TokenScanner) ScanIdentifierLikeSkipSpaces() (ok bool) {
 }
 
 func (ts *TokenScanner) Scan() (ok bool) {
-	if ts.unscan {
+	if len(ts.unscan) > 0 {
 		ok = true
-		ts.unscan = false
+		ts.unscan = nil
 		return
 	}
 

@@ -8,21 +8,22 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func key(sk sku.ExternalLike) string {
-	eoid := sk.GetExternalObjectId().String()
+func key(el sku.ExternalLike) string {
+	eoid := el.GetExternalObjectId().String()
 	if len(eoid) > 1 {
 		return eoid
 	}
 
-	if !sk.GetSku().ObjectId.IsEmpty() {
-		return sk.GetSku().ObjectId.String()
+	if !el.GetSku().ObjectId.IsEmpty() {
+		return el.GetSku().ObjectId.String()
 	}
 
-	if sk.GetSku().Metadata.Description.String() != "" {
-		return sk.GetSku().Metadata.Description.String()
+	desc := el.GetSku().Metadata.Description.String()
+	if desc != "" {
+		return desc
 	}
 
-	panic("empty key")
+	panic(fmt.Sprintf("empty key for external like: %#v", el))
 }
 
 func (ot *Text) GetSkus(

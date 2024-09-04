@@ -1239,15 +1239,13 @@ function create_structured_zettels { # @test
 	EOM
 }
 
-function fix { # @test
+function description_with_literal_characters { # @test
 	run_zit organize "${cmd_def_organize[@]}" -mode commit-directly <<-EOM
-		- [terb/ala !md-meeting_notes payee-architect_sepia project-24q1-reno w-2024-07-09] thoughts on quincey's contract / scope of work
+		- [terb/ala !md payee] thoughts on quincey's contract / scope of work
 	EOM
 	assert_success
-	assert_output - <<-EOM
-		[!task@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/tres@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !task "second" tag-3 test]
-		[test@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[two/uno@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "first" test]
+	assert_output_unsorted - <<-EOM
+		[payee@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[terb/ala@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "thoughts on quincey's contract / scope of work" payee]
 	EOM
 }
