@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"syscall"
 
-	"code.linenisgreat.com/chrest/go/chrest/src/charlie/browser_items"
+	"code.linenisgreat.com/chrest/go/src/charlie/browser_items"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"

@@ -6,7 +6,7 @@ import (
 	"io"
 	"strings"
 
-	"code.linenisgreat.com/chrest/go/chrest/src/bravo/client"
+	"code.linenisgreat.com/chrest/go/src/bravo/client"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"

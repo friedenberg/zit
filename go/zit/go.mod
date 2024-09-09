@@ -2,13 +2,12 @@ module code.linenisgreat.com/zit/go/zit
 
 go 1.23
 
-// replace code.linenisgreat.com/chrest/go/chrest => /Users/sasha/eng/chrest/go/chrest
-
 require (
-	code.linenisgreat.com/chrest/go/chrest v0.0.0-20240824132247-74aa7f1dc1b2
+	code.linenisgreat.com/chrest/go v0.0.0-20240909122209-fd9c19fb1fd9
 	filippo.io/age v1.1.1
 	github.com/DataDog/zstd v1.5.5
 	github.com/brandondube/tai v0.1.0
+	github.com/google/go-cmp v0.6.0
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/pelletier/go-toml/v2 v2.1.1
 	github.com/yuin/gopher-lua v1.1.1
@@ -19,8 +18,6 @@ require (
 )
 
 require (
-	code.linenisgreat.com/chrest v0.0.0-20240824123826-4875e6924907 // indirect
-	github.com/google/go-cmp v0.6.0 // indirect
 	golang.org/x/crypto v0.21.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect
 )
