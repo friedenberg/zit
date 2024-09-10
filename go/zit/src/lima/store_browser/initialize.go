@@ -111,6 +111,8 @@ func (s *Store) flushUrls() (err error) {
 			}
 		}
 
+		ui.Debug().Print(req, resp)
+
 		if err = s.resetCacheIfNecessary(resp.Response); err != nil {
 			err = errors.Wrap(err)
 			return

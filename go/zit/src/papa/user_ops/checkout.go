@@ -201,7 +201,7 @@ func (op Checkout) runOrganize(
 		ids.MakeGenre(genres.TrueGenre()...),
 	).WithTransacted(
 		changeResults.After.AsTransactedSet(),
-	).WithDoNotMatchEmpty()
+	).WithDoNotMatchEmpty().WithRequireNonEmptyQuery()
 
 	if qgModified, err = b.BuildQueryGroup(); err != nil {
 		err = errors.Wrap(err)
