@@ -94,7 +94,7 @@ func (u OrganizeAndCommit) RunWithExternalLike(
 		Options: organizeFlags.GetOptions(
 			u.GetConfig().PrintOptions,
 			qg,
-			u.SkuFmtOrganize(qg.RepoId),
+			u.SkuFormatBox(qg.RepoId),
 			u.GetStore().GetAbbrStore().GetAbbr(),
 			u.GetExternalLikePoolForRepoId(qg.RepoId),
 		),

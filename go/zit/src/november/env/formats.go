@@ -2,7 +2,6 @@ package env
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -36,9 +35,7 @@ func (u *Env) StringFormatWriterShaLike(
 	return id_fmts.MakeShaCliFormat(
 		u.config.PrintOptions,
 		co,
-		func(s *sha.Sha) (string, error) {
-			return u.store.GetAbbrStore().Shas().Abbreviate(s)
-		},
+		u.store.GetAbbrStore().GetAbbr(),
 	)
 }
 
@@ -101,11 +98,11 @@ func (u *Env) StringFormatWriterMetadatei(
 	)
 }
 
-func (u *Env) StringFormatWriterSku(
+func (u *Env) StringFormatWriterSkuBox(
 	co string_format_writer.ColorOptions,
 	truncation string_format_writer.CliFormatTruncation,
-) *sku_fmt.Organize {
-	return sku_fmt.MakeFormatOrganize(
+) *sku_fmt.Box {
+	return sku_fmt.MakeBox(
 		co,
 		u.config.PrintOptions,
 		u.StringFormatWriterShaLike(co),
@@ -117,14 +114,15 @@ func (u *Env) StringFormatWriterSku(
 			co,
 			truncation,
 		),
+		u.GetStore().GetAbbrStore().GetAbbr(),
 	)
 }
 
-func (u *Env) SkuFmtOrganize(repoId ids.RepoId) sku_fmt.ExternalLike {
+func (u *Env) SkuFormatBox(repoId ids.RepoId) sku_fmt.ExternalLike {
 	co := u.FormatColorOptionsOut()
 	co.OffEntirely = true
 
-	f := u.StringFormatWriterSku(
+	f := u.StringFormatWriterSkuBox(
 		co,
 		string_format_writer.CliFormatTruncationNone,
 	)
@@ -176,7 +174,7 @@ func (u *Env) StringFormatWriterStoreBrowserCheckedOut() interfaces.StringFormat
 	return store_browser.MakeCliCheckedOutFormat(
 		u.config.PrintOptions,
 		store_browser.MakeFormatOrganize(
-			u.StringFormatWriterSku(
+			u.StringFormatWriterSkuBox(
 				u.FormatColorOptionsOut(),
 				string_format_writer.CliFormatTruncation66CharEllipsis,
 			),

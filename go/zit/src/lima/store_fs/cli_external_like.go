@@ -23,7 +23,7 @@ type CliExternal struct {
 	fdStringFormatWriter       interfaces.StringFormatWriter[*fd.FD]
 	metadataStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata]
 
-	transactedWriter *sku_fmt.Organize
+	transactedWriter *sku_fmt.Box
 }
 
 func MakeCliExternalFormat(

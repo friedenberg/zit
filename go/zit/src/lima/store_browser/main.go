@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
@@ -239,8 +240,9 @@ func (c *Store) QueryCheckedOut(
 }
 
 func (c *Store) GetExternalStoreOrganizeFormat(
-	f *sku_fmt.Organize,
+	f *sku_fmt.Box,
 ) sku_fmt.ExternalLike {
+	ui.Debug().Print(f.Abbr.Sha)
 	fo := MakeFormatOrganize(f)
 
 	return sku_fmt.ExternalLike{

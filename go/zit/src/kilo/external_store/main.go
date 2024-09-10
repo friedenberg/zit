@@ -51,7 +51,7 @@ type (
 
 	OrganizeFormatGetter interface {
 		GetExternalStoreOrganizeFormat(
-			*sku_fmt.Organize,
+			*sku_fmt.Box,
 		) sku_fmt.ExternalLike
 	}
 

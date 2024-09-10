@@ -101,7 +101,7 @@ func (op Organize) RunWithExternalLike(
 		Options: organizeFlags.GetOptions(
 			op.GetConfig().PrintOptions,
 			organizeResults.QueryGroup,
-			op.SkuFmtOrganize(qg.RepoId),
+			op.SkuFormatBox(qg.RepoId),
 			op.GetStore().GetAbbrStore().GetAbbr(),
 			op.GetExternalLikePoolForRepoId(qg.RepoId),
 		),

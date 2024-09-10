@@ -66,7 +66,7 @@ func (c *FormatOrganize) Run(u *env.Env, args ...string) (err error) {
 
 	ot.Options = c.Flags.GetOptionsWithMetadata(
 		u.GetConfig().PrintOptions,
-		u.SkuFmtOrganize(repoId),
+		u.SkuFormatBox(repoId),
 		u.GetStore().GetAbbrStore().GetAbbr(),
 		u.GetExternalLikePoolForRepoId(repoId),
 		ot.Metadata,

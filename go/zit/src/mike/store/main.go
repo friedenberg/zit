@@ -77,6 +77,7 @@ func (c *Store) Initialize(
 	c.inventoryList = inventory_list.MakeInventoryList()
 
 	if c.Abbr, err = newIndexAbbr(
+		k.PrintOptions,
 		c.fs_home,
 		st.DirVerzeichnisse("Abbr"),
 	); err != nil {

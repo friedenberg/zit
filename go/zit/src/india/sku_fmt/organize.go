@@ -23,8 +23,7 @@ type ObjectIdAlignedFormat interface {
 	SetMaxKopfUndSchwanz(kop, schwanz int)
 }
 
-// TODO rename from organize
-func MakeFormatOrganize(
+func MakeBox(
 	co string_format_writer.ColorOptions,
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
@@ -33,13 +32,14 @@ func MakeFormatOrganize(
 	tagsStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
 	fieldsFormatWriter interfaces.StringFormatWriter[[]string_format_writer.Field],
 	metadata interfaces.StringFormatWriter[*object_metadata.Metadata],
-) *Organize {
+	abbr ids.Abbr,
+) *Box {
 	options.PrintTime = false
 	options.PrintShas = false
 
 	co.OffEntirely = true
 
-	return &Organize{
+	return &Box{
 		ColorOptions: co,
 		Options:      options,
 		ShaString:    shaStringFormatWriter,
@@ -49,10 +49,11 @@ func MakeFormatOrganize(
 		Fields:       fieldsFormatWriter,
 		Metadata:     metadata,
 		RightAligned: string_format_writer.MakeRightAligned(),
+		Abbr:         abbr,
 	}
 }
 
-type Organize struct {
+type Box struct {
 	string_format_writer.ColorOptions
 	Options erworben_cli_print_options.PrintOptions
 
@@ -67,15 +68,17 @@ type Organize struct {
 	TagString interfaces.StringFormatWriter[*ids.Tag]
 	Fields    interfaces.StringFormatWriter[[]string_format_writer.Field]
 	Metadata  interfaces.StringFormatWriter[*object_metadata.Metadata]
+
+	ids.Abbr
 }
 
-func (f *Organize) SetMaxKopfUndSchwanz(k, s int) {
+func (f *Box) SetMaxKopfUndSchwanz(k, s int) {
 	f.MaxHead, f.MaxTail = k, s
 	f.Padding = strings.Repeat(" ", 5+k+s)
 	f.ObjectId.SetMaxKopfUndSchwanz(k, s)
 }
 
-func (f *Organize) WriteStringFormat(
+func (f *Box) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
 	el sku.ExternalLike,
 ) (n int64, err error) {
@@ -230,7 +233,7 @@ func (f *Organize) WriteStringFormat(
 	return
 }
 
-func (f *Organize) ReadStringFormat(
+func (f *Box) ReadStringFormat(
 	rb *catgut.RingBuffer,
 	el sku.ExternalLike,
 ) (n int64, err error) {
@@ -256,7 +259,7 @@ func (f *Organize) ReadStringFormat(
 	return
 }
 
-func (f *Organize) readStringFormatWithinBrackets(
+func (f *Box) readStringFormatWithinBrackets(
 	ts *query_spec.TokenScanner,
 	el sku.ExternalLike,
 ) (err error) {

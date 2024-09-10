@@ -244,25 +244,25 @@ func TestAbbreviate(t1 *testing.T) {
 	sut := Make(
 		"12",
 		"121",
+		"123456",
 		"127",
 		"128",
-		"123456",
 		"654321",
-		"mewtwo",
 		"mew",
+		"mewtwo",
 	)
 
 	expectedContains := map[string]string{
-		"mewtwo":   "mewt",
-		"mew":      "mew",
-		"121":      "121",
 		"12":       "12",
+		"121":      "121",
 		"123":      "123",
 		"123456":   "123",
 		"1234567":  "1234",
 		"12345678": "1234",
 		"124":      "124",
 		"2":        "2",
+		"mew":      "mew",
+		"mewtwo":   "mewt",
 	}
 
 	for e, c := range expectedContains {

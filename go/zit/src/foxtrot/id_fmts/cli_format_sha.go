@@ -7,24 +7,21 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type shaCliFormat struct {
-	abbr               func(*sha.Sha) (string, error)
+	ids.Abbr
 	stringFormatWriter interfaces.StringFormatWriter[string]
 }
 
 func MakeShaCliFormat(
 	options erworben_cli_print_options.PrintOptions,
 	co string_format_writer.ColorOptions,
-	abbr func(*sha.Sha) (string, error),
+	abbr ids.Abbr,
 ) *shaCliFormat {
-	if !options.Abbreviations.Shas {
-		abbr = nil
-	}
-
 	return &shaCliFormat{
-		abbr: abbr,
+		Abbr: abbr,
 		stringFormatWriter: string_format_writer.MakeColor[string](
 			co,
 			string_format_writer.MakeString[string](),
@@ -39,12 +36,12 @@ func (f *shaCliFormat) WriteStringFormat(
 ) (n int64, err error) {
 	v := s.String()
 
-	if f.abbr != nil {
+	if f.Abbr.Sha.Abbreviate != nil {
 		var v1 string
 
 		sh := sha.Make(s)
 
-		if v1, err = f.abbr(sh); err != nil {
+		if v1, err = f.Abbr.Sha.Abbreviate(sh); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

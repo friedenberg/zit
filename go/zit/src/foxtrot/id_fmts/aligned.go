@@ -3,20 +3,20 @@ package id_fmts
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
+	cli_print_options "code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 func MakeAligned(
-	options erworben_cli_print_options.PrintOptions,
+	options cli_print_options.PrintOptions,
 	ab ids.Abbr,
 ) *aligned {
 	return &aligned{PrintOptions: options, Abbr: ab}
 }
 
 type aligned struct {
-	erworben_cli_print_options.PrintOptions
+	cli_print_options.PrintOptions
 	ids.Abbr
 	maxHead, maxTail int
 }

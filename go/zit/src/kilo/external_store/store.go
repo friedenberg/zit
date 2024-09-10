@@ -234,7 +234,7 @@ func (es *Store) Open(
 }
 
 func (s *Store) GetExternalStoreOrganizeFormat(
-	f *sku_fmt.Organize,
+	f *sku_fmt.Box,
 ) sku_fmt.ExternalLike {
 	esof, ok := s.StoreLike.(OrganizeFormatGetter)
 

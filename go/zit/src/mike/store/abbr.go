@@ -8,7 +8,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/tridex"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -20,7 +20,6 @@ import (
 // TODO-P4 make generic to just ObjectIds
 type AbbrStore interface {
 	ZettelId() AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId]
-	Kisten() AbbrStoreGeneric[ids.RepoId, *ids.RepoId]
 	Shas() AbbrStoreGeneric[sha.Sha, *sha.Sha]
 	Etiketten() AbbrStoreGeneric[ids.Tag, *ids.Tag]
 	Typen() AbbrStoreGeneric[ids.Type, *ids.Type]
@@ -36,10 +35,11 @@ type indexAbbrEncodableTridexes struct {
 	ZettelId indexZettelId
 	Tags     indexNotZettelId[ids.Tag, *ids.Tag]
 	Types    indexNotZettelId[ids.Type, *ids.Type]
-	RepoIds  indexNotZettelId[ids.RepoId, *ids.RepoId]
 }
 
 type indexAbbr struct {
+	erworben_cli_print_options.PrintOptions
+
 	lock    sync.Locker
 	once    *sync.Once
 	fs_home fs_home.Home
@@ -53,14 +53,16 @@ type indexAbbr struct {
 }
 
 func newIndexAbbr(
+	options erworben_cli_print_options.PrintOptions,
 	fs_home fs_home.Home,
 	p string,
 ) (i *indexAbbr, err error) {
 	i = &indexAbbr{
-		lock:    &sync.Mutex{},
-		once:    &sync.Once{},
-		path:    p,
-		fs_home: fs_home,
+		PrintOptions: options,
+		lock:         &sync.Mutex{},
+		once:         &sync.Once{},
+		path:         p,
+		fs_home:      fs_home,
 		indexAbbrEncodableTridexes: indexAbbrEncodableTridexes{
 			Shas: indexNotZettelId[sha.Sha, *sha.Sha]{
 				ObjectIds: tridex.Make(),
@@ -75,14 +77,10 @@ func newIndexAbbr(
 			Types: indexNotZettelId[ids.Type, *ids.Type]{
 				ObjectIds: tridex.Make(),
 			},
-			RepoIds: indexNotZettelId[ids.RepoId, *ids.RepoId]{
-				ObjectIds: tridex.Make(),
-			},
 		},
 	}
 
 	i.indexAbbrEncodableTridexes.ZettelId.readFunc = i.readIfNecessary
-	i.indexAbbrEncodableTridexes.RepoIds.readFunc = i.readIfNecessary
 	i.indexAbbrEncodableTridexes.Shas.readFunc = i.readIfNecessary
 	i.indexAbbrEncodableTridexes.Tags.readFunc = i.readIfNecessary
 	i.indexAbbrEncodableTridexes.Types.readFunc = i.readIfNecessary
@@ -168,8 +166,13 @@ func (i *indexAbbr) GetAbbr() (out ids.Abbr) {
 	out.ZettelId.Expand = i.ZettelId().ExpandStringString
 	out.Sha.Expand = i.Shas().ExpandStringString
 
-	out.ZettelId.Abbreviate = i.ZettelId().Abbreviate
-	out.Sha.Abbreviate = i.Shas().Abbreviate
+	if i.Abbreviations.Hinweisen {
+		out.ZettelId.Abbreviate = i.ZettelId().Abbreviate
+	}
+
+	if i.Abbreviations.Shas {
+		out.Sha.Abbreviate = i.Shas().Abbreviate
+	}
 
 	return
 }
@@ -204,41 +207,12 @@ func (i *indexAbbr) AddMatchable(o *sku.Transacted) (err error) {
 	case genres.Tag:
 		i.indexAbbrEncodableTridexes.Tags.ObjectIds.Add(ks)
 
-	case genres.Repo:
-		i.indexAbbrEncodableTridexes.RepoIds.ObjectIds.Add(ks)
-
-		// default:
-		// 	err = errors.Errorf("unsupported objekte: %T", to)
-		// 	return
-	}
-
-	return
-}
-
-// TODO switch to using ennui for existence
-func (i *indexAbbr) Exists(k *ids.ObjectId) (err error) {
-	i.lock.Lock()
-	defer i.lock.Unlock()
-
-	switch k.GetGenre() {
-	case genres.Zettel:
-		err = i.ZettelId().Exists(k.Parts())
-
-	case genres.Type:
-		err = i.Typen().Exists(k.Parts())
-
-	case genres.Tag:
-		err = i.Etiketten().Exists(k.Parts())
-
-	case genres.Repo:
-		err = i.Kisten().Exists(k.Parts())
-
 	case genres.Config:
-		// konfig always exists
 		return
 
 	default:
-		err = collections.MakeErrNotFound(k)
+		err = errors.Errorf("unsupported object id: %#v", ks)
+		return
 	}
 
 	return
@@ -246,12 +220,6 @@ func (i *indexAbbr) Exists(k *ids.ObjectId) (err error) {
 
 func (i *indexAbbr) ZettelId() (asg AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId]) {
 	asg = &i.indexAbbrEncodableTridexes.ZettelId
-
-	return
-}
-
-func (i *indexAbbr) Kisten() (asg AbbrStoreGeneric[ids.RepoId, *ids.RepoId]) {
-	asg = &i.indexAbbrEncodableTridexes.RepoIds
 
 	return
 }

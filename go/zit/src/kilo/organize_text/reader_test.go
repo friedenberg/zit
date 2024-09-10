@@ -87,7 +87,7 @@ func makeAssignmentLineReader() reader {
 				},
 			},
 		},
-		stringFormatReader: sku_fmt.MakeFormatOrganize(
+		stringFormatReader: sku_fmt.MakeBox(
 			string_format_writer.ColorOptions{},
 			erworben_cli_print_options.PrintOptions{},
 			nil,
@@ -96,6 +96,7 @@ func makeAssignmentLineReader() reader {
 			nil,
 			nil,
 			nil,
+			ids.Abbr{},
 		),
 	}
 }

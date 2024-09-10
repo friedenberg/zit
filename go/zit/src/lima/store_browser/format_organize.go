@@ -20,15 +20,15 @@ import (
 )
 
 func MakeFormatOrganize(
-	f *sku_fmt.Organize,
+	f *sku_fmt.Box,
 ) *Organize {
 	return &Organize{
-		Organize: f,
+		Box: f,
 	}
 }
 
 type Organize struct {
-	*sku_fmt.Organize
+	*sku_fmt.Box
 }
 
 func (f *Organize) WriteStringFormat(
@@ -91,7 +91,7 @@ func (f *Organize) WriteStringFormat(
 			}
 		}
 	} else {
-		n2, err = f.Organize.WriteStringFormat(sw, o)
+		n2, err = f.Box.WriteStringFormat(sw, o)
 
 		n += n2
 
@@ -308,7 +308,7 @@ func (f *Organize) writeStringFormatExternal(
 
 		if shaString, err = object_metadata_fmt.MetadataShaString(
 			m,
-			nil,
+			f.Abbr.Sha.Abbreviate,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

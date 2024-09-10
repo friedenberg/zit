@@ -276,7 +276,7 @@ func (c *Store) Len() int {
 }
 
 func (c *Store) GetExternalStoreOrganizeFormat(
-	f *sku_fmt.Organize,
+	f *sku_fmt.Box,
 ) sku_fmt.ExternalLike {
 	formatExternal := *c.formatExternal
 	formatExternal.transactedWriter = f

@@ -5,12 +5,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 )
 
 func MetadataShaString(
 	m *object_metadata.Metadata,
-	abbr func(*sha.Sha) (string, error),
+	abbr ids.FuncAbbreviateString,
 ) (v string, err error) {
 	s := m.Sha()
 	v = s.String()
