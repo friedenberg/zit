@@ -21,7 +21,7 @@ type executor struct {
 
 func (c *executor) tryToEmitOneExplicitlyCheckedOut(
 	internal *sku.Transacted,
-	item browserItem,
+	item Item,
 ) (err error) {
 	sku.TransactedResetter.Reset(&c.co.External.Browser)
 	c.co.External.ObjectId.Reset()
@@ -61,7 +61,7 @@ func (c *executor) tryToEmitOneExplicitlyCheckedOut(
 
 func (c *executor) tryToEmitOneRecognized(
 	internal *sku.Transacted,
-	item browserItem,
+	item Item,
 ) (err error) {
 	c.co.State = checked_out_state.Recognized
 
@@ -91,7 +91,7 @@ func (c *executor) tryToEmitOneRecognized(
 }
 
 func (c *executor) tryToEmitOneUntracked(
-	item browserItem,
+	item Item,
 ) (err error) {
 	c.co.State = checked_out_state.Untracked
 
@@ -119,7 +119,7 @@ func (c *executor) tryToEmitOneUntracked(
 }
 
 func (c *executor) tryToEmitOneCommon(
-	i browserItem,
+	i Item,
 	overwrite bool,
 ) (err error) {
 	browser := &c.co.External.Browser
@@ -147,12 +147,12 @@ func (c *executor) tryToEmitOneCommon(
 		return
 	}
 
-	if err = c.co.Internal.ObjectId.SetRepoId(
-		c.store.externalStoreInfo.RepoId.String(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	// if err = c.co.Internal.ObjectId.SetRepoId(
+	// 	c.store.externalStoreInfo.RepoId.String(),
+	// ); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
 
 	if err = c.out(&c.co); err != nil {
 		err = errors.Wrap(err)

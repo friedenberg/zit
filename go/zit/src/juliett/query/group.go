@@ -400,6 +400,7 @@ func (qg *Group) ContainsExternalSku(
 	state checked_out_state.State,
 ) (ok bool) {
 	sk := el.GetSku()
+
 	defer sk.Metadata.Cache.QueryPath.PushOnReturn(qg, &ok)
 
 	if !qg.ContainsSkuCheckedOutState(state) {

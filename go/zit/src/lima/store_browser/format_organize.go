@@ -303,9 +303,20 @@ func (f *Organize) writeStringFormatExternal(
 
 	if e.State != external_state.Untracked {
 		m := &e.Metadata
+
+		var shaString string
+
+		if shaString, err = object_metadata_fmt.MetadataShaString(
+			m,
+			nil,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		fields = append(
 			fields,
-			object_metadata_fmt.MetadataFieldSha(m),
+			object_metadata_fmt.MetadataFieldShaString(shaString),
 			object_metadata_fmt.MetadataFieldType(m),
 		)
 

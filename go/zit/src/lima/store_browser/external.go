@@ -22,7 +22,7 @@ type External struct {
 	external_state.State
 	sku.Transacted
 	Browser sku.Transacted
-	Item    browserItem
+	Item    Item
 }
 
 func (e *External) Validate(k string) {
@@ -81,7 +81,7 @@ func (e *External) SaveBlob(s fs_home.Home) (err error) {
 	return
 }
 
-func (e *External) SetItem(i browserItem, overwrite bool) (err error) {
+func (e *External) SetItem(i Item, overwrite bool) (err error) {
 	e.Item = i
 
 	if err = i.WriteToMetadata(&e.Browser.Metadata); err != nil {

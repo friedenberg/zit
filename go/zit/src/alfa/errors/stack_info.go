@@ -186,7 +186,7 @@ func (se *stackWrapError) writeError(sb *strings.Builder) {
 	}
 
 	if se.next == nil && se.error == nil {
-		sb.WriteString("both nil!!!!")
+    sb.WriteString("zit/alfa/errors/stackWrapError: both next and error are nil!!!!")
 	}
 }
 

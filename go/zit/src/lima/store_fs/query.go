@@ -43,11 +43,10 @@ func (s *Store) ApplyCheckedOut(
 		return
 	}
 
-	if co.External.FDs.State != external_state.Recognized &&
-		!qg.ContainsExternalSku(
-			&co.External.Transacted,
-			co.State,
-		) {
+	if !qg.ContainsExternalSku(
+		&co.External.Transacted,
+		co.State,
+	) {
 		return
 	}
 

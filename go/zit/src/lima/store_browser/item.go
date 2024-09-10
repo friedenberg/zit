@@ -16,37 +16,43 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type browserItem struct {
+type Item struct {
 	browser_items.Item
 }
 
-func (i *browserItem) GetExternalObjectId() sku.ExternalObjectId {
+func (i *Item) GetExternalObjectId() sku.ExternalObjectId {
 	return &ids.DumbObjectId{
 		Value: i.String(),
 		Genre: genres.Zettel,
 	}
 }
 
-func (i *browserItem) GetGenre() interfaces.Genre {
+func (i *Item) GetGenre() interfaces.Genre {
 	return genres.Zettel
 }
 
-func (i *browserItem) String() string {
+func (i *Item) String() string {
 	return i.GetKey()
 }
 
-func (i *browserItem) GetKey() string {
-	return fmt.Sprintf("%s-%s", i.Id.Type, i.Id.Id)
+func (i *Item) GetKey() string {
+	return fmt.Sprintf(
+		"/%s-%s/%s-%s",
+		i.Id.BrowserId.Browser,
+		i.Id.BrowserId.Id,
+		i.Id.Type,
+		i.Id.Id,
+	)
 }
 
-func (i *browserItem) GetObjectId() *ids.ObjectId {
+func (i *Item) GetObjectId() *ids.ObjectId {
 	var oid ids.ObjectId
 	errors.PanicIfError(oid.SetLeft(i.GetKey()))
 	// errors.PanicIfError(oid.SetRepoId("browser"))
 	return &oid
 }
 
-func (i *browserItem) SetId(v string) (err error) {
+func (i *Item) SetId(v string) (err error) {
 	// /browser/bookmark-aBljQkGWNl2
 	v = strings.TrimPrefix(v, "/browser/")
 
@@ -63,7 +69,7 @@ func (i *browserItem) SetId(v string) (err error) {
 	return
 }
 
-func (i *browserItem) GetType() (t ids.Type, err error) {
+func (i *Item) GetType() (t ids.Type, err error) {
 	if err = t.Set("browser-" + i.Id.Type); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -72,7 +78,7 @@ func (i *browserItem) GetType() (t ids.Type, err error) {
 	return
 }
 
-func (dst *browserItem) readFromRaw(src map[string]interface{}) (err error) {
+func (dst *Item) readFromRaw(src map[string]interface{}) (err error) {
 	// TODO BrowserId
 	dst.Id.Id = src["id"].(string)
 	dst.Id.Type = src["type"].(string)
@@ -83,7 +89,7 @@ func (dst *browserItem) readFromRaw(src map[string]interface{}) (err error) {
 	return
 }
 
-func (i browserItem) WriteToMetadata(m *object_metadata.Metadata) (err error) {
+func (i Item) WriteToMetadata(m *object_metadata.Metadata) (err error) {
 	if m.Tai, err = i.GetTai(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -114,7 +120,7 @@ func (i browserItem) WriteToMetadata(m *object_metadata.Metadata) (err error) {
 }
 
 // TODO move below to !toml-bookmark type
-func (i browserItem) GetUrlPathTag() (e ids.Tag, err error) {
+func (i Item) GetUrlPathTag() (e ids.Tag, err error) {
 	var u *url.URL
 
 	if u, err = i.GetUrl(); err != nil {
@@ -144,7 +150,7 @@ func (i browserItem) GetUrlPathTag() (e ids.Tag, err error) {
 	return
 }
 
-func (i browserItem) GetTai() (t ids.Tai, err error) {
+func (i Item) GetTai() (t ids.Tai, err error) {
 	if i.Date == "" {
 		return
 	}
@@ -159,7 +165,7 @@ func (i browserItem) GetTai() (t ids.Tai, err error) {
 
 var errEmptyUrl = errors.New("empty url")
 
-func (i browserItem) GetUrl() (u *url.URL, err error) {
+func (i Item) GetUrl() (u *url.URL, err error) {
 	ur := i.Url
 
 	if ur == "" {
@@ -175,7 +181,7 @@ func (i browserItem) GetUrl() (u *url.URL, err error) {
 	return
 }
 
-func (i browserItem) GetDescription() (b descriptions.Description, err error) {
+func (i Item) GetDescription() (b descriptions.Description, err error) {
 	if err = b.Set(i.Title); err != nil {
 		err = errors.Wrap(err)
 		return

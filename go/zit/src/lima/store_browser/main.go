@@ -36,33 +36,33 @@ type Store struct {
 
 	tabCache cache
 
-	urls map[url.URL][]browserItem
+	urls map[url.URL][]Item
 
 	l       sync.Mutex
-	deleted map[url.URL][]browserItem
-	added   map[url.URL][]browserItem
+	deleted map[url.URL][]Item
+	added   map[url.URL][]Item
 
-	itemsById map[string]browserItem
+	itemsById map[string]Item
 
 	transacted transacted
 
 	transactedUrlIndex  map[url.URL]sku.TransactedMutableSet
 	transactedItemIndex map[browser_items.ItemId]*sku.Transacted
 
-	itemDeletedStringFormatWriter interfaces.FuncIter[browserItem]
+	itemDeletedStringFormatWriter interfaces.FuncIter[Item]
 }
 
 func Make(
 	k *config.Compiled,
 	s fs_home.Home,
-	itemDeletedStringFormatWriter interfaces.FuncIter[browserItem],
+	itemDeletedStringFormatWriter interfaces.FuncIter[Item],
 ) *Store {
 	c := &Store{
 		config:    k,
 		typ:       ids.MustType("toml-bookmark"),
-		deleted:   make(map[url.URL][]browserItem),
-		added:     make(map[url.URL][]browserItem),
-		itemsById: make(map[string]browserItem),
+		deleted:   make(map[url.URL][]Item),
+		added:     make(map[url.URL][]Item),
+		itemsById: make(map[string]Item),
 		transacted: transacted{
 			MutableSetLike: collections_value.MakeMutableValueSet(
 				iter.StringerKeyer[*ids.ObjectId]{},
@@ -266,7 +266,7 @@ func (c *Store) GetExternalLikeResetter3() interfaces.Resetter3[sku.ExternalLike
 			a := el.(*External)
 			sku.TransactedResetter.Reset(&a.Transacted)
 			sku.TransactedResetter.Reset(&a.Browser)
-			a.Item = browserItem{}
+			a.Item = Item{}
 		},
 		FuncResetWith: func(eldst, elsrc sku.ExternalLike) {
 			dst, src := eldst.(*External), elsrc.(*External)

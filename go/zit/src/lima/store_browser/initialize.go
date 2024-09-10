@@ -49,7 +49,7 @@ func (s *Store) initializeUrls() (err error) {
 		}
 	}
 
-	s.urls = make(map[url.URL][]browserItem, len(resp.RequestPayloadGet))
+	s.urls = make(map[url.URL][]Item, len(resp.RequestPayloadGet))
 
 	if err = s.resetCacheIfNecessary(resp.Response); err != nil {
 		err = errors.Wrap(err)
@@ -57,7 +57,7 @@ func (s *Store) initializeUrls() (err error) {
 	}
 
 	for _, item := range resp.RequestPayloadGet {
-		i := browserItem{Item: item}
+		i := Item{Item: item}
 
 		var u *url.URL
 
@@ -127,8 +127,7 @@ func (s *Store) flushUrls() (err error) {
 				resp.Added = append(resp.Added, i.Item)
 			}
 		}
-
-  }
+	}
 
 	for _, i := range resp.RequestPayloadPut.Added {
 		// TODO emit changes
@@ -138,7 +137,7 @@ func (s *Store) flushUrls() (err error) {
 	for _, i := range resp.RequestPayloadPut.Deleted {
 		delete(s.tabCache.Rows, i.ExternalId)
 
-		if err = s.itemDeletedStringFormatWriter(browserItem{Item: i}); err != nil {
+		if err = s.itemDeletedStringFormatWriter(Item{Item: i}); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

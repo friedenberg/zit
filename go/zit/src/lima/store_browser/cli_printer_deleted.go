@@ -34,7 +34,7 @@ func MakeItemDeletedStringWriterFormat(
 
 func (f *itemDeletedStringFormatWriter) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
-	item browserItem,
+	item Item,
 ) (n int64, err error) {
 	var (
 		n1 int
