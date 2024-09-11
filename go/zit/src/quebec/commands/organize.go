@@ -146,16 +146,13 @@ func (c *Organize) RunWithQuery(
 			return
 		}
 
-		commitOrganizeTextOp := user_ops.CommitOrganizeFile{
-			Env: u,
-		}
-
-		if _, err = commitOrganizeTextOp.RunTraditionalCommit(
-			u,
-			createOrganizeFileResults,
-			organizeText,
-			getResults,
-			qg,
+		if _, err = u.LockAndCommitOrganizeResults(
+			organize_text.OrganizeResults{
+				Before:     createOrganizeFileResults,
+				After:      organizeText,
+				Original:   getResults,
+				QueryGroup: qg,
+			},
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -199,25 +196,15 @@ func (c *Organize) RunWithQuery(
 			return
 		}
 
-		if err = u.Lock(); err != nil {
-			err = errors.Wrapf(err, "Organize File: %q", f.Name())
-			return
-		}
-
-		defer errors.Deferred(&err, u.Unlock)
-
-		commitOrganizeTextOp := user_ops.CommitOrganizeFile{
-			Env: u,
-		}
-
-		if _, err = commitOrganizeTextOp.RunTraditionalCommit(
-			u,
-			createOrganizeFileResults,
-			organizeText,
-			getResults,
-			qg,
+		if _, err = u.LockAndCommitOrganizeResults(
+			organize_text.OrganizeResults{
+				Before:     createOrganizeFileResults,
+				After:      organizeText,
+				Original:   getResults,
+				QueryGroup: qg,
+			},
 		); err != nil {
-			err = errors.Wrapf(err, "Organize File: %q", f.Name())
+			err = errors.Wrap(err)
 			return
 		}
 
