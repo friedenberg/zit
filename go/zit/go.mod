@@ -3,7 +3,7 @@ module code.linenisgreat.com/zit/go/zit
 go 1.23
 
 require (
-	code.linenisgreat.com/chrest/go v0.0.0-20240910134442-437302e8ccc0
+	code.linenisgreat.com/chrest/go v0.0.0-20240910214137-80ac68e95dc8
 	filippo.io/age v1.1.1
 	github.com/DataDog/zstd v1.5.5
 	github.com/brandondube/tai v0.1.0
