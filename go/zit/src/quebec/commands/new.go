@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
@@ -135,7 +136,7 @@ func (c *New) Run(u *env.Env, args ...string) (err error) {
 	}
 
 	if c.Organize {
-		opOrganize := user_ops.OrganizeAndCommit{
+		opOrganize := user_ops.Organize{
 			Env: u,
 		}
 
@@ -144,7 +145,14 @@ func (c *New) Run(u *env.Env, args ...string) (err error) {
 			return
 		}
 
-		if _, err = opOrganize.RunWithTransacted(nil, zts); err != nil {
+		var results organize_text.OrganizeResults
+
+		if results, err = opOrganize.RunWithTransacted(nil, zts); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if _, err = u.CommitOrganizeResults(results); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

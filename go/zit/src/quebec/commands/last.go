@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
@@ -79,11 +80,21 @@ func (c Last) Run(u *env.Env, args ...string) (err error) {
 	}
 
 	if c.Organize {
-		opOrganize := user_ops.OrganizeAndCommit{
+		opOrganize := user_ops.Organize{
 			Env: u,
+			Metadata: organize_text.Metadata{
+				OptionCommentSet: organize_text.MakeOptionCommentSet(nil),
+			},
 		}
 
-		if _, err = opOrganize.RunWithTransacted(nil, skus); err != nil {
+		var results organize_text.OrganizeResults
+
+		if results, err = opOrganize.RunWithTransacted(nil, skus); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if _, err = u.CommitOrganizeResults(results); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

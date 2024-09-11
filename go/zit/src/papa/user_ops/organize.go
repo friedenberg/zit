@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/vim_cli_options_builder"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -53,7 +52,6 @@ func (op Organize) RunWithQueryGroup(
 func (op Organize) RunWithTransacted(
 	qg *query.Group,
 	transacted sku.TransactedSet,
-	onChanged interfaces.FuncIter[sku.ExternalLike],
 ) (organizeResults organize_text.OrganizeResults, err error) {
 	skus := sku.MakeExternalLikeMutableSet()
 	transacted.Each(
