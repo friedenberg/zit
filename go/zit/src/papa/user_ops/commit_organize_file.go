@@ -21,7 +21,7 @@ func (op CommitOrganizeFile) RunTraditionalCommit(
 	original sku.ExternalLikeSet,
 	qg *query.Group,
 ) (cs CommitOrganizeFileResults, err error) {
-	if cs, err = u.CommitOrganizeResults(
+	if cs, err = u.LockAndCommitOrganizeResults(
 		organize_text.OrganizeResults{
 			Before:     a,
 			After:      b,

@@ -20,8 +20,6 @@ func (c WriteNewZettels) RunMany(
 		return
 	}
 
-	defer errors.Deferred(&err, c.Unlock)
-
 	results = sku.MakeTransactedMutableSet()
 
 	// TODO-P4 modify this to be run once
@@ -39,6 +37,11 @@ func (c WriteNewZettels) RunMany(
 		}
 	}
 
+	if err = c.Unlock(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
@@ -50,9 +53,12 @@ func (c WriteNewZettels) RunOne(
 		return
 	}
 
-	defer errors.Deferred(&err, c.Unlock)
-
 	if result, err = c.runOneAlreadyLocked(z); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = c.Unlock(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

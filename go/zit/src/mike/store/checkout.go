@@ -13,7 +13,7 @@ import (
 
 func (s *Store) DeleteCheckedOutLike(col sku.CheckedOutLike) (err error) {
 	if err = s.DeleteExternalLike(
-		col.GetRepoId(),
+		col.GetSkuExternalLike().GetRepoId(),
 		col.GetSkuExternalLike(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -27,11 +27,10 @@ func (s *Store) DeleteExternalLike(
 	repoId ids.RepoId,
 	el sku.ExternalLike,
 ) (err error) {
-	kid := repoId.GetRepoIdString()
-	es, ok := s.externalStores[kid]
+	es, ok := s.externalStores[repoId]
 
 	if !ok {
-		err = errors.Errorf("no kasten with id %q", kid)
+		err = errors.Errorf("no kasten with id %q", repoId)
 		return
 	}
 
@@ -85,15 +84,14 @@ func (s *Store) CheckoutQuery(
 }
 
 func (s *Store) CheckoutOne(
-	kasten ids.RepoId,
+	repoId ids.RepoId,
 	options checkout_options.Options,
 	sz *sku.Transacted,
 ) (cz sku.CheckedOutLike, err error) {
-	kid := kasten.GetRepoIdString()
-	es, ok := s.externalStores[kid]
+	es, ok := s.externalStores[repoId]
 
 	if !ok {
-		err = errors.Errorf("no kasten with id %q", kid)
+		err = errors.Errorf("no kasten with id %q", repoId)
 		return
 	}
 
@@ -112,7 +110,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	options checkout_options.Options,
 	col sku.CheckedOutLike,
 ) (err error) {
-	switch col.GetRepoId().GetRepoIdString() {
+	switch col.GetSkuExternalLike().GetRepoId().GetRepoIdString() {
 	case "browser":
 		err = todo.Implement()
 

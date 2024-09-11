@@ -28,13 +28,6 @@ type ZettelFromExternalBlob struct {
 func (c ZettelFromExternalBlob) Run(
 	qg *query.Group,
 ) (results sku.TransactedMutableSet, err error) {
-	if err = c.Lock(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.Deferred(&err, c.Unlock)
-
 	results = sku.MakeTransactedMutableSet()
 	toDelete := fd.MakeMutableSet()
 

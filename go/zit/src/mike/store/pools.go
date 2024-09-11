@@ -7,7 +7,7 @@ import (
 )
 
 func (s *Store) PutCheckedOutLike(col sku.CheckedOutLike) {
-	switch col.GetRepoId().GetRepoIdString() {
+	switch col.GetSkuExternalLike().GetRepoId().GetRepoIdString() {
 	// TODO make generic?
 	case "browser":
 		store_browser.GetCheckedOutPool().Put(col.(*store_browser.CheckedOut))

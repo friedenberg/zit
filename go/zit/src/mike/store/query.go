@@ -55,7 +55,7 @@ func (s *Store) MakeQueryExecutor(
 		}
 	}
 
-	es := s.externalStores[qg.RepoId.String()]
+	es := s.externalStores[qg.RepoId]
 
 	e = query.MakeExecutorWithExternalStore(
 		qg,

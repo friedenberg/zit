@@ -46,8 +46,6 @@ func (t *Text) ReadFrom(r io.Reader) (n int64, err error) {
 		options: t.Options,
 	}
 
-	r1.stringFormatReader = t.stringFormatReader
-
 	mr := object_metadata.Reader{
 		Metadata: &t.Metadata,
 		Blob:     r1,
@@ -111,8 +109,6 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		OmitLeadingEmptyLine: omit,
 	}
 
-	aw.stringFormatWriter = ot.stringFormatWriter
-
 	ocs := ot.OptionComments
 
 	for _, oc := range ocs {
@@ -124,7 +120,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		}
 	}
 
-	if aligned, ok := aw.stringFormatWriter.(sku_fmt.ObjectIdAlignedFormat); ok {
+	if aligned, ok := aw.options.stringFormatWriter.(sku_fmt.ObjectIdAlignedFormat); ok {
 		aligned.SetMaxKopfUndSchwanz(kopf, schwanz)
 	}
 

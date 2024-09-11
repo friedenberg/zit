@@ -56,7 +56,7 @@ func (c CatAlfred) RunWithQuery(
 	if aw, err = alfred.New(
 		wo,
 		u.GetStore().GetAbbrStore().GetAbbr(),
-		u.SkuFormatBox(qg.RepoId),
+		u.SkuFormatBox(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

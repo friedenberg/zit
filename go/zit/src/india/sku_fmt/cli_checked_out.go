@@ -24,7 +24,7 @@ func (f *cliCheckedOutLike) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
 	co sku.CheckedOutLike,
 ) (n int64, err error) {
-	kid := co.GetRepoId().GetRepoIdString()
+	kid := co.GetSkuExternalLike().GetRepoId().GetRepoIdString()
 	sfw, ok := f.externalWriters[kid]
 
 	if !ok {

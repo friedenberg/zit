@@ -35,6 +35,10 @@ func (e *External) Validate(k string) {
 	}
 }
 
+func (c *External) GetRepoId() ids.RepoId {
+	return *(ids.MustRepoId("browser"))
+}
+
 func (e *External) GetObjectId() *ids.ObjectId {
 	return e.Transacted.GetObjectId()
 }

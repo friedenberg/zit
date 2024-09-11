@@ -5,11 +5,9 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
@@ -19,10 +17,10 @@ type writer struct {
 	OmitLeadingEmptyLine bool
 	object_metadata.Metadata
 	*format.LineWriter
-	maxDepth           int
-	maxHead, maxTail   int
-	maxLen             int
-	stringFormatWriter interfaces.StringFormatWriter[sku.ExternalLike]
+	maxDepth         int
+	maxHead, maxTail int
+	maxLen           int
+	options          Options
 }
 
 func (av writer) write(a *Assignment) (err error) {
@@ -75,7 +73,7 @@ func (av writer) writeNormal(a *Assignment) (err error) {
 		// sku.TransactedResetter.ResetWith(cursor, z.ExternalLike.GetSku())
 		z.ExternalLike.GetSku().Metadata.Subtract(&av.Metadata)
 
-		if _, err = av.stringFormatWriter.WriteStringFormat(&sb, z.ExternalLike); err != nil {
+		if _, err = av.options.stringFormatWriter.WriteStringFormat(&sb, z.ExternalLike); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -155,7 +153,7 @@ func (av writer) writeRightAligned(a *Assignment) (err error) {
 
 		sk.Metadata.SetTags(mes)
 
-		if _, err = av.stringFormatWriter.WriteStringFormat(&sb, cursor); err != nil {
+		if _, err = av.options.stringFormatWriter.WriteStringFormat(&sb, cursor); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

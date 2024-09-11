@@ -212,7 +212,7 @@ func (u *Env) PrinterCheckedOutLike() interfaces.FuncIter[sku.CheckedOutLike] {
 	pcobrowser := u.PrinterCheckedOutBrowser()
 
 	return func(co sku.CheckedOutLike) (err error) {
-		switch co.GetRepoId().GetRepoIdString() {
+		switch co.GetSkuExternalLike().GetRepoId().GetRepoIdString() {
 		case "browser":
 			return pcobrowser(co)
 

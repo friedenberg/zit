@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 )
 
 type OptionComment interface {
@@ -39,7 +38,6 @@ func MakeOptionCommentSet(
 		}
 	}
 
-	ocs.AddPrototype("format", optionCommentFormat(""))
 	ocs.AddPrototype("hide", optionCommentHide(""))
 	ocs.AddPrototype("", optionCommentHide(""))
 
@@ -130,47 +128,6 @@ func (ocf OptionCommentWithKey) Set(v string) (err error) {
 
 func (ocf OptionCommentWithKey) String() string {
 	return fmt.Sprintf("%s:%s", ocf.Key, ocf.OptionComment)
-}
-
-type optionCommentFormat string
-
-func (ocf optionCommentFormat) CloneOptionComment() OptionComment {
-	return ocf
-}
-
-func (ocf optionCommentFormat) Set(v string) (err error) {
-	return todo.Implement()
-}
-
-func (ocf optionCommentFormat) String() string {
-	return fmt.Sprintf("format:%s", string(ocf))
-}
-
-func (ocf optionCommentFormat) ApplyToText(Options, *Assignment) (err error) {
-	return
-}
-
-func (ocf optionCommentFormat) ApplyToReader(
-	Options,
-	*reader,
-) (err error) {
-	return
-}
-
-func (ocf optionCommentFormat) ApplyToWriter(
-	f Options,
-	aw *writer,
-) (err error) {
-	switch string(ocf) {
-	case "new":
-		aw.stringFormatWriter = f.stringFormatWriter
-
-	default:
-		err = collections.MakeErrNotFoundString(string(ocf))
-		return
-	}
-
-	return
 }
 
 type optionCommentHide string

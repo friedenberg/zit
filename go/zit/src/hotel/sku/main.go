@@ -46,7 +46,7 @@ type (
 		Clone() ExternalLike
 		GetExternalState() external_state.State
 		ExternalObjectIdGetter
-		// GetRepoId() ids.RepoId
+		GetRepoId() ids.RepoId
 	}
 
 	ExternalLikeGetter interface {
@@ -57,7 +57,6 @@ type (
 		interfaces.Stringer
 		TransactedGetter
 		ExternalLikeGetter
-		GetRepoId() ids.RepoId
 		GetSkuCheckedOutLike() CheckedOutLike
 		GetState() checked_out_state.State
 		SetState(checked_out_state.State) error

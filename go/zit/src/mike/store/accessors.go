@@ -22,7 +22,7 @@ import (
 )
 
 func (u *Store) GetBrowserStore() *external_store.Store {
-	return u.externalStores["browser"]
+	return u.externalStores[*(ids.MustRepoId("browser"))]
 }
 
 func (s *Store) GetBlobStore() *blob_store.VersionedStores {

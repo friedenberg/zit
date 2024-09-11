@@ -88,9 +88,19 @@ func (c *Add) RunWithQuery(
 		AllowDupes: c.AllowDupes,
 	}
 
+	if err = u.Lock(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	var zettelsFromBlobResults sku.TransactedMutableSet
 
 	if zettelsFromBlobResults, err = zettelsFromBlobOp.Run(qg); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = u.Unlock(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -125,7 +135,7 @@ func (c *Add) RunWithQuery(
 		return
 	}
 
-	if _, err = u.CommitOrganizeResults(results); err != nil {
+	if _, err = u.LockAndCommitOrganizeResults(results); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

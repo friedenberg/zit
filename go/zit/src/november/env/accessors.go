@@ -52,8 +52,7 @@ func (u *Env) GetExternalLikePoolForRepoId(
 		return
 	}
 
-	kid := repoId.GetRepoIdString()
-	es, ok := u.externalStores[kid]
+	es, ok := u.externalStores[repoId]
 
 	if ok {
 		of.PoolValue = es.GetExternalLikePool()

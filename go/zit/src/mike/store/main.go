@@ -29,7 +29,7 @@ type Store struct {
 	fs_home fs_home.Home
 
 	cwdFiles           *store_fs.Store
-	externalStores     map[string]*external_store.Store
+	externalStores     map[ids.RepoId]*external_store.Store
 	blob_store         *blob_store.VersionedStores
 	inventoryListStore inventory_list.Store
 	Abbr               AbbrStore
@@ -133,7 +133,7 @@ func (c *Store) Initialize(
 }
 
 func (s *Store) SetExternalStores(
-	stores map[string]*external_store.Store,
+	stores map[ids.RepoId]*external_store.Store,
 ) (err error) {
 	s.externalStores = stores
 
@@ -146,12 +146,9 @@ func (s *Store) SetExternalStores(
 		}
 
 		es.Home = s.GetStandort()
-		es.DirCache = s.GetStandort().DirVerzeichnisseKasten(k)
+		es.DirCache = s.GetStandort().DirVerzeichnisseKasten(k.GetRepoIdString())
 
-		if err = es.RepoId.Set(k); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+    es.RepoId = k
 
 		if esfs, ok := es.StoreLike.(*store_fs.Store); ok {
 			s.cwdFiles = esfs

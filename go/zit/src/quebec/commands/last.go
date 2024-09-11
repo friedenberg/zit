@@ -94,7 +94,7 @@ func (c Last) Run(u *env.Env, args ...string) (err error) {
 			return
 		}
 
-		if _, err = u.CommitOrganizeResults(results); err != nil {
+		if _, err = u.LockAndCommitOrganizeResults(results); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

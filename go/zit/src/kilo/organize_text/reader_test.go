@@ -86,18 +86,18 @@ func makeAssignmentLineReader() reader {
 					},
 				},
 			},
+			stringFormatReader: sku_fmt.MakeBox(
+				string_format_writer.ColorOptions{},
+				erworben_cli_print_options.PrintOptions{},
+				nil,
+				nil,
+				nil,
+				nil,
+				nil,
+				nil,
+				ids.Abbr{},
+			),
 		},
-		stringFormatReader: sku_fmt.MakeBox(
-			string_format_writer.ColorOptions{},
-			erworben_cli_print_options.PrintOptions{},
-			nil,
-			nil,
-			nil,
-			nil,
-			nil,
-			nil,
-			ids.Abbr{},
-		),
 	}
 }
 

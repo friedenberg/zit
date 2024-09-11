@@ -99,9 +99,9 @@ func (op Organize) RunWithExternalLike(
 		Options: organizeFlags.GetOptions(
 			op.GetConfig().PrintOptions,
 			organizeResults.QueryGroup,
-			op.SkuFormatBox(qg.RepoId),
+			op.SkuFormatBoxForRepoId(organizeResults.QueryGroup.RepoId),
 			op.GetStore().GetAbbrStore().GetAbbr(),
-			op.GetExternalLikePoolForRepoId(qg.RepoId),
+			op.GetExternalLikePoolForRepoId(organizeResults.QueryGroup.RepoId),
 		),
 	}
 
@@ -156,7 +156,7 @@ func (op Organize) RunWithExternalLike(
 		if organizeResults.After, err = readOrganizeTextOp.Run(
 			op.Env,
 			f,
-			qg.RepoId,
+			organizeResults.QueryGroup.RepoId,
 			organize_text.NewMetadataWithOptionCommentLookup(
 				op.GetPrototypeOptionComments(),
 			),

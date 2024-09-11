@@ -50,5 +50,5 @@ func (u *Env) MakeQueryBuilder(
 }
 
 func (u *Env) GetDefaultExternalStore() *external_store.Store {
-	return u.externalStores[""]
+	return u.externalStores[ids.RepoId{}]
 }

@@ -20,6 +20,10 @@ type Transacted struct {
 	Metadata object_metadata.Metadata
 }
 
+func (t *Transacted) GetRepoId() ids.RepoId {
+	return ids.RepoId{}
+}
+
 func (t *Transacted) GetSkuExternalLike() ExternalLike {
 	return t
 }

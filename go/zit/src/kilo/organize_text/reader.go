@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type reader struct {
@@ -18,7 +17,6 @@ type reader struct {
 	lineNo             int
 	root               *Assignment
 	currentAssignment  *Assignment
-	stringFormatReader catgut.StringFormatReader[sku.ExternalLike]
 }
 
 func (ar *reader) ReadFrom(r1 io.Reader) (n int64, err error) {
@@ -279,7 +277,7 @@ func (ar *reader) readOneObj(
 	z.ExternalLike = ar.options.ObjectFactory.Get()
 	z.Type = t
 
-	if _, err = ar.stringFormatReader.ReadStringFormat(
+	if _, err = ar.options.stringFormatReader.ReadStringFormat(
 		r,
 		z.ExternalLike,
 	); err != nil {

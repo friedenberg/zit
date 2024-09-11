@@ -64,7 +64,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 func (s *Store) Merge(
 	tm sku.Conflicted,
 ) (err error) {
-	switch tm.CheckedOutLike.GetRepoId().GetRepoIdString() {
+	switch tm.CheckedOutLike.GetSkuExternalLike().GetRepoId().GetRepoIdString() {
 	case "browser":
 		err = todo.Implement()
 
@@ -83,7 +83,7 @@ func (s *Store) RunMergeTool(
 ) (err error) {
 	tool := s.GetKonfig().ToolOptions.Merge
 
-	switch tm.GetRepoId().GetRepoIdString() {
+	switch tm.GetSkuExternalLike().GetRepoId().GetRepoIdString() {
 	case "browser":
 		err = todo.Implement()
 

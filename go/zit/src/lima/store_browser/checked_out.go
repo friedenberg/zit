@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -14,10 +13,6 @@ type CheckedOut struct {
 	State    checked_out_state.State
 	IsImport bool
 	Error    error
-}
-
-func (c *CheckedOut) GetRepoId() ids.RepoId {
-	return *(ids.MustRepoId("browser"))
 }
 
 func (c *CheckedOut) GetSkuCheckedOutLike() sku.CheckedOutLike {

@@ -198,7 +198,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	}
 
 	if _, err = s.CheckoutOne(
-		co.GetRepoId(),
+		co.GetSkuExternalLike().GetRepoId(),
 		checkout_options.Options{Force: true, CheckoutMode: mode},
 		el.GetSku(),
 	); err != nil {

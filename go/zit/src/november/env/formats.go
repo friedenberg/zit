@@ -118,7 +118,17 @@ func (u *Env) StringFormatWriterSkuBox(
 	)
 }
 
-func (u *Env) SkuFormatBox(repoId ids.RepoId) sku_fmt.ExternalLike {
+func (u *Env) SkuFormatBox() sku_fmt.ExternalLike {
+  formats := make(map[ids.RepoId]sku_fmt.ExternalLike, len(u.externalStores))
+
+  for rid := range u.externalStores {
+    formats[rid] = u.SkuFormatBoxForRepoId(rid)
+  }
+
+  return sku_fmt.MakeExternalLikeCombo(formats)
+}
+
+func (u *Env) SkuFormatBoxForRepoId(repoId ids.RepoId) sku_fmt.ExternalLike {
 	co := u.FormatColorOptionsOut()
 	co.OffEntirely = true
 
@@ -127,8 +137,7 @@ func (u *Env) SkuFormatBox(repoId ids.RepoId) sku_fmt.ExternalLike {
 		string_format_writer.CliFormatTruncationNone,
 	)
 
-	kid := repoId.GetRepoIdString()
-	es, ok := u.externalStores[kid]
+	es, ok := u.externalStores[repoId]
 
 	if !ok {
 		return sku_fmt.ExternalLike{

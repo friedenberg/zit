@@ -78,7 +78,7 @@ func (c *Organize) RunWithQuery(
 		Options: c.GetOptions(
 			u.GetConfig().PrintOptions,
 			qg,
-			u.SkuFormatBox(qg.RepoId),
+			u.SkuFormatBox(),
 			u.GetStore().GetAbbrStore().GetAbbr(),
 			u.GetExternalLikePoolForRepoId(qg.RepoId),
 		),

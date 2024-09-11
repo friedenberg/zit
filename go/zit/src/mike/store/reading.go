@@ -10,14 +10,13 @@ import (
 )
 
 func (s *Store) UpdateTransactedWithExternal(
-	kasten ids.RepoId,
+	repoId ids.RepoId,
 	z *sku.Transacted,
 ) (err error) {
-	kid := kasten.GetRepoIdString()
-	es, ok := s.externalStores[kid]
+	es, ok := s.externalStores[repoId]
 
 	if !ok {
-		err = errors.Errorf("no kasten with id %q", kid)
+		err = errors.Errorf("no kasten with id %q", repoId)
 		return
 	}
 

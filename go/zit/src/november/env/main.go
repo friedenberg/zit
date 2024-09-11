@@ -49,7 +49,7 @@ type Env struct {
 	storesInitialized bool
 	store             store.Store
 	age               *age.Age
-	externalStores    map[string]*external_store.Store
+	externalStores    map[ids.RepoId]*external_store.Store
 
 	DormantCounter query.DormantCounter
 
@@ -199,11 +199,11 @@ func (u *Env) Initialize(options Options) (err error) {
 		return
 	}
 
-	u.externalStores = map[string]*external_store.Store{
-		"": {
+	u.externalStores = map[ids.RepoId]*external_store.Store{
+		ids.RepoId{}: {
 			StoreLike: sfs,
 		},
-		"browser": {
+		*(ids.MustRepoId("browser")): {
 			StoreLike: store_browser.Make(
 				k,
 				u.GetFSHome(),
@@ -251,7 +251,7 @@ func (u *Env) Initialize(options Options) (err error) {
 
 	u.storesInitialized = true
 
-	u.luaSkuFormat = u.SkuFormatBox(ids.RepoId{})
+	u.luaSkuFormat = u.SkuFormatBoxForRepoId(ids.RepoId{})
 
 	return
 }
@@ -298,8 +298,8 @@ func (u *Env) GetMatcherArchiviert() query.DormantCounter {
 }
 
 func (u *Env) GetExternalStoreForQuery(
-	k ids.RepoId,
+	repoId ids.RepoId,
 ) (sku.ExternalStoreForQuery, bool) {
-	e, ok := u.externalStores[k.String()]
+	e, ok := u.externalStores[repoId]
 	return e, ok
 }

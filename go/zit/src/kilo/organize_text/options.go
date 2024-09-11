@@ -149,7 +149,7 @@ func (o *Flags) GetOptionsWithMetadata(
 func (o *Flags) GetOptions(
 	printOptions erworben_cli_print_options.PrintOptions,
 	q TagSetGetter,
-	skuFmt sku_fmt.ExternalLike,
+	skuBoxFormat sku_fmt.ExternalLike,
 	abbr ids.Abbr, // TODO move Abbr as required arg
 	of external_store.ObjectFactory,
 ) Options {
@@ -165,7 +165,7 @@ func (o *Flags) GetOptions(
 
 	return o.GetOptionsWithMetadata(
 		printOptions,
-		skuFmt,
+		skuBoxFormat,
 		abbr,
 		of,
 		m,
