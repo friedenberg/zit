@@ -32,13 +32,6 @@ func (op CommitOrganizeFile) RunTraditionalCommit(
 		err = errors.Wrap(err)
 		return
 	}
-	if cs, err = organize_text.ChangesFrom(
-		u.GetConfig().PrintOptions,
-		a, b, original,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	return
 }

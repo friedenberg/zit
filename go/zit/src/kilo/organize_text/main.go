@@ -107,6 +107,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		Metadata:             ot.AsMetadatei(),
 		RightAlignedIndents:  ot.UseRightAlignedIndents,
 		OmitLeadingEmptyLine: omit,
+		options:              ot.Options,
 	}
 
 	ocs := ot.OptionComments

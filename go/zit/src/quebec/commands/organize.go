@@ -146,13 +146,6 @@ func (c *Organize) RunWithQuery(
 			return
 		}
 
-		if err = u.Lock(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		defer errors.Deferred(&err, u.Unlock)
-
 		commitOrganizeTextOp := user_ops.CommitOrganizeFile{
 			Env: u,
 		}

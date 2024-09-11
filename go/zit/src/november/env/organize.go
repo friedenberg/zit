@@ -9,15 +9,15 @@ import (
 )
 
 func (e *Env) MakeOrganizeOptionsWithQueryGroup(
-  organizeFlags organize_text.Flags,
-  qg *query.Group,
+	organizeFlags organize_text.Flags,
+	qg *query.Group,
 ) organize_text.Options {
 	return organizeFlags.GetOptions(
 		e.GetConfig().PrintOptions,
 		qg,
 		e.SkuFormatBox(),
 		e.GetStore().GetAbbrStore().GetAbbr(),
-		e.GetExternalLikePoolForRepoId(organizeResults.QueryGroup.RepoId),
+		e.GetExternalLikePoolForRepoId(qg.RepoId),
 	)
 }
 
