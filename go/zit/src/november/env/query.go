@@ -28,7 +28,7 @@ func (u *Env) MakeQueryBuilderExcludingHidden(
 	return u.makeQueryBuilder().
 		WithDefaultGenres(dg).
 		WithVirtualTags(u.config.Filters).
-		WithRepo(u.GetDefaultExternalStore()).
+		WithRepoId(ids.RepoId{}).
 		WithFileExtensionGetter(u.GetConfig().FileExtensions).
 		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr()).
 		WithHidden(u.GetMatcherArchiviert())
@@ -44,7 +44,7 @@ func (u *Env) MakeQueryBuilder(
 	return u.makeQueryBuilder().
 		WithDefaultGenres(dg).
 		WithVirtualTags(u.config.Filters).
-		WithRepo(u.GetDefaultExternalStore()).
+		WithRepoId(ids.RepoId{}).
 		WithFileExtensionGetter(u.GetConfig().FileExtensions).
 		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr())
 }

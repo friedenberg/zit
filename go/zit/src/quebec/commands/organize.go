@@ -75,12 +75,9 @@ func (c *Organize) RunWithQuery(
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
 		Env: u,
-		Options: c.GetOptions(
-			u.GetConfig().PrintOptions,
+		Options: u.MakeOrganizeOptionsWithQueryGroup(
+			c.Flags,
 			qg,
-			u.SkuFormatBox(),
-			u.GetStore().GetAbbrStore().GetAbbr(),
-			u.GetExternalLikePoolForRepoId(qg.RepoId),
 		),
 	}
 

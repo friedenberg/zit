@@ -113,9 +113,6 @@ func (op Checkin) runOrganize(
 
 	if err = changes.After.Each(
 		func(el sku.ExternalLike) (err error) {
-			ui.Debug().Print(el.GetSkuExternalLike().GetSku().GetType())
-			ui.Debug().Print(el.GetSku().GetType())
-
 			if err = u.GetStore().CreateOrUpdate(
 				el,
 				objekte_mode.ModeCreate,

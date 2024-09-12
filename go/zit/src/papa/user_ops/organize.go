@@ -75,6 +75,12 @@ func (op Organize) RunWithExternalLike(
 	organizeResults.Original = skus
 	organizeResults.QueryGroup = qg
 
+	var repoId ids.RepoId
+
+	if qg != nil {
+		repoId = qg.RepoId
+	}
+
 	if organizeResults.QueryGroup == nil ||
 		op.DontUseQueryGroupForOrganizeMetadata {
 		b := op.MakeQueryBuilder(
@@ -89,6 +95,8 @@ func (op Organize) RunWithExternalLike(
 		}
 	}
 
+	organizeResults.QueryGroup.RepoId = repoId
+
 	// otFlags.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
 	organizeFlags := organize_text.MakeFlagsWithMetadata(op.Metadata)
 	op.ApplyToOrganizeOptions(&organizeFlags.Options)
@@ -96,12 +104,9 @@ func (op Organize) RunWithExternalLike(
 
 	createOrganizeFileOp := CreateOrganizeFile{
 		Env: op.Env,
-		Options: organizeFlags.GetOptions(
-			op.GetConfig().PrintOptions,
+		Options: op.Env.MakeOrganizeOptionsWithQueryGroup(
+			organizeFlags,
 			organizeResults.QueryGroup,
-			op.SkuFormatBoxForRepoId(organizeResults.QueryGroup.RepoId),
-			op.GetStore().GetAbbrStore().GetAbbr(),
-			op.GetExternalLikePoolForRepoId(organizeResults.QueryGroup.RepoId),
 		),
 	}
 

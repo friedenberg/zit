@@ -200,7 +200,7 @@ func (u *Env) Initialize(options Options) (err error) {
 	}
 
 	u.externalStores = map[ids.RepoId]*external_store.Store{
-		ids.RepoId{}: {
+		{}: {
 			StoreLike: sfs,
 		},
 		*(ids.MustRepoId("browser")): {
@@ -251,7 +251,7 @@ func (u *Env) Initialize(options Options) (err error) {
 
 	u.storesInitialized = true
 
-	u.luaSkuFormat = u.SkuFormatBoxForRepoId(ids.RepoId{})
+	u.luaSkuFormat = u.SkuFormatBox()
 
 	return
 }

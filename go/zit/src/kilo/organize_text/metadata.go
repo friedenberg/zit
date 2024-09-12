@@ -35,7 +35,6 @@ func NewMetadataWithOptionCommentLookup(
 }
 
 type Metadata struct {
-	// metadatei.Metadatei
 	ids.TagSet
 	Matchers interfaces.SetLike[sku.Query]
 	OptionCommentSet

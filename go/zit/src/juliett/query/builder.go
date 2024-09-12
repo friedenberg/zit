@@ -38,7 +38,7 @@ type Builder struct {
 	pinnedObjectIds            []ObjectId
 	pinnedExternalObjectIds    []sku.ExternalObjectId
 	repoGetter                 sku.ExternalStoreForQueryGetter
-	repo                       sku.ExternalStoreForQuery
+	repoId                     ids.RepoId
 	virtualEtikettenBeforeInit map[string]string
 	fileExtensionGetter        interfaces.FileExtensionGetter
 	expanders                  ids.Abbr
@@ -105,10 +105,10 @@ func (mb *Builder) WithDebug() *Builder {
 	return mb
 }
 
-func (mb *Builder) WithRepo(
-	repo sku.ExternalStoreForQuery,
+func (mb *Builder) WithRepoId(
+	repoId ids.RepoId,
 ) *Builder {
-	mb.repo = repo
+	mb.repoId = repoId
 	return mb
 }
 
