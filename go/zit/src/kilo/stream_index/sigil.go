@@ -23,7 +23,7 @@ func (qg *flushQueryGroup) Get(_ genres.Genre) (sku.QueryWithSigilAndObjectId, b
 	return qg, true
 }
 
-func (s *flushQueryGroup) ContainsSku(_ *sku.Transacted) bool {
+func (s *flushQueryGroup) ContainsSku(_ sku.TransactedGetter) bool {
 	return true
 }
 

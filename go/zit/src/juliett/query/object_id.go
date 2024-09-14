@@ -28,7 +28,9 @@ func (k ObjectId) reduce(b *buildState) (err error) {
 }
 
 // TODO support exact
-func (exp ObjectId) ContainsSku(sk *sku.Transacted) (ok bool) {
+func (exp ObjectId) ContainsSku(tg sku.TransactedGetter) (ok bool) {
+  sk := tg.GetSku()
+
 	defer sk.Metadata.Cache.QueryPath.PushOnReturn(exp, &ok)
 
 	skMe := sk.GetMetadata()

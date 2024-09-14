@@ -36,7 +36,9 @@ func (m dormantCounter) CountArchiviert() int64 {
 	return m.countArchiviert
 }
 
-func (matcher *dormantCounter) ContainsSku(matchable *sku.Transacted) bool {
+func (matcher *dormantCounter) ContainsSku(tg sku.TransactedGetter) bool {
+  matchable := tg.GetSku()
+
 	if !matchable.GetMetadata().Cache.Dormant.Bool() {
 		atomic.AddInt64(&matcher.countArchiviert, 1)
 		return false

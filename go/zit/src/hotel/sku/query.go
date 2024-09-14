@@ -9,7 +9,7 @@ import (
 type (
 	Queryable interface {
 		// AppendMatchToQueryPath(*Transacted, *QueryPath) error
-		ContainsSku(*Transacted) bool
+		ContainsSku(TransactedGetter) bool
 	}
 
 	Query interface {

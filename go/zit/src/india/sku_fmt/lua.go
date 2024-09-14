@@ -15,7 +15,9 @@ type LuaTable struct {
 	EtikettenImplicit *lua.LTable
 }
 
-func ToLuaTable(o *sku.Transacted, l *lua.LState, t *LuaTable) {
+func ToLuaTable(tg sku.TransactedGetter, l *lua.LState, t *LuaTable) {
+  o := tg.GetSku()
+
 	l.SetField(t.Transacted, "Gattung", lua.LString(o.GetGenre().String()))
 	l.SetField(t.Transacted, "Kennung", lua.LString(o.GetObjectId().String()))
 	l.SetField(t.Transacted, "Gattung", lua.LString(o.GetGenre().GetGenreString()))

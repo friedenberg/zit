@@ -9,12 +9,12 @@ type TagLua struct {
 	*ObjectId
 }
 
-func (k *TagLua) ContainsSku(sk *sku.Transacted) bool {
-	if k.ObjectId.ContainsSku(sk) {
+func (k *TagLua) ContainsSku(tg sku.TransactedGetter) bool {
+	if k.ObjectId.ContainsSku(tg) {
 		return true
 	}
 
-	if k.Lua.ContainsSku(sk) {
+	if k.Lua.ContainsSku(tg) {
 		return true
 	}
 

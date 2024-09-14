@@ -243,7 +243,9 @@ func (q *Query) ShouldHide(sk *sku.Transacted, k string) bool {
 	return q.Hidden.ContainsSku(sk)
 }
 
-func (q *Query) ContainsSku(sk *sku.Transacted) (ok bool) {
+func (q *Query) ContainsSku(tg sku.TransactedGetter) (ok bool) {
+	sk := tg.GetSku()
+
 	defer sk.Metadata.Cache.QueryPath.PushOnReturn(q, &ok)
 	k := sk.ObjectId.String()
 

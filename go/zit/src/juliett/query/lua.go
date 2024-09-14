@@ -63,7 +63,7 @@ type Lua struct {
 	sku_fmt.LuaVMPool
 }
 
-func (matcher Lua) ContainsSku(sk *sku.Transacted) bool {
+func (matcher Lua) ContainsSku(tg sku.TransactedGetter) bool {
 	vm, err := matcher.Get()
 
 	if err != nil {
@@ -90,7 +90,7 @@ func (matcher Lua) ContainsSku(sk *sku.Transacted) bool {
 	vm.VM.Push(f)
 
 	sku_fmt.ToLuaTable(
-		sk,
+		tg,
 		vm.VM.LState,
 		tSku,
 	)
