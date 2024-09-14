@@ -34,16 +34,16 @@ func (externalResetter) Reset(a *External) {
 	a.ExternalObjectId.Reset()
 }
 
-func (externalResetter) ResetWith(a *External, b *External) {
-	errors.PanicIfError(a.Transacted.ObjectId.ResetWithIdLike(&b.Transacted.ObjectId))
-	object_metadata.Resetter.ResetWith(&a.Transacted.Metadata, &b.Transacted.Metadata)
-	TransactedResetter.ResetWith(b.GetSku(), a.GetSku())
-	b.Transacted.Fields = b.Transacted.Fields[:0]
-	b.Transacted.Fields = append(b.Transacted.Fields, a.Transacted.Fields...)
-	b.ExternalType = a.ExternalType
-	b.RepoId = a.RepoId
-	b.State = a.State
-	b.ExternalObjectId.ResetWith(&a.ExternalObjectId)
+func (externalResetter) ResetWith(dst *External, src *External) {
+	errors.PanicIfError(dst.Transacted.ObjectId.ResetWithIdLike(&src.Transacted.ObjectId))
+	object_metadata.Resetter.ResetWith(&dst.Transacted.Metadata, &src.Transacted.Metadata)
+	TransactedResetter.ResetWith(dst.GetSku(), src.GetSku())
+	dst.Transacted.Fields = dst.Transacted.Fields[:0]
+	dst.Transacted.Fields = append(dst.Transacted.Fields, src.Transacted.Fields...)
+	dst.ExternalType = src.ExternalType
+	dst.RepoId = src.RepoId
+	dst.State = src.State
+	dst.ExternalObjectId.ResetWith(&src.ExternalObjectId)
 }
 
 var Resetter resetter

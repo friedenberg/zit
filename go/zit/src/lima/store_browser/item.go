@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -49,36 +48,6 @@ func (i *Item) GetType() (t ids.Type, err error) {
 		err = errors.Wrap(err)
 		return
 	}
-
-	return
-}
-
-func (i Item) WriteToMetadata(m *object_metadata.Metadata) (err error) {
-	if m.Tai, err = i.GetTai(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if m.Type, err = i.GetType(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if m.Description, err = i.GetDescription(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var e ids.Tag
-
-	if e, err = i.GetUrlPathTag(); err == nil {
-		if err = m.AddTagPtr(&e); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	err = nil
 
 	return
 }

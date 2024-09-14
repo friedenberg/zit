@@ -223,31 +223,16 @@ LOOP:
 					right := string(tokenParts.Right)
 
 					switch left {
-					case "id":
-						if err = e.Item.Id.Set(right); err != nil {
-							err = errors.Wrap(err)
-							return
-						}
-
-						continue LOOP
-
-					case "url":
-						if err = e.Item.Url.UnmarshalBinary(tokenParts.Right); err != nil {
-							err = errors.Wrap(err)
-							return
-						}
-
-						continue LOOP
-
-					case "title":
-						e.Item.Title = right
-						continue LOOP
-
-					case "":
-						if err = e.Transacted.Metadata.Description.Set(right); err != nil {
-							err = errors.Wrap(err)
-							return
-						}
+					case "id", "url", "title", "":
+						e.Transacted.Fields = append(
+							e.Transacted.Fields,
+							sku.Field{
+								Key:                left,
+								Value:              right,
+								DisableValueQuotes: true,
+								ColorType:          string_format_writer.ColorTypeId,
+							},
+						)
 
 						continue LOOP
 

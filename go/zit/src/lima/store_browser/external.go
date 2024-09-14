@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
@@ -68,6 +69,12 @@ func (e *External) SaveBlob(s fs_home.Home) (err error) {
 }
 
 func (e *External) SetItem(i Item) (err error) {
+	if err = e.ExternalObjectId.SetRaw(i.Id.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	e.Transacted.Metadata.Type = ids.MustType("!toml-bookmark")
 	e.Item = i
 
 	m := &e.Transacted.Metadata
@@ -82,11 +89,25 @@ func (e *External) SetItem(i Item) (err error) {
 		return
 	}
 
-	if m.Description, err = i.GetDescription(); err != nil {
-		err = errors.Wrap(err)
-		return
+	e.Transacted.Fields = []sku.Field{
+		{
+			Value:              i.Id.String(),
+			DisableValueQuotes: true,
+			ColorType:          string_format_writer.ColorTypeId,
+		},
+		{
+			Key:       "title",
+			Value:     i.Title,
+			ColorType: string_format_writer.ColorTypeUserData,
+		},
+		{
+			Key:       "url",
+			Value:     i.Url.String(),
+			ColorType: string_format_writer.ColorTypeUserData,
+		},
 	}
 
+	// TODO move to !toml-bookmark type
 	var t ids.Tag
 
 	if t, err = i.GetUrlPathTag(); err == nil {
@@ -98,7 +119,6 @@ func (e *External) SetItem(i Item) (err error) {
 
 	err = nil
 
-	e.Transacted.Metadata.Type = ids.MustType("!toml-bookmark")
 	return
 }
 
@@ -112,15 +132,10 @@ func (t *External) GetSkuExternalLike() sku.ExternalLike {
 	return t
 }
 
-func (t *External) GetExternalObjectId() sku.ExternalObjectId {
-	return t.Item.GetExternalObjectId()
-}
-
 func (a *External) Clone() sku.ExternalLike {
 	b := GetExternalPool().Get()
-	sku.TransactedResetter.ResetWith(b.GetSku(), a.GetSku())
+	sku.ExternalResetter.ResetWith(&b.External, &a.External)
 	b.Item = a.Item
-	b.State = a.State
 	return b
 }
 
