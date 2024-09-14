@@ -15,12 +15,16 @@ type External struct {
 	ids.RepoId
 	external_state.State
 	ExternalObjectId ids.ObjectId
-	Transacted
-	Fields []string_format_writer.Field
+	Transacted       Transacted
+	Fields           []string_format_writer.Field
 }
 
 func (t *External) GetRepoId() ids.RepoId {
 	return t.RepoId
+}
+
+func (t *External) GetObjectId() *ids.ObjectId {
+	return &t.Transacted.ObjectId
 }
 
 func (t *External) GetExternalObjectId() ids.ExternalObjectId {
@@ -28,7 +32,7 @@ func (t *External) GetExternalObjectId() ids.ExternalObjectId {
 }
 
 func (t *External) GetSkuExternalLike() ExternalLike {
-	return t
+	return &t.Transacted
 }
 
 func (t *External) GetExternalState() external_state.State {
@@ -46,15 +50,15 @@ func (c *External) GetSku() *Transacted {
 }
 
 func (a *External) GetObjectIdLike() ids.IdLike {
-	return &a.ObjectId
+	return &a.Transacted.ObjectId
 }
 
 func (a *External) GetMetadatei() *object_metadata.Metadata {
-	return &a.Metadata
+	return &a.Transacted.Metadata
 }
 
 func (a *External) GetGenre() interfaces.Genre {
-	return a.ObjectId.GetGenre()
+	return a.Transacted.ObjectId.GetGenre()
 }
 
 func (a *External) String() string {
@@ -62,17 +66,17 @@ func (a *External) String() string {
 		". %s %s %s %s",
 		a.GetGenre(),
 		a.GetObjectIdLike(),
-		a.GetObjectSha(),
+		a.Transacted.GetObjectSha(),
 		a.GetBlobSha(),
 	)
 }
 
 func (a *External) GetBlobSha() interfaces.Sha {
-	return &a.Metadata.Blob
+	return &a.Transacted.Metadata.Blob
 }
 
 func (a *External) SetBlobSha(v interfaces.Sha) (err error) {
-	if err = a.Metadata.Blob.SetShaLike(v); err != nil {
+	if err = a.Transacted.Metadata.Blob.SetShaLike(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

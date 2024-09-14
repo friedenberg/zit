@@ -244,7 +244,7 @@ LOOP:
 						continue LOOP
 
 					case "":
-						if err = e.Metadata.Description.Set(right); err != nil {
+						if err = e.Transacted.Metadata.Description.Set(right); err != nil {
 							err = errors.Wrap(err)
 							return
 						}
@@ -313,7 +313,7 @@ func (f *Organize) writeStringFormatExternal(
 ) (n int64, err error) {
 	fields := []string_format_writer.Field{}
 
-	idFieldValue := (*ids.ObjectIdStringerSansRepo)(&e.ObjectId).String()
+	idFieldValue := (*ids.ObjectIdStringerSansRepo)(&e.Transacted.ObjectId).String()
 	var n2 int64
 
 	// TODO make this more robust
@@ -337,7 +337,7 @@ func (f *Organize) writeStringFormatExternal(
 	)
 
 	if e.State != external_state.Untracked {
-		m := &e.Metadata
+		m := &e.Transacted.Metadata
 
 		var shaString string
 

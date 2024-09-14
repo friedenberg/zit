@@ -24,7 +24,7 @@ func (c *executor) tryToEmitOneExplicitlyCheckedOut(
 	item Item,
 ) (err error) {
 	sku.TransactedResetter.Reset(&c.co.External.Browser)
-	c.co.External.ObjectId.Reset()
+	c.co.External.Transacted.ObjectId.Reset()
 
 	var uSku *url.URL
 
@@ -96,7 +96,7 @@ func (c *executor) tryToEmitOneUntracked(
 	sku.TransactedResetter.Reset(&c.co.External.Transacted)
 	sku.TransactedResetter.Reset(&c.co.Internal)
 
-	if err = c.co.External.Metadata.Description.Set(item.Title); err != nil {
+	if err = c.co.External.Transacted.Metadata.Description.Set(item.Title); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -124,7 +124,7 @@ func (c *executor) tryToEmitOneCommon(
 	}
 
 	browser.ObjectId.SetGenre(genres.Zettel)
-	external.ObjectId.SetGenre(genres.Zettel)
+	external.Transacted.ObjectId.SetGenre(genres.Zettel)
 
 	// ui.Debug().Print(browser.GetExternalObjectId(), external.GetExternalObjectId())
 
@@ -133,7 +133,7 @@ func (c *executor) tryToEmitOneCommon(
 		return
 	}
 
-	if err = c.co.External.ObjectId.SetRepoId(
+	if err = c.co.External.Transacted.ObjectId.SetRepoId(
 		c.store.externalStoreInfo.RepoId.String(),
 	); err != nil {
 		err = errors.Wrap(err)

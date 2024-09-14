@@ -25,13 +25,13 @@ var ExternalResetter externalResetter
 type externalResetter struct{}
 
 func (externalResetter) Reset(a *External) {
-	a.ObjectId.SetGenre(genres.Unknown)
-	object_metadata.Resetter.Reset(&a.Metadata)
+	a.Transacted.ObjectId.SetGenre(genres.Unknown)
+	object_metadata.Resetter.Reset(&a.Transacted.Metadata)
 }
 
 func (externalResetter) ResetWith(a *External, b *External) {
-	errors.PanicIfError(a.ObjectId.ResetWithIdLike(&b.ObjectId))
-	object_metadata.Resetter.ResetWith(&a.Metadata, &b.Metadata)
+	errors.PanicIfError(a.Transacted.ObjectId.ResetWithIdLike(&b.Transacted.ObjectId))
+	object_metadata.Resetter.ResetWith(&a.Transacted.Metadata, &b.Transacted.Metadata)
 }
 
 var Resetter resetter

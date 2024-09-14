@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -60,7 +59,7 @@ func (e *External) SaveBlob(s fs_home.Home) (err error) {
 		}
 	}()
 
-	e.Metadata.Blob.SetShaLike(aw)
+	e.Transacted.Metadata.Blob.SetShaLike(aw)
 
 	return
 }
@@ -73,7 +72,7 @@ func (e *External) SetItem(i Item, overwrite bool) (err error) {
 		return
 	}
 
-	e.Metadata.Tai = e.Browser.Metadata.GetTai()
+	e.Transacted.Metadata.Tai = e.Browser.Metadata.GetTai()
 
 	// if overwrite {
 	// 	if err = i.WriteToMetadata(&e.Metadata); err != nil {
@@ -83,7 +82,7 @@ func (e *External) SetItem(i Item, overwrite bool) (err error) {
 	// }
 
 	// TODO make configurable
-	e.Metadata.Type = ids.MustType("!toml-bookmark")
+	e.Transacted.Metadata.Type = ids.MustType("!toml-bookmark")
 
 	return
 }
@@ -110,29 +109,11 @@ func (c *External) GetSku() *sku.Transacted {
 }
 
 func (a *External) GetMetadatei() *object_metadata.Metadata {
-	return &a.Metadata
-}
-
-func (a *External) GetGattung() interfaces.Genre {
-	return a.ObjectId.GetGenre()
-}
-
-func (a *External) String() string {
-	return fmt.Sprintf(
-		". %s %s %s %s",
-		a.GetGattung(),
-		a.GetObjectId(),
-		a.GetObjectSha(),
-		a.GetBlobSha(),
-	)
-}
-
-func (a *External) GetBlobSha() interfaces.Sha {
-	return &a.Metadata.Blob
+	return &a.Transacted.Metadata
 }
 
 func (o *External) GetKey() string {
-	return fmt.Sprintf("%s.%s", o.GetGattung(), o.GetObjectId())
+	return fmt.Sprintf("%s.%s", o.GetGenre(), o.GetObjectId())
 }
 
 type lessorExternal struct{}
