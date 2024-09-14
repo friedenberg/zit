@@ -2,7 +2,6 @@ package sku_fmt
 
 import (
 	"fmt"
-	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
@@ -20,11 +19,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type ObjectIdAlignedFormat interface {
-	SetMaxKopfUndSchwanz(kop, schwanz int)
-}
-
-func MakeBox(
+func MakeBox2(
 	co string_format_writer.ColorOptions,
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
@@ -34,13 +29,13 @@ func MakeBox(
 	fieldsFormatWriter interfaces.StringFormatWriter[string_format_writer.Fields],
 	metadata interfaces.StringFormatWriter[*object_metadata.Metadata],
 	abbr ids.Abbr,
-) *Box {
+) *Box2 {
 	options.PrintTime = false
 	options.PrintShas = false
 
 	co.OffEntirely = true
 
-	return &Box{
+	return &Box2{
 		ColorOptions: co,
 		Options:      options,
 		ShaString:    shaStringFormatWriter,
@@ -54,7 +49,7 @@ func MakeBox(
 	}
 }
 
-type Box struct {
+type Box2 struct {
 	string_format_writer.ColorOptions
 	Options erworben_cli_print_options.PrintOptions
 
@@ -73,17 +68,11 @@ type Box struct {
 	ids.Abbr
 }
 
-func (f *Box) SetMaxKopfUndSchwanz(k, s int) {
-	f.MaxHead, f.MaxTail = k, s
-	f.Padding = strings.Repeat(" ", 5+k+s)
-	f.ObjectId.SetMaxKopfUndSchwanz(k, s)
-}
-
-func (f *Box) WriteStringFormat(
+func (f *Box2) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
-	el sku.ExternalLike,
+	e *sku.External,
 ) (n int64, err error) {
-	o := el.GetSku()
+	o := e.GetSku()
 
 	var n1 int
 
@@ -236,21 +225,21 @@ func (f *Box) WriteStringFormat(
 	return
 }
 
-func (f *Box) ReadStringFormat(
+func (f *Box2) ReadStringFormat(
 	rb *catgut.RingBuffer,
-	el sku.ExternalLike,
+	e *sku.External,
 ) (n int64, err error) {
 	var ts query_spec.TokenScanner
 	ts.Reset(catgut.MakeRingBufferRuneScanner(rb))
 
-	if err = f.readStringFormatBox(&ts, el); err != nil {
+	if err = f.readStringFormatBox(&ts, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	n = ts.N()
 
-	o := el.GetSku()
+	o := e.GetSku()
 
 	if err = o.Metadata.Description.ReadFromRuneScanner(&ts); err != nil {
 		err = errors.Wrap(err)
@@ -262,9 +251,9 @@ func (f *Box) ReadStringFormat(
 	return
 }
 
-func (f *Box) readStringFormatBox(
+func (f *Box2) readStringFormatBox(
 	ts *query_spec.TokenScanner,
-	el sku.ExternalLike,
+	el *sku.External,
 ) (err error) {
 	o := el.GetSku()
 

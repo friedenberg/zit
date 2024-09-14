@@ -3,7 +3,6 @@ package store_browser
 import (
 	"bufio"
 	"fmt"
-	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
@@ -18,20 +17,9 @@ import (
 )
 
 type External struct {
-	external_state.State
-	sku.Transacted
+	sku.External
 	Browser sku.Transacted
 	Item    Item
-}
-
-func (e *External) Validate(k string) {
-	k = strings.TrimSuffix(k, "/")
-	expected := k
-	actual := strings.TrimSuffix(e.Browser.GetObjectId().String(), "/")
-
-	if expected != actual {
-		panic(fmt.Sprintf("expected %q but got %q", expected, actual))
-	}
 }
 
 func (c *External) GetRepoId() ids.RepoId {

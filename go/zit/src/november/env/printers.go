@@ -113,7 +113,7 @@ func (u *Env) PrinterExternalLikeFS() *store_fs.CliExternal {
 			u.fs_home.MakeRelativePathStringFormatWriter(),
 		),
 		u.StringFormatWriterObjectId(oo.ColorOptionsErr),
-		u.StringFormatWriterMetadatei(
+		u.StringFormatWriterMetadata(
 			oo.ColorOptionsErr,
 			string_format_writer.CliFormatTruncation66CharEllipsis,
 		),
@@ -134,7 +134,7 @@ func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[sku.CheckedOutLike] {
 				u.fs_home.MakeRelativePathStringFormatWriter(),
 			),
 			u.StringFormatWriterObjectId(oo.ColorOptionsErr),
-			u.StringFormatWriterMetadatei(
+			u.StringFormatWriterMetadata(
 				oo.ColorOptionsErr,
 				string_format_writer.CliFormatTruncation66CharEllipsis,
 			),
@@ -152,7 +152,7 @@ func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[sku.CheckedOutLike] {
 				u.fs_home.MakeRelativePathStringFormatWriter(),
 			),
 			u.StringFormatWriterObjectId(oo.ColorOptionsOut),
-			u.StringFormatWriterMetadatei(
+			u.StringFormatWriterMetadata(
 				oo.ColorOptionsErr,
 				string_format_writer.CliFormatTruncation66CharEllipsis,
 			),

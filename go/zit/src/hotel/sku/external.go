@@ -6,14 +6,17 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
+	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 )
 
 type External struct {
 	ids.RepoId
+	external_state.State
 	ExternalObjectId ids.ObjectId
 	Transacted
+	Fields []string_format_writer.Field
 }
 
 func (t *External) GetRepoId() ids.RepoId {

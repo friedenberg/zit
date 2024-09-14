@@ -58,7 +58,7 @@ func (u *Env) StringFormatWriterObjectId(
 	)
 }
 
-func (u *Env) StringFormatWriterTyp(
+func (u *Env) StringFormatWriterType(
 	co string_format_writer.ColorOptions,
 ) interfaces.StringFormatWriter[*ids.Type] {
 	return id_fmts.MakeTypCliFormat(co)
@@ -79,22 +79,42 @@ func (u *Env) StringFormatWriterFields(
 	return string_format_writer.MakeCliFormatFields(truncate, co)
 }
 
-func (u *Env) StringFormatWriterEtiketten(
+func (u *Env) StringFormatWriterTags(
 	co string_format_writer.ColorOptions,
 ) interfaces.StringFormatWriter[*ids.Tag] {
 	return id_fmts.MakeEtikettenCliFormat()
 }
 
-func (u *Env) StringFormatWriterMetadatei(
+func (u *Env) StringFormatWriterMetadata(
 	co string_format_writer.ColorOptions,
 	truncation string_format_writer.CliFormatTruncation,
 ) interfaces.StringFormatWriter[*object_metadata.Metadata] {
 	return object_metadata_fmt.MakeCliMetadateiFormat(
 		u.config.PrintOptions,
 		u.StringFormatWriterShaLike(co),
-		u.StringFormatWriterTyp(co),
+		u.StringFormatWriterType(co),
 		u.StringFormatWriterFields(truncation, co),
-		u.StringFormatWriterEtiketten(co),
+		u.StringFormatWriterTags(co),
+	)
+}
+
+func (u *Env) StringFormatWriterSkuBox2(
+	co string_format_writer.ColorOptions,
+	truncation string_format_writer.CliFormatTruncation,
+) *sku_fmt.Box2 {
+	return sku_fmt.MakeBox2(
+		co,
+		u.config.PrintOptions,
+		u.StringFormatWriterShaLike(co),
+		u.StringFormatWriterObjectIdAligned(co),
+		u.StringFormatWriterType(co),
+		u.StringFormatWriterTags(co),
+		u.StringFormatWriterFields(truncation, co),
+		u.StringFormatWriterMetadata(
+			co,
+			truncation,
+		),
+		u.GetStore().GetAbbrStore().GetAbbr(),
 	)
 }
 
@@ -107,10 +127,10 @@ func (u *Env) StringFormatWriterSkuBox(
 		u.config.PrintOptions,
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterObjectIdAligned(co),
-		u.StringFormatWriterTyp(co),
-		u.StringFormatWriterEtiketten(co),
+		u.StringFormatWriterType(co),
+		u.StringFormatWriterTags(co),
 		u.StringFormatWriterFields(truncation, co),
-		u.StringFormatWriterMetadatei(
+		u.StringFormatWriterMetadata(
 			co,
 			truncation,
 		),
@@ -161,7 +181,7 @@ func (u *Env) StringFormatWriterSkuTransacted(
 	return sku_fmt.MakeCliFormat(
 		u.config.PrintOptions,
 		u.StringFormatWriterObjectId(*co),
-		u.StringFormatWriterMetadatei(*co, truncate),
+		u.StringFormatWriterMetadata(*co, truncate),
 	)
 }
 
@@ -172,7 +192,7 @@ func (u *Env) StringFormatWriterSkuTransactedShort() interfaces.StringFormatWrit
 
 	return sku_fmt.MakeCliFormatShort(
 		u.StringFormatWriterObjectId(co),
-		u.StringFormatWriterMetadatei(
+		u.StringFormatWriterMetadata(
 			co,
 			string_format_writer.CliFormatTruncation66CharEllipsis,
 		),
