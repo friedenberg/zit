@@ -2,21 +2,19 @@ package store_browser
 
 import (
 	"bufio"
-	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
+// TODO remove entirely
 type External struct {
 	sku.External
-	Item Item
 }
 
 func (c *External) GetRepoId() ids.RepoId {
@@ -74,30 +72,5 @@ func (t *External) GetSkuExternalLike() sku.ExternalLike {
 func (a *External) Clone() sku.ExternalLike {
 	b := GetExternalPool().Get()
 	sku.ExternalResetter.ResetWith(&b.External, &a.External)
-	b.Item = a.Item
 	return b
-}
-
-func (a *External) GetMetadatei() *object_metadata.Metadata {
-	return &a.Transacted.Metadata
-}
-
-func (o *External) GetKey() string {
-	return fmt.Sprintf("%s.%s", o.GetGenre(), o.GetObjectId())
-}
-
-type lessorExternal struct{}
-
-func (lessorExternal) Less(a, b External) bool {
-	panic("not supported")
-}
-
-func (lessorExternal) LessPtr(a, b *External) bool {
-	return a.Transacted.GetTai().Less(b.Transacted.GetTai())
-}
-
-type equalerExternal struct{}
-
-func (equalerExternal) Equals(a, b External) bool {
-	panic("not supported")
 }

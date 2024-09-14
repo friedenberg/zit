@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/chrest/go/src/charlie/browser_items"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
@@ -109,7 +108,6 @@ func (i *Item) WriteToExternal(e *External) (err error) {
 	}
 
 	e.Transacted.Metadata.Type = ids.MustType("!toml-bookmark")
-	e.Item = *i
 
 	m := &e.Transacted.Metadata
 
@@ -163,8 +161,6 @@ func (i *Item) ReadFromExternal(e *External) (err error) {
 	}
 
 	for _, field := range e.Transacted.Fields {
-		ui.Debug().Printf("%#v", field)
-
 		switch field.Key {
 		case "id":
 			if field.Value == "" {
