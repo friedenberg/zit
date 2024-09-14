@@ -166,7 +166,7 @@ func (c Clean) runOrganize(u *env.Env, qg *query.Group) (err error) {
 			OptionCommentSet: organize_text.MakeOptionCommentSet(
 				nil,
 				organize_text.OptionCommentUnknown(
-					"instructions: to prevent an object from being cleaned, delete it entirely",
+					"instructions: to clean an object, delete it entirely",
 				),
 			),
 		},
@@ -199,7 +199,7 @@ func (c Clean) runOrganize(u *env.Env, qg *query.Group) (err error) {
 		return
 	}
 
-	if err = changes.After.Each(
+	if err = changes.Removed.Each(
 		func(el sku.ExternalLike) (err error) {
 			if err = u.GetStore().DeleteExternalLike(
 				qg.RepoId,

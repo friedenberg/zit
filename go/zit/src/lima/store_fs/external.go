@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+// TODO migrate to *sku.External
 type External struct {
 	sku.Transacted
 	FDs FDSet

@@ -57,10 +57,12 @@ func (a *Assignment) addToSet(
 
 	if err = a.Each(
 		func(o *obj) (err error) {
+			var selwi skuExternalLikeWithIndex
 			var z sku.ExternalLike
 			ok := false
 
-			if z, ok = out.m[key(o.ExternalLike)]; !ok {
+			if selwi, ok = out.m[key(o.ExternalLike)]; !ok {
+        z = selwi.ExternalLike
 				z = ot.ObjectFactory.Get()
 
 				ot.ObjectFactory.ResetWith(z, o.ExternalLike)

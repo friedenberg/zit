@@ -17,7 +17,7 @@ func MakeSkuMapWithOrder(c int) (out SkuMapWithOrder) {
 }
 
 type skuExternalLikeWithIndex struct {
-	sku.ExternalLike
+	ExternalLike sku.ExternalLike
 	int
 }
 
@@ -68,7 +68,7 @@ func (sm *SkuMapWithOrder) Clone() (out SkuMapWithOrder) {
 	out = MakeSkuMapWithOrder(sm.Len())
 
 	for _, v := range sm.m {
-		out.Add(v)
+		out.Add(v.ExternalLike)
 	}
 
 	return out
@@ -179,19 +179,19 @@ func ChangesFromResults(
 	c.Removed = c.Before.Clone()
 
 	for _, sk := range c.After.m {
-		if err = c.Removed.Del(sk); err != nil {
+		if err = c.Removed.Del(sk.ExternalLike); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
 	for _, sk := range c.Removed.m {
-		if err = results.Before.RemoveFromTransacted(sk); err != nil {
+		if err = results.Before.RemoveFromTransacted(sk.ExternalLike); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = c.Changed.Add(sk); err != nil {
+		if err = c.Changed.Add(sk.ExternalLike); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
