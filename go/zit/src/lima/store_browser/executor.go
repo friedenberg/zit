@@ -23,7 +23,6 @@ func (c *executor) tryToEmitOneExplicitlyCheckedOut(
 	internal *sku.Transacted,
 	item Item,
 ) (err error) {
-	sku.TransactedResetter.Reset(&c.co.External.Browser)
 	c.co.External.Transacted.ObjectId.Reset()
 
 	var uSku *url.URL
@@ -62,8 +61,6 @@ func (c *executor) tryToEmitOneRecognized(
 		return
 	}
 
-	sku.TransactedResetter.Reset(&c.co.External.Browser)
-
 	sku.TransactedResetter.ResetWith(&c.co.Internal, internal)
 	sku.TransactedResetter.ResetWith(c.co.External.GetSku(), internal)
 
@@ -92,7 +89,6 @@ func (c *executor) tryToEmitOneUntracked(
 		return
 	}
 
-	sku.TransactedResetter.Reset(&c.co.External.Browser)
 	sku.TransactedResetter.Reset(c.co.External.GetSku())
 	sku.TransactedResetter.Reset(&c.co.Internal)
 
@@ -115,7 +111,6 @@ func (c *executor) tryToEmitOneCommon(
 	i Item,
 	overwrite bool,
 ) (err error) {
-	browser := &c.co.External.Browser
 	external := &c.co.External
 
 	if err = external.SetItem(i, overwrite); err != nil {
@@ -123,13 +118,11 @@ func (c *executor) tryToEmitOneCommon(
 		return
 	}
 
-	browser.ObjectId.SetGenre(genres.Zettel)
 	external.Transacted.ObjectId.SetGenre(genres.Zettel)
 
 	// ui.Debug().Print(browser.GetExternalObjectId(), external.GetExternalObjectId())
 
-	if !c.qg.ContainsExternalSku(browser, c.co.State) &&
-		!c.qg.ContainsExternalSku(external, c.co.State) {
+	if !c.qg.ContainsExternalSku(external, c.co.State) {
 		return
 	}
 

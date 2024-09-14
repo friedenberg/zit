@@ -17,8 +17,7 @@ import (
 
 type External struct {
 	sku.External
-	Browser sku.Transacted
-	Item    Item
+	Item Item
 }
 
 func (c *External) GetRepoId() ids.RepoId {
@@ -67,21 +66,34 @@ func (e *External) SaveBlob(s fs_home.Home) (err error) {
 func (e *External) SetItem(i Item, overwrite bool) (err error) {
 	e.Item = i
 
-	if err = i.WriteToMetadata(&e.Browser.Metadata); err != nil {
+  m := &e.Transacted.Metadata
+
+	if m.Tai, err = i.GetTai(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	e.Transacted.Metadata.Tai = e.Browser.Metadata.GetTai()
+	if e.ExternalType, err = i.GetType(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	// if overwrite {
-	// 	if err = i.WriteToMetadata(&e.Metadata); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return
-	// 	}
-	// }
+	if m.Description, err = i.GetDescription(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	// TODO make configurable
+	var t ids.Tag
+
+	if t, err = i.GetUrlPathTag(); err == nil {
+		if err = m.AddTagPtr(&t); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	err = nil
+
 	e.Transacted.Metadata.Type = ids.MustType("!toml-bookmark")
 
 	return
@@ -98,7 +110,6 @@ func (t *External) GetExternalObjectId() sku.ExternalObjectId {
 func (a *External) Clone() sku.ExternalLike {
 	b := GetExternalPool().Get()
 	sku.TransactedResetter.ResetWith(b.GetSku(), a.GetSku())
-	sku.TransactedResetter.ResetWith(&b.Browser, &a.Browser)
 	b.Item = a.Item
 	b.State = a.State
 	return b

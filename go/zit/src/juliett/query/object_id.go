@@ -29,7 +29,7 @@ func (k ObjectId) reduce(b *buildState) (err error) {
 
 // TODO support exact
 func (exp ObjectId) ContainsSku(tg sku.TransactedGetter) (ok bool) {
-  sk := tg.GetSku()
+	sk := tg.GetSku()
 
 	defer sk.Metadata.Cache.QueryPath.PushOnReturn(exp, &ok)
 
@@ -68,6 +68,13 @@ func (exp ObjectId) ContainsSku(tg sku.TransactedGetter) (ok bool) {
 		if ids.Contains(skMe.GetType(), exp.GetObjectId()) {
 			ok = true
 			return
+		}
+
+    if e, isExternal := tg.(*sku.External); isExternal {
+			if ids.Contains(e.ExternalType, exp.GetObjectId()) {
+				ok = true
+				return
+			}
 		}
 	}
 

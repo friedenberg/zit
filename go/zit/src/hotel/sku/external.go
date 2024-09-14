@@ -17,6 +17,7 @@ type External struct {
 	ids.RepoId
 	external_state.State
 	ExternalObjectId ids.ObjectId
+	ExternalType     ids.Type
 }
 
 func (t *External) GetRepoId() ids.RepoId {
