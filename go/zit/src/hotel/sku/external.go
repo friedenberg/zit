@@ -42,7 +42,7 @@ func (t *External) GetExternalState() external_state.State {
 
 func (a *External) Clone() ExternalLike {
 	b := GetExternalPool().Get()
-	TransactedResetter.ResetWith(b.GetSku(), a.GetSku())
+  ExternalResetter.ResetWith(b, a)
 	return b
 }
 

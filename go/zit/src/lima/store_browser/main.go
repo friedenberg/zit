@@ -157,20 +157,26 @@ func (c *Store) CheckoutOne(
 
 	co := GetCheckedOutPool().Get()
 	cz = co
+	var item Item
+	item.Url.URL = *u
+	item.ExternalId = sz.ObjectId.String()
+	item.Id.Type = "tab"
 
 	sku.TransactedResetter.ResetWith(co.GetSku(), sz)
 	sku.TransactedResetter.ResetWith(co.GetSkuExternalLike().GetSku(), sz)
 	co.State = checked_out_state.JustCheckedOut
 	co.External.ExternalType = ids.MustType("!browser-tab")
-	co.External.Item.Url.URL = *u
-	co.External.Item.ExternalId = sz.ObjectId.String()
-	co.External.Item.Id.Type = "tab"
+
+	if err = co.External.SetItem(item); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	c.l.Lock()
 	defer c.l.Unlock()
 
 	existing := c.added[*u]
-	c.added[*u] = append(existing, co.External.Item)
+	c.added[*u] = append(existing, item)
 
 	// 	ui.Debug().Print(response)
 

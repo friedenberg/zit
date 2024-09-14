@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -28,10 +27,8 @@ func (e *External) GetObjectId() *ids.ObjectId {
 	return e.Transacted.GetObjectId()
 }
 
-func (e *External) GetExternalState() external_state.State {
-	return e.State
-}
-
+// TODO support updating bookmarks without overwriting. Maybe move to
+// toml-bookmark type
 func (e *External) SaveBlob(s fs_home.Home) (err error) {
 	var aw sha.WriteCloser
 
@@ -42,8 +39,15 @@ func (e *External) SaveBlob(s fs_home.Home) (err error) {
 
 	defer errors.DeferredCloser(&err, aw)
 
+	var item Item
+
+	if item, err = e.GetItem(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	tb := sku_fmt.TomlBookmark{
-		Url: e.Item.Url.String(),
+		Url: item.Url.String(),
 	}
 
 	func() {
@@ -63,10 +67,10 @@ func (e *External) SaveBlob(s fs_home.Home) (err error) {
 	return
 }
 
-func (e *External) SetItem(i Item, overwrite bool) (err error) {
+func (e *External) SetItem(i Item) (err error) {
 	e.Item = i
 
-  m := &e.Transacted.Metadata
+	m := &e.Transacted.Metadata
 
 	if m.Tai, err = i.GetTai(); err != nil {
 		err = errors.Wrap(err)
@@ -95,7 +99,12 @@ func (e *External) SetItem(i Item, overwrite bool) (err error) {
 	err = nil
 
 	e.Transacted.Metadata.Type = ids.MustType("!toml-bookmark")
+	return
+}
 
+func (e *External) GetItem() (i Item, err error) {
+	i = e.Item
+	// err = todo.Implement()
 	return
 }
 

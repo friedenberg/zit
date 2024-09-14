@@ -99,7 +99,7 @@ func (i Item) GetUrlPathTag() (e ids.Tag, err error) {
 		return
 	}
 
-	if err = e.Set("zz-site-" + host); err != nil {
+	if err = e.Set("%zz-site-" + host); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

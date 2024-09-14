@@ -363,7 +363,12 @@ func (f *Organize) writeStringFormatExternal(
 		}
 	}
 
-	item := &e.Item
+  var item Item
+
+  if item, err = e.GetItem(); err != nil {
+    err = errors.Wrap(err)
+    return
+  }
 
 	fields = append(
 		fields,
@@ -428,7 +433,12 @@ func (f *Organize) writeStringFormatExternalBoxUntracked(
 
 	var n2 int64
 
-	item := &e.Item
+  var item Item
+
+  if item, err = e.GetItem(); err != nil {
+    err = errors.Wrap(err)
+    return
+  }
 
 	boxed = append(
 		boxed,
