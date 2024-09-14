@@ -120,8 +120,6 @@ func (c *executor) tryToEmitOneCommon(
 
 	external.Transacted.ObjectId.SetGenre(genres.Zettel)
 
-	// ui.Debug().Print(browser.GetExternalObjectId(), external.GetExternalObjectId())
-
 	if !c.qg.ContainsExternalSku(&external.External, c.co.State) {
 		return
 	}
@@ -132,13 +130,6 @@ func (c *executor) tryToEmitOneCommon(
 		err = errors.Wrap(err)
 		return
 	}
-
-	// if err = c.co.Internal.ObjectId.SetRepoId(
-	// 	c.store.externalStoreInfo.RepoId.String(),
-	// ); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
 
 	if err = c.out(&c.co); err != nil {
 		err = errors.Wrap(err)
