@@ -10,6 +10,10 @@ type DumbObjectId struct {
 	Genre genres.Genre
 }
 
+func (a *DumbObjectId) IsEmpty() bool {
+	return a.Value == ""
+}
+
 func (a *DumbObjectId) GetExternalObjectId() ExternalObjectId {
 	return a
 }

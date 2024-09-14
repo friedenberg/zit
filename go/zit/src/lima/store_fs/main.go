@@ -243,12 +243,6 @@ func (fs *Store) GetBlobFDs() fd.Set {
 	return fds
 }
 
-func (fs *Store) GetEmptyDirectories() fd.Set {
-	fds := fd.MakeMutableSet()
-	fs.emptyDirectories.Each(fds.Add)
-	return fds
-}
-
 func (fs *Store) Get(
 	k interfaces.ObjectId,
 ) (t *FDSet, ok bool) {

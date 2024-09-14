@@ -33,17 +33,10 @@ func (c *executor) tryToEmitOneExplicitlyCheckedOut(
 		return
 	}
 
-	var uBrowser *url.URL
-
-	if uBrowser, err = item.GetUrl(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	sku.TransactedResetter.ResetWith(&c.co.Internal, internal)
 	sku.TransactedResetter.ResetWith(&c.co.External.Transacted, internal)
 
-	if *uSku == *uBrowser {
+	if *uSku == item.Url.URL {
 		c.co.State = checked_out_state.ExistsAndSame
 	} else {
 		c.co.State = checked_out_state.ExistsAndDifferent

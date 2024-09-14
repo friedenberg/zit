@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"github.com/google/go-cmp/cmp/cmpopts"
@@ -169,30 +170,30 @@ func TestTokenScannerWithTypes(t1 *testing.T) {
 
 	type stringWithType struct {
 		Value string
-		TokenType
+		token_types.TokenType
 	}
 
 	expected := []stringWithType{
-		{Value: "[", TokenType: TokenTypeOperator},
-		{Value: "\n", TokenType: TokenTypeOperator},
-		{Value: "/browser/bookmark-1FuOLQOYZAsP/", TokenType: TokenTypeIdentifier},
-		{Value: " ", TokenType: TokenTypeOperator},
-		{Value: "!toml-bookmark", TokenType: TokenTypeIdentifier},
-		{Value: "\n", TokenType: TokenTypeOperator},
-		{Value: "zz-site-org-mozilla-support", TokenType: TokenTypeIdentifier},
-		{Value: "\n", TokenType: TokenTypeOperator},
-		{Value: "!browser-bookmark", TokenType: TokenTypeIdentifier},
-		{Value: " ", TokenType: TokenTypeOperator},
-		{Value: `"Get Help"`, TokenType: TokenTypeLiteral},
-		{Value: "\n", TokenType: TokenTypeOperator},
-		{Value: `url="https://support.\"mozilla.org/products/firefox"`, TokenType: TokenTypeField},
-		{Value: "\n", TokenType: TokenTypeOperator},
-		{Value: "zz-site-org-mozilla-support", TokenType: TokenTypeIdentifier},
-		{Value: "]", TokenType: TokenTypeOperator},
-		{Value: " ", TokenType: TokenTypeOperator},
-		{Value: "Get", TokenType: TokenTypeIdentifier},
-		{Value: " ", TokenType: TokenTypeOperator},
-		{Value: "Help", TokenType: TokenTypeIdentifier},
+		{Value: "[", TokenType: token_types.TypeOperator},
+		{Value: "\n", TokenType: token_types.TypeOperator},
+		{Value: "/browser/bookmark-1FuOLQOYZAsP/", TokenType: token_types.TypeIdentifier},
+		{Value: " ", TokenType: token_types.TypeOperator},
+		{Value: "!toml-bookmark", TokenType: token_types.TypeIdentifier},
+		{Value: "\n", TokenType: token_types.TypeOperator},
+		{Value: "zz-site-org-mozilla-support", TokenType: token_types.TypeIdentifier},
+		{Value: "\n", TokenType: token_types.TypeOperator},
+		{Value: "!browser-bookmark", TokenType: token_types.TypeIdentifier},
+		{Value: " ", TokenType: token_types.TypeOperator},
+		{Value: `"Get Help"`, TokenType: token_types.TypeLiteral},
+		{Value: "\n", TokenType: token_types.TypeOperator},
+		{Value: `url="https://support.\"mozilla.org/products/firefox"`, TokenType: token_types.TypeField},
+		{Value: "\n", TokenType: token_types.TypeOperator},
+		{Value: "zz-site-org-mozilla-support", TokenType: token_types.TypeIdentifier},
+		{Value: "]", TokenType: token_types.TypeOperator},
+		{Value: " ", TokenType: token_types.TypeOperator},
+		{Value: "Get", TokenType: token_types.TypeIdentifier},
+		{Value: " ", TokenType: token_types.TypeOperator},
+		{Value: "Help", TokenType: token_types.TypeIdentifier},
 	}
 
 	var scanner TokenScanner
@@ -224,57 +225,57 @@ func TestTokenScannerWithTypesAndParts(t1 *testing.T) {
 
 	type stringWithTypeAndParts struct {
 		Value string
-		TokenType
+		token_types.TokenType
 		TokenParts
 	}
 
 	expected := []stringWithTypeAndParts{
-		{Value: "[", TokenType: TokenTypeOperator},
-		{Value: "\n", TokenType: TokenTypeOperator},
+		{Value: "[", TokenType: token_types.TypeOperator},
+		{Value: "\n", TokenType: token_types.TypeOperator},
 		{
-			Value: "/browser/bookmark-1FuOLQOYZAsP/", TokenType: TokenTypeIdentifier, TokenParts: TokenParts{
+			Value: "/browser/bookmark-1FuOLQOYZAsP/", TokenType: token_types.TypeIdentifier, TokenParts: TokenParts{
 				[]uint8("/browser/bookmark-1FuOLQOYZAsP/"),
 				[]byte{},
 			},
 		},
-		{Value: " ", TokenType: TokenTypeOperator},
-		{Value: "!toml-bookmark", TokenType: TokenTypeIdentifier, TokenParts: TokenParts{
+		{Value: " ", TokenType: token_types.TypeOperator},
+		{Value: "!toml-bookmark", TokenType: token_types.TypeIdentifier, TokenParts: TokenParts{
 			[]uint8("!toml-bookmark"),
 			[]byte{},
 		}},
-		{Value: "\n", TokenType: TokenTypeOperator},
-		{Value: "zz-site-org-mozilla-support", TokenType: TokenTypeIdentifier, TokenParts: TokenParts{
+		{Value: "\n", TokenType: token_types.TypeOperator},
+		{Value: "zz-site-org-mozilla-support", TokenType: token_types.TypeIdentifier, TokenParts: TokenParts{
 			[]uint8("zz-site-org-mozilla-support"),
 			[]byte{},
 		}},
-		{Value: "\n", TokenType: TokenTypeOperator},
-		{Value: "!browser-bookmark", TokenType: TokenTypeIdentifier, TokenParts: TokenParts{
+		{Value: "\n", TokenType: token_types.TypeOperator},
+		{Value: "!browser-bookmark", TokenType: token_types.TypeIdentifier, TokenParts: TokenParts{
 			[]uint8("!browser-bookmark"),
 			[]byte{},
 		}},
-		{Value: " ", TokenType: TokenTypeOperator},
-		{Value: `"Get Help"`, TokenType: TokenTypeLiteral, TokenParts: TokenParts{
+		{Value: " ", TokenType: token_types.TypeOperator},
+		{Value: `"Get Help"`, TokenType: token_types.TypeLiteral, TokenParts: TokenParts{
 			[]uint8("Get Help"),
 			[]byte{},
 		}},
-		{Value: "\n", TokenType: TokenTypeOperator},
-		{Value: `url="https://support.\"mozilla.org/products/firefox"`, TokenType: TokenTypeField, TokenParts: TokenParts{
+		{Value: "\n", TokenType: token_types.TypeOperator},
+		{Value: `url="https://support.\"mozilla.org/products/firefox"`, TokenType: token_types.TypeField, TokenParts: TokenParts{
 			[]uint8("url"),
 			[]uint8(`https://support.\"mozilla.org/products/firefox`),
 		}},
-		{Value: "\n", TokenType: TokenTypeOperator},
-		{Value: "zz-site-org-mozilla-support", TokenType: TokenTypeIdentifier, TokenParts: TokenParts{
+		{Value: "\n", TokenType: token_types.TypeOperator},
+		{Value: "zz-site-org-mozilla-support", TokenType: token_types.TypeIdentifier, TokenParts: TokenParts{
 			[]uint8("zz-site-org-mozilla-support"),
 			[]byte{},
 		}},
-		{Value: "]", TokenType: TokenTypeOperator},
-		{Value: " ", TokenType: TokenTypeOperator},
-		{Value: "Get", TokenType: TokenTypeIdentifier, TokenParts: TokenParts{
+		{Value: "]", TokenType: token_types.TypeOperator},
+		{Value: " ", TokenType: token_types.TypeOperator},
+		{Value: "Get", TokenType: token_types.TypeIdentifier, TokenParts: TokenParts{
 			[]uint8("Get"),
 			[]byte{},
 		}},
-		{Value: " ", TokenType: TokenTypeOperator},
-		{Value: "Help", TokenType: TokenTypeIdentifier, TokenParts: TokenParts{
+		{Value: " ", TokenType: token_types.TypeOperator},
+		{Value: "Help", TokenType: token_types.TypeIdentifier, TokenParts: TokenParts{
 			[]uint8("Help"),
 			[]byte{},
 		}},
@@ -306,30 +307,30 @@ func TestTokenScannerWithTypesAndPartsRingBufferEdition(t1 *testing.T) {
 
 	type stringWithTypeAndParts struct {
 		Value string
-		TokenType
+		token_types.TokenType
 		TokenParts
 	}
 
 	expected := []stringWithTypeAndParts{
-		{Value: "[", TokenType: TokenTypeOperator},
-		{Value: "\n", TokenType: TokenTypeOperator},
-		{Value: `url="https://support.\"mozilla.org/products/firefox"`, TokenType: TokenTypeField, TokenParts: TokenParts{
+		{Value: "[", TokenType: token_types.TypeOperator},
+		{Value: "\n", TokenType: token_types.TypeOperator},
+		{Value: `url="https://support.\"mozilla.org/products/firefox"`, TokenType: token_types.TypeField, TokenParts: TokenParts{
 			[]uint8("url"),
 			[]uint8(`https://support.\"mozilla.org/products/firefox`),
 		}},
-		{Value: "\n", TokenType: TokenTypeOperator},
-		{Value: "zz-site-org-mozilla-support", TokenType: TokenTypeIdentifier, TokenParts: TokenParts{
+		{Value: "\n", TokenType: token_types.TypeOperator},
+		{Value: "zz-site-org-mozilla-support", TokenType: token_types.TypeIdentifier, TokenParts: TokenParts{
 			[]uint8("zz-site-org-mozilla-support"),
 			[]byte{},
 		}},
-		{Value: "]", TokenType: TokenTypeOperator},
-		{Value: " ", TokenType: TokenTypeOperator},
-		{Value: "Get", TokenType: TokenTypeIdentifier, TokenParts: TokenParts{
+		{Value: "]", TokenType: token_types.TypeOperator},
+		{Value: " ", TokenType: token_types.TypeOperator},
+		{Value: "Get", TokenType: token_types.TypeIdentifier, TokenParts: TokenParts{
 			[]uint8("Get"),
 			[]byte{},
 		}},
-		{Value: " ", TokenType: TokenTypeOperator},
-		{Value: "Help", TokenType: TokenTypeIdentifier, TokenParts: TokenParts{
+		{Value: " ", TokenType: token_types.TypeOperator},
+		{Value: "Help", TokenType: token_types.TypeIdentifier, TokenParts: TokenParts{
 			[]uint8("Help"),
 			[]byte{},
 		}},

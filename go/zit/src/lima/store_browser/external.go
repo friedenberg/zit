@@ -3,7 +3,6 @@ package store_browser
 import (
 	"bufio"
 	"fmt"
-	"net/url"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -57,15 +56,8 @@ func (e *External) SaveBlob(s fs_home.Home) (err error) {
 
 	defer errors.DeferredCloser(&err, aw)
 
-	var u *url.URL
-
-	if u, err = e.Item.GetUrl(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	tb := sku_fmt.TomlBookmark{
-		Url: u.String(),
+		Url: e.Item.Url.String(),
 	}
 
 	func() {

@@ -9,9 +9,9 @@ import (
 )
 
 func key(el sku.ExternalLike) string {
-	eoid := el.GetExternalObjectId().String()
-	if len(eoid) > 1 {
-		return eoid
+	eoid := el.GetExternalObjectId()
+	if !eoid.IsEmpty() {
+		return eoid.String()
 	}
 
 	if !el.GetSku().ObjectId.IsEmpty() {

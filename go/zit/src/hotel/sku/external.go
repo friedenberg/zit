@@ -12,11 +12,16 @@ import (
 
 type External struct {
 	ids.RepoId
+	ExternalObjectId ids.ObjectId
 	Transacted
 }
 
 func (t *External) GetRepoId() ids.RepoId {
 	return t.RepoId
+}
+
+func (t *External) GetExternalObjectId() ids.ExternalObjectId {
+	return &t.ExternalObjectId
 }
 
 func (t *External) GetSkuExternalLike() ExternalLike {

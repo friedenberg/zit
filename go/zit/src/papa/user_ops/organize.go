@@ -97,7 +97,6 @@ func (op Organize) RunWithExternalLike(
 
 	organizeResults.QueryGroup.RepoId = repoId
 
-	// otFlags.Abbr = u.StoreObjekten().GetAbbrStore().AbbreviateHinweis
 	organizeFlags := organize_text.MakeFlagsWithMetadata(op.Metadata)
 	op.ApplyToOrganizeOptions(&organizeFlags.Options)
 	organizeFlags.Skus = skus

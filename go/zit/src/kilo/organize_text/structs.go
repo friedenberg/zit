@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -114,22 +115,33 @@ func (os *Objects) Del(v *obj) error {
 }
 
 func (os Objects) Sort() {
-	out := os
+	sort.Slice(os, func(i, j int) bool {
+		ei, ej := os[i].ExternalLike, os[j].ExternalLike
 
-	sort.Slice(out, func(i, j int) bool {
+		oidI := ids.ObjectIdLike(ei.GetObjectId())
+		oidJ := ids.ObjectIdLike(ej.GetObjectId())
+
+		if oidI.IsEmpty() {
+			oidI = ei.GetExternalObjectId()
+		}
+
+		if oidJ.IsEmpty() {
+			oidJ = ej.GetExternalObjectId()
+		}
+
 		switch {
-		case out[i].ExternalLike.GetSku().ObjectId.IsEmpty() && out[j].ExternalLike.GetSku().ObjectId.IsEmpty():
-			return out[i].ExternalLike.GetSku().Metadata.Description.String() < out[j].ExternalLike.GetSku().Metadata.Description.String()
+		case oidI.IsEmpty() && oidJ.IsEmpty():
+			return ei.GetSku().Metadata.Description.String() < ej.GetSku().Metadata.Description.String()
 
-		case out[i].ExternalLike.GetSku().ObjectId.IsEmpty():
+		case oidI.IsEmpty():
 			return true
 
-		case out[j].ExternalLike.GetSku().ObjectId.IsEmpty():
+		case oidJ.IsEmpty():
 			return false
 
 		default:
 			// TODO sort by ints for virtual object id
-			return out[i].ExternalLike.GetSku().ObjectId.String() < out[j].ExternalLike.GetSku().ObjectId.String()
+			return oidI.String() < oidJ.String()
 		}
 	})
 }

@@ -4,14 +4,16 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
 type Clean struct {
@@ -19,6 +21,7 @@ type Clean struct {
 	includeRecognizedBlobs   bool
 	includeRecognizedZettels bool
 	includeParent            bool
+	organize                 bool
 }
 
 func init() {
@@ -54,6 +57,8 @@ func init() {
 				false,
 				"remove Zetteln in working directory or args that are recognized",
 			)
+
+			f.BoolVar(&c.organize, "organize", false, "")
 
 			return c
 		},
@@ -111,25 +116,26 @@ func (c Clean) ModifyBuilder(b *query.Builder) {
 
 func (c Clean) RunWithQuery(
 	u *env.Env,
-	eqwk *query.Group,
+	qg *query.Group,
 ) (err error) {
-	fds := fd.MakeMutableSet()
+	if c.organize {
+		if err = c.runOrganize(u, qg); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	u.Lock()
-	defer errors.Deferred(&err, u.Unlock)
+		return
+	}
 
-	// TODO [radi/kof !task project-2021-zit-features zz-inbox] add support for kasten in checkouts and external
-	if err = u.GetStore().GetCwdFiles().GetEmptyDirectories().Each(
-		fds.Add,
-	); err != nil {
+	if err = u.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if err = u.GetStore().QueryCheckedOut(
-		eqwk,
+		qg,
 		func(co sku.CheckedOutLike) (err error) {
-			if !c.shouldClean(u, co, eqwk) {
+			if !c.shouldClean(u, co, qg) {
 				return
 			}
 
@@ -145,23 +151,72 @@ func (c Clean) RunWithQuery(
 		return
 	}
 
-	// TODO [radi/kof !task project-2021-zit-features zz-inbox] add support for kasten in checkouts and external
-	// if err = c.markUnsureAktenForRemovalIfNecessary(u, eqwk, fds.Add); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
+	if err = u.Unlock(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	// TODO [radi/kof !task project-2021-zit-features zz-inbox] add support for kasten in checkouts and external
-	// if err = c.markUnsureZettelenForRemovalIfNecessary(
-	// 	u,
-	// 	eqwk,
-	// 	fds.Add,
-	// ); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
+	return
+}
 
-	if err = u.DeleteFiles(fds); err != nil {
+func (c Clean) runOrganize(u *env.Env, qg *query.Group) (err error) {
+	opOrganize := user_ops.Organize{
+		Env: u,
+		Metadata: organize_text.Metadata{
+			OptionCommentSet: organize_text.MakeOptionCommentSet(
+				nil,
+				organize_text.OptionCommentUnknown(
+					"instructions: to prevent an object from being cleaned, delete it entirely",
+				),
+			),
+		},
+		DontUseQueryGroupForOrganizeMetadata: true,
+	}
+
+	ui.Log().Print(qg)
+
+	var organizeResults organize_text.OrganizeResults
+
+	if organizeResults, err = opOrganize.RunWithQueryGroup(
+		qg,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var changes organize_text.Changes
+
+	if changes, err = organize_text.ChangesFromResults(
+		u.GetConfig().PrintOptions,
+		organizeResults,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = u.Lock(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = changes.After.Each(
+		func(el sku.ExternalLike) (err error) {
+			if err = u.GetStore().DeleteExternalLike(
+				qg.RepoId,
+				el,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = u.Unlock(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

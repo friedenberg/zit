@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -17,15 +18,18 @@ type Store struct {
 	Info
 	StoreLike
 
-	didInit  bool
-	onceInit sync.Once
+	didInit   bool
+	onceInit  sync.Once
+	initError error
 }
 
 func (ve *Store) Initialize() (err error) {
 	ve.onceInit.Do(func() {
-		err = ve.StoreLike.Initialize(ve.Info)
+		ve.initError = ve.StoreLike.Initialize(ve.Info)
 		ve.didInit = true
 	})
+
+	err = ve.initError
 
 	return
 }
@@ -55,6 +59,7 @@ func (es *Store) QueryCheckedOut(
 	}
 
 	if err = es.Initialize(); err != nil {
+		ui.Debug().Print(errors.Unwrap(err))
 		err = errors.Wrap(err)
 		return
 	}

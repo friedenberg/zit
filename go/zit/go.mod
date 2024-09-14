@@ -2,8 +2,10 @@ module code.linenisgreat.com/zit/go/zit
 
 go 1.23
 
+replace code.linenisgreat.com/chrest/go => /Users/sasha.friedenberg/eng/chrest/go
+
 require (
-	code.linenisgreat.com/chrest/go v0.0.0-20240910214137-80ac68e95dc8
+	code.linenisgreat.com/chrest/go v0.0.0-20240914165707-06356ba92521
 	filippo.io/age v1.1.1
 	github.com/DataDog/zstd v1.5.5
 	github.com/brandondube/tai v0.1.0

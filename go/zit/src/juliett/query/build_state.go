@@ -2,6 +2,7 @@ package query
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -208,7 +209,7 @@ LOOP:
 	for b.ts.Scan() {
 		token, tokenType := b.ts.GetTokenAndType()
 
-		if tokenType == query_spec.TokenTypeOperator {
+		if tokenType == token_types.TypeOperator {
 			op := token.String()[0]
 
 			switch op {
@@ -260,7 +261,7 @@ LOOP:
 			}
 		} else {
 			k := ObjectId{
-				ObjectIdLike: ids.GetObjectIdPool().Get(),
+				ObjectId: ids.GetObjectIdPool().Get(),
 			}
 
 			if err = k.GetObjectId().Set(token.String()); err != nil {
@@ -348,7 +349,7 @@ LOOP:
 func (b *buildState) parseSigilsAndGenres(
 	q *Query,
 ) (err error) {
-	for b.ts.ScanOnly(query_spec.TokenTypeOperator) {
+	for b.ts.ScanOnly(token_types.TypeOperator) {
 		token := b.ts.GetToken()
 
 		op := token.String()[0]

@@ -172,7 +172,7 @@ func (b *Builder) WithTransacted(
 			b.pinnedObjectIds = append(
 				b.pinnedObjectIds,
 				ObjectId{
-					ObjectIdLike: t.ObjectId.Clone(),
+					ObjectId: t.ObjectId.Clone(),
 				},
 			)
 
@@ -191,7 +191,7 @@ func (b *Builder) WithCheckedOut(
 			b.pinnedObjectIds = append(
 				b.pinnedObjectIds,
 				ObjectId{
-					ObjectIdLike: co.GetSku().ObjectId.Clone(),
+					ObjectId: co.GetSku().ObjectId.Clone(),
 				},
 			)
 

@@ -6,13 +6,14 @@ import (
 	"unicode/utf8"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 )
 
 type TokenScanner struct {
 	io.RuneScanner
-	tokenTypeProbably TokenType
-	tokenType         TokenType
+	tokenTypeProbably token_types.TokenType
+	tokenType         token_types.TokenType
 	token             catgut.String
 	parts             TokenParts
 	err               error
@@ -24,8 +25,8 @@ type TokenScanner struct {
 func (ts *TokenScanner) Reset(r io.RuneScanner) {
 	ts.RuneScanner = r
 	ts.token.Reset()
-	ts.tokenType = TokenTypeIncomplete
-	ts.tokenTypeProbably = TokenTypeIncomplete
+	ts.tokenType = token_types.TypeIncomplete
+	ts.tokenTypeProbably = token_types.TypeIncomplete
 	ts.parts.Reset()
 	ts.err = nil
 	ts.unscan = nil
@@ -60,7 +61,7 @@ func (ts *TokenScanner) Unscan() {
 	ts.unscan = []rune(string(ts.token.Bytes()))
 }
 
-func (ts *TokenScanner) ScanOnly(tokenType TokenType) (ok bool) {
+func (ts *TokenScanner) ScanOnly(tokenType token_types.TokenType) (ok bool) {
 	ok = ts.Scan()
 
 	if !ok {
@@ -99,8 +100,8 @@ func (ts *TokenScanner) ScanIdentifierLikeSkipSpaces() (ok bool) {
 	ok = true
 
 	ts.token.Reset()
-	ts.tokenType = TokenTypeIncomplete
-	ts.tokenTypeProbably = TokenTypeIncomplete
+	ts.tokenType = token_types.TypeIncomplete
+	ts.tokenTypeProbably = token_types.TypeIncomplete
 	ts.parts.Reset()
 
 	for {
@@ -123,9 +124,9 @@ func (ts *TokenScanner) ScanIdentifierLikeSkipSpaces() (ok bool) {
 
 		switch {
 		case r == '"' || r == '\'':
-			ts.tokenType = TokenTypeLiteral
+			ts.tokenType = token_types.TypeLiteral
 
-			if !ts.consumeLiteralOrFieldValue(r, TokenTypeLiteral, &ts.parts.Left) {
+			if !ts.consumeLiteralOrFieldValue(r, token_types.TypeLiteral, &ts.parts.Left) {
 				ok = false
 				return
 			}
@@ -142,12 +143,12 @@ func (ts *TokenScanner) ScanIdentifierLikeSkipSpaces() (ok bool) {
 				continue
 			} else {
 				ts.token.WriteRune(r)
-				ts.tokenType = TokenTypeOperator
+				ts.tokenType = token_types.TypeOperator
 				return
 			}
 
 		case !isOperator:
-			ts.tokenTypeProbably = TokenTypeIdentifier
+			ts.tokenTypeProbably = token_types.TypeIdentifier
 			ts.token.WriteRune(r)
 			afterFirst = true
 			continue
@@ -169,7 +170,7 @@ func (ts *TokenScanner) ScanIdentifierLikeSkipSpaces() (ok bool) {
 				ok = false
 			}
 
-			ts.tokenType = TokenTypeIdentifier
+			ts.tokenType = token_types.TypeIdentifier
 
 			return
 		}
@@ -191,8 +192,8 @@ func (ts *TokenScanner) Scan() (ok bool) {
 	ok = true
 
 	ts.token.Reset()
-	ts.tokenType = TokenTypeIncomplete
-	ts.tokenTypeProbably = TokenTypeIncomplete
+	ts.tokenType = token_types.TypeIncomplete
+	ts.tokenTypeProbably = token_types.TypeIncomplete
 	ts.parts.Reset()
 
 	for {
@@ -215,9 +216,9 @@ func (ts *TokenScanner) Scan() (ok bool) {
 
 		switch {
 		case r == '"' || r == '\'':
-			ts.tokenType = TokenTypeLiteral
+			ts.tokenType = token_types.TypeLiteral
 
-			if !ts.consumeLiteralOrFieldValue(r, TokenTypeLiteral, &ts.parts.Left) {
+			if !ts.consumeLiteralOrFieldValue(r, token_types.TypeLiteral, &ts.parts.Left) {
 				ok = false
 				return
 			}
@@ -234,12 +235,12 @@ func (ts *TokenScanner) Scan() (ok bool) {
 				}
 			}
 
-			ts.tokenType = TokenTypeOperator
+			ts.tokenType = token_types.TypeOperator
 
 			return
 
 		case !isOperator:
-			ts.tokenTypeProbably = TokenTypeIdentifier
+			ts.tokenTypeProbably = token_types.TypeIdentifier
 			ts.token.WriteRune(r)
 			afterFirst = true
 			continue
@@ -261,7 +262,7 @@ func (ts *TokenScanner) Scan() (ok bool) {
 				ok = false
 			}
 
-			ts.tokenType = TokenTypeIdentifier
+			ts.tokenType = token_types.TypeIdentifier
 
 			return
 		}
@@ -297,7 +298,7 @@ func (ts *TokenScanner) consumeSpaces() (ok bool) {
 // TODO add support for ellipis
 func (ts *TokenScanner) consumeLiteralOrFieldValue(
 	start rune,
-	tt TokenType,
+	tt token_types.TokenType,
 	partLocation *[]byte,
 ) (ok bool) {
 	ok = true
@@ -333,13 +334,13 @@ func (ts *TokenScanner) consumeLiteralOrFieldValue(
 
 func (ts *TokenScanner) consumeField(start rune) bool {
 	ts.token.WriteRune(start)
-	ok := ts.consumeIdentifierLike(TokenTypeField, &ts.parts.Right)
+	ok := ts.consumeIdentifierLike(token_types.TypeField, &ts.parts.Right)
 	return ok
 }
 
 // TODO add support for ellipsis
 func (ts *TokenScanner) consumeIdentifierLike(
-	tt TokenType,
+	tt token_types.TokenType,
 	partLocation *[]byte,
 ) (ok bool) {
 	ok = true
@@ -364,7 +365,7 @@ func (ts *TokenScanner) consumeIdentifierLike(
 
 		switch {
 		case r == '"' || r == '\'':
-			if !ts.consumeLiteralOrFieldValue(r, TokenTypeLiteral, partLocation) {
+			if !ts.consumeLiteralOrFieldValue(r, token_types.TypeLiteral, partLocation) {
 				ok = false
 				return
 			}
@@ -396,11 +397,11 @@ func (ts *TokenScanner) GetToken() *catgut.String {
 	return &ts.token
 }
 
-func (ts *TokenScanner) GetTokenAndType() (*catgut.String, TokenType) {
+func (ts *TokenScanner) GetTokenAndType() (*catgut.String, token_types.TokenType) {
 	return &ts.token, ts.tokenType
 }
 
-func (ts *TokenScanner) GetTokenAndTypeAndParts() (*catgut.String, TokenType, TokenParts) {
+func (ts *TokenScanner) GetTokenAndTypeAndParts() (*catgut.String, token_types.TokenType, TokenParts) {
 	return &ts.token, ts.tokenType, ts.parts
 }
 

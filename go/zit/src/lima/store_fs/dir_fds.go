@@ -39,8 +39,6 @@ type dirFDs struct {
 	shasToObjectFDs map[sha.Bytes]interfaces.MutableSetLike[*FDSet]
 
 	errors interfaces.MutableSetLike[fdSetWithError]
-
-	emptyDirectories fd.MutableSet
 }
 
 func makeObjectsWithDir(
@@ -56,9 +54,6 @@ func makeObjectsWithDir(
 	d.shasToBlobFDs = make(map[sha.Bytes]interfaces.MutableSetLike[*FDSet])
 	d.shasToObjectFDs = make(map[sha.Bytes]interfaces.MutableSetLike[*FDSet])
 	d.errors = collections_value.MakeMutableValueSet[fdSetWithError](nil)
-	d.emptyDirectories = collections_value.MakeMutableValueSet[*fd.FD](
-		nil,
-	)
 
 	return
 }

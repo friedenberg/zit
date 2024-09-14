@@ -13,10 +13,10 @@ import (
 )
 
 type reader struct {
-	options            Options
-	lineNo             int
-	root               *Assignment
-	currentAssignment  *Assignment
+	options           Options
+	lineNo            int
+	root              *Assignment
+	currentAssignment *Assignment
 }
 
 func (ar *reader) ReadFrom(r1 io.Reader) (n int64, err error) {

@@ -3,10 +3,10 @@ package store_browser
 import (
 	"bytes"
 	"fmt"
-	"net/url"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
@@ -39,6 +39,21 @@ func (f *Organize) WriteStringFormat(
 	var n2 int64
 
 	if e, hasNative := el.(*External); hasNative {
+		switch e.State {
+		case external_state.Untracked:
+			if n, err = f.writeStringFormatExternalBoxUntracked(
+				sw,
+				nil,
+				e,
+				true,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
 		var n1 int
 		n1, err = sw.WriteString("[")
 		n += int64(n1)
@@ -74,12 +89,14 @@ func (f *Organize) WriteStringFormat(
 		if !b.IsEmpty() {
 			n2, err = f.Fields.WriteStringFormat(
 				sw,
-				[]string_format_writer.Field{
-					{
-						Value:              b.String(),
-						ColorType:          string_format_writer.ColorTypeUserData,
-						DisableValueQuotes: true,
-						Prefix:             " ",
+				string_format_writer.Fields{
+					Boxed: []string_format_writer.Field{
+						{
+							Value:              b.String(),
+							ColorType:          string_format_writer.ColorTypeUserData,
+							DisableValueQuotes: true,
+							Prefix:             " ",
+						},
 					},
 				},
 			)
@@ -111,7 +128,7 @@ func (f *Organize) ReadStringFormat(
 	var ts query_spec.TokenScanner
 	ts.Reset(catgut.MakeRingBufferRuneScanner(rb))
 
-	if err = f.readStringFormatWithinBrackets(&ts, el); err != nil {
+	if err = f.readStringFormatBoxContents(&ts, el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -136,13 +153,21 @@ func (f *Organize) ReadStringFormat(
 
 	rb.AdvanceRead(sl.Len())
 
+	if err = el.GetSkuExternalLike().GetSku().Metadata.Type.Set(
+		"!toml-bookmark",
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
-func (f *Organize) readStringFormatWithinBrackets(
+func (f *Organize) readStringFormatBoxContents(
 	ts *query_spec.TokenScanner,
 	el sku.ExternalLike,
 ) (err error) {
+	e := el.(*External)
 	o := el.GetSku()
 
 	state := 0
@@ -167,7 +192,13 @@ LOOP:
 			state++
 
 		case 1:
-			if err = o.ObjectId.TodoSetBytesForgiving(t); err != nil {
+			if t.Bytes()[0] == '/' {
+				if err = e.Item.Id.Set(t.String()); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+				// TODO set external Id to t
+			} else if err = o.ObjectId.TodoSetBytesForgiving(t); err != nil {
 				err = errors.Wrap(err)
 				o.ObjectId.Reset()
 				return
@@ -180,7 +211,7 @@ LOOP:
 				break LOOP
 			} else {
 				switch tokenType {
-				case query_spec.TokenTypeField, query_spec.TokenTypeLiteral:
+				case token_types.TypeField, token_types.TypeLiteral:
 					e, hasNative := el.(*External)
 
 					if !hasNative {
@@ -193,7 +224,7 @@ LOOP:
 
 					switch left {
 					case "id":
-						if err = e.Item.SetId(right); err != nil {
+						if err = e.Item.Id.Set(right); err != nil {
 							err = errors.Wrap(err)
 							return
 						}
@@ -201,7 +232,11 @@ LOOP:
 						continue LOOP
 
 					case "url":
-						e.Item.Url = right
+						if err = e.Item.Url.UnmarshalBinary(tokenParts.Right); err != nil {
+							err = errors.Wrap(err)
+							return
+						}
+
 						continue LOOP
 
 					case "title":
@@ -278,14 +313,14 @@ func (f *Organize) writeStringFormatExternal(
 ) (n int64, err error) {
 	fields := []string_format_writer.Field{}
 
-	idFieldValue := e.ObjectId.String()
+	idFieldValue := (*ids.ObjectIdStringerSansRepo)(&e.ObjectId).String()
 	var n2 int64
 
 	// TODO make this more robust
 	switch e.State {
 	case external_state.Tracked, external_state.Recognized:
 		if i != nil {
-			idFieldValue = i.ObjectId.String()
+			idFieldValue = (*ids.ObjectIdStringerSansRepo)(&i.ObjectId).String()
 		}
 
 	case external_state.Untracked:
@@ -349,23 +384,93 @@ func (f *Organize) writeStringFormatExternal(
 		)
 	}
 
-	var u *url.URL
-
-	if u, err = item.GetUrl(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	fields = append(
 		fields,
 		string_format_writer.Field{
 			Key:       "url",
-			Value:     u.String(),
+			Value:     item.Url.String(),
 			ColorType: string_format_writer.ColorTypeUserData,
 		},
 	)
 
-	n2, err = f.Fields.WriteStringFormat(sw, fields)
+	n2, err = f.Fields.WriteStringFormat(
+		sw,
+		string_format_writer.Fields{Boxed: fields},
+	)
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (f *Organize) writeStringFormatExternalBoxUntracked(
+	sw interfaces.WriterAndStringWriter,
+	i *sku.Transacted,
+	e *External,
+	unboxedDescription bool,
+) (n int64, err error) {
+	if e.State != external_state.Untracked {
+		err = errors.Errorf(
+			"expected state %s but got %s",
+			external_state.Untracked,
+			e.State,
+		)
+
+		return
+	}
+
+	boxed := []string_format_writer.Field{}
+	unboxed := []string_format_writer.Field{}
+
+	var n2 int64
+
+	item := &e.Item
+
+	boxed = append(
+		boxed,
+		string_format_writer.Field{
+			Value:              item.Id.String(),
+			DisableValueQuotes: true,
+			ColorType:          string_format_writer.ColorTypeId,
+		},
+	)
+
+	if item.Title != "" {
+		field := string_format_writer.Field{
+			Value:     item.Title,
+			ColorType: string_format_writer.ColorTypeUserData,
+		}
+
+		if unboxedDescription {
+			field.DisableValueQuotes = true
+			unboxed = append(unboxed, field)
+		} else {
+			field.Key = "title"
+			boxed = append(boxed, field)
+		}
+	}
+
+	boxed = append(
+		boxed,
+		string_format_writer.Field{
+			Key:       "url",
+			Value:     item.Url.String(),
+			ColorType: string_format_writer.ColorTypeUserData,
+		},
+	)
+
+	n2, err = f.Fields.WriteStringFormat(
+		sw,
+		string_format_writer.Fields{
+			Boxed:   boxed,
+			Box:     true,
+			Unboxed: unboxed,
+		},
+	)
 	n += n2
 
 	if err != nil {

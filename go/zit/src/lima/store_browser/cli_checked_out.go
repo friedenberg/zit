@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -55,15 +56,27 @@ func (f *cliCheckedOut) WriteStringFormat(
 		}
 	}
 
+	switch co.External.State {
+	case external_state.Untracked:
+		if n, err = f.stringFormatExternal.writeStringFormatExternalBoxUntracked(
+			sw,
+			&co.Internal,
+			&co.External,
+			false,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+
 	n1, err = sw.WriteString("[")
 	n += int64(n1)
 
 	if err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	if co.State != checked_out_state.Untracked {
 	}
 
 	n2, err = f.stringFormatExternal.writeStringFormatExternal(

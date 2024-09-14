@@ -1,8 +1,6 @@
 package store_browser
 
 import (
-	"fmt"
-	"net/url"
 	"slices"
 	"strings"
 
@@ -36,13 +34,7 @@ func (i *Item) String() string {
 }
 
 func (i *Item) GetKey() string {
-	return fmt.Sprintf(
-		"/%s-%s/%s-%s",
-		i.Id.BrowserId.Browser,
-		i.Id.BrowserId.Id,
-		i.Id.Type,
-		i.Id.Id,
-	)
+	return i.Id.String()
 }
 
 func (i *Item) GetObjectId() *ids.ObjectId {
@@ -52,40 +44,12 @@ func (i *Item) GetObjectId() *ids.ObjectId {
 	return &oid
 }
 
-func (i *Item) SetId(v string) (err error) {
-	// /browser/bookmark-aBljQkGWNl2
-	v = strings.TrimPrefix(v, "/browser/")
-
-	head, tail, ok := strings.Cut(v, "-")
-
-	if !ok {
-		err = errors.Errorf("unsupported id: %q", v)
-		return
-	}
-
-	i.Id.Type = head
-	i.Id.Id = tail
-
-	return
-}
-
 func (i *Item) GetType() (t ids.Type, err error) {
 	if err = t.Set("browser-" + i.Id.Type); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	return
-}
-
-func (dst *Item) readFromRaw(src map[string]interface{}) (err error) {
-	// TODO BrowserId
-	dst.Id.Id = src["id"].(string)
-	dst.Id.Type = src["type"].(string)
-	dst.Url = src["url"].(string)
-	dst.Date = src["date"].(string)
-	dst.Title, _ = src["title"].(string)
-	dst.ExternalId, _ = src["external-id"].(string)
 	return
 }
 
@@ -121,14 +85,7 @@ func (i Item) WriteToMetadata(m *object_metadata.Metadata) (err error) {
 
 // TODO move below to !toml-bookmark type
 func (i Item) GetUrlPathTag() (e ids.Tag, err error) {
-	var u *url.URL
-
-	if u, err = i.GetUrl(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	els := strings.Split(u.Hostname(), ".")
+	els := strings.Split(i.Url.Hostname(), ".")
 	slices.Reverse(els)
 
 	if els[0] == "www" {
@@ -164,22 +121,6 @@ func (i Item) GetTai() (t ids.Tai, err error) {
 }
 
 var errEmptyUrl = errors.New("empty url")
-
-func (i Item) GetUrl() (u *url.URL, err error) {
-	ur := i.Url
-
-	if ur == "" {
-		err = errEmptyUrl
-		return
-	}
-
-	if u, err = url.Parse(ur); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
 
 func (i Item) GetDescription() (b descriptions.Description, err error) {
 	if err = b.Set(i.Title); err != nil {

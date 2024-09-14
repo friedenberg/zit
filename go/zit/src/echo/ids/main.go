@@ -17,20 +17,23 @@ type IdWithParts interface {
 	Parts() [3]string
 }
 
-type IdLike interface {
-	IdWithParts
-	interfaces.GenreGetter
-	// interfaces.Resetter
-	// interfaces.Setter
-}
-
 type (
+	IdLike interface {
+		IdWithParts
+		interfaces.GenreGetter
+		// interfaces.Resetter
+		// interfaces.Setter
+	}
+
 	ObjectIdLike interface {
 		interfaces.GenreGetter
-		GetObjectId() *ObjectId
+		interfaces.Stringer
+		// GetObjectId() *ObjectId
+		IsEmpty() bool
 	}
 
 	ExternalObjectId interface {
+    ObjectIdLike
 		interfaces.GenreGetter
 		interfaces.Stringer
 		ExternalObjectIdGetter

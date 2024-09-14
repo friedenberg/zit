@@ -37,7 +37,7 @@ func (q *Query) addExactObjectId(
 	b *buildState,
 	k ObjectId,
 ) (err error) {
-	if k.ObjectIdLike == nil {
+	if k.ObjectId == nil {
 		err = errors.Errorf("nil object id")
 		return
 	}

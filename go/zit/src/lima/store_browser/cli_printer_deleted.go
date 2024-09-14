@@ -1,8 +1,6 @@
 package store_browser
 
 import (
-	"net/url"
-
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -12,13 +10,13 @@ type itemDeletedStringFormatWriter struct {
 	interfaces.Config
 	rightAlignedWriter   interfaces.StringFormatWriter[string]
 	idStringFormatWriter interfaces.StringFormatWriter[string]
-	fieldsFormatWriter   interfaces.StringFormatWriter[[]string_format_writer.Field]
+	fieldsFormatWriter   interfaces.StringFormatWriter[string_format_writer.Fields]
 }
 
 func MakeItemDeletedStringWriterFormat(
 	config interfaces.Config,
 	co string_format_writer.ColorOptions,
-	fieldsFormatWriter interfaces.StringFormatWriter[[]string_format_writer.Field],
+	fieldsFormatWriter interfaces.StringFormatWriter[string_format_writer.Fields],
 ) *itemDeletedStringFormatWriter {
 	return &itemDeletedStringFormatWriter{
 		Config:             config,
@@ -85,24 +83,20 @@ func (f *itemDeletedStringFormatWriter) WriteStringFormat(
 		)
 	}
 
-	var u *url.URL
-
-	if u, err = item.GetUrl(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	fields = append(
 		fields,
 		string_format_writer.Field{
 			Key:       "url",
-			Value:     u.String(),
+			Value:     item.Url.String(),
 			ColorType: string_format_writer.ColorTypeUserData,
 			Prefix:    prefix,
 		},
 	)
 
-	n2, err = f.fieldsFormatWriter.WriteStringFormat(sw, fields)
+	n2, err = f.fieldsFormatWriter.WriteStringFormat(
+		sw,
+		string_format_writer.Fields{Boxed: fields},
+	)
 	n += n2
 
 	if err != nil {

@@ -75,7 +75,7 @@ func (u *Env) StringFormatWriterDescription(
 func (u *Env) StringFormatWriterFields(
 	truncate string_format_writer.CliFormatTruncation,
 	co string_format_writer.ColorOptions,
-) interfaces.StringFormatWriter[[]string_format_writer.Field] {
+) interfaces.StringFormatWriter[string_format_writer.Fields] {
 	return string_format_writer.MakeCliFormatFields(truncate, co)
 }
 
@@ -119,13 +119,13 @@ func (u *Env) StringFormatWriterSkuBox(
 }
 
 func (u *Env) SkuFormatBox() sku_fmt.ExternalLike {
-  formats := make(map[ids.RepoId]sku_fmt.ExternalLike, len(u.externalStores))
+	formats := make(map[ids.RepoId]sku_fmt.ExternalLike, len(u.externalStores))
 
-  for rid := range u.externalStores {
-    formats[rid] = u.SkuFormatBoxForRepoId(rid)
-  }
+	for rid := range u.externalStores {
+		formats[rid] = u.SkuFormatBoxForRepoId(rid)
+	}
 
-  return sku_fmt.MakeExternalLikeCombo(formats)
+	return sku_fmt.MakeExternalLikeCombo(formats)
 }
 
 func (u *Env) SkuFormatBoxForRepoId(repoId ids.RepoId) sku_fmt.ExternalLike {

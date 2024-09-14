@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
@@ -284,7 +285,7 @@ LOOP:
 			if t.EqualsString("]") {
 				break LOOP
 			} else {
-				if tokenType == query_spec.TokenTypeField {
+				if tokenType == token_types.TypeField {
 					ui.Debug().Print(tokenParts)
 					continue
 				}

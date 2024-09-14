@@ -33,6 +33,7 @@ const (
 	colorItalic  = "\u001b[3m"
 	colorNone    = ""
 
+	ColorTypeNormal   = ColorType(colorNone)
 	ColorTypeId       = ColorType(colorBlue)
 	ColorTypeHash     = ColorType(colorItalic)
 	ColorTypeType     = ColorType(colorYellow)

@@ -25,8 +25,10 @@ func (op Checkin) Run(
 			return
 		}
 	} else {
-		u.Lock()
-		defer errors.Deferred(&err, u.Unlock)
+		if err = u.Lock(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 		if err = u.GetStore().QueryCheckedOut(
 			qg,
@@ -51,6 +53,11 @@ func (op Checkin) Run(
 				return
 			},
 		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = u.Unlock(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -108,8 +115,10 @@ func (op Checkin) runOrganize(
 		return
 	}
 
-	u.Lock()
-	defer errors.Deferred(&err, u.Unlock)
+	if err = u.Lock(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = changes.After.Each(
 		func(el sku.ExternalLike) (err error) {
@@ -136,6 +145,11 @@ func (op Checkin) runOrganize(
 			return
 		},
 	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = u.Unlock(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

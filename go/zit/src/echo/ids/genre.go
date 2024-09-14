@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -134,7 +135,7 @@ func (g *Genre) ReadFromTokenScanner(
 		token, tokenType := ts.GetTokenAndType()
 
 		switch tokenType {
-		case query_spec.TokenTypeOperator:
+		case token_types.TypeOperator:
 			el := token.String()
 
 			if el == " " {
@@ -146,7 +147,7 @@ func (g *Genre) ReadFromTokenScanner(
 				continue
 			}
 
-		case query_spec.TokenTypeIdentifier:
+		case token_types.TypeIdentifier:
 			if err = g.AddString(token.String()); err != nil {
 				err = errors.Wrap(err)
 				return

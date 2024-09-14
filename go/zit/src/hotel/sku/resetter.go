@@ -11,7 +11,7 @@ var TransactedResetter transactedResetter
 type transactedResetter struct{}
 
 func (transactedResetter) Reset(a *Transacted) {
-	a.ObjectId.SetGenre(genres.Unknown)
+	a.ObjectId.Reset()
 	object_metadata.Resetter.Reset(&a.Metadata)
 }
 

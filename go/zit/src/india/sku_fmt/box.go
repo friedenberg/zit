@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
@@ -30,7 +31,7 @@ func MakeBox(
 	objectIdStringFormatWriter id_fmts.Aligned,
 	typeStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
 	tagsStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
-	fieldsFormatWriter interfaces.StringFormatWriter[[]string_format_writer.Field],
+	fieldsFormatWriter interfaces.StringFormatWriter[string_format_writer.Fields],
 	metadata interfaces.StringFormatWriter[*object_metadata.Metadata],
 	abbr ids.Abbr,
 ) *Box {
@@ -66,7 +67,7 @@ type Box struct {
 	ObjectId  id_fmts.Aligned
 	Type      interfaces.StringFormatWriter[*ids.Type]
 	TagString interfaces.StringFormatWriter[*ids.Tag]
-	Fields    interfaces.StringFormatWriter[[]string_format_writer.Field]
+	Fields    interfaces.StringFormatWriter[string_format_writer.Fields]
 	Metadata  interfaces.StringFormatWriter[*object_metadata.Metadata]
 
 	ids.Abbr
@@ -213,12 +214,14 @@ func (f *Box) WriteStringFormat(
 	if !b.IsEmpty() {
 		n2, err = f.Fields.WriteStringFormat(
 			sw,
-			[]string_format_writer.Field{
-				{
-					Value:              b.String(),
-					DisableValueQuotes: true,
-					ColorType:          string_format_writer.ColorTypeUserData,
-					Prefix:             " ",
+			string_format_writer.Fields{
+				Boxed: []string_format_writer.Field{
+					{
+						Value:              b.String(),
+						DisableValueQuotes: true,
+						ColorType:          string_format_writer.ColorTypeUserData,
+						Prefix:             " ",
+					},
 				},
 			},
 		)
@@ -286,7 +289,9 @@ LOOP:
 			state++
 
 		case 1:
-			if err = o.ObjectId.ReadFromToken(t); err != nil {
+			if t.Bytes()[0] == '/' {
+				// TODO set external object ID
+			} else if err = o.ObjectId.ReadFromToken(t); err != nil {
 				o.ObjectId.Reset()
 				return
 			}
@@ -297,7 +302,7 @@ LOOP:
 			if t.EqualsString("]") {
 				break LOOP
 			} else {
-				if tokenType == query_spec.TokenTypeField {
+				if tokenType == token_types.TypeField {
 					ui.Debug().Print(tokenParts)
 					continue
 				}

@@ -15,7 +15,7 @@ type ObjectId struct {
 	Virtual bool
 	Debug   bool
 
-	ids.ObjectIdLike
+	*ids.ObjectId
 }
 
 func (k ObjectId) reduce(b *buildState) (err error) {

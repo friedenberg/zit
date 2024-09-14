@@ -59,19 +59,9 @@ func (s *Store) initializeUrls() (err error) {
 	for _, item := range resp.RequestPayloadGet {
 		i := Item{Item: item}
 
-		var u *url.URL
+		u := i.Url.URL
 
-		if u, err = i.GetUrl(); err != nil {
-			if errors.Is(err, errEmptyUrl) {
-				err = nil
-				continue
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
-		s.urls[*u] = append(s.urls[*u], i)
+		s.urls[u] = append(s.urls[u], i)
 		s.itemsById[i.GetObjectId().String()] = i
 	}
 
@@ -110,8 +100,6 @@ func (s *Store) flushUrls() (err error) {
 				return
 			}
 		}
-
-		ui.Debug().Print(req, resp)
 
 		if err = s.resetCacheIfNecessary(resp.Response); err != nil {
 			err = errors.Wrap(err)
