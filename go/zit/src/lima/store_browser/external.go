@@ -97,15 +97,11 @@ func (t *External) GetExternalObjectId() sku.ExternalObjectId {
 
 func (a *External) Clone() sku.ExternalLike {
 	b := GetExternalPool().Get()
-	sku.TransactedResetter.ResetWith(&b.Transacted, &a.Transacted)
+	sku.TransactedResetter.ResetWith(b.GetSku(), a.GetSku())
 	sku.TransactedResetter.ResetWith(&b.Browser, &a.Browser)
 	b.Item = a.Item
 	b.State = a.State
 	return b
-}
-
-func (c *External) GetSku() *sku.Transacted {
-	return &c.Transacted
 }
 
 func (a *External) GetMetadatei() *object_metadata.Metadata {

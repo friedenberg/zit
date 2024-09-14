@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
-	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 )
@@ -15,8 +14,7 @@ type External struct {
 	ids.RepoId
 	external_state.State
 	ExternalObjectId ids.ObjectId
-	Transacted       Transacted
-	Fields           []string_format_writer.Field
+	Transacted       TransactedWithFields
 }
 
 func (t *External) GetRepoId() ids.RepoId {
@@ -41,12 +39,12 @@ func (t *External) GetExternalState() external_state.State {
 
 func (a *External) Clone() ExternalLike {
 	b := GetExternalPool().Get()
-	TransactedResetter.ResetWith(&b.Transacted, &a.Transacted)
+	TransactedResetter.ResetWith(b.GetSku(), a.GetSku())
 	return b
 }
 
 func (c *External) GetSku() *Transacted {
-	return &c.Transacted
+	return &c.Transacted.Transacted
 }
 
 func (a *External) GetObjectIdLike() ids.IdLike {
@@ -80,12 +78,6 @@ func (a *External) SetBlobSha(v interfaces.Sha) (err error) {
 		err = errors.Wrap(err)
 		return
 	}
-
-	return
-}
-
-func (a *External) AsTransacted() (b Transacted) {
-	b = a.Transacted
 
 	return
 }

@@ -264,13 +264,13 @@ func (c *Store) GetExternalLikeResetter3() interfaces.Resetter3[sku.ExternalLike
 	return pool.BespokeResetter[sku.ExternalLike]{
 		FuncReset: func(el sku.ExternalLike) {
 			a := el.(*External)
-			sku.TransactedResetter.Reset(&a.Transacted)
+			sku.TransactedResetter.Reset(a.GetSku())
 			sku.TransactedResetter.Reset(&a.Browser)
 			a.Item = Item{}
 		},
 		FuncResetWith: func(eldst, elsrc sku.ExternalLike) {
 			dst, src := eldst.(*External), elsrc.(*External)
-			sku.TransactedResetter.ResetWith(&dst.Transacted, &src.Transacted)
+			sku.TransactedResetter.ResetWith(dst.GetSku(), src.GetSku())
 			sku.TransactedResetter.ResetWith(&dst.Browser, &src.Browser)
 			dst.Item = src.Item
 		},

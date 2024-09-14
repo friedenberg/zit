@@ -69,7 +69,7 @@ func (checkedOutResetter) Reset(a *CheckedOut) {
 	a.Error = nil
 
 	sku.TransactedResetter.Reset(&a.Internal)
-	sku.TransactedResetter.Reset(&a.External.Transacted)
+	sku.TransactedResetter.Reset(a.External.GetSku())
 	// TODO reset item
 }
 
@@ -79,7 +79,7 @@ func (checkedOutResetter) ResetWith(a *CheckedOut, b *CheckedOut) {
 	a.Error = b.Error
 
 	sku.TransactedResetter.ResetWith(&a.Internal, &b.Internal)
-	sku.TransactedResetter.ResetWith(&a.External.Transacted, &b.External.Transacted)
+	sku.TransactedResetter.ResetWith(a.External.GetSku(), b.External.GetSku())
 	// TODO reset item
 	// a.External.FDs.ResetWith(&b.External.FDs)
 }

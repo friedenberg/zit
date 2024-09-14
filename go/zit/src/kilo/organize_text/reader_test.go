@@ -50,9 +50,11 @@ func makeBez(t *testing.T, v string) (b descriptions.Description) {
 func makeObjWithHinAndBez(t *testing.T, hin string, bez string) (o *obj) {
 	o = &obj{
 		ExternalLike: &sku.External{
-			Transacted: sku.Transacted{
-				Metadata: object_metadata.Metadata{
-					Description: makeBez(t, bez),
+			Transacted: sku.TransactedWithFields{
+				Transacted: sku.Transacted{
+					Metadata: object_metadata.Metadata{
+						Description: makeBez(t, bez),
+					},
 				},
 			},
 		},
