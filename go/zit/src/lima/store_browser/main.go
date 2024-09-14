@@ -167,7 +167,7 @@ func (c *Store) CheckoutOne(
 	co.State = checked_out_state.JustCheckedOut
 	co.External.ExternalType = ids.MustType("!browser-tab")
 
-	if err = co.External.SetItem(item); err != nil {
+	if err = item.WriteToExternal(&co.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

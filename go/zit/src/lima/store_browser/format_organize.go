@@ -193,11 +193,10 @@ LOOP:
 
 		case 1:
 			if t.Bytes()[0] == '/' {
-				if err = e.Item.Id.Set(t.String()); err != nil {
+				if err = e.ExternalObjectId.SetRaw(t.String()); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
-				// TODO set external Id to t
 			} else if err = o.ObjectId.TodoSetBytesForgiving(t); err != nil {
 				err = errors.Wrap(err)
 				o.ObjectId.Reset()
@@ -350,7 +349,7 @@ func (f *Organize) writeStringFormatExternal(
 
 	var item Item
 
-	if item, err = e.GetItem(); err != nil {
+	if err = item.ReadFromExternal(e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -420,7 +419,7 @@ func (f *Organize) writeStringFormatExternalBoxUntracked(
 
 	var item Item
 
-	if item, err = e.GetItem(); err != nil {
+	if err = item.ReadFromExternal(e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

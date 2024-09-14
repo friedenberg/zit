@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
@@ -42,7 +41,7 @@ func (e *External) SaveBlob(s fs_home.Home) (err error) {
 
 	var item Item
 
-	if item, err = e.GetItem(); err != nil {
+	if err = item.ReadFromExternal(e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -65,66 +64,6 @@ func (e *External) SaveBlob(s fs_home.Home) (err error) {
 
 	e.Transacted.Metadata.Blob.SetShaLike(aw)
 
-	return
-}
-
-func (e *External) SetItem(i Item) (err error) {
-	if err = e.ExternalObjectId.SetRaw(i.Id.String()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	e.Transacted.Metadata.Type = ids.MustType("!toml-bookmark")
-	e.Item = i
-
-	m := &e.Transacted.Metadata
-
-	if m.Tai, err = i.GetTai(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if e.ExternalType, err = i.GetType(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	e.Transacted.Fields = []sku.Field{
-		{
-			Value:              i.Id.String(),
-			DisableValueQuotes: true,
-			ColorType:          string_format_writer.ColorTypeId,
-		},
-		{
-			Key:       "title",
-			Value:     i.Title,
-			ColorType: string_format_writer.ColorTypeUserData,
-		},
-		{
-			Key:       "url",
-			Value:     i.Url.String(),
-			ColorType: string_format_writer.ColorTypeUserData,
-		},
-	}
-
-	// TODO move to !toml-bookmark type
-	var t ids.Tag
-
-	if t, err = i.GetUrlPathTag(); err == nil {
-		if err = m.AddTagPtr(&t); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	err = nil
-
-	return
-}
-
-func (e *External) GetItem() (i Item, err error) {
-	i = e.Item
-	// err = todo.Implement()
 	return
 }
 

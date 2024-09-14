@@ -113,7 +113,7 @@ func (c *executor) tryToEmitOneCommon(
 ) (err error) {
 	external := &c.co.External
 
-	if err = external.SetItem(i); err != nil {
+	if err = i.WriteToExternal(external); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

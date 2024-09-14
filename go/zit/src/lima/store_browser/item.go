@@ -7,7 +7,9 @@ import (
 	"code.linenisgreat.com/chrest/go/src/charlie/browser_items"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -97,5 +99,98 @@ func (i Item) GetDescription() (b descriptions.Description, err error) {
 		return
 	}
 
+	return
+}
+
+func (i *Item) WriteToExternal(e *External) (err error) {
+	if err = e.ExternalObjectId.SetRaw(i.Id.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	e.Transacted.Metadata.Type = ids.MustType("!toml-bookmark")
+	e.Item = *i
+
+	m := &e.Transacted.Metadata
+
+	if m.Tai, err = i.GetTai(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if e.ExternalType, err = i.GetType(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	e.Transacted.Fields = []sku.Field{
+		{
+			Value:              i.Id.String(),
+			DisableValueQuotes: true,
+			ColorType:          string_format_writer.ColorTypeId,
+		},
+		{
+			Key:       "title",
+			Value:     i.Title,
+			ColorType: string_format_writer.ColorTypeUserData,
+		},
+		{
+			Key:       "url",
+			Value:     i.Url.String(),
+			ColorType: string_format_writer.ColorTypeUserData,
+		},
+	}
+
+	// TODO move to !toml-bookmark type
+	var t ids.Tag
+
+	if t, err = i.GetUrlPathTag(); err == nil {
+		if err = m.AddTagPtr(&t); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	err = nil
+
+	return
+}
+
+func (i *Item) ReadFromExternal(e *External) (err error) {
+	if err = i.Id.Set(e.ExternalObjectId.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	for _, field := range e.Transacted.Fields {
+		ui.Debug().Printf("%#v", field)
+
+		switch field.Key {
+		case "id":
+			if field.Value == "" {
+				continue
+			}
+
+			if err = i.Id.Set(e.ExternalObjectId.String()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+		case "", "title":
+			i.Title = field.Value
+
+		case "url":
+			if err = i.Url.Set(field.Value); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+		default:
+			err = errors.Errorf("unsupported field type: %s=%q", field.Key, field.Value)
+			return
+		}
+	}
+
+	// err = todo.Implement()
 	return
 }
