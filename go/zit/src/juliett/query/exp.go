@@ -222,17 +222,17 @@ func (e *Exp) ContainsSku(tg sku.TransactedGetter) (ok bool) {
 	}
 
 	if e.Or {
-		ok = e.containsMatchableOr(sk)
+		ok = e.containsMatchableOr(tg)
 	} else {
-		ok = e.containsMatchableAnd(sk)
+		ok = e.containsMatchableAnd(tg)
 	}
 
 	return
 }
 
-func (e *Exp) containsMatchableAnd(sk *sku.Transacted) bool {
+func (e *Exp) containsMatchableAnd(tg sku.TransactedGetter) bool {
 	for _, m := range e.Children {
-		if !m.ContainsSku(sk) {
+		if !m.ContainsSku(tg) {
 			return e.negateIfNecessary(false)
 		}
 	}
@@ -240,9 +240,9 @@ func (e *Exp) containsMatchableAnd(sk *sku.Transacted) bool {
 	return e.negateIfNecessary(true)
 }
 
-func (e *Exp) containsMatchableOr(sk *sku.Transacted) bool {
+func (e *Exp) containsMatchableOr(tg sku.TransactedGetter) bool {
 	for _, m := range e.Children {
-		if m.ContainsSku(sk) {
+		if m.ContainsSku(tg) {
 			return e.negateIfNecessary(true)
 		}
 	}

@@ -233,14 +233,14 @@ func (q *Query) String() string {
 	return sb.String()
 }
 
-func (q *Query) ShouldHide(sk *sku.Transacted, k string) bool {
+func (q *Query) ShouldHide(tg sku.TransactedGetter, k string) bool {
 	_, ok := q.ObjectIds[k]
 
 	if q.IncludesHidden() || q.Hidden == nil || ok {
 		return false
 	}
 
-	return q.Hidden.ContainsSku(sk)
+	return q.Hidden.ContainsSku(tg)
 }
 
 func (q *Query) ContainsSku(tg sku.TransactedGetter) (ok bool) {
@@ -266,7 +266,7 @@ func (q *Query) ContainsSku(tg sku.TransactedGetter) (ok bool) {
 	if len(q.Children) == 0 {
 		ok = len(q.ObjectIds) == 0
 		return
-	} else if !q.Exp.ContainsSku(sk) {
+	} else if !q.Exp.ContainsSku(tg) {
 		return
 	}
 
@@ -289,7 +289,7 @@ func (q *Query) ContainsExternalSku(el sku.ExternalLike) (ok bool) {
 
 	k := sk.ObjectId.String()
 
-	if q.ShouldHide(sk, k) {
+	if q.ShouldHide(el, k) {
 		return
 	}
 
@@ -305,7 +305,7 @@ func (q *Query) ContainsExternalSku(el sku.ExternalLike) (ok bool) {
 	if len(q.Children) == 0 {
 		ok = len(q.ObjectIds) == 0 && len(q.ExternalObjectIds) == 0
 		return
-	} else if !q.Exp.ContainsSku(sk) {
+	} else if !q.Exp.ContainsSku(el) {
 		return
 	}
 

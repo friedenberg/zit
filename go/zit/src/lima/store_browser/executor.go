@@ -122,7 +122,7 @@ func (c *executor) tryToEmitOneCommon(
 
 	// ui.Debug().Print(browser.GetExternalObjectId(), external.GetExternalObjectId())
 
-	if !c.qg.ContainsExternalSku(external, c.co.State) {
+	if !c.qg.ContainsExternalSku(&external.External, c.co.State) {
 		return
 	}
 

@@ -11,13 +11,13 @@ import (
 )
 
 type External struct {
-	Transacted TransactedWithFields
+	Transacted   TransactedWithFields
+	ExternalType ids.Type
 
 	// TODO add support for querying the below
 	ids.RepoId
 	external_state.State
 	ExternalObjectId ids.ObjectId
-	ExternalType     ids.Type
 }
 
 func (t *External) GetRepoId() ids.RepoId {

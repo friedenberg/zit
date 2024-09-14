@@ -373,7 +373,8 @@ func (qg *Group) String() string {
 	return sb.String()
 }
 
-func (qg *Group) ContainsSku(sk *sku.Transacted) (ok bool) {
+func (qg *Group) ContainsSku(tg sku.TransactedGetter) (ok bool) {
+  sk := tg.GetSku()
 	defer sk.Metadata.Cache.QueryPath.PushOnReturn(qg, &ok)
 
 	if len(qg.OptimizedQueries) == 0 && qg.matchOnEmpty {
@@ -385,7 +386,7 @@ func (qg *Group) ContainsSku(sk *sku.Transacted) (ok bool) {
 
 	q, ok := qg.OptimizedQueries[genres.Must(g)]
 
-	if !ok || !q.ContainsSku(sk) {
+	if !ok || !q.ContainsSku(tg) {
 		ok = false
 		return
 	}

@@ -70,7 +70,7 @@ func (exp ObjectId) ContainsSku(tg sku.TransactedGetter) (ok bool) {
 			return
 		}
 
-    if e, isExternal := tg.(*sku.External); isExternal {
+		if e, isExternal := tg.(*sku.External); isExternal {
 			if ids.Contains(e.ExternalType, exp.GetObjectId()) {
 				ok = true
 				return
