@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
-func (s *Store) Initialize(esi external_store.Info) (err error) {
+func (s *Store) Initialize(esi external_store.Supplies) (err error) {
 	s.externalStoreInfo = esi
 
 	if err = s.browser.Read(); err != nil {

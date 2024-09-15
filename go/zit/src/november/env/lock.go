@@ -18,6 +18,8 @@ func (u *Env) Lock() (err error) {
 	return
 }
 
+// TODO print organize files that were created if dry run or make it possible to
+// commit dry-run transactions
 func (u *Env) Unlock() (err error) {
 	ptl := u.PrinterTransactedLike()
 

@@ -57,7 +57,7 @@ type (
 
 	QueryCheckedOut = query.QueryCheckedOut
 
-	Info struct {
+	Supplies struct {
 		StoreFuncs
 		DirCache string
 		fs_home.Home
@@ -66,7 +66,7 @@ type (
 	}
 
 	StoreLike interface {
-		Initialize(Info) error
+		Initialize(Supplies) error
 		QueryCheckedOut
 		interfaces.Flusher
 		sku.ExternalStoreForQuery

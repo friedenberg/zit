@@ -30,7 +30,7 @@ type transacted struct {
 
 type Store struct {
 	config            *config.Compiled
-	externalStoreInfo external_store.Info
+	externalStoreInfo external_store.Supplies
 	typ               ids.Type
 	browser           browser_items.BrowserProxy
 
@@ -177,8 +177,6 @@ func (c *Store) CheckoutOne(
 
 	existing := c.added[*u]
 	c.added[*u] = append(existing, item)
-
-	// 	ui.Debug().Print(response)
 
 	return
 }

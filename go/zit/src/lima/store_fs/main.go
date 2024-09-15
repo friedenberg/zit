@@ -249,7 +249,7 @@ func (fs *Store) Get(
 	return fs.dirFDs.objects.Get(k.String())
 }
 
-func (s *Store) Initialize(esi external_store.Info) (err error) {
+func (s *Store) Initialize(esi external_store.Supplies) (err error) {
 	s.externalStoreInfo = esi
 	return
 }

@@ -31,7 +31,7 @@ type dirFDs struct {
 
 	file_extensions.FileExtensions
 	fs_home           fs_home.Home
-	externalStoreInfo external_store.Info
+	externalStoreInfo external_store.Supplies
 
 	objects         interfaces.MutableSetLike[*FDSet]
 	blobs           interfaces.MutableSetLike[*FDSet]

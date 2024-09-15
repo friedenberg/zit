@@ -47,10 +47,19 @@ func (s *Store) CheckoutQuery(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
+	es, ok := s.externalStores[qg.RepoId]
+
+	if !ok {
+		err = errors.Errorf("no kasten with id %q", qg.RepoId)
+		return
+	}
+
 	qf := func(t *sku.Transacted) (err error) {
 		var col sku.CheckedOutLike
 
-		if col, err = s.CheckoutOne(qg.RepoId, options, t); err != nil {
+    // TODO include a "query complete" signal for the external store to batch
+    // the checkout if necessary
+		if col, err = es.CheckoutOne(options, t); err != nil {
 			if errors.Is(err, external_store.ErrUnsupportedTyp{}) {
 				err = nil
 			} else {

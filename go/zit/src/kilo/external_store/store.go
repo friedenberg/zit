@@ -15,7 +15,7 @@ import (
 )
 
 type Store struct {
-	Info
+	Supplies
 	StoreLike
 
 	didInit   bool
@@ -25,7 +25,7 @@ type Store struct {
 
 func (ve *Store) Initialize() (err error) {
 	ve.onceInit.Do(func() {
-		ve.initError = ve.StoreLike.Initialize(ve.Info)
+		ve.initError = ve.StoreLike.Initialize(ve.Supplies)
 		ve.didInit = true
 	})
 
