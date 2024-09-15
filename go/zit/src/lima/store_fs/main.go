@@ -36,7 +36,7 @@ type Store struct {
 	dir                 string
 	objectFormatOptions object_inventory_format.Options
 
-	dirFDs
+	dirItems
 
 	deleteLock sync.Mutex
 	deleted    fd.MutableSet
@@ -97,7 +97,7 @@ func (fs *Store) Flush() (err error) {
 
 func (fs *Store) String() (out string) {
 	if iter.Len(
-		fs.dirFDs.objects,
+		fs.dirItems.objects,
 		fs.blobs,
 	) == 0 {
 		return
@@ -120,14 +120,14 @@ func (fs *Store) String() (out string) {
 		return
 	}
 
-	fs.dirFDs.objects.Each(
-		func(z *FDSet) (err error) {
+	fs.dirItems.objects.Each(
+		func(z *Item) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
 
 	fs.blobs.Each(
-		func(z *FDSet) (err error) {
+		func(z *Item) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
@@ -139,7 +139,7 @@ func (fs *Store) String() (out string) {
 }
 
 func (s *Store) GetExternalObjectIds() (ks []sku.ExternalObjectId, err error) {
-	if err = s.dirFDs.processRootDir(); err != nil {
+	if err = s.dirItems.processRootDir(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -148,7 +148,7 @@ func (s *Store) GetExternalObjectIds() (ks []sku.ExternalObjectId, err error) {
 	var l sync.Mutex
 
 	if err = s.All(
-		func(kfp *FDSet) (err error) {
+		func(kfp *Item) (err error) {
 			l.Lock()
 			defer l.Unlock()
 
@@ -172,9 +172,9 @@ func (s *Store) GetObjectIdsForDir(
 		return
 	}
 
-	var results []*FDSet
+	var results []*Item
 
-	if results, err = s.dirFDs.processDir(fd.GetPath()); err != nil {
+	if results, err = s.dirItems.processDir(fd.GetPath()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -210,9 +210,9 @@ func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err e
 			return
 		}
 	} else {
-		var results []*FDSet
+		var results []*Item
 
-		if _, results, err = s.dirFDs.processFD(fdee); err != nil {
+		if _, results, err = s.dirItems.processFD(fdee); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -228,14 +228,14 @@ func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err e
 }
 
 func (fs *Store) ContainsSku(m *sku.Transacted) bool {
-	return fs.dirFDs.objects.ContainsKey(m.GetObjectId().String())
+	return fs.dirItems.objects.ContainsKey(m.GetObjectId().String())
 }
 
 func (fs *Store) GetBlobFDs() fd.Set {
 	fds := fd.MakeMutableSet()
 
 	fs.blobs.Each(
-		func(fds *FDSet) error {
+		func(fds *Item) error {
 			return fds.Each(fds.Add)
 		},
 	)
@@ -245,8 +245,8 @@ func (fs *Store) GetBlobFDs() fd.Set {
 
 func (fs *Store) Get(
 	k interfaces.ObjectId,
-) (t *FDSet, ok bool) {
-	return fs.dirFDs.objects.Get(k.String())
+) (t *Item, ok bool) {
+	return fs.dirItems.objects.Get(k.String())
 }
 
 func (s *Store) Initialize(esi external_store.Supplies) (err error) {
@@ -255,7 +255,7 @@ func (s *Store) Initialize(esi external_store.Supplies) (err error) {
 }
 
 func (s *Store) ApplyDotOperator() (err error) {
-	if err = s.dirFDs.processRootDir(); err != nil {
+	if err = s.dirItems.processRootDir(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -265,7 +265,7 @@ func (s *Store) ApplyDotOperator() (err error) {
 
 func (c *Store) Len() int {
 	return iter.Len(
-		c.dirFDs.objects,
+		c.dirItems.objects,
 	)
 }
 

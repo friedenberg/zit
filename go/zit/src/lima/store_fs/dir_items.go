@@ -21,11 +21,11 @@ import (
 
 type fdSetWithError struct {
 	error
-	*FDSet
+	*Item
 }
 
 // TODO support globs and ignores
-type dirFDs struct {
+type dirItems struct {
 	root          string
 	rootProcessed bool
 
@@ -33,10 +33,10 @@ type dirFDs struct {
 	fs_home           fs_home.Home
 	externalStoreInfo external_store.Supplies
 
-	objects         interfaces.MutableSetLike[*FDSet]
-	blobs           interfaces.MutableSetLike[*FDSet]
-	shasToBlobFDs   map[sha.Bytes]interfaces.MutableSetLike[*FDSet]
-	shasToObjectFDs map[sha.Bytes]interfaces.MutableSetLike[*FDSet]
+	objects         interfaces.MutableSetLike[*Item]
+	blobs           interfaces.MutableSetLike[*Item]
+	shasToBlobFDs   map[sha.Bytes]interfaces.MutableSetLike[*Item]
+	shasToObjectFDs map[sha.Bytes]interfaces.MutableSetLike[*Item]
 
 	errors interfaces.MutableSetLike[fdSetWithError]
 }
@@ -45,14 +45,14 @@ func makeObjectsWithDir(
 	p string,
 	fe file_extensions.FileExtensions,
 	fs_home fs_home.Home,
-) (d dirFDs) {
+) (d dirItems) {
 	d.root = p
 	d.FileExtensions = fe
 	d.fs_home = fs_home
-	d.objects = collections_value.MakeMutableValueSet[*FDSet](nil)
-	d.blobs = collections_value.MakeMutableValueSet[*FDSet](nil)
-	d.shasToBlobFDs = make(map[sha.Bytes]interfaces.MutableSetLike[*FDSet])
-	d.shasToObjectFDs = make(map[sha.Bytes]interfaces.MutableSetLike[*FDSet])
+	d.objects = collections_value.MakeMutableValueSet[*Item](nil)
+	d.blobs = collections_value.MakeMutableValueSet[*Item](nil)
+	d.shasToBlobFDs = make(map[sha.Bytes]interfaces.MutableSetLike[*Item])
+	d.shasToObjectFDs = make(map[sha.Bytes]interfaces.MutableSetLike[*Item])
 	d.errors = collections_value.MakeMutableValueSet[fdSetWithError](nil)
 
 	return
@@ -65,8 +65,8 @@ func makeObjectsWithDir(
 //     \_/\_/ \__,_|_|_|\_\_|_| |_|\__, |
 //                                 |___/
 
-func (d *dirFDs) walkDir(
-	cache map[string]*FDSet,
+func (d *dirItems) walkDir(
+	cache map[string]*Item,
 	p string,
 ) (err error) {
 	if err = filepath.WalkDir(
@@ -108,11 +108,11 @@ func (d *dirFDs) walkDir(
 	return
 }
 
-func (d *dirFDs) addPathAndDirEntry(
-	cache map[string]*FDSet,
+func (d *dirItems) addPathAndDirEntry(
+	cache map[string]*Item,
 	p string,
 	de fs.DirEntry,
-) (key string, fds *FDSet, err error) {
+) (key string, fds *Item, err error) {
 	if de.IsDir() {
 		return
 	}
@@ -132,7 +132,7 @@ func (d *dirFDs) addPathAndDirEntry(
 	return
 }
 
-func (d *dirFDs) keyForFD(fdee *fd.FD) (key string, err error) {
+func (d *dirItems) keyForFD(fdee *fd.FD) (key string, err error) {
 	var rel string
 
 	if rel, err = filepath.Rel(d.root, fdee.GetPath()); err != nil {
@@ -146,10 +146,10 @@ func (d *dirFDs) keyForFD(fdee *fd.FD) (key string, err error) {
 	return
 }
 
-func (d *dirFDs) addFD(
-	cache map[string]*FDSet,
+func (d *dirItems) addFD(
+	cache map[string]*Item,
 	f *fd.FD,
-) (key string, fds *FDSet, err error) {
+) (key string, fds *Item, err error) {
 	if f.IsDir() {
 		return
 	}
@@ -160,7 +160,7 @@ func (d *dirFDs) addFD(
 	}
 
 	if cache == nil {
-		fds = &FDSet{
+		fds = &Item{
 			MutableSetLike: collections_value.MakeMutableValueSet[*fd.FD](nil),
 		}
 
@@ -170,7 +170,7 @@ func (d *dirFDs) addFD(
 		fds, ok = cache[key]
 
 		if !ok {
-			fds = &FDSet{
+			fds = &Item{
 				MutableSetLike: collections_value.MakeMutableValueSet[*fd.FD](nil),
 			}
 		}
@@ -189,10 +189,10 @@ func (d *dirFDs) addFD(
 //  |_|   |_|  \___/ \___\___||___/___/_|_| |_|\__, |
 //                                             |___/
 
-func (d *dirFDs) processDir(p string) (results []*FDSet, err error) {
-	cache := make(map[string]*FDSet)
+func (d *dirItems) processDir(p string) (results []*Item, err error) {
+	cache := make(map[string]*Item)
 
-	results = make([]*FDSet, 0)
+	results = make([]*Item, 0)
 
 	if err = d.walkDir(cache, p); err != nil {
 		err = errors.Wrap(err)
@@ -200,7 +200,7 @@ func (d *dirFDs) processDir(p string) (results []*FDSet, err error) {
 	}
 
 	for objectIdString, fds := range cache {
-		var someResult []*FDSet
+		var someResult []*Item
 
 		if someResult, err = d.processFDSet(objectIdString, fds); err != nil {
 			err = errors.Wrap(err)
@@ -213,10 +213,10 @@ func (d *dirFDs) processDir(p string) (results []*FDSet, err error) {
 	return
 }
 
-func (d *dirFDs) processFD(
+func (d *dirItems) processFD(
 	fdee *fd.FD,
-) (objectIdString string, fds []*FDSet, err error) {
-	cache := make(map[string]*FDSet)
+) (objectIdString string, fds []*Item, err error) {
+	cache := make(map[string]*Item)
 
 	if objectIdString, err = d.keyForFD(fdee); err != nil {
 		err = errors.Wrap(err)
@@ -239,7 +239,7 @@ func (d *dirFDs) processFD(
 	return
 }
 
-func (d *dirFDs) processRootDir() (err error) {
+func (d *dirItems) processRootDir() (err error) {
 	if d.rootProcessed {
 		return
 	}
@@ -254,10 +254,10 @@ func (d *dirFDs) processRootDir() (err error) {
 	return
 }
 
-func (d *dirFDs) processFDSet(
+func (d *dirItems) processFDSet(
 	objectIdString string,
-	fds *FDSet,
-) (results []*FDSet, err error) {
+	fds *Item,
+) (results []*Item, err error) {
 	var recognizedGenre genres.Genre
 
 	{
@@ -333,7 +333,7 @@ func (d *dirFDs) processFDSet(
 		}
 
 		if err != nil {
-			if err = d.errors.Add(fdSetWithError{FDSet: fds, error: err}); err != nil {
+			if err = d.errors.Add(fdSetWithError{Item: fds, error: err}); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -360,16 +360,16 @@ func (d *dirFDs) processFDSet(
 			return
 		}
 
-		results = []*FDSet{fds}
+		results = []*Item{fds}
 	}
 
 	return
 }
 
-func (d *dirFDs) addOneBlob(
+func (d *dirItems) addOneBlob(
 	f *fd.FD,
-) (result *FDSet, err error) {
-	result = &FDSet{
+) (result *Item, err error) {
+	result = &Item{
 		MutableSetLike: collections_value.MakeMutableValueSet[*fd.FD](nil),
 	}
 
@@ -405,7 +405,7 @@ func (d *dirFDs) addOneBlob(
 	existing, ok := d.shasToBlobFDs[key]
 
 	if !ok {
-		existing = collections_value.MakeMutableValueSet[*FDSet](nil)
+		existing = collections_value.MakeMutableValueSet[*Item](nil)
 	}
 
 	if err = existing.Add(result); err != nil {
@@ -418,11 +418,11 @@ func (d *dirFDs) addOneBlob(
 	return
 }
 
-func (d *dirFDs) addOneOrMoreBlobs(
-	fds *FDSet,
-) (results []*FDSet, err error) {
+func (d *dirItems) addOneOrMoreBlobs(
+	fds *Item,
+) (results []*Item, err error) {
 	if fds.MutableSetLike.Len() == 1 {
-		var fdsOne *FDSet
+		var fdsOne *Item
 
 		if fdsOne, err = d.addOneBlob(
 			fds.Any(),
@@ -431,14 +431,14 @@ func (d *dirFDs) addOneOrMoreBlobs(
 			return
 		}
 
-		results = []*FDSet{fdsOne}
+		results = []*Item{fdsOne}
 
 		return
 	}
 
 	if err = fds.MutableSetLike.Each(
 		func(fd *fd.FD) (err error) {
-			var fdsOne *FDSet
+			var fdsOne *Item
 
 			if fdsOne, err = d.addOneBlob(
 				fds.Any(),
@@ -459,9 +459,9 @@ func (d *dirFDs) addOneOrMoreBlobs(
 	return
 }
 
-func (d *dirFDs) addOneObject(
+func (d *dirItems) addOneObject(
 	objectIdString string,
-	fds *FDSet,
+	fds *Item,
 ) (err error) {
 	g := fds.GetGenre()
 	if g == genres.Zettel {
@@ -487,8 +487,8 @@ func (d *dirFDs) addOneObject(
 	return
 }
 
-func (d *dirFDs) ConsolidateDuplicateBlobs() (err error) {
-	replacement := collections_value.MakeMutableValueSet[*FDSet](nil)
+func (d *dirItems) ConsolidateDuplicateBlobs() (err error) {
+	replacement := collections_value.MakeMutableValueSet[*Item](nil)
 
 	for _, fds := range d.shasToBlobFDs {
 		if fds.Len() == 1 {
@@ -497,7 +497,7 @@ func (d *dirFDs) ConsolidateDuplicateBlobs() (err error) {
 
 		sorted := iter.ElementsSorted(
 			fds,
-			func(a, b *FDSet) bool {
+			func(a, b *Item) bool {
 				return a.ObjectId.String() < b.ObjectId.String()
 			},
 		)
@@ -524,8 +524,8 @@ func (d *dirFDs) ConsolidateDuplicateBlobs() (err error) {
 //  |___|\__\___|_|  \__,_|\__|_|\___/|_| |_|
 //
 
-func (d *dirFDs) AllObjects(
-	f interfaces.FuncIter[*FDSet],
+func (d *dirItems) OnlyObjects(
+	f interfaces.FuncIter[*Item],
 ) (err error) {
 	wg := iter.MakeErrorWaitGroupParallel()
 
@@ -534,8 +534,8 @@ func (d *dirFDs) AllObjects(
 	return wg.GetError()
 }
 
-func (d *dirFDs) All(
-	f interfaces.FuncIter[*FDSet],
+func (d *dirItems) All(
+	f interfaces.FuncIter[*Item],
 ) (err error) {
 	wg := iter.MakeErrorWaitGroupParallel()
 

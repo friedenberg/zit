@@ -15,7 +15,7 @@ import (
 
 func (s *Store) ReadOneExternal(
 	o *sku.CommitOptions,
-	em *FDSet,
+	em *Item,
 	t *sku.Transacted,
 ) (e *External, err error) {
 	e = GetExternalPool().Get()
@@ -55,7 +55,7 @@ func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 
 func (s *Store) ReadOneExternalInto(
 	o *sku.CommitOptions,
-	em *FDSet,
+	em *Item,
 	t *sku.Transacted,
 	e *External,
 ) (err error) {

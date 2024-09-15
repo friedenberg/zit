@@ -180,7 +180,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 
 func (f *cliCheckedOut) writeStringFormatBlobFDsExcept(
 	sw interfaces.WriterAndStringWriter,
-	fds *FDSet,
+	fds *Item,
 	except *fd.FD,
 ) (n int64, err error) {
 	var n2 int64

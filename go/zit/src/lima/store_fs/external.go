@@ -16,7 +16,7 @@ import (
 // TODO migrate to *sku.External
 type External struct {
 	sku.External
-	fds FDSet
+	fds Item // TODO remove and keep separately
 }
 
 func (t *External) GetSkuExternalLike() sku.ExternalLike {
@@ -67,7 +67,7 @@ func (a *External) SetBlobSha(v interfaces.Sha) (err error) {
 	return
 }
 
-func (a *External) GetFDs() *FDSet {
+func (a *External) GetFDs() *Item {
 	return &a.fds
 }
 
@@ -89,7 +89,7 @@ func (a *External) GetObjectFD() *fd.FD {
 }
 
 func (a *External) ResetWithExternalMaybe(
-	b *FDSet,
+	b *Item,
 ) (err error) {
 	k := &b.ObjectId
 	a.Transacted.ObjectId.ResetWithIdLike(k)
@@ -100,42 +100,6 @@ func (a *External) ResetWithExternalMaybe(
 
 func (o *External) GetKey() string {
 	return fmt.Sprintf("%s.%s", o.GetGenre(), o.GetObjectId())
-}
-
-func (e *External) GetCheckoutMode() (m checkout_mode.Mode, err error) {
-	switch {
-	case !e.fds.Object.IsEmpty() && !e.fds.Blob.IsEmpty():
-		m = checkout_mode.MetadataAndBlob
-
-	case !e.fds.Blob.IsEmpty():
-		m = checkout_mode.BlobOnly
-
-	case !e.fds.Object.IsEmpty():
-		m = checkout_mode.MetadataOnly
-
-	default:
-		err = checkout_mode.MakeErrInvalidCheckoutMode(
-			errors.Errorf("all FD's are empty"),
-		)
-	}
-
-	return
-}
-
-type lessorExternal struct{}
-
-func (lessorExternal) Less(a, b External) bool {
-	panic("not supported")
-}
-
-func (lessorExternal) LessPtr(a, b *External) bool {
-	return a.Transacted.GetTai().Less(b.Transacted.GetTai())
-}
-
-type equalerExternal struct{}
-
-func (equalerExternal) Equals(a, b External) bool {
-	panic("not supported")
 }
 
 func GetCheckoutModeOrError(

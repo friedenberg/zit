@@ -39,7 +39,7 @@ func (c CreateFromPaths) Run(
 
 	for _, arg := range args {
 		var z *store_fs.External
-		var t store_fs.FDSet
+		var t store_fs.Item
 
 		t.ObjectId.SetGenre(genres.Zettel)
 

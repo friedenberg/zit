@@ -19,8 +19,8 @@ func (s *Store) MakeApplyCheckedOut(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 	o sku.CommitOptions,
-) interfaces.FuncIter[*FDSet] {
-	return func(em *FDSet) (err error) {
+) interfaces.FuncIter[*Item] {
+	return func(em *Item) (err error) {
 		if err = s.ApplyCheckedOut(o, qg, em, f); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -33,7 +33,7 @@ func (s *Store) MakeApplyCheckedOut(
 func (s *Store) ApplyCheckedOut(
 	o sku.CommitOptions,
 	qg *query.Group,
-	em *FDSet,
+	em *Item,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	var co *CheckedOut
@@ -71,7 +71,7 @@ func (s *Store) QueryCheckedOut(
 	aco := s.MakeApplyCheckedOut(qg, f, o)
 
 	wg.Do(func() error {
-		return s.AllObjects(aco)
+		return s.OnlyObjects(aco)
 	})
 
 	if !qg.ExcludeUntracked {
@@ -94,18 +94,18 @@ func (s *Store) QueryCheckedOut(
 
 func (s *Store) QueryUntracked(
 	qg *query.Group,
-	aco interfaces.FuncIter[*FDSet],
+	aco interfaces.FuncIter[*Item],
 	f func(sku.CheckedOutLike) error,
 ) (err error) {
-	allRecognizedBlobs := make([]*FDSet, 0)
-	allRecognizedObjects := make([]*FDSet, 0)
+	allRecognizedBlobs := make([]*Item, 0)
+	allRecognizedObjects := make([]*Item, 0)
 
 	addRecognizedIfNecessary := func(
 		sk *sku.Transacted,
 		shaBlob *sha.Sha,
-		shaCache map[sha.Bytes]interfaces.MutableSetLike[*FDSet],
-		allRecognized *[]*FDSet,
-		fdSetToFD func(*FDSet) *fd.FD,
+		shaCache map[sha.Bytes]interfaces.MutableSetLike[*Item],
+		allRecognized *[]*Item,
+		fdSetToFD func(*Item) *fd.FD,
 	) (err error) {
 		if shaBlob.IsNull() {
 			return
@@ -118,7 +118,7 @@ func (s *Store) QueryUntracked(
 			return
 		}
 
-		recognizedFDS := &FDSet{
+		recognizedFDS := &Item{
 			State:          external_state.Recognized,
 			MutableSetLike: collections_value.MakeMutableValueSet[*fd.FD](nil),
 		}
@@ -126,7 +126,7 @@ func (s *Store) QueryUntracked(
 		recognizedFDS.ObjectId.ResetWith(&sk.ObjectId)
 
 		if err = recognized.Each(
-			func(fds *FDSet) (err error) {
+			func(fds *Item) (err error) {
 				fds.State = external_state.Recognized
 				recognizedFDS.Add(fdSetToFD(fds).Clone())
 				return
@@ -149,7 +149,7 @@ func (s *Store) QueryUntracked(
 				&sk.Metadata.Blob,
 				s.shasToBlobFDs,
 				&allRecognizedBlobs,
-				func(fds *FDSet) *fd.FD { return &fds.Blob },
+				func(fds *Item) *fd.FD { return &fds.Blob },
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -160,7 +160,7 @@ func (s *Store) QueryUntracked(
 				&sk.Metadata.SelfMetadataWithoutTai,
 				s.shasToObjectFDs,
 				&allRecognizedObjects,
-				func(fds *FDSet) *fd.FD { return &fds.Object },
+				func(fds *Item) *fd.FD { return &fds.Object },
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -173,16 +173,16 @@ func (s *Store) QueryUntracked(
 		return
 	}
 
-	if err = s.dirFDs.ConsolidateDuplicateBlobs(); err != nil {
+	if err = s.dirItems.ConsolidateDuplicateBlobs(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	{
-		blobs := make([]*FDSet, 0, s.dirFDs.blobs.Len())
+		blobs := make([]*Item, 0, s.dirItems.blobs.Len())
 
-		if err = s.dirFDs.blobs.Each(
-			func(fds *FDSet) (err error) {
+		if err = s.dirItems.blobs.Each(
+			func(fds *Item) (err error) {
 				blobs = append(blobs, fds)
 				return
 			},
@@ -218,10 +218,10 @@ func (s *Store) QueryUntracked(
 	}
 
 	if false {
-		objects := make([]*FDSet, 0, s.dirFDs.objects.Len())
+		objects := make([]*Item, 0, s.dirItems.objects.Len())
 
-		if err = s.dirFDs.objects.Each(
-			func(fds *FDSet) (err error) {
+		if err = s.dirItems.objects.Each(
+			func(fds *Item) (err error) {
 				objects = append(objects, fds)
 				return
 			},

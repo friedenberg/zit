@@ -38,7 +38,7 @@ func (s *Store) checkoutOneNew(
 		return
 	}
 
-	var e *FDSet
+	var e *Item
 	ok := false
 
 	ui.TodoP4("cleanup")

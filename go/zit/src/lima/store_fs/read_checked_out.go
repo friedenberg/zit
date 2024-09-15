@@ -12,7 +12,7 @@ import (
 
 func (s *Store) ReadCheckedOutFromObjectIdFDPair(
 	o sku.CommitOptions,
-	em *FDSet,
+	em *Item,
 ) (co *CheckedOut, err error) {
 	co = GetCheckedOutPool().Get()
 
@@ -77,7 +77,7 @@ func (s *Store) ReadIntoCheckedOutFromTransacted(
 
 	ok := false
 
-	var kfp *FDSet
+	var kfp *Item
 
 	if kfp, ok = s.Get(&sk.ObjectId); !ok {
 		err = collections.MakeErrNotFound(sk.GetObjectId())
@@ -120,7 +120,7 @@ func (s *Store) ReadIntoCheckedOutFromTransacted(
 
 func (s *Store) ReadIntoCheckedOutFromTransactedAndFDSet(
 	sk *sku.Transacted,
-	fds *FDSet,
+	fds *Item,
 	co *CheckedOut,
 ) (err error) {
 	if &co.Internal != sk {

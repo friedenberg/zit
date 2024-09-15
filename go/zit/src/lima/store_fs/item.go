@@ -14,28 +14,28 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type FDSet struct {
+type Item struct {
 	external_state.State
 
 	// TODO refactor this to be a string and a genre that is tied to the state
 	ids.ObjectId
 
 	Object   fd.FD
-	Blob     fd.FD
+	Blob     fd.FD // TODO make set
 	Conflict fd.FD
 
 	interfaces.MutableSetLike[*fd.FD]
 }
 
-func (ef *FDSet) String() string {
+func (ef *Item) String() string {
 	return ef.ObjectId.String()
 }
 
-func (ef *FDSet) GetExternalObjectId() sku.ExternalObjectId {
+func (ef *Item) GetExternalObjectId() sku.ExternalObjectId {
 	return ef
 }
 
-func (ef *FDSet) Debug() string {
+func (ef *Item) Debug() string {
 	return fmt.Sprintf(
 		"State: %q, Genre: %q, ObjectId: %q, Object: %q, Blob: %q, Conflict: %q, All: %q",
 		ef.State,
@@ -48,15 +48,15 @@ func (ef *FDSet) Debug() string {
 	)
 }
 
-func (ef *FDSet) GetTai() ids.Tai {
+func (ef *Item) GetTai() ids.Tai {
 	return ids.TaiFromTime(ef.LatestModTime())
 }
 
-func (ef *FDSet) GetTime() thyme.Time {
+func (ef *Item) GetTime() thyme.Time {
 	return ef.LatestModTime()
 }
 
-func (ef *FDSet) LatestModTime() thyme.Time {
+func (ef *Item) LatestModTime() thyme.Time {
 	o, a := ef.Object.ModTime(), ef.Blob.ModTime()
 
 	if o.Less(a) {
@@ -66,7 +66,7 @@ func (ef *FDSet) LatestModTime() thyme.Time {
 	}
 }
 
-func (dst *FDSet) Reset() {
+func (dst *Item) Reset() {
 	dst.State = 0
 	dst.ObjectId.Reset()
 	dst.Object.Reset()
@@ -80,7 +80,7 @@ func (dst *FDSet) Reset() {
 	}
 }
 
-func (dst *FDSet) ResetWith(src *FDSet) {
+func (dst *Item) ResetWith(src *Item) {
 	dst.State = src.State
 	dst.ObjectId.ResetWith(&src.ObjectId)
 	dst.Object.ResetWith(&src.Object)
@@ -96,7 +96,7 @@ func (dst *FDSet) ResetWith(src *FDSet) {
 	}
 }
 
-func (a *FDSet) Equals(b *FDSet) bool {
+func (a *Item) Equals(b *Item) bool {
 	if !a.Object.Equals(&b.Object) {
 		return false
 	}
@@ -108,7 +108,7 @@ func (a *FDSet) Equals(b *FDSet) bool {
 	return true
 }
 
-func (e *FDSet) GenerateConflictFD() (err error) {
+func (e *Item) GenerateConflictFD() (err error) {
 	if err = e.Conflict.SetPath(e.ObjectId.String() + ".conflict"); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -117,7 +117,7 @@ func (e *FDSet) GenerateConflictFD() (err error) {
 	return
 }
 
-func (e *FDSet) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
+func (e *Item) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 	switch {
 	case !e.Object.IsEmpty() && !e.Blob.IsEmpty():
 		m = checkout_mode.MetadataAndBlob
