@@ -145,6 +145,12 @@ func (e *Item) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 }
 
 // TODO replace with fields
+func (i *Item) ReadFromExternal(e *External) (err error) {
+  i.ResetWith(&e.item)
+	return
+}
+
+// TODO replace with fields
 func (i *Item) WriteToExternal(e *External) (err error) {
 	if err = e.ExternalObjectId.SetRaw(i.ObjectId.String()); err != nil {
 		err = errors.Wrap(err)

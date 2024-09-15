@@ -160,14 +160,21 @@ func (s *Store) handleMergeResult(
 		return
 	}
 
-	if err = cofs.External.item.GenerateConflictFD(); err != nil {
+	var i Item
+
+	if err = i.ReadFromExternal(&cofs.External); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = i.GenerateConflictFD(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if err = os.Rename(
 		f.Name(),
-		cofs.External.item.Conflict.GetPath(),
+		i.Conflict.GetPath(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

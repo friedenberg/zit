@@ -48,7 +48,7 @@ func (c CreateFromPaths) Run(
 			return
 		}
 
-		if z, err = c.GetStore().GetCwdFiles().ReadExternalFromObjectIdFDPair(
+		if z, err = c.GetStore().GetCwdFiles().ReadExternalFromItem(
 			o,
 			&t,
 			nil,

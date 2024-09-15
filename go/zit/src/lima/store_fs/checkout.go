@@ -38,19 +38,19 @@ func (s *Store) checkoutOneNew(
 		return
 	}
 
-	var e *Item
+	var i *Item
 	ok := false
 
 	ui.TodoP4("cleanup")
-	if e, ok = s.Get(&sz.ObjectId); ok {
-		ui.Log().Print("E", e.MutableSetLike)
+	if i, ok = s.Get(&sz.ObjectId); ok {
+		ui.Log().Print("E", i.MutableSetLike)
 		var cze *External
 
-		if cze, err = s.ReadExternalFromObjectIdFDPair(
+		if cze, err = s.ReadExternalFromItem(
 			sku.CommitOptions{
 				Mode: objekte_mode.ModeRealizeSansProto,
 			},
-			e,
+			i,
 			sz,
 		); err != nil {
 			if errors.Is(err, ErrExternalHasConflictMarker) && options.AllowConflicted {

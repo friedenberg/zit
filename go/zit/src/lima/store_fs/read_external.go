@@ -18,7 +18,7 @@ func (s *Store) ReadExternalLikeFromObjectId(
 		return
 	}
 
-	if e, err = s.ReadExternalFromObjectIdFDPair(o, k, t); err != nil {
+	if e, err = s.ReadExternalFromItem(o, k, t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -26,7 +26,7 @@ func (s *Store) ReadExternalLikeFromObjectId(
 	return
 }
 
-func (s *Store) ReadExternalFromObjectIdFDPair(
+func (s *Store) ReadExternalFromItem(
 	o sku.CommitOptions,
 	em *Item,
 	t *sku.Transacted,

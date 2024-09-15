@@ -37,7 +37,7 @@ func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 
 	var e2 *External
 
-	if e2, err = s.ReadExternalFromObjectIdFDPair(
+	if e2, err = s.ReadExternalFromItem(
 		sku.CommitOptions{
 			Mode: objekte_mode.ModeUpdateTai,
 		},
