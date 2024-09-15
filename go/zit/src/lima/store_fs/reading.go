@@ -89,7 +89,7 @@ func (s *Store) ReadOneExternalInto(
 		}
 
 	case checkout_mode.MetadataOnly, checkout_mode.MetadataAndBlob:
-		if e.item.Object.IsStdin() {
+		if i.Object.IsStdin() {
 			if err = s.ReadOneExternalObjectReader(os.Stdin, e); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -111,8 +111,8 @@ func (s *Store) ReadOneExternalInto(
 		panic(checkout_mode.MakeErrInvalidCheckoutModeMode(m))
 	}
 
-	if !e.item.Blob.IsEmpty() {
-		blobFD := &e.item.Blob
+	if !i.Blob.IsEmpty() {
+		blobFD := &i.Blob
 		ext := blobFD.ExtSansDot()
 		typFromExtension := s.config.GetTypeStringFromExtension(ext)
 
@@ -129,7 +129,7 @@ func (s *Store) ReadOneExternalInto(
 	}
 
 	if o.Clock == nil {
-		o.Clock = &e.item
+		o.Clock = i
 	}
 
 	return
