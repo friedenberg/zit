@@ -152,13 +152,14 @@ func (s *Store) checkoutOne(
 	options checkout_options.Options,
 	cz *CheckedOut,
 ) (i *Item, err error) {
-	i = &Item{}
-	i.Reset()
+	// i = &Item{}
+	// i.Reset()
 
-	if err = i.ReadFromExternal(&cz.External); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	// if err = i.ReadFromExternal(&cz.External); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
+	i = &cz.External.item
 
 	if s.config.IsDryRun() {
 		return
@@ -180,15 +181,15 @@ func (s *Store) checkoutOne(
 	inlineBlob := s.config.IsInlineType(t)
 
 	if options.CheckoutMode.IncludesMetadata() {
-		if err = cz.External.GetFDs().Object.SetPath(filename); err != nil {
+		if err = i.Object.SetPath(filename); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		cz.External.item.Add(&cz.External.item.Object)
+		i.Add(&i.Object)
 	} else {
-		cz.External.item.MutableSetLike.Del(&cz.External.item.Object)
-		cz.External.item.Object.Reset()
+		i.MutableSetLike.Del(&i.Object)
+		i.Object.Reset()
 	}
 
 	if ((!inlineBlob || !options.CheckoutMode.IncludesMetadata()) &&
@@ -201,17 +202,17 @@ func (s *Store) checkoutOne(
 			fe = t.String()
 		}
 
-		if err = cz.External.GetFDs().Blob.SetPath(
+		if err = i.Blob.SetPath(
 			originalFilename + "." + fe,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		cz.External.item.Add(&cz.External.item.Blob)
+		i.Add(&i.Blob)
 	} else {
-		cz.External.item.MutableSetLike.Del(&cz.External.item.Blob)
-		cz.External.item.Blob.Reset()
+		i.MutableSetLike.Del(&i.Blob)
+		i.Blob.Reset()
 	}
 
 	sku.Resetter.ResetWith(&cz.External, &cz.Internal)
@@ -219,7 +220,13 @@ func (s *Store) checkoutOne(
 	if err = s.fileEncoder.Encode(
 		options.TextFormatterOptions,
 		&cz.External,
+		i,
 	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = i.WriteToExternal(&cz.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

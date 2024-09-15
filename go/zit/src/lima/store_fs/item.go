@@ -8,11 +8,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -83,6 +83,10 @@ func (dst *Item) Reset() {
 }
 
 func (dst *Item) ResetWith(src *Item) {
+	if dst == src {
+		return
+	}
+
 	dst.State = src.State
 	dst.ObjectId.ResetWith(&src.ObjectId)
 	dst.Object.ResetWith(&src.Object)
@@ -146,16 +150,30 @@ func (e *Item) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 
 // TODO replace with fields
 func (i *Item) ReadFromExternal(e *External) (err error) {
-  i.ResetWith(&e.item)
+	i.ResetWith(&e.item)
 	return
 }
 
 // TODO replace with fields
 func (i *Item) WriteToExternal(e *External) (err error) {
-	if err = e.ExternalObjectId.SetRaw(i.ObjectId.String()); err != nil {
+	k := &i.ObjectId
+
+	if err = e.ExternalObjectId.SetRaw(k.String()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	if k.String() != "" {
+		if k.GetGenre() != genres.Blob {
+			if err = e.Transacted.ObjectId.Set(k.String()); err != nil {
+        err = nil
+				// err = errors.Wrap(err)
+				// return
+			}
+		}
+	}
+	// e.Transacted.ObjectId.SetGenre(k.GetGenre())
+	e.item.ResetWith(i) // TODO remove
 
 	m := &e.Transacted.Metadata
 	m.Tai = i.GetTai()
@@ -192,9 +210,5 @@ func (i *Item) WriteToExternal(e *External) (err error) {
 		}
 	}
 
-	k := &i.ObjectId
-	e.Transacted.ObjectId.ResetWithIdLike(k)
-	object_metadata.Resetter.Reset(&e.Transacted.Metadata)
-	e.item.ResetWith(i) // TODO remove
 	return
 }

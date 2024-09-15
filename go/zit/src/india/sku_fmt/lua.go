@@ -16,7 +16,7 @@ type LuaTable struct {
 }
 
 func ToLuaTable(tg sku.TransactedGetter, l *lua.LState, t *LuaTable) {
-  o := tg.GetSku()
+	o := tg.GetSku()
 
 	l.SetField(t.Transacted, "Gattung", lua.LString(o.GetGenre().String()))
 	l.SetField(t.Transacted, "Kennung", lua.LString(o.GetObjectId().String()))
@@ -54,9 +54,11 @@ func FromLuaTable(o *sku.Transacted, l *lua.LState, lt *LuaTable) (err error) {
 	o.ObjectId.SetGenre(g)
 	k := l.GetField(t, "Kennung").String()
 
-	if err = o.ObjectId.Set(k); err != nil {
-		err = errors.Wrap(err)
-		return
+	if k != "" {
+		if err = o.ObjectId.Set(k); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	et := l.GetField(t, "Etiketten")

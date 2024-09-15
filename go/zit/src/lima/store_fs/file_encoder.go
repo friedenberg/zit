@@ -14,7 +14,11 @@ import (
 )
 
 type FileEncoder interface {
-	Encode(options checkout_options.TextFormatterOptions, z *External) (err error)
+	Encode(
+    options checkout_options.TextFormatterOptions,
+    z *External,
+    i *Item,
+  ) (err error)
 }
 
 type fileEncoder struct {
@@ -185,11 +189,12 @@ func (e *fileEncoder) EncodeObject(
 func (e *fileEncoder) Encode(
 	options checkout_options.TextFormatterOptions,
 	z *External,
+  i *Item,
 ) (err error) {
 	return e.EncodeObject(
 		options,
 		z,
-		z.GetObjectFD().GetPath(),
-		z.GetBlobFD().GetPath(),
+    i.Object.GetPath(),
+    i.Blob.GetPath(),
 	)
 }
