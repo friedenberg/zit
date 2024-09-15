@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 )
 
 type External struct {
@@ -42,7 +41,7 @@ func (t *External) GetExternalState() external_state.State {
 
 func (a *External) Clone() ExternalLike {
 	b := GetExternalPool().Get()
-  ExternalResetter.ResetWith(b, a)
+	ExternalResetter.ResetWith(b, a)
 	return b
 }
 
@@ -54,8 +53,8 @@ func (a *External) GetObjectIdLike() ids.IdLike {
 	return &a.Transacted.ObjectId
 }
 
-func (a *External) GetMetadatei() *object_metadata.Metadata {
-	return &a.Transacted.Metadata
+func (a *External) GetType() ids.Type {
+	return a.Transacted.Metadata.Type
 }
 
 func (a *External) GetGenre() interfaces.Genre {
@@ -70,6 +69,10 @@ func (a *External) String() string {
 		a.Transacted.GetObjectSha(),
 		a.GetBlobSha(),
 	)
+}
+
+func (a *External) GetObjectSha() interfaces.Sha {
+	return a.Transacted.Metadata.Sha()
 }
 
 func (a *External) GetBlobSha() interfaces.Sha {

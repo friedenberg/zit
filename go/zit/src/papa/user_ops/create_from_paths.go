@@ -61,7 +61,7 @@ func (c CreateFromPaths) Run(
 			return
 		}
 
-		sh := &z.Metadata.Shas.SelfMetadataWithoutTai
+		sh := &z.Transacted.Metadata.Shas.SelfMetadataWithoutTai
 
 		if sh.IsNull() {
 			return
@@ -71,8 +71,8 @@ func (c CreateFromPaths) Run(
 		existing, ok := toCreate[k]
 
 		if ok {
-			if err = existing.Metadata.Description.Set(
-				z.Metadata.Description.String(),
+			if err = existing.Transacted.Metadata.Description.Set(
+				z.Transacted.Metadata.Description.String(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -120,7 +120,7 @@ func (c CreateFromPaths) Run(
 	defer errors.Deferred(&err, c.Unlock)
 
 	for _, z := range toCreate {
-		if z.Metadata.IsEmpty() {
+		if z.Transacted.Metadata.IsEmpty() {
 			return
 		}
 
@@ -134,7 +134,7 @@ func (c CreateFromPaths) Run(
 			continue
 		}
 
-		results.Add(&z.Transacted)
+		results.Add(&z.Transacted.Transacted)
 	}
 
 	if err = toDelete.Each(
@@ -191,16 +191,19 @@ func (c *CreateFromPaths) zettelsFromPath(
 		return
 	}
 
-	ze.Metadata.Tai = ids.TaiFromTime(fd.ModTime())
+	ze.Transacted.Metadata.Tai = ids.TaiFromTime(fd.ModTime())
 
-	ze.ObjectId.SetGenre(genres.Zettel)
+	ze.Transacted.ObjectId.SetGenre(genres.Zettel)
 
-	if _, err = c.TextParser.ParseMetadata(r, ze); err != nil {
+	if _, err = c.TextParser.ParseMetadata(
+    r,
+    &ze.Transacted,
+  ); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = ze.CalculateObjectShas(); err != nil {
+	if err = ze.Transacted.CalculateObjectShas(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -133,17 +133,17 @@ func (checkedOutResetter) Reset(a *CheckedOut) {
 	a.Error = nil
 
 	sku.TransactedResetter.Reset(&a.Internal)
-	sku.TransactedResetter.Reset(&a.External.Transacted)
+	sku.ExternalResetter.Reset(&a.External.External)
 	a.External.fds.Object.Reset()
 	a.External.fds.Blob.Reset()
 }
 
-func (checkedOutResetter) ResetWith(a *CheckedOut, b *CheckedOut) {
-	a.State = b.State
-	a.IsImport = b.IsImport
-	a.Error = b.Error
+func (checkedOutResetter) ResetWith(dst *CheckedOut, src *CheckedOut) {
+	dst.State = src.State
+	dst.IsImport = src.IsImport
+	dst.Error = src.Error
 
-	sku.TransactedResetter.ResetWith(&a.Internal, &b.Internal)
-	sku.TransactedResetter.ResetWith(&a.External.Transacted, &b.External.Transacted)
-	a.External.fds.ResetWith(&b.External.fds)
+	sku.TransactedResetter.ResetWith(&dst.Internal, &src.Internal)
+	sku.ExternalResetter.ResetWith(&dst.External.External, &src.External.External)
+	dst.External.fds.ResetWith(&src.External.fds)
 }

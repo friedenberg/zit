@@ -230,7 +230,7 @@ func (s *Store) shouldCheckOut(
 
 	eq := object_metadata.EqualerSansTai.Equals(
 		&cz.Internal.Metadata,
-		&cz.External.Metadata,
+		&cz.External.Transacted.Metadata,
 	)
 
 	if eq {
@@ -249,7 +249,7 @@ func (s *Store) shouldCheckOut(
 		cz.Internal.GetObjectId().String(),
 		mutter,
 	); err == nil {
-		if object_metadata.EqualerSansTai.Equals(&mutter.Metadata, &cz.External.Metadata) {
+		if object_metadata.EqualerSansTai.Equals(&mutter.Metadata, &cz.External.Transacted.Metadata) {
 			return true
 		}
 	}

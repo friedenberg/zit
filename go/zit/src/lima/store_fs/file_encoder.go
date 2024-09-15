@@ -70,7 +70,7 @@ func (e *fileEncoder) EncodeObject(
 	blobPath string,
 ) (err error) {
 	ctx := object_metadata.TextFormatterContext{
-		PersistentFormatterContext: z,
+		PersistentFormatterContext: z.GetSku(),
 		TextFormatterOptions:       options,
 	}
 

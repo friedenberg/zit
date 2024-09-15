@@ -110,7 +110,10 @@ func (f *cliCheckedOut) WriteStringFormat(
 		fallthrough
 
 	case m == checkout_mode.BlobOnly || m == checkout_mode.BlobRecognized:
-		n2, err = f.objectIdStringFormatWriter.WriteStringFormat(sw, &o.ObjectId)
+		n2, err = f.objectIdStringFormatWriter.WriteStringFormat(
+      sw,
+      &o.Transacted.ObjectId,
+    )
 		n += n2
 
 		if err != nil {
@@ -142,7 +145,10 @@ func (f *cliCheckedOut) WriteStringFormat(
 		return
 	}
 
-	n2, err = f.metadataStringFormatWriter.WriteStringFormat(sw, o.GetMetadata())
+	n2, err = f.metadataStringFormatWriter.WriteStringFormat(
+    sw,
+    o.Transacted.GetMetadata(),
+  )
 	n += n2
 
 	if err != nil {
@@ -285,7 +291,10 @@ func (f *cliCheckedOut) writeStringFormatUntracked(
 		return
 	}
 
-	n2, err = f.metadataStringFormatWriter.WriteStringFormat(sw, o.GetMetadata())
+	n2, err = f.metadataStringFormatWriter.WriteStringFormat(
+    sw,
+    o.Transacted.GetMetadata(),
+  )
 	n += n2
 
 	if err != nil {

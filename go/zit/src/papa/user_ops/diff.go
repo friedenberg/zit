@@ -71,11 +71,11 @@ func (op Diff) Run(
 
 	el := &cofs.External
 	elCtx := object_metadata.TextFormatterContext{
-		PersistentFormatterContext: el,
+		PersistentFormatterContext: &el.Transacted,
 		TextFormatterOptions:       options,
 	}
 
-  if mode, err = store_fs.GetCheckoutModeOrError(el, mode); err != nil {
+	if mode, err = store_fs.GetCheckoutModeOrError(el, mode); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

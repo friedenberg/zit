@@ -65,7 +65,7 @@ func (s *Store) ReadOneExternalInto(
 	}
 
 	if t != nil {
-		e.ObjectId.ResetWith(&t.ObjectId)
+		e.Transacted.ObjectId.ResetWith(&t.ObjectId)
 	}
 
 	var m checkout_mode.Mode
@@ -102,7 +102,10 @@ func (s *Store) ReadOneExternalInto(
 		}
 
 	case checkout_mode.BlobRecognized:
-		object_metadata.Resetter.ResetWith(e.GetMetadata(), t1.GetMetadata())
+		object_metadata.Resetter.ResetWith(
+      e.Transacted.GetMetadata(),
+      t1.GetMetadata(),
+    )
 
 	default:
 		panic(checkout_mode.MakeErrInvalidCheckoutModeMode(m))
@@ -137,7 +140,10 @@ func (s *Store) ReadOneExternalObject(
 	t *sku.Transacted,
 ) (err error) {
 	if t != nil {
-		object_metadata.Resetter.ResetWith(e.GetMetadata(), t.GetMetadata())
+		object_metadata.Resetter.ResetWith(
+      e.Transacted.GetMetadata(),
+      t.GetMetadata(),
+    )
 	}
 
 	var f *os.File
@@ -161,7 +167,7 @@ func (s *Store) ReadOneExternalObjectReader(
 	r io.Reader,
 	e *External,
 ) (err error) {
-	if _, err = s.metadataTextParser.ParseMetadata(r, e); err != nil {
+	if _, err = s.metadataTextParser.ParseMetadata(r, &e.Transacted); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -173,7 +179,7 @@ func (s *Store) ReadOneExternalBlob(
 	e *External,
 	t *sku.Transacted,
 ) (err error) {
-	object_metadata.Resetter.ResetWith(&e.Metadata, t.GetMetadata())
+	object_metadata.Resetter.ResetWith(&e.Transacted.Metadata, t.GetMetadata())
 
 	// TODO use cache
 	{
@@ -202,7 +208,7 @@ func (s *Store) ReadOneExternalBlob(
 			return
 		}
 
-		e.GetMetadata().Blob.SetShaLike(aw)
+		e.Transacted.GetMetadata().Blob.SetShaLike(aw)
 	}
 
 	return

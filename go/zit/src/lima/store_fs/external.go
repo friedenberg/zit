@@ -9,14 +9,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 // TODO migrate to *sku.External
 type External struct {
-	sku.Transacted
+	sku.External
 	fds FDSet
 }
 
@@ -30,13 +29,13 @@ func (t *External) GetExternalState() external_state.State {
 
 func (a *External) Clone() sku.ExternalLike {
 	b := GetExternalPool().Get()
-	sku.TransactedResetter.ResetWith(&b.Transacted, &a.Transacted)
+	sku.ExternalResetter.ResetWith(&b.External, &a.External)
 	b.fds.ResetWith(&a.fds)
 	return b
 }
 
 func (c *External) GetSku() *sku.Transacted {
-	return &c.Transacted
+	return &c.External.Transacted.Transacted
 }
 
 func (a *External) ResetWith(b *External) {
@@ -44,34 +43,18 @@ func (a *External) ResetWith(b *External) {
 	sku.Resetter.ResetWith(a, b)
 }
 
-func (a *External) GetObjectId() *ids.ObjectId {
-	return &a.ObjectId
-}
-
-func (a *External) GetMetadata() *object_metadata.Metadata {
-	return &a.Metadata
-}
-
-func (a *External) GetGattung() interfaces.Genre {
-	return a.ObjectId.GetGenre()
-}
-
 func (a *External) String() string {
 	return fmt.Sprintf(
 		". %s %s %s %s",
-		a.GetGattung(),
+		a.GetGenre(),
 		a.GetObjectId(),
-		a.GetObjectSha(),
+		a.Transacted.GetObjectSha(),
 		a.GetBlobSha(),
 	)
 }
 
-func (a *External) GetBlobSha() interfaces.Sha {
-	return &a.Metadata.Blob
-}
-
 func (a *External) SetBlobSha(v interfaces.Sha) (err error) {
-	if err = a.Metadata.Blob.SetShaLike(v); err != nil {
+	if err = a.Transacted.Metadata.Blob.SetShaLike(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -94,7 +77,7 @@ func (a *External) GetBlobFD() *fd.FD {
 
 func (a *External) SetBlobFD(v *fd.FD) {
 	a.fds.Blob.ResetWith(v)
-	a.Metadata.Blob.SetShaLike(v.GetShaLike())
+	a.Transacted.Metadata.Blob.SetShaLike(v.GetShaLike())
 }
 
 func (a *External) GetBlobPath() string {
@@ -109,14 +92,14 @@ func (a *External) ResetWithExternalMaybe(
 	b *FDSet,
 ) (err error) {
 	k := &b.ObjectId
-	a.ObjectId.ResetWithIdLike(k)
-	object_metadata.Resetter.Reset(&a.Metadata)
+	a.Transacted.ObjectId.ResetWithIdLike(k)
+	object_metadata.Resetter.Reset(&a.Transacted.Metadata)
 	a.fds.ResetWith(b)
 	return
 }
 
 func (o *External) GetKey() string {
-	return fmt.Sprintf("%s.%s", o.GetGattung(), o.GetObjectId())
+	return fmt.Sprintf("%s.%s", o.GetGenre(), o.GetObjectId())
 }
 
 func (e *External) GetCheckoutMode() (m checkout_mode.Mode, err error) {
@@ -146,7 +129,7 @@ func (lessorExternal) Less(a, b External) bool {
 }
 
 func (lessorExternal) LessPtr(a, b *External) bool {
-	return a.GetTai().Less(b.GetTai())
+	return a.Transacted.GetTai().Less(b.Transacted.GetTai())
 }
 
 type equalerExternal struct{}
@@ -294,7 +277,7 @@ func UpdateDescriptionFromBlobs(
 	for _, f := range sorted {
 		desc := f.FileNameSansExt()
 
-		if err = e.Metadata.Description.Set(desc); err != nil {
+		if err = e.Transacted.Metadata.Description.Set(desc); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

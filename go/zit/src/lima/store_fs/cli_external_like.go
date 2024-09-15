@@ -102,7 +102,10 @@ func (f *CliExternal) WriteStringFormat(
 		return
 	}
 
-	n2, err = f.metadataStringFormatWriter.WriteStringFormat(sw, o.GetMetadata())
+	n2, err = f.metadataStringFormatWriter.WriteStringFormat(
+    sw,
+    o.Transacted.GetMetadata(),
+  )
 	n += n2
 
 	if err != nil {
@@ -245,7 +248,10 @@ func (f *CliExternal) writeStringFormatUntracked(
 		return
 	}
 
-	n2, err = f.metadataStringFormatWriter.WriteStringFormat(sw, o.GetMetadata())
+	n2, err = f.metadataStringFormatWriter.WriteStringFormat(
+    sw,
+    o.Transacted.GetMetadata(),
+  )
 	n += n2
 
 	if err != nil {

@@ -165,7 +165,7 @@ func (c *ZettelFromExternalBlob) createZettelForBlobs(
 
 	z.Transacted.ObjectId.SetGenre(genres.Zettel)
 
-	if err = c.Proto.ApplyWithBlobFD(z, blobFD); err != nil {
+	if err = c.Proto.ApplyWithBlobFD(&z.Transacted, blobFD); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -99,9 +98,9 @@ func (s *Store) ReadIntoCheckedOutFromTransacted(
 			co.State = checked_out_state.Conflicted
 			co.External.fds.ResetWith(kfp)
 
-			ui.Debug().Print(&sk.ObjectId, kfp)
-
-			if err = co.External.ObjectId.SetWithIdLike(&sk.ObjectId); err != nil {
+			if err = co.External.Transacted.ObjectId.SetWithIdLike(
+				&sk.ObjectId,
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -142,7 +141,9 @@ func (s *Store) ReadIntoCheckedOutFromTransactedAndFDSet(
 			co.State = checked_out_state.Conflicted
 			co.External.fds.ResetWith(fds)
 
-			if err = co.External.ObjectId.SetWithIdLike(&sk.ObjectId); err != nil {
+			if err = co.External.Transacted.ObjectId.SetWithIdLike(
+        &sk.ObjectId,
+      ); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
