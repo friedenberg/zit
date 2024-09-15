@@ -54,7 +54,7 @@ func (fs *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
 	fs.deleteLock.Lock()
 	defer fs.deleteLock.Unlock()
 
-	if err = fs.deleted.Add(&e.FDs.Conflict); err != nil {
+	if err = fs.deleted.Add(&e.fds.Conflict); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -69,7 +69,7 @@ func (fs *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
 		return
 	}
 
-	if err = e.FDs.MutableSetLike.Each(fs.deleted.Add); err != nil {
+	if err = e.fds.MutableSetLike.Each(fs.deleted.Add); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -297,12 +297,12 @@ func (c *Store) GetExternalLikeResetter3() interfaces.Resetter3[sku.ExternalLike
 		FuncReset: func(el sku.ExternalLike) {
 			a := el.(*External)
 			sku.TransactedResetter.Reset(&a.Transacted)
-			a.FDs.Reset()
+			a.fds.Reset()
 		},
 		FuncResetWith: func(eldst, elsrc sku.ExternalLike) {
 			dst, src := eldst.(*External), elsrc.(*External)
 			sku.TransactedResetter.ResetWith(&dst.Transacted, &src.Transacted)
-			dst.FDs.ResetWith(&src.FDs)
+			dst.fds.ResetWith(&src.fds)
 		},
 	}
 }

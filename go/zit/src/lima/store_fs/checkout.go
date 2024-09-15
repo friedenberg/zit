@@ -30,7 +30,7 @@ func (s *Store) checkoutOneNew(
 	sz *sku.Transacted,
 ) (cz *CheckedOut, err error) {
 	cz = GetCheckedOutPool().Get()
-	cz.External.FDs.Reset()
+	cz.External.fds.Reset()
 
 	sku.Resetter.ResetWith(&cz.Internal, sz)
 
@@ -81,7 +81,7 @@ func (s *Store) checkoutOneNew(
 			ui.Log().Print("")
 		}
 
-		ui.Log().Print("EQUAL", cz.External.FDs.MutableSetLike, cze.FDs.MutableSetLike)
+		ui.Log().Print("EQUAL", cz.External.fds.MutableSetLike, cze.fds.MutableSetLike)
 	}
 
 	ui.Log().Print("")
@@ -103,7 +103,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 ) (err error) {
 	cofs := col.(*CheckedOut)
 
-	if options.CheckoutMode, err = cofs.External.FDs.GetCheckoutModeOrError(); err != nil {
+	if options.CheckoutMode, err = cofs.External.fds.GetCheckoutModeOrError(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -122,8 +122,8 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 
 	defer GetCheckedOutPool().Put(replacement)
 
-	newFDs := replacement.External.FDs
-	oldFDs := cofs.External.FDs
+	newFDs := replacement.External.fds
+	oldFDs := cofs.External.fds
 
 	if !oldFDs.Object.IsEmpty() {
 		if err = os.Rename(
@@ -177,10 +177,10 @@ func (s *Store) checkoutOne(
 			return
 		}
 
-		cz.External.FDs.Add(&cz.External.FDs.Object)
+		cz.External.fds.Add(&cz.External.fds.Object)
 	} else {
-		cz.External.FDs.MutableSetLike.Del(&cz.External.FDs.Object)
-		cz.External.FDs.Object.Reset()
+		cz.External.fds.MutableSetLike.Del(&cz.External.fds.Object)
+		cz.External.fds.Object.Reset()
 	}
 
 	if ((!inlineBlob || !options.CheckoutMode.IncludesMetadata()) &&
@@ -200,10 +200,10 @@ func (s *Store) checkoutOne(
 			return
 		}
 
-		cz.External.FDs.Add(&cz.External.FDs.Blob)
+		cz.External.fds.Add(&cz.External.fds.Blob)
 	} else {
-		cz.External.FDs.MutableSetLike.Del(&cz.External.FDs.Blob)
-		cz.External.FDs.Blob.Reset()
+		cz.External.fds.MutableSetLike.Del(&cz.External.fds.Blob)
+		cz.External.fds.Blob.Reset()
 	}
 
 	sku.Resetter.ResetWith(&cz.External, &cz.Internal)

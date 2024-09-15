@@ -97,7 +97,7 @@ func (s *Store) ReadIntoCheckedOutFromTransacted(
 			err = iter.MakeErrStopIteration()
 		} else if errors.Is(err, ErrExternalHasConflictMarker) {
 			co.State = checked_out_state.Conflicted
-			co.External.FDs.ResetWith(kfp)
+			co.External.fds.ResetWith(kfp)
 
 			ui.Debug().Print(&sk.ObjectId, kfp)
 
@@ -140,7 +140,7 @@ func (s *Store) ReadIntoCheckedOutFromTransactedAndFDSet(
 			err = iter.MakeErrStopIteration()
 		} else if errors.Is(err, ErrExternalHasConflictMarker) {
 			co.State = checked_out_state.Conflicted
-			co.External.FDs.ResetWith(fds)
+			co.External.fds.ResetWith(fds)
 
 			if err = co.External.ObjectId.SetWithIdLike(&sk.ObjectId); err != nil {
 				err = errors.Wrap(err)
