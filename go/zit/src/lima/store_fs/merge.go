@@ -118,16 +118,13 @@ func (s *Store) checkoutOneForMerge(
 	cz.External.item.Reset()
 	sku.Resetter.ResetWith(&cz.Internal, sz)
 
-	if err = s.checkoutOne(
+	if _, err = s.checkoutOne(
 		options,
 		cz,
 	); err != nil {
-		ui.Log().Print(&cz.External.item.Object, &cz.External.item.Blob)
 		err = errors.Wrap(err)
 		return
 	}
-
-	ui.Log().Print(&cz.External.item.Object, &cz.External.item.Blob)
 
 	return
 }
