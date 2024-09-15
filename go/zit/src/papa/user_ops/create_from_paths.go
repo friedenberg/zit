@@ -83,14 +83,28 @@ func (c CreateFromPaths) Run(
 
 		if c.Delete {
 			{
+				var object *fd.FD
+
+				if object, err = store_fs.GetObjectOrError(z); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
 				var f fd.FD
-				f.ResetWith(&z.FDs.Object)
+				f.ResetWith(object)
 				toDelete.Add(&f)
 			}
 
 			{
+				var blob *fd.FD
+
+				if blob, err = store_fs.GetObjectOrError(z); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
 				var f fd.FD
-				f.ResetWith(&z.FDs.Blob)
+				f.ResetWith(blob)
 				toDelete.Add(&f)
 			}
 		}
@@ -171,8 +185,10 @@ func (c *CreateFromPaths) zettelsFromPath(
 	}
 
 	ze := store_fs.GetExternalPool().Get()
-	ze.FDs = store_fs.FDSet{
-		Object: fd,
+
+	if err = store_fs.SetObjectOrError(ze, &fd); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	ze.Metadata.Tai = ids.TaiFromTime(fd.ModTime())

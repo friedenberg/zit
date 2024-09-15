@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -78,9 +79,16 @@ func (c Mergetool) RunWithQuery(
 				CheckedOutLike: col.Clone(),
 			}
 
+			var conflict *fd.FD
+
+			if conflict, err = store_fs.GetConflictOrError(&cofs.External); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
 			var f *os.File
 
-			if f, err = files.Open(cofs.External.FDs.Conflict.GetPath()); err != nil {
+			if f, err = files.Open(conflict.GetPath()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

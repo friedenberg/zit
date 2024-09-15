@@ -4,7 +4,6 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
@@ -42,20 +41,9 @@ func (c ZettelFromExternalBlob) Run(
 				return
 			}
 
-			sorted := iter.ElementsSorted(
-				cofs.External.FDs.MutableSetLike,
-				func(a, b *fd.FD) bool {
-					return a.GetPath() < b.GetPath()
-				},
-			)
-
-			for _, f := range sorted {
-				desc := f.FileNameSansExt()
-
-				if err = z.Metadata.Description.Set(desc); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+			if err = store_fs.UpdateDescriptionFromBlobs(&cofs.External); err != nil {
+				err = errors.Wrap(err)
+				return
 			}
 
 			z.ObjectId.Reset()

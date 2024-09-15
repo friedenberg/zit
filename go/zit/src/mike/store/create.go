@@ -190,11 +190,9 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	var mode checkout_mode.Mode
 
 	// TODO [radi/kof !task project-2021-zit-features zz-inbox] add support for kasten in checkouts and external
-	if efs, ok := el.(*store_fs.External); ok {
-		if mode, err = efs.FDs.GetCheckoutModeOrError(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if mode, err = store_fs.GetCheckoutModeOrError(el, mode); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if _, err = s.CheckoutOne(

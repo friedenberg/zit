@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -152,4 +153,135 @@ type equalerExternal struct{}
 
 func (equalerExternal) Equals(a, b External) bool {
 	panic("not supported")
+}
+
+func GetCheckoutModeOrError(
+	el sku.ExternalLike,
+	originalMode checkout_mode.Mode,
+) (m checkout_mode.Mode, err error) {
+	var e *External
+	ok := false
+
+	if e, ok = el.(*External); !ok {
+		m = originalMode
+		return
+	}
+
+	switch {
+	case !e.FDs.Object.IsEmpty() && !e.FDs.Blob.IsEmpty():
+		m = checkout_mode.MetadataAndBlob
+
+	case !e.FDs.Blob.IsEmpty():
+		m = checkout_mode.BlobOnly
+
+	case !e.FDs.Object.IsEmpty():
+		m = checkout_mode.MetadataOnly
+
+	default:
+		if e.FDs.State == external_state.Recognized {
+			m = checkout_mode.BlobRecognized
+			return
+		}
+
+		err = checkout_mode.MakeErrInvalidCheckoutMode(
+			errors.Errorf("all FD's are empty: %s", e.FDs.Debug()),
+		)
+	}
+
+	return
+}
+
+func GetConflictOrError(
+	el sku.ExternalLike,
+) (f *fd.FD, err error) {
+	var e *External
+	ok := false
+
+	if e, ok = el.(*External); !ok {
+		err = errors.Errorf("expected store_fs.External but got %T", el)
+		return
+	}
+
+	f = &e.FDs.Conflict
+
+	return
+}
+
+func GetObjectOrError(
+	el sku.ExternalLike,
+) (f *fd.FD, err error) {
+	var e *External
+	ok := false
+
+	if e, ok = el.(*External); !ok {
+		err = errors.Errorf("expected store_fs.External but got %T", el)
+		return
+	}
+
+	f = &e.FDs.Object
+
+	return
+}
+
+func SetObjectOrError(
+	el sku.ExternalLike,
+	object *fd.FD,
+) (err error) {
+	var e *External
+	ok := false
+
+	if e, ok = el.(*External); !ok {
+		err = errors.Errorf("expected store_fs.External but got %T", el)
+		return
+	}
+
+	e.FDs.Object.ResetWith(object)
+
+	return
+}
+
+func GetBlobOrError(
+	el sku.ExternalLike,
+) (f *fd.FD, err error) {
+	var e *External
+	ok := false
+
+	if e, ok = el.(*External); !ok {
+		err = errors.Errorf("expected store_fs.External but got %T", el)
+		return
+	}
+
+	f = &e.FDs.Blob
+
+	return
+}
+
+func UpdateDescriptionFromBlobs(
+	el sku.ExternalLike,
+) (err error) {
+	var e *External
+	ok := false
+
+	if e, ok = el.(*External); !ok {
+		err = errors.Errorf("expected store_fs.External but got %T", el)
+		return
+	}
+
+	sorted := iter.ElementsSorted(
+		e.FDs.MutableSetLike,
+		func(a, b *fd.FD) bool {
+			return a.GetPath() < b.GetPath()
+		},
+	)
+
+	for _, f := range sorted {
+		desc := f.FileNameSansExt()
+
+		if err = e.Metadata.Description.Set(desc); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
 }
