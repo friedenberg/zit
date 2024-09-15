@@ -30,7 +30,7 @@ func (s *Store) checkoutOneNew(
 	sz *sku.Transacted,
 ) (cz *CheckedOut, err error) {
 	cz = GetCheckedOutPool().Get()
-	cz.External.fds.Reset()
+	cz.External.item.Reset()
 
 	sku.Resetter.ResetWith(&cz.Internal, sz)
 
@@ -81,7 +81,7 @@ func (s *Store) checkoutOneNew(
 			ui.Log().Print("")
 		}
 
-		ui.Log().Print("EQUAL", cz.External.fds.MutableSetLike, cze.fds.MutableSetLike)
+		ui.Log().Print("EQUAL", cz.External.item.MutableSetLike, cze.item.MutableSetLike)
 	}
 
 	ui.Log().Print("")
@@ -103,7 +103,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 ) (err error) {
 	cofs := col.(*CheckedOut)
 
-	if options.CheckoutMode, err = cofs.External.fds.GetCheckoutModeOrError(); err != nil {
+	if options.CheckoutMode, err = cofs.External.item.GetCheckoutModeOrError(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -122,8 +122,8 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 
 	defer GetCheckedOutPool().Put(replacement)
 
-	newFDs := replacement.External.fds
-	oldFDs := cofs.External.fds
+	newFDs := replacement.External.item
+	oldFDs := cofs.External.item
 
 	if !oldFDs.Object.IsEmpty() {
 		if err = os.Rename(
@@ -177,10 +177,10 @@ func (s *Store) checkoutOne(
 			return
 		}
 
-		cz.External.fds.Add(&cz.External.fds.Object)
+		cz.External.item.Add(&cz.External.item.Object)
 	} else {
-		cz.External.fds.MutableSetLike.Del(&cz.External.fds.Object)
-		cz.External.fds.Object.Reset()
+		cz.External.item.MutableSetLike.Del(&cz.External.item.Object)
+		cz.External.item.Object.Reset()
 	}
 
 	if ((!inlineBlob || !options.CheckoutMode.IncludesMetadata()) &&
@@ -200,10 +200,10 @@ func (s *Store) checkoutOne(
 			return
 		}
 
-		cz.External.fds.Add(&cz.External.fds.Blob)
+		cz.External.item.Add(&cz.External.item.Blob)
 	} else {
-		cz.External.fds.MutableSetLike.Del(&cz.External.fds.Blob)
-		cz.External.fds.Blob.Reset()
+		cz.External.item.MutableSetLike.Del(&cz.External.item.Blob)
+		cz.External.item.Blob.Reset()
 	}
 
 	sku.Resetter.ResetWith(&cz.External, &cz.Internal)
@@ -245,7 +245,7 @@ func (s *Store) shouldCheckOut(
 	mutter := sku.GetTransactedPool().Get()
 	defer sku.GetTransactedPool().Put(mutter)
 
-	if err := s.externalStoreInfo.FuncReadOneInto(
+	if err := s.externalStoreSupplies.FuncReadOneInto(
 		cz.Internal.GetObjectId().String(),
 		mutter,
 	); err == nil {

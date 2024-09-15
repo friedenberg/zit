@@ -30,8 +30,8 @@ type dirItems struct {
 	rootProcessed bool
 
 	file_extensions.FileExtensions
-	fs_home           fs_home.Home
-	externalStoreInfo external_store.Supplies
+	fs_home               fs_home.Home
+	externalStoreSupplies external_store.Supplies
 
 	objects         interfaces.MutableSetLike[*Item]
 	blobs           interfaces.MutableSetLike[*Item]
@@ -264,7 +264,7 @@ func (d *dirItems) processFDSet(
 		recognized := sku.GetTransactedPool().Get()
 		defer sku.GetTransactedPool().Put(recognized)
 
-		if err = d.externalStoreInfo.FuncReadOneInto(
+		if err = d.externalStoreSupplies.FuncReadOneInto(
 			objectIdString,
 			recognized,
 		); err != nil {

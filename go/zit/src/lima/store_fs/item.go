@@ -8,9 +8,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
+	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -35,32 +37,32 @@ func (ef *Item) GetExternalObjectId() sku.ExternalObjectId {
 	return ef
 }
 
-func (ef *Item) Debug() string {
+func (i *Item) Debug() string {
 	return fmt.Sprintf(
 		"State: %q, Genre: %q, ObjectId: %q, Object: %q, Blob: %q, Conflict: %q, All: %q",
-		ef.State,
-		ef.GetGenre(),
-		&ef.ObjectId,
-		&ef.Object,
-		&ef.Blob,
-		&ef.Conflict,
-		ef.MutableSetLike,
+		i.State,
+		i.GetGenre(),
+		&i.ObjectId,
+		&i.Object,
+		&i.Blob,
+		&i.Conflict,
+		i.MutableSetLike,
 	)
 }
 
-func (ef *Item) GetTai() ids.Tai {
-	return ids.TaiFromTime(ef.LatestModTime())
+func (i *Item) GetTai() ids.Tai {
+	return ids.TaiFromTime(i.LatestModTime())
 }
 
-func (ef *Item) GetTime() thyme.Time {
-	return ef.LatestModTime()
+func (i *Item) GetTime() thyme.Time {
+	return i.LatestModTime()
 }
 
-func (ef *Item) LatestModTime() thyme.Time {
-	o, a := ef.Object.ModTime(), ef.Blob.ModTime()
+func (i *Item) LatestModTime() thyme.Time {
+	o, b := i.Object.ModTime(), i.Blob.ModTime()
 
-	if o.Less(a) {
-		return a
+	if o.Less(b) {
+		return b
 	} else {
 		return o
 	}
@@ -139,5 +141,54 @@ func (e *Item) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 		)
 	}
 
+	return
+}
+
+// TODO replace with fields
+func (i *Item) WriteToExternal(e *External) (err error) {
+	if err = e.ExternalObjectId.SetRaw(i.ObjectId.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	m := &e.Transacted.Metadata
+	m.Tai = i.GetTai()
+
+	if i.MutableSetLike != nil {
+		if err = i.MutableSetLike.Each(
+			func(f *fd.FD) (err error) {
+				field := sku.Field{
+					Value:     f.GetPath(),
+					ColorType: string_format_writer.ColorTypeId,
+				}
+
+				switch {
+				case f == &i.Object:
+					field.Key = "object"
+
+				case f == &i.Conflict:
+					field.Key = "conflict"
+
+				case f == &i.Blob:
+					fallthrough
+
+				default:
+					field.Key = "blob"
+				}
+
+				e.Transacted.Fields = append(e.Transacted.Fields, field)
+
+				return
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	k := &i.ObjectId
+	e.Transacted.ObjectId.ResetWithIdLike(k)
+	object_metadata.Resetter.Reset(&e.Transacted.Metadata)
+	e.item.ResetWith(i) // TODO remove
 	return
 }

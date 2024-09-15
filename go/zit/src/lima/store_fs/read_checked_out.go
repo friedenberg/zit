@@ -10,20 +10,20 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func (s *Store) ReadCheckedOutFromObjectIdFDPair(
+// TODO remove Item from construction
+func (s *Store) ReadCheckedOutFromItem(
 	o sku.CommitOptions,
-	em *Item,
+	i *Item,
 ) (co *CheckedOut, err error) {
 	co = GetCheckedOutPool().Get()
 
-	if err = s.externalStoreInfo.FuncReadOneInto(
-		em.ObjectId.String(),
+	if err = s.externalStoreSupplies.FuncReadOneInto(
+		i.ObjectId.String(),
 		&co.Internal,
 	); err != nil {
 		if collections.IsErrNotFound(err) || genres.IsErrUnsupportedGenre(err) {
-			// TODO mark status as new
 			err = nil
-			co.Internal.ObjectId.ResetWith(&em.ObjectId)
+			co.Internal.ObjectId.ResetWith(&i.ObjectId)
 			co.State = checked_out_state.Untracked
 		} else {
 			err = errors.Wrap(err)
@@ -31,15 +31,14 @@ func (s *Store) ReadCheckedOutFromObjectIdFDPair(
 		}
 	}
 
-	if err = s.ReadIntoCheckedOutFromTransactedAndFDSet(
+	if err = s.ReadIntoCheckedOutFromTransactedAndItem(
 		&co.Internal,
-		em,
+		i,
 		co,
 	); err != nil {
 		if collections.IsErrNotFound(err) {
-			// TODO mark status as new
 			err = nil
-			co.Internal.ObjectId.ResetWith(&em.ObjectId)
+			co.Internal.ObjectId.ResetWith(&i.ObjectId)
 			co.State = checked_out_state.Untracked
 		} else {
 			err = errors.Wrap(err)
@@ -47,7 +46,7 @@ func (s *Store) ReadCheckedOutFromObjectIdFDPair(
 		}
 	}
 
-	if !em.Conflict.IsEmpty() {
+	if !i.Conflict.IsEmpty() {
 		co.State = checked_out_state.Conflicted
 	}
 
@@ -84,7 +83,7 @@ func (s *Store) ReadIntoCheckedOutFromTransacted(
 		return
 	}
 
-	if err = s.ReadIntoExternalFromObjectIdFDPair(
+	if err = s.ReadIntoExternalFromItem(
 		sku.CommitOptions{
 			Mode: objekte_mode.ModeUpdateTai,
 		},
@@ -96,7 +95,7 @@ func (s *Store) ReadIntoCheckedOutFromTransacted(
 			err = iter.MakeErrStopIteration()
 		} else if errors.Is(err, ErrExternalHasConflictMarker) {
 			co.State = checked_out_state.Conflicted
-			co.External.fds.ResetWith(kfp)
+			co.External.item.ResetWith(kfp)
 
 			if err = co.External.Transacted.ObjectId.SetWithIdLike(
 				&sk.ObjectId,
@@ -118,20 +117,20 @@ func (s *Store) ReadIntoCheckedOutFromTransacted(
 	return
 }
 
-func (s *Store) ReadIntoCheckedOutFromTransactedAndFDSet(
+func (s *Store) ReadIntoCheckedOutFromTransactedAndItem(
 	sk *sku.Transacted,
-	fds *Item,
+	i *Item,
 	co *CheckedOut,
 ) (err error) {
 	if &co.Internal != sk {
 		sku.Resetter.ResetWith(&co.Internal, sk)
 	}
 
-	if err = s.ReadIntoExternalFromObjectIdFDPair(
+	if err = s.ReadIntoExternalFromItem(
 		sku.CommitOptions{
 			Mode: objekte_mode.ModeUpdateTai,
 		},
-		fds,
+		i,
 		sk,
 		&co.External,
 	); err != nil {
@@ -139,18 +138,18 @@ func (s *Store) ReadIntoCheckedOutFromTransactedAndFDSet(
 			err = iter.MakeErrStopIteration()
 		} else if errors.Is(err, ErrExternalHasConflictMarker) {
 			co.State = checked_out_state.Conflicted
-			co.External.fds.ResetWith(fds)
+			co.External.item.ResetWith(i)
 
 			if err = co.External.Transacted.ObjectId.SetWithIdLike(
-        &sk.ObjectId,
-      ); err != nil {
+				&sk.ObjectId,
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
 			return
 		} else {
-			err = errors.Wrapf(err, "Cwd: %#v", fds)
+			err = errors.Wrapf(err, "Cwd: %#v", i)
 		}
 
 		return

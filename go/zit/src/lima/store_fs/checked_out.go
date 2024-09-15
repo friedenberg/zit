@@ -66,7 +66,7 @@ func (a *CheckedOut) String() string {
 
 func (e *CheckedOut) Remove(s interfaces.Directory) (err error) {
 	// TODO check conflict state
-	if err = e.External.fds.MutableSetLike.Each(
+	if err = e.External.item.MutableSetLike.Each(
 		func(f *fd.FD) (err error) {
 			if err = f.Remove(s); err != nil {
 				err = errors.Wrap(err)
@@ -80,7 +80,7 @@ func (e *CheckedOut) Remove(s interfaces.Directory) (err error) {
 		return
 	}
 
-	e.External.fds.Reset()
+	e.External.item.Reset()
 
 	return
 }
@@ -134,8 +134,8 @@ func (checkedOutResetter) Reset(a *CheckedOut) {
 
 	sku.TransactedResetter.Reset(&a.Internal)
 	sku.ExternalResetter.Reset(&a.External.External)
-	a.External.fds.Object.Reset()
-	a.External.fds.Blob.Reset()
+	a.External.item.Object.Reset()
+	a.External.item.Blob.Reset()
 }
 
 func (checkedOutResetter) ResetWith(dst *CheckedOut, src *CheckedOut) {
@@ -145,5 +145,5 @@ func (checkedOutResetter) ResetWith(dst *CheckedOut, src *CheckedOut) {
 
 	sku.TransactedResetter.ResetWith(&dst.Internal, &src.Internal)
 	sku.ExternalResetter.ResetWith(&dst.External.External, &src.External.External)
-	dst.External.fds.ResetWith(&src.External.fds)
+	dst.External.item.ResetWith(&src.External.item)
 }

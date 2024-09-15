@@ -33,13 +33,13 @@ func (s *Store) MakeApplyCheckedOut(
 func (s *Store) ApplyCheckedOut(
 	o sku.CommitOptions,
 	qg *query.Group,
-	em *Item,
+	i *Item,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	var co *CheckedOut
 
-	if co, err = s.ReadCheckedOutFromObjectIdFDPair(o, em); err != nil {
-		err = errors.Wrapf(err, "%s", em.Debug())
+	if co, err = s.ReadCheckedOutFromItem(o, i); err != nil {
+		err = errors.Wrapf(err, "%s", i.Debug())
 		return
 	}
 
@@ -141,7 +141,7 @@ func (s *Store) QueryUntracked(
 		return
 	}
 
-	if err = s.externalStoreInfo.FuncPrimitiveQuery(
+	if err = s.externalStoreSupplies.FuncPrimitiveQuery(
 		nil,
 		func(sk *sku.Transacted) (err error) {
 			if err = addRecognizedIfNecessary(

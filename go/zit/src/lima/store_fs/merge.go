@@ -49,7 +49,7 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 	}
 
 	src := merged.Object.GetPath()
-	dst := cofs.External.fds.Object.GetPath()
+	dst := cofs.External.item.Object.GetPath()
 
 	// TODO determine why dst is sometimes ""
 	if err = files.Rename(src, dst); err != nil {
@@ -94,9 +94,9 @@ func (s *Store) tryMergeIgnoringConflicts(
 	}
 
 	path, err = s.runDiff3(
-		leftCO.External.fds.Object,
-		middleCO.External.fds.Object,
-		rightCO.External.fds.Object,
+		leftCO.External.item.Object,
+		middleCO.External.item.Object,
+		rightCO.External.item.Object,
 	)
 
 	return
@@ -115,19 +115,19 @@ func (s *Store) checkoutOneForMerge(
 	}
 
 	cz = GetCheckedOutPool().Get()
-	cz.External.fds.Reset()
+	cz.External.item.Reset()
 	sku.Resetter.ResetWith(&cz.Internal, sz)
 
 	if err = s.checkoutOne(
 		options,
 		cz,
 	); err != nil {
-		ui.Log().Print(&cz.External.fds.Object, &cz.External.fds.Blob)
+		ui.Log().Print(&cz.External.item.Object, &cz.External.item.Blob)
 		err = errors.Wrap(err)
 		return
 	}
 
-	ui.Log().Print(&cz.External.fds.Object, &cz.External.fds.Blob)
+	ui.Log().Print(&cz.External.item.Object, &cz.External.item.Blob)
 
 	return
 }
@@ -160,14 +160,14 @@ func (s *Store) handleMergeResult(
 		return
 	}
 
-	if err = cofs.External.fds.GenerateConflictFD(); err != nil {
+	if err = cofs.External.item.GenerateConflictFD(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if err = os.Rename(
 		f.Name(),
-		cofs.External.fds.Conflict.GetPath(),
+		cofs.External.item.Conflict.GetPath(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -222,9 +222,9 @@ func (s *Store) RunMergeTool(
 	}
 
 	tool = append(tool,
-		leftCO.External.fds.Object.GetPath(),
-		middleCO.External.fds.Object.GetPath(),
-		rightCO.External.fds.Object.GetPath(),
+		leftCO.External.item.Object.GetPath(),
+		middleCO.External.item.Object.GetPath(),
+		rightCO.External.item.Object.GetPath(),
 		tmpPath,
 	)
 

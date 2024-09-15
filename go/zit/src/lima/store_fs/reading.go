@@ -55,11 +55,11 @@ func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 
 func (s *Store) ReadOneExternalInto(
 	o *sku.CommitOptions,
-	em *Item,
+	i *Item,
 	t *sku.Transacted,
 	e *External,
 ) (err error) {
-	if err = e.ResetWithExternalMaybe(em); err != nil {
+	if err = i.WriteToExternal(e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -70,7 +70,7 @@ func (s *Store) ReadOneExternalInto(
 
 	var m checkout_mode.Mode
 
-	if m, err = em.GetCheckoutModeOrError(); err != nil {
+	if m, err = i.GetCheckoutModeOrError(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -89,7 +89,7 @@ func (s *Store) ReadOneExternalInto(
 		}
 
 	case checkout_mode.MetadataOnly, checkout_mode.MetadataAndBlob:
-		if e.fds.Object.IsStdin() {
+		if e.item.Object.IsStdin() {
 			if err = s.ReadOneExternalObjectReader(os.Stdin, e); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -103,16 +103,16 @@ func (s *Store) ReadOneExternalInto(
 
 	case checkout_mode.BlobRecognized:
 		object_metadata.Resetter.ResetWith(
-      e.Transacted.GetMetadata(),
-      t1.GetMetadata(),
-    )
+			e.Transacted.GetMetadata(),
+			t1.GetMetadata(),
+		)
 
 	default:
 		panic(checkout_mode.MakeErrInvalidCheckoutModeMode(m))
 	}
 
-	if !e.fds.Blob.IsEmpty() {
-		blobFD := &e.fds.Blob
+	if !e.item.Blob.IsEmpty() {
+		blobFD := &e.item.Blob
 		ext := blobFD.ExtSansDot()
 		typFromExtension := s.config.GetTypeStringFromExtension(ext)
 
@@ -129,7 +129,7 @@ func (s *Store) ReadOneExternalInto(
 	}
 
 	if o.Clock == nil {
-		o.Clock = &e.fds
+		o.Clock = &e.item
 	}
 
 	return
@@ -141,9 +141,9 @@ func (s *Store) ReadOneExternalObject(
 ) (err error) {
 	if t != nil {
 		object_metadata.Resetter.ResetWith(
-      e.Transacted.GetMetadata(),
-      t.GetMetadata(),
-    )
+			e.Transacted.GetMetadata(),
+			t.GetMetadata(),
+		)
 	}
 
 	var f *os.File

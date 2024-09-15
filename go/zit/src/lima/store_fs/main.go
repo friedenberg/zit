@@ -54,7 +54,7 @@ func (fs *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
 	fs.deleteLock.Lock()
 	defer fs.deleteLock.Unlock()
 
-	if err = fs.deleted.Add(&e.fds.Conflict); err != nil {
+	if err = fs.deleted.Add(&e.item.Conflict); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -69,7 +69,7 @@ func (fs *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
 		return
 	}
 
-	if err = e.fds.MutableSetLike.Each(fs.deleted.Add); err != nil {
+	if err = e.item.MutableSetLike.Each(fs.deleted.Add); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -227,22 +227,6 @@ func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err e
 	return
 }
 
-func (fs *Store) ContainsSku(m *sku.Transacted) bool {
-	return fs.dirItems.objects.ContainsKey(m.GetObjectId().String())
-}
-
-func (fs *Store) GetBlobFDs() fd.Set {
-	fds := fd.MakeMutableSet()
-
-	fs.blobs.Each(
-		func(fds *Item) error {
-			return fds.Each(fds.Add)
-		},
-	)
-
-	return fds
-}
-
 func (fs *Store) Get(
 	k interfaces.ObjectId,
 ) (t *Item, ok bool) {
@@ -250,7 +234,7 @@ func (fs *Store) Get(
 }
 
 func (s *Store) Initialize(esi external_store.Supplies) (err error) {
-	s.externalStoreInfo = esi
+	s.externalStoreSupplies = esi
 	return
 }
 
@@ -261,12 +245,6 @@ func (s *Store) ApplyDotOperator() (err error) {
 	}
 
 	return
-}
-
-func (c *Store) Len() int {
-	return iter.Len(
-		c.dirItems.objects,
-	)
 }
 
 func (c *Store) GetExternalStoreOrganizeFormat(
@@ -297,12 +275,12 @@ func (c *Store) GetExternalLikeResetter3() interfaces.Resetter3[sku.ExternalLike
 		FuncReset: func(el sku.ExternalLike) {
 			a := el.(*External)
 			sku.ExternalResetter.Reset(&a.External)
-			a.fds.Reset()
+			a.item.Reset()
 		},
 		FuncResetWith: func(eldst, elsrc sku.ExternalLike) {
 			dst, src := eldst.(*External), elsrc.(*External)
 			sku.ExternalResetter.ResetWith(&dst.External, &src.External)
-			dst.fds.ResetWith(&src.fds)
+			dst.item.ResetWith(&src.item)
 		},
 	}
 }

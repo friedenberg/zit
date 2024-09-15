@@ -9,14 +9,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 // TODO migrate to *sku.External
 type External struct {
 	sku.External
-	fds Item // TODO remove and keep separately
+	item Item // TODO remove and keep separately
 }
 
 func (t *External) GetSkuExternalLike() sku.ExternalLike {
@@ -24,13 +23,13 @@ func (t *External) GetSkuExternalLike() sku.ExternalLike {
 }
 
 func (t *External) GetExternalState() external_state.State {
-	return t.fds.State
+	return t.item.State
 }
 
 func (a *External) Clone() sku.ExternalLike {
 	b := GetExternalPool().Get()
 	sku.ExternalResetter.ResetWith(&b.External, &a.External)
-	b.fds.ResetWith(&a.fds)
+	b.item.ResetWith(&a.item)
 	return b
 }
 
@@ -39,7 +38,7 @@ func (c *External) GetSku() *sku.Transacted {
 }
 
 func (a *External) ResetWith(b *External) {
-	a.fds.ResetWith(b.GetFDs())
+	a.item.ResetWith(b.GetFDs())
 	sku.Resetter.ResetWith(a, b)
 }
 
@@ -59,7 +58,7 @@ func (a *External) SetBlobSha(v interfaces.Sha) (err error) {
 		return
 	}
 
-	if err = a.fds.Blob.SetShaLike(v); err != nil {
+	if err = a.item.Blob.SetShaLike(v); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -68,34 +67,24 @@ func (a *External) SetBlobSha(v interfaces.Sha) (err error) {
 }
 
 func (a *External) GetFDs() *Item {
-	return &a.fds
+	return &a.item
 }
 
 func (a *External) GetBlobFD() *fd.FD {
-	return &a.fds.Blob
+	return &a.item.Blob
 }
 
 func (a *External) SetBlobFD(v *fd.FD) {
-	a.fds.Blob.ResetWith(v)
+	a.item.Blob.ResetWith(v)
 	a.Transacted.Metadata.Blob.SetShaLike(v.GetShaLike())
 }
 
 func (a *External) GetBlobPath() string {
-	return a.fds.Blob.GetPath()
+	return a.item.Blob.GetPath()
 }
 
 func (a *External) GetObjectFD() *fd.FD {
-	return &a.fds.Object
-}
-
-func (a *External) ResetWithExternalMaybe(
-	b *Item,
-) (err error) {
-	k := &b.ObjectId
-	a.Transacted.ObjectId.ResetWithIdLike(k)
-	object_metadata.Resetter.Reset(&a.Transacted.Metadata)
-	a.fds.ResetWith(b)
-	return
+	return &a.item.Object
 }
 
 func (o *External) GetKey() string {
@@ -115,23 +104,23 @@ func GetCheckoutModeOrError(
 	}
 
 	switch {
-	case !e.fds.Object.IsEmpty() && !e.fds.Blob.IsEmpty():
+	case !e.item.Object.IsEmpty() && !e.item.Blob.IsEmpty():
 		m = checkout_mode.MetadataAndBlob
 
-	case !e.fds.Blob.IsEmpty():
+	case !e.item.Blob.IsEmpty():
 		m = checkout_mode.BlobOnly
 
-	case !e.fds.Object.IsEmpty():
+	case !e.item.Object.IsEmpty():
 		m = checkout_mode.MetadataOnly
 
 	default:
-		if e.fds.State == external_state.Recognized {
+		if e.item.State == external_state.Recognized {
 			m = checkout_mode.BlobRecognized
 			return
 		}
 
 		err = checkout_mode.MakeErrInvalidCheckoutMode(
-			errors.Errorf("all FD's are empty: %s", e.fds.Debug()),
+			errors.Errorf("all FD's are empty: %s", e.item.Debug()),
 		)
 	}
 
@@ -149,7 +138,7 @@ func GetConflictOrError(
 		return
 	}
 
-	f = &e.fds.Conflict
+	f = &e.item.Conflict
 
 	return
 }
@@ -165,7 +154,7 @@ func GetObjectOrError(
 		return
 	}
 
-	f = &e.fds.Object
+	f = &e.item.Object
 
 	return
 }
@@ -182,7 +171,7 @@ func SetObjectOrError(
 		return
 	}
 
-	e.fds.Object.ResetWith(object)
+	e.item.Object.ResetWith(object)
 
 	return
 }
@@ -198,7 +187,7 @@ func GetBlobOrError(
 		return
 	}
 
-	f = &e.fds.Blob
+	f = &e.item.Blob
 
 	return
 }
@@ -215,7 +204,7 @@ func SetBlobOrError(
 		return
 	}
 
-	e.fds.Blob.ResetWith(blob)
+	e.item.Blob.ResetWith(blob)
 
 	return
 }
@@ -232,7 +221,7 @@ func UpdateDescriptionFromBlobs(
 	}
 
 	sorted := iter.ElementsSorted(
-		e.fds.MutableSetLike,
+		e.item.MutableSetLike,
 		func(a, b *fd.FD) bool {
 			return a.GetPath() < b.GetPath()
 		},

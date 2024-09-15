@@ -33,7 +33,7 @@ func (s *Store) ReadExternalFromObjectIdFDPair(
 ) (e *External, err error) {
 	e = GetExternalPool().Get()
 
-	if err = s.ReadIntoExternalFromObjectIdFDPair(o, em, t, e); err != nil {
+	if err = s.ReadIntoExternalFromItem(o, em, t, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -41,25 +41,20 @@ func (s *Store) ReadExternalFromObjectIdFDPair(
 	return
 }
 
-func (s *Store) ReadIntoExternalFromObjectIdFDPair(
+func (s *Store) ReadIntoExternalFromItem(
 	o sku.CommitOptions,
-	em *Item,
+	i *Item,
 	t *sku.Transacted,
 	e *External,
 ) (err error) {
 	o.Del(objekte_mode.ModeApplyProto)
 
-	if err = s.ReadOneExternalInto(
-		&o,
-		em,
-		t,
-		e,
-	); err != nil {
+	if err = s.ReadOneExternalInto(&o, i, t, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = s.externalStoreInfo.FuncCommit(
+	if err = s.externalStoreSupplies.FuncCommit(
 		&e.Transacted,
 		o,
 	); err != nil {
