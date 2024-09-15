@@ -256,6 +256,23 @@ func GetBlobOrError(
 	return
 }
 
+func SetBlobOrError(
+	el sku.ExternalLike,
+	blob *fd.FD,
+) (err error) {
+	var e *External
+	ok := false
+
+	if e, ok = el.(*External); !ok {
+		err = errors.Errorf("expected store_fs.External but got %T", el)
+		return
+	}
+
+	e.FDs.Blob.ResetWith(blob)
+
+	return
+}
+
 func UpdateDescriptionFromBlobs(
 	el sku.ExternalLike,
 ) (err error) {

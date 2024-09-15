@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
@@ -72,7 +73,10 @@ func (c ZettelFromExternalBlob) Run(
 				return
 			}
 
-			if err = cofs.External.FDs.Each(toDelete.Add); err != nil {
+			if err = c.Env.GetStore().DeleteExternalLike(
+				ids.RepoId{},
+				&cofs.External,
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -154,7 +158,10 @@ func (c *ZettelFromExternalBlob) createZettelForBlobs(
 	blobFD := blobFDs[0]
 	z = store_fs.GetExternalPool().Get()
 
-	z.FDs.Blob.ResetWith(blobFD)
+	if err = store_fs.SetBlobOrError(z, blobFD); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	z.Transacted.ObjectId.SetGenre(genres.Zettel)
 
