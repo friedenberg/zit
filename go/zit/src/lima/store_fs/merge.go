@@ -60,6 +60,28 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 	return
 }
 
+func (s *Store) checkoutConflictedForMerge(
+	tm sku.Conflicted,
+	mode checkout_mode.Mode,
+) (left, middle, right *Item, err error) {
+	if _, left, err = s.checkoutOneForMerge(mode, tm.Left); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, middle, err = s.checkoutOneForMerge(mode, tm.Middle); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, right, err = s.checkoutOneForMerge(mode, tm.Right); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s *Store) tryMergeIgnoringConflicts(
 	tm sku.Conflicted,
 ) (path string, err error) {
@@ -68,7 +90,7 @@ func (s *Store) tryMergeIgnoringConflicts(
 		return
 	}
 
-	var leftCO, middleCO, rightCO *CheckedOut
+	var leftItem, middleItem, rightItem *Item
 
 	inlineBlob := tm.IsAllInlineType(s.config)
 
@@ -78,25 +100,18 @@ func (s *Store) tryMergeIgnoringConflicts(
 		mode = checkout_mode.MetadataOnly
 	}
 
-	if leftCO, err = s.checkoutOneForMerge(mode, tm.Left); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if middleCO, err = s.checkoutOneForMerge(mode, tm.Middle); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if rightCO, err = s.checkoutOneForMerge(mode, tm.Right); err != nil {
+	if leftItem, middleItem, rightItem, err = s.checkoutConflictedForMerge(
+		tm,
+		mode,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	path, err = s.runDiff3(
-		leftCO.External.item.Object,
-		middleCO.External.item.Object,
-		rightCO.External.item.Object,
+		leftItem.Object,
+		middleItem.Object,
+		rightItem.Object,
 	)
 
 	return
@@ -105,7 +120,7 @@ func (s *Store) tryMergeIgnoringConflicts(
 func (s *Store) checkoutOneForMerge(
 	mode checkout_mode.Mode,
 	sz *sku.Transacted,
-) (cz *CheckedOut, err error) {
+) (cz *CheckedOut, i *Item, err error) {
 	options := checkout_options.Options{
 		CheckoutMode:    mode,
 		AllowConflicted: true,
@@ -118,7 +133,7 @@ func (s *Store) checkoutOneForMerge(
 	cz.External.item.Reset()
 	sku.Resetter.ResetWith(&cz.Internal, sz)
 
-	if _, err = s.checkoutOne(
+	if i, err = s.checkoutOne(
 		options,
 		cz,
 	); err != nil {
@@ -201,19 +216,12 @@ func (s *Store) RunMergeTool(
 		mode = checkout_mode.MetadataOnly
 	}
 
-	var leftCO, middleCO, rightCO *CheckedOut
+	var leftItem, middleItem, rightItem *Item
 
-	if leftCO, err = s.checkoutOneForMerge(mode, tm.Left); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if middleCO, err = s.checkoutOneForMerge(mode, tm.Middle); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if rightCO, err = s.checkoutOneForMerge(mode, tm.Right); err != nil {
+	if leftItem, middleItem, rightItem, err = s.checkoutConflictedForMerge(
+		tm,
+		mode,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -226,9 +234,9 @@ func (s *Store) RunMergeTool(
 	}
 
 	tool = append(tool,
-		leftCO.External.item.Object.GetPath(),
-		middleCO.External.item.Object.GetPath(),
-		rightCO.External.item.Object.GetPath(),
+		leftItem.Object.GetPath(),
+		middleItem.Object.GetPath(),
+		rightItem.Object.GetPath(),
 		tmpPath,
 	)
 
@@ -247,7 +255,12 @@ func (s *Store) RunMergeTool(
 	e := GetExternalPool().Get()
 	defer GetExternalPool().Put(e)
 
-	e.ResetWith(&leftCO.External)
+	e.Transacted.ObjectId.ResetWith(&co.External.Transacted.ObjectId)
+
+	if err = leftItem.WriteToExternal(e); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	var f *os.File
 
