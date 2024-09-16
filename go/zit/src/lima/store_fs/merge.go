@@ -18,14 +18,9 @@ import (
 )
 
 func (s *Store) Merge(tm sku.Conflicted) (err error) {
-	p, mergeResult := s.tryMergeIgnoringConflicts(tm)
+	var original, replacement *FDPair
 
-	var merged FDPair
-
-	if err = merged.Object.SetPath(p); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	original, replacement, mergeResult := s.tryMergeIgnoringConflicts(tm)
 
 	cofs := tm.CheckedOutLike.(*CheckedOut)
 
@@ -48,13 +43,24 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 		return
 	}
 
-	src := merged.Object.GetPath()
-	dst := cofs.External.item.Object.GetPath()
+	if !replacement.Object.IsEmpty() {
+		if err = files.Rename(
+			replacement.Object.GetPath(),
+			original.Object.GetPath(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 
-	// TODO determine why dst is sometimes ""
-	if err = files.Rename(src, dst); err != nil {
-		err = errors.Wrap(err)
-		return
+	if !replacement.Blob.IsEmpty() {
+		if err = files.Rename(
+			replacement.Blob.GetPath(),
+			original.Blob.GetPath(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
@@ -84,7 +90,7 @@ func (s *Store) checkoutConflictedForMerge(
 
 func (s *Store) tryMergeIgnoringConflicts(
 	tm sku.Conflicted,
-) (path string, err error) {
+) (original, replacement *FDPair, err error) {
 	if err = tm.MergeTags(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -108,11 +114,48 @@ func (s *Store) tryMergeIgnoringConflicts(
 		return
 	}
 
-	path, err = s.runDiff3(
-		leftItem.Object,
-		middleItem.Object,
-		rightItem.Object,
-	)
+	var i Item
+
+	if err = i.ReadFromExternal(tm.CheckedOutLike.GetSkuExternalLike()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	original = &FDPair{}
+
+	if err = original.Object.SetPath(i.Object.GetPath()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = original.Blob.SetPath(i.Blob.GetPath()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	{
+		var path string
+
+		var diff3Error error
+
+		path, diff3Error = s.runDiff3(
+			&leftItem.Object,
+			&middleItem.Object,
+			&rightItem.Object,
+		)
+
+		replacement = &FDPair{}
+
+		if err = replacement.Object.SetPath(path); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if diff3Error != nil {
+			err = errors.Wrap(diff3Error)
+			return
+		}
+	}
 
 	return
 }
@@ -226,7 +269,7 @@ func (s *Store) RunMergeTool(
 		return
 	}
 
-	tmpPath, mergeResult := s.tryMergeIgnoringConflicts(tm)
+	_, after, mergeResult := s.tryMergeIgnoringConflicts(tm)
 
 	if !errors.Is(mergeResult, &ErrMergeConflict{}) {
 		err = errors.Wrap(mergeResult)
@@ -237,8 +280,10 @@ func (s *Store) RunMergeTool(
 		leftItem.Object.GetPath(),
 		middleItem.Object.GetPath(),
 		rightItem.Object.GetPath(),
-		tmpPath,
+		after.Object.GetPath(),
 	)
+
+	// TODO merge blobs
 
 	cmd := exec.Command(tool[0], tool[1:]...)
 	cmd.Stdin = os.Stdin
@@ -264,10 +309,12 @@ func (s *Store) RunMergeTool(
 
 	var f *os.File
 
-	if f, err = files.Open(tmpPath); err != nil {
+	if f, err = files.Open(after.Object.GetPath()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	// TODO open blob
 
 	defer errors.DeferredCloser(&err, f)
 

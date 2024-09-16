@@ -149,7 +149,8 @@ func (e *Item) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 }
 
 // TODO replace with fields
-func (i *Item) ReadFromExternal(e *External) (err error) {
+func (i *Item) ReadFromExternal(el sku.ExternalLike) (err error) {
+	e := el.(*External)
 	i.ResetWith(&e.item)
 	return
 }
@@ -166,7 +167,7 @@ func (i *Item) WriteToExternal(e *External) (err error) {
 	if k.String() != "" {
 		if k.GetGenre() != genres.Blob {
 			if err = e.Transacted.ObjectId.Set(k.String()); err != nil {
-        err = nil
+				err = nil
 				// err = errors.Wrap(err)
 				// return
 			}

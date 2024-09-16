@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 )
 
-func (s *Store) runDiff3(left, middle, right fd.FD) (path string, err error) {
+func (s *Store) runDiff3(left, middle, right *fd.FD) (path string, err error) {
 	cmd := exec.Command(
 		"git",
 		"merge-file",
