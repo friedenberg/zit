@@ -103,7 +103,10 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 ) (err error) {
 	cofs := col.(*CheckedOut)
 
-	if options.CheckoutMode, err = cofs.External.item.GetCheckoutModeOrError(); err != nil {
+	if options.CheckoutMode, err = GetCheckoutModeOrError(
+		col.GetSkuExternalLike(),
+		options.CheckoutMode,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

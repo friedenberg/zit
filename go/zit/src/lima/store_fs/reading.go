@@ -146,9 +146,17 @@ func (s *Store) ReadOneExternalObject(
 		)
 	}
 
+		var fds Item
+
+		if err = fds.ReadFromExternal(e); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+
 	var f *os.File
 
-	if f, err = files.Open(e.GetObjectFD().GetPath()); err != nil {
+	if f, err = files.Open(fds.Object.GetPath()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -192,10 +200,17 @@ func (s *Store) ReadOneExternalBlob(
 
 		defer errors.DeferredCloser(&err, aw)
 
+		var fds Item
+
+		if err = fds.ReadFromExternal(e); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
 		var f *os.File
 
 		if f, err = files.OpenExclusiveReadOnly(
-			e.GetBlobFD().GetPath(),
+			fds.Blob.GetPath(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

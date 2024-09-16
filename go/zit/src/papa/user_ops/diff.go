@@ -22,6 +22,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
+// TODO move to store_fs
 type Diff struct {
 	*env.Env
 
@@ -98,6 +99,13 @@ func (op Diff) Run(
 	internalInline := op.GetConfig().IsInlineType(il.GetType())
 	externalInline := op.GetConfig().IsInlineType(el.GetType())
 
+	var fds store_fs.Item
+
+	if err = fds.ReadFromExternal(el); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	var externalFD *fd.FD
 
 	switch {
@@ -110,17 +118,17 @@ func (op Diff) Run(
 			wg.Do(op.makeDo(wRight, op.MetadataOnly, elCtx))
 		}
 
-		externalFD = el.GetObjectFD()
+		externalFD = &fds.Object
 
 	case internalInline && externalInline:
 		wg.Do(op.makeDoBlob(wLeft, op.GetFSHome(), il.GetBlobSha()))
-		wg.Do(op.makeDoFD(wRight, el.GetBlobFD()))
-		externalFD = el.GetBlobFD()
+		wg.Do(op.makeDoFD(wRight, &fds.Blob))
+		externalFD = &fds.Blob
 
 	default:
 		wg.Do(op.makeDo(wLeft, op.MetadataOnly, ilCtx))
 		wg.Do(op.makeDo(wRight, op.MetadataOnly, elCtx))
-		externalFD = el.GetBlobFD()
+		externalFD = &fds.Blob
 	}
 
 	internalLabel := fmt.Sprintf(

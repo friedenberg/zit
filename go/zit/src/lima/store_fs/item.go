@@ -158,7 +158,8 @@ func (i *Item) ReadFromExternal(el sku.ExternalLike) (err error) {
 }
 
 // TODO replace with fields
-func (i *Item) WriteToExternal(e *External) (err error) {
+func (i *Item) WriteToExternal(el sku.ExternalLike) (err error) {
+  e := el.(*External)
 	k := &i.ObjectId
 
 	if err = e.ExternalObjectId.SetRaw(k.String()); err != nil {

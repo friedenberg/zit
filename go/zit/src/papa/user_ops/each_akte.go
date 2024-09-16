@@ -11,6 +11,7 @@ import (
 	"github.com/google/shlex"
 )
 
+// TODO move to store_fs
 type EachBlob struct {
 	*env.Env
 	Utility string
@@ -27,8 +28,14 @@ func (c EachBlob) Run(
 
 	if err = zsc.Each(
 		func(col sku.CheckedOutLike) (err error) {
-			cofs := col.(*store_fs.CheckedOut)
-			blob_store = append(blob_store, cofs.External.GetBlobFD().GetPath())
+      var fds store_fs.Item
+
+      if err = fds.ReadFromExternal(col.GetSkuExternalLike()); err != nil {
+        err = errors.Wrap(err)
+        return
+      }
+
+			blob_store = append(blob_store, fds.Blob.GetPath())
 
 			return
 		},

@@ -71,7 +71,13 @@ func (f *cliCheckedOut) WriteStringFormat(
 	}
 
 	o := &co.External
-	fds := o.GetFDs()
+  var fds Item
+
+  if err = fds.ReadFromExternal(o); err != nil {
+    err = errors.Wrap(err)
+    return
+  }
+  
 	n1, err = sw.WriteString("[")
 	n += int64(n1)
 
@@ -158,7 +164,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 
 	if m == checkout_mode.BlobRecognized ||
 		(m != checkout_mode.MetadataOnly && m != checkout_mode.None) {
-		n2, err = f.writeStringFormatBlobFDsExcept(sw, fds, fdAlreadyWritten)
+		n2, err = f.writeStringFormatBlobFDsExcept(sw, &fds, fdAlreadyWritten)
 		n += n2
 
 		if err != nil {
@@ -272,12 +278,17 @@ func (f *cliCheckedOut) writeStringFormatUntracked(
 	)
 
 	o := &co.External
-	fds := o.GetFDs()
+  var i Item
 
-	fdToPrint := &fds.Blob
+  if err = i.ReadFromExternal(o); err != nil {
+    err = errors.Wrap(err)
+    return
+  }
 
-	if o.GetGenre() != genres.Zettel && !fds.Object.IsEmpty() {
-		fdToPrint = &fds.Object
+	fdToPrint := &i.Blob
+
+	if o.GetGenre() != genres.Zettel && !i.Object.IsEmpty() {
+		fdToPrint = &i.Object
 	}
 
 	n2, err = f.fdStringFormatWriter.WriteStringFormat(
@@ -302,7 +313,7 @@ func (f *cliCheckedOut) writeStringFormatUntracked(
 		return
 	}
 
-	n2, err = f.writeStringFormatBlobFDsExcept(sw, fds, fdToPrint)
+	n2, err = f.writeStringFormatBlobFDsExcept(sw, &i, fdToPrint)
 	n += n2
 
 	if err != nil {

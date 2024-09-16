@@ -91,8 +91,14 @@ func ToSliceFilesZettelen(
 	return iter.DerivedValues(
 		s,
 		func(col sku.CheckedOutLike) (e string, err error) {
-			z := col.(*CheckedOut)
-			e = z.External.GetObjectFD().GetPath()
+			var fds Item
+
+			if err = fds.ReadFromExternal(col.GetSkuExternalLike()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			e = fds.Object.GetPath()
 
 			if e == "" {
 				err = collections.MakeErrStopIteration()
@@ -110,8 +116,14 @@ func ToSliceFilesBlobs(
 	return iter.DerivedValues(
 		s,
 		func(col sku.CheckedOutLike) (e string, err error) {
-			z := col.(*CheckedOut)
-			e = z.External.GetBlobFD().GetPath()
+			var fds Item
+
+			if err = fds.ReadFromExternal(col.GetSkuExternalLike()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			e = fds.Blob.GetPath()
 
 			if e == "" {
 				err = collections.MakeErrStopIteration()

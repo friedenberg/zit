@@ -22,10 +22,6 @@ func (t *External) GetSkuExternalLike() sku.ExternalLike {
 	return t
 }
 
-func (t *External) GetExternalState() external_state.State {
-	return t.item.State
-}
-
 func (a *External) Clone() sku.ExternalLike {
 	b := GetExternalPool().Get()
 	sku.ExternalResetter.ResetWith(&b.External, &a.External)
@@ -83,10 +79,6 @@ func (a *External) GetBlobPath() string {
 	return a.item.Blob.GetPath()
 }
 
-func (a *External) GetObjectFD() *fd.FD {
-	return &a.item.Object
-}
-
 func (o *External) GetKey() string {
 	return fmt.Sprintf("%s.%s", o.GetGenre(), o.GetObjectId())
 }
@@ -95,32 +87,31 @@ func GetCheckoutModeOrError(
 	el sku.ExternalLike,
 	originalMode checkout_mode.Mode,
 ) (m checkout_mode.Mode, err error) {
-	var e *External
-	ok := false
+	var fds Item
 
-	if e, ok = el.(*External); !ok {
-		m = originalMode
+	if err = fds.ReadFromExternal(el); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
 	switch {
-	case !e.item.Object.IsEmpty() && !e.item.Blob.IsEmpty():
+	case !fds.Object.IsEmpty() && !fds.Blob.IsEmpty():
 		m = checkout_mode.MetadataAndBlob
 
-	case !e.item.Blob.IsEmpty():
+	case !fds.Blob.IsEmpty():
 		m = checkout_mode.BlobOnly
 
-	case !e.item.Object.IsEmpty():
+	case !fds.Object.IsEmpty():
 		m = checkout_mode.MetadataOnly
 
 	default:
-		if e.item.State == external_state.Recognized {
+		if fds.State == external_state.Recognized {
 			m = checkout_mode.BlobRecognized
 			return
 		}
 
 		err = checkout_mode.MakeErrInvalidCheckoutMode(
-			errors.Errorf("all FD's are empty: %s", e.item.Debug()),
+			errors.Errorf("all FD's are empty: %s", fds.Debug()),
 		)
 	}
 
@@ -130,15 +121,14 @@ func GetCheckoutModeOrError(
 func GetConflictOrError(
 	el sku.ExternalLike,
 ) (f *fd.FD, err error) {
-	var e *External
-	ok := false
+	var fds Item
 
-	if e, ok = el.(*External); !ok {
-		err = errors.Errorf("expected store_fs.External but got %T", el)
+	if err = fds.ReadFromExternal(el); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	f = &e.item.Conflict
+	f = &fds.Conflict
 
 	return
 }
@@ -146,15 +136,14 @@ func GetConflictOrError(
 func GetObjectOrError(
 	el sku.ExternalLike,
 ) (f *fd.FD, err error) {
-	var e *External
-	ok := false
+	var fds Item
 
-	if e, ok = el.(*External); !ok {
-		err = errors.Errorf("expected store_fs.External but got %T", el)
+	if err = fds.ReadFromExternal(el); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	f = &e.item.Object
+	f = &fds.Object
 
 	return
 }
@@ -163,15 +152,19 @@ func SetObjectOrError(
 	el sku.ExternalLike,
 	object *fd.FD,
 ) (err error) {
-	var e *External
-	ok := false
+	var fds Item
 
-	if e, ok = el.(*External); !ok {
-		err = errors.Errorf("expected store_fs.External but got %T", el)
+	if err = fds.ReadFromExternal(el); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	e.item.Object.ResetWith(object)
+	fds.Object.ResetWith(object)
+
+	if err = fds.WriteToExternal(el); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
@@ -179,15 +172,14 @@ func SetObjectOrError(
 func GetBlobOrError(
 	el sku.ExternalLike,
 ) (f *fd.FD, err error) {
-	var e *External
-	ok := false
+	var fds Item
 
-	if e, ok = el.(*External); !ok {
-		err = errors.Errorf("expected store_fs.External but got %T", el)
+	if err = fds.ReadFromExternal(el); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	f = &e.item.Blob
+	f = &fds.Blob
 
 	return
 }
@@ -196,15 +188,19 @@ func SetBlobOrError(
 	el sku.ExternalLike,
 	blob *fd.FD,
 ) (err error) {
-	var e *External
-	ok := false
+	var fds Item
 
-	if e, ok = el.(*External); !ok {
-		err = errors.Errorf("expected store_fs.External but got %T", el)
+	if err = fds.ReadFromExternal(el); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	e.item.Blob.ResetWith(blob)
+	fds.Blob.ResetWith(blob)
+
+	if err = fds.WriteToExternal(el); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
@@ -212,16 +208,15 @@ func SetBlobOrError(
 func UpdateDescriptionFromBlobs(
 	el sku.ExternalLike,
 ) (err error) {
-	var e *External
-	ok := false
+	var fds Item
 
-	if e, ok = el.(*External); !ok {
-		err = errors.Errorf("expected store_fs.External but got %T", el)
+	if err = fds.ReadFromExternal(el); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
 	sorted := iter.ElementsSorted(
-		e.item.MutableSetLike,
+		fds.MutableSetLike,
 		func(a, b *fd.FD) bool {
 			return a.GetPath() < b.GetPath()
 		},
@@ -230,10 +225,15 @@ func UpdateDescriptionFromBlobs(
 	for _, f := range sorted {
 		desc := f.FileNameSansExt()
 
-		if err = e.Transacted.Metadata.Description.Set(desc); err != nil {
+		if err = el.GetSku().Metadata.Description.Set(desc); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+	}
+
+	if err = fds.WriteToExternal(el); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
