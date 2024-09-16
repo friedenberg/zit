@@ -99,10 +99,23 @@ func (dst *Item) ResetWith(src *Item) {
 		dst.MutableSetLike = collections_value.MakeMutableValueSet[*fd.FD](nil)
 	}
 
-  dst.MutableSetLike.Reset()
+	dst.MutableSetLike.Reset()
 
 	if src.MutableSetLike != nil {
 		src.MutableSetLike.Each(dst.MutableSetLike.Add)
+	}
+
+	// TODO consider if this approach actually works
+	if !dst.Object.IsEmpty() {
+		dst.Add(&dst.Object)
+	}
+
+	if !dst.Blob.IsEmpty() {
+		dst.Add(&dst.Blob)
+	}
+
+	if !dst.Conflict.IsEmpty() {
+		dst.Add(&dst.Conflict)
 	}
 }
 
