@@ -48,20 +48,20 @@ func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
 	return fs
 }
 
-func (fs *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
+func (s *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
 	e := el.(*External)
 
 	var i Item
 
-	if err = i.ReadFromExternal(e); err != nil {
+	if err = s.ReadFromExternal(&i,e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	fs.deleteLock.Lock()
-	defer fs.deleteLock.Unlock()
+	s.deleteLock.Lock()
+	defer s.deleteLock.Unlock()
 
-	if err = i.MutableSetLike.Each(fs.deleted.Add); err != nil {
+	if err = i.MutableSetLike.Each(s.deleted.Add); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

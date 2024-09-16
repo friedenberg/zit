@@ -24,6 +24,8 @@ type CliExternal struct {
 	metadataStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata]
 
 	transactedWriter *sku_fmt.Box
+
+	store *Store
 }
 
 func MakeCliExternalFormat(
@@ -32,6 +34,7 @@ func MakeCliExternalFormat(
 	fdStringFormatWriter interfaces.StringFormatWriter[*fd.FD],
 	objectIdStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
 	metadataStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata],
+	s *Store,
 ) *CliExternal {
 	return &CliExternal{
 		options:                    options,
@@ -40,6 +43,7 @@ func MakeCliExternalFormat(
 		objectIdStringFormatWriter: objectIdStringFormatWriter,
 		fdStringFormatWriter:       fdStringFormatWriter,
 		metadataStringFormatWriter: metadataStringFormatWriter,
+		store:                      s,
 	}
 }
 
@@ -73,12 +77,12 @@ func (f *CliExternal) WriteStringFormat(
 
 	o := co
 
-  var fds Item
+	var fds Item
 
-  if err = fds.ReadFromExternal(o); err != nil {
-    err = errors.Wrap(err)
-    return
-  }
+	if err = f.store.ReadFromExternal(&fds, o); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	n1, err = sw.WriteString("[")
 	n += int64(n1)
@@ -110,9 +114,9 @@ func (f *CliExternal) WriteStringFormat(
 	}
 
 	n2, err = f.metadataStringFormatWriter.WriteStringFormat(
-    sw,
-    o.Transacted.GetMetadata(),
-  )
+		sw,
+		o.Transacted.GetMetadata(),
+	)
 	n += n2
 
 	if err != nil {
@@ -237,12 +241,12 @@ func (f *CliExternal) writeStringFormatUntracked(
 
 	o := co
 
-  var fds Item
+	var fds Item
 
-  if err = fds.ReadFromExternal(o); err != nil {
-    err = errors.Wrap(err)
-    return
-  }
+	if err = f.store.ReadFromExternal(&fds, o); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	fdToPrint := &fds.Blob
 
@@ -262,9 +266,9 @@ func (f *CliExternal) writeStringFormatUntracked(
 	}
 
 	n2, err = f.metadataStringFormatWriter.WriteStringFormat(
-    sw,
-    o.Transacted.GetMetadata(),
-  )
+		sw,
+		o.Transacted.GetMetadata(),
+	)
 	n += n2
 
 	if err != nil {

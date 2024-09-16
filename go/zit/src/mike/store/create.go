@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 )
 
 // TODO-P2 add support for quiet reindexing
@@ -190,7 +189,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	var mode checkout_mode.Mode
 
 	// TODO [radi/kof !task project-2021-zit-features zz-inbox] add support for kasten in checkouts and external
-	if mode, err = store_fs.GetCheckoutModeOrError(el, mode); err != nil {
+	if mode, err = s.GetCwdFiles().GetCheckoutModeOrError(el, mode); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

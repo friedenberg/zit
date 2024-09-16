@@ -117,6 +117,7 @@ func (u *Env) PrinterExternalLikeFS() *store_fs.CliExternal {
 			oo.ColorOptionsErr,
 			string_format_writer.CliFormatTruncation66CharEllipsis,
 		),
+		u.GetStore().GetCwdFiles(),
 	)
 }
 
@@ -138,6 +139,7 @@ func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[sku.CheckedOutLike] {
 				oo.ColorOptionsErr,
 				string_format_writer.CliFormatTruncation66CharEllipsis,
 			),
+			u.GetStore().GetCwdFiles(),
 		),
 	)
 
@@ -156,6 +158,7 @@ func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[sku.CheckedOutLike] {
 				oo.ColorOptionsErr,
 				string_format_writer.CliFormatTruncation66CharEllipsis,
 			),
+			u.GetStore().GetCwdFiles(),
 		),
 	)
 

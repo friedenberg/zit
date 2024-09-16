@@ -30,7 +30,10 @@ func (c EachBlob) Run(
 		func(col sku.CheckedOutLike) (err error) {
       var fds store_fs.Item
 
-      if err = fds.ReadFromExternal(col.GetSkuExternalLike()); err != nil {
+      if err = c.GetStore().GetCwdFiles().ReadFromExternal(
+        &fds,
+        col.GetSkuExternalLike(),
+      ); err != nil {
         err = errors.Wrap(err)
         return
       }

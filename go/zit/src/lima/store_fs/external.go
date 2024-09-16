@@ -70,13 +70,13 @@ func (o *External) GetKey() string {
 	return fmt.Sprintf("%s.%s", o.GetGenre(), o.GetObjectId())
 }
 
-func GetCheckoutModeOrError(
+func (s *Store) GetCheckoutModeOrError(
 	el sku.ExternalLike,
 	originalMode checkout_mode.Mode,
 ) (m checkout_mode.Mode, err error) {
 	var fds Item
 
-	if err = fds.ReadFromExternal(el); err != nil {
+	if err = s.ReadFromExternal(&fds, el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -105,12 +105,12 @@ func GetCheckoutModeOrError(
 	return
 }
 
-func GetConflictOrError(
+func (s *Store) GetConflictOrError(
 	el sku.ExternalLike,
 ) (f *fd.FD, err error) {
 	var fds Item
 
-	if err = fds.ReadFromExternal(el); err != nil {
+	if err = s.ReadFromExternal(&fds, el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -120,12 +120,12 @@ func GetConflictOrError(
 	return
 }
 
-func GetObjectOrError(
+func (s *Store) GetObjectOrError(
 	el sku.ExternalLike,
 ) (f *fd.FD, err error) {
 	var fds Item
 
-	if err = fds.ReadFromExternal(el); err != nil {
+	if err = s.ReadFromExternal(&fds, el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -135,20 +135,20 @@ func GetObjectOrError(
 	return
 }
 
-func SetObjectOrError(
+func (s *Store) SetObjectOrError(
 	el sku.ExternalLike,
 	object *fd.FD,
 ) (err error) {
 	var fds Item
 
-	if err = fds.ReadFromExternal(el); err != nil {
+	if err = s.ReadFromExternal(&fds, el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	fds.Object.ResetWith(object)
 
-	if err = fds.WriteToExternal(el); err != nil {
+	if err = s.WriteToExternal(&fds, el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -156,12 +156,12 @@ func SetObjectOrError(
 	return
 }
 
-func GetBlobOrError(
+func (s *Store) GetBlobOrError(
 	el sku.ExternalLike,
 ) (f *fd.FD, err error) {
 	var fds Item
 
-	if err = fds.ReadFromExternal(el); err != nil {
+	if err = s.ReadFromExternal(&fds, el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -171,20 +171,20 @@ func GetBlobOrError(
 	return
 }
 
-func SetBlobOrError(
+func (s *Store) SetBlobOrError(
 	el sku.ExternalLike,
 	blob *fd.FD,
 ) (err error) {
 	var fds Item
 
-	if err = fds.ReadFromExternal(el); err != nil {
+	if err = s.ReadFromExternal(&fds, el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	fds.Blob.ResetWith(blob)
 
-	if err = fds.WriteToExternal(el); err != nil {
+	if err = s.WriteToExternal(&fds, el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -192,12 +192,12 @@ func SetBlobOrError(
 	return
 }
 
-func UpdateDescriptionFromBlobs(
+func (s *Store) UpdateDescriptionFromBlobs(
 	el sku.ExternalLike,
 ) (err error) {
 	var fds Item
 
-	if err = fds.ReadFromExternal(el); err != nil {
+	if err = s.ReadFromExternal(&fds, el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -218,7 +218,7 @@ func UpdateDescriptionFromBlobs(
 		}
 	}
 
-	if err = fds.WriteToExternal(el); err != nil {
+	if err = s.WriteToExternal(&fds, el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -85,7 +85,7 @@ func (c CreateFromPaths) Run(
 			{
 				var object *fd.FD
 
-				if object, err = store_fs.GetObjectOrError(z); err != nil {
+				if object, err = c.GetStore().GetCwdFiles().GetObjectOrError(z); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -98,7 +98,7 @@ func (c CreateFromPaths) Run(
 			{
 				var blob *fd.FD
 
-				if blob, err = store_fs.GetObjectOrError(z); err != nil {
+				if blob, err = c.GetStore().GetCwdFiles().GetObjectOrError(z); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -186,7 +186,7 @@ func (c *CreateFromPaths) zettelsFromPath(
 
 	ze := store_fs.GetExternalPool().Get()
 
-	if err = store_fs.SetObjectOrError(ze, &fd); err != nil {
+	if err = c.GetStore().GetCwdFiles().SetObjectOrError(ze, &fd); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -196,9 +196,9 @@ func (c *CreateFromPaths) zettelsFromPath(
 	ze.Transacted.ObjectId.SetGenre(genres.Zettel)
 
 	if _, err = c.TextParser.ParseMetadata(
-    r,
-    &ze.Transacted,
-  ); err != nil {
+		r,
+		&ze.Transacted,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -85,15 +85,15 @@ func (e *CheckedOut) Remove(s interfaces.Directory) (err error) {
 	return
 }
 
-func ToSliceFilesZettelen(
-	s sku.CheckedOutLikeSet,
+func (s *Store) ToSliceFilesZettelen(
+	cos sku.CheckedOutLikeSet,
 ) (out []string, err error) {
 	return iter.DerivedValues(
-		s,
+		cos,
 		func(col sku.CheckedOutLike) (e string, err error) {
 			var fds Item
 
-			if err = fds.ReadFromExternal(col.GetSkuExternalLike()); err != nil {
+			if err = s.ReadFromExternal(&fds, col.GetSkuExternalLike()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -110,15 +110,15 @@ func ToSliceFilesZettelen(
 	)
 }
 
-func ToSliceFilesBlobs(
-	s sku.CheckedOutLikeSet,
+func (s *Store) ToSliceFilesBlobs(
+	cos sku.CheckedOutLikeSet,
 ) (out []string, err error) {
 	return iter.DerivedValues(
-		s,
+		cos,
 		func(col sku.CheckedOutLike) (e string, err error) {
 			var fds Item
 
-			if err = fds.ReadFromExternal(col.GetSkuExternalLike()); err != nil {
+			if err = s.ReadFromExternal(&fds, col.GetSkuExternalLike()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

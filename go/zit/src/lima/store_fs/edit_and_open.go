@@ -42,7 +42,7 @@ func (s *Store) openZettels(
 ) (err error) {
 	var filesZettels []string
 
-	if filesZettels, err = ToSliceFilesZettelen(zsc); err != nil {
+	if filesZettels, err = s.ToSliceFilesZettelen(zsc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -69,7 +69,7 @@ func (s *Store) openBlob(
 ) (err error) {
 	var filesBlobs []string
 
-	if filesBlobs, err = ToSliceFilesBlobs(zsc); err != nil {
+	if filesBlobs, err = s.ToSliceFilesBlobs(zsc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -42,7 +42,7 @@ func (c ZettelFromExternalBlob) Run(
 				return
 			}
 
-			if err = store_fs.UpdateDescriptionFromBlobs(&cofs.External); err != nil {
+			if err = c.GetStore().GetCwdFiles().UpdateDescriptionFromBlobs(&cofs.External); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -158,7 +158,7 @@ func (c *ZettelFromExternalBlob) createZettelForBlobs(
 	blobFD := blobFDs[0]
 	z = store_fs.GetExternalPool().Get()
 
-	if err = store_fs.SetBlobOrError(z, blobFD); err != nil {
+	if err = c.GetStore().GetCwdFiles().SetBlobOrError(z, blobFD); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

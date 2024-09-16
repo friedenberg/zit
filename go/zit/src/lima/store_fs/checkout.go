@@ -102,7 +102,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 ) (err error) {
 	cofs := col.(*CheckedOut)
 
-	if options.CheckoutMode, err = GetCheckoutModeOrError(
+	if options.CheckoutMode, err = s.GetCheckoutModeOrError(
 		col.GetSkuExternalLike(),
 		options.CheckoutMode,
 	); err != nil {
@@ -117,7 +117,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 
 	oldFDs = &Item{}
 
-	if err = oldFDs.ReadFromExternal(col.GetSkuExternalLike()); err != nil {
+	if err = s.ReadFromExternal(oldFDs, col.GetSkuExternalLike()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -162,7 +162,7 @@ func (s *Store) checkoutOne(
 	i = &Item{}
 	i.Reset()
 
-	if err = i.ReadFromExternal(&cz.External); err != nil {
+	if err = s.ReadFromExternal(i, &cz.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -232,7 +232,7 @@ func (s *Store) checkoutOne(
 		return
 	}
 
-	if err = i.WriteToExternal(&cz.External); err != nil {
+	if err = s.WriteToExternal(i, &cz.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

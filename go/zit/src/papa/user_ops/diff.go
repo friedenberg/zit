@@ -76,7 +76,7 @@ func (op Diff) Run(
 		TextFormatterOptions:       options,
 	}
 
-	if mode, err = store_fs.GetCheckoutModeOrError(el, mode); err != nil {
+	if mode, err = op.GetStore().GetCwdFiles().GetCheckoutModeOrError(el, mode); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -101,7 +101,7 @@ func (op Diff) Run(
 
 	var fds store_fs.Item
 
-	if err = fds.ReadFromExternal(el); err != nil {
+	if err = op.GetStore().GetCwdFiles().ReadFromExternal(&fds, el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

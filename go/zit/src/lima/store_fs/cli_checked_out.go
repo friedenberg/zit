@@ -22,6 +22,7 @@ type cliCheckedOut struct {
 	objectIdStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId]
 	fdStringFormatWriter       interfaces.StringFormatWriter[*fd.FD]
 	metadataStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata]
+	store                      *Store
 }
 
 func MakeCliCheckedOutFormat(
@@ -30,6 +31,7 @@ func MakeCliCheckedOutFormat(
 	fdStringFormatWriter interfaces.StringFormatWriter[*fd.FD],
 	objectIdStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
 	metadataStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata],
+	s *Store,
 ) *cliCheckedOut {
 	return &cliCheckedOut{
 		options:                    options,
@@ -38,6 +40,7 @@ func MakeCliCheckedOutFormat(
 		objectIdStringFormatWriter: objectIdStringFormatWriter,
 		fdStringFormatWriter:       fdStringFormatWriter,
 		metadataStringFormatWriter: metadataStringFormatWriter,
+		store:                      s,
 	}
 }
 
@@ -71,13 +74,13 @@ func (f *cliCheckedOut) WriteStringFormat(
 	}
 
 	o := &co.External
-  var fds Item
+	var fds Item
 
-  if err = fds.ReadFromExternal(o); err != nil {
-    err = errors.Wrap(err)
-    return
-  }
-  
+	if err = f.store.ReadFromExternal(&fds, o); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	n1, err = sw.WriteString("[")
 	n += int64(n1)
 
@@ -117,9 +120,9 @@ func (f *cliCheckedOut) WriteStringFormat(
 
 	case m == checkout_mode.BlobOnly || m == checkout_mode.BlobRecognized:
 		n2, err = f.objectIdStringFormatWriter.WriteStringFormat(
-      sw,
-      &o.Transacted.ObjectId,
-    )
+			sw,
+			&o.Transacted.ObjectId,
+		)
 		n += n2
 
 		if err != nil {
@@ -152,9 +155,9 @@ func (f *cliCheckedOut) WriteStringFormat(
 	}
 
 	n2, err = f.metadataStringFormatWriter.WriteStringFormat(
-    sw,
-    o.Transacted.GetMetadata(),
-  )
+		sw,
+		o.Transacted.GetMetadata(),
+	)
 	n += n2
 
 	if err != nil {
@@ -278,12 +281,12 @@ func (f *cliCheckedOut) writeStringFormatUntracked(
 	)
 
 	o := &co.External
-  var i Item
+	var i Item
 
-  if err = i.ReadFromExternal(o); err != nil {
-    err = errors.Wrap(err)
-    return
-  }
+	if err = f.store.ReadFromExternal(&i, o); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	fdToPrint := &i.Blob
 
@@ -303,9 +306,9 @@ func (f *cliCheckedOut) writeStringFormatUntracked(
 	}
 
 	n2, err = f.metadataStringFormatWriter.WriteStringFormat(
-    sw,
-    o.Transacted.GetMetadata(),
-  )
+		sw,
+		o.Transacted.GetMetadata(),
+	)
 	n += n2
 
 	if err != nil {

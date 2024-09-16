@@ -116,7 +116,7 @@ func (s *Store) tryMergeIgnoringConflicts(
 
 	var i Item
 
-	if err = i.ReadFromExternal(tm.CheckedOutLike.GetSkuExternalLike()); err != nil {
+	if err = s.ReadFromExternal(&i, tm.CheckedOutLike.GetSkuExternalLike()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -206,7 +206,7 @@ func (s *Store) handleMergeResult(
 
 	var i Item
 
-	if err = i.ReadFromExternal(&cofs.External); err != nil {
+	if err = s.ReadFromExternal(&i, &cofs.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -291,7 +291,7 @@ func (s *Store) RunMergeTool(
 
 	e.Transacted.ObjectId.ResetWith(&co.External.Transacted.ObjectId)
 
-	if err = leftItem.WriteToExternal(e); err != nil {
+	if err = s.WriteToExternal(leftItem, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

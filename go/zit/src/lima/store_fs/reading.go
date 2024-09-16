@@ -44,7 +44,7 @@ func (s *Store) readOneExternalInto(
 	t *sku.Transacted,
 	e *External,
 ) (err error) {
-	if err = i.WriteToExternal(e); err != nil {
+	if err = s.WriteToExternal(i, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -133,7 +133,7 @@ func (s *Store) readOneExternalObject(
 
 	var fds Item
 
-	if err = fds.ReadFromExternal(e); err != nil {
+	if err = s.ReadFromExternal(&fds, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -186,7 +186,7 @@ func (s *Store) ReadOneExternalBlob(
 
 		var fds Item
 
-		if err = fds.ReadFromExternal(e); err != nil {
+		if err = s.ReadFromExternal(&fds, e); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
