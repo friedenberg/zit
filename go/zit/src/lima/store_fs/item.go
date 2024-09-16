@@ -16,6 +16,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+var ErrExternalHasConflictMarker = errors.New("external has conflict marker")
+
 type Item struct {
 	external_state.State
 

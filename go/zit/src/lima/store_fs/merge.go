@@ -18,7 +18,7 @@ import (
 )
 
 func (s *Store) Merge(tm sku.Conflicted) (err error) {
-	var original, replacement *FDPair
+	var original, replacement *Item
 
 	original, replacement, mergeResult := s.tryMergeIgnoringConflicts(tm)
 
@@ -90,7 +90,7 @@ func (s *Store) checkoutConflictedForMerge(
 
 func (s *Store) tryMergeIgnoringConflicts(
 	tm sku.Conflicted,
-) (original, replacement *FDPair, err error) {
+) (original, replacement *Item, err error) {
 	if err = tm.MergeTags(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -121,17 +121,7 @@ func (s *Store) tryMergeIgnoringConflicts(
 		return
 	}
 
-	original = &FDPair{}
-
-	if err = original.Object.SetPath(i.Object.GetPath()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = original.Blob.SetPath(i.Blob.GetPath()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	original = &i
 
 	{
 		var path string
@@ -144,7 +134,7 @@ func (s *Store) tryMergeIgnoringConflicts(
 			&rightItem.Object,
 		)
 
-		replacement = &FDPair{}
+		replacement = &Item{}
 
 		if err = replacement.Object.SetPath(path); err != nil {
 			err = errors.Wrap(err)
@@ -173,7 +163,6 @@ func (s *Store) checkoutOneForMerge(
 	}
 
 	cz = GetCheckedOutPool().Get()
-	cz.External.item.Reset()
 	sku.Resetter.ResetWith(&cz.Internal, sz)
 
 	if i, err = s.checkoutOne(
@@ -337,7 +326,7 @@ func (s *Store) RunMergeTool(
 	return
 }
 
-func MakeErrMergeConflict(sk *FDPair) (err *ErrMergeConflict) {
+func MakeErrMergeConflict(sk *Item) (err *ErrMergeConflict) {
 	err = &ErrMergeConflict{}
 
 	if sk != nil {
@@ -348,7 +337,7 @@ func MakeErrMergeConflict(sk *FDPair) (err *ErrMergeConflict) {
 }
 
 type ErrMergeConflict struct {
-	FDPair
+	Item
 }
 
 func (e *ErrMergeConflict) Is(target error) bool {
@@ -359,7 +348,7 @@ func (e *ErrMergeConflict) Is(target error) bool {
 func (e *ErrMergeConflict) Error() string {
 	return fmt.Sprintf(
 		"merge conflict for fds: Object: %q, Blob: %q",
-		&e.FDPair.Object,
-		&e.FDPair.Blob,
+		&e.Object,
+		&e.Blob,
 	)
 }
