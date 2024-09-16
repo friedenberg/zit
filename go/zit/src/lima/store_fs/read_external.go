@@ -33,7 +33,7 @@ func (s *Store) ReadExternalFromItem(
 ) (e *External, err error) {
 	e = GetExternalPool().Get()
 
-	if err = s.ReadIntoExternalFromItem(o, em, t, e); err != nil {
+	if err = s.readIntoExternalFromItem(o, em, t, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -41,7 +41,7 @@ func (s *Store) ReadExternalFromItem(
 	return
 }
 
-func (s *Store) ReadIntoExternalFromItem(
+func (s *Store) readIntoExternalFromItem(
 	o sku.CommitOptions,
 	i *Item,
 	t *sku.Transacted,
@@ -49,7 +49,7 @@ func (s *Store) ReadIntoExternalFromItem(
 ) (err error) {
 	o.Del(objekte_mode.ModeApplyProto)
 
-	if err = s.ReadOneExternalInto(&o, i, t, e); err != nil {
+	if err = s.readOneExternalInto(&o, i, t, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -13,21 +13,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func (s *Store) ReadOneExternal(
-	o *sku.CommitOptions,
-	em *Item,
-	t *sku.Transacted,
-) (e *External, err error) {
-	e = GetExternalPool().Get()
-
-	if err = s.ReadOneExternalInto(o, em, t, e); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 	e, ok := s.Get(&z.ObjectId)
 
@@ -53,7 +38,7 @@ func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 	return
 }
 
-func (s *Store) ReadOneExternalInto(
+func (s *Store) readOneExternalInto(
 	o *sku.CommitOptions,
 	i *Item,
 	t *sku.Transacted,
@@ -95,7 +80,7 @@ func (s *Store) ReadOneExternalInto(
 				return
 			}
 		} else {
-			if err = s.ReadOneExternalObject(e, t1); err != nil {
+			if err = s.readOneExternalObject(e, t1); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -135,7 +120,7 @@ func (s *Store) ReadOneExternalInto(
 	return
 }
 
-func (s *Store) ReadOneExternalObject(
+func (s *Store) readOneExternalObject(
 	e *External,
 	t *sku.Transacted,
 ) (err error) {
@@ -146,13 +131,12 @@ func (s *Store) ReadOneExternalObject(
 		)
 	}
 
-		var fds Item
+	var fds Item
 
-		if err = fds.ReadFromExternal(e); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
+	if err = fds.ReadFromExternal(e); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	var f *os.File
 

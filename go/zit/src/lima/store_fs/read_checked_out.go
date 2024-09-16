@@ -11,7 +11,7 @@ import (
 )
 
 // TODO remove Item from construction
-func (s *Store) ReadCheckedOutFromItem(
+func (s *Store) readCheckedOutFromItem(
 	o sku.CommitOptions,
 	i *Item,
 ) (co *CheckedOut, err error) {
@@ -31,7 +31,7 @@ func (s *Store) ReadCheckedOutFromItem(
 		}
 	}
 
-	if err = s.ReadIntoCheckedOutFromTransactedAndItem(
+	if err = s.readIntoCheckedOutFromTransactedAndItem(
 		&co.Internal,
 		i,
 		co,
@@ -58,7 +58,7 @@ func (s *Store) ReadCheckedOutFromTransacted(
 ) (co *CheckedOut, err error) {
 	co = GetCheckedOutPool().Get()
 
-	if err = s.ReadIntoCheckedOutFromTransacted(sk2, co); err != nil {
+	if err = s.readIntoCheckedOutFromTransacted(sk2, co); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -66,7 +66,7 @@ func (s *Store) ReadCheckedOutFromTransacted(
 	return
 }
 
-func (s *Store) ReadIntoCheckedOutFromTransacted(
+func (s *Store) readIntoCheckedOutFromTransacted(
 	sk *sku.Transacted,
 	co *CheckedOut,
 ) (err error) {
@@ -83,7 +83,7 @@ func (s *Store) ReadIntoCheckedOutFromTransacted(
 		return
 	}
 
-	if err = s.ReadIntoExternalFromItem(
+	if err = s.readIntoExternalFromItem(
 		sku.CommitOptions{
 			Mode: objekte_mode.ModeUpdateTai,
 		},
@@ -116,7 +116,7 @@ func (s *Store) ReadIntoCheckedOutFromTransacted(
 	return
 }
 
-func (s *Store) ReadIntoCheckedOutFromTransactedAndItem(
+func (s *Store) readIntoCheckedOutFromTransactedAndItem(
 	sk *sku.Transacted,
 	i *Item,
 	co *CheckedOut,
@@ -125,7 +125,7 @@ func (s *Store) ReadIntoCheckedOutFromTransactedAndItem(
 		sku.Resetter.ResetWith(&co.Internal, sk)
 	}
 
-	if err = s.ReadIntoExternalFromItem(
+	if err = s.readIntoExternalFromItem(
 		sku.CommitOptions{
 			Mode: objekte_mode.ModeUpdateTai,
 		},
