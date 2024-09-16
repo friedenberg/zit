@@ -254,33 +254,9 @@ func (d *dirItems) processRootDir() (err error) {
 	return
 }
 
-func (d *dirItems) processFDSet(
-	objectIdString string,
+func (d *dirItems) processFDsOnItem(
 	fds *Item,
-) (results []*Item, err error) {
-	var recognizedGenre genres.Genre
-
-	{
-		recognized := sku.GetTransactedPool().Get()
-		defer sku.GetTransactedPool().Put(recognized)
-
-		if err = d.externalStoreSupplies.FuncReadOneInto(
-			objectIdString,
-			recognized,
-		); err != nil {
-			if collections.IsErrNotFound(err) {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
-		} else {
-			recognizedGenre = genres.Must(recognized.GetGenre())
-		}
-	}
-
-	var blobCount, objectCount int
-
+) (blobCount, objectCount int, err error) {
 	if err = fds.Each(
 		func(f *fd.FD) (err error) {
 			ext := f.ExtSansDot()
@@ -314,6 +290,41 @@ func (d *dirItems) processFDSet(
 			return
 		},
 	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (d *dirItems) processFDSet(
+	objectIdString string,
+	fds *Item,
+) (results []*Item, err error) {
+	var recognizedGenre genres.Genre
+
+	{
+		recognized := sku.GetTransactedPool().Get()
+		defer sku.GetTransactedPool().Put(recognized)
+
+		if err = d.externalStoreSupplies.FuncReadOneInto(
+			objectIdString,
+			recognized,
+		); err != nil {
+			if collections.IsErrNotFound(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
+		} else {
+			recognizedGenre = genres.Must(recognized.GetGenre())
+		}
+	}
+
+	var blobCount, objectCount int
+
+	if blobCount, objectCount, err = d.processFDsOnItem(fds); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

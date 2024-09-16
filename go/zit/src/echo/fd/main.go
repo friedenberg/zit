@@ -124,6 +124,26 @@ func (f *FD) SetFileInfoWithDir(fi os.FileInfo, dir string) (err error) {
 	return
 }
 
+func (fd *FD) SetIgnoreNotExists(v string) (err error) {
+	v = strings.TrimSpace(v)
+
+	if v == "-" {
+		fd.path = v
+		fd.modTime = thyme.Now()
+		fd.isDir = false
+		return
+	}
+
+	if v == "." {
+		err = errors.Errorf("'.' not supported")
+		return
+	}
+
+  fd.path = filepath.Clean(v)
+
+	return
+}
+
 func (fd *FD) Set(v string) (err error) {
 	v = strings.TrimSpace(v)
 
@@ -152,32 +172,7 @@ func (fd *FD) Set(v string) (err error) {
 	}
 
 	return
-	// errors.TodoP2("move this and cache")
-	// hash := sha256.New()
-
-	// var f *os.File
-
-	// if f, err = files.Open(fd.Path); err != nil {
-	// err = errors.Wrap(err)
-	// return
-	// }
-
-	// defer errors.Deferred(&err, f.Close)
-
-	// if _, err = io.Copy(hash, f); err != nil {
-	// err = errors.Wrap(err)
-	// return
-	// }
-
-	// fd.Sha = sha.FromHash(hash)
-
-	// return
 }
-
-// TODO-P4 add formatter
-// func (ut File) String() string {
-// 	return fmt.Sprintf("[%s %s]", ut.Path, ut.Sha)
-// }
 
 func (f *FD) String() string {
 	p := filepath.Clean(f.path)
