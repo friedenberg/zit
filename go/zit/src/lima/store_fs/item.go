@@ -151,7 +151,9 @@ func (e *Item) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 }
 
 // TODO replace with fields
-func (s *Store) ReadFromExternal(i *Item, el sku.ExternalLike) (err error) {
+func (s *Store) ReadFromExternal(el sku.ExternalLike) (i *Item, err error) {
+	i = &Item{}
+	i.Reset()
 	e := el.(*External)
 	i.ResetWith(&e.item)
 	return
@@ -159,7 +161,7 @@ func (s *Store) ReadFromExternal(i *Item, el sku.ExternalLike) (err error) {
 
 // TODO replace with fields
 func (s *Store) WriteToExternal(i *Item, el sku.ExternalLike) (err error) {
-  e := el.(*External)
+	e := el.(*External)
 	k := &i.ObjectId
 
 	if err = e.ExternalObjectId.SetRaw(k.String()); err != nil {

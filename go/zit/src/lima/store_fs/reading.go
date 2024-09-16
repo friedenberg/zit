@@ -131,9 +131,9 @@ func (s *Store) readOneExternalObject(
 		)
 	}
 
-	var fds Item
+	var fds *Item
 
-	if err = s.ReadFromExternal(&fds, e); err != nil {
+	if fds, err = s.ReadFromExternal(e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -184,9 +184,9 @@ func (s *Store) ReadOneExternalBlob(
 
 		defer errors.DeferredCloser(&err, aw)
 
-		var fds Item
+		var fds *Item
 
-		if err = s.ReadFromExternal(&fds, e); err != nil {
+		if fds, err = s.ReadFromExternal(e); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

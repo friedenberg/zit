@@ -51,9 +51,9 @@ func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
 func (s *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
 	e := el.(*External)
 
-	var i Item
+	var i *Item
 
-	if err = s.ReadFromExternal(&i,e); err != nil {
+	if i, err = s.ReadFromExternal(e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

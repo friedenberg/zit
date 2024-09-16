@@ -114,14 +114,10 @@ func (s *Store) tryMergeIgnoringConflicts(
 		return
 	}
 
-	var i Item
-
-	if err = s.ReadFromExternal(&i, tm.CheckedOutLike.GetSkuExternalLike()); err != nil {
+	if original, err = s.ReadFromExternal(tm.CheckedOutLike.GetSkuExternalLike()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	original = &i
 
 	{
 		var path string
@@ -204,9 +200,9 @@ func (s *Store) handleMergeResult(
 		return
 	}
 
-	var i Item
+	var i *Item
 
-	if err = s.ReadFromExternal(&i, &cofs.External); err != nil {
+	if i, err = s.ReadFromExternal(&cofs.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

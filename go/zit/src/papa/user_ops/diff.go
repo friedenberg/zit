@@ -99,9 +99,9 @@ func (op Diff) Run(
 	internalInline := op.GetConfig().IsInlineType(il.GetType())
 	externalInline := op.GetConfig().IsInlineType(el.GetType())
 
-	var fds store_fs.Item
+	var fds *store_fs.Item
 
-	if err = op.GetStore().GetCwdFiles().ReadFromExternal(&fds, el); err != nil {
+	if fds, err = op.GetStore().GetCwdFiles().ReadFromExternal(el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

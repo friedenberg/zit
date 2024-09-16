@@ -115,9 +115,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	var replacement *CheckedOut
 	var oldFDs, newFDs *Item
 
-	oldFDs = &Item{}
-
-	if err = s.ReadFromExternal(oldFDs, col.GetSkuExternalLike()); err != nil {
+	if oldFDs, err = s.ReadFromExternal(col.GetSkuExternalLike()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -159,10 +157,7 @@ func (s *Store) checkoutOne(
 	options checkout_options.Options,
 	cz *CheckedOut,
 ) (i *Item, err error) {
-	i = &Item{}
-	i.Reset()
-
-	if err = s.ReadFromExternal(i, &cz.External); err != nil {
+	if i, err = s.ReadFromExternal(&cz.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

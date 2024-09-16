@@ -28,10 +28,9 @@ func (c EachBlob) Run(
 
 	if err = zsc.Each(
 		func(col sku.CheckedOutLike) (err error) {
-      var fds store_fs.Item
+      var fds *store_fs.Item
 
-      if err = c.GetStore().GetCwdFiles().ReadFromExternal(
-        &fds,
+      if fds, err = c.GetStore().GetCwdFiles().ReadFromExternal(
         col.GetSkuExternalLike(),
       ); err != nil {
         err = errors.Wrap(err)

@@ -77,9 +77,9 @@ func (f *CliExternal) WriteStringFormat(
 
 	o := co
 
-	var fds Item
+	var fds *Item
 
-	if err = f.store.ReadFromExternal(&fds, o); err != nil {
+	if fds, err = f.store.ReadFromExternal(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -126,7 +126,7 @@ func (f *CliExternal) WriteStringFormat(
 
 	if m == checkout_mode.BlobRecognized ||
 		(m != checkout_mode.MetadataOnly && m != checkout_mode.None) {
-		n2, err = f.writeStringFormatBlobFDsExcept(sw, &fds, firstFD)
+		n2, err = f.writeStringFormatBlobFDsExcept(sw, fds, firstFD)
 		n += n2
 
 		if err != nil {
@@ -241,9 +241,9 @@ func (f *CliExternal) writeStringFormatUntracked(
 
 	o := co
 
-	var fds Item
+	var fds *Item
 
-	if err = f.store.ReadFromExternal(&fds, o); err != nil {
+	if fds, err = f.store.ReadFromExternal(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -276,7 +276,7 @@ func (f *CliExternal) writeStringFormatUntracked(
 		return
 	}
 
-	n2, err = f.writeStringFormatBlobFDsExcept(sw, &fds, fdToPrint)
+	n2, err = f.writeStringFormatBlobFDsExcept(sw, fds, fdToPrint)
 	n += n2
 
 	if err != nil {
