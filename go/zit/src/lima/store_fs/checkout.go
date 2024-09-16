@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -74,7 +75,7 @@ func (s *Store) checkoutOneNew(
 			ui.Log().Print("")
 
 			if options.Path == checkout_options.PathDefault {
-				if err = cz.Remove(s.fs_home); err != nil {
+				if err = s.Remove(cz); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -338,4 +339,37 @@ func (s *Store) FileExtensionForGattung(
 	gg interfaces.GenreGetter,
 ) string {
 	return s.fileExtensions.GetFileExtensionForGattung(gg)
+}
+
+func (s *Store) Remove(e *CheckedOut) (err error) {
+	var i *Item
+
+	if i, err = s.ReadFromExternal(&e.External); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	// TODO check conflict state
+	if err = i.MutableSetLike.Each(
+		func(f *fd.FD) (err error) {
+			if err = f.Remove(s.fs_home); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	i.Reset()
+
+	if err = s.WriteToExternal(i, &e.External); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }

@@ -4,11 +4,9 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -62,27 +60,6 @@ func (c *CheckedOut) SetError(err error) {
 
 func (a *CheckedOut) String() string {
 	return fmt.Sprintf("%s %s", &a.Internal, &a.External)
-}
-
-func (e *CheckedOut) Remove(s interfaces.Directory) (err error) {
-	// TODO check conflict state
-	if err = e.External.item.MutableSetLike.Each(
-		func(f *fd.FD) (err error) {
-			if err = f.Remove(s); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	e.External.item.Reset()
-
-	return
 }
 
 func (s *Store) ToSliceFilesZettelen(

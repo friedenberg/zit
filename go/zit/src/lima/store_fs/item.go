@@ -99,6 +99,8 @@ func (dst *Item) ResetWith(src *Item) {
 		dst.MutableSetLike = collections_value.MakeMutableValueSet[*fd.FD](nil)
 	}
 
+  dst.MutableSetLike.Reset()
+
 	if src.MutableSetLike != nil {
 		src.MutableSetLike.Each(dst.MutableSetLike.Add)
 	}
