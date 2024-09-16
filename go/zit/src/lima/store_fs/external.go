@@ -34,7 +34,7 @@ func (c *External) GetSku() *sku.Transacted {
 }
 
 func (a *External) ResetWith(b *External) {
-	a.item.ResetWith(b.GetFDs())
+	a.item.ResetWith(&b.item)
 	sku.Resetter.ResetWith(a, b)
 }
 
@@ -54,20 +54,7 @@ func (a *External) SetBlobSha(v interfaces.Sha) (err error) {
 		return
 	}
 
-	if err = a.item.Blob.SetShaLike(v); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	return
-}
-
-func (a *External) GetFDs() *Item {
-	return &a.item
-}
-
-func (a *External) GetBlobFD() *fd.FD {
-	return &a.item.Blob
 }
 
 func (a *External) SetBlobFD(v *fd.FD) {

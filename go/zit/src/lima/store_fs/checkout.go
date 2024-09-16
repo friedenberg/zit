@@ -22,13 +22,14 @@ func (s *Store) CheckoutOne(
 	options checkout_options.Options,
 	sz *sku.Transacted,
 ) (col sku.CheckedOutLike, err error) {
-	return s.checkoutOneNew(options, sz)
+	col, _, err = s.checkoutOneNew(options, sz)
+	return
 }
 
 func (s *Store) checkoutOneNew(
 	options checkout_options.Options,
 	sz *sku.Transacted,
-) (cz *CheckedOut, err error) {
+) (cz *CheckedOut, fds *Item, err error) {
 	cz = GetCheckedOutPool().Get()
 	cz.External.item.Reset()
 
@@ -80,13 +81,11 @@ func (s *Store) checkoutOneNew(
 			}
 			ui.Log().Print("")
 		}
-
-		ui.Log().Print("EQUAL", cz.External.item.MutableSetLike, cze.item.MutableSetLike)
 	}
 
 	ui.Log().Print("")
 
-	if _, err = s.checkoutOne(
+	if fds, err = s.checkoutOne(
 		options,
 		cz,
 	); err != nil {
@@ -114,8 +113,16 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	options.Path = checkout_options.PathTempLocal
 
 	var replacement *CheckedOut
+	var oldFDs, newFDs *Item
 
-	if replacement, err = s.checkoutOneNew(
+	oldFDs = &Item{}
+
+	if err = oldFDs.ReadFromExternal(col.GetSkuExternalLike()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if replacement, newFDs, err = s.checkoutOneNew(
 		options,
 		cofs.GetSkuExternalLike().GetSku(),
 	); err != nil {
@@ -124,9 +131,6 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	}
 
 	defer GetCheckedOutPool().Put(replacement)
-
-	newFDs := replacement.External.item
-	oldFDs := cofs.External.item
 
 	if !oldFDs.Object.IsEmpty() {
 		if err = os.Rename(
