@@ -152,14 +152,13 @@ func (s *Store) checkoutOne(
 	options checkout_options.Options,
 	cz *CheckedOut,
 ) (i *Item, err error) {
-	// i = &Item{}
-	// i.Reset()
+	i = &Item{}
+	i.Reset()
 
-	// if err = i.ReadFromExternal(&cz.External); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
-	i = &cz.External.item
+	if err = i.ReadFromExternal(&cz.External); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if s.config.IsDryRun() {
 		return
