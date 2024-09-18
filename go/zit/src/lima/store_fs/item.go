@@ -174,7 +174,6 @@ func (e *Item) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 	return
 }
 
-// TODO replace with fields
 func (s *Store) ReadFromExternal(el sku.ExternalLike) (i *Item, err error) {
 	i = &Item{} // TODO use pool or use dir_items?
 	i.Reset()
@@ -218,24 +217,10 @@ func (s *Store) ReadFromExternal(el sku.ExternalLike) (i *Item, err error) {
 
 	i.State = e.State
 	i.ObjectId.ResetWith(&e.ExternalObjectId)
-	// i.ObjectId.ResetWith(&e.ExternalObjectId)
-
-	if ok, why := i.Equals(&e.item); !ok {
-		err = errors.BadRequestf(
-			"expected:\n%s\nactual:\n%s\nwhy: %q\nfields: %#v",
-			e.item.Debug(),
-			i.Debug(),
-			why,
-			e.Transacted.Fields,
-		)
-
-		return
-	}
 
 	return
 }
 
-// TODO replace with fields
 func (s *Store) WriteToExternal(i *Item, el sku.ExternalLike) (err error) {
 	e := el.(*External)
 	e.Transacted.Fields = e.Transacted.Fields[:0]
@@ -246,18 +231,6 @@ func (s *Store) WriteToExternal(i *Item, el sku.ExternalLike) (err error) {
 	if e.ExternalObjectId.String() != k.String() {
 		err = errors.Errorf("expected %q but got %q", k, &e.ExternalObjectId)
 	}
-
-	// if k.String() != "" {
-	// 	if k.GetGenre() != genres.Blob {
-	// 		if err = e.Transacted.ObjectId.Set(k.String()); err != nil {
-	// 			err = nil
-	// 			// err = errors.Wrap(err)
-	// 			// return
-	// 		}
-	// 	}
-	// }
-	// e.Transacted.ObjectId.SetGenre(k.GetGenre())
-	e.item.ResetWith(i) // TODO remove
 
 	m := &e.Transacted.Metadata
 	m.Tai = i.GetTai()
