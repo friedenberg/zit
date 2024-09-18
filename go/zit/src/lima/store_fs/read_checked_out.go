@@ -134,7 +134,9 @@ func (s *Store) readIntoCheckedOutFromTransactedAndItem(
 		&co.External,
 	); err != nil {
 		if errors.IsNotExist(err) {
-			err = iter.MakeErrStopIteration()
+			err = errors.Wrapf(err, "Item: %s", i.Debug())
+			return
+			// err = iter.MakeErrStopIteration()
 		} else if errors.Is(err, ErrExternalHasConflictMarker) {
 			co.State = checked_out_state.Conflicted
 

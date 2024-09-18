@@ -68,7 +68,7 @@ func (s *Store) readOneExternalInto(
 
 	switch m {
 	case checkout_mode.BlobOnly:
-		if err = s.ReadOneExternalBlob(e, t1); err != nil {
+		if err = s.ReadOneExternalBlob(e, t1, i); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -80,7 +80,7 @@ func (s *Store) readOneExternalInto(
 				return
 			}
 		} else {
-			if err = s.readOneExternalObject(e, t1); err != nil {
+			if err = s.readOneExternalObject(e, t1, i); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -128,6 +128,7 @@ func (s *Store) readOneExternalInto(
 func (s *Store) readOneExternalObject(
 	e *External,
 	t *sku.Transacted,
+  i *Item,
 ) (err error) {
 	if t != nil {
 		object_metadata.Resetter.ResetWith(
@@ -136,17 +137,10 @@ func (s *Store) readOneExternalObject(
 		)
 	}
 
-	var fds *Item
-
-	if fds, err = s.ReadFromExternal(e); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	var f *os.File
 
-	if f, err = files.Open(fds.Object.GetPath()); err != nil {
-		err = errors.Wrap(err)
+	if f, err = files.Open(i.Object.GetPath()); err != nil {
+		err = errors.Wrapf(err, "Item: %s", i.Debug())
 		return
 	}
 
@@ -175,6 +169,7 @@ func (s *Store) ReadOneExternalObjectReader(
 func (s *Store) ReadOneExternalBlob(
 	e *External,
 	t *sku.Transacted,
+  i *Item,
 ) (err error) {
 	object_metadata.Resetter.ResetWith(&e.Transacted.Metadata, t.GetMetadata())
 
@@ -189,17 +184,10 @@ func (s *Store) ReadOneExternalBlob(
 
 		defer errors.DeferredCloser(&err, aw)
 
-		var fds *Item
-
-		if fds, err = s.ReadFromExternal(e); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
 		var f *os.File
 
 		if f, err = files.OpenExclusiveReadOnly(
-			fds.Blob.GetPath(),
+			i.Blob.GetPath(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

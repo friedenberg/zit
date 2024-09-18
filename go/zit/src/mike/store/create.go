@@ -195,7 +195,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	}
 
 	if err = s.UpdateCheckoutFromCheckedOut(
-		checkout_options.Options{Force: true, CheckoutMode: mode},
+		checkout_options.OptionsWithoutMode{Force: true},
     col,
 	); err != nil {
 		err = errors.Wrap(err)

@@ -151,11 +151,13 @@ func (s *Store) checkoutOneForMerge(
 	sz *sku.Transacted,
 ) (cz *CheckedOut, i *Item, err error) {
 	options := checkout_options.Options{
-		CheckoutMode:    mode,
-		AllowConflicted: true,
-		Path:            checkout_options.PathTempLocal,
-		ForceInlineBlob: true,
-		Force:           true,
+		CheckoutMode: mode,
+		OptionsWithoutMode: checkout_options.OptionsWithoutMode{
+			AllowConflicted: true,
+			Path:            checkout_options.PathTempLocal,
+			ForceInlineBlob: true,
+			Force:           true,
+		},
 	}
 
 	cz = GetCheckedOutPool().Get()
@@ -169,7 +171,7 @@ func (s *Store) checkoutOneForMerge(
 	if err = s.checkoutOne(
 		options,
 		cz,
-    i,
+		i,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

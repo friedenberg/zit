@@ -116,7 +116,7 @@ func (s *Store) CheckoutOne(
 }
 
 func (s *Store) UpdateCheckoutFromCheckedOut(
-	options checkout_options.Options,
+	options checkout_options.OptionsWithoutMode,
 	col sku.CheckedOutLike,
 ) (err error) {
 	switch col.GetSkuExternalLike().GetRepoId().GetRepoIdString() {

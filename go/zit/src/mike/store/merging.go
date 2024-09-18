@@ -32,7 +32,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 	parentEqualsExternal := right.Metadata.EqualsSansTai(&col.GetSku().Metadata)
 
 	if parentEqualsExternal {
-		op := checkout_options.Options{
+		op := checkout_options.OptionsWithoutMode{
 			Force: true,
 		}
 

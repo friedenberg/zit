@@ -38,8 +38,10 @@ func (op Diff) Run(
 	if !ok {
 		if col, err = op.GetStore().GetCwdFiles().CheckoutOne(
 			checkout_options.Options{
-				Path:         checkout_options.PathTempLocal,
 				CheckoutMode: checkout_mode.MetadataAndBlob,
+				OptionsWithoutMode: checkout_options.OptionsWithoutMode{
+					Path: checkout_options.PathTempLocal,
+				},
 			},
 			col.GetSku(),
 		); err != nil {

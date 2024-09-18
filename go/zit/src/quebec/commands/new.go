@@ -123,8 +123,10 @@ func (c *New) Run(u *env.Env, args ...string) (err error) {
 		opCheckout := user_ops.Checkout{
 			Env: u,
 			Options: checkout_options.Options{
-				CheckoutMode:         checkout_mode.MetadataAndBlob,
-				TextFormatterOptions: cotfo,
+				CheckoutMode: checkout_mode.MetadataAndBlob,
+				OptionsWithoutMode: checkout_options.OptionsWithoutMode{
+					TextFormatterOptions: cotfo,
+				},
 			},
 			Edit: true,
 		}

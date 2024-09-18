@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
@@ -111,14 +112,18 @@ func (s *Store) checkoutOneNew(
 }
 
 func (s *Store) UpdateCheckoutFromCheckedOut(
-	options checkout_options.Options,
+	options checkout_options.OptionsWithoutMode,
 	col sku.CheckedOutLike,
 ) (err error) {
 	cofs := col.(*CheckedOut)
 
-	if options.CheckoutMode, err = s.GetCheckoutModeOrError(
+	o := checkout_options.Options{
+		OptionsWithoutMode: options,
+	}
+
+	if o.CheckoutMode, err = s.GetCheckoutModeOrError(
 		col.GetSkuExternalLike(),
-		options.CheckoutMode,
+		checkout_mode.None,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -135,7 +140,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	}
 
 	if replacement, newFDs, err = s.checkoutOneNew(
-		options,
+		o,
 		cofs.GetSkuExternalLike(),
 	); err != nil {
 		err = errors.Wrap(err)
