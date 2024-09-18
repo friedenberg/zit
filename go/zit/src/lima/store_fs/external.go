@@ -2,12 +2,14 @@ package store_fs
 
 import (
 	"fmt"
+	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
+	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -15,7 +17,6 @@ import (
 // TODO migrate to *sku.External
 type External struct {
 	sku.External
-	item Item // TODO remove and keep separately
 }
 
 func (t *External) GetSkuExternalLike() sku.ExternalLike {
@@ -25,7 +26,6 @@ func (t *External) GetSkuExternalLike() sku.ExternalLike {
 func (a *External) Clone() sku.ExternalLike {
 	b := GetExternalPool().Get()
 	sku.ExternalResetter.ResetWith(&b.External, &a.External)
-	b.item.ResetWith(&a.item)
 	return b
 }
 
@@ -34,7 +34,6 @@ func (c *External) GetSku() *sku.Transacted {
 }
 
 func (a *External) ResetWith(b *External) {
-	a.item.ResetWith(&b.item)
 	sku.Resetter.ResetWith(a, b)
 }
 
@@ -57,13 +56,25 @@ func (a *External) SetBlobSha(v interfaces.Sha) (err error) {
 	return
 }
 
-func (a *External) SetBlobFD(v *fd.FD) {
-	a.item.Blob.ResetWith(v)
-	a.Transacted.Metadata.Blob.SetShaLike(v.GetShaLike())
+func (e *External) SetBlobFD(v *fd.FD) {
+	field := sku.Field{
+		Key:       "blob",
+		Value:     v.GetPath(),
+		ColorType: string_format_writer.ColorTypeId,
+	}
+
+	e.Transacted.Fields = append(e.Transacted.Fields, field)
+	e.Transacted.Metadata.Blob.SetShaLike(v.GetShaLike())
 }
 
-func (a *External) GetBlobPath() string {
-	return a.item.Blob.GetPath()
+func (e *External) GetBlobPath() string {
+	for _, f := range e.Transacted.Fields {
+		if strings.ToLower(f.Key) == "blob" {
+			return f.Value
+		}
+	}
+
+	return "."
 }
 
 func (o *External) GetKey() string {

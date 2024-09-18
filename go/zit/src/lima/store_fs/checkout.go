@@ -34,7 +34,6 @@ func (s *Store) checkoutOneNew(
 	sz := tg.GetSku()
 
 	cz = GetCheckedOutPool().Get()
-	cz.External.item.Reset()
 
 	sku.Resetter.ResetWith(&cz.Internal, sz)
 
