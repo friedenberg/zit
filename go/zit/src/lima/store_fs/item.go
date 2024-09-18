@@ -2,13 +2,14 @@ package store_fs
 
 import (
 	"fmt"
+	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
-	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
@@ -119,16 +120,24 @@ func (dst *Item) ResetWith(src *Item) {
 	}
 }
 
-func (a *Item) Equals(b *Item) bool {
-	if !a.Object.Equals(&b.Object) {
-		return false
+func (a *Item) Equals(b *Item) (ok bool, why string) {
+	if ok, why = a.Object.Equals2(&b.Object); !ok {
+		return false, fmt.Sprintf("Object.%s", why)
 	}
 
-	if !a.Blob.Equals(&b.Blob) {
-		return false
+	if ok, why = a.Blob.Equals2(&b.Blob); !ok {
+		return false, fmt.Sprintf("Blob.%s", why)
 	}
 
-	return true
+	if ok, why = a.Conflict.Equals2(&b.Conflict); !ok {
+		return false, fmt.Sprintf("Conflict.%s", why)
+	}
+
+	if !iter.SetEquals(a.MutableSetLike, b.MutableSetLike) {
+		return false, "set"
+	}
+
+	return
 }
 
 func (e *Item) GenerateConflictFD() (err error) {
@@ -167,68 +176,115 @@ func (e *Item) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 
 // TODO replace with fields
 func (s *Store) ReadFromExternal(el sku.ExternalLike) (i *Item, err error) {
-	i = &Item{}
+	i = &Item{} // TODO use pool or use dir_items?
 	i.Reset()
+
 	e := el.(*External)
-	i.ResetWith(&e.item)
+
+	// TODO handle sort order
+	for _, f := range e.Transacted.Fields {
+		var fdee *fd.FD
+		switch strings.ToLower(f.Key) {
+		case "object":
+			fdee = &i.Object
+
+		case "blob":
+			fdee = &i.Blob
+
+		case "conflict":
+			fdee = &i.Conflict
+
+		default:
+			err = errors.Errorf("unexpected field: %#v", f)
+			return
+		}
+
+		// if we've already set one of object, blob, or conflict, don't set it again
+		// and instead add a new FD to the item
+		if !fdee.IsEmpty() {
+			fdee = &fd.FD{}
+		}
+
+		if err = fdee.SetIgnoreNotExists(f.Value); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = i.Add(fdee); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	i.State = e.State
+	i.ObjectId.ResetWith(&e.ExternalObjectId)
+	// i.ObjectId.ResetWith(&e.ExternalObjectId)
+
+	if ok, why := i.Equals(&e.item); !ok {
+		err = errors.BadRequestf(
+			"expected:\n%s\nactual:\n%s\nwhy: %q\nfields: %#v",
+			e.item.Debug(),
+			i.Debug(),
+			why,
+			e.Transacted.Fields,
+		)
+
+		return
+	}
+
 	return
 }
 
 // TODO replace with fields
 func (s *Store) WriteToExternal(i *Item, el sku.ExternalLike) (err error) {
 	e := el.(*External)
+	e.Transacted.Fields = e.Transacted.Fields[:0]
 	k := &i.ObjectId
 
-	if err = e.ExternalObjectId.SetRaw(k.String()); err != nil {
-		err = errors.Wrap(err)
-		return
+	e.ExternalObjectId.ResetWith(k)
+
+	if e.ExternalObjectId.String() != k.String() {
+		err = errors.Errorf("expected %q but got %q", k, &e.ExternalObjectId)
 	}
 
-	if k.String() != "" {
-		if k.GetGenre() != genres.Blob {
-			if err = e.Transacted.ObjectId.Set(k.String()); err != nil {
-				err = nil
-				// err = errors.Wrap(err)
-				// return
-			}
-		}
-	}
+	// if k.String() != "" {
+	// 	if k.GetGenre() != genres.Blob {
+	// 		if err = e.Transacted.ObjectId.Set(k.String()); err != nil {
+	// 			err = nil
+	// 			// err = errors.Wrap(err)
+	// 			// return
+	// 		}
+	// 	}
+	// }
 	// e.Transacted.ObjectId.SetGenre(k.GetGenre())
 	e.item.ResetWith(i) // TODO remove
 
 	m := &e.Transacted.Metadata
 	m.Tai = i.GetTai()
 
-	if i.MutableSetLike != nil {
-		if err = i.MutableSetLike.Each(
-			func(f *fd.FD) (err error) {
-				field := sku.Field{
-					Value:     f.GetPath(),
-					ColorType: string_format_writer.ColorTypeId,
-				}
+	fdees := iter.SortedValues(i.MutableSetLike)
 
-				switch {
-				case f == &i.Object:
-					field.Key = "object"
-
-				case f == &i.Conflict:
-					field.Key = "conflict"
-
-				case f == &i.Blob:
-					fallthrough
-
-				default:
-					field.Key = "blob"
-				}
-
-				e.Transacted.Fields = append(e.Transacted.Fields, field)
-
-				return
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
+	for _, f := range fdees {
+		field := sku.Field{
+			Value:     f.GetPath(),
+			ColorType: string_format_writer.ColorTypeId,
 		}
+
+		switch {
+		case i.Object.Equals(f):
+			field.Key = "object"
+
+		case i.Conflict.Equals(f):
+			field.Key = "conflict"
+
+		case i.Blob.Equals(f):
+			fallthrough
+
+		default:
+			field.Key = "blob"
+		}
+
+		e.Transacted.Fields = append(e.Transacted.Fields, field)
 	}
 
 	return

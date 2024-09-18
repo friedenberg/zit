@@ -21,7 +21,7 @@ import (
 
 func (s *Store) CheckoutOne(
 	options checkout_options.Options,
-	sz *sku.Transacted,
+	sz sku.TransactedGetter,
 ) (col sku.CheckedOutLike, err error) {
 	col, _, err = s.checkoutOneNew(options, sz)
 	return
@@ -29,23 +29,24 @@ func (s *Store) CheckoutOne(
 
 func (s *Store) checkoutOneNew(
 	options checkout_options.Options,
-	sz *sku.Transacted,
-) (cz *CheckedOut, fds *Item, err error) {
+	tg sku.TransactedGetter,
+) (cz *CheckedOut, i *Item, err error) {
+	sz := tg.GetSku()
+
 	cz = GetCheckedOutPool().Get()
 	cz.External.item.Reset()
 
 	sku.Resetter.ResetWith(&cz.Internal, sz)
 
 	if s.config.IsDryRun() {
+		i = &Item{}
 		return
 	}
 
-	var i *Item
 	ok := false
 
 	ui.TodoP4("cleanup")
 	if i, ok = s.Get(&sz.ObjectId); ok {
-		ui.Log().Print("E", i.MutableSetLike)
 		var cze *External
 
 		if cze, err = s.ReadExternalFromItem(
@@ -69,27 +70,40 @@ func (s *Store) checkoutOneNew(
 			sku.DetermineState(cz, true)
 
 			if !s.shouldCheckOut(options, cz, true) {
-				ui.Log().Print("")
+				if err = s.WriteToExternal(i, &cz.External); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
 				return
 			}
-			ui.Log().Print("")
 
 			if options.Path == checkout_options.PathDefault {
-				if err = s.Remove(cz); err != nil {
+				if err = s.RemoveItem(i); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 			}
-			ui.Log().Print("")
 		}
 	}
 
-	ui.Log().Print("")
+	if i == nil {
+		if i, err = s.ReadFromExternal(&cz.External); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 
-	if fds, err = s.checkoutOne(
+	if err = s.checkoutOne(
 		options,
 		cz,
+		i,
 	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.WriteToExternal(i, &cz.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -98,7 +112,7 @@ func (s *Store) checkoutOneNew(
 }
 
 func (s *Store) UpdateCheckoutFromCheckedOut(
-	options checkout_options.Options, // TODO CheckoutMode is currently ignored
+	options checkout_options.Options,
 	col sku.CheckedOutLike,
 ) (err error) {
 	cofs := col.(*CheckedOut)
@@ -123,7 +137,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 
 	if replacement, newFDs, err = s.checkoutOneNew(
 		options,
-		cofs.GetSkuExternalLike().GetSku(),
+		cofs.GetSkuExternalLike(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -131,7 +145,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 
 	defer GetCheckedOutPool().Put(replacement)
 
-	if !oldFDs.Object.IsEmpty() {
+	if !oldFDs.Object.IsEmpty() && !s.config.IsDryRun() {
 		if err = os.Rename(
 			newFDs.Object.GetPath(),
 			oldFDs.Object.GetPath(),
@@ -141,7 +155,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 		}
 	}
 
-	if !oldFDs.Blob.IsEmpty() {
+	if !oldFDs.Blob.IsEmpty() && !s.config.IsDryRun() {
 		if err = os.Rename(
 			newFDs.Blob.GetPath(),
 			oldFDs.Blob.GetPath(),
@@ -157,12 +171,8 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 func (s *Store) checkoutOne(
 	options checkout_options.Options,
 	cz *CheckedOut,
-) (i *Item, err error) {
-	if i, err = s.ReadFromExternal(&cz.External); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
+	i *Item,
+) (err error) {
 	if s.config.IsDryRun() {
 		return
 	}
@@ -224,11 +234,6 @@ func (s *Store) checkoutOne(
 		&cz.External,
 		i,
 	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.WriteToExternal(i, &cz.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -341,14 +346,7 @@ func (s *Store) FileExtensionForGattung(
 	return s.fileExtensions.GetFileExtensionForGattung(gg)
 }
 
-func (s *Store) Remove(e *CheckedOut) (err error) {
-	var i *Item
-
-	if i, err = s.ReadFromExternal(&e.External); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
+func (s *Store) RemoveItem(i *Item) (err error) {
 	// TODO check conflict state
 	if err = i.MutableSetLike.Each(
 		func(f *fd.FD) (err error) {
@@ -365,11 +363,6 @@ func (s *Store) Remove(e *CheckedOut) (err error) {
 	}
 
 	i.Reset()
-
-	if err = s.WriteToExternal(i, &e.External); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	return
 }

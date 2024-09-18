@@ -27,7 +27,7 @@ func (e errUnsupportedGenre) Is(target error) (ok bool) {
 }
 
 func (e errUnsupportedGenre) Error() string {
-	return fmt.Sprintf("unsupported gattung: %q", e.Genre)
+	return fmt.Sprintf("unsupported genre: %q", e.Genre)
 }
 
 func MakeErrUnrecognizedGenre(v string) errUnrecognizedGenre {
@@ -46,7 +46,7 @@ func (e errUnrecognizedGenre) Is(target error) (ok bool) {
 }
 
 func (e errUnrecognizedGenre) Error() string {
-	return fmt.Sprintf("unknown gattung: %q", string(e))
+	return fmt.Sprintf("unknown genre: %q", string(e))
 }
 
 type ErrWrongType struct {

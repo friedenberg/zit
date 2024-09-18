@@ -39,18 +39,25 @@ func (c CreateFromPaths) Run(
 
 	for _, arg := range args {
 		var z *store_fs.External
-		var t store_fs.Item
+		var i store_fs.Item
 
-		t.ObjectId.SetGenre(genres.Zettel)
+    i.Reset()
 
-		if err = t.Object.Set(arg); err != nil {
+		i.ObjectId.SetGenre(genres.Zettel)
+
+		if err = i.Object.Set(arg); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = i.Add(&i.Object); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		if z, err = c.GetStore().GetCwdFiles().ReadExternalFromItem(
 			o,
-			&t,
+			&i,
 			nil,
 		); err != nil {
 			err = errors.Errorf(

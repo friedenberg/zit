@@ -45,11 +45,7 @@ func ToLuaTable(tg sku.TransactedGetter, l *lua.LState, t *LuaTable) {
 func FromLuaTable(o *sku.Transacted, l *lua.LState, lt *LuaTable) (err error) {
 	t := lt.Transacted
 
-	var g genres.Genre
-	if err = g.Set(l.GetField(t, "Gattung").String()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+  g := genres.MakeOrUnknown(l.GetField(t, "Gattung").String())
 
 	o.ObjectId.SetGenre(g)
 	k := l.GetField(t, "Kennung").String()

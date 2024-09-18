@@ -28,12 +28,12 @@ func (s *Store) ReadExternalLikeFromObjectId(
 
 func (s *Store) ReadExternalFromItem(
 	o sku.CommitOptions,
-	em *Item,
+	i *Item,
 	t *sku.Transacted,
 ) (e *External, err error) {
 	e = GetExternalPool().Get()
 
-	if err = s.readIntoExternalFromItem(o, em, t, e); err != nil {
+	if err = s.readIntoExternalFromItem(o, i, t, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

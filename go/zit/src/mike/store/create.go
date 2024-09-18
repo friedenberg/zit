@@ -159,10 +159,10 @@ func (s *Store) RevertTo(
 }
 
 func (s *Store) CreateOrUpdateCheckedOut(
-	co sku.CheckedOutLike,
+	col sku.CheckedOutLike,
 	updateCheckout bool,
 ) (err error) {
-	el := co.GetSkuExternalLike()
+	el := col.GetSkuExternalLike()
 	e := el.GetSku()
 	objectIdPtr := e.GetObjectId()
 
@@ -194,10 +194,9 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	if _, err = s.CheckoutOne(
-		co.GetSkuExternalLike().GetRepoId(),
+	if err = s.UpdateCheckoutFromCheckedOut(
 		checkout_options.Options{Force: true, CheckoutMode: mode},
-		el.GetSku(),
+    col,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -127,7 +127,7 @@ func (es *Store) ReadExternalLikeFromObjectId(
 
 func (es *Store) CheckoutOne(
 	options checkout_options.Options,
-	sz *sku.Transacted,
+	sz sku.TransactedGetter,
 ) (cz sku.CheckedOutLike, err error) {
 	escoo, ok := es.StoreLike.(CheckoutOne)
 

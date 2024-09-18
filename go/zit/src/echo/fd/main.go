@@ -35,6 +35,22 @@ func (a *FD) EqualsAny(b any) bool {
 	return values.Equals(a, b)
 }
 
+func (a *FD) Equals2(b *FD) (bool, string) {
+	if a.path != b.path {
+		return false, "path"
+	}
+
+	// if !a.modTime.Equals(b.modTime) {
+	// 	return false, "modTime"
+	// }
+
+	// if !a.sha.Equals(&b.sha) {
+	// 	return false, "sha"
+	// }
+
+	return true, ""
+}
+
 func (a *FD) Equals(b *FD) bool {
 	if a.path != b.path {
 		return false

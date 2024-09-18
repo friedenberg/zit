@@ -117,6 +117,11 @@ func (s *Store) readOneExternalInto(
 		o.Clock = i
 	}
 
+	if err = s.WriteToExternal(i, e); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 

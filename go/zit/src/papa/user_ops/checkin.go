@@ -35,7 +35,7 @@ func (op Checkin) Run(
 			func(col sku.CheckedOutLike) (err error) {
 				if err = u.GetStore().CreateOrUpdateCheckedOut(
 					col,
-					true,
+					!op.Delete,
 				); err != nil {
 					err = errors.Wrap(err)
 					return

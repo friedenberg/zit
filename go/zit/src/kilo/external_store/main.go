@@ -31,7 +31,7 @@ type (
 	CheckoutOne interface {
 		CheckoutOne(
 			options checkout_options.Options,
-			sz *sku.Transacted,
+			sz sku.TransactedGetter,
 		) (cz sku.CheckedOutLike, err error)
 	}
 

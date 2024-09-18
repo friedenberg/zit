@@ -161,10 +161,21 @@ func (s *Store) checkoutOneForMerge(
 	cz = GetCheckedOutPool().Get()
 	sku.Resetter.ResetWith(&cz.Internal, sz)
 
-	if i, err = s.checkoutOne(
+	if i, err = s.ReadFromExternal(&cz.External); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.checkoutOne(
 		options,
 		cz,
+    i,
 	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.WriteToExternal(i, &cz.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

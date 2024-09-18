@@ -13,7 +13,11 @@ func SetEquals[T any](
 	}
 
 	if a == nil {
-		return false
+		return b.Len() == 0
+	}
+
+	if b == nil {
+		return a.Len() == 0
 	}
 
 	if a.Len() != b.Len() {

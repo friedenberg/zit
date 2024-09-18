@@ -141,8 +141,10 @@ func (c *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 
 func (c *Store) CheckoutOne(
 	options checkout_options.Options,
-	sz *sku.Transacted,
+	tg sku.TransactedGetter,
 ) (cz sku.CheckedOutLike, err error) {
+  sz := tg.GetSku()
+
 	if !sz.Metadata.Type.Equals(c.typ) {
 		err = errors.Wrap(external_store.ErrUnsupportedTyp(sz.Metadata.Type))
 		return
