@@ -38,7 +38,7 @@ type Assignment struct {
 }
 
 func (a *Assignment) AddObject(v *obj) (err error) {
-	k := key(v.ExternalLike)
+	k := key(v.External)
 	_, ok := a.objects[k]
 
 	if ok {
@@ -85,7 +85,7 @@ func (a Assignment) AlignmentSpacing() int {
 func (a Assignment) MaxLen() (m int) {
 	a.Objects.Each(
 		func(z *obj) (err error) {
-			oM := z.ExternalLike.GetSku().ObjectId.Len()
+			oM := z.External.GetSku().ObjectId.Len()
 
 			if oM > m {
 				m = oM
@@ -111,11 +111,11 @@ func (a Assignment) MaxHeadAndTail(
 ) (kopf, schwanz int) {
 	a.Objects.Each(
 		func(z *obj) (err error) {
-			oKopf, oSchwanz := z.ExternalLike.GetSku().ObjectId.LenHeadAndTail()
+			oKopf, oSchwanz := z.External.GetSku().ObjectId.LenHeadAndTail()
 
 			if o.PrintOptions.Abbreviations.Hinweisen {
 				if oKopf, oSchwanz, err = o.Abbr.LenKopfUndSchwanz(
-					&z.ExternalLike.GetSku().ObjectId,
+					&z.External.GetSku().ObjectId,
 				); err != nil {
 					err = errors.Wrap(err)
 					return

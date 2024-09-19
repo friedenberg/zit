@@ -71,9 +71,9 @@ func (av writer) writeNormal(a *Assignment) (err error) {
 		}
 
 		// sku.TransactedResetter.ResetWith(cursor, z.ExternalLike.GetSku())
-		z.ExternalLike.GetSku().Metadata.Subtract(&av.Metadata)
+		z.External.GetSku().Metadata.Subtract(&av.Metadata)
 
-		if _, err = av.options.stringFormatWriter.WriteStringFormat(&sb, z.ExternalLike); err != nil {
+		if _, err = av.options.stringFormatWriter.WriteStringFormat(&sb, z.External); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -141,7 +141,7 @@ func (av writer) writeRightAligned(a *Assignment) (err error) {
 			sb.WriteString("% ")
 		}
 
-		cursor := z.ExternalLike.Clone()
+		cursor := z.External.Clone()
 		sk := cursor.GetSku()
 		sk.Metadata.Subtract(&av.Metadata)
 		mes := sk.GetMetadata().GetTags().CloneMutableSetPtrLike()

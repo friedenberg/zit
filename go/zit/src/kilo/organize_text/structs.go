@@ -23,25 +23,25 @@ func makeObjSet() objSet {
 }
 
 type obj struct {
-	ExternalLike sku.ExternalLike
+	External sku.ExternalLike
 	tag_paths.Type
 }
 
 func (a *obj) cloneWithType(t tag_paths.Type) (b *obj) {
 	b = &obj{
-		Type:         t,
-		ExternalLike: a.ExternalLike.Clone(),
+		Type:     t,
+		External: a.External.Clone(),
 	}
 
 	return
 }
 
 func (a *obj) GetExternalObjectId() sku.ExternalObjectId {
-	return a.ExternalLike.GetExternalObjectId()
+	return a.External.GetExternalObjectId()
 }
 
 func (a *obj) String() string {
-	return a.ExternalLike.String()
+	return a.External.String()
 }
 
 func sortObjSet(
@@ -51,17 +51,17 @@ func sortObjSet(
 
 	sort.Slice(out, func(i, j int) bool {
 		switch {
-		case out[i].ExternalLike.GetSku().ObjectId.IsEmpty() && out[j].ExternalLike.GetSku().ObjectId.IsEmpty():
-			return out[i].ExternalLike.GetSku().Metadata.Description.String() < out[j].ExternalLike.GetSku().Metadata.Description.String()
+		case out[i].External.GetSku().ObjectId.IsEmpty() && out[j].External.GetSku().ObjectId.IsEmpty():
+			return out[i].External.GetSku().Metadata.Description.String() < out[j].External.GetSku().Metadata.Description.String()
 
-		case out[i].ExternalLike.GetSku().ObjectId.IsEmpty():
+		case out[i].External.GetSku().ObjectId.IsEmpty():
 			return true
 
-		case out[j].ExternalLike.GetSku().ObjectId.IsEmpty():
+		case out[j].External.GetSku().ObjectId.IsEmpty():
 			return false
 
 		default:
-			return out[i].ExternalLike.GetSku().ObjectId.String() < out[j].ExternalLike.GetSku().ObjectId.String()
+			return out[i].External.GetSku().ObjectId.String() < out[j].External.GetSku().ObjectId.String()
 		}
 	})
 
@@ -116,7 +116,7 @@ func (os *Objects) Del(v *obj) error {
 
 func (os Objects) Sort() {
 	sort.Slice(os, func(i, j int) bool {
-		ei, ej := os[i].ExternalLike, os[j].ExternalLike
+		ei, ej := os[i].External, os[j].External
 
 		oidI := ids.ObjectIdLike(ei.GetObjectId())
 		oidJ := ids.ObjectIdLike(ej.GetObjectId())

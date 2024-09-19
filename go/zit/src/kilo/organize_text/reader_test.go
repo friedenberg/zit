@@ -49,7 +49,7 @@ func makeBez(t *testing.T, v string) (b descriptions.Description) {
 
 func makeObjWithHinAndBez(t *testing.T, hin string, bez string) (o *obj) {
 	o = &obj{
-		ExternalLike: &sku.External{
+		External: &sku.External{
 			Transacted: sku.Transacted{
 				Metadata: object_metadata.Metadata{
 					Description: makeBez(t, bez),
@@ -58,7 +58,7 @@ func makeObjWithHinAndBez(t *testing.T, hin string, bez string) (o *obj) {
 		},
 	}
 
-	o.ExternalLike.GetSku().ObjectId.SetWithIdLike(makeZettelId(t, hin))
+	o.External.GetSku().ObjectId.SetWithIdLike(makeZettelId(t, hin))
 
 	return
 }
@@ -112,7 +112,7 @@ func assertEqualObjekten(t *test_logz.T, expected, actual Objects) {
 	}
 
 	for i := range actual {
-		actualObj, expectedObj := actual[i].ExternalLike.GetSku(), expected[i].ExternalLike.GetSku()
+		actualObj, expectedObj := actual[i].External.GetSku(), expected[i].External.GetSku()
 
 		if !actualObj.Equals(expectedObj) {
 			t.Errorf("\nexpected: %#v\n  actual: %#v", expectedObj, actualObj)

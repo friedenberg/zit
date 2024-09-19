@@ -274,12 +274,12 @@ func (ar *reader) readOneObj(
 	// logz.Print("reading one zettel", l)
 
 	var z obj
-	z.ExternalLike = ar.options.ObjectFactory.Get()
+	z.External = ar.options.ObjectFactory.Get()
 	z.Type = t
 
 	if _, err = ar.options.stringFormatReader.ReadStringFormat(
 		r,
-		z.ExternalLike,
+		z.External,
 	); err != nil {
 		err = ErrorRead{
 			error:  err,
@@ -290,9 +290,9 @@ func (ar *reader) readOneObj(
 		return
 	}
 
-	if z.ExternalLike.GetSku().ObjectId.IsEmpty() {
+	if z.External.GetSku().ObjectId.IsEmpty() {
 		// set empty hinweis to ensure middle is '/'
-		if err = z.ExternalLike.GetSku().ObjectId.SetWithIdLike(ids.ZettelId{}); err != nil {
+		if err = z.External.GetSku().ObjectId.SetWithIdLike(ids.ZettelId{}); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -302,7 +302,7 @@ func (ar *reader) readOneObj(
 		return
 	}
 
-	if err = ar.options.Abbr.ExpandZettelIdOnly(&z.ExternalLike.GetSku().ObjectId); err != nil {
+	if err = ar.options.Abbr.ExpandZettelIdOnly(&z.External.GetSku().ObjectId); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

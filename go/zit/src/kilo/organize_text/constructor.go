@@ -282,7 +282,7 @@ func (c *constructor) cloneObj(
 ) (z *obj, err error) {
 	z = &obj{
 		Type:         named.Type,
-		ExternalLike: named.ExternalLike.Clone(),
+		External: named.External.Clone(),
 	}
 
 	if err = c.removeTagsIfNecessary(z); err != nil {
@@ -300,11 +300,11 @@ func (c *constructor) removeTagsIfNecessary(
 		return
 	}
 
-	if o.ExternalLike.GetSku().Metadata.Description.IsEmpty() {
+	if o.External.GetSku().Metadata.Description.IsEmpty() {
 		return
 	}
 
-	o.ExternalLike.GetSku().Metadata.ResetTags()
+	o.External.GetSku().Metadata.ResetTags()
 
 	return
 }

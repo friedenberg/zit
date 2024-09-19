@@ -61,11 +61,11 @@ func (a *Assignment) addToSet(
 			var z sku.ExternalLike
 			ok := false
 
-			if selwi, ok = out.m[key(o.ExternalLike)]; !ok {
+			if selwi, ok = out.m[key(o.External)]; !ok {
 				z = selwi.ExternalLike
 				z = ot.ObjectFactory.Get()
 
-				ot.ObjectFactory.ResetWith(z, o.ExternalLike)
+				ot.ObjectFactory.ResetWith(z, o.External)
 
 				if err = ot.EachPtr(
 					z.GetSku().AddTagPtr,
@@ -80,7 +80,7 @@ func (a *Assignment) addToSet(
 
 				out.Add(z)
 
-				zPrime, hasOriginal := original.Get(original.Key(o.ExternalLike))
+				zPrime, hasOriginal := original.Get(original.Key(o.External))
 
 				if hasOriginal {
 					z.GetSku().Metadata.Blob.ResetWith(&zPrime.GetSku().Metadata.Blob)
@@ -92,20 +92,20 @@ func (a *Assignment) addToSet(
 				}
 			}
 
-			if o.ExternalLike.GetSku().ObjectId.String() == "" {
+			if o.External.GetSku().ObjectId.String() == "" {
 				panic(fmt.Sprintf("%s: object id is nil", o))
 			}
 
 			if err = z.GetSku().Metadata.Description.Set(
-				o.ExternalLike.GetSku().Metadata.Description.String(),
+				o.External.GetSku().Metadata.Description.String(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if !o.ExternalLike.GetSku().Metadata.Type.IsEmpty() {
+			if !o.External.GetSku().Metadata.Type.IsEmpty() {
 				if err = z.GetSku().Metadata.Type.Set(
-					o.ExternalLike.GetSku().Metadata.Type.String(),
+					o.External.GetSku().Metadata.Type.String(),
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -118,10 +118,10 @@ func (a *Assignment) addToSet(
 
 			z.GetSku().Metadata.Comments = append(
 				z.GetSku().Metadata.Comments,
-				o.ExternalLike.GetSku().Metadata.Comments...,
+				o.External.GetSku().Metadata.Comments...,
 			)
 
-			if err = o.ExternalLike.GetSku().Metadata.GetTags().EachPtr(
+			if err = o.External.GetSku().Metadata.GetTags().EachPtr(
 				z.GetSku().AddTagPtr,
 			); err != nil {
 				err = errors.Wrap(err)
