@@ -162,7 +162,7 @@ func (c Import) importBlobIfNecessary(
 	ag *age.Age,
 	coErrPrinter interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	blobSha := co.External.GetBlobSha()
+	blobSha := co.External.Transacted.GetBlobSha()
 
 	if u.GetFSHome().HasBlob(u.GetConfig().GetStoreVersion(), blobSha) {
 		return

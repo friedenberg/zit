@@ -83,7 +83,7 @@ func (e *fileEncoder) EncodeObject(
 
 	var ar sha.ReadCloser
 
-	if ar, err = e.fs_home.BlobReader(z.GetBlobSha()); err != nil {
+	if ar, err = e.fs_home.BlobReader(z.Transacted.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -170,7 +170,7 @@ func (c *ZettelFromExternalBlob) createZettelForBlobs(
 		return
 	}
 
-	z.SetBlobSha(blobFD.GetShaLike())
+	z.Transacted.SetBlobSha(blobFD.GetShaLike())
 
 	return
 }
