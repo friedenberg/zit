@@ -3,6 +3,7 @@ package sku
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
+	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 )
@@ -62,4 +63,24 @@ func (resetter) ResetWith(asl, bsl TransactedGetter) {
 	a, b := asl.GetSku(), bsl.GetSku()
 	errors.PanicIfError(a.ObjectId.ResetWithIdLike(&b.ObjectId))
 	object_metadata.Resetter.ResetWith(&a.Metadata, &b.Metadata)
+}
+
+var CheckedOutResetter checkedOutResetter
+
+type checkedOutResetter struct{}
+
+func (checkedOutResetter) Reset(dst *CheckedOut) {
+	TransactedResetter.Reset(&dst.Internal)
+	ExternalResetter.Reset(&dst.External)
+	dst.State = checked_out_state.Unknown
+	dst.Error = nil
+	dst.IsImport = false
+}
+
+func (checkedOutResetter) ResetWith(dst *CheckedOut, src *CheckedOut) {
+	TransactedResetter.ResetWith(&dst.Internal, &src.Internal)
+	ExternalResetter.ResetWith(&dst.External, &src.External)
+	dst.State = src.State
+	dst.Error = src.Error
+	dst.IsImport = src.IsImport
 }

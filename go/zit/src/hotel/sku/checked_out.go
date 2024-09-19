@@ -3,7 +3,6 @@ package sku
 import (
 	"fmt"
 
-	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -51,13 +50,14 @@ func DetermineState(
 
 type CheckedOut struct {
 	Internal Transacted
-	External ExternalLike
+	External External
 	State    checked_out_state.State
 	Error    error
+	IsImport bool
 }
 
 func (c *CheckedOut) GetRepoId() ids.RepoId {
-	panic(todo.Implement())
+	return c.External.RepoId
 }
 
 func (c *CheckedOut) GetSkuCheckedOutLike() CheckedOutLike {
@@ -65,7 +65,7 @@ func (c *CheckedOut) GetSkuCheckedOutLike() CheckedOutLike {
 }
 
 func (c *CheckedOut) GetSkuExternalLike() ExternalLike {
-	return c.External
+	return &c.External
 }
 
 func (c *CheckedOut) GetSku() *Transacted {
@@ -76,8 +76,10 @@ func (c *CheckedOut) GetState() checked_out_state.State {
 	return c.State
 }
 
-func (c *CheckedOut) Clone() CheckedOutLike {
-	panic(todo.Implement())
+func (src *CheckedOut) Clone() CheckedOutLike {
+	dst := GetCheckedOutPool().Get()
+	CheckedOutResetter.ResetWith(dst, src)
+	return dst
 }
 
 func (c *CheckedOut) SetError(err error) {
@@ -105,5 +107,5 @@ func (c *CheckedOut) GetError() error {
 }
 
 func (a *CheckedOut) String() string {
-	return fmt.Sprintf("%s %s", &a.Internal, a.External)
+	return fmt.Sprintf("%s %s", &a.Internal, &a.External)
 }
