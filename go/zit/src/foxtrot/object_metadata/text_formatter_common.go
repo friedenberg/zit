@@ -139,10 +139,17 @@ func (f textFormatterCommon) writePathType(
 ) (n int64, err error) {
 	var ap string
 
-	if apg, ok := c.PersistentFormatterContext.(BlobPathGetter); ok {
-		ap = f.fs_home.RelToCwdOrSame(apg.GetBlobPath())
+	for _, f := range c.PersistentFormatterContext.GetMetadata().Fields {
+		if strings.ToLower(f.Key) == "blob" {
+			ap = f.Value
+			break
+		}
+	}
+
+	if ap != "" {
+		ap = f.fs_home.RelToCwdOrSame(ap)
 	} else {
-		err = errors.Errorf("unable to convert %T int %T", c, apg)
+		err = errors.Errorf("path not found in fields")
 		return
 	}
 

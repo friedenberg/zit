@@ -4,7 +4,6 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 )
 
 type (
@@ -18,14 +17,6 @@ type (
 
 	MetadataLike interface {
 		Getter
-	}
-
-	BlobPathGetter interface {
-		GetBlobPath() string
-	}
-
-	BlobPathSetter interface {
-		SetBlobFD(*fd.FD) error
 	}
 
 	PersistentFormatterContext interface {
@@ -57,9 +48,5 @@ type (
 
 	TextParser interface {
 		ParseMetadata(io.Reader, TextParserContext) (int64, error)
-	}
-
-	BlobFDSetter interface {
-		SetBlobFD(*fd.FD)
 	}
 )

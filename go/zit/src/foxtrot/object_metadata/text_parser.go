@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 )
 
 type textParser struct {
@@ -97,9 +98,14 @@ func (f textParser) ParseMetadata(
 
 		return
 	} else if !mp.Blob.GetShaLike().IsNull() {
-		if afs, ok := c.(BlobFDSetter); ok {
-			afs.SetBlobFD(&mp.Blob)
-		}
+		m.Fields = append(
+			m.Fields,
+			Field{
+				Key:       "blob",
+				Value:     mp.Blob.GetPath(),
+				ColorType: string_format_writer.ColorTypeId,
+			},
+		)
 
 		m.Blob.SetShaLike(mp.Blob.GetShaLike())
 	}

@@ -150,9 +150,7 @@ func (s *Store) tryRealizeAndOrStore(
 		ids.Equals(kinder.GetObjectId(), mutter.GetObjectId()) &&
 		kinder.Metadata.EqualsSansTai(&mutter.Metadata) {
 
-    // We don't reset the kinder with the mutter as the kinder may have things
-    // like fields
-		// sku.TransactedResetter.ResetWith(kinder, mutter)
+		sku.TransactedResetter.ResetWithExceptFields(kinder, mutter)
 
 		if o.Mode.Contains(objekte_mode.ModeSchwanz) {
 			if err = s.Unchanged(kinder); err != nil {
