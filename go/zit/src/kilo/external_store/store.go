@@ -252,3 +252,26 @@ func (s *Store) GetExternalStoreOrganizeFormat(
 
 	return esof.GetExternalStoreOrganizeFormat(f)
 }
+
+func (s *Store) SaveBlob(el sku.ExternalLike) (err error) {
+	es, ok := s.StoreLike.(sku.BlobSaver)
+
+	if !ok {
+    // TODO make sigil error that can be ignored upstream
+		err = errors.Errorf("store does not support sku.BlobSaver")
+    err = nil
+		return
+	}
+
+	if err = s.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = es.SaveBlob(el); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}

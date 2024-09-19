@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
@@ -21,16 +20,12 @@ func (c *External) GetRepoId() ids.RepoId {
 	return *(ids.MustRepoId("browser"))
 }
 
-func (e *External) GetObjectId() *ids.ObjectId {
-	return e.Transacted.GetObjectId()
-}
-
 // TODO support updating bookmarks without overwriting. Maybe move to
 // toml-bookmark type
-func (e *External) SaveBlob(s fs_home.Home) (err error) {
+func (s *Store) SaveBlob(e *External) (err error) {
 	var aw sha.WriteCloser
 
-	if aw, err = s.BlobWriter(); err != nil {
+	if aw, err = s.externalStoreInfo.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -63,14 +58,4 @@ func (e *External) SaveBlob(s fs_home.Home) (err error) {
 	e.Transacted.Metadata.Blob.SetShaLike(aw)
 
 	return
-}
-
-func (t *External) GetSkuExternalLike() sku.ExternalLike {
-	return t
-}
-
-func (a *External) Clone() sku.ExternalLike {
-	b := GetExternalPool().Get()
-	sku.ExternalResetter.ResetWith(&b.External, &a.External)
-	return b
 }

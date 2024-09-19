@@ -19,11 +19,9 @@ func (s *Store) tryRealize(
 	el sku.ExternalLike, mutter *sku.Transacted,
 	o sku.CommitOptions,
 ) (err error) {
-	if as, ok := el.(sku.BlobSaver); ok {
-		if err = as.SaveBlob(s.GetStandort()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = s.SaveBlob(el); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	kinder := el.GetSku()

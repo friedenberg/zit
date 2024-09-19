@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 )
@@ -81,6 +80,6 @@ type (
 	}
 
 	BlobSaver interface {
-		SaveBlob(s fs_home.Home) (err error)
+		SaveBlob(ExternalLike) (err error)
 	}
 )
