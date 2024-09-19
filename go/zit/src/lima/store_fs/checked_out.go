@@ -122,7 +122,7 @@ func (checkedOutResetter) Reset(a *CheckedOut) {
 	a.Error = nil
 
 	sku.TransactedResetter.Reset(&a.Internal)
-	sku.ExternalResetter.Reset(&a.External.External)
+	sku.ExternalResetter.Reset(&a.External)
 }
 
 func (checkedOutResetter) ResetWith(dst *CheckedOut, src *CheckedOut) {
@@ -131,5 +131,5 @@ func (checkedOutResetter) ResetWith(dst *CheckedOut, src *CheckedOut) {
 	dst.Error = src.Error
 
 	sku.TransactedResetter.ResetWith(&dst.Internal, &src.Internal)
-	sku.ExternalResetter.ResetWith(&dst.External.External, &src.External.External)
+	sku.ExternalResetter.ResetWith(&dst.External, &src.External)
 }

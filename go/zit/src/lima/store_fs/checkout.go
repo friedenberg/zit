@@ -57,7 +57,7 @@ func (s *Store) checkoutOneNew(
 			sz,
 		); err != nil {
 			if errors.Is(err, ErrExternalHasConflictMarker) && options.AllowConflicted {
-				sku.ExternalResetter.ResetWith(&cz.External.External, &cze.External)
+				sku.ExternalResetter.ResetWith(&cz.External, cze)
 				sku.DetermineState(cz, true)
 				err = nil
 			} else {
@@ -65,7 +65,7 @@ func (s *Store) checkoutOneNew(
 				return
 			}
 		} else {
-			sku.ExternalResetter.ResetWith(&cz.External.External, &cze.External)
+			sku.ExternalResetter.ResetWith(&cz.External, cze)
 
 			sku.DetermineState(cz, true)
 

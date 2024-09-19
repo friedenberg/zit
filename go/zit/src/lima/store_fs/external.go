@@ -9,20 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-// TODO migrate to *sku.External
-type External struct {
-	sku.External
-}
-
-func (t *External) GetSkuExternalLike() sku.ExternalLike {
-	return t
-}
-
-func (a *External) Clone() sku.ExternalLike {
-	b := GetExternalPool().Get()
-	sku.ExternalResetter.ResetWith(&b.External, &a.External)
-	return b
-}
+type External = sku.External
 
 func (s *Store) GetCheckoutModeOrError(
 	el sku.ExternalLike,

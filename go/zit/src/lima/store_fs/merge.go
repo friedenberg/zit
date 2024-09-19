@@ -330,7 +330,7 @@ func (s *Store) RunMergeTool(
 
 	co = GetCheckedOutPool().Get()
 
-	sku.ExternalResetter.ResetWith(&co.External.External, &e.External)
+	sku.ExternalResetter.ResetWith(&co.External, e)
 
 	return
 }
