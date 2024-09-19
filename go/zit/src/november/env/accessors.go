@@ -48,16 +48,5 @@ func (u *Env) GetStore() *store.Store {
 func (u *Env) GetExternalLikePoolForRepoId(
 	repoId ids.RepoId,
 ) (of external_store.ObjectFactory) {
-	if repoId.IsEmpty() {
-		return
-	}
-
-	es, ok := u.externalStores[repoId]
-
-	if ok {
-		of.PoolValue = es.GetExternalLikePool()
-		of.Resetter3 = es.GetExternalLikeResetter3()
-	}
-
 	return
 }

@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
@@ -248,29 +247,5 @@ func (c *Store) GetExternalStoreOrganizeFormat(
 	return sku_fmt.ExternalLike{
 		ReaderExternalLike: f,
 		WriterExternalLike: &formatExternal,
-	}
-}
-
-func (c *Store) GetExternalLikePool() interfaces.PoolValue[sku.ExternalLike] {
-	return pool.Bespoke[sku.ExternalLike]{
-		FuncGet: func() sku.ExternalLike {
-			return poolExternal.Get()
-		},
-		FuncPut: func(e sku.ExternalLike) {
-			poolExternal.Put(e.(*sku.External))
-		},
-	}
-}
-
-func (c *Store) GetExternalLikeResetter3() interfaces.Resetter3[sku.ExternalLike] {
-	return pool.BespokeResetter[sku.ExternalLike]{
-		FuncReset: func(el sku.ExternalLike) {
-			a := el.(*sku.External)
-			sku.ExternalResetter.Reset(a)
-		},
-		FuncResetWith: func(eldst, elsrc sku.ExternalLike) {
-			dst, src := eldst.(*sku.External), elsrc.(*sku.External)
-			sku.ExternalResetter.ResetWith(dst, src)
-		},
 	}
 }
