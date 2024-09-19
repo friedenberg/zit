@@ -32,7 +32,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
 	col sku.CheckedOutLike,
 ) (n int64, err error) {
-	co := col.(*CheckedOut)
+	co := col.(*sku.CheckedOut)
 	var (
 		n1 int
 		n2 int64

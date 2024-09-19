@@ -10,7 +10,7 @@ func (s *Store) PutCheckedOutLike(col sku.CheckedOutLike) {
 	switch col.GetSkuExternalLike().GetRepoId().GetRepoIdString() {
 	// TODO make generic?
 	case "browser":
-		store_browser.GetCheckedOutPool().Put(col.(*store_browser.CheckedOut))
+		store_browser.GetCheckedOutPool().Put(col.(*sku.CheckedOut))
 
 	default:
 		cofs := col.(*sku.CheckedOut)

@@ -6,7 +6,7 @@ import (
 )
 
 func (s *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
-	e := el.(*External)
+	e := el.(*sku.External)
 
 	var item Item
 

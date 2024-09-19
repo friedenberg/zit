@@ -6,7 +6,7 @@ import (
 
 func (s *Store) ReadIntoCheckedOutFromTransacted(
 	sk *sku.Transacted,
-	co *CheckedOut,
+	co *sku.CheckedOut,
 ) (err error) {
 	if &co.Internal != sk {
 		sku.Resetter.ResetWith(&co.Internal, sk)

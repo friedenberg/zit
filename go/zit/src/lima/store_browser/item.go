@@ -102,7 +102,7 @@ func (i Item) GetDescription() (b descriptions.Description, err error) {
 	return
 }
 
-func (i *Item) WriteToExternal(e *External) (err error) {
+func (i *Item) WriteToExternal(e *sku.External) (err error) {
 	if err = e.ExternalObjectId.SetRaw(i.Id.String()); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -155,7 +155,7 @@ func (i *Item) WriteToExternal(e *External) (err error) {
 	return
 }
 
-func (i *Item) ReadFromExternal(e *External) (err error) {
+func (i *Item) ReadFromExternal(e *sku.External) (err error) {
 	if err = i.Id.Set(e.ExternalObjectId.String()); err != nil {
 		err = errors.Wrap(err)
 		return

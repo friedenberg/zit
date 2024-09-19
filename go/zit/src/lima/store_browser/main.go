@@ -1,6 +1,7 @@
 package store_browser
 
 import (
+	"bufio"
 	"net/url"
 	"sync"
 
@@ -261,7 +262,7 @@ func (c *Store) GetExternalLikePool() interfaces.PoolValue[sku.ExternalLike] {
 			return poolExternal.Get()
 		},
 		FuncPut: func(e sku.ExternalLike) {
-			poolExternal.Put(e.(*External))
+			poolExternal.Put(e.(*sku.External))
 		},
 	}
 }
@@ -269,12 +270,52 @@ func (c *Store) GetExternalLikePool() interfaces.PoolValue[sku.ExternalLike] {
 func (c *Store) GetExternalLikeResetter3() interfaces.Resetter3[sku.ExternalLike] {
 	return pool.BespokeResetter[sku.ExternalLike]{
 		FuncReset: func(el sku.ExternalLike) {
-			a := el.(*External)
-			sku.ExternalResetter.Reset(&a.External)
+			a := el.(*sku.External)
+			sku.ExternalResetter.Reset(a)
 		},
 		FuncResetWith: func(eldst, elsrc sku.ExternalLike) {
-			dst, src := eldst.(*External), elsrc.(*External)
-			sku.ExternalResetter.ResetWith(&dst.External, &src.External)
+			dst, src := eldst.(*sku.External), elsrc.(*sku.External)
+			sku.ExternalResetter.ResetWith(dst, src)
 		},
 	}
+}
+
+// TODO support updating bookmarks without overwriting. Maybe move to
+// toml-bookmark type
+func (s *Store) SaveBlob(e *sku.External) (err error) {
+	var aw sha.WriteCloser
+
+	if aw, err = s.externalStoreInfo.BlobWriter(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, aw)
+
+	var item Item
+
+	if err = item.ReadFromExternal(e); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	tb := sku_fmt.TomlBookmark{
+		Url: item.Url.String(),
+	}
+
+	func() {
+		bw := bufio.NewWriter(aw)
+		defer errors.DeferredFlusher(&err, bw)
+
+		enc := toml.NewEncoder(bw)
+
+		if err = enc.Encode(tb); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}()
+
+	e.Transacted.Metadata.Blob.SetShaLike(aw)
+
+	return
 }

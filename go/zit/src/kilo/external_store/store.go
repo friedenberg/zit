@@ -257,9 +257,9 @@ func (s *Store) SaveBlob(el sku.ExternalLike) (err error) {
 	es, ok := s.StoreLike.(sku.BlobSaver)
 
 	if !ok {
-    // TODO make sigil error that can be ignored upstream
+		// TODO make sigil error that can be ignored upstream
 		err = errors.Errorf("store does not support sku.BlobSaver")
-    err = nil
+		err = nil
 		return
 	}
 

@@ -16,7 +16,7 @@ type executor struct {
 	store *Store
 	qg    *query.Group
 	out   interfaces.FuncIter[sku.CheckedOutLike]
-	co    CheckedOut
+	co    sku.CheckedOut
 }
 
 func (c *executor) tryToEmitOneExplicitlyCheckedOut(
@@ -120,7 +120,7 @@ func (c *executor) tryToEmitOneCommon(
 
 	external.Transacted.ObjectId.SetGenre(genres.Zettel)
 
-	if !c.qg.ContainsExternalSku(&external.External, c.co.State) {
+	if !c.qg.ContainsExternalSku(external, c.co.State) {
 		return
 	}
 
