@@ -14,6 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -181,7 +182,7 @@ func (s *Store) ReadFromExternal(el sku.ExternalLike) (i *Item, err error) {
 	e := el.(*External)
 
 	// TODO handle sort order
-	for _, f := range e.Transacted.Fields {
+	for _, f := range e.Transacted.Metadata.Fields {
 		var fdee *fd.FD
 		switch strings.ToLower(f.Key) {
 		case "object":
@@ -223,7 +224,7 @@ func (s *Store) ReadFromExternal(el sku.ExternalLike) (i *Item, err error) {
 
 func (s *Store) WriteToExternal(i *Item, el sku.ExternalLike) (err error) {
 	e := el.(*External)
-	e.Transacted.Fields = e.Transacted.Fields[:0]
+	e.Transacted.Metadata.Fields = e.Transacted.Metadata.Fields[:0]
 	k := &i.ObjectId
 
 	e.ExternalObjectId.ResetWith(k)
@@ -238,7 +239,7 @@ func (s *Store) WriteToExternal(i *Item, el sku.ExternalLike) (err error) {
 	fdees := iter.SortedValues(i.MutableSetLike)
 
 	for _, f := range fdees {
-		field := sku.Field{
+		field := object_metadata.Field{
 			Value:     f.GetPath(),
 			ColorType: string_format_writer.ColorTypeId,
 		}
@@ -257,7 +258,7 @@ func (s *Store) WriteToExternal(i *Item, el sku.ExternalLike) (err error) {
 			field.Key = "blob"
 		}
 
-		e.Transacted.Fields = append(e.Transacted.Fields, field)
+		e.Transacted.Metadata.Fields = append(e.Transacted.Metadata.Fields, field)
 	}
 
 	return

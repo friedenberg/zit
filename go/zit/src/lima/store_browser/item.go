@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -121,7 +122,7 @@ func (i *Item) WriteToExternal(e *External) (err error) {
 		return
 	}
 
-	e.Transacted.Fields = []sku.Field{
+	e.Transacted.Metadata.Fields = []object_metadata.Field{
 		{
 			Value:              i.Id.String(),
 			DisableValueQuotes: true,
@@ -160,7 +161,7 @@ func (i *Item) ReadFromExternal(e *External) (err error) {
 		return
 	}
 
-	for _, field := range e.Transacted.Fields {
+	for _, field := range e.Transacted.Metadata.Fields {
 		switch field.Key {
 		case "id":
 			if field.Value == "" {

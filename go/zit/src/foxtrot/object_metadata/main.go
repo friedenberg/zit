@@ -12,6 +12,7 @@ import (
 	flag2 "code.linenisgreat.com/zit/go/zit/src/bravo/flag"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
@@ -20,6 +21,8 @@ type MetadataWriterTo interface {
 	io.WriterTo
 	HasMetadataContent() bool
 }
+
+type Field = string_format_writer.Field
 
 type Metadata struct {
 	// StoreVersion values.Int
@@ -32,6 +35,7 @@ type Metadata struct {
 
 	Comments []string
 	Cache    Cache
+	Fields   []Field
 }
 
 func (m *Metadata) GetMetadata() *Metadata {

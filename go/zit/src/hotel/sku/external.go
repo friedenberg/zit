@@ -10,7 +10,7 @@ import (
 )
 
 type External struct {
-	Transacted   TransactedWithFields
+	Transacted   Transacted
 	ExternalType ids.Type
 
 	// TODO add support for querying the below
@@ -46,7 +46,7 @@ func (a *External) Clone() ExternalLike {
 }
 
 func (c *External) GetSku() *Transacted {
-	return &c.Transacted.Transacted
+	return &c.Transacted
 }
 
 func (a *External) GetObjectIdLike() ids.IdLike {

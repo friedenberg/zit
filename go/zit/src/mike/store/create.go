@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
@@ -186,17 +185,9 @@ func (s *Store) CreateOrUpdateCheckedOut(
 		return
 	}
 
-	var mode checkout_mode.Mode
-
-	// TODO [radi/kof !task project-2021-zit-features zz-inbox] add support for kasten in checkouts and external
-	if mode, err = s.GetCwdFiles().GetCheckoutModeOrError(el, mode); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if err = s.UpdateCheckoutFromCheckedOut(
 		checkout_options.OptionsWithoutMode{Force: true},
-    col,
+		col,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

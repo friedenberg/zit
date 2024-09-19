@@ -21,13 +21,17 @@ func (transactedResetter) ResetWith(a *Transacted, b *Transacted) {
 	object_metadata.Resetter.ResetWith(&a.Metadata, &b.Metadata)
 }
 
+func (transactedResetter) ResetWithExceptFields(a *Transacted, b *Transacted) {
+	errors.PanicIfError(a.ObjectId.ResetWithIdLike(&b.ObjectId))
+	object_metadata.Resetter.ResetWithExceptFields(&a.Metadata, &b.Metadata)
+}
+
 var ExternalResetter externalResetter
 
 type externalResetter struct{}
 
 func (externalResetter) Reset(a *External) {
 	TransactedResetter.Reset(a.GetSku())
-	a.Transacted.Fields = a.Transacted.Fields[:0]
 	a.ExternalType.Reset()
 	a.RepoId.Reset()
 	a.State = external_state.Unknown
@@ -38,8 +42,6 @@ func (externalResetter) ResetWith(dst *External, src *External) {
 	errors.PanicIfError(dst.Transacted.ObjectId.ResetWithIdLike(&src.Transacted.ObjectId))
 	object_metadata.Resetter.ResetWith(&dst.Transacted.Metadata, &src.Transacted.Metadata)
 	TransactedResetter.ResetWith(dst.GetSku(), src.GetSku())
-	dst.Transacted.Fields = dst.Transacted.Fields[:0]
-	dst.Transacted.Fields = append(dst.Transacted.Fields, src.Transacted.Fields...)
 	dst.ExternalType = src.ExternalType
 	dst.RepoId = src.RepoId
 	dst.State = src.State

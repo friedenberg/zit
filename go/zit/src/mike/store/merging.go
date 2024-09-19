@@ -36,9 +36,12 @@ func (s *Store) readExternalAndMergeIfNecessary(
 			Force: true,
 		}
 
-		sku.TransactedResetter.ResetWith(right, left)
+		sku.TransactedResetter.ResetWithExceptFields(right, left)
 
-		if err = s.UpdateCheckoutFromCheckedOut(op, col); err != nil {
+		if err = s.UpdateCheckoutFromCheckedOut(
+      op,
+      col,
+    ); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

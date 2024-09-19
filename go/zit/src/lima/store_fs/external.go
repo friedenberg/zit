@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -30,7 +31,7 @@ func (a *External) Clone() sku.ExternalLike {
 }
 
 func (c *External) GetSku() *sku.Transacted {
-	return &c.External.Transacted.Transacted
+	return &c.External.Transacted
 }
 
 func (a *External) ResetWith(b *External) {
@@ -57,18 +58,18 @@ func (a *External) SetBlobSha(v interfaces.Sha) (err error) {
 }
 
 func (e *External) SetBlobFD(v *fd.FD) {
-	field := sku.Field{
+	field := object_metadata.Field{
 		Key:       "blob",
 		Value:     v.GetPath(),
 		ColorType: string_format_writer.ColorTypeId,
 	}
 
-	e.Transacted.Fields = append(e.Transacted.Fields, field)
+	e.Transacted.Metadata.Fields = append(e.Transacted.Metadata.Fields, field)
 	e.Transacted.Metadata.Blob.SetShaLike(v.GetShaLike())
 }
 
 func (e *External) GetBlobPath() string {
-	for _, f := range e.Transacted.Fields {
+	for _, f := range e.Transacted.Metadata.Fields {
 		if strings.ToLower(f.Key) == "blob" {
 			return f.Value
 		}
@@ -109,7 +110,11 @@ func (s *Store) GetCheckoutModeOrError(
 		}
 
 		err = checkout_mode.MakeErrInvalidCheckoutMode(
-			errors.Errorf("all FD's are empty: %s", fds.Debug()),
+			errors.Errorf(
+				"all FD's are empty: %s. Fields: %#v",
+				fds.Debug(),
+				el.GetSku().Metadata.Fields,
+			),
 		)
 	}
 

@@ -141,7 +141,7 @@ func (c CreateFromPaths) Run(
 			continue
 		}
 
-		results.Add(&z.Transacted.Transacted)
+		results.Add(&z.Transacted)
 	}
 
 	if err = toDelete.Each(

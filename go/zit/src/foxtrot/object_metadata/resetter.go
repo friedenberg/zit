@@ -19,21 +19,28 @@ func (resetter) Reset(z *Metadata) {
 	// z.Gattung = gattung.Unknown
 	z.Tai.Reset()
 	z.Shas.Reset()
+	z.Fields = z.Fields[:0]
 }
 
-func (resetter) ResetWith(a *Metadata, b *Metadata) {
-	a.Description = b.Description
-	a.Comments = a.Comments[:0]
-	a.Comments = append(a.Comments, b.Comments...)
+func (resetter) ResetWithExceptFields(dst *Metadata, src *Metadata) {
+	dst.Description = src.Description
+	dst.Comments = dst.Comments[:0]
+	dst.Comments = append(dst.Comments, src.Comments...)
 
-	a.SetTags(b.Tags)
+	dst.SetTags(src.Tags)
 
-	ResetterVerzeichnisse.ResetWith(&a.Cache, &b.Cache)
+	ResetterVerzeichnisse.ResetWith(&dst.Cache, &src.Cache)
 
-	a.Type = b.Type
-	a.Tai = b.Tai
+	dst.Type = src.Type
+	dst.Tai = src.Tai
 
-	a.Shas.ResetWith(&b.Shas)
+	dst.Shas.ResetWith(&src.Shas)
+}
+
+func (r resetter) ResetWith(dst *Metadata, src *Metadata) {
+  r.ResetWithExceptFields(dst, src)
+	dst.Fields = dst.Fields[:0]
+	dst.Fields = append(dst.Fields, src.Fields...)
 }
 
 var ResetterVerzeichnisse resetterVerzeichnisse

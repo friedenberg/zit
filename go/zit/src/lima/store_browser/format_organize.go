@@ -14,6 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
@@ -223,9 +224,9 @@ LOOP:
 
 					switch left {
 					case "id", "url", "title", "":
-						e.Transacted.Fields = append(
-							e.Transacted.Fields,
-							sku.Field{
+						e.Transacted.Metadata.Fields = append(
+							e.Transacted.Metadata.Fields,
+							object_metadata.Field{
 								Key:                left,
 								Value:              right,
 								DisableValueQuotes: true,
