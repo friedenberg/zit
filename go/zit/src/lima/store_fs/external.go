@@ -9,8 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type External = sku.External
-
 func (s *Store) GetCheckoutModeOrError(
 	el sku.ExternalLike,
 	originalMode checkout_mode.Mode,

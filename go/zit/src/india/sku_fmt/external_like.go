@@ -37,19 +37,19 @@ func (f externalLikeCombo) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
 	el sku.ExternalLike,
 ) (n int64, err error) {
-  rid := el.GetRepoId()
+	rid := el.GetRepoId()
 
-  w, ok := f.repoIdsToFormats[rid]
+	w, ok := f.repoIdsToFormats[rid]
 
-  if !ok {
-    err = errors.Errorf("no WriterExternalLike for repo id: %s", rid)
-    return
-  }
+	if !ok {
+		err = errors.Errorf("no WriterExternalLike for repo id: %s", rid)
+		return
+	}
 
-  if n, err = w.WriteStringFormat(sw, el); err != nil {
-    err = errors.Wrap(err)
-    return
-  }
+	if n, err = w.WriteStringFormat(sw, el); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
@@ -58,19 +58,19 @@ func (f externalLikeCombo) ReadStringFormat(
 	rb *catgut.RingBuffer,
 	el sku.ExternalLike,
 ) (n int64, err error) {
-  rid := el.GetRepoId()
+	rid := el.GetRepoId()
 
-  r, ok := f.repoIdsToFormats[rid]
+	r, ok := f.repoIdsToFormats[rid]
 
-  if !ok {
-    err = errors.Errorf("no ReaderExternalLike for repo id: %s", rid)
-    return
-  }
+	if !ok {
+		err = errors.Errorf("no ReaderExternalLike for repo id: %s", rid)
+		return
+	}
 
-  if n, err = r.ReadStringFormat(rb, el); err != nil {
-    err = errors.Wrap(err)
-    return
-  }
+	if n, err = r.ReadStringFormat(rb, el); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }

@@ -99,7 +99,7 @@ func (bf *binaryField) WriteTo(w io.Writer) (n int64, err error) {
 		return
 	}
 
-  n1, err = ohio.WriteFixedUInt16(w, bf.ContentLength)
+	n1, err = ohio.WriteFixedUInt16(w, bf.ContentLength)
 	n += int64(n1)
 
 	if err != nil {

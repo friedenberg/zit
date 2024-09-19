@@ -143,7 +143,7 @@ func (c *Store) CheckoutOne(
 	options checkout_options.Options,
 	tg sku.TransactedGetter,
 ) (cz sku.CheckedOutLike, err error) {
-  sz := tg.GetSku()
+	sz := tg.GetSku()
 
 	if !sz.Metadata.Type.Equals(c.typ) {
 		err = errors.Wrap(external_store.ErrUnsupportedTyp(sz.Metadata.Type))

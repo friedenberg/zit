@@ -39,21 +39,21 @@ func TestMultiRuneReader(t1 *testing.T) {
 	}
 
 	{
-    mrr.Reset(input...)
+		mrr.Reset(input...)
 		readMany('w', 'o', 'w', 'n', 'i', 'c', 'e', 'h', 'a', 't')
 		unreadOne()
 		readMany('t')
 	}
 
 	{
-    mrr.Reset(input...)
+		mrr.Reset(input...)
 		readMany('w', 'o', 'w', 'n')
 		unreadOne()
 		readMany('n')
 	}
 
 	{
-    mrr.Reset(input...)
+		mrr.Reset(input...)
 		readMany('w', 'o', 'w')
 		unreadOne()
 		readMany('w')

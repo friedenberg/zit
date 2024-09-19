@@ -38,7 +38,7 @@ func (resetter) ResetWithExceptFields(dst *Metadata, src *Metadata) {
 }
 
 func (r resetter) ResetWith(dst *Metadata, src *Metadata) {
-  r.ResetWithExceptFields(dst, src)
+	r.ResetWithExceptFields(dst, src)
 	dst.Fields = dst.Fields[:0]
 	dst.Fields = append(dst.Fields, src.Fields...)
 }

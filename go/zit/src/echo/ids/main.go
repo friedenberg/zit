@@ -33,7 +33,7 @@ type (
 	}
 
 	ExternalObjectId interface {
-    ObjectIdLike
+		ObjectIdLike
 		interfaces.GenreGetter
 		interfaces.Stringer
 		ExternalObjectIdGetter

@@ -51,7 +51,7 @@ func (f *CliExternal) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
 	col sku.ExternalLike,
 ) (n int64, err error) {
-	var co *External
+	var co *sku.External
 
 	switch colt := col.(type) {
 	case *sku.Transacted:
@@ -62,7 +62,7 @@ func (f *CliExternal) WriteStringFormat(
 
 		return
 
-	case *External:
+	case *sku.External:
 		co = colt
 
 	default:
@@ -231,7 +231,7 @@ func (f *CliExternal) writeStringFormatBlobFD(
 
 func (f *CliExternal) writeStringFormatUntracked(
 	sw interfaces.WriterAndStringWriter,
-	co *External,
+	co *sku.External,
 	mode checkout_mode.Mode,
 ) (n int64, err error) {
 	var (

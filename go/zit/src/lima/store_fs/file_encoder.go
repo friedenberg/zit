@@ -11,14 +11,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type FileEncoder interface {
 	Encode(
-    options checkout_options.TextFormatterOptions,
-    z *External,
-    i *Item,
-  ) (err error)
+		options checkout_options.TextFormatterOptions,
+		z *sku.External,
+		i *Item,
+	) (err error)
 }
 
 type fileEncoder struct {
@@ -69,7 +70,7 @@ func (e *fileEncoder) openOrCreate(p string) (f *os.File, err error) {
 
 func (e *fileEncoder) EncodeObject(
 	options checkout_options.TextFormatterOptions,
-	z *External,
+	z *sku.External,
 	objectPath string,
 	blobPath string,
 ) (err error) {
@@ -188,13 +189,13 @@ func (e *fileEncoder) EncodeObject(
 
 func (e *fileEncoder) Encode(
 	options checkout_options.TextFormatterOptions,
-	z *External,
-  i *Item,
+	z *sku.External,
+	i *Item,
 ) (err error) {
 	return e.EncodeObject(
 		options,
 		z,
-    i.Object.GetPath(),
-    i.Blob.GetPath(),
+		i.Object.GetPath(),
+		i.Blob.GetPath(),
 	)
 }

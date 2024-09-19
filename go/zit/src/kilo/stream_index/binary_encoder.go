@@ -63,17 +63,17 @@ func (bf *binaryEncoder) writeFormat(
 	}
 
 	bf.binaryField.Reset()
-  rawContentLength := bf.Len()
+	rawContentLength := bf.Len()
 
-  if rawContentLength > math.MaxUint16 {
-    err = errContentLengthTooLarge
-    return
-  }
+	if rawContentLength > math.MaxUint16 {
+		err = errContentLengthTooLarge
+		return
+	}
 
 	bf.ContentLength = uint16(rawContentLength)
 
 	var n1 int
-  n1, err = ohio.WriteFixedUInt16(w, bf.ContentLength)
+	n1, err = ohio.WriteFixedUInt16(w, bf.ContentLength)
 	n += int64(n1)
 
 	if err != nil {

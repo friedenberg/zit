@@ -12,7 +12,7 @@ import (
 
 type CheckedOut struct {
 	Internal sku.Transacted
-	External External
+	External sku.External
 	State    checked_out_state.State
 	IsImport bool
 	Error    error

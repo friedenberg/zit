@@ -153,7 +153,7 @@ func (c *ZettelFromExternalBlob) addToMapAndWriteToBlobStore(
 
 func (c *ZettelFromExternalBlob) createZettelForBlobs(
 	blobFDs []*fd.FD,
-) (z *store_fs.External, err error) {
+) (z *sku.External, err error) {
 	// TODO handle other FD's
 	blobFD := blobFDs[0]
 	z = store_fs.GetExternalPool().Get()

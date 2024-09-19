@@ -672,4 +672,3 @@ func (t *objectId2) UnmarshalBinary(text []byte) (err error) {
 
 	return
 }
-

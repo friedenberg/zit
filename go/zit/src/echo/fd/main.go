@@ -155,7 +155,7 @@ func (fd *FD) SetIgnoreNotExists(v string) (err error) {
 		return
 	}
 
-  fd.path = filepath.Clean(v)
+	fd.path = filepath.Clean(v)
 
 	return
 }

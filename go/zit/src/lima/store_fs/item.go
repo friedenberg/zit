@@ -179,7 +179,7 @@ func (s *Store) ReadFromExternal(el sku.ExternalLike) (i *Item, err error) {
 	i = &Item{} // TODO use pool or use dir_items?
 	i.Reset()
 
-	e := el.(*External)
+	e := el.(*sku.External)
 
 	// TODO handle sort order
 	for _, f := range e.Transacted.Metadata.Fields {
@@ -223,7 +223,7 @@ func (s *Store) ReadFromExternal(el sku.ExternalLike) (i *Item, err error) {
 }
 
 func (s *Store) WriteToExternal(i *Item, el sku.ExternalLike) (err error) {
-	e := el.(*External)
+	e := el.(*sku.External)
 	e.Transacted.Metadata.Fields = e.Transacted.Metadata.Fields[:0]
 	k := &i.ObjectId
 

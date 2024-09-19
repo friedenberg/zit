@@ -30,7 +30,7 @@ type CreateFromPaths struct {
 func (c CreateFromPaths) Run(
 	args ...string,
 ) (results sku.TransactedMutableSet, err error) {
-	toCreate := make(map[sha.Bytes]*store_fs.External)
+	toCreate := make(map[sha.Bytes]*sku.External)
 	toDelete := fd.MakeMutableSet()
 
 	o := sku.CommitOptions{
@@ -38,10 +38,10 @@ func (c CreateFromPaths) Run(
 	}
 
 	for _, arg := range args {
-		var z *store_fs.External
+		var z *sku.External
 		var i store_fs.Item
 
-    i.Reset()
+		i.Reset()
 
 		i.ObjectId.SetGenre(genres.Zettel)
 
@@ -171,7 +171,7 @@ func (c CreateFromPaths) Run(
 // TODO remove this
 func (c *CreateFromPaths) zettelsFromPath(
 	p string,
-	wf interfaces.FuncIter[*store_fs.External],
+	wf interfaces.FuncIter[*sku.External],
 ) (err error) {
 	var r io.Reader
 
@@ -224,7 +224,7 @@ func (c *CreateFromPaths) zettelsFromPath(
 }
 
 func (c CreateFromPaths) handleStoreError(
-	z *store_fs.External,
+	z *sku.External,
 	f string,
 	in error,
 ) {

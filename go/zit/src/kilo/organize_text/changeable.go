@@ -62,7 +62,7 @@ func (a *Assignment) addToSet(
 			ok := false
 
 			if selwi, ok = out.m[key(o.ExternalLike)]; !ok {
-        z = selwi.ExternalLike
+				z = selwi.ExternalLike
 				z = ot.ObjectFactory.Get()
 
 				ot.ObjectFactory.ResetWith(z, o.ExternalLike)

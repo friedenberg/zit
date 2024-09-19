@@ -118,7 +118,7 @@ func (t *T) AssertNoError(err error) {
 	t.Helper()
 
 	if err != nil {
-    t.fatalf(1, "expected no error but got: %s", err)
+		t.fatalf(1, "expected no error but got: %s", err)
 	}
 }
 

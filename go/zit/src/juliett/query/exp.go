@@ -212,7 +212,7 @@ func (m *Exp) negateIfNecessary(v bool) bool {
 }
 
 func (e *Exp) ContainsSku(tg sku.TransactedGetter) (ok bool) {
-  sk := tg.GetSku()
+	sk := tg.GetSku()
 	ui.Log().Printf("%s in %s", sk, e)
 	defer sk.Metadata.Cache.QueryPath.PushOnReturn(e, &ok)
 

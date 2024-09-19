@@ -28,14 +28,14 @@ func (c EachBlob) Run(
 
 	if err = zsc.Each(
 		func(col sku.CheckedOutLike) (err error) {
-      var fds *store_fs.Item
+			var fds *store_fs.Item
 
-      if fds, err = c.GetStore().GetCwdFiles().ReadFromExternal(
-        col.GetSkuExternalLike(),
-      ); err != nil {
-        err = errors.Wrap(err)
-        return
-      }
+			if fds, err = c.GetStore().GetCwdFiles().ReadFromExternal(
+				col.GetSkuExternalLike(),
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 
 			blob_store = append(blob_store, fds.Blob.GetPath())
 

@@ -20,7 +20,7 @@ func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 		return
 	}
 
-	var e2 *External
+	var e2 *sku.External
 
 	if e2, err = s.ReadExternalFromItem(
 		sku.CommitOptions{
@@ -42,7 +42,7 @@ func (s *Store) readOneExternalInto(
 	o *sku.CommitOptions,
 	i *Item,
 	t *sku.Transacted,
-	e *External,
+	e *sku.External,
 ) (err error) {
 	if err = s.WriteToExternal(i, e); err != nil {
 		err = errors.Wrap(err)
@@ -126,9 +126,9 @@ func (s *Store) readOneExternalInto(
 }
 
 func (s *Store) readOneExternalObject(
-	e *External,
+	e *sku.External,
 	t *sku.Transacted,
-  i *Item,
+	i *Item,
 ) (err error) {
 	if t != nil {
 		object_metadata.Resetter.ResetWith(
@@ -156,7 +156,7 @@ func (s *Store) readOneExternalObject(
 
 func (s *Store) ReadOneExternalObjectReader(
 	r io.Reader,
-	e *External,
+	e *sku.External,
 ) (err error) {
 	if _, err = s.metadataTextParser.ParseMetadata(r, &e.Transacted); err != nil {
 		err = errors.Wrap(err)
@@ -167,9 +167,9 @@ func (s *Store) ReadOneExternalObjectReader(
 }
 
 func (s *Store) ReadOneExternalBlob(
-	e *External,
+	e *sku.External,
 	t *sku.Transacted,
-  i *Item,
+	i *Item,
 ) (err error) {
 	object_metadata.Resetter.ResetWith(&e.Transacted.Metadata, t.GetMetadata())
 

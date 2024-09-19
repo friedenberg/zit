@@ -374,7 +374,7 @@ func (qg *Group) String() string {
 }
 
 func (qg *Group) ContainsSku(tg sku.TransactedGetter) (ok bool) {
-  sk := tg.GetSku()
+	sk := tg.GetSku()
 	defer sk.Metadata.Cache.QueryPath.PushOnReturn(qg, &ok)
 
 	if len(qg.OptimizedQueries) == 0 && qg.matchOnEmpty {

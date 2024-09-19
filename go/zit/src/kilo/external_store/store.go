@@ -156,7 +156,7 @@ func (es *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
 	esdc, ok := es.StoreLike.(DeleteExternal)
 
 	if !ok {
-    err = errors.Errorf("store does not support DeleteExternal: %T", es.StoreLike)
+		err = errors.Errorf("store does not support DeleteExternal: %T", es.StoreLike)
 		return
 	}
 

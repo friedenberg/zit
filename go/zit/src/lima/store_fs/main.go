@@ -22,7 +22,7 @@ import (
 )
 
 func init() {
-	gob.Register(External{})
+	gob.Register(sku.External{})
 }
 
 type Store struct {
@@ -49,7 +49,7 @@ func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
 }
 
 func (s *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
-	e := el.(*External)
+	e := el.(*sku.External)
 
 	var i *Item
 
@@ -257,7 +257,7 @@ func (c *Store) GetExternalLikePool() interfaces.PoolValue[sku.ExternalLike] {
 			return poolExternal.Get()
 		},
 		FuncPut: func(e sku.ExternalLike) {
-			poolExternal.Put(e.(*External))
+			poolExternal.Put(e.(*sku.External))
 		},
 	}
 }
@@ -265,11 +265,11 @@ func (c *Store) GetExternalLikePool() interfaces.PoolValue[sku.ExternalLike] {
 func (c *Store) GetExternalLikeResetter3() interfaces.Resetter3[sku.ExternalLike] {
 	return pool.BespokeResetter[sku.ExternalLike]{
 		FuncReset: func(el sku.ExternalLike) {
-			a := el.(*External)
+			a := el.(*sku.External)
 			sku.ExternalResetter.Reset(a)
 		},
 		FuncResetWith: func(eldst, elsrc sku.ExternalLike) {
-			dst, src := eldst.(*External), elsrc.(*External)
+			dst, src := eldst.(*sku.External), elsrc.(*sku.External)
 			sku.ExternalResetter.ResetWith(dst, src)
 		},
 	}

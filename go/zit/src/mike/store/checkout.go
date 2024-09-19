@@ -57,8 +57,8 @@ func (s *Store) CheckoutQuery(
 	qf := func(t *sku.Transacted) (err error) {
 		var col sku.CheckedOutLike
 
-    // TODO include a "query complete" signal for the external store to batch
-    // the checkout if necessary
+		// TODO include a "query complete" signal for the external store to batch
+		// the checkout if necessary
 		if col, err = es.CheckoutOne(options, t); err != nil {
 			if errors.Is(err, external_store.ErrUnsupportedTyp{}) {
 				err = nil

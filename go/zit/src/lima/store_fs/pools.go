@@ -3,15 +3,16 @@ package store_fs
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 var (
-	poolExternal   interfaces.Pool[External, *External]
+	poolExternal   interfaces.Pool[sku.External, *sku.External]
 	poolCheckedOut interfaces.Pool[CheckedOut, *CheckedOut]
 )
 
 func init() {
-	poolExternal = pool.MakePool[External](
+	poolExternal = pool.MakePool[sku.External](
 		nil,
 		nil,
 	)
@@ -22,7 +23,7 @@ func init() {
 	)
 }
 
-func GetExternalPool() interfaces.Pool[External, *External] {
+func GetExternalPool() interfaces.Pool[sku.External, *sku.External] {
 	return poolExternal
 }
 
