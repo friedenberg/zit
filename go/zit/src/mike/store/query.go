@@ -3,6 +3,7 @@ package store
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
@@ -45,28 +46,6 @@ func (s *Store) Query(
 	return
 }
 
-func (s *Store) MakeQueryExecutor(
-	qg *query.Group,
-) (e query.Executor, err error) {
-	if qg == nil {
-		if qg, err = s.queryBuilder.BuildQueryGroup(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	es := s.externalStores[qg.RepoId]
-
-	e = query.MakeExecutorWithExternalStore(
-		qg,
-		s.GetStreamIndex().ReadQuery,
-		s.ReadOneInto,
-		es,
-	)
-
-	return
-}
-
 func (s *Store) QueryCheckedOut(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.CheckedOutLike],
@@ -79,6 +58,24 @@ func (s *Store) QueryCheckedOut(
 	}
 
 	if err = e.ExecuteCheckedOutLike(f); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) ReadTransactedFromObjectId(
+	k1 interfaces.ObjectId,
+) (sk1 *sku.Transacted, err error) {
+	sk1 = sku.GetTransactedPool().Get()
+
+	if err = s.ReadOneInto(k1, sk1); err != nil {
+		if collections.IsErrNotFound(err) {
+			sku.GetTransactedPool().Put(sk1)
+			sk1 = nil
+		}
+
 		err = errors.Wrap(err)
 		return
 	}

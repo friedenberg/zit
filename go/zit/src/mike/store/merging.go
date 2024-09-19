@@ -2,7 +2,6 @@ package store
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -59,52 +58,6 @@ func (s *Store) readExternalAndMergeIfNecessary(
 	if err = s.Merge(tm); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	return
-}
-
-func (s *Store) Merge(
-	tm sku.Conflicted,
-) (err error) {
-	switch tm.CheckedOutLike.GetSkuExternalLike().GetRepoId().GetRepoIdString() {
-	case "browser":
-		err = todo.Implement()
-
-	default:
-		if err = s.cwdFiles.Merge(tm); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
-func (s *Store) RunMergeTool(
-	tm sku.Conflicted,
-) (err error) {
-	tool := s.GetKonfig().ToolOptions.Merge
-
-	switch tm.GetSkuExternalLike().GetRepoId().GetRepoIdString() {
-	case "browser":
-		err = todo.Implement()
-
-	default:
-		var co sku.CheckedOutLike
-
-		if co, err = s.cwdFiles.RunMergeTool(tool, tm); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		defer s.PutCheckedOutLike(co)
-
-		if err = s.CreateOrUpdateCheckedOut(co, false); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
 	}
 
 	return
