@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 )
 
-func (s *Store) Import(external *sku.Transacted) (co *store_fs.CheckedOut, err error) {
+func (s *Store) Import(external *sku.Transacted) (co *sku.CheckedOut, err error) {
 	co = store_fs.GetCheckedOutPool().Get()
 	co.IsImport = true
 
@@ -99,7 +99,7 @@ func (s *Store) Import(external *sku.Transacted) (co *store_fs.CheckedOut, err e
 
 var ErrNeedsMerge = errors.New("needs merge")
 
-func (s *Store) importDoMerge(co *store_fs.CheckedOut) (err error) {
+func (s *Store) importDoMerge(co *sku.CheckedOut) (err error) {
 	co.State = checked_out_state.Conflicted
 	return
 }

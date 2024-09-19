@@ -14,7 +14,7 @@ import (
 func (s *Store) readCheckedOutFromItem(
 	o sku.CommitOptions,
 	i *Item,
-) (co *CheckedOut, err error) {
+) (co *sku.CheckedOut, err error) {
 	co = GetCheckedOutPool().Get()
 
 	if err = s.externalStoreSupplies.FuncReadOneInto(
@@ -55,7 +55,7 @@ func (s *Store) readCheckedOutFromItem(
 
 func (s *Store) ReadCheckedOutFromTransacted(
 	sk2 *sku.Transacted,
-) (co *CheckedOut, err error) {
+) (co *sku.CheckedOut, err error) {
 	co = GetCheckedOutPool().Get()
 
 	if err = s.readIntoCheckedOutFromTransacted(sk2, co); err != nil {
@@ -68,7 +68,7 @@ func (s *Store) ReadCheckedOutFromTransacted(
 
 func (s *Store) readIntoCheckedOutFromTransacted(
 	sk *sku.Transacted,
-	co *CheckedOut,
+	co *sku.CheckedOut,
 ) (err error) {
 	if &co.Internal != sk {
 		sku.Resetter.ResetWith(&co.Internal, sk)
@@ -119,7 +119,7 @@ func (s *Store) readIntoCheckedOutFromTransacted(
 func (s *Store) readIntoCheckedOutFromTransactedAndItem(
 	sk *sku.Transacted,
 	i *Item,
-	co *CheckedOut,
+	co *sku.CheckedOut,
 ) (err error) {
 	if &co.Internal != sk {
 		sku.Resetter.ResetWith(&co.Internal, sk)

@@ -7,8 +7,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type CheckedOut = sku.CheckedOut
-
 func (s *Store) ToSliceFilesZettelen(
 	cos sku.CheckedOutLikeSet,
 ) (out []string, err error) {

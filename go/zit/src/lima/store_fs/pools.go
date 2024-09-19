@@ -8,7 +8,7 @@ import (
 
 var (
 	poolExternal   interfaces.Pool[sku.External, *sku.External]
-	poolCheckedOut interfaces.Pool[CheckedOut, *CheckedOut]
+	poolCheckedOut interfaces.Pool[sku.CheckedOut, *sku.CheckedOut]
 )
 
 func init() {
@@ -17,7 +17,7 @@ func init() {
 		nil,
 	)
 
-	poolCheckedOut = pool.MakePool[CheckedOut](
+	poolCheckedOut = pool.MakePool[sku.CheckedOut](
 		nil,
 		nil,
 	)
@@ -27,6 +27,6 @@ func GetExternalPool() interfaces.Pool[sku.External, *sku.External] {
 	return poolExternal
 }
 
-func GetCheckedOutPool() interfaces.Pool[CheckedOut, *CheckedOut] {
+func GetCheckedOutPool() interfaces.Pool[sku.CheckedOut, *sku.CheckedOut] {
 	return poolCheckedOut
 }

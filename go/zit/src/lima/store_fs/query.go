@@ -36,7 +36,7 @@ func (s *Store) ApplyCheckedOut(
 	i *Item,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	var co *CheckedOut
+	var co *sku.CheckedOut
 
 	if co, err = s.readCheckedOutFromItem(o, i); err != nil {
 		err = errors.Wrapf(err, "%s", i.Debug())

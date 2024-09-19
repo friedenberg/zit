@@ -16,7 +16,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list"
-	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
@@ -104,7 +103,7 @@ func (c Import) Run(u *env.Env, args ...string) (err error) {
 	u.Lock()
 	defer u.Unlock()
 
-	var co *store_fs.CheckedOut
+	var co *sku.CheckedOut
 
 	for {
 		sk, ok := list.Pop()
@@ -159,7 +158,7 @@ func (c Import) Run(u *env.Env, args ...string) (err error) {
 
 func (c Import) importBlobIfNecessary(
 	u *env.Env,
-	co *store_fs.CheckedOut,
+	co *sku.CheckedOut,
 	ag *age.Age,
 	coErrPrinter interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {

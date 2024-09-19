@@ -31,7 +31,7 @@ func (s *Store) CheckoutOne(
 func (s *Store) checkoutOneNew(
 	options checkout_options.Options,
 	tg sku.TransactedGetter,
-) (cz *CheckedOut, i *Item, err error) {
+) (cz *sku.CheckedOut, i *Item, err error) {
 	sz := tg.GetSku()
 
 	cz = GetCheckedOutPool().Get()
@@ -115,7 +115,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	options checkout_options.OptionsWithoutMode,
 	col sku.CheckedOutLike,
 ) (err error) {
-	cofs := col.(*CheckedOut)
+	cofs := col.(*sku.CheckedOut)
 
 	o := checkout_options.Options{
 		OptionsWithoutMode: options,
@@ -131,7 +131,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 
 	options.Path = checkout_options.PathTempLocal
 
-	var replacement *CheckedOut
+	var replacement *sku.CheckedOut
 	var oldFDs, newFDs *Item
 
 	if oldFDs, err = s.ReadFromExternal(col.GetSkuExternalLike()); err != nil {
@@ -174,7 +174,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 
 func (s *Store) checkoutOne(
 	options checkout_options.Options,
-	cz *CheckedOut,
+	cz *sku.CheckedOut,
 	i *Item,
 ) (err error) {
 	if s.config.IsDryRun() {
@@ -247,7 +247,7 @@ func (s *Store) checkoutOne(
 
 func (s *Store) shouldCheckOut(
 	options checkout_options.Options,
-	cz *CheckedOut,
+	cz *sku.CheckedOut,
 	allowMutterMatch bool,
 ) bool {
 	if options.Force {

@@ -16,7 +16,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
@@ -73,7 +72,7 @@ func (c Mergetool) RunWithQuery(
 
 	if err = conflicted.Each(
 		func(col sku.CheckedOutLike) (err error) {
-			cofs := col.(*store_fs.CheckedOut)
+			cofs := col.(*sku.CheckedOut)
 
 			tm := sku.Conflicted{
 				CheckedOutLike: col.Clone(),

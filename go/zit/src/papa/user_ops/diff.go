@@ -33,7 +33,7 @@ func (op Diff) Run(
 	col sku.CheckedOutLike,
 	options object_metadata.TextFormatterOptions,
 ) (err error) {
-	cofs, ok := col.(*store_fs.CheckedOut)
+	cofs, ok := col.(*sku.CheckedOut)
 
 	if !ok {
 		if col, err = op.GetStore().GetCwdFiles().CheckoutOne(
@@ -49,7 +49,7 @@ func (op Diff) Run(
 			return
 		}
 
-		cofs = col.(*store_fs.CheckedOut)
+		cofs = col.(*sku.CheckedOut)
 
 		defer errors.Deferred(&err, func() (err error) {
 			if err = op.GetStore().GetCwdFiles().DeleteExternalLike(

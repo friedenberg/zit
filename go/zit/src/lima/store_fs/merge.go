@@ -22,7 +22,7 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 
 	original, replacement, mergeResult := s.tryMergeIgnoringConflicts(tm)
 
-	cofs := tm.CheckedOutLike.(*CheckedOut)
+	cofs := tm.CheckedOutLike.(*sku.CheckedOut)
 
 	if mergeResult != nil {
 		mergeConflict := &ErrMergeConflict{}
@@ -149,7 +149,7 @@ func (s *Store) tryMergeIgnoringConflicts(
 func (s *Store) checkoutOneForMerge(
 	mode checkout_mode.Mode,
 	sz *sku.Transacted,
-) (cz *CheckedOut, i *Item, err error) {
+) (cz *sku.CheckedOut, i *Item, err error) {
 	options := checkout_options.Options{
 		CheckoutMode: mode,
 		OptionsWithoutMode: checkout_options.OptionsWithoutMode{
@@ -187,7 +187,7 @@ func (s *Store) checkoutOneForMerge(
 
 func (s *Store) handleMergeResult(
 	conflicted sku.Conflicted,
-	cofs *CheckedOut,
+	cofs *sku.CheckedOut,
 	mergeResult *ErrMergeConflict,
 ) (err error) {
 	var f *os.File
@@ -241,13 +241,13 @@ func (s *Store) handleMergeResult(
 func (s *Store) RunMergeTool(
 	tool []string,
 	tm sku.Conflicted,
-) (co *CheckedOut, err error) {
+) (co *sku.CheckedOut, err error) {
 	if len(tool) == 0 {
 		err = errors.Errorf("no utility provided")
 		return
 	}
 
-	co = tm.CheckedOutLike.(*CheckedOut)
+	co = tm.CheckedOutLike.(*sku.CheckedOut)
 
 	inlineBlob := tm.IsAllInlineType(s.config)
 

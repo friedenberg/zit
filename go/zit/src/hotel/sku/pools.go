@@ -8,7 +8,7 @@ import (
 var (
 	poolTransacted interfaces.Pool[Transacted, *Transacted]
 	poolExternal   interfaces.Pool[External, *External]
-	poolCheckedOut   interfaces.Pool[CheckedOut, *CheckedOut]
+	poolCheckedOut interfaces.Pool[CheckedOut, *CheckedOut]
 )
 
 func init() {

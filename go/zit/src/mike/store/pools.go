@@ -13,7 +13,7 @@ func (s *Store) PutCheckedOutLike(col sku.CheckedOutLike) {
 		store_browser.GetCheckedOutPool().Put(col.(*store_browser.CheckedOut))
 
 	default:
-		cofs := col.(*store_fs.CheckedOut)
+		cofs := col.(*sku.CheckedOut)
 		store_fs.GetCheckedOutPool().Put(cofs)
 	}
 }

@@ -48,7 +48,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
 	col sku.CheckedOutLike,
 ) (n int64, err error) {
-	co := col.(*CheckedOut)
+	co := col.(*sku.CheckedOut)
 
 	var (
 		n1 int
@@ -272,7 +272,7 @@ func (f *cliCheckedOut) writeStringFormatBlobFD(
 
 func (f *cliCheckedOut) writeStringFormatUntracked(
 	sw interfaces.WriterAndStringWriter,
-	co *CheckedOut,
+	co *sku.CheckedOut,
 	mode checkout_mode.Mode,
 ) (n int64, err error) {
 	var (

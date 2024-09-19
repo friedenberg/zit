@@ -35,7 +35,7 @@ func (c ZettelFromExternalBlob) Run(
 		qg,
 		func(col sku.CheckedOutLike) (err error) {
 			// TODO support other repos
-			cofs := col.(*store_fs.CheckedOut)
+			cofs := col.(*sku.CheckedOut)
 			z := col.GetSkuExternalLike().GetSku()
 
 			if z.Metadata.IsEmpty() {
