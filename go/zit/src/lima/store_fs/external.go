@@ -1,10 +1,7 @@
 package store_fs
 
 import (
-	"fmt"
-
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
@@ -25,29 +22,6 @@ func (a *External) Clone() sku.ExternalLike {
 	b := GetExternalPool().Get()
 	sku.ExternalResetter.ResetWith(&b.External, &a.External)
 	return b
-}
-
-func (a *External) String() string {
-	return fmt.Sprintf(
-		". %s %s %s %s",
-		a.GetGenre(),
-		a.GetObjectId(),
-		a.Transacted.GetObjectSha(),
-		a.GetBlobSha(),
-	)
-}
-
-func (a *External) SetBlobSha(v interfaces.Sha) (err error) {
-	if err = a.Transacted.Metadata.Blob.SetShaLike(v); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (o *External) GetKey() string {
-	return fmt.Sprintf("%s.%s", o.GetGenre(), o.GetObjectId())
 }
 
 func (s *Store) GetCheckoutModeOrError(
