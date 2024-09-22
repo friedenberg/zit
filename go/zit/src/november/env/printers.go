@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
+	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
 func (u *Env) PrinterSkuTransacted() interfaces.FuncIter[*sku.Transacted] {
@@ -101,7 +101,7 @@ func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[*sku.CheckedOut] {
 	err := string_format_writer.MakeDelim(
 		"\n",
 		u.Err(),
-		store_fs.MakeCliCheckedOutFormat(
+		sku_fmt.MakeCliCheckedOutFormat(
 			u.config.PrintOptions,
 			u.StringFormatWriterShaLike(oo.ColorOptionsErr),
 			id_fmts.MakeFDCliFormat(
@@ -124,7 +124,7 @@ func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[*sku.CheckedOut] {
 	out := string_format_writer.MakeDelim(
 		"\n",
 		u.Out(),
-		store_fs.MakeCliCheckedOutFormat(
+		sku_fmt.MakeCliCheckedOutFormat(
 			u.config.PrintOptions,
 			u.StringFormatWriterShaLike(oo.ColorOptionsOut),
 			id_fmts.MakeFDCliFormat(

@@ -1,4 +1,4 @@
-package store_fs
+package sku_fmt
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
 type cliCheckedOut struct {
@@ -23,7 +22,7 @@ type cliCheckedOut struct {
 	objectIdStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId]
 	fdStringFormatWriter       interfaces.StringFormatWriter[*fd.FD]
 	metadataStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata]
-	formatBox                  *sku_fmt.Box
+	formatBox                  *Box
 	fsItemReadWriter           sku.FSItemReadWriter
 }
 
@@ -33,7 +32,7 @@ func MakeCliCheckedOutFormat(
 	fdStringFormatWriter interfaces.StringFormatWriter[*fd.FD],
 	objectIdStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
 	metadataStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata],
-	formatBox *sku_fmt.Box,
+	formatBox *Box,
 	fsItemReadWriter sku.FSItemReadWriter,
 ) *cliCheckedOut {
 	return &cliCheckedOut{
@@ -77,7 +76,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 
 	o := &co.External
 
-	var fds *Item
+	var fds *sku.FSItem
 
 	if fds, err = f.fsItemReadWriter.ReadFSItemFromExternal(o); err != nil {
 		// TODO write error field to box
@@ -193,7 +192,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 
 func (f *cliCheckedOut) writeStringFormatBlobFDsExcept(
 	sw interfaces.WriterAndStringWriter,
-	fds *Item,
+	fds *sku.FSItem,
 	except *fd.FD,
 ) (n int64, err error) {
 	var n2 int64
@@ -285,7 +284,7 @@ func (f *cliCheckedOut) writeStringFormatUntracked(
 	)
 
 	o := &co.External
-	var i *Item
+	var i *sku.FSItem
 
 	if i, err = f.fsItemReadWriter.ReadFSItemFromExternal(o); err != nil {
 		err = errors.Wrap(err)
