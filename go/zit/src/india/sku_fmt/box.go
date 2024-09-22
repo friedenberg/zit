@@ -21,8 +21,8 @@ import (
 )
 
 type (
-	ReaderExternalLike = catgut.StringFormatReader[sku.ExternalLike]
-	WriterExternalLike = catgut.StringFormatWriter[sku.ExternalLike]
+	ReaderExternalLike = catgut.StringFormatReader[*sku.Transacted]
+	WriterExternalLike = catgut.StringFormatWriter[*sku.Transacted]
 
 	ExternalLike interface {
 		ReaderExternalLike
@@ -91,10 +91,8 @@ func (f *Box) SetMaxKopfUndSchwanz(k, s int) {
 
 func (f *Box) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
-	el sku.ExternalLike,
+	o *sku.Transacted,
 ) (n int64, err error) {
-	o := el.GetSku()
-
 	var n1 int
 	var n2 int64
 
@@ -126,8 +124,7 @@ func (f *Box) WriteStringFormat(
 		return
 	}
 
-	e := el.(*sku.Transacted)
-	n2, err = f.WriteStringFormatExternal(sw, e, false)
+	n2, err = f.WriteStringFormatExternal(sw, o, false)
 	n += int64(n2)
 
 	if err != nil {
@@ -143,7 +140,7 @@ func (f *Box) WriteStringFormat(
 		return
 	}
 
-	b := &e.Metadata.Description
+	b := &o.Metadata.Description
 
 	if !b.IsEmpty() {
 		n2, err = f.Fields.WriteStringFormat(
@@ -172,7 +169,7 @@ func (f *Box) WriteStringFormat(
 
 func (f *Box) ReadStringFormat(
 	rb *catgut.RingBuffer,
-	el sku.ExternalLike,
+	el *sku.Transacted,
 ) (n int64, err error) {
 	var ts query_spec.TokenScanner
 	ts.Reset(catgut.MakeRingBufferRuneScanner(rb))

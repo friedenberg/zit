@@ -73,7 +73,10 @@ func (av writer) writeNormal(a *Assignment) (err error) {
 		// sku.TransactedResetter.ResetWith(cursor, z.ExternalLike.GetSku())
 		z.External.GetSku().Metadata.Subtract(&av.Metadata)
 
-		if _, err = av.options.stringFormatWriter.WriteStringFormat(&sb, z.External); err != nil {
+		if _, err = av.options.stringFormatWriter.WriteStringFormat(
+      &sb,
+      z.External.GetSku(),
+    ); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -153,7 +156,10 @@ func (av writer) writeRightAligned(a *Assignment) (err error) {
 
 		sk.Metadata.SetTags(mes)
 
-		if _, err = av.options.stringFormatWriter.WriteStringFormat(&sb, cursor); err != nil {
+		if _, err = av.options.stringFormatWriter.WriteStringFormat(
+      &sb,
+      cursor.GetSku(),
+    ); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

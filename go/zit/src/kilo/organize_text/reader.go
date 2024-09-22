@@ -279,7 +279,7 @@ func (ar *reader) readOneObj(
 
 	if _, err = ar.options.stringFormatReader.ReadStringFormat(
 		r,
-		z.External,
+		z.External.GetSku(),
 	); err != nil {
 		err = ErrorRead{
 			error:  err,

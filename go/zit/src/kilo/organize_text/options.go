@@ -47,8 +47,8 @@ type Options struct {
 	UseMetadataHeader      bool
 
 	PrintOptions       erworben_cli_print_options.PrintOptions
-	stringFormatReader catgut.StringFormatReader[sku.ExternalLike]
-	stringFormatWriter catgut.StringFormatWriter[sku.ExternalLike]
+	stringFormatReader catgut.StringFormatReader[*sku.Transacted]
+	stringFormatWriter catgut.StringFormatWriter[*sku.Transacted]
 }
 
 func MakeFlags() Flags {
