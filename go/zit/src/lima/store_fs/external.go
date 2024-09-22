@@ -15,7 +15,7 @@ func (s *Store) GetCheckoutModeOrError(
 ) (m checkout_mode.Mode, err error) {
 	var fds *Item
 
-	if fds, err = s.ReadFromExternal(el); err != nil {
+	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -53,7 +53,7 @@ func (s *Store) GetConflictOrError(
 ) (f *fd.FD, err error) {
 	var fds *Item
 
-	if fds, err = s.ReadFromExternal(el); err != nil {
+	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -68,7 +68,7 @@ func (s *Store) GetObjectOrError(
 ) (f *fd.FD, err error) {
 	var fds *Item
 
-	if fds, err = s.ReadFromExternal(el); err != nil {
+	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -84,14 +84,14 @@ func (s *Store) SetObjectOrError(
 ) (err error) {
 	var fds *Item
 
-	if fds, err = s.ReadFromExternal(el); err != nil {
+	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	fds.Object.ResetWith(object)
 
-	if err = s.WriteToExternal(fds, el); err != nil {
+	if err = s.WriteFSItemToExternal(fds, el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -104,7 +104,7 @@ func (s *Store) GetBlobOrError(
 ) (f *fd.FD, err error) {
 	var fds *Item
 
-	if fds, err = s.ReadFromExternal(el); err != nil {
+	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -120,14 +120,14 @@ func (s *Store) SetBlobOrError(
 ) (err error) {
 	var fds *Item
 
-	if fds, err = s.ReadFromExternal(el); err != nil {
+	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	fds.Blob.ResetWith(blob)
 
-	if err = s.WriteToExternal(fds, el); err != nil {
+	if err = s.WriteFSItemToExternal(fds, el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -140,7 +140,7 @@ func (s *Store) UpdateDescriptionFromBlobs(
 ) (err error) {
 	var fds *Item
 
-	if fds, err = s.ReadFromExternal(el); err != nil {
+	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -161,7 +161,7 @@ func (s *Store) UpdateDescriptionFromBlobs(
 		}
 	}
 
-	if err = s.WriteToExternal(fds, el); err != nil {
+	if err = s.WriteFSItemToExternal(fds, el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -113,6 +113,10 @@ func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[*sku.CheckedOut] {
 				oo.ColorOptionsErr,
 				string_format_writer.CliFormatTruncation66CharEllipsis,
 			),
+			u.StringFormatWriterSkuBox(
+				oo.ColorOptionsErr,
+				string_format_writer.CliFormatTruncation66CharEllipsis,
+			),
 			u.GetStore().GetCwdFiles(),
 		),
 	)
@@ -129,6 +133,10 @@ func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[*sku.CheckedOut] {
 			),
 			u.StringFormatWriterObjectId(oo.ColorOptionsOut),
 			u.StringFormatWriterMetadata(
+				oo.ColorOptionsErr,
+				string_format_writer.CliFormatTruncation66CharEllipsis,
+			),
+			u.StringFormatWriterSkuBox(
 				oo.ColorOptionsErr,
 				string_format_writer.CliFormatTruncation66CharEllipsis,
 			),

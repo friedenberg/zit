@@ -114,7 +114,7 @@ func (s *Store) tryMergeIgnoringConflicts(
 		return
 	}
 
-	if original, err = s.ReadFromExternal(tm.CheckedOutLike.GetSkuExternalLike()); err != nil {
+	if original, err = s.ReadFSItemFromExternal(tm.CheckedOutLike.GetSkuExternalLike()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -163,7 +163,7 @@ func (s *Store) checkoutOneForMerge(
 	cz = GetCheckedOutPool().Get()
 	sku.Resetter.ResetWith(&cz.Internal, sz)
 
-	if i, err = s.ReadFromExternal(&cz.External); err != nil {
+	if i, err = s.ReadFSItemFromExternal(&cz.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -177,7 +177,7 @@ func (s *Store) checkoutOneForMerge(
 		return
 	}
 
-	if err = s.WriteToExternal(i, &cz.External); err != nil {
+	if err = s.WriteFSItemToExternal(i, &cz.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -215,7 +215,7 @@ func (s *Store) handleMergeResult(
 
 	var i *Item
 
-	if i, err = s.ReadFromExternal(&cofs.External); err != nil {
+	if i, err = s.ReadFSItemFromExternal(&cofs.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -300,7 +300,7 @@ func (s *Store) RunMergeTool(
 
 	e.ObjectId.ResetWith(&co.External.ObjectId)
 
-	if err = s.WriteToExternal(leftItem, e); err != nil {
+	if err = s.WriteFSItemToExternal(leftItem, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

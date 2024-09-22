@@ -103,7 +103,7 @@ func (op Diff) Run(
 
 	var fds *store_fs.Item
 
-	if fds, err = op.GetStore().GetCwdFiles().ReadFromExternal(el); err != nil {
+	if fds, err = op.GetStore().GetCwdFiles().ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

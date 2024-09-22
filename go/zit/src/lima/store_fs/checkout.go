@@ -56,7 +56,7 @@ func (s *Store) checkoutOneNew(
 			i,
 			sz,
 		); err != nil {
-			if errors.Is(err, ErrExternalHasConflictMarker) && options.AllowConflicted {
+			if errors.Is(err, sku.ErrExternalHasConflictMarker) && options.AllowConflicted {
 				sku.TransactedResetter.ResetWith(&cz.External, cze)
 				sku.DetermineState(cz, true)
 				err = nil
@@ -70,7 +70,7 @@ func (s *Store) checkoutOneNew(
 			sku.DetermineState(cz, true)
 
 			if !s.shouldCheckOut(options, cz, true) {
-				if err = s.WriteToExternal(i, &cz.External); err != nil {
+				if err = s.WriteFSItemToExternal(i, &cz.External); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -88,7 +88,7 @@ func (s *Store) checkoutOneNew(
 	}
 
 	if i == nil {
-		if i, err = s.ReadFromExternal(&cz.External); err != nil {
+		if i, err = s.ReadFSItemFromExternal(&cz.External); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -103,7 +103,7 @@ func (s *Store) checkoutOneNew(
 		return
 	}
 
-	if err = s.WriteToExternal(i, &cz.External); err != nil {
+	if err = s.WriteFSItemToExternal(i, &cz.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -134,7 +134,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	var replacement *sku.CheckedOut
 	var oldFDs, newFDs *Item
 
-	if oldFDs, err = s.ReadFromExternal(col.GetSkuExternalLike()); err != nil {
+	if oldFDs, err = s.ReadFSItemFromExternal(col.GetSkuExternalLike()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

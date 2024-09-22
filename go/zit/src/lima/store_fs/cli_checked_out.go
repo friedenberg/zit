@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
 type cliCheckedOut struct {
@@ -22,7 +23,8 @@ type cliCheckedOut struct {
 	objectIdStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId]
 	fdStringFormatWriter       interfaces.StringFormatWriter[*fd.FD]
 	metadataStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata]
-	store                      *Store
+	formatBox                  *sku_fmt.Box
+	fsItemReadWriter           sku.FSItemReadWriter
 }
 
 func MakeCliCheckedOutFormat(
@@ -31,7 +33,8 @@ func MakeCliCheckedOutFormat(
 	fdStringFormatWriter interfaces.StringFormatWriter[*fd.FD],
 	objectIdStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
 	metadataStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata],
-	s *Store,
+	formatBox *sku_fmt.Box,
+	fsItemReadWriter sku.FSItemReadWriter,
 ) *cliCheckedOut {
 	return &cliCheckedOut{
 		options:                    options,
@@ -40,7 +43,8 @@ func MakeCliCheckedOutFormat(
 		objectIdStringFormatWriter: objectIdStringFormatWriter,
 		fdStringFormatWriter:       fdStringFormatWriter,
 		metadataStringFormatWriter: metadataStringFormatWriter,
-		store:                      s,
+		formatBox:                  formatBox,
+		fsItemReadWriter:           fsItemReadWriter,
 	}
 }
 
@@ -72,9 +76,10 @@ func (f *cliCheckedOut) WriteStringFormat(
 	}
 
 	o := &co.External
+
 	var fds *Item
 
-	if fds, err = f.store.ReadFromExternal(o); err != nil {
+	if fds, err = f.fsItemReadWriter.ReadFSItemFromExternal(o); err != nil {
 		// TODO write error field to box
 		err = errors.Wrap(err)
 		return
@@ -282,7 +287,7 @@ func (f *cliCheckedOut) writeStringFormatUntracked(
 	o := &co.External
 	var i *Item
 
-	if i, err = f.store.ReadFromExternal(o); err != nil {
+	if i, err = f.fsItemReadWriter.ReadFSItemFromExternal(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

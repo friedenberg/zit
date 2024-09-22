@@ -44,7 +44,7 @@ func (s *Store) readOneExternalInto(
 	t *sku.Transacted,
 	e *sku.External,
 ) (err error) {
-	if err = s.WriteToExternal(i, e); err != nil {
+	if err = s.WriteFSItemToExternal(i, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -117,7 +117,7 @@ func (s *Store) readOneExternalInto(
 		o.Clock = i
 	}
 
-	if err = s.WriteToExternal(i, e); err != nil {
+	if err = s.WriteFSItemToExternal(i, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

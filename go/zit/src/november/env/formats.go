@@ -98,26 +98,6 @@ func (u *Env) StringFormatWriterMetadata(
 	)
 }
 
-func (u *Env) StringFormatWriterSkuBox2(
-	co string_format_writer.ColorOptions,
-	truncation string_format_writer.CliFormatTruncation,
-) *sku_fmt.Box2 {
-	return sku_fmt.MakeBox2(
-		co,
-		u.config.PrintOptions,
-		u.StringFormatWriterShaLike(co),
-		u.StringFormatWriterObjectIdAligned(co),
-		u.StringFormatWriterType(co),
-		u.StringFormatWriterTags(co),
-		u.StringFormatWriterFields(truncation, co),
-		u.StringFormatWriterMetadata(
-			co,
-			truncation,
-		),
-		u.GetStore().GetAbbrStore().GetAbbr(),
-	)
-}
-
 func (u *Env) StringFormatWriterSkuBox(
 	co string_format_writer.ColorOptions,
 	truncation string_format_writer.CliFormatTruncation,

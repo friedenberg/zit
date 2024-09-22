@@ -52,6 +52,11 @@ type (
 		GetSkuExternalLike() ExternalLike
 	}
 
+	FSItemReadWriter interface {
+		ReadFSItemFromExternal(el ExternalLike) (i *FSItem, err error)
+		WriteFSItemToExternal(i *FSItem, el ExternalLike) (err error)
+	}
+
 	CheckedOutLike interface {
 		interfaces.Stringer
 		TransactedGetter

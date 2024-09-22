@@ -1,8 +1,7 @@
-package store_fs
+package sku
 
 import (
 	"fmt"
-	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
@@ -10,17 +9,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
-	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 var ErrExternalHasConflictMarker = errors.New("external has conflict marker")
 
-type Item struct {
+type FSItem struct {
 	external_state.State
 
 	// TODO refactor this to be a string and a genre that is tied to the state
@@ -33,15 +29,15 @@ type Item struct {
 	interfaces.MutableSetLike[*fd.FD]
 }
 
-func (ef *Item) String() string {
+func (ef *FSItem) String() string {
 	return ef.ObjectId.String()
 }
 
-func (ef *Item) GetExternalObjectId() sku.ExternalObjectId {
+func (ef *FSItem) GetExternalObjectId() ExternalObjectId {
 	return ef
 }
 
-func (i *Item) Debug() string {
+func (i *FSItem) Debug() string {
 	return fmt.Sprintf(
 		"State: %q, Genre: %q, ObjectId: %q, Object: %q, Blob: %q, Conflict: %q, All: %q",
 		i.State,
@@ -54,15 +50,15 @@ func (i *Item) Debug() string {
 	)
 }
 
-func (i *Item) GetTai() ids.Tai {
+func (i *FSItem) GetTai() ids.Tai {
 	return ids.TaiFromTime(i.LatestModTime())
 }
 
-func (i *Item) GetTime() thyme.Time {
+func (i *FSItem) GetTime() thyme.Time {
 	return i.LatestModTime()
 }
 
-func (i *Item) LatestModTime() thyme.Time {
+func (i *FSItem) LatestModTime() thyme.Time {
 	o, b := i.Object.ModTime(), i.Blob.ModTime()
 
 	if o.Less(b) {
@@ -72,7 +68,7 @@ func (i *Item) LatestModTime() thyme.Time {
 	}
 }
 
-func (dst *Item) Reset() {
+func (dst *FSItem) Reset() {
 	dst.State = 0
 	dst.ObjectId.Reset()
 	dst.Object.Reset()
@@ -86,7 +82,7 @@ func (dst *Item) Reset() {
 	}
 }
 
-func (dst *Item) ResetWith(src *Item) {
+func (dst *FSItem) ResetWith(src *FSItem) {
 	if dst == src {
 		return
 	}
@@ -121,7 +117,7 @@ func (dst *Item) ResetWith(src *Item) {
 	}
 }
 
-func (a *Item) Equals(b *Item) (ok bool, why string) {
+func (a *FSItem) Equals(b *FSItem) (ok bool, why string) {
 	if ok, why = a.Object.Equals2(&b.Object); !ok {
 		return false, fmt.Sprintf("Object.%s", why)
 	}
@@ -141,7 +137,7 @@ func (a *Item) Equals(b *Item) (ok bool, why string) {
 	return
 }
 
-func (e *Item) GenerateConflictFD() (err error) {
+func (e *FSItem) GenerateConflictFD() (err error) {
 	if err = e.Conflict.SetPath(e.ObjectId.String() + ".conflict"); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -150,7 +146,7 @@ func (e *Item) GenerateConflictFD() (err error) {
 	return
 }
 
-func (e *Item) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
+func (e *FSItem) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 	switch {
 	case !e.Object.IsEmpty() && !e.Blob.IsEmpty():
 		m = checkout_mode.MetadataAndBlob
@@ -170,95 +166,6 @@ func (e *Item) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 		err = checkout_mode.MakeErrInvalidCheckoutMode(
 			errors.Errorf("all FD's are empty: %s", e.Debug()),
 		)
-	}
-
-	return
-}
-
-func (s *Store) ReadFromExternal(el sku.ExternalLike) (i *Item, err error) {
-	i = &Item{} // TODO use pool or use dir_items?
-	i.Reset()
-
-	e := el.(*sku.External)
-
-	// TODO handle sort order
-	for _, f := range e.Metadata.Fields {
-		var fdee *fd.FD
-		switch strings.ToLower(f.Key) {
-		case "object":
-			fdee = &i.Object
-
-		case "blob":
-			fdee = &i.Blob
-
-		case "conflict":
-			fdee = &i.Conflict
-
-		default:
-			err = errors.Errorf("unexpected field: %#v", f)
-			return
-		}
-
-		// if we've already set one of object, blob, or conflict, don't set it again
-		// and instead add a new FD to the item
-		if !fdee.IsEmpty() {
-			fdee = &fd.FD{}
-		}
-
-		if err = fdee.SetIgnoreNotExists(f.Value); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = i.Add(fdee); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	i.State = e.State
-	i.ObjectId.ResetWith(&e.ExternalObjectId)
-
-	return
-}
-
-func (s *Store) WriteToExternal(i *Item, el sku.ExternalLike) (err error) {
-	e := el.(*sku.External)
-	e.Metadata.Fields = e.Metadata.Fields[:0]
-	k := &i.ObjectId
-
-	e.ExternalObjectId.ResetWith(k)
-
-	if e.ExternalObjectId.String() != k.String() {
-		err = errors.Errorf("expected %q but got %q", k, &e.ExternalObjectId)
-	}
-
-	m := &e.Metadata
-	m.Tai = i.GetTai()
-
-	fdees := iter.SortedValues(i.MutableSetLike)
-
-	for _, f := range fdees {
-		field := object_metadata.Field{
-			Value:     f.GetPath(),
-			ColorType: string_format_writer.ColorTypeId,
-		}
-
-		switch {
-		case i.Object.Equals(f):
-			field.Key = "object"
-
-		case i.Conflict.Equals(f):
-			field.Key = "conflict"
-
-		case i.Blob.Equals(f):
-			fallthrough
-
-		default:
-			field.Key = "blob"
-		}
-
-		e.Metadata.Fields = append(e.Metadata.Fields, field)
 	}
 
 	return

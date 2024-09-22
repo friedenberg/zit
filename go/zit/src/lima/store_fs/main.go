@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
+	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -22,6 +23,8 @@ import (
 func init() {
 	gob.Register(sku.External{})
 }
+
+type Item = sku.FSItem
 
 type Store struct {
 	config              sku.Config
@@ -49,7 +52,7 @@ func (s *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
 
 	var i *Item
 
-	if i, err = s.ReadFromExternal(e); err != nil {
+	if i, err = s.ReadFSItemFromExternal(e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -230,6 +233,95 @@ func (s *Store) ApplyDotOperator() (err error) {
 	if err = s.dirItems.processRootDir(); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	return
+}
+
+func (s *Store) ReadFSItemFromExternal(el sku.ExternalLike) (i *Item, err error) {
+	i = &Item{} // TODO use pool or use dir_items?
+	i.Reset()
+
+	e := el.(*sku.External)
+
+	// TODO handle sort order
+	for _, f := range e.Metadata.Fields {
+		var fdee *fd.FD
+		switch strings.ToLower(f.Key) {
+		case "object":
+			fdee = &i.Object
+
+		case "blob":
+			fdee = &i.Blob
+
+		case "conflict":
+			fdee = &i.Conflict
+
+		default:
+			err = errors.Errorf("unexpected field: %#v", f)
+			return
+		}
+
+		// if we've already set one of object, blob, or conflict, don't set it again
+		// and instead add a new FD to the item
+		if !fdee.IsEmpty() {
+			fdee = &fd.FD{}
+		}
+
+		if err = fdee.SetIgnoreNotExists(f.Value); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = i.Add(fdee); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	i.State = e.State
+	i.ObjectId.ResetWith(&e.ExternalObjectId)
+
+	return
+}
+
+func (s *Store) WriteFSItemToExternal(i *Item, el sku.ExternalLike) (err error) {
+	e := el.(*sku.External)
+	e.Metadata.Fields = e.Metadata.Fields[:0]
+	k := &i.ObjectId
+
+	e.ExternalObjectId.ResetWith(k)
+
+	if e.ExternalObjectId.String() != k.String() {
+		err = errors.Errorf("expected %q but got %q", k, &e.ExternalObjectId)
+	}
+
+	m := &e.Metadata
+	m.Tai = i.GetTai()
+
+	fdees := iter.SortedValues(i.MutableSetLike)
+
+	for _, f := range fdees {
+		field := object_metadata.Field{
+			Value:     f.GetPath(),
+			ColorType: string_format_writer.ColorTypeId,
+		}
+
+		switch {
+		case i.Object.Equals(f):
+			field.Key = "object"
+
+		case i.Conflict.Equals(f):
+			field.Key = "conflict"
+
+		case i.Blob.Equals(f):
+			fallthrough
+
+		default:
+			field.Key = "blob"
+		}
+
+		e.Metadata.Fields = append(e.Metadata.Fields, field)
 	}
 
 	return
