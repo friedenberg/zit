@@ -19,7 +19,7 @@ func init() {
 
 	poolExternal = pool.MakePool(
 		nil,
-		ExternalResetter.Reset,
+		TransactedResetter.Reset,
 	)
 
 	poolCheckedOut = pool.MakePool(

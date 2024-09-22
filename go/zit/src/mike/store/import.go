@@ -46,7 +46,7 @@ func (s *Store) Import(external *sku.Transacted) (co *sku.CheckedOut, err error)
 			if err = s.tryRealizeAndOrStore(
 				external,
 				sku.CommitOptions{
-					Clock: &co.External.Transacted,
+					Clock: &co.External,
 					Mode:  objekte_mode.ModeCommit,
 				},
 			); err != nil {

@@ -2,7 +2,6 @@ package config
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
@@ -71,21 +70,16 @@ func (a *tag) Equals(b *tag) bool {
 }
 
 func (e *tag) Set(v string) (err error) {
-	return (&e.Transacted.ObjectId).Set(v)
+	if err = e.Transacted.ObjectId.Set(v); err != nil {
+    err = errors.Wrap(err)
+    return
+  }
+
+  return
 }
 
 func (e *tag) String() string {
 	return e.Transacted.GetObjectId().String()
-}
-
-func (k *compiled) EachTag(
-	f interfaces.FuncIter[*sku.Transacted],
-) (err error) {
-	return k.Tags.Each(
-		func(ek *tag) (err error) {
-			return f(&ek.Transacted)
-		},
-	)
 }
 
 func (k *compiled) AccumulateImplicitTags(

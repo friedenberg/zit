@@ -57,7 +57,7 @@ func (s *Store) checkoutOneNew(
 			sz,
 		); err != nil {
 			if errors.Is(err, ErrExternalHasConflictMarker) && options.AllowConflicted {
-				sku.ExternalResetter.ResetWith(&cz.External, cze)
+				sku.TransactedResetter.ResetWith(&cz.External, cze)
 				sku.DetermineState(cz, true)
 				err = nil
 			} else {
@@ -65,7 +65,7 @@ func (s *Store) checkoutOneNew(
 				return
 			}
 		} else {
-			sku.ExternalResetter.ResetWith(&cz.External, cze)
+			sku.TransactedResetter.ResetWith(&cz.External, cze)
 
 			sku.DetermineState(cz, true)
 
@@ -256,7 +256,7 @@ func (s *Store) shouldCheckOut(
 
 	eq := object_metadata.EqualerSansTai.Equals(
 		&cz.Internal.Metadata,
-		&cz.External.Transacted.Metadata,
+		&cz.External.Metadata,
 	)
 
 	if eq {
@@ -275,7 +275,7 @@ func (s *Store) shouldCheckOut(
 		cz.Internal.GetObjectId().String(),
 		mutter,
 	); err == nil {
-		if object_metadata.EqualerSansTai.Equals(&mutter.Metadata, &cz.External.Transacted.Metadata) {
+		if object_metadata.EqualerSansTai.Equals(&mutter.Metadata, &cz.External.Metadata) {
 			return true
 		}
 	}

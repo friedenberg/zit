@@ -193,7 +193,7 @@ func (u *Env) Initialize(options Options) (err error) {
 		k.FileExtensions,
 		u.GetFSHome(),
 		ofo,
-		u.PrinterExternalLikeFS(),
+		u.PrinterExternalLike(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -246,7 +246,7 @@ func (u *Env) Initialize(options Options) (err error) {
 		},
 	}
 
-	u.store.SetCheckedOutLogWriter(u.PrinterCheckedOutLike())
+	u.store.SetCheckedOutLogWriter(u.PrinterCheckedOutFS())
 	u.store.SetLogWriter(lw)
 
 	u.storesInitialized = true

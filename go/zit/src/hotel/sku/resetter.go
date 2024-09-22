@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
-	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 )
 
@@ -12,37 +11,26 @@ var TransactedResetter transactedResetter
 
 type transactedResetter struct{}
 
-func (transactedResetter) Reset(a *Transacted) {
-	a.ObjectId.Reset()
-	object_metadata.Resetter.Reset(&a.Metadata)
+func (transactedResetter) Reset(dst *Transacted) {
+	dst.ObjectId.Reset()
+	object_metadata.Resetter.Reset(&dst.Metadata)
+	dst.ExternalType.Reset()
+	dst.RepoId.Reset()
+	dst.State = external_state.Unknown
 }
 
-func (transactedResetter) ResetWith(a *Transacted, b *Transacted) {
-	errors.PanicIfError(a.ObjectId.ResetWithIdLike(&b.ObjectId))
-	object_metadata.Resetter.ResetWith(&a.Metadata, &b.Metadata)
+func (transactedResetter) ResetWith(dst *Transacted, src *Transacted) {
+	errors.PanicIfError(dst.ObjectId.ResetWithIdLike(&src.ObjectId))
+	object_metadata.Resetter.ResetWith(&dst.Metadata, &src.Metadata)
+	dst.ExternalType = src.ExternalType
+	dst.RepoId = src.RepoId
+	dst.State = src.State
+	dst.ExternalObjectId.ResetWith(&src.ExternalObjectId)
 }
 
-func (transactedResetter) ResetWithExceptFields(a *Transacted, b *Transacted) {
-	errors.PanicIfError(a.ObjectId.ResetWithIdLike(&b.ObjectId))
-	object_metadata.Resetter.ResetWithExceptFields(&a.Metadata, &b.Metadata)
-}
-
-var ExternalResetter externalResetter
-
-type externalResetter struct{}
-
-func (externalResetter) Reset(a *External) {
-	TransactedResetter.Reset(a.GetSku())
-	a.ExternalType.Reset()
-	a.RepoId.Reset()
-	a.State = external_state.Unknown
-	a.ExternalObjectId.Reset()
-}
-
-func (externalResetter) ResetWith(dst *External, src *External) {
-	errors.PanicIfError(dst.Transacted.ObjectId.ResetWithIdLike(&src.Transacted.ObjectId))
-	object_metadata.Resetter.ResetWith(&dst.Transacted.Metadata, &src.Transacted.Metadata)
-	TransactedResetter.ResetWith(dst.GetSku(), src.GetSku())
+func (transactedResetter) ResetWithExceptFields(dst *Transacted, src *Transacted) {
+	errors.PanicIfError(dst.ObjectId.ResetWithIdLike(&src.ObjectId))
+	object_metadata.Resetter.ResetWithExceptFields(&dst.Metadata, &src.Metadata)
 	dst.ExternalType = src.ExternalType
 	dst.RepoId = src.RepoId
 	dst.State = src.State
@@ -54,15 +42,11 @@ var Resetter resetter
 type resetter struct{}
 
 func (resetter) Reset(sl TransactedGetter) {
-	a := sl.GetSku()
-	a.ObjectId.SetGenre(genres.Unknown)
-	object_metadata.Resetter.Reset(&a.Metadata)
+	TransactedResetter.Reset(sl.GetSku())
 }
 
-func (resetter) ResetWith(asl, bsl TransactedGetter) {
-	a, b := asl.GetSku(), bsl.GetSku()
-	errors.PanicIfError(a.ObjectId.ResetWithIdLike(&b.ObjectId))
-	object_metadata.Resetter.ResetWith(&a.Metadata, &b.Metadata)
+func (resetter) ResetWith(dst, src TransactedGetter) {
+	TransactedResetter.ResetWith(dst.GetSku(), src.GetSku())
 }
 
 var CheckedOutResetter checkedOutResetter
@@ -71,7 +55,7 @@ type checkedOutResetter struct{}
 
 func (checkedOutResetter) Reset(dst *CheckedOut) {
 	TransactedResetter.Reset(&dst.Internal)
-	ExternalResetter.Reset(&dst.External)
+	TransactedResetter.Reset(&dst.External)
 	dst.State = checked_out_state.Unknown
 	dst.Error = nil
 	dst.IsImport = false
@@ -79,7 +63,7 @@ func (checkedOutResetter) Reset(dst *CheckedOut) {
 
 func (checkedOutResetter) ResetWith(dst *CheckedOut, src *CheckedOut) {
 	TransactedResetter.ResetWith(&dst.Internal, &src.Internal)
-	ExternalResetter.ResetWith(&dst.External, &src.External)
+	TransactedResetter.ResetWith(&dst.External, &src.External)
 	dst.State = src.State
 	dst.Error = src.Error
 	dst.IsImport = src.IsImport

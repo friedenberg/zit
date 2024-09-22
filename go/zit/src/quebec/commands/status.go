@@ -44,7 +44,7 @@ func (c Status) RunWithQuery(
 	if err = u.GetStore().QueryCheckedOut(
 		qg,
 		func(co sku.CheckedOutLike) (err error) {
-			if err = pcol(co); err != nil {
+			if err = pcol(co.(*sku.CheckedOut)); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

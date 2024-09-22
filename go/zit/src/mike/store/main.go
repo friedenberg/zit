@@ -47,7 +47,7 @@ type Store struct {
 	protoZettel  sku.Proto
 	queryBuilder *query.Builder
 
-	checkedOutLogPrinter interfaces.FuncIter[sku.CheckedOutLike]
+	checkedOutLogPrinter interfaces.FuncIter[*sku.CheckedOut]
 	Logger
 }
 
@@ -166,7 +166,7 @@ func (s *Store) SetExternalStores(
 
 // TODO remove
 func (s *Store) SetCheckedOutLogWriter(
-	zelw interfaces.FuncIter[sku.CheckedOutLike],
+	zelw interfaces.FuncIter[*sku.CheckedOut],
 ) {
 	s.checkedOutLogPrinter = zelw
 }

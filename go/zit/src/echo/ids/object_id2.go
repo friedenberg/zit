@@ -664,8 +664,10 @@ func (t *objectId2) MarshalBinary() (text []byte, err error) {
 	return
 }
 
-func (t *objectId2) UnmarshalBinary(text []byte) (err error) {
-	if err = t.Set(string(text)); err != nil {
+func (t *objectId2) UnmarshalBinary(bs []byte) (err error) {
+	text := string(bs)
+
+	if err = t.Set(text); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

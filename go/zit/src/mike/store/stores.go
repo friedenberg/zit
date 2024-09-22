@@ -89,7 +89,7 @@ func (s *Store) CheckoutQuery(
 
 		sku.DetermineState(col, true)
 
-		if err = s.checkedOutLogPrinter(col); err != nil {
+		if err = s.checkedOutLogPrinter(col.(*sku.CheckedOut)); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

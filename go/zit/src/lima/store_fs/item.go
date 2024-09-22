@@ -182,7 +182,7 @@ func (s *Store) ReadFromExternal(el sku.ExternalLike) (i *Item, err error) {
 	e := el.(*sku.External)
 
 	// TODO handle sort order
-	for _, f := range e.Transacted.Metadata.Fields {
+	for _, f := range e.Metadata.Fields {
 		var fdee *fd.FD
 		switch strings.ToLower(f.Key) {
 		case "object":
@@ -224,7 +224,7 @@ func (s *Store) ReadFromExternal(el sku.ExternalLike) (i *Item, err error) {
 
 func (s *Store) WriteToExternal(i *Item, el sku.ExternalLike) (err error) {
 	e := el.(*sku.External)
-	e.Transacted.Metadata.Fields = e.Transacted.Metadata.Fields[:0]
+	e.Metadata.Fields = e.Metadata.Fields[:0]
 	k := &i.ObjectId
 
 	e.ExternalObjectId.ResetWith(k)
@@ -233,7 +233,7 @@ func (s *Store) WriteToExternal(i *Item, el sku.ExternalLike) (err error) {
 		err = errors.Errorf("expected %q but got %q", k, &e.ExternalObjectId)
 	}
 
-	m := &e.Transacted.Metadata
+	m := &e.Metadata
 	m.Tai = i.GetTai()
 
 	fdees := iter.SortedValues(i.MutableSetLike)
@@ -258,7 +258,7 @@ func (s *Store) WriteToExternal(i *Item, el sku.ExternalLike) (err error) {
 			field.Key = "blob"
 		}
 
-		e.Transacted.Metadata.Fields = append(e.Transacted.Metadata.Fields, field)
+		e.Metadata.Fields = append(e.Metadata.Fields, field)
 	}
 
 	return

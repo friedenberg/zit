@@ -298,7 +298,7 @@ func (s *Store) RunMergeTool(
 	e := GetExternalPool().Get()
 	defer GetExternalPool().Put(e)
 
-	e.Transacted.ObjectId.ResetWith(&co.External.Transacted.ObjectId)
+	e.ObjectId.ResetWith(&co.External.ObjectId)
 
 	if err = s.WriteToExternal(leftItem, e); err != nil {
 		err = errors.Wrap(err)
@@ -330,7 +330,7 @@ func (s *Store) RunMergeTool(
 
 	co = GetCheckedOutPool().Get()
 
-	sku.ExternalResetter.ResetWith(&co.External, e)
+	sku.TransactedResetter.ResetWith(&co.External, e)
 
 	return
 }

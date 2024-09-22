@@ -290,7 +290,7 @@ func (s *Store) SaveBlob(e *sku.External) (err error) {
 		}
 	}()
 
-	e.Transacted.Metadata.Blob.SetShaLike(aw)
+	e.Metadata.Blob.SetShaLike(aw)
 
 	return
 }

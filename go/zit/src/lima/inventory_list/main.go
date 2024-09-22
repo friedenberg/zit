@@ -238,7 +238,7 @@ func (s *Store) readOnePath(p string) (o *sku.Transacted, err error) {
 			err1 := t.Set(o.ObjectId.String())
 
 			if err1 != nil {
-				err = errors.Wrapf(err, "%#v", o)
+				err = errors.Wrapf(err, "%s", sku_fmt.String(o))
 				return
 			}
 
@@ -320,8 +320,7 @@ func (s *Store) ReadOne(
 
 	defer errors.DeferredCloser(&err, or)
 
-	_, o, err = s.readOneFromReader(or)
-	if err != nil {
+	if _, o, err = s.readOneFromReader(or); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

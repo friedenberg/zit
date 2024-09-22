@@ -49,7 +49,7 @@ func (s *Store) ApplyCheckedOut(
 	}
 
 	if !qg.ContainsExternalSku(
-		&co.External.Transacted,
+		&co.External,
 		co.State,
 	) {
 		return

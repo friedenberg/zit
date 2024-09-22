@@ -95,7 +95,7 @@ func (u *Env) PrinterHeader() interfaces.FuncIter[string] {
 	}
 }
 
-func (u *Env) PrinterExternalLikeFS() *store_fs.CliExternal {
+func (u *Env) PrinterExternalLike() *store_fs.CliExternal {
 	oo := string_format_writer.OutputOptions{
 		ColorOptionsOut: string_format_writer.ColorOptions{
 			OffEntirely: true,
@@ -121,7 +121,7 @@ func (u *Env) PrinterExternalLikeFS() *store_fs.CliExternal {
 	)
 }
 
-func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[sku.CheckedOutLike] {
+func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[*sku.CheckedOut] {
 	oo := u.FormatOutputOptions()
 
 	err := string_format_writer.MakeDelim(
@@ -162,7 +162,7 @@ func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[sku.CheckedOutLike] {
 		),
 	)
 
-	return func(co sku.CheckedOutLike) error {
+	return func(co *sku.CheckedOut) error {
 		if co.GetState() == checked_out_state.Error {
 			return err(co)
 		} else {
@@ -197,37 +197,13 @@ func (u *Env) PrinterCheckedOutBrowser() interfaces.FuncIter[sku.CheckedOutLike]
 
 func (u *Env) PrinterCheckedOutForKasten(
 	k ids.RepoId,
-) interfaces.FuncIter[sku.CheckedOutLike] {
-	pcofs := u.PrinterCheckedOutFS()
-	pcobrowser := u.PrinterCheckedOutBrowser()
-
-	switch k.GetRepoIdString() {
-	case "browser":
-		return pcobrowser
-
-	default:
-		return pcofs
-	}
-}
-
-func (u *Env) PrinterCheckedOutLike() interfaces.FuncIter[sku.CheckedOutLike] {
-	pcofs := u.PrinterCheckedOutFS()
-	pcobrowser := u.PrinterCheckedOutBrowser()
-
-	return func(co sku.CheckedOutLike) (err error) {
-		switch co.GetSkuExternalLike().GetRepoId().GetRepoIdString() {
-		case "browser":
-			return pcobrowser(co)
-
-		default:
-			return pcofs(co)
-		}
-	}
+) interfaces.FuncIter[*sku.CheckedOut] {
+	return u.PrinterCheckedOutFS()
 }
 
 func (u *Env) PrinterMatching() sku.IterMatching {
 	pt := u.PrinterSkuTransacted()
-	pco := u.PrinterCheckedOutLike()
+	pco := u.PrinterCheckedOutFS()
 
 	return func(
 		mt sku.UnsureMatchType,
@@ -250,7 +226,7 @@ func (u *Env) PrinterMatching() sku.IterMatching {
 
 				sku.TransactedResetter.ResetWith(co.GetSku(), sk)
 
-				if err = pco(co); err != nil {
+				if err = pco(co.(*sku.CheckedOut)); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

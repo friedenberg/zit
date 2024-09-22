@@ -2,6 +2,7 @@ package sku
 
 import (
 	"encoding/gob"
+	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
@@ -18,12 +19,31 @@ var (
 )
 
 type ExternalObjectIdKeyer[
-	T ExternalObjectIdGetter,
+	T interface {
+		ids.ObjectIdGetter
+		ExternalObjectIdGetter
+		TransactedGetter
+	},
 ] struct{}
 
-func (ExternalObjectIdKeyer[T]) GetKey(e T) string {
-	k := e.GetExternalObjectId().String()
-	return k
+func (ExternalObjectIdKeyer[T]) GetKey(el T) string {
+	eoid := el.GetExternalObjectId()
+
+	if !eoid.IsEmpty() {
+		return eoid.String()
+	}
+
+	if !el.GetSku().ObjectId.IsEmpty() {
+		return el.GetSku().ObjectId.String()
+	}
+
+	desc := el.GetSku().Metadata.Description.String()
+
+	if desc != "" {
+		return desc
+	}
+
+	panic(fmt.Sprintf("empty key for external like: %#v", el))
 }
 
 func init() {

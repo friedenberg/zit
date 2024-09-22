@@ -46,10 +46,8 @@ func MakeCliCheckedOutFormat(
 
 func (f *cliCheckedOut) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
-	col sku.CheckedOutLike,
+	co *sku.CheckedOut,
 ) (n int64, err error) {
-	co := col.(*sku.CheckedOut)
-
 	var (
 		n1 int
 		n2 int64
@@ -77,6 +75,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 	var fds *Item
 
 	if fds, err = f.store.ReadFromExternal(o); err != nil {
+		// TODO write error field to box
 		err = errors.Wrap(err)
 		return
 	}
@@ -121,7 +120,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 	case m == checkout_mode.BlobOnly || m == checkout_mode.BlobRecognized:
 		n2, err = f.objectIdStringFormatWriter.WriteStringFormat(
 			sw,
-			&o.Transacted.ObjectId,
+			&o.ObjectId,
 		)
 		n += n2
 
@@ -156,7 +155,7 @@ func (f *cliCheckedOut) WriteStringFormat(
 
 	n2, err = f.metadataStringFormatWriter.WriteStringFormat(
 		sw,
-		o.Transacted.GetMetadata(),
+		o.GetMetadata(),
 	)
 	n += n2
 
@@ -307,7 +306,7 @@ func (f *cliCheckedOut) writeStringFormatUntracked(
 
 	n2, err = f.metadataStringFormatWriter.WriteStringFormat(
 		sw,
-		o.Transacted.GetMetadata(),
+		o.GetMetadata(),
 	)
 	n += n2
 

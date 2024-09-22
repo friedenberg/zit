@@ -5,11 +5,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
@@ -47,6 +49,62 @@ func MakeCliExternalFormat(
 	}
 }
 
+func (f *CliExternal) WriteStringFormat1(
+	sw interfaces.WriterAndStringWriter,
+	col sku.ExternalLike,
+) (n int64, err error) {
+	e := col.(*sku.External)
+
+	fields := []string_format_writer.Field{}
+
+	idFieldValue := (*ids.ObjectIdStringerSansRepo)(&e.ObjectId).String()
+
+	fields = append(
+		fields,
+		string_format_writer.Field{
+			Value:              idFieldValue,
+			DisableValueQuotes: true,
+			ColorType:          string_format_writer.ColorTypeId,
+		},
+	)
+
+	if e.State != external_state.Untracked {
+		m := &e.Metadata
+
+		var shaString string
+
+		if shaString, err = object_metadata_fmt.MetadataShaString(
+			m,
+			f.transactedWriter.Abbr.Sha.Abbreviate,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		fields = append(
+			fields,
+			object_metadata_fmt.MetadataFieldShaString(shaString),
+			object_metadata_fmt.MetadataFieldType(m),
+			object_metadata_fmt.MetadataFieldDescription(m),
+		)
+	}
+
+	var n2 int64
+
+	n2, err = f.transactedWriter.Fields.WriteStringFormat(
+		sw,
+		string_format_writer.Fields{Boxed: e.Metadata.Fields},
+	)
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (f *CliExternal) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
 	col sku.ExternalLike,
@@ -55,14 +113,6 @@ func (f *CliExternal) WriteStringFormat(
 
 	switch colt := col.(type) {
 	case *sku.Transacted:
-		if n, err = f.transactedWriter.WriteStringFormat(sw, col); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-
-	case *sku.External:
 		co = colt
 
 	default:
@@ -84,17 +134,27 @@ func (f *CliExternal) WriteStringFormat(
 		return
 	}
 
+	var m checkout_mode.Mode
+
+	if m, err = fds.GetCheckoutModeOrError(); err != nil {
+		// TODO validate error
+
+		n2, err = f.transactedWriter.WriteStringFormat(sw, o)
+
+		n += n2
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+
 	n1, err = sw.WriteString("[")
 	n += int64(n1)
 
 	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var m checkout_mode.Mode
-
-	if m, err = fds.GetCheckoutModeOrError(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -115,7 +175,7 @@ func (f *CliExternal) WriteStringFormat(
 
 	n2, err = f.metadataStringFormatWriter.WriteStringFormat(
 		sw,
-		o.Transacted.GetMetadata(),
+		o.GetMetadata(),
 	)
 	n += n2
 
@@ -267,7 +327,7 @@ func (f *CliExternal) writeStringFormatUntracked(
 
 	n2, err = f.metadataStringFormatWriter.WriteStringFormat(
 		sw,
-		o.Transacted.GetMetadata(),
+		o.GetMetadata(),
 	)
 	n += n2
 

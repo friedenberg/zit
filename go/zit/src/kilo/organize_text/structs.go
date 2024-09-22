@@ -27,6 +27,14 @@ type obj struct {
 	tag_paths.Type
 }
 
+func (o obj) GetObjectId() *ids.ObjectId {
+	return o.External.GetObjectId()
+}
+
+func (o obj) GetSku() *sku.Transacted {
+	return o.External.GetSku()
+}
+
 func (a *obj) cloneWithType(t tag_paths.Type) (b *obj) {
 	b = &obj{
 		Type:     t,

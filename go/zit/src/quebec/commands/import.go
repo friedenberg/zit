@@ -69,7 +69,7 @@ func (c Import) Run(u *env.Env, args ...string) (err error) {
 		return
 	}
 
-	coPrinter := u.PrinterCheckedOutLike()
+	coPrinter := u.PrinterCheckedOutFS()
 
 	ofo := object_inventory_format.Options{Tai: true, Verzeichnisse: true}
 
@@ -160,9 +160,9 @@ func (c Import) importBlobIfNecessary(
 	u *env.Env,
 	co *sku.CheckedOut,
 	ag *age.Age,
-	coErrPrinter interfaces.FuncIter[sku.CheckedOutLike],
+	coErrPrinter interfaces.FuncIter[*sku.CheckedOut],
 ) (err error) {
-	blobSha := co.External.Transacted.GetBlobSha()
+	blobSha := co.External.GetBlobSha()
 
 	if u.GetFSHome().HasBlob(u.GetConfig().GetStoreVersion(), blobSha) {
 		return

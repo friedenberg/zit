@@ -95,6 +95,7 @@ func (c *Organize) RunWithQuery(
 		func(el sku.ExternalLike) (err error) {
 			l.Lock()
 			defer l.Unlock()
+
 			return getResults.Add(el.Clone())
 		},
 	); err != nil {

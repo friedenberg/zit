@@ -16,24 +16,32 @@ import (
 )
 
 type Transacted struct {
-	ObjectId ids.ObjectId
-	Metadata object_metadata.Metadata
-}
+	ObjectId     ids.ObjectId
+	Metadata     object_metadata.Metadata
+	ExternalInfo ExternalInfo
 
-func (t *Transacted) GetRepoId() ids.RepoId {
-	return ids.RepoId{}
+	ExternalType ids.Type
+
+	// TODO add support for querying the below
+	RepoId           ids.RepoId
+	State            external_state.State
+	ExternalObjectId ids.ObjectId
 }
 
 func (t *Transacted) GetSkuExternalLike() ExternalLike {
 	return t
 }
 
-func (t *Transacted) GetExternalState() external_state.State {
-	return external_state.Unknown
+func (t *Transacted) GetRepoId() ids.RepoId {
+	return t.RepoId
 }
 
-func (a *Transacted) GetExternalObjectId() ExternalObjectId {
-	return &a.ObjectId
+func (t *Transacted) GetExternalObjectId() ids.ExternalObjectId {
+	return &t.ExternalObjectId
+}
+
+func (t *Transacted) GetExternalState() external_state.State {
+	return t.State
 }
 
 func (a *Transacted) Clone() ExternalLike {

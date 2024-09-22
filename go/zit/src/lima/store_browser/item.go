@@ -108,9 +108,9 @@ func (i *Item) WriteToExternal(e *sku.External) (err error) {
 		return
 	}
 
-	e.Transacted.Metadata.Type = ids.MustType("!toml-bookmark")
+	e.Metadata.Type = ids.MustType("!toml-bookmark")
 
-	m := &e.Transacted.Metadata
+	m := &e.Metadata
 
 	if m.Tai, err = i.GetTai(); err != nil {
 		err = errors.Wrap(err)
@@ -122,7 +122,7 @@ func (i *Item) WriteToExternal(e *sku.External) (err error) {
 		return
 	}
 
-	e.Transacted.Metadata.Fields = []object_metadata.Field{
+	e.Metadata.Fields = []object_metadata.Field{
 		{
 			Value:              i.Id.String(),
 			DisableValueQuotes: true,
@@ -161,7 +161,7 @@ func (i *Item) ReadFromExternal(e *sku.External) (err error) {
 		return
 	}
 
-	for _, field := range e.Transacted.Metadata.Fields {
+	for _, field := range e.Metadata.Fields {
 		switch field.Key {
 		case "id":
 			if field.Value == "" {

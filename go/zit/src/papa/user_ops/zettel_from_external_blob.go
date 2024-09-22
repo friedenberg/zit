@@ -163,14 +163,14 @@ func (c *ZettelFromExternalBlob) createZettelForBlobs(
 		return
 	}
 
-	z.Transacted.ObjectId.SetGenre(genres.Zettel)
+	z.ObjectId.SetGenre(genres.Zettel)
 
-	if err = c.Proto.ApplyWithBlobFD(&z.Transacted, blobFD); err != nil {
+	if err = c.Proto.ApplyWithBlobFD(z, blobFD); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	z.Transacted.SetBlobSha(blobFD.GetShaLike())
+	z.SetBlobSha(blobFD.GetShaLike())
 
 	return
 }

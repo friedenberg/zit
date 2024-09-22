@@ -50,7 +50,7 @@ func (s *Store) readOneExternalInto(
 	}
 
 	if t != nil {
-		e.Transacted.ObjectId.ResetWith(&t.ObjectId)
+		e.ObjectId.ResetWith(&t.ObjectId)
 	}
 
 	var m checkout_mode.Mode
@@ -88,7 +88,7 @@ func (s *Store) readOneExternalInto(
 
 	case checkout_mode.BlobRecognized:
 		object_metadata.Resetter.ResetWith(
-			e.Transacted.GetMetadata(),
+			e.GetMetadata(),
 			t1.GetMetadata(),
 		)
 
@@ -106,7 +106,7 @@ func (s *Store) readOneExternalInto(
 		}
 
 		if typFromExtension != "" {
-			if err = e.Transacted.Metadata.Type.Set(typFromExtension); err != nil {
+			if err = e.Metadata.Type.Set(typFromExtension); err != nil {
 				err = errors.Wrapf(err, "Path: %s", blobFD.GetPath())
 				return
 			}
@@ -132,7 +132,7 @@ func (s *Store) readOneExternalObject(
 ) (err error) {
 	if t != nil {
 		object_metadata.Resetter.ResetWith(
-			e.Transacted.GetMetadata(),
+			e.GetMetadata(),
 			t.GetMetadata(),
 		)
 	}
@@ -158,7 +158,7 @@ func (s *Store) ReadOneExternalObjectReader(
 	r io.Reader,
 	e *sku.External,
 ) (err error) {
-	if _, err = s.metadataTextParser.ParseMetadata(r, &e.Transacted); err != nil {
+	if _, err = s.metadataTextParser.ParseMetadata(r, e); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -171,7 +171,7 @@ func (s *Store) ReadOneExternalBlob(
 	t *sku.Transacted,
 	i *Item,
 ) (err error) {
-	object_metadata.Resetter.ResetWith(&e.Transacted.Metadata, t.GetMetadata())
+	object_metadata.Resetter.ResetWith(&e.Metadata, t.GetMetadata())
 
 	// TODO use cache
 	{
@@ -200,7 +200,7 @@ func (s *Store) ReadOneExternalBlob(
 			return
 		}
 
-		e.Transacted.GetMetadata().Blob.SetShaLike(aw)
+		e.GetMetadata().Blob.SetShaLike(aw)
 	}
 
 	return

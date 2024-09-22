@@ -15,6 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
 func (kc *Compiled) recompile(
@@ -42,8 +43,8 @@ func (kc *Compiled) recompileTags() (err error) {
 		func(ke *tag) (err error) {
 			var e ids.Tag
 
-			if err = e.Set(ke.Transacted.GetObjectId().String()); err != nil {
-				err = errors.Wrap(err)
+			if err = e.Set(ke.String()); err != nil {
+				err = errors.Wrapf(err, "Sku: %s", sku_fmt.String(&ke.Transacted))
 				return
 			}
 
@@ -232,9 +233,9 @@ func (kc *Compiled) flushMutableConfig(
 
 	defer errors.DeferredCloser(&err, f)
 
-	dec := gob.NewEncoder(f)
+	enc := gob.NewEncoder(f)
 
-	if err = dec.Encode(&kc.compiled); err != nil {
+	if err = enc.Encode(&kc.compiled); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

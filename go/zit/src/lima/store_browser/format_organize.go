@@ -85,7 +85,7 @@ func (f *Organize) WriteStringFormat(
 			return
 		}
 
-		b := &e.Transacted.Metadata.Description
+		b := &e.Metadata.Description
 
 		if !b.IsEmpty() {
 			n2, err = f.Fields.WriteStringFormat(
@@ -224,8 +224,8 @@ LOOP:
 
 					switch left {
 					case "id", "url", "title", "":
-						e.Transacted.Metadata.Fields = append(
-							e.Transacted.Metadata.Fields,
+						e.Metadata.Fields = append(
+							e.Metadata.Fields,
 							object_metadata.Field{
 								Key:                left,
 								Value:              right,
@@ -298,7 +298,7 @@ func (f *Organize) writeStringFormatExternal(
 ) (n int64, err error) {
 	fields := []string_format_writer.Field{}
 
-	idFieldValue := (*ids.ObjectIdStringerSansRepo)(&e.Transacted.ObjectId).String()
+	idFieldValue := (*ids.ObjectIdStringerSansRepo)(&e.ObjectId).String()
 	var n2 int64
 
 	// TODO make this more robust
@@ -322,7 +322,7 @@ func (f *Organize) writeStringFormatExternal(
 	)
 
 	if e.State != external_state.Untracked {
-		m := &e.Transacted.Metadata
+		m := &e.Metadata
 
 		var shaString string
 

@@ -96,7 +96,7 @@ func (s *Store) flushUrls() (err error) {
 				ui.Err().Print("chrest offline")
 				err = nil
 			} else {
-				err = errors.Wrapf(err, "Request: %#v", req)
+				err = errors.Wrap(err)
 				return
 			}
 		}

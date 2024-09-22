@@ -74,7 +74,7 @@ func (op Diff) Run(
 
 	el := &cofs.External
 	elCtx := object_metadata.TextFormatterContext{
-		PersistentFormatterContext: &el.Transacted,
+		PersistentFormatterContext: el,
 		TextFormatterOptions:       options,
 	}
 

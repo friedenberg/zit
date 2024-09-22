@@ -172,6 +172,11 @@ function clean_all_force_dirty_wd { # @test
 }
 
 function clean_hidden { # @test
+	run_zit show one/uno
+	assert_success
+	assert_output - <<-EOM
+		[one/uno@11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+	EOM
 	run_zit organize -mode commit-directly :z <<-EOM
 		- [one/uno  !md zz-archive tag-3 tag-4] wow the first
 	EOM

@@ -55,7 +55,7 @@ func (s *Store) readIntoExternalFromItem(
 	}
 
 	if err = s.externalStoreSupplies.FuncCommit(
-		&e.Transacted,
+		e,
 		o,
 	); err != nil {
 		err = errors.Wrap(err)
