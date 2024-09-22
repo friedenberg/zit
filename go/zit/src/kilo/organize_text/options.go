@@ -133,8 +133,8 @@ func (o *Flags) GetOptionsWithMetadata(
 		},
 	)
 
-	o.stringFormatReader = skuFmt.ReaderExternalLike
-	o.stringFormatWriter = skuFmt.WriterExternalLike
+	o.stringFormatReader = skuFmt
+	o.stringFormatWriter = skuFmt
 
 	of.SetDefaultsIfNecessary()
 

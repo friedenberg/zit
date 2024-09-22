@@ -1,13 +1,11 @@
 package sku_fmt
 
 import (
-	"fmt"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
@@ -22,6 +20,16 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+type (
+	ReaderExternalLike = catgut.StringFormatReader[sku.ExternalLike]
+	WriterExternalLike = catgut.StringFormatWriter[sku.ExternalLike]
+
+	ExternalLike interface {
+		ReaderExternalLike
+		WriterExternalLike
+	}
+)
+
 type ObjectIdAlignedFormat interface {
 	SetMaxKopfUndSchwanz(kop, schwanz int)
 }
@@ -33,7 +41,7 @@ func MakeBox(
 	objectIdStringFormatWriter id_fmts.Aligned,
 	typeStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
 	tagsStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
-	fieldsFormatWriter interfaces.StringFormatWriter[string_format_writer.Fields],
+	fieldsFormatWriter interfaces.StringFormatWriter[string_format_writer.Box],
 	metadata interfaces.StringFormatWriter[*object_metadata.Metadata],
 	abbr ids.Abbr,
 ) *Box {
@@ -69,7 +77,7 @@ type Box struct {
 	ObjectId  id_fmts.Aligned
 	Type      interfaces.StringFormatWriter[*ids.Type]
 	TagString interfaces.StringFormatWriter[*ids.Tag]
-	Fields    interfaces.StringFormatWriter[string_format_writer.Fields]
+	Fields    interfaces.StringFormatWriter[string_format_writer.Box]
 	Metadata  interfaces.StringFormatWriter[*object_metadata.Metadata]
 
 	ids.Abbr
@@ -88,6 +96,7 @@ func (f *Box) WriteStringFormat(
 	o := el.GetSku()
 
 	var n1 int
+	var n2 int64
 
 	if f.Options.PrintTime {
 		t := o.GetTai()
@@ -117,8 +126,8 @@ func (f *Box) WriteStringFormat(
 		return
 	}
 
-	var n2 int64
-	n2, err = f.ObjectId.WriteStringFormat(sw, &o.ObjectId)
+	e := el.(*sku.Transacted)
+	n2, err = f.WriteStringFormatExternal(sw, e, false)
 	n += int64(n2)
 
 	if err != nil {
@@ -126,86 +135,7 @@ func (f *Box) WriteStringFormat(
 		return
 	}
 
-	sh := o.GetBlobSha()
-
-	if f.Options.PrintShas && (!sh.IsNull() || f.Options.PrintEmptyShas) {
-		n1, err = sw.WriteString("@")
-		n += int64(n1)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		n2, err = f.ShaString.WriteStringFormat(sw, o.GetBlobSha())
-		n += n2
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	t := o.GetMetadata().GetTypePtr()
-
-	if len(t.String()) > 0 {
-		if f.Padding == "" {
-			n1, err = sw.WriteString(" !")
-		} else {
-			n1, err = sw.WriteString("  !")
-		}
-
-		n += int64(n1)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		n2, err = f.Type.WriteStringFormat(sw, t)
-		n += n2
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	b := &o.Metadata.Description
-
-	if f.Options.PrintTagsAlways {
-		b := o.GetMetadata().GetTags()
-
-		for _, v := range iter.SortedValues(b) {
-			if f.Options.ZittishNewlines {
-				n1, err = fmt.Fprintf(sw, "\n%s", f.Padding)
-			} else {
-				n1, err = sw.WriteString(" ")
-			}
-
-			n += int64(n1)
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			n2, err = f.TagString.WriteStringFormat(sw, &v)
-			n += n2
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-	}
-
-	if f.Options.ZittishNewlines {
-		n1, err = fmt.Fprintf(sw, "\n%s]", f.Padding)
-	} else {
-		n1, err = sw.WriteString("]")
-	}
-
+	n1, err = sw.WriteString("]")
 	n += int64(n1)
 
 	if err != nil {
@@ -213,15 +143,17 @@ func (f *Box) WriteStringFormat(
 		return
 	}
 
+	b := &e.Metadata.Description
+
 	if !b.IsEmpty() {
 		n2, err = f.Fields.WriteStringFormat(
 			sw,
-			string_format_writer.Fields{
-				Boxed: []string_format_writer.Field{
+			string_format_writer.Box{
+				Contents: []string_format_writer.Field{
 					{
 						Value:              b.String(),
-						DisableValueQuotes: true,
 						ColorType:          string_format_writer.ColorTypeUserData,
+						DisableValueQuotes: true,
 						Prefix:             " ",
 					},
 				},
@@ -361,7 +293,6 @@ LOOP:
 
 func (f *Box) WriteStringFormatExternal(
 	sw interfaces.WriterAndStringWriter,
-	i *sku.Transacted,
 	e *sku.External,
 	includeDescriptionInBox bool,
 ) (n int64, err error) {
@@ -372,15 +303,15 @@ func (f *Box) WriteStringFormatExternal(
 	var n2 int64
 
 	// TODO make this more robust
-	switch e.State {
-	case external_state.Tracked, external_state.Recognized:
-		if i != nil {
-			idFieldValue = (*ids.ObjectIdStringerSansRepo)(&i.ObjectId).String()
-		}
+	// switch e.State {
+	// case external_state.Tracked, external_state.Recognized:
+	// 	if i != nil {
+	// 		idFieldValue = (*ids.ObjectIdStringerSansRepo)(&i.ObjectId).String()
+	// 	}
 
-	case external_state.Untracked:
-		idFieldValue = "/"
-	}
+	// case external_state.Untracked:
+	// 	idFieldValue = "/"
+	// }
 
 	fields = append(
 		fields,
@@ -394,20 +325,33 @@ func (f *Box) WriteStringFormatExternal(
 	if e.State != external_state.Untracked {
 		m := &e.Metadata
 
-		var shaString string
+		if f.Options.PrintShas {
+			var shaString string
 
-		if shaString, err = object_metadata_fmt.MetadataShaString(
-			m,
-			f.Abbr.Sha.Abbreviate,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
+			if shaString, err = object_metadata_fmt.MetadataShaString(
+				m,
+				f.Abbr.Sha.Abbreviate,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			fields = append(
+				fields,
+				object_metadata_fmt.MetadataFieldShaString(shaString),
+			)
+		}
+
+		if !m.Type.IsEmpty() {
+			fields = append(
+				fields,
+				object_metadata_fmt.MetadataFieldType(m),
+			)
 		}
 
 		fields = append(
 			fields,
-			object_metadata_fmt.MetadataFieldShaString(shaString),
-			object_metadata_fmt.MetadataFieldType(m),
+			object_metadata_fmt.MetadataFieldTags(m)...,
 		)
 
 		if includeDescriptionInBox {
@@ -420,7 +364,7 @@ func (f *Box) WriteStringFormatExternal(
 
 	n2, err = f.Fields.WriteStringFormat(
 		sw,
-		string_format_writer.Fields{Boxed: fields},
+		string_format_writer.Box{Contents: fields},
 	)
 	n += n2
 
@@ -455,10 +399,10 @@ func (f *Box) WriteStringFormatExternalBoxUntracked(
 
 	n2, err = f.Fields.WriteStringFormat(
 		sw,
-		string_format_writer.Fields{
-			Boxed:   boxed,
-			Box:     true,
-			Unboxed: unboxed,
+		string_format_writer.Box{
+			Contents: boxed,
+			Box:      true,
+			Trailer:  unboxed,
 		},
 	)
 	n += n2

@@ -90,8 +90,8 @@ func (f *Organize) WriteStringFormat(
 		if !b.IsEmpty() {
 			n2, err = f.Fields.WriteStringFormat(
 				sw,
-				string_format_writer.Fields{
-					Boxed: []string_format_writer.Field{
+				string_format_writer.Box{
+					Contents: []string_format_writer.Field{
 						{
 							Value:              b.String(),
 							ColorType:          string_format_writer.ColorTypeUserData,
@@ -385,7 +385,7 @@ func (f *Organize) writeStringFormatExternal(
 
 	n2, err = f.Fields.WriteStringFormat(
 		sw,
-		string_format_writer.Fields{Boxed: fields},
+		string_format_writer.Box{Contents: fields},
 	)
 	n += n2
 
@@ -460,10 +460,10 @@ func (f *Organize) writeStringFormatExternalBoxUntracked(
 
 	n2, err = f.Fields.WriteStringFormat(
 		sw,
-		string_format_writer.Fields{
-			Boxed:   boxed,
+		string_format_writer.Box{
+			Contents:   boxed,
 			Box:     true,
-			Unboxed: unboxed,
+			Trailer: unboxed,
 		},
 	)
 	n += n2

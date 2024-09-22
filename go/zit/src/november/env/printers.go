@@ -1,7 +1,6 @@
 package env
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
@@ -13,20 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
-func (u *Env) PrinterSkuTransacted() interfaces.FuncIter[*sku.Transacted] {
-	sw := u.StringFormatWriterSkuTransacted(
-		nil,
-		string_format_writer.CliFormatTruncation66CharEllipsis,
-	)
-
-	return string_format_writer.MakeDelim(
-		"\n",
-		u.Out(),
-		sw,
-	)
-}
-
-func (u *Env) PrinterTransactedLike() interfaces.FuncIter[*sku.Transacted] {
+func (u *Env) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
 	sw := u.StringFormatWriterSkuTransacted(
 		nil,
 		string_format_writer.CliFormatTruncation66CharEllipsis,
@@ -40,22 +26,6 @@ func (u *Env) PrinterTransactedLike() interfaces.FuncIter[*sku.Transacted] {
 				return sw.WriteStringFormat(w, o)
 			},
 		),
-	)
-}
-
-func (u *Env) PrinterFileNotRecognized() interfaces.FuncIter[*fd.FD] {
-	p := id_fmts.MakeFileNotRecognizedStringWriterFormat(
-		id_fmts.MakeFDCliFormat(
-			u.FormatColorOptionsOut(),
-			u.fs_home.MakeRelativePathStringFormatWriter(),
-		),
-		u.StringFormatWriterShaLike(u.FormatColorOptionsOut()),
-	)
-
-	return string_format_writer.MakeDelim(
-		"\n",
-		u.Out(),
-		p,
 	)
 }
 
@@ -95,7 +65,7 @@ func (u *Env) PrinterHeader() interfaces.FuncIter[string] {
 	}
 }
 
-func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[*sku.CheckedOut] {
+func (u *Env) PrinterCheckedOut() interfaces.FuncIter[*sku.CheckedOut] {
 	oo := u.FormatOutputOptions()
 
 	err := string_format_writer.MakeDelim(
@@ -114,6 +84,7 @@ func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[*sku.CheckedOut] {
 				string_format_writer.CliFormatTruncation66CharEllipsis,
 			),
 			u.StringFormatWriterSkuBox(
+        u.config.PrintOptions,
 				oo.ColorOptionsErr,
 				string_format_writer.CliFormatTruncation66CharEllipsis,
 			),
@@ -137,6 +108,7 @@ func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[*sku.CheckedOut] {
 				string_format_writer.CliFormatTruncation66CharEllipsis,
 			),
 			u.StringFormatWriterSkuBox(
+        u.config.PrintOptions,
 				oo.ColorOptionsErr,
 				string_format_writer.CliFormatTruncation66CharEllipsis,
 			),
@@ -153,73 +125,8 @@ func (u *Env) PrinterCheckedOutFS() interfaces.FuncIter[*sku.CheckedOut] {
 	}
 }
 
-func (u *Env) PrinterCheckedOutBrowser() interfaces.FuncIter[sku.CheckedOutLike] {
-	sfw := u.StringFormatWriterStoreBrowserCheckedOut()
-
-	err := string_format_writer.MakeDelim(
-		"\n",
-		u.Err(),
-		sfw,
-	)
-
-	out := string_format_writer.MakeDelim(
-		"\n",
-		u.Out(),
-		sfw,
-	)
-
-	return func(co sku.CheckedOutLike) error {
-		if co.GetState() == checked_out_state.Error {
-			return err(co)
-		} else {
-			return out(co)
-		}
-	}
-}
-
 func (u *Env) PrinterCheckedOutForKasten(
 	k ids.RepoId,
 ) interfaces.FuncIter[*sku.CheckedOut] {
-	return u.PrinterCheckedOutFS()
-}
-
-func (u *Env) PrinterMatching() sku.IterMatching {
-	pt := u.PrinterSkuTransacted()
-	pco := u.PrinterCheckedOutFS()
-
-	return func(
-		mt sku.UnsureMatchType,
-		sk *sku.Transacted,
-		existing sku.CheckedOutLikeMutableSet,
-	) (err error) {
-		if err = pt(sk); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = existing.Each(
-			func(co sku.CheckedOutLike) (err error) {
-				if err = co.SetState(
-					checked_out_state.Recognized,
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				sku.TransactedResetter.ResetWith(co.GetSku(), sk)
-
-				if err = pco(co.(*sku.CheckedOut)); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				return
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
+	return u.PrinterCheckedOut()
 }

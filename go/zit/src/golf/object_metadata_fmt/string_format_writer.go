@@ -20,7 +20,7 @@ type cliMetadatei struct {
 
 	shaStringFormatWriter       interfaces.StringFormatWriter[interfaces.Sha]
 	typStringFormatWriter       interfaces.StringFormatWriter[*ids.Type]
-	fieldsStringFormatWriter    interfaces.StringFormatWriter[string_format_writer.Fields]
+	fieldsStringFormatWriter    interfaces.StringFormatWriter[string_format_writer.Box]
 	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag]
 }
 
@@ -28,7 +28,7 @@ func MakeCliMetadateiFormat(
 	options erworben_cli_print_options.PrintOptions,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
-	fieldsFormatWriter interfaces.StringFormatWriter[string_format_writer.Fields],
+	fieldsFormatWriter interfaces.StringFormatWriter[string_format_writer.Box],
 	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
 ) *cliMetadatei {
 	return &cliMetadatei{
@@ -120,8 +120,8 @@ func (f *cliMetadatei) WriteStringFormat(
 
 			n2, err = f.fieldsStringFormatWriter.WriteStringFormat(
 				sw,
-				string_format_writer.Fields{
-					Boxed: []string_format_writer.Field{
+				string_format_writer.Box{
+					Contents: []string_format_writer.Field{
 						{
 							Value:     b.String(),
 							ColorType: string_format_writer.ColorTypeUserData,

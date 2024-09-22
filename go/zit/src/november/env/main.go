@@ -231,7 +231,7 @@ func (u *Env) Initialize(options Options) (err error) {
 
 	ui.Log().Print("done initing checkout store")
 
-	ptl := u.PrinterTransactedLike()
+	ptl := u.PrinterTransacted()
 
 	lw := store.Logger{
 		New:     ptl,
@@ -245,7 +245,7 @@ func (u *Env) Initialize(options Options) (err error) {
 		},
 	}
 
-	u.store.SetCheckedOutLogWriter(u.PrinterCheckedOutFS())
+	u.store.SetCheckedOutLogWriter(u.PrinterCheckedOut())
 	u.store.SetLogWriter(lw)
 
 	u.storesInitialized = true

@@ -69,7 +69,7 @@ func (c Import) Run(u *env.Env, args ...string) (err error) {
 		return
 	}
 
-	coPrinter := u.PrinterCheckedOutFS()
+	coPrinter := u.PrinterCheckedOut()
 
 	ofo := object_inventory_format.Options{Tai: true, Verzeichnisse: true}
 

@@ -45,6 +45,7 @@ func (oid *ObjectIdStringerSansRepo) String() string {
 		sb.Write(oid.right.Bytes())
 
 	case genres.Type:
+		sb.WriteRune('!')
 		sb.Write(oid.right.Bytes())
 
 	default:

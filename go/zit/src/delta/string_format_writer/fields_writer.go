@@ -7,14 +7,17 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
-type Fields struct {
-	Boxed   []Field
-	Box     bool
-	Unboxed []Field
+type Box struct {
+	Header   []Field
+	Contents []Field
+	Box      bool
+	Trailer  []Field
 }
 
-func (f Fields) IsBox() bool {
-	return f.Box || (len(f.Boxed) > 0 && len(f.Unboxed) > 0)
+func (f Box) IsBox() bool {
+	return f.Box ||
+		(len(f.Contents) > 0 && len(f.Trailer) > 0) ||
+		(len(f.Contents) > 0 && len(f.Header) > 0)
 }
 
 type fieldsWriter struct {
@@ -35,7 +38,7 @@ func MakeCliFormatFields(
 
 func (f *fieldsWriter) WriteStringFormat(
 	w interfaces.WriterAndStringWriter,
-	fields Fields,
+	fields Box,
 ) (n int64, err error) {
 	if fields.IsBox() {
 		if n, err = f.writeStringFormatYesBox(w, fields); err != nil {
@@ -54,12 +57,12 @@ func (f *fieldsWriter) WriteStringFormat(
 
 func (f *fieldsWriter) writeStringFormatNoBox(
 	w interfaces.WriterAndStringWriter,
-	fields Fields,
+	fields Box,
 ) (n int64, err error) {
 	var n1 int64
 	var n2 int
 
-	for i, field := range fields.Boxed {
+	for i, field := range fields.Contents {
 		if i > 0 {
 			n2, err = fmt.Fprint(w, " ")
 			n += int64(n2)
@@ -84,10 +87,28 @@ func (f *fieldsWriter) writeStringFormatNoBox(
 
 func (f *fieldsWriter) writeStringFormatYesBox(
 	w interfaces.WriterAndStringWriter,
-	fields Fields,
+	fields Box,
 ) (n int64, err error) {
 	var n1 int64
 	var n2 int
+
+	for _, field := range fields.Header {
+		n1, err = f.fieldWriter.WriteStringFormat(w, field)
+		n += n1
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		n2, err = fmt.Fprint(w, " ")
+		n += int64(n2)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 
 	n1, err = f.fieldWriter.WriteStringFormat(
 		w,
@@ -103,7 +124,7 @@ func (f *fieldsWriter) writeStringFormatYesBox(
 		return
 	}
 
-	for i, field := range fields.Boxed {
+	for i, field := range fields.Contents {
 		if i > 0 {
 			n2, err = fmt.Fprint(w, " ")
 			n += int64(n2)
@@ -137,7 +158,7 @@ func (f *fieldsWriter) writeStringFormatYesBox(
 		return
 	}
 
-	for _, field := range fields.Unboxed {
+	for _, field := range fields.Trailer {
 		n2, err = fmt.Fprint(w, " ")
 		n += int64(n2)
 

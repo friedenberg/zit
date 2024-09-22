@@ -81,7 +81,7 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "organize":
+	case "box":
 		p := u.SkuFormatBox()
 
 		f = func(tl *sku.Transacted) (err error) {
@@ -349,7 +349,7 @@ func (u *Env) MakeFormatFunc(
 		}
 
 	case "log":
-		f = u.PrinterTransactedLike()
+		f = u.PrinterTransacted()
 
 		// case "objekte":
 		// 	f := Format{}
@@ -582,7 +582,7 @@ func (u *Env) MakeFormatFunc(
 		}
 
 	case "mutter":
-		p := u.PrinterTransactedLike()
+		p := u.PrinterTransacted()
 
 		f = func(z *sku.Transacted) (err error) {
 			if z.Metadata.Mutter().IsNull() {
@@ -657,7 +657,7 @@ func (u *Env) MakeFormatFunc(
 		}
 
 	case "verzeichnisse":
-		p := u.PrinterTransactedLike()
+		p := u.PrinterTransacted()
 
 		f = func(o *sku.Transacted) (err error) {
 			sk := sku.GetTransactedPool().Get()

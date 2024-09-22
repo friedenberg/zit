@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
@@ -236,21 +235,6 @@ func (es *Store) Open(
 	}
 
 	return
-}
-
-func (s *Store) GetExternalStoreOrganizeFormat(
-	f *sku_fmt.Box,
-) sku_fmt.ExternalLike {
-	esof, ok := s.StoreLike.(OrganizeFormatGetter)
-
-	if !ok {
-		return sku_fmt.ExternalLike{
-			ReaderExternalLike: f,
-			WriterExternalLike: f,
-		}
-	}
-
-	return esof.GetExternalStoreOrganizeFormat(f)
 }
 
 func (s *Store) SaveBlob(el sku.ExternalLike) (err error) {

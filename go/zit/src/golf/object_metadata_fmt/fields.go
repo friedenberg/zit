@@ -54,6 +54,26 @@ func MetadataFieldType(
 	}
 }
 
+func MetadataFieldTags(
+	m *object_metadata.Metadata,
+) []string_format_writer.Field {
+	out := make([]string_format_writer.Field, 0, m.Tags.Len())
+
+	m.Tags.EachPtr(
+		func(t *ids.Tag) (err error) {
+			out = append(
+				out,
+				string_format_writer.Field{
+					Value: t.String(),
+				},
+			)
+			return
+		},
+	)
+
+  return out
+}
+
 func MetadataFieldDescription(
 	m *object_metadata.Metadata,
 ) string_format_writer.Field {

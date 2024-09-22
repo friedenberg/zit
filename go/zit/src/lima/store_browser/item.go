@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -103,9 +102,11 @@ func (i Item) GetDescription() (b descriptions.Description, err error) {
 }
 
 func (i *Item) WriteToExternal(e *sku.External) (err error) {
-	if err = e.ExternalObjectId.SetRaw(i.Id.String()); err != nil {
-		err = errors.Wrap(err)
-		return
+	if !i.Id.IsEmpty() {
+		if err = e.ExternalObjectId.SetRaw(i.Id.String()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	e.Metadata.Type = ids.MustType("!toml-bookmark")
@@ -122,23 +123,25 @@ func (i *Item) WriteToExternal(e *sku.External) (err error) {
 		return
 	}
 
-	e.Metadata.Fields = []object_metadata.Field{
-		{
-			Value:              i.Id.String(),
-			DisableValueQuotes: true,
-			ColorType:          string_format_writer.ColorTypeId,
-		},
-		{
-			Key:       "title",
-			Value:     i.Title,
-			ColorType: string_format_writer.ColorTypeUserData,
-		},
-		{
+	if i.Title != "" {
+		e.Metadata.Fields = append(
+			e.Metadata.Fields,
+			string_format_writer.Field{
+				Key:       "title",
+				Value:     i.Title,
+				ColorType: string_format_writer.ColorTypeUserData,
+			},
+		)
+	}
+
+	e.Metadata.Fields = append(
+		e.Metadata.Fields,
+		string_format_writer.Field{
 			Key:       "url",
 			Value:     i.Url.String(),
 			ColorType: string_format_writer.ColorTypeUserData,
 		},
-	}
+	)
 
 	// TODO move to !toml-bookmark type
 	var t ids.Tag

@@ -8,9 +8,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata_fmt"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
-	"code.linenisgreat.com/zit/go/zit/src/lima/store_browser"
 )
 
 func (u *Env) FormatOutputOptions() (o string_format_writer.OutputOptions) {
@@ -75,7 +72,7 @@ func (u *Env) StringFormatWriterDescription(
 func (u *Env) StringFormatWriterFields(
 	truncate string_format_writer.CliFormatTruncation,
 	co string_format_writer.ColorOptions,
-) interfaces.StringFormatWriter[string_format_writer.Fields] {
+) interfaces.StringFormatWriter[string_format_writer.Box] {
 	return string_format_writer.MakeCliFormatFields(truncate, co)
 }
 
@@ -95,98 +92,5 @@ func (u *Env) StringFormatWriterMetadata(
 		u.StringFormatWriterType(co),
 		u.StringFormatWriterFields(truncation, co),
 		u.StringFormatWriterTags(co),
-	)
-}
-
-func (u *Env) StringFormatWriterSkuBox(
-	co string_format_writer.ColorOptions,
-	truncation string_format_writer.CliFormatTruncation,
-) *sku_fmt.Box {
-	return sku_fmt.MakeBox(
-		co,
-		u.config.PrintOptions,
-		u.StringFormatWriterShaLike(co),
-		u.StringFormatWriterObjectIdAligned(co),
-		u.StringFormatWriterType(co),
-		u.StringFormatWriterTags(co),
-		u.StringFormatWriterFields(truncation, co),
-		u.StringFormatWriterMetadata(
-			co,
-			truncation,
-		),
-		u.GetStore().GetAbbrStore().GetAbbr(),
-	)
-}
-
-func (u *Env) SkuFormatBox() sku_fmt.ExternalLike {
-	formats := make(map[ids.RepoId]sku_fmt.ExternalLike, len(u.externalStores))
-
-	for rid := range u.externalStores {
-		formats[rid] = u.SkuFormatBoxForRepoId(rid)
-	}
-
-	return sku_fmt.MakeExternalLikeCombo(formats)
-}
-
-func (u *Env) SkuFormatBoxForRepoId(repoId ids.RepoId) sku_fmt.ExternalLike {
-	co := u.FormatColorOptionsOut()
-	co.OffEntirely = true
-
-	f := u.StringFormatWriterSkuBox(
-		co,
-		string_format_writer.CliFormatTruncationNone,
-	)
-
-	es, ok := u.externalStores[repoId]
-
-	if !ok {
-		return sku_fmt.ExternalLike{
-			ReaderExternalLike: f,
-			WriterExternalLike: f,
-		}
-	}
-
-	return es.GetExternalStoreOrganizeFormat(f)
-}
-
-func (u *Env) StringFormatWriterSkuTransacted(
-	co *string_format_writer.ColorOptions,
-	truncate string_format_writer.CliFormatTruncation,
-) interfaces.StringFormatWriter[*sku.Transacted] {
-	if co == nil {
-		co1 := u.FormatColorOptionsOut()
-		co = &co1
-	}
-
-	return sku_fmt.MakeCliFormat(
-		u.config.PrintOptions,
-		u.StringFormatWriterObjectId(*co),
-		u.StringFormatWriterMetadata(*co, truncate),
-	)
-}
-
-func (u *Env) StringFormatWriterSkuTransactedShort() interfaces.StringFormatWriter[*sku.Transacted] {
-	co := string_format_writer.ColorOptions{
-		OffEntirely: true,
-	}
-
-	return sku_fmt.MakeCliFormatShort(
-		u.StringFormatWriterObjectId(co),
-		u.StringFormatWriterMetadata(
-			co,
-			string_format_writer.CliFormatTruncation66CharEllipsis,
-		),
-	)
-}
-
-func (u *Env) StringFormatWriterStoreBrowserCheckedOut() interfaces.StringFormatWriter[sku.CheckedOutLike] {
-	return store_browser.MakeCliCheckedOutFormat(
-		u.config.PrintOptions,
-		store_browser.MakeFormatOrganize(
-			u.StringFormatWriterSkuBox(
-				u.FormatColorOptionsOut(),
-				string_format_writer.CliFormatTruncation66CharEllipsis,
-			),
-		),
 	)
 }

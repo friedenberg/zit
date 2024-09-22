@@ -244,17 +244,6 @@ func (c *Store) QueryCheckedOut(
 	return
 }
 
-func (c *Store) GetExternalStoreOrganizeFormat(
-	f *sku_fmt.Box,
-) sku_fmt.ExternalLike {
-	fo := MakeFormatOrganize(f)
-
-	return sku_fmt.ExternalLike{
-		ReaderExternalLike: fo,
-		WriterExternalLike: fo,
-	}
-}
-
 // TODO support updating bookmarks without overwriting. Maybe move to
 // toml-bookmark type
 func (s *Store) SaveBlob(e *sku.External) (err error) {

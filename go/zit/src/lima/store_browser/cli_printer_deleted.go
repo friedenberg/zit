@@ -10,13 +10,13 @@ type itemDeletedStringFormatWriter struct {
 	interfaces.Config
 	rightAlignedWriter   interfaces.StringFormatWriter[string]
 	idStringFormatWriter interfaces.StringFormatWriter[string]
-	fieldsFormatWriter   interfaces.StringFormatWriter[string_format_writer.Fields]
+	fieldsFormatWriter   interfaces.StringFormatWriter[string_format_writer.Box]
 }
 
 func MakeItemDeletedStringWriterFormat(
 	config interfaces.Config,
 	co string_format_writer.ColorOptions,
-	fieldsFormatWriter interfaces.StringFormatWriter[string_format_writer.Fields],
+	fieldsFormatWriter interfaces.StringFormatWriter[string_format_writer.Box],
 ) *itemDeletedStringFormatWriter {
 	return &itemDeletedStringFormatWriter{
 		Config:             config,
@@ -95,7 +95,7 @@ func (f *itemDeletedStringFormatWriter) WriteStringFormat(
 
 	n2, err = f.fieldsFormatWriter.WriteStringFormat(
 		sw,
-		string_format_writer.Fields{Boxed: fields},
+		string_format_writer.Box{Contents: fields},
 	)
 	n += n2
 

@@ -234,3 +234,8 @@ func (c *PrintOptions) AddToFlags(f *flag.FlagSet, m *PrintOptions) {
 		"",
 	)
 }
+
+func (c PrintOptions) WithPrintShas(v bool) PrintOptions {
+	c.PrintShas = v
+	return c
+}
