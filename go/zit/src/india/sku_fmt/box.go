@@ -293,9 +293,7 @@ func (f *Box) WriteStringFormatExternal(
 	e *sku.Transacted,
 	includeDescriptionInBox bool,
 ) (n int64, err error) {
-	fields := make([]string_format_writer.Field, len(e.Metadata.Fields))
-	copy(fields, e.Metadata.Fields)
-
+	fields := make([]string_format_writer.Field, 0, 10)
 	idFieldValue := (*ids.ObjectIdStringerSansRepo)(&e.ObjectId).String()
 	var n2 int64
 
@@ -358,6 +356,8 @@ func (f *Box) WriteStringFormatExternal(
 			)
 		}
 	}
+
+	fields = append(fields, e.Metadata.Fields...)
 
 	n2, err = f.Fields.WriteStringFormat(
 		sw,

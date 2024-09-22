@@ -59,6 +59,10 @@ func MetadataFieldType(
 func MetadataFieldTags(
 	m *object_metadata.Metadata,
 ) []string_format_writer.Field {
+	if m.Tags == nil {
+		return nil
+	}
+
 	out := make([]string_format_writer.Field, 0, m.Tags.Len())
 
 	m.Tags.EachPtr(
