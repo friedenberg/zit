@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -17,6 +18,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -351,6 +353,118 @@ LOOP:
 
 	if ts.Error() != nil {
 		err = errors.Wrap(ts.Error())
+		return
+	}
+
+	return
+}
+
+func (f *Box) WriteStringFormatExternal(
+	sw interfaces.WriterAndStringWriter,
+	i *sku.Transacted,
+	e *sku.External,
+	includeDescriptionInBox bool,
+) (n int64, err error) {
+	fields := make([]string_format_writer.Field, len(e.Metadata.Fields))
+	copy(fields, e.Metadata.Fields)
+
+	idFieldValue := (*ids.ObjectIdStringerSansRepo)(&e.ObjectId).String()
+	var n2 int64
+
+	// TODO make this more robust
+	switch e.State {
+	case external_state.Tracked, external_state.Recognized:
+		if i != nil {
+			idFieldValue = (*ids.ObjectIdStringerSansRepo)(&i.ObjectId).String()
+		}
+
+	case external_state.Untracked:
+		idFieldValue = "/"
+	}
+
+	fields = append(
+		fields,
+		string_format_writer.Field{
+			Value:              idFieldValue,
+			DisableValueQuotes: true,
+			ColorType:          string_format_writer.ColorTypeId,
+		},
+	)
+
+	if e.State != external_state.Untracked {
+		m := &e.Metadata
+
+		var shaString string
+
+		if shaString, err = object_metadata_fmt.MetadataShaString(
+			m,
+			f.Abbr.Sha.Abbreviate,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		fields = append(
+			fields,
+			object_metadata_fmt.MetadataFieldShaString(shaString),
+			object_metadata_fmt.MetadataFieldType(m),
+		)
+
+		if includeDescriptionInBox {
+			fields = append(
+				fields,
+				object_metadata_fmt.MetadataFieldDescription(m),
+			)
+		}
+	}
+
+	n2, err = f.Fields.WriteStringFormat(
+		sw,
+		string_format_writer.Fields{Boxed: fields},
+	)
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (f *Box) WriteStringFormatExternalBoxUntracked(
+	sw interfaces.WriterAndStringWriter,
+	i *sku.Transacted,
+	e *sku.External,
+	unboxedDescription bool,
+) (n int64, err error) {
+	if e.State != external_state.Untracked {
+		err = errors.Errorf(
+			"expected state %s but got %s",
+			external_state.Untracked,
+			e.State,
+		)
+
+		return
+	}
+
+	boxed := []string_format_writer.Field{}
+	unboxed := []string_format_writer.Field{}
+
+	var n2 int64
+
+	n2, err = f.Fields.WriteStringFormat(
+		sw,
+		string_format_writer.Fields{
+			Boxed:   boxed,
+			Box:     true,
+			Unboxed: unboxed,
+		},
+	)
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
