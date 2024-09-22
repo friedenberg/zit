@@ -13,9 +13,15 @@ import (
 )
 
 func (u *Env) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
-	sw := u.StringFormatWriterSkuTransacted(
-		nil,
-		string_format_writer.CliFormatTruncation66CharEllipsis,
+	co := u.FormatColorOptionsOut()
+
+	sw := sku_fmt.MakeCliFormat(
+		u.config.PrintOptions,
+		u.StringFormatWriterObjectId(co),
+		u.StringFormatWriterMetadata(
+			co,
+			string_format_writer.CliFormatTruncation66CharEllipsis,
+		),
 	)
 
 	return string_format_writer.MakeDelim(

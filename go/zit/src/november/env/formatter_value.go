@@ -82,7 +82,7 @@ func (u *Env) MakeFormatFunc(
 		}
 
 	case "box":
-		p := u.SkuFormatBox()
+		p := u.SkuFormatBoxNoColor()
 
 		f = func(tl *sku.Transacted) (err error) {
 			if _, err = p.WriteStringFormat(out, tl); err != nil {

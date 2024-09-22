@@ -15,7 +15,7 @@ func (e *Env) MakeOrganizeOptionsWithQueryGroup(
 	return organizeFlags.GetOptions(
 		e.GetConfig().PrintOptions,
 		qg,
-		e.SkuFormatBox(),
+		e.SkuFormatBoxNoColor(),
 		e.GetStore().GetAbbrStore().GetAbbr(),
 		e.GetExternalLikePoolForRepoId(qg.RepoId),
 	)

@@ -29,29 +29,13 @@ func (u *Env) StringFormatWriterSkuBox(
 	)
 }
 
-func (u *Env) SkuFormatBox() sku_fmt.ExternalLike {
+func (u *Env) SkuFormatBoxNoColor() sku_fmt.ExternalLike {
 	co := u.FormatColorOptionsOut()
 
 	return u.StringFormatWriterSkuBox(
 		u.config.PrintOptions.WithPrintShas(false),
 		co,
 		string_format_writer.CliFormatTruncationNone,
-	)
-}
-
-func (u *Env) StringFormatWriterSkuTransacted(
-	co *string_format_writer.ColorOptions,
-	truncate string_format_writer.CliFormatTruncation,
-) interfaces.StringFormatWriter[*sku.Transacted] {
-	if co == nil {
-		co1 := u.FormatColorOptionsOut()
-		co = &co1
-	}
-
-	return sku_fmt.MakeCliFormat(
-		u.config.PrintOptions,
-		u.StringFormatWriterObjectId(*co),
-		u.StringFormatWriterMetadata(*co, truncate),
 	)
 }
 
