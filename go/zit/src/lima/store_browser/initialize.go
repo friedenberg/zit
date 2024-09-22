@@ -75,19 +75,22 @@ func (s *Store) flushUrls() (err error) {
 
 	var resp browser_items.HTTPResponseWithRequestPayloadPut
 
+  deleted := make(map[string]transactedWithItem, len(s.deleted))
+
 	if !s.config.DryRun {
 		var req browser_items.BrowserRequestPut
 		req.Deleted = make([]browser_items.Item, 0, len(s.deleted))
 
 		for _, is := range s.deleted {
 			for _, i := range is {
-				req.Deleted = append(req.Deleted, i.Item)
+				req.Deleted = append(req.Deleted, i.Item.Item)
+        deleted[i.Item.Item.ExternalId] = i
 			}
 		}
 
 		for _, is := range s.added {
 			for _, i := range is {
-				req.Added = append(req.Added, i.Item)
+				req.Added = append(req.Added, i.Item.Item)
 			}
 		}
 
@@ -108,13 +111,13 @@ func (s *Store) flushUrls() (err error) {
 	} else {
 		for _, is := range s.deleted {
 			for _, i := range is {
-				resp.Deleted = append(resp.Deleted, i.Item)
+				resp.Deleted = append(resp.Deleted, i.Item.Item)
 			}
 		}
 
 		for _, is := range s.added {
 			for _, i := range is {
-				resp.Added = append(resp.Added, i.Item)
+				resp.Added = append(resp.Added, i.Item.Item)
 			}
 		}
 	}
@@ -124,10 +127,14 @@ func (s *Store) flushUrls() (err error) {
 		s.tabCache.Rows[i.ExternalId] = i.Id
 	}
 
-	for _, i := range resp.RequestPayloadPut.Deleted {
-		delete(s.tabCache.Rows, i.ExternalId)
+	for _, item := range resp.RequestPayloadPut.Deleted {
+		delete(s.tabCache.Rows, item.ExternalId)
 
-		if err = s.itemDeletedStringFormatWriter(Item{Item: i}); err != nil {
+    originalItem := deleted[item.ExternalId]
+
+		if err = s.itemDeletedStringFormatWriter(
+      originalItem.Transacted,
+    ); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

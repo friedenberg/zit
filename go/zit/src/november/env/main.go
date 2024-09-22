@@ -209,7 +209,7 @@ func (u *Env) Initialize(options Options) (err error) {
 				string_format_writer.MakeDelim(
 					"\n",
 					u.Out(),
-					store_browser.MakeItemDeletedStringWriterFormat(
+					sku_fmt.MakeItemDeletedStringWriterFormat(
 						k,
 						u.FormatColorOptionsOut(),
 						u.StringFormatWriterFields(

@@ -28,6 +28,11 @@ type transacted struct {
 	interfaces.MutableSetLike[*ids.ObjectId]
 }
 
+type transactedWithItem struct {
+	*sku.Transacted
+	Item
+}
+
 type Store struct {
 	config            *config.Compiled
 	externalStoreInfo external_store.Supplies
@@ -39,8 +44,8 @@ type Store struct {
 	urls map[url.URL][]Item
 
 	l       sync.Mutex
-	deleted map[url.URL][]Item
-	added   map[url.URL][]Item
+	deleted map[url.URL][]transactedWithItem
+	added   map[url.URL][]transactedWithItem
 
 	itemsById map[string]Item
 
@@ -49,19 +54,19 @@ type Store struct {
 	transactedUrlIndex  map[url.URL]sku.TransactedMutableSet
 	transactedItemIndex map[browser_items.ItemId]*sku.Transacted
 
-	itemDeletedStringFormatWriter interfaces.FuncIter[Item]
+	itemDeletedStringFormatWriter interfaces.FuncIter[*sku.Transacted]
 }
 
 func Make(
 	k *config.Compiled,
 	s fs_home.Home,
-	itemDeletedStringFormatWriter interfaces.FuncIter[Item],
+	itemDeletedStringFormatWriter interfaces.FuncIter[*sku.Transacted],
 ) *Store {
 	c := &Store{
 		config:    k,
 		typ:       ids.MustType("toml-bookmark"),
-		deleted:   make(map[url.URL][]Item),
-		added:     make(map[url.URL][]Item),
+		deleted:   make(map[url.URL][]transactedWithItem),
+		added:     make(map[url.URL][]transactedWithItem),
 		itemsById: make(map[string]Item),
 		transacted: transacted{
 			MutableSetLike: collections_value.MakeMutableValueSet(
@@ -178,7 +183,10 @@ func (c *Store) CheckoutOne(
 	defer c.l.Unlock()
 
 	existing := c.added[*u]
-	c.added[*u] = append(existing, item)
+	c.added[*u] = append(existing, transactedWithItem{
+		Transacted: co.External.CloneTransacted(),
+		Item:       item,
+	})
 
 	return
 }

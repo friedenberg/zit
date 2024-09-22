@@ -1,9 +1,10 @@
-package store_browser
+package sku_fmt
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type itemDeletedStringFormatWriter struct {
@@ -32,7 +33,7 @@ func MakeItemDeletedStringWriterFormat(
 
 func (f *itemDeletedStringFormatWriter) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
-	item Item,
+	o *sku.Transacted,
 ) (n int64, err error) {
 	var (
 		n1 int
@@ -61,41 +62,9 @@ func (f *itemDeletedStringFormatWriter) WriteStringFormat(
 		return
 	}
 
-	fields := []string_format_writer.Field{
-		{
-			Key:       "id",
-			Value:     item.Id.String(),
-			ColorType: string_format_writer.ColorTypeId,
-		},
-	}
-
-	prefix := "\n" + string_format_writer.StringIndentWithSpace
-
-	if item.Title != "" {
-		fields = append(
-			fields,
-			string_format_writer.Field{
-				Key:       "title",
-				Value:     item.Title,
-				ColorType: string_format_writer.ColorTypeUserData,
-				Prefix:    prefix,
-			},
-		)
-	}
-
-	fields = append(
-		fields,
-		string_format_writer.Field{
-			Key:       "url",
-			Value:     item.Url.String(),
-			ColorType: string_format_writer.ColorTypeUserData,
-			Prefix:    prefix,
-		},
-	)
-
 	n2, err = f.fieldsFormatWriter.WriteStringFormat(
 		sw,
-		string_format_writer.Box{Contents: fields},
+		string_format_writer.Box{Contents: o.Metadata.Fields},
 	)
 	n += n2
 

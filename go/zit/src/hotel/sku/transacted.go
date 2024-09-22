@@ -44,6 +44,12 @@ func (t *Transacted) GetExternalState() external_state.State {
 	return t.State
 }
 
+func (a *Transacted) CloneTransacted() (b *Transacted) {
+	b = GetTransactedPool().Get()
+	TransactedResetter.ResetWith(b, a)
+	return
+}
+
 func (a *Transacted) Clone() ExternalLike {
 	b := GetTransactedPool().Get()
 	TransactedResetter.ResetWith(b, a)
