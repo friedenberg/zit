@@ -21,7 +21,7 @@ import (
 )
 
 func init() {
-	gob.Register(sku.External{})
+	gob.Register(sku.Transacted{})
 }
 
 type Item = sku.FSItem
@@ -48,7 +48,7 @@ func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
 }
 
 func (s *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
-	e := el.(*sku.External)
+	e := el.(*sku.Transacted)
 
 	var i *Item
 
@@ -242,7 +242,7 @@ func (s *Store) ReadFSItemFromExternal(el sku.ExternalLike) (i *Item, err error)
 	i = &Item{} // TODO use pool or use dir_items?
 	i.Reset()
 
-	e := el.(*sku.External)
+	e := el.(*sku.Transacted)
 
 	// TODO handle sort order
 	for _, f := range e.Metadata.Fields {
@@ -286,7 +286,7 @@ func (s *Store) ReadFSItemFromExternal(el sku.ExternalLike) (i *Item, err error)
 }
 
 func (s *Store) WriteFSItemToExternal(i *Item, el sku.ExternalLike) (err error) {
-	e := el.(*sku.External)
+	e := el.(*sku.Transacted)
 	e.Metadata.Fields = e.Metadata.Fields[:0]
 	k := &i.ObjectId
 

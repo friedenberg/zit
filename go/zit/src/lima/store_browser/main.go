@@ -246,7 +246,7 @@ func (c *Store) QueryCheckedOut(
 
 // TODO support updating bookmarks without overwriting. Maybe move to
 // toml-bookmark type
-func (s *Store) SaveBlob(e *sku.External) (err error) {
+func (s *Store) SaveBlob(e *sku.Transacted) (err error) {
 	var aw sha.WriteCloser
 
 	if aw, err = s.externalStoreInfo.BlobWriter(); err != nil {

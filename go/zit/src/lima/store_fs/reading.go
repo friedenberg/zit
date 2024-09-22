@@ -20,7 +20,7 @@ func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 		return
 	}
 
-	var e2 *sku.External
+	var e2 *sku.Transacted
 
 	if e2, err = s.ReadExternalFromItem(
 		sku.CommitOptions{
@@ -42,7 +42,7 @@ func (s *Store) readOneExternalInto(
 	o *sku.CommitOptions,
 	i *Item,
 	t *sku.Transacted,
-	e *sku.External,
+	e *sku.Transacted,
 ) (err error) {
 	if err = s.WriteFSItemToExternal(i, e); err != nil {
 		err = errors.Wrap(err)
@@ -126,7 +126,7 @@ func (s *Store) readOneExternalInto(
 }
 
 func (s *Store) readOneExternalObject(
-	e *sku.External,
+	e *sku.Transacted,
 	t *sku.Transacted,
 	i *Item,
 ) (err error) {
@@ -156,7 +156,7 @@ func (s *Store) readOneExternalObject(
 
 func (s *Store) ReadOneExternalObjectReader(
 	r io.Reader,
-	e *sku.External,
+	e *sku.Transacted,
 ) (err error) {
 	if _, err = s.metadataTextParser.ParseMetadata(r, e); err != nil {
 		err = errors.Wrap(err)
@@ -167,7 +167,7 @@ func (s *Store) ReadOneExternalObjectReader(
 }
 
 func (s *Store) ReadOneExternalBlob(
-	e *sku.External,
+	e *sku.Transacted,
 	t *sku.Transacted,
 	i *Item,
 ) (err error) {

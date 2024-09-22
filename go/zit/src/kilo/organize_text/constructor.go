@@ -281,7 +281,7 @@ func (c *constructor) cloneObj(
 	named *obj,
 ) (z *obj, err error) {
 	z = &obj{
-		Type:         named.Type,
+		Type:     named.Type,
 		External: named.External.Clone(),
 	}
 

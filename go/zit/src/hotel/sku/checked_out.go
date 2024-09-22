@@ -50,7 +50,7 @@ func DetermineState(
 
 type CheckedOut struct {
 	Internal Transacted
-	External External
+	External Transacted
 	State    checked_out_state.State
 	Error    error
 	IsImport bool

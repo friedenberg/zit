@@ -39,7 +39,7 @@ func (f *Organize) WriteStringFormat(
 	o := el.GetSku()
 	var n2 int64
 
-	if e, hasNative := el.(*sku.External); hasNative {
+	if e, hasNative := el.(*sku.Transacted); hasNative {
 		switch e.State {
 		case external_state.Untracked:
 			if n, err = f.writeStringFormatExternalBoxUntracked(
@@ -168,7 +168,7 @@ func (f *Organize) readStringFormatBoxContents(
 	ts *query_spec.TokenScanner,
 	el sku.ExternalLike,
 ) (err error) {
-	e := el.(*sku.External)
+	e := el.(*sku.Transacted)
 	o := el.GetSku()
 
 	state := 0
@@ -212,7 +212,7 @@ LOOP:
 			} else {
 				switch tokenType {
 				case token_types.TypeField, token_types.TypeLiteral:
-					e, hasNative := el.(*sku.External)
+					e, hasNative := el.(*sku.Transacted)
 
 					if !hasNative {
 						err = errors.Errorf("unsupported type: %T", el)
@@ -293,7 +293,7 @@ LOOP:
 func (f *Organize) writeStringFormatExternal(
 	sw interfaces.WriterAndStringWriter,
 	i *sku.Transacted,
-	e *sku.External,
+	e *sku.Transacted,
 	includeDescriptionInBox bool,
 ) (n int64, err error) {
 	fields := []string_format_writer.Field{}
@@ -400,7 +400,7 @@ func (f *Organize) writeStringFormatExternal(
 func (f *Organize) writeStringFormatExternalBoxUntracked(
 	sw interfaces.WriterAndStringWriter,
 	i *sku.Transacted,
-	e *sku.External,
+	e *sku.Transacted,
 	unboxedDescription bool,
 ) (n int64, err error) {
 	if e.State != external_state.Untracked {
@@ -461,9 +461,9 @@ func (f *Organize) writeStringFormatExternalBoxUntracked(
 	n2, err = f.Fields.WriteStringFormat(
 		sw,
 		string_format_writer.Box{
-			Contents:   boxed,
-			Box:     true,
-			Trailer: unboxed,
+			Contents: boxed,
+			Box:      true,
+			Trailer:  unboxed,
 		},
 	)
 	n += n2

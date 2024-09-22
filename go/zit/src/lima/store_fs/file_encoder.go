@@ -17,7 +17,7 @@ import (
 type FileEncoder interface {
 	Encode(
 		options checkout_options.TextFormatterOptions,
-		z *sku.External,
+		z *sku.Transacted,
 		i *Item,
 	) (err error)
 }
@@ -70,7 +70,7 @@ func (e *fileEncoder) openOrCreate(p string) (f *os.File, err error) {
 
 func (e *fileEncoder) EncodeObject(
 	options checkout_options.TextFormatterOptions,
-	z *sku.External,
+	z *sku.Transacted,
 	objectPath string,
 	blobPath string,
 ) (err error) {
@@ -189,7 +189,7 @@ func (e *fileEncoder) EncodeObject(
 
 func (e *fileEncoder) Encode(
 	options checkout_options.TextFormatterOptions,
-	z *sku.External,
+	z *sku.Transacted,
 	i *Item,
 ) (err error) {
 	return e.EncodeObject(

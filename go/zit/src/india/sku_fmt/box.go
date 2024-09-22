@@ -293,7 +293,7 @@ LOOP:
 
 func (f *Box) WriteStringFormatExternal(
 	sw interfaces.WriterAndStringWriter,
-	e *sku.External,
+	e *sku.Transacted,
 	includeDescriptionInBox bool,
 ) (n int64, err error) {
 	fields := make([]string_format_writer.Field, len(e.Metadata.Fields))
@@ -379,7 +379,7 @@ func (f *Box) WriteStringFormatExternal(
 func (f *Box) WriteStringFormatExternalBoxUntracked(
 	sw interfaces.WriterAndStringWriter,
 	i *sku.Transacted,
-	e *sku.External,
+	e *sku.Transacted,
 	unboxedDescription bool,
 ) (n int64, err error) {
 	if e.State != external_state.Untracked {

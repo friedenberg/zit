@@ -1,6 +1,8 @@
 package object_metadata_fmt
 
 import (
+	"sort"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -71,7 +73,11 @@ func MetadataFieldTags(
 		},
 	)
 
-  return out
+	sort.Slice(out, func(i, j int) bool {
+		return out[i].Value < out[j].Value
+	})
+
+	return out
 }
 
 func MetadataFieldDescription(

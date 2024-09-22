@@ -47,7 +47,7 @@ func (s *Store) checkoutOneNew(
 
 	ui.TodoP4("cleanup")
 	if i, ok = s.Get(&sz.ObjectId); ok {
-		var cze *sku.External
+		var cze *sku.Transacted
 
 		if cze, err = s.ReadExternalFromItem(
 			sku.CommitOptions{

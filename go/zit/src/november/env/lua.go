@@ -11,7 +11,7 @@ import (
 )
 
 func (s *Env) GetSkuFromString(lv string) (sk *sku.Transacted, err error) {
-	e := sku.GetExternalPool().Get()
+	e := sku.GetTransactedPool().Get()
 	sk = e.GetSku()
 
 	defer func() {

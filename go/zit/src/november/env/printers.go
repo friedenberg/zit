@@ -84,7 +84,7 @@ func (u *Env) PrinterCheckedOut() interfaces.FuncIter[*sku.CheckedOut] {
 				string_format_writer.CliFormatTruncation66CharEllipsis,
 			),
 			u.StringFormatWriterSkuBox(
-        u.config.PrintOptions,
+				u.config.PrintOptions,
 				oo.ColorOptionsErr,
 				string_format_writer.CliFormatTruncation66CharEllipsis,
 			),
@@ -108,7 +108,7 @@ func (u *Env) PrinterCheckedOut() interfaces.FuncIter[*sku.CheckedOut] {
 				string_format_writer.CliFormatTruncation66CharEllipsis,
 			),
 			u.StringFormatWriterSkuBox(
-        u.config.PrintOptions,
+				u.config.PrintOptions,
 				oo.ColorOptionsErr,
 				string_format_writer.CliFormatTruncation66CharEllipsis,
 			),

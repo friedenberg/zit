@@ -71,11 +71,11 @@ func (a *tag) Equals(b *tag) bool {
 
 func (e *tag) Set(v string) (err error) {
 	if err = e.Transacted.ObjectId.Set(v); err != nil {
-    err = errors.Wrap(err)
-    return
-  }
+		err = errors.Wrap(err)
+		return
+	}
 
-  return
+	return
 }
 
 func (e *tag) String() string {

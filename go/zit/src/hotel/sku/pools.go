@@ -7,17 +7,11 @@ import (
 
 var (
 	poolTransacted interfaces.Pool[Transacted, *Transacted]
-	poolExternal   interfaces.Pool[External, *External]
 	poolCheckedOut interfaces.Pool[CheckedOut, *CheckedOut]
 )
 
 func init() {
 	poolTransacted = pool.MakePool(
-		nil,
-		TransactedResetter.Reset,
-	)
-
-	poolExternal = pool.MakePool(
 		nil,
 		TransactedResetter.Reset,
 	)
@@ -30,10 +24,6 @@ func init() {
 
 func GetTransactedPool() interfaces.Pool[Transacted, *Transacted] {
 	return poolTransacted
-}
-
-func GetExternalPool() interfaces.Pool[External, *External] {
-	return poolExternal
 }
 
 func GetCheckedOutPool() interfaces.Pool[CheckedOut, *CheckedOut] {
