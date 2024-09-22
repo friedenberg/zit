@@ -193,7 +193,6 @@ func (u *Env) Initialize(options Options) (err error) {
 		k.FileExtensions,
 		u.GetFSHome(),
 		ofo,
-		u.PrinterExternalLike(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
