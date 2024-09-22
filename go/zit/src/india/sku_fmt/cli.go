@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+// TODO remove and replace with box
 type cli struct {
 	options       erworben_cli_print_options.PrintOptions
 	contentPrefix string
