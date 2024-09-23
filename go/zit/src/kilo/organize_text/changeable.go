@@ -44,7 +44,7 @@ func (ot *Text) GetSkus(
 }
 
 func (a *Assignment) addToSet(
-	ot *Text,
+	organizeText *Text,
 	out SkuMapWithOrder,
 	original sku.ExternalLikeSet,
 ) (err error) {
@@ -61,21 +61,22 @@ func (a *Assignment) addToSet(
 			var z sku.ExternalLike
 			ok := false
 
-			if selwi, ok = out.m[key(o.External)]; !ok {
-				z = selwi.ExternalLike
-				z = ot.ObjectFactory.Get()
+			k := key(o.External)
 
-				ot.ObjectFactory.ResetWith(z, o.External)
+			if selwi, ok = out.m[k]; !ok {
+				z = organizeText.ObjectFactory.Get()
 
-				if err = ot.EachPtr(
+				organizeText.ObjectFactory.ResetWith(z, o.External)
+
+				if err = organizeText.EachPtr(
 					z.GetSku().AddTagPtr,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
 
-				if !ot.Metadata.Type.IsEmpty() {
-					z.GetSku().Metadata.Type.ResetWith(ot.Metadata.Type)
+				if !organizeText.Metadata.Type.IsEmpty() {
+					z.GetSku().Metadata.Type.ResetWith(organizeText.Metadata.Type)
 				}
 
 				out.Add(z)
@@ -87,13 +88,19 @@ func (a *Assignment) addToSet(
 					z.GetSku().Metadata.Type.ResetWith(zPrime.GetSku().Metadata.Type)
 				}
 
-				if !ot.Metadata.Type.IsEmpty() {
-					z.GetSku().Metadata.Type.ResetWith(ot.Metadata.Type)
+				if !organizeText.Metadata.Type.IsEmpty() {
+					z.GetSku().Metadata.Type.ResetWith(organizeText.Metadata.Type)
 				}
+			} else {
+				z = selwi.ExternalLike
 			}
 
 			if o.External.GetSku().ObjectId.String() == "" {
 				panic(fmt.Sprintf("%s: object id is nil", o))
+			}
+
+			if z == nil {
+				panic("empty object")
 			}
 
 			if err = z.GetSku().Metadata.Description.Set(
@@ -143,7 +150,7 @@ func (a *Assignment) addToSet(
 	}
 
 	for _, c := range a.Children {
-		if err = c.addToSet(ot, out, original); err != nil {
+		if err = c.addToSet(organizeText, out, original); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
