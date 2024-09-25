@@ -17,6 +17,8 @@ type Box struct {
 	PrintTagsAlways         bool `toml:"print-etiketten-always"`
 	PrintEmptyShas          bool `toml:"print-empty-shas"`
 	PrintIncludeTypen       bool `toml:"print-include-typen"`
+	DescriptionInBox        bool `toml:"-"`
+	ExcludeFields           bool `toml:"-"`
 }
 
 type General struct {
@@ -243,5 +245,15 @@ func (c *General) AddToFlags(f *flag.FlagSet, m *General) {
 
 func (c General) WithPrintShas(v bool) General {
 	c.PrintShas = v
+	return c
+}
+
+func (c General) WithDescriptionInBox(v bool) General {
+	c.DescriptionInBox = v
+	return c
+}
+
+func (c General) WithExcludeFields(v bool) General {
+	c.ExcludeFields = v
 	return c
 }

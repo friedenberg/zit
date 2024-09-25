@@ -13,15 +13,15 @@ import (
 )
 
 func (u *Env) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
-	co := u.FormatColorOptionsOut()
+	po := u.config.PrintOptions.
+		WithPrintShas(true).
+		WithDescriptionInBox(true).
+		WithExcludeFields(true)
 
-	sw := sku_fmt.MakeCliFormat(
-		u.config.PrintOptions,
-		u.StringFormatWriterObjectId(co),
-		u.StringFormatWriterMetadata(
-			co,
-			string_format_writer.CliFormatTruncation66CharEllipsis,
-		),
+	sw := u.StringFormatWriterSkuBox(
+		po,
+		u.FormatColorOptionsOut(),
+		string_format_writer.CliFormatTruncation66CharEllipsis,
 	)
 
 	return string_format_writer.MakeDelim(
@@ -73,12 +73,15 @@ func (u *Env) PrinterHeader() interfaces.FuncIter[string] {
 
 func (u *Env) PrinterCheckedOut() interfaces.FuncIter[*sku.CheckedOut] {
 	oo := u.FormatOutputOptions()
+	po := u.config.PrintOptions.
+		WithPrintShas(true).
+		WithDescriptionInBox(true)
 
 	err := string_format_writer.MakeDelim(
 		"\n",
 		u.Err(),
 		sku_fmt.MakeCliCheckedOutFormat(
-			u.config.PrintOptions,
+			po,
 			u.StringFormatWriterShaLike(oo.ColorOptionsErr),
 			id_fmts.MakeFDCliFormat(
 				oo.ColorOptionsErr,
@@ -90,7 +93,7 @@ func (u *Env) PrinterCheckedOut() interfaces.FuncIter[*sku.CheckedOut] {
 				string_format_writer.CliFormatTruncation66CharEllipsis,
 			),
 			u.StringFormatWriterSkuBox(
-				u.config.PrintOptions,
+				po,
 				oo.ColorOptionsErr,
 				string_format_writer.CliFormatTruncation66CharEllipsis,
 			),
@@ -102,7 +105,7 @@ func (u *Env) PrinterCheckedOut() interfaces.FuncIter[*sku.CheckedOut] {
 		"\n",
 		u.Out(),
 		sku_fmt.MakeCliCheckedOutFormat(
-			u.config.PrintOptions,
+			po,
 			u.StringFormatWriterShaLike(oo.ColorOptionsOut),
 			id_fmts.MakeFDCliFormat(
 				oo.ColorOptionsOut,
@@ -114,7 +117,7 @@ func (u *Env) PrinterCheckedOut() interfaces.FuncIter[*sku.CheckedOut] {
 				string_format_writer.CliFormatTruncation66CharEllipsis,
 			),
 			u.StringFormatWriterSkuBox(
-				u.config.PrintOptions,
+				po,
 				oo.ColorOptionsErr,
 				string_format_writer.CliFormatTruncation66CharEllipsis,
 			),

@@ -45,11 +45,6 @@ func MakeBox(
 	metadata interfaces.StringFormatWriter[*object_metadata.Metadata],
 	abbr ids.Abbr,
 ) *Box {
-	options.PrintTime = false
-	options.PrintShas = false
-
-	co.OffEntirely = true
-
 	return &Box{
 		ColorOptions: co,
 		Options:      options,
@@ -124,7 +119,7 @@ func (f *Box) WriteStringFormat(
 		return
 	}
 
-	n2, err = f.WriteStringFormatExternal(sw, o, false)
+	n2, err = f.WriteStringFormatExternal(sw, o, f.Options.DescriptionInBox)
 	n += int64(n2)
 
 	if err != nil {
@@ -142,7 +137,7 @@ func (f *Box) WriteStringFormat(
 
 	b := &o.Metadata.Description
 
-	if !b.IsEmpty() {
+	if !f.Options.DescriptionInBox && !b.IsEmpty() {
 		n2, err = f.Fields.WriteStringFormat(
 			sw,
 			string_format_writer.Box{
@@ -344,20 +339,22 @@ func (f *Box) WriteStringFormatExternal(
 			)
 		}
 
-		fields = append(
-			fields,
-			object_metadata_fmt.MetadataFieldTags(m)...,
-		)
-
-		if includeDescriptionInBox {
+		if includeDescriptionInBox && !m.Description.IsEmpty() {
 			fields = append(
 				fields,
 				object_metadata_fmt.MetadataFieldDescription(m),
 			)
 		}
+
+		fields = append(
+			fields,
+			object_metadata_fmt.MetadataFieldTags(m)...,
+		)
 	}
 
-	fields = append(fields, e.Metadata.Fields...)
+	if !f.Options.ExcludeFields {
+		fields = append(fields, e.Metadata.Fields...)
+	}
 
 	n2, err = f.Fields.WriteStringFormat(
 		sw,
