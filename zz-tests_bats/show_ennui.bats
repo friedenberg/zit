@@ -30,7 +30,7 @@ function format_mutter_one { # @test
 	run_zit show -format mutter one/uno
 	assert_success
 	assert_output - <<-EOM
-		[one/uno@3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
+		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
 	EOM
 }
 
@@ -38,6 +38,6 @@ function format_mutter_all { # @test
 	run_zit show -format mutter :
 	assert_success
 	assert_output - <<-EOM
-		[one/uno@3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
+		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
 	EOM
 }

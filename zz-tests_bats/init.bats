@@ -17,8 +17,8 @@ function init_and_reindex { # @test
 
 	expected="$(mktemp)"
 	cat - >"$expected" <<-EOM
-		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
-		[konfig@$(get_konfig_sha)]
+		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+		[konfig @$(get_konfig_sha)]
 	EOM
 
 	run_zit_init_disable_age
@@ -30,12 +30,12 @@ function init_and_reindex { # @test
 	run_zit show -format log :konfig
 	assert_success
 	assert_output - <<-EOM
-		[konfig@$(get_konfig_sha)]
+		[konfig @$(get_konfig_sha)]
 	EOM
 
 	cat - >"$expected" <<-EOM
-		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
-		[konfig@$(get_konfig_sha)]
+		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+		[konfig @$(get_konfig_sha)]
 	EOM
 
 	run_zit reindex
@@ -53,8 +53,8 @@ function init_and_deinit { # @test
 
 	run_zit_init_disable_age
 	assert_output_unsorted - <<-EOM
-		[!md@102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
-		[konfig@$(get_konfig_sha)]
+		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+		[konfig @$(get_konfig_sha)]
 	EOM
 
 	run test -f .zit/KonfigAngeboren
@@ -65,7 +65,7 @@ function init_and_deinit { # @test
 	run_zit show -format log :konfig
 	assert_success
 	assert_output - <<-EOM
-		[konfig@$(get_konfig_sha)]
+		[konfig @$(get_konfig_sha)]
 	EOM
 
 	# run_zit deinit
@@ -112,8 +112,8 @@ function init_and_with_another_age { # @test
 # 	run_zit new -edit=false to_add
 # 	assert_success
 # 	assert_output - <<-EOM
-# 		[-tag@48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-# 		[one/uno@37d3869e9b1711f009eabf69a2bf294cfd785f5b1c7463cba77d11d5f81f5e09 !md "wow"]
+# 		[-tag @48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
+# 		[one/uno @37d3869e9b1711f009eabf69a2bf294cfd785f5b1c7463cba77d11d5f81f5e09 !md "wow"]
 # 	EOM
 
 # 	run_zit show one/uno

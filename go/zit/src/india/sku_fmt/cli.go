@@ -20,19 +20,6 @@ type cli struct {
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata]
 }
 
-func MakeCliFormatShort(
-	objectIdStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
-	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata],
-) *cli {
-  // options := print_options.PrintOptions{
-  // }
-
-	return &cli{
-		objectIdStringFormatWriter:  objectIdStringFormatWriter,
-		metadateiStringFormatWriter: metadateiStringFormatWriter,
-	}
-}
-
 func MakeCliFormat(
 	options print_options.General,
 	objectStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],

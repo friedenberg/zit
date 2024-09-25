@@ -1,10 +1,8 @@
 package env
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
@@ -37,19 +35,5 @@ func (u *Env) SkuFormatBoxNoColor() sku_fmt.ExternalLike {
 		u.config.PrintOptions.WithPrintShas(false),
 		co,
 		string_format_writer.CliFormatTruncationNone,
-	)
-}
-
-func (u *Env) StringFormatWriterSkuTransactedShort() interfaces.StringFormatWriter[*sku.Transacted] {
-	co := string_format_writer.ColorOptions{
-		OffEntirely: true,
-	}
-
-	return sku_fmt.MakeCliFormatShort(
-		u.StringFormatWriterObjectId(co),
-		u.StringFormatWriterMetadata(
-			co,
-			string_format_writer.CliFormatTruncation66CharEllipsis,
-		),
 	)
 }

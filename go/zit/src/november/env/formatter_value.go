@@ -509,7 +509,7 @@ func (u *Env) MakeFormatFunc(
 		}
 
 	case "blob-sku-prefix":
-		cliFmt := u.StringFormatWriterSkuTransactedShort()
+		cliFmt := u.SkuFormatBoxNoColor()
 
 		f = func(o *sku.Transacted) (err error) {
 			var r sha.ReadCloser

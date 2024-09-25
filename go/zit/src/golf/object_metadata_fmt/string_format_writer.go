@@ -18,10 +18,10 @@ type cliMetadatei struct {
 	writeDescription bool
 	writeEtiketten   bool
 
-	shaStringFormatWriter       interfaces.StringFormatWriter[interfaces.Sha]
-	typStringFormatWriter       interfaces.StringFormatWriter[*ids.Type]
-	fieldsStringFormatWriter    interfaces.StringFormatWriter[string_format_writer.Box]
-	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag]
+	Sha    interfaces.StringFormatWriter[interfaces.Sha]
+	Type   interfaces.StringFormatWriter[*ids.Type]
+	Fields interfaces.StringFormatWriter[string_format_writer.Box]
+	Tags   interfaces.StringFormatWriter[*ids.Tag]
 }
 
 func MakeCliMetadateiFormat(
@@ -36,13 +36,13 @@ func MakeCliMetadateiFormat(
 		contentPrefix: string_format_writer.StringPrefixFromOptions(
 			options,
 		),
-		writeTyp:                    true,
-		writeDescription:            true,
-		writeEtiketten:              true,
-		shaStringFormatWriter:       shaStringFormatWriter,
-		typStringFormatWriter:       typStringFormatWriter,
-		fieldsStringFormatWriter:    fieldsFormatWriter,
-		etikettenStringFormatWriter: etikettenStringFormatWriter,
+		writeTyp:         true,
+		writeDescription: true,
+		writeEtiketten:   true,
+		Sha:              shaStringFormatWriter,
+		Type:             typStringFormatWriter,
+		Fields:           fieldsFormatWriter,
+		Tags:             etikettenStringFormatWriter,
 	}
 }
 
@@ -56,7 +56,7 @@ func (f *cliMetadatei) WriteStringFormat(
 	sh := &o.Blob
 
 	if !sh.IsNull() || f.options.PrintEmptyShas {
-		n1, err = sw.WriteString("@")
+		n1, err = sw.WriteString(" @")
 		n += int64(n1)
 
 		if err != nil {
@@ -64,7 +64,7 @@ func (f *cliMetadatei) WriteStringFormat(
 			return
 		}
 
-		n2, err = f.shaStringFormatWriter.WriteStringFormat(sw, sh)
+		n2, err = f.Sha.WriteStringFormat(sw, sh)
 		n += n2
 
 		if err != nil {
@@ -93,7 +93,7 @@ func (f *cliMetadatei) WriteStringFormat(
 				return
 			}
 
-			n2, err = f.typStringFormatWriter.WriteStringFormat(sw, t)
+			n2, err = f.Type.WriteStringFormat(sw, t)
 			n += n2
 
 			if err != nil {
@@ -118,7 +118,7 @@ func (f *cliMetadatei) WriteStringFormat(
 				return
 			}
 
-			n2, err = f.fieldsStringFormatWriter.WriteStringFormat(
+			n2, err = f.Fields.WriteStringFormat(
 				sw,
 				string_format_writer.Box{
 					Contents: []string_format_writer.Field{
@@ -177,7 +177,7 @@ func (f *cliMetadatei) writeStringFormatEtiketten(
 			return
 		}
 
-		n2, err = f.etikettenStringFormatWriter.WriteStringFormat(sw, &v)
+		n2, err = f.Tags.WriteStringFormat(sw, &v)
 		n += n2
 
 		if err != nil {
