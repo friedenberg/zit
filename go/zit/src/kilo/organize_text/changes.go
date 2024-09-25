@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
@@ -138,7 +138,7 @@ type OrganizeResults struct {
 }
 
 func ChangesFrom(
-	po erworben_cli_print_options.PrintOptions,
+	po print_options.General,
 	a, b *Text,
 	original sku.ExternalLikeSet,
 ) (c Changes, err error) {
@@ -157,7 +157,7 @@ func ChangesFrom(
 }
 
 func ChangesFromResults(
-	po erworben_cli_print_options.PrintOptions,
+	po print_options.General,
 	results OrganizeResults,
 ) (c Changes, err error) {
 	if err = applyToText(po, results.Before); err != nil {
@@ -201,7 +201,7 @@ func ChangesFromResults(
 }
 
 func applyToText(
-	po erworben_cli_print_options.PrintOptions,
+	po print_options.General,
 	t *Text,
 ) (err error) {
 	if po.PrintTagsAlways {

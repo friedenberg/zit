@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -15,7 +15,7 @@ import (
 )
 
 type cliCheckedOut struct {
-	options erworben_cli_print_options.PrintOptions
+	options print_options.General
 
 	rightAlignedWriter         interfaces.StringFormatWriter[string]
 	shaStringFormatWriter      interfaces.StringFormatWriter[interfaces.Sha]
@@ -27,7 +27,7 @@ type cliCheckedOut struct {
 }
 
 func MakeCliCheckedOutFormat(
-	options erworben_cli_print_options.PrintOptions,
+	options print_options.General,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 	fdStringFormatWriter interfaces.StringFormatWriter[*fd.FD],
 	objectIdStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],

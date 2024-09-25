@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/erworben_tools"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -22,7 +22,7 @@ type Blob struct {
 	FileExtensions  file_extensions.FileExtensions          `toml:"file-extensions"`
 	RemoteScripts   map[string]script_config.RemoteScript   `toml:"remote-scripts"`
 	Actions         map[string]script_config.ScriptConfig   `toml:"actions,omitempty"`
-	PrintOptions    erworben_cli_print_options.PrintOptions `toml:"cli-output"`
+	PrintOptions    print_options.General `toml:"cli-output"`
 	Tools           erworben_tools.Tools                    `toml:"tools"`
 	Filters         map[string]string                       `toml:"filters"`
 }
@@ -76,7 +76,7 @@ func (a *Blob) Reset() {
 	a.HiddenEtiketten = make([]ids.Tag, 0)
 	a.RemoteScripts = make(map[string]script_config.RemoteScript)
 	a.Actions = make(map[string]script_config.ScriptConfig)
-	a.PrintOptions = erworben_cli_print_options.Default()
+	a.PrintOptions = print_options.Default()
 	a.Filters = make(map[string]string)
 }
 

@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
@@ -13,7 +13,7 @@ import (
 
 // TODO remove and replace with box
 type cli struct {
-	options       erworben_cli_print_options.PrintOptions
+	options       print_options.General
 	contentPrefix string
 
 	objectIdStringFormatWriter  interfaces.StringFormatWriter[*ids.ObjectId]
@@ -24,6 +24,9 @@ func MakeCliFormatShort(
 	objectIdStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata],
 ) *cli {
+  // options := print_options.PrintOptions{
+  // }
+
 	return &cli{
 		objectIdStringFormatWriter:  objectIdStringFormatWriter,
 		metadateiStringFormatWriter: metadateiStringFormatWriter,
@@ -31,7 +34,7 @@ func MakeCliFormatShort(
 }
 
 func MakeCliFormat(
-	options erworben_cli_print_options.PrintOptions,
+	options print_options.General,
 	objectStringFormatWriter interfaces.StringFormatWriter[*ids.ObjectId],
 	metadateiStringFormatWriter interfaces.StringFormatWriter[*object_metadata.Metadata],
 ) *cli {

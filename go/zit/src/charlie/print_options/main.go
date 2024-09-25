@@ -1,4 +1,4 @@
-package erworben_cli_print_options
+package print_options
 
 import (
 	"flag"
@@ -11,23 +11,27 @@ type Abbreviations struct {
 	Shas      bool `toml:"shas"`
 }
 
-type PrintOptions struct {
-	Abbreviations           Abbreviations `toml:"abbreviations"`
-	PrintIncludeTypen       bool          `toml:"print-include-typen"`
-	PrintIncludeDescription bool          `toml:"print-include-description"`
-	PrintTime               bool          `toml:"print-time"`
-	PrintTagsAlways         bool          `toml:"print-etiketten-always"`
-	PrintEmptyShas          bool          `toml:"print-empty-shas"`
-	PrintMatchedArchiviert  bool          `toml:"print-matched-archiviert"`
-	PrintShas               bool          `toml:"print-shas"`
-	PrintFlush              bool          `toml:"print-flush"`
-	PrintUnchanged          bool          `toml:"print-unchanged"`
-	PrintColors             bool          `toml:"print-colors"`
-	PrintBestandsaufnahme   bool          `toml:"print-bestandsaufnahme"`
-	ZittishNewlines         bool          `toml:"-"`
+type Box struct {
+	PrintIncludeDescription bool `toml:"print-include-description"`
+	PrintTime               bool `toml:"print-time"`
+	PrintTagsAlways         bool `toml:"print-etiketten-always"`
+	PrintEmptyShas          bool `toml:"print-empty-shas"`
+	PrintIncludeTypen       bool `toml:"print-include-typen"`
 }
 
-func (a *PrintOptions) Merge(b PrintOptions, mask PrintOptions) {
+type General struct {
+	Abbreviations Abbreviations `toml:"abbreviations"`
+	Box
+	PrintMatchedArchiviert bool `toml:"print-matched-archiviert"`
+	PrintShas              bool `toml:"print-shas"`
+	PrintFlush             bool `toml:"print-flush"`
+	PrintUnchanged         bool `toml:"print-unchanged"`
+	PrintColors            bool `toml:"print-colors"`
+	PrintBestandsaufnahme  bool `toml:"print-bestandsaufnahme"`
+	ZittishNewlines        bool `toml:"-"`
+}
+
+func (a *General) Merge(b General, mask General) {
 	if mask.Abbreviations.Hinweisen {
 		a.Abbreviations.Hinweisen = b.Abbreviations.Hinweisen
 	}
@@ -83,23 +87,25 @@ func (a *PrintOptions) Merge(b PrintOptions, mask PrintOptions) {
 	a.ZittishNewlines = b.ZittishNewlines
 }
 
-func Default() PrintOptions {
-	return PrintOptions{
+func Default() General {
+	return General{
 		Abbreviations: Abbreviations{
 			Hinweisen: true,
 			Shas:      true,
 		},
-		PrintIncludeTypen:       true,
-		PrintIncludeDescription: true,
-		PrintTime:               true,
-		PrintTagsAlways:         true,
-		PrintEmptyShas:          false,
-		PrintMatchedArchiviert:  false,
-		PrintShas:               true,
-		PrintFlush:              true,
-		PrintUnchanged:          true,
-		PrintColors:             true,
-		PrintBestandsaufnahme:   true,
+		Box: Box{
+			PrintIncludeTypen:       true,
+			PrintIncludeDescription: true,
+			PrintTime:               true,
+			PrintTagsAlways:         true,
+			PrintEmptyShas:          false,
+		},
+		PrintMatchedArchiviert: false,
+		PrintShas:              true,
+		PrintFlush:             true,
+		PrintUnchanged:         true,
+		PrintColors:            true,
+		PrintBestandsaufnahme:  true,
 	}
 }
 
@@ -128,7 +134,7 @@ func boolVarWithMask(
 	)
 }
 
-func (c *PrintOptions) AddToFlags(f *flag.FlagSet, m *PrintOptions) {
+func (c *General) AddToFlags(f *flag.FlagSet, m *General) {
 	boolVarWithMask(
 		f,
 		"print-typen",
@@ -235,7 +241,7 @@ func (c *PrintOptions) AddToFlags(f *flag.FlagSet, m *PrintOptions) {
 	)
 }
 
-func (c PrintOptions) WithPrintShas(v bool) PrintOptions {
+func (c General) WithPrintShas(v bool) General {
 	c.PrintShas = v
 	return c
 }

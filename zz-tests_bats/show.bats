@@ -338,11 +338,11 @@ function show_konfig { # @test
 		kasten = 'kasten'
 
 		[cli-output]
-		print-include-typen = false
 		print-include-description = false
 		print-time = false
 		print-etiketten-always = false
 		print-empty-shas = false
+		print-include-typen = false
 		print-matched-archiviert = false
 		print-shas = false
 		print-flush = false

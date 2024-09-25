@@ -2,14 +2,14 @@ package env
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
 func (u *Env) StringFormatWriterSkuBox(
-	po erworben_cli_print_options.PrintOptions,
+	po print_options.General,
 	co string_format_writer.ColorOptions,
 	truncation string_format_writer.CliFormatTruncation,
 ) *sku_fmt.Box {

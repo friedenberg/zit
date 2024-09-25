@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -46,7 +46,7 @@ type Options struct {
 	UseRefiner             bool
 	UseMetadataHeader      bool
 
-	PrintOptions       erworben_cli_print_options.PrintOptions
+	PrintOptions       print_options.General
 	stringFormatReader catgut.StringFormatReader[*sku.Transacted]
 	stringFormatWriter catgut.StringFormatWriter[*sku.Transacted]
 }
@@ -121,7 +121,7 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 }
 
 func (o *Flags) GetOptionsWithMetadata(
-	printOptions erworben_cli_print_options.PrintOptions,
+	printOptions print_options.General,
 	skuFmt sku_fmt.ExternalLike,
 	abbr ids.Abbr,
 	of external_store.ObjectFactory,
@@ -147,7 +147,7 @@ func (o *Flags) GetOptionsWithMetadata(
 }
 
 func (o *Flags) GetOptions(
-	printOptions erworben_cli_print_options.PrintOptions,
+	printOptions print_options.General,
 	q TagSetGetter,
 	skuBoxFormat sku_fmt.ExternalLike,
 	abbr ids.Abbr, // TODO move Abbr as required arg

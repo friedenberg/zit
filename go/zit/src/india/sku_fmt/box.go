@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -36,7 +36,7 @@ type ObjectIdAlignedFormat interface {
 
 func MakeBox(
 	co string_format_writer.ColorOptions,
-	options erworben_cli_print_options.PrintOptions,
+	options print_options.General,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 	objectIdStringFormatWriter id_fmts.Aligned,
 	typeStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
@@ -66,7 +66,7 @@ func MakeBox(
 
 type Box struct {
 	string_format_writer.ColorOptions
-	Options erworben_cli_print_options.PrintOptions
+	Options print_options.General
 
 	MaxHead, MaxTail int
 	Padding          string

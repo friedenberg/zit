@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/erworben_tools"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 )
@@ -29,7 +29,7 @@ type Cli struct {
 	PredictableHinweisen bool
 	EtikettenPaths       bool
 
-	PrintOptions, maskPrintOptions erworben_cli_print_options.PrintOptions
+	PrintOptions, maskPrintOptions print_options.General
 	ToolOptions                    erworben_tools.Tools
 
 	descriptions.Description
@@ -100,13 +100,13 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 }
 
 func DefaultCli() (c Cli) {
-	c.PrintOptions = erworben_cli_print_options.Default()
+	c.PrintOptions = print_options.Default()
 
 	return
 }
 
 func (c *Cli) ApplyPrintOptionsConfig(
-	po erworben_cli_print_options.PrintOptions,
+	po print_options.General,
 ) {
 	cliSet := c.PrintOptions
 	c.PrintOptions = po

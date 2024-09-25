@@ -4,14 +4,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 )
 
 type cliMetadatei struct {
-	options       erworben_cli_print_options.PrintOptions
+	options       print_options.General
 	contentPrefix string
 
 	writeTyp         bool
@@ -25,7 +25,7 @@ type cliMetadatei struct {
 }
 
 func MakeCliMetadateiFormat(
-	options erworben_cli_print_options.PrintOptions,
+	options print_options.General,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
 	fieldsFormatWriter interfaces.StringFormatWriter[string_format_writer.Box],

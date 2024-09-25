@@ -3,20 +3,20 @@ package id_fmts
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/erworben_cli_print_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type objectIdCliFormat struct {
-	options              erworben_cli_print_options.PrintOptions
+	options              print_options.General
 	sfwColor, sfwNoColor interfaces.StringFormatWriter[*catgut.String]
 	abbr                 ids.Abbr
 }
 
 func MakeObjectIdCliFormat(
-	options erworben_cli_print_options.PrintOptions,
+	options print_options.General,
 	co string_format_writer.ColorOptions,
 	abbr ids.Abbr,
 ) *objectIdCliFormat {
