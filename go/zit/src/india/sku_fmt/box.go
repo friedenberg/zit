@@ -23,20 +23,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type (
-	ReaderExternalLike = catgut.StringFormatReader[*sku.Transacted]
-	WriterExternalLike = catgut.StringFormatWriter[*sku.Transacted]
-
-	ExternalLike interface {
-		ReaderExternalLike
-		WriterExternalLike
-	}
-)
-
-type ObjectIdAlignedFormat interface {
-	SetMaxKopfUndSchwanz(kop, schwanz int)
-}
-
 func MakeBox(
 	co string_format_writer.ColorOptions,
 	options print_options.General,
@@ -102,12 +88,12 @@ func (f *Box) WriteStringFormat(
 	var n1 int
 	var n2 int64
 
-  objectForFDs := o
+	objectForFDs := o
 
 	co, isCO := el.(*sku.CheckedOut)
 
 	if isCO {
-    objectForFDs = &co.External
+		objectForFDs = &co.External
 		state := co.GetState()
 		var stateString string
 
@@ -154,8 +140,8 @@ func (f *Box) WriteStringFormat(
 	}
 
 	if fds, errFS := f.FSItemReadWriter.ReadFSItemFromExternal(
-    objectForFDs,
-  ); errFS != nil || !isCO {
+		objectForFDs,
+	); errFS != nil || !isCO {
 		n2, err = f.WriteStringFormatExternal(
 			sw,
 			o,

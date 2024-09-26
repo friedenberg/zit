@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
@@ -47,12 +46,6 @@ type (
 			ph interfaces.FuncIter[string],
 			zsc sku.CheckedOutLikeSet,
 		) (err error)
-	}
-
-	OrganizeFormatGetter interface {
-		GetExternalStoreOrganizeFormat(
-			*sku_fmt.Box,
-		) sku_fmt.ExternalLike
 	}
 
 	QueryCheckedOut = query.QueryCheckedOut

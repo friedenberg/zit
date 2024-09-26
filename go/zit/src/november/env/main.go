@@ -53,7 +53,7 @@ type Env struct {
 
 	DormantCounter query.DormantCounter
 
-	luaSkuFormat sku_fmt.ReaderExternalLike
+	luaSkuFormat *sku_fmt.Box
 }
 
 func Make(
