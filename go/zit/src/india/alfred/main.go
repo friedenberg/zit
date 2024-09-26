@@ -16,13 +16,13 @@ import (
 type Writer struct {
 	alfredWriter *alfred.Writer
 	abbr         ids.Abbr
-	organizeFmt  interfaces.StringFormatWriter[*sku.Transacted]
+	organizeFmt  interfaces.StringFormatWriter[sku.ExternalLike]
 }
 
 func New(
 	out io.Writer,
 	abbr ids.Abbr,
-	organizeFmt interfaces.StringFormatWriter[*sku.Transacted],
+	organizeFmt interfaces.StringFormatWriter[sku.ExternalLike],
 ) (w *Writer, err error) {
 	var aw *alfred.Writer
 

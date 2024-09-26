@@ -27,7 +27,7 @@ func (u *Env) StringFormatWriterSkuBox(
 	)
 }
 
-func (u *Env) SkuFormatBoxNoColor() sku_fmt.ExternalLike {
+func (u *Env) SkuFormatBoxNoColor() *sku_fmt.Box {
 	co := u.FormatColorOptionsOut()
 	co.OffEntirely = true
 	options := u.config.PrintOptions.WithPrintShas(false)

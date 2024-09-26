@@ -86,8 +86,10 @@ func (f *Box) SetMaxKopfUndSchwanz(k, s int) {
 
 func (f *Box) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
-	o *sku.Transacted,
+	el sku.ExternalLike,
 ) (n int64, err error) {
+	o := el.GetSku()
+
 	var n1 int
 	var n2 int64
 

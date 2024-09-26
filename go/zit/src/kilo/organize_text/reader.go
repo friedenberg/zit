@@ -277,7 +277,7 @@ func (ar *reader) readOneObj(
 	z.External = ar.options.ObjectFactory.Get()
 	z.Type = t
 
-	if _, err = ar.options.stringFormatReader.ReadStringFormat(
+	if _, err = ar.options.fmtBox.ReadStringFormat(
 		r,
 		z.External.GetSku(),
 	); err != nil {

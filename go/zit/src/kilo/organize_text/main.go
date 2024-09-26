@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
 type Text struct {
@@ -121,9 +120,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		}
 	}
 
-	if aligned, ok := aw.options.stringFormatWriter.(sku_fmt.ObjectIdAlignedFormat); ok {
-		aligned.SetMaxKopfUndSchwanz(kopf, schwanz)
-	}
+	aw.options.fmtBox.SetMaxKopfUndSchwanz(kopf, schwanz)
 
 	if err = aw.write(ot.Assignment); err != nil {
 		err = errors.Wrap(err)
