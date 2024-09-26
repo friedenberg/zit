@@ -82,6 +82,23 @@ func (src *CheckedOut) CloneCheckedOutLike() CheckedOutLike {
 	return dst
 }
 
+func (src *CheckedOut) CloneExternalLike() ExternalLike {
+	return src.External.CloneExternalLike()
+}
+
+func (t *CheckedOut) GetExternalObjectId() ids.ExternalObjectId {
+	return t.External.GetExternalObjectId()
+}
+
+func (t *CheckedOut) GetExternalState() external_state.State {
+	return t.External.GetExternalState()
+}
+
+func (a *CheckedOut) GetObjectId() *ids.ObjectId {
+	return a.External.GetObjectId()
+}
+
+
 func (c *CheckedOut) SetError(err error) {
 	if err == nil {
 		return

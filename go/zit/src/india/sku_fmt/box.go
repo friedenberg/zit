@@ -45,18 +45,20 @@ func MakeBox(
 	fieldsFormatWriter interfaces.StringFormatWriter[string_format_writer.Box],
 	metadata interfaces.StringFormatWriter[*object_metadata.Metadata],
 	abbr ids.Abbr,
+	fsItemReadWriter sku.FSItemReadWriter,
 ) *Box {
 	return &Box{
-		ColorOptions: co,
-		Options:      options,
-		ShaString:    shaStringFormatWriter,
-		ObjectId:     objectIdStringFormatWriter,
-		Type:         typeStringFormatWriter,
-		TagString:    tagsStringFormatWriter,
-		Fields:       fieldsFormatWriter,
-		Metadata:     metadata,
-		RightAligned: string_format_writer.MakeRightAligned(),
-		Abbr:         abbr,
+		ColorOptions:     co,
+		Options:          options,
+		ShaString:        shaStringFormatWriter,
+		ObjectId:         objectIdStringFormatWriter,
+		Type:             typeStringFormatWriter,
+		TagString:        tagsStringFormatWriter,
+		Fields:           fieldsFormatWriter,
+		Metadata:         metadata,
+		RightAligned:     string_format_writer.MakeRightAligned(),
+		Abbr:             abbr,
+		FSItemReadWriter: fsItemReadWriter,
 	}
 }
 
@@ -77,6 +79,7 @@ type Box struct {
 	Metadata  interfaces.StringFormatWriter[*object_metadata.Metadata]
 
 	ids.Abbr
+	FSItemReadWriter sku.FSItemReadWriter
 }
 
 func (f *Box) SetMaxKopfUndSchwanz(k, s int) {
@@ -139,7 +142,11 @@ func (f *Box) WriteStringFormat(
 		return
 	}
 
-	n2, err = f.WriteStringFormatExternal(sw, o, f.Options.DescriptionInBox)
+	n2, err = f.WriteStringFormatExternal(
+		sw,
+		o,
+		f.Options.DescriptionInBox,
+	)
 	n += int64(n2)
 
 	if err != nil {

@@ -16,9 +16,8 @@ import (
 )
 
 type Transacted struct {
-	ObjectId     ids.ObjectId
-	Metadata     object_metadata.Metadata
-	ExternalInfo ExternalInfo
+	ObjectId ids.ObjectId
+	Metadata object_metadata.Metadata
 
 	ExternalType ids.Type
 

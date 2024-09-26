@@ -1,6 +1,6 @@
 
 " TODO-P3 use https://github.com/suy/vim-context-commentstring
-let &l:equalprg = "$BIN_ZIT format-zettel %"
+let &l:equalprg = "$BIN_ZIT format-object %"
 let &l:comments = "fb:*,fb:-,fb:+,n:>"
 let &l:commentstring = "<!--%s-->"
 
@@ -60,7 +60,7 @@ function! ZitMakeUTIGroupCommand(uti_group, cmd_args_unprocessed_list)
     call add(l:cmd_args_list, "-i")
     call add(l:cmd_args_list, l:uti)
     let l:cmd_sub_args = [
-          \ "$BIN_ZIT", "format-zettel", "-mode blob",
+          \ "$BIN_ZIT", "format-object", "-mode blob",
           \ "-uti-group", a:uti_group,
           \ l:uti,
           \ GetKennung(),
@@ -123,7 +123,7 @@ function! ZitPreview()
     let l:tempfile = tempname() .. "." .. l:format
 
     let l:cmd_args_list = [
-          \ "zit format-zettel -mode blob",
+          \ "zit format-object -mode blob",
           \ l:format,
           \ l:hinweis,
           \ ">",
