@@ -14,6 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+// TODO remove depends on FSItem if possible
 type cliCheckedOut struct {
 	options print_options.General
 

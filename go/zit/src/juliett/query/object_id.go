@@ -35,6 +35,12 @@ func (exp ObjectId) ContainsSku(tg sku.TransactedGetter) (ok bool) {
 
 	skMe := sk.GetMetadata()
 
+	method := ids.Contains
+
+	if exp.Exact {
+		method = ids.ContainsExactly
+	}
+
 	switch exp.GetGenre() {
 	case genres.Tag:
 		var idx int
@@ -65,13 +71,13 @@ func (exp ObjectId) ContainsSku(tg sku.TransactedGetter) (ok bool) {
 		return
 
 	case genres.Type:
-		if ids.Contains(skMe.GetType(), exp.GetObjectId()) {
+		if method(skMe.GetType(), exp.GetObjectId()) {
 			ok = true
 			return
 		}
 
 		if e, isExternal := tg.(*sku.Transacted); isExternal {
-			if ids.Contains(e.ExternalType, exp.GetObjectId()) {
+			if method(e.ExternalType, exp.GetObjectId()) {
 				ok = true
 				return
 			}
@@ -80,7 +86,7 @@ func (exp ObjectId) ContainsSku(tg sku.TransactedGetter) (ok bool) {
 
 	idl := &sk.ObjectId
 
-	if !ids.Contains(idl, exp.GetObjectId()) {
+	if !method(idl, exp.GetObjectId()) {
 		return
 	}
 

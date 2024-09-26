@@ -17,7 +17,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
-type FormatZettel struct {
+type FormatObject struct {
 	Format string
 	ids.RepoId
 	UTIGroup string
@@ -26,9 +26,9 @@ type FormatZettel struct {
 
 func init() {
 	registerCommand(
-		"format-zettel",
+		"format-object",
 		func(f *flag.FlagSet) Command {
-			c := &FormatZettel{
+			c := &FormatObject{
 				Mode: checkout_mode.MetadataAndBlob,
 			}
 
@@ -48,7 +48,7 @@ func init() {
 	)
 }
 
-func (c *FormatZettel) Run(u *env.Env, args ...string) (err error) {
+func (c *FormatObject) Run(u *env.Env, args ...string) (err error) {
 	formatId := "text"
 
 	var objectIdString string
@@ -105,7 +105,7 @@ func (c *FormatZettel) Run(u *env.Env, args ...string) (err error) {
 	return
 }
 
-func (c *FormatZettel) getSku(
+func (c *FormatObject) getSku(
 	u *env.Env,
 	objectIdString string,
 ) (sk *sku.Transacted, err error) {
@@ -133,7 +133,7 @@ func (c *FormatZettel) getSku(
 	return
 }
 
-func (c *FormatZettel) getBlobFormatter(
+func (c *FormatObject) getBlobFormatter(
 	u *env.Env,
 	zt *sku.Transacted,
 	formatId string,

@@ -193,6 +193,19 @@ func Contains(a, b IdWithParts) bool {
 	return true
 }
 
+func ContainsExactly(a, b IdWithParts) bool {
+	var (
+		as = a.Parts()
+		bs = b.Parts()
+	)
+
+	if as != bs {
+		return false
+	}
+
+	return true
+}
+
 func IsEmpty[T interfaces.Stringer](a T) bool {
 	return len(a.String()) == 0
 }
