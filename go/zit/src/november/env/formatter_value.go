@@ -646,7 +646,7 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "typ":
+	case "type":
 		f = func(o *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(out, o.GetType().String()); err != nil {
 				err = errors.Wrap(err)

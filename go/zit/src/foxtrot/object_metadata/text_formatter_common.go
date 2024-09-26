@@ -182,6 +182,7 @@ func (f textFormatterCommon) writeBlob(
 			f.blobFormatter,
 			map[string]string{
 				"ZIT_BIN": f.fs_home.Executable(),
+				"ZIT_DIR": f.fs_home.Dir(),
 			},
 			ar,
 		); err != nil {

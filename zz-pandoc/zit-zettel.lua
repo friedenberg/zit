@@ -4,6 +4,7 @@ function Image(el)
     return nil
   end
 
+  -- TODO-P1 switch to using box format instead of url
   if el.src:find("^zit://") == nil then
     return nil
   end
@@ -14,11 +15,12 @@ function Image(el)
     error("expected ZIT_DIR env variable to be set")
   end
 
-  local kennung = el.src:sub(7)
-  local typ = pandoc.pipe("zit", {"show", "-dir-zit", dir_zit, "-format", "typ", kennung}, "")
-  local data = pandoc.pipe("zit", {"show", "-dir-zit", dir_zit, "-format", "akte", kennung}, "")
-  local fname = kennung .. "." .. typ
-  -- TODO-P1 use mime type from typ
+  local objectID = el.src:sub(7)
+  local typ = pandoc.pipe("zit", {"show", "-dir-zit", dir_zit, "-format", "type", objectID}, "")
+  -- TODO-P1 load MIMEs from type and pick the best one
+  local data = pandoc.pipe("zit", {"format-object", "-dir-zit", dir_zit, "-mode", "blob", "png", objectID}, "")
+  local fname = objectID .. ".png"
   pandoc.mediabag.insert(fname, "image/png", data)
+
   return pandoc.Image(el.caption, fname)
 end
