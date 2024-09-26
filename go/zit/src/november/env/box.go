@@ -3,6 +3,7 @@ package env
 import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
@@ -25,6 +26,10 @@ func (u *Env) StringFormatWriterSkuBox(
 		),
 		u.GetStore().GetAbbrStore().GetAbbr(),
 		u.GetStore().GetCwdFiles(),
+		id_fmts.MakeFDCliFormat(
+			co,
+			u.fs_home.MakeRelativePathStringFormatWriter(),
+		),
 	)
 }
 

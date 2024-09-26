@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
@@ -13,6 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
@@ -46,19 +48,21 @@ func MakeBox(
 	metadata interfaces.StringFormatWriter[*object_metadata.Metadata],
 	abbr ids.Abbr,
 	fsItemReadWriter sku.FSItemReadWriter,
+	fdStringFormatWriter interfaces.StringFormatWriter[*fd.FD],
 ) *Box {
 	return &Box{
-		ColorOptions:     co,
-		Options:          options,
-		ShaString:        shaStringFormatWriter,
-		ObjectId:         objectIdStringFormatWriter,
-		Type:             typeStringFormatWriter,
-		TagString:        tagsStringFormatWriter,
-		Fields:           fieldsFormatWriter,
-		Metadata:         metadata,
-		RightAligned:     string_format_writer.MakeRightAligned(),
-		Abbr:             abbr,
-		FSItemReadWriter: fsItemReadWriter,
+		ColorOptions:         co,
+		Options:              options,
+		ShaString:            shaStringFormatWriter,
+		ObjectId:             objectIdStringFormatWriter,
+		Type:                 typeStringFormatWriter,
+		TagString:            tagsStringFormatWriter,
+		Fields:               fieldsFormatWriter,
+		Metadata:             metadata,
+		RightAligned:         string_format_writer.MakeRightAligned(),
+		Abbr:                 abbr,
+		FSItemReadWriter:     fsItemReadWriter,
+		fdStringFormatWriter: fdStringFormatWriter,
 	}
 }
 
@@ -79,7 +83,8 @@ type Box struct {
 	Metadata  interfaces.StringFormatWriter[*object_metadata.Metadata]
 
 	ids.Abbr
-	FSItemReadWriter sku.FSItemReadWriter
+	FSItemReadWriter     sku.FSItemReadWriter
+	fdStringFormatWriter interfaces.StringFormatWriter[*fd.FD]
 }
 
 func (f *Box) SetMaxKopfUndSchwanz(k, s int) {
@@ -97,12 +102,17 @@ func (f *Box) WriteStringFormat(
 	var n1 int
 	var n2 int64
 
-	if col, ok := el.(sku.CheckedOutLike); ok {
-		state := col.GetState()
+  objectForFDs := o
+
+	co, isCO := el.(*sku.CheckedOut)
+
+	if isCO {
+    objectForFDs = &co.External
+		state := co.GetState()
 		var stateString string
 
 		if state == checked_out_state.Error {
-			stateString = col.GetError().Error()
+			stateString = co.GetError().Error()
 		} else {
 			stateString = state.String()
 		}
@@ -114,6 +124,7 @@ func (f *Box) WriteStringFormat(
 			err = errors.Wrap(err)
 			return
 		}
+
 	} else if f.Options.PrintTime {
 		t := o.GetTai()
 
@@ -142,16 +153,28 @@ func (f *Box) WriteStringFormat(
 		return
 	}
 
-	n2, err = f.WriteStringFormatExternal(
-		sw,
-		o,
-		f.Options.DescriptionInBox,
-	)
-	n += int64(n2)
+	if fds, errFS := f.FSItemReadWriter.ReadFSItemFromExternal(
+    objectForFDs,
+  ); errFS != nil || !isCO {
+		n2, err = f.WriteStringFormatExternal(
+			sw,
+			o,
+			f.Options.DescriptionInBox,
+		)
+		n += int64(n2)
 
-	if err != nil {
-		err = errors.Wrap(err)
-		return
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		n2, err = f.WriteStringFormatFSBox(sw, co, objectForFDs, fds)
+		n += n2
+
+		if err != nil {
+			err = errors.Wrapf(err, "CheckedOut: %s", co)
+			return
+		}
 	}
 
 	n1, err = sw.WriteString("]")
@@ -315,10 +338,6 @@ func (f *Box) WriteStringFormatExternal(
 	e *sku.Transacted,
 	includeDescriptionInBox bool,
 ) (n int64, err error) {
-	fields := make([]string_format_writer.Field, 0, 10)
-	idFieldValue := (*ids.ObjectIdStringerSansRepo)(&e.ObjectId).String()
-	var n2 int64
-
 	// TODO make this more robust
 	// switch e.State {
 	// case external_state.Tracked, external_state.Recognized:
@@ -330,14 +349,19 @@ func (f *Box) WriteStringFormatExternal(
 	// 	idFieldValue = "/"
 	// }
 
-	fields = append(
-		fields,
-		string_format_writer.Field{
-			Value:              idFieldValue,
-			DisableValueQuotes: true,
-			ColorType:          string_format_writer.ColorTypeId,
-		},
-	)
+	fields := make([]string_format_writer.Field, 0, 10)
+
+	oid := &e.ObjectId
+
+	objectIDField := string_format_writer.Field{
+		Value:              (*ids.ObjectIdStringerSansRepo)(oid).String(),
+		DisableValueQuotes: true,
+		ColorType:          string_format_writer.ColorTypeId,
+	}
+
+	fields = append(fields, objectIDField)
+
+	var n2 int64
 
 	if e.State != external_state.Untracked {
 		m := &e.Metadata
@@ -426,6 +450,233 @@ func (f *Box) WriteStringFormatExternalBoxUntracked(
 			Trailer:  unboxed,
 		},
 	)
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (f *Box) WriteStringFormatFSBox(
+	sw interfaces.WriterAndStringWriter,
+	co *sku.CheckedOut,
+	o *sku.Transacted,
+	fds *sku.FSItem,
+) (n int64, err error) {
+	var n2 int64
+
+	var m checkout_mode.Mode
+
+	if m, err = fds.GetCheckoutModeOrError(); err != nil {
+		if co.State == checked_out_state.Conflicted {
+			err = nil
+			m = checkout_mode.BlobOnly
+		} else {
+			err = errors.Wrapf(err, "FDs: %s", fds.Debug())
+			return
+		}
+	}
+
+	var fdAlreadyWritten *fd.FD
+
+	switch {
+	case co.State == checked_out_state.Untracked:
+		n2, err = f.writeStringFormatUntracked(sw, co, m)
+		n += n2
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+
+	case co.IsImport:
+		fallthrough
+
+	case m == checkout_mode.BlobOnly || m == checkout_mode.BlobRecognized:
+		n2, err = f.ObjectId.WriteStringFormat(
+			sw,
+			&o.ObjectId,
+		)
+		n += n2
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	default:
+		n2, err = f.fdStringFormatWriter.WriteStringFormat(sw, &fds.Object)
+		n += n2
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		fdAlreadyWritten = &fds.Object
+	}
+
+	if co.State == checked_out_state.Conflicted {
+		return
+	}
+
+	n2, err = f.Metadata.WriteStringFormat(
+		sw,
+		o.GetMetadata(),
+	)
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if m == checkout_mode.BlobRecognized ||
+		(m != checkout_mode.MetadataOnly && m != checkout_mode.None) {
+		n2, err = f.writeStringFormatBlobFDsExcept(sw, fds, fdAlreadyWritten)
+		n += n2
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (f *Box) writeStringFormatBlobFDsExcept(
+	sw interfaces.WriterAndStringWriter,
+	fds *sku.FSItem,
+	except *fd.FD,
+) (n int64, err error) {
+	var n2 int64
+
+	if fds.MutableSetLike == nil {
+		err = errors.Errorf("FDSet.MutableSetLike was nil")
+		return
+	}
+
+	if err = fds.MutableSetLike.Each(
+		func(fd *fd.FD) (err error) {
+			if except != nil && fd.Equals(except) {
+				return
+			}
+
+			n2, err = f.writeStringFormatBlobFD(sw, fd)
+			n += n2
+
+			if err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (f *Box) writeStringFormatBlobFD(
+	sw interfaces.WriterAndStringWriter,
+	fd *fd.FD,
+) (n int64, err error) {
+	var n1 int
+	var n2 int64
+
+	n1, err = sw.WriteString("\n")
+	n += int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n2, err = f.RightAligned.WriteStringFormat(
+		sw,
+		"",
+	)
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n1, err = sw.WriteString(" ")
+	n += int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n2, err = f.fdStringFormatWriter.WriteStringFormat(sw, fd)
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (f *Box) writeStringFormatUntracked(
+	sw interfaces.WriterAndStringWriter,
+	co *sku.CheckedOut,
+	mode checkout_mode.Mode,
+) (n int64, err error) {
+	var n2 int64
+
+	o := &co.External
+	var i *sku.FSItem
+
+	if i, err = f.FSItemReadWriter.ReadFSItemFromExternal(o); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	fdToPrint := &i.Blob
+
+	if o.GetGenre() != genres.Zettel && !i.Object.IsEmpty() {
+		fdToPrint = &i.Object
+	}
+
+	n2, err = f.fdStringFormatWriter.WriteStringFormat(
+		sw,
+		fdToPrint,
+	)
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n2, err = f.Metadata.WriteStringFormat(
+		sw,
+		o.GetMetadata(),
+	)
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	n2, err = f.writeStringFormatBlobFDsExcept(sw, i, fdToPrint)
 	n += n2
 
 	if err != nil {

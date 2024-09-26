@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
 func (u *Env) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
@@ -80,48 +79,20 @@ func (u *Env) PrinterCheckedOut() interfaces.FuncIter[*sku.CheckedOut] {
 	err := string_format_writer.MakeDelim(
 		"\n",
 		u.Err(),
-		sku_fmt.MakeCliCheckedOutFormat(
+		u.StringFormatWriterSkuBox(
 			po,
-			u.StringFormatWriterShaLike(oo.ColorOptionsErr),
-			id_fmts.MakeFDCliFormat(
-				oo.ColorOptionsErr,
-				u.fs_home.MakeRelativePathStringFormatWriter(),
-			),
-			u.StringFormatWriterObjectId(oo.ColorOptionsErr),
-			u.StringFormatWriterMetadata(
-				oo.ColorOptionsErr,
-				string_format_writer.CliFormatTruncation66CharEllipsis,
-			),
-			u.StringFormatWriterSkuBox(
-				po,
-				oo.ColorOptionsErr,
-				string_format_writer.CliFormatTruncation66CharEllipsis,
-			),
-			u.GetStore().GetCwdFiles(),
+			oo.ColorOptionsErr,
+			string_format_writer.CliFormatTruncation66CharEllipsis,
 		),
 	)
 
 	out := string_format_writer.MakeDelim(
 		"\n",
 		u.Out(),
-		sku_fmt.MakeCliCheckedOutFormat(
+		u.StringFormatWriterSkuBox(
 			po,
-			u.StringFormatWriterShaLike(oo.ColorOptionsOut),
-			id_fmts.MakeFDCliFormat(
-				oo.ColorOptionsOut,
-				u.fs_home.MakeRelativePathStringFormatWriter(),
-			),
-			u.StringFormatWriterObjectId(oo.ColorOptionsOut),
-			u.StringFormatWriterMetadata(
-				oo.ColorOptionsErr,
-				string_format_writer.CliFormatTruncation66CharEllipsis,
-			),
-			u.StringFormatWriterSkuBox(
-				po,
-				oo.ColorOptionsErr,
-				string_format_writer.CliFormatTruncation66CharEllipsis,
-			),
-			u.GetStore().GetCwdFiles(),
+			oo.ColorOptionsErr,
+			string_format_writer.CliFormatTruncation66CharEllipsis,
 		),
 	)
 

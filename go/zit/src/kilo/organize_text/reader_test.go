@@ -95,6 +95,7 @@ func makeAssignmentLineReader() reader {
 				nil,
 				ids.Abbr{},
         nil,
+        nil,
 			),
 		},
 	}
