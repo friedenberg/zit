@@ -90,7 +90,7 @@ func MakeUnsureMatchMapsCollector(
 		l.Lock()
 		defer l.Unlock()
 
-		clone := col.Clone()
+		clone := col.CloneCheckedOutLike()
 
 		for t, v := range umm.Lookup {
 			var k sha.Bytes

@@ -41,7 +41,7 @@ func (s PrefixSet) Len() int {
 
 func (s *PrefixSet) AddTransacted(z sku.ExternalLike) (err error) {
 	o := obj{
-		External: z.Clone(),
+		External: z.CloneExternalLike(),
 	}
 
 	if err = s.Add(&o); err != nil {

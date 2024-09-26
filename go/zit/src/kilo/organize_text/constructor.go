@@ -282,7 +282,7 @@ func (c *constructor) cloneObj(
 ) (z *obj, err error) {
 	z = &obj{
 		Type:     named.Type,
-		External: named.External.Clone(),
+		External: named.External.CloneExternalLike(),
 	}
 
 	if err = c.removeTagsIfNecessary(z); err != nil {

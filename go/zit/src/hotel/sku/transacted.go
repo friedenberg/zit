@@ -50,7 +50,7 @@ func (a *Transacted) CloneTransacted() (b *Transacted) {
 	return
 }
 
-func (a *Transacted) Clone() ExternalLike {
+func (a *Transacted) CloneExternalLike() ExternalLike {
 	b := GetTransactedPool().Get()
 	TransactedResetter.ResetWith(b, a)
 	return b

@@ -42,7 +42,7 @@ type (
 		interfaces.Stringer
 		TransactedGetter
 		ExternalLikeGetter
-		Clone() ExternalLike
+		CloneExternalLike() ExternalLike
 		GetExternalState() external_state.State
 		ExternalObjectIdGetter
 		GetRepoId() ids.RepoId
@@ -65,7 +65,7 @@ type (
 		GetState() checked_out_state.State
 		SetState(checked_out_state.State) error
 		GetError() error
-		Clone() CheckedOutLike
+		CloneCheckedOutLike() CheckedOutLike
 	}
 
 	ManyPrinter interface {

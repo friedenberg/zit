@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
+	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -93,7 +94,24 @@ func (f *Box) WriteStringFormat(
 	var n1 int
 	var n2 int64
 
-	if f.Options.PrintTime {
+	if col, ok := el.(sku.CheckedOutLike); ok {
+		state := col.GetState()
+		var stateString string
+
+		if state == checked_out_state.Error {
+			stateString = col.GetError().Error()
+		} else {
+			stateString = state.String()
+		}
+
+		n2, err = f.RightAligned.WriteStringFormat(sw, stateString)
+		n += n2
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else if f.Options.PrintTime {
 		t := o.GetTai()
 
 		n1, err = sw.WriteString(t.Format(string_format_writer.StringFormatDateTime))

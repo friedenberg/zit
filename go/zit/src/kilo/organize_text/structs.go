@@ -38,7 +38,7 @@ func (o obj) GetSku() *sku.Transacted {
 func (a *obj) cloneWithType(t tag_paths.Type) (b *obj) {
 	b = &obj{
 		Type:     t,
-		External: a.External.Clone(),
+		External: a.External.CloneExternalLike(),
 	}
 
 	return

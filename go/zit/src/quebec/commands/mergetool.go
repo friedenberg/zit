@@ -49,7 +49,7 @@ func (c Mergetool) RunWithQuery(
 				return
 			}
 
-			if err = conflicted.Add(co.Clone()); err != nil {
+			if err = conflicted.Add(co.CloneCheckedOutLike()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -75,7 +75,7 @@ func (c Mergetool) RunWithQuery(
 			cofs := col.(*sku.CheckedOut)
 
 			tm := sku.Conflicted{
-				CheckedOutLike: col.Clone(),
+				CheckedOutLike: col.CloneCheckedOutLike(),
 			}
 
 			var conflict *fd.FD

@@ -144,7 +144,7 @@ func (av writer) writeRightAligned(a *Assignment) (err error) {
 			sb.WriteString("% ")
 		}
 
-		cursor := z.External.Clone()
+		cursor := z.External.CloneExternalLike()
 		sk := cursor.GetSku()
 		sk.Metadata.Subtract(&av.Metadata)
 		mes := sk.GetMetadata().GetTags().CloneMutableSetPtrLike()

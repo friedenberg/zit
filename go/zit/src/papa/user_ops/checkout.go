@@ -74,7 +74,7 @@ func (op Checkout) RunQuery(
 		l.Lock()
 		defer l.Unlock()
 
-		cl := col.Clone()
+		cl := col.CloneCheckedOutLike()
 
 		if err = zsc.Add(cl); err != nil {
 			err = errors.Wrap(err)

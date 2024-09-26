@@ -96,7 +96,7 @@ func (c *Organize) RunWithQuery(
 			l.Lock()
 			defer l.Unlock()
 
-			return getResults.Add(el.Clone())
+			return getResults.Add(el.CloneExternalLike())
 		},
 	); err != nil {
 		err = errors.Wrap(err)

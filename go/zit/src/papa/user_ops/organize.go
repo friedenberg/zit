@@ -34,7 +34,7 @@ func (op Organize) RunWithQueryGroup(
 		func(el sku.ExternalLike) (err error) {
 			l.Lock()
 			defer l.Unlock()
-			return skus.Add(el.Clone())
+			return skus.Add(el.CloneExternalLike())
 		},
 	); err != nil {
 		err = errors.Wrap(err)

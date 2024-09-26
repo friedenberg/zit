@@ -29,7 +29,7 @@ func (kc *compiled) getType(k ids.IdLike) (ct *sku.Transacted) {
 	}
 
 	if ct1, ok := kc.Types.Get(k.String()); ok {
-		ct = ct1.Clone().GetSku()
+		ct = ct1.CloneExternalLike().GetSku()
 	}
 
 	return
@@ -41,7 +41,7 @@ func (kc *compiled) getRepo(k ids.IdLike) (ct *sku.Transacted) {
 	}
 
 	if ct1, ok := kc.Repos.Get(k.String()); ok {
-		ct = ct1.Clone().GetSku()
+		ct = ct1.CloneExternalLike().GetSku()
 	}
 
 	return
