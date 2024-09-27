@@ -2,6 +2,7 @@ package commands
 
 import (
 	"flag"
+	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
@@ -18,6 +19,7 @@ import (
 )
 
 type FormatObject struct {
+	Stdin  bool
 	Format string
 	ids.RepoId
 	UTIGroup string
@@ -32,6 +34,7 @@ func init() {
 				Mode: checkout_mode.MetadataAndBlob,
 			}
 
+			f.BoolVar(&c.Stdin, "stdin", false, "Read object from stdin and use a Type directly")
 			f.Var(&c.Mode, "mode", "metadata, blob, or both")
 
 			f.Var(&c.RepoId, "kasten", "none or Browser")
@@ -49,9 +52,19 @@ func init() {
 }
 
 func (c *FormatObject) Run(u *env.Env, args ...string) (err error) {
+	if c.Stdin {
+		if err = c.FormatFromStdin(u, args...); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+
 	formatId := "text"
 
 	var objectIdString string
+	var blobFormatter script_config.RemoteScript
 
 	switch len(args) {
 	case 1:
@@ -69,16 +82,20 @@ func (c *FormatObject) Run(u *env.Env, args ...string) (err error) {
 		return
 	}
 
-	var zt *sku.Transacted
+	var object *sku.Transacted
 
-	if zt, err = c.getSku(u, objectIdString); err != nil {
+	if object, err = c.getSku(u, objectIdString); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var blobFormatter script_config.RemoteScript
+	tipe := object.GetType()
 
-	if blobFormatter, err = c.getBlobFormatter(u, zt, formatId); err != nil {
+	if blobFormatter, err = c.getBlobFormatter(
+		u,
+		tipe,
+		formatId,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -92,12 +109,71 @@ func (c *FormatObject) Run(u *env.Env, args ...string) (err error) {
 		blobFormatter,
 	)
 
-	if err = u.GetStore().TryFormatHook(zt); err != nil {
+	if err = u.GetStore().TryFormatHook(object); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if _, err = f.WriteStringFormatWithMode(u.Out(), zt, c.Mode); err != nil {
+	if _, err = f.WriteStringFormatWithMode(u.Out(), object, c.Mode); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (c *FormatObject) FormatFromStdin(
+	u *env.Env,
+	args ...string,
+) (err error) {
+	formatId := "text"
+
+	var blobFormatter script_config.RemoteScript
+	var tipe ids.Type
+
+	switch len(args) {
+	case 1:
+		if err = tipe.Set(args[0]); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	case 2:
+		formatId = args[0]
+		if err = tipe.Set(args[1]); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	default:
+		err = errors.Errorf(
+			"expected one or two input arguments, but got %d",
+			len(args),
+		)
+		return
+	}
+
+	if blobFormatter, err = c.getBlobFormatter(
+		u,
+		tipe,
+		formatId,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var wt io.WriterTo
+
+	if wt, err = script_config.MakeWriterToWithStdin(
+		blobFormatter,
+		u.GetFSHome().MakeCommonEnv(),
+		u.In(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, err = wt.WriteTo(u.Out()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -135,17 +211,19 @@ func (c *FormatObject) getSku(
 
 func (c *FormatObject) getBlobFormatter(
 	u *env.Env,
-	zt *sku.Transacted,
+	tipe ids.Type,
 	formatId string,
 ) (blobFormatter script_config.RemoteScript, err error) {
-	if zt.GetType().IsEmpty() {
-		ui.Log().Print("empty typ")
+	if tipe.GetType().IsEmpty() {
+		ui.Log().Print("empty type")
 		return
 	}
 
-	var typKonfig *sku.Transacted
+	var typeObject *sku.Transacted
 
-	if typKonfig, err = u.GetStore().ReadTransactedFromObjectId(zt.GetType()); err != nil {
+	if typeObject, err = u.GetStore().ReadTransactedFromObjectId(
+		tipe.GetType(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -153,7 +231,7 @@ func (c *FormatObject) getBlobFormatter(
 	var typeBlob *type_blobs.V0
 
 	if typeBlob, err = u.GetStore().GetBlobStore().GetTypeV0().GetBlob(
-		typKonfig.GetBlobSha(),
+		typeObject.GetBlobSha(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -172,38 +250,42 @@ func (c *FormatObject) getBlobFormatter(
 			// err = errors.Normalf("no format id %q", actualFormatId)
 			// return
 		}
-	} else {
-		var g type_blobs.FormatterUTIGroup
-		g, ok = typeBlob.FormatterUTIGroups[c.UTIGroup]
 
-		if !ok {
-			err = errors.Errorf("no uti group: %q", c.UTIGroup)
-			return
-		}
+		return
+	}
 
-		ft, ok := g.Map()[formatId]
+	var g type_blobs.FormatterUTIGroup
+	g, ok = typeBlob.FormatterUTIGroups[c.UTIGroup]
 
-		if !ok {
-			err = errors.Errorf(
-				"no format id %q for uti group %q",
-				formatId,
-				c.UTIGroup,
-			)
+	if !ok {
+		err = errors.Errorf("no uti group: %q", c.UTIGroup)
+		return
+	}
 
-			return
-		}
+	ft, ok := g.Map()[formatId]
 
-		actualFormatId = ft
+	if !ok {
+		err = errors.Errorf(
+			"no format id %q for uti group %q",
+			formatId,
+			c.UTIGroup,
+		)
 
-		blobFormatter, ok = typeBlob.Formatters[actualFormatId]
+		return
+	}
 
-		if !ok {
-			ui.Log().Print("no matching format id")
-			blobFormatter = nil
-			// TODO-P2 allow option to error on missing format
-			// err = errors.Normalf("no format id %q", actualFormatId)
-			// return
-		}
+	actualFormatId = ft
+
+	blobFormatter, ok = typeBlob.Formatters[actualFormatId]
+
+	if !ok {
+		ui.Log().Print("no matching format id")
+		blobFormatter = nil
+		// TODO-P2 allow option to error on missing format
+		// err = errors.Normalf("no format id %q", actualFormatId)
+		// return
+
+		return
 	}
 
 	return

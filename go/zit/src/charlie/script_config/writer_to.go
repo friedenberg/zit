@@ -30,6 +30,11 @@ func MakeWriterTo(
 ) (wt *writerTo, err error) {
 	wt = &writerTo{}
 
+	if rs == nil {
+		err = errors.Errorf("empty remote script")
+		return
+	}
+
 	if wt.cmd, err = rs.Cmd(args...); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -180,10 +180,7 @@ func (f textFormatterCommon) writeBlob(
 
 		if wt, err = script_config.MakeWriterToWithStdin(
 			f.blobFormatter,
-			map[string]string{
-				"ZIT_BIN": f.fs_home.Executable(),
-				"ZIT_DIR": f.fs_home.Dir(),
-			},
+      f.fs_home.MakeCommonEnv(),
 			ar,
 		); err != nil {
 			err = errors.Wrap(err)

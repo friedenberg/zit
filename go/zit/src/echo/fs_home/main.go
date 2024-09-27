@@ -343,3 +343,10 @@ func (s Home) ResetCache() (err error) {
 
 	return
 }
+
+func (h Home) MakeCommonEnv() map[string]string {
+	return map[string]string{
+		"ZIT_BIN": h.Executable(),
+		"ZIT_DIR": h.Dir(),
+	}
+}
