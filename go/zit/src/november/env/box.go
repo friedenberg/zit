@@ -41,7 +41,7 @@ func (u *Env) SkuFormatBoxNoColor() *sku_fmt.Box {
 	options.PrintShas = false
 
 	return u.StringFormatWriterSkuBox(
-		u.config.PrintOptions.WithPrintShas(false),
+		options,
 		co,
 		string_format_writer.CliFormatTruncationNone,
 	)
