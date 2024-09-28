@@ -465,7 +465,7 @@ function organize_v5_outputs_organize_one_etikett { # @test
 		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "wow" ok]
 	EOM
 
-	run_zit expand-hinweis o/u
+	run_zit expand-zettel-id o/u
 	assert_success
 	assert_output 'one/uno'
 

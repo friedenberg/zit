@@ -192,11 +192,11 @@ function checkin_simple_typ { # @test
 		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
 	EOM
 
-	run_zit show -format typ.vim-syntax-type !md:typ
+	run_zit show -format type.vim-syntax-type !md:typ
 	assert_success
 	assert_output 'toml'
 
-	run_zit show -format typ.vim-syntax-type one/uno
+	run_zit show -format type.vim-syntax-type one/uno
 	assert_success
 	assert_output 'test'
 }

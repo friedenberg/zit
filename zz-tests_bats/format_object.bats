@@ -36,7 +36,7 @@ function format_simple { # @test
 		          deleted [md.typ]
 	EOM
 
-	run_zit format-object one/uno
+	run_zit format-object one/uno text
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -62,7 +62,7 @@ function format_simple { # @test
 		last time but new
 	EOM
 
-	run_zit format-object one/uno.zettel
+	run_zit format-object one/uno.zettel text
 	assert_success
 	assert_output - <<-EOM
 		---

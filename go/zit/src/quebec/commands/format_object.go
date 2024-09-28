@@ -16,6 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"golang.org/x/exp/maps"
 )
 
 type FormatObject struct {
@@ -61,18 +62,17 @@ func (c *FormatObject) Run(u *env.Env, args ...string) (err error) {
 		return
 	}
 
-	formatId := "text"
+	var formatId string
 
 	var objectIdString string
 	var blobFormatter script_config.RemoteScript
 
 	switch len(args) {
+	case 2:
+		formatId = args[1]
+    fallthrough
 	case 1:
 		objectIdString = args[0]
-
-	case 2:
-		formatId = args[0]
-		objectIdString = args[1]
 
 	default:
 		err = errors.Errorf(
@@ -215,7 +215,7 @@ func (c *FormatObject) getBlobFormatter(
 	formatId string,
 ) (blobFormatter script_config.RemoteScript, err error) {
 	if tipe.GetType().IsEmpty() {
-		ui.Log().Print("empty type")
+		ui.Err().Print("empty type")
 		return
 	}
 
@@ -237,18 +237,23 @@ func (c *FormatObject) getBlobFormatter(
 		return
 	}
 
-	actualFormatId := formatId
 	ok := false
 
 	if c.UTIGroup == "" {
-		blobFormatter, ok = typeBlob.Formatters[actualFormatId]
+    if formatId == "" {
+      formatId = "text-edit"
+    }
 
-		if !ok {
-			ui.Log().Print("no matching format id")
-			blobFormatter = nil
-			// TODO-P2 allow option to error on missing format
-			// err = errors.Normalf("no format id %q", actualFormatId)
-			// return
+		blobFormatter, ok = typeBlob.Formatters[formatId]
+
+		if !ok && len(typeBlob.Formatters) > 0 && formatId != "" {
+			err = errors.BadRequestf(
+				"no matching format id %q. Available ID's: %s",
+        formatId,
+				maps.Keys(typeBlob.Formatters),
+			)
+
+      return
 		}
 
 		return
@@ -258,7 +263,11 @@ func (c *FormatObject) getBlobFormatter(
 	g, ok = typeBlob.FormatterUTIGroups[c.UTIGroup]
 
 	if !ok {
-		err = errors.Errorf("no uti group: %q", c.UTIGroup)
+    err = errors.BadRequestf(
+      "no uti group: %q. Available groups: %s",
+      c.UTIGroup,
+      maps.Keys(typeBlob.FormatterUTIGroups),
+    )
 		return
 	}
 
@@ -274,12 +283,12 @@ func (c *FormatObject) getBlobFormatter(
 		return
 	}
 
-	actualFormatId = ft
+	formatId = ft
 
-	blobFormatter, ok = typeBlob.Formatters[actualFormatId]
+	blobFormatter, ok = typeBlob.Formatters[formatId]
 
 	if !ok {
-		ui.Log().Print("no matching format id")
+		ui.Err().Print("no matching format id")
 		blobFormatter = nil
 		// TODO-P2 allow option to error on missing format
 		// err = errors.Normalf("no format id %q", actualFormatId)

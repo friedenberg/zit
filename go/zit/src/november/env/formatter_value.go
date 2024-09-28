@@ -34,8 +34,8 @@ func (u *Env) MakeFormatFunc(
 		out = u.Out()
 	}
 
-	if strings.HasPrefix(v, "typ.") {
-		return u.makeTypFormatter(strings.TrimPrefix(v, "typ."), out)
+	if strings.HasPrefix(v, "type.") {
+		return u.makeTypFormatter(strings.TrimPrefix(v, "type."), out)
 	}
 
 	switch v {

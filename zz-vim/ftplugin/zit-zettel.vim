@@ -1,12 +1,12 @@
 
-" TODO-P3 use https://github.com/suy/vim-context-commentstring
 let &l:equalprg = "$BIN_ZIT format-object %"
+" TODO-P3 use https://github.com/suy/vim-context-commentstring
 let &l:comments = "fb:*,fb:-,fb:+,n:>"
 let &l:commentstring = "<!--%s-->"
 
 function! GfZettel()
   let l:h = expand("<cfile>")
-  let l:expanded = trim(system("$BIN_ZIT expand-hinweis " . l:h))
+  let l:expanded = trim(system("$BIN_ZIT expand-zettel-id " . l:h))
   let l:f = l:expanded . ".zettel"
 
   if !filereadable(l:f)
@@ -33,7 +33,7 @@ function! ZitAction()
     endif
 
     let l:val = substitute(l:items[a:result-1], '\t.*$', '', '')
-    execute("!$BIN_ZIT exec-action -action " . l:val .  " " . GetKennung())
+    execute("!$BIN_ZIT exec-action -action " . l:val .  " " . GetObjectId())
   endfunc
 
   if len(l:items) == 0
@@ -63,7 +63,7 @@ function! ZitMakeUTIGroupCommand(uti_group, cmd_args_unprocessed_list)
           \ "$BIN_ZIT", "format-object", "-mode blob",
           \ "-uti-group", a:uti_group,
           \ l:uti,
-          \ GetKennung(),
+          \ GetObjectId(),
           \ "2>/dev/null",
           \ ]
 
@@ -89,65 +89,67 @@ function! SplitListOnSpaceAndReturnBoth(rawItems)
   return [l:items, l:processedItems]
 endfunction
 
-function! GetKennung()
+function! GetObjectId()
   return expand("%")
 endfunction
 
 function! ZitGetUTIGroups()
-  let l:rawItems = sort(systemlist("$BIN_ZIT show -format typ.formatter-uti-groups " . GetKennung()))
+  let l:rawItems = sort(systemlist("$BIN_ZIT show -format type.formatter-uti-groups " . GetObjectId()))
   return SplitListOnSpaceAndReturnBoth(l:rawItems)
 endfunction
 
 function! ZitGetActionNames()
-  let l:rawItems = sort(systemlist("$BIN_ZIT show -format typ.action-names " . GetKennung()))
+  let l:rawItems = sort(systemlist("$BIN_ZIT show -format type.action-names " . GetObjectId()))
   return SplitListOnSpaceAndReturnBoth(l:rawItems)
 endfunction
 
 function! ZitGetFormats()
-  let l:rawItems =  sort(systemlist("$BIN_ZIT show -format typ.formatters " . GetKennung()))
+  let l:rawItems =  sort(systemlist("$BIN_ZIT show -format type.formatters " . GetObjectId()))
   return SplitListOnSpaceAndReturnBoth(l:rawItems)
 endfunction
 
 function! ZitPreview()
-  let [l:items, l:processedItems] = ZitGetFormats()
+  let [l:formatIds, l:fileExtensions] = ZitGetFormats()
 
   func! ZitPreviewMenuItemPicked(id, result) closure
     if a:result == -1
       return
     endif
 
-    " let l:format = substitute(l:items[a:result-1], '\t.*$', '', '')
-    let l:format = l:processedItems[a:result-1]
-    let l:hinweis = GetKennung()
+    " let l:format = substitute(l:formatIds[a:result-1], '\t.*$', '', '')
+    let l:format = l:formatIds[a:result-1]
+    let l:fileExtension = l:fileExtensions[a:result-1]
+    let l:objectId = GetObjectId()
 
-    let l:tempfile = tempname() .. "." .. l:format
+    let l:tempfile = tempname() .. "." .. l:fileExtension
 
     let l:cmd_args_list = [
           \ "zit format-object -mode blob",
+          \ l:objectId,
           \ l:format,
-          \ l:hinweis,
           \ ">",
           \ l:tempfile,
           \ ]
 
-    call system(join(l:cmd_args_list, " "))
+    let l:cmd_args =  join(l:cmd_args_list, " ")
+    call system(l:cmd_args)
 
     let l:cmd_preview = "qlmanage -p "..l:tempfile..">/dev/null 2>&1 &"
     call system(l:cmd_preview)
   endfunc
 
-  if len(l:items) == 1
+  if len(l:formatIds) == 1
     call ZitPreviewMenuItemPicked("", 1)
     return
   endif
 
-  if len(l:items) == 0
+  if len(l:formatIds) == 0
     echom "No Zettel-Typ-specific actions available"
     return
   endif
 
   call popup#menu(
-        \ items,
+        \ formatIds,
         \ #{ title: "Preview format", 
         \ callback: 'ZitPreviewMenuItemPicked', 
         \ line: 25, col: 40,

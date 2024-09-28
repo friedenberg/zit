@@ -12,14 +12,14 @@ let zettel = expand("%")
 let g:markdown_syntax_conceal = 0
 
 if zettel != ""
-  let cmdFormat = "$BIN_ZIT show -quiet -format typ.vim-syntax-type " . zettel
+  let cmdFormat = "$BIN_ZIT show -quiet -format type.vim-syntax-type " . zettel
   let zettelTypSyntax = trim(system(cmdFormat))
 
   if v:shell_error
     echom "Error getting vim syntax type: " . zettelTypSyntax
     let zettelTypSyntax = "markdown"
   elseif zettelTypSyntax == ""
-    echom "Zettel Typ has no vim syntax set"
+    echom "Zettel Type has no vim syntax set"
     let zettelTypSyntax = "markdown"
   endif
 

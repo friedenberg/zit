@@ -14,7 +14,7 @@ type ExpandZettelId struct{}
 
 func init() {
 	registerCommand(
-		"expand-hinweis",
+		"expand-zettel-id",
 		func(f *flag.FlagSet) Command {
 			c := &ExpandZettelId{}
 
