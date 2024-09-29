@@ -44,7 +44,7 @@ func (e *BigBang) AddToFlagSet(f *flag.FlagSet) {
 func (u *Env) Start(e BigBang) (err error) {
 	s := u.GetFSHome()
 
-	mkdirAll(s.DirKennung())
+	mkdirAll(s.DirObjectId())
 	mkdirAll(s.DirVerzeichnisse())
 	mkdirAll(s.DirVerlorenUndGefunden())
 

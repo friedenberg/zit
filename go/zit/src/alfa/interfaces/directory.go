@@ -2,9 +2,9 @@ package interfaces
 
 type Directory interface {
 	Delete(string) error
-	DirKennung() string
+	DirObjectId() string
 	FileVerzeichnisseEtiketten() string
-	FileVerzeichnisseKennung() string
+	FileVerzeichnisseObjectId() string
 	FileVerzeichnisseHinweis() string
 }
 

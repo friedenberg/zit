@@ -20,8 +20,8 @@ type Provider struct {
 }
 
 func New(ps interfaces.Directory) (f *Provider, err error) {
-	providerPathYin := path.Join(ps.DirKennung(), FilePathZettelIdYin)
-	providerPathYang := path.Join(ps.DirKennung(), FilePathZettelIdYang)
+	providerPathYin := path.Join(ps.DirObjectId(), FilePathZettelIdYin)
+	providerPathYang := path.Join(ps.DirObjectId(), FilePathZettelIdYang)
 
 	f = &Provider{
 		Locker: &sync.Mutex{},

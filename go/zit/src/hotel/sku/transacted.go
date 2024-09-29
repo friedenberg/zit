@@ -206,7 +206,7 @@ func (s *Transacted) calculateObjectSha(debug bool) (err error) {
 	wg.Do(
 		s.makeShaCalcFunc(
 			f,
-			object_inventory_format.Formats.MetadataKennungMutter(),
+			object_inventory_format.Formats.MetadataObjectIdParent(),
 			s.Metadata.Sha(),
 		),
 	)

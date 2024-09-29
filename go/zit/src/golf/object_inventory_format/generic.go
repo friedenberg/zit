@@ -76,9 +76,9 @@ type FormatGeneric struct {
 }
 
 type formats struct {
-	metadataSansTai       FormatGeneric
-	metadata              FormatGeneric
-	metadataKennungMutter FormatGeneric
+	metadataSansTai        FormatGeneric
+	metadata               FormatGeneric
+	metadataObjectIdParent FormatGeneric
 }
 
 func (fs formats) MetadataSansTai() FormatGeneric {
@@ -89,8 +89,8 @@ func (fs formats) Metadata() FormatGeneric {
 	return fs.metadata
 }
 
-func (fs formats) MetadataKennungMutter() FormatGeneric {
-	return fs.metadataKennungMutter
+func (fs formats) MetadataObjectIdParent() FormatGeneric {
+	return fs.metadataObjectIdParent
 }
 
 var Formats formats
@@ -102,8 +102,8 @@ func init() {
 	Formats.metadataSansTai.key = KeyFormatV5MetadataWithoutTai
 	Formats.metadataSansTai.keys = []*catgut.String{keyAkte, keyBezeichnung, keyEtikett, keyTyp}
 
-	Formats.metadataKennungMutter.key = KeyFormatV5MetadataObjectIdParent
-	Formats.metadataKennungMutter.keys = []*catgut.String{keyAkte, keyBezeichnung, keyEtikett, keyKennung, keyTyp, keyTai, keyShasMutterMetadataKennungMutter}
+	Formats.metadataObjectIdParent.key = KeyFormatV5MetadataObjectIdParent
+	Formats.metadataObjectIdParent.keys = []*catgut.String{keyAkte, keyBezeichnung, keyEtikett, keyKennung, keyTyp, keyTai, keyShasMutterMetadataKennungMutter}
 }
 
 func FormatForKeyError(k string) (fo FormatGeneric, err error) {
@@ -115,7 +115,7 @@ func FormatForKeyError(k string) (fo FormatGeneric, err error) {
 		fo = Formats.metadataSansTai
 
 	case KeyFormatV5MetadataObjectIdParent:
-		fo = Formats.metadataKennungMutter
+		fo = Formats.metadataObjectIdParent
 
 	default:
 		err = errInvalidGenericFormat(k)

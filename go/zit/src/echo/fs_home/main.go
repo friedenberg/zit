@@ -286,7 +286,7 @@ func (s Home) DirVerzeichnisseMetadata() string {
 	return s.DirVerzeichnisseDurable("Metadatei")
 }
 
-func (s Home) DirVerzeichnisseMetadataKennungMutter() string {
+func (s Home) DirVerzeichnisseMetadataObjectIdParent() string {
 	return s.DirVerzeichnisseDurable("MetadateiKennungMutter")
 }
 
@@ -298,7 +298,7 @@ func (s Home) FileVerzeichnisseEtiketten() string {
 	return s.DirVerzeichnisse("Etiketten")
 }
 
-func (s Home) FileVerzeichnisseKennung() string {
+func (s Home) FileVerzeichnisseObjectId() string {
 	return s.DirVerzeichnisse("Kennung")
 }
 
@@ -306,7 +306,7 @@ func (s Home) FileVerzeichnisseHinweis() string {
 	return s.DirVerzeichnisse("Hinweis")
 }
 
-func (s Home) DirKennung() string {
+func (s Home) DirObjectId() string {
 	return s.DirZit("Kennung")
 }
 
@@ -331,7 +331,7 @@ func (s Home) ResetCache() (err error) {
 		return
 	}
 
-	if err = s.MakeDir(s.DirVerzeichnisseMetadataKennungMutter()); err != nil {
+	if err = s.MakeDir(s.DirVerzeichnisseMetadataObjectIdParent()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

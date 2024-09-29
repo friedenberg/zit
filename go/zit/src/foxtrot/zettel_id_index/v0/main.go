@@ -42,7 +42,7 @@ func MakeIndex(
 	su interfaces.CacheIOFactory,
 ) (i *index, err error) {
 	i = &index{
-		path:               s.FileVerzeichnisseKennung(),
+		path:               s.FileVerzeichnisseObjectId(),
 		nonRandomSelection: k.UsePredictableHinweisen(),
 		su:                 su,
 		encodedIds: encodedIds{
@@ -88,7 +88,7 @@ func (i *index) Flush() (err error) {
 	enc := gob.NewEncoder(w)
 
 	if err = enc.Encode(i.encodedIds); err != nil {
-		err = errors.Wrapf(err, "failed to write encoded kennung")
+		err = errors.Wrapf(err, "failed to write encoded object id")
 		return
 	}
 
@@ -141,12 +141,12 @@ func (i *index) Reset() (err error) {
 	rMax := i.oldZettelIdStore.Right().Len() - 1
 
 	if lMax == 0 {
-		err = errors.Errorf("left kennung are empty")
+		err = errors.Errorf("left object id are empty")
 		return
 	}
 
 	if rMax == 0 {
-		err = errors.Errorf("right kennung are empty")
+		err = errors.Errorf("right object id are empty")
 		return
 	}
 
@@ -226,7 +226,7 @@ func (i *index) CreateZettelId() (h *ids.ZettelId, err error) {
 	}
 
 	if len(i.AvailableIds) == 0 {
-		err = errors.Errorf("no available kennung")
+		err = errors.Errorf("no available object id")
 		return
 	}
 

@@ -101,7 +101,7 @@ func (s *Store) ReadOneObjectId(
 func (s *Store) ReaderFor(sh *sha.Sha) (rc sha.ReadCloser, err error) {
 	if rc, err = s.fs_home.BlobReaderFrom(
 		sh,
-		s.fs_home.DirVerzeichnisseMetadataKennungMutter(),
+		s.fs_home.DirVerzeichnisseMetadataObjectIdParent(),
 	); err != nil {
 		if errors.IsNotExist(err) {
 			err = collections.MakeErrNotFound(sh)

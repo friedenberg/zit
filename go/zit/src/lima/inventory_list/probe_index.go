@@ -104,8 +104,8 @@ func (s *probe_index) WriteOneObject(o *sku.Transacted) (err error) {
 	wg.Do(s.MakeFuncSaveOneObjectId(o))
 
 	wg.Do(s.makeWriteMetadataFunc(
-		s.fs_home.DirVerzeichnisseMetadataKennungMutter(),
-		object_inventory_format.Formats.MetadataKennungMutter(),
+		s.fs_home.DirVerzeichnisseMetadataObjectIdParent(),
+		object_inventory_format.Formats.MetadataObjectIdParent(),
 		o,
 		o.Metadata.Sha(),
 	))

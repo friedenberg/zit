@@ -20,7 +20,6 @@ func ToLuaTable(tg sku.TransactedGetter, l *lua.LState, t *LuaTable) {
 
 	l.SetField(t.Transacted, "Gattung", lua.LString(o.GetGenre().String()))
 	l.SetField(t.Transacted, "Kennung", lua.LString(o.GetObjectId().String()))
-	l.SetField(t.Transacted, "Gattung", lua.LString(o.GetGenre().GetGenreString()))
 	l.SetField(t.Transacted, "Typ", lua.LString(o.GetType().String()))
 
 	etiketten := t.Etiketten
