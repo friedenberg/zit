@@ -82,14 +82,12 @@ func (f *Box) WriteStringFormat(
 	var n1 int
 	var n2 int64
 
-	objectForFDs := o
-
 	co, isCO := el.(*sku.CheckedOut)
 
+	var stateString string
+
 	if isCO {
-		objectForFDs = &co.External
 		state := co.GetState()
-		var stateString string
 
 		if state == checked_out_state.Error {
 			stateString = co.GetError().Error()
@@ -97,6 +95,12 @@ func (f *Box) WriteStringFormat(
 			stateString = state.String()
 		}
 
+		o = &co.External
+	} else if f.Options.PrintState {
+		stateString = o.GetExternalState().String()
+	}
+
+	if stateString != "" {
 		n2, err = f.RightAligned.WriteStringFormat(sw, stateString)
 		n += n2
 
@@ -134,8 +138,8 @@ func (f *Box) WriteStringFormat(
 	}
 
 	if fds, errFS := f.FSItemReadWriter.ReadFSItemFromExternal(
-		objectForFDs,
-	); errFS != nil || !isCO {
+		o,
+	); errFS != nil || !isCO || !o.RepoId.IsEmpty() {
 		n2, err = f.WriteStringFormatExternal(
 			sw,
 			o,
@@ -148,7 +152,7 @@ func (f *Box) WriteStringFormat(
 			return
 		}
 	} else {
-		n2, err = f.WriteStringFormatFSBox(sw, co, objectForFDs, fds)
+		n2, err = f.WriteStringFormatFSBox(sw, co, o, fds)
 		n += n2
 
 		if err != nil {
@@ -201,6 +205,10 @@ func (f *Box) WriteStringFormatExternal(
 
 	oid := &e.ObjectId
 
+	if e.State == external_state.Untracked {
+		oid = &e.ExternalObjectId
+	}
+
 	objectIDField := string_format_writer.Field{
 		Value:              (*ids.ObjectIdStringerSansRepo)(oid).String(),
 		DisableValueQuotes: true,
@@ -212,6 +220,17 @@ func (f *Box) WriteStringFormatExternal(
 	var n2 int64
 
 	if e.State != external_state.Untracked {
+		if !e.ExternalObjectId.IsEmpty() && false {
+			fields = append(
+				fields,
+				string_format_writer.Field{
+					Value:              (*ids.ObjectIdStringerSansRepo)(&e.ExternalObjectId).String(),
+					DisableValueQuotes: true,
+					ColorType:          string_format_writer.ColorTypeId,
+				},
+			)
+		}
+
 		m := &e.Metadata
 
 		if f.Options.PrintShas {
