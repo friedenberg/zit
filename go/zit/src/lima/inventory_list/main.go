@@ -23,6 +23,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 )
 
 // type Store interface {
@@ -238,7 +239,7 @@ func (s *Store) readOnePath(p string) (o *sku.Transacted, err error) {
 			err1 := t.Set(o.ObjectId.String())
 
 			if err1 != nil {
-				err = errors.Wrapf(err, "%s", sku_fmt.String(o))
+				err = errors.Wrapf(err, "%s", sku_fmt_debug.StringTaiGenreObjectIdShaBlob(o))
 				return
 			}
 

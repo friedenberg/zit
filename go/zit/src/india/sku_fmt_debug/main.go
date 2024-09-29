@@ -1,4 +1,4 @@
-package sku_fmt
+package sku_fmt_debug
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func String(o *sku.Transacted) (str string) {
+func StringTaiGenreObjectIdShaBlob(o *sku.Transacted) (str string) {
 	str = fmt.Sprintf(
 		"%s %s %s %s %s",
 		o.GetTai(),
@@ -22,12 +22,24 @@ func String(o *sku.Transacted) (str string) {
 	return
 }
 
-func StringMetadatei(o *sku.Transacted) (str string) {
+func StringObjectIdBlobMetadataSansTai(o *sku.Transacted) (str string) {
+	str = fmt.Sprintf(
+		"%s %s %s",
+		o.GetObjectId(),
+		o.GetBlobSha(),
+		StringMetadataSansTai(o),
+	)
+
+	return
+}
+
+func StringMetadataTai(o *sku.Transacted) (str string) {
+	return fmt.Sprintf("%s %s", o.GetTai(), StringMetadataSansTai(o))
+}
+
+func StringMetadataSansTai(o *sku.Transacted) (str string) {
 	sb := &strings.Builder{}
 
-	sb.WriteString(o.GetTai().String())
-
-	sb.WriteString(" ")
 	sb.WriteString(o.GetGenre().GetGenreString())
 
 	sb.WriteString(" ")

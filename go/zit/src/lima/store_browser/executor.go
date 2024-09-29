@@ -124,12 +124,7 @@ func (c *executor) tryToEmitOneCommon(
 		return
 	}
 
-	if err = c.co.External.ObjectId.SetRepoId(
-		c.store.externalStoreInfo.RepoId.String(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	c.co.External.RepoId = c.store.externalStoreInfo.RepoId
 
 	if err = c.out(&c.co); err != nil {
 		err = errors.Wrap(err)

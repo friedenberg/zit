@@ -290,6 +290,13 @@ func (ar *reader) readOneObj(
 		return
 	}
 
+	// z.External.GetSku().Metadata.Tai = ids.NowTai()
+
+	// if err = z.External.GetSku().CalculateObjectShas(); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
+
 	if z.External.GetSku().ObjectId.IsEmpty() {
 		// set empty hinweis to ensure middle is '/'
 		if err = z.External.GetSku().ObjectId.SetWithIdLike(ids.ZettelId{}); err != nil {

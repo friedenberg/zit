@@ -285,6 +285,15 @@ func (c *constructor) cloneObj(
 		External: named.External.CloneExternalLike(),
 	}
 
+  // TODO explore using shas as keys
+	// if named.External.GetSku().Metadata.Shas.SelfMetadataWithoutTai.IsNull() {
+	// 	panic("empty sha")
+	// }
+
+	// if z.External.GetSku().Metadata.Shas.SelfMetadataWithoutTai.IsNull() {
+	// 	panic("empty sha")
+	// }
+
 	if err = c.removeTagsIfNecessary(z); err != nil {
 		err = errors.Wrap(err)
 		return

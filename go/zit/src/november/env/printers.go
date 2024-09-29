@@ -34,6 +34,30 @@ func (u *Env) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
 	)
 }
 
+func (u *Env) PrinterTransactedDeleted() interfaces.FuncIter[*sku.Transacted] {
+	po := u.config.PrintOptions.
+		WithPrintShas(true).
+		WithDescriptionInBox(true).
+		WithPrintTime(false).
+		WithPrintState(true)
+
+	sw := u.StringFormatWriterSkuBox(
+		po,
+		u.FormatColorOptionsOut(),
+		string_format_writer.CliFormatTruncation66CharEllipsis,
+	)
+
+	return string_format_writer.MakeDelim(
+		"\n",
+		u.Out(),
+		string_format_writer.MakeFunc(
+			func(w interfaces.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
+				return sw.WriteStringFormat(w, o)
+			},
+		),
+	)
+}
+
 // TODO make generic external version
 func (u *Env) PrinterFDDeleted() interfaces.FuncIter[*fd.FD] {
 	p := id_fmts.MakeFDDeletedStringWriterFormat(

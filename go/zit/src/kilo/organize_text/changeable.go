@@ -9,13 +9,15 @@ import (
 )
 
 func key(el sku.ExternalLike) string {
-	eoid := el.GetExternalObjectId()
-	if !eoid.IsEmpty() {
-		return eoid.String()
+	eoid := el.GetExternalObjectId().String()
+	if len(eoid) > 1 {
+		return eoid
 	}
 
-	if !el.GetSku().ObjectId.IsEmpty() {
-		return el.GetSku().ObjectId.String()
+	oid := el.GetSku().ObjectId.String()
+
+	if len(oid) > 1 {
+		return oid
 	}
 
 	desc := el.GetSku().Metadata.Description.String()
@@ -24,6 +26,22 @@ func key(el sku.ExternalLike) string {
 	}
 
 	panic(fmt.Sprintf("empty key for external like: %#v", el))
+}
+
+// TODO explore using shas as keys
+func keySha(el sku.ExternalLike) string {
+	objectSha := &el.GetSku().Metadata.SelfMetadataWithoutTai
+
+	if objectSha.IsNull() {
+		panic("empty object sha")
+	}
+
+	return fmt.Sprintf(
+		"%s.%s.%s",
+		el.GetObjectId(),
+		el.GetExternalObjectId(),
+		objectSha,
+	)
 }
 
 func (ot *Text) GetSkus(

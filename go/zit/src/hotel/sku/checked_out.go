@@ -76,10 +76,14 @@ func (c *CheckedOut) GetState() checked_out_state.State {
 	return c.State
 }
 
-func (src *CheckedOut) CloneCheckedOutLike() CheckedOutLike {
+func (src *CheckedOut) Clone() *CheckedOut {
 	dst := GetCheckedOutPool().Get()
 	CheckedOutResetter.ResetWith(dst, src)
 	return dst
+}
+
+func (src *CheckedOut) CloneCheckedOutLike() CheckedOutLike {
+  return src.Clone()
 }
 
 func (src *CheckedOut) CloneExternalLike() ExternalLike {

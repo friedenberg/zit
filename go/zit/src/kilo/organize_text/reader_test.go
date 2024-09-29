@@ -15,6 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/test_config"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
@@ -94,14 +95,14 @@ func makeAssignmentLineReader() reader {
 				nil,
 				nil,
 				ids.Abbr{},
-        nil,
-        nil,
+				nil,
+				nil,
 			),
 		},
 	}
 }
 
-func assertEqualObjekten(t *test_logz.T, expected, actual Objects) {
+func assertEqualObjects(t *test_logz.T, expected, actual Objects) {
 	t = t.Skip(1)
 
 	actual.Sort()
@@ -112,9 +113,11 @@ func assertEqualObjekten(t *test_logz.T, expected, actual Objects) {
 	}
 
 	for i := range actual {
-		actualObj, expectedObj := actual[i].External.GetSku(), expected[i].External.GetSku()
+		// actualObj, expectedObj := actual[i].External.GetSku(), expected[i].External.GetSku()
+		actualObj := sku_fmt_debug.StringMetadataSansTai(actual[i].External.GetSku())
+		expectedObj := sku_fmt_debug.StringMetadataSansTai(expected[i].External.GetSku())
 
-		if !actualObj.Equals(expectedObj) {
+		if actualObj != expectedObj {
 			t.Errorf("\nexpected: %#v\n  actual: %#v", expectedObj, actualObj)
 		}
 	}
@@ -195,7 +198,7 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 
 		actual := sub.root.Children[0].Objects
 
-		assertEqualObjekten(&t1, expected, actual)
+		assertEqualObjects(&t1, expected, actual)
 	}
 
 	if false {
@@ -279,7 +282,7 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 
 		actual := sub.root.Children[0].Children[0].Objects
 
-		assertEqualObjekten(&t, expected, actual)
+		assertEqualObjects(&t, expected, actual)
 	}
 }
 
@@ -364,7 +367,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 
 		actual := sub.root.Children[0].Objects
 
-		assertEqualObjekten(&t1, expected, actual)
+		assertEqualObjects(&t1, expected, actual)
 	}
 
 	{
@@ -374,7 +377,7 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 
 		actual := sub.root.Children[1].Objects
 
-		assertEqualObjekten(&t1, expected, actual)
+		assertEqualObjects(&t1, expected, actual)
 	}
 }
 
@@ -441,7 +444,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 
 		actual := sub.root.Children[0].Objects
 
-		assertEqualObjekten(&t1, expected, actual)
+		assertEqualObjects(&t1, expected, actual)
 	}
 
 	{
@@ -451,7 +454,7 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 
 		actual := sub.root.Children[1].Objects
 
-		assertEqualObjekten(&t1, expected, actual)
+		assertEqualObjects(&t1, expected, actual)
 	}
 }
 
@@ -503,7 +506,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 		actual := sub.root.Children[0].Objects
 
-		assertEqualObjekten(&t1, expected, actual)
+		assertEqualObjects(&t1, expected, actual)
 	}
 
 	// ## priority-1
@@ -540,7 +543,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 		actual := sub.root.Children[0].Children[0].Children[0].Objects
 
-		assertEqualObjekten(&t1, expected, actual)
+		assertEqualObjects(&t1, expected, actual)
 	}
 
 	// ##
@@ -551,7 +554,7 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 		actual := sub.root.Children[0].Children[0].Objects
 
-		assertEqualObjekten(&t1, expected, actual)
+		assertEqualObjects(&t1, expected, actual)
 	}
 
 	// ## priority-2
@@ -565,6 +568,6 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 
 		actual := sub.root.Children[0].Children[1].Objects
 
-		assertEqualObjekten(&t1, expected, actual)
+		assertEqualObjects(&t1, expected, actual)
 	}
 }

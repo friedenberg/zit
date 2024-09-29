@@ -211,6 +211,10 @@ func (t Tai) IsEmpty() (ok bool) {
 	return
 }
 
+func (t Tai) GetTai() Tai {
+  return t
+}
+
 func (t *Tai) Reset() {
 	t.Sec = 0
 	t.Asec = 0

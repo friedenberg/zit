@@ -19,6 +19,7 @@ type Box struct {
 	PrintIncludeTypen       bool `toml:"print-include-typen"`
 	DescriptionInBox        bool `toml:"-"`
 	ExcludeFields           bool `toml:"-"`
+	PrintState              bool `toml:"-"`
 }
 
 type General struct {
@@ -255,5 +256,15 @@ func (c General) WithDescriptionInBox(v bool) General {
 
 func (c General) WithExcludeFields(v bool) General {
 	c.ExcludeFields = v
+	return c
+}
+
+func (c General) WithPrintTime(v bool) General {
+	c.PrintTime = v
+	return c
+}
+
+func (c General) WithPrintState(v bool) General {
+	c.PrintState = v
 	return c
 }

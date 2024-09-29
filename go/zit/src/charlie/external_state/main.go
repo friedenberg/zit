@@ -1,6 +1,7 @@
 package external_state
 
-//go:generate stringer -type=State
+import "fmt"
+
 type State int
 
 const (
@@ -9,5 +10,35 @@ const (
 	Untracked
 	Recognized
 	Conflicted
+	Deleted
+	WouldDelete
 	Error
 )
+
+func (s State) String() string {
+	switch s {
+	case Tracked:
+		return "tracked"
+
+	case Untracked:
+		return "untracked"
+
+	case Recognized:
+		return "recognized"
+
+	case Conflicted:
+		return "conflict"
+
+	case Deleted:
+		return "deleted"
+
+	case WouldDelete:
+		return "would delete"
+
+	case Error:
+		return "error"
+
+	default:
+		return fmt.Sprintf("Unknown(%d)", s)
+	}
+}

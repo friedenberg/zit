@@ -16,7 +16,6 @@ func (resetter) Reset(z *Metadata) {
 	z.ResetTags()
 	ResetterVerzeichnisse.Reset(&z.Cache)
 	z.Type = ids.Type{}
-	// z.Gattung = gattung.Unknown
 	z.Tai.Reset()
 	z.Shas.Reset()
 	z.Fields = z.Fields[:0]

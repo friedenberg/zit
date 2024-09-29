@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 )
 
 func (kc *Compiled) recompile(
@@ -44,7 +44,7 @@ func (kc *Compiled) recompileTags() (err error) {
 			var e ids.Tag
 
 			if err = e.Set(ke.String()); err != nil {
-				err = errors.Wrapf(err, "Sku: %s", sku_fmt.String(&ke.Transacted))
+				err = errors.Wrapf(err, "Sku: %s", sku_fmt_debug.StringTaiGenreObjectIdShaBlob(&ke.Transacted))
 				return
 			}
 

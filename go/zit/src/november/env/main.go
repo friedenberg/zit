@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
-	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
@@ -206,18 +205,7 @@ func (u *Env) Initialize(options Options) (err error) {
 			StoreLike: store_browser.Make(
 				k,
 				u.GetFSHome(),
-				string_format_writer.MakeDelim(
-					"\n",
-					u.Out(),
-					sku_fmt.MakeItemDeletedStringWriterFormat(
-						k,
-						u.FormatColorOptionsOut(),
-						u.StringFormatWriterFields(
-							66,
-							u.FormatColorOptionsOut(),
-						),
-					),
-				),
+        u.PrinterTransactedDeleted(),
 			),
 		},
 	}

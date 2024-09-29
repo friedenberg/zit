@@ -40,12 +40,12 @@ func (s *Shas) Reset() {
 	s.ParentMetadataObjectIdParent.Reset()
 }
 
-func (a *Shas) ResetWith(b *Shas) {
-	a.Blob.ResetWith(&b.Blob)
-	a.SelfMetadata.ResetWith(&b.SelfMetadata)
-	a.SelfMetadataWithoutTai.ResetWith(&b.SelfMetadataWithoutTai)
-	a.SelfMetadataObjectIdParent.ResetWith(&b.SelfMetadataObjectIdParent)
-	a.ParentMetadataObjectIdParent.ResetWith(&b.ParentMetadataObjectIdParent)
+func (dst *Shas) ResetWith(src *Shas) {
+	dst.Blob.ResetWith(&src.Blob)
+	dst.SelfMetadata.ResetWith(&src.SelfMetadata)
+	dst.SelfMetadataWithoutTai.ResetWith(&src.SelfMetadataWithoutTai)
+	dst.SelfMetadataObjectIdParent.ResetWith(&src.SelfMetadataObjectIdParent)
+	dst.ParentMetadataObjectIdParent.ResetWith(&src.ParentMetadataObjectIdParent)
 }
 
 func (s *Shas) String() string {

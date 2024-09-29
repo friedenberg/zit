@@ -56,6 +56,7 @@ type (
 		fs_home.Home
 		ids.RepoId
 		ids.TypeSet
+    ids.Clock
 	}
 
 	StoreLike interface {

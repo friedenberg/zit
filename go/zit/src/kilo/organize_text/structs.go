@@ -126,30 +126,9 @@ func (os Objects) Sort() {
 	sort.Slice(os, func(i, j int) bool {
 		ei, ej := os[i].External, os[j].External
 
-		oidI := ids.ObjectIdLike(ei.GetObjectId())
-		oidJ := ids.ObjectIdLike(ej.GetObjectId())
+		keyI := key(ei)
+		keyJ := key(ej)
 
-		if oidI.IsEmpty() {
-			oidI = ei.GetExternalObjectId()
-		}
-
-		if oidJ.IsEmpty() {
-			oidJ = ej.GetExternalObjectId()
-		}
-
-		switch {
-		case oidI.IsEmpty() && oidJ.IsEmpty():
-			return ei.GetSku().Metadata.Description.String() < ej.GetSku().Metadata.Description.String()
-
-		case oidI.IsEmpty():
-			return true
-
-		case oidJ.IsEmpty():
-			return false
-
-		default:
-			// TODO sort by ints for virtual object id
-			return oidI.String() < oidJ.String()
-		}
+		return keyI < keyJ
 	})
 }

@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/alfred"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 )
 
 type Writer struct {
@@ -61,7 +61,7 @@ func (w *Writer) PrintOne(z *sku.Transacted) (err error) {
 	default:
 		item = w.alfredWriter.Get()
 		item.Title = fmt.Sprintf("not implemented for gattung: %q", g)
-		item.Subtitle = fmt.Sprintf("%s", sku_fmt.String(z))
+		item.Subtitle = fmt.Sprintf("%s", sku_fmt_debug.StringTaiGenreObjectIdShaBlob(z))
 	}
 
 	w.alfredWriter.WriteItem(item)

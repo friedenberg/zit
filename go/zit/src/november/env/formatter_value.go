@@ -24,6 +24,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 )
 
 func (u *Env) MakeFormatFunc(
@@ -306,21 +307,6 @@ func (u *Env) MakeFormatFunc(
 				out,
 				sku_fmt.StringMetadateiSansTai(e),
 			)
-			return
-		}
-
-	case "sku-metadatei":
-		f = func(e *sku.Transacted) (err error) {
-			_, err = fmt.Fprintln(
-				out,
-				sku_fmt.StringMetadatei(e),
-			)
-			return
-		}
-
-	case "sku":
-		f = func(e *sku.Transacted) (err error) {
-			_, err = fmt.Fprintln(out, sku_fmt.String(e))
 			return
 		}
 
@@ -754,6 +740,21 @@ func (u *Env) MakeFormatFunc(
 				return
 			}
 
+			return
+		}
+
+	case "debug-sku-metadatei":
+		f = func(e *sku.Transacted) (err error) {
+			_, err = fmt.Fprintln(
+				out,
+				sku_fmt_debug.StringMetadataTai(e),
+			)
+			return
+		}
+
+	case "debug-sku":
+		f = func(e *sku.Transacted) (err error) {
+			_, err = fmt.Fprintln(out, sku_fmt_debug.StringTaiGenreObjectIdShaBlob(e))
 			return
 		}
 

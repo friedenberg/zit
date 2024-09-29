@@ -179,6 +179,8 @@ func (c *Store) CheckoutOne(
 		return
 	}
 
+	co.External.RepoId = c.externalStoreInfo.RepoId
+
 	c.l.Lock()
 	defer c.l.Unlock()
 
