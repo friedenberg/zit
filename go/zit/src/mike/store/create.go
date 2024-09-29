@@ -128,7 +128,7 @@ func (s *Store) RevertTo(
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
-			Operation: "update many metadatei",
+			Operation: "update many metadata",
 		}
 
 		return

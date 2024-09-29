@@ -34,7 +34,7 @@ type (
 	}
 )
 
-type Metadatei = object_metadata.Metadata
+type Metadata = object_metadata.Metadata
 
 const (
 	DigitWidth = 1
@@ -74,10 +74,10 @@ func (e *object_probe_index) GetObjectProbeIndex() Index {
 	return e
 }
 
-func (e *object_probe_index) AddMetadatei(m *Metadatei, loc Loc) (err error) {
+func (e *object_probe_index) AddMetadata(m *Metadata, loc Loc) (err error) {
 	var shas map[string]*sha.Sha
 
-	if shas, err = object_inventory_format.GetShasForMetadatei(m); err != nil {
+	if shas, err = object_inventory_format.GetShasForMetadata(m); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -143,7 +143,7 @@ func (e *object_probe_index) ReadOneKey(kf string, m *object_metadata.Metadata) 
 
 	var sh *Sha
 
-	if sh, err = object_inventory_format.GetShaForMetadatei(f, m); err != nil {
+	if sh, err = object_inventory_format.GetShaForMetadata(f, m); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -172,7 +172,7 @@ func (e *object_probe_index) ReadManyKeys(
 
 	var sh *Sha
 
-	if sh, err = object_inventory_format.GetShaForMetadatei(f, m); err != nil {
+	if sh, err = object_inventory_format.GetShaForMetadata(f, m); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -183,7 +183,7 @@ func (e *object_probe_index) ReadManyKeys(
 func (e *object_probe_index) ReadAll(m *object_metadata.Metadata, h *[]Loc) (err error) {
 	var shas map[string]*sha.Sha
 
-	if shas, err = object_inventory_format.GetShasForMetadatei(m); err != nil {
+	if shas, err = object_inventory_format.GetShasForMetadata(m); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

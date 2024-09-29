@@ -103,7 +103,7 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 		maxHead:              kopf,
 		maxTail:              schwanz,
 		maxLen:               l,
-		Metadata:             ot.AsMetadatei(),
+		Metadata:             ot.AsMetadata(),
 		RightAlignedIndents:  ot.UseRightAlignedIndents,
 		OmitLeadingEmptyLine: omit,
 		options:              ot.Options,

@@ -14,7 +14,7 @@ type textFormatter struct {
 	sequence []interfaces.FuncWriterElementInterface[TextFormatterContext]
 }
 
-func MakeTextFormatterMetadateiBlobPath(
+func MakeTextFormatterMetadataBlobPath(
 	fs_home fs_home.Home,
 	blobFormatter script_config.RemoteScript,
 ) textFormatter {

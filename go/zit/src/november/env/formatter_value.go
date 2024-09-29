@@ -221,7 +221,7 @@ func (u *Env) MakeFormatFunc(
 		}
 
 		f = func(tl *sku.Transacted) (err error) {
-			if _, err = fo.FormatPersistentMetadatei(out, tl, o); err != nil {
+			if _, err = fo.FormatPersistentMetadata(out, tl, o); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -301,30 +301,36 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "sku-metadatei-sans-tai":
+	case "sku-metadata-sans-tai":
 		f = func(e *sku.Transacted) (err error) {
 			_, err = fmt.Fprintln(
 				out,
-				sku_fmt.StringMetadateiSansTai(e),
+				sku_fmt.StringMetadataSansTai(e),
 			)
 			return
 		}
 
-	case "metadatei":
-		fo, err := object_inventory_format.FormatForKeyError("Metadatei")
+	case "metadata":
+		fo, err := object_inventory_format.FormatForKeyError(
+			object_inventory_format.KeyFormatV5Metadata,
+		)
+
 		errors.PanicIfError(err)
 
 		f = func(e *sku.Transacted) (err error) {
-			_, err = fo.WriteMetadateiTo(out, e)
+			_, err = fo.WriteMetadataTo(out, e)
 			return
 		}
 
-	case "metadatei-plus-mutter":
-		fo, err := object_inventory_format.FormatForKeyError("MetadateiMutter")
+	case "metadata-plus-mutter":
+		fo, err := object_inventory_format.FormatForKeyError(
+			object_inventory_format.KeyFormatV5MetadataObjectIdParent,
+		)
+
 		errors.PanicIfError(err)
 
 		f = func(e *sku.Transacted) (err error) {
-			_, err = fo.WriteMetadateiTo(out, e)
+			_, err = fo.WriteMetadataTo(out, e)
 			return
 		}
 
@@ -743,7 +749,7 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "debug-sku-metadatei":
+	case "debug-sku-metadata":
 		f = func(e *sku.Transacted) (err error) {
 			_, err = fmt.Fprintln(
 				out,

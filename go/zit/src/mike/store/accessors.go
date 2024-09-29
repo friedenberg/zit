@@ -45,7 +45,7 @@ func (s *Store) GetProtoZettel() sku.Proto {
 	return s.protoZettel
 }
 
-func (s *Store) GetPersistentMetadateiFormat() object_inventory_format.Format {
+func (s *Store) GetPersistentMetadataFormat() object_inventory_format.Format {
 	return s.persistentObjectFormat
 }
 
@@ -101,7 +101,7 @@ func (s *Store) ReadOneObjectId(
 func (s *Store) ReaderFor(sh *sha.Sha) (rc sha.ReadCloser, err error) {
 	if rc, err = s.fs_home.BlobReaderFrom(
 		sh,
-		s.fs_home.DirVerzeichnisseMetadateiKennungMutter(),
+		s.fs_home.DirVerzeichnisseMetadataKennungMutter(),
 	); err != nil {
 		if errors.IsNotExist(err) {
 			err = collections.MakeErrNotFound(sh)

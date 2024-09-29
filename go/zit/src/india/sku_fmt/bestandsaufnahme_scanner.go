@@ -99,7 +99,7 @@ func (scanner *bestandsaufnahmeScanner) Scan() (ok bool) {
 
 	scanner.lastSku = sku.GetTransactedPool().Get()
 
-	scanner.ContentLength, scanner.err = scanner.format.ParsePersistentMetadatei(
+	scanner.ContentLength, scanner.err = scanner.format.ParsePersistentMetadata(
 		scanner.ringBuffer,
 		scanner.lastSku,
 		scanner.options,

@@ -21,7 +21,7 @@ type (
 	}
 
 	Formatter interface {
-		FormatPersistentMetadatei(
+		FormatPersistentMetadata(
 			io.Writer,
 			FormatterContext,
 			Options,
@@ -29,7 +29,7 @@ type (
 	}
 
 	Parser interface {
-		ParsePersistentMetadatei(
+		ParsePersistentMetadata(
 			*catgut.RingBuffer,
 			ParserContext,
 			Options,
@@ -42,7 +42,7 @@ type (
 	}
 
 	Getter interface {
-		GetPersistentMetadateiFormat() Format
+		GetPersistentMetadataFormat() Format
 	}
 )
 

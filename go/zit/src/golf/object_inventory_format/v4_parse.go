@@ -15,7 +15,7 @@ type key struct {
 	includeInSha bool
 }
 
-func (f v4) ParsePersistentMetadatei(
+func (f v4) ParsePersistentMetadata(
 	r *catgut.RingBuffer,
 	c ParserContext,
 	o Options,
@@ -173,7 +173,7 @@ func (f v4) ParsePersistentMetadatei(
 				return
 			}
 
-		case key.Equal(keyShasMutterMetadateiKennungMutter.Bytes()):
+		case key.Equal(keyShasMutterMetadataKennungMutter.Bytes()):
 			if err = m.Mutter().SetHexBytes(val.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return

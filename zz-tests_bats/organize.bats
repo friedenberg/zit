@@ -1143,7 +1143,7 @@ function organize_v5_etiketten_correct { # @test
 	EOM
 }
 
-function organize_remove_anchored_metadatei { # @test
+function organize_remove_anchored_metadata { # @test
 	run_zit show tag-3:z
 	assert_success
 	assert_output_unsorted - <<-EOM

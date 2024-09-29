@@ -194,7 +194,7 @@ func TestOffsets(t1 *testing.T) {
 		// re := rb.PeekReadable().String()
 
 		sk = &sku.Transacted{}
-		_, err = f.ParsePersistentMetadatei(rb, sk, op)
+		_, err = f.ParsePersistentMetadata(rb, sk, op)
 		// t.AssertErrorEquals(objekte_format.ErrV4ExpectedSpaceSeparatedKey, err)
 
 		if !s.Equals(sk) {

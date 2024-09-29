@@ -24,7 +24,7 @@ type Json struct {
 	Tai         string   `json:"tai"`
 }
 
-func (j *Json) FromStringAndMetadatei(
+func (j *Json) FromStringAndMetadata(
 	k string,
 	m *object_metadata.Metadata,
 	s fs_home.Home,
@@ -61,7 +61,7 @@ func (j *Json) FromTransacted(
 	sk *sku.Transacted,
 	s fs_home.Home,
 ) (err error) {
-	return j.FromStringAndMetadatei(sk.ObjectId.String(), sk.GetMetadata(), s)
+	return j.FromStringAndMetadata(sk.ObjectId.String(), sk.GetMetadata(), s)
 }
 
 func (j *Json) ToTransacted(sk *sku.Transacted, s fs_home.Home) (err error) {
@@ -81,11 +81,6 @@ func (j *Json) ToTransacted(sk *sku.Transacted, s fs_home.Home) (err error) {
 
 	// TODO-P1 support states of blob vs blob sha
 	sk.SetBlobSha(w.GetShaLike())
-
-	// if err = sk.Metadatei.Tai.Set(j.Tai); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
 
 	if err = sk.ObjectId.Set(j.ObjectId); err != nil {
 		err = errors.Wrap(err)

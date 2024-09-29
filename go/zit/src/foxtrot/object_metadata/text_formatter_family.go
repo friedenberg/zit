@@ -17,7 +17,7 @@ func MakeTextFormatterFamily(
 	formatter script_config.RemoteScript,
 ) TextFormatterFamily {
 	return TextFormatterFamily{
-		BlobPath:     MakeTextFormatterMetadateiBlobPath(fs_home, formatter),
+		BlobPath:     MakeTextFormatterMetadataBlobPath(fs_home, formatter),
 		InlineBlob:   MakeTextFormatterMetadataInlineBlob(fs_home, formatter),
 		MetadataOnly: MakeTextFormatterMetadataOnly(fs_home, formatter),
 		BlobOnly:     MakeTextFormatterExcludeMetadata(fs_home, formatter),

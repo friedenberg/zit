@@ -189,7 +189,7 @@ function show_zettel_etikett { # @test
 		not another one
 	EOM
 
-	run_zit show -format sku-metadatei-sans-tai tag-3:z
+	run_zit show -format sku-metadata-sans-tai tag-3:z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		Zettel one/uno 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-4 "wow the first"
@@ -236,7 +236,7 @@ function show_zettel_etikett_complex { # @test
 		last time
 	EOM
 
-	run_zit show -format sku-metadatei-sans-tai [tag-3 tag-5]:z
+	run_zit show -format sku-metadata-sans-tai [tag-3 tag-5]:z
 	assert_success
 	assert_output_unsorted --partial - <<-EOM
 		Zettel one/uno 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-5 "wow the first"
@@ -271,7 +271,7 @@ function show_simple_all { # @test
 		vim-syntax-type = 'markdown'
 	EOM
 
-	run_zit show -format sku-metadatei-sans-tai :z,t
+	run_zit show -format sku-metadata-sans-tai :z,t
 	assert_success
 	assert_output_unsorted - <<-EOM
 		Typ md 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
@@ -360,7 +360,7 @@ function show_konfig { # @test
 }
 
 function show_history_all { # @test
-	run_zit show -format sku-metadatei-sans-tai +konfig,kasten,typ,etikett,zettel
+	run_zit show -format sku-metadata-sans-tai +konfig,kasten,typ,etikett,zettel
 	assert_output_unsorted - <<-EOM
 		Etikett tag e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 		Etikett tag-1 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855

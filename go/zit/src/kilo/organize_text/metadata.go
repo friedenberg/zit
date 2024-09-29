@@ -75,7 +75,7 @@ func (m Metadata) RemoveFromTransacted(sk sku.ExternalLike) (err error) {
 	return
 }
 
-func (m Metadata) AsMetadatei() (m1 object_metadata.Metadata) {
+func (m Metadata) AsMetadata() (m1 object_metadata.Metadata) {
 	m1.Type = m.Type
 	m1.SetTags(m.TagSet)
 	return

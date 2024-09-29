@@ -87,7 +87,7 @@ func (f *bestandsaufnahmePrinter) makeFuncFormatOne(
 	tlp object_inventory_format.FormatterContext,
 ) func() (int64, error) {
 	return func() (int64, error) {
-		n1, err := f.format.FormatPersistentMetadatei(f.out, tlp, f.options)
+		n1, err := f.format.FormatPersistentMetadata(f.out, tlp, f.options)
 		f.offset += n1
 		return n1, err
 	}

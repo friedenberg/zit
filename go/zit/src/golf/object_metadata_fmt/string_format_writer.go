@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 )
 
-type cliMetadatei struct {
+type cliMetadata struct {
 	options       print_options.General
 	contentPrefix string
 
@@ -24,14 +24,14 @@ type cliMetadatei struct {
 	Tags   interfaces.StringFormatWriter[*ids.Tag]
 }
 
-func MakeCliMetadateiFormat(
+func MakeCliMetadataFormat(
 	options print_options.General,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 	typStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
 	fieldsFormatWriter interfaces.StringFormatWriter[string_format_writer.Box],
 	etikettenStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
-) *cliMetadatei {
-	return &cliMetadatei{
+) *cliMetadata {
+	return &cliMetadata{
 		options: options,
 		contentPrefix: string_format_writer.StringPrefixFromOptions(
 			options,
@@ -46,7 +46,7 @@ func MakeCliMetadateiFormat(
 	}
 }
 
-func (f *cliMetadatei) WriteStringFormat(
+func (f *cliMetadata) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
 	o *object_metadata.Metadata,
 ) (n int64, err error) {
@@ -138,7 +138,7 @@ func (f *cliMetadatei) WriteStringFormat(
 		}
 	}
 
-	n2, err = f.writeStringFormatEtiketten(sw, o, didWriteDescription)
+	n2, err = f.writeStringFormatTags(sw, o, didWriteDescription)
 	n += n2
 
 	if err != nil {
@@ -149,7 +149,7 @@ func (f *cliMetadatei) WriteStringFormat(
 	return
 }
 
-func (f *cliMetadatei) writeStringFormatEtiketten(
+func (f *cliMetadata) writeStringFormatTags(
 	sw interfaces.WriterAndStringWriter,
 	o *object_metadata.Metadata,
 	didWriteDescription bool,

@@ -86,7 +86,7 @@ func (u *Env) StringFormatWriterMetadata(
 	co string_format_writer.ColorOptions,
 	truncation string_format_writer.CliFormatTruncation,
 ) interfaces.StringFormatWriter[*object_metadata.Metadata] {
-	return object_metadata_fmt.MakeCliMetadateiFormat(
+	return object_metadata_fmt.MakeCliMetadataFormat(
 		u.config.PrintOptions,
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterType(co),

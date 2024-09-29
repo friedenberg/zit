@@ -16,7 +16,7 @@ import (
 
 type v5 struct{}
 
-func (f v5) FormatPersistentMetadatei(
+func (f v5) FormatPersistentMetadata(
 	w1 io.Writer,
 	c FormatterContext,
 	o Options,
@@ -212,7 +212,7 @@ func (f v5) FormatPersistentMetadatei(
 
 	n1, err = writeShaKeyIfNotNull(
 		w,
-		keyShasMutterMetadateiKennungMutter,
+		keyShasMutterMetadataKennungMutter,
 		m.Mutter(),
 	)
 
@@ -252,7 +252,7 @@ func (f v5) FormatPersistentMetadatei(
 	return
 }
 
-func (f v5) ParsePersistentMetadatei(
+func (f v5) ParsePersistentMetadata(
 	r *catgut.RingBuffer,
 	c ParserContext,
 	o Options,
@@ -410,7 +410,7 @@ func (f v5) ParsePersistentMetadatei(
 				return
 			}
 
-		case key.Equal(keyShasMutterMetadateiKennungMutter.Bytes()):
+		case key.Equal(keyShasMutterMetadataKennungMutter.Bytes()):
 			if err = m.Mutter().SetHexBytes(val.Bytes()); err != nil {
 				err = errors.Wrap(err)
 				return

@@ -14,7 +14,7 @@ import (
 
 type v4 struct{}
 
-func (f v4) FormatPersistentMetadatei(
+func (f v4) FormatPersistentMetadata(
 	w1 io.Writer,
 	c FormatterContext,
 	o Options,
@@ -209,7 +209,7 @@ func (f v4) FormatPersistentMetadatei(
 	if !m.Mutter().IsNull() && !o.ExcludeMutter {
 		n1, err = ohio.WriteKeySpaceValueNewlineString(
 			mw,
-			keyShasMutterMetadateiKennungMutter.String(),
+			keyShasMutterMetadataKennungMutter.String(),
 			m.Mutter().String(),
 		)
 		n += int64(n1)

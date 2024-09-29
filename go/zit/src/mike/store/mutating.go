@@ -329,12 +329,6 @@ func (s *Store) createTagsOrType(k *ids.ObjectId) (err error) {
 		return
 	}
 
-	// 	err = sku.CalculateAndSetSha(
-	// 		t,
-	// 		s.GetPersistentMetadateiFormat(),
-	// 		s.GetObjekteFormatOptions(),
-	// 	)
-
 	if err != nil {
 		err = errors.Wrap(err)
 		return

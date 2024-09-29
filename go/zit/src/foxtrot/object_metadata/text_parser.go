@@ -62,21 +62,9 @@ func (f textParser) ParseMetadata(
 	defer errors.DeferredCloser(&err, blobWriter)
 
 	mr := Reader{
-		// RequireMetadatei: true,
 		Metadata: mp,
 		Blob:     blobWriter,
 	}
-
-	// if cmg, ok := c.(checkout_mode.Getter); ok {
-	// 	var checkoutMode checkout_mode.Mode
-
-	// 	if checkoutMode, err = cmg.GetCheckoutMode(); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return
-	// 	}
-
-	// 	mr.RequireMetadatei = checkoutMode.IncludesObjekte()
-	// }
 
 	if n, err = mr.ReadFrom(r); err != nil {
 		n += n1
@@ -120,7 +108,7 @@ func (f textParser) ParseMetadata(
 	case !m.Blob.IsNull() && !inlineBlobSha.IsNull() &&
 		!m.Blob.Equals(inlineBlobSha):
 		err = errors.Wrap(
-			MakeErrHasInlineBlobAndMetadateiSha(
+			MakeErrHasInlineBlobAndMetadataSha(
 				inlineBlobSha,
 				&m.Blob,
 			),

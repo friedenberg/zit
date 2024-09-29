@@ -17,7 +17,7 @@ import (
 
 type v6 struct{}
 
-func (f v6) FormatPersistentMetadatei(
+func (f v6) FormatPersistentMetadata(
 	w1 io.Writer,
 	c FormatterContext,
 	o Options,
@@ -168,7 +168,7 @@ func (f v6) FormatPersistentMetadatei(
 	return
 }
 
-func (f v6) ParsePersistentMetadatei(
+func (f v6) ParsePersistentMetadata(
 	r *catgut.RingBuffer,
 	c ParserContext,
 	o Options,

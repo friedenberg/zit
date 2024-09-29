@@ -102,9 +102,6 @@ func (i *Index) Initialize() (err error) {
 	return
 }
 
-// func (i *Store) ReadMany(string, *metadatei.Metadatei, *[]Loc) error {}
-// func (i *Store) ReadAll(*metadatei.Metadatei, *[]Loc) error          {}
-
 func (i *Index) GetPagePair(n uint8) (p *Page) {
 	p = &i.pages[n]
 	return

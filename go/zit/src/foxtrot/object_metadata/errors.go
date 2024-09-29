@@ -31,23 +31,23 @@ func (e *ErrHasInlineBlobAndFilePath) Error() string {
 	)
 }
 
-func MakeErrHasInlineBlobAndMetadateiSha(
+func MakeErrHasInlineBlobAndMetadataSha(
 	inline, object_metadata *sha.Sha,
-) (err *ErrHasInlineBlobAndMetadateiSha) {
-	err = &ErrHasInlineBlobAndMetadateiSha{}
+) (err *ErrHasInlineBlobAndMetadataSha) {
+	err = &ErrHasInlineBlobAndMetadataSha{}
 	err.MetadataSha.SetShaLike(object_metadata)
 	err.InlineSha.SetShaLike(inline)
 	return
 }
 
-type ErrHasInlineBlobAndMetadateiSha struct {
+type ErrHasInlineBlobAndMetadataSha struct {
 	InlineSha   sha.Sha
 	MetadataSha sha.Sha
 }
 
-func (e *ErrHasInlineBlobAndMetadateiSha) Error() string {
+func (e *ErrHasInlineBlobAndMetadataSha) Error() string {
 	return fmt.Sprintf(
-		"text has inline blob and metadatei sha: \ninline sha: %s\n metadatei sha: %s",
+		"text has inline blob and metadata sha: \ninline sha: %s\n metadata sha: %s",
 		&e.InlineSha,
 		&e.MetadataSha,
 	)

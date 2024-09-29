@@ -112,9 +112,9 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 
 	f.BoolVar(
 		&o.UseMetadataHeader,
-		"metadatei-header",
+		"metadata-header",
 		true,
-		"metadatei header",
+		"metadata header",
 	)
 }
 

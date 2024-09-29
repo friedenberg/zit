@@ -147,7 +147,7 @@ func (s *Store) Create(
 
 	defer errors.DeferredCloser(&err, w)
 
-	if _, err = s.object_format.FormatPersistentMetadatei(
+	if _, err = s.object_format.FormatPersistentMetadata(
 		w,
 		t,
 		object_inventory_format.Options{Tai: true},
@@ -334,7 +334,7 @@ func (s *Store) readOneFromReader(
 ) (n int64, o *sku.Transacted, err error) {
 	o = sku.GetTransactedPool().Get()
 
-	if n, err = s.object_format.ParsePersistentMetadatei(
+	if n, err = s.object_format.ParsePersistentMetadata(
 		catgut.MakeRingBuffer(r, 0),
 		o,
 		s.options,

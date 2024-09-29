@@ -12,19 +12,19 @@ import (
 )
 
 type probe_index struct {
-	fs_home                   fs_home.Home
-	persistentMetadateiFormat object_inventory_format.Format
-	object_id_probe           sha_probe_index.Index
-	options                   object_inventory_format.Options
+	fs_home                  fs_home.Home
+	persistentMetadataFormat object_inventory_format.Format
+	object_id_probe          sha_probe_index.Index
+	options                  object_inventory_format.Options
 }
 
 func (s *probe_index) Initialize(
 	fs_home fs_home.Home,
-	persistentMetadateiFormat object_inventory_format.Format,
+	persistentMetadataFormat object_inventory_format.Format,
 	options object_inventory_format.Options,
 ) (err error) {
 	s.fs_home = fs_home
-	s.persistentMetadateiFormat = persistentMetadateiFormat
+	s.persistentMetadataFormat = persistentMetadataFormat
 	s.options = options
 
 	if s.object_id_probe, err = sha_probe_index.MakeNoDuplicates(
@@ -57,7 +57,7 @@ func (s *probe_index) makeWriteMetadataFunc(
 
 		defer errors.DeferredCloser(&err, sw)
 
-		if _, err = fo.WriteMetadateiTo(sw, o); err != nil {
+		if _, err = fo.WriteMetadataTo(sw, o); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -104,15 +104,15 @@ func (s *probe_index) WriteOneObject(o *sku.Transacted) (err error) {
 	wg.Do(s.MakeFuncSaveOneObjectId(o))
 
 	wg.Do(s.makeWriteMetadataFunc(
-		s.fs_home.DirVerzeichnisseMetadateiKennungMutter(),
-		object_inventory_format.Formats.MetadateiKennungMutter(),
+		s.fs_home.DirVerzeichnisseMetadataKennungMutter(),
+		object_inventory_format.Formats.MetadataKennungMutter(),
 		o,
 		o.Metadata.Sha(),
 	))
 
 	wg.Do(s.makeWriteMetadataFunc(
-		s.fs_home.DirVerzeichnisseMetadatei(),
-		object_inventory_format.Formats.Metadatei(),
+		s.fs_home.DirVerzeichnisseMetadata(),
+		object_inventory_format.Formats.Metadata(),
 		o,
 		&o.Metadata.SelfMetadata,
 	))

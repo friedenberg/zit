@@ -18,8 +18,8 @@ import (
 )
 
 type (
-	Metadatei = object_metadata.Metadata
-	Sha       = sha.Sha
+	Metadata = object_metadata.Metadata
+	Sha      = sha.Sha
 )
 
 const (
@@ -53,17 +53,17 @@ var (
 		KeyFormatV6MetadataObjectIdParent,
 	}
 
-	keyAkte                             = german_keys.KeyAkte
-	keyBezeichnung                      = german_keys.KeyBezeichnung
-	keyEtikett                          = german_keys.KeyEtikett
-	keyGattung                          = german_keys.KeyGattung
-	keyKennung                          = german_keys.KeyKennung
-	keyKomment                          = german_keys.KeyKomment
-	keyTyp                              = german_keys.KeyTyp
-	keyShasMutterMetadateiKennungMutter = german_keys.KeyShasMutterMetadateiKennungMutter
-	keyVerzeichnisseArchiviert          = german_keys.KeyVerzeichnisseArchiviert
-	keyVerzeichnisseEtikettImplicit     = german_keys.KeyVerzeichnisseEtikettImplicit
-	keyVerzeichnisseEtikettExpanded     = german_keys.KeyVerzeichnisseEtikettExpanded
+	keyAkte                            = german_keys.KeyAkte
+	keyBezeichnung                     = german_keys.KeyBezeichnung
+	keyEtikett                         = german_keys.KeyEtikett
+	keyGattung                         = german_keys.KeyGattung
+	keyKennung                         = german_keys.KeyKennung
+	keyKomment                         = german_keys.KeyKomment
+	keyTyp                             = german_keys.KeyTyp
+	keyShasMutterMetadataKennungMutter = german_keys.KeyShasMutterMetadateiKennungMutter
+	keyVerzeichnisseArchiviert         = german_keys.KeyVerzeichnisseArchiviert
+	keyVerzeichnisseEtikettImplicit    = german_keys.KeyVerzeichnisseEtikettImplicit
+	keyVerzeichnisseEtikettExpanded    = german_keys.KeyVerzeichnisseEtikettExpanded
 
 	keySigil = keys.KeySigil
 	keyTai   = keys.KeyTai
@@ -76,46 +76,46 @@ type FormatGeneric struct {
 }
 
 type formats struct {
-	metadateiSansTai       FormatGeneric
-	metadatei              FormatGeneric
-	metadateiKennungMutter FormatGeneric
+	metadataSansTai       FormatGeneric
+	metadata              FormatGeneric
+	metadataKennungMutter FormatGeneric
 }
 
-func (fs formats) MetadateiSansTai() FormatGeneric {
-	return fs.metadateiSansTai
+func (fs formats) MetadataSansTai() FormatGeneric {
+	return fs.metadataSansTai
 }
 
-func (fs formats) Metadatei() FormatGeneric {
-	return fs.metadatei
+func (fs formats) Metadata() FormatGeneric {
+	return fs.metadata
 }
 
-func (fs formats) MetadateiKennungMutter() FormatGeneric {
-	return fs.metadateiKennungMutter
+func (fs formats) MetadataKennungMutter() FormatGeneric {
+	return fs.metadataKennungMutter
 }
 
 var Formats formats
 
 func init() {
-	Formats.metadatei.key = KeyFormatV5Metadata
-	Formats.metadatei.keys = []*catgut.String{keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai}
+	Formats.metadata.key = KeyFormatV5Metadata
+	Formats.metadata.keys = []*catgut.String{keyAkte, keyBezeichnung, keyEtikett, keyTyp, keyTai}
 
-	Formats.metadateiSansTai.key = KeyFormatV5MetadataWithoutTai
-	Formats.metadateiSansTai.keys = []*catgut.String{keyAkte, keyBezeichnung, keyEtikett, keyTyp}
+	Formats.metadataSansTai.key = KeyFormatV5MetadataWithoutTai
+	Formats.metadataSansTai.keys = []*catgut.String{keyAkte, keyBezeichnung, keyEtikett, keyTyp}
 
-	Formats.metadateiKennungMutter.key = KeyFormatV5MetadataObjectIdParent
-	Formats.metadateiKennungMutter.keys = []*catgut.String{keyAkte, keyBezeichnung, keyEtikett, keyKennung, keyTyp, keyTai, keyShasMutterMetadateiKennungMutter}
+	Formats.metadataKennungMutter.key = KeyFormatV5MetadataObjectIdParent
+	Formats.metadataKennungMutter.keys = []*catgut.String{keyAkte, keyBezeichnung, keyEtikett, keyKennung, keyTyp, keyTai, keyShasMutterMetadataKennungMutter}
 }
 
 func FormatForKeyError(k string) (fo FormatGeneric, err error) {
 	switch k {
 	case KeyFormatV5Metadata:
-		fo = Formats.metadatei
+		fo = Formats.metadata
 
 	case KeyFormatV5MetadataWithoutTai:
-		fo = Formats.metadateiSansTai
+		fo = Formats.metadataSansTai
 
 	case KeyFormatV5MetadataObjectIdParent:
-		fo = Formats.metadateiKennungMutter
+		fo = Formats.metadataKennungMutter
 
 	default:
 		err = errInvalidGenericFormat(k)
@@ -131,14 +131,14 @@ func FormatForKey(k string) FormatGeneric {
 	return f
 }
 
-func (f FormatGeneric) WriteMetadateiTo(
+func (f FormatGeneric) WriteMetadataTo(
 	w io.Writer,
 	c FormatterContext,
 ) (n int64, err error) {
 	var n1 int64
 
 	for _, k := range f.keys {
-		n1, err = WriteMetadateiKeyTo(w, c, k)
+		n1, err = WriteMetadataKeyTo(w, c, k)
 		n += n1
 
 		if err != nil {
@@ -150,7 +150,7 @@ func (f FormatGeneric) WriteMetadateiTo(
 	return
 }
 
-func WriteMetadateiKeyTo(
+func WriteMetadataKeyTo(
 	w io.Writer,
 	c FormatterContext,
 	key *catgut.String,
@@ -255,10 +255,10 @@ func WriteMetadateiKeyTo(
 			return
 		}
 
-	case keyShasMutterMetadateiKennungMutter:
+	case keyShasMutterMetadataKennungMutter:
 		n1, err = writeShaKeyIfNotNull(
 			w,
-			keyShasMutterMetadateiKennungMutter,
+			keyShasMutterMetadataKennungMutter,
 			m.Mutter(),
 		)
 
@@ -269,10 +269,10 @@ func WriteMetadateiKeyTo(
 			return
 		}
 
-	case keyShasMutterMetadateiKennungMutter:
+	case keyShasMutterMetadataKennungMutter:
 		n1, err = writeShaKeyIfNotNull(
 			w,
-			keyShasMutterMetadateiKennungMutter,
+			keyShasMutterMetadataKennungMutter,
 			&m.ParentMetadataObjectIdParent,
 		)
 
@@ -363,14 +363,14 @@ func GetShaForContext(f FormatGeneric, c FormatterContext) (sh *Sha, err error) 
 	return getShaForContext(f, c)
 }
 
-func GetShaForMetadatei(f FormatGeneric, m *Metadatei) (sh *Sha, err error) {
+func GetShaForMetadata(f FormatGeneric, m *Metadata) (sh *Sha, err error) {
 	return GetShaForContext(f, nopFormatterContext{m})
 }
 
-func WriteMetadatei(w io.Writer, f FormatGeneric, c FormatterContext) (sh *Sha, err error) {
+func WriteMetadata(w io.Writer, f FormatGeneric, c FormatterContext) (sh *Sha, err error) {
 	sw := sha.MakeWriter(w)
 
-	_, err = f.WriteMetadateiTo(sw, c)
+	_, err = f.WriteMetadataTo(sw, c)
 	if err != nil {
 		err = errors.Wrap(err)
 		return
@@ -387,7 +387,7 @@ func WriteMetadatei(w io.Writer, f FormatGeneric, c FormatterContext) (sh *Sha, 
 }
 
 func getShaForContext(f FormatGeneric, c FormatterContext) (sh *Sha, err error) {
-	if sh, err = WriteMetadatei(nil, f, c); err != nil {
+	if sh, err = WriteMetadata(nil, f, c); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -402,7 +402,7 @@ func GetShaForContextDebug(
 	var sb strings.Builder
 	sw := sha.MakeWriter(&sb)
 
-	_, err = f.WriteMetadateiTo(sw, c)
+	_, err = f.WriteMetadataTo(sw, c)
 	if err != nil {
 		err = errors.Wrap(err)
 		return
@@ -420,7 +420,7 @@ func GetShaForContextDebug(
 	return
 }
 
-func GetShasForMetadatei(m *Metadatei) (shas map[string]*sha.Sha, err error) {
+func GetShasForMetadata(m *Metadata) (shas map[string]*sha.Sha, err error) {
 	shas = make(map[string]*sha.Sha, len(FormatKeysV5))
 
 	for _, k := range FormatKeysV5 {
@@ -428,7 +428,7 @@ func GetShasForMetadatei(m *Metadatei) (shas map[string]*sha.Sha, err error) {
 
 		var sh *Sha
 
-		if sh, err = GetShaForMetadatei(f, m); err != nil {
+		if sh, err = GetShaForMetadata(f, m); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

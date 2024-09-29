@@ -165,7 +165,7 @@ function can_checkout_via_etiketten { # @test
 	EOM
 }
 
-function can_new_zettel_with_metadatei { # @test
+function can_new_zettel_with_metadata { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 

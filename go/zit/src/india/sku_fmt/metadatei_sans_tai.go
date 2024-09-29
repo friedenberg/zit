@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func StringMetadateiSansTai(o *sku.Transacted) (str string) {
+func StringMetadataSansTai(o *sku.Transacted) (str string) {
 	sb := &strings.Builder{}
 
 	sb.WriteString(o.GetGenre().GetGenreString())

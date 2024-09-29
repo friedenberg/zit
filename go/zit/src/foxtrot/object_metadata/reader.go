@@ -41,7 +41,7 @@ func (mr *Reader) ReadMetadataFrom(r *io.Reader) (n int64, err error) {
 	br := bufio.NewReader(*r)
 
 	if mr.RequireMetadata && mr.Metadata == nil {
-		err = errors.Errorf("metadatei reader is nil")
+		err = errors.Errorf("metadata reader is nil")
 		return
 	}
 
@@ -96,7 +96,7 @@ LINE_READ_LOOP:
 		case readerStateFirstBoundary:
 			if line == Boundary {
 				if _, err = object_metadata.Close(); err != nil {
-					err = errors.Wrapf(err, "metadatei read failed")
+					err = errors.Wrapf(err, "metadata read failed")
 					return
 				}
 
