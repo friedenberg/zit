@@ -22,6 +22,10 @@ code.linenisgreat.com/chrest/go v0.0.0-20240914161909-4026772955d2 h1:PfDzRyey5a
 code.linenisgreat.com/chrest/go v0.0.0-20240914161909-4026772955d2/go.mod h1:r4o+gH14v/SVVo0NohSjI2WA1d+E5FLukSRPi1jEvFo=
 code.linenisgreat.com/chrest/go v0.0.0-20240914165707-06356ba92521 h1:xVbX5o5B2J+ZoZQ4EZD4V3Yg9b8/g0fROV0PmrOCr6k=
 code.linenisgreat.com/chrest/go v0.0.0-20240914165707-06356ba92521/go.mod h1:r4o+gH14v/SVVo0NohSjI2WA1d+E5FLukSRPi1jEvFo=
+code.linenisgreat.com/chrest/go v0.0.0-20240930015713-9956349e38cd h1:Qxx3UtC5rrh0LjrwFpBwwmfJehIIqgZo4G0myyIk64o=
+code.linenisgreat.com/chrest/go v0.0.0-20240930015713-9956349e38cd/go.mod h1:r4o+gH14v/SVVo0NohSjI2WA1d+E5FLukSRPi1jEvFo=
+code.linenisgreat.com/chrest/go v0.0.0-20240930022256-86d732042864 h1:DRJWgR8BGfyRGS520fJEg4CRKw3qPEcFZJtH/kQeLQA=
+code.linenisgreat.com/chrest/go v0.0.0-20240930022256-86d732042864/go.mod h1:2dZY/TeWfeer5MZm54PjwZ/o9HqoRGqIKZb8bf6nbLU=
 filippo.io/age v1.1.1 h1:pIpO7l151hCnQ4BdyBujnGP2YlUo0uj6sAVNHGBvXHg=
 filippo.io/age v1.1.1/go.mod h1:l03SrzDUrBkdBx8+IILdnn2KZysqQdbEBUQ4p3sqEQE=
 github.com/DataDog/zstd v1.5.5 h1:oWf5W7GtOLgp6bciQYDmhHHjdhYkALu6S/5Ni9ZgSvQ=
