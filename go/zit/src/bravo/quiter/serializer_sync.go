@@ -1,4 +1,4 @@
-package iter
+package quiter
 
 import (
 	"sync"

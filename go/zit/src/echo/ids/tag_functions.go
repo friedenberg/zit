@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 )
 
 func IsDependentLeaf(a Tag) (has bool) {
@@ -20,7 +20,7 @@ func HasParentPrefix(a, b Tag) (has bool) {
 func IntersectPrefixes(haystack TagSet, needle Tag) (s3 TagSet) {
 	s4 := MakeTagMutableSet()
 
-	for _, e := range iter.Elements[Tag](haystack) {
+	for _, e := range quiter.Elements[Tag](haystack) {
 		if strings.HasPrefix(e.String(), needle.String()) {
 			s4.Add(e)
 		}
@@ -34,7 +34,7 @@ func IntersectPrefixes(haystack TagSet, needle Tag) (s3 TagSet) {
 func SubtractPrefix(s1 TagSet, e Tag) (s2 TagSet) {
 	s3 := MakeTagMutableSet()
 
-	for _, e1 := range iter.Elements[Tag](s1) {
+	for _, e1 := range quiter.Elements[Tag](s1) {
 		e2, _ := LeftSubtract(e1, e)
 
 		if e2.String() == "" {
@@ -50,7 +50,7 @@ func SubtractPrefix(s1 TagSet, e Tag) (s2 TagSet) {
 }
 
 func WithRemovedCommonPrefixes(s TagSet) (s2 TagSet) {
-	es1 := iter.SortedValues[Tag](s)
+	es1 := quiter.SortedValues[Tag](s)
 	es := make([]Tag, 0, len(es1))
 
 	for _, e := range es1 {
@@ -93,7 +93,7 @@ func AddNormalizedTag(es TagMutableSet, e *Tag) {
 }
 
 func RemovePrefixes(es TagMutableSet, needle Tag) {
-	for _, haystack := range iter.Elements(es) {
+	for _, haystack := range quiter.Elements(es) {
 		// TODO-P2 make more efficient
 		if strings.HasPrefix(haystack.String(), needle.String()) {
 			es.Del(haystack)

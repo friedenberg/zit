@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
@@ -209,7 +209,7 @@ func WriteMetadataKeyTo(
 				_ = recover()
 			}()
 
-			sortedValues = iter.SortedValues(es)
+			sortedValues = quiter.SortedValues(es)
 		}()
 
 		for _, e := range sortedValues {

@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 )
@@ -27,7 +27,7 @@ func expandOne[T idExpandable[T], TPtr idExpandablePtr[T]](
 	ex expansion.Expander,
 	acc interfaces.Adder[T],
 ) {
-	f := iter.MakeFuncSetString[T, TPtr](acc)
+	f := quiter.MakeFuncSetString[T, TPtr](acc)
 	ex.Expand(f, k.String())
 }
 
@@ -72,7 +72,7 @@ func ExpandOneSlice[T IdLike](
 		ExpandOneInto(k, mf, ex, s1)
 	}
 
-	out = iter.SortedValuesBy(
+	out = quiter.SortedValuesBy(
 		s1,
 		func(a, b T) bool {
 			return len(a.String()) < len(b.String())

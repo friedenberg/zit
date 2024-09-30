@@ -3,7 +3,7 @@ package store_fs
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -145,7 +145,7 @@ func (s *Store) UpdateDescriptionFromBlobs(
 		return
 	}
 
-	sorted := iter.ElementsSorted(
+	sorted := quiter.ElementsSorted(
 		fds.MutableSetLike,
 		func(a, b *fd.FD) bool {
 			return a.GetPath() < b.GetPath()

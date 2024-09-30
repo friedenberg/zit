@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
@@ -97,7 +97,7 @@ func (c ExecAction) runAction(
 		map[string]string{
 			"ZIT_BIN": u.GetFSHome().Executable(),
 		},
-		iter.Strings[ids.IdLike](object_id_provider)...,
+		quiter.Strings[ids.IdLike](object_id_provider)...,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

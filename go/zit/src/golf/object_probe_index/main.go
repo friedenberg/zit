@@ -3,7 +3,7 @@ package object_probe_index
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
@@ -188,7 +188,7 @@ func (e *object_probe_index) ReadAll(m *object_metadata.Metadata, h *[]Loc) (err
 		return
 	}
 
-	wg := iter.MakeErrorWaitGroupParallel()
+	wg := quiter.MakeErrorWaitGroupParallel()
 
 	for k, s := range shas {
 		s := s
@@ -225,7 +225,7 @@ func (e *object_probe_index) PrintAll() (err error) {
 }
 
 func (e *object_probe_index) Flush() (err error) {
-	wg := iter.MakeErrorWaitGroupParallel()
+	wg := quiter.MakeErrorWaitGroupParallel()
 
 	for i := range e.pages {
 		p := &e.pages[i]

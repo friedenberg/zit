@@ -2,7 +2,7 @@ package store_fs
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
@@ -92,7 +92,7 @@ func (s *Store) readIntoCheckedOutFromTransacted(
 		&co.External,
 	); err != nil {
 		if errors.IsNotExist(err) {
-			err = iter.MakeErrStopIteration()
+			err = quiter.MakeErrStopIteration()
 		} else if errors.Is(err, sku.ErrExternalHasConflictMarker) {
 			co.State = checked_out_state.Conflicted
 

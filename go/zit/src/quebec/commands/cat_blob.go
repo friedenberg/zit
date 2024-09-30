@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
@@ -29,7 +29,7 @@ func (c CatBlob) Run(
 	u *env.Env,
 	args ...string,
 ) (err error) {
-	blobWriter := iter.MakeSyncSerializer(
+	blobWriter := quiter.MakeSyncSerializer(
 		func(rc io.ReadCloser) (err error) {
 			defer errors.DeferredCloser(&err, rc)
 

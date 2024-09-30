@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
@@ -60,7 +60,7 @@ func (atc *Refiner) shouldMergeIntoParent(a *Assignment) bool {
 		return false
 	}
 
-	equal := iter.SetEqualsPtr(a.Transacted.Metadata.Tags, a.Parent.Transacted.Metadata.Tags)
+	equal := quiter.SetEqualsPtr(a.Transacted.Metadata.Tags, a.Parent.Transacted.Metadata.Tags)
 
 	if !equal {
 		ui.Log().Print("parent tags not equal")

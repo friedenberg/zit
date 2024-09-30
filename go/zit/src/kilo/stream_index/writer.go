@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -87,7 +87,7 @@ func (pw *writer) Flush() (err error) {
 func (pw *writer) flushBoth() (err error) {
 	ui.Log().Printf("flushing both: %s", pw.Path())
 
-	chain := iter.MakeChain(
+	chain := quiter.MakeChain(
 		pw.config.ApplyDormantAndRealizeTags,
 		pw.writeOne,
 	)
@@ -155,7 +155,7 @@ func (pw *writer) flushJustLatest() (err error) {
 		return
 	}
 
-	chain := iter.MakeChain(
+	chain := quiter.MakeChain(
 		pw.config.ApplyDormantAndRealizeTags,
 		pw.removeOldLatest,
 		pw.writeOne,

@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
@@ -31,7 +31,7 @@ func (f v0) FormatPersistentMetadata(
 	w.WriteFormat("%s %s", genres.Type, m.GetType())
 	w.WriteFormat("Bezeichnung %s", m.Description)
 
-	for _, e := range iter.SortedValues(m.GetTags()) {
+	for _, e := range quiter.SortedValues(m.GetTags()) {
 		w.WriteFormat("%s %s", genres.Tag, e)
 	}
 
@@ -56,7 +56,7 @@ func (f v0) ParsePersistentMetadata(
 
 	typLineReader := ohio.MakeLineReaderIgnoreErrors(m.Type.Set)
 
-	esa := iter.MakeFuncSetString[ids.Tag, *ids.Tag](
+	esa := quiter.MakeFuncSetString[ids.Tag, *ids.Tag](
 		etiketten,
 	)
 

@@ -3,7 +3,7 @@ package organize_text
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -107,7 +107,7 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 func (c *constructor) populate() (err error) {
 	allUsed := makeObjSet()
 
-	for _, e := range iter.Elements(c.ExtraTags) {
+	for _, e := range quiter.Elements(c.ExtraTags) {
 		ee := c.makeChild(e)
 
 		segments := c.all.Subset(e)
@@ -285,7 +285,7 @@ func (c *constructor) cloneObj(
 		External: named.External.CloneExternalLike(),
 	}
 
-  // TODO explore using shas as keys
+	// TODO explore using shas as keys
 	// if named.External.GetSku().Metadata.Shas.SelfMetadataWithoutTai.IsNull() {
 	// 	panic("empty sha")
 	// }

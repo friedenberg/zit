@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
 )
 
@@ -50,7 +50,7 @@ func MakeTagMutableSet(hs ...Tag) TagMutableSet {
 }
 
 func TagSetEquals(a, b TagSet) bool {
-	return iter.SetEqualsPtr(a, b)
+	return quiter.SetEqualsPtr(a, b)
 }
 
 type TagSlice []Tag

@@ -7,7 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -171,7 +171,7 @@ func (c *client) makeAndProcessOneSkuWithFilter(
 	}()
 
 	if err := f(sk); err != nil {
-		if iter.IsStopIteration(err) {
+		if quiter.IsStopIteration(err) {
 			err = nil
 		} else {
 			ui.TodoP1("support net.ErrClosed downstream")

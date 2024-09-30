@@ -3,6 +3,7 @@ package store
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
@@ -169,7 +170,12 @@ func (s *Store) tryPreCommitHooks(
 		); err != nil {
 			err = errors.Wrapf(err, "Hook: %#v", h)
 			err = errors.Wrapf(err, "Type: %q", kinder.GetType())
-			return
+
+			if ui.Continue("hook failed", err) {
+				err = nil
+			} else {
+				return
+			}
 		}
 	}
 

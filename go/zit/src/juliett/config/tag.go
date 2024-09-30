@@ -3,7 +3,7 @@ package config
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -59,7 +59,7 @@ func (a *tag) Equals(b *tag) bool {
 		return false
 	}
 
-	if !iter.SetEqualsPtr(
+	if !quiter.SetEqualsPtr(
 		a.Transacted.Metadata.Cache.GetImplicitTags(),
 		b.Transacted.Metadata.Cache.GetImplicitTags(),
 	) {
@@ -164,7 +164,7 @@ func (k *compiled) addTag(
 
 	sku.Resetter.ResetWith(&b.Transacted, kinder)
 
-	if didChange, err = iter.AddOrReplaceIfGreater(k.Tags, &b); err != nil {
+	if didChange, err = quiter.AddOrReplaceIfGreater(k.Tags, &b); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

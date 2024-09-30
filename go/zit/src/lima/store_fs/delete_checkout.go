@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
@@ -20,7 +20,7 @@ func (c DeleteCheckout) Run(
 	p interfaces.FuncIter[*fd.FD],
 	fs interfaces.Iterable[*fd.FD],
 ) (err error) {
-	els := iter.ElementsSorted(
+	els := quiter.ElementsSorted(
 		fs,
 		func(i, j *fd.FD) bool {
 			return i.String() < j.String()

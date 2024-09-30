@@ -3,7 +3,7 @@ package collections_value
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 )
 
 type Set[
@@ -56,7 +56,7 @@ func (s Set[T]) Contains(e T) (ok bool) {
 func (s Set[T]) EachKey(wf interfaces.FuncIterKey) (err error) {
 	for v := range s.E {
 		if err = wf(v); err != nil {
-			if errors.Is(err, iter.MakeErrStopIteration()) {
+			if errors.Is(err, quiter.MakeErrStopIteration()) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -77,7 +77,7 @@ func (s Set[T]) Add(v T) (err error) {
 func (s Set[T]) Each(wf interfaces.FuncIter[T]) (err error) {
 	for _, v := range s.E {
 		if err = wf(v); err != nil {
-			if iter.IsStopIteration(err) {
+			if quiter.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

@@ -2,7 +2,7 @@ package object_metadata
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
@@ -22,7 +22,7 @@ func (v *Cache) GetExpandedTags() ids.TagSet {
 }
 
 func (v *Cache) AddTagExpandedPtr(e *ids.Tag) (err error) {
-	return iter.AddClonePool(
+	return quiter.AddClonePool(
 		v.GetExpandedTagsMutable(),
 		ids.GetTagPool(),
 		ids.TagResetter,
@@ -40,7 +40,7 @@ func (v *Cache) GetExpandedTagsMutable() ids.TagMutableSet {
 
 func (v *Cache) SetExpandedTags(e ids.TagSet) {
 	es := v.GetExpandedTagsMutable()
-	iter.ResetMutableSetWithPool(es, ids.GetTagPool())
+	quiter.ResetMutableSetWithPool(es, ids.GetTagPool())
 
 	if e == nil {
 		return
@@ -54,7 +54,7 @@ func (v *Cache) GetImplicitTags() ids.TagSet {
 }
 
 func (v *Cache) AddTagsImplicitPtr(e *ids.Tag) (err error) {
-	return iter.AddClonePool(
+	return quiter.AddClonePool(
 		v.GetImplicitTagsMutable(),
 		ids.GetTagPool(),
 		ids.TagResetter,
@@ -72,7 +72,7 @@ func (v *Cache) GetImplicitTagsMutable() ids.TagMutableSet {
 
 func (v *Cache) SetImplicitTags(e ids.TagSet) {
 	es := v.GetImplicitTagsMutable()
-	iter.ResetMutableSetWithPool(es, ids.GetTagPool())
+	quiter.ResetMutableSetWithPool(es, ids.GetTagPool())
 
 	if e == nil {
 		return

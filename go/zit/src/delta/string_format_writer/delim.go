@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
@@ -17,7 +17,7 @@ func MakeDelim[T any](
 ) func(T) error {
 	w := bufio.NewWriter(w1)
 
-	return iter.MakeSyncSerializer(
+	return quiter.MakeSyncSerializer(
 		func(e T) (err error) {
 			ui.TodoP3("modify flushing behavior based on w1 being a TTY")
 			defer errors.DeferredFlusher(&err, w)

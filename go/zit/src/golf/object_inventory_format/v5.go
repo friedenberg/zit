@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
@@ -70,7 +70,7 @@ func (f v5) FormatPersistentMetadata(
 
 	es := m.GetTags()
 
-	for _, e := range iter.SortedValues[ids.Tag](es) {
+	for _, e := range quiter.SortedValues[ids.Tag](es) {
 		if e.IsVirtual() {
 			continue
 		}
@@ -172,7 +172,7 @@ func (f v5) FormatPersistentMetadata(
 		if m.Cache.GetExpandedTags().Len() > 0 {
 			k := keyVerzeichnisseEtikettExpanded.String()
 
-			for _, e := range iter.SortedValues[ids.Tag](
+			for _, e := range quiter.SortedValues[ids.Tag](
 				m.Cache.GetExpandedTags(),
 			) {
 				n1, err = ohio.WriteKeySpaceValueNewlineString(
@@ -192,7 +192,7 @@ func (f v5) FormatPersistentMetadata(
 		if m.Cache.GetImplicitTags().Len() > 0 {
 			k := keyVerzeichnisseEtikettImplicit.String()
 
-			for _, e := range iter.SortedValues[ids.Tag](
+			for _, e := range quiter.SortedValues[ids.Tag](
 				m.Cache.GetImplicitTags(),
 			) {
 				n2, err = ohio.WriteKeySpaceValueNewline(

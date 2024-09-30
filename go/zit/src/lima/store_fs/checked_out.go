@@ -2,7 +2,7 @@ package store_fs
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -10,7 +10,7 @@ import (
 func (s *Store) ToSliceFilesZettelen(
 	cos sku.CheckedOutLikeSet,
 ) (out []string, err error) {
-	return iter.DerivedValues(
+	return quiter.DerivedValues(
 		cos,
 		func(col sku.CheckedOutLike) (e string, err error) {
 			var fds *Item
@@ -35,7 +35,7 @@ func (s *Store) ToSliceFilesZettelen(
 func (s *Store) ToSliceFilesBlobs(
 	cos sku.CheckedOutLikeSet,
 ) (out []string, err error) {
-	return iter.DerivedValues(
+	return quiter.DerivedValues(
 		cos,
 		func(col sku.CheckedOutLike) (e string, err error) {
 			var fds *Item

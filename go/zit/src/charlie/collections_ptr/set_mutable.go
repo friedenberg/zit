@@ -3,7 +3,7 @@ package collections_ptr
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 )
 
 type MutableSet[
@@ -97,7 +97,7 @@ func (s MutableSet[T, TPtr]) EachKey(
 ) (err error) {
 	for v := range s.E {
 		if err = wf(v); err != nil {
-			if iter.IsStopIteration(err) {
+			if quiter.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -115,7 +115,7 @@ func (s MutableSet[T, TPtr]) Each(
 ) (err error) {
 	for _, v := range s.E {
 		if err = wf(*v); err != nil {
-			if iter.IsStopIteration(err) {
+			if quiter.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -133,7 +133,7 @@ func (s MutableSet[T, TPtr]) EachPtr(
 ) (err error) {
 	for _, v := range s.E {
 		if err = wf(v); err != nil {
-			if iter.IsStopIteration(err) {
+			if quiter.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

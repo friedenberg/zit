@@ -3,7 +3,7 @@ package config
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -160,7 +160,7 @@ func (k *Compiled) addImplicitTags(
 		}
 
 		if err = impl.EachPtr(
-			iter.MakeChain(
+			quiter.MakeChain(
 				ie.AddPtr,
 				func(e1 *ids.Tag) (err error) {
 					p2 := p1.Clone()

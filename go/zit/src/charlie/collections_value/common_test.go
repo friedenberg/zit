@@ -5,7 +5,7 @@ import (
 	"sort"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 )
@@ -70,7 +70,7 @@ func assertSet(
 
 	{
 		ex := vals
-		ac := iter.Elements[values.String](sut)
+		ac := quiter.Elements[values.String](sut)
 
 		sort.Slice(ac, func(i, j int) bool { return ac[i].Less(ac[j]) })
 
@@ -90,7 +90,7 @@ func assertSet(
 	{
 		sutCopy := sut.CloneSetLike()
 
-		if !iter.SetEquals(sut, sutCopy) {
+		if !quiter.SetEquals(sut, sutCopy) {
 			t.Fatalf("expected copy to equal original")
 		}
 	}
@@ -99,13 +99,13 @@ func assertSet(
 	{
 		sutCopy := sut.CloneMutableSetLike()
 
-		if !iter.SetEquals[values.String](sut, sutCopy) {
+		if !quiter.SetEquals[values.String](sut, sutCopy) {
 			t.Fatalf("expected mutable copy to equal original")
 		}
 
 		sutCopy.Reset()
 
-		if iter.SetEquals[values.String](sut, sutCopy) {
+		if quiter.SetEquals[values.String](sut, sutCopy) {
 			t.Fatalf("expected reset mutable copy to not equal original")
 		}
 	}

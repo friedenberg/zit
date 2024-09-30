@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
@@ -455,7 +455,7 @@ func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 		return
 	}
 
-	es := iter.SortedValues(m.Metadata.GetTags())
+	es := quiter.SortedValues(m.Metadata.GetTags())
 
 	for _, e := range es {
 		if err = s.addEtikettAndExpanded(e); err != nil {

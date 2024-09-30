@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -114,7 +114,7 @@ func (m *Metadata) ReadFrom(r1 io.Reader) (n int64, err error) {
 			ohio.MakeLineReaderKeyValues(
 				map[string]interfaces.FuncSetString{
 					"%": m.OptionCommentSet.Set,
-					"-": iter.MakeFuncSetString(mes),
+					"-": quiter.MakeFuncSetString(mes),
 					"!": m.Type.Set,
 				},
 			),
@@ -132,7 +132,7 @@ func (m *Metadata) ReadFrom(r1 io.Reader) (n int64, err error) {
 func (m Metadata) WriteTo(w1 io.Writer) (n int64, err error) {
 	w := format.NewLineWriter()
 
-	for _, e := range iter.SortedStrings(m.TagSet) {
+	for _, e := range quiter.SortedStrings(m.TagSet) {
 		w.WriteFormat("- %s", e)
 	}
 
@@ -143,7 +143,7 @@ func (m Metadata) WriteTo(w1 io.Writer) (n int64, err error) {
 	}
 
 	if m.Matchers != nil {
-		for _, c := range iter.SortedStrings(m.Matchers) {
+		for _, c := range quiter.SortedStrings(m.Matchers) {
 			w.WriteFormat("%% Matcher:%s", c)
 		}
 	}

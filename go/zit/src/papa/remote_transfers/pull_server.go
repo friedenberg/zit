@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -152,7 +152,7 @@ func (op PullServer) skusForFilter(
 
 	if err = op.env.GetStore().QueryTransacted(
 		msg.MetaSet,
-		iter.MakeChain(
+		quiter.MakeChain(
 			func(sk *sku.Transacted) (err error) {
 				if err = d.Send(sk); err != nil {
 					err = errors.Wrap(err)

@@ -7,7 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
@@ -138,7 +138,7 @@ func (b bitset) EachOff(f interfaces.FuncIter[int]) (err error) {
 		}
 
 		if err = f(i); err != nil {
-			if iter.IsStopIteration(err) {
+			if quiter.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -163,7 +163,7 @@ func (b bitset) EachOn(f interfaces.FuncIter[int]) (err error) {
 		}
 
 		if err = f(i); err != nil {
-			if iter.IsStopIteration(err) {
+			if quiter.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

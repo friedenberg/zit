@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/delta/collections_delta"
 )
@@ -161,7 +161,7 @@ func TestExpandedRight(t *testing.T) {
 		"zz-archive-task-done",
 	}
 
-	actual := iter.SortedStrings[Tag](ex)
+	actual := quiter.SortedStrings[Tag](ex)
 
 	if !stringSliceEquals(actual, expected) {
 		t.Errorf(
@@ -184,7 +184,7 @@ func TestPrefixIntersection(t *testing.T) {
 		"project-2021-zit",
 	}
 
-	actual := iter.SortedStrings(ex)
+	actual := quiter.SortedStrings(ex)
 
 	if !stringSliceEquals(actual, expected) {
 		t.Errorf(
@@ -233,7 +233,7 @@ func TestDelta1(t *testing.T) {
 		MustTag("zz-archive-task-done"),
 	)
 
-	if !iter.SetEquals[Tag](c_expected, d.GetAdded()) {
+	if !quiter.SetEquals[Tag](c_expected, d.GetAdded()) {
 		t.Errorf("expected\n%s\nactual:\n%s", c_expected, d.GetAdded())
 	}
 
@@ -241,7 +241,7 @@ func TestDelta1(t *testing.T) {
 		MustTag("task-todo"),
 	)
 
-	if !iter.SetEquals[Tag](d_expected, d.GetRemoved()) {
+	if !quiter.SetEquals[Tag](d_expected, d.GetRemoved()) {
 		t.Errorf("expected\n%s\nactual:\n%s", d_expected, d.GetRemoved())
 	}
 }

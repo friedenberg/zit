@@ -2,7 +2,6 @@ package commands
 
 import (
 	"flag"
-	"fmt"
 	"os"
 	"sync"
 
@@ -189,7 +188,12 @@ func (c *Organize) RunWithQuery(
 
 		var organizeText *organize_text.Text
 
-		if organizeText, err = c.readFromVim(u, f.Name(), createOrganizeFileResults, qg); err != nil {
+		if organizeText, err = c.readFromVim(
+			u,
+			f.Name(),
+			createOrganizeFileResults,
+			qg,
+		); err != nil {
 			err = errors.Wrapf(err, "Organize File: %q", f.Name())
 			return
 		}
@@ -255,28 +259,7 @@ func (c Organize) handleReadChangesError(err error) (tryAgain bool) {
 		return
 	}
 
-	ui.Err().Printf("reading changes failed:")
-	ui.Err().Print(err)
-	ui.Err().Printf("would you like to edit and try again? (y/*)")
-
-	var answer rune
-	var n int
-
-	if n, err = fmt.Scanf("%c", &answer); err != nil {
-		tryAgain = false
-		ui.Err().Printf("failed to read answer: %s", err)
-		return
-	}
-
-	if n != 1 {
-		tryAgain = false
-		ui.Err().Printf("failed to read at exactly 1 answer: %s", err)
-		return
-	}
-
-	if answer == 'y' || answer == 'Y' {
-		tryAgain = true
-	}
+	tryAgain = ui.Retry("reading changes failed", err)
 
 	return
 }

@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 )
 
 type SetterPolicy int
@@ -89,7 +89,7 @@ func (f flagCommas[T, TPtr]) String() (out string) {
 		return
 	}
 
-	sorted := iter.SortedStrings[T](f)
+	sorted := quiter.SortedStrings[T](f)
 
 	sb := &strings.Builder{}
 	first := true
@@ -131,7 +131,7 @@ func (f *flagCommas[T, TPtr]) Set(v string) (err error) {
 		e = strings.TrimSpace(e)
 
 		// TODO-P2 use iter.AddStringPtr
-		if err = iter.AddString[T, TPtr](f, e); err != nil {
+		if err = quiter.AddString[T, TPtr](f, e); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

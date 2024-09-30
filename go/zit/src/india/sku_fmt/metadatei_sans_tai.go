@@ -3,7 +3,7 @@ package sku_fmt
 import (
 	"strings"
 
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -33,7 +33,7 @@ func StringMetadataSansTai(o *sku.Transacted) (str string) {
 	if es.Len() > 0 {
 		sb.WriteString(" ")
 		sb.WriteString(
-			iter.StringDelimiterSeparated[ids.Tag](
+			quiter.StringDelimiterSeparated[ids.Tag](
 				" ",
 				m.GetTags(),
 			),

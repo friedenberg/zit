@@ -135,7 +135,7 @@ func (ts *TokenScanner) ScanIdentifierLikeSkipSpaces() (ok bool) {
 
 		case !afterFirst && isOperator:
 			if isSpace {
-				if !ts.consumeSpaces() {
+				if !ts.ConsumeSpaces() {
 					ok = false
 					return
 				}
@@ -229,7 +229,7 @@ func (ts *TokenScanner) Scan() (ok bool) {
 			ts.token.WriteRune(r)
 
 			if isSpace {
-				if !ts.consumeSpaces() {
+				if !ts.ConsumeSpaces() {
 					ok = false
 					return
 				}
@@ -269,7 +269,7 @@ func (ts *TokenScanner) Scan() (ok bool) {
 	}
 }
 
-func (ts *TokenScanner) consumeSpaces() (ok bool) {
+func (ts *TokenScanner) ConsumeSpaces() (ok bool) {
 	ok = true
 
 	for {

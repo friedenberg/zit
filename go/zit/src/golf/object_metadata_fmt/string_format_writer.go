@@ -3,7 +3,7 @@ package object_metadata_fmt
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -168,7 +168,7 @@ func (f *cliMetadata) writeStringFormatTags(
 	var n1 int
 	var n2 int64
 
-	for _, v := range iter.SortedValues(b) {
+	for _, v := range quiter.SortedValues(b) {
 		n1, err = sw.WriteString(f.contentPrefix)
 		n += int64(n1)
 

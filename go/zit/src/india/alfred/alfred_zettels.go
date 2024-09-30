@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/echo/alfred"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -71,7 +71,7 @@ func (w *Writer) zettelToItem(
 
 	a.Title = z.Metadata.Description.String()
 
-	es := iter.StringCommaSeparated(
+	es := quiter.StringCommaSeparated(
 		z.Metadata.GetTags(),
 	)
 

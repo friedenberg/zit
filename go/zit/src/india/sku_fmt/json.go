@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -48,7 +48,7 @@ func (j *Json) FromStringAndMetadata(
 	j.BlobString = out.String()
 	j.BlobSha = m.Blob.String()
 	j.Description = m.Description.String()
-	j.Tags = iter.Strings(m.GetTags())
+	j.Tags = quiter.Strings(m.GetTags())
 	j.ObjectId = k
 	j.Sha = m.SelfMetadataWithoutTai.String()
 	j.Tai = m.Tai.String()

@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -71,10 +71,10 @@ func (c *Store) Flush(
 		return
 	}
 
-	wg := iter.MakeErrorWaitGroupParallel()
+	wg := quiter.MakeErrorWaitGroupParallel()
 
 	if c.GetStandort().GetLockSmith().IsAcquired() {
-		gob.Register(iter.StringerKeyerPtr[ids.Type, *ids.Type]{}) // TODO check if can be removed
+		gob.Register(quiter.StringerKeyerPtr[ids.Type, *ids.Type]{}) // TODO check if can be removed
 		wg.Do(func() error { return c.streamIndex.Flush(printerHeader) })
 		wg.Do(c.GetAbbrStore().Flush)
 		wg.Do(c.zettelIdIndex.Flush)

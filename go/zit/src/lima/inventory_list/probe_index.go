@@ -3,7 +3,7 @@ package inventory_list
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
@@ -99,7 +99,7 @@ func (s *probe_index) WriteOneObject(o *sku.Transacted) (err error) {
 		return
 	}
 
-	wg := iter.MakeErrorWaitGroupParallel()
+	wg := quiter.MakeErrorWaitGroupParallel()
 
 	wg.Do(s.MakeFuncSaveOneObjectId(o))
 

@@ -3,7 +3,7 @@ setlocal list
 " TODO document
 let &l:t_ut = ''
 let &l:listchars = "tab:  ,trail:·,nbsp:·"
-let &l:equalprg = "$BIN_ZIT format-organize -metadatei-header %"
+let &l:equalprg = "$BIN_ZIT format-organize -metadata-header %"
 
 let &l:foldmethod = "expr"
 let &l:foldexpr = "GetZitOrganizeFold()"

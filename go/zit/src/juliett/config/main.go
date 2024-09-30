@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
@@ -40,8 +40,8 @@ func init() {
 		),
 	)
 
-	gob.Register(iter.StringerKeyer[values.String]{})
-	gob.Register(iter.StringerKeyerPtr[ids.Type, *ids.Type]{})
+	gob.Register(quiter.StringerKeyer[values.String]{})
+	gob.Register(quiter.StringerKeyerPtr[ids.Type, *ids.Type]{})
 }
 
 type immutable_config = pkg_angeboren.Config
@@ -111,7 +111,7 @@ func (c *Compiled) Initialize(
 	c.immutable_config = s.GetConfig()
 	c.dormant = dormant
 
-	wg := iter.MakeErrorWaitGroupParallel()
+	wg := quiter.MakeErrorWaitGroupParallel()
 	wg.Do(func() (err error) {
 		if err = c.loadMutableConfig(s); err != nil {
 			if errors.IsNotExist(err) {
@@ -194,7 +194,7 @@ func (k *compiled) addRepo(
 
 	sku.Resetter.ResetWith(b, c)
 
-	if didChange, err = iter.AddOrReplaceIfGreater(
+	if didChange, err = quiter.AddOrReplaceIfGreater(
 		k.Repos,
 		b,
 	); err != nil {
@@ -277,7 +277,7 @@ func (k *compiled) addType(
 	k.lock.Lock()
 	defer k.lock.Unlock()
 
-	if didChange, err = iter.AddOrReplaceIfGreater(
+	if didChange, err = quiter.AddOrReplaceIfGreater(
 		k.Types,
 		b,
 	); err != nil {

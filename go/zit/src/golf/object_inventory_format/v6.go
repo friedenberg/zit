@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
@@ -68,7 +68,7 @@ func (f v6) FormatPersistentMetadata(
 
 	es := m.GetTags()
 
-	for _, e := range iter.SortedValues(es) {
+	for _, e := range quiter.SortedValues(es) {
 		if e.IsVirtual() {
 			continue
 		}

@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 )
 
 func MakeValueSetString[
@@ -19,7 +19,7 @@ func MakeValueSetString[
 	s.E = make(map[string]T, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyer[T]{}
+		keyer = quiter.StringerKeyer[T]{}
 	}
 
 	s.K = keyer
@@ -47,7 +47,7 @@ func MakeValueSetValue[T interfaces.Stringer](
 	s.E = make(map[string]T, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyer[T]{}
+		keyer = quiter.StringerKeyer[T]{}
 	}
 
 	s.K = keyer
@@ -68,7 +68,7 @@ func MakeValueSet[T interfaces.Stringer](
 	s.E = make(map[string]T, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyer[T]{}
+		keyer = quiter.StringerKeyer[T]{}
 	}
 
 	s.K = keyer
@@ -131,7 +131,7 @@ func MakeMutableValueSetValue[T interfaces.Stringer](
 	s.E = make(map[string]T, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyer[T]{}
+		keyer = quiter.StringerKeyer[T]{}
 	}
 
 	s.K = keyer
@@ -152,7 +152,7 @@ func MakeMutableValueSet[T interfaces.Stringer](
 	s.E = make(map[string]T, len(es))
 
 	if keyer == nil {
-		keyer = iter.StringerKeyer[T]{}
+		keyer = quiter.StringerKeyer[T]{}
 	}
 
 	s.K = keyer

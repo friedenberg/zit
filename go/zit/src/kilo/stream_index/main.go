@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
@@ -137,7 +137,7 @@ func (i *Index) flushAdded(
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	ui.Log().Print("flushing")
-	wg := iter.MakeErrorWaitGroupParallel()
+	wg := quiter.MakeErrorWaitGroupParallel()
 
 	actualFlushCount := 0
 
@@ -190,7 +190,7 @@ func (i *Index) flushEverything(
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	ui.Log().Print("flushing")
-	wg := iter.MakeErrorWaitGroupParallel()
+	wg := quiter.MakeErrorWaitGroupParallel()
 
 	for n := range i.pages {
 		wg.Do(i.pages[n].MakeFlush(true))
@@ -389,7 +389,7 @@ func (i *Index) readFrom(
 						<-openFileCh
 						continue
 
-					case iter.IsStopIteration(err1):
+					case quiter.IsStopIteration(err1):
 
 					default:
 						me.Add(err1)

@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
@@ -48,7 +48,7 @@ func (av writer) writeNormal(a *Assignment) (err error) {
 				"%s%s %s",
 				tab_prefix,
 				strings.Repeat("#", a.GetDepth()),
-				iter.StringCommaSeparated(a.Transacted.Metadata.Tags),
+				quiter.StringCommaSeparated(a.Transacted.Metadata.Tags),
 			),
 		)
 		av.WriteExactlyOneEmpty()
@@ -129,7 +129,7 @@ func (av writer) writeRightAligned(a *Assignment) (err error) {
 				tab_prefix[len(sharps)-1:],
 				sharps,
 				alignmentSpacing,
-				iter.StringCommaSeparated(a.Transacted.Metadata.Tags),
+				quiter.StringCommaSeparated(a.Transacted.Metadata.Tags),
 			),
 		)
 		av.WriteExactlyOneEmpty()

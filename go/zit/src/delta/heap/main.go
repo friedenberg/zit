@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 )
 
 type Heap[T Element, TPtr ElementPtr[T]] struct {
@@ -95,7 +95,7 @@ func (h *Heap[T, TPtr]) Restore() {
 	h.h.GetPool().Put(h.h.lastPopped)
 	h.h.lastPopped = nil
 
-	iter.ReverseSortable(&h.h)
+	quiter.ReverseSortable(&h.h)
 }
 
 func (h *Heap[T, TPtr]) PopError() (sk TPtr, err error) {
@@ -103,7 +103,7 @@ func (h *Heap[T, TPtr]) PopError() (sk TPtr, err error) {
 	sk, ok = h.Pop()
 
 	if !ok {
-		err = iter.MakeErrStopIteration()
+		err = quiter.MakeErrStopIteration()
 	}
 
 	return
@@ -166,7 +166,7 @@ func (a *Heap[T, TPtr]) EachPtr(f interfaces.FuncIter[TPtr]) (err error) {
 
 	for _, s := range a.h.Elements {
 		if err = f(s); err != nil {
-			if iter.IsStopIteration(err) {
+			if quiter.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -185,7 +185,7 @@ func (a *Heap[T, TPtr]) Each(f interfaces.FuncIter[T]) (err error) {
 
 	for _, s := range a.h.Elements {
 		if err = f(*s); err != nil {
-			if iter.IsStopIteration(err) {
+			if quiter.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

@@ -7,7 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
@@ -87,7 +87,7 @@ func (fs *Store) Flush() (err error) {
 }
 
 func (fs *Store) String() (out string) {
-	if iter.Len(
+	if quiter.Len(
 		fs.dirItems.objects,
 		fs.blobs,
 	) == 0 {
@@ -299,7 +299,7 @@ func (s *Store) WriteFSItemToExternal(i *Item, el sku.ExternalLike) (err error) 
 	m := &e.Metadata
 	m.Tai = i.GetTai()
 
-	fdees := iter.SortedValues(i.MutableSetLike)
+	fdees := quiter.SortedValues(i.MutableSetLike)
 
 	for _, f := range fdees {
 		field := object_metadata.Field{

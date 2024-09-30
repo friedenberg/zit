@@ -7,7 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
@@ -506,7 +506,7 @@ func (d *dirItems) ConsolidateDuplicateBlobs() (err error) {
 			replacement.Add(fds.Any())
 		}
 
-		sorted := iter.ElementsSorted(
+		sorted := quiter.ElementsSorted(
 			fds,
 			func(a, b *Item) bool {
 				return a.ObjectId.String() < b.ObjectId.String()
@@ -538,9 +538,9 @@ func (d *dirItems) ConsolidateDuplicateBlobs() (err error) {
 func (d *dirItems) OnlyObjects(
 	f interfaces.FuncIter[*Item],
 ) (err error) {
-	wg := iter.MakeErrorWaitGroupParallel()
+	wg := quiter.MakeErrorWaitGroupParallel()
 
-	iter.ErrorWaitGroupApply(wg, d.objects, f)
+	quiter.ErrorWaitGroupApply(wg, d.objects, f)
 
 	return wg.GetError()
 }
@@ -548,10 +548,10 @@ func (d *dirItems) OnlyObjects(
 func (d *dirItems) All(
 	f interfaces.FuncIter[*Item],
 ) (err error) {
-	wg := iter.MakeErrorWaitGroupParallel()
+	wg := quiter.MakeErrorWaitGroupParallel()
 
-	iter.ErrorWaitGroupApply(wg, d.objects, f)
-	iter.ErrorWaitGroupApply(wg, d.blobs, f)
+	quiter.ErrorWaitGroupApply(wg, d.objects, f)
+	quiter.ErrorWaitGroupApply(wg, d.blobs, f)
 
 	return wg.GetError()
 }

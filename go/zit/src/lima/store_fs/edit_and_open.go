@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/vim_cli_options_builder"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -14,7 +14,7 @@ func (s *Store) Open(
 	ph interfaces.FuncIter[string],
 	zsc sku.CheckedOutLikeSet,
 ) (err error) {
-	wg := iter.MakeErrorWaitGroupParallel()
+	wg := quiter.MakeErrorWaitGroupParallel()
 
 	if m.IncludesMetadata() {
 		wg.Do(func() error {

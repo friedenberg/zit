@@ -8,7 +8,7 @@ import (
 	"math"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/keys"
@@ -130,7 +130,7 @@ func (bf *binaryEncoder) writeFieldKey(
 	case keys.Tag:
 		es := sk.GetTags()
 
-		for _, e := range iter.SortedValues(es) {
+		for _, e := range quiter.SortedValues(es) {
 			if e.IsVirtual() {
 				continue
 			}
@@ -203,7 +203,7 @@ func (bf *binaryEncoder) writeFieldKey(
 	case keys.CacheTagImplicit:
 		es := sk.Metadata.Cache.GetImplicitTags()
 
-		for _, e := range iter.SortedValues[ids.Tag](es) {
+		for _, e := range quiter.SortedValues[ids.Tag](es) {
 			var n1 int64
 			n1, err = bf.writeFieldBinaryMarshaler(&e)
 			n += n1
@@ -217,7 +217,7 @@ func (bf *binaryEncoder) writeFieldKey(
 	case keys.CacheTagExpanded:
 		es := sk.Metadata.Cache.GetExpandedTags()
 
-		for _, e := range iter.SortedValues[ids.Tag](es) {
+		for _, e := range quiter.SortedValues[ids.Tag](es) {
 			var n1 int64
 			n1, err = bf.writeFieldBinaryMarshaler(&e)
 			n += n1

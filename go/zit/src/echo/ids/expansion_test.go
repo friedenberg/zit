@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 )
 
@@ -90,7 +90,7 @@ func TestExpansionAll(t1 *testing.T) {
 		"this-is-a-tag",
 	}
 
-	actual := iter.SortedStrings(ex)
+	actual := quiter.SortedStrings(ex)
 
 	if !stringSliceEquals(actual, expected) {
 		t.Errorf(
@@ -121,7 +121,7 @@ func TestExpansionRight(t1 *testing.T) {
 		"this-is-a-tag",
 	}
 
-	actual := iter.SortedStrings[Tag](ex)
+	actual := quiter.SortedStrings[Tag](ex)
 
 	if !stringSliceEquals(actual, expected) {
 		t.Errorf(

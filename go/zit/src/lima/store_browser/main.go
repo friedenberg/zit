@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
@@ -70,7 +70,7 @@ func Make(
 		itemsById: make(map[string]Item),
 		transacted: transacted{
 			MutableSetLike: collections_value.MakeMutableValueSet(
-				iter.StringerKeyer[*ids.ObjectId]{},
+				quiter.StringerKeyer[*ids.ObjectId]{},
 			),
 		},
 		transactedUrlIndex:            make(map[url.URL]sku.TransactedMutableSet),
@@ -105,7 +105,7 @@ func (s *Store) GetObjectIdsForString(
 }
 
 func (s *Store) Flush() (err error) {
-	wg := iter.MakeErrorWaitGroupParallel()
+	wg := quiter.MakeErrorWaitGroupParallel()
 
 	wg.Do(s.flushUrls)
 

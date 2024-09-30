@@ -154,3 +154,28 @@ function create_structured_zettels { # @test
 		- [/] third
 	EOM
 }
+
+function create_bare_object_description_line_wrap { # @test
+	run_zit_init_disable_age
+
+	function cat_body {
+		cat <<-EOM
+			---
+			- test
+			---
+
+			- this is a long
+			  description
+		EOM
+	}
+
+	run_zit format-organize "${cmd_def_organize[@]}" <(cat_body)
+	assert_success
+	assert_output - <<-EOM
+		---
+		- test
+		---
+
+		- [/] this is a long description
+	EOM
+}

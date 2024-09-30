@@ -3,7 +3,7 @@ package heap
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 )
 
 func MergeStream[T Element, TPtr ElementPtr[T]](
@@ -67,7 +67,7 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 		var element TPtr
 
 		if element, err = r(); err != nil {
-			if iter.IsStopIteration(err) {
+			if quiter.IsStopIteration(err) {
 				err = nil
 				break
 			} else {
@@ -112,7 +112,7 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 			}
 
 			if err = w(popped); err != nil {
-				if iter.IsStopIteration(err) {
+				if quiter.IsStopIteration(err) {
 					err = nil
 				} else {
 					err = errors.Wrap(err)
@@ -123,7 +123,7 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 		}
 
 		if err = w(element); err != nil {
-			if iter.IsStopIteration(err) {
+			if quiter.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -141,7 +141,7 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 		}
 
 		if err = w(popped); err != nil {
-			if iter.IsStopIteration(err) {
+			if quiter.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

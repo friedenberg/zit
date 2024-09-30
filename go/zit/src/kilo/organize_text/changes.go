@@ -1,11 +1,12 @@
 package organize_text
 
 import (
+	"fmt"
 	"sort"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
@@ -111,7 +112,7 @@ func (sm *SkuMapWithOrder) Each(
 		}
 
 		if err = f(v); err != nil {
-			if iter.IsStopIteration(err) {
+			if quiter.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -128,6 +129,17 @@ type Changes struct {
 	Before, After  SkuMapWithOrder
 	Added, Removed SkuMapWithOrder
 	Changed        SkuMapWithOrder
+}
+
+func (c Changes) String() string {
+	return fmt.Sprintf(
+		"Before: %d, After: %d, Added: %d, Removed: %d, Changed: %d",
+		c.Before.Len(),
+		c.After.Len(),
+		c.Added.Len(),
+		c.Removed.Len(),
+		c.Changed.Len(),
+	)
 }
 
 // TODO combine with above

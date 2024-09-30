@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
@@ -130,7 +130,7 @@ func (a *FSItem) Equals(b *FSItem) (ok bool, why string) {
 		return false, fmt.Sprintf("Conflict.%s", why)
 	}
 
-	if !iter.SetEquals(a.MutableSetLike, b.MutableSetLike) {
+	if !quiter.SetEquals(a.MutableSetLike, b.MutableSetLike) {
 		return false, "set"
 	}
 

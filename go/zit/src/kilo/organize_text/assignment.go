@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -154,7 +154,7 @@ func (a Assignment) String() (s string) {
 		s = a.Parent.String() + "."
 	}
 
-	return s + iter.StringCommaSeparated(a.Transacted.Metadata.Tags)
+	return s + quiter.StringCommaSeparated(a.Transacted.Metadata.Tags)
 }
 
 func (a *Assignment) makeChild(e ids.Tag) (b *Assignment) {
@@ -411,8 +411,8 @@ func (parent *Assignment) SortChildren() {
 				return ei < ej
 			}
 		} else {
-			vi := iter.StringCommaSeparated(esi)
-			vj := iter.StringCommaSeparated(esj)
+			vi := quiter.StringCommaSeparated(esi)
+			vj := quiter.StringCommaSeparated(esj)
 			return vi < vj
 		}
 	})

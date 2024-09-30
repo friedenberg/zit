@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
@@ -96,7 +96,7 @@ func (f textFormatterCommon) writeCommonMetadataFormat(
 		}
 	}
 
-	for _, e := range iter.SortedValues(m.GetTags()) {
+	for _, e := range quiter.SortedValues(m.GetTags()) {
 		if ids.IsEmpty(e) {
 			continue
 		}

@@ -4,14 +4,14 @@ import (
 	"encoding/gob"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 )
 
 func RegisterGobValue[T interfaces.ValueLike, TPtr interfaces.ValuePtr[T]](
 	keyer interfaces.StringKeyerPtr[T, TPtr],
 ) {
 	if keyer == nil {
-		keyer = iter.StringerKeyerPtr[T, TPtr]{}.RegisterGob()
+		keyer = quiter.StringerKeyerPtr[T, TPtr]{}.RegisterGob()
 	}
 
 	gob.Register(keyer)

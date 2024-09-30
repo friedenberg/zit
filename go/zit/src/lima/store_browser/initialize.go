@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/chrest/go/src/charlie/browser_items"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
@@ -19,7 +19,7 @@ func (s *Store) Initialize(esi external_store.Supplies) (err error) {
 		return
 	}
 
-	wg := iter.MakeErrorWaitGroupParallel()
+	wg := quiter.MakeErrorWaitGroupParallel()
 
 	wg.Do(s.initializeUrls)
 	wg.Do(s.initializeIndex)

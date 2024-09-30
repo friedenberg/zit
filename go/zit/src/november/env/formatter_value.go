@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/toml"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
@@ -137,7 +137,7 @@ func (u *Env) MakeFormatFunc(
 
 			if _, err = fmt.Fprintln(
 				out,
-				iter.StringCommaSeparated(esImp),
+				quiter.StringCommaSeparated(esImp),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -153,7 +153,7 @@ func (u *Env) MakeFormatFunc(
 
 			if _, err = fmt.Fprintln(
 				out,
-				iter.StringCommaSeparated(esImp),
+				quiter.StringCommaSeparated(esImp),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -166,7 +166,7 @@ func (u *Env) MakeFormatFunc(
 		f = func(tl *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(
 				out,
-				iter.StringCommaSeparated(
+				quiter.StringCommaSeparated(
 					tl.Metadata.GetTags(),
 				),
 			); err != nil {

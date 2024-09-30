@@ -5,13 +5,13 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 )
 
 var (
 	ErrNilPointer        = errors.New("nil pointer")
 	ErrExists            = errors.New("exists")
-	MakeErrStopIteration = iter.MakeErrStopIteration
+	MakeErrStopIteration = quiter.MakeErrStopIteration
 	ErrNotFound          = errNotFound("not found")
 )
 

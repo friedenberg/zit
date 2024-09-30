@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
+	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 )
 
 // TODO-P1 move to catgut.String
@@ -43,9 +44,47 @@ func (b *Description) TodoSetSlice(v catgut.Slice) (err error) {
 	return b.Set(v.String())
 }
 
-func (b *Description) ReadFromRuneScanner(rs io.RuneScanner) (err error) {
-	var sb strings.Builder
+func (b *Description) readFromRuneScannerAfterNewline(
+	rs *query_spec.TokenScanner,
+	sb *strings.Builder,
+) (err error) {
+	var r rune
 
+	r, _, err = rs.ReadRune()
+	isEOF := err == io.EOF
+
+	if err != nil && !isEOF {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if r != ' ' {
+		if err = rs.UnreadRune(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	} else {
+		sb.WriteRune(' ')
+
+		if !rs.ConsumeSpaces() {
+			return
+		}
+
+		if err = b.readFromRuneScannerOrdinary(rs, sb); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (b *Description) readFromRuneScannerOrdinary(
+	rs *query_spec.TokenScanner,
+	sb *strings.Builder,
+) (err error) {
 	for {
 		var r rune
 
@@ -58,8 +97,7 @@ func (b *Description) ReadFromRuneScanner(rs io.RuneScanner) (err error) {
 		}
 
 		if r == '\n' {
-			err = rs.UnreadRune()
-			if err != nil {
+			if err = b.readFromRuneScannerAfterNewline(rs, sb); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -68,6 +106,7 @@ func (b *Description) ReadFromRuneScanner(rs io.RuneScanner) (err error) {
 		}
 
 		if isEOF {
+			err = nil
 			if r != utf8.RuneError {
 				sb.WriteRune(r)
 			}
@@ -76,6 +115,17 @@ func (b *Description) ReadFromRuneScanner(rs io.RuneScanner) (err error) {
 		}
 
 		sb.WriteRune(r)
+	}
+
+	return
+}
+
+func (b *Description) ReadFromTokenScanner(rs *query_spec.TokenScanner) (err error) {
+	var sb strings.Builder
+
+	if err = b.readFromRuneScannerOrdinary(rs, &sb); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if err = b.Set(sb.String()); err != nil {

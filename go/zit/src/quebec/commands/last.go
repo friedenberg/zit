@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -72,7 +72,7 @@ func (c Last) Run(u *env.Env, args ...string) (err error) {
 		}
 	}
 
-	f = iter.MakeSyncSerializer(f)
+	f = quiter.MakeSyncSerializer(f)
 
 	if err = c.runWithInventoryList(u, f); err != nil {
 		err = errors.Wrap(err)

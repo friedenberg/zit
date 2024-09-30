@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
@@ -55,7 +55,7 @@ func (a *obj) String() string {
 func sortObjSet(
 	s interfaces.MutableSetLike[*obj],
 ) (out []*obj) {
-	out = iter.Elements(s)
+	out = quiter.Elements(s)
 
 	sort.Slice(out, func(i, j int) bool {
 		switch {
@@ -85,7 +85,7 @@ func (os Objects) Len() int {
 func (os *Objects) Each(f interfaces.FuncIter[*obj]) (err error) {
 	for _, v := range *os {
 		if err = f(v); err != nil {
-			if iter.IsStopIteration(err) {
+			if quiter.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
@@ -205,7 +205,7 @@ func (u *Env) Initialize(options Options) (err error) {
 			StoreLike: store_browser.Make(
 				k,
 				u.GetFSHome(),
-        u.PrinterTransactedDeleted(),
+				u.PrinterTransactedDeleted(),
 			),
 		},
 	}
@@ -244,7 +244,7 @@ func (u *Env) Initialize(options Options) (err error) {
 }
 
 func (u *Env) Flush() (err error) {
-	wg := iter.MakeErrorWaitGroupParallel()
+	wg := quiter.MakeErrorWaitGroupParallel()
 
 	wg.Do(u.age.Close)
 

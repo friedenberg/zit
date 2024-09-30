@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -59,7 +59,7 @@ func (c Show) RunWithQuery(
 
 	if err = u.GetStore().QueryTransacted(
 		qg,
-		iter.MakeSyncSerializer(f),
+		quiter.MakeSyncSerializer(f),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -106,7 +106,7 @@ func TestMakeTags(t1 *testing.T) {
 	}
 
 	{
-		ac := iter.SortedStrings[ids.Tag](sut)
+		ac := quiter.SortedStrings[ids.Tag](sut)
 
 		if !reflect.DeepEqual(ac, vs) {
 			t.Fatalf("expected %q but got %q", vs, ac)
@@ -115,7 +115,7 @@ func TestMakeTags(t1 *testing.T) {
 
 	{
 		ex := "tag1, tag2, tag3"
-		ac := iter.StringCommaSeparated[ids.Tag](sut)
+		ac := quiter.StringCommaSeparated[ids.Tag](sut)
 
 		if ac != ex {
 			t.Fatalf("expected %q but got %q", ex, ac)
@@ -124,7 +124,7 @@ func TestMakeTags(t1 *testing.T) {
 
 	{
 		ex := "tag1, tag2, tag3"
-		ac := iter.StringCommaSeparated[ids.Tag](
+		ac := quiter.StringCommaSeparated[ids.Tag](
 			sut.CloneSetLike(),
 		)
 

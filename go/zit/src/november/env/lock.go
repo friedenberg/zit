@@ -2,7 +2,7 @@ package env
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
@@ -68,7 +68,7 @@ func (u *Env) Unlock() (err error) {
 
 		u.GetStore().GetStreamIndex().SetNeedsFlushHistory(changes)
 
-		wg := iter.MakeErrorWaitGroupParallel()
+		wg := quiter.MakeErrorWaitGroupParallel()
 		wg.Do(
 			func() error {
 				ui.Log().Print("will flush store second time")

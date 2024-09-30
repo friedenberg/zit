@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
@@ -157,7 +157,7 @@ func (f *Organize) WriteStringFormat(
 	if f.options.PrintTagsAlways {
 		b := o.GetMetadata().GetTags()
 
-		for _, v := range iter.SortedValues(b) {
+		for _, v := range quiter.SortedValues(b) {
 			if f.options.ZittishNewlines {
 				n1, err = fmt.Fprintf(sw, "\n%s", f.padding)
 			} else {

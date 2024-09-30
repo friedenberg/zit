@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/iter"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -144,7 +144,7 @@ func (a PrefixSet) Each(
 		}
 
 		if err = f(e1, ssz); err != nil {
-			if iter.IsStopIteration(err) {
+			if quiter.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -201,7 +201,7 @@ func (a PrefixSet) Match(
 					return
 				}
 
-				for _, e2 := range iter.Elements(intersection) {
+				for _, e2 := range quiter.Elements(intersection) {
 					out.Grouped.addPair(e2.String(), z)
 				}
 
