@@ -2,8 +2,14 @@ package catgut
 
 import "unicode/utf8"
 
-func CompareUTF8Bytes(a, b []byte, partial bool) int {
-	lenA, lenB := len(a), len(b)
+type Comparer interface {
+	Len() int
+	SliceFrom(int) Comparer
+	DecodeRune() (r rune, width int)
+}
+
+func CompareUTF8Bytes(a, b Comparer, partial bool) int {
+	lenA, lenB := a.Len(), b.Len()
 
 	// TODO remove?
 	switch {
@@ -18,7 +24,7 @@ func CompareUTF8Bytes(a, b []byte, partial bool) int {
 	}
 
 	for {
-		lenA, lenB := len(a), len(b)
+		lenA, lenB := a.Len(), b.Len()
 
 		switch {
 		case lenA == 0 && lenB == 0:
@@ -39,15 +45,15 @@ func CompareUTF8Bytes(a, b []byte, partial bool) int {
 			}
 		}
 
-		runeA, widthA := utf8.DecodeRune(a)
-		a = a[widthA:]
+		runeA, widthA := a.DecodeRune()
+    a = a.SliceFrom(widthA)
 
 		if runeA == utf8.RuneError {
 			panic("not a valid utf8 string")
 		}
 
-		runeB, widthB := utf8.DecodeRune(b)
-		b = b[widthB:]
+		runeB, widthB := b.DecodeRune()
+    b = b.SliceFrom(widthB)
 
 		if runeB == utf8.RuneError {
 			panic("not a valid utf8 string")
@@ -59,4 +65,40 @@ func CompareUTF8Bytes(a, b []byte, partial bool) int {
 			return 1
 		}
 	}
+}
+
+type ComparerBytes []byte
+
+func (cb ComparerBytes) Len() int {
+	return len(cb)
+}
+
+func (cb ComparerBytes) SliceFrom(start int) Comparer {
+	return ComparerBytes(cb[start:])
+}
+
+func (cb ComparerBytes) DecodeRune() (r rune, width int) {
+	r, width = utf8.DecodeRune(cb)
+	return
+}
+
+type ComparerString string
+
+func (cb ComparerString) Len() int {
+	return len(cb)
+}
+
+func (cb ComparerString) SliceFrom(start int) Comparer {
+	return ComparerString(cb[start:])
+}
+
+func (cb ComparerString) DecodeRune() (r rune, width int) {
+	for _, r1 := range cb {
+		r = r1
+		break
+	}
+
+	width = utf8.RuneLen(r)
+
+	return
 }

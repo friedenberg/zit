@@ -1,6 +1,7 @@
 package organize_text
 
 import (
+	"iter"
 	"sort"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -82,6 +83,17 @@ func (os Objects) Len() int {
 	return len(os)
 }
 
+func (os *Objects) All() iter.Seq2[int, *obj] {
+	return func(yield func(int, *obj) bool) {
+		for i, o := range *os {
+			if !yield(i, o) {
+				break
+			}
+		}
+	}
+}
+
+// TODO remove
 func (os *Objects) Each(f interfaces.FuncIter[*obj]) (err error) {
 	for _, v := range *os {
 		if err = f(v); err != nil {

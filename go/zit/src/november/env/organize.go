@@ -37,6 +37,8 @@ func (e *Env) LockAndCommitOrganizeResults(
 		return
 	}
 
+	// ui.Debug().Print(changeResults)
+
 	if err = changeResults.Changed.Each(
 		func(changed sku.ExternalLike) (err error) {
 			if err = e.GetStore().CreateOrUpdate(

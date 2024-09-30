@@ -69,8 +69,8 @@ func (s TagsWithParentsAndTypes) containsObjectIdTag(
 		e,
 		func(ewp EtikettWithParentsAndTypes, e *Tag) int {
 			cmp := catgut.CompareUTF8Bytes(
-				ewp.Tag.Bytes()[offset:],
-				e.Bytes(),
+				catgut.ComparerBytes(ewp.Tag.Bytes()[offset:]),
+				catgut.ComparerBytes(e.Bytes()),
 				partial,
 			)
 
@@ -85,6 +85,19 @@ func (s TagsWithParentsAndTypes) ContainsEtikett(e *Tag) (int, bool) {
 		e,
 		func(ewp EtikettWithParentsAndTypes, e *Tag) int {
 			cmp := ewp.Tag.ComparePartial(e)
+			return cmp
+		},
+	)
+}
+
+func (s TagsWithParentsAndTypes) ContainsComparer(
+  c catgut.Comparer,
+) (int, bool) {
+	return slices.BinarySearchFunc(
+		s,
+		c,
+		func(ewp EtikettWithParentsAndTypes, c catgut.Comparer) int {
+			cmp := ewp.Tag.ComparePartialComparer(c)
 			return cmp
 		},
 	)

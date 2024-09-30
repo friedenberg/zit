@@ -83,17 +83,13 @@ func (a Assignment) AlignmentSpacing() int {
 }
 
 func (a Assignment) MaxLen() (m int) {
-	a.Objects.Each(
-		func(z *obj) (err error) {
-			oM := z.External.GetSku().ObjectId.Len()
+	for _, z := range a.Objects.All() {
+		oM := z.External.GetSku().ObjectId.Len()
 
-			if oM > m {
-				m = oM
-			}
-
-			return
-		},
-	)
+		if oM > m {
+			m = oM
+		}
+	}
 
 	for _, c := range a.Children {
 		oM := c.MaxLen()
@@ -109,30 +105,27 @@ func (a Assignment) MaxLen() (m int) {
 func (a Assignment) MaxHeadAndTail(
 	o Options,
 ) (kopf, schwanz int) {
-	a.Objects.Each(
-		func(z *obj) (err error) {
-			oKopf, oSchwanz := z.External.GetSku().ObjectId.LenHeadAndTail()
+	for _, z := range a.Objects.All() {
+		oKopf, oSchwanz := z.External.GetSku().ObjectId.LenHeadAndTail()
 
-			if o.PrintOptions.Abbreviations.Hinweisen {
-				if oKopf, oSchwanz, err = o.Abbr.LenKopfUndSchwanz(
-					&z.External.GetSku().ObjectId,
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+		if o.PrintOptions.Abbreviations.Hinweisen {
+			var err error
+
+			if oKopf, oSchwanz, err = o.Abbr.LenKopfUndSchwanz(
+				&z.External.GetSku().ObjectId,
+			); err != nil {
+				panic(err)
 			}
+		}
 
-			if oKopf > kopf {
-				kopf = oKopf
-			}
+		if oKopf > kopf {
+			kopf = oKopf
+		}
 
-			if oSchwanz > schwanz {
-				schwanz = oSchwanz
-			}
-
-			return
-		},
-	)
+		if oSchwanz > schwanz {
+			schwanz = oSchwanz
+		}
+	}
 
 	for _, c := range a.Children {
 		zKopf, zSchwanz := c.MaxHeadAndTail(o)

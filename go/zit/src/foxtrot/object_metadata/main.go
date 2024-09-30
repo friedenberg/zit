@@ -252,13 +252,14 @@ func (a *Metadata) Subtract(
 		return
 	}
 
-	err := b.GetTags().EachPtr(
-		func(e *ids.Tag) (err error) {
-			return a.Tags.DelPtr(e)
-		},
-	)
+	// ui.Debug().Print("before", b.Tags, a.Tags)
 
-	errors.PanicIfError(err)
+	for e := range b.Tags.AllPtr() {
+		// ui.Debug().Print(e)
+		a.Tags.DelPtr(e)
+	}
+
+	// ui.Debug().Print("after", b.Tags, a.Tags)
 }
 
 func (mp *Metadata) AddComment(f string, vals ...interface{}) {

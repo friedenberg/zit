@@ -3,7 +3,6 @@ package organize_text
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -79,7 +78,8 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 
 			ui.Log().Print(re, "explicit", explicitCount, "implicit", implicitCount)
 
-			if explicitCount == c.Options.Skus.Len() {
+			// TODO [hemp/mr !task project-2021-zit-bugs today zz-inbox] fix issue with `zit organize project-2021-zit` causing deltas
+			if explicitCount == c.Options.Skus.Len() || true {
 				if err = anchored.Add(re); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -107,7 +107,7 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 func (c *constructor) populate() (err error) {
 	allUsed := makeObjSet()
 
-	for _, e := range quiter.Elements(c.ExtraTags) {
+	for e := range c.ExtraTags.All() {
 		ee := c.makeChild(e)
 
 		segments := c.all.Subset(e)
