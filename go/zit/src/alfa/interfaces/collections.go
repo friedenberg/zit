@@ -2,12 +2,8 @@ package interfaces
 
 import (
 	"flag"
+	"iter"
 )
-
-type Iter[T any] interface {
-	Each(FuncIter[T]) error
-	Next() (T, bool)
-}
 
 type Delta[T any] interface {
 	GetAdded() SetLike[T]
@@ -27,6 +23,7 @@ type SetLike[T any] interface {
 	Get(string) (T, bool)
 	Contains(T) bool
 	EachKey(FuncIterKey) error
+	AllKeys() iter.Seq[string]
 
 	CloneSetLike() SetLike[T]
 	CloneMutableSetLike() MutableSetLike[T]

@@ -26,24 +26,17 @@ func (c EachBlob) Run(
 
 	var blob_store []string
 
-	if err = zsc.Each(
-		func(col sku.CheckedOutLike) (err error) {
-			var fds *store_fs.Item
+	for col := range zsc.All() {
+		var fds *store_fs.Item
 
-			if fds, err = c.GetStore().GetCwdFiles().ReadFSItemFromExternal(
-				col.GetSkuExternalLike(),
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			blob_store = append(blob_store, fds.Blob.GetPath())
-
+		if fds, err = c.GetStore().GetCwdFiles().ReadFSItemFromExternal(
+			col.GetSkuExternalLike(),
+		); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		blob_store = append(blob_store, fds.Blob.GetPath())
 	}
 
 	v := fmt.Sprintf("running utility: %q", c.Utility)

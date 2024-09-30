@@ -1,6 +1,8 @@
 package collections_ptr
 
 import (
+	"iter"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
@@ -12,6 +14,36 @@ type Set[
 ] struct {
 	K interfaces.StringKeyerPtr[T, TPtr]
 	E map[string]TPtr
+}
+
+func (s Set[T, TPtr]) AllKeys() iter.Seq[string] {
+	return func(yield func(string) bool) {
+		for k := range s.E {
+			if !yield(k) {
+				break
+			}
+		}
+	}
+}
+
+func (s Set[T, TPtr]) All() iter.Seq[T] {
+	return func(yield func(T) bool) {
+		for _, e := range s.E {
+			if !yield(*e) {
+				break
+			}
+		}
+	}
+}
+
+func (s Set[T, TPtr]) AllPtr() iter.Seq[TPtr] {
+	return func(yield func(TPtr) bool) {
+		for _, e := range s.E {
+			if !yield(e) {
+				break
+			}
+		}
+	}
 }
 
 func (s Set[T, TPtr]) Len() int {

@@ -1,5 +1,7 @@
 package interfaces
 
+import "iter"
+
 type (
 	FuncIter[T any]              func(T) error
 	FuncIterIO[T any]            func(T) (int64, error)
@@ -30,12 +32,13 @@ type StringAdder interface {
 }
 
 type Iterable[T any] interface {
-	Any() T // TODO-P2 remove in favor of collection method?
-	Each(FuncIter[T]) error
-	// Iterator() Iter[T]
+	Any() T // TODO-P2 remove in favor of collection method
+	Each(FuncIter[T]) error // TODO remove in favor of iter.Seq
+	All() iter.Seq[T]
 	Lenner
 }
 
 type IterablePtr[T any, TPtr Ptr[T]] interface {
-	EachPtr(FuncIter[TPtr]) error
+	EachPtr(FuncIter[TPtr]) error // TODO remove in favor of iter.Seq
+	AllPtr() iter.Seq[TPtr]
 }

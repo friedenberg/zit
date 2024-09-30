@@ -91,24 +91,16 @@ func (c ZettelFromExternalBlob) Run(
 	// TODO move to umwelt
 	dp := c.Env.PrinterFDDeleted()
 
-	err = toDelete.Each(
-		func(f *fd.FD) (err error) {
-			if err = c.Env.GetFSHome().Delete(f.GetPath()); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if err = dp(f); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+	for f := range toDelete.All() {
+		if err = c.Env.GetFSHome().Delete(f.GetPath()); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
-	)
-	if err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		if err = dp(f); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

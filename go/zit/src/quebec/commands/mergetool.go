@@ -70,57 +70,50 @@ func (c Mergetool) RunWithQuery(
 		return
 	}
 
-	if err = conflicted.Each(
-		func(col sku.CheckedOutLike) (err error) {
-			cofs := col.(*sku.CheckedOut)
+	for col := range conflicted.All() {
+		cofs := col.(*sku.CheckedOut)
 
-			tm := sku.Conflicted{
-				CheckedOutLike: col.CloneCheckedOutLike(),
-			}
+		tm := sku.Conflicted{
+			CheckedOutLike: col.CloneCheckedOutLike(),
+		}
 
-			var conflict *fd.FD
+		var conflict *fd.FD
 
-			if conflict, err = u.GetStore().GetCwdFiles().GetConflictOrError(&cofs.External); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			var f *os.File
-
-			if f, err = files.Open(conflict.GetPath()); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			defer errors.DeferredCloser(&err, f)
-
-			br := bufio.NewReader(f)
-
-			s := sku_fmt.MakeFormatInventoryListScanner(
-				br,
-				object_inventory_format.FormatForVersion(u.GetConfig().GetStoreVersion()),
-				u.GetStore().GetObjekteFormatOptions(),
-			)
-
-			if err = tm.ReadConflictMarker(
-				s,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if err = u.GetStore().RunMergeTool(
-				tm,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+		if conflict, err = u.GetStore().GetCwdFiles().GetConflictOrError(&cofs.External); err != nil {
+			err = errors.Wrap(err)
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		var f *os.File
+
+		if f, err = files.Open(conflict.GetPath()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer errors.DeferredCloser(&err, f)
+
+		br := bufio.NewReader(f)
+
+		s := sku_fmt.MakeFormatInventoryListScanner(
+			br,
+			object_inventory_format.FormatForVersion(u.GetConfig().GetStoreVersion()),
+			u.GetStore().GetObjekteFormatOptions(),
+		)
+
+		if err = tm.ReadConflictMarker(
+			s,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = u.GetStore().RunMergeTool(
+			tm,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

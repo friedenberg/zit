@@ -2,6 +2,7 @@ package collections_ptr
 
 import (
 	"flag"
+	"iter"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -74,6 +75,10 @@ type flagCommas[
 	interfaces.MutableSetPtrLike[T, TPtr]
 	pool     interfaces.Pool[T, TPtr]
 	resetter interfaces.Resetter2[T, TPtr]
+}
+
+func (f flagCommas[T, TPtr]) All() iter.Seq[T] {
+	return f.MutableSetPtrLike.All()
 }
 
 func (f flagCommas[T, TPtr]) GetSetPtrLike() (s interfaces.SetPtrLike[T, TPtr]) {

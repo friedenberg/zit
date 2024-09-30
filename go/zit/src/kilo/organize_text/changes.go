@@ -2,6 +2,7 @@ package organize_text
 
 import (
 	"fmt"
+	"iter"
 	"sort"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -25,6 +26,16 @@ type skuExternalLikeWithIndex struct {
 type SkuMapWithOrder struct {
 	m    map[string]skuExternalLikeWithIndex
 	next int
+}
+
+func (smwo *SkuMapWithOrder) AllSkuAndIndex() iter.Seq2[int, sku.ExternalLike] {
+	return func(yield func(int, sku.ExternalLike) bool) {
+		for _, sk := range smwo.m {
+			if !yield(sk.int, sk.ExternalLike) {
+				break
+			}
+		}
+	}
 }
 
 func (smwo *SkuMapWithOrder) AsExternalLikeSet() sku.ExternalLikeMutableSet {
@@ -197,13 +208,13 @@ func ChangesFromResults(
 		}
 	}
 
-	for _, sk := range c.Removed.m {
-		if err = results.Before.RemoveFromTransacted(sk.ExternalLike); err != nil {
+	for _, sk := range c.Removed.AllSkuAndIndex() {
+		if err = results.Before.RemoveFromTransacted(sk); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = c.Changed.Add(sk.ExternalLike); err != nil {
+		if err = c.Changed.Add(sk); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

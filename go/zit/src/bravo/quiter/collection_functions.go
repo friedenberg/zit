@@ -48,31 +48,23 @@ func CheckAnyPtr[
 }
 
 func CheckAny[T any](c interfaces.Collection[T], f func(T) bool) bool {
-	err := c.Each(
-		func(e T) (err error) {
-			if f(e) {
-				err = errors.ErrTrue
-			}
+	for e := range c.All() {
+		if f(e) {
+			return true
+		}
+	}
 
-			return
-		},
-	)
-
-	return errors.IsErrTrue(err)
+	return false
 }
 
 func All[T any](c interfaces.Collection[T], f func(T) bool) bool {
-	err := c.Each(
-		func(e T) (err error) {
-			if !f(e) {
-				err = errors.ErrFalse
-			}
+	for e := range c.All() {
+		if !f(e) {
+			return false
+		}
+	}
 
-			return
-		},
-	)
-
-	return !errors.IsErrFalse(err)
+	return true
 }
 
 func MakeFuncSetString[
@@ -107,62 +99,26 @@ func Len(cs ...interfaces.Lenner) (n int) {
 	return
 }
 
-func Map[E interfaces.Value[E], F interfaces.Value[F]](
-	in interfaces.SetLike[E],
-	tr interfaces.FuncTransform[E, F],
-	out interfaces.MutableSetLike[F],
-) (err error) {
-	if err = in.Each(
-		func(e E) (err error) {
-			var e1 F
-
-			if e1, err = tr(e); err != nil {
-				if IsStopIteration(err) {
-					err = nil
-				} else {
-					err = errors.Wrap(err)
-				}
-
-				return
-			}
-
-			return out.Add(e1)
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func DerivedValues[E any, F any](
 	c interfaces.SetLike[E],
 	f interfaces.FuncTransform[E, F],
 ) (out []F, err error) {
 	out = make([]F, 0, c.Len())
 
-	if err = c.Each(
-		func(e E) (err error) {
-			var e1 F
+	for e := range c.All() {
+		var e1 F
 
-			if e1, err = f(e); err != nil {
-				if IsStopIteration(err) {
-					err = nil
-				} else {
-					err = errors.Wrap(err)
-				}
-
-				return
+		if e1, err = f(e); err != nil {
+			if IsStopIteration(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
 			}
 
-			out = append(out, e1)
-
 			return
-		},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+		}
+
+		out = append(out, e1)
 	}
 
 	return

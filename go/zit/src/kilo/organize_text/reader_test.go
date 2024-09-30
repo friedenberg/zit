@@ -161,10 +161,9 @@ func TestAssignmentLineReader2Heading2Zettels(t *testing.T) {
 	t1 := test_logz.T{T: t}
 
 	input := `# wow
-
-    - [one/wow] uno
-    - [dos/wow] two/wow
-    `
+- [one/wow] uno
+- [dos/wow] two/wow
+`
 
 	sr := strings.NewReader(input)
 	sub := makeAssignmentLineReader()
@@ -220,12 +219,10 @@ func TestAssignmentLineReader1_1Heading2_2Zettels(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
 	input := `# wow
-
-    ## sub-wow
-
-    - [one/wow] uno
-    - [dos/wow] two/wow
-    `
+## sub-wow
+- [one/wow] uno
+- [dos/wow] two/wow
+`
 
 	sr := strings.NewReader(input)
 	sub := makeAssignmentLineReader()
@@ -291,19 +288,19 @@ func TestAssignmentLineReader2_1Heading2_2_2Zettels(t *testing.T) {
 
 	input := `# wow
 
-    - [one/wow] uno
-    - [dos/wow] two/wow
+- [one/wow] uno
+- [dos/wow] two/wow
 
-    ## sub-wow
+## sub-wow
 
-    - [three/wow] tres
-    - [four/wow] quatro
+- [three/wow] tres
+- [four/wow] quatro
 
-    # cow
+# cow
 
-    - [one/wow] uno
-    - [dos/wow] two/wow
-    `
+- [one/wow] uno
+- [dos/wow] two/wow
+`
 
 	sr := strings.NewReader(input)
 	sub := makeAssignmentLineReader()
@@ -385,19 +382,19 @@ func TestAssignmentLineReader2_1Heading2_2_2ZettelsOffset(t *testing.T) {
 	t1 := test_logz.T{T: t}
 
 	input := `
-    - [one/wow] uno
-    - [dos/wow] two/wow
+- [one/wow] uno
+- [dos/wow] two/wow
 
-    ## sub-wow
+## sub-wow
 
-    - [three/wow] tres
-    - [four/wow] quatro
+- [three/wow] tres
+- [four/wow] quatro
 
-    ## sub-cow
+## sub-cow
 
-    - [one/wow] uno
-    - [dos/wow] two/wow
-    `
+- [one/wow] uno
+- [dos/wow] two/wow
+`
 
 	sr := strings.NewReader(input)
 	sub := makeAssignmentLineReader()
@@ -462,17 +459,17 @@ func TestAssignmentLineReaderBigCheese(t *testing.T) {
 	t1 := test_logz.T{T: t}
 
 	input := `# task
-    - [one/wow] uno
-    - [two/wow] dos/wow
-    ## priority-1
-    ### w-2022-07-09
-    - [three/wow] tres
-    ###
-    - [four/wow] quatro
-    ## priority-2
-    - [five/wow] cinco
-    - [six/wow] seis
-    `
+- [one/wow] uno
+- [two/wow] dos/wow
+## priority-1
+### w-2022-07-09
+- [three/wow] tres
+###
+- [four/wow] quatro
+## priority-2
+- [five/wow] cinco
+- [six/wow] seis
+`
 
 	sr := strings.NewReader(input)
 	sub := makeAssignmentLineReader()

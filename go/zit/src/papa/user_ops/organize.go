@@ -54,11 +54,10 @@ func (op Organize) RunWithTransacted(
 	transacted sku.TransactedSet,
 ) (organizeResults organize_text.OrganizeResults, err error) {
 	skus := sku.MakeExternalLikeMutableSet()
-	transacted.Each(
-		func(z *sku.Transacted) (err error) {
-			return skus.Add(z)
-		},
-	)
+
+	for z := range transacted.All() {
+		skus.Add(z)
+	}
 
 	if organizeResults, err = op.RunWithExternalLike(qg, skus); err != nil {
 		err = errors.Wrap(err)

@@ -1,6 +1,8 @@
 package collections_value
 
 import (
+	"iter"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
@@ -11,6 +13,26 @@ type Set[
 ] struct {
 	K interfaces.StringKeyer[T]
 	E map[string]T
+}
+
+func (s Set[T]) AllKeys() iter.Seq[string] {
+	return func(yield func(string) bool) {
+		for k := range s.E {
+			if !yield(k) {
+				break
+			}
+		}
+	}
+}
+
+func (s Set[T]) All() iter.Seq[T] {
+	return func(yield func(T) bool) {
+		for _, e := range s.E {
+			if !yield(e) {
+				break
+			}
+		}
+	}
 }
 
 func (s Set[T]) Len() int {

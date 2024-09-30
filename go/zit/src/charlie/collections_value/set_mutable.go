@@ -1,6 +1,8 @@
 package collections_value
 
 import (
+	"iter"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
@@ -19,6 +21,26 @@ func (s MutableSet[T]) Len() int {
 	}
 
 	return len(s.E)
+}
+
+func (s MutableSet[T]) All() iter.Seq[T] {
+	return func(yield func(T) bool) {
+		for _, e := range s.E {
+			if !yield(e) {
+				break
+			}
+		}
+	}
+}
+
+func (s MutableSet[T]) AllKeys() iter.Seq[string] {
+	return func(yield func(string) bool) {
+		for k := range s.E {
+			if !yield(k) {
+				break
+			}
+		}
+	}
 }
 
 func (s MutableSet[T]) Key(e T) string {
