@@ -33,7 +33,7 @@ func (u *Env) Unlock() (err error) {
 		u.GetStore().GetStreamIndex().SetNeedsFlushHistory(changes)
 
 		ui.Log().Print("will flush bestandsaufnahme")
-		if err = u.store.FlushBestandsaufnahme(ptl); err != nil {
+		if err = u.store.FlushInventoryList(ptl); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

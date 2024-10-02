@@ -233,7 +233,8 @@ func (f *Box) WriteStringFormatExternal(
 
 		m := &e.Metadata
 
-		if f.Options.PrintShas {
+		if f.Options.PrintShas &&
+			(f.Options.PrintEmptyShas || !m.Blob.IsNull()) {
 			var shaString string
 
 			if shaString, err = object_metadata_fmt.MetadataShaString(

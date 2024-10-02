@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
@@ -170,7 +169,7 @@ func (k *compiled) setTransacted(
 
 	sku.Resetter.ResetWith(&k.Sku, kt1)
 
-	k.setHasChanges(fmt.Sprintf("updated konfig: %s", &k.Sku))
+	k.setNeedsRecompile(fmt.Sprintf("updated konfig: %s", &k.Sku))
 
 	var a *mutable_config.Blob
 
@@ -225,11 +224,12 @@ func (k *Compiled) AddTransacted(
 	kinder *sku.Transacted,
 	mutter *sku.Transacted,
 	ak *blob_store.VersionedStores,
-	mode objekte_mode.Mode,
 ) (err error) {
 	didChange := false
 
-	switch kinder.ObjectId.GetGenre() {
+  g := kinder.ObjectId.GetGenre()
+
+	switch g {
 	case genres.Type:
 		if didChange, err = k.addType(kinder); err != nil {
 			err = errors.Wrap(err)
@@ -255,9 +255,23 @@ func (k *Compiled) AddTransacted(
 		}
 	}
 
-	if didChange && (mutter != nil || mode.Contains(objekte_mode.ModeSchwanz)) {
-		k.SetHasChanges(fmt.Sprintf("added: %s", kinder))
-	}
+  if g != genres.Tag {
+    return
+  }
+
+  if !didChange {
+    return
+  }
+
+  if mutter == nil {
+    return
+  }
+
+  if quiter.SetEquals(kinder.Metadata.Tags, mutter.Metadata.Tags) {
+    return
+  }
+
+  k.SetNeedsRecompile(fmt.Sprintf("modified: %s", kinder))
 
 	return
 }

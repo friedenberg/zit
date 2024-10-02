@@ -139,14 +139,14 @@ func (kc *Compiled) GetChanges() (out []string) {
 	return
 }
 
-func (kc *compiled) SetHasChanges(reason string) {
+func (kc *compiled) SetNeedsRecompile(reason string) {
 	kc.lock.Lock()
 	defer kc.lock.Unlock()
 
-	kc.setHasChanges(reason)
+	kc.setNeedsRecompile(reason)
 }
 
-func (kc *compiled) setHasChanges(reason string) {
+func (kc *compiled) setNeedsRecompile(reason string) {
 	ui.Log().FunctionName(1)
 	kc.changes = append(kc.changes, reason)
 }

@@ -9,9 +9,9 @@ func _() {
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
 	_ = x[ModeEmpty-0]
-	_ = x[ModeAddToBestandsaufnahme-2]
+	_ = x[ModeAddToInventoryList-2]
 	_ = x[ModeUpdateTai-4]
-	_ = x[ModeSchwanz-8]
+	_ = x[ModeLatest-8]
 	_ = x[ModeMergeCheckedOut-16]
 	_ = x[ModeApplyProto-32]
 	_ = x[ModeHooks-64]
@@ -19,9 +19,9 @@ func _() {
 
 const (
 	_Mode_name_0 = "ModeEmpty"
-	_Mode_name_1 = "ModeAddToBestandsaufnahme"
+	_Mode_name_1 = "ModeAddToInventoryList"
 	_Mode_name_2 = "ModeUpdateTai"
-	_Mode_name_3 = "ModeSchwanz"
+	_Mode_name_3 = "ModeLatest"
 	_Mode_name_4 = "ModeMergeCheckedOut"
 	_Mode_name_5 = "ModeApplyProto"
 	_Mode_name_6 = "ModeHooks"

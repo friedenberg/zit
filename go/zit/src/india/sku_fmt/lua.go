@@ -10,9 +10,9 @@ import (
 
 // TODO setup versions of LuaTable
 type LuaTable struct {
-	Transacted        *lua.LTable
-	Etiketten         *lua.LTable
-	EtikettenImplicit *lua.LTable
+	Transacted   *lua.LTable
+	Tags         *lua.LTable
+	TagsImplicit *lua.LTable
 }
 
 func ToLuaTable(tg sku.TransactedGetter, l *lua.LState, t *LuaTable) {
@@ -22,20 +22,20 @@ func ToLuaTable(tg sku.TransactedGetter, l *lua.LState, t *LuaTable) {
 	l.SetField(t.Transacted, "Kennung", lua.LString(o.GetObjectId().String()))
 	l.SetField(t.Transacted, "Typ", lua.LString(o.GetType().String()))
 
-	etiketten := t.Etiketten
+	tags := t.Tags
 
 	o.Metadata.GetTags().EachPtr(
 		func(e *ids.Tag) (err error) {
-			l.SetField(etiketten, e.String(), lua.LBool(true))
+			l.SetField(tags, e.String(), lua.LBool(true))
 			return
 		},
 	)
 
-	etiketten = t.EtikettenImplicit
+	tags = t.TagsImplicit
 
 	o.Metadata.Cache.GetImplicitTags().EachPtr(
 		func(e *ids.Tag) (err error) {
-			l.SetField(etiketten, e.String(), lua.LBool(true))
+			l.SetField(tags, e.String(), lua.LBool(true))
 			return
 		},
 	)

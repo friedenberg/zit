@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list"
 )
 
-func (s *Store) FlushBestandsaufnahme(
+func (s *Store) FlushInventoryList(
 	p interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	if s.GetKonfig().DryRun {
@@ -25,9 +25,9 @@ func (s *Store) FlushBestandsaufnahme(
 
 	ui.Log().Printf("saving Bestandsaufnahme")
 
-	var bestandsaufnahmeSku *sku.Transacted
+	var inventoryListSku *sku.Transacted
 
-	if bestandsaufnahmeSku, err = s.GetInventoryListStore().Create(
+	if inventoryListSku, err = s.GetInventoryListStore().Create(
 		s.inventoryList,
 		s.GetKonfig().Description,
 	); err != nil {
@@ -40,11 +40,11 @@ func (s *Store) FlushBestandsaufnahme(
 		}
 	}
 
-	if bestandsaufnahmeSku != nil {
-		defer sku.GetTransactedPool().Put(bestandsaufnahmeSku)
+	if inventoryListSku != nil {
+		defer sku.GetTransactedPool().Put(inventoryListSku)
 
 		if s.GetKonfig().PrintOptions.PrintBestandsaufnahme {
-			if err = p(bestandsaufnahmeSku); err != nil {
+			if err = p(inventoryListSku); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

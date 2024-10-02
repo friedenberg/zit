@@ -120,7 +120,7 @@ func (s *Store) tryPreCommitHooks(
 	o sku.CommitOptions,
 ) (err error) {
 	if !o.Mode.Contains(objekte_mode.ModeHooks) &&
-		!o.Mode.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
+		!o.Mode.Contains(objekte_mode.ModeAddToInventoryList) {
 		return
 	}
 

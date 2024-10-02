@@ -241,7 +241,7 @@ func (c *FormatObject) getBlobFormatter(
 
 	if c.UTIGroup == "" {
     if formatId == "" {
-      formatId = "text-edit"
+      formatId = "text"
     }
 
 		blobFormatter, ok = typeBlob.Formatters[formatId]

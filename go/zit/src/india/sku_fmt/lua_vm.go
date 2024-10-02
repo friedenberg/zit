@@ -73,18 +73,18 @@ func MakeLuaTablePool(vm *lua.VM) LuaTablePool {
 		func() (t *LuaTable) {
 			t = &LuaTable{
 				Transacted:        vm.Pool.Get(),
-				Etiketten:         vm.Pool.Get(),
-				EtikettenImplicit: vm.Pool.Get(),
+				Tags:         vm.Pool.Get(),
+				TagsImplicit: vm.Pool.Get(),
 			}
 
-			vm.SetField(t.Transacted, "Etiketten", t.Etiketten)
-			vm.SetField(t.Transacted, "EtikettenImplicit", t.EtikettenImplicit)
+			vm.SetField(t.Transacted, "Etiketten", t.Tags)
+			vm.SetField(t.Transacted, "EtikettenImplicit", t.TagsImplicit)
 
 			return
 		},
 		func(t *LuaTable) {
-			lua.ClearTable(vm.LState, t.Etiketten)
-			lua.ClearTable(vm.LState, t.EtikettenImplicit)
+			lua.ClearTable(vm.LState, t.Tags)
+			lua.ClearTable(vm.LState, t.TagsImplicit)
 		},
 	)
 }

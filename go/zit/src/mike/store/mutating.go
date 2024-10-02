@@ -70,7 +70,7 @@ func (s *Store) tryRealizeAndOrStore(
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() &&
 		o.ContainsAny(
-			objekte_mode.ModeAddToBestandsaufnahme,
+			objekte_mode.ModeAddToInventoryList,
 		) {
 		err = errors.Wrap(file_lock.ErrLockRequired{
 			Operation: "commit",
@@ -81,7 +81,7 @@ func (s *Store) tryRealizeAndOrStore(
 
 	// TAI must be set before calculating objekte sha
 	if o.ContainsAny(
-		objekte_mode.ModeAddToBestandsaufnahme,
+		objekte_mode.ModeAddToInventoryList,
 		objekte_mode.ModeUpdateTai,
 	) {
 		if o.Clock == nil {
@@ -92,7 +92,7 @@ func (s *Store) tryRealizeAndOrStore(
 	}
 
 	if o.ContainsAny(
-		objekte_mode.ModeAddToBestandsaufnahme,
+		objekte_mode.ModeAddToInventoryList,
 	) && (kinder.ObjectId.IsEmpty() || kinder.GetGenre() == genres.Unknown) {
 		var ken *ids.ZettelId
 
@@ -124,7 +124,7 @@ func (s *Store) tryRealizeAndOrStore(
 		return
 	}
 
-	if o.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
+	if o.Contains(objekte_mode.ModeAddToInventoryList) {
 		if err = s.addMatchableTypAndEtikettenIfNecessary(kinder); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -150,7 +150,7 @@ func (s *Store) tryRealizeAndOrStore(
 
 		sku.TransactedResetter.ResetWithExceptFields(kinder, mutter)
 
-		if o.Mode.Contains(objekte_mode.ModeSchwanz) {
+		if o.Mode.Contains(objekte_mode.ModeLatest) {
 			if err = s.Unchanged(kinder); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -167,12 +167,11 @@ func (s *Store) tryRealizeAndOrStore(
 		return
 	}
 
-	if o.Mode.Contains(objekte_mode.ModeSchwanz) {
+	if o.Mode.Contains(objekte_mode.ModeLatest) {
 		if err = s.GetKonfig().AddTransacted(
 			kinder,
 			mutter,
 			s.GetBlobStore(),
-			o.Mode,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -192,7 +191,7 @@ func (s *Store) tryRealizeAndOrStore(
 
 	}
 
-	if o.Contains(objekte_mode.ModeAddToBestandsaufnahme) {
+	if o.Contains(objekte_mode.ModeAddToInventoryList) {
 		ui.Log().Print("adding to bestandsaufnahme", o, kinder)
 		if err = s.commitTransacted(kinder, mutter); err != nil {
 			err = errors.Wrap(err)
@@ -207,7 +206,7 @@ func (s *Store) tryRealizeAndOrStore(
 		err = nil
 	}
 
-	if o.Contains(objekte_mode.ModeSchwanz) {
+	if o.Contains(objekte_mode.ModeLatest) {
 		if err = s.GetStreamIndex().Add(
 			kinder,
 			kinder.GetObjectId().String(),

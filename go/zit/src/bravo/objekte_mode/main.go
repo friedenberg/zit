@@ -18,17 +18,17 @@ type Mode byte
 
 const (
 	ModeEmpty                 = Mode(iota)
-	ModeAddToBestandsaufnahme = Mode(1 << iota) // proper commit
+	ModeAddToInventoryList = Mode(1 << iota) // proper commit
 	ModeUpdateTai                               // update the tai
-	ModeSchwanz                                 // only features updates that have no retroactive effects
+	ModeLatest                                  // only features updates that have no retroactive effects
 	ModeMergeCheckedOut
 	ModeApplyProto
 	ModeHooks
 
 	ModeRealizeWithProto = ModeUpdateTai | ModeApplyProto | ModeHooks
 	ModeRealizeSansProto = ModeUpdateTai | ModeHooks
-	ModeReindex          = ModeSchwanz
-	ModeCommit           = ModeReindex | ModeAddToBestandsaufnahme | ModeHooks
+	ModeReindex          = ModeLatest
+	ModeCommit           = ModeReindex | ModeAddToInventoryList | ModeHooks
 	ModeCreate           = ModeCommit | ModeApplyProto
 )
 

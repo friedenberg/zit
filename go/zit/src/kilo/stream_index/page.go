@@ -91,7 +91,7 @@ func (pt *Page) add(
 
 	sku.TransactedResetter.ResetWith(z, z1)
 
-	if mode.Contains(objekte_mode.ModeSchwanz) {
+	if mode.Contains(objekte_mode.ModeLatest) {
 		pt.addedLatest.Add(z)
 	} else {
 		pt.added.Add(z)
