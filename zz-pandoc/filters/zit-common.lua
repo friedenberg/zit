@@ -58,7 +58,7 @@ function UnescapeIfSku(table, key)
     return
   end
 
-  table[key] = common.Unescape(el)
+  table[key] = Unescape(el)
 
   return
 end

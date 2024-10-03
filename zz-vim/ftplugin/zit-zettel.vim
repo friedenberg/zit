@@ -62,8 +62,8 @@ function! ZitMakeUTIGroupCommand(uti_group, cmd_args_unprocessed_list)
     let l:cmd_sub_args = [
           \ "$BIN_ZIT", "format-object", "-mode blob",
           \ "-uti-group", a:uti_group,
-          \ l:uti,
           \ GetObjectId(),
+          \ l:uti,
           \ "2>/dev/null",
           \ ]
 

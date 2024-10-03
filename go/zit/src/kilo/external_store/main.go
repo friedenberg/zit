@@ -48,6 +48,13 @@ type (
 		) (err error)
 	}
 
+	UpdateCheckoutFromCheckedOut interface {
+		UpdateCheckoutFromCheckedOut(
+			options checkout_options.OptionsWithoutMode,
+			co *sku.CheckedOut,
+		) (err error)
+	}
+
 	QueryCheckedOut = query.QueryCheckedOut
 
 	Supplies struct {
@@ -56,7 +63,7 @@ type (
 		fs_home.Home
 		ids.RepoId
 		ids.TypeSet
-    ids.Clock
+		ids.Clock
 	}
 
 	StoreLike interface {
