@@ -118,7 +118,10 @@ func (c *Add) RunWithQuery(
 		Env: u,
 	}
 
-	if err = opOrganize.Metadata.SetFromObjectMetadata(&c.Metadata); err != nil {
+	if err = opOrganize.Metadata.SetFromObjectMetadata(
+		&c.Metadata,
+		qg.RepoId,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -163,6 +163,7 @@ func (c Clean) runOrganize(u *env.Env, qg *query.Group) (err error) {
 	opOrganize := user_ops.Organize{
 		Env: u,
 		Metadata: organize_text.Metadata{
+			RepoId: qg.RepoId,
 			OptionCommentSet: organize_text.MakeOptionCommentSet(
 				nil,
 				organize_text.OptionCommentUnknown(

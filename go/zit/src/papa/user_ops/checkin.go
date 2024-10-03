@@ -78,6 +78,7 @@ func (op Checkin) runOrganize(
 	opOrganize := Organize{
 		Env: u,
 		Metadata: organize_text.Metadata{
+			RepoId: qg.RepoId,
 			OptionCommentSet: organize_text.MakeOptionCommentSet(
 				map[string]organize_text.OptionComment{
 					"delete": flagDelete,

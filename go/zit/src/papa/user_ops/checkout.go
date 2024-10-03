@@ -162,6 +162,7 @@ func (op Checkout) runOrganize(
 	opOrganize := Organize{
 		Env: op.Env,
 		Metadata: organize_text.Metadata{
+			RepoId: qgOriginal.RepoId,
 			OptionCommentSet: organize_text.MakeOptionCommentSet(
 				// TODO add other OptionComments
 				nil,

@@ -49,6 +49,7 @@ func (m *Metadata) GetTags() ids.TagSet {
 
 func (m *Metadata) SetFromObjectMetadata(
 	om *object_metadata.Metadata,
+	repoId ids.RepoId,
 ) (err error) {
 	m.TagSet = om.Tags.CloneSetPtrLike()
 

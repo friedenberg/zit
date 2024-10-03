@@ -142,7 +142,10 @@ func (c *New) Run(u *env.Env, args ...string) (err error) {
 			Env: u,
 		}
 
-		if err = opOrganize.Metadata.SetFromObjectMetadata(&c.Metadata); err != nil {
+		if err = opOrganize.Metadata.SetFromObjectMetadata(
+			&c.Metadata,
+			ids.RepoId{},
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
