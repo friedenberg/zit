@@ -64,9 +64,9 @@ func (ot *Text) GetSkus(
 }
 
 func (a *Assignment) addToSet(
-	organizeText *Text,
-	out SkuMapWithOrder,
-	original sku.ExternalLikeSet,
+	ot *Text,
+	output SkuMapWithOrder,
+	objectsFromBefore sku.ExternalLikeSet,
 ) (err error) {
 	expanded := ids.MakeTagMutableSet()
 
@@ -75,95 +75,104 @@ func (a *Assignment) addToSet(
 		return
 	}
 
-	for _, o := range a.All() {
-		var selwi skuExternalLikeWithIndex
-		var z sku.ExternalLike
-		ok := false
+	for _, organizeObject := range a.All() {
+		var outputObject sku.ExternalLike
 
-		k := key(o.External)
+		objectKey := key(organizeObject.External)
 
-		if selwi, ok = out.m[k]; !ok {
-			z = organizeText.ObjectFactory.Get()
+		previouslyProcessedObject, wasPreviouslyProcessed := output.m[objectKey]
 
-			organizeText.ObjectFactory.ResetWith(z, o.External)
+		if !wasPreviouslyProcessed {
+			outputObject = ot.ObjectFactory.Get()
 
-			if !organizeText.Metadata.Type.IsEmpty() {
-				z.GetSku().Metadata.Type.ResetWith(organizeText.Metadata.Type)
+			ot.ObjectFactory.ResetWith(outputObject, organizeObject.External)
+
+			if !ot.Metadata.Type.IsEmpty() {
+				outputObject.GetSku().Metadata.Type.ResetWith(ot.Metadata.Type)
 			}
 
-			out.Add(z)
+			outputObject.GetSku().RepoId.ResetWith(ot.Metadata.RepoId)
 
-			zPrime, hasOriginal := original.Get(original.Key(o.External))
+			output.Add(outputObject)
+
+			objectOriginal, hasOriginal := objectsFromBefore.Get(
+				objectsFromBefore.Key(organizeObject.External),
+			)
 
 			if hasOriginal {
-				z.GetSku().Metadata.Blob.ResetWith(&zPrime.GetSku().Metadata.Blob)
-				z.GetSku().Metadata.Type.ResetWith(zPrime.GetSku().Metadata.Type)
+				outputObject.GetSku().Metadata.Blob.ResetWith(
+					&objectOriginal.GetSku().Metadata.Blob,
+				)
+
+				outputObject.GetSku().Metadata.Type.ResetWith(
+					objectOriginal.GetSku().Metadata.Type,
+				)
 			}
 
-			m := z.GetSku().GetMetadata()
+			outputMetadata := outputObject.GetSku().GetMetadata()
 
-			for e := range organizeText.Metadata.AllPtr() {
-        if o.Type == tag_paths.TypeUnknown {
-          continue
-        }
+			for e := range ot.Metadata.AllPtr() {
+				if organizeObject.Type == tag_paths.TypeUnknown {
+					continue
+				}
 
-				if _, ok := m.Cache.TagPaths.All.ContainsComparer(
+				if _, ok := outputMetadata.Cache.TagPaths.All.ContainsComparer(
 					catgut.ComparerString(e.String()),
 				); ok {
 					continue
 				}
 
-				z.GetSku().AddTagPtr(e)
+				outputObject.GetSku().AddTagPtr(e)
 			}
 
-			if !organizeText.Metadata.Type.IsEmpty() {
-				z.GetSku().Metadata.Type.ResetWith(organizeText.Metadata.Type)
+			if !ot.Metadata.Type.IsEmpty() {
+				outputObject.GetSku().Metadata.Type.ResetWith(ot.Metadata.Type)
 			}
 		} else {
-			z = selwi.ExternalLike
+			outputObject = previouslyProcessedObject.ExternalLike
 		}
 
-		if o.External.GetSku().ObjectId.String() == "" {
-			panic(fmt.Sprintf("%s: object id is nil", o))
+		if organizeObject.External.GetSku().ObjectId.String() == "" {
+			panic(fmt.Sprintf("%s: object id is nil", organizeObject))
 		}
 
-		if z == nil {
+		if outputObject == nil {
 			panic("empty object")
 		}
 
-		if err = z.GetSku().Metadata.Description.Set(
-			o.External.GetSku().Metadata.Description.String(),
+		if err = outputObject.GetSku().Metadata.Description.Set(
+			organizeObject.External.GetSku().Metadata.Description.String(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if !o.External.GetSku().Metadata.Type.IsEmpty() {
-			if err = z.GetSku().Metadata.Type.Set(
-				o.External.GetSku().Metadata.Type.String(),
+		if !organizeObject.External.GetSku().Metadata.Type.IsEmpty() {
+			if err = outputObject.GetSku().Metadata.Type.Set(
+				organizeObject.External.GetSku().Metadata.Type.String(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 		}
 
-		if !o.IsDirectOrSelf() {
+		if !organizeObject.IsDirectOrSelf() {
 			return
 		}
 
-		z.GetSku().Metadata.Comments = append(
-			z.GetSku().Metadata.Comments,
-			o.External.GetSku().Metadata.Comments...,
+		outputObject.GetSku().Metadata.Comments = append(
+			outputObject.GetSku().Metadata.Comments,
+			organizeObject.External.GetSku().Metadata.Comments...,
 		)
 
-		if err = o.External.GetSku().Metadata.GetTags().EachPtr(
-			z.GetSku().AddTagPtr,
+		if err = organizeObject.External.GetSku().Metadata.GetTags().EachPtr(
+			outputObject.GetSku().AddTagPtr,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		m := z.GetSku().GetMetadata()
+		m := outputObject.GetSku().GetMetadata()
 
 		for e := range expanded.AllPtr() {
 			m.AddTagPtr(e)
@@ -171,7 +180,7 @@ func (a *Assignment) addToSet(
 	}
 
 	for _, c := range a.Children {
-		if err = c.addToSet(organizeText, out, original); err != nil {
+		if err = c.addToSet(ot, output, objectsFromBefore); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
