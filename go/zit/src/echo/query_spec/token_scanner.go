@@ -8,20 +8,19 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 )
 
 type TokenScanner struct {
 	io.RuneScanner
-	tokenTypeProbably token_types.TokenType
-	tokenType         token_types.TokenType
-	token             catgut.String
-	parts             TokenParts
-	colorType         string_format_writer.ColorType
-	err               error
-	unscan            []rune
-	n                 int64
-	lastRune          rune
+	tokenTypeProbably  token_types.TokenType
+	tokenType          token_types.TokenType
+	token              catgut.String
+	parts              TokenParts
+	sawNonLiteralQuote bool
+	err                error
+	unscan             []rune
+	n                  int64
+	lastRune           rune
 }
 
 func (ts *TokenScanner) Reset(r io.RuneScanner) {
@@ -30,7 +29,7 @@ func (ts *TokenScanner) Reset(r io.RuneScanner) {
 	ts.tokenType = token_types.TypeIncomplete
 	ts.tokenTypeProbably = token_types.TypeIncomplete
 	ts.parts.Reset()
-	ts.colorType = string_format_writer.ColorTypeNormal
+	ts.sawNonLiteralQuote = false
 	ts.err = nil
 	ts.unscan = nil
 	ts.n = 0
@@ -106,7 +105,7 @@ func (ts *TokenScanner) ScanIdentifierLikeSkipSpaces() (ok bool) {
 	ts.tokenType = token_types.TypeIncomplete
 	ts.tokenTypeProbably = token_types.TypeIncomplete
 	ts.parts.Reset()
-	ts.colorType = string_format_writer.ColorTypeNormal
+	ts.sawNonLiteralQuote = false
 
 	for {
 		var r rune
@@ -128,6 +127,7 @@ func (ts *TokenScanner) ScanIdentifierLikeSkipSpaces() (ok bool) {
 
 		switch {
 		case r == '"' || r == '\'':
+			ts.sawNonLiteralQuote = true
 			ts.tokenType = token_types.TypeLiteral
 
 			if !ts.consumeLiteralOrFieldValue(r, token_types.TypeLiteral, &ts.parts.Left) {
@@ -198,6 +198,7 @@ func (ts *TokenScanner) Scan() (ok bool) {
 	ts.token.Reset()
 	ts.tokenType = token_types.TypeIncomplete
 	ts.tokenTypeProbably = token_types.TypeIncomplete
+	ts.sawNonLiteralQuote = false
 	ts.parts.Reset()
 
 	for {
@@ -221,6 +222,7 @@ func (ts *TokenScanner) Scan() (ok bool) {
 		switch {
 		case r == '"' || r == '\'':
 			ts.tokenType = token_types.TypeLiteral
+			ts.sawNonLiteralQuote = true
 
 			if !ts.consumeLiteralOrFieldValue(r, token_types.TypeLiteral, &ts.parts.Left) {
 				ok = false
@@ -322,10 +324,6 @@ func (ts *TokenScanner) consumeLiteralOrFieldValue(
 			return
 		}
 
-		if unicode.IsSpace(r) {
-			ts.colorType = string_format_writer.ColorTypeUserData
-		}
-
 		ts.token.WriteRune(r)
 
 		if r != start || lastWasBackslash {
@@ -411,10 +409,6 @@ func (ts *TokenScanner) GetTokenAndType() (*catgut.String, token_types.TokenType
 
 func (ts *TokenScanner) GetTokenAndTypeAndParts() (*catgut.String, token_types.TokenType, TokenParts) {
 	return &ts.token, ts.tokenType, ts.parts
-}
-
-func (ts *TokenScanner) GetColorType() string_format_writer.ColorType {
-	return ts.colorType
 }
 
 func (ts *TokenScanner) N() int64 {
