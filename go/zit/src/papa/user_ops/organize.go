@@ -160,8 +160,8 @@ func (op Organize) RunWithExternalLike(
 		if organizeResults.After, err = readOrganizeTextOp.Run(
 			op.Env,
 			f,
-			organizeResults.QueryGroup.RepoId,
 			organize_text.NewMetadataWithOptionCommentLookup(
+				organizeResults.Before.Metadata.RepoId,
 				op.GetPrototypeOptionComments(),
 			),
 		); err != nil {

@@ -18,17 +18,20 @@ type TagSetGetter interface {
 	GetTags() ids.TagSet
 }
 
-func NewMetadata() Metadata {
+func NewMetadata(repoId ids.RepoId) Metadata {
 	return Metadata{
+		RepoId:           repoId,
 		TagSet:           ids.MakeTagSet(),
 		OptionCommentSet: MakeOptionCommentSet(nil),
 	}
 }
 
 func NewMetadataWithOptionCommentLookup(
+	repoId ids.RepoId,
 	elements map[string]OptionComment,
 ) Metadata {
 	return Metadata{
+		RepoId:           repoId,
 		TagSet:           ids.MakeTagSet(),
 		OptionCommentSet: MakeOptionCommentSet(elements),
 	}

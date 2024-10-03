@@ -60,7 +60,7 @@ func MakeFlags() Flags {
 			wasMade:      true,
 			GroupingTags: ids.MakeTagSlice(),
 			Skus:         sku.MakeExternalLikeMutableSet(),
-			Metadata:     NewMetadata(),
+			Metadata:     NewMetadata(ids.RepoId{}),
 		},
 	}
 }

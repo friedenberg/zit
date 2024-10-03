@@ -136,8 +136,7 @@ func (c *Organize) RunWithQuery(
 		if organizeText, err = readOrganizeTextOp.Run(
 			u,
 			os.Stdin,
-			qg.RepoId,
-			organize_text.NewMetadata(),
+			organize_text.NewMetadata(qg.RepoId),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
