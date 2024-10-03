@@ -94,6 +94,8 @@ LOOP:
 						Value: string(tokenParts.Right),
 					}
 
+					field.ColorType = ts.GetColorType()
+
 					o.Metadata.Fields = append(o.Metadata.Fields, field)
 				}
 
@@ -105,6 +107,8 @@ LOOP:
 					field := string_format_writer.Field{
 						Value: t.String(),
 					}
+
+					field.ColorType = ts.GetColorType()
 
 					o.Metadata.Fields = append(o.Metadata.Fields, field)
 				}

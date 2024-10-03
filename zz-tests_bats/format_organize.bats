@@ -179,3 +179,23 @@ function create_bare_object_description_line_wrap { # @test
 		- [/] this is a long description
 	EOM
 }
+
+function with_fields_and_instructions { # @test
+	run_zit_init_disable_age
+
+	function cat_body {
+		cat <<-EOM
+			---
+			% instructions: to prevent an object from being checked in, delete it entirely
+			% delete:false delete once checked in
+			---
+
+			- [/firefox-ddog/bookmark-9ikbbKaAXmb7 title="CI Visibility Tests" url="https://docs.datadoghq.com/api/latest/ci-visibility-tests/#aggregate-tests-events"] CI Visibility Tests
+			- [/firefox-ddog/bookmark-BNLiQZXO8rEK title="Unbound can't resolve specific domain : r/pihole" url="https://www.reddit.com/r/pihole/comments/os2jqb/unbound_cant_resolve_specific_domain/"] Unbound can't resolve specific domain : r/pihole
+		EOM
+	}
+
+	run_zit format-organize "${cmd_def_organize[@]}" <(cat_body)
+	assert_success
+	assert_output "$(cat_body)"
+}
