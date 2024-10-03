@@ -83,9 +83,9 @@ func (op Checkin) runOrganize(
 				map[string]organize_text.OptionComment{
 					"delete": flagDelete,
 				},
-				organize_text.OptionCommentUnknown(
-					"instructions: to prevent an object from being checked in, delete it entirely",
-				),
+				&organize_text.OptionCommentUnknown{
+					Value: "instructions: to prevent an object from being checked in, delete it entirely",
+				},
 				organize_text.OptionCommentWithKey{
 					Key:           "delete",
 					OptionComment: flagDelete,

@@ -76,5 +76,10 @@ func StringMetadataSansTai(o *sku.Transacted) (str string) {
 		sb.WriteString("\"" + b.String() + "\"")
 	}
 
+	for _, field := range m.Fields {
+		sb.WriteString(" ")
+		fmt.Fprintf(sb, "%q=%q", field.Key, field.Value)
+	}
+
 	return sb.String()
 }

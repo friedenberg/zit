@@ -166,9 +166,9 @@ func (op Checkout) runOrganize(
 			OptionCommentSet: organize_text.MakeOptionCommentSet(
 				// TODO add other OptionComments
 				nil,
-				organize_text.OptionCommentUnknown(
-					"instructions: to prevent an object from being checked out, delete it entirely",
-				),
+				&organize_text.OptionCommentUnknown{
+					Value: "instructions: to prevent an object from being checked out, delete it entirely",
+				},
 			),
 		},
 		DontUseQueryGroupForOrganizeMetadata: true,

@@ -86,7 +86,7 @@ func (ocs *OptionCommentSet) Set(v string) (err error) {
 	if ok {
 		oc = oc.CloneOptionComment()
 	} else {
-		oc = OptionCommentUnknown("")
+		oc = &OptionCommentUnknown{}
 	}
 
 	oc = OptionCommentWithKey{
@@ -187,19 +187,21 @@ func (ocf *OptionCommentDryRun) String() string {
 	return fmt.Sprintf("%t", ocf.IsDryRun())
 }
 
-type OptionCommentUnknown string
-
-func (ocf OptionCommentUnknown) CloneOptionComment() OptionComment {
-	return ocf
+type OptionCommentUnknown struct {
+	Value string
 }
 
-func (ocf OptionCommentUnknown) Set(v string) (err error) {
-	ocf = OptionCommentUnknown(strings.TrimSpace(v))
+func (ocf OptionCommentUnknown) CloneOptionComment() OptionComment {
+	return &OptionCommentUnknown{Value: ocf.Value}
+}
+
+func (ocf *OptionCommentUnknown) Set(v string) (err error) {
+	ocf.Value = v
 	return
 }
 
 func (ocf OptionCommentUnknown) String() string {
-	return string(ocf)
+	return ocf.Value
 }
 
 type OptionCommentBooleanFlag struct {

@@ -166,9 +166,9 @@ func (c Clean) runOrganize(u *env.Env, qg *query.Group) (err error) {
 			RepoId: qg.RepoId,
 			OptionCommentSet: organize_text.MakeOptionCommentSet(
 				nil,
-				organize_text.OptionCommentUnknown(
-					"instructions: to clean an object, delete it entirely",
-				),
+				&organize_text.OptionCommentUnknown{
+					Value: "instructions: to clean an object, delete it entirely",
+				},
 			),
 		},
 		DontUseQueryGroupForOrganizeMetadata: true,
