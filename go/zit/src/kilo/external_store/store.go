@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -46,24 +45,23 @@ func (ve *Store) Flush() (err error) {
 	return
 }
 
-func (es *Store) QueryCheckedOut(
+func (s *Store) QueryCheckedOut(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	esqco, ok := es.StoreLike.(QueryCheckedOut)
+	es, ok := s.StoreLike.(QueryCheckedOut)
 
 	if !ok {
-		err = errors.Errorf("store does not support %T", &esqco)
+		err = makeErrUnsupportedOperation(s, &s)
 		return
 	}
 
-	if err = es.Initialize(); err != nil {
-		ui.Debug().Print(errors.Unwrap(err))
+	if err = s.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = esqco.QueryCheckedOut(
+	if err = es.QueryCheckedOut(
 		qg,
 		f,
 	); err != nil {
@@ -95,24 +93,24 @@ func (es *Store) ApplyDotOperator() (err error) {
 	return
 }
 
-func (es *Store) ReadExternalLikeFromObjectId(
+func (s *Store) ReadExternalLikeFromObjectId(
 	o sku.CommitOptions,
 	k1 interfaces.ObjectId,
 	t *sku.Transacted,
 ) (e sku.ExternalLike, err error) {
-	esrtfoi, ok := es.StoreLike.(sku.ExternalStoreReadExternalLikeFromObjectId)
+	es, ok := s.StoreLike.(sku.ExternalStoreReadExternalLikeFromObjectId)
 
 	if !ok {
-		err = errors.Errorf("store does not support %T", &esrtfoi)
+		err = makeErrUnsupportedOperation(s, &s)
 		return
 	}
 
-	if err = es.Initialize(); err != nil {
+	if err = s.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if e, err = esrtfoi.ReadExternalLikeFromObjectId(
+	if e, err = es.ReadExternalLikeFromObjectId(
 		o,
 		k1,
 		t,
@@ -124,23 +122,23 @@ func (es *Store) ReadExternalLikeFromObjectId(
 	return
 }
 
-func (es *Store) CheckoutOne(
+func (s *Store) CheckoutOne(
 	options checkout_options.Options,
 	sz sku.TransactedGetter,
 ) (cz sku.CheckedOutLike, err error) {
-	escoo, ok := es.StoreLike.(CheckoutOne)
+	es, ok := s.StoreLike.(CheckoutOne)
 
 	if !ok {
-		err = errors.Errorf("store does not support %T", &escoo)
+		err = makeErrUnsupportedOperation(s, &s)
 		return
 	}
 
-	if err = es.Initialize(); err != nil {
+	if err = s.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if cz, err = escoo.CheckoutOne(
+	if cz, err = es.CheckoutOne(
 		options,
 		sz,
 	); err != nil {
@@ -151,20 +149,20 @@ func (es *Store) CheckoutOne(
 	return
 }
 
-func (es *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
-	esdc, ok := es.StoreLike.(DeleteExternal)
+func (s *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
+	es, ok := s.StoreLike.(DeleteExternal)
 
 	if !ok {
-		err = errors.Errorf("store does not support DeleteExternal: %T", es.StoreLike)
+		err = makeErrUnsupportedOperation(s, &s)
 		return
 	}
 
-	if err = es.Initialize(); err != nil {
+	if err = s.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = esdc.DeleteExternalLike(el); err != nil {
+	if err = es.DeleteExternalLike(el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -172,20 +170,20 @@ func (es *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
 	return
 }
 
-func (es *Store) UpdateTransacted(z *sku.Transacted) (err error) {
-	esut, ok := es.StoreLike.(UpdateTransacted)
+func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
+	es, ok := s.StoreLike.(UpdateTransacted)
 
 	if !ok {
-		err = errors.Errorf("store does not support %T", &esut)
+		err = makeErrUnsupportedOperation(s, &s)
 		return
 	}
 
-	if err = es.Initialize(); err != nil {
+	if err = s.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = esut.UpdateTransacted(z); err != nil {
+	if err = es.UpdateTransacted(z); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -212,24 +210,24 @@ func (es *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err 
 	return
 }
 
-func (es *Store) Open(
+func (s *Store) Open(
 	m checkout_mode.Mode,
 	ph interfaces.FuncIter[string],
 	zsc sku.CheckedOutLikeSet,
 ) (err error) {
-	eso, ok := es.StoreLike.(Open)
+	es, ok := s.StoreLike.(Open)
 
 	if !ok {
-		err = errors.Errorf("store does not support %T", &eso)
+		err = makeErrUnsupportedOperation(s, &es)
 		return
 	}
 
-	if err = es.Initialize(); err != nil {
+	if err = s.Initialize(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = eso.Open(m, ph, zsc); err != nil {
+	if err = es.Open(m, ph, zsc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -241,9 +239,7 @@ func (s *Store) SaveBlob(el sku.ExternalLike) (err error) {
 	es, ok := s.StoreLike.(sku.BlobSaver)
 
 	if !ok {
-		// TODO make sigil error that can be ignored upstream
-		err = errors.Errorf("store does not support sku.BlobSaver")
-		// err = nil
+		err = makeErrUnsupportedOperation(s, &es)
 		return
 	}
 
@@ -267,7 +263,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	es, ok := s.StoreLike.(UpdateCheckoutFromCheckedOut)
 
 	if !ok {
-		err = errors.Errorf("store does not support UpdateCheckoutFromCheckedOut")
+		err = makeErrUnsupportedOperation(s, &s)
 		return
 	}
 

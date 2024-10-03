@@ -22,8 +22,12 @@ func (s *Store) SaveBlob(el sku.ExternalLike) (err error) {
 	}
 
 	if err = es.SaveBlob(el); err != nil {
-		err = errors.Wrap(err)
-		return
+		if errors.Is(err, external_store.ErrUnsupportedOperation{}) {
+			err = nil
+		} else {
+			err = errors.Wrapf(err, "Sku: %s, RepoId: %s", el, repoId)
+			return
+		}
 	}
 
 	return
@@ -78,7 +82,7 @@ func (s *Store) CheckoutQuery(
 		// TODO include a "query complete" signal for the external store to batch
 		// the checkout if necessary
 		if col, err = es.CheckoutOne(options, t); err != nil {
-			if errors.Is(err, external_store.ErrUnsupportedTyp{}) {
+			if errors.Is(err, external_store.ErrUnsupportedType{}) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

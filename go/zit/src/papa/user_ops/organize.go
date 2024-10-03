@@ -132,6 +132,7 @@ func (op Organize) RunWithExternalLike(
 		return
 	}
 
+	// TODO refactor into common vim processing loop
 	for {
 		openVimOp := OpenVim{
 			Options: vim_cli_options_builder.New().

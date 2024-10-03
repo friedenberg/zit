@@ -1,6 +1,8 @@
 package sku_fmt
 
 import (
+	"bytes"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
@@ -47,10 +49,12 @@ func (f *Box) readStringFormatBox(
 	var k ids.ObjectId
 
 LOOP:
-	for ts.ScanIdentifierLikeSkipSpaces() {
+	for ts.Scan() {
 		t, tokenType, tokenParts := ts.GetTokenAndTypeAndParts()
 
-		if t.EqualsString(" ") || t.EqualsString("\n") {
+		if (tokenType == token_types.TypeOperator &&
+			(bytes.Equal(t.Bytes(), []byte{' '}))) ||
+			bytes.Equal(t.Bytes(), []byte{'\n'}) {
 			continue
 		}
 
@@ -82,12 +86,24 @@ LOOP:
 			}
 
 			switch tokenType {
-			case token_types.TypeLiteral:
+			case token_types.TypeField:
 				if len(tokenParts.Left) == 0 {
 				} else {
 					field := string_format_writer.Field{
 						Key:   string(tokenParts.Left),
 						Value: string(tokenParts.Right),
+					}
+
+					o.Metadata.Fields = append(o.Metadata.Fields, field)
+				}
+
+				continue LOOP
+
+			case token_types.TypeLiteral:
+				if len(tokenParts.Left) == 0 {
+				} else {
+					field := string_format_writer.Field{
+						Value: t.String(),
 					}
 
 					o.Metadata.Fields = append(o.Metadata.Fields, field)

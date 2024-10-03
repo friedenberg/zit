@@ -467,3 +467,105 @@ func TestTokenScannerIdentifierLikeOnlySkipSpaces(t1 *testing.T) {
 		t.AssertNotEqual(tc.expected, actual)
 	}
 }
+
+type typeAndParts struct {
+	token_types.TokenType
+	Token, Left, Right string
+}
+
+type tokenScannerTypesAndPartsTestCase struct {
+	input    string
+	expected []typeAndParts
+}
+
+func getTokenScannerTypeAndPartsTestCases() []tokenScannerTypesAndPartsTestCase {
+	return []tokenScannerTypesAndPartsTestCase{
+		{
+			input: `[/firefox-ddog/bookmark-5nSmpin9cwMc title="Equipment Recommendations" url="https://atlassian.net/"] Equipment Recommendations`,
+			expected: []typeAndParts{
+				{
+					TokenType: token_types.TypeOperator,
+					Token:     "[",
+				},
+				{
+					TokenType: token_types.TypeIdentifier,
+					Token:     "/firefox-ddog/bookmark-5nSmpin9cwMc",
+					Left:      "/firefox-ddog/bookmark-5nSmpin9cwMc",
+				},
+				{
+					TokenType: token_types.TypeOperator,
+					Token:     " ",
+				},
+				{
+					TokenType: token_types.TypeField,
+					Token:     `title="Equipment Recommendations"`,
+					Left:      `title`,
+					Right:     `Equipment Recommendations`,
+				},
+				{
+					TokenType: token_types.TypeOperator,
+					Token:     " ",
+				},
+				{
+					TokenType: token_types.TypeField,
+					Token:     `url="https://atlassian.net/"`,
+					Left:      `url`,
+					Right:     `https://atlassian.net/`,
+				},
+				{
+					TokenType: token_types.TypeOperator,
+					Token:     "]",
+				},
+				{
+					TokenType: token_types.TypeOperator,
+					Token:     " ",
+				},
+				{
+					TokenType: token_types.TypeIdentifier,
+					Token:     "Equipment",
+					Left:      "Equipment",
+				},
+				{
+					TokenType: token_types.TypeOperator,
+					Token:     " ",
+				},
+				{
+					TokenType: token_types.TypeIdentifier,
+					Token:     "Recommendations",
+					Left:      "Recommendations",
+				},
+			},
+		},
+	}
+}
+
+func TestTokenScannerTypesAndParts(t1 *testing.T) {
+	t := test_logz.T{T: t1}
+
+	var scanner TokenScanner
+
+	for _, tc := range getTokenScannerTypeAndPartsTestCases() {
+		scanner.Reset(strings.NewReader(tc.input))
+
+		actual := make([]typeAndParts, 0)
+
+		for scanner.Scan() {
+			token, tokenType, parts := scanner.GetTokenAndTypeAndParts()
+			actual = append(
+				actual,
+				typeAndParts{
+					TokenType: tokenType,
+					Token:     token.String(),
+					Left:      string(parts.Left),
+					Right:     string(parts.Right),
+				},
+			)
+		}
+
+		if err := scanner.Error(); err != nil {
+			t.AssertNoError(err)
+		}
+
+		t.AssertNotEqual(tc.expected, actual)
+	}
+}

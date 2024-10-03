@@ -186,7 +186,13 @@ func (i *Item) ReadFromExternal(e *sku.Transacted) (err error) {
 			}
 
 		default:
-			err = errors.Errorf("unsupported field type: %s=%q", field.Key, field.Value)
+			err = errors.Errorf(
+				"unsupported field type: %q=%q. Fields: %#v",
+				field.Key,
+				field.Value,
+				e.Metadata.Fields,
+			)
+
 			return
 		}
 	}

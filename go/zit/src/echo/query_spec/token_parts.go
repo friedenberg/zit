@@ -1,7 +1,13 @@
 package query_spec
 
+import "fmt"
+
 type TokenParts struct {
 	Left, Right []byte
+}
+
+func (tp TokenParts) String() string {
+	return fmt.Sprintf("Left: %q, Right: %q", tp.Left, tp.Right)
 }
 
 func (tp *TokenParts) Reset() {

@@ -117,6 +117,7 @@ func (s *Store) Flush() (err error) {
 	return
 }
 
+// TODO limit this to being used only by *Item.ReadFromExternal
 func (c *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 	var r sha.ReadCloser
 
@@ -151,7 +152,7 @@ func (c *Store) CheckoutOne(
 	sz := tg.GetSku()
 
 	if !sz.Metadata.Type.Equals(c.typ) {
-		err = errors.Wrap(external_store.ErrUnsupportedTyp(sz.Metadata.Type))
+		err = errors.Wrap(external_store.ErrUnsupportedType(sz.Metadata.Type))
 		return
 	}
 
@@ -296,4 +297,11 @@ func (s *Store) SaveBlob(e sku.ExternalLike) (err error) {
 
 func (s *Store) asBlobSaver() sku.BlobSaver {
 	return s
+}
+
+func (s *Store) UpdateCheckoutFromCheckedOut(
+	options checkout_options.OptionsWithoutMode,
+	col sku.CheckedOutLike,
+) (err error) {
+	return
 }

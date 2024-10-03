@@ -34,11 +34,13 @@ func NewMetadataWithOptionCommentLookup(
 	}
 }
 
+// TODO replace with embedded *sku.Transacted
 type Metadata struct {
 	ids.TagSet
 	Matchers interfaces.SetLike[sku.Query]
 	OptionCommentSet
-	Type ids.Type
+	Type   ids.Type
+	RepoId ids.RepoId
 }
 
 func (m *Metadata) GetTags() ids.TagSet {

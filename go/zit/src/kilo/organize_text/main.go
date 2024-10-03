@@ -10,7 +10,7 @@ import (
 
 type Text struct {
 	Options
-	*Assignment
+	*Assignment // TODO make not embedded
 }
 
 func New(options Options) (ot *Text, err error) {
