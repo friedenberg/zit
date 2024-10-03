@@ -201,11 +201,17 @@ func (f *Box) WriteStringFormatExternal(
 	e *sku.Transacted,
 	includeDescriptionInBox bool,
 ) (n int64, err error) {
+	if e.State == external_state.Unknown {
+		if e.ObjectId.IsEmpty() {
+			e.State = external_state.Untracked
+		}
+	}
+
 	fields := make([]string_format_writer.Field, 0, 10)
 
 	oid := &e.ObjectId
 
-	if e.State == external_state.Untracked {
+	if e.State == external_state.Untracked && !e.ExternalObjectId.IsEmpty() {
 		oid = &e.ExternalObjectId
 	}
 
@@ -219,6 +225,8 @@ func (f *Box) WriteStringFormatExternal(
 
 	var n2 int64
 
+	m := &e.Metadata
+
 	if e.State != external_state.Untracked {
 		if !e.ExternalObjectId.IsEmpty() && false {
 			fields = append(
@@ -230,8 +238,6 @@ func (f *Box) WriteStringFormatExternal(
 				},
 			)
 		}
-
-		m := &e.Metadata
 
 		if f.Options.PrintShas &&
 			(f.Options.PrintEmptyShas || !m.Blob.IsNull()) {
@@ -250,26 +256,26 @@ func (f *Box) WriteStringFormatExternal(
 				object_metadata_fmt.MetadataFieldShaString(shaString),
 			)
 		}
+	}
 
-		if !m.Type.IsEmpty() {
-			fields = append(
-				fields,
-				object_metadata_fmt.MetadataFieldType(m),
-			)
-		}
-
-		if includeDescriptionInBox && !m.Description.IsEmpty() {
-			fields = append(
-				fields,
-				object_metadata_fmt.MetadataFieldDescription(m),
-			)
-		}
-
+	if !m.Type.IsEmpty() {
 		fields = append(
 			fields,
-			object_metadata_fmt.MetadataFieldTags(m)...,
+			object_metadata_fmt.MetadataFieldType(m),
 		)
 	}
+
+	if includeDescriptionInBox && !m.Description.IsEmpty() {
+		fields = append(
+			fields,
+			object_metadata_fmt.MetadataFieldDescription(m),
+		)
+	}
+
+	fields = append(
+		fields,
+		object_metadata_fmt.MetadataFieldTags(m)...,
+	)
 
 	if !f.Options.ExcludeFields {
 		fields = append(fields, e.Metadata.Fields...)
