@@ -137,18 +137,20 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	options checkout_options.OptionsWithoutMode,
 	col sku.CheckedOutLike,
 ) (err error) {
-	switch col.GetSkuExternalLike().GetRepoId().GetRepoIdString() {
-	case "browser":
-		err = todo.Implement()
+	repoId := col.GetSkuExternalLike().GetRepoId()
+	es, ok := s.externalStores[repoId]
 
-	default:
-		if err = s.cwdFiles.UpdateCheckoutFromCheckedOut(
-			options,
-			col,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if !ok {
+		err = errors.Errorf("no repo id with id %q", repoId)
+		return
+	}
+
+	if err = es.UpdateCheckoutFromCheckedOut(
+		options,
+		col,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

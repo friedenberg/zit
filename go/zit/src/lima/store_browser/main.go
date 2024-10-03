@@ -293,3 +293,7 @@ func (s *Store) SaveBlob(e sku.ExternalLike) (err error) {
 
 	return
 }
+
+func (s *Store) asBlobSaver() sku.BlobSaver {
+	return s
+}

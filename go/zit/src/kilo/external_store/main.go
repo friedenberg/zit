@@ -51,7 +51,7 @@ type (
 	UpdateCheckoutFromCheckedOut interface {
 		UpdateCheckoutFromCheckedOut(
 			options checkout_options.OptionsWithoutMode,
-			co *sku.CheckedOut,
+			co sku.CheckedOutLike,
 		) (err error)
 	}
 

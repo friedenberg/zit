@@ -243,7 +243,7 @@ func (s *Store) SaveBlob(el sku.ExternalLike) (err error) {
 	if !ok {
 		// TODO make sigil error that can be ignored upstream
 		err = errors.Errorf("store does not support sku.BlobSaver")
-		err = nil
+		// err = nil
 		return
 	}
 
@@ -253,6 +253,30 @@ func (s *Store) SaveBlob(el sku.ExternalLike) (err error) {
 	}
 
 	if err = es.SaveBlob(el); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) UpdateCheckoutFromCheckedOut(
+	options checkout_options.OptionsWithoutMode,
+	col sku.CheckedOutLike,
+) (err error) {
+	es, ok := s.StoreLike.(UpdateCheckoutFromCheckedOut)
+
+	if !ok {
+		err = errors.Errorf("store does not support UpdateCheckoutFromCheckedOut")
+		return
+	}
+
+	if err = s.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = es.UpdateCheckoutFromCheckedOut(options, col); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
