@@ -79,7 +79,7 @@ func (f *fieldsWriter) writeStringFormatNoBox(
 			}
 		}
 
-		n1, err = f.writeStringFormatField(w, field, separator)
+		n1, err = f.writeStringFormatField(w, field)
 		n += n1
 
 		if err != nil {
@@ -101,7 +101,7 @@ func (f *fieldsWriter) writeStringFormatYesBox(
 	separator := fields.GetSeparator()
 
 	for _, field := range fields.Header {
-		n1, err = f.writeStringFormatField(w, field, separator)
+		n1, err = f.writeStringFormatField(w, field)
 		n += n1
 
 		if err != nil {
@@ -124,7 +124,6 @@ func (f *fieldsWriter) writeStringFormatYesBox(
 			Value:     "[",
 			ColorType: ColorTypeNormal,
 		},
-    separator,
 	)
 	n += n1
 
@@ -134,17 +133,27 @@ func (f *fieldsWriter) writeStringFormatYesBox(
 	}
 
 	for i, field := range fields.Contents {
-		if i > 0 && !field.NeedsNewline {
-			n2, err = fmt.Fprint(w, separator)
-			n += int64(n2)
+		if i > 0 {
+			if field.NeedsNewline {
+				n2, err = w.WriteString("\n")
+				n += int64(n2)
 
-			if err != nil {
-				err = errors.Wrap(err)
-				return
+				if err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			} else {
+				n2, err = fmt.Fprint(w, separator)
+				n += int64(n2)
+
+				if err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 		}
 
-		n1, err = f.writeStringFormatField(w, field, separator)
+		n1, err = f.writeStringFormatField(w, field)
 		n += n1
 
 		if err != nil {
@@ -169,7 +178,6 @@ func (f *fieldsWriter) writeStringFormatYesBox(
 			Value:     "]",
 			ColorType: ColorTypeNormal,
 		},
-    separator,
 	)
 	n += n1
 
@@ -191,7 +199,7 @@ func (f *fieldsWriter) writeStringFormatYesBox(
 			return
 		}
 
-		n1, err = f.writeStringFormatField(w, field, separator)
+		n1, err = f.writeStringFormatField(w, field)
 		n += n1
 
 		if err != nil {
@@ -206,19 +214,8 @@ func (f *fieldsWriter) writeStringFormatYesBox(
 func (f *fieldsWriter) writeStringFormatField(
 	w interfaces.WriterAndStringWriter,
 	field Field,
-  separator string,
 ) (n int64, err error) {
 	var n1 int
-
-	if field.NeedsNewline {
-		n1, err = w.WriteString("\n")
-		n += int64(n1)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
 
 	n1, err = w.WriteString(field.Prefix)
 	n += int64(n1)
