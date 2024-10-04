@@ -136,7 +136,6 @@ func (f *Box) WriteStringFormat(
 						Value:              b.String(),
 						ColorType:          string_format_writer.ColorTypeUserData,
 						DisableValueQuotes: true,
-						Prefix:             " ",
 					},
 				},
 			},
@@ -278,7 +277,6 @@ func (f *Box) WriteMetadataToBox(
 				Value:              b.String(),
 				ColorType:          string_format_writer.ColorTypeUserData,
 				DisableValueQuotes: true,
-				Prefix:             " ",
 			},
 		}
 	}

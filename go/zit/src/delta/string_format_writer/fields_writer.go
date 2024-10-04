@@ -9,11 +9,15 @@ import (
 
 type Field struct {
 	NeedsNewline bool
-	Prefix       string
 	ColorType
 	Separator          rune
 	Key, Value         string
 	DisableValueQuotes bool
+}
+
+type BoxHeader struct {
+	Value        string
+	RightAligned bool
 }
 
 type Box struct {
@@ -84,7 +88,7 @@ func (f *fieldsWriter) WriteStringFormat(
 	for i, field := range fields.Contents {
 		if i > 0 {
 			if field.NeedsNewline {
-				n2, err = w.WriteString("\n")
+				n2, err = w.WriteString("\n" + StringIndentWithSpace)
 				n += int64(n2)
 
 				if err != nil {
@@ -135,13 +139,9 @@ func (f *fieldsWriter) WriteStringFormat(
 		return
 	}
 
-	for i, field := range fields.Trailer {
-		if i == 0 {
-			// n2, err = fmt.Fprint(w, " ")
-		} else {
-			n2, err = fmt.Fprint(w, separator)
-			n += int64(n2)
-		}
+	for _, field := range fields.Trailer {
+		n2, err = fmt.Fprint(w, separator)
+		n += int64(n2)
 
 		if err != nil {
 			err = errors.Wrap(err)
@@ -165,16 +165,6 @@ func (f *fieldsWriter) writeStringFormatField(
 	field Field,
 ) (n int64, err error) {
 	var n1 int
-
-	if field.Prefix != "" {
-		n1, err = w.WriteString(field.Prefix)
-		n += int64(n1)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
 
 	if field.Key != "" {
 		if field.Separator == '\x00' {
