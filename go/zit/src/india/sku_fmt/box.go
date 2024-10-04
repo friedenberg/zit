@@ -80,22 +80,13 @@ func (f *Box) WriteStringFormat(
 		stateString = o.GetExternalState().String()
 	}
 
+	box.Header.RightAligned = true
+
 	if stateString != "" {
-		box.Header = append(
-			box.Header,
-			string_format_writer.Field{
-				Value: stateString,
-			},
-		)
+		box.Header.Value = stateString
 	} else if f.Options.PrintTime {
 		t := o.GetTai()
-
-		box.Header = append(
-			box.Header,
-			string_format_writer.Field{
-				Value: t.Format(string_format_writer.StringFormatDateTime),
-			},
-		)
+		box.Header.Value = t.Format(string_format_writer.StringFormatDateTime)
 	}
 
 	if fds, errFS := f.FSItemReadWriter.ReadFSItemFromExternal(

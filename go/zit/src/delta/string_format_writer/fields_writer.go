@@ -21,7 +21,7 @@ type BoxHeader struct {
 }
 
 type Box struct {
-	Header              []Field
+	Header              BoxHeader
 	Contents            []Field
 	Trailer             []Field
 	EachFieldOnANewline bool
@@ -54,19 +54,25 @@ func MakeCliFormatFields(
 
 func (f *fieldsWriter) WriteStringFormat(
 	w interfaces.WriterAndStringWriter,
-	fields Box,
+	box Box,
 ) (n int64, err error) {
 	var n1 int64
 	var n2 int
 
-	separator := fields.GetSeparator()
+	separator := box.GetSeparator()
 
-	for _, field := range fields.Header {
-		n1, err = f.writeStringFormatField(rightAligned2{w}, field)
-		n += n1
+  if box.Header.Value != "" {
+    headerWriter := w
+
+    if box.Header.RightAligned {
+		headerWriter = rightAligned2{w}
+    }
+
+		n2, err = headerWriter.WriteString(box.Header.Value)
+		n += int64(n2)
 
 		if err != nil {
-			err = errors.Wrapf(err, "Headers: %#v", fields.Header)
+			err = errors.Wrapf(err, "Headers: %#v", box.Header)
 			return
 		}
 	}
@@ -85,7 +91,7 @@ func (f *fieldsWriter) WriteStringFormat(
 		return
 	}
 
-	for i, field := range fields.Contents {
+	for i, field := range box.Contents {
 		if i > 0 {
 			if field.NeedsNewline {
 				n2, err = w.WriteString("\n" + StringIndentWithSpace)
@@ -139,7 +145,7 @@ func (f *fieldsWriter) WriteStringFormat(
 		return
 	}
 
-	for _, field := range fields.Trailer {
+	for _, field := range box.Trailer {
 		n2, err = fmt.Fprint(w, separator)
 		n += int64(n2)
 
