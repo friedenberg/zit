@@ -27,6 +27,7 @@ func (u *Env) SkuFormatBoxNoColor() *sku_fmt.Box {
 	options := u.config.PrintOptions.WithPrintShas(false)
 	options.PrintTime = false
 	options.PrintShas = false
+  options.DescriptionInBox = false
 
 	return u.StringFormatWriterSkuBox(
 		options,

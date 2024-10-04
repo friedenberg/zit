@@ -14,7 +14,6 @@ import (
 func (u *Env) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
 	po := u.config.PrintOptions.
 		WithPrintShas(true).
-		WithDescriptionInBox(true).
 		WithExcludeFields(true)
 
 	sw := u.StringFormatWriterSkuBox(
@@ -37,7 +36,6 @@ func (u *Env) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
 func (u *Env) PrinterTransactedDeleted() interfaces.FuncIter[*sku.Transacted] {
 	po := u.config.PrintOptions.
 		WithPrintShas(true).
-		WithDescriptionInBox(true).
 		WithPrintTime(false).
 		WithPrintState(true)
 
@@ -97,8 +95,7 @@ func (u *Env) PrinterHeader() interfaces.FuncIter[string] {
 func (u *Env) PrinterCheckedOut() interfaces.FuncIter[*sku.CheckedOut] {
 	oo := u.FormatOutputOptions()
 	po := u.config.PrintOptions.
-		WithPrintShas(true).
-		WithDescriptionInBox(true)
+		WithPrintShas(true)
 
 	err := string_format_writer.MakeDelim(
 		"\n",

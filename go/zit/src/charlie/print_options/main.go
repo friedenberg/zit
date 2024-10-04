@@ -87,6 +87,10 @@ func (a *General) Merge(b General, mask General) {
 		a.PrintBestandsaufnahme = b.PrintBestandsaufnahme
 	}
 
+	if mask.DescriptionInBox {
+		a.DescriptionInBox = b.DescriptionInBox
+	}
+
 	a.ZittishNewlines = b.ZittishNewlines
 }
 
@@ -240,6 +244,14 @@ func (c *General) AddToFlags(f *flag.FlagSet, m *General) {
 		"print-bestandsaufnahme",
 		&c.PrintBestandsaufnahme,
 		&m.PrintBestandsaufnahme,
+		"",
+	)
+
+	boolVarWithMask(
+		f,
+		"boxed-description",
+		&c.DescriptionInBox,
+		&m.DescriptionInBox,
 		"",
 	)
 }
