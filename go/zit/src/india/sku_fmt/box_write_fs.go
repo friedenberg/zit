@@ -144,7 +144,6 @@ func (f *Box) writeStringFormatBlobFD(
 	box.Contents = append(
 		box.Contents,
 		string_format_writer.Field{
-			NeedsNewline: true,
 			Value:        f.Rel(fd.GetPath()),
 			ColorType:    string_format_writer.ColorTypeId,
 		},

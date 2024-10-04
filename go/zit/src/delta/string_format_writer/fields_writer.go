@@ -8,7 +8,6 @@ import (
 )
 
 type Field struct {
-	NeedsNewline bool
 	ColorType
 	Separator          rune
 	Key, Value         string
@@ -25,15 +24,6 @@ type Box struct {
 	Contents            []Field
 	Trailer             []Field
 	EachFieldOnANewline bool
-}
-
-func (b Box) GetSeparator() string {
-	return " "
-	if b.EachFieldOnANewline || true {
-		return "\n"
-	} else {
-		return " "
-	}
 }
 
 type fieldsWriter struct {
@@ -59,14 +49,15 @@ func (f *fieldsWriter) WriteStringFormat(
 	var n1 int64
 	var n2 int
 
-	separator := box.GetSeparator()
+	separatorSameLine := " "
+	separatorNextLine := "\n" + StringIndentWithSpace
 
-  if box.Header.Value != "" {
-    headerWriter := w
+	if box.Header.Value != "" {
+		headerWriter := w
 
-    if box.Header.RightAligned {
-		headerWriter = rightAligned2{w}
-    }
+		if box.Header.RightAligned {
+			headerWriter = rightAligned2{w}
+		}
 
 		n2, err = headerWriter.WriteString(box.Header.Value)
 		n += int64(n2)
@@ -93,16 +84,18 @@ func (f *fieldsWriter) WriteStringFormat(
 
 	for i, field := range box.Contents {
 		if i > 0 {
-			if field.NeedsNewline {
-				n2, err = w.WriteString("\n" + StringIndentWithSpace)
+			switch field.ColorType {
+			case ColorTypeId:
+				n2, err = w.WriteString(separatorNextLine)
 				n += int64(n2)
 
 				if err != nil {
 					err = errors.Wrap(err)
 					return
 				}
-			} else {
-				n2, err = fmt.Fprint(w, separator)
+
+			default:
+				n2, err = fmt.Fprint(w, separatorSameLine)
 				n += int64(n2)
 
 				if err != nil {
@@ -121,8 +114,8 @@ func (f *fieldsWriter) WriteStringFormat(
 		}
 	}
 
-	if separator == "\n" {
-		n2, err = w.WriteString(separator)
+	if separatorSameLine == "\n" {
+		n2, err = w.WriteString(separatorSameLine)
 		n += int64(n2)
 
 		if err != nil {
@@ -146,7 +139,7 @@ func (f *fieldsWriter) WriteStringFormat(
 	}
 
 	for _, field := range box.Trailer {
-		n2, err = fmt.Fprint(w, separator)
+		n2, err = fmt.Fprint(w, separatorSameLine)
 		n += int64(n2)
 
 		if err != nil {
