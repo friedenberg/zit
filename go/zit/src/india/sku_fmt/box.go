@@ -28,7 +28,6 @@ func MakeBox(
 		ColorOptions:     co,
 		Options:          options,
 		Fields:           fieldsFormatWriter,
-		RightAligned:     string_format_writer.MakeRightAligned(),
 		Abbr:             abbr,
 		FSItemReadWriter: fsItemReadWriter,
 		RelativePath:     relativePath,
@@ -41,8 +40,6 @@ type Box struct {
 
 	MaxHead, MaxTail int
 	Padding          string
-
-	RightAligned interfaces.StringFormatWriter[string]
 
 	Fields interfaces.StringFormatWriter[string_format_writer.Box]
 
@@ -63,7 +60,6 @@ func (f *Box) WriteStringFormat(
 	o := el.GetSku()
 	var box string_format_writer.Box
 
-	var n1 int
 	var n2 int64
 
 	co, isCO := el.(*sku.CheckedOut)
@@ -85,32 +81,21 @@ func (f *Box) WriteStringFormat(
 	}
 
 	if stateString != "" {
-		n2, err = f.RightAligned.WriteStringFormat(sw, stateString)
-		n += n2
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
+		box.Header = append(
+			box.Header,
+			string_format_writer.Field{
+				Value: stateString,
+			},
+		)
 	} else if f.Options.PrintTime {
 		t := o.GetTai()
 
-		n1, err = sw.WriteString(t.Format(string_format_writer.StringFormatDateTime))
-		n += int64(n1)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		n1, err = sw.WriteString(" ")
-		n += int64(n1)
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		box.Header = append(
+			box.Header,
+			string_format_writer.Field{
+				Value: t.Format(string_format_writer.StringFormatDateTime),
+			},
+		)
 	}
 
 	if fds, errFS := f.FSItemReadWriter.ReadFSItemFromExternal(

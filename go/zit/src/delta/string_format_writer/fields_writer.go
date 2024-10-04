@@ -24,7 +24,7 @@ type Box struct {
 }
 
 func (b Box) GetSeparator() string {
-  return " "
+	return " "
 	if b.EachFieldOnANewline || true {
 		return "\n"
 	} else {
@@ -35,6 +35,7 @@ func (b Box) GetSeparator() string {
 type fieldsWriter struct {
 	ColorOptions
 	truncate CliFormatTruncation
+	rightAligned
 }
 
 func MakeCliFormatFields(
@@ -51,69 +52,17 @@ func (f *fieldsWriter) WriteStringFormat(
 	w interfaces.WriterAndStringWriter,
 	fields Box,
 ) (n int64, err error) {
-	if n, err = f.writeStringFormatYesBox(w, fields); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (f *fieldsWriter) writeStringFormatNoBox(
-	w interfaces.WriterAndStringWriter,
-	fields Box,
-) (n int64, err error) {
-	var n1 int64
-	var n2 int
-
-	separator := fields.GetSeparator()
-
-	for i, field := range fields.Contents {
-		if i > 0 {
-			n2, err = fmt.Fprint(w, separator)
-			n += int64(n2)
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
-		n1, err = f.writeStringFormatField(w, field)
-		n += n1
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
-func (f *fieldsWriter) writeStringFormatYesBox(
-	w interfaces.WriterAndStringWriter,
-	fields Box,
-) (n int64, err error) {
 	var n1 int64
 	var n2 int
 
 	separator := fields.GetSeparator()
 
 	for _, field := range fields.Header {
-		n1, err = f.writeStringFormatField(w, field)
+		n1, err = f.writeStringFormatField(rightAligned2{w}, field)
 		n += n1
 
 		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		n2, err = fmt.Fprint(w, separator)
-		n += int64(n2)
-
-		if err != nil {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(err, "Headers: %#v", fields.Header)
 			return
 		}
 	}
@@ -217,12 +166,14 @@ func (f *fieldsWriter) writeStringFormatField(
 ) (n int64, err error) {
 	var n1 int
 
-	n1, err = w.WriteString(field.Prefix)
-	n += int64(n1)
+	if field.Prefix != "" {
+		n1, err = w.WriteString(field.Prefix)
+		n += int64(n1)
 
-	if err != nil {
-		err = errors.Wrap(err)
-		return
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if field.Key != "" {
