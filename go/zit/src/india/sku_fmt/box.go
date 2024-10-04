@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -19,12 +18,7 @@ import (
 func MakeBox(
 	co string_format_writer.ColorOptions,
 	options print_options.General,
-	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
-	objectIdStringFormatWriter id_fmts.Aligned,
-	typeStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
-	tagsStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
 	fieldsFormatWriter interfaces.StringFormatWriter[string_format_writer.Box],
-	metadata *object_metadata_fmt.Box,
 	abbr ids.Abbr,
 	fsItemReadWriter sku.FSItemReadWriter,
 	relativePath fs_home.RelativePath,
@@ -32,12 +26,7 @@ func MakeBox(
 	return &Box{
 		ColorOptions:     co,
 		Options:          options,
-		ShaString:        shaStringFormatWriter,
-		ObjectId:         objectIdStringFormatWriter,
-		Type:             typeStringFormatWriter,
-		TagString:        tagsStringFormatWriter,
 		Fields:           fieldsFormatWriter,
-		Metadata:         metadata,
 		RightAligned:     string_format_writer.MakeRightAligned(),
 		Abbr:             abbr,
 		FSItemReadWriter: fsItemReadWriter,
@@ -54,12 +43,7 @@ type Box struct {
 
 	RightAligned interfaces.StringFormatWriter[string]
 
-	ShaString interfaces.StringFormatWriter[interfaces.Sha]
-	ObjectId  id_fmts.Aligned
-	Type      interfaces.StringFormatWriter[*ids.Type]
-	TagString interfaces.StringFormatWriter[*ids.Tag]
-	Fields    interfaces.StringFormatWriter[string_format_writer.Box]
-	Metadata  *object_metadata_fmt.Box
+	Fields interfaces.StringFormatWriter[string_format_writer.Box]
 
 	ids.Abbr
 	FSItemReadWriter sku.FSItemReadWriter
@@ -69,7 +53,6 @@ type Box struct {
 func (f *Box) SetMaxKopfUndSchwanz(k, s int) {
 	f.MaxHead, f.MaxTail = k, s
 	f.Padding = strings.Repeat(" ", 5+k+s)
-	f.ObjectId.SetMaxKopfUndSchwanz(k, s)
 }
 
 func (f *Box) WriteStringFormat(

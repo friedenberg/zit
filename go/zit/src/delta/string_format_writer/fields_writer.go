@@ -7,6 +7,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
+type Field struct {
+	NeedsNewline bool
+	Prefix       string
+	ColorType
+	Separator          rune
+	Key, Value         string
+	DisableValueQuotes bool
+}
+
 type Box struct {
 	Header              []Field
 	Contents            []Field
@@ -15,7 +24,8 @@ type Box struct {
 }
 
 func (b Box) GetSeparator() string {
-	if b.EachFieldOnANewline && false {
+  return " "
+	if b.EachFieldOnANewline || true {
 		return "\n"
 	} else {
 		return " "
@@ -23,7 +33,8 @@ func (b Box) GetSeparator() string {
 }
 
 type fieldsWriter struct {
-	fieldWriter
+	ColorOptions
+	truncate CliFormatTruncation
 }
 
 func MakeCliFormatFields(
@@ -31,10 +42,8 @@ func MakeCliFormatFields(
 	co ColorOptions,
 ) *fieldsWriter {
 	return &fieldsWriter{
-		fieldWriter: fieldWriter{
-			truncate:     truncate,
-			ColorOptions: co,
-		},
+		truncate:     truncate,
+		ColorOptions: co,
 	}
 }
 
@@ -70,7 +79,7 @@ func (f *fieldsWriter) writeStringFormatNoBox(
 			}
 		}
 
-		n1, err = f.fieldWriter.WriteStringFormat(w, field)
+		n1, err = f.writeStringFormatField(w, field, separator)
 		n += n1
 
 		if err != nil {
@@ -92,7 +101,7 @@ func (f *fieldsWriter) writeStringFormatYesBox(
 	separator := fields.GetSeparator()
 
 	for _, field := range fields.Header {
-		n1, err = f.fieldWriter.WriteStringFormat(w, field)
+		n1, err = f.writeStringFormatField(w, field, separator)
 		n += n1
 
 		if err != nil {
@@ -109,12 +118,13 @@ func (f *fieldsWriter) writeStringFormatYesBox(
 		}
 	}
 
-	n1, err = f.fieldWriter.WriteStringFormat(
+	n1, err = f.writeStringFormatField(
 		w,
 		Field{
 			Value:     "[",
 			ColorType: ColorTypeNormal,
 		},
+    separator,
 	)
 	n += n1
 
@@ -134,7 +144,7 @@ func (f *fieldsWriter) writeStringFormatYesBox(
 			}
 		}
 
-		n1, err = f.fieldWriter.WriteStringFormat(w, field)
+		n1, err = f.writeStringFormatField(w, field, separator)
 		n += n1
 
 		if err != nil {
@@ -153,12 +163,13 @@ func (f *fieldsWriter) writeStringFormatYesBox(
 		}
 	}
 
-	n1, err = f.fieldWriter.WriteStringFormat(
+	n1, err = f.writeStringFormatField(
 		w,
 		Field{
 			Value:     "]",
 			ColorType: ColorTypeNormal,
 		},
+    separator,
 	)
 	n += n1
 
@@ -180,13 +191,86 @@ func (f *fieldsWriter) writeStringFormatYesBox(
 			return
 		}
 
-		n1, err = f.fieldWriter.WriteStringFormat(w, field)
+		n1, err = f.writeStringFormatField(w, field, separator)
 		n += n1
 
 		if err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+	}
+
+	return
+}
+
+func (f *fieldsWriter) writeStringFormatField(
+	w interfaces.WriterAndStringWriter,
+	field Field,
+  separator string,
+) (n int64, err error) {
+	var n1 int
+
+	if field.NeedsNewline {
+		n1, err = w.WriteString("\n")
+		n += int64(n1)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	n1, err = w.WriteString(field.Prefix)
+	n += int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if field.Key != "" {
+		if field.Separator == '\x00' {
+			field.Separator = '='
+		}
+
+		n1, err = fmt.Fprintf(w, "%s%c", field.Key, field.Separator)
+		n += int64(n1)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	preColor, postColor, ellipsis := field.ColorType, colorReset, ""
+
+	if f.OffEntirely {
+		preColor, postColor = "", ""
+	}
+
+	trunc := f.truncate
+
+	if trunc == CliFormatTruncation66CharEllipsis {
+		trunc = 66
+	}
+
+	if trunc > 0 && len(field.Value) > int(trunc) {
+		field.Value = field.Value[:trunc+1]
+		ellipsis = "…"
+	}
+
+	format := "%s%s%s%s"
+
+	if field.ColorType == ColorTypeUserData && !field.DisableValueQuotes {
+		format = "%s%q%s%s"
+	}
+
+	n1, err = fmt.Fprintf(w, format, preColor, field.Value, postColor, ellipsis)
+	n += int64(n1)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

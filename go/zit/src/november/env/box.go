@@ -14,15 +14,7 @@ func (u *Env) StringFormatWriterSkuBox(
 	return sku_fmt.MakeBox(
 		co,
 		po,
-		u.StringFormatWriterShaLike(co),
-		u.StringFormatWriterObjectIdAligned(co),
-		u.StringFormatWriterType(co),
-		u.StringFormatWriterTags(co),
 		u.StringFormatWriterFields(truncation, co),
-		u.StringFormatWriterMetadata(
-			co,
-			truncation,
-		),
 		u.GetStore().GetAbbrStore().GetAbbr(),
 		u.GetStore().GetCwdFiles(),
 		u.fs_home,
