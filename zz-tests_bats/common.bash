@@ -50,6 +50,7 @@ cmd_zit_def=(
   -print-flush=false
   -print-unchanged=false
   -print-bestandsaufnahme=false
+  -boxed-description
 )
 
 export cmd_zit_def

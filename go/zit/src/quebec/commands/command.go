@@ -41,7 +41,10 @@ func registerCommand(n string, makeFunc func(*flag.FlagSet) Command) {
 	}
 }
 
-func registerCommandWithoutEnvironment(n string, makeFunc func(*flag.FlagSet) Command) {
+func registerCommandWithoutEnvironment(
+	n string,
+	makeFunc func(*flag.FlagSet) Command,
+) {
 	f := flag.NewFlagSet(n, flag.ExitOnError)
 
 	c := makeFunc(f)

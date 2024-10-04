@@ -97,6 +97,13 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	f.StringVar(&c.Hooks, "hooks", "", "")
 
 	f.Var(&c.Description, "komment", "Comment for Bestandsaufnahme")
+
+	f.BoolVar(
+		&c.PrintOptions.DescriptionInBox,
+		"boxed-description",
+    false,
+		"",
+	)
 }
 
 func DefaultCli() (c Cli) {
