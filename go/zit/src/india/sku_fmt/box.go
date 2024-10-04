@@ -9,10 +9,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -25,24 +24,24 @@ func MakeBox(
 	typeStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
 	tagsStringFormatWriter interfaces.StringFormatWriter[*ids.Tag],
 	fieldsFormatWriter interfaces.StringFormatWriter[string_format_writer.Box],
-	metadata interfaces.StringFormatWriter[*object_metadata.Metadata],
+	metadata *object_metadata_fmt.Box,
 	abbr ids.Abbr,
 	fsItemReadWriter sku.FSItemReadWriter,
-	fdStringFormatWriter interfaces.StringFormatWriter[*fd.FD],
+	relativePath fs_home.RelativePath,
 ) *Box {
 	return &Box{
-		ColorOptions:         co,
-		Options:              options,
-		ShaString:            shaStringFormatWriter,
-		ObjectId:             objectIdStringFormatWriter,
-		Type:                 typeStringFormatWriter,
-		TagString:            tagsStringFormatWriter,
-		Fields:               fieldsFormatWriter,
-		Metadata:             metadata,
-		RightAligned:         string_format_writer.MakeRightAligned(),
-		Abbr:                 abbr,
-		FSItemReadWriter:     fsItemReadWriter,
-		fdStringFormatWriter: fdStringFormatWriter,
+		ColorOptions:     co,
+		Options:          options,
+		ShaString:        shaStringFormatWriter,
+		ObjectId:         objectIdStringFormatWriter,
+		Type:             typeStringFormatWriter,
+		TagString:        tagsStringFormatWriter,
+		Fields:           fieldsFormatWriter,
+		Metadata:         metadata,
+		RightAligned:     string_format_writer.MakeRightAligned(),
+		Abbr:             abbr,
+		FSItemReadWriter: fsItemReadWriter,
+		RelativePath:     relativePath,
 	}
 }
 
@@ -60,11 +59,11 @@ type Box struct {
 	Type      interfaces.StringFormatWriter[*ids.Type]
 	TagString interfaces.StringFormatWriter[*ids.Tag]
 	Fields    interfaces.StringFormatWriter[string_format_writer.Box]
-	Metadata  interfaces.StringFormatWriter[*object_metadata.Metadata]
+	Metadata  *object_metadata_fmt.Box
 
 	ids.Abbr
-	FSItemReadWriter     sku.FSItemReadWriter
-	fdStringFormatWriter interfaces.StringFormatWriter[*fd.FD]
+	FSItemReadWriter sku.FSItemReadWriter
+	fs_home.RelativePath
 }
 
 func (f *Box) SetMaxKopfUndSchwanz(k, s int) {
@@ -129,14 +128,6 @@ func (f *Box) WriteStringFormat(
 		}
 	}
 
-	n1, err = sw.WriteString("[")
-	n += int64(n1)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if fds, errFS := f.FSItemReadWriter.ReadFSItemFromExternal(
 		o,
 	); errFS != nil || !isCO || !o.RepoId.IsEmpty() {
@@ -151,6 +142,8 @@ func (f *Box) WriteStringFormat(
 			err = errors.Wrap(err)
 			return
 		}
+
+		return
 	} else {
 		n2, err = f.WriteStringFormatFSBox(sw, co, o, fds)
 		n += n2
@@ -159,14 +152,6 @@ func (f *Box) WriteStringFormat(
 			err = errors.Wrapf(err, "CheckedOut: %s", co)
 			return
 		}
-	}
-
-	n1, err = sw.WriteString("]")
-	n += int64(n1)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	b := &o.Metadata.Description
@@ -225,7 +210,7 @@ func (f *Box) WriteStringFormatExternal(
 
 	var n2 int64
 
-	m := &e.Metadata
+	o := f.Options
 
 	if e.State != external_state.Untracked {
 		if !e.ExternalObjectId.IsEmpty() && false {
@@ -238,52 +223,23 @@ func (f *Box) WriteStringFormatExternal(
 				},
 			)
 		}
-
-		if f.Options.PrintShas &&
-			(f.Options.PrintEmptyShas || !m.Blob.IsNull()) {
-			var shaString string
-
-			if shaString, err = object_metadata_fmt.MetadataShaString(
-				m,
-				f.Abbr.Sha.Abbreviate,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			fields = append(
-				fields,
-				object_metadata_fmt.MetadataFieldShaString(shaString),
-			)
-		}
 	}
 
-	if !m.Type.IsEmpty() {
-		fields = append(
-			fields,
-			object_metadata_fmt.MetadataFieldType(m),
-		)
-	}
+	box := string_format_writer.Box{Contents: fields}
 
-	if includeDescriptionInBox && !m.Description.IsEmpty() {
-		fields = append(
-			fields,
-			object_metadata_fmt.MetadataFieldDescription(m),
-		)
-	}
-
-	fields = append(
-		fields,
-		object_metadata_fmt.MetadataFieldTags(m)...,
-	)
-
-	if !f.Options.ExcludeFields {
-		fields = append(fields, e.Metadata.Fields...)
+	if err = f.WriteMetadataToBox(
+		o,
+		e,
+		includeDescriptionInBox,
+		&box,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	n2, err = f.Fields.WriteStringFormat(
 		sw,
-		string_format_writer.Box{Contents: fields},
+		box,
 	)
 	n += n2
 
@@ -320,7 +276,6 @@ func (f *Box) WriteStringFormatExternalBoxUntracked(
 		sw,
 		string_format_writer.Box{
 			Contents: boxed,
-			Box:      true,
 			Trailer:  unboxed,
 		},
 	)
@@ -329,6 +284,71 @@ func (f *Box) WriteStringFormatExternalBoxUntracked(
 	if err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	return
+}
+
+func (f *Box) WriteMetadataToBox(
+	options print_options.General,
+	o *sku.Transacted,
+	includeDescriptionInBox bool,
+	box *string_format_writer.Box,
+) (err error) {
+	m := o.GetMetadata()
+
+	if options.PrintShas &&
+		(options.PrintEmptyShas || !m.Blob.IsNull()) {
+		var shaString string
+
+		if shaString, err = object_metadata_fmt.MetadataShaString(
+			m,
+			f.Abbr.Sha.Abbreviate,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		box.Contents = append(
+			box.Contents,
+			object_metadata_fmt.MetadataFieldShaString(shaString),
+		)
+	}
+
+	if !m.Type.IsEmpty() {
+		box.Contents = append(
+			box.Contents,
+			object_metadata_fmt.MetadataFieldType(m),
+		)
+	}
+
+	b := m.Description
+
+	if includeDescriptionInBox && !b.IsEmpty() {
+		box.Contents = append(
+			box.Contents,
+			object_metadata_fmt.MetadataFieldDescription(m),
+		)
+	}
+
+	box.Contents = append(
+		box.Contents,
+		object_metadata_fmt.MetadataFieldTags(m)...,
+	)
+
+	if !options.ExcludeFields {
+		box.Contents = append(box.Contents, m.Fields...)
+	}
+
+	if !options.DescriptionInBox && !b.IsEmpty() {
+		box.Trailer = []string_format_writer.Field{
+			{
+				Value:              b.String(),
+				ColorType:          string_format_writer.ColorTypeUserData,
+				DisableValueQuotes: true,
+				Prefix:             " ",
+			},
+		}
 	}
 
 	return

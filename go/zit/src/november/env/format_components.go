@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata_fmt"
 )
 
@@ -85,8 +84,8 @@ func (u *Env) StringFormatWriterTags(
 func (u *Env) StringFormatWriterMetadata(
 	co string_format_writer.ColorOptions,
 	truncation string_format_writer.CliFormatTruncation,
-) interfaces.StringFormatWriter[*object_metadata.Metadata] {
-	return object_metadata_fmt.MakeCliMetadataFormat(
+) *object_metadata_fmt.Box {
+	return object_metadata_fmt.MakeBoxMetadataFormat(
 		u.config.PrintOptions,
 		u.StringFormatWriterShaLike(co),
 		u.StringFormatWriterType(co),

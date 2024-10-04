@@ -8,11 +8,12 @@ import (
 )
 
 type Field struct {
+	NeedsNewline bool
+	Prefix       string
+	ColorType
+	Separator          rune
 	Key, Value         string
 	DisableValueQuotes bool
-	ColorType
-	Prefix    string
-	Separator rune
 }
 
 type fieldWriter struct {
@@ -34,7 +35,18 @@ func (f *fieldWriter) WriteStringFormat(
 	w interfaces.WriterAndStringWriter,
 	field Field,
 ) (n int64, err error) {
+	// ui.Debug().Printf("%#v", field)
 	var n1 int
+
+	if field.NeedsNewline {
+		n1, err = w.WriteString("\n")
+		n += int64(n1)
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 
 	n1, err = w.WriteString(field.Prefix)
 	n += int64(n1)

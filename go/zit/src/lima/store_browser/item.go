@@ -123,7 +123,12 @@ func (i *Item) WriteToExternal(e *sku.Transacted) (err error) {
 		return
 	}
 
-	if i.Title != "" {
+	if e.Metadata.Description.IsEmpty() {
+		if err = e.Metadata.Description.Set(i.Title); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else if i.Title != "" && e.Metadata.Description.String() != i.Title {
 		e.Metadata.Fields = append(
 			e.Metadata.Fields,
 			string_format_writer.Field{

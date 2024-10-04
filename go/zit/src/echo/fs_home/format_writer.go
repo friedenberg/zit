@@ -8,6 +8,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
+type RelativePath interface {
+	Rel(string) string
+}
+
 func (s Home) Rel(
 	p string,
 ) (out string) {

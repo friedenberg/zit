@@ -6,7 +6,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -32,52 +34,70 @@ func (f *Box) WriteStringFormatFSBox(
 
 	var fdAlreadyWritten *fd.FD
 
+	var box string_format_writer.Box
+
+	op := f.Options
+	op.ExcludeFields = true
+
 	switch {
 	case co.State == checked_out_state.Untracked:
-		n2, err = f.writeStringFormatUntracked(sw, co, m)
-		n += n2
-
-		if err != nil {
+		if err = f.writeStringFormatUntracked(co, m, &box); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-
-		return
 
 	case co.IsImport:
 		fallthrough
 
 	case m == checkout_mode.BlobOnly || m == checkout_mode.BlobRecognized:
-		n2, err = f.ObjectId.WriteStringFormat(
-			sw,
-			&o.ObjectId,
+		box.Contents = append(
+			box.Contents,
+			string_format_writer.Field{
+				Value:              (*ids.ObjectIdStringerSansRepo)(&o.ObjectId).String(),
+				DisableValueQuotes: true,
+				ColorType:          string_format_writer.ColorTypeId,
+			},
 		)
-		n += n2
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
 
 	default:
-		n2, err = f.fdStringFormatWriter.WriteStringFormat(sw, &fds.Object)
-		n += n2
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		box.Contents = append(
+			box.Contents,
+			string_format_writer.Field{
+				ColorType: string_format_writer.ColorTypeId,
+				Value:     f.Rel(fds.Object.GetPath()),
+			},
+		)
 
 		fdAlreadyWritten = &fds.Object
 	}
 
-	if co.State == checked_out_state.Conflicted {
-		return
+	if co.State != checked_out_state.Conflicted {
+		if err = f.WriteMetadataToBox(
+			op,
+			o,
+			true,
+			&box,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if m == checkout_mode.BlobRecognized ||
+			(m != checkout_mode.MetadataOnly && m != checkout_mode.None) {
+			if err = f.writeStringFormatBlobFDsExcept(
+				fds,
+				fdAlreadyWritten,
+				&box,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
 	}
 
-	n2, err = f.Metadata.WriteStringFormat(
+	n2, err = f.Fields.WriteStringFormat(
 		sw,
-		o.GetMetadata(),
+		box,
 	)
 	n += n2
 
@@ -86,50 +106,25 @@ func (f *Box) WriteStringFormatFSBox(
 		return
 	}
 
-	if m == checkout_mode.BlobRecognized ||
-		(m != checkout_mode.MetadataOnly && m != checkout_mode.None) {
-		n2, err = f.writeStringFormatBlobFDsExcept(sw, fds, fdAlreadyWritten)
-		n += n2
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
 	return
 }
 
 func (f *Box) writeStringFormatBlobFDsExcept(
-	sw interfaces.WriterAndStringWriter,
 	fds *sku.FSItem,
 	except *fd.FD,
-) (n int64, err error) {
-	var n2 int64
-
+	box *string_format_writer.Box,
+) (err error) {
 	if fds.MutableSetLike == nil {
 		err = errors.Errorf("FDSet.MutableSetLike was nil")
 		return
 	}
 
-	if err = fds.MutableSetLike.Each(
-		func(fd *fd.FD) (err error) {
-			if except != nil && fd.Equals(except) {
-				return
-			}
-
-			n2, err = f.writeStringFormatBlobFD(sw, fd)
-			n += n2
-
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
+	for fd := range fds.All() {
+		if except != nil && fd.Equals(except) {
 			return
-		},
-	); err != nil {
-		if err != nil {
+		}
+
+		if err = f.writeStringFormatBlobFD(fd, box); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -139,57 +134,32 @@ func (f *Box) writeStringFormatBlobFDsExcept(
 }
 
 func (f *Box) writeStringFormatBlobFD(
-	sw interfaces.WriterAndStringWriter,
 	fd *fd.FD,
-) (n int64, err error) {
-	var n1 int
-	var n2 int64
-
-	n1, err = sw.WriteString("\n")
-	n += int64(n1)
-
+	box *string_format_writer.Box,
+) (err error) {
 	if err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	n2, err = f.RightAligned.WriteStringFormat(
-		sw,
-		"",
+	box.Contents = append(
+		box.Contents,
+		string_format_writer.Field{
+			NeedsNewline: true,
+			Prefix:       string_format_writer.StringIndentWithSpace,
+			Value:        f.Rel(fd.GetPath()),
+			ColorType:    string_format_writer.ColorTypeId,
+		},
 	)
-	n += n2
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	n1, err = sw.WriteString(" ")
-	n += int64(n1)
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	n2, err = f.fdStringFormatWriter.WriteStringFormat(sw, fd)
-	n += n2
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	return
 }
 
 func (f *Box) writeStringFormatUntracked(
-	sw interfaces.WriterAndStringWriter,
 	co *sku.CheckedOut,
 	mode checkout_mode.Mode,
-) (n int64, err error) {
-	var n2 int64
-
+	box *string_format_writer.Box,
+) (err error) {
 	o := &co.External
 	var i *sku.FSItem
 
@@ -204,32 +174,15 @@ func (f *Box) writeStringFormatUntracked(
 		fdToPrint = &i.Object
 	}
 
-	n2, err = f.fdStringFormatWriter.WriteStringFormat(
-		sw,
-		fdToPrint,
+	box.Contents = append(
+		box.Contents,
+		string_format_writer.Field{
+			ColorType: string_format_writer.ColorTypeId,
+			Value:     f.Rel(fdToPrint.GetPath()),
+		},
 	)
-	n += n2
 
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	n2, err = f.Metadata.WriteStringFormat(
-		sw,
-		o.GetMetadata(),
-	)
-	n += n2
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	n2, err = f.writeStringFormatBlobFDsExcept(sw, i, fdToPrint)
-	n += n2
-
-	if err != nil {
+	if err = f.writeStringFormatBlobFDsExcept(i, fdToPrint, box); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
