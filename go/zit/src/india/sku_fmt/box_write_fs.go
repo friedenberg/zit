@@ -16,6 +16,7 @@ func (f *Box) WriteStringFormatFSBox(
 	sw interfaces.WriterAndStringWriter,
 	co *sku.CheckedOut,
 	o *sku.Transacted,
+  box *string_format_writer.Box,
 	fds *sku.FSItem,
 ) (n int64, err error) {
 	var n2 int64
@@ -34,14 +35,12 @@ func (f *Box) WriteStringFormatFSBox(
 
 	var fdAlreadyWritten *fd.FD
 
-	var box string_format_writer.Box
-
 	op := f.Options
 	op.ExcludeFields = true
 
 	switch {
 	case co.State == checked_out_state.Untracked:
-		if err = f.writeStringFormatUntracked(co, m, &box); err != nil {
+		if err = f.writeStringFormatUntracked(co, m, box); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -76,7 +75,7 @@ func (f *Box) WriteStringFormatFSBox(
 			op,
 			o,
 			true,
-			&box,
+			box,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -87,7 +86,7 @@ func (f *Box) WriteStringFormatFSBox(
 			if err = f.writeStringFormatBlobFDsExcept(
 				fds,
 				fdAlreadyWritten,
-				&box,
+				box,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -97,7 +96,7 @@ func (f *Box) WriteStringFormatFSBox(
 
 	n2, err = f.Fields.WriteStringFormat(
 		sw,
-		box,
+		*box,
 	)
 	n += n2
 

@@ -1,6 +1,7 @@
 package sku_fmt
 
 import (
+	"slices"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -60,6 +61,7 @@ func (f *Box) WriteStringFormat(
 	el sku.ExternalLike,
 ) (n int64, err error) {
 	o := el.GetSku()
+	var box string_format_writer.Box
 
 	var n1 int
 	var n2 int64
@@ -117,6 +119,7 @@ func (f *Box) WriteStringFormat(
 		n2, err = f.WriteStringFormatExternal(
 			sw,
 			o,
+			&box,
 			f.Options.DescriptionInBox,
 		)
 		n += int64(n2)
@@ -128,7 +131,7 @@ func (f *Box) WriteStringFormat(
 
 		return
 	} else {
-		n2, err = f.WriteStringFormatFSBox(sw, co, o, fds)
+		n2, err = f.WriteStringFormatFSBox(sw, co, o, &box, fds)
 		n += n2
 
 		if err != nil {
@@ -167,6 +170,7 @@ func (f *Box) WriteStringFormat(
 func (f *Box) WriteStringFormatExternal(
 	sw interfaces.WriterAndStringWriter,
 	e *sku.Transacted,
+	box *string_format_writer.Box,
 	includeDescriptionInBox bool,
 ) (n int64, err error) {
 	if e.State == external_state.Unknown {
@@ -175,7 +179,7 @@ func (f *Box) WriteStringFormatExternal(
 		}
 	}
 
-	fields := make([]string_format_writer.Field, 0, 10)
+	box.Contents = slices.Grow(box.Contents, 10)
 
 	oid := &e.ObjectId
 
@@ -189,7 +193,7 @@ func (f *Box) WriteStringFormatExternal(
 		ColorType:          string_format_writer.ColorTypeId,
 	}
 
-	fields = append(fields, objectIDField)
+	box.Contents = append(box.Contents, objectIDField)
 
 	var n2 int64
 
@@ -197,8 +201,8 @@ func (f *Box) WriteStringFormatExternal(
 
 	if e.State != external_state.Untracked {
 		if !e.ExternalObjectId.IsEmpty() && false {
-			fields = append(
-				fields,
+			box.Contents = append(
+				box.Contents,
 				string_format_writer.Field{
 					Value:              (*ids.ObjectIdStringerSansRepo)(&e.ExternalObjectId).String(),
 					DisableValueQuotes: true,
@@ -208,13 +212,11 @@ func (f *Box) WriteStringFormatExternal(
 		}
 	}
 
-	box := string_format_writer.Box{Contents: fields}
-
 	if err = f.WriteMetadataToBox(
 		o,
 		e,
 		includeDescriptionInBox,
-		&box,
+		box,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -222,45 +224,7 @@ func (f *Box) WriteStringFormatExternal(
 
 	n2, err = f.Fields.WriteStringFormat(
 		sw,
-		box,
-	)
-	n += n2
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (f *Box) WriteStringFormatExternalBoxUntracked(
-	sw interfaces.WriterAndStringWriter,
-	i *sku.Transacted,
-	e *sku.Transacted,
-	unboxedDescription bool,
-) (n int64, err error) {
-	if e.State != external_state.Untracked {
-		err = errors.Errorf(
-			"expected state %s but got %s",
-			external_state.Untracked,
-			e.State,
-		)
-
-		return
-	}
-
-	boxed := []string_format_writer.Field{}
-	unboxed := []string_format_writer.Field{}
-
-	var n2 int64
-
-	n2, err = f.Fields.WriteStringFormat(
-		sw,
-		string_format_writer.Box{
-			Contents: boxed,
-			Trailer:  unboxed,
-		},
+		*box,
 	)
 	n += n2
 
