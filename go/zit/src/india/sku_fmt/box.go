@@ -104,8 +104,6 @@ func (f *Box) WriteStringFormat(
 			err = errors.Wrap(err)
 			return
 		}
-
-		return
 	} else {
 		n2, err = f.WriteStringFormatFSBox(sw, co, o, &box, fds)
 		n += n2
@@ -119,16 +117,12 @@ func (f *Box) WriteStringFormat(
 	b := &o.Metadata.Description
 
 	if !f.Options.DescriptionInBox && !b.IsEmpty() {
-		n2, err = f.Fields.WriteStringFormat(
-			sw,
-			string_format_writer.Box{
-				Contents: []string_format_writer.Field{
-					{
-						Value:              b.String(),
-						ColorType:          string_format_writer.ColorTypeUserData,
-						DisableValueQuotes: true,
-					},
-				},
+		box.Trailer = append(
+			box.Trailer,
+			string_format_writer.Field{
+				Value:              b.String(),
+				ColorType:          string_format_writer.ColorTypeUserData,
+				DisableValueQuotes: true,
 			},
 		)
 		n += n2
@@ -137,6 +131,17 @@ func (f *Box) WriteStringFormat(
 			err = errors.Wrap(err)
 			return
 		}
+	}
+
+	n2, err = f.Fields.WriteStringFormat(
+		sw,
+		box,
+	)
+	n += n2
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
@@ -170,8 +175,6 @@ func (f *Box) WriteStringFormatExternal(
 
 	box.Contents = append(box.Contents, objectIDField)
 
-	var n2 int64
-
 	o := f.Options
 
 	if e.State != external_state.Untracked {
@@ -193,17 +196,6 @@ func (f *Box) WriteStringFormatExternal(
 		includeDescriptionInBox,
 		box,
 	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	n2, err = f.Fields.WriteStringFormat(
-		sw,
-		*box,
-	)
-	n += n2
-
-	if err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -260,16 +252,6 @@ func (f *Box) WriteMetadataToBox(
 
 	if !options.ExcludeFields {
 		box.Contents = append(box.Contents, m.Fields...)
-	}
-
-	if !options.DescriptionInBox && !b.IsEmpty() {
-		box.Trailer = []string_format_writer.Field{
-			{
-				Value:              b.String(),
-				ColorType:          string_format_writer.ColorTypeUserData,
-				DisableValueQuotes: true,
-			},
-		}
 	}
 
 	return

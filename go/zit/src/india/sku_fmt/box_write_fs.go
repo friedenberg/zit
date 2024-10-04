@@ -16,11 +16,9 @@ func (f *Box) WriteStringFormatFSBox(
 	sw interfaces.WriterAndStringWriter,
 	co *sku.CheckedOut,
 	o *sku.Transacted,
-  box *string_format_writer.Box,
+	box *string_format_writer.Box,
 	fds *sku.FSItem,
 ) (n int64, err error) {
-	var n2 int64
-
 	var m checkout_mode.Mode
 
 	if m, err = fds.GetCheckoutModeOrError(); err != nil {
@@ -94,17 +92,6 @@ func (f *Box) WriteStringFormatFSBox(
 		}
 	}
 
-	n2, err = f.Fields.WriteStringFormat(
-		sw,
-		*box,
-	)
-	n += n2
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	return
 }
 
@@ -144,8 +131,8 @@ func (f *Box) writeStringFormatBlobFD(
 	box.Contents = append(
 		box.Contents,
 		string_format_writer.Field{
-			Value:        f.Rel(fd.GetPath()),
-			ColorType:    string_format_writer.ColorTypeId,
+			Value:     f.Rel(fd.GetPath()),
+			ColorType: string_format_writer.ColorTypeId,
 		},
 	)
 
