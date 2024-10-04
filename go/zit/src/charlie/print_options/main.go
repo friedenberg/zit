@@ -242,6 +242,8 @@ func (c *General) AddToFlags(f *flag.FlagSet, m *General) {
 		&m.PrintBestandsaufnahme,
 		"",
 	)
+
+	f.BoolVar(&c.DescriptionInBox, "boxed-descrption", false, "")
 }
 
 func (c General) WithPrintShas(v bool) General {
