@@ -32,6 +32,7 @@ type Page struct {
 	hasChanges         bool
 	fs_home            fs_home.Home
 	config             *config.Compiled
+	oids               map[string]struct{}
 }
 
 func (pt *Page) initialize(
@@ -44,6 +45,7 @@ func (pt *Page) initialize(
 	pt.addedLatest = sku.MakeTransactedHeap()
 	pt.config = i.mutable_config
 	pt.probe_index = &i.probe_index
+	pt.oids = make(map[string]struct{})
 }
 
 func (s *Page) readOneRange(
@@ -87,6 +89,7 @@ func (pt *Page) add(
 	z1 *sku.Transacted,
 	mode objekte_mode.Mode,
 ) (err error) {
+	pt.oids[z1.ObjectId.String()] = struct{}{}
 	z := sku.GetTransactedPool().Get()
 
 	sku.TransactedResetter.ResetWith(z, z1)

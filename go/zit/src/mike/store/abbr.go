@@ -21,10 +21,9 @@ import (
 type AbbrStore interface {
 	ZettelId() AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId]
 	Shas() AbbrStoreGeneric[sha.Sha, *sha.Sha]
-	Etiketten() AbbrStoreGeneric[ids.Tag, *ids.Tag]
 	Typen() AbbrStoreGeneric[ids.Type, *ids.Type]
 
-	AddMatchable(*sku.Transacted) error
+	AddObjectToAbbreviationStore(*sku.Transacted) error
 	GetAbbr() ids.Abbr
 
 	errors.Flusher
@@ -33,7 +32,6 @@ type AbbrStore interface {
 type indexAbbrEncodableTridexes struct {
 	Shas     indexNotZettelId[sha.Sha, *sha.Sha]
 	ZettelId indexZettelId
-	Tags     indexNotZettelId[ids.Tag, *ids.Tag]
 	Types    indexNotZettelId[ids.Type, *ids.Type]
 }
 
@@ -59,10 +57,10 @@ func newIndexAbbr(
 ) (i *indexAbbr, err error) {
 	i = &indexAbbr{
 		General: options,
-		lock:         &sync.Mutex{},
-		once:         &sync.Once{},
-		path:         p,
-		fs_home:      fs_home,
+		lock:    &sync.Mutex{},
+		once:    &sync.Once{},
+		path:    p,
+		fs_home: fs_home,
 		indexAbbrEncodableTridexes: indexAbbrEncodableTridexes{
 			Shas: indexNotZettelId[sha.Sha, *sha.Sha]{
 				ObjectIds: tridex.Make(),
@@ -70,9 +68,6 @@ func newIndexAbbr(
 			ZettelId: indexZettelId{
 				Kopfen:    tridex.Make(),
 				Schwanzen: tridex.Make(),
-			},
-			Tags: indexNotZettelId[ids.Tag, *ids.Tag]{
-				ObjectIds: tridex.Make(),
 			},
 			Types: indexNotZettelId[ids.Type, *ids.Type]{
 				ObjectIds: tridex.Make(),
@@ -82,7 +77,6 @@ func newIndexAbbr(
 
 	i.indexAbbrEncodableTridexes.ZettelId.readFunc = i.readIfNecessary
 	i.indexAbbrEncodableTridexes.Shas.readFunc = i.readIfNecessary
-	i.indexAbbrEncodableTridexes.Tags.readFunc = i.readIfNecessary
 	i.indexAbbrEncodableTridexes.Types.readFunc = i.readIfNecessary
 
 	return
@@ -177,7 +171,7 @@ func (i *indexAbbr) GetAbbr() (out ids.Abbr) {
 	return
 }
 
-func (i *indexAbbr) AddMatchable(o *sku.Transacted) (err error) {
+func (i *indexAbbr) AddObjectToAbbreviationStore(o *sku.Transacted) (err error) {
 	if err = i.readIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -205,7 +199,7 @@ func (i *indexAbbr) AddMatchable(o *sku.Transacted) (err error) {
 		i.indexAbbrEncodableTridexes.Types.ObjectIds.Add(ks)
 
 	case genres.Tag:
-		i.indexAbbrEncodableTridexes.Tags.ObjectIds.Add(ks)
+    return
 
 	case genres.Config:
 		return
@@ -226,12 +220,6 @@ func (i *indexAbbr) ZettelId() (asg AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId
 
 func (i *indexAbbr) Shas() (asg AbbrStoreGeneric[sha.Sha, *sha.Sha]) {
 	asg = &i.indexAbbrEncodableTridexes.Shas
-
-	return
-}
-
-func (i *indexAbbr) Etiketten() (asg AbbrStoreGeneric[ids.Tag, *ids.Tag]) {
-	asg = &i.indexAbbrEncodableTridexes.Tags
 
 	return
 }

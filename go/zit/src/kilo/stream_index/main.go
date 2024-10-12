@@ -6,9 +6,9 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
@@ -102,7 +102,7 @@ func (i *Index) Initialize() (err error) {
 	return
 }
 
-func (i *Index) GetPagePair(n uint8) (p *Page) {
+func (i *Index) GetPage(n uint8) (p *Page) {
 	p = &i.pages[n]
 	return
 }
@@ -259,7 +259,7 @@ func (i *Index) Add(
 		return
 	}
 
-	p := i.GetPagePair(n)
+	p := i.GetPage(n)
 
 	if err = p.add(z, mode); err != nil {
 		err = errors.Wrap(err)
@@ -281,6 +281,35 @@ func (s *Index) ReadOneSha(
 	}
 
 	if err = s.readOneLoc(loc, sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Index) ObjectExists(
+	id ids.IdLike,
+) (err error) {
+	var n uint8
+
+	oid := id.String()
+
+	if n, err = sha.PageIndexForString(DigitWidth, oid); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	p := s.GetPage(n)
+
+	if _, ok := p.oids[oid]; ok {
+		return
+	}
+
+	sh := sha.FromString(oid)
+	defer sha.GetPool().Put(sh)
+
+	if _, err = s.readOneShaLoc(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

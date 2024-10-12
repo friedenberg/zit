@@ -4,8 +4,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
@@ -357,7 +357,7 @@ func (s *Store) addTyp(
 		return
 	}
 
-	if err = s.GetAbbrStore().Typen().Exists(t.Parts()); err == nil {
+	if err = s.GetStreamIndex().ObjectExists(t); err == nil {
 		return
 	}
 
@@ -422,7 +422,7 @@ func (s *Store) addEtikettAndExpanded(
 			continue
 		}
 
-		if err = s.GetAbbrStore().Etiketten().Exists(e1.Parts()); err == nil {
+		if err = s.GetStreamIndex().ObjectExists(e1); err == nil {
 			continue
 		}
 
@@ -467,7 +467,7 @@ func (s *Store) addMatchableTypAndEtikettenIfNecessary(
 }
 
 func (s *Store) addMatchableCommon(m *sku.Transacted) (err error) {
-	if err = s.GetAbbrStore().AddMatchable(m); err != nil {
+	if err = s.GetAbbrStore().AddObjectToAbbreviationStore(m); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -488,7 +488,7 @@ func (s *Store) reindexOne(besty, sk *sku.Transacted) (err error) {
 		return
 	}
 
-	if err = s.GetAbbrStore().AddMatchable(sk); err != nil {
+	if err = s.GetAbbrStore().AddObjectToAbbreviationStore(sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
