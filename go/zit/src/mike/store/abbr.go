@@ -21,7 +21,6 @@ import (
 type AbbrStore interface {
 	ZettelId() AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId]
 	Shas() AbbrStoreGeneric[sha.Sha, *sha.Sha]
-	Typen() AbbrStoreGeneric[ids.Type, *ids.Type]
 
 	AddObjectToAbbreviationStore(*sku.Transacted) error
 	GetAbbr() ids.Abbr
@@ -32,7 +31,6 @@ type AbbrStore interface {
 type indexAbbrEncodableTridexes struct {
 	Shas     indexNotZettelId[sha.Sha, *sha.Sha]
 	ZettelId indexZettelId
-	Types    indexNotZettelId[ids.Type, *ids.Type]
 }
 
 type indexAbbr struct {
@@ -69,15 +67,11 @@ func newIndexAbbr(
 				Kopfen:    tridex.Make(),
 				Schwanzen: tridex.Make(),
 			},
-			Types: indexNotZettelId[ids.Type, *ids.Type]{
-				ObjectIds: tridex.Make(),
-			},
 		},
 	}
 
 	i.indexAbbrEncodableTridexes.ZettelId.readFunc = i.readIfNecessary
 	i.indexAbbrEncodableTridexes.Shas.readFunc = i.readIfNecessary
-	i.indexAbbrEncodableTridexes.Types.readFunc = i.readIfNecessary
 
 	return
 }
@@ -195,13 +189,7 @@ func (i *indexAbbr) AddObjectToAbbreviationStore(o *sku.Transacted) (err error) 
 		i.indexAbbrEncodableTridexes.ZettelId.Kopfen.Add(h.GetHead())
 		i.indexAbbrEncodableTridexes.ZettelId.Schwanzen.Add(h.GetTail())
 
-	case genres.Type:
-		i.indexAbbrEncodableTridexes.Types.ObjectIds.Add(ks)
-
-	case genres.Tag:
-    return
-
-	case genres.Config:
+	case genres.Type, genres.Tag, genres.Config:
 		return
 
 	default:
@@ -220,12 +208,6 @@ func (i *indexAbbr) ZettelId() (asg AbbrStoreGeneric[ids.ZettelId, *ids.ZettelId
 
 func (i *indexAbbr) Shas() (asg AbbrStoreGeneric[sha.Sha, *sha.Sha]) {
 	asg = &i.indexAbbrEncodableTridexes.Shas
-
-	return
-}
-
-func (i *indexAbbr) Typen() (asg AbbrStoreGeneric[ids.Type, *ids.Type]) {
-	asg = &i.indexAbbrEncodableTridexes.Types
 
 	return
 }
