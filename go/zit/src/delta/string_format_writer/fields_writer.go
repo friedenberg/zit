@@ -124,10 +124,16 @@ func (f *fieldsWriter) WriteStringFormat(
 		}
 	}
 
+	closingBracket := "]"
+
+	if len(box.Trailer) > 0 && false {
+		closingBracket = "\n" + StringIndent + " ]"
+	}
+
 	n1, err = f.writeStringFormatField(
 		w,
 		Field{
-			Value:     "]",
+			Value:     closingBracket,
 			ColorType: ColorTypeNormal,
 		},
 	)

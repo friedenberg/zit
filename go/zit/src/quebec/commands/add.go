@@ -31,7 +31,7 @@ type Add struct {
 
 func init() {
 	registerCommandWithQuery(
-		"add",
+		"add-old",
 		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Add{}
 

@@ -6,37 +6,50 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
 type Checkin struct {
-	Delete     bool
-	IgnoreBlob bool
-	Organize   bool
+	Delete             bool
+	IgnoreBlob         bool
+	Organize           bool
+	Proto              sku.Proto
+	CheckoutBlobAndRun string
+	OpenBlob           bool
 }
 
 func init() {
-	registerCommandWithQuery(
-		"checkin",
-		func(f *flag.FlagSet) CommandWithQuery {
-			c := &Checkin{}
+	f := func(f *flag.FlagSet) CommandWithQuery {
+		c := &Checkin{}
 
-			f.BoolVar(&c.Delete, "delete", false, "the checked-out file")
+		f.BoolVar(&c.Delete, "delete", false, "the checked-out file")
 
-			f.BoolVar(
-				&c.IgnoreBlob,
-				"ignore-blob",
-				false,
-				"do not change the blob",
-			)
+		f.BoolVar(
+			&c.IgnoreBlob,
+			"ignore-blob",
+			false,
+			"do not change the blob",
+		)
 
-			f.BoolVar(&c.Organize, "organize", false, "")
+		f.StringVar(
+			&c.CheckoutBlobAndRun,
+			"each-blob",
+			"",
+			"checkout each Blob and run a utility",
+		)
 
-			return c
-		},
-	)
+		f.BoolVar(&c.Organize, "organize", false, "")
+
+		c.Proto.AddToFlagSet(f)
+
+		return c
+	}
+
+	registerCommandWithQuery("checkin", f)
+	registerCommandWithQuery("add", f)
 }
 
 func (c Checkin) DefaultGenres() ids.Genre {
@@ -54,8 +67,11 @@ func (c Checkin) RunWithQuery(
 	qg *query.Group,
 ) (err error) {
 	op := user_ops.Checkin{
-		Delete:   c.Delete,
-		Organize: c.Organize,
+		Delete:             c.Delete,
+		Organize:           c.Organize,
+		Proto:              c.Proto,
+		CheckoutBlobAndRun: c.CheckoutBlobAndRun,
+		OpenBlob:           c.OpenBlob,
 	}
 
 	// TODO add auto dot operator

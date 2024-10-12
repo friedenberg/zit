@@ -1,17 +1,13 @@
 package user_ops
 
 import (
-	"io"
-
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
@@ -163,62 +159,6 @@ func (c CreateFromPaths) Run(
 	}
 
 	if err = c.Unlock(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-// TODO-P1 migrate this to use store_working_directory
-// TODO remove this
-func (c *CreateFromPaths) zettelsFromPath(
-	p string,
-	wf interfaces.FuncIter[*sku.Transacted],
-) (err error) {
-	var r io.Reader
-
-	ui.Log().Print("running")
-
-	if r, err = c.Filter.Run(p); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, &c.Filter)
-
-	var fd fd.FD
-
-	if err = fd.Set(p); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	ze := store_fs.GetExternalPool().Get()
-
-	if err = c.GetStore().GetCwdFiles().SetObjectOrError(ze, &fd); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	ze.Metadata.Tai = ids.TaiFromTime(fd.ModTime())
-
-	ze.ObjectId.SetGenre(genres.Zettel)
-
-	if _, err = c.TextParser.ParseMetadata(
-		r,
-		ze,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = ze.CalculateObjectShas(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = wf(ze); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

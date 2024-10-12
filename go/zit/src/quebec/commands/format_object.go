@@ -70,7 +70,7 @@ func (c *FormatObject) Run(u *env.Env, args ...string) (err error) {
 	switch len(args) {
 	case 2:
 		formatId = args[1]
-    fallthrough
+		fallthrough
 	case 1:
 		objectIdString = args[0]
 
@@ -240,21 +240,27 @@ func (c *FormatObject) getBlobFormatter(
 	ok := false
 
 	if c.UTIGroup == "" {
-    if formatId == "" {
-      formatId = "text"
-    }
+		getBlobFormatter := func(formatId string) (script_config.RemoteScript) {
+			var formatIds []string
 
-		blobFormatter, ok = typeBlob.Formatters[formatId]
+			if formatId == "" {
+				formatIds = []string{"text-edit", "text"}
+			} else {
+				formatIds = []string{formatId}
+			}
 
-		if !ok && len(typeBlob.Formatters) > 0 && formatId != "" {
-			err = errors.BadRequestf(
-				"no matching format id %q. Available ID's: %s",
-        formatId,
-				maps.Keys(typeBlob.Formatters),
-			)
+			for _, formatId := range formatIds {
+				blobFormatter, ok = typeBlob.Formatters[formatId]
 
-      return
+				if ok {
+					return blobFormatter
+				}
+			}
+
+			return nil
 		}
+
+		blobFormatter = getBlobFormatter(formatId)
 
 		return
 	}
@@ -263,11 +269,11 @@ func (c *FormatObject) getBlobFormatter(
 	g, ok = typeBlob.FormatterUTIGroups[c.UTIGroup]
 
 	if !ok {
-    err = errors.BadRequestf(
-      "no uti group: %q. Available groups: %s",
-      c.UTIGroup,
-      maps.Keys(typeBlob.FormatterUTIGroups),
-    )
+		err = errors.BadRequestf(
+			"no uti group: %q. Available groups: %s",
+			c.UTIGroup,
+			maps.Keys(typeBlob.FormatterUTIGroups),
+		)
 		return
 	}
 

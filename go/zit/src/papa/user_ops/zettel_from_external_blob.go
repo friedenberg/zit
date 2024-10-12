@@ -34,7 +34,6 @@ func (c ZettelFromExternalBlob) Run(
 	if err = c.GetStore().QueryCheckedOut(
 		qg,
 		func(col sku.CheckedOutLike) (err error) {
-			// TODO support other repos
 			cofs := col.(*sku.CheckedOut)
 			z := col.GetSkuExternalLike().GetSku()
 

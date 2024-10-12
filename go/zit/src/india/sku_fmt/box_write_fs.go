@@ -72,7 +72,7 @@ func (f *Box) WriteStringFormatFSBox(
 		if err = f.WriteMetadataToBox(
 			op,
 			o,
-			true,
+			op.DescriptionInBox,
 			box,
 		); err != nil {
 			err = errors.Wrap(err)
