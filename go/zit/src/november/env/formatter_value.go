@@ -295,6 +295,19 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
+	case "object-id-abbreviated":
+		f = func(e *sku.Transacted) (err error) {
+			if _, err = fmt.Fprintln(
+				out,
+				&e.ObjectId,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
 	case "object-id-tai":
 		f = func(e *sku.Transacted) (err error) {
 			_, err = fmt.Fprintln(out, e.StringObjectIdTai())

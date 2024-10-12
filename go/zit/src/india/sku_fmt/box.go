@@ -27,7 +27,7 @@ func MakeBox(
 	return &Box{
 		ColorOptions:     co,
 		Options:          options,
-		Fields:           fieldsFormatWriter,
+		Box:              fieldsFormatWriter,
 		Abbr:             abbr,
 		FSItemReadWriter: fsItemReadWriter,
 		RelativePath:     relativePath,
@@ -41,7 +41,7 @@ type Box struct {
 	MaxHead, MaxTail int
 	Padding          string
 
-	Fields interfaces.StringFormatWriter[string_format_writer.Box]
+	Box interfaces.StringFormatWriter[string_format_writer.Box]
 
 	ids.Abbr
 	FSItemReadWriter sku.FSItemReadWriter
@@ -133,7 +133,7 @@ func (f *Box) WriteStringFormat(
 		}
 	}
 
-	n2, err = f.Fields.WriteStringFormat(
+	n2, err = f.Box.WriteStringFormat(
 		sw,
 		box,
 	)
@@ -167,8 +167,17 @@ func (f *Box) WriteStringFormatExternal(
 		oid = &e.ExternalObjectId
 	}
 
+	oidString := (*ids.ObjectIdStringerSansRepo)(oid).String()
+
+	if f.Abbr.ZettelId.Abbreviate != nil {
+		if oidString, err = f.Abbr.ZettelId.Abbreviate(oid); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	objectIDField := string_format_writer.Field{
-		Value:              (*ids.ObjectIdStringerSansRepo)(oid).String(),
+		Value:              oidString,
 		DisableValueQuotes: true,
 		ColorType:          string_format_writer.ColorTypeId,
 	}
