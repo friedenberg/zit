@@ -349,7 +349,7 @@ func (a *Assignment) SubtractFromSet(es ids.TagMutableSet) (err error) {
 		func(e *ids.Tag) (err error) {
 			if err = es.EachPtr(
 				func(e1 *ids.Tag) (err error) {
-					if !ids.Contains(e1, e) {
+					if !ids.ContainsExactly(e1, e) {
 						return
 					}
 

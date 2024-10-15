@@ -10,6 +10,7 @@ const (
 	Untracked
 	Recognized
 	Conflicted
+	Parent
 	Deleted
 	WouldDelete
 	Error
@@ -28,6 +29,9 @@ func (s State) String() string {
 
 	case Conflicted:
 		return "conflict"
+
+	case Parent:
+		return "parent"
 
 	case Deleted:
 		return "deleted"

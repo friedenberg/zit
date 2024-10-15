@@ -78,8 +78,8 @@ func (c *constructor) preparePrefixSetsAndRootsAndExtras() (err error) {
 
 			ui.Log().Print(re, "explicit", explicitCount, "implicit", implicitCount)
 
-			// TODO [hemp/mr !task project-2021-zit-bugs today zz-inbox] fix issue with `zit organize project-2021-zit` causing deltas
-			if explicitCount == c.Options.Skus.Len() || true {
+			// TODO [radi/du !task project-2021-zit-etiketten_and_organize zz-inbox] fix issue with `zit organize project-2021-zit` causing an extra tag…
+			if explicitCount == c.Options.Skus.Len() {
 				if err = anchored.Add(re); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -172,13 +172,20 @@ func (c *constructor) makeChildrenWithPossibleGroups(
 	used objSet,
 ) (err error) {
 	if groupingTags.Len() == 0 {
-		if err = c.makeChildrenWithoutGroups(
-			parent,
-			prefixSet.EachZettel,
-			used,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
+		for _, tz := range prefixSet.AllObjects() {
+			var z *obj
+
+			if z, err = c.cloneObj(tz); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			parent.AddObject(z)
+
+			if err = used.Add(tz); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 
 		return
@@ -293,27 +300,6 @@ func (c *constructor) cloneObj(
 	// if z.External.GetSku().Metadata.Shas.SelfMetadataWithoutTai.IsNull() {
 	// 	panic("empty sha")
 	// }
-
-	if err = c.removeTagsIfNecessary(z); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (c *constructor) removeTagsIfNecessary(
-	o *obj,
-) (err error) {
-	if c.PrintOptions.PrintTagsAlways {
-		return
-	}
-
-	if o.External.GetSku().Metadata.Description.IsEmpty() {
-		return
-	}
-
-	o.External.GetSku().Metadata.ResetTags()
 
 	return
 }

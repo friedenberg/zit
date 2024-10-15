@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/object_id_provider"
@@ -222,6 +223,12 @@ func (s *Store) tryRealizeAndOrStore(
 				return
 			}
 		} else {
+      // [are/kabuto !task project-2021-zit-features zz-inbox] add delta printing to changed objects
+			// if err = s.Updated(mutter); err != nil {
+			// 	err = errors.Wrap(err)
+			// 	return
+			// }
+
 			if err = s.Updated(kinder); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -274,6 +281,7 @@ func (s *Store) fetchMutterIfNecessary(
 	// }
 
 	sk.Metadata.Mutter().ResetWith(mutter.Metadata.Sha())
+	mutter.State = external_state.Parent
 
 	return
 }

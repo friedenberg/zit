@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -169,7 +170,7 @@ func (f *Box) WriteStringFormatExternal(
 
 	oidString := (*ids.ObjectIdStringerSansRepo)(oid).String()
 
-	if f.Abbr.ZettelId.Abbreviate != nil {
+	if f.Abbr.ZettelId.Abbreviate != nil && oid.GetGenre() == genres.Zettel {
 		if oidString, err = f.Abbr.ZettelId.Abbreviate(oid); err != nil {
 			err = errors.Wrap(err)
 			return

@@ -1,6 +1,8 @@
 package organize_text
 
 import (
+	"iter"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
@@ -157,7 +159,29 @@ func (a PrefixSet) Each(
 	return
 }
 
-func (a PrefixSet) EachZettel(
+func (a PrefixSet) AllObjectSets() iter.Seq2[string, objSet] {
+	return func(yield func(string, objSet) bool) {
+		for i, os := range a.innerMap {
+			if !yield(i, os) {
+				break
+			}
+		}
+	}
+}
+
+func (a PrefixSet) AllObjects() iter.Seq2[string, *obj] {
+	return func(yield func(string, *obj) bool) {
+		for i, os := range a.innerMap {
+			for o := range os.All() {
+				if !yield(i, o) {
+					break
+				}
+			}
+		}
+	}
+}
+
+func (a PrefixSet) EachObject(
 	f interfaces.FuncIter[*obj],
 ) error {
 	return a.Each(
