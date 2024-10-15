@@ -172,10 +172,8 @@ func (a *Assignment) addToSet(
 			return
 		}
 
-		m := outputObject.GetSku().GetMetadata()
-
 		for e := range expanded.AllPtr() {
-			m.AddTagPtr(e)
+			outputObject.GetSku().AddTagPtr(e)
 		}
 	}
 

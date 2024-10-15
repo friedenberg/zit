@@ -303,15 +303,11 @@ func (ar *reader) readOneObj(
 			err = errors.Wrap(err)
 			return
 		}
-
-		ar.currentAssignment.AddObject(&z)
-
-		return
-	}
-
-	if err = ar.options.Abbr.ExpandZettelIdOnly(&z.External.GetSku().ObjectId); err != nil {
-		err = errors.Wrap(err)
-		return
+	} else {
+		if err = ar.options.Abbr.ExpandZettelIdOnly(&z.External.GetSku().ObjectId); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	ar.currentAssignment.AddObject(&z)
