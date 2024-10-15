@@ -28,7 +28,7 @@ function write_blob_null { # @test
 
 	run_zit write-blob - </dev/null
 	assert_success
-	assert_output 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 -'
+	assert_output 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 - (checked in)'
 }
 
 function write_blob_one_file { # @test

@@ -88,7 +88,7 @@ func MetadataFieldDescription(
 	m *object_metadata.Metadata,
 ) string_format_writer.Field {
 	return string_format_writer.Field{
-		Value:     m.Description.String(),
+		Value:     m.Description.StringWithoutNewlines(),
 		ColorType: string_format_writer.ColorTypeUserData,
 	}
 }

@@ -121,7 +121,7 @@ func (f *Box) WriteStringFormat(
 		box.Trailer = append(
 			box.Trailer,
 			string_format_writer.Field{
-				Value:              b.String(),
+				Value:              b.StringWithoutNewlines(),
 				ColorType:          string_format_writer.ColorTypeUserData,
 				DisableValueQuotes: true,
 			},

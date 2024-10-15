@@ -1,7 +1,10 @@
 package commands
 
 import (
+	"context"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
@@ -11,6 +14,19 @@ import (
 )
 
 func Run(args []string) (exitStatus int) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	ch := make(chan os.Signal, 1)
+
+	signal.Notify(ch, syscall.SIGINT)
+
+	go func() {
+		<-ch
+		cancel()
+		os.Exit(1)
+	}()
+
 	var err error
 
 	defer func() {
@@ -66,14 +82,10 @@ func Run(args []string) (exitStatus int) {
 		return
 	}
 
-	var dc *debug.Context
-
-	if dc, err = debug.MakeContext(konfigCli.Debug); err != nil {
+	if _, err = debug.MakeContext(ctx, konfigCli.Debug); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	defer errors.DeferredCloser(&err, dc)
 
 	cmdArgs := cmd.Args()
 

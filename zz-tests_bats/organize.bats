@@ -1340,3 +1340,17 @@ function query_with_and_without_default_genre_matches { # @test
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
 }
+
+# [nob/golb !task project-2021-zit-bugs project-2021-zit-v1 today zz-inbox] fix issue with newlines rendered in organize
+function object_with_newline_in_description { # @test
+	run_zit new -edit=false - <<-EOM
+		---
+		# description that has
+		# newline
+		---
+	EOM
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "description that has newline"]
+	EOM
+}

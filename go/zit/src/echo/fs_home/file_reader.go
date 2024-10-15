@@ -10,9 +10,13 @@ import (
 func NewFileReader(o FileReadOptions) (r Reader, err error) {
 	ar := objekteReader{}
 
-	if ar.file, err = files.Open(o.Path); err != nil {
-		err = errors.Wrap(err)
-		return
+	if o.Path == "-" {
+		ar.file = os.Stdin
+	} else {
+		if ar.file, err = files.Open(o.Path); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	fro := ReadOptions{

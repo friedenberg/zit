@@ -267,7 +267,7 @@ func TestReadWithoutBlobWithMultilineDescription(t1 *testing.T) {
 	)
 
 	expected := &object_metadata.Metadata{
-		Description: descriptions.Make("the title\ncontinues"),
+		Description: descriptions.Make("the title continues"),
 		Type:        makeBlobExt(t, "md"),
 	}
 

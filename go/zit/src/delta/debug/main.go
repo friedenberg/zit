@@ -1,16 +1,13 @@
 package debug
 
 import (
+	"context"
 	"os"
-	"os/signal"
-	"runtime"
 	"runtime/debug"
 	"runtime/pprof"
 	"runtime/trace"
-	"syscall"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 )
 
@@ -19,7 +16,7 @@ type Context struct {
 	options                                Options
 }
 
-func MakeContext(options Options) (c *Context, err error) {
+func MakeContext(ctx context.Context, options Options) (c *Context, err error) {
 	c = &Context{
 		options: options,
 	}
@@ -46,15 +43,9 @@ func MakeContext(options Options) (c *Context, err error) {
 		debug.SetGCPercent(-1)
 	}
 
-	ch := make(chan os.Signal, 1)
-
-	signal.Notify(ch, syscall.SIGINT)
-
 	go func() {
-		<-ch
-		ui.Err().Print("SIGINT")
+		<-ctx.Done()
 		c.Close()
-		runtime.Goexit()
 	}()
 
 	return

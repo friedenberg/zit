@@ -27,6 +27,10 @@ func (b Description) String() string {
 	return b.value
 }
 
+func (b Description) StringWithoutNewlines() string {
+	return strings.Replace(b.value, "\n", " ", -1)
+}
+
 func (b *Description) TodoSetManyCatgutStrings(
 	vs ...*catgut.String,
 ) (err error) {
@@ -142,7 +146,7 @@ func (b *Description) Set(v string) (err error) {
 	v1 := strings.TrimSpace(v)
 
 	if v0 := b.String(); v0 != "" && v0 != v1 {
-		b.value = v0 + "\n" + v1
+		b.value = v0 + " " + v1
 	} else {
 		b.value = v1
 	}
