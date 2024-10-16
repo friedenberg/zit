@@ -15,7 +15,7 @@ type StoreVersion struct {
 func init() {
 	registerCommandWithoutEnvironment(
 		"store-version",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithResult {
 			c := &StoreVersion{
 				Config: immutable_config.Default(),
 			}
@@ -25,7 +25,7 @@ func init() {
 	)
 }
 
-func (c StoreVersion) Run(u *env.Env, args ...string) (err error) {
+func (c StoreVersion) Run(u *env.Env, args ...string) (result Result) {
 	ui.Out().Printf("%s\n", c.Config.GetStoreVersion())
 
 	return

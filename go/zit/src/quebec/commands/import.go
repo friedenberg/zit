@@ -32,7 +32,7 @@ type Import struct {
 func init() {
 	registerCommand(
 		"import",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithResult {
 			c := &Import{
 				CompressionType: immutable_config.CompressionTypeDefault,
 			}
@@ -49,7 +49,13 @@ func init() {
 	)
 }
 
-func (c Import) Run(u *env.Env, args ...string) (err error) {
+func (c Import) Run(u *env.Env, args ...string) (result Result) {
+	result.Error = c.run(u, args...)
+
+	return
+}
+
+func (c Import) run(u *env.Env, args ...string) (err error) {
 	hasConflicts := false
 
 	if c.InventoryList == "" {
@@ -220,7 +226,8 @@ func (c Import) importBlobIfNecessary(
 		)
 	}
 
-	ui.Err().Printf("copied Blob %s (%d bytes)", blobSha, n)
+	// TODO switch to Err and fix test
+	ui.Out().Printf("copied Blob %s (%d bytes)", blobSha, n)
 
 	return
 }

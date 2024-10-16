@@ -14,6 +14,8 @@ import (
 )
 
 type Show struct {
+	After  ids.Tai
+	Before ids.Tai
 	Format string
 }
 
@@ -24,6 +26,8 @@ func init() {
 			c := &Show{}
 
 			f.StringVar(&c.Format, "format", "log", "format")
+			f.Var((*ids.TaiRFC3339Value)(&c.Before), "before", "")
+			f.Var((*ids.TaiRFC3339Value)(&c.After), "after", "")
 
 			return c
 		},
@@ -55,6 +59,40 @@ func (c Show) RunWithQuery(
 	if f, err = u.MakeFormatFunc(c.Format, u.Out()); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	if !c.Before.IsEmpty() {
+		old := f
+
+		f = func(sk *sku.Transacted) (err error) {
+			if !sk.GetTai().Before(c.Before) {
+				return
+			}
+
+			if err = old(sk); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+	}
+
+	if !c.After.IsEmpty() {
+		old := f
+
+		f = func(sk *sku.Transacted) (err error) {
+			if !sk.GetTai().After(c.After) {
+				return
+			}
+
+			if err = old(sk); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
 	}
 
 	if err = u.GetStore().QueryTransacted(

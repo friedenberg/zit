@@ -2,6 +2,7 @@ package commands
 
 import (
 	"flag"
+	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
@@ -10,13 +11,17 @@ type Command interface {
 	Run(*env.Env, ...string) error
 }
 
+type CommandWithResult interface {
+	Run(*env.Env, ...string) Result
+}
+
 type WithCompletion interface {
 	Complete(u *env.Env, args ...string) (err error)
 }
 
 type command struct {
 	withoutEnv bool
-	Command
+	Command    CommandWithResult
 	*flag.FlagSet
 }
 
@@ -26,64 +31,65 @@ func Commands() map[string]command {
 	return commands
 }
 
-func registerCommand(n string, makeFunc func(*flag.FlagSet) Command) {
+func _registerCommand(
+	env bool,
+	n string,
+	makeFunc any,
+) {
 	f := flag.NewFlagSet(n, flag.ExitOnError)
-
-	c := makeFunc(f)
 
 	if _, ok := commands[n]; ok {
 		panic("command added more than once: " + n)
 	}
 
-	commands[n] = command{
-		Command: c,
-		FlagSet: f,
+	switch mft := makeFunc.(type) {
+	case func(*flag.FlagSet) Command:
+		commands[n] = command{
+			withoutEnv: env,
+			Command:    commandWithResult{Command: mft(f)},
+			FlagSet:    f,
+		}
+
+	case func(*flag.FlagSet) CommandWithResult:
+		commands[n] = command{
+			withoutEnv: env,
+			Command:    mft(f),
+			FlagSet:    f,
+		}
+
+	default:
+		panic(fmt.Sprintf("command make func not supported: %T", mft))
 	}
+}
+
+func registerCommand(n string, makeFunc any) {
+	_registerCommand(false, n, makeFunc)
 }
 
 func registerCommandWithoutEnvironment(
 	n string,
-	makeFunc func(*flag.FlagSet) Command,
+	makeFunc any,
 ) {
-	f := flag.NewFlagSet(n, flag.ExitOnError)
-
-	c := makeFunc(f)
-
-	if _, ok := commands[n]; ok {
-		panic("command added more than once: " + n)
-	}
-
-	commands[n] = command{
-		withoutEnv: true,
-		Command:    c,
-		FlagSet:    f,
-	}
+	_registerCommand(true, n, makeFunc)
 }
 
 func registerCommandWithQuery(
 	n string,
 	makeFunc func(*flag.FlagSet) CommandWithQuery,
 ) {
-	f := flag.NewFlagSet(n, flag.ExitOnError)
+	_registerCommand(
+		false,
+		n,
+		func(f *flag.FlagSet) Command {
+			cweq := &commandWithQuery{}
 
-	c := makeFunc(f)
+			f.Var(&cweq.RepoId, "kasten", "none or Browser")
+			f.BoolVar(&cweq.ExcludeUntracked, "exclude-untracked", false, "")
+			f.BoolVar(&cweq.ExcludeRecognized, "exclude-recognized", false, "")
 
-	if _, ok := commands[n]; ok {
-		panic("command added more than once: " + n)
-	}
+			cweq.CommandWithQuery = makeFunc(f)
 
-	cweq := &commandWithQuery{
-		CommandWithQuery: c,
-	}
-
-	f.Var(&cweq.RepoId, "kasten", "none or Browser")
-	f.BoolVar(&cweq.ExcludeUntracked, "exclude-untracked", false, "")
-	f.BoolVar(&cweq.ExcludeRecognized, "exclude-recognized", false, "")
-
-	co := command{
-		Command: cweq,
-		FlagSet: f,
-	}
-
-	commands[n] = co
+			return cweq
+		},
+	)
 }

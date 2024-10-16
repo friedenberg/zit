@@ -32,17 +32,9 @@ var binaryFieldOrder = []keys.Binary{
 	keys.CacheTags,
 }
 
-func makeQueryGroupForFlush() sku.PrimitiveQueryGroup {
-	return makeQueryGroupWithSigils(ids.SigilHistory, ids.SigilHidden)
-}
-
-func makeQueryGroupWithSigils(ss ...ids.Sigil) sku.PrimitiveQueryGroup {
-	return &flushQueryGroup{Sigil: ids.MakeSigil(ss...)}
-}
-
 func makeBinary(s ids.Sigil) binaryDecoder {
 	return binaryDecoder{
-		PrimitiveQueryGroup: makeQueryGroupWithSigils(s),
+		PrimitiveQueryGroup: sku.MakePrimitiveQueryGroupWithSigils(s),
 		Sigil:               s,
 	}
 }
@@ -53,7 +45,7 @@ func makeBinaryWithQueryGroup(
 ) binaryDecoder {
 	ui.Log().Print(qg)
 	if qg == nil {
-		qg = makeQueryGroupForFlush()
+		qg = sku.MakePrimitiveQueryGroup()
 	}
 
 	if !qg.HasHidden() {

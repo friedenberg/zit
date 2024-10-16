@@ -8,6 +8,25 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
+func (s *Store) QueryPrimitive(
+	qg sku.PrimitiveQueryGroup,
+	f interfaces.FuncIter[*sku.Transacted],
+) (err error) {
+	var e query.ExecutorPrimitive
+
+	if e, err = s.MakeQueryExecutorPrimitive(qg); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = e.ExecuteTransacted(f); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s *Store) QueryTransacted(
 	qg *query.Group,
 	f interfaces.FuncIter[*sku.Transacted],
@@ -27,6 +46,7 @@ func (s *Store) QueryTransacted(
 	return
 }
 
+// TODO remove entirely in favor of Transacted
 func (s *Store) Query(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.ExternalLike],

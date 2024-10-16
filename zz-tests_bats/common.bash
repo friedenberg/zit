@@ -1,5 +1,6 @@
 #! /bin/bash -e
 
+bats_require_minimum_version 1.5.0
 load "$BATS_CWD/zz-tests_bats/test_helper/bats-support/load"
 load "$BATS_CWD/zz-tests_bats/test_helper/bats-assert/load"
 load "$BATS_CWD/zz-tests_bats/test_helper/bats-assert-additions/load"
@@ -72,6 +73,13 @@ function chflags_and_rm {
 }
 
 function run_zit {
+  cmd="$1"
+  shift
+  #shellcheck disable=SC2068
+  run --separate-stderr zit "$cmd" ${cmd_zit_def[@]} "$@"
+}
+
+function run_zit_stderr_unified {
   cmd="$1"
   shift
   #shellcheck disable=SC2068

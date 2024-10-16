@@ -66,6 +66,14 @@ func (t Tai) AsTime() (t1 thyme.Time) {
 	return
 }
 
+func (a Tai) Before(b Tai) bool {
+	return a.tai.Before(b.tai)
+}
+
+func (a Tai) After(b Tai) bool {
+	return a.tai.After(b.tai)
+}
+
 func (t Tai) GetGenre() interfaces.Genre {
 	return genres.InventoryList
 }
@@ -212,7 +220,7 @@ func (t Tai) IsEmpty() (ok bool) {
 }
 
 func (t Tai) GetTai() Tai {
-  return t
+	return t
 }
 
 func (t *Tai) Reset() {
@@ -298,5 +306,26 @@ func (t Tai) Equals(t1 Tai) bool {
 }
 
 func (t Tai) Less(t1 Tai) bool {
-	return t.Before(t1.tai)
+	return t.Before(t1)
+}
+
+type TaiRFC3339Value Tai
+
+func (t *TaiRFC3339Value) Set(v string) (err error) {
+	t.wasSet = true
+
+	var t1 time.Time
+
+	if t1, err = thyme.Parse(thyme.RFC3339, v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	*t = TaiRFC3339Value(TaiFromTime1(t1))
+
+	return
+}
+
+func (t *TaiRFC3339Value) String() string {
+	return t.Format(thyme.RFC3339)
 }

@@ -28,12 +28,7 @@ func CopyWithPrefixOnDelim(
 		lineNo int
 	)
 
-	for {
-		if eof {
-			err = nil
-			break
-		}
-
+	for !eof {
 		var rawLine string
 
 		rawLine, err = br.ReadString(delim)
@@ -47,12 +42,15 @@ func CopyWithPrefixOnDelim(
 
 		if errors.IsEOF(err) {
 			eof = true
+			err = nil
+
+			if n1 == 0 {
+				break
+			}
 		}
 
 		bw.WriteString(prefix)
-		bw.WriteString(fmt.Sprintf(":%d:\t", lineNo))
-		bw.WriteString(rawLine)
-		bw.WriteByte(delim)
+		fmt.Fprintf(bw, ":%d:\t%s", lineNo, rawLine)
 
 		lineNo++
 	}

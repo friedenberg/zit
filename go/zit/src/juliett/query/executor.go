@@ -31,6 +31,7 @@ type (
 	}
 )
 
+// TODO use ExecutorPrimitive
 type Executor struct {
 	*Group
 	ExecutionInfo

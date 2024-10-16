@@ -3,44 +3,100 @@ package commands
 import (
 	"flag"
 	"io"
+	"os/exec"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/delim_io"
+	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
-type CatBlob struct{}
+type CatBlob struct {
+	Utility script_value.Utility
+}
 
 func init() {
 	registerCommand(
 		"cat-blob",
-		func(_ *flag.FlagSet) Command {
+		func(f *flag.FlagSet) Command {
 			c := &CatBlob{}
+
+			f.Var(&c.Utility, "utility", "")
 
 			return c
 		},
 	)
 }
 
+type shaWithReadCloser struct {
+	Sha        *sha.Sha
+	ReadCloser io.ReadCloser
+}
+
+func (c CatBlob) makeBlobWriter(u *env.Env) interfaces.FuncIter[shaWithReadCloser] {
+	if c.Utility.IsEmpty() {
+		return quiter.MakeSyncSerializer(
+			func(rc shaWithReadCloser) (err error) {
+				defer errors.DeferredCloser(&err, rc.ReadCloser)
+
+				if _, err = io.Copy(u.Out(), rc.ReadCloser); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
+			},
+		)
+	} else {
+		return quiter.MakeSyncSerializer(
+			func(rc shaWithReadCloser) (err error) {
+				defer errors.DeferredCloser(&err, rc.ReadCloser)
+
+				cmd := exec.Command(c.Utility.Head(), c.Utility.Tail()...)
+				cmd.Stdin = rc.ReadCloser
+
+				var out io.ReadCloser
+
+				if out, err = cmd.StdoutPipe(); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if err = cmd.Start(); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if _, err = delim_io.CopyWithPrefixOnDelim(
+					'\n',
+          rc.Sha.GetShaLike().GetShaString(),
+					u.Out(),
+					out,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if err = cmd.Wait(); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
+			},
+		)
+	}
+}
+
 func (c CatBlob) Run(
 	u *env.Env,
 	args ...string,
 ) (err error) {
-	blobWriter := quiter.MakeSyncSerializer(
-		func(rc io.ReadCloser) (err error) {
-			defer errors.DeferredCloser(&err, rc)
-
-			if _, err = io.Copy(u.Out(), rc); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
-	)
+	blobWriter := c.makeBlobWriter(u)
 
 	for _, v := range args {
 		var sh sha.Sha
@@ -50,23 +106,10 @@ func (c CatBlob) Run(
 			return
 		}
 
-		if err = c.blob(u, &sh, blobWriter); err == nil {
-			continue
+		if err = c.blob(u, &sh, blobWriter); err != nil {
+			ui.Err().Print(err)
+			err = nil
 		}
-
-		var rc sha.ReadCloser
-
-		if rc, err = u.GetStore().ReaderFor(&sh); err == nil {
-			if err = blobWriter(rc); err != nil {
-				ui.Err().Print(err)
-				err = nil
-				continue
-			}
-
-			continue
-		}
-
-		ui.Err().Print(err)
 	}
 
 	return
@@ -75,16 +118,18 @@ func (c CatBlob) Run(
 func (c CatBlob) blob(
 	u *env.Env,
 	sh *sha.Sha,
-	blobWriter interfaces.FuncIter[io.ReadCloser],
+	blobWriter interfaces.FuncIter[shaWithReadCloser],
 ) (err error) {
-	var r io.ReadCloser
+	var r sha.ReadCloser
 
 	if r, err = u.GetFSHome().BlobReader(sh); err != nil {
-		err = errors.Wrap(err)
-		return
+		if r, err = u.GetStore().ReaderFor(sh); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
-	if err = blobWriter(r); err != nil {
+	if err = blobWriter(shaWithReadCloser{Sha: sh, ReadCloser: r}); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -8,8 +8,8 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
@@ -25,27 +25,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 )
-
-// type Store interface {
-// 	errors.Flusher
-// 	GetStore() Store
-
-// 	Create(
-// 		*InventoryList,
-// 		descriptions.Description,
-// 	) (*sku.Transacted, error)
-// 	ReadLast() (*sku.Transacted, error)
-// 	ReadOne(interfaces.Stringer) (*sku.Transacted, error)
-// 	ReadOneSku(besty, sk *sha.Sha) (*sku.Transacted, error)
-// 	ReadAll(interfaces.FuncIter[*sku.Transacted]) error
-// 	ReadAllSkus(func(besty, sk *sku.Transacted) error) error
-// 	interfaces.BlobGetter[*InventoryList]
-
-// 	StreamInventoryList(
-// 		interfaces.Sha,
-// 		interfaces.FuncIter[*sku.Transacted],
-// 	) error
-// }
 
 type Format = blob_store.Format[
 	InventoryList,

@@ -15,11 +15,15 @@ import (
 )
 
 type Checkin struct {
-	Delete             bool
+	Delete bool
+	Proto  sku.Proto
+
+	// TODO make flag family disambiguate these options
+	// and use with other commands too
 	Organize           bool
-	Proto              sku.Proto
 	CheckoutBlobAndRun string
 	OpenBlob           bool
+	Edit               bool // TODO add support back for this
 }
 
 func (op Checkin) Run(
@@ -93,10 +97,10 @@ func (op Checkin) Run(
 					return
 				}
 
-        if err = results.Add(&cofs.External); err != nil {
+				if err = results.Add(&cofs.External); err != nil {
 					err = errors.Wrap(err)
 					return
-        }
+				}
 
 				return
 			},

@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
+// TODO switch to returning result
 func Run(args []string) (exitStatus int) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -109,32 +110,59 @@ func Run(args []string) (exitStatus int) {
 	defer u.PrintMatchedArchiviertIfNecessary()
 	defer errors.DeferredFlusher(&err, u)
 
+	defer func() {
+		if err = u.GetFSHome().ResetTempOnExit(err); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}()
+
+	var result Result
+
+OUTER:
 	switch {
 	case u.GetConfig().Complete:
 		var t WithCompletion
-		ok := false
+		haystack := any(cmd.Command)
 
-		if t, ok = cmd.Command.(WithCompletion); !ok {
-			err = errors.BadRequestf("Command does not support completion")
-			return
+	LOOP:
+		for {
+			switch c := haystack.(type) {
+			case commandWithResult:
+				haystack = c.Command
+				continue LOOP
+
+			case WithCompletion:
+				t = c
+				break LOOP
+
+			default:
+				result.Error = errors.BadRequestf("Command does not support completion")
+				break OUTER
+			}
 		}
 
-		if err = t.Complete(u, cmdArgs...); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		result.Error = t.Complete(u, cmdArgs...)
 
 	default:
-		if err = cmd.Run(u, cmdArgs...); err != nil {
-			return
-		}
+
+		func() {
+			defer func() {
+				// if r := recover(); r != nil {
+				// 	result = ErrorResult{error: errors.Errorf("panicked: %s", r)}
+				// }
+			}()
+
+			result = cmd.Command.Run(u, cmdArgs...)
+		}()
 	}
 
-	if err == nil {
-		if err = u.GetFSHome().ResetTemp(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	exitStatus = result.ExitCode
+
+	if result.Error != nil {
+		exitStatus = 1
+		// TODO switch to Err() and update tests
+		ui.Out().Print(result.Error)
 	}
 
 	return

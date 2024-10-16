@@ -65,3 +65,43 @@ type (
 		ExternalQueryOptions
 	}
 )
+
+func MakePrimitiveQueryGroup() PrimitiveQueryGroup {
+	return MakePrimitiveQueryGroupWithSigils(ids.SigilHistory, ids.SigilHidden)
+}
+
+func MakePrimitiveQueryGroupWithSigils(ss ...ids.Sigil) PrimitiveQueryGroup {
+	return &primitiveQueryGroup{Sigil: ids.MakeSigil(ss...)}
+}
+
+type primitiveQueryGroup struct {
+	ids.Sigil
+}
+
+func (qg *primitiveQueryGroup) SetIncludeHistory() {
+	qg.Add(ids.SigilHistory)
+}
+
+func (qg *primitiveQueryGroup) HasHidden() bool {
+	return false
+}
+
+func (qg *primitiveQueryGroup) Get(_ genres.Genre) (QueryWithSigilAndObjectId, bool) {
+	return qg, true
+}
+
+func (s *primitiveQueryGroup) ContainsSku(_ TransactedGetter) bool {
+	return true
+}
+
+func (s *primitiveQueryGroup) ContainsObjectId(_ *ids.ObjectId) bool {
+	return false
+}
+
+func (s *primitiveQueryGroup) GetSigil() ids.Sigil {
+	return s.Sigil
+}
+
+func (s *primitiveQueryGroup) Each(_ interfaces.FuncIter[Query]) error {
+	return nil
+}

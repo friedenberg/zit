@@ -13,12 +13,14 @@ import (
 )
 
 type Checkin struct {
-	Delete             bool
-	IgnoreBlob         bool
+	Delete     bool
+	IgnoreBlob bool
+	Proto      sku.Proto
+
 	Organize           bool
-	Proto              sku.Proto
 	CheckoutBlobAndRun string
 	OpenBlob           bool
+	Edit               bool
 }
 
 func init() {
@@ -39,6 +41,13 @@ func init() {
 			"each-blob",
 			"",
 			"checkout each Blob and run a utility",
+		)
+
+		f.BoolVar(
+			&c.Edit,
+			"edit",
+			false,
+			"edit each checked in object",
 		)
 
 		f.BoolVar(&c.Organize, "organize", false, "")
