@@ -18,9 +18,9 @@ func (s *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
 	item.ExternalId = e.GetSku().ObjectId.String()
 
 	s.deleted[item.Url.URL] = append(s.deleted[item.Url.URL], transactedWithItem{
-    Transacted: e.CloneTransacted(),
-    Item: item,
-  })
+		Transacted: e.CloneTransacted(),
+		Item:       item,
+	})
 
 	return
 }

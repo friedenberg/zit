@@ -5,8 +5,8 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -70,7 +70,7 @@ func (s *Store) QueryCheckedOut(
 	wg := quiter.MakeErrorWaitGroupParallel()
 
 	o := sku.CommitOptions{
-		Mode: objekte_mode.ModeRealizeSansProto,
+		Mode: object_mode.ModeRealizeSansProto,
 	}
 
 	aco := s.MakeApplyCheckedOut(qg, f, o)

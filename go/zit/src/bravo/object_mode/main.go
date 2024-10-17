@@ -1,4 +1,4 @@
-package objekte_mode
+package object_mode
 
 import (
 	"strconv"
@@ -17,10 +17,10 @@ func Make(ms ...Mode) (out Mode) {
 type Mode byte
 
 const (
-	ModeEmpty                 = Mode(iota)
+	ModeEmpty              = Mode(iota)
 	ModeAddToInventoryList = Mode(1 << iota) // proper commit
-	ModeUpdateTai                               // update the tai
-	ModeLatest                                  // only features updates that have no retroactive effects
+	ModeUpdateTai                            // update the tai
+	ModeLatest                               // only features updates that have no retroactive effects
 	ModeMergeCheckedOut
 	ModeApplyProto
 	ModeHooks

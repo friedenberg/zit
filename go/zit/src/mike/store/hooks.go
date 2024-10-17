@@ -2,7 +2,7 @@ package store
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
@@ -15,7 +15,7 @@ func (s *Store) tryNewHook(
 	kinder *sku.Transacted,
 	o sku.CommitOptions,
 ) (err error) {
-	if !o.Mode.Contains(objekte_mode.ModeHooks) {
+	if !o.Mode.Contains(object_mode.ModeHooks) {
 		return
 	}
 
@@ -119,8 +119,8 @@ func (s *Store) tryPreCommitHooks(
 	mutter *sku.Transacted,
 	o sku.CommitOptions,
 ) (err error) {
-	if !o.Mode.Contains(objekte_mode.ModeHooks) &&
-		!o.Mode.Contains(objekte_mode.ModeAddToInventoryList) {
+	if !o.Mode.Contains(object_mode.ModeHooks) &&
+		!o.Mode.Contains(object_mode.ModeAddToInventoryList) {
 		return
 	}
 
@@ -185,11 +185,11 @@ func (s *Store) tryPreCommitHooks(
 func (s *Store) tryPreCommitHook(
 	kinder *sku.Transacted,
 	mutter *sku.Transacted,
-	mode objekte_mode.Mode,
+	mode object_mode.Mode,
 	selbst *sku.Transacted,
 	script string,
 ) (err error) {
-	if mode == objekte_mode.ModeEmpty {
+	if mode == object_mode.ModeEmpty {
 		return
 	}
 

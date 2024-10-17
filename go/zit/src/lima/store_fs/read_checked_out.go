@@ -2,8 +2,8 @@ package store_fs
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -85,7 +85,7 @@ func (s *Store) readIntoCheckedOutFromTransacted(
 
 	if err = s.readIntoExternalFromItem(
 		sku.CommitOptions{
-			Mode: objekte_mode.ModeUpdateTai,
+			Mode: object_mode.ModeUpdateTai,
 		},
 		kfp,
 		sk,
@@ -127,7 +127,7 @@ func (s *Store) readIntoCheckedOutFromTransactedAndItem(
 
 	if err = s.readIntoExternalFromItem(
 		sku.CommitOptions{
-			Mode: objekte_mode.ModeUpdateTai,
+			Mode: object_mode.ModeUpdateTai,
 		},
 		i,
 		sk,

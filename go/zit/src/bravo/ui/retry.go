@@ -3,7 +3,7 @@ package ui
 import "fmt"
 
 func Retry(header string, err error) (tryAgain bool) {
-  Err().Printf("%s:", header)
+	Err().Printf("%s:", header)
 	Err().Print(err)
 	Err().Printf("try again? (y/*)")
 

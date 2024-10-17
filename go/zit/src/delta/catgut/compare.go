@@ -46,14 +46,14 @@ func CompareUTF8Bytes(a, b Comparer, partial bool) int {
 		}
 
 		runeA, widthA := a.DecodeRune()
-    a = a.SliceFrom(widthA)
+		a = a.SliceFrom(widthA)
 
 		if runeA == utf8.RuneError {
 			panic("not a valid utf8 string")
 		}
 
 		runeB, widthB := b.DecodeRune()
-    b = b.SliceFrom(widthB)
+		b = b.SliceFrom(widthB)
 
 		if runeB == utf8.RuneError {
 			panic("not a valid utf8 string")

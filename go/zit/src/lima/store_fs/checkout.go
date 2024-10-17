@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
@@ -51,7 +51,7 @@ func (s *Store) checkoutOneNew(
 
 		if cze, err = s.ReadExternalFromItem(
 			sku.CommitOptions{
-				Mode: objekte_mode.ModeRealizeSansProto,
+				Mode: object_mode.ModeRealizeSansProto,
 			},
 			i,
 			sz,

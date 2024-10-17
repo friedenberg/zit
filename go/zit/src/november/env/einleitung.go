@@ -10,7 +10,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
@@ -203,7 +203,7 @@ func initDefaultTypAndKonfig(u *Env) (err error) {
 
 		if err = u.GetStore().CreateOrUpdate(
 			newConfig,
-			objekte_mode.ModeCreate,
+			object_mode.ModeCreate,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

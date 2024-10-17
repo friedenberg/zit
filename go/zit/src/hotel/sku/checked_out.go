@@ -83,7 +83,7 @@ func (src *CheckedOut) Clone() *CheckedOut {
 }
 
 func (src *CheckedOut) CloneCheckedOutLike() CheckedOutLike {
-  return src.Clone()
+	return src.Clone()
 }
 
 func (src *CheckedOut) CloneExternalLike() ExternalLike {
@@ -101,7 +101,6 @@ func (t *CheckedOut) GetExternalState() external_state.State {
 func (a *CheckedOut) GetObjectId() *ids.ObjectId {
 	return a.External.GetObjectId()
 }
-
 
 func (c *CheckedOut) SetError(err error) {
 	if err == nil {

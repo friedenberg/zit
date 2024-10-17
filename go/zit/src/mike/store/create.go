@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
@@ -50,11 +50,11 @@ func (s *Store) Reindex() (err error) {
 
 func (s *Store) CreateOrUpdate(
 	in sku.ExternalLike,
-	mode objekte_mode.Mode,
+	mode object_mode.Mode,
 ) (err error) {
 	mode.Add(
-		objekte_mode.ModeCommit,
-		objekte_mode.ModeApplyProto,
+		object_mode.ModeCommit,
+		object_mode.ModeApplyProto,
 	)
 
 	if err = s.tryRealizeAndOrStore(
@@ -105,7 +105,7 @@ func (s *Store) CreateOrUpdateBlobSha(
 
 	if err = s.tryRealizeAndOrStore(
 		t,
-		sku.CommitOptions{Mode: objekte_mode.ModeCommit},
+		sku.CommitOptions{Mode: object_mode.ModeCommit},
 	); err != nil {
 		err = errors.WrapExcept(err, collections.ErrExists)
 		return
@@ -148,7 +148,7 @@ func (s *Store) RevertTo(
 
 	if err = s.tryRealizeAndOrStore(
 		mutter,
-		sku.CommitOptions{Mode: objekte_mode.ModeCommit},
+		sku.CommitOptions{Mode: object_mode.ModeCommit},
 	); err != nil {
 		err = errors.WrapExcept(err, collections.ErrExists)
 		return
@@ -175,7 +175,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 
 	if err = s.tryRealizeAndOrStore(
 		el,
-		sku.CommitOptions{Mode: objekte_mode.ModeCreate},
+		sku.CommitOptions{Mode: object_mode.ModeCreate},
 	); err != nil {
 		err = errors.Wrap(err)
 		return

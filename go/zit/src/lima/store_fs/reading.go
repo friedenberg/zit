@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
@@ -24,7 +24,7 @@ func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 
 	if e2, err = s.ReadExternalFromItem(
 		sku.CommitOptions{
-			Mode: objekte_mode.ModeUpdateTai,
+			Mode: object_mode.ModeUpdateTai,
 		},
 		e,
 		z,

@@ -6,7 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
@@ -250,7 +250,7 @@ func (i *Index) flushEverything(
 func (i *Index) Add(
 	z *sku.Transacted,
 	v string,
-	mode objekte_mode.Mode,
+	mode object_mode.Mode,
 ) (err error) {
 	var n uint8
 

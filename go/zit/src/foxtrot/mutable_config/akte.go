@@ -17,14 +17,14 @@ type Defaults struct {
 }
 
 type Blob struct {
-	Defaults        Defaults                                `toml:"defaults"`
-	HiddenEtiketten []ids.Tag                               `toml:"hidden-etiketten"`
-	FileExtensions  file_extensions.FileExtensions          `toml:"file-extensions"`
-	RemoteScripts   map[string]script_config.RemoteScript   `toml:"remote-scripts"`
-	Actions         map[string]script_config.ScriptConfig   `toml:"actions,omitempty"`
-	PrintOptions    print_options.General `toml:"cli-output"`
-	Tools           erworben_tools.Tools                    `toml:"tools"`
-	Filters         map[string]string                       `toml:"filters"`
+	Defaults        Defaults                              `toml:"defaults"`
+	HiddenEtiketten []ids.Tag                             `toml:"hidden-etiketten"`
+	FileExtensions  file_extensions.FileExtensions        `toml:"file-extensions"`
+	RemoteScripts   map[string]script_config.RemoteScript `toml:"remote-scripts"`
+	Actions         map[string]script_config.ScriptConfig `toml:"actions,omitempty"`
+	PrintOptions    print_options.General                 `toml:"cli-output"`
+	Tools           erworben_tools.Tools                  `toml:"tools"`
+	Filters         map[string]string                     `toml:"filters"`
 }
 
 func (a Blob) GetFilters() map[string]string {

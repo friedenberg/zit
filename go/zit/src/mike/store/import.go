@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
@@ -47,7 +47,7 @@ func (s *Store) Import(external *sku.Transacted) (co *sku.CheckedOut, err error)
 				external,
 				sku.CommitOptions{
 					Clock: &co.External,
-					Mode:  objekte_mode.ModeCommit,
+					Mode:  object_mode.ModeCommit,
 				},
 			); err != nil {
 				err = errors.WrapExcept(err, collections.ErrExists)
@@ -87,7 +87,7 @@ func (s *Store) Import(external *sku.Transacted) (co *sku.CheckedOut, err error)
 	if err = s.tryRealizeAndOrStore(
 		external,
 		sku.CommitOptions{
-			Mode: objekte_mode.ModeCommit,
+			Mode: object_mode.ModeCommit,
 		},
 	); err == collections.ErrExists {
 		co.SetError(err)

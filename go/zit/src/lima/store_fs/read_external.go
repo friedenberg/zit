@@ -3,7 +3,7 @@ package store_fs
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -47,7 +47,7 @@ func (s *Store) readIntoExternalFromItem(
 	t *sku.Transacted,
 	e *sku.Transacted,
 ) (err error) {
-	o.Del(objekte_mode.ModeApplyProto)
+	o.Del(object_mode.ModeApplyProto)
 
 	if err = s.readOneExternalInto(&o, i, t, e); err != nil {
 		err = errors.Wrap(err)

@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -149,8 +149,8 @@ func (c CheckinBlob) Run(u *env.Env, args ...string) (err error) {
 	for _, z := range zettels {
 		if err = u.GetStore().CreateOrUpdate(
 			z,
-			objekte_mode.Make(
-				objekte_mode.ModeMergeCheckedOut,
+			object_mode.Make(
+				object_mode.ModeMergeCheckedOut,
 			),
 		); err != nil {
 			err = errors.Wrap(err)

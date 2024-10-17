@@ -4,7 +4,7 @@ import (
 	"encoding/gob"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -17,7 +17,7 @@ func init() {
 
 type CommitOptions struct {
 	ids.RepoId
-	objekte_mode.Mode // TODO rename
+	object_mode.Mode // TODO rename
 	ids.Clock
 	Proto *Transacted
 }

@@ -149,7 +149,7 @@ func (s *Store) SetExternalStores(
 		es.DirCache = s.GetStandort().DirVerzeichnisseKasten(k.GetRepoIdString())
 
 		es.RepoId = k
-    es.Clock = s.sunrise
+		es.Clock = s.sunrise
 
 		if esfs, ok := es.StoreLike.(*store_fs.Store); ok {
 			s.cwdFiles = esfs

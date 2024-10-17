@@ -3,7 +3,7 @@ package user_ops
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
@@ -63,7 +63,7 @@ func (op Checkin) Run(
 
 					if err = u.GetStore().CreateOrUpdate(
 						z,
-						objekte_mode.ModeApplyProto,
+						object_mode.ModeApplyProto,
 					); err != nil {
 						err = errors.Wrap(err)
 						return
@@ -72,7 +72,7 @@ func (op Checkin) Run(
 					if op.Proto.Apply(z, genres.Zettel) {
 						if err = u.GetStore().CreateOrUpdate(
 							z.GetSku(),
-							objekte_mode.ModeEmpty,
+							object_mode.ModeEmpty,
 						); err != nil {
 							err = errors.Wrap(err)
 							return
@@ -183,7 +183,7 @@ func (op Checkin) runOrganize(
 		func(el sku.ExternalLike) (err error) {
 			if err = u.GetStore().CreateOrUpdate(
 				el,
-				objekte_mode.ModeCreate,
+				object_mode.ModeCreate,
 			); err != nil {
 				err = errors.Wrap(err)
 				return

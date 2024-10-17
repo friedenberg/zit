@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
@@ -27,7 +27,7 @@ func (s *Store) tryRealize(
 
 	kinder := el.GetSku()
 
-	if mutter == nil && o.Contains(objekte_mode.ModeApplyProto) {
+	if mutter == nil && o.Contains(object_mode.ModeApplyProto) {
 		s.protoZettel.Apply(kinder, kinder)
 	}
 
@@ -71,7 +71,7 @@ func (s *Store) tryRealizeAndOrStore(
 
 	if !s.GetStandort().GetLockSmith().IsAcquired() &&
 		o.ContainsAny(
-			objekte_mode.ModeAddToInventoryList,
+			object_mode.ModeAddToInventoryList,
 		) {
 		err = errors.Wrap(file_lock.ErrLockRequired{
 			Operation: "commit",
@@ -82,8 +82,8 @@ func (s *Store) tryRealizeAndOrStore(
 
 	// TAI must be set before calculating objekte sha
 	if o.ContainsAny(
-		objekte_mode.ModeAddToInventoryList,
-		objekte_mode.ModeUpdateTai,
+		object_mode.ModeAddToInventoryList,
+		object_mode.ModeUpdateTai,
 	) {
 		if o.Clock == nil {
 			o.Clock = s
@@ -93,7 +93,7 @@ func (s *Store) tryRealizeAndOrStore(
 	}
 
 	if o.ContainsAny(
-		objekte_mode.ModeAddToInventoryList,
+		object_mode.ModeAddToInventoryList,
 	) && (kinder.ObjectId.IsEmpty() || kinder.GetGenre() == genres.Unknown) {
 		var ken *ids.ZettelId
 
@@ -125,7 +125,7 @@ func (s *Store) tryRealizeAndOrStore(
 		return
 	}
 
-	if o.Contains(objekte_mode.ModeAddToInventoryList) {
+	if o.Contains(object_mode.ModeAddToInventoryList) {
 		if err = s.addMatchableTypAndEtikettenIfNecessary(kinder); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -144,14 +144,14 @@ func (s *Store) tryRealizeAndOrStore(
 	// 	}
 	// }
 
-	if o.Mode != objekte_mode.ModeReindex &&
+	if o.Mode != object_mode.ModeReindex &&
 		mutter != nil &&
 		ids.Equals(kinder.GetObjectId(), mutter.GetObjectId()) &&
 		kinder.Metadata.EqualsSansTai(&mutter.Metadata) {
 
 		sku.TransactedResetter.ResetWithExceptFields(kinder, mutter)
 
-		if o.Mode.Contains(objekte_mode.ModeLatest) {
+		if o.Mode.Contains(object_mode.ModeLatest) {
 			if err = s.Unchanged(kinder); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -168,7 +168,7 @@ func (s *Store) tryRealizeAndOrStore(
 		return
 	}
 
-	if o.Mode.Contains(objekte_mode.ModeLatest) {
+	if o.Mode.Contains(object_mode.ModeLatest) {
 		if err = s.GetKonfig().AddTransacted(
 			kinder,
 			mutter,
@@ -192,7 +192,7 @@ func (s *Store) tryRealizeAndOrStore(
 
 	}
 
-	if o.Contains(objekte_mode.ModeAddToInventoryList) {
+	if o.Contains(object_mode.ModeAddToInventoryList) {
 		ui.Log().Print("adding to bestandsaufnahme", o, kinder)
 		if err = s.commitTransacted(kinder, mutter); err != nil {
 			err = errors.Wrap(err)
@@ -207,7 +207,7 @@ func (s *Store) tryRealizeAndOrStore(
 		err = nil
 	}
 
-	if o.Contains(objekte_mode.ModeLatest) {
+	if o.Contains(object_mode.ModeLatest) {
 		if err = s.GetStreamIndex().Add(
 			kinder,
 			kinder.GetObjectId().String(),
@@ -223,7 +223,7 @@ func (s *Store) tryRealizeAndOrStore(
 				return
 			}
 		} else {
-      // [are/kabuto !task project-2021-zit-features zz-inbox] add delta printing to changed objects
+			// [are/kabuto !task project-2021-zit-features zz-inbox] add delta printing to changed objects
 			// if err = s.Updated(mutter); err != nil {
 			// 	err = errors.Wrap(err)
 			// 	return
@@ -237,7 +237,7 @@ func (s *Store) tryRealizeAndOrStore(
 
 	}
 
-	if o.Contains(objekte_mode.ModeMergeCheckedOut) {
+	if o.Contains(object_mode.ModeMergeCheckedOut) {
 		if err = s.readExternalAndMergeIfNecessary(
 			kinder,
 			mutter,
@@ -348,7 +348,7 @@ func (s *Store) createTagsOrType(k *ids.ObjectId) (err error) {
 
 	if err = s.tryRealizeAndOrStore(
 		t,
-		sku.CommitOptions{Mode: objekte_mode.ModeCommit},
+		sku.CommitOptions{Mode: object_mode.ModeCommit},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -485,7 +485,7 @@ func (s *Store) addMatchableCommon(m *sku.Transacted) (err error) {
 
 func (s *Store) reindexOne(besty, sk *sku.Transacted) (err error) {
 	o := sku.CommitOptions{
-		Mode: objekte_mode.ModeReindex,
+		Mode: object_mode.ModeReindex,
 	}
 
 	if err = s.tryRealizeAndOrStore(

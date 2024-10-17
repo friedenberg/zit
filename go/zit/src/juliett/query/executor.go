@@ -3,7 +3,7 @@ package query
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -94,7 +94,7 @@ func (e *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
 
 	if ze, err = e.ExecutionInfo.ReadExternalLikeFromObjectId(
 		sku.CommitOptions{
-			Mode: objekte_mode.ModeUpdateTai,
+			Mode: object_mode.ModeUpdateTai,
 		},
 		k,
 		sk,

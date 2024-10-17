@@ -240,7 +240,7 @@ func (c *FormatObject) getBlobFormatter(
 	ok := false
 
 	if c.UTIGroup == "" {
-		getBlobFormatter := func(formatId string) (script_config.RemoteScript) {
+		getBlobFormatter := func(formatId string) script_config.RemoteScript {
 			var formatIds []string
 
 			if formatId == "" {

@@ -72,7 +72,7 @@ func MakeLuaTablePool(vm *lua.VM) LuaTablePool {
 	return pool.MakePool(
 		func() (t *LuaTable) {
 			t = &LuaTable{
-				Transacted:        vm.Pool.Get(),
+				Transacted:   vm.Pool.Get(),
 				Tags:         vm.Pool.Get(),
 				TagsImplicit: vm.Pool.Get(),
 			}

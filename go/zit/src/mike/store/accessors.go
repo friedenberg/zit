@@ -80,4 +80,3 @@ func (s *Store) GetStreamIndex() *stream_index.Index {
 func (s *Store) GetConfigBlobFormat() blob_store.Format[mutable_config.Blob, *mutable_config.Blob] {
 	return s.configBlobFormat
 }
-

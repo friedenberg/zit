@@ -91,7 +91,7 @@ func (s TagsWithParentsAndTypes) ContainsEtikett(e *Tag) (int, bool) {
 }
 
 func (s TagsWithParentsAndTypes) ContainsComparer(
-  c catgut.Comparer,
+	c catgut.Comparer,
 ) (int, bool) {
 	return slices.BinarySearchFunc(
 		s,

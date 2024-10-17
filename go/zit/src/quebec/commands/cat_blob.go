@@ -73,7 +73,7 @@ func (c CatBlob) makeBlobWriter(u *env.Env) interfaces.FuncIter[shaWithReadClose
 
 				if _, err = delim_io.CopyWithPrefixOnDelim(
 					'\n',
-          rc.Sha.GetShaLike().GetShaString(),
+					rc.Sha.GetShaLike().GetShaString(),
 					u.Out(),
 					out,
 				); err != nil {

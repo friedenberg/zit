@@ -227,7 +227,7 @@ func (k *Compiled) AddTransacted(
 ) (err error) {
 	didChange := false
 
-  g := kinder.ObjectId.GetGenre()
+	g := kinder.ObjectId.GetGenre()
 
 	switch g {
 	case genres.Type:
@@ -255,23 +255,23 @@ func (k *Compiled) AddTransacted(
 		}
 	}
 
-  if g != genres.Tag {
-    return
-  }
+	if g != genres.Tag {
+		return
+	}
 
-  if !didChange {
-    return
-  }
+	if !didChange {
+		return
+	}
 
-  if mutter == nil {
-    return
-  }
+	if mutter == nil {
+		return
+	}
 
-  if quiter.SetEquals(kinder.Metadata.Tags, mutter.Metadata.Tags) {
-    return
-  }
+	if quiter.SetEquals(kinder.Metadata.Tags, mutter.Metadata.Tags) {
+		return
+	}
 
-  k.SetNeedsRecompile(fmt.Sprintf("modified: %s", kinder))
+	k.SetNeedsRecompile(fmt.Sprintf("modified: %s", kinder))
 
 	return
 }

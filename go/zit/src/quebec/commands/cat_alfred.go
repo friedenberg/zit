@@ -74,7 +74,7 @@ func (c CatAlfred) RunWithQuery(
 			switch c.Genre {
 			case genres.Tag:
 				for t := range object.Metadata.Tags.All() {
-          var tagObject *sku.Transacted
+					var tagObject *sku.Transacted
 
 					if tagObject, err = u.GetStore().ReadTransactedFromObjectId(
 						t,

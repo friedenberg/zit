@@ -8,7 +8,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
@@ -28,7 +28,7 @@ type Page struct {
 	*probe_index
 	// All, Schwanzen  Page
 	added, addedLatest *sku.TransactedHeap
-	flushMode          objekte_mode.Mode
+	flushMode          object_mode.Mode
 	hasChanges         bool
 	fs_home            fs_home.Home
 	config             *config.Compiled
@@ -87,14 +87,14 @@ func (s *Page) readOneRange(
 
 func (pt *Page) add(
 	z1 *sku.Transacted,
-	mode objekte_mode.Mode,
+	mode object_mode.Mode,
 ) (err error) {
 	pt.oids[z1.ObjectId.String()] = struct{}{}
 	z := sku.GetTransactedPool().Get()
 
 	sku.TransactedResetter.ResetWith(z, z1)
 
-	if mode.Contains(objekte_mode.ModeLatest) {
+	if mode.Contains(object_mode.ModeLatest) {
 		pt.addedLatest.Add(z)
 	} else {
 		pt.added.Add(z)

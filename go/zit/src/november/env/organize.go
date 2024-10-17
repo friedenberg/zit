@@ -2,7 +2,7 @@ package env
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/objekte_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
@@ -43,8 +43,8 @@ func (e *Env) LockAndCommitOrganizeResults(
 		func(changed sku.ExternalLike) (err error) {
 			if err = e.GetStore().CreateOrUpdate(
 				changed,
-				objekte_mode.Make(
-					objekte_mode.ModeMergeCheckedOut,
+				object_mode.Make(
+					object_mode.ModeMergeCheckedOut,
 				),
 			); err != nil {
 				err = errors.Wrap(err)

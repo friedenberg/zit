@@ -3,7 +3,7 @@ package ui
 import "fmt"
 
 func Continue(header string, err error) (shouldContinue bool) {
-  Err().Printf("%s:", header)
+	Err().Printf("%s:", header)
 	Err().Print(err)
 	Err().Printf("ignore and continue? (y/*)")
 

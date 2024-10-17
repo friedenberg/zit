@@ -180,7 +180,7 @@ func (f textFormatterCommon) writeBlob(
 
 		if wt, err = script_config.MakeWriterToWithStdin(
 			f.blobFormatter,
-      f.fs_home.MakeCommonEnv(),
+			f.fs_home.MakeCommonEnv(),
 			ar,
 		); err != nil {
 			err = errors.Wrap(err)
