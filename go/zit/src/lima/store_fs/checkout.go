@@ -103,11 +103,6 @@ func (s *Store) checkoutOneNew(
 		return
 	}
 
-	if err = s.WriteFSItemToExternal(i, &cz.External); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	return
 }
 
@@ -232,6 +227,11 @@ func (s *Store) checkoutOne(
 	}
 
 	sku.Resetter.ResetWith(&cz.External, &cz.Internal)
+
+	if err = s.WriteFSItemToExternal(i, &cz.External); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = s.fileEncoder.Encode(
 		options.TextFormatterOptions,

@@ -11,6 +11,24 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+func (s *Store) ReadTransactedFromObjectId(
+	k1 interfaces.ObjectId,
+) (sk1 *sku.Transacted, err error) {
+	sk1 = sku.GetTransactedPool().Get()
+
+	if err = s.ReadOneInto(k1, sk1); err != nil {
+		if collections.IsErrNotFound(err) {
+			sku.GetTransactedPool().Put(sk1)
+			sk1 = nil
+		}
+
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s *Store) ReadOneObjectId(
 	k interfaces.ObjectId,
 ) (sk *sku.Transacted, err error) {

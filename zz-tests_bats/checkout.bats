@@ -125,3 +125,31 @@ function checkout_zettel_akte_then_objekte { # @test
 		uno.zettel
 	EOM
 }
+
+function mode_both { # @test
+	run_zit new -edit=false - <<-EOM
+		---
+		! pdf
+		---
+
+		not really pdf content but that's ok
+	EOM
+	assert_success
+	assert_output - <<-EOM
+		[!pdf @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[two/uno @22cbac1a49e4d3a94e97f18394400f8a0c99639293d8e2dc59eb14cbe8406e4e !pdf]
+	EOM
+
+	run_zit checkout -mode both two/uno
+	assert_success
+	assert_output - <<-EOM
+		      checked out [two/uno.zettel @22cbac1a49e4d3a94e97f18394400f8a0c99639293d8e2dc59eb14cbe8406e4e !pdf
+		                   two/uno.pdf]
+	EOM
+
+	run ls two/
+	assert_output_unsorted - <<-EOM
+		uno.pdf
+		uno.zettel
+	EOM
+}

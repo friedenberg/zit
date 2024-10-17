@@ -72,10 +72,23 @@ function use_blob_shas { # @test
 		[two/uno @6a405a5e357550175234d9f5b177014984f99fe34d35fe931cf8d2e96b8b0cb0 !md]
 	EOM
 
-	run_zit new -edit=false -shas -type txt 6a405a5e357550175234d9f5b177014984f99fe34d35fe931cf8d2e96b8b0cb0
+	the_blob2_sha="ad100d00763b333c0c8af3c89dbcc1f52f9c4a8a208476c35eb9d364121301b6"
+	run_zit write-blob - <<-EOM
+		  the blob2
+	EOM
+	assert_success
+	assert_output "$the_blob2_sha - (checked in)"
+
+	run_zit new -edit=false -shas -type txt "$the_blob2_sha"
 	assert_success
 	assert_output - <<-EOM
 		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/tres @6a405a5e357550175234d9f5b177014984f99fe34d35fe931cf8d2e96b8b0cb0 !txt]
+		[one/tres @$the_blob2_sha !txt]
+	EOM
+
+	run_zit_stderr_unified new -edit=false -shas "$the_blob2_sha"
+	assert_success
+	assert_output --partial - <<-EOM
+		ad100d00763b333c0c8af3c89dbcc1f52f9c4a8a208476c35eb9d364121301b6 appears in object already checked in (["one/tres"]). Ignoring
 	EOM
 }

@@ -1,9 +1,12 @@
 package store
 
 import (
+	"slices"
+	"sync"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
+	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
@@ -85,17 +88,32 @@ func (s *Store) QueryCheckedOut(
 	return
 }
 
-func (s *Store) ReadTransactedFromObjectId(
-	k1 interfaces.ObjectId,
-) (sk1 *sku.Transacted, err error) {
-	sk1 = sku.GetTransactedPool().Get()
+func (s *Store) MakeBlobShaBytesMap() (blobShaBytes map[sha.Bytes][]string, err error) {
+	blobShaBytes = make(map[sha.Bytes][]string)
+	var l sync.Mutex
 
-	if err = s.ReadOneInto(k1, sk1); err != nil {
-		if collections.IsErrNotFound(err) {
-			sku.GetTransactedPool().Put(sk1)
-			sk1 = nil
-		}
+	if err = s.QueryPrimitive(
+		sku.MakePrimitiveQueryGroup(),
+		func(sk *sku.Transacted) (err error) {
+			l.Lock()
+			defer l.Unlock()
 
+			k := sk.Metadata.Blob.GetBytes()
+			oids := blobShaBytes[k]
+			oid := sk.ObjectId.String()
+			loc, found := slices.BinarySearch(oids, oid)
+
+			if found {
+				return
+			}
+
+			oids = slices.Insert(oids, loc, oid)
+
+			blobShaBytes[sk.Metadata.Blob.GetBytes()] = oids
+
+			return
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

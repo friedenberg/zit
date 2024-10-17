@@ -21,6 +21,13 @@ const (
 	BlobRecognized // should never be set via flags
 )
 
+var AvailableModes = []Mode{
+	None,
+	MetadataOnly,
+	MetadataAndBlob,
+	BlobOnly,
+}
+
 func (m Mode) String() string {
 	switch m {
 	case None:
@@ -57,7 +64,12 @@ func (m *Mode) Set(v string) (err error) {
 		*m = MetadataAndBlob
 
 	default:
-		err = errors.Errorf("unsupported checkout mode: %s", v)
+		err = errors.Errorf(
+			"unsupported checkout mode: %s. Available modes: %q",
+			v,
+			AvailableModes,
+		)
+
 		return
 	}
 

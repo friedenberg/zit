@@ -18,6 +18,13 @@ type CreateFromShas struct {
 func (c CreateFromShas) Run(
 	args ...string,
 ) (results sku.TransactedMutableSet, err error) {
+	var lookupStored map[sha.Bytes][]string
+
+	if lookupStored, err = c.GetStore().MakeBlobShaBytesMap(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	toCreate := make(map[sha.Bytes]*sku.Transacted)
 
 	for _, arg := range args {
@@ -31,6 +38,12 @@ func (c CreateFromShas) Run(
 		k := sh.GetBytes()
 
 		if _, ok := toCreate[k]; ok {
+			ui.Err().Printf("%s appears in arguments more than once. Ignoring", &sh)
+			continue
+		}
+
+		if oids, ok := lookupStored[k]; ok {
+			ui.Err().Printf("%s appears in object already checked in (%q). Ignoring", &sh, oids)
 			continue
 		}
 
