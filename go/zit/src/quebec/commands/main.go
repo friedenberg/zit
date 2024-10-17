@@ -110,14 +110,14 @@ func Run(args []string) (exitStatus int) {
 	defer u.PrintMatchedArchiviertIfNecessary()
 	defer errors.DeferredFlusher(&err, u)
 
+	var result Result
+
 	defer func() {
-		if err = u.GetFSHome().ResetTempOnExit(err); err != nil {
+		if err = u.GetFSHome().ResetTempOnExit(result.Error); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}()
-
-	var result Result
 
 OUTER:
 	switch {

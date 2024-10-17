@@ -58,3 +58,24 @@ function can_duplicate_zettel_content { # @test
 	assert_success
 	assert_output "$(cat "$expected")"
 }
+
+function use_blob_shas { # @test
+	run_zit write-blob - <<-EOM
+		  the blob
+	EOM
+	assert_success
+	assert_output '6a405a5e357550175234d9f5b177014984f99fe34d35fe931cf8d2e96b8b0cb0 - (checked in)'
+
+	run_zit new -edit=false -shas 6a405a5e357550175234d9f5b177014984f99fe34d35fe931cf8d2e96b8b0cb0
+	assert_success
+	assert_output - <<-EOM
+		[two/uno @6a405a5e357550175234d9f5b177014984f99fe34d35fe931cf8d2e96b8b0cb0 !md]
+	EOM
+
+	run_zit new -edit=false -shas -type txt 6a405a5e357550175234d9f5b177014984f99fe34d35fe931cf8d2e96b8b0cb0
+	assert_success
+	assert_output - <<-EOM
+		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/tres @6a405a5e357550175234d9f5b177014984f99fe34d35fe931cf8d2e96b8b0cb0 !txt]
+	EOM
+}

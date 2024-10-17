@@ -24,6 +24,7 @@ type New struct {
 	Edit      bool
 	PrintOnly bool
 	Filter    script_value.ScriptValue
+	Shas      bool
 
 	sku.Proto
 }
@@ -35,6 +36,13 @@ func init() {
 			c := &New{}
 
 			f.Var(&c.RepoId, "kasten", "none or Browser")
+
+			f.BoolVar(
+				&c.Shas,
+				"shas",
+				false,
+				"treat arguments as blobs that are already checked in",
+			)
 
 			f.BoolVar(
 				&c.Delete,
@@ -107,12 +115,34 @@ func (c *New) Run(u *env.Env, args ...string) (err error) {
 	var zts sku.TransactedMutableSet
 
 	if len(args) == 0 {
-		if zts, err = c.writeNewZettels(u); err != nil {
+		emptyOp := user_ops.WriteNewZettels{
+			Env: u,
+		}
+
+		if zts, err = emptyOp.RunMany(c.Proto, c.Count); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else if c.Shas {
+		opCreateFromShas := user_ops.CreateFromShas{
+			Env:   u,
+			Proto: c.Proto,
+		}
+
+		if zts, err = opCreateFromShas.Run(args...); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if zts, err = c.readExistingFilesAsZettels(u, f, args...); err != nil {
+		opCreateFromPath := user_ops.CreateFromPaths{
+			Env:        u,
+			TextParser: f,
+			Filter:     c.Filter,
+			Delete:     c.Delete,
+			Proto:      c.Proto,
+		}
+
+		if zts, err = opCreateFromPath.Run(args...); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -161,42 +191,6 @@ func (c *New) Run(u *env.Env, args ...string) (err error) {
 			err = errors.Wrap(err)
 			return
 		}
-	}
-
-	return
-}
-
-func (c New) readExistingFilesAsZettels(
-	u *env.Env,
-	f object_metadata.TextParser,
-	args ...string,
-) (zts sku.TransactedMutableSet, err error) {
-	opCreateFromPath := user_ops.CreateFromPaths{
-		Env:        u,
-		TextParser: f,
-		Filter:     c.Filter,
-		Delete:     c.Delete,
-		Proto:      c.Proto,
-	}
-
-	if zts, err = opCreateFromPath.Run(args...); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (c New) writeNewZettels(
-	u *env.Env,
-) (zts sku.TransactedMutableSet, err error) {
-	emptyOp := user_ops.WriteNewZettels{
-		Env: u,
-	}
-
-	if zts, err = emptyOp.RunMany(c.Proto, c.Count); err != nil {
-		err = errors.Wrap(err)
-		return
 	}
 
 	return
