@@ -46,7 +46,7 @@ func (u *Env) Start(e BigBang) (err error) {
 
 	mkdirAll(s.DirObjectId())
 	mkdirAll(s.DirCache())
-	mkdirAll(s.DirVerlorenUndGefunden())
+	mkdirAll(s.DirLostAndFound())
 
 	if err = readAndTransferLines(e.Yin, s.DirZit("Kennung", "Yin")); err != nil {
 		err = errors.Wrap(err)
@@ -85,11 +85,11 @@ func (u *Env) Start(e BigBang) (err error) {
 		return
 	}
 
-	writeFile(s.FileKonfigAngeboren(), e.Config)
+	writeFile(s.FileConfigPermanent(), e.Config)
 
-	writeFile(s.FileKonfigErworben(), "")
+	writeFile(s.FileConfigMutable(), "")
 
-	writeFile(s.FileSchlummernd(), "")
+	writeFile(s.FileCacheDormant(), "")
 
 	if err = u.dormantIndex.Flush(
 		u.GetFSHome(),

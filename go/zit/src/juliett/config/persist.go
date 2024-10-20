@@ -154,7 +154,7 @@ func (kc *compiled) setNeedsRecompile(reason string) {
 func (kc *Compiled) loadMutableConfig(s fs_home.Home) (err error) {
 	var f *os.File
 
-	p := s.FileKonfigErworben()
+	p := s.FileConfigMutable()
 
 	if f, err = files.Open(p); err != nil {
 		err = errors.Wrap(err)
@@ -222,7 +222,7 @@ func (kc *Compiled) flushMutableConfig(
 		return
 	}
 
-	p := s.FileKonfigErworben()
+	p := s.FileConfigMutable()
 
 	var f *os.File
 

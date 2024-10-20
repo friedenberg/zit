@@ -4,13 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
-func (s Home) ObjekteReaderFactory(
-	g interfaces.GenreGetter,
-) interfaces.ObjectReaderFactory {
-	return s.ObjekteReaderWriterFactory(g)
-}
-
-func (s Home) ObjekteReaderWriterFactory(
+func (s Home) ObjectReaderWriterFactory(
 	g interfaces.GenreGetter,
 ) interfaces.ObjectIOFactory {
 	return interfaces.MakeBespokeObjectReadWriterFactory(

@@ -89,7 +89,7 @@ func (sch *Tags) ContainsSku(sk *sku.Transacted) bool {
 func (sch *Tags) Load(s fs_home.Home) (err error) {
 	var f *os.File
 
-	p := s.FileEtiketten()
+	p := s.FileTags()
 
 	if f, err = files.Open(p); err != nil {
 		if errors.IsNotExist(err) {
@@ -133,7 +133,7 @@ func (sch *Tags) Flush(
 		return
 	}
 
-	p := s.FileEtiketten()
+	p := s.FileTags()
 
 	var f *os.File
 

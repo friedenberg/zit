@@ -139,7 +139,7 @@ func (s Home) GetConfig() immutable_config.Config {
 func (s *Home) loadKonfigAngeboren() (err error) {
 	var f *os.File
 
-	if f, err = files.OpenExclusiveReadOnly(s.FileKonfigAngeboren()); err != nil {
+	if f, err = files.OpenExclusiveReadOnly(s.FileConfigPermanent()); err != nil {
 		if errors.IsNotExist(err) {
 			err = nil
 		} else {
@@ -226,7 +226,7 @@ func (s Home) ResetCache() (err error) {
 		return
 	}
 
-	if err = s.MakeDir(s.DirVerzeichnisseObjekten()); err != nil {
+	if err = s.MakeDir(s.DirCacheObjects()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

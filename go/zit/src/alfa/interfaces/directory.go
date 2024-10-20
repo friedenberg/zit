@@ -3,20 +3,19 @@ package interfaces
 type DirectoryPaths interface {
 	Dir(p ...string) string
 	DirCache(p ...string) string
-	DirCacheDurable(p ...string) string
 	DirCacheObjectPointers() string
+	DirCacheObjects() string
 	DirCacheRepo(p ...string) string
+	DirLostAndFound() string
 	DirObjectId() string
 	DirObjects(p ...string) string
-	DirVerlorenUndGefunden() string
-	DirVerzeichnisseObjekten() string
 	DirZit(p ...string) string
 	FileAge() string
+	FileCacheDormant() string
 	FileCacheObjectId() string
-	FileEtiketten() string
-	FileKonfigAngeboren() string
-	FileKonfigErworben() string
-	FileSchlummernd() string
+	FileConfigMutable() string
+	FileConfigPermanent() string
+	FileTags() string
 }
 
 type Directory interface {

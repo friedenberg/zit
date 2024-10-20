@@ -88,7 +88,7 @@ func (sch *Index) ContainsSku(sk *sku.Transacted) bool {
 func (sch *Index) Load(s fs_home.Home) (err error) {
 	var f *os.File
 
-	p := s.FileSchlummernd()
+	p := s.FileCacheDormant()
 
 	if f, err = files.Open(p); err != nil {
 		if errors.IsNotExist(err) {
@@ -132,7 +132,7 @@ func (sch *Index) Flush(
 		return
 	}
 
-	p := s.FileSchlummernd()
+	p := s.FileCacheDormant()
 
 	var f *os.File
 

@@ -113,7 +113,7 @@ func (op PullServer) objekteReaderForSku(
 
 	ui.Log().Printf("received request: %#v", msg)
 
-	orf := op.env.GetFSHome().ObjekteReaderWriterFactory(msg.Gattung)
+	orf := op.env.GetFSHome().ObjectReaderWriterFactory(msg.Gattung)
 
 	var or io.ReadCloser
 

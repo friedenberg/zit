@@ -89,7 +89,7 @@ func (c *Store) Initialize(
 		c.GetStandort(),
 		c.GetStandort().GetLockSmith(),
 		c.config.GetStoreVersion(),
-		c.fs_home.ObjekteReaderWriterFactory(genres.InventoryList),
+		c.fs_home.ObjectReaderWriterFactory(genres.InventoryList),
 		c.fs_home,
 		pmf,
 		c,
@@ -110,7 +110,7 @@ func (c *Store) Initialize(
 	if c.streamIndex, err = stream_index.MakeIndex(
 		c.GetStandort(),
 		c.GetKonfig(),
-		c.GetStandort().DirVerzeichnisseObjekten(),
+		c.GetStandort().DirCacheObjects(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
