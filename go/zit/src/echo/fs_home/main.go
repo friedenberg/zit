@@ -195,10 +195,6 @@ func stringSliceJoin(s string, vs []string) []string {
 	return append([]string{s}, vs...)
 }
 
-func (c Home) FileKonfigCompiled() string {
-	return c.DirZit("KonfigCompiled")
-}
-
 func (c Home) FileSchlummernd() string {
 	return c.DirZit("Schlummernd")
 }
@@ -215,24 +211,6 @@ func (c Home) FileKonfigErworben() string {
 	return c.DirZit("KonfigErworben")
 }
 
-func (c Home) FileKonfigToml() string {
-	// var usr *user.User
-
-	// if usr, err = user.Current(); err != nil {
-	// 	err = errors.Error(err)
-	// 	return
-	// }
-
-	// p = path.Join(
-	// 	usr.HomeDir,
-	// 	".config",
-	// 	"zettelkasten",
-	// 	"config.toml",
-	// )
-
-	return c.DirZit("Konfig")
-}
-
 func (s Home) Dir(p ...string) string {
 	return filepath.Join(stringSliceJoin(s.basePath, p)...)
 }
@@ -245,15 +223,15 @@ func (s Home) FileAge() string {
 	return s.DirZit("AgeIdentity")
 }
 
-func (s Home) DirVerzeichnisse(p ...string) string {
+func (s Home) DirCache(p ...string) string {
 	return s.DirZit(append([]string{"Verzeichnisse"}, p...)...)
 }
 
-func (s Home) DirVerzeichnisseKasten(p ...string) string {
+func (s Home) DirCacheRepo(p ...string) string {
 	return s.DirZit(append([]string{"Verzeichnisse", "Kasten"}, p...)...)
 }
 
-func (s Home) DirVerzeichnisseDurable(p ...string) string {
+func (s Home) DirCacheDurable(p ...string) string {
 	return s.DirZit(append([]string{"VerzeichnisseDurable"}, p...)...)
 }
 
@@ -279,49 +257,33 @@ func (s Home) MakeDir(d string) (err error) {
 }
 
 func (s Home) DirVerzeichnisseObjekten() string {
-	return s.DirVerzeichnisse("Objekten")
+	return s.DirCache("Objekten")
 }
 
-func (s Home) DirVerzeichnisseMetadata() string {
-	return s.DirVerzeichnisseDurable("Metadatei")
-}
-
-func (s Home) DirVerzeichnisseMetadataObjectIdParent() string {
-	return s.DirVerzeichnisseDurable("MetadateiKennungMutter")
-}
-
-func (s Home) DirVerzeichnisseVerweise() string {
-	return s.DirVerzeichnisse("Verweise")
-}
-
-func (s Home) FileVerzeichnisseEtiketten() string {
-	return s.DirVerzeichnisse("Etiketten")
-}
-
-func (s Home) FileVerzeichnisseObjectId() string {
-	return s.DirVerzeichnisse("Kennung")
-}
-
-func (s Home) FileVerzeichnisseHinweis() string {
-	return s.DirVerzeichnisse("Hinweis")
+func (s Home) DirCacheObjectPointers() string {
+	return s.DirCache("Verweise")
 }
 
 func (s Home) DirObjectId() string {
 	return s.DirZit("Kennung")
 }
 
+func (s Home) FileCacheObjectId() string {
+	return s.DirCache("Kennung")
+}
+
 func (s Home) ResetCache() (err error) {
-	if err = files.SetAllowUserChangesRecursive(s.DirVerzeichnisse()); err != nil {
+	if err = files.SetAllowUserChangesRecursive(s.DirCache()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = os.RemoveAll(s.DirVerzeichnisse()); err != nil {
+	if err = os.RemoveAll(s.DirCache()); err != nil {
 		err = errors.Wrapf(err, "failed to remove verzeichnisse dir")
 		return
 	}
 
-	if err = s.MakeDir(s.DirVerzeichnisse()); err != nil {
+	if err = s.MakeDir(s.DirCache()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -331,12 +293,7 @@ func (s Home) ResetCache() (err error) {
 		return
 	}
 
-	if err = s.MakeDir(s.DirVerzeichnisseMetadataObjectIdParent()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.MakeDir(s.DirVerzeichnisseVerweise()); err != nil {
+	if err = s.MakeDir(s.DirCacheObjectPointers()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

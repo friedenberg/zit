@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -36,23 +35,6 @@ func (s *Store) ReadOneObjectId(
 
 	if err = s.GetStreamIndex().ReadOneObjectId(k.String(), sk); err != nil {
 		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) ReaderFor(sh *sha.Sha) (rc sha.ReadCloser, err error) {
-	if rc, err = s.fs_home.BlobReaderFrom(
-		sh,
-		s.fs_home.DirVerzeichnisseMetadataObjectIdParent(),
-	); err != nil {
-		if errors.IsNotExist(err) {
-			err = collections.MakeErrNotFound(sh)
-		} else {
-			err = errors.Wrap(err)
-		}
-
 		return
 	}
 

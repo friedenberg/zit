@@ -42,7 +42,7 @@ func MakeIndex(
 	su interfaces.CacheIOFactory,
 ) (i *index, err error) {
 	i = &index{
-		path:               s.FileVerzeichnisseObjectId(),
+		path:               s.FileCacheObjectId(),
 		nonRandomSelection: k.UsePredictableHinweisen(),
 		su:                 su,
 		encodedIds: encodedIds{

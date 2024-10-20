@@ -21,7 +21,7 @@ func (s *probe_index) Initialize(
 
 	if s.Index, err = object_probe_index.MakeNoDuplicates(
 		s.fs_home,
-		s.fs_home.DirVerzeichnisseVerweise(),
+		s.fs_home.DirCacheObjectPointers(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

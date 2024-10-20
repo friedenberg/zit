@@ -150,10 +150,8 @@ func (c CatBlob) blob(
 	var r sha.ReadCloser
 
 	if r, err = u.GetFSHome().BlobReader(sh); err != nil {
-		if r, err = u.GetStore().ReaderFor(sh); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		err = errors.Wrap(err)
+		return
 	}
 
 	if err = blobWriter(shaWithReadCloser{Sha: sh, ReadCloser: r}); err != nil {

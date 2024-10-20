@@ -79,7 +79,7 @@ func (c *Store) Initialize(
 	if c.Abbr, err = newIndexAbbr(
 		k.PrintOptions,
 		c.fs_home,
-		st.DirVerzeichnisse("Abbr"),
+		st.DirCache("Abbr"),
 	); err != nil {
 		err = errors.Wrapf(err, "failed to init abbr index")
 		return
@@ -146,7 +146,7 @@ func (s *Store) SetExternalStores(
 		}
 
 		es.Home = s.GetStandort()
-		es.DirCache = s.GetStandort().DirVerzeichnisseKasten(k.GetRepoIdString())
+		es.DirCache = s.GetStandort().DirCacheRepo(k.GetRepoIdString())
 
 		es.RepoId = k
 		es.Clock = s.sunrise

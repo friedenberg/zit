@@ -41,7 +41,7 @@ func MakeIndex(
 ) (i *index, err error) {
 	i = &index{
 		lock:               &sync.RWMutex{},
-		path:               s.FileVerzeichnisseHinweis(),
+		path:               s.FileCacheObjectId(),
 		nonRandomSelection: k.UsePredictableHinweisen(),
 		su:                 su,
 		bitset:             collections.MakeBitset(0),

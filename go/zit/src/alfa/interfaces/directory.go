@@ -3,9 +3,7 @@ package interfaces
 type Directory interface {
 	Delete(string) error
 	DirObjectId() string
-	FileVerzeichnisseEtiketten() string
-	FileVerzeichnisseObjectId() string
-	FileVerzeichnisseHinweis() string
+	FileCacheObjectId() string
 }
 
 type CacheIOFactory interface {

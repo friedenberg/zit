@@ -45,7 +45,7 @@ func (u *Env) Start(e BigBang) (err error) {
 	s := u.GetFSHome()
 
 	mkdirAll(s.DirObjectId())
-	mkdirAll(s.DirVerzeichnisse())
+	mkdirAll(s.DirCache())
 	mkdirAll(s.DirVerlorenUndGefunden())
 
 	if err = readAndTransferLines(e.Yin, s.DirZit("Kennung", "Yin")); err != nil {
