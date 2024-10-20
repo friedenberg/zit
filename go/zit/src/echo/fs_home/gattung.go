@@ -9,14 +9,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
-func (s Home) DirObjektenGattung(
+func (s Home) DirObjectGenre(
 	sv interfaces.StoreVersion,
 	g interfaces.GenreGetter,
 ) (p string, err error) {
-	return s.dirObjektenGattung2(g)
+	return s.dirObjectGenre2(g)
 }
 
-func (s Home) dirObjektenGattung2(
+func (s Home) dirObjectGenre2(
 	g1 interfaces.GenreGetter,
 ) (p string, err error) {
 	g := g1.GetGenre()
@@ -31,7 +31,7 @@ func (s Home) dirObjektenGattung2(
 	return
 }
 
-func (s Home) HasObjekte(
+func (s Home) HasObject(
 	sv interfaces.StoreVersion,
 	g interfaces.GenreGetter,
 	sh sha.ShaLike,
@@ -39,7 +39,7 @@ func (s Home) HasObjekte(
 	var d string
 	var err error
 
-	if d, err = s.DirObjektenGattung(sv, g); err != nil {
+	if d, err = s.DirObjectGenre(sv, g); err != nil {
 		return
 	}
 
@@ -61,7 +61,7 @@ func (s Home) HasBlob(
 	var d string
 	var err error
 
-	if d, err = s.DirObjektenGattung(sv, genres.Blob); err != nil {
+	if d, err = s.DirObjectGenre(sv, genres.Blob); err != nil {
 		return
 	}
 
@@ -69,10 +69,6 @@ func (s Home) HasBlob(
 	ok = files.Exists(p)
 
 	return
-}
-
-func (s Home) DirObjektenTransaktion() string {
-	return s.DirObjekten("Transaktion")
 }
 
 func (s Home) ReadAllLevel2Files(
@@ -125,7 +121,7 @@ func (s Home) ReadAllShasForGenre(
 ) (err error) {
 	var p string
 
-	if p, err = s.DirObjektenGattung(sv, g); err != nil {
+	if p, err = s.DirObjectGenre(sv, g); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

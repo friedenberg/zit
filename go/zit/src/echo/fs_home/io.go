@@ -3,12 +3,10 @@ package fs_home
 import (
 	"bytes"
 	"io"
-	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
@@ -19,7 +17,7 @@ func (s Home) objectReader(
 ) (rc sha.ReadCloser, err error) {
 	var p string
 
-	if p, err = s.DirObjektenGattung(
+	if p, err = s.DirObjectGenre(
 		s.immutable_config.GetStoreVersion(),
 		g,
 	); err != nil {
@@ -47,7 +45,7 @@ func (s Home) objectWriter(
 ) (wc sha.WriteCloser, err error) {
 	var p string
 
-	if p, err = s.DirObjektenGattung(
+	if p, err = s.DirObjectGenre(
 		s.immutable_config.GetStoreVersion(),
 		g,
 	); err != nil {
@@ -136,31 +134,10 @@ func (s Home) BlobWriterTo(p string) (w sha.WriteCloser, err error) {
 	return
 }
 
-func (s Home) BlobWriterToLight(p string) (w sha.WriteCloser, err error) {
-	var outer Writer
-
-	mo := MoveOptions{
-		Age:                      s.age,
-		FinalPath:                p,
-		GenerateFinalPathFromSha: true,
-		LockFile:                 s.immutable_config.LockInternalFiles,
-		CompressionType:          s.immutable_config.CompressionType,
-	}
-
-	if outer, err = s.NewMoverLight(mo); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	w = outer
-
-	return
-}
-
 func (s Home) BlobWriter() (w sha.WriteCloser, err error) {
 	var p string
 
-	if p, err = s.DirObjektenGattung(
+	if p, err = s.DirObjectGenre(
 		s.immutable_config.GetStoreVersion(),
 		genres.Blob,
 	); err != nil {
@@ -176,36 +153,6 @@ func (s Home) BlobWriter() (w sha.WriteCloser, err error) {
 	return
 }
 
-func (s Home) BlobReaderFile(sh sha.ShaLike) (f *os.File, err error) {
-	if sh.GetShaLike().IsNull() {
-		err = errors.Errorf("sha is null")
-		return
-	}
-
-	var p string
-
-	if p, err = s.DirObjektenGattung(
-		s.immutable_config.GetStoreVersion(),
-		genres.Blob,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	p = id.Path(sh.GetShaLike(), p)
-
-	if f, err = files.OpenFile(
-		p,
-		os.O_RDONLY,
-		0o666,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (s Home) BlobReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
 	if sh.GetShaLike().IsNull() {
 		r = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
@@ -214,7 +161,7 @@ func (s Home) BlobReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
 
 	var p string
 
-	if p, err = s.DirObjektenGattung(
+	if p, err = s.DirObjectGenre(
 		s.immutable_config.GetStoreVersion(),
 		genres.Blob,
 	); err != nil {

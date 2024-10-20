@@ -16,7 +16,8 @@ import (
 )
 
 type CatBlob struct {
-	Utility script_value.Utility
+	Utility   script_value.Utility
+	PrefixSha bool
 }
 
 func init() {
@@ -26,6 +27,7 @@ func init() {
 			c := &CatBlob{}
 
 			f.Var(&c.Utility, "utility", "")
+			f.BoolVar(&c.PrefixSha, "prefix-sha", false, "")
 
 			return c
 		},
@@ -41,9 +43,7 @@ func (c CatBlob) makeBlobWriter(u *env.Env) interfaces.FuncIter[shaWithReadClose
 	if c.Utility.IsEmpty() {
 		return quiter.MakeSyncSerializer(
 			func(rc shaWithReadCloser) (err error) {
-				defer errors.DeferredCloser(&err, rc.ReadCloser)
-
-				if _, err = io.Copy(u.Out(), rc.ReadCloser); err != nil {
+				if err = c.copy(u, rc); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -71,11 +71,12 @@ func (c CatBlob) makeBlobWriter(u *env.Env) interfaces.FuncIter[shaWithReadClose
 					return
 				}
 
-				if _, err = delim_io.CopyWithPrefixOnDelim(
-					'\n',
-					rc.Sha.GetShaLike().GetShaString(),
-					u.Out(),
-					out,
+				if err = c.copy(
+					u,
+					shaWithReadCloser{
+						Sha:        rc.Sha,
+						ReadCloser: out,
+					},
 				); err != nil {
 					err = errors.Wrap(err)
 					return
@@ -109,6 +110,32 @@ func (c CatBlob) Run(
 		if err = c.blob(u, &sh, blobWriter); err != nil {
 			ui.Err().Print(err)
 			err = nil
+		}
+	}
+
+	return
+}
+
+func (c CatBlob) copy(
+	u *env.Env,
+	rc shaWithReadCloser,
+) (err error) {
+	defer errors.DeferredCloser(&err, rc.ReadCloser)
+
+	if c.PrefixSha {
+		if _, err = delim_io.CopyWithPrefixOnDelim(
+			'\n',
+			rc.Sha.GetShaLike().GetShaString(),
+			u.Out(),
+			rc.ReadCloser,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if _, err = io.Copy(u.Out(), rc.ReadCloser); err != nil {
+			err = errors.Wrap(err)
+			return
 		}
 	}
 

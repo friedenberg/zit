@@ -24,19 +24,15 @@ type FormatObject struct {
 	Format string
 	ids.RepoId
 	UTIGroup string
-	Mode     checkout_mode.Mode
 }
 
 func init() {
 	registerCommand(
 		"format-object",
 		func(f *flag.FlagSet) Command {
-			c := &FormatObject{
-				Mode: checkout_mode.MetadataAndBlob,
-			}
+			c := &FormatObject{}
 
 			f.BoolVar(&c.Stdin, "stdin", false, "Read object from stdin and use a Type directly")
-			f.Var(&c.Mode, "mode", "metadata, blob, or both")
 
 			f.Var(&c.RepoId, "kasten", "none or Browser")
 
@@ -71,6 +67,7 @@ func (c *FormatObject) Run(u *env.Env, args ...string) (err error) {
 	case 2:
 		formatId = args[1]
 		fallthrough
+
 	case 1:
 		objectIdString = args[0]
 
@@ -114,7 +111,11 @@ func (c *FormatObject) Run(u *env.Env, args ...string) (err error) {
 		return
 	}
 
-	if _, err = f.WriteStringFormatWithMode(u.Out(), object, c.Mode); err != nil {
+	if _, err = f.WriteStringFormatWithMode(
+		u.Out(),
+		object,
+		checkout_mode.MetadataAndBlob,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

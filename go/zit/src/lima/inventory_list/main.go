@@ -446,7 +446,7 @@ func (s *Store) ReadAll(
 ) (err error) {
 	var p string
 
-	if p, err = s.fs_home.DirObjektenGattung(
+	if p, err = s.fs_home.DirObjectGenre(
 		s.sv,
 		genres.InventoryList,
 	); err != nil {

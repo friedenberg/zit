@@ -1,6 +1,7 @@
 package delim_io
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 
@@ -29,9 +30,9 @@ func CopyWithPrefixOnDelim(
 	)
 
 	for !eof {
-		var rawLine string
+		var rawLine []byte
 
-		rawLine, err = br.ReadString(delim)
+		rawLine, err = br.ReadBytes(delim)
 		n1 := len(rawLine)
 		n += int64(n1)
 
@@ -50,7 +51,9 @@ func CopyWithPrefixOnDelim(
 		}
 
 		bw.WriteString(prefix)
-		fmt.Fprintf(bw, ":%d:\t%s", lineNo, rawLine)
+		fmt.Fprintf(bw, ":%d:\t", lineNo)
+		bw.Write(bytes.TrimSuffix(rawLine, []byte{delim}))
+		bw.WriteByte(delim)
 
 		lineNo++
 	}

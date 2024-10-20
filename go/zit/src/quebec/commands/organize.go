@@ -58,7 +58,7 @@ func (c *Organize) ModifyBuilder(b *query.Builder) {
 		WithRequireNonEmptyQuery()
 }
 
-func (c *Organize) CompletionGattung() ids.Genre {
+func (c *Organize) CompletionGenres() ids.Genre {
 	return ids.MakeGenre(
 		genres.Zettel,
 		genres.Tag,

@@ -61,7 +61,7 @@ func (u *Env) Start(e BigBang) (err error) {
 	for _, g := range []genres.Genre{genres.Blob, genres.InventoryList} {
 		var d string
 
-		if d, err = s.DirObjektenGattung(
+		if d, err = s.DirObjectGenre(
 			e.Config.GetStoreVersion(),
 			g,
 		); err != nil {

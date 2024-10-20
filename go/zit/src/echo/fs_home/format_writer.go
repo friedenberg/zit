@@ -1,7 +1,6 @@
 package fs_home
 
 import (
-	"io"
 	"path/filepath"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -60,71 +59,4 @@ func (f relativePathStringFormatWriter) WriteStringFormat(
 	}
 
 	return
-}
-
-func (s Home) MakeWriterRelativePath(
-	p string,
-) interfaces.FuncWriter {
-	return func(w io.Writer) (n int64, err error) {
-		var n1 int
-
-		{
-			// if p, err = filepath.Rel(s.cwd, p); err != nil {
-			// 	err = errors.Wrap(err)
-			// 	return
-			// }
-
-			p1, _ := filepath.Rel(s.cwd, p)
-
-			if p1 != "" {
-				p = p1
-			}
-		}
-
-		if n1, err = io.WriteString(w, p); err != nil {
-			n = int64(n1)
-			err = errors.Wrap(err)
-			return
-		}
-
-		n = int64(n1)
-
-		return
-	}
-}
-
-func (s Home) MakeWriterRelativePathOr(
-	p string,
-	or interfaces.FuncWriter,
-) interfaces.FuncWriter {
-	if p == "" {
-		return or
-	}
-
-	return func(w io.Writer) (n int64, err error) {
-		var n1 int
-
-		{
-			// if p, err = filepath.Rel(s.cwd, p); err != nil {
-			// 	err = errors.Wrap(err)
-			// 	return
-			// }
-
-			p1, _ := filepath.Rel(s.cwd, p)
-
-			if p1 != "" {
-				p = p1
-			}
-		}
-
-		if n1, err = io.WriteString(w, p); err != nil {
-			n = int64(n1)
-			err = errors.Wrap(err)
-			return
-		}
-
-		n = int64(n1)
-
-		return
-	}
 }

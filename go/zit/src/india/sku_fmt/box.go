@@ -163,14 +163,17 @@ func (f *Box) WriteStringFormatExternal(
 	box.Contents = slices.Grow(box.Contents, 10)
 
 	oid := &e.ObjectId
+	oidIsExternal := e.State == external_state.Untracked && !e.ExternalObjectId.IsEmpty()
 
-	if e.State == external_state.Untracked && !e.ExternalObjectId.IsEmpty() {
+	if oidIsExternal {
 		oid = &e.ExternalObjectId
 	}
 
 	oidString := (*ids.ObjectIdStringerSansRepo)(oid).String()
 
-	if f.Abbr.ZettelId.Abbreviate != nil && oid.GetGenre() == genres.Zettel {
+	if f.Abbr.ZettelId.Abbreviate != nil &&
+		oid.GetGenre() == genres.Zettel &&
+		!oidIsExternal {
 		if oidString, err = f.Abbr.ZettelId.Abbreviate(oid); err != nil {
 			err = errors.Wrap(err)
 			return

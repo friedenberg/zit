@@ -8,7 +8,7 @@ import (
 )
 
 func NewFileReader(o FileReadOptions) (r Reader, err error) {
-	ar := objekteReader{}
+	ar := objectReader{}
 
 	if o.Path == "-" {
 		ar.file = os.Stdin
@@ -35,12 +35,12 @@ func NewFileReader(o FileReadOptions) (r Reader, err error) {
 	return
 }
 
-type objekteReader struct {
+type objectReader struct {
 	file *os.File
 	Reader
 }
 
-func (ar objekteReader) Close() (err error) {
+func (ar objectReader) Close() (err error) {
 	if ar.file == nil {
 		err = errors.Errorf("nil file")
 		return
