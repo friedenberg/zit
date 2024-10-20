@@ -26,7 +26,7 @@ func (s Home) dirObjectGenre2(
 		return
 	}
 
-	p = s.DirObjekten2(g.GetGenreStringPlural())
+	p = s.DirObjects(g.GetGenreStringPlural())
 
 	return
 }

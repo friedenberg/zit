@@ -34,6 +34,8 @@ type Home struct {
 	debug            debug.Options
 	dryRun           bool
 	pid              int
+
+	interfaces.DirectoryPaths
 }
 
 func Make(
@@ -63,6 +65,10 @@ func Make(
 	s.debug = o.Debug
 	s.cwd = o.store_fs
 	s.pid = os.Getpid()
+
+	s.DirectoryPaths = directoryV0{
+		basePath: s.basePath,
+	}
 
 	if !o.PermitNoZitDirectory {
 		if ok := files.Exists(s.DirZit()); !ok {
@@ -195,58 +201,6 @@ func stringSliceJoin(s string, vs []string) []string {
 	return append([]string{s}, vs...)
 }
 
-func (c Home) FileSchlummernd() string {
-	return c.DirZit("Schlummernd")
-}
-
-func (c Home) FileEtiketten() string {
-	return c.DirZit("Etiketten")
-}
-
-func (c Home) FileKonfigAngeboren() string {
-	return c.DirZit("KonfigAngeboren")
-}
-
-func (c Home) FileKonfigErworben() string {
-	return c.DirZit("KonfigErworben")
-}
-
-func (s Home) Dir(p ...string) string {
-	return filepath.Join(stringSliceJoin(s.basePath, p)...)
-}
-
-func (s Home) DirZit(p ...string) string {
-	return s.Dir(stringSliceJoin(".zit", p)...)
-}
-
-func (s Home) FileAge() string {
-	return s.DirZit("AgeIdentity")
-}
-
-func (s Home) DirCache(p ...string) string {
-	return s.DirZit(append([]string{"Verzeichnisse"}, p...)...)
-}
-
-func (s Home) DirCacheRepo(p ...string) string {
-	return s.DirZit(append([]string{"Verzeichnisse", "Kasten"}, p...)...)
-}
-
-func (s Home) DirCacheDurable(p ...string) string {
-	return s.DirZit(append([]string{"VerzeichnisseDurable"}, p...)...)
-}
-
-func (s Home) DirObjekten(p ...string) string {
-	return s.DirZit(append([]string{"Objekten"}, p...)...)
-}
-
-func (s Home) DirObjekten2(p ...string) string {
-	return s.DirZit(append([]string{"Objekten2"}, p...)...)
-}
-
-func (s Home) DirVerlorenUndGefunden() string {
-	return s.DirZit("Verloren+Gefunden")
-}
-
 func (s Home) MakeDir(d string) (err error) {
 	if err = os.MkdirAll(d, os.ModeDir|0o755); err != nil {
 		err = errors.Wrapf(err, "Dir: %q", d)
@@ -254,22 +208,6 @@ func (s Home) MakeDir(d string) (err error) {
 	}
 
 	return
-}
-
-func (s Home) DirVerzeichnisseObjekten() string {
-	return s.DirCache("Objekten")
-}
-
-func (s Home) DirCacheObjectPointers() string {
-	return s.DirCache("Verweise")
-}
-
-func (s Home) DirObjectId() string {
-	return s.DirZit("Kennung")
-}
-
-func (s Home) FileCacheObjectId() string {
-	return s.DirCache("Kennung")
 }
 
 func (s Home) ResetCache() (err error) {
