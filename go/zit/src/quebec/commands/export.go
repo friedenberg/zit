@@ -85,6 +85,7 @@ func (c Export) Run(u *env.Env, args ...string) (result Result) {
 
 	po := (print_options.General{}).
 		WithPrintShas(true).
+		WithPrintTai(true).
 		WithDescriptionInBox(true)
 
 	boxFormat := u.StringFormatWriterSkuBox(

@@ -242,6 +242,13 @@ func (f *Box) WriteMetadataToBox(
 		)
 	}
 
+	if options.PrintTai && options.PrintTime {
+		box.Contents = append(
+			box.Contents,
+			object_metadata_fmt.MetadataFieldTai(m),
+		)
+	}
+
 	if !m.Type.IsEmpty() {
 		box.Contents = append(
 			box.Contents,

@@ -131,8 +131,9 @@ LOOP:
 			g := k.GetGenre()
 
 			switch g {
-      case genres.InventoryList:
-				if err = o.Metadata.Tai.TodoSetFromObjectId(&k); err != nil {
+			case genres.InventoryList:
+				// TODO make more performant
+				if err = o.Metadata.Tai.Set(k.String()); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

@@ -47,6 +47,15 @@ func MetadataFieldShaString(
 	}
 }
 
+func MetadataFieldTai(
+	m *object_metadata.Metadata,
+) string_format_writer.Field {
+	return string_format_writer.Field{
+		Value:     m.Tai.String(),
+		ColorType: string_format_writer.ColorTypeHash,
+	}
+}
+
 func MetadataFieldType(
 	m *object_metadata.Metadata,
 ) string_format_writer.Field {

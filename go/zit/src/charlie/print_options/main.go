@@ -14,6 +14,7 @@ type Abbreviations struct {
 type Box struct {
 	PrintIncludeDescription bool `toml:"print-include-description"`
 	PrintTime               bool `toml:"print-time"`
+	PrintTai                bool `toml:"-"`
 	PrintTagsAlways         bool `toml:"print-etiketten-always"`
 	PrintEmptyShas          bool `toml:"print-empty-shas"`
 	PrintIncludeTypen       bool `toml:"print-include-typen"`
@@ -263,6 +264,11 @@ func (c General) WithPrintShas(v bool) General {
 
 func (c General) WithDescriptionInBox(v bool) General {
 	c.DescriptionInBox = v
+	return c
+}
+
+func (c General) WithPrintTai(v bool) General {
+	c.PrintTai = v
 	return c
 }
 

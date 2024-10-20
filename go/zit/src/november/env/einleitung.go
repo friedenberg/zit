@@ -36,8 +36,10 @@ func (e *BigBang) AddToFlagSet(f *flag.FlagSet) {
 		"age",
 		"",
 	) // TODO-P3 move to Angeboren
+
 	f.StringVar(&e.Yin, "yin", "", "File containing list of zettel id left parts")
 	f.StringVar(&e.Yang, "yang", "", "File containing list of zettel id right parts")
+
 	e.Config.AddToFlagSet(f)
 }
 
