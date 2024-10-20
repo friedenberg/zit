@@ -7,10 +7,8 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
-	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 )
@@ -25,15 +23,11 @@ type Getter interface {
 }
 
 type Home struct {
-	cwd              string
+	Primitive
 	basePath         string
-	execPath         string
 	lockSmith        interfaces.LockSmith
 	age              *age.Age
 	immutable_config immutable_config.Config
-	debug            debug.Options
-	dryRun           bool
-	pid              int
 
 	interfaces.DirectoryPaths
 }
@@ -41,13 +35,10 @@ type Home struct {
 func Make(
 	// config immutable_config.Config,
 	o Options,
+	primitive Primitive,
 ) (s Home, err error) {
+	s.Primitive = primitive
 	s.age = &age.Age{}
-	ui.TodoP3("add 'touched' which can get deleted / cleaned")
-	if err = o.Validate(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	if o.BasePath == "" {
 		o.BasePath = os.Getenv(EnvDir)
@@ -60,15 +51,32 @@ func Make(
 		}
 	}
 
-	s.dryRun = o.DryRun
 	s.basePath = o.BasePath
-	s.debug = o.Debug
-	s.cwd = o.store_fs
-	s.pid = os.Getpid()
 
-	s.DirectoryPaths = directoryV0{
-		basePath: s.basePath,
+	if s.sv, err = immutable_config.ReadStoreVersionFromFile(
+		s.DataFileStoreVersion(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
+
+	var dp directoryPaths
+
+	switch s.sv.GetInt() {
+	case 6:
+		s.xdg.Data = s.basePath
+		dp = &directoryV0{}
+
+	default:
+		dp = &directoryV1{}
+	}
+
+	if err = dp.init(s.xdg); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	s.DirectoryPaths = dp
 
 	if !o.PermitNoZitDirectory {
 		if ok := files.Exists(s.DirZit()); !ok {
@@ -84,14 +92,17 @@ func Make(
 		return
 	}
 
-	if err = os.Setenv(EnvDir, s.basePath); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	// TODO switch to useing MakeCommonEnv()
+	{
+		if err = os.Setenv(EnvDir, s.basePath); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
-	if err = os.Setenv(EnvBin, s.execPath); err != nil {
-		err = errors.Wrap(err)
-		return
+		if err = os.Setenv(EnvBin, s.execPath); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	{
@@ -237,6 +248,10 @@ func (s Home) ResetCache() (err error) {
 	}
 
 	return
+}
+
+func (h Home) DataFileStoreVersion() string {
+	return filepath.Join(h.xdg.Data, "version")
 }
 
 func (h Home) MakeCommonEnv() map[string]string {

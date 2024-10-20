@@ -97,7 +97,7 @@ func (s *Store) Import(external *sku.Transacted) (co *sku.CheckedOut, err error)
 	return
 }
 
-var ErrNeedsMerge = errors.New("needs merge")
+var ErrNeedsMerge = errors.NewNormal("needs merge")
 
 func (s *Store) importDoMerge(co *sku.CheckedOut) (err error) {
 	co.State = checked_out_state.Conflicted

@@ -3,55 +3,22 @@ package commands
 import (
 	"context"
 	"os"
-	"os/signal"
-	"syscall"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 // TODO switch to returning result
-func Run(args []string) (exitStatus int) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	ch := make(chan os.Signal, 1)
-
-	signal.Notify(ch, syscall.SIGINT)
-
-	go func() {
-		<-ch
-		cancel()
-		os.Exit(1)
-	}()
-
-	var err error
-
-	defer func() {
-		var normalError errors.StackTracer
-
-		if err != nil {
-			exitStatus = 1
-		}
-
-		if errors.As(err, &normalError) {
-			ui.Err().Printf("%s", normalError.Error())
-		} else {
-			if err != nil {
-				ui.Err().Print(err)
-			}
-		}
-	}()
-
+func Run(
+	ctx context.Context,
+	cancel context.CancelCauseFunc,
+	args ...string,
+) (exitStatus int) {
 	var cmd command
-
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	if len(os.Args) < 1 {
 		ui.Log().Print("printing usage")
@@ -78,13 +45,21 @@ func Run(args []string) (exitStatus int) {
 	konfigCli := mutable_config.DefaultCli()
 	konfigCli.AddToFlags(cmd.FlagSet)
 
-	if err = cmd.Parse(args); err != nil {
-		err = errors.Wrap(err)
+	if err := cmd.Parse(args); err != nil {
+		cancel(err)
+		return
+	}
+
+	var primitiveFSHome fs_home.Primitive
+	var err error
+
+	if primitiveFSHome, err = fs_home.MakePrimitive(konfigCli.Debug); err != nil {
+		cancel(errors.Wrap(err))
 		return
 	}
 
 	if _, err = debug.MakeContext(ctx, konfigCli.Debug); err != nil {
-		err = errors.Wrap(err)
+		cancel(errors.Wrap(err))
 		return
 	}
 
@@ -98,11 +73,11 @@ func Run(args []string) (exitStatus int) {
 		options = og.GetEnvironmentInitializeOptions()
 	}
 
-	if u, err = env.Make(cmd.FlagSet, konfigCli, options); err != nil {
+	if u, err = env.Make(cmd.FlagSet, konfigCli, options, primitiveFSHome); err != nil {
 		if cmd.withoutEnv {
 			err = nil
 		} else {
-			err = errors.Wrap(err)
+			cancel(errors.Wrap(err))
 			return
 		}
 	}
@@ -114,7 +89,7 @@ func Run(args []string) (exitStatus int) {
 
 	defer func() {
 		if err = u.GetFSHome().ResetTempOnExit(result.Error); err != nil {
-			err = errors.Wrap(err)
+			cancel(errors.Wrap(err))
 			return
 		}
 	}()

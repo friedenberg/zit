@@ -193,6 +193,7 @@ func makeTestFSHome(
 		fs_home.Options{
 			BasePath: p,
 		},
+		fs_home.Primitive{},
 	)
 	if err != nil {
 		t.Fatalf("failed to make fs_home: %s", err)

@@ -40,10 +40,11 @@ type Env struct {
 	outIsTty bool
 	errIsTty bool
 
-	fs_home      fs_home.Home
-	cliConfig    mutable_config.Cli
-	config       config.Compiled
-	dormantIndex dormant_index.Index
+	primitiveFSHome fs_home.Primitive
+	fsHome          fs_home.Home
+	cliConfig       mutable_config.Cli
+	config          config.Compiled
+	dormantIndex    dormant_index.Index
 
 	storesInitialized bool
 	store             store.Store
@@ -59,14 +60,16 @@ func Make(
 	flags *flag.FlagSet,
 	kCli mutable_config.Cli,
 	options Options,
+	primitiveFSHome fs_home.Primitive,
 ) (u *Env, err error) {
 	u = &Env{
-		in:             os.Stdin,
-		out:            os.Stdout,
-		err:            os.Stderr,
-		flags:          flags,
-		cliConfig:      kCli,
-		DormantCounter: query.MakeDormantCounter(),
+		in:              os.Stdin,
+		out:             os.Stdout,
+		err:             os.Stderr,
+		flags:           flags,
+		cliConfig:       kCli,
+		DormantCounter:  query.MakeDormantCounter(),
+		primitiveFSHome: primitiveFSHome,
 	}
 
 	u.config.Reset()
@@ -115,19 +118,18 @@ func (u *Env) Initialize(options Options) (err error) {
 
 		standortOptions := fs_home.Options{
 			BasePath: u.cliConfig.BasePath,
-			Debug:    u.cliConfig.Debug,
-			DryRun:   u.cliConfig.DryRun,
 		}
 
-		if u.fs_home, err = fs_home.Make(
+		if u.fsHome, err = fs_home.Make(
 			standortOptions,
+			u.primitiveFSHome,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		if err = os.MkdirAll(
-			u.fs_home.DirTempLocal(),
+			u.fsHome.DirTempLocal(),
 			os.ModeDir|0o755,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -136,14 +138,14 @@ func (u *Env) Initialize(options Options) (err error) {
 	}
 
 	if err = u.dormantIndex.Load(
-		u.fs_home,
+		u.fsHome,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if err = u.config.Initialize(
-		u.fs_home,
+		u.fsHome,
 		u.cliConfig,
 		&u.dormantIndex,
 	); err != nil {
@@ -168,7 +170,7 @@ func (u *Env) Initialize(options Options) (err error) {
 	if err = u.store.Initialize(
 		u.flags,
 		u.GetConfig(),
-		u.fs_home,
+		u.fsHome,
 		object_inventory_format.FormatForVersion(u.GetConfig().GetStoreVersion()),
 		u.sunrise,
 		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),

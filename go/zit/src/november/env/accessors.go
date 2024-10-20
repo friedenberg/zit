@@ -38,7 +38,7 @@ func (u *Env) Err() interfaces.WriterAndStringWriter {
 }
 
 func (u *Env) GetFSHome() fs_home.Home {
-	return u.fs_home
+	return u.fsHome
 }
 
 func (u *Env) GetStore() *store.Store {

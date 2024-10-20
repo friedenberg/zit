@@ -24,7 +24,7 @@ type Config struct {
 
 func Default() Config {
 	return Config{
-		StoreVersion:      storeVersion(values.Int(6)),
+		StoreVersion:      storeVersion(values.Int(7)),
 		Recipients:        make([]string, 0),
 		CompressionType:   CompressionTypeDefault,
 		LockInternalFiles: true,

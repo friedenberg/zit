@@ -23,6 +23,7 @@ func Make(
 			BasePath:             p,
 			PermitNoZitDirectory: true,
 		},
+		fs_home.Primitive{},
 	)
 	if err != nil {
 		t.Fatalf("failed to make fs_home: %s", err)

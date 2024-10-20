@@ -2,7 +2,12 @@
 
 dir_base="$(realpath "$(dirname "$0")")"
 zit="$(realpath build/zit)"
-v="$("$zit" store-version)"
+
+if ! v="$("$zit" store-version)"; then
+  echo "failed to get store version" >&2
+  exit 1
+fi
+
 d="${1:-$dir_base/v$v}"
 
 if [[ -d $d ]]; then

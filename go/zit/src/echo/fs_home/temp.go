@@ -9,7 +9,6 @@ import (
 	"syscall"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
 func (s Home) DeleteAll(p string) (err error) {
@@ -38,9 +37,10 @@ func (s Home) Delete(p string) (err error) {
 	return
 }
 
+// TODO only call reset temp when actually not resetting temp
 func (s Home) ResetTempOnExit(errIn error) (err error) {
 	if errIn != nil || s.debug.NoTempDirCleanup {
-		ui.Err().Printf("temp dir: %q", s.DirTempLocal())
+		// ui.Err().Printf("temp dir: %q", s.DirTempLocal())
 	} else {
 		if err = os.RemoveAll(s.DirTempLocal()); err != nil {
 			err = errors.Wrapf(err, "failed to remove temp local")
