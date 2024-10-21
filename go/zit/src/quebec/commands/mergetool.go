@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_fax"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
@@ -95,7 +95,7 @@ func (c Mergetool) RunWithQuery(
 
 		br := bufio.NewReader(f)
 
-		s := sku_fmt.MakeFormatInventoryListScanner(
+		s := inventory_list_fax.MakeScanner(
 			br,
 			object_inventory_format.FormatForVersion(u.GetConfig().GetStoreVersion()),
 			u.GetStore().GetObjekteFormatOptions(),

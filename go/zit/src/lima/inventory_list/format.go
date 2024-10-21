@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_fax"
 )
 
 type format struct {
@@ -28,7 +28,7 @@ func (f format) ParseBlob(
 	r io.Reader,
 	o *InventoryList,
 ) (n int64, err error) {
-	dec := sku_fmt.MakeFormatInventoryListScanner(
+	dec := inventory_list_fax.MakeScanner(
 		r,
 		f.Format,
 		f.Options,

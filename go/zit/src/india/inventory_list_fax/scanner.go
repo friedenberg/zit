@@ -1,4 +1,4 @@
-package sku_fmt
+package inventory_list_fax
 
 import (
 	"io"
@@ -13,20 +13,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type FormatBestandsaufnahmeScanner interface {
-	Error() error
-	GetTransacted() *sku.Transacted
-	GetRange() object_probe_index.Range
-	Scan() bool
-	SetDebug()
-}
-
-func MakeFormatInventoryListScanner(
+func MakeScanner(
 	in io.Reader,
 	of object_inventory_format.Format,
 	op object_inventory_format.Options,
-) FormatBestandsaufnahmeScanner {
-	return &bestandsaufnahmeScanner{
+) FormatInventoryListScanner {
+	return &scanner{
 		ringBuffer: catgut.MakeRingBuffer(in, 0),
 		format:     of,
 		options:    op,
@@ -34,7 +26,7 @@ func MakeFormatInventoryListScanner(
 	}
 }
 
-type bestandsaufnahmeScanner struct {
+type scanner struct {
 	object_probe_index.Range
 
 	ringBuffer *catgut.RingBuffer
@@ -52,11 +44,11 @@ type bestandsaufnahmeScanner struct {
 	debug   bool
 }
 
-func (scanner *bestandsaufnahmeScanner) SetDebug() {
+func (scanner *scanner) SetDebug() {
 	scanner.debug = true
 }
 
-func (scanner *bestandsaufnahmeScanner) Error() error {
+func (scanner *scanner) Error() error {
 	if errors.IsEOF(scanner.err) {
 		return nil
 	}
@@ -64,15 +56,15 @@ func (scanner *bestandsaufnahmeScanner) Error() error {
 	return scanner.err
 }
 
-func (scanner *bestandsaufnahmeScanner) GetTransacted() *sku.Transacted {
+func (scanner *scanner) GetTransacted() *sku.Transacted {
 	return scanner.lastSku
 }
 
-func (scanner *bestandsaufnahmeScanner) GetRange() object_probe_index.Range {
+func (scanner *scanner) GetRange() object_probe_index.Range {
 	return scanner.Range
 }
 
-func (scanner *bestandsaufnahmeScanner) Scan() (ok bool) {
+func (scanner *scanner) Scan() (ok bool) {
 	if scanner.err != nil {
 		return
 	}

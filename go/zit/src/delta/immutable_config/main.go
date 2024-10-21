@@ -5,7 +5,6 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 )
 
 func init() {
@@ -13,7 +12,7 @@ func init() {
 }
 
 type Config struct {
-	StoreVersion                        storeVersion
+	StoreVersion                        StoreVersion
 	Recipients                          []string
 	UseBestandsaufnahme                 bool // deprecated
 	UseKonfigErworbenFile               bool // deprecated
@@ -24,7 +23,7 @@ type Config struct {
 
 func Default() Config {
 	return Config{
-		StoreVersion:      storeVersion(values.Int(7)),
+		StoreVersion:      CurrentStoreVersion,
 		Recipients:        make([]string, 0),
 		CompressionType:   CompressionTypeDefault,
 		LockInternalFiles: true,

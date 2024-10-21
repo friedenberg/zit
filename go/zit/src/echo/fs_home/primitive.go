@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 )
@@ -17,7 +16,7 @@ type Primitive struct {
 	debug    debug.Options
 	pid      int
 	xdg      XDG
-	sv       interfaces.StoreVersion
+	sv       immutable_config.StoreVersion
 }
 
 func MakePrimitive(do debug.Options) (s Primitive, err error) {
@@ -34,7 +33,7 @@ func MakePrimitive(do debug.Options) (s Primitive, err error) {
 		return
 	}
 
-	if s.sv, err = immutable_config.ReadStoreVersionFromFile(
+	if err = s.sv.ReadFromFile(
 		s.DataFileStoreVersion(),
 	); err != nil {
 		err = errors.Wrap(err)

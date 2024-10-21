@@ -22,6 +22,7 @@ import (
 
 // Switch to External store
 type Import struct {
+	immutable_config.StoreVersion
 	InventoryList   string
 	Blobs           string
 	AgeIdentity     age.Identity
@@ -37,6 +38,7 @@ func init() {
 				CompressionType: immutable_config.CompressionTypeDefault,
 			}
 
+			f.Var(&c.StoreVersion, "store-version", "")
 			f.StringVar(&c.InventoryList, "inventory-list", "", "")
 			f.StringVar(&c.Blobs, "blobs", "", "")
 			f.Var(&c.AgeIdentity, "age-identity", "")

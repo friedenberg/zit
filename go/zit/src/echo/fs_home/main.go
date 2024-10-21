@@ -53,13 +53,6 @@ func Make(
 
 	s.basePath = o.BasePath
 
-	if s.sv, err = immutable_config.ReadStoreVersionFromFile(
-		s.DataFileStoreVersion(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	var dp directoryPaths
 
 	switch s.sv.GetInt() {

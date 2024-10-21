@@ -162,7 +162,7 @@ func (c *General) AddToFlags(f *flag.FlagSet, m *General) {
 
 	boolVarWithMask(
 		f,
-		"abbreviate-hinweisen",
+		"abbreviate-zettel-ids",
 		&c.Abbreviations.Hinweisen,
 		&m.Abbreviations.Hinweisen,
 		"",

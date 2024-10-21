@@ -8,7 +8,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -67,23 +66,20 @@ func (c Export) Run(u *env.Env, args ...string) (result Result) {
 
 	var wc io.WriteCloser
 
-	// setup inventory list reader
-	{
-		o := fs_home.WriteOptions{
-			Age:             &ag,
-			CompressionType: c.CompressionType,
-			Writer:          u.Out(),
-		}
-
-		if wc, result.Error = fs_home.NewWriter(o); result.Error != nil {
-			result.Error = errors.Wrap(result.Error)
-			return
-		}
-
-		defer errors.DeferredCloser(&result.Error, wc)
+	o := fs_home.WriteOptions{
+		Age:             &ag,
+		CompressionType: c.CompressionType,
+		Writer:          u.Out(),
 	}
 
-	po := (print_options.General{}).
+	if wc, result.Error = fs_home.NewWriter(o); result.Error != nil {
+		result.Error = errors.Wrap(result.Error)
+		return
+	}
+
+	defer errors.DeferredCloser(&result.Error, wc)
+
+	po := u.GetConfig().PrintOptions.
 		WithPrintShas(true).
 		WithPrintTai(true).
 		WithDescriptionInBox(true)
@@ -94,9 +90,12 @@ func (c Export) Run(u *env.Env, args ...string) (result Result) {
 		string_format_writer.CliFormatTruncation66CharEllipsis,
 	)
 
+	bw := bufio.NewWriter(wc)
+	defer errors.DeferredFlusher(&result.Error, bw)
+
 	printer := string_format_writer.MakeDelim(
 		"\n",
-		u.Out(),
+		bw,
 		string_format_writer.MakeFunc(
 			func(w interfaces.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
 				return boxFormat.WriteStringFormat(w, o)
@@ -106,8 +105,6 @@ func (c Export) Run(u *env.Env, args ...string) (result Result) {
 
 	var sk *sku.Transacted
 	var hasMore bool
-	bw := bufio.NewWriter(wc)
-	defer errors.DeferredFlusher(&result.Error, bw)
 
 	for {
 		sk, hasMore = list.Pop()

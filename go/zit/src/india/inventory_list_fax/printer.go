@@ -1,4 +1,4 @@
-package sku_fmt
+package inventory_list_fax
 
 import (
 	"io"
@@ -10,26 +10,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 )
 
-type FormatBestandsaufnahmePrinter interface {
-	Offset() int64
-	Print(object_inventory_format.FormatterContext) (int64, error)
-	PrintMany(...object_inventory_format.FormatterContext) (int64, error)
-}
-
-type bestandsaufnahmePrinter struct {
-	format            object_inventory_format.Formatter
-	options           object_inventory_format.Options
-	out               io.Writer
-	offset            int64
-	firstBoundaryOnce *sync.Once
-}
-
-func MakeFormatInventoryListPrinter(
+func MakePrinter(
 	out io.Writer,
 	of object_inventory_format.Formatter,
 	op object_inventory_format.Options,
-) FormatBestandsaufnahmePrinter {
-	return &bestandsaufnahmePrinter{
+) FormatInventoryListPrinter {
+	return &printer{
 		format:            of,
 		options:           op,
 		out:               out,
@@ -38,7 +24,15 @@ func MakeFormatInventoryListPrinter(
 	}
 }
 
-func (f *bestandsaufnahmePrinter) printBoundary() (n int64, err error) {
+type printer struct {
+	format            object_inventory_format.Formatter
+	options           object_inventory_format.Options
+	out               io.Writer
+	offset            int64
+	firstBoundaryOnce *sync.Once
+}
+
+func (f *printer) printBoundary() (n int64, err error) {
 	if n, err = ohio.WriteLine(f.out, object_metadata.Boundary); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -49,7 +43,7 @@ func (f *bestandsaufnahmePrinter) printBoundary() (n int64, err error) {
 	return
 }
 
-func (f *bestandsaufnahmePrinter) printFirstBoundary() (n int64, err error) {
+func (f *printer) printFirstBoundary() (n int64, err error) {
 	f.firstBoundaryOnce.Do(
 		func() {
 			if n, err = ohio.WriteLine(f.out, object_metadata.Boundary); err != nil {
@@ -62,7 +56,7 @@ func (f *bestandsaufnahmePrinter) printFirstBoundary() (n int64, err error) {
 	return
 }
 
-func (f *bestandsaufnahmePrinter) PrintMany(
+func (f *printer) PrintMany(
 	tlps ...object_inventory_format.FormatterContext,
 ) (n int64, err error) {
 	for _, tlp := range tlps {
@@ -79,11 +73,11 @@ func (f *bestandsaufnahmePrinter) PrintMany(
 	return
 }
 
-func (f *bestandsaufnahmePrinter) Offset() int64 {
+func (f *printer) Offset() int64 {
 	return f.offset
 }
 
-func (f *bestandsaufnahmePrinter) makeFuncFormatOne(
+func (f *printer) makeFuncFormatOne(
 	tlp object_inventory_format.FormatterContext,
 ) func() (int64, error) {
 	return func() (int64, error) {
@@ -93,7 +87,7 @@ func (f *bestandsaufnahmePrinter) makeFuncFormatOne(
 	}
 }
 
-func (f *bestandsaufnahmePrinter) Print(
+func (f *printer) Print(
 	tlp object_inventory_format.FormatterContext,
 ) (n int64, err error) {
 	var n1 int64

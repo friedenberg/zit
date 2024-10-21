@@ -85,7 +85,7 @@ func (f *Box) WriteStringFormat(
 
 	if stateString != "" {
 		box.Header.Value = stateString
-	} else if f.Options.PrintTime {
+	} else if f.Options.PrintTime && !f.Options.PrintTai {
 		t := o.GetTai()
 		box.Header.Value = t.Format(string_format_writer.StringFormatDateTime)
 	}

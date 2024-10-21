@@ -11,14 +11,48 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 )
 
-func ReadStoreVersionFromFile(p string) (v storeVersion, err error) {
+var CurrentStoreVersion = StoreVersion(values.Int(7))
+
+type StoreVersion values.Int
+
+func (a StoreVersion) Less(b interfaces.StoreVersion) bool {
+	return a.String() < b.String()
+}
+
+func (a StoreVersion) String() string {
+	return values.Int(a).String()
+}
+
+func (a StoreVersion) GetInt() int {
+	return values.Int(a).Int()
+}
+
+func (v *StoreVersion) Set(p string) (err error) {
+	var i uint64
+
+	if i, err = strconv.ParseUint(p, 10, 16); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	*v = StoreVersion(i)
+
+	if CurrentStoreVersion.Less(v) {
+		err = errors.Wrap(ErrFutureStoreVersion{StoreVersion: v})
+		return
+	}
+
+	return
+}
+
+func (v *StoreVersion) ReadFromFile(p string) (err error) {
 	var b []byte
 
 	var f *os.File
 
 	if f, err = files.Open(p); err != nil {
 		if errors.IsNotExist(err) {
-			v = storeVersion(6)
+			*v = StoreVersion(6)
 			err = nil
 		} else {
 			err = errors.Wrap(err)
@@ -32,28 +66,10 @@ func ReadStoreVersionFromFile(p string) (v storeVersion, err error) {
 		return
 	}
 
-	var i uint64
-
-	if i, err = strconv.ParseUint(string(b), 10, 16); err != nil {
+	if err = v.Set(string(b)); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	v = storeVersion(i)
-
 	return
-}
-
-type storeVersion values.Int
-
-func (a storeVersion) Less(b interfaces.StoreVersion) bool {
-	return a.String() < b.String()
-}
-
-func (a storeVersion) String() string {
-	return values.Int(a).String()
-}
-
-func (a storeVersion) GetInt() int {
-	return values.Int(a).Int()
 }

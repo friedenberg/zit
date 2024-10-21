@@ -23,6 +23,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_fax"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 )
@@ -549,7 +550,7 @@ func (u *Env) MakeFormatFunc(
 		}
 
 	case "inventory-list-without-tai":
-		be := sku_fmt.MakeFormatInventoryListPrinter(
+		be := inventory_list_fax.MakePrinter(
 			out,
 			object_inventory_format.Default(),
 			object_inventory_format.Options{ExcludeMutter: true},
@@ -607,7 +608,7 @@ func (u *Env) MakeFormatFunc(
 		}
 
 	case "inventory-list":
-		fo := sku_fmt.MakeFormatInventoryListPrinter(
+		fo := inventory_list_fax.MakePrinter(
 			out,
 			object_inventory_format.Default(),
 			object_inventory_format.Options{Tai: true},
@@ -623,7 +624,7 @@ func (u *Env) MakeFormatFunc(
 		}
 
 	case "inventory-list-cache":
-		fo := sku_fmt.MakeFormatInventoryListPrinter(
+		fo := inventory_list_fax.MakePrinter(
 			out,
 			object_inventory_format.Default(),
 			object_inventory_format.Options{

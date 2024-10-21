@@ -22,7 +22,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_fax"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 )
 
@@ -161,7 +161,7 @@ func (s *Store) writeInventoryList(
 	func() {
 		defer errors.DeferredCloser(&err, sw)
 
-		fo := sku_fmt.MakeFormatInventoryListPrinter(
+		fo := inventory_list_fax.MakePrinter(
 			sw,
 			s.object_format,
 			s.options,
@@ -255,7 +255,7 @@ func (s *Store) ReadOneSku(besty, sh *sha.Sha) (o *sku.Transacted, err error) {
 
 	defer errors.DeferredCloser(&err, ar)
 
-	dec := sku_fmt.MakeFormatInventoryListScanner(
+	dec := inventory_list_fax.MakeScanner(
 		ar,
 		s.object_format,
 		s.options,
@@ -376,7 +376,7 @@ func (s *Store) StreamInventoryList(
 
 	defer errors.DeferredCloser(&err, ar)
 
-	dec := sku_fmt.MakeFormatInventoryListScanner(
+	dec := inventory_list_fax.MakeScanner(
 		ar,
 		object_inventory_format.FormatForVersion(s.sv),
 		s.options,
