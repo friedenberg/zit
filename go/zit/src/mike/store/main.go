@@ -15,6 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
@@ -64,6 +65,7 @@ func (c *Store) Initialize(
 	luaVMPoolBuilder *lua.VMPoolBuilder,
 	qb *query.Builder,
 	options object_inventory_format.Options,
+	box *box_format.Box,
 ) (err error) {
 	c.config = k
 	c.fs_home = st
@@ -93,6 +95,7 @@ func (c *Store) Initialize(
 		c.fs_home,
 		pmf,
 		c,
+		box,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

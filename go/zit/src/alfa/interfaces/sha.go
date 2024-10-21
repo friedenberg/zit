@@ -20,19 +20,23 @@ type ShaGetter interface {
 	GetShaLike() Sha
 }
 
-type ShaReadCloser interface {
-	io.Seeker
-	io.WriterTo
-	io.ReadCloser
-	GetShaLike() Sha
-}
+// TODO reconsider this and force consumption of bufio? Formats expect
+// WriterAndStringWriter, but this forces just Writer
+type (
+	ShaReadCloser interface {
+		io.Seeker
+		io.WriterTo
+		io.ReadCloser
+		GetShaLike() Sha
+	}
 
-type ShaWriteCloser interface {
-	io.ReaderFrom
-	io.WriteCloser
-	// io.WriterAt
-	GetShaLike() Sha
-}
+	ShaWriteCloser interface {
+		io.ReaderFrom
+		io.WriteCloser
+		// io.WriterAt
+		GetShaLike() Sha
+	}
+)
 
 type (
 	FuncShaReadCloser  func(Sha) (ShaReadCloser, error)

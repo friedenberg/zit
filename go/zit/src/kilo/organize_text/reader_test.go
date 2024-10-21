@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/test_config"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
@@ -85,7 +85,7 @@ func makeAssignmentLineReader() reader {
 					},
 				},
 			},
-			fmtBox: sku_fmt.MakeBox(
+			fmtBox: box_format.MakeBox(
 				string_format_writer.ColorOptions{},
 				print_options.General{},
 				nil,

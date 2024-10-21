@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
@@ -46,7 +46,7 @@ type Options struct {
 	UseMetadataHeader      bool
 
 	PrintOptions print_options.General
-	fmtBox       *sku_fmt.Box
+	fmtBox       *box_format.Box
 }
 
 func MakeFlags() Flags {
@@ -120,7 +120,7 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 
 func (o *Flags) GetOptionsWithMetadata(
 	printOptions print_options.General,
-	skuFmt *sku_fmt.Box,
+	skuFmt *box_format.Box,
 	abbr ids.Abbr,
 	of external_store.ObjectFactory,
 	m Metadata,
@@ -146,7 +146,7 @@ func (o *Flags) GetOptionsWithMetadata(
 func (o *Flags) GetOptions(
 	printOptions print_options.General,
 	q TagSetGetter,
-	skuBoxFormat *sku_fmt.Box,
+	skuBoxFormat *box_format.Box,
 	abbr ids.Abbr, // TODO move Abbr as required arg
 	of external_store.ObjectFactory,
 ) Options {

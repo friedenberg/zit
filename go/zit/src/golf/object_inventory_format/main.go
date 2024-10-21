@@ -40,10 +40,6 @@ type (
 		Formatter
 		Parser
 	}
-
-	Getter interface {
-		GetPersistentMetadataFormat() Format
-	}
 )
 
 func Default() Format {

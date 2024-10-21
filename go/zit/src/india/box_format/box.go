@@ -1,4 +1,4 @@
-package sku_fmt
+package box_format
 
 import (
 	"slices"
@@ -90,9 +90,14 @@ func (f *Box) WriteStringFormat(
 		box.Header.Value = t.Format(string_format_writer.StringFormatDateTime)
 	}
 
-	if fds, errFS := f.FSItemReadWriter.ReadFSItemFromExternal(
-		o,
-	); errFS != nil || !isCO || !o.RepoId.IsEmpty() {
+	var fds *sku.FSItem
+	var errFS error
+
+	if f.FSItemReadWriter != nil {
+		fds, errFS = f.FSItemReadWriter.ReadFSItemFromExternal(o)
+	}
+
+	if f.FSItemReadWriter == nil || errFS != nil || !isCO || !o.RepoId.IsEmpty() {
 		n2, err = f.WriteStringFormatExternal(
 			sw,
 			o,

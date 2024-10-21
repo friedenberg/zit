@@ -2,7 +2,6 @@ package inventory_list
 
 import (
 	"fmt"
-	"io"
 	"sort"
 	"sync"
 
@@ -12,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -22,6 +20,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
+	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_fax"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 )
@@ -42,6 +41,8 @@ type Store struct {
 	object_format object_inventory_format.Format
 	options       object_inventory_format.Options
 	format
+
+	versionedFormat
 }
 
 func (s *Store) Initialize(
@@ -52,6 +53,7 @@ func (s *Store) Initialize(
 	af interfaces.BlobIOFactory,
 	pmf object_inventory_format.Format,
 	clock ids.Clock,
+	box *box_format.Box,
 ) (err error) {
 	p := pool.MakePool(nil, func(a *InventoryList) { Resetter.Reset(a) })
 
@@ -69,6 +71,22 @@ func (s *Store) Initialize(
 		object_format: pmf,
 		options:       op,
 		format:        fa,
+	}
+
+	v := sv.GetInt()
+
+	switch {
+	case v <= 6 || true:
+		s.versionedFormat = versionedFormatOld{
+			object_format: pmf,
+			options:       op,
+			format:        fa,
+		}
+
+	default:
+		s.versionedFormat = versionedFormatNew{
+			box: box,
+		}
 	}
 
 	return
@@ -98,7 +116,12 @@ func (s *Store) Create(
 
 	var sh *sha.Sha
 
-	if sh, err = s.writeInventoryList(o); err != nil {
+	if sh, err = s.writeInventoryListBlob(o, s.fs_home.BlobWriter); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, err = s.GetBlob(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -117,25 +140,13 @@ func (s *Store) Create(
 
 	t.SetTai(tai)
 
-	var w sha.WriteCloser
-
-	if w, err = s.of.ObjectWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, w)
-
-	if _, err = s.object_format.FormatPersistentMetadata(
-		w,
+	if sh, err = s.versionedFormat.writeInventoryListObject(
 		t,
-		object_inventory_format.Options{Tai: true},
+		s.of.ObjectWriter,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	sh = sha.Make(w.GetShaLike())
 
 	ui.Log().Printf(
 		"saving Bestandsaufnahme with tai: %s -> %s",
@@ -144,57 +155,6 @@ func (s *Store) Create(
 	)
 
 	t.SetObjectSha(sh)
-
-	return
-}
-
-func (s *Store) writeInventoryList(
-	o *InventoryList,
-) (sh *sha.Sha, err error) {
-	var sw sha.WriteCloser
-
-	if sw, err = s.fs_home.BlobWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	func() {
-		defer errors.DeferredCloser(&err, sw)
-
-		fo := inventory_list_fax.MakePrinter(
-			sw,
-			s.object_format,
-			s.options,
-		)
-
-		defer o.Restore()
-
-		for {
-			sk, ok := o.PopAndSave()
-
-			if !ok {
-				break
-			}
-
-			if sk.Metadata.Sha().IsNull() {
-				err = errors.Errorf("empty sha: %s", sk)
-				return
-			}
-
-			_, err = fo.Print(sk)
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-	}()
-
-	sh = sha.Make(sw.GetShaLike())
-
-	if _, err = s.GetBlob(sh); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	return
 }
@@ -238,49 +198,6 @@ func (s *Store) readOnePath(p string) (o *sku.Transacted, err error) {
 	return
 }
 
-func (s *Store) ReadOneSku(besty, sh *sha.Sha) (o *sku.Transacted, err error) {
-	var bestySku *sku.Transacted
-
-	if bestySku, err = s.ReadOne(besty); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	var ar interfaces.ShaReadCloser
-
-	if ar, err = s.af.BlobReader(&bestySku.Metadata.Blob); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, ar)
-
-	dec := inventory_list_fax.MakeScanner(
-		ar,
-		s.object_format,
-		s.options,
-	)
-
-	for dec.Scan() {
-		o = dec.GetTransacted()
-
-		if !o.Metadata.Sha().Equals(sh) {
-			continue
-		}
-
-		return
-	}
-
-	o = nil
-
-	if err = dec.Error(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (s *Store) ReadOne(
 	k interfaces.Stringer,
 ) (o *sku.Transacted, err error) {
@@ -300,63 +217,8 @@ func (s *Store) ReadOne(
 
 	defer errors.DeferredCloser(&err, or)
 
-	if _, o, err = s.readOneFromReader(or); err != nil {
+	if _, o, err = s.readInventoryListObject(or); err != nil {
 		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) readOneFromReader(
-	r io.Reader,
-) (n int64, o *sku.Transacted, err error) {
-	o = sku.GetTransactedPool().Get()
-
-	if n, err = s.object_format.ParsePersistentMetadata(
-		catgut.MakeRingBuffer(r, 0),
-		o,
-		s.options,
-	); err != nil {
-		if errors.IsEOF(err) {
-			err = nil
-		} else {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
-func (s *Store) populateInventoryList(
-	blobSha interfaces.Sha,
-	a *InventoryList,
-) (err error) {
-	var ar interfaces.ShaReadCloser
-
-	if ar, err = s.af.BlobReader(blobSha); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, ar)
-
-	sw := sha.MakeWriter(nil)
-
-	if _, err = s.format.ParseBlob(io.TeeReader(ar, sw), a); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	sh := sw.GetShaLike()
-
-	if !sh.EqualsSha(blobSha) {
-		err = errors.Errorf(
-			"objekte had blob sha %s while blob reader had %s",
-			blobSha,
-			sh,
-		)
 		return
 	}
 
@@ -401,7 +263,7 @@ func (s *Store) StreamInventoryList(
 
 func (s *Store) GetBlob(blobSha interfaces.Sha) (a *InventoryList, err error) {
 	a = MakeInventoryList()
-	err = s.populateInventoryList(blobSha, a)
+	err = s.readInventoryListBlob(s.af.BlobReader, blobSha, a)
 	return
 }
 

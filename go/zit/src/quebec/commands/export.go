@@ -7,10 +7,8 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list"
@@ -79,29 +77,10 @@ func (c Export) Run(u *env.Env, args ...string) (result Result) {
 
 	defer errors.DeferredCloser(&result.Error, wc)
 
-	po := u.GetConfig().PrintOptions.
-		WithPrintShas(true).
-		WithPrintTai(true).
-		WithDescriptionInBox(true)
-
-	boxFormat := u.StringFormatWriterSkuBox(
-		po,
-		u.FormatColorOptionsOut(),
-		string_format_writer.CliFormatTruncation66CharEllipsis,
-	)
-
 	bw := bufio.NewWriter(wc)
 	defer errors.DeferredFlusher(&result.Error, bw)
 
-	printer := string_format_writer.MakeDelim(
-		"\n",
-		bw,
-		string_format_writer.MakeFunc(
-			func(w interfaces.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
-				return boxFormat.WriteStringFormat(w, o)
-			},
-		),
-	)
+	printer := u.MakePrinterBoxArchive(bw)
 
 	var sk *sku.Transacted
 	var hasMore bool

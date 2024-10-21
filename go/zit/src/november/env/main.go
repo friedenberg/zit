@@ -17,8 +17,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/india/dormant_index"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
@@ -53,7 +53,7 @@ type Env struct {
 
 	DormantCounter query.DormantCounter
 
-	luaSkuFormat *sku_fmt.Box
+	luaSkuFormat *box_format.Box
 }
 
 func Make(
@@ -177,6 +177,7 @@ func (u *Env) Initialize(options Options) (err error) {
 		u.makeQueryBuilder().
 			WithDefaultGenres(ids.MakeGenre(genres.TrueGenre()...)),
 		ofo,
+    u.MakeBoxArchive(),
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")
 		return

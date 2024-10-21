@@ -39,4 +39,6 @@ type (
 	}
 
 	FuncStringWriterFormat[T any] func(WriterAndStringWriter, T) (int64, error)
+
+	FuncMakePrinter[OUT any] func(WriterAndStringWriter) FuncIter[OUT]
 )

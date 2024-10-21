@@ -131,3 +131,19 @@ func (u *Env) PrinterCheckedOutForKasten(
 ) interfaces.FuncIter[*sku.CheckedOut] {
 	return u.PrinterCheckedOut()
 }
+
+func (u *Env) MakePrinterBoxArchive(
+	out interfaces.WriterAndStringWriter,
+) interfaces.FuncIter[*sku.Transacted] {
+	boxFormat := u.MakeBoxArchive()
+
+	return string_format_writer.MakeDelim(
+		"\n",
+		out,
+		string_format_writer.MakeFunc(
+			func(w interfaces.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
+				return boxFormat.WriteStringFormat(w, o)
+			},
+		),
+	)
+}

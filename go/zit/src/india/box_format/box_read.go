@@ -1,4 +1,4 @@
-package sku_fmt
+package box_format
 
 import (
 	"bytes"
