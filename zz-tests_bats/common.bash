@@ -1,6 +1,5 @@
 #! /bin/bash -e
 
-bats_require_minimum_version 1.5.0
 load "$BATS_CWD/zz-tests_bats/test_helper/bats-support/load"
 load "$BATS_CWD/zz-tests_bats/test_helper/bats-assert/load"
 load "$BATS_CWD/zz-tests_bats/test_helper/bats-assert-additions/load"
@@ -29,7 +28,7 @@ PATH="$BATS_CWD/build:$PATH"
 # }
 
 {
-  pushd "$BATS_TEST_TMPDIR" || exit 1
+  pushd "$BATS_TEST_TMPDIR" >/dev/null || exit 1
 }
 
 cat_yin() (
