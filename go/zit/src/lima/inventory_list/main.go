@@ -309,7 +309,6 @@ func (s *Store) ReadAll(
 	var p string
 
 	if p, err = s.fs_home.DirObjectGenre(
-		s.sv,
 		genres.InventoryList,
 	); err != nil {
 		err = errors.Wrap(err)

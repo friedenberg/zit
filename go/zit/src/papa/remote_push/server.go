@@ -85,7 +85,6 @@ func (op Server) GetNeededSkus(
 		}
 
 		if op.env.GetFSHome().HasObject(
-			op.env.GetConfig().GetStoreVersion(),
 			sk.GetGenre(),
 			sk.GetObjectSha(),
 		) {

@@ -64,7 +64,7 @@ func Make(
 		dp = &directoryV1{}
 	}
 
-	if err = dp.init(s.xdg); err != nil {
+	if err = dp.init(s.sv, s.xdg); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

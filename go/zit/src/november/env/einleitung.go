@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"path/filepath"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
@@ -50,12 +51,18 @@ func (u *Env) Start(e BigBang) (err error) {
 	mkdirAll(s.DirCache())
 	mkdirAll(s.DirLostAndFound())
 
-	if err = readAndTransferLines(e.Yin, s.DirZit("Kennung", "Yin")); err != nil {
+	if err = readAndTransferLines(
+		e.Yin,
+		filepath.Join(s.DirObjectId(), "Yin"),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = readAndTransferLines(e.Yang, s.DirZit("Kennung", "Yang")); err != nil {
+	if err = readAndTransferLines(
+		e.Yang,
+		filepath.Join(s.DirObjectId(), "Yang"),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -63,10 +70,7 @@ func (u *Env) Start(e BigBang) (err error) {
 	for _, g := range []genres.Genre{genres.Blob, genres.InventoryList} {
 		var d string
 
-		if d, err = s.DirObjectGenre(
-			e.Config.GetStoreVersion(),
-			g,
-		); err != nil {
+		if d, err = s.DirObjectGenre(g); err != nil {
 			if genres.IsErrUnsupportedGenre(err) {
 				err = nil
 				continue

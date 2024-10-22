@@ -172,7 +172,7 @@ func (c Import) importBlobIfNecessary(
 ) (err error) {
 	blobSha := co.External.GetBlobSha()
 
-	if u.GetFSHome().HasBlob(u.GetConfig().GetStoreVersion(), blobSha) {
+	if u.GetFSHome().HasBlob(blobSha) {
 		return
 	}
 

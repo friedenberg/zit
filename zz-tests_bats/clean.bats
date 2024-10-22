@@ -31,7 +31,7 @@ function clean_all { # @test
 		          deleted [tag.etikett]
 	EOM
 
-	run find . -maxdepth 2 ! -ipath './.zit*'
+	run find . -maxdepth 2 ! -ipath './.xdg*'
 	assert_output '.'
 }
 
@@ -44,7 +44,7 @@ function clean_zettels { # @test
 		          deleted [one/]
 	EOM
 
-	run find . -maxdepth 2 ! -ipath './.zit*'
+	run find . -maxdepth 2 ! -ipath './.xdg*'
 	assert_success
 	assert_output_unsorted - <<-EOM
 		.
@@ -102,7 +102,7 @@ function clean_all_dirty_wd { # @test
 		          deleted [tag.etikett]
 	EOM
 
-	run find . -maxdepth 2 ! -ipath './.zit*'
+	run find . -maxdepth 2 ! -ipath './.xdg*'
 	assert_success
 	assert_output_unsorted - <<-EOM
 		.
@@ -166,7 +166,7 @@ function clean_all_force_dirty_wd { # @test
 		          deleted [zz-archive.etikett]
 	EOM
 
-	run find . -maxdepth 2 ! -ipath './.zit*'
+	run find . -maxdepth 2 ! -ipath './.xdg*'
 	assert_success
 	assert_output '.'
 }

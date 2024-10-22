@@ -26,7 +26,7 @@ func init() {
 }
 
 func (c StoreVersion) Run(u *env.Env, args ...string) (result Result) {
-	ui.Out().Printf("%s\n", c.Config.GetStoreVersion())
+	ui.Out().Print(c.Config.GetStoreVersion())
 
 	return
 }

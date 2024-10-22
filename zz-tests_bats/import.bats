@@ -18,17 +18,20 @@ function import { # @test
 	(
 		mkdir inner
 		pushd inner || exit 1
+		set_xdg "$(pwd)"
 		run_zit_init
 	)
 
+	set_xdg "$BATS_TEST_TMPDIR"
 	run_zit show -format inventory-list-cache +:z
 	assert_success
 	echo "$output" | gzip >list
 
 	list="$(realpath list)"
-	blobs="$(realpath .zit/Objekten2/Akten)"
+	blobs="$(realpath .xdg/data/zit/objects/blobs)"
 
 	pushd inner || exit 1
+	set_xdg "$(pwd)"
 
 	run_zit import \
 		-inventory-list "$list" \
@@ -61,6 +64,7 @@ function import_one_tai_same { # @test
 	(
 		mkdir inner
 		pushd inner || exit 1
+		set_xdg "$(pwd)"
 		run_zit_init
 	)
 
@@ -72,9 +76,10 @@ function import_one_tai_same { # @test
 	echo "$output" | gzip >list
 
 	list="$(realpath list)"
-	blobs="$(realpath .zit/Objekten2/Akten)"
+	blobs="$(realpath .xdg/data/zit/objects/blobs)"
 
 	pushd inner || exit 1
+	set_xdg "$(pwd)"
 
 	run_zit import \
 		-inventory-list "$list" \
@@ -106,6 +111,7 @@ function import_twice_no_dupes_one_zettel { # @test
 	(
 		mkdir inner
 		pushd inner || exit 1
+		set_xdg "$(pwd)"
 		run_zit_init
 	)
 
@@ -117,6 +123,7 @@ function import_twice_no_dupes_one_zettel { # @test
 	blobs="$(realpath .zit/Objekten2/Akten)"
 
 	pushd inner || exit 1
+	set_xdg "$(pwd)"
 
 	run_zit import -inventory-list "$list" -blobs "$blobs" -compression-type gzip
 	assert_success
@@ -156,6 +163,7 @@ function import_conflict { # @test
 	(
 		mkdir inner
 		pushd inner || exit 1
+		set_xdg "$(pwd)"
 		run_zit_init
 	)
 
@@ -164,9 +172,10 @@ function import_conflict { # @test
 	echo "$output" | gzip >list
 
 	list="$(realpath list)"
-	blobs="$(realpath .zit/Objekten2/Akten)"
+	blobs="$(realpath .xdg/data/zit/objects/blobs)"
 
 	pushd inner || exit 1
+	set_xdg "$(pwd)"
 
 	run_zit new -edit=false - <<-EOM
 		---

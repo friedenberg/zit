@@ -38,7 +38,7 @@ func (c Deinit) Run(u *env.Env, args ...string) (err error) {
 		return
 	}
 
-	base := path.Join(u.GetFSHome().Dir(), ".zit")
+	base := path.Join(u.GetFSHome().Dir())
 
 	if err = files.SetAllowUserChangesRecursive(base); err != nil {
 		err = errors.Wrap(err)

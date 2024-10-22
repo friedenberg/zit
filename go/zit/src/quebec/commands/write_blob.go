@@ -80,7 +80,7 @@ func (c WriteBlob) Run(u *env.Env, args ...string) (result Result) {
 			continue
 		}
 
-		hasBlob := u.GetFSHome().HasBlob(u.GetConfig().GetStoreVersion(), a.Sha)
+		hasBlob := u.GetFSHome().HasBlob(a.Sha)
 
 		if hasBlob {
 			if c.Check {

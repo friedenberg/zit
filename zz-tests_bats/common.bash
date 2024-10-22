@@ -5,11 +5,16 @@ load "$BATS_CWD/zz-tests_bats/test_helper/bats-support/load"
 load "$BATS_CWD/zz-tests_bats/test_helper/bats-assert/load"
 load "$BATS_CWD/zz-tests_bats/test_helper/bats-assert-additions/load"
 
-export XDG_DATA_HOME="$BATS_TEST_TMPDIR/.xdg/data"
-export XDG_CONFIG_HOME="$BATS_TEST_TMPDIR/.xdg/config"
-export XDG_STATE_HOME="$BATS_TEST_TMPDIR/.xdg/state"
-export XDG_CACHE_HOME="$BATS_TEST_TMPDIR/.xdg/cache"
-export XDG_RUNTIME_HOME="$BATS_TEST_TMPDIR/.xdg/runtime"
+set_xdg() {
+  loc="$1"
+  export XDG_DATA_HOME="$loc/.xdg/data"
+  export XDG_CONFIG_HOME="$loc/.xdg/config"
+  export XDG_STATE_HOME="$loc/.xdg/state"
+  export XDG_CACHE_HOME="$loc/.xdg/cache"
+  export XDG_RUNTIME_HOME="$loc/.xdg/runtime"
+}
+
+set_xdg "$BATS_TEST_TMPDIR"
 
 # get the containing directory of this file
 # use $BATS_TEST_FILENAME instead of ${BASH_SOURCE[0]} or $0,
@@ -65,12 +70,11 @@ export cmd_zit_def
 function copy_from_version {
   DIR="$1"
   version="${2:-v$(zit store-version)}"
-  cp -r "$DIR/migration/$version" "$BATS_TEST_TMPDIR"
-  cd "$BATS_TEST_TMPDIR/$version" || exit 1
+  rm -rf "$BATS_TEST_TMPDIR/.xdg"
+  cp -r "$DIR/migration/$version/.xdg" "$BATS_TEST_TMPDIR/.xdg"
 }
 
 function rm_from_version {
-  version="${2:-v$(zit store-version)}"
   chflags_and_rm
 }
 
@@ -93,7 +97,7 @@ function run_zit_stderr_unified {
 }
 
 function run_zit_init {
-  run_zit init -yin <(cat_yin) -yang <(cat_yang)
+  run_zit init -yin <(cat_yin) -yang <(cat_yang) -lock-internal-files=false
   assert_success
 }
 
@@ -102,7 +106,7 @@ function get_konfig_sha() {
 }
 
 function run_zit_init_disable_age {
-  run_zit init -yin <(cat_yin) -yang <(cat_yang) -age none "$@"
+  run_zit init -yin <(cat_yin) -yang <(cat_yang) -age none "$@" -lock-internal-files=false
   assert_success
   assert_output - <<-EOM
 	[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]

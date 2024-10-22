@@ -17,24 +17,26 @@ function can_initialize_without_age { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
+  set_xdg "$wd"
 	run_zit_init_disable_age
 	assert_success
 
-	[ -d .zit/ ]
-	[ ! -f .zit/AgeIdentity ]
+	run test -d .xdg/data/zit/objects
+	assert_success
+
+	run test -f .xdg/data/zit/age_identity
+	assert_failure
 }
 
 function can_initialize_with_age { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
+  set_xdg "$wd"
 
 	run_zit init -yin <(cat_yin) -yang <(cat_yang)
 	assert_success
 
-	run test -d .zit/
-	assert_success
-
-	run test -f .zit/AgeIdentity
+	run test -f .xdg/data/zit/age_identity
 	assert_success
 }
 

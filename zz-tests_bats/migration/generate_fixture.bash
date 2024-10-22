@@ -30,4 +30,4 @@ else
 fi
 
 mkdir -p "$d"
-cp -r "$bats_dir/test/1/.zit" "$d/.zit"
+cp -r "$bats_dir/test/1/.xdg" "$d/.xdg"

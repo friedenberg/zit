@@ -15,6 +15,8 @@ function init_and_reindex { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
+	set_xdg "$wd"
+
 	expected="$(mktemp)"
 	cat - >"$expected" <<-EOM
 		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
@@ -24,7 +26,7 @@ function init_and_reindex { # @test
 	run_zit_init_disable_age
 	assert_output_unsorted - <"$expected"
 
-	run test -f .zit/KonfigAngeboren
+	run test -f .xdg/data/zit/config-permanent
 	assert_success
 
 	run_zit show -format log :konfig
@@ -51,13 +53,15 @@ function init_and_deinit { # @test
 	wd="$(mktemp -d)"
 	cd "$wd" || exit 1
 
+	set_xdg "$wd"
+
 	run_zit_init_disable_age
 	assert_output_unsorted - <<-EOM
 		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
 		[konfig @$(get_konfig_sha)]
 	EOM
 
-	run test -f .zit/KonfigAngeboren
+	run test -f .xdg/data/zit/config-permanent
 	assert_success
 
 	# run cat .zit/Objekten/Akten/c1/a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685
@@ -80,16 +84,17 @@ function init_and_deinit { # @test
 
 function init_and_with_another_age { # @test
 	run_zit_init
-	age_id="$(realpath .zit/AgeIdentity)"
+	age_id="$(realpath .xdg/data/zit/age_identity)"
 
 	mkdir inner
 	pushd inner || exit 1
 
+	set_xdg "$(pwd)"
 	run_zit init -yin <(cat_yin) -yang <(cat_yang) -age "$age_id"
 	assert_success
 
-  run diff .zit/AgeIdentity "$age_id"
-  assert_success
+	run diff .xdg/data/zit/age_identity "$age_id"
+	assert_success
 }
 
 # function init_and_init { ## @test

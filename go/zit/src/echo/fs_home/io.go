@@ -18,7 +18,6 @@ func (s Home) objectReader(
 	var p string
 
 	if p, err = s.DirObjectGenre(
-		s.immutable_config.GetStoreVersion(),
 		g,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -46,7 +45,6 @@ func (s Home) objectWriter(
 	var p string
 
 	if p, err = s.DirObjectGenre(
-		s.immutable_config.GetStoreVersion(),
 		g,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -138,7 +136,6 @@ func (s Home) BlobWriter() (w sha.WriteCloser, err error) {
 	var p string
 
 	if p, err = s.DirObjectGenre(
-		s.immutable_config.GetStoreVersion(),
 		genres.Blob,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -162,7 +159,6 @@ func (s Home) BlobReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
 	var p string
 
 	if p, err = s.DirObjectGenre(
-		s.immutable_config.GetStoreVersion(),
 		genres.Blob,
 	); err != nil {
 		err = errors.Wrap(err)

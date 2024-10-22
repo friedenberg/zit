@@ -1,6 +1,7 @@
 package genres
 
 import (
+	"fmt"
 	"io"
 	"strings"
 
@@ -152,7 +153,42 @@ func (g Genre) IsTrueGenre() bool {
 	}
 }
 
-func (g Genre) GetGenreStringPlural() string {
+func (g Genre) GetGenreStringPlural(sv interfaces.StoreVersion) string {
+	switch sv.GetInt() {
+	case 6:
+		return g.getGenreStringPluralOld()
+
+	default:
+		return g.getGenreStringPluralNew()
+	}
+}
+
+func (g Genre) getGenreStringPluralNew() string {
+	switch g {
+	case Blob:
+		return "blobs"
+
+	case Type:
+		return "types"
+
+	case Tag:
+		return "tags"
+
+	case Zettel:
+		return "zettels"
+
+	case InventoryList:
+		return "inventory_lists"
+
+	case Repo:
+		return "repos"
+
+	default:
+		panic(fmt.Sprintf("undeclared plural for genre: %q", g))
+	}
+}
+
+func (g Genre) getGenreStringPluralOld() string {
 	switch g {
 	case Blob:
 		return "Akten"

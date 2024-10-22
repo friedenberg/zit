@@ -4,19 +4,25 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 )
 
 type directoryPaths interface {
 	interfaces.DirectoryPaths
-	init(xdg XDG) error
+	init(sv immutable_config.StoreVersion, xdg XDG) error
 }
 
 type directoryV0 struct {
+	sv       immutable_config.StoreVersion
 	basePath string
 }
 
-func (c *directoryV0) init(xdg XDG) (err error) {
-	c.basePath = xdg.Data
+func (c *directoryV0) init(
+  sv immutable_config.StoreVersion,
+  xdg XDG,
+) (err error) {
+	c.sv = sv
 	return
 }
 
@@ -46,6 +52,21 @@ func (s directoryV0) Dir(p ...string) string {
 
 func (s directoryV0) DirZit(p ...string) string {
 	return s.Dir(stringSliceJoin(".zit", p)...)
+}
+
+func (s directoryV0) DirObjectGenre(
+	g1 interfaces.GenreGetter,
+) (p string, err error) {
+	g := g1.GetGenre()
+
+	if g == genres.Unknown {
+		err = genres.MakeErrUnsupportedGenre(g)
+		return
+	}
+
+	p = s.DirObjects(g.GetGenreStringPlural(s.sv))
+
+	return
 }
 
 func (s directoryV0) FileAge() string {

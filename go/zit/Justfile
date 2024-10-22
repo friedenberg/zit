@@ -1,0 +1,3 @@
+
+gen-fixture:
+ ./zz-tests_bats/migration/generate_fixture.bash

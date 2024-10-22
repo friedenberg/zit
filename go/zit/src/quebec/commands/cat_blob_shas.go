@@ -32,7 +32,6 @@ func (c CatBlobShas) CompletionGenres() ids.Genre {
 
 func (c CatBlobShas) Run(u *env.Env, _ ...string) (err error) {
 	if err = u.GetFSHome().ReadAllShasForGenre(
-		u.GetConfig().GetStoreVersion(),
 		genres.Blob,
 		func(s *sha.Sha) (err error) {
 			_, err = fmt.Fprintln(u.Out(), s)
