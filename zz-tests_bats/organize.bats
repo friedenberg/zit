@@ -318,7 +318,7 @@ function organize_simple_checkedout_merge_conflict { # @test
 	EOM
 }
 
-function organize_hides_hidden_etiketten_from_organize { # @test
+function organize_hides_hidden_tags_from_organize { # @test
 	run_zit schlummernd-add zz-archive
 	assert_success
 	assert_output ''
@@ -384,7 +384,7 @@ function organize_dry_run { # @test
 	assert_output_unsorted "$(cat "$expected_show")"
 }
 
-function organize_with_typ_output { # @test
+function organize_with_type_output { # @test
 	run_zit organize "${cmd_def_organize[@]}" -mode output-only !md:z
 	assert_success
 	assert_output - <<-EOM
@@ -397,7 +397,7 @@ function organize_with_typ_output { # @test
 	EOM
 }
 
-function organize_with_typ_commit { # @test
+function organize_with_type_commit { # @test
 	run_zit organize -mode commit-directly !md:z <<-EOM
 		---
 		! txt
@@ -415,7 +415,7 @@ function organize_with_typ_commit { # @test
 	EOM
 }
 
-function modify_bezeichnung { # @test
+function modify_description { # @test
 	run_zit organize -mode commit-directly :z,e,t <<-EOM
 
 		- [   !md   ]
@@ -480,7 +480,7 @@ function organize_v5_outputs_organize_one_etikett { # @test
 	EOM
 }
 
-function organize_v5_outputs_organize_two_etiketten { # @test
+function organize_v5_outputs_organize_two_tags { # @test
 	to_add="$(mktemp)"
 	{
 		echo "---"
@@ -534,7 +534,7 @@ function organize_v5_outputs_organize_two_etiketten { # @test
 	EOM
 }
 
-function organize_v5_outputs_organize_one_etiketten_group_by_one { # @test
+function organize_v5_outputs_organize_one_tags_group_by_one { # @test
 	to_add="$(mktemp)"
 	{
 		echo "---"
@@ -601,7 +601,7 @@ function organize_v5_outputs_organize_one_etiketten_group_by_one { # @test
 	EOM
 }
 
-function organize_v5_outputs_organize_two_zettels_one_etiketten_group_by_one { # @test
+function organize_v5_outputs_organize_two_zettels_one_tags_group_by_one { # @test
 	to_add="$(mktemp)"
 	{
 		echo "---"
@@ -656,7 +656,7 @@ function organize_v5_outputs_organize_two_zettels_one_etiketten_group_by_one { #
 	EOM
 }
 
-function organize_v5_commits_organize_one_etiketten_group_by_two { # @test
+function organize_v5_commits_organize_one_tags_group_by_two { # @test
 	to_add="$(mktemp)"
 	{
 		echo "---"
@@ -753,7 +753,7 @@ function organize_v5_commits_organize_one_etiketten_group_by_two { # @test
 	assert_output "$(cat "$to_add")"
 }
 
-function organize_v5_commits_organize_one_etiketten_group_by_two_new_zettels { # @test
+function organize_v5_commits_organize_one_tags_group_by_two_new_zettels { # @test
 	skip
 	to_add="$(mktemp)"
 	{
@@ -884,7 +884,7 @@ function organize_v5_commits_organize_one_etiketten_group_by_two_new_zettels { #
 	} >"$expected"
 
 	# TODO
-	# run zit cat-etiketten-schwanzen
+	# run zit cat-tags-schwanzen
 	# assert_output "$(cat "$expected")"
 }
 
@@ -1091,7 +1091,7 @@ function organize_v5_zettels_in_correct_places { # @test
 	EOM
 }
 
-function organize_v5_etiketten_correct { # @test
+function organize_v5_tags_correct { # @test
 
 	run_zit organize "${cmd_def_organize[@]}" -mode commit-directly <<-EOM
 		# test1
@@ -1123,7 +1123,7 @@ function organize_v5_etiketten_correct { # @test
 	EOM
 
 	# TODO-P2 fix issue with kennung schwanzen
-	# run_zit cat-etiketten-schwanzen
+	# run_zit cat-tags-schwanzen
 	# assert_output - <<-EOM
 	# EOM
 
@@ -1197,7 +1197,7 @@ function organize_update_checkout { # @test
 	EOM
 }
 
-function organize_update_checkout_remove_etiketten { # @test
+function organize_update_checkout_remove_tags { # @test
 	run_zit checkout one/dos
 	assert_success
 	assert_output_unsorted - <<-EOM

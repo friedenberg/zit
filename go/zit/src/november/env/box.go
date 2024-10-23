@@ -41,6 +41,7 @@ func (u *Env) MakeBoxArchive() *box_format.Box {
 	po := u.GetConfig().PrintOptions.
 		WithPrintShas(true).
 		WithPrintTai(true).
+		WithExcludeFields(true).
 		WithDescriptionInBox(true)
 
 	co := u.FormatColorOptionsOut()
@@ -50,10 +51,10 @@ func (u *Env) MakeBoxArchive() *box_format.Box {
 		co,
 		po,
 		u.StringFormatWriterFields(
-			string_format_writer.CliFormatTruncation66CharEllipsis,
+			string_format_writer.CliFormatTruncationNone,
 			co,
 		),
-    ids.Abbr{},
+		ids.Abbr{},
 		nil,
 		nil,
 	)

@@ -126,7 +126,11 @@ func (ts *TokenScanner) ScanIdentifierLikeSkipSpaces() (ok bool) {
 		case r == '"' || r == '\'':
 			ts.tokenType = token_types.TypeLiteral
 
-			if !ts.consumeLiteralOrFieldValue(r, token_types.TypeLiteral, &ts.parts.Left) {
+			if !ts.consumeLiteralOrFieldValue(
+				r,
+				token_types.TypeLiteral,
+				&ts.parts.Left,
+			) {
 				ok = false
 				return
 			}
@@ -177,6 +181,16 @@ func (ts *TokenScanner) ScanIdentifierLikeSkipSpaces() (ok bool) {
 	}
 }
 
+func (ts *TokenScanner) ScanSkipSpace() (ok bool) {
+	if !ts.ConsumeSpaces() {
+		return
+	}
+
+	ok = ts.Scan()
+
+	return
+}
+
 func (ts *TokenScanner) Scan() (ok bool) {
 	if len(ts.unscan) > 0 {
 		ok = true
@@ -218,7 +232,11 @@ func (ts *TokenScanner) Scan() (ok bool) {
 		case r == '"' || r == '\'':
 			ts.tokenType = token_types.TypeLiteral
 
-			if !ts.consumeLiteralOrFieldValue(r, token_types.TypeLiteral, &ts.parts.Left) {
+			if !ts.consumeLiteralOrFieldValue(
+				r,
+				token_types.TypeLiteral,
+				&ts.parts.Left,
+			) {
 				ok = false
 				return
 			}
@@ -269,6 +287,11 @@ func (ts *TokenScanner) Scan() (ok bool) {
 	}
 }
 
+// Consumes any spaces currently available in the underlying RuneReader. If this
+// returns false, it means that a read error has occurred, not that no spaces
+// were consumed.
+//
+// TODO make this support unscanned content
 func (ts *TokenScanner) ConsumeSpaces() (ok bool) {
 	ok = true
 
