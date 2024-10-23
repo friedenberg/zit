@@ -227,6 +227,7 @@ func (s *Sha) Set(v string) (err error) {
 	s.allocDataIfNecessary()
 
 	v1 := strings.TrimSpace(v)
+	v1 = strings.TrimPrefix(v, "@")
 
 	var b []byte
 

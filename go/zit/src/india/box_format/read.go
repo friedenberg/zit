@@ -1,8 +1,6 @@
 package box_format
 
 import (
-	"io"
-
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
@@ -45,14 +43,15 @@ func (f *Box) readStringFormatBox(
 ) (err error) {
 	o := el.GetSku()
 
-	ts.ConsumeSpaces()
-
-	if !ts.Scan() {
-		err = io.ErrUnexpectedEOF
-		return
-	}
-
 	{
+		if !ts.ScanSkipSpace() {
+			if ts.Error() != nil {
+				err = errors.Wrap(ts.Error())
+			}
+
+			return
+		}
+
 		t := ts.GetToken()
 
 		if !t.EqualsString("[") {
@@ -61,23 +60,51 @@ func (f *Box) readStringFormatBox(
 		}
 	}
 
-	ts.ConsumeSpaces()
+	if !ts.ConsumeSpaces() {
+		if ts.Error() != nil {
+			err = errors.Wrap(ts.Error())
+		}
+
+		return
+	}
 
 	{
-		if !ts.Scan() {
-			err = io.ErrUnexpectedEOF
+		var toid catgut.String
+
+	LOOP:
+		for ts.Scan() {
+			t, tokenType := ts.GetTokenAndType()
+			first := t.Bytes()[0]
+
+			if tokenType == token_types.TypeOperator {
+				switch first {
+				case '.':
+					// fall through to append
+
+				default:
+					ts.Unscan()
+					break LOOP
+				}
+			}
+
+			if _, err = toid.Append(t); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+		if ts.Error() != nil {
+			err = errors.Wrap(ts.Error())
 			return
 		}
 
-		t := ts.GetToken()
-
-		if t.Bytes()[0] == '/' {
-			if err = o.ExternalObjectId.SetRaw(t.String()); err != nil {
+		if toid.Bytes()[0] == '/' {
+			if err = o.ExternalObjectId.SetRaw(toid.String()); err != nil {
 				err = errors.Wrap(err)
 				o.ExternalObjectId.Reset()
 				return
 			}
-		} else if err = o.ObjectId.ReadFromToken(t); err != nil {
+		} else if err = o.ObjectId.ReadFromToken(&toid); err != nil {
 			err = errors.Wrap(err)
 			o.ObjectId.Reset()
 			return
@@ -86,10 +113,18 @@ func (f *Box) readStringFormatBox(
 
 	var k ids.ObjectId
 
-	for ts.ScanSkipSpace() {
+LOOP_AFTER_OID:
+	for ts.Scan() {
 		t, tokenType, tokenParts := ts.GetTokenAndTypeAndParts()
-		if t.EqualsString("]") {
-			break
+
+		if tokenType == token_types.TypeOperator {
+			switch t.Bytes()[0] {
+			case ']':
+				break LOOP_AFTER_OID
+
+			case ' ':
+				continue LOOP_AFTER_OID
+			}
 		}
 
 		switch tokenType {
@@ -119,6 +154,7 @@ func (f *Box) readStringFormatBox(
 			}
 
 			continue
+
 		case token_types.TypeIdentifier:
 			switch t.Bytes()[0] {
 			case '/':

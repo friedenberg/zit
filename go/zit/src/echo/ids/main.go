@@ -67,6 +67,15 @@ func Make(v string) (k IdLike, err error) {
 	}
 
 	{
+		var h Tai
+
+		if err = h.Set(v); err == nil {
+			k = &h
+			return
+		}
+	}
+
+	{
 		var e Tag
 
 		if err = e.Set(v); err == nil {
@@ -98,15 +107,6 @@ func Make(v string) (k IdLike, err error) {
 
 		if err = ka.Set(v); err == nil {
 			k = &ka
-			return
-		}
-	}
-
-	{
-		var h Tai
-
-		if err = h.Set(v); err == nil {
-			k = &h
 			return
 		}
 	}
