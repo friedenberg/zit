@@ -1,9 +1,10 @@
 package box_format
 
 import (
+	"io"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
-	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -12,20 +13,29 @@ import (
 )
 
 func (f *Box) ReadStringFormat(
-	rb *catgut.RingBuffer,
+	rs io.RuneScanner,
 	el *sku.Transacted,
 ) (n int64, err error) {
 	var ts query_spec.TokenScanner
-	ts.Reset(catgut.MakeRingBufferRuneScanner(rb))
+	ts.Reset(rs)
 
 	if err = f.readStringFormatBox(&ts, el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
+	if ts.Error() != nil {
+		err = errors.Wrap(ts.Error())
+		return
+	}
+
 	n = ts.N()
 
 	o := el.GetSku()
+
+	if f.Options.DescriptionInBox {
+		return
+	}
 
 	if err = o.Metadata.Description.ReadFromTokenScanner(&ts); err != nil {
 		err = errors.Wrap(err)
@@ -47,14 +57,16 @@ func (f *Box) readStringFormatBox(
 		if !ts.ScanSkipSpace() {
 			if ts.Error() != nil {
 				err = errors.Wrap(ts.Error())
+			} else {
+				err = io.EOF
 			}
 
 			return
 		}
 
-		t := ts.GetToken()
+		t, tokenType := ts.GetTokenAndType()
 
-		if !t.EqualsString("[") {
+		if tokenType != token_types.TypeOperator || t.Bytes()[0] != '[' {
 			ts.Unscan()
 			return
 		}
@@ -63,58 +75,48 @@ func (f *Box) readStringFormatBox(
 	if !ts.ConsumeSpaces() {
 		if ts.Error() != nil {
 			err = errors.Wrap(ts.Error())
+		} else {
+			err = io.ErrUnexpectedEOF
 		}
 
 		return
 	}
 
 	{
-		var toid catgut.String
-
-	LOOP:
-		for ts.Scan() {
-			t, tokenType := ts.GetTokenAndType()
-			first := t.Bytes()[0]
-
-			if tokenType == token_types.TypeOperator {
-				switch first {
-				case '.':
-					// fall through to append
-
-				default:
-					ts.Unscan()
-					break LOOP
-				}
-			}
-
-			if _, err = toid.Append(t); err != nil {
-				err = errors.Wrap(err)
-				return
+		if !ts.ScanDotAllowedInIdentifiers() {
+			if ts.Error() != nil {
+				err = errors.Wrap(ts.Error())
+			} else {
+				err = io.ErrUnexpectedEOF
 			}
 		}
 
-		if ts.Error() != nil {
-			err = errors.Wrap(ts.Error())
-			return
-		}
+		t := ts.GetToken()
 
-		if toid.Bytes()[0] == '/' {
-			if err = o.ExternalObjectId.SetRaw(toid.String()); err != nil {
+		if t.Bytes()[0] == '/' {
+			if err = o.ExternalObjectId.SetRaw(t.String()); err != nil {
 				err = errors.Wrap(err)
 				o.ExternalObjectId.Reset()
 				return
 			}
-		} else if err = o.ObjectId.ReadFromToken(&toid); err != nil {
+		} else if err = o.ObjectId.ReadFromToken(t); err != nil {
 			err = errors.Wrap(err)
 			o.ObjectId.Reset()
 			return
+		}
+
+		if o.ObjectId.GetGenre() == genres.InventoryList {
+			if err = o.Metadata.Tai.Set(t.String()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 	}
 
 	var k ids.ObjectId
 
 LOOP_AFTER_OID:
-	for ts.Scan() {
+	for ts.ScanDotAllowedInIdentifiers() {
 		t, tokenType, tokenParts := ts.GetTokenAndTypeAndParts()
 
 		if tokenType == token_types.TypeOperator {
@@ -144,6 +146,11 @@ LOOP_AFTER_OID:
 
 		case token_types.TypeLiteral:
 			if len(tokenParts.Left) == 0 {
+			} else if len(tokenParts.Right) == 0 {
+				if err = o.Metadata.Description.Set(string(tokenParts.Left)); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			} else {
 				field := string_format_writer.Field{
 					Value: t.String(),

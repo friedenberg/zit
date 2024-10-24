@@ -31,7 +31,10 @@ func (s *Env) GetSkuFromString(lv string) (sk *sku.Transacted, err error) {
 
 	rb := catgut.MakeRingBuffer(strings.NewReader(lv), 0)
 
-	if _, err = s.luaSkuFormat.ReadStringFormat(rb, e); err == nil {
+	if _, err = s.luaSkuFormat.ReadStringFormat(
+		catgut.MakeRingBufferRuneScanner(rb),
+		e,
+	); err == nil {
 		return
 	}
 

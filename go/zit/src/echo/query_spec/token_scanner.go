@@ -43,6 +43,7 @@ func (ts *TokenScanner) ReadRune() (r rune, n int, err error) {
 
 	ts.lastRune, n, err = ts.RuneScanner.ReadRune()
 	ts.n += int64(n)
+
 	return ts.lastRune, n, err
 }
 
@@ -192,6 +193,14 @@ func (ts *TokenScanner) ScanSkipSpace() (ok bool) {
 }
 
 func (ts *TokenScanner) Scan() (ok bool) {
+	return ts.scan(true)
+}
+
+func (ts *TokenScanner) ScanDotAllowedInIdentifiers() (ok bool) {
+	return ts.scan(false)
+}
+
+func (ts *TokenScanner) scan(dotOperatorAsSplit bool) (ok bool) {
 	if len(ts.unscan) > 0 {
 		ok = true
 		ts.unscan = nil
@@ -225,7 +234,7 @@ func (ts *TokenScanner) Scan() (ok bool) {
 			return
 		}
 
-		isOperator := IsOperator(r)
+		isOperator := isOperator(r, !dotOperatorAsSplit)
 		isSpace := unicode.IsSpace(r)
 
 		switch {
@@ -290,9 +299,27 @@ func (ts *TokenScanner) Scan() (ok bool) {
 // Consumes any spaces currently available in the underlying RuneReader. If this
 // returns false, it means that a read error has occurred, not that no spaces
 // were consumed.
-//
-// TODO make this support unscanned content
 func (ts *TokenScanner) ConsumeSpaces() (ok bool) {
+	for _, r := range ts.unscan {
+		if ts.err != nil {
+			ok = false
+			return
+		}
+
+		if unicode.IsSpace(r) {
+			continue
+		}
+
+		if ts.err = ts.UnreadRune(); ts.err != nil {
+			ok = false
+			ts.err = errors.Wrapf(ts.err, "%c", r)
+		}
+
+		ok = true
+	}
+
+	ts.unscan = nil
+
 	ok = true
 
 	for {

@@ -198,14 +198,10 @@ function checkin_simple_typ { # @test
 		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
 	EOM
 
-	run_zit last -format inventory-list-without-tai
+	run_zit last -format box-archive
 	assert_success
 	assert_output - <<-EOM
-		---
-		Akte 220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217
-		Gattung Typ
-		Kennung md
-		---
+		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
 	EOM
 
 	run_zit show !md:t

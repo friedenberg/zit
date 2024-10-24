@@ -37,10 +37,10 @@ func (u *Env) SkuFormatBoxNoColor() *box_format.Box {
 	)
 }
 
-func (u *Env) MakeBoxArchive() *box_format.Box {
+func (u *Env) MakeBoxArchive(includeTai bool) *box_format.Box {
 	po := u.GetConfig().PrintOptions.
 		WithPrintShas(true).
-		WithPrintTai(true).
+		WithPrintTai(includeTai).
 		WithExcludeFields(true).
 		WithDescriptionInBox(true)
 

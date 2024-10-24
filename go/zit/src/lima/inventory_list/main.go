@@ -75,7 +75,7 @@ func (s *Store) Initialize(
 	v := sv.GetInt()
 
 	switch {
-	case v <= 6 || true:
+	case v <= 6:
 		s.versionedFormat = versionedFormatOld{
 			object_format: pmf,
 			options:       op,
@@ -266,7 +266,12 @@ func (s *Store) readInventoryListBlob(
 
 func (s *Store) GetBlob(blobSha interfaces.Sha) (a *InventoryList, err error) {
 	a = MakeInventoryList()
-	err = s.readInventoryListBlob(s.af.BlobReader, blobSha, a)
+
+	if err = s.readInventoryListBlob(s.af.BlobReader, blobSha, a); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 

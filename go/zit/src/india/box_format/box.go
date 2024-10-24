@@ -247,7 +247,7 @@ func (f *Box) WriteMetadataToBox(
 		)
 	}
 
-	if options.PrintTai && options.PrintTime {
+	if options.PrintTai && o.GetGenre() != genres.InventoryList {
 		box.Contents = append(
 			box.Contents,
 			object_metadata_fmt.MetadataFieldTai(m),

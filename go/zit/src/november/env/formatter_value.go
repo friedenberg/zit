@@ -100,6 +100,18 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
+	case "box-archive":
+		p := u.MakePrinterBoxArchive(out, u.GetConfig().PrintOptions.PrintTime)
+
+		f = func(tl *sku.Transacted) (err error) {
+			if err = p(tl); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
+
 	case "sha":
 		f = func(tl *sku.Transacted) (err error) {
 			_, err = fmt.Fprintln(out, tl.Metadata.Sha())

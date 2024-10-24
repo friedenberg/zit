@@ -278,7 +278,7 @@ func (ar *reader) readOneObj(
 	z.Type = t
 
 	if _, err = ar.options.fmtBox.ReadStringFormat(
-		r,
+		catgut.MakeRingBufferRuneScanner(r),
 		z.External.GetSku(),
 	); err != nil {
 		err = ErrorRead{

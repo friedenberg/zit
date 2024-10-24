@@ -3,12 +3,9 @@ package inventory_list
 import (
 	"bufio"
 	"io"
-	"unicode"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/unicorn"
-	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -113,7 +110,7 @@ func (s versionedFormatNew) readInventoryListObject(
 ) (n int64, o *sku.Transacted, err error) {
 	o = sku.GetTransactedPool().Get()
 
-	r := catgut.MakeRingBuffer(r1, 0)
+	r := bufio.NewReader(r1)
 
 	if n, err = s.box.ReadStringFormat(r, o); err != nil {
 		err = errors.Wrap(err)
@@ -137,59 +134,24 @@ func (s versionedFormatNew) streamInventoryListBlobSkus(
 
 	defer errors.DeferredCloser(&err, ar)
 
-	r := catgut.MakeRingBuffer(ar, 0)
-	rbs := catgut.MakeRingBufferScanner(r)
+	r := bufio.NewReader(ar)
 
-LOOP:
 	for {
-		var sl catgut.Slice
-		var offsetPlusMatch int
-
-		_, offsetPlusMatch, err = rbs.FirstMatch(unicorn.Not(unicode.IsSpace))
-
-		if err == io.EOF && sl.Len() == 0 {
-			err = nil
-			break
-		}
-
-		switch err {
-		case catgut.ErrBufferEmpty, catgut.ErrNoMatch:
-			var n1 int64
-			n1, err = r.Fill()
-
-			if n1 == 0 && err == io.EOF {
-				err = nil
-				break LOOP
-			} else {
-				err = nil
-				continue
-			}
-		}
-
-		if err != nil && err != io.EOF {
-			err = errors.Wrap(err)
-			return
-		}
-
 		o := sku.GetTransactedPool().Get()
 
 		if _, err = s.box.ReadStringFormat(r, o); err != nil {
-			err = errors.Wrap(err)
-			return
+			if errors.IsEOF(err) {
+				err = nil
+				break
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 
 		if err = f(o); err != nil {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(err, "Object: %s", o)
 			return
-		}
-
-		r.AdvanceRead(offsetPlusMatch)
-
-		if err == io.EOF {
-			err = nil
-			break
-		} else {
-			continue
 		}
 	}
 

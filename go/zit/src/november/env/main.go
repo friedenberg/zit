@@ -177,7 +177,7 @@ func (u *Env) Initialize(options Options) (err error) {
 		u.makeQueryBuilder().
 			WithDefaultGenres(ids.MakeGenre(genres.TrueGenre()...)),
 		ofo,
-    u.MakeBoxArchive(),
+    u.MakeBoxArchive(true),
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")
 		return

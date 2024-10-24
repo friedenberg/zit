@@ -80,7 +80,7 @@ func (c Export) Run(u *env.Env, args ...string) (result Result) {
 	bw := bufio.NewWriter(wc)
 	defer errors.DeferredFlusher(&result.Error, bw)
 
-	printer := u.MakePrinterBoxArchive(bw)
+	printer := u.MakePrinterBoxArchive(bw, u.GetConfig().PrintOptions.PrintTime)
 
 	var sk *sku.Transacted
 	var hasMore bool
