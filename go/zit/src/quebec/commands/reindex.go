@@ -35,14 +35,17 @@ func (c Reindex) Run(u *env.Env, args ...string) (err error) {
 		return
 	}
 
-	defer errors.Deferred(&err, u.Unlock)
-
 	if err = u.GetConfig().Reset(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if err = u.GetStore().Reindex(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = u.Unlock(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

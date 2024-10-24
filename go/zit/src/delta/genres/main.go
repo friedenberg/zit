@@ -154,8 +154,10 @@ func (g Genre) IsTrueGenre() bool {
 }
 
 func (g Genre) GetGenreStringPlural(sv interfaces.StoreVersion) string {
-	switch sv.GetInt() {
-	case 6:
+	v := sv.GetInt()
+
+	switch {
+	case v <= 6:
 		return g.getGenreStringPluralOld()
 
 	default:

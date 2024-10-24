@@ -3,9 +3,11 @@ package inventory_list
 import (
 	"bufio"
 	"io"
+	"unicode"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/unicorn"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -121,10 +123,10 @@ func (s versionedFormatNew) readInventoryListObject(
 	return
 }
 
-func (s versionedFormatNew) readInventoryListBlob(
+func (s versionedFormatNew) streamInventoryListBlobSkus(
 	rf func(interfaces.ShaGetter) (interfaces.ShaReadCloser, error),
 	blobSha interfaces.Sha,
-	a *InventoryList,
+	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	var ar interfaces.ShaReadCloser
 
@@ -135,30 +137,63 @@ func (s versionedFormatNew) readInventoryListBlob(
 
 	defer errors.DeferredCloser(&err, ar)
 
-	sw := sha.MakeWriter(nil)
-
-	var eof bool
-
 	r := catgut.MakeRingBuffer(ar, 0)
+	rbs := catgut.MakeRingBufferScanner(r)
 
-	for !eof {
-		o := sku.GetTransactedPool().Get()
+LOOP:
+	for {
+		var sl catgut.Slice
+		var offsetPlusMatch int
 
-		if _, err = s.box.ReadStringFormat(r, o); err != nil {
-			if errors.IsEOF(err) {
-				// TODO determine if EOF is after content or during
-				eof = true
+		_, offsetPlusMatch, err = rbs.FirstMatch(unicorn.Not(unicode.IsSpace))
+
+		if err == io.EOF && sl.Len() == 0 {
+			err = nil
+			break
+		}
+
+		switch err {
+		case catgut.ErrBufferEmpty, catgut.ErrNoMatch:
+			var n1 int64
+			n1, err = r.Fill()
+
+			if n1 == 0 && err == io.EOF {
 				err = nil
+				break LOOP
 			} else {
-				err = errors.Wrap(err)
-				return
+				err = nil
+				continue
 			}
 		}
 
-		a.Add(o)
+		if err != nil && err != io.EOF {
+			err = errors.Wrap(err)
+			return
+		}
+
+		o := sku.GetTransactedPool().Get()
+
+		if _, err = s.box.ReadStringFormat(r, o); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = f(o); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		r.AdvanceRead(offsetPlusMatch)
+
+		if err == io.EOF {
+			err = nil
+			break
+		} else {
+			continue
+		}
 	}
 
-	sh := sw.GetShaLike()
+	sh := ar.GetShaLike()
 
 	if !sh.EqualsSha(blobSha) {
 		err = errors.Errorf(

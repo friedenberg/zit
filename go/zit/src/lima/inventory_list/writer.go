@@ -16,10 +16,10 @@ type versionedFormat interface {
 	writeInventoryListBlob(*InventoryList, func() (sha.WriteCloser, error)) (*sha.Sha, error)
 	writeInventoryListObject(*sku.Transacted, func() (sha.WriteCloser, error)) (*sha.Sha, error)
 	readInventoryListObject(io.Reader) (int64, *sku.Transacted, error)
-	readInventoryListBlob(
+	streamInventoryListBlobSkus(
 		rf func(interfaces.ShaGetter) (interfaces.ShaReadCloser, error),
 		blobSha interfaces.Sha,
-		a *InventoryList,
+		f interfaces.FuncIter[*sku.Transacted],
 	) error
 }
 
@@ -128,10 +128,10 @@ func (s versionedFormatOld) readInventoryListObject(
 	return
 }
 
-func (s versionedFormatOld) readInventoryListBlob(
+func (s versionedFormatOld) streamInventoryListBlobSkus(
 	rf func(interfaces.ShaGetter) (interfaces.ShaReadCloser, error),
 	blobSha interfaces.Sha,
-	a *InventoryList,
+	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	var ar interfaces.ShaReadCloser
 
@@ -155,7 +155,7 @@ func (s versionedFormatOld) readInventoryListBlob(
 	for dec.Scan() {
 		sk := dec.GetTransacted()
 
-		if err = a.Add(sk); err != nil {
+		if err = f(sk); err != nil {
 			err = errors.Wrapf(err, "Sku: %s", sk)
 			return
 		}

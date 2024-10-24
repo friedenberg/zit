@@ -122,7 +122,7 @@ func (s *Store) Create(
 	}
 
 	if _, err = s.GetBlob(sh); err != nil {
-		err = errors.Wrap(err)
+		err = errors.Wrapf(err, "Blob Sha: %q", sh)
 		return
 	}
 
@@ -254,6 +254,30 @@ func (s *Store) StreamInventoryList(
 	}
 
 	if err = dec.Error(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Store) readInventoryListBlob(
+	rf func(interfaces.ShaGetter) (interfaces.ShaReadCloser, error),
+	blobSha interfaces.Sha,
+	a *InventoryList,
+) (err error) {
+	if err = s.streamInventoryListBlobSkus(
+		rf,
+		blobSha,
+		func(sk *sku.Transacted) (err error) {
+			if err = a.Add(sk); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
