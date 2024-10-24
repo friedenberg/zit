@@ -21,7 +21,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
-	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_fax"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 )
 
@@ -229,31 +228,11 @@ func (s *Store) StreamInventoryList(
 	blobSha interfaces.Sha,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	var ar interfaces.ShaReadCloser
-
-	if ar, err = s.af.BlobReader(blobSha); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, ar)
-
-	dec := inventory_list_fax.MakeScanner(
-		ar,
-		object_inventory_format.FormatForVersion(s.sv),
-		s.options,
-	)
-
-	for dec.Scan() {
-		sk := dec.GetTransacted()
-
-		if err = f(sk); err != nil {
-			err = errors.Wrapf(err, "Sku: %s", sk)
-			return
-		}
-	}
-
-	if err = dec.Error(); err != nil {
+	if err = s.streamInventoryListBlobSkus(
+		s.af.BlobReader,
+		blobSha,
+		f,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
