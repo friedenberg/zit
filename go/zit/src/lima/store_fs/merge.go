@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_fax"
+	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_fmt"
 )
 
 func (s *Store) Merge(tm sku.Conflicted) (err error) {
@@ -202,7 +202,7 @@ func (s *Store) handleMergeResult(
 	bw := bufio.NewWriter(f)
 	defer errors.DeferredFlusher(&err, bw)
 
-	p := inventory_list_fax.MakePrinter(
+	p := inventory_list_fmt.MakePrinter(
 		bw,
 		object_inventory_format.FormatForVersion(s.config.GetStoreVersion()),
 		s.objectFormatOptions,

@@ -1,4 +1,4 @@
-package inventory_list_fax
+package inventory_list_fmt
 
 import (
 	"bytes"

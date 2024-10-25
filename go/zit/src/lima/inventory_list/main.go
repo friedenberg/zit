@@ -21,6 +21,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
+	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 )
 
@@ -41,7 +42,7 @@ type Store struct {
 	options       object_inventory_format.Options
 	format
 
-	versionedFormat
+	VersionedFormat
 }
 
 func (s *Store) Initialize(
@@ -54,7 +55,7 @@ func (s *Store) Initialize(
 	clock ids.Clock,
 	box *box_format.Box,
 ) (err error) {
-	p := pool.MakePool(nil, func(a *InventoryList) { Resetter.Reset(a) })
+	p := pool.MakePool(nil, func(a *InventoryList) { sku.ResetterList.Reset(a) })
 
 	op := object_inventory_format.Options{Tai: true}
 	fa := MakeFormat(sv, op)
@@ -76,15 +77,16 @@ func (s *Store) Initialize(
 
 	switch {
 	case v <= 6:
-		s.versionedFormat = versionedFormatOld{
-			object_format: pmf,
-			options:       op,
-			format:        fa,
+		s.VersionedFormat = versionedFormatOld{
+			Factory: inventory_list_fmt.Factory{
+				Format:  pmf,
+				Options: op,
+			},
 		}
 
 	default:
-		s.versionedFormat = versionedFormatNew{
-			box: box,
+		s.VersionedFormat = inventory_list_fmt.VersionedFormatNew{
+			Box: box,
 		}
 	}
 
@@ -115,7 +117,7 @@ func (s *Store) Create(
 
 	var sh *sha.Sha
 
-	if sh, err = s.writeInventoryListBlob(o, s.fs_home.BlobWriter); err != nil {
+	if sh, err = s.WriteInventoryListBlob(o, s.fs_home.BlobWriter); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -139,7 +141,7 @@ func (s *Store) Create(
 
 	t.SetTai(tai)
 
-	if sh, err = s.versionedFormat.writeInventoryListObject(
+	if sh, err = s.VersionedFormat.WriteInventoryListObject(
 		t,
 		s.of.ObjectWriter,
 	); err != nil {
@@ -216,7 +218,7 @@ func (s *Store) ReadOne(
 
 	defer errors.DeferredCloser(&err, or)
 
-	if _, o, err = s.readInventoryListObject(or); err != nil {
+	if _, o, err = s.ReadInventoryListObject(or); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -228,7 +230,7 @@ func (s *Store) StreamInventoryList(
 	blobSha interfaces.Sha,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	if err = s.streamInventoryListBlobSkus(
+	if err = s.StreamInventoryListBlobSkus(
 		s.af.BlobReader,
 		blobSha,
 		f,
@@ -245,7 +247,7 @@ func (s *Store) readInventoryListBlob(
 	blobSha interfaces.Sha,
 	a *InventoryList,
 ) (err error) {
-	if err = s.streamInventoryListBlobSkus(
+	if err = s.StreamInventoryListBlobSkus(
 		rf,
 		blobSha,
 		func(sk *sku.Transacted) (err error) {
@@ -265,7 +267,7 @@ func (s *Store) readInventoryListBlob(
 }
 
 func (s *Store) GetBlob(blobSha interfaces.Sha) (a *InventoryList, err error) {
-	a = MakeInventoryList()
+	a = sku.MakeList()
 
 	if err = s.readInventoryListBlob(s.af.BlobReader, blobSha, a); err != nil {
 		err = errors.Wrap(err)

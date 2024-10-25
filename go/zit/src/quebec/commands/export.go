@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
@@ -37,7 +36,7 @@ func init() {
 }
 
 func (c Export) Run(u *env.Env, args ...string) (result Result) {
-	list := inventory_list.MakeInventoryList()
+	list := sku.MakeList()
 	var l sync.Mutex
 
 	if result.Error = u.GetStore().QueryPrimitive(

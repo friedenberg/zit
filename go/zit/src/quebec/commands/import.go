@@ -101,7 +101,7 @@ func (c Import) run(u *env.Env, args ...string) (err error) {
 		defer errors.DeferredCloser(&err, rc)
 	}
 
-	list := inventory_list.MakeInventoryList()
+	list := sku.MakeList()
 
 	if _, err = bf.ParseBlob(rc, list); err != nil {
 		err = errors.Wrap(err)

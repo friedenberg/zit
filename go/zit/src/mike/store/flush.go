@@ -51,7 +51,7 @@ func (s *Store) FlushInventoryList(
 		}
 	}
 
-	inventory_list.Resetter.Reset(s.inventoryList)
+	sku.ResetterList.Reset(s.inventoryList)
 
 	if err = s.GetInventoryListStore().Flush(); err != nil {
 		err = errors.Wrap(err)

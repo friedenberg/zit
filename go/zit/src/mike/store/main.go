@@ -76,7 +76,7 @@ func (c *Store) Initialize(
 	c.luaVMPoolBuilder = luaVMPoolBuilder
 	c.queryBuilder = qb
 
-	c.inventoryList = inventory_list.MakeInventoryList()
+	c.inventoryList = sku.MakeList()
 
 	if c.Abbr, err = newIndexAbbr(
 		k.PrintOptions,

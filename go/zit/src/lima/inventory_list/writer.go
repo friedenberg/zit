@@ -9,14 +9,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_fax"
+	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_fmt"
 )
 
-type versionedFormat interface {
-	writeInventoryListBlob(*InventoryList, func() (sha.WriteCloser, error)) (*sha.Sha, error)
-	writeInventoryListObject(*sku.Transacted, func() (sha.WriteCloser, error)) (*sha.Sha, error)
-	readInventoryListObject(io.Reader) (int64, *sku.Transacted, error)
-	streamInventoryListBlobSkus(
+type VersionedFormat interface {
+	WriteInventoryListBlob(*sku.List, func() (sha.WriteCloser, error)) (*sha.Sha, error)
+	WriteInventoryListObject(*sku.Transacted, func() (sha.WriteCloser, error)) (*sha.Sha, error)
+	ReadInventoryListObject(io.Reader) (int64, *sku.Transacted, error)
+	StreamInventoryListBlobSkus(
 		rf func(interfaces.ShaGetter) (interfaces.ShaReadCloser, error),
 		blobSha interfaces.Sha,
 		f interfaces.FuncIter[*sku.Transacted],
@@ -24,16 +24,14 @@ type versionedFormat interface {
 }
 
 type versionedFormatOld struct {
-	object_format object_inventory_format.Format
-	options       object_inventory_format.Options
-	format
+	inventory_list_fmt.Factory
 }
 
-func (v versionedFormatOld) GetVersionedFormat() versionedFormat {
+func (v versionedFormatOld) GetVersionedFormat() VersionedFormat {
 	return v
 }
 
-func (s versionedFormatOld) writeInventoryListObject(
+func (s versionedFormatOld) WriteInventoryListObject(
 	o *sku.Transacted,
 	wf func() (sha.WriteCloser, error),
 ) (sh *sha.Sha, err error) {
@@ -46,7 +44,7 @@ func (s versionedFormatOld) writeInventoryListObject(
 
 	defer errors.DeferredCloser(&err, w)
 
-	if _, err = s.object_format.FormatPersistentMetadata(
+	if _, err = s.Format.FormatPersistentMetadata(
 		w,
 		o,
 		object_inventory_format.Options{Tai: true},
@@ -60,8 +58,8 @@ func (s versionedFormatOld) writeInventoryListObject(
 	return
 }
 
-func (s versionedFormatOld) writeInventoryListBlob(
-	o *InventoryList,
+func (s versionedFormatOld) WriteInventoryListBlob(
+	o *sku.List,
 	wf func() (sha.WriteCloser, error),
 ) (sh *sha.Sha, err error) {
 	var sw sha.WriteCloser
@@ -74,11 +72,7 @@ func (s versionedFormatOld) writeInventoryListBlob(
 	func() {
 		defer errors.DeferredCloser(&err, sw)
 
-		fo := inventory_list_fax.MakePrinter(
-			sw,
-			s.object_format,
-			s.options,
-		)
+		fo := s.MakePrinter(sw)
 
 		defer o.Restore()
 
@@ -107,15 +101,15 @@ func (s versionedFormatOld) writeInventoryListBlob(
 	return
 }
 
-func (s versionedFormatOld) readInventoryListObject(
+func (s versionedFormatOld) ReadInventoryListObject(
 	r io.Reader,
 ) (n int64, o *sku.Transacted, err error) {
 	o = sku.GetTransactedPool().Get()
 
-	if n, err = s.object_format.ParsePersistentMetadata(
+	if n, err = s.Format.ParsePersistentMetadata(
 		catgut.MakeRingBuffer(r, 0),
 		o,
-		s.options,
+		s.Options,
 	); err != nil {
 		if errors.IsEOF(err) {
 			err = nil
@@ -128,7 +122,7 @@ func (s versionedFormatOld) readInventoryListObject(
 	return
 }
 
-func (s versionedFormatOld) streamInventoryListBlobSkus(
+func (s versionedFormatOld) StreamInventoryListBlobSkus(
 	rf func(interfaces.ShaGetter) (interfaces.ShaReadCloser, error),
 	blobSha interfaces.Sha,
 	f interfaces.FuncIter[*sku.Transacted],
@@ -144,13 +138,7 @@ func (s versionedFormatOld) streamInventoryListBlobSkus(
 
 	sw := sha.MakeWriter(nil)
 
-	dec := inventory_list_fax.MakeScanner(
-		ar,
-		s.format,
-		s.options,
-	)
-
-	// dec.SetDebug()
+	dec := s.MakeScanner(ar)
 
 	for dec.Scan() {
 		sk := dec.GetTransacted()

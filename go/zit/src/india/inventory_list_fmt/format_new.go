@@ -1,4 +1,4 @@
-package inventory_list
+package inventory_list_fmt
 
 import (
 	"bufio"
@@ -12,15 +12,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 )
 
-type versionedFormatNew struct {
-	box *box_format.Box
+type VersionedFormatNew struct {
+	Box *box_format.Box
 }
 
-func (v versionedFormatNew) GetVersionedFormat() versionedFormat {
+func (v VersionedFormatNew) GetVersionedFormat() VersionedFormat {
 	return v
 }
 
-func (v versionedFormatNew) makePrinter(
+func (v VersionedFormatNew) makePrinter(
 	out interfaces.WriterAndStringWriter,
 ) interfaces.FuncIter[*sku.Transacted] {
 	return string_format_writer.MakeDelim(
@@ -28,14 +28,14 @@ func (v versionedFormatNew) makePrinter(
 		out,
 		string_format_writer.MakeFunc(
 			func(w interfaces.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
-				return v.box.WriteStringFormat(w, o)
+				return v.Box.WriteStringFormat(w, o)
 			},
 		),
 	)
 }
 
-func (s versionedFormatNew) writeInventoryListBlob(
-	o *InventoryList,
+func (s VersionedFormatNew) WriteInventoryListBlob(
+	o *sku.List,
 	wf func() (sha.WriteCloser, error),
 ) (sh *sha.Sha, err error) {
 	var sw sha.WriteCloser
@@ -77,7 +77,7 @@ func (s versionedFormatNew) writeInventoryListBlob(
 	return
 }
 
-func (s versionedFormatNew) writeInventoryListObject(
+func (s VersionedFormatNew) WriteInventoryListObject(
 	o *sku.Transacted,
 	wf func() (sha.WriteCloser, error),
 ) (sh *sha.Sha, err error) {
@@ -105,14 +105,14 @@ func (s versionedFormatNew) writeInventoryListObject(
 	return
 }
 
-func (s versionedFormatNew) readInventoryListObject(
+func (s VersionedFormatNew) ReadInventoryListObject(
 	r1 io.Reader,
 ) (n int64, o *sku.Transacted, err error) {
 	o = sku.GetTransactedPool().Get()
 
 	r := bufio.NewReader(r1)
 
-	if n, err = s.box.ReadStringFormat(r, o); err != nil {
+	if n, err = s.Box.ReadStringFormat(r, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -120,7 +120,7 @@ func (s versionedFormatNew) readInventoryListObject(
 	return
 }
 
-func (s versionedFormatNew) streamInventoryListBlobSkus(
+func (s VersionedFormatNew) StreamInventoryListBlobSkus(
 	rf func(interfaces.ShaGetter) (interfaces.ShaReadCloser, error),
 	blobSha interfaces.Sha,
 	f interfaces.FuncIter[*sku.Transacted],
@@ -139,7 +139,7 @@ func (s versionedFormatNew) streamInventoryListBlobSkus(
 	for {
 		o := sku.GetTransactedPool().Get()
 
-		if _, err = s.box.ReadStringFormat(r, o); err != nil {
+		if _, err = s.Box.ReadStringFormat(r, o); err != nil {
 			if errors.IsEOF(err) {
 				err = nil
 				break
