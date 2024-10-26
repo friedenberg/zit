@@ -18,6 +18,8 @@ var (
 	TransactedEqualer         transactedEqualer
 )
 
+type Collection interfaces.Collection[*Transacted]
+
 type ExternalObjectIdKeyer[
 	T interface {
 		ids.ObjectIdGetter

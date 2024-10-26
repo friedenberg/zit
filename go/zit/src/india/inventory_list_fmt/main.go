@@ -4,21 +4,10 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
-
-type VersionedFormat interface {
-	WriteInventoryListBlob(*sku.List, io.Writer) (int64, error)
-	WriteInventoryListObject(*sku.Transacted, io.Writer) (int64, error)
-	ReadInventoryListObject(io.Reader) (int64, *sku.Transacted, error)
-	StreamInventoryListBlobSkus(
-		rf io.Reader,
-		f interfaces.FuncIter[*sku.Transacted],
-	) error
-}
 
 type FormatInventoryListPrinter interface {
 	Offset() int64
@@ -35,7 +24,7 @@ type FormatInventoryListScanner interface {
 }
 
 func ReadInventoryListBlob(
-	vf VersionedFormat,
+	vf sku.ListFormat,
 	r io.Reader,
 	a *sku.List,
 ) (err error) {

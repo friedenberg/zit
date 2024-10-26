@@ -10,15 +10,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type VersionedFormatOld struct {
+type FormatOld struct {
 	Factory
 }
 
-func (v VersionedFormatOld) GetVersionedFormat() VersionedFormat {
+func (v FormatOld) GetListFormat() sku.ListFormat {
 	return v
 }
 
-func (s VersionedFormatOld) WriteInventoryListObject(
+func (s FormatOld) WriteInventoryListObject(
 	o *sku.Transacted,
 	w io.Writer,
 ) (n int64, err error) {
@@ -34,7 +34,7 @@ func (s VersionedFormatOld) WriteInventoryListObject(
 	return
 }
 
-func (s VersionedFormatOld) WriteInventoryListBlob(
+func (s FormatOld) WriteInventoryListBlob(
 	o *sku.List,
 	w io.Writer,
 ) (n int64, err error) {
@@ -68,7 +68,7 @@ func (s VersionedFormatOld) WriteInventoryListBlob(
 	return
 }
 
-func (s VersionedFormatOld) ReadInventoryListObject(
+func (s FormatOld) ReadInventoryListObject(
 	r io.Reader,
 ) (n int64, o *sku.Transacted, err error) {
 	o = sku.GetTransactedPool().Get()
@@ -89,7 +89,7 @@ func (s VersionedFormatOld) ReadInventoryListObject(
 	return
 }
 
-func (s VersionedFormatOld) StreamInventoryListBlobSkus(
+func (s FormatOld) StreamInventoryListBlobSkus(
 	r1 io.Reader,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {

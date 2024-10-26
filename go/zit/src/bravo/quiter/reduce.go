@@ -3,7 +3,6 @@ package quiter
 import (
 	"sort"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
@@ -14,14 +13,9 @@ func Elements[T any](s interfaces.Iterable[T]) (out []T) {
 
 	out = make([]T, 0, s.Len())
 
-	err := s.Each(
-		func(v T) (err error) {
-			out = append(out, v)
-			return
-		},
-	)
-
-	errors.PanicIfError(err)
+	for v := range s.All() {
+		out = append(out, v)
+	}
 
 	return
 }
@@ -36,14 +30,9 @@ func ElementsSorted[T any](
 
 	out = make([]T, 0, s.Len())
 
-	err := s.Each(
-		func(v T) (err error) {
-			out = append(out, v)
-			return
-		},
-	)
-
-	errors.PanicIfError(err)
+	for v := range s.All() {
+		out = append(out, v)
+	}
 
 	sort.Slice(out, func(i, j int) bool {
 		return sf(out[i], out[j])

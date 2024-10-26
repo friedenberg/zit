@@ -43,7 +43,7 @@ type Store struct {
 	options       object_inventory_format.Options
 	box           *box_format.Box
 
-	inventory_list_fmt.VersionedFormat
+	sku.ListFormat
 }
 
 func (s *Store) Initialize(
@@ -73,7 +73,7 @@ func (s *Store) Initialize(
 		box:           box,
 	}
 
-	s.VersionedFormat = s.FormatForVersion(sv)
+	s.ListFormat = s.FormatForVersion(sv)
 
 	return
 }
@@ -83,12 +83,12 @@ func (s *Store) Flush() (err error) {
 	return wg.GetError()
 }
 
-func (s *Store) FormatForVersion(sv interfaces.StoreVersion) inventory_list_fmt.VersionedFormat {
+func (s *Store) FormatForVersion(sv interfaces.StoreVersion) sku.ListFormat {
 	v := sv.GetInt()
 
 	switch {
 	case v <= 6:
-		return inventory_list_fmt.VersionedFormatOld{
+		return inventory_list_fmt.FormatOld{
 			Factory: inventory_list_fmt.Factory{
 				Format:  s.object_format,
 				Options: s.options,
@@ -96,7 +96,7 @@ func (s *Store) FormatForVersion(sv interfaces.StoreVersion) inventory_list_fmt.
 		}
 
 	default:
-		return inventory_list_fmt.VersionedFormatNew{
+		return inventory_list_fmt.FormatNew{
 			Box: s.box,
 		}
 	}
@@ -164,7 +164,7 @@ func (s *Store) Create(
 	func() {
 		defer errors.DeferredCloser(&err, wc)
 
-		if _, err = s.VersionedFormat.WriteInventoryListObject(
+		if _, err = s.ListFormat.WriteInventoryListObject(
 			t,
 			wc,
 		); err != nil {
@@ -320,7 +320,7 @@ func (s *Store) GetBlob(blobSha interfaces.Sha) (a *InventoryList, err error) {
 	defer errors.DeferredCloser(&err, rc)
 
 	if err = inventory_list_fmt.ReadInventoryListBlob(
-		s.VersionedFormat,
+		s.ListFormat,
 		rc,
 		a,
 	); err != nil {

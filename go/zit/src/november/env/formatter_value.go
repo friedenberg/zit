@@ -23,7 +23,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
-	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 )
@@ -554,22 +553,6 @@ func (u *Env) MakeFormatFunc(
 				out,
 				r,
 			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		}
-
-	case "inventory-list-without-tai":
-		be := inventory_list_fmt.MakePrinter(
-			out,
-			object_inventory_format.Default(),
-			object_inventory_format.Options{ExcludeMutter: true},
-		)
-
-		f = func(o *sku.Transacted) (err error) {
-			if _, err = be.Print(o); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

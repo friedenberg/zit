@@ -37,7 +37,7 @@ type StringAdder interface {
 
 type Iterable[T any] interface {
 	Any() T                 // TODO-P2 remove in favor of collection method
-	Each(FuncIter[T]) error // TODO remove in favor of iter.Seq
+	// Each(FuncIter[T]) error // TODO remove in favor of iter.Seq
 	All() iter.Seq[T]
 	Lenner
 }

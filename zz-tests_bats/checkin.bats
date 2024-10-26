@@ -227,14 +227,10 @@ function checkin_simple_etikett { # @test
 		[zz-archive @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
 	EOM
 
-	run_zit last -format inventory-list-without-tai
+	run_zit last -format inventory-list-sans-tai
 	assert_success
 	assert_output - <<-EOM
-		---
-		Akte b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93
-		Gattung Etikett
-		Kennung zz-archive
-		---
+		[zz-archive @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
 	EOM
 
 	run_zit show -format blob zz-archive?e

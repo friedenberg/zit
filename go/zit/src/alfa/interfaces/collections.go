@@ -10,13 +10,19 @@ type Delta[T any] interface {
 	GetRemoved() SetLike[T]
 }
 
+type CollectionOld[T any] interface {
+	Lenner
+	Iterable[T]
+	Each(FuncIter[T]) error // TODO remove in favor of iter.Seq
+}
+
 type Collection[T any] interface {
 	Lenner
 	Iterable[T]
 }
 
 type SetLike[T any] interface {
-	Collection[T]
+	CollectionOld[T]
 	ContainsKeyer
 
 	Key(T) string

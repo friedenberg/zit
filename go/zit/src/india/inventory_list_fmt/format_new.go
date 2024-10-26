@@ -12,15 +12,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 )
 
-type VersionedFormatNew struct {
+type FormatNew struct {
 	Box *box_format.Box
 }
 
-func (v VersionedFormatNew) GetVersionedFormat() VersionedFormat {
+func (v FormatNew) GetListFormat() sku.ListFormat {
 	return v
 }
 
-func (v VersionedFormatNew) makePrinter(
+func (v FormatNew) makePrinter(
 	out interfaces.WriterAndStringWriter,
 ) interfaces.FuncIter[*sku.Transacted] {
 	return string_format_writer.MakeDelim(
@@ -34,7 +34,7 @@ func (v VersionedFormatNew) makePrinter(
 	)
 }
 
-func (s VersionedFormatNew) WriteInventoryListBlob(
+func (s FormatNew) WriteInventoryListBlob(
 	o *sku.List,
 	w1 io.Writer,
 ) (n int64, err error) {
@@ -78,7 +78,7 @@ func (s VersionedFormatNew) WriteInventoryListBlob(
 	return
 }
 
-func (s VersionedFormatNew) WriteInventoryListObject(
+func (s FormatNew) WriteInventoryListObject(
 	o *sku.Transacted,
 	w1 io.Writer,
 ) (n int64, err error) {
@@ -107,7 +107,7 @@ func (s VersionedFormatNew) WriteInventoryListObject(
 	return
 }
 
-func (s VersionedFormatNew) ReadInventoryListObject(
+func (s FormatNew) ReadInventoryListObject(
 	r1 io.Reader,
 ) (n int64, o *sku.Transacted, err error) {
 	o = sku.GetTransactedPool().Get()
@@ -122,7 +122,7 @@ func (s VersionedFormatNew) ReadInventoryListObject(
 	return
 }
 
-func (s VersionedFormatNew) StreamInventoryListBlobSkus(
+func (s FormatNew) StreamInventoryListBlobSkus(
 	r1 io.Reader,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {

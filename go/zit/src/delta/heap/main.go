@@ -2,6 +2,7 @@ package heap
 
 import (
 	"container/heap"
+	"iter"
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -13,6 +14,35 @@ type Heap[T Element, TPtr ElementPtr[T]] struct {
 	l sync.Mutex
 	h heapPrivate[T, TPtr]
 	s int
+}
+
+func (h *Heap[T, TPtr]) GetCollection() interfaces.Collection[TPtr] {
+	return h
+}
+
+func (h *Heap[T, TPtr]) Any() TPtr {
+	e, _ := h.Peek()
+	return e
+}
+
+func (h *Heap[T, TPtr]) All() iter.Seq[TPtr] {
+	return func(yield func(TPtr) bool) {
+		h.l.Lock()
+		defer h.l.Unlock()
+		defer h.Restore()
+
+		for {
+			e, ok := h.PopAndSave()
+
+			if !ok {
+				return
+			}
+
+			if !yield(e) {
+				break
+			}
+		}
+	}
 }
 
 func (h *Heap[T, TPtr]) SetPool(v interfaces.Pool[T, TPtr]) {
