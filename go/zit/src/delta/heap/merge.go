@@ -35,7 +35,7 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 	re interfaces.Resetter2[T, TPtr],
 ) (err error) {
 	defer func() {
-		h.Restore()
+		h.restore()
 	}()
 
 	oldWrite := w
@@ -95,7 +95,7 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 			default:
 			}
 
-			popped, _ := h.PopAndSave()
+			popped, _ := h.popAndSave()
 
 			if !equaler.Equals(peeked, popped) {
 				err = errors.Errorf(
@@ -134,7 +134,7 @@ func MergeStreamPreferringHeap[T Element, TPtr ElementPtr[T]](
 	}
 
 	for {
-		popped, ok := h.PopAndSave()
+		popped, ok := h.popAndSave()
 
 		if !ok {
 			break

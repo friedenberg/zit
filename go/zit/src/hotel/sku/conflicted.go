@@ -1,6 +1,9 @@
 package sku
 
 import (
+	"bufio"
+	"iter"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
@@ -8,6 +11,34 @@ import (
 type Conflicted struct {
 	CheckedOutLike
 	Left, Middle, Right *Transacted
+}
+
+func (tm Conflicted) GetCollection() Collection {
+	return tm
+}
+
+func (tm Conflicted) Len() int {
+	return 3
+}
+
+func (tm Conflicted) Any() *Transacted {
+	return tm.Left
+}
+
+func (tm Conflicted) All() iter.Seq[*Transacted] {
+	return func(yield func(*Transacted) bool) {
+		if !yield(tm.Left) {
+			return
+		}
+
+		if !yield(tm.Middle) {
+			return
+		}
+
+		if !yield(tm.Right) {
+			return
+		}
+	}
 }
 
 func (tm Conflicted) IsAllInlineType(itc ids.InlineTypeChecker) bool {
@@ -96,43 +127,34 @@ func (tm *Conflicted) MergeTags() (err error) {
 }
 
 func (tm *Conflicted) ReadConflictMarker(
-	s Scanner,
+	br *bufio.Reader,
+	fo ListFormat,
 ) (err error) {
 	i := 0
 
-	for s.Scan() {
-		sk := s.GetTransacted()
+	if err = fo.StreamInventoryListBlobSkus(
+		br,
+		func(sk *Transacted) (err error) {
+			switch i {
+			case 0:
+				tm.Left = sk
 
-		switch i {
-		case 0:
-			tm.Left = sk
+			case 1:
+				tm.Middle = sk
 
-		case 1:
-			tm.Middle = sk
+			case 2:
+				tm.Right = sk
 
-		case 2:
-			tm.Right = sk
+			default:
+				err = errors.Errorf("too many skus in conflict file")
+				return
+			}
 
-		default:
-			err = errors.Errorf("too many skus in conflict file")
+			i++
+
 			return
-		}
-
-		i++
-	}
-
-	if err = s.Error(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (tm Conflicted) WriteConflictMarker(
-	p ManyPrinter,
-) (err error) {
-	if _, err = p.PrintMany(tm.Left, tm.Middle, tm.Right); err != nil {
+		},
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

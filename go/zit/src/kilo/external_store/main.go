@@ -64,6 +64,7 @@ type (
 		ids.RepoId
 		ids.TypeSet
 		ids.Clock
+		ListFormat sku.ListFormat
 	}
 
 	StoreLike interface {

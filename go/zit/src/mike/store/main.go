@@ -153,6 +153,7 @@ func (s *Store) SetExternalStores(
 
 		es.RepoId = k
 		es.Clock = s.sunrise
+		es.ListFormat = s.GetInventoryListStore().ListFormat
 
 		if esfs, ok := es.StoreLike.(*store_fs.Store); ok {
 			s.cwdFiles = esfs

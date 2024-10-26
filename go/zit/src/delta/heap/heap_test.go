@@ -58,9 +58,9 @@ func TestSaveAndRestore(t1 *testing.T) {
 	)
 
 	checkAllElements := func() {
-		defer sut.Restore()
+		defer sut.restore()
 		for i := 0; i < 5; i++ {
-			el, ok := sut.PopAndSave()
+			el, ok := sut.popAndSave()
 			ex := values.MakeInt(i)
 
 			if !ok {

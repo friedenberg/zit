@@ -35,24 +35,16 @@ func (v FormatNew) makePrinter(
 }
 
 func (s FormatNew) WriteInventoryListBlob(
-	o *sku.List,
+	o sku.Collection,
 	w1 io.Writer,
 ) (n int64, err error) {
 	bw := bufio.NewWriter(w1)
 	defer errors.DeferredFlusher(&err, bw)
 
-	defer o.Restore()
-
 	var n1 int64
 	var n2 int
 
-	for {
-		sk, ok := o.PopAndSave()
-
-		if !ok {
-			break
-		}
-
+	for sk := range o.All() {
 		if sk.Metadata.Sha().IsNull() {
 			err = errors.Errorf("empty sha: %s", sk)
 			return

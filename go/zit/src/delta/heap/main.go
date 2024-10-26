@@ -29,10 +29,10 @@ func (h *Heap[T, TPtr]) All() iter.Seq[TPtr] {
 	return func(yield func(TPtr) bool) {
 		h.l.Lock()
 		defer h.l.Unlock()
-		defer h.Restore()
+		defer h.restore()
 
 		for {
-			e, ok := h.PopAndSave()
+			e, ok := h.popAndSave()
 
 			if !ok {
 				return
@@ -98,6 +98,10 @@ func (h *Heap[T, TPtr]) PopAndSave() (sk TPtr, ok bool) {
 	h.l.Lock()
 	defer h.l.Unlock()
 
+  return h.popAndSave()
+}
+
+func (h *Heap[T, TPtr]) popAndSave() (sk TPtr, ok bool) {
 	// h.h.discardDupes()
 
 	if h.h.Len() == 0 {
@@ -120,6 +124,10 @@ func (h *Heap[T, TPtr]) Restore() {
 	h.l.Lock()
 	defer h.l.Unlock()
 
+  h.restore()
+}
+
+func (h *Heap[T, TPtr]) restore() {
 	h.h.Elements = h.h.Elements[:h.s]
 	h.s = 0
 	h.h.GetPool().Put(h.h.lastPopped)

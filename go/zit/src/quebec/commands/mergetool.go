@@ -12,9 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
@@ -95,14 +93,11 @@ func (c Mergetool) RunWithQuery(
 
 		br := bufio.NewReader(f)
 
-		s := inventory_list_fmt.MakeScanner(
-			br,
-			object_inventory_format.FormatForVersion(u.GetConfig().GetStoreVersion()),
-			u.GetStore().GetObjekteFormatOptions(),
-		)
+		fo := u.GetStore().GetInventoryListStore().ListFormat
 
 		if err = tm.ReadConflictMarker(
-			s,
+			br,
+			fo,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

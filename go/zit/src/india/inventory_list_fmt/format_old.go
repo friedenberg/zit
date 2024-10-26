@@ -35,22 +35,14 @@ func (s FormatOld) WriteInventoryListObject(
 }
 
 func (s FormatOld) WriteInventoryListBlob(
-	o *sku.List,
+	o sku.Collection,
 	w io.Writer,
 ) (n int64, err error) {
 	var n1 int64
 
 	fo := s.MakePrinter(w)
 
-	defer o.Restore()
-
-	for {
-		sk, ok := o.PopAndSave()
-
-		if !ok {
-			break
-		}
-
+	for sk := range o.All() {
 		if sk.Metadata.Sha().IsNull() {
 			err = errors.Errorf("empty sha: %s", sk)
 			return
