@@ -35,7 +35,7 @@ type Store struct {
 	inventoryListStore inventory_list.Store
 	Abbr               AbbrStore
 
-	inventoryList          *inventory_list.InventoryList
+	inventoryList          *sku.List
 	options                object_inventory_format.Options
 	persistentObjectFormat object_inventory_format.Format
 	configBlobFormat       blob_store.Format[mutable_config.Blob, *mutable_config.Blob]

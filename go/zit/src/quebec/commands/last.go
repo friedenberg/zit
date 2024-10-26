@@ -13,7 +13,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
@@ -129,7 +128,7 @@ func (c Last) runWithInventoryList(
 		return
 	}
 
-	var a *inventory_list.InventoryList
+	var a *sku.List
 
 	if a, err = s.GetInventoryListStore().GetBlob(b.GetBlobSha()); err != nil {
 		err = errors.Wrapf(err, "InventoryList: %q", b)

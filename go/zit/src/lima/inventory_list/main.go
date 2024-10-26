@@ -19,16 +19,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 )
-
-type Format = blob_store.Format[
-	InventoryList,
-	*InventoryList,
-]
 
 type Store struct {
 	fs_home fs_home.Home
@@ -37,7 +31,7 @@ type Store struct {
 	of      interfaces.ObjectIOFactory
 	af      interfaces.BlobIOFactory
 	clock   ids.Clock
-	pool    interfaces.Pool[InventoryList, *InventoryList]
+	pool    interfaces.Pool[sku.List, *sku.List]
 
 	object_format object_inventory_format.Format
 	options       object_inventory_format.Options
@@ -56,7 +50,7 @@ func (s *Store) Initialize(
 	clock ids.Clock,
 	box *box_format.Box,
 ) (err error) {
-	p := pool.MakePool(nil, func(a *InventoryList) { sku.ResetterList.Reset(a) })
+	p := pool.MakePool(nil, func(a *sku.List) { sku.ResetterList.Reset(a) })
 
 	op := object_inventory_format.Options{Tai: true}
 
@@ -103,7 +97,7 @@ func (s *Store) FormatForVersion(sv interfaces.StoreVersion) sku.ListFormat {
 }
 
 func (s *Store) Create(
-	o *InventoryList,
+	o *sku.List,
 	bez descriptions.Description,
 ) (t *sku.Transacted, err error) {
 	if !s.ls.IsAcquired() {
@@ -278,7 +272,7 @@ func (s *Store) StreamInventoryList(
 
 func (s *Store) readInventoryListBlob(
 	blobSha interfaces.Sha,
-	a *InventoryList,
+	a *sku.List,
 ) (err error) {
 	var rc interfaces.ShaReadCloser
 
@@ -307,7 +301,7 @@ func (s *Store) readInventoryListBlob(
 	return
 }
 
-func (s *Store) GetBlob(blobSha interfaces.Sha) (a *InventoryList, err error) {
+func (s *Store) GetBlob(blobSha interfaces.Sha) (a *sku.List, err error) {
 	a = sku.MakeList()
 
 	var rc interfaces.ShaReadCloser
