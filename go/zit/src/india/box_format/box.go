@@ -66,16 +66,16 @@ func (f *Box) WriteStringFormat(
 	co, isCO := el.(*sku.CheckedOut)
 
 	var stateString string
+	var isError bool
 
 	if isCO {
 		state := co.GetState()
 
 		if state == checked_out_state.Error {
-			stateString = co.GetError().Error()
-		} else {
-			stateString = state.String()
+			isError = true
 		}
 
+		stateString = state.String()
 		o = &co.External
 	} else if f.Options.PrintState {
 		stateString = o.GetExternalState().String()
@@ -97,7 +97,7 @@ func (f *Box) WriteStringFormat(
 		fds, errFS = f.FSItemReadWriter.ReadFSItemFromExternal(o)
 	}
 
-	if f.FSItemReadWriter == nil || errFS != nil || !isCO || !o.RepoId.IsEmpty() {
+	if f.FSItemReadWriter == nil || errFS != nil || !isCO || !o.RepoId.IsEmpty() || isError {
 		n2, err = f.WriteStringFormatExternal(
 			sw,
 			o,

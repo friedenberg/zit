@@ -38,6 +38,37 @@ func MetadataShaString(
 	return
 }
 
+func MetadataFieldError(
+	err error,
+) []string_format_writer.Field {
+	var me errors.Multi
+
+	if errors.As(err, &me) {
+		out := make([]string_format_writer.Field, 0, me.Len())
+
+		for _, e := range me.Errors() {
+			out = append(
+				out,
+				string_format_writer.Field{
+					Key:       "error",
+					Value:     e.Error(),
+					ColorType: string_format_writer.ColorTypeUserData,
+				},
+			)
+		}
+
+    return out
+	} else {
+		return []string_format_writer.Field{
+			{
+				Key:       "error",
+				Value:     err.Error(),
+				ColorType: string_format_writer.ColorTypeUserData,
+			},
+		}
+	}
+}
+
 func MetadataFieldShaString(
 	v string,
 ) string_format_writer.Field {

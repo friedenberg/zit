@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
 type Multi interface {
@@ -14,6 +16,8 @@ type Multi interface {
 	Reset()
 	GetMultiError() Multi
 	GetError() error
+	Errors() []error
+	interfaces.Lenner
 }
 
 type multi struct {

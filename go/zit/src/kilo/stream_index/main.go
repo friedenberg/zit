@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -337,7 +338,7 @@ func (s *Index) ReadOneObjectIdTai(
 	t ids.Tai,
 ) (sk *sku.Transacted, err error) {
 	if t.IsEmpty() {
-		err = errors.Errorf("empty tai")
+		err = collections.MakeErrNotFoundString(t.String())
 		return
 	}
 

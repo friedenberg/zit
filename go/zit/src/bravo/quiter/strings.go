@@ -4,7 +4,6 @@ import (
 	"sort"
 	"strings"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
@@ -33,7 +32,7 @@ func SortedValues[E interfaces.Value[E]](
 }
 
 func Strings[E interfaces.Stringer](
-	cs ...interfaces.SetLike[E],
+	cs ...interfaces.Collection[E],
 ) (out []string) {
 	l := 0
 
@@ -52,21 +51,16 @@ func Strings[E interfaces.Stringer](
 			continue
 		}
 
-		err := c.Each(
-			func(e E) (err error) {
-				out = append(out, e.String())
-				return
-			},
-		)
-
-		errors.PanicIfError(err)
+		for e := range c.All() {
+			out = append(out, e.String())
+		}
 	}
 
 	return
 }
 
 func SortedStrings[E interfaces.Stringer](
-	cs ...interfaces.SetLike[E],
+	cs ...interfaces.Collection[E],
 ) (out []string) {
 	out = Strings(cs...)
 
@@ -77,7 +71,7 @@ func SortedStrings[E interfaces.Stringer](
 
 func StringDelimiterSeparated[E interfaces.Stringer](
 	d string,
-	cs ...interfaces.SetLike[E],
+	cs ...interfaces.Collection[E],
 ) string {
 	if cs == nil {
 		return ""
@@ -106,7 +100,7 @@ func StringDelimiterSeparated[E interfaces.Stringer](
 }
 
 func StringCommaSeparated[E interfaces.Stringer](
-	cs ...interfaces.SetLike[E],
+	cs ...interfaces.Collection[E],
 ) string {
 	return StringDelimiterSeparated(", ", cs...)
 }

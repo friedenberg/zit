@@ -19,11 +19,11 @@ func (s *Store) Import(external *sku.Transacted) (co *sku.CheckedOut, err error)
 
 	sku.Resetter.ResetWith(&co.External, external)
 
-	if err = external.CalculateObjectShas(); err != nil {
-		co.SetError(err)
-		err = nil
-		return
-	}
+	// if err = external.CalculateObjectShas(); err != nil {
+	// 	co.SetError(err)
+	// 	err = nil
+	// 	return
+	// }
 
 	_, err = s.GetStreamIndex().ReadOneObjectIdTai(
 		external.GetObjectId(),
@@ -46,14 +46,16 @@ func (s *Store) Import(external *sku.Transacted) (co *sku.CheckedOut, err error)
 			if err = s.tryRealizeAndOrStore(
 				external,
 				sku.CommitOptions{
-					Clock: &co.External,
-					Mode:  object_mode.ModeCommit,
+					Clock:              &co.External,
+					Mode:               object_mode.ModeCommit,
+					DontAddMissingTags: true,
+					DontAddMissingType: true,
 				},
 			); err != nil {
 				err = errors.WrapExcept(err, collections.ErrExists)
 			}
 		} else {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(err, "ObjectId: %s", external.GetObjectId())
 		}
 
 		return

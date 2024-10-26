@@ -1,6 +1,10 @@
 package interfaces
 
-import "iter"
+import (
+	"iter"
+
+	"golang.org/x/exp/constraints"
+)
 
 type (
 	FuncIter[T any]              func(T) error
@@ -36,6 +40,11 @@ type Iterable[T any] interface {
 	Each(FuncIter[T]) error // TODO remove in favor of iter.Seq
 	All() iter.Seq[T]
 	Lenner
+}
+
+type KeyedIterable[K constraints.Ordered, T any] interface {
+	Iterable[T]
+	AllPairs() iter.Seq2[K, T]
 }
 
 type IterablePtr[T any, TPtr Ptr[T]] interface {

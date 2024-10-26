@@ -126,12 +126,12 @@ func (s *Store) tryRealizeAndOrStore(
 	}
 
 	if o.Contains(object_mode.ModeAddToInventoryList) {
-		if err = s.addMatchableTypAndEtikettenIfNecessary(kinder); err != nil {
+		if err = s.addMissingTypeAndTags(o, kinder); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = s.addMatchableCommon(kinder); err != nil {
+		if err = s.addObjectToAbbrStore(kinder); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -341,7 +341,7 @@ func (s *Store) createTagsOrType(k *ids.ObjectId) (err error) {
 		return
 	}
 
-	if err = s.addMatchableCommon(t); err != nil {
+	if err = s.addObjectToAbbrStore(t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -452,29 +452,34 @@ func (s *Store) addEtikettAndExpanded(
 	return
 }
 
-func (s *Store) addMatchableTypAndEtikettenIfNecessary(
+func (s *Store) addMissingTypeAndTags(
+	co sku.CommitOptions,
 	m *sku.Transacted,
 ) (err error) {
 	t := m.GetType()
 
-	if err = s.addTypAndExpandedIfNecessary(t); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	es := quiter.SortedValues(m.Metadata.GetTags())
-
-	for _, e := range es {
-		if err = s.addEtikettAndExpanded(e); err != nil {
+	if !co.DontAddMissingType {
+		if err = s.addTypAndExpandedIfNecessary(t); err != nil {
 			err = errors.Wrap(err)
 			return
+		}
+	}
+
+	if !co.DontAddMissingTags {
+		es := quiter.SortedValues(m.Metadata.GetTags())
+
+		for _, e := range es {
+			if err = s.addEtikettAndExpanded(e); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 	}
 
 	return
 }
 
-func (s *Store) addMatchableCommon(m *sku.Transacted) (err error) {
+func (s *Store) addObjectToAbbrStore(m *sku.Transacted) (err error) {
 	if err = s.GetAbbrStore().AddObjectToAbbreviationStore(m); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -23,7 +23,7 @@ function import { # @test
 	)
 
 	set_xdg "$BATS_TEST_TMPDIR"
-	run_zit show -format inventory-list-cache +:z
+	run_zit export -print-time=true
 	assert_success
 	echo "$output" | gzip >list
 
@@ -71,7 +71,7 @@ function import_one_tai_same { # @test
 	run_zit show -format tai one/uno
 	tai="$output"
 
-	run_zit show -format inventory-list-cache one/uno
+	run_zit show -format inventory-list one/uno [tag ^tag-1 ^tag-2]:e
 	assert_success
 	echo "$output" | gzip >list
 
@@ -115,7 +115,7 @@ function import_twice_no_dupes_one_zettel { # @test
 		run_zit_init
 	)
 
-	run_zit show -format inventory-list-cache one/uno+
+	run_zit show -format inventory-list one/uno+
 	assert_success
 	echo "$output" | gzip >list
 
@@ -167,7 +167,7 @@ function import_conflict { # @test
 		run_zit_init
 	)
 
-	run_zit show -format inventory-list-cache one/uno+
+	run_zit show -format inventory-list one/uno+
 	assert_success
 	echo "$output" | gzip >list
 

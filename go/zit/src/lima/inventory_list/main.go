@@ -31,18 +31,19 @@ type Format = blob_store.Format[
 ]
 
 type Store struct {
-	fs_home       fs_home.Home
-	ls            interfaces.LockSmith
-	sv            interfaces.StoreVersion
-	of            interfaces.ObjectIOFactory
-	af            interfaces.BlobIOFactory
-	clock         ids.Clock
-	pool          interfaces.Pool[InventoryList, *InventoryList]
+	fs_home fs_home.Home
+	ls      interfaces.LockSmith
+	sv      interfaces.StoreVersion
+	of      interfaces.ObjectIOFactory
+	af      interfaces.BlobIOFactory
+	clock   ids.Clock
+	pool    interfaces.Pool[InventoryList, *InventoryList]
+
 	object_format object_inventory_format.Format
 	options       object_inventory_format.Options
-	format
+	box           *box_format.Box
 
-	VersionedFormat
+	inventory_list_fmt.VersionedFormat
 }
 
 func (s *Store) Initialize(
@@ -58,7 +59,6 @@ func (s *Store) Initialize(
 	p := pool.MakePool(nil, func(a *InventoryList) { sku.ResetterList.Reset(a) })
 
 	op := object_inventory_format.Options{Tai: true}
-	fa := MakeFormat(sv, op)
 
 	*s = Store{
 		fs_home:       fs_home,
@@ -70,25 +70,10 @@ func (s *Store) Initialize(
 		clock:         clock,
 		object_format: pmf,
 		options:       op,
-		format:        fa,
+		box:           box,
 	}
 
-	v := sv.GetInt()
-
-	switch {
-	case v <= 6:
-		s.VersionedFormat = versionedFormatOld{
-			Factory: inventory_list_fmt.Factory{
-				Format:  pmf,
-				Options: op,
-			},
-		}
-
-	default:
-		s.VersionedFormat = inventory_list_fmt.VersionedFormatNew{
-			Box: box,
-		}
-	}
+	s.VersionedFormat = s.FormatForVersion(sv)
 
 	return
 }
@@ -96,6 +81,25 @@ func (s *Store) Initialize(
 func (s *Store) Flush() (err error) {
 	wg := quiter.MakeErrorWaitGroupParallel()
 	return wg.GetError()
+}
+
+func (s *Store) FormatForVersion(sv interfaces.StoreVersion) inventory_list_fmt.VersionedFormat {
+	v := sv.GetInt()
+
+	switch {
+	case v <= 6:
+		return inventory_list_fmt.VersionedFormatOld{
+			Factory: inventory_list_fmt.Factory{
+				Format:  s.object_format,
+				Options: s.options,
+			},
+		}
+
+	default:
+		return inventory_list_fmt.VersionedFormatNew{
+			Box: s.box,
+		}
+	}
 }
 
 func (s *Store) Create(
@@ -115,12 +119,23 @@ func (s *Store) Create(
 		return
 	}
 
-	var sh *sha.Sha
+	var wc interfaces.ShaWriteCloser
 
-	if sh, err = s.WriteInventoryListBlob(o, s.fs_home.BlobWriter); err != nil {
+	if wc, err = s.fs_home.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	func() {
+		defer errors.DeferredCloser(&err, wc)
+
+		if _, err = s.WriteInventoryListBlob(o, wc); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}()
+
+	sh := wc.GetShaLike()
 
 	if _, err = s.GetBlob(sh); err != nil {
 		err = errors.Wrapf(err, "Blob Sha: %q", sh)
@@ -141,13 +156,24 @@ func (s *Store) Create(
 
 	t.SetTai(tai)
 
-	if sh, err = s.VersionedFormat.WriteInventoryListObject(
-		t,
-		s.of.ObjectWriter,
-	); err != nil {
+	if wc, err = s.of.ObjectWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	func() {
+		defer errors.DeferredCloser(&err, wc)
+
+		if _, err = s.VersionedFormat.WriteInventoryListObject(
+			t,
+			wc,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}()
+
+	sh = wc.GetShaLike()
 
 	ui.Log().Printf(
 		"saving Bestandsaufnahme with tai: %s -> %s",
@@ -230,9 +256,17 @@ func (s *Store) StreamInventoryList(
 	blobSha interfaces.Sha,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
+	var rc interfaces.ShaReadCloser
+
+	if rc, err = s.af.BlobReader(blobSha); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, rc)
+
 	if err = s.StreamInventoryListBlobSkus(
-		s.af.BlobReader,
-		blobSha,
+		rc,
 		f,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -243,13 +277,20 @@ func (s *Store) StreamInventoryList(
 }
 
 func (s *Store) readInventoryListBlob(
-	rf func(interfaces.ShaGetter) (interfaces.ShaReadCloser, error),
 	blobSha interfaces.Sha,
 	a *InventoryList,
 ) (err error) {
+	var rc interfaces.ShaReadCloser
+
+	if rc, err = s.af.BlobReader(blobSha); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, rc)
+
 	if err = s.StreamInventoryListBlobSkus(
-		rf,
-		blobSha,
+		rc,
 		func(sk *sku.Transacted) (err error) {
 			if err = a.Add(sk); err != nil {
 				err = errors.Wrap(err)
@@ -269,10 +310,25 @@ func (s *Store) readInventoryListBlob(
 func (s *Store) GetBlob(blobSha interfaces.Sha) (a *InventoryList, err error) {
 	a = sku.MakeList()
 
-	if err = s.readInventoryListBlob(s.af.BlobReader, blobSha, a); err != nil {
+	var rc interfaces.ShaReadCloser
+
+	if rc, err = s.af.BlobReader(blobSha); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	defer errors.DeferredCloser(&err, rc)
+
+	if err = inventory_list_fmt.ReadInventoryListBlob(
+		s.VersionedFormat,
+		rc,
+		a,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	// TODO validate sha
 
 	return
 }

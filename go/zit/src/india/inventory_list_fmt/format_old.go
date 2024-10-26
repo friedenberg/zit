@@ -1,4 +1,4 @@
-package inventory_list
+package inventory_list_fmt
 
 import (
 	"io"
@@ -6,45 +6,23 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_fmt"
 )
 
-type VersionedFormat interface {
-	WriteInventoryListBlob(*sku.List, func() (sha.WriteCloser, error)) (*sha.Sha, error)
-	WriteInventoryListObject(*sku.Transacted, func() (sha.WriteCloser, error)) (*sha.Sha, error)
-	ReadInventoryListObject(io.Reader) (int64, *sku.Transacted, error)
-	StreamInventoryListBlobSkus(
-		rf func(interfaces.ShaGetter) (interfaces.ShaReadCloser, error),
-		blobSha interfaces.Sha,
-		f interfaces.FuncIter[*sku.Transacted],
-	) error
+type VersionedFormatOld struct {
+	Factory
 }
 
-type versionedFormatOld struct {
-	inventory_list_fmt.Factory
-}
-
-func (v versionedFormatOld) GetVersionedFormat() VersionedFormat {
+func (v VersionedFormatOld) GetVersionedFormat() VersionedFormat {
 	return v
 }
 
-func (s versionedFormatOld) WriteInventoryListObject(
+func (s VersionedFormatOld) WriteInventoryListObject(
 	o *sku.Transacted,
-	wf func() (sha.WriteCloser, error),
-) (sh *sha.Sha, err error) {
-	var w sha.WriteCloser
-
-	if w, err = wf(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, w)
-
-	if _, err = s.Format.FormatPersistentMetadata(
+	w io.Writer,
+) (n int64, err error) {
+	if n, err = s.Format.FormatPersistentMetadata(
 		w,
 		o,
 		object_inventory_format.Options{Tai: true},
@@ -53,55 +31,44 @@ func (s versionedFormatOld) WriteInventoryListObject(
 		return
 	}
 
-	sh = sha.Make(w.GetShaLike())
-
 	return
 }
 
-func (s versionedFormatOld) WriteInventoryListBlob(
+func (s VersionedFormatOld) WriteInventoryListBlob(
 	o *sku.List,
-	wf func() (sha.WriteCloser, error),
-) (sh *sha.Sha, err error) {
-	var sw sha.WriteCloser
+	w io.Writer,
+) (n int64, err error) {
+	var n1 int64
 
-	if sw, err = wf(); err != nil {
-		err = errors.Wrap(err)
-		return
+	fo := s.MakePrinter(w)
+
+	defer o.Restore()
+
+	for {
+		sk, ok := o.PopAndSave()
+
+		if !ok {
+			break
+		}
+
+		if sk.Metadata.Sha().IsNull() {
+			err = errors.Errorf("empty sha: %s", sk)
+			return
+		}
+
+		n1, err = fo.Print(sk)
+		n += n1
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
-	func() {
-		defer errors.DeferredCloser(&err, sw)
-
-		fo := s.MakePrinter(sw)
-
-		defer o.Restore()
-
-		for {
-			sk, ok := o.PopAndSave()
-
-			if !ok {
-				break
-			}
-
-			if sk.Metadata.Sha().IsNull() {
-				err = errors.Errorf("empty sha: %s", sk)
-				return
-			}
-
-			_, err = fo.Print(sk)
-			if err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-	}()
-
-	sh = sha.Make(sw.GetShaLike())
-
 	return
 }
 
-func (s versionedFormatOld) ReadInventoryListObject(
+func (s VersionedFormatOld) ReadInventoryListObject(
 	r io.Reader,
 ) (n int64, o *sku.Transacted, err error) {
 	o = sku.GetTransactedPool().Get()
@@ -122,23 +89,11 @@ func (s versionedFormatOld) ReadInventoryListObject(
 	return
 }
 
-func (s versionedFormatOld) StreamInventoryListBlobSkus(
-	rf func(interfaces.ShaGetter) (interfaces.ShaReadCloser, error),
-	blobSha interfaces.Sha,
+func (s VersionedFormatOld) StreamInventoryListBlobSkus(
+	r1 io.Reader,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	var ar interfaces.ShaReadCloser
-
-	if ar, err = rf(blobSha); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, ar)
-
-	sw := sha.MakeWriter(nil)
-
-	dec := s.MakeScanner(ar)
+	dec := s.MakeScanner(r1)
 
 	for dec.Scan() {
 		sk := dec.GetTransacted()
@@ -151,19 +106,6 @@ func (s versionedFormatOld) StreamInventoryListBlobSkus(
 
 	if err = dec.Error(); err != nil {
 		err = errors.Wrap(err)
-		return
-	}
-
-	return
-
-	sh := sw.GetShaLike()
-
-	if !sh.EqualsSha(blobSha) {
-		err = errors.Errorf(
-			"objekte had blob sha %s while blob reader had %s",
-			blobSha,
-			sh,
-		)
 		return
 	}
 

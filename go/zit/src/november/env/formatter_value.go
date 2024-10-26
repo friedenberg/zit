@@ -620,14 +620,10 @@ func (u *Env) MakeFormatFunc(
 		}
 
 	case "inventory-list":
-		fo := inventory_list_fmt.MakePrinter(
-			out,
-			object_inventory_format.Default(),
-			object_inventory_format.Options{Tai: true},
-		)
+		p := u.MakePrinterBoxArchive(u.Out(), true)
 
 		f = func(o *sku.Transacted) (err error) {
-			if _, err = fo.Print(o); err != nil {
+			if err = p(o); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -635,18 +631,11 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "inventory-list-cache":
-		fo := inventory_list_fmt.MakePrinter(
-			out,
-			object_inventory_format.Default(),
-			object_inventory_format.Options{
-				Tai:           true,
-				Verzeichnisse: true,
-			},
-		)
+	case "inventory-list-sans-tai":
+		p := u.MakePrinterBoxArchive(u.Out(), false)
 
 		f = func(o *sku.Transacted) (err error) {
-			if _, err = fo.Print(o); err != nil {
+			if err = p(o); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

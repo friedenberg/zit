@@ -1,6 +1,6 @@
 module code.linenisgreat.com/zit/go/zit
 
-go 1.23
+go 1.23.0
 
 require (
 	code.linenisgreat.com/chrest/go v0.0.0-20240930022256-86d732042864

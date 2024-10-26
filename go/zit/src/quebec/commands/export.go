@@ -8,8 +8,10 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
@@ -17,6 +19,7 @@ import (
 type Export struct {
 	AgeIdentity     age.Identity
 	CompressionType immutable_config.CompressionType
+	Genres          ids.Genre
 }
 
 func init() {
@@ -25,9 +28,11 @@ func init() {
 		func(f *flag.FlagSet) CommandWithResult {
 			c := &Export{
 				CompressionType: immutable_config.CompressionTypeEmpty,
+				Genres:          ids.MakeGenre(genres.Tag, genres.Zettel),
 			}
 
 			f.Var(&c.AgeIdentity, "age-identity", "")
+			f.Var(&c.Genres, "genres", "")
 			c.CompressionType.AddToFlagSet(f)
 
 			return c
@@ -42,6 +47,10 @@ func (c Export) Run(u *env.Env, args ...string) (result Result) {
 	if result.Error = u.GetStore().QueryPrimitive(
 		sku.MakePrimitiveQueryGroup(),
 		func(sk *sku.Transacted) (err error) {
+			if !c.Genres.Contains(sk.GetGenre()) {
+				return
+			}
+
 			l.Lock()
 			defer l.Unlock()
 

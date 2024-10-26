@@ -2,11 +2,11 @@ package inventory_list_fmt
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
@@ -36,23 +36,15 @@ func (v VersionedFormatNew) makePrinter(
 
 func (s VersionedFormatNew) WriteInventoryListBlob(
 	o *sku.List,
-	wf func() (sha.WriteCloser, error),
-) (sh *sha.Sha, err error) {
-	var sw sha.WriteCloser
-
-	if sw, err = wf(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, sw)
-
-	bw := bufio.NewWriter(sw)
+	w1 io.Writer,
+) (n int64, err error) {
+	bw := bufio.NewWriter(w1)
 	defer errors.DeferredFlusher(&err, bw)
 
-	fo := s.makePrinter(bw)
-
 	defer o.Restore()
+
+	var n1 int64
+	var n2 int
 
 	for {
 		sk, ok := o.PopAndSave()
@@ -66,41 +58,51 @@ func (s VersionedFormatNew) WriteInventoryListBlob(
 			return
 		}
 
-		if err = fo(sk); err != nil {
+		n1, err = s.Box.WriteStringFormat(bw, sk)
+		n += n1
+
+		if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		n2, err = fmt.Fprintf(bw, "\n")
+		n += int64(n2)
+
+		if err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
-
-	sh = sha.Make(sw.GetShaLike())
 
 	return
 }
 
 func (s VersionedFormatNew) WriteInventoryListObject(
 	o *sku.Transacted,
-	wf func() (sha.WriteCloser, error),
-) (sh *sha.Sha, err error) {
-	var w sha.WriteCloser
-
-	if w, err = wf(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, w)
-
-	bw := bufio.NewWriter(w)
+	w1 io.Writer,
+) (n int64, err error) {
+	bw := bufio.NewWriter(w1)
 	defer errors.DeferredFlusher(&err, bw)
 
-	fo := s.makePrinter(bw)
+	var n1 int64
+	var n2 int
 
-	if err = fo(o); err != nil {
+	n1, err = s.Box.WriteStringFormat(bw, o)
+	n += n1
+
+	if err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	sh = sha.Make(w.GetShaLike())
+	n2, err = fmt.Fprintf(bw, "\n")
+	n += int64(n2)
+
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
@@ -121,20 +123,10 @@ func (s VersionedFormatNew) ReadInventoryListObject(
 }
 
 func (s VersionedFormatNew) StreamInventoryListBlobSkus(
-	rf func(interfaces.ShaGetter) (interfaces.ShaReadCloser, error),
-	blobSha interfaces.Sha,
+	r1 io.Reader,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	var ar interfaces.ShaReadCloser
-
-	if ar, err = rf(blobSha); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, ar)
-
-	r := bufio.NewReader(ar)
+	r := bufio.NewReader(r1)
 
 	for {
 		o := sku.GetTransactedPool().Get()
@@ -153,17 +145,6 @@ func (s VersionedFormatNew) StreamInventoryListBlobSkus(
 			err = errors.Wrapf(err, "Object: %s", o)
 			return
 		}
-	}
-
-	sh := ar.GetShaLike()
-
-	if !sh.EqualsSha(blobSha) {
-		err = errors.Errorf(
-			"objekte had blob sha %s while blob reader had %s",
-			blobSha,
-			sh,
-		)
-		return
 	}
 
 	return

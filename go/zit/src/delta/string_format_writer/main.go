@@ -36,6 +36,7 @@ const (
 	ColorTypeNormal   = ColorType(colorNone)
 	ColorTypeId       = ColorType(colorBlue)
 	ColorTypeHash     = ColorType(colorItalic)
+	ColorTypeError    = ColorType(colorRed)
 	ColorTypeType     = ColorType(colorYellow)
 	ColorTypeUserData = ColorType(colorCyan)
 	ColorTypeHeading  = ColorType(colorRed)

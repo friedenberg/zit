@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 )
 
 var ErrNoAbbreviation = errors.New("no abbreviation")
@@ -46,7 +47,11 @@ func (e errUnrecognizedGenre) Is(target error) (ok bool) {
 }
 
 func (e errUnrecognizedGenre) Error() string {
-	return fmt.Sprintf("unknown genre: %q", string(e))
+	return fmt.Sprintf(
+		"unknown genre: %q. Available genres: %q",
+		string(e),
+		quiter.Strings(quiter.Slice[Genre](TrueGenre())),
+	)
 }
 
 type ErrWrongType struct {

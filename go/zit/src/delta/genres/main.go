@@ -43,6 +43,8 @@ const (
 	repo
 )
 
+// TODO switch to
+// quiter.Slice[Genre](All())
 func All() (out []Genre) {
 	out = make([]Genre, 0, MaxGenre-1)
 
@@ -53,6 +55,8 @@ func All() (out []Genre) {
 	return
 }
 
+// TODO switch to
+// quiter.Slice[Genre](TrueGenre())
 func TrueGenre() (out []Genre) {
 	out = make([]Genre, 0, MaxGenre-1)
 

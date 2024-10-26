@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+// TODO make this error for invalid input
 func (f *Box) ReadStringFormat(
 	rs io.RuneScanner,
 	el *sku.Transacted,

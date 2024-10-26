@@ -15,7 +15,7 @@ teardown() {
 }
 
 function basic { # @test
-	run_zit export
+	run_zit export -genres konfig,e,t,z
 	assert_success
 	assert_output - <<-EOM
 		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]

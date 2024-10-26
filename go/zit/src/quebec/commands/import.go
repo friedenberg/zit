@@ -13,9 +13,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
-	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list"
+	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
@@ -35,6 +35,7 @@ func init() {
 		"import",
 		func(f *flag.FlagSet) CommandWithResult {
 			c := &Import{
+				StoreVersion:    immutable_config.CurrentStoreVersion,
 				CompressionType: immutable_config.CompressionTypeDefault,
 			}
 
@@ -79,9 +80,7 @@ func (c Import) run(u *env.Env, args ...string) (err error) {
 
 	coPrinter := u.PrinterCheckedOut()
 
-	ofo := object_inventory_format.Options{Tai: true, Verzeichnisse: true}
-
-	bf := inventory_list.MakeFormat(u.GetConfig().GetStoreVersion(), ofo)
+	bf := u.GetStore().GetInventoryListStore().FormatForVersion(c.StoreVersion)
 
 	var rc io.ReadCloser
 
@@ -103,7 +102,8 @@ func (c Import) run(u *env.Env, args ...string) (err error) {
 
 	list := sku.MakeList()
 
-	if _, err = bf.ParseBlob(rc, list); err != nil {
+	// TODO determine why this is not erroring for invalid input
+	if err = inventory_list_fmt.ReadInventoryListBlob(bf, rc, list); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -123,7 +123,7 @@ func (c Import) run(u *env.Env, args ...string) (err error) {
 		if co, err = u.GetStore().Import(
 			sk,
 		); err != nil {
-			err = errors.Wrapf(err, "Sku: %s, %#v", sk, err)
+			err = errors.Wrapf(err, "Sku: %s", sk)
 			return
 		}
 
@@ -148,6 +148,11 @@ func (c Import) run(u *env.Env, args ...string) (err error) {
 		}
 
 		if co.State == checked_out_state.Error {
+			co.External.Metadata.Fields = append(
+				co.External.Metadata.Fields,
+				object_metadata_fmt.MetadataFieldError(co.Error)...,
+			)
+
 			if err = coPrinter(co); err != nil {
 				err = errors.Wrap(err)
 				return
