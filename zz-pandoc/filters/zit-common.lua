@@ -1,4 +1,3 @@
-
 DirZit = os.getenv("ZIT_DIR")
 
 if DirZit == nil then
@@ -15,9 +14,9 @@ function Unescape(url)
   return url:gsub("%%(%x%x)", Hex_to_char)
 end
 
-function FormatObjectImage(imgSrc, mimeGroup)
+function FormatObjectImage(imgSrc, format)
   local objectID = Unescape(imgSrc)
-  return pandoc.pipe("zit", { "format-object", "-dir-zit", DirZit, objectID, mimeGroup }, ""), objectID
+  return pandoc.pipe("zit", { "format-object", "-dir-zit", DirZit, objectID, format }, ""), objectID
 end
 
 function ReplaceObjectImageWithTextIfNecessary(img)
@@ -25,9 +24,9 @@ function ReplaceObjectImageWithTextIfNecessary(img)
     return nil
   end
 
-  local mimeGroup = "text"
+  local format = "text"
 
-  local data, _ = FormatObjectImage(img.src, mimeGroup)
+  local data, _ = FormatObjectImage(img.src, format)
 
   return pandoc.RawInline("markdown", data)
 end
@@ -37,12 +36,12 @@ function ReplaceObjectImageWithImageIfNecessary(img)
     return nil
   end
 
-  local mimeGroup = "png"
+  local format = "png"
 
-  local data, objectID = FormatObjectImage(img.src, mimeGroup)
+  local data, objectID = FormatObjectImage(img.src, format)
 
   local id = pandoc.utils.sha1(objectID)
-  local fname = id .. "." .. mimeGroup
+  local fname = id .. "." .. format
   pandoc.mediabag.insert(fname, "image/png", data)
   return pandoc.Image(img.caption, fname)
 end
@@ -62,7 +61,6 @@ function UnescapeIfSku(table, key)
 
   return
 end
-
 
 return {
   DirZit = DirZit,

@@ -44,13 +44,13 @@ function CodeBlock(el)
     return nil
   end
 
-  local mimeGroup = "text"
+  local format = "text"
 
   if common.IsBinary then
-    mimeGroup = "png"
+    format = "png"
   end
 
-  local data = pandoc.pipe("zit", { "format-object", "-dir-zit", common.DirZit, "-stdin", mimeGroup, type }, el.text)
+  local data = pandoc.pipe("zit", { "format-object", "-dir-zit", common.DirZit, "-stdin", format, type }, el.text)
 
   if common.IsBinary then
     local id = pandoc.utils.sha1(el.text)
