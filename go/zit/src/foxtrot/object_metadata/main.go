@@ -57,7 +57,7 @@ func (m *Metadata) AddToFlagSet(f *flag.FlagSet) {
 		"the description to use for created or updated Zettels",
 	)
 
-	// TODO add support for etiketten_path
+	// TODO add support for tag_paths
 	fes := flag2.Make(
 		flag_policy.FlagPolicyAppend,
 		func() string {
@@ -176,7 +176,7 @@ func (m *Metadata) AddTagPtr(e *ids.Tag) (err error) {
 
 	ids.AddNormalizedTag(m.Tags, e)
 	cs := catgut.MakeFromString(e.String())
-	m.Cache.TagPaths.AddEtikett(cs)
+	m.Cache.TagPaths.AddTag(cs)
 
 	return
 }
@@ -193,7 +193,7 @@ func (m *Metadata) AddTagPtrFast(e *ids.Tag) (err error) {
 
 	cs := catgut.MakeFromString(e.String())
 
-	if err = m.Cache.TagPaths.AddEtikett(cs); err != nil {
+	if err = m.Cache.TagPaths.AddTag(cs); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -213,7 +213,7 @@ func (m *Metadata) SetTags(e ids.TagSet) {
 	}
 
 	if e.Len() == 1 && e.Any().String() == "" {
-		panic("empty etikett set")
+		panic("empty tag set")
 	}
 
 	errors.PanicIfError(e.EachPtr(m.AddTagPtr))

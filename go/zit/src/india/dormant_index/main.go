@@ -63,7 +63,7 @@ func (sch *Index) ContainsSku(sk *sku.Transacted) bool {
 		}
 
 		all := sk.Metadata.Cache.TagPaths.All
-		i, ok := all.ContainsEtikett(e.Tag)
+		i, ok := all.ContainsTag(e.Tag)
 
 		if ok {
 			ui.Log().Printf(
@@ -198,7 +198,7 @@ func (s *Index) ReadFrom(r *bufio.Reader) (n int64, err error) {
 			return
 		}
 
-		s.etiketten = append(s.etiketten, tag_paths.EtikettWithParentsAndTypes{
+		s.etiketten = append(s.etiketten, tag_paths.TagWithParentsAndTypes{
 			Tag: cs,
 		})
 	}

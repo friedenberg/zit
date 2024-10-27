@@ -10,7 +10,7 @@ import (
 )
 
 type (
-	TagsWithParentsAndTypes []EtikettWithParentsAndTypes
+	TagsWithParentsAndTypes []TagWithParentsAndTypes
 )
 
 func (s *TagsWithParentsAndTypes) Reset() {
@@ -50,7 +50,7 @@ func (s TagsWithParentsAndTypes) containsObjectIdTag(
 		loc, ok := slices.BinarySearchFunc(
 			s,
 			percent,
-			func(ewp EtikettWithParentsAndTypes, e *Tag) int {
+			func(ewp TagWithParentsAndTypes, e *Tag) int {
 				cmp := ewp.Tag.ComparePartial(e)
 				return cmp
 			},
@@ -67,7 +67,7 @@ func (s TagsWithParentsAndTypes) containsObjectIdTag(
 	return slices.BinarySearchFunc(
 		s,
 		e,
-		func(ewp EtikettWithParentsAndTypes, e *Tag) int {
+		func(ewp TagWithParentsAndTypes, e *Tag) int {
 			cmp := catgut.CompareUTF8Bytes(
 				catgut.ComparerBytes(ewp.Tag.Bytes()[offset:]),
 				catgut.ComparerBytes(e.Bytes()),
@@ -79,11 +79,11 @@ func (s TagsWithParentsAndTypes) containsObjectIdTag(
 	)
 }
 
-func (s TagsWithParentsAndTypes) ContainsEtikett(e *Tag) (int, bool) {
+func (s TagsWithParentsAndTypes) ContainsTag(e *Tag) (int, bool) {
 	return slices.BinarySearchFunc(
 		s,
 		e,
-		func(ewp EtikettWithParentsAndTypes, e *Tag) int {
+		func(ewp TagWithParentsAndTypes, e *Tag) int {
 			cmp := ewp.Tag.ComparePartial(e)
 			return cmp
 		},
@@ -96,7 +96,7 @@ func (s TagsWithParentsAndTypes) ContainsComparer(
 	return slices.BinarySearchFunc(
 		s,
 		c,
-		func(ewp EtikettWithParentsAndTypes, c catgut.Comparer) int {
+		func(ewp TagWithParentsAndTypes, c catgut.Comparer) int {
 			cmp := ewp.Tag.ComparePartialComparer(c)
 			return cmp
 		},
@@ -105,8 +105,8 @@ func (s TagsWithParentsAndTypes) ContainsComparer(
 
 func (s TagsWithParentsAndTypes) GetMatching(
 	e *Tag,
-) (matching []EtikettWithParentsAndTypes) {
-	i, ok := s.ContainsEtikett(e)
+) (matching []TagWithParentsAndTypes) {
+	i, ok := s.ContainsTag(e)
 
 	if !ok {
 		return
@@ -137,16 +137,16 @@ func (s *TagsWithParentsAndTypes) Add(
 		return
 	}
 
-	idx, ok := s.ContainsEtikett(e)
+	idx, ok := s.ContainsTag(e)
 
-	var a EtikettWithParentsAndTypes
+	var a TagWithParentsAndTypes
 
 	if ok {
 		a = (*s)[idx]
 		a.Parents.AddNonEmptyPath(p)
 		(*s)[idx] = a
 	} else {
-		a = EtikettWithParentsAndTypes{Tag: e}
+		a = TagWithParentsAndTypes{Tag: e}
 		a.Parents.AddNonEmptyPath(p)
 
 		if idx == s.Len() {
@@ -168,7 +168,7 @@ func (s *TagsWithParentsAndTypes) Remove(e1 *Tag) (err error) {
 		return
 	}
 
-	idx, ok := s.ContainsEtikett(e)
+	idx, ok := s.ContainsTag(e)
 
 	if !ok {
 		return

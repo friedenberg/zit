@@ -11,23 +11,23 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
-type Etiketten struct {
+type Tags struct {
 	Paths PathsWithTypes // TODO implement
 	All   TagsWithParentsAndTypes
 }
 
-func (a *Etiketten) String() string {
+func (a *Tags) String() string {
 	return fmt.Sprintf("[Paths: %s, All: %s]", a.Paths, a.All)
 }
 
-func (a *Etiketten) Reset() {
+func (a *Tags) Reset() {
 	// TODO pool *Path's
 	a.Paths.Reset()
 	a.All.Reset()
 }
 
 // TODO improve performance
-func (a *Etiketten) ResetWith(b *Etiketten) {
+func (a *Tags) ResetWith(b *Tags) {
 	a.Paths = slices.Grow(a.Paths, len(b.Paths))
 
 	for _, p := range b.Paths {
@@ -42,8 +42,8 @@ func (a *Etiketten) ResetWith(b *Etiketten) {
 	// ui.Debug().Print(nPaths, nAll, a, b)
 }
 
-func (a *Etiketten) AddSuperFrom(
-	b *Etiketten,
+func (a *Tags) AddSuperFrom(
+	b *Tags,
 	prefix *Tag,
 ) (err error) {
 	for _, ep := range b.Paths {
@@ -69,11 +69,11 @@ func (a *Etiketten) AddSuperFrom(
 	return
 }
 
-func (es *Etiketten) AddEtikettOld(e ids.Tag) (err error) {
-	return es.AddEtikett(catgut.MakeFromString(e.String()))
+func (es *Tags) AddTagOld(e ids.Tag) (err error) {
+	return es.AddTag(catgut.MakeFromString(e.String()))
 }
 
-func (es *Etiketten) AddEtikett(e *Tag) (err error) {
+func (es *Tags) AddTag(e *Tag) (err error) {
 	if e.IsEmpty() {
 		return
 	}
@@ -88,7 +88,7 @@ func (es *Etiketten) AddEtikett(e *Tag) (err error) {
 	return
 }
 
-func (es *Etiketten) AddSelf(e *Tag) (err error) {
+func (es *Tags) AddSelf(e *Tag) (err error) {
 	if e.IsEmpty() {
 		return
 	}
@@ -104,7 +104,7 @@ func (es *Etiketten) AddSelf(e *Tag) (err error) {
 	return
 }
 
-func (es *Etiketten) AddPathWithType(pwt *PathWithType) (err error) {
+func (es *Tags) AddPathWithType(pwt *PathWithType) (err error) {
 	_, alreadyExists := es.Paths.AddPath(pwt)
 
 	if alreadyExists {
@@ -121,7 +121,7 @@ func (es *Etiketten) AddPathWithType(pwt *PathWithType) (err error) {
 	return
 }
 
-func (es *Etiketten) AddPath(p *PathWithType) (err error) {
+func (es *Tags) AddPath(p *PathWithType) (err error) {
 	if err = es.AddPathWithType(p); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -130,7 +130,7 @@ func (es *Etiketten) AddPath(p *PathWithType) (err error) {
 	return
 }
 
-func (s *Etiketten) Set(v string) (err error) {
+func (s *Tags) Set(v string) (err error) {
 	vs := strings.Split(v, ",")
 
 	for _, v := range vs {
@@ -143,7 +143,7 @@ func (s *Etiketten) Set(v string) (err error) {
 
 		es := catgut.MakeFromString(e.String())
 
-		if err = s.AddEtikett(es); err != nil {
+		if err = s.AddTag(es); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

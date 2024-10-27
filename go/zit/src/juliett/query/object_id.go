@@ -58,11 +58,6 @@ func (exp ObjectId) ContainsSku(tg sku.TransactedGetter) (ok bool) {
 		ui.Log().Print(exp, idx, ok, skMe.Cache.TagPaths.All, sk)
 
 		if ok {
-			// if k.Exact {
-			// 	ewp := me.Verzeichnisse.Etiketten.All[idx]
-			// 	ui.Debug().Print(ewp, sk)
-			// }
-
 			ps := skMe.Cache.TagPaths.All[idx]
 			sk.Metadata.Cache.QueryPath.Push(ps.Parents)
 			return

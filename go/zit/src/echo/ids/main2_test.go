@@ -10,11 +10,11 @@ import (
 func idWriteToReadFromData() []string {
 	return []string{
 		"one/uno",
-		"konfig",
+		"config",
 		"!md",
-		"-etikett",
-		"//kasten",
-		"etikett",
+		"-tag",
+		"//repo",
+		"tag",
 	}
 }
 

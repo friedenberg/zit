@@ -70,7 +70,7 @@ func (w *Writer) PrintOne(z *sku.Transacted) (err error) {
 }
 
 func (w *Writer) WriteHinweis(e ids.ZettelId) (n int64, err error) {
-	item := w.hinweisToItem(e)
+	item := w.zettelIdToItem(e)
 	w.alfredWriter.WriteItem(item)
 	return
 }

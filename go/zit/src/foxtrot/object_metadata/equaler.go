@@ -45,10 +45,6 @@ func (e equaler) Equals(a, b *Metadata) bool {
 	aes := a.GetTags()
 	bes := b.GetTags()
 
-	// for i, ea := range a.Verzeichnisse.Etiketten.All {
-
-	// }
-
 	if err := aes.EachPtr(
 		func(ea *ids.Tag) (err error) {
 			if (!e.includeVirtual && ea.IsVirtual()) || ea.IsEmpty() {

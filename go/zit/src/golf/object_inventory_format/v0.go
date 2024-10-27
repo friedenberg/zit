@@ -50,14 +50,14 @@ func (f v0) ParsePersistentMetadata(
 ) (n int64, err error) {
 	m := c.GetMetadata()
 
-	etiketten := ids.MakeTagMutableSet()
+	tags := ids.MakeTagMutableSet()
 
 	r := bufio.NewReader(r1)
 
 	typLineReader := ohio.MakeLineReaderIgnoreErrors(m.Type.Set)
 
 	esa := quiter.MakeFuncSetString[ids.Tag, *ids.Tag](
-		etiketten,
+		tags,
 	)
 
 	var g genres.Genre
@@ -83,7 +83,7 @@ func (f v0) ParsePersistentMetadata(
 		return
 	}
 
-	m.SetTags(etiketten)
+	m.SetTags(tags)
 
 	return
 }

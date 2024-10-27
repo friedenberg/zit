@@ -24,7 +24,7 @@ type buildState struct {
 	pinnedObjectIds         []ObjectId
 	pinnedExternalObjectIds []sku.ExternalObjectId
 	repo                    sku.ExternalStoreForQuery
-	virtualEtiketten        map[string]Lua
+	virtualTags        map[string]Lua
 	eqo                     sku.ExternalQueryOptions
 
 	externalStoreAcceptedQueryComponent bool
@@ -138,7 +138,7 @@ func (b *buildState) build(
 }
 
 func (b *buildState) realizeVirtualTags() (err error) {
-	for k, v := range b.builder.virtualEtikettenBeforeInit {
+	for k, v := range b.builder.virtualTagsBeforeInit {
 		var vmp *lua.VMPool
 
 		lb := b.luaVMPoolBuilder.Clone().WithScript(v)
@@ -152,7 +152,7 @@ func (b *buildState) realizeVirtualTags() (err error) {
 			LuaVMPool: sku_fmt.MakeLuaVMPool(vmp, nil),
 		}
 
-		b.virtualEtiketten[k] = ml
+		b.virtualTags[k] = ml
 	}
 
 	return

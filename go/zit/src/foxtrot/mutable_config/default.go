@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
+// TODO version
 func Default(defaultTyp ids.Type) (k Blob) {
 	k = Blob{
 		Defaults: Defaults{

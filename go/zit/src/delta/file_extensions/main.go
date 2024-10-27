@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 )
 
+// TODO make new non-german version
 type FileExtensions struct {
 	Zettel   string `toml:"zettel"`
 	Organize string `toml:"organize"`
@@ -23,17 +24,21 @@ func (a FileExtensions) GetFileExtensionForGattung(
 		return a.GetFileExtensionZettel()
 
 	case genres.Type:
-		return a.GetFileExtensionTyp()
+		return a.GetFileExtensionType()
 
 	case genres.Tag:
-		return a.GetFileExtensionEtikett()
+		return a.GetFileExtensionTag()
 
 	case genres.Repo:
-		return a.GetFileExtensionKasten()
+		return a.GetFileExtensionRepo()
 
 	default:
 		return ""
 	}
+}
+
+func (a FileExtensions) GetFileExtensionGetter() interfaces.FileExtensionGetter {
+	return a
 }
 
 func (a FileExtensions) GetFileExtensionZettel() string {
@@ -44,15 +49,15 @@ func (a FileExtensions) GetFileExtensionOrganize() string {
 	return a.Organize
 }
 
-func (a FileExtensions) GetFileExtensionTyp() string {
+func (a FileExtensions) GetFileExtensionType() string {
 	return a.Typ
 }
 
-func (a FileExtensions) GetFileExtensionEtikett() string {
+func (a FileExtensions) GetFileExtensionTag() string {
 	return a.Etikett
 }
 
-func (a FileExtensions) GetFileExtensionKasten() string {
+func (a FileExtensions) GetFileExtensionRepo() string {
 	return a.Kasten
 }
 

@@ -37,7 +37,7 @@ func (k *Compiled) ApplyDormantAndRealizeTags(
 	// Specifically, making this less fragile and dependent on remembering to do
 	// ApplyToSku for each Sku. Maybe a factory?
 	mp.Cache.TagPaths.Reset()
-	mp.GetTags().Each(mp.Cache.TagPaths.AddEtikettOld)
+	mp.GetTags().Each(mp.Cache.TagPaths.AddTagOld)
 
 	if isTag {
 		ks := sk.ObjectId.String()
@@ -110,7 +110,7 @@ func (k *Compiled) addSuperTags(
 		if ek == nil {
 			// this is ok because currently, konfig is applied twice. However, this
 			// is fragile as the order in which this method is called is
-			// non-deterministic and the `GetEtikett` call may request an Etikett we
+			// non-deterministic and the `GetTag` call may request an Tag we
 			// have not processed yet
 			continue
 		}

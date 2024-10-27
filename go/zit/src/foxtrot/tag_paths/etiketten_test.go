@@ -10,7 +10,7 @@ import (
 func TestAddPaths(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	var es Etiketten
+	var es Tags
 
 	es.AddPath(MakePathWithType(
 		catgut.MakeFromString("area-home"),
@@ -18,10 +18,10 @@ func TestAddPaths(t1 *testing.T) {
 	))
 
 	{
-		i, ok := es.All.ContainsEtikett(catgut.MakeFromString("area"))
+		i, ok := es.All.ContainsTag(catgut.MakeFromString("area"))
 
 		if !ok {
-			t.Errorf("expected some etikett: %d, %t, %s", i, ok, es)
+			t.Errorf("expected some tag: %d, %t, %s", i, ok, es)
 		}
 	}
 
@@ -31,10 +31,10 @@ func TestAddPaths(t1 *testing.T) {
 	))
 
 	{
-		i, ok := es.All.ContainsEtikett(catgut.MakeFromString("area"))
+		i, ok := es.All.ContainsTag(catgut.MakeFromString("area"))
 
 		if !ok {
-			t.Errorf("expected some etikett: %d, %t, %s", i, ok, es.All)
+			t.Errorf("expected some tag: %d, %t, %s", i, ok, es.All)
 		}
 	}
 }
@@ -42,15 +42,15 @@ func TestAddPaths(t1 *testing.T) {
 func TestRealWorld(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	var es Etiketten
+	var es Tags
 
-	es.AddEtikett(catgut.MakeFromString("pom-1"))
-	es.AddEtikett(catgut.MakeFromString("req-comp-internet"))
-	es.AddEtikett(catgut.MakeFromString("today-in_progress"))
+	es.AddTag(catgut.MakeFromString("pom-1"))
+	es.AddTag(catgut.MakeFromString("req-comp-internet"))
+	es.AddTag(catgut.MakeFromString("today-in_progress"))
 
 	{
 		e := catgut.MakeFromString("req-comp-internet")
-		_, ok := es.All.ContainsEtikett(e)
+		_, ok := es.All.ContainsTag(e)
 
 		if !ok {
 			t.Errorf("expected %s to be in %s", e, es)
@@ -63,7 +63,7 @@ func TestRealWorld(t1 *testing.T) {
 	))
 
 	e := catgut.MakeFromString("req-comp-internet")
-	_, ok := es.All.ContainsEtikett(e)
+	_, ok := es.All.ContainsTag(e)
 
 	if !ok {
 		t.Errorf("expected %s to be in %s", e, es)
@@ -71,7 +71,7 @@ func TestRealWorld(t1 *testing.T) {
 }
 
 func BenchmarkMatchFirstYes(b *testing.B) {
-	var es Etiketten
+	var es Tags
 
 	es.AddPath(MakePathWithType(
 		catgut.MakeFromString("area-home"),
@@ -88,12 +88,12 @@ func BenchmarkMatchFirstYes(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		es.All.ContainsEtikett(m)
+		es.All.ContainsTag(m)
 	}
 }
 
 func BenchmarkMatchFirstNo(b *testing.B) {
-	var es Etiketten
+	var es Tags
 
 	es.AddPath(MakePathWithType(
 		catgut.MakeFromString("area-home"),
@@ -110,6 +110,6 @@ func BenchmarkMatchFirstNo(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		es.All.ContainsEtikett(m)
+		es.All.ContainsTag(m)
 	}
 }

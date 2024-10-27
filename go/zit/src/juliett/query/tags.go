@@ -35,7 +35,7 @@ func (sch *Tags) HasChanges() bool {
 	return len(sch.changes) > 0
 }
 
-func (sch *Tags) AddEtikett(e *tag_paths.Tag) (err error) {
+func (sch *Tags) AddTag(e *tag_paths.Tag) (err error) {
 	sch.changes = append(sch.changes, fmt.Sprintf("added %q", e))
 
 	if err = sch.tags.Add(e, nil); err != nil {
@@ -46,7 +46,7 @@ func (sch *Tags) AddEtikett(e *tag_paths.Tag) (err error) {
 	return
 }
 
-func (sch *Tags) RemoveSchlummerndEtikett(e *tag_paths.Tag) (err error) {
+func (sch *Tags) RemoveDormantTag(e *tag_paths.Tag) (err error) {
 	sch.changes = append(sch.changes, fmt.Sprintf("removed %q", e))
 
 	if err = sch.tags.Remove(e); err != nil {
@@ -64,7 +64,7 @@ func (sch *Tags) ContainsSku(sk *sku.Transacted) bool {
 		}
 
 		all := sk.Metadata.Cache.TagPaths.All
-		i, ok := all.ContainsEtikett(e.Tag)
+		i, ok := all.ContainsTag(e.Tag)
 
 		if ok {
 			ui.Log().Printf(
@@ -119,16 +119,16 @@ func (sch *Tags) Flush(
 	dryRun bool,
 ) (err error) {
 	if len(sch.changes) == 0 {
-		ui.Log().Print("no Etiketten changes")
+		ui.Log().Print("no tags changes")
 		return
 	}
 
 	if dryRun {
-		ui.Log().Print("no Etiketten flush, dry run")
+		ui.Log().Print("no tags flush, dry run")
 		return
 	}
 
-	if err = printerHeader("writing schlummernd"); err != nil {
+	if err = printerHeader("writing dormant tags"); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -199,7 +199,7 @@ func (s *Tags) ReadFrom(r *bufio.Reader) (n int64, err error) {
 			return
 		}
 
-		s.tags = append(s.tags, tag_paths.EtikettWithParentsAndTypes{
+		s.tags = append(s.tags, tag_paths.TagWithParentsAndTypes{
 			Tag: cs,
 		})
 	}

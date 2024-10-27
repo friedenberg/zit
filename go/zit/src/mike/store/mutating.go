@@ -409,7 +409,7 @@ func (s *Store) addTypAndExpandedIfNecessary(
 	return
 }
 
-func (s *Store) addEtikettAndExpanded(
+func (s *Store) addTagAndExpanded(
 	e ids.Tag,
 ) (err error) {
 	if e.IsVirtual() {
@@ -469,7 +469,7 @@ func (s *Store) addMissingTypeAndTags(
 		es := quiter.SortedValues(m.Metadata.GetTags())
 
 		for _, e := range es {
-			if err = s.addEtikettAndExpanded(e); err != nil {
+			if err = s.addTagAndExpanded(e); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

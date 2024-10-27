@@ -246,7 +246,7 @@ func (p *Path) WriteTo(w io.Writer) (n int64, err error) {
 
 	for _, s := range *p {
 		if s.Len() == 0 {
-			panic("found empty etikett in etiketten_path")
+			panic("found empty tag in tag_paths")
 		}
 
 		n1, err = ohio.WriteUint8(w, uint8(s.Len()))

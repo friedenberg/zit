@@ -5,12 +5,12 @@ import (
 	"strings"
 )
 
-type EtikettWithParentsAndTypes struct {
+type TagWithParentsAndTypes struct {
 	*Tag
 	Parents PathsWithTypes
 }
 
-func (ewp EtikettWithParentsAndTypes) String() string {
+func (ewp TagWithParentsAndTypes) String() string {
 	var sb strings.Builder
 
 	fmt.Fprintf(&sb, "%s:%s", ewp.Tag, ewp.Parents)

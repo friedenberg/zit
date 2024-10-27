@@ -31,8 +31,8 @@ type Tag = tag
 
 var TagResetter = sTagResetter
 
-// type Etikett = etikett2
-// var EtikettResetter = sEtikett2Resetter
+// type Tag = tag2
+// var TagResetter = sTag2Resetter
 
 type tag struct {
 	virtual       bool

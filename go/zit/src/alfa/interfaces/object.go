@@ -4,9 +4,9 @@ type FileExtensionGetter interface {
 	GetFileExtensionForGattung(GenreGetter) string
 	GetFileExtensionZettel() string
 	GetFileExtensionOrganize() string
-	GetFileExtensionTyp() string
-	GetFileExtensionEtikett() string
-	GetFileExtensionKasten() string
+	GetFileExtensionType() string
+	GetFileExtensionTag() string
+	GetFileExtensionRepo() string
 }
 
 type ObjectIOFactory interface {

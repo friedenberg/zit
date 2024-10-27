@@ -13,7 +13,7 @@ type Cache struct {
 	Dormant      values.Bool
 	ExpandedTags ids.TagMutableSet // public for gob, but should be private
 	ImplicitTags ids.TagMutableSet // public for gob, but should be private
-	TagPaths     tag_paths.Etiketten
+	TagPaths     tag_paths.Tags
 	QueryPath
 }
 

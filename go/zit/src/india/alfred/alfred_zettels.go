@@ -136,12 +136,10 @@ func (w *Writer) errorToItem(err error) (a *alfred.Item) {
 	return
 }
 
-func (w *Writer) hinweisToItem(e ids.ZettelId) (a *alfred.Item) {
+func (w *Writer) zettelIdToItem(e ids.ZettelId) (a *alfred.Item) {
 	a = w.alfredWriter.Get()
 
 	a.Title = e.String()
-	// a.Subtitle = fmt.Sprintf("%s: %s", z.Hinweis.String(),
-	// strings.Join(EtikettenStringsFromZettel(z, false), ", "))
 
 	a.Arg = e.String()
 

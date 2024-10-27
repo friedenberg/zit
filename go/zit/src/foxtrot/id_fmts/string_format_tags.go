@@ -9,15 +9,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
-type etikettenReader struct{}
+type tagsReader struct{}
 
-func MakeTagsReader() (f *etikettenReader) {
-	f = &etikettenReader{}
+func MakeTagsReader() (f *tagsReader) {
+	f = &tagsReader{}
 
 	return
 }
 
-func (f *etikettenReader) ReadStringFormat(
+func (f *tagsReader) ReadStringFormat(
 	rb *catgut.RingBuffer,
 	k ids.TagMutableSet,
 ) (n int64, err error) {

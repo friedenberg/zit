@@ -19,43 +19,43 @@ func MakeBuilder(
 	repoGetter sku.ExternalStoreForQueryGetter,
 ) (b *Builder) {
 	b = &Builder{
-		fs_home:                    s,
-		blob_store:                 blob_store,
-		object_probe_index:         object_probe_index,
-		luaVMPoolBuilder:           luaVMPoolBuilder,
-		virtualEtikettenBeforeInit: make(map[string]string),
-		repoGetter:                 repoGetter,
+		fs_home:               s,
+		blob_store:            blob_store,
+		object_probe_index:    object_probe_index,
+		luaVMPoolBuilder:      luaVMPoolBuilder,
+		virtualTagsBeforeInit: make(map[string]string),
+		repoGetter:            repoGetter,
 	}
 
 	return
 }
 
 type Builder struct {
-	fs_home                    fs_home.Home
-	blob_store                 *blob_store.VersionedStores
-	object_probe_index         sku.ObjectProbeIndex
-	luaVMPoolBuilder           *lua.VMPoolBuilder
-	pinnedObjectIds            []ObjectId
-	pinnedExternalObjectIds    []sku.ExternalObjectId
-	repoGetter                 sku.ExternalStoreForQueryGetter
-	repoId                     ids.RepoId
-	virtualEtikettenBeforeInit map[string]string
-	fileExtensionGetter        interfaces.FileExtensionGetter
-	expanders                  ids.Abbr
-	hidden                     sku.Query
-	defaultGenres              ids.Genre
-	defaultSigil               ids.Sigil
-	permittedSigil             ids.Sigil
-	doNotMatchEmpty            bool
-	debug                      bool
-	requireNonEmptyQuery       bool
+	fs_home                 fs_home.Home
+	blob_store              *blob_store.VersionedStores
+	object_probe_index      sku.ObjectProbeIndex
+	luaVMPoolBuilder        *lua.VMPoolBuilder
+	pinnedObjectIds         []ObjectId
+	pinnedExternalObjectIds []sku.ExternalObjectId
+	repoGetter              sku.ExternalStoreForQueryGetter
+	repoId                  ids.RepoId
+	virtualTagsBeforeInit   map[string]string
+	fileExtensionGetter     interfaces.FileExtensionGetter
+	expanders               ids.Abbr
+	hidden                  sku.Query
+	defaultGenres           ids.Genre
+	defaultSigil            ids.Sigil
+	permittedSigil          ids.Sigil
+	doNotMatchEmpty         bool
+	debug                   bool
+	requireNonEmptyQuery    bool
 }
 
 func (b *Builder) makeState() *buildState {
 	state := &buildState{
-		builder:          b,
-		latentErrors:     errors.MakeMulti(),
-		virtualEtiketten: make(map[string]Lua),
+		builder:      b,
+		latentErrors: errors.MakeMulti(),
+		virtualTags:  make(map[string]Lua),
 	}
 
 	if b.luaVMPoolBuilder != nil {
@@ -94,7 +94,7 @@ func (b *Builder) WithRequireNonEmptyQuery() *Builder {
 
 func (mb *Builder) WithVirtualTags(vs map[string]string) *Builder {
 	for k, v := range vs {
-		mb.virtualEtikettenBeforeInit["%"+k] = v
+		mb.virtualTagsBeforeInit["%"+k] = v
 	}
 
 	return mb

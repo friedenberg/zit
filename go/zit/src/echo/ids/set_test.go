@@ -196,7 +196,7 @@ func TestPrefixIntersection(t *testing.T) {
 }
 
 // func TestExpansionRight(t *testing.T) {
-// 	e := MustEtikett("this-is-a-tag")
+// 	e := MustTag("this-is-a-tag")
 // 	ex := e.Expanded(ExpanderRight{})
 // 	expected := []string{
 // 		"this",
