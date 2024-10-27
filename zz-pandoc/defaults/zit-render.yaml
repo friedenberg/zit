@@ -1,6 +1,6 @@
 from: markdown
-to: markdown+definition_lists+shortcut_reference_links+simple_tables+table_captions+line_blocks+fenced_code_attributes-raw_attribute+yaml_metadata_block+footnotes
-wrap: none
+# to: markdown+definition_lists+shortcut_reference_links+simple_tables+table_captions+line_blocks+fenced_code_attributes-raw_attribute+yaml_metadata_block+footnotes
+# wrap: none
 standalone: true
 embed-resources: true
 reference-links: true

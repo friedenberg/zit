@@ -17,7 +17,7 @@ end
 
 function FormatObjectImage(imgSrc, mimeGroup)
   local objectID = Unescape(imgSrc)
-  return pandoc.pipe("zit", { "format-object", "-dir-zit", DirZit, "-mode", "blob", mimeGroup, objectID }, ""), objectID
+  return pandoc.pipe("zit", { "format-object", "-dir-zit", DirZit, objectID, mimeGroup }, ""), objectID
 end
 
 function ReplaceObjectImageWithTextIfNecessary(img)
