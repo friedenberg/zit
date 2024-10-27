@@ -36,7 +36,7 @@ function format_simple { # @test
 		          deleted [md.typ]
 	EOM
 
-	run_zit format-object one/uno text
+	run_zit format-object -mode both one/uno text
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -62,7 +62,7 @@ function format_simple { # @test
 		last time but new
 	EOM
 
-	run_zit format-object one/uno.zettel text
+	run_zit format-object -mode both one/uno.zettel text
 	assert_success
 	assert_output - <<-EOM
 		---
@@ -86,7 +86,7 @@ function show_simple_one_zettel_binary { # @test
 		[two/uno @b20c8fea8cb3e467783c5cdadf0707124cac5db72f9a6c3abba79fa0a42df627 !bin "file"]
 	EOM
 
-	run_zit format-object two/uno
+	run_zit format-object -mode both two/uno
 	assert_success
 	assert_output - <<-EOM
 		---

@@ -20,8 +20,8 @@ import (
 )
 
 type FormatObject struct {
-	Stdin  bool
-	Format string
+	CheckoutMode checkout_mode.Mode // add test that says this is unused for stdin
+	Stdin        bool               // switch to using `-`
 	ids.RepoId
 	UTIGroup string
 }
@@ -30,18 +30,17 @@ func init() {
 	registerCommand(
 		"format-object",
 		func(f *flag.FlagSet) Command {
-			c := &FormatObject{}
+			c := &FormatObject{
+				CheckoutMode: checkout_mode.BlobOnly,
+			}
 
 			f.BoolVar(&c.Stdin, "stdin", false, "Read object from stdin and use a Type directly")
 
 			f.Var(&c.RepoId, "kasten", "none or Browser")
 
-			f.StringVar(
-				&c.UTIGroup,
-				"uti-group",
-				"",
-				"lookup format from UTI group",
-			)
+			f.StringVar(&c.UTIGroup, "uti-group", "", "lookup format from UTI group")
+
+			f.Var(&c.CheckoutMode, "mode", "mode for checking out the zettel")
 
 			return c
 		},
@@ -114,7 +113,7 @@ func (c *FormatObject) Run(u *env.Env, args ...string) (err error) {
 	if _, err = f.WriteStringFormatWithMode(
 		u.Out(),
 		object,
-		checkout_mode.MetadataAndBlob,
+		c.CheckoutMode,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -254,6 +253,7 @@ func (c *FormatObject) getBlobFormatter(
 				blobFormatter, ok = typeBlob.Formatters[formatId]
 
 				if ok {
+					ui.Log().Print(formatId, blobFormatter)
 					return blobFormatter
 				}
 			}

@@ -1,5 +1,5 @@
 
-let &l:equalprg = "$BIN_ZIT format-object %"
+let &l:equalprg = "$BIN_ZIT format-object -mode both %"
 " TODO-P3 use https://github.com/suy/vim-context-commentstring
 let &l:comments = "fb:*,fb:-,fb:+,n:>"
 let &l:commentstring = "<!--%s-->"
