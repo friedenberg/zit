@@ -198,8 +198,8 @@ func (c *Store) QueryCheckedOut(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
-	// o := sku.ObjekteOptions{
-	// 	Mode: objekte_mode.ModeRealizeSansProto,
+	// o := sku.CommitOptions{
+	// 	Mode: object_mode.ModeRealizeSansProto,
 	// }
 
 	ex := executor{

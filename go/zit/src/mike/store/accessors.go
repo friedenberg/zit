@@ -33,10 +33,6 @@ func (s *Store) GetCwdFiles() *store_fs.Store {
 	return s.cwdFiles
 }
 
-func (s *Store) GetObjekteFormatOptions() object_inventory_format.Options {
-	return s.options
-}
-
 func (s *Store) GetProtoZettel() sku.Proto {
 	return s.protoZettel
 }

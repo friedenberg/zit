@@ -53,7 +53,7 @@ cmd_zit_def=(
   -debug no-tempdir-cleanup
   -abbreviate-zettel-ids=false
   -abbreviate-shas=false
-  -predictable-hinweisen
+  -predictable-zettel-ids
   -print-typen=false
   -print-time=false
   -print-etiketten=true

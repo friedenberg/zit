@@ -34,14 +34,14 @@ func init() {
 				&c.force,
 				"force",
 				false,
-				"remove Objekten in working directory even if they have changes",
+				"remove objects in working directory even if they have changes",
 			)
 
 			f.BoolVar(
 				&c.includeParent,
 				"include-mutter",
 				false,
-				"remove Objekten in working directory if they match their Mutter",
+				"remove objects in working directory if they match their Mutter",
 			)
 
 			f.BoolVar(

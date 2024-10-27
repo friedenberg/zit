@@ -226,7 +226,7 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "objekte":
+	case "object":
 		fo := object_inventory_format.FormatForVersion(u.GetConfig().GetStoreVersion())
 		o := object_inventory_format.Options{
 			Tai: true,
@@ -368,17 +368,6 @@ func (u *Env) MakeFormatFunc(
 	case "log":
 		f = u.PrinterTransacted()
 
-		// case "objekte":
-		// 	f := Format{}
-
-		// 	f = func(o TransactedLikePtr) (err error) {
-		// 		if _, err = f.Format(out, &o.Objekte); err != nil {
-		// 			err = errors.Wrap(err)
-		// 			return
-		// 		}
-
-		// 		return
-		// 	}
 	case "json":
 		enc := json.NewEncoder(out)
 

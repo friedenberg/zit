@@ -335,7 +335,7 @@ function add_dot { # @test
 #	EOM
 
 #	run zit add \
-#		-predictable-hinweisen \
+#		-predictable-zettel-ids \
 #		-delete \
 #		-tags new-etikett-2 \
 #		"$f"

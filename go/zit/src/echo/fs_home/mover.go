@@ -13,7 +13,7 @@ type Mover struct {
 	Writer
 
 	basePath                  string
-	objektePath               string
+	objectPath                string
 	lockFile                  bool
 	errorOnAttemptedOverwrite bool
 }
@@ -27,7 +27,7 @@ func (s Home) NewMover(o MoveOptions) (m *Mover, err error) {
 	if o.GenerateFinalPathFromSha {
 		m.basePath = o.FinalPath
 	} else {
-		m.objektePath = o.FinalPath
+		m.objectPath = o.FinalPath
 	}
 
 	if m.file, err = s.FileTempLocal(); err != nil {
@@ -56,7 +56,7 @@ func (m *Mover) Close() (err error) {
 	}
 
 	if m.Writer == nil {
-		err = errors.Errorf("nil objekte reader")
+		err = errors.Errorf("nil object reader")
 		return
 	}
 
@@ -86,14 +86,14 @@ func (m *Mover) Close() (err error) {
 	// 	sh,
 	// )
 
-	if m.objektePath == "" {
+	if m.objectPath == "" {
 		// TODO-P3 move this validation to options
 		if m.basePath == "" {
 			err = errors.Errorf("basepath is nil")
 			return
 		}
 
-		if m.objektePath, err = id.MakeDirIfNecessary(sh, m.basePath); err != nil {
+		if m.objectPath, err = id.MakeDirIfNecessary(sh, m.basePath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -101,10 +101,10 @@ func (m *Mover) Close() (err error) {
 
 	p := m.file.Name()
 
-	if err = os.Rename(p, m.objektePath); err != nil {
-		if files.Exists(m.objektePath) {
+	if err = os.Rename(p, m.objectPath); err != nil {
+		if files.Exists(m.objectPath) {
 			if m.errorOnAttemptedOverwrite {
-				err = MakeErrAlreadyExists(sh, m.objektePath)
+				err = MakeErrAlreadyExists(sh, m.objectPath)
 			} else {
 				err = nil
 			}
@@ -116,10 +116,10 @@ func (m *Mover) Close() (err error) {
 		}
 	}
 
-	// log.Log().Printf("moved %s to %s", p, m.objektePath)
+	// log.Log().Printf("moved %s to %s", p, m.objectPath)
 
 	if m.lockFile {
-		if err = files.SetDisallowUserChanges(m.objektePath); err != nil {
+		if err = files.SetDisallowUserChanges(m.objectPath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

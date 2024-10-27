@@ -47,7 +47,7 @@ func (ar objectReader) Close() (err error) {
 	}
 
 	if ar.Reader == nil {
-		err = errors.Errorf("nil objekte reader")
+		err = errors.Errorf("nil object reader")
 		return
 	}
 

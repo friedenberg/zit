@@ -18,7 +18,7 @@ func Default() (t V0) {
 	return
 }
 
-func DefaultEtikettLuaV0() (t V0) {
+func DefaultLuaV0() (t V0) {
 	t = V0{
 		InlineBlob:     true,
 		FileExtension:  "lua",
@@ -31,7 +31,7 @@ func DefaultEtikettLuaV0() (t V0) {
 	return
 }
 
-func MakeObjekte() (t *V0) {
+func Make() (t *V0) {
 	t = &V0{
 		Formatters:     make(map[string]script_config.WithOutputFormat),
 		Actions:        make(map[string]script_config.ScriptConfig),

@@ -19,8 +19,8 @@ type directoryV0 struct {
 }
 
 func (c *directoryV0) init(
-  sv immutable_config.StoreVersion,
-  xdg XDG,
+	sv immutable_config.StoreVersion,
+	xdg XDG,
 ) (err error) {
 	c.sv = sv
 	return
@@ -83,10 +83,6 @@ func (s directoryV0) DirCacheRepo(p ...string) string {
 
 func (s directoryV0) DirCacheDurable(p ...string) string {
 	return s.DirZit(append([]string{"VerzeichnisseDurable"}, p...)...)
-}
-
-func (s directoryV0) DirObjektenOld(p ...string) string {
-	return s.DirZit(append([]string{"Objekten"}, p...)...)
 }
 
 func (s directoryV0) DirObjects(p ...string) string {

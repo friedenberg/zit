@@ -4,12 +4,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
-func (s client) ObjekteReaderFactory(
+func (s client) ObjectReaderFactory(
 	g interfaces.GenreGetter,
 ) interfaces.ObjectReaderFactory {
 	return interfaces.MakeBespokeObjectReadFactory(
 		func(sh interfaces.ShaGetter) (interfaces.ShaReadCloser, error) {
-			return s.ObjekteReader(g, sh)
+			return s.ObjectReader(g, sh)
 		},
 	)
 }

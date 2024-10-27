@@ -67,16 +67,6 @@ func (s Home) objectWriter(
 	return
 }
 
-func (s Home) ReadCloserObjekten(p string) (sha.ReadCloser, error) {
-	o := FileReadOptions{
-		Age:             s.age,
-		Path:            p,
-		CompressionType: s.immutable_config.CompressionType,
-	}
-
-	return NewFileReader(o)
-}
-
 func (s Home) ReadCloserCache(p string) (sha.ReadCloser, error) {
 	o := FileReadOptions{
 		Age:             s.age,
@@ -85,17 +75,6 @@ func (s Home) ReadCloserCache(p string) (sha.ReadCloser, error) {
 	}
 
 	return NewFileReader(o)
-}
-
-func (s Home) WriteCloserObjekten(p string) (w sha.WriteCloser, err error) {
-	return s.NewMover(
-		MoveOptions{
-			Age:             s.age,
-			FinalPath:       p,
-			LockFile:        s.immutable_config.LockInternalFiles,
-			CompressionType: s.immutable_config.CompressionType,
-		},
-	)
 }
 
 func (s Home) WriteCloserCache(

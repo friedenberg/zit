@@ -183,7 +183,7 @@ func (c *client) makeAndProcessOneSkuWithFilter(
 	}
 }
 
-func (c *client) ObjekteReader(
+func (c *client) ObjectReader(
 	g interfaces.GenreGetter,
 	sh interfaces.ShaGetter,
 ) (rc sha.ReadCloser, err error) {
@@ -196,7 +196,7 @@ func (c *client) ObjekteReader(
 		return
 	}
 
-	msgRequest := messageRequestObjekteData{
+	msgRequest := messageRequestObjectData{
 		Gattung: genres.Make(g.GetGenre()),
 	}
 

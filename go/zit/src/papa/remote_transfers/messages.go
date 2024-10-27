@@ -10,7 +10,7 @@ type messageRequestSkus struct {
 	MetaSet *query.Group
 }
 
-type messageRequestObjekteData struct {
+type messageRequestObjectData struct {
 	Gattung genres.Genre
 	Sha     sha.Sha
 }

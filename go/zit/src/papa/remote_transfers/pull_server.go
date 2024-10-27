@@ -51,7 +51,7 @@ func (op PullServer) addToSoldierStage() {
 
 	op.stage.RegisterHandler(
 		remote_conn.DialogueTypeObjects,
-		op.objekteReaderForSku,
+		op.objectReaderForSku,
 	)
 
 	op.stage.RegisterHandler(
@@ -92,17 +92,17 @@ func (op PullServer) blobReaderForSha(
 		return
 	}
 
-	ui.Log().Printf("served %d objekte bytes", n)
+	ui.Log().Printf("served %d object bytes", n)
 
 	return
 }
 
-func (op PullServer) objekteReaderForSku(
+func (op PullServer) objectReaderForSku(
 	d remote_conn.Dialogue,
 ) (err error) {
 	defer errors.DeferredCloser(&err, d)
 
-	var msg messageRequestObjekteData
+	var msg messageRequestObjectData
 
 	if err = d.Receive(&msg); err != nil {
 		err = errors.Wrap(err)
@@ -133,7 +133,7 @@ func (op PullServer) objekteReaderForSku(
 		return
 	}
 
-	ui.Log().Printf("served %d objekte bytes", n)
+	ui.Log().Printf("served %d object bytes", n)
 
 	return
 }

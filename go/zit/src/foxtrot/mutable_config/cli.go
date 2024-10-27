@@ -21,13 +21,8 @@ type Cli struct {
 	IgnoreHookErrors bool
 	Hooks            string
 
-	IncludeCwd    bool
-	IncludeHidden bool
-
-	AllowMissingHinweis  bool
 	CheckoutCacheEnabled bool
-	PredictableHinweisen bool
-	EtikettenPaths       bool
+	PredictableZettelIds bool
 
 	PrintOptions, maskPrintOptions print_options.General
 	ToolOptions                    erworben_tools.Tools
@@ -45,36 +40,13 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	f.BoolVar(&c.Quiet, "quiet", false, "")
 	f.BoolVar(&c.Complete, "complete", false, "")
 
-	f.BoolVar(
-		&c.IncludeCwd,
-		"include-cwd",
-		true,
-		"include checked-out Objekten in the working directory",
-	)
-
-	f.BoolVar(
-		&c.IncludeHidden,
-		"include-hidden",
-		false,
-		"include zettels that have hidden etiketten",
-	)
-
-	f.BoolVar(&c.AllowMissingHinweis, "allow-missing-hinweis", false, "")
-
 	f.BoolVar(&c.CheckoutCacheEnabled, "checkout-cache-enabled", false, "")
 
 	f.BoolVar(
-		&c.PredictableHinweisen,
-		"predictable-hinweisen",
+		&c.PredictableZettelIds,
+		"predictable-zettel-ids",
 		false,
-		"don't randomly select new hinweisen",
-	)
-
-	f.BoolVar(
-		&c.EtikettenPaths,
-		"etiketten-paths",
-		true,
-		"use new etiketten paths for queries",
+		"generate new zettel ids in order",
 	)
 
 	c.PrintOptions.AddToFlags(f, &c.maskPrintOptions)
@@ -114,7 +86,7 @@ func (c *Cli) ApplyPrintOptionsConfig(
 }
 
 func (c Cli) UsePredictableHinweisen() bool {
-	return c.PredictableHinweisen
+	return c.PredictableZettelIds
 }
 
 func (c Cli) UsePrintTime() bool {

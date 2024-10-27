@@ -43,7 +43,7 @@ func (op Server) Listen() (err error) {
 func (op Server) addToSoldierStage() {
 	op.stage.RegisterHandler(
 		remote_conn.DialogueTypeObjectWriter,
-		op.ObjekteWriter,
+		op.ObjectWriter,
 	)
 
 	op.stage.RegisterHandler(
@@ -52,7 +52,7 @@ func (op Server) addToSoldierStage() {
 	)
 }
 
-func (c Server) ObjekteWriter(
+func (c Server) ObjectWriter(
 	d remote_conn.Dialogue,
 ) (err error) {
 	return
@@ -88,11 +88,11 @@ func (op Server) GetNeededSkus(
 			sk.GetGenre(),
 			sk.GetObjectSha(),
 		) {
-			ui.Log().Printf("already have objekte: %s", sk.GetObjectSha())
+			ui.Log().Printf("already have object: %s", sk.GetObjectSha())
 			return
 		}
 
-		ui.Log().Printf("need objekte: %s", sk.GetObjectSha())
+		ui.Log().Printf("need object: %s", sk.GetObjectSha())
 
 		// TODO-P1 check for blob sha
 		// TODO-P1 write blob

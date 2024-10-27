@@ -142,8 +142,8 @@ func (a *Transacted) Equals(b *Transacted) (ok bool) {
 		return
 	}
 
-	// TODO-P2 determine why objekte shas in import test differed
-	// if !a.ObjekteSha.Equals(b.ObjekteSha) {
+	// TODO-P2 determine why object shas in import test differed
+	// if !a.Metadata.Sha().Equals(b.Metadata.Sha()) {
 	// 	return
 	// }
 

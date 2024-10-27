@@ -80,7 +80,7 @@ func (s *Store) tryRealizeAndOrStore(
 		return
 	}
 
-	// TAI must be set before calculating objekte sha
+	// TAI must be set before calculating object sha
 	if o.ContainsAny(
 		object_mode.ModeAddToInventoryList,
 		object_mode.ModeUpdateTai,

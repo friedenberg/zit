@@ -90,7 +90,7 @@ func (c client) SendNeededSkus(filter *query.Group) (err error) {
 	return
 }
 
-func (c *client) ObjekteWriter(
+func (c *client) ObjectWriter(
 	g interfaces.GenreGetter,
 	sh interfaces.Sha,
 ) (rc sha.ReadCloser, err error) {
@@ -103,7 +103,7 @@ func (c *client) ObjekteWriter(
 		return
 	}
 
-	msgRequest := messageRequestObjekteData{
+	msgRequest := messageRequestObjectData{
 		Gattung: genres.Make(g.GetGenre()),
 	}
 
@@ -114,7 +114,7 @@ func (c *client) ObjekteWriter(
 		return
 	}
 
-	// TODO-P1 copy objekte data
+	// TODO-P1 copy object data
 
 	return
 }

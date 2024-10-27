@@ -159,7 +159,7 @@ func (u *Env) Initialize(options Options) (err error) {
 
 	u.config.ApplyPrintOptionsConfig(u.config.Blob.PrintOptions)
 
-	// for _, rb := range u.konfig.Transacted.Objekte.Akte.Recipients {
+	// for _, rb := range u.GetConfig().Recipients {
 	// 	if err = u.age.AddBech32PivYubikeyEC256(rb); err != nil {
 	// 		errors.Wrap(err)
 	// 		return
@@ -276,7 +276,7 @@ func (u *Env) PrintMatchedArchiviertIfNecessary() {
 		return
 	}
 
-	ui.Err().Printf("%d archived objekten matched", c)
+	ui.Err().Printf("%d archived objects matched", c)
 }
 
 func (u *Env) MakeObjectIdIndex() ids.Index {

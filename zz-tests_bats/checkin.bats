@@ -124,7 +124,7 @@ function checkin_simple_one_zettel_virtual_etikett { # @test
 }
 
 function checkin_complex_zettel_etikett_negation { # @test
-	run_zit checkin -etiketten-paths=false ^etikett-two.z
+	run_zit checkin ^etikett-two.z
 	assert_success
 	assert_output - <<-EOM
 		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]

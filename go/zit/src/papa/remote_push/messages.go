@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
-type messageRequestObjekteData struct {
+type messageRequestObjectData struct {
 	Gattung genres.Genre
 	Sha     sha.Sha
 }
