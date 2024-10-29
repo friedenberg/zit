@@ -19,6 +19,7 @@ type BlobStore struct {
 	tempPath         string
 	age              *age.Age
 	immutable_config immutable_config.Config
+	TemporaryFS
 	MoverFactory
 }
 
@@ -27,6 +28,7 @@ func MakeBlobStoreFromHome(s Home) (bs BlobStore, err error) {
 		age:              s.age,
 		immutable_config: s.immutable_config,
 		MoverFactory:     s,
+		TemporaryFS:      s.TempLocal,
 	}
 
 	if bs.basePath, err = s.DirObjectGenre(genres.Blob); err != nil {

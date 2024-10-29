@@ -42,7 +42,7 @@ type MoveOptions struct {
 	*age.Age
 	CompressionType immutable_config.CompressionType
 
-	TempDir                   string
+	TemporaryFS
 	ErrorOnAttemptedOverwrite bool
 	LockFile                  bool
 	FinalPath                 string

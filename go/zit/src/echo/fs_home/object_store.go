@@ -15,6 +15,7 @@ type ObjectStore struct {
 	age              *age.Age
 	immutable_config immutable_config.Config
 	interfaces.DirectoryPaths
+	TemporaryFS
 	MoverFactory
 }
 
@@ -81,6 +82,7 @@ func (s ObjectStore) objectWriter(
 		GenerateFinalPathFromSha: true,
 		LockFile:                 s.immutable_config.LockInternalFiles,
 		CompressionType:          s.immutable_config.CompressionType,
+		TemporaryFS:              s.TemporaryFS,
 	}
 
 	if wc, err = s.NewMover(o); err != nil {

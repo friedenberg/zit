@@ -21,6 +21,7 @@ func (s Home) WriteCloserCache(
 			FinalPath:       p,
 			LockFile:        false,
 			CompressionType: s.immutable_config.CompressionType,
+			TemporaryFS:     s.TempLocal,
 		},
 	)
 }

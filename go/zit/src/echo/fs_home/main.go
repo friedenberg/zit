@@ -144,6 +144,7 @@ func Make(
 		age:              s.age,
 		immutable_config: s.immutable_config,
 		DirectoryPaths:   s.DirectoryPaths,
+		TemporaryFS:      s.TempLocal,
 		MoverFactory:     s,
 	}
 
