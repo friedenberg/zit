@@ -33,6 +33,8 @@ type Home struct {
 
 	interfaces.DirectoryPaths
 
+  blobStore blobStore
+
 	BlobStore
 	ObjectStore
 
@@ -134,10 +136,12 @@ func Make(
 		return
 	}
 
-	if s.BlobStore, err = MakeBlobStoreFromHome(s); err != nil {
+	if s.blobStore, err = MakeBlobStoreFromHome(s); err != nil {
 		errors.Wrap(err)
 		return
 	}
+
+  s.BlobStore = s.blobStore
 
 	s.ObjectStore = ObjectStore{
 		basePath:         s.basePath,
@@ -153,16 +157,18 @@ func Make(
 func (a Home) SansAge() (b Home) {
 	b = a
 	b.age = nil
-	b.BlobStore.age = nil
+	b.blobStore.age = nil
 	b.ObjectStore.age = nil
+  b.BlobStore = b.blobStore
 	return
 }
 
 func (a Home) SansCompression() (b Home) {
 	b = a
 	b.immutable_config.CompressionType = immutable_config.CompressionTypeNone
-	b.BlobStore.immutable_config.CompressionType = immutable_config.CompressionTypeNone
+	b.blobStore.immutable_config.CompressionType = immutable_config.CompressionTypeNone
 	b.ObjectStore.immutable_config.CompressionType = immutable_config.CompressionTypeNone
+  b.BlobStore = b.blobStore
 	return
 }
 

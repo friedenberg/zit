@@ -14,7 +14,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
-type BlobStore struct {
+type BlobStore interface {
+	HasBlob(sh sha.ShaLike) (ok bool)
+	BlobWriter() (w sha.WriteCloser, err error)
+	BlobReader(sh sha.ShaLike) (r sha.ReadCloser, err error)
+}
+
+type blobStore struct {
 	basePath         string
 	tempPath         string
 	age              *age.Age
@@ -22,8 +28,8 @@ type BlobStore struct {
 	TemporaryFS
 }
 
-func MakeBlobStoreFromHome(s Home) (bs BlobStore, err error) {
-	bs = BlobStore{
+func MakeBlobStoreFromHome(s Home) (bs blobStore, err error) {
+	bs = blobStore{
 		age:              s.age,
 		immutable_config: s.immutable_config,
 		TemporaryFS:      s.TempLocal,
@@ -41,8 +47,8 @@ func MakeBlobStore(
 	basePath string,
 	age *age.Age,
 	compressionType immutable_config.CompressionType,
-) BlobStore {
-	return BlobStore{
+) blobStore {
+	return blobStore{
 		basePath: basePath,
 		age:      age,
 		immutable_config: immutable_config.Config{
@@ -51,7 +57,7 @@ func MakeBlobStore(
 	}
 }
 
-func (s BlobStore) HasBlob(
+func (s blobStore) HasBlob(
 	sh sha.ShaLike,
 ) (ok bool) {
 	if sh.GetShaLike().IsNull() {
@@ -65,7 +71,33 @@ func (s BlobStore) HasBlob(
 	return
 }
 
-func (s BlobStore) BlobWriterTo(p string) (w sha.WriteCloser, err error) {
+func (s blobStore) BlobWriter() (w sha.WriteCloser, err error) {
+	if w, err = s.blobWriterTo(s.basePath); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s blobStore) BlobReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
+	if sh.GetShaLike().IsNull() {
+		r = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
+		return
+	}
+
+	if r, err = s.blobReaderFrom(sh, s.basePath); err != nil {
+		if !IsErrBlobMissing(err) {
+			err = errors.Wrap(err)
+		}
+
+		return
+	}
+
+	return
+}
+
+func (s blobStore) blobWriterTo(p string) (w sha.WriteCloser, err error) {
 	mo := MoveOptions{
 		Age:                      s.age,
 		FinalPath:                p,
@@ -83,33 +115,7 @@ func (s BlobStore) BlobWriterTo(p string) (w sha.WriteCloser, err error) {
 	return
 }
 
-func (s BlobStore) BlobWriter() (w sha.WriteCloser, err error) {
-	if w, err = s.BlobWriterTo(s.basePath); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s BlobStore) BlobReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
-	if sh.GetShaLike().IsNull() {
-		r = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
-		return
-	}
-
-	if r, err = s.BlobReaderFrom(sh, s.basePath); err != nil {
-		if !IsErrBlobMissing(err) {
-			err = errors.Wrap(err)
-		}
-
-		return
-	}
-
-	return
-}
-
-func (s BlobStore) BlobReaderFrom(
+func (s blobStore) blobReaderFrom(
 	sh sha.ShaLike,
 	p string,
 ) (r sha.ReadCloser, err error) {
@@ -145,7 +151,8 @@ func (s BlobStore) BlobReaderFrom(
 	return
 }
 
-func (dst BlobStore) CopyBlobIfNecessary(
+func CopyBlobIfNecessary(
+	dst BlobStore,
 	src BlobStore,
 	blobShaGetter interfaces.ShaGetter,
 ) (n int64, err error) {

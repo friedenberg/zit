@@ -182,7 +182,11 @@ func (c Import) importBlobIfNecessary(
 
 	var n int64
 
-	if n, err = u.GetFSHome().CopyBlobIfNecessary(blobStore, blobSha); err != nil {
+	if n, err = fs_home.CopyBlobIfNecessary(
+		u.GetFSHome(),
+		blobStore,
+		blobSha,
+	); err != nil {
 		if errors.Is(err, &fs_home.ErrAlreadyExists{}) {
 			err = nil
 		} else {
