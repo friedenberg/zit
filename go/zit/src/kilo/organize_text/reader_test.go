@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -87,7 +87,7 @@ func makeAssignmentLineReader() reader {
 			},
 			fmtBox: box_format.MakeBox(
 				string_format_writer.ColorOptions{},
-				print_options.General{},
+				options_print.General{},
 				nil,
 				ids.Abbr{},
 				nil,

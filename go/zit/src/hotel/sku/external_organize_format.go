@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -25,7 +25,7 @@ type ObjectIdAlignedFormat interface {
 }
 
 func MakeFormatOrganize(
-	options print_options.General,
+	options options_print.General,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 	objectIdStringFormatWriter id_fmts.Aligned,
 	typeStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
@@ -46,7 +46,7 @@ func MakeFormatOrganize(
 }
 
 type Organize struct {
-	options print_options.General
+	options options_print.General
 
 	maxKopf, maxSchwanz int
 	padding             string

@@ -21,7 +21,7 @@ type EditConfig struct{}
 
 func init() {
 	registerCommand(
-		"konfig-edit",
+		"edit-config",
 		func(f *flag.FlagSet) Command {
 			c := &EditConfig{}
 
@@ -52,9 +52,12 @@ func (c EditConfig) Run(u *env.Env, args ...string) (err error) {
 		return
 	}
 
-	defer errors.Deferred(&err, u.Unlock)
-
 	if _, err = u.GetStore().UpdateKonfig(sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = u.Unlock(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -67,7 +70,7 @@ func (c EditConfig) editInVim(
 ) (sh interfaces.Sha, err error) {
 	var p string
 
-	if p, err = c.makeTempKonfigFile(u); err != nil {
+	if p, err = c.makeTempConfigFile(u); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -91,7 +94,7 @@ func (c EditConfig) editInVim(
 	return
 }
 
-func (c EditConfig) makeTempKonfigFile(
+func (c EditConfig) makeTempConfigFile(
 	u *env.Env,
 ) (p string, err error) {
 	var k *sku.Transacted

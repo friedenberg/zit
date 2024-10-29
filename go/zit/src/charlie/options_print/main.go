@@ -1,4 +1,4 @@
-package print_options
+package options_print
 
 import (
 	"flag"

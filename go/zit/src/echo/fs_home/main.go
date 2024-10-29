@@ -24,16 +24,17 @@ type Getter interface {
 
 type Home struct {
 	Primitive
-	basePath         string
-	lockSmith        interfaces.LockSmith
-	age              *age.Age
-	immutable_config immutable_config.Config
+	basePath              string
+	readOnlyBlobStorePath string
+	lockSmith             interfaces.LockSmith
+	age                   *age.Age
+	immutable_config      immutable_config.Config
 
 	interfaces.DirectoryPaths
+	BlobStore
 }
 
 func Make(
-	// config immutable_config.Config,
 	o Options,
 	primitive Primitive,
 ) (s Home, err error) {
@@ -52,6 +53,7 @@ func Make(
 	}
 
 	s.basePath = o.BasePath
+	s.readOnlyBlobStorePath = o.GetReadOnlyBlobStorePath()
 
 	var dp directoryPaths
 
@@ -119,6 +121,14 @@ func Make(
 	if err = s.loadKonfigAngeboren(); err != nil {
 		errors.Wrap(err)
 		return
+	}
+
+	s.BlobStore = BlobStore{
+		basePath:         s.basePath,
+		age:              s.age,
+		immutable_config: s.immutable_config,
+		DirectoryPaths:   s.DirectoryPaths,
+		MoverFactory:     s,
 	}
 
 	return

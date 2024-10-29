@@ -50,20 +50,22 @@ func MetadataFieldError(
 			out = append(
 				out,
 				string_format_writer.Field{
-					Key:       "error",
-					Value:     e.Error(),
-					ColorType: string_format_writer.ColorTypeUserData,
+					Key:        "error",
+					Value:      e.Error(),
+					ColorType:  string_format_writer.ColorTypeUserData,
+					NoTruncate: true,
 				},
 			)
 		}
 
-    return out
+		return out
 	} else {
 		return []string_format_writer.Field{
 			{
-				Key:       "error",
-				Value:     err.Error(),
-				ColorType: string_format_writer.ColorTypeUserData,
+				Key:        "error",
+				Value:      err.Error(),
+				ColorType:  string_format_writer.ColorTypeUserData,
+				NoTruncate: true,
 			},
 		}
 	}

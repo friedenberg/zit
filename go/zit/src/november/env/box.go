@@ -1,14 +1,14 @@
 package env
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 )
 
 func (u *Env) StringFormatWriterSkuBox(
-	po print_options.General,
+	po options_print.General,
 	co string_format_writer.ColorOptions,
 	truncation string_format_writer.CliFormatTruncation,
 ) *box_format.Box {

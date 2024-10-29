@@ -3,11 +3,11 @@ package string_format_writer
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 )
 
 func StringPrefixFromOptions(
-	options print_options.General,
+	options options_print.General,
 ) string {
 	if options.ZittishNewlines {
 		return "\n  " + StringIndent

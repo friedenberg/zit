@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
@@ -45,7 +45,7 @@ type Options struct {
 	UseRefiner             bool
 	UseMetadataHeader      bool
 
-	PrintOptions print_options.General
+	PrintOptions options_print.General
 	fmtBox       *box_format.Box
 }
 
@@ -119,7 +119,7 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 }
 
 func (o *Flags) GetOptionsWithMetadata(
-	printOptions print_options.General,
+	printOptions options_print.General,
 	skuFmt *box_format.Box,
 	abbr ids.Abbr,
 	of external_store.ObjectFactory,
@@ -144,7 +144,7 @@ func (o *Flags) GetOptionsWithMetadata(
 }
 
 func (o *Flags) GetOptions(
-	printOptions print_options.General,
+	printOptions options_print.General,
 	q TagSetGetter,
 	skuBoxFormat *box_format.Box,
 	abbr ids.Abbr, // TODO move Abbr as required arg

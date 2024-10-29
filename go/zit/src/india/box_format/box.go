@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -19,7 +19,7 @@ import (
 
 func MakeBox(
 	co string_format_writer.ColorOptions,
-	options print_options.General,
+	options options_print.General,
 	fieldsFormatWriter interfaces.StringFormatWriter[string_format_writer.Box],
 	abbr ids.Abbr,
 	fsItemReadWriter sku.FSItemReadWriter,
@@ -37,7 +37,7 @@ func MakeBox(
 
 type Box struct {
 	string_format_writer.ColorOptions
-	Options print_options.General
+	Options options_print.General
 
 	MaxHead, MaxTail int
 	Padding          string
@@ -222,7 +222,7 @@ func (f *Box) WriteStringFormatExternal(
 }
 
 func (f *Box) WriteMetadataToBox(
-	options print_options.General,
+	options options_print.General,
 	o *sku.Transacted,
 	includeDescriptionInBox bool,
 	box *string_format_writer.Box,

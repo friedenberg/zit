@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/tag_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -19,12 +20,13 @@ type buildState struct {
 	builder      *Builder
 	qg           *Group
 	latentErrors errors.Multi
+	missingBlobs []ErrBlobMissing
 
 	luaVMPoolBuilder        *lua.VMPoolBuilder
 	pinnedObjectIds         []ObjectId
 	pinnedExternalObjectIds []sku.ExternalObjectId
 	repo                    sku.ExternalStoreForQuery
-	virtualTags        map[string]Lua
+	virtualTags             map[string]Lua
 	eqo                     sku.ExternalQueryOptions
 
 	externalStoreAcceptedQueryComponent bool
@@ -425,7 +427,22 @@ func (b *buildState) makeTagOrLuaTag(
 		var ar sha.ReadCloser
 
 		if ar, err = b.builder.fs_home.BlobReader(sk.GetBlobSha()); err != nil {
-			err = errors.Wrap(err)
+			var errBlobMissing fs_home.ErrBlobMissing
+
+			if errors.As(err, &errBlobMissing) {
+				b.missingBlobs = append(
+					b.missingBlobs,
+					ErrBlobMissing{
+						ObjectId:       *k,
+						ErrBlobMissing: errBlobMissing,
+					},
+				)
+
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
 			return
 		}
 

@@ -2,6 +2,7 @@ package fs_home
 
 import (
 	"io"
+	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
@@ -11,6 +12,10 @@ type Options struct {
 	BasePath             string
 	PermitNoZitDirectory bool
 	MakeXDGDirectories   bool
+}
+
+func (o Options) GetReadOnlyBlobStorePath() string {
+	return os.Getenv("ZIT_READ_ONLY_BLOB_STORE_PATH")
 }
 
 type ReadOptions struct {

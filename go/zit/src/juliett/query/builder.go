@@ -265,6 +265,18 @@ func (b *Builder) build(state *buildState, vs ...string) (err error) {
 		return
 	}
 
+	if len(state.missingBlobs) > 0 {
+		me := errors.MakeMulti()
+
+		for _, e := range state.missingBlobs {
+			me.Add(e)
+		}
+
+		err = me
+
+		return
+	}
+
 	ui.Log().Print(state.qg.StringDebug())
 
 	return

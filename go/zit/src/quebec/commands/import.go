@@ -66,11 +66,6 @@ func (c Import) run(u *env.Env, args ...string) (err error) {
 		return
 	}
 
-	if c.Blobs == "" {
-		err = errors.Errorf("empty blob store")
-		return
-	}
-
 	var ag age.Age
 
 	if err = ag.AddIdentity(c.AgeIdentity); err != nil {
@@ -175,6 +170,10 @@ func (c Import) importBlobIfNecessary(
 	ag *age.Age,
 	coErrPrinter interfaces.FuncIter[*sku.CheckedOut],
 ) (err error) {
+	if c.Blobs == "" {
+		return
+	}
+
 	blobSha := co.External.GetBlobSha()
 
 	if u.GetFSHome().HasBlob(blobSha) {
@@ -193,7 +192,7 @@ func (c Import) importBlobIfNecessary(
 
 	if rc, err = fs_home.NewFileReader(o); err != nil {
 		if errors.IsNotExist(err) {
-			co.SetError(errors.New("blob missing"))
+			co.SetError(errors.Errorf("blob missing: %q", p))
 			err = coErrPrinter(co)
 		} else {
 			err = errors.Wrapf(err, "Path: %q", p)

@@ -12,6 +12,7 @@ type Field struct {
 	Separator          rune
 	Key, Value         string
 	DisableValueQuotes bool
+	NoTruncate         bool
 }
 
 type BoxHeader struct {
@@ -197,7 +198,7 @@ func (f *fieldsWriter) writeStringFormatField(
 		trunc = 66
 	}
 
-	if trunc > 0 && len(field.Value) > int(trunc) {
+	if !field.NoTruncate && trunc > 0 && len(field.Value) > int(trunc) {
 		field.Value = field.Value[:trunc+1]
 		ellipsis = "…"
 	}

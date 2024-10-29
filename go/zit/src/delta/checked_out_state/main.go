@@ -17,6 +17,7 @@ const (
 	Untracked
 	Recognized
 	Conflicted
+	BlobMissing
 	Error
 )
 
@@ -44,6 +45,9 @@ func (s State) String() string {
 
 	case Error:
 		return "error"
+
+	case BlobMissing:
+		return string_format_writer.StringBlobMissing
 
 	default:
 		return fmt.Sprintf("unknown: %#v", s)

@@ -8,7 +8,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/tridex"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -34,7 +34,7 @@ type indexAbbrEncodableTridexes struct {
 }
 
 type indexAbbr struct {
-	print_options.General
+	options_print.General
 
 	lock    sync.Locker
 	once    *sync.Once
@@ -49,7 +49,7 @@ type indexAbbr struct {
 }
 
 func newIndexAbbr(
-	options print_options.General,
+	options options_print.General,
 	fs_home fs_home.Home,
 	p string,
 ) (i *indexAbbr, err error) {

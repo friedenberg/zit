@@ -3,14 +3,14 @@ package mutable_config
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/bravo/erworben_tools"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/print_options"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/options_tools"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 )
 
 type Cli struct {
-	BasePath string
+	BasePath        string
 
 	Debug            debug.Options
 	Verbose          bool
@@ -24,8 +24,8 @@ type Cli struct {
 	CheckoutCacheEnabled bool
 	PredictableZettelIds bool
 
-	PrintOptions, maskPrintOptions print_options.General
-	ToolOptions                    erworben_tools.Tools
+	PrintOptions, maskPrintOptions options_print.General
+	ToolOptions                    options_tools.Options
 
 	descriptions.Description
 }
@@ -72,13 +72,13 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 }
 
 func DefaultCli() (c Cli) {
-	c.PrintOptions = print_options.Default()
+	c.PrintOptions = options_print.Default()
 
 	return
 }
 
 func (c *Cli) ApplyPrintOptionsConfig(
-	po print_options.General,
+	po options_print.General,
 ) {
 	cliSet := c.PrintOptions
 	c.PrintOptions = po

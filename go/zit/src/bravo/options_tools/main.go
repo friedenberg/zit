@@ -1,4 +1,4 @@
-package erworben_tools
+package options_tools
 
 import (
 	"flag"
@@ -7,11 +7,11 @@ import (
 	"github.com/google/shlex"
 )
 
-type Tools struct {
+type Options struct {
 	Merge []string `toml:"merge"`
 }
 
-func (c *Tools) AddToFlags(f *flag.FlagSet) {
+func (c *Options) AddToFlags(f *flag.FlagSet) {
 	f.Func(
 		"merge-tool",
 		"utility to launch for merge conflict resolution",
