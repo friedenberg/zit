@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
+	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
@@ -189,11 +190,19 @@ func makeTestFSHome(
 ) fs_home.Home {
 	p := t.TempDir()
 
+	var primitive fs_home.Primitive
+
+	var err error
+
+	if primitive, err = fs_home.MakePrimitiveWithHome(p, debug.Options{}); err != nil {
+		t.Fatalf("failed to make fs_home.Primitive: %s", err)
+	}
+
 	f, err := fs_home.Make(
 		fs_home.Options{
 			BasePath: p,
 		},
-		fs_home.Primitive{},
+		primitive,
 	)
 	if err != nil {
 		t.Fatalf("failed to make fs_home: %s", err)
@@ -213,7 +222,7 @@ func makeTestTextFormat(
 
 func TestReadWithoutBlob(t1 *testing.T) {
 	t := test_logz.T{T: t1}
-	af := test_object_metadata_io.Make(t, nil)
+	af := test_object_metadata_io.Make(&t, nil)
 
 	actual := readFormat(
 		t,
@@ -251,7 +260,7 @@ func TestReadWithoutBlob(t1 *testing.T) {
 func TestReadWithoutBlobWithMultilineDescription(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	af := test_object_metadata_io.Make(t, nil)
+	af := test_object_metadata_io.Make(&t, nil)
 
 	actual := readFormat(
 		t,
@@ -290,7 +299,7 @@ func TestReadWithoutBlobWithMultilineDescription(t1 *testing.T) {
 func TestReadWithBlob(t1 *testing.T) {
 	t := test_logz.T{T: t1}
 
-	af := test_object_metadata_io.Make(t, nil)
+	af := test_object_metadata_io.Make(&t, nil)
 
 	actual := readFormat(
 		t,
@@ -409,7 +418,7 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 	))
 
 	af := test_object_metadata_io.Make(
-		t,
+		&t,
 		map[string]string{
 			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body",
 		},
@@ -451,7 +460,7 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 	))
 
 	af := test_object_metadata_io.Make(
-		t,
+		&t,
 		map[string]string{
 			"fa8242e99f48966ca514092b4233b446851f42b57ad5031bf133e1dd76787f3e": "the body",
 		},

@@ -5,27 +5,34 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
+	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 )
 
 func Make(
-	t test_logz.T,
+	t *test_logz.T,
 	contents map[string]string,
 ) (f fs_home.Home) {
-	t.Skip(1)
+	t = t.Skip(1)
 
 	p := t.TempDir()
 
+	var primitive fs_home.Primitive
+
 	var err error
-	f, err = fs_home.Make(
+
+	if primitive, err = fs_home.MakePrimitiveWithHome(p, debug.Options{}); err != nil {
+		t.Fatalf("failed to make fs_home.Primitive: %s", err)
+	}
+
+	if f, err = fs_home.Make(
 		fs_home.Options{
 			BasePath:             p,
 			PermitNoZitDirectory: true,
 		},
-		fs_home.Primitive{},
-	)
-	if err != nil {
+		primitive,
+	); err != nil {
 		t.Fatalf("failed to make fs_home: %s", err)
 	}
 

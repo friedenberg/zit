@@ -8,6 +8,7 @@ import (
 )
 
 type XDG struct {
+	Home      string
 	AddedPath string
 	Data      string
 	Config    string
@@ -28,7 +29,15 @@ func (x *XDG) setDefaultOrEnv(
 	if v, ok := os.LookupEnv(initElement.envKey); ok {
 		*initElement.out = v
 	} else {
-		*initElement.out = os.ExpandEnv(initElement.defawlt)
+		*initElement.out = os.Expand(initElement.defawlt, func(v string) string {
+      switch v {
+      case "HOME":
+        return x.Home
+
+      default:
+        return os.Getenv(v)
+      }
+    })
 	}
 
 	*initElement.out = filepath.Join(*initElement.out, x.AddedPath)
