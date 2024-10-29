@@ -8,6 +8,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 )
 
+type MoverFactory interface {
+	NewMover(o MoveOptions) (m *Mover, err error)
+}
+
 type Mover struct {
 	file *os.File
 	Writer

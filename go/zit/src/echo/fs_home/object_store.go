@@ -4,10 +4,20 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
+	"code.linenisgreat.com/zit/go/zit/src/delta/age"
+	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
-func (s Home) objectReader(
+type ObjectStore struct {
+	basePath         string
+	age              *age.Age
+	immutable_config immutable_config.Config
+	interfaces.DirectoryPaths
+	MoverFactory
+}
+
+func (s ObjectStore) objectReader(
 	g interfaces.GenreGetter,
 	sh sha.ShaLike,
 ) (rc sha.ReadCloser, err error) {
@@ -35,7 +45,7 @@ func (s Home) objectReader(
 	return
 }
 
-func (s Home) objectWriter(
+func (s ObjectStore) objectWriter(
 	g interfaces.GenreGetter,
 ) (wc sha.WriteCloser, err error) {
 	var p string
@@ -61,29 +71,6 @@ func (s Home) objectWriter(
 	}
 
 	return
-}
-
-func (s Home) ReadCloserCache(p string) (sha.ReadCloser, error) {
-	o := FileReadOptions{
-		Age:             s.age,
-		Path:            p,
-		CompressionType: s.immutable_config.CompressionType,
-	}
-
-	return NewFileReader(o)
-}
-
-func (s Home) WriteCloserCache(
-	p string,
-) (w sha.WriteCloser, err error) {
-	return s.NewMover(
-		MoveOptions{
-			Age:             s.age,
-			FinalPath:       p,
-			LockFile:        false,
-			CompressionType: s.immutable_config.CompressionType,
-		},
-	)
 }
 
 // func (s Home) ImportBlobIfNecessary(

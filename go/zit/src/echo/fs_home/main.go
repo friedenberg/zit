@@ -32,6 +32,7 @@ type Home struct {
 
 	interfaces.DirectoryPaths
 	BlobStore
+  ObjectStore
 }
 
 func Make(
@@ -124,6 +125,14 @@ func Make(
 	}
 
 	s.BlobStore = BlobStore{
+		basePath:         s.basePath,
+		age:              s.age,
+		immutable_config: s.immutable_config,
+		DirectoryPaths:   s.DirectoryPaths,
+		MoverFactory:     s,
+	}
+
+	s.ObjectStore = ObjectStore{
 		basePath:         s.basePath,
 		age:              s.age,
 		immutable_config: s.immutable_config,

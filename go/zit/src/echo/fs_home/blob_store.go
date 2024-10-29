@@ -13,16 +13,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
-type MoverFactory interface {
-	NewMover(o MoveOptions) (m *Mover, err error)
-}
-
 type BlobStore struct {
 	basePath         string
 	age              *age.Age
 	immutable_config immutable_config.Config
 	interfaces.DirectoryPaths
-  MoverFactory
+	MoverFactory
 }
 
 func (s BlobStore) BlobWriterTo(p string) (w sha.WriteCloser, err error) {
