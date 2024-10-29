@@ -6,12 +6,10 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -174,62 +172,24 @@ func (c Import) importBlobIfNecessary(
 		return
 	}
 
+	blobStore := fs_home.MakeBlobStore(
+		c.Blobs,
+		ag,
+		c.CompressionType,
+	)
+
 	blobSha := co.External.GetBlobSha()
-
-	if u.GetFSHome().HasBlob(blobSha) {
-		return
-	}
-
-	p := id.Path(blobSha, c.Blobs)
-
-	o := fs_home.FileReadOptions{
-		Age:             ag,
-		Path:            p,
-		CompressionType: c.CompressionType,
-	}
-
-	var rc sha.ReadCloser
-
-	if rc, err = fs_home.NewFileReader(o); err != nil {
-		if errors.IsNotExist(err) {
-			co.SetError(errors.Errorf("blob missing: %q", p))
-			err = coErrPrinter(co)
-		} else {
-			err = errors.Wrapf(err, "Path: %q", p)
-		}
-
-		return
-	}
-
-	defer errors.DeferredCloser(&err, rc)
-
-	var aw sha.WriteCloser
-
-	if aw, err = u.GetFSHome().BlobWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, aw)
 
 	var n int64
 
-	if n, err = io.Copy(aw, rc); err != nil {
-		co.SetError(errors.New("blob copy failed"))
-		err = coErrPrinter(co)
+	if n, err = u.GetFSHome().CopyBlobIfNecessary(blobStore, blobSha); err != nil {
+		if errors.Is(err, &fs_home.ErrAlreadyExists{}) {
+			err = nil
+		} else {
+			co.SetError(err)
+			err = coErrPrinter(co)
+		}
 		return
-	}
-
-	shaRc := rc.GetShaLike()
-
-	if !shaRc.EqualsSha(blobSha) {
-		co.SetError(errors.New("blob sha mismatch"))
-		err = coErrPrinter(co)
-		ui.TodoRecoverable(
-			"sku blob mismatch: sku had %s while blob store had %s",
-			co.Internal.GetBlobSha(),
-			shaRc,
-		)
 	}
 
 	// TODO switch to Err and fix test

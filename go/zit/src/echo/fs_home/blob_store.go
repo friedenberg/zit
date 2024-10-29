@@ -37,12 +37,17 @@ func MakeBlobStoreFromHome(s Home) (bs BlobStore, err error) {
 	return
 }
 
-func MakeBlobStore(h Home) BlobStore {
+func MakeBlobStore(
+	basePath string,
+	age *age.Age,
+	compressionType immutable_config.CompressionType,
+) BlobStore {
 	return BlobStore{
-		// basePath:         s.basePath,
-		// age:              s.age,
-		// immutable_config: s.immutable_config,
-		// MoverFactory:     s,
+		basePath: basePath,
+		age:      age,
+		immutable_config: immutable_config.Config{
+			CompressionType: compressionType,
+		},
 	}
 }
 
@@ -146,7 +151,12 @@ func (dst BlobStore) CopyBlobIfNecessary(
 ) (n int64, err error) {
 	blobSha := blobShaGetter.GetShaLike()
 
-	if dst.HasBlob(blobSha) {
+	if dst.HasBlob(blobSha) || blobSha.IsNull() {
+		err = MakeErrAlreadyExists(
+			blobSha,
+			"",
+		)
+
 		return
 	}
 
