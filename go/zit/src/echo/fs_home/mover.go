@@ -8,10 +8,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 )
 
-type MoverFactory interface {
-	NewMover(o MoveOptions) (m *Mover, err error)
-}
-
 type Mover struct {
 	file *os.File
 	Writer
@@ -22,7 +18,7 @@ type Mover struct {
 	errorOnAttemptedOverwrite bool
 }
 
-func (s Home) NewMover(o MoveOptions) (m *Mover, err error) {
+func NewMover(o MoveOptions) (m *Mover, err error) {
 	m = &Mover{
 		lockFile:                  o.LockFile,
 		errorOnAttemptedOverwrite: o.ErrorOnAttemptedOverwrite,

@@ -145,7 +145,6 @@ func Make(
 		immutable_config: s.immutable_config,
 		DirectoryPaths:   s.DirectoryPaths,
 		TemporaryFS:      s.TempLocal,
-		MoverFactory:     s,
 	}
 
 	return

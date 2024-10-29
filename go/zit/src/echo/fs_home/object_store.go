@@ -16,7 +16,6 @@ type ObjectStore struct {
 	immutable_config immutable_config.Config
 	interfaces.DirectoryPaths
 	TemporaryFS
-	MoverFactory
 }
 
 func (s Home) HasObject(
@@ -85,7 +84,7 @@ func (s ObjectStore) objectWriter(
 		TemporaryFS:              s.TemporaryFS,
 	}
 
-	if wc, err = s.NewMover(o); err != nil {
+	if wc, err = NewMover(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

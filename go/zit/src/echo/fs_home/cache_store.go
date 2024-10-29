@@ -15,7 +15,7 @@ func (s Home) ReadCloserCache(p string) (sha.ReadCloser, error) {
 func (s Home) WriteCloserCache(
 	p string,
 ) (w sha.WriteCloser, err error) {
-	return s.NewMover(
+	return NewMover(
 		MoveOptions{
 			Age:             s.age,
 			FinalPath:       p,

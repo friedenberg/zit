@@ -20,14 +20,12 @@ type BlobStore struct {
 	age              *age.Age
 	immutable_config immutable_config.Config
 	TemporaryFS
-	MoverFactory
 }
 
 func MakeBlobStoreFromHome(s Home) (bs BlobStore, err error) {
 	bs = BlobStore{
 		age:              s.age,
 		immutable_config: s.immutable_config,
-		MoverFactory:     s,
 		TemporaryFS:      s.TempLocal,
 	}
 
@@ -69,9 +67,10 @@ func (s BlobStore) BlobWriterTo(p string) (w sha.WriteCloser, err error) {
 		GenerateFinalPathFromSha: true,
 		LockFile:                 s.immutable_config.LockInternalFiles,
 		CompressionType:          s.immutable_config.CompressionType,
+		TemporaryFS:              s.TemporaryFS,
 	}
 
-	if w, err = s.NewMover(mo); err != nil {
+	if w, err = NewMover(mo); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
