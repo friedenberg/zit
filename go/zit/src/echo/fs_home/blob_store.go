@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -151,6 +152,56 @@ func (s blobStore) blobReaderFrom(
 	return
 }
 
+func MakeCopyingBlobStore(local, remote BlobStore) CopyingBlobStore {
+	if local == nil {
+		panic("nil local blob store")
+	}
+
+	return CopyingBlobStore{
+		local:  local,
+		remote: remote,
+	}
+}
+
+type CopyingBlobStore struct {
+	local, remote BlobStore
+}
+
+func (s CopyingBlobStore) HasBlob(sh sha.ShaLike) bool {
+	if s.local.HasBlob(sh) {
+		return true
+	}
+
+	if s.remote != nil && s.remote.HasBlob(sh) {
+		return true
+	}
+
+	return false
+}
+
+func (s CopyingBlobStore) BlobWriter() (w sha.WriteCloser, err error) {
+	return s.local.BlobWriter()
+}
+
+func (s CopyingBlobStore) BlobReader(
+	sh sha.ShaLike,
+) (r sha.ReadCloser, err error) {
+	if s.local.HasBlob(sh) || s.remote == nil {
+		return s.local.BlobReader(sh)
+	}
+
+	var n int64
+
+	if n, err = CopyBlob(s.local, s.remote, sh.GetShaLike()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	ui.Err().Printf("copied Blob %s (%d bytes)", sh, n)
+
+	return s.local.BlobReader(sh)
+}
+
 func CopyBlobIfNecessary(
 	dst BlobStore,
 	src BlobStore,
@@ -167,6 +218,14 @@ func CopyBlobIfNecessary(
 		return
 	}
 
+	return CopyBlob(dst, src, blobSha)
+}
+
+func CopyBlob(
+	dst BlobStore,
+	src BlobStore,
+	blobSha interfaces.Sha,
+) (n int64, err error) {
 	var rc sha.ReadCloser
 
 	if rc, err = src.BlobReader(blobSha); err != nil {

@@ -39,7 +39,7 @@ func (pt *Page) initialize(
 	pid PageId,
 	i *Index,
 ) {
-	pt.fs_home = i.fs_home.SansAge().SansCompression()
+	pt.fs_home = i.fs_home.SansObjectAge().SansObjectCompression()
 	pt.PageId = pid
 	pt.added = sku.MakeTransactedHeap()
 	pt.addedLatest = sku.MakeTransactedHeap()

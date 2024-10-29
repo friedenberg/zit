@@ -33,9 +33,9 @@ type Home struct {
 
 	interfaces.DirectoryPaths
 
-  blobStore blobStore
+	local, remote blobStore
 
-	BlobStore
+	CopyingBlobStore
 	ObjectStore
 
 	TempLocal, TempOS TemporaryFS
@@ -136,12 +136,20 @@ func Make(
 		return
 	}
 
-	if s.blobStore, err = MakeBlobStoreFromHome(s); err != nil {
+	if s.local, err = MakeBlobStoreFromHome(s); err != nil {
 		errors.Wrap(err)
 		return
 	}
 
-  s.BlobStore = s.blobStore
+	if s.readOnlyBlobStorePath != "" {
+		s.remote = MakeBlobStore(
+			s.readOnlyBlobStorePath,
+			s.age,
+			s.immutable_config.CompressionType,
+		)
+	}
+
+	s.CopyingBlobStore = MakeCopyingBlobStore(s.local, s.remote)
 
 	s.ObjectStore = ObjectStore{
 		basePath:         s.basePath,
@@ -154,21 +162,17 @@ func Make(
 	return
 }
 
-func (a Home) SansAge() (b Home) {
+func (a Home) SansObjectAge() (b Home) {
 	b = a
 	b.age = nil
-	b.blobStore.age = nil
 	b.ObjectStore.age = nil
-  b.BlobStore = b.blobStore
 	return
 }
 
-func (a Home) SansCompression() (b Home) {
+func (a Home) SansObjectCompression() (b Home) {
 	b = a
 	b.immutable_config.CompressionType = immutable_config.CompressionTypeNone
-	b.blobStore.immutable_config.CompressionType = immutable_config.CompressionTypeNone
-	b.ObjectStore.immutable_config.CompressionType = immutable_config.CompressionTypeNone
-  b.BlobStore = b.blobStore
+	b.ObjectStore.immutable_config.CompressionType = b.immutable_config.CompressionType
 	return
 }
 
