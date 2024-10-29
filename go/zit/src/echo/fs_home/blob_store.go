@@ -16,6 +16,7 @@ import (
 
 type BlobStore struct {
 	basePath         string
+	tempPath         string
 	age              *age.Age
 	immutable_config immutable_config.Config
 	MoverFactory
@@ -60,8 +61,6 @@ func (s BlobStore) HasBlob(
 }
 
 func (s BlobStore) BlobWriterTo(p string) (w sha.WriteCloser, err error) {
-	var outer Writer
-
 	mo := MoveOptions{
 		Age:                      s.age,
 		FinalPath:                p,
@@ -70,12 +69,10 @@ func (s BlobStore) BlobWriterTo(p string) (w sha.WriteCloser, err error) {
 		CompressionType:          s.immutable_config.CompressionType,
 	}
 
-	if outer, err = s.NewMover(mo); err != nil {
+	if w, err = s.NewMover(mo); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	w = outer
 
 	return
 }

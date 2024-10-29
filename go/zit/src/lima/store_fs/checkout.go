@@ -295,7 +295,7 @@ func (s *Store) filenameForTransacted(
 	case checkout_options.PathTempLocal:
 		var f *os.File
 
-		if f, err = s.fs_home.FileTempLocal(); err != nil {
+		if f, err = s.fs_home.TempLocal.FileTemp(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

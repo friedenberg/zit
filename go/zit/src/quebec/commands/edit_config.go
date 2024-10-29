@@ -106,7 +106,7 @@ func (c EditConfig) makeTempConfigFile(
 
 	var f *os.File
 
-	if f, err = u.GetFSHome().FileTempLocal(); err != nil {
+	if f, err = u.GetFSHome().TempLocal.FileTemp(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

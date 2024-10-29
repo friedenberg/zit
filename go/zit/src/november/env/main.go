@@ -127,14 +127,6 @@ func (u *Env) Initialize(options Options) (err error) {
 			err = errors.Wrap(err)
 			return
 		}
-
-		if err = os.MkdirAll(
-			u.fsHome.DirTempLocal(),
-			os.ModeDir|0o755,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
 	}
 
 	if err = u.dormantIndex.Load(

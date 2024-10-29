@@ -169,7 +169,7 @@ func (c *Organize) RunWithQuery(
 
 		var f *os.File
 
-		if f, err = u.GetFSHome().FileTempLocalWithTemplate(
+		if f, err = u.GetFSHome().TempLocal.FileTempWithTemplate(
 			"*." + u.GetConfig().FileExtensions.Organize,
 		); err != nil {
 			err = errors.Wrap(err)

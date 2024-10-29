@@ -34,7 +34,7 @@ func (s Home) NewMover(o MoveOptions) (m *Mover, err error) {
 		m.objectPath = o.FinalPath
 	}
 
-	if m.file, err = s.FileTempLocal(); err != nil {
+	if m.file, err = s.TempLocal.FileTemp(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

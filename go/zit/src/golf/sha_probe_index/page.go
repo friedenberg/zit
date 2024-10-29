@@ -293,7 +293,7 @@ func (e *page) Flush() (err error) {
 
 	var ft *os.File
 
-	if ft, err = e.fs_home.FileTempLocal(); err != nil {
+	if ft, err = e.fs_home.TempLocal.FileTemp(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

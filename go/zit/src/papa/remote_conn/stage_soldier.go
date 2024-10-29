@@ -60,7 +60,7 @@ func MakeStageSoldier(u *env.Env) (
 
 	var d string
 
-	if d, err = u.GetFSHome().DirTempOS(); err != nil {
+	if d, err = u.GetFSHome().TempOS.DirTemp(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

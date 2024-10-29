@@ -29,11 +29,6 @@ func Make(
 		t.Fatalf("failed to make fs_home: %s", err)
 	}
 
-	err = f.MakeDir(f.DirTempLocal())
-	if err != nil {
-		t.Fatalf("failed to reset cache: %s", err)
-	}
-
 	if contents == nil {
 		return
 	}

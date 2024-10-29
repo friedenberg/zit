@@ -2,6 +2,7 @@ package fs_home
 
 import (
 	"encoding/gob"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -31,8 +32,11 @@ type Home struct {
 	immutable_config      immutable_config.Config
 
 	interfaces.DirectoryPaths
+
 	BlobStore
 	ObjectStore
+
+	TempLocal, TempOS TemporaryFS
 }
 
 func Make(
@@ -73,6 +77,12 @@ func Make(
 	}
 
 	s.DirectoryPaths = dp
+	s.TempLocal.basePath = s.DirZit(fmt.Sprintf("tmp-%d", s.pid))
+
+	if err = s.MakeDir(s.TempLocal.basePath); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if !o.PermitNoZitDirectory {
 		if ok := files.Exists(s.DirZit()); !ok {
