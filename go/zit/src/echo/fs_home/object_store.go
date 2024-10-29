@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -15,6 +16,23 @@ type ObjectStore struct {
 	immutable_config immutable_config.Config
 	interfaces.DirectoryPaths
 	MoverFactory
+}
+
+func (s Home) HasObject(
+	g interfaces.GenreGetter,
+	sh sha.ShaLike,
+) (ok bool) {
+	var d string
+	var err error
+
+	if d, err = s.DirObjectGenre(g); err != nil {
+		return
+	}
+
+	p := id.Path(sh.GetShaLike(), d)
+	ok = files.Exists(p)
+
+	return
 }
 
 func (s ObjectStore) objectReader(
@@ -72,68 +90,3 @@ func (s ObjectStore) objectWriter(
 
 	return
 }
-
-// func (s Home) ImportBlobIfNecessary(
-//   blobSha interfaces.ShaGetter,
-// ) (err error) {
-// 	if s.HasBlob(blobSha) {
-// 		return
-// 	}
-
-// 	p := id.Path(blobSha, c.Blobs)
-
-// 	o := fs_home.FileReadOptions{
-// 		Age:             ag,
-// 		Path:            p,
-// 		CompressionType: c.CompressionType,
-// 	}
-
-// 	var rc sha.ReadCloser
-
-// 	if rc, err = fs_home.NewFileReader(o); err != nil {
-// 		if errors.IsNotExist(err) {
-// 			co.SetError(errors.Errorf("blob missing: %q", p))
-// 			err = coErrPrinter(co)
-// 		} else {
-// 			err = errors.Wrapf(err, "Path: %q", p)
-// 		}
-
-// 		return
-// 	}
-
-// 	defer errors.DeferredCloser(&err, rc)
-
-// 	var aw sha.WriteCloser
-
-// 	if aw, err = u.GetFSHome().BlobWriter(); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	defer errors.DeferredCloser(&err, aw)
-
-// 	var n int64
-
-// 	if n, err = io.Copy(aw, rc); err != nil {
-// 		co.SetError(errors.New("blob copy failed"))
-// 		err = coErrPrinter(co)
-// 		return
-// 	}
-
-// 	shaRc := rc.GetShaLike()
-
-// 	if !shaRc.EqualsSha(blobSha) {
-// 		co.SetError(errors.New("blob sha mismatch"))
-// 		err = coErrPrinter(co)
-// 		ui.TodoRecoverable(
-// 			"sku blob mismatch: sku had %s while blob store had %s",
-// 			co.Internal.GetBlobSha(),
-// 			shaRc,
-// 		)
-// 	}
-
-// 	// TODO switch to Err and fix test
-// 	ui.Out().Printf("copied Blob %s (%d bytes)", blobSha, n)
-
-// 	return
-// }

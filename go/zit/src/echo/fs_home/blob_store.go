@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
@@ -17,8 +18,45 @@ type BlobStore struct {
 	basePath         string
 	age              *age.Age
 	immutable_config immutable_config.Config
-	interfaces.DirectoryPaths
 	MoverFactory
+}
+
+func MakeBlobStoreFromHome(s Home) (bs BlobStore, err error) {
+	bs = BlobStore{
+		age:              s.age,
+		immutable_config: s.immutable_config,
+		MoverFactory:     s,
+	}
+
+	if bs.basePath, err = s.DirObjectGenre(genres.Blob); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func MakeBlobStore(h Home) BlobStore {
+	return BlobStore{
+		// basePath:         s.basePath,
+		// age:              s.age,
+		// immutable_config: s.immutable_config,
+		// MoverFactory:     s,
+	}
+}
+
+func (s BlobStore) HasBlob(
+	sh sha.ShaLike,
+) (ok bool) {
+	if sh.GetShaLike().IsNull() {
+		ok = true
+		return
+	}
+
+	p := id.Path(sh.GetShaLike(), s.basePath)
+	ok = files.Exists(p)
+
+	return
 }
 
 func (s BlobStore) BlobWriterTo(p string) (w sha.WriteCloser, err error) {
@@ -43,16 +81,7 @@ func (s BlobStore) BlobWriterTo(p string) (w sha.WriteCloser, err error) {
 }
 
 func (s BlobStore) BlobWriter() (w sha.WriteCloser, err error) {
-	var p string
-
-	if p, err = s.DirObjectGenre(
-		genres.Blob,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if w, err = s.BlobWriterTo(p); err != nil {
+	if w, err = s.BlobWriterTo(s.basePath); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -66,16 +95,7 @@ func (s BlobStore) BlobReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
 		return
 	}
 
-	var p string
-
-	if p, err = s.DirObjectGenre(
-		genres.Blob,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if r, err = s.BlobReaderFrom(sh, p); err != nil {
+	if r, err = s.BlobReaderFrom(sh, s.basePath); err != nil {
 		if !IsErrBlobMissing(err) {
 			err = errors.Wrap(err)
 		}
@@ -117,6 +137,54 @@ func (s BlobStore) BlobReaderFrom(
 		}
 
 		return
+	}
+
+	return
+}
+
+func (dst BlobStore) CopyBlobIfNecessary(
+	src BlobStore,
+	blobShaGetter interfaces.ShaGetter,
+) (n int64, err error) {
+	blobSha := blobShaGetter.GetShaLike()
+
+	if dst.HasBlob(blobSha) {
+		return
+	}
+
+	var rc sha.ReadCloser
+
+	if rc, err = src.BlobReader(blobSha); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, rc)
+
+	var wc sha.WriteCloser
+
+	if wc, err = dst.BlobWriter(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, wc)
+
+	if n, err = io.Copy(wc, rc); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	shaRc := rc.GetShaLike()
+	shaWc := wc.GetShaLike()
+
+	if !shaRc.EqualsSha(blobSha) || !shaWc.EqualsSha(blobSha) {
+		err = errors.Errorf(
+			"lookup sha was %s, read sha was %s, but written sha was %s",
+			blobSha,
+			shaRc,
+			shaWc,
+		)
 	}
 
 	return

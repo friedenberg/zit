@@ -3,49 +3,9 @@ package fs_home
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
-
-func (s Home) HasObject(
-	g interfaces.GenreGetter,
-	sh sha.ShaLike,
-) (ok bool) {
-	var d string
-	var err error
-
-	if d, err = s.DirObjectGenre(g); err != nil {
-		return
-	}
-
-	p := id.Path(sh.GetShaLike(), d)
-	ok = files.Exists(p)
-
-	return
-}
-
-func (s Home) HasBlob(
-	sh sha.ShaLike,
-) (ok bool) {
-	if sh.GetShaLike().IsNull() {
-		ok = true
-		return
-	}
-
-	var d string
-	var err error
-
-	if d, err = s.DirObjectGenre(genres.Blob); err != nil {
-		return
-	}
-
-	p := id.Path(sh.GetShaLike(), d)
-	ok = files.Exists(p)
-
-	return
-}
 
 func (s Home) ReadAllLevel2Files(
 	p string,
