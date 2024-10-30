@@ -50,8 +50,8 @@ func (sp *VMPoolBuilder) WithApply(
 	return sp
 }
 
-func (vpb *VMPoolBuilder) Build() (vm *VMPool, err error) {
-	vm = &VMPool{
+func (vpb *VMPoolBuilder) Build() (vmp *VMPool, err error) {
+	vmp = &VMPool{
 		Require:  vpb.proto.Require,
 		Searcher: vpb.proto.Searcher,
 	}
@@ -61,10 +61,24 @@ func (vpb *VMPoolBuilder) Build() (vm *VMPool, err error) {
 		return
 	}
 
-	if err = vm.SetReader(vpb.scriptReader, vpb.apply); err != nil {
+	if err = vmp.SetReader(vpb.scriptReader, vpb.apply); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	// try initializing a lua vm to make sure there are no errors
+	vm, err := vmp.Get()
+	if err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, err = vm.GetTopTableOrError(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	vmp.Put(vm)
 
 	return
 }

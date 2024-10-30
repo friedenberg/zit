@@ -3,6 +3,7 @@ package query
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -146,7 +147,7 @@ func (b *buildState) realizeVirtualTags() (err error) {
 		lb := b.luaVMPoolBuilder.Clone().WithScript(v)
 
 		if vmp, err = lb.Build(); err != nil {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(err, "Key: %q, Value: %q", k, v)
 			return
 		}
 
@@ -469,7 +470,9 @@ func (b *buildState) makeTagOrLuaTag(
 	var vmp *lua.VMPool
 
 	if vmp, err = lb.Build(); err != nil {
-		err = errors.Wrap(err)
+		exp = k
+		ui.Err().Print(err)
+		err = nil
 		return
 	}
 
@@ -478,15 +481,6 @@ func (b *buildState) makeTagOrLuaTag(
 	}
 
 	exp = &TagLua{Lua: &ml, ObjectId: k}
-
-	// try initializing a lua vm to make sure there are no errors
-	vm, err := ml.Get()
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	ml.Put(vm)
 
 	return
 }

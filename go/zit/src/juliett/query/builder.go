@@ -256,6 +256,10 @@ func (b *Builder) build(state *buildState, vs ...string) (err error) {
 
 	if err, latent = state.build(vs...); err != nil {
 		if !errors.IsBadRequest(err) {
+			if latent == nil {
+				latent = errors.MakeMulti()
+			}
+
 			latent.Add(errors.Wrapf(err, "Query String: %q", vs))
 			err = latent
 		}

@@ -142,10 +142,11 @@ func Make(
 	}
 
 	if s.readOnlyBlobStorePath != "" {
+		// ui.Err().Printf("using remote store: %q", s.readOnlyBlobStorePath)
 		s.remote = MakeBlobStore(
 			s.readOnlyBlobStorePath,
 			s.age,
-			s.immutable_config.CompressionType,
+			immutable_config.CompressionTypeZstd,
 		)
 	}
 

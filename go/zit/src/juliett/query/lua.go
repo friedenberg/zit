@@ -43,9 +43,9 @@ func MakeLua(
 
 func MakeLuaFromBuilder(
 	b *lua.VMPoolBuilder,
-	selbst *sku.Transacted,
+	self *sku.Transacted,
 ) (l Lua, err error) {
-	b = b.Clone().WithApply(MakeSelfApply(selbst))
+	b = b.Clone().WithApply(MakeSelfApply(self))
 
 	var vmp *lua.VMPool
 
@@ -54,7 +54,7 @@ func MakeLuaFromBuilder(
 		return
 	}
 
-	l.LuaVMPool = sku_fmt.MakeLuaVMPool(vmp, selbst)
+	l.LuaVMPool = sku_fmt.MakeLuaVMPool(vmp, self)
 
 	return
 }
@@ -65,7 +65,6 @@ type Lua struct {
 
 func (matcher Lua) ContainsSku(tg sku.TransactedGetter) bool {
 	vm, err := matcher.Get()
-
 	if err != nil {
 		ui.Err().Printf("lua script error: %s", err)
 		return false
