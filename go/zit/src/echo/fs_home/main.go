@@ -93,7 +93,7 @@ func Make(
 		}
 	}
 
-	s.lockSmith = file_lock.New(s.DirZit("Lock"))
+	s.lockSmith = file_lock.New(s.FileLock())
 
 	if s.execPath, err = os.Executable(); err != nil {
 		err = errors.Wrap(err)

@@ -164,6 +164,13 @@ function status_simple_one_zettel_akte_only { # @test
 
 	dirty_existing_akte
 
+	run ls one
+	assert_success
+	assert_output - <<-EOM
+		dos.zettel
+		uno.md
+		uno.zettel
+	EOM
 	# TODO fix non-determinism
 	run_zit status one/uno.zettel
 	assert_success

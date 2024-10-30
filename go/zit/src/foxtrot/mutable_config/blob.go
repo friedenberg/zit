@@ -23,7 +23,7 @@ type Blob struct {
 	RemoteScripts   map[string]script_config.RemoteScript `toml:"remote-scripts"`
 	Actions         map[string]script_config.ScriptConfig `toml:"actions,omitempty"`
 	PrintOptions    options_print.General                 `toml:"cli-output"`
-	Tools           options_tools.Options                  `toml:"tools"`
+	Tools           options_tools.Options                 `toml:"tools"`
 	Filters         map[string]string                     `toml:"filters"`
 }
 

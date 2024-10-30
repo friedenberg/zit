@@ -23,7 +23,7 @@ function import { # @test
 	)
 
 	set_xdg "$BATS_TEST_TMPDIR"
-	run_zit export -print-time=true
+	run_zit export -print-time=true -genres z,e
 	assert_success
 	echo "$output" | gzip >list
 
@@ -159,6 +159,7 @@ function import_twice_no_dupes_one_zettel { # @test
 	EOM
 }
 
+# TODO add support for conflict resolution
 function import_conflict { # @test
 	(
 		mkdir inner

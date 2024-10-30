@@ -7,6 +7,8 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/flags"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
@@ -19,7 +21,7 @@ import (
 type Export struct {
 	AgeIdentity     age.Identity
 	CompressionType immutable_config.CompressionType
-	Genres          ids.Genre
+	Genres          flags.ResettingFlag[ids.Genre, *ids.Genre]
 }
 
 func init() {
@@ -28,7 +30,9 @@ func init() {
 		func(f *flag.FlagSet) CommandWithResult {
 			c := &Export{
 				CompressionType: immutable_config.CompressionTypeEmpty,
-				Genres:          ids.MakeGenre(genres.Tag, genres.Zettel),
+				Genres: flags.MakeResettingFlag(
+					ids.MakeGenreAll(),
+				),
 			}
 
 			f.Var(&c.AgeIdentity, "age-identity", "")
@@ -44,21 +48,43 @@ func (c Export) Run(u *env.Env, args ...string) (result Result) {
 	list := sku.MakeList()
 	var l sync.Mutex
 
-	if result.Error = u.GetStore().QueryPrimitive(
-		sku.MakePrimitiveQueryGroup(),
-		func(sk *sku.Transacted) (err error) {
-			if !c.Genres.Contains(sk.GetGenre()) {
-				return
-			}
+	addSku := func(sk *sku.Transacted) (err error) {
+		l.Lock()
+		defer l.Unlock()
 
-			l.Lock()
-			defer l.Unlock()
+		list.Add(sk.CloneTransacted())
 
-			list.Add(sk.CloneTransacted())
+		return
+	}
 
-			return
+	wg := quiter.MakeErrorWaitGroupParallel()
+
+	wg.Do(
+		func() error {
+			return u.GetStore().QueryPrimitive(
+				sku.MakePrimitiveQueryGroup(),
+				func(sk *sku.Transacted) (err error) {
+					if !c.Genres.GetFlag().Contains(sk.GetGenre()) {
+						return
+					}
+
+					return addSku(sk)
+				},
+			)
 		},
-	); result.Error != nil {
+	)
+
+	if c.Genres.GetFlag().Contains(genres.InventoryList) {
+		wg.Do(
+			func() error {
+				return u.GetStore().GetInventoryListStore().ReadAll(
+					addSku,
+				)
+			},
+		)
+	}
+
+	if result.Error = wg.GetError(); result.Error != nil {
 		result.Error = errors.Wrap(result.Error)
 		return
 	}

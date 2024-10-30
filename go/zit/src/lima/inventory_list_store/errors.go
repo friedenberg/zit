@@ -1,4 +1,4 @@
-package inventory_list
+package inventory_list_store
 
 import "errors"
 

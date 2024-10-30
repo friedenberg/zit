@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list"
+	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
 )
 
 func (s *Store) FlushInventoryList(
@@ -31,7 +31,7 @@ func (s *Store) FlushInventoryList(
 		s.inventoryList,
 		s.GetKonfig().Description,
 	); err != nil {
-		if errors.Is(err, inventory_list.ErrEmpty) {
+		if errors.Is(err, inventory_list_store.ErrEmpty) {
 			ui.Log().Printf("Bestandsaufnahme was empty")
 			err = nil
 		} else {

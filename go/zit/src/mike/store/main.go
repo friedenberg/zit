@@ -20,7 +20,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/stream_index"
-	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list"
+	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 )
 
@@ -32,7 +32,7 @@ type Store struct {
 	cwdFiles           *store_fs.Store
 	externalStores     map[ids.RepoId]*external_store.Store
 	blob_store         *blob_store.VersionedStores
-	inventoryListStore inventory_list.Store
+	inventoryListStore inventory_list_store.Store
 	Abbr               AbbrStore
 
 	inventoryList          *sku.List

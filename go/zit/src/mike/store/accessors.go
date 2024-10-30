@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/stream_index"
-	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list"
+	"code.linenisgreat.com/zit/go/zit/src/lima/inventory_list_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 )
 
@@ -49,7 +49,7 @@ func (s *Store) GetTai() ids.Tai {
 	return ids.NowTai()
 }
 
-func (s *Store) GetInventoryListStore() *inventory_list.Store {
+func (s *Store) GetInventoryListStore() *inventory_list_store.Store {
 	return &s.inventoryListStore
 }
 

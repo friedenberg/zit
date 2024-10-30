@@ -34,6 +34,10 @@ func (c directoryV1) FileTags() string {
 	return c.DirZit("tags")
 }
 
+func (c directoryV1) FileLock() string {
+	return filepath.Join(c.State, "lock")
+}
+
 func (c directoryV1) FileConfigPermanent() string {
 	return c.DirZit("config-permanent")
 }

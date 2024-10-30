@@ -16,6 +16,7 @@ type DirectoryPaths interface {
 	FileCacheObjectId() string
 	FileConfigMutable() string
 	FileConfigPermanent() string
+	FileLock() string
 	FileTags() string
 }
 

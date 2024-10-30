@@ -40,6 +40,7 @@ const (
 	tag
 	zettel
 	config
+	inventory_list
 	repo
 )
 
@@ -96,7 +97,9 @@ func (g Genre) GetGenre() interfaces.Genre {
 func (g Genre) GetGenreBitInt() byte {
 	switch g {
 	default:
-		return unknown
+		panic(fmt.Sprintf("genre does not define bit int: %s", g))
+	case InventoryList:
+		return inventory_list
 	case Blob:
 		return blob
 	case Zettel:

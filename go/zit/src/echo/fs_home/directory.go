@@ -38,6 +38,10 @@ func (c directoryV0) FileTags() string {
 	return c.DirZit("Etiketten")
 }
 
+func (c directoryV0) FileLock() string {
+	return c.DirZit("Lock")
+}
+
 func (c directoryV0) FileConfigPermanent() string {
 	return c.DirZit("KonfigAngeboren")
 }

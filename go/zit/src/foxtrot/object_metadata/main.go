@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/flag_policy"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/expansion"
-	flag2 "code.linenisgreat.com/zit/go/zit/src/bravo/flag"
+	flag2 "code.linenisgreat.com/zit/go/zit/src/bravo/flags"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"

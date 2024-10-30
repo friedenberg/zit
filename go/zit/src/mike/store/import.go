@@ -86,6 +86,7 @@ func (s *Store) Import(external *sku.Transacted) (co *sku.CheckedOut, err error)
 		return
 	}
 
+	// TODO add support for inventory lists
 	if err = s.tryRealizeAndOrStore(
 		external,
 		sku.CommitOptions{
