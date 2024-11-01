@@ -100,6 +100,10 @@ func (s *Store) Create(
 	o *sku.List,
 	bez descriptions.Description,
 ) (t *sku.Transacted, err error) {
+	if o.Len() == 0 {
+		return
+	}
+
 	if !s.ls.IsAcquired() {
 		err = file_lock.ErrLockRequired{
 			Operation: "create bestandsaufnahme",
@@ -108,39 +112,36 @@ func (s *Store) Create(
 		return
 	}
 
-	if o.Len() == 0 {
-		err = errors.Wrap(ErrEmpty)
-		return
-	}
+	t = sku.GetTransactedPool().Get()
 
-	var wc interfaces.ShaWriteCloser
+	if o.Len() > 0 {
+		var wc interfaces.ShaWriteCloser
 
-	if wc, err = s.fs_home.BlobWriter(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	func() {
-		defer errors.DeferredCloser(&err, wc)
-
-		if _, err = s.WriteInventoryListBlob(o, wc); err != nil {
+		if wc, err = s.fs_home.BlobWriter(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
-	}()
 
-	sh := wc.GetShaLike()
+		func() {
+			defer errors.DeferredCloser(&err, wc)
 
-	if _, err = s.GetBlob(sh); err != nil {
-		err = errors.Wrapf(err, "Blob Sha: %q", sh)
-		return
+			if _, err = s.WriteInventoryListBlob(o, wc); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}()
+
+		sh := wc.GetShaLike()
+
+		if _, err = s.GetBlob(sh); err != nil {
+			err = errors.Wrapf(err, "Blob Sha: %q", sh)
+			return
+		}
+
+		t.SetBlobSha(sh)
 	}
 
-	t = sku.GetTransactedPool().Get()
-
-	sku.TransactedResetter.Reset(t)
 	t.Metadata.Description = bez
-	t.SetBlobSha(sh)
 	tai := s.clock.GetTai()
 
 	if err = t.ObjectId.SetWithIdLike(tai); err != nil {
@@ -149,6 +150,8 @@ func (s *Store) Create(
 	}
 
 	t.SetTai(tai)
+
+	var wc interfaces.ShaWriteCloser
 
 	if wc, err = s.of.ObjectWriter(); err != nil {
 		err = errors.Wrap(err)
@@ -167,7 +170,7 @@ func (s *Store) Create(
 		}
 	}()
 
-	sh = wc.GetShaLike()
+	sh := wc.GetShaLike()
 
 	ui.Log().Printf(
 		"saving Bestandsaufnahme with tai: %s -> %s",
@@ -175,7 +178,10 @@ func (s *Store) Create(
 		sh,
 	)
 
-	t.SetObjectSha(sh)
+	if err = t.CalculateObjectShas(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
@@ -188,7 +194,7 @@ func (s *Store) readOnePath(p string) (o *sku.Transacted, err error) {
 		return
 	}
 
-	if o, err = s.ReadOne(sh); err != nil {
+	if o, err = s.ReadOneSha(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -219,7 +225,7 @@ func (s *Store) readOnePath(p string) (o *sku.Transacted, err error) {
 	return
 }
 
-func (s *Store) ReadOne(
+func (s *Store) ReadOneSha(
 	k interfaces.Stringer,
 ) (o *sku.Transacted, err error) {
 	var sh sha.Sha
@@ -433,6 +439,16 @@ func (s *Store) ReadAllSkus(
 ) (err error) {
 	if err = s.ReadAll(
 		func(t *sku.Transacted) (err error) {
+			if err = f(t, t); err != nil {
+				err = errors.Wrapf(
+					err,
+					"InventoryList: %s",
+					t.GetObjectId(),
+				)
+
+				return
+			}
+
 			if err = s.StreamInventoryList(
 				t.GetBlobSha(),
 				func(sk *sku.Transacted) (err error) {
@@ -441,7 +457,7 @@ func (s *Store) ReadAllSkus(
 			); err != nil {
 				err = errors.Wrapf(
 					err,
-					"Bestandsaufnahme: %s",
+					"InventoryList: %s",
 					t.GetObjectId(),
 				)
 

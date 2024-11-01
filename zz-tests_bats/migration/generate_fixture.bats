@@ -19,6 +19,14 @@ cmd_def=(
 function generate { # @test
 	run_zit_init_disable_age
 
+	run_zit show :b
+	assert_success
+	assert_output
+
+	run_zit last
+	assert_success
+	assert_output
+
 	run_zit store-version
 	assert_success
 	assert_output 7

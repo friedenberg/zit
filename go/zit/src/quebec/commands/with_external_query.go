@@ -18,6 +18,13 @@ type CommandWithQuery interface {
 	) error
 }
 
+type CommandWithQuery2 interface {
+	RunWithQuery(
+		store *env.Env,
+		ids *query.Group,
+	) Result
+}
+
 type commandWithQuery struct {
 	CommandWithQuery
 	sku.ExternalQueryOptions

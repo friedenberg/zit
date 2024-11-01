@@ -117,7 +117,7 @@ func (u *Env) Start(e BigBang) (err error) {
 	}
 
 	ui.TodoP2("determine if this should be an Einleitung option")
-	if err = initDefaultTypAndKonfig(u); err != nil {
+	if err = initDefaultTypeAndConfig(u); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -128,9 +128,12 @@ func (u *Env) Start(e BigBang) (err error) {
 			return
 		}
 
-		defer errors.Deferred(&err, u.Unlock)
-
 		if err = u.GetStore().ResetIndexes(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = u.Unlock(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -139,7 +142,7 @@ func (u *Env) Start(e BigBang) (err error) {
 	return
 }
 
-func initDefaultTypAndKonfig(u *Env) (err error) {
+func initDefaultTypeAndConfig(u *Env) (err error) {
 	if err = u.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return

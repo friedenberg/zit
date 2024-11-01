@@ -23,7 +23,7 @@ function import { # @test
 	)
 
 	set_xdg "$BATS_TEST_TMPDIR"
-	run_zit export -print-time=true -genres z,e
+	run_zit export -print-time=true +z,e,t
 	assert_success
 	echo "$output" | gzip >list
 
@@ -37,20 +37,20 @@ function import { # @test
 		-inventory-list "$list" \
 		-blobs "$blobs" \
 		-compression-type gzip
+	assert_success
 
+	run_zit show +z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
+		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
+		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
+		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
-		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
-		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
-		copied Blob 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 (10 bytes)
-		copied Blob 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 (16 bytes)
-		copied Blob 3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 (27 bytes)
 	EOM
 
 	run_zit show one/uno
@@ -193,7 +193,7 @@ function import_conflict { # @test
 		[one/uno @81c3b19e19b4dd2d8e69f413cd253c67c861ec0066e30f90be23ff62fb7b0cf5 !md "get out of here!" scary]
 	EOM
 
-	run_zit import -inventory-list "$list" -blobs "$blobs" -compression-type gzip
+	run_zit import -print-copies=false -inventory-list "$list" -blobs "$blobs" -compression-type gzip
 	assert_failure
 	assert_output_unsorted - <<-EOM
 		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -318,5 +318,46 @@ function import_age { # @test
 		---
 
 		last time
+	EOM
+}
+
+function import_inventory_lists { # @test
+	(
+		mkdir inner
+		pushd inner || exit 1
+		set_xdg "$(pwd)"
+		run_zit_init
+	)
+
+	set_xdg "$BATS_TEST_TMPDIR"
+	run_zit export -print-time=true
+	assert_success
+	echo "$output" | gzip >list
+
+	list="$(realpath list)"
+	blobs="$(realpath .xdg/data/zit/objects/blobs)"
+
+	pushd inner || exit 1
+	set_xdg "$(pwd)"
+
+	run_zit import \
+		-inventory-list "$list" \
+		-blobs "$blobs" \
+		-compression-type gzip
+
+	assert_success
+
+	run_zit show +z,e,t
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
+		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
+		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 }

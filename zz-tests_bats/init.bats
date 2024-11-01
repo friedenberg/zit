@@ -42,9 +42,13 @@ function init_and_reindex { # @test
 
 	run_zit reindex
 	assert_success
+  run_zit show :t,konfig
+	assert_success
 	assert_output_unsorted - <"$expected"
 
 	run_zit reindex
+	assert_success
+  run_zit show :t,konfig
 	assert_success
 	assert_output_unsorted - <"$expected"
 }

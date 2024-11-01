@@ -425,3 +425,9 @@ function show_etiketten_exact { # @test
 	assert_output_unsorted - <<-EOM
 	EOM
 }
+
+function show_inventory_lists { # @test
+	run_zit show :b
+	assert_success
+	assert_output
+}

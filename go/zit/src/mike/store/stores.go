@@ -215,7 +215,7 @@ func (s *Store) MakeQueryExecutor(
 	return
 }
 
-func (s *Store) Merge(
+func (s *Store) MergeConflicted(
 	tm sku.Conflicted,
 ) (err error) {
 	switch tm.CheckedOutLike.GetSkuExternalLike().GetRepoId().GetRepoIdString() {

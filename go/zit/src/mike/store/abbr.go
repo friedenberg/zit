@@ -189,7 +189,7 @@ func (i *indexAbbr) AddObjectToAbbreviationStore(o *sku.Transacted) (err error) 
 		i.indexAbbrEncodableTridexes.ZettelId.Kopfen.Add(h.GetHead())
 		i.indexAbbrEncodableTridexes.ZettelId.Schwanzen.Add(h.GetTail())
 
-	case genres.Type, genres.Tag, genres.Config:
+	case genres.Type, genres.Tag, genres.Config, genres.InventoryList:
 		return
 
 	default:

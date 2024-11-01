@@ -152,7 +152,7 @@ func (g Genre) HasParents() bool {
 
 func (g Genre) IsTrueGenre() bool {
 	switch g {
-	case Type, Tag, Zettel, Config, Repo:
+	case Type, Tag, Zettel, Config, Repo, InventoryList:
 		return true
 
 	default:
@@ -258,6 +258,8 @@ func (g *Genre) Set(v string) (err error) {
 	v = strings.TrimSpace(v)
 
 	switch {
+	case strings.EqualFold(v, "blob"):
+    fallthrough
 	case strings.EqualFold(v, "akte"):
 		*g = Blob
 
@@ -267,18 +269,28 @@ func (g *Genre) Set(v string) (err error) {
 	case strings.EqualFold(v, "aktetyp"):
 		*g = Type
 
+	case hasPrefixOrEquals("tag", v):
+    fallthrough
 	case hasPrefixOrEquals("etikett", v):
 		*g = Tag
 
 	case hasPrefixOrEquals("zettel", v):
 		*g = Zettel
 
+	case strings.EqualFold("config", v):
+    fallthrough
 	case strings.EqualFold("konfig", v):
 		*g = Config
 
+	case hasPrefixOrEquals("inventory_list", v):
+    fallthrough
+	case hasPrefixOrEquals("inventory-list", v):
+    fallthrough
 	case hasPrefixOrEquals("bestandsaufnahme", v):
 		*g = InventoryList
 
+	case hasPrefixOrEquals("repo", v):
+    fallthrough
 	case hasPrefixOrEquals("kasten", v):
 		*g = Repo
 

@@ -1,19 +1,83 @@
 package store
 
 import (
-	"fmt"
-
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
-	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
-	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 )
 
-func (s *Store) Import(external *sku.Transacted) (co *sku.CheckedOut, err error) {
+var ErrNeedsMerge = errors.NewNormal("needs merge")
+
+type BlobCopyResult struct {
+	*sku.Transacted
+	N int64
+}
+
+type Importer struct {
+	*Store
+	RemoteBlobStore    fs_home.BlobStore
+	BlobCopierDelegate interfaces.FuncIter[BlobCopyResult]
+	ErrPrinter         interfaces.FuncIter[*sku.CheckedOut]
+}
+
+func (s Importer) Import(
+	external *sku.Transacted,
+) (co *sku.CheckedOut, err error) {
+	if err = s.importBlobIfNecessary(external); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if external.GetGenre() == genres.InventoryList {
+		return s.importInventoryList(external)
+	} else {
+		return s.importLeafSku(external)
+	}
+}
+
+func (s Importer) importInventoryList(
+	el *sku.Transacted,
+) (co *sku.CheckedOut, err error) {
+	if el.GetGenre() == genres.InventoryList {
+		if err = s.GetInventoryListStore().StreamInventoryList(
+			el.GetBlobSha(),
+			func(sk *sku.Transacted) (err error) {
+				if _, err = s.importLeafSku(
+					sk,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
+			},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if co, err = s.importLeafSku(
+		el,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+
+	return
+}
+
+func (s Importer) importLeafSku(
+	external *sku.Transacted,
+) (co *sku.CheckedOut, err error) {
 	co = store_fs.GetCheckedOutPool().Get()
 	co.IsImport = true
 
@@ -66,32 +130,16 @@ func (s *Store) Import(external *sku.Transacted) (co *sku.CheckedOut, err error)
 		return
 	}
 
-	if !co.Internal.Metadata.Sha().IsNull() &&
-		!co.Internal.Metadata.Sha().Equals(external.Metadata.Mutter()) &&
-		!co.Internal.Metadata.Sha().Equals(external.Metadata.Sha()) {
-		if err = s.importDoMerge(co); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
+	var commitOptions sku.CommitOptions
 
-	if !s.GetStandort().GetLockSmith().IsAcquired() {
-		err = errors.Wrap(file_lock.ErrLockRequired{
-			Operation: fmt.Sprintf(
-				"import %s",
-				external.GetGenre(),
-			),
-		})
-
+	if commitOptions, err = s.MergeCheckedOutIfNecessary(co); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	// TODO add support for inventory lists
 	if err = s.tryRealizeAndOrStore(
 		external,
-		sku.CommitOptions{
-			Mode: object_mode.ModeCommit,
-		},
+		commitOptions,
 	); err == collections.ErrExists {
 		co.SetError(err)
 		err = nil
@@ -100,9 +148,36 @@ func (s *Store) Import(external *sku.Transacted) (co *sku.CheckedOut, err error)
 	return
 }
 
-var ErrNeedsMerge = errors.NewNormal("needs merge")
+func (c Importer) importBlobIfNecessary(
+	sk *sku.Transacted,
+) (err error) {
+	blobSha := sk.GetBlobSha()
 
-func (s *Store) importDoMerge(co *sku.CheckedOut) (err error) {
-	co.State = checked_out_state.Conflicted
+	var n int64
+
+	if n, err = fs_home.CopyBlobIfNecessary(
+		c.GetStandort(),
+		c.RemoteBlobStore,
+		blobSha,
+	); err != nil {
+		if errors.Is(err, &fs_home.ErrAlreadyExists{}) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+
+	if c.BlobCopierDelegate != nil {
+		if err = c.BlobCopierDelegate(
+			BlobCopyResult{Transacted: sk, N: n},
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
 	return
 }

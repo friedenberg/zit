@@ -5,7 +5,6 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
@@ -25,6 +24,7 @@ type Import struct {
 	Blobs           string
 	AgeIdentity     age.Identity
 	CompressionType immutable_config.CompressionType
+	PrintCopies     bool
 	sku.Proto
 }
 
@@ -42,6 +42,7 @@ func init() {
 			f.StringVar(&c.Blobs, "blobs", "", "")
 			f.Var(&c.AgeIdentity, "age-identity", "")
 			c.CompressionType.AddToFlagSet(f)
+			f.BoolVar(&c.PrintCopies, "print-copies", true, "output when blobs are copied")
 
 			c.Proto.AddToFlagSet(f)
 
@@ -101,8 +102,34 @@ func (c Import) run(u *env.Env, args ...string) (err error) {
 		return
 	}
 
-	u.Lock()
-	defer u.Unlock()
+	if err = u.Lock(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	importer := store.Importer{
+		Store:      u.GetStore(),
+		ErrPrinter: coPrinter,
+	}
+
+	if c.PrintCopies {
+		importer.BlobCopierDelegate = func(result store.BlobCopyResult) error {
+			// TODO switch to Err and fix test
+			return ui.Out().Printf(
+				"copied Blob %s (%d bytes)",
+				result.GetBlobSha(),
+				result.N,
+			)
+		}
+	}
+
+	if c.Blobs != "" {
+		importer.RemoteBlobStore = fs_home.MakeBlobStore(
+			c.Blobs,
+			&ag,
+			c.CompressionType,
+		)
+	}
 
 	var co *sku.CheckedOut
 
@@ -113,7 +140,7 @@ func (c Import) run(u *env.Env, args ...string) (err error) {
 			break
 		}
 
-		if co, err = u.GetStore().Import(
+		if co, err = importer.Import(
 			sk,
 		); err != nil {
 			err = errors.Wrapf(err, "Sku: %s", sk)
@@ -131,15 +158,6 @@ func (c Import) run(u *env.Env, args ...string) (err error) {
 			continue
 		}
 
-		if err = c.importBlobIfNecessary(u, co, &ag, coPrinter); err != nil {
-			if age.IsNoIdentityMatchError(err) {
-				err = nil
-			} else {
-				err = errors.Wrapf(err, "Checked Out: %q", co)
-				return
-			}
-		}
-
 		if co.State == checked_out_state.Error {
 			co.External.Metadata.Fields = append(
 				co.External.Metadata.Fields,
@@ -155,49 +173,14 @@ func (c Import) run(u *env.Env, args ...string) (err error) {
 		}
 	}
 
+	if err = u.Unlock(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	if hasConflicts {
 		err = store.ErrNeedsMerge
 	}
-
-	return
-}
-
-func (c Import) importBlobIfNecessary(
-	u *env.Env,
-	co *sku.CheckedOut,
-	ag *age.Age,
-	coErrPrinter interfaces.FuncIter[*sku.CheckedOut],
-) (err error) {
-	if c.Blobs == "" {
-		return
-	}
-
-	blobStore := fs_home.MakeBlobStore(
-		c.Blobs,
-		ag,
-		c.CompressionType,
-	)
-
-	blobSha := co.External.GetBlobSha()
-
-	var n int64
-
-	if n, err = fs_home.CopyBlobIfNecessary(
-		u.GetFSHome(),
-		blobStore,
-		blobSha,
-	); err != nil {
-		if errors.Is(err, &fs_home.ErrAlreadyExists{}) {
-			err = nil
-		} else {
-			co.SetError(err)
-			err = coErrPrinter(co)
-		}
-		return
-	}
-
-	// TODO switch to Err and fix test
-	ui.Out().Printf("copied Blob %s (%d bytes)", blobSha, n)
 
 	return
 }

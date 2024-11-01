@@ -66,7 +66,7 @@ func (s *Store) ReadOneInto(
 			return
 		}
 
-	case genres.Type, genres.Tag, genres.Repo:
+	case genres.Type, genres.Tag, genres.Repo, genres.InventoryList:
 		if sk, err = s.ReadOneObjectId(k1); err != nil {
 			err = errors.Wrap(err)
 			return

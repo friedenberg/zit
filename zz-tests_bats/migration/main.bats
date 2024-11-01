@@ -51,6 +51,11 @@ function migration_validate_history { # @test
 
 function migration_reindex { # @test
 	run_zit reindex
+  assert_success
+  assert_output
+
+	run_zit show +e,konfig,t,z
+  assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
 		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]

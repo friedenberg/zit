@@ -16,6 +16,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+// Saves the blob if necessary, applies the proto object, runs pre-commit hooks,
+// runs the new hook, and then calculates the sha for the object
 func (s *Store) tryRealize(
 	el sku.ExternalLike, mutter *sku.Transacted,
 	o sku.CommitOptions,
@@ -137,13 +139,7 @@ func (s *Store) tryRealizeAndOrStore(
 		}
 	}
 
-	// for _, vs := range s.virtualStores {
-	// 	if err = vs.CommitTransacted(kinder, mutter); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return
-	// 	}
-	// }
-
+	// short circuits if the parent is equal to the child
 	if o.Mode != object_mode.ModeReindex &&
 		mutter != nil &&
 		ids.Equals(kinder.GetObjectId(), mutter.GetObjectId()) &&
@@ -198,13 +194,6 @@ func (s *Store) tryRealizeAndOrStore(
 			err = errors.Wrap(err)
 			return
 		}
-
-		if err = s.addToTomlIndexIfNecessary(kinder, o); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		err = nil
 	}
 
 	if o.Contains(object_mode.ModeLatest) {
@@ -493,10 +482,7 @@ func (s *Store) reindexOne(besty, sk *sku.Transacted) (err error) {
 		Mode: object_mode.ModeReindex,
 	}
 
-	if err = s.tryRealizeAndOrStore(
-		sk,
-		o,
-	); err != nil {
+	if err = s.tryRealizeAndOrStore(sk, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -7,36 +7,30 @@ import (
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/flags"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
 type Export struct {
 	AgeIdentity     age.Identity
 	CompressionType immutable_config.CompressionType
-	Genres          flags.ResettingFlag[ids.Genre, *ids.Genre]
 }
 
 func init() {
-	registerCommand(
+	registerCommandWithQuery(
 		"export",
-		func(f *flag.FlagSet) CommandWithResult {
+		func(f *flag.FlagSet) CommandWithQuery {
 			c := &Export{
 				CompressionType: immutable_config.CompressionTypeEmpty,
-				Genres: flags.MakeResettingFlag(
-					ids.MakeGenreAll(),
-				),
 			}
 
 			f.Var(&c.AgeIdentity, "age-identity", "")
-			f.Var(&c.Genres, "genres", "")
 			c.CompressionType.AddToFlagSet(f)
 
 			return c
@@ -44,55 +38,37 @@ func init() {
 	)
 }
 
-func (c Export) Run(u *env.Env, args ...string) (result Result) {
+func (c Export) DefaultSigil() ids.Sigil {
+	return ids.MakeSigil(ids.SigilHistory, ids.SigilHidden)
+}
+
+func (c Export) DefaultGenres() ids.Genre {
+	return ids.MakeGenre(genres.InventoryList)
+}
+
+func (c Export) RunWithQuery(u *env.Env, qg *query.Group) (err error) {
 	list := sku.MakeList()
 	var l sync.Mutex
 
-	addSku := func(sk *sku.Transacted) (err error) {
-		l.Lock()
-		defer l.Unlock()
+	if err = u.GetStore().QueryTransacted(
+		qg,
+		func(sk *sku.Transacted) (err error) {
+			l.Lock()
+			defer l.Unlock()
 
-		list.Add(sk.CloneTransacted())
+			list.Add(sk.CloneTransacted())
 
-		return
-	}
-
-	wg := quiter.MakeErrorWaitGroupParallel()
-
-	wg.Do(
-		func() error {
-			return u.GetStore().QueryPrimitive(
-				sku.MakePrimitiveQueryGroup(),
-				func(sk *sku.Transacted) (err error) {
-					if !c.Genres.GetFlag().Contains(sk.GetGenre()) {
-						return
-					}
-
-					return addSku(sk)
-				},
-			)
+			return
 		},
-	)
-
-	if c.Genres.GetFlag().Contains(genres.InventoryList) {
-		wg.Do(
-			func() error {
-				return u.GetStore().GetInventoryListStore().ReadAll(
-					addSku,
-				)
-			},
-		)
-	}
-
-	if result.Error = wg.GetError(); result.Error != nil {
-		result.Error = errors.Wrap(result.Error)
+	); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
 	var ag age.Age
 
-	if result.Error = ag.AddIdentity(c.AgeIdentity); result.Error != nil {
-		result.Error = errors.Wrapf(result.Error, "age-identity: %q", &c.AgeIdentity)
+	if err = ag.AddIdentity(c.AgeIdentity); err != nil {
+		err = errors.Wrapf(err, "age-identity: %q", &c.AgeIdentity)
 		return
 	}
 
@@ -104,15 +80,15 @@ func (c Export) Run(u *env.Env, args ...string) (result Result) {
 		Writer:          u.Out(),
 	}
 
-	if wc, result.Error = fs_home.NewWriter(o); result.Error != nil {
-		result.Error = errors.Wrap(result.Error)
+	if wc, err = fs_home.NewWriter(o); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&result.Error, wc)
+	defer errors.DeferredCloser(&err, wc)
 
 	bw := bufio.NewWriter(wc)
-	defer errors.DeferredFlusher(&result.Error, bw)
+	defer errors.DeferredFlusher(&err, bw)
 
 	printer := u.MakePrinterBoxArchive(bw, u.GetConfig().PrintOptions.PrintTime)
 
@@ -126,8 +102,8 @@ func (c Export) Run(u *env.Env, args ...string) (result Result) {
 			break
 		}
 
-		if result.Error = printer(sk); result.Error != nil {
-			result.Error = errors.Wrap(result.Error)
+		if err = printer(sk); err != nil {
+			err = errors.Wrap(err)
 			return
 		}
 	}

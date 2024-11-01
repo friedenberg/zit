@@ -17,6 +17,8 @@ teardown() {
 function reindex_simple { # @test
 	run_zit reindex
 	assert_success
+  run_zit show +t,e,z,konfig
+	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
 		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -61,9 +63,13 @@ function reindex_simple_twice { # @test
 
 	run_zit reindex
 	assert_success
+  run_zit show +e,t,z,konfig
+	assert_success
 	assert_output_unsorted - <"$expected"
 
 	run_zit reindex
+	assert_success
+  run_zit show +e,t,z,konfig
 	assert_success
 	assert_output_unsorted - <"$expected"
 }
@@ -108,6 +114,8 @@ function reindex_after_changes { # @test
 	verify
 
 	run_zit reindex
+	assert_success
+  run_zit show +e,t,z,konfig
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]

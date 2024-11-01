@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -41,6 +42,14 @@ func (s *Store) FlushInventoryList(
 	}
 
 	if inventoryListSku != nil {
+		if err = s.GetStreamIndex().Add(
+			inventoryListSku,
+			inventoryListSku.GetObjectId().String(),
+			object_mode.ModeLatest,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 		defer sku.GetTransactedPool().Put(inventoryListSku)
 
 		if s.GetKonfig().PrintOptions.PrintBestandsaufnahme {
