@@ -55,10 +55,10 @@ setup() {
 	EOM
 
 	cat >md.type <<-EOM
-		inline-akte = false
+		binary = true
 		vim-syntax-type = "test"
 	EOM
-
+ 
 	cat >zz-archive.tag <<-EOM
 		hide = true
 	EOM
@@ -137,7 +137,7 @@ function checkin_simple_all { # @test
 	run_zit checkin .
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
+		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b]
 		[etikett-one @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[etikett-two @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -149,7 +149,7 @@ function checkin_simple_all { # @test
 	run_zit show -format log :?z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
+		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b]
 		[etikett-one @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[etikett-two @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -168,7 +168,7 @@ function checkin_simple_all_dry_run { # @test
 	run_zit checkin -dry-run .
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
+		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b]
 		[etikett-one @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[etikett-two @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -195,19 +195,19 @@ function checkin_simple_typ { # @test
 	run_zit checkin .t
 	assert_success
 	assert_output - <<-EOM
-		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
+		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b]
 	EOM
 
 	run_zit last -format box-archive
 	assert_success
 	assert_output - <<-EOM
-		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
+		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b]
 	EOM
 
 	run_zit show !md:t
 	assert_success
 	assert_output - <<-EOM
-		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
+		[!md @77f414a7068e223113928615caf1b11edd5bd6e8312eea8cdbaff37084b1d10b]
 	EOM
 
 	run_zit show -format type.vim-syntax-type !md:typ
