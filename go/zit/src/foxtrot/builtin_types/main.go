@@ -3,13 +3,18 @@ package builtin_types
 import "code.linenisgreat.com/zit/go/zit/src/echo/ids"
 
 const (
-	TypeTypeV0     = "toml-type-v0"
-	TypeTypeV1     = "toml-type-v1"
-	TypeTypeLatest = TypeTypeV1
+	TagTypeTomlV0        = "toml-tag-v0"
+	TagTypeTomlV1        = "toml-tag-v1"
+	TagTypeLuaV1         = "lua-tag-v1"
+	TagTypeLatestDefault = TagTypeTomlV1
 
-	ConfigTypeV0     = "toml-config-v0"
-	ConfigTypeV1     = "toml-config-v1"
-	ConfigTypeLatest = ConfigTypeV1
+	TypeTypeTomlV0        = "toml-type-v0"
+	TypeTypeTomlV1        = "toml-type-v1"
+	TypeTypeLatestDefault = TypeTypeTomlV1
+
+	ConfigTypeTomlV0        = "toml-config-v0"
+	ConfigTypeTomlV1        = "toml-config-v1"
+	ConfigTypeLatestDefault = ConfigTypeTomlV1
 )
 
 var (
@@ -19,10 +24,13 @@ var (
 
 func init() {
 	allMap = map[string]struct{}{
-		TypeTypeV0:   {},
-		TypeTypeV1:   {},
-		ConfigTypeV0: {},
-		ConfigTypeV1: {},
+		TagTypeTomlV0:    {},
+		TagTypeTomlV1:    {},
+		TagTypeLuaV1:     {},
+		TypeTypeTomlV0:   {},
+		TypeTypeTomlV1:   {},
+		ConfigTypeTomlV0: {},
+		ConfigTypeTomlV1: {},
 	}
 
 	for k := range allMap {

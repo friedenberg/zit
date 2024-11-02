@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -23,25 +23,25 @@ type FileEncoder interface {
 }
 
 type fileEncoder struct {
-	mode    int
-	perm    os.FileMode
-	fs_home fs_home.Home
-	ic      ids.InlineTypeChecker
+	mode      int
+	perm      os.FileMode
+	dirLayout dir_layout.DirLayout
+	ic        ids.InlineTypeChecker
 
 	object_metadata.TextFormatterFamily
 }
 
 func MakeFileEncoder(
-	fs_home fs_home.Home,
+	dirLayout dir_layout.DirLayout,
 	ic ids.InlineTypeChecker,
 ) *fileEncoder {
 	return &fileEncoder{
-		mode:    os.O_WRONLY | os.O_CREATE | os.O_TRUNC,
-		perm:    0o666,
-		fs_home: fs_home,
-		ic:      ic,
+		mode:      os.O_WRONLY | os.O_CREATE | os.O_TRUNC,
+		perm:      0o666,
+		dirLayout: dirLayout,
+		ic:        ic,
 		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
-			fs_home,
+			dirLayout,
 			nil,
 		),
 	}
@@ -83,7 +83,7 @@ func (e *fileEncoder) EncodeObject(
 
 	var ar sha.ReadCloser
 
-	if ar, err = e.fs_home.BlobReader(z.GetBlobSha()); err != nil {
+	if ar, err = e.dirLayout.BlobReader(z.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -101,7 +101,7 @@ func (e *fileEncoder) EncodeObject(
 				if errors.IsExist(err) {
 					var aw sha.WriteCloser
 
-					if aw, err = e.fs_home.BlobWriter(); err != nil {
+					if aw, err = e.dirLayout.BlobWriter(); err != nil {
 						err = errors.Wrap(err)
 						return
 					}

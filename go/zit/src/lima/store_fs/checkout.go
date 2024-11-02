@@ -289,13 +289,13 @@ func (s *Store) filenameForTransacted(
 	options checkout_options.Options,
 	sz *sku.Transacted,
 ) (originalFilename string, filename string, err error) {
-	dir := s.fs_home.Cwd()
+	dir := s.dirLayout.Cwd()
 
 	switch options.Path {
 	case checkout_options.PathTempLocal:
 		var f *os.File
 
-		if f, err = s.fs_home.TempLocal.FileTemp(); err != nil {
+		if f, err = s.dirLayout.TempLocal.FileTemp(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -354,7 +354,7 @@ func (s *Store) RemoveItem(i *Item) (err error) {
 	// TODO check conflict state
 	if err = i.MutableSetLike.Each(
 		func(f *fd.FD) (err error) {
-			if err = f.Remove(s.fs_home); err != nil {
+			if err = f.Remove(s.dirLayout); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

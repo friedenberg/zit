@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	TypeV0     = builtin_types.ConfigTypeV0
-	TypeV1     = builtin_types.ConfigTypeV1
-	TypeLatest = builtin_types.ConfigTypeLatest
+	TypeV0     = builtin_types.ConfigTypeTomlV0
+	TypeV1     = builtin_types.ConfigTypeTomlV1
+	TypeLatest = builtin_types.ConfigTypeLatestDefault
 )
 
 type Blob interface {

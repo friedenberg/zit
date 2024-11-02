@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
@@ -50,10 +50,10 @@ func Run(
 		return
 	}
 
-	var primitiveFSHome fs_home.Primitive
+	var primitiveFSHome dir_layout.Primitive
 	var err error
 
-	if primitiveFSHome, err = fs_home.MakePrimitive(konfigCli.Debug); err != nil {
+	if primitiveFSHome, err = dir_layout.MakePrimitive(konfigCli.Debug); err != nil {
 		cancel(errors.Wrap(err))
 		return
 	}

@@ -4,24 +4,24 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type probe_index struct {
-	fs_home fs_home.Home
+	directoryLayout dir_layout.DirLayout
 	object_probe_index.Index
 }
 
 func (s *probe_index) Initialize(
-	fs_home fs_home.Home,
+	directoryLayout dir_layout.DirLayout,
 ) (err error) {
-	s.fs_home = fs_home
+	s.directoryLayout = directoryLayout
 
 	if s.Index, err = object_probe_index.MakeNoDuplicates(
-		s.fs_home,
-		s.fs_home.DirCacheObjectPointers(),
+		s.directoryLayout,
+		s.directoryLayout.DirCacheObjectPointers(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
@@ -30,7 +30,7 @@ type Store struct {
 	config              sku.Config
 	deletedPrinter      interfaces.FuncIter[*fd.FD]
 	metadataTextParser  object_metadata.TextParser
-	fs_home             fs_home.Home
+	dirLayout             dir_layout.DirLayout
 	fileEncoder         FileEncoder
 	ic                  ids.InlineTypeChecker
 	fileExtensions      file_extensions.FileExtensions
@@ -73,7 +73,7 @@ func (fs *Store) Flush() (err error) {
 
 	if err = deleteOp.Run(
 		fs.config.IsDryRun(),
-		fs.fs_home,
+		fs.dirLayout,
 		fs.deletedPrinter,
 		fs.deleted,
 	); err != nil {
@@ -190,7 +190,7 @@ func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err e
 
 	var fdee *fd.FD
 
-	if fdee, err = fd.MakeFromPath(v, s.fs_home); err != nil {
+	if fdee, err = fd.MakeFromPath(v, s.dirLayout); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

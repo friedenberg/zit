@@ -7,33 +7,33 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 )
 
 func Make(
 	t *test_logz.T,
 	contents map[string]string,
-) (f fs_home.Home) {
+) (f dir_layout.DirLayout) {
 	t = t.Skip(1)
 
 	p := t.TempDir()
 
-	var primitive fs_home.Primitive
+	var primitive dir_layout.Primitive
 
 	var err error
 
-	if primitive, err = fs_home.MakePrimitiveWithHome(p, debug.Options{}); err != nil {
-		t.Fatalf("failed to make fs_home.Primitive: %s", err)
+	if primitive, err = dir_layout.MakePrimitiveWithHome(p, debug.Options{}); err != nil {
+		t.Fatalf("failed to make dir_layout.Primitive: %s", err)
 	}
 
-	if f, err = fs_home.Make(
-		fs_home.Options{
+	if f, err = dir_layout.Make(
+		dir_layout.Options{
 			BasePath:             p,
 			PermitNoZitDirectory: true,
 		},
 		primitive,
 	); err != nil {
-		t.Fatalf("failed to make fs_home: %s", err)
+		t.Fatalf("failed to make dir_layout: %s", err)
 	}
 
 	if contents == nil {

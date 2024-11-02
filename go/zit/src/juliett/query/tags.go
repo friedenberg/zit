@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -86,7 +86,7 @@ func (sch *Tags) ContainsSku(sk *sku.Transacted) bool {
 	return false
 }
 
-func (sch *Tags) Load(s fs_home.Home) (err error) {
+func (sch *Tags) Load(s dir_layout.DirLayout) (err error) {
 	var f *os.File
 
 	p := s.FileTags()
@@ -114,7 +114,7 @@ func (sch *Tags) Load(s fs_home.Home) (err error) {
 }
 
 func (sch *Tags) Flush(
-	s fs_home.Home,
+	s dir_layout.DirLayout,
 	printerHeader interfaces.FuncIter[string],
 	dryRun bool,
 ) (err error) {

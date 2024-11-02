@@ -4,14 +4,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 )
 
 type BlobStore[
 	A interfaces.Blob[A],
 	APtr interfaces.BlobPtr[A],
 ] struct {
-	fs_home fs_home.Home
+	dirLayout dir_layout.DirLayout
 	Format[A, APtr]
 	resetFunc func(APtr)
 }
@@ -20,12 +20,12 @@ func MakeBlobStore[
 	A interfaces.Blob[A],
 	APtr interfaces.BlobPtr[A],
 ](
-	st fs_home.Home,
+	st dir_layout.DirLayout,
 	format Format[A, APtr],
 	resetFunc func(APtr),
 ) (s *BlobStore[A, APtr]) {
 	s = &BlobStore[A, APtr]{
-		fs_home:   st,
+		dirLayout: st,
 		Format:    format,
 		resetFunc: resetFunc,
 	}
@@ -38,7 +38,7 @@ func (s *BlobStore[A, APtr]) GetBlob(
 ) (a APtr, err error) {
 	var ar interfaces.ShaReadCloser
 
-	if ar, err = s.fs_home.BlobReader(sh); err != nil {
+	if ar, err = s.dirLayout.BlobReader(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -73,7 +73,7 @@ func (h *BlobStore[A, APtr]) SaveBlobText(
 ) (sh interfaces.Sha, n int64, err error) {
 	var w sha.WriteCloser
 
-	if w, err = h.fs_home.BlobWriter(); err != nil {
+	if w, err = h.dirLayout.BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

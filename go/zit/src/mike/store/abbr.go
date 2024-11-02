@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/tridex"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -36,9 +36,9 @@ type indexAbbrEncodableTridexes struct {
 type indexAbbr struct {
 	options_print.General
 
-	lock    sync.Locker
-	once    *sync.Once
-	fs_home fs_home.Home
+	lock      sync.Locker
+	once      *sync.Once
+	dirLayout dir_layout.DirLayout
 
 	path string
 
@@ -50,15 +50,15 @@ type indexAbbr struct {
 
 func newIndexAbbr(
 	options options_print.General,
-	fs_home fs_home.Home,
+	dirLayout dir_layout.DirLayout,
 	p string,
 ) (i *indexAbbr, err error) {
 	i = &indexAbbr{
-		General: options,
-		lock:    &sync.Mutex{},
-		once:    &sync.Once{},
-		path:    p,
-		fs_home: fs_home,
+		General:   options,
+		lock:      &sync.Mutex{},
+		once:      &sync.Once{},
+		path:      p,
+		dirLayout: dirLayout,
 		indexAbbrEncodableTridexes: indexAbbrEncodableTridexes{
 			Shas: indexNotZettelId[sha.Sha, *sha.Sha]{
 				ObjectIds: tridex.Make(),
@@ -87,7 +87,7 @@ func (i *indexAbbr) Flush() (err error) {
 
 	var w1 io.WriteCloser
 
-	if w1, err = i.fs_home.WriteCloserCache(i.path); err != nil {
+	if w1, err = i.dirLayout.WriteCloserCache(i.path); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -121,7 +121,7 @@ func (i *indexAbbr) readIfNecessary() (err error) {
 
 			var r1 io.ReadCloser
 
-			if r1, err = i.fs_home.ReadCloserCache(i.path); err != nil {
+			if r1, err = i.dirLayout.ReadCloserCache(i.path); err != nil {
 				if errors.IsNotExist(err) {
 					err = nil
 				} else {

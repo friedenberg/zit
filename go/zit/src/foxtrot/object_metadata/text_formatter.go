@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 )
 
 type textFormatter struct {
@@ -15,11 +15,11 @@ type textFormatter struct {
 }
 
 func MakeTextFormatterMetadataBlobPath(
-	fs_home fs_home.Home,
+	dirLayout dir_layout.DirLayout,
 	blobFormatter script_config.RemoteScript,
 ) textFormatter {
 	common := textFormatterCommon{
-		fs_home:       fs_home,
+		dirLayout:     dirLayout,
 		blobFormatter: blobFormatter,
 	}
 
@@ -36,11 +36,11 @@ func MakeTextFormatterMetadataBlobPath(
 }
 
 func MakeTextFormatterMetadataOnly(
-	fs_home fs_home.Home,
+	dirLayout dir_layout.DirLayout,
 	blobFormatter script_config.RemoteScript,
 ) textFormatter {
 	common := textFormatterCommon{
-		fs_home:       fs_home,
+		dirLayout:     dirLayout,
 		blobFormatter: blobFormatter,
 	}
 
@@ -57,11 +57,11 @@ func MakeTextFormatterMetadataOnly(
 }
 
 func MakeTextFormatterMetadataInlineBlob(
-	fs_home fs_home.Home,
+	dirLayout dir_layout.DirLayout,
 	blobFormatter script_config.RemoteScript,
 ) textFormatter {
 	common := textFormatterCommon{
-		fs_home:       fs_home,
+		dirLayout:     dirLayout,
 		blobFormatter: blobFormatter,
 	}
 
@@ -80,11 +80,11 @@ func MakeTextFormatterMetadataInlineBlob(
 }
 
 func MakeTextFormatterExcludeMetadata(
-	fs_home fs_home.Home,
+	dirLayout dir_layout.DirLayout,
 	blobFormatter script_config.RemoteScript,
 ) textFormatter {
 	common := textFormatterCommon{
-		fs_home:       fs_home,
+		dirLayout:     dirLayout,
 		blobFormatter: blobFormatter,
 	}
 

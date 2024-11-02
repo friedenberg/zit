@@ -153,7 +153,7 @@ func (s *Store) tryPreCommitHooks(
 	script, _ := blob.Hooks.(string)
 
 	hooks = append(hooks, hook{script: script, description: "typ"})
-	hooks = append(hooks, hook{script: s.GetKonfig().Hooks, description: "erworben"})
+	hooks = append(hooks, hook{script: s.GetConfig().Hooks, description: "erworben"})
 
 	for _, h := range hooks {
 		if h.script == "" {

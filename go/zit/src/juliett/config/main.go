@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	pkg_angeboren "code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -101,7 +101,7 @@ type compiled struct {
 }
 
 func (c *Compiled) Initialize(
-	s fs_home.Home,
+	s dir_layout.DirLayout,
 	kcli mutable_config_blobs.Cli,
 	dormant *dormant_index.Index,
 ) (err error) {

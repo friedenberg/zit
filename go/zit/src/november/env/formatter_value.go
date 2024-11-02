@@ -214,7 +214,7 @@ func (u *Env) MakeFormatFunc(
 
 	case "text":
 		fo := blob_store.MakeTextFormatter(
-			u.GetStore().GetStandort(),
+			u.GetStore().GetDirectoryLayout(),
 			checkout_options.TextFormatterOptions{
 				DoNotWriteEmptyDescription: true,
 			},
@@ -374,7 +374,7 @@ func (u *Env) MakeFormatFunc(
 		f = func(o *sku.Transacted) (err error) {
 			var j sku_fmt.Json
 
-			if err = j.FromTransacted(o, u.GetStore().GetStandort()); err != nil {
+			if err = j.FromTransacted(o, u.GetStore().GetDirectoryLayout()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -398,7 +398,7 @@ func (u *Env) MakeFormatFunc(
 		f = func(o *sku.Transacted) (err error) {
 			var j tomlJson
 
-			if err = j.FromTransacted(o, u.GetStore().GetStandort()); err != nil {
+			if err = j.FromTransacted(o, u.GetStore().GetDirectoryLayout()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -451,7 +451,7 @@ func (u *Env) MakeFormatFunc(
 
 			if j, err = sku_fmt.MakeJsonTomlBookmark(
 				o,
-				u.GetStore().GetStandort(),
+				u.GetStore().GetDirectoryLayout(),
 				tabs,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -476,7 +476,7 @@ func (u *Env) MakeFormatFunc(
 		f = func(o *sku.Transacted) (err error) {
 			var r sha.ReadCloser
 
-			if r, err = u.GetStore().GetStandort().BlobReader(
+			if r, err = u.GetStore().GetDirectoryLayout().BlobReader(
 				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -497,7 +497,7 @@ func (u *Env) MakeFormatFunc(
 		f = func(o *sku.Transacted) (err error) {
 			var r sha.ReadCloser
 
-			if r, err = u.GetStore().GetStandort().BlobReader(
+			if r, err = u.GetStore().GetDirectoryLayout().BlobReader(
 				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -520,7 +520,7 @@ func (u *Env) MakeFormatFunc(
 		f = func(o *sku.Transacted) (err error) {
 			var r sha.ReadCloser
 
-			if r, err = u.GetStore().GetStandort().BlobReader(
+			if r, err = u.GetStore().GetDirectoryLayout().BlobReader(
 				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -666,7 +666,7 @@ func (u *Env) MakeFormatFunc(
 
 			var r sha.ReadCloser
 
-			if r, err = u.GetStore().GetStandort().BlobReader(
+			if r, err = u.GetStore().GetDirectoryLayout().BlobReader(
 				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -701,7 +701,7 @@ func (u *Env) MakeFormatFunc(
 
 			var r sha.ReadCloser
 
-			if r, err = u.GetStore().GetStandort().BlobReader(
+			if r, err = u.GetStore().GetDirectoryLayout().BlobReader(
 				o.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)

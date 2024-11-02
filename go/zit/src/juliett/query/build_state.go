@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/tag_blobs"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -427,8 +427,8 @@ func (b *buildState) makeTagOrLuaTag(
 	if sk.GetType().String() == "lua" {
 		var ar sha.ReadCloser
 
-		if ar, err = b.builder.fs_home.BlobReader(sk.GetBlobSha()); err != nil {
-			var errBlobMissing fs_home.ErrBlobMissing
+		if ar, err = b.builder.dirLayout.BlobReader(sk.GetBlobSha()); err != nil {
+			var errBlobMissing dir_layout.ErrBlobMissing
 
 			if errors.As(err, &errBlobMissing) {
 				b.missingBlobs = append(
@@ -451,9 +451,9 @@ func (b *buildState) makeTagOrLuaTag(
 
 		lb.WithReader(ar)
 	} else {
-		var blob *tag_blobs.V1
+		var blob *tag_blobs.TomlV1
 
-		if blob, err = b.builder.blob_store.GetTagV1().GetBlob(
+		if blob, err = b.builder.blob_store.GetTagTomlV1().GetBlob(
 			sk.GetBlobSha(),
 		); err != nil {
 			err = errors.Wrap(err)

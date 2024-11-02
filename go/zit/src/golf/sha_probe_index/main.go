@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 )
 
 type (
@@ -43,7 +43,7 @@ type object_probe_index struct {
 }
 
 func MakePermitDuplicates(
-	s fs_home.Home,
+	s dir_layout.DirLayout,
 	path string,
 ) (e *object_probe_index, err error) {
 	e = &object_probe_index{}
@@ -52,7 +52,7 @@ func MakePermitDuplicates(
 	return
 }
 
-func MakeNoDuplicates(s fs_home.Home, path string) (e *object_probe_index, err error) {
+func MakeNoDuplicates(s dir_layout.DirLayout, path string) (e *object_probe_index, err error) {
 	e = &object_probe_index{}
 	e.rowSize = RowSize
 	err = e.initialize(rowEqualerShaOnly{}, s, path)
@@ -61,7 +61,7 @@ func MakeNoDuplicates(s fs_home.Home, path string) (e *object_probe_index, err e
 
 func (e *object_probe_index) initialize(
 	equaler interfaces.Equaler1[*row],
-	s fs_home.Home,
+	s dir_layout.DirLayout,
 	path string,
 ) (err error) {
 	for i := range e.pages {

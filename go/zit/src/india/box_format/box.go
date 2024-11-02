@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -23,7 +23,7 @@ func MakeBox(
 	fieldsFormatWriter interfaces.StringFormatWriter[string_format_writer.Box],
 	abbr ids.Abbr,
 	fsItemReadWriter sku.FSItemReadWriter,
-	relativePath fs_home.RelativePath,
+	relativePath dir_layout.RelativePath,
 ) *Box {
 	return &Box{
 		ColorOptions:     co,
@@ -46,7 +46,7 @@ type Box struct {
 
 	ids.Abbr
 	FSItemReadWriter sku.FSItemReadWriter
-	fs_home.RelativePath
+	dir_layout.RelativePath
 }
 
 func (f *Box) SetMaxKopfUndSchwanz(k, s int) {

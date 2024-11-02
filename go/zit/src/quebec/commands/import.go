@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_fmt"
@@ -80,13 +80,13 @@ func (c Import) run(u *env.Env, args ...string) (err error) {
 
 	// setup inventory list reader
 	{
-		o := fs_home.FileReadOptions{
+		o := dir_layout.FileReadOptions{
 			Age:             &ag,
 			Path:            c.InventoryList,
 			CompressionType: c.CompressionType,
 		}
 
-		if rc, err = fs_home.NewFileReader(o); err != nil {
+		if rc, err = dir_layout.NewFileReader(o); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -124,7 +124,7 @@ func (c Import) run(u *env.Env, args ...string) (err error) {
 	}
 
 	if c.Blobs != "" {
-		importer.RemoteBlobStore = fs_home.MakeBlobStore(
+		importer.RemoteBlobStore = dir_layout.MakeBlobStore(
 			c.Blobs,
 			&ag,
 			c.CompressionType,

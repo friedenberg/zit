@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 )
 
 type page struct {
@@ -24,14 +24,14 @@ type page struct {
 	br         bufio.Reader
 	equaler    interfaces.Equaler1[*row]
 	added      addedMap
-	fs_home    fs_home.Home
+	dirLayout  dir_layout.DirLayout
 	searchFunc func(*sha.Sha) (mid int64, err error)
 	rowSize    int
 }
 
 func (p *page) initialize(
 	equaler interfaces.Equaler1[*row],
-	s fs_home.Home,
+	s dir_layout.DirLayout,
 	pid sha.PageId,
 	rowSize int,
 ) (err error) {
@@ -45,7 +45,7 @@ func (p *page) initialize(
 	// 	rowResetter{},
 	// )
 
-	p.fs_home = s
+	p.dirLayout = s
 	p.PageId = pid
 
 	p.rowSize = rowSize
@@ -293,7 +293,7 @@ func (e *page) Flush() (err error) {
 
 	var ft *os.File
 
-	if ft, err = e.fs_home.TempLocal.FileTemp(); err != nil {
+	if ft, err = e.dirLayout.TempLocal.FileTemp(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

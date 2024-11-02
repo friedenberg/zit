@@ -235,7 +235,7 @@ func (s *Store) MergeConflicted(
 func (s *Store) RunMergeTool(
 	tm sku.Conflicted,
 ) (err error) {
-	tool := s.GetKonfig().ToolOptions.Merge
+	tool := s.GetConfig().ToolOptions.Merge
 
 	switch tm.GetSkuExternalLike().GetRepoId().GetRepoIdString() {
 	case "browser":

@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -25,13 +25,13 @@ import (
 )
 
 type Store struct {
-	fs_home fs_home.Home
-	ls      interfaces.LockSmith
-	sv      interfaces.StoreVersion
-	of      interfaces.ObjectIOFactory
-	af      interfaces.BlobIOFactory
-	clock   ids.Clock
-	pool    interfaces.Pool[sku.List, *sku.List]
+	dirLayout dir_layout.DirLayout
+	ls        interfaces.LockSmith
+	sv        interfaces.StoreVersion
+	of        interfaces.ObjectIOFactory
+	af        interfaces.BlobIOFactory
+	clock     ids.Clock
+	pool      interfaces.Pool[sku.List, *sku.List]
 
 	object_format object_inventory_format.Format
 	options       object_inventory_format.Options
@@ -41,7 +41,7 @@ type Store struct {
 }
 
 func (s *Store) Initialize(
-	fs_home fs_home.Home,
+	dirLayout dir_layout.DirLayout,
 	ls interfaces.LockSmith,
 	sv interfaces.StoreVersion,
 	of interfaces.ObjectIOFactory,
@@ -55,7 +55,7 @@ func (s *Store) Initialize(
 	op := object_inventory_format.Options{Tai: true}
 
 	*s = Store{
-		fs_home:       fs_home,
+		dirLayout:     dirLayout,
 		ls:            ls,
 		sv:            sv,
 		of:            of,
@@ -117,7 +117,7 @@ func (s *Store) Create(
 	if o.Len() > 0 {
 		var wc interfaces.ShaWriteCloser
 
-		if wc, err = s.fs_home.BlobWriter(); err != nil {
+		if wc, err = s.dirLayout.BlobWriter(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -374,7 +374,7 @@ func (s *Store) ReadAll(
 ) (err error) {
 	var p string
 
-	if p, err = s.fs_home.DirObjectGenre(
+	if p, err = s.dirLayout.DirObjectGenre(
 		genres.InventoryList,
 	); err != nil {
 		err = errors.Wrap(err)

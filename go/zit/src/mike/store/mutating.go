@@ -36,7 +36,7 @@ func (s *Store) tryRealize(
 
 	if genres.Type == el.GetSku().GetGenre() {
 		if el.GetSku().GetType().IsEmpty() {
-			if err = el.GetSku().Metadata.Type.Set(builtin_types.TypeTypeLatest); err != nil {
+			if err = el.GetSku().Metadata.Type.Set(builtin_types.TypeTypeLatestDefault); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -86,7 +86,7 @@ func (s *Store) tryRealizeAndOrStore(
 
 	ui.Log().Printf("%s -> %s", o, kinder)
 
-	if !s.GetStandort().GetLockSmith().IsAcquired() &&
+	if !s.GetDirectoryLayout().GetLockSmith().IsAcquired() &&
 		o.ContainsAny(
 			object_mode.ModeAddToInventoryList,
 		) {
@@ -172,7 +172,7 @@ func (s *Store) tryRealizeAndOrStore(
 		return
 	}
 
-	if err = s.GetKonfig().ApplyDormantAndRealizeTags(
+	if err = s.GetConfig().ApplyDormantAndRealizeTags(
 		kinder,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -180,7 +180,7 @@ func (s *Store) tryRealizeAndOrStore(
 	}
 
 	if o.Mode.Contains(object_mode.ModeLatest) {
-		if err = s.GetKonfig().AddTransacted(
+		if err = s.GetConfig().AddTransacted(
 			kinder,
 			mutter,
 			s.GetBlobStore(),
@@ -332,7 +332,7 @@ func (s *Store) createTagsOrType(k *ids.ObjectId) (err error) {
 		return
 
 	case genres.Type:
-		if err = t.Metadata.Type.Set(builtin_types.TypeTypeLatest); err != nil {
+		if err = t.Metadata.Type.Set(builtin_types.TypeTypeLatestDefault); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -5,21 +5,21 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 )
 
 func MakeBuilder(
-	s fs_home.Home,
+	s dir_layout.DirLayout,
 	blob_store *blob_store.VersionedStores,
 	object_probe_index sku.ObjectProbeIndex,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
 	repoGetter sku.ExternalStoreForQueryGetter,
 ) (b *Builder) {
 	b = &Builder{
-		fs_home:               s,
+		dirLayout:             s,
 		blob_store:            blob_store,
 		object_probe_index:    object_probe_index,
 		luaVMPoolBuilder:      luaVMPoolBuilder,
@@ -31,7 +31,7 @@ func MakeBuilder(
 }
 
 type Builder struct {
-	fs_home                 fs_home.Home
+	dirLayout               dir_layout.DirLayout
 	blob_store              *blob_store.VersionedStores
 	object_probe_index      sku.ObjectProbeIndex
 	luaVMPoolBuilder        *lua.VMPoolBuilder

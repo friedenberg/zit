@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 )
@@ -21,7 +21,7 @@ type BlobCopyResult struct {
 
 type Importer struct {
 	*Store
-	RemoteBlobStore    fs_home.BlobStore
+	RemoteBlobStore    dir_layout.BlobStore
 	BlobCopierDelegate interfaces.FuncIter[BlobCopyResult]
 	ErrPrinter         interfaces.FuncIter[*sku.CheckedOut]
 }
@@ -155,12 +155,12 @@ func (c Importer) importBlobIfNecessary(
 
 	var n int64
 
-	if n, err = fs_home.CopyBlobIfNecessary(
-		c.GetStandort(),
+	if n, err = dir_layout.CopyBlobIfNecessary(
+		c.GetDirectoryLayout(),
 		c.RemoteBlobStore,
 		blobSha,
 	); err != nil {
-		if errors.Is(err, &fs_home.ErrAlreadyExists{}) {
+		if errors.Is(err, &dir_layout.ErrAlreadyExists{}) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)

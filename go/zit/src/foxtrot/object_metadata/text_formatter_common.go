@@ -11,12 +11,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type textFormatterCommon struct {
-	fs_home       fs_home.Home
+	dirLayout       dir_layout.DirLayout
 	blobFormatter script_config.RemoteScript
 }
 
@@ -147,7 +147,7 @@ func (f textFormatterCommon) writePathType(
 	}
 
 	if ap != "" {
-		ap = f.fs_home.RelToCwdOrSame(ap)
+		ap = f.dirLayout.RelToCwdOrSame(ap)
 	} else {
 		err = errors.Errorf("path not found in fields")
 		return
@@ -163,7 +163,7 @@ func (f textFormatterCommon) writeBlob(
 	var ar io.ReadCloser
 	m := c.GetMetadata()
 
-	if ar, err = f.fs_home.BlobReader(&m.Blob); err != nil {
+	if ar, err = f.dirLayout.BlobReader(&m.Blob); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -180,7 +180,7 @@ func (f textFormatterCommon) writeBlob(
 
 		if wt, err = script_config.MakeWriterToWithStdin(
 			f.blobFormatter,
-			f.fs_home.MakeCommonEnv(),
+			f.dirLayout.MakeCommonEnv(),
 			ar,
 		); err != nil {
 			err = errors.Wrap(err)

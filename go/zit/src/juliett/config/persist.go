@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
@@ -162,7 +162,7 @@ func (kc *compiled) setNeedsRecompile(reason string) {
 	kc.changes = append(kc.changes, reason)
 }
 
-func (kc *Compiled) loadMutableConfig(s fs_home.Home) (err error) {
+func (kc *Compiled) loadMutableConfig(s dir_layout.DirLayout) (err error) {
 	var f *os.File
 
 	p := s.FileConfigMutable()
@@ -190,7 +190,7 @@ func (kc *Compiled) loadMutableConfig(s fs_home.Home) (err error) {
 }
 
 func (kc *Compiled) Flush(
-	s fs_home.Home,
+	s dir_layout.DirLayout,
 	blobStore *blob_store.VersionedStores,
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
@@ -219,7 +219,7 @@ func (kc *Compiled) Flush(
 }
 
 func (kc *Compiled) flushMutableConfig(
-	s fs_home.Home,
+	s dir_layout.DirLayout,
 	blobStore *blob_store.VersionedStores,
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {

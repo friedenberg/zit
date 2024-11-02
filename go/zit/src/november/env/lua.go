@@ -84,7 +84,7 @@ func (s *Env) LuaRequire(ls *lua.LState) int {
 
 	var ar sha.ReadCloser
 
-	if ar, err = s.GetStore().GetStandort().BlobReader(
+	if ar, err = s.GetStore().GetDirectoryLayout().BlobReader(
 		sk.GetBlobSha(),
 	); err != nil {
 		panic(err)

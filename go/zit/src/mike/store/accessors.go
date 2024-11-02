@@ -2,7 +2,7 @@ package store
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/zettel_id_index"
@@ -61,11 +61,11 @@ func (s *Store) GetZettelIdIndex() zettel_id_index.Index {
 	return s.zettelIdIndex
 }
 
-func (s *Store) GetStandort() fs_home.Home {
-	return s.fs_home
+func (s *Store) GetDirectoryLayout() dir_layout.DirLayout {
+	return s.dirLayout
 }
 
-func (s *Store) GetKonfig() *config.Compiled {
+func (s *Store) GetConfig() *config.Compiled {
 	return s.config
 }
 

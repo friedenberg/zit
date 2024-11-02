@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/zettel_id_index"
@@ -27,7 +27,7 @@ import (
 type Store struct {
 	sunrise ids.Tai
 	config  *config.Compiled
-	fs_home fs_home.Home
+	dirLayout dir_layout.DirLayout
 
 	cwdFiles           *store_fs.Store
 	externalStores     map[ids.RepoId]*external_store.Store
@@ -59,7 +59,7 @@ type Logger struct {
 func (c *Store) Initialize(
 	flags *flag.FlagSet,
 	k *config.Compiled,
-	st fs_home.Home,
+	st dir_layout.DirLayout,
 	pmf object_inventory_format.Format,
 	t ids.Tai,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
@@ -68,7 +68,7 @@ func (c *Store) Initialize(
 	box *box_format.Box,
 ) (err error) {
 	c.config = k
-	c.fs_home = st
+	c.dirLayout = st
 	c.blob_store = blob_store.Make(st)
 	c.persistentObjectFormat = pmf
 	c.options = options
@@ -80,7 +80,7 @@ func (c *Store) Initialize(
 
 	if c.Abbr, err = newIndexAbbr(
 		k.PrintOptions,
-		c.fs_home,
+		c.dirLayout,
 		st.DirCache("Abbr"),
 	); err != nil {
 		err = errors.Wrapf(err, "failed to init abbr index")
@@ -88,11 +88,11 @@ func (c *Store) Initialize(
 	}
 
 	if err = c.inventoryListStore.Initialize(
-		c.GetStandort(),
-		c.GetStandort().GetLockSmith(),
+		c.GetDirectoryLayout(),
+		c.GetDirectoryLayout().GetLockSmith(),
 		c.config.GetStoreVersion(),
-		c.fs_home.ObjectReaderWriterFactory(genres.InventoryList),
-		c.fs_home,
+		c.dirLayout.ObjectReaderWriterFactory(genres.InventoryList),
+		c.dirLayout,
 		pmf,
 		c,
 		box,
@@ -102,18 +102,18 @@ func (c *Store) Initialize(
 	}
 
 	if c.zettelIdIndex, err = zettel_id_index.MakeIndex(
-		c.GetKonfig(),
-		c.GetStandort(),
-		c.GetStandort(),
+		c.GetConfig(),
+		c.GetDirectoryLayout(),
+		c.GetDirectoryLayout(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if c.streamIndex, err = stream_index.MakeIndex(
-		c.GetStandort(),
-		c.GetKonfig(),
-		c.GetStandort().DirCacheObjects(),
+		c.GetDirectoryLayout(),
+		c.GetConfig(),
+		c.GetDirectoryLayout().DirCacheObjects(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -126,10 +126,10 @@ func (c *Store) Initialize(
 
 	c.configBlobFormat = blob_store.MakeBlobFormat2(
 		blob_store.MakeTextParserIgnoreTomlErrors2[mutable_config_blobs.Blob](
-			c.GetStandort(),
+			c.GetDirectoryLayout(),
 		),
 		blob_store.ParsedBlobTomlFormatter2[mutable_config_blobs.Blob]{},
-		c.GetStandort(),
+		c.GetDirectoryLayout(),
 	)
 
 	return
@@ -148,8 +148,8 @@ func (s *Store) SetExternalStores(
 			FuncPrimitiveQuery: s.GetStreamIndex().ReadQuery,
 		}
 
-		es.Home = s.GetStandort()
-		es.DirCache = s.GetStandort().DirCacheRepo(k.GetRepoIdString())
+		es.DirLayout = s.GetDirectoryLayout()
+		es.DirCache = s.GetDirectoryLayout().DirCacheRepo(k.GetRepoIdString())
 
 		es.RepoId = k
 		es.Clock = s.sunrise

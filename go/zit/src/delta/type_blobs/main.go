@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	TypeV0     = builtin_types.TypeTypeV0
-	TypeV1     = builtin_types.TypeTypeV1
-	TypeLatest = builtin_types.TypeTypeLatest
+	TypeV0     = builtin_types.TypeTypeTomlV0
+	TypeV1     = builtin_types.TypeTypeTomlV1
+	TypeLatest = builtin_types.TypeTypeLatestDefault
 )
 
 func Default() (t TomlV1) {

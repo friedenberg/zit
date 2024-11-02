@@ -13,8 +13,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
@@ -30,7 +30,7 @@ type dirItems struct {
 	rootProcessed bool
 
 	file_extensions.FileExtensions
-	fs_home               fs_home.Home
+	dirLayout             dir_layout.DirLayout
 	externalStoreSupplies external_store.Supplies
 
 	objects         interfaces.MutableSetLike[*Item]
@@ -44,11 +44,11 @@ type dirItems struct {
 func makeObjectsWithDir(
 	p string,
 	fe file_extensions.FileExtensions,
-	fs_home fs_home.Home,
+	fs_home dir_layout.DirLayout,
 ) (d dirItems) {
 	d.root = p
 	d.FileExtensions = fe
-	d.fs_home = fs_home
+	d.dirLayout = fs_home
 	d.objects = collections_value.MakeMutableValueSet[*Item](nil)
 	d.blobs = collections_value.MakeMutableValueSet[*Item](nil)
 	d.shasToBlobFDs = make(map[sha.Bytes]interfaces.MutableSetLike[*Item])
@@ -119,7 +119,7 @@ func (d *dirItems) addPathAndDirEntry(
 
 	var fdee *fd.FD
 
-	if fdee, err = fd.MakeFromPathAndDirEntry(p, de, d.fs_home); err != nil {
+	if fdee, err = fd.MakeFromPathAndDirEntry(p, de, d.dirLayout); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

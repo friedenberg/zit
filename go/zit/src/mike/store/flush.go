@@ -16,11 +16,11 @@ import (
 func (s *Store) FlushInventoryList(
 	p interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	if s.GetKonfig().DryRun {
+	if s.GetConfig().DryRun {
 		return
 	}
 
-	if !s.GetStandort().GetLockSmith().IsAcquired() {
+	if !s.GetDirectoryLayout().GetLockSmith().IsAcquired() {
 		return
 	}
 
@@ -30,7 +30,7 @@ func (s *Store) FlushInventoryList(
 
 	if inventoryListSku, err = s.GetInventoryListStore().Create(
 		s.inventoryList,
-		s.GetKonfig().Description,
+		s.GetConfig().Description,
 	); err != nil {
 		if errors.Is(err, inventory_list_store.ErrEmpty) {
 			ui.Log().Printf("Bestandsaufnahme was empty")
@@ -52,7 +52,7 @@ func (s *Store) FlushInventoryList(
 		}
 		defer sku.GetTransactedPool().Put(inventoryListSku)
 
-		if s.GetKonfig().PrintOptions.PrintBestandsaufnahme {
+		if s.GetConfig().PrintOptions.PrintBestandsaufnahme {
 			if err = p(inventoryListSku); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -76,13 +76,13 @@ func (c *Store) Flush(
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	// TODO handle flushes with dry run
-	if c.GetKonfig().DryRun {
+	if c.GetConfig().DryRun {
 		return
 	}
 
 	wg := quiter.MakeErrorWaitGroupParallel()
 
-	if c.GetStandort().GetLockSmith().IsAcquired() {
+	if c.GetDirectoryLayout().GetLockSmith().IsAcquired() {
 		gob.Register(quiter.StringerKeyerPtr[ids.Type, *ids.Type]{}) // TODO check if can be removed
 		wg.Do(func() error { return c.streamIndex.Flush(printerHeader) })
 		wg.Do(c.GetAbbrStore().Flush)

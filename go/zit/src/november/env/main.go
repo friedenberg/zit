@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
@@ -40,8 +40,8 @@ type Env struct {
 	outIsTty bool
 	errIsTty bool
 
-	primitiveFSHome fs_home.Primitive
-	fsHome          fs_home.Home
+	primitiveFSHome dir_layout.Primitive
+	fsHome          dir_layout.DirLayout
 	cliConfig       mutable_config_blobs.Cli
 	config          config.Compiled
 	dormantIndex    dormant_index.Index
@@ -60,7 +60,7 @@ func Make(
 	flags *flag.FlagSet,
 	kCli mutable_config_blobs.Cli,
 	options Options,
-	primitiveFSHome fs_home.Primitive,
+	primitiveFSHome dir_layout.Primitive,
 ) (u *Env, err error) {
 	u = &Env{
 		in:              os.Stdin,
@@ -116,11 +116,11 @@ func (u *Env) Initialize(options Options) (err error) {
 			ui.SetTodoOn()
 		}
 
-		standortOptions := fs_home.Options{
+		standortOptions := dir_layout.Options{
 			BasePath: u.cliConfig.BasePath,
 		}
 
-		if u.fsHome, err = fs_home.Make(
+		if u.fsHome, err = dir_layout.Make(
 			standortOptions,
 			u.primitiveFSHome,
 		); err != nil {

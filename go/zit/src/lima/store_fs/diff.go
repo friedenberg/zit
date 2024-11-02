@@ -33,7 +33,7 @@ func (s *Store) runDiff3(left, middle, right *fd.FD) (path string, err error) {
 
 	var f *os.File
 
-	if f, err = s.fs_home.TempLocal.FileTemp(); err != nil {
+	if f, err = s.dirLayout.TempLocal.FileTemp(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -30,7 +30,7 @@ type Page struct {
 	added, addedLatest *sku.TransactedHeap
 	flushMode          object_mode.Mode
 	hasChanges         bool
-	fs_home            fs_home.Home
+	directoryLayout    dir_layout.DirLayout
 	config             *config.Compiled
 	oids               map[string]struct{}
 }
@@ -39,7 +39,7 @@ func (pt *Page) initialize(
 	pid PageId,
 	i *Index,
 ) {
-	pt.fs_home = i.fs_home.SansObjectAge().SansObjectCompression()
+	pt.directoryLayout = i.directoryLayout.SansObjectAge().SansObjectCompression()
 	pt.PageId = pid
 	pt.added = sku.MakeTransactedHeap()
 	pt.addedLatest = sku.MakeTransactedHeap()
@@ -161,7 +161,7 @@ func (pt *Page) copyHistoryAndMaybeLatest(
 ) (err error) {
 	var r io.ReadCloser
 
-	if r, err = pt.fs_home.ReadCloserCache(pt.Path()); err != nil {
+	if r, err = pt.directoryLayout.ReadCloserCache(pt.Path()); err != nil {
 		if errors.IsNotExist(err) {
 			r = io.NopCloser(bytes.NewReader(nil))
 			err = nil

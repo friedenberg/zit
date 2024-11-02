@@ -177,7 +177,7 @@ func (s *Store) ReadOneExternalBlob(
 	{
 		var aw sha.WriteCloser
 
-		if aw, err = s.fs_home.BlobWriter(); err != nil {
+		if aw, err = s.dirLayout.BlobWriter(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

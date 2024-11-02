@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/test_object_metadata_io"
@@ -187,35 +187,35 @@ func TestEqualityNotSelf(t1 *testing.T) {
 func makeTestFSHome(
 	t *testing.T,
 	contents map[string]string,
-) fs_home.Home {
+) dir_layout.DirLayout {
 	p := t.TempDir()
 
-	var primitive fs_home.Primitive
+	var primitive dir_layout.Primitive
 
 	var err error
 
-	if primitive, err = fs_home.MakePrimitiveWithHome(p, debug.Options{}); err != nil {
-		t.Fatalf("failed to make fs_home.Primitive: %s", err)
+	if primitive, err = dir_layout.MakePrimitiveWithHome(p, debug.Options{}); err != nil {
+		t.Fatalf("failed to make dir_layout.Primitive: %s", err)
 	}
 
-	f, err := fs_home.Make(
-		fs_home.Options{
+	f, err := dir_layout.Make(
+		dir_layout.Options{
 			BasePath: p,
 		},
 		primitive,
 	)
 	if err != nil {
-		t.Fatalf("failed to make fs_home: %s", err)
+		t.Fatalf("failed to make dir_layout: %s", err)
 	}
 
 	return f
 }
 
 func makeTestTextFormat(
-	fs_home fs_home.Home,
+	dirLayout dir_layout.DirLayout,
 ) object_metadata.TextFormat {
 	return object_metadata.MakeTextFormat(
-		fs_home,
+		dirLayout,
 		nil,
 	)
 }

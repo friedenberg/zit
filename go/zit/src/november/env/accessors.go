@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/india/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
@@ -37,7 +37,7 @@ func (u *Env) Err() interfaces.WriterAndStringWriter {
 	return u.err
 }
 
-func (u *Env) GetFSHome() fs_home.Home {
+func (u *Env) GetFSHome() dir_layout.DirLayout {
 	return u.fsHome
 }
 

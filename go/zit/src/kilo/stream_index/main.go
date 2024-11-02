@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_probe_index"
@@ -52,9 +52,9 @@ func init() {
 }
 
 type Index struct {
-	fs_home        fs_home.Home
-	mutable_config *config.Compiled
-	path           string
+	directoryLayout dir_layout.DirLayout
+	mutable_config  *config.Compiled
+	path            string
 	interfaces.CacheIOFactory
 	pages             [PageCount]Page
 	historicalChanges []string
@@ -62,15 +62,15 @@ type Index struct {
 }
 
 func MakeIndex(
-	s fs_home.Home,
+	s dir_layout.DirLayout,
 	k *config.Compiled,
 	dir string,
 ) (i *Index, err error) {
 	i = &Index{
-		fs_home:        s,
-		mutable_config: k,
-		path:           dir,
-		CacheIOFactory: s,
+		directoryLayout: s,
+		mutable_config:  k,
+		path:            dir,
+		CacheIOFactory:  s,
 	}
 
 	if err = i.probe_index.Initialize(
