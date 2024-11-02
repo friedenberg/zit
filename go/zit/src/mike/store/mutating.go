@@ -34,6 +34,15 @@ func (s *Store) tryRealize(
 		s.protoZettel.Apply(kinder, kinder)
 	}
 
+	if genres.Type == el.GetSku().GetGenre() {
+		if el.GetSku().GetType().IsEmpty() {
+			if err = el.GetSku().Metadata.Type.Set(builtin_types.TypeTypeLatest); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+	}
+
 	if err = s.tryPreCommitHooks(kinder, mutter, o); err != nil {
 		if s.config.IgnoreHookErrors {
 			err = nil
@@ -323,10 +332,10 @@ func (s *Store) createTagsOrType(k *ids.ObjectId) (err error) {
 		return
 
 	case genres.Type:
-		// if err = t.Metadata.Type.Set(type_blob.TypeTypeLatest); err != nil {
-		// 	err = errors.Wrap(err)
-		// 	return
-		// }
+		if err = t.Metadata.Type.Set(builtin_types.TypeTypeLatest); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 
 	case genres.Tag:
 	}

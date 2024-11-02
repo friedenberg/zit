@@ -36,7 +36,7 @@ function last_after_typ_mutate { # @test
 	run_zit checkin .t
 	assert_success
 	assert_output - <<-EOM
-		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
+		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217 !toml-type-v1]
 	EOM
 
 	run bash -c 'find .xdg/data/zit/objects/inventory_lists -type f | wc -l | tr -d " "'
@@ -46,6 +46,6 @@ function last_after_typ_mutate { # @test
 	run_zit last -format inventory-list-sans-tai
 	assert_success
 	assert_output - <<-EOM
-		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
+		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217 !toml-type-v1]
 	EOM
 }

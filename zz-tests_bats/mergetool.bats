@@ -49,7 +49,7 @@ function mergetool_conflict_base {
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!txt2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[!txt2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
 		[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[new-etikett-for @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[new-etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -115,7 +115,7 @@ function mergetool_conflict_one_remote { # @test
 	run_zit merge-tool -merge-tool "/bin/bash -c 'cat \"\$2\" >\"\$3\"'" .
 	assert_success
 	assert_output - <<-EOM
-		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
 		[get_this_shit_merged @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged new-etikett-for-all tag-3 tag-4]
 		          deleted [one/dos.conflict]
@@ -138,7 +138,7 @@ function mergetool_conflict_one_remote { # @test
 	run_zit last
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
 		[get_this_shit_merged @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/dos @9f27ee471da4d09872847d3057ab4fe0d34134b5fef472da37b6f70af483d225 !txt "wow ok again" get_this_shit_merged new-etikett-for-all tag-3 tag-4]
 	EOM

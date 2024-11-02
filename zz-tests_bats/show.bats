@@ -130,8 +130,23 @@ function show_simple_one_zettel_binary { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		          deleted [file.bin]
-		[!bin @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[!bin @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
 		[two/uno @b20c8fea8cb3e467783c5cdadf0707124cac5db72f9a6c3abba79fa0a42df627 !bin "file"]
+	EOM
+
+	cat >bin.type <<-EOM
+		---
+		! toml-type-v1
+		---
+
+		binary = true
+	EOM
+
+	run_zit checkin -delete bin.type
+	assert_success
+	assert_output_unsorted - <<-EOM
+		          deleted [bin.type]
+		[!bin @e07d72a74e0a01c23ddeb871751f6fcb43afec5fb81108c157537db96c6c1da0 !toml-type-v1]
 	EOM
 
 	run_zit show -format text two/uno

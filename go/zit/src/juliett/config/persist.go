@@ -94,7 +94,7 @@ func (kc *Compiled) recompileTypes(
 			defer blobStore.PutTypeBlob(tipe, commonBlob)
 
 			if commonBlob == nil {
-				err = errors.Errorf("nil type blob for type: %q", tipe)
+				err = errors.Errorf("nil type blob for type: %q. Sku: %s", tipe, ct)
 				return
 			}
 
@@ -108,7 +108,8 @@ func (kc *Compiled) recompileTypes(
 			kc.ExtensionsToTypes[fe] = ct.GetObjectId().String()
 			kc.TypesToExtensions[ct.GetObjectId().String()] = fe
 
-			if !commonBlob.GetBinary() {
+			isBinary := commonBlob.GetBinary()
+			if !isBinary {
 				inlineTypes.Add(values.MakeString(ct.ObjectId.String()))
 			}
 

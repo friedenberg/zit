@@ -268,7 +268,8 @@ func (s *Store) RunMergeTool(
 		return
 	}
 
-	tool = append(tool,
+	tool = append(
+		tool,
 		leftItem.Object.GetPath(),
 		middleItem.Object.GetPath(),
 		rightItem.Object.GetPath(),

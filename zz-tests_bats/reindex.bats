@@ -89,7 +89,7 @@ function reindex_after_changes { # @test
 	run_zit checkin .t
 	assert_success
 	assert_output - <<-EOM
-		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
+		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217 !toml-type-v1]
 	EOM
 
 	function verify() {
@@ -118,7 +118,7 @@ function reindex_after_changes { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
-		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
+		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217 !toml-type-v1]
 		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]

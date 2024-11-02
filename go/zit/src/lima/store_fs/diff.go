@@ -51,12 +51,20 @@ func (s *Store) runDiff3(left, middle, right *fd.FD) (path string, err error) {
 	}
 
 	if err = cmd.Wait(); err != nil {
-		if cmd.ProcessState.ExitCode() == 1 {
-			err = errors.Wrap(MakeErrMergeConflict(nil))
-		} else {
+		var errExit *exec.ExitError
+
+		if !errors.As(err, &errExit) {
 			err = errors.Wrap(err)
 			return
 		}
+
+		// TODO figure out why exit code 2 is being thrown by diff3 for conflicts
+		err = errors.Wrap(MakeErrMergeConflict(nil))
+		// if errExit.ExitCode() == 1 {
+		// } else {
+		// 	err = errors.Wrapf(errExit, "Stderr: %q", errExit.Stderr)
+		// 	return
+		// }
 	}
 
 	path = f.Name()

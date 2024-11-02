@@ -232,11 +232,19 @@ function organize_simple_checkedout_merge_no_conflict { # @test
 function organize_simple_checkedout_merge_conflict { # @test
 	#TODO-project-2022-zit-collapse_skus
 	cat - >txt.type <<-EOM
-		inline-akte = true
+		---
+		! toml-type-v1
+		---
+
+		binary = false
 	EOM
 
 	cat - >txt2.type <<-EOM
-		inline-akte = true
+		---
+		! toml-type-v1
+		---
+
+		binary = false
 	EOM
 
 	run_zit checkin -delete .t
@@ -244,8 +252,8 @@ function organize_simple_checkedout_merge_conflict { # @test
 	assert_output_unsorted - <<-EOM
 		          deleted [txt.type]
 		          deleted [txt2.type]
-		[!txt2 @c9627d6d0f0a88e6cbc93a5ccb4657a7b274655c1b89c53cbff92ecae5f6c583]
-		[!txt @c9627d6d0f0a88e6cbc93a5ccb4657a7b274655c1b89c53cbff92ecae5f6c583]
+		[!txt2 @bf2cb7a91cdfdcc84acd1bbaaf0252ff9901977bf76128a578317a42788c4eb6 !toml-type-v1]
+		[!txt @bf2cb7a91cdfdcc84acd1bbaaf0252ff9901977bf76128a578317a42788c4eb6 !toml-type-v1]
 	EOM
 
 	run_zit checkout one/dos
@@ -268,47 +276,46 @@ function organize_simple_checkedout_merge_conflict { # @test
 
 	run_zit organize -mode commit-directly :z,e,t <<-EOM
 		---
-		! txt2
+		- new-etikett-for-all
 		---
 
-		# new-etikett-for-all
 		- [   !md   ]
 		- [   -tag  ]
 		- [   -tag-1]
 		- [   -tag-2]
 		- [   -tag-3]
 		- [   -tag-4]
-		- [one/dos   !md tag-3 tag-4] wow ok again different
-		- [one/uno   !md tag-3 tag-4] wow the first
+		- [one/dos   !txt2 tag-3 tag-4] wow ok again different
+		- [one/uno   !txt2 tag-3 tag-4] wow the first
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md @$(get_type_blob_sha) !txt2 new-etikett-for-all]
-		[-tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !txt2 new-etikett-for-all]
-		[-tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !txt2 new-etikett-for-all]
-		[-tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !txt2 new-etikett-for-all]
-		[-tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !txt2 new-etikett-for-all]
-		[-tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !txt2 new-etikett-for-all]
+		[!md @$(get_type_blob_sha) !toml-type-v1 new-etikett-for-all]
+		[-tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
+		[-tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
+		[-tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
+		[-tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
+		[-tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
 		[new @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[new-etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[new-etikett-for @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again different" new-etikett-for-all tag-3 tag-4]
-		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
+		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again different" new-etikett-for-all tag-3 tag-4]
+		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !txt2 "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
 
 	run_zit show -format log new-etikett-for-all:z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md @$(get_type_blob_sha) !txt2 new-etikett-for-all]
-		[-tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !txt2 new-etikett-for-all]
-		[-tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !txt2 new-etikett-for-all]
-		[-tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !txt2 new-etikett-for-all]
-		[-tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !txt2 new-etikett-for-all]
-		[-tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !txt2 new-etikett-for-all]
+		[!md @$(get_type_blob_sha) !toml-type-v1 new-etikett-for-all]
+		[-tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
+		[-tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
+		[-tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
+		[-tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
+		[-tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
 		[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again different" new-etikett-for-all tag-3 tag-4]
-		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
+		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt2 "wow ok again different" new-etikett-for-all tag-3 tag-4]
+		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !txt2 "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
 
 	run_zit status one/dos.zettel
@@ -409,7 +416,7 @@ function organize_with_type_commit { # @test
 
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !txt "wow ok again" tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !txt "wow the first" tag-3 tag-4]
 	EOM
@@ -1232,7 +1239,7 @@ function create_structured_zettels { # @test
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!task @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[!task @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
 		[one/tres @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !task "second" tag-3 test]
 		[test @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[two/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md "first" test]

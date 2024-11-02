@@ -82,7 +82,7 @@ function use_blob_shas { # @test
 	run_zit new -edit=false -shas -type txt "$the_blob2_sha"
 	assert_success
 	assert_output - <<-EOM
-		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
 		[one/tres @$the_blob2_sha !txt]
 	EOM
 

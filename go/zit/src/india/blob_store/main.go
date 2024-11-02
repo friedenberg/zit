@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/tag_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config_blobs"
 )
@@ -140,7 +139,7 @@ func (a *VersionedStores) GetTypeV1() Store[type_blobs.TomlV1, *type_blobs.TomlV
 }
 
 func (a *VersionedStores) ParseTypeBlob(
-	tipe ids.Type,
+	tipe interfaces.ObjectId,
 	blobSha interfaces.Sha,
 ) (common type_blobs.Common, n int64, err error) {
 	switch tipe.String() {
@@ -171,7 +170,7 @@ func (a *VersionedStores) ParseTypeBlob(
 }
 
 func (a *VersionedStores) PutTypeBlob(
-	tipe ids.Type,
+	tipe interfaces.ObjectId,
 	common type_blobs.Common,
 ) (err error) {
 	switch tipe.String() {

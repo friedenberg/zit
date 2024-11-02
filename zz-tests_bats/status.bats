@@ -40,7 +40,7 @@ function dirty_new_zettel() {
 
 	assert_success
 	assert_output --partial - <<-EOM
-		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
 		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[etikett-one @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[two/uno @aeb82efa111ccb5b8c5ca351f12d8b2f8e76d8d7bd0ecebf2efaaa1581d19400 !txt "the new zettel" etikett-one]
@@ -296,10 +296,10 @@ function status_simple_all { # @test
 		             same [tag-3.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		             same [tag-4.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		             same [tag.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		          changed [md.type @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
+		          changed [md.type @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217 !toml-type-v1]
 		          changed [one/dos.zettel @b5c4fbaac3b71657edee74de4b947f13dfa104715feb8bab7cfa4dd47cafa3db !md "dos wildly different" etikett-two]
 		          changed [one/uno.zettel @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "wildly different" etikett-one]
-		        untracked [da-new.type @1a4c3a8914d9e5fa1a08cb183bcdf7e6e10aa224f663dc56610a303b10aa0834]
+		        untracked [da-new.type @1a4c3a8914d9e5fa1a08cb183bcdf7e6e10aa224f663dc56610a303b10aa0834 !toml-type-v1]
 		        untracked [zz-archive.tag @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
 	EOM
 }
@@ -317,8 +317,8 @@ function status_simple_typ { # @test
 	run_zit status .t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		          changed [md.type @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
-		        untracked [da-new.type @1a4c3a8914d9e5fa1a08cb183bcdf7e6e10aa224f663dc56610a303b10aa0834]
+		          changed [md.type @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217 !toml-type-v1]
+		        untracked [da-new.type @1a4c3a8914d9e5fa1a08cb183bcdf7e6e10aa224f663dc56610a303b10aa0834 !toml-type-v1]
 	EOM
 }
 
@@ -376,7 +376,7 @@ function status_conflict { # @test
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!txt2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[!txt2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
 		[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[new-etikett-for @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[new-etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]

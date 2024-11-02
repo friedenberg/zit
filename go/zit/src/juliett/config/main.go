@@ -236,6 +236,12 @@ func (k *Compiled) AddTransacted(
 			return
 		}
 
+		if didChange {
+			k.SetNeedsRecompile(fmt.Sprintf("modified type: %s", kinder))
+		}
+
+		return
+
 	case genres.Tag:
 		if didChange, err = k.addTag(kinder, mutter); err != nil {
 			err = errors.Wrap(err)
