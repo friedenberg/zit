@@ -21,12 +21,19 @@ type ConfigGetFilters interface {
 	GetFilters() map[string]string
 }
 
-type Config interface {
-	ImmutableConfig
-	UsePredictableHinweisen() bool
-	UsePrintTime() bool
-	GetFilters() map[string]string
-	GetTypeStringFromExtension(t string) string
-	ConfigDryRun
+type MutableStoredConfig interface {
 	ConfigGetFilters
+}
+
+type MutableConfig interface {
+	MutableStoredConfig
+	UsePrintTime() bool
+	UsePredictableHinweisen() bool
+	ConfigDryRun
+}
+
+type Config interface {
+	MutableConfig
+	ImmutableConfig
+	GetTypeStringFromExtension(t string) string
 }

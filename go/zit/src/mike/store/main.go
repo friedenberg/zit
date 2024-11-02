@@ -38,7 +38,7 @@ type Store struct {
 	inventoryList          *sku.List
 	options                object_inventory_format.Options
 	persistentObjectFormat object_inventory_format.Format
-	configBlobFormat       blob_store.Format[mutable_config_blobs.V0, *mutable_config_blobs.V0]
+	configBlobFormat       blob_store.Format2[mutable_config_blobs.Blob]
 	luaVMPoolBuilder       *lua.VMPoolBuilder
 	tagLock                sync.Mutex
 
@@ -124,11 +124,11 @@ func (c *Store) Initialize(
 		k.DefaultTags,
 	)
 
-	c.configBlobFormat = blob_store.MakeBlobFormat(
-		blob_store.MakeTextParserIgnoreTomlErrors[mutable_config_blobs.V0](
+	c.configBlobFormat = blob_store.MakeBlobFormat2(
+		blob_store.MakeTextParserIgnoreTomlErrors2[mutable_config_blobs.Blob](
 			c.GetStandort(),
 		),
-		blob_store.ParsedBlobTomlFormatter[mutable_config_blobs.V0, *mutable_config_blobs.V0]{},
+		blob_store.ParsedBlobTomlFormatter2[mutable_config_blobs.Blob]{},
 		c.GetStandort(),
 	)
 

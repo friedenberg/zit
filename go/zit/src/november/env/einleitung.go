@@ -246,7 +246,7 @@ func writeDefaultMutableConfig(
 
 	defer errors.DeferredCloser(&err, aw)
 
-	if _, err = f.FormatParsedBlob(aw, &defaultKonfig); err != nil {
+	if _, err = f.FormatParsedBlob(aw, defaultKonfig); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

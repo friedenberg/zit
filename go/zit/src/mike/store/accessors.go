@@ -73,6 +73,6 @@ func (s *Store) GetStreamIndex() *stream_index.Index {
 	return s.streamIndex
 }
 
-func (s *Store) GetConfigBlobFormat() blob_store.Format[mutable_config_blobs.V0, *mutable_config_blobs.V0] {
+func (s *Store) GetConfigBlobFormat() blob_store.Format2[mutable_config_blobs.Blob] {
 	return s.configBlobFormat
 }

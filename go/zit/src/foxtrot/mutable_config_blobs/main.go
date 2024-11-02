@@ -1,6 +1,7 @@
 package mutable_config_blobs
 
 import (
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/options_tools"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -12,11 +13,13 @@ const (
 	TypeLatest = TypeV1
 )
 
-type Blob interface{}
+type Blob interface {
+	interfaces.MutableStoredConfig
+}
 
 // TODO version
-func Default(defaultTyp ids.Type) (k V0) {
-	k = V0{
+func Default(defaultTyp ids.Type) Blob {
+	return V0{
 		Defaults: DefaultsV0{
 			Typ:       defaultTyp,
 			Etiketten: make([]ids.Tag, 0),
@@ -34,6 +37,4 @@ func Default(defaultTyp ids.Type) (k V0) {
 			},
 		},
 	}
-
-	return
 }
