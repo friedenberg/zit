@@ -20,7 +20,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -183,7 +183,7 @@ func initDefaultTypeAndConfig(u *Env) (err error) {
 		}
 
 		o.Metadata.Blob.ResetWithShaLike(sh)
-		if err = o.Metadata.Type.Set("!toml-type-v1"); err != nil {
+		if err = o.Metadata.Type.Set(type_blobs.TypeLatest); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -233,7 +233,7 @@ func writeDefaultMutableConfig(
 	u *Env,
 	dt ids.Type,
 ) (sh interfaces.Sha, err error) {
-	defaultKonfig := mutable_config.Default(dt)
+	defaultKonfig := mutable_config_blobs.Default(dt)
 
 	f := u.GetStore().GetConfigBlobFormat()
 

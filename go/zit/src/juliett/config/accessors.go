@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -205,6 +205,6 @@ func (c *compiled) getImplicitTags(
 	return s
 }
 
-func (kc *Compiled) Cli() mutable_config.Cli {
+func (kc *Compiled) Cli() mutable_config_blobs.Cli {
 	return kc.cli
 }

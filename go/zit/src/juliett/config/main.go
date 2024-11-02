@@ -16,7 +16,7 @@ import (
 	pkg_angeboren "code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/dormant_index"
@@ -70,11 +70,11 @@ func (a *compiled) Reset() error {
 	return nil
 }
 
-func (a *Compiled) GetMutableConfig() *mutable_config.Blob {
-	return &a.Blob
+func (a *Compiled) GetMutableConfig() *mutable_config_blobs.V0 {
+	return &a.V0
 }
 
-type cli = mutable_config.Cli
+type cli = mutable_config_blobs.Cli
 
 type compiled struct {
 	lock sync.Locker
@@ -83,7 +83,7 @@ type compiled struct {
 
 	Sku sku.Transacted
 
-	mutable_config.Blob
+	mutable_config_blobs.V0
 
 	DefaultTags  ids.TagSet
 	Tags         interfaces.MutableSetLike[*tag]
@@ -102,7 +102,7 @@ type compiled struct {
 
 func (c *Compiled) Initialize(
 	s fs_home.Home,
-	kcli mutable_config.Cli,
+	kcli mutable_config_blobs.Cli,
 	dormant *dormant_index.Index,
 ) (err error) {
 	c.cli = kcli
@@ -131,11 +131,11 @@ func (c *Compiled) Initialize(
 	return
 }
 
-func (kc *Compiled) SetCli(k mutable_config.Cli) {
+func (kc *Compiled) SetCli(k mutable_config_blobs.Cli) {
 	kc.cli = k
 }
 
-func (kc *Compiled) SetCliFromCommander(k mutable_config.Cli) {
+func (kc *Compiled) SetCliFromCommander(k mutable_config_blobs.Cli) {
 	oldBasePath := kc.BasePath
 	kc.cli = k
 	kc.BasePath = oldBasePath
@@ -156,7 +156,7 @@ type ApproximatedType = blob_store.ApproximatedType
 
 func (k *compiled) setTransacted(
 	kt1 *sku.Transacted,
-	kag interfaces.BlobGetter[*mutable_config.Blob],
+	kag interfaces.BlobGetter[*mutable_config_blobs.V0],
 ) (didChange bool, err error) {
 	if !sku.TransactedLessor.LessPtr(&k.Sku, kt1) {
 		return
@@ -171,14 +171,14 @@ func (k *compiled) setTransacted(
 
 	k.setNeedsRecompile(fmt.Sprintf("updated konfig: %s", &k.Sku))
 
-	var a *mutable_config.Blob
+	var a *mutable_config_blobs.V0
 
 	if a, err = kag.GetBlob(k.Sku.GetBlobSha()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	k.Blob = *a
+	k.V0 = *a
 
 	return
 }

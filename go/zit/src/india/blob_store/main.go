@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_blobs"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config_blobs"
 )
 
 type Store[
@@ -25,7 +25,7 @@ type VersionedStores struct {
 	tag_v0       Store[tag_blobs.V0, *tag_blobs.V0]
 	tag_v1       Store[tag_blobs.V1, *tag_blobs.V1]
 	repo_v0      Store[repo_blobs.V0, *repo_blobs.V0]
-	config_v0    Store[mutable_config.Blob, *mutable_config.Blob]
+	config_v0    Store[mutable_config_blobs.V0, *mutable_config_blobs.V0]
 	type_v0      Store[type_blobs.V0, *type_blobs.V0]
 	type_toml_v1 Store[type_blobs.TomlV1, *type_blobs.TomlV1]
 }
@@ -76,13 +76,13 @@ func Make(
 		config_v0: MakeBlobStore(
 			st,
 			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[mutable_config.Blob](
+				MakeTextParserIgnoreTomlErrors[mutable_config_blobs.V0](
 					st,
 				),
-				ParsedBlobTomlFormatter[mutable_config.Blob, *mutable_config.Blob]{},
+				ParsedBlobTomlFormatter[mutable_config_blobs.V0, *mutable_config_blobs.V0]{},
 				st,
 			),
-			func(a *mutable_config.Blob) {
+			func(a *mutable_config_blobs.V0) {
 				a.Reset()
 			},
 		),
@@ -127,7 +127,7 @@ func (a *VersionedStores) GetRepoV0() Store[repo_blobs.V0, *repo_blobs.V0] {
 	return a.repo_v0
 }
 
-func (a *VersionedStores) GetConfigV0() Store[mutable_config.Blob, *mutable_config.Blob] {
+func (a *VersionedStores) GetConfigV0() Store[mutable_config_blobs.V0, *mutable_config_blobs.V0] {
 	return a.config_v0
 }
 
@@ -144,7 +144,7 @@ func (a *VersionedStores) ParseTypeBlob(
 	blobSha interfaces.Sha,
 ) (common type_blobs.Common, n int64, err error) {
 	switch tipe.String() {
-	case "", "toml-type-v0":
+	case "", type_blobs.TypeV0:
 		store := a.GetTypeV0()
 		var blob *type_blobs.V0
 
@@ -155,7 +155,7 @@ func (a *VersionedStores) ParseTypeBlob(
 
 		common = blob
 
-	case "toml-type-v1":
+	case type_blobs.TypeV1:
 		store := a.GetTypeV1()
 		var blob *type_blobs.TomlV1
 
@@ -175,7 +175,7 @@ func (a *VersionedStores) PutTypeBlob(
 	common type_blobs.Common,
 ) (err error) {
 	switch tipe.String() {
-	case "", "toml-type-v0":
+	case "", type_blobs.TypeV0:
 		if blob, ok := common.(*type_blobs.V0); !ok {
 			err = errors.Errorf("expected %T but got %T", blob, common)
 			return
@@ -183,7 +183,7 @@ func (a *VersionedStores) PutTypeBlob(
 			a.GetTypeV0().PutBlob(blob)
 		}
 
-	case "toml-type-v1":
+	case type_blobs.TypeV1:
 		if blob, ok := common.(*type_blobs.TomlV1); !ok {
 			err = errors.Errorf("expected %T but got %T", blob, common)
 			return

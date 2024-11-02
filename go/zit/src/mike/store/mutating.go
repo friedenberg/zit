@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/object_id_provider"
+	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -322,7 +323,7 @@ func (s *Store) createTagsOrType(k *ids.ObjectId) (err error) {
 		return
 
 	case genres.Type:
-		// if err = t.Metadata.Type.Set("!toml-type-v1"); err != nil {
+		// if err = t.Metadata.Type.Set(type_blob.TypeTypeLatest); err != nil {
 		// 	err = errors.Wrap(err)
 		// 	return
 		// }
@@ -393,7 +394,7 @@ func (s *Store) addTypeAndExpandedIfNecessary(
 	}
 
 	switch t1.String() {
-	case "", "toml-type-v0", "toml-type-v1":
+	case "", type_blobs.TypeV0, type_blobs.TypeV1:
 		return
 	}
 

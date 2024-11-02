@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
@@ -42,7 +42,7 @@ type Env struct {
 
 	primitiveFSHome fs_home.Primitive
 	fsHome          fs_home.Home
-	cliConfig       mutable_config.Cli
+	cliConfig       mutable_config_blobs.Cli
 	config          config.Compiled
 	dormantIndex    dormant_index.Index
 
@@ -58,7 +58,7 @@ type Env struct {
 
 func Make(
 	flags *flag.FlagSet,
-	kCli mutable_config.Cli,
+	kCli mutable_config_blobs.Cli,
 	options Options,
 	primitiveFSHome fs_home.Primitive,
 ) (u *Env, err error) {
@@ -149,7 +149,7 @@ func (u *Env) Initialize(options Options) (err error) {
 		}
 	}
 
-	u.config.ApplyPrintOptionsConfig(u.config.Blob.PrintOptions)
+	u.config.ApplyPrintOptionsConfig(u.config.V0.PrintOptions)
 
 	// for _, rb := range u.GetConfig().Recipients {
 	// 	if err = u.age.AddBech32PivYubikeyEC256(rb); err != nil {

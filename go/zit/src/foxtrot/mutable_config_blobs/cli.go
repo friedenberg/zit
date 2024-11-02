@@ -1,4 +1,4 @@
-package mutable_config
+package mutable_config_blobs
 
 import (
 	"flag"

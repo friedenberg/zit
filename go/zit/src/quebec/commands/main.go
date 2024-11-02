@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
@@ -42,7 +42,7 @@ func Run(
 
 	args = os.Args[2:]
 
-	konfigCli := mutable_config.DefaultCli()
+	konfigCli := mutable_config_blobs.DefaultCli()
 	konfigCli.AddToFlags(cmd.FlagSet)
 
 	if err := cmd.Parse(args); err != nil {

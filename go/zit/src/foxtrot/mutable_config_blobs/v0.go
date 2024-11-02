@@ -1,23 +1,15 @@
-package mutable_config
+package mutable_config_blobs
 
 import (
-	"reflect"
-
 	"code.linenisgreat.com/zit/go/zit/src/bravo/options_tools"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
-type Defaults struct {
-	Typ       ids.Type  `toml:"typ"`
-	Etiketten []ids.Tag `toml:"etiketten"`
-}
-
-type Blob struct {
-	Defaults        Defaults                              `toml:"defaults"`
+type V0 struct {
+	Defaults        DefaultsV0                            `toml:"defaults"`
 	HiddenEtiketten []ids.Tag                             `toml:"hidden-etiketten"`
 	FileExtensions  file_extensions.FileExtensions        `toml:"file-extensions"`
 	RemoteScripts   map[string]script_config.RemoteScript `toml:"remote-scripts"`
@@ -27,49 +19,7 @@ type Blob struct {
 	Filters         map[string]string                     `toml:"filters"`
 }
 
-func (a Blob) GetFilters() map[string]string {
-	return a.Filters
-}
-
-func (a Blob) Equals(b Blob) bool {
-	todo.Change("don't use reflection for equality")
-
-	if !reflect.DeepEqual(a.Defaults.Etiketten, b.Defaults.Etiketten) {
-		return false
-	}
-
-	if !reflect.DeepEqual(a.HiddenEtiketten, b.HiddenEtiketten) {
-		return false
-	}
-
-	if !a.Defaults.Typ.Equals(b.Defaults.Typ) {
-		return false
-	}
-
-	if !reflect.DeepEqual(a.FileExtensions, b.FileExtensions) {
-		return false
-	}
-
-	if !reflect.DeepEqual(a.RemoteScripts, b.RemoteScripts) {
-		return false
-	}
-
-	if !reflect.DeepEqual(a.Actions, b.Actions) {
-		return false
-	}
-
-	if !reflect.DeepEqual(a.PrintOptions, b.PrintOptions) {
-		return false
-	}
-
-	if !reflect.DeepEqual(a.Filters, b.Filters) {
-		return false
-	}
-
-	return true
-}
-
-func (a *Blob) Reset() {
+func (a *V0) Reset() {
 	a.FileExtensions.Reset()
 	a.Defaults.Typ = ids.Type{}
 	a.Defaults.Etiketten = make([]ids.Tag, 0)
@@ -80,7 +30,7 @@ func (a *Blob) Reset() {
 	a.Filters = make(map[string]string)
 }
 
-func (a *Blob) ResetWith(b *Blob) {
+func (a *V0) ResetWith(b *V0) {
 	a.FileExtensions.Reset()
 
 	a.Defaults.Typ = b.Defaults.Typ
@@ -95,4 +45,8 @@ func (a *Blob) ResetWith(b *Blob) {
 	a.Actions = b.Actions
 	a.PrintOptions = b.PrintOptions
 	a.Filters = b.Filters
+}
+
+func (a V0) GetFilters() map[string]string {
+	return a.Filters
 }

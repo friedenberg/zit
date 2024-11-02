@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/zettel_id_index"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_probe_index"
@@ -73,6 +73,6 @@ func (s *Store) GetStreamIndex() *stream_index.Index {
 	return s.streamIndex
 }
 
-func (s *Store) GetConfigBlobFormat() blob_store.Format[mutable_config.Blob, *mutable_config.Blob] {
+func (s *Store) GetConfigBlobFormat() blob_store.Format[mutable_config_blobs.V0, *mutable_config_blobs.V0] {
 	return s.configBlobFormat
 }

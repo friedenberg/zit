@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/zettel_id_index"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -38,7 +38,7 @@ type Store struct {
 	inventoryList          *sku.List
 	options                object_inventory_format.Options
 	persistentObjectFormat object_inventory_format.Format
-	configBlobFormat       blob_store.Format[mutable_config.Blob, *mutable_config.Blob]
+	configBlobFormat       blob_store.Format[mutable_config_blobs.V0, *mutable_config_blobs.V0]
 	luaVMPoolBuilder       *lua.VMPoolBuilder
 	tagLock                sync.Mutex
 
@@ -125,10 +125,10 @@ func (c *Store) Initialize(
 	)
 
 	c.configBlobFormat = blob_store.MakeBlobFormat(
-		blob_store.MakeTextParserIgnoreTomlErrors[mutable_config.Blob](
+		blob_store.MakeTextParserIgnoreTomlErrors[mutable_config_blobs.V0](
 			c.GetStandort(),
 		),
-		blob_store.ParsedBlobTomlFormatter[mutable_config.Blob, *mutable_config.Blob]{},
+		blob_store.ParsedBlobTomlFormatter[mutable_config_blobs.V0, *mutable_config_blobs.V0]{},
 		c.GetStandort(),
 	)
 
