@@ -18,7 +18,7 @@ function basic { # @test
 	run_zit export +e,konfig,t,z
 	assert_success
 	assert_output - <<-EOM
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+		[!md @$(get_type_blob_sha) !toml-type-v1]
 		[konfig @facdee599b069eb9dae4b04079fbf1b3aaaed30fe587ccc3e6fa7b6ff680b1f0]
 		[one/uno @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
 		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]

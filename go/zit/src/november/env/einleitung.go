@@ -167,23 +167,30 @@ func initDefaultTypeAndConfig(u *Env) (err error) {
 
 		var sh interfaces.Sha
 
-		if sh, _, err = u.GetStore().GetBlobStore().GetTypeV0().SaveBlobText(
+		if sh, _, err = u.GetStore().GetBlobStore().GetTypeV1().SaveBlobText(
 			&defaultTypeBlob,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		var k ids.ObjectId
+		o := sku.GetTransactedPool().Get()
+		defer sku.GetTransactedPool().Put(o)
 
-		if err = k.SetWithIdLike(defaultTypeObjectId); err != nil {
+		if err = o.ObjectId.SetWithIdLike(defaultTypeObjectId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if _, err = u.GetStore().CreateOrUpdateBlobSha(
-			&k,
-			sh,
+		o.Metadata.Blob.ResetWithShaLike(sh)
+		if err = o.Metadata.Type.Set("!toml-type-v1"); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = u.GetStore().CreateOrUpdate(
+			o,
+			object_mode.ModeCreate,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

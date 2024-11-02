@@ -19,7 +19,7 @@ function init_and_reindex { # @test
 
 	expected="$(mktemp)"
 	cat - >"$expected" <<-EOM
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+		[!md @$(get_type_blob_sha) !toml-type-v1]
 		[konfig @$(get_konfig_sha)]
 	EOM
 
@@ -36,7 +36,7 @@ function init_and_reindex { # @test
 	EOM
 
 	cat - >"$expected" <<-EOM
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+		[!md @$(get_type_blob_sha) !toml-type-v1]
 		[konfig @$(get_konfig_sha)]
 	EOM
 
@@ -61,7 +61,7 @@ function init_and_deinit { # @test
 
 	run_zit_init_disable_age
 	assert_output_unsorted - <<-EOM
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+		[!md @$(get_type_blob_sha) !toml-type-v1]
 		[konfig @$(get_konfig_sha)]
 	EOM
 

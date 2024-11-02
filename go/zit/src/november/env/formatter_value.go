@@ -820,8 +820,6 @@ func (u *Env) makeTypFormatter(
 		}
 
 	case "action-names":
-		fan := type_blobs.MakeFormatterActionNames()
-
 		f = func(o *sku.Transacted) (err error) {
 			var blob *type_blobs.V0
 
@@ -832,9 +830,14 @@ func (u *Env) makeTypFormatter(
 
 			defer agp.PutBlob(blob)
 
-			if _, err = fan.Format(out, blob); err != nil {
-				err = errors.Wrap(err)
-				return
+			for v, v1 := range blob.Actions {
+				if _, err = io.WriteString(
+					out,
+					fmt.Sprintf("%s\t%s\n", v, v1.Description),
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 
 			return

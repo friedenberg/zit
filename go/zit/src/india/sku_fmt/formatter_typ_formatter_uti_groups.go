@@ -1,6 +1,7 @@
 package sku_fmt
 
 import (
+	"bytes"
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -28,8 +29,6 @@ func (e formatterTypFormatterUTIGroups) Format(
 	w io.Writer,
 	z *sku.Transacted,
 ) (n int64, err error) {
-	e1 := type_blobs.MakeFormatterFormatterUTIGroups()
-
 	var skuTyp *sku.Transacted
 
 	if skuTyp, err = e.ReadTransactedFromObjectId(z.Metadata.GetType()); err != nil {
@@ -46,9 +45,24 @@ func (e formatterTypFormatterUTIGroups) Format(
 
 	defer e.typBlobGetterPutter.PutBlob(ta)
 
-	if n, err = e1.Format(w, ta); err != nil {
-		err = errors.Wrap(err)
-		return
+	for groupName, group := range ta.FormatterUTIGroups {
+		sb := bytes.NewBuffer(nil)
+
+		sb.WriteString(groupName)
+
+		for uti, formatter := range group.Map() {
+			sb.WriteString(" ")
+			sb.WriteString(uti)
+			sb.WriteString(" ")
+			sb.WriteString(formatter)
+		}
+
+		sb.WriteString("\n")
+
+		if n, err = io.Copy(w, sb); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return

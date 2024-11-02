@@ -256,7 +256,7 @@ function show_simple_all { # @test
 	run_zit show :z,t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+		[!md @$(get_type_blob_sha) !toml-type-v1]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 	EOM
@@ -265,7 +265,6 @@ function show_simple_all { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		file-extension = 'md'
-		inline-akte = true
 		last time
 		not another one
 		vim-syntax-type = 'markdown'
@@ -274,7 +273,7 @@ function show_simple_all { # @test
 	run_zit show -format sku-metadata-sans-tai :z,t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		Typ md 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
+		Typ md $(get_type_blob_sha) !toml-type-v1
 		Zettel one/dos 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md tag-3 tag-4 "wow ok again"
 		Zettel one/uno 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-4 "wow the first"
 	EOM
@@ -283,14 +282,14 @@ function show_simple_all { # @test
 function show_simple_typ_schwanzen { # @test
 	run_zit show :t
 	assert_output_unsorted - <<-EOM
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+		[!md @$(get_type_blob_sha) !toml-type-v1]
 	EOM
 }
 
 function show_simple_typ_history { # @test
 	run_zit show +t
 	assert_output_unsorted - <<-EOM
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+		[!md @$(get_type_blob_sha) !toml-type-v1]
 	EOM
 }
 
@@ -368,7 +367,7 @@ function show_history_all { # @test
 		Etikett tag-3 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 		Etikett tag-4 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 		Konfig konfig $(get_konfig_sha)
-		Typ md 102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384
+		Typ md $(get_type_blob_sha) !toml-type-v1
 		Zettel one/dos 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md tag-3 tag-4 "wow ok again"
 		Zettel one/uno 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md tag-3 tag-4 "wow the first"
 		Zettel one/uno 3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md tag-1 tag-2 "wow ok"

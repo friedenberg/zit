@@ -23,6 +23,7 @@ type CommitOptions struct {
 	Proto              *Transacted
 	DontAddMissingTags bool
 	DontAddMissingType bool
+	DontValidate       bool
 }
 
 type (

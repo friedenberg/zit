@@ -17,7 +17,7 @@ import (
 )
 
 // Saves the blob if necessary, applies the proto object, runs pre-commit hooks,
-// runs the new hook, and then calculates the sha for the object
+// runs the new hook, validates the blob, then calculates the sha for the object
 func (s *Store) tryRealize(
 	el sku.ExternalLike, mutter *sku.Transacted,
 	o sku.CommitOptions,
@@ -52,6 +52,11 @@ func (s *Store) tryRealize(
 				return
 			}
 		}
+	}
+
+	if err = s.validate(kinder, mutter, o); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if err = kinder.CalculateObjectShas(); err != nil {
@@ -308,17 +313,22 @@ func (s *Store) UpdateKonfig(
 }
 
 func (s *Store) createTagsOrType(k *ids.ObjectId) (err error) {
+	t := sku.GetTransactedPool().Get()
+	defer sku.GetTransactedPool().Put(t)
+
 	switch k.GetGenre() {
 	default:
 		err = genres.MakeErrUnsupportedGenre(k.GetGenre())
 		return
 
-	case genres.Type, genres.Tag:
-		break
-	}
+	case genres.Type:
+		// if err = t.Metadata.Type.Set("!toml-type-v1"); err != nil {
+		// 	err = errors.Wrap(err)
+		// 	return
+		// }
 
-	t := sku.GetTransactedPool().Get()
-	defer sku.GetTransactedPool().Put(t)
+	case genres.Tag:
+	}
 
 	if err = t.ObjectId.SetWithIdLike(k); err != nil {
 		err = errors.Wrap(err)
@@ -346,7 +356,7 @@ func (s *Store) createTagsOrType(k *ids.ObjectId) (err error) {
 	return
 }
 
-func (s *Store) addTyp(
+func (s *Store) addType(
 	t ids.Type,
 ) (err error) {
 	if t.IsEmpty() {
@@ -375,10 +385,15 @@ func (s *Store) addTyp(
 	return
 }
 
-func (s *Store) addTypAndExpandedIfNecessary(
+func (s *Store) addTypeAndExpandedIfNecessary(
 	t1 ids.Type,
 ) (err error) {
 	if t1.IsEmpty() {
+		return
+	}
+
+	switch t1.String() {
+	case "", "toml-type-v0", "toml-type-v1":
 		return
 	}
 
@@ -389,7 +404,7 @@ func (s *Store) addTypAndExpandedIfNecessary(
 	)
 
 	for _, t := range typenExpanded {
-		if err = s.addTyp(t); err != nil {
+		if err = s.addType(t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -448,7 +463,7 @@ func (s *Store) addMissingTypeAndTags(
 	t := m.GetType()
 
 	if !co.DontAddMissingType {
-		if err = s.addTypAndExpandedIfNecessary(t); err != nil {
+		if err = s.addTypeAndExpandedIfNecessary(t); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

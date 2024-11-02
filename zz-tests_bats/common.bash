@@ -104,11 +104,15 @@ function get_konfig_sha() {
   echo -n "facdee599b069eb9dae4b04079fbf1b3aaaed30fe587ccc3e6fa7b6ff680b1f0"
 }
 
+function get_type_blob_sha() {
+  echo -n "b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16"
+}
+
 function run_zit_init_disable_age {
   run_zit init -yin <(cat_yin) -yang <(cat_yang) -age none -lock-internal-files=false "$@"
   assert_success
   assert_output - <<-EOM
-	[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
-	[konfig @$(get_konfig_sha)]
+[!md @$(get_type_blob_sha) !toml-type-v1]
+[konfig @$(get_konfig_sha)]
 EOM
 }

@@ -50,7 +50,7 @@ function organize_simple { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 
-		- [!md]
+		- [!md !toml-type-v1]
 		- [one/dos !md tag-3 tag-4] wow ok again
 		- [one/uno !md tag-3 tag-4] wow the first
 		- [tag-1]
@@ -78,7 +78,7 @@ function organize_simple_commit { # @test
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384 %virtual_etikett new-etikett-for-all]
+		[!md @$(get_type_blob_sha) !toml-type-v1 %virtual_etikett new-etikett-for-all]
 		[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[new-etikett-for @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[new-etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -95,7 +95,7 @@ function organize_simple_commit { # @test
 	run_zit show -format log new-etikett-for-all:z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384 new-etikett-for-all]
+		[!md @$(get_type_blob_sha) !toml-type-v1 new-etikett-for-all]
 		[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" new-etikett-for-all tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
@@ -127,7 +127,7 @@ function organize_simple_checkedout_matchesmutter { # @test
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384 new-etikett-for-all]
+		[!md @$(get_type_blob_sha) !toml-type-v1 new-etikett-for-all]
 		[-tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
 		[-tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
 		[-tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
@@ -144,7 +144,7 @@ function organize_simple_checkedout_matchesmutter { # @test
 	run_zit show -format log new-etikett-for-all:z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384 new-etikett-for-all]
+		[!md @$(get_type_blob_sha) !toml-type-v1 new-etikett-for-all]
 		[-tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
 		[-tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
 		[-tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
@@ -194,7 +194,7 @@ function organize_simple_checkedout_merge_no_conflict { # @test
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384 new-etikett-for-all]
+		[!md @$(get_type_blob_sha) !toml-type-v1 new-etikett-for-all]
 		[-tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
 		[-tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
 		[-tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
@@ -211,7 +211,7 @@ function organize_simple_checkedout_merge_no_conflict { # @test
 	run_zit show -format log new-etikett-for-all:z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384 new-etikett-for-all]
+		[!md @$(get_type_blob_sha) !toml-type-v1 new-etikett-for-all]
 		[-tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
 		[-tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
 		[-tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 new-etikett-for-all]
@@ -283,16 +283,16 @@ function organize_simple_checkedout_merge_conflict { # @test
 	EOM
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384 !txt2 new-etikett-for-all]
+		[!md @$(get_type_blob_sha) !txt2 new-etikett-for-all]
+		[-tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !txt2 new-etikett-for-all]
 		[-tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !txt2 new-etikett-for-all]
 		[-tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !txt2 new-etikett-for-all]
 		[-tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !txt2 new-etikett-for-all]
 		[-tag-4 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !txt2 new-etikett-for-all]
-		[-tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !txt2 new-etikett-for-all]
-		[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[new-etikett-for @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[new-etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[new @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[new-etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[new-etikett-for @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[new-etikett-for-all @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again different" new-etikett-for-all tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" new-etikett-for-all tag-3 tag-4]
 	EOM
@@ -300,7 +300,7 @@ function organize_simple_checkedout_merge_conflict { # @test
 	run_zit show -format log new-etikett-for-all:z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384 !txt2 new-etikett-for-all]
+		[!md @$(get_type_blob_sha) !txt2 new-etikett-for-all]
 		[-tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !txt2 new-etikett-for-all]
 		[-tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !txt2 new-etikett-for-all]
 		[-tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !txt2 new-etikett-for-all]

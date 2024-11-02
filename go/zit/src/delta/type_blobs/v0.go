@@ -30,3 +30,11 @@ func (a *V0) Reset() {
 	a.Actions = reset.Map(a.Actions)
 	a.Hooks = nil
 }
+
+func (a *V0) GetBinary() bool {
+  return !a.InlineBlob
+}
+
+func (a *V0) GetFileExtension() string {
+  return a.FileExtension
+}

@@ -4,13 +4,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 )
 
-func Default() (t V0) {
-	t = V0{
-		InlineBlob:    true,
+func Default() (t TomlV1) {
+	t = TomlV1{
 		FileExtension: "md",
 		Formatters:    make(map[string]script_config.WithOutputFormat),
 		VimSyntaxType: "markdown",
-		Actions:       make(map[string]script_config.ScriptConfig),
 	}
 
 	return

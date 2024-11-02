@@ -15,18 +15,19 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 )
 
 func (kc *Compiled) recompile(
-	tagp interfaces.BlobGetterPutter[*type_blobs.V0],
+	blobStore *blob_store.VersionedStores,
 ) (err error) {
 	if err = kc.recompileTags(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = kc.recompileTypes(tagp); err != nil {
+	if err = kc.recompileTypes(blobStore); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -69,26 +70,35 @@ func (kc *Compiled) recompileTags() (err error) {
 }
 
 func (kc *Compiled) recompileTypes(
-	tagp interfaces.BlobGetterPutter[*type_blobs.V0],
+	blobStore *blob_store.VersionedStores,
 ) (err error) {
-	inlineTypen := collections_value.MakeMutableValueSet[values.String](nil)
+	inlineTypes := collections_value.MakeMutableValueSet[values.String](nil)
 
 	defer func() {
-		kc.InlineTypes = inlineTypen.CloneSetLike()
+		kc.InlineTypes = inlineTypes.CloneSetLike()
 	}()
 
 	if err = kc.Types.Each(
 		func(ct *sku.Transacted) (err error) {
-			var ta *type_blobs.V0
+			tipe := ct.GetSku().GetType()
+			var commonBlob type_blobs.Common
 
-			if ta, err = tagp.GetBlob(ct.GetBlobSha()); err != nil {
+			if commonBlob, _, err = blobStore.ParseTypeBlob(
+				tipe,
+				ct.GetBlobSha(),
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			defer tagp.PutBlob(ta)
+			defer blobStore.PutTypeBlob(tipe, commonBlob)
 
-			fe := ta.FileExtension
+			if commonBlob == nil {
+				err = errors.Errorf("nil type blob for type: %q", tipe)
+				return
+			}
+
+			fe := commonBlob.GetFileExtension()
 
 			if fe == "" {
 				fe = ct.GetObjectId().String()
@@ -98,8 +108,8 @@ func (kc *Compiled) recompileTypes(
 			kc.ExtensionsToTypes[fe] = ct.GetObjectId().String()
 			kc.TypesToExtensions[ct.GetObjectId().String()] = fe
 
-			if ta.InlineBlob {
-				inlineTypen.Add(values.MakeString(ct.ObjectId.String()))
+			if !commonBlob.GetBinary() {
+				inlineTypes.Add(values.MakeString(ct.ObjectId.String()))
 			}
 
 			if err = kc.ApplyDormantAndRealizeTags(ct); err != nil {
@@ -180,7 +190,7 @@ func (kc *Compiled) loadMutableConfig(s fs_home.Home) (err error) {
 
 func (kc *Compiled) Flush(
 	s fs_home.Home,
-	tagp interfaces.BlobGetterPutter[*type_blobs.V0],
+	blobStore *blob_store.VersionedStores,
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	if !kc.HasChanges() || kc.DryRun {
@@ -189,7 +199,7 @@ func (kc *Compiled) Flush(
 
 	wg := quiter.MakeErrorWaitGroupParallel()
 	wg.Do(func() (err error) {
-		if err = kc.flushMutableConfig(s, tagp, printerHeader); err != nil {
+		if err = kc.flushMutableConfig(s, blobStore, printerHeader); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -209,7 +219,7 @@ func (kc *Compiled) Flush(
 
 func (kc *Compiled) flushMutableConfig(
 	s fs_home.Home,
-	tagp interfaces.BlobGetterPutter[*type_blobs.V0],
+	blobStore *blob_store.VersionedStores,
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	if err = printerHeader("recompiling konfig"); err != nil {
@@ -217,7 +227,7 @@ func (kc *Compiled) flushMutableConfig(
 		return
 	}
 
-	if err = kc.recompile(tagp); err != nil {
+	if err = kc.recompile(blobStore); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

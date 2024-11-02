@@ -1,0 +1,36 @@
+package store
+
+import (
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+)
+
+func (s *Store) validate(
+	el sku.ExternalLike, mutter *sku.Transacted,
+	o sku.CommitOptions,
+) (err error) {
+	if o.DontValidate {
+		return
+	}
+
+	switch el.GetSku().GetGenre() {
+	case genres.Type:
+		tipe := el.GetSku().GetType()
+
+		var commonBlob type_blobs.Common
+
+		if commonBlob, _, err = s.GetBlobStore().ParseTypeBlob(
+			tipe,
+			el.GetSku().GetBlobSha(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer s.GetBlobStore().PutTypeBlob(tipe, commonBlob)
+	}
+
+	return
+}

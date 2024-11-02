@@ -269,6 +269,7 @@ func (a *Sha) ResetWith(b *Sha) {
 }
 
 func (a *Sha) ResetWithShaLike(b interfaces.Sha) {
+  a.allocDataIfNecessary()
 	copy(a.data[:], b.GetShaBytes())
 }
 

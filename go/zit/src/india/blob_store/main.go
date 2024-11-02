@@ -1,10 +1,12 @@
 package blob_store
 
 import (
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/tag_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fs_home"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config"
 )
@@ -18,12 +20,14 @@ type Store[
 	interfaces.BlobGetterPutter[APtr]
 }
 
+// TODO switch to interfaces instead of structs
 type VersionedStores struct {
-	tag_v0    Store[tag_blobs.V0, *tag_blobs.V0]
-	tag_v1    Store[tag_blobs.V1, *tag_blobs.V1]
-	repo_v0   Store[repo_blobs.V0, *repo_blobs.V0]
-	config_v0 Store[mutable_config.Blob, *mutable_config.Blob]
-	type_v0   Store[type_blobs.V0, *type_blobs.V0]
+	tag_v0       Store[tag_blobs.V0, *tag_blobs.V0]
+	tag_v1       Store[tag_blobs.V1, *tag_blobs.V1]
+	repo_v0      Store[repo_blobs.V0, *repo_blobs.V0]
+	config_v0    Store[mutable_config.Blob, *mutable_config.Blob]
+	type_v0      Store[type_blobs.V0, *type_blobs.V0]
+	type_toml_v1 Store[type_blobs.TomlV1, *type_blobs.TomlV1]
 }
 
 func Make(
@@ -95,6 +99,19 @@ func Make(
 				a.Reset()
 			},
 		),
+		type_toml_v1: MakeBlobStore(
+			st,
+			MakeBlobFormat(
+				MakeTextParserIgnoreTomlErrors[type_blobs.TomlV1](
+					st,
+				),
+				ParsedBlobTomlFormatter[type_blobs.TomlV1, *type_blobs.TomlV1]{},
+				st,
+			),
+			func(a *type_blobs.TomlV1) {
+				a.Reset()
+			},
+		),
 	}
 }
 
@@ -116,4 +133,64 @@ func (a *VersionedStores) GetConfigV0() Store[mutable_config.Blob, *mutable_conf
 
 func (a *VersionedStores) GetTypeV0() Store[type_blobs.V0, *type_blobs.V0] {
 	return a.type_v0
+}
+
+func (a *VersionedStores) GetTypeV1() Store[type_blobs.TomlV1, *type_blobs.TomlV1] {
+	return a.type_toml_v1
+}
+
+func (a *VersionedStores) ParseTypeBlob(
+	tipe ids.Type,
+	blobSha interfaces.Sha,
+) (common type_blobs.Common, n int64, err error) {
+	switch tipe.String() {
+	case "", "toml-type-v0":
+		store := a.GetTypeV0()
+		var blob *type_blobs.V0
+
+		if blob, err = store.GetBlob(blobSha); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		common = blob
+
+	case "toml-type-v1":
+		store := a.GetTypeV1()
+		var blob *type_blobs.TomlV1
+
+		if blob, err = store.GetBlob(blobSha); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		common = blob
+	}
+
+	return
+}
+
+func (a *VersionedStores) PutTypeBlob(
+	tipe ids.Type,
+	common type_blobs.Common,
+) (err error) {
+	switch tipe.String() {
+	case "", "toml-type-v0":
+		if blob, ok := common.(*type_blobs.V0); !ok {
+			err = errors.Errorf("expected %T but got %T", blob, common)
+			return
+		} else {
+			a.GetTypeV0().PutBlob(blob)
+		}
+
+	case "toml-type-v1":
+		if blob, ok := common.(*type_blobs.TomlV1); !ok {
+			err = errors.Errorf("expected %T but got %T", blob, common)
+			return
+		} else {
+			a.GetTypeV1().PutBlob(blob)
+		}
+	}
+
+	return
 }

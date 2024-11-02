@@ -17,10 +17,10 @@ teardown() {
 function reindex_simple { # @test
 	run_zit reindex
 	assert_success
-  run_zit show +t,e,z,konfig
+	run_zit show +t,e,z,konfig
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+		[!md @$(get_type_blob_sha) !toml-type-v1]
 		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -49,7 +49,7 @@ function reindex_simple { # @test
 function reindex_simple_twice { # @test
 	expected="$(mktemp)"
 	cat - >"$expected" <<-EOM
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+		[!md @$(get_type_blob_sha) !toml-type-v1]
 		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
@@ -63,13 +63,13 @@ function reindex_simple_twice { # @test
 
 	run_zit reindex
 	assert_success
-  run_zit show +e,t,z,konfig
+	run_zit show +e,t,z,konfig
 	assert_success
 	assert_output_unsorted - <"$expected"
 
 	run_zit reindex
 	assert_success
-  run_zit show +e,t,z,konfig
+	run_zit show +e,t,z,konfig
 	assert_success
 	assert_output_unsorted - <"$expected"
 }
@@ -78,7 +78,7 @@ function reindex_after_changes { # @test
 	run_zit show !md:t
 	assert_success
 	assert_output - <<-EOM
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+		[!md @$(get_type_blob_sha) !toml-type-v1]
 	EOM
 
 	cat >md.typ <<-EOM
@@ -96,7 +96,6 @@ function reindex_after_changes { # @test
 		run_zit show -format blob !md+t
 		assert_success
 		assert_output - <<-EOM
-			inline-akte = true
 			file-extension = 'md'
 			vim-syntax-type = 'markdown'
 			inline-akte = false
@@ -115,10 +114,10 @@ function reindex_after_changes { # @test
 
 	run_zit reindex
 	assert_success
-  run_zit show +e,t,z,konfig
+	run_zit show +e,t,z,konfig
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
+		[!md @$(get_type_blob_sha) !toml-type-v1]
 		[!md @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
 		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
