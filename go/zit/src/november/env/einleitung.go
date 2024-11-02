@@ -199,8 +199,12 @@ func initDefaultTypeAndConfig(u *Env) (err error) {
 
 	{
 		var sh interfaces.Sha
+    var tipe ids.Type
 
-		if sh, err = writeDefaultMutableConfig(u, defaultTypeObjectId); err != nil {
+		if sh, tipe, err = writeDefaultMutableConfig(
+      u,
+      defaultTypeObjectId,
+    ); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -217,6 +221,8 @@ func initDefaultTypeAndConfig(u *Env) (err error) {
 			return
 		}
 
+		newConfig.Metadata.Type.ResetWith(tipe)
+
 		if err = u.GetStore().CreateOrUpdate(
 			newConfig,
 			object_mode.ModeCreate,
@@ -232,8 +238,9 @@ func initDefaultTypeAndConfig(u *Env) (err error) {
 func writeDefaultMutableConfig(
 	u *Env,
 	dt ids.Type,
-) (sh interfaces.Sha, err error) {
-	defaultKonfig := mutable_config_blobs.Default(dt)
+) (sh interfaces.Sha, tipe ids.Type, err error) {
+	defaultMutableConfig := mutable_config_blobs.Default(dt)
+	tipe = defaultMutableConfig.Type
 
 	f := u.GetStore().GetConfigBlobFormat()
 
@@ -246,7 +253,7 @@ func writeDefaultMutableConfig(
 
 	defer errors.DeferredCloser(&err, aw)
 
-	if _, err = f.FormatParsedBlob(aw, defaultKonfig); err != nil {
+	if _, err = f.FormatParsedBlob(aw, defaultMutableConfig.Blob); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

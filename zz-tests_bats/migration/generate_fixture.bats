@@ -35,7 +35,7 @@ function generate { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
-		[konfig @$(get_konfig_sha)]
+		[konfig @$(get_konfig_sha) !toml-config-v1]
 	EOM
 
 	run_zit new "${cmd_def[@]}" -edit=false - <<EOM

@@ -364,19 +364,19 @@ func (k2 *objectId2) SetFromPath(
 	ext := els[0]
 
 	switch ext {
-	case fe.Etikett:
+	case fe.Tag:
 		if err = k2.SetWithGenre(els[1], genres.Tag); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case fe.Typ:
+	case fe.Type:
 		if err = k2.SetWithGenre(els[1], genres.Type); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-	case fe.Kasten:
+	case fe.Repo:
 		if err = k2.SetWithGenre(els[1], genres.Repo); err != nil {
 			err = errors.Wrap(err)
 			return

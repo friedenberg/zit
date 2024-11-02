@@ -2,12 +2,13 @@ package type_blobs
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 )
 
 const (
-	TypeV0     = "toml-type-v0"
-	TypeV1     = "toml-type-v1"
-	TypeLatest = TypeV1
+	TypeV0     = builtin_types.TypeTypeV0
+	TypeV1     = builtin_types.TypeTypeV1
+	TypeLatest = builtin_types.TypeTypeLatest
 )
 
 func Default() (t TomlV1) {

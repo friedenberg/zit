@@ -339,15 +339,15 @@ func (s *Store) PathForTransacted(dir string, tl *sku.Transacted) string {
 		fmt.Sprintf(
 			"%s.%s",
 			&tl.ObjectId,
-			s.FileExtensionForGattung(tl),
+			s.FileExtensionForGenre(tl),
 		),
 	)
 }
 
-func (s *Store) FileExtensionForGattung(
+func (s *Store) FileExtensionForGenre(
 	gg interfaces.GenreGetter,
 ) string {
-	return s.fileExtensions.GetFileExtensionForGattung(gg)
+	return s.fileExtensions.GetFileExtensionForGenre(gg)
 }
 
 func (s *Store) RemoveItem(i *Item) (err error) {

@@ -21,7 +21,7 @@ function last_after_init { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
-		[konfig @facdee599b069eb9dae4b04079fbf1b3aaaed30fe587ccc3e6fa7b6ff680b1f0]
+		[konfig @$(get_konfig_sha) !toml-config-v1]
 	EOM
 }
 

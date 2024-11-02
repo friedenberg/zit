@@ -12,8 +12,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/object_id_provider"
-	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -393,8 +393,7 @@ func (s *Store) addTypeAndExpandedIfNecessary(
 		return
 	}
 
-	switch t1.String() {
-	case "", type_blobs.TypeV0, type_blobs.TypeV1:
+	if builtin_types.IsBuiltin(t1) {
 		return
 	}
 

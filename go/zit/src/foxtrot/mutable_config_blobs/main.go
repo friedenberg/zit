@@ -5,12 +5,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/options_tools"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 )
 
 const (
-	TypeV0     = "toml-config-v0"
-	TypeV1     = "toml-config-v1"
-	TypeLatest = TypeV1
+	TypeV0     = builtin_types.ConfigTypeV0
+	TypeV1     = builtin_types.ConfigTypeV1
+	TypeLatest = builtin_types.ConfigTypeLatest
 )
 
 type Blob interface {
@@ -18,22 +19,25 @@ type Blob interface {
 }
 
 // TODO version
-func Default(defaultTyp ids.Type) Blob {
-	return V0{
-		Defaults: DefaultsV0{
-			Typ:       defaultTyp,
-			Etiketten: make([]ids.Tag, 0),
-		},
-		FileExtensions: file_extensions.FileExtensions{
-			Typ:      "typ",
-			Zettel:   "zettel",
-			Organize: "md",
-			Etikett:  "etikett",
-			Kasten:   "kasten",
-		},
-		Tools: options_tools.Options{
-			Merge: []string{
-				"vimdiff",
+func Default(defaultTyp ids.Type) ids.TypedBlob[Blob] {
+	return ids.TypedBlob[Blob]{
+		Type: ids.MustType(TypeLatest),
+		Blob: V1{
+			Defaults: DefaultsV1{
+				Type: defaultTyp,
+				Tags: make([]ids.Tag, 0),
+			},
+			FileExtensions: file_extensions.FileExtensions{
+				Type:     "typ",
+				Zettel:   "zettel",
+				Organize: "md",
+				Tag:      "etikett",
+				Repo:     "kasten",
+			},
+			Tools: options_tools.Options{
+				Merge: []string{
+					"vimdiff",
+				},
 			},
 		},
 	}

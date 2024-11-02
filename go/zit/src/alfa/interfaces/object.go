@@ -1,7 +1,7 @@
 package interfaces
 
 type FileExtensionGetter interface {
-	GetFileExtensionForGattung(GenreGetter) string
+	GetFileExtensionForGenre(GenreGetter) string
 	GetFileExtensionZettel() string
 	GetFileExtensionOrganize() string
 	GetFileExtensionType() string

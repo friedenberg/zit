@@ -265,13 +265,13 @@ func (d *dirItems) processFDsOnItem(
 			case d.Zettel:
 				fds.SetGenre(genres.Zettel)
 
-			case d.Typ:
+			case d.Type:
 				fds.SetGenre(genres.Type)
 
-			case d.Etikett:
+			case d.Tag:
 				fds.SetGenre(genres.Tag)
 
-			case d.Kasten:
+			case d.Repo:
 				fds.SetGenre(genres.Repo)
 
 			case "conflict":

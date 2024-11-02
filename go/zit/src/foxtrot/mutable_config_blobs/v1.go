@@ -31,3 +31,7 @@ func (a *V1) ResetWith(b *V1) {
 
 	a.PrintOptions = b.PrintOptions
 }
+
+func (a V1) GetFilters() map[string]string {
+	return make(map[string]string)
+}
