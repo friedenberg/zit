@@ -18,10 +18,10 @@ function add_one { # @test
 	run_zit checkout tag-3:e
 	assert_success
 	# assert_output - <<-EOM
-	# 	      checked out [tag-3.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+	# 	      checked out [tag-3.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	# EOM
 
-	cat - >tag-3.etikett <<-EOM
+	cat - >tag-3.tag <<-EOM
 		---
 		- recurse
 		---
@@ -33,7 +33,7 @@ function add_one { # @test
 	assert_output - <<-EOM
 		[recurse @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 recurse]
-		          deleted [tag-3.etikett]
+		          deleted [tag-3.tag]
 	EOM
 
 	run_zit show recurse:e,z
@@ -50,10 +50,10 @@ function add_one_super_etiketten { # @test
 	run_zit checkout tag-3:e
 	assert_success
 	assert_output - <<-EOM
-		      checked out [tag-3.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [tag-3.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 
-	cat - >tag-3.etikett <<-EOM
+	cat - >tag-3.tag <<-EOM
 		---
 		- recurse
 		---
@@ -65,7 +65,7 @@ function add_one_super_etiketten { # @test
 	assert_output - <<-EOM
 		[recurse @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-3 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 recurse]
-		          deleted [tag-3.etikett]
+		          deleted [tag-3.tag]
 	EOM
 
 	run_zit organize -mode commit-directly <<-EOM

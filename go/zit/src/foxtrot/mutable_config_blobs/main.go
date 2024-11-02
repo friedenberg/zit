@@ -28,11 +28,11 @@ func Default(defaultTyp ids.Type) ids.TypedBlob[Blob] {
 				Tags: make([]ids.Tag, 0),
 			},
 			FileExtensions: file_extensions.FileExtensions{
-				Type:     "typ",
+				Type:     "type",
 				Zettel:   "zettel",
 				Organize: "md",
-				Tag:      "etikett",
-				Repo:     "kasten",
+				Tag:      "tag",
+				Repo:     "repo",
 			},
 			Tools: options_tools.Options{
 				Merge: []string{

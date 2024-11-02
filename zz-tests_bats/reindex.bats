@@ -81,7 +81,7 @@ function reindex_after_changes { # @test
 		[!md @$(get_type_blob_sha) !toml-type-v1]
 	EOM
 
-	cat >md.typ <<-EOM
+	cat >md.type <<-EOM
 		inline-akte = false
 		vim-syntax-type = "test"
 	EOM

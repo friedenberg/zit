@@ -20,15 +20,15 @@ function clean_all { # @test
 	run_zit clean .
 	assert_success
 	assert_output_unsorted - <<-EOM
-		          deleted [md.typ]
+		          deleted [md.type]
 		          deleted [one/]
 		          deleted [one/dos.zettel]
 		          deleted [one/uno.zettel]
-		          deleted [tag-1.etikett]
-		          deleted [tag-2.etikett]
-		          deleted [tag-3.etikett]
-		          deleted [tag-4.etikett]
-		          deleted [tag.etikett]
+		          deleted [tag-1.tag]
+		          deleted [tag-2.tag]
+		          deleted [tag-3.tag]
+		          deleted [tag-4.tag]
+		          deleted [tag.tag]
 	EOM
 
 	run find . -maxdepth 2 ! -ipath './.xdg*'
@@ -48,12 +48,12 @@ function clean_zettels { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		.
-		./md.typ
-		./tag-1.etikett
-		./tag-2.etikett
-		./tag-3.etikett
-		./tag-4.etikett
-		./tag.etikett
+		./md.type
+		./tag-1.tag
+		./tag-2.tag
+		./tag-3.tag
+		./tag-4.tag
+		./tag.tag
 	EOM
 }
 
@@ -78,40 +78,40 @@ function clean_all_dirty_wd { # @test
 		dos newest body
 	EOM
 
-	cat >md.typ <<-EOM
+	cat >md.type <<-EOM
 		inline-akte = false
 		vim-syntax-type = "test"
 	EOM
 
-	cat >da-new.typ <<-EOM
+	cat >da-new.type <<-EOM
 		inline-akte = true
 		vim-syntax-type = "da-new"
 	EOM
 
-	cat >zz-archive.etikett <<-EOM
+	cat >zz-archive.tag <<-EOM
 		hide = true
 	EOM
 
 	run_zit clean .
 	assert_success
 	assert_output_unsorted - <<-EOM
-		          deleted [tag-1.etikett]
-		          deleted [tag-2.etikett]
-		          deleted [tag-3.etikett]
-		          deleted [tag-4.etikett]
-		          deleted [tag.etikett]
+		          deleted [tag-1.tag]
+		          deleted [tag-2.tag]
+		          deleted [tag-3.tag]
+		          deleted [tag-4.tag]
+		          deleted [tag.tag]
 	EOM
 
 	run find . -maxdepth 2 ! -ipath './.xdg*'
 	assert_success
 	assert_output_unsorted - <<-EOM
 		.
-		./md.typ
+		./md.type
 		./one
 		./one/uno.zettel
 		./one/dos.zettel
-		./da-new.typ
-		./zz-archive.etikett
+		./da-new.type
+		./zz-archive.tag
 	EOM
 }
 
@@ -129,41 +129,41 @@ function clean_all_force_dirty_wd { # @test
 	cat >one/dos.zettel <<-EOM
 		---
 		# dos wildly different
-		- etikett-two
+		- tag-two
 		! md
 		---
 
 		dos newest body
 	EOM
 
-	cat >md.typ <<-EOM
+	cat >md.type <<-EOM
 		inline-akte = false
 		vim-syntax-type = "test"
 	EOM
 
-	cat >da-new.typ <<-EOM
+	cat >da-new.type <<-EOM
 		inline-akte = true
 		vim-syntax-type = "da-new"
 	EOM
 
-	cat >zz-archive.etikett <<-EOM
+	cat >zz-archive.tag <<-EOM
 		hide = true
 	EOM
 
 	run_zit clean -force .
 	assert_success
 	assert_output_unsorted - <<-EOM
-		          deleted [da-new.typ]
-		          deleted [md.typ]
+		          deleted [da-new.type]
+		          deleted [md.type]
 		          deleted [one/dos.zettel]
 		          deleted [one/uno.zettel]
 		          deleted [one/]
-		          deleted [tag-1.etikett]
-		          deleted [tag-2.etikett]
-		          deleted [tag-3.etikett]
-		          deleted [tag-4.etikett]
-		          deleted [tag.etikett]
-		          deleted [zz-archive.etikett]
+		          deleted [tag-1.tag]
+		          deleted [tag-2.tag]
+		          deleted [tag-3.tag]
+		          deleted [tag-4.tag]
+		          deleted [tag.tag]
+		          deleted [zz-archive.tag]
 	EOM
 
 	run find . -maxdepth 2 ! -ipath './.xdg*'

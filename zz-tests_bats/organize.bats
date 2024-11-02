@@ -231,19 +231,19 @@ function organize_simple_checkedout_merge_no_conflict { # @test
 
 function organize_simple_checkedout_merge_conflict { # @test
 	#TODO-project-2022-zit-collapse_skus
-	cat - >txt.typ <<-EOM
+	cat - >txt.type <<-EOM
 		inline-akte = true
 	EOM
 
-	cat - >txt2.typ <<-EOM
+	cat - >txt2.type <<-EOM
 		inline-akte = true
 	EOM
 
 	run_zit checkin -delete .t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		          deleted [txt.typ]
-		          deleted [txt2.typ]
+		          deleted [txt.type]
+		          deleted [txt2.type]
 		[!txt2 @c9627d6d0f0a88e6cbc93a5ccb4657a7b274655c1b89c53cbff92ecae5f6c583]
 		[!txt @c9627d6d0f0a88e6cbc93a5ccb4657a7b274655c1b89c53cbff92ecae5f6c583]
 	EOM

@@ -12,26 +12,26 @@ setup() {
 	run_zit checkout :z,t,e
 	assert_success
 	assert_output_unsorted - <<-EOM
-		      checked out [md.typ @$(get_type_blob_sha) !toml-type-v1]
+		      checked out [md.type @$(get_type_blob_sha) !toml-type-v1]
 		      checked out [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		      checked out [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
-		      checked out [tag-1.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		      checked out [tag-2.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		      checked out [tag-3.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		      checked out [tag-4.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		      checked out [tag.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [tag-1.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [tag-2.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [tag-3.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [tag-4.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [tag.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 
 	run ls
 	assert_success
 	assert_output_unsorted - <<-EOM
-		md.typ
+		md.type
 		one
-		tag-1.etikett
-		tag-2.etikett
-		tag-3.etikett
-		tag-4.etikett
-		tag.etikett
+		tag-1.tag
+		tag-2.tag
+		tag-3.tag
+		tag-4.tag
+		tag.tag
 	EOM
 
 	cat >one/uno.zettel <<-EOM
@@ -54,12 +54,12 @@ setup() {
 		dos newest body
 	EOM
 
-	cat >md.typ <<-EOM
+	cat >md.type <<-EOM
 		inline-akte = false
 		vim-syntax-type = "test"
 	EOM
 
-	cat >zz-archive.etikett <<-EOM
+	cat >zz-archive.tag <<-EOM
 		hide = true
 	EOM
 }
@@ -220,7 +220,7 @@ function checkin_simple_typ { # @test
 }
 
 function checkin_simple_etikett { # @test
-	run_zit checkin zz-archive.etikett
+	run_zit checkin zz-archive.tag
 	# run_zit checkin zz-archive.e
 	assert_success
 	assert_output - <<-EOM
@@ -241,7 +241,7 @@ function checkin_simple_etikett { # @test
 }
 
 function checkin_zettel_typ_has_commit_hook { # @test
-	cat >typ_with_hook.typ <<-EOM
+	cat >typ_with_hook.type <<-EOM
 		hooks = """
 		return {
 		  on_new = function (kinder)
@@ -256,11 +256,11 @@ function checkin_zettel_typ_has_commit_hook { # @test
 		"""
 	EOM
 
-	run_zit checkin -delete typ_with_hook.typ
+	run_zit checkin -delete typ_with_hook.type
 	assert_success
 	assert_output - <<-EOM
 		[!typ_with_hook @1f6b9061059a83822901612bc050dd7d966bb5a2ceb917549ca3881728854477]
-		          deleted [typ_with_hook.typ]
+		          deleted [typ_with_hook.type]
 	EOM
 
 	run_zit new -edit=false - <<-EOM

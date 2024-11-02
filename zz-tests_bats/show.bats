@@ -330,9 +330,9 @@ function show_konfig { # @test
 		[file-extensions]
 		zettel = 'zettel'
 		organize = 'md'
-		typ = 'typ'
-		etikett = 'etikett'
-		kasten = 'kasten'
+		typ = 'type'
+		etikett = 'tag'
+		kasten = 'repo'
 
 		[cli-output]
 		print-include-description = false
@@ -373,7 +373,7 @@ function show_history_all { # @test
 }
 
 function show_etikett_lua { # @test
-	cat >true.etikett <<-EOM
+	cat >true.tag <<-EOM
 		filter = """
 		return {
 		  contains_sku = function (sk)
@@ -383,10 +383,10 @@ function show_etikett_lua { # @test
 		"""
 	EOM
 
-	run_zit checkin -delete true.etikett
+	run_zit checkin -delete true.tag
 	assert_success
 	assert_output_unsorted - <<-EOM
-		          deleted [true.etikett]
+		          deleted [true.tag]
 		[true @1379cb8d553a340a4d262b3be216659d8d8835ad0b4cc48005db8db264a395ed]
 	EOM
 

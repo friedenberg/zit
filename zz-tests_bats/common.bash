@@ -101,7 +101,7 @@ function run_zit_init {
 }
 
 function get_konfig_sha() {
-  echo -n "4c84c19c85dd3db6b391505807ba6df42986913626709404111d9a86246228ec"
+  echo -n "444944ec8380922845d04b5b412fc67c7752128ec3abeed01a63cdcc0c9b002c"
 }
 
 function get_type_blob_sha() {

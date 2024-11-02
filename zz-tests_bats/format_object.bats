@@ -18,7 +18,7 @@ function format_simple { # @test
 	run_zit checkout !md:t
 	assert_success
 
-	cat >md.typ <<-EOM
+	cat >md.type <<-EOM
 		inline-akte = true
 		[formatters.text]
 		shell = [
@@ -33,7 +33,7 @@ function format_simple { # @test
 	assert_success
 	assert_output - <<-EOM
 		[!md @21759bebd1a7937005f692b9394c0d2629361286b9fe837617e166c3ded687eb]
-		          deleted [md.typ]
+		          deleted [md.type]
 	EOM
 
 	run_zit format-object -mode both one/uno text

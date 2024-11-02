@@ -28,7 +28,7 @@ function last_after_init { # @test
 function last_after_typ_mutate { # @test
 	run_zit_init_disable_age
 
-	cat >md.typ <<-EOM
+	cat >md.type <<-EOM
 		inline-akte = false
 		vim-syntax-type = "test"
 	EOM

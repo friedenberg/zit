@@ -12,14 +12,14 @@ setup() {
 	run_zit checkout :z,t,e
 	assert_success
 	assert_output_unsorted - <<-EOM
-		      checked out [md.typ @$(get_type_blob_sha) !toml-type-v1]
+		      checked out [md.type @$(get_type_blob_sha) !toml-type-v1]
 		      checked out [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		      checked out [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
-		      checked out [tag-1.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		      checked out [tag-2.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		      checked out [tag-3.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		      checked out [tag-4.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		      checked out [tag.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [tag-1.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [tag-2.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [tag-3.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [tag-4.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [tag.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 }
 
@@ -86,21 +86,21 @@ function dirty_one_dos() {
 }
 
 function dirty_md_typ() {
-	cat >md.typ <<-EOM
+	cat >md.type <<-EOM
 		inline-akte = false
 		vim-syntax-type = "test"
 	EOM
 }
 
 function dirty_da_new_typ() {
-	cat >da-new.typ <<-EOM
+	cat >da-new.type <<-EOM
 		inline-akte = true
 		vim-syntax-type = "da-new"
 	EOM
 }
 
 function dirty_zz_archive_etikett() {
-	cat >zz-archive.etikett <<-EOM
+	cat >zz-archive.tag <<-EOM
 		hide = true
 	EOM
 }
@@ -272,14 +272,14 @@ function status_simple_all { # @test
 	run_zit status
 	assert_success
 	assert_output_unsorted - <<-EOM
-		             same [md.typ @$(get_type_blob_sha) !toml-type-v1]
+		             same [md.type @$(get_type_blob_sha) !toml-type-v1]
 		             same [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		             same [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
-		             same [tag-1.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		             same [tag-2.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		             same [tag-3.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		             same [tag-4.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		             same [tag.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag-1.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag-2.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag-3.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag-4.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 
 	dirty_one_uno
@@ -291,16 +291,16 @@ function status_simple_all { # @test
 	run_zit status .
 	assert_success
 	assert_output_unsorted - <<-EOM
-		             same [tag-1.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		             same [tag-2.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		             same [tag-3.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		             same [tag-4.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		             same [tag.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		          changed [md.typ @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
+		             same [tag-1.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag-2.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag-3.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag-4.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		          changed [md.type @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
 		          changed [one/dos.zettel @b5c4fbaac3b71657edee74de4b947f13dfa104715feb8bab7cfa4dd47cafa3db !md "dos wildly different" etikett-two]
 		          changed [one/uno.zettel @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "wildly different" etikett-one]
-		        untracked [da-new.typ @1a4c3a8914d9e5fa1a08cb183bcdf7e6e10aa224f663dc56610a303b10aa0834]
-		        untracked [zz-archive.etikett @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
+		        untracked [da-new.type @1a4c3a8914d9e5fa1a08cb183bcdf7e6e10aa224f663dc56610a303b10aa0834]
+		        untracked [zz-archive.tag @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
 	EOM
 }
 
@@ -308,7 +308,7 @@ function status_simple_typ { # @test
 	run_zit status .t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		             same [md.typ @$(get_type_blob_sha) !toml-type-v1]
+		             same [md.type @$(get_type_blob_sha) !toml-type-v1]
 	EOM
 
 	dirty_md_typ
@@ -317,8 +317,8 @@ function status_simple_typ { # @test
 	run_zit status .t
 	assert_success
 	assert_output_unsorted - <<-EOM
-		          changed [md.typ @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
-		        untracked [da-new.typ @1a4c3a8914d9e5fa1a08cb183bcdf7e6e10aa224f663dc56610a303b10aa0834]
+		          changed [md.type @220519ab7c918ccbd73c2d4d73502ab2ec76106662469feea2db8960b5d68217]
+		        untracked [da-new.type @1a4c3a8914d9e5fa1a08cb183bcdf7e6e10aa224f663dc56610a303b10aa0834]
 	EOM
 }
 
@@ -326,11 +326,11 @@ function status_simple_etikett { # @test
 	run_zit status .e
 	assert_success
 	assert_output_unsorted - <<-EOM
-		             same [tag-1.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		             same [tag-2.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		             same [tag-3.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		             same [tag-4.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		             same [tag.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag-1.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag-2.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag-3.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag-4.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 
 	dirty_zz_archive_etikett
@@ -338,12 +338,12 @@ function status_simple_etikett { # @test
 	run_zit status .e
 	assert_success
 	assert_output_unsorted - <<-EOM
-		             same [tag-1.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		             same [tag-2.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		             same [tag-3.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		             same [tag-4.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		             same [tag.etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		        untracked [zz-archive.etikett @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
+		             same [tag-1.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag-2.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag-3.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag-4.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		        untracked [zz-archive.tag @b8cd0eaa1891284eafdf99d3acc2007a3d4396e8a7282335f707d99825388a93]
 	EOM
 }
 
