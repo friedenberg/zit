@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
+	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 

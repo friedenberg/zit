@@ -4,8 +4,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/organize_text"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
+	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
 )
 
 func (e *Env) MakeOrganizeOptionsWithQueryGroup(

@@ -2,7 +2,7 @@ package commands
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
 
 type QueryBuilderModifier interface {
