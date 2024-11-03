@@ -396,6 +396,7 @@ func (b *buildState) parseSigilsAndGenres(
 	return
 }
 
+// TODO use new generic and typed blobs
 func (b *buildState) makeTagOrLuaTag(
 	k *ObjectId,
 ) (exp sku.Query, err error) {
