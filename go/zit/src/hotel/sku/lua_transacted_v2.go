@@ -7,18 +7,18 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
-type LuaTableV1 struct {
+type LuaTableV2 struct {
 	Transacted   *lua.LTable
 	Tags         *lua.LTable
 	TagsImplicit *lua.LTable
 }
 
-func ToLuaTableV1(tg TransactedGetter, l *lua.LState, t *LuaTableV1) {
+func ToLuaTableV2(tg TransactedGetter, l *lua.LState, t *LuaTableV2) {
 	o := tg.GetSku()
 
-	l.SetField(t.Transacted, "Gattung", lua.LString(o.GetGenre().String()))
-	l.SetField(t.Transacted, "Kennung", lua.LString(o.GetObjectId().String()))
-	l.SetField(t.Transacted, "Typ", lua.LString(o.GetType().String()))
+	l.SetField(t.Transacted, "Genre", lua.LString(o.GetGenre().String()))
+	l.SetField(t.Transacted, "ObjectId", lua.LString(o.GetObjectId().String()))
+	l.SetField(t.Transacted, "Type", lua.LString(o.GetType().String()))
 
 	tags := t.Tags
 
@@ -39,13 +39,13 @@ func ToLuaTableV1(tg TransactedGetter, l *lua.LState, t *LuaTableV1) {
 	)
 }
 
-func FromLuaTableV1(o *Transacted, l *lua.LState, lt *LuaTableV1) (err error) {
+func FromLuaTableV2(o *Transacted, l *lua.LState, lt *LuaTableV2) (err error) {
 	t := lt.Transacted
 
-	g := genres.MakeOrUnknown(l.GetField(t, "Gattung").String())
+	g := genres.MakeOrUnknown(l.GetField(t, "Genre").String())
 
 	o.ObjectId.SetGenre(g)
-	k := l.GetField(t, "Kennung").String()
+	k := l.GetField(t, "ObjectId").String()
 
 	if k != "" {
 		if err = o.ObjectId.Set(k); err != nil {
@@ -54,7 +54,7 @@ func FromLuaTableV1(o *Transacted, l *lua.LState, lt *LuaTableV1) (err error) {
 		}
 	}
 
-	et := l.GetField(t, "Etiketten")
+	et := l.GetField(t, "Tags")
 	ets, ok := et.(*lua.LTable)
 
 	if !ok {
@@ -77,11 +77,11 @@ func FromLuaTableV1(o *Transacted, l *lua.LState, lt *LuaTableV1) (err error) {
 		},
 	)
 
-	// TODO Bezeichnung
-	// TODO Typ
+	// TODO Description
+	// TODO Type
 	// TODO Tai
 	// TODO Blob
-	// TODO Verzeichnisse
+	// TODO Cache
 
 	return
 }

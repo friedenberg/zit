@@ -12,16 +12,16 @@ type ExecLua struct {
 }
 
 func (u ExecLua) Run(sk *sku.Transacted, args ...string) (err error) {
-	var lvp sku.LuaVMPool
+	var lvp sku.LuaVMPoolV1
 
 	if lvp, err = u.GetStore().MakeLuaVMPoolWithSku(sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var vm *sku.LuaVM
+	var vm *sku.LuaVMV1
 
-	if vm, args, err = sku.PushTopFunc(lvp, args); err != nil {
+	if vm, args, err = sku.PushTopFuncV1(lvp, args); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

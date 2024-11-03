@@ -109,7 +109,7 @@ func (a TagStore) GetTransactedWithBlob(
 			return
 		}
 
-		blob.LuaVMPool = sku.MakeLuaVMPool(vmp, nil)
+		blob.LuaVMPoolV1 = sku.MakeLuaVMPoolV1(vmp, nil)
 		twb.Blob = blob
 
 	case builtin_types.TagTypeLuaV1:
@@ -134,7 +134,7 @@ func (a TagStore) GetTransactedWithBlob(
 		}
 
 		twb.Blob = &tag_blobs.LuaV1{
-			LuaVMPool: sku.MakeLuaVMPool(vmp, nil),
+			LuaVMPoolV1: sku.MakeLuaVMPoolV1(vmp, nil),
 		}
 	}
 

@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func MakeLuaSelfApplyV1(
+func MakeLuaSelfApplyV2(
 	self *sku.Transacted,
 ) interfaces.FuncIter[*lua.VM] {
 	if self == nil {
@@ -15,28 +15,28 @@ func MakeLuaSelfApplyV1(
 	}
 
 	return func(vm *lua.VM) (err error) {
-		selbstTable := sku.MakeLuaTablePoolV1(vm).Get()
-		sku.ToLuaTableV1(self, vm.LState, selbstTable)
-		vm.SetGlobal("Selbst", selbstTable.Transacted)
+		selfTable := sku.MakeLuaTablePoolV2(vm).Get()
+		sku.ToLuaTableV2(self, vm.LState, selfTable)
+		vm.SetGlobal("Self", selfTable.Transacted)
 		return
 	}
 }
 
-type LuaV1 struct {
-	sku.LuaVMPoolV1
+type LuaV2 struct {
+	sku.LuaVMPoolV2
 }
 
-func (a *LuaV1) GetQueryable() sku.Queryable {
+func (a *LuaV2) GetQueryable() sku.Queryable {
 	return a
 }
 
-func (a *LuaV1) Reset() {
+func (a *LuaV2) Reset() {
 }
 
-func (a *LuaV1) ResetWith(b LuaV1) {
+func (a *LuaV2) ResetWith(b LuaV2) {
 }
 
-func (tb *LuaV1) ContainsSku(tg sku.TransactedGetter) bool {
+func (tb *LuaV2) ContainsSku(tg sku.TransactedGetter) bool {
 	// lb := b.luaVMPoolBuilder.Clone().WithApply(MakeSelfApply(sk))
 	vm, err := tb.Get()
 	if err != nil {
@@ -62,7 +62,7 @@ func (tb *LuaV1) ContainsSku(tg sku.TransactedGetter) bool {
 
 	vm.VM.Push(f)
 
-	sku.ToLuaTableV1(
+	sku.ToLuaTableV2(
 		tg,
 		vm.VM.LState,
 		tSku,

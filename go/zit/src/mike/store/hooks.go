@@ -192,14 +192,14 @@ func (s *Store) tryPreCommitHook(
 		return
 	}
 
-	var vp sku.LuaVMPool
+	var vp sku.LuaVMPoolV1
 
 	if vp, err = s.MakeLuaVMPool(selbst, script); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var vm *sku.LuaVM
+	var vm *sku.LuaVMV1
 
 	if vm, err = vp.Get(); err != nil {
 		err = errors.Wrap(err)
@@ -276,14 +276,14 @@ func (s *Store) tryHookWithName(
 	script string,
 	name string,
 ) (err error) {
-	var vp sku.LuaVMPool
+	var vp sku.LuaVMPoolV1
 
 	if vp, err = s.MakeLuaVMPool(selbst, script); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var vm *sku.LuaVM
+	var vm *sku.LuaVMV1
 
 	if vm, err = vp.Get(); err != nil {
 		err = errors.Wrap(err)

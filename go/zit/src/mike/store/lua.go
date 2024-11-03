@@ -12,7 +12,7 @@ import (
 
 func (s *Store) MakeLuaVMPoolWithSku(
 	sk *sku.Transacted,
-) (lvp sku.LuaVMPool, err error) {
+) (lvp sku.LuaVMPoolV1, err error) {
 	if sk.GetType().String() != "lua" {
 		err = errors.Errorf("unsupported typ: %s, Sku: %s", sk.GetType(), sk)
 		return
@@ -38,7 +38,7 @@ func (s *Store) MakeLuaVMPoolWithSku(
 func (u *Store) MakeLuaVMPool(
 	selbst *sku.Transacted,
 	script string,
-) (vp sku.LuaVMPool, err error) {
+) (vp sku.LuaVMPoolV1, err error) {
 	b := u.luaVMPoolBuilder.Clone().
 		WithScript(script).
 		WithApply(query.MakeSelfApply(selbst))
@@ -50,7 +50,7 @@ func (u *Store) MakeLuaVMPool(
 		return
 	}
 
-	vp = sku.MakeLuaVMPool(lvmp, selbst)
+	vp = sku.MakeLuaVMPoolV1(lvmp, selbst)
 
 	return
 }
@@ -58,7 +58,7 @@ func (u *Store) MakeLuaVMPool(
 func (u *Store) MakeLuaVMPoolWithReader(
 	selbst *sku.Transacted,
 	r io.Reader,
-) (vp sku.LuaVMPool, err error) {
+) (vp sku.LuaVMPoolV1, err error) {
 	b := u.luaVMPoolBuilder.Clone().
 		WithReader(r).
 		WithApply(query.MakeSelfApply(selbst))
@@ -70,7 +70,7 @@ func (u *Store) MakeLuaVMPoolWithReader(
 		return
 	}
 
-	vp = sku.MakeLuaVMPool(lvmp, selbst)
+	vp = sku.MakeLuaVMPoolV1(lvmp, selbst)
 
 	return
 }

@@ -8,17 +8,17 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 )
 
-type LuaVMV1 struct {
+type LuaVMV2 struct {
 	lua.LValue
 	*lua.VM
-	TablePool LuaTablePoolV1
+	TablePool LuaTablePoolV2
 	Selbst    *Transacted
 }
 
-func PushTopFuncV1(
-	lvm LuaVMPoolV1,
+func PushTopFuncV2(
+	lvm LuaVMPoolV2,
 	args []string,
-) (vm *LuaVMV1, argsOut []string, err error) {
+) (vm *LuaVMV2, argsOut []string, err error) {
 	if vm, err = lvm.Get(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -41,13 +41,13 @@ func PushTopFuncV1(
 }
 
 type (
-	LuaVMPoolV1    interfaces.Pool2[LuaVMV1, *LuaVMV1]
-	LuaTablePoolV1 = interfaces.Pool[LuaTableV1, *LuaTableV1]
+	LuaVMPoolV2    interfaces.Pool2[LuaVMV2, *LuaVMV2]
+	LuaTablePoolV2 = interfaces.Pool[LuaTableV2, *LuaTableV2]
 )
 
-func MakeLuaVMPoolV1(lvp *lua.VMPool, selbst *Transacted) LuaVMPoolV1 {
+func MakeLuaVMPoolV2(lvp *lua.VMPool, selbst *Transacted) LuaVMPoolV2 {
 	return pool2.MakePool(
-		func() (out *LuaVMV1, err error) {
+		func() (out *LuaVMV2, err error) {
 			var vm *lua.VM
 
 			if vm, err = lvp.Pool2.Get(); err != nil {
@@ -55,9 +55,9 @@ func MakeLuaVMPoolV1(lvp *lua.VMPool, selbst *Transacted) LuaVMPoolV1 {
 				return
 			}
 
-			out = &LuaVMV1{
+			out = &LuaVMV2{
 				VM:        vm,
-				TablePool: MakeLuaTablePoolV1(vm),
+				TablePool: MakeLuaTablePoolV2(vm),
 				Selbst:    selbst,
 			}
 
@@ -67,10 +67,10 @@ func MakeLuaVMPoolV1(lvp *lua.VMPool, selbst *Transacted) LuaVMPoolV1 {
 	)
 }
 
-func MakeLuaTablePoolV1(vm *lua.VM) LuaTablePoolV1 {
+func MakeLuaTablePoolV2(vm *lua.VM) LuaTablePoolV2 {
 	return pool.MakePool(
-		func() (t *LuaTableV1) {
-			t = &LuaTableV1{
+		func() (t *LuaTableV2) {
+			t = &LuaTableV2{
 				Transacted:   vm.Pool.Get(),
 				Tags:         vm.Pool.Get(),
 				TagsImplicit: vm.Pool.Get(),
@@ -81,7 +81,7 @@ func MakeLuaTablePoolV1(vm *lua.VM) LuaTablePoolV1 {
 
 			return
 		},
-		func(t *LuaTableV1) {
+		func(t *LuaTableV2) {
 			lua.ClearTable(vm.LState, t.Tags)
 			lua.ClearTable(vm.LState, t.TagsImplicit)
 		},

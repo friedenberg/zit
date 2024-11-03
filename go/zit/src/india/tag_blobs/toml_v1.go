@@ -7,7 +7,7 @@ import (
 )
 
 type TomlV1 struct {
-	sku.LuaVMPool
+	sku.LuaVMPoolV1
 	Filter string `toml:"filter"`
 }
 

@@ -417,7 +417,7 @@ function show_etikett_toml { # @test
 	EOM
 }
 
-function show_etikett_lua { # @test
+function show_etikett_lua_v1 { # @test
 	cat >true.tag <<-EOM
 		---
 		! lua-tag-v1

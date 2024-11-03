@@ -148,7 +148,7 @@ func (b *buildState) realizeVirtualTags() (err error) {
 		}
 
 		ml := Lua{
-			LuaVMPool: sku.MakeLuaVMPool(vmp, nil),
+			LuaVMPoolV1: sku.MakeLuaVMPoolV1(vmp, nil),
 		}
 
 		b.virtualTags[k] = ml

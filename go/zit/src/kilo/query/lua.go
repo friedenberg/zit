@@ -16,7 +16,7 @@ func MakeSelfApply(
 	}
 
 	return func(vm *lua.VM) (err error) {
-		selbstTable := sku.MakeLuaTablePool(vm).Get()
+		selbstTable := sku.MakeLuaTablePoolV1(vm).Get()
 		sku.ToLuaTableV1(self, vm.LState, selbstTable)
 		vm.SetGlobal("Selbst", selbstTable.Transacted)
 		return
@@ -53,13 +53,13 @@ func MakeLuaFromBuilder(
 		return
 	}
 
-	l.LuaVMPool = sku.MakeLuaVMPool(vmp, self)
+	l.LuaVMPoolV1 = sku.MakeLuaVMPoolV1(vmp, self)
 
 	return
 }
 
 type Lua struct {
-	sku.LuaVMPool
+	sku.LuaVMPoolV1
 }
 
 func (matcher Lua) ContainsSku(tg sku.TransactedGetter) bool {

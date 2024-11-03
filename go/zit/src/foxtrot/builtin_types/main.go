@@ -6,6 +6,7 @@ const (
 	TagTypeTomlV0        = "toml-tag-v0"
 	TagTypeTomlV1        = "toml-tag-v1"
 	TagTypeLuaV1         = "lua-tag-v1"
+	TagTypeLuaV2         = "lua-tag-v2"
 	TagTypeLatestDefault = TagTypeTomlV1
 
 	TypeTypeTomlV0        = "toml-type-v0"
@@ -27,6 +28,7 @@ func init() {
 		TagTypeTomlV0:    {},
 		TagTypeTomlV1:    {},
 		TagTypeLuaV1:     {},
+		TagTypeLuaV2:     {},
 		TypeTypeTomlV0:   {},
 		TypeTypeTomlV1:   {},
 		ConfigTypeTomlV0: {},
