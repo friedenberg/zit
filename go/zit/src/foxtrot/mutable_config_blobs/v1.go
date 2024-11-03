@@ -1,6 +1,7 @@
 package mutable_config_blobs
 
 import (
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/options_tools"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
@@ -8,10 +9,10 @@ import (
 )
 
 type V1 struct {
-	Defaults       DefaultsV1                     `toml:"defaults"`
-	FileExtensions file_extensions.FileExtensions `toml:"file-extensions"`
-	PrintOptions   options_print.General          `toml:"cli-output"`
-	Tools          options_tools.Options          `toml:"tools"`
+	Defaults       DefaultsV1            `toml:"defaults"`
+	FileExtensions file_extensions.V1    `toml:"file-extensions"`
+	PrintOptions   options_print.General `toml:"cli-output"`
+	Tools          options_tools.Options `toml:"tools"`
 }
 
 func (a *V1) Reset() {
@@ -34,4 +35,16 @@ func (a *V1) ResetWith(b *V1) {
 
 func (a V1) GetFilters() map[string]string {
 	return make(map[string]string)
+}
+
+func (a V1) GetDefaults() Defaults {
+	return a.Defaults
+}
+
+func (a V1) GetFileExtensions() interfaces.FileExtensionGetter {
+	return a.FileExtensions
+}
+
+func (a V1) GetPrintOptions() options_print.General {
+	return a.PrintOptions
 }

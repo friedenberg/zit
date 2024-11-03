@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	pkg_angeboren "code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config_blobs"
@@ -43,16 +43,20 @@ func init() {
 	gob.Register(quiter.StringerKeyerPtr[ids.Type, *ids.Type]{})
 }
 
-type immutable_config = pkg_angeboren.Config
+type (
+	immutable_config_private = immutable_config.Config
+	mutable_config_private   = mutable_config_blobs.Blob
+)
 
 type Compiled struct {
 	cli
 	compiled
-	immutable_config
+	immutable_config_private
 	dormant *dormant_index.Index
 }
 
 func (a *compiled) Reset() error {
+	a.mutable_config_private = mutable_config_blobs.V1{}
 	a.ExtensionsToTypes = make(map[string]string)
 	a.TypesToExtensions = make(map[string]string)
 
@@ -70,8 +74,8 @@ func (a *compiled) Reset() error {
 	return nil
 }
 
-func (a *Compiled) GetMutableConfig() *mutable_config_blobs.V0 {
-	return &a.V0
+func (a *Compiled) GetMutableConfig() mutable_config_blobs.Blob {
+	return a.mutable_config_private
 }
 
 type cli = mutable_config_blobs.Cli
@@ -83,7 +87,7 @@ type compiled struct {
 
 	Sku sku.Transacted
 
-	mutable_config_blobs.V0
+	mutable_config_private
 
 	DefaultTags  ids.TagSet
 	Tags         interfaces.MutableSetLike[*tag]
@@ -101,18 +105,19 @@ type compiled struct {
 }
 
 func (c *Compiled) Initialize(
-	s dir_layout.DirLayout,
+	dirLayout dir_layout.DirLayout,
 	kcli mutable_config_blobs.Cli,
 	dormant *dormant_index.Index,
+	blobStore *blob_store.VersionedStores,
 ) (err error) {
 	c.cli = kcli
 	c.Reset()
-	c.immutable_config = s.GetConfig()
+	c.immutable_config_private = dirLayout.GetConfig()
 	c.dormant = dormant
 
 	wg := quiter.MakeErrorWaitGroupParallel()
 	wg.Do(func() (err error) {
-		if err = c.loadMutableConfig(s); err != nil {
+		if err = c.loadMutableConfig(dirLayout, blobStore); err != nil {
 			if errors.IsNotExist(err) {
 				err = nil
 			} else {
@@ -156,7 +161,7 @@ type ApproximatedType = blob_store.ApproximatedType
 
 func (k *compiled) setTransacted(
 	kt1 *sku.Transacted,
-	kag interfaces.BlobGetter[*mutable_config_blobs.V0],
+	blobStore *blob_store.VersionedStores,
 ) (didChange bool, err error) {
 	if !sku.TransactedLessor.LessPtr(&k.Sku, kt1) {
 		return
@@ -171,14 +176,35 @@ func (k *compiled) setTransacted(
 
 	k.setNeedsRecompile(fmt.Sprintf("updated konfig: %s", &k.Sku))
 
-	var a *mutable_config_blobs.V0
-
-	if a, err = kag.GetBlob(k.Sku.GetBlobSha()); err != nil {
+	if err = k.loadMutableConfigBlob(
+		blobStore,
+		k.Sku.GetType(),
+		k.Sku.GetBlobSha(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	k.V0 = *a
+	return
+}
+
+func (k *compiled) loadMutableConfigBlob(
+	blobStore *blob_store.VersionedStores,
+	mutableConfigType ids.Type,
+	blobSha interfaces.Sha,
+) (err error) {
+	// k.lock.Lock()
+	// defer k.lock.Unlock()
+
+	kag := blobStore.GetConfig()
+
+	if k.mutable_config_private, _, err = kag.ParseTypedBlob(
+		mutableConfigType,
+		blobSha,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
@@ -255,7 +281,7 @@ func (k *Compiled) AddTransacted(
 		}
 
 	case genres.Config:
-		if didChange, err = k.setTransacted(kinder, ak.GetConfigV0()); err != nil {
+		if didChange, err = k.setTransacted(kinder, ak); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

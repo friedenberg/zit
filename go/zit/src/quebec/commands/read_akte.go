@@ -61,7 +61,7 @@ func (c ReadBlob) Run(u *env.Env, args ...string) (err error) {
 func (ReadBlob) readOneBlob(u *env.Env, entry readBlobEntry) (sh *sha.Sha, err error) {
 	var aw sha.WriteCloser
 
-	if aw, err = u.GetFSHome().BlobWriter(); err != nil {
+	if aw, err = u.GetDirectoryLayout().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

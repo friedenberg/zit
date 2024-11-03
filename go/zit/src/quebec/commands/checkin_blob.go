@@ -86,7 +86,7 @@ func (c CheckinBlob) Run(u *env.Env, args ...string) (err error) {
 	for i, p := range pairs {
 		var ow sha.WriteCloser
 
-		if ow, err = u.GetFSHome().BlobWriter(); err != nil {
+		if ow, err = u.GetDirectoryLayout().BlobWriter(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

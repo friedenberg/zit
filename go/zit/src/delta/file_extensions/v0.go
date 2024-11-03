@@ -5,8 +5,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 )
 
-// TODO make new non-german version
-type FileExtensions struct {
+type V0 struct {
 	Zettel   string `toml:"zettel"`
 	Organize string `toml:"organize"`
 	Type     string `toml:"typ"`
@@ -14,7 +13,7 @@ type FileExtensions struct {
 	Repo     string `toml:"kasten"`
 }
 
-func (a FileExtensions) GetFileExtensionForGenre(
+func (a V0) GetFileExtensionForGenre(
 	g1 interfaces.GenreGetter,
 ) string {
 	g := genres.Must(g1)
@@ -37,31 +36,31 @@ func (a FileExtensions) GetFileExtensionForGenre(
 	}
 }
 
-func (a FileExtensions) GetFileExtensionGetter() interfaces.FileExtensionGetter {
+func (a V0) GetFileExtensionGetter() interfaces.FileExtensionGetter {
 	return a
 }
 
-func (a FileExtensions) GetFileExtensionZettel() string {
+func (a V0) GetFileExtensionZettel() string {
 	return a.Zettel
 }
 
-func (a FileExtensions) GetFileExtensionOrganize() string {
+func (a V0) GetFileExtensionOrganize() string {
 	return a.Organize
 }
 
-func (a FileExtensions) GetFileExtensionType() string {
+func (a V0) GetFileExtensionType() string {
 	return a.Type
 }
 
-func (a FileExtensions) GetFileExtensionTag() string {
+func (a V0) GetFileExtensionTag() string {
 	return a.Tag
 }
 
-func (a FileExtensions) GetFileExtensionRepo() string {
+func (a V0) GetFileExtensionRepo() string {
 	return a.Repo
 }
 
-func (a *FileExtensions) Reset() {
+func (a *V0) Reset() {
 	a.Zettel = ""
 	a.Organize = ""
 	a.Type = ""
@@ -69,7 +68,7 @@ func (a *FileExtensions) Reset() {
 	a.Repo = ""
 }
 
-func (a *FileExtensions) ResetWith(b FileExtensions) {
+func (a *V0) ResetWith(b V0) {
 	a.Zettel = b.Zettel
 	a.Organize = b.Organize
 	a.Type = b.Type

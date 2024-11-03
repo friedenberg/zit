@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
-	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
@@ -29,7 +28,7 @@ type dirItems struct {
 	root          string
 	rootProcessed bool
 
-	file_extensions.FileExtensions
+	interfaces.FileExtensionGetter
 	dirLayout             dir_layout.DirLayout
 	externalStoreSupplies external_store.Supplies
 
@@ -43,11 +42,11 @@ type dirItems struct {
 
 func makeObjectsWithDir(
 	p string,
-	fe file_extensions.FileExtensions,
+	fe interfaces.FileExtensionGetter,
 	fs_home dir_layout.DirLayout,
 ) (d dirItems) {
 	d.root = p
-	d.FileExtensions = fe
+	d.FileExtensionGetter = fe
 	d.dirLayout = fs_home
 	d.objects = collections_value.MakeMutableValueSet[*Item](nil)
 	d.blobs = collections_value.MakeMutableValueSet[*Item](nil)
@@ -262,16 +261,16 @@ func (d *dirItems) processFDsOnItem(
 			ext := f.ExtSansDot()
 
 			switch ext {
-			case d.Zettel:
+			case d.GetFileExtensionZettel():
 				fds.SetGenre(genres.Zettel)
 
-			case d.Type:
+			case d.GetFileExtensionType():
 				fds.SetGenre(genres.Type)
 
-			case d.Tag:
+			case d.GetFileExtensionTag():
 				fds.SetGenre(genres.Tag)
 
-			case d.Repo:
+			case d.GetFileExtensionRepo():
 				fds.SetGenre(genres.Repo)
 
 			case "conflict":

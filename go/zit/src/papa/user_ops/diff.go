@@ -123,7 +123,7 @@ func (op Diff) Run(
 		externalFD = &fds.Object
 
 	case internalInline && externalInline:
-		wg.Do(op.makeDoBlob(wLeft, op.GetFSHome(), il.GetBlobSha()))
+		wg.Do(op.makeDoBlob(wLeft, op.GetDirectoryLayout(), il.GetBlobSha()))
 		wg.Do(op.makeDoFD(wRight, &fds.Blob))
 		externalFD = &fds.Blob
 
@@ -139,7 +139,7 @@ func (op Diff) Run(
 		strings.ToLower(il.GetGenre().GetGenreString()),
 	)
 
-	externalLabel := op.GetFSHome().Rel(externalFD.GetPath())
+	externalLabel := op.GetDirectoryLayout().Rel(externalFD.GetPath())
 
 	todo.Change("disambiguate internal and external, and object / blob")
 	cmd := exec.Command(

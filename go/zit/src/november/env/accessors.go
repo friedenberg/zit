@@ -37,8 +37,8 @@ func (u *Env) Err() interfaces.WriterAndStringWriter {
 	return u.err
 }
 
-func (u *Env) GetFSHome() dir_layout.DirLayout {
-	return u.fsHome
+func (u *Env) GetDirectoryLayout() dir_layout.DirLayout {
+	return u.dirLayout
 }
 
 func (u *Env) GetStore() *store.Store {

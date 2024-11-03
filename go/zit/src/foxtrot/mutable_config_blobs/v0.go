@@ -1,6 +1,7 @@
 package mutable_config_blobs
 
 import (
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/options_tools"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
@@ -11,7 +12,7 @@ import (
 type V0 struct {
 	Defaults        DefaultsV0                            `toml:"defaults"`
 	HiddenEtiketten []ids.Tag                             `toml:"hidden-etiketten"`
-	FileExtensions  file_extensions.FileExtensions        `toml:"file-extensions"`
+	FileExtensions  file_extensions.V0                    `toml:"file-extensions"`
 	RemoteScripts   map[string]script_config.RemoteScript `toml:"remote-scripts"`
 	Actions         map[string]script_config.ScriptConfig `toml:"actions,omitempty"`
 	PrintOptions    options_print.General                 `toml:"cli-output"`
@@ -49,4 +50,16 @@ func (a *V0) ResetWith(b *V0) {
 
 func (a V0) GetFilters() map[string]string {
 	return a.Filters
+}
+
+func (a V0) GetDefaults() Defaults {
+	return a.Defaults
+}
+
+func (a V0) GetFileExtensions() interfaces.FileExtensionGetter {
+	return a.FileExtensions
+}
+
+func (a V0) GetPrintOptions() options_print.General {
+	return a.PrintOptions
 }

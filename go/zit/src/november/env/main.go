@@ -17,6 +17,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/india/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
@@ -41,7 +42,7 @@ type Env struct {
 	errIsTty bool
 
 	primitiveFSHome dir_layout.Primitive
-	fsHome          dir_layout.DirLayout
+	dirLayout       dir_layout.DirLayout
 	cliConfig       mutable_config_blobs.Cli
 	config          config.Compiled
 	dormantIndex    dormant_index.Index
@@ -120,7 +121,7 @@ func (u *Env) Initialize(options Options) (err error) {
 			BasePath: u.cliConfig.BasePath,
 		}
 
-		if u.fsHome, err = dir_layout.Make(
+		if u.dirLayout, err = dir_layout.Make(
 			standortOptions,
 			u.primitiveFSHome,
 		); err != nil {
@@ -130,16 +131,17 @@ func (u *Env) Initialize(options Options) (err error) {
 	}
 
 	if err = u.dormantIndex.Load(
-		u.fsHome,
+		u.dirLayout,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if err = u.config.Initialize(
-		u.fsHome,
+		u.dirLayout,
 		u.cliConfig,
 		&u.dormantIndex,
+		blob_store.Make(u.dirLayout),
 	); err != nil {
 		if options.GetAllowConfigReadError() {
 			err = nil
@@ -149,7 +151,7 @@ func (u *Env) Initialize(options Options) (err error) {
 		}
 	}
 
-	u.config.ApplyPrintOptionsConfig(u.config.V0.PrintOptions)
+	u.config.ApplyPrintOptionsConfig(u.config.PrintOptions)
 
 	// for _, rb := range u.GetConfig().Recipients {
 	// 	if err = u.age.AddBech32PivYubikeyEC256(rb); err != nil {
@@ -162,14 +164,14 @@ func (u *Env) Initialize(options Options) (err error) {
 	if err = u.store.Initialize(
 		u.flags,
 		u.GetConfig(),
-		u.fsHome,
+		u.dirLayout,
 		object_inventory_format.FormatForVersion(u.GetConfig().GetStoreVersion()),
 		u.sunrise,
 		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
 		u.makeQueryBuilder().
 			WithDefaultGenres(ids.MakeGenre(genres.TrueGenre()...)),
 		ofo,
-    u.MakeBoxArchive(true),
+		u.MakeBoxArchive(true),
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")
 		return
@@ -184,8 +186,8 @@ func (u *Env) Initialize(options Options) (err error) {
 	if sfs, err = store_fs.MakeCwdFilesAll(
 		k,
 		u.PrinterFDDeleted(),
-		k.FileExtensions,
-		u.GetFSHome(),
+		k.GetFileExtensions(),
+		u.GetDirectoryLayout(),
 		ofo,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -199,7 +201,7 @@ func (u *Env) Initialize(options Options) (err error) {
 		*(ids.MustRepoId("browser")): {
 			StoreLike: store_browser.Make(
 				k,
-				u.GetFSHome(),
+				u.GetDirectoryLayout(),
 				u.PrinterTransactedDeleted(),
 			),
 		},

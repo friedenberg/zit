@@ -103,7 +103,7 @@ func (c DormantEdit) makeTempKonfigFile(
 
 	var f *os.File
 
-	if f, err = u.GetFSHome().TempLocal.FileTemp(); err != nil {
+	if f, err = u.GetDirectoryLayout().TempLocal.FileTemp(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -141,7 +141,7 @@ func (c DormantEdit) readTempKonfigFile(
 
 	var aw interfaces.ShaWriteCloser
 
-	if aw, err = u.GetFSHome().BlobWriter(); err != nil {
+	if aw, err = u.GetDirectoryLayout().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

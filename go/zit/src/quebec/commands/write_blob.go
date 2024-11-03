@@ -72,7 +72,7 @@ func (c WriteBlob) Run(u *env.Env, args ...string) (result Result) {
 
 		a := answer{Path: p}
 
-		a.Sha, a.error = c.doOne(&ag, u.GetFSHome(), p)
+		a.Sha, a.error = c.doOne(&ag, u.GetDirectoryLayout(), p)
 
 		if a.error != nil {
 			ui.Err().Printf("%s: (error: %q)", a.Path, a.error)
@@ -80,7 +80,7 @@ func (c WriteBlob) Run(u *env.Env, args ...string) (result Result) {
 			continue
 		}
 
-		hasBlob := u.GetFSHome().HasBlob(a.Sha)
+		hasBlob := u.GetDirectoryLayout().HasBlob(a.Sha)
 
 		if hasBlob {
 			if c.Check {

@@ -45,7 +45,7 @@ func (e *BigBang) AddToFlagSet(f *flag.FlagSet) {
 }
 
 func (u *Env) Start(e BigBang) (err error) {
-	s := u.GetFSHome()
+	s := u.GetDirectoryLayout()
 
 	mkdirAll(s.DirObjectId())
 	mkdirAll(s.DirCache())
@@ -98,7 +98,7 @@ func (u *Env) Start(e BigBang) (err error) {
 	writeFile(s.FileCacheDormant(), "")
 
 	if err = u.dormantIndex.Flush(
-		u.GetFSHome(),
+		u.GetDirectoryLayout(),
 		u.PrinterHeader(),
 		u.config.DryRun,
 	); err != nil {
@@ -111,7 +111,7 @@ func (u *Env) Start(e BigBang) (err error) {
 		return
 	}
 
-	if err = u.GetFSHome().ResetCache(); err != nil {
+	if err = u.GetDirectoryLayout().ResetCache(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -199,12 +199,12 @@ func initDefaultTypeAndConfig(u *Env) (err error) {
 
 	{
 		var sh interfaces.Sha
-    var tipe ids.Type
+		var tipe ids.Type
 
 		if sh, tipe, err = writeDefaultMutableConfig(
-      u,
-      defaultTypeObjectId,
-    ); err != nil {
+			u,
+			defaultTypeObjectId,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -246,7 +246,7 @@ func writeDefaultMutableConfig(
 
 	var aw sha.WriteCloser
 
-	if aw, err = u.GetFSHome().BlobWriter(); err != nil {
+	if aw, err = u.GetDirectoryLayout().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

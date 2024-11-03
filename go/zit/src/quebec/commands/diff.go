@@ -50,7 +50,7 @@ func (c Diff) RunWithQuery(
 	opDiffFS := user_ops.Diff{
 		Env: u,
 		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
-			u.GetFSHome(),
+			u.GetDirectoryLayout(),
 			nil,
 		),
 	}

@@ -104,7 +104,7 @@ func MakeStageCommander(
 	}
 
 	s.remoteActorCmd = exec.Command(
-		u.GetFSHome().Executable(),
+		u.GetDirectoryLayout().Executable(),
 		"listen",
 		"-dir-zit",
 		from,

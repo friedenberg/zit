@@ -17,14 +17,7 @@ function init_and_reindex { # @test
 
 	set_xdg "$wd"
 
-	expected="$(mktemp)"
-	cat - >"$expected" <<-EOM
-		[!md @$(get_type_blob_sha) !toml-type-v1]
-		[konfig @$(get_konfig_sha) !toml-config-v1]
-	EOM
-
 	run_zit_init_disable_age
-	assert_output_unsorted - <"$expected"
 
 	run test -f .xdg/data/zit/config-permanent
 	assert_success
@@ -35,22 +28,23 @@ function init_and_reindex { # @test
 		[konfig @$(get_konfig_sha) !toml-config-v1]
 	EOM
 
-	cat - >"$expected" <<-EOM
+	run_zit reindex
+	assert_success
+	run_zit show :t,konfig
+	assert_success
+	assert_output_unsorted - <<-EOM
 		[!md @$(get_type_blob_sha) !toml-type-v1]
 		[konfig @$(get_konfig_sha) !toml-config-v1]
 	EOM
 
 	run_zit reindex
 	assert_success
-  run_zit show :t,konfig
+	run_zit show :t,konfig
 	assert_success
-	assert_output_unsorted - <"$expected"
-
-	run_zit reindex
-	assert_success
-  run_zit show :t,konfig
-	assert_success
-	assert_output_unsorted - <"$expected"
+	assert_output_unsorted - <<-EOM
+		[!md @$(get_type_blob_sha) !toml-type-v1]
+		[konfig @$(get_konfig_sha) !toml-config-v1]
+	EOM
 }
 
 function init_and_deinit { # @test
@@ -60,10 +54,6 @@ function init_and_deinit { # @test
 	set_xdg "$wd"
 
 	run_zit_init_disable_age
-	assert_output_unsorted - <<-EOM
-		[!md @$(get_type_blob_sha) !toml-type-v1]
-		[konfig @$(get_konfig_sha) !toml-config-v1]
-	EOM
 
 	run test -f .xdg/data/zit/config-permanent
 	assert_success

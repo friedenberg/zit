@@ -108,7 +108,7 @@ func (c *New) Run(u *env.Env, args ...string) (err error) {
 	cotfo := checkout_options.TextFormatterOptions{}
 
 	f := object_metadata.MakeTextFormat(
-		u.GetFSHome(),
+		u.GetDirectoryLayout(),
 		nil,
 	)
 

@@ -339,15 +339,15 @@ function show_konfig { # @test
 	run_zit show -format text :konfig
 	assert_output - <<-EOM
 		[defaults]
-		typ = 'md'
-		etiketten = []
+		type = 'md'
+		tags = []
 
 		[file-extensions]
 		zettel = 'zettel'
 		organize = 'md'
-		typ = 'type'
-		etikett = 'tag'
-		kasten = 'repo'
+		type = 'type'
+		tag = 'tag'
+		repo = 'repo'
 
 		[cli-output]
 		print-include-description = false

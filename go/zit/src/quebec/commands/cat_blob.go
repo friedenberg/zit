@@ -149,7 +149,7 @@ func (c CatBlob) blob(
 ) (err error) {
 	var r sha.ReadCloser
 
-	if r, err = u.GetFSHome().BlobReader(sh); err != nil {
+	if r, err = u.GetDirectoryLayout().BlobReader(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

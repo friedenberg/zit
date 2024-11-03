@@ -16,11 +16,11 @@ import (
 )
 
 func (c *compiled) GetZettelFileExtension() string {
-	return fmt.Sprintf(".%s", c.FileExtensions.Zettel)
+	return fmt.Sprintf(".%s", c.GetFileExtensions().GetFileExtensionZettel())
 }
 
 func (kc *Compiled) GetImmutableConfig() interfaces.ImmutableConfig {
-	return kc.immutable_config
+	return kc.immutable_config_private
 }
 
 func (kc *compiled) getType(k ids.IdLike) (ct *sku.Transacted) {

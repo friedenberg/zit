@@ -12,7 +12,7 @@ func (u *Env) DeleteFiles(fs interfaces.Iterable[*fd.FD]) (err error) {
 
 	if err = deleteOp.Run(
 		u.GetConfig().DryRun,
-		u.GetFSHome(),
+		u.GetDirectoryLayout(),
 		u.PrinterFDDeleted(),
 		fs,
 	); err != nil {

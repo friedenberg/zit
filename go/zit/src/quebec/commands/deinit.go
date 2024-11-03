@@ -38,14 +38,14 @@ func (c Deinit) Run(u *env.Env, args ...string) (err error) {
 		return
 	}
 
-	base := path.Join(u.GetFSHome().Dir())
+	base := path.Join(u.GetDirectoryLayout().Dir())
 
 	if err = files.SetAllowUserChangesRecursive(base); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = u.GetFSHome().DeleteAll(base); err != nil {
+	if err = u.GetDirectoryLayout().DeleteAll(base); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -57,7 +57,7 @@ func (c Deinit) getPermission(u *env.Env) (success bool) {
 	var err error
 	ui.Err().Printf(
 		"are you sure you want to deinit in %q? (y/*)",
-		u.GetFSHome().Dir(),
+		u.GetDirectoryLayout().Dir(),
 	)
 
 	var answer rune

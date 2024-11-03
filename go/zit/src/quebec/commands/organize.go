@@ -114,7 +114,7 @@ func (c *Organize) RunWithQuery(
 		var f *os.File
 
 		if f, err = files.TempFileWithPattern(
-			"*." + u.GetConfig().FileExtensions.Organize,
+			"*." + u.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -169,8 +169,8 @@ func (c *Organize) RunWithQuery(
 
 		var f *os.File
 
-		if f, err = u.GetFSHome().TempLocal.FileTempWithTemplate(
-			"*." + u.GetConfig().FileExtensions.Organize,
+		if f, err = u.GetDirectoryLayout().TempLocal.FileTempWithTemplate(
+			"*." + u.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

@@ -41,7 +41,7 @@ func (c Fsck) Run(u *env.Env, args ...string) (result Result) {
 
 			blobSha := sk.GetBlobSha()
 
-			if u.GetFSHome().HasBlob(blobSha) {
+			if u.GetDirectoryLayout().HasBlob(blobSha) {
 				return
 			}
 

@@ -10,7 +10,7 @@ import (
 
 func (u *Env) makeQueryBuilder() *query.Builder {
 	return query.MakeBuilder(
-		u.GetFSHome(),
+		u.GetDirectoryLayout(),
 		u.GetStore().GetBlobStore(),
 		u.GetStore().GetStreamIndex(),
 		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
@@ -27,9 +27,8 @@ func (u *Env) MakeQueryBuilderExcludingHidden(
 
 	return u.makeQueryBuilder().
 		WithDefaultGenres(dg).
-		WithVirtualTags(u.config.Filters).
 		WithRepoId(ids.RepoId{}).
-		WithFileExtensionGetter(u.GetConfig().FileExtensions).
+		WithFileExtensionGetter(u.GetConfig().GetFileExtensions()).
 		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr()).
 		WithHidden(u.GetMatcherArchiviert())
 }
@@ -43,9 +42,8 @@ func (u *Env) MakeQueryBuilder(
 
 	return u.makeQueryBuilder().
 		WithDefaultGenres(dg).
-		WithVirtualTags(u.config.Filters).
 		WithRepoId(ids.RepoId{}).
-		WithFileExtensionGetter(u.GetConfig().FileExtensions).
+		WithFileExtensionGetter(u.GetConfig().GetFileExtensions()).
 		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr())
 }
 

@@ -88,7 +88,7 @@ func Run(
 	var result Result
 
 	defer func() {
-		if err = u.GetFSHome().ResetTempOnExit(result.Error); err != nil {
+		if err = u.GetDirectoryLayout().ResetTempOnExit(result.Error); err != nil {
 			cancel(errors.Wrap(err))
 			return
 		}

@@ -8,7 +8,7 @@ import (
 
 func (u *Env) Lock() (err error) {
 	ui.Log().Caller(1, "Umwelt Lock")
-	if err = u.fsHome.GetLockSmith().Lock(); err != nil {
+	if err = u.dirLayout.GetLockSmith().Lock(); err != nil {
 		ui.Log().Caller(1, "Umwelt Lock Failure")
 		err = errors.Wrap(err)
 		return
@@ -48,7 +48,7 @@ func (u *Env) Unlock() (err error) {
 
 		ui.Log().Print("will flush konfig")
 		if err = u.config.Flush(
-			u.GetFSHome(),
+			u.GetDirectoryLayout(),
 			u.GetStore().GetBlobStore(),
 			u.PrinterHeader(),
 		); err != nil {
@@ -58,7 +58,7 @@ func (u *Env) Unlock() (err error) {
 
 		ui.Log().Print("will flush schlummernd")
 		if err = u.dormantIndex.Flush(
-			u.GetFSHome(),
+			u.GetDirectoryLayout(),
 			u.PrinterHeader(),
 			u.config.DryRun,
 		); err != nil {
@@ -88,7 +88,7 @@ func (u *Env) Unlock() (err error) {
 	// explicitly do not unlock if there was an error to encourage user
 	// interaction
 	// and manual recovery
-	if err = u.fsHome.GetLockSmith().Unlock(); err != nil {
+	if err = u.dirLayout.GetLockSmith().Unlock(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

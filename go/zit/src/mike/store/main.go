@@ -120,7 +120,7 @@ func (c *Store) Initialize(
 	}
 
 	c.protoZettel = sku.MakeProto(
-		k.GetMutableConfig().Defaults.Typ,
+		k.GetMutableConfig().GetDefaults().GetType(),
 		k.DefaultTags,
 	)
 

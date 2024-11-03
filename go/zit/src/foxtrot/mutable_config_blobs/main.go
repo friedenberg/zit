@@ -3,6 +3,8 @@ package mutable_config_blobs
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/options_tools"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
@@ -14,11 +16,20 @@ const (
 	TypeLatest = builtin_types.ConfigTypeLatestDefault
 )
 
-type Blob interface {
-	interfaces.MutableStoredConfig
-}
+type (
+	Blob interface {
+		interfaces.MutableStoredConfig
+		GetDefaults() Defaults
+		GetFileExtensions() interfaces.FileExtensionGetter
+		GetPrintOptions() options_print.General
+	}
 
-// TODO version
+	Defaults interface {
+		GetType() ids.Type
+		GetTags() quiter.Slice[ids.Tag]
+	}
+)
+
 func Default(defaultTyp ids.Type) ids.TypedBlob[Blob] {
 	return ids.TypedBlob[Blob]{
 		Type: ids.MustType(TypeLatest),
@@ -27,7 +38,7 @@ func Default(defaultTyp ids.Type) ids.TypedBlob[Blob] {
 				Type: defaultTyp,
 				Tags: make([]ids.Tag, 0),
 			},
-			FileExtensions: file_extensions.FileExtensions{
+			FileExtensions: file_extensions.V1{
 				Type:     "type",
 				Zettel:   "zettel",
 				Organize: "md",

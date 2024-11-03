@@ -347,7 +347,13 @@ func (s *Store) PathForTransacted(dir string, tl *sku.Transacted) string {
 func (s *Store) FileExtensionForGenre(
 	gg interfaces.GenreGetter,
 ) string {
-	return s.fileExtensions.GetFileExtensionForGenre(gg)
+	ext := s.fileExtensions.GetFileExtensionForGenre(gg)
+
+	if ext == "" {
+		panic("empty file extension")
+	}
+
+	return ext
 }
 
 func (s *Store) RemoveItem(i *Item) (err error) {

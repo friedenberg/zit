@@ -14,10 +14,16 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 )
+
+func init() {
+	gob.Register(mutable_config_blobs.V1{})
+	gob.Register(mutable_config_blobs.V0{})
+}
 
 func (kc *Compiled) recompile(
 	blobStore *blob_store.VersionedStores,
@@ -36,7 +42,7 @@ func (kc *Compiled) recompile(
 }
 
 func (kc *Compiled) recompileTags() (err error) {
-	kc.DefaultTags = ids.MakeTagSet(kc.Defaults.Etiketten...)
+	kc.DefaultTags = ids.MakeTagSet(kc.GetDefaults().GetTags()...)
 
 	kc.ImplicitTags = make(implicitTagMap)
 
@@ -162,10 +168,13 @@ func (kc *compiled) setNeedsRecompile(reason string) {
 	kc.changes = append(kc.changes, reason)
 }
 
-func (kc *Compiled) loadMutableConfig(s dir_layout.DirLayout) (err error) {
+func (kc *Compiled) loadMutableConfig(
+	dirLayout dir_layout.DirLayout,
+	blobStore *blob_store.VersionedStores,
+) (err error) {
 	var f *os.File
 
-	p := s.FileConfigMutable()
+	p := dirLayout.FileConfigMutable()
 
 	if f, err = files.Open(p); err != nil {
 		err = errors.Wrap(err)
@@ -186,11 +195,20 @@ func (kc *Compiled) loadMutableConfig(s dir_layout.DirLayout) (err error) {
 		return
 	}
 
+	if err = kc.loadMutableConfigBlob(
+		blobStore,
+		kc.Sku.GetType(),
+		kc.Sku.GetBlobSha(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
 func (kc *Compiled) Flush(
-	s dir_layout.DirLayout,
+	dirLayout dir_layout.DirLayout,
 	blobStore *blob_store.VersionedStores,
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
@@ -200,7 +218,7 @@ func (kc *Compiled) Flush(
 
 	wg := quiter.MakeErrorWaitGroupParallel()
 	wg.Do(func() (err error) {
-		if err = kc.flushMutableConfig(s, blobStore, printerHeader); err != nil {
+		if err = kc.flushMutableConfig(dirLayout, blobStore, printerHeader); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -101,7 +101,7 @@ function run_zit_init {
 }
 
 function get_konfig_sha() {
-  echo -n "444944ec8380922845d04b5b412fc67c7752128ec3abeed01a63cdcc0c9b002c"
+  echo -n "d904d322213ed86cdc0eabd58d44f55385f9665280f6c03a01e396f22ba2333b"
 }
 
 function get_type_blob_sha() {
@@ -115,4 +115,8 @@ function run_zit_init_disable_age {
 [!md @$(get_type_blob_sha) !toml-type-v1]
 [konfig @$(get_konfig_sha) !toml-config-v1]
 EOM
+
+  run_zit cat-blob "$(get_konfig_sha)"
+  assert_success
+  assert_output
 }

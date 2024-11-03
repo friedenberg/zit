@@ -236,7 +236,7 @@ func (c client) BlobReader(
 
 	var ow sha.WriteCloser
 
-	if ow, err = c.env.GetFSHome().BlobWriter(); err != nil {
+	if ow, err = c.env.GetDirectoryLayout().BlobWriter(); err != nil {
 		if c.stage.ShouldIgnoreConnectionError(err) {
 			err = nil
 		} else {

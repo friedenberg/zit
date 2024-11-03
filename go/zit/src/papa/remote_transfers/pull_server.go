@@ -78,7 +78,7 @@ func (op PullServer) blobReaderForSha(
 
 	var or io.ReadCloser
 
-	if or, err = op.env.GetFSHome().BlobReader(&sh); err != nil {
+	if or, err = op.env.GetDirectoryLayout().BlobReader(&sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -113,7 +113,7 @@ func (op PullServer) objectReaderForSku(
 
 	ui.Log().Printf("received request: %#v", msg)
 
-	orf := op.env.GetFSHome().ObjectReaderWriterFactory(msg.Gattung)
+	orf := op.env.GetDirectoryLayout().ObjectReaderWriterFactory(msg.Gattung)
 
 	var or io.ReadCloser
 
