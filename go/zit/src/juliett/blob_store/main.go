@@ -2,11 +2,11 @@ package blob_store
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
-	"code.linenisgreat.com/zit/go/zit/src/delta/tag_blobs"
-	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_blobs"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/india/tag_blobs"
 )
 
 // TODO switch to interfaces instead of structs
