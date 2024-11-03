@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
 func MakeSelfApply(
@@ -17,7 +16,7 @@ func MakeSelfApply(
 	}
 
 	return func(vm *lua.VM) (err error) {
-		selbstTable := sku_fmt.MakeLuaTablePool(vm).Get()
+		selbstTable := sku.MakeLuaTablePool(vm).Get()
 		sku.ToLuaTableV1(self, vm.LState, selbstTable)
 		vm.SetGlobal("Selbst", selbstTable.Transacted)
 		return
@@ -54,13 +53,13 @@ func MakeLuaFromBuilder(
 		return
 	}
 
-	l.LuaVMPool = sku_fmt.MakeLuaVMPool(vmp, self)
+	l.LuaVMPool = sku.MakeLuaVMPool(vmp, self)
 
 	return
 }
 
 type Lua struct {
-	sku_fmt.LuaVMPool
+	sku.LuaVMPool
 }
 
 func (matcher Lua) ContainsSku(tg sku.TransactedGetter) bool {

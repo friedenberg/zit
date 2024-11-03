@@ -1,4 +1,4 @@
-package sku_fmt
+package sku
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -6,14 +6,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool2"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type LuaVM struct {
 	lua.LValue
 	*lua.VM
 	TablePool LuaTablePool
-	Selbst    *sku.Transacted
+	Selbst    *Transacted
 }
 
 func PushTopFunc(
@@ -43,10 +42,10 @@ func PushTopFunc(
 
 type (
 	LuaVMPool    interfaces.Pool2[LuaVM, *LuaVM]
-	LuaTablePool = interfaces.Pool[sku.LuaTableV1, *sku.LuaTableV1]
+	LuaTablePool = interfaces.Pool[LuaTableV1, *LuaTableV1]
 )
 
-func MakeLuaVMPool(lvp *lua.VMPool, selbst *sku.Transacted) LuaVMPool {
+func MakeLuaVMPool(lvp *lua.VMPool, selbst *Transacted) LuaVMPool {
 	return pool2.MakePool(
 		func() (out *LuaVM, err error) {
 			var vm *lua.VM
@@ -70,8 +69,8 @@ func MakeLuaVMPool(lvp *lua.VMPool, selbst *sku.Transacted) LuaVMPool {
 
 func MakeLuaTablePool(vm *lua.VM) LuaTablePool {
 	return pool.MakePool(
-		func() (t *sku.LuaTableV1) {
-			t = &sku.LuaTableV1{
+		func() (t *LuaTableV1) {
+			t = &LuaTableV1{
 				Transacted:   vm.Pool.Get(),
 				Tags:         vm.Pool.Get(),
 				TagsImplicit: vm.Pool.Get(),
@@ -82,7 +81,7 @@ func MakeLuaTablePool(vm *lua.VM) LuaTablePool {
 
 			return
 		},
-		func(t *sku.LuaTableV1) {
+		func(t *LuaTableV1) {
 			lua.ClearTable(vm.LState, t.Tags)
 			lua.ClearTable(vm.LState, t.TagsImplicit)
 		},

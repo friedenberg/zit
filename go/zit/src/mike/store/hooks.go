@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
 func (s *Store) tryNewHook(
@@ -193,14 +192,14 @@ func (s *Store) tryPreCommitHook(
 		return
 	}
 
-	var vp sku_fmt.LuaVMPool
+	var vp sku.LuaVMPool
 
 	if vp, err = s.MakeLuaVMPool(selbst, script); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var vm *sku_fmt.LuaVM
+	var vm *sku.LuaVM
 
 	if vm, err = vp.Get(); err != nil {
 		err = errors.Wrap(err)
@@ -277,14 +276,14 @@ func (s *Store) tryHookWithName(
 	script string,
 	name string,
 ) (err error) {
-	var vp sku_fmt.LuaVMPool
+	var vp sku.LuaVMPool
 
 	if vp, err = s.MakeLuaVMPool(selbst, script); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var vm *sku_fmt.LuaVM
+	var vm *sku.LuaVM
 
 	if vm, err = vp.Get(); err != nil {
 		err = errors.Wrap(err)

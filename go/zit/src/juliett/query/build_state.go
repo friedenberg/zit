@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
 type buildState struct {
@@ -149,7 +148,7 @@ func (b *buildState) realizeVirtualTags() (err error) {
 		}
 
 		ml := Lua{
-			LuaVMPool: sku_fmt.MakeLuaVMPool(vmp, nil),
+			LuaVMPool: sku.MakeLuaVMPool(vmp, nil),
 		}
 
 		b.virtualTags[k] = ml

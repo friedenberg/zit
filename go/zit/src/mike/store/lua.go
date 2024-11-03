@@ -7,13 +7,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 )
 
 func (s *Store) MakeLuaVMPoolWithSku(
 	sk *sku.Transacted,
-) (lvp sku_fmt.LuaVMPool, err error) {
+) (lvp sku.LuaVMPool, err error) {
 	if sk.GetType().String() != "lua" {
 		err = errors.Errorf("unsupported typ: %s, Sku: %s", sk.GetType(), sk)
 		return
@@ -39,7 +38,7 @@ func (s *Store) MakeLuaVMPoolWithSku(
 func (u *Store) MakeLuaVMPool(
 	selbst *sku.Transacted,
 	script string,
-) (vp sku_fmt.LuaVMPool, err error) {
+) (vp sku.LuaVMPool, err error) {
 	b := u.luaVMPoolBuilder.Clone().
 		WithScript(script).
 		WithApply(query.MakeSelfApply(selbst))
@@ -51,7 +50,7 @@ func (u *Store) MakeLuaVMPool(
 		return
 	}
 
-	vp = sku_fmt.MakeLuaVMPool(lvmp, selbst)
+	vp = sku.MakeLuaVMPool(lvmp, selbst)
 
 	return
 }
@@ -59,7 +58,7 @@ func (u *Store) MakeLuaVMPool(
 func (u *Store) MakeLuaVMPoolWithReader(
 	selbst *sku.Transacted,
 	r io.Reader,
-) (vp sku_fmt.LuaVMPool, err error) {
+) (vp sku.LuaVMPool, err error) {
 	b := u.luaVMPoolBuilder.Clone().
 		WithReader(r).
 		WithApply(query.MakeSelfApply(selbst))
@@ -71,7 +70,7 @@ func (u *Store) MakeLuaVMPoolWithReader(
 		return
 	}
 
-	vp = sku_fmt.MakeLuaVMPool(lvmp, selbst)
+	vp = sku.MakeLuaVMPool(lvmp, selbst)
 
 	return
 }

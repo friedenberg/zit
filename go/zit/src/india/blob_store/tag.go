@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
 type TagStore struct {
@@ -110,7 +109,7 @@ func (a TagStore) GetTransactedWithBlob(
 			return
 		}
 
-		blob.LuaVMPool = sku_fmt.MakeLuaVMPool(vmp, nil)
+		blob.LuaVMPool = sku.MakeLuaVMPool(vmp, nil)
 		twb.Blob = blob
 
 	case builtin_types.TagTypeLuaV1:
@@ -135,7 +134,7 @@ func (a TagStore) GetTransactedWithBlob(
 		}
 
 		twb.Blob = &tag_blobs.LuaV1{
-			LuaVMPool: sku_fmt.MakeLuaVMPool(vmp, nil),
+			LuaVMPool: sku.MakeLuaVMPool(vmp, nil),
 		}
 	}
 

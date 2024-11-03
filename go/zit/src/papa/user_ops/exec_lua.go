@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
@@ -13,16 +12,16 @@ type ExecLua struct {
 }
 
 func (u ExecLua) Run(sk *sku.Transacted, args ...string) (err error) {
-	var lvp sku_fmt.LuaVMPool
+	var lvp sku.LuaVMPool
 
 	if lvp, err = u.GetStore().MakeLuaVMPoolWithSku(sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var vm *sku_fmt.LuaVM
+	var vm *sku.LuaVM
 
-	if vm, args, err = sku_fmt.PushTopFunc(lvp, args); err != nil {
+	if vm, args, err = sku.PushTopFunc(lvp, args); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -860,14 +860,14 @@ func (u *Env) makeTypFormatter(
 				return
 			}
 
-			var vp sku_fmt.LuaVMPool
+			var vp sku.LuaVMPool
 
 			if vp, err = u.GetStore().MakeLuaVMPool(o, script); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			var vm *sku_fmt.LuaVM
+			var vm *sku.LuaVM
 
 			if vm, err = vp.Get(); err != nil {
 				err = errors.Wrap(err)

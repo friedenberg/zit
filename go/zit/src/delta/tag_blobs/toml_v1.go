@@ -4,11 +4,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
 type TomlV1 struct {
-	sku_fmt.LuaVMPool
+	sku.LuaVMPool
 	Filter string `toml:"filter"`
 }
 
