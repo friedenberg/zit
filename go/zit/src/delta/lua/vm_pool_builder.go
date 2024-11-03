@@ -6,16 +6,19 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	lua "github.com/yuin/gopher-lua"
 )
 
 type VMPoolBuilder struct {
 	proto        VMPool
 	scriptReader io.Reader
+	compiled     *lua.FunctionProto
 	apply        interfaces.FuncIter[*VM]
 }
 
 func (vpb *VMPoolBuilder) Clone() *VMPoolBuilder {
 	clone := *vpb
+	// TODO support cloning of vpb.compiled
 	return &clone
 }
 
@@ -43,6 +46,13 @@ func (sp *VMPoolBuilder) WithReader(
 	return sp
 }
 
+func (sp *VMPoolBuilder) WithCompiled(
+	compiled *FunctionProto,
+) *VMPoolBuilder {
+	sp.compiled = compiled
+	return sp
+}
+
 func (sp *VMPoolBuilder) WithApply(
 	apply interfaces.FuncIter[*VM],
 ) *VMPoolBuilder {
@@ -56,14 +66,21 @@ func (vpb *VMPoolBuilder) Build() (vmp *VMPool, err error) {
 		Searcher: vpb.proto.Searcher,
 	}
 
-	if vpb.scriptReader == nil {
-		err = errors.Errorf("no script or reader set")
+	if vpb.scriptReader == nil && vpb.compiled == nil {
+		err = errors.Errorf("no script, reader, or compiled set")
 		return
 	}
 
-	if err = vmp.SetReader(vpb.scriptReader, vpb.apply); err != nil {
-		err = errors.Wrap(err)
-		return
+	if vpb.compiled != nil {
+		if err = vmp.SetCompiled(vpb.compiled, vpb.apply); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else if vpb.scriptReader != nil {
+		if err = vmp.SetReader(vpb.scriptReader, vpb.apply); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	// try initializing a lua vm to make sure there are no errors

@@ -387,8 +387,12 @@ function show_history_all { # @test
 	EOM
 }
 
-function show_etikett_lua { # @test
+function show_etikett_toml { # @test
 	cat >true.tag <<-EOM
+		---
+		! toml-tag-v1
+		---
+
 		filter = """
 		return {
 		  contains_sku = function (sk)
@@ -402,7 +406,35 @@ function show_etikett_lua { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		          deleted [true.tag]
-		[true @1379cb8d553a340a4d262b3be216659d8d8835ad0b4cc48005db8db264a395ed]
+		[true @1379cb8d553a340a4d262b3be216659d8d8835ad0b4cc48005db8db264a395ed !toml-tag-v1]
+	EOM
+
+	run_zit show true
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
+		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+	EOM
+}
+
+function show_etikett_lua { # @test
+	cat >true.tag <<-EOM
+		---
+		! lua-tag-v1
+		---
+
+		return {
+		  contains_sku = function (sk)
+		    return true
+		  end
+		}
+	EOM
+
+	run_zit checkin -delete true.tag
+	assert_success
+	assert_output_unsorted - <<-EOM
+		          deleted [true.tag]
+		[true @b0464657d3360b746e310519861dffc6c33f4e61349800b5b6312eae0f57f0a3 !lua-tag-v1]
 	EOM
 
 	run_zit show true

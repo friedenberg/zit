@@ -2,7 +2,6 @@ package env
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/query"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
@@ -13,7 +12,7 @@ func (u *Env) makeQueryBuilder() *query.Builder {
 		u.GetDirectoryLayout(),
 		u.GetStore().GetBlobStore(),
 		u.GetStore().GetStreamIndex(),
-		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
+    u.MakeLuaVMPoolBuilder(),
 		u,
 	)
 }

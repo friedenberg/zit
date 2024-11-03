@@ -10,6 +10,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+func (u *Env) MakeLuaVMPoolBuilder() *lua.VMPoolBuilder {
+	return (&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher)
+}
+
 func (s *Env) GetSkuFromString(lv string) (sk *sku.Transacted, err error) {
 	e := sku.GetTransactedPool().Get()
 	sk = e.GetSku()
@@ -105,18 +109,4 @@ func (s *Env) LuaRequire(ls *lua.LState) int {
 	}
 
 	return 1
-}
-
-// TODO check if selbst needs to be passed in
-func (u *Env) MakeLuaVMPool(script string) (vp *lua.VMPool, err error) {
-	if vp, err = lua.MakeVMPoolWithZitSearcher(
-		script,
-		u.LuaSearcher,
-		nil,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
 }

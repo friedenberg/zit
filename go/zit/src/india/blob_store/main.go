@@ -1,6 +1,7 @@
 package blob_store
 
 import (
+	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/delta/tag_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/delta/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
@@ -10,54 +11,18 @@ import (
 
 // TODO switch to interfaces instead of structs
 type VersionedStores struct {
-	tag_toml_v0  Store[tag_blobs.V0, *tag_blobs.V0]
-	tag_toml_v1  Store[tag_blobs.TomlV1, *tag_blobs.TomlV1]
-	tag_lua_v1   Store[struct{}, *struct{}]
 	repo_v0      Store[repo_blobs.V0, *repo_blobs.V0]
 	config_store ConfigStore
 	type_store   TypeStore
+	tag_store    TagStore
 }
 
 func Make(
 	dirLayout dir_layout.DirLayout,
+	luaVMPoolBuilder *lua.VMPoolBuilder,
 ) *VersionedStores {
 	return &VersionedStores{
-		tag_toml_v0: MakeBlobStore(
-			dirLayout,
-			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[tag_blobs.V0](
-					dirLayout,
-				),
-				ParsedBlobTomlFormatter[tag_blobs.V0, *tag_blobs.V0]{},
-				dirLayout,
-			),
-			func(a *tag_blobs.V0) {
-				a.Reset()
-			},
-		),
-		tag_toml_v1: MakeBlobStore(
-			dirLayout,
-			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[tag_blobs.TomlV1](
-					dirLayout,
-				),
-				ParsedBlobTomlFormatter[tag_blobs.TomlV1, *tag_blobs.TomlV1]{},
-				dirLayout,
-			),
-			func(a *tag_blobs.TomlV1) {
-				a.Reset()
-			},
-		),
-		tag_lua_v1: MakeBlobStore(
-			dirLayout,
-			MakeBlobFormat[struct{}, *struct{}](
-				nil,
-				nil,
-				dirLayout,
-			),
-			func(a *struct{}) {
-			},
-		),
+		tag_store: MakeTagStore(dirLayout, luaVMPoolBuilder),
 		repo_v0: MakeBlobStore(
 			dirLayout,
 			MakeBlobFormat(
@@ -77,15 +42,11 @@ func Make(
 }
 
 func (a *VersionedStores) GetTagTomlV0() Store[tag_blobs.V0, *tag_blobs.V0] {
-	return a.tag_toml_v0
+	return a.tag_store.toml_v0
 }
 
 func (a *VersionedStores) GetTagTomlV1() Store[tag_blobs.TomlV1, *tag_blobs.TomlV1] {
-	return a.tag_toml_v1
-}
-
-func (a *VersionedStores) GetTagLuaV1() Store[struct{}, *struct{}] {
-	return a.tag_lua_v1
+	return a.tag_store.toml_v1
 }
 
 func (a *VersionedStores) GetRepoV0() Store[repo_blobs.V0, *repo_blobs.V0] {
@@ -110,4 +71,8 @@ func (a *VersionedStores) GetConfig() ConfigStore {
 
 func (a *VersionedStores) GetType() TypeStore {
 	return a.type_store
+}
+
+func (a *VersionedStores) GetTag() TagStore {
+	return a.tag_store
 }

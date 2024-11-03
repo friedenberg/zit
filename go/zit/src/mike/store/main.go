@@ -25,8 +25,8 @@ import (
 )
 
 type Store struct {
-	sunrise ids.Tai
-	config  *config.Compiled
+	sunrise   ids.Tai
+	config    *config.Compiled
 	dirLayout dir_layout.DirLayout
 
 	cwdFiles           *store_fs.Store
@@ -66,10 +66,11 @@ func (c *Store) Initialize(
 	qb *query.Builder,
 	options object_inventory_format.Options,
 	box *box_format.Box,
+	blobStore *blob_store.VersionedStores,
 ) (err error) {
 	c.config = k
 	c.dirLayout = st
-	c.blob_store = blob_store.Make(st)
+	c.blob_store = blobStore
 	c.persistentObjectFormat = pmf
 	c.options = options
 	c.sunrise = t

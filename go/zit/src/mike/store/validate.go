@@ -19,7 +19,7 @@ func (s *Store) validate(
 	case genres.Type:
 		tipe := el.GetSku().GetType()
 
-		var commonBlob type_blobs.Common
+		var commonBlob type_blobs.Blob
 
 		if commonBlob, _, err = s.GetBlobStore().GetType().ParseTypedBlob(
 			tipe,

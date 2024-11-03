@@ -42,6 +42,11 @@ type (
 		GetSku() *Transacted
 	}
 
+	TransactedWithBlob[T any] struct {
+		*Transacted
+		Blob T
+	}
+
 	ExternalLike interface {
 		ids.ObjectIdGetter
 		interfaces.Stringer

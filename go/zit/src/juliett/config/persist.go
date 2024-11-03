@@ -87,7 +87,7 @@ func (kc *Compiled) recompileTypes(
 	if err = kc.Types.Each(
 		func(ct *sku.Transacted) (err error) {
 			tipe := ct.GetSku().GetType()
-			var commonBlob type_blobs.Common
+			var commonBlob type_blobs.Blob
 
 			if commonBlob, _, err = blobStore.GetType().ParseTypedBlob(
 				tipe,

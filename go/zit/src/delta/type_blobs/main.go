@@ -20,3 +20,8 @@ func Default() (t TomlV1) {
 
 	return
 }
+
+type Blob interface {
+	GetFileExtension() string
+	GetBinary() bool
+}

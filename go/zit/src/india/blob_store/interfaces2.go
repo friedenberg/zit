@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type (
@@ -34,6 +35,16 @@ type (
 		PutTypedBlob(
 			interfaces.ObjectId,
 			T,
+		) error
+	}
+
+	CommonStore2[T any] interface {
+		GetTransactedWithBlob(
+			sk sku.TransactedGetter,
+		) (common sku.TransactedWithBlob[T], n int64, err error)
+
+		PutTransactedWithBlob(
+			sku.TransactedWithBlob[T],
 		) error
 	}
 )

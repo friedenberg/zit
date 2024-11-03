@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/mutable_config_blobs"
@@ -48,6 +47,7 @@ type Env struct {
 	dormantIndex    dormant_index.Index
 
 	storesInitialized bool
+	blobStore         *blob_store.VersionedStores
 	store             store.Store
 	age               *age.Age
 	externalStores    map[ids.RepoId]*external_store.Store
@@ -137,11 +137,16 @@ func (u *Env) Initialize(options Options) (err error) {
 		return
 	}
 
+	u.blobStore = blob_store.Make(
+		u.dirLayout,
+		u.MakeLuaVMPoolBuilder(),
+	)
+
 	if err = u.config.Initialize(
 		u.dirLayout,
 		u.cliConfig,
 		&u.dormantIndex,
-		blob_store.Make(u.dirLayout),
+		u.blobStore,
 	); err != nil {
 		if options.GetAllowConfigReadError() {
 			err = nil
@@ -167,11 +172,12 @@ func (u *Env) Initialize(options Options) (err error) {
 		u.dirLayout,
 		object_inventory_format.FormatForVersion(u.GetConfig().GetStoreVersion()),
 		u.sunrise,
-		(&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher),
+		u.MakeLuaVMPoolBuilder(),
 		u.makeQueryBuilder().
 			WithDefaultGenres(ids.MakeGenre(genres.TrueGenre()...)),
 		ofo,
 		u.MakeBoxArchive(true),
+		u.blobStore,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")
 		return

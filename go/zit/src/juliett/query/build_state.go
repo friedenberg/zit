@@ -3,14 +3,11 @@ package query
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
-	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/delta/tag_blobs"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -422,66 +419,26 @@ func (b *buildState) makeTagOrLuaTag(
 		return
 	}
 
-	lb := b.luaVMPoolBuilder.Clone().WithApply(MakeSelfApply(sk))
+	var twb sku.TransactedWithBlob[tag_blobs.Blob]
 
-	// TODO use repo pattern
-	if sk.GetType().String() == "lua" {
-		var ar sha.ReadCloser
-
-		if ar, err = b.builder.dirLayout.BlobReader(sk.GetBlobSha()); err != nil {
-			var errBlobMissing dir_layout.ErrBlobMissing
-
-			if errors.As(err, &errBlobMissing) {
-				b.missingBlobs = append(
-					b.missingBlobs,
-					ErrBlobMissing{
-						ObjectId:       *k,
-						ErrBlobMissing: errBlobMissing,
-					},
-				)
-
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-			}
-
-			return
-		}
-
-		defer errors.DeferredCloser(&err, ar)
-
-		lb.WithReader(ar)
-	} else {
-		var blob *tag_blobs.TomlV1
-
-		if blob, err = b.builder.blob_store.GetTagTomlV1().GetBlob(
-			sk.GetBlobSha(),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if blob.Filter == "" {
-			return
-		}
-
-		lb.WithScript(blob.Filter)
-	}
-
-	var vmp *lua.VMPool
-
-	if vmp, err = lb.Build(); err != nil {
-		exp = k
-		ui.Err().Print(err)
-		err = nil
+	if twb, _, err = b.builder.blob_store.GetTag().GetTransactedWithBlob(
+		sk,
+	); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	ml := Lua{
-		LuaVMPool: sku_fmt.MakeLuaVMPool(vmp, nil),
+	var matcherBlob sku.Queryable
+
+	{
+		var ok bool
+
+		if matcherBlob, ok = twb.Blob.(sku.Queryable); !ok {
+			return
+		}
 	}
 
-	exp = &TagLua{Lua: &ml, ObjectId: k}
+	exp = &CompoundMatch{Queryable: matcherBlob, ObjectId: k}
 
 	return
 }

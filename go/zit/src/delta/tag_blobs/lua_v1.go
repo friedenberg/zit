@@ -1,7 +1,6 @@
-package query
+package tag_blobs
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
@@ -9,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 )
 
-func MakeSelfApply(
+func MakeLuaSelfApplyV1(
 	self *sku.Transacted,
 ) interfaces.FuncIter[*lua.VM] {
 	if self == nil {
@@ -24,53 +23,29 @@ func MakeSelfApply(
 	}
 }
 
-func MakeLua(
-	self *sku.Transacted,
-	script string,
-	require lua.LGFunction,
-) (ml Lua, err error) {
-	b := (&lua.VMPoolBuilder{}).
-		WithScript(script).
-		WithRequire(require)
-
-	if ml, err = MakeLuaFromBuilder(b, self); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func MakeLuaFromBuilder(
-	b *lua.VMPoolBuilder,
-	self *sku.Transacted,
-) (l Lua, err error) {
-	b = b.Clone().WithApply(MakeSelfApply(self))
-
-	var vmp *lua.VMPool
-
-	if vmp, err = b.Build(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	l.LuaVMPool = sku_fmt.MakeLuaVMPool(vmp, self)
-
-	return
-}
-
-type Lua struct {
+type LuaV1 struct {
 	sku_fmt.LuaVMPool
 }
 
-func (matcher Lua) ContainsSku(tg sku.TransactedGetter) bool {
-	vm, err := matcher.Get()
+func (a *LuaV1) GetQueryable() sku.Queryable {
+	return a
+}
+
+func (a *LuaV1) Reset() {
+}
+
+func (a *LuaV1) ResetWith(b LuaV1) {
+}
+
+func (tb *LuaV1) ContainsSku(tg sku.TransactedGetter) bool {
+	// lb := b.luaVMPoolBuilder.Clone().WithApply(MakeSelfApply(sk))
+	vm, err := tb.Get()
 	if err != nil {
 		ui.Err().Printf("lua script error: %s", err)
 		return false
 	}
 
-	defer matcher.Put(vm)
+	defer tb.Put(vm)
 
 	var t *lua.LTable
 

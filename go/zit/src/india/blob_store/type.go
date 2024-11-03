@@ -45,14 +45,14 @@ func MakeTypeStore(
 	}
 }
 
-func (a TypeStore) GetCommonStore() CommonStore[type_blobs.Common] {
+func (a TypeStore) GetCommonStore() CommonStore[type_blobs.Blob] {
 	return a
 }
 
 func (a TypeStore) ParseTypedBlob(
 	tipe interfaces.ObjectId,
 	blobSha interfaces.Sha,
-) (common type_blobs.Common, n int64, err error) {
+) (common type_blobs.Blob, n int64, err error) {
 	switch tipe.String() {
 	case "", type_blobs.TypeV0:
 		store := a.type_toml_v0
@@ -82,7 +82,7 @@ func (a TypeStore) ParseTypedBlob(
 
 func (a TypeStore) PutTypedBlob(
 	tipe interfaces.ObjectId,
-	common type_blobs.Common,
+	common type_blobs.Blob,
 ) (err error) {
 	switch tipe.String() {
 	case "", type_blobs.TypeV0:

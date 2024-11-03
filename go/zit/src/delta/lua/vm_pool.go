@@ -86,10 +86,26 @@ func (sp *VMPool) SetReader(
 	reader io.Reader,
 	apply interfaces.FuncIter[*VM],
 ) (err error) {
-	if sp.compiled, err = CompileReader(reader); err != nil {
+	var compiled *FunctionProto
+
+	if compiled, err = CompileReader(reader); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	if err = sp.SetCompiled(compiled, apply); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (sp *VMPool) SetCompiled(
+	compiled *FunctionProto,
+	apply interfaces.FuncIter[*VM],
+) (err error) {
+	sp.compiled = compiled
 
 	sp.Pool2 = pool2.MakePool(
 		func() (vm *VM, err error) {
