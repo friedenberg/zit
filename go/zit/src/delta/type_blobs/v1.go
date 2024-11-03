@@ -27,9 +27,9 @@ func (a *TomlV1) Reset() {
 }
 
 func (a *TomlV1) GetBinary() bool {
-  return a.Binary
+	return a.Binary
 }
 
 func (a *TomlV1) GetFileExtension() string {
-  return a.FileExtension
+	return a.FileExtension
 }

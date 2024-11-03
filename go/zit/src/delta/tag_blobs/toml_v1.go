@@ -46,7 +46,7 @@ func (tb *TomlV1) ContainsSku(tg sku.TransactedGetter) bool {
 
 	vm.VM.Push(f)
 
-	sku_fmt.ToLuaTableV1(
+	sku.ToLuaTableV1(
 		tg,
 		vm.VM.LState,
 		tSku,

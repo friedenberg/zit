@@ -30,14 +30,14 @@ func (x *XDG) setDefaultOrEnv(
 		*initElement.out = v
 	} else {
 		*initElement.out = os.Expand(initElement.defawlt, func(v string) string {
-      switch v {
-      case "HOME":
-        return x.Home
+			switch v {
+			case "HOME":
+				return x.Home
 
-      default:
-        return os.Getenv(v)
-      }
-    })
+			default:
+				return os.Getenv(v)
+			}
+		})
 	}
 
 	*initElement.out = filepath.Join(*initElement.out, x.AddedPath)

@@ -259,7 +259,7 @@ func (g *Genre) Set(v string) (err error) {
 
 	switch {
 	case strings.EqualFold(v, "blob"):
-    fallthrough
+		fallthrough
 	case strings.EqualFold(v, "akte"):
 		*g = Blob
 
@@ -270,7 +270,7 @@ func (g *Genre) Set(v string) (err error) {
 		*g = Type
 
 	case hasPrefixOrEquals("tag", v):
-    fallthrough
+		fallthrough
 	case hasPrefixOrEquals("etikett", v):
 		*g = Tag
 
@@ -278,19 +278,19 @@ func (g *Genre) Set(v string) (err error) {
 		*g = Zettel
 
 	case strings.EqualFold("config", v):
-    fallthrough
+		fallthrough
 	case strings.EqualFold("konfig", v):
 		*g = Config
 
 	case hasPrefixOrEquals("inventory_list", v):
-    fallthrough
+		fallthrough
 	case hasPrefixOrEquals("inventory-list", v):
-    fallthrough
+		fallthrough
 	case hasPrefixOrEquals("bestandsaufnahme", v):
 		*g = InventoryList
 
 	case hasPrefixOrEquals("repo", v):
-    fallthrough
+		fallthrough
 	case hasPrefixOrEquals("kasten", v):
 		*g = Repo
 

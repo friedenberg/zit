@@ -10,7 +10,7 @@ import (
 )
 
 type Cli struct {
-	BasePath        string
+	BasePath string
 
 	Debug            debug.Options
 	Verbose          bool

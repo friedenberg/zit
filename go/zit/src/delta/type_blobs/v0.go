@@ -32,9 +32,9 @@ func (a *V0) Reset() {
 }
 
 func (a *V0) GetBinary() bool {
-  return !a.InlineBlob
+	return !a.InlineBlob
 }
 
 func (a *V0) GetFileExtension() string {
-  return a.FileExtension
+	return a.FileExtension
 }

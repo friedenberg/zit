@@ -18,7 +18,7 @@ func MakeSelfApply(
 
 	return func(vm *lua.VM) (err error) {
 		selbstTable := sku_fmt.MakeLuaTablePool(vm).Get()
-		sku_fmt.ToLuaTableV1(self, vm.LState, selbstTable)
+		sku.ToLuaTableV1(self, vm.LState, selbstTable)
 		vm.SetGlobal("Selbst", selbstTable.Transacted)
 		return
 	}
@@ -88,7 +88,7 @@ func (matcher Lua) ContainsSku(tg sku.TransactedGetter) bool {
 
 	vm.VM.Push(f)
 
-	sku_fmt.ToLuaTableV1(
+	sku.ToLuaTableV1(
 		tg,
 		vm.VM.LState,
 		tSku,

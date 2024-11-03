@@ -12,7 +12,7 @@ func (u *Env) makeQueryBuilder() *query.Builder {
 		u.GetDirectoryLayout(),
 		u.GetStore().GetBlobStore(),
 		u.GetStore().GetStreamIndex(),
-    u.MakeLuaVMPoolBuilder(),
+		u.MakeLuaVMPoolBuilder(),
 		u,
 	)
 }

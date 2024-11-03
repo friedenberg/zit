@@ -133,14 +133,14 @@ func TestQuery(t1 *testing.T) {
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
 			defaultGattung:    ids.MakeGenre(genres.TrueGenre()...),
-      expectedOptimized: ":Typ :Etikett :Zettel :Konfig :Bestandsaufnahme :Kasten",
+			expectedOptimized: ":Typ :Etikett :Zettel :Konfig :Bestandsaufnahme :Kasten",
 			expected:          ":Typ,Etikett,Zettel,Konfig,Bestandsaufnahme,Kasten",
 			inputs:            []string{},
 		},
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
 			defaultGattung:    ids.MakeGenre(genres.TrueGenre()...),
-      expectedOptimized: ":Typ :Etikett :Zettel :Konfig :Bestandsaufnahme :Kasten",
+			expectedOptimized: ":Typ :Etikett :Zettel :Konfig :Bestandsaufnahme :Kasten",
 			expected:          ":Typ,Etikett,Zettel,Konfig,Bestandsaufnahme,Kasten",
 			inputs:            []string{":"},
 		},

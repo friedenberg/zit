@@ -37,13 +37,13 @@ var mapOperators = map[rune]bool{
 
 // TODO make private
 func IsOperator(r rune) (ok bool) {
-  return isOperator(r, false)
+	return isOperator(r, false)
 }
 
 func isOperator(r rune, dotAllowed bool) (ok bool) {
-  if dotAllowed && r == '.' {
-    return
-  }
+	if dotAllowed && r == '.' {
+		return
+	}
 
 	_, ok = mapOperators[r]
 	return

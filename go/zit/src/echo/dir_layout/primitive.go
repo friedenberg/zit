@@ -20,19 +20,19 @@ type Primitive struct {
 }
 
 func MakePrimitive(do debug.Options) (s Primitive, err error) {
-  var home string
+	var home string
 
 	if home, err = os.UserHomeDir(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-  if s, err = MakePrimitiveWithHome(home, do); err != nil {
+	if s, err = MakePrimitiveWithHome(home, do); err != nil {
 		err = errors.Wrap(err)
 		return
-  }
+	}
 
-  return
+	return
 }
 
 func MakePrimitiveWithHome(home string, do debug.Options) (s Primitive, err error) {
@@ -44,7 +44,7 @@ func MakePrimitiveWithHome(home string, do debug.Options) (s Primitive, err erro
 	s.pid = os.Getpid()
 	s.dryRun = do.DryRun
 
-  s.xdg.Home = home
+	s.xdg.Home = home
 
 	if err = s.xdg.Initialize(true, "zit"); err != nil {
 		err = errors.Wrap(err)

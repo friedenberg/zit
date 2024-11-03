@@ -10,13 +10,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
-	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type textFormatterCommon struct {
-	dirLayout       dir_layout.DirLayout
+	dirLayout     dir_layout.DirLayout
 	blobFormatter script_config.RemoteScript
 }
 

@@ -134,7 +134,7 @@ func (u *Env) PrinterCheckedOutForKasten(
 
 func (u *Env) MakePrinterBoxArchive(
 	out interfaces.WriterAndStringWriter,
-  includeTai bool,
+	includeTai bool,
 ) interfaces.FuncIter[*sku.Transacted] {
 	boxFormat := u.MakeBoxArchive(includeTai)
 

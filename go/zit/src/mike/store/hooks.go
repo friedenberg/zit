@@ -225,19 +225,19 @@ func (s *Store) tryPreCommitHook(
 	tableKinder := vm.TablePool.Get()
 	defer vm.TablePool.Put(tableKinder)
 
-	sku_fmt.ToLuaTableV1(
+	sku.ToLuaTableV1(
 		kinder,
 		vm.LState,
 		tableKinder,
 	)
 
-	var tableMutter *sku_fmt.LuaTableV1
+	var tableMutter *sku.LuaTableV1
 
 	if mutter != nil {
 		tableMutter = vm.TablePool.Get()
 		defer vm.TablePool.Put(tableMutter)
 
-		sku_fmt.ToLuaTableV1(
+		sku.ToLuaTableV1(
 			mutter,
 			vm.LState,
 			tableMutter,
@@ -261,7 +261,7 @@ func (s *Store) tryPreCommitHook(
 		return
 	}
 
-	if err = sku_fmt.FromLuaTableV1(kinder, vm.LState, tableKinder); err != nil {
+	if err = sku.FromLuaTableV1(kinder, vm.LState, tableKinder); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -313,19 +313,19 @@ func (s *Store) tryHookWithName(
 	tableKinder := vm.TablePool.Get()
 	defer vm.TablePool.Put(tableKinder)
 
-	sku_fmt.ToLuaTableV1(
+	sku.ToLuaTableV1(
 		kinder,
 		vm.LState,
 		tableKinder,
 	)
 
-	var tableMutter *sku_fmt.LuaTableV1
+	var tableMutter *sku.LuaTableV1
 
 	if mutter != nil {
 		tableMutter = vm.TablePool.Get()
 		defer vm.TablePool.Put(tableMutter)
 
-		sku_fmt.ToLuaTableV1(
+		sku.ToLuaTableV1(
 			mutter,
 			vm.LState,
 			tableMutter,
@@ -354,7 +354,7 @@ func (s *Store) tryHookWithName(
 		return
 	}
 
-	if err = sku_fmt.FromLuaTableV1(kinder, vm.LState, tableKinder); err != nil {
+	if err = sku.FromLuaTableV1(kinder, vm.LState, tableKinder); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

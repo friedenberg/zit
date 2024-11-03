@@ -1,11 +1,10 @@
-package sku_fmt
+package sku
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 // TODO setup versions of LuaTableV1
@@ -15,7 +14,7 @@ type LuaTableV1 struct {
 	TagsImplicit *lua.LTable
 }
 
-func ToLuaTableV1(tg sku.TransactedGetter, l *lua.LState, t *LuaTableV1) {
+func ToLuaTableV1(tg TransactedGetter, l *lua.LState, t *LuaTableV1) {
 	o := tg.GetSku()
 
 	l.SetField(t.Transacted, "Gattung", lua.LString(o.GetGenre().String()))
@@ -41,7 +40,7 @@ func ToLuaTableV1(tg sku.TransactedGetter, l *lua.LState, t *LuaTableV1) {
 	)
 }
 
-func FromLuaTableV1(o *sku.Transacted, l *lua.LState, lt *LuaTableV1) (err error) {
+func FromLuaTableV1(o *Transacted, l *lua.LState, lt *LuaTableV1) (err error) {
 	t := lt.Transacted
 
 	g := genres.MakeOrUnknown(l.GetField(t, "Gattung").String())

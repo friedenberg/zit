@@ -26,10 +26,10 @@ func (s *Store) MergeCheckedOutIfNecessary(
 		return
 	} else if co.Internal.Metadata.EqualsSansTai(&co.External.Metadata) {
 		if !co.Internal.Metadata.Tai.Less(co.External.Metadata.Tai) {
-      // TODO implement retroactive change
+			// TODO implement retroactive change
 		}
 
-    return
+		return
 	} else if co.Internal.Metadata.Blob.Equals(&co.External.Metadata.Blob) {
 		conflicts = checkout_mode.MetadataOnly
 	} else {

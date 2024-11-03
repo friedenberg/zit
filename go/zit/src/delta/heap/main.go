@@ -98,7 +98,7 @@ func (h *Heap[T, TPtr]) PopAndSave() (sk TPtr, ok bool) {
 	h.l.Lock()
 	defer h.l.Unlock()
 
-  return h.popAndSave()
+	return h.popAndSave()
 }
 
 func (h *Heap[T, TPtr]) popAndSave() (sk TPtr, ok bool) {
@@ -124,7 +124,7 @@ func (h *Heap[T, TPtr]) Restore() {
 	h.l.Lock()
 	defer h.l.Unlock()
 
-  h.restore()
+	h.restore()
 }
 
 func (h *Heap[T, TPtr]) restore() {
