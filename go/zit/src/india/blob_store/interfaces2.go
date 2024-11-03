@@ -24,4 +24,16 @@ type (
 		ParsedBlobFormatter2[T]
 		Parser2[T]
 	}
+
+	CommonStore[T any] interface {
+		ParseTypedBlob(
+			tipe interfaces.ObjectId,
+			blobSha interfaces.Sha,
+		) (common T, n int64, err error)
+
+		PutTypedBlob(
+			interfaces.ObjectId,
+			T,
+		) error
+	}
 )

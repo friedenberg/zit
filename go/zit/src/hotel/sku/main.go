@@ -15,7 +15,7 @@ func init() {
 	gob.Register(Transacted{})
 }
 
-// TODO rename
+// TODO rename and switch to no object.Mode
 type CommitOptions struct {
 	ids.RepoId
 	object_mode.Mode // TODO rename
@@ -24,6 +24,7 @@ type CommitOptions struct {
 	DontAddMissingTags bool
 	DontAddMissingType bool
 	DontValidate       bool
+	DontRunHooks       bool
 }
 
 type (

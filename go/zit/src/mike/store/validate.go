@@ -21,7 +21,7 @@ func (s *Store) validate(
 
 		var commonBlob type_blobs.Common
 
-		if commonBlob, _, err = s.GetBlobStore().ParseTypeBlob(
+		if commonBlob, _, err = s.GetBlobStore().GetType().ParseTypedBlob(
 			tipe,
 			el.GetSku().GetBlobSha(),
 		); err != nil {
@@ -29,7 +29,7 @@ func (s *Store) validate(
 			return
 		}
 
-		defer s.GetBlobStore().PutTypeBlob(tipe, commonBlob)
+		defer s.GetBlobStore().GetType().PutTypedBlob(tipe, commonBlob)
 	}
 
 	return

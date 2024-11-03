@@ -83,7 +83,7 @@ func (kc *Compiled) recompileTypes(
 			tipe := ct.GetSku().GetType()
 			var commonBlob type_blobs.Common
 
-			if commonBlob, _, err = blobStore.ParseTypeBlob(
+			if commonBlob, _, err = blobStore.GetType().ParseTypedBlob(
 				tipe,
 				ct.GetBlobSha(),
 			); err != nil {
@@ -91,7 +91,7 @@ func (kc *Compiled) recompileTypes(
 				return
 			}
 
-			defer blobStore.PutTypeBlob(tipe, commonBlob)
+			defer blobStore.GetType().PutTypedBlob(tipe, commonBlob)
 
 			if commonBlob == nil {
 				err = errors.Errorf("nil type blob for type: %q. Sku: %s", tipe, ct)
