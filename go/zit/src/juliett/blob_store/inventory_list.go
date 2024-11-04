@@ -206,22 +206,10 @@ func (a InventoryStore) ReadInventoryListObject(
 	tipe ids.Type,
 	r io.Reader,
 ) (out *sku.Transacted, err error) {
-	f := func(sk *sku.Transacted) (err error) {
-		if out == nil {
-			out = sk.CloneTransacted()
-		} else {
-			err = errors.Errorf("expected only one sku.Transacted, but read more than one")
-			return
-		}
-
-		return
-	}
-
 	switch tipe.String() {
 	case "", builtin_types.InventoryListTypeV0:
-		if err = a.v0.StreamInventoryListBlobSkus(
+		if _, out, err = a.v0.ReadInventoryListObject(
 			r,
-			f,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -230,7 +218,16 @@ func (a InventoryStore) ReadInventoryListObject(
 	case builtin_types.InventoryListTypeV1:
 		if err = a.v1.StreamInventoryListBlobSkus(
 			r,
-			f,
+			func(sk *sku.Transacted) (err error) {
+				if out == nil {
+					out = sk.CloneTransacted()
+				} else {
+					err = errors.Errorf("expected only one sku.Transacted, but read more than one")
+					return
+				}
+
+				return
+			},
 		); err != nil {
 			err = errors.Wrap(err)
 			return

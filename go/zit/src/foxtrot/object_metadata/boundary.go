@@ -33,9 +33,10 @@ func ReadBoundary(r *catgut.RingBuffer) (n int, err error) {
 	if readable.Len() != BoundaryStringValue.Len() {
 		err = errors.Wrapf(
 			errBoundaryInvalid,
-			"Expected: %d, Actual: %d",
+			"Expected: %d, Actual: %d. Readable: %q",
 			BoundaryStringValue.Len(),
 			readable.Len(),
+			readable,
 		)
 
 		return
