@@ -16,6 +16,7 @@ type TagStore struct {
 	toml_v0          Store[tag_blobs.V0, *tag_blobs.V0]
 	toml_v1          Store[tag_blobs.TomlV1, *tag_blobs.TomlV1]
 	lua_v1           Store[tag_blobs.LuaV1, *tag_blobs.LuaV1]
+	lua_v2           Store[tag_blobs.LuaV2, *tag_blobs.LuaV2]
 }
 
 func MakeTagStore(
@@ -59,6 +60,16 @@ func MakeTagStore(
 				dirLayout,
 			),
 			func(a *tag_blobs.LuaV1) {
+			},
+		),
+		lua_v2: MakeBlobStore(
+			dirLayout,
+			MakeBlobFormat[tag_blobs.LuaV2, *tag_blobs.LuaV2](
+				nil,
+				nil,
+				dirLayout,
+			),
+			func(a *tag_blobs.LuaV2) {
 			},
 		),
 	}
@@ -135,6 +146,31 @@ func (a TagStore) GetTransactedWithBlob(
 
 		twb.Blob = &tag_blobs.LuaV1{
 			LuaVMPoolV1: sku.MakeLuaVMPoolV1(vmp, nil),
+		}
+
+	case builtin_types.TagTypeLuaV2:
+		var rc sha.ReadCloser
+
+		if rc, err = a.dirLayout.BlobReader(blobSha); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		defer errors.DeferredCloser(&err, rc)
+
+		lb := a.luaVMPoolBuilder.Clone().WithApply(tag_blobs.MakeLuaSelfApplyV2(sk))
+
+		var vmp *lua.VMPool
+
+		lb.WithReader(rc)
+
+		if vmp, err = lb.Build(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		twb.Blob = &tag_blobs.LuaV2{
+			LuaVMPoolV2: sku.MakeLuaVMPoolV2(vmp, nil),
 		}
 	}
 

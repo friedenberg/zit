@@ -425,6 +425,7 @@ function show_etikett_lua_v1 { # @test
 
 		return {
 		  contains_sku = function (sk)
+		    print(Selbst.Kennung)
 		    return true
 		  end
 		}
@@ -434,7 +435,7 @@ function show_etikett_lua_v1 { # @test
 	assert_success
 	assert_output_unsorted - <<-EOM
 		          deleted [true.tag]
-		[true @b0464657d3360b746e310519861dffc6c33f4e61349800b5b6312eae0f57f0a3 !lua-tag-v1]
+		[true @67b7eb3e9ea1c4b3404b34a0b2abcc09f450797c8cc801671463a79429aead37 !lua-tag-v1]
 	EOM
 
 	run_zit show true
@@ -442,6 +443,39 @@ function show_etikett_lua_v1 { # @test
 	assert_output_unsorted - <<-EOM
 		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+		true
+		true
+	EOM
+}
+
+function show_etikett_lua_v2 { # @test
+	cat >true.tag <<-EOM
+		---
+		! lua-tag-v2
+		---
+
+		return {
+		  contains_sku = function (sk)
+		    print(Self.ObjectId)
+		    return true
+		  end
+		}
+	EOM
+
+	run_zit checkin -delete true.tag
+	assert_success
+	assert_output_unsorted - <<-EOM
+		          deleted [true.tag]
+		[true @ed8e3cf53e044fcc1ae040ed5203515d1c6d205decc745f0caafd5dee67efbab !lua-tag-v2]
+	EOM
+
+	run_zit show true
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[one/dos @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
+		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+		true
+		true
 	EOM
 }
 

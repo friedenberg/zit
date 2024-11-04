@@ -23,7 +23,6 @@ type buildState struct {
 	pinnedObjectIds         []ObjectId
 	pinnedExternalObjectIds []sku.ExternalObjectId
 	repo                    sku.ExternalStoreForQuery
-	virtualTags             map[string]Lua
 	eqo                     sku.ExternalQueryOptions
 
 	externalStoreAcceptedQueryComponent bool
@@ -42,11 +41,6 @@ func (b *buildState) makeGroup() *Group {
 func (b *buildState) build(
 	vs ...string,
 ) (err error, latent errors.Multi) {
-	if err = b.realizeVirtualTags(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	em := errors.MakeMulti()
 	latent = em
 
@@ -131,27 +125,6 @@ func (b *buildState) build(
 	if err = b.qg.reduce(b); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	return
-}
-
-func (b *buildState) realizeVirtualTags() (err error) {
-	for k, v := range b.builder.virtualTagsBeforeInit {
-		var vmp *lua.VMPool
-
-		lb := b.luaVMPoolBuilder.Clone().WithScript(v)
-
-		if vmp, err = lb.Build(); err != nil {
-			err = errors.Wrapf(err, "Key: %q, Value: %q", k, v)
-			return
-		}
-
-		ml := Lua{
-			LuaVMPoolV1: sku.MakeLuaVMPoolV1(vmp, nil),
-		}
-
-		b.virtualTags[k] = ml
 	}
 
 	return

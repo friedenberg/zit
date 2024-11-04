@@ -107,7 +107,7 @@ func (f *Box) writeStringFormatBlobFDsExcept(
 
 	for fd := range fds.All() {
 		if except != nil && fd.Equals(except) {
-			return
+			continue
 		}
 
 		if err = f.writeStringFormatBlobFD(fd, box); err != nil {

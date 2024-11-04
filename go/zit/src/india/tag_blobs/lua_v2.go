@@ -8,11 +8,13 @@ import (
 )
 
 func MakeLuaSelfApplyV2(
-	self *sku.Transacted,
+	selfOriginal *sku.Transacted,
 ) interfaces.FuncIter[*lua.VM] {
-	if self == nil {
-		return nil
+	if selfOriginal == nil {
+		panic("self was nil")
 	}
+
+	self := selfOriginal.CloneTransacted()
 
 	return func(vm *lua.VM) (err error) {
 		selfTable := sku.MakeLuaTablePoolV2(vm).Get()

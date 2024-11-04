@@ -19,12 +19,11 @@ func MakeBuilder(
 	repoGetter sku.ExternalStoreForQueryGetter,
 ) (b *Builder) {
 	b = &Builder{
-		dirLayout:             s,
-		blob_store:            blob_store,
-		object_probe_index:    object_probe_index,
-		luaVMPoolBuilder:      luaVMPoolBuilder,
-		virtualTagsBeforeInit: make(map[string]string),
-		repoGetter:            repoGetter,
+		dirLayout:          s,
+		blob_store:         blob_store,
+		object_probe_index: object_probe_index,
+		luaVMPoolBuilder:   luaVMPoolBuilder,
+		repoGetter:         repoGetter,
 	}
 
 	return
@@ -39,7 +38,6 @@ type Builder struct {
 	pinnedExternalObjectIds []sku.ExternalObjectId
 	repoGetter              sku.ExternalStoreForQueryGetter
 	repoId                  ids.RepoId
-	virtualTagsBeforeInit   map[string]string
 	fileExtensionGetter     interfaces.FileExtensionGetter
 	expanders               ids.Abbr
 	hidden                  sku.Query
@@ -55,7 +53,6 @@ func (b *Builder) makeState() *buildState {
 	state := &buildState{
 		builder:      b,
 		latentErrors: errors.MakeMulti(),
-		virtualTags:  make(map[string]Lua),
 	}
 
 	if b.luaVMPoolBuilder != nil {
@@ -90,14 +87,6 @@ func (b *Builder) WithDoNotMatchEmpty() *Builder {
 func (b *Builder) WithRequireNonEmptyQuery() *Builder {
 	b.requireNonEmptyQuery = true
 	return b
-}
-
-func (mb *Builder) WithVirtualTags(vs map[string]string) *Builder {
-	for k, v := range vs {
-		mb.virtualTagsBeforeInit["%"+k] = v
-	}
-
-	return mb
 }
 
 func (mb *Builder) WithDebug() *Builder {

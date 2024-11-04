@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
+	"code.linenisgreat.com/zit/go/zit/src/india/tag_blobs"
 )
 
 func (s *Store) MakeLuaVMPoolWithSku(
@@ -41,7 +41,7 @@ func (u *Store) MakeLuaVMPool(
 ) (vp sku.LuaVMPoolV1, err error) {
 	b := u.luaVMPoolBuilder.Clone().
 		WithScript(script).
-		WithApply(query.MakeSelfApply(selbst))
+		WithApply(tag_blobs.MakeLuaSelfApplyV1(selbst))
 
 	var lvmp *lua.VMPool
 
@@ -61,7 +61,7 @@ func (u *Store) MakeLuaVMPoolWithReader(
 ) (vp sku.LuaVMPoolV1, err error) {
 	b := u.luaVMPoolBuilder.Clone().
 		WithReader(r).
-		WithApply(query.MakeSelfApply(selbst))
+		WithApply(tag_blobs.MakeLuaSelfApplyV1(selbst))
 
 	var lvmp *lua.VMPool
 
@@ -74,33 +74,3 @@ func (u *Store) MakeLuaVMPoolWithReader(
 
 	return
 }
-
-// type LuaVMPool struct {
-// 	*sku.Transacted
-// 	*lua.VMPool
-// }
-
-// func (lvm LuaVMPool) Put(vm LuaVM) {
-// 	// vm.Put(vm.LTable)
-// 	lvm.VMPool.Put(vm.VM)
-// }
-
-// func (lvm LuaVMPool) Get() (vm LuaVM, err error) {
-// 	vm.VM = lvm.VMPool.Get()
-
-// 	if vm.LValue, err = vm.GetTopTableOrError(); err != nil {
-// 		err = errors.Wrap(err)
-// 		return
-// 	}
-
-// 	selbstTable := vm.Pool.Get()
-// 	sku_fmt.ToLuaTable(lvm.Transacted, vm.LState, selbstTable)
-// 	vm.SetField(vm.LValue, "Selbst", selbstTable)
-
-// 	return
-// }
-
-// type LuaVM struct {
-// 	*lua.VM
-// 	lua.LValue
-// }
