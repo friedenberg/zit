@@ -128,7 +128,7 @@ func (a InventoryStore) GetTransactedWithBlobFromReader(
 	return
 }
 
-func (a InventoryStore) WriteTransactedWithBlobToWriter(
+func (a InventoryStore) WriteObjectToWriter(
 	sk *sku.Transacted,
 	w io.Writer,
 ) (n int64, err error) {
@@ -147,6 +147,36 @@ func (a InventoryStore) WriteTransactedWithBlobToWriter(
 	case builtin_types.InventoryListTypeV1:
 		if n, err = a.v1.WriteInventoryListObject(
 			sk,
+			w,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (a InventoryStore) WriteBlobToWriter(
+	sk *sku.Transacted,
+  b *sku.List,
+	w io.Writer,
+) (n int64, err error) {
+	tipe := sk.GetType()
+
+	switch tipe.String() {
+	case "", builtin_types.InventoryListTypeV0:
+		if n, err = a.v0.WriteInventoryListBlob(
+			b,
+			w,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	case builtin_types.InventoryListTypeV1:
+		if n, err = a.v1.WriteInventoryListBlob(
+			b,
 			w,
 		); err != nil {
 			err = errors.Wrap(err)

@@ -147,7 +147,8 @@ func (s *Store) Create(
 		func() {
 			defer errors.DeferredCloser(&err, wc)
 
-			if _, err = s.blobStore.GetInventoryList().GetListFormat().WriteInventoryListBlob(
+			if _, err = s.blobStore.GetInventoryList().WriteBlobToWriter(
+        t,
         o,
         wc,
       ); err != nil {
@@ -179,7 +180,7 @@ func (s *Store) Create(
 
 		t.Metadata.Type = s.blobType
 
-		if _, err = s.blobStore.GetInventoryList().WriteTransactedWithBlobToWriter(
+		if _, err = s.blobStore.GetInventoryList().WriteObjectToWriter(
 			t,
 			wc,
 		); err != nil {
