@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -96,8 +97,17 @@ func (c Mergetool) RunWithQuery(
 		fo := u.GetStore().GetBlobStore().GetInventoryList().GetListFormat()
 
 		if err = tm.ReadConflictMarker(
-			br,
-			fo,
+			func(f interfaces.FuncIter[*sku.Transacted]) {
+				if err = fo.StreamInventoryListBlobSkus(
+					br,
+					f,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
+			},
 		); err != nil {
 			err = errors.Wrap(err)
 			return

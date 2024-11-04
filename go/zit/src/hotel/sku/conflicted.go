@@ -1,10 +1,10 @@
 package sku
 
 import (
-	"bufio"
 	"iter"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
@@ -127,13 +127,11 @@ func (tm *Conflicted) MergeTags() (err error) {
 }
 
 func (tm *Conflicted) ReadConflictMarker(
-	br *bufio.Reader,
-	fo ListFormat,
+	iter func(interfaces.FuncIter[*Transacted]),
 ) (err error) {
 	i := 0
 
-	if err = fo.StreamInventoryListBlobSkus(
-		br,
+	if iter(
 		func(sk *Transacted) (err error) {
 			switch i {
 			case 0:
