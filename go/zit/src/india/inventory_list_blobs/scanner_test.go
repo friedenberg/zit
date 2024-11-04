@@ -1,4 +1,4 @@
-package inventory_list_fmt
+package inventory_list_blobs
 
 import (
 	"bytes"
@@ -23,7 +23,7 @@ func TestOne(t1 *testing.T) {
 	o := object_inventory_format.Options{Tai: true}
 	w := zstd.NewWriter(b)
 
-	printer := MakePrinter(w, f, o)
+	printer := makePrinter(w, f, o)
 
 	sk := &sku.Transacted{}
 	t.AssertNoError(sk.ObjectId.SetWithIdLike(ids.MustZettelId("one/uno")))
@@ -66,7 +66,7 @@ func TestOne(t1 *testing.T) {
 
 	op := object_inventory_format.Options{}
 
-	scanner := MakeScanner(zstd.NewReader(b), f, op)
+	scanner := makeScanner(zstd.NewReader(b), f, op)
 
 	if !scanner.Scan() {
 		t.Logf("scan error: %q", scanner.Error())
@@ -106,7 +106,7 @@ func TestBigMac(t1 *testing.T) {
 	f := object_inventory_format.Default()
 	op := object_inventory_format.Options{}
 
-	scanner := MakeScanner(
+	scanner := makeScanner(
 		zstd.NewReader(dataComp),
 		f,
 		op,
@@ -141,7 +141,7 @@ func TestOffsets(t1 *testing.T) {
 	f := object_inventory_format.Default()
 	op := object_inventory_format.Options{Tai: true}
 
-	scanner := MakeScanner(
+	scanner := makeScanner(
 		strings.NewReader(dataRaw),
 		f,
 		op,
@@ -161,7 +161,7 @@ func TestOffsets(t1 *testing.T) {
 	lookup := make(map[int64]*sku.Transacted)
 	var b bytes.Buffer
 
-	printer := MakePrinter(&b, f, op)
+	printer := makePrinter(&b, f, op)
 
 	sk := &sku.Transacted{}
 	t.AssertNoError(sk.ObjectId.SetWithIdLike(ids.MustZettelId("one/uno")))

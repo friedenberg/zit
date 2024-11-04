@@ -3,7 +3,6 @@ package blob_store
 import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
-	"code.linenisgreat.com/zit/go/zit/src/echo/repo_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/india/tag_blobs"
@@ -11,10 +10,10 @@ import (
 
 // TODO switch to interfaces instead of structs
 type VersionedStores struct {
-	repo_v0      Store[repo_blobs.V0, *repo_blobs.V0]
-	config_store ConfigStore
-	type_store   TypeStore
-	tag_store    TagStore
+	repo   RepoStore
+	config ConfigStore
+	tipe   TypeStore
+	tag    TagStore
 }
 
 func Make(
@@ -22,57 +21,41 @@ func Make(
 	luaVMPoolBuilder *lua.VMPoolBuilder,
 ) *VersionedStores {
 	return &VersionedStores{
-		tag_store: MakeTagStore(dirLayout, luaVMPoolBuilder),
-		repo_v0: MakeBlobStore(
-			dirLayout,
-			MakeBlobFormat(
-				MakeTextParserIgnoreTomlErrors[repo_blobs.V0](
-					dirLayout,
-				),
-				ParsedBlobTomlFormatter[repo_blobs.V0, *repo_blobs.V0]{},
-				dirLayout,
-			),
-			func(a *repo_blobs.V0) {
-				a.Reset()
-			},
-		),
-		config_store: MakeConfigStore(dirLayout),
-		type_store:   MakeTypeStore(dirLayout),
+		tag:    MakeTagStore(dirLayout, luaVMPoolBuilder),
+		repo:   MakeRepoStore(dirLayout),
+		config: MakeConfigStore(dirLayout),
+		tipe:   MakeTypeStore(dirLayout),
 	}
 }
 
 func (a *VersionedStores) GetTagTomlV0() Store[tag_blobs.V0, *tag_blobs.V0] {
-	return a.tag_store.toml_v0
+	return a.tag.toml_v0
 }
 
 func (a *VersionedStores) GetTagTomlV1() Store[tag_blobs.TomlV1, *tag_blobs.TomlV1] {
-	return a.tag_store.toml_v1
-}
-
-func (a *VersionedStores) GetRepoV0() Store[repo_blobs.V0, *repo_blobs.V0] {
-	return a.repo_v0
+	return a.tag.toml_v1
 }
 
 func (a *VersionedStores) GetConfigV0() Store[mutable_config_blobs.V0, *mutable_config_blobs.V0] {
-	return a.config_store.config_toml_v0
+	return a.config.toml_v0
 }
 
 func (a *VersionedStores) GetTypeV0() Store[type_blobs.V0, *type_blobs.V0] {
-	return a.type_store.type_toml_v0
+	return a.tipe.toml_v0
 }
 
 func (a *VersionedStores) GetTypeV1() Store[type_blobs.TomlV1, *type_blobs.TomlV1] {
-	return a.type_store.type_toml_v1
+	return a.tipe.toml_v1
 }
 
 func (a *VersionedStores) GetConfig() ConfigStore {
-	return a.config_store
+	return a.config
 }
 
 func (a *VersionedStores) GetType() TypeStore {
-	return a.type_store
+	return a.tipe
 }
 
 func (a *VersionedStores) GetTag() TagStore {
-	return a.tag_store
+	return a.tag
 }

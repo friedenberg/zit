@@ -20,7 +20,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
-	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 )
 
@@ -82,15 +82,13 @@ func (s *Store) FormatForVersion(sv interfaces.StoreVersion) sku.ListFormat {
 
 	switch {
 	case v <= 6:
-		return inventory_list_fmt.FormatOld{
-			Factory: inventory_list_fmt.Factory{
-				Format:  s.object_format,
-				Options: s.options,
-			},
-		}
+		return inventory_list_blobs.MakeV0(
+			s.object_format,
+			s.options,
+		)
 
 	default:
-		return inventory_list_fmt.FormatNew{
+		return inventory_list_blobs.V1{
 			Box: s.box,
 		}
 	}
@@ -319,7 +317,7 @@ func (s *Store) GetBlob(blobSha interfaces.Sha) (a *sku.List, err error) {
 
 	defer errors.DeferredCloser(&err, rc)
 
-	if err = inventory_list_fmt.ReadInventoryListBlob(
+	if err = inventory_list_blobs.ReadInventoryListBlob(
 		s.ListFormat,
 		rc,
 		a,

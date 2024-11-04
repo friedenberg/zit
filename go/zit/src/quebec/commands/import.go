@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_fmt"
+	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
@@ -97,7 +97,7 @@ func (c Import) run(u *env.Env, args ...string) (err error) {
 	list := sku.MakeList()
 
 	// TODO determine why this is not erroring for invalid input
-	if err = inventory_list_fmt.ReadInventoryListBlob(bf, rc, list); err != nil {
+	if err = inventory_list_blobs.ReadInventoryListBlob(bf, rc, list); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -9,15 +9,15 @@ import (
 )
 
 type ConfigStore struct {
-	config_toml_v0 Store[mutable_config_blobs.V0, *mutable_config_blobs.V0]
-	config_toml_v1 Store[mutable_config_blobs.V1, *mutable_config_blobs.V1]
+	toml_v0 Store[mutable_config_blobs.V0, *mutable_config_blobs.V0]
+	toml_v1 Store[mutable_config_blobs.V1, *mutable_config_blobs.V1]
 }
 
 func MakeConfigStore(
 	dirLayout dir_layout.DirLayout,
 ) ConfigStore {
 	return ConfigStore{
-		config_toml_v0: MakeBlobStore(
+		toml_v0: MakeBlobStore(
 			dirLayout,
 			MakeBlobFormat(
 				MakeTextParserIgnoreTomlErrors[mutable_config_blobs.V0](
@@ -30,7 +30,7 @@ func MakeConfigStore(
 				a.Reset()
 			},
 		),
-		config_toml_v1: MakeBlobStore(
+		toml_v1: MakeBlobStore(
 			dirLayout,
 			MakeBlobFormat(
 				MakeTextParserIgnoreTomlErrors[mutable_config_blobs.V1](
@@ -52,7 +52,7 @@ func (a ConfigStore) ParseTypedBlob(
 ) (common mutable_config_blobs.Blob, n int64, err error) {
 	switch tipe.String() {
 	case "", builtin_types.ConfigTypeTomlV0:
-		store := a.config_toml_v0
+		store := a.toml_v0
 		var blob *mutable_config_blobs.V0
 
 		if blob, err = store.GetBlob(blobSha); err != nil {
@@ -63,7 +63,7 @@ func (a ConfigStore) ParseTypedBlob(
 		common = blob
 
 	case builtin_types.ConfigTypeTomlV1:
-		store := a.config_toml_v1
+		store := a.toml_v1
 		var blob *mutable_config_blobs.V1
 
 		if blob, err = store.GetBlob(blobSha); err != nil {
@@ -87,7 +87,7 @@ func (a ConfigStore) PutTypedBlob(
 			err = errors.Errorf("expected %T but got %T", blob, common)
 			return
 		} else {
-			a.config_toml_v0.PutBlob(blob)
+			a.toml_v0.PutBlob(blob)
 		}
 
 	case builtin_types.ConfigTypeTomlV1:
@@ -95,7 +95,7 @@ func (a ConfigStore) PutTypedBlob(
 			err = errors.Errorf("expected %T but got %T", blob, common)
 			return
 		} else {
-			a.config_toml_v1.PutBlob(blob)
+			a.toml_v1.PutBlob(blob)
 		}
 	}
 

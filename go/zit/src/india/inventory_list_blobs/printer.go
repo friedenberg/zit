@@ -1,4 +1,4 @@
-package inventory_list_fmt
+package inventory_list_blobs
 
 import (
 	"io"
@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 )
 
-func MakePrinter(
+func makePrinter(
 	out io.Writer,
 	of object_inventory_format.Formatter,
 	op object_inventory_format.Options,

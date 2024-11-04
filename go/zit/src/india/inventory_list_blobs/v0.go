@@ -1,4 +1,4 @@
-package inventory_list_fmt
+package inventory_list_blobs
 
 import (
 	"io"
@@ -10,15 +10,42 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type FormatOld struct {
-	Factory
+type V0 struct {
+	object_inventory_format.Format
+	object_inventory_format.Options
 }
 
-func (v FormatOld) GetListFormat() sku.ListFormat {
+func (pf V0) makePrinter(out io.Writer) FormatInventoryListPrinter {
+	return makePrinter(
+		out,
+		pf.Format,
+		pf.Options,
+	)
+}
+
+func (pf V0) MakeScanner(in io.Reader) FormatInventoryListScanner {
+	return makeScanner(
+		in,
+		pf.Format,
+		pf.Options,
+	)
+}
+
+func MakeV0(
+	format object_inventory_format.Format,
+	options object_inventory_format.Options,
+) V0 {
+	return V0{
+		Format:  format,
+		Options: options,
+	}
+}
+
+func (v V0) GetListFormat() sku.ListFormat {
 	return v
 }
 
-func (s FormatOld) WriteInventoryListObject(
+func (s V0) WriteInventoryListObject(
 	o *sku.Transacted,
 	w io.Writer,
 ) (n int64, err error) {
@@ -34,13 +61,13 @@ func (s FormatOld) WriteInventoryListObject(
 	return
 }
 
-func (s FormatOld) WriteInventoryListBlob(
+func (s V0) WriteInventoryListBlob(
 	o sku.Collection,
 	w io.Writer,
 ) (n int64, err error) {
 	var n1 int64
 
-	fo := s.MakePrinter(w)
+	fo := s.makePrinter(w)
 
 	for sk := range o.All() {
 		if sk.Metadata.Sha().IsNull() {
@@ -60,7 +87,7 @@ func (s FormatOld) WriteInventoryListBlob(
 	return
 }
 
-func (s FormatOld) ReadInventoryListObject(
+func (s V0) ReadInventoryListObject(
 	r io.Reader,
 ) (n int64, o *sku.Transacted, err error) {
 	o = sku.GetTransactedPool().Get()
@@ -81,7 +108,7 @@ func (s FormatOld) ReadInventoryListObject(
 	return
 }
 
-func (s FormatOld) StreamInventoryListBlobSkus(
+func (s V0) StreamInventoryListBlobSkus(
 	r1 io.Reader,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {

@@ -1,4 +1,4 @@
-package inventory_list_fmt
+package inventory_list_blobs
 
 import (
 	"io"
@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func MakeScanner(
+func makeScanner(
 	in io.Reader,
 	of object_inventory_format.Format,
 	op object_inventory_format.Options,

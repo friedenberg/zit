@@ -8,15 +8,15 @@ import (
 )
 
 type TypeStore struct {
-	type_toml_v0 Store[type_blobs.V0, *type_blobs.V0]
-	type_toml_v1 Store[type_blobs.TomlV1, *type_blobs.TomlV1]
+	toml_v0 Store[type_blobs.V0, *type_blobs.V0]
+	toml_v1 Store[type_blobs.TomlV1, *type_blobs.TomlV1]
 }
 
 func MakeTypeStore(
 	dirLayout dir_layout.DirLayout,
 ) TypeStore {
 	return TypeStore{
-		type_toml_v0: MakeBlobStore(
+		toml_v0: MakeBlobStore(
 			dirLayout,
 			MakeBlobFormat(
 				MakeTextParserIgnoreTomlErrors[type_blobs.V0](
@@ -29,7 +29,7 @@ func MakeTypeStore(
 				a.Reset()
 			},
 		),
-		type_toml_v1: MakeBlobStore(
+		toml_v1: MakeBlobStore(
 			dirLayout,
 			MakeBlobFormat(
 				MakeTextParserIgnoreTomlErrors[type_blobs.TomlV1](
@@ -55,7 +55,7 @@ func (a TypeStore) ParseTypedBlob(
 ) (common type_blobs.Blob, n int64, err error) {
 	switch tipe.String() {
 	case "", type_blobs.TypeV0:
-		store := a.type_toml_v0
+		store := a.toml_v0
 		var blob *type_blobs.V0
 
 		if blob, err = store.GetBlob(blobSha); err != nil {
@@ -66,7 +66,7 @@ func (a TypeStore) ParseTypedBlob(
 		common = blob
 
 	case type_blobs.TypeV1:
-		store := a.type_toml_v1
+		store := a.toml_v1
 		var blob *type_blobs.TomlV1
 
 		if blob, err = store.GetBlob(blobSha); err != nil {
@@ -90,7 +90,7 @@ func (a TypeStore) PutTypedBlob(
 			err = errors.Errorf("expected %T but got %T", blob, common)
 			return
 		} else {
-			a.type_toml_v0.PutBlob(blob)
+			a.toml_v0.PutBlob(blob)
 		}
 
 	case type_blobs.TypeV1:
@@ -98,7 +98,7 @@ func (a TypeStore) PutTypedBlob(
 			err = errors.Errorf("expected %T but got %T", blob, common)
 			return
 		} else {
-			a.type_toml_v1.PutBlob(blob)
+			a.toml_v1.PutBlob(blob)
 		}
 	}
 
