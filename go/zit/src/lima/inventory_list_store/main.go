@@ -148,10 +148,10 @@ func (s *Store) Create(
 			defer errors.DeferredCloser(&err, wc)
 
 			if _, err = s.blobStore.GetInventoryList().WriteBlobToWriter(
-        t,
-        o,
-        wc,
-      ); err != nil {
+				t,
+				o,
+				wc,
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -263,9 +263,10 @@ func (s *Store) ReadOneSha(
 
 	defer errors.DeferredCloser(&err, or)
 
-	if _, o, err = s.blobStore.GetInventoryList().GetListFormat().ReadInventoryListObject(
-    or,
-  ); err != nil {
+	if o, err = s.blobStore.GetInventoryList().ReadInventoryListObject(
+		s.blobType,
+		or,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -286,7 +287,8 @@ func (s *Store) StreamInventoryList(
 
 	defer errors.DeferredCloser(&err, rc)
 
-	if err = s.blobStore.GetInventoryList().GetListFormat().StreamInventoryListBlobSkus(
+	if err = s.blobStore.GetInventoryList().StreamInventoryListBlobSkus(
+		s.blobType,
 		rc,
 		f,
 	); err != nil {

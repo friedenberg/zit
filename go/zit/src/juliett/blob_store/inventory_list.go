@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -159,7 +160,7 @@ func (a InventoryStore) WriteObjectToWriter(
 
 func (a InventoryStore) WriteBlobToWriter(
 	sk *sku.Transacted,
-  b *sku.List,
+	b *sku.List,
 	w io.Writer,
 ) (n int64, err error) {
 	tipe := sk.GetType()
@@ -198,6 +199,72 @@ func (a InventoryStore) PutTransactedWithBlob(
 	}
 
 	sku.GetTransactedPool().Put(twb.Transacted)
+
+	return
+}
+
+func (a InventoryStore) StreamInventoryListBlobSkus(
+	tipe ids.Type,
+	rf io.Reader,
+	f interfaces.FuncIter[*sku.Transacted],
+) (err error) {
+	switch tipe.String() {
+	case "", builtin_types.InventoryListTypeV0:
+		if err = a.v0.StreamInventoryListBlobSkus(
+			rf,
+			f,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	case builtin_types.InventoryListTypeV1:
+		if err = a.v1.StreamInventoryListBlobSkus(
+			rf,
+			f,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (a InventoryStore) ReadInventoryListObject(
+	tipe ids.Type,
+	r io.Reader,
+) (out *sku.Transacted, err error) {
+	f := func(sk *sku.Transacted) (err error) {
+		if out == nil {
+			out = sk.CloneTransacted()
+		} else {
+			err = errors.Errorf("expected only one sku.Transacted, but read more than one")
+			return
+		}
+
+		return
+	}
+
+	switch tipe.String() {
+	case "", builtin_types.InventoryListTypeV0:
+		if err = a.v0.StreamInventoryListBlobSkus(
+			r,
+			f,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	case builtin_types.InventoryListTypeV1:
+		if err = a.v1.StreamInventoryListBlobSkus(
+			r,
+			f,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 
 	return
 }
