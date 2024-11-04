@@ -128,6 +128,17 @@ func (s *Store) Create(
 
 	t = sku.GetTransactedPool().Get()
 
+	t.Metadata.Type = s.blobType
+	t.Metadata.Description = bez
+	tai := s.clock.GetTai()
+
+	if err = t.ObjectId.SetWithIdLike(tai); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	t.SetTai(tai)
+
 	if o.Len() > 0 {
 		var wc interfaces.ShaWriteCloser
 
@@ -146,24 +157,15 @@ func (s *Store) Create(
 		}()
 
 		sh := wc.GetShaLike()
+		t.SetBlobSha(sh)
 
-		if _, err = s.GetBlob(sh); err != nil {
+		if _, _, err = s.blobStore.GetInventoryList().GetTransactedWithBlob(
+			t,
+		); err != nil {
 			err = errors.Wrapf(err, "Blob Sha: %q", sh)
 			return
 		}
-
-		t.SetBlobSha(sh)
 	}
-
-	t.Metadata.Description = bez
-	tai := s.clock.GetTai()
-
-	if err = t.ObjectId.SetWithIdLike(tai); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	t.SetTai(tai)
 
 	var wc interfaces.ShaWriteCloser
 

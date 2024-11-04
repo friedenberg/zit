@@ -45,8 +45,8 @@ func (a InventoryStore) GetCommonStore() CommonStore2[*sku.List] {
 func (a InventoryStore) GetTransactedWithBlob(
 	tg sku.TransactedGetter,
 ) (twb sku.TransactedWithBlob[*sku.List], n int64, err error) {
-	sk := tg.GetSku()
-	blobSha := sk.GetBlobSha()
+	twb.Transacted = tg.GetSku()
+	blobSha := twb.GetBlobSha()
 
 	var rc interfaces.ShaReadCloser
 
@@ -99,7 +99,7 @@ func (a InventoryStore) GetTransactedWithBlobFromReader(
 }
 
 func (a InventoryStore) WriteTransactedWithBlobToWriter(
-  sk *sku.Transacted,
+	sk *sku.Transacted,
 	w io.Writer,
 ) (n int64, err error) {
 	tipe := sk.GetType()
