@@ -14,9 +14,11 @@ import (
 )
 
 type InventoryStore struct {
-	dirLayout dir_layout.DirLayout
-	v0        inventory_list_blobs.V0
-	v1        inventory_list_blobs.V1
+	dirLayout  dir_layout.DirLayout
+	boxFormat  *box_format.Box
+	v0         inventory_list_blobs.V0
+	v1         inventory_list_blobs.V1
+	listFormat sku.ListFormat
 }
 
 func MakeInventoryStore(
@@ -26,8 +28,9 @@ func MakeInventoryStore(
 ) InventoryStore {
 	objectOptions := object_inventory_format.Options{Tai: true}
 
-	return InventoryStore{
+	s := InventoryStore{
 		dirLayout: dirLayout,
+		boxFormat: boxFormat,
 		v0: inventory_list_blobs.MakeV0(
 			objectFormat,
 			objectOptions,
@@ -36,10 +39,38 @@ func MakeInventoryStore(
 			Box: boxFormat,
 		},
 	}
+
+	s.listFormat = s.formatForVersion(objectFormat, objectOptions)
+
+	return s
+}
+
+func (s *InventoryStore) formatForVersion(
+	objectFormat object_inventory_format.Format,
+	objectOptions object_inventory_format.Options,
+) sku.ListFormat {
+	v := s.dirLayout.GetStoreVersion().GetInt()
+
+	switch {
+	case v <= 6:
+		return inventory_list_blobs.MakeV0(
+			objectFormat,
+			objectOptions,
+		)
+
+	default:
+		return inventory_list_blobs.V1{
+			Box: s.boxFormat,
+		}
+	}
 }
 
 func (a InventoryStore) GetCommonStore() CommonStore2[*sku.List] {
 	return a
+}
+
+func (a InventoryStore) GetListFormat() sku.ListFormat {
+	return a.listFormat
 }
 
 func (a InventoryStore) GetTransactedWithBlob(

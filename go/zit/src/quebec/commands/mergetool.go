@@ -93,7 +93,7 @@ func (c Mergetool) RunWithQuery(
 
 		br := bufio.NewReader(f)
 
-		fo := u.GetStore().GetInventoryListStore().ListFormat
+		fo := u.GetStore().GetBlobStore().GetInventoryList().GetListFormat()
 
 		if err = tm.ReadConflictMarker(
 			br,

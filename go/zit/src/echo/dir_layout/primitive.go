@@ -74,6 +74,10 @@ func MakePrimitiveWithHome(home string, do debug.Options) (s Primitive, err erro
 	return
 }
 
+func (h Primitive) GetStoreVersion() immutable_config.StoreVersion {
+	return h.sv
+}
+
 func (h Primitive) DataFileStoreVersion() string {
 	return filepath.Join(h.xdg.Data, "version")
 }

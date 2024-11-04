@@ -31,7 +31,7 @@ type Store struct {
 
 	cwdFiles           *store_fs.Store
 	externalStores     map[ids.RepoId]*external_store.Store
-	blob_store         *blob_store.VersionedStores
+	blobStore          *blob_store.VersionedStores
 	inventoryListStore inventory_list_store.Store
 	Abbr               AbbrStore
 
@@ -70,7 +70,7 @@ func (c *Store) Initialize(
 ) (err error) {
 	c.config = k
 	c.dirLayout = st
-	c.blob_store = blobStore
+	c.blobStore = blobStore
 	c.persistentObjectFormat = pmf
 	c.options = options
 	c.sunrise = t
@@ -97,7 +97,7 @@ func (c *Store) Initialize(
 		pmf,
 		c,
 		box,
-    blobStore,
+		blobStore,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -155,7 +155,9 @@ func (s *Store) SetExternalStores(
 
 		es.RepoId = k
 		es.Clock = s.sunrise
-		es.ListFormat = s.GetInventoryListStore().ListFormat
+		es.ListFormat = s.GetInventoryListStore().FormatForVersion(
+			s.config.GetStoreVersion(),
+		)
 
 		if esfs, ok := es.StoreLike.(*store_fs.Store); ok {
 			s.cwdFiles = esfs

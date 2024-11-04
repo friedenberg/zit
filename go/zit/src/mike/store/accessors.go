@@ -22,7 +22,7 @@ func (u *Store) GetBrowserStore() *external_store.Store {
 }
 
 func (s *Store) GetBlobStore() *blob_store.VersionedStores {
-	return s.blob_store
+	return s.blobStore
 }
 
 func (s *Store) GetEnnui() object_probe_index.Index {

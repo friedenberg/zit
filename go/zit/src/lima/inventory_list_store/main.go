@@ -41,7 +41,6 @@ type Store struct {
 	box           *box_format.Box
 
 	blobType ids.Type
-	sku.ListFormat
 }
 
 func (s *Store) Initialize(
@@ -82,8 +81,6 @@ func (s *Store) Initialize(
 	default:
 		s.blobType = ids.MustType(builtin_types.InventoryListTypeV1)
 	}
-
-	s.ListFormat = s.FormatForVersion(sv)
 
 	return
 }
@@ -150,7 +147,10 @@ func (s *Store) Create(
 		func() {
 			defer errors.DeferredCloser(&err, wc)
 
-			if _, err = s.WriteInventoryListBlob(o, wc); err != nil {
+			if _, err = s.blobStore.GetInventoryList().GetListFormat().WriteInventoryListBlob(
+        o,
+        wc,
+      ); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -262,7 +262,9 @@ func (s *Store) ReadOneSha(
 
 	defer errors.DeferredCloser(&err, or)
 
-	if _, o, err = s.ReadInventoryListObject(or); err != nil {
+	if _, o, err = s.blobStore.GetInventoryList().GetListFormat().ReadInventoryListObject(
+    or,
+  ); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -283,40 +285,9 @@ func (s *Store) StreamInventoryList(
 
 	defer errors.DeferredCloser(&err, rc)
 
-	if err = s.StreamInventoryListBlobSkus(
+	if err = s.blobStore.GetInventoryList().GetListFormat().StreamInventoryListBlobSkus(
 		rc,
 		f,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) readInventoryListBlob(
-	blobSha interfaces.Sha,
-	a *sku.List,
-) (err error) {
-	var rc interfaces.ShaReadCloser
-
-	if rc, err = s.af.BlobReader(blobSha); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, rc)
-
-	if err = s.StreamInventoryListBlobSkus(
-		rc,
-		func(sk *sku.Transacted) (err error) {
-			if err = a.Add(sk); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
