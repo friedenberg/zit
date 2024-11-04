@@ -57,7 +57,7 @@ func (a InventoryStore) GetTransactedWithBlob(
 
 	defer errors.DeferredCloser(&err, rc)
 
-	if n, err = a.GetTransactedWithBlobFromReader(twb, rc); err != nil {
+	if n, err = a.GetTransactedWithBlobFromReader(&twb, rc); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -66,11 +66,10 @@ func (a InventoryStore) GetTransactedWithBlob(
 }
 
 func (a InventoryStore) GetTransactedWithBlobFromReader(
-	twb sku.TransactedWithBlob[*sku.List],
+	twb *sku.TransactedWithBlob[*sku.List],
 	r io.Reader,
 ) (n int64, err error) {
 	tipe := twb.GetType()
-
 	twb.Blob = sku.MakeList()
 
 	switch tipe.String() {

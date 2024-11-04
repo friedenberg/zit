@@ -128,15 +128,17 @@ func (c Last) runWithInventoryList(
 		return
 	}
 
-	var a *sku.List
+	var twb sku.TransactedWithBlob[*sku.List]
 
-	if a, err = s.GetInventoryListStore().GetBlob(b.GetBlobSha()); err != nil {
+	if twb, _, err = s.GetBlobStore().GetInventoryList().GetTransactedWithBlob(
+		b,
+	); err != nil {
 		err = errors.Wrapf(err, "InventoryList: %q", b)
 		return
 	}
 
 	ui.TodoP3("support log line format for skus")
-	if err = a.EachPtr(
+	if err = twb.Blob.EachPtr(
 		func(sk *sku.Transacted) (err error) {
 			return f(sk)
 		},

@@ -325,32 +325,6 @@ func (s *Store) readInventoryListBlob(
 	return
 }
 
-func (s *Store) GetBlob(blobSha interfaces.Sha) (a *sku.List, err error) {
-	a = sku.MakeList()
-
-	var rc interfaces.ShaReadCloser
-
-	if rc, err = s.af.BlobReader(blobSha); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, rc)
-
-	if err = inventory_list_blobs.ReadInventoryListBlob(
-		s.ListFormat,
-		rc,
-		a,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	// TODO validate sha
-
-	return
-}
-
 func (s *Store) ReadLast() (max *sku.Transacted, err error) {
 	l := &sync.Mutex{}
 
