@@ -17,11 +17,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/blob_store"
 )
 
 type Store struct {
@@ -32,11 +34,13 @@ type Store struct {
 	af        interfaces.BlobIOFactory
 	clock     ids.Clock
 	pool      interfaces.Pool[sku.List, *sku.List]
+	blobStore *blob_store.VersionedStores
 
 	object_format object_inventory_format.Format
 	options       object_inventory_format.Options
 	box           *box_format.Box
 
+	blobType ids.Type
 	sku.ListFormat
 }
 
@@ -49,6 +53,7 @@ func (s *Store) Initialize(
 	pmf object_inventory_format.Format,
 	clock ids.Clock,
 	box *box_format.Box,
+	blobStore *blob_store.VersionedStores,
 ) (err error) {
 	p := pool.MakePool(nil, func(a *sku.List) { sku.ResetterList.Reset(a) })
 
@@ -65,6 +70,17 @@ func (s *Store) Initialize(
 		object_format: pmf,
 		options:       op,
 		box:           box,
+		blobStore:     blobStore,
+	}
+
+	v := sv.GetInt()
+
+	switch {
+	case v <= 6:
+		s.blobType = ids.MustType(builtin_types.InventoryListTypeV0)
+
+	default:
+		s.blobType = ids.MustType(builtin_types.InventoryListTypeV1)
 	}
 
 	s.ListFormat = s.FormatForVersion(sv)
@@ -159,7 +175,9 @@ func (s *Store) Create(
 	func() {
 		defer errors.DeferredCloser(&err, wc)
 
-		if _, err = s.ListFormat.WriteInventoryListObject(
+		t.Metadata.Type = s.blobType
+
+		if _, err = s.blobStore.GetInventoryList().WriteTransactedWithBlobToWriter(
 			t,
 			wc,
 		); err != nil {

@@ -15,22 +15,6 @@ type V0 struct {
 	object_inventory_format.Options
 }
 
-func (pf V0) makePrinter(out io.Writer) FormatInventoryListPrinter {
-	return makePrinter(
-		out,
-		pf.Format,
-		pf.Options,
-	)
-}
-
-func (pf V0) MakeScanner(in io.Reader) FormatInventoryListScanner {
-	return makeScanner(
-		in,
-		pf.Format,
-		pf.Options,
-	)
-}
-
 func MakeV0(
 	format object_inventory_format.Format,
 	options object_inventory_format.Options,
@@ -67,7 +51,11 @@ func (s V0) WriteInventoryListBlob(
 ) (n int64, err error) {
 	var n1 int64
 
-	fo := s.makePrinter(w)
+	fo := makePrinter(
+		w,
+		s.Format,
+		s.Options,
+	)
 
 	for sk := range o.All() {
 		if sk.Metadata.Sha().IsNull() {
@@ -112,7 +100,11 @@ func (s V0) StreamInventoryListBlobSkus(
 	r1 io.Reader,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	dec := s.MakeScanner(r1)
+	dec := makeScanner(
+		r1,
+		s.Format,
+		s.Options,
+	)
 
 	for dec.Scan() {
 		sk := dec.GetTransacted()

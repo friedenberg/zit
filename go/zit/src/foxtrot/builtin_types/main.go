@@ -16,6 +16,10 @@ const (
 	ConfigTypeTomlV0        = "toml-config-v0"
 	ConfigTypeTomlV1        = "toml-config-v1"
 	ConfigTypeLatestDefault = ConfigTypeTomlV1
+
+	InventoryListTypeV0            = "inventory_list-v0"
+	InventoryListTypeV1            = "inventory_list-v1"
+	InventoryListTypeLatestDefault = InventoryListTypeV1
 )
 
 var (
@@ -25,14 +29,16 @@ var (
 
 func init() {
 	allMap = map[string]struct{}{
-		TagTypeTomlV0:    {},
-		TagTypeTomlV1:    {},
-		TagTypeLuaV1:     {},
-		TagTypeLuaV2:     {},
-		TypeTypeTomlV0:   {},
-		TypeTypeTomlV1:   {},
-		ConfigTypeTomlV0: {},
-		ConfigTypeTomlV1: {},
+		TagTypeTomlV0:       {},
+		TagTypeTomlV1:       {},
+		TagTypeLuaV1:        {},
+		TagTypeLuaV2:        {},
+		TypeTypeTomlV0:      {},
+		TypeTypeTomlV1:      {},
+		ConfigTypeTomlV0:    {},
+		ConfigTypeTomlV1:    {},
+		InventoryListTypeV0: {},
+		InventoryListTypeV1: {},
 	}
 
 	for k := range allMap {

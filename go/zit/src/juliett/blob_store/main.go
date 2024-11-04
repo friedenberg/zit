@@ -4,27 +4,33 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/india/tag_blobs"
 )
 
 // TODO switch to interfaces instead of structs
 type VersionedStores struct {
-	repo   RepoStore
-	config ConfigStore
-	tipe   TypeStore
-	tag    TagStore
+	inventory_list InventoryStore
+	repo           RepoStore
+	config         ConfigStore
+	tipe           TypeStore
+	tag            TagStore
 }
 
 func Make(
 	dirLayout dir_layout.DirLayout,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
+	objectFormat object_inventory_format.Format,
+	boxFormat *box_format.Box,
 ) *VersionedStores {
 	return &VersionedStores{
-		tag:    MakeTagStore(dirLayout, luaVMPoolBuilder),
-		repo:   MakeRepoStore(dirLayout),
-		config: MakeConfigStore(dirLayout),
-		tipe:   MakeTypeStore(dirLayout),
+		inventory_list: MakeInventoryStore(dirLayout, objectFormat, boxFormat),
+		tag:            MakeTagStore(dirLayout, luaVMPoolBuilder),
+		repo:           MakeRepoStore(dirLayout),
+		config:         MakeConfigStore(dirLayout),
+		tipe:           MakeTypeStore(dirLayout),
 	}
 }
 
@@ -58,4 +64,8 @@ func (a *VersionedStores) GetType() TypeStore {
 
 func (a *VersionedStores) GetTag() TagStore {
 	return a.tag
+}
+
+func (a *VersionedStores) GetInventoryList() InventoryStore {
+	return a.inventory_list
 }

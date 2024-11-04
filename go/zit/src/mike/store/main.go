@@ -97,6 +97,7 @@ func (c *Store) Initialize(
 		pmf,
 		c,
 		box,
+    blobStore,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

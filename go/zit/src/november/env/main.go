@@ -137,9 +137,14 @@ func (u *Env) Initialize(options Options) (err error) {
 		return
 	}
 
+	objectFormat := object_inventory_format.FormatForVersion(u.GetConfig().GetStoreVersion())
+	boxFormatArchive := u.MakeBoxArchive(true)
+
 	u.blobStore = blob_store.Make(
 		u.dirLayout,
 		u.MakeLuaVMPoolBuilder(),
+		objectFormat,
+		boxFormatArchive,
 	)
 
 	if err = u.config.Initialize(
@@ -170,13 +175,13 @@ func (u *Env) Initialize(options Options) (err error) {
 		u.flags,
 		u.GetConfig(),
 		u.dirLayout,
-		object_inventory_format.FormatForVersion(u.GetConfig().GetStoreVersion()),
+		objectFormat,
 		u.sunrise,
 		u.MakeLuaVMPoolBuilder(),
 		u.makeQueryBuilder().
 			WithDefaultGenres(ids.MakeGenre(genres.TrueGenre()...)),
 		ofo,
-		u.MakeBoxArchive(true),
+		boxFormatArchive,
 		u.blobStore,
 	); err != nil {
 		err = errors.Wrapf(err, "failed to initialize store util")
