@@ -12,6 +12,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -200,9 +202,13 @@ func (s *Store) handleMergeResult(
 	bw := bufio.NewWriter(f)
 	defer errors.DeferredFlusher(&err, bw)
 
-	fo := s.externalStoreSupplies.ListFormat
+	bs := s.externalStoreSupplies.BlobStore.GetInventoryList()
 
-	if _, err = fo.WriteInventoryListBlob(conflicted, bw); err != nil {
+	if _, err = bs.WriteBlobToWriter(
+		ids.MustType(builtin_types.InventoryListTypeLatestDefault),
+		conflicted,
+		bw,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

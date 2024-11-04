@@ -148,7 +148,7 @@ func (s *Store) Create(
 			defer errors.DeferredCloser(&err, wc)
 
 			if _, err = s.blobStore.GetInventoryList().WriteBlobToWriter(
-				t,
+				t.GetType(),
 				o,
 				wc,
 			); err != nil {

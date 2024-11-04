@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
@@ -94,19 +95,18 @@ func (c Mergetool) RunWithQuery(
 
 		br := bufio.NewReader(f)
 
-		fo := u.GetStore().GetBlobStore().GetInventoryList().GetListFormat()
+		bs := u.GetStore().GetBlobStore().GetInventoryList()
 
 		if err = tm.ReadConflictMarker(
 			func(f interfaces.FuncIter[*sku.Transacted]) {
-				if err = fo.StreamInventoryListBlobSkus(
+				if err = bs.StreamInventoryListBlobSkus(
+					ids.MustType(builtin_types.InventoryListTypeLatestDefault),
 					br,
 					f,
 				); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
-
-				return
 			},
 		); err != nil {
 			err = errors.Wrap(err)

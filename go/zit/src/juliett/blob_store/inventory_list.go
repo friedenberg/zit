@@ -15,11 +15,10 @@ import (
 )
 
 type InventoryStore struct {
-	dirLayout  dir_layout.DirLayout
-	boxFormat  *box_format.Box
-	v0         inventory_list_blobs.V0
-	v1         inventory_list_blobs.V1
-	listFormat sku.ListFormat
+	dirLayout dir_layout.DirLayout
+	boxFormat *box_format.Box
+	v0        inventory_list_blobs.V0
+	v1        inventory_list_blobs.V1
 }
 
 func MakeInventoryStore(
@@ -41,37 +40,11 @@ func MakeInventoryStore(
 		},
 	}
 
-	s.listFormat = s.formatForVersion(objectFormat, objectOptions)
-
 	return s
-}
-
-func (s *InventoryStore) formatForVersion(
-	objectFormat object_inventory_format.Format,
-	objectOptions object_inventory_format.Options,
-) sku.ListFormat {
-	v := s.dirLayout.GetStoreVersion().GetInt()
-
-	switch {
-	case v <= 6:
-		return inventory_list_blobs.MakeV0(
-			objectFormat,
-			objectOptions,
-		)
-
-	default:
-		return inventory_list_blobs.V1{
-			Box: s.boxFormat,
-		}
-	}
 }
 
 func (a InventoryStore) GetCommonStore() CommonStore2[*sku.List] {
 	return a
-}
-
-func (a InventoryStore) GetListFormat() sku.ListFormat {
-	return a.listFormat
 }
 
 func (a InventoryStore) GetTransactedWithBlob(
@@ -159,12 +132,10 @@ func (a InventoryStore) WriteObjectToWriter(
 }
 
 func (a InventoryStore) WriteBlobToWriter(
-	sk *sku.Transacted,
-	b *sku.List,
+	tipe ids.Type,
+	b sku.Collection,
 	w io.Writer,
 ) (n int64, err error) {
-	tipe := sk.GetType()
-
 	switch tipe.String() {
 	case "", builtin_types.InventoryListTypeV0:
 		if n, err = a.v0.WriteInventoryListBlob(
