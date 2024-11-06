@@ -30,16 +30,21 @@ func (s *Store) tryNewHook(
 		return
 	}
 
-	var blob *type_blobs.V0
+	var blob type_blobs.Blob
 
-	if blob, err = s.GetBlobStore().GetTypeV0().GetBlob(t.GetBlobSha()); err != nil {
+	if blob, _, err = s.GetBlobStore().GetType().ParseTypedBlob(
+		t.GetType(),
+		t.GetBlobSha(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	script, ok := blob.Hooks.(string)
+	defer s.GetBlobStore().GetType().PutTypedBlob(t.GetType(), blob)
 
-	if !ok || script == "" {
+	script := blob.GetStringLuaHooks()
+
+	if script == "" {
 		return
 	}
 
@@ -85,16 +90,21 @@ func (s *Store) TryFormatHook(
 		return
 	}
 
-	var blob *type_blobs.V0
+	var blob type_blobs.Blob
 
-	if blob, err = s.GetBlobStore().GetTypeV0().GetBlob(t.GetBlobSha()); err != nil {
+	if blob, _, err = s.GetBlobStore().GetType().ParseTypedBlob(
+		t.GetType(),
+		t.GetBlobSha(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	script, ok := blob.Hooks.(string)
+	defer s.GetBlobStore().GetType().PutTypedBlob(t.GetType(), blob)
 
-	if !ok || script == "" {
+	script := blob.GetStringLuaHooks()
+
+	if script == "" {
 		return
 	}
 
@@ -142,17 +152,22 @@ func (s *Store) tryPreCommitHooks(
 		return
 	}
 
-	var blob *type_blobs.V0
+	var blob type_blobs.Blob
 
-	if blob, err = s.GetBlobStore().GetTypeV0().GetBlob(t.GetBlobSha()); err != nil {
-		err = errors.Wrapf(err, "Type: %q", kinder.GetType())
+	if blob, _, err = s.GetBlobStore().GetType().ParseTypedBlob(
+		t.GetType(),
+		t.GetBlobSha(),
+	); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 
-	script, _ := blob.Hooks.(string)
+	defer s.GetBlobStore().GetType().PutTypedBlob(t.GetType(), blob)
 
-	hooks = append(hooks, hook{script: script, description: "typ"})
-	hooks = append(hooks, hook{script: s.GetConfig().Hooks, description: "erworben"})
+	script := blob.GetStringLuaHooks()
+
+	hooks = append(hooks, hook{script: script, description: "type"})
+	hooks = append(hooks, hook{script: s.GetConfig().Hooks, description: "config-mutable"})
 
 	for _, h := range hooks {
 		if h.script == "" {
@@ -194,7 +209,7 @@ func (s *Store) tryPreCommitHook(
 
 	var vp sku.LuaVMPoolV1
 
-	if vp, err = s.MakeLuaVMPool(selbst, script); err != nil {
+	if vp, err = s.MakeLuaVMPoolV1(selbst, script); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -268,17 +283,18 @@ func (s *Store) tryPreCommitHook(
 	return
 }
 
+// TODO add method with hook with reader
 func (s *Store) tryHookWithName(
 	kinder *sku.Transacted,
 	mutter *sku.Transacted,
 	o sku.CommitOptions,
-	selbst *sku.Transacted,
+	self *sku.Transacted,
 	script string,
 	name string,
 ) (err error) {
 	var vp sku.LuaVMPoolV1
 
-	if vp, err = s.MakeLuaVMPool(selbst, script); err != nil {
+	if vp, err = s.MakeLuaVMPoolV1(self, script); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

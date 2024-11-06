@@ -763,7 +763,6 @@ func (u *Env) makeTypFormatter(
 	out io.Writer,
 ) (f interfaces.FuncIter[*sku.Transacted], err error) {
 	typeBlobStore := u.GetStore().GetBlobStore().GetType()
-	typeBlobStoreV0 := u.GetStore().GetBlobStore().GetTypeV0()
 
 	if out == nil {
 		out = u.Out()
@@ -846,7 +845,7 @@ func (u *Env) makeTypFormatter(
 			// TODO switch to typed variant
 			var vp sku.LuaVMPoolV1
 
-			if vp, err = u.GetStore().MakeLuaVMPool(o, script); err != nil {
+			if vp, err = u.GetStore().MakeLuaVMPoolV1(o, script); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -899,20 +898,21 @@ func (u *Env) makeTypFormatter(
 				return
 			}
 
-			var ta *type_blobs.V0
+			var ta type_blobs.Blob
 
-			if ta, err = typeBlobStoreV0.GetBlob(
+			if ta, _, err = typeBlobStore.ParseTypedBlob(
+				t.GetType(),
 				t.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			defer typeBlobStoreV0.PutBlob(ta)
+			defer typeBlobStore.PutTypedBlob(t.GetType(), ta)
 
 			if _, err = fmt.Fprintln(
 				out,
-				ta.VimSyntaxType,
+				ta.GetVimSyntaxType(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return

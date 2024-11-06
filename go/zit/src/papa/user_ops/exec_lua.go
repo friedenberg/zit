@@ -14,7 +14,7 @@ type ExecLua struct {
 func (u ExecLua) Run(sk *sku.Transacted, args ...string) (err error) {
 	var lvp sku.LuaVMPoolV1
 
-	if lvp, err = u.GetStore().MakeLuaVMPoolWithSku(sk); err != nil {
+	if lvp, err = u.GetStore().MakeLuaVMPoolV1WithSku(sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -34,6 +34,10 @@ func (a *TomlV1) GetFileExtension() string {
 	return a.FileExtension
 }
 
+func (a *TomlV1) GetVimSyntaxType() string {
+	return a.VimSyntaxType
+}
+
 func (a *TomlV1) GetFormatters() map[string]script_config.WithOutputFormat {
 	return a.Formatters
 }

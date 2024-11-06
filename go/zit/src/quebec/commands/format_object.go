@@ -228,14 +228,20 @@ func (c *FormatObject) getBlobFormatter(
 		return
 	}
 
-	var typeBlob *type_blobs.V0
+	var typeBlob type_blobs.Blob
 
-	if typeBlob, err = u.GetStore().GetBlobStore().GetTypeV0().GetBlob(
+	if typeBlob, _, err = u.GetStore().GetBlobStore().GetType().ParseTypedBlob(
+		typeObject.GetType(),
 		typeObject.GetBlobSha(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
+
+	defer u.GetStore().GetBlobStore().GetType().PutTypedBlob(
+		typeObject.GetType(),
+		typeBlob,
+	)
 
 	ok := false
 
@@ -250,7 +256,7 @@ func (c *FormatObject) getBlobFormatter(
 			}
 
 			for _, formatId := range formatIds {
-				blobFormatter, ok = typeBlob.Formatters[formatId]
+				blobFormatter, ok = typeBlob.GetFormatters()[formatId]
 
 				if ok {
 					ui.Log().Print(formatId, blobFormatter)
@@ -267,13 +273,13 @@ func (c *FormatObject) getBlobFormatter(
 	}
 
 	var g type_blobs.FormatterUTIGroup
-	g, ok = typeBlob.FormatterUTIGroups[c.UTIGroup]
+	g, ok = typeBlob.GetFormatterUTIGroups()[c.UTIGroup]
 
 	if !ok {
 		err = errors.BadRequestf(
 			"no uti group: %q. Available groups: %s",
 			c.UTIGroup,
-			maps.Keys(typeBlob.FormatterUTIGroups),
+			maps.Keys(typeBlob.GetFormatterUTIGroups()),
 		)
 		return
 	}
@@ -292,7 +298,7 @@ func (c *FormatObject) getBlobFormatter(
 
 	formatId = ft
 
-	blobFormatter, ok = typeBlob.Formatters[formatId]
+	blobFormatter, ok = typeBlob.GetFormatters()[formatId]
 
 	if !ok {
 		ui.Err().Print("no matching format id")

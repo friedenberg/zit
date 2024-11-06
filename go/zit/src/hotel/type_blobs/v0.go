@@ -39,6 +39,10 @@ func (a *V0) GetFileExtension() string {
 	return a.FileExtension
 }
 
+func (a *V0) GetVimSyntaxType() string {
+	return a.VimSyntaxType
+}
+
 func (a *V0) GetFormatters() map[string]script_config.WithOutputFormat {
 	return a.Formatters
 }
@@ -48,6 +52,6 @@ func (a *V0) GetFormatterUTIGroups() map[string]FormatterUTIGroup {
 }
 
 func (a *V0) GetStringLuaHooks() string {
-  hooks, _ := a.Hooks.(string)
-  return hooks
+	hooks, _ := a.Hooks.(string)
+	return hooks
 }

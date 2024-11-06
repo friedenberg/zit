@@ -24,6 +24,7 @@ func Default() (t TomlV1) {
 type Blob interface {
 	GetFileExtension() string
 	GetBinary() bool
+  GetVimSyntaxType() string
 	WithFormatters
 	WithFormatterUTIGropus
 	WithStringLuaHooks

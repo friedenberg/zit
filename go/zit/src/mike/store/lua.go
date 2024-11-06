@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/tag_blobs"
 )
 
-func (s *Store) MakeLuaVMPoolWithSku(
+func (s *Store) MakeLuaVMPoolV1WithSku(
 	sk *sku.Transacted,
 ) (lvp sku.LuaVMPoolV1, err error) {
 	if sk.GetType().String() != "lua" {
@@ -35,13 +35,13 @@ func (s *Store) MakeLuaVMPoolWithSku(
 	return
 }
 
-func (u *Store) MakeLuaVMPool(
-	selbst *sku.Transacted,
+func (u *Store) MakeLuaVMPoolV1(
+	self *sku.Transacted,
 	script string,
 ) (vp sku.LuaVMPoolV1, err error) {
 	b := u.luaVMPoolBuilder.Clone().
 		WithScript(script).
-		WithApply(tag_blobs.MakeLuaSelfApplyV1(selbst))
+		WithApply(tag_blobs.MakeLuaSelfApplyV1(self))
 
 	var lvmp *lua.VMPool
 
@@ -50,7 +50,7 @@ func (u *Store) MakeLuaVMPool(
 		return
 	}
 
-	vp = sku.MakeLuaVMPoolV1(lvmp, selbst)
+	vp = sku.MakeLuaVMPoolV1(lvmp, self)
 
 	return
 }
