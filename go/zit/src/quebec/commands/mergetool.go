@@ -99,7 +99,7 @@ func (c Mergetool) RunWithQuery(
 
 		if err = tm.ReadConflictMarker(
 			func(f interfaces.FuncIter[*sku.Transacted]) {
-				if err = bs.StreamInventoryListBlobSkus(
+				if err = bs.StreamInventoryListBlobSkusFromReader(
 					ids.MustType(builtin_types.InventoryListTypeLatestDefault),
 					br,
 					f,

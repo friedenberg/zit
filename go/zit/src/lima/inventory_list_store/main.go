@@ -287,7 +287,7 @@ func (s *Store) StreamInventoryList(
 
 	defer errors.DeferredCloser(&err, rc)
 
-	if err = s.blobStore.GetInventoryList().StreamInventoryListBlobSkus(
+	if err = s.blobStore.GetInventoryList().StreamInventoryListBlobSkusFromReader(
 		s.blobType,
 		rc,
 		f,

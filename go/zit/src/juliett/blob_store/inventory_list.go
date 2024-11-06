@@ -175,6 +175,35 @@ func (a InventoryStore) PutTransactedWithBlob(
 }
 
 func (a InventoryStore) StreamInventoryListBlobSkus(
+	tg sku.TransactedGetter,
+	f interfaces.FuncIter[*sku.Transacted],
+) (err error) {
+	sk := tg.GetSku()
+	tipe := sk.GetType()
+	blobSha := sk.GetBlobSha()
+
+	var rc interfaces.ShaReadCloser
+
+	if rc, err = a.dirLayout.BlobReader(blobSha); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer errors.DeferredCloser(&err, rc)
+
+	if err = a.StreamInventoryListBlobSkusFromReader(
+		tipe,
+		rc,
+		f,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (a InventoryStore) StreamInventoryListBlobSkusFromReader(
 	tipe ids.Type,
 	rf io.Reader,
 	f interfaces.FuncIter[*sku.Transacted],

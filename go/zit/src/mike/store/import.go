@@ -45,10 +45,10 @@ func (s Importer) importInventoryList(
 	el *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
 	if el.GetGenre() == genres.InventoryList {
-		if err = s.GetInventoryListStore().StreamInventoryList(
-			el.GetBlobSha(),
+		if err = s.GetBlobStore().GetInventoryList().StreamInventoryListBlobSkus(
+			el,
 			func(sk *sku.Transacted) (err error) {
-				if _, err = s.importLeafSku(
+				if _, err = s.Import(
 					sk,
 				); err != nil {
 					err = errors.Wrap(err)
@@ -114,6 +114,7 @@ func (s Importer) importLeafSku(
 					Mode:               object_mode.ModeCommit,
 					DontAddMissingTags: true,
 					DontAddMissingType: true,
+					ChangeIsHistorical: true,
 				},
 			); err != nil {
 				err = errors.WrapExcept(err, collections.ErrExists)
@@ -137,7 +138,7 @@ func (s Importer) importLeafSku(
 		return
 	}
 
-  commitOptions.ChangeIsHistorical = true
+	commitOptions.ChangeIsHistorical = true
 
 	if err = s.tryRealizeAndOrStore(
 		external,
