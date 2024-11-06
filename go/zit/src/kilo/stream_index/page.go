@@ -87,14 +87,14 @@ func (s *Page) readOneRange(
 
 func (pt *Page) add(
 	z1 *sku.Transacted,
-	mode object_mode.Mode,
+	options sku.CommitOptions,
 ) (err error) {
 	pt.oids[z1.ObjectId.String()] = struct{}{}
 	z := sku.GetTransactedPool().Get()
 
 	sku.TransactedResetter.ResetWith(z, z1)
 
-	if mode.Contains(object_mode.ModeLatest) {
+	if options.Contains(object_mode.ModeLatest) && !options.ChangeIsHistorical {
 		pt.addedLatest.Add(z)
 	} else {
 		pt.added.Add(z)

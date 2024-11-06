@@ -45,7 +45,9 @@ func (s *Store) FlushInventoryList(
 		if err = s.GetStreamIndex().Add(
 			inventoryListSku,
 			inventoryListSku.GetObjectId().String(),
-			object_mode.ModeLatest,
+			sku.CommitOptions{
+				Mode: object_mode.ModeLatest,
+			},
 		); err != nil {
 			err = errors.Wrap(err)
 			return

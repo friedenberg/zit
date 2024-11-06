@@ -111,7 +111,7 @@ func (s *Store) tryRealizeAndOrStore(
 
 	if o.ContainsAny(
 		object_mode.ModeAddToInventoryList,
-	) && (kinder.ObjectId.IsEmpty() || kinder.GetGenre() == genres.Unknown) {
+	) && (kinder.ObjectId.IsEmpty() || kinder.GetGenre() == genres.None) {
 		var ken *ids.ZettelId
 
 		if ken, err = s.zettelIdIndex.CreateZettelId(); err != nil {
@@ -215,7 +215,7 @@ func (s *Store) tryRealizeAndOrStore(
 		if err = s.GetStreamIndex().Add(
 			kinder,
 			kinder.GetObjectId().String(),
-			o.Mode,
+			o,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

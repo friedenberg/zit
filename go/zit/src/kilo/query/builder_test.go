@@ -79,12 +79,12 @@ func TestQuery(t1 *testing.T) {
 				"ducks:Etikett [=!md house]?Zettel wow:Zettel",
 			},
 		},
-		// { //TODO
-		// 	stackInfo:         test_logz.MakeStackInfo(&t, 0),
-		// 	expectedOptimized: "one/uno.zettel",
-		// 	expected:          "one/uno.zettel",
-		// 	inputs:            []string{"one/uno.zettel"},
-		// },
+		{ // TODO try to make this expect `one/uno.zettel`
+			stackInfo:         test_logz.MakeStackInfo(&t, 0),
+			expectedOptimized: "one/uno:.Zettel",
+			expected:          "one/uno:.Zettel",
+			inputs:            []string{"one/uno.zettel"},
+		},
 		{
 			stackInfo:         test_logz.MakeStackInfo(&t, 0),
 			expectedOptimized: "one/uno:Zettel",
@@ -144,6 +144,13 @@ func TestQuery(t1 *testing.T) {
 			expected:          ":Typ,Etikett,Zettel,Konfig,Bestandsaufnahme,Kasten",
 			inputs:            []string{":"},
 		},
+		// {
+		// 	stackInfo:         test_logz.MakeStackInfo(&t, 0),
+		// 	defaultGattung:    ids.MakeGenre(genres.TrueGenre()...),
+		// 	expectedOptimized: ":Bestandsaufnahme",
+		// 	expected:          ":Typ,Etikett,Zettel,Konfig,Bestandsaufnahme,Kasten",
+      // inputs:            []string{"[2109504781.792086]:b"},
+		// },
 	}
 
 	for _, tc := range testCases {

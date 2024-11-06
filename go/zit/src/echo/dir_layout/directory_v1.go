@@ -63,6 +63,8 @@ func (s directoryV1) DirCache(p ...string) string {
 }
 
 func (s directoryV1) DirCacheRepo(p ...string) string {
+  // TODO switch to XDG cache
+	// return filepath.Join(stringSliceJoin(s.Cache, "repo", p...)...)
 	return s.DirZit(append([]string{"cache", "repo"}, p...)...)
 }
 
@@ -75,7 +77,7 @@ func (s directoryV1) DirObjectGenre(
 ) (p string, err error) {
 	g := g1.GetGenre()
 
-	if g == genres.Unknown {
+	if g == genres.None {
 		err = genres.MakeErrUnsupportedGenre(g)
 		return
 	}

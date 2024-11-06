@@ -67,7 +67,7 @@ func (pz Proto) Apply(
 	ui.Log().Print(ml, g)
 
 	switch g {
-	case genres.Zettel, genres.Unknown:
+	case genres.Zettel, genres.None:
 		if ids.IsEmpty(z.GetType()) &&
 			!ids.IsEmpty(pz.Metadata.Type) &&
 			!z.GetType().Equals(pz.Metadata.Type) {

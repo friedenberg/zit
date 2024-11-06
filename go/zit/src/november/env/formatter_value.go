@@ -752,7 +752,7 @@ func (u *Env) MakeFormatFunc(
 		}
 
 	default:
-		err = MakeErrUnsupportedFormatterValue(v, genres.Unknown)
+		err = MakeErrUnsupportedFormatterValue(v, genres.None)
 	}
 
 	return

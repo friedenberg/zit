@@ -43,7 +43,7 @@ func (c *executor) tryToEmitOneExplicitlyCheckedOut(
 
 	c.co.External.State = external_state.Tracked
 
-	if err = c.tryToEmitOneCommon(item, false); err != nil {
+	if err = c.tryToEmitOneCommon(item); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -72,7 +72,7 @@ func (c *executor) tryToEmitOneRecognized(
 	c.co.State = checked_out_state.Recognized
 	c.co.External.State = external_state.Recognized
 
-	if err = c.tryToEmitOneCommon(item, true); err != nil {
+	if err = c.tryToEmitOneCommon(item); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -99,7 +99,7 @@ func (c *executor) tryToEmitOneUntracked(
 
 	c.co.External.State = external_state.Untracked
 
-	if err = c.tryToEmitOneCommon(item, true); err != nil {
+	if err = c.tryToEmitOneCommon(item); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -109,7 +109,6 @@ func (c *executor) tryToEmitOneUntracked(
 
 func (c *executor) tryToEmitOneCommon(
 	i Item,
-	overwrite bool,
 ) (err error) {
 	external := &c.co.External
 
@@ -119,6 +118,7 @@ func (c *executor) tryToEmitOneCommon(
 	}
 
 	external.ObjectId.SetGenre(genres.Zettel)
+	external.ExternalObjectId.SetGenre(genres.Zettel)
 
 	if !c.qg.ContainsExternalSku(external, c.co.State) {
 		return

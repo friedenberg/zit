@@ -15,7 +15,7 @@ func MakeErrUnsupportedGenre(g interfaces.GenreGetter) error {
 }
 
 func IsErrUnsupportedGenre(err error) bool {
-	return errors.Is(err, errUnsupportedGenre{Genre: Unknown})
+	return errors.Is(err, errUnsupportedGenre{Genre: None})
 }
 
 type errUnsupportedGenre struct {

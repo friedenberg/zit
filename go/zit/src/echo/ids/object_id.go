@@ -196,7 +196,7 @@ func (k2 *objectId) ReadFrom(r io.Reader) (n int64, err error) {
 
 func (k2 *objectId) SetGenre(g interfaces.GenreGetter) {
 	if g == nil {
-		k2.g = genres.Unknown
+		k2.g = genres.None
 	} else {
 		k2.g = genres.Must(g.GetGenre())
 	}
@@ -265,7 +265,7 @@ func (k2 *objectId) String() string {
 }
 
 func (k2 *objectId) Reset() {
-	k2.g = genres.Unknown
+	k2.g = genres.None
 	k2.left.Reset()
 	k2.middle = 0
 	k2.right.Reset()
@@ -433,7 +433,7 @@ func (h *objectId) TodoSetBytes(v *catgut.String) (err error) {
 }
 
 func (h *objectId) SetRaw(v string) (err error) {
-	h.g = genres.Unknown
+	h.g = genres.None
 
 	if err = h.left.Set(v); err != nil {
 		err = errors.Wrap(err)
@@ -447,7 +447,7 @@ func (h *objectId) Set(v string) (err error) {
 	var k IdLike
 
 	switch h.g {
-	case genres.Unknown:
+	case genres.None:
 		k, err = Make(v)
 
 	case genres.Zettel:

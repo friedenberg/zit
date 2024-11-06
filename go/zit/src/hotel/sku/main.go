@@ -21,6 +21,7 @@ type CommitOptions struct {
 	object_mode.Mode // TODO rename
 	ids.Clock
 	Proto              *Transacted
+	ChangeIsHistorical bool
 	DontAddMissingTags bool
 	DontAddMissingType bool
 	DontValidate       bool

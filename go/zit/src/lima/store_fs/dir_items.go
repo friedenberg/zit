@@ -328,7 +328,7 @@ func (d *dirItems) processFDSet(
 		return
 	}
 
-	if fds.GetGenre() != genres.Unknown {
+	if fds.GetGenre() != genres.None {
 		if blobCount > 1 {
 			err = errors.Errorf(
 				"several blobs matching object id %q: %q",
@@ -350,11 +350,11 @@ func (d *dirItems) processFDSet(
 		}
 	}
 
-	if fds.GetGenre() == genres.Unknown {
+	if fds.GetGenre() == genres.None {
 		fds.ObjectId.SetGenre(recognizedGenre)
 	}
 
-	if fds.GetGenre() == genres.Unknown {
+	if fds.GetGenre() == genres.None {
 		if results, err = d.addOneOrMoreBlobs(
 			fds,
 		); err != nil {

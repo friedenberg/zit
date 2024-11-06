@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -139,16 +140,16 @@ func (mb *Builder) WithHidden(
 func (b *Builder) WithExternalLike(
 	zts sku.ExternalLikeSet,
 ) *Builder {
-	errors.PanicIfError(zts.Each(
-		func(t sku.ExternalLike) (err error) {
-			b.pinnedExternalObjectIds = append(
-				b.pinnedExternalObjectIds,
-				t.GetExternalObjectId(),
-			)
+	for t := range zts.All() {
+    if t.GetExternalObjectId().GetGenre() == genres.None {
+      panic("genre is none")
+    }
 
-			return
-		},
-	))
+		b.pinnedExternalObjectIds = append(
+			b.pinnedExternalObjectIds,
+			t.GetExternalObjectId(),
+		)
+	}
 
 	return b
 }

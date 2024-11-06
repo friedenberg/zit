@@ -63,7 +63,7 @@ func (s directoryV0) DirObjectGenre(
 ) (p string, err error) {
 	g := g1.GetGenre()
 
-	if g == genres.Unknown {
+	if g == genres.None {
 		err = genres.MakeErrUnsupportedGenre(g)
 		return
 	}

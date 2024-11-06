@@ -16,7 +16,7 @@ type Genre byte
 // Do not change this order, various serialization formats rely on the
 // underlying integer values.
 const (
-	Unknown = Genre(iota)
+	None = Genre(iota)
 	Blob
 	Type
 	_ // Bezeichnung
@@ -49,7 +49,7 @@ const (
 func All() (out []Genre) {
 	out = make([]Genre, 0, MaxGenre-1)
 
-	for i := Unknown + 1; i <= MaxGenre; i++ {
+	for i := None + 1; i <= MaxGenre; i++ {
 		out = append(out, Genre(i))
 	}
 
@@ -61,7 +61,7 @@ func All() (out []Genre) {
 func TrueGenre() (out []Genre) {
 	out = make([]Genre, 0, MaxGenre-1)
 
-	for i := Unknown + 1; i <= MaxGenre; i++ {
+	for i := None + 1; i <= MaxGenre; i++ {
 		g := Genre(i)
 
 		if !g.IsTrueGenre() {
@@ -84,7 +84,7 @@ func Make(g interfaces.Genre) Genre {
 
 func MakeOrUnknown(v string) (g Genre) {
 	if err := g.Set(v); err != nil {
-		g = Unknown
+		g = None
 	}
 
 	return
@@ -245,8 +245,11 @@ func (g Genre) String() string {
 	case Repo:
 		return "Kasten"
 
+	case None:
+		return "none"
+
 	default:
-		return "Unknown"
+		return fmt.Sprintf("Unknown(%#v)", g)
 	}
 }
 
@@ -303,11 +306,11 @@ func (g *Genre) Set(v string) (err error) {
 }
 
 func (g *Genre) Reset() {
-	*g = Unknown
+	*g = None
 }
 
 func (g *Genre) ReadFrom(r io.Reader) (n int64, err error) {
-	*g = Unknown
+	*g = None
 
 	var b [1]byte
 

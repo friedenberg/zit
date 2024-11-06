@@ -164,7 +164,12 @@ func (i *Item) WriteToExternal(e *sku.Transacted) (err error) {
 }
 
 func (i *Item) ReadFromExternal(e *sku.Transacted) (err error) {
-	if err = i.Id.Set(e.ExternalObjectId.String()); err != nil {
+	if err = i.Id.Set(
+		strings.TrimSuffix(
+			e.ExternalObjectId.String(),
+			"/",
+		),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

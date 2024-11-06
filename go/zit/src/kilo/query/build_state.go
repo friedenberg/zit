@@ -13,9 +13,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/tag_blobs"
 )
 
+type stackEl interface {
+	sku.Query
+	Add(sku.Query) error
+}
+
 type buildState struct {
 	builder      *Builder
 	qg           *Group
+	stack        []stackEl
 	latentErrors errors.Multi
 	missingBlobs []ErrBlobMissing
 
@@ -71,6 +77,11 @@ func (b *buildState) build(
 			b.externalStoreAcceptedQueryComponent = true
 
 			for _, k := range k {
+				if k.GetGenre() == genres.None {
+					err = errors.Errorf("id with empty genre: %q", k)
+					return
+				}
+
 				b.pinnedExternalObjectIds = append(
 					b.pinnedExternalObjectIds,
 					k,
@@ -100,6 +111,11 @@ func (b *buildState) build(
 	}
 
 	for _, k := range b.pinnedExternalObjectIds {
+		if k.GetGenre() == genres.None {
+			err = errors.Errorf("id with empty genre: %q", k)
+			return
+		}
+
 		if err = b.qg.addExactExternalObjectId(b, k); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -166,13 +182,8 @@ func (b *buildState) addDefaultsIfNecessary() {
 }
 
 func (b *buildState) parseTokens() (err error) {
-	type stackEl interface {
-		sku.Query
-		Add(sku.Query) error
-	}
-
 	q := b.makeQuery()
-	stack := []stackEl{q}
+	b.stack = []stackEl{q}
 
 	isNegated := false
 	isExact := false
@@ -192,12 +203,12 @@ LOOP:
 				isNegated = true
 
 			case ' ':
-				if len(stack) == 1 {
+				if len(b.stack) == 1 {
 					break LOOP
 				}
 
 			case ',':
-				last := stack[len(stack)-1].(*Exp)
+				last := b.stack[len(b.stack)-1].(*Exp)
 				last.Or = true
 				// TODO handle or when invalid
 
@@ -205,11 +216,11 @@ LOOP:
 				exp := b.makeExp(isNegated, isExact)
 				isExact = false
 				isNegated = false
-				stack[len(stack)-1].Add(exp)
-				stack = append(stack, exp)
+				b.stack[len(b.stack)-1].Add(exp)
+				b.stack = append(b.stack, exp)
 
 			case ']':
-				stack = stack[:len(stack)-1]
+				b.stack = b.stack[:len(b.stack)-1]
 				// TODO handle errors of unbalanced
 
 			case '.':
@@ -217,7 +228,7 @@ LOOP:
 				fallthrough
 
 			case ':', '+', '?':
-				if len(stack) > 1 {
+				if len(b.stack) > 1 {
 					err = errors.Errorf("sigil before end")
 					return
 				}
@@ -267,7 +278,7 @@ LOOP:
 				}
 
 				exp := b.makeExp(isNegated, isExact, et)
-				stack[len(stack)-1].Add(exp)
+				b.stack[len(b.stack)-1].Add(exp)
 
 			case genres.Type:
 				var t ids.Type
@@ -285,7 +296,7 @@ LOOP:
 				}
 
 				exp := b.makeExp(isNegated, isExact, &k)
-				stack[len(stack)-1].Add(exp)
+				b.stack[len(b.stack)-1].Add(exp)
 			}
 
 			isNegated = false

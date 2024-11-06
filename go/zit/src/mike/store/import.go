@@ -137,6 +137,8 @@ func (s Importer) importLeafSku(
 		return
 	}
 
+  commitOptions.ChangeIsHistorical = true
+
 	if err = s.tryRealizeAndOrStore(
 		external,
 		commitOptions,
