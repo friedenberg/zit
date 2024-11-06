@@ -144,13 +144,13 @@ func TestQuery(t1 *testing.T) {
 			expected:          ":Typ,Etikett,Zettel,Konfig,Bestandsaufnahme,Kasten",
 			inputs:            []string{":"},
 		},
-		// {
-		// 	stackInfo:         test_logz.MakeStackInfo(&t, 0),
-		// 	defaultGattung:    ids.MakeGenre(genres.TrueGenre()...),
-		// 	expectedOptimized: ":Bestandsaufnahme",
-		// 	expected:          ":Typ,Etikett,Zettel,Konfig,Bestandsaufnahme,Kasten",
-      // inputs:            []string{"[2109504781.792086]:b"},
-		// },
+		{
+			stackInfo:         test_logz.MakeStackInfo(&t, 0),
+			defaultGattung:    ids.MakeGenre(genres.TrueGenre()...),
+			expectedOptimized: "2109504781.792086:Bestandsaufnahme",
+			expected:          "2109504781.792086:Bestandsaufnahme",
+			inputs:            []string{"[2109504781.792086]:b"},
+		},
 	}
 
 	for _, tc := range testCases {

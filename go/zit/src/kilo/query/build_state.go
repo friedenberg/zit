@@ -21,7 +21,6 @@ type stackEl interface {
 type buildState struct {
 	builder      *Builder
 	qg           *Group
-	stack        []stackEl
 	latentErrors errors.Multi
 	missingBlobs []ErrBlobMissing
 
@@ -183,17 +182,27 @@ func (b *buildState) addDefaultsIfNecessary() {
 
 func (b *buildState) parseTokens() (err error) {
 	q := b.makeQuery()
-	b.stack = []stackEl{q}
+	stack := []stackEl{q}
 
 	isNegated := false
 	isExact := false
 
 LOOP:
-	for b.ts.Scan() {
+	for {
+		loopFunc := b.ts.Scan
+
+		if len(stack) > 1 {
+			loopFunc = b.ts.ScanDotAllowedInIdentifiers
+		}
+
+		if !loopFunc() {
+			break
+		}
+
 		token, tokenType := b.ts.GetTokenAndType()
 
 		if tokenType == token_types.TypeOperator {
-			op := token.String()[0]
+			op := token.Bytes()[0]
 
 			switch op {
 			case '=':
@@ -203,12 +212,12 @@ LOOP:
 				isNegated = true
 
 			case ' ':
-				if len(b.stack) == 1 {
+				if len(stack) == 1 {
 					break LOOP
 				}
 
 			case ',':
-				last := b.stack[len(b.stack)-1].(*Exp)
+				last := stack[len(stack)-1].(*Exp)
 				last.Or = true
 				// TODO handle or when invalid
 
@@ -216,11 +225,11 @@ LOOP:
 				exp := b.makeExp(isNegated, isExact)
 				isExact = false
 				isNegated = false
-				b.stack[len(b.stack)-1].Add(exp)
-				b.stack = append(b.stack, exp)
+				stack[len(stack)-1].Add(exp)
+				stack = append(stack, exp)
 
 			case ']':
-				b.stack = b.stack[:len(b.stack)-1]
+				stack = stack[:len(stack)-1]
 				// TODO handle errors of unbalanced
 
 			case '.':
@@ -228,7 +237,7 @@ LOOP:
 				fallthrough
 
 			case ':', '+', '?':
-				if len(b.stack) > 1 {
+				if len(stack) > 1 {
 					err = errors.Errorf("sigil before end")
 					return
 				}
@@ -258,6 +267,17 @@ LOOP:
 			}
 
 			switch k.GetGenre() {
+			case genres.InventoryList:
+				b.pinnedObjectIds = append(
+					b.pinnedObjectIds,
+					k,
+				)
+
+				if err = q.addExactObjectId(b, k); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
 			case genres.Zettel:
 				b.pinnedObjectIds = append(
 					b.pinnedObjectIds,
@@ -278,7 +298,7 @@ LOOP:
 				}
 
 				exp := b.makeExp(isNegated, isExact, et)
-				b.stack[len(b.stack)-1].Add(exp)
+				stack[len(stack)-1].Add(exp)
 
 			case genres.Type:
 				var t ids.Type
@@ -296,7 +316,7 @@ LOOP:
 				}
 
 				exp := b.makeExp(isNegated, isExact, &k)
-				b.stack[len(b.stack)-1].Add(exp)
+				stack[len(stack)-1].Add(exp)
 			}
 
 			isNegated = false
