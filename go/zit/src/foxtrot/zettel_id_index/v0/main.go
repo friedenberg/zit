@@ -43,7 +43,7 @@ func MakeIndex(
 ) (i *index, err error) {
 	i = &index{
 		path:               s.FileCacheObjectId(),
-		nonRandomSelection: k.UsePredictableHinweisen(),
+		nonRandomSelection: k.UsePredictableZettelIds(),
 		su:                 su,
 		encodedIds: encodedIds{
 			AvailableIds: make(map[int]bool),

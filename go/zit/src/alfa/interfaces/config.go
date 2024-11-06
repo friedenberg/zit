@@ -28,7 +28,7 @@ type MutableStoredConfig interface {
 type MutableConfig interface {
 	MutableStoredConfig
 	UsePrintTime() bool
-	UsePredictableHinweisen() bool
+	UsePredictableZettelIds() bool
 	ConfigDryRun
 }
 

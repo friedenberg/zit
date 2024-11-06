@@ -38,3 +38,16 @@ func (a *V0) GetBinary() bool {
 func (a *V0) GetFileExtension() string {
 	return a.FileExtension
 }
+
+func (a *V0) GetFormatters() map[string]script_config.WithOutputFormat {
+	return a.Formatters
+}
+
+func (a *V0) GetFormatterUTIGroups() map[string]FormatterUTIGroup {
+	return a.FormatterUTIGroups
+}
+
+func (a *V0) GetStringLuaHooks() string {
+  hooks, _ := a.Hooks.(string)
+  return hooks
+}

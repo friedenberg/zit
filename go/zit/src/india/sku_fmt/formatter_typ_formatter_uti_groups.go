@@ -5,23 +5,23 @@ import (
 	"io"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/juliett/blob_store"
 )
 
 type formatterTypFormatterUTIGroups struct {
 	sku.OneReader
-	typBlobGetterPutter interfaces.BlobGetterPutter[*type_blobs.V0]
+	blob_store.TypeStore
 }
 
 func MakeFormatterTypFormatterUTIGroups(
 	sr sku.OneReader,
-	tagp interfaces.BlobGetterPutter[*type_blobs.V0],
+	typeBlobStore blob_store.TypeStore,
 ) *formatterTypFormatterUTIGroups {
 	return &formatterTypFormatterUTIGroups{
-		OneReader:           sr,
-		typBlobGetterPutter: tagp,
+		OneReader: sr,
+		TypeStore: typeBlobStore,
 	}
 }
 
@@ -36,16 +36,19 @@ func (e formatterTypFormatterUTIGroups) Format(
 		return
 	}
 
-	var ta *type_blobs.V0
+	var ta type_blobs.Blob
 
-	if ta, err = e.typBlobGetterPutter.GetBlob(skuTyp.GetBlobSha()); err != nil {
+	if ta, _, err = e.ParseTypedBlob(
+		skuTyp.GetType(),
+		skuTyp.GetBlobSha(),
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer e.typBlobGetterPutter.PutBlob(ta)
+	defer e.PutTypedBlob(skuTyp.GetType(), ta)
 
-	for groupName, group := range ta.FormatterUTIGroups {
+	for groupName, group := range ta.GetFormatterUTIGroups() {
 		sb := bytes.NewBuffer(nil)
 
 		sb.WriteString(groupName)

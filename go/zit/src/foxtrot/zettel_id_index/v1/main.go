@@ -42,7 +42,7 @@ func MakeIndex(
 	i = &index{
 		lock:               &sync.RWMutex{},
 		path:               s.FileCacheObjectId(),
-		nonRandomSelection: k.UsePredictableHinweisen(),
+		nonRandomSelection: k.UsePredictableZettelIds(),
 		su:                 su,
 		bitset:             collections.MakeBitset(0),
 	}

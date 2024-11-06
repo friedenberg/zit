@@ -762,7 +762,8 @@ func (u *Env) makeTypFormatter(
 	v string,
 	out io.Writer,
 ) (f interfaces.FuncIter[*sku.Transacted], err error) {
-	agp := u.GetStore().GetBlobStore().GetTypeV0()
+	typeBlobStore := u.GetStore().GetBlobStore().GetType()
+	typeBlobStoreV0 := u.GetStore().GetBlobStore().GetTypeV0()
 
 	if out == nil {
 		out = u.Out()
@@ -778,18 +779,21 @@ func (u *Env) makeTypFormatter(
 				return
 			}
 
-			var ta *type_blobs.V0
+			var ta type_blobs.Blob
 
-			if ta, err = agp.GetBlob(tt.GetBlobSha()); err != nil {
+			if ta, _, err = typeBlobStore.ParseTypedBlob(
+				tt.GetType(),
+				tt.GetBlobSha(),
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			defer agp.PutBlob(ta)
+			defer typeBlobStore.PutTypedBlob(tt.GetType(), ta)
 
 			lw := format.MakeLineWriter()
 
-			for fn, f := range ta.Formatters {
+			for fn, f := range ta.GetFormatters() {
 				fe := f.FileExtension
 
 				if fe == "" {
@@ -808,7 +812,7 @@ func (u *Env) makeTypFormatter(
 		}
 
 	case "formatter-uti-groups":
-		fo := sku_fmt.MakeFormatterTypFormatterUTIGroups(u.GetStore(), agp)
+		fo := sku_fmt.MakeFormatterTypFormatterUTIGroups(u.GetStore(), typeBlobStore)
 
 		f = func(o *sku.Transacted) (err error) {
 			if _, err = fo.Format(out, o); err != nil {
@@ -819,47 +823,27 @@ func (u *Env) makeTypFormatter(
 			return
 		}
 
-	case "action-names":
-		f = func(o *sku.Transacted) (err error) {
-			var blob *type_blobs.V0
-
-			if blob, err = agp.GetBlob(o.GetBlobSha()); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			defer agp.PutBlob(blob)
-
-			for v, v1 := range blob.Actions {
-				if _, err = io.WriteString(
-					out,
-					fmt.Sprintf("%s\t%s\n", v, v1.Description),
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-			}
-
-			return
-		}
-
 	case "hooks.on_pre_commit":
 		f = func(o *sku.Transacted) (err error) {
-			var blob *type_blobs.V0
+			var blob type_blobs.Blob
 
-			if blob, err = agp.GetBlob(o.GetBlobSha()); err != nil {
+			if blob, _, err = typeBlobStore.ParseTypedBlob(
+				o.GetType(),
+				o.GetBlobSha(),
+			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			defer agp.PutBlob(blob)
+			defer typeBlobStore.PutTypedBlob(o.GetType(), blob)
 
-			script, ok := blob.Hooks.(string)
+			script := blob.GetStringLuaHooks()
 
-			if !ok || script == "" {
+			if script == "" {
 				return
 			}
 
+			// TODO switch to typed variant
 			var vp sku.LuaVMPoolV1
 
 			if vp, err = u.GetStore().MakeLuaVMPool(o, script); err != nil {
@@ -917,14 +901,14 @@ func (u *Env) makeTypFormatter(
 
 			var ta *type_blobs.V0
 
-			if ta, err = u.GetStore().GetBlobStore().GetTypeV0().GetBlob(
+			if ta, err = typeBlobStoreV0.GetBlob(
 				t.GetBlobSha(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			defer u.GetStore().GetBlobStore().GetTypeV0().PutBlob(ta)
+			defer typeBlobStoreV0.PutBlob(ta)
 
 			if _, err = fmt.Fprintln(
 				out,

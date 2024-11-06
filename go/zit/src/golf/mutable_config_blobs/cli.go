@@ -85,7 +85,7 @@ func (c *Cli) ApplyPrintOptionsConfig(
 	c.PrintOptions.Merge(cliSet, c.maskPrintOptions)
 }
 
-func (c Cli) UsePredictableHinweisen() bool {
+func (c Cli) UsePredictableZettelIds() bool {
 	return c.PredictableZettelIds
 }
 

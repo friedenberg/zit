@@ -30,7 +30,7 @@ func (s *Store) GetEnnui() object_probe_index.Index {
 }
 
 func (s *Store) GetStoreFS() *store_fs.Store {
-	return s.cwdFiles
+	return s.storeFS
 }
 
 func (s *Store) GetProtoZettel() sku.Proto {

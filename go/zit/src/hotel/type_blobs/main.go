@@ -24,4 +24,20 @@ func Default() (t TomlV1) {
 type Blob interface {
 	GetFileExtension() string
 	GetBinary() bool
+	WithFormatters
+	WithFormatterUTIGropus
+	WithStringLuaHooks
+}
+
+type WithFormatters interface {
+	GetFormatters() map[string]script_config.WithOutputFormat
+}
+
+type WithFormatterUTIGropus interface {
+	GetFormatterUTIGroups() map[string]FormatterUTIGroup
+}
+
+// TODO make typed hooks
+type WithStringLuaHooks interface {
+	GetStringLuaHooks() string
 }

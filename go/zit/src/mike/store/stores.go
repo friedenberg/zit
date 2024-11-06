@@ -223,7 +223,7 @@ func (s *Store) MergeConflicted(
 		err = todo.Implement()
 
 	default:
-		if err = s.cwdFiles.Merge(tm); err != nil {
+		if err = s.storeFS.Merge(tm); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -244,7 +244,7 @@ func (s *Store) RunMergeTool(
 	default:
 		var co sku.CheckedOutLike
 
-		if co, err = s.cwdFiles.RunMergeTool(tool, tm); err != nil {
+		if co, err = s.storeFS.RunMergeTool(tool, tm); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -289,7 +289,7 @@ func (s *Store) ReadCheckedOutFromTransacted(
 		err = todo.Implement()
 
 	default:
-		if co, err = s.cwdFiles.ReadCheckedOutFromTransacted(sk); err != nil {
+		if co, err = s.storeFS.ReadCheckedOutFromTransacted(sk); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

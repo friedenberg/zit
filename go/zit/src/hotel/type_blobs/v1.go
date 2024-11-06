@@ -33,3 +33,16 @@ func (a *TomlV1) GetBinary() bool {
 func (a *TomlV1) GetFileExtension() string {
 	return a.FileExtension
 }
+
+func (a *TomlV1) GetFormatters() map[string]script_config.WithOutputFormat {
+	return a.Formatters
+}
+
+func (a *TomlV1) GetFormatterUTIGroups() map[string]FormatterUTIGroup {
+	return a.UTIGroups
+}
+
+func (a *TomlV1) GetStringLuaHooks() string {
+	hooks, _ := a.Hooks.(string)
+	return hooks
+}

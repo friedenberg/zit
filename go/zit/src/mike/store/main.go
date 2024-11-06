@@ -29,7 +29,7 @@ type Store struct {
 	config    *config.Compiled
 	dirLayout dir_layout.DirLayout
 
-	cwdFiles           *store_fs.Store
+	storeFS            *store_fs.Store
 	externalStores     map[ids.RepoId]*external_store.Store
 	blobStore          *blob_store.VersionedStores
 	inventoryListStore inventory_list_store.Store
@@ -155,10 +155,10 @@ func (s *Store) SetExternalStores(
 
 		es.RepoId = k
 		es.Clock = s.sunrise
-    es.BlobStore = s.blobStore
+		es.BlobStore = s.blobStore
 
 		if esfs, ok := es.StoreLike.(*store_fs.Store); ok {
-			s.cwdFiles = esfs
+			s.storeFS = esfs
 
 			// TODO remove once store_fs.Store is fully ExternalStoreLike
 			if err = es.Initialize(); err != nil {
