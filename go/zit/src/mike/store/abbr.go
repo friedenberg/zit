@@ -154,7 +154,7 @@ func (i *indexAbbr) GetAbbr() (out ids.Abbr) {
 	out.ZettelId.Expand = i.ZettelId().ExpandStringString
 	out.Sha.Expand = i.Shas().ExpandStringString
 
-	if i.Abbreviations.Hinweisen {
+	if i.Abbreviations.ZettelIds {
 		out.ZettelId.Abbreviate = i.ZettelId().Abbreviate
 	}
 

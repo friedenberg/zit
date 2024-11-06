@@ -7,7 +7,7 @@ import (
 )
 
 type Abbreviations struct {
-	Hinweisen bool `toml:"hinweisen"`
+	ZettelIds bool `toml:"hinweisen"`
 	Shas      bool `toml:"shas"`
 }
 
@@ -17,7 +17,7 @@ type Box struct {
 	PrintTai                bool `toml:"-"`
 	PrintTagsAlways         bool `toml:"print-etiketten-always"`
 	PrintEmptyShas          bool `toml:"print-empty-shas"`
-	PrintIncludeTypen       bool `toml:"print-include-typen"`
+	PrintIncludeTypes       bool `toml:"print-include-typen"`
 	DescriptionInBox        bool `toml:"-"`
 	ExcludeFields           bool `toml:"-"`
 	PrintState              bool `toml:"-"`
@@ -26,26 +26,26 @@ type Box struct {
 type General struct {
 	Abbreviations Abbreviations `toml:"abbreviations"`
 	Box
-	PrintMatchedArchiviert bool `toml:"print-matched-archiviert"`
-	PrintShas              bool `toml:"print-shas"`
-	PrintFlush             bool `toml:"print-flush"`
-	PrintUnchanged         bool `toml:"print-unchanged"`
-	PrintColors            bool `toml:"print-colors"`
-	PrintBestandsaufnahme  bool `toml:"print-bestandsaufnahme"`
-	ZittishNewlines        bool `toml:"-"`
+	PrintMatchedDormant bool `toml:"print-matched-archiviert"`
+	PrintShas           bool `toml:"print-shas"`
+	PrintFlush          bool `toml:"print-flush"`
+	PrintUnchanged      bool `toml:"print-unchanged"`
+	PrintColors         bool `toml:"print-colors"`
+	PrintInventoryLists bool `toml:"print-bestandsaufnahme"`
+	ZittishNewlines     bool `toml:"-"`
 }
 
 func (a *General) Merge(b General, mask General) {
-	if mask.Abbreviations.Hinweisen {
-		a.Abbreviations.Hinweisen = b.Abbreviations.Hinweisen
+	if mask.Abbreviations.ZettelIds {
+		a.Abbreviations.ZettelIds = b.Abbreviations.ZettelIds
 	}
 
 	if mask.Abbreviations.Shas {
 		a.Abbreviations.Shas = b.Abbreviations.Shas
 	}
 
-	if mask.PrintIncludeTypen {
-		a.PrintIncludeTypen = b.PrintIncludeTypen
+	if mask.PrintIncludeTypes {
+		a.PrintIncludeTypes = b.PrintIncludeTypes
 	}
 
 	if mask.PrintIncludeDescription {
@@ -64,8 +64,8 @@ func (a *General) Merge(b General, mask General) {
 		a.PrintEmptyShas = b.PrintEmptyShas
 	}
 
-	if mask.PrintMatchedArchiviert {
-		a.PrintMatchedArchiviert = b.PrintMatchedArchiviert
+	if mask.PrintMatchedDormant {
+		a.PrintMatchedDormant = b.PrintMatchedDormant
 	}
 
 	if mask.PrintShas {
@@ -84,8 +84,8 @@ func (a *General) Merge(b General, mask General) {
 		a.PrintColors = b.PrintColors
 	}
 
-	if mask.PrintBestandsaufnahme {
-		a.PrintBestandsaufnahme = b.PrintBestandsaufnahme
+	if mask.PrintInventoryLists {
+		a.PrintInventoryLists = b.PrintInventoryLists
 	}
 
 	if mask.DescriptionInBox {
@@ -98,22 +98,22 @@ func (a *General) Merge(b General, mask General) {
 func Default() General {
 	return General{
 		Abbreviations: Abbreviations{
-			Hinweisen: true,
+			ZettelIds: true,
 			Shas:      true,
 		},
 		Box: Box{
-			PrintIncludeTypen:       true,
+			PrintIncludeTypes:       true,
 			PrintIncludeDescription: true,
 			PrintTime:               true,
 			PrintTagsAlways:         true,
 			PrintEmptyShas:          false,
 		},
-		PrintMatchedArchiviert: false,
-		PrintShas:              true,
-		PrintFlush:             true,
-		PrintUnchanged:         true,
-		PrintColors:            true,
-		PrintBestandsaufnahme:  true,
+		PrintMatchedDormant: false,
+		PrintShas:           true,
+		PrintFlush:          true,
+		PrintUnchanged:      true,
+		PrintColors:         true,
+		PrintInventoryLists: true,
 	}
 }
 
@@ -146,8 +146,8 @@ func (c *General) AddToFlags(f *flag.FlagSet, m *General) {
 	boolVarWithMask(
 		f,
 		"print-typen",
-		&c.PrintIncludeTypen,
-		&m.PrintIncludeTypen,
+		&c.PrintIncludeTypes,
+		&m.PrintIncludeTypes,
 		"",
 	)
 
@@ -163,8 +163,8 @@ func (c *General) AddToFlags(f *flag.FlagSet, m *General) {
 	boolVarWithMask(
 		f,
 		"abbreviate-zettel-ids",
-		&c.Abbreviations.Hinweisen,
-		&m.Abbreviations.Hinweisen,
+		&c.Abbreviations.ZettelIds,
+		&m.Abbreviations.ZettelIds,
 		"",
 	)
 
@@ -203,8 +203,8 @@ func (c *General) AddToFlags(f *flag.FlagSet, m *General) {
 	boolVarWithMask(
 		f,
 		"print-matched-archiviert",
-		&c.PrintMatchedArchiviert,
-		&m.PrintMatchedArchiviert,
+		&c.PrintMatchedDormant,
+		&m.PrintMatchedDormant,
 		"",
 	)
 
@@ -243,8 +243,8 @@ func (c *General) AddToFlags(f *flag.FlagSet, m *General) {
 	boolVarWithMask(
 		f,
 		"print-bestandsaufnahme",
-		&c.PrintBestandsaufnahme,
-		&m.PrintBestandsaufnahme,
+		&c.PrintInventoryLists,
+		&m.PrintInventoryLists,
 		"",
 	)
 

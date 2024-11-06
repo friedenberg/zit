@@ -29,7 +29,7 @@ func (s *Store) GetEnnui() object_probe_index.Index {
 	return nil
 }
 
-func (s *Store) GetCwdFiles() *store_fs.Store {
+func (s *Store) GetStoreFS() *store_fs.Store {
 	return s.cwdFiles
 }
 

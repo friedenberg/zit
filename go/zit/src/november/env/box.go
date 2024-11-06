@@ -17,7 +17,7 @@ func (u *Env) StringFormatWriterSkuBox(
 		po,
 		u.StringFormatWriterFields(truncation, co),
 		u.GetStore().GetAbbrStore().GetAbbr(),
-		u.GetStore().GetCwdFiles(),
+		u.GetStore().GetStoreFS(),
 		u.dirLayout,
 	)
 }

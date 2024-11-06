@@ -54,7 +54,7 @@ func (op Checkin) Run(
 						return
 					}
 
-					if err = u.GetStore().GetCwdFiles().UpdateDescriptionFromBlobs(&cofs.External); err != nil {
+					if err = u.GetStore().GetStoreFS().UpdateDescriptionFromBlobs(&cofs.External); err != nil {
 						err = errors.Wrap(err)
 						return
 					}

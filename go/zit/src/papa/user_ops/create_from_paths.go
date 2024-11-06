@@ -51,7 +51,7 @@ func (c CreateFromPaths) Run(
 			return
 		}
 
-		if z, err = c.GetStore().GetCwdFiles().ReadExternalFromItem(
+		if z, err = c.GetStore().GetStoreFS().ReadExternalFromItem(
 			o,
 			&i,
 			nil,
@@ -88,7 +88,7 @@ func (c CreateFromPaths) Run(
 			{
 				var object *fd.FD
 
-				if object, err = c.GetStore().GetCwdFiles().GetObjectOrError(z); err != nil {
+				if object, err = c.GetStore().GetStoreFS().GetObjectOrError(z); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -101,7 +101,7 @@ func (c CreateFromPaths) Run(
 			{
 				var blob *fd.FD
 
-				if blob, err = c.GetStore().GetCwdFiles().GetObjectOrError(z); err != nil {
+				if blob, err = c.GetStore().GetStoreFS().GetObjectOrError(z); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

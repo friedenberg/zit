@@ -29,7 +29,7 @@ func (c EachBlob) Run(
 	for col := range zsc.All() {
 		var fds *store_fs.Item
 
-		if fds, err = c.GetStore().GetCwdFiles().ReadFSItemFromExternal(
+		if fds, err = c.GetStore().GetStoreFS().ReadFSItemFromExternal(
 			col.GetSkuExternalLike(),
 		); err != nil {
 			err = errors.Wrap(err)

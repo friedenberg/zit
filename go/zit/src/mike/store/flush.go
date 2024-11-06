@@ -54,7 +54,7 @@ func (s *Store) FlushInventoryList(
 		}
 		defer sku.GetTransactedPool().Put(inventoryListSku)
 
-		if s.GetConfig().PrintOptions.PrintBestandsaufnahme {
+		if s.GetConfig().PrintOptions.PrintInventoryLists {
 			if err = p(inventoryListSku); err != nil {
 				err = errors.Wrap(err)
 				return

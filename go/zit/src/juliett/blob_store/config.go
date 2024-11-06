@@ -1,11 +1,14 @@
 package blob_store
 
 import (
+	"io"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type ConfigStore struct {
@@ -72,6 +75,32 @@ func (a ConfigStore) ParseTypedBlob(
 		}
 
 		common = blob
+	}
+
+	return
+}
+
+func (a ConfigStore) FormatTypedBlob(
+  tg sku.TransactedGetter,
+	w io.Writer,
+) (n int64, err error) {
+  sk := tg.GetSku()
+
+  tipe := sk.GetType()
+  blobSha := sk.GetBlobSha()
+
+	var store SavedBlobFormatter
+	switch tipe.String() {
+	case "", builtin_types.ConfigTypeTomlV0:
+		store = a.toml_v0
+
+	case builtin_types.ConfigTypeTomlV1:
+		store = a.toml_v1
+	}
+
+	if n, err = store.FormatSavedBlob(w, blobSha); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

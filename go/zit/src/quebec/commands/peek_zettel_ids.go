@@ -15,7 +15,7 @@ type PeekZettelIds struct{}
 
 func init() {
 	registerCommand(
-		"peek-hinweisen",
+		"peek-zettel-ids",
 		func(f *flag.FlagSet) Command {
 			c := &PeekZettelIds{}
 

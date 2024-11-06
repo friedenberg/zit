@@ -43,6 +43,7 @@ type Env struct {
 	primitiveFSHome dir_layout.Primitive
 	dirLayout       dir_layout.DirLayout
 	cliConfig       mutable_config_blobs.Cli
+	fileEncoder     store_fs.FileEncoder
 	config          config.Compiled
 	dormantIndex    dormant_index.Index
 
@@ -130,6 +131,8 @@ func (u *Env) Initialize(options Options) (err error) {
 		}
 	}
 
+	u.fileEncoder = store_fs.MakeFileEncoder(u.dirLayout, &u.config)
+
 	if err = u.dormantIndex.Load(
 		u.dirLayout,
 	); err != nil {
@@ -200,6 +203,7 @@ func (u *Env) Initialize(options Options) (err error) {
 		k.GetFileExtensions(),
 		u.GetDirectoryLayout(),
 		ofo,
+		u.fileEncoder,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -270,7 +274,7 @@ func (u *Env) Flush() (err error) {
 }
 
 func (u *Env) PrintMatchedArchiviertIfNecessary() {
-	if !u.GetConfig().PrintOptions.PrintMatchedArchiviert {
+	if !u.GetConfig().PrintOptions.PrintMatchedDormant {
 		return
 	}
 

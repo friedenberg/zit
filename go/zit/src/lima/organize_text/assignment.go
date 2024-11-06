@@ -108,7 +108,7 @@ func (a Assignment) MaxHeadAndTail(
 	for _, z := range a.Objects.All() {
 		oKopf, oSchwanz := z.External.GetSku().ObjectId.LenHeadAndTail()
 
-		if o.PrintOptions.Abbreviations.Hinweisen {
+		if o.PrintOptions.Abbreviations.ZettelIds {
 			var err error
 
 			if oKopf, oSchwanz, err = o.Abbr.LenKopfUndSchwanz(

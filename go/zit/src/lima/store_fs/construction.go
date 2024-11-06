@@ -16,12 +16,13 @@ func MakeCwdFilesAll(
 	fileExtensions interfaces.FileExtensionGetter,
 	st dir_layout.DirLayout,
 	ofo object_inventory_format.Options,
+	fileEncoder FileEncoder,
 ) (fs *Store, err error) {
 	fs = &Store{
 		config:         k,
 		deletedPrinter: dp,
 		dirLayout:      st,
-		fileEncoder:    MakeFileEncoder(st, k),
+		fileEncoder:    fileEncoder,
 		fileExtensions: fileExtensions,
 		dir:            st.Cwd(),
 		dirItems:       makeObjectsWithDir(st.Cwd(), fileExtensions, st),

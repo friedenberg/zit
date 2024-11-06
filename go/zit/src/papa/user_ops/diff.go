@@ -36,7 +36,7 @@ func (op Diff) Run(
 	cofs, ok := col.(*sku.CheckedOut)
 
 	if !ok {
-		if col, err = op.GetStore().GetCwdFiles().CheckoutOne(
+		if col, err = op.GetStore().GetStoreFS().CheckoutOne(
 			checkout_options.Options{
 				CheckoutMode: checkout_mode.MetadataAndBlob,
 				OptionsWithoutMode: checkout_options.OptionsWithoutMode{
@@ -52,7 +52,7 @@ func (op Diff) Run(
 		cofs = col.(*sku.CheckedOut)
 
 		defer errors.Deferred(&err, func() (err error) {
-			if err = op.GetStore().GetCwdFiles().DeleteExternalLike(
+			if err = op.GetStore().GetStoreFS().DeleteExternalLike(
 				cofs.GetSkuExternalLike(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -78,7 +78,7 @@ func (op Diff) Run(
 		TextFormatterOptions:       options,
 	}
 
-	if mode, err = op.GetStore().GetCwdFiles().GetCheckoutModeOrError(el, mode); err != nil {
+	if mode, err = op.GetStore().GetStoreFS().GetCheckoutModeOrError(el, mode); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -103,7 +103,7 @@ func (op Diff) Run(
 
 	var fds *store_fs.Item
 
-	if fds, err = op.GetStore().GetCwdFiles().ReadFSItemFromExternal(el); err != nil {
+	if fds, err = op.GetStore().GetStoreFS().ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

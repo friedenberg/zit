@@ -2,16 +2,15 @@ package commands
 
 import (
 	"flag"
-	"io"
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/vim_cli_options_builder"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
@@ -35,9 +34,9 @@ func (c EditConfig) Run(u *env.Env, args ...string) (err error) {
 		ui.Err().Print("Command edit-konfig ignores passed in arguments.")
 	}
 
-	var sh interfaces.Sha
+	var sk *sku.Transacted
 
-	if sh, err = c.editInVim(u); err != nil {
+	if sk, err = c.editInVim(u); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -52,7 +51,10 @@ func (c EditConfig) Run(u *env.Env, args ...string) (err error) {
 		return
 	}
 
-	if _, err = u.GetStore().UpdateKonfig(sh); err != nil {
+	if err = u.GetStore().CreateOrUpdate(
+		sk,
+		object_mode.ModeLatest,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -67,10 +69,22 @@ func (c EditConfig) Run(u *env.Env, args ...string) (err error) {
 
 func (c EditConfig) editInVim(
 	u *env.Env,
-) (sh interfaces.Sha, err error) {
-	var p string
+) (sk *sku.Transacted, err error) {
+	var f *os.File
 
-	if p, err = c.makeTempConfigFile(u); err != nil {
+	if f, err = u.GetDirectoryLayout().TempLocal.FileTemp(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	p := f.Name()
+
+	if err = f.Close(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = c.makeTempConfigFile(u, p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -86,7 +100,7 @@ func (c EditConfig) editInVim(
 		return
 	}
 
-	if sh, err = c.readTempKonfigFile(u, p); err != nil {
+	if sk, err = c.readTempConfigFile(u, p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -96,7 +110,8 @@ func (c EditConfig) editInVim(
 
 func (c EditConfig) makeTempConfigFile(
 	u *env.Env,
-) (p string, err error) {
+	p string,
+) (err error) {
 	var k *sku.Transacted
 
 	if k, err = u.GetStore().ReadTransactedFromObjectId(&ids.Config{}); err != nil {
@@ -104,20 +119,21 @@ func (c EditConfig) makeTempConfigFile(
 		return
 	}
 
-	var f *os.File
+	var i sku.FSItem
+	i.Reset()
 
-	if f, err = u.GetDirectoryLayout().TempLocal.FileTemp(); err != nil {
+	if err = i.Object.Set(p); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, f)
+	i.MutableSetLike.Add(&i.Object)
 
-	p = f.Name()
-
-	format := u.GetStore().GetConfigBlobFormat()
-
-	if _, err = format.FormatSavedBlob(f, k.GetBlobSha()); err != nil {
+	if err = u.GetFileEncoder().Encode(
+		checkout_options.TextFormatterOptions{},
+		k,
+		&i,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -125,10 +141,17 @@ func (c EditConfig) makeTempConfigFile(
 	return
 }
 
-func (c EditConfig) readTempKonfigFile(
+func (c EditConfig) readTempConfigFile(
 	u *env.Env,
 	p string,
-) (sh interfaces.Sha, err error) {
+) (sk *sku.Transacted, err error) {
+	sk = sku.GetTransactedPool().Get()
+
+	if sk.ObjectId.Set("konfig"); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	var f *os.File
 
 	if f, err = files.Open(p); err != nil {
@@ -138,26 +161,13 @@ func (c EditConfig) readTempKonfigFile(
 
 	defer errors.DeferredCloser(&err, f)
 
-	format := u.GetStore().GetConfigBlobFormat()
-
-	var k mutable_config_blobs.V0
-
-	var aw interfaces.ShaWriteCloser
-
-	if aw, err = u.GetDirectoryLayout().BlobWriter(); err != nil {
+	if err = u.GetStore().GetStoreFS().ReadOneExternalObjectReader(
+		f,
+		sk,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	defer errors.DeferredCloser(&err, aw)
-
-	// TODO-P3 offer option to edit again
-	if _, err = format.ParseBlob(io.TeeReader(f, aw), &k); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	sh = aw.GetShaLike()
 
 	return
 }

@@ -79,7 +79,7 @@ func (c Mergetool) RunWithQuery(
 
 		var conflict *fd.FD
 
-		if conflict, err = u.GetStore().GetCwdFiles().GetConflictOrError(&cofs.External); err != nil {
+		if conflict, err = u.GetStore().GetStoreFS().GetConflictOrError(&cofs.External); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
+	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
@@ -49,4 +50,8 @@ func (u *Env) GetExternalLikePoolForRepoId(
 	repoId ids.RepoId,
 ) (of external_store.ObjectFactory) {
 	return
+}
+
+func (u *Env) GetFileEncoder() store_fs.FileEncoder {
+	return u.fileEncoder
 }
