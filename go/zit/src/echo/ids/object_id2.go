@@ -576,7 +576,16 @@ func (oid *objectId2) Set(v string) (err error) {
 
 	switch oid.g {
 	case genres.None:
-		k, err = Make(v)
+		if k, err = Make(v); err != nil {
+			oid.g = genres.Blob
+
+			if err = oid.left.Set(v); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
+		}
 
 	case genres.Zettel:
 		var h ZettelId

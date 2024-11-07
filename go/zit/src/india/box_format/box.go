@@ -186,7 +186,8 @@ func (f *Box) WriteStringFormatExternal(
 	}
 
 	objectIDField := string_format_writer.Field{
-		Value:              oidString,
+		Value: oidString,
+		// DisableValueQuotes: oid.GetGenre() != genres.Blob,
 		DisableValueQuotes: true,
 		ColorType:          string_format_writer.ColorTypeId,
 	}
