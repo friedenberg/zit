@@ -40,8 +40,7 @@ func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 
 func (s *Store) readOneExternalInto(
 	o *sku.CommitOptions,
-	i *Item,
-	t *sku.Transacted,
+	i *sku.FSItem, t *sku.Transacted,
 	e *sku.Transacted,
 ) (err error) {
 	if err = s.WriteFSItemToExternal(i, e); err != nil {
@@ -128,8 +127,7 @@ func (s *Store) readOneExternalInto(
 func (s *Store) readOneExternalObject(
 	e *sku.Transacted,
 	t *sku.Transacted,
-	i *Item,
-) (err error) {
+	i *sku.FSItem) (err error) {
 	if t != nil {
 		object_metadata.Resetter.ResetWith(
 			e.GetMetadata(),
@@ -169,8 +167,7 @@ func (s *Store) ReadOneExternalObjectReader(
 func (s *Store) ReadOneExternalBlob(
 	e *sku.Transacted,
 	t *sku.Transacted,
-	i *Item,
-) (err error) {
+	i *sku.FSItem) (err error) {
 	object_metadata.Resetter.ResetWith(&e.Metadata, t.GetMetadata())
 
 	// TODO use cache

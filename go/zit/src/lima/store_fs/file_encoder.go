@@ -18,8 +18,7 @@ type FileEncoder interface {
 	Encode(
 		options checkout_options.TextFormatterOptions,
 		z *sku.Transacted,
-		i *Item,
-	) (err error)
+		i *sku.FSItem) (err error)
 }
 
 type fileEncoder struct {
@@ -190,8 +189,7 @@ func (e *fileEncoder) EncodeObject(
 func (e *fileEncoder) Encode(
 	options checkout_options.TextFormatterOptions,
 	z *sku.Transacted,
-	i *Item,
-) (err error) {
+	i *sku.FSItem) (err error) {
 	return e.EncodeObject(
 		options,
 		z,

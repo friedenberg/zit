@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
@@ -35,7 +34,7 @@ func (c CreateFromPaths) Run(
 
 	for _, arg := range args {
 		var z *sku.Transacted
-		var i store_fs.Item
+		var i sku.FSItem
 
 		i.Reset()
 

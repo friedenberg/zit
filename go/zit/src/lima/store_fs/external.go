@@ -13,7 +13,7 @@ func (s *Store) GetCheckoutModeOrError(
 	el sku.ExternalLike,
 	originalMode checkout_mode.Mode,
 ) (m checkout_mode.Mode, err error) {
-	var fds *Item
+	var fds *sku.FSItem
 
 	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
@@ -51,7 +51,7 @@ func (s *Store) GetCheckoutModeOrError(
 func (s *Store) GetConflictOrError(
 	el sku.ExternalLike,
 ) (f *fd.FD, err error) {
-	var fds *Item
+	var fds *sku.FSItem
 
 	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
@@ -66,7 +66,7 @@ func (s *Store) GetConflictOrError(
 func (s *Store) GetObjectOrError(
 	el sku.ExternalLike,
 ) (f *fd.FD, err error) {
-	var fds *Item
+	var fds *sku.FSItem
 
 	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
@@ -82,7 +82,7 @@ func (s *Store) SetObjectOrError(
 	el sku.ExternalLike,
 	object *fd.FD,
 ) (err error) {
-	var fds *Item
+	var fds *sku.FSItem
 
 	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
@@ -102,7 +102,7 @@ func (s *Store) SetObjectOrError(
 func (s *Store) GetBlobOrError(
 	el sku.ExternalLike,
 ) (f *fd.FD, err error) {
-	var fds *Item
+	var fds *sku.FSItem
 
 	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
@@ -118,7 +118,7 @@ func (s *Store) SetBlobOrError(
 	el sku.ExternalLike,
 	blob *fd.FD,
 ) (err error) {
-	var fds *Item
+	var fds *sku.FSItem
 
 	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
@@ -138,7 +138,7 @@ func (s *Store) SetBlobOrError(
 func (s *Store) UpdateDescriptionFromBlobs(
 	el sku.ExternalLike,
 ) (err error) {
-	var fds *Item
+	var fds *sku.FSItem
 
 	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)

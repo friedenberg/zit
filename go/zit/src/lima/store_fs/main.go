@@ -23,8 +23,6 @@ func init() {
 	gob.Register(sku.Transacted{})
 }
 
-type Item = sku.FSItem
-
 type Store struct {
 	config              sku.Config
 	deletedPrinter      interfaces.FuncIter[*fd.FD]
@@ -49,7 +47,7 @@ func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
 func (s *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
 	e := el.(*sku.Transacted)
 
-	var i *Item
+	var i *sku.FSItem
 
 	if i, err = s.ReadFSItemFromExternal(e); err != nil {
 		err = errors.Wrap(err)
@@ -111,13 +109,13 @@ func (fs *Store) String() (out string) {
 	}
 
 	fs.dirItems.objects.Each(
-		func(z *Item) (err error) {
+		func(z *sku.FSItem) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
 
 	fs.blobs.Each(
-		func(z *Item) (err error) {
+		func(z *sku.FSItem) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
@@ -138,7 +136,7 @@ func (s *Store) GetExternalObjectIds() (ks []sku.ExternalObjectId, err error) {
 	var l sync.Mutex
 
 	if err = s.All(
-		func(kfp *Item) (err error) {
+		func(kfp *sku.FSItem) (err error) {
 			l.Lock()
 			defer l.Unlock()
 
@@ -162,7 +160,7 @@ func (s *Store) GetObjectIdsForDir(
 		return
 	}
 
-	var results []*Item
+	var results []*sku.FSItem
 
 	if results, err = s.dirItems.processDir(fd.GetPath()); err != nil {
 		err = errors.Wrap(err)
@@ -200,7 +198,7 @@ func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err e
 			return
 		}
 	} else {
-		var results []*Item
+		var results []*sku.FSItem
 
 		if _, results, err = s.dirItems.processFD(fdee); err != nil {
 			err = errors.Wrap(err)
@@ -219,7 +217,7 @@ func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err e
 
 func (fs *Store) Get(
 	k interfaces.ObjectId,
-) (t *Item, ok bool) {
+) (t *sku.FSItem, ok bool) {
 	return fs.dirItems.objects.Get(k.String())
 }
 
@@ -237,8 +235,8 @@ func (s *Store) ApplyDotOperator() (err error) {
 	return
 }
 
-func (s *Store) ReadFSItemFromExternal(el sku.ExternalLike) (i *Item, err error) {
-	i = &Item{} // TODO use pool or use dir_items?
+func (s *Store) ReadFSItemFromExternal(el sku.ExternalLike) (i *sku.FSItem, err error) {
+	i = &sku.FSItem{} // TODO use pool or use dir_items?
 	i.Reset()
 
 	e := el.(*sku.Transacted)
@@ -284,7 +282,10 @@ func (s *Store) ReadFSItemFromExternal(el sku.ExternalLike) (i *Item, err error)
 	return
 }
 
-func (s *Store) WriteFSItemToExternal(i *Item, el sku.ExternalLike) (err error) {
+func (s *Store) WriteFSItemToExternal(
+  i *sku.FSItem,
+  el sku.ExternalLike,
+) (err error) {
 	e := el.(*sku.Transacted)
 	e.Metadata.Fields = e.Metadata.Fields[:0]
 	k := &i.ObjectId

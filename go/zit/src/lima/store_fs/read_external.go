@@ -28,8 +28,7 @@ func (s *Store) ReadExternalLikeFromObjectId(
 
 func (s *Store) ReadExternalFromItem(
 	o sku.CommitOptions,
-	i *Item,
-	t *sku.Transacted,
+	i *sku.FSItem, t *sku.Transacted,
 ) (e *sku.Transacted, err error) {
 	e = GetExternalPool().Get()
 
@@ -43,8 +42,7 @@ func (s *Store) ReadExternalFromItem(
 
 func (s *Store) readIntoExternalFromItem(
 	o sku.CommitOptions,
-	i *Item,
-	t *sku.Transacted,
+	i *sku.FSItem, t *sku.Transacted,
 	e *sku.Transacted,
 ) (err error) {
 	o.Del(object_mode.ModeApplyProto)

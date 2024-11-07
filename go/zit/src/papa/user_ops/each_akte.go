@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 	"github.com/google/shlex"
 )
@@ -27,7 +26,7 @@ func (c EachBlob) Run(
 	var blob_store []string
 
 	for col := range zsc.All() {
-		var fds *store_fs.Item
+		var fds *sku.FSItem
 
 		if fds, err = c.GetStore().GetStoreFS().ReadFSItemFromExternal(
 			col.GetSkuExternalLike(),

@@ -18,7 +18,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
@@ -101,7 +100,7 @@ func (op Diff) Run(
 	internalInline := op.GetConfig().IsInlineType(il.GetType())
 	externalInline := op.GetConfig().IsInlineType(el.GetType())
 
-	var fds *store_fs.Item
+	var fds *sku.FSItem
 
 	if fds, err = op.GetStore().GetStoreFS().ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)

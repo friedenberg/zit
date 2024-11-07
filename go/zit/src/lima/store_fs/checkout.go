@@ -31,7 +31,7 @@ func (s *Store) CheckoutOne(
 func (s *Store) checkoutOneNew(
 	options checkout_options.Options,
 	tg sku.TransactedGetter,
-) (cz *sku.CheckedOut, i *Item, err error) {
+) (cz *sku.CheckedOut, i *sku.FSItem, err error) {
 	sz := tg.GetSku()
 
 	cz = GetCheckedOutPool().Get()
@@ -39,7 +39,7 @@ func (s *Store) checkoutOneNew(
 	sku.Resetter.ResetWith(&cz.Internal, sz)
 
 	if s.config.IsDryRun() {
-		i = &Item{}
+		i = &sku.FSItem{}
 		return
 	}
 
@@ -127,7 +127,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	options.Path = checkout_options.PathTempLocal
 
 	var replacement *sku.CheckedOut
-	var oldFDs, newFDs *Item
+	var oldFDs, newFDs *sku.FSItem
 
 	if oldFDs, err = s.ReadFSItemFromExternal(col.GetSkuExternalLike()); err != nil {
 		err = errors.Wrap(err)
@@ -170,8 +170,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 func (s *Store) checkoutOne(
 	options checkout_options.Options,
 	cz *sku.CheckedOut,
-	i *Item,
-) (err error) {
+	i *sku.FSItem) (err error) {
 	if s.config.IsDryRun() {
 		return
 	}
@@ -356,7 +355,7 @@ func (s *Store) FileExtensionForGenre(
 	return ext
 }
 
-func (s *Store) RemoveItem(i *Item) (err error) {
+func (s *Store) RemoveItem(i *sku.FSItem) (err error) {
 	// TODO check conflict state
 	if err = i.MutableSetLike.Each(
 		func(f *fd.FD) (err error) {

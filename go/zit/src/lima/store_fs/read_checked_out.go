@@ -13,8 +13,7 @@ import (
 // TODO remove Item from construction
 func (s *Store) readCheckedOutFromItem(
 	o sku.CommitOptions,
-	i *Item,
-) (co *sku.CheckedOut, err error) {
+	i *sku.FSItem) (co *sku.CheckedOut, err error) {
 	co = GetCheckedOutPool().Get()
 
 	if err = s.externalStoreSupplies.FuncReadOneInto(
@@ -76,7 +75,7 @@ func (s *Store) readIntoCheckedOutFromTransacted(
 
 	ok := false
 
-	var kfp *Item
+	var kfp *sku.FSItem
 
 	if kfp, ok = s.Get(&sk.ObjectId); !ok {
 		err = collections.MakeErrNotFound(sk.GetObjectId())
@@ -118,8 +117,7 @@ func (s *Store) readIntoCheckedOutFromTransacted(
 
 func (s *Store) readIntoCheckedOutFromTransactedAndItem(
 	sk *sku.Transacted,
-	i *Item,
-	co *sku.CheckedOut,
+	i *sku.FSItem, co *sku.CheckedOut,
 ) (err error) {
 	if &co.Internal != sk {
 		sku.Resetter.ResetWith(&co.Internal, sk)

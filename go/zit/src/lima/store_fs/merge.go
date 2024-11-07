@@ -18,7 +18,7 @@ import (
 )
 
 func (s *Store) Merge(tm sku.Conflicted) (err error) {
-	var original, replacement *Item
+	var original, replacement *sku.FSItem
 
 	original, replacement, mergeResult := s.tryMergeIgnoringConflicts(tm)
 
@@ -69,7 +69,7 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 func (s *Store) checkoutConflictedForMerge(
 	tm sku.Conflicted,
 	mode checkout_mode.Mode,
-) (left, middle, right *Item, err error) {
+) (left, middle, right *sku.FSItem, err error) {
 	if _, left, err = s.checkoutOneForMerge(mode, tm.Left); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -90,13 +90,13 @@ func (s *Store) checkoutConflictedForMerge(
 
 func (s *Store) tryMergeIgnoringConflicts(
 	tm sku.Conflicted,
-) (original, replacement *Item, err error) {
+) (original, replacement *sku.FSItem, err error) {
 	if err = tm.MergeTags(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	var leftItem, middleItem, rightItem *Item
+	var leftItem, middleItem, rightItem *sku.FSItem
 
 	inlineBlob := tm.IsAllInlineType(s.config)
 
@@ -130,7 +130,7 @@ func (s *Store) tryMergeIgnoringConflicts(
 			&rightItem.Object,
 		)
 
-		replacement = &Item{}
+		replacement = &sku.FSItem{}
 
 		if err = replacement.Object.SetPath(path); err != nil {
 			err = errors.Wrap(err)
@@ -149,7 +149,7 @@ func (s *Store) tryMergeIgnoringConflicts(
 func (s *Store) checkoutOneForMerge(
 	mode checkout_mode.Mode,
 	sz *sku.Transacted,
-) (cz *sku.CheckedOut, i *Item, err error) {
+) (cz *sku.CheckedOut, i *sku.FSItem, err error) {
 	options := checkout_options.Options{
 		CheckoutMode: mode,
 		OptionsWithoutMode: checkout_options.OptionsWithoutMode{
@@ -213,7 +213,7 @@ func (s *Store) handleMergeResult(
 		return
 	}
 
-	var i *Item
+	var i *sku.FSItem
 
 	if i, err = s.ReadFSItemFromExternal(&cofs.External); err != nil {
 		err = errors.Wrap(err)
@@ -257,7 +257,7 @@ func (s *Store) RunMergeTool(
 		mode = checkout_mode.MetadataOnly
 	}
 
-	var leftItem, middleItem, rightItem *Item
+	var leftItem, middleItem, rightItem *sku.FSItem
 
 	if leftItem, middleItem, rightItem, err = s.checkoutConflictedForMerge(
 		tm,
@@ -336,7 +336,7 @@ func (s *Store) RunMergeTool(
 	return
 }
 
-func MakeErrMergeConflict(sk *Item) (err *ErrMergeConflict) {
+func MakeErrMergeConflict(sk *sku.FSItem) (err *ErrMergeConflict) {
 	err = &ErrMergeConflict{}
 
 	if sk != nil {
@@ -347,7 +347,7 @@ func MakeErrMergeConflict(sk *Item) (err *ErrMergeConflict) {
 }
 
 type ErrMergeConflict struct {
-	Item
+	sku.FSItem
 }
 
 func (e *ErrMergeConflict) Is(target error) bool {

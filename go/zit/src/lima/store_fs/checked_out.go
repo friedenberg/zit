@@ -13,7 +13,7 @@ func (s *Store) ToSliceFilesZettelen(
 	return quiter.DerivedValues(
 		cos,
 		func(col sku.CheckedOutLike) (e string, err error) {
-			var fds *Item
+			var fds *sku.FSItem
 
 			if fds, err = s.ReadFSItemFromExternal(col.GetSkuExternalLike()); err != nil {
 				err = errors.Wrap(err)
@@ -38,7 +38,7 @@ func (s *Store) ToSliceFilesBlobs(
 	return quiter.DerivedValues(
 		cos,
 		func(col sku.CheckedOutLike) (e string, err error) {
-			var fds *Item
+			var fds *sku.FSItem
 
 			if fds, err = s.ReadFSItemFromExternal(col.GetSkuExternalLike()); err != nil {
 				err = errors.Wrap(err)
