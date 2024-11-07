@@ -44,11 +44,11 @@ func (a Abbr) ExpanderFor(g genres.Genre) FuncExpandString {
 	}
 }
 
-func (a Abbr) LenKopfUndSchwanz(
+func (a Abbr) LenHeadAndTail(
 	in *ObjectId,
-) (kopf, schwanz int, err error) {
+) (head, tail int, err error) {
 	if in.GetGenre() != genres.Zettel || a.ZettelId.Abbreviate == nil {
-		kopf, schwanz = in.LenHeadAndTail()
+		head, tail = in.LenHeadAndTail()
 		return
 	}
 
@@ -71,8 +71,8 @@ func (a Abbr) LenKopfUndSchwanz(
 		return
 	}
 
-	kopf = len(h.GetHead())
-	schwanz = len(h.GetTail())
+	head = len(h.GetHead())
+	tail = len(h.GetTail())
 
 	return
 }

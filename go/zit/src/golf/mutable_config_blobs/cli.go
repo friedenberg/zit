@@ -24,7 +24,7 @@ type Cli struct {
 	CheckoutCacheEnabled bool
 	PredictableZettelIds bool
 
-	PrintOptions, maskPrintOptions options_print.General
+	PrintOptions, maskPrintOptions options_print.V0
 	ToolOptions                    options_tools.Options
 
 	descriptions.Description
@@ -78,7 +78,7 @@ func DefaultCli() (c Cli) {
 }
 
 func (c *Cli) ApplyPrintOptionsConfig(
-	po options_print.General,
+	po options_print.V0,
 ) {
 	cliSet := c.PrintOptions
 	c.PrintOptions = po

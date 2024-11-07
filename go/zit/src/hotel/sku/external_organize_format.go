@@ -25,7 +25,7 @@ type ObjectIdAlignedFormat interface {
 }
 
 func MakeFormatOrganize(
-	options options_print.General,
+	options options_print.V0,
 	shaStringFormatWriter interfaces.StringFormatWriter[interfaces.Sha],
 	objectIdStringFormatWriter id_fmts.Aligned,
 	typeStringFormatWriter interfaces.StringFormatWriter[*ids.Type],
@@ -46,7 +46,7 @@ func MakeFormatOrganize(
 }
 
 type Organize struct {
-	options options_print.General
+	options options_print.V0
 
 	maxKopf, maxSchwanz int
 	padding             string

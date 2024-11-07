@@ -161,7 +161,7 @@ type OrganizeResults struct {
 }
 
 func ChangesFrom(
-	po options_print.General,
+	po options_print.V0,
 	a, b *Text,
 	original sku.ExternalLikeSet,
 ) (c Changes, err error) {
@@ -180,7 +180,7 @@ func ChangesFrom(
 }
 
 func ChangesFromResults(
-	po options_print.General,
+	po options_print.V0,
 	results OrganizeResults,
 ) (c Changes, err error) {
 	if err = applyToText(po, results.Before); err != nil {
@@ -224,7 +224,7 @@ func ChangesFromResults(
 }
 
 func applyToText(
-	po options_print.General,
+	po options_print.V0,
 	t *Text,
 ) (err error) {
 	if po.PrintTagsAlways {

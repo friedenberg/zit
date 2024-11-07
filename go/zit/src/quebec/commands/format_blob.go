@@ -272,7 +272,7 @@ func (c *FormatBlob) getBlobFormatter(
 		return
 	}
 
-	var g type_blobs.FormatterUTIGroup
+	var g type_blobs.UTIGroup
 	g, ok = typeBlob.GetFormatterUTIGroups()[c.UTIGroup]
 
 	if !ok {

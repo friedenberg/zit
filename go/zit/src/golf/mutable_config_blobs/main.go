@@ -21,7 +21,7 @@ type (
 		interfaces.MutableStoredConfig
 		GetDefaults() Defaults
 		GetFileExtensions() interfaces.FileExtensionGetter
-		GetPrintOptions() options_print.General
+		GetPrintOptions() options_print.V0
 	}
 
 	Defaults interface {

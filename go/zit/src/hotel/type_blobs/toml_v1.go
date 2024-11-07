@@ -10,7 +10,7 @@ type TomlV1 struct {
 	FileExtension string                                    `toml:"file-extension,omitempty"`
 	ExecCommand   *script_config.ScriptConfig               `toml:"exec-command,omitempty"`
 	VimSyntaxType string                                    `toml:"vim-syntax-type"`
-	UTIGroups     map[string]FormatterUTIGroup              `toml:"uti-groups"`
+	UTIGroups     map[string]UTIGroup              `toml:"uti-groups"`
 	Formatters    map[string]script_config.WithOutputFormat `toml:"formatters,omitempty"`
 	Hooks         interface{}                               `toml:"hooks"`
 }
@@ -42,7 +42,7 @@ func (a *TomlV1) GetFormatters() map[string]script_config.WithOutputFormat {
 	return a.Formatters
 }
 
-func (a *TomlV1) GetFormatterUTIGroups() map[string]FormatterUTIGroup {
+func (a *TomlV1) GetFormatterUTIGroups() map[string]UTIGroup {
 	return a.UTIGroups
 }
 

@@ -2,13 +2,13 @@ package type_blobs
 
 import "code.linenisgreat.com/zit/go/zit/src/bravo/equality"
 
-type FormatterUTIGroup map[string]string
+type UTIGroup map[string]string
 
-func (a FormatterUTIGroup) Map() map[string]string {
+func (a UTIGroup) Map() map[string]string {
 	return map[string]string(a)
 }
 
-func (a *FormatterUTIGroup) Equals(b FormatterUTIGroup) bool {
+func (a *UTIGroup) Equals(b UTIGroup) bool {
 	if b == nil {
 		return false
 	}
@@ -24,7 +24,7 @@ func (a *FormatterUTIGroup) Equals(b FormatterUTIGroup) bool {
 	return true
 }
 
-func (ct *FormatterUTIGroup) Merge(ct2 FormatterUTIGroup) {
+func (ct *UTIGroup) Merge(ct2 UTIGroup) {
 	for k, v := range ct2.Map() {
 		if v != "" {
 			ct.Map()[k] = v

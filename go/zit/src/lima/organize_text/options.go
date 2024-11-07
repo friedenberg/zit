@@ -41,11 +41,10 @@ type Options struct {
 	Abbr ids.Abbr
 
 	UsePrefixJoints        bool
-	UseRightAlignedIndents bool
 	UseRefiner             bool
 	UseMetadataHeader      bool
 
-	PrintOptions options_print.General
+	PrintOptions options_print.V0
 	fmtBox       *box_format.Box
 }
 
@@ -101,13 +100,6 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 		"split tags around hyphens",
 	)
 
-	f.BoolVar(
-		&o.UseRightAlignedIndents,
-		"right-align",
-		true,
-		"right-align tags",
-	)
-
 	f.BoolVar(&o.UseRefiner, "refine", true, "refine the organize tree")
 
 	f.BoolVar(
@@ -119,7 +111,7 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 }
 
 func (o *Flags) GetOptionsWithMetadata(
-	printOptions options_print.General,
+	printOptions options_print.V0,
 	skuFmt *box_format.Box,
 	abbr ids.Abbr,
 	of external_store.ObjectFactory,
@@ -144,7 +136,7 @@ func (o *Flags) GetOptionsWithMetadata(
 }
 
 func (o *Flags) GetOptions(
-	printOptions options_print.General,
+	printOptions options_print.V0,
 	q TagSetGetter,
 	skuBoxFormat *box_format.Box,
 	abbr ids.Abbr, // TODO move Abbr as required arg

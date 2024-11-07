@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 )
 
-// TODO switch to interfaces instead of structs
 type VersionedStores struct {
 	InventoryList InventoryStore
 	Repo          RepoStore
@@ -32,20 +31,16 @@ func Make(
 	}
 }
 
-func (a *VersionedStores) GetTypeV0() Store[type_blobs.V0, *type_blobs.V0] {
-	return a.Type.toml_v0
-}
-
 func (a *VersionedStores) GetTypeV1() Store[type_blobs.TomlV1, *type_blobs.TomlV1] {
 	return a.Type.toml_v1
 }
 
-func (a *VersionedStores) GetConfig() ConfigStore {
-	return a.Config
-}
-
 func (a *VersionedStores) GetType() TypeStore {
 	return a.Type
+}
+
+func (a *VersionedStores) GetConfig() ConfigStore {
+	return a.Config
 }
 
 func (a *VersionedStores) GetTag() TagStore {

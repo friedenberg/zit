@@ -15,7 +15,7 @@ type V0 struct {
 	FileExtensions  file_extensions.V0                    `toml:"file-extensions"`
 	RemoteScripts   map[string]script_config.RemoteScript `toml:"remote-scripts"`
 	Actions         map[string]script_config.ScriptConfig `toml:"actions,omitempty"`
-	PrintOptions    options_print.General                 `toml:"cli-output"`
+	PrintOptions    options_print.V0                 `toml:"cli-output"`
 	Tools           options_tools.Options                 `toml:"tools"`
 	Filters         map[string]string                     `toml:"filters"`
 }
@@ -60,6 +60,6 @@ func (a V0) GetFileExtensions() interfaces.FileExtensionGetter {
 	return a.FileExtensions
 }
 
-func (a V0) GetPrintOptions() options_print.General {
+func (a V0) GetPrintOptions() options_print.V0 {
 	return a.PrintOptions
 }

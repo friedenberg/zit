@@ -34,7 +34,7 @@ type indexAbbrEncodableTridexes struct {
 }
 
 type indexAbbr struct {
-	options_print.General
+	options_print.V0
 
 	lock      sync.Locker
 	once      *sync.Once
@@ -49,12 +49,12 @@ type indexAbbr struct {
 }
 
 func newIndexAbbr(
-	options options_print.General,
+	options options_print.V0,
 	dirLayout dir_layout.DirLayout,
 	p string,
 ) (i *indexAbbr, err error) {
 	i = &indexAbbr{
-		General:   options,
+		V0:   options,
 		lock:      &sync.Mutex{},
 		once:      &sync.Once{},
 		path:      p,

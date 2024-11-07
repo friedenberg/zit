@@ -90,21 +90,13 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 
 	lw := format.NewLineWriter()
 
-	kopf, schwanz := ot.MaxHeadAndTail(ot.Options)
-
-	l := ot.MaxLen()
-
 	omit := ot.HasMetadataContent()
 
 	aw := writer{
 		ObjectFactory:        ot.ObjectFactory,
 		LineWriter:           lw,
 		maxDepth:             ot.MaxDepth(),
-		maxHead:              kopf,
-		maxTail:              schwanz,
-		maxLen:               l,
 		Metadata:             ot.AsMetadata(),
-		RightAlignedIndents:  ot.UseRightAlignedIndents,
 		OmitLeadingEmptyLine: omit,
 		options:              ot.Options,
 	}
@@ -119,8 +111,6 @@ func (ot Text) WriteTo(out io.Writer) (n int64, err error) {
 			}
 		}
 	}
-
-	aw.options.fmtBox.SetMaxKopfUndSchwanz(kopf, schwanz)
 
 	if err = aw.write(ot.Assignment); err != nil {
 		err = errors.Wrap(err)

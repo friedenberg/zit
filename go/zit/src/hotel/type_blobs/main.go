@@ -35,7 +35,7 @@ type WithFormatters interface {
 }
 
 type WithFormatterUTIGropus interface {
-	GetFormatterUTIGroups() map[string]FormatterUTIGroup
+	GetFormatterUTIGroups() map[string]UTIGroup
 }
 
 // TODO make typed hooks

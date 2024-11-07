@@ -102,46 +102,6 @@ func (a Assignment) MaxLen() (m int) {
 	return
 }
 
-func (a Assignment) MaxHeadAndTail(
-	o Options,
-) (kopf, schwanz int) {
-	for _, z := range a.Objects.All() {
-		oKopf, oSchwanz := z.External.GetSku().ObjectId.LenHeadAndTail()
-
-		if o.PrintOptions.Abbreviations.ZettelIds {
-			var err error
-
-			if oKopf, oSchwanz, err = o.Abbr.LenKopfUndSchwanz(
-				&z.External.GetSku().ObjectId,
-			); err != nil {
-				panic(err)
-			}
-		}
-
-		if oKopf > kopf {
-			kopf = oKopf
-		}
-
-		if oSchwanz > schwanz {
-			schwanz = oSchwanz
-		}
-	}
-
-	for _, c := range a.Children {
-		zKopf, zSchwanz := c.MaxHeadAndTail(o)
-
-		if zKopf > kopf {
-			kopf = zKopf
-		}
-
-		if zSchwanz > schwanz {
-			schwanz = zSchwanz
-		}
-	}
-
-	return
-}
-
 func (a Assignment) String() (s string) {
 	if a.Parent != nil {
 		s = a.Parent.String() + "."

@@ -8,7 +8,7 @@ import (
 )
 
 func (u *Env) StringFormatWriterSkuBox(
-	po options_print.General,
+	po options_print.V0,
 	co string_format_writer.ColorOptions,
 	truncation string_format_writer.CliFormatTruncation,
 ) *box_format.Box {

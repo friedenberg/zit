@@ -19,7 +19,7 @@ import (
 
 func MakeBox(
 	co string_format_writer.ColorOptions,
-	options options_print.General,
+	options options_print.V0,
 	fieldsFormatWriter interfaces.StringFormatWriter[string_format_writer.Box],
 	abbr ids.Abbr,
 	fsItemReadWriter sku.FSItemReadWriter,
@@ -37,7 +37,7 @@ func MakeBox(
 
 type Box struct {
 	string_format_writer.ColorOptions
-	Options options_print.General
+	Options options_print.V0
 
 	MaxHead, MaxTail int
 	Padding          string
@@ -222,7 +222,7 @@ func (f *Box) WriteStringFormatExternal(
 }
 
 func (f *Box) WriteMetadataToBox(
-	options options_print.General,
+	options options_print.V0,
 	o *sku.Transacted,
 	includeDescriptionInBox bool,
 	box *string_format_writer.Box,

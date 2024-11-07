@@ -11,7 +11,7 @@ import (
 type V1 struct {
 	Defaults       DefaultsV1            `toml:"defaults"`
 	FileExtensions file_extensions.V1    `toml:"file-extensions"`
-	PrintOptions   options_print.General `toml:"cli-output"`
+	PrintOptions   options_print.V0 `toml:"cli-output"`
 	Tools          options_tools.Options `toml:"tools"`
 }
 
@@ -45,6 +45,6 @@ func (a V1) GetFileExtensions() interfaces.FileExtensionGetter {
 	return a.FileExtensions
 }
 
-func (a V1) GetPrintOptions() options_print.General {
+func (a V1) GetPrintOptions() options_print.V0 {
 	return a.PrintOptions
 }

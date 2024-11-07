@@ -572,11 +572,11 @@ function organize_v5_outputs_organize_one_tags_group_by_one { # @test
 		- task
 		---
 
-		          # priority-1
+		    # priority-1
 
 		- [two/uno !md priority-2] wow
 
-		          # priority-2
+		    # priority-2
 
 		- [two/uno !md priority-1] wow
 	EOM
@@ -653,11 +653,11 @@ function organize_v5_outputs_organize_two_zettels_one_tags_group_by_one { # @tes
 		- task
 		---
 
-		           # priority-1
+		    # priority-1
 
 		- [two/uno !md] one/uno
 
-		           # priority-2
+		    # priority-2
 
 		- [one/tres !md] two/dos
 	EOM
@@ -965,16 +965,17 @@ function organize_v5_commits_no_changes { # @test
 		- task
 		---
 
-		           # priority-1
+		    # priority-1
 
-		          ## w-2022-07-06
+		   ## w-2022-07-06
 
 		- [one/tres !md] two/dos
 		- [two/dos !md] 3
 
-		          ## w-2022-07-07
+		   ## w-2022-07-07
 
 		- [two/uno !md] one/uno
+
 	EOM
 
 	run_zit organize "${cmd_def_organize[@]}" \
