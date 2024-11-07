@@ -1,24 +1,24 @@
-package user_ops
+package store_fs
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/exec_editor"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
-type OpenEditor struct {
-	VimOptions []string
+type Open struct {
+	Options []string
 }
 
-func (c OpenEditor) Run(
-	u *env.Env,
+func (c Open) Run(
+	ph interfaces.FuncIter[string],
 	args ...string,
 ) (err error) {
 	var editor exec_editor.Editor
 
 	if editor, err = exec_editor.MakeEditorWithVimOptions(
-		u.PrinterHeader(),
-		c.VimOptions,
+		ph,
+		c.Options,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

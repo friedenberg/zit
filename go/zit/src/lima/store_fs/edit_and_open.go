@@ -48,14 +48,19 @@ func (s *Store) openZettels(
 		return
 	}
 
-	editor := exec_editor.MakeEditorWithVimOptions(
+	var editor exec_editor.Editor
+
+	if editor, err = exec_editor.MakeEditorWithVimOptions(
 		ph,
 		vim_cli_options_builder.New().
 			WithCursorLocation(2, 3).
 			WithFileType("zit-zettel").
 			WithInsertMode().
 			Build(),
-	)
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	if err = editor.Run(filesZettels); err != nil {
 		err = errors.Wrap(err)
