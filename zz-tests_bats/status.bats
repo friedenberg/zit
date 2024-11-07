@@ -397,3 +397,13 @@ function status_conflict { # @test
 		       conflicted [one/dos.zettel]
 	EOM
 }
+
+function status_external_files { # @test
+	skip
+	echo "test file" >"test file.md"
+	run_zit status "test file.md"
+	assert_success
+	assert_output - <<-EOM
+		       conflicted [one/dos.zettel]
+	EOM
+}

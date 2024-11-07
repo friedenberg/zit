@@ -15,11 +15,11 @@ import (
 )
 
 type Checkin struct {
-	Delete bool
-	Proto  sku.Proto
+	Proto sku.Proto
 
 	// TODO make flag family disambiguate these options
 	// and use with other commands too
+	Delete             bool
 	Organize           bool
 	CheckoutBlobAndRun string
 	OpenBlob           bool
@@ -30,6 +30,8 @@ func (op Checkin) Run(
 	u *env.Env,
 	qg *query.Group,
 ) (err error) {
+	// TODO make organize use results in order to support open blob via organize
+	// path
 	results := sku.MakeTransactedMutableSet()
 
 	if op.Organize {
@@ -49,12 +51,16 @@ func (op Checkin) Run(
 				cofs := col.(*sku.CheckedOut)
 				z := col.GetSkuExternalLike().GetSku()
 
-				if cofs.State == checked_out_state.Untracked && cofs.External.GetGenre() == genres.Zettel {
+				if cofs.State == checked_out_state.Untracked &&
+					(cofs.External.GetGenre() == genres.Zettel ||
+						cofs.External.GetGenre() == genres.Blob) {
 					if z.Metadata.IsEmpty() {
 						return
 					}
 
-					if err = u.GetStore().GetStoreFS().UpdateDescriptionFromBlobs(&cofs.External); err != nil {
+					if err = u.GetStore().GetStoreFS().UpdateTransactedFromBlobs(
+						&cofs.External,
+					); err != nil {
 						err = errors.Wrap(err)
 						return
 					}

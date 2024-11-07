@@ -2,6 +2,7 @@ package string_format_writer
 
 import (
 	"fmt"
+	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
@@ -205,7 +206,8 @@ func (f *fieldsWriter) writeStringFormatField(
 
 	format := "%s%s%s%s"
 
-	if field.ColorType == ColorTypeUserData && !field.DisableValueQuotes {
+	if (strings.ContainsRune(field.Value, ' ') || field.ColorType == ColorTypeUserData) &&
+		!field.DisableValueQuotes {
 		format = "%s%q%s%s"
 	}
 

@@ -135,7 +135,7 @@ func (s *Store) SetBlobOrError(
 	return
 }
 
-func (s *Store) UpdateDescriptionFromBlobs(
+func (s *Store) UpdateTransactedFromBlobs(
 	el sku.ExternalLike,
 ) (err error) {
 	var fds *sku.FSItem
@@ -158,6 +158,23 @@ func (s *Store) UpdateDescriptionFromBlobs(
 		if err = el.GetSku().Metadata.Description.Set(desc); err != nil {
 			err = errors.Wrap(err)
 			return
+		}
+	}
+
+	if !fds.Blob.IsEmpty() {
+		blobFD := &fds.Blob
+		ext := blobFD.ExtSansDot()
+		typFromExtension := s.config.GetTypeStringFromExtension(ext)
+
+		if typFromExtension == "" {
+			typFromExtension = ext
+		}
+
+		if typFromExtension != "" {
+			if err = el.GetSku().Metadata.Type.Set(typFromExtension); err != nil {
+				err = errors.Wrapf(err, "Path: %s", blobFD.GetPath())
+				return
+			}
 		}
 	}
 

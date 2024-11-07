@@ -183,8 +183,8 @@ func (f *Box) addFieldsExternal(
 	objectIDField := string_format_writer.Field{
 		Value: oidString,
 		// DisableValueQuotes: oid.GetGenre() != genres.Blob,
-		DisableValueQuotes: true,
-		ColorType:          string_format_writer.ColorTypeId,
+		// DisableValueQuotes: true,
+		ColorType: string_format_writer.ColorTypeId,
 	}
 
 	box.Contents = append(box.Contents, objectIDField)

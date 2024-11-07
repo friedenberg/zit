@@ -48,8 +48,8 @@ func (f *Box) addFieldsFS(
 		box.Contents = append(
 			box.Contents,
 			string_format_writer.Field{
-				Value:              (*ids.ObjectIdStringerSansRepo)(&o.ObjectId).String(),
-				DisableValueQuotes: true,
+				Value: (*ids.ObjectIdStringerSansRepo)(&o.ObjectId).String(),
+				// DisableValueQuotes: true,
 				// ColorType: string_format_writer.ColorTypeId,
 				// Value:     f.Rel(fds.Blob.GetPath()),
 			},

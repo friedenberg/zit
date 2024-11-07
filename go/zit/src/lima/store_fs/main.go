@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
@@ -288,35 +289,36 @@ func (s *Store) WriteFSItemToExternal(
 ) (err error) {
 	e := el.(*sku.Transacted)
 	e.Metadata.Fields = e.Metadata.Fields[:0]
-	k := &i.ExternalObjectId
-
-	e.ExternalObjectId.ResetWith(k)
-
-	if e.ExternalObjectId.String() != k.String() {
-		err = errors.Errorf("expected %q but got %q", k, &e.ExternalObjectId)
-	}
 
 	m := &e.Metadata
 	m.Tai = i.GetTai()
 
-	// var mode checkout_mode.Mode
+	var mode checkout_mode.Mode
 
-	// if mode, err = i.GetCheckoutModeOrError(); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
+	if mode, err = i.GetCheckoutModeOrError(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	// switch mode {
-	// case checkout_mode.BlobOnly:
-	// 	before := i.Blob.String()
-	// 	after := s.dirLayout.Rel(before)
-	// 	ui.Debug().Print(before, "->", after)
+	switch mode {
+	case checkout_mode.BlobOnly:
+		before := i.Blob.String()
+		after := s.dirLayout.Rel(before)
 
-	// 	if err = e.ExternalObjectId.SetBlob(after); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return
-	// 	}
-	// }
+		if err = e.ExternalObjectId.SetBlob(after); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+	default:
+		k := &i.ExternalObjectId
+
+		e.ExternalObjectId.ResetWith(k)
+
+		if e.ExternalObjectId.String() != k.String() {
+			err = errors.Errorf("expected %q but got %q", k, &e.ExternalObjectId)
+		}
+	}
 
 	fdees := quiter.SortedValues(i.MutableSetLike)
 

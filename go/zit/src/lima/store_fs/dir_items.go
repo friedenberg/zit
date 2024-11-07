@@ -387,8 +387,8 @@ func (d *dirItems) addOneBlob(
 		return
 	}
 
-	if err = result.ExternalObjectId.SetLeft(
-		f.GetPath(),
+	if err = result.ExternalObjectId.SetBlob(
+		d.dirLayout.Rel(f.GetPath()),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -438,6 +438,7 @@ func (d *dirItems) addOneOrMoreBlobs(
 			return
 		}
 
+		fdsOne.ExternalObjectId.SetGenre(genres.Blob)
 		results = []*sku.FSItem{fdsOne}
 
 		return

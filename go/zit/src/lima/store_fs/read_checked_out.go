@@ -13,7 +13,8 @@ import (
 // TODO remove Item from construction
 func (s *Store) readCheckedOutFromItem(
 	o sku.CommitOptions,
-	i *sku.FSItem) (co *sku.CheckedOut, err error) {
+	i *sku.FSItem,
+) (co *sku.CheckedOut, err error) {
 	co = GetCheckedOutPool().Get()
 
 	if err = s.externalStoreSupplies.FuncReadOneInto(

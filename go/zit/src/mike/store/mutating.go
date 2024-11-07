@@ -111,7 +111,9 @@ func (s *Store) tryRealizeAndOrStore(
 
 	if o.ContainsAny(
 		object_mode.ModeAddToInventoryList,
-	) && (kinder.ObjectId.IsEmpty() || kinder.GetGenre() == genres.None) {
+	) && (kinder.ObjectId.IsEmpty() ||
+		kinder.GetGenre() == genres.None ||
+		kinder.GetGenre() == genres.Blob) {
 		var ken *ids.ZettelId
 
 		if ken, err = s.zettelIdIndex.CreateZettelId(); err != nil {

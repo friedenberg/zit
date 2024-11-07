@@ -152,7 +152,7 @@ func (g Genre) HasParents() bool {
 
 func (g Genre) IsTrueGenre() bool {
 	switch g {
-	case Type, Tag, Zettel, Config, Repo, InventoryList:
+	case Type, Tag, Zettel, Config, Repo, InventoryList, Blob:
 		return true
 
 	default:

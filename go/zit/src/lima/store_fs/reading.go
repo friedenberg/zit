@@ -95,22 +95,22 @@ func (s *Store) readOneExternalInto(
 		panic(checkout_mode.MakeErrInvalidCheckoutModeMode(m))
 	}
 
-	if !i.Blob.IsEmpty() {
-		blobFD := &i.Blob
-		ext := blobFD.ExtSansDot()
-		typFromExtension := s.config.GetTypeStringFromExtension(ext)
+	// if !i.Blob.IsEmpty() {
+	// 	blobFD := &i.Blob
+	// 	ext := blobFD.ExtSansDot()
+	// 	typFromExtension := s.config.GetTypeStringFromExtension(ext)
 
-		if typFromExtension == "" {
-			typFromExtension = ext
-		}
+	// 	if typFromExtension == "" {
+	// 		typFromExtension = ext
+	// 	}
 
-		if typFromExtension != "" {
-			if err = e.Metadata.Type.Set(typFromExtension); err != nil {
-				err = errors.Wrapf(err, "Path: %s", blobFD.GetPath())
-				return
-			}
-		}
-	}
+	// 	if typFromExtension != "" {
+	// 		if err = e.Metadata.Type.Set(typFromExtension); err != nil {
+	// 			err = errors.Wrapf(err, "Path: %s", blobFD.GetPath())
+	// 			return
+	// 		}
+	// 	}
+	// }
 
 	if o.Clock == nil {
 		o.Clock = i
@@ -127,7 +127,8 @@ func (s *Store) readOneExternalInto(
 func (s *Store) readOneExternalObject(
 	e *sku.Transacted,
 	t *sku.Transacted,
-	i *sku.FSItem) (err error) {
+	i *sku.FSItem,
+) (err error) {
 	if t != nil {
 		object_metadata.Resetter.ResetWith(
 			e.GetMetadata(),
@@ -167,7 +168,8 @@ func (s *Store) ReadOneExternalObjectReader(
 func (s *Store) ReadOneExternalBlob(
 	e *sku.Transacted,
 	t *sku.Transacted,
-	i *sku.FSItem) (err error) {
+	i *sku.FSItem,
+) (err error) {
 	object_metadata.Resetter.ResetWith(&e.Metadata, t.GetMetadata())
 
 	// TODO use cache
