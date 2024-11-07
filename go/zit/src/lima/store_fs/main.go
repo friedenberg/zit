@@ -140,7 +140,7 @@ func (s *Store) GetExternalObjectIds() (ks []sku.ExternalObjectId, err error) {
 			l.Lock()
 			defer l.Unlock()
 
-			ks = append(ks, kfp)
+			ks = append(ks, kfp.GetExternalObjectId())
 
 			return
 		},
@@ -168,7 +168,7 @@ func (s *Store) GetObjectIdsForDir(
 	}
 
 	for _, r := range results {
-		k = append(k, r)
+		k = append(k, r.GetExternalObjectId())
 	}
 
 	return
@@ -208,7 +208,7 @@ func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err e
 		k = make([]sku.ExternalObjectId, 0, len(results))
 
 		for _, r := range results {
-			k = append(k, r)
+			k = append(k, r.GetExternalObjectId())
 		}
 	}
 

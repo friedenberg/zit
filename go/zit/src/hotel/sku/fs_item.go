@@ -20,7 +20,7 @@ type FSItem struct {
 	external_state.State
 
 	// TODO refactor this to be a string and a genre that is tied to the state
-	ids.ObjectId
+	ObjectId ids.ObjectId
 
 	Object   fd.FD
 	Blob     fd.FD // TODO make set
@@ -34,14 +34,14 @@ func (ef *FSItem) String() string {
 }
 
 func (ef *FSItem) GetExternalObjectId() ExternalObjectId {
-	return ef
+	return &ef.ObjectId
 }
 
 func (i *FSItem) Debug() string {
 	return fmt.Sprintf(
 		"State: %q, Genre: %q, ObjectId: %q, Object: %q, Blob: %q, Conflict: %q, All: %q",
 		i.State,
-		i.GetGenre(),
+		i.ObjectId.GetGenre(),
 		&i.ObjectId,
 		&i.Object,
 		&i.Blob,

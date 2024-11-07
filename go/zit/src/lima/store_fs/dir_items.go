@@ -259,16 +259,16 @@ func (d *dirItems) processFDsOnItem(
 
 			switch ext {
 			case d.GetFileExtensionZettel():
-				fds.SetGenre(genres.Zettel)
+				fds.ObjectId.SetGenre(genres.Zettel)
 
 			case d.GetFileExtensionType():
-				fds.SetGenre(genres.Type)
+				fds.ObjectId.SetGenre(genres.Type)
 
 			case d.GetFileExtensionTag():
-				fds.SetGenre(genres.Tag)
+				fds.ObjectId.SetGenre(genres.Tag)
 
 			case d.GetFileExtensionRepo():
-				fds.SetGenre(genres.Repo)
+				fds.ObjectId.SetGenre(genres.Repo)
 
 			case "conflict":
 				fds.Conflict.ResetWith(f)
@@ -325,7 +325,7 @@ func (d *dirItems) processFDSet(
 		return
 	}
 
-	if fds.GetGenre() != genres.None {
+	if fds.ObjectId.GetGenre() != genres.None {
 		if blobCount > 1 {
 			err = errors.Errorf(
 				"several blobs matching object id %q: %q",
@@ -347,11 +347,11 @@ func (d *dirItems) processFDSet(
 		}
 	}
 
-	if fds.GetGenre() == genres.None {
+	if fds.ObjectId.GetGenre() == genres.None {
 		fds.ObjectId.SetGenre(recognizedGenre)
 	}
 
-	if fds.GetGenre() == genres.None {
+	if fds.ObjectId.GetGenre() == genres.None {
 		if results, err = d.addOneOrMoreBlobs(
 			fds,
 		); err != nil {
@@ -470,7 +470,7 @@ func (d *dirItems) addOneObject(
 	objectIdString string,
 	fds *sku.FSItem,
 ) (err error) {
-	g := fds.GetGenre()
+	g := fds.ObjectId.GetGenre()
 	if g == genres.Zettel {
 		err = fds.ObjectId.SetWithGenre(fd.ZettelId(objectIdString), g)
 	} else {
@@ -478,7 +478,7 @@ func (d *dirItems) addOneObject(
 	}
 
 	if err != nil {
-		fds.ObjectId.SetGenre(fds.GetGenre())
+		fds.ObjectId.SetGenre(fds.ObjectId.GetGenre())
 
 		if err = fds.ObjectId.SetRaw(objectIdString); err != nil {
 			err = errors.Wrap(err)
