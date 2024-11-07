@@ -98,8 +98,7 @@ func (f *Box) WriteStringFormat(
 	}
 
 	if f.FSItemReadWriter == nil || errFS != nil || !isCO || !o.RepoId.IsEmpty() || isError {
-		n2, err = f.WriteStringFormatExternal(
-			sw,
+		n2, err = f.addFieldsExternal(
 			o,
 			&box,
 			f.Options.DescriptionInBox,
@@ -111,7 +110,7 @@ func (f *Box) WriteStringFormat(
 			return
 		}
 	} else {
-		n2, err = f.WriteStringFormatFSBox(sw, co, o, &box, fds)
+		n2, err = f.addFieldsFS(co, o, &box, fds)
 		n += n2
 
 		if err != nil {
@@ -139,10 +138,7 @@ func (f *Box) WriteStringFormat(
 		}
 	}
 
-	n2, err = f.Box.WriteStringFormat(
-		sw,
-		box,
-	)
+	n2, err = f.Box.WriteStringFormat(sw, box)
 	n += n2
 
 	if err != nil {
@@ -153,8 +149,7 @@ func (f *Box) WriteStringFormat(
 	return
 }
 
-func (f *Box) WriteStringFormatExternal(
-	sw interfaces.WriterAndStringWriter,
+func (f *Box) addFieldsExternal(
 	e *sku.Transacted,
 	box *string_format_writer.Box,
 	includeDescriptionInBox bool,
@@ -209,7 +204,7 @@ func (f *Box) WriteStringFormatExternal(
 		}
 	}
 
-	if err = f.WriteMetadataToBox(
+	if err = f.addFieldsMetadata(
 		o,
 		e,
 		includeDescriptionInBox,
@@ -222,7 +217,7 @@ func (f *Box) WriteStringFormatExternal(
 	return
 }
 
-func (f *Box) WriteMetadataToBox(
+func (f *Box) addFieldsMetadata(
 	options options_print.V0,
 	o *sku.Transacted,
 	includeDescriptionInBox bool,

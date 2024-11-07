@@ -1,4 +1,4 @@
-package exec_editor
+package editor
 
 //go:generate stringer -type=Type
 type Type byte

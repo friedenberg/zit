@@ -2,7 +2,6 @@ package box_format
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -12,8 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func (f *Box) WriteStringFormatFSBox(
-	sw interfaces.WriterAndStringWriter,
+func (f *Box) addFieldsFS(
 	co *sku.CheckedOut,
 	o *sku.Transacted,
 	box *string_format_writer.Box,
@@ -38,7 +36,7 @@ func (f *Box) WriteStringFormatFSBox(
 
 	switch {
 	case co.State == checked_out_state.Untracked:
-		if err = f.writeStringFormatUntracked(co, m, box); err != nil {
+		if err = f.addFieldsFSUntracked(co, m, box); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -52,7 +50,8 @@ func (f *Box) WriteStringFormatFSBox(
 			string_format_writer.Field{
 				Value:              (*ids.ObjectIdStringerSansRepo)(&o.ObjectId).String(),
 				DisableValueQuotes: true,
-				ColorType:          string_format_writer.ColorTypeId,
+				// ColorType: string_format_writer.ColorTypeId,
+				// Value:     f.Rel(fds.Blob.GetPath()),
 			},
 		)
 
@@ -69,7 +68,7 @@ func (f *Box) WriteStringFormatFSBox(
 	}
 
 	if co.State != checked_out_state.Conflicted {
-		if err = f.WriteMetadataToBox(
+		if err = f.addFieldsMetadata(
 			op,
 			o,
 			op.DescriptionInBox,
@@ -81,7 +80,7 @@ func (f *Box) WriteStringFormatFSBox(
 
 		if m == checkout_mode.BlobRecognized ||
 			(m != checkout_mode.MetadataOnly && m != checkout_mode.None) {
-			if err = f.writeStringFormatBlobFDsExcept(
+			if err = f.addFieldsFSBlobExcept(
 				fds,
 				fdAlreadyWritten,
 				box,
@@ -95,7 +94,7 @@ func (f *Box) WriteStringFormatFSBox(
 	return
 }
 
-func (f *Box) writeStringFormatBlobFDsExcept(
+func (f *Box) addFieldsFSBlobExcept(
 	fds *sku.FSItem,
 	except *fd.FD,
 	box *string_format_writer.Box,
@@ -110,7 +109,7 @@ func (f *Box) writeStringFormatBlobFDsExcept(
 			continue
 		}
 
-		if err = f.writeStringFormatBlobFD(fd, box); err != nil {
+		if err = f.addFieldFSBlob(fd, box); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -119,7 +118,7 @@ func (f *Box) writeStringFormatBlobFDsExcept(
 	return
 }
 
-func (f *Box) writeStringFormatBlobFD(
+func (f *Box) addFieldFSBlob(
 	fd *fd.FD,
 	box *string_format_writer.Box,
 ) (err error) {
@@ -139,7 +138,7 @@ func (f *Box) writeStringFormatBlobFD(
 	return
 }
 
-func (f *Box) writeStringFormatUntracked(
+func (f *Box) addFieldsFSUntracked(
 	co *sku.CheckedOut,
 	mode checkout_mode.Mode,
 	box *string_format_writer.Box,
@@ -166,7 +165,7 @@ func (f *Box) writeStringFormatUntracked(
 		},
 	)
 
-	if err = f.writeStringFormatBlobFDsExcept(i, fdToPrint, box); err != nil {
+	if err = f.addFieldsFSBlobExcept(i, fdToPrint, box); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

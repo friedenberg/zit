@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/vim_cli_options_builder"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
-	"code.linenisgreat.com/zit/go/zit/src/delta/exec_editor"
+	"code.linenisgreat.com/zit/go/zit/src/delta/editor"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
@@ -48,9 +48,9 @@ func (s *Store) openZettels(
 		return
 	}
 
-	var editor exec_editor.Editor
+	var e editor.Editor
 
-	if editor, err = exec_editor.MakeEditorWithVimOptions(
+	if e, err = editor.MakeEditorWithVimOptions(
 		ph,
 		vim_cli_options_builder.New().
 			WithCursorLocation(2, 3).
@@ -62,7 +62,7 @@ func (s *Store) openZettels(
 		return
 	}
 
-	if err = editor.Run(filesZettels); err != nil {
+	if err = e.Run(filesZettels); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

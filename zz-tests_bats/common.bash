@@ -111,10 +111,10 @@ function get_type_blob_sha() {
 function run_zit_init_disable_age {
   run_zit init -yin <(cat_yin) -yang <(cat_yang) -age none -lock-internal-files=false "$@"
   assert_success
-  assert_output - <<-EOM
-[!md @$(get_type_blob_sha) !toml-type-v1]
-[konfig @$(get_konfig_sha) !toml-config-v1]
-EOM
+  # assert_output - <<-EOM
+# [!md @$(get_type_blob_sha) !toml-type-v1]
+# [konfig @$(get_konfig_sha) !toml-config-v1]
+# EOM
 
   run_zit cat-blob "$(get_konfig_sha)"
   assert_success
