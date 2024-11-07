@@ -21,8 +21,12 @@ func (f *Box) ReadStringFormat(
 	ts.Reset(rs)
 
 	if err = f.readStringFormatBox(&ts, el); err != nil {
-		err = errors.Wrap(err)
-		return
+		if errors.Is(err, errNotABox) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if ts.Error() != nil {
@@ -48,29 +52,25 @@ func (f *Box) ReadStringFormat(
 	return
 }
 
-func (f *Box) readStringFormatBox(
-	ts *query_spec.TokenScanner,
-	el sku.ExternalLike,
-) (err error) {
-	o := el.GetSku()
+var errNotABox = errors.New("not a box")
 
-	{
-		if !ts.ScanSkipSpace() {
-			if ts.Error() != nil {
-				err = errors.Wrap(ts.Error())
-			} else {
-				err = io.EOF
-			}
-
-			return
+func (f *Box) openBox(ts *query_spec.TokenScanner) (err error) {
+	if !ts.ScanSkipSpace() {
+		if ts.Error() != nil {
+			err = errors.Wrap(ts.Error())
+		} else {
+			err = io.EOF
 		}
 
-		t, tokenType := ts.GetTokenAndType()
+		return
+	}
 
-		if tokenType != token_types.TypeOperator || t.Bytes()[0] != '[' {
-			ts.Unscan()
-			return
-		}
+	t, tokenType := ts.GetTokenAndType()
+
+	if tokenType != token_types.TypeOperator || t.Bytes()[0] != '[' {
+		err = errNotABox
+		ts.Unscan()
+		return
 	}
 
 	if !ts.ConsumeSpaces() {
@@ -80,6 +80,20 @@ func (f *Box) readStringFormatBox(
 			err = io.ErrUnexpectedEOF
 		}
 
+		return
+	}
+
+	return
+}
+
+func (f *Box) readStringFormatBox(
+	ts *query_spec.TokenScanner,
+	el sku.ExternalLike,
+) (err error) {
+	o := el.GetSku()
+
+	if err = f.openBox(ts); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

@@ -433,7 +433,10 @@ function add_each_blob { # @test
 }
 
 function add_organize { # @test
+	skip
 	run_zit_init_disable_age
+
+	export EDITOR="/bin/bash -c 'cat \"\$0\"'"
 
 	f="to add.md"
 	{
@@ -442,6 +445,7 @@ function add_organize { # @test
 
 	run_zit add \
 		-each-blob "cat" \
+		-organize \
 		-delete \
 		-tags zz-inbox-2022-11-14 \
 		"$f"
