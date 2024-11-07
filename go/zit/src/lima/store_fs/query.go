@@ -126,7 +126,7 @@ func (s *Store) QueryUntracked(
 			MutableSetLike: collections_value.MakeMutableValueSet[*fd.FD](nil),
 		}
 
-		recognizedFDS.ObjectId.ResetWith(&sk.ObjectId)
+		recognizedFDS.ExternalObjectId.ResetWith(&sk.ObjectId)
 
 		if err = recognized.Each(
 			func(fds *sku.FSItem) (err error) {
@@ -197,7 +197,7 @@ func (s *Store) QueryUntracked(
 		sort.Slice(
 			blobs,
 			func(i, j int) bool {
-				return blobs[i].ObjectId.String() < blobs[j].ObjectId.String()
+				return blobs[i].ExternalObjectId.String() < blobs[j].ExternalObjectId.String()
 			},
 		)
 
@@ -236,7 +236,7 @@ func (s *Store) QueryUntracked(
 		sort.Slice(
 			objects,
 			func(i, j int) bool {
-				return objects[i].ObjectId.String() < objects[j].ObjectId.String()
+				return objects[i].ExternalObjectId.String() < objects[j].ExternalObjectId.String()
 			},
 		)
 

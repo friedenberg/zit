@@ -277,18 +277,18 @@ func (s *Store) ReadFSItemFromExternal(el sku.ExternalLike) (i *sku.FSItem, err 
 	}
 
 	i.State = e.State
-	i.ObjectId.ResetWith(&e.ExternalObjectId)
+	i.ExternalObjectId.ResetWith(&e.ExternalObjectId)
 
 	return
 }
 
 func (s *Store) WriteFSItemToExternal(
-  i *sku.FSItem,
-  el sku.ExternalLike,
+	i *sku.FSItem,
+	el sku.ExternalLike,
 ) (err error) {
 	e := el.(*sku.Transacted)
 	e.Metadata.Fields = e.Metadata.Fields[:0]
-	k := &i.ObjectId
+	k := &i.ExternalObjectId
 
 	e.ExternalObjectId.ResetWith(k)
 
@@ -298,6 +298,25 @@ func (s *Store) WriteFSItemToExternal(
 
 	m := &e.Metadata
 	m.Tai = i.GetTai()
+
+	// var mode checkout_mode.Mode
+
+	// if mode, err = i.GetCheckoutModeOrError(); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
+
+	// switch mode {
+	// case checkout_mode.BlobOnly:
+	// 	before := i.Blob.String()
+	// 	after := s.dirLayout.Rel(before)
+	// 	ui.Debug().Print(before, "->", after)
+
+	// 	if err = e.ExternalObjectId.SetBlob(after); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return
+	// 	}
+	// }
 
 	fdees := quiter.SortedValues(i.MutableSetLike)
 

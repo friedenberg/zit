@@ -259,16 +259,16 @@ func (d *dirItems) processFDsOnItem(
 
 			switch ext {
 			case d.GetFileExtensionZettel():
-				fds.ObjectId.SetGenre(genres.Zettel)
+				fds.ExternalObjectId.SetGenre(genres.Zettel)
 
 			case d.GetFileExtensionType():
-				fds.ObjectId.SetGenre(genres.Type)
+				fds.ExternalObjectId.SetGenre(genres.Type)
 
 			case d.GetFileExtensionTag():
-				fds.ObjectId.SetGenre(genres.Tag)
+				fds.ExternalObjectId.SetGenre(genres.Tag)
 
 			case d.GetFileExtensionRepo():
-				fds.ObjectId.SetGenre(genres.Repo)
+				fds.ExternalObjectId.SetGenre(genres.Repo)
 
 			case "conflict":
 				fds.Conflict.ResetWith(f)
@@ -325,7 +325,7 @@ func (d *dirItems) processFDSet(
 		return
 	}
 
-	if fds.ObjectId.GetGenre() != genres.None {
+	if fds.ExternalObjectId.GetGenre() != genres.None {
 		if blobCount > 1 {
 			err = errors.Errorf(
 				"several blobs matching object id %q: %q",
@@ -347,11 +347,11 @@ func (d *dirItems) processFDSet(
 		}
 	}
 
-	if fds.ObjectId.GetGenre() == genres.None {
-		fds.ObjectId.SetGenre(recognizedGenre)
+	if fds.ExternalObjectId.GetGenre() == genres.None {
+		fds.ExternalObjectId.SetGenre(recognizedGenre)
 	}
 
-	if fds.ObjectId.GetGenre() == genres.None {
+	if fds.ExternalObjectId.GetGenre() == genres.None {
 		if results, err = d.addOneOrMoreBlobs(
 			fds,
 		); err != nil {
@@ -387,7 +387,7 @@ func (d *dirItems) addOneBlob(
 		return
 	}
 
-	if err = result.ObjectId.SetLeft(
+	if err = result.ExternalObjectId.SetLeft(
 		f.GetPath(),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -470,17 +470,17 @@ func (d *dirItems) addOneObject(
 	objectIdString string,
 	fds *sku.FSItem,
 ) (err error) {
-	g := fds.ObjectId.GetGenre()
+	g := fds.ExternalObjectId.GetGenre()
 	if g == genres.Zettel {
-		err = fds.ObjectId.SetWithGenre(fd.ZettelId(objectIdString), g)
+		err = fds.ExternalObjectId.SetWithGenre(fd.ZettelId(objectIdString), g)
 	} else {
-		err = fds.ObjectId.SetWithGenre(objectIdString, g)
+		err = fds.ExternalObjectId.SetWithGenre(objectIdString, g)
 	}
 
 	if err != nil {
-		fds.ObjectId.SetGenre(fds.ObjectId.GetGenre())
+		fds.ExternalObjectId.SetGenre(fds.ExternalObjectId.GetGenre())
 
-		if err = fds.ObjectId.SetRaw(objectIdString); err != nil {
+		if err = fds.ExternalObjectId.SetRaw(objectIdString); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -505,7 +505,7 @@ func (d *dirItems) ConsolidateDuplicateBlobs() (err error) {
 		sorted := quiter.ElementsSorted(
 			fds,
 			func(a, b *sku.FSItem) bool {
-				return a.ObjectId.String() < b.ObjectId.String()
+				return a.ExternalObjectId.String() < b.ExternalObjectId.String()
 			},
 		)
 

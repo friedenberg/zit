@@ -20,7 +20,7 @@ type FSItem struct {
 	external_state.State
 
 	// TODO refactor this to be a string and a genre that is tied to the state
-	ObjectId ids.ObjectId
+	ExternalObjectId ids.ObjectId
 
 	Object   fd.FD
 	Blob     fd.FD // TODO make set
@@ -30,19 +30,19 @@ type FSItem struct {
 }
 
 func (ef *FSItem) String() string {
-	return ef.ObjectId.String()
+	return ef.ExternalObjectId.String()
 }
 
 func (ef *FSItem) GetExternalObjectId() ExternalObjectId {
-	return &ef.ObjectId
+	return &ef.ExternalObjectId
 }
 
 func (i *FSItem) Debug() string {
 	return fmt.Sprintf(
 		"State: %q, Genre: %q, ObjectId: %q, Object: %q, Blob: %q, Conflict: %q, All: %q",
 		i.State,
-		i.ObjectId.GetGenre(),
-		&i.ObjectId,
+		i.ExternalObjectId.GetGenre(),
+		&i.ExternalObjectId,
 		&i.Object,
 		&i.Blob,
 		&i.Conflict,
@@ -70,7 +70,7 @@ func (i *FSItem) LatestModTime() thyme.Time {
 
 func (dst *FSItem) Reset() {
 	dst.State = 0
-	dst.ObjectId.Reset()
+	dst.ExternalObjectId.Reset()
 	dst.Object.Reset()
 	dst.Blob.Reset()
 	dst.Conflict.Reset()
@@ -88,7 +88,7 @@ func (dst *FSItem) ResetWith(src *FSItem) {
 	}
 
 	dst.State = src.State
-	dst.ObjectId.ResetWith(&src.ObjectId)
+	dst.ExternalObjectId.ResetWith(&src.ExternalObjectId)
 	dst.Object.ResetWith(&src.Object)
 	dst.Blob.ResetWith(&src.Blob)
 	dst.Conflict.ResetWith(&src.Conflict)
@@ -138,7 +138,7 @@ func (a *FSItem) Equals(b *FSItem) (ok bool, why string) {
 }
 
 func (e *FSItem) GenerateConflictFD() (err error) {
-	if err = e.Conflict.SetPath(e.ObjectId.String() + ".conflict"); err != nil {
+	if err = e.Conflict.SetPath(e.ExternalObjectId.String() + ".conflict"); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -141,14 +141,29 @@ func (b *Builder) WithExternalLike(
 	zts sku.ExternalLikeSet,
 ) *Builder {
 	for t := range zts.All() {
-    if t.GetExternalObjectId().GetGenre() == genres.None {
-      panic("genre is none")
-    }
+		if t.GetExternalObjectId().IsEmpty() {
+			b.pinnedObjectIds = append(
+				b.pinnedObjectIds,
+				ObjectId{
+					Exact:    true,
+					ObjectId: t.GetObjectId(),
+				},
+			)
+		} else {
+			if t.GetExternalObjectId().GetGenre() == genres.None {
+				panic(
+					errors.BadRequestf(
+						"External object ID has an empty genre: %q",
+						t.GetExternalObjectId(),
+					),
+				)
+			}
 
-		b.pinnedExternalObjectIds = append(
-			b.pinnedExternalObjectIds,
-			t.GetExternalObjectId(),
-		)
+			b.pinnedExternalObjectIds = append(
+				b.pinnedExternalObjectIds,
+				t.GetExternalObjectId(),
+			)
+		}
 	}
 
 	return b

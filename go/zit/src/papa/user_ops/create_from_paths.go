@@ -38,7 +38,7 @@ func (c CreateFromPaths) Run(
 
 		i.Reset()
 
-		i.ObjectId.SetGenre(genres.Zettel)
+		i.ExternalObjectId.SetGenre(genres.Zettel)
 
 		if err = i.Object.Set(arg); err != nil {
 			err = errors.Wrap(err)

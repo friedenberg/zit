@@ -469,6 +469,17 @@ func (h *objectId2) TodoSetBytesForgiving(v *catgut.String) (err error) {
 	return
 }
 
+func (h *objectId2) SetBlob(v string) (err error) {
+	h.g = genres.Blob
+
+	if err = h.left.Set(v); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (h *objectId2) SetRaw(v string) (err error) {
 	h.g = genres.None
 

@@ -17,12 +17,12 @@ func (s *Store) readCheckedOutFromItem(
 	co = GetCheckedOutPool().Get()
 
 	if err = s.externalStoreSupplies.FuncReadOneInto(
-		i.ObjectId.String(),
+		i.ExternalObjectId.String(),
 		&co.Internal,
 	); err != nil {
 		if collections.IsErrNotFound(err) || genres.IsErrUnsupportedGenre(err) {
 			err = nil
-			co.Internal.ObjectId.ResetWith(&i.ObjectId)
+			co.Internal.ObjectId.ResetWith(&i.ExternalObjectId)
 			co.State = checked_out_state.Untracked
 		} else {
 			err = errors.Wrap(err)
@@ -37,7 +37,7 @@ func (s *Store) readCheckedOutFromItem(
 	); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = nil
-			co.Internal.ObjectId.ResetWith(&i.ObjectId)
+			co.Internal.ObjectId.ResetWith(&i.ExternalObjectId)
 			co.State = checked_out_state.Untracked
 		} else {
 			err = errors.Wrap(err)
