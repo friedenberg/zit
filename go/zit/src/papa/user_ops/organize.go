@@ -134,8 +134,8 @@ func (op Organize) RunWithExternalLike(
 
 	// TODO refactor into common vim processing loop
 	for {
-		openVimOp := OpenVim{
-			Options: vim_cli_options_builder.New().
+		openVimOp := OpenEditor{
+			VimOptions: vim_cli_options_builder.New().
 				WithFileType("zit-organize").
 				Build(),
 		}

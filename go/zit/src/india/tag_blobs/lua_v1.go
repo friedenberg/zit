@@ -14,12 +14,12 @@ func MakeLuaSelfApplyV1(
 		panic("self was nil")
 	}
 
-  self := selfOriginal.CloneTransacted()
+	self := selfOriginal.CloneTransacted()
 
 	return func(vm *lua.VM) (err error) {
-		selbstTable := sku.MakeLuaTablePoolV1(vm).Get()
-		sku.ToLuaTableV1(self, vm.LState, selbstTable)
-		vm.SetGlobal("Selbst", selbstTable.Transacted)
+		selfTable := sku.MakeLuaTablePoolV1(vm).Get()
+		sku.ToLuaTableV1(self, vm.LState, selfTable)
+		vm.SetGlobal("Selbst", selfTable.Transacted)
 		return
 	}
 }

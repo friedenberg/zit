@@ -89,8 +89,8 @@ func (c EditConfig) editInVim(
 		return
 	}
 
-	openVimOp := user_ops.OpenVim{
-		Options: vim_cli_options_builder.New().
+	openVimOp := user_ops.OpenEditor{
+		VimOptions: vim_cli_options_builder.New().
 			WithFileType("zit-konfig").
 			Build(),
 	}

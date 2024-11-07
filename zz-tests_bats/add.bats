@@ -402,7 +402,37 @@ function add_several_with_spaces_in_filename { # @test
 	EOM
 }
 
-function add_each_akte { # @test
+function add_each_blob { # @test
+	run_zit_init_disable_age
+
+	f="to add.md"
+	{
+		echo test file
+	} >"$f"
+
+	run_zit add \
+		-each-blob "cat" \
+		-delete \
+		-tags zz-inbox-2022-11-14 \
+		"$f"
+
+	assert_success
+	assert_output_unsorted - <<-EOM
+		                   one/uno.md]
+		          deleted [to add.md]
+		      checked out [one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add" zz-inbox-2022-11-14
+		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add" zz-inbox-2022-11-14]
+		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add"]
+		[zz-inbox-2022-11-14 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[zz-inbox-2022-11 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[zz-inbox-2022 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[zz-inbox @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		test file
+	EOM
+}
+
+function add_organize { # @test
 	run_zit_init_disable_age
 
 	f="to add.md"
