@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -24,72 +23,7 @@ func (s *Store) CheckoutOne(
 	options checkout_options.Options,
 	sz sku.TransactedGetter,
 ) (col sku.CheckedOutLike, err error) {
-	col, _, err = s.checkoutOneNew(options, sz)
-	return
-}
-
-func (s *Store) checkoutOneNew(
-	options checkout_options.Options,
-	tg sku.TransactedGetter,
-) (co *sku.CheckedOut, i *sku.FSItem, err error) {
-	internal := tg.GetSku()
-	co = GetCheckedOutPool().Get()
-
-	sku.Resetter.ResetWith(&co.Internal, internal)
-
-	if s.config.IsDryRun() {
-		i = &sku.FSItem{}
-		return
-	}
-
-	ok := false
-
-	ui.TodoP4("cleanup")
-	if i, ok = s.Get(&internal.ObjectId); ok {
-		if err = s.readIntoExternalFromItem(
-			sku.CommitOptions{
-				Mode: object_mode.ModeRealizeSansProto,
-			},
-			i,
-			internal,
-			&co.External,
-		); err != nil {
-			if errors.Is(err, sku.ErrExternalHasConflictMarker) && options.AllowConflicted {
-				err = nil
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
-		sku.DetermineState(co, true)
-
-		if !s.shouldCheckOut(options, co, true) {
-			if err = s.WriteFSItemToExternal(i, &co.External); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		}
-	}
-
-	if i == nil {
-		if i, err = s.ReadFSItemFromExternal(&co.External); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if err = s.checkoutOneForReal(
-		options,
-		co,
-		i,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
+	col, _, err = s.checkoutOneNew2(options, sz)
 	return
 }
 
@@ -339,7 +273,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 		return
 	}
 
-	if replacement, newFDs, err = s.checkoutOneNew(
+	if replacement, newFDs, err = s.checkoutOneNew2(
 		o,
 		cofs.GetSkuExternalLike(),
 	); err != nil {

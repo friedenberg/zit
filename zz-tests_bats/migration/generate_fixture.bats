@@ -86,6 +86,10 @@ EOM
 	EOM
 
 	run_zit checkout "${cmd_def[@]}" one/uno
+	assert_success
+	assert_output - <<-EOM
+		      checked out [one/uno.zettel @3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 !md "wow ok" tag-1 tag-2]
+	EOM
 	cat >one/uno.zettel <<EOM
 ---
 # wow the first
