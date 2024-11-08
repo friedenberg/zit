@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func (s *Store) checkoutOneNew2(
+func (s *Store) checkoutOneIfNecessary(
 	options checkout_options.Options,
 	tg sku.TransactedGetter,
 ) (co *sku.CheckedOut, i *sku.FSItem, err error) {

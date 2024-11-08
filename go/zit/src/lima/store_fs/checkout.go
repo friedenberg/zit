@@ -23,7 +23,7 @@ func (s *Store) CheckoutOne(
 	options checkout_options.Options,
 	sz sku.TransactedGetter,
 ) (col sku.CheckedOutLike, err error) {
-	col, _, err = s.checkoutOneNew2(options, sz)
+	col, _, err = s.checkoutOneIfNecessary(options, sz)
 	return
 }
 
@@ -59,39 +59,20 @@ func (s *Store) checkoutOneForReal(
 	t := cz.Internal.GetType()
 	inlineBlob := s.config.IsInlineType(t)
 
-	if options.CheckoutMode.IncludesMetadata() {
-		if err = i.Object.SetPath(filename); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		i.Add(&i.Object)
-	} else {
-		i.MutableSetLike.Del(&i.Object)
-		i.Object.Reset()
+	if err = s.setObjectIfNecessary(options, i, filename); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
-	if ((!inlineBlob || !options.CheckoutMode.IncludesMetadata()) &&
-		!options.ForceInlineBlob) &&
-		options.CheckoutMode.IncludesBlob() {
-
-		fe := s.config.GetTypeExtension(t.String())
-
-		if fe == "" {
-			fe = t.String()
-		}
-
-		if err = i.Blob.SetPath(
-			originalFilename + "." + fe,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		i.Add(&i.Blob)
-	} else {
-		i.MutableSetLike.Del(&i.Blob)
-		i.Blob.Reset()
+	if err = s.setBlobIfNecessary(
+		options,
+		i,
+		originalFilename,
+		inlineBlob,
+		t,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	sku.Resetter.ResetWith(&cz.External, &cz.Internal)
@@ -109,6 +90,59 @@ func (s *Store) checkoutOneForReal(
 		err = errors.Wrap(err)
 		return
 	}
+
+	return
+}
+
+func (s *Store) setObjectIfNecessary(
+	options checkout_options.Options,
+	i *sku.FSItem,
+	filename string,
+) (err error) {
+	if !options.CheckoutMode.IncludesMetadata() {
+		i.MutableSetLike.Del(&i.Object)
+		i.Object.Reset()
+		return
+	}
+
+	if err = i.Object.SetPath(filename); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	i.Add(&i.Object)
+
+	return
+}
+
+func (s *Store) setBlobIfNecessary(
+	options checkout_options.Options,
+	i *sku.FSItem,
+	filename string,
+	inlineBlob bool,
+	tipe ids.Type,
+) (err error) {
+	if inlineBlob && options.CheckoutMode.IncludesMetadata() ||
+		options.ForceInlineBlob || !options.CheckoutMode.IncludesBlob() {
+		i.MutableSetLike.Del(&i.Blob)
+		i.Blob.Reset()
+		return
+	}
+
+	fe := s.config.GetTypeExtension(tipe.String())
+
+	if fe == "" {
+		fe = tipe.String()
+	}
+
+	if err = i.Blob.SetPath(
+		filename + "." + fe,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	i.Add(&i.Blob)
 
 	return
 }
@@ -273,7 +307,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 		return
 	}
 
-	if replacement, newFDs, err = s.checkoutOneNew2(
+	if replacement, newFDs, err = s.checkoutOneIfNecessary(
 		o,
 		cofs.GetSkuExternalLike(),
 	); err != nil {
