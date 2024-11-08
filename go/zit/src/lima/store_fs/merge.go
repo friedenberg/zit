@@ -168,7 +168,7 @@ func (s *Store) checkoutOneForMerge(
 		return
 	}
 
-	if err = s.checkoutOne(
+	if err = s.checkoutOneForReal(
 		options,
 		cz,
 		i,

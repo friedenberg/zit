@@ -72,13 +72,6 @@ func (s *Store) checkoutOneNew(
 
 			return
 		}
-
-		if options.Path == checkout_options.PathDefault {
-			if err = s.RemoveItem(i); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
 	}
 
 	if i == nil {
@@ -88,7 +81,7 @@ func (s *Store) checkoutOneNew(
 		}
 	}
 
-	if err = s.checkoutOne(
+	if err = s.checkoutOneForReal(
 		options,
 		co,
 		i,
@@ -100,74 +93,21 @@ func (s *Store) checkoutOneNew(
 	return
 }
 
-func (s *Store) UpdateCheckoutFromCheckedOut(
-	options checkout_options.OptionsWithoutMode,
-	col sku.CheckedOutLike,
-) (err error) {
-	cofs := col.(*sku.CheckedOut)
-
-	o := checkout_options.Options{
-		OptionsWithoutMode: options,
-	}
-
-	if o.CheckoutMode, err = s.GetCheckoutModeOrError(
-		col.GetSkuExternalLike(),
-		checkout_mode.None,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	options.Path = checkout_options.PathTempLocal
-
-	var replacement *sku.CheckedOut
-	var oldFDs, newFDs *sku.FSItem
-
-	if oldFDs, err = s.ReadFSItemFromExternal(col.GetSkuExternalLike()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if replacement, newFDs, err = s.checkoutOneNew(
-		o,
-		cofs.GetSkuExternalLike(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer GetCheckedOutPool().Put(replacement)
-
-	if !oldFDs.Object.IsEmpty() && !s.config.IsDryRun() {
-		if err = os.Rename(
-			newFDs.Object.GetPath(),
-			oldFDs.Object.GetPath(),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	if !oldFDs.Blob.IsEmpty() && !s.config.IsDryRun() {
-		if err = os.Rename(
-			newFDs.Blob.GetPath(),
-			oldFDs.Blob.GetPath(),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
-func (s *Store) checkoutOne(
+func (s *Store) checkoutOneForReal(
 	options checkout_options.Options,
 	cz *sku.CheckedOut,
 	i *sku.FSItem,
 ) (err error) {
 	if s.config.IsDryRun() {
 		return
+	}
+
+	// delete the existing checkout if it exists?
+	if options.Path == checkout_options.PathDefault {
+		if err = s.RemoveItem(i); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	var originalFilename, filename string
@@ -367,6 +307,67 @@ func (s *Store) RemoveItem(i *sku.FSItem) (err error) {
 	}
 
 	i.Reset()
+
+	return
+}
+
+func (s *Store) UpdateCheckoutFromCheckedOut(
+	options checkout_options.OptionsWithoutMode,
+	col sku.CheckedOutLike,
+) (err error) {
+	cofs := col.(*sku.CheckedOut)
+
+	o := checkout_options.Options{
+		OptionsWithoutMode: options,
+	}
+
+	if o.CheckoutMode, err = s.GetCheckoutModeOrError(
+		col.GetSkuExternalLike(),
+		checkout_mode.None,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	options.Path = checkout_options.PathTempLocal
+
+	var replacement *sku.CheckedOut
+	var oldFDs, newFDs *sku.FSItem
+
+	if oldFDs, err = s.ReadFSItemFromExternal(col.GetSkuExternalLike()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if replacement, newFDs, err = s.checkoutOneNew(
+		o,
+		cofs.GetSkuExternalLike(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	defer GetCheckedOutPool().Put(replacement)
+
+	if !oldFDs.Object.IsEmpty() && !s.config.IsDryRun() {
+		if err = os.Rename(
+			newFDs.Object.GetPath(),
+			oldFDs.Object.GetPath(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if !oldFDs.Blob.IsEmpty() && !s.config.IsDryRun() {
+		if err = os.Rename(
+			newFDs.Blob.GetPath(),
+			oldFDs.Blob.GetPath(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
 
 	return
 }
