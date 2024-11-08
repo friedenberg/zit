@@ -417,6 +417,7 @@ function show_etikett_toml { # @test
 	EOM
 }
 
+# TODO fix race condition between stderr and stdout
 function show_etikett_lua_v1 { # @test
 	cat >true.tag <<-EOM
 		---
@@ -448,6 +449,7 @@ function show_etikett_lua_v1 { # @test
 	EOM
 }
 
+# TODO fix race condition between stderr and stdout
 function show_etikett_lua_v2 { # @test
 	cat >true.tag <<-EOM
 		---

@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -20,29 +19,9 @@ func (s *Store) GetCheckoutModeOrError(
 		return
 	}
 
-	switch {
-	case !fds.Object.IsEmpty() && !fds.Blob.IsEmpty():
-		m = checkout_mode.MetadataAndBlob
-
-	case !fds.Blob.IsEmpty():
-		m = checkout_mode.BlobOnly
-
-	case !fds.Object.IsEmpty():
-		m = checkout_mode.MetadataOnly
-
-	default:
-		if fds.State == external_state.Recognized {
-			m = checkout_mode.BlobRecognized
-			return
-		}
-
-		err = checkout_mode.MakeErrInvalidCheckoutMode(
-			errors.Errorf(
-				"all FD's are empty: %s. Fields: %#v",
-				fds.Debug(),
-				el.GetSku().Metadata.Fields,
-			),
-		)
+	if m, err = fds.GetCheckoutModeOrError(); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
