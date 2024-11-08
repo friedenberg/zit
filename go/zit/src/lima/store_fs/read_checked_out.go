@@ -31,20 +31,36 @@ func (s *Store) readCheckedOutFromItem(
 		}
 	}
 
-	if err = s.readIntoCheckedOutFromTransactedAndItem(
-		&co.Internal,
+	if err = s.readIntoExternalFromItem(
+		sku.CommitOptions{
+			Mode: object_mode.ModeUpdateTai,
+		},
 		i,
-		co,
+		&co.Internal,
+		&co.External,
 	); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = nil
 			co.Internal.ObjectId.ResetWith(&i.ExternalObjectId)
 			co.State = checked_out_state.Untracked
+		} else if errors.Is(err, sku.ErrExternalHasConflictMarker) {
+			co.State = checked_out_state.Conflicted
+
+			if err = co.External.ObjectId.SetWithIdLike(
+				&co.Internal.ObjectId,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
 		} else {
-			err = errors.Wrap(err)
+			err = errors.Wrapf(err, "Cwd: %#v", i.Debug())
 			return
 		}
 	}
+
+	sku.DetermineState(co, false)
 
 	if !i.Conflict.IsEmpty() {
 		co.State = checked_out_state.Conflicted
@@ -106,49 +122,6 @@ func (s *Store) readIntoCheckedOutFromTransacted(
 			return
 		} else {
 			err = errors.Wrapf(err, "Cwd: %#v", kfp)
-		}
-
-		return
-	}
-
-	sku.DetermineState(co, false)
-
-	return
-}
-
-func (s *Store) readIntoCheckedOutFromTransactedAndItem(
-	sk *sku.Transacted,
-	i *sku.FSItem, co *sku.CheckedOut,
-) (err error) {
-	if &co.Internal != sk {
-		sku.Resetter.ResetWith(&co.Internal, sk)
-	}
-
-	if err = s.readIntoExternalFromItem(
-		sku.CommitOptions{
-			Mode: object_mode.ModeUpdateTai,
-		},
-		i,
-		sk,
-		&co.External,
-	); err != nil {
-		if errors.IsNotExist(err) {
-			err = errors.Wrapf(err, "Item: %s", i.Debug())
-			return
-			// err = iter.MakeErrStopIteration()
-		} else if errors.Is(err, sku.ErrExternalHasConflictMarker) {
-			co.State = checked_out_state.Conflicted
-
-			if err = co.External.ObjectId.SetWithIdLike(
-				&sk.ObjectId,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			return
-		} else {
-			err = errors.Wrapf(err, "Cwd: %#v", i)
 		}
 
 		return

@@ -33,7 +33,8 @@ func (s *Store) MakeApplyCheckedOut(
 func (s *Store) ApplyCheckedOut(
 	o sku.CommitOptions,
 	qg *query.Group,
-	i *sku.FSItem, f interfaces.FuncIter[sku.CheckedOutLike],
+	i *sku.FSItem,
+	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	var co *sku.CheckedOut
 

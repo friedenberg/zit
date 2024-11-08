@@ -36,7 +36,7 @@ func (s *Store) checkoutOneForReal(
 		return
 	}
 
-	// delete the existing checkout if it exists?
+	// delete the existing checkout if it exists in the cwd
 	if options.Path == checkout_options.PathDefault {
 		if err = s.RemoveItem(i); err != nil {
 			err = errors.Wrap(err)
@@ -73,7 +73,7 @@ func (s *Store) checkoutOneForReal(
 		return
 	}
 
-  // TODO is this necessary?
+	// This is necessary otherwise External is an empty sku
 	sku.Resetter.ResetWith(&cz.External, &cz.Internal)
 
 	if err = s.WriteFSItemToExternal(i, &cz.External); err != nil {
