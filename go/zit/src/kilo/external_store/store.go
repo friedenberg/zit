@@ -170,6 +170,8 @@ func (s *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
 	return
 }
 
+// Takes a given sku.Transacted (internal) and updates it with the state of its
+// checked out counterpart (external).
 func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 	es, ok := s.StoreLike.(UpdateTransacted)
 

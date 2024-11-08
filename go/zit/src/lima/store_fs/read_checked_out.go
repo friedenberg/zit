@@ -31,7 +31,7 @@ func (s *Store) readCheckedOutFromItem(
 		}
 	}
 
-	if err = s.readIntoExternalFromItem(
+	if err = s.HydrateExternalFromItem(
 		sku.CommitOptions{
 			Mode: object_mode.ModeUpdateTai,
 		},
@@ -99,7 +99,7 @@ func (s *Store) readIntoCheckedOutFromTransacted(
 		return
 	}
 
-	if err = s.readIntoExternalFromItem(
+	if err = s.HydrateExternalFromItem(
 		sku.CommitOptions{
 			Mode: object_mode.ModeUpdateTai,
 		},
@@ -118,8 +118,6 @@ func (s *Store) readIntoCheckedOutFromTransacted(
 				err = errors.Wrap(err)
 				return
 			}
-
-			return
 		} else {
 			err = errors.Wrapf(err, "Cwd: %#v", kfp)
 		}

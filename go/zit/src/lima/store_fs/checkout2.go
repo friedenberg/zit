@@ -54,7 +54,7 @@ func (s *Store) prepareFSItemForCheckOut(
 	}
 
 	if item, alreadyCheckedOut = s.Get(&co.Internal.ObjectId); alreadyCheckedOut {
-		if err = s.readIntoExternalFromItem(
+		if err = s.HydrateExternalFromItem(
 			sku.CommitOptions{
 				Mode: object_mode.ModeRealizeSansProto,
 			},
