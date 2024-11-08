@@ -11,13 +11,13 @@ func (s *Store) ReadExternalLikeFromObjectId(
 	oid interfaces.ObjectId,
 	internal *sku.Transacted,
 ) (external sku.ExternalLike, err error) {
-	k, ok := s.Get(oid)
+	item, ok := s.Get(oid)
 
 	if !ok {
 		return
 	}
 
-	if external, err = s.ReadExternalFromItem(o, k, internal); err != nil {
+	if external, err = s.ReadExternalFromItem(o, item, internal); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -25,6 +25,8 @@ func (s *Store) ReadExternalLikeFromObjectId(
 	return
 }
 
+// Given a sku and an FSItem, return the overlayed external variant. Internal
+// can be nil and then only the external data is used.
 func (s *Store) ReadExternalFromItem(
 	o sku.CommitOptions,
 	item *sku.FSItem,

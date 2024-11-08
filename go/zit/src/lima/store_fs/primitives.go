@@ -21,28 +21,6 @@ func (s *Store) HydrateExternalFromItem(
 ) (err error) {
 	o.Del(object_mode.ModeApplyProto)
 
-	if err = s.readOneExternalInto(&o, item, internal, external); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = s.externalStoreSupplies.FuncCommit(
-		external,
-		o,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) readOneExternalInto(
-	o *sku.CommitOptions,
-	item *sku.FSItem,
-	internal *sku.Transacted,
-	external *sku.Transacted,
-) (err error) {
 	if err = s.WriteFSItemToExternal(item, external); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -115,9 +93,18 @@ func (s *Store) readOneExternalInto(
 		return
 	}
 
+	if err = s.externalStoreSupplies.FuncCommit(
+		external,
+		o,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	return
 }
 
+// Internal can be nil which means that no overlaying is done.
 func (s *Store) readOneExternalObject(
 	external *sku.Transacted,
 	internal *sku.Transacted,

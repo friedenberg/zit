@@ -12,19 +12,18 @@ import (
 
 // TODO remove Item from construction
 func (s *Store) readCheckedOutFromItem(
-	o sku.CommitOptions,
-	i *sku.FSItem,
+	item *sku.FSItem,
 ) (co *sku.CheckedOut, err error) {
 	co = GetCheckedOutPool().Get()
+	co.Internal.ObjectId.ResetWith(&item.ExternalObjectId)
+	co.State = checked_out_state.Untracked
 
 	if err = s.externalStoreSupplies.FuncReadOneInto(
-		i.ExternalObjectId.String(),
+		item.ExternalObjectId.String(),
 		&co.Internal,
 	); err != nil {
 		if collections.IsErrNotFound(err) || genres.IsErrUnsupportedGenre(err) {
 			err = nil
-			co.Internal.ObjectId.ResetWith(&i.ExternalObjectId)
-			co.State = checked_out_state.Untracked
 		} else {
 			err = errors.Wrap(err)
 			return
@@ -35,13 +34,13 @@ func (s *Store) readCheckedOutFromItem(
 		sku.CommitOptions{
 			Mode: object_mode.ModeUpdateTai,
 		},
-		i,
+		item,
 		&co.Internal,
 		&co.External,
 	); err != nil {
 		if collections.IsErrNotFound(err) {
 			err = nil
-			co.Internal.ObjectId.ResetWith(&i.ExternalObjectId)
+			co.Internal.ObjectId.ResetWith(&item.ExternalObjectId)
 			co.State = checked_out_state.Untracked
 		} else if errors.Is(err, sku.ErrExternalHasConflictMarker) {
 			co.State = checked_out_state.Conflicted
@@ -55,14 +54,14 @@ func (s *Store) readCheckedOutFromItem(
 
 			return
 		} else {
-			err = errors.Wrapf(err, "Cwd: %#v", i.Debug())
+			err = errors.Wrapf(err, "Cwd: %#v", item.Debug())
 			return
 		}
 	}
 
 	sku.DetermineState(co, false)
 
-	if !i.Conflict.IsEmpty() {
+	if !item.Conflict.IsEmpty() {
 		co.State = checked_out_state.Conflicted
 	}
 

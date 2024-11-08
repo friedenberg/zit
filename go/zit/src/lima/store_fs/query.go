@@ -33,17 +33,17 @@ func (s *Store) MakeApplyCheckedOut(
 func (s *Store) ApplyCheckedOut(
 	o sku.CommitOptions,
 	qg *query.Group,
-	i *sku.FSItem,
+	item *sku.FSItem,
 	f interfaces.FuncIter[sku.CheckedOutLike],
 ) (err error) {
 	var co *sku.CheckedOut
 
-	if co, err = s.readCheckedOutFromItem(o, i); err != nil {
-		err = errors.Wrapf(err, "%s", i.Debug())
+	if co, err = s.readCheckedOutFromItem(item); err != nil {
+		err = errors.Wrapf(err, "%s", item.Debug())
 		return
 	}
 
-	if err = s.WriteFSItemToExternal(i, &co.External); err != nil {
+	if err = s.WriteFSItemToExternal(item, &co.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
