@@ -13,14 +13,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+// Internal may be nil, which means that the extneral is hydrated without an
+// overlay.
 func (s *Store) HydrateExternalFromItem(
 	o sku.CommitOptions,
 	item *sku.FSItem,
 	internal *sku.Transacted,
 	external *sku.Transacted,
 ) (err error) {
-	o.Del(object_mode.ModeApplyProto)
-
 	if internal != nil {
 		external.ObjectId.ResetWith(&internal.ObjectId)
 	}
@@ -59,25 +59,9 @@ func (s *Store) HydrateExternalFromItem(
 		)
 
 	default:
-		panic(checkout_mode.MakeErrInvalidCheckoutModeMode(m))
+		err = checkout_mode.MakeErrInvalidCheckoutModeMode(m)
+		return
 	}
-
-	// if !i.Blob.IsEmpty() {
-	// 	blobFD := &i.Blob
-	// 	ext := blobFD.ExtSansDot()
-	// 	typFromExtension := s.config.GetTypeStringFromExtension(ext)
-
-	// 	if typFromExtension == "" {
-	// 		typFromExtension = ext
-	// 	}
-
-	// 	if typFromExtension != "" {
-	// 		if err = e.Metadata.Type.Set(typFromExtension); err != nil {
-	// 			err = errors.Wrapf(err, "Path: %s", blobFD.GetPath())
-	// 			return
-	// 		}
-	// 	}
-	// }
 
 	if o.Clock == nil {
 		o.Clock = item
@@ -87,6 +71,9 @@ func (s *Store) HydrateExternalFromItem(
 		err = errors.Wrap(err)
 		return
 	}
+
+	// Don't apply the proto object as that would artificially create deltas
+	o.Del(object_mode.ModeApplyProto)
 
 	if err = s.externalStoreSupplies.FuncCommit(
 		external,

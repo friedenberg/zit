@@ -5,8 +5,11 @@ import "code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 type errInvalidCheckoutMode error
 
 func MakeErrInvalidCheckoutModeMode(mode Mode) errInvalidCheckoutMode {
-	return errInvalidCheckoutMode(
-		errors.Errorf("invalid checkout mode: %s", mode),
+	return errors.WrapN(
+		1,
+		errInvalidCheckoutMode(
+			errors.Errorf("invalid checkout mode: %s", mode),
+		),
 	)
 }
 
