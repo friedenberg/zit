@@ -44,9 +44,9 @@ func (s *Store) checkoutOneForReal(
 		}
 	}
 
-	var originalFilename, filename string
+	var info checkoutFileNameInfo
 
-	if originalFilename, filename, err = s.filenameForTransacted(
+	if info, err = s.filenameForTransacted(
 		options,
 		&cz.Internal,
 	); err != nil {
@@ -56,10 +56,10 @@ func (s *Store) checkoutOneForReal(
 
 	cz.State = checked_out_state.JustCheckedOut
 
-	t := cz.Internal.GetType()
-	inlineBlob := s.config.IsInlineType(t)
+	info.tipe = cz.Internal.GetType()
+	info.inlineBlob = s.config.IsInlineType(info.tipe)
 
-	if err = s.setObjectIfNecessary(options, i, filename); err != nil {
+	if err = s.setObjectIfNecessary(options, i, info); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -67,14 +67,13 @@ func (s *Store) checkoutOneForReal(
 	if err = s.setBlobIfNecessary(
 		options,
 		i,
-		originalFilename,
-		inlineBlob,
-		t,
+		info,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
+  // TODO is this necessary?
 	sku.Resetter.ResetWith(&cz.External, &cz.Internal)
 
 	if err = s.WriteFSItemToExternal(i, &cz.External); err != nil {
@@ -97,7 +96,7 @@ func (s *Store) checkoutOneForReal(
 func (s *Store) setObjectIfNecessary(
 	options checkout_options.Options,
 	i *sku.FSItem,
-	filename string,
+	info checkoutFileNameInfo,
 ) (err error) {
 	if !options.CheckoutMode.IncludesMetadata() {
 		i.MutableSetLike.Del(&i.Object)
@@ -105,7 +104,7 @@ func (s *Store) setObjectIfNecessary(
 		return
 	}
 
-	if err = i.Object.SetPath(filename); err != nil {
+	if err = i.Object.SetPath(info.objectName); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -118,25 +117,23 @@ func (s *Store) setObjectIfNecessary(
 func (s *Store) setBlobIfNecessary(
 	options checkout_options.Options,
 	i *sku.FSItem,
-	filename string,
-	inlineBlob bool,
-	tipe ids.Type,
+	info checkoutFileNameInfo,
 ) (err error) {
-	if inlineBlob && options.CheckoutMode.IncludesMetadata() ||
+	if info.inlineBlob && options.CheckoutMode.IncludesMetadata() ||
 		options.ForceInlineBlob || !options.CheckoutMode.IncludesBlob() {
 		i.MutableSetLike.Del(&i.Blob)
 		i.Blob.Reset()
 		return
 	}
 
-	fe := s.config.GetTypeExtension(tipe.String())
+	fe := s.config.GetTypeExtension(info.tipe.String())
 
 	if fe == "" {
-		fe = tipe.String()
+		fe = info.tipe.String()
 	}
 
 	if err = i.Blob.SetPath(
-		filename + "." + fe,
+		info.basename + "." + fe,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -187,14 +184,20 @@ func (s *Store) shouldCheckOut(
 	return false
 }
 
+type checkoutFileNameInfo struct {
+	basename   string
+	objectName string
+	tipe       ids.Type
+	inlineBlob bool
+}
+
 func (s *Store) filenameForTransacted(
 	options checkout_options.Options,
-	sz *sku.Transacted,
-) (originalFilename string, filename string, err error) {
-	dir := s.dirLayout.Cwd()
+	sk *sku.Transacted,
+) (info checkoutFileNameInfo, err error) {
+	cwd := s.dirLayout.Cwd()
 
-	switch options.Path {
-	case checkout_options.PathTempLocal:
+	if options.Path == checkout_options.PathTempLocal {
 		var f *os.File
 
 		if f, err = s.dirLayout.TempLocal.FileTemp(); err != nil {
@@ -204,32 +207,29 @@ func (s *Store) filenameForTransacted(
 
 		defer errors.DeferredCloser(&err, f)
 
-		originalFilename = f.Name()
-		filename = f.Name()
+		info.basename = f.Name()
+		info.objectName = f.Name()
 
 		return
-	default:
 	}
 
-	switch sz.GetGenre() {
-	case genres.Zettel:
+	if sk.GetGenre() == genres.Zettel {
 		var h ids.ZettelId
 
-		if err = h.Set(sz.GetObjectId().String()); err != nil {
+		if err = h.Set(sk.GetObjectId().String()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if originalFilename, err = id.MakeDirIfNecessary(h, dir); err != nil {
+		if info.basename, err = id.MakeDirIfNecessary(h, cwd); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		filename = s.PathForTransacted(dir, sz)
-
-	default:
-		originalFilename = s.PathForTransacted(dir, sz)
-		filename = originalFilename
+		info.objectName = s.PathForTransacted(cwd, sk)
+	} else {
+		info.basename = s.PathForTransacted(cwd, sk)
+		info.objectName = info.basename
 	}
 
 	return
