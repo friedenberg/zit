@@ -21,11 +21,6 @@ func (s *Store) HydrateExternalFromItem(
 ) (err error) {
 	o.Del(object_mode.ModeApplyProto)
 
-	if err = s.WriteFSItemToExternal(item, external); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if internal != nil {
 		external.ObjectId.ResetWith(&internal.ObjectId)
 	}

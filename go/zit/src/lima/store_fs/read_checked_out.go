@@ -15,8 +15,10 @@ func (s *Store) readCheckedOutFromItem(
 	item *sku.FSItem,
 ) (co *sku.CheckedOut, err error) {
 	co = GetCheckedOutPool().Get()
+
+	// at a bare minimum, the internal object ID must always be set as there are
+	// hard assumptions about internal being valid throughout the reading cycle
 	co.Internal.ObjectId.ResetWith(&item.ExternalObjectId)
-	co.State = checked_out_state.Untracked
 
 	if err = s.externalStoreSupplies.FuncReadOneInto(
 		item.ExternalObjectId.String(),
@@ -38,11 +40,7 @@ func (s *Store) readCheckedOutFromItem(
 		&co.Internal,
 		&co.External,
 	); err != nil {
-		if collections.IsErrNotFound(err) {
-			err = nil
-			co.Internal.ObjectId.ResetWith(&item.ExternalObjectId)
-			co.State = checked_out_state.Untracked
-		} else if errors.Is(err, sku.ErrExternalHasConflictMarker) {
+		if errors.Is(err, sku.ErrExternalHasConflictMarker) {
 			co.State = checked_out_state.Conflicted
 
 			if err = co.External.ObjectId.SetWithIdLike(
