@@ -31,12 +31,11 @@ func (s *Store) CheckoutOne(
 func (s *Store) checkoutOneNew(
 	options checkout_options.Options,
 	tg sku.TransactedGetter,
-) (cz *sku.CheckedOut, i *sku.FSItem, err error) {
-	sz := tg.GetSku()
+) (co *sku.CheckedOut, i *sku.FSItem, err error) {
+	internal := tg.GetSku()
+	co = GetCheckedOutPool().Get()
 
-	cz = GetCheckedOutPool().Get()
-
-	sku.Resetter.ResetWith(&cz.Internal, sz)
+	sku.Resetter.ResetWith(&co.Internal, internal)
 
 	if s.config.IsDryRun() {
 		i = &sku.FSItem{}
@@ -46,49 +45,44 @@ func (s *Store) checkoutOneNew(
 	ok := false
 
 	ui.TodoP4("cleanup")
-	if i, ok = s.Get(&sz.ObjectId); ok {
-		var cze *sku.Transacted
-
-		if cze, err = s.ReadExternalFromItem(
+	if i, ok = s.Get(&internal.ObjectId); ok {
+		if err = s.readIntoExternalFromItem(
 			sku.CommitOptions{
 				Mode: object_mode.ModeRealizeSansProto,
 			},
 			i,
-			sz,
+			internal,
+			&co.External,
 		); err != nil {
 			if errors.Is(err, sku.ErrExternalHasConflictMarker) && options.AllowConflicted {
-				sku.TransactedResetter.ResetWith(&cz.External, cze)
-				sku.DetermineState(cz, true)
 				err = nil
 			} else {
 				err = errors.Wrap(err)
 				return
 			}
-		} else {
-			sku.TransactedResetter.ResetWith(&cz.External, cze)
+		}
 
-			sku.DetermineState(cz, true)
+		sku.DetermineState(co, true)
 
-			if !s.shouldCheckOut(options, cz, true) {
-				if err = s.WriteFSItemToExternal(i, &cz.External); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
+		if !s.shouldCheckOut(options, co, true) {
+			if err = s.WriteFSItemToExternal(i, &co.External); err != nil {
+				err = errors.Wrap(err)
 				return
 			}
 
-			if options.Path == checkout_options.PathDefault {
-				if err = s.RemoveItem(i); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
+			return
+		}
+
+		if options.Path == checkout_options.PathDefault {
+			if err = s.RemoveItem(i); err != nil {
+				err = errors.Wrap(err)
+				return
 			}
 		}
 	}
 
 	if i == nil {
-		if i, err = s.ReadFSItemFromExternal(&cz.External); err != nil {
+		if i, err = s.ReadFSItemFromExternal(&co.External); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -96,7 +90,7 @@ func (s *Store) checkoutOneNew(
 
 	if err = s.checkoutOne(
 		options,
-		cz,
+		co,
 		i,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -170,7 +164,8 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 func (s *Store) checkoutOne(
 	options checkout_options.Options,
 	cz *sku.CheckedOut,
-	i *sku.FSItem) (err error) {
+	i *sku.FSItem,
+) (err error) {
 	if s.config.IsDryRun() {
 		return
 	}

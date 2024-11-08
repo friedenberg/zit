@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
@@ -22,6 +23,35 @@ import (
 
 func init() {
 	gob.Register(sku.Transacted{})
+}
+
+func Make(
+	k sku.Config,
+	dp interfaces.FuncIter[*fd.FD],
+	fileExtensions interfaces.FileExtensionGetter,
+	st dir_layout.DirLayout,
+	ofo object_inventory_format.Options,
+	fileEncoder FileEncoder,
+) (fs *Store, err error) {
+	fs = &Store{
+		config:         k,
+		deletedPrinter: dp,
+		dirLayout:      st,
+		fileEncoder:    fileEncoder,
+		fileExtensions: fileExtensions,
+		dir:            st.Cwd(),
+		dirItems:       makeObjectsWithDir(st.Cwd(), fileExtensions, st),
+		deleted: collections_value.MakeMutableValueSet[*fd.FD](
+			nil,
+		),
+		objectFormatOptions: ofo,
+		metadataTextParser: object_metadata.MakeTextParser(
+			st,
+			nil,
+		),
+	}
+
+	return
 }
 
 type Store struct {

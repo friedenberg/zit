@@ -197,7 +197,7 @@ func (u *Env) Initialize(options Options) (err error) {
 
 	k := u.GetConfig()
 
-	if sfs, err = store_fs.MakeCwdFilesAll(
+	if sfs, err = store_fs.Make(
 		k,
 		u.PrinterFDDeleted(),
 		k.GetFileExtensions(),

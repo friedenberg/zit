@@ -57,63 +57,6 @@ func (s *Store) GetObjectOrError(
 	return
 }
 
-func (s *Store) SetObjectOrError(
-	el sku.ExternalLike,
-	object *fd.FD,
-) (err error) {
-	var fds *sku.FSItem
-
-	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	fds.Object.ResetWith(object)
-
-	if err = s.WriteFSItemToExternal(fds, el); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
-func (s *Store) GetBlobOrError(
-	el sku.ExternalLike,
-) (f *fd.FD, err error) {
-	var fds *sku.FSItem
-
-	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	f = &fds.Blob
-
-	return
-}
-
-func (s *Store) SetBlobOrError(
-	el sku.ExternalLike,
-	blob *fd.FD,
-) (err error) {
-	var fds *sku.FSItem
-
-	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	fds.Blob.ResetWith(blob)
-
-	if err = s.WriteFSItemToExternal(fds, el); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (s *Store) UpdateTransactedFromBlobs(
 	el sku.ExternalLike,
 ) (err error) {
