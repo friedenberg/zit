@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type PrefixSet struct {
@@ -41,9 +41,9 @@ func (s PrefixSet) Len() int {
 	return s.count
 }
 
-func (s *PrefixSet) AddTransacted(z external_store.SkuType) (err error) {
+func (s *PrefixSet) AddTransacted(z sku.SkuType) (err error) {
 	o := obj{
-		sku: external_store.CloneSkuType(z),
+		sku: sku.CloneSkuType(z),
 	}
 
 	if err = s.Add(&o); err != nil {

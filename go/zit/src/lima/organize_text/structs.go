@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
 type (
@@ -25,7 +24,7 @@ func makeObjSet() objSet {
 }
 
 type obj struct {
-	sku  external_store.SkuType
+	sku  sku.SkuType
 	tipe tag_paths.Type
 }
 
@@ -40,7 +39,7 @@ func (o obj) GetSku() *sku.Transacted {
 func (a *obj) cloneWithType(t tag_paths.Type) (b *obj) {
 	b = &obj{
 		tipe: t,
-		sku:  external_store.CloneSkuType(a.sku),
+		sku:  sku.CloneSkuType(a.sku),
 	}
 
 	return

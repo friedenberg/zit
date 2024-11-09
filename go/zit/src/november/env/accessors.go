@@ -7,9 +7,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
@@ -48,7 +48,7 @@ func (u *Env) GetStore() *store.Store {
 
 func (u *Env) GetExternalLikePoolForRepoId(
 	repoId ids.RepoId,
-) (of external_store.ObjectFactory) {
+) (of sku.ObjectFactory) {
 	return
 }
 

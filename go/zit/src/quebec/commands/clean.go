@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
@@ -202,7 +201,7 @@ func (c Clean) runOrganize(u *env.Env, qg *query.Group) (err error) {
 	}
 
 	if err = changes.Removed.Each(
-		func(el external_store.SkuType) (err error) {
+		func(el sku.SkuType) (err error) {
 			if err = u.GetStore().DeleteExternalLike(
 				qg.RepoId,
 				el,

@@ -11,10 +11,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/test_config"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
 func TestMain(m *testing.M) {
@@ -46,8 +46,8 @@ func makeBez(t *testing.T, v string) (b descriptions.Description) {
 }
 
 func makeObjWithHinAndBez(t *testing.T, hin string, bez string) (o *obj) {
-  sk := external_store.MakeSkuType()
-  sk.GetSku().Metadata.Description = makeBez(t, bez)
+	sk := sku.MakeSkuType()
+	sk.GetSku().Metadata.Description = makeBez(t, bez)
 
 	o = &obj{
 		sku: sk,
@@ -63,7 +63,7 @@ func makeAssignmentLineReader() reader {
 		options: Options{
 			wasMade:       true,
 			Config:        &test_config.Config{},
-			ObjectFactory: (&external_store.ObjectFactory{}).SetDefaultsIfNecessary(),
+			ObjectFactory: (&sku.ObjectFactory{}).SetDefaultsIfNecessary(),
 			fmtBox: box_format.MakeBoxTransacted(
 				string_format_writer.ColorOptions{},
 				options_print.V0{},

@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type constructor struct {
@@ -16,13 +16,13 @@ type constructor struct {
 }
 
 func (c *constructor) collectExplicitAndImplicitFor(
-	skus external_store.SkuTypeSet,
+	skus sku.SkuTypeSet,
 	re ids.Tag,
 ) (explicitCount, implicitCount int, err error) {
 	res := catgut.MakeFromString(re.String())
 
 	if err = skus.Each(
-		func(st external_store.SkuType) (err error) {
+		func(st sku.SkuType) (err error) {
 			sk := st.GetSku()
 
 			for _, ewp := range sk.Metadata.Cache.TagPaths.All {
@@ -289,7 +289,7 @@ func (c *constructor) cloneObj(
 ) (z *obj, err error) {
 	z = &obj{
 		tipe: named.tipe,
-		sku:  external_store.CloneSkuType(named.sku),
+		sku:  sku.CloneSkuType(named.sku),
 	}
 
 	// TODO explore using shas as keys

@@ -137,9 +137,9 @@ func (mb *Builder) WithHidden(
 	return mb
 }
 
-// TODO modify to take an iterator instead of a concrete type
+// TODO
 func (b *Builder) WithExternalLike(
-	zts sku.ExternalLikeSet,
+	zts sku.SkuTypeSet,
 ) *Builder {
 	for t := range zts.All() {
 		if t.GetExternalObjectId().IsEmpty() {

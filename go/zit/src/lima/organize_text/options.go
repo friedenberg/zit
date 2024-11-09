@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
 type Flags struct {
@@ -34,9 +33,9 @@ type Options struct {
 	commentMatchers interfaces.SetLike[sku.Query]
 	GroupingTags    ids.TagSlice
 	ExtraTags       ids.TagSet
-	Skus            external_store.SkuTypeSet
+	Skus            sku.SkuTypeSet
 
-	external_store.ObjectFactory
+	sku.ObjectFactory
 
 	Abbr ids.Abbr
 
@@ -58,7 +57,7 @@ func MakeFlags() Flags {
 		Options: Options{
 			wasMade:      true,
 			GroupingTags: ids.MakeTagSlice(),
-			Skus:         external_store.MakeSkuTypeSetMutable(),
+			Skus:         sku.MakeSkuTypeSetMutable(),
 			Metadata:     NewMetadata(ids.RepoId{}),
 		},
 	}
@@ -79,7 +78,7 @@ func MakeFlagsWithMetadata(m Metadata) Flags {
 			Metadata:     m,
 			wasMade:      true,
 			GroupingTags: ids.MakeTagSlice(),
-			Skus:         external_store.MakeSkuTypeSetMutable(),
+			Skus:         sku.MakeSkuTypeSetMutable(),
 		},
 	}
 }
@@ -114,7 +113,7 @@ func (o *Flags) GetOptionsWithMetadata(
 	printOptions options_print.V0,
 	skuFmt *box_format.BoxTransacted,
 	abbr ids.Abbr,
-	of external_store.ObjectFactory,
+	of sku.ObjectFactory,
 	m Metadata,
 ) Options {
 	o.once.Do(
@@ -140,7 +139,7 @@ func (o *Flags) GetOptions(
 	q TagSetGetter,
 	skuBoxFormat *box_format.BoxTransacted,
 	abbr ids.Abbr, // TODO move Abbr as required arg
-	of external_store.ObjectFactory,
+	of sku.ObjectFactory,
 ) Options {
 	m := o.Metadata
 

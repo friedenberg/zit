@@ -8,11 +8,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type writer struct {
-	external_store.ObjectFactory
+	sku.ObjectFactory
 	OmitLeadingEmptyLine bool
 	object_metadata.Metadata
 	*format.LineWriter

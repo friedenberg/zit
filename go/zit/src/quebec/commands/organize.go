@@ -14,7 +14,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
@@ -87,7 +86,7 @@ func (c *Organize) RunWithQuery(
 		createOrganizeFileOp.Type = typen.Any()
 	}
 
-	getResults := external_store.MakeSkuTypeSetMutable()
+	getResults := sku.MakeSkuTypeSetMutable()
 	var l sync.Mutex
 
 	if err = u.GetStore().Query(
@@ -96,7 +95,7 @@ func (c *Organize) RunWithQuery(
 			l.Lock()
 			defer l.Unlock()
 
-			return getResults.Add(external_store.CloneSkuTypeFromTransacted(
+			return getResults.Add(sku.CloneSkuTypeFromTransacted(
 				el.GetSku(),
 			))
 		},

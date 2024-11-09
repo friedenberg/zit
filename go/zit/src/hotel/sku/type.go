@@ -1,11 +1,9 @@
-package external_store
-
-import "code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+package sku
 
 type (
-	SkuType           = sku.ExternalLike
-	SkuTypeSet        = sku.ExternalLikeSet
-	SkuTypeSetMutable = sku.ExternalLikeMutableSet
+	SkuType           = ExternalLike
+	SkuTypeSet        = ExternalLikeSet
+	SkuTypeSetMutable = ExternalLikeMutableSet
 	ObjectFactory     = objectFactoryExternalLike
 )
 
@@ -13,13 +11,13 @@ var (
 	MakeSkuType                = makeExternalLike
 	CloneSkuType               = cloneExternalLike
 	CloneSkuTypeFromTransacted = cloneFromTransactedExternalLike
-	MakeSkuTypeSetMutable      = sku.MakeExternalLikeMutableSet
+	MakeSkuTypeSetMutable      = MakeExternalLikeMutableSet
 )
 
 // type (
-// 	SkuType           = *sku.CheckedOut
-// 	SkuTypeSet        = sku.CheckedOutSet
-// 	SkuTypeSetMutable = sku.CheckedOutMutableSet
+// 	SkuType           = *CheckedOut
+// 	SkuTypeSet        = CheckedOutSet
+// 	SkuTypeSetMutable = CheckedOutMutableSet
 // 	ObjectFactory     = objectFactoryCheckedOut
 // )
 
@@ -27,5 +25,5 @@ var (
 // 	MakeSkuType                = makeCheckedOut
 // 	CloneSkuType               = cloneCheckedOut
 // 	CloneSkuTypeFromTransacted = cloneFromTransactedCheckedOut
-// 	MakeSkuTypeSetMutable      = sku.MakeCheckedOutMutableSet
+// 	MakeSkuTypeSetMutable      = MakeCheckedOutMutableSet
 // )

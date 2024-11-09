@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
@@ -27,7 +26,7 @@ type Organize struct {
 func (op Organize) RunWithQueryGroup(
 	qg *query.Group,
 ) (organizeResults organize_text.OrganizeResults, err error) {
-	skus := external_store.MakeSkuTypeSetMutable()
+	skus := sku.MakeSkuTypeSetMutable()
 	var l sync.Mutex
 
 	if err = op.GetStore().Query(
@@ -35,7 +34,7 @@ func (op Organize) RunWithQueryGroup(
 		func(el sku.ExternalLike) (err error) {
 			l.Lock()
 			defer l.Unlock()
-			return skus.Add(external_store.CloneSkuTypeFromTransacted(el.GetSku()))
+			return skus.Add(sku.CloneSkuTypeFromTransacted(el.GetSku()))
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -55,10 +54,10 @@ func (op Organize) RunWithTransacted(
 	qg *query.Group,
 	transacted sku.TransactedSet,
 ) (organizeResults organize_text.OrganizeResults, err error) {
-	skus := external_store.MakeSkuTypeSetMutable()
+	skus := sku.MakeSkuTypeSetMutable()
 
 	for z := range transacted.All() {
-		skus.Add(external_store.CloneSkuTypeFromTransacted(z))
+		skus.Add(sku.CloneSkuTypeFromTransacted(z))
 	}
 
 	if organizeResults, err = op.RunWithExternalLike(qg, skus); err != nil {
@@ -71,7 +70,7 @@ func (op Organize) RunWithTransacted(
 
 func (op Organize) RunWithExternalLike(
 	qg *query.Group,
-	skus external_store.SkuTypeSet,
+	skus sku.SkuTypeSet,
 ) (organizeResults organize_text.OrganizeResults, err error) {
 	organizeResults.Original = skus
 	organizeResults.QueryGroup = qg

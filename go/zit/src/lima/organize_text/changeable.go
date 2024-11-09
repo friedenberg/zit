@@ -7,10 +7,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func key(el external_store.SkuType) string {
+func key(el sku.SkuType) string {
 	eoid := el.GetExternalObjectId().String()
 	if len(eoid) > 1 {
 		return eoid
@@ -31,7 +31,7 @@ func key(el external_store.SkuType) string {
 }
 
 // TODO explore using shas as keys
-func keySha(el external_store.SkuType) string {
+func keySha(el sku.SkuType) string {
 	objectSha := &el.GetSku().Metadata.SelfMetadataWithoutTai
 
 	if objectSha.IsNull() {
@@ -47,7 +47,7 @@ func keySha(el external_store.SkuType) string {
 }
 
 func (ot *Text) GetSkus(
-	original external_store.SkuTypeSet,
+	original sku.SkuTypeSet,
 ) (out SkuMapWithOrder, err error) {
 	out = MakeSkuMapWithOrder(original.Len())
 
@@ -66,7 +66,7 @@ func (ot *Text) GetSkus(
 func (a *Assignment) addToSet(
 	ot *Text,
 	output SkuMapWithOrder,
-	objectsFromBefore external_store.SkuTypeSet,
+	objectsFromBefore sku.SkuTypeSet,
 ) (err error) {
 	expanded := ids.MakeTagMutableSet()
 
@@ -76,7 +76,7 @@ func (a *Assignment) addToSet(
 	}
 
 	for _, organizeObject := range a.All() {
-		var outputObject external_store.SkuType
+		var outputObject sku.SkuType
 
 		objectKey := key(organizeObject.sku)
 
