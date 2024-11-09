@@ -27,7 +27,7 @@ func key(el sku.SkuType) string {
 		return desc
 	}
 
-	panic(fmt.Sprintf("empty key for external like: %#v", el))
+	panic(fmt.Sprintf("empty key for external like: %s", el))
 }
 
 // TODO explore using shas as keys
@@ -95,9 +95,7 @@ func (a *Assignment) addToSet(
 
 			output.Add(outputObject)
 
-			objectOriginal, hasOriginal := objectsFromBefore.Get(
-				objectsFromBefore.Key(organizeObject.sku),
-			)
+			objectOriginal, hasOriginal := objectsFromBefore.Get(objectKey)
 
 			if hasOriginal {
 				outputObject.GetSku().Metadata.Blob.ResetWith(

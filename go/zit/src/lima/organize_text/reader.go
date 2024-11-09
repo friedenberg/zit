@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type reader struct {
@@ -279,7 +280,7 @@ func (ar *reader) readOneObj(
 
 	if _, err = ar.options.fmtBox.ReadStringFormat(
 		catgut.MakeRingBufferRuneScanner(r),
-		z.sku.GetSku(),
+		z.GetSku(),
 	); err != nil {
 		err = ErrorRead{
 			error:  err,
@@ -310,6 +311,7 @@ func (ar *reader) readOneObj(
 		}
 	}
 
+	sku.TransactedResetter.ResetWith(&z.sku.External, &z.sku.Internal)
 	ar.currentAssignment.AddObject(&z)
 
 	return
