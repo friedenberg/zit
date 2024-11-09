@@ -3,7 +3,6 @@ package box_format
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -27,11 +26,12 @@ func (f *Box) addFieldsExternal2(
 		return
 	}
 
-	if err = f.addFieldsMetadata(
+	if err = f.addFieldsMetadata2(
 		f.Options,
 		e,
 		includeDescriptionInBox,
 		box,
+		item,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -44,13 +44,6 @@ func (f *Box) makeFieldExternalObjectIdsIfNecessary(
 	sk *sku.Transacted,
 	item *sku.FSItem,
 ) (field string_format_writer.Field, err error) {
-	// TODO figure out why this is necessary and in this horribly place
-	if sk.State == external_state.Unknown {
-		if sk.ObjectId.IsEmpty() {
-			sk.State = external_state.Untracked
-		}
-	}
-
 	field = string_format_writer.Field{
 		ColorType: string_format_writer.ColorTypeId,
 	}
@@ -203,7 +196,7 @@ func (f *Box) addFieldsMetadata2(
 		object_metadata_fmt.MetadataFieldTags(m)...,
 	)
 
-	if !options.ExcludeFields && item == nil {
+	if !options.ExcludeFields && (item == nil || item.Len() == 0) {
 		box.Contents = append(box.Contents, m.Fields...)
 	}
 
