@@ -6,6 +6,18 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+func makeCheckedOut() *sku.CheckedOut {
+	dst := sku.GetCheckedOutPool().Get()
+	return dst
+}
+
+func cloneFromTransactedCheckedOut(src *sku.Transacted) *sku.CheckedOut {
+	dst := sku.GetCheckedOutPool().Get()
+	sku.TransactedResetter.ResetWith(&dst.Internal, src)
+	sku.TransactedResetter.ResetWith(&dst.External, src)
+	return dst
+}
+
 func cloneCheckedOut(co *sku.CheckedOut) *sku.CheckedOut {
 	return co.Clone()
 }

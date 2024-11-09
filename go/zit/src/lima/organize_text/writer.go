@@ -57,13 +57,13 @@ func (av writer) write(a *Assignment) (err error) {
 	write := func(z *obj) (err error) {
 		var sb strings.Builder
 
-		if z.IsDirectOrSelf() {
+		if z.tipe.IsDirectOrSelf() {
 			sb.WriteString("- ")
 		} else {
 			sb.WriteString("% ")
 		}
 
-		cursor := z.External.CloneExternalLike()
+		cursor := z.sku.CloneExternalLike()
 		sk := cursor.GetSku()
 		sk.Metadata.Subtract(&av.Metadata)
 		mes := sk.GetMetadata().GetTags().CloneMutableSetPtrLike()

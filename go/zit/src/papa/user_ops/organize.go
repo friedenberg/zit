@@ -27,7 +27,7 @@ type Organize struct {
 func (op Organize) RunWithQueryGroup(
 	qg *query.Group,
 ) (organizeResults organize_text.OrganizeResults, err error) {
-	skus := sku.MakeExternalLikeMutableSet()
+	skus := external_store.MakeSkuTypeSetMutable()
 	var l sync.Mutex
 
 	if err = op.GetStore().Query(
@@ -35,7 +35,7 @@ func (op Organize) RunWithQueryGroup(
 		func(el sku.ExternalLike) (err error) {
 			l.Lock()
 			defer l.Unlock()
-			return skus.Add(el.CloneExternalLike())
+			return skus.Add(external_store.CloneSkuTypeFromTransacted(el.GetSku()))
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -55,10 +55,10 @@ func (op Organize) RunWithTransacted(
 	qg *query.Group,
 	transacted sku.TransactedSet,
 ) (organizeResults organize_text.OrganizeResults, err error) {
-	skus := sku.MakeExternalLikeMutableSet()
+	skus := external_store.MakeSkuTypeSetMutable()
 
 	for z := range transacted.All() {
-		skus.Add(z)
+		skus.Add(external_store.CloneSkuTypeFromTransacted(z))
 	}
 
 	if organizeResults, err = op.RunWithExternalLike(qg, skus); err != nil {

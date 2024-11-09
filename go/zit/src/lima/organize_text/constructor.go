@@ -22,7 +22,7 @@ func (c *constructor) collectExplicitAndImplicitFor(
 	res := catgut.MakeFromString(re.String())
 
 	if err = skus.Each(
-		func(st skuType) (err error) {
+		func(st external_store.SkuType) (err error) {
 			sk := st.GetSku()
 
 			for _, ewp := range sk.Metadata.Cache.TagPaths.All {
@@ -288,8 +288,8 @@ func (c *constructor) cloneObj(
 	named *obj,
 ) (z *obj, err error) {
 	z = &obj{
-		Type:     named.Type,
-		External: external_store.CloneSkuType(named.External),
+		tipe: named.tipe,
+		sku:  external_store.CloneSkuType(named.sku),
 	}
 
 	// TODO explore using shas as keys

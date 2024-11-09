@@ -38,7 +38,7 @@ type Assignment struct {
 }
 
 func (a *Assignment) AddObject(v *obj) (err error) {
-	k := key(v.External)
+	k := key(v.sku)
 	_, ok := a.objects[k]
 
 	if ok {
@@ -84,7 +84,7 @@ func (a Assignment) AlignmentSpacing() int {
 
 func (a Assignment) MaxLen() (m int) {
 	for _, z := range a.Objects.All() {
-		oM := z.External.GetSku().ObjectId.Len()
+		oM := z.sku.GetSku().ObjectId.Len()
 
 		if oM > m {
 			m = oM

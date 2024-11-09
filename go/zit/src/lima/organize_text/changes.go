@@ -19,10 +19,8 @@ func MakeSkuMapWithOrder(c int) (out SkuMapWithOrder) {
 	return
 }
 
-type skuType = external_store.SkuType
-
 type skuTypeWithIndex struct {
-	skuType skuType
+	sku external_store.SkuType
 	int
 }
 
@@ -31,10 +29,10 @@ type SkuMapWithOrder struct {
 	next int
 }
 
-func (smwo *SkuMapWithOrder) AllSkuAndIndex() iter.Seq2[int, skuType] {
-	return func(yield func(int, skuType) bool) {
+func (smwo *SkuMapWithOrder) AllSkuAndIndex() iter.Seq2[int, external_store.SkuType] {
+	return func(yield func(int, external_store.SkuType) bool) {
 		for _, sk := range smwo.m {
-			if !yield(sk.int, sk.skuType) {
+			if !yield(sk.int, sk.sku) {
 				break
 			}
 		}
@@ -49,24 +47,24 @@ func (smwo *SkuMapWithOrder) AsExternalLikeSet() external_store.SkuTypeSetMutabl
 
 func (smwo *SkuMapWithOrder) AsTransactedSet() sku.TransactedMutableSet {
 	tms := sku.MakeTransactedMutableSet()
-	errors.PanicIfError(smwo.Each(func(el skuType) (err error) {
+	errors.PanicIfError(smwo.Each(func(el external_store.SkuType) (err error) {
 		return tms.Add(el.GetSku())
 	}))
 	return tms
 }
 
-func (sm *SkuMapWithOrder) Del(sk skuType) error {
+func (sm *SkuMapWithOrder) Del(sk external_store.SkuType) error {
 	delete(sm.m, key(sk))
 	return nil
 }
 
-func (sm *SkuMapWithOrder) Add(sk skuType) error {
+func (sm *SkuMapWithOrder) Add(sk external_store.SkuType) error {
 	k := key(sk)
 	entry, ok := sm.m[k]
 
 	if !ok {
 		entry.int = sm.next
-		entry.skuType = sk
+		entry.sku = sk
 		sm.next++
 	}
 
@@ -83,17 +81,17 @@ func (sm *SkuMapWithOrder) Clone() (out SkuMapWithOrder) {
 	out = MakeSkuMapWithOrder(sm.Len())
 
 	for _, v := range sm.m {
-		out.Add(v.skuType)
+		out.Add(v.sku)
 	}
 
 	return out
 }
 
-func (sm SkuMapWithOrder) Sorted() (out []skuType) {
-	out = make([]skuType, 0, sm.Len())
+func (sm SkuMapWithOrder) Sorted() (out []external_store.SkuType) {
+	out = make([]external_store.SkuType, 0, sm.Len())
 
 	for _, v := range sm.m {
-		out = append(out, v.skuType)
+		out = append(out, v.sku)
 	}
 
 	sort.Slice(out, func(i, j int) bool {
@@ -116,7 +114,7 @@ func (sm SkuMapWithOrder) Sorted() (out []skuType) {
 }
 
 func (sm *SkuMapWithOrder) Each(
-	f interfaces.FuncIter[skuType],
+	f interfaces.FuncIter[external_store.SkuType],
 ) (err error) {
 	for _, v := range sm.Sorted() {
 		_, ok := sm.m[key(v)]
@@ -205,7 +203,7 @@ func ChangesFromResults(
 	c.Removed = c.Before.Clone()
 
 	for _, sk := range c.After.m {
-		if err = c.Removed.Del(sk.skuType); err != nil {
+		if err = c.Removed.Del(sk.sku); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -235,7 +233,7 @@ func applyToText(
 	}
 
 	if err = t.Options.Skus.Each(
-		func(el skuType) (err error) {
+		func(el external_store.SkuType) (err error) {
 			sk := el.GetSku()
 
 			if sk.Metadata.Description.IsEmpty() {

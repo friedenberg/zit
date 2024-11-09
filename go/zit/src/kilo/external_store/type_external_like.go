@@ -6,6 +6,17 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+func makeExternalLike() sku.ExternalLike {
+	dst := sku.GetTransactedPool().Get()
+	return dst
+}
+
+func cloneFromTransactedExternalLike(src *sku.Transacted) sku.ExternalLike {
+	dst := sku.GetTransactedPool().Get()
+	sku.TransactedResetter.ResetWith(dst, src)
+	return dst
+}
+
 func cloneExternalLike(el sku.ExternalLike) sku.ExternalLike {
 	return el.CloneExternalLike()
 }

@@ -25,33 +25,33 @@ func makeObjSet() objSet {
 }
 
 type obj struct {
-	External skuType
-	tag_paths.Type
+	sku  external_store.SkuType
+	tipe tag_paths.Type
 }
 
 func (o obj) GetObjectId() *ids.ObjectId {
-	return o.External.GetObjectId()
+	return o.sku.GetObjectId()
 }
 
 func (o obj) GetSku() *sku.Transacted {
-	return o.External.GetSku()
+	return o.sku.GetSku()
 }
 
 func (a *obj) cloneWithType(t tag_paths.Type) (b *obj) {
 	b = &obj{
-		Type:     t,
-		External: external_store.CloneSkuType(a.External),
+		tipe: t,
+		sku:  external_store.CloneSkuType(a.sku),
 	}
 
 	return
 }
 
 func (a *obj) GetExternalObjectId() sku.ExternalObjectId {
-	return a.External.GetExternalObjectId()
+	return a.sku.GetExternalObjectId()
 }
 
 func (a *obj) String() string {
-	return a.External.String()
+	return a.sku.String()
 }
 
 func sortObjSet(
@@ -61,17 +61,17 @@ func sortObjSet(
 
 	sort.Slice(out, func(i, j int) bool {
 		switch {
-		case out[i].External.GetSku().ObjectId.IsEmpty() && out[j].External.GetSku().ObjectId.IsEmpty():
-			return out[i].External.GetSku().Metadata.Description.String() < out[j].External.GetSku().Metadata.Description.String()
+		case out[i].sku.GetSku().ObjectId.IsEmpty() && out[j].sku.GetSku().ObjectId.IsEmpty():
+			return out[i].sku.GetSku().Metadata.Description.String() < out[j].sku.GetSku().Metadata.Description.String()
 
-		case out[i].External.GetSku().ObjectId.IsEmpty():
+		case out[i].sku.GetSku().ObjectId.IsEmpty():
 			return true
 
-		case out[j].External.GetSku().ObjectId.IsEmpty():
+		case out[j].sku.GetSku().ObjectId.IsEmpty():
 			return false
 
 		default:
-			return out[i].External.GetSku().ObjectId.String() < out[j].External.GetSku().ObjectId.String()
+			return out[i].sku.GetSku().ObjectId.String() < out[j].sku.GetSku().ObjectId.String()
 		}
 	})
 
@@ -137,7 +137,7 @@ func (os *Objects) Del(v *obj) error {
 
 func (os Objects) Sort() {
 	sort.Slice(os, func(i, j int) bool {
-		ei, ej := os[i].External, os[j].External
+		ei, ej := os[i].sku, os[j].sku
 
 		keyI := key(ei)
 		keyJ := key(ej)

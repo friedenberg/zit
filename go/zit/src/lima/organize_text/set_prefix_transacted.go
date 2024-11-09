@@ -41,9 +41,9 @@ func (s PrefixSet) Len() int {
 	return s.count
 }
 
-func (s *PrefixSet) AddTransacted(z skuType) (err error) {
+func (s *PrefixSet) AddTransacted(z external_store.SkuType) (err error) {
 	o := obj{
-		External: external_store.CloneSkuType(z),
+		sku: external_store.CloneSkuType(z),
 	}
 
 	if err = s.Add(&o); err != nil {
@@ -57,11 +57,11 @@ func (s *PrefixSet) AddTransacted(z skuType) (err error) {
 // this splits on right-expanded
 func (s *PrefixSet) Add(z *obj) (err error) {
 	es := ids.Expanded(
-		z.External.GetSku().GetMetadata().Cache.GetImplicitTags(),
+		z.sku.GetSku().GetMetadata().Cache.GetImplicitTags(),
 		expansion.ExpanderRight,
 	).CloneMutableSetPtrLike()
 
-	if err = z.External.GetSku().GetMetadata().Cache.GetExpandedTags().EachPtr(
+	if err = z.sku.GetSku().GetMetadata().Cache.GetExpandedTags().EachPtr(
 		es.AddPtr,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -112,7 +112,7 @@ func (s *PrefixSet) addPair(
 	e string,
 	z *obj,
 ) {
-	if e == z.External.GetSku().ObjectId.String() {
+	if e == z.sku.GetSku().ObjectId.String() {
 		e = ""
 	}
 
@@ -126,8 +126,8 @@ func (s *PrefixSet) addPair(
 	var existingObj *obj
 	existingObj, ok = existingSet.Get(existingSet.Key(z))
 
-	if ok && existingObj.IsDirectOrSelf() {
-		z.SetDirect()
+	if ok && existingObj.tipe.IsDirectOrSelf() {
+		z.tipe.SetDirect()
 	} else if !ok {
 		s.count += 1
 	}
@@ -211,7 +211,7 @@ func (a PrefixSet) Match(
 
 		zSet.Each(
 			func(z *obj) (err error) {
-				es := z.External.GetSku().GetTags()
+				es := z.sku.GetSku().GetTags()
 
 				intersection := ids.IntersectPrefixes(
 					es,
@@ -253,7 +253,7 @@ func (a PrefixSet) Subset(
 		zSet.Each(
 			func(z *obj) (err error) {
 				ui.Log().Print(e2, z)
-				intersection := z.External.GetSku().Metadata.Cache.TagPaths.All.GetMatching(e2)
+				intersection := z.sku.GetSku().Metadata.Cache.TagPaths.All.GetMatching(e2)
 				hasDirect := false || len(intersection) == 0
 				type match struct {
 					string

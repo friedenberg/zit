@@ -10,8 +10,10 @@ type (
 )
 
 var (
-	CloneSkuType          = cloneExternalLike
-	MakeSkuTypeSetMutable = sku.MakeExternalLikeMutableSet
+	MakeSkuType                = makeExternalLike
+	CloneSkuType               = cloneExternalLike
+	CloneSkuTypeFromTransacted = cloneFromTransactedExternalLike
+	MakeSkuTypeSetMutable      = sku.MakeExternalLikeMutableSet
 )
 
 // type (
@@ -22,6 +24,8 @@ var (
 // )
 
 // var (
-// 	CloneSkuType          = cloneCheckedOut
-// 	MakeSkuTypeSetMutable = sku.MakeCheckedOutMutableSet
+// 	MakeSkuType                = makeCheckedOut
+// 	CloneSkuType               = cloneCheckedOut
+// 	CloneSkuTypeFromTransacted = cloneFromTransactedCheckedOut
+// 	MakeSkuTypeSetMutable      = sku.MakeCheckedOutMutableSet
 // )

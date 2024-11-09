@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
-func key(el skuType) string {
+func key(el external_store.SkuType) string {
 	eoid := el.GetExternalObjectId().String()
 	if len(eoid) > 1 {
 		return eoid
@@ -31,7 +31,7 @@ func key(el skuType) string {
 }
 
 // TODO explore using shas as keys
-func keySha(el skuType) string {
+func keySha(el external_store.SkuType) string {
 	objectSha := &el.GetSku().Metadata.SelfMetadataWithoutTai
 
 	if objectSha.IsNull() {
@@ -76,16 +76,16 @@ func (a *Assignment) addToSet(
 	}
 
 	for _, organizeObject := range a.All() {
-		var outputObject skuType
+		var outputObject external_store.SkuType
 
-		objectKey := key(organizeObject.External)
+		objectKey := key(organizeObject.sku)
 
 		previouslyProcessedObject, wasPreviouslyProcessed := output.m[objectKey]
 
 		if !wasPreviouslyProcessed {
 			outputObject = ot.ObjectFactory.Get()
 
-			ot.ObjectFactory.ResetWith(outputObject, organizeObject.External)
+			ot.ObjectFactory.ResetWith(outputObject, organizeObject.sku)
 
 			if !ot.Metadata.Type.IsEmpty() {
 				outputObject.GetSku().Metadata.Type.ResetWith(ot.Metadata.Type)
@@ -96,7 +96,7 @@ func (a *Assignment) addToSet(
 			output.Add(outputObject)
 
 			objectOriginal, hasOriginal := objectsFromBefore.Get(
-				objectsFromBefore.Key(organizeObject.External),
+				objectsFromBefore.Key(organizeObject.sku),
 			)
 
 			if hasOriginal {
@@ -112,7 +112,7 @@ func (a *Assignment) addToSet(
 			outputMetadata := outputObject.GetSku().GetMetadata()
 
 			for e := range ot.Metadata.AllPtr() {
-				if organizeObject.Type == tag_paths.TypeUnknown {
+				if organizeObject.tipe == tag_paths.TypeUnknown {
 					continue
 				}
 
@@ -129,10 +129,10 @@ func (a *Assignment) addToSet(
 				outputObject.GetSku().Metadata.Type.ResetWith(ot.Metadata.Type)
 			}
 		} else {
-			outputObject = previouslyProcessedObject.skuType
+			outputObject = previouslyProcessedObject.sku
 		}
 
-		if organizeObject.External.GetSku().ObjectId.String() == "" {
+		if organizeObject.sku.GetSku().ObjectId.String() == "" {
 			panic(fmt.Sprintf("%s: object id is nil", organizeObject))
 		}
 
@@ -141,31 +141,31 @@ func (a *Assignment) addToSet(
 		}
 
 		if err = outputObject.GetSku().Metadata.Description.Set(
-			organizeObject.External.GetSku().Metadata.Description.String(),
+			organizeObject.sku.GetSku().Metadata.Description.String(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if !organizeObject.External.GetSku().Metadata.Type.IsEmpty() {
+		if !organizeObject.sku.GetSku().Metadata.Type.IsEmpty() {
 			if err = outputObject.GetSku().Metadata.Type.Set(
-				organizeObject.External.GetSku().Metadata.Type.String(),
+				organizeObject.sku.GetSku().Metadata.Type.String(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 		}
 
-		if !organizeObject.IsDirectOrSelf() {
+		if !organizeObject.tipe.IsDirectOrSelf() {
 			return
 		}
 
 		outputObject.GetSku().Metadata.Comments = append(
 			outputObject.GetSku().Metadata.Comments,
-			organizeObject.External.GetSku().Metadata.Comments...,
+			organizeObject.sku.GetSku().Metadata.Comments...,
 		)
 
-		if err = organizeObject.External.GetSku().Metadata.GetTags().EachPtr(
+		if err = organizeObject.sku.GetSku().Metadata.GetTags().EachPtr(
 			outputObject.GetSku().AddTagPtr,
 		); err != nil {
 			err = errors.Wrap(err)

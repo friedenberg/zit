@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
 type TagSetGetter interface {
@@ -68,7 +69,7 @@ func (m *Metadata) SetFromObjectMetadata(
 	return
 }
 
-func (m Metadata) RemoveFromTransacted(sk skuType) (err error) {
+func (m Metadata) RemoveFromTransacted(sk external_store.SkuType) (err error) {
 	mes := sk.GetSku().Metadata.GetTags().CloneMutableSetPtrLike()
 
 	if err = m.Each(mes.Del); err != nil {

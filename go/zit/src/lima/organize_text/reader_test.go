@@ -11,8 +11,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt_debug"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/test_config"
@@ -48,15 +46,14 @@ func makeBez(t *testing.T, v string) (b descriptions.Description) {
 }
 
 func makeObjWithHinAndBez(t *testing.T, hin string, bez string) (o *obj) {
+  sk := external_store.MakeSkuType()
+  sk.GetSku().Metadata.Description = makeBez(t, bez)
+
 	o = &obj{
-		External: &sku.Transacted{
-			Metadata: object_metadata.Metadata{
-				Description: makeBez(t, bez),
-			},
-		},
+		sku: sk,
 	}
 
-	o.External.GetSku().ObjectId.SetWithIdLike(makeZettelId(t, hin))
+	o.sku.GetSku().ObjectId.SetWithIdLike(makeZettelId(t, hin))
 
 	return
 }
@@ -91,8 +88,8 @@ func assertEqualObjects(t *test_logz.T, expected, actual Objects) {
 
 	for i := range actual {
 		// actualObj, expectedObj := actual[i].External.GetSku(), expected[i].External.GetSku()
-		actualObj := sku_fmt_debug.StringMetadataSansTai(actual[i].External.GetSku())
-		expectedObj := sku_fmt_debug.StringMetadataSansTai(expected[i].External.GetSku())
+		actualObj := sku_fmt_debug.StringMetadataSansTai(actual[i].sku.GetSku())
+		expectedObj := sku_fmt_debug.StringMetadataSansTai(expected[i].sku.GetSku())
 
 		if actualObj != expectedObj {
 			t.Errorf("\nexpected: %#v\n  actual: %#v", expectedObj, actualObj)
