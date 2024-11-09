@@ -2,7 +2,6 @@ package box_format
 
 import (
 	"slices"
-	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
@@ -49,21 +48,16 @@ type BoxTransacted struct {
 	dir_layout.RelativePath
 }
 
-func (f *BoxTransacted) SetMaxKopfUndSchwanz(k, s int) {
-	f.MaxHead, f.MaxTail = k, s
-	f.Padding = strings.Repeat(" ", 5+k+s)
-}
-
 func (f *BoxTransacted) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
-	el sku.ExternalLike,
+	sk *sku.Transacted,
 ) (n int64, err error) {
-	o := el.GetSku()
 	var box string_format_writer.Box
 
 	var n2 int64
 
-	co, isCO := el.(*sku.CheckedOut)
+	var co *sku.CheckedOut
+	isCO := false
 
 	var stateString string
 	var isError bool
@@ -76,9 +70,9 @@ func (f *BoxTransacted) WriteStringFormat(
 		}
 
 		stateString = state.String()
-		o = &co.External
+		sk = &co.External
 	} else if f.Options.PrintState {
-		stateString = o.GetExternalState().String()
+		stateString = sk.GetExternalState().String()
 	}
 
 	box.Header.RightAligned = true
@@ -86,7 +80,7 @@ func (f *BoxTransacted) WriteStringFormat(
 	if stateString != "" {
 		box.Header.Value = stateString
 	} else if f.Options.PrintTime && !f.Options.PrintTai {
-		t := o.GetTai()
+		t := sk.GetTai()
 		box.Header.Value = t.Format(string_format_writer.StringFormatDateTime)
 	}
 
@@ -96,12 +90,12 @@ func (f *BoxTransacted) WriteStringFormat(
 	var errFS error
 
 	if f.FSItemReadWriter != nil {
-		fds, errFS = f.FSItemReadWriter.ReadFSItemFromExternal(o)
+		fds, errFS = f.FSItemReadWriter.ReadFSItemFromExternal(sk)
 	}
 
-	if f.FSItemReadWriter == nil || errFS != nil || !isCO || !o.RepoId.IsEmpty() || isError {
+	if f.FSItemReadWriter == nil || errFS != nil || !isCO || !sk.RepoId.IsEmpty() || isError {
 		n2, err = f.addFieldsExternal2(
-			o,
+			sk,
 			&box,
 			f.Options.DescriptionInBox,
 			fds,
@@ -113,7 +107,7 @@ func (f *BoxTransacted) WriteStringFormat(
 			return
 		}
 	} else {
-		n2, err = f.addFieldsFS(co, o, &box, fds)
+		n2, err = f.addFieldsFS(co, sk, &box, fds)
 		n += n2
 
 		if err != nil {
@@ -122,7 +116,7 @@ func (f *BoxTransacted) WriteStringFormat(
 		}
 	}
 
-	b := &o.Metadata.Description
+	b := &sk.Metadata.Description
 
 	if !f.Options.DescriptionInBox && !b.IsEmpty() {
 		box.Trailer = append(

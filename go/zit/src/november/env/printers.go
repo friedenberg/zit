@@ -40,7 +40,7 @@ func (u *Env) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOut] {
 		WithPrintTime(false).
 		WithPrintState(true)
 
-	sw := u.StringFormatWriterSkuBoxTransacted(
+	sw := u.StringFormatWriterSkuBoxCheckedOut(
 		po,
 		u.FormatColorOptionsOut(),
 		string_format_writer.CliFormatTruncation66CharEllipsis,
