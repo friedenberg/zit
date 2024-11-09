@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func (f *BoxTransacted) addFieldsFS(
+func (f *BoxCheckedOut) addFieldsFS(
 	co *sku.CheckedOut,
 	o *sku.Transacted,
 	box *string_format_writer.Box,

@@ -9,7 +9,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata_fmt"
@@ -56,22 +55,9 @@ func (f *BoxTransacted) WriteStringFormat(
 
 	var n2 int64
 
-	var co *sku.CheckedOut
-	isCO := false
-
 	var stateString string
-	var isError bool
 
-	if isCO {
-		state := co.GetState()
-
-		if state == checked_out_state.Error {
-			isError = true
-		}
-
-		stateString = state.String()
-		sk = &co.External
-	} else if f.Options.PrintState {
+	if f.Options.PrintState {
 		stateString = sk.GetExternalState().String()
 	}
 
@@ -87,33 +73,22 @@ func (f *BoxTransacted) WriteStringFormat(
 	box.Contents = slices.Grow(box.Contents, 10)
 
 	var fds *sku.FSItem
-	var errFS error
 
 	if f.FSItemReadWriter != nil {
-		fds, errFS = f.FSItemReadWriter.ReadFSItemFromExternal(sk)
+		fds, _ = f.FSItemReadWriter.ReadFSItemFromExternal(sk)
 	}
 
-	if f.FSItemReadWriter == nil || errFS != nil || !isCO || !sk.RepoId.IsEmpty() || isError {
-		n2, err = f.addFieldsExternal2(
-			sk,
-			&box,
-			f.Options.DescriptionInBox,
-			fds,
-		)
-		n += int64(n2)
+	n2, err = f.addFieldsExternal2(
+		sk,
+		&box,
+		f.Options.DescriptionInBox,
+		fds,
+	)
+	n += int64(n2)
 
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		n2, err = f.addFieldsFS(co, sk, &box, fds)
-		n += n2
-
-		if err != nil {
-			err = errors.Wrapf(err, "CheckedOut: %s", co)
-			return
-		}
+	if err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	b := &sk.Metadata.Description
