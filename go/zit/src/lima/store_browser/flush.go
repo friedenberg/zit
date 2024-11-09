@@ -17,7 +17,7 @@ func (s *Store) flushUrls() (err error) {
 
 	var resp browser_items.HTTPResponseWithRequestPayloadPut
 
-	deleted := make(map[string]transactedWithItem, len(s.deleted))
+	deleted := make(map[string]checkedOutWithItem, len(s.deleted))
 
 	var req browser_items.BrowserRequestPut
 	req.Deleted = make([]browser_items.Item, 0, len(s.deleted))
@@ -85,13 +85,13 @@ func (s *Store) flushUrls() (err error) {
 		}
 
 		if s.config.IsDryRun() {
-			originalItem.Transacted.State = external_state.WouldDelete
+			originalItem.CheckedOut.External.State = external_state.WouldDelete
 		} else {
-			originalItem.Transacted.State = external_state.Deleted
+			originalItem.CheckedOut.External.State = external_state.Deleted
 		}
 
 		if err = s.itemDeletedStringFormatWriter(
-			originalItem.Transacted,
+			originalItem.CheckedOut,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

@@ -34,7 +34,7 @@ func (u *Env) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
 }
 
 // TODO migrate to StringFormatWriterSkuBoxCheckedOut
-func (u *Env) PrinterTransactedDeleted() interfaces.FuncIter[*sku.Transacted] {
+func (u *Env) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOut] {
 	po := u.config.PrintOptions.
 		WithPrintShas(true).
 		WithPrintTime(false).
@@ -50,7 +50,7 @@ func (u *Env) PrinterTransactedDeleted() interfaces.FuncIter[*sku.Transacted] {
 		"\n",
 		u.Out(),
 		string_format_writer.MakeFunc(
-			func(w interfaces.WriterAndStringWriter, o *sku.Transacted) (n int64, err error) {
+			func(w interfaces.WriterAndStringWriter, o *sku.CheckedOut) (n int64, err error) {
 				return sw.WriteStringFormat(w, o)
 			},
 		),
