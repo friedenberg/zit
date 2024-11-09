@@ -22,7 +22,7 @@ func (c *constructor) collectExplicitAndImplicitFor(
 	res := catgut.MakeFromString(re.String())
 
 	if err = skus.Each(
-		func(st sku.ExternalLike) (err error) {
+		func(st skuType) (err error) {
 			sk := st.GetSku()
 
 			for _, ewp := range sk.Metadata.Cache.TagPaths.All {

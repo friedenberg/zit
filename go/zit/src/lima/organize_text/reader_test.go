@@ -68,19 +68,19 @@ func makeAssignmentLineReader() reader {
 			wasMade: true,
 			Config:  &test_config.Config{},
 			ObjectFactory: external_store.ObjectFactory{
-				PoolValue: pool.Bespoke[sku.ExternalLike]{
-					FuncGet: func() sku.ExternalLike {
+				PoolValue: pool.Bespoke[skuType]{
+					FuncGet: func() skuType {
 						return sku.GetTransactedPool().Get()
 					},
-					FuncPut: func(e sku.ExternalLike) {
+					FuncPut: func(e skuType) {
 						sku.GetTransactedPool().Put(e.(*sku.Transacted))
 					},
 				},
-				Resetter3: pool.BespokeResetter[sku.ExternalLike]{
-					FuncReset: func(e sku.ExternalLike) {
+				Resetter3: pool.BespokeResetter[skuType]{
+					FuncReset: func(e skuType) {
 						sku.TransactedResetter.Reset(e.GetSku())
 					},
-					FuncResetWith: func(dst, src sku.ExternalLike) {
+					FuncResetWith: func(dst, src skuType) {
 						sku.TransactedResetter.ResetWith(dst.GetSku(), src.GetSku())
 					},
 				},

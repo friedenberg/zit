@@ -6,29 +6,32 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+// type SkuType = *sku.CheckedOut
+type SkuType = sku.ExternalLike
+
 type ObjectFactory struct {
-	interfaces.PoolValue[sku.ExternalLike]
-	interfaces.Resetter3[sku.ExternalLike]
+	interfaces.PoolValue[SkuType]
+	interfaces.Resetter3[SkuType]
 }
 
 func (of *ObjectFactory) SetDefaultsIfNecessary() {
 	if of.Resetter3 == nil {
-		of.Resetter3 = pool.BespokeResetter[sku.ExternalLike]{
-			FuncReset: func(e sku.ExternalLike) {
+		of.Resetter3 = pool.BespokeResetter[SkuType]{
+			FuncReset: func(e SkuType) {
 				sku.TransactedResetter.Reset(e.GetSku())
 			},
-			FuncResetWith: func(dst, src sku.ExternalLike) {
+			FuncResetWith: func(dst, src SkuType) {
 				sku.TransactedResetter.ResetWith(dst.GetSku(), src.GetSku())
 			},
 		}
 	}
 
 	if of.PoolValue == nil {
-		of.PoolValue = pool.Bespoke[sku.ExternalLike]{
-			FuncGet: func() sku.ExternalLike {
+		of.PoolValue = pool.Bespoke[SkuType]{
+			FuncGet: func() SkuType {
 				return sku.GetTransactedPool().Get()
 			},
-			FuncPut: func(e sku.ExternalLike) {
+			FuncPut: func(e SkuType) {
 				sku.GetTransactedPool().Put(e.(*sku.Transacted))
 			},
 		}

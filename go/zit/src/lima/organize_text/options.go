@@ -34,7 +34,7 @@ type Options struct {
 	commentMatchers interfaces.SetLike[sku.Query]
 	GroupingTags    ids.TagSlice
 	ExtraTags       ids.TagSet
-	Skus            interfaces.SetLike[sku.ExternalLike]
+	Skus            interfaces.SetLike[skuType]
 
 	external_store.ObjectFactory
 

@@ -24,7 +24,7 @@ func makeObjSet() objSet {
 }
 
 type obj struct {
-	External sku.ExternalLike
+	External skuType
 	tag_paths.Type
 }
 

@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func key(el sku.ExternalLike) string {
+func key(el skuType) string {
 	eoid := el.GetExternalObjectId().String()
 	if len(eoid) > 1 {
 		return eoid
@@ -31,7 +31,7 @@ func key(el sku.ExternalLike) string {
 }
 
 // TODO explore using shas as keys
-func keySha(el sku.ExternalLike) string {
+func keySha(el skuType) string {
 	objectSha := &el.GetSku().Metadata.SelfMetadataWithoutTai
 
 	if objectSha.IsNull() {
@@ -76,7 +76,7 @@ func (a *Assignment) addToSet(
 	}
 
 	for _, organizeObject := range a.All() {
-		var outputObject sku.ExternalLike
+		var outputObject skuType
 
 		objectKey := key(organizeObject.External)
 

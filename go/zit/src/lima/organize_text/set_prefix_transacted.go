@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type PrefixSet struct {
@@ -41,7 +40,7 @@ func (s PrefixSet) Len() int {
 	return s.count
 }
 
-func (s *PrefixSet) AddTransacted(z sku.ExternalLike) (err error) {
+func (s *PrefixSet) AddTransacted(z skuType) (err error) {
 	o := obj{
 		External: z.CloneExternalLike(),
 	}

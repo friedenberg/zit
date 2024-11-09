@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
 
@@ -18,8 +19,10 @@ func MakeSkuMapWithOrder(c int) (out SkuMapWithOrder) {
 	return
 }
 
+type skuType = external_store.SkuType
+
 type skuExternalLikeWithIndex struct {
-	ExternalLike sku.ExternalLike
+	ExternalLike skuType
 	int
 }
 
@@ -28,8 +31,8 @@ type SkuMapWithOrder struct {
 	next int
 }
 
-func (smwo *SkuMapWithOrder) AllSkuAndIndex() iter.Seq2[int, sku.ExternalLike] {
-	return func(yield func(int, sku.ExternalLike) bool) {
+func (smwo *SkuMapWithOrder) AllSkuAndIndex() iter.Seq2[int, skuType] {
+	return func(yield func(int, skuType) bool) {
 		for _, sk := range smwo.m {
 			if !yield(sk.int, sk.ExternalLike) {
 				break
@@ -46,18 +49,18 @@ func (smwo *SkuMapWithOrder) AsExternalLikeSet() sku.ExternalLikeMutableSet {
 
 func (smwo *SkuMapWithOrder) AsTransactedSet() sku.TransactedMutableSet {
 	tms := sku.MakeTransactedMutableSet()
-	errors.PanicIfError(smwo.Each(func(el sku.ExternalLike) (err error) {
+	errors.PanicIfError(smwo.Each(func(el skuType) (err error) {
 		return tms.Add(el.GetSku())
 	}))
 	return tms
 }
 
-func (sm *SkuMapWithOrder) Del(sk sku.ExternalLike) error {
+func (sm *SkuMapWithOrder) Del(sk skuType) error {
 	delete(sm.m, key(sk))
 	return nil
 }
 
-func (sm *SkuMapWithOrder) Add(sk sku.ExternalLike) error {
+func (sm *SkuMapWithOrder) Add(sk skuType) error {
 	k := key(sk)
 	entry, ok := sm.m[k]
 
@@ -86,8 +89,8 @@ func (sm *SkuMapWithOrder) Clone() (out SkuMapWithOrder) {
 	return out
 }
 
-func (sm SkuMapWithOrder) Sorted() (out []sku.ExternalLike) {
-	out = make([]sku.ExternalLike, 0, sm.Len())
+func (sm SkuMapWithOrder) Sorted() (out []skuType) {
+	out = make([]skuType, 0, sm.Len())
 
 	for _, v := range sm.m {
 		out = append(out, v.ExternalLike)
@@ -113,7 +116,7 @@ func (sm SkuMapWithOrder) Sorted() (out []sku.ExternalLike) {
 }
 
 func (sm *SkuMapWithOrder) Each(
-	f interfaces.FuncIter[sku.ExternalLike],
+	f interfaces.FuncIter[skuType],
 ) (err error) {
 	for _, v := range sm.Sorted() {
 		_, ok := sm.m[key(v)]
@@ -232,7 +235,7 @@ func applyToText(
 	}
 
 	if err = t.Options.Skus.Each(
-		func(el sku.ExternalLike) (err error) {
+		func(el skuType) (err error) {
 			sk := el.GetSku()
 
 			if sk.Metadata.Description.IsEmpty() {
