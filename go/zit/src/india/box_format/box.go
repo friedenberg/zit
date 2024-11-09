@@ -90,6 +90,8 @@ func (f *Box) WriteStringFormat(
 		box.Header.Value = t.Format(string_format_writer.StringFormatDateTime)
 	}
 
+	box.Contents = slices.Grow(box.Contents, 10)
+
 	var fds *sku.FSItem
 	var errFS error
 
@@ -159,8 +161,6 @@ func (f *Box) addFieldsExternal(
 			e.State = external_state.Untracked
 		}
 	}
-
-	box.Contents = slices.Grow(box.Contents, 10)
 
 	oid := &e.ObjectId
 	oidIsExternal := e.State == external_state.Untracked && !e.ExternalObjectId.IsEmpty()

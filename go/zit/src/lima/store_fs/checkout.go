@@ -29,8 +29,8 @@ func (s *Store) CheckoutOne(
 
 func (s *Store) checkoutOneForReal(
 	options checkout_options.Options,
-	cz *sku.CheckedOut,
-	i *sku.FSItem,
+	co *sku.CheckedOut,
+	item *sku.FSItem,
 ) (err error) {
 	if s.config.IsDryRun() {
 		return
@@ -38,7 +38,7 @@ func (s *Store) checkoutOneForReal(
 
 	// delete the existing checkout if it exists in the cwd
 	if options.Path == checkout_options.PathDefault {
-		if err = s.RemoveItem(i); err != nil {
+		if err = s.RemoveItem(item); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -46,27 +46,23 @@ func (s *Store) checkoutOneForReal(
 
 	var info checkoutFileNameInfo
 
-	if info, err = s.filenameForTransacted(
+	if err = s.hydrateCheckoutFileNameInfoFromCheckedOut(
 		options,
-		&cz.Internal,
+		co,
+		&info,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	cz.State = checked_out_state.JustCheckedOut
-
-	info.tipe = cz.Internal.GetType()
-	info.inlineBlob = s.config.IsInlineType(info.tipe)
-
-	if err = s.setObjectIfNecessary(options, i, info); err != nil {
+	if err = s.setObjectIfNecessary(options, item, info); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if err = s.setBlobIfNecessary(
 		options,
-		i,
+		item,
 		info,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -74,17 +70,17 @@ func (s *Store) checkoutOneForReal(
 	}
 
 	// This is necessary otherwise External is an empty sku
-	sku.Resetter.ResetWith(&cz.External, &cz.Internal)
+	sku.Resetter.ResetWith(&co.External, &co.Internal)
 
-	if err = s.WriteFSItemToExternal(i, &cz.External); err != nil {
+	if err = s.WriteFSItemToExternal(item, &co.External); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if err = s.fileEncoder.Encode(
 		options.TextFormatterOptions,
-		&cz.External,
-		i,
+		&co.External,
+		item,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -191,10 +187,29 @@ type checkoutFileNameInfo struct {
 	inlineBlob bool
 }
 
-func (s *Store) filenameForTransacted(
+func (s *Store) hydrateCheckoutFileNameInfoFromCheckedOut(
+	options checkout_options.Options,
+	co *sku.CheckedOut,
+	info *checkoutFileNameInfo,
+) (err error) {
+	if err = s.SetFilenameForTransacted(options, &co.Internal, info); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	co.State = checked_out_state.JustCheckedOut
+
+	info.tipe = co.Internal.GetType()
+	info.inlineBlob = s.config.IsInlineType(info.tipe)
+
+	return
+}
+
+func (s *Store) SetFilenameForTransacted(
 	options checkout_options.Options,
 	sk *sku.Transacted,
-) (info checkoutFileNameInfo, err error) {
+	info *checkoutFileNameInfo,
+) (err error) {
 	cwd := s.dirLayout.Cwd()
 
 	if options.Path == checkout_options.PathTempLocal {
