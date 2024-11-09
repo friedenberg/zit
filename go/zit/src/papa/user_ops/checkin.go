@@ -98,7 +98,7 @@ func (op Checkin) Run(
 					return
 				}
 
-				if err = u.GetStore().DeleteCheckedOutLike(col); err != nil {
+				if err = u.GetStore().DeleteCheckedOut(col.(*sku.CheckedOut)); err != nil {
 					err = errors.Wrap(err)
 					return
 				}
@@ -186,9 +186,9 @@ func (op Checkin) runOrganize(
 	}
 
 	if err = changes.After.Each(
-		func(el sku.SkuType) (err error) {
+		func(co sku.SkuType) (err error) {
 			if err = u.GetStore().CreateOrUpdate(
-				el,
+				co,
 				object_mode.ModeCreate,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -199,9 +199,8 @@ func (op Checkin) runOrganize(
 				return
 			}
 
-			if err = u.GetStore().DeleteExternalLike(
-				qg.RepoId,
-				el,
+			if err = u.GetStore().DeleteCheckedOut(
+				co,
 			); err != nil {
 				err = errors.Wrap(err)
 				return

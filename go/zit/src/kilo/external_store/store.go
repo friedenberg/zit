@@ -149,8 +149,8 @@ func (s *Store) CheckoutOne(
 	return
 }
 
-func (s *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
-	es, ok := s.StoreLike.(DeleteExternal)
+func (s *Store) DeleteCheckedOut(el *sku.CheckedOut) (err error) {
+	es, ok := s.StoreLike.(DeleteCheckedOut)
 
 	if !ok {
 		err = makeErrUnsupportedOperation(s, &s)
@@ -162,7 +162,7 @@ func (s *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
 		return
 	}
 
-	if err = es.DeleteExternalLike(el); err != nil {
+	if err = es.DeleteCheckedOut(el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -75,12 +75,12 @@ func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
 	return fs
 }
 
-func (s *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
-	e := el.(*sku.Transacted)
+func (s *Store) DeleteCheckedOut(co *sku.CheckedOut) (err error) {
+	external := &co.External
 
 	var i *sku.FSItem
 
-	if i, err = s.ReadFSItemFromExternal(e); err != nil {
+	if i, err = s.ReadFSItemFromExternal(external); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

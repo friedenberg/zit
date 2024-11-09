@@ -9,7 +9,7 @@ import (
 )
 
 type Conflicted struct {
-	CheckedOutLike
+	*CheckedOut
 	Left, Middle, Right *Transacted
 }
 

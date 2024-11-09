@@ -299,7 +299,7 @@ func (ar *reader) readOneObj(
 	// }
 
 	if z.sku.GetSku().ObjectId.IsEmpty() {
-		// set empty hinweis to ensure middle is '/'
+		// set empty zettel id to ensure middle is '/'
 		if err = z.sku.GetSku().ObjectId.SetWithIdLike(ids.ZettelId{}); err != nil {
 			err = errors.Wrap(err)
 			return

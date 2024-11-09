@@ -5,20 +5,20 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func (s *Store) DeleteExternalLike(el sku.ExternalLike) (err error) {
-	e := el.(*sku.Transacted)
+func (s *Store) DeleteCheckedOut(co *sku.CheckedOut) (err error) {
+	external := &co.External
 
 	var item Item
 
-	if err = item.ReadFromExternal(e); err != nil {
+	if err = item.ReadFromExternal(external); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	item.ExternalId = e.GetSku().ObjectId.String()
+	item.ExternalId = external.GetSku().ObjectId.String()
 
 	s.deleted[item.Url.URL] = append(s.deleted[item.Url.URL], transactedWithItem{
-		Transacted: e.CloneTransacted(),
+		Transacted: external.CloneTransacted(),
 		Item:       item,
 	})
 

@@ -35,8 +35,8 @@ type (
 		) (cz sku.CheckedOutLike, err error)
 	}
 
-	DeleteExternal interface {
-		DeleteExternalLike(el sku.ExternalLike) (err error)
+	DeleteCheckedOut interface {
+		DeleteCheckedOut(el *sku.CheckedOut) (err error)
 	}
 
 	UpdateTransacted = sku.ExternalStoreUpdateTransacted

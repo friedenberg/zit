@@ -33,22 +33,9 @@ func (s *Store) SaveBlob(el sku.ExternalLike) (err error) {
 	return
 }
 
-func (s *Store) DeleteCheckedOutLike(col sku.CheckedOutLike) (err error) {
-	if err = s.DeleteExternalLike(
-		col.GetSkuExternalLike().GetRepoId(),
-		col.GetSkuExternalLike(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+func (s *Store) DeleteCheckedOut(col *sku.CheckedOut) (err error) {
+	repoId := col.GetSkuExternalLike().GetRepoId()
 
-	return
-}
-
-func (s *Store) DeleteExternalLike(
-	repoId ids.RepoId,
-	el sku.ExternalLike,
-) (err error) {
 	es, ok := s.externalStores[repoId]
 
 	if !ok {
@@ -56,7 +43,7 @@ func (s *Store) DeleteExternalLike(
 		return
 	}
 
-	if err = es.DeleteExternalLike(el); err != nil {
+	if err = es.DeleteCheckedOut(col); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -218,7 +205,7 @@ func (s *Store) MakeQueryExecutor(
 func (s *Store) MergeConflicted(
 	tm sku.Conflicted,
 ) (err error) {
-	switch tm.CheckedOutLike.GetSkuExternalLike().GetRepoId().GetRepoIdString() {
+	switch tm.CheckedOut.GetSkuExternalLike().GetRepoId().GetRepoIdString() {
 	case "browser":
 		err = todo.Implement()
 
@@ -283,7 +270,7 @@ func (s *Store) UpdateTransactedWithExternal(
 func (s *Store) ReadCheckedOutFromTransacted(
 	kasten ids.RepoId,
 	sk *sku.Transacted,
-) (co sku.CheckedOutLike, err error) {
+) (co *sku.CheckedOut, err error) {
 	switch kasten.GetRepoIdString() {
 	case "browser":
 		err = todo.Implement()

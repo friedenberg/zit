@@ -74,7 +74,7 @@ func (c Mergetool) RunWithQuery(
 		cofs := col.(*sku.CheckedOut)
 
 		tm := sku.Conflicted{
-			CheckedOutLike: col.CloneCheckedOutLike(),
+			CheckedOut: cofs.Clone(),
 		}
 
 		var conflict *fd.FD

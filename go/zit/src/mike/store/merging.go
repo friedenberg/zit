@@ -57,9 +57,9 @@ func (s *Store) readExternalAndMergeIfNecessary(
 		return
 	}
 
-	var col sku.CheckedOutLike
+	var co *sku.CheckedOut
 
-	if col, err = s.ReadCheckedOutFromTransacted(
+	if co, err = s.ReadCheckedOutFromTransacted(
 		options.RepoId,
 		parent,
 	); err != nil {
@@ -67,11 +67,11 @@ func (s *Store) readExternalAndMergeIfNecessary(
 		return
 	}
 
-	defer s.PutCheckedOutLike(col)
+	defer s.PutCheckedOutLike(co)
 
-	right := col.GetSkuExternalLike().GetSku()
+	right := co.GetSkuExternalLike().GetSku()
 
-	parentEqualsExternal := right.Metadata.EqualsSansTai(&col.GetSku().Metadata)
+	parentEqualsExternal := right.Metadata.EqualsSansTai(&co.GetSku().Metadata)
 
 	if parentEqualsExternal {
 		op := checkout_options.OptionsWithoutMode{
@@ -82,7 +82,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 
 		if err = s.UpdateCheckoutFromCheckedOut(
 			op,
-			col,
+			co,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -92,10 +92,10 @@ func (s *Store) readExternalAndMergeIfNecessary(
 	}
 
 	tm := sku.Conflicted{
-		CheckedOutLike: col,
-		Left:           left,
-		Middle:         parent,
-		Right:          right,
+		CheckedOut: co,
+		Left:       left,
+		Middle:     parent,
+		Right:      right,
 	}
 
 	if err = s.MergeConflicted(tm); err != nil {

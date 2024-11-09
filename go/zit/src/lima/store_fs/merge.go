@@ -22,7 +22,7 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 
 	original, replacement, mergeResult := s.tryMergeIgnoringConflicts(tm)
 
-	cofs := tm.CheckedOutLike.(*sku.CheckedOut)
+	co := tm.CheckedOut
 
 	if mergeResult != nil {
 		mergeConflict := &ErrMergeConflict{}
@@ -30,7 +30,7 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 		if errors.As(mergeResult, &mergeConflict) {
 			if err = s.handleMergeResult(
 				tm,
-				cofs,
+				co,
 				mergeConflict,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -114,7 +114,7 @@ func (s *Store) tryMergeIgnoringConflicts(
 		return
 	}
 
-	if original, err = s.ReadFSItemFromExternal(tm.CheckedOutLike.GetSkuExternalLike()); err != nil {
+	if original, err = s.ReadFSItemFromExternal(tm.CheckedOut.GetSkuExternalLike()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -247,7 +247,7 @@ func (s *Store) RunMergeTool(
 		return
 	}
 
-	co = tm.CheckedOutLike.(*sku.CheckedOut)
+	co = tm.CheckedOut
 
 	inlineBlob := tm.IsAllInlineType(s.config)
 
@@ -322,8 +322,8 @@ func (s *Store) RunMergeTool(
 		return
 	}
 
-	if err = s.DeleteExternalLike(
-		tm.CheckedOutLike.GetSkuExternalLike(),
+	if err = s.DeleteCheckedOut(
+		tm.CheckedOut,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

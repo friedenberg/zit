@@ -32,7 +32,7 @@ func (op Diff) Run(
 	col sku.CheckedOutLike,
 	options object_metadata.TextFormatterOptions,
 ) (err error) {
-	cofs, ok := col.(*sku.CheckedOut)
+	co, ok := col.(*sku.CheckedOut)
 
 	if !ok {
 		if col, err = op.GetStore().GetStoreFS().CheckoutOne(
@@ -48,11 +48,11 @@ func (op Diff) Run(
 			return
 		}
 
-		cofs = col.(*sku.CheckedOut)
+		co = col.(*sku.CheckedOut)
 
 		defer errors.Deferred(&err, func() (err error) {
-			if err = op.GetStore().GetStoreFS().DeleteExternalLike(
-				cofs.GetSkuExternalLike(),
+			if err = op.GetStore().GetStoreFS().DeleteCheckedOut(
+				co,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -65,13 +65,13 @@ func (op Diff) Run(
 	wg := quiter.MakeErrorWaitGroupParallel()
 	var mode checkout_mode.Mode
 
-	il := &cofs.Internal
+	il := &co.Internal
 	ilCtx := object_metadata.TextFormatterContext{
 		PersistentFormatterContext: il,
 		TextFormatterOptions:       options,
 	}
 
-	el := &cofs.External
+	el := &co.External
 	elCtx := object_metadata.TextFormatterContext{
 		PersistentFormatterContext: el,
 		TextFormatterOptions:       options,

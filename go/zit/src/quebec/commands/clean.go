@@ -139,7 +139,7 @@ func (c Clean) RunWithQuery(
 				return
 			}
 
-			if err = u.GetStore().DeleteCheckedOutLike(co); err != nil {
+			if err = u.GetStore().DeleteCheckedOut(co.(*sku.CheckedOut)); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -202,8 +202,7 @@ func (c Clean) runOrganize(u *env.Env, qg *query.Group) (err error) {
 
 	if err = changes.Removed.Each(
 		func(el sku.SkuType) (err error) {
-			if err = u.GetStore().DeleteExternalLike(
-				qg.RepoId,
+			if err = u.GetStore().DeleteCheckedOut(
 				el,
 			); err != nil {
 				err = errors.Wrap(err)
