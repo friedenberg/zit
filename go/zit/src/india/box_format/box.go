@@ -100,10 +100,11 @@ func (f *Box) WriteStringFormat(
 	}
 
 	if f.FSItemReadWriter == nil || errFS != nil || !isCO || !o.RepoId.IsEmpty() || isError {
-		n2, err = f.addFieldsExternal(
+		n2, err = f.addFieldsExternal2(
 			o,
 			&box,
 			f.Options.DescriptionInBox,
+      fds,
 		)
 		n += int64(n2)
 
