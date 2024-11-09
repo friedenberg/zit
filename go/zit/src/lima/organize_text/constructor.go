@@ -289,7 +289,7 @@ func (c *constructor) cloneObj(
 ) (z *obj, err error) {
 	z = &obj{
 		Type:     named.Type,
-		External: named.External.CloneExternalLike(),
+		External: external_store.CloneSkuType(named.External),
 	}
 
 	// TODO explore using shas as keys

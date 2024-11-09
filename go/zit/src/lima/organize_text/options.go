@@ -58,7 +58,7 @@ func MakeFlags() Flags {
 		Options: Options{
 			wasMade:      true,
 			GroupingTags: ids.MakeTagSlice(),
-			Skus:         sku.MakeExternalLikeMutableSet(),
+			Skus:         external_store.MakeSkuTypeSetMutable(),
 			Metadata:     NewMetadata(ids.RepoId{}),
 		},
 	}
@@ -79,7 +79,7 @@ func MakeFlagsWithMetadata(m Metadata) Flags {
 			Metadata:     m,
 			wasMade:      true,
 			GroupingTags: ids.MakeTagSlice(),
-			Skus:         sku.MakeExternalLikeMutableSet(),
+			Skus:         external_store.MakeSkuTypeSetMutable(),
 		},
 	}
 }

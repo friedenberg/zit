@@ -41,8 +41,8 @@ func (smwo *SkuMapWithOrder) AllSkuAndIndex() iter.Seq2[int, skuType] {
 	}
 }
 
-func (smwo *SkuMapWithOrder) AsExternalLikeSet() sku.ExternalLikeMutableSet {
-	elms := sku.MakeExternalLikeMutableSet()
+func (smwo *SkuMapWithOrder) AsExternalLikeSet() external_store.SkuTypeSetMutable {
+	elms := external_store.MakeSkuTypeSetMutable()
 	errors.PanicIfError(smwo.Each(elms.Add))
 	return elms
 }

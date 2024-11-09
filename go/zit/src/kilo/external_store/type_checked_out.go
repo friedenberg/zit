@@ -6,12 +6,16 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+func cloneCheckedOut(co *sku.CheckedOut) *sku.CheckedOut {
+	return co.Clone()
+}
+
 type objectFactoryCheckedOut struct {
 	interfaces.PoolValue[*sku.CheckedOut]
 	interfaces.Resetter3[*sku.CheckedOut]
 }
 
-func (of *objectFactoryCheckedOut) SetDefaultsIfNecessary() {
+func (of *objectFactoryCheckedOut) SetDefaultsIfNecessary() objectFactoryCheckedOut {
 	if of.Resetter3 == nil {
 		of.Resetter3 = pool.BespokeResetter[*sku.CheckedOut]{
 			FuncReset: func(e *sku.CheckedOut) {
@@ -33,4 +37,6 @@ func (of *objectFactoryCheckedOut) SetDefaultsIfNecessary() {
 			},
 		}
 	}
+
+	return *of
 }

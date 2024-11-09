@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
 type (
@@ -39,7 +40,7 @@ func (o obj) GetSku() *sku.Transacted {
 func (a *obj) cloneWithType(t tag_paths.Type) (b *obj) {
 	b = &obj{
 		Type:     t,
-		External: a.External.CloneExternalLike(),
+		External: external_store.CloneSkuType(a.External),
 	}
 
 	return

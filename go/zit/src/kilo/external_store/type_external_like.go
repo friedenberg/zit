@@ -6,6 +6,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+func cloneExternalLike(el sku.ExternalLike) sku.ExternalLike {
+	return el.CloneExternalLike()
+}
+
 type objectFactoryExternalLike struct {
 	interfaces.PoolValue[sku.ExternalLike]
 	interfaces.Resetter3[sku.ExternalLike]
@@ -34,5 +38,5 @@ func (of *objectFactoryExternalLike) SetDefaultsIfNecessary() objectFactoryExter
 		}
 	}
 
-  return *of
+	return *of
 }

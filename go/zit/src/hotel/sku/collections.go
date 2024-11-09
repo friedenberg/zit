@@ -13,6 +13,7 @@ import (
 var (
 	transactedKeyerObjectId   ids.ObjectIdKeyer[*Transacted]
 	externalLikeKeyerObjectId ExternalObjectIdKeyer[ExternalLike]
+	checkedOutKeyerObjectId   ids.ObjectIdKeyer[*CheckedOut]
 	TransactedSetEmpty        TransactedSet
 	TransactedLessor          transactedLessor
 	TransactedEqualer         transactedEqualer
@@ -96,6 +97,14 @@ func MakeExternalLikeSet() ExternalLikeSet {
 
 func MakeExternalLikeMutableSet() ExternalLikeMutableSet {
 	return collections_value.MakeMutableValueSet(externalLikeKeyerObjectId)
+}
+
+func MakeCheckedOutSet() CheckedOutSet {
+	return collections_value.MakeValueSet(checkedOutKeyerObjectId)
+}
+
+func MakeCheckedOutMutableSet() CheckedOutMutableSet {
+	return collections_value.MakeMutableValueSet(checkedOutKeyerObjectId)
 }
 
 func MakeCheckedOutLikeMutableSet() CheckedOutLikeMutableSet {
