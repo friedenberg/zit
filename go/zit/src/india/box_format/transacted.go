@@ -17,15 +17,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func MakeBox(
+func MakeBoxTransacted(
 	co string_format_writer.ColorOptions,
 	options options_print.V0,
 	fieldsFormatWriter interfaces.StringFormatWriter[string_format_writer.Box],
 	abbr ids.Abbr,
 	fsItemReadWriter sku.FSItemReadWriter,
 	relativePath dir_layout.RelativePath,
-) *Box {
-	return &Box{
+) *BoxTransacted {
+	return &BoxTransacted{
 		ColorOptions:     co,
 		Options:          options,
 		Box:              fieldsFormatWriter,
@@ -35,7 +35,7 @@ func MakeBox(
 	}
 }
 
-type Box struct {
+type BoxTransacted struct {
 	string_format_writer.ColorOptions
 	Options options_print.V0
 
@@ -49,12 +49,12 @@ type Box struct {
 	dir_layout.RelativePath
 }
 
-func (f *Box) SetMaxKopfUndSchwanz(k, s int) {
+func (f *BoxTransacted) SetMaxKopfUndSchwanz(k, s int) {
 	f.MaxHead, f.MaxTail = k, s
 	f.Padding = strings.Repeat(" ", 5+k+s)
 }
 
-func (f *Box) WriteStringFormat(
+func (f *BoxTransacted) WriteStringFormat(
 	sw interfaces.WriterAndStringWriter,
 	el sku.ExternalLike,
 ) (n int64, err error) {
@@ -152,7 +152,7 @@ func (f *Box) WriteStringFormat(
 	return
 }
 
-func (f *Box) addFieldsExternal(
+func (f *BoxTransacted) addFieldsExternal(
 	e *sku.Transacted,
 	box *string_format_writer.Box,
 	includeDescriptionInBox bool,
@@ -218,7 +218,7 @@ func (f *Box) addFieldsExternal(
 	return
 }
 
-func (f *Box) addFieldsMetadata(
+func (f *BoxTransacted) addFieldsMetadata(
 	options options_print.V0,
 	o *sku.Transacted,
 	includeDescriptionInBox bool,

@@ -13,7 +13,7 @@ import (
 )
 
 // TODO make this error for invalid input
-func (f *Box) ReadStringFormat(
+func (f *BoxTransacted) ReadStringFormat(
 	rs io.RuneScanner,
 	el *sku.Transacted,
 ) (n int64, err error) {
@@ -54,7 +54,7 @@ func (f *Box) ReadStringFormat(
 
 var errNotABox = errors.New("not a box")
 
-func (f *Box) openBox(ts *query_spec.TokenScanner) (err error) {
+func (f *BoxTransacted) openBox(ts *query_spec.TokenScanner) (err error) {
 	if !ts.ScanSkipSpace() {
 		if ts.Error() != nil {
 			err = errors.Wrap(ts.Error())
@@ -86,7 +86,7 @@ func (f *Box) openBox(ts *query_spec.TokenScanner) (err error) {
 	return
 }
 
-func (f *Box) readStringFormatBox(
+func (f *BoxTransacted) readStringFormatBox(
 	ts *query_spec.TokenScanner,
 	el sku.ExternalLike,
 ) (err error) {

@@ -38,7 +38,7 @@ type Store struct {
 
 	object_format object_inventory_format.Format
 	options       object_inventory_format.Options
-	box           *box_format.Box
+	box           *box_format.BoxTransacted
 
 	blobType ids.Type
 }
@@ -51,7 +51,7 @@ func (s *Store) Initialize(
 	af interfaces.BlobIOFactory,
 	pmf object_inventory_format.Format,
 	clock ids.Clock,
-	box *box_format.Box,
+	box *box_format.BoxTransacted,
 	blobStore *blob_store.VersionedStores,
 ) (err error) {
 	p := pool.MakePool(nil, func(a *sku.List) { sku.ResetterList.Reset(a) })

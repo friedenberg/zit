@@ -40,12 +40,12 @@ type Options struct {
 
 	Abbr ids.Abbr
 
-	UsePrefixJoints        bool
-	UseRefiner             bool
-	UseMetadataHeader      bool
+	UsePrefixJoints   bool
+	UseRefiner        bool
+	UseMetadataHeader bool
 
 	PrintOptions options_print.V0
-	fmtBox       *box_format.Box
+	fmtBox       *box_format.BoxTransacted
 }
 
 func MakeFlags() Flags {
@@ -112,7 +112,7 @@ func (o *Flags) AddToFlagSet(f *flag.FlagSet) {
 
 func (o *Flags) GetOptionsWithMetadata(
 	printOptions options_print.V0,
-	skuFmt *box_format.Box,
+	skuFmt *box_format.BoxTransacted,
 	abbr ids.Abbr,
 	of external_store.ObjectFactory,
 	m Metadata,
@@ -138,7 +138,7 @@ func (o *Flags) GetOptionsWithMetadata(
 func (o *Flags) GetOptions(
 	printOptions options_print.V0,
 	q TagSetGetter,
-	skuBoxFormat *box_format.Box,
+	skuBoxFormat *box_format.BoxTransacted,
 	abbr ids.Abbr, // TODO move Abbr as required arg
 	of external_store.ObjectFactory,
 ) Options {

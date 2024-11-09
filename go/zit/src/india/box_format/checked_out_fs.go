@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func (f *Box) addFieldsFS(
+func (f *BoxTransacted) addFieldsFS(
 	co *sku.CheckedOut,
 	o *sku.Transacted,
 	box *string_format_writer.Box,
@@ -94,7 +94,7 @@ func (f *Box) addFieldsFS(
 	return
 }
 
-func (f *Box) addFieldsFSBlobExcept(
+func (f *BoxTransacted) addFieldsFSBlobExcept(
 	fds *sku.FSItem,
 	except *fd.FD,
 	box *string_format_writer.Box,
@@ -118,7 +118,7 @@ func (f *Box) addFieldsFSBlobExcept(
 	return
 }
 
-func (f *Box) addFieldFSBlob(
+func (f *BoxTransacted) addFieldFSBlob(
 	fd *fd.FD,
 	box *string_format_writer.Box,
 ) (err error) {
@@ -139,7 +139,7 @@ func (f *Box) addFieldFSBlob(
 	return
 }
 
-func (f *Box) addFieldsFSUntracked(
+func (f *BoxTransacted) addFieldsFSUntracked(
 	co *sku.CheckedOut,
 	mode checkout_mode.Mode,
 	box *string_format_writer.Box,

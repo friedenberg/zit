@@ -55,7 +55,7 @@ type Env struct {
 
 	DormantCounter query.DormantCounter
 
-	luaSkuFormat *box_format.Box
+	luaSkuFormat *box_format.BoxTransacted
 }
 
 func Make(

@@ -16,7 +16,7 @@ import (
 
 type InventoryStore struct {
 	dirLayout dir_layout.DirLayout
-	boxFormat *box_format.Box
+	boxFormat *box_format.BoxTransacted
 	v0        inventory_list_blobs.V0
 	v1        inventory_list_blobs.V1
 }
@@ -24,7 +24,7 @@ type InventoryStore struct {
 func MakeInventoryStore(
 	dirLayout dir_layout.DirLayout,
 	objectFormat object_inventory_format.Format,
-	boxFormat *box_format.Box,
+	boxFormat *box_format.BoxTransacted,
 ) InventoryStore {
 	objectOptions := object_inventory_format.Options{Tai: true}
 

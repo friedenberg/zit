@@ -15,7 +15,7 @@ type V0 struct {
 	FileExtensions  file_extensions.V0                    `toml:"file-extensions"`
 	RemoteScripts   map[string]script_config.RemoteScript `toml:"remote-scripts"`
 	Actions         map[string]script_config.ScriptConfig `toml:"actions,omitempty"`
-	PrintOptions    options_print.V0                 `toml:"cli-output"`
+	PrintOptions    options_print.V0                      `toml:"cli-output"`
 	Tools           options_tools.Options                 `toml:"tools"`
 	Filters         map[string]string                     `toml:"filters"`
 }

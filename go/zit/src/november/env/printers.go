@@ -16,7 +16,7 @@ func (u *Env) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
 		WithPrintShas(true).
 		WithExcludeFields(true)
 
-	sw := u.StringFormatWriterSkuBox(
+	sw := u.StringFormatWriterSkuBoxTransacted(
 		po,
 		u.FormatColorOptionsOut(),
 		string_format_writer.CliFormatTruncation66CharEllipsis,
@@ -33,13 +33,14 @@ func (u *Env) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
 	)
 }
 
+// TODO migrate to StringFormatWriterSkuBoxCheckedOut
 func (u *Env) PrinterTransactedDeleted() interfaces.FuncIter[*sku.Transacted] {
 	po := u.config.PrintOptions.
 		WithPrintShas(true).
 		WithPrintTime(false).
 		WithPrintState(true)
 
-	sw := u.StringFormatWriterSkuBox(
+	sw := u.StringFormatWriterSkuBoxTransacted(
 		po,
 		u.FormatColorOptionsOut(),
 		string_format_writer.CliFormatTruncation66CharEllipsis,
@@ -100,7 +101,7 @@ func (u *Env) PrinterCheckedOut() interfaces.FuncIter[*sku.CheckedOut] {
 	err := string_format_writer.MakeDelim(
 		"\n",
 		u.Err(),
-		u.StringFormatWriterSkuBox(
+		u.StringFormatWriterSkuBoxCheckedOut(
 			po,
 			oo.ColorOptionsErr,
 			string_format_writer.CliFormatTruncation66CharEllipsis,
@@ -110,7 +111,7 @@ func (u *Env) PrinterCheckedOut() interfaces.FuncIter[*sku.CheckedOut] {
 	out := string_format_writer.MakeDelim(
 		"\n",
 		u.Out(),
-		u.StringFormatWriterSkuBox(
+		u.StringFormatWriterSkuBoxCheckedOut(
 			po,
 			oo.ColorOptionsErr,
 			string_format_writer.CliFormatTruncation66CharEllipsis,

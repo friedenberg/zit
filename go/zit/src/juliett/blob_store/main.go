@@ -20,7 +20,7 @@ func Make(
 	dirLayout dir_layout.DirLayout,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
 	objectFormat object_inventory_format.Format,
-	boxFormat *box_format.Box,
+	boxFormat *box_format.BoxTransacted,
 ) *VersionedStores {
 	return &VersionedStores{
 		InventoryList: MakeInventoryStore(dirLayout, objectFormat, boxFormat),

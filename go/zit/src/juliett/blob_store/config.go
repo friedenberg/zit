@@ -81,13 +81,13 @@ func (a ConfigStore) ParseTypedBlob(
 }
 
 func (a ConfigStore) FormatTypedBlob(
-  tg sku.TransactedGetter,
+	tg sku.TransactedGetter,
 	w io.Writer,
 ) (n int64, err error) {
-  sk := tg.GetSku()
+	sk := tg.GetSku()
 
-  tipe := sk.GetType()
-  blobSha := sk.GetBlobSha()
+	tipe := sk.GetType()
+	blobSha := sk.GetBlobSha()
 
 	var store SavedBlobFormatter
 	switch tipe.String() {

@@ -65,7 +65,7 @@ func (c *Store) Initialize(
 	luaVMPoolBuilder *lua.VMPoolBuilder,
 	qb *query.Builder,
 	options object_inventory_format.Options,
-	box *box_format.Box,
+	box *box_format.BoxTransacted,
 	blobStore *blob_store.VersionedStores,
 ) (err error) {
 	c.config = k

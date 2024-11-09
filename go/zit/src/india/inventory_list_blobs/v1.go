@@ -13,7 +13,7 @@ import (
 )
 
 type V1 struct {
-	Box *box_format.Box
+	Box *box_format.BoxTransacted
 }
 
 func (v V1) GetListFormat() sku.ListFormat {

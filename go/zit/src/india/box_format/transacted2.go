@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func (f *Box) addFieldsExternal2(
+func (f *BoxTransacted) addFieldsExternal2(
 	e *sku.Transacted,
 	box *string_format_writer.Box,
 	includeDescriptionInBox bool,
@@ -40,7 +40,7 @@ func (f *Box) addFieldsExternal2(
 	return
 }
 
-func (f *Box) makeFieldExternalObjectIdsIfNecessary(
+func (f *BoxTransacted) makeFieldExternalObjectIdsIfNecessary(
 	sk *sku.Transacted,
 	item *sku.FSItem,
 ) (field string_format_writer.Field, err error) {
@@ -67,7 +67,7 @@ func (f *Box) makeFieldExternalObjectIdsIfNecessary(
 	return
 }
 
-func (f *Box) makeFieldObjectId(
+func (f *BoxTransacted) makeFieldObjectId(
 	sk *sku.Transacted,
 ) (field string_format_writer.Field, empty bool, err error) {
 	oid := &sk.ObjectId
@@ -93,7 +93,7 @@ func (f *Box) makeFieldObjectId(
 	return
 }
 
-func (f *Box) addFieldsObjectIds2(
+func (f *BoxTransacted) addFieldsObjectIds2(
 	sk *sku.Transacted,
 	box *string_format_writer.Box,
 	item *sku.FSItem,
@@ -141,7 +141,7 @@ func (f *Box) addFieldsObjectIds2(
 	return
 }
 
-func (f *Box) addFieldsMetadata2(
+func (f *BoxTransacted) addFieldsMetadata2(
 	options options_print.V0,
 	sk *sku.Transacted,
 	includeDescriptionInBox bool,

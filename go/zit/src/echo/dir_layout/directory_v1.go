@@ -63,7 +63,7 @@ func (s directoryV1) DirCache(p ...string) string {
 }
 
 func (s directoryV1) DirCacheRepo(p ...string) string {
-  // TODO switch to XDG cache
+	// TODO switch to XDG cache
 	// return filepath.Join(stringSliceJoin(s.Cache, "repo", p...)...)
 	return s.DirZit(append([]string{"cache", "repo"}, p...)...)
 }

@@ -54,7 +54,7 @@ func newIndexAbbr(
 	p string,
 ) (i *indexAbbr, err error) {
 	i = &indexAbbr{
-		V0:   options,
+		V0:        options,
 		lock:      &sync.Mutex{},
 		once:      &sync.Once{},
 		path:      p,
