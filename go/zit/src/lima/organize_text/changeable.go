@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
 func key(el skuType) string {
@@ -47,7 +47,7 @@ func keySha(el skuType) string {
 }
 
 func (ot *Text) GetSkus(
-	original sku.ExternalLikeSet,
+	original external_store.SkuTypeSet,
 ) (out SkuMapWithOrder, err error) {
 	out = MakeSkuMapWithOrder(original.Len())
 
@@ -66,7 +66,7 @@ func (ot *Text) GetSkus(
 func (a *Assignment) addToSet(
 	ot *Text,
 	output SkuMapWithOrder,
-	objectsFromBefore sku.ExternalLikeSet,
+	objectsFromBefore external_store.SkuTypeSet,
 ) (err error) {
 	expanded := ids.MakeTagMutableSet()
 

@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -65,26 +64,9 @@ func makeObjWithHinAndBez(t *testing.T, hin string, bez string) (o *obj) {
 func makeAssignmentLineReader() reader {
 	return reader{
 		options: Options{
-			wasMade: true,
-			Config:  &test_config.Config{},
-			ObjectFactory: external_store.ObjectFactory{
-				PoolValue: pool.Bespoke[skuType]{
-					FuncGet: func() skuType {
-						return sku.GetTransactedPool().Get()
-					},
-					FuncPut: func(e skuType) {
-						sku.GetTransactedPool().Put(e.(*sku.Transacted))
-					},
-				},
-				Resetter3: pool.BespokeResetter[skuType]{
-					FuncReset: func(e skuType) {
-						sku.TransactedResetter.Reset(e.GetSku())
-					},
-					FuncResetWith: func(dst, src skuType) {
-						sku.TransactedResetter.ResetWith(dst.GetSku(), src.GetSku())
-					},
-				},
-			},
+			wasMade:       true,
+			Config:        &test_config.Config{},
+			ObjectFactory: (&external_store.ObjectFactory{}).SetDefaultsIfNecessary(),
 			fmtBox: box_format.MakeBoxTransacted(
 				string_format_writer.ColorOptions{},
 				options_print.V0{},

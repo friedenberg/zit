@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 )
 
 type constructor struct {
@@ -16,7 +16,7 @@ type constructor struct {
 }
 
 func (c *constructor) collectExplicitAndImplicitFor(
-	skus sku.ExternalLikeSet,
+	skus external_store.SkuTypeSet,
 	re ids.Tag,
 ) (explicitCount, implicitCount int, err error) {
 	res := catgut.MakeFromString(re.String())

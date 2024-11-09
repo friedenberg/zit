@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
@@ -186,7 +187,7 @@ func (op Checkin) runOrganize(
 	}
 
 	if err = changes.After.Each(
-		func(el sku.ExternalLike) (err error) {
+		func(el external_store.SkuType) (err error) {
 			if err = u.GetStore().CreateOrUpdate(
 				el,
 				object_mode.ModeCreate,

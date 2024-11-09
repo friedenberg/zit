@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/external_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
@@ -49,6 +50,7 @@ func (op Organize) RunWithQueryGroup(
 	return
 }
 
+// TODO remove
 func (op Organize) RunWithTransacted(
 	qg *query.Group,
 	transacted sku.TransactedSet,
@@ -69,7 +71,7 @@ func (op Organize) RunWithTransacted(
 
 func (op Organize) RunWithExternalLike(
 	qg *query.Group,
-	skus sku.ExternalLikeSet,
+	skus external_store.SkuTypeSet,
 ) (organizeResults organize_text.OrganizeResults, err error) {
 	organizeResults.Original = skus
 	organizeResults.QueryGroup = qg

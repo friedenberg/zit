@@ -159,14 +159,14 @@ func (c Changes) String() string {
 // TODO combine with above
 type OrganizeResults struct {
 	Before, After *Text
-	Original      sku.ExternalLikeSet
+	Original      external_store.SkuTypeSet
 	QueryGroup    *query.Group
 }
 
 func ChangesFrom(
 	po options_print.V0,
 	a, b *Text,
-	original sku.ExternalLikeSet,
+	original external_store.SkuTypeSet,
 ) (c Changes, err error) {
 	if c, err = ChangesFromResults(
 		po,
