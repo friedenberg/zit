@@ -72,17 +72,10 @@ func (f *BoxTransacted) WriteStringFormat(
 
 	box.Contents = slices.Grow(box.Contents, 10)
 
-	var fds *sku.FSItem
-
-	if f.FSItemReadWriter != nil {
-		fds, _ = f.FSItemReadWriter.ReadFSItemFromExternal(sk)
-	}
-
 	n2, err = f.addFieldsExternal2(
 		sk,
 		&box,
 		f.Options.DescriptionInBox,
-		fds,
 	)
 	n += int64(n2)
 

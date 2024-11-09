@@ -2,7 +2,6 @@ package box_format
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -15,12 +14,10 @@ func (f *BoxTransacted) addFieldsExternal2(
 	e *sku.Transacted,
 	box *string_format_writer.Box,
 	includeDescriptionInBox bool,
-	item *sku.FSItem,
 ) (n int64, err error) {
 	if err = f.addFieldsObjectIds2(
 		e,
 		box,
-		item,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -31,7 +28,6 @@ func (f *BoxTransacted) addFieldsExternal2(
 		e,
 		includeDescriptionInBox,
 		box,
-		item,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -42,26 +38,15 @@ func (f *BoxTransacted) addFieldsExternal2(
 
 func (f *BoxTransacted) makeFieldExternalObjectIdsIfNecessary(
 	sk *sku.Transacted,
-	item *sku.FSItem,
 ) (field string_format_writer.Field, err error) {
 	field = string_format_writer.Field{
 		ColorType: string_format_writer.ColorTypeId,
 	}
 
-	switch {
-	case (item == nil || item.Len() == 0) && !sk.ExternalObjectId.IsEmpty():
+	if !sk.ExternalObjectId.IsEmpty() {
 		oid := &sk.ExternalObjectId
 		// TODO quote as necessary
 		field.Value = (*ids.ObjectIdStringerSansRepo)(oid).String()
-
-	case item != nil:
-		switch item.GetCheckoutMode() {
-		case checkout_mode.MetadataOnly, checkout_mode.MetadataAndBlob:
-			// TODO quote as necessary
-			if !item.Object.IsStdin() {
-				field.Value = f.RelativePath.Rel(item.Object.String())
-			}
-		}
 	}
 
 	return
@@ -96,13 +81,11 @@ func (f *BoxTransacted) makeFieldObjectId(
 func (f *BoxTransacted) addFieldsObjectIds2(
 	sk *sku.Transacted,
 	box *string_format_writer.Box,
-	item *sku.FSItem,
 ) (err error) {
 	var external string_format_writer.Field
 
 	if external, err = f.makeFieldExternalObjectIdsIfNecessary(
 		sk,
-		item,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -146,7 +129,6 @@ func (f *BoxTransacted) addFieldsMetadata2(
 	sk *sku.Transacted,
 	includeDescriptionInBox bool,
 	box *string_format_writer.Box,
-	item *sku.FSItem,
 ) (err error) {
 	m := sk.GetMetadata()
 
@@ -196,7 +178,7 @@ func (f *BoxTransacted) addFieldsMetadata2(
 		object_metadata_fmt.MetadataFieldTags(m)...,
 	)
 
-	if !options.ExcludeFields && (item == nil || item.Len() == 0) {
+	if !options.ExcludeFields {
 		box.Contents = append(box.Contents, m.Fields...)
 	}
 
