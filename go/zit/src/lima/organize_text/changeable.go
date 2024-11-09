@@ -129,7 +129,7 @@ func (a *Assignment) addToSet(
 				outputObject.GetSku().Metadata.Type.ResetWith(ot.Metadata.Type)
 			}
 		} else {
-			outputObject = previouslyProcessedObject.ExternalLike
+			outputObject = previouslyProcessedObject.skuType
 		}
 
 		if organizeObject.External.GetSku().ObjectId.String() == "" {

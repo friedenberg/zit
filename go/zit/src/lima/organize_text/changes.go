@@ -15,26 +15,26 @@ import (
 )
 
 func MakeSkuMapWithOrder(c int) (out SkuMapWithOrder) {
-	out.m = make(map[string]skuExternalLikeWithIndex, c)
+	out.m = make(map[string]skuTypeWithIndex, c)
 	return
 }
 
 type skuType = external_store.SkuType
 
-type skuExternalLikeWithIndex struct {
-	ExternalLike skuType
+type skuTypeWithIndex struct {
+	skuType skuType
 	int
 }
 
 type SkuMapWithOrder struct {
-	m    map[string]skuExternalLikeWithIndex
+	m    map[string]skuTypeWithIndex
 	next int
 }
 
 func (smwo *SkuMapWithOrder) AllSkuAndIndex() iter.Seq2[int, skuType] {
 	return func(yield func(int, skuType) bool) {
 		for _, sk := range smwo.m {
-			if !yield(sk.int, sk.ExternalLike) {
+			if !yield(sk.int, sk.skuType) {
 				break
 			}
 		}
@@ -66,7 +66,7 @@ func (sm *SkuMapWithOrder) Add(sk skuType) error {
 
 	if !ok {
 		entry.int = sm.next
-		entry.ExternalLike = sk
+		entry.skuType = sk
 		sm.next++
 	}
 
@@ -83,7 +83,7 @@ func (sm *SkuMapWithOrder) Clone() (out SkuMapWithOrder) {
 	out = MakeSkuMapWithOrder(sm.Len())
 
 	for _, v := range sm.m {
-		out.Add(v.ExternalLike)
+		out.Add(v.skuType)
 	}
 
 	return out
@@ -93,7 +93,7 @@ func (sm SkuMapWithOrder) Sorted() (out []skuType) {
 	out = make([]skuType, 0, sm.Len())
 
 	for _, v := range sm.m {
-		out = append(out, v.ExternalLike)
+		out = append(out, v.skuType)
 	}
 
 	sort.Slice(out, func(i, j int) bool {
@@ -205,7 +205,7 @@ func ChangesFromResults(
 	c.Removed = c.Before.Clone()
 
 	for _, sk := range c.After.m {
-		if err = c.Removed.Del(sk.ExternalLike); err != nil {
+		if err = c.Removed.Del(sk.skuType); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
