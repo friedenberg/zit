@@ -55,17 +55,9 @@ func (f *BoxTransacted) WriteStringFormat(
 
 	var n2 int64
 
-	var stateString string
-
-	if f.Options.PrintState {
-		stateString = sk.GetExternalState().String()
-	}
-
 	box.Header.RightAligned = true
 
-	if stateString != "" {
-		box.Header.Value = stateString
-	} else if f.Options.PrintTime && !f.Options.PrintTai {
+	if f.Options.PrintTime && !f.Options.PrintTai {
 		t := sk.GetTai()
 		box.Header.Value = t.Format(string_format_writer.StringFormatDateTime)
 	}
