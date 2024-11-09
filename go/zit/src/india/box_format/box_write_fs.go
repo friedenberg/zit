@@ -130,8 +130,9 @@ func (f *Box) addFieldFSBlob(
 	box.Contents = append(
 		box.Contents,
 		string_format_writer.Field{
-			Value:     f.Rel(fd.GetPath()),
-			ColorType: string_format_writer.ColorTypeId,
+			Value:        f.Rel(fd.GetPath()),
+			ColorType:    string_format_writer.ColorTypeId,
+			NeedsNewline: true,
 		},
 	)
 

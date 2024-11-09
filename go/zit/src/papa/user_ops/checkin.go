@@ -48,18 +48,18 @@ func (op Checkin) Run(
 		if err = u.GetStore().QueryCheckedOut(
 			qg,
 			func(col sku.CheckedOutLike) (err error) {
-				cofs := col.(*sku.CheckedOut)
+				co := col.(*sku.CheckedOut)
 				z := col.GetSkuExternalLike().GetSku()
 
-				if cofs.State == checked_out_state.Untracked &&
-					(cofs.External.GetGenre() == genres.Zettel ||
-						cofs.External.GetGenre() == genres.Blob) {
+				if co.State == checked_out_state.Untracked &&
+					(co.External.GetGenre() == genres.Zettel ||
+						co.External.GetGenre() == genres.Blob) {
 					if z.Metadata.IsEmpty() {
 						return
 					}
 
 					if err = u.GetStore().GetStoreFS().UpdateTransactedFromBlobs(
-						&cofs.External,
+						&co.External,
 					); err != nil {
 						err = errors.Wrap(err)
 						return
@@ -103,7 +103,7 @@ func (op Checkin) Run(
 					return
 				}
 
-				if err = results.Add(&cofs.External); err != nil {
+				if err = results.Add(&co.External); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

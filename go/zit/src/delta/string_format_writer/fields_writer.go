@@ -14,6 +14,7 @@ type Field struct {
 	Key, Value         string
 	DisableValueQuotes bool
 	NoTruncate         bool
+	NeedsNewline       bool
 }
 
 type BoxHeader struct {
@@ -22,10 +23,11 @@ type BoxHeader struct {
 }
 
 type Box struct {
-	Header              BoxHeader
-	Contents            []Field
-	Trailer             []Field
-	EachFieldOnANewline bool
+	Header                   BoxHeader
+	Contents                 []Field
+	Trailer                  []Field
+	EachFieldOnANewline      bool
+	IdFieldsSeparatedByLines bool
 }
 
 type fieldsWriter struct {
@@ -86,8 +88,7 @@ func (f *fieldsWriter) WriteStringFormat(
 
 	for i, field := range box.Contents {
 		if i > 0 {
-			switch field.ColorType {
-			case ColorTypeId:
+			if field.NeedsNewline {
 				n2, err = w.WriteString(separatorNextLine)
 				n += int64(n2)
 
@@ -95,8 +96,7 @@ func (f *fieldsWriter) WriteStringFormat(
 					err = errors.Wrap(err)
 					return
 				}
-
-			default:
+			} else {
 				n2, err = fmt.Fprint(w, separatorSameLine)
 				n += int64(n2)
 
