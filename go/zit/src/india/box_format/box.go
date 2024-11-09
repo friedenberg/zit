@@ -104,7 +104,7 @@ func (f *Box) WriteStringFormat(
 			o,
 			&box,
 			f.Options.DescriptionInBox,
-      fds,
+			fds,
 		)
 		n += int64(n2)
 

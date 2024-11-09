@@ -118,7 +118,7 @@ func (f *Box) addFieldsObjectIds2(
 
 	switch {
 	// case internal.Value != "" && external.Value != "":
-	// 	if strings.HasPrefix(external.Value, internal.Value) {
+	// 	if strings.HasPrefix(external.Value, strings.TrimPrefix(internal.Value, "!")) {
 	// 		box.Contents = append(box.Contents, external)
 	// 	} else {
 	// 		box.Contents = append(box.Contents, internal, external)
