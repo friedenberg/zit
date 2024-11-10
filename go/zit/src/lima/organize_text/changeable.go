@@ -105,6 +105,14 @@ func (a *Assignment) addToSet(
 				outputObject.GetSku().Metadata.Type.ResetWith(
 					objectOriginal.GetSku().Metadata.Type,
 				)
+
+				// outputObject.GetSkuExternalLike().GetSku().Metadata.Blob.ResetWith(
+				// 	&objectOriginal.GetSkuExternalLike().GetSku().Metadata.Blob,
+				// )
+
+				// outputObject.GetSkuExternalLike().GetSku().Metadata.Type.ResetWith(
+				// 	objectOriginal.GetSkuExternalLike().GetSku().Metadata.Type,
+				// )
 			}
 
 			outputMetadata := outputObject.GetSku().GetMetadata()

@@ -161,20 +161,19 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	col sku.CheckedOutLike,
 	updateCheckout bool,
 ) (err error) {
-	el := col.GetSkuExternalLike()
-	e := el.GetSku()
-	objectIdPtr := e.GetObjectId()
+	external := col.GetSkuExternalLike()
+	internal := external.GetSku()
 
 	if !s.GetDirectoryLayout().GetLockSmith().IsAcquired() {
 		err = file_lock.ErrLockRequired{
-			Operation: fmt.Sprintf("create or update %s", objectIdPtr),
+			Operation: fmt.Sprintf("create or update %s", internal.GetObjectId()),
 		}
 
 		return
 	}
 
 	if err = s.tryRealizeAndOrStore(
-		el,
+		external,
 		sku.CommitOptions{Mode: object_mode.ModeCreate},
 	); err != nil {
 		err = errors.Wrap(err)

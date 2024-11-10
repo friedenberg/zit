@@ -134,7 +134,7 @@ func (op Checkout) RunQuery(
 
 		builder := op.MakeQueryBuilderExcludingHidden(ids.MakeGenre(genres.Zettel))
 
-		if ms, err = builder.WithCheckedOut(
+		if ms, err = builder.WithCheckedOutLike(
 			zsc,
 		).BuildQueryGroup(); err != nil {
 			err = errors.Wrap(err)

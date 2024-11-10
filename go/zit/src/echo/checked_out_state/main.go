@@ -6,6 +6,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 )
 
+// TODO define this state much more clearly, as it's currently overloaded and
+// abused
 type State int
 
 const (
