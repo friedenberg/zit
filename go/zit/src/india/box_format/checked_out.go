@@ -126,67 +126,6 @@ func (f *BoxCheckedOut) WriteStringFormat(
 	return
 }
 
-func (f *BoxCheckedOut) addFieldsMetadata(
-	options options_print.V0,
-	o *sku.Transacted,
-	includeDescriptionInBox bool,
-	box *string_format_writer.Box,
-) (err error) {
-	m := o.GetMetadata()
-
-	if options.PrintShas &&
-		(options.PrintEmptyShas || !m.Blob.IsNull()) {
-		var shaString string
-
-		if shaString, err = object_metadata_fmt.MetadataShaString(
-			m,
-			f.Abbr.Sha.Abbreviate,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		box.Contents = append(
-			box.Contents,
-			object_metadata_fmt.MetadataFieldShaString(shaString),
-		)
-	}
-
-	if options.PrintTai && o.GetGenre() != genres.InventoryList {
-		box.Contents = append(
-			box.Contents,
-			object_metadata_fmt.MetadataFieldTai(m),
-		)
-	}
-
-	if !m.Type.IsEmpty() {
-		box.Contents = append(
-			box.Contents,
-			object_metadata_fmt.MetadataFieldType(m),
-		)
-	}
-
-	b := m.Description
-
-	if includeDescriptionInBox && !b.IsEmpty() {
-		box.Contents = append(
-			box.Contents,
-			object_metadata_fmt.MetadataFieldDescription(m),
-		)
-	}
-
-	box.Contents = append(
-		box.Contents,
-		object_metadata_fmt.MetadataFieldTags(m)...,
-	)
-
-	if !options.ExcludeFields {
-		box.Contents = append(box.Contents, m.Fields...)
-	}
-
-	return
-}
-
 func (f *BoxCheckedOut) addFieldsExternalWithFSItem(
 	e *sku.Transacted,
 	box *string_format_writer.Box,
