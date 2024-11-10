@@ -24,8 +24,10 @@ func MakeBoxCheckedOut(
 	abbr ids.Abbr,
 	fsItemReadWriter sku.FSItemReadWriter,
 	relativePath dir_layout.RelativePath,
+	printHeader bool,
 ) *BoxCheckedOut {
 	return &BoxCheckedOut{
+		PrintHeader: printHeader,
 		BoxTransacted: BoxTransacted{
 			ColorOptions:     co,
 			Options:          options,
@@ -38,6 +40,7 @@ func MakeBoxCheckedOut(
 }
 
 type BoxCheckedOut struct {
+	PrintHeader bool
 	BoxTransacted
 }
 
@@ -49,25 +52,21 @@ func (f *BoxCheckedOut) WriteStringFormat(
 
 	var n2 int64
 
-	var stateString string
-	var isError bool
-
 	state := co.GetState()
+	isError := state == checked_out_state.Error
+	external := &co.External
 
-	if state == checked_out_state.Error {
-		isError = true
-	}
+	if f.PrintHeader {
+		stateString := state.String()
 
-	stateString = state.String()
-	o := &co.External
+		box.Header.RightAligned = true
 
-	box.Header.RightAligned = true
-
-	if stateString != "" {
-		box.Header.Value = stateString
-	} else if f.Options.PrintTime && !f.Options.PrintTai {
-		t := o.GetTai()
-		box.Header.Value = t.Format(string_format_writer.StringFormatDateTime)
+		if stateString != "" {
+			box.Header.Value = stateString
+		} else if f.Options.PrintTime && !f.Options.PrintTai {
+			t := external.GetTai()
+			box.Header.Value = t.Format(string_format_writer.StringFormatDateTime)
+		}
 	}
 
 	box.Contents = slices.Grow(box.Contents, 10)
@@ -76,12 +75,12 @@ func (f *BoxCheckedOut) WriteStringFormat(
 	var errFS error
 
 	if f.FSItemReadWriter != nil {
-		fds, errFS = f.FSItemReadWriter.ReadFSItemFromExternal(o)
+		fds, errFS = f.FSItemReadWriter.ReadFSItemFromExternal(external)
 	}
 
-	if f.FSItemReadWriter == nil || errFS != nil || !o.RepoId.IsEmpty() || isError {
+	if f.FSItemReadWriter == nil || errFS != nil || !external.RepoId.IsEmpty() || isError {
 		n2, err = f.addFieldsExternalWithFSItem(
-			o,
+			external,
 			&box,
 			f.Options.DescriptionInBox,
 			fds,
@@ -93,7 +92,7 @@ func (f *BoxCheckedOut) WriteStringFormat(
 			return
 		}
 	} else {
-		n2, err = f.addFieldsFS(co, o, &box, fds)
+		n2, err = f.addFieldsFS(co, &box, fds)
 		n += n2
 
 		if err != nil {
@@ -102,7 +101,7 @@ func (f *BoxCheckedOut) WriteStringFormat(
 		}
 	}
 
-	b := &o.Metadata.Description
+	b := &external.Metadata.Description
 
 	if !f.Options.DescriptionInBox && !b.IsEmpty() {
 		box.Trailer = append(
@@ -127,13 +126,13 @@ func (f *BoxCheckedOut) WriteStringFormat(
 }
 
 func (f *BoxCheckedOut) addFieldsExternalWithFSItem(
-	e *sku.Transacted,
+	external *sku.Transacted,
 	box *string_format_writer.Box,
 	includeDescriptionInBox bool,
 	item *sku.FSItem,
 ) (n int64, err error) {
-	if err = f.addFieldsObjectIds2(
-		e,
+	if err = f.addFieldsObjectIdsWithFSItem(
+		external,
 		box,
 		item,
 	); err != nil {
@@ -143,7 +142,7 @@ func (f *BoxCheckedOut) addFieldsExternalWithFSItem(
 
 	if err = f.addFieldsMetadataWithFSItem(
 		f.Options,
-		e,
+		external,
 		includeDescriptionInBox,
 		box,
 		item,
@@ -208,7 +207,7 @@ func (f *BoxCheckedOut) makeFieldObjectId(
 	return
 }
 
-func (f *BoxCheckedOut) addFieldsObjectIds2(
+func (f *BoxCheckedOut) addFieldsObjectIdsWithFSItem(
 	sk *sku.Transacted,
 	box *string_format_writer.Box,
 	item *sku.FSItem,
@@ -320,64 +319,55 @@ func (f *BoxCheckedOut) addFieldsMetadataWithFSItem(
 
 func (f *BoxCheckedOut) addFieldsFS(
 	co *sku.CheckedOut,
-	o *sku.Transacted,
 	box *string_format_writer.Box,
-	fds *sku.FSItem,
+	item *sku.FSItem,
 ) (n int64, err error) {
-	var m checkout_mode.Mode
-
-	if m, err = fds.GetCheckoutModeOrError(); err != nil {
-		if co.State == checked_out_state.Conflicted {
-			err = nil
-			m = checkout_mode.BlobOnly
-		} else {
-			err = errors.Wrapf(err, "FDs: %s", fds.Debug())
-			return
-		}
-	}
+	m := item.GetCheckoutMode()
 
 	var fdAlreadyWritten *fd.FD
 
 	op := f.Options
 	op.ExcludeFields = true
 
-	switch {
-	case co.State == checked_out_state.Untracked:
-		if err = f.addFieldsFSUntracked(co, m, box); err != nil {
+	if co.State == checked_out_state.Untracked {
+		if err = f.addFieldsUntracked(co, m, box, item, op); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
+		return
+	}
+
+	var id string_format_writer.Field
+
+	switch {
 	case co.IsImport:
 		fallthrough
 
 	case m == checkout_mode.BlobOnly || m == checkout_mode.BlobRecognized:
-		box.Contents = append(
-			box.Contents,
-			string_format_writer.Field{
-				Value: (*ids.ObjectIdStringerSansRepo)(&o.ObjectId).String(),
-				// DisableValueQuotes: true,
-				// ColorType: string_format_writer.ColorTypeId,
-				// Value:     f.Rel(fds.Blob.GetPath()),
-			},
-		)
+		id.Value = (*ids.ObjectIdStringerSansRepo)(&co.External.ObjectId).String()
+
+	case m.IncludesMetadata():
+		id.Value = f.Rel(item.Object.GetPath())
+		fdAlreadyWritten = &item.Object
 
 	default:
-		box.Contents = append(
-			box.Contents,
-			string_format_writer.Field{
-				ColorType: string_format_writer.ColorTypeId,
-				Value:     f.Rel(fds.Object.GetPath()),
-			},
-		)
-
-		fdAlreadyWritten = &fds.Object
+		if id, _, err = f.makeFieldObjectId(
+			&co.External,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
-	if co.State != checked_out_state.Conflicted {
+	id.ColorType = string_format_writer.ColorTypeId
+	box.Contents = append(box.Contents, id)
+
+	if co.State == checked_out_state.Conflicted {
+	} else {
 		if err = f.addFieldsMetadata(
 			op,
-			o,
+			&co.External,
 			op.DescriptionInBox,
 			box,
 		); err != nil {
@@ -388,7 +378,7 @@ func (f *BoxCheckedOut) addFieldsFS(
 		if m == checkout_mode.BlobRecognized ||
 			(m != checkout_mode.MetadataOnly && m != checkout_mode.None) {
 			if err = f.addFieldsFSBlobExcept(
-				fds,
+				item,
 				fdAlreadyWritten,
 				box,
 			); err != nil {
@@ -446,23 +436,19 @@ func (f *BoxTransacted) addFieldFSBlob(
 	return
 }
 
-func (f *BoxTransacted) addFieldsFSUntracked(
+func (f *BoxTransacted) addFieldsUntracked(
 	co *sku.CheckedOut,
 	mode checkout_mode.Mode,
 	box *string_format_writer.Box,
+	item *sku.FSItem,
+	op options_print.V0,
 ) (err error) {
 	o := &co.External
-	var i *sku.FSItem
 
-	if i, err = f.FSItemReadWriter.ReadFSItemFromExternal(o); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	fdToPrint := &item.Blob
 
-	fdToPrint := &i.Blob
-
-	if o.GetGenre() != genres.Zettel && !i.Object.IsEmpty() {
-		fdToPrint = &i.Object
+	if o.GetGenre() != genres.Zettel && !item.Object.IsEmpty() {
+		fdToPrint = &item.Object
 	}
 
 	box.Contents = append(
@@ -473,7 +459,12 @@ func (f *BoxTransacted) addFieldsFSUntracked(
 		},
 	)
 
-	if err = f.addFieldsFSBlobExcept(i, fdToPrint, box); err != nil {
+	if err = f.addFieldsMetadata(
+		op,
+		o,
+		f.Options.DescriptionInBox,
+		box,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -49,7 +49,7 @@ func (c ReadOrganizeFile) Run(
 
 	o := otFlags.GetOptionsWithMetadata(
 		u.GetConfig().PrintOptions,
-		u.SkuFormatBoxNoColor(),
+		u.SkuFormatBoxCheckedOutNoColor(),
 		u.GetStore().GetAbbrStore().GetAbbr(),
 		u.GetExternalLikePoolForRepoId(om.RepoId),
 		om,

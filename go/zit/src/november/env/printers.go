@@ -44,6 +44,7 @@ func (u *Env) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOut] {
 		po,
 		u.FormatColorOptionsOut(),
 		string_format_writer.CliFormatTruncation66CharEllipsis,
+    true,
 	)
 
 	return string_format_writer.MakeDelim(
@@ -105,6 +106,7 @@ func (u *Env) PrinterCheckedOut() interfaces.FuncIter[*sku.CheckedOut] {
 			po,
 			oo.ColorOptionsErr,
 			string_format_writer.CliFormatTruncation66CharEllipsis,
+      true,
 		),
 	)
 
@@ -115,6 +117,7 @@ func (u *Env) PrinterCheckedOut() interfaces.FuncIter[*sku.CheckedOut] {
 			po,
 			oo.ColorOptionsErr,
 			string_format_writer.CliFormatTruncation66CharEllipsis,
+      true,
 		),
 	)
 

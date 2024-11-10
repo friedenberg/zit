@@ -26,6 +26,7 @@ func (u *Env) StringFormatWriterSkuBoxCheckedOut(
 	po options_print.V0,
 	co string_format_writer.ColorOptions,
 	truncation string_format_writer.CliFormatTruncation,
+	printHeader bool,
 ) *box_format.BoxCheckedOut {
 	return box_format.MakeBoxCheckedOut(
 		co,
@@ -34,10 +35,11 @@ func (u *Env) StringFormatWriterSkuBoxCheckedOut(
 		u.GetStore().GetAbbrStore().GetAbbr(),
 		u.GetStore().GetStoreFS(),
 		u.dirLayout,
+		printHeader,
 	)
 }
 
-func (u *Env) SkuFormatBoxNoColor() *box_format.BoxTransacted {
+func (u *Env) SkuFormatBoxTransactedNoColor() *box_format.BoxTransacted {
 	co := u.FormatColorOptionsOut()
 	co.OffEntirely = true
 	options := u.config.PrintOptions.WithPrintShas(false)
@@ -49,6 +51,22 @@ func (u *Env) SkuFormatBoxNoColor() *box_format.BoxTransacted {
 		options,
 		co,
 		string_format_writer.CliFormatTruncationNone,
+	)
+}
+
+func (u *Env) SkuFormatBoxCheckedOutNoColor() *box_format.BoxCheckedOut {
+	co := u.FormatColorOptionsOut()
+	co.OffEntirely = true
+	options := u.config.PrintOptions.WithPrintShas(false)
+	options.PrintTime = false
+	options.PrintShas = false
+	options.DescriptionInBox = false
+
+	return u.StringFormatWriterSkuBoxCheckedOut(
+		options,
+		co,
+		string_format_writer.CliFormatTruncationNone,
+		false,
 	)
 }
 

@@ -83,7 +83,7 @@ func (u *Env) MakeFormatFunc(
 		}
 
 	case "box":
-		p := u.SkuFormatBoxNoColor()
+		p := u.SkuFormatBoxTransactedNoColor()
 
 		f = func(tl *sku.Transacted) (err error) {
 			if _, err = p.WriteStringFormat(out, tl); err != nil {
@@ -515,7 +515,7 @@ func (u *Env) MakeFormatFunc(
 		}
 
 	case "blob-sku-prefix":
-		cliFmt := u.SkuFormatBoxNoColor()
+		cliFmt := u.SkuFormatBoxTransactedNoColor()
 
 		f = func(o *sku.Transacted) (err error) {
 			var r sha.ReadCloser

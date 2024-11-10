@@ -64,13 +64,14 @@ func makeAssignmentLineReader() reader {
 			wasMade:       true,
 			Config:        &test_config.Config{},
 			ObjectFactory: (&sku.ObjectFactory{}).SetDefaultsIfNecessary(),
-			fmtBox: box_format.MakeBoxTransacted(
+			fmtBox: box_format.MakeBoxCheckedOut(
 				string_format_writer.ColorOptions{},
 				options_print.V0{},
 				nil,
 				ids.Abbr{},
 				nil,
 				nil,
+				false,
 			),
 		},
 	}

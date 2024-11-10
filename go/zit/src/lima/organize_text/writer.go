@@ -63,21 +63,21 @@ func (av writer) write(a *Assignment) (err error) {
 			sb.WriteString("% ")
 		}
 
-		cursor := z.sku.CloneExternalLike()
-		sk := cursor.GetSku()
-		sk.Metadata.Subtract(&av.Metadata)
-		mes := sk.GetMetadata().GetTags().CloneMutableSetPtrLike()
+		cursor := z.sku.Clone()
+		cursorExternal := &cursor.External
+		cursorExternal.Metadata.Subtract(&av.Metadata)
+		mes := cursorExternal.GetMetadata().GetTags().CloneMutableSetPtrLike()
 
 		if err = a.SubtractFromSet(mes); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		sk.Metadata.SetTags(mes)
+		cursorExternal.Metadata.SetTags(mes)
 
 		if _, err = av.options.fmtBox.WriteStringFormat(
 			&sb,
-			cursor.GetSku(),
+			cursor,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
