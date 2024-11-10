@@ -58,7 +58,7 @@ setup() {
 		binary = true
 		vim-syntax-type = "test"
 	EOM
- 
+
 	cat >zz-archive.tag <<-EOM
 		hide = true
 	EOM
@@ -287,5 +287,17 @@ function checkin_zettel_with_komment { # @test
 		\[etikett-one @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\]
 		\[one/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "wildly different" etikett-one\]
 		\[[0-9]+\.[0-9]+ @[0-9a-f]{64} !inventory_list-v1 "message"\]
+	EOM
+}
+
+function checkin_via_organize { # @test
+	export EDITOR="true"
+	run_zit checkin -organize one/uno.zettel
+	assert_success
+	assert_output - <<-'EOM'
+		[!zettel @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
+		[etikett @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[etikett-one @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !zettel "wildly different" etikett-one]
 	EOM
 }

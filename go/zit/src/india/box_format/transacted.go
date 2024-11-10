@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -64,14 +63,20 @@ func (f *BoxTransacted) WriteStringFormat(
 
 	box.Contents = slices.Grow(box.Contents, 10)
 
-	n2, err = f.addFieldsExternal2(
+	if err = f.addFieldsObjectIds(
 		sk,
 		&box,
-		f.Options.DescriptionInBox,
-	)
-	n += int64(n2)
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	if err != nil {
+	if err = f.addFieldsMetadata(
+		f.Options,
+		sk,
+		f.Options.DescriptionInBox,
+		&box,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -87,12 +92,6 @@ func (f *BoxTransacted) WriteStringFormat(
 				DisableValueQuotes: true,
 			},
 		)
-		n += n2
-
-		if err != nil {
-			err = errors.Wrap(err)
-			return
-		}
 	}
 
 	n2, err = f.Box.WriteStringFormat(sw, box)
@@ -106,66 +105,88 @@ func (f *BoxTransacted) WriteStringFormat(
 	return
 }
 
-func (f *BoxTransacted) addFieldsExternal(
-	e *sku.Transacted,
-	box *string_format_writer.Box,
-	includeDescriptionInBox bool,
-) (n int64, err error) {
-	if e.State == external_state.Unknown {
-		if e.ObjectId.IsEmpty() {
-			e.State = external_state.Untracked
-		}
+func (f *BoxTransacted) makeFieldExternalObjectIdsIfNecessary(
+	sk *sku.Transacted,
+) (field string_format_writer.Field, err error) {
+	field = string_format_writer.Field{
+		ColorType: string_format_writer.ColorTypeId,
 	}
 
-	oid := &e.ObjectId
-	oidIsExternal := e.State == external_state.Untracked && !e.ExternalObjectId.IsEmpty()
-
-	if oidIsExternal {
-		oid = &e.ExternalObjectId
+	if !sk.ExternalObjectId.IsEmpty() {
+		oid := &sk.ExternalObjectId
+		// TODO quote as necessary
+		field.Value = (*ids.ObjectIdStringerSansRepo)(oid).String()
 	}
+
+	return
+}
+
+func (f *BoxTransacted) makeFieldObjectId(
+	sk *sku.Transacted,
+) (field string_format_writer.Field, empty bool, err error) {
+	oid := &sk.ObjectId
+
+	empty = oid.IsEmpty()
 
 	oidString := (*ids.ObjectIdStringerSansRepo)(oid).String()
 
 	if f.Abbr.ZettelId.Abbreviate != nil &&
-		oid.GetGenre() == genres.Zettel &&
-		!oidIsExternal {
+		oid.GetGenre() == genres.Zettel {
 		if oidString, err = f.Abbr.ZettelId.Abbreviate(oid); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	objectIDField := string_format_writer.Field{
-		Value: oidString,
-		// DisableValueQuotes: oid.GetGenre() != genres.Blob,
-		// DisableValueQuotes: true,
-		ColorType: string_format_writer.ColorTypeId,
+	field = string_format_writer.Field{
+		Value:              oidString,
+		DisableValueQuotes: true,
+		ColorType:          string_format_writer.ColorTypeId,
 	}
 
-	box.Contents = append(box.Contents, objectIDField)
+	return
+}
 
-	o := f.Options
+func (f *BoxTransacted) addFieldsObjectIds(
+	sk *sku.Transacted,
+	box *string_format_writer.Box,
+) (err error) {
+	var external string_format_writer.Field
 
-	if e.State != external_state.Untracked {
-		if !e.ExternalObjectId.IsEmpty() && false {
-			box.Contents = append(
-				box.Contents,
-				string_format_writer.Field{
-					Value:              (*ids.ObjectIdStringerSansRepo)(&e.ExternalObjectId).String(),
-					DisableValueQuotes: true,
-					ColorType:          string_format_writer.ColorTypeId,
-				},
-			)
-		}
-	}
-
-	if err = f.addFieldsMetadata(
-		o,
-		e,
-		includeDescriptionInBox,
-		box,
+	if external, err = f.makeFieldExternalObjectIdsIfNecessary(
+		sk,
 	); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	var internal string_format_writer.Field
+	var externalEmpty bool
+
+	if internal, externalEmpty, err = f.makeFieldObjectId(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	switch {
+	// case internal.Value != "" && external.Value != "":
+	// 	if strings.HasPrefix(external.Value, strings.TrimPrefix(internal.Value, "!")) {
+	// 		box.Contents = append(box.Contents, external)
+	// 	} else {
+	// 		box.Contents = append(box.Contents, internal, external)
+	// 	}
+
+	case externalEmpty && external.Value != "":
+		box.Contents = append(box.Contents, external)
+
+	case internal.Value != "":
+		box.Contents = append(box.Contents, internal)
+
+	case external.Value != "":
+		box.Contents = append(box.Contents, external)
+
+	default:
+		err = errors.Errorf("empty id")
 		return
 	}
 
@@ -174,11 +195,11 @@ func (f *BoxTransacted) addFieldsExternal(
 
 func (f *BoxTransacted) addFieldsMetadata(
 	options options_print.V0,
-	o *sku.Transacted,
+	sk *sku.Transacted,
 	includeDescriptionInBox bool,
 	box *string_format_writer.Box,
 ) (err error) {
-	m := o.GetMetadata()
+	m := sk.GetMetadata()
 
 	if options.PrintShas &&
 		(options.PrintEmptyShas || !m.Blob.IsNull()) {
@@ -198,7 +219,7 @@ func (f *BoxTransacted) addFieldsMetadata(
 		)
 	}
 
-	if options.PrintTai && o.GetGenre() != genres.InventoryList {
+	if options.PrintTai && sk.GetGenre() != genres.InventoryList {
 		box.Contents = append(
 			box.Contents,
 			object_metadata_fmt.MetadataFieldTai(m),
