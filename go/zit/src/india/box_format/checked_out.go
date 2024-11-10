@@ -323,14 +323,24 @@ func (f *BoxCheckedOut) addFieldsFS(
 	op := f.Options
 	op.ExcludeFields = true
 
-	if co.State == checked_out_state.Untracked {
-		if err = f.addFieldsUntracked(co, m, box, item, op); err != nil {
+	if co.State == checked_out_state.Untracked{
+		if err = f.addFieldsUntracked(co, box, item, op); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		return
 	}
+
+	// if co.State == checked_out_state.Untracked ||
+	// 	co.State == checked_out_state.Unknown {
+	// 	if err = f.addFieldsUntracked(co, box, item, op); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return
+	// 	}
+
+	// 	return
+	// }
 
 	var id string_format_writer.Field
 
@@ -432,7 +442,6 @@ func (f *BoxTransacted) addFieldFSBlob(
 
 func (f *BoxTransacted) addFieldsUntracked(
 	co *sku.CheckedOut,
-	mode checkout_mode.Mode,
 	box *string_format_writer.Box,
 	item *sku.FSItem,
 	op options_print.V0,
