@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
@@ -127,72 +126,6 @@ func (f *BoxCheckedOut) WriteStringFormat(
 	return
 }
 
-func (f *BoxCheckedOut) addFieldsExternal(
-	e *sku.Transacted,
-	box *string_format_writer.Box,
-	includeDescriptionInBox bool,
-) (n int64, err error) {
-	if e.State == external_state.Unknown {
-		if e.ObjectId.IsEmpty() {
-			e.State = external_state.Untracked
-		}
-	}
-
-	oid := &e.ObjectId
-	oidIsExternal := e.State == external_state.Untracked && !e.ExternalObjectId.IsEmpty()
-
-	if oidIsExternal {
-		oid = &e.ExternalObjectId
-	}
-
-	oidString := (*ids.ObjectIdStringerSansRepo)(oid).String()
-
-	if f.Abbr.ZettelId.Abbreviate != nil &&
-		oid.GetGenre() == genres.Zettel &&
-		!oidIsExternal {
-		if oidString, err = f.Abbr.ZettelId.Abbreviate(oid); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	objectIDField := string_format_writer.Field{
-		Value: oidString,
-		// DisableValueQuotes: oid.GetGenre() != genres.Blob,
-		// DisableValueQuotes: true,
-		ColorType: string_format_writer.ColorTypeId,
-	}
-
-	box.Contents = append(box.Contents, objectIDField)
-
-	o := f.Options
-
-	if e.State != external_state.Untracked {
-		if !e.ExternalObjectId.IsEmpty() && false {
-			box.Contents = append(
-				box.Contents,
-				string_format_writer.Field{
-					Value:              (*ids.ObjectIdStringerSansRepo)(&e.ExternalObjectId).String(),
-					DisableValueQuotes: true,
-					ColorType:          string_format_writer.ColorTypeId,
-				},
-			)
-		}
-	}
-
-	if err = f.addFieldsMetadata(
-		o,
-		e,
-		includeDescriptionInBox,
-		box,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (f *BoxCheckedOut) addFieldsMetadata(
 	options options_print.V0,
 	o *sku.Transacted,
@@ -269,7 +202,7 @@ func (f *BoxCheckedOut) addFieldsExternalWithFSItem(
 		return
 	}
 
-	if err = f.addFieldsMetadata2(
+	if err = f.addFieldsMetadataWithFSItem(
 		f.Options,
 		e,
 		includeDescriptionInBox,
@@ -384,7 +317,7 @@ func (f *BoxCheckedOut) addFieldsObjectIds2(
 	return
 }
 
-func (f *BoxCheckedOut) addFieldsMetadata2(
+func (f *BoxCheckedOut) addFieldsMetadataWithFSItem(
 	options options_print.V0,
 	sk *sku.Transacted,
 	includeDescriptionInBox bool,
