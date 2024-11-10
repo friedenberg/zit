@@ -79,23 +79,17 @@ func (f *BoxCheckedOut) WriteStringFormat(
 	}
 
 	if f.FSItemReadWriter == nil || errFS != nil || !external.RepoId.IsEmpty() || isError {
-		n2, err = f.addFieldsExternalWithFSItem(
+		if err = f.addFieldsExternalWithFSItem(
 			external,
 			&box,
 			f.Options.DescriptionInBox,
 			fds,
-		)
-		n += int64(n2)
-
-		if err != nil {
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		n2, err = f.addFieldsFS(co, &box, fds)
-		n += n2
-
-		if err != nil {
+		if err = f.addFieldsFS(co, &box, fds); err != nil {
 			err = errors.Wrapf(err, "CheckedOut: %s", co)
 			return
 		}
@@ -130,7 +124,7 @@ func (f *BoxCheckedOut) addFieldsExternalWithFSItem(
 	box *string_format_writer.Box,
 	includeDescriptionInBox bool,
 	item *sku.FSItem,
-) (n int64, err error) {
+) (err error) {
 	if err = f.addFieldsObjectIdsWithFSItem(
 		external,
 		box,
@@ -321,7 +315,7 @@ func (f *BoxCheckedOut) addFieldsFS(
 	co *sku.CheckedOut,
 	box *string_format_writer.Box,
 	item *sku.FSItem,
-) (n int64, err error) {
+) (err error) {
 	m := item.GetCheckoutMode()
 
 	var fdAlreadyWritten *fd.FD
@@ -461,7 +455,7 @@ func (f *BoxTransacted) addFieldsUntracked(
 
 	if err = f.addFieldsMetadata(
 		op,
-		o,
+		&co.External,
 		f.Options.DescriptionInBox,
 		box,
 	); err != nil {
