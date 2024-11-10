@@ -8,9 +8,23 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+func (s *Store) GetCheckoutMode(
+	el sku.ExternalLike,
+) (m checkout_mode.Mode, err error) {
+	var fds *sku.FSItem
+
+	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	m = fds.GetCheckoutMode()
+
+	return
+}
+
 func (s *Store) GetCheckoutModeOrError(
 	el sku.ExternalLike,
-	originalMode checkout_mode.Mode,
 ) (m checkout_mode.Mode, err error) {
 	var fds *sku.FSItem
 

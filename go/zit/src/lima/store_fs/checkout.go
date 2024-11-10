@@ -304,11 +304,14 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 		OptionsWithoutMode: options,
 	}
 
-	if o.CheckoutMode, err = s.GetCheckoutModeOrError(
+	if o.CheckoutMode, err = s.GetCheckoutMode(
 		col.GetSkuExternalLike(),
-		checkout_mode.None,
 	); err != nil {
 		err = errors.Wrap(err)
+		return
+	}
+
+	if o.CheckoutMode == checkout_mode.None {
 		return
 	}
 

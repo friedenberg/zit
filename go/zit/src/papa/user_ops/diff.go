@@ -77,7 +77,9 @@ func (op Diff) Run(
 		TextFormatterOptions:       options,
 	}
 
-	if mode, err = op.GetStore().GetStoreFS().GetCheckoutModeOrError(el, mode); err != nil {
+	if mode, err = op.GetStore().GetStoreFS().GetCheckoutModeOrError(
+		el,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
