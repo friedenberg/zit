@@ -37,32 +37,6 @@ func (op Checkout) Run(
 	return
 }
 
-func (op Checkout) RunWithCheckedOut(
-	skus sku.SkuTypeSet,
-) (zsc sku.CheckedOutLikeMutableSet, err error) {
-	b := op.Env.MakeQueryBuilder(
-		ids.MakeGenre(genres.Zettel),
-	).WithCheckedOut(
-		skus,
-	).WithRequireNonEmptyQuery()
-
-	var qg *query.Group
-
-	if qg, err = b.BuildQueryGroup(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if zsc, err = op.RunQuery(
-		qg,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (op Checkout) RunWithKasten(
 	kasten ids.RepoId,
 	skus sku.TransactedSet,

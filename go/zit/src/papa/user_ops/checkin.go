@@ -1,6 +1,8 @@
 package user_ops
 
 import (
+	"sync"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
@@ -30,9 +32,8 @@ func (op Checkin) Run(
 	u *env.Env,
 	qg *query.Group,
 ) (err error) {
-	// TODO make organize use results in order to support open blob via organize
-	// path
-	results := sku.MakeTransactedMutableSet()
+	var l sync.Mutex
+	results := sku.MakeSkuTypeSetMutable()
 
 	if op.Organize {
 		if err = op.runOrganize(u, qg, results); err != nil {
@@ -40,88 +41,94 @@ func (op Checkin) Run(
 			return
 		}
 	} else {
-		if err = u.Lock(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
 		if err = u.GetStore().QueryCheckedOut(
 			qg,
 			func(col sku.CheckedOutLike) (err error) {
-				co := col.(*sku.CheckedOut)
-				z := col.GetSkuExternalLike().GetSku()
-
-				if co.State == checked_out_state.Untracked &&
-					(co.External.GetGenre() == genres.Zettel ||
-						co.External.GetGenre() == genres.Blob) {
-					if z.Metadata.IsEmpty() {
-						return
-					}
-
-					if err = u.GetStore().GetStoreFS().UpdateTransactedFromBlobs(
-						&co.External,
-					); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
-					z.ObjectId.Reset()
-
-					if err = u.GetStore().CreateOrUpdate(
-						z,
-						object_mode.ModeApplyProto,
-					); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-
-					if op.Proto.Apply(z, genres.Zettel) {
-						if err = u.GetStore().CreateOrUpdate(
-							z.GetSku(),
-							object_mode.ModeEmpty,
-						); err != nil {
-							err = errors.Wrap(err)
-							return
-						}
-					}
-				} else {
-					if err = u.GetStore().CreateOrUpdateCheckedOut(
-						col,
-						!op.Delete,
-					); err != nil {
-						err = errors.Wrap(err)
-						return
-					}
-				}
-
-				if !op.Delete {
-					return
-				}
-
-				if err = u.GetStore().DeleteCheckedOut(col.(*sku.CheckedOut)); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				if err = results.Add(&co.External); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				return
+				l.Lock()
+				defer l.Unlock()
+				return results.Add(col.(*sku.CheckedOut).Clone())
 			},
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
+	}
 
-		if err = u.Unlock(); err != nil {
+	if err = u.Lock(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	processed := sku.MakeTransactedMutableSet()
+
+	for co := range results.All() {
+		z := co.GetSkuExternalLike().GetSku()
+
+		if co.State == checked_out_state.Untracked &&
+			(co.External.GetGenre() == genres.Zettel ||
+				co.External.GetGenre() == genres.Blob) {
+			if z.Metadata.IsEmpty() {
+				return
+			}
+
+			// TODO make generic to external stores
+			if err = u.GetStore().GetStoreFS().UpdateTransactedFromBlobs(
+				&co.External,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			z.ObjectId.Reset()
+
+			if err = u.GetStore().CreateOrUpdate(
+				z,
+				object_mode.ModeApplyProto,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if op.Proto.Apply(z, genres.Zettel) {
+				if err = u.GetStore().CreateOrUpdate(
+					z.GetSku(),
+					object_mode.ModeEmpty,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			}
+		} else {
+			if err = u.GetStore().CreateOrUpdateCheckedOut(
+				co,
+				!op.Delete,
+			); err != nil {
+				err = errors.Wrapf(err, "CheckedOut: %s", co)
+				return
+			}
+		}
+
+		if !op.Delete {
+			continue
+		}
+
+		if err = u.GetStore().DeleteCheckedOut(co); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = processed.Add(co.External.CloneTransacted()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	if err = op.openBlobIfNecessary(u, results); err != nil {
+	if err = u.Unlock(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = op.openBlobIfNecessary(u, processed); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -132,7 +139,7 @@ func (op Checkin) Run(
 func (op Checkin) runOrganize(
 	u *env.Env,
 	qg *query.Group,
-	results sku.TransactedMutableSet,
+	results sku.SkuTypeSetMutable,
 ) (err error) {
 	flagDelete := organize_text.OptionCommentBooleanFlag{
 		Value:   &op.Delete,
@@ -180,28 +187,9 @@ func (op Checkin) runOrganize(
 		return
 	}
 
-	if err = u.Lock(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if err = changes.After.Each(
 		func(co sku.SkuType) (err error) {
-			if err = u.GetStore().CreateOrUpdate(
-				co,
-				object_mode.ModeCreate,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			if !op.Delete {
-				return
-			}
-
-			if err = u.GetStore().DeleteCheckedOut(
-				co,
-			); err != nil {
+			if err = results.Add(co.Clone()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -213,17 +201,12 @@ func (op Checkin) runOrganize(
 		return
 	}
 
-	if err = u.Unlock(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	return
 }
 
 func (c Checkin) openBlobIfNecessary(
 	u *env.Env,
-	zettels sku.TransactedSet,
+	objects sku.TransactedSet,
 ) (err error) {
 	if !c.OpenBlob && c.CheckoutBlobAndRun == "" {
 		return
@@ -237,9 +220,7 @@ func (c Checkin) openBlobIfNecessary(
 		Utility: c.CheckoutBlobAndRun,
 	}
 
-	if _, err = opCheckout.Run(
-		zettels,
-	); err != nil {
+	if _, err = opCheckout.Run(objects); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
