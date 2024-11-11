@@ -653,6 +653,86 @@ func (oid *objectId2) Set(v string) (err error) {
 	return
 }
 
+func (oid *objectId2) SetOnlyNotUnknownGenre(v string) (err error) {
+	if v == "/" {
+		oid.g = genres.Zettel
+		return
+	}
+
+	if strings.HasPrefix(v, "/") {
+		els := strings.SplitAfterN(v[1:], "/", 2)
+
+		if len(els) != 2 {
+			err = errors.Errorf("invalid object id format: %q", v)
+			return
+		}
+
+		v = els[1]
+
+		if err = oid.SetRepoId(strings.TrimSuffix(els[0], "/")); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	var k IdLike
+
+	switch oid.g {
+	case genres.Zettel:
+		var h ZettelId
+		err = h.Set(v)
+		k = &h
+
+	case genres.Tag:
+		var h Tag
+		err = h.Set(v)
+		k = &h
+
+	case genres.Type:
+		var h Type
+		err = h.Set(v)
+		k = &h
+
+	case genres.Repo:
+		var h RepoId
+		err = h.Set(v)
+		k = &h
+
+	case genres.Config:
+		var h Config
+		err = h.Set(v)
+		k = &h
+
+	case genres.InventoryList:
+		var h Tai
+		err = h.Set(v)
+		k = &h
+
+	case genres.Blob:
+		if err = oid.left.Set(v); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+
+	default:
+		err = genres.MakeErrUnrecognizedGenre(oid.g.GetGenreString())
+	}
+
+	if err != nil {
+		err = errors.Wrapf(err, "String: %q", v)
+		return
+	}
+
+	if err = oid.SetWithIdLike(k); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (a *objectId2) ResetWith(b *objectId2) {
 	a.g = b.g
 	b.left.CopyTo(&a.left)

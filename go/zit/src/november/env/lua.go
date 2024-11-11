@@ -15,8 +15,7 @@ func (u *Env) MakeLuaVMPoolBuilder() *lua.VMPoolBuilder {
 }
 
 func (s *Env) GetSkuFromString(lv string) (sk *sku.Transacted, err error) {
-	e := sku.GetTransactedPool().Get()
-	sk = e.GetSku()
+	sk = sku.GetTransactedPool().Get()
 
 	defer func() {
 		if err != nil {
@@ -29,7 +28,7 @@ func (s *Env) GetSkuFromString(lv string) (sk *sku.Transacted, err error) {
 		}
 	}()
 
-	if err = sk.ObjectId.Set(lv); err == nil {
+	if err = sk.ObjectId.SetOnlyNotUnknownGenre(lv); err == nil {
 		return
 	}
 
@@ -37,7 +36,7 @@ func (s *Env) GetSkuFromString(lv string) (sk *sku.Transacted, err error) {
 
 	if _, err = s.luaSkuFormat.ReadStringFormat(
 		catgut.MakeRingBufferRuneScanner(rb),
-		e,
+		sk,
 	); err == nil {
 		return
 	}
