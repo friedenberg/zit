@@ -69,7 +69,7 @@ func (s *Store) readExternalAndMergeIfNecessary(
 
 	defer s.PutCheckedOutLike(co)
 
-	right := co.GetSkuExternalLike().GetSku()
+	right := co.GetSkuExternal().GetSku()
 
 	parentEqualsExternal := right.Metadata.EqualsSansTai(&co.GetSku().Metadata)
 

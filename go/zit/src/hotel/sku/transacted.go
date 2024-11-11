@@ -27,7 +27,7 @@ type Transacted struct {
 	ExternalObjectId ids.ObjectId
 }
 
-func (t *Transacted) GetSkuExternalLike() ExternalLike {
+func (t *Transacted) GetSkuExternal() *Transacted {
 	return t
 }
 

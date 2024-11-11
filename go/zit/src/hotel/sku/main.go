@@ -51,14 +51,13 @@ type (
 		interfaces.Stringer
 		TransactedGetter
 		ExternalLikeGetter
-		CloneExternalLike() ExternalLike
 		GetExternalState() external_state.State
 		ExternalObjectIdGetter
 		GetRepoId() ids.RepoId
 	}
 
 	ExternalLikeGetter interface {
-		GetSkuExternalLike() ExternalLike
+		GetSkuExternal() *Transacted
 	}
 
 	FSItemReadWriter interface {

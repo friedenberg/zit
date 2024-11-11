@@ -303,7 +303,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	}
 
 	if o.CheckoutMode, err = s.GetCheckoutMode(
-		co.GetSkuExternalLike(),
+		co.GetSkuExternal(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -318,14 +318,14 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	var replacement *sku.CheckedOut
 	var oldFDs, newFDs *sku.FSItem
 
-	if oldFDs, err = s.ReadFSItemFromExternal(co.GetSkuExternalLike()); err != nil {
+	if oldFDs, err = s.ReadFSItemFromExternal(co.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if replacement, newFDs, err = s.checkoutOneIfNecessary(
 		o,
-		co.GetSkuExternalLike(),
+		co.GetSkuExternal(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

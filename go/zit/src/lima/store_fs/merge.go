@@ -114,7 +114,7 @@ func (s *Store) tryMergeIgnoringConflicts(
 		return
 	}
 
-	if original, err = s.ReadFSItemFromExternal(tm.CheckedOut.GetSkuExternalLike()); err != nil {
+	if original, err = s.ReadFSItemFromExternal(tm.CheckedOut.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

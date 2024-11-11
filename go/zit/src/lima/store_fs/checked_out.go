@@ -15,7 +15,7 @@ func (s *Store) ToSliceFilesZettelen(
 		func(col sku.SkuType) (e string, err error) {
 			var fds *sku.FSItem
 
-			if fds, err = s.ReadFSItemFromExternal(col.GetSkuExternalLike()); err != nil {
+			if fds, err = s.ReadFSItemFromExternal(col.GetSkuExternal()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -40,7 +40,7 @@ func (s *Store) ToSliceFilesBlobs(
 		func(col sku.SkuType) (e string, err error) {
 			var fds *sku.FSItem
 
-			if fds, err = s.ReadFSItemFromExternal(col.GetSkuExternalLike()); err != nil {
+			if fds, err = s.ReadFSItemFromExternal(col.GetSkuExternal()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}

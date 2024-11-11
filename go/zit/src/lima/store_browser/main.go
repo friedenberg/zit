@@ -171,7 +171,7 @@ func (c *Store) CheckoutOne(
 	item.Id.Type = "tab"
 
 	sku.TransactedResetter.ResetWith(co.GetSku(), sz)
-	sku.TransactedResetter.ResetWith(co.GetSkuExternalLike().GetSku(), sz)
+	sku.TransactedResetter.ResetWith(co.GetSkuExternal().GetSku(), sz)
 	co.State = checked_out_state.JustCheckedOut
 	co.External.ExternalType = ids.MustType("!browser-tab")
 

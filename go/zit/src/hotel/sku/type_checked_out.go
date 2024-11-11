@@ -12,13 +12,13 @@ func makeCheckedOut() *CheckedOut {
 }
 
 func cloneFromTransactedCheckedOut(
-  src *Transacted,
-  newState checked_out_state.State,
+	src *Transacted,
+	newState checked_out_state.State,
 ) *CheckedOut {
 	dst := GetCheckedOutPool().Get()
 	TransactedResetter.ResetWith(&dst.Internal, src)
 	TransactedResetter.ResetWith(&dst.External, src)
-  dst.State = newState
+	dst.State = newState
 	return dst
 }
 

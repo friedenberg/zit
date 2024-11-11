@@ -32,10 +32,10 @@ func (op Diff) Run(
 	col sku.SkuType,
 	options object_metadata.TextFormatterOptions,
 ) (err error) {
-  ok := false
-  co := col
+	ok := false
+	co := col
 
-  // TODO determine conditions when a checkout needs to happen
+	// TODO determine conditions when a checkout needs to happen
 	if !ok {
 		if col, err = op.GetStore().GetStoreFS().CheckoutOne(
 			checkout_options.Options{

@@ -100,7 +100,7 @@ func (c Clean) shouldClean(
 		errors.PanicIfError(err)
 
 		if object_metadata.EqualerSansTai.Equals(
-			&co.GetSkuExternalLike().GetSku().Metadata,
+			&co.GetSkuExternal().GetSku().Metadata,
 			&mutter.Metadata,
 		) {
 			return true

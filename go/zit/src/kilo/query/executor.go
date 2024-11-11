@@ -205,7 +205,7 @@ func (e *Executor) executeExternalQueryExternalLike(
 ) (err error) {
 	if err = e.executeExternalQueryCheckedOutLike(
 		func(col sku.SkuType) (err error) {
-			z := col.GetSkuExternalLike()
+			z := col.GetSkuExternal()
 
 			if err = out(z); err != nil {
 				err = errors.Wrap(err)

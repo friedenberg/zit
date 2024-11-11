@@ -161,7 +161,7 @@ func (s *Store) CreateOrUpdateCheckedOut(
 	col sku.SkuType,
 	updateCheckout bool,
 ) (err error) {
-	external := col.GetSkuExternalLike()
+	external := col.GetSkuExternal()
 	internal := external.GetSku()
 
 	if !s.GetDirectoryLayout().GetLockSmith().IsAcquired() {

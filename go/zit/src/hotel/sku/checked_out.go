@@ -10,7 +10,7 @@ import (
 
 func InternalAndExternalEqualsWithoutTai(co SkuType) bool {
 	i := co.GetSku()
-	e := co.GetSkuExternalLike().GetSku()
+	e := co.GetSkuExternal().GetSku()
 
 	return e.Metadata.EqualsSansTai(
 		&i.Metadata,
@@ -21,7 +21,7 @@ func DetermineState(
 	c SkuType,
 	justCheckedOut bool,
 ) {
-	es := c.GetSkuExternalLike().GetExternalState()
+	es := c.GetSkuExternal().GetExternalState()
 
 	if es == external_state.Recognized {
 		c.SetState(checked_out_state.Recognized)
@@ -29,7 +29,7 @@ func DetermineState(
 	}
 
 	i := c.GetSku()
-	e := c.GetSkuExternalLike().GetSku()
+	e := c.GetSkuExternal().GetSku()
 
 	if i.GetObjectSha().IsNull() {
 		c.SetState(checked_out_state.Untracked)
@@ -55,7 +55,7 @@ func (c *CheckedOut) GetRepoId() ids.RepoId {
 	return c.External.RepoId
 }
 
-func (c *CheckedOut) GetSkuExternalLike() ExternalLike {
+func (c *CheckedOut) GetSkuExternal() *Transacted {
 	return &c.External
 }
 
@@ -71,10 +71,6 @@ func (src *CheckedOut) Clone() *CheckedOut {
 	dst := GetCheckedOutPool().Get()
 	CheckedOutResetter.ResetWith(dst, src)
 	return dst
-}
-
-func (src *CheckedOut) CloneExternalLike() ExternalLike {
-	return src.External.CloneExternalLike()
 }
 
 func (t *CheckedOut) GetExternalObjectId() ids.ExternalObjectId {

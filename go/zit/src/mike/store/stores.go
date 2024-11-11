@@ -34,7 +34,7 @@ func (s *Store) SaveBlob(el sku.ExternalLike) (err error) {
 }
 
 func (s *Store) DeleteCheckedOut(col *sku.CheckedOut) (err error) {
-	repoId := col.GetSkuExternalLike().GetRepoId()
+	repoId := col.GetSkuExternal().GetRepoId()
 
 	es, ok := s.externalStores[repoId]
 
@@ -128,7 +128,7 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	options checkout_options.OptionsWithoutMode,
 	col sku.SkuType,
 ) (err error) {
-	repoId := col.GetSkuExternalLike().GetRepoId()
+	repoId := col.GetSkuExternal().GetRepoId()
 	es, ok := s.externalStores[repoId]
 
 	if !ok {
@@ -205,7 +205,7 @@ func (s *Store) MakeQueryExecutor(
 func (s *Store) MergeConflicted(
 	tm sku.Conflicted,
 ) (err error) {
-	switch tm.CheckedOut.GetSkuExternalLike().GetRepoId().GetRepoIdString() {
+	switch tm.CheckedOut.GetSkuExternal().GetRepoId().GetRepoIdString() {
 	case "browser":
 		err = todo.Implement()
 
@@ -224,7 +224,7 @@ func (s *Store) RunMergeTool(
 ) (err error) {
 	tool := s.GetConfig().ToolOptions.Merge
 
-	switch tm.GetSkuExternalLike().GetRepoId().GetRepoIdString() {
+	switch tm.GetSkuExternal().GetRepoId().GetRepoIdString() {
 	case "browser":
 		err = todo.Implement()
 

@@ -69,7 +69,7 @@ func (op Checkin) Run(
 	)
 
 	for _, co := range sortedResults {
-		z := co.GetSkuExternalLike().GetSku()
+		z := co.GetSkuExternal().GetSku()
 
 		if co.State == checked_out_state.Untracked &&
 			(co.External.GetGenre() == genres.Zettel ||

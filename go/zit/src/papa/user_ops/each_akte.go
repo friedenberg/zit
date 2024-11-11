@@ -29,7 +29,7 @@ func (c EachBlob) Run(
 		var fds *sku.FSItem
 
 		if fds, err = c.GetStore().GetStoreFS().ReadFSItemFromExternal(
-			col.GetSkuExternalLike(),
+			col.GetSkuExternal(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

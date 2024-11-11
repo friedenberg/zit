@@ -312,7 +312,7 @@ func (ar *reader) readOneObj(
 		}
 	}
 
-  // TODO determine a better state for this
+	// TODO determine a better state for this
 	z.sku.State = checked_out_state.JustCheckedOut
 
 	sku.TransactedResetter.ResetWith(&z.sku.External, &z.sku.Internal)

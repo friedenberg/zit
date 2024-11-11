@@ -17,7 +17,7 @@ func cloneFromTransactedExternalLike(src *Transacted) ExternalLike {
 }
 
 func cloneExternalLike(el ExternalLike) ExternalLike {
-	return el.CloneExternalLike()
+	return el.GetSku().CloneTransacted()
 }
 
 type objectFactoryExternalLike struct {

@@ -8,7 +8,7 @@ import (
 
 // TODO remove entirely
 func (s *Store) PutCheckedOutLike(co sku.SkuType) {
-	switch co.GetSkuExternalLike().GetRepoId().GetRepoIdString() {
+	switch co.GetSkuExternal().GetRepoId().GetRepoIdString() {
 	// TODO make generic?
 	case "browser":
 		store_browser.GetCheckedOutPool().Put(co)

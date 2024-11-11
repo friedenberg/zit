@@ -85,7 +85,7 @@ func MakeUnsureMatchMapsCollector(
 	var l sync.Mutex
 
 	return func(co SkuType) (err error) {
-		e := co.GetSkuExternalLike().GetSku()
+		e := co.GetSkuExternal().GetSku()
 
 		l.Lock()
 		defer l.Unlock()
