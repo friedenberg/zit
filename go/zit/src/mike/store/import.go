@@ -95,7 +95,7 @@ func (s Importer) importLeafSku(
 	)
 
 	if err == nil {
-		co.SetError(collections.ErrExists)
+		err = collections.ErrExists
 		return
 	} else if collections.IsErrNotFound(err) {
 		err = nil
@@ -143,9 +143,9 @@ func (s Importer) importLeafSku(
 	if err = s.tryRealizeAndOrStore(
 		external,
 		commitOptions,
-	); err == collections.ErrExists {
-		co.SetError(err)
-		err = nil
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

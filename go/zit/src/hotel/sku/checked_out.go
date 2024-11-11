@@ -90,15 +90,6 @@ func (a *CheckedOut) GetObjectId() *ids.ObjectId {
 	return a.External.GetObjectId()
 }
 
-func (c *CheckedOut) SetError(err error) {
-	if err == nil {
-		return
-	}
-
-	c.State = checked_out_state.Error
-	c.Error = err
-}
-
 func (c *CheckedOut) InternalAndExternalEqualsSansTai() bool {
 	return c.External.GetSku().GetMetadata().EqualsSansTai(
 		&c.Internal.Metadata,
