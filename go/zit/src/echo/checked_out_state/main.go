@@ -10,17 +10,26 @@ import (
 // abused
 type State int
 
+/*
+
+State       | Internal | External | Equality
+------------|----------|----------|---------
+empty       | none     | none     | invalid
+transacted  | some     | none     | invalid
+untracked   | none     | some     | invalid
+checked out | some     | some     | valid
+
+*/
+
 const (
-	Unknown                    = State(iota)
-	JustCheckedOut             // UI
-	JustCheckedOutButDifferent // UI
-	ExistsAndSame              // Internal v External
-	ExistsAndDifferent         // Internal v External
-	Untracked                  // Internal v External
-	Recognized                 // Internal v External
-	Conflicted                 // Internal v External
-	BlobMissing                // External / UI
-	Error                      // External / UI
+	Unknown        = State(iota)
+	JustCheckedOut // UI
+	ExistsAndSame  // Internal v External
+	Changed        // Internal v External
+	Untracked      // Internal v External
+	Recognized     // Internal v External
+	Conflicted     // Internal v External
+	Error          // External / UI
 )
 
 func (s State) String() string {
@@ -31,9 +40,7 @@ func (s State) String() string {
 	case ExistsAndSame:
 		return string_format_writer.StringSame
 
-	case JustCheckedOutButDifferent:
-		fallthrough
-	case ExistsAndDifferent:
+	case Changed:
 		return string_format_writer.StringChanged
 
 	case Untracked:
@@ -47,9 +54,6 @@ func (s State) String() string {
 
 	case Error:
 		return "error"
-
-	case BlobMissing:
-		return string_format_writer.StringBlobMissing
 
 	default:
 		return fmt.Sprintf("unknown: %#v", s)

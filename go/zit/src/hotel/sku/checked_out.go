@@ -40,11 +40,7 @@ func DetermineState(
 			c.SetState(checked_out_state.ExistsAndSame)
 		}
 	} else {
-		if justCheckedOut {
-			c.SetState(checked_out_state.JustCheckedOutButDifferent)
-		} else {
-			c.SetState(checked_out_state.ExistsAndDifferent)
-		}
+		c.SetState(checked_out_state.Changed)
 	}
 }
 

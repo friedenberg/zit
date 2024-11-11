@@ -38,7 +38,7 @@ func (c *executor) tryToEmitOneExplicitlyCheckedOut(
 	if *uSku == item.Url.URL {
 		c.co.State = checked_out_state.ExistsAndSame
 	} else {
-		c.co.State = checked_out_state.ExistsAndDifferent
+		c.co.State = checked_out_state.Changed
 	}
 
 	c.co.External.State = external_state.Tracked
