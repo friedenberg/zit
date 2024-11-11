@@ -4,7 +4,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
@@ -99,17 +98,6 @@ func (u *Env) PrinterCheckedOut() interfaces.FuncIter[*sku.CheckedOut] {
 	po := u.config.PrintOptions.
 		WithPrintShas(true)
 
-	err := string_format_writer.MakeDelim(
-		"\n",
-		u.Err(),
-		u.StringFormatWriterSkuBoxCheckedOut(
-			po,
-			oo.ColorOptionsErr,
-			string_format_writer.CliFormatTruncation66CharEllipsis,
-			true,
-		),
-	)
-
 	out := string_format_writer.MakeDelim(
 		"\n",
 		u.Out(),
@@ -121,13 +109,7 @@ func (u *Env) PrinterCheckedOut() interfaces.FuncIter[*sku.CheckedOut] {
 		),
 	)
 
-	return func(co *sku.CheckedOut) error {
-		if co.GetState() == checked_out_state.Error {
-			return err(co)
-		} else {
-			return out(co)
-		}
-	}
+	return out
 }
 
 func (u *Env) PrinterCheckedOutForKasten(

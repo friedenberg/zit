@@ -53,7 +53,6 @@ func (f *BoxCheckedOut) WriteStringFormat(
 	var n2 int64
 
 	state := co.GetState()
-	isError := state == checked_out_state.Error
 	external := &co.External
 
 	if f.PrintHeader {
@@ -78,7 +77,7 @@ func (f *BoxCheckedOut) WriteStringFormat(
 		fds, errFS = f.FSItemReadWriter.ReadFSItemFromExternal(external)
 	}
 
-	if f.FSItemReadWriter == nil || errFS != nil || !external.RepoId.IsEmpty() || isError {
+	if f.FSItemReadWriter == nil || errFS != nil || !external.RepoId.IsEmpty() {
 		if err = f.addFieldsExternalWithFSItem(
 			external,
 			&box,

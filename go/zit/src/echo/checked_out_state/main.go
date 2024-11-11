@@ -29,7 +29,6 @@ const (
 	Untracked      // Internal v External
 	Recognized     // Internal v External
 	Conflicted     // Internal v External
-	Error          // External / UI
 )
 
 func (s State) String() string {
@@ -51,9 +50,6 @@ func (s State) String() string {
 
 	case Conflicted:
 		return string_format_writer.StringConflicted
-
-	case Error:
-		return "error"
 
 	default:
 		return fmt.Sprintf("unknown: %#v", s)

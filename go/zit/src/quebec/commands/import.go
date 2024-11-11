@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
-	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
@@ -149,20 +148,6 @@ func (c Import) run(u *env.Env, args ...string) (err error) {
 
 		if co.State == checked_out_state.Conflicted {
 			hasConflicts = true
-
-			if err = coPrinter(co); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-
-			continue
-		}
-
-		if co.State == checked_out_state.Error {
-			co.External.Metadata.Fields = append(
-				co.External.Metadata.Fields,
-				object_metadata_fmt.MetadataFieldError(co.Error)...,
-			)
 
 			if err = coPrinter(co); err != nil {
 				err = errors.Wrap(err)
