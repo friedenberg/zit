@@ -3,6 +3,7 @@ package sku
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
+	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 )
 
 func makeCheckedOut() *CheckedOut {
@@ -10,10 +11,14 @@ func makeCheckedOut() *CheckedOut {
 	return dst
 }
 
-func cloneFromTransactedCheckedOut(src *Transacted) *CheckedOut {
+func cloneFromTransactedCheckedOut(
+  src *Transacted,
+  newState checked_out_state.State,
+) *CheckedOut {
 	dst := GetCheckedOutPool().Get()
 	TransactedResetter.ResetWith(&dst.Internal, src)
 	TransactedResetter.ResetWith(&dst.External, src)
+  dst.State = newState
 	return dst
 }
 

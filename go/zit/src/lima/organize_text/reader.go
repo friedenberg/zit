@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/unicorn"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
+	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
@@ -310,6 +311,9 @@ func (ar *reader) readOneObj(
 			return
 		}
 	}
+
+  // TODO determine a better state for this
+	z.sku.State = checked_out_state.JustCheckedOut
 
 	sku.TransactedResetter.ResetWith(&z.sku.External, &z.sku.Internal)
 	ar.currentAssignment.AddObject(&z)

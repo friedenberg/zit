@@ -12,6 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
+	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -95,9 +96,12 @@ func (c *Organize) RunWithQuery(
 			l.Lock()
 			defer l.Unlock()
 
-			return getResults.Add(sku.CloneSkuTypeFromTransacted(
+			clone := sku.CloneSkuTypeFromTransacted(
 				el.GetSku(),
-			))
+				checked_out_state.ExistsAndSame,
+			)
+
+			return getResults.Add(clone)
 		},
 	); err != nil {
 		err = errors.Wrap(err)

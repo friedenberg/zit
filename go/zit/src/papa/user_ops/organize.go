@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/vim_cli_options_builder"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -34,7 +35,13 @@ func (op Organize) RunWithQueryGroup(
 		func(el sku.ExternalLike) (err error) {
 			l.Lock()
 			defer l.Unlock()
-			return skus.Add(sku.CloneSkuTypeFromTransacted(el.GetSku()))
+
+			clone := sku.CloneSkuTypeFromTransacted(
+				el.GetSku(),
+				checked_out_state.ExistsAndSame,
+			)
+
+			return skus.Add(clone)
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -57,7 +64,12 @@ func (op Organize) RunWithTransacted(
 	skus := sku.MakeSkuTypeSetMutable()
 
 	for z := range transacted.All() {
-		skus.Add(sku.CloneSkuTypeFromTransacted(z))
+		clone := sku.CloneSkuTypeFromTransacted(
+			z.GetSku(),
+			checked_out_state.Unknown,
+		)
+
+		skus.Add(clone)
 	}
 
 	if organizeResults, err = op.RunWithExternalLike(qg, skus); err != nil {

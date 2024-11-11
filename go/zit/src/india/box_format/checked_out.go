@@ -323,6 +323,11 @@ func (f *BoxCheckedOut) addFieldsFS(
 	op := f.Options
 	op.ExcludeFields = true
 
+	if co.State == checked_out_state.Unknown {
+		err = errors.Errorf("invalid state unknown")
+		return
+	}
+
 	if co.State == checked_out_state.Untracked {
 		if err = f.addFieldsUntracked(co, box, item, op); err != nil {
 			err = errors.Wrap(err)

@@ -177,7 +177,7 @@ func (o Options) Make() (ot *Text, err error) {
 		c.TagSet = ids.MakeTagSet()
 	}
 
-	if err = c.Options.Skus.Each(c.all.AddTransacted); err != nil {
+	if err = c.Options.Skus.Each(c.all.AddSku); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

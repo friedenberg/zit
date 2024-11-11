@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
+	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -41,7 +42,12 @@ func (s PrefixSet) Len() int {
 	return s.count
 }
 
-func (s *PrefixSet) AddTransacted(z sku.SkuType) (err error) {
+func (s *PrefixSet) AddSku(z sku.SkuType) (err error) {
+  if z.State == checked_out_state.Unknown {
+    err = errors.Errorf("unacceptable state: %s", z.State)
+    return
+  }
+
 	o := obj{
 		sku: sku.CloneSkuType(z),
 	}

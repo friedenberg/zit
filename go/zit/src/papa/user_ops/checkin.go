@@ -6,6 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -60,8 +61,14 @@ func (op Checkin) Run(
 	}
 
 	processed := sku.MakeTransactedMutableSet()
+	sortedResults := quiter.ElementsSorted(
+		results,
+		func(left, right sku.SkuType) bool {
+			return left.String() < right.String()
+		},
+	)
 
-	for co := range results.All() {
+	for _, co := range sortedResults {
 		z := co.GetSkuExternalLike().GetSku()
 
 		if co.State == checked_out_state.Untracked &&
