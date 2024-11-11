@@ -48,7 +48,6 @@ type CheckedOut struct {
 	Internal Transacted
 	External Transacted
 	State    checked_out_state.State
-	Error    error
 	IsImport bool
 }
 
@@ -99,10 +98,6 @@ func (c *CheckedOut) InternalAndExternalEqualsSansTai() bool {
 func (c *CheckedOut) SetState(v checked_out_state.State) (err error) {
 	c.State = v
 	return
-}
-
-func (c *CheckedOut) GetError() error {
-	return c.Error
 }
 
 func (a *CheckedOut) String() string {

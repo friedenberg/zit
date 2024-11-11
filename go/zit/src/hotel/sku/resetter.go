@@ -54,17 +54,15 @@ var CheckedOutResetter checkedOutResetter
 type checkedOutResetter struct{}
 
 func (checkedOutResetter) Reset(dst *CheckedOut) {
-	TransactedResetter.Reset(&dst.Internal)
-	TransactedResetter.Reset(&dst.External)
-	dst.State = checked_out_state.Unknown
-	dst.Error = nil
+	TransactedResetter.Reset(dst.GetSku())
+	TransactedResetter.Reset(dst.GetSkuExternalLike().GetSku())
+	dst.SetState(checked_out_state.Unknown)
 	dst.IsImport = false
 }
 
 func (checkedOutResetter) ResetWith(dst *CheckedOut, src *CheckedOut) {
-	TransactedResetter.ResetWith(&dst.Internal, &src.Internal)
-	TransactedResetter.ResetWith(&dst.External, &src.External)
-	dst.State = src.State
-	dst.Error = src.Error
+	TransactedResetter.ResetWith(dst.GetSku(), src.GetSku())
+	TransactedResetter.ResetWith(dst.GetSkuExternalLike().GetSku(), src.GetSkuExternalLike().GetSku())
+	dst.SetState(src.State)
 	dst.IsImport = src.IsImport
 }
