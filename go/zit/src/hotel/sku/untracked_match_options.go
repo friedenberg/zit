@@ -30,14 +30,14 @@ func (a UnsureMatchType) MakeMatchMap() UnsureMatchMaps {
 	if a.Contains(UnsureMatchTypeMetadataWithoutTaiHistory) {
 		maps.Lookup[UnsureMatchTypeMetadataWithoutTaiHistory] = UnsureMatchMap{
 			UnsureMatchType: UnsureMatchTypeMetadataWithoutTaiHistory,
-			Lookup:          make(map[sha.Bytes]CheckedOutLikeMutableSet),
+			Lookup:          make(map[sha.Bytes]SkuTypeSetMutable),
 		}
 	}
 
 	if a.Contains(UnsureMatchTypeDescription) {
 		maps.Lookup[UnsureMatchTypeDescription] = UnsureMatchMap{
 			UnsureMatchType: UnsureMatchTypeDescription,
-			Lookup:          make(map[sha.Bytes]CheckedOutLikeMutableSet),
+			Lookup:          make(map[sha.Bytes]SkuTypeSetMutable),
 		}
 	}
 
@@ -57,12 +57,12 @@ func UnsureMatchOptionsDefault() UnsureMatchOptions {
 type IterMatching func(
 	mt UnsureMatchType,
 	sk *Transacted,
-	existing CheckedOutLikeMutableSet,
+	existing SkuTypeSetMutable,
 ) error
 
 type UnsureMatchMap struct {
 	UnsureMatchType
-	Lookup map[sha.Bytes]CheckedOutLikeMutableSet
+	Lookup map[sha.Bytes]SkuTypeSetMutable
 }
 
 type UnsureMatchMaps struct {
@@ -81,16 +81,16 @@ func (umm UnsureMatchMaps) Len() int {
 
 func MakeUnsureMatchMapsCollector(
 	umm UnsureMatchMaps,
-) interfaces.FuncIter[CheckedOutLike] {
+) interfaces.FuncIter[SkuType] {
 	var l sync.Mutex
 
-	return func(col CheckedOutLike) (err error) {
-		e := col.GetSkuExternalLike().GetSku()
+	return func(co SkuType) (err error) {
+		e := co.GetSkuExternalLike().GetSku()
 
 		l.Lock()
 		defer l.Unlock()
 
-		clone := col.CloneCheckedOutLike()
+		clone := co.Clone()
 
 		for t, v := range umm.Lookup {
 			var k sha.Bytes
@@ -109,7 +109,7 @@ func MakeUnsureMatchMapsCollector(
 			existing, ok := v.Lookup[k]
 
 			if !ok {
-				existing = MakeCheckedOutLikeMutableSet()
+				existing = MakeSkuTypeSetMutable()
 			}
 
 			if err = existing.Add(clone); err != nil {

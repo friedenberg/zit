@@ -67,7 +67,6 @@ type (
 
 	CheckedOutSet            = interfaces.SetLike[*CheckedOut]
 	CheckedOutMutableSet     = interfaces.MutableSetLike[*CheckedOut]
-	CheckedOutLikeSet        = interfaces.SetLike[CheckedOutLike]
 	CheckedOutLikeMutableSet = interfaces.MutableSetLike[CheckedOutLike]
 )
 

@@ -189,22 +189,6 @@ func (b *Builder) WithTransacted(
 	return b
 }
 
-// TODO make type that combines this with WithCheckedOut
-func (b *Builder) WithCheckedOutLike(
-	cos sku.CheckedOutLikeSet,
-) *Builder {
-	for co := range cos.All() {
-		b.pinnedObjectIds = append(
-			b.pinnedObjectIds,
-			ObjectId{
-				ObjectId: co.GetSku().ObjectId.Clone(),
-			},
-		)
-	}
-
-	return b
-}
-
 func (b *Builder) WithCheckedOut(
 	cos sku.SkuTypeSet,
 ) *Builder {
