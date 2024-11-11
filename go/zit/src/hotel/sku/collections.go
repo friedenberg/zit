@@ -65,9 +65,8 @@ type (
 	ExternalLikeSet        = interfaces.SetLike[ExternalLike]
 	ExternalLikeMutableSet = interfaces.MutableSetLike[ExternalLike]
 
-	CheckedOutSet            = interfaces.SetLike[*CheckedOut]
-	CheckedOutMutableSet     = interfaces.MutableSetLike[*CheckedOut]
-	CheckedOutLikeMutableSet = interfaces.MutableSetLike[CheckedOutLike]
+	CheckedOutSet        = interfaces.SetLike[*CheckedOut]
+	CheckedOutMutableSet = interfaces.MutableSetLike[*CheckedOut]
 )
 
 func MakeTransactedHeap() *TransactedHeap {
@@ -104,10 +103,4 @@ func MakeCheckedOutSet() CheckedOutSet {
 
 func MakeCheckedOutMutableSet() CheckedOutMutableSet {
 	return collections_value.MakeMutableValueSet(checkedOutKeyerObjectId)
-}
-
-func MakeCheckedOutLikeMutableSet() CheckedOutLikeMutableSet {
-	return collections_value.MakeMutableValueSet[CheckedOutLike](
-		nil,
-	)
 }

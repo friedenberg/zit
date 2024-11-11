@@ -40,7 +40,7 @@ func (c Mergetool) RunWithQuery(
 	u *env.Env,
 	qg *query.Group,
 ) (err error) {
-	conflicted := sku.MakeCheckedOutLikeMutableSet()
+	conflicted := sku.MakeSkuTypeSetMutable()
 
 	if err = u.GetStore().QueryCheckedOut(
 		qg,
@@ -49,7 +49,7 @@ func (c Mergetool) RunWithQuery(
 				return
 			}
 
-			if err = conflicted.Add(co.CloneCheckedOutLike()); err != nil {
+			if err = conflicted.Add(co.Clone()); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -70,17 +70,15 @@ func (c Mergetool) RunWithQuery(
 		return
 	}
 
-	for col := range conflicted.All() {
-		cofs := col.(*sku.CheckedOut)
-
+	for co := range conflicted.All() {
 		tm := sku.Conflicted{
-			CheckedOut: cofs.Clone(),
+			CheckedOut: co.Clone(),
 		}
 
 		var conflict *fd.FD
 
 		if conflict, err = u.GetStore().GetStoreFS().GetConflictOrError(
-			&cofs.External,
+			&co.External,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

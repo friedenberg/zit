@@ -8,9 +8,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
-func InternalAndExternalEqualsWithoutTai(col CheckedOutLike) bool {
-	i := col.GetSku()
-	e := col.GetSkuExternalLike().GetSku()
+func InternalAndExternalEqualsWithoutTai(co SkuType) bool {
+	i := co.GetSku()
+	e := co.GetSkuExternalLike().GetSku()
 
 	return e.Metadata.EqualsSansTai(
 		&i.Metadata,
@@ -18,7 +18,7 @@ func InternalAndExternalEqualsWithoutTai(col CheckedOutLike) bool {
 }
 
 func DetermineState(
-	c CheckedOutLike,
+	c SkuType,
 	justCheckedOut bool,
 ) {
 	es := c.GetSkuExternalLike().GetExternalState()
@@ -60,10 +60,6 @@ func (c *CheckedOut) GetRepoId() ids.RepoId {
 	return c.External.RepoId
 }
 
-func (c *CheckedOut) GetSkuCheckedOutLike() CheckedOutLike {
-	return c
-}
-
 func (c *CheckedOut) GetSkuExternalLike() ExternalLike {
 	return &c.External
 }
@@ -80,10 +76,6 @@ func (src *CheckedOut) Clone() *CheckedOut {
 	dst := GetCheckedOutPool().Get()
 	CheckedOutResetter.ResetWith(dst, src)
 	return dst
-}
-
-func (src *CheckedOut) CloneCheckedOutLike() CheckedOutLike {
-	return src.Clone()
 }
 
 func (src *CheckedOut) CloneExternalLike() ExternalLike {
