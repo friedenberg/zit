@@ -11,16 +11,16 @@ import (
 type State int
 
 const (
-	Unknown = State(iota)
-	JustCheckedOut
-	JustCheckedOutButDifferent
-	ExistsAndSame
-	ExistsAndDifferent
-	Untracked
-	Recognized
-	Conflicted
-	BlobMissing
-	Error
+	Unknown                    = State(iota)
+	JustCheckedOut             // UI
+	JustCheckedOutButDifferent // UI
+	ExistsAndSame              // Internal v External
+	ExistsAndDifferent         // Internal v External
+	Untracked                  // Internal v External
+	Recognized                 // Internal v External
+	Conflicted                 // Internal v External
+	BlobMissing                // External / UI
+	Error                      // External / UI
 )
 
 func (s State) String() string {

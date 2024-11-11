@@ -451,11 +451,9 @@ func (f *BoxTransacted) addFieldsUntracked(
 	item *sku.FSItem,
 	op options_print.V0,
 ) (err error) {
-	o := &co.External
-
 	fdToPrint := &item.Blob
 
-	if o.GetGenre() != genres.Zettel && !item.Object.IsEmpty() {
+	if co.External.GetGenre() != genres.Zettel && !item.Object.IsEmpty() {
 		fdToPrint = &item.Object
 	}
 
