@@ -43,10 +43,10 @@ func (op Checkin) Run(
 	} else {
 		if err = u.GetStore().QueryCheckedOut(
 			qg,
-			func(col sku.CheckedOutLike) (err error) {
+			func(co sku.SkuType) (err error) {
 				l.Lock()
 				defer l.Unlock()
-				return results.Add(col.(*sku.CheckedOut).Clone())
+				return results.Add(co.Clone())
 			},
 		); err != nil {
 			err = errors.Wrap(err)
@@ -170,6 +170,7 @@ func (op Checkin) runOrganize(
 
 	var organizeResults organize_text.OrganizeResults
 
+	// TODO switch to using SkuType?
 	if organizeResults, err = opOrganize.RunWithQueryGroup(
 		qg,
 	); err != nil {

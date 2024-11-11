@@ -32,7 +32,7 @@ type (
 		CheckoutOne(
 			options checkout_options.Options,
 			sz sku.TransactedGetter,
-		) (cz sku.CheckedOutLike, err error)
+		) (cz sku.SkuType, err error)
 	}
 
 	DeleteCheckedOut interface {
@@ -45,14 +45,14 @@ type (
 		Open(
 			m checkout_mode.Mode,
 			ph interfaces.FuncIter[string],
-			zsc sku.CheckedOutLikeSet,
+			zsc sku.SkuTypeSet,
 		) (err error)
 	}
 
 	UpdateCheckoutFromCheckedOut interface {
 		UpdateCheckoutFromCheckedOut(
 			options checkout_options.OptionsWithoutMode,
-			co sku.CheckedOutLike,
+			co sku.SkuType,
 		) (err error)
 	}
 

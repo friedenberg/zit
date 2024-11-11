@@ -4,7 +4,6 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -57,16 +56,10 @@ func (c Diff) RunWithQuery(
 
 	if err = u.GetStore().QueryCheckedOut(
 		qg,
-		func(co sku.CheckedOutLike) (err error) {
-			switch cot := co.(type) {
-			case *sku.CheckedOut:
-				if err = opDiffFS.Run(cot, o); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-			default:
-				ui.Err().Printf("unsupported type: %T, %s", cot, cot)
+		func(co sku.SkuType) (err error) {
+			if err = opDiffFS.Run(co, o); err != nil {
+				err = errors.Wrap(err)
+				return
 			}
 
 			return

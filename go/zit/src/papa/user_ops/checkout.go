@@ -26,7 +26,7 @@ type Checkout struct {
 
 func (op Checkout) Run(
 	skus sku.TransactedSet,
-) (zsc sku.CheckedOutLikeMutableSet, err error) {
+) (zsc sku.SkuTypeSetMutable, err error) {
 	var k ids.RepoId
 
 	if zsc, err = op.RunWithKasten(k, skus); err != nil {
@@ -40,7 +40,7 @@ func (op Checkout) Run(
 func (op Checkout) RunWithKasten(
 	kasten ids.RepoId,
 	skus sku.TransactedSet,
-) (zsc sku.CheckedOutLikeMutableSet, err error) {
+) (zsc sku.SkuTypeSetMutable, err error) {
 	b := op.Env.MakeQueryBuilder(
 		ids.MakeGenre(genres.Zettel),
 	).WithTransacted(
@@ -66,15 +66,15 @@ func (op Checkout) RunWithKasten(
 
 func (op Checkout) RunQuery(
 	qg *query.Group,
-) (zsc sku.CheckedOutLikeMutableSet, err error) {
-	zsc = sku.MakeCheckedOutLikeMutableSet()
+) (zsc sku.SkuTypeSetMutable, err error) {
+	zsc = sku.MakeSkuTypeSetMutable()
 	var l sync.Mutex
 
-	onCheckedOut := func(col sku.CheckedOutLike) (err error) {
+	onCheckedOut := func(col sku.SkuType) (err error) {
 		l.Lock()
 		defer l.Unlock()
 
-		cl := col.CloneCheckedOutLike()
+		cl := col.Clone()
 
 		if err = zsc.Add(cl); err != nil {
 			err = errors.Wrap(err)
@@ -134,7 +134,7 @@ func (op Checkout) RunQuery(
 
 		builder := op.MakeQueryBuilderExcludingHidden(ids.MakeGenre(genres.Zettel))
 
-		if ms, err = builder.WithCheckedOutLike(
+		if ms, err = builder.WithCheckedOut(
 			zsc,
 		).BuildQueryGroup(); err != nil {
 			err = errors.Wrap(err)
@@ -157,7 +157,7 @@ func (op Checkout) RunQuery(
 
 func (op Checkout) runOrganize(
 	qgOriginal *query.Group,
-	onCheckedOut interfaces.FuncIter[sku.CheckedOutLike],
+	onCheckedOut interfaces.FuncIter[sku.SkuType],
 ) (qgModified *query.Group, err error) {
 	opOrganize := Organize{
 		Env: op.Env,

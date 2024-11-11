@@ -15,7 +15,7 @@ import (
 type executor struct {
 	store *Store
 	qg    *query.Group
-	out   interfaces.FuncIter[sku.CheckedOutLike]
+	out   interfaces.FuncIter[sku.SkuType]
 	co    sku.CheckedOut
 }
 

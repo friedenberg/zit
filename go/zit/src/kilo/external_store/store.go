@@ -47,7 +47,7 @@ func (ve *Store) Flush() (err error) {
 
 func (s *Store) QueryCheckedOut(
 	qg *query.Group,
-	f interfaces.FuncIter[sku.CheckedOutLike],
+	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	es, ok := s.StoreLike.(QueryCheckedOut)
 
@@ -125,7 +125,7 @@ func (s *Store) ReadExternalLikeFromObjectId(
 func (s *Store) CheckoutOne(
 	options checkout_options.Options,
 	sz sku.TransactedGetter,
-) (cz sku.CheckedOutLike, err error) {
+) (cz sku.SkuType, err error) {
 	es, ok := s.StoreLike.(CheckoutOne)
 
 	if !ok {
@@ -215,7 +215,7 @@ func (es *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err 
 func (s *Store) Open(
 	m checkout_mode.Mode,
 	ph interfaces.FuncIter[string],
-	zsc sku.CheckedOutLikeSet,
+	zsc sku.SkuTypeSet,
 ) (err error) {
 	es, ok := s.StoreLike.(Open)
 
@@ -260,7 +260,7 @@ func (s *Store) SaveBlob(el sku.ExternalLike) (err error) {
 
 func (s *Store) UpdateCheckoutFromCheckedOut(
 	options checkout_options.OptionsWithoutMode,
-	col sku.CheckedOutLike,
+	col sku.SkuType,
 ) (err error) {
 	es, ok := s.StoreLike.(UpdateCheckoutFromCheckedOut)
 

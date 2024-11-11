@@ -22,7 +22,7 @@ import (
 func (s *Store) CheckoutOne(
 	options checkout_options.Options,
 	sz sku.TransactedGetter,
-) (col sku.CheckedOutLike, err error) {
+) (col sku.SkuType, err error) {
 	col, _, err = s.checkoutOneIfNecessary(options, sz)
 	return
 }
@@ -296,16 +296,14 @@ func (s *Store) RemoveItem(i *sku.FSItem) (err error) {
 
 func (s *Store) UpdateCheckoutFromCheckedOut(
 	options checkout_options.OptionsWithoutMode,
-	col sku.CheckedOutLike,
+	co sku.SkuType,
 ) (err error) {
-	cofs := col.(*sku.CheckedOut)
-
 	o := checkout_options.Options{
 		OptionsWithoutMode: options,
 	}
 
 	if o.CheckoutMode, err = s.GetCheckoutMode(
-		col.GetSkuExternalLike(),
+		co.GetSkuExternalLike(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -320,14 +318,14 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 	var replacement *sku.CheckedOut
 	var oldFDs, newFDs *sku.FSItem
 
-	if oldFDs, err = s.ReadFSItemFromExternal(col.GetSkuExternalLike()); err != nil {
+	if oldFDs, err = s.ReadFSItemFromExternal(co.GetSkuExternalLike()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if replacement, newFDs, err = s.checkoutOneIfNecessary(
 		o,
-		cofs.GetSkuExternalLike(),
+		co.GetSkuExternalLike(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return

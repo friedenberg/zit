@@ -29,11 +29,13 @@ type Diff struct {
 }
 
 func (op Diff) Run(
-	col sku.CheckedOutLike,
+	col sku.SkuType,
 	options object_metadata.TextFormatterOptions,
 ) (err error) {
-	co, ok := col.(*sku.CheckedOut)
+  ok := false
+  co := col
 
+  // TODO determine conditions when a checkout needs to happen
 	if !ok {
 		if col, err = op.GetStore().GetStoreFS().CheckoutOne(
 			checkout_options.Options{
@@ -48,7 +50,7 @@ func (op Diff) Run(
 			return
 		}
 
-		co = col.(*sku.CheckedOut)
+		co = col
 
 		defer errors.Deferred(&err, func() (err error) {
 			if err = op.GetStore().GetStoreFS().DeleteCheckedOut(

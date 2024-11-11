@@ -158,7 +158,7 @@ func (s *Store) RevertTo(
 }
 
 func (s *Store) CreateOrUpdateCheckedOut(
-	col sku.CheckedOutLike,
+	col sku.SkuType,
 	updateCheckout bool,
 ) (err error) {
 	external := col.GetSkuExternalLike()

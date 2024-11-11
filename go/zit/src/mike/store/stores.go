@@ -54,7 +54,7 @@ func (s *Store) DeleteCheckedOut(col *sku.CheckedOut) (err error) {
 func (s *Store) CheckoutQuery(
 	options checkout_options.Options,
 	qg *query.Group,
-	f interfaces.FuncIter[sku.CheckedOutLike],
+	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	es, ok := s.externalStores[qg.RepoId]
 
@@ -64,11 +64,11 @@ func (s *Store) CheckoutQuery(
 	}
 
 	qf := func(t *sku.Transacted) (err error) {
-		var col sku.CheckedOutLike
+		var co sku.SkuType
 
 		// TODO include a "query complete" signal for the external store to batch
 		// the checkout if necessary
-		if col, err = es.CheckoutOne(options, t); err != nil {
+		if co, err = es.CheckoutOne(options, t); err != nil {
 			if errors.Is(err, external_store.ErrUnsupportedType{}) {
 				err = nil
 			} else {
@@ -78,14 +78,14 @@ func (s *Store) CheckoutQuery(
 			return
 		}
 
-		sku.DetermineState(col, true)
+		sku.DetermineState(co, true)
 
-		if err = s.checkedOutLogPrinter(col.(*sku.CheckedOut)); err != nil {
+		if err = s.checkedOutLogPrinter(co); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = f(col); err != nil {
+		if err = f(co); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -105,7 +105,7 @@ func (s *Store) CheckoutOne(
 	repoId ids.RepoId,
 	options checkout_options.Options,
 	sz *sku.Transacted,
-) (cz sku.CheckedOutLike, err error) {
+) (cz sku.SkuType, err error) {
 	es, ok := s.externalStores[repoId]
 
 	if !ok {
@@ -126,7 +126,7 @@ func (s *Store) CheckoutOne(
 
 func (s *Store) UpdateCheckoutFromCheckedOut(
 	options checkout_options.OptionsWithoutMode,
-	col sku.CheckedOutLike,
+	col sku.SkuType,
 ) (err error) {
 	repoId := col.GetSkuExternalLike().GetRepoId()
 	es, ok := s.externalStores[repoId]
@@ -151,7 +151,7 @@ func (s *Store) Open(
 	repoId ids.RepoId,
 	m checkout_mode.Mode,
 	ph interfaces.FuncIter[string],
-	zsc sku.CheckedOutLikeSet,
+	zsc sku.SkuTypeSet,
 ) (err error) {
 	es, ok := s.externalStores[repoId]
 
@@ -229,7 +229,7 @@ func (s *Store) RunMergeTool(
 		err = todo.Implement()
 
 	default:
-		var co sku.CheckedOutLike
+		var co sku.SkuType
 
 		if co, err = s.storeFS.RunMergeTool(tool, tm); err != nil {
 			err = errors.Wrap(err)

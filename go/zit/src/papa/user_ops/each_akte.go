@@ -17,7 +17,7 @@ type EachBlob struct {
 }
 
 func (c EachBlob) Run(
-	zsc sku.CheckedOutLikeSet,
+	zsc sku.SkuTypeSet,
 ) (err error) {
 	if zsc.Len() == 0 {
 		return

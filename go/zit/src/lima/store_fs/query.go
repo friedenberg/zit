@@ -17,7 +17,7 @@ import (
 
 func (s *Store) MakeApplyCheckedOut(
 	qg *query.Group,
-	f interfaces.FuncIter[sku.CheckedOutLike],
+	f interfaces.FuncIter[sku.SkuType],
 	o sku.CommitOptions,
 ) interfaces.FuncIter[*sku.FSItem] {
 	return func(em *sku.FSItem) (err error) {
@@ -34,7 +34,7 @@ func (s *Store) ApplyCheckedOut(
 	o sku.CommitOptions,
 	qg *query.Group,
 	item *sku.FSItem,
-	f interfaces.FuncIter[sku.CheckedOutLike],
+	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	var co *sku.CheckedOut
 
@@ -65,7 +65,7 @@ func (s *Store) ApplyCheckedOut(
 
 func (s *Store) QueryCheckedOut(
 	qg *query.Group,
-	f interfaces.FuncIter[sku.CheckedOutLike],
+	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	wg := quiter.MakeErrorWaitGroupParallel()
 
@@ -100,7 +100,7 @@ func (s *Store) QueryCheckedOut(
 func (s *Store) QueryUntracked(
 	qg *query.Group,
 	aco interfaces.FuncIter[*sku.FSItem],
-	f func(sku.CheckedOutLike) error,
+	f func(sku.SkuType) error,
 ) (err error) {
 	allRecognizedBlobs := make([]*sku.FSItem, 0)
 	allRecognizedObjects := make([]*sku.FSItem, 0)

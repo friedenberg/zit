@@ -13,7 +13,7 @@ import (
 func (s *Store) Open(
 	m checkout_mode.Mode,
 	ph interfaces.FuncIter[string],
-	zsc sku.CheckedOutLikeSet,
+	zsc sku.SkuTypeSet,
 ) (err error) {
 	wg := quiter.MakeErrorWaitGroupParallel()
 
@@ -39,7 +39,7 @@ func (s *Store) Open(
 
 func (s *Store) openZettels(
 	ph interfaces.FuncIter[string],
-	zsc sku.CheckedOutLikeSet,
+	zsc sku.SkuTypeSet,
 ) (err error) {
 	var filesZettels []string
 
@@ -72,7 +72,7 @@ func (s *Store) openZettels(
 
 func (s *Store) openBlob(
 	ph interfaces.FuncIter[string],
-	zsc sku.CheckedOutLikeSet,
+	zsc sku.SkuTypeSet,
 ) (err error) {
 	var filesBlobs []string
 

@@ -6,14 +6,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 )
 
-func (s *Store) PutCheckedOutLike(col sku.CheckedOutLike) {
-	switch col.GetSkuExternalLike().GetRepoId().GetRepoIdString() {
+// TODO remove entirely
+func (s *Store) PutCheckedOutLike(co sku.SkuType) {
+	switch co.GetSkuExternalLike().GetRepoId().GetRepoIdString() {
 	// TODO make generic?
 	case "browser":
-		store_browser.GetCheckedOutPool().Put(col.(*sku.CheckedOut))
+		store_browser.GetCheckedOutPool().Put(co)
 
 	default:
-		cofs := col.(*sku.CheckedOut)
-		store_fs.GetCheckedOutPool().Put(cofs)
+		store_fs.GetCheckedOutPool().Put(co)
 	}
 }

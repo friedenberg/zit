@@ -13,7 +13,7 @@ type (
 	QueryCheckedOut interface {
 		QueryCheckedOut(
 			qg *Group,
-			f interfaces.FuncIter[sku.CheckedOutLike],
+			f interfaces.FuncIter[sku.SkuType],
 		) (err error)
 	}
 
@@ -111,7 +111,7 @@ func (e *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
 }
 
 func (e *Executor) ExecuteCheckedOutLike(
-	out interfaces.FuncIter[sku.CheckedOutLike],
+	out interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	// TODO only apply dot operator when necessary
 	if err = e.ExternalStore.ApplyDotOperator(); err != nil {
@@ -187,7 +187,7 @@ func (e *Executor) ExecuteTransacted(
 }
 
 func (e *Executor) executeExternalQueryCheckedOutLike(
-	out interfaces.FuncIter[sku.CheckedOutLike],
+	out interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	if err = e.ExternalStore.QueryCheckedOut(
 		e.Group,
@@ -204,7 +204,7 @@ func (e *Executor) executeExternalQueryExternalLike(
 	out interfaces.FuncIter[sku.ExternalLike],
 ) (err error) {
 	if err = e.executeExternalQueryCheckedOutLike(
-		func(col sku.CheckedOutLike) (err error) {
+		func(col sku.SkuType) (err error) {
 			z := col.GetSkuExternalLike()
 
 			if err = out(z); err != nil {

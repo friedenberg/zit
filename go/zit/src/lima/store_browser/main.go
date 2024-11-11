@@ -148,7 +148,7 @@ func (c *Store) getUrl(sk *sku.Transacted) (u *url.URL, err error) {
 func (c *Store) CheckoutOne(
 	options checkout_options.Options,
 	tg sku.TransactedGetter,
-) (cz sku.CheckedOutLike, err error) {
+) (cz sku.SkuType, err error) {
 	sz := tg.GetSku()
 
 	if !sz.Metadata.Type.Equals(c.typ) {
@@ -196,7 +196,7 @@ func (c *Store) CheckoutOne(
 
 func (c *Store) QueryCheckedOut(
 	qg *query.Group,
-	f interfaces.FuncIter[sku.CheckedOutLike],
+	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	// o := sku.CommitOptions{
 	// 	Mode: object_mode.ModeRealizeSansProto,
@@ -301,7 +301,7 @@ func (s *Store) asBlobSaver() sku.BlobSaver {
 
 func (s *Store) UpdateCheckoutFromCheckedOut(
 	options checkout_options.OptionsWithoutMode,
-	col sku.CheckedOutLike,
+	col sku.SkuType,
 ) (err error) {
 	return
 }

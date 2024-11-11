@@ -8,11 +8,11 @@ import (
 )
 
 func (s *Store) ToSliceFilesZettelen(
-	cos sku.CheckedOutLikeSet,
+	cos sku.SkuTypeSet,
 ) (out []string, err error) {
 	return quiter.DerivedValues(
 		cos,
-		func(col sku.CheckedOutLike) (e string, err error) {
+		func(col sku.SkuType) (e string, err error) {
 			var fds *sku.FSItem
 
 			if fds, err = s.ReadFSItemFromExternal(col.GetSkuExternalLike()); err != nil {
@@ -33,11 +33,11 @@ func (s *Store) ToSliceFilesZettelen(
 }
 
 func (s *Store) ToSliceFilesBlobs(
-	cos sku.CheckedOutLikeSet,
+	cos sku.SkuTypeSet,
 ) (out []string, err error) {
 	return quiter.DerivedValues(
 		cos,
-		func(col sku.CheckedOutLike) (e string, err error) {
+		func(col sku.SkuType) (e string, err error) {
 			var fds *sku.FSItem
 
 			if fds, err = s.ReadFSItemFromExternal(col.GetSkuExternalLike()); err != nil {

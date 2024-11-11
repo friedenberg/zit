@@ -71,7 +71,7 @@ func (s *Store) Query(
 
 func (s *Store) QueryCheckedOut(
 	qg *query.Group,
-	f interfaces.FuncIter[sku.CheckedOutLike],
+	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	var e query.Executor
 

@@ -44,7 +44,7 @@ func (c Mergetool) RunWithQuery(
 
 	if err = u.GetStore().QueryCheckedOut(
 		qg,
-		func(co sku.CheckedOutLike) (err error) {
+		func(co sku.SkuType) (err error) {
 			if co.GetState() != checked_out_state.Conflicted {
 				return
 			}

@@ -71,7 +71,7 @@ func (c Clean) DefaultGenres() ids.Genre {
 
 func (c Clean) shouldClean(
 	u *env.Env,
-	co sku.CheckedOutLike,
+	co sku.SkuType,
 	eqwk *query.Group,
 ) bool {
 	if c.force {
@@ -134,12 +134,12 @@ func (c Clean) RunWithQuery(
 
 	if err = u.GetStore().QueryCheckedOut(
 		qg,
-		func(co sku.CheckedOutLike) (err error) {
+		func(co sku.SkuType) (err error) {
 			if !c.shouldClean(u, co, qg) {
 				return
 			}
 
-			if err = u.GetStore().DeleteCheckedOut(co.(*sku.CheckedOut)); err != nil {
+			if err = u.GetStore().DeleteCheckedOut(co); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
