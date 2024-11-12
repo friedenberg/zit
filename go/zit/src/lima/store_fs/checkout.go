@@ -151,7 +151,7 @@ func (s *Store) shouldCheckOut(
 
 	eq := object_metadata.EqualerSansTai.Equals(
 		&cz.GetSku().Metadata,
-		&cz.External.Metadata,
+		&cz.GetSkuExternal().Metadata,
 	)
 
 	if eq {
@@ -170,7 +170,7 @@ func (s *Store) shouldCheckOut(
 		cz.GetSku().GetObjectId().String(),
 		mutter,
 	); err == nil {
-		if object_metadata.EqualerSansTai.Equals(&mutter.Metadata, &cz.External.Metadata) {
+		if object_metadata.EqualerSansTai.Equals(&mutter.Metadata, &cz.GetSkuExternal().Metadata) {
 			return true
 		}
 	}

@@ -21,16 +21,16 @@ func (s *Store) MergeCheckedOutIfNecessary(
 	var conflicts checkout_mode.Mode
 
 	// TODO add checkout_mode.BlobOnly
-	if co.GetSku().Metadata.Sha().Equals(co.External.Metadata.Sha()) {
+	if co.GetSku().Metadata.Sha().Equals(co.GetSkuExternal().Metadata.Sha()) {
 		commitOptions.Mode = object_mode.ModeEmpty
 		return
-	} else if co.GetSku().Metadata.EqualsSansTai(&co.External.Metadata) {
-		if !co.GetSku().Metadata.Tai.Less(co.External.Metadata.Tai) {
+	} else if co.GetSku().Metadata.EqualsSansTai(&co.GetSkuExternal().Metadata) {
+		if !co.GetSku().Metadata.Tai.Less(co.GetSkuExternal().Metadata.Tai) {
 			// TODO implement retroactive change
 		}
 
 		return
-	} else if co.GetSku().Metadata.Blob.Equals(&co.External.Metadata.Blob) {
+	} else if co.GetSku().Metadata.Blob.Equals(&co.GetSkuExternal().Metadata.Blob) {
 		conflicts = checkout_mode.MetadataOnly
 	} else {
 		conflicts = checkout_mode.MetadataAndBlob

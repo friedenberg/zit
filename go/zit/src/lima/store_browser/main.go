@@ -173,14 +173,14 @@ func (c *Store) CheckoutOne(
 	sku.TransactedResetter.ResetWith(co.GetSku(), sz)
 	sku.TransactedResetter.ResetWith(co.GetSkuExternal().GetSku(), sz)
 	co.State = checked_out_state.JustCheckedOut
-	co.External.ExternalType = ids.MustType("!browser-tab")
+	co.GetSkuExternal().ExternalType = ids.MustType("!browser-tab")
 
 	if err = item.WriteToExternal(co.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	co.External.RepoId = c.externalStoreInfo.RepoId
+	co.GetSkuExternal().RepoId = c.externalStoreInfo.RepoId
 
 	c.l.Lock()
 	defer c.l.Unlock()

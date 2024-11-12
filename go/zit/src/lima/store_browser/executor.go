@@ -23,7 +23,7 @@ func (c *executor) tryToEmitOneExplicitlyCheckedOut(
 	internal *sku.Transacted,
 	item Item,
 ) (err error) {
-	c.co.External.ObjectId.Reset()
+	c.co.GetSkuExternal().ObjectId.Reset()
 
 	var uSku *url.URL
 
@@ -33,7 +33,7 @@ func (c *executor) tryToEmitOneExplicitlyCheckedOut(
 	}
 
 	sku.TransactedResetter.ResetWith(c.co.GetSku(), internal)
-	sku.TransactedResetter.ResetWith(c.co.External.GetSku(), internal)
+	sku.TransactedResetter.ResetWith(c.co.GetSkuExternal().GetSku(), internal)
 
 	if *uSku == item.Url.URL {
 		c.co.State = checked_out_state.ExistsAndSame
@@ -41,7 +41,7 @@ func (c *executor) tryToEmitOneExplicitlyCheckedOut(
 		c.co.State = checked_out_state.Changed
 	}
 
-	c.co.External.State = external_state.Tracked
+	c.co.GetSkuExternal().State = external_state.Tracked
 
 	if err = c.tryToEmitOneCommon(item); err != nil {
 		err = errors.Wrap(err)
@@ -62,7 +62,7 @@ func (c *executor) tryToEmitOneRecognized(
 	}
 
 	sku.TransactedResetter.ResetWith(c.co.GetSku(), internal)
-	sku.TransactedResetter.ResetWith(c.co.External.GetSku(), internal)
+	sku.TransactedResetter.ResetWith(c.co.GetSkuExternal().GetSku(), internal)
 
 	// if err = item.WriteToObjectId(&c.co.External.ObjectId); err != nil {
 	// 	err = errors.Wrap(err)
@@ -70,7 +70,7 @@ func (c *executor) tryToEmitOneRecognized(
 	// }
 
 	c.co.State = checked_out_state.Recognized
-	c.co.External.State = external_state.Recognized
+	c.co.GetSkuExternal().State = external_state.Recognized
 
 	if err = c.tryToEmitOneCommon(item); err != nil {
 		err = errors.Wrap(err)
@@ -89,15 +89,15 @@ func (c *executor) tryToEmitOneUntracked(
 		return
 	}
 
-	sku.TransactedResetter.Reset(c.co.External.GetSku())
+	sku.TransactedResetter.Reset(c.co.GetSkuExternal().GetSku())
 	sku.TransactedResetter.Reset(c.co.GetSku())
 
-	if err = c.co.External.Metadata.Description.Set(item.Title); err != nil {
+	if err = c.co.GetSkuExternal().Metadata.Description.Set(item.Title); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	c.co.External.State = external_state.Untracked
+	c.co.GetSkuExternal().State = external_state.Untracked
 
 	if err = c.tryToEmitOneCommon(item); err != nil {
 		err = errors.Wrap(err)
@@ -124,7 +124,7 @@ func (c *executor) tryToEmitOneCommon(
 		return
 	}
 
-	c.co.External.RepoId = c.store.externalStoreInfo.RepoId
+	c.co.GetSkuExternal().RepoId = c.store.externalStoreInfo.RepoId
 
 	if err = c.out(&c.co); err != nil {
 		err = errors.Wrap(err)

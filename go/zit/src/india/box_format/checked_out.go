@@ -353,7 +353,7 @@ func (f *BoxCheckedOut) addFieldsFS(
 		fallthrough
 
 	case m == checkout_mode.BlobOnly || m == checkout_mode.BlobRecognized:
-		id.Value = (*ids.ObjectIdStringerSansRepo)(&co.External.ObjectId).String()
+		id.Value = (*ids.ObjectIdStringerSansRepo)(&co.GetSkuExternal().ObjectId).String()
 
 	case m.IncludesMetadata():
 		id.Value = f.Rel(item.Object.GetPath())
@@ -452,7 +452,7 @@ func (f *BoxTransacted) addFieldsUntracked(
 ) (err error) {
 	fdToPrint := &item.Blob
 
-	if co.External.GetGenre() != genres.Zettel && !item.Object.IsEmpty() {
+	if co.GetSkuExternal().GetGenre() != genres.Zettel && !item.Object.IsEmpty() {
 		fdToPrint = &item.Object
 	}
 

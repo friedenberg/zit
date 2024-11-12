@@ -299,7 +299,7 @@ func (s *Store) RunMergeTool(
 	e := GetExternalPool().Get()
 	defer GetExternalPool().Put(e)
 
-	e.ObjectId.ResetWith(&co.External.ObjectId)
+	e.ObjectId.ResetWith(&co.GetSkuExternal().ObjectId)
 
 	if err = s.WriteFSItemToExternal(leftItem, e); err != nil {
 		err = errors.Wrap(err)

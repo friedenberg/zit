@@ -52,7 +52,7 @@ type CheckedOut struct {
 }
 
 func (c *CheckedOut) GetRepoId() ids.RepoId {
-	return c.External.RepoId
+	return c.GetSkuExternal().RepoId
 }
 
 func (c *CheckedOut) GetSkuExternal() *Transacted {
@@ -74,19 +74,19 @@ func (src *CheckedOut) Clone() *CheckedOut {
 }
 
 func (t *CheckedOut) GetExternalObjectId() ids.ExternalObjectId {
-	return t.External.GetExternalObjectId()
+	return t.GetSkuExternal().GetExternalObjectId()
 }
 
 func (t *CheckedOut) GetExternalState() external_state.State {
-	return t.External.GetExternalState()
+	return t.GetSkuExternal().GetExternalState()
 }
 
 func (a *CheckedOut) GetObjectId() *ids.ObjectId {
-	return a.External.GetObjectId()
+	return a.GetSkuExternal().GetObjectId()
 }
 
 func (c *CheckedOut) InternalAndExternalEqualsSansTai() bool {
-	return c.External.GetSku().GetMetadata().EqualsSansTai(
+	return c.GetSkuExternal().GetSku().GetMetadata().EqualsSansTai(
 		&c.GetSku().Metadata,
 	)
 }

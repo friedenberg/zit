@@ -43,7 +43,7 @@ func (s *Store) readCheckedOutFromItem(
 		if errors.Is(err, sku.ErrExternalHasConflictMarker) {
 			co.State = checked_out_state.Conflicted
 
-			if err = co.External.ObjectId.SetWithIdLike(
+			if err = co.GetSkuExternal().ObjectId.SetWithIdLike(
 				&co.GetSku().ObjectId,
 			); err != nil {
 				err = errors.Wrap(err)
@@ -109,7 +109,7 @@ func (s *Store) readIntoCheckedOutFromTransacted(
 		} else if errors.Is(err, sku.ErrExternalHasConflictMarker) {
 			co.State = checked_out_state.Conflicted
 
-			if err = co.External.ObjectId.SetWithIdLike(
+			if err = co.GetSkuExternal().ObjectId.SetWithIdLike(
 				&sk.ObjectId,
 			); err != nil {
 				err = errors.Wrap(err)

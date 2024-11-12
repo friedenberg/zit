@@ -85,9 +85,9 @@ func (s *Store) flushUrls() (err error) {
 		}
 
 		if s.config.IsDryRun() {
-			originalItem.CheckedOut.External.State = external_state.WouldDelete
+			originalItem.CheckedOut.GetSkuExternal().State = external_state.WouldDelete
 		} else {
-			originalItem.CheckedOut.External.State = external_state.Deleted
+			originalItem.CheckedOut.GetSkuExternal().State = external_state.Deleted
 		}
 
 		if err = s.itemDeletedStringFormatWriter(

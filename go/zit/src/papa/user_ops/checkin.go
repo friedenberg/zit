@@ -72,8 +72,8 @@ func (op Checkin) Run(
 		z := co.GetSkuExternal().GetSku()
 
 		if co.State == checked_out_state.Untracked &&
-			(co.External.GetGenre() == genres.Zettel ||
-				co.External.GetGenre() == genres.Blob) {
+			(co.GetSkuExternal().GetGenre() == genres.Zettel ||
+				co.GetSkuExternal().GetGenre() == genres.Blob) {
 			if z.Metadata.IsEmpty() {
 				return
 			}
@@ -124,7 +124,7 @@ func (op Checkin) Run(
 			return
 		}
 
-		if err = processed.Add(co.External.CloneTransacted()); err != nil {
+		if err = processed.Add(co.GetSkuExternal().CloneTransacted()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
