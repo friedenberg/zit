@@ -126,7 +126,7 @@ func (s Importer) importLeafSku(
 		return
 	}
 
-	if co.Internal.Metadata.Sha().IsNull() {
+	if co.GetSku().Metadata.Sha().IsNull() {
 		err = errors.Errorf("empty sha")
 		return
 	}

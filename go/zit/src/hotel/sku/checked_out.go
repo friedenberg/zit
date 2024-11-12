@@ -45,7 +45,7 @@ func DetermineState(
 }
 
 type CheckedOut struct {
-	Internal Transacted
+	internal Transacted
 	External Transacted
 	State    checked_out_state.State
 	IsImport bool
@@ -60,7 +60,7 @@ func (c *CheckedOut) GetSkuExternal() *Transacted {
 }
 
 func (c *CheckedOut) GetSku() *Transacted {
-	return &c.Internal
+	return &c.internal
 }
 
 func (c *CheckedOut) GetState() checked_out_state.State {
@@ -87,7 +87,7 @@ func (a *CheckedOut) GetObjectId() *ids.ObjectId {
 
 func (c *CheckedOut) InternalAndExternalEqualsSansTai() bool {
 	return c.External.GetSku().GetMetadata().EqualsSansTai(
-		&c.Internal.Metadata,
+		&c.GetSku().Metadata,
 	)
 }
 

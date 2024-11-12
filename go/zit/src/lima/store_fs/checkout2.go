@@ -53,7 +53,7 @@ func (s *Store) prepareFSItemForCheckOut(
 		return
 	}
 
-	if item, alreadyCheckedOut = s.Get(&co.Internal.ObjectId); alreadyCheckedOut {
+	if item, alreadyCheckedOut = s.Get(&co.GetSku().ObjectId); alreadyCheckedOut {
 		if err = s.HydrateExternalFromItem(
 			sku.CommitOptions{
 				Mode: object_mode.ModeRealizeSansProto,

@@ -150,7 +150,7 @@ func (s *Store) shouldCheckOut(
 	}
 
 	eq := object_metadata.EqualerSansTai.Equals(
-		&cz.Internal.Metadata,
+		&cz.GetSku().Metadata,
 		&cz.External.Metadata,
 	)
 
@@ -167,7 +167,7 @@ func (s *Store) shouldCheckOut(
 	defer sku.GetTransactedPool().Put(mutter)
 
 	if err := s.externalStoreSupplies.FuncReadOneInto(
-		cz.Internal.GetObjectId().String(),
+		cz.GetSku().GetObjectId().String(),
 		mutter,
 	); err == nil {
 		if object_metadata.EqualerSansTai.Equals(&mutter.Metadata, &cz.External.Metadata) {
@@ -199,7 +199,7 @@ func (s *Store) hydrateCheckoutFileNameInfoFromCheckedOut(
 
 	co.State = checked_out_state.JustCheckedOut
 
-	info.tipe = co.Internal.GetType()
+	info.tipe = co.GetSku().GetType()
 	info.inlineBlob = s.config.IsInlineType(info.tipe)
 
 	return
