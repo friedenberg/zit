@@ -76,7 +76,7 @@ func (s *Store) prepareFSItemForCheckOut(
 		}
 	}
 
-	sku.DetermineState(co, true)
+	// sku.DetermineState(co, true)
 
 	return
 }

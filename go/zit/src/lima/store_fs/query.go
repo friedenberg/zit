@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -46,6 +47,17 @@ func (s *Store) ApplyCheckedOut(
 	if err = s.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	switch {
+	case !item.Conflict.IsEmpty():
+		co.SetState(checked_out_state.Conflicted)
+
+	case item.State == external_state.Recognized:
+		co.SetState(checked_out_state.Recognized)
+
+	case item.State == external_state.Untracked:
+		co.SetState(checked_out_state.Untracked)
 	}
 
 	if !qg.ContainsExternalSku(

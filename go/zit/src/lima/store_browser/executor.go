@@ -97,8 +97,6 @@ func (c *executor) tryToEmitOneUntracked(
 		return
 	}
 
-	c.co.GetSkuExternal().State = external_state.Untracked
-
 	if err = c.tryToEmitOneCommon(item); err != nil {
 		err = errors.Wrap(err)
 		return

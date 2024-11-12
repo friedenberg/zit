@@ -24,6 +24,7 @@ checked out | some     | some     | valid
 const (
 	Unknown        = State(iota)
 	JustCheckedOut // UI
+	CheckedOut     // UI
 	ExistsAndSame  // Internal v External
 	Changed        // Internal v External
 	Untracked      // Internal v External
