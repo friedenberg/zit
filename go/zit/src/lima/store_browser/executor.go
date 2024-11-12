@@ -32,7 +32,7 @@ func (c *executor) tryToEmitOneExplicitlyCheckedOut(
 		return
 	}
 
-	sku.TransactedResetter.ResetWith(&c.co.Internal, internal)
+	sku.TransactedResetter.ResetWith(c.co.GetSku(), internal)
 	sku.TransactedResetter.ResetWith(c.co.External.GetSku(), internal)
 
 	if *uSku == item.Url.URL {
@@ -61,7 +61,7 @@ func (c *executor) tryToEmitOneRecognized(
 		return
 	}
 
-	sku.TransactedResetter.ResetWith(&c.co.Internal, internal)
+	sku.TransactedResetter.ResetWith(c.co.GetSku(), internal)
 	sku.TransactedResetter.ResetWith(c.co.External.GetSku(), internal)
 
 	// if err = item.WriteToObjectId(&c.co.External.ObjectId); err != nil {
@@ -90,7 +90,7 @@ func (c *executor) tryToEmitOneUntracked(
 	}
 
 	sku.TransactedResetter.Reset(c.co.External.GetSku())
-	sku.TransactedResetter.Reset(&c.co.Internal)
+	sku.TransactedResetter.Reset(c.co.GetSku())
 
 	if err = c.co.External.Metadata.Description.Set(item.Title); err != nil {
 		err = errors.Wrap(err)

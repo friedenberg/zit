@@ -8,8 +8,8 @@ func (s *Store) ReadIntoCheckedOutFromTransacted(
 	sk *sku.Transacted,
 	co *sku.CheckedOut,
 ) (err error) {
-	if &co.Internal != sk {
-		sku.Resetter.ResetWith(&co.Internal, sk)
+	if co.GetSku() != sk {
+		sku.Resetter.ResetWith(co.GetSku(), sk)
 	}
 
 	sku.DetermineState(co, false)

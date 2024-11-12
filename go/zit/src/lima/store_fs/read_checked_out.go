@@ -22,7 +22,7 @@ func (s *Store) readCheckedOutFromItem(
 
 	if err = s.externalStoreSupplies.FuncReadOneInto(
 		item.ExternalObjectId.String(),
-		&co.Internal,
+		co.GetSku(),
 	); err != nil {
 		if collections.IsErrNotFound(err) || genres.IsErrUnsupportedGenre(err) {
 			err = nil
@@ -37,7 +37,7 @@ func (s *Store) readCheckedOutFromItem(
 			Mode: object_mode.ModeUpdateTai,
 		},
 		item,
-		&co.Internal,
+		co.GetSku(),
 		&co.External,
 	); err != nil {
 		if errors.Is(err, sku.ErrExternalHasConflictMarker) {
@@ -83,8 +83,8 @@ func (s *Store) readIntoCheckedOutFromTransacted(
 	sk *sku.Transacted,
 	co *sku.CheckedOut,
 ) (err error) {
-	if &co.Internal != sk {
-		sku.Resetter.ResetWith(&co.Internal, sk)
+	if co.GetSku() != sk {
+		sku.Resetter.ResetWith(co.GetSku(), sk)
 	}
 
 	ok := false

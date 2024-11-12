@@ -14,7 +14,7 @@ func (s *Store) checkoutOneIfNecessary(
 	internal := tg.GetSku()
 	co = GetCheckedOutPool().Get()
 
-	sku.Resetter.ResetWith(&co.Internal, internal)
+	sku.Resetter.ResetWith(co.GetSku(), internal)
 
 	var alreadyCheckedOut bool
 
@@ -59,7 +59,7 @@ func (s *Store) prepareFSItemForCheckOut(
 				Mode: object_mode.ModeRealizeSansProto,
 			},
 			item,
-			&co.Internal,
+			co.GetSku(),
 			&co.External,
 		); err != nil {
 			if errors.Is(err, sku.ErrExternalHasConflictMarker) && options.AllowConflicted {

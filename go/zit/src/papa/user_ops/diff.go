@@ -67,7 +67,7 @@ func (op Diff) Run(
 	wg := quiter.MakeErrorWaitGroupParallel()
 	var mode checkout_mode.Mode
 
-	il := &co.Internal
+	il := co.GetSku()
 	ilCtx := object_metadata.TextFormatterContext{
 		PersistentFormatterContext: il,
 		TextFormatterOptions:       options,

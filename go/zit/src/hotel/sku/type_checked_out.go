@@ -16,7 +16,7 @@ func cloneFromTransactedCheckedOut(
 	newState checked_out_state.State,
 ) *CheckedOut {
 	dst := GetCheckedOutPool().Get()
-	TransactedResetter.ResetWith(&dst.Internal, src)
+	TransactedResetter.ResetWith(dst.GetSku(), src)
 	TransactedResetter.ResetWith(&dst.External, src)
 	dst.State = newState
 	return dst

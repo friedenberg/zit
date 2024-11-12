@@ -70,7 +70,7 @@ func (s *Store) checkoutOneForReal(
 	}
 
 	// This is necessary otherwise External is an empty sku
-	sku.Resetter.ResetWith(&co.External, &co.Internal)
+	sku.Resetter.ResetWith(&co.External, co.GetSku())
 
 	if err = s.WriteFSItemToExternal(item, &co.External); err != nil {
 		err = errors.Wrap(err)
@@ -192,7 +192,7 @@ func (s *Store) hydrateCheckoutFileNameInfoFromCheckedOut(
 	co *sku.CheckedOut,
 	info *checkoutFileNameInfo,
 ) (err error) {
-	if err = s.SetFilenameForTransacted(options, &co.Internal, info); err != nil {
+	if err = s.SetFilenameForTransacted(options, co.GetSku(), info); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

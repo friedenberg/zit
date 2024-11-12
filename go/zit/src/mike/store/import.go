@@ -105,7 +105,7 @@ func (s Importer) importLeafSku(
 	}
 
 	ui.TodoP4("cleanup")
-	if err = s.ReadOneInto(external.GetObjectId(), &co.Internal); err != nil {
+	if err = s.ReadOneInto(external.GetObjectId(), co.GetSku()); err != nil {
 		if collections.IsErrNotFound(err) {
 			if err = s.tryRealizeAndOrStore(
 				external,
