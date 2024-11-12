@@ -5,14 +5,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-type CheckedOutHeaderUserTai struct{}
+type TransactedHeaderUserTai struct{}
 
-func (f CheckedOutHeaderUserTai) WriteBoxHeader(
+func (f TransactedHeaderUserTai) WriteBoxHeader(
 	header *string_format_writer.BoxHeader,
-	co *sku.CheckedOut,
+	sk *sku.Transacted,
 ) (err error) {
-	external := co.GetSkuExternal()
-	t := external.GetTai()
+	t := sk.GetTai()
 	header.Value = t.Format(string_format_writer.StringFormatDateTime)
 
 	return

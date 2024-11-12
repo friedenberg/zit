@@ -21,6 +21,7 @@ func MakeBoxTransacted(
 	abbr ids.Abbr,
 	fsItemReadWriter sku.FSItemReadWriter,
 	relativePath dir_layout.RelativePath,
+	headerWriter string_format_writer.HeaderWriter[*sku.Transacted],
 ) *BoxTransacted {
 	return &BoxTransacted{
 		optionsColor:     co,
@@ -29,6 +30,7 @@ func MakeBoxTransacted(
 		abbr:             abbr,
 		fsItemReadWriter: fsItemReadWriter,
 		relativePath:     relativePath,
+		headerWriter:     headerWriter,
 	}
 }
 
@@ -36,7 +38,8 @@ type BoxTransacted struct {
 	optionsColor string_format_writer.ColorOptions
 	optionsPrint options_print.V0
 
-	box interfaces.StringFormatWriter[string_format_writer.Box]
+	box          interfaces.StringFormatWriter[string_format_writer.Box]
+	headerWriter string_format_writer.HeaderWriter[*sku.Transacted]
 
 	abbr             ids.Abbr
 	fsItemReadWriter sku.FSItemReadWriter
@@ -49,13 +52,18 @@ func (f *BoxTransacted) WriteStringFormat(
 ) (n int64, err error) {
 	var box string_format_writer.Box
 
-	var n2 int64
+	// box.Header.RightAligned = true
 
-	box.Header.RightAligned = true
+	// if f.optionsPrint.PrintTime && !f.optionsPrint.PrintTai {
+	// 	t := sk.GetTai()
+	// 	box.Header.Value = t.Format(string_format_writer.StringFormatDateTime)
+	// }
 
-	if f.optionsPrint.PrintTime && !f.optionsPrint.PrintTai {
-		t := sk.GetTai()
-		box.Header.Value = t.Format(string_format_writer.StringFormatDateTime)
+	if f.headerWriter != nil {
+		if err = f.headerWriter.WriteBoxHeader(&box.Header, sk); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	box.Contents = slices.Grow(box.Contents, 10)
@@ -91,10 +99,7 @@ func (f *BoxTransacted) WriteStringFormat(
 		)
 	}
 
-	n2, err = f.box.WriteStringFormat(sw, box)
-	n += n2
-
-	if err != nil {
+	if n, err = f.box.WriteStringFormat(sw, box); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

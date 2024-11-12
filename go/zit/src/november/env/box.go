@@ -13,6 +13,12 @@ func (u *Env) StringFormatWriterSkuBoxTransacted(
 	co string_format_writer.ColorOptions,
 	truncation string_format_writer.CliFormatTruncation,
 ) *box_format.BoxTransacted {
+	var headerWriter string_format_writer.HeaderWriter[*sku.Transacted]
+
+	if po.PrintTime && !po.PrintTai {
+		headerWriter = box_format.TransactedHeaderUserTai{}
+	}
+
 	return box_format.MakeBoxTransacted(
 		co,
 		po,
@@ -20,6 +26,7 @@ func (u *Env) StringFormatWriterSkuBoxTransacted(
 		u.GetStore().GetAbbrStore().GetAbbr(),
 		u.GetStore().GetStoreFS(),
 		u.dirLayout,
+		headerWriter,
 	)
 }
 
@@ -89,6 +96,7 @@ func (u *Env) MakeBoxArchive(includeTai bool) *box_format.BoxTransacted {
 			co,
 		),
 		ids.Abbr{},
+		nil,
 		nil,
 		nil,
 	)
