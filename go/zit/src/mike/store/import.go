@@ -81,7 +81,7 @@ func (s Importer) importLeafSku(
 	co = store_fs.GetCheckedOutPool().Get()
 	co.IsImport = true
 
-	sku.Resetter.ResetWith(&co.External, external)
+	sku.Resetter.ResetWith(co.GetSkuExternal(), external)
 
 	// if err = external.CalculateObjectShas(); err != nil {
 	// 	co.SetError(err)
@@ -110,7 +110,7 @@ func (s Importer) importLeafSku(
 			if err = s.tryRealizeAndOrStore(
 				external,
 				sku.CommitOptions{
-					Clock:              &co.External,
+					Clock:              co.GetSkuExternal(),
 					Mode:               object_mode.ModeCommit,
 					DontAddMissingTags: true,
 					DontAddMissingType: true,

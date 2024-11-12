@@ -43,13 +43,13 @@ func (s *Store) ApplyCheckedOut(
 		return
 	}
 
-	if err = s.WriteFSItemToExternal(item, &co.External); err != nil {
+	if err = s.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if !qg.ContainsExternalSku(
-		&co.External,
+		co.GetSkuExternal(),
 		co.State,
 	) {
 		return

@@ -110,7 +110,7 @@ func (c *executor) tryToEmitOneUntracked(
 func (c *executor) tryToEmitOneCommon(
 	i Item,
 ) (err error) {
-	external := &c.co.External
+	external := c.co.GetSkuExternal()
 
 	if err = i.WriteToExternal(external); err != nil {
 		err = errors.Wrap(err)

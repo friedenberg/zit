@@ -97,5 +97,5 @@ func (c *CheckedOut) SetState(v checked_out_state.State) (err error) {
 }
 
 func (a *CheckedOut) String() string {
-	return fmt.Sprintf("%s %s", a.GetSku(), &a.External)
+	return fmt.Sprintf("%s %s", a.GetSku(), a.GetSkuExternal())
 }

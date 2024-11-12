@@ -73,7 +73,7 @@ func (op Diff) Run(
 		TextFormatterOptions:       options,
 	}
 
-	el := &co.External
+	el := co.GetSkuExternal()
 	elCtx := object_metadata.TextFormatterContext{
 		PersistentFormatterContext: el,
 		TextFormatterOptions:       options,

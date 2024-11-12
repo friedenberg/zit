@@ -70,16 +70,16 @@ func (s *Store) checkoutOneForReal(
 	}
 
 	// This is necessary otherwise External is an empty sku
-	sku.Resetter.ResetWith(&co.External, co.GetSku())
+	sku.Resetter.ResetWith(co.GetSkuExternal(), co.GetSku())
 
-	if err = s.WriteFSItemToExternal(item, &co.External); err != nil {
+	if err = s.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if err = s.fileEncoder.Encode(
 		options.TextFormatterOptions,
-		&co.External,
+		co.GetSkuExternal(),
 		item,
 	); err != nil {
 		err = errors.Wrap(err)

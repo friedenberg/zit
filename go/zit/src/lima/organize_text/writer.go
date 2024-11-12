@@ -64,7 +64,7 @@ func (av writer) write(a *Assignment) (err error) {
 		}
 
 		cursor := z.sku.Clone()
-		cursorExternal := &cursor.External
+		cursorExternal := cursor.GetSkuExternal()
 		cursorExternal.Metadata.Subtract(&av.Metadata)
 		mes := cursorExternal.GetMetadata().GetTags().CloneMutableSetPtrLike()
 

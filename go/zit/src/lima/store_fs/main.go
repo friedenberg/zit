@@ -76,7 +76,7 @@ func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
 }
 
 func (s *Store) DeleteCheckedOut(co *sku.CheckedOut) (err error) {
-	external := &co.External
+	external := co.GetSkuExternal()
 
 	var i *sku.FSItem
 

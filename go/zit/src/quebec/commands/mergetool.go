@@ -78,7 +78,7 @@ func (c Mergetool) RunWithQuery(
 		var conflict *fd.FD
 
 		if conflict, err = u.GetStore().GetStoreFS().GetConflictOrError(
-			&co.External,
+			co.GetSkuExternal(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

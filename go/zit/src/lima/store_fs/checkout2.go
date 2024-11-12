@@ -24,7 +24,7 @@ func (s *Store) checkoutOneIfNecessary(
 	}
 
 	if alreadyCheckedOut && !s.shouldCheckOut(options, co, true) {
-		if err = s.WriteFSItemToExternal(i, &co.External); err != nil {
+		if err = s.WriteFSItemToExternal(i, co.GetSkuExternal()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -60,7 +60,7 @@ func (s *Store) prepareFSItemForCheckOut(
 			},
 			item,
 			co.GetSku(),
-			&co.External,
+			co.GetSkuExternal(),
 		); err != nil {
 			if errors.Is(err, sku.ErrExternalHasConflictMarker) && options.AllowConflicted {
 				err = nil
@@ -70,7 +70,7 @@ func (s *Store) prepareFSItemForCheckOut(
 			}
 		}
 	} else {
-		if item, err = s.ReadFSItemFromExternal(&co.External); err != nil {
+		if item, err = s.ReadFSItemFromExternal(co.GetSkuExternal()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

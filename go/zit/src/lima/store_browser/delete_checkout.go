@@ -6,7 +6,7 @@ import (
 )
 
 func (s *Store) DeleteCheckedOut(co *sku.CheckedOut) (err error) {
-	external := &co.External
+	external := co.GetSkuExternal()
 
 	var item Item
 

@@ -53,7 +53,7 @@ func (f *BoxCheckedOut) WriteStringFormat(
 	var n2 int64
 
 	state := co.GetState()
-	external := &co.External
+	external := co.GetSkuExternal()
 
 	if f.PrintHeader {
 		stateString := state.String()
@@ -361,7 +361,7 @@ func (f *BoxCheckedOut) addFieldsFS(
 
 	default:
 		if id, _, err = f.makeFieldObjectId(
-			&co.External,
+			co.GetSkuExternal(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -375,7 +375,7 @@ func (f *BoxCheckedOut) addFieldsFS(
 	} else {
 		if err = f.addFieldsMetadata(
 			op,
-			&co.External,
+			co.GetSkuExternal(),
 			op.DescriptionInBox,
 			box,
 		); err != nil {
@@ -466,7 +466,7 @@ func (f *BoxTransacted) addFieldsUntracked(
 
 	if err = f.addFieldsMetadata(
 		op,
-		&co.External,
+		co.GetSkuExternal(),
 		f.Options.DescriptionInBox,
 		box,
 	); err != nil {
