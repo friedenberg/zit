@@ -233,20 +233,21 @@ func (u *Env) Initialize(options Options) (err error) {
 
 	ptl := u.PrinterTransacted()
 
-	lw := store.Logger{
-		New:     ptl,
-		Updated: ptl,
-		Unchanged: func(sk *sku.Transacted) (err error) {
+	lw := store.UIDelegate{
+		TransactedNew:     ptl,
+		TransactedUpdated: ptl,
+		TransactedUnchanged: func(sk *sku.Transacted) (err error) {
 			if !u.config.PrintOptions.PrintUnchanged {
 				return
 			}
 
 			return ptl(sk)
 		},
+		CheckedOutCheckedOut: u.PrinterCheckedOut(),
+		CheckedOutChanged:    u.PrinterCheckedOut(),
 	}
 
-	u.store.SetCheckedOutLogWriter(u.PrinterCheckedOut())
-	u.store.SetLogWriter(lw)
+	u.store.SetUIDelegate(lw)
 
 	u.storesInitialized = true
 

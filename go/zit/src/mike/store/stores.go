@@ -78,9 +78,14 @@ func (s *Store) CheckoutQuery(
 			return
 		}
 
+		// if co.GetSku().Metadata.EqualsSansTai(&co.GetSkuExternal().GetSku().Metadata) {
+		// 	co.SetState(checked_out_state.JustCheckedOut)
+		// } else {
+		// 	co.SetState(checked_out_state.JustCheckedOut)
+		// }
 		sku.DetermineState(co, true)
 
-		if err = s.checkedOutLogPrinter(co); err != nil {
+		if err = s.ui.CheckedOutCheckedOut(co); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

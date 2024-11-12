@@ -164,7 +164,7 @@ func (s *Store) tryRealizeAndOrStore(
 		sku.TransactedResetter.ResetWithExceptFields(kinder, mutter)
 
 		if o.Mode.Contains(object_mode.ModeLatest) {
-			if err = s.Unchanged(kinder); err != nil {
+			if err = s.ui.TransactedUnchanged(kinder); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -223,7 +223,7 @@ func (s *Store) tryRealizeAndOrStore(
 		}
 
 		if mutter == nil {
-			if err = s.New(kinder); err != nil {
+			if err = s.ui.TransactedNew(kinder); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -234,7 +234,7 @@ func (s *Store) tryRealizeAndOrStore(
 			// 	return
 			// }
 
-			if err = s.Updated(kinder); err != nil {
+			if err = s.ui.TransactedUpdated(kinder); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -310,7 +310,7 @@ func (s *Store) commitTransacted(
 func (s *Store) handleUnchanged(
 	t *sku.Transacted,
 ) (err error) {
-	return s.Unchanged(t)
+	return s.ui.TransactedUnchanged(t)
 }
 
 func (s *Store) UpdateKonfig(

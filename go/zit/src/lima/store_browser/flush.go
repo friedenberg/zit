@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/chrest/go/src/charlie/browser_items"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"golang.org/x/exp/maps"
 )
 
@@ -82,12 +81,6 @@ func (s *Store) flushUrls() (err error) {
 			)
 
 			return
-		}
-
-		if s.config.IsDryRun() {
-			originalItem.CheckedOut.GetSkuExternal().State = external_state.WouldDelete
-		} else {
-			originalItem.CheckedOut.GetSkuExternal().State = external_state.Deleted
 		}
 
 		if err = s.itemDeletedStringFormatWriter(

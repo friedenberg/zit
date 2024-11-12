@@ -48,12 +48,16 @@ type Store struct {
 	protoZettel  sku.Proto
 	queryBuilder *query.Builder
 
-	checkedOutLogPrinter interfaces.FuncIter[*sku.CheckedOut]
-	Logger
+	ui UIDelegate
 }
 
-type Logger struct {
-	New, Updated, Unchanged interfaces.FuncIter[*sku.Transacted]
+type UIDelegate struct {
+	TransactedNew       interfaces.FuncIter[*sku.Transacted]
+	TransactedUpdated   interfaces.FuncIter[*sku.Transacted]
+	TransactedUnchanged interfaces.FuncIter[*sku.Transacted]
+
+	CheckedOutCheckedOut interfaces.FuncIter[sku.SkuType]
+	CheckedOutChanged    interfaces.FuncIter[sku.SkuType]
 }
 
 func (c *Store) Initialize(
@@ -171,13 +175,6 @@ func (s *Store) SetExternalStores(
 	return
 }
 
-// TODO remove
-func (s *Store) SetCheckedOutLogWriter(
-	zelw interfaces.FuncIter[*sku.CheckedOut],
-) {
-	s.checkedOutLogPrinter = zelw
-}
-
 func (s *Store) ResetIndexes() (err error) {
 	if err = s.zettelIdIndex.Reset(); err != nil {
 		err = errors.Wrapf(err, "failed to reset index object id index")
@@ -187,6 +184,6 @@ func (s *Store) ResetIndexes() (err error) {
 	return
 }
 
-func (s *Store) SetLogWriter(lw Logger) {
-	s.Logger = lw
+func (s *Store) SetUIDelegate(ud UIDelegate) {
+	s.ui = ud
 }
