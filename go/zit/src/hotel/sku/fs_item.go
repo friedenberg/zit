@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/thyme"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -17,8 +16,6 @@ import (
 var ErrExternalHasConflictMarker = errors.New("external has conflict marker")
 
 type FSItem struct {
-	external_state.State
-
 	// TODO refactor this to be a string and a genre that is tied to the state
 	ExternalObjectId ids.ObjectId
 
@@ -39,8 +36,7 @@ func (ef *FSItem) GetExternalObjectId() ExternalObjectId {
 
 func (i *FSItem) Debug() string {
 	return fmt.Sprintf(
-		"State: %q, Genre: %q, ObjectId: %q, Object: %q, Blob: %q, Conflict: %q, All: %q",
-		i.State,
+		"Genre: %q, ObjectId: %q, Object: %q, Blob: %q, Conflict: %q, All: %q",
 		i.ExternalObjectId.GetGenre(),
 		&i.ExternalObjectId,
 		&i.Object,
@@ -69,7 +65,6 @@ func (i *FSItem) LatestModTime() thyme.Time {
 }
 
 func (dst *FSItem) Reset() {
-	dst.State = 0
 	dst.ExternalObjectId.Reset()
 	dst.Object.Reset()
 	dst.Blob.Reset()
@@ -87,7 +82,6 @@ func (dst *FSItem) ResetWith(src *FSItem) {
 		return
 	}
 
-	dst.State = src.State
 	dst.ExternalObjectId.ResetWith(&src.ExternalObjectId)
 	dst.Object.ResetWith(&src.Object)
 	dst.Blob.ResetWith(&src.Blob)
@@ -158,11 +152,6 @@ func (e *FSItem) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 		m = checkout_mode.MetadataOnly
 
 	default:
-		if e.State == external_state.Recognized {
-			m = checkout_mode.BlobRecognized
-			return
-		}
-
 		err = checkout_mode.MakeErrInvalidCheckoutMode(
 			errors.Errorf("all FD's are empty: %s", e.Debug()),
 		)
@@ -181,12 +170,6 @@ func (e *FSItem) GetCheckoutMode() (m checkout_mode.Mode) {
 
 	case !e.Object.IsEmpty():
 		m = checkout_mode.MetadataOnly
-
-	default:
-		if e.State == external_state.Recognized {
-			m = checkout_mode.BlobRecognized
-			return
-		}
 	}
 
 	return

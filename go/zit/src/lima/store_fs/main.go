@@ -307,7 +307,6 @@ func (s *Store) ReadFSItemFromExternal(el sku.ExternalLike) (i *sku.FSItem, err 
 		}
 	}
 
-	i.State = e.State
 	i.ExternalObjectId.ResetWith(&e.ExternalObjectId)
 
 	return

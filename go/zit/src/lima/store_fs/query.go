@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
@@ -53,11 +52,11 @@ func (s *Store) ApplyCheckedOut(
 	case !item.Conflict.IsEmpty():
 		co.SetState(checked_out_state.Conflicted)
 
-	case item.State == external_state.Recognized:
-		co.SetState(checked_out_state.Recognized)
+		// case item.State == external_state.Recognized:
+		// 	co.SetState(checked_out_state.Recognized)
 
-	case item.State == external_state.Untracked:
-		co.SetState(checked_out_state.Untracked)
+		// case item.State == external_state.Untracked:
+		// 	co.SetState(checked_out_state.Untracked)
 	}
 
 	if !qg.ContainsExternalSku(
@@ -134,8 +133,8 @@ func (s *Store) QueryUntracked(
 			return
 		}
 
+		// TODO forward checked_out_state.Recognized
 		recognizedFDS := &sku.FSItem{
-			State:          external_state.Recognized,
 			MutableSetLike: collections_value.MakeMutableValueSet[*fd.FD](nil),
 		}
 
@@ -143,7 +142,6 @@ func (s *Store) QueryUntracked(
 
 		if err = recognized.Each(
 			func(fds *sku.FSItem) (err error) {
-				fds.State = external_state.Recognized
 				recognizedFDS.Add(fdSetToFD(fds).Clone())
 				return
 			},
@@ -215,9 +213,9 @@ func (s *Store) QueryUntracked(
 		)
 
 		for _, fds := range blobs {
-			if fds.State == external_state.Recognized {
-				continue
-			}
+			// if fds.State == external_state.Recognized {
+			// 	continue
+			// }
 
 			if err = aco(fds); err != nil {
 				err = errors.Wrap(err)
@@ -254,9 +252,9 @@ func (s *Store) QueryUntracked(
 		)
 
 		for _, fds := range objects {
-			if fds.State == external_state.Recognized {
-				continue
-			}
+			// if fds.State == external_state.Recognized {
+			// 	continue
+			// }
 
 			if err = aco(fds); err != nil {
 				err = errors.Wrap(err)
