@@ -40,8 +40,32 @@ func MakeBoxCheckedOut(
 }
 
 type BoxCheckedOut struct {
+	string_format_writer.HeaderWriter[*sku.CheckedOut]
 	PrintHeader bool
 	BoxTransacted
+}
+
+func (f *BoxCheckedOut) WriteBoxHeader(
+	header *string_format_writer.BoxHeader,
+	co *sku.CheckedOut,
+) (err error) {
+	if f.PrintHeader {
+		state := co.GetState()
+		external := co.GetSkuExternal()
+
+		stateString := state.String()
+
+		header.RightAligned = true
+
+		if stateString != "" {
+			header.Value = stateString
+		} else if f.Options.PrintTime && !f.Options.PrintTai {
+			t := external.GetTai()
+			header.Value = t.Format(string_format_writer.StringFormatDateTime)
+		}
+	}
+
+	return
 }
 
 func (f *BoxCheckedOut) WriteStringFormat(
@@ -52,26 +76,17 @@ func (f *BoxCheckedOut) WriteStringFormat(
 
 	var n2 int64
 
-	state := co.GetState()
-	external := co.GetSkuExternal()
-
-	if f.PrintHeader {
-		stateString := state.String()
-
-		box.Header.RightAligned = true
-
-		if stateString != "" {
-			box.Header.Value = stateString
-		} else if f.Options.PrintTime && !f.Options.PrintTai {
-			t := external.GetTai()
-			box.Header.Value = t.Format(string_format_writer.StringFormatDateTime)
-		}
+	if err = f.WriteBoxHeader(&box.Header, co); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	box.Contents = slices.Grow(box.Contents, 10)
 
 	var fds *sku.FSItem
 	var errFS error
+
+	external := co.GetSkuExternal()
 
 	if f.FSItemReadWriter != nil {
 		fds, errFS = f.FSItemReadWriter.ReadFSItemFromExternal(external)

@@ -22,6 +22,10 @@ type BoxHeader struct {
 	RightAligned bool
 }
 
+type HeaderWriter[T any] interface {
+	WriteBoxHeader(*BoxHeader, T) error
+}
+
 type Box struct {
 	Header                   BoxHeader
 	Contents                 []Field
