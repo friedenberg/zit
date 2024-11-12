@@ -34,7 +34,7 @@ const (
 
 func (s State) String() string {
 	switch s {
-	case JustCheckedOut:
+	case JustCheckedOut, CheckedOut:
 		return string_format_writer.StringCheckedOut
 
 	case ExistsAndSame:

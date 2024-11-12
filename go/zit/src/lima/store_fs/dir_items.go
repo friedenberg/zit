@@ -10,6 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
@@ -394,6 +395,8 @@ func (d *dirItems) addOneBlob(
 		return
 	}
 
+	result.State = external_state.Tracked
+
 	if err = d.blobs.Add(result); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -486,6 +489,9 @@ func (d *dirItems) addOneObject(
 			return
 		}
 	}
+
+	// TODO read if item exists and then set state
+	fds.State = external_state.Tracked
 
 	if err = d.objects.Add(fds); err != nil {
 		err = errors.Wrap(err)

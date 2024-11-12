@@ -59,9 +59,20 @@ func (s *Store) readCheckedOutFromItem(
 
 	sku.DetermineState(co, false)
 
+	// ui.Debug().Print(co.GetState())
+
 	if !item.Conflict.IsEmpty() {
 		co.SetState(checked_out_state.Conflicted)
+	} else {
+		// if co.GetState() == checked_out_state.Untracked {
+		// 	ui.Debug().Print(item.State)
+		// 	ui.Debug().Print(item.Debug())
+		// 	panic("wow")
+		// }
+		// co.SetState(checked_out_state.CheckedOut)
 	}
+
+	// ui.Debug().Print(co.GetState())
 
 	return
 }
