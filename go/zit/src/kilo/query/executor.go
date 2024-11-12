@@ -110,7 +110,7 @@ func (e *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
 	return
 }
 
-func (e *Executor) ExecuteCheckedOutLike(
+func (e *Executor) ExecuteSkuType(
 	out interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	// TODO only apply dot operator when necessary
@@ -127,30 +127,6 @@ func (e *Executor) ExecuteCheckedOutLike(
 	return
 }
 
-func (e *Executor) ExecuteExternalLike(
-	out interfaces.FuncIter[sku.ExternalLike],
-) (err error) {
-	// TODO only apply dot operator when necessary
-	if err = e.ExternalStore.ApplyDotOperator(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if e.dotOperatorActive {
-		if err = e.executeExternalQueryExternalLike(out); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	} else {
-		if err = e.executeInternalQueryExternalLike(out); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
-
-	return
-}
-
 func (e *Executor) ExecuteTransacted(
 	out interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
@@ -160,24 +136,13 @@ func (e *Executor) ExecuteTransacted(
 		return
 	}
 
-	out1 := func(el sku.ExternalLike) (err error) {
-		sk := el.GetSku()
-
-		if err = out(sk); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-
 	if e.dotOperatorActive {
-		if err = e.executeExternalQueryExternalLike(out1); err != nil {
+		if err = e.executeExternalQuery(out); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if err = e.executeInternalQueryExternalLike(out1); err != nil {
+		if err = e.executeInternalQuery(out); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -200,8 +165,8 @@ func (e *Executor) executeExternalQueryCheckedOutLike(
 	return
 }
 
-func (e *Executor) executeExternalQueryExternalLike(
-	out interfaces.FuncIter[sku.ExternalLike],
+func (e *Executor) executeExternalQuery(
+	out interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	if err = e.executeExternalQueryCheckedOutLike(
 		func(col sku.SkuType) (err error) {
@@ -222,8 +187,8 @@ func (e *Executor) executeExternalQueryExternalLike(
 	return
 }
 
-func (e *Executor) executeInternalQueryExternalLike(
-	out interfaces.FuncIter[sku.ExternalLike],
+func (e *Executor) executeInternalQuery(
+	out interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	if err = e.FuncPrimitiveQuery(
 		e.Group,
@@ -237,7 +202,7 @@ func (e *Executor) executeInternalQueryExternalLike(
 }
 
 func (e *Executor) makeEmitSkuSigilLatest(
-	out interfaces.FuncIter[sku.ExternalLike],
+	out interfaces.FuncIter[*sku.Transacted],
 ) interfaces.FuncIter[*sku.Transacted] {
 	return func(z *sku.Transacted) (err error) {
 		g := genres.Must(z.GetGenre())

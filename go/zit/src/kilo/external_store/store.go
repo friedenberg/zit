@@ -93,6 +93,35 @@ func (es *Store) ApplyDotOperator() (err error) {
 	return
 }
 
+func (s *Store) ReadTransactedFromObjectId(
+	o sku.CommitOptions,
+	k1 interfaces.ObjectId,
+	t *sku.Transacted,
+) (e sku.ExternalLike, err error) {
+	es, ok := s.StoreLike.(sku.ExternalStoreReadExternalLikeFromObjectId)
+
+	if !ok {
+		err = makeErrUnsupportedOperation(s, &s)
+		return
+	}
+
+	if err = s.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if e, err = es.ReadExternalLikeFromObjectId(
+		o,
+		k1,
+		t,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s *Store) ReadExternalLikeFromObjectId(
 	o sku.CommitOptions,
 	k1 interfaces.ObjectId,

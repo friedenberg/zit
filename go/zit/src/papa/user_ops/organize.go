@@ -30,14 +30,14 @@ func (op Organize) RunWithQueryGroup(
 	skus := sku.MakeSkuTypeSetMutable()
 	var l sync.Mutex
 
-	if err = op.GetStore().Query(
+	if err = op.GetStore().QueryTransacted(
 		qg,
-		func(el sku.ExternalLike) (err error) {
+		func(sk *sku.Transacted) (err error) {
 			l.Lock()
 			defer l.Unlock()
 
 			clone := sku.CloneSkuTypeFromTransacted(
-				el.GetSku(),
+				sk,
 				checked_out_state.ExistsAndSame,
 			)
 

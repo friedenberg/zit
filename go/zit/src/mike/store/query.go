@@ -49,26 +49,6 @@ func (s *Store) QueryTransacted(
 	return
 }
 
-// TODO remove entirely in favor of Transacted
-func (s *Store) Query(
-	qg *query.Group,
-	f interfaces.FuncIter[sku.ExternalLike],
-) (err error) {
-	var e query.Executor
-
-	if e, err = s.MakeQueryExecutor(qg); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = e.ExecuteExternalLike(f); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
-}
-
 func (s *Store) QueryCheckedOut(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.SkuType],
@@ -80,7 +60,7 @@ func (s *Store) QueryCheckedOut(
 		return
 	}
 
-	if err = e.ExecuteCheckedOutLike(f); err != nil {
+	if err = e.ExecuteSkuType(f); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
