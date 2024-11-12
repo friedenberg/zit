@@ -44,7 +44,7 @@ func (s *Store) MergeCheckedOutIfNecessary(
 	default:
 	}
 
-	co.State = checked_out_state.Conflicted
+	co.SetState(checked_out_state.Conflicted)
 
 	return
 }

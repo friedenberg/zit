@@ -36,9 +36,9 @@ func (c *executor) tryToEmitOneExplicitlyCheckedOut(
 	sku.TransactedResetter.ResetWith(c.co.GetSkuExternal().GetSku(), internal)
 
 	if *uSku == item.Url.URL {
-		c.co.State = checked_out_state.ExistsAndSame
+		c.co.SetState(checked_out_state.ExistsAndSame)
 	} else {
-		c.co.State = checked_out_state.Changed
+		c.co.SetState(checked_out_state.Changed)
 	}
 
 	c.co.GetSkuExternal().State = external_state.Tracked
@@ -55,9 +55,9 @@ func (c *executor) tryToEmitOneRecognized(
 	internal *sku.Transacted,
 	item Item,
 ) (err error) {
-	c.co.State = checked_out_state.Recognized
+	c.co.SetState(checked_out_state.Recognized)
 
-	if !c.qg.ContainsSkuCheckedOutState(c.co.State) {
+	if !c.qg.ContainsSkuCheckedOutState(c.co.GetState()) {
 		return
 	}
 
@@ -69,7 +69,7 @@ func (c *executor) tryToEmitOneRecognized(
 	// 	return
 	// }
 
-	c.co.State = checked_out_state.Recognized
+	c.co.SetState(checked_out_state.Recognized)
 	c.co.GetSkuExternal().State = external_state.Recognized
 
 	if err = c.tryToEmitOneCommon(item); err != nil {
@@ -83,9 +83,9 @@ func (c *executor) tryToEmitOneRecognized(
 func (c *executor) tryToEmitOneUntracked(
 	item Item,
 ) (err error) {
-	c.co.State = checked_out_state.Untracked
+	c.co.SetState(checked_out_state.Untracked)
 
-	if !c.qg.ContainsSkuCheckedOutState(c.co.State) {
+	if !c.qg.ContainsSkuCheckedOutState(c.co.GetState()) {
 		return
 	}
 
@@ -120,7 +120,7 @@ func (c *executor) tryToEmitOneCommon(
 	external.ObjectId.SetGenre(genres.Zettel)
 	external.ExternalObjectId.SetGenre(genres.Zettel)
 
-	if !c.qg.ContainsExternalSku(external, c.co.State) {
+	if !c.qg.ContainsExternalSku(external, c.co.GetState()) {
 		return
 	}
 

@@ -71,7 +71,7 @@ func (op Checkin) Run(
 	for _, co := range sortedResults {
 		z := co.GetSkuExternal().GetSku()
 
-		if co.State == checked_out_state.Untracked &&
+		if co.GetState() == checked_out_state.Untracked &&
 			(co.GetSkuExternal().GetGenre() == genres.Zettel ||
 				co.GetSkuExternal().GetGenre() == genres.Blob) {
 			if z.Metadata.IsEmpty() {

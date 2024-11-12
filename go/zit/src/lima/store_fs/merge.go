@@ -233,7 +233,7 @@ func (s *Store) handleMergeResult(
 		return
 	}
 
-	cofs.State = checked_out_state.Conflicted
+	cofs.SetState(checked_out_state.Conflicted)
 
 	return
 }

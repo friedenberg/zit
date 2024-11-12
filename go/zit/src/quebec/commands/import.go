@@ -146,7 +146,7 @@ func (c Import) run(u *env.Env, args ...string) (err error) {
 			return
 		}
 
-		if co.State == checked_out_state.Conflicted {
+		if co.GetState() == checked_out_state.Conflicted {
 			hasConflicts = true
 
 			if err = coPrinter(co); err != nil {

@@ -197,7 +197,7 @@ func (s *Store) hydrateCheckoutFileNameInfoFromCheckedOut(
 		return
 	}
 
-	co.State = checked_out_state.JustCheckedOut
+	co.SetState(checked_out_state.JustCheckedOut)
 
 	info.tipe = co.GetSku().GetType()
 	info.inlineBlob = s.config.IsInlineType(info.tipe)

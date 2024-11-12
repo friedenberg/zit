@@ -313,7 +313,7 @@ func (ar *reader) readOneObj(
 	}
 
 	// TODO determine a better state for this
-	z.sku.State = checked_out_state.JustCheckedOut
+	z.sku.SetState(checked_out_state.JustCheckedOut)
 
 	sku.TransactedResetter.ResetWith(z.sku.GetSkuExternal(), z.sku.GetSku())
 	ar.currentAssignment.AddObject(&z)

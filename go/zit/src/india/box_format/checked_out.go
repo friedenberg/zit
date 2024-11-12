@@ -322,12 +322,12 @@ func (f *BoxCheckedOut) addFieldsFS(
 	op := f.Options
 	op.ExcludeFields = true
 
-	if co.State == checked_out_state.Unknown {
+	if co.GetState() == checked_out_state.Unknown {
 		err = errors.Errorf("invalid state unknown")
 		return
 	}
 
-	if co.State == checked_out_state.Untracked {
+	if co.GetState() == checked_out_state.Untracked {
 		if err = f.addFieldsUntracked(co, box, item, op); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -371,7 +371,7 @@ func (f *BoxCheckedOut) addFieldsFS(
 	id.ColorType = string_format_writer.ColorTypeId
 	box.Contents = append(box.Contents, id)
 
-	if co.State == checked_out_state.Conflicted {
+	if co.GetState() == checked_out_state.Conflicted {
 	} else {
 		if err = f.addFieldsMetadata(
 			op,

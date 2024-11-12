@@ -172,7 +172,7 @@ func (c *Store) CheckoutOne(
 
 	sku.TransactedResetter.ResetWith(co.GetSku(), sz)
 	sku.TransactedResetter.ResetWith(co.GetSkuExternal().GetSku(), sz)
-	co.State = checked_out_state.JustCheckedOut
+	co.SetState(checked_out_state.JustCheckedOut)
 	co.GetSkuExternal().ExternalType = ids.MustType("!browser-tab")
 
 	if err = item.WriteToExternal(co.GetSkuExternal()); err != nil {

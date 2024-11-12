@@ -46,8 +46,8 @@ func DetermineState(
 
 type CheckedOut struct {
 	internal Transacted
-	External Transacted
-	State    checked_out_state.State
+	external Transacted
+	state    checked_out_state.State
 	IsImport bool
 }
 
@@ -56,7 +56,7 @@ func (c *CheckedOut) GetRepoId() ids.RepoId {
 }
 
 func (c *CheckedOut) GetSkuExternal() *Transacted {
-	return &c.External
+	return &c.external
 }
 
 func (c *CheckedOut) GetSku() *Transacted {
@@ -64,7 +64,7 @@ func (c *CheckedOut) GetSku() *Transacted {
 }
 
 func (c *CheckedOut) GetState() checked_out_state.State {
-	return c.State
+	return c.state
 }
 
 func (src *CheckedOut) Clone() *CheckedOut {
@@ -92,7 +92,7 @@ func (c *CheckedOut) InternalAndExternalEqualsSansTai() bool {
 }
 
 func (c *CheckedOut) SetState(v checked_out_state.State) (err error) {
-	c.State = v
+	c.state = v
 	return
 }
 
