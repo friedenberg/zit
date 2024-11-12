@@ -24,10 +24,10 @@ func MakeBoxCheckedOut(
 	abbr ids.Abbr,
 	fsItemReadWriter sku.FSItemReadWriter,
 	relativePath dir_layout.RelativePath,
-	printHeader bool,
+	headerWriter string_format_writer.HeaderWriter[*sku.CheckedOut],
 ) *BoxCheckedOut {
 	return &BoxCheckedOut{
-		PrintHeader: printHeader,
+		headerWriter: headerWriter,
 		BoxTransacted: BoxTransacted{
 			optionsColor:     co,
 			optionsPrint:     options,
@@ -40,32 +40,8 @@ func MakeBoxCheckedOut(
 }
 
 type BoxCheckedOut struct {
-	string_format_writer.HeaderWriter[*sku.CheckedOut]
-	PrintHeader bool
+	headerWriter string_format_writer.HeaderWriter[*sku.CheckedOut]
 	BoxTransacted
-}
-
-func (f *BoxCheckedOut) WriteBoxHeader(
-	header *string_format_writer.BoxHeader,
-	co *sku.CheckedOut,
-) (err error) {
-	if f.PrintHeader {
-		state := co.GetState()
-		external := co.GetSkuExternal()
-
-		stateString := state.String()
-
-		header.RightAligned = true
-
-		if stateString != "" {
-			header.Value = stateString
-		} else if f.optionsPrint.PrintTime && !f.optionsPrint.PrintTai {
-			t := external.GetTai()
-			header.Value = t.Format(string_format_writer.StringFormatDateTime)
-		}
-	}
-
-	return
 }
 
 func (f *BoxCheckedOut) WriteStringFormat(
@@ -74,11 +50,11 @@ func (f *BoxCheckedOut) WriteStringFormat(
 ) (n int64, err error) {
 	var box string_format_writer.Box
 
-	var n2 int64
-
-	if err = f.WriteBoxHeader(&box.Header, co); err != nil {
-		err = errors.Wrap(err)
-		return
+	if f.headerWriter != nil {
+		if err = f.headerWriter.WriteBoxHeader(&box.Header, co); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	box.Contents = slices.Grow(box.Contents, 10)
@@ -122,10 +98,7 @@ func (f *BoxCheckedOut) WriteStringFormat(
 		)
 	}
 
-	n2, err = f.box.WriteStringFormat(sw, box)
-	n += n2
-
-	if err != nil {
+	if n, err = f.box.WriteStringFormat(sw, box); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

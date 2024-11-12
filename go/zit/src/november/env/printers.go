@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 )
 
 func (u *Env) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
@@ -36,14 +37,15 @@ func (u *Env) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
 func (u *Env) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOut] {
 	po := u.config.PrintOptions.
 		WithPrintShas(true).
-		WithPrintTime(false).
-		WithPrintState(true)
+		WithPrintTime(false)
 
 	sw := u.StringFormatWriterSkuBoxCheckedOut(
 		po,
 		u.FormatColorOptionsOut(),
 		string_format_writer.CliFormatTruncation66CharEllipsis,
-		true,
+		box_format.CheckedOutHeaderDeleted{
+			DryRun: u.config.DryRun,
+		},
 	)
 
 	return string_format_writer.MakeDelim(
@@ -105,7 +107,7 @@ func (u *Env) PrinterCheckedOut() interfaces.FuncIter[*sku.CheckedOut] {
 			po,
 			oo.ColorOptionsErr,
 			string_format_writer.CliFormatTruncation66CharEllipsis,
-			true,
+			box_format.CheckedOutHeaderState{},
 		),
 	)
 

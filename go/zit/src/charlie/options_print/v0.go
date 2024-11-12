@@ -96,8 +96,3 @@ func (c V0) WithPrintTime(v bool) V0 {
 	c.PrintTime = v
 	return c
 }
-
-func (c V0) WithPrintState(v bool) V0 {
-	c.PrintState = v
-	return c
-}

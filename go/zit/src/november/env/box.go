@@ -4,6 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 )
 
@@ -26,7 +27,7 @@ func (u *Env) StringFormatWriterSkuBoxCheckedOut(
 	po options_print.V0,
 	co string_format_writer.ColorOptions,
 	truncation string_format_writer.CliFormatTruncation,
-	printHeader bool,
+	headerWriter string_format_writer.HeaderWriter[*sku.CheckedOut],
 ) *box_format.BoxCheckedOut {
 	return box_format.MakeBoxCheckedOut(
 		co,
@@ -35,7 +36,7 @@ func (u *Env) StringFormatWriterSkuBoxCheckedOut(
 		u.GetStore().GetAbbrStore().GetAbbr(),
 		u.GetStore().GetStoreFS(),
 		u.dirLayout,
-		printHeader,
+		headerWriter,
 	)
 }
 
@@ -66,7 +67,7 @@ func (u *Env) SkuFormatBoxCheckedOutNoColor() *box_format.BoxCheckedOut {
 		options,
 		co,
 		string_format_writer.CliFormatTruncationNone,
-		false,
+		nil,
 	)
 }
 
