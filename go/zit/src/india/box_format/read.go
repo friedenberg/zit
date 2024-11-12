@@ -38,7 +38,7 @@ func (f *BoxTransacted) ReadStringFormat(
 
 	o := el.GetSku()
 
-	if f.Options.DescriptionInBox {
+	if f.optionsPrint.DescriptionInBox {
 		return
 	}
 

@@ -23,27 +23,24 @@ func MakeBoxTransacted(
 	relativePath dir_layout.RelativePath,
 ) *BoxTransacted {
 	return &BoxTransacted{
-		ColorOptions:     co,
-		Options:          options,
-		Box:              fieldsFormatWriter,
-		Abbr:             abbr,
-		FSItemReadWriter: fsItemReadWriter,
-		RelativePath:     relativePath,
+		optionsColor:     co,
+		optionsPrint:     options,
+		box:              fieldsFormatWriter,
+		abbr:             abbr,
+		fsItemReadWriter: fsItemReadWriter,
+		relativePath:     relativePath,
 	}
 }
 
 type BoxTransacted struct {
-	string_format_writer.ColorOptions
-	Options options_print.V0
+	optionsColor string_format_writer.ColorOptions
+	optionsPrint options_print.V0
 
-	MaxHead, MaxTail int
-	Padding          string
+	box interfaces.StringFormatWriter[string_format_writer.Box]
 
-	Box interfaces.StringFormatWriter[string_format_writer.Box]
-
-	ids.Abbr
-	FSItemReadWriter sku.FSItemReadWriter
-	dir_layout.RelativePath
+	abbr             ids.Abbr
+	fsItemReadWriter sku.FSItemReadWriter
+	relativePath     dir_layout.RelativePath
 }
 
 func (f *BoxTransacted) WriteStringFormat(
@@ -56,7 +53,7 @@ func (f *BoxTransacted) WriteStringFormat(
 
 	box.Header.RightAligned = true
 
-	if f.Options.PrintTime && !f.Options.PrintTai {
+	if f.optionsPrint.PrintTime && !f.optionsPrint.PrintTai {
 		t := sk.GetTai()
 		box.Header.Value = t.Format(string_format_writer.StringFormatDateTime)
 	}
@@ -72,9 +69,9 @@ func (f *BoxTransacted) WriteStringFormat(
 	}
 
 	if err = f.addFieldsMetadata(
-		f.Options,
+		f.optionsPrint,
 		sk,
-		f.Options.DescriptionInBox,
+		f.optionsPrint.DescriptionInBox,
 		&box,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -83,7 +80,7 @@ func (f *BoxTransacted) WriteStringFormat(
 
 	b := &sk.Metadata.Description
 
-	if !f.Options.DescriptionInBox && !b.IsEmpty() {
+	if !f.optionsPrint.DescriptionInBox && !b.IsEmpty() {
 		box.Trailer = append(
 			box.Trailer,
 			string_format_writer.Field{
@@ -94,7 +91,7 @@ func (f *BoxTransacted) WriteStringFormat(
 		)
 	}
 
-	n2, err = f.Box.WriteStringFormat(sw, box)
+	n2, err = f.box.WriteStringFormat(sw, box)
 	n += n2
 
 	if err != nil {
@@ -130,9 +127,9 @@ func (f *BoxTransacted) makeFieldObjectId(
 
 	oidString := (*ids.ObjectIdStringerSansRepo)(oid).String()
 
-	if f.Abbr.ZettelId.Abbreviate != nil &&
+	if f.abbr.ZettelId.Abbreviate != nil &&
 		oid.GetGenre() == genres.Zettel {
-		if oidString, err = f.Abbr.ZettelId.Abbreviate(oid); err != nil {
+		if oidString, err = f.abbr.ZettelId.Abbreviate(oid); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -207,7 +204,7 @@ func (f *BoxTransacted) addFieldsMetadata(
 
 		if shaString, err = object_metadata_fmt.MetadataShaString(
 			m,
-			f.Abbr.Sha.Abbreviate,
+			f.abbr.Sha.Abbreviate,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

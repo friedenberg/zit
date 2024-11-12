@@ -29,12 +29,12 @@ func MakeBoxCheckedOut(
 	return &BoxCheckedOut{
 		PrintHeader: printHeader,
 		BoxTransacted: BoxTransacted{
-			ColorOptions:     co,
-			Options:          options,
-			Box:              fieldsFormatWriter,
-			Abbr:             abbr,
-			FSItemReadWriter: fsItemReadWriter,
-			RelativePath:     relativePath,
+			optionsColor:     co,
+			optionsPrint:     options,
+			box:              fieldsFormatWriter,
+			abbr:             abbr,
+			fsItemReadWriter: fsItemReadWriter,
+			relativePath:     relativePath,
 		},
 	}
 }
@@ -59,7 +59,7 @@ func (f *BoxCheckedOut) WriteBoxHeader(
 
 		if stateString != "" {
 			header.Value = stateString
-		} else if f.Options.PrintTime && !f.Options.PrintTai {
+		} else if f.optionsPrint.PrintTime && !f.optionsPrint.PrintTai {
 			t := external.GetTai()
 			header.Value = t.Format(string_format_writer.StringFormatDateTime)
 		}
@@ -88,15 +88,15 @@ func (f *BoxCheckedOut) WriteStringFormat(
 
 	external := co.GetSkuExternal()
 
-	if f.FSItemReadWriter != nil {
-		fds, errFS = f.FSItemReadWriter.ReadFSItemFromExternal(external)
+	if f.fsItemReadWriter != nil {
+		fds, errFS = f.fsItemReadWriter.ReadFSItemFromExternal(external)
 	}
 
-	if f.FSItemReadWriter == nil || errFS != nil || !external.RepoId.IsEmpty() {
+	if f.fsItemReadWriter == nil || errFS != nil || !external.RepoId.IsEmpty() {
 		if err = f.addFieldsExternalWithFSItem(
 			external,
 			&box,
-			f.Options.DescriptionInBox,
+			f.optionsPrint.DescriptionInBox,
 			fds,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -111,7 +111,7 @@ func (f *BoxCheckedOut) WriteStringFormat(
 
 	b := &external.Metadata.Description
 
-	if !f.Options.DescriptionInBox && !b.IsEmpty() {
+	if !f.optionsPrint.DescriptionInBox && !b.IsEmpty() {
 		box.Trailer = append(
 			box.Trailer,
 			string_format_writer.Field{
@@ -122,7 +122,7 @@ func (f *BoxCheckedOut) WriteStringFormat(
 		)
 	}
 
-	n2, err = f.Box.WriteStringFormat(sw, box)
+	n2, err = f.box.WriteStringFormat(sw, box)
 	n += n2
 
 	if err != nil {
@@ -149,7 +149,7 @@ func (f *BoxCheckedOut) addFieldsExternalWithFSItem(
 	}
 
 	if err = f.addFieldsMetadataWithFSItem(
-		f.Options,
+		f.optionsPrint,
 		external,
 		includeDescriptionInBox,
 		box,
@@ -181,7 +181,7 @@ func (f *BoxCheckedOut) makeFieldExternalObjectIdsIfNecessary(
 		case checkout_mode.MetadataOnly, checkout_mode.MetadataAndBlob:
 			// TODO quote as necessary
 			if !item.Object.IsStdin() {
-				field.Value = f.RelativePath.Rel(item.Object.String())
+				field.Value = f.relativePath.Rel(item.Object.String())
 			}
 		}
 	}
@@ -198,9 +198,9 @@ func (f *BoxCheckedOut) makeFieldObjectId(
 
 	oidString := (*ids.ObjectIdStringerSansRepo)(oid).String()
 
-	if f.Abbr.ZettelId.Abbreviate != nil &&
+	if f.abbr.ZettelId.Abbreviate != nil &&
 		oid.GetGenre() == genres.Zettel {
-		if oidString, err = f.Abbr.ZettelId.Abbreviate(oid); err != nil {
+		if oidString, err = f.abbr.ZettelId.Abbreviate(oid); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -278,7 +278,7 @@ func (f *BoxCheckedOut) addFieldsMetadataWithFSItem(
 
 		if shaString, err = object_metadata_fmt.MetadataShaString(
 			m,
-			f.Abbr.Sha.Abbreviate,
+			f.abbr.Sha.Abbreviate,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -334,7 +334,7 @@ func (f *BoxCheckedOut) addFieldsFS(
 
 	var fdAlreadyWritten *fd.FD
 
-	op := f.Options
+	op := f.optionsPrint
 	op.ExcludeFields = true
 
 	if co.GetState() == checked_out_state.Unknown {
@@ -371,7 +371,7 @@ func (f *BoxCheckedOut) addFieldsFS(
 		id.Value = (*ids.ObjectIdStringerSansRepo)(&co.GetSkuExternal().ObjectId).String()
 
 	case m.IncludesMetadata():
-		id.Value = f.Rel(item.Object.GetPath())
+		id.Value = f.relativePath.Rel(item.Object.GetPath())
 		fdAlreadyWritten = &item.Object
 
 	default:
@@ -450,7 +450,7 @@ func (f *BoxTransacted) addFieldFSBlob(
 	box.Contents = append(
 		box.Contents,
 		string_format_writer.Field{
-			Value:        f.Rel(fd.GetPath()),
+			Value:        f.relativePath.Rel(fd.GetPath()),
 			ColorType:    string_format_writer.ColorTypeId,
 			NeedsNewline: true,
 		},
@@ -475,14 +475,14 @@ func (f *BoxTransacted) addFieldsUntracked(
 		box.Contents,
 		string_format_writer.Field{
 			ColorType: string_format_writer.ColorTypeId,
-			Value:     f.Rel(fdToPrint.GetPath()),
+			Value:     f.relativePath.Rel(fdToPrint.GetPath()),
 		},
 	)
 
 	if err = f.addFieldsMetadata(
 		op,
 		co.GetSkuExternal(),
-		f.Options.DescriptionInBox,
+		f.optionsPrint.DescriptionInBox,
 		box,
 	); err != nil {
 		err = errors.Wrap(err)
