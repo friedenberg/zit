@@ -48,7 +48,6 @@ type CheckedOut struct {
 	internal Transacted
 	external Transacted
 	state    checked_out_state.State
-	IsImport bool
 }
 
 func (c *CheckedOut) GetRepoId() ids.RepoId {
@@ -85,11 +84,11 @@ func (a *CheckedOut) GetObjectId() *ids.ObjectId {
 	return a.GetSkuExternal().GetObjectId()
 }
 
-func (c *CheckedOut) InternalAndExternalEqualsSansTai() bool {
-	return c.GetSkuExternal().GetSku().GetMetadata().EqualsSansTai(
-		&c.GetSku().Metadata,
-	)
-}
+// func (c *CheckedOut) InternalAndExternalEqualsSansTai() bool {
+// 	return c.GetSkuExternal().GetSku().GetMetadata().EqualsSansTai(
+// 		&c.GetSku().Metadata,
+// 	)
+// }
 
 func (c *CheckedOut) SetState(v checked_out_state.State) (err error) {
 	c.state = v

@@ -57,12 +57,10 @@ func (checkedOutResetter) Reset(dst *CheckedOut) {
 	TransactedResetter.Reset(dst.GetSku())
 	TransactedResetter.Reset(dst.GetSkuExternal().GetSku())
 	dst.SetState(checked_out_state.Unknown)
-	dst.IsImport = false
 }
 
 func (checkedOutResetter) ResetWith(dst *CheckedOut, src *CheckedOut) {
 	TransactedResetter.ResetWith(dst.GetSku(), src.GetSku())
 	TransactedResetter.ResetWith(dst.GetSkuExternal().GetSku(), src.GetSkuExternal().GetSku())
 	dst.SetState(src.state)
-	dst.IsImport = src.IsImport
 }

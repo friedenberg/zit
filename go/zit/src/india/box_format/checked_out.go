@@ -349,8 +349,8 @@ func (f *BoxCheckedOut) addFieldsFS(
 	var id string_format_writer.Field
 
 	switch {
-	case co.IsImport:
-		fallthrough
+	// case co.IsImport:
+	// 	fallthrough
 
 	case m == checkout_mode.BlobOnly || m == checkout_mode.BlobRecognized:
 		id.Value = (*ids.ObjectIdStringerSansRepo)(&co.GetSkuExternal().ObjectId).String()

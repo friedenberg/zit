@@ -79,7 +79,6 @@ func (s Importer) importLeafSku(
 	external *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
 	co = store_fs.GetCheckedOutPool().Get()
-	co.IsImport = true
 
 	sku.Resetter.ResetWith(co.GetSkuExternal(), external)
 
