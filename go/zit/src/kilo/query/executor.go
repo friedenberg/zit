@@ -119,7 +119,7 @@ func (e *Executor) ExecuteSkuType(
 		return
 	}
 
-	if err = e.executeExternalQueryCheckedOutLike(out); err != nil {
+	if err = e.executeExternalQueryCheckedOut(out); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -151,7 +151,7 @@ func (e *Executor) ExecuteTransacted(
 	return
 }
 
-func (e *Executor) executeExternalQueryCheckedOutLike(
+func (e *Executor) executeExternalQueryCheckedOut(
 	out interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	if err = e.ExternalStore.QueryCheckedOut(
@@ -168,7 +168,7 @@ func (e *Executor) executeExternalQueryCheckedOutLike(
 func (e *Executor) executeExternalQuery(
 	out interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
-	if err = e.executeExternalQueryCheckedOutLike(
+	if err = e.executeExternalQueryCheckedOut(
 		func(col sku.SkuType) (err error) {
 			z := col.GetSkuExternal()
 

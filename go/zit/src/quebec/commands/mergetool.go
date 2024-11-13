@@ -42,7 +42,7 @@ func (c Mergetool) RunWithQuery(
 ) (err error) {
 	conflicted := sku.MakeSkuTypeSetMutable()
 
-	if err = u.GetStore().QueryCheckedOut(
+	if err = u.GetStore().QuerySkuType(
 		qg,
 		func(co sku.SkuType) (err error) {
 			if co.GetState() != checked_out_state.Conflicted {

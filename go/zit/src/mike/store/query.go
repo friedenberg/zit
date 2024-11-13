@@ -49,7 +49,7 @@ func (s *Store) QueryTransacted(
 	return
 }
 
-func (s *Store) QueryCheckedOut(
+func (s *Store) QuerySkuType(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {

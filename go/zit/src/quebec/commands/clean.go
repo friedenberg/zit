@@ -132,7 +132,7 @@ func (c Clean) RunWithQuery(
 		return
 	}
 
-	if err = u.GetStore().QueryCheckedOut(
+	if err = u.GetStore().QuerySkuType(
 		qg,
 		func(co sku.SkuType) (err error) {
 			if !c.shouldClean(u, co, qg) {

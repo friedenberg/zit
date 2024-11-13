@@ -54,7 +54,7 @@ func (c Diff) RunWithQuery(
 		),
 	}
 
-	if err = u.GetStore().QueryCheckedOut(
+	if err = u.GetStore().QuerySkuType(
 		qg,
 		func(co sku.SkuType) (err error) {
 			if err = opDiffFS.Run(co, o); err != nil {

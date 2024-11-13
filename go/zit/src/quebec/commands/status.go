@@ -42,7 +42,7 @@ func (c Status) RunWithQuery(
 ) (err error) {
 	pcol := u.PrinterCheckedOut(box_format.CheckedOutHeaderState{})
 
-	if err = u.GetStore().QueryCheckedOut(
+	if err = u.GetStore().QuerySkuType(
 		qg,
 		func(co sku.SkuType) (err error) {
 			if err = pcol(co); err != nil {

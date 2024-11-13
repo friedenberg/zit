@@ -42,7 +42,7 @@ func (op Checkin) Run(
 			return
 		}
 	} else {
-		if err = u.GetStore().QueryCheckedOut(
+		if err = u.GetStore().QuerySkuType(
 			qg,
 			func(co sku.SkuType) (err error) {
 				l.Lock()

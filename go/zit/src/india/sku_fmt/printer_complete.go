@@ -59,22 +59,43 @@ func MakeWriterComplete(w io.Writer) *WriterComplete {
 	return w1
 }
 
-func (w *WriterComplete) WriteOne(
-	z *sku.Transacted,
+func (w *WriterComplete) WriteOneSkuType(
+	co sku.SkuType,
 ) (err error) {
-	if z.GetObjectId().String() == "/" {
+	switch co.GetState() {
+	// case checked_out_state.Internal:
+	// 	sku.Resetter.ResetWith(sk, co.GetSku())
+
+	default:
+		// sku.Resetter.ResetWith(sk, co.GetSkuExternal())
+		// TODO use proper states
+		// sku.Resetter.ResetWith(sk, co.GetSku())
+	}
+
+	if err = w.WriteOneTransacted(co.GetSku()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (w *WriterComplete) WriteOneTransacted(
+	src *sku.Transacted,
+) (err error) {
+	if src.GetObjectId().String() == "/" {
 		err = errors.New("empty sku")
 		return
 	}
 
-	sk := w.pool.Get()
-	sku.Resetter.ResetWith(sk, z)
+	dst := w.pool.Get()
+	sku.Resetter.ResetWith(dst, src)
 
 	select {
 	case <-w.chDone:
 		err = collections.MakeErrStopIteration()
 
-	case w.chTransacted <- sk:
+	case w.chTransacted <- dst:
 	}
 
 	return

@@ -8,6 +8,7 @@ const (
 	StringDeleted         = "deleted"
 	StringUpdated         = "updated"
 	StringArchived        = "archived"
+	StringInternal        = "internal"
 	StringUnchanged       = "unchanged"
 	StringUntracked       = "untracked"
 	StringConflicted      = "conflicted"

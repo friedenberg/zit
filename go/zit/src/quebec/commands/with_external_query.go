@@ -57,7 +57,7 @@ func (c commandWithQuery) Complete(
 
 	if err = u.GetStore().QueryTransacted(
 		c.Group,
-		w.WriteOne,
+		w.WriteOneTransacted,
 	); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -22,7 +22,8 @@ checked out | some     | some     | valid
 */
 
 const (
-	Unknown        = State(iota)
+	Unknown = State(iota)
+	Internal
 	JustCheckedOut // UI
 	CheckedOut     // UI
 	Untracked      // Internal v External
@@ -32,6 +33,9 @@ const (
 
 func (s State) String() string {
 	switch s {
+	case Internal:
+		return string_format_writer.StringInternal
+
 	case JustCheckedOut, CheckedOut:
 		return string_format_writer.StringCheckedOut
 
