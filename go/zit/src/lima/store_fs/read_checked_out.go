@@ -65,7 +65,5 @@ func (s *Store) readIntoCheckedOutFromTransacted(
 		return
 	}
 
-	sku.DetermineState(co, false)
-
 	return
 }
