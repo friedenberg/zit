@@ -40,3 +40,15 @@ function user_story_fs_blobs_organize() { # @test
 		       conflicted [one/dos.zettel]
 	EOM
 }
+
+function user_story_fs_blobs_status_recognized() { # @test
+	run_zit show -format blob one/uno
+	echo "$output" >test.md
+
+	run_zit status .
+	assert_success
+	assert_output - <<-EOM
+		       recognized [one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4
+		                   test.md]
+	EOM
+}

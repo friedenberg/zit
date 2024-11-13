@@ -310,13 +310,21 @@ func (f *BoxCheckedOut) addFieldsFS(
 	op := f.optionsPrint
 	op.ExcludeFields = true
 
-	if co.GetState() == checked_out_state.Unknown {
+	switch co.GetState() {
+	case checked_out_state.Unknown:
 		err = errors.Errorf("invalid state unknown")
 		return
-	}
 
-	if co.GetState() == checked_out_state.Untracked {
+	case checked_out_state.Untracked:
 		if err = f.addFieldsUntracked(co, box, item, op); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+
+	case checked_out_state.Recognized:
+		if err = f.addFieldsRecognized(co, box, item, op); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -456,6 +464,46 @@ func (f *BoxTransacted) addFieldsUntracked(
 		op,
 		co.GetSkuExternal(),
 		f.optionsPrint.DescriptionInBox,
+		box,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (f *BoxTransacted) addFieldsRecognized(
+	co *sku.CheckedOut,
+	box *string_format_writer.Box,
+	item *sku.FSItem,
+	op options_print.V0,
+) (err error) {
+	var id string_format_writer.Field
+
+	if id, _, err = f.makeFieldObjectId(
+		co.GetSkuExternal(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	id.ColorType = string_format_writer.ColorTypeId
+	box.Contents = append(box.Contents, id)
+
+	if err = f.addFieldsMetadata(
+		op,
+		co.GetSkuExternal(),
+		op.DescriptionInBox,
+		box,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = f.addFieldsFSBlobExcept(
+		item,
+		nil,
 		box,
 	); err != nil {
 		err = errors.Wrap(err)

@@ -42,7 +42,7 @@ func (s *Store) QueryCheckedOut(
 				s.makeFuncIterFilterAndApply(qg, f),
 			)
 
-			if err = s.queryUntracked(aco); err != nil {
+			if err = s.queryUntracked(qg, aco); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -231,10 +231,18 @@ func (s *Store) hydrateDefinitelyNotCheckedOutRecognizedItem(
 
 	co.SetState(checked_out_state.Recognized)
 
-	// TODO iterate thru FSItems and emit CheckedOut?
-	if err = f(co); err != nil {
-		err = errors.Wrap(err)
-		return
+	for _, item := range item.Matching {
+		co.GetSkuExternal().ExternalObjectId.ResetWith(&item.ExternalObjectId)
+
+		if err = s.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = f(co); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	return
@@ -267,6 +275,7 @@ type fsItemRecognized struct {
 }
 
 func (s *Store) queryUntracked(
+	qg *query.Group, // TODO use this to conditionally perform recognition
 	aco interfaces.FuncIter[any],
 ) (err error) {
 	definitelyNotCheckedOut := s.dirItems.definitelyNotCheckedOut.Clone()
@@ -277,15 +286,13 @@ func (s *Store) queryUntracked(
 		return
 	}
 
-	allRecognizedBlobs := make([]*fsItemRecognized, 0)
-	allRecognizedObjects := make([]*fsItemRecognized, 0)
+	allRecognized := make([]*fsItemRecognized, 0)
 
 	addRecognizedIfNecessary := func(
 		sk *sku.Transacted,
 		shaBlob *sha.Sha,
 		shaCache map[sha.Bytes]interfaces.MutableSetLike[*sku.FSItem],
-		allRecognized *[]*fsItemRecognized,
-	) (err error) {
+	) (item *fsItemRecognized, err error) {
 		if shaBlob.IsNull() {
 			return
 		}
@@ -297,18 +304,13 @@ func (s *Store) queryUntracked(
 			return
 		}
 
-		recognizedFDS := &fsItemRecognized{}
+		item = &fsItemRecognized{}
 
-		sku.TransactedResetter.ResetWith(
-			&recognizedFDS.Recognized,
-			sk,
-		)
+		sku.TransactedResetter.ResetWith(&item.Recognized, sk)
 
-		for item := range recognized.All() {
-			recognizedFDS.Matching = append(recognizedFDS.Matching, item)
+		for recognized := range recognized.All() {
+			item.Matching = append(item.Matching, recognized)
 		}
-
-		*allRecognized = append(*allRecognized, recognizedFDS)
 
 		return
 	}
@@ -316,24 +318,40 @@ func (s *Store) queryUntracked(
 	if err = s.externalStoreSupplies.FuncPrimitiveQuery(
 		nil,
 		func(sk *sku.Transacted) (err error) {
-			if err = addRecognizedIfNecessary(
+			var recognizedBlob, recognizedObject *fsItemRecognized
+
+			if recognizedBlob, err = addRecognizedIfNecessary(
 				sk,
 				&sk.Metadata.Blob,
 				definitelyNotCheckedOut.shas,
-				&allRecognizedBlobs,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if err = addRecognizedIfNecessary(
+			if recognizedObject, err = addRecognizedIfNecessary(
 				sk,
 				&sk.Metadata.SelfMetadataWithoutTai,
 				s.probablyCheckedOut.shas,
-				&allRecognizedObjects,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
+			}
+
+			if recognizedBlob != nil {
+				allRecognized = append(allRecognized, recognizedBlob)
+
+				for _, item := range recognizedBlob.Matching {
+					definitelyNotCheckedOut.Del(item)
+				}
+			}
+
+			if recognizedObject != nil {
+				allRecognized = append(allRecognized, recognizedObject)
+
+				for _, item := range recognizedObject.Matching {
+					definitelyNotCheckedOut.Del(item)
+				}
 			}
 
 			return
@@ -374,50 +392,44 @@ func (s *Store) queryUntracked(
 			}
 		}
 
-		for _, fds := range allRecognizedBlobs {
-			if err = aco(fds); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
 	}
 
-	if false {
-		objects := make([]*sku.FSItem, 0, s.dirItems.probablyCheckedOut.Len())
+	// if false {
+	// 	objects := make([]*sku.FSItem, 0, s.dirItems.probablyCheckedOut.Len())
 
-		if err = s.dirItems.probablyCheckedOut.Each(
-			func(fds *sku.FSItem) (err error) {
-				objects = append(objects, fds)
-				return
-			},
-		); err != nil {
+	// 	if err = s.dirItems.probablyCheckedOut.Each(
+	// 		func(fds *sku.FSItem) (err error) {
+	// 			objects = append(objects, fds)
+	// 			return
+	// 		},
+	// 	); err != nil {
+	// 		err = errors.Wrap(err)
+	// 		return
+	// 	}
+
+	// 	sort.Slice(
+	// 		objects,
+	// 		func(i, j int) bool {
+	// 			return objects[i].ExternalObjectId.String() < objects[j].ExternalObjectId.String()
+	// 		},
+	// 	)
+
+	// 	for _, fds := range objects {
+	// 		// if fds.State == external_state.Recognized {
+	// 		// 	continue
+	// 		// }
+
+	// 		if err = aco(fds); err != nil {
+	// 			err = errors.Wrap(err)
+	// 			return
+	// 		}
+	// 	}
+	// }
+
+	for _, fds := range allRecognized {
+		if err = aco(fds); err != nil {
 			err = errors.Wrap(err)
 			return
-		}
-
-		sort.Slice(
-			objects,
-			func(i, j int) bool {
-				return objects[i].ExternalObjectId.String() < objects[j].ExternalObjectId.String()
-			},
-		)
-
-		for _, fds := range objects {
-			// if fds.State == external_state.Recognized {
-			// 	continue
-			// }
-
-			if err = aco(fds); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
-		}
-
-		for _, fds := range allRecognizedObjects {
-			if err = aco(fds); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
 		}
 	}
 
