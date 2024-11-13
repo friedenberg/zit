@@ -36,9 +36,9 @@ func (c *executor) tryToEmitOneExplicitlyCheckedOut(
 	sku.TransactedResetter.ResetWith(c.co.GetSkuExternal().GetSku(), internal)
 
 	if *uSku == item.Url.URL {
-		c.co.SetState(checked_out_state.ExistsAndSame)
+		// c.co.SetState(checked_out_state.ExistsAndSame)
 	} else {
-		c.co.SetState(checked_out_state.Changed)
+		// c.co.SetState(checked_out_state.Changed)
 	}
 
 	c.co.GetSkuExternal().State = external_state.Tracked

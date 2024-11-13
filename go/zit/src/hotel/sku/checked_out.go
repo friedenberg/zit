@@ -17,26 +17,6 @@ func InternalAndExternalEqualsWithoutTai(co SkuType) bool {
 	)
 }
 
-func DetermineState(
-	c SkuType,
-	justCheckedOut bool,
-) {
-	i := c.GetSku()
-	e := c.GetSkuExternal().GetSku()
-
-	if i.GetObjectSha().IsNull() {
-		// c.SetState(checked_out_state.Untracked)
-	} else if i.Metadata.EqualsSansTai(&e.Metadata) {
-		if justCheckedOut {
-			c.SetState(checked_out_state.JustCheckedOut)
-		} else {
-			c.SetState(checked_out_state.ExistsAndSame)
-		}
-	} else {
-		c.SetState(checked_out_state.Changed)
-	}
-}
-
 type CheckedOut struct {
 	internal Transacted
 	external Transacted

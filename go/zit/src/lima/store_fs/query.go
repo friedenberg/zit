@@ -108,26 +108,13 @@ func (s *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 			}
 		}
 
-		sku.DetermineState(co, false)
-
-		if !hasInternal {
-			co.SetState(checked_out_state.Untracked)
-		}
-
-		// ui.Debug().Print(co.GetState())
-
 		if !item.Conflict.IsEmpty() {
 			co.SetState(checked_out_state.Conflicted)
+		} else if !hasInternal {
+			co.SetState(checked_out_state.Untracked)
 		} else {
-			// if co.GetState() == checked_out_state.Untracked {
-			// 	ui.Debug().Print(item.State)
-			// 	ui.Debug().Print(item.Debug())
-			// 	panic("wow")
-			// }
-			// co.SetState(checked_out_state.CheckedOut)
+			co.SetState(checked_out_state.CheckedOut)
 		}
-
-		// ui.Debug().Print(co.GetState())
 
 		if err = s.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
 			err = errors.Wrap(err)

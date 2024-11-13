@@ -25,8 +25,6 @@ const (
 	Unknown        = State(iota)
 	JustCheckedOut // UI
 	CheckedOut     // UI
-	ExistsAndSame  // Internal v External
-	Changed        // Internal v External
 	Untracked      // Internal v External
 	Recognized     // Internal v External
 	Conflicted     // Internal v External
@@ -36,12 +34,6 @@ func (s State) String() string {
 	switch s {
 	case JustCheckedOut, CheckedOut:
 		return string_format_writer.StringCheckedOut
-
-	case ExistsAndSame:
-		return string_format_writer.StringSame
-
-	case Changed:
-		return string_format_writer.StringChanged
 
 	case Untracked:
 		return string_format_writer.StringUntracked

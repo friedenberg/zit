@@ -81,8 +81,8 @@ func (c Clean) shouldClean(
 	state := co.GetState()
 
 	switch state {
-	case checked_out_state.ExistsAndSame:
-		return true
+	case checked_out_state.CheckedOut:
+		return sku.InternalAndExternalEqualsWithoutTai(co)
 
 	case checked_out_state.Recognized:
 		return !eqwk.ExcludeRecognized

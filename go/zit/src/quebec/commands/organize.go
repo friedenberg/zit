@@ -98,7 +98,7 @@ func (c *Organize) RunWithQuery(
 
 			clone := sku.CloneSkuTypeFromTransacted(
 				sk,
-				checked_out_state.ExistsAndSame,
+				checked_out_state.CheckedOut,
 			)
 
 			return getResults.Add(clone)
