@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-// Internal may be nil, which means that the extneral is hydrated without an
+// Internal may be nil, which means that the external is hydrated without an
 // overlay.
 func (s *Store) HydrateExternalFromItem(
 	o sku.CommitOptions,
