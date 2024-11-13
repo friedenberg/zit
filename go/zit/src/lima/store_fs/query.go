@@ -68,12 +68,14 @@ func (s *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 		// at a bare minimum, the internal object ID must always be set as there are
 		// hard assumptions about internal being valid throughout the reading cycle
 		co.GetSku().ObjectId.ResetWith(&item.ExternalObjectId)
+		hasInternal := true
 
 		if err = s.externalStoreSupplies.FuncReadOneInto(
 			item.ExternalObjectId.String(),
 			co.GetSku(),
 		); err != nil {
 			if collections.IsErrNotFound(err) || genres.IsErrUnsupportedGenre(err) {
+				hasInternal = false
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -107,6 +109,10 @@ func (s *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 		}
 
 		sku.DetermineState(co, false)
+
+		if !hasInternal {
+			co.SetState(checked_out_state.Untracked)
+		}
 
 		// ui.Debug().Print(co.GetState())
 

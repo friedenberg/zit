@@ -21,18 +21,11 @@ func DetermineState(
 	c SkuType,
 	justCheckedOut bool,
 ) {
-	// es := c.GetSkuExternal().GetExternalState()
-
-	// if es == external_state.Recognized {
-	// 	c.SetState(checked_out_state.Recognized)
-	// 	return
-	// }
-
 	i := c.GetSku()
 	e := c.GetSkuExternal().GetSku()
 
 	if i.GetObjectSha().IsNull() {
-		c.SetState(checked_out_state.Untracked)
+		// c.SetState(checked_out_state.Untracked)
 	} else if i.Metadata.EqualsSansTai(&e.Metadata) {
 		if justCheckedOut {
 			c.SetState(checked_out_state.JustCheckedOut)
