@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -32,10 +31,8 @@ type dirItems struct {
 	dirLayout             dir_layout.DirLayout
 	externalStoreSupplies external_store.Supplies
 
-	objects         interfaces.MutableSetLike[*sku.FSItem]
-	blobs           interfaces.MutableSetLike[*sku.FSItem]
-	shasToBlobFDs   map[sha.Bytes]interfaces.MutableSetLike[*sku.FSItem]
-	shasToObjectFDs map[sha.Bytes]interfaces.MutableSetLike[*sku.FSItem]
+	probablyCheckedOut      fsItemData
+	definitelyNotCheckedOut fsItemData
 
 	errors interfaces.MutableSetLike[fdSetWithError]
 }
@@ -48,10 +45,8 @@ func makeObjectsWithDir(
 	d.root = p
 	d.FileExtensionGetter = fe
 	d.dirLayout = fs_home
-	d.objects = collections_value.MakeMutableValueSet[*sku.FSItem](nil)
-	d.blobs = collections_value.MakeMutableValueSet[*sku.FSItem](nil)
-	d.shasToBlobFDs = make(map[sha.Bytes]interfaces.MutableSetLike[*sku.FSItem])
-	d.shasToObjectFDs = make(map[sha.Bytes]interfaces.MutableSetLike[*sku.FSItem])
+	d.probablyCheckedOut = makeFSItemData()
+	d.definitelyNotCheckedOut = makeFSItemData()
 	d.errors = collections_value.MakeMutableValueSet[fdSetWithError](nil)
 
 	return
@@ -373,7 +368,7 @@ func (d *dirItems) processFDSet(
 	return
 }
 
-func (d *dirItems) addOneBlob(
+func (d *dirItems) addOneUntracked(
 	f *fd.FD,
 ) (result *sku.FSItem, err error) {
 	result = &sku.FSItem{
@@ -394,7 +389,7 @@ func (d *dirItems) addOneBlob(
 		return
 	}
 
-	if err = d.blobs.Add(result); err != nil {
+	if err = d.definitelyNotCheckedOut.Add(result); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -409,7 +404,7 @@ func (d *dirItems) addOneBlob(
 
 	// TODO add sha cache
 	key := sh.GetBytes()
-	existing, ok := d.shasToBlobFDs[key]
+	existing, ok := d.definitelyNotCheckedOut.shas[key]
 
 	if !ok {
 		existing = collections_value.MakeMutableValueSet[*sku.FSItem](nil)
@@ -420,7 +415,7 @@ func (d *dirItems) addOneBlob(
 		return
 	}
 
-	d.shasToBlobFDs[key] = existing
+	d.definitelyNotCheckedOut.shas[key] = existing
 
 	return
 }
@@ -431,7 +426,7 @@ func (d *dirItems) addOneOrMoreBlobs(
 	if fds.MutableSetLike.Len() == 1 {
 		var fdsOne *sku.FSItem
 
-		if fdsOne, err = d.addOneBlob(
+		if fdsOne, err = d.addOneUntracked(
 			fds.Any(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -448,7 +443,7 @@ func (d *dirItems) addOneOrMoreBlobs(
 		func(fd *fd.FD) (err error) {
 			var fdsOne *sku.FSItem
 
-			if fdsOne, err = d.addOneBlob(
+			if fdsOne, err = d.addOneUntracked(
 				fds.Any(),
 			); err != nil {
 				err = errors.Wrap(err)
@@ -472,6 +467,7 @@ func (d *dirItems) addOneObject(
 	fds *sku.FSItem,
 ) (err error) {
 	g := fds.ExternalObjectId.GetGenre()
+
 	if g == genres.Zettel {
 		err = fds.ExternalObjectId.SetWithGenre(fd.ZettelId(objectIdString), g)
 	} else {
@@ -487,40 +483,10 @@ func (d *dirItems) addOneObject(
 		}
 	}
 
-	if err = d.objects.Add(fds); err != nil {
+	if err = d.probablyCheckedOut.Add(fds); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	return
-}
-
-func (d *dirItems) ConsolidateDuplicateBlobs() (err error) {
-	replacement := collections_value.MakeMutableValueSet[*sku.FSItem](nil)
-
-	for _, fds := range d.shasToBlobFDs {
-		if fds.Len() == 1 {
-			replacement.Add(fds.Any())
-		}
-
-		sorted := quiter.ElementsSorted(
-			fds,
-			func(a, b *sku.FSItem) bool {
-				return a.ExternalObjectId.String() < b.ExternalObjectId.String()
-			},
-		)
-
-		top := sorted[0]
-
-		for _, other := range sorted[1:] {
-			other.MutableSetLike.Each(top.MutableSetLike.Add)
-		}
-
-		replacement.Add(top)
-	}
-
-	// TODO make less leaky
-	d.blobs = replacement
 
 	return
 }
@@ -537,7 +503,7 @@ func (d *dirItems) OnlyObjects(
 ) (err error) {
 	wg := quiter.MakeErrorWaitGroupParallel()
 
-	quiter.ErrorWaitGroupApply(wg, d.objects, f)
+	quiter.ErrorWaitGroupApply(wg, d.probablyCheckedOut, f)
 
 	return wg.GetError()
 }
@@ -547,8 +513,8 @@ func (d *dirItems) All(
 ) (err error) {
 	wg := quiter.MakeErrorWaitGroupParallel()
 
-	quiter.ErrorWaitGroupApply(wg, d.objects, f)
-	quiter.ErrorWaitGroupApply(wg, d.blobs, f)
+	quiter.ErrorWaitGroupApply(wg, d.probablyCheckedOut, f)
+	quiter.ErrorWaitGroupApply(wg, d.definitelyNotCheckedOut, f)
 
 	return wg.GetError()
 }

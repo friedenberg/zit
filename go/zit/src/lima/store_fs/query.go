@@ -120,7 +120,8 @@ func (s *Store) QueryUntracked(
 		sk *sku.Transacted,
 		shaBlob *sha.Sha,
 		shaCache map[sha.Bytes]interfaces.MutableSetLike[*sku.FSItem],
-		allRecognized *[]*sku.FSItem, fdSetToFD func(*sku.FSItem) *fd.FD,
+		allRecognized *[]*sku.FSItem,
+		fdSetToFD func(*sku.FSItem) *fd.FD,
 	) (err error) {
 		if shaBlob.IsNull() {
 			return
@@ -161,7 +162,7 @@ func (s *Store) QueryUntracked(
 			if err = addRecognizedIfNecessary(
 				sk,
 				&sk.Metadata.Blob,
-				s.shasToBlobFDs,
+				s.definitelyNotCheckedOut.shas,
 				&allRecognizedBlobs,
 				func(fds *sku.FSItem) *fd.FD { return &fds.Blob },
 			); err != nil {
@@ -172,7 +173,7 @@ func (s *Store) QueryUntracked(
 			if err = addRecognizedIfNecessary(
 				sk,
 				&sk.Metadata.SelfMetadataWithoutTai,
-				s.shasToObjectFDs,
+				s.probablyCheckedOut.shas,
 				&allRecognizedObjects,
 				func(fds *sku.FSItem) *fd.FD { return &fds.Object },
 			); err != nil {
@@ -187,15 +188,16 @@ func (s *Store) QueryUntracked(
 		return
 	}
 
-	if err = s.dirItems.ConsolidateDuplicateBlobs(); err != nil {
+	// TODO move to initial parse?
+	if err = s.dirItems.definitelyNotCheckedOut.ConsolidateDuplicateBlobs(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	{
-		blobs := make([]*sku.FSItem, 0, s.dirItems.blobs.Len())
+		blobs := make([]*sku.FSItem, 0, s.dirItems.definitelyNotCheckedOut.Len())
 
-		if err = s.dirItems.blobs.Each(
+		if err = s.dirItems.definitelyNotCheckedOut.Each(
 			func(fds *sku.FSItem) (err error) {
 				blobs = append(blobs, fds)
 				return
@@ -232,9 +234,9 @@ func (s *Store) QueryUntracked(
 	}
 
 	if false {
-		objects := make([]*sku.FSItem, 0, s.dirItems.objects.Len())
+		objects := make([]*sku.FSItem, 0, s.dirItems.probablyCheckedOut.Len())
 
-		if err = s.dirItems.objects.Each(
+		if err = s.dirItems.probablyCheckedOut.Each(
 			func(fds *sku.FSItem) (err error) {
 				objects = append(objects, fds)
 				return

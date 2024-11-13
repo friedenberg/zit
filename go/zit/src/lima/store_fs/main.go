@@ -116,8 +116,8 @@ func (fs *Store) Flush() (err error) {
 
 func (fs *Store) String() (out string) {
 	if quiter.Len(
-		fs.dirItems.objects,
-		fs.blobs,
+		fs.dirItems.probablyCheckedOut,
+		fs.definitelyNotCheckedOut,
 	) == 0 {
 		return
 	}
@@ -139,13 +139,13 @@ func (fs *Store) String() (out string) {
 		return
 	}
 
-	fs.dirItems.objects.Each(
+	fs.dirItems.probablyCheckedOut.Each(
 		func(z *sku.FSItem) (err error) {
 			return writeOneIfNecessary(z)
 		},
 	)
 
-	fs.blobs.Each(
+	fs.definitelyNotCheckedOut.Each(
 		func(z *sku.FSItem) (err error) {
 			return writeOneIfNecessary(z)
 		},
@@ -249,7 +249,7 @@ func (s *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err e
 func (fs *Store) Get(
 	k interfaces.ObjectId,
 ) (t *sku.FSItem, ok bool) {
-	return fs.dirItems.objects.Get(k.String())
+	return fs.dirItems.probablyCheckedOut.Get(k.String())
 }
 
 func (s *Store) Initialize(esi external_store.Supplies) (err error) {
