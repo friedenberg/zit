@@ -121,17 +121,6 @@ func (s *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 			return
 		}
 
-		switch {
-		case !item.Conflict.IsEmpty():
-			co.SetState(checked_out_state.Conflicted)
-
-			// case item.State == external_state.Recognized:
-			// 	co.SetState(checked_out_state.Recognized)
-
-			// case item.State == external_state.Untracked:
-			// 	co.SetState(checked_out_state.Untracked)
-		}
-
 		if err = f(co); err != nil {
 			err = errors.Wrap(err)
 			return
