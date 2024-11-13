@@ -5,7 +5,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
-	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )

@@ -1,6 +1,8 @@
 package store_fs
 
 import (
+	"maps"
+
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
@@ -18,6 +20,12 @@ func makeFSItemData() fsItemData {
 		MutableSetLike: collections_value.MakeMutableValueSet[*sku.FSItem](nil),
 		shas:           make(map[sha.Bytes]interfaces.MutableSetLike[*sku.FSItem]),
 	}
+}
+
+func (src *fsItemData) Clone() (dst fsItemData) {
+	dst.MutableSetLike = src.MutableSetLike.CloneMutableSetLike()
+	dst.shas = maps.Clone(src.shas)
+	return
 }
 
 func (data *fsItemData) ConsolidateDuplicateBlobs() (err error) {

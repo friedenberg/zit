@@ -8,11 +8,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
@@ -152,41 +152,43 @@ func (s *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 
 func (s *Store) makeFuncIterHydrateCheckedOutDefinitelyNotCheckedOut(
 	f interfaces.FuncIter[sku.SkuType],
-) interfaces.FuncIter[*sku.FSItem] {
-	return func(item *sku.FSItem) (err error) {
+) interfaces.FuncIter[any] {
+	return func(itemUnknown any) (err error) {
 		co := sku.GetCheckedOutPool().Get()
 
-		co.GetSku().ObjectId.ResetWith(&item.ExternalObjectId)
-		co.GetSkuExternal().ObjectId.ResetWith(&item.ExternalObjectId)
+		switch item := itemUnknown.(type) {
+		case *sku.FSItem:
+			co.GetSku().ObjectId.ResetWith(&item.ExternalObjectId)
+			co.GetSkuExternal().ObjectId.ResetWith(&item.ExternalObjectId)
 
-		if err = s.HydrateExternalFromItem(
-			sku.CommitOptions{
-				Mode: object_mode.ModeUpdateTai,
-			},
-			item,
-			co.GetSku(),
-			co.GetSkuExternal(),
-		); err != nil {
-			err = errors.Wrapf(err, "Cwd: %#v", item.Debug())
+			if err = s.readOneExternalBlob(
+				co.GetSkuExternal(),
+				co.GetSku(),
+				item,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			if err = s.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			sku.DetermineState(co, false)
+
+			if !item.Conflict.IsEmpty() {
+				err = errors.Errorf("cannot have a conflict for a definitely not checked out blob: %s", item.Debug())
+				return
+			}
+
+			co.SetState(checked_out_state.Untracked)
+
+		case *fsItemRecognized:
+
+		default:
+			err = errors.Errorf("unsupported type for item: %T", itemUnknown)
 			return
-		}
-
-		if err = s.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		sku.DetermineState(co, false)
-
-		switch {
-		case !item.Conflict.IsEmpty():
-			co.SetState(checked_out_state.Conflicted)
-
-			// case item.State == external_state.Recognized:
-			// 	co.SetState(checked_out_state.Recognized)
-
-			// case item.State == external_state.Untracked:
-			// 	co.SetState(checked_out_state.Untracked)
 		}
 
 		if err = f(co); err != nil {
@@ -219,17 +221,30 @@ func (s *Store) makeFuncIterFilterAndApply(
 	}
 }
 
+type fsItemRecognized struct {
+	Recognized ids.ObjectId
+	Matching   []*sku.FSItem
+}
+
 func (s *Store) queryUntracked(
-	aco interfaces.FuncIter[*sku.FSItem],
+	aco interfaces.FuncIter[any],
 ) (err error) {
-	allRecognizedBlobs := make([]*sku.FSItem, 0)
-	allRecognizedObjects := make([]*sku.FSItem, 0)
+	definitelyNotCheckedOut := s.dirItems.definitelyNotCheckedOut.Clone()
+
+	// TODO move to initial parse?
+	if err = definitelyNotCheckedOut.ConsolidateDuplicateBlobs(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	allRecognizedBlobs := make([]*fsItemRecognized, 0)
+	allRecognizedObjects := make([]*fsItemRecognized, 0)
 
 	addRecognizedIfNecessary := func(
 		sk *sku.Transacted,
 		shaBlob *sha.Sha,
 		shaCache map[sha.Bytes]interfaces.MutableSetLike[*sku.FSItem],
-		allRecognized *[]*sku.FSItem,
+		allRecognized *[]*fsItemRecognized,
 		fdSetToFD func(*sku.FSItem) *fd.FD,
 	) (err error) {
 		if shaBlob.IsNull() {
@@ -244,20 +259,12 @@ func (s *Store) queryUntracked(
 		}
 
 		// TODO forward checked_out_state.Recognized
-		recognizedFDS := &sku.FSItem{
-			MutableSetLike: collections_value.MakeMutableValueSet[*fd.FD](nil),
-		}
+		recognizedFDS := &fsItemRecognized{}
 
-		recognizedFDS.ExternalObjectId.ResetWith(&sk.ObjectId)
+		recognizedFDS.Recognized.ResetWith(&sk.ObjectId)
 
-		if err = recognized.Each(
-			func(fds *sku.FSItem) (err error) {
-				recognizedFDS.Add(fdSetToFD(fds).Clone())
-				return
-			},
-		); err != nil {
-			err = errors.Wrap(err)
-			return
+		for item := range recognized.All() {
+			recognizedFDS.Matching = append(recognizedFDS.Matching, item)
 		}
 
 		*allRecognized = append(*allRecognized, recognizedFDS)
@@ -271,7 +278,7 @@ func (s *Store) queryUntracked(
 			if err = addRecognizedIfNecessary(
 				sk,
 				&sk.Metadata.Blob,
-				s.definitelyNotCheckedOut.shas,
+				definitelyNotCheckedOut.shas,
 				&allRecognizedBlobs,
 				func(fds *sku.FSItem) *fd.FD { return &fds.Blob },
 			); err != nil {
@@ -297,16 +304,10 @@ func (s *Store) queryUntracked(
 		return
 	}
 
-	// TODO move to initial parse?
-	if err = s.dirItems.definitelyNotCheckedOut.ConsolidateDuplicateBlobs(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	{
-		blobs := make([]*sku.FSItem, 0, s.dirItems.definitelyNotCheckedOut.Len())
+		blobs := make([]*sku.FSItem, 0, definitelyNotCheckedOut.Len())
 
-		if err = s.dirItems.definitelyNotCheckedOut.Each(
+		if err = definitelyNotCheckedOut.Each(
 			func(fds *sku.FSItem) (err error) {
 				blobs = append(blobs, fds)
 				return
