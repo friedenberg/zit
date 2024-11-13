@@ -11,7 +11,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -175,7 +174,7 @@ func (s *Store) makeFuncIterHydrateCheckedOutDefinitelyNotCheckedOut(
 				return
 			}
 
-			sku.DetermineState(co, false)
+			// sku.DetermineState(co, false)
 
 			if !item.Conflict.IsEmpty() {
 				err = errors.Errorf("cannot have a conflict for a definitely not checked out blob: %s", item.Debug())
@@ -245,7 +244,6 @@ func (s *Store) queryUntracked(
 		shaBlob *sha.Sha,
 		shaCache map[sha.Bytes]interfaces.MutableSetLike[*sku.FSItem],
 		allRecognized *[]*fsItemRecognized,
-		fdSetToFD func(*sku.FSItem) *fd.FD,
 	) (err error) {
 		if shaBlob.IsNull() {
 			return
@@ -258,7 +256,6 @@ func (s *Store) queryUntracked(
 			return
 		}
 
-		// TODO forward checked_out_state.Recognized
 		recognizedFDS := &fsItemRecognized{}
 
 		recognizedFDS.Recognized.ResetWith(&sk.ObjectId)
@@ -280,7 +277,6 @@ func (s *Store) queryUntracked(
 				&sk.Metadata.Blob,
 				definitelyNotCheckedOut.shas,
 				&allRecognizedBlobs,
-				func(fds *sku.FSItem) *fd.FD { return &fds.Blob },
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -291,7 +287,6 @@ func (s *Store) queryUntracked(
 				&sk.Metadata.SelfMetadataWithoutTai,
 				s.probablyCheckedOut.shas,
 				&allRecognizedObjects,
-				func(fds *sku.FSItem) *fd.FD { return &fds.Object },
 			); err != nil {
 				err = errors.Wrap(err)
 				return
