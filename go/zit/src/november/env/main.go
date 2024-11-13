@@ -243,8 +243,9 @@ func (u *Env) Initialize(options Options) (err error) {
 
 			return ptl(sk)
 		},
-		CheckedOutCheckedOut: u.PrinterCheckedOut(),
-		CheckedOutChanged:    u.PrinterCheckedOut(),
+		CheckedOutCheckedOut: u.PrinterCheckedOut(
+			box_format.CheckedOutHeaderState{},
+		),
 	}
 
 	u.store.SetUIDelegate(lw)

@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
@@ -71,7 +72,7 @@ func (c Import) run(u *env.Env, args ...string) (err error) {
 		return
 	}
 
-	coPrinter := u.PrinterCheckedOut()
+	coPrinter := u.PrinterCheckedOut(box_format.CheckedOutHeaderState{})
 
 	bf := u.GetStore().GetInventoryListStore().FormatForVersion(c.StoreVersion)
 

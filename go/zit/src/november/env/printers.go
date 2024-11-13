@@ -94,7 +94,9 @@ func (u *Env) PrinterHeader() interfaces.FuncIter[string] {
 	}
 }
 
-func (u *Env) PrinterCheckedOut() interfaces.FuncIter[*sku.CheckedOut] {
+func (u *Env) PrinterCheckedOut(
+  headerWriter string_format_writer.HeaderWriter[*sku.CheckedOut],
+) interfaces.FuncIter[*sku.CheckedOut] {
 	oo := u.FormatOutputOptions()
 	po := u.config.PrintOptions.
 		WithPrintShas(true)

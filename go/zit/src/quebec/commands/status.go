@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
@@ -39,7 +40,7 @@ func (c Status) RunWithQuery(
 	u *env.Env,
 	qg *query.Group,
 ) (err error) {
-	pcol := u.PrinterCheckedOut()
+	pcol := u.PrinterCheckedOut(box_format.CheckedOutHeaderState{})
 
 	if err = u.GetStore().QueryCheckedOut(
 		qg,
