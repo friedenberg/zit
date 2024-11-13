@@ -14,15 +14,67 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
 
-func (s *Store) makeFuncIterHydrateCheckedOut(
+func (s *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 	f interfaces.FuncIter[sku.SkuType],
 ) interfaces.FuncIter[*sku.FSItem] {
-	return func(em *sku.FSItem) (err error) {
+	return func(item *sku.FSItem) (err error) {
 		var co *sku.CheckedOut
 
-		if co, err = s.hydrateCheckedOut(em); err != nil {
+		if co, err = s.readCheckedOutFromItem(item); err != nil {
+			err = errors.Wrapf(err, "%s", item.Debug())
+			return
+		}
+
+		if err = s.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
 			err = errors.Wrap(err)
 			return
+		}
+
+		switch {
+		case !item.Conflict.IsEmpty():
+			co.SetState(checked_out_state.Conflicted)
+
+			// case item.State == external_state.Recognized:
+			// 	co.SetState(checked_out_state.Recognized)
+
+			// case item.State == external_state.Untracked:
+			// 	co.SetState(checked_out_state.Untracked)
+		}
+
+		if err = f(co); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+}
+
+func (s *Store) makeFuncIterHydrateCheckedOutDefinitelyNotCheckedOut(
+	f interfaces.FuncIter[sku.SkuType],
+) interfaces.FuncIter[*sku.FSItem] {
+	return func(item *sku.FSItem) (err error) {
+		var co *sku.CheckedOut
+
+		if co, err = s.readCheckedOutFromItem(item); err != nil {
+			err = errors.Wrapf(err, "%s", item.Debug())
+			return
+		}
+
+		if err = s.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		switch {
+		case !item.Conflict.IsEmpty():
+			co.SetState(checked_out_state.Conflicted)
+
+			// case item.State == external_state.Recognized:
+			// 	co.SetState(checked_out_state.Recognized)
+
+			// case item.State == external_state.Untracked:
+			// 	co.SetState(checked_out_state.Untracked)
 		}
 
 		if err = f(co); err != nil {
@@ -55,44 +107,17 @@ func (s *Store) makeFuncIterFilterAndApply(
 	}
 }
 
-func (s *Store) hydrateCheckedOut(
-	item *sku.FSItem,
-) (co *sku.CheckedOut, err error) {
-	if co, err = s.readCheckedOutFromItem(item); err != nil {
-		err = errors.Wrapf(err, "%s", item.Debug())
-		return
-	}
-
-	if err = s.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	switch {
-	case !item.Conflict.IsEmpty():
-		co.SetState(checked_out_state.Conflicted)
-
-		// case item.State == external_state.Recognized:
-		// 	co.SetState(checked_out_state.Recognized)
-
-		// case item.State == external_state.Untracked:
-		// 	co.SetState(checked_out_state.Untracked)
-	}
-
-	return
-}
-
 func (s *Store) QueryCheckedOut(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	wg := quiter.MakeErrorWaitGroupParallel()
 
-	aco := s.makeFuncIterHydrateCheckedOut(
-		s.makeFuncIterFilterAndApply(qg, f),
-	)
-
 	wg.Do(func() (err error) {
+		aco := s.makeFuncIterHydrateCheckedOutProbablyCheckedOut(
+			s.makeFuncIterFilterAndApply(qg, f),
+		)
+
 		for o := range s.probablyCheckedOut.All() {
 			if err = aco(o); err != nil {
 				err = errors.Wrap(err)
@@ -104,12 +129,17 @@ func (s *Store) QueryCheckedOut(
 	})
 
 	if !qg.ExcludeUntracked {
-		// wg.Do(func() error {
-		// 	return s.QueryUnsure(qg, f)
-		// })
+		wg.Do(func() (err error) {
+			aco := s.makeFuncIterHydrateCheckedOutDefinitelyNotCheckedOut(
+				s.makeFuncIterFilterAndApply(qg, f),
+			)
 
-		wg.Do(func() error {
-			return s.QueryUntracked(qg, aco, f)
+			if err = s.queryUntracked(aco); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
 		})
 	}
 
@@ -121,10 +151,8 @@ func (s *Store) QueryCheckedOut(
 	return
 }
 
-func (s *Store) QueryUntracked(
-	qg *query.Group,
+func (s *Store) queryUntracked(
 	aco interfaces.FuncIter[*sku.FSItem],
-	f func(sku.SkuType) error,
 ) (err error) {
 	allRecognizedBlobs := make([]*sku.FSItem, 0)
 	allRecognizedObjects := make([]*sku.FSItem, 0)
