@@ -464,26 +464,26 @@ func (d *dirItems) addOneOrMoreBlobs(
 
 func (d *dirItems) addOneObject(
 	objectIdString string,
-	fds *sku.FSItem,
+	item *sku.FSItem,
 ) (err error) {
-	g := fds.ExternalObjectId.GetGenre()
+	g := item.ExternalObjectId.GetGenre()
 
 	if g == genres.Zettel {
-		err = fds.ExternalObjectId.SetWithGenre(fd.ZettelId(objectIdString), g)
+		err = item.ExternalObjectId.SetWithGenre(fd.ZettelId(objectIdString), g)
 	} else {
-		err = fds.ExternalObjectId.SetWithGenre(objectIdString, g)
+		err = item.ExternalObjectId.SetWithGenre(objectIdString, g)
 	}
 
 	if err != nil {
-		fds.ExternalObjectId.SetGenre(fds.ExternalObjectId.GetGenre())
+		item.ExternalObjectId.SetGenre(item.ExternalObjectId.GetGenre())
 
-		if err = fds.ExternalObjectId.SetRaw(objectIdString); err != nil {
+		if err = item.ExternalObjectId.SetRaw(objectIdString); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	if err = d.probablyCheckedOut.Add(fds); err != nil {
+	if err = d.probablyCheckedOut.Add(item); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -14,7 +14,7 @@ func (resetter) Reset(z *Metadata) {
 	z.Description.Reset()
 	z.Comments = z.Comments[:0]
 	z.ResetTags()
-	ResetterVerzeichnisse.Reset(&z.Cache)
+	ResetterCache.Reset(&z.Cache)
 	z.Type = ids.Type{}
 	z.Tai.Reset()
 	z.Shas.Reset()
@@ -28,7 +28,7 @@ func (resetter) ResetWithExceptFields(dst *Metadata, src *Metadata) {
 
 	dst.SetTags(src.Tags)
 
-	ResetterVerzeichnisse.ResetWith(&dst.Cache, &src.Cache)
+	ResetterCache.ResetWith(&dst.Cache, &src.Cache)
 
 	dst.Type = src.Type
 	dst.Tai = src.Tai
@@ -42,11 +42,11 @@ func (r resetter) ResetWith(dst *Metadata, src *Metadata) {
 	dst.Fields = append(dst.Fields, src.Fields...)
 }
 
-var ResetterVerzeichnisse resetterVerzeichnisse
+var ResetterCache resetterCache
 
-type resetterVerzeichnisse struct{}
+type resetterCache struct{}
 
-func (resetterVerzeichnisse) Reset(a *Cache) {
+func (resetterCache) Reset(a *Cache) {
 	a.ParentTai.Reset()
 	a.TagPaths.Reset()
 	a.Dormant.Reset()
@@ -55,7 +55,7 @@ func (resetterVerzeichnisse) Reset(a *Cache) {
 	a.QueryPath.Reset()
 }
 
-func (resetterVerzeichnisse) ResetWith(a, b *Cache) {
+func (resetterCache) ResetWith(a, b *Cache) {
 	a.ParentTai.ResetWith(b.ParentTai)
 	a.TagPaths.ResetWith(&b.TagPaths)
 	a.Dormant.ResetWith(b.Dormant)

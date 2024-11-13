@@ -266,27 +266,30 @@ func (s *Store) ApplyDotOperator() (err error) {
 	return
 }
 
-func (s *Store) ReadFSItemFromExternal(el sku.ExternalLike) (i *sku.FSItem, err error) {
-	i = &sku.FSItem{} // TODO use pool or use dir_items?
-	i.Reset()
+func (s *Store) ReadFSItemFromExternal(
+	tg sku.TransactedGetter,
+) (item *sku.FSItem, err error) {
+	item = &sku.FSItem{} // TODO use pool or use dir_items?
+	item.Reset()
 
-	e := el.(*sku.Transacted)
+	sk := tg.GetSku()
 
 	// TODO handle sort order
-	for _, f := range e.Metadata.Fields {
+	for _, field := range sk.Metadata.Fields {
 		var fdee *fd.FD
-		switch strings.ToLower(f.Key) {
+
+		switch strings.ToLower(field.Key) {
 		case "object":
-			fdee = &i.Object
+			fdee = &item.Object
 
 		case "blob":
-			fdee = &i.Blob
+			fdee = &item.Blob
 
 		case "conflict":
-			fdee = &i.Conflict
+			fdee = &item.Conflict
 
 		default:
-			err = errors.Errorf("unexpected field: %#v", f)
+			err = errors.Errorf("unexpected field: %#v", field)
 			return
 		}
 
@@ -296,42 +299,42 @@ func (s *Store) ReadFSItemFromExternal(el sku.ExternalLike) (i *sku.FSItem, err 
 			fdee = &fd.FD{}
 		}
 
-		if err = fdee.SetIgnoreNotExists(f.Value); err != nil {
+		if err = fdee.SetIgnoreNotExists(field.Value); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = i.Add(fdee); err != nil {
+		if err = item.Add(fdee); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	i.ExternalObjectId.ResetWith(&e.ExternalObjectId)
+	item.ExternalObjectId.ResetWith(&sk.ExternalObjectId)
 
 	return
 }
 
 func (s *Store) WriteFSItemToExternal(
-	i *sku.FSItem,
-	el sku.ExternalLike,
+	item *sku.FSItem,
+	tg sku.TransactedGetter,
 ) (err error) {
-	e := el.(*sku.Transacted)
+	e := tg.GetSku()
 	e.Metadata.Fields = e.Metadata.Fields[:0]
 
 	m := &e.Metadata
-	m.Tai = i.GetTai()
+	m.Tai = item.GetTai()
 
 	var mode checkout_mode.Mode
 
-	if mode, err = i.GetCheckoutModeOrError(); err != nil {
+	if mode, err = item.GetCheckoutModeOrError(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	switch mode {
 	case checkout_mode.BlobOnly:
-		before := i.Blob.String()
+		before := item.Blob.String()
 		after := s.dirLayout.Rel(before)
 
 		if err = e.ExternalObjectId.SetBlob(after); err != nil {
@@ -340,7 +343,7 @@ func (s *Store) WriteFSItemToExternal(
 		}
 
 	default:
-		k := &i.ExternalObjectId
+		k := &item.ExternalObjectId
 
 		e.ExternalObjectId.ResetWith(k)
 
@@ -349,7 +352,7 @@ func (s *Store) WriteFSItemToExternal(
 		}
 	}
 
-	fdees := quiter.SortedValues(i.MutableSetLike)
+	fdees := quiter.SortedValues(item.MutableSetLike)
 
 	for _, f := range fdees {
 		field := object_metadata.Field{
@@ -358,13 +361,13 @@ func (s *Store) WriteFSItemToExternal(
 		}
 
 		switch {
-		case i.Object.Equals(f):
+		case item.Object.Equals(f):
 			field.Key = "object"
 
-		case i.Conflict.Equals(f):
+		case item.Conflict.Equals(f):
 			field.Key = "conflict"
 
-		case i.Blob.Equals(f):
+		case item.Blob.Equals(f):
 			fallthrough
 
 		default:

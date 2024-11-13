@@ -59,14 +59,14 @@ func (s *Store) GetConflictOrError(
 func (s *Store) GetObjectOrError(
 	el sku.ExternalLike,
 ) (f *fd.FD, err error) {
-	var fds *sku.FSItem
+	var item *sku.FSItem
 
-	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
+	if item, err = s.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	f = &fds.Object
+	f = &item.Object
 
 	return
 }
@@ -74,15 +74,15 @@ func (s *Store) GetObjectOrError(
 func (s *Store) UpdateTransactedFromBlobs(
 	el sku.ExternalLike,
 ) (err error) {
-	var fds *sku.FSItem
+	var item *sku.FSItem
 
-	if fds, err = s.ReadFSItemFromExternal(el); err != nil {
+	if item, err = s.ReadFSItemFromExternal(el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	sorted := quiter.ElementsSorted(
-		fds.MutableSetLike,
+		item.MutableSetLike,
 		func(a, b *fd.FD) bool {
 			return a.GetPath() < b.GetPath()
 		},
@@ -97,8 +97,8 @@ func (s *Store) UpdateTransactedFromBlobs(
 		}
 	}
 
-	if !fds.Blob.IsEmpty() {
-		blobFD := &fds.Blob
+	if !item.Blob.IsEmpty() {
+		blobFD := &item.Blob
 		ext := blobFD.ExtSansDot()
 		typFromExtension := s.config.GetTypeStringFromExtension(ext)
 
@@ -114,7 +114,7 @@ func (s *Store) UpdateTransactedFromBlobs(
 		}
 	}
 
-	if err = s.WriteFSItemToExternal(fds, el); err != nil {
+	if err = s.WriteFSItemToExternal(item, el); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -61,8 +61,8 @@ type (
 	}
 
 	FSItemReadWriter interface {
-		ReadFSItemFromExternal(el ExternalLike) (i *FSItem, err error)
-		WriteFSItemToExternal(i *FSItem, el ExternalLike) (err error)
+		ReadFSItemFromExternal(TransactedGetter) (*FSItem, error)
+		WriteFSItemToExternal(*FSItem, TransactedGetter) (err error)
 	}
 
 	OneReader interface {

@@ -47,6 +47,7 @@ func (op Checkin) Run(
 			func(co sku.SkuType) (err error) {
 				l.Lock()
 				defer l.Unlock()
+
 				return results.Add(co.Clone())
 			},
 		); err != nil {
@@ -69,13 +70,13 @@ func (op Checkin) Run(
 	)
 
 	for _, co := range sortedResults {
-		z := co.GetSkuExternal().GetSku()
+		internal := co.GetSkuExternal().GetSku()
 
 		if co.GetState() == checked_out_state.Untracked &&
 			(co.GetSkuExternal().GetGenre() == genres.Zettel ||
 				co.GetSkuExternal().GetGenre() == genres.Blob) {
-			if z.Metadata.IsEmpty() {
-				return
+			if internal.Metadata.IsEmpty() {
+				continue
 			}
 
 			// TODO make generic to external stores
@@ -86,19 +87,19 @@ func (op Checkin) Run(
 				return
 			}
 
-			z.ObjectId.Reset()
+			internal.ObjectId.Reset()
 
 			if err = u.GetStore().CreateOrUpdate(
-				z,
+				internal,
 				object_mode.ModeApplyProto,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if op.Proto.Apply(z, genres.Zettel) {
+			if op.Proto.Apply(internal, genres.Zettel) {
 				if err = u.GetStore().CreateOrUpdate(
-					z.GetSku(),
+					internal.GetSku(),
 					object_mode.ModeEmpty,
 				); err != nil {
 					err = errors.Wrap(err)
