@@ -7,7 +7,9 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
@@ -63,12 +65,65 @@ func (s *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 	f interfaces.FuncIter[sku.SkuType],
 ) interfaces.FuncIter[*sku.FSItem] {
 	return func(item *sku.FSItem) (err error) {
-		var co *sku.CheckedOut
+		co := GetCheckedOutPool().Get()
 
-		if co, err = s.readCheckedOutFromItem(item); err != nil {
-			err = errors.Wrapf(err, "%s", item.Debug())
-			return
+		// at a bare minimum, the internal object ID must always be set as there are
+		// hard assumptions about internal being valid throughout the reading cycle
+		co.GetSku().ObjectId.ResetWith(&item.ExternalObjectId)
+
+		if err = s.externalStoreSupplies.FuncReadOneInto(
+			item.ExternalObjectId.String(),
+			co.GetSku(),
+		); err != nil {
+			if collections.IsErrNotFound(err) || genres.IsErrUnsupportedGenre(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+				return
+			}
 		}
+
+		if err = s.HydrateExternalFromItem(
+			sku.CommitOptions{
+				Mode: object_mode.ModeUpdateTai,
+			},
+			item,
+			co.GetSku(),
+			co.GetSkuExternal(),
+		); err != nil {
+			if errors.Is(err, sku.ErrExternalHasConflictMarker) {
+				co.SetState(checked_out_state.Conflicted)
+
+				if err = co.GetSkuExternal().ObjectId.SetWithIdLike(
+					&co.GetSku().ObjectId,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				return
+			} else {
+				err = errors.Wrapf(err, "Cwd: %#v", item.Debug())
+				return
+			}
+		}
+
+		sku.DetermineState(co, false)
+
+		// ui.Debug().Print(co.GetState())
+
+		if !item.Conflict.IsEmpty() {
+			co.SetState(checked_out_state.Conflicted)
+		} else {
+			// if co.GetState() == checked_out_state.Untracked {
+			// 	ui.Debug().Print(item.State)
+			// 	ui.Debug().Print(item.Debug())
+			// 	panic("wow")
+			// }
+			// co.SetState(checked_out_state.CheckedOut)
+		}
+
+		// ui.Debug().Print(co.GetState())
 
 		if err = s.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
 			err = errors.Wrap(err)
