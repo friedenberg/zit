@@ -39,7 +39,7 @@ func (c Status) RunWithQuery(
 	u *env.Env,
 	qg *query.Group,
 ) (err error) {
-	pcol := u.PrinterCheckedOutForKasten(qg.RepoId)
+	pcol := u.PrinterCheckedOut()
 
 	if err = u.GetStore().QueryCheckedOut(
 		qg,
@@ -55,17 +55,6 @@ func (c Status) RunWithQuery(
 		err = errors.Wrap(err)
 		return
 	}
-
-	// if err = u.GetStore().QueryUnsure(
-	// 	eqwk,
-	// 	sku.UnsureMatchOptions{
-	// 		UnsureMatchType: sku.UnsureMatchTypeMetadataWithoutTaiHistory | sku.UnsureMatchTypeDescription,
-	// 	},
-	// 	u.PrinterMatching(),
-	// ); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
 
 	return
 }

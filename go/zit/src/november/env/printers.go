@@ -5,7 +5,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/id_fmts"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
@@ -112,12 +111,6 @@ func (u *Env) PrinterCheckedOut() interfaces.FuncIter[*sku.CheckedOut] {
 	)
 
 	return out
-}
-
-func (u *Env) PrinterCheckedOutForKasten(
-	k ids.RepoId,
-) interfaces.FuncIter[*sku.CheckedOut] {
-	return u.PrinterCheckedOut()
 }
 
 func (u *Env) MakePrinterBoxArchive(
