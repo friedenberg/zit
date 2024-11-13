@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -15,13 +14,18 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
 
-func (s *Store) MakeApplyCheckedOut(
-	qg *query.Group,
+func (s *Store) makeFuncIterHydrateCheckedOut(
 	f interfaces.FuncIter[sku.SkuType],
-	o sku.CommitOptions,
 ) interfaces.FuncIter[*sku.FSItem] {
 	return func(em *sku.FSItem) (err error) {
-		if err = s.ApplyCheckedOut(o, qg, em, f); err != nil {
+		var co *sku.CheckedOut
+
+		if co, err = s.hydrateCheckedOut(em); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = f(co); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -30,14 +34,30 @@ func (s *Store) MakeApplyCheckedOut(
 	}
 }
 
-func (s *Store) ApplyCheckedOut(
-	o sku.CommitOptions,
+func (s *Store) makeFuncIterFilterAndApply(
 	qg *query.Group,
-	item *sku.FSItem,
 	f interfaces.FuncIter[sku.SkuType],
-) (err error) {
-	var co *sku.CheckedOut
+) interfaces.FuncIter[*sku.CheckedOut] {
+	return func(co *sku.CheckedOut) (err error) {
+		if !qg.ContainsExternalSku(
+			co.GetSkuExternal(),
+			co.GetState(),
+		) {
+			return
+		}
 
+		if err = f(co); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+}
+
+func (s *Store) hydrateCheckedOut(
+	item *sku.FSItem,
+) (co *sku.CheckedOut, err error) {
 	if co, err = s.readCheckedOutFromItem(item); err != nil {
 		err = errors.Wrapf(err, "%s", item.Debug())
 		return
@@ -59,18 +79,6 @@ func (s *Store) ApplyCheckedOut(
 		// 	co.SetState(checked_out_state.Untracked)
 	}
 
-	if !qg.ContainsExternalSku(
-		co.GetSkuExternal(),
-		co.GetState(),
-	) {
-		return
-	}
-
-	if err = f(co); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	return
 }
 
@@ -80,14 +88,19 @@ func (s *Store) QueryCheckedOut(
 ) (err error) {
 	wg := quiter.MakeErrorWaitGroupParallel()
 
-	o := sku.CommitOptions{
-		Mode: object_mode.ModeRealizeSansProto,
-	}
+	aco := s.makeFuncIterHydrateCheckedOut(
+		s.makeFuncIterFilterAndApply(qg, f),
+	)
 
-	aco := s.MakeApplyCheckedOut(qg, f, o)
+	wg.Do(func() (err error) {
+		for o := range s.probablyCheckedOut.All() {
+			if err = aco(o); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
 
-	wg.Do(func() error {
-		return s.OnlyObjects(aco)
+		return
 	})
 
 	if !qg.ExcludeUntracked {

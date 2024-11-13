@@ -498,16 +498,6 @@ func (d *dirItems) addOneObject(
 //  |___|\__\___|_|  \__,_|\__|_|\___/|_| |_|
 //
 
-func (d *dirItems) OnlyObjects(
-	f interfaces.FuncIter[*sku.FSItem],
-) (err error) {
-	wg := quiter.MakeErrorWaitGroupParallel()
-
-	quiter.ErrorWaitGroupApply(wg, d.probablyCheckedOut, f)
-
-	return wg.GetError()
-}
-
 func (d *dirItems) All(
 	f interfaces.FuncIter[*sku.FSItem],
 ) (err error) {
