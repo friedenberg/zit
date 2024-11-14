@@ -153,10 +153,10 @@ func (op Organize) RunWithExternalLike(
 			return
 		}
 
-		if err = op.Reset(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		// if err = op.Reset(); err != nil {
+		// 	err = errors.Wrap(err)
+		// 	return
+		// }
 
 		readOrganizeTextOp := ReadOrganizeFile{}
 

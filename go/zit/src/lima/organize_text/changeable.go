@@ -113,6 +113,15 @@ func (a *Assignment) addToSet(
 				outputObject.GetSkuExternal().GetSkuExternal().Metadata.Type.ResetWith(
 					objectOriginal.GetSkuExternal().GetSkuExternal().Metadata.Type,
 				)
+
+				outputObject.SetState(objectOriginal.GetState())
+
+				{
+					src := &objectOriginal.GetSkuExternal().Metadata
+					dst := &outputObject.GetSkuExternal().Metadata
+					dst.Fields = objectOriginal.GetSkuExternal().Metadata.Fields[:0]
+					dst.Fields = append(dst.Fields, src.Fields...)
+				}
 			}
 
 			outputMetadata := outputObject.GetSkuExternal().GetMetadata()
