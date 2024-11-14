@@ -361,6 +361,25 @@ function checkin_explicit_organize_include_untracked_fs_blob() { # @test
 }
 
 # bats test_tags=user_story:fs_blobs, user_story:organize, user_story:editor
+function checkin_explicit_organize_include_untracked_fs_blob_change_description() { # @test
+	cat >test.md <<-EOM
+		newest body
+	EOM
+
+	cat >desired_end_state.md <<-EOM
+		  - [test.md some_tag] a different description
+	EOM
+
+	export EDITOR="bash -c 'cat desired_end_state.md >\$0'"
+	run_zit checkin -organize test.md </dev/null
+	assert_success
+	assert_output - <<-EOM
+		[some_tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[two/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "a different description" some_tag]
+	EOM
+}
+
+# bats test_tags=user_story:fs_blobs, user_story:organize, user_story:editor
 function checkin_dot_organize_include_untracked_fs_blob() { # @test
 	cat >test.md <<-EOM
 		newest body

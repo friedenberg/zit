@@ -74,26 +74,30 @@ func (s *Store) GetObjectOrError(
 func (s *Store) UpdateTransactedFromBlobs(
 	el sku.ExternalLike,
 ) (err error) {
+	sk := el.GetSku()
+
 	var item *sku.FSItem
 
-	if item, err = s.ReadFSItemFromExternal(el); err != nil {
+	if item, err = s.ReadFSItemFromExternal(sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	sorted := quiter.ElementsSorted(
-		item.MutableSetLike,
-		func(a, b *fd.FD) bool {
-			return a.GetPath() < b.GetPath()
-		},
-	)
+	if sk.Metadata.Description.IsEmpty() {
+		sorted := quiter.ElementsSorted(
+			item.MutableSetLike,
+			func(a, b *fd.FD) bool {
+				return a.GetPath() < b.GetPath()
+			},
+		)
 
-	for _, f := range sorted {
-		desc := f.FileNameSansExt()
+		for _, f := range sorted {
+			desc := f.FileNameSansExt()
 
-		if err = el.GetSku().Metadata.Description.Set(desc); err != nil {
-			err = errors.Wrap(err)
-			return
+			if err = sk.Metadata.Description.Set(desc); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 	}
 
@@ -107,14 +111,14 @@ func (s *Store) UpdateTransactedFromBlobs(
 		}
 
 		if typFromExtension != "" {
-			if err = el.GetSku().Metadata.Type.Set(typFromExtension); err != nil {
+			if err = sk.Metadata.Type.Set(typFromExtension); err != nil {
 				err = errors.Wrapf(err, "Path: %s", blobFD.GetPath())
 				return
 			}
 		}
 	}
 
-	if err = s.WriteFSItemToExternal(item, el); err != nil {
+	if err = s.WriteFSItemToExternal(item, sk); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
