@@ -28,20 +28,15 @@ func (op Organize) RunWithQueryGroup(
 	qg *query.Group,
 ) (organizeResults organize_text.OrganizeResults, err error) {
 	skus := sku.MakeSkuTypeSetMutable()
-	var l sync.Mutex
+	var l sync.RWMutex
 
-	if err = op.GetStore().QueryTransacted(
+	if err = op.GetStore().QueryTransactedAsSkuType(
 		qg,
-		func(sk *sku.Transacted) (err error) {
+		func(co sku.SkuType) (err error) {
 			l.Lock()
 			defer l.Unlock()
 
-			clone := sku.CloneSkuTypeFromTransacted(
-				sk,
-				checked_out_state.CheckedOut,
-			)
-
-			return skus.Add(clone)
+			return skus.Add(co.Clone())
 		},
 	); err != nil {
 		err = errors.Wrap(err)

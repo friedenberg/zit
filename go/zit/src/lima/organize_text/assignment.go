@@ -84,7 +84,7 @@ func (a Assignment) AlignmentSpacing() int {
 
 func (a Assignment) MaxLen() (m int) {
 	for _, z := range a.Objects.All() {
-		oM := z.sku.GetSku().ObjectId.Len()
+		oM := z.sku.GetSkuExternal().ObjectId.Len()
 
 		if oM > m {
 			m = oM

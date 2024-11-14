@@ -23,7 +23,7 @@ func (c *constructor) collectExplicitAndImplicitFor(
 
 	if err = skus.Each(
 		func(st sku.SkuType) (err error) {
-			sk := st.GetSku()
+			sk := st.GetSkuExternal()
 
 			for _, ewp := range sk.Metadata.Cache.TagPaths.All {
 				if ewp.Tag.String() == sk.ObjectId.String() {
@@ -293,11 +293,11 @@ func (c *constructor) cloneObj(
 	}
 
 	// TODO explore using shas as keys
-	// if named.External.GetSku().Metadata.Shas.SelfMetadataWithoutTai.IsNull() {
+	// if named.External.GetSkuExternal().Metadata.Shas.SelfMetadataWithoutTai.IsNull() {
 	// 	panic("empty sha")
 	// }
 
-	// if z.External.GetSku().Metadata.Shas.SelfMetadataWithoutTai.IsNull() {
+	// if z.External.GetSkuExternal().Metadata.Shas.SelfMetadataWithoutTai.IsNull() {
 	// 	panic("empty sha")
 	// }
 

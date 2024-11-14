@@ -47,7 +47,7 @@ func (smwo *SkuMapWithOrder) AsExternalLikeSet() sku.SkuTypeSetMutable {
 func (smwo *SkuMapWithOrder) AsTransactedSet() sku.TransactedMutableSet {
 	tms := sku.MakeTransactedMutableSet()
 	errors.PanicIfError(smwo.Each(func(el sku.SkuType) (err error) {
-		return tms.Add(el.GetSku())
+		return tms.Add(el.GetSkuExternal())
 	}))
 	return tms
 }
@@ -95,17 +95,17 @@ func (sm SkuMapWithOrder) Sorted() (out []sku.SkuType) {
 
 	sort.Slice(out, func(i, j int) bool {
 		switch {
-		case out[i].GetSku().ObjectId.IsEmpty() && out[j].GetSku().ObjectId.IsEmpty():
-			return out[i].GetSku().Metadata.Description.String() < out[j].GetSku().Metadata.Description.String()
+		case out[i].GetSkuExternal().ObjectId.IsEmpty() && out[j].GetSkuExternal().ObjectId.IsEmpty():
+			return out[i].GetSkuExternal().Metadata.Description.String() < out[j].GetSkuExternal().Metadata.Description.String()
 
-		case out[i].GetSku().ObjectId.IsEmpty():
+		case out[i].GetSkuExternal().ObjectId.IsEmpty():
 			return true
 
-		case out[j].GetSku().ObjectId.IsEmpty():
+		case out[j].GetSkuExternal().ObjectId.IsEmpty():
 			return false
 
 		default:
-			return out[i].GetSku().ObjectId.String() < out[j].GetSku().ObjectId.String()
+			return out[i].GetSkuExternal().ObjectId.String() < out[j].GetSkuExternal().ObjectId.String()
 		}
 	})
 
@@ -233,7 +233,7 @@ func applyToText(
 
 	if err = t.Options.Skus.Each(
 		func(el sku.SkuType) (err error) {
-			sk := el.GetSku()
+			sk := el.GetSkuExternal()
 
 			if sk.Metadata.Description.IsEmpty() {
 				return

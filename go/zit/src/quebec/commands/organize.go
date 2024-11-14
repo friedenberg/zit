@@ -12,7 +12,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
-	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -87,28 +86,23 @@ func (c *Organize) RunWithQuery(
 		createOrganizeFileOp.Type = typen.Any()
 	}
 
-	getResults := sku.MakeSkuTypeSetMutable()
-	var l sync.Mutex
+	skus := sku.MakeSkuTypeSetMutable()
+	var l sync.RWMutex
 
-	if err = u.GetStore().QueryTransacted(
+	if err = u.GetStore().QueryTransactedAsSkuType(
 		qg,
-		func(sk *sku.Transacted) (err error) {
+		func(co sku.SkuType) (err error) {
 			l.Lock()
 			defer l.Unlock()
 
-			clone := sku.CloneSkuTypeFromTransacted(
-				sk,
-				checked_out_state.CheckedOut,
-			)
-
-			return getResults.Add(clone)
+			return skus.Add(co.Clone())
 		},
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	createOrganizeFileOp.Skus = getResults
+	createOrganizeFileOp.Skus = skus
 
 	switch c.Mode {
 	case organize_text_mode.ModeCommitDirectly:
@@ -152,7 +146,7 @@ func (c *Organize) RunWithQuery(
 			organize_text.OrganizeResults{
 				Before:     createOrganizeFileResults,
 				After:      organizeText,
-				Original:   getResults,
+				Original:   skus,
 				QueryGroup: qg,
 			},
 		); err != nil {
@@ -207,7 +201,7 @@ func (c *Organize) RunWithQuery(
 			organize_text.OrganizeResults{
 				Before:     createOrganizeFileResults,
 				After:      organizeText,
-				Original:   getResults,
+				Original:   skus,
 				QueryGroup: qg,
 			},
 		); err != nil {

@@ -36,6 +36,10 @@ func (o obj) GetSku() *sku.Transacted {
 	return o.sku.GetSku()
 }
 
+func (o obj) GetSkuExternal() *sku.Transacted {
+	return o.sku.GetSkuExternal()
+}
+
 func (a *obj) cloneWithType(t tag_paths.Type) (b *obj) {
 	b = &obj{
 		tipe: t,
@@ -60,17 +64,17 @@ func sortObjSet(
 
 	sort.Slice(out, func(i, j int) bool {
 		switch {
-		case out[i].sku.GetSku().ObjectId.IsEmpty() && out[j].sku.GetSku().ObjectId.IsEmpty():
-			return out[i].sku.GetSku().Metadata.Description.String() < out[j].sku.GetSku().Metadata.Description.String()
+		case out[i].GetSkuExternal().ObjectId.IsEmpty() && out[j].GetSkuExternal().ObjectId.IsEmpty():
+			return out[i].GetSkuExternal().Metadata.Description.String() < out[j].GetSkuExternal().Metadata.Description.String()
 
-		case out[i].sku.GetSku().ObjectId.IsEmpty():
+		case out[i].GetSkuExternal().ObjectId.IsEmpty():
 			return true
 
-		case out[j].sku.GetSku().ObjectId.IsEmpty():
+		case out[j].GetSkuExternal().ObjectId.IsEmpty():
 			return false
 
 		default:
-			return out[i].sku.GetSku().ObjectId.String() < out[j].sku.GetSku().ObjectId.String()
+			return out[i].GetSkuExternal().ObjectId.String() < out[j].GetSkuExternal().ObjectId.String()
 		}
 	})
 

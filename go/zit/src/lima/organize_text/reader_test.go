@@ -47,13 +47,13 @@ func makeBez(t *testing.T, v string) (b descriptions.Description) {
 
 func makeObjWithHinAndBez(t *testing.T, hin string, bez string) (o *obj) {
 	sk := sku.MakeSkuType()
-	sk.GetSku().Metadata.Description = makeBez(t, bez)
+	sk.GetSkuExternal().Metadata.Description = makeBez(t, bez)
 
 	o = &obj{
 		sku: sk,
 	}
 
-	o.sku.GetSku().ObjectId.SetWithIdLike(makeZettelId(t, hin))
+	o.GetSkuExternal().ObjectId.SetWithIdLike(makeZettelId(t, hin))
 
 	return
 }
@@ -71,7 +71,7 @@ func makeAssignmentLineReader() reader {
 				ids.Abbr{},
 				nil,
 				nil,
-        nil,
+				nil,
 			),
 		},
 	}
@@ -88,9 +88,9 @@ func assertEqualObjects(t *test_logz.T, expected, actual Objects) {
 	}
 
 	for i := range actual {
-		// actualObj, expectedObj := actual[i].External.GetSku(), expected[i].External.GetSku()
-		actualObj := sku_fmt_debug.StringMetadataSansTai(actual[i].sku.GetSku())
-		expectedObj := sku_fmt_debug.StringMetadataSansTai(expected[i].sku.GetSku())
+		// actualObj, expectedObj := actual[i].External.GetSkuExternal(), expected[i].External.GetSkuExternal()
+		actualObj := sku_fmt_debug.StringMetadataSansTai(actual[i].GetSkuExternal())
+		expectedObj := sku_fmt_debug.StringMetadataSansTai(expected[i].GetSkuExternal())
 
 		if actualObj != expectedObj {
 			t.Errorf("\nexpected: %#v\n  actual: %#v", expectedObj, actualObj)

@@ -281,7 +281,7 @@ func (ar *reader) readOneObj(
 
 	if _, err = ar.options.fmtBox.ReadStringFormat(
 		catgut.MakeRingBufferRuneScanner(r),
-		z.GetSku(),
+		z.GetSkuExternal(),
 	); err != nil {
 		err = ErrorRead{
 			error:  err,
@@ -292,21 +292,21 @@ func (ar *reader) readOneObj(
 		return
 	}
 
-	// z.External.GetSku().Metadata.Tai = ids.NowTai()
+	// z.External.GetSkuExternal().Metadata.Tai = ids.NowTai()
 
-	// if err = z.External.GetSku().CalculateObjectShas(); err != nil {
+	// if err = z.External.GetSkuExternal().CalculateObjectShas(); err != nil {
 	// 	err = errors.Wrap(err)
 	// 	return
 	// }
 
-	if z.sku.GetSku().ObjectId.IsEmpty() {
+	if z.GetSkuExternal().ObjectId.IsEmpty() {
 		// set empty zettel id to ensure middle is '/'
-		if err = z.sku.GetSku().ObjectId.SetWithIdLike(ids.ZettelId{}); err != nil {
+		if err = z.GetSkuExternal().ObjectId.SetWithIdLike(ids.ZettelId{}); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if err = ar.options.Abbr.ExpandZettelIdOnly(&z.sku.GetSku().ObjectId); err != nil {
+		if err = ar.options.Abbr.ExpandZettelIdOnly(&z.GetSkuExternal().ObjectId); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -315,7 +315,7 @@ func (ar *reader) readOneObj(
 	// TODO determine a better state for this
 	z.sku.SetState(checked_out_state.CheckedOut)
 
-	sku.TransactedResetter.ResetWith(z.sku.GetSkuExternal(), z.sku.GetSku())
+	sku.TransactedResetter.ResetWith(z.GetSku(), z.GetSkuExternal())
 	ar.currentAssignment.AddObject(&z)
 
 	return

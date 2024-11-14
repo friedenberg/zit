@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -151,6 +152,30 @@ func (e *Executor) ExecuteTransacted(
 	return
 }
 
+func (e *Executor) ExecuteTransactedAsSkuType(
+	out interfaces.FuncIter[sku.SkuType],
+) (err error) {
+	// TODO only apply dot operator when necessary
+	if err = e.ExternalStore.ApplyDotOperator(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if e.dotOperatorActive {
+		if err = e.executeExternalQueryCheckedOut(out); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if err = e.executeInternalQuerySkuType(out); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
 func (e *Executor) executeExternalQueryCheckedOut(
 	out interfaces.FuncIter[sku.SkuType],
 ) (err error) {
@@ -179,6 +204,20 @@ func (e *Executor) executeExternalQuery(
 
 			return
 		},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (e *Executor) executeInternalQuerySkuType(
+	out interfaces.FuncIter[sku.SkuType],
+) (err error) {
+	if err = e.FuncPrimitiveQuery(
+		e.Group,
+		e.makeEmitSkuSigilLatestSkuType(out),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -224,6 +263,45 @@ func (e *Executor) makeEmitSkuSigilLatest(
 		}
 
 		if err = out(z); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		return
+	}
+}
+
+func (e *Executor) makeEmitSkuSigilLatestSkuType(
+	out interfaces.FuncIter[sku.SkuType],
+) interfaces.FuncIter[*sku.Transacted] {
+	return func(internal *sku.Transacted) (err error) {
+		g := genres.Must(internal.GetGenre())
+		m, ok := e.Get(g)
+
+		if !ok {
+			return
+		}
+
+		if m.GetSigil().IncludesExternal() {
+			// TODO update External
+			if err = e.UpdateTransacted(internal); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+		}
+
+		if !m.ContainsSku(internal) {
+			return
+		}
+
+		co := sku.GetCheckedOutPool().Get()
+		defer sku.GetCheckedOutPool().Put(co)
+
+		sku.TransactedResetter.ResetWith(co.GetSkuExternal(), internal)
+
+		co.SetState(checked_out_state.Internal)
+
+		if err = out(co); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

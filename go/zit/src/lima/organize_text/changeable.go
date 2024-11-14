@@ -16,13 +16,13 @@ func key(el sku.SkuType) string {
 		return eoid
 	}
 
-	oid := el.GetSku().ObjectId.String()
+	oid := el.GetSkuExternal().ObjectId.String()
 
 	if len(oid) > 1 {
 		return oid
 	}
 
-	desc := el.GetSku().Metadata.Description.String()
+	desc := el.GetSkuExternal().Metadata.Description.String()
 	if desc != "" {
 		return desc
 	}
@@ -32,7 +32,7 @@ func key(el sku.SkuType) string {
 
 // TODO explore using shas as keys
 func keySha(el sku.SkuType) string {
-	objectSha := &el.GetSku().Metadata.SelfMetadataWithoutTai
+	objectSha := &el.GetSkuExternal().Metadata.SelfMetadataWithoutTai
 
 	if objectSha.IsNull() {
 		panic("empty object sha")
@@ -88,34 +88,34 @@ func (a *Assignment) addToSet(
 			ot.ObjectFactory.ResetWith(outputObject, organizeObject.sku)
 
 			if !ot.Metadata.Type.IsEmpty() {
-				outputObject.GetSku().Metadata.Type.ResetWith(ot.Metadata.Type)
+				outputObject.GetSkuExternal().Metadata.Type.ResetWith(ot.Metadata.Type)
 			}
 
-			outputObject.GetSku().RepoId.ResetWith(ot.Metadata.RepoId)
+			outputObject.GetSkuExternal().RepoId.ResetWith(ot.Metadata.RepoId)
 
 			output.Add(outputObject)
 
 			objectOriginal, hasOriginal := objectsFromBefore.Get(objectKey)
 
 			if hasOriginal {
-				outputObject.GetSku().Metadata.Blob.ResetWith(
-					&objectOriginal.GetSku().Metadata.Blob,
+				outputObject.GetSkuExternal().Metadata.Blob.ResetWith(
+					&objectOriginal.GetSkuExternal().Metadata.Blob,
 				)
 
-				outputObject.GetSku().Metadata.Type.ResetWith(
-					objectOriginal.GetSku().Metadata.Type,
+				outputObject.GetSkuExternal().Metadata.Type.ResetWith(
+					objectOriginal.GetSkuExternal().Metadata.Type,
 				)
 
-				outputObject.GetSkuExternal().GetSku().Metadata.Blob.ResetWith(
-					&objectOriginal.GetSkuExternal().GetSku().Metadata.Blob,
+				outputObject.GetSkuExternal().GetSkuExternal().Metadata.Blob.ResetWith(
+					&objectOriginal.GetSkuExternal().GetSkuExternal().Metadata.Blob,
 				)
 
-				outputObject.GetSkuExternal().GetSku().Metadata.Type.ResetWith(
-					objectOriginal.GetSkuExternal().GetSku().Metadata.Type,
+				outputObject.GetSkuExternal().GetSkuExternal().Metadata.Type.ResetWith(
+					objectOriginal.GetSkuExternal().GetSkuExternal().Metadata.Type,
 				)
 			}
 
-			outputMetadata := outputObject.GetSku().GetMetadata()
+			outputMetadata := outputObject.GetSkuExternal().GetMetadata()
 
 			for e := range ot.Metadata.AllPtr() {
 				if organizeObject.tipe == tag_paths.TypeUnknown {
@@ -128,17 +128,17 @@ func (a *Assignment) addToSet(
 					continue
 				}
 
-				outputObject.GetSku().AddTagPtr(e)
+				outputObject.GetSkuExternal().AddTagPtr(e)
 			}
 
 			if !ot.Metadata.Type.IsEmpty() {
-				outputObject.GetSku().Metadata.Type.ResetWith(ot.Metadata.Type)
+				outputObject.GetSkuExternal().Metadata.Type.ResetWith(ot.Metadata.Type)
 			}
 		} else {
 			outputObject = previouslyProcessedObject.sku
 		}
 
-		if organizeObject.sku.GetSku().ObjectId.String() == "" {
+		if organizeObject.GetSkuExternal().ObjectId.String() == "" {
 			panic(fmt.Sprintf("%s: object id is nil", organizeObject))
 		}
 
@@ -146,16 +146,16 @@ func (a *Assignment) addToSet(
 			panic("empty object")
 		}
 
-		if err = outputObject.GetSku().Metadata.Description.Set(
-			organizeObject.sku.GetSku().Metadata.Description.String(),
+		if err = outputObject.GetSkuExternal().Metadata.Description.Set(
+			organizeObject.GetSkuExternal().Metadata.Description.String(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if !organizeObject.sku.GetSku().Metadata.Type.IsEmpty() {
-			if err = outputObject.GetSku().Metadata.Type.Set(
-				organizeObject.sku.GetSku().Metadata.Type.String(),
+		if !organizeObject.GetSkuExternal().Metadata.Type.IsEmpty() {
+			if err = outputObject.GetSkuExternal().Metadata.Type.Set(
+				organizeObject.GetSkuExternal().Metadata.Type.String(),
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -166,20 +166,20 @@ func (a *Assignment) addToSet(
 			return
 		}
 
-		outputObject.GetSku().Metadata.Comments = append(
-			outputObject.GetSku().Metadata.Comments,
-			organizeObject.sku.GetSku().Metadata.Comments...,
+		outputObject.GetSkuExternal().Metadata.Comments = append(
+			outputObject.GetSkuExternal().Metadata.Comments,
+			organizeObject.GetSkuExternal().Metadata.Comments...,
 		)
 
-		if err = organizeObject.sku.GetSku().Metadata.GetTags().EachPtr(
-			outputObject.GetSku().AddTagPtr,
+		if err = organizeObject.GetSkuExternal().Metadata.GetTags().EachPtr(
+			outputObject.GetSkuExternal().AddTagPtr,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		for e := range expanded.AllPtr() {
-			outputObject.GetSku().AddTagPtr(e)
+			outputObject.GetSkuExternal().AddTagPtr(e)
 		}
 	}
 

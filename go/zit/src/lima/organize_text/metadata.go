@@ -69,14 +69,14 @@ func (m *Metadata) SetFromObjectMetadata(
 }
 
 func (m Metadata) RemoveFromTransacted(sk sku.SkuType) (err error) {
-	mes := sk.GetSku().Metadata.GetTags().CloneMutableSetPtrLike()
+	mes := sk.GetSkuExternal().Metadata.GetTags().CloneMutableSetPtrLike()
 
 	if err = m.Each(mes.Del); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	sk.GetSku().Metadata.SetTags(mes)
+	sk.GetSkuExternal().Metadata.SetTags(mes)
 
 	return
 }

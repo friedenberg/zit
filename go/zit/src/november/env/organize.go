@@ -42,7 +42,7 @@ func (e *Env) LockAndCommitOrganizeResults(
 	if err = changeResults.Changed.Each(
 		func(changed sku.SkuType) (err error) {
 			if err = e.GetStore().CreateOrUpdate(
-				changed,
+				changed.GetSkuExternal(),
 				object_mode.Make(
 					object_mode.ModeMergeCheckedOut,
 				),

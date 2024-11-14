@@ -49,6 +49,25 @@ func (s *Store) QueryTransacted(
 	return
 }
 
+func (s *Store) QueryTransactedAsSkuType(
+	qg *query.Group,
+	f interfaces.FuncIter[sku.SkuType],
+) (err error) {
+	var e query.Executor
+
+	if e, err = s.MakeQueryExecutor(qg); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = e.ExecuteTransactedAsSkuType(f); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s *Store) QuerySkuType(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.SkuType],

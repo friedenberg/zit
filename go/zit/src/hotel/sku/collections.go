@@ -26,6 +26,7 @@ type ExternalObjectIdKeyer[
 		ids.ObjectIdGetter
 		ExternalObjectIdGetter
 		TransactedGetter
+    ExternalLikeGetter
 	},
 ] struct{}
 
@@ -36,11 +37,11 @@ func (ExternalObjectIdKeyer[T]) GetKey(el T) string {
 		return eoid.String()
 	}
 
-	if !el.GetSku().ObjectId.IsEmpty() {
-		return el.GetSku().ObjectId.String()
+	if !el.GetSkuExternal().ObjectId.IsEmpty() {
+		return el.GetSkuExternal().ObjectId.String()
 	}
 
-	desc := el.GetSku().Metadata.Description.String()
+	desc := el.GetSkuExternal().Metadata.Description.String()
 
 	if desc != "" {
 		return desc

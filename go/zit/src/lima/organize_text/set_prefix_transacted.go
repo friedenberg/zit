@@ -63,11 +63,11 @@ func (s *PrefixSet) AddSku(z sku.SkuType) (err error) {
 // this splits on right-expanded
 func (s *PrefixSet) Add(z *obj) (err error) {
 	es := ids.Expanded(
-		z.sku.GetSku().GetMetadata().Cache.GetImplicitTags(),
+		z.GetSkuExternal().GetMetadata().Cache.GetImplicitTags(),
 		expansion.ExpanderRight,
 	).CloneMutableSetPtrLike()
 
-	if err = z.sku.GetSku().GetMetadata().Cache.GetExpandedTags().EachPtr(
+	if err = z.GetSkuExternal().GetMetadata().Cache.GetExpandedTags().EachPtr(
 		es.AddPtr,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -118,7 +118,7 @@ func (s *PrefixSet) addPair(
 	e string,
 	z *obj,
 ) {
-	if e == z.sku.GetSku().ObjectId.String() {
+	if e == z.GetSkuExternal().ObjectId.String() {
 		e = ""
 	}
 
@@ -217,7 +217,7 @@ func (a PrefixSet) Match(
 
 		zSet.Each(
 			func(z *obj) (err error) {
-				es := z.sku.GetSku().GetTags()
+				es := z.GetSkuExternal().GetTags()
 
 				intersection := ids.IntersectPrefixes(
 					es,
@@ -259,7 +259,7 @@ func (a PrefixSet) Subset(
 		zSet.Each(
 			func(z *obj) (err error) {
 				ui.Log().Print(e2, z)
-				intersection := z.sku.GetSku().Metadata.Cache.TagPaths.All.GetMatching(e2)
+				intersection := z.GetSkuExternal().Metadata.Cache.TagPaths.All.GetMatching(e2)
 				hasDirect := false || len(intersection) == 0
 				type match struct {
 					string
