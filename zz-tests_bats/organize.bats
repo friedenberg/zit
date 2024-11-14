@@ -1391,3 +1391,17 @@ function organize_checked_out { # @test
 		      checked out [tag.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 }
+
+# bats test_tags=user_story:fs_blobs
+function organize_output_only_fs_blobs() { # @test
+	cat >test.md <<-EOM
+		newest body
+	EOM
+
+	run_zit organize -mode output-only .
+	assert_success
+	assert_output - <<-EOM
+
+		- [test.md]
+	EOM
+}

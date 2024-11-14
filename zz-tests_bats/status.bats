@@ -8,23 +8,25 @@ setup() {
 
 	version="v$(zit store-version)"
 	copy_from_version "$DIR" "$version"
-
-	run_zit checkout :z,t,e
-	assert_success
-	# assert_output_unsorted - <<-EOM
-	# 	      checked out [md.type @$(get_type_blob_sha) !toml-type-v1]
-	# 	      checked out [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
-	# 	      checked out [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
-	# 	      checked out [tag-1.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-	# 	      checked out [tag-2.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-	# 	      checked out [tag-3.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-	# 	      checked out [tag-4.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-	# 	      checked out [tag.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-	# EOM
 }
 
 teardown() {
 	rm_from_version "$version"
+}
+
+function checkout_everything() {
+	run_zit checkout :z,t,e
+	assert_success
+	assert_output_unsorted - <<-EOM
+		      checked out [md.type @$(get_type_blob_sha) !toml-type-v1]
+		      checked out [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
+		      checked out [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+		      checked out [tag-1.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [tag-2.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [tag-3.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [tag-4.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		      checked out [tag.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+	EOM
 }
 
 function dirty_new_zettel() {
@@ -106,6 +108,7 @@ function dirty_zz_archive_etikett() {
 }
 
 function status_simple_one_zettel { # @test
+	checkout_everything
 	run_zit status one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
@@ -122,6 +125,7 @@ function status_simple_one_zettel { # @test
 }
 
 function status_simple_one_zettel_akte_separate { # @test
+	checkout_everything
 	run_zit status one/uno.zettel
 	assert_success
 	assert_output - <<-EOM
@@ -143,6 +147,7 @@ function status_simple_one_zettel_akte_separate { # @test
 }
 
 function status_simple_one_zettel_akte_only { # @test
+	checkout_everything
 	run_zit clean one/uno.zettel
 	assert_success
 	# assert_output - <<-EOM
@@ -181,6 +186,7 @@ function status_simple_one_zettel_akte_only { # @test
 }
 
 function status_zettel_akte_checkout { # @test
+	checkout_everything
 	run_zit clean .
 	assert_success
 
@@ -202,6 +208,7 @@ function status_zettel_akte_checkout { # @test
 }
 
 function status_zettel_hidden { # @test
+	checkout_everything
 	run_zit schlummernd-add tag-3
 	assert_success
 
@@ -232,6 +239,7 @@ function status_zettel_hidden { # @test
 }
 
 function status_zettelen_typ { # @test
+	checkout_everything
 	run_zit status !md.z
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -251,6 +259,7 @@ function status_zettelen_typ { # @test
 }
 
 function status_complex_zettel_etikett_negation { # @test
+	checkout_everything
 	run_zit status ^-etikett-two.z
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -269,6 +278,7 @@ function status_complex_zettel_etikett_negation { # @test
 }
 
 function status_simple_all { # @test
+	checkout_everything
 	run_zit status
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -305,6 +315,7 @@ function status_simple_all { # @test
 }
 
 function status_simple_typ { # @test
+	checkout_everything
 	run_zit status .t
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -323,6 +334,7 @@ function status_simple_typ { # @test
 }
 
 function status_simple_etikett { # @test
+	checkout_everything
 	run_zit status .e
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -348,6 +360,7 @@ function status_simple_etikett { # @test
 }
 
 function status_conflict { # @test
+	checkout_everything
 	run_zit checkout one/dos
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -395,5 +408,82 @@ function status_conflict { # @test
 	assert_success
 	assert_output - <<-EOM
 		       conflicted [one/dos.zettel]
+	EOM
+}
+
+# bats test_tags=user_story:fs_blobs
+function status_added_untracked_only() { # @test
+	cat >test.md <<-EOM
+		newest body
+	EOM
+
+	run_zit status .
+	assert_success
+	assert_output_unsorted - <<-EOM
+		        untracked [test.md @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc]
+	EOM
+}
+
+# bats test_tags=user_story:fs_blobs
+function status_added_untracked() { # @test
+	checkout_everything
+	cat >test.md <<-EOM
+		newest body
+	EOM
+
+	run_zit status .
+	assert_success
+	assert_output_unsorted - <<-EOM
+		        untracked [test.md @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc]
+		             same [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+		             same [tag-1.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [md.type @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
+		             same [tag-2.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag-3.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag-4.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
+	EOM
+}
+
+# bats test_tags=user_story:fs_blobs, user_story:recognized_blobs
+function status_dot_untracked_recognized_blob_only() { # @test
+	run_zit show -format blob one/uno
+	echo "$output" >test.md
+
+	run_zit status .
+	assert_success
+	assert_output - <<-EOM
+		       recognized [one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4
+		                   test.md]
+	EOM
+}
+
+# bats test_tags=user_story:fs_blobs, user_story:recognized_blobs
+function status_explicit_untracked_recognized_blob_only() { # @test
+	skip
+	run_zit show -format blob one/uno
+	echo "$output" >test.md
+
+	run_zit status test.md
+	assert_success
+	assert_output - <<-EOM
+		       recognized [one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4
+		                   test.md]
+	EOM
+}
+
+# bats test_tags=user_story:fs_blobs, user_story:recognized_blobs
+function status_dot_untracked_recognized_blob() { # @test
+	skip
+	checkout_everything
+	run_zit show -format blob one/uno
+	echo "$output" >test.md
+
+	run_zit status .
+	assert_success
+	assert_output - <<-EOM
+		       recognized [one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4
+		                   test.md]
 	EOM
 }
