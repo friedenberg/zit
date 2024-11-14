@@ -8,6 +8,8 @@ setup() {
 
 	version="v$(zit store-version)"
 	copy_from_version "$DIR" "$version"
+
+	export BATS_TEST_BODY=true
 }
 
 teardown() {
@@ -461,7 +463,6 @@ function status_dot_untracked_recognized_blob_only() { # @test
 
 # bats test_tags=user_story:fs_blobs, user_story:recognized_blobs
 function status_explicit_untracked_recognized_blob_only() { # @test
-	skip
 	run_zit show -format blob one/uno
 	echo "$output" >test.md
 
@@ -475,15 +476,22 @@ function status_explicit_untracked_recognized_blob_only() { # @test
 
 # bats test_tags=user_story:fs_blobs, user_story:recognized_blobs
 function status_dot_untracked_recognized_blob() { # @test
-	skip
 	checkout_everything
 	run_zit show -format blob one/uno
 	echo "$output" >test.md
 
 	run_zit status .
 	assert_success
-	assert_output - <<-EOM
+	assert_output_unsorted - <<-EOM
 		       recognized [one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4
 		                   test.md]
+		             same [tag-1.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag-2.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag-4.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [tag.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		             same [md.type @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
+		             same [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
+		             same [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
+		             same [tag-3.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 }

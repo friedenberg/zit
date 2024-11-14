@@ -215,6 +215,7 @@ func (s *Store) hydrateDefinitelyNotCheckedOutRecognizedItem(
 
 	for _, item := range item.Matching {
 		co.GetSkuExternal().ExternalObjectId.ResetWith(&item.ExternalObjectId)
+		co.GetSkuExternal().ObjectId.SetGenre(genres.Blob)
 
 		if err = s.WriteFSItemToExternal(item, co.GetSkuExternal()); err != nil {
 			err = errors.Wrap(err)

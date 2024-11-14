@@ -1,8 +1,6 @@
 package ui
 
 import (
-	"fmt"
-	"io"
 	"log"
 	"os"
 
@@ -47,6 +45,7 @@ type DevPrinter interface {
 var (
 	printerOut, printerErr   prodPrinter
 	printerLog, printerDebug devPrinter
+	printerBatsTestBody      devPrinter
 )
 
 func init() {
@@ -75,16 +74,19 @@ func init() {
 		},
 		includesStack: true,
 	}
-}
 
-type prodPrinter struct {
-	f  io.Writer
-	on bool
-}
+	// TODO-P2 determine thru compilation
+	envVarFilter := "BATS_TEST_BODY"
+	_, printerBatsTestBodyOn := os.LookupEnv(envVarFilter)
 
-type devPrinter struct {
-	prodPrinter
-	includesStack bool
+	printerBatsTestBody = devPrinter{
+		prodPrinter: prodPrinter{
+			f: os.Stderr,
+			// TODO-P2 determine thru compilation
+			on: printerBatsTestBodyOn,
+		},
+		includesStack: true,
+	}
 }
 
 func Out() ProdPrinter {
@@ -103,103 +105,10 @@ func Debug() DevPrinter {
 	return printerDebug
 }
 
+func DebugBatsTestBody() DevPrinter {
+	return printerBatsTestBody
+}
+
 func DebugAllowCommit() DevPrinter {
 	return printerDebug
-}
-
-func (p prodPrinter) Print(a ...interface{}) (err error) {
-	if !p.on {
-		return
-	}
-
-	_, err = fmt.Fprintln(
-		p.f,
-		a...,
-	)
-
-	return
-}
-
-func (p devPrinter) Print(a ...interface{}) (err error) {
-	if !p.on {
-		return
-	}
-
-	if p.includesStack {
-		si, _ := errors.MakeStackInfo(1)
-		a = append([]interface{}{si.StringNoFunctionName()}, a...)
-	}
-
-	return p.prodPrinter.Print(a...)
-}
-
-func (p prodPrinter) printfStack(depth int, f string, a ...interface{}) (err error) {
-	if !p.on {
-		return
-	}
-
-	si, _ := errors.MakeStackInfo(1 + depth)
-	f = "%s" + f
-	a = append([]interface{}{si}, a...)
-
-	_, err = fmt.Fprintln(
-		p.f,
-		fmt.Sprintf(f, a...),
-	)
-
-	return
-}
-
-func (p prodPrinter) Printf(f string, a ...interface{}) (err error) {
-	if !p.on {
-		return
-	}
-
-	_, err = fmt.Fprintln(
-		p.f,
-		fmt.Sprintf(f, a...),
-	)
-
-	return
-}
-
-func (p devPrinter) Printf(f string, a ...interface{}) (err error) {
-	if !p.on {
-		return
-	}
-
-	if p.includesStack {
-		si, _ := errors.MakeStackInfo(1)
-		f = "%s " + f
-		a = append([]interface{}{si.StringNoFunctionName()}, a...)
-	}
-
-	return p.prodPrinter.Printf(f, a...)
-}
-
-func (p devPrinter) Caller(i int, vs ...interface{}) {
-	if !p.on {
-		return
-	}
-
-	st, _ := errors.MakeStackInfo(i + 1)
-
-	vs = append([]interface{}{st}, vs...)
-	// TODO-P4 strip trailing newline and add back
-	p.prodPrinter.Print(vs...)
-}
-
-func (p devPrinter) CallerNonEmpty(i int, v interface{}) {
-	if v != nil {
-		p.Caller(i+1, "%s", v)
-	}
-}
-
-func (p devPrinter) FunctionName(skip int) {
-	if !p.on {
-		return
-	}
-
-	st, _ := errors.MakeStackInfo(skip + 1)
-	io.WriteString(p.f, fmt.Sprintf("%s%s\n", st, st.Function))
 }
