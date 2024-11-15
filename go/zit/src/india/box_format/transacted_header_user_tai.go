@@ -12,6 +12,7 @@ func (f TransactedHeaderUserTai) WriteBoxHeader(
 	sk *sku.Transacted,
 ) (err error) {
 	t := sk.GetTai()
+	header.RightAligned = true
 	header.Value = t.Format(string_format_writer.StringFormatDateTime)
 
 	return

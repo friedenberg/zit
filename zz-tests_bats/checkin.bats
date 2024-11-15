@@ -62,6 +62,8 @@ setup() {
 	cat >zz-archive.tag <<-EOM
 		hide = true
 	EOM
+
+	export BATS_TEST_BODY=true
 }
 
 teardown() {
@@ -301,7 +303,7 @@ function checkin_via_organize { # @test
 	EOM
 }
 
-# bats test_tags=user_story:fs_blobs
+# bats test_tags=user_story:fs_blobs, user_story:external_ids
 function checkin_dot_untracked_fs_blob() { # @test
 	cat >test.md <<-EOM
 		newest body
@@ -321,7 +323,7 @@ function checkin_dot_untracked_fs_blob() { # @test
 	EOM
 }
 
-# bats test_tags=user_story:fs_blobs
+# bats test_tags=user_story:fs_blobs, user_story:external_ids
 function checkin_explicit_untracked_fs_blob() { # @test
 	cat >test.md <<-EOM
 		newest body
@@ -334,7 +336,7 @@ function checkin_explicit_untracked_fs_blob() { # @test
 	EOM
 }
 
-# bats test_tags=user_story:fs_blobs, user_story:organize, user_story:editor
+# bats test_tags=user_story:fs_blobs, user_story:organize, user_story:editor, user_story:external_ids
 function checkin_dot_organize_exclude_untracked_fs_blob() { # @test
 	cat >test.md <<-EOM
 		newest body
@@ -346,7 +348,7 @@ function checkin_dot_organize_exclude_untracked_fs_blob() { # @test
 	assert_output ''
 }
 
-# bats test_tags=user_story:fs_blobs, user_story:organize, user_story:editor
+# bats test_tags=user_story:fs_blobs, user_story:organize, user_story:editor, user_story:external_ids
 function checkin_explicit_organize_include_untracked_fs_blob() { # @test
 	cat >test.md <<-EOM
 		newest body
@@ -360,7 +362,7 @@ function checkin_explicit_organize_include_untracked_fs_blob() { # @test
 	EOM
 }
 
-# bats test_tags=user_story:fs_blobs, user_story:organize, user_story:editor
+# bats test_tags=user_story:fs_blobs, user_story:organize, user_story:editor, user_story:external_ids
 function checkin_explicit_organize_include_untracked_fs_blob_change_description() { # @test
 	cat >test.md <<-EOM
 		newest body
@@ -379,7 +381,7 @@ function checkin_explicit_organize_include_untracked_fs_blob_change_description(
 	EOM
 }
 
-# bats test_tags=user_story:fs_blobs, user_story:organize, user_story:editor
+# bats test_tags=user_story:fs_blobs, user_story:organize, user_story:editor, user_story:external_ids
 function checkin_dot_organize_include_untracked_fs_blob() { # @test
 	cat >test.md <<-EOM
 		newest body
@@ -402,5 +404,34 @@ function checkin_dot_organize_include_untracked_fs_blob() { # @test
 		[two/tres @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md]
 		[three/dos @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !md "test"]
 		[four/uno @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !md]
+	EOM
+}
+
+# bats test_tags=user_story:fs_blobs, user_story:organize, user_story:editor, user_story:external_ids
+function checkin_dot_include_untracked_fs_blob_with_spaces() { # @test
+	cat >"test with spaces.txt" <<-EOM
+		newest body
+	EOM
+
+	run_zit checkin "test with spaces.txt" </dev/null
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
+		[two/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !txt "test with spaces"]
+	EOM
+}
+
+# bats test_tags=user_story:fs_blobs, user_story:organize, user_story:editor, user_story:external_ids
+function checkin_dot_organize_include_untracked_fs_blob_with_spaces() { # @test
+	cat >"test with spaces.txt" <<-EOM
+		newest body
+	EOM
+
+	export EDITOR="bash -c 'true'"
+	run_zit checkin -organize "test with spaces.txt" </dev/null
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[!txt @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
+		[two/uno @d2b258fadce18f2de6356bead0c773ca785237cad5009925a3cf1a77603847fc !txt "test with spaces"]
 	EOM
 }

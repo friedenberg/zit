@@ -7,7 +7,7 @@ type TokenParts struct {
 }
 
 func (tp TokenParts) String() string {
-	return fmt.Sprintf("Left: %q, Right: %q", tp.Left, tp.Right)
+	return fmt.Sprintf("Left: %q, Right: %q", string(tp.Left), string(tp.Right))
 }
 
 func (tp *TokenParts) Reset() {

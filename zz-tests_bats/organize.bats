@@ -14,6 +14,8 @@ teardown() {
 	rm_from_version "$version"
 }
 
+# bats file_tags=user_story:organize
+
 cmd_def_organize=(
 	"${cmd_zit_def[@]}"
 	-prefix-joints=false
@@ -1364,7 +1366,6 @@ function object_with_newline_in_description { # @test
 }
 
 function organize_checked_out { # @test
-	skip
 	run_zit checkout :z,e,t
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -1381,18 +1382,19 @@ function organize_checked_out { # @test
 	run_zit organize -mode output-only .
 	assert_success
 	assert_output - <<-EOM
-		      checked out [md.type @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
-		      checked out [one/dos.zettel @2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 !md "wow ok again" tag-3 tag-4]
-		      checked out [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
-		      checked out [tag-1.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		      checked out [tag-2.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		      checked out [tag-3.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		      checked out [tag-4.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		      checked out [tag.tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+
+		- [md.type !toml-type-v1]
+		- [one/dos.zettel !md tag-3 tag-4] wow ok again
+		- [one/uno.zettel !md tag-3 tag-4] wow the first
+		- [tag.tag]
+		- [tag-1.tag]
+		- [tag-2.tag]
+		- [tag-3.tag]
+		- [tag-4.tag]
 	EOM
 }
 
-# bats test_tags=user_story:fs_blobs
+# bats test_tags=user_story:fs_blobs, user_story:external_ids
 function organize_output_only_fs_blobs() { # @test
 	cat >test.md <<-EOM
 		newest body
@@ -1403,5 +1405,19 @@ function organize_output_only_fs_blobs() { # @test
 	assert_output - <<-EOM
 
 		- [test.md]
+	EOM
+}
+
+# bats test_tags=user_story:fs_blobs, user_story:organize, user_story:external_ids
+function organize_untracked_fs_blob_with_spaces() { # @test
+	cat >"test with spaces.txt" <<-EOM
+		newest body
+	EOM
+
+	run_zit organize -mode output-only "test with spaces.txt"
+	assert_success
+	assert_output_unsorted - <<-EOM
+
+		- ["test with spaces.txt"]
 	EOM
 }

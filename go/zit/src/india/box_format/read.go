@@ -106,7 +106,7 @@ func (f *BoxTransacted) readStringFormatBox(
 			}
 		}
 
-		t := ts.GetToken()
+		t, _, parts := ts.GetTokenAndTypeAndParts()
 
 		if t.Bytes()[0] == '/' {
 			if err = o.ExternalObjectId.SetRaw(t.String()); err != nil {
@@ -114,7 +114,7 @@ func (f *BoxTransacted) readStringFormatBox(
 				o.ExternalObjectId.Reset()
 				return
 			}
-		} else if err = o.ObjectId.ReadFromToken(t); err != nil {
+		} else if err = o.ObjectId.ReadFromTokenAndParts(t, parts); err != nil {
 			err = errors.Wrap(err)
 			o.ObjectId.Reset()
 			return

@@ -180,9 +180,8 @@ func (f *BoxCheckedOut) makeFieldObjectId(
 	}
 
 	field = string_format_writer.Field{
-		Value:              oidString,
-		DisableValueQuotes: true,
-		ColorType:          string_format_writer.ColorTypeId,
+		Value:     oidString,
+		ColorType: string_format_writer.ColorTypeId,
 	}
 
 	return
@@ -212,13 +211,6 @@ func (f *BoxCheckedOut) addFieldsObjectIdsWithFSItem(
 	}
 
 	switch {
-	// case internal.Value != "" && external.Value != "":
-	// 	if strings.HasPrefix(external.Value, strings.TrimPrefix(internal.Value, "!")) {
-	// 		box.Contents = append(box.Contents, external)
-	// 	} else {
-	// 		box.Contents = append(box.Contents, internal, external)
-	// 	}
-
 	case externalEmpty && external.Value != "":
 		box.Contents = append(box.Contents, external)
 
@@ -332,22 +324,9 @@ func (f *BoxCheckedOut) addFieldsFS(
 		return
 	}
 
-	// if co.State == checked_out_state.Untracked ||
-	// 	co.State == checked_out_state.Unknown {
-	// 	if err = f.addFieldsUntracked(co, box, item, op); err != nil {
-	// 		err = errors.Wrap(err)
-	// 		return
-	// 	}
-
-	// 	return
-	// }
-
 	var id string_format_writer.Field
 
 	switch {
-	// case co.IsImport:
-	// 	fallthrough
-
 	case m == checkout_mode.BlobOnly || m == checkout_mode.BlobRecognized:
 		id.Value = (*ids.ObjectIdStringerSansRepo)(&co.GetSkuExternal().ObjectId).String()
 
@@ -368,6 +347,7 @@ func (f *BoxCheckedOut) addFieldsFS(
 	box.Contents = append(box.Contents, id)
 
 	if co.GetState() == checked_out_state.Conflicted {
+		// TODO handle conflicted state
 	} else {
 		if err = f.addFieldsMetadata(
 			op,
@@ -423,11 +403,6 @@ func (f *BoxTransacted) addFieldFSBlob(
 	fd *fd.FD,
 	box *string_format_writer.Box,
 ) (err error) {
-	if err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	box.Contents = append(
 		box.Contents,
 		string_format_writer.Field{

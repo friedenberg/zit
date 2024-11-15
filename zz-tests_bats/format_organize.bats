@@ -5,11 +5,14 @@ setup() {
 
 	# for shellcheck SC2154
 	export output
+	export BATS_TEST_BODY=true
 }
 
 teardown() {
 	rm_from_version
 }
+
+# bats file_tags=user_story:organize
 
 function format_organize_right_align { # @test
 	wd="$(mktemp -d)"
@@ -48,6 +51,7 @@ function format_organize_right_align { # @test
 	assert_output "$(cat "$expected")"
 }
 
+# bats user_story:organize
 function format_organize_left_align { # @test
 	cd "$BATS_TEST_TMPDIR" || exit 1
 	run_zit_init_disable_age
@@ -179,6 +183,7 @@ function create_bare_object_description_line_wrap { # @test
 	EOM
 }
 
+# bats test_tags=user_story:external_ids
 function with_fields_and_instructions { # @test
 	run_zit_init_disable_age
 
@@ -197,4 +202,17 @@ function with_fields_and_instructions { # @test
 	run_zit format-organize "${cmd_def_organize[@]}" <(cat_body)
 	assert_success
 	assert_output "$(cat_body)"
+}
+
+# bats test_tags=user_story:external_ids
+function format_organize_untracked_fs_blob_with_spaces() { # @test
+	run_zit format-organize - <<-EOM
+
+		- ["test with spaces.txt"]
+	EOM
+	assert_success
+	assert_output_unsorted - <<-EOM
+
+		- ["test with spaces.txt"]
+	EOM
 }

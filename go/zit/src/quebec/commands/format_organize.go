@@ -2,10 +2,12 @@ package commands
 
 import (
 	"flag"
+	"io"
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
@@ -39,14 +41,29 @@ func (c *FormatOrganize) Run(u *env.Env, args ...string) (err error) {
 		return
 	}
 
-	var f *os.File
+	var fdee fd.FD
 
-	if f, err = files.Open(args[0]); err != nil {
+	if err = fdee.Set(args[0]); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	defer errors.DeferredCloser(&err, f)
+	var r io.Reader
+
+	if fdee.IsStdin() {
+		r = os.Stdin
+	} else {
+		var f *os.File
+
+		if f, err = files.Open(args[0]); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		r = f
+
+		defer errors.DeferredCloser(&err, f)
+	}
 
 	var ot *organize_text.Text
 
@@ -56,7 +73,7 @@ func (c *FormatOrganize) Run(u *env.Env, args ...string) (err error) {
 
 	if ot, err = readOrganizeTextOp.Run(
 		u,
-		f,
+		r,
 		organize_text.NewMetadata(repoId),
 	); err != nil {
 		err = errors.Wrap(err)

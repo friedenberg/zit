@@ -70,12 +70,12 @@ func (op Checkin) Run(
 	)
 
 	for _, co := range sortedResults {
-		internal := co.GetSkuExternal().GetSku()
+		external := co.GetSkuExternal()
 
 		if co.GetState() == checked_out_state.Untracked &&
 			(co.GetSkuExternal().GetGenre() == genres.Zettel ||
 				co.GetSkuExternal().GetGenre() == genres.Blob) {
-			if internal.Metadata.IsEmpty() {
+			if external.Metadata.IsEmpty() {
 				continue
 			}
 
@@ -87,19 +87,19 @@ func (op Checkin) Run(
 				return
 			}
 
-			internal.ObjectId.Reset()
+			external.ObjectId.Reset()
 
 			if err = u.GetStore().CreateOrUpdate(
-				internal,
+				external,
 				object_mode.ModeApplyProto,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			if op.Proto.Apply(internal, genres.Zettel) {
+			if op.Proto.Apply(external, genres.Zettel) {
 				if err = u.GetStore().CreateOrUpdate(
-					internal.GetSku(),
+					external.GetSku(),
 					object_mode.ModeEmpty,
 				); err != nil {
 					err = errors.Wrap(err)

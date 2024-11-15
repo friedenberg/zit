@@ -15,6 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_extensions"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
 )
 
 var poolObjectId2 interfaces.Pool[objectId2, *objectId2]
@@ -508,13 +509,17 @@ func (h *objectId2) SetLeft(v string) (err error) {
 // /browser/bookmark-1
 // /browser/!md
 // /browser/!md
-func (oid *objectId2) ReadFromToken(s *catgut.String) (err error) {
+func (oid *objectId2) ReadFromTokenAndParts(
+	s *catgut.String,
+	parts query_spec.TokenParts,
+) (err error) {
 	if s.Len() == 0 {
 		err = errors.Errorf("empty token")
 		return
 	}
 
-	b := s.Bytes()
+	// b := s.Bytes()
+	b := parts.Left
 
 	if b[0] == '/' {
 		oid.g = genres.Zettel
