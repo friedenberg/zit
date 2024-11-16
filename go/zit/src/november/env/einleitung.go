@@ -19,6 +19,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
@@ -183,10 +184,7 @@ func initDefaultTypeAndConfig(u *Env) (err error) {
 		}
 
 		o.Metadata.Blob.ResetWithShaLike(sh)
-		if err = o.Metadata.Type.Set(type_blobs.TypeLatest); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		o.GetMetadata().Type = builtin_types.DefaultOrPanic(genres.Type)
 
 		if err = u.GetStore().CreateOrUpdate(
 			o,

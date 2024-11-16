@@ -130,7 +130,7 @@ function outputs_organize_one_etikett { # @test
 	assert_output "$(cat_organize)"
 }
 
-function create_structured_zettels { # @test
+function format_organize_create_structured_zettels { # @test
 	run_zit_init_disable_age
 
 	function cat_body {
@@ -158,7 +158,7 @@ function create_structured_zettels { # @test
 	EOM
 }
 
-function create_bare_object_description_line_wrap { # @test
+function format_organize_create_bare_object_description_line_wrap { # @test
 	run_zit_init_disable_age
 
 	function cat_body {
@@ -184,7 +184,7 @@ function create_bare_object_description_line_wrap { # @test
 }
 
 # bats test_tags=user_story:external_ids
-function with_fields_and_instructions { # @test
+function format_organize_with_fields_and_instructions { # @test
 	run_zit_init_disable_age
 
 	function cat_body {

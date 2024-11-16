@@ -24,7 +24,7 @@ type Options struct {
 	wasMade bool
 
 	Config interface {
-		interfaces.ConfigDryRun
+		interfaces.MutableConfigDryRun
 		interfaces.ConfigGetFilters
 	}
 

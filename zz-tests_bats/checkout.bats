@@ -111,7 +111,7 @@ function checkout_binary_simple_zettel { # @test
 	EOM
 }
 
-function checkout_simple_zettel_akte_only { # @test
+function checkout_simple_zettel_blob_only { # @test
 	run_zit clean .
 	assert_success
 	# TODO fail checkouts if working directly has incompatible checkout
@@ -134,7 +134,7 @@ function checkout_zettel_several { # @test
 	EOM
 }
 
-function checkout_simple_typ { # @test
+function checkout_simple_type { # @test
 	run_zit checkout :t
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -144,7 +144,7 @@ function checkout_simple_typ { # @test
 	EOM
 }
 
-function checkout_zettel_akte_then_objekte { # @test
+function checkout_zettel_blob_then_object { # @test
 	run_zit checkout -mode blob one/uno
 	assert_success
 	assert_output - <<-EOM
@@ -199,5 +199,16 @@ function mode_both { # @test
 	assert_output_unsorted - <<-EOM
 		uno.bin
 		uno.zettel
+	EOM
+}
+
+# bats test_tags=user_story:builtin_types
+function checkout_builtin_type { # @test
+	run_zit checkout !toml-type-v1:t
+	assert_success
+	assert_output_unsorted - <<-EOM
+		      checked out [md.type @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
+		      checked out [txt.type @bf2cb7a91cdfdcc84acd1bbaaf0252ff9901977bf76128a578317a42788c4eb6 !toml-type-v1]
+		      checked out [bin.type @e07d72a74e0a01c23ddeb871751f6fcb43afec5fb81108c157537db96c6c1da0 !toml-type-v1]
 	EOM
 }

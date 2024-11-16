@@ -502,12 +502,25 @@ function show_etiketten_exact { # @test
 
 	run_zit show =tag
 	assert_success
-	assert_output_unsorted - <<-EOM
-	EOM
+	assert_output_unsorted ''
 }
 
 function show_inventory_lists { # @test
 	run_zit show :b
 	assert_success
 	assert_output
+}
+
+# bats test_tags=user_story:builtin_types
+function show_builtin_type_md { # @test
+	run_zit show -format text !toml-type-v1:t
+	assert_success
+	assert_output - <<-EOM
+		---
+		! toml-type-v1
+		---
+
+		file-extension = 'md'
+		vim-syntax-type = 'markdown'
+	EOM
 }

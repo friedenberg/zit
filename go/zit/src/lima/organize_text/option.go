@@ -163,7 +163,7 @@ func (ocf optionCommentHide) ApplyToWriter(
 }
 
 type OptionCommentDryRun struct {
-	interfaces.ConfigDryRun
+	interfaces.MutableConfigDryRun
 }
 
 func (ocf *OptionCommentDryRun) CloneOptionComment() OptionComment {

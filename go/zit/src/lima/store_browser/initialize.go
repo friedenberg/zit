@@ -1,6 +1,7 @@
 package store_browser
 
 import (
+	"context"
 	"net/url"
 	"syscall"
 
@@ -36,7 +37,7 @@ func (s *Store) initializeUrls() (err error) {
 	var req browser_items.BrowserRequestGet
 	var resp browser_items.HTTPResponseWithRequestPayloadGet
 
-	if resp, err = s.browser.Get(req); err != nil {
+	if resp, err = s.browser.GetAll(context.Background(), req); err != nil {
 		if errors.IsErrno(err, syscall.ECONNREFUSED) {
 			if !s.config.Quiet {
 				ui.Err().Print("chrest offline")

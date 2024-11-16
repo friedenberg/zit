@@ -35,10 +35,7 @@ func (s *Store) tryRealize(
 
 	if genres.Type == el.GetSku().GetGenre() {
 		if el.GetSku().GetType().IsEmpty() {
-			if err = el.GetSku().Metadata.Type.Set(builtin_types.TypeTypeLatestDefault); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+			el.GetSku().GetMetadata().Type = builtin_types.DefaultOrPanic(genres.Type)
 		}
 	}
 
@@ -332,10 +329,7 @@ func (s *Store) createTagsOrType(k *ids.ObjectId) (err error) {
 		return
 
 	case genres.Type:
-		if err = t.Metadata.Type.Set(builtin_types.TypeTypeLatestDefault); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+		t.GetMetadata().Type = builtin_types.DefaultOrPanic(genres.Type)
 
 	case genres.Tag:
 	}

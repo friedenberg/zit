@@ -16,6 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/dormant_index"
@@ -152,7 +153,8 @@ func (kc *compiled) IsInlineType(k ids.Type) (isInline bool) {
 		return true
 	}
 
-	isInline = kc.InlineTypes.ContainsKey(k.String())
+	isInline = kc.InlineTypes.ContainsKey(k.String()) ||
+		builtin_types.IsBuiltin(k)
 
 	return
 }

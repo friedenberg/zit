@@ -11,8 +11,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -205,7 +205,7 @@ func (s *Store) handleMergeResult(
 	bs := s.externalStoreSupplies.BlobStore.GetInventoryList()
 
 	if _, err = bs.WriteBlobToWriter(
-		ids.MustType(builtin_types.InventoryListTypeLatestDefault),
+		builtin_types.DefaultOrPanic(genres.InventoryList),
 		conflicted,
 		bw,
 	); err != nil {

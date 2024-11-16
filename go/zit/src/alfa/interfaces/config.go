@@ -1,9 +1,5 @@
 package interfaces
 
-type ConfigGetter interface {
-	GetKonfig() Config
-}
-
 type ImmutableConfigGetter interface {
 	GetImmutableConfig() ImmutableConfig
 }
@@ -12,7 +8,7 @@ type ImmutableConfig interface {
 	GetStoreVersion() StoreVersion
 }
 
-type ConfigDryRun interface {
+type MutableConfigDryRun interface {
 	IsDryRun() bool
 	SetDryRun(bool)
 }
@@ -29,7 +25,7 @@ type MutableConfig interface {
 	MutableStoredConfig
 	UsePrintTime() bool
 	UsePredictableZettelIds() bool
-	ConfigDryRun
+	MutableConfigDryRun
 }
 
 type Config interface {
