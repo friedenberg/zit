@@ -85,12 +85,6 @@ func (e *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
 		return
 	}
 
-	// TODO only apply dot operator when necessary
-	if err = e.ExternalStore.ApplyDotOperator(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	var ze sku.ExternalLike
 
 	if ze, err = e.ExecutionInfo.ReadExternalLikeFromObjectId(

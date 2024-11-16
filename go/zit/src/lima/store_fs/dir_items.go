@@ -282,6 +282,43 @@ func (d *dirItems) processFD(
 	return
 }
 
+func (d *dirItems) getFDsForObjectIdString(
+	objectIdString string,
+) (fds []*sku.FSItem, err error) {
+	cache := make(map[string]*sku.FSItem)
+	dir := d.dirLayout.Cwd()
+	pattern := filepath.Join(dir, fmt.Sprintf("%s*", objectIdString))
+
+	if err = d.walkDir(cache, dir, pattern); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	item := cache[objectIdString]
+
+	if item == nil {
+		err = errors.Errorf(
+			"failed to write FSItem to cache. Cache: %s, Pattern: %s, ObjectId: %s, Dir: %s",
+			cache,
+			pattern,
+			objectIdString,
+			dir,
+		)
+
+		return
+	}
+
+	if fds, err = d.processFDSet(
+		objectIdString,
+		item,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (d *dirItems) processRootDir() (err error) {
 	if d.rootProcessed {
 		return

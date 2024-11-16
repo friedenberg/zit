@@ -11,11 +11,33 @@ func (s *Store) ReadExternalLikeFromObjectId(
 	oid interfaces.ObjectId,
 	internal *sku.Transacted,
 ) (external sku.ExternalLike, err error) {
-	item, ok := s.Get(oid)
+	var results []*sku.FSItem
 
-	if !ok {
+	if results, err = s.dirItems.getFDsForObjectIdString(
+		oid.String(),
+	); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
+
+	switch len(results) {
+	case 0:
+		return
+
+	case 1:
+		break
+
+	default:
+		err = errors.Errorf(
+			"more than one FSItem (%q) matches object id (%q).",
+			results,
+			oid,
+		)
+
+		return
+	}
+
+	item := results[0]
 
 	if external, err = s.ReadExternalFromItem(o, item, internal); err != nil {
 		err = errors.Wrap(err)
