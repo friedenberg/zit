@@ -1,7 +1,9 @@
 package store_fs
 
 import (
+	"fmt"
 	"io/fs"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -60,10 +62,12 @@ func makeObjectsWithDir(
 //                                 |___/
 
 func (d *dirItems) walkDir(
-	cache map[string]*sku.FSItem, p string,
+	cache map[string]*sku.FSItem,
+	dir string,
+	pattern string,
 ) (err error) {
 	if err = filepath.WalkDir(
-		p,
+		dir,
 		func(p string, de fs.DirEntry, in error) (err error) {
 			if in != nil {
 				err = errors.Wrap(in)
@@ -74,6 +78,24 @@ func (d *dirItems) walkDir(
 				return
 			}
 
+			if de.Type()&fs.ModeSymlink != 0 {
+				if p, err = filepath.EvalSymlinks(p); err != nil {
+					err = nil
+					return
+					// err = errors.Wrap(err)
+					// return
+				}
+
+				var fi fs.FileInfo
+
+				if fi, err = os.Lstat(p); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				de = fs.FileInfoToDirEntry(fi)
+			}
+
 			if strings.HasPrefix(filepath.Base(p), ".") {
 				if de.IsDir() {
 					err = filepath.SkipDir
@@ -82,12 +104,25 @@ func (d *dirItems) walkDir(
 				return
 			}
 
-			// if de.IsDir() {
-			// 	return
-			// }
+			if pattern != "" {
+				var matched bool
+
+				if matched, err = filepath.Match(pattern, p); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				if !matched {
+					return
+				}
+			}
+
+			if de.IsDir() {
+				return
+			}
 
 			if _, _, err = d.addPathAndDirEntry(cache, p, de); err != nil {
-				err = errors.Wrap(in)
+				err = errors.Wrapf(err, "DirEntry: %s", de)
 				return
 			}
 
@@ -185,7 +220,7 @@ func (d *dirItems) processDir(p string) (results []*sku.FSItem, err error) {
 
 	results = make([]*sku.FSItem, 0)
 
-	if err = d.walkDir(cache, p); err != nil {
+	if err = d.walkDir(cache, p, ""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -214,15 +249,32 @@ func (d *dirItems) processFD(
 		return
 	}
 
-	p := filepath.Dir(fdee.GetPath())
+	dir := filepath.Dir(fdee.GetPath())
+	pattern := filepath.Join(dir, fmt.Sprintf("%s*", fdee.FileNameSansExt()))
 
-	// TODO add filter for just matching fdee
-	if err = d.walkDir(cache, p); err != nil {
+	if err = d.walkDir(cache, dir, pattern); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if fds, err = d.processFDSet(objectIdString, cache[objectIdString]); err != nil {
+	item := cache[objectIdString]
+
+	if item == nil {
+		err = errors.Errorf(
+			"failed to write FSItem to cache. Cache: %s, Pattern: %s, ObjectId: %s, Dir: %s",
+			cache,
+			pattern,
+			objectIdString,
+			dir,
+		)
+
+		panic(err)
+	}
+
+	if fds, err = d.processFDSet(
+		objectIdString,
+		item,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
