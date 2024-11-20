@@ -257,7 +257,7 @@ func (s *Store) Initialize(esi external_store.Supplies) (err error) {
 	return
 }
 
-func (s *Store) ApplyDotOperator() (err error) {
+func (s *Store) ReadAllExternalItems() (err error) {
 	if err = s.dirItems.processRootDir(); err != nil {
 		err = errors.Wrap(err)
 		return

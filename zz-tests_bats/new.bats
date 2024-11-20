@@ -8,6 +8,8 @@ setup() {
 
 	version="v$(zit store-version)"
 	copy_from_version "$DIR" "$version"
+
+	export BATS_TEST_BODY=true
 }
 
 teardown() {

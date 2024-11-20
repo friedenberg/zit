@@ -210,7 +210,7 @@ function clean_hidden { # @test
 		      checked out [one/uno.zettel @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4 zz-archive]
 	EOM
 
-	run_zit clean !md:z
+	run_zit clean !md.z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		          deleted [one/]
@@ -241,7 +241,7 @@ function clean_mode_akte { # @test
 		                   one/uno.md]
 	EOM
 
-	run_zit clean !md:z
+	run_zit clean !md.z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		          deleted [one/uno.md]

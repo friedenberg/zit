@@ -85,7 +85,7 @@ func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
 	return fs
 }
 
-func (s *Store) ApplyDotOperator() error {
+func (s *Store) ReadAllExternalItems() error {
 	return nil
 }
 

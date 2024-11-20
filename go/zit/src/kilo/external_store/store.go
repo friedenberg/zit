@@ -72,8 +72,8 @@ func (s *Store) QueryCheckedOut(
 	return
 }
 
-func (es *Store) ApplyDotOperator() (err error) {
-	esado, ok := es.StoreLike.(sku.ExternalStoreApplyDotOperator)
+func (es *Store) ReadAllExternalItems() (err error) {
+	esado, ok := es.StoreLike.(sku.ExternalStoreReadAllExternalItems)
 
 	if !ok {
 		err = errors.Errorf("store does not support %T", &esado)
@@ -85,7 +85,7 @@ func (es *Store) ApplyDotOperator() (err error) {
 		return
 	}
 
-	if err = esado.ApplyDotOperator(); err != nil {
+	if err = esado.ReadAllExternalItems(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -30,8 +30,8 @@ type (
 		) (e ExternalLike, err error)
 	}
 
-	ExternalStoreApplyDotOperator interface {
-		ApplyDotOperator() error
+	ExternalStoreReadAllExternalItems interface {
+		ReadAllExternalItems() error
 	}
 
 	ExternalStoreForQuery interface {

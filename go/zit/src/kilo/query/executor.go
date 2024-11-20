@@ -19,7 +19,7 @@ type (
 	}
 
 	ExternalStore interface {
-		sku.ExternalStoreApplyDotOperator
+		sku.ExternalStoreReadAllExternalItems
 		sku.ExternalStoreUpdateTransacted
 		sku.ExternalStoreReadExternalLikeFromObjectId
 		QueryCheckedOut
@@ -108,8 +108,7 @@ func (e *Executor) ExecuteExactlyOne() (sk *sku.Transacted, err error) {
 func (e *Executor) ExecuteSkuType(
 	out interfaces.FuncIter[sku.SkuType],
 ) (err error) {
-	// TODO only apply dot operator when necessary
-	if err = e.ExternalStore.ApplyDotOperator(); err != nil {
+	if err = e.applyDotOperatorIfNecessary(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -126,7 +125,7 @@ func (e *Executor) ExecuteTransacted(
 	out interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	// TODO only apply dot operator when necessary
-	if err = e.ExternalStore.ApplyDotOperator(); err != nil {
+	if err = e.ExternalStore.ReadAllExternalItems(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -150,7 +149,7 @@ func (e *Executor) ExecuteTransactedAsSkuType(
 	out interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	// TODO only apply dot operator when necessary
-	if err = e.ExternalStore.ApplyDotOperator(); err != nil {
+	if err = e.ExternalStore.ReadAllExternalItems(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -302,4 +301,18 @@ func (e *Executor) makeEmitSkuSigilLatestSkuType(
 
 		return
 	}
+}
+
+func (e *Executor) applyDotOperatorIfNecessary() (err error) {
+
+	if !e.dotOperatorActive && false {
+		return
+	}
+
+	if err = e.ExternalStore.ReadAllExternalItems(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
