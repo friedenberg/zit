@@ -33,16 +33,29 @@ func (a *Query) GetSigil() ids.Sigil {
 	return a.Sigil
 }
 
+func (q *Query) addPinnedObjectId(
+	b *buildState,
+	k pinnedObjectId,
+) (err error) {
+  if err = q.addExactObjectId(b, k.ObjectId, k.Sigil); err != nil {
+    err = errors.Wrap(err)
+    return
+  }
+
+	return
+}
+
 func (q *Query) addExactObjectId(
 	b *buildState,
 	k ObjectId,
+  sigil ids.Sigil,
 ) (err error) {
 	if k.ObjectId == nil {
 		err = errors.Errorf("nil object id")
 		return
 	}
 
-	q.Sigil.Add(ids.SigilLatest)
+	q.Sigil.Add(sigil)
 	q.ObjectIds[k.GetObjectId().String()] = k
 	q.Genre.Add(genres.Must(k))
 

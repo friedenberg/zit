@@ -45,6 +45,7 @@ func (op Checkout) RunWithKasten(
 		ids.MakeGenre(genres.Zettel),
 	).WithTransacted(
 		skus,
+		ids.SigilExternal,
 	).WithRequireNonEmptyQuery()
 
 	var qg *query.Group
@@ -130,11 +131,11 @@ func (op Checkout) RunQuery(
 			return
 		}
 
-		var ms *query.Group
+		var qg *query.Group
 
 		builder := op.MakeQueryBuilderExcludingHidden(ids.MakeGenre(genres.Zettel))
 
-		if ms, err = builder.WithCheckedOut(
+		if qg, err = builder.WithCheckedOut(
 			zsc,
 		).BuildQueryGroup(); err != nil {
 			err = errors.Wrap(err)
@@ -145,7 +146,7 @@ func (op Checkout) RunQuery(
 
 		if err = checkinOp.Run(
 			op.Env,
-			ms,
+			qg,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -202,6 +203,7 @@ func (op Checkout) runOrganize(
 		ids.MakeGenre(genres.TrueGenre()...),
 	).WithTransacted(
 		changeResults.After.AsTransactedSet(),
+		ids.SigilExternal,
 	).WithDoNotMatchEmpty().WithRequireNonEmptyQuery()
 
 	if qgModified, err = b.BuildQueryGroup(); err != nil {

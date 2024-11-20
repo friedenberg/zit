@@ -25,7 +25,7 @@ type buildState struct {
 	missingBlobs []ErrBlobMissing
 
 	luaVMPoolBuilder        *lua.VMPoolBuilder
-	pinnedObjectIds         []ObjectId
+	pinnedObjectIds         []pinnedObjectId
 	pinnedExternalObjectIds []sku.ExternalObjectId
 	repo                    sku.ExternalStoreForQuery
 	eqo                     sku.ExternalQueryOptions
@@ -124,7 +124,7 @@ func (b *buildState) build(
 	for _, k := range b.pinnedObjectIds {
 		q := b.makeQuery()
 
-		if err = q.addExactObjectId(b, k); err != nil {
+		if err = q.addPinnedObjectId(b, k); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -266,25 +266,19 @@ LOOP:
 				return
 			}
 
+			pid := pinnedObjectId{
+				Sigil:    ids.SigilLatest,
+				ObjectId: k,
+			}
+
 			switch k.GetGenre() {
-			case genres.InventoryList:
+			case genres.InventoryList, genres.Zettel:
 				b.pinnedObjectIds = append(
 					b.pinnedObjectIds,
-					k,
+					pid,
 				)
 
-				if err = q.addExactObjectId(b, k); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-			case genres.Zettel:
-				b.pinnedObjectIds = append(
-					b.pinnedObjectIds,
-					k,
-				)
-
-				if err = q.addExactObjectId(b, k); err != nil {
+				if err = q.addPinnedObjectId(b, pid); err != nil {
 					err = errors.Wrap(err)
 					return
 				}

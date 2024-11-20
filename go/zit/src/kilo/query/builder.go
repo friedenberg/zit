@@ -35,7 +35,7 @@ type Builder struct {
 	blob_store              *blob_store.VersionedStores
 	object_probe_index      sku.ObjectProbeIndex
 	luaVMPoolBuilder        *lua.VMPoolBuilder
-	pinnedObjectIds         []ObjectId
+	pinnedObjectIds         []pinnedObjectId
 	pinnedExternalObjectIds []sku.ExternalObjectId
 	repoGetter              sku.ExternalStoreForQueryGetter
 	repoId                  ids.RepoId
@@ -62,7 +62,7 @@ func (b *Builder) makeState() *buildState {
 
 	state.qg = state.makeGroup()
 
-	state.pinnedObjectIds = make([]ObjectId, len(b.pinnedObjectIds))
+	state.pinnedObjectIds = make([]pinnedObjectId, len(b.pinnedObjectIds))
 	copy(state.pinnedObjectIds, b.pinnedObjectIds)
 
 	state.pinnedExternalObjectIds = make(
@@ -145,9 +145,12 @@ func (b *Builder) WithExternalLike(
 		if t.GetExternalObjectId().IsEmpty() {
 			b.pinnedObjectIds = append(
 				b.pinnedObjectIds,
-				ObjectId{
-					Exact:    true,
-					ObjectId: t.GetObjectId(),
+				pinnedObjectId{
+					Sigil: ids.SigilExternal,
+					ObjectId: ObjectId{
+						Exact:    true,
+						ObjectId: t.GetObjectId(),
+					},
 				},
 			)
 		} else {
@@ -172,13 +175,17 @@ func (b *Builder) WithExternalLike(
 
 func (b *Builder) WithTransacted(
 	zts sku.TransactedSet,
+	sigil ids.Sigil,
 ) *Builder {
 	errors.PanicIfError(zts.Each(
 		func(t *sku.Transacted) (err error) {
 			b.pinnedObjectIds = append(
 				b.pinnedObjectIds,
-				ObjectId{
-					ObjectId: t.ObjectId.Clone(),
+				pinnedObjectId{
+					Sigil: sigil,
+					ObjectId: ObjectId{
+						ObjectId: t.ObjectId.Clone(),
+					},
 				},
 			)
 
@@ -195,8 +202,12 @@ func (b *Builder) WithCheckedOut(
 	for co := range cos.All() {
 		b.pinnedObjectIds = append(
 			b.pinnedObjectIds,
-			ObjectId{
-				ObjectId: co.GetSku().ObjectId.Clone(),
+			pinnedObjectId{
+				Sigil: ids.SigilExternal,
+				ObjectId: ObjectId{
+					Exact:    true,
+					ObjectId: co.GetSku().ObjectId.Clone(),
+				},
 			},
 		)
 	}
