@@ -2,53 +2,22 @@ package sku
 
 import (
 	"encoding/gob"
-	"fmt"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 var (
-	transactedKeyerObjectId   ids.ObjectIdKeyer[*Transacted]
+	transactedKeyerObjectId   ObjectIdKeyer[*Transacted]
 	externalLikeKeyerObjectId ExternalObjectIdKeyer[ExternalLike]
-	checkedOutKeyerObjectId   ids.ObjectIdKeyer[*CheckedOut]
+	checkedOutKeyerObjectId   ObjectIdKeyer[*CheckedOut]
 	TransactedSetEmpty        TransactedSet
 	TransactedLessor          transactedLessor
 	TransactedEqualer         transactedEqualer
 )
 
 type Collection interfaces.Collection[*Transacted]
-
-type ExternalObjectIdKeyer[
-	T interface {
-		ids.ObjectIdGetter
-		ExternalObjectIdGetter
-		TransactedGetter
-		ExternalLikeGetter
-	},
-] struct{}
-
-func (ExternalObjectIdKeyer[T]) GetKey(el T) string {
-	eoid := el.GetExternalObjectId()
-
-	if !eoid.IsEmpty() {
-		return eoid.String()
-	}
-
-	if !el.GetSkuExternal().ObjectId.IsEmpty() {
-		return el.GetSkuExternal().ObjectId.String()
-	}
-
-	desc := el.GetSkuExternal().Metadata.Description.String()
-
-	if desc != "" {
-		return desc
-	}
-
-	panic(fmt.Sprintf("empty key for external like: %#v", el))
-}
 
 func init() {
 	gob.Register(transactedKeyerObjectId)

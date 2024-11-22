@@ -9,6 +9,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 )
 
+type ObjectIdGetter interface {
+	GetObjectId() *ObjectId
+}
+
 func GetObjectIdPool() interfaces.Pool[ObjectId, *ObjectId] {
 	return getObjectIdPool2()
 }
