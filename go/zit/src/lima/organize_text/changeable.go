@@ -12,27 +12,6 @@ import (
 
 var keyer = sku.GetExternalLikeKeyer[sku.SkuType]()
 
-func key(el sku.SkuType) string {
-	key := keyer.GetKey(el)
-	return key
-}
-
-// TODO explore using shas as keys
-func keySha(el sku.SkuType) string {
-	objectSha := &el.GetSkuExternal().Metadata.SelfMetadataWithoutTai
-
-	if objectSha.IsNull() {
-		panic("empty object sha")
-	}
-
-	return fmt.Sprintf(
-		"%s.%s.%s",
-		el.GetObjectId(),
-		el.GetExternalObjectId(),
-		objectSha,
-	)
-}
-
 func (ot *Text) GetSkus(
 	original sku.SkuTypeSet,
 ) (out SkuMapWithOrder, err error) {
@@ -65,7 +44,7 @@ func (a *Assignment) addToSet(
 	for _, organizeObject := range a.All() {
 		var outputObject sku.SkuType
 
-		objectKey := key(organizeObject.sku)
+		objectKey := keyer.GetKey(organizeObject.sku)
 
 		previouslyProcessedObject, wasPreviouslyProcessed := output.m[objectKey]
 

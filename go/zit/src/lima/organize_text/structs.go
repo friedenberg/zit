@@ -142,8 +142,8 @@ func (os Objects) Sort() {
 	sort.Slice(os, func(i, j int) bool {
 		ei, ej := os[i].sku, os[j].sku
 
-		keyI := key(ei)
-		keyJ := key(ej)
+		keyI := keyer.GetKey(ei)
+		keyJ := keyer.GetKey(ej)
 
 		return keyI < keyJ
 	})

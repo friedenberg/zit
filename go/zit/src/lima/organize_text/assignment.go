@@ -38,7 +38,7 @@ type Assignment struct {
 }
 
 func (a *Assignment) AddObject(v *obj) (err error) {
-	k := key(v.sku)
+	k := keyer.GetKey(v.sku)
 	_, ok := a.objects[k]
 
 	if ok {

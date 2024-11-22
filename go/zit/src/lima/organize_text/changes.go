@@ -53,12 +53,12 @@ func (smwo *SkuMapWithOrder) AsTransactedSet() sku.TransactedMutableSet {
 }
 
 func (sm *SkuMapWithOrder) Del(sk sku.SkuType) error {
-	delete(sm.m, key(sk))
+	delete(sm.m, keyer.GetKey(sk))
 	return nil
 }
 
 func (sm *SkuMapWithOrder) Add(sk sku.SkuType) error {
-	k := key(sk)
+	k := keyer.GetKey(sk)
 	entry, ok := sm.m[k]
 
 	if !ok {
@@ -116,7 +116,7 @@ func (sm *SkuMapWithOrder) Each(
 	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
 	for _, v := range sm.Sorted() {
-		_, ok := sm.m[key(v)]
+		_, ok := sm.m[keyer.GetKey(v)]
 
 		if !ok {
 			continue
