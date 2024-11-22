@@ -10,24 +10,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+var keyer = sku.GetExternalLikeKeyer[sku.SkuType]()
+
 func key(el sku.SkuType) string {
-	eoid := el.GetExternalObjectId().String()
-	if len(eoid) > 1 {
-		return eoid
-	}
-
-	oid := el.GetSkuExternal().ObjectId.String()
-
-	if len(oid) > 1 {
-		return oid
-	}
-
-	desc := el.GetSkuExternal().Metadata.Description.String()
-	if desc != "" {
-		return desc
-	}
-
-	panic(fmt.Sprintf("empty key for external like: %s", el))
+	key := keyer.GetKey(el)
+	return key
 }
 
 // TODO explore using shas as keys

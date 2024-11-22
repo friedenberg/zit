@@ -215,14 +215,20 @@ func (k2 *objectId2) SetGenre(g interfaces.GenreGetter) {
 	}
 }
 
-func (k2 *objectId2) IsEmpty() bool {
-	if k2.g == genres.Zettel {
-		if k2.left.IsEmpty() && k2.right.IsEmpty() {
+func (oid *objectId2) IsEmpty() bool {
+	switch oid.g {
+	case genres.None:
+		if oid.left.String() == "/" && oid.right.IsEmpty() {
+			return true
+		}
+
+	case genres.Zettel, genres.Blob:
+		if oid.left.IsEmpty() && oid.right.IsEmpty() {
 			return true
 		}
 	}
 
-	return k2.left.Len() == 0 && k2.middle == 0 && k2.right.Len() == 0
+	return oid.left.Len() == 0 && oid.middle == 0 && oid.right.Len() == 0
 }
 
 func (k2 *objectId2) Len() int {
