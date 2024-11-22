@@ -26,7 +26,13 @@ type Group struct {
 }
 
 func (qg *Group) DotOperatorActive() bool {
-	return qg.dotOperatorActive
+	for _, oq := range qg.OptimizedQueries {
+		if oq.Sigil.ContainsOneOf(ids.SigilExternal) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (qg *Group) SetIncludeHistory() {
