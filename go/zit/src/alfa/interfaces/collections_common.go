@@ -18,15 +18,6 @@ type Lenner interface {
 	Len() int
 }
 
-type StringKeyer[T any] interface {
-	GetKey(T) string
-}
-
-type StringKeyerPtr[T any, TPtr Ptr[T]] interface {
-	StringKeyer[T]
-	GetKeyPtr(TPtr) string
-}
-
 type ContainsKeyer interface {
 	ContainsKey(string) bool
 }

@@ -6,16 +6,35 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 var (
 	transactedKeyerObjectId   ObjectIdKeyer[*Transacted]
-	externalLikeKeyerObjectId ExternalObjectIdKeyer[ExternalLike]
-	checkedOutKeyerObjectId   ObjectIdKeyer[*CheckedOut]
-	TransactedSetEmpty        TransactedSet
-	TransactedLessor          transactedLessor
-	TransactedEqualer         transactedEqualer
+	externalLikeKeyerObjectId = interfaces.CompoundKeyer[ExternalLike]{
+		ObjectIdKeyer[ExternalLike]{},
+		ExternalObjectIdKeyer[ExternalLike]{},
+		DescriptionKeyer[ExternalLike]{},
+	}
+	checkedOutKeyerObjectId ObjectIdKeyer[*CheckedOut]
+	TransactedSetEmpty      TransactedSet
+	TransactedLessor        transactedLessor
+	TransactedEqualer       transactedEqualer
 )
+
+func GetExternalLikeKeyer[
+	T interface {
+		ExternalObjectIdGetter
+		ids.ObjectIdGetter
+		ExternalLikeGetter
+	},
+]() interfaces.StringKeyer[T] {
+	return interfaces.CompoundKeyer[T]{
+		ObjectIdKeyer[T]{},
+		ExternalObjectIdKeyer[T]{},
+		DescriptionKeyer[T]{},
+	}
+}
 
 type Collection interfaces.Collection[*Transacted]
 
