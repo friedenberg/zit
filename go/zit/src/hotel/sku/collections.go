@@ -26,7 +26,7 @@ type ExternalObjectIdKeyer[
 		ids.ObjectIdGetter
 		ExternalObjectIdGetter
 		TransactedGetter
-    ExternalLikeGetter
+		ExternalLikeGetter
 	},
 ] struct{}
 

@@ -117,6 +117,7 @@ func (fd *FD) SetWithBlobWriterFactory(
 
 	fd.path = p
 	fd.sha.SetShaLike(blobWriter)
+	fd.state = StateStored
 
 	return
 }
@@ -137,6 +138,8 @@ func (f *FD) SetFileInfoWithDir(fi os.FileInfo, dir string) (err error) {
 		return
 	}
 
+	f.state = StateFileInfo
+
 	return
 }
 
@@ -156,6 +159,7 @@ func (fd *FD) SetIgnoreNotExists(v string) (err error) {
 	}
 
 	fd.path = filepath.Clean(v)
+	fd.state = StateFileInfo
 
 	return
 }
@@ -335,7 +339,7 @@ func (dst *FD) ResetWith(src *FD) {
 	dst.isDir = src.isDir
 	dst.path = src.path
 	dst.modTime = src.modTime
-	errors.PanicIfError(dst.sha.SetShaLike(&src.sha))
+	dst.sha.ResetWith(&src.sha)
 }
 
 func (src *FD) Clone() (dst *FD) {
@@ -344,6 +348,6 @@ func (src *FD) Clone() (dst *FD) {
 	dst.isDir = src.isDir
 	dst.path = src.path
 	dst.modTime = src.modTime
-	errors.PanicIfError(dst.sha.SetShaLike(&src.sha))
+	dst.sha.ResetWith(&src.sha)
 	return
 }

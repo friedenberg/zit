@@ -131,6 +131,7 @@ func MakeFromFileInfoWithDir(
 	}
 
 	fd.sha.SetShaLike(aw)
+	fd.state = StateStored
 
 	return
 }
