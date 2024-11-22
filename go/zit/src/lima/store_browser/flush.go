@@ -36,7 +36,7 @@ func (s *Store) flushUrls() (err error) {
 	}
 
 	if !s.config.DryRun {
-		if resp, err = s.browser.Put(context.Background(), req); err != nil {
+		if resp, err = s.browser.PutAll(context.Background(), req); err != nil {
 			if errors.IsErrno(err, syscall.ECONNREFUSED) {
 				ui.Err().Print("chrest offline")
 				err = nil

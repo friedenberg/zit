@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -37,10 +36,10 @@ func (q *Query) addPinnedObjectId(
 	b *buildState,
 	k pinnedObjectId,
 ) (err error) {
-  if err = q.addExactObjectId(b, k.ObjectId, k.Sigil); err != nil {
-    err = errors.Wrap(err)
-    return
-  }
+	if err = q.addExactObjectId(b, k.ObjectId, k.Sigil); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
@@ -48,7 +47,7 @@ func (q *Query) addPinnedObjectId(
 func (q *Query) addExactObjectId(
 	b *buildState,
 	k ObjectId,
-  sigil ids.Sigil,
+	sigil ids.Sigil,
 ) (err error) {
 	if k.ObjectId == nil {
 		err = errors.Errorf("nil object id")
@@ -296,7 +295,6 @@ func (q *Query) ContainsExternalSku(el sku.ExternalLike) (ok bool) {
 	g := genres.Must(sk)
 
 	if !q.Genre.ContainsOneOf(g) {
-		ui.Debug().Print(g, q.Genre)
 		return
 	}
 

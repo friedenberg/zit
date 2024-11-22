@@ -26,9 +26,9 @@ type Group struct {
 }
 
 func (qg *Group) DotOperatorActive() bool {
-  if qg.dotOperatorActive {
-    return true
-  }
+	if qg.dotOperatorActive {
+		return true
+	}
 
 	for _, oq := range qg.OptimizedQueries {
 		if oq.Sigil.ContainsOneOf(ids.SigilExternal) {
@@ -438,7 +438,9 @@ func (qg *Group) ContainsExternalSku(
 	return
 }
 
-func (qg *Group) ContainsSkuCheckedOutState(state checked_out_state.State) (ok bool) {
+func (qg *Group) ContainsSkuCheckedOutState(
+	state checked_out_state.State,
+) (ok bool) {
 	switch state {
 	case checked_out_state.Untracked:
 		ok = !qg.ExcludeUntracked

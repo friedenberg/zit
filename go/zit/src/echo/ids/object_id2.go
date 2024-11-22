@@ -430,6 +430,10 @@ func (h *objectId2) SetWithIdLike(
 
 		if len(mid) >= 1 {
 			h.middle = mid[0]
+
+			if h.middle == '%' {
+				h.virtual = true
+			}
 		}
 
 		if err = h.right.Set(p[2]); err != nil {
@@ -749,6 +753,11 @@ func (a *objectId2) ResetWith(b *objectId2) {
 	b.left.CopyTo(&a.left)
 	b.right.CopyTo(&a.right)
 	a.middle = b.middle
+
+	if a.middle == '%' {
+		a.virtual = true
+	}
+
 	b.repoId.CopyTo(&a.repoId)
 }
 
