@@ -130,6 +130,7 @@ func (e *Executor) ExecuteTransacted(
 		return
 	}
 
+  // TODO tease apart the reliance on dotOperatorActive here
 	if e.dotOperatorActive {
 		if err = e.executeExternalQuery(out); err != nil {
 			err = errors.Wrap(err)
