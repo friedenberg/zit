@@ -15,6 +15,11 @@ func main() {
 
 	errors.MakeSIGINTWatchChannelAndCancelContextIfNecessary(cancel)
 
+	go func() {
+		<-ctx.Done()
+		os.Exit(1)
+	}()
+
 	exitStatus := commands.Run(
 		errors.ContextOrdinary{
 			Context: ctx,
