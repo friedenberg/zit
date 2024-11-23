@@ -282,3 +282,24 @@ func (s *Store) ReadCheckedOutFromTransacted(
 
 	return
 }
+
+func (s *Store) UpdateTransactedFromBlobs(
+	co *sku.CheckedOut,
+) (err error) {
+	external := co.GetSkuExternal()
+
+	repoId := co.GetRepoId()
+	es, ok := s.externalStores[repoId]
+
+	if !ok {
+		err = errors.Errorf("no kasten with id %q", repoId)
+		return
+	}
+
+	if err = es.UpdateTransactedFromBlobs(external); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}

@@ -1,6 +1,9 @@
 schema = 3
 
 [mod]
+  [mod."code.linenisgreat.com/chrest/go"]
+    version = "v0.0.0-20241116161136-b70cd937c987"
+    hash = "sha256-TZcp1cEwMDF+5hD1goJMUxl7LtTUjdPdrz9irptpYjM="
   [mod."filippo.io/age"]
     version = "v1.1.1"
     hash = "sha256-LRxxJQLQkzoCNYGS/XBixVmYXoZ1mPHKvFicPGXYLcw="

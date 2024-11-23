@@ -41,6 +41,10 @@ type (
 
 	UpdateTransacted = sku.ExternalStoreUpdateTransacted
 
+	UpdateTransactedFromBlobs interface {
+		UpdateTransactedFromBlobs(sku.ExternalLike) (err error)
+	}
+
 	Open interface {
 		Open(
 			m checkout_mode.Mode,

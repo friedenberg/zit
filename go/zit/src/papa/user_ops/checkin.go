@@ -79,9 +79,8 @@ func (op Checkin) Run(
 				continue
 			}
 
-			// TODO make generic to external stores
-			if err = u.GetStore().GetStoreFS().UpdateTransactedFromBlobs(
-				co.GetSkuExternal(),
+			if err = u.GetStore().UpdateTransactedFromBlobs(
+				co,
 			); err != nil {
 				err = errors.Wrap(err)
 				return

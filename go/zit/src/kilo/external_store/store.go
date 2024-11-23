@@ -222,6 +222,27 @@ func (s *Store) UpdateTransacted(z *sku.Transacted) (err error) {
 	return
 }
 
+func (s *Store) UpdateTransactedFromBlobs(z sku.ExternalLike) (err error) {
+	es, ok := s.StoreLike.(UpdateTransactedFromBlobs)
+
+	if !ok {
+		err = makeErrUnsupportedOperation(s, &es)
+		return
+	}
+
+	if err = s.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = es.UpdateTransactedFromBlobs(z); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (es *Store) GetObjectIdsForString(v string) (k []sku.ExternalObjectId, err error) {
 	if es == nil {
 		err = collections.MakeErrNotFoundString(v)
