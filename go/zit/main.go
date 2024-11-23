@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"os"
-	"os/signal"
-	"syscall"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
@@ -15,9 +13,15 @@ func main() {
 	ctx, cancel := context.WithCancelCause(context.Background())
 	defer cancel(nil)
 
-	makeSIGINTWatchChannelAndCancelContextIfNecessary(cancel)
+	errors.MakeSIGINTWatchChannelAndCancelContextIfNecessary(cancel)
 
-	exitStatus := commands.Run(ctx, cancel, os.Args...)
+	exitStatus := commands.Run(
+		errors.ContextOrdinary{
+			Context: ctx,
+		},
+		cancel,
+		os.Args...,
+	)
 
 	if err := context.Cause(ctx); err != nil {
 		var normalError errors.StackTracer
@@ -36,18 +40,4 @@ func main() {
 	}
 
 	os.Exit(exitStatus)
-}
-
-func makeSIGINTWatchChannelAndCancelContextIfNecessary(
-	cancel context.CancelCauseFunc,
-) {
-	ch := make(chan os.Signal, 1)
-
-	signal.Notify(ch, syscall.SIGINT)
-
-	go func() {
-		<-ch
-		cancel(nil)
-		os.Exit(1)
-	}()
 }

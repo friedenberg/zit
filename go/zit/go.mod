@@ -21,3 +21,7 @@ require (
 	golang.org/x/crypto v0.21.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect
 )
+
+replace (
+	code.linenisgreat.com/chrest/go v0.0.0-20241116161136-b70cd937c987 => /Users/sasha.friedenberg/eng/chrest/go
+)

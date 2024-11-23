@@ -1,4 +1,4 @@
-package alfred
+package alfred_sku
 
 import (
 	"fmt"
@@ -14,30 +14,31 @@ import (
 )
 
 type Writer struct {
-	alfredWriter *alfred.Writer
+	alfredWriter alfred.Writer
 	abbr         ids.Abbr
 	organizeFmt  interfaces.StringFormatWriter[*sku.Transacted]
+	alfred.ItemPool
 }
 
 func New(
 	out io.Writer,
 	abbr ids.Abbr,
 	organizeFmt interfaces.StringFormatWriter[*sku.Transacted],
+	aw alfred.Writer,
+	itemPool alfred.ItemPool,
 ) (w *Writer, err error) {
-	var aw *alfred.Writer
-
-	if aw, err = alfred.NewWriter(out); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	w = &Writer{
 		abbr:         abbr,
 		alfredWriter: aw,
 		organizeFmt:  organizeFmt,
+		ItemPool:     itemPool,
 	}
 
 	return
+}
+
+func (w *Writer) SetWriter(alfredWriter alfred.Writer) {
+	w.alfredWriter = alfredWriter
 }
 
 func (w *Writer) PrintOne(z *sku.Transacted) (err error) {
@@ -59,7 +60,7 @@ func (w *Writer) PrintOne(z *sku.Transacted) (err error) {
 		item = w.etikettToItem(z, &e)
 
 	default:
-		item = w.alfredWriter.Get()
+		item = w.Get()
 		item.Title = fmt.Sprintf("not implemented for gattung: %q", g)
 		item.Subtitle = fmt.Sprintf("%s", sku_fmt_debug.StringTaiGenreObjectIdShaBlob(z))
 	}
@@ -69,7 +70,7 @@ func (w *Writer) PrintOne(z *sku.Transacted) (err error) {
 	return
 }
 
-func (w *Writer) WriteHinweis(e ids.ZettelId) (n int64, err error) {
+func (w *Writer) WriteZettelId(e ids.ZettelId) (n int64, err error) {
 	item := w.zettelIdToItem(e)
 	w.alfredWriter.WriteItem(item)
 	return
@@ -80,8 +81,18 @@ func (w *Writer) WriteError(in error) (n int64, out error) {
 		return 0, nil
 	}
 
-	item := w.errorToItem(in)
-	w.alfredWriter.WriteItem(item)
+	var em errors.Multi
+
+	if errors.As(in, &em) {
+		for _, err := range em.Errors() {
+			item := w.errorToItem(err)
+			w.alfredWriter.WriteItem(item)
+		}
+	} else {
+		item := w.errorToItem(in)
+		w.alfredWriter.WriteItem(item)
+	}
+
 	return
 }
 

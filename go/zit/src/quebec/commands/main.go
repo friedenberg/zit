@@ -14,7 +14,7 @@ import (
 
 // TODO switch to returning result
 func Run(
-	ctx context.Context,
+	ctx errors.ContextOrdinary,
 	cancel context.CancelCauseFunc,
 	args ...string,
 ) (exitStatus int) {

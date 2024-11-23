@@ -37,7 +37,16 @@ func (s *Store) initializeUrls() (err error) {
 	var req browser_items.BrowserRequestGet
 	var resp browser_items.HTTPResponseWithRequestPayloadGet
 
-	if resp, err = s.browser.GetAll(context.Background(), req); err != nil {
+	ui.Log().Print("getting all")
+
+  ctx := context.Background()
+  ctxWithTimeout, cancel := context.WithTimeout(ctx, 1e9)
+  defer cancel()
+
+	if resp, err = s.browser.GetAll(
+    ctxWithTimeout,
+    req,
+  ); err != nil {
 		if errors.IsErrno(err, syscall.ECONNREFUSED) {
 			if !s.config.Quiet {
 				ui.Err().Print("chrest offline")
@@ -49,6 +58,8 @@ func (s *Store) initializeUrls() (err error) {
 			return
 		}
 	}
+
+	ui.Log().Print("got all")
 
 	s.urls = make(map[url.URL][]Item, len(resp.RequestPayloadGet))
 

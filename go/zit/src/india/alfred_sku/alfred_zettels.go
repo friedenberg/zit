@@ -1,4 +1,4 @@
-package alfred
+package alfred_sku
 
 import (
 	"fmt"
@@ -67,7 +67,7 @@ func (w *Writer) addCommonMatches(
 func (w *Writer) zettelToItem(
 	z *sku.Transacted,
 ) (a *alfred.Item) {
-	a = w.alfredWriter.Get()
+	a = w.Get()
 
 	a.Title = z.Metadata.Description.String()
 
@@ -114,7 +114,7 @@ func (w *Writer) etikettToItem(
 	z *sku.Transacted,
 	e *ids.Tag,
 ) (a *alfred.Item) {
-	a = w.alfredWriter.Get()
+	a = w.Get()
 
 	a.Title = "@" + e.String()
 
@@ -129,15 +129,15 @@ func (w *Writer) etikettToItem(
 }
 
 func (w *Writer) errorToItem(err error) (a *alfred.Item) {
-	a = w.alfredWriter.Get()
+	a = w.Get()
 
-	a.Title = err.Error()
+	a.Title = errors.Unwrap(err).Error()
 
 	return
 }
 
 func (w *Writer) zettelIdToItem(e ids.ZettelId) (a *alfred.Item) {
-	a = w.alfredWriter.Get()
+	a = w.Get()
 
 	a.Title = e.String()
 

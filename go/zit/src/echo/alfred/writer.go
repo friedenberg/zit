@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
 
-type Writer struct {
+type writer struct {
 	wBuf        *bufio.Writer
 	jsonEncoder *json.Encoder
 
@@ -16,15 +16,16 @@ type Writer struct {
 	chDone chan struct{}
 
 	afterFirstWrite bool
+
 	ItemPool
 }
 
-func NewWriter(out io.Writer) (w *Writer, err error) {
-	w = &Writer{
-		wBuf:     bufio.NewWriter(out),
-		chItem:   make(chan *Item),
-		chDone:   make(chan struct{}),
-		ItemPool: MakeItemPool(),
+func NewWriter(out io.Writer, itemPool ItemPool) (w *writer, err error) {
+	w = &writer{
+		wBuf:   bufio.NewWriter(out),
+		chItem: make(chan *Item),
+		chDone: make(chan struct{}),
+    ItemPool: itemPool,
 	}
 
 	w.jsonEncoder = json.NewEncoder(w.wBuf)
@@ -37,7 +38,7 @@ func NewWriter(out io.Writer) (w *Writer, err error) {
 	return
 }
 
-func (w *Writer) open() (err error) {
+func (w *writer) open() (err error) {
 	_, err = w.wBuf.WriteString("{\"items\":[\n")
 
 	go func() {
@@ -56,21 +57,20 @@ func (w *Writer) open() (err error) {
 	return
 }
 
-func (w *Writer) WriteItem(i *Item) {
+func (w *writer) WriteItem(i *Item) {
 	w.chItem <- i
 }
 
-func (w *Writer) setAfterFirstWrite() {
+func (w *writer) setAfterFirstWrite() {
 	w.afterFirstWrite = true
 }
 
-func (w *Writer) writeItem(i *Item) (err error) {
+func (w *writer) writeItem(i *Item) (err error) {
 	if i == nil {
 		panic("item was nil")
 	}
 
 	defer w.setAfterFirstWrite()
-	defer w.Put(i)
 
 	if w.afterFirstWrite {
 		if _, err = io.WriteString(w.wBuf, ","); err != nil {
@@ -84,10 +84,12 @@ func (w *Writer) writeItem(i *Item) (err error) {
 		return
 	}
 
+	w.Put(i)
+
 	return
 }
 
-func (w *Writer) Close() (err error) {
+func (w *writer) Close() (err error) {
 	close(w.chItem)
 	<-w.chDone
 

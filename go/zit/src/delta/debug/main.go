@@ -1,7 +1,6 @@
 package debug
 
 import (
-	"context"
 	"os"
 	"runtime/debug"
 	"runtime/pprof"
@@ -16,7 +15,10 @@ type Context struct {
 	options                                Options
 }
 
-func MakeContext(ctx context.Context, options Options) (c *Context, err error) {
+func MakeContext(
+	ctx errors.ContextOrdinary,
+	options Options,
+) (c *Context, err error) {
 	c = &Context{
 		options: options,
 	}
