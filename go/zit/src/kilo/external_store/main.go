@@ -60,6 +60,12 @@ type (
 		) (err error)
 	}
 
+	ReadCheckedOutFromTransacted interface {
+		ReadCheckedOutFromTransacted(
+			sk *sku.Transacted,
+		) (co *sku.CheckedOut, err error)
+	}
+
 	QueryCheckedOut = query.QueryCheckedOut
 
 	Supplies struct {

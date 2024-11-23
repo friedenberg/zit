@@ -266,18 +266,19 @@ func (s *Store) UpdateTransactedWithExternal(
 }
 
 func (s *Store) ReadCheckedOutFromTransacted(
-	kasten ids.RepoId,
+	repoId ids.RepoId,
 	sk *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
-	switch kasten.GetRepoIdString() {
-	case "browser":
-		err = todo.Implement()
+	es, ok := s.externalStores[repoId]
 
-	default:
-		if co, err = s.storeFS.ReadCheckedOutFromTransacted(sk); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if !ok {
+		err = errors.Errorf("no kasten with id %q", repoId)
+		return
+	}
+
+	if co, err = es.ReadCheckedOutFromTransacted(sk); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

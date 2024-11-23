@@ -331,3 +331,26 @@ func (s *Store) UpdateCheckoutFromCheckedOut(
 
 	return
 }
+
+func (s *Store) ReadCheckedOutFromTransacted(
+	sk *sku.Transacted,
+) (co *sku.CheckedOut, err error) {
+	es, ok := s.StoreLike.(ReadCheckedOutFromTransacted)
+
+	if !ok {
+		err = makeErrUnsupportedOperation(s, &s)
+		return
+	}
+
+	if err = s.Initialize(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if co, err = es.ReadCheckedOutFromTransacted(sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
