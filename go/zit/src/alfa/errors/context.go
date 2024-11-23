@@ -35,7 +35,6 @@ func MakeSignalWatchChannelAndCancelContextIfNecessary(
 	go func() {
 		<-ch
 		cancel(nil)
-		os.Exit(1)
 	}()
 }
 
