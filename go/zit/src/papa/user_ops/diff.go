@@ -29,32 +29,28 @@ type Diff struct {
 }
 
 func (op Diff) Run(
-	col sku.SkuType,
+	remoteCheckedOut sku.SkuType,
 	options object_metadata.TextFormatterOptions,
 ) (err error) {
-	ok := false
-	co := col
+	var localCheckedOut sku.SkuType
 
-	// TODO determine conditions when a checkout needs to happen
-	if !ok {
-		if col, err = op.GetStore().GetStoreFS().CheckoutOne(
+	{
+		if localCheckedOut, err = op.GetStore().GetStoreFS().CheckoutOne(
 			checkout_options.Options{
 				CheckoutMode: checkout_mode.MetadataAndBlob,
 				OptionsWithoutMode: checkout_options.OptionsWithoutMode{
 					Path: checkout_options.PathTempLocal,
 				},
 			},
-			col.GetSku(),
+			remoteCheckedOut.GetSku(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		co = col
-
 		defer errors.Deferred(&err, func() (err error) {
-			if err = op.GetStore().GetStoreFS().DeleteCheckedOut(
-				co,
+			if err = op.GetStore().GetStoreFS().DeleteCheckedOutInternal(
+				localCheckedOut,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -65,22 +61,23 @@ func (op Diff) Run(
 	}
 
 	wg := quiter.MakeErrorWaitGroupParallel()
+
 	var mode checkout_mode.Mode
 
-	il := co.GetSku()
-	ilCtx := object_metadata.TextFormatterContext{
-		PersistentFormatterContext: il,
+	local := localCheckedOut.GetSku()
+	localContext := object_metadata.TextFormatterContext{
+		PersistentFormatterContext: local,
 		TextFormatterOptions:       options,
 	}
 
-	el := co.GetSkuExternal()
-	elCtx := object_metadata.TextFormatterContext{
-		PersistentFormatterContext: el,
+	remote := remoteCheckedOut.GetSkuExternal()
+	remoteCtx := object_metadata.TextFormatterContext{
+		PersistentFormatterContext: remote,
 		TextFormatterOptions:       options,
 	}
 
 	if mode, err = op.GetStore().GetStoreFS().GetCheckoutModeOrError(
-		el,
+		remote,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -101,12 +98,12 @@ func (op Diff) Run(
 	}
 
 	// sameTyp := il.GetTyp().Equals(el.GetTyp())
-	internalInline := op.GetConfig().IsInlineType(il.GetType())
-	externalInline := op.GetConfig().IsInlineType(el.GetType())
+	internalInline := op.GetConfig().IsInlineType(local.GetType())
+	externalInline := op.GetConfig().IsInlineType(remote.GetType())
 
 	var fds *sku.FSItem
 
-	if fds, err = op.GetStore().GetStoreFS().ReadFSItemFromExternal(el); err != nil {
+	if fds, err = op.GetStore().GetStoreFS().ReadFSItemFromExternal(remote); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -116,38 +113,45 @@ func (op Diff) Run(
 	switch {
 	case mode.IncludesMetadata():
 		if internalInline && externalInline {
-			wg.Do(op.makeDo(wLeft, op.InlineBlob, ilCtx))
-			wg.Do(op.makeDo(wRight, op.InlineBlob, elCtx))
+			wg.Do(op.makeDo(wLeft, op.InlineBlob, localContext))
+			wg.Do(op.makeDo(wRight, op.InlineBlob, remoteCtx))
 		} else {
-			wg.Do(op.makeDo(wLeft, op.MetadataOnly, ilCtx))
-			wg.Do(op.makeDo(wRight, op.MetadataOnly, elCtx))
+			wg.Do(op.makeDo(wLeft, op.MetadataOnly, localContext))
+			wg.Do(op.makeDo(wRight, op.MetadataOnly, remoteCtx))
 		}
 
 		externalFD = &fds.Object
 
 	case internalInline && externalInline:
-		wg.Do(op.makeDoBlob(wLeft, op.GetDirectoryLayout(), il.GetBlobSha()))
+		wg.Do(op.makeDoBlob(wLeft, op.GetDirectoryLayout(), local.GetBlobSha()))
 		wg.Do(op.makeDoFD(wRight, &fds.Blob))
 		externalFD = &fds.Blob
 
 	default:
-		wg.Do(op.makeDo(wLeft, op.MetadataOnly, ilCtx))
-		wg.Do(op.makeDo(wRight, op.MetadataOnly, elCtx))
+		wg.Do(op.makeDo(wLeft, op.MetadataOnly, localContext))
+		wg.Do(op.makeDo(wRight, op.MetadataOnly, remoteCtx))
 		externalFD = &fds.Blob
 	}
 
 	internalLabel := fmt.Sprintf(
 		"%s:%s",
-		il.GetObjectId(),
-		strings.ToLower(il.GetGenre().GetGenreString()),
+		local.GetObjectId(),
+		strings.ToLower(local.GetGenre().GetGenreString()),
 	)
 
 	externalLabel := op.GetDirectoryLayout().Rel(externalFD.GetPath())
 
+	colorOptions := op.FormatColorOptionsOut()
+	colorString := "always"
+
+	if colorOptions.OffEntirely {
+		colorString = "never"
+	}
+
 	todo.Change("disambiguate internal and external, and object / blob")
 	cmd := exec.Command(
 		"diff",
-		"--color=always",
+		fmt.Sprintf("--color=%s", colorString),
 		"-u",
 		"--label", internalLabel,
 		"--label", externalLabel,
@@ -179,7 +183,12 @@ func (op Diff) Run(
 		},
 	)
 
-	return wg.GetError()
+	if err = wg.GetError(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 }
 
 func (c Diff) makeDo(

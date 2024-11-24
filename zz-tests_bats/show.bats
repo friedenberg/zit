@@ -29,6 +29,32 @@ function show_simple_one_zettel { # @test
 	EOM
 }
 
+function show_simple_one_zettel_with_description_with_quotes { # @test
+	run_zit new -edit=false - <<-EOM
+		---
+		# see these "quotes"
+		! md
+		---
+
+		last time
+	EOM
+	assert_success
+	assert_output - <<-EOM
+		[two/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "see these \"quotes\""]
+	EOM
+
+	run_zit show -format text two/uno:
+	assert_success
+	assert_output - <<-EOM
+		---
+		# see these "quotes"
+		! md
+		---
+
+		last time
+	EOM
+}
+
 function show_simple_one_zettel_with_sigil { # @test
 	run_zit show -format text one/uno:
 	assert_success

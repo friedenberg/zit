@@ -51,12 +51,13 @@ func (s *Store) prepareFSItemForCheckOut(
 	options checkout_options.Options,
 	co *sku.CheckedOut,
 ) (item *sku.FSItem, alreadyCheckedOut bool, err error) {
-	if s.config.IsDryRun() {
+	if s.config.IsDryRun() || options.Path == checkout_options.PathTempLocal {
 		item = &sku.FSItem{}
+		item.Reset()
 		return
 	}
 
-	if item, alreadyCheckedOut = s.Get(&co.GetSku().ObjectId); alreadyCheckedOut {
+	if item, alreadyCheckedOut = s.Get(co.GetSku().GetObjectId()); alreadyCheckedOut {
 		if err = s.HydrateExternalFromItem(
 			sku.CommitOptions{
 				Mode: object_mode.ModeRealizeSansProto,

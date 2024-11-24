@@ -44,6 +44,9 @@ func Make(
 		deleted: collections_value.MakeMutableValueSet[*fd.FD](
 			nil,
 		),
+		deletedInternal: collections_value.MakeMutableValueSet[*fd.FD](
+			nil,
+		),
 		objectFormatOptions: ofo,
 		metadataTextParser: object_metadata.MakeTextParser(
 			st,
@@ -67,14 +70,16 @@ type Store struct {
 
 	dirItems
 
-	deleteLock sync.Mutex
-	deleted    fd.MutableSet
+	deleteLock      sync.Mutex
+	deleted         fd.MutableSet
+	deletedInternal fd.MutableSet
 }
 
 func (fs *Store) GetExternalStoreLike() external_store.StoreLike {
 	return fs
 }
 
+// Deletions of user objects that should be exposed to the user
 func (s *Store) DeleteCheckedOut(co *sku.CheckedOut) (err error) {
 	external := co.GetSkuExternal()
 
@@ -96,6 +101,29 @@ func (s *Store) DeleteCheckedOut(co *sku.CheckedOut) (err error) {
 	return
 }
 
+// Deletions of "transient" internal objects that should not be exposed to the
+// user
+func (s *Store) DeleteCheckedOutInternal(co *sku.CheckedOut) (err error) {
+	external := co.GetSkuExternal()
+
+	var i *sku.FSItem
+
+	if i, err = s.ReadFSItemFromExternal(external); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	s.deleteLock.Lock()
+	defer s.deleteLock.Unlock()
+
+	if err = i.MutableSetLike.Each(s.deletedInternal.Add); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (fs *Store) Flush() (err error) {
 	deleteOp := DeleteCheckout{}
 
@@ -109,7 +137,18 @@ func (fs *Store) Flush() (err error) {
 		return
 	}
 
+	if err = deleteOp.Run(
+		fs.config.IsDryRun(),
+		fs.dirLayout,
+    nil,
+		fs.deletedInternal,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	fs.deleted.Reset()
+	fs.deletedInternal.Reset()
 
 	return
 }

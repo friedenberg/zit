@@ -75,9 +75,11 @@ func (c DeleteCheckout) Run(
 			}
 		}
 
-		if err = p(fd); err != nil {
-			err = errors.Wrap(err)
-			return
+		if p != nil {
+			if err = p(fd); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 	}
 
@@ -110,9 +112,11 @@ func (c DeleteCheckout) Run(
 			return
 		}
 
-		if err = p(f); err != nil {
-			err = errors.Wrap(err)
-			return
+		if p != nil {
+			if err = p(f); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 	}
 
