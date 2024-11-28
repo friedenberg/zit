@@ -8,9 +8,17 @@ type ImmutableConfig interface {
 	GetStoreVersion() StoreVersion
 }
 
-type MutableConfigDryRun interface {
+type ConfigDryRunReader interface {
 	IsDryRun() bool
+}
+
+type ConfigDryRunWriter interface {
 	SetDryRun(bool)
+}
+
+type MutableConfigDryRun interface {
+	ConfigDryRunReader
+	ConfigDryRunWriter
 }
 
 type ConfigGetFilters interface {

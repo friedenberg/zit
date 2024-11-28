@@ -55,6 +55,7 @@ func (m *Mode) Set(v string) (err error) {
 		*m = None
 
 	case "metadata":
+	case "object":
 		*m = MetadataOnly
 
 	case "blob":

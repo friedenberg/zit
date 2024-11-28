@@ -43,7 +43,7 @@ func (u *Env) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOut] {
 		u.FormatColorOptionsOut(),
 		string_format_writer.CliFormatTruncation66CharEllipsis,
 		box_format.CheckedOutHeaderDeleted{
-			DryRun: u.config.DryRun,
+			ConfigDryRunReader: u.GetConfig(),
 		},
 	)
 
@@ -95,7 +95,7 @@ func (u *Env) PrinterHeader() interfaces.FuncIter[string] {
 }
 
 func (u *Env) PrinterCheckedOut(
-  headerWriter string_format_writer.HeaderWriter[*sku.CheckedOut],
+	headerWriter string_format_writer.HeaderWriter[*sku.CheckedOut],
 ) interfaces.FuncIter[*sku.CheckedOut] {
 	oo := u.FormatOutputOptions()
 	po := u.config.PrintOptions.

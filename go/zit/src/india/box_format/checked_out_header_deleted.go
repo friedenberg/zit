@@ -1,12 +1,13 @@
 package box_format
 
 import (
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type CheckedOutHeaderDeleted struct {
-	DryRun bool
+	interfaces.ConfigDryRunReader
 }
 
 func (f CheckedOutHeaderDeleted) WriteBoxHeader(
@@ -15,7 +16,7 @@ func (f CheckedOutHeaderDeleted) WriteBoxHeader(
 ) (err error) {
 	header.RightAligned = true
 
-	if f.DryRun {
+	if f.IsDryRun() {
 		header.Value = "would delete"
 	} else {
 		header.Value = "deleted"
