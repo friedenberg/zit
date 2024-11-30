@@ -5,6 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/token_types"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/unicorn"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -135,11 +136,13 @@ LOOP_AFTER_OID:
 		t, tokenType, tokenParts := ts.GetTokenAndTypeAndParts()
 
 		if tokenType == token_types.TypeOperator {
-			switch t.Bytes()[0] {
-			case ']':
+			r := rune(t.Bytes()[0])
+
+			switch {
+			case r == ']':
 				break LOOP_AFTER_OID
 
-			case ' ':
+			case unicorn.IsSpace(r):
 				continue LOOP_AFTER_OID
 			}
 		}
@@ -230,6 +233,15 @@ LOOP_AFTER_OID:
 				err = errors.Wrap(err)
 				return
 			}
+
+		case genres.Blob:
+			field := string_format_writer.Field{
+				Key:   string(tokenParts.Left),
+				Value: string(tokenParts.Right),
+			}
+
+			field.ColorType = string_format_writer.ColorTypeUserData
+			o.Metadata.Fields = append(o.Metadata.Fields, field)
 
 		default:
 			err = genres.MakeErrUnsupportedGenre(k.GetGenre())

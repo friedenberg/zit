@@ -36,9 +36,9 @@ func (e formatterTypFormatterUTIGroups) Format(
 		return
 	}
 
-	var ta type_blobs.Blob
+	var blob type_blobs.Blob
 
-	if ta, _, err = e.ParseTypedBlob(
+	if blob, _, err = e.ParseTypedBlob(
 		skuTyp.GetType(),
 		skuTyp.GetBlobSha(),
 	); err != nil {
@@ -46,9 +46,9 @@ func (e formatterTypFormatterUTIGroups) Format(
 		return
 	}
 
-	defer e.PutTypedBlob(skuTyp.GetType(), ta)
+	defer e.PutTypedBlob(skuTyp.GetType(), blob)
 
-	for groupName, group := range ta.GetFormatterUTIGroups() {
+	for groupName, group := range blob.GetFormatterUTIGroups() {
 		sb := bytes.NewBuffer(nil)
 
 		sb.WriteString(groupName)

@@ -1,6 +1,11 @@
 package unicorn
 
-import "unicode/utf8"
+import (
+	"unicode"
+	"unicode/utf8"
+)
+
+var IsSpace = unicode.IsSpace
 
 func Not(f func(rune) bool) func(rune) bool {
 	return func(r rune) bool {

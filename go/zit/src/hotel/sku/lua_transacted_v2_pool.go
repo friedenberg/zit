@@ -76,8 +76,8 @@ func MakeLuaTablePoolV2(vm *lua.VM) LuaTablePoolV2 {
 				TagsImplicit: vm.Pool.Get(),
 			}
 
-			vm.SetField(t.Transacted, "Etiketten", t.Tags)
-			vm.SetField(t.Transacted, "EtikettenImplicit", t.TagsImplicit)
+			vm.SetField(t.Transacted, "Tags", t.Tags)
+			vm.SetField(t.Transacted, "TagsImplicit", t.TagsImplicit)
 
 			return
 		},
