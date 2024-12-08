@@ -216,3 +216,20 @@ function format_organize_untracked_fs_blob_with_spaces() { # @test
 		- ["test with spaces.txt"]
 	EOM
 }
+
+# bats test_tags=user_story:external_ids
+# TODO [anti/deb !task zz-inbox] fix `zit organize .`
+function format_organize_recognized_fs_blob_with_newlines() { # @test
+	skip
+	run_zit format-organize - <<-EOM
+		- [one/uno !pdf payee-x-heloc zz-inbox
+		                   "heloc-board/CO-OP Modified Clarity Comittment - letterhead.pdf"] CO-OP Modified Clarity Comittment - letterhead
+		- [two/dos !pdf area-money-tax
+		                                  heloc-board/2022 taxes.pdf] us tax return
+	EOM
+	assert_success
+	assert_output_unsorted - <<-EOM
+
+		- [americium/bartok !pdf payee-bank_of_america-heloc project-24q1-reno-heloc-board_approval-docs zz-inbox] heloc-board/CO-OP Modified Clarity Comittment - BOA letterhead.pdf CO-OP Modified Clarity Comittment - BOA letterhead
+	EOM
+}
