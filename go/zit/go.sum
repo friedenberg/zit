@@ -1,7 +1,3 @@
-code.linenisgreat.com/chrest/go v0.0.0-20240930022256-86d732042864 h1:DRJWgR8BGfyRGS520fJEg4CRKw3qPEcFZJtH/kQeLQA=
-code.linenisgreat.com/chrest/go v0.0.0-20240930022256-86d732042864/go.mod h1:2dZY/TeWfeer5MZm54PjwZ/o9HqoRGqIKZb8bf6nbLU=
-code.linenisgreat.com/chrest/go v0.0.0-20241003115921-39317168eeee h1:2FuhmROGH3ozlwkAQCRM3AZ2Cw72pvmDrP+Se0zoBGc=
-code.linenisgreat.com/chrest/go v0.0.0-20241003115921-39317168eeee/go.mod h1:2dZY/TeWfeer5MZm54PjwZ/o9HqoRGqIKZb8bf6nbLU=
 code.linenisgreat.com/chrest/go v0.0.0-20241116161136-b70cd937c987 h1:5V6ZS/bzavUbPoM14mbO6IWnaLYjByYCLDGV/0WuA3s=
 code.linenisgreat.com/chrest/go v0.0.0-20241116161136-b70cd937c987/go.mod h1:8pyXhB3yxhHYHD6runutERtGi8zIBzznsfQF5ySJ2Hk=
 filippo.io/age v1.1.1 h1:pIpO7l151hCnQ4BdyBujnGP2YlUo0uj6sAVNHGBvXHg=

@@ -42,12 +42,9 @@ build/go_generate: $(files_go_generate) | build_dir
 > go generate ./...
 > touch "$@"
 
-gomod2nix.toml: go.mod go.sum
-> gomod2nix || true
-
 files_go := $(shell find src -type f)
 
-build/zit: build/go_generate $(files_go) gomod2nix.toml | build_dir
+build/zit: build/go_generate $(files_go) | build_dir
 > go build -o build/zit ./.
 
 build/go_vet: $(files_go) | build_dir

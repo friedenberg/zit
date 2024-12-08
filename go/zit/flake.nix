@@ -22,20 +22,26 @@
             ];
           };
 
-          zit = pkgs.buildGoApplication {
-            name = "zit";
-            pname = "zit";
-            version = "0.0.1";
-            src = ./.;
-            modules = ./gomod2nix.toml;
-            doCheck = false;
-            enableParallelBuilding = true;
-          };
+          # The current default sdk for macOS fails to compile go projects, so we use a newer one for now.
+          # This has no effect on other platforms.
+          callPackage = pkgs.darwin.apple_sdk_11_0.callPackage or pkgs.callPackage;
 
         in
         {
-          pname = "zit";
-          packages.default = zit;
+          # packages.default = callPackage ./. {
+          #   inherit (gomod2nix.legacyPackages.${system}) buildGoApplication;
+          # };
+
+          packages.default = pkgs.buildGoModule rec {
+            enableParallelBuilding = true;
+            doCheck = false;
+            pname = "zit";
+            version = "0.0.0";
+            src = ./.;
+            # vendorHash = pkgs.lib.fakeHash;
+            vendorHash = "sha256-ufxoYprkKUN9j3bqaQ/aU4d5oacODg9W0EJfMcS3+LU=";
+          };
+
           devShells.default = pkgs.mkShell {
             packages = (with pkgs; [
               fish
