@@ -55,7 +55,8 @@ func (i *Item) GetType() (t ids.Type, err error) {
 
 // TODO move below to !toml-bookmark type
 func (i Item) GetUrlPathTag() (e ids.Tag, err error) {
-	els := strings.Split(i.Url.Hostname(), ".")
+	ur := i.Url.Url()
+	els := strings.Split(ur.Hostname(), ".")
 	slices.Reverse(els)
 
 	if els[0] == "www" {

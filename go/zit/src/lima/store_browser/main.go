@@ -166,7 +166,12 @@ func (c *Store) CheckoutOne(
 	co := GetCheckedOutPool().Get()
 	cz = co
 	var item Item
-	item.Url.URL = *u
+
+	if err = item.Url.Set(u.String()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
 	item.ExternalId = sz.ObjectId.String()
 	item.Id.Type = "tab"
 

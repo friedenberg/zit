@@ -118,9 +118,9 @@ func (editor Editor) openWithArgs(fs ...string) (err error) {
 		allArgs...,
 	)
 
-	// if files.IsTty(os.Stdin) {
-	// 	cmd.Stdin = os.Stdin
-	// }
+	if files.IsTty(os.Stdin) {
+		cmd.Stdin = os.Stdin
+	}
 
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

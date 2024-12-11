@@ -71,7 +71,7 @@ func (s *Store) initializeUrls() (err error) {
 	for _, item := range resp.RequestPayloadGet {
 		i := Item{Item: item}
 
-		u := i.Url.URL
+		u := i.Url.Url()
 
 		s.urls[u] = append(s.urls[u], i)
 		s.itemsById[i.GetObjectId().String()] = i

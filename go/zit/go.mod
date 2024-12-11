@@ -3,7 +3,7 @@ module code.linenisgreat.com/zit/go/zit
 go 1.23.0
 
 require (
-	code.linenisgreat.com/chrest/go v0.0.0-20241116161136-b70cd937c987
+	code.linenisgreat.com/chrest/go v0.0.0-20241130155642-ba5156f42bcd
 	filippo.io/age v1.1.1
 	github.com/DataDog/zstd v1.5.5
 	github.com/brandondube/tai v0.1.0
@@ -20,4 +20,8 @@ require (
 require (
 	golang.org/x/crypto v0.21.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect
+)
+
+replace (
+	code.linenisgreat.com/chrest/go v0.0.0-20241130155642-ba5156f42bcd => /Users/sasha.friedenberg/eng/chrest/go
 )

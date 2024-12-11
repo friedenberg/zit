@@ -17,7 +17,7 @@ func (s *Store) DeleteCheckedOut(co *sku.CheckedOut) (err error) {
 
 	item.ExternalId = external.GetSkuExternal().GetExternalObjectId().String()
 
-	s.deleted[item.Url.URL] = append(s.deleted[item.Url.URL], checkedOutWithItem{
+	s.deleted[item.Url.Url()] = append(s.deleted[item.Url.Url()], checkedOutWithItem{
 		CheckedOut: co.Clone(),
 		Item:       item,
 	})

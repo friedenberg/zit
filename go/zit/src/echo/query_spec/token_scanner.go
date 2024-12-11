@@ -140,7 +140,7 @@ func (ts *TokenScanner) ScanIdentifierLikeSkipSpaces() (ok bool) {
 
 		case !afterFirst && isOperator:
 			if isSpace {
-				if !ts.ConsumeSpaces() {
+				if !ts.ConsumeSpacesOrErrorOnFalse() {
 					ok = false
 					return
 				}
@@ -183,7 +183,7 @@ func (ts *TokenScanner) ScanIdentifierLikeSkipSpaces() (ok bool) {
 }
 
 func (ts *TokenScanner) ScanSkipSpace() (ok bool) {
-	if !ts.ConsumeSpaces() {
+	if !ts.ConsumeSpacesOrErrorOnFalse() {
 		return
 	}
 
@@ -256,7 +256,7 @@ func (ts *TokenScanner) scan(dotOperatorAsSplit bool) (ok bool) {
 			ts.token.WriteRune(r)
 
 			if isSpace {
-				if !ts.ConsumeSpaces() {
+				if !ts.ConsumeSpacesOrErrorOnFalse() {
 					ok = false
 					return
 				}
@@ -299,7 +299,7 @@ func (ts *TokenScanner) scan(dotOperatorAsSplit bool) (ok bool) {
 // Consumes any spaces currently available in the underlying RuneReader. If this
 // returns false, it means that a read error has occurred, not that no spaces
 // were consumed.
-func (ts *TokenScanner) ConsumeSpaces() (ok bool) {
+func (ts *TokenScanner) ConsumeSpacesOrErrorOnFalse() (ok bool) {
 	for _, r := range ts.unscan {
 		if ts.err != nil {
 			ok = false

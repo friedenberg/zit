@@ -52,6 +52,10 @@ func (b *Description) readFromRuneScannerAfterNewline(
 	rs *query_spec.TokenScanner,
 	sb *strings.Builder,
 ) (err error) {
+	if !rs.ConsumeSpacesOrErrorOnFalse() {
+		return
+	}
+
 	var r rune
 
 	r, _, err = rs.ReadRune()
@@ -62,24 +66,25 @@ func (b *Description) readFromRuneScannerAfterNewline(
 		return
 	}
 
-	if r != ' ' {
+	if r == '-' || r == '%' || r == '#' {
 		if err = rs.UnreadRune(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 		return
-	} else {
-		sb.WriteRune(' ')
+	}
 
-		if !rs.ConsumeSpaces() {
-			return
-		}
+	sb.WriteRune(' ')
+	sb.WriteRune(r)
 
-		if err = b.readFromRuneScannerOrdinary(rs, sb); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if !rs.ConsumeSpacesOrErrorOnFalse() {
+		return
+	}
+
+	if err = b.readFromRuneScannerOrdinary(rs, sb); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

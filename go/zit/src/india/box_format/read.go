@@ -74,7 +74,7 @@ func (f *BoxTransacted) openBox(ts *query_spec.TokenScanner) (err error) {
 		return
 	}
 
-	if !ts.ConsumeSpaces() {
+	if !ts.ConsumeSpacesOrErrorOnFalse() {
 		if ts.Error() != nil {
 			err = errors.Wrap(ts.Error())
 		} else {

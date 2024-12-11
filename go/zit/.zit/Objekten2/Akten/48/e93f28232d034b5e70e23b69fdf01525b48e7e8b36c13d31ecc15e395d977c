@@ -1,8 +1,0 @@
-
-cmd_bats := BATS_TEST_TIMEOUT=$(timeout) bats --tap --jobs $(n_prc)
-
-gen-fixture:
- ./zz-tests_bats/migration/generate_fixture.bash
-
-end-to-end-tests:
-  $(cmd_bats) zz-tests_bats/*.bats
