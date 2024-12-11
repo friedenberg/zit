@@ -2,6 +2,7 @@ package id_fmts
 
 import (
 	"io"
+	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
@@ -29,16 +30,18 @@ func (f *tagsReader) ReadStringFormat(
 	var readable catgut.Slice
 
 	if readable, err = rb.PeekUptoAndIncluding('\n'); err != nil && err != io.EOF {
-		errors.Wrap(err)
+		err = errors.Wrap(err)
 		return
 	}
 
-	if readable.Len() == 1 {
+	tag := strings.TrimSpace(readable.String())
+
+	if len(tag) <= 1 {
 		return
 	}
 
-	if err = flag.Set(readable.String()); err != nil {
-		errors.Wrap(err)
+	if err = flag.Set(tag); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

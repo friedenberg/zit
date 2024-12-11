@@ -134,6 +134,8 @@ func (c *Compiled) Initialize(
 		return
 	}
 
+	c.cli.ApplyPrintOptionsConfig(c.GetPrintOptions())
+
 	return
 }
 

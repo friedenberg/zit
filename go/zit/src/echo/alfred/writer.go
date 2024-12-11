@@ -56,7 +56,7 @@ func (w *writer) open() (err error) {
 	}
 
 	if _, err = w.wBuf.WriteString(
-		`{"items":[`,
+		`"items":[`,
 	); err != nil {
 		close(w.chDone)
 		err = errors.Wrap(err)

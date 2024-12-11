@@ -42,8 +42,8 @@ func Run(
 
 	args = os.Args[2:]
 
-	konfigCli := mutable_config_blobs.DefaultCli()
-	konfigCli.AddToFlags(cmd.FlagSet)
+	cliConfig := mutable_config_blobs.DefaultCli()
+	cliConfig.AddToFlags(cmd.FlagSet)
 
 	if err := cmd.Parse(args); err != nil {
 		cancel(err)
@@ -53,12 +53,12 @@ func Run(
 	var primitiveFSHome dir_layout.Primitive
 	var err error
 
-	if primitiveFSHome, err = dir_layout.MakePrimitive(konfigCli.Debug); err != nil {
+	if primitiveFSHome, err = dir_layout.MakePrimitive(cliConfig.Debug); err != nil {
 		cancel(errors.Wrap(err))
 		return
 	}
 
-	if _, err = debug.MakeContext(ctx, konfigCli.Debug); err != nil {
+	if _, err = debug.MakeContext(ctx, cliConfig.Debug); err != nil {
 		cancel(errors.Wrap(err))
 		return
 	}
@@ -73,7 +73,7 @@ func Run(
 		options = og.GetEnvironmentInitializeOptions()
 	}
 
-	if u, err = env.Make(cmd.FlagSet, konfigCli, options, primitiveFSHome); err != nil {
+	if u, err = env.Make(cmd.FlagSet, cliConfig, options, primitiveFSHome); err != nil {
 		if cmd.withoutEnv {
 			err = nil
 		} else {

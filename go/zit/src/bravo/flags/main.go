@@ -40,5 +40,9 @@ func (f Flag) Set(v string) (err error) {
 }
 
 func (f Flag) String() string {
-	return f.stringer()
+	if f.stringer == nil {
+		return "nil"
+	} else {
+		return f.stringer()
+	}
 }

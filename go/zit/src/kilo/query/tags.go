@@ -18,7 +18,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-// TODO move implicit etiketten here
+// TODO move implicit tags here
 type Tags struct {
 	changes []string
 	tags    tag_paths.TagsWithParentsAndTypes

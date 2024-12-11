@@ -301,3 +301,36 @@ function format_organize_with_new_spreading_several_lines_and_ambiguous_heading 
 		- [/ !task pom-1] john jacob jingleheimer smith that's my name too
 	EOM
 }
+
+function format_organize_with_heading_having_space { # @test
+	run_zit_init_disable_age
+
+	function cat_body {
+		cat <<-EOM
+			---
+			- today
+			---
+
+			- [abo/gal !task pom-4 priority-2_want zz-inbox] john jacob
+			- [mes/mare !task pom-4 priority-2_want today-in_progress zz-inbox] john jacob jingleheimer smith
+			- [ne/har !task pom-1 priority-1_should zz-inbox] jingleheimer smith
+			# 
+
+			- [/ !task pom-1] john jacob jingleheimer smith
+			that's my name too
+		EOM
+	}
+
+	run_zit format-organize "${cmd_def_organize[@]}" <(cat_body)
+	assert_success
+	assert_output - <<-EOM
+		---
+		- today
+		---
+
+		- [abo/gal !task pom-4 priority-2_want zz-inbox] john jacob
+		- [/ !task pom-1] john jacob jingleheimer smith that's my name too
+		- [mes/mare !task pom-4 priority-2_want today-in_progress zz-inbox] john jacob jingleheimer smith
+		- [ne/har !task pom-1 priority-1_should zz-inbox] jingleheimer smith
+	EOM
+}

@@ -164,8 +164,6 @@ func (u *Env) Initialize(options Options) (err error) {
 		}
 	}
 
-	u.config.ApplyPrintOptionsConfig(u.config.PrintOptions)
-
 	// for _, rb := range u.GetConfig().Recipients {
 	// 	if err = u.age.AddBech32PivYubikeyEC256(rb); err != nil {
 	// 		errors.Wrap(err)
