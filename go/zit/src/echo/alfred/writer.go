@@ -22,10 +22,10 @@ type writer struct {
 
 func NewWriter(out io.Writer, itemPool ItemPool) (w *writer, err error) {
 	w = &writer{
-		wBuf:   bufio.NewWriter(out),
-		chItem: make(chan *Item),
-		chDone: make(chan struct{}),
-    ItemPool: itemPool,
+		wBuf:     bufio.NewWriter(out),
+		chItem:   make(chan *Item),
+		chDone:   make(chan struct{}),
+		ItemPool: itemPool,
 	}
 
 	w.jsonEncoder = json.NewEncoder(w.wBuf)
@@ -39,7 +39,29 @@ func NewWriter(out io.Writer, itemPool ItemPool) (w *writer, err error) {
 }
 
 func (w *writer) open() (err error) {
-	_, err = w.wBuf.WriteString("{\"items\":[\n")
+	if _, err = w.wBuf.WriteString(
+		"{",
+	); err != nil {
+		close(w.chDone)
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, err = w.wBuf.WriteString(
+		`"cache": {"seconds": 3600, "loosereload": true},`,
+	); err != nil {
+		close(w.chDone)
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, err = w.wBuf.WriteString(
+		`{"items":[`,
+	); err != nil {
+		close(w.chDone)
+		err = errors.Wrap(err)
+		return
+	}
 
 	go func() {
 		for i := range w.chItem {
@@ -51,7 +73,7 @@ func (w *writer) open() (err error) {
 			}
 		}
 
-		w.chDone <- struct{}{}
+		close(w.chDone)
 	}()
 
 	return
