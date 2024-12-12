@@ -37,7 +37,7 @@ func (s *Store) flushUrls() (err error) {
 
 	if !s.config.DryRun {
 		ctx := context.Background()
-		ctxWithTimeout, cancel := context.WithTimeout(ctx, 1e9)
+		ctxWithTimeout, cancel := context.WithTimeout(ctx, DefaultTimeout)
 		defer cancel()
 
 		if resp, err = s.browser.PutAll(

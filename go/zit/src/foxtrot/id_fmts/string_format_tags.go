@@ -34,15 +34,19 @@ func (f *tagsReader) ReadStringFormat(
 		return
 	}
 
-	tag := strings.TrimSpace(readable.String())
-
-	if len(tag) <= 1 {
+	if readable.Len() == 1 {
 		return
 	}
 
+	tag := strings.TrimSpace(readable.String())
+
 	if err = flag.Set(tag); err != nil {
-		err = errors.Wrap(err)
-		return
+		if errors.Is(err, ids.ErrEmptyTag) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	n = int64(readable.Len())

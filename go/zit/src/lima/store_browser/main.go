@@ -23,6 +23,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
 
+const DefaultTimeout = 2e9
+
 type transacted struct {
 	sync.Mutex
 	interfaces.MutableSetLike[*ids.ObjectId]

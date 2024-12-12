@@ -40,7 +40,7 @@ func (s *Store) initializeUrls() (err error) {
 	ui.Log().Print("getting all")
 
   ctx := context.Background()
-  ctxWithTimeout, cancel := context.WithTimeout(ctx, 1e9)
+  ctxWithTimeout, cancel := context.WithTimeout(ctx, DefaultTimeout)
   defer cancel()
 
 	if resp, err = s.browser.GetAll(

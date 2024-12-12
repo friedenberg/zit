@@ -35,3 +35,5 @@ func (e errInvalidSigil) Is(err error) (ok bool) {
 func IsErrInvalidSigil(err error) bool {
 	return errors.Is(err, errInvalidSigil(""))
 }
+
+var ErrEmptyTag = errors.New("empty tag")
