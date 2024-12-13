@@ -46,7 +46,7 @@ function add_one { # @test
 	EOM
 }
 
-function add_one_super_etiketten { # @test
+function add_one_super_tags { # @test
 	run_zit checkout tag-3:e
 	assert_success
 	assert_output - <<-EOM
@@ -77,7 +77,7 @@ function add_one_super_etiketten { # @test
 		[tag-3-sub @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 
-	run_zit show -format etiketten-path tag-3-sub:e
+	run_zit show -format tags-path tag-3-sub:e
 	assert_success
 	assert_output_unsorted - <<-EOM
 		tag-3-sub [Paths: [TypeSuper:[tag-3 -> recurse] TypeSelf:[tag-3-sub]], All: [recurse:[TypeSuper:[tag-3 -> recurse]] tag-3:[TypeSuper:[tag-3 -> recurse]] tag-3-sub:[TypeSelf:[tag-3-sub]]]]
@@ -93,7 +93,7 @@ function add_one_super_etiketten { # @test
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 	EOM
 
-	run_zit show -format etiketten-path recurse:z,e
+	run_zit show -format tags-path recurse:z,e
 	assert_success
 	assert_output_unsorted - <<-EOM
 		one/dos [Paths: [TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse] TypeDirect:[tag-4]], All: [recurse:[TypeIndirect:[tag-3 -> recurse]] tag-3:[TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse]] tag-4:[TypeDirect:[tag-4]]]]
@@ -103,7 +103,7 @@ function add_one_super_etiketten { # @test
 		tag-3-sub [Paths: [TypeSuper:[tag-3 -> recurse] TypeSelf:[tag-3-sub]], All: [recurse:[TypeSuper:[tag-3 -> recurse]] tag-3:[TypeSuper:[tag-3 -> recurse]] tag-3-sub:[TypeSelf:[tag-3-sub]]]]
 	EOM
 
-	run_zit show -format etiketten-path recurse:e,z
+	run_zit show -format tags-path recurse:e,z
 	assert_success
 	assert_output_unsorted - <<-EOM
 		one/dos [Paths: [TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse] TypeDirect:[tag-4]], All: [recurse:[TypeIndirect:[tag-3 -> recurse]] tag-3:[TypeDirect:[tag-3] TypeIndirect:[tag-3 -> recurse]] tag-4:[TypeDirect:[tag-4]]]]

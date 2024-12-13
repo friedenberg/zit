@@ -507,8 +507,8 @@ function show_etikett_lua_v2 { # @test
 	EOM
 }
 
-function show_etiketten_paths { # @test
-	run_zit show -format etiketten-path :e
+function show_tags_paths { # @test
+	run_zit show -format tags-path :e
 	assert_success
 	assert_output_unsorted - <<-EOM
 		tag [Paths: [TypeSelf:[tag]], All: [tag:[TypeSelf:[tag]]]]
@@ -519,7 +519,7 @@ function show_etiketten_paths { # @test
 	EOM
 }
 
-function show_etiketten_exact { # @test
+function show_tags_exact { # @test
 	run_zit show =tag:e
 	assert_success
 	assert_output_unsorted - <<-EOM

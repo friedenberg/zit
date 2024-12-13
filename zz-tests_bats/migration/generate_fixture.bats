@@ -57,7 +57,7 @@ EOM
 		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 	EOM
 
-	run_zit show "${cmd_def[@]}" -format etiketten one/uno
+	run_zit show "${cmd_def[@]}" -format tags one/uno
 	assert_success
 	assert_output "tag-1, tag-2"
 
@@ -114,7 +114,7 @@ EOM
 		[one/uno @11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 !md "wow the first" tag-3 tag-4]
 	EOM
 
-	run_zit show "${cmd_def[@]}" -format etiketten one/uno
+	run_zit show "${cmd_def[@]}" -format tags one/uno
 	assert_success
 	assert_output "tag-3, tag-4"
 }

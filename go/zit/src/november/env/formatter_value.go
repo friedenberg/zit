@@ -40,7 +40,7 @@ func (u *Env) MakeFormatFunc(
 	}
 
 	switch v {
-	case "etiketten-path":
+	case "tags-path":
 		f = func(tl *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(
 				out,
@@ -54,7 +54,7 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "etiketten-path-with-types":
+	case "tags-path-with-types":
 		f = func(tl *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(
 				out,
@@ -123,7 +123,7 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "etiketten-all":
+	case "tags-all":
 		f = func(tl *sku.Transacted) (err error) {
 			for _, es := range tl.Metadata.Cache.TagPaths.Paths {
 				if _, err = fmt.Fprintf(out, "%s: %s\n", tl.GetObjectId(), es); err != nil {
@@ -142,7 +142,7 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "etiketten-expanded":
+	case "tags-expanded":
 		f = func(tl *sku.Transacted) (err error) {
 			esImp := tl.GetMetadata().Cache.GetExpandedTags()
 			// TODO-P3 determine if empty sets should be printed or not
@@ -158,7 +158,7 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "etiketten-implicit":
+	case "tags-implicit":
 		f = func(tl *sku.Transacted) (err error) {
 			esImp := tl.GetMetadata().Cache.GetImplicitTags()
 			// TODO-P3 determine if empty sets should be printed or not
@@ -174,7 +174,7 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "etiketten":
+	case "tags":
 		f = func(tl *sku.Transacted) (err error) {
 			if _, err = fmt.Fprintln(
 				out,
@@ -189,7 +189,7 @@ func (u *Env) MakeFormatFunc(
 			return
 		}
 
-	case "etiketten-newlines":
+	case "tags-newlines":
 		f = func(tl *sku.Transacted) (err error) {
 			if err = tl.Metadata.GetTags().EachPtr(func(e *ids.Tag) (err error) {
 				_, err = fmt.Fprintln(out, e)

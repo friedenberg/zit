@@ -226,11 +226,6 @@ func (i *index) CreateZettelId() (h *ids.ZettelId, err error) {
 	}
 
 	if len(i.AvailableIds) == 0 {
-		err = errors.Errorf("no available object id")
-		return
-	}
-
-	if len(i.AvailableIds) == 0 {
 		err = errors.Wrap(object_id_provider.ErrZettelIdsExhausted{})
 		return
 	}
