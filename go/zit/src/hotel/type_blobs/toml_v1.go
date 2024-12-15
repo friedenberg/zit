@@ -12,8 +12,8 @@ type TomlV1 struct {
 	VimSyntaxType string                                    `toml:"vim-syntax-type"`
 	UTIGroups     map[string]UTIGroup                       `toml:"uti-groups"`
 	Formatters    map[string]script_config.WithOutputFormat `toml:"formatters,omitempty"`
-  // TODO migrate to properly-typed hooks
-	Hooks         interface{}                               `toml:"hooks"`
+	// TODO migrate to properly-typed hooks
+	Hooks interface{} `toml:"hooks"`
 }
 
 func (a *TomlV1) Reset() {

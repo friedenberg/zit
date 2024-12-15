@@ -30,6 +30,8 @@ type BigBang struct {
 	Yin         string
 	Yang        string
 	immutable_config.Config
+	ExcludeDefaultType   bool
+	ExcludeDefaultConfig bool
 }
 
 func (e *BigBang) AddToFlagSet(f *flag.FlagSet) {
@@ -45,7 +47,7 @@ func (e *BigBang) AddToFlagSet(f *flag.FlagSet) {
 	e.Config.AddToFlagSet(f)
 }
 
-func (u *Env) Start(e BigBang) (err error) {
+func (u *Env) Start(bb BigBang) (err error) {
 	s := u.GetDirectoryLayout()
 
 	mkdirAll(s.DirObjectId())
@@ -53,7 +55,7 @@ func (u *Env) Start(e BigBang) (err error) {
 	mkdirAll(s.DirLostAndFound())
 
 	if err = readAndTransferLines(
-		e.Yin,
+		bb.Yin,
 		filepath.Join(s.DirObjectId(), "Yin"),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -61,7 +63,7 @@ func (u *Env) Start(e BigBang) (err error) {
 	}
 
 	if err = readAndTransferLines(
-		e.Yang,
+		bb.Yang,
 		filepath.Join(s.DirObjectId(), "Yang"),
 	); err != nil {
 		err = errors.Wrap(err)
@@ -85,14 +87,14 @@ func (u *Env) Start(e BigBang) (err error) {
 	}
 
 	if err = s.Age().AddIdentityOrGenerateIfNecessary(
-		e.AgeIdentity,
+		bb.AgeIdentity,
 		s.FileAge(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	writeFile(s.FileConfigPermanent(), e.Config)
+	writeFile(s.FileConfigPermanent(), bb.Config)
 
 	writeFile(s.FileConfigMutable(), "")
 
@@ -118,7 +120,7 @@ func (u *Env) Start(e BigBang) (err error) {
 	}
 
 	ui.TodoP2("determine if this should be an Einleitung option")
-	if err = initDefaultTypeAndConfig(u); err != nil {
+	if err = bb.initDefaultTypeAndConfig(u); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -143,7 +145,7 @@ func (u *Env) Start(e BigBang) (err error) {
 	return
 }
 
-func initDefaultTypeAndConfig(u *Env) (err error) {
+func (bb BigBang) initDefaultTypeAndConfig(u *Env) (err error) {
 	if err = u.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -151,10 +153,33 @@ func initDefaultTypeAndConfig(u *Env) (err error) {
 
 	defer errors.Deferred(&err, u.Unlock)
 
-	defaultTypeObjectId := ids.MustType("md")
-	defaultTypeBlob := type_blobs.Default()
+	var defaultTypeObjectId ids.Type
 
-	// var defaultTypTransacted *typ.Transacted
+	if defaultTypeObjectId, err = bb.initDefaultTypeIfNecessaryAfterLock(u); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = bb.initDefaultConfigIfNecessaryAfterLock(
+		u,
+		defaultTypeObjectId,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (bb BigBang) initDefaultTypeIfNecessaryAfterLock(
+	u *Env,
+) (defaultTypeObjectId ids.Type, err error) {
+	if bb.ExcludeDefaultType {
+		return
+	}
+
+	defaultTypeObjectId = ids.MustType("md")
+	defaultTypeBlob := type_blobs.Default()
 
 	var k ids.ObjectId
 
@@ -163,71 +188,76 @@ func initDefaultTypeAndConfig(u *Env) (err error) {
 		return
 	}
 
-	{
-		err = nil
+	var sh interfaces.Sha
 
-		var sh interfaces.Sha
-
-		if sh, _, err = u.GetStore().GetBlobStore().GetTypeV1().SaveBlobText(
-			&defaultTypeBlob,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		o := sku.GetTransactedPool().Get()
-		defer sku.GetTransactedPool().Put(o)
-
-		if err = o.ObjectId.SetWithIdLike(defaultTypeObjectId); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		o.Metadata.Blob.ResetWithShaLike(sh)
-		o.GetMetadata().Type = builtin_types.DefaultOrPanic(genres.Type)
-
-		if err = u.GetStore().CreateOrUpdate(
-			o,
-			object_mode.ModeCreate,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if sh, _, err = u.GetStore().GetBlobStore().GetTypeV1().SaveBlobText(
+		&defaultTypeBlob,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
-	{
-		var sh interfaces.Sha
-		var tipe ids.Type
+	o := sku.GetTransactedPool().Get()
+	defer sku.GetTransactedPool().Put(o)
 
-		if sh, tipe, err = writeDefaultMutableConfig(
-			u,
-			defaultTypeObjectId,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = o.ObjectId.SetWithIdLike(defaultTypeObjectId); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-		newConfig := sku.GetTransactedPool().Get()
+	o.Metadata.Blob.ResetWithShaLike(sh)
+	o.GetMetadata().Type = builtin_types.DefaultOrPanic(genres.Type)
 
-		if err = newConfig.ObjectId.SetWithIdLike(ids.Config{}); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	if err = u.GetStore().CreateOrUpdate(
+		o,
+		object_mode.ModeCreate,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-		if err = newConfig.SetBlobSha(sh); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	return
+}
 
-		newConfig.Metadata.Type.ResetWith(tipe)
+func (bb BigBang) initDefaultConfigIfNecessaryAfterLock(
+	u *Env,
+	defaultTypeObjectId ids.Type,
+) (err error) {
+	if bb.ExcludeDefaultConfig {
+		return
+	}
 
-		if err = u.GetStore().CreateOrUpdate(
-			newConfig,
-			object_mode.ModeCreate,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	var sh interfaces.Sha
+	var tipe ids.Type
+
+	if sh, tipe, err = writeDefaultMutableConfig(
+		u,
+		defaultTypeObjectId,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	newConfig := sku.GetTransactedPool().Get()
+
+	if err = newConfig.ObjectId.SetWithIdLike(ids.Config{}); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = newConfig.SetBlobSha(sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	newConfig.Metadata.Type.ResetWith(tipe)
+
+	if err = u.GetStore().CreateOrUpdate(
+		newConfig,
+		object_mode.ModeCreate,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return

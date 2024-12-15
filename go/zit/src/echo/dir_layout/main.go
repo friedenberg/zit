@@ -81,6 +81,12 @@ func Make(
 	s.DirectoryPaths = dp
 	s.TempLocal.basePath = s.DirZit(fmt.Sprintf("tmp-%d", s.pid))
 
+	// TODO add support for failing on pre-existing temp local
+	// if files.Exists(s.TempLocal.basePath) {
+	// 	err = MakeErrTempAlreadyExists(s.TempLocal.basePath)
+	// 	return
+	// }
+
 	if err = s.MakeDir(s.TempLocal.basePath); err != nil {
 		err = errors.Wrap(err)
 		return

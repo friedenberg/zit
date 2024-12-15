@@ -140,7 +140,7 @@ func (fs *Store) Flush() (err error) {
 	if err = deleteOp.Run(
 		fs.config.IsDryRun(),
 		fs.dirLayout,
-    nil,
+		nil,
 		fs.deletedInternal,
 	); err != nil {
 		err = errors.Wrap(err)

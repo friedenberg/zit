@@ -6,7 +6,7 @@ setup() {
 	# for shellcheck SC2154
 	export output
 
-	version="v$(zit store-version)"
+	version="v$(zit info store-version)"
 	copy_from_version "$DIR" "$version"
 
 	cat >txt.type <<-EOM

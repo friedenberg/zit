@@ -40,12 +40,12 @@ type Env struct {
 	outIsTty bool
 	errIsTty bool
 
-	primitiveFSHome dir_layout.Primitive
-	dirLayout       dir_layout.DirLayout
-	cliConfig       mutable_config_blobs.Cli
-	fileEncoder     store_fs.FileEncoder
-	config          config.Compiled
-	dormantIndex    dormant_index.Index
+	dirLayoutPrimitive dir_layout.Primitive
+	dirLayout          dir_layout.DirLayout
+	cliConfig          mutable_config_blobs.Cli
+	fileEncoder        store_fs.FileEncoder
+	config             config.Compiled
+	dormantIndex       dormant_index.Index
 
 	storesInitialized bool
 	blobStore         *blob_store.VersionedStores
@@ -65,13 +65,13 @@ func Make(
 	primitiveFSHome dir_layout.Primitive,
 ) (u *Env, err error) {
 	u = &Env{
-		in:              os.Stdin,
-		out:             os.Stdout,
-		err:             os.Stderr,
-		flags:           flags,
-		cliConfig:       kCli,
-		DormantCounter:  query.MakeDormantCounter(),
-		primitiveFSHome: primitiveFSHome,
+		in:                 os.Stdin,
+		out:                os.Stdout,
+		err:                os.Stderr,
+		flags:              flags,
+		cliConfig:          kCli,
+		DormantCounter:     query.MakeDormantCounter(),
+		dirLayoutPrimitive: primitiveFSHome,
 	}
 
 	u.config.Reset()
@@ -124,7 +124,7 @@ func (u *Env) Initialize(options Options) (err error) {
 
 		if u.dirLayout, err = dir_layout.Make(
 			standortOptions,
-			u.primitiveFSHome,
+			u.dirLayoutPrimitive,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

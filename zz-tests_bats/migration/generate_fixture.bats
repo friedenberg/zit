@@ -27,7 +27,7 @@ function generate { # @test
 	assert_success
 	assert_output
 
-	run_zit store-version
+	run_zit info store-version
 	assert_success
 	assert_output 7
 

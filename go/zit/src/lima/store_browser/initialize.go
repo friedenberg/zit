@@ -39,14 +39,14 @@ func (s *Store) initializeUrls() (err error) {
 
 	ui.Log().Print("getting all")
 
-  ctx := context.Background()
-  ctxWithTimeout, cancel := context.WithTimeout(ctx, DefaultTimeout)
-  defer cancel()
+	ctx := context.Background()
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, DefaultTimeout)
+	defer cancel()
 
 	if resp, err = s.browser.GetAll(
-    ctxWithTimeout,
-    req,
-  ); err != nil {
+		ctxWithTimeout,
+		req,
+	); err != nil {
 		if errors.IsErrno(err, syscall.ECONNREFUSED) {
 			if !s.config.Quiet {
 				ui.Err().Print("chrest offline")

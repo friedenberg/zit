@@ -55,7 +55,7 @@ func (c CatAlfred) RunWithQuery(
 ) (err error) {
 	// this command does its own error handling
 	defer func() {
-    err = nil
+		err = nil
 	}()
 
 	wo := bufio.NewWriter(u.Out())

@@ -68,7 +68,7 @@ export cmd_zit_def
 
 function copy_from_version {
   DIR="$1"
-  version="${2:-v$(zit store-version)}"
+  version="${2:-v$(zit info store-version)}"
   rm -rf "$BATS_TEST_TMPDIR/.xdg"
   cp -r "$DIR/migration/$version/.xdg" "$BATS_TEST_TMPDIR/.xdg"
 }

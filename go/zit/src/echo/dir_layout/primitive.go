@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/xdg"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 )
@@ -15,7 +16,7 @@ type Primitive struct {
 	dryRun   bool
 	debug    debug.Options
 	pid      int
-	xdg      XDG
+	xdg      xdg.XDG
 	sv       immutable_config.StoreVersion
 }
 
@@ -46,7 +47,7 @@ func MakePrimitiveWithHome(home string, do debug.Options) (s Primitive, err erro
 
 	s.xdg.Home = home
 
-	if err = s.xdg.Initialize(true, "zit"); err != nil {
+	if err = s.xdg.InitializeFromEnv(true, "zit"); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -80,4 +81,8 @@ func (h Primitive) GetStoreVersion() immutable_config.StoreVersion {
 
 func (h Primitive) DataFileStoreVersion() string {
 	return filepath.Join(h.xdg.Data, "version")
+}
+
+func (h Primitive) GetXDG() xdg.XDG {
+	return h.xdg
 }

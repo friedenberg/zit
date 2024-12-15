@@ -42,6 +42,10 @@ func (u *Env) GetDirectoryLayout() dir_layout.DirLayout {
 	return u.dirLayout
 }
 
+func (u *Env) GetDirLayoutPrimitive() dir_layout.Primitive {
+	return u.dirLayoutPrimitive
+}
+
 func (u *Env) GetStore() *store.Store {
 	return &u.store
 }

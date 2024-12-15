@@ -48,7 +48,7 @@ func (w *writer) open() (err error) {
 	}
 
 	if _, err = w.wBuf.WriteString(
-		`"cache": {"seconds": 3600, "loosereload": true},`,
+		`"cache": {"seconds": 1, "loosereload": true},`,
 	); err != nil {
 		close(w.chDone)
 		err = errors.Wrap(err)

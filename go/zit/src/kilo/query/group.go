@@ -71,23 +71,22 @@ func (qg *Group) GetSigil() (s ids.Sigil) {
 	return
 }
 
-func (qg *Group) IsExactlyOneObjectId(
-) bool {
+func (qg *Group) IsExactlyOneObjectId() bool {
 	if len(qg.OptimizedQueries) != 1 {
-    return false
+		return false
 	}
 
-  var q *Query
+	var q *Query
 
-  for _, q1 := range qg.OptimizedQueries {
-    q = q1
-  }
+	for _, q1 := range qg.OptimizedQueries {
+		q = q1
+	}
 
 	kn := q.ObjectIds
 	lk := len(kn)
 
 	if lk != 1 {
-    return false
+		return false
 	}
 
 	return true

@@ -4,18 +4,19 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/xdg"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 )
 
 type directoryV1 struct {
 	sv immutable_config.StoreVersion
-	XDG
+	xdg.XDG
 }
 
 func (c *directoryV1) init(
 	sv immutable_config.StoreVersion,
-	xdg XDG,
+	xdg xdg.XDG,
 ) (err error) {
 	c.sv = sv
 	c.XDG = xdg

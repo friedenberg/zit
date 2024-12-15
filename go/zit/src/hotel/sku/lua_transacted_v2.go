@@ -8,10 +8,10 @@ import (
 )
 
 type LuaTableV2 struct {
-	Transacted   *lua.LTable
+	Transacted *lua.LTable
 
-  // TODO transition to single Tags table with Tag objects that reflect
-  // tag_paths.PathWithType
+	// TODO transition to single Tags table with Tag objects that reflect
+	// tag_paths.PathWithType
 	Tags         *lua.LTable
 	TagsImplicit *lua.LTable
 }

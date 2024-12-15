@@ -67,3 +67,35 @@ func (e ErrBlobMissing) Is(target error) bool {
 func IsErrBlobMissing(err error) bool {
 	return errors.Is(err, ErrBlobMissing{})
 }
+
+func MakeErrTempAlreadyExists(
+	path string,
+) (err *ErrTempAlreadyExists) {
+	err = &ErrTempAlreadyExists{Path: path}
+	return
+}
+
+type ErrTempAlreadyExists struct {
+	Path string
+}
+
+func (e *ErrTempAlreadyExists) Error() string {
+	return fmt.Sprintf("Local temporary directory already exists: %q", e.Path)
+}
+
+func (e *ErrTempAlreadyExists) ErrorCause() string {
+	return "Another zit previous process with the same PID likely terminated unexpectedly"
+}
+
+func (e *ErrTempAlreadyExists) ErrorRecovery() string {
+	return "Check if there are any relevant files in the directory, or possible delete it"
+}
+
+func (e *ErrTempAlreadyExists) ErrorRecoveryAutomatic() string {
+	return "TODO"
+}
+
+func (e *ErrTempAlreadyExists) Is(target error) bool {
+	_, ok := target.(*ErrTempAlreadyExists)
+	return ok
+}

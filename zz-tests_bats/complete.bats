@@ -3,7 +3,7 @@
 setup() {
 	load "$(dirname "$BATS_TEST_FILE")/common.bash"
 
-	version="v$(zit store-version)"
+	version="v$(zit info store-version)"
 	copy_from_version "$DIR" "$version"
 }
 

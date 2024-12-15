@@ -164,7 +164,7 @@ func (e *tag) Set(v string) (err error) {
 
 	if !TagRegex.MatchString(v) {
 		if v == "" {
-      err = ErrEmptyTag
+			err = ErrEmptyTag
 		} else {
 			err = errors.Errorf("not a valid tag: %q", v1)
 		}
