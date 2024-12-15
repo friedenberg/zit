@@ -17,3 +17,7 @@ func MakeStd(f *os.File) Std {
 		IsTty: files.IsTty(f),
 	}
 }
+
+func (f Std) GetFile() *os.File {
+	return f.File
+}

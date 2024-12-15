@@ -27,15 +27,15 @@ func (u *Local) GetDormantIndex() *dormant_index.Index {
 }
 
 func (u *Local) In() io.Reader {
-	return u.in
+	return u.in.File
 }
 
 func (u *Local) Out() interfaces.WriterAndStringWriter {
-	return u.out
+	return u.out.File
 }
 
 func (u *Local) Err() interfaces.WriterAndStringWriter {
-	return u.err
+	return u.err.File
 }
 
 func (u *Local) GetDirectoryLayout() dir_layout.DirLayout {
