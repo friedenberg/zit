@@ -8,10 +8,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
@@ -30,15 +30,11 @@ import (
 type Local struct {
 	sunrise ids.Tai
 
-	in  *os.File
-	out *os.File
-	err *os.File
+	in  fd.Std
+	out fd.Std
+	err fd.Std
 
 	flags *flag.FlagSet
-
-	inIsTty  bool
-	outIsTty bool
-	errIsTty bool
 
 	dirLayoutPrimitive dir_layout.Primitive
 	dirLayout          dir_layout.DirLayout
@@ -65,9 +61,9 @@ func Make(
 	primitiveFSHome dir_layout.Primitive,
 ) (u *Local, err error) {
 	u = &Local{
-		in:                 os.Stdin,
-		out:                os.Stdout,
-		err:                os.Stderr,
+		in:                 fd.MakeStd(os.Stdin),
+		out:                fd.MakeStd(os.Stdout),
+		err:                fd.MakeStd(os.Stderr),
 		flags:              flags,
 		cliConfig:          kCli,
 		DormantCounter:     query.MakeDormantCounter(),
@@ -75,18 +71,6 @@ func Make(
 	}
 
 	u.config.Reset()
-
-	if files.IsTty(u.in) {
-		u.inIsTty = true
-	}
-
-	if files.IsTty(u.out) {
-		u.outIsTty = true
-	}
-
-	if files.IsTty(u.err) {
-		u.errIsTty = true
-	}
 
 	err = u.Initialize(options)
 

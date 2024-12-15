@@ -15,7 +15,6 @@ teardown() {
 # bats file_tags=user_story:clone,user_story:repo,user_store:xdg
 
 function bootstrap {
-	skip
 	set_xdg "$1"
 	run_zit_init
 
