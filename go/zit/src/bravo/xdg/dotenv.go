@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -32,8 +31,6 @@ func (d Dotenv) setDefaultOrEnvFromMap(
 			}
 		})
 	}
-
-	*initElement.out = filepath.Join(*initElement.out, d.AddedPath)
 
 	return
 }
@@ -80,11 +77,6 @@ func (d Dotenv) ReadFrom(r io.Reader) (n int64, err error) {
 			ie,
 			env,
 		); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = os.MkdirAll(*ie.out, 0o700); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

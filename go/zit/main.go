@@ -10,10 +10,10 @@ import (
 )
 
 func main() {
-	ctx, cancel := context.WithCancelCause(context.Background())
-	defer cancel(nil)
+	ctx := errors.MakeContext(context.Background())
+	defer ctx.Cancel(nil)
 
-	errors.MakeSIGINTWatchChannelAndCancelContextIfNecessary(cancel)
+	ctx.SetCancelOnSIGINT()
 
 	go func() {
 		<-ctx.Done()
@@ -21,10 +21,7 @@ func main() {
 	}()
 
 	exitStatus := commands.Run(
-		errors.ContextOrdinary{
-			Context: ctx,
-		},
-		cancel,
+		ctx,
 		os.Args...,
 	)
 

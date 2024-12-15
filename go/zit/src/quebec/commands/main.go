@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"context"
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -14,8 +13,7 @@ import (
 
 // TODO switch to returning result
 func Run(
-	ctx errors.ContextOrdinary,
-	cancel context.CancelCauseFunc,
+	ctx errors.Context,
 	args ...string,
 ) (exitStatus int) {
 	var cmd command
@@ -46,7 +44,7 @@ func Run(
 	cliConfig.AddToFlags(cmd.FlagSet)
 
 	if err := cmd.Parse(args); err != nil {
-		cancel(err)
+		ctx.Cancel(err)
 		return
 	}
 
@@ -54,12 +52,12 @@ func Run(
 	var err error
 
 	if primitiveFSHome, err = dir_layout.MakePrimitive(cliConfig.Debug); err != nil {
-		cancel(errors.Wrap(err))
+		ctx.Cancel(errors.Wrap(err))
 		return
 	}
 
 	if _, err = debug.MakeContext(ctx, cliConfig.Debug); err != nil {
-		cancel(errors.Wrap(err))
+		ctx.Cancel(errors.Wrap(err))
 		return
 	}
 
@@ -77,7 +75,7 @@ func Run(
 		if cmd.withoutEnv {
 			err = nil
 		} else {
-			cancel(errors.Wrap(err))
+			ctx.Cancel(errors.Wrap(err))
 			return
 		}
 	}
@@ -89,7 +87,7 @@ func Run(
 
 	defer func() {
 		if err = u.GetDirectoryLayout().ResetTempOnExit(result.Error); err != nil {
-			cancel(errors.Wrap(err))
+			ctx.Cancel(errors.Wrap(err))
 			return
 		}
 	}()

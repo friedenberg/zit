@@ -28,7 +28,7 @@ function info_xdg { # @test
 		XDG_DATA_HOME=$BATS_TEST_TMPDIR/.xdg/data/zit
 		XDG_CONFIG_HOME=$BATS_TEST_TMPDIR/.xdg/config/zit
 		XDG_STATE_HOME=$BATS_TEST_TMPDIR/.xdg/state/zit
-		XDG_CACHE_HOME=$BATS_TEST_TMPDIR/.xdg/runtime/zit
+		XDG_CACHE_HOME=$BATS_TEST_TMPDIR/.xdg/cache/zit
 		XDG_RUNTIME_HOME=$BATS_TEST_TMPDIR/.xdg/runtime/zit
 	EOM
 }

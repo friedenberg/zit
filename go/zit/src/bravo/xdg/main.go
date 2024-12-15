@@ -50,7 +50,7 @@ func (x *XDG) GetInitElements() []xdgInitElement {
 		{
 			defawlt: "$HOME/.local/runtime",
 			envKey:  "XDG_RUNTIME_HOME",
-			out:     &x.Cache,
+			out:     &x.Runtime,
 		},
 	}
 }
