@@ -8,7 +8,7 @@ import (
 )
 
 type ExecLua struct {
-	*env.Env
+	*env.Local
 }
 
 func (u ExecLua) Run(sk *sku.Transacted, args ...string) (err error) {

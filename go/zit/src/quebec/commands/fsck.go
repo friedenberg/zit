@@ -29,7 +29,7 @@ func init() {
 	)
 }
 
-func (c Fsck) Run(u *env.Env, args ...string) (result Result) {
+func (c Fsck) Run(u *env.Local, args ...string) (result Result) {
 	p := u.PrinterTransacted()
 
 	if result.Error = u.GetStore().QueryPrimitive(

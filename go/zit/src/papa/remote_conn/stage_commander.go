@@ -75,7 +75,7 @@ func (c StageCommander) ShouldIgnoreConnectionError(in error) (ok bool) {
 }
 
 func MakeStageCommander(
-	u *env.Env,
+	u *env.Local,
 	from string,
 	command string,
 ) (s *StageCommander, err error) {

@@ -63,7 +63,7 @@ func Run(
 
 	cmdArgs := cmd.Args()
 
-	var u *env.Env
+	var u *env.Local
 
 	options := env.OptionsEmpty
 

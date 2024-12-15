@@ -48,7 +48,7 @@ func (s StageSoldier) Close() (err error) {
 	return
 }
 
-func MakeStageSoldier(u *env.Env) (
+func MakeStageSoldier(u *env.Local) (
 	s *StageSoldier,
 	err error,
 ) {

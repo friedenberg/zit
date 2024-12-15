@@ -39,7 +39,7 @@ func (c Diff) ModifyBuilder(
 }
 
 func (c Diff) RunWithQuery(
-	u *env.Env,
+	u *env.Local,
 	qg *query.Group,
 ) (err error) {
 	o := checkout_options.TextFormatterOptions{
@@ -47,7 +47,7 @@ func (c Diff) RunWithQuery(
 	}
 
 	opDiffFS := user_ops.Diff{
-		Env: u,
+		Local: u,
 		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
 			u.GetDirectoryLayout(),
 			nil,

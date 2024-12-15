@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
-func (u *Env) Lock() (err error) {
+func (u *Local) Lock() (err error) {
 	ui.Log().Caller(1, "Umwelt Lock")
 	if err = u.dirLayout.GetLockSmith().Lock(); err != nil {
 		ui.Log().Caller(1, "Umwelt Lock Failure")
@@ -20,7 +20,7 @@ func (u *Env) Lock() (err error) {
 
 // TODO print organize files that were created if dry run or make it possible to
 // commit dry-run transactions
-func (u *Env) Unlock() (err error) {
+func (u *Local) Unlock() (err error) {
 	ptl := u.PrinterTransacted()
 
 	if u.storesInitialized {

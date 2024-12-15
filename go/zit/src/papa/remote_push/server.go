@@ -10,12 +10,12 @@ import (
 )
 
 type Server struct {
-	env   *env.Env
+	env   *env.Local
 	stage *remote_conn.StageSoldier
 }
 
 func MakeServer(
-	u *env.Env,
+	u *env.Local,
 ) (s Server, err error) {
 	s = Server{
 		env: u,

@@ -8,15 +8,15 @@ import (
 )
 
 type Command interface {
-	Run(*env.Env, ...string) error
+	Run(*env.Local, ...string) error
 }
 
 type CommandWithResult interface {
-	Run(*env.Env, ...string) Result
+	Run(*env.Local, ...string) Result
 }
 
 type WithCompletion interface {
-	Complete(u *env.Env, args ...string) (err error)
+	Complete(u *env.Local, args ...string) (err error)
 }
 
 type command struct {

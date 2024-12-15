@@ -48,7 +48,7 @@ type answer struct {
 	Path string
 }
 
-func (c WriteBlob) Run(u *env.Env, args ...string) (result Result) {
+func (c WriteBlob) Run(u *env.Local, args ...string) (result Result) {
 	var failCount atomic.Uint32
 
 	sawStdin := false

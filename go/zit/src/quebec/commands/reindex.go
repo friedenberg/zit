@@ -24,7 +24,7 @@ func (c Reindex) GetEnvInitializeOptions() env.Options {
 	return env.OptionsAllowConfigReadError
 }
 
-func (c Reindex) Run(u *env.Env, args ...string) (err error) {
+func (c Reindex) Run(u *env.Local, args ...string) (err error) {
 	if len(args) > 0 {
 		err = errors.Errorf("reindex does not support arguments")
 		return

@@ -30,7 +30,7 @@ func init() {
 	)
 }
 
-func (c DormantEdit) Run(u *env.Env, args ...string) (err error) {
+func (c DormantEdit) Run(u *env.Local, args ...string) (err error) {
 	if len(args) > 0 {
 		ui.Err().Print("Command edit-konfig ignores passed in arguments.")
 	}
@@ -63,7 +63,7 @@ func (c DormantEdit) Run(u *env.Env, args ...string) (err error) {
 }
 
 func (c DormantEdit) editInVim(
-	u *env.Env,
+	u *env.Local,
 ) (sh interfaces.Sha, err error) {
 	var p string
 
@@ -92,7 +92,7 @@ func (c DormantEdit) editInVim(
 }
 
 func (c DormantEdit) makeTempKonfigFile(
-	u *env.Env,
+	u *env.Local,
 ) (p string, err error) {
 	var k *sku.Transacted
 
@@ -123,7 +123,7 @@ func (c DormantEdit) makeTempKonfigFile(
 }
 
 func (c DormantEdit) readTempKonfigFile(
-	u *env.Env,
+	u *env.Local,
 	p string,
 ) (sh interfaces.Sha, err error) {
 	var f *os.File

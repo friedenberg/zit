@@ -52,11 +52,11 @@ func (c Checkout) ModifyBuilder(b *query.Builder) {
 }
 
 func (c Checkout) RunWithQuery(
-	u *env.Env,
+	u *env.Local,
 	qg *query.Group,
 ) (err error) {
 	opCheckout := user_ops.Checkout{
-		Env:      u,
+		Local:      u,
 		Organize: c.Organize,
 		Options:  c.CheckoutOptions,
 	}

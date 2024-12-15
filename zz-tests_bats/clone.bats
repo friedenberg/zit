@@ -15,6 +15,7 @@ teardown() {
 # bats file_tags=user_story:clone,user_story:repo,user_store:xdg
 
 function bootstrap {
+	skip
 	set_xdg "$1"
 	run_zit_init
 
@@ -37,7 +38,6 @@ function bootstrap {
 }
 
 function clone { # @test
-	skip
 	them="them"
 	bootstrap "$them"
 	assert_success
@@ -60,9 +60,14 @@ function clone { # @test
 		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 	EOM
 
+	function print_their_xdg() (
+		set_xdg "$them"
+		zit info xdg
+	)
+
 	us="us"
 	set_xdg "$us"
-	run_zit clone "$them/.xdg/data/" +zettel,typ
+	run_zit clone -xdg-dotenv <(print_their_xdg) +zettel,typ
 
 	assert_success
 	assert_output_unsorted - <<-EOM

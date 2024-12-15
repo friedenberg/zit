@@ -11,7 +11,7 @@ import (
 )
 
 type CreateFromShas struct {
-	*env.Env
+	*env.Local
 	sku.Proto
 }
 

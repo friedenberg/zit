@@ -31,7 +31,7 @@ type Checkin struct {
 }
 
 func (op Checkin) Run(
-	u *env.Env,
+	u *env.Local,
 	qg *query.Group,
 ) (err error) {
 	var l sync.Mutex
@@ -149,7 +149,7 @@ func (op Checkin) Run(
 }
 
 func (op Checkin) runOrganize(
-	u *env.Env,
+	u *env.Local,
 	qg *query.Group,
 	results sku.SkuTypeSetMutable,
 ) (err error) {
@@ -159,7 +159,7 @@ func (op Checkin) runOrganize(
 	}
 
 	opOrganize := Organize{
-		Env: u,
+		Local: u,
 		Metadata: organize_text.Metadata{
 			RepoId: qg.RepoId,
 			OptionCommentSet: organize_text.MakeOptionCommentSet(
@@ -218,7 +218,7 @@ func (op Checkin) runOrganize(
 }
 
 func (c Checkin) openBlobIfNecessary(
-	u *env.Env,
+	u *env.Local,
 	objects sku.TransactedSet,
 ) (err error) {
 	if !c.OpenBlob && c.CheckoutBlobAndRun == "" {
@@ -226,7 +226,7 @@ func (c Checkin) openBlobIfNecessary(
 	}
 
 	opCheckout := Checkout{
-		Env: u,
+		Local: u,
 		Options: checkout_options.Options{
 			CheckoutMode: checkout_mode.BlobOnly,
 		},

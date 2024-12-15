@@ -47,7 +47,7 @@ func init() {
 	)
 }
 
-func (c *FormatObject) Run(u *env.Env, args ...string) (err error) {
+func (c *FormatObject) Run(u *env.Local, args ...string) (err error) {
 	if c.Stdin {
 		if err = c.FormatFromStdin(u, args...); err != nil {
 			err = errors.Wrap(err)
@@ -123,7 +123,7 @@ func (c *FormatObject) Run(u *env.Env, args ...string) (err error) {
 }
 
 func (c *FormatObject) FormatFromStdin(
-	u *env.Env,
+	u *env.Local,
 	args ...string,
 ) (err error) {
 	formatId := "text"
@@ -182,7 +182,7 @@ func (c *FormatObject) FormatFromStdin(
 }
 
 func (c *FormatObject) getSku(
-	u *env.Env,
+	u *env.Local,
 	objectIdString string,
 ) (sk *sku.Transacted, err error) {
 	b := u.MakeQueryBuilder(ids.MakeGenre(genres.Zettel))
@@ -210,7 +210,7 @@ func (c *FormatObject) getSku(
 }
 
 func (c *FormatObject) getBlobFormatter(
-	u *env.Env,
+	u *env.Local,
 	tipe ids.Type,
 	formatId string,
 ) (blobFormatter script_config.RemoteScript, err error) {

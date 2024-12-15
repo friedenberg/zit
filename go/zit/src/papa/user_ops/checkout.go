@@ -16,7 +16,7 @@ import (
 )
 
 type Checkout struct {
-	*env.Env
+	*env.Local
 	Organize bool
 	checkout_options.Options
 	Open    bool
@@ -41,7 +41,7 @@ func (op Checkout) RunWithKasten(
 	kasten ids.RepoId,
 	skus sku.TransactedSet,
 ) (zsc sku.SkuTypeSetMutable, err error) {
-	b := op.Env.MakeQueryBuilder(
+	b := op.Local.MakeQueryBuilder(
 		ids.MakeGenre(genres.Zettel),
 	).WithTransacted(
 		skus,
@@ -92,7 +92,7 @@ func (op Checkout) RunQuery(
 		}
 	}
 
-	if err = op.Env.GetStore().CheckoutQuery(
+	if err = op.Local.GetStore().CheckoutQuery(
 		op.Options,
 		qg,
 		onCheckedOut,
@@ -104,7 +104,7 @@ func (op Checkout) RunQuery(
 	if op.Utility != "" {
 		eachBlobOp := EachBlob{
 			Utility: op.Utility,
-			Env:     op.Env,
+			Local:     op.Local,
 		}
 
 		if err = eachBlobOp.Run(zsc); err != nil {
@@ -145,7 +145,7 @@ func (op Checkout) RunQuery(
 		checkinOp := Checkin{}
 
 		if err = checkinOp.Run(
-			op.Env,
+			op.Local,
 			qg,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -161,7 +161,7 @@ func (op Checkout) runOrganize(
 	onCheckedOut interfaces.FuncIter[sku.SkuType],
 ) (qgModified *query.Group, err error) {
 	opOrganize := Organize{
-		Env: op.Env,
+		Local: op.Local,
 		Metadata: organize_text.Metadata{
 			RepoId: qgOriginal.RepoId,
 			OptionCommentSet: organize_text.MakeOptionCommentSet(

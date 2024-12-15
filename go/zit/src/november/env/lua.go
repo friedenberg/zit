@@ -10,11 +10,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func (u *Env) MakeLuaVMPoolBuilder() *lua.VMPoolBuilder {
+func (u *Local) MakeLuaVMPoolBuilder() *lua.VMPoolBuilder {
 	return (&lua.VMPoolBuilder{}).WithSearcher(u.LuaSearcher)
 }
 
-func (s *Env) GetSkuFromString(lv string) (sk *sku.Transacted, err error) {
+func (s *Local) GetSkuFromString(lv string) (sk *sku.Transacted, err error) {
 	sk = sku.GetTransactedPool().Get()
 
 	defer func() {
@@ -44,7 +44,7 @@ func (s *Env) GetSkuFromString(lv string) (sk *sku.Transacted, err error) {
 	return
 }
 
-func (s *Env) LuaSearcher(ls *lua.LState) int {
+func (s *Local) LuaSearcher(ls *lua.LState) int {
 	lv := ls.ToString(1)
 	ls.Pop(1)
 
@@ -64,7 +64,7 @@ func (s *Env) LuaSearcher(ls *lua.LState) int {
 }
 
 // TODO modify `package.loaded` to include variations of object id
-func (s *Env) LuaRequire(ls *lua.LState) int {
+func (s *Local) LuaRequire(ls *lua.LState) int {
 	// TODO handle second extra arg
 	// TODO parse lv as object id / blob
 	lv := ls.ToString(1)

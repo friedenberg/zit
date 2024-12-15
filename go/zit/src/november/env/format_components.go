@@ -5,23 +5,23 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
 )
 
-func (u *Env) FormatOutputOptions() (o string_format_writer.OutputOptions) {
+func (u *Local) FormatOutputOptions() (o string_format_writer.OutputOptions) {
 	o.ColorOptionsOut = u.FormatColorOptionsOut()
 	o.ColorOptionsErr = u.FormatColorOptionsErr()
 	return
 }
 
-func (u *Env) FormatColorOptionsOut() (o string_format_writer.ColorOptions) {
+func (u *Local) FormatColorOptionsOut() (o string_format_writer.ColorOptions) {
 	o.OffEntirely = !u.outIsTty || !u.config.PrintOptions.PrintColors
 	return
 }
 
-func (u *Env) FormatColorOptionsErr() (o string_format_writer.ColorOptions) {
+func (u *Local) FormatColorOptionsErr() (o string_format_writer.ColorOptions) {
 	o.OffEntirely = !u.errIsTty || !u.config.PrintOptions.PrintColors
 	return
 }
 
-func (u *Env) StringFormatWriterFields(
+func (u *Local) StringFormatWriterFields(
 	truncate string_format_writer.CliFormatTruncation,
 	co string_format_writer.ColorOptions,
 ) interfaces.StringFormatWriter[string_format_writer.Box] {

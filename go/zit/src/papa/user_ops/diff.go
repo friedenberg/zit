@@ -23,7 +23,7 @@ import (
 
 // TODO move to store_fs
 type Diff struct {
-	*env.Env
+	*env.Local
 
 	object_metadata.TextFormatterFamily
 }

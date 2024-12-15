@@ -35,7 +35,7 @@ func (c Pull) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c Pull) Run(u *env.Env, args ...string) (err error) {
+func (c Pull) Run(u *env.Local, args ...string) (err error) {
 	if len(args) == 0 {
 		err = errors.BadRequestf("must specify kasten to pull from")
 		return

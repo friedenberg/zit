@@ -14,48 +14,48 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
-func (u *Env) GetTime() time.Time {
+func (u *Local) GetTime() time.Time {
 	return time.Now()
 }
 
-func (u *Env) GetConfig() *config.Compiled {
+func (u *Local) GetConfig() *config.Compiled {
 	return &u.config
 }
 
-func (u *Env) GetDormantIndex() *dormant_index.Index {
+func (u *Local) GetDormantIndex() *dormant_index.Index {
 	return &u.dormantIndex
 }
 
-func (u *Env) In() io.Reader {
+func (u *Local) In() io.Reader {
 	return u.in
 }
 
-func (u *Env) Out() interfaces.WriterAndStringWriter {
+func (u *Local) Out() interfaces.WriterAndStringWriter {
 	return u.out
 }
 
-func (u *Env) Err() interfaces.WriterAndStringWriter {
+func (u *Local) Err() interfaces.WriterAndStringWriter {
 	return u.err
 }
 
-func (u *Env) GetDirectoryLayout() dir_layout.DirLayout {
+func (u *Local) GetDirectoryLayout() dir_layout.DirLayout {
 	return u.dirLayout
 }
 
-func (u *Env) GetDirLayoutPrimitive() dir_layout.Primitive {
+func (u *Local) GetDirLayoutPrimitive() dir_layout.Primitive {
 	return u.dirLayoutPrimitive
 }
 
-func (u *Env) GetStore() *store.Store {
+func (u *Local) GetStore() *store.Store {
 	return &u.store
 }
 
-func (u *Env) GetExternalLikePoolForRepoId(
+func (u *Local) GetExternalLikePoolForRepoId(
 	repoId ids.RepoId,
 ) (of sku.ObjectFactory) {
 	return
 }
 
-func (u *Env) GetFileEncoder() store_fs.FileEncoder {
+func (u *Local) GetFileEncoder() store_fs.FileEncoder {
 	return u.fileEncoder
 }

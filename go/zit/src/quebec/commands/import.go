@@ -51,13 +51,13 @@ func init() {
 	)
 }
 
-func (c Import) Run(u *env.Env, args ...string) (result Result) {
+func (c Import) Run(u *env.Local, args ...string) (result Result) {
 	result.Error = c.run(u, args...)
 
 	return
 }
 
-func (c Import) run(u *env.Env, args ...string) (err error) {
+func (c Import) run(u *env.Local, args ...string) (err error) {
 	hasConflicts := false
 
 	if c.InventoryList == "" {

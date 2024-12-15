@@ -59,7 +59,7 @@ func (c Edit) DefaultGenres() ids.Genre {
 }
 
 func (c Edit) RunWithQuery(
-	u *env.Env,
+	u *env.Local,
 	eqwk *query.Group,
 ) (err error) {
 	options := checkout_options.Options{
@@ -67,7 +67,7 @@ func (c Edit) RunWithQuery(
 	}
 
 	opEdit := user_ops.Checkout{
-		Env:     u,
+		Local:     u,
 		Options: options,
 		Edit:    true,
 	}

@@ -14,7 +14,7 @@ import (
 type ReadOrganizeFile struct{}
 
 func (c ReadOrganizeFile) RunWithPath(
-	u *env.Env,
+	u *env.Local,
 	p string,
 	repoId ids.RepoId,
 ) (ot *organize_text.Text, err error) {
@@ -40,7 +40,7 @@ func (c ReadOrganizeFile) RunWithPath(
 }
 
 func (c ReadOrganizeFile) Run(
-	u *env.Env,
+	u *env.Local,
 	r io.Reader,
 	om organize_text.Metadata,
 ) (ot *organize_text.Text, err error) {

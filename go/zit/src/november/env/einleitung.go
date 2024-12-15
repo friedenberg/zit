@@ -47,7 +47,7 @@ func (e *BigBang) AddToFlagSet(f *flag.FlagSet) {
 	e.Config.AddToFlagSet(f)
 }
 
-func (u *Env) Start(bb BigBang) (err error) {
+func (u *Local) Start(bb BigBang) (err error) {
 	s := u.GetDirectoryLayout()
 
 	mkdirAll(s.DirObjectId())
@@ -145,7 +145,7 @@ func (u *Env) Start(bb BigBang) (err error) {
 	return
 }
 
-func (bb BigBang) initDefaultTypeAndConfig(u *Env) (err error) {
+func (bb BigBang) initDefaultTypeAndConfig(u *Local) (err error) {
 	if err = u.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -172,7 +172,7 @@ func (bb BigBang) initDefaultTypeAndConfig(u *Env) (err error) {
 }
 
 func (bb BigBang) initDefaultTypeIfNecessaryAfterLock(
-	u *Env,
+	u *Local,
 ) (defaultTypeObjectId ids.Type, err error) {
 	if bb.ExcludeDefaultType {
 		return
@@ -220,7 +220,7 @@ func (bb BigBang) initDefaultTypeIfNecessaryAfterLock(
 }
 
 func (bb BigBang) initDefaultConfigIfNecessaryAfterLock(
-	u *Env,
+	u *Local,
 	defaultTypeObjectId ids.Type,
 ) (err error) {
 	if bb.ExcludeDefaultConfig {
@@ -264,7 +264,7 @@ func (bb BigBang) initDefaultConfigIfNecessaryAfterLock(
 }
 
 func writeDefaultMutableConfig(
-	u *Env,
+	u *Local,
 	dt ids.Type,
 ) (sh interfaces.Sha, tipe ids.Type, err error) {
 	defaultMutableConfig := mutable_config_blobs.Default(dt)

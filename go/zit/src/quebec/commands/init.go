@@ -29,7 +29,7 @@ func init() {
 	)
 }
 
-func (c Init) Run(u *env.Env, args ...string) (err error) {
+func (c Init) Run(u *env.Local, args ...string) (err error) {
 	if err = u.Start(c.BigBang); err != nil {
 		err = errors.Wrap(err)
 		return

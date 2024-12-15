@@ -28,20 +28,20 @@ type PullClient interface {
 }
 
 type client struct {
-	env                *env.Env
+	env                *env.Local
 	stage              *remote_conn.StageCommander
 	chDone             chan struct{}
 	chFilterSkuTickets chan struct{}
 	common
 }
 
-func MakePullClient(u *env.Env, from string) (c *client, err error) {
+func MakePullClient(u *env.Local, from string) (c *client, err error) {
 	c = &client{
 		env:                u,
 		chDone:             make(chan struct{}),
 		chFilterSkuTickets: make(chan struct{}, concurrentSkuFilterJobLimit),
 		common: common{
-			Env: u,
+			Local: u,
 		},
 	}
 

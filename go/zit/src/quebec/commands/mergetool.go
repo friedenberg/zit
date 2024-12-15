@@ -37,7 +37,7 @@ func (c Mergetool) DefaultGenres() ids.Genre {
 }
 
 func (c Mergetool) RunWithQuery(
-	u *env.Env,
+	u *env.Local,
 	qg *query.Group,
 ) (err error) {
 	conflicted := sku.MakeSkuTypeSetMutable()

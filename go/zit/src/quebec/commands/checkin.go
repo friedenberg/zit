@@ -73,7 +73,7 @@ func (c *Checkin) ModifyBuilder(b *query.Builder) {
 }
 
 func (c Checkin) RunWithQuery(
-	u *env.Env,
+	u *env.Local,
 	qg *query.Group,
 ) (err error) {
 	op := user_ops.Checkin{

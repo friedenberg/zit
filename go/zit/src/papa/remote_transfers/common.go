@@ -6,6 +6,6 @@ import (
 )
 
 type common struct {
-	*env.Env
+	*env.Local
 	pmf object_inventory_format.Format
 }

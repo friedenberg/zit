@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 )
 
-func (u *Env) DeleteFiles(fs interfaces.Iterable[*fd.FD]) (err error) {
+func (u *Local) DeleteFiles(fs interfaces.Iterable[*fd.FD]) (err error) {
 	deleteOp := store_fs.DeleteCheckout{}
 
 	if err = deleteOp.Run(

@@ -46,7 +46,7 @@ func (c Export) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.InventoryList)
 }
 
-func (c Export) RunWithQuery(u *env.Env, qg *query.Group) (err error) {
+func (c Export) RunWithQuery(u *env.Local, qg *query.Group) (err error) {
 	list := sku.MakeList()
 	var l sync.Mutex
 

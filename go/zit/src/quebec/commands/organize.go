@@ -67,13 +67,13 @@ func (c *Organize) CompletionGenres() ids.Genre {
 }
 
 func (c *Organize) RunWithQuery(
-	u *env.Env,
+	u *env.Local,
 	qg *query.Group,
 ) (err error) {
 	u.ApplyToOrganizeOptions(&c.Options)
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
-		Env: u,
+		Local: u,
 		Options: u.MakeOrganizeOptionsWithQueryGroup(
 			c.Flags,
 			qg,
@@ -218,7 +218,7 @@ func (c *Organize) RunWithQuery(
 }
 
 func (c Organize) readFromVim(
-	u *env.Env,
+	u *env.Local,
 	f string,
 	results *organize_text.Text,
 	qg *query.Group,

@@ -33,7 +33,7 @@ func init() {
 	)
 }
 
-func (c *FormatOrganize) Run(u *env.Env, args ...string) (err error) {
+func (c *FormatOrganize) Run(u *env.Local, args ...string) (err error) {
 	c.Flags.Config = u.GetConfig()
 
 	if len(args) != 1 {

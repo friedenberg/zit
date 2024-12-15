@@ -27,7 +27,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
-type Env struct {
+type Local struct {
 	sunrise ids.Tai
 
 	in  *os.File
@@ -63,8 +63,8 @@ func Make(
 	kCli mutable_config_blobs.Cli,
 	options Options,
 	primitiveFSHome dir_layout.Primitive,
-) (u *Env, err error) {
-	u = &Env{
+) (u *Local, err error) {
+	u = &Local{
 		in:                 os.Stdin,
 		out:                os.Stdout,
 		err:                os.Stderr,
@@ -94,11 +94,11 @@ func Make(
 }
 
 // TODO investigate removing unnecessary resets like from organize
-func (u *Env) Reset() (err error) {
+func (u *Local) Reset() (err error) {
 	return u.Initialize(OptionsEmpty)
 }
 
-func (u *Env) Initialize(options Options) (err error) {
+func (u *Local) Initialize(options Options) (err error) {
 	if err = u.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -255,7 +255,7 @@ func (u *Env) Initialize(options Options) (err error) {
 	return
 }
 
-func (u *Env) Flush() (err error) {
+func (u *Local) Flush() (err error) {
 	wg := quiter.MakeErrorWaitGroupParallel()
 
 	wg.Do(u.age.Close)
@@ -273,7 +273,7 @@ func (u *Env) Flush() (err error) {
 	return
 }
 
-func (u *Env) PrintMatchedArchiviertIfNecessary() {
+func (u *Local) PrintMatchedArchiviertIfNecessary() {
 	if !u.GetConfig().PrintOptions.PrintMatchedDormant {
 		return
 	}
@@ -288,15 +288,15 @@ func (u *Env) PrintMatchedArchiviertIfNecessary() {
 	ui.Err().Printf("%d archived objects matched", c)
 }
 
-func (u *Env) MakeObjectIdIndex() ids.Index {
+func (u *Local) MakeObjectIdIndex() ids.Index {
 	return ids.Index{}
 }
 
-func (u *Env) GetMatcherArchiviert() query.DormantCounter {
+func (u *Local) GetMatcherArchiviert() query.DormantCounter {
 	return u.DormantCounter
 }
 
-func (u *Env) GetExternalStoreForQuery(
+func (u *Local) GetExternalStoreForQuery(
 	repoId ids.RepoId,
 ) (sku.ExternalStoreForQuery, bool) {
 	e, ok := u.externalStores[repoId]

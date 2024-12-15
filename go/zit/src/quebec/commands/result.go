@@ -12,7 +12,7 @@ type commandWithResult struct {
 	Command
 }
 
-func (cwr commandWithResult) Run(u *env.Env, args ...string) (result Result) {
+func (cwr commandWithResult) Run(u *env.Local, args ...string) (result Result) {
 	result.Error = cwr.Command.Run(u, args...)
 	return
 }

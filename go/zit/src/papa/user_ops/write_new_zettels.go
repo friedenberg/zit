@@ -8,7 +8,7 @@ import (
 )
 
 type WriteNewZettels struct {
-	*env.Env
+	*env.Local
 }
 
 func (c WriteNewZettels) RunMany(

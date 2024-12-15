@@ -24,7 +24,7 @@ func init() {
 	)
 }
 
-func (c PeekZettelIds) Run(store *env.Env, args ...string) (err error) {
+func (c PeekZettelIds) Run(store *env.Local, args ...string) (err error) {
 	n := 0
 
 	if len(args) > 0 {

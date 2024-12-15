@@ -13,14 +13,14 @@ import (
 
 type CommandWithQuery interface {
 	RunWithQuery(
-		store *env.Env,
+		store *env.Local,
 		ids *query.Group,
 	) error
 }
 
 type CommandWithQuery2 interface {
 	RunWithQuery(
-		store *env.Env,
+		store *env.Local,
 		ids *query.Group,
 	) Result
 }
@@ -32,7 +32,7 @@ type commandWithQuery struct {
 }
 
 func (c commandWithQuery) Complete(
-	u *env.Env,
+	u *env.Local,
 	args ...string,
 ) (err error) {
 	var cgg CompletionGenresGetter
@@ -66,7 +66,7 @@ func (c commandWithQuery) Complete(
 	return
 }
 
-func (c commandWithQuery) Run(u *env.Env, args ...string) (err error) {
+func (c commandWithQuery) Run(u *env.Local, args ...string) (err error) {
 	b := u.MakeQueryBuilderExcludingHidden(ids.MakeGenre())
 
 	if dgg, ok := c.CommandWithQuery.(DefaultGenresGetter); ok {

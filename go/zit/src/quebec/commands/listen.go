@@ -23,7 +23,7 @@ func init() {
 	)
 }
 
-func (c Listen) Run(u *env.Env, args ...string) (err error) {
+func (c Listen) Run(u *env.Local, args ...string) (err error) {
 	if len(args) == 0 {
 		err = errors.BadRequestf("must specify command to listen for")
 		return

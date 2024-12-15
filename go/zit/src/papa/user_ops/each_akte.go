@@ -12,7 +12,7 @@ import (
 
 // TODO move to store_fs
 type EachBlob struct {
-	*env.Env
+	*env.Local
 	Utility string
 }
 

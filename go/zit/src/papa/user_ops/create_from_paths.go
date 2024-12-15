@@ -14,7 +14,7 @@ import (
 )
 
 type CreateFromPaths struct {
-	*env.Env
+	*env.Local
 	sku.Proto
 	TextParser object_metadata.TextParser
 	Filter     script_value.ScriptValue

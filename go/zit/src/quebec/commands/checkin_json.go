@@ -34,7 +34,7 @@ type TomlBookmark struct {
 }
 
 func (c CheckinJson) Run(
-	u *env.Env,
+	u *env.Local,
 	args ...string,
 ) (err error) {
 	dec := json.NewDecoder(u.In())

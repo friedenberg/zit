@@ -37,7 +37,7 @@ func (c Status) ModifyBuilder(
 }
 
 func (c Status) RunWithQuery(
-	u *env.Env,
+	u *env.Local,
 	qg *query.Group,
 ) (err error) {
 	pcol := u.PrinterCheckedOut(box_format.CheckedOutHeaderState{})

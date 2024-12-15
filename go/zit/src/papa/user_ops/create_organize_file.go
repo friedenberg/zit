@@ -10,7 +10,7 @@ import (
 
 // TODO support using query results for organize population
 type CreateOrganizeFile struct {
-	*env.Env
+	*env.Local
 	organize_text.Options
 }
 

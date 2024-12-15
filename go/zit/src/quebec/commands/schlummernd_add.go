@@ -21,7 +21,7 @@ func init() {
 	)
 }
 
-func (c DormantAdd) Run(u *env.Env, args ...string) (err error) {
+func (c DormantAdd) Run(u *env.Local, args ...string) (err error) {
 	if err = u.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return

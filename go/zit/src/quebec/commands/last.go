@@ -46,7 +46,7 @@ func (c Last) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c Last) Run(u *env.Env, args ...string) (err error) {
+func (c Last) Run(u *env.Local, args ...string) (err error) {
 	if len(args) != 0 {
 		ui.Err().Print("ignoring arguments")
 	}
@@ -80,7 +80,7 @@ func (c Last) Run(u *env.Env, args ...string) (err error) {
 
 	if c.Organize {
 		opOrganize := user_ops.Organize{
-			Env: u,
+			Local: u,
 			Metadata: organize_text.Metadata{
 				OptionCommentSet: organize_text.MakeOptionCommentSet(nil),
 			},
@@ -102,7 +102,7 @@ func (c Last) Run(u *env.Env, args ...string) (err error) {
 			Options: checkout_options.Options{
 				CheckoutMode: checkout_mode.MetadataAndBlob,
 			},
-			Env:  u,
+			Local:  u,
 			Edit: true,
 		}
 
@@ -116,7 +116,7 @@ func (c Last) Run(u *env.Env, args ...string) (err error) {
 }
 
 func (c Last) runWithInventoryList(
-	u *env.Env,
+	u *env.Local,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	s := u.GetStore()

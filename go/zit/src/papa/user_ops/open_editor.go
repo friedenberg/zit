@@ -11,7 +11,7 @@ type OpenEditor struct {
 }
 
 func (c OpenEditor) Run(
-	u *env.Env,
+	u *env.Local,
 	args ...string,
 ) (err error) {
 	var e editor.Editor

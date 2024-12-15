@@ -51,7 +51,7 @@ func (c Show) DefaultGenres() ids.Genre {
 }
 
 func (c Show) RunWithQuery(
-	u *env.Env,
+	u *env.Local,
 	qg *query.Group,
 ) (err error) {
 	var f interfaces.FuncIter[*sku.Transacted]

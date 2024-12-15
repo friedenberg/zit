@@ -20,7 +20,7 @@ func init() {
 }
 
 func (c Test) Run(
-	u *env.Env,
+	u *env.Local,
 	args ...string,
 ) (err error) {
 	return

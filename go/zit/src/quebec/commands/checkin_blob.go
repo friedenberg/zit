@@ -42,7 +42,7 @@ func init() {
 	)
 }
 
-func (c CheckinBlob) Run(u *env.Env, args ...string) (err error) {
+func (c CheckinBlob) Run(u *env.Local, args ...string) (err error) {
 	if len(args)%2 != 0 {
 		err = errors.Errorf(
 			"arguments must come in pairs of zettel id and blob path",

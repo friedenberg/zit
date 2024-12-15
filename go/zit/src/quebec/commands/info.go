@@ -28,7 +28,7 @@ func init() {
 	)
 }
 
-func (c Info) Run(u *env.Env, args ...string) (result Result) {
+func (c Info) Run(u *env.Local, args ...string) (result Result) {
 	if len(args) == 0 {
 		args = []string{"store-version"}
 	}

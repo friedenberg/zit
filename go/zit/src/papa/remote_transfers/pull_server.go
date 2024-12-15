@@ -13,12 +13,12 @@ import (
 )
 
 type PullServer struct {
-	env   *env.Env
+	env   *env.Local
 	stage *remote_conn.StageSoldier
 }
 
 func MakePullServer(
-	u *env.Env,
+	u *env.Local,
 ) (s PullServer, err error) {
 	s = PullServer{
 		env: u,

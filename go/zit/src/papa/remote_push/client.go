@@ -24,13 +24,13 @@ type Client interface {
 }
 
 type client struct {
-	env                *env.Env
+	env                *env.Local
 	stage              *remote_conn.StageCommander
 	chDone             chan struct{}
 	chFilterSkuTickets chan struct{}
 }
 
-func MakeClient(u *env.Env, from string) (c *client, err error) {
+func MakeClient(u *env.Local, from string) (c *client, err error) {
 	c = &client{
 		chDone:             make(chan struct{}),
 		chFilterSkuTickets: make(chan struct{}, concurrentSkuFilterJobLimit),
