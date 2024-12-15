@@ -36,7 +36,31 @@ func MakePrimitive(do debug.Options) (s Primitive, err error) {
 	return
 }
 
-func MakePrimitiveWithHome(home string, do debug.Options) (s Primitive, err error) {
+func MakePrimitiveWithHome(
+	home string,
+	do debug.Options,
+) (s Primitive, err error) {
+	xdg := xdg.XDG{
+		Home: home,
+	}
+
+	if err = xdg.InitializeFromEnv(true, "zit"); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if s, err = MakePrimitiveWithXDG(do, xdg); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func MakePrimitiveWithXDG(
+	do debug.Options,
+	xdg xdg.XDG,
+) (s Primitive, err error) {
 	if s.cwd, err = os.Getwd(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -45,12 +69,7 @@ func MakePrimitiveWithHome(home string, do debug.Options) (s Primitive, err erro
 	s.pid = os.Getpid()
 	s.dryRun = do.DryRun
 
-	s.xdg.Home = home
-
-	if err = s.xdg.InitializeFromEnv(true, "zit"); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	s.xdg = xdg
 
 	if err = s.sv.ReadFromFile(
 		s.DataFileStoreVersion(),
