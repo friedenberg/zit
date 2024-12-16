@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -28,6 +29,10 @@ type commandWithQuery struct {
 	CommandWithQuery
 	sku.ExternalQueryOptions
 	*query.Group
+}
+
+type CompletionGenresGetter interface {
+	CompletionGenres() ids.Genre
 }
 
 func (c commandWithQuery) Complete(

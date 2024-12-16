@@ -14,3 +14,8 @@ test:
   pushd "$HOME/zit"
   echo "TODO: insert test function"
   exit 1
+
+precommit:
+  make build/zit
+  ./zz-tests_bats/migration/generate_fixture.bash
+  make build/tests_slower
