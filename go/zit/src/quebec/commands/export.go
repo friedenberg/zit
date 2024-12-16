@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"flag"
 	"io"
-	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
@@ -47,20 +46,9 @@ func (c Export) DefaultGenres() ids.Genre {
 }
 
 func (c Export) RunWithQuery(u *env.Local, qg *query.Group) (err error) {
-	list := sku.MakeList()
-	var l sync.Mutex
+	var list *sku.List
 
-	if err = u.GetStore().QueryTransacted(
-		qg,
-		func(sk *sku.Transacted) (err error) {
-			l.Lock()
-			defer l.Unlock()
-
-			list.Add(sk.CloneTransacted())
-
-			return
-		},
-	); err != nil {
+	if list, err = u.MakeInventoryList(qg); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

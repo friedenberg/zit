@@ -4,7 +4,6 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -67,21 +66,8 @@ func (c commandWithQuery) Complete(
 }
 
 func (c commandWithQuery) Run(u *env.Local, args ...string) (err error) {
-	b := u.MakeQueryBuilderExcludingHidden(ids.MakeGenre())
-
-	if dgg, ok := c.CommandWithQuery.(DefaultGenresGetter); ok {
-		b = b.WithDefaultGenres(dgg.DefaultGenres())
-	}
-
-	if dsg, ok := c.CommandWithQuery.(DefaultSigilGetter); ok {
-		b.WithDefaultSigil(dsg.DefaultSigil())
-	}
-
-	if qbm, ok := c.CommandWithQuery.(QueryBuilderModifier); ok {
-		qbm.ModifyBuilder(b)
-	}
-
-	if c.Group, err = b.BuildQueryGroupWithRepoId(
+	if c.Group, err = u.MakeQueryGroup(
+		c.CommandWithQuery,
 		c.RepoId,
 		c.ExternalQueryOptions,
 		args...,
@@ -89,8 +75,6 @@ func (c commandWithQuery) Run(u *env.Local, args ...string) (err error) {
 		err = errors.Wrap(err)
 		return
 	}
-
-	c.Group.ExternalQueryOptions = c.ExternalQueryOptions
 
 	if err = c.RunWithQuery(u, c.Group); err != nil {
 		err = errors.Wrap(err)

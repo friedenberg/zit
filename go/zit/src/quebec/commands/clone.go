@@ -9,6 +9,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/xdg"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
 )
 
@@ -74,7 +78,7 @@ func (c Clone) Run(local *env.Local, args ...string) (err error) {
 			return
 		}
 
-		if remote, err = c.cloneXDG(local, *dotenv.XDG, args...); err != nil {
+		if remote, err = c.cloneXDG(local, *dotenv.XDG); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -84,6 +88,28 @@ func (c Clone) Run(local *env.Local, args ...string) (err error) {
 	}
 
 	ui.Debug().Print(remote)
+
+	var qg *query.Group
+
+	if qg, err = remote.MakeQueryGroup(
+		c,
+		ids.RepoId{},
+		sku.ExternalQueryOptions{},
+		args...,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var list *sku.List
+
+	if list, err = remote.MakeInventoryList(qg); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	ui.Debug().Print(list)
+
 	// get their inventory list as per the query in the args
 	// setup the import to copy blobs from their env
 	// import their inventory list
@@ -93,11 +119,27 @@ func (c Clone) Run(local *env.Local, args ...string) (err error) {
 
 func (c Clone) cloneXDG(
 	local *env.Local,
-	ecksDeeGee xdg.XDG,
-	args ...string,
+	xdg xdg.XDG,
 ) (remote *env.Local, err error) {
-	// if remote, err = env.
-	// bootstrap their dirlayout and turn it into an *env.Env
+	var primitiveFSHome dir_layout.Primitive
+
+	if primitiveFSHome, err = dir_layout.MakePrimitiveWithXDG(
+		local.GetConfig().Debug,
+		xdg,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if remote, err = env.Make(
+		nil,
+		local.GetConfig().Cli(),
+		env.OptionsEmpty,
+		primitiveFSHome,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	return
 }
