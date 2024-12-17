@@ -15,11 +15,6 @@ func main() {
 
 	ctx.SetCancelOnSIGINT()
 
-	go func() {
-		<-ctx.Done()
-		// os.Exit(1)
-	}()
-
 	var exitStatus int
 
 	func() {

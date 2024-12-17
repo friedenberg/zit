@@ -52,10 +52,18 @@ func (c Context) SetCancelOnSignals(
 	}()
 }
 
-func (c Context) Closer(closer io.Closer) {
-	if err := closer.Close(); err != nil {
+func (c Context) Must(f func() error) {
+	if err := f(); err != nil {
 		c.Cancel(err)
 	}
 
 	c.Heartbeat()
+}
+
+func (c Context) Closer(closer io.Closer) {
+	c.Must(closer.Close)
+}
+
+func (c Context) Flusher(flusher Flusher) {
+	c.Must(flusher.Flush)
 }
