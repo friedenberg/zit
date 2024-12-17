@@ -35,10 +35,18 @@ func (s Importer) Import(
 	}
 
 	if external.GetGenre() == genres.InventoryList {
-		return s.importInventoryList(external)
+		if co, err = s.importInventoryList(external); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	} else {
-		return s.importLeafSku(external)
+		if co, err = s.importLeafSku(external); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
+
+	return
 }
 
 func (s Importer) importInventoryList(

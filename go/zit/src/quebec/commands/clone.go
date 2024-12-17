@@ -6,8 +6,8 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/xdg"
+	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -27,9 +27,8 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Clone{
 				BigBang: env.BigBang{
-					Config:               immutable_config.Default(),
-					ExcludeDefaultType:   true,
-					ExcludeDefaultConfig: true,
+					Config:             immutable_config.Default(),
+					ExcludeDefaultType: true,
 				},
 			}
 
@@ -40,6 +39,15 @@ func init() {
 			return c
 		},
 	)
+}
+
+func (c Clone) DefaultSigil() ids.Sigil {
+	return ids.MakeSigil(ids.SigilHistory, ids.SigilHidden)
+}
+
+func (c Clone) DefaultGenres() ids.Genre {
+	return ids.MakeGenre(genres.InventoryList)
+	// return ids.MakeGenre(genres.TrueGenre()...)
 }
 
 func (c Clone) Run(local *env.Local, args ...string) (err error) {
@@ -87,8 +95,6 @@ func (c Clone) Run(local *env.Local, args ...string) (err error) {
 		return
 	}
 
-	ui.Debug().Print(remote)
-
 	var qg *query.Group
 
 	if qg, err = remote.MakeQueryGroup(
@@ -108,11 +114,16 @@ func (c Clone) Run(local *env.Local, args ...string) (err error) {
 		return
 	}
 
-	ui.Debug().Print(list)
+	if err = local.Import(
+		list,
+		remote.GetDirectoryLayout(),
+		true,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	// get their inventory list as per the query in the args
-	// setup the import to copy blobs from their env
-	// import their inventory list
+	// TODO import zettel ids
 
 	return
 }

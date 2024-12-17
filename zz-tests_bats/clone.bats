@@ -15,7 +15,6 @@ teardown() {
 # bats file_tags=user_story:clone,user_story:repo,user_store:xdg
 
 function bootstrap {
-	skip
 	set_xdg "$1"
 	run_zit_init
 
@@ -35,12 +34,6 @@ function bootstrap {
 		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
 	EOM
-}
-
-function clone { # @test
-	them="them"
-	bootstrap "$them"
-	assert_success
 
 	run_zit new -edit=false - <<-EOM
 		---
@@ -59,6 +52,33 @@ function clone { # @test
 		[this_is_the_second @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 	EOM
+}
+
+# TODO add support for populating zettel-ids at clone time
+function try_add_new_after_clone {
+	run_zit new -edit=false - <<-EOM
+		---
+		# zettel after clone description
+		! md
+		---
+
+		zettel after clone body
+	EOM
+
+	assert_success
+	assert_output - <<-EOM
+		[this_is_the_first @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[this_is_the_second @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
+	EOM
+
+	zit exp
+}
+
+function clone_history_zettel_typ_etikett { # @test
+	them="them"
+	bootstrap "$them"
+	assert_success
 
 	function print_their_xdg() (
 		set_xdg "$them"
@@ -67,33 +87,56 @@ function clone { # @test
 
 	us="us"
 	set_xdg "$us"
-	run_zit clone -xdg-dotenv <(print_their_xdg) +zettel,typ
+	run_zit clone -xdg-dotenv <(print_their_xdg) +zettel,typ,etikett
 
 	assert_success
 	assert_output_unsorted - <<-EOM
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
-		[!md @102bc5f72997424cf55c6afc1c634f04d636c9aa094426c95b00073c04697384]
-		[-tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-this_is_the_first @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-this_is_the_second @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[konfig @c1a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685]
-		[konfig @c1a8ed3cf288dd5d7ccdfd6b9c8052a925bc56be2ec97ed0bb345ab1d961c685]
+		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
+		[konfig @ef6b910d71068d5cb0598abeaea21140b44da67a4a4a9eca6485e8a2906ca483 !toml-config-v1]
 		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
+		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[this_is_the_first @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[this_is_the_second @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		copied Blob 024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b (36 bytes)
+		copied Blob 9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 (5 bytes)
+		copied Blob b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 (51 bytes)
 	EOM
+}
 
-	run_zit show one/dos
+function clone_history_default { # @test
+	them="them"
+	bootstrap "$them"
 	assert_success
-	assert_output - <<-EOM
-		---
-		# zettel with multiple etiketten
-		- this_is_the_first
-		- this_is_the_second
-		! md
-		---
 
-		zettel with multiple etiketten body
+	function print_their_xdg() (
+		set_xdg "$them"
+		zit info xdg
+	)
+
+	us="us"
+	set_xdg "$us"
+	run_zit clone -xdg-dotenv <(print_their_xdg)
+
+	assert_success
+	assert_output_unsorted --regexp - <<-EOM
+		\[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
+		\[.+\..+ @.+ !inventory_list-v1]
+		\[.+\..+ @.+ !inventory_list-v1]
+		\[.+\..+ @.+ !inventory_list-v1]
+		\[konfig @d904d322213ed86cdc0eabd58d44f55385f9665280f6c03a01e396f22ba2333b !toml-config-v1]
+		\[konfig @ef6b910d71068d5cb0598abeaea21140b44da67a4a4a9eca6485e8a2906ca483 !toml-config-v1]
+		\[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
+		\[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
+		\[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		\[this_is_the_first @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		\[this_is_the_second @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		copied Blob .+ \(.+ bytes)
+		copied Blob .+ \(.+ bytes)
+		copied Blob .+ \(.+ bytes)
+		copied Blob .+ \(.+ bytes)
+		copied Blob .+ \(.+ bytes)
+		copied Blob .+ \(.+ bytes)
+		copied Blob .+ \(.+ bytes)
 	EOM
 }
