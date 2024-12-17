@@ -62,7 +62,7 @@ func (c Clone) Run(local *env.Local, args ...string) (err error) {
 		return
 	}
 
-	var remote *env.Local
+	var remote env.Env
 
 	if c.TheirXDGDotenv != "" {
 		dotenv := xdg.Dotenv{
@@ -86,7 +86,7 @@ func (c Clone) Run(local *env.Local, args ...string) (err error) {
 			return
 		}
 
-		if remote, err = c.cloneXDG(local, *dotenv.XDG); err != nil {
+		if remote, err = c.makeLocalEnvFromXDG(local, *dotenv.XDG); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -107,7 +107,7 @@ func (c Clone) Run(local *env.Local, args ...string) (err error) {
 		return
 	}
 
-	if err = local.ImportQueryGroupFromRemote(
+	if err = local.PullQueryGroupFromRemote(
 		remote,
 		qg,
 		true,
@@ -119,7 +119,7 @@ func (c Clone) Run(local *env.Local, args ...string) (err error) {
 	return
 }
 
-func (c Clone) cloneXDG(
+func (c Clone) makeLocalEnvFromXDG(
 	local *env.Local,
 	xdg xdg.XDG,
 ) (remote *env.Local, err error) {

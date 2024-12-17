@@ -1,0 +1,20 @@
+package env
+
+import (
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
+)
+
+type Env interface {
+	MakeQueryGroup(
+		metaBuilder any,
+		repoId ids.RepoId,
+		externalQueryOptions sku.ExternalQueryOptions,
+		args ...string,
+	) (qg *query.Group, err error)
+
+	MakeInventoryList(
+		qg *query.Group,
+	) (list *sku.List, err error)
+}
