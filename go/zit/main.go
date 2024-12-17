@@ -20,7 +20,21 @@ func main() {
 		// os.Exit(1)
 	}()
 
-	exitStatus := commands.Run(ctx, os.Args...)
+	var exitStatus int
+
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				exitStatus = 1
+
+				if r != errors.ErrContextCancelled {
+					panic(r)
+				}
+			}
+		}()
+
+		exitStatus = commands.Run(ctx, os.Args...)
+	}()
 
 	if err := context.Cause(ctx); err != nil {
 		var normalError errors.StackTracer

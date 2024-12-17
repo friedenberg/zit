@@ -2,20 +2,13 @@ package errors
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
-type SignalError struct {
-	os.Signal
-}
-
-func (err SignalError) Error() string {
-	return fmt.Sprintf("signal: %q", err.Signal)
-}
+var ErrContextCancelled = New("context cancelled")
 
 type Context struct {
 	context.Context
@@ -38,7 +31,7 @@ func (c Context) Heartbeat() {
 
 	case <-c.Done():
 		if err := context.Cause(c); err != nil {
-			panic(err)
+			panic(ErrContextCancelled)
 		}
 	}
 }
@@ -55,14 +48,14 @@ func (c Context) SetCancelOnSignals(
 	signal.Notify(ch, signals...)
 
 	go func() {
-		c.Cancel(SignalError{Signal: <-ch})
+		c.Cancel(Signal{Signal: <-ch})
 	}()
 }
 
-func (c Context) Closer(
-	closer io.Closer,
-) {
+func (c Context) Closer(closer io.Closer) {
 	if err := closer.Close(); err != nil {
 		c.Cancel(err)
 	}
+
+	c.Heartbeat()
 }
