@@ -107,23 +107,14 @@ func (c Clone) Run(local *env.Local, args ...string) (err error) {
 		return
 	}
 
-	var list *sku.List
-
-	if list, err = remote.MakeInventoryList(qg); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = local.Import(
-		list,
-		remote.GetDirectoryLayout(),
+	if err = local.ImportQueryGroupFromRemote(
+		remote,
+		qg,
 		true,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	// TODO import zettel ids
 
 	return
 }

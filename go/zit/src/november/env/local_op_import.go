@@ -7,10 +7,35 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
-func (u *Local) Import(
+func (local *Local) ImportQueryGroupFromRemote(
+	remote *Local,
+	qg *query.Group,
+	printCopies bool,
+) (err error) {
+	var list *sku.List
+
+	if list, err = remote.MakeInventoryList(qg); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = local.ImportListFromRemoteBlobStore(
+		list,
+		remote.GetDirectoryLayout(),
+		printCopies,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (u *Local) ImportListFromRemoteBlobStore(
 	list *sku.List,
 	remoteBlobStore dir_layout.BlobStore,
 	printCopies bool,

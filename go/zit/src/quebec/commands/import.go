@@ -105,7 +105,7 @@ func (c Import) run(u *env.Local, args ...string) (err error) {
 		)
 	}
 
-	if err = u.Import(
+	if err = u.ImportListFromRemoteBlobStore(
 		list,
 		remoteBlobStore,
 		c.PrintCopies,

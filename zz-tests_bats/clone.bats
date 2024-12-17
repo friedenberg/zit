@@ -54,7 +54,14 @@ function bootstrap {
 	EOM
 }
 
-# TODO add support for populating zettel-ids at clone time
+function run_clone_default_with() {
+	run_zit clone \
+		-yin <(cat_yin) \
+		-yang <(cat_yang) \
+		-lock-internal-files=false \
+		"$@"
+}
+
 function try_add_new_after_clone {
 	run_zit new -edit=false - <<-EOM
 		---
@@ -67,12 +74,8 @@ function try_add_new_after_clone {
 
 	assert_success
 	assert_output - <<-EOM
-		[this_is_the_first @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[this_is_the_second @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
+		[two/uno @13af191e86dcd8448565157de81919f19337656787f3d0fdd90b5335d2170f3f !md "zettel after clone description"]
 	EOM
-
-	zit exp
 }
 
 function clone_history_zettel_typ_etikett { # @test
@@ -87,7 +90,9 @@ function clone_history_zettel_typ_etikett { # @test
 
 	us="us"
 	set_xdg "$us"
-	run_zit clone -xdg-dotenv <(print_their_xdg) +zettel,typ,etikett
+	run_clone_default_with \
+		-xdg-dotenv <(print_their_xdg) \
+		+zettel,typ,etikett
 
 	assert_success
 	assert_output_unsorted - <<-EOM
@@ -102,6 +107,8 @@ function clone_history_zettel_typ_etikett { # @test
 		copied Blob 9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 (5 bytes)
 		copied Blob b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 (51 bytes)
 	EOM
+
+	try_add_new_after_clone
 }
 
 function clone_history_default { # @test
@@ -116,7 +123,7 @@ function clone_history_default { # @test
 
 	us="us"
 	set_xdg "$us"
-	run_zit clone -xdg-dotenv <(print_their_xdg)
+	run_clone_default_with -xdg-dotenv <(print_their_xdg)
 
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM
@@ -139,4 +146,6 @@ function clone_history_default { # @test
 		copied Blob .+ \(.+ bytes)
 		copied Blob .+ \(.+ bytes)
 	EOM
+
+	try_add_new_after_clone
 }
