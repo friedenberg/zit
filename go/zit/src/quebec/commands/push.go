@@ -2,67 +2,91 @@ package commands
 
 import (
 	"flag"
+	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/xdg"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
-	"code.linenisgreat.com/zit/go/zit/src/papa/remote_push"
 )
 
 type Push struct {
-	genres.Genre
+	TheirXDGDotenv string
 }
 
 func init() {
 	registerCommand(
 		"push",
 		func(f *flag.FlagSet) Command {
-			c := &Push{
-				Genre: genres.Zettel,
-			}
+			c := &Push{}
 
-			f.Var(&c.Genre, "gattung", "Gattung")
+			f.StringVar(&c.TheirXDGDotenv, "xdg-dotenv", "", "")
 
 			return c
 		},
 	)
 }
 
-func (c Push) CompletionGenres() ids.Genre {
-	return ids.MakeGenre(
-		genres.Zettel,
-		genres.Tag,
-		genres.Type,
-		genres.InventoryList,
-		genres.Repo,
-	)
+func (c Push) DefaultSigil() ids.Sigil {
+	return ids.MakeSigil(ids.SigilHistory, ids.SigilHidden)
 }
 
-func (c Push) Run(u *env.Local, args ...string) (err error) {
-	if len(args) == 0 {
-		err = errors.BadRequestf("must specify kasten to push from")
+func (c Push) DefaultGenres() ids.Genre {
+	return ids.MakeGenre(genres.InventoryList)
+}
+
+func (c Push) Run(local *env.Local, args ...string) (err error) {
+	if len(args) < 1 && c.TheirXDGDotenv == "" {
+		// TODO add info about remote options
+		err = errors.BadRequestf("Cloning requires a remote to be specified")
 		return
 	}
 
-	from := args[0]
+	var remote env.Env
 
-	if len(args) > 1 {
-		args = args[1:]
+	if c.TheirXDGDotenv != "" {
+		dotenv := xdg.Dotenv{
+			XDG: &xdg.XDG{},
+		}
+
+		var f *os.File
+
+		if f, err = os.Open(c.TheirXDGDotenv); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if _, err = dotenv.ReadFrom(f); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = f.Close(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if remote, err = env.MakeLocalFromConfigAndXDG(
+      local.Context,
+			local.GetConfig(),
+			*dotenv.XDG,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	} else {
-		err = errors.BadRequestf("Nothing to push.")
+		err = todo.Implement()
 		return
 	}
-
-	builder := u.MakeQueryBuilderExcludingHidden(
-		ids.MakeGenre(),
-	)
 
 	var qg *query.Group
 
-	if qg, err = builder.BuildQueryGroupWithRepoId(
+	if qg, err = remote.MakeQueryGroup(
+		c,
 		ids.RepoId{},
 		sku.ExternalQueryOptions{},
 		args...,
@@ -71,26 +95,14 @@ func (c Push) Run(u *env.Local, args ...string) (err error) {
 		return
 	}
 
-	if err = u.Lock(); err != nil {
+	if err = remote.PullQueryGroupFromRemote(
+		local,
+		qg,
+		true,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
-
-	defer errors.Deferred(&err, u.Unlock)
-
-	var client remote_push.Client
-
-	if client, err = remote_push.MakeClient(u, from); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = client.SendNeededSkus(qg); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, client)
 
 	return
 }

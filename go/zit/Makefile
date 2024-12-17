@@ -44,7 +44,7 @@ build/go_generate: $(files_go_generate) | build_dir
 
 files_go := $(shell find src -type f)
 
-build/zit: build/go_generate $(files_go) | build_dir
+build/zit: build/go_generate $(files_go) main.go | build_dir
 > go build -o build/zit ./.
 
 build/go_vet: $(files_go) | build_dir

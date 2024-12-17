@@ -29,6 +29,8 @@ import (
 )
 
 type Local struct {
+	errors.Context
+
 	sunrise ids.Tai
 
 	in  fd.Std
@@ -56,6 +58,7 @@ type Local struct {
 }
 
 func MakeLocalFromConfigAndXDG(
+	context errors.Context,
 	config *config.Compiled,
 	xdg xdg.XDG,
 ) (local *Local, err error) {
@@ -70,6 +73,7 @@ func MakeLocalFromConfigAndXDG(
 	}
 
 	if local, err = MakeLocal(
+		context,
 		nil,
 		config.Cli(),
 		OptionsEmpty,
@@ -83,12 +87,14 @@ func MakeLocalFromConfigAndXDG(
 }
 
 func MakeLocal(
+	context errors.Context,
 	flags *flag.FlagSet,
 	kCli mutable_config_blobs.Cli,
 	options Options,
 	primitiveFSHome dir_layout.Primitive,
 ) (u *Local, err error) {
 	u = &Local{
+		Context:            context,
 		in:                 fd.MakeStd(os.Stdin),
 		out:                fd.MakeStd(os.Stdout),
 		err:                fd.MakeStd(os.Stderr),

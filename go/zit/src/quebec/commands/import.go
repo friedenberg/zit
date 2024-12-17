@@ -28,7 +28,7 @@ type Import struct {
 func init() {
 	registerCommand(
 		"import",
-		func(f *flag.FlagSet) CommandWithResult {
+		func(f *flag.FlagSet) CommandWithContext {
 			c := &Import{
 				StoreVersion:    immutable_config.CurrentStoreVersion,
 				CompressionType: immutable_config.CompressionTypeDefault,
@@ -48,22 +48,16 @@ func init() {
 	)
 }
 
-func (c Import) Run(u *env.Local, args ...string) (result Result) {
-	result.Error = c.run(u, args...)
-
-	return
-}
-
-func (c Import) run(u *env.Local, args ...string) (err error) {
+func (c Import) Run(u *env.Local, args ...string) {
 	if c.InventoryList == "" {
-		err = errors.Errorf("empty inventory list")
+		u.Context.Cancel(errors.BadRequestf("empty inventory list"))
 		return
 	}
 
 	var ag age.Age
 
-	if err = ag.AddIdentity(c.AgeIdentity); err != nil {
-		err = errors.Wrapf(err, "age-identity: %q", &c.AgeIdentity)
+	if err := ag.AddIdentity(c.AgeIdentity); err != nil {
+		u.Context.Cancel(errors.Wrapf(err, "age-identity: %q", &c.AgeIdentity))
 		return
 	}
 
@@ -79,19 +73,21 @@ func (c Import) run(u *env.Local, args ...string) (err error) {
 			CompressionType: c.CompressionType,
 		}
 
+		var err error
+
 		if rc, err = dir_layout.NewFileReader(o); err != nil {
-			err = errors.Wrap(err)
+			u.Context.Cancel(errors.Wrap(err))
 			return
 		}
 
-		defer errors.DeferredCloser(&err, rc)
+		defer u.Context.Closer(rc)
 	}
 
 	list := sku.MakeList()
 
 	// TODO determine why this is not erroring for invalid input
-	if err = inventory_list_blobs.ReadInventoryListBlob(bf, rc, list); err != nil {
-		err = errors.Wrap(err)
+	if err := inventory_list_blobs.ReadInventoryListBlob(bf, rc, list); err != nil {
+		u.Context.Cancel(errors.Wrap(err))
 		return
 	}
 
@@ -105,7 +101,7 @@ func (c Import) run(u *env.Local, args ...string) (err error) {
 		)
 	}
 
-	if err = u.ImportListFromRemoteBlobStore(
+	if err := u.ImportListFromRemoteBlobStore(
 		list,
 		remoteBlobStore,
 		c.PrintCopies,
@@ -114,8 +110,8 @@ func (c Import) run(u *env.Local, args ...string) (err error) {
 			err = errors.Wrap(err)
 		}
 
+		u.Context.Cancel(err)
+
 		return
 	}
-
-	return
 }

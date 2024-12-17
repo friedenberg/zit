@@ -1,13 +1,16 @@
 package dir_layout
 
 import (
+	"context"
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 )
 
 // TODO only call reset temp when actually not resetting temp
-func (s DirLayout) ResetTempOnExit(errIn error) (err error) {
+func (s DirLayout) ResetTempOnExit(ctx errors.Context) (err error) {
+	errIn := context.Cause(ctx)
+
 	if errIn != nil || s.debug.NoTempDirCleanup {
 		// ui.Err().Printf("temp dir: %q", s.DirTempLocal())
 	} else {

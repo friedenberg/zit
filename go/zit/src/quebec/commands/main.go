@@ -71,7 +71,13 @@ func Run(
 		options = og.GetEnvironmentInitializeOptions()
 	}
 
-	if u, err = env.MakeLocal(cmd.FlagSet, cliConfig, options, primitiveFSHome); err != nil {
+	if u, err = env.MakeLocal(
+		ctx,
+		cmd.FlagSet,
+		cliConfig,
+		options,
+		primitiveFSHome,
+	); err != nil {
 		if cmd.withoutEnv {
 			err = nil
 		} else {
@@ -83,16 +89,13 @@ func Run(
 	defer u.PrintMatchedArchiviertIfNecessary()
 	defer errors.DeferredFlusher(&err, u)
 
-	var result Result
-
 	defer func() {
-		if err = u.GetDirectoryLayout().ResetTempOnExit(result.Error); err != nil {
+		if err = u.GetDirectoryLayout().ResetTempOnExit(ctx); err != nil {
 			ctx.Cancel(errors.Wrap(err))
 			return
 		}
 	}()
 
-OUTER:
 	switch {
 	case u.GetConfig().Complete:
 		var t WithCompletion
@@ -110,12 +113,15 @@ OUTER:
 				break LOOP
 
 			default:
-				result.Error = errors.BadRequestf("Command does not support completion")
-				break OUTER
+				ctx.Cancel(errors.BadRequestf("Command does not support completion"))
+				return
 			}
 		}
 
-		result.Error = t.Complete(u, cmdArgs...)
+		if err := t.Complete(u, cmdArgs...); err != nil {
+			ctx.Cancel(err)
+			return
+		}
 
 	default:
 
@@ -126,16 +132,8 @@ OUTER:
 				// }
 			}()
 
-			result = cmd.Command.Run(u, cmdArgs...)
+			cmd.Command.Run(u, cmdArgs...)
 		}()
-	}
-
-	exitStatus = result.ExitCode
-
-	if result.Error != nil {
-		exitStatus = 1
-		// TODO switch to Err() and update tests
-		ui.Out().Print(result.Error)
 	}
 
 	return

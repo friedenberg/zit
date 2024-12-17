@@ -17,7 +17,7 @@ type Fsck struct {
 func init() {
 	registerCommand(
 		"fsck",
-		func(f *flag.FlagSet) CommandWithResult {
+		func(f *flag.FlagSet) CommandWithContext {
 			c := &Fsck{
 				Genres: ids.MakeGenre(genres.Tag, genres.Type, genres.Zettel),
 			}
@@ -29,10 +29,10 @@ func init() {
 	)
 }
 
-func (c Fsck) Run(u *env.Local, args ...string) (result Result) {
+func (c Fsck) Run(u *env.Local, args ...string) {
 	p := u.PrinterTransacted()
 
-	if result.Error = u.GetStore().QueryPrimitive(
+	if err := u.GetStore().QueryPrimitive(
 		sku.MakePrimitiveQueryGroup(),
 		func(sk *sku.Transacted) (err error) {
 			if !c.Genres.Contains(sk.GetGenre()) {
@@ -52,8 +52,8 @@ func (c Fsck) Run(u *env.Local, args ...string) (result Result) {
 
 			return
 		},
-	); result.Error != nil {
-		result.Error = errors.Wrap(result.Error)
+	); err != nil {
+		u.Context.Cancel(errors.Wrap(err))
 		return
 	}
 

@@ -86,6 +86,7 @@ func (c Clone) Run(local *env.Local, args ...string) (err error) {
 		}
 
 		if remote, err = env.MakeLocalFromConfigAndXDG(
+      local.Context,
 			local.GetConfig(),
 			*dotenv.XDG,
 		); err != nil {

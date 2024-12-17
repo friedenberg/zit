@@ -27,7 +27,7 @@ type WriteBlob struct {
 func init() {
 	registerCommand(
 		"write-blob",
-		func(f *flag.FlagSet) CommandWithResult {
+		func(f *flag.FlagSet) CommandWithContext {
 			c := &WriteBlob{}
 
 			f.BoolVar(&c.Check, "check", false, "only check if the object already exists")
@@ -48,15 +48,15 @@ type answer struct {
 	Path string
 }
 
-func (c WriteBlob) Run(u *env.Local, args ...string) (result Result) {
+func (c WriteBlob) Run(u *env.Local, args ...string) {
 	var failCount atomic.Uint32
 
 	sawStdin := false
 
 	var ag age.Age
 
-	if result.Error = ag.AddIdentity(c.AgeIdentity); result.Error != nil {
-		result.Error = errors.Wrapf(result.Error, "age-identity: %q", &c.AgeIdentity)
+	if err := ag.AddIdentity(c.AgeIdentity); err != nil {
+		u.Context.Cancel(errors.Wrapf(err, "age-identity: %q", &c.AgeIdentity))
 		return
 	}
 
@@ -100,8 +100,7 @@ func (c WriteBlob) Run(u *env.Local, args ...string) (result Result) {
 	fc := failCount.Load()
 
 	if fc > 0 {
-		ui.Err().Printf("untracked objects: %d", fc)
-		result.ExitCode = 1
+		u.Context.Cancel(errors.BadRequestf("untracked objects: %d", fc))
 		return
 	}
 

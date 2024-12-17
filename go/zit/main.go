@@ -17,27 +17,19 @@ func main() {
 
 	go func() {
 		<-ctx.Done()
-		os.Exit(1)
+		// os.Exit(1)
 	}()
 
-	exitStatus := commands.Run(
-		ctx,
-		os.Args...,
-	)
+	exitStatus := commands.Run(ctx, os.Args...)
 
 	if err := context.Cause(ctx); err != nil {
 		var normalError errors.StackTracer
-
-		if err != nil {
-			exitStatus = 1
-		}
+		exitStatus = 1
 
 		if errors.As(err, &normalError) && !normalError.ShouldShowStackTrace() {
 			ui.Err().Printf("%s", normalError.Error())
 		} else {
-			if err != nil {
-				ui.Err().Print(err)
-			}
+			ui.Err().Print(err)
 		}
 	}
 

@@ -17,4 +17,10 @@ type Env interface {
 	MakeInventoryList(
 		qg *query.Group,
 	) (list *sku.List, err error)
+
+	PullQueryGroupFromRemote(
+		remote Env,
+		qg *query.Group,
+		printCopies bool,
+	) (err error)
 }

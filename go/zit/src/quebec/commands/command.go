@@ -11,8 +11,8 @@ type Command interface {
 	Run(*env.Local, ...string) error
 }
 
-type CommandWithResult interface {
-	Run(*env.Local, ...string) Result
+type CommandWithContext interface {
+	Run(*env.Local, ...string)
 }
 
 type WithCompletion interface {
@@ -21,7 +21,7 @@ type WithCompletion interface {
 
 type command struct {
 	withoutEnv bool
-	Command    CommandWithResult
+	Command    CommandWithContext
 	*flag.FlagSet
 }
 
@@ -50,7 +50,7 @@ func _registerCommand(
 			FlagSet:    f,
 		}
 
-	case func(*flag.FlagSet) CommandWithResult:
+	case func(*flag.FlagSet) CommandWithContext:
 		commands[n] = command{
 			withoutEnv: env,
 			Command:    mft(f),

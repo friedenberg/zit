@@ -79,8 +79,6 @@ func (s Importer) importInventoryList(
 	}
 
 	return
-
-	return
 }
 
 func (s Importer) importLeafSku(

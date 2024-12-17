@@ -18,7 +18,7 @@ type Info struct {
 func init() {
 	registerCommandWithoutEnvironment(
 		"info",
-		func(f *flag.FlagSet) CommandWithResult {
+		func(f *flag.FlagSet) CommandWithContext {
 			c := &Info{
 				Config: immutable_config.Default(),
 			}
@@ -28,7 +28,7 @@ func init() {
 	)
 }
 
-func (c Info) Run(u *env.Local, args ...string) (result Result) {
+func (c Info) Run(u *env.Local, args ...string) {
 	if len(args) == 0 {
 		args = []string{"store-version"}
 	}
@@ -45,8 +45,8 @@ func (c Info) Run(u *env.Local, args ...string) (result Result) {
 				XDG: &ecksDeeGee,
 			}
 
-			if _, result.Error = dotenv.WriteTo(u.Out()); result.Error != nil {
-				result.Error = errors.Wrap(result.Error)
+			if _, err := dotenv.WriteTo(u.Out()); err != nil {
+				u.Context.Cancel(errors.Wrap(err))
 				return
 			}
 		}

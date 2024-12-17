@@ -2,6 +2,7 @@ package env
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
@@ -28,6 +29,10 @@ func (local *Local) PullQueryGroupFromRemote(
 			err = errors.Wrap(err)
 			return
 		}
+
+  default:
+    err = todo.Implement()
+    return
 	}
 
 	return
