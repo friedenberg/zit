@@ -71,7 +71,7 @@ func Run(
 		options = og.GetEnvironmentInitializeOptions()
 	}
 
-	if u, err = env.Make(cmd.FlagSet, cliConfig, options, primitiveFSHome); err != nil {
+	if u, err = env.MakeLocal(cmd.FlagSet, cliConfig, options, primitiveFSHome); err != nil {
 		if cmd.withoutEnv {
 			err = nil
 		} else {

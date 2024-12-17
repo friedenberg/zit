@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/xdg"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
@@ -54,7 +55,34 @@ type Local struct {
 	luaSkuFormat *box_format.BoxTransacted
 }
 
-func Make(
+func MakeLocalFromConfigAndXDG(
+	config *config.Compiled,
+	xdg xdg.XDG,
+) (local *Local, err error) {
+	var primitiveFSHome dir_layout.Primitive
+
+	if primitiveFSHome, err = dir_layout.MakePrimitiveWithXDG(
+		config.Debug,
+		xdg,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if local, err = MakeLocal(
+		nil,
+		config.Cli(),
+		OptionsEmpty,
+		primitiveFSHome,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func MakeLocal(
 	flags *flag.FlagSet,
 	kCli mutable_config_blobs.Cli,
 	options Options,

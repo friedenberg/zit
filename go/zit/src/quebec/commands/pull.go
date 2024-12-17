@@ -2,17 +2,21 @@ package commands
 
 import (
 	"flag"
+	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/xdg"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
-	"code.linenisgreat.com/zit/go/zit/src/papa/remote_transfers"
 )
 
-type Pull struct{}
+type Pull struct {
+	TheirXDGDotenv string
+}
 
 func init() {
 	registerCommand(
@@ -20,43 +24,69 @@ func init() {
 		func(f *flag.FlagSet) Command {
 			c := &Pull{}
 
+			f.StringVar(&c.TheirXDGDotenv, "xdg-dotenv", "", "")
+
 			return c
 		},
 	)
 }
 
-func (c Pull) CompletionGenres() ids.Genre {
-	return ids.MakeGenre(
-		genres.Zettel,
-		genres.Tag,
-		genres.Type,
-		genres.InventoryList,
-		genres.Repo,
-	)
+func (c Pull) DefaultSigil() ids.Sigil {
+	return ids.MakeSigil(ids.SigilHistory, ids.SigilHidden)
 }
 
-func (c Pull) Run(u *env.Local, args ...string) (err error) {
-	if len(args) == 0 {
-		err = errors.BadRequestf("must specify kasten to pull from")
+func (c Pull) DefaultGenres() ids.Genre {
+	return ids.MakeGenre(genres.InventoryList)
+	// return ids.MakeGenre(genres.TrueGenre()...)
+}
+
+func (c Pull) Run(local *env.Local, args ...string) (err error) {
+	if len(args) < 1 && c.TheirXDGDotenv == "" {
+		// TODO add info about remote options
+		err = errors.BadRequestf("Pulling requires a remote to be specified")
 		return
 	}
 
-	from := args[0]
+	var remote env.Env
 
-	if len(args) > 1 {
-		args = args[1:]
+	if c.TheirXDGDotenv != "" {
+		dotenv := xdg.Dotenv{
+			XDG: &xdg.XDG{},
+		}
+
+		var f *os.File
+
+		if f, err = os.Open(c.TheirXDGDotenv); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if _, err = dotenv.ReadFrom(f); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = f.Close(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if remote, err = env.MakeLocalFromConfigAndXDG(
+			local.GetConfig(),
+			*dotenv.XDG,
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	} else {
-		err = errors.BadRequestf("Nothing to pull")
+		err = todo.Implement()
 		return
 	}
-
-	builder := u.MakeQueryBuilderExcludingHidden(
-		c.CompletionGenres(),
-	)
 
 	var qg *query.Group
 
-	if qg, err = builder.BuildQueryGroupWithRepoId(
+	if qg, err = remote.MakeQueryGroup(
+		c,
 		ids.RepoId{},
 		sku.ExternalQueryOptions{},
 		args...,
@@ -65,23 +95,11 @@ func (c Pull) Run(u *env.Local, args ...string) (err error) {
 		return
 	}
 
-	if err = u.Lock(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.Deferred(&err, u.Unlock)
-
-	var client remote_transfers.PullClient
-
-	if client, err = remote_transfers.MakePullClient(u, from); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	defer errors.DeferredCloser(&err, client)
-
-	if err = client.PullSkus(qg); err != nil {
+	if err = local.PullQueryGroupFromRemote(
+		remote,
+		qg,
+		true,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
