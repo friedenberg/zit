@@ -6,10 +6,13 @@ import (
 	"os/exec"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func (s *Store) runDiff3(left, middle, right *fd.FD) (path string, err error) {
+// TODO include blobs
+func (s *Store) runDiff3(
+	left, middle, right *sku.FSItem,
+) (merged *sku.FSItem, err error) {
 	cmd := exec.Command(
 		"git",
 		"merge-file",
@@ -17,9 +20,9 @@ func (s *Store) runDiff3(left, middle, right *fd.FD) (path string, err error) {
 		"-L=left",
 		"-L=middle",
 		"-L=right",
-		left.GetPath(),
-		middle.GetPath(),
-		right.GetPath(),
+		left.Object.GetPath(),
+		middle.Object.GetPath(),
+		right.Object.GetPath(),
 	)
 
 	var out io.ReadCloser
@@ -50,6 +53,11 @@ func (s *Store) runDiff3(left, middle, right *fd.FD) (path string, err error) {
 		return
 	}
 
+	merged = &sku.FSItem{}
+	merged.Reset()
+
+	hasConflict := false
+
 	if err = cmd.Wait(); err != nil {
 		var errExit *exec.ExitError
 
@@ -58,16 +66,17 @@ func (s *Store) runDiff3(left, middle, right *fd.FD) (path string, err error) {
 			return
 		}
 
-		// TODO figure out why exit code 2 is being thrown by diff3 for conflicts
-		err = errors.Wrap(MakeErrMergeConflict(nil))
-		// if errExit.ExitCode() == 1 {
-		// } else {
-		// 	err = errors.Wrapf(errExit, "Stderr: %q", errExit.Stderr)
-		// 	return
-		// }
+		hasConflict = true
 	}
 
-	path = f.Name()
+	if err = merged.Object.SetPath(f.Name()); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if hasConflict {
+		err = errors.Wrap(MakeErrMergeConflict(merged))
+	}
 
 	return
 }

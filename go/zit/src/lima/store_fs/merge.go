@@ -8,6 +8,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
@@ -18,9 +19,7 @@ import (
 )
 
 func (s *Store) Merge(conflicted sku.Conflicted) (err error) {
-	var original, replacement *sku.FSItem
-
-	replacement, mergeResult := s.tryMergeIgnoringConflicts(conflicted)
+	var original *sku.FSItem
 
 	if original, err = s.ReadFSItemFromExternal(
 		conflicted.CheckedOut.GetSkuExternal(),
@@ -29,19 +28,19 @@ func (s *Store) Merge(conflicted sku.Conflicted) (err error) {
 		return
 	}
 
-	co := conflicted.CheckedOut
+	var skuReplacement *sku.Transacted
 
-	if mergeResult != nil {
-		if IsErrMergeConflict(mergeResult) {
+	if skuReplacement, err = s.MakeMergedTransacted(conflicted); err != nil {
+		if IsErrMergeConflict(err) {
 			if err = s.GenerateConflictMarker(
 				conflicted,
-				co,
+				conflicted.CheckedOut,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 		} else {
-			err = errors.Wrap(mergeResult)
+			err = errors.Wrap(err)
 		}
 
 		return
@@ -51,6 +50,13 @@ func (s *Store) Merge(conflicted sku.Conflicted) (err error) {
 		// generate check out item
 		// TODO if original is empty, it means this was not a checked out conflict but
 		// a remote conflict
+	}
+
+	var replacement *sku.FSItem
+
+	if replacement, err = s.ReadFSItemFromExternal(skuReplacement); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	if !original.Object.IsEmpty() && !replacement.Object.IsEmpty() {
@@ -98,9 +104,9 @@ func (s *Store) checkoutConflictedForMerge(
 	return
 }
 
-func (s *Store) tryMergeIgnoringConflicts(
+func (s *Store) MakeMergedTransacted(
 	conflicted sku.Conflicted,
-) (replacement *sku.FSItem, err error) {
+) (merged *sku.Transacted, err error) {
 	if err = conflicted.MergeTags(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -124,27 +130,41 @@ func (s *Store) tryMergeIgnoringConflicts(
 		return
 	}
 
-	{
-		var path string
-		var diff3Error error
+	var mergedItem *sku.FSItem
+	var diff3Error error
 
-		path, diff3Error = s.runDiff3(
-			&leftItem.Object,
-			&middleItem.Object,
-			&rightItem.Object,
-		)
+	mergedItem, diff3Error = s.runDiff3(
+		leftItem,
+		middleItem,
+		rightItem,
+	)
 
-		replacement = &sku.FSItem{}
+	if diff3Error != nil {
+		err = errors.Wrap(diff3Error)
+		return
+	}
 
-		if err = replacement.Object.SetPath(path); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
+	leftItem.ResetWith(mergedItem)
 
-		if diff3Error != nil {
-			err = errors.Wrap(diff3Error)
-			return
-		}
+	merged = GetExternalPool().Get()
+
+	merged.ObjectId.ResetWith(&conflicted.GetSku().ObjectId)
+
+	if err = s.WriteFSItemToExternal(leftItem, merged); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.HydrateExternalFromItem(
+		sku.CommitOptions{
+			Mode: object_mode.ModeUpdateTai,
+		},
+		mergedItem,
+		conflicted.GetSku(),
+		conflicted.GetSkuExternal(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	return
@@ -270,11 +290,24 @@ func (s *Store) RunMergeTool(
 		return
 	}
 
-	replacementObject, mergeResult := s.tryMergeIgnoringConflicts(conflicted)
+	var skuReplacement *sku.Transacted
+	var replacement *sku.FSItem
 
-	if !errors.Is(mergeResult, &ErrMergeConflict{}) {
-		err = errors.Wrap(mergeResult)
-		return
+	if skuReplacement, err = s.MakeMergedTransacted(conflicted); err != nil {
+		var mergeConflict *ErrMergeConflict
+
+		if errors.As(err, &mergeConflict) {
+			err = nil
+      replacement = &mergeConflict.FSItem
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if replacement, err = s.ReadFSItemFromExternal(skuReplacement); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	tool = append(
@@ -282,7 +315,7 @@ func (s *Store) RunMergeTool(
 		leftItem.Object.GetPath(),
 		middleItem.Object.GetPath(),
 		rightItem.Object.GetPath(),
-		replacementObject.Object.GetPath(),
+		replacement.Object.GetPath(),
 	)
 
 	// TODO merge blobs
@@ -311,7 +344,7 @@ func (s *Store) RunMergeTool(
 
 	var f *os.File
 
-	if f, err = files.Open(replacementObject.Object.GetPath()); err != nil {
+	if f, err = files.Open(replacement.Object.GetPath()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
