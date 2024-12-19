@@ -47,7 +47,7 @@ func (s *Store) MergeCheckedOutIfNecessary(
 
 	var parent *sku.Transacted
 
-  // TODO fetch parent more intelligently based on what we know
+	// TODO fetch parent more intelligently based on what we know
 	if parent, err = s.fetchParentIfNecessary(
 		co.GetSku(),
 		sku.CommitOptions{},
@@ -58,9 +58,9 @@ func (s *Store) MergeCheckedOutIfNecessary(
 
 	conflicted := sku.Conflicted{
 		CheckedOut: co,
-		Left:       co.GetSku(),
-		Middle:     parent,
-		Right:      co.GetSkuExternal(),
+		Local:      co.GetSku(),
+		Base:       parent,
+		Remote:     co.GetSkuExternal(),
 	}
 
 	if err = s.MergeConflicted(conflicted); err != nil {
@@ -117,9 +117,9 @@ func (s *Store) ReadExternalAndMergeIfNecessary(
 
 	conflicted := sku.Conflicted{
 		CheckedOut: co,
-		Left:       left,
-		Middle:     parent,
-		Right:      right,
+		Local:      left,
+		Base:       parent,
+		Remote:     right,
 	}
 
 	if err = s.MergeConflicted(conflicted); err != nil {

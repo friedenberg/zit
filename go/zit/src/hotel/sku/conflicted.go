@@ -10,7 +10,7 @@ import (
 
 type Conflicted struct {
 	*CheckedOut
-	Left, Middle, Right *Transacted
+	Local, Base, Remote *Transacted
 }
 
 func (tm Conflicted) GetCollection() Collection {
@@ -22,35 +22,35 @@ func (tm Conflicted) Len() int {
 }
 
 func (tm Conflicted) Any() *Transacted {
-	return tm.Left
+	return tm.Local
 }
 
 func (tm Conflicted) All() iter.Seq[*Transacted] {
 	return func(yield func(*Transacted) bool) {
-		if !yield(tm.Left) {
+		if !yield(tm.Local) {
 			return
 		}
 
-		if !yield(tm.Middle) {
+		if tm.Base != nil && !yield(tm.Base) {
 			return
 		}
 
-		if !yield(tm.Right) {
+		if !yield(tm.Remote) {
 			return
 		}
 	}
 }
 
 func (tm Conflicted) IsAllInlineType(itc ids.InlineTypeChecker) bool {
-	if !itc.IsInlineType(tm.Left.GetType()) {
+	if !itc.IsInlineType(tm.Local.GetType()) {
 		return false
 	}
 
-	if !itc.IsInlineType(tm.Middle.GetType()) {
+	if tm.Base != nil && !itc.IsInlineType(tm.Base.GetType()) {
 		return false
 	}
 
-	if !itc.IsInlineType(tm.Right.GetType()) {
+	if !itc.IsInlineType(tm.Remote.GetType()) {
 		return false
 	}
 
@@ -58,9 +58,13 @@ func (tm Conflicted) IsAllInlineType(itc ids.InlineTypeChecker) bool {
 }
 
 func (tm *Conflicted) MergeTags() (err error) {
-	left := tm.Left.GetTags().CloneMutableSetPtrLike()
-	middle := tm.Middle.GetTags().CloneMutableSetPtrLike()
-	right := tm.Right.GetTags().CloneMutableSetPtrLike()
+	if tm.Base == nil {
+		return
+	}
+
+	left := tm.Local.GetTags().CloneMutableSetPtrLike()
+	middle := tm.Base.GetTags().CloneMutableSetPtrLike()
+	right := tm.Remote.GetTags().CloneMutableSetPtrLike()
 
 	same := ids.MakeTagMutableSet()
 	deleted := ids.MakeTagMutableSet()
@@ -119,29 +123,29 @@ func (tm *Conflicted) MergeTags() (err error) {
 
 	ets := same.CloneSetPtrLike()
 
-	tm.Left.GetMetadata().SetTags(ets)
-	tm.Middle.GetMetadata().SetTags(ets)
-	tm.Right.GetMetadata().SetTags(ets)
+	tm.Local.GetMetadata().SetTags(ets)
+	tm.Base.GetMetadata().SetTags(ets)
+	tm.Remote.GetMetadata().SetTags(ets)
 
 	return
 }
 
 func (tm *Conflicted) ReadConflictMarker(
-	iter func(interfaces.FuncIter[*Transacted]),
+	iter func(interfaces.FuncIter[*Transacted]) error,
 ) (err error) {
 	i := 0
 
-	if iter(
+	if err = iter(
 		func(sk *Transacted) (err error) {
 			switch i {
 			case 0:
-				tm.Left = sk
+				tm.Local = sk
 
 			case 1:
-				tm.Middle = sk
+				tm.Base = sk
 
 			case 2:
-				tm.Right = sk
+				tm.Remote = sk
 
 			default:
 				err = errors.Errorf("too many skus in conflict file")
@@ -156,6 +160,12 @@ func (tm *Conflicted) ReadConflictMarker(
 		err = errors.Wrap(err)
 		return
 	}
+
+  // Conflicts can exist between objects without a base
+  if i == 2 {
+    tm.Base = tm.Remote
+    tm.Remote = nil
+  }
 
 	return
 }

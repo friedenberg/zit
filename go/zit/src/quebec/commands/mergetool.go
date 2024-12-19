@@ -98,7 +98,7 @@ func (c Mergetool) RunWithQuery(
 		bs := u.GetStore().GetBlobStore().GetInventoryList()
 
 		if err = tm.ReadConflictMarker(
-			func(f interfaces.FuncIter[*sku.Transacted]) {
+			func(f interfaces.FuncIter[*sku.Transacted]) (err error) {
 				if err = bs.StreamInventoryListBlobSkusFromReader(
 					builtin_types.DefaultOrPanic(genres.InventoryList),
 					br,
@@ -107,6 +107,8 @@ func (c Mergetool) RunWithQuery(
 					err = errors.Wrap(err)
 					return
 				}
+
+        return
 			},
 		); err != nil {
 			err = errors.Wrap(err)

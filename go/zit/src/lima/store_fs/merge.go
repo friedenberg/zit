@@ -7,12 +7,14 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/id"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -84,18 +86,18 @@ func (s *Store) Merge(conflicted sku.Conflicted) (err error) {
 func (s *Store) checkoutConflictedForMerge(
 	tm sku.Conflicted,
 	mode checkout_mode.Mode,
-) (left, middle, right *sku.FSItem, err error) {
-	if _, left, err = s.checkoutOneForMerge(mode, tm.Left); err != nil {
+) (local, base, remote *sku.FSItem, err error) {
+	if _, local, err = s.checkoutOneForMerge(mode, tm.Local); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if _, middle, err = s.checkoutOneForMerge(mode, tm.Middle); err != nil {
+	if _, base, err = s.checkoutOneForMerge(mode, tm.Base); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if _, right, err = s.checkoutOneForMerge(mode, tm.Right); err != nil {
+	if _, remote, err = s.checkoutOneForMerge(mode, tm.Remote); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -111,7 +113,7 @@ func (s *Store) MakeMergedTransacted(
 		return
 	}
 
-	var leftItem, middleItem, rightItem *sku.FSItem
+	var localItem, baseItem, remoteItem *sku.FSItem
 
 	inlineBlob := conflicted.IsAllInlineType(s.config)
 
@@ -121,7 +123,7 @@ func (s *Store) MakeMergedTransacted(
 		mode = checkout_mode.MetadataOnly
 	}
 
-	if leftItem, middleItem, rightItem, err = s.checkoutConflictedForMerge(
+	if localItem, baseItem, remoteItem, err = s.checkoutConflictedForMerge(
 		conflicted,
 		mode,
 	); err != nil {
@@ -133,9 +135,9 @@ func (s *Store) MakeMergedTransacted(
 	var diff3Error error
 
 	mergedItem, diff3Error = s.runDiff3(
-		leftItem,
-		middleItem,
-		rightItem,
+		localItem,
+		baseItem,
+		remoteItem,
 	)
 
 	if diff3Error != nil {
@@ -143,13 +145,13 @@ func (s *Store) MakeMergedTransacted(
 		return
 	}
 
-	leftItem.ResetWith(mergedItem)
+	localItem.ResetWith(mergedItem)
 
 	merged = GetExternalPool().Get()
 
 	merged.ObjectId.ResetWith(&conflicted.GetSku().ObjectId)
 
-	if err = s.WriteFSItemToExternal(leftItem, merged); err != nil {
+	if err = s.WriteFSItemToExternal(localItem, merged); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -173,6 +175,12 @@ func (s *Store) checkoutOneForMerge(
 	mode checkout_mode.Mode,
 	sz *sku.Transacted,
 ) (cz *sku.CheckedOut, i *sku.FSItem, err error) {
+	if sz == nil {
+		i = &sku.FSItem{}
+		i.Reset()
+		return
+	}
+
 	options := checkout_options.Options{
 		CheckoutMode: mode,
 		OptionsWithoutMode: checkout_options.OptionsWithoutMode{
@@ -210,7 +218,7 @@ func (s *Store) checkoutOneForMerge(
 
 func (s *Store) GenerateConflictMarker(
 	conflicted sku.Conflicted,
-	cofs *sku.CheckedOut,
+	co *sku.CheckedOut,
 ) (err error) {
 	var f *os.File
 
@@ -237,7 +245,7 @@ func (s *Store) GenerateConflictMarker(
 
 	var i *sku.FSItem
 
-	if i, err = s.ReadFSItemFromExternal(cofs.GetSkuExternal()); err != nil {
+	if i, err = s.ReadFSItemFromExternal(co.GetSkuExternal()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -245,6 +253,23 @@ func (s *Store) GenerateConflictMarker(
 	if err = i.GenerateConflictFD(); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	if co.GetSkuExternal().GetGenre() == genres.Zettel {
+		var h ids.ZettelId
+
+		if err = h.Set(co.GetSkuExternal().GetObjectId().String()); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if _, err = id.MakeDirIfNecessary(
+			h,
+			s.dirLayout.Cwd(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if err = os.Rename(
@@ -255,7 +280,7 @@ func (s *Store) GenerateConflictMarker(
 		return
 	}
 
-	cofs.SetState(checked_out_state.Conflicted)
+	co.SetState(checked_out_state.Conflicted)
 
 	return
 }

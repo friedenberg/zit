@@ -11,18 +11,24 @@ import (
 
 // TODO include blobs
 func (s *Store) runDiff3(
-	left, middle, right *sku.FSItem,
+	local, base, remote *sku.FSItem,
 ) (merged *sku.FSItem, err error) {
+	baseObjectPath := "/dev/null"
+
+	if base.Len() > 0 {
+		baseObjectPath = base.Object.GetPath()
+	}
+
 	cmd := exec.Command(
 		"git",
 		"merge-file",
 		"-p",
-		"-L=left",
-		"-L=middle",
-		"-L=right",
-		left.Object.GetPath(),
-		middle.Object.GetPath(),
-		right.Object.GetPath(),
+		"-L=local",
+		"-L=base",
+		"-L=remote",
+		local.Object.GetPath(),
+		baseObjectPath,
+		remote.Object.GetPath(),
 	)
 
 	var out io.ReadCloser
