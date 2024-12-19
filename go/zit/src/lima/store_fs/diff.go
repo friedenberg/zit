@@ -60,7 +60,10 @@ func (s *Store) runDiff3(
 	}
 
 	merged = &sku.FSItem{}
-	merged.Reset()
+	merged.ResetWith(local)
+	merged.Object.Reset()
+	merged.Blob.Reset()
+	merged.MutableSetLike.Reset()
 
 	hasConflict := false
 

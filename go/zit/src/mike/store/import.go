@@ -95,8 +95,8 @@ func (s Importer) importLeafSku(
 	// }
 
 	_, err = s.GetStreamIndex().ReadOneObjectIdTai(
-		external.GetObjectId(),
-		external.GetTai(),
+		co.GetSkuExternal().GetObjectId(),
+		co.GetSkuExternal().GetTai(),
 	)
 
 	if err == nil {
@@ -110,10 +110,10 @@ func (s Importer) importLeafSku(
 	}
 
 	ui.TodoP4("cleanup")
-	if err = s.ReadOneInto(external.GetObjectId(), co.GetSku()); err != nil {
+	if err = s.ReadOneInto(co.GetSkuExternal().GetObjectId(), co.GetSku()); err != nil {
 		if collections.IsErrNotFound(err) {
 			if err = s.tryRealizeAndOrStore(
-				external,
+				co.GetSkuExternal(),
 				sku.CommitOptions{
 					Clock:              co.GetSkuExternal(),
 					Mode:               object_mode.ModeCommit,
@@ -146,7 +146,7 @@ func (s Importer) importLeafSku(
 	commitOptions.ChangeIsHistorical = true
 
 	if err = s.tryRealizeAndOrStore(
-		external,
+		co.GetSkuExternal(),
 		commitOptions,
 	); err != nil {
 		err = errors.Wrap(err)
