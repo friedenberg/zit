@@ -42,7 +42,7 @@ func (c Push) DefaultGenres() ids.Genre {
 func (c Push) Run(local *env.Local, args ...string) (err error) {
 	if len(args) < 1 && c.TheirXDGDotenv == "" {
 		// TODO add info about remote options
-		err = errors.BadRequestf("Cloning requires a remote to be specified")
+		err = errors.BadRequestf("Pushing requires a remote to be specified")
 		return
 	}
 

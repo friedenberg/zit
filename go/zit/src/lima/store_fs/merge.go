@@ -17,21 +17,25 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func (s *Store) Merge(tm sku.Conflicted) (err error) {
+func (s *Store) Merge(conflicted sku.Conflicted) (err error) {
 	var original, replacement *sku.FSItem
 
-	original, replacement, mergeResult := s.tryMergeIgnoringConflicts(tm)
+	replacement, mergeResult := s.tryMergeIgnoringConflicts(conflicted)
 
-	co := tm.CheckedOut
+	if original, err = s.ReadFSItemFromExternal(
+		conflicted.CheckedOut.GetSkuExternal(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	co := conflicted.CheckedOut
 
 	if mergeResult != nil {
-		mergeConflict := &ErrMergeConflict{}
-
-		if errors.As(mergeResult, &mergeConflict) {
-			if err = s.handleMergeResult(
-				tm,
+		if IsErrMergeConflict(mergeResult) {
+			if err = s.GenerateConflictMarker(
+				conflicted,
 				co,
-				mergeConflict,
 			); err != nil {
 				err = errors.Wrap(err)
 				return
@@ -43,7 +47,13 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 		return
 	}
 
-	if !replacement.Object.IsEmpty() {
+	if original.Len() == 0 {
+		// generate check out item
+		// TODO if original is empty, it means this was not a checked out conflict but
+		// a remote conflict
+	}
+
+	if !original.Object.IsEmpty() && !replacement.Object.IsEmpty() {
 		if err = files.Rename(
 			replacement.Object.GetPath(),
 			original.Object.GetPath(),
@@ -53,7 +63,7 @@ func (s *Store) Merge(tm sku.Conflicted) (err error) {
 		}
 	}
 
-	if !replacement.Blob.IsEmpty() {
+	if !original.Blob.IsEmpty() && !replacement.Blob.IsEmpty() {
 		if err = files.Rename(
 			replacement.Blob.GetPath(),
 			original.Blob.GetPath(),
@@ -89,16 +99,16 @@ func (s *Store) checkoutConflictedForMerge(
 }
 
 func (s *Store) tryMergeIgnoringConflicts(
-	tm sku.Conflicted,
-) (original, replacement *sku.FSItem, err error) {
-	if err = tm.MergeTags(); err != nil {
+	conflicted sku.Conflicted,
+) (replacement *sku.FSItem, err error) {
+	if err = conflicted.MergeTags(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	var leftItem, middleItem, rightItem *sku.FSItem
 
-	inlineBlob := tm.IsAllInlineType(s.config)
+	inlineBlob := conflicted.IsAllInlineType(s.config)
 
 	mode := checkout_mode.MetadataAndBlob
 
@@ -107,21 +117,15 @@ func (s *Store) tryMergeIgnoringConflicts(
 	}
 
 	if leftItem, middleItem, rightItem, err = s.checkoutConflictedForMerge(
-		tm,
+		conflicted,
 		mode,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if original, err = s.ReadFSItemFromExternal(tm.CheckedOut.GetSkuExternal()); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	{
 		var path string
-
 		var diff3Error error
 
 		path, diff3Error = s.runDiff3(
@@ -185,10 +189,9 @@ func (s *Store) checkoutOneForMerge(
 	return
 }
 
-func (s *Store) handleMergeResult(
+func (s *Store) GenerateConflictMarker(
 	conflicted sku.Conflicted,
 	cofs *sku.CheckedOut,
-	mergeResult *ErrMergeConflict,
 ) (err error) {
 	var f *os.File
 
@@ -202,9 +205,9 @@ func (s *Store) handleMergeResult(
 	bw := bufio.NewWriter(f)
 	defer errors.DeferredFlusher(&err, bw)
 
-	bs := s.externalStoreSupplies.BlobStore.GetInventoryList()
+	blobStore := s.externalStoreSupplies.BlobStore.GetInventoryList()
 
-	if _, err = bs.WriteBlobToWriter(
+	if _, err = blobStore.WriteBlobToWriter(
 		builtin_types.DefaultOrPanic(genres.InventoryList),
 		conflicted,
 		bw,
@@ -240,16 +243,16 @@ func (s *Store) handleMergeResult(
 
 func (s *Store) RunMergeTool(
 	tool []string,
-	tm sku.Conflicted,
+	conflicted sku.Conflicted,
 ) (co *sku.CheckedOut, err error) {
 	if len(tool) == 0 {
 		err = errors.Errorf("no utility provided")
 		return
 	}
 
-	co = tm.CheckedOut
+	co = conflicted.CheckedOut
 
-	inlineBlob := tm.IsAllInlineType(s.config)
+	inlineBlob := conflicted.IsAllInlineType(s.config)
 
 	mode := checkout_mode.MetadataAndBlob
 
@@ -260,14 +263,14 @@ func (s *Store) RunMergeTool(
 	var leftItem, middleItem, rightItem *sku.FSItem
 
 	if leftItem, middleItem, rightItem, err = s.checkoutConflictedForMerge(
-		tm,
+		conflicted,
 		mode,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	_, after, mergeResult := s.tryMergeIgnoringConflicts(tm)
+	replacementObject, mergeResult := s.tryMergeIgnoringConflicts(conflicted)
 
 	if !errors.Is(mergeResult, &ErrMergeConflict{}) {
 		err = errors.Wrap(mergeResult)
@@ -279,7 +282,7 @@ func (s *Store) RunMergeTool(
 		leftItem.Object.GetPath(),
 		middleItem.Object.GetPath(),
 		rightItem.Object.GetPath(),
-		after.Object.GetPath(),
+		replacementObject.Object.GetPath(),
 	)
 
 	// TODO merge blobs
@@ -308,7 +311,7 @@ func (s *Store) RunMergeTool(
 
 	var f *os.File
 
-	if f, err = files.Open(after.Object.GetPath()); err != nil {
+	if f, err = files.Open(replacementObject.Object.GetPath()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -323,7 +326,7 @@ func (s *Store) RunMergeTool(
 	}
 
 	if err = s.DeleteCheckedOut(
-		tm.CheckedOut,
+		conflicted.CheckedOut,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -361,4 +364,8 @@ func (e *ErrMergeConflict) Error() string {
 		&e.Object,
 		&e.Blob,
 	)
+}
+
+func IsErrMergeConflict(err error) bool {
+	return errors.Is(err, &ErrMergeConflict{})
 }

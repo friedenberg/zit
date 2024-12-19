@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
+// TODO combine with other method in this file
 func (s *Store) MergeCheckedOutIfNecessary(
 	co *sku.CheckedOut,
 ) (commitOptions sku.CommitOptions, err error) {
@@ -36,12 +37,35 @@ func (s *Store) MergeCheckedOutIfNecessary(
 		conflicts = checkout_mode.MetadataAndBlob
 	}
 
+	// TODO write conflicts
 	switch conflicts {
 	case checkout_mode.BlobOnly:
 	case checkout_mode.MetadataOnly:
 	case checkout_mode.MetadataAndBlob:
-
 	default:
+	}
+
+	var parent *sku.Transacted
+
+  // TODO fetch parent more intelligently based on what we know
+	if parent, err = s.fetchParentIfNecessary(
+		co.GetSku(),
+		sku.CommitOptions{},
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	conflicted := sku.Conflicted{
+		CheckedOut: co,
+		Left:       co.GetSku(),
+		Middle:     parent,
+		Right:      co.GetSkuExternal(),
+	}
+
+	if err = s.MergeConflicted(conflicted); err != nil {
+		err = errors.Wrap(err)
+		return
 	}
 
 	co.SetState(checked_out_state.Conflicted)
@@ -49,7 +73,7 @@ func (s *Store) MergeCheckedOutIfNecessary(
 	return
 }
 
-func (s *Store) readExternalAndMergeIfNecessary(
+func (s *Store) ReadExternalAndMergeIfNecessary(
 	left, parent *sku.Transacted,
 	options sku.CommitOptions,
 ) (err error) {
@@ -91,14 +115,14 @@ func (s *Store) readExternalAndMergeIfNecessary(
 		return
 	}
 
-	tm := sku.Conflicted{
+	conflicted := sku.Conflicted{
 		CheckedOut: co,
 		Left:       left,
 		Middle:     parent,
 		Right:      right,
 	}
 
-	if err = s.MergeConflicted(tm); err != nil {
+	if err = s.MergeConflicted(conflicted); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

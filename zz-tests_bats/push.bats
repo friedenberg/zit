@@ -139,11 +139,14 @@ function push_history_zettel_typ_etikett_yes_conflicts { # @test
 		copied Blob 11e1c0499579c9a892263b5678e1dfc985c8643b2d7a0ebddcf4bd0e0288bc11 (10 bytes)
 		copied Blob 2d36c504bb5f4c6cc804c63c983174a36303e1e15a3a2120481545eec6cc5f24 (16 bytes)
 		copied Blob 3aa85276929951b03184a038ca0ad67cba78ae626f2e3510426b5a17a56df955 (27 bytes)
+		needs merge
 	EOM
 
 	set_xdg "$them"
+	run tree "$them"
+	assert_output ""
 
-	run_zit status
+	run_zit status .
 	assert_output ""
 
 	run_zit show +zettel,typ,konfig,etikett,repo

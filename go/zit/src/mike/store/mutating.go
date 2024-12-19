@@ -78,9 +78,9 @@ func (s *Store) tryRealizeAndOrStore(
 	el sku.ExternalLike,
 	o sku.CommitOptions,
 ) (err error) {
-	kinder := el.GetSku()
+	child := el.GetSku()
 
-	ui.Log().Printf("%s -> %s", o, kinder)
+	ui.Log().Printf("%s -> %s", o, child)
 
 	if !s.GetDirectoryLayout().GetLockSmith().IsAcquired() &&
 		o.ContainsAny(
@@ -102,14 +102,14 @@ func (s *Store) tryRealizeAndOrStore(
 			o.Clock = s
 		}
 
-		kinder.SetTai(o.Clock.GetTai())
+		child.SetTai(o.Clock.GetTai())
 	}
 
 	if o.ContainsAny(
 		object_mode.ModeAddToInventoryList,
-	) && (kinder.ObjectId.IsEmpty() ||
-		kinder.GetGenre() == genres.None ||
-		kinder.GetGenre() == genres.Blob) {
+	) && (child.ObjectId.IsEmpty() ||
+		child.GetGenre() == genres.None ||
+		child.GetGenre() == genres.Blob) {
 		var ken *ids.ZettelId
 
 		if ken, err = s.zettelIdIndex.CreateZettelId(); err != nil {
@@ -117,36 +117,36 @@ func (s *Store) tryRealizeAndOrStore(
 			return
 		}
 
-		if err = kinder.ObjectId.SetWithIdLike(ken); err != nil {
+		if err = child.ObjectId.SetWithIdLike(ken); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	}
 
-	var mutter *sku.Transacted
+	var parent *sku.Transacted
 
-	if mutter, err = s.fetchMutterIfNecessary(kinder, o); err != nil {
+	if parent, err = s.fetchParentIfNecessary(child, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if mutter != nil {
-		defer sku.GetTransactedPool().Put(mutter)
-		kinder.Metadata.Cache.ParentTai = mutter.GetTai()
+	if parent != nil {
+		defer sku.GetTransactedPool().Put(parent)
+		child.Metadata.Cache.ParentTai = parent.GetTai()
 	}
 
-	if err = s.tryRealize(el, mutter, o); err != nil {
+	if err = s.tryRealize(el, parent, o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	if o.Contains(object_mode.ModeAddToInventoryList) {
-		if err = s.addMissingTypeAndTags(o, kinder); err != nil {
+		if err = s.addMissingTypeAndTags(o, child); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = s.addObjectToAbbrStore(kinder); err != nil {
+		if err = s.addObjectToAbbrStore(child); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -154,14 +154,14 @@ func (s *Store) tryRealizeAndOrStore(
 
 	// short circuits if the parent is equal to the child
 	if o.Mode != object_mode.ModeReindex &&
-		mutter != nil &&
-		ids.Equals(kinder.GetObjectId(), mutter.GetObjectId()) &&
-		kinder.Metadata.EqualsSansTai(&mutter.Metadata) {
+		parent != nil &&
+		ids.Equals(child.GetObjectId(), parent.GetObjectId()) &&
+		child.Metadata.EqualsSansTai(&parent.Metadata) {
 
-		sku.TransactedResetter.ResetWithExceptFields(kinder, mutter)
+		sku.TransactedResetter.ResetWithExceptFields(child, parent)
 
 		if o.Mode.Contains(object_mode.ModeLatest) {
-			if err = s.ui.TransactedUnchanged(kinder); err != nil {
+			if err = s.ui.TransactedUnchanged(child); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -171,7 +171,7 @@ func (s *Store) tryRealizeAndOrStore(
 	}
 
 	if err = s.GetConfig().ApplyDormantAndRealizeTags(
-		kinder,
+		child,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -179,21 +179,21 @@ func (s *Store) tryRealizeAndOrStore(
 
 	if o.Mode.Contains(object_mode.ModeLatest) {
 		if err = s.GetConfig().AddTransacted(
-			kinder,
-			mutter,
+			child,
+			parent,
 			s.GetBlobStore(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if kinder.GetGenre() == genres.Zettel {
-			if err = s.zettelIdIndex.AddZettelId(&kinder.ObjectId); err != nil {
+		if child.GetGenre() == genres.Zettel {
+			if err = s.zettelIdIndex.AddZettelId(&child.ObjectId); err != nil {
 				if errors.Is(err, object_id_provider.ErrDoesNotExist{}) {
 					ui.Log().Printf("object id does not contain value: %s", err)
 					err = nil
 				} else {
-					err = errors.Wrapf(err, "failed to write zettel to index: %s", kinder)
+					err = errors.Wrapf(err, "failed to write zettel to index: %s", child)
 					return
 				}
 			}
@@ -202,8 +202,8 @@ func (s *Store) tryRealizeAndOrStore(
 	}
 
 	if o.Contains(object_mode.ModeAddToInventoryList) {
-		ui.Log().Print("adding to bestandsaufnahme", o, kinder)
-		if err = s.commitTransacted(kinder, mutter); err != nil {
+		ui.Log().Print("adding to bestandsaufnahme", o, child)
+		if err = s.commitTransacted(child, parent); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -211,16 +211,16 @@ func (s *Store) tryRealizeAndOrStore(
 
 	if o.Contains(object_mode.ModeLatest) {
 		if err = s.GetStreamIndex().Add(
-			kinder,
-			kinder.GetObjectId().String(),
+			child,
+			child.GetObjectId().String(),
 			o,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if mutter == nil {
-			if err = s.ui.TransactedNew(kinder); err != nil {
+		if parent == nil {
+			if err = s.ui.TransactedNew(child); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -231,7 +231,7 @@ func (s *Store) tryRealizeAndOrStore(
 			// 	return
 			// }
 
-			if err = s.ui.TransactedUpdated(kinder); err != nil {
+			if err = s.ui.TransactedUpdated(child); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
@@ -240,9 +240,9 @@ func (s *Store) tryRealizeAndOrStore(
 	}
 
 	if o.Contains(object_mode.ModeMergeCheckedOut) {
-		if err = s.readExternalAndMergeIfNecessary(
-			kinder,
-			mutter,
+		if err = s.ReadExternalAndMergeIfNecessary(
+			child,
+			parent,
 			o,
 		); err != nil {
 			err = errors.Wrap(err)
@@ -253,7 +253,7 @@ func (s *Store) tryRealizeAndOrStore(
 	return
 }
 
-func (s *Store) fetchMutterIfNecessary(
+func (s *Store) fetchParentIfNecessary(
 	sk *sku.Transacted,
 	ut sku.CommitOptions,
 ) (mutter *sku.Transacted, err error) {

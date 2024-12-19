@@ -100,7 +100,49 @@ function pull_history_zettel_typ_etikett_no_conflicts { # @test
 	try_add_new_after_pull
 }
 
-function pull_history_default { # @test
+function pull_history_zettel_typ_etikett_yes_conflicts { # @test
+	skip
+	them="them"
+	bootstrap "$them"
+	assert_success
+
+	function print_their_xdg() (
+		set_xdg "$them"
+		zit info xdg
+	)
+
+	set_xdg "$BATS_TEST_TMPDIR"
+
+	version="v$(zit info store-version)"
+	copy_from_version "$DIR" "$version"
+
+	run_zit pull \
+		-xdg-dotenv <(print_their_xdg) \
+		+zettel,typ,etikett
+
+	assert_failure
+	assert_output - <<-EOM
+		copied Blob 9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 (5 bytes)
+		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
+		       conflicted [one/uno]
+		copied Blob 024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b (36 bytes)
+		[this_is_the_first @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[this_is_the_second @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
+		       conflicted [one/dos]
+		[this_is_the_first @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[this_is_the_second @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		needs merge
+	EOM
+
+	run_zit status
+	assert_success
+	assert_output ''
+
+	try_add_new_after_pull
+}
+
+function pull_history_default_no_conflict { # @test
 	them="them"
 	bootstrap "$them"
 	assert_success

@@ -44,6 +44,8 @@ func TestContextCancelled(t *testing.T) {
 	ctx.Cancel(nil)
 	ctx.Heartbeat()
 
+	t.Errorf("expected to not get here")
+
 	if !didPanic {
 		t.Errorf("expected to panic")
 	}

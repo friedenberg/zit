@@ -200,15 +200,16 @@ func (s *Store) MakeQueryExecutor(
 	return
 }
 
+// TODO make this configgable
 func (s *Store) MergeConflicted(
-	tm sku.Conflicted,
+	conflicted sku.Conflicted,
 ) (err error) {
-	switch tm.CheckedOut.GetSkuExternal().GetRepoId().GetRepoIdString() {
+	switch conflicted.CheckedOut.GetSkuExternal().GetRepoId().GetRepoIdString() {
 	case "browser":
 		err = todo.Implement()
 
 	default:
-		if err = s.storeFS.Merge(tm); err != nil {
+		if err = s.storeFS.Merge(conflicted); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -218,18 +219,18 @@ func (s *Store) MergeConflicted(
 }
 
 func (s *Store) RunMergeTool(
-	tm sku.Conflicted,
+	conflicted sku.Conflicted,
 ) (err error) {
 	tool := s.GetConfig().ToolOptions.Merge
 
-	switch tm.GetSkuExternal().GetRepoId().GetRepoIdString() {
+	switch conflicted.GetSkuExternal().GetRepoId().GetRepoIdString() {
 	case "browser":
 		err = todo.Implement()
 
 	default:
 		var co sku.SkuType
 
-		if co, err = s.storeFS.RunMergeTool(tool, tm); err != nil {
+		if co, err = s.storeFS.RunMergeTool(tool, conflicted); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
