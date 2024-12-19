@@ -145,6 +145,13 @@ func (s *Store) MakeMergedTransacted(
 		return
 	}
 
+	// ui.Debug().Print(
+	// "merged", mergedItem.Debug(),
+	// "local", localItem.Debug(),
+	// "base", baseItem.Debug(),
+	// "remote", remoteItem.Debug(),
+	// )
+
 	localItem.ResetWith(mergedItem)
 
 	merged = GetExternalPool().Get()

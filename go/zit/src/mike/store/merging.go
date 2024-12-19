@@ -45,30 +45,45 @@ func (s *Store) MergeCheckedOutIfNecessary(
 	default:
 	}
 
-	var parent *sku.Transacted
-
-	// TODO fetch parent more intelligently based on what we know
-	if parent, err = s.fetchParentIfNecessary(
-		co.GetSku(),
-		sku.CommitOptions{},
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	conflicted := sku.Conflicted{
 		CheckedOut: co,
 		Local:      co.GetSku(),
-		Base:       parent,
 		Remote:     co.GetSkuExternal(),
 	}
 
-	if err = s.MergeConflicted(conflicted); err != nil {
-		err = errors.Wrap(err)
+	// TODO fetch parent more intelligently based on what we know
+	// if conflicted.Base, err = s.fetchParentIfNecessary(
+	// 	co.GetSku(),
+	// 	sku.CommitOptions{},
+	// ); err != nil {
+	// 	err = errors.Wrap(err)
+	// 	return
+	// }
+
+	var skuReplacement *sku.Transacted
+
+	// TODO pass mode / conflicts
+	if skuReplacement, err = s.GetStoreFS().MakeMergedTransacted(
+		conflicted,
+	); err != nil {
+		if sku.IsErrMergeConflict(err) {
+			if err = s.GetStoreFS().GenerateConflictMarker(
+				conflicted,
+				conflicted.CheckedOut,
+			); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			co.SetState(checked_out_state.Conflicted)
+		} else {
+			err = errors.Wrap(err)
+		}
+
 		return
 	}
 
-	co.SetState(checked_out_state.Conflicted)
+	sku.TransactedResetter.ResetWith(co.GetSkuExternal(), skuReplacement)
 
 	return
 }

@@ -88,11 +88,10 @@ func (s Importer) importLeafSku(
 
 	sku.Resetter.ResetWith(co.GetSkuExternal(), external)
 
-	// if err = external.CalculateObjectShas(); err != nil {
-	// 	co.SetError(err)
-	// 	err = nil
-	// 	return
-	// }
+	if err = co.GetSkuExternal().CalculateObjectShas(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	_, err = s.GetStreamIndex().ReadOneObjectIdTai(
 		co.GetSkuExternal().GetObjectId(),
@@ -128,11 +127,6 @@ func (s Importer) importLeafSku(
 			err = errors.Wrapf(err, "ObjectId: %s", external.GetObjectId())
 		}
 
-		return
-	}
-
-	if co.GetSku().Metadata.Sha().IsNull() {
-		err = errors.Errorf("empty sha")
 		return
 	}
 

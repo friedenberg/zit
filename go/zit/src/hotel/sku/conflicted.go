@@ -25,17 +25,17 @@ func (tm Conflicted) Any() *Transacted {
 	return tm.Local
 }
 
-func (tm Conflicted) All() iter.Seq[*Transacted] {
+func (c Conflicted) All() iter.Seq[*Transacted] {
 	return func(yield func(*Transacted) bool) {
-		if !yield(tm.Local) {
+		if !yield(c.Local) {
 			return
 		}
 
-		if tm.Base != nil && !yield(tm.Base) {
+		if c.Base != nil && !yield(c.Base) {
 			return
 		}
 
-		if !yield(tm.Remote) {
+		if !yield(c.Remote) {
 			return
 		}
 	}
@@ -161,11 +161,11 @@ func (tm *Conflicted) ReadConflictMarker(
 		return
 	}
 
-  // Conflicts can exist between objects without a base
-  if i == 2 {
-    tm.Base = tm.Remote
-    tm.Remote = nil
-  }
+	// Conflicts can exist between objects without a base
+	if i == 2 {
+		tm.Base = tm.Remote
+		tm.Remote = nil
+	}
 
 	return
 }
