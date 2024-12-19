@@ -349,7 +349,11 @@ func (s *Store) ReadFSItemFromExternal(
 		}
 	}
 
-	item.ExternalObjectId.ResetWith(&sk.ExternalObjectId)
+	if sk.ExternalObjectId.IsEmpty() {
+		item.ExternalObjectId.ResetWith(&sk.ObjectId)
+	} else {
+		item.ExternalObjectId.ResetWith(&sk.ExternalObjectId)
+	}
 
 	return
 }

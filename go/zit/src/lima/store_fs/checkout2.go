@@ -66,7 +66,7 @@ func (s *Store) prepareFSItemForCheckOut(
 			co.GetSku(),
 			co.GetSkuExternal(),
 		); err != nil {
-			if errors.Is(err, sku.ErrExternalHasConflictMarker) && options.AllowConflicted {
+			if sku.IsErrMergeConflict(err) && options.AllowConflicted {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

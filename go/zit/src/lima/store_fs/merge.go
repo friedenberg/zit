@@ -2,7 +2,6 @@ package store_fs
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"os/exec"
 
@@ -31,7 +30,7 @@ func (s *Store) Merge(conflicted sku.Conflicted) (err error) {
 	var skuReplacement *sku.Transacted
 
 	if skuReplacement, err = s.MakeMergedTransacted(conflicted); err != nil {
-		if IsErrMergeConflict(err) {
+		if sku.IsErrMergeConflict(err) {
 			if err = s.GenerateConflictMarker(
 				conflicted,
 				conflicted.CheckedOut,
@@ -294,11 +293,11 @@ func (s *Store) RunMergeTool(
 	var replacement *sku.FSItem
 
 	if skuReplacement, err = s.MakeMergedTransacted(conflicted); err != nil {
-		var mergeConflict *ErrMergeConflict
+		var mergeConflict *sku.ErrMergeConflict
 
 		if errors.As(err, &mergeConflict) {
 			err = nil
-      replacement = &mergeConflict.FSItem
+			replacement = &mergeConflict.FSItem
 		} else {
 			err = errors.Wrap(err)
 			return
@@ -370,35 +369,4 @@ func (s *Store) RunMergeTool(
 	sku.TransactedResetter.ResetWith(co.GetSkuExternal(), e)
 
 	return
-}
-
-func MakeErrMergeConflict(sk *sku.FSItem) (err *ErrMergeConflict) {
-	err = &ErrMergeConflict{}
-
-	if sk != nil {
-		err.ResetWith(sk)
-	}
-
-	return
-}
-
-type ErrMergeConflict struct {
-	sku.FSItem
-}
-
-func (e *ErrMergeConflict) Is(target error) bool {
-	_, ok := target.(*ErrMergeConflict)
-	return ok
-}
-
-func (e *ErrMergeConflict) Error() string {
-	return fmt.Sprintf(
-		"merge conflict for fds: Object: %q, Blob: %q",
-		&e.Object,
-		&e.Blob,
-	)
-}
-
-func IsErrMergeConflict(err error) bool {
-	return errors.Is(err, &ErrMergeConflict{})
 }

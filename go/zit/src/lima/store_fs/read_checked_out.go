@@ -49,7 +49,7 @@ func (s *Store) readIntoCheckedOutFromTransacted(
 	); err != nil {
 		if errors.IsNotExist(err) {
 			err = quiter.MakeErrStopIteration()
-		} else if errors.Is(err, sku.ErrExternalHasConflictMarker) {
+		} else if sku.IsErrMergeConflict(err) {
 			co.SetState(checked_out_state.Conflicted)
 
 			if err = co.GetSkuExternal().ObjectId.SetWithIdLike(

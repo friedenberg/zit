@@ -75,7 +75,7 @@ func (s *Store) runDiff3(
 	}
 
 	if hasConflict {
-		err = errors.Wrap(MakeErrMergeConflict(merged))
+		err = errors.Wrap(sku.MakeErrMergeConflict(merged))
 	}
 
 	return

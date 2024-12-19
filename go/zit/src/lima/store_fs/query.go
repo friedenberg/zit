@@ -91,7 +91,7 @@ func (s *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 			co.GetSku(),
 			co.GetSkuExternal(),
 		); err != nil {
-			if errors.Is(err, sku.ErrExternalHasConflictMarker) {
+			if sku.IsErrMergeConflict(err) {
 				co.SetState(checked_out_state.Conflicted)
 
 				if err = co.GetSkuExternal().ObjectId.SetWithIdLike(

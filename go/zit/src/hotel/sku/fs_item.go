@@ -13,8 +13,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
-var ErrExternalHasConflictMarker = errors.New("external has conflict marker")
-
 type FSItem struct {
 	// TODO refactor this to be a string and a genre that is tied to the state
 	ExternalObjectId ids.ObjectId
@@ -132,6 +130,11 @@ func (a *FSItem) Equals(b *FSItem) (ok bool, why string) {
 }
 
 func (e *FSItem) GenerateConflictFD() (err error) {
+	if e.ExternalObjectId.IsEmpty() {
+		err = errors.Errorf("cannot generate conflict FD for empty external object id")
+		return
+	}
+
 	if err = e.Conflict.SetPath(e.ExternalObjectId.String() + ".conflict"); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -150,6 +153,9 @@ func (e *FSItem) GetCheckoutModeOrError() (m checkout_mode.Mode, err error) {
 
 	case !e.Object.IsEmpty():
 		m = checkout_mode.MetadataOnly
+
+	case !e.Conflict.IsEmpty():
+		err = MakeErrMergeConflict(e)
 
 	default:
 		err = checkout_mode.MakeErrInvalidCheckoutMode(
