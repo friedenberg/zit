@@ -101,7 +101,6 @@ function pull_history_zettel_typ_etikett_no_conflicts { # @test
 }
 
 function pull_history_zettel_typ_etikett_yes_conflicts { # @test
-	skip
 	them="them"
 	bootstrap "$them"
 	assert_success
@@ -137,9 +136,33 @@ function pull_history_zettel_typ_etikett_yes_conflicts { # @test
 
 	run_zit status
 	assert_success
-	assert_output ''
+	assert_output_unsorted - <<-EOM
+		       conflicted [one/dos]
+		       conflicted [one/uno]
+		        untracked [to_add @05b22ebd6705f9ac35e6e4736371df50b03d0e50f85865861fd1f377c4c76e23]
+	EOM
 
-	try_add_new_after_pull
+	run_zit merge-tool -merge-tool "/bin/bash -c 'cat \"\$2\" >\"\$3\"'" .
+	assert_success
+	assert_output - <<-EOM
+		          deleted [one/dos.conflict]
+		          deleted [one/uno.conflict]
+		          deleted [one/]
+	EOM
+
+	run_zit show -format text one/dos
+	assert_success
+	assert_output - <<-EOM
+		---
+		# zettel with multiple etiketten
+		- this_is_the_first
+		- this_is_the_second
+		! md
+		---
+
+		zettel with multiple etiketten body
+	EOM
+
 }
 
 function pull_history_default_no_conflict { # @test

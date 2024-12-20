@@ -100,8 +100,6 @@ func (s *Store) makeFuncIterHydrateCheckedOutProbablyCheckedOut(
 					err = errors.Wrap(err)
 					return
 				}
-
-				return
 			} else {
 				err = errors.Wrapf(err, "Cwd: %#v", item.Debug())
 				return

@@ -8,21 +8,27 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
+// TODO consider making this a ConflictedWithBase and ConflictedWithoutBase
+// and an interface for both
 type Conflicted struct {
 	*CheckedOut
 	Local, Base, Remote *Transacted
 }
 
-func (tm Conflicted) GetCollection() Collection {
-	return tm
+func (c Conflicted) GetCollection() Collection {
+	return c
 }
 
-func (tm Conflicted) Len() int {
-	return 3
+func (c Conflicted) Len() int {
+	if c.Base == nil {
+		return 2
+	} else {
+		return 3
+	}
 }
 
-func (tm Conflicted) Any() *Transacted {
-	return tm.Local
+func (c Conflicted) Any() *Transacted {
+	return c.Local
 }
 
 func (c Conflicted) All() iter.Seq[*Transacted] {
@@ -41,16 +47,16 @@ func (c Conflicted) All() iter.Seq[*Transacted] {
 	}
 }
 
-func (tm Conflicted) IsAllInlineType(itc ids.InlineTypeChecker) bool {
-	if !itc.IsInlineType(tm.Local.GetType()) {
+func (c Conflicted) IsAllInlineType(itc ids.InlineTypeChecker) bool {
+	if !itc.IsInlineType(c.Local.GetType()) {
 		return false
 	}
 
-	if tm.Base != nil && !itc.IsInlineType(tm.Base.GetType()) {
+	if c.Base != nil && !itc.IsInlineType(c.Base.GetType()) {
 		return false
 	}
 
-	if !itc.IsInlineType(tm.Remote.GetType()) {
+	if !itc.IsInlineType(c.Remote.GetType()) {
 		return false
 	}
 
@@ -130,7 +136,7 @@ func (tm *Conflicted) MergeTags() (err error) {
 	return
 }
 
-func (tm *Conflicted) ReadConflictMarker(
+func (c *Conflicted) ReadConflictMarker(
 	iter func(interfaces.FuncIter[*Transacted]) error,
 ) (err error) {
 	i := 0
@@ -139,13 +145,13 @@ func (tm *Conflicted) ReadConflictMarker(
 		func(sk *Transacted) (err error) {
 			switch i {
 			case 0:
-				tm.Local = sk
+				c.Local = sk
 
 			case 1:
-				tm.Base = sk
+				c.Base = sk
 
 			case 2:
-				tm.Remote = sk
+				c.Remote = sk
 
 			default:
 				err = errors.Errorf("too many skus in conflict file")
@@ -163,8 +169,8 @@ func (tm *Conflicted) ReadConflictMarker(
 
 	// Conflicts can exist between objects without a base
 	if i == 2 {
-		tm.Base = tm.Remote
-		tm.Remote = nil
+		c.Remote = c.Base
+		c.Base = nil
 	}
 
 	return

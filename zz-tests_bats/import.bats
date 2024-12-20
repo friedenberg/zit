@@ -195,7 +195,7 @@ function import_conflict { # @test
 
 	run_zit import -print-copies=false -inventory-list "$list" -blobs "$blobs" -compression-type gzip
 	assert_failure
-	assert_output_unsorted - <<-EOM
+	assert_output - <<-EOM
 		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-1 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[tag-2 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]

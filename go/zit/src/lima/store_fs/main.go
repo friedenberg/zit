@@ -371,8 +371,12 @@ func (s *Store) WriteFSItemToExternal(
 	var mode checkout_mode.Mode
 
 	if mode, err = item.GetCheckoutModeOrError(); err != nil {
-		err = errors.Wrap(err)
-		return
+		if sku.IsErrMergeConflict(err) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	switch mode {
