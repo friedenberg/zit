@@ -2,9 +2,7 @@ package env
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
@@ -12,8 +10,7 @@ import (
 
 func (u *Local) ImportListFromRemoteBlobStore(
 	list *sku.List,
-	remoteBlobStore dir_layout.BlobStore,
-	printCopies bool,
+	importer store.Importer,
 ) (err error) {
 	if err = u.Lock(); err != nil {
 		err = errors.Wrap(err)
@@ -21,23 +18,6 @@ func (u *Local) ImportListFromRemoteBlobStore(
 	}
 
 	coPrinter := u.PrinterCheckedOut(box_format.CheckedOutHeaderState{})
-
-	importer := store.Importer{
-		Store:           u.GetStore(),
-		ErrPrinter:      coPrinter,
-		RemoteBlobStore: remoteBlobStore,
-	}
-
-	if printCopies {
-		importer.BlobCopierDelegate = func(result store.BlobCopyResult) error {
-			// TODO switch to Err and fix test
-			return ui.Out().Printf(
-				"copied Blob %s (%d bytes)",
-				result.GetBlobSha(),
-				result.N,
-			)
-		}
-	}
 
 	var co *sku.CheckedOut
 	hasConflicts := false

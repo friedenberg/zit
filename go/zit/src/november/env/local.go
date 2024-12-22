@@ -57,6 +57,44 @@ type Local struct {
 	luaSkuFormat *box_format.BoxTransacted
 }
 
+func MakeLocalFromConfigAndXDGDotenvPath(
+	context errors.Context,
+	config *config.Compiled,
+	xdgDotenvPath string,
+) (local *Local, err error) {
+	dotenv := xdg.Dotenv{
+		XDG: &xdg.XDG{},
+	}
+
+	var f *os.File
+
+	if f, err = os.Open(xdgDotenvPath); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if _, err = dotenv.ReadFrom(f); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = f.Close(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if local, err = MakeLocalFromConfigAndXDG(
+		context,
+		config,
+		*dotenv.XDG,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func MakeLocalFromConfigAndXDG(
 	context errors.Context,
 	config *config.Compiled,

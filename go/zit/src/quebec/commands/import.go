@@ -101,10 +101,11 @@ func (c Import) Run(u *env.Local, args ...string) {
 		)
 	}
 
+	importer := u.MakeImporter(remoteBlobStore, c.PrintCopies)
+
 	if err := u.ImportListFromRemoteBlobStore(
 		list,
-		remoteBlobStore,
-		c.PrintCopies,
+		importer,
 	); err != nil {
 		if !errors.Is(err, store.ErrNeedsMerge) {
 			err = errors.Wrap(err)

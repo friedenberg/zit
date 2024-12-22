@@ -2,11 +2,9 @@ package commands
 
 import (
 	"flag"
-	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/xdg"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -49,31 +47,10 @@ func (c Push) Run(local *env.Local, args ...string) (err error) {
 	var remote env.Env
 
 	if c.TheirXDGDotenv != "" {
-		dotenv := xdg.Dotenv{
-			XDG: &xdg.XDG{},
-		}
-
-		var f *os.File
-
-		if f, err = os.Open(c.TheirXDGDotenv); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if _, err = dotenv.ReadFrom(f); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = f.Close(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if remote, err = env.MakeLocalFromConfigAndXDG(
+		if remote, err = env.MakeLocalFromConfigAndXDGDotenvPath(
       local.Context,
 			local.GetConfig(),
-			*dotenv.XDG,
+      c.TheirXDGDotenv,
 		); err != nil {
 			err = errors.Wrap(err)
 			return

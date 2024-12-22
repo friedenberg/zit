@@ -24,6 +24,7 @@ type Importer struct {
 	RemoteBlobStore    dir_layout.BlobStore
 	BlobCopierDelegate interfaces.FuncIter[BlobCopyResult]
 	ErrPrinter         interfaces.FuncIter[*sku.CheckedOut]
+	sku.ParentNegotiator
 }
 
 func (s Importer) Import(
@@ -81,7 +82,7 @@ func (s Importer) importInventoryList(
 	return
 }
 
-func (s Importer) importLeafSku(
+func (importer Importer) importLeafSku(
 	external *sku.Transacted,
 ) (co *sku.CheckedOut, err error) {
 	co = store_fs.GetCheckedOutPool().Get()
@@ -93,7 +94,7 @@ func (s Importer) importLeafSku(
 		return
 	}
 
-	_, err = s.GetStreamIndex().ReadOneObjectIdTai(
+	_, err = importer.GetStreamIndex().ReadOneObjectIdTai(
 		co.GetSkuExternal().GetObjectId(),
 		co.GetSkuExternal().GetTai(),
 	)
@@ -109,9 +110,9 @@ func (s Importer) importLeafSku(
 	}
 
 	ui.TodoP4("cleanup")
-	if err = s.ReadOneInto(co.GetSkuExternal().GetObjectId(), co.GetSku()); err != nil {
+	if err = importer.ReadOneInto(co.GetSkuExternal().GetObjectId(), co.GetSku()); err != nil {
 		if collections.IsErrNotFound(err) {
-			if err = s.tryRealizeAndOrStore(
+			if err = importer.tryRealizeAndOrStore(
 				co.GetSkuExternal(),
 				sku.CommitOptions{
 					Clock:              co.GetSkuExternal(),
@@ -132,14 +133,17 @@ func (s Importer) importLeafSku(
 
 	var commitOptions sku.CommitOptions
 
-	if commitOptions, err = s.MergeCheckedOutIfNecessary(co); err != nil {
+	if commitOptions, err = importer.MergeCheckedOutIfNecessary(
+		co,
+		importer.ParentNegotiator,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	commitOptions.ChangeIsHistorical = true
 
-	if err = s.tryRealizeAndOrStore(
+	if err = importer.tryRealizeAndOrStore(
 		co.GetSkuExternal(),
 		commitOptions,
 	); err != nil {

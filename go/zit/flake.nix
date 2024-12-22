@@ -39,13 +39,14 @@
             version = "0.0.0";
             src = ./.;
             # vendorHash = pkgs.lib.fakeHash;
-            vendorHash = "sha256-ufxoYprkKUN9j3bqaQ/aU4d5oacODg9W0EJfMcS3+LU=";
+            vendorHash = "sha256-i+RNBc8Dl8rqgQDAQ32dtvFfvwJ/YA8TTOEWm0AdO0s=";
           };
 
           devShells.default = pkgs.mkShell {
             packages = (with pkgs; [
               fish
               gnumake
+              just
             ]);
 
             inputsFrom = [

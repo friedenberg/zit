@@ -12,6 +12,7 @@ import (
 // TODO combine with other method in this file
 func (s *Store) MergeCheckedOutIfNecessary(
 	co *sku.CheckedOut,
+	parentNegotiator sku.ParentNegotiator,
 ) (commitOptions sku.CommitOptions, err error) {
 	commitOptions.Mode = object_mode.ModeCommit
 
@@ -51,14 +52,10 @@ func (s *Store) MergeCheckedOutIfNecessary(
 		Remote:     co.GetSkuExternal(),
 	}
 
-	// TODO fetch parent more intelligently based on what we know
-	// if conflicted.Base, err = s.fetchParentIfNecessary(
-	// 	co.GetSku(),
-	// 	sku.CommitOptions{},
-	// ); err != nil {
-	// 	err = errors.Wrap(err)
-	// 	return
-	// }
+	if err = conflicted.FindBestCommonAncestor(parentNegotiator); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	var skuReplacement *sku.Transacted
 

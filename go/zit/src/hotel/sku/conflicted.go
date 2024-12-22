@@ -8,11 +8,30 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
+type ParentNegotiator interface {
+  FindBestCommonAncestor(*Conflicted) (*Transacted, error)
+}
+
 // TODO consider making this a ConflictedWithBase and ConflictedWithoutBase
 // and an interface for both
 type Conflicted struct {
 	*CheckedOut
 	Local, Base, Remote *Transacted
+}
+
+func (c *Conflicted) FindBestCommonAncestor(
+  negotiator ParentNegotiator,
+) (err error) {
+  if negotiator == nil {
+    return
+  }
+
+  if c.Base, err = negotiator.FindBestCommonAncestor(c); err != nil {
+    err = errors.Wrap(err)
+    return
+  }
+
+  return
 }
 
 func (c Conflicted) GetCollection() Collection {

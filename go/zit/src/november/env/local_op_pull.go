@@ -21,18 +21,19 @@ func (local *Local) PullQueryGroupFromRemote(
 
 	switch remoteTyped := remote.(type) {
 	case *Local:
+		importer := local.MakeImporter(remoteTyped.GetDirectoryLayout(), printCopies)
+
 		if err = local.ImportListFromRemoteBlobStore(
 			list,
-			remoteTyped.GetDirectoryLayout(),
-			printCopies,
+			importer,
 		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-  default:
-    err = todo.Implement()
-    return
+	default:
+		err = todo.Implement()
+		return
 	}
 
 	return
