@@ -9,7 +9,7 @@ import (
 )
 
 type ParentNegotiator interface {
-  FindBestCommonAncestor(*Conflicted) (*Transacted, error)
+	FindBestCommonAncestor(Conflicted) (*Transacted, error)
 }
 
 // TODO consider making this a ConflictedWithBase and ConflictedWithoutBase
@@ -20,18 +20,18 @@ type Conflicted struct {
 }
 
 func (c *Conflicted) FindBestCommonAncestor(
-  negotiator ParentNegotiator,
+	negotiator ParentNegotiator,
 ) (err error) {
-  if negotiator == nil {
-    return
-  }
+	if negotiator == nil {
+		return
+	}
 
-  if c.Base, err = negotiator.FindBestCommonAncestor(c); err != nil {
-    err = errors.Wrap(err)
-    return
-  }
+	if c.Base, err = negotiator.FindBestCommonAncestor(*c); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-  return
+	return
 }
 
 func (c Conflicted) GetCollection() Collection {

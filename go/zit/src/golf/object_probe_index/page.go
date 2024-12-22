@@ -17,7 +17,7 @@ import (
 )
 
 type page struct {
-	sync.Mutex
+	sync.Mutex // for the buffered reader
 	f          *os.File
 	br         bufio.Reader
 	added      *heap.Heap[row, *row]
@@ -138,7 +138,7 @@ func (e *page) ReadOne(sh *Sha) (loc Loc, err error) {
 		return
 	}
 
-	if loc, err = e.readCurrentLoc(sh, e.f); err != nil {
+	if loc, _, err = e.readCurrentLoc(sh, &e.br); err != nil {
 		err = errors.Wrapf(err, "Start: %d", start)
 		return
 	}
@@ -157,9 +157,30 @@ func (e *page) ReadMany(sh *Sha, locs *[]Loc) (err error) {
 		return
 	}
 
-	if err = e.collectLocs(sh, locs, start); err != nil {
+	if err = e.seekAndResetTo(start); err != nil {
 		err = errors.Wrap(err)
 		return
+	}
+
+	isEOF := false
+
+	for !isEOF {
+		var loc Loc
+		var found bool
+
+		loc, found, err = e.readCurrentLoc(sh, &e.br)
+
+		if err == io.EOF {
+			err = nil
+			isEOF = true
+		} else if err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if found {
+			*locs = append(*locs, loc)
+		}
 	}
 
 	return
@@ -168,7 +189,7 @@ func (e *page) ReadMany(sh *Sha, locs *[]Loc) (err error) {
 func (e *page) readCurrentLoc(
 	in *sha.Sha,
 	r io.Reader,
-) (out Loc, err error) {
+) (out Loc, found bool, err error) {
 	if in.IsNull() {
 		err = errors.Errorf("empty sha")
 		return
@@ -178,10 +199,7 @@ func (e *page) readCurrentLoc(
 	defer sha.GetPool().Put(sh)
 
 	if _, err = sh.ReadFrom(r); err != nil {
-		if err != io.EOF {
-			err = errors.Wrap(err)
-		}
-
+		err = errors.WrapExcept(err, io.EOF)
 		return
 	}
 
@@ -190,8 +208,15 @@ func (e *page) readCurrentLoc(
 		return
 	}
 
-	if _, err = out.ReadFrom(e.f); err != nil {
-		err = errors.Wrap(err)
+	var n int64
+	n, err = out.ReadFrom(r)
+
+	if n > 0 {
+		found = true
+	}
+
+	if err != nil {
+		err = errors.WrapExcept(err, io.EOF)
 		return
 	}
 
@@ -207,32 +232,6 @@ func (e *page) seekAndResetTo(loc int64) (err error) {
 	e.br.Reset(e.f)
 
 	return
-}
-
-func (e *page) collectLocs(
-	shMet *sha.Sha,
-	h *[]Loc,
-	start int64,
-) (err error) {
-	if err = e.seekAndResetTo(start); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	for {
-		var loc Loc
-
-		loc, err = e.readCurrentLoc(shMet, &e.br)
-		if err != nil {
-			if err == io.EOF {
-				err = nil
-			}
-
-			return
-		}
-
-		*h = append(*h, loc)
-	}
 }
 
 func (e *page) PrintAll() (err error) {

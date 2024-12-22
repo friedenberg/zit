@@ -13,18 +13,24 @@ var (
 	isTest    bool
 )
 
-func SetVerbose() {
-	printerLog.on = true
-	printerDebug.on = true
-	verbose = true
+func init() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile | log.Lmicroseconds)
-	log.Print("verbose")
+}
+
+func SetVerbose(on bool) {
+	printerLog.on = on
+	printerDebug.on = on
+	verbose = on
+
+	if on {
+		log.Print("verbose")
+	}
 }
 
 func SetTesting() {
 	isTest = true
 	errors.SetTesting()
-	SetVerbose()
+	SetVerbose(true)
 }
 
 func IsVerbose() bool {

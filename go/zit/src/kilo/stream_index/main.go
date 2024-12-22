@@ -288,6 +288,30 @@ func (s *Index) ReadOneSha(
 	return
 }
 
+func (s *Index) ReadManySha(
+	sh *sha.Sha,
+) (skus []*sku.Transacted, err error) {
+	var locs []object_probe_index.Loc
+
+	if locs, err = s.readManyShaLoc(sh); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	for _, loc := range locs {
+		sk := sku.GetTransactedPool().Get()
+
+		if err = s.readOneLoc(loc, sk); err != nil {
+			err = errors.Wrapf(err, "Loc: %s", loc)
+			return
+		}
+
+		skus = append(skus, sk)
+	}
+
+	return
+}
+
 func (s *Index) ObjectExists(
 	id ids.IdLike,
 ) (err error) {
@@ -325,6 +349,20 @@ func (s *Index) ReadOneObjectId(
 	defer sha.GetPool().Put(sh)
 
 	if err = s.ReadOneSha(sh, sk); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (s *Index) ReadManyObjectId(
+	id string,
+) (skus []*sku.Transacted, err error) {
+	sh := sha.FromString(id)
+	defer sha.GetPool().Put(sh)
+
+	if skus, err = s.ReadManySha(sh); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

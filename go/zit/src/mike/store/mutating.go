@@ -125,7 +125,7 @@ func (s *Store) tryRealizeAndOrStore(
 
 	var parent *sku.Transacted
 
-	if parent, err = s.fetchParentIfNecessary(child, o); err != nil {
+	if parent, err = s.fetchParentIfNecessary(child); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -255,7 +255,6 @@ func (s *Store) tryRealizeAndOrStore(
 
 func (s *Store) fetchParentIfNecessary(
 	sk *sku.Transacted,
-	ut sku.CommitOptions,
 ) (mutter *sku.Transacted, err error) {
 	mutter = sku.GetTransactedPool().Get()
 	if err = s.GetStreamIndex().ReadOneObjectId(
@@ -273,14 +272,6 @@ func (s *Store) fetchParentIfNecessary(
 
 		return
 	}
-
-	// for _, vs := range s.virtualStores {
-	// 	if err = vs.ModifySku(mutter); err != nil {
-	// 		ui.Err().Print(err)
-	// 		err = nil
-	// 		return
-	// 	}
-	// }
 
 	sk.Metadata.Mutter().ResetWith(mutter.Metadata.Sha())
 

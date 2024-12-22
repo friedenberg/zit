@@ -165,7 +165,7 @@ func (u *Local) Initialize(options Options) (err error) {
 	ui.TodoP4("find a better place for this")
 	{
 		if u.cliConfig.Verbose && !u.cliConfig.Quiet {
-			ui.SetVerbose()
+			ui.SetVerbose(true)
 		} else {
 			ui.SetOutput(io.Discard)
 		}

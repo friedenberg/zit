@@ -44,6 +44,7 @@
 
           devShells.default = pkgs.mkShell {
             packages = (with pkgs; [
+              bats
               fish
               gnumake
               just

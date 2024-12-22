@@ -50,6 +50,17 @@ func (s *probe_index) readOneShaLoc(
 	return
 }
 
+func (s *probe_index) readManyShaLoc(
+	sh *sha.Sha,
+) (locs []object_probe_index.Loc, err error) {
+	if err = s.Index.ReadMany(sh, &locs); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
 func (s *probe_index) saveOneLoc(
 	o *sku.Transacted,
 	loc object_probe_index.Loc,

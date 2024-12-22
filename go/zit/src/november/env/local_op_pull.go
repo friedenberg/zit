@@ -19,20 +19,26 @@ func (local *Local) PullQueryGroupFromRemote(
 		return
 	}
 
+	importer := local.MakeImporter(printCopies)
+
 	switch remoteTyped := remote.(type) {
 	case *Local:
-		importer := local.MakeImporter(remoteTyped.GetDirectoryLayout(), printCopies)
-
-		if err = local.ImportListFromRemoteBlobStore(
-			list,
-			importer,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
+		importer.RemoteBlobStore = remoteTyped.GetDirectoryLayout()
+		importer.ParentNegotiator = ParentNegotiatorFirstAncestor{
+			Local:  local,
+			Remote: remoteTyped,
 		}
 
 	default:
 		err = todo.Implement()
+		return
+	}
+
+	if err = local.ImportList(
+		list,
+		importer,
+	); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

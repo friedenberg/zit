@@ -23,7 +23,6 @@ type Importer struct {
 	*Store
 	RemoteBlobStore    dir_layout.BlobStore
 	BlobCopierDelegate interfaces.FuncIter[BlobCopyResult]
-	ErrPrinter         interfaces.FuncIter[*sku.CheckedOut]
 	sku.ParentNegotiator
 }
 

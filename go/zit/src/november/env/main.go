@@ -23,4 +23,8 @@ type Env interface {
 		qg *query.Group,
 		printCopies bool,
 	) (err error)
+
+	ReadObjectHistory(
+		oid *ids.ObjectId,
+	) (skus []*sku.Transacted, err error)
 }

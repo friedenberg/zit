@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
-func (u *Local) ImportListFromRemoteBlobStore(
+func (u *Local) ImportList(
 	list *sku.List,
 	importer store.Importer,
 ) (err error) {

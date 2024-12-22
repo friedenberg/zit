@@ -27,7 +27,7 @@ func (l *Loc) ReadFrom(r io.Reader) (n int64, err error) {
 	n += int64(n1)
 
 	if err != nil {
-		err = errors.Wrap(err)
+		err = errors.WrapExcept(err, io.EOF)
 		return
 	}
 

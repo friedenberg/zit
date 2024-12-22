@@ -48,20 +48,20 @@ func init() {
 	)
 }
 
-func (c Import) Run(u *env.Local, args ...string) {
+func (c Import) Run(local *env.Local, args ...string) {
 	if c.InventoryList == "" {
-		u.Context.Cancel(errors.BadRequestf("empty inventory list"))
+		local.Context.Cancel(errors.BadRequestf("empty inventory list"))
 		return
 	}
 
 	var ag age.Age
 
 	if err := ag.AddIdentity(c.AgeIdentity); err != nil {
-		u.Context.Cancel(errors.Wrapf(err, "age-identity: %q", &c.AgeIdentity))
+		local.Context.Cancel(errors.Wrapf(err, "age-identity: %q", &c.AgeIdentity))
 		return
 	}
 
-	bf := u.GetStore().GetInventoryListStore().FormatForVersion(c.StoreVersion)
+	bf := local.GetStore().GetInventoryListStore().FormatForVersion(c.StoreVersion)
 
 	var rc io.ReadCloser
 
@@ -76,34 +76,36 @@ func (c Import) Run(u *env.Local, args ...string) {
 		var err error
 
 		if rc, err = dir_layout.NewFileReader(o); err != nil {
-			u.Context.Cancel(errors.Wrap(err))
+			local.Context.Cancel(errors.Wrap(err))
 			return
 		}
 
-		defer u.Context.Closer(rc)
+		defer local.Context.Closer(rc)
 	}
 
 	list := sku.MakeList()
 
 	// TODO determine why this is not erroring for invalid input
-	if err := inventory_list_blobs.ReadInventoryListBlob(bf, rc, list); err != nil {
-		u.Context.Cancel(errors.Wrap(err))
+	if err := inventory_list_blobs.ReadInventoryListBlob(
+		bf,
+		rc,
+		list,
+	); err != nil {
+		local.Context.Cancel(errors.Wrap(err))
 		return
 	}
 
-	var remoteBlobStore dir_layout.BlobStore
+	importer := local.MakeImporter(c.PrintCopies)
 
 	if c.Blobs != "" {
-		remoteBlobStore = dir_layout.MakeBlobStore(
+		importer.RemoteBlobStore = dir_layout.MakeBlobStore(
 			c.Blobs,
 			&ag,
 			c.CompressionType,
 		)
 	}
 
-	importer := u.MakeImporter(remoteBlobStore, c.PrintCopies)
-
-	if err := u.ImportListFromRemoteBlobStore(
+	if err := local.ImportList(
 		list,
 		importer,
 	); err != nil {
@@ -111,7 +113,7 @@ func (c Import) Run(u *env.Local, args ...string) {
 			err = errors.Wrap(err)
 		}
 
-		u.Context.Cancel(err)
+		local.Context.Cancel(err)
 
 		return
 	}
