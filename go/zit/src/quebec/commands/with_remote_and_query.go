@@ -121,6 +121,4 @@ func (c commandWithRemoteAndQuery) Run(
 	}
 
 	c.RunWithRemoteAndQuery(local, remote, c.Group)
-
-	return
 }

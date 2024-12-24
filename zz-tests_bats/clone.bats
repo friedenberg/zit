@@ -12,7 +12,7 @@ teardown() {
 	chflags_and_rm
 }
 
-# bats file_tags=user_story:clone,user_story:repo,user_store:xdg
+# bats file_tags=user_story:clone,user_story:repo,user_store:xdg,user_story:remote
 
 function bootstrap {
 	set_xdg "$1"

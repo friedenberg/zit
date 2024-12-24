@@ -3,7 +3,6 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -42,7 +41,7 @@ func (c Pull) RunWithRemoteAndQuery(
 		qg,
 		true,
 	); err != nil {
-		local.Context.Cancel(errors.Wrap(err))
+		local.CancelWithError(err)
 		return
 	}
 }

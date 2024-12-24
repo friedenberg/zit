@@ -14,7 +14,7 @@ teardown() {
 	rm_from_version "$version"
 }
 
-# bats file_tags=user_story:pull,user_story:repo,user_store:xdg
+# bats file_tags=user_story:pull,user_story:repo,user_store:xdg,user_story:remote
 
 function bootstrap {
 	set_xdg "$1"
