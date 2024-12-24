@@ -29,6 +29,13 @@ func (local *Local) PullQueryGroupFromRemote(
 			Remote: remoteTyped,
 		}
 
+	case *RemoteHTTP:
+		importer.RemoteBlobStore = remoteTyped.GetBlobStore()
+		// importer.ParentNegotiator = ParentNegotiatorFirstAncestor{
+		// 	Local:  local,
+		// 	Remote: remoteTyped,
+		// }
+
 	default:
 		err = todo.Implement()
 		return

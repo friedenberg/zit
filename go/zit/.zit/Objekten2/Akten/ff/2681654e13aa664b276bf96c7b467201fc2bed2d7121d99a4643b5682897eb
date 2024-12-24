@@ -1,0 +1,52 @@
+
+cmd_bats := "BATS_TEST_TIMEOUT=$(timeout) bats --tap --jobs $(n_prc)"
+
+gen-fixture:
+ ./zz-tests_bats/migration/generate_fixture.bash
+
+end-to-end-tests:
+  {{cmd_bats}} zz-tests_bats/*.bats
+
+test:
+  #! /usr/bin/env -S bash -xe
+  pushd "{{invocation_directory()}}"
+  make build/zit
+  pushd "$HOME/zit"
+  echo "TODO: insert test function"
+  exit 1
+
+# run go generate and compile the go binary
+build:
+  make build/zit
+
+# generate bats test fixtures and run all bats tests
+test-all:
+  ./zz-tests_bats/migration/generate_fixture.bash
+  make build/tests_slower
+
+build-and-test-all: build test-all
+
+git-add-and-commit *PATHS:
+  #! /usr/bin/env fish
+  set -l argv {{PATHS}}
+  if test (count $argv) -gt 0
+    git add $argv
+  end
+
+  set -l diff_status (git diff --cached 2>&1)
+
+  if test -n "$diff_status"
+    echo "committing..." >&2
+
+    if not git commit -m update
+      return 1
+    end
+  else
+    echo "no changes, just pushing" >&2
+  end
+
+  echo "pushing..." >&2
+  git push
+  
+commit: build-and-test-all \
+    (git-add-and-commit "." "../../{zz-pandoc,zz-vim,zz-tests_bats}")

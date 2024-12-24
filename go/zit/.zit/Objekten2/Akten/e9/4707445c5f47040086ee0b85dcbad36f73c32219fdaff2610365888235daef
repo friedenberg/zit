@@ -1,0 +1,45 @@
+package commands
+
+import (
+	"flag"
+	"net"
+
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/november/env"
+)
+
+type Serve struct {
+	Protocol   string
+	Privileges string
+}
+
+func init() {
+	registerCommand(
+		"serve",
+		func(f *flag.FlagSet) CommandWithContext {
+			c := &Serve{}
+
+			f.StringVar(&c.Protocol, "protocol", "http", "")
+
+			return c
+		},
+	)
+}
+
+func (c Serve) Run(u *env.Local, args ...string) {
+	var listener net.Listener
+
+	{
+		var err error
+
+		if listener, err = u.InitializeHTTP(); err != nil {
+			u.Context.Cancel(errors.Wrap(err))
+			return
+		}
+	}
+
+	if err := u.Serve(listener); err != nil {
+		u.Context.Cancel(errors.Wrap(err))
+		return
+	}
+}

@@ -93,3 +93,26 @@ func registerCommandWithQuery(
 		},
 	)
 }
+
+func registerCommandWithRemoteAndQuery(
+	n string,
+	makeFunc func(*flag.FlagSet) CommandWithRemoteAndQuery,
+) {
+	_registerCommand(
+		false,
+		n,
+		func(f *flag.FlagSet) CommandWithContext {
+			c := &commandWithRemoteAndQuery{}
+
+			f.Var(&c.RepoId, "kasten", "none or Browser")
+			f.BoolVar(&c.ExcludeUntracked, "exclude-untracked", false, "")
+			f.BoolVar(&c.ExcludeRecognized, "exclude-recognized", false, "")
+			f.StringVar(&c.TheirXDGDotenv, "xdg-dotenv", "", "")
+			f.BoolVar(&c.UseSocket, "use-socket", false, "")
+
+			c.CommandWithRemoteAndQuery = makeFunc(f)
+
+			return c
+		},
+	)
+}

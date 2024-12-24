@@ -1,0 +1,214 @@
+package env
+
+import (
+	"bufio"
+	"context"
+	"fmt"
+	"io"
+	"net"
+	"net/http"
+	"os"
+	"strconv"
+	"strings"
+
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
+)
+
+type UnixSocket struct {
+	net.Listener
+	Path string
+}
+
+func (env *Local) InitializeUnixSocket() (unixSocket UnixSocket, err error) {
+	dir := env.GetDirectoryLayout().GetXDG().State
+
+	if err = os.MkdirAll(dir, 0o700); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	unixSocket.Path = fmt.Sprintf("%s/%d.sock", dir, os.Getpid())
+
+	ui.Log().Printf("starting server on %q", unixSocket.Path)
+
+	var unixAddress *net.UnixAddr
+
+	if unixAddress, err = net.ResolveUnixAddr("unix", unixSocket.Path); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var listener net.Listener
+
+	if listener, err = net.ListenUnix("unix", unixAddress); err != nil {
+		// TODO add sigil error
+		err = errors.Wrap(err)
+		return
+	}
+
+	unixSocket.Listener = listener
+
+	ui.Log().Printf("listening: %s", unixSocket.Path)
+
+	return
+}
+
+type HTTPPort struct {
+	net.Listener
+	Port int
+}
+
+func (env *Local) InitializeHTTP() (httpPort HTTPPort, err error) {
+	var addr net.TCPAddr
+
+	var listener net.Listener
+
+	if listener, err = net.ListenTCP("tcp", &addr); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	httpPort.Listener = listener
+
+	addr = *listener.Addr().(*net.TCPAddr)
+	httpPort.Port = addr.Port
+
+	ui.Log().Printf("Listening on port %q", strconv.Itoa(httpPort.Port))
+
+	return
+}
+
+func (env *Local) Serve(listener net.Listener) (err error) {
+	httpServer := http.Server{Handler: env}
+
+	go func() {
+		<-env.Done()
+		ui.Log().Print("shutting down")
+
+		ctx, cancel := context.WithTimeoutCause(
+			context.Background(),
+			1e9, // 1 second
+			errors.Errorf("shut down timeout"),
+		)
+
+		defer cancel()
+
+		httpServer.Shutdown(ctx)
+	}()
+
+	if err = httpServer.Serve(listener); err != nil {
+		if errors.Is(err, http.ErrServerClosed) {
+			err = nil
+		} else {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	ui.Log().Print("shutdown complete")
+
+	return
+}
+
+func (local *Local) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	type MethodPath struct {
+		Method string
+		Path   string
+	}
+
+	mp := MethodPath{Method: req.Method, Path: req.URL.Path}
+
+	switch mp {
+	case MethodPath{"GET", "/blob"}:
+		var shString strings.Builder
+
+		if _, err := io.Copy(&shString, req.Body); err != nil {
+			panic(err)
+		}
+
+		sh := sha.Must(shString.String())
+
+		ui.Log().Printf("blob requested: %q", sh)
+
+		var rc sha.ReadCloser
+
+		{
+			var err error
+
+			if rc, err = local.GetDirectoryLayout().BlobReader(sh); err != nil {
+				panic(err)
+			}
+		}
+
+		if _, err := io.Copy(w, rc); err != nil {
+			panic(err)
+		}
+
+		if err := rc.Close(); err != nil {
+			panic(err)
+		}
+
+	case MethodPath{"GET", "/inventory_list"}:
+		var qgString strings.Builder
+
+		if _, err := io.Copy(&qgString, req.Body); err != nil {
+			panic(err)
+		}
+
+		var qg *query.Group
+
+		{
+			var err error
+
+			if qg, err = local.MakeQueryGroup(
+				nil,
+				ids.RepoId{},
+				sku.ExternalQueryOptions{},
+				qgString.String(),
+			); err != nil {
+				panic(err)
+			}
+		}
+
+		var list *sku.List
+
+		{
+			var err error
+
+			if list, err = local.MakeInventoryList(qg); err != nil {
+				panic(err)
+			}
+		}
+
+		bw := bufio.NewWriter(w)
+
+		printer := local.MakePrinterBoxArchive(bw, local.GetConfig().PrintOptions.PrintTime)
+
+		var sk *sku.Transacted
+		var hasMore bool
+
+		for {
+			sk, hasMore = list.Pop()
+
+			if !hasMore {
+				break
+			}
+
+			if err := printer(sk); err != nil {
+				panic(err)
+			}
+		}
+
+		if err := bw.Flush(); err != nil {
+			panic(err)
+		}
+
+	default:
+		w.WriteHeader(http.StatusNotFound)
+	}
+}

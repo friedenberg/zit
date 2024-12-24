@@ -48,11 +48,6 @@ func (c Clone) DefaultGenres() ids.Genre {
 }
 
 func (c Clone) Run(local *env.Local, args ...string) (err error) {
-	if err = local.Start(c.BigBang); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	if len(args) < 1 && c.TheirXDGDotenv == "" {
 		// TODO add info about remote options
 		err = errors.BadRequestf("Cloning requires a remote to be specified")
@@ -72,6 +67,11 @@ func (c Clone) Run(local *env.Local, args ...string) (err error) {
 		}
 	} else {
 		err = todo.Implement()
+		return
+	}
+
+	if err = local.Start(c.BigBang); err != nil {
+		err = errors.Wrap(err)
 		return
 	}
 

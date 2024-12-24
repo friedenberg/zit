@@ -5,6 +5,7 @@ setup() {
 
 	# for shellcheck SC2154
 	export output
+  export BATS_TEST_BODY=true
 }
 
 teardown() {
@@ -83,6 +84,38 @@ function pull_history_zettel_typ_etikett_no_conflicts { # @test
 
 	run_zit_init_disable_age
 	run_zit pull \
+		-xdg-dotenv <(print_their_xdg) \
+		+zettel,typ,etikett
+
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
+		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
+		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[this_is_the_first @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[this_is_the_second @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		copied Blob 024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b (36 bytes)
+		copied Blob 9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 (5 bytes)
+	EOM
+
+	try_add_new_after_pull
+}
+
+function pull_history_zettel_typ_etikett_no_conflicts_socket { # @test
+	them="them"
+	bootstrap "$them"
+	assert_success
+
+	function print_their_xdg() (
+		set_xdg "$them"
+		zit info xdg
+	)
+
+	set_xdg "$BATS_TEST_TMPDIR"
+
+	run_zit_init_disable_age
+	run_zit pull \
+  -use-socket \
 		-xdg-dotenv <(print_their_xdg) \
 		+zettel,typ,etikett
 
