@@ -1,17 +1,17 @@
 package blob_store
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_blobs"
 )
 
 type RepoStore struct {
-	dirLayout dir_layout.DirLayout
+	dirLayout repo_layout.Layout
 	v0        Store[repo_blobs.V0, *repo_blobs.V0]
 }
 
 func MakeRepoStore(
-	dirLayout dir_layout.DirLayout,
+	dirLayout repo_layout.Layout,
 ) RepoStore {
 	return RepoStore{
 		dirLayout: dirLayout,

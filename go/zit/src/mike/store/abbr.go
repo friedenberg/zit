@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/tridex"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -38,7 +38,7 @@ type indexAbbr struct {
 
 	lock      sync.Locker
 	once      *sync.Once
-	dirLayout dir_layout.DirLayout
+	dirLayout repo_layout.Layout
 
 	path string
 
@@ -50,7 +50,7 @@ type indexAbbr struct {
 
 func newIndexAbbr(
 	options options_print.V0,
-	dirLayout dir_layout.DirLayout,
+	dirLayout repo_layout.Layout,
 	p string,
 ) (i *indexAbbr, err error) {
 	i = &indexAbbr{

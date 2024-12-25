@@ -11,8 +11,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout_primitive"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -33,7 +33,7 @@ type Repo struct {
 
 	sunrise ids.Tai
 
-	dirLayout    dir_layout.DirLayout
+	dirLayout    repo_layout.Layout
 	fileEncoder  store_fs.FileEncoder
 	config       config.Compiled
 	dormantIndex dormant_index.Index
@@ -75,9 +75,9 @@ func MakeFromConfigAndXDGDotenvPath(
 		return
 	}
 
-	var primitiveFSHome dir_layout_primitive.Primitive
+	var primitiveFSHome dir_layout.Layout
 
-	if primitiveFSHome, err = dir_layout_primitive.MakePrimitiveWithXDG(
+	if primitiveFSHome, err = dir_layout.MakePrimitiveWithXDG(
 		config.Debug,
 		*dotenv.XDG,
 	); err != nil {
@@ -148,13 +148,13 @@ func (u *Repo) Initialize(options Options) (err error) {
 			ui.SetTodoOn()
 		}
 
-		standortOptions := dir_layout.Options{
+		standortOptions := repo_layout.Options{
 			BasePath: u.GetCLIConfig().BasePath,
 		}
 
-		if u.dirLayout, err = dir_layout.Make(
+		if u.dirLayout, err = repo_layout.Make(
+			u.Env,
 			standortOptions,
-			u.GetDirLayoutPrimitive(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

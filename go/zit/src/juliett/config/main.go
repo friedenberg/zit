@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
@@ -106,7 +106,7 @@ type compiled struct {
 }
 
 func (c *Compiled) Initialize(
-	dirLayout dir_layout.DirLayout,
+	dirLayout repo_layout.Layout,
 	kcli mutable_config_blobs.Cli,
 	dormant *dormant_index.Index,
 	blobStore *blob_store.VersionedStores,

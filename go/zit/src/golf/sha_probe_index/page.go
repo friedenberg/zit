@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 )
 
 type page struct {
@@ -24,14 +24,14 @@ type page struct {
 	br         bufio.Reader
 	equaler    interfaces.Equaler1[*row]
 	added      addedMap
-	dirLayout  dir_layout.DirLayout
+	dirLayout  repo_layout.Layout
 	searchFunc func(*sha.Sha) (mid int64, err error)
 	rowSize    int
 }
 
 func (p *page) initialize(
 	equaler interfaces.Equaler1[*row],
-	s dir_layout.DirLayout,
+	s repo_layout.Layout,
 	pid sha.PageId,
 	rowSize int,
 ) (err error) {

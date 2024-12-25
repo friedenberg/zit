@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/options_print"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout_primitive"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_metadata_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -20,7 +20,7 @@ func MakeBoxTransacted(
 	fieldsFormatWriter interfaces.StringFormatWriter[string_format_writer.Box],
 	abbr ids.Abbr,
 	fsItemReadWriter sku.FSItemReadWriter,
-	relativePath dir_layout_primitive.RelativePath,
+	relativePath dir_layout.RelativePath,
 	headerWriter string_format_writer.HeaderWriter[*sku.Transacted],
 ) *BoxTransacted {
 	return &BoxTransacted{
@@ -43,7 +43,7 @@ type BoxTransacted struct {
 
 	abbr             ids.Abbr
 	fsItemReadWriter sku.FSItemReadWriter
-	relativePath     dir_layout_primitive.RelativePath
+	relativePath     dir_layout.RelativePath
 }
 
 func (f *BoxTransacted) WriteStringFormat(

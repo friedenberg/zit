@@ -7,7 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout_primitive"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 )
@@ -21,24 +21,37 @@ type Env struct {
 
 	flags *flag.FlagSet
 
-	dirLayoutPrimitive dir_layout_primitive.Primitive
-	cliConfig          mutable_config_blobs.Cli
+	dir_layout.Layout
+
+	cliConfig mutable_config_blobs.Cli
+}
+
+func MakeDefault(
+	layout dir_layout.Layout,
+) *Env {
+	return &Env{
+		Context: errors.MakeContextDefault(),
+		in:      fd.MakeStd(os.Stdin),
+		out:     fd.MakeStd(os.Stdout),
+		err:     fd.MakeStd(os.Stderr),
+		Layout:  layout,
+	}
 }
 
 func Make(
 	context errors.Context,
 	flags *flag.FlagSet,
 	kCli mutable_config_blobs.Cli,
-	primitiveFSHome dir_layout_primitive.Primitive,
+	primitiveFSHome dir_layout.Layout,
 ) *Env {
 	return &Env{
-		Context:            context,
-		in:                 fd.MakeStd(os.Stdin),
-		out:                fd.MakeStd(os.Stdout),
-		err:                fd.MakeStd(os.Stderr),
-		flags:              flags,
-		cliConfig:          kCli,
-		dirLayoutPrimitive: primitiveFSHome,
+		Context:   context,
+		in:        fd.MakeStd(os.Stdin),
+		out:       fd.MakeStd(os.Stdout),
+		err:       fd.MakeStd(os.Stderr),
+		flags:     flags,
+		cliConfig: kCli,
+		Layout:    primitiveFSHome,
 	}
 }
 
@@ -70,6 +83,6 @@ func (u *Env) GetCLIConfig() mutable_config_blobs.Cli {
 	return u.cliConfig
 }
 
-func (u *Env) GetDirLayoutPrimitive() dir_layout_primitive.Primitive {
-	return u.dirLayoutPrimitive
+func (u *Env) GetDirLayoutPrimitive() dir_layout.Layout {
+	return u.Layout
 }

@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
@@ -15,14 +15,14 @@ import (
 )
 
 type InventoryStore struct {
-	dirLayout dir_layout.DirLayout
+	dirLayout repo_layout.Layout
 	boxFormat *box_format.BoxTransacted
 	v0        inventory_list_blobs.V0
 	v1        inventory_list_blobs.V1
 }
 
 func MakeInventoryStore(
-	dirLayout dir_layout.DirLayout,
+	dirLayout repo_layout.Layout,
 	objectFormat object_inventory_format.Format,
 	boxFormat *box_format.BoxTransacted,
 ) InventoryStore {

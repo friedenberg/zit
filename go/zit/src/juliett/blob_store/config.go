@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -17,7 +17,7 @@ type ConfigStore struct {
 }
 
 func MakeConfigStore(
-	dirLayout dir_layout.DirLayout,
+	dirLayout repo_layout.Layout,
 ) ConfigStore {
 	return ConfigStore{
 		toml_v0: MakeBlobStore(

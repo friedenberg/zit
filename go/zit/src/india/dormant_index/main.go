@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/tag_paths"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
@@ -85,7 +85,7 @@ func (sch *Index) ContainsSku(sk *sku.Transacted) bool {
 	return false
 }
 
-func (sch *Index) Load(s dir_layout.DirLayout) (err error) {
+func (sch *Index) Load(s repo_layout.Layout) (err error) {
 	var f *os.File
 
 	p := s.FileCacheDormant()
@@ -113,7 +113,7 @@ func (sch *Index) Load(s dir_layout.DirLayout) (err error) {
 }
 
 func (sch *Index) Flush(
-	s dir_layout.DirLayout,
+	s repo_layout.Layout,
 	printerHeader interfaces.FuncIter[string],
 	dryRun bool,
 ) (err error) {

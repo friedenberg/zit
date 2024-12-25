@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -24,14 +24,14 @@ type FileEncoder interface {
 type fileEncoder struct {
 	mode      int
 	perm      os.FileMode
-	dirLayout dir_layout.DirLayout
+	dirLayout repo_layout.Layout
 	ic        ids.InlineTypeChecker
 
 	object_metadata.TextFormatterFamily
 }
 
 func MakeFileEncoder(
-	dirLayout dir_layout.DirLayout,
+	dirLayout repo_layout.Layout,
 	ic ids.InlineTypeChecker,
 ) *fileEncoder {
 	return &fileEncoder{
@@ -41,7 +41,7 @@ func MakeFileEncoder(
 		ic:        ic,
 		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
 			object_metadata.Dependencies{
-				Primitive: dirLayout.Primitive,
+				Primitive: dirLayout.Layout,
 				BlobStore: dirLayout,
 			},
 		),

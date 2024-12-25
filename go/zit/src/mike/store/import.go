@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/store_fs"
 )
@@ -165,12 +165,12 @@ func (c Importer) importBlobIfNecessary(
 
 	var n int64
 
-	if n, err = dir_layout.CopyBlobIfNecessary(
+	if n, err = repo_layout.CopyBlobIfNecessary(
 		c.GetDirectoryLayout(),
 		c.RemoteBlobStore,
 		blobSha,
 	); err != nil {
-		if errors.Is(err, &dir_layout.ErrAlreadyExists{}) {
+		if errors.Is(err, &repo_layout.ErrAlreadyExists{}) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)

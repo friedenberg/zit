@@ -15,10 +15,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout_primitive"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/test_object_metadata_io"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env"
 )
 
 type inlineTypChecker struct {
@@ -188,25 +189,25 @@ func TestEqualityNotSelf(t1 *testing.T) {
 func makeTestFSHome(
 	t *testing.T,
 	contents map[string]string,
-) dir_layout.DirLayout {
+) repo_layout.Layout {
 	p := t.TempDir()
 
-	var primitive dir_layout_primitive.Primitive
+	var primitive dir_layout.Layout
 
 	var err error
 
-	if primitive, err = dir_layout_primitive.MakePrimitiveWithHome(
+	if primitive, err = dir_layout.MakePrimitiveWithHome(
 		p,
 		debug.Options{},
 	); err != nil {
 		t.Fatalf("failed to make dir_layout.Primitive: %s", err)
 	}
 
-	f, err := dir_layout.Make(
-		dir_layout.Options{
+	f, err := repo_layout.Make(
+		env.MakeDefault(primitive),
+		repo_layout.Options{
 			BasePath: p,
 		},
-		primitive,
 	)
 	if err != nil {
 		t.Fatalf("failed to make dir_layout: %s", err)
@@ -216,11 +217,11 @@ func makeTestFSHome(
 }
 
 func makeTestTextFormat(
-	dirLayout dir_layout.DirLayout,
+	dirLayout repo_layout.Layout,
 ) object_metadata.TextFormat {
 	return object_metadata.MakeTextFormat(
 		object_metadata.Dependencies{
-			Primitive: dirLayout.Primitive,
+			Primitive: dirLayout.Layout,
 			BlobStore: dirLayout,
 		},
 	)

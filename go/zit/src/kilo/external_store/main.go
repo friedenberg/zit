@@ -4,7 +4,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/blob_store"
@@ -71,7 +71,7 @@ type (
 	Supplies struct {
 		StoreFuncs
 		DirCache string
-		dir_layout.DirLayout
+		repo_layout.Layout
 		ids.RepoId
 		ids.TypeSet
 		ids.Clock

@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
@@ -114,13 +114,13 @@ func (c WriteBlob) doOne(
 ) (sh interfaces.Sha, err error) {
 	var rc io.ReadCloser
 
-	o := dir_layout.FileReadOptions{
+	o := repo_layout.FileReadOptions{
 		Age:             ag,
 		Path:            p,
 		CompressionType: c.CompressionType,
 	}
 
-	if rc, err = dir_layout.NewFileReader(o); err != nil {
+	if rc, err = repo_layout.NewFileReader(o); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

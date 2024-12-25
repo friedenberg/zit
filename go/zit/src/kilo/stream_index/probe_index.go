@@ -4,18 +4,18 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 type probe_index struct {
-	directoryLayout dir_layout.DirLayout
+	directoryLayout repo_layout.Layout
 	object_probe_index.Index
 }
 
 func (s *probe_index) Initialize(
-	directoryLayout dir_layout.DirLayout,
+	directoryLayout repo_layout.Layout,
 ) (err error) {
 	s.directoryLayout = directoryLayout
 

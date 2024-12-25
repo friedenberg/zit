@@ -11,13 +11,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout_primitive"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
 type Dependencies struct {
-	Primitive     dir_layout_primitive.Primitive
+	Primitive     dir_layout.Layout
 	BlobStore     interfaces.BlobStore
 	BlobFormatter script_config.RemoteScript
 }

@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
@@ -27,7 +27,7 @@ import (
 )
 
 type Store struct {
-	dirLayout dir_layout.DirLayout
+	dirLayout repo_layout.Layout
 	ls        interfaces.LockSmith
 	sv        interfaces.StoreVersion
 	of        interfaces.ObjectIOFactory
@@ -44,7 +44,7 @@ type Store struct {
 }
 
 func (s *Store) Initialize(
-	dirLayout dir_layout.DirLayout,
+	dirLayout repo_layout.Layout,
 	ls interfaces.LockSmith,
 	sv interfaces.StoreVersion,
 	of interfaces.ObjectIOFactory,

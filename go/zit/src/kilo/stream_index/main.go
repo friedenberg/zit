@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_probe_index"
@@ -51,7 +51,7 @@ func init() {
 }
 
 type Index struct {
-	directoryLayout dir_layout.DirLayout
+	directoryLayout repo_layout.Layout
 	mutable_config  *config.Compiled
 	path            string
 	interfaces.CacheIOFactory
@@ -61,7 +61,7 @@ type Index struct {
 }
 
 func MakeIndex(
-	s dir_layout.DirLayout,
+	s repo_layout.Layout,
 	k *config.Compiled,
 	dir string,
 ) (i *Index, err error) {

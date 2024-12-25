@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/checked_out_state"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
@@ -61,7 +61,7 @@ type Store struct {
 
 func Make(
 	k *config.Compiled,
-	s dir_layout.DirLayout,
+	s repo_layout.Layout,
 	itemDeletedStringFormatWriter interfaces.FuncIter[*sku.CheckedOut],
 ) *Store {
 	c := &Store{

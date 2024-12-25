@@ -8,34 +8,35 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout_primitive"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env"
 )
 
 func Make(
 	t *test_logz.T,
 	contents map[string]string,
-) (f dir_layout.DirLayout) {
+) (f repo_layout.Layout) {
 	t = t.Skip(1)
 
 	p := t.TempDir()
 
-	var primitive dir_layout_primitive.Primitive
+	var primitive dir_layout.Layout
 
 	var err error
 
-	if primitive, err = dir_layout_primitive.MakePrimitiveWithHome(
+	if primitive, err = dir_layout.MakePrimitiveWithHome(
 		p,
 		debug.Options{},
 	); err != nil {
 		t.Fatalf("failed to make dir_layout.Primitive: %s", err)
 	}
 
-	if f, err = dir_layout.Make(
-		dir_layout.Options{
+	if f, err = repo_layout.Make(
+		env.MakeDefault(primitive),
+		repo_layout.Options{
 			BasePath:             p,
 			PermitNoZitDirectory: true,
 		},
-		primitive,
 	); err != nil {
 		t.Fatalf("failed to make dir_layout: %s", err)
 	}

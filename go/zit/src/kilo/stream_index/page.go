@@ -14,7 +14,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/heap"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_probe_index"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -30,7 +30,7 @@ type Page struct {
 	added, addedLatest *sku.TransactedHeap
 	flushMode          object_mode.Mode
 	hasChanges         bool
-	directoryLayout    dir_layout.DirLayout
+	directoryLayout    repo_layout.Layout
 	config             *config.Compiled
 	oids               map[string]struct{}
 }

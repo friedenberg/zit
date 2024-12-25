@@ -15,6 +15,10 @@ type Context struct {
 	Cancel context.CancelCauseFunc
 }
 
+func MakeContextDefault() Context {
+	return MakeContext(context.Background())
+}
+
 func MakeContext(in context.Context) Context {
 	ctx, cancel := context.WithCancelCause(in)
 

@@ -7,13 +7,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
 func MakeTextFormatter(
-	dirLayout dir_layout.DirLayout,
+	dirLayout repo_layout.Layout,
 	options checkout_options.TextFormatterOptions,
 	k Config,
 ) textFormatter {
@@ -21,7 +21,7 @@ func MakeTextFormatter(
 }
 
 func MakeTextFormatterWithBlobFormatter(
-	dirLayout dir_layout.DirLayout,
+	dirLayout repo_layout.Layout,
 	options checkout_options.TextFormatterOptions,
 	k Config,
 	formatter script_config.RemoteScript,
@@ -31,7 +31,7 @@ func MakeTextFormatterWithBlobFormatter(
 		k:       k,
 		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
 			object_metadata.Dependencies{
-				Primitive:     dirLayout.Primitive,
+				Primitive:     dirLayout.Layout,
 				BlobStore:     dirLayout,
 				BlobFormatter: formatter,
 			},

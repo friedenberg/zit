@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/string_format_writer"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/query_spec"
@@ -29,7 +29,7 @@ func Make(
 	k sku.Config,
 	dp interfaces.FuncIter[*fd.FD],
 	fileExtensions interfaces.FileExtensionGetter,
-	st dir_layout.DirLayout,
+	st repo_layout.Layout,
 	ofo object_inventory_format.Options,
 	fileEncoder FileEncoder,
 ) (fs *Store, err error) {
@@ -50,7 +50,7 @@ func Make(
 		objectFormatOptions: ofo,
 		metadataTextParser: object_metadata.MakeTextParser(
 			object_metadata.Dependencies{
-				Primitive: st.Primitive,
+				Primitive: st.Layout,
 				BlobStore: st,
 			},
 		),
@@ -63,7 +63,7 @@ type Store struct {
 	config              sku.Config
 	deletedPrinter      interfaces.FuncIter[*fd.FD]
 	metadataTextParser  object_metadata.TextParser
-	dirLayout           dir_layout.DirLayout
+	dirLayout           repo_layout.Layout
 	fileEncoder         FileEncoder
 	ic                  ids.InlineTypeChecker
 	fileExtensions      interfaces.FileExtensionGetter

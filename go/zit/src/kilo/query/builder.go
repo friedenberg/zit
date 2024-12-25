@@ -6,14 +6,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/blob_store"
 )
 
 func MakeBuilder(
-	s dir_layout.DirLayout,
+	s repo_layout.Layout,
 	blob_store *blob_store.VersionedStores,
 	object_probe_index sku.ObjectProbeIndex,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
@@ -31,7 +31,7 @@ func MakeBuilder(
 }
 
 type Builder struct {
-	dirLayout               dir_layout.DirLayout
+	dirLayout               repo_layout.Layout
 	blob_store              *blob_store.VersionedStores
 	object_probe_index      sku.ObjectProbeIndex
 	luaVMPoolBuilder        *lua.VMPoolBuilder

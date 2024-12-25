@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 )
 
@@ -16,7 +16,7 @@ type DeleteCheckout struct{}
 
 func (c DeleteCheckout) Run(
 	dryRun bool,
-	s dir_layout.DirLayout,
+	s repo_layout.Layout,
 	p interfaces.FuncIter[*fd.FD],
 	fs interfaces.Iterable[*fd.FD],
 ) (err error) {

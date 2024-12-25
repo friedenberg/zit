@@ -2,7 +2,7 @@ package blob_store
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/lua"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
@@ -17,7 +17,7 @@ type VersionedStores struct {
 }
 
 func Make(
-	dirLayout dir_layout.DirLayout,
+	dirLayout repo_layout.Layout,
 	luaVMPoolBuilder *lua.VMPoolBuilder,
 	objectFormat object_inventory_format.Format,
 	boxFormat *box_format.BoxTransacted,
