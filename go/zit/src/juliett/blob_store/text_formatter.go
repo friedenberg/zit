@@ -31,7 +31,7 @@ func MakeTextFormatterWithBlobFormatter(
 		k:       k,
 		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
 			object_metadata.Dependencies{
-				Primitive:     dirLayout.Layout,
+				DirLayout:     dirLayout.Layout,
 				BlobStore:     dirLayout,
 				BlobFormatter: formatter,
 			},

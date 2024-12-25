@@ -109,7 +109,7 @@ func (c *New) Run(u *repo_local.Repo, args ...string) (err error) {
 
 	f := object_metadata.MakeTextFormat(
 		object_metadata.Dependencies{
-			Primitive: u.GetRepoLayout().Layout,
+			DirLayout: u.GetRepoLayout().Layout,
 			BlobStore: u.GetRepoLayout(),
 		},
 	)

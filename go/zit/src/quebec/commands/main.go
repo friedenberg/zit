@@ -41,25 +41,25 @@ func Run(
 
 	args = os.Args[2:]
 
-	cliConfig := config_mutable_cli.Default()
-	cliConfig.AddToFlags(cmd.FlagSet)
+	configCli := config_mutable_cli.Default()
+	configCli.AddToFlags(cmd.FlagSet)
 
 	if err := cmd.Parse(args); err != nil {
 		ctx.Cancel(err)
 		return
 	}
 
-	var primitiveFSHome dir_layout.Layout
+	var dirLayout dir_layout.Layout
 	var err error
 
-	if primitiveFSHome, err = dir_layout.MakePrimitive(
-		cliConfig.Debug,
+	if dirLayout, err = dir_layout.MakePrimitive(
+		configCli.Debug,
 	); err != nil {
 		ctx.Cancel(errors.Wrap(err))
 		return
 	}
 
-	if _, err = debug.MakeContext(ctx, cliConfig.Debug); err != nil {
+	if _, err = debug.MakeContext(ctx, configCli.Debug); err != nil {
 		ctx.Cancel(errors.Wrap(err))
 		return
 	}
@@ -77,8 +77,8 @@ func Run(
 	env := env.Make(
 		ctx,
 		cmd.FlagSet,
-		cliConfig,
-		primitiveFSHome,
+		configCli,
+		dirLayout,
 	)
 
 	if u, err = repo_local.Make(

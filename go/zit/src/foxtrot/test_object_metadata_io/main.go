@@ -20,11 +20,11 @@ func Make(
 
 	p := t.TempDir()
 
-	var primitive dir_layout.Layout
+	var dirLayout dir_layout.Layout
 
 	var err error
 
-	if primitive, err = dir_layout.MakePrimitiveWithHome(
+	if dirLayout, err = dir_layout.MakePrimitiveWithHome(
 		p,
 		debug.Options{},
 	); err != nil {
@@ -32,7 +32,7 @@ func Make(
 	}
 
 	if f, err = repo_layout.Make(
-		env.MakeDefault(primitive),
+		env.MakeDefault(dirLayout),
 		repo_layout.Options{
 			BasePath:             p,
 			PermitNoZitDirectory: true,

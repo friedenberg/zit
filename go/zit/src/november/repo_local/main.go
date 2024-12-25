@@ -75,9 +75,9 @@ func MakeFromConfigAndXDGDotenvPath(
 		return
 	}
 
-	var primitiveFSHome dir_layout.Layout
+	var dirLayout dir_layout.Layout
 
-	if primitiveFSHome, err = dir_layout.MakePrimitiveWithXDG(
+	if dirLayout, err = dir_layout.MakePrimitiveWithXDG(
 		config.Debug,
 		*dotenv.XDG,
 	); err != nil {
@@ -89,7 +89,7 @@ func MakeFromConfigAndXDGDotenvPath(
 		context,
 		nil,
 		config.Cli(),
-		primitiveFSHome,
+		dirLayout,
 	)
 
 	if local, err = Make(

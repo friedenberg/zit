@@ -42,7 +42,7 @@ func Make(
 	context errors.Context,
 	flags *flag.FlagSet,
 	kCli config_mutable_cli.Config,
-	primitiveFSHome dir_layout.Layout,
+	dirLayout dir_layout.Layout,
 ) *Env {
 	return &Env{
 		Context:   context,
@@ -51,7 +51,7 @@ func Make(
 		err:       fd.MakeStd(os.Stderr),
 		flags:     flags,
 		cliConfig: kCli,
-		Layout:    primitiveFSHome,
+		Layout:    dirLayout,
 	}
 }
 
@@ -83,6 +83,6 @@ func (u *Env) GetCLIConfig() config_mutable_cli.Config {
 	return u.cliConfig
 }
 
-func (u *Env) GetDirLayoutPrimitive() dir_layout.Layout {
+func (u *Env) GetDirLayout() dir_layout.Layout {
 	return u.Layout
 }

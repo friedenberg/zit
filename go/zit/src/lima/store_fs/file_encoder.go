@@ -41,7 +41,7 @@ func MakeFileEncoder(
 		ic:        ic,
 		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
 			object_metadata.Dependencies{
-				Primitive: dirLayout.Layout,
+				DirLayout: dirLayout.Layout,
 				BlobStore: dirLayout,
 			},
 		),

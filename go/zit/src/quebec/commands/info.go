@@ -39,7 +39,7 @@ func (c Info) Run(u *repo_local.Repo, args ...string) {
 			ui.Out().Print(c.Config.GetStoreVersion())
 
 		case "xdg":
-			ecksDeeGee := u.GetDirLayoutPrimitive().GetXDG()
+			ecksDeeGee := u.GetDirLayout().GetXDG()
 
 			dotenv := xdg.Dotenv{
 				XDG: &ecksDeeGee,

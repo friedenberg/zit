@@ -192,11 +192,11 @@ func makeTestFSHome(
 ) repo_layout.Layout {
 	p := t.TempDir()
 
-	var primitive dir_layout.Layout
+	var dirLayout dir_layout.Layout
 
 	var err error
 
-	if primitive, err = dir_layout.MakePrimitiveWithHome(
+	if dirLayout, err = dir_layout.MakePrimitiveWithHome(
 		p,
 		debug.Options{},
 	); err != nil {
@@ -204,7 +204,7 @@ func makeTestFSHome(
 	}
 
 	f, err := repo_layout.Make(
-		env.MakeDefault(primitive),
+		env.MakeDefault(dirLayout),
 		repo_layout.Options{
 			BasePath: p,
 		},
@@ -221,7 +221,7 @@ func makeTestTextFormat(
 ) object_metadata.TextFormat {
 	return object_metadata.MakeTextFormat(
 		object_metadata.Dependencies{
-			Primitive: dirLayout.Layout,
+			DirLayout: dirLayout.Layout,
 			BlobStore: dirLayout,
 		},
 	)

@@ -50,7 +50,7 @@ func Make(
 		objectFormatOptions: ofo,
 		metadataTextParser: object_metadata.MakeTextParser(
 			object_metadata.Dependencies{
-				Primitive: st.Layout,
+				DirLayout: st.Layout,
 				BlobStore: st,
 			},
 		),
