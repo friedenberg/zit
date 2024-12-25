@@ -14,9 +14,10 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/dormant_index"
@@ -79,7 +80,7 @@ func (a *Compiled) GetMutableConfig() mutable_config_blobs.Blob {
 	return a.mutable_config_private
 }
 
-type cli = mutable_config_blobs.Cli
+type cli = config_mutable_cli.Config
 
 type compiled struct {
 	lock sync.Locker
@@ -107,7 +108,7 @@ type compiled struct {
 
 func (c *Compiled) Initialize(
 	dirLayout repo_layout.Layout,
-	kcli mutable_config_blobs.Cli,
+	kcli config_mutable_cli.Config,
 	dormant *dormant_index.Index,
 	blobStore *blob_store.VersionedStores,
 ) (err error) {
@@ -139,11 +140,11 @@ func (c *Compiled) Initialize(
 	return
 }
 
-func (kc *Compiled) SetCli(k mutable_config_blobs.Cli) {
+func (kc *Compiled) SetCli(k config_mutable_cli.Config) {
 	kc.cli = k
 }
 
-func (kc *Compiled) SetCliFromCommander(k mutable_config_blobs.Cli) {
+func (kc *Compiled) SetCliFromCommander(k config_mutable_cli.Config) {
 	oldBasePath := kc.BasePath
 	kc.cli = k
 	kc.BasePath = oldBasePath

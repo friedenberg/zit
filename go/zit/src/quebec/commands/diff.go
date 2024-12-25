@@ -50,8 +50,8 @@ func (c Diff) RunWithQuery(
 		Repo: u,
 		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
 			object_metadata.Dependencies{
-				Primitive: u.GetDirectoryLayout().Layout,
-				BlobStore: u.GetDirectoryLayout(),
+				Primitive: u.GetRepoLayout().Layout,
+				BlobStore: u.GetRepoLayout(),
 			},
 		),
 	}

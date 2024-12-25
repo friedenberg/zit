@@ -13,11 +13,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/env"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 )
 
 type Getter interface {
-	GetDirectoryLayout() Layout
+	GetRepoLayout() Layout
 }
 
 type Layout struct {

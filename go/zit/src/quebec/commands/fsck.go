@@ -41,7 +41,7 @@ func (c Fsck) Run(u *repo_local.Repo, args ...string) {
 
 			blobSha := sk.GetBlobSha()
 
-			if u.GetDirectoryLayout().HasBlob(blobSha) {
+			if u.GetRepoLayout().HasBlob(blobSha) {
 				return
 			}
 

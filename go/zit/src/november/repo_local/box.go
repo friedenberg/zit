@@ -25,7 +25,7 @@ func (u *Repo) StringFormatWriterSkuBoxTransacted(
 		u.StringFormatWriterFields(truncation, co),
 		u.GetStore().GetAbbrStore().GetAbbr(),
 		u.GetStore().GetStoreFS(),
-		u.dirLayout,
+		u.layout,
 		headerWriter,
 	)
 }
@@ -42,7 +42,7 @@ func (u *Repo) StringFormatWriterSkuBoxCheckedOut(
 		u.StringFormatWriterFields(truncation, co),
 		u.GetStore().GetAbbrStore().GetAbbr(),
 		u.GetStore().GetStoreFS(),
-		u.dirLayout,
+		u.layout,
 		headerWriter,
 	)
 }

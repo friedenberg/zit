@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
-	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 )
 
 type Env struct {
@@ -23,7 +23,7 @@ type Env struct {
 
 	dir_layout.Layout
 
-	cliConfig mutable_config_blobs.Cli
+	cliConfig config_mutable_cli.Config
 }
 
 func MakeDefault(
@@ -41,7 +41,7 @@ func MakeDefault(
 func Make(
 	context errors.Context,
 	flags *flag.FlagSet,
-	kCli mutable_config_blobs.Cli,
+	kCli config_mutable_cli.Config,
 	primitiveFSHome dir_layout.Layout,
 ) *Env {
 	return &Env{
@@ -79,7 +79,7 @@ func (u *Env) GetErrFile() interfaces.WriterAndStringWriter {
 	return u.err.File
 }
 
-func (u *Env) GetCLIConfig() mutable_config_blobs.Cli {
+func (u *Env) GetCLIConfig() config_mutable_cli.Config {
 	return u.cliConfig
 }
 

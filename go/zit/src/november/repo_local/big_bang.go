@@ -48,7 +48,7 @@ func (e *BigBang) AddToFlagSet(f *flag.FlagSet) {
 }
 
 func (u *Repo) Start(bb BigBang) (err error) {
-	s := u.GetDirectoryLayout()
+	s := u.GetRepoLayout()
 
 	mkdirAll(s.DirObjectId())
 	mkdirAll(s.DirCache())
@@ -101,7 +101,7 @@ func (u *Repo) Start(bb BigBang) (err error) {
 	writeFile(s.FileCacheDormant(), "")
 
 	if err = u.dormantIndex.Flush(
-		u.GetDirectoryLayout(),
+		u.GetRepoLayout(),
 		u.PrinterHeader(),
 		u.config.DryRun,
 	); err != nil {
@@ -114,7 +114,7 @@ func (u *Repo) Start(bb BigBang) (err error) {
 		return
 	}
 
-	if err = u.GetDirectoryLayout().ResetCache(); err != nil {
+	if err = u.GetRepoLayout().ResetCache(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -274,7 +274,7 @@ func writeDefaultMutableConfig(
 
 	var aw sha.WriteCloser
 
-	if aw, err = u.GetDirectoryLayout().BlobWriter(); err != nil {
+	if aw, err = u.GetRepoLayout().BlobWriter(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

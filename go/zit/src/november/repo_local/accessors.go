@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/dormant_index"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
@@ -25,12 +25,12 @@ func (u *Repo) GetDormantIndex() *dormant_index.Index {
 	return &u.dormantIndex
 }
 
-func (u *Repo) GetDirectoryLayout() repo_layout.Layout {
-	return u.dirLayout
+func (u *Repo) GetRepoLayout() repo_layout.Layout {
+	return u.layout
 }
 
 func (u *Repo) GetBlobStore() interfaces.BlobStore {
-	return u.GetDirectoryLayout()
+	return u.GetRepoLayout()
 }
 
 func (u *Repo) GetStore() *store.Store {

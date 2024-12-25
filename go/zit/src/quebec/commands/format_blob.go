@@ -98,7 +98,7 @@ func (c *FormatBlob) Run(u *repo_local.Repo, args ...string) (err error) {
 	}
 
 	f := blob_store.MakeTextFormatterWithBlobFormatter(
-		u.GetDirectoryLayout(),
+		u.GetRepoLayout(),
 		checkout_options.TextFormatterOptions{
 			DoNotWriteEmptyDescription: true,
 		},
@@ -167,7 +167,7 @@ func (c *FormatBlob) FormatFromStdin(
 
 	if wt, err = script_config.MakeWriterToWithStdin(
 		blobFormatter,
-		u.GetDirectoryLayout().MakeCommonEnv(),
+		u.GetRepoLayout().MakeCommonEnv(),
 		u.GetInFile(),
 	); err != nil {
 		err = errors.Wrap(err)

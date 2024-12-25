@@ -38,14 +38,14 @@ func (c Deinit) Run(u *repo_local.Repo, args ...string) (err error) {
 		return
 	}
 
-	base := path.Join(u.GetDirectoryLayout().Dir())
+	base := path.Join(u.GetRepoLayout().Dir())
 
 	if err = files.SetAllowUserChangesRecursive(base); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if err = u.GetDirectoryLayout().DeleteAll(base); err != nil {
+	if err = u.GetRepoLayout().DeleteAll(base); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -57,7 +57,7 @@ func (c Deinit) getPermission(u *repo_local.Repo) (success bool) {
 	var err error
 	ui.Err().Printf(
 		"are you sure you want to deinit in %q? (y/*)",
-		u.GetDirectoryLayout().Dir(),
+		u.GetRepoLayout().Dir(),
 	)
 
 	var answer rune

@@ -7,8 +7,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
-	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/env"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
@@ -41,7 +41,7 @@ func Run(
 
 	args = os.Args[2:]
 
-	cliConfig := mutable_config_blobs.DefaultCli()
+	cliConfig := config_mutable_cli.Default()
 	cliConfig.AddToFlags(cmd.FlagSet)
 
 	if err := cmd.Parse(args); err != nil {
@@ -96,7 +96,7 @@ func Run(
 	defer errors.DeferredFlusher(&err, u)
 
 	defer func() {
-		if err = u.GetDirectoryLayout().ResetTempOnExit(ctx); err != nil {
+		if err = u.GetRepoLayout().ResetTempOnExit(ctx); err != nil {
 			ctx.Cancel(errors.Wrap(err))
 			return
 		}

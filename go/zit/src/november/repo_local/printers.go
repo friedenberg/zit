@@ -64,7 +64,7 @@ func (u *Repo) PrinterFDDeleted() interfaces.FuncIter[*fd.FD] {
 		u.GetConfig().DryRun,
 		id_fmts.MakeFDCliFormat(
 			u.FormatColorOptionsOut(),
-			u.dirLayout.MakeRelativePathStringFormatWriter(),
+			u.layout.MakeRelativePathStringFormatWriter(),
 		),
 	)
 

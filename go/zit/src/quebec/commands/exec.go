@@ -71,7 +71,7 @@ func (c Exec) runBash(
 	func() {
 		var ar io.ReadCloser
 
-		if ar, err = u.GetDirectoryLayout().BlobReader(
+		if ar, err = u.GetRepoLayout().BlobReader(
 			tz.GetBlobSha(),
 		); err != nil {
 			err = errors.Wrap(err)
@@ -80,7 +80,7 @@ func (c Exec) runBash(
 
 		var f *os.File
 
-		if f, err = u.GetDirectoryLayout().TempLocal.FileTemp(); err != nil {
+		if f, err = u.GetRepoLayout().TempLocal.FileTemp(); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

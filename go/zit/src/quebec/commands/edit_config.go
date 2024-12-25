@@ -72,7 +72,7 @@ func (c EditConfig) editInVim(
 ) (sk *sku.Transacted, err error) {
 	var f *os.File
 
-	if f, err = u.GetDirectoryLayout().TempLocal.FileTemp(); err != nil {
+	if f, err = u.GetRepoLayout().TempLocal.FileTemp(); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

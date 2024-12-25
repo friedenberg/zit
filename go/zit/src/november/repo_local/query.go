@@ -9,7 +9,7 @@ import (
 
 func (u *Repo) makeQueryBuilder() *query.Builder {
 	return query.MakeBuilder(
-		u.GetDirectoryLayout(),
+		u.GetRepoLayout(),
 		u.GetStore().GetBlobStore(),
 		u.GetStore().GetStreamIndex(),
 		u.MakeLuaVMPoolBuilder(),

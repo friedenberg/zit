@@ -68,7 +68,7 @@ func (env *Repo) InitializeUnixSocket(
 	sock.Path = path
 
 	if sock.Path == "" {
-		dir := env.GetDirectoryLayout().GetXDG().State
+		dir := env.GetRepoLayout().GetXDG().State
 
 		if err = os.MkdirAll(dir, 0o700); err != nil {
 			err = errors.Wrap(err)
@@ -180,7 +180,7 @@ func (local *Repo) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		ui.Log().Printf("blob requested: %q", sh)
 
 		if mp.Method == "HEAD" {
-			if local.GetDirectoryLayout().HasBlob(sh) {
+			if local.GetRepoLayout().HasBlob(sh) {
 				w.WriteHeader(http.StatusNoContent)
 			} else {
 				w.WriteHeader(http.StatusNotFound)
@@ -191,7 +191,7 @@ func (local *Repo) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			{
 				var err error
 
-				if rc, err = local.GetDirectoryLayout().BlobReader(sh); err != nil {
+				if rc, err = local.GetRepoLayout().BlobReader(sh); err != nil {
 					w.WriteHeader(http.StatusInternalServerError)
 					io.WriteString(w, err.Error())
 					return

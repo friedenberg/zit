@@ -7,14 +7,14 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/xdg"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
+	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/env"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 	"code.linenisgreat.com/zit/go/zit/src/india/dormant_index"
@@ -33,7 +33,7 @@ type Repo struct {
 
 	sunrise ids.Tai
 
-	dirLayout    repo_layout.Layout
+	layout       repo_layout.Layout
 	fileEncoder  store_fs.FileEncoder
 	config       config.Compiled
 	dormantIndex dormant_index.Index
@@ -152,7 +152,7 @@ func (u *Repo) Initialize(options Options) (err error) {
 			BasePath: u.GetCLIConfig().BasePath,
 		}
 
-		if u.dirLayout, err = repo_layout.Make(
+		if u.layout, err = repo_layout.Make(
 			u.Env,
 			standortOptions,
 		); err != nil {
@@ -161,10 +161,10 @@ func (u *Repo) Initialize(options Options) (err error) {
 		}
 	}
 
-	u.fileEncoder = store_fs.MakeFileEncoder(u.dirLayout, &u.config)
+	u.fileEncoder = store_fs.MakeFileEncoder(u.layout, &u.config)
 
 	if err = u.dormantIndex.Load(
-		u.dirLayout,
+		u.layout,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -174,14 +174,14 @@ func (u *Repo) Initialize(options Options) (err error) {
 	boxFormatArchive := u.MakeBoxArchive(true)
 
 	u.blobStore = blob_store.Make(
-		u.dirLayout,
+		u.layout,
 		u.MakeLuaVMPoolBuilder(),
 		objectFormat,
 		boxFormatArchive,
 	)
 
 	if err = u.config.Initialize(
-		u.dirLayout,
+		u.layout,
 		u.GetCLIConfig(),
 		&u.dormantIndex,
 		u.blobStore,
@@ -204,7 +204,7 @@ func (u *Repo) Initialize(options Options) (err error) {
 
 	if err = u.store.Initialize(
 		u.GetConfig(),
-		u.dirLayout,
+		u.layout,
 		objectFormat,
 		u.sunrise,
 		u.MakeLuaVMPoolBuilder(),
@@ -228,7 +228,7 @@ func (u *Repo) Initialize(options Options) (err error) {
 		k,
 		u.PrinterFDDeleted(),
 		k.GetFileExtensions(),
-		u.GetDirectoryLayout(),
+		u.GetRepoLayout(),
 		ofo,
 		u.fileEncoder,
 	); err != nil {
@@ -243,7 +243,7 @@ func (u *Repo) Initialize(options Options) (err error) {
 		*(ids.MustRepoId("browser")): {
 			StoreLike: store_browser.Make(
 				k,
-				u.GetDirectoryLayout(),
+				u.GetRepoLayout(),
 				u.PrinterTransactedDeleted(),
 			),
 		},

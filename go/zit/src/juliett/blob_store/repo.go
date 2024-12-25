@@ -1,8 +1,8 @@
 package blob_store
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 )
 
 type RepoStore struct {

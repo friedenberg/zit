@@ -1,4 +1,4 @@
-package mutable_config_blobs
+package config_mutable_cli
 
 import (
 	"flag"
@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 )
 
-type Cli struct {
+type Config struct {
 	BasePath string
 
 	Debug            debug.Options
@@ -30,7 +30,7 @@ type Cli struct {
 	descriptions.Description
 }
 
-func (c *Cli) AddToFlags(f *flag.FlagSet) {
+func (c *Config) AddToFlags(f *flag.FlagSet) {
 	f.StringVar(&c.BasePath, "dir-zit", "", "")
 
 	f.Var(&c.Debug, "debug", "debugging options")
@@ -71,13 +71,13 @@ func (c *Cli) AddToFlags(f *flag.FlagSet) {
 	f.Var(&c.Description, "komment", "Comment for Bestandsaufnahme")
 }
 
-func DefaultCli() (c Cli) {
+func Default() (c Config) {
 	c.PrintOptions = options_print.Default()
 
 	return
 }
 
-func (c *Cli) ApplyPrintOptionsConfig(
+func (c *Config) ApplyPrintOptionsConfig(
 	po options_print.V0,
 ) {
 	cliSet := c.PrintOptions
@@ -85,14 +85,14 @@ func (c *Cli) ApplyPrintOptionsConfig(
 	c.PrintOptions.Merge(cliSet, c.maskPrintOptions)
 }
 
-func (c Cli) UsePredictableZettelIds() bool {
+func (c Config) UsePredictableZettelIds() bool {
 	return c.PredictableZettelIds
 }
 
-func (c Cli) UsePrintTime() bool {
+func (c Config) UsePrintTime() bool {
 	return c.PrintOptions.PrintTime
 }
 
-func (c Cli) UsePrintTags() bool {
+func (c Config) UsePrintTags() bool {
 	return c.PrintOptions.PrintTagsAlways
 }

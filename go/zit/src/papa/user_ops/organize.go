@@ -124,7 +124,7 @@ func (op Organize) RunWithExternalLike(
 
 	var f *os.File
 
-	if f, err = op.GetDirectoryLayout().TempLocal.FileTempWithTemplate(
+	if f, err = op.GetRepoLayout().TempLocal.FileTempWithTemplate(
 		"*." + op.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
 	); err != nil {
 		err = errors.Wrap(err)

@@ -12,7 +12,7 @@ func (u *Repo) DeleteFiles(fs interfaces.Iterable[*fd.FD]) (err error) {
 
 	if err = deleteOp.Run(
 		u.GetConfig().DryRun,
-		u.GetDirectoryLayout(),
+		u.GetRepoLayout(),
 		u.PrinterFDDeleted(),
 		fs,
 	); err != nil {
