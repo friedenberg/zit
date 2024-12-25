@@ -11,6 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout_primitive"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env"
@@ -74,9 +75,9 @@ func MakeFromConfigAndXDGDotenvPath(
 		return
 	}
 
-	var primitiveFSHome dir_layout.Primitive
+	var primitiveFSHome dir_layout_primitive.Primitive
 
-	if primitiveFSHome, err = dir_layout.MakePrimitiveWithXDG(
+	if primitiveFSHome, err = dir_layout_primitive.MakePrimitiveWithXDG(
 		config.Debug,
 		*dotenv.XDG,
 	); err != nil {
@@ -301,7 +302,7 @@ func (u *Repo) Flush() (err error) {
 	return
 }
 
-func (u *Repo) PrintMatchedArchiviertIfNecessary() {
+func (u *Repo) PrintMatchedDormantIfNecessary() {
 	if !u.GetConfig().PrintOptions.PrintMatchedDormant {
 		return
 	}

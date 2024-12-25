@@ -67,7 +67,7 @@ func (c Edit) RunWithQuery(
 	}
 
 	opEdit := user_ops.Checkout{
-		Repo:   u,
+		Repo:    u,
 		Options: options,
 		Edit:    true,
 	}

@@ -20,8 +20,8 @@ type WithCompletion interface {
 }
 
 type command struct {
-	withoutEnv bool
-	Command    CommandWithContext
+	withoutRepo bool
+	Command     CommandWithContext
 	*flag.FlagSet
 }
 
@@ -45,16 +45,16 @@ func _registerCommand(
 	switch mft := makeFunc.(type) {
 	case func(*flag.FlagSet) Command:
 		commands[n] = command{
-			withoutEnv: env,
-			Command:    commandWithResult{Command: mft(f)},
-			FlagSet:    f,
+			withoutRepo: env,
+			Command:     commandWithResult{Command: mft(f)},
+			FlagSet:     f,
 		}
 
 	case func(*flag.FlagSet) CommandWithContext:
 		commands[n] = command{
-			withoutEnv: env,
-			Command:    mft(f),
-			FlagSet:    f,
+			withoutRepo: env,
+			Command:     mft(f),
+			FlagSet:     f,
 		}
 
 	default:

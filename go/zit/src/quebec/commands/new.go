@@ -125,7 +125,7 @@ func (c *New) Run(u *repo_local.Repo, args ...string) (err error) {
 		}
 	} else if c.Shas {
 		opCreateFromShas := user_ops.CreateFromShas{
-			Repo: u,
+			Repo:  u,
 			Proto: c.Proto,
 		}
 
@@ -135,7 +135,7 @@ func (c *New) Run(u *repo_local.Repo, args ...string) (err error) {
 		}
 	} else {
 		opCreateFromPath := user_ops.CreateFromPaths{
-			Repo:      u,
+			Repo:       u,
 			TextParser: f,
 			Filter:     c.Filter,
 			Delete:     c.Delete,

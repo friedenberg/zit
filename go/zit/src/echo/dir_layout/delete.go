@@ -7,7 +7,7 @@ import (
 )
 
 func (s DirLayout) DeleteAll(p string) (err error) {
-	if s.dryRun {
+	if s.IsDryRun() {
 		return
 	}
 
@@ -20,7 +20,7 @@ func (s DirLayout) DeleteAll(p string) (err error) {
 }
 
 func (s DirLayout) Delete(p string) (err error) {
-	if s.dryRun {
+	if s.IsDryRun() {
 		return
 	}
 

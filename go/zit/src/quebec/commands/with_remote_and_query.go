@@ -91,6 +91,8 @@ func (c commandWithRemoteAndQuery) Run(
 		}
 	}
 
+	defer local.PrintMatchedDormantIfNecessary()
+
 	var remote repo.Repo
 
 	{

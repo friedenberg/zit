@@ -12,11 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/file_lock"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
-)
-
-const (
-	EnvDir = "DIR_ZIT"
-	EnvBin = "BIN_ZIT"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout_primitive"
 )
 
 type Getter interface {
@@ -24,7 +20,7 @@ type Getter interface {
 }
 
 type DirLayout struct {
-	Primitive
+	dir_layout_primitive.Primitive
 	basePath              string
 	readOnlyBlobStorePath string
 	lockSmith             interfaces.LockSmith
@@ -43,13 +39,13 @@ type DirLayout struct {
 
 func Make(
 	o Options,
-	primitive Primitive,
+	primitive dir_layout_primitive.Primitive,
 ) (s DirLayout, err error) {
 	s.Primitive = primitive
 	s.age = &age.Age{}
 
 	if o.BasePath == "" {
-		o.BasePath = os.Getenv(EnvDir)
+		o.BasePath = os.Getenv(dir_layout_primitive.EnvDir)
 	}
 
 	if o.BasePath == "" {
@@ -64,22 +60,24 @@ func Make(
 
 	var dp directoryPaths
 
-	switch s.sv.GetInt() {
+	switch s.GetStoreVersion().GetInt() {
 	case 6:
-		s.xdg.Data = s.basePath
+		xdg := s.GetXDG()
+		xdg.Data = s.basePath
+		s.SetXDG(xdg)
 		dp = &directoryV0{}
 
 	default:
 		dp = &directoryV1{}
 	}
 
-	if err = dp.init(s.sv, s.xdg); err != nil {
+	if err = dp.init(s.GetStoreVersion(), s.GetXDG()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
 	s.DirectoryPaths = dp
-	s.TempLocal.basePath = s.DirZit(fmt.Sprintf("tmp-%d", s.pid))
+	s.TempLocal.basePath = s.DirZit(fmt.Sprintf("tmp-%d", s.GetPid()))
 
 	// TODO add support for failing on pre-existing temp local
 	// if files.Exists(s.TempLocal.basePath) {
@@ -101,19 +99,17 @@ func Make(
 
 	s.lockSmith = file_lock.New(s.FileLock())
 
-	if s.execPath, err = os.Executable(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	// TODO switch to useing MakeCommonEnv()
 	{
-		if err = os.Setenv(EnvDir, s.basePath); err != nil {
+		if err = os.Setenv(dir_layout_primitive.EnvDir, s.basePath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
-		if err = os.Setenv(EnvBin, s.execPath); err != nil {
+		if err = os.Setenv(
+			dir_layout_primitive.EnvBin,
+			s.GetExecPath(),
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -220,34 +216,6 @@ func (s *DirLayout) Age() *age.Age {
 	return s.age
 }
 
-func (s DirLayout) Cwd() string {
-	return s.cwd
-}
-
-func (s DirLayout) Executable() string {
-	return s.execPath
-}
-
-func (s DirLayout) AbsFromCwdOrSame(p string) (p1 string) {
-	var err error
-	p1, err = filepath.Abs(p)
-	if err != nil {
-		p1 = p
-	}
-
-	return
-}
-
-func (s DirLayout) RelToCwdOrSame(p string) (p1 string) {
-	var err error
-
-	if p1, err = filepath.Rel(s.Cwd(), p); err != nil {
-		p1 = p
-	}
-
-	return
-}
-
 func stringSliceJoin(s string, vs []string) []string {
 	return append([]string{s}, vs...)
 }
@@ -291,12 +259,12 @@ func (s DirLayout) ResetCache() (err error) {
 }
 
 func (h DirLayout) DataFileStoreVersion() string {
-	return filepath.Join(h.xdg.Data, "version")
+	return filepath.Join(h.GetXDG().Data, "version")
 }
 
 func (h DirLayout) MakeCommonEnv() map[string]string {
 	return map[string]string{
-		"ZIT_BIN": h.Executable(),
+		"ZIT_BIN": h.GetExecPath(),
 		"ZIT_DIR": h.Dir(),
 	}
 }

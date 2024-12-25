@@ -56,7 +56,7 @@ func (c Checkout) RunWithQuery(
 	qg *query.Group,
 ) (err error) {
 	opCheckout := user_ops.Checkout{
-		Repo:    u,
+		Repo:     u,
 		Organize: c.Organize,
 		Options:  c.CheckoutOptions,
 	}

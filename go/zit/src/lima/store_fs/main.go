@@ -39,8 +39,8 @@ func Make(
 		dirLayout:      st,
 		fileEncoder:    fileEncoder,
 		fileExtensions: fileExtensions,
-		dir:            st.Cwd(),
-		dirItems:       makeObjectsWithDir(st.Cwd(), fileExtensions, st),
+		dir:            st.GetCwd(),
+		dirItems:       makeObjectsWithDir(st.GetCwd(), fileExtensions, st),
 		deleted: collections_value.MakeMutableValueSet[*fd.FD](
 			nil,
 		),

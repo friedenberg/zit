@@ -103,7 +103,7 @@ func (c Last) Run(u *repo_local.Repo, args ...string) (err error) {
 				CheckoutMode: checkout_mode.MetadataAndBlob,
 			},
 			Repo: u,
-			Edit:  true,
+			Edit: true,
 		}
 
 		if _, err = opCheckout.Run(skus); err != nil {

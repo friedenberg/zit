@@ -11,7 +11,7 @@ import (
 func (s DirLayout) ResetTempOnExit(ctx errors.Context) (err error) {
 	errIn := context.Cause(ctx)
 
-	if errIn != nil || s.debug.NoTempDirCleanup {
+	if errIn != nil || s.GetDebug().NoTempDirCleanup {
 		// ui.Err().Printf("temp dir: %q", s.DirTempLocal())
 	} else {
 		if err = os.RemoveAll(s.TempLocal.basePath); err != nil {

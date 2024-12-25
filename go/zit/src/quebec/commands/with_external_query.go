@@ -81,6 +81,8 @@ func (c commandWithQuery) Run(u *repo_local.Repo, args ...string) (err error) {
 		return
 	}
 
+	defer u.PrintMatchedDormantIfNecessary()
+
 	if err = c.RunWithQuery(u, c.Group); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -1,4 +1,4 @@
-package dir_layout
+package dir_layout_primitive
 
 import (
 	"path/filepath"
@@ -11,25 +11,11 @@ type RelativePath interface {
 	Rel(string) string
 }
 
-func (s DirLayout) Rel(
-	p string,
-) (out string) {
-	out = p
-
-	p1, _ := filepath.Rel(s.cwd, p)
-
-	if p1 != "" {
-		out = p1
-	}
-
-	return
-}
-
-func (s DirLayout) MakeRelativePathStringFormatWriter() interfaces.StringFormatWriter[string] {
+func (s Primitive) MakeRelativePathStringFormatWriter() interfaces.StringFormatWriter[string] {
 	return relativePathStringFormatWriter(s)
 }
 
-type relativePathStringFormatWriter DirLayout
+type relativePathStringFormatWriter Primitive
 
 func (f relativePathStringFormatWriter) WriteStringFormat(
 	w interfaces.WriterAndStringWriter,

@@ -15,6 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/descriptions"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout_primitive"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/test_object_metadata_io"
@@ -190,11 +191,14 @@ func makeTestFSHome(
 ) dir_layout.DirLayout {
 	p := t.TempDir()
 
-	var primitive dir_layout.Primitive
+	var primitive dir_layout_primitive.Primitive
 
 	var err error
 
-	if primitive, err = dir_layout.MakePrimitiveWithHome(p, debug.Options{}); err != nil {
+	if primitive, err = dir_layout_primitive.MakePrimitiveWithHome(
+		p,
+		debug.Options{},
+	); err != nil {
 		t.Fatalf("failed to make dir_layout.Primitive: %s", err)
 	}
 

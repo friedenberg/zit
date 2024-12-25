@@ -272,7 +272,7 @@ func (s *Store) GenerateConflictMarker(
 
 		if _, err = id.MakeDirIfNecessary(
 			h,
-			s.dirLayout.Cwd(),
+			s.dirLayout.GetCwd(),
 		); err != nil {
 			err = errors.Wrap(err)
 			return

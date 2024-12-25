@@ -210,7 +210,7 @@ func (s *Store) SetFilenameForTransacted(
 	sk *sku.Transacted,
 	info *checkoutFileNameInfo,
 ) (err error) {
-	cwd := s.dirLayout.Cwd()
+	cwd := s.dirLayout.GetCwd()
 
 	if options.Path == checkout_options.PathTempLocal {
 		var f *os.File

@@ -67,3 +67,7 @@ func (c Context) Closer(closer io.Closer) {
 func (c Context) Flusher(flusher Flusher) {
 	c.Must(flusher.Flush)
 }
+
+func (c Context) CancelWithError(err error) {
+	c.Cancel(WrapN(1, err))
+}

@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout_primitive"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
@@ -49,10 +49,12 @@ func Run(
 		return
 	}
 
-	var primitiveFSHome dir_layout.Primitive
+	var primitiveFSHome dir_layout_primitive.Primitive
 	var err error
 
-	if primitiveFSHome, err = dir_layout.MakePrimitive(cliConfig.Debug); err != nil {
+	if primitiveFSHome, err = dir_layout_primitive.MakePrimitive(
+		cliConfig.Debug,
+	); err != nil {
 		ctx.Cancel(errors.Wrap(err))
 		return
 	}
@@ -83,7 +85,7 @@ func Run(
 		env,
 		options,
 	); err != nil {
-		if cmd.withoutEnv {
+		if cmd.withoutRepo {
 			err = nil
 		} else {
 			ctx.Cancel(errors.Wrap(err))
@@ -91,7 +93,6 @@ func Run(
 		}
 	}
 
-	defer u.PrintMatchedArchiviertIfNecessary()
 	defer errors.DeferredFlusher(&err, u)
 
 	defer func() {

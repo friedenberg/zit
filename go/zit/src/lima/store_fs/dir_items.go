@@ -286,7 +286,7 @@ func (d *dirItems) getFDsForObjectIdString(
 	objectIdString string,
 ) (fds []*sku.FSItem, err error) {
 	cache := make(map[string]*sku.FSItem)
-	dir := d.dirLayout.Cwd()
+	dir := d.dirLayout.GetCwd()
 	pattern := filepath.Join(dir, fmt.Sprintf("%s*", objectIdString))
 
 	if err = d.walkDir(cache, dir, pattern); err != nil {

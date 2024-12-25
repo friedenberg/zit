@@ -104,7 +104,7 @@ func (op Checkout) RunQuery(
 	if op.Utility != "" {
 		eachBlobOp := EachBlob{
 			Utility: op.Utility,
-			Repo:   op.Repo,
+			Repo:    op.Repo,
 		}
 
 		if err = eachBlobOp.Run(zsc); err != nil {

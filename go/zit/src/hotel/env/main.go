@@ -7,7 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout_primitive"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 )
@@ -21,7 +21,7 @@ type Env struct {
 
 	flags *flag.FlagSet
 
-	dirLayoutPrimitive dir_layout.Primitive
+	dirLayoutPrimitive dir_layout_primitive.Primitive
 	cliConfig          mutable_config_blobs.Cli
 }
 
@@ -29,7 +29,7 @@ func Make(
 	context errors.Context,
 	flags *flag.FlagSet,
 	kCli mutable_config_blobs.Cli,
-	primitiveFSHome dir_layout.Primitive,
+	primitiveFSHome dir_layout_primitive.Primitive,
 ) *Env {
 	return &Env{
 		Context:            context,
@@ -70,6 +70,6 @@ func (u *Env) GetCLIConfig() mutable_config_blobs.Cli {
 	return u.cliConfig
 }
 
-func (u *Env) GetDirLayoutPrimitive() dir_layout.Primitive {
+func (u *Env) GetDirLayoutPrimitive() dir_layout_primitive.Primitive {
 	return u.dirLayoutPrimitive
 }
