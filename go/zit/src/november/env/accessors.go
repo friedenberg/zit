@@ -46,6 +46,10 @@ func (u *Local) GetDirLayoutPrimitive() dir_layout.Primitive {
 	return u.dirLayoutPrimitive
 }
 
+func (u *Local) GetBlobStore() dir_layout.BlobStore {
+	return u.GetDirectoryLayout()
+}
+
 func (u *Local) GetStore() *store.Store {
 	return &u.store
 }

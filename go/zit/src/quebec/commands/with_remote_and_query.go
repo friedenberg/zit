@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/oscar/env_remote"
 )
 
 type CommandWithRemoteAndQuery interface {
@@ -96,7 +97,7 @@ func (c commandWithRemoteAndQuery) Run(
 
 		if c.TheirXDGDotenv != "" {
 			if c.UseSocket {
-				if remote, err = env.MakeRemoteHTTPFromXDGDotenvPath(
+				if remote, err = env_remote.MakeRemoteHTTPFromXDGDotenvPath(
 					local.Context,
 					local.GetConfig(),
 					c.TheirXDGDotenv,

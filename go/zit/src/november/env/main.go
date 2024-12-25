@@ -1,13 +1,14 @@
 package env
 
 import (
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
 
 type Env interface {
-  GetEnv() Env
+	GetEnv() Env
 
 	MakeQueryGroup(
 		metaBuilder any,
@@ -29,4 +30,6 @@ type Env interface {
 	ReadObjectHistory(
 		oid *ids.ObjectId,
 	) (skus []*sku.Transacted, err error)
+
+	GetBlobStore() dir_layout.BlobStore
 }

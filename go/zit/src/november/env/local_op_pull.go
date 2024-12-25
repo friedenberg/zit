@@ -2,7 +2,6 @@ package env
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
@@ -21,24 +20,10 @@ func (local *Local) PullQueryGroupFromRemote(
 
 	importer := local.MakeImporter(printCopies)
 
-	switch remoteTyped := remote.(type) {
-	case *Local:
-		importer.RemoteBlobStore = remoteTyped.GetDirectoryLayout()
-		importer.ParentNegotiator = ParentNegotiatorFirstAncestor{
-			Local:  local,
-			Remote: remoteTyped,
-		}
-
-	case *RemoteHTTP:
-		importer.RemoteBlobStore = remoteTyped.GetBlobStore()
-		// importer.ParentNegotiator = ParentNegotiatorFirstAncestor{
-		// 	Local:  local,
-		// 	Remote: remoteTyped,
-		// }
-
-	default:
-		err = todo.Implement()
-		return
+	importer.RemoteBlobStore = remote.GetBlobStore()
+	importer.ParentNegotiator = ParentNegotiatorFirstAncestor{
+		Local:  local,
+		Remote: remote,
 	}
 
 	if err = local.ImportList(

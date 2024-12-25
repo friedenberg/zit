@@ -494,21 +494,42 @@ func (u *Local) MakeFormatFunc(
 		}
 
 	case "text-sku-prefix":
-		f = func(o *sku.Transacted) (err error) {
-			var r sha.ReadCloser
+		cliFmt := u.SkuFormatBoxTransactedNoColor()
 
-			if r, err = u.GetStore().GetDirectoryLayout().BlobReader(
-				o.GetBlobSha(),
-			); err != nil {
+		f = func(o *sku.Transacted) (err error) {
+			sb := &strings.Builder{}
+
+			if _, err = cliFmt.WriteStringFormat(sb, o); err != nil {
 				err = errors.Wrap(err)
 				return
 			}
 
-			defer errors.DeferredCloser(&err, r)
+			if u.GetConfig().IsInlineType(o.GetType()) {
+				var r sha.ReadCloser
 
-			if _, err = io.Copy(out, r); err != nil {
-				err = errors.Wrap(err)
-				return
+				if r, err = u.GetStore().GetDirectoryLayout().BlobReader(
+					o.GetBlobSha(),
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+
+				defer errors.DeferredCloser(&err, r)
+
+				if _, err = delim_io.CopyWithPrefixOnDelim(
+					'\n',
+					sb.String(),
+					out,
+					r,
+				); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
+			} else {
+				if _, err = io.WriteString(out, sb.String()); err != nil {
+					err = errors.Wrap(err)
+					return
+				}
 			}
 
 			return
