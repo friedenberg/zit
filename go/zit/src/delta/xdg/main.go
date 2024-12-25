@@ -72,7 +72,9 @@ func (x *XDG) setDefaultOrEnv(
 		})
 	}
 
-	*initElement.out = filepath.Join(*initElement.out, x.AddedPath)
+	if x.AddedPath != "" {
+		*initElement.out = filepath.Join(*initElement.out, x.AddedPath)
+	}
 
 	return
 }
@@ -97,7 +99,7 @@ func (x *XDG) InitializeFromEnv(mkDir bool, addedPath string) (err error) {
 	return
 }
 
-func (x *XDG) InitializeFromFile(
+func (x *XDG) InitializeFromDotenvFile(
 	mkDir bool,
 	addedPath string,
 	file string,

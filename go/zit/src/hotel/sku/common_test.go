@@ -196,9 +196,10 @@ func makeTestFSHome(
 
 	var err error
 
-	if dirLayout, err = dir_layout.MakePrimitiveWithHome(
+	if dirLayout, err = dir_layout.MakeWithHome(
 		p,
 		debug.Options{},
+		false,
 	); err != nil {
 		t.Fatalf("failed to make dir_layout.Primitive: %s", err)
 	}

@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
+	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
@@ -16,16 +18,14 @@ const (
 )
 
 type Layout struct {
-	cwd      string
-	execPath string
-	dryRun   bool
-	debug    debug.Options
-	pid      int
-	xdg      xdg.XDG
-	sv       immutable_config.StoreVersion
+	beforeXDG
+
+	xdg xdg.XDG
+
+	sv immutable_config.StoreVersion
 }
 
-func MakePrimitive(do debug.Options) (s Layout, err error) {
+func MakeDefault(do debug.Options) (s Layout, err error) {
 	var home string
 
 	if home, err = os.UserHomeDir(); err != nil {
@@ -33,7 +33,7 @@ func MakePrimitive(do debug.Options) (s Layout, err error) {
 		return
 	}
 
-	if s, err = MakePrimitiveWithHome(home, do); err != nil {
+	if s, err = MakeWithHome(home, do, true); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -41,20 +41,35 @@ func MakePrimitive(do debug.Options) (s Layout, err error) {
 	return
 }
 
-func MakePrimitiveWithHome(
+func MakeWithHome(
 	home string,
 	do debug.Options,
+	permitCwdXDGOverride bool,
 ) (s Layout, err error) {
 	xdg := xdg.XDG{
 		Home: home,
 	}
 
-	if err = xdg.InitializeFromEnv(true, "zit"); err != nil {
+	if err = s.beforeXDG.initialize(do); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if s, err = MakePrimitiveWithXDG(do, xdg); err != nil {
+	addedPath := "zit"
+	pathCwdXDGOverride := filepath.Join(s.cwd, ".zit")
+
+	if permitCwdXDGOverride && files.Exists(pathCwdXDGOverride) {
+		xdg.Home = pathCwdXDGOverride
+		addedPath = ""
+    ui.Debug().Printf("overridding xdg home: %q", xdg.Home)
+	}
+
+	if err = xdg.InitializeFromEnv(true, addedPath); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if err = s.initializeXDG(xdg); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -62,38 +77,31 @@ func MakePrimitiveWithHome(
 	return
 }
 
-func MakePrimitiveWithXDG(
+func MakeWithXDG(
 	do debug.Options,
 	xdg xdg.XDG,
 ) (s Layout, err error) {
-	if s.cwd, err = os.Getwd(); err != nil {
+	if err = s.beforeXDG.initialize(do); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	s.pid = os.Getpid()
-	s.dryRun = do.DryRun
+	if err = s.initializeXDG(xdg); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
-	s.xdg = xdg
+	return
+}
 
-	if err = s.sv.ReadFromFile(
-		s.DataFileStoreVersion(),
+func (layout *Layout) initializeXDG(xdg xdg.XDG) (err error) {
+	layout.xdg = xdg
+
+	if err = layout.sv.ReadFromFile(
+		layout.DataFileStoreVersion(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
-	}
-
-	if s.execPath, err = os.Executable(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	// TODO switch to useing MakeCommonEnv()
-	{
-		if err = os.Setenv(EnvBin, s.execPath); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
 	}
 
 	return

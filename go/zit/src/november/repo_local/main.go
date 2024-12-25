@@ -77,7 +77,7 @@ func MakeFromConfigAndXDGDotenvPath(
 
 	var dirLayout dir_layout.Layout
 
-	if dirLayout, err = dir_layout.MakePrimitiveWithXDG(
+	if dirLayout, err = dir_layout.MakeWithXDG(
 		config.Debug,
 		*dotenv.XDG,
 	); err != nil {

@@ -52,7 +52,7 @@ func Run(
 	var dirLayout dir_layout.Layout
 	var err error
 
-	if dirLayout, err = dir_layout.MakePrimitive(
+	if dirLayout, err = dir_layout.MakeDefault(
 		configCli.Debug,
 	); err != nil {
 		ctx.Cancel(errors.Wrap(err))
