@@ -3,6 +3,7 @@ package repo_local
 import (
 	"time"
 
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -28,7 +29,7 @@ func (u *Repo) GetDirectoryLayout() dir_layout.DirLayout {
 	return u.dirLayout
 }
 
-func (u *Repo) GetBlobStore() dir_layout.BlobStore {
+func (u *Repo) GetBlobStore() interfaces.BlobStore {
 	return u.GetDirectoryLayout()
 }
 

@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_blobs"
@@ -66,7 +66,7 @@ func (remote *HTTP) GetRepo() repo.Repo {
 	return remote
 }
 
-func (remote *HTTP) GetBlobStore() dir_layout.BlobStore {
+func (remote *HTTP) GetBlobStore() interfaces.BlobStore {
 	return &HTTPBlobStore{remote: remote}
 }
 
@@ -172,11 +172,11 @@ type HTTPBlobStore struct {
 	remote *HTTP
 }
 
-func (blobStore *HTTPBlobStore) GetBlobStore() dir_layout.BlobStore {
+func (blobStore *HTTPBlobStore) GetBlobStore() interfaces.BlobStore {
 	return blobStore
 }
 
-func (blobStore *HTTPBlobStore) HasBlob(sh sha.ShaLike) (ok bool) {
+func (blobStore *HTTPBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
 	var request *http.Request
 
 	{
@@ -209,13 +209,14 @@ func (blobStore *HTTPBlobStore) HasBlob(sh sha.ShaLike) (ok bool) {
 	return
 }
 
-func (blobStore *HTTPBlobStore) BlobWriter() (w sha.WriteCloser, err error) {
+func (blobStore *HTTPBlobStore) BlobWriter() (w interfaces.ShaWriteCloser, err error) {
+	err = todo.Implement()
 	return
 }
 
 func (blobStore *HTTPBlobStore) BlobReader(
-	sh sha.ShaLike,
-) (r sha.ReadCloser, err error) {
+	sh interfaces.Sha,
+) (r interfaces.ShaReadCloser, err error) {
 	var request *http.Request
 
 	if request, err = http.NewRequestWithContext(

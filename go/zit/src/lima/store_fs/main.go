@@ -49,8 +49,10 @@ func Make(
 		),
 		objectFormatOptions: ofo,
 		metadataTextParser: object_metadata.MakeTextParser(
-			st,
-			nil,
+			object_metadata.Dependencies{
+				Primitive: st.Primitive,
+				BlobStore: st,
+			},
 		),
 	}
 

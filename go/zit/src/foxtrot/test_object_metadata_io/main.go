@@ -24,9 +24,9 @@ func Make(
 	var err error
 
 	if primitive, err = dir_layout_primitive.MakePrimitiveWithHome(
-    p,
-    debug.Options{},
-  ); err != nil {
+		p,
+		debug.Options{},
+	); err != nil {
 		t.Fatalf("failed to make dir_layout.Primitive: %s", err)
 	}
 

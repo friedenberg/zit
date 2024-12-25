@@ -1,10 +1,5 @@
 package object_metadata
 
-import (
-	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
-)
-
 type TextFormatterFamily struct {
 	BlobPath     TextFormatter
 	InlineBlob   TextFormatter
@@ -12,14 +7,15 @@ type TextFormatterFamily struct {
 	BlobOnly     TextFormatter
 }
 
+type FormatterDependencies struct{}
+
 func MakeTextFormatterFamily(
-	dirLayout dir_layout.DirLayout,
-	formatter script_config.RemoteScript,
+	common Dependencies,
 ) TextFormatterFamily {
 	return TextFormatterFamily{
-		BlobPath:     MakeTextFormatterMetadataBlobPath(dirLayout, formatter),
-		InlineBlob:   MakeTextFormatterMetadataInlineBlob(dirLayout, formatter),
-		MetadataOnly: MakeTextFormatterMetadataOnly(dirLayout, formatter),
-		BlobOnly:     MakeTextFormatterExcludeMetadata(dirLayout, formatter),
+		BlobPath:     MakeTextFormatterMetadataBlobPath(common),
+		InlineBlob:   MakeTextFormatterMetadataInlineBlob(common),
+		MetadataOnly: MakeTextFormatterMetadataOnly(common),
+		BlobOnly:     MakeTextFormatterExcludeMetadata(common),
 	}
 }

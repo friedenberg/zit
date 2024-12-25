@@ -1,7 +1,7 @@
 package repo
 
 import (
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -31,5 +31,5 @@ type Repo interface {
 		oid *ids.ObjectId,
 	) (skus []*sku.Transacted, err error)
 
-	GetBlobStore() dir_layout.BlobStore
+	GetBlobStore() interfaces.BlobStore
 }

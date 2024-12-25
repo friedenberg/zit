@@ -5,26 +5,18 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
-	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 )
 
 type textFormatter struct {
-	textFormatterCommon
+	Dependencies
 	sequence []interfaces.FuncWriterElementInterface[TextFormatterContext]
 }
 
 func MakeTextFormatterMetadataBlobPath(
-	dirLayout dir_layout.DirLayout,
-	blobFormatter script_config.RemoteScript,
+	common Dependencies,
 ) textFormatter {
-	common := textFormatterCommon{
-		dirLayout:     dirLayout,
-		blobFormatter: blobFormatter,
-	}
-
 	return textFormatter{
-		textFormatterCommon: common,
+		Dependencies: common,
 		sequence: []interfaces.FuncWriterElementInterface[TextFormatterContext]{
 			common.writeBoundary,
 			common.writeCommonMetadataFormat,
@@ -36,16 +28,10 @@ func MakeTextFormatterMetadataBlobPath(
 }
 
 func MakeTextFormatterMetadataOnly(
-	dirLayout dir_layout.DirLayout,
-	blobFormatter script_config.RemoteScript,
+	common Dependencies,
 ) textFormatter {
-	common := textFormatterCommon{
-		dirLayout:     dirLayout,
-		blobFormatter: blobFormatter,
-	}
-
 	return textFormatter{
-		textFormatterCommon: common,
+		Dependencies: common,
 		sequence: []interfaces.FuncWriterElementInterface[TextFormatterContext]{
 			common.writeBoundary,
 			common.writeCommonMetadataFormat,
@@ -57,16 +43,10 @@ func MakeTextFormatterMetadataOnly(
 }
 
 func MakeTextFormatterMetadataInlineBlob(
-	dirLayout dir_layout.DirLayout,
-	blobFormatter script_config.RemoteScript,
+	common Dependencies,
 ) textFormatter {
-	common := textFormatterCommon{
-		dirLayout:     dirLayout,
-		blobFormatter: blobFormatter,
-	}
-
 	return textFormatter{
-		textFormatterCommon: common,
+		Dependencies: common,
 		sequence: []interfaces.FuncWriterElementInterface[TextFormatterContext]{
 			common.writeBoundary,
 			common.writeCommonMetadataFormat,
@@ -80,16 +60,10 @@ func MakeTextFormatterMetadataInlineBlob(
 }
 
 func MakeTextFormatterExcludeMetadata(
-	dirLayout dir_layout.DirLayout,
-	blobFormatter script_config.RemoteScript,
+	common Dependencies,
 ) textFormatter {
-	common := textFormatterCommon{
-		dirLayout:     dirLayout,
-		blobFormatter: blobFormatter,
-	}
-
 	return textFormatter{
-		textFormatterCommon: common,
+		Dependencies: common,
 		sequence: []interfaces.FuncWriterElementInterface[TextFormatterContext]{
 			common.writeBlob,
 		},

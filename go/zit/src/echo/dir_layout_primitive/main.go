@@ -168,3 +168,11 @@ func (s Primitive) Rel(
 
 	return
 }
+
+func (h Primitive) MakeCommonEnv() map[string]string {
+	return map[string]string{
+		"ZIT_BIN": h.GetExecPath(),
+		// TODO determine if ZIT_DIR is kept
+		// "ZIT_DIR": h.Dir(),
+	}
+}

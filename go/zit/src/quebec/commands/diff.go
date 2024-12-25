@@ -49,8 +49,10 @@ func (c Diff) RunWithQuery(
 	opDiffFS := user_ops.Diff{
 		Repo: u,
 		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
-			u.GetDirectoryLayout(),
-			nil,
+			object_metadata.Dependencies{
+				Primitive: u.GetDirectoryLayout().Primitive,
+				BlobStore: u.GetDirectoryLayout(),
+			},
 		),
 	}
 

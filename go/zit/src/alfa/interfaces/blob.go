@@ -1,5 +1,12 @@
 package interfaces
 
+type BlobStore interface {
+	GetBlobStore() BlobStore
+	HasBlob(sh Sha) (ok bool)
+	BlobWriter() (w ShaWriteCloser, err error)
+	BlobReader(sh Sha) (r ShaReadCloser, err error)
+}
+
 // Blobs represent persisted files, like blobs in Git. Blobs are used by
 // Zettels, types, tags, config, and inventory lists.
 type (
@@ -35,7 +42,7 @@ type (
 	}
 
 	BlobReaderFactory interface {
-		BlobReader(ShaGetter) (ShaReadCloser, error)
+		BlobReader(Sha) (ShaReadCloser, error)
 	}
 
 	BlobWriterFactory interface {

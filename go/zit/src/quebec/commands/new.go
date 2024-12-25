@@ -108,8 +108,10 @@ func (c *New) Run(u *repo_local.Repo, args ...string) (err error) {
 	cotfo := checkout_options.TextFormatterOptions{}
 
 	f := object_metadata.MakeTextFormat(
-		u.GetDirectoryLayout(),
-		nil,
+		object_metadata.Dependencies{
+			Primitive: u.GetDirectoryLayout().Primitive,
+			BlobStore: u.GetDirectoryLayout(),
+		},
 	)
 
 	var zts sku.TransactedMutableSet

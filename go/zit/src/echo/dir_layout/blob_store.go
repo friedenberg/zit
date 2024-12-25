@@ -15,12 +15,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 )
 
-type BlobStore interface {
-	HasBlob(sh sha.ShaLike) (ok bool)
-	BlobWriter() (w sha.WriteCloser, err error)
-	BlobReader(sh sha.ShaLike) (r sha.ReadCloser, err error)
-}
-
 type blobStore struct {
 	basePath         string
 	tempPath         string
@@ -58,8 +52,12 @@ func MakeBlobStore(
 	}
 }
 
+func (s blobStore) GetBlobStore() interfaces.BlobStore {
+	return s
+}
+
 func (s blobStore) HasBlob(
-	sh sha.ShaLike,
+	sh interfaces.Sha,
 ) (ok bool) {
 	if sh.GetShaLike().IsNull() {
 		ok = true
@@ -72,7 +70,7 @@ func (s blobStore) HasBlob(
 	return
 }
 
-func (s blobStore) BlobWriter() (w sha.WriteCloser, err error) {
+func (s blobStore) BlobWriter() (w interfaces.ShaWriteCloser, err error) {
 	if w, err = s.blobWriterTo(s.basePath); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -81,7 +79,9 @@ func (s blobStore) BlobWriter() (w sha.WriteCloser, err error) {
 	return
 }
 
-func (s blobStore) BlobReader(sh sha.ShaLike) (r sha.ReadCloser, err error) {
+func (s blobStore) BlobReader(
+	sh interfaces.Sha,
+) (r interfaces.ShaReadCloser, err error) {
 	if sh.GetShaLike().IsNull() {
 		r = sha.MakeNopReadCloser(io.NopCloser(bytes.NewReader(nil)))
 		return
@@ -152,7 +152,7 @@ func (s blobStore) blobReaderFrom(
 	return
 }
 
-func MakeCopyingBlobStore(local, remote BlobStore) CopyingBlobStore {
+func MakeCopyingBlobStore(local, remote interfaces.BlobStore) CopyingBlobStore {
 	if local == nil {
 		panic("nil local blob store")
 	}
@@ -164,10 +164,14 @@ func MakeCopyingBlobStore(local, remote BlobStore) CopyingBlobStore {
 }
 
 type CopyingBlobStore struct {
-	local, remote BlobStore
+	local, remote interfaces.BlobStore
 }
 
-func (s CopyingBlobStore) HasBlob(sh sha.ShaLike) bool {
+func (s CopyingBlobStore) GetBlobStore() interfaces.BlobStore {
+	return s
+}
+
+func (s CopyingBlobStore) HasBlob(sh interfaces.Sha) bool {
 	if s.local.HasBlob(sh) {
 		return true
 	}
@@ -184,8 +188,8 @@ func (s CopyingBlobStore) BlobWriter() (w sha.WriteCloser, err error) {
 }
 
 func (s CopyingBlobStore) BlobReader(
-	sh sha.ShaLike,
-) (r sha.ReadCloser, err error) {
+	sh interfaces.Sha,
+) (r interfaces.ShaReadCloser, err error) {
 	if s.local.HasBlob(sh) || s.remote == nil {
 		return s.local.BlobReader(sh)
 	}
@@ -203,8 +207,8 @@ func (s CopyingBlobStore) BlobReader(
 }
 
 func CopyBlobIfNecessary(
-	dst BlobStore,
-	src BlobStore,
+	dst interfaces.BlobStore,
+	src interfaces.BlobStore,
 	blobShaGetter interfaces.ShaGetter,
 ) (n int64, err error) {
 	if src == nil {
@@ -226,8 +230,8 @@ func CopyBlobIfNecessary(
 }
 
 func CopyBlob(
-	dst BlobStore,
-	src BlobStore,
+	dst interfaces.BlobStore,
+	src interfaces.BlobStore,
 	blobSha interfaces.Sha,
 ) (n int64, err error) {
 	if src == nil {

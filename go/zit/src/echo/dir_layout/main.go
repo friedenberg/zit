@@ -261,10 +261,3 @@ func (s DirLayout) ResetCache() (err error) {
 func (h DirLayout) DataFileStoreVersion() string {
 	return filepath.Join(h.GetXDG().Data, "version")
 }
-
-func (h DirLayout) MakeCommonEnv() map[string]string {
-	return map[string]string{
-		"ZIT_BIN": h.GetExecPath(),
-		"ZIT_DIR": h.Dir(),
-	}
-}

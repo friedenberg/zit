@@ -16,16 +16,15 @@ type textParser struct {
 }
 
 func MakeTextParser(
-	awf interfaces.BlobWriterFactory,
-	blobFormatter script_config.RemoteScript,
+	dependencies Dependencies,
 ) TextParser {
-	if awf == nil {
+	if dependencies.BlobStore == nil {
 		panic("nil BlobWriterFactory")
 	}
 
 	return textParser{
-		awf: awf,
-		af:  blobFormatter,
+		awf: dependencies.BlobStore,
+		af:  dependencies.BlobFormatter,
 	}
 }
 

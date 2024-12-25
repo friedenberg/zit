@@ -148,7 +148,7 @@ func (nopBlobFactory) BlobWriter() (WriteCloser, error) {
 	return MakeWriter(nil), nil
 }
 
-func (nopBlobFactory) BlobReader(s ShaLike) (ReadCloser, error) {
+func (nopBlobFactory) BlobReader(s interfaces.Sha) (ReadCloser, error) {
 	return MakeNopReadCloser(io.NopCloser(bytes.NewBuffer(nil))), nil
 }
 

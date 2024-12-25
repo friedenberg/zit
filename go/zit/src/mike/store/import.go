@@ -21,7 +21,7 @@ type BlobCopyResult struct {
 
 type Importer struct {
 	*Store
-	RemoteBlobStore    dir_layout.BlobStore
+	RemoteBlobStore    interfaces.BlobStore
 	BlobCopierDelegate interfaces.FuncIter[BlobCopyResult]
 	sku.ParentNegotiator
 }

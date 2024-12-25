@@ -7,20 +7,22 @@ import (
 	"strings"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
+	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/ohio"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/script_config"
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout_primitive"
 	"code.linenisgreat.com/zit/go/zit/src/echo/format"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 )
 
-type textFormatterCommon struct {
-	dirLayout     dir_layout.DirLayout
-	blobFormatter script_config.RemoteScript
+type Dependencies struct {
+	Primitive     dir_layout_primitive.Primitive
+	BlobStore     interfaces.BlobStore
+	BlobFormatter script_config.RemoteScript
 }
 
-func (f textFormatterCommon) writeComments(
+func (f Dependencies) writeComments(
 	w1 io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {
@@ -52,21 +54,21 @@ func (f textFormatterCommon) writeComments(
 	return
 }
 
-func (f textFormatterCommon) writeBoundary(
+func (f Dependencies) writeBoundary(
 	w1 io.Writer,
 	_ TextFormatterContext,
 ) (n int64, err error) {
 	return ohio.WriteLine(w1, Boundary)
 }
 
-func (f textFormatterCommon) writeNewLine(
+func (f Dependencies) writeNewLine(
 	w1 io.Writer,
 	_ TextFormatterContext,
 ) (n int64, err error) {
 	return ohio.WriteLine(w1, "")
 }
 
-func (f textFormatterCommon) writeCommonMetadataFormat(
+func (f Dependencies) writeCommonMetadataFormat(
 	w1 io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {
@@ -112,7 +114,7 @@ func (f textFormatterCommon) writeCommonMetadataFormat(
 	return
 }
 
-func (f textFormatterCommon) writeTyp(
+func (f Dependencies) writeTyp(
 	w1 io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {
@@ -125,7 +127,7 @@ func (f textFormatterCommon) writeTyp(
 	return ohio.WriteLine(w1, fmt.Sprintf("! %s", m.Type))
 }
 
-func (f textFormatterCommon) writeShaTyp(
+func (f Dependencies) writeShaTyp(
 	w1 io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {
@@ -133,7 +135,7 @@ func (f textFormatterCommon) writeShaTyp(
 	return ohio.WriteLine(w1, fmt.Sprintf("! %s.%s", &m.Blob, m.Type))
 }
 
-func (f textFormatterCommon) writePathType(
+func (f Dependencies) writePathType(
 	w1 io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {
@@ -147,7 +149,7 @@ func (f textFormatterCommon) writePathType(
 	}
 
 	if ap != "" {
-		ap = f.dirLayout.RelToCwdOrSame(ap)
+		ap = f.Primitive.RelToCwdOrSame(ap)
 	} else {
 		err = errors.Errorf("path not found in fields")
 		return
@@ -156,14 +158,14 @@ func (f textFormatterCommon) writePathType(
 	return ohio.WriteLine(w1, fmt.Sprintf("! %s", ap))
 }
 
-func (f textFormatterCommon) writeBlob(
+func (f Dependencies) writeBlob(
 	w1 io.Writer,
 	c TextFormatterContext,
 ) (n int64, err error) {
 	var ar io.ReadCloser
 	m := c.GetMetadata()
 
-	if ar, err = f.dirLayout.BlobReader(&m.Blob); err != nil {
+	if ar, err = f.BlobStore.BlobReader(&m.Blob); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -175,12 +177,12 @@ func (f textFormatterCommon) writeBlob(
 
 	defer errors.DeferredCloser(&err, ar)
 
-	if f.blobFormatter != nil {
+	if f.BlobFormatter != nil {
 		var wt io.WriterTo
 
 		if wt, err = script_config.MakeWriterToWithStdin(
-			f.blobFormatter,
-			f.dirLayout.MakeCommonEnv(),
+			f.BlobFormatter,
+			f.Primitive.MakeCommonEnv(),
 			ar,
 		); err != nil {
 			err = errors.Wrap(err)

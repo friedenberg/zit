@@ -219,8 +219,10 @@ func makeTestTextFormat(
 	dirLayout dir_layout.DirLayout,
 ) object_metadata.TextFormat {
 	return object_metadata.MakeTextFormat(
-		dirLayout,
-		nil,
+		object_metadata.Dependencies{
+			Primitive: dirLayout.Primitive,
+			BlobStore: dirLayout,
+		},
 	)
 }
 
@@ -429,8 +431,9 @@ func TestWriteWithoutBlob(t1 *testing.T) {
 	)
 
 	format := object_metadata.MakeTextFormatterMetadataOnly(
-		af,
-		nil,
+		object_metadata.Dependencies{
+			BlobStore: af,
+		},
 	)
 
 	actual := writeFormat(t, z, format, false, "the body", object_metadata.TextFormatterOptions{})
@@ -471,8 +474,9 @@ func TestWriteWithInlineBlob(t1 *testing.T) {
 	)
 
 	format := object_metadata.MakeTextFormatterMetadataInlineBlob(
-		af,
-		nil,
+		object_metadata.Dependencies{
+			BlobStore: af,
+		},
 	)
 
 	actual := writeFormat(t, z, format, true, "the body",

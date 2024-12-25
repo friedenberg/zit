@@ -40,8 +40,10 @@ func MakeFileEncoder(
 		dirLayout: dirLayout,
 		ic:        ic,
 		TextFormatterFamily: object_metadata.MakeTextFormatterFamily(
-			dirLayout,
-			nil,
+			object_metadata.Dependencies{
+				Primitive: dirLayout.Primitive,
+				BlobStore: dirLayout,
+			},
 		),
 	}
 }
@@ -189,7 +191,8 @@ func (e *fileEncoder) EncodeObject(
 func (e *fileEncoder) Encode(
 	options checkout_options.TextFormatterOptions,
 	z *sku.Transacted,
-	i *sku.FSItem) (err error) {
+	i *sku.FSItem,
+) (err error) {
 	return e.EncodeObject(
 		options,
 		z,
