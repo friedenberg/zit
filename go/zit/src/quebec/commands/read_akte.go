@@ -29,7 +29,7 @@ type readBlobEntry struct {
 	Blob string `json:"blob"`
 }
 
-func (c ReadBlob) Run(u *repo_local.Local, args ...string) (err error) {
+func (c ReadBlob) Run(u *repo_local.Repo, args ...string) (err error) {
 	dec := json.NewDecoder(u.GetInFile())
 
 	for {
@@ -58,7 +58,7 @@ func (c ReadBlob) Run(u *repo_local.Local, args ...string) (err error) {
 	return
 }
 
-func (ReadBlob) readOneBlob(u *repo_local.Local, entry readBlobEntry) (sh *sha.Sha, err error) {
+func (ReadBlob) readOneBlob(u *repo_local.Repo, entry readBlobEntry) (sh *sha.Sha, err error) {
 	var aw sha.WriteCloser
 
 	if aw, err = u.GetDirectoryLayout().BlobWriter(); err != nil {

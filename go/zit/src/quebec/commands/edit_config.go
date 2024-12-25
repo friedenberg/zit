@@ -29,7 +29,7 @@ func init() {
 	)
 }
 
-func (c EditConfig) Run(u *repo_local.Local, args ...string) (err error) {
+func (c EditConfig) Run(u *repo_local.Repo, args ...string) (err error) {
 	if len(args) > 0 {
 		ui.Err().Print("Command edit-konfig ignores passed in arguments.")
 	}
@@ -68,7 +68,7 @@ func (c EditConfig) Run(u *repo_local.Local, args ...string) (err error) {
 }
 
 func (c EditConfig) editInVim(
-	u *repo_local.Local,
+	u *repo_local.Repo,
 ) (sk *sku.Transacted, err error) {
 	var f *os.File
 
@@ -109,7 +109,7 @@ func (c EditConfig) editInVim(
 }
 
 func (c EditConfig) makeTempConfigFile(
-	u *repo_local.Local,
+	u *repo_local.Repo,
 	p string,
 ) (err error) {
 	var k *sku.Transacted
@@ -142,7 +142,7 @@ func (c EditConfig) makeTempConfigFile(
 }
 
 func (c EditConfig) readTempConfigFile(
-	u *repo_local.Local,
+	u *repo_local.Repo,
 	p string,
 ) (sk *sku.Transacted, err error) {
 	sk = sku.GetTransactedPool().Get()

@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
 
-func (u *Local) MakeInventoryList(
+func (u *Repo) MakeInventoryList(
 	qg *query.Group,
 ) (list *sku.List, err error) {
 	list = sku.MakeList()

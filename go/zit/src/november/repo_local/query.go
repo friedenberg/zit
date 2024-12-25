@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
 
-func (u *Local) makeQueryBuilder() *query.Builder {
+func (u *Repo) makeQueryBuilder() *query.Builder {
 	return query.MakeBuilder(
 		u.GetDirectoryLayout(),
 		u.GetStore().GetBlobStore(),
@@ -17,7 +17,7 @@ func (u *Local) makeQueryBuilder() *query.Builder {
 	)
 }
 
-func (u *Local) MakeQueryBuilderExcludingHidden(
+func (u *Repo) MakeQueryBuilderExcludingHidden(
 	dg ids.Genre,
 ) *query.Builder {
 	if dg.IsEmpty() {
@@ -32,7 +32,7 @@ func (u *Local) MakeQueryBuilderExcludingHidden(
 		WithHidden(u.GetMatcherDormant())
 }
 
-func (u *Local) MakeQueryBuilder(
+func (u *Repo) MakeQueryBuilder(
 	dg ids.Genre,
 ) *query.Builder {
 	if dg.IsEmpty() {
@@ -46,6 +46,6 @@ func (u *Local) MakeQueryBuilder(
 		WithExpanders(u.GetStore().GetAbbrStore().GetAbbr())
 }
 
-func (u *Local) GetDefaultExternalStore() *external_store.Store {
+func (u *Repo) GetDefaultExternalStore() *external_store.Store {
 	return u.externalStores[ids.RepoId{}]
 }

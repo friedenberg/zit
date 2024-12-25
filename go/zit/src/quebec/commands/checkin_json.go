@@ -34,7 +34,7 @@ type TomlBookmark struct {
 }
 
 func (c CheckinJson) Run(
-	u *repo_local.Local,
+	u *repo_local.Repo,
 	args ...string,
 ) (err error) {
 	dec := json.NewDecoder(u.GetInFile())

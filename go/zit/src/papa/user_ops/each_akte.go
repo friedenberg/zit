@@ -12,7 +12,7 @@ import (
 
 // TODO move to store_fs
 type EachBlob struct {
-	*repo_local.Local
+	*repo_local.Repo
 	Utility string
 }
 

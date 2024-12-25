@@ -23,7 +23,7 @@ import (
 
 // TODO move to store_fs
 type Diff struct {
-	*repo_local.Local
+	*repo_local.Repo
 
 	object_metadata.TextFormatterFamily
 }

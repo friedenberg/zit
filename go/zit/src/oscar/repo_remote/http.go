@@ -24,9 +24,9 @@ func MakeRemoteHTTPFromXDGDotenvPath(
 	config *config.Compiled,
 	xdgDotenvPath string,
 ) (remoteHTTP *HTTP, err error) {
-	var remote *repo_local.Local
+	var remote *repo_local.Repo
 
-	if remote, err = repo_local.MakeLocalFromConfigAndXDGDotenvPath(
+	if remote, err = repo_local.MakeFromConfigAndXDGDotenvPath(
 		context,
 		config,
 		xdgDotenvPath,
@@ -59,7 +59,7 @@ func MakeRemoteHTTPFromXDGDotenvPath(
 
 type HTTP struct {
 	unixSocket repo_local.UnixSocket
-	remote     *repo_local.Local
+	remote     *repo_local.Repo
 }
 
 func (remote *HTTP) GetRepo() repo.Repo {

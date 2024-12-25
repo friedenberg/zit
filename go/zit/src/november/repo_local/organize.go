@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
 )
 
-func (e *Local) MakeOrganizeOptionsWithQueryGroup(
+func (e *Repo) MakeOrganizeOptionsWithQueryGroup(
 	organizeFlags organize_text.Flags,
 	qg *query.Group,
 ) organize_text.Options {
@@ -21,7 +21,7 @@ func (e *Local) MakeOrganizeOptionsWithQueryGroup(
 	)
 }
 
-func (e *Local) LockAndCommitOrganizeResults(
+func (e *Repo) LockAndCommitOrganizeResults(
 	results organize_text.OrganizeResults,
 ) (changeResults organize_text.Changes, err error) {
 	if err = e.Lock(); err != nil {
@@ -66,7 +66,7 @@ func (e *Local) LockAndCommitOrganizeResults(
 	return
 }
 
-func (e *Local) ApplyToOrganizeOptions(oo *organize_text.Options) {
+func (e *Repo) ApplyToOrganizeOptions(oo *organize_text.Options) {
 	oo.Config = e.GetConfig()
 	oo.Abbr = e.GetStore().GetAbbrStore().GetAbbr()
 

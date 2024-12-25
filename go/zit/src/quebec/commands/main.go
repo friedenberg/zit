@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
+	"code.linenisgreat.com/zit/go/zit/src/hotel/env"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
@@ -63,7 +64,7 @@ func Run(
 
 	cmdArgs := cmd.Args()
 
-	var u *repo_local.Local
+	var u *repo_local.Repo
 
 	options := repo_local.OptionsEmpty
 
@@ -71,12 +72,16 @@ func Run(
 		options = og.GetEnvironmentInitializeOptions()
 	}
 
-	if u, err = repo_local.MakeLocal(
+	env := env.Make(
 		ctx,
 		cmd.FlagSet,
 		cliConfig,
-		options,
 		primitiveFSHome,
+	)
+
+	if u, err = repo_local.Make(
+		env,
+		options,
 	); err != nil {
 		if cmd.withoutEnv {
 			err = nil

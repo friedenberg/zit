@@ -28,7 +28,7 @@ func init() {
 	)
 }
 
-func (c Info) Run(u *repo_local.Local, args ...string) {
+func (c Info) Run(u *repo_local.Repo, args ...string) {
 	if len(args) == 0 {
 		args = []string{"store-version"}
 	}

@@ -43,7 +43,7 @@ func (c Clone) DefaultGenres() ids.Genre {
 }
 
 func (c Clone) RunWithRemoteAndQuery(
-	local *repo_local.Local,
+	local *repo_local.Repo,
 	remote repo.Repo,
 	qg *query.Group,
 ) {

@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 )
 
-func (u *Local) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
+func (u *Repo) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
 	po := u.config.PrintOptions.
 		WithPrintShas(true).
 		WithExcludeFields(true)
@@ -33,7 +33,7 @@ func (u *Local) PrinterTransacted() interfaces.FuncIter[*sku.Transacted] {
 }
 
 // TODO migrate to StringFormatWriterSkuBoxCheckedOut
-func (u *Local) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOut] {
+func (u *Repo) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOut] {
 	po := u.config.PrintOptions.
 		WithPrintShas(true).
 		WithPrintTime(false)
@@ -59,7 +59,7 @@ func (u *Local) PrinterTransactedDeleted() interfaces.FuncIter[*sku.CheckedOut] 
 }
 
 // TODO make generic external version
-func (u *Local) PrinterFDDeleted() interfaces.FuncIter[*fd.FD] {
+func (u *Repo) PrinterFDDeleted() interfaces.FuncIter[*fd.FD] {
 	p := id_fmts.MakeFDDeletedStringWriterFormat(
 		u.GetConfig().DryRun,
 		id_fmts.MakeFDCliFormat(
@@ -75,7 +75,7 @@ func (u *Local) PrinterFDDeleted() interfaces.FuncIter[*fd.FD] {
 	)
 }
 
-func (u *Local) PrinterHeader() interfaces.FuncIter[string] {
+func (u *Repo) PrinterHeader() interfaces.FuncIter[string] {
 	if u.config.PrintOptions.PrintFlush {
 		return string_format_writer.MakeDelim(
 			"\n",
@@ -94,7 +94,7 @@ func (u *Local) PrinterHeader() interfaces.FuncIter[string] {
 	}
 }
 
-func (u *Local) PrinterCheckedOut(
+func (u *Repo) PrinterCheckedOut(
 	headerWriter string_format_writer.HeaderWriter[*sku.CheckedOut],
 ) interfaces.FuncIter[*sku.CheckedOut] {
 	oo := u.FormatOutputOptions()
@@ -115,7 +115,7 @@ func (u *Local) PrinterCheckedOut(
 	return out
 }
 
-func (u *Local) MakePrinterBoxArchive(
+func (u *Repo) MakePrinterBoxArchive(
 	out interfaces.WriterAndStringWriter,
 	includeTai bool,
 ) interfaces.FuncIter[*sku.Transacted] {

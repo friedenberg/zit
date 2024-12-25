@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
-func (u *Local) ImportList(
+func (u *Repo) ImportList(
 	list *sku.List,
 	importer store.Importer,
 ) (err error) {

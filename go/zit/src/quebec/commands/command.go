@@ -8,15 +8,15 @@ import (
 )
 
 type Command interface {
-	Run(*repo_local.Local, ...string) error
+	Run(*repo_local.Repo, ...string) error
 }
 
 type CommandWithContext interface {
-	Run(*repo_local.Local, ...string)
+	Run(*repo_local.Repo, ...string)
 }
 
 type WithCompletion interface {
-	Complete(u *repo_local.Local, args ...string) (err error)
+	Complete(u *repo_local.Repo, args ...string) (err error)
 }
 
 type command struct {

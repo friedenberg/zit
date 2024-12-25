@@ -19,7 +19,7 @@ import (
 )
 
 type Organize struct {
-	*repo_local.Local
+	*repo_local.Repo
 	organize_text.Metadata
 	DontUseQueryGroupForOrganizeMetadata bool
 }
@@ -109,8 +109,8 @@ func (op Organize) RunWithExternalLike(
 	organizeFlags.Skus = skus
 
 	createOrganizeFileOp := CreateOrganizeFile{
-		Local: op.Local,
-		Options: op.Local.MakeOrganizeOptionsWithQueryGroup(
+		Repo: op.Repo,
+		Options: op.Repo.MakeOrganizeOptionsWithQueryGroup(
 			organizeFlags,
 			organizeResults.QueryGroup,
 		),
@@ -148,7 +148,7 @@ func (op Organize) RunWithExternalLike(
 				Build(),
 		}
 
-		if err = openVimOp.Run(op.Local, f.Name()); err != nil {
+		if err = openVimOp.Run(op.Repo, f.Name()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -166,7 +166,7 @@ func (op Organize) RunWithExternalLike(
 		}
 
 		if organizeResults.After, err = readOrganizeTextOp.Run(
-			op.Local,
+			op.Repo,
 			f,
 			organize_text.NewMetadataWithOptionCommentLookup(
 				organizeResults.Before.Metadata.RepoId,

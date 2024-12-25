@@ -70,7 +70,7 @@ func (c Clean) DefaultGenres() ids.Genre {
 }
 
 func (c Clean) shouldClean(
-	u *repo_local.Local,
+	u *repo_local.Repo,
 	co sku.SkuType,
 	eqwk *query.Group,
 ) bool {
@@ -115,7 +115,7 @@ func (c Clean) ModifyBuilder(b *query.Builder) {
 }
 
 func (c Clean) RunWithQuery(
-	u *repo_local.Local,
+	u *repo_local.Repo,
 	qg *query.Group,
 ) (err error) {
 	if c.organize {
@@ -159,9 +159,9 @@ func (c Clean) RunWithQuery(
 	return
 }
 
-func (c Clean) runOrganize(u *repo_local.Local, qg *query.Group) (err error) {
+func (c Clean) runOrganize(u *repo_local.Repo, qg *query.Group) (err error) {
 	opOrganize := user_ops.Organize{
-		Local: u,
+		Repo: u,
 		Metadata: organize_text.Metadata{
 			RepoId: qg.RepoId,
 			OptionCommentSet: organize_text.MakeOptionCommentSet(

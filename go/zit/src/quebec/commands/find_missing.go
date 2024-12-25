@@ -23,7 +23,7 @@ func init() {
 }
 
 func (c FindMissing) Run(
-	u *repo_local.Local,
+	u *repo_local.Repo,
 	args ...string,
 ) (err error) {
 	var lookupStored map[sha.Bytes][]string

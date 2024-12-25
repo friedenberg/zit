@@ -1,7 +1,6 @@
 package repo_local
 
 import (
-	"flag"
 	"io"
 	"os"
 
@@ -13,7 +12,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/env"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -29,7 +27,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
-type Local struct {
+type Repo struct {
 	*env.Env
 
 	sunrise ids.Tai
@@ -50,11 +48,11 @@ type Local struct {
 	luaSkuFormat *box_format.BoxTransacted
 }
 
-func MakeLocalFromConfigAndXDGDotenvPath(
+func MakeFromConfigAndXDGDotenvPath(
 	context errors.Context,
 	config *config.Compiled,
 	xdgDotenvPath string,
-) (local *Local, err error) {
+) (local *Repo, err error) {
 	dotenv := xdg.Dotenv{
 		XDG: &xdg.XDG{},
 	}
@@ -76,39 +74,26 @@ func MakeLocalFromConfigAndXDGDotenvPath(
 		return
 	}
 
-	if local, err = MakeLocalFromConfigAndXDG(
-		context,
-		config,
+	var primitiveFSHome dir_layout.Primitive
+
+	if primitiveFSHome, err = dir_layout.MakePrimitiveWithXDG(
+		config.Debug,
 		*dotenv.XDG,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	return
-}
-
-func MakeLocalFromConfigAndXDG(
-	context errors.Context,
-	config *config.Compiled,
-	xdg xdg.XDG,
-) (local *Local, err error) {
-	var primitiveFSHome dir_layout.Primitive
-
-	if primitiveFSHome, err = dir_layout.MakePrimitiveWithXDG(
-		config.Debug,
-		xdg,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if local, err = MakeLocal(
+	env := env.Make(
 		context,
 		nil,
 		config.Cli(),
-		OptionsEmpty,
 		primitiveFSHome,
+	)
+
+	if local, err = Make(
+		env,
+		OptionsEmpty,
 	); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -117,20 +102,12 @@ func MakeLocalFromConfigAndXDG(
 	return
 }
 
-func MakeLocal(
-	context errors.Context,
-	flags *flag.FlagSet,
-	kCli mutable_config_blobs.Cli,
+func Make(
+	env *env.Env,
 	options Options,
-	primitiveDirLayout dir_layout.Primitive,
-) (u *Local, err error) {
-	u = &Local{
-		Env: env.Make(
-			context,
-			flags,
-			kCli,
-			primitiveDirLayout,
-		),
+) (u *Repo, err error) {
+	u = &Repo{
+		Env:            env,
 		DormantCounter: query.MakeDormantCounter(),
 	}
 
@@ -141,16 +118,16 @@ func MakeLocal(
 	return
 }
 
-func (u *Local) GetRepo() repo.Repo {
+func (u *Repo) GetRepo() repo.Repo {
 	return u
 }
 
 // TODO investigate removing unnecessary resets like from organize
-func (u *Local) Reset() (err error) {
+func (u *Repo) Reset() (err error) {
 	return u.Initialize(OptionsEmpty)
 }
 
-func (u *Local) Initialize(options Options) (err error) {
+func (u *Repo) Initialize(options Options) (err error) {
 	if err = u.Flush(); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -306,7 +283,7 @@ func (u *Local) Initialize(options Options) (err error) {
 	return
 }
 
-func (u *Local) Flush() (err error) {
+func (u *Repo) Flush() (err error) {
 	wg := quiter.MakeErrorWaitGroupParallel()
 
 	wg.Do(u.age.Close)
@@ -324,7 +301,7 @@ func (u *Local) Flush() (err error) {
 	return
 }
 
-func (u *Local) PrintMatchedArchiviertIfNecessary() {
+func (u *Repo) PrintMatchedArchiviertIfNecessary() {
 	if !u.GetConfig().PrintOptions.PrintMatchedDormant {
 		return
 	}
@@ -339,15 +316,15 @@ func (u *Local) PrintMatchedArchiviertIfNecessary() {
 	ui.Err().Printf("%d archived objects matched", c)
 }
 
-func (u *Local) MakeObjectIdIndex() ids.Index {
+func (u *Repo) MakeObjectIdIndex() ids.Index {
 	return ids.Index{}
 }
 
-func (u *Local) GetMatcherDormant() query.DormantCounter {
+func (u *Repo) GetMatcherDormant() query.DormantCounter {
 	return u.DormantCounter
 }
 
-func (u *Local) GetExternalStoreForQuery(
+func (u *Repo) GetExternalStoreForQuery(
 	repoId ids.RepoId,
 ) (sku.ExternalStoreForQuery, bool) {
 	e, ok := u.externalStores[repoId]

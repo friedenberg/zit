@@ -29,7 +29,7 @@ func init() {
 	)
 }
 
-func (c Fsck) Run(u *repo_local.Local, args ...string) {
+func (c Fsck) Run(u *repo_local.Repo, args ...string) {
 	p := u.PrinterTransacted()
 
 	if err := u.GetStore().QueryPrimitive(

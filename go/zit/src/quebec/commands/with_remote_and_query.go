@@ -15,7 +15,7 @@ import (
 
 type CommandWithRemoteAndQuery interface {
 	RunWithRemoteAndQuery(
-		local *repo_local.Local,
+		local *repo_local.Repo,
 		remote repo.Repo,
 		qg *query.Group,
 	)
@@ -33,7 +33,7 @@ type commandWithRemoteAndQuery struct {
 }
 
 func (c commandWithRemoteAndQuery) Complete(
-	u *repo_local.Local,
+	u *repo_local.Repo,
 	args ...string,
 ) (err error) {
 	var cgg CompletionGenresGetter
@@ -68,7 +68,7 @@ func (c commandWithRemoteAndQuery) Complete(
 }
 
 func (c commandWithRemoteAndQuery) Run(
-	local *repo_local.Local,
+	local *repo_local.Repo,
 	args ...string,
 ) {
 	if len(args) < 1 && c.TheirXDGDotenv == "" {
@@ -107,7 +107,7 @@ func (c commandWithRemoteAndQuery) Run(
 					return
 				}
 			} else {
-				if remote, err = repo_local.MakeLocalFromConfigAndXDGDotenvPath(
+				if remote, err = repo_local.MakeFromConfigAndXDGDotenvPath(
 					local.Context,
 					local.GetConfig(),
 					c.TheirXDGDotenv,

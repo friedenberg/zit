@@ -29,7 +29,7 @@ func init() {
 	)
 }
 
-func (c Init) Run(u *repo_local.Local, args ...string) (err error) {
+func (c Init) Run(u *repo_local.Repo, args ...string) (err error) {
 	if err = u.Start(c.BigBang); err != nil {
 		err = errors.Wrap(err)
 		return

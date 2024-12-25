@@ -51,7 +51,7 @@ func (c Revert) DefaultGenres() ids.Genre {
 }
 
 func (c Revert) RunWithQuery(
-	u *repo_local.Local,
+	u *repo_local.Repo,
 	ms *query.Group,
 ) (err error) {
 	f := func(rt store.RevertId) (err error) {
@@ -86,7 +86,7 @@ func (c Revert) RunWithQuery(
 }
 
 func (c Revert) runRevertFromQuery(
-	u *repo_local.Local,
+	u *repo_local.Repo,
 	eq *query.Group,
 	f interfaces.FuncIter[store.RevertId],
 ) (err error) {
@@ -107,7 +107,7 @@ func (c Revert) runRevertFromQuery(
 }
 
 func (c Revert) runRevertFromLast(
-	u *repo_local.Local,
+	u *repo_local.Repo,
 	f interfaces.FuncIter[store.RevertId],
 ) (err error) {
 	s := u.GetStore()

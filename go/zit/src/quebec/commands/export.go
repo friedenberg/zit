@@ -45,7 +45,7 @@ func (c Export) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.InventoryList)
 }
 
-func (c Export) RunWithQuery(u *repo_local.Local, qg *query.Group) (err error) {
+func (c Export) RunWithQuery(u *repo_local.Repo, qg *query.Group) (err error) {
 	var list *sku.List
 
 	if list, err = u.MakeInventoryList(qg); err != nil {

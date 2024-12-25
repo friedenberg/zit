@@ -12,36 +12,36 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
-func (u *Local) GetTime() time.Time {
+func (u *Repo) GetTime() time.Time {
 	return time.Now()
 }
 
-func (u *Local) GetConfig() *config.Compiled {
+func (u *Repo) GetConfig() *config.Compiled {
 	return &u.config
 }
 
-func (u *Local) GetDormantIndex() *dormant_index.Index {
+func (u *Repo) GetDormantIndex() *dormant_index.Index {
 	return &u.dormantIndex
 }
 
-func (u *Local) GetDirectoryLayout() dir_layout.DirLayout {
+func (u *Repo) GetDirectoryLayout() dir_layout.DirLayout {
 	return u.dirLayout
 }
 
-func (u *Local) GetBlobStore() dir_layout.BlobStore {
+func (u *Repo) GetBlobStore() dir_layout.BlobStore {
 	return u.GetDirectoryLayout()
 }
 
-func (u *Local) GetStore() *store.Store {
+func (u *Repo) GetStore() *store.Store {
 	return &u.store
 }
 
-func (u *Local) GetExternalLikePoolForRepoId(
+func (u *Repo) GetExternalLikePoolForRepoId(
 	repoId ids.RepoId,
 ) (of sku.ObjectFactory) {
 	return
 }
 
-func (u *Local) GetFileEncoder() store_fs.FileEncoder {
+func (u *Repo) GetFileEncoder() store_fs.FileEncoder {
 	return u.fileEncoder
 }

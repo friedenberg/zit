@@ -20,7 +20,7 @@ func init() {
 }
 
 func (c Test) Run(
-	u *repo_local.Local,
+	u *repo_local.Repo,
 	args ...string,
 ) (err error) {
 	return

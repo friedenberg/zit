@@ -48,7 +48,7 @@ func init() {
 	)
 }
 
-func (c Import) Run(local *repo_local.Local, args ...string) {
+func (c Import) Run(local *repo_local.Repo, args ...string) {
 	if c.InventoryList == "" {
 		local.Context.Cancel(errors.BadRequestf("empty inventory list"))
 		return

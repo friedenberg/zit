@@ -86,7 +86,7 @@ func init() {
 }
 
 func (c New) ValidateFlagsAndArgs(
-	u *repo_local.Local,
+	u *repo_local.Repo,
 	args ...string,
 ) (err error) {
 	if u.GetConfig().DryRun && len(args) == 0 {
@@ -99,7 +99,7 @@ func (c New) ValidateFlagsAndArgs(
 	return
 }
 
-func (c *New) Run(u *repo_local.Local, args ...string) (err error) {
+func (c *New) Run(u *repo_local.Repo, args ...string) (err error) {
 	if err = c.ValidateFlagsAndArgs(u, args...); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -116,7 +116,7 @@ func (c *New) Run(u *repo_local.Local, args ...string) (err error) {
 
 	if len(args) == 0 {
 		emptyOp := user_ops.WriteNewZettels{
-			Local: u,
+			Repo: u,
 		}
 
 		if zts, err = emptyOp.RunMany(c.Proto, c.Count); err != nil {
@@ -125,7 +125,7 @@ func (c *New) Run(u *repo_local.Local, args ...string) (err error) {
 		}
 	} else if c.Shas {
 		opCreateFromShas := user_ops.CreateFromShas{
-			Local: u,
+			Repo: u,
 			Proto: c.Proto,
 		}
 
@@ -135,7 +135,7 @@ func (c *New) Run(u *repo_local.Local, args ...string) (err error) {
 		}
 	} else {
 		opCreateFromPath := user_ops.CreateFromPaths{
-			Local:      u,
+			Repo:      u,
 			TextParser: f,
 			Filter:     c.Filter,
 			Delete:     c.Delete,
@@ -151,7 +151,7 @@ func (c *New) Run(u *repo_local.Local, args ...string) (err error) {
 	// TODO make mutually exclusive with organize
 	if c.Edit {
 		opCheckout := user_ops.Checkout{
-			Local: u,
+			Repo: u,
 			Options: checkout_options.Options{
 				CheckoutMode: checkout_mode.MetadataAndBlob,
 				OptionsWithoutMode: checkout_options.OptionsWithoutMode{
@@ -169,7 +169,7 @@ func (c *New) Run(u *repo_local.Local, args ...string) (err error) {
 
 	if c.Organize {
 		opOrganize := user_ops.Organize{
-			Local: u,
+			Repo: u,
 		}
 
 		if err = opOrganize.Metadata.SetFromObjectMetadata(

@@ -25,7 +25,7 @@ func init() {
 	)
 }
 
-func (c Exec) Run(u *repo_local.Local, args ...string) (err error) {
+func (c Exec) Run(u *repo_local.Repo, args ...string) (err error) {
 	if len(args) == 0 {
 		err = errors.BadRequestf("needs at least Sku and possibly function name")
 		return
@@ -49,7 +49,7 @@ func (c Exec) Run(u *repo_local.Local, args ...string) (err error) {
 
 	case strings.HasPrefix(sk.GetType().String(), "lua"):
 		execLuaOp := user_ops.ExecLua{
-			Local: u,
+			Repo: u,
 		}
 
 		if err = execLuaOp.Run(sk, args...); err != nil {
@@ -62,7 +62,7 @@ func (c Exec) Run(u *repo_local.Local, args ...string) (err error) {
 }
 
 func (c Exec) runBash(
-	u *repo_local.Local,
+	u *repo_local.Repo,
 	tz *sku.Transacted,
 	args ...string,
 ) (err error) {

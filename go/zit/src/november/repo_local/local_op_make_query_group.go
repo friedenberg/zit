@@ -23,7 +23,7 @@ type CompletionGenresGetter interface {
 	CompletionGenres() ids.Genre
 }
 
-func (u *Local) MakeQueryGroup(
+func (u *Repo) MakeQueryGroup(
 	metaBuilder any,
 	repoId ids.RepoId,
 	externalQueryOptions sku.ExternalQueryOptions,

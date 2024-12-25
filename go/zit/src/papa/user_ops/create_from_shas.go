@@ -11,7 +11,7 @@ import (
 )
 
 type CreateFromShas struct {
-	*repo_local.Local
+	*repo_local.Repo
 	sku.Proto
 }
 

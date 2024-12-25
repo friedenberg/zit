@@ -8,7 +8,7 @@ import (
 )
 
 type WriteNewZettels struct {
-	*repo_local.Local
+	*repo_local.Repo
 }
 
 func (c WriteNewZettels) RunMany(

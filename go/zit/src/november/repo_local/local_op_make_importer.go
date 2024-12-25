@@ -5,7 +5,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
 )
 
-func (env *Local) MakeImporter(
+func (env *Repo) MakeImporter(
 	printCopies bool,
 ) (importer store.Importer) {
 	importer = store.Importer{

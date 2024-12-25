@@ -14,7 +14,7 @@ import (
 )
 
 type CreateFromPaths struct {
-	*repo_local.Local
+	*repo_local.Repo
 	sku.Proto
 	TextParser object_metadata.TextParser
 	Filter     script_value.ScriptValue

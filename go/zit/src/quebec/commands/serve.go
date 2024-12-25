@@ -23,7 +23,7 @@ func init() {
 	)
 }
 
-func (c Serve) Run(u *repo_local.Local, args ...string) {
+func (c Serve) Run(u *repo_local.Repo, args ...string) {
 	var network, address string
 
 	switch len(args) {

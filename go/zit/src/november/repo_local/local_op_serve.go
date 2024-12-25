@@ -19,7 +19,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
 
-func (env *Local) InitializeListener(
+func (env *Repo) InitializeListener(
 	network, address string,
 ) (listener net.Listener, err error) {
 	var config net.ListenConfig
@@ -61,7 +61,7 @@ type UnixSocket struct {
 	Path string
 }
 
-func (env *Local) InitializeUnixSocket(
+func (env *Repo) InitializeUnixSocket(
 	config net.ListenConfig,
 	path string,
 ) (sock UnixSocket, err error) {
@@ -93,7 +93,7 @@ type HTTPPort struct {
 	Port int
 }
 
-func (env *Local) InitializeHTTP(
+func (env *Repo) InitializeHTTP(
 	config net.ListenConfig,
 	port int,
 ) (httpPort HTTPPort, err error) {
@@ -113,7 +113,7 @@ func (env *Local) InitializeHTTP(
 	return
 }
 
-func (env *Local) Serve(listener net.Listener) (err error) {
+func (env *Repo) Serve(listener net.Listener) (err error) {
 	httpServer := http.Server{Handler: env}
 
 	go func() {
@@ -145,7 +145,7 @@ func (env *Local) Serve(listener net.Listener) (err error) {
 	return
 }
 
-func (local *Local) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (local *Repo) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	type MethodPath struct {
 		Method string
 		Path   string

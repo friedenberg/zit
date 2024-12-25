@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 )
 
-func (local *Local) PullQueryGroupFromRemote(
+func (local *Repo) PullQueryGroupFromRemote(
 	remote repo.Repo,
 	qg *query.Group,
 	printCopies bool,

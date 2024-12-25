@@ -21,7 +21,7 @@ func init() {
 	)
 }
 
-func (c DormantRemove) Run(u *repo_local.Local, args ...string) (err error) {
+func (c DormantRemove) Run(u *repo_local.Repo, args ...string) (err error) {
 	if err = u.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return

@@ -24,7 +24,7 @@ func (c Reindex) GetEnvInitializeOptions() repo_local.Options {
 	return repo_local.OptionsAllowConfigReadError
 }
 
-func (c Reindex) Run(u *repo_local.Local, args ...string) (err error) {
+func (c Reindex) Run(u *repo_local.Repo, args ...string) (err error) {
 	if len(args) > 0 {
 		err = errors.Errorf("reindex does not support arguments")
 		return

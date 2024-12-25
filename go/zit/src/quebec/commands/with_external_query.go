@@ -13,14 +13,14 @@ import (
 
 type CommandWithQuery interface {
 	RunWithQuery(
-		store *repo_local.Local,
+		store *repo_local.Repo,
 		ids *query.Group,
 	) error
 }
 
 type CommandWithQuery2 interface {
 	RunWithQuery(
-		store *repo_local.Local,
+		store *repo_local.Repo,
 		ids *query.Group,
 	) Result
 }
@@ -36,7 +36,7 @@ type CompletionGenresGetter interface {
 }
 
 func (c commandWithQuery) Complete(
-	u *repo_local.Local,
+	u *repo_local.Repo,
 	args ...string,
 ) (err error) {
 	var cgg CompletionGenresGetter
@@ -70,7 +70,7 @@ func (c commandWithQuery) Complete(
 	return
 }
 
-func (c commandWithQuery) Run(u *repo_local.Local, args ...string) (err error) {
+func (c commandWithQuery) Run(u *repo_local.Repo, args ...string) (err error) {
 	if c.Group, err = u.MakeQueryGroup(
 		c.CommandWithQuery,
 		c.RepoId,

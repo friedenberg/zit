@@ -10,7 +10,7 @@ import (
 
 // TODO support using query results for organize population
 type CreateOrganizeFile struct {
-	*repo_local.Local
+	*repo_local.Repo
 	organize_text.Options
 }
 

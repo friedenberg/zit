@@ -50,7 +50,7 @@ func (c CatAlfred) DefaultGenres() ids.Genre {
 }
 
 func (c CatAlfred) RunWithQuery(
-	u *repo_local.Local,
+	u *repo_local.Repo,
 	qg *query.Group,
 ) (err error) {
 	// this command does its own error handling

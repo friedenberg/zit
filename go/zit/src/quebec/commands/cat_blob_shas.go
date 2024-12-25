@@ -30,7 +30,7 @@ func (c CatBlobShas) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c CatBlobShas) Run(u *repo_local.Local, _ ...string) (err error) {
+func (c CatBlobShas) Run(u *repo_local.Repo, _ ...string) (err error) {
 	if err = u.GetDirectoryLayout().ReadAllShasForGenre(
 		genres.Blob,
 		func(s *sha.Sha) (err error) {

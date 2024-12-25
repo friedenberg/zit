@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/india/box_format"
 )
 
-func (u *Local) StringFormatWriterSkuBoxTransacted(
+func (u *Repo) StringFormatWriterSkuBoxTransacted(
 	po options_print.V0,
 	co string_format_writer.ColorOptions,
 	truncation string_format_writer.CliFormatTruncation,
@@ -30,7 +30,7 @@ func (u *Local) StringFormatWriterSkuBoxTransacted(
 	)
 }
 
-func (u *Local) StringFormatWriterSkuBoxCheckedOut(
+func (u *Repo) StringFormatWriterSkuBoxCheckedOut(
 	po options_print.V0,
 	co string_format_writer.ColorOptions,
 	truncation string_format_writer.CliFormatTruncation,
@@ -47,7 +47,7 @@ func (u *Local) StringFormatWriterSkuBoxCheckedOut(
 	)
 }
 
-func (u *Local) SkuFormatBoxTransactedNoColor() *box_format.BoxTransacted {
+func (u *Repo) SkuFormatBoxTransactedNoColor() *box_format.BoxTransacted {
 	co := u.FormatColorOptionsOut()
 	co.OffEntirely = true
 	options := u.config.PrintOptions.WithPrintShas(false)
@@ -62,7 +62,7 @@ func (u *Local) SkuFormatBoxTransactedNoColor() *box_format.BoxTransacted {
 	)
 }
 
-func (u *Local) SkuFormatBoxCheckedOutNoColor() *box_format.BoxCheckedOut {
+func (u *Repo) SkuFormatBoxCheckedOutNoColor() *box_format.BoxCheckedOut {
 	co := u.FormatColorOptionsOut()
 	co.OffEntirely = true
 	options := u.config.PrintOptions.WithPrintShas(false)
@@ -78,7 +78,7 @@ func (u *Local) SkuFormatBoxCheckedOutNoColor() *box_format.BoxCheckedOut {
 	)
 }
 
-func (u *Local) MakeBoxArchive(includeTai bool) *box_format.BoxTransacted {
+func (u *Repo) MakeBoxArchive(includeTai bool) *box_format.BoxTransacted {
 	po := u.GetConfig().PrintOptions.
 		WithPrintShas(true).
 		WithPrintTai(includeTai).

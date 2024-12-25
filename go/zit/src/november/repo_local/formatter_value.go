@@ -27,7 +27,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/juliett/blob_store"
 )
 
-func (u *Local) MakeFormatFunc(
+func (u *Repo) MakeFormatFunc(
 	v string,
 	out interfaces.WriterAndStringWriter,
 ) (f interfaces.FuncIter[*sku.Transacted], err error) {
@@ -779,7 +779,7 @@ func (u *Local) MakeFormatFunc(
 	return
 }
 
-func (u *Local) makeTypFormatter(
+func (u *Repo) makeTypFormatter(
 	v string,
 	out io.Writer,
 ) (f interfaces.FuncIter[*sku.Transacted], err error) {

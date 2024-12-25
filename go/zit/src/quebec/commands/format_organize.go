@@ -33,7 +33,7 @@ func init() {
 	)
 }
 
-func (c *FormatOrganize) Run(u *repo_local.Local, args ...string) (err error) {
+func (c *FormatOrganize) Run(u *repo_local.Repo, args ...string) (err error) {
 	c.Flags.Config = u.GetConfig()
 
 	if len(args) != 1 {

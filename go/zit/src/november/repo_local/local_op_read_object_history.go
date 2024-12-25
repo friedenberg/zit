@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 )
 
-func (env *Local) ReadObjectHistory(
+func (env *Repo) ReadObjectHistory(
 	oid *ids.ObjectId,
 ) (skus []*sku.Transacted, err error) {
 	streamIndex := env.GetStore().GetStreamIndex()

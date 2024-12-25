@@ -32,7 +32,7 @@ func (c Push) DefaultGenres() ids.Genre {
 }
 
 func (c Push) RunWithRemoteAndQuery(
-	local *repo_local.Local,
+	local *repo_local.Repo,
 	remote repo.Repo,
 	qg *query.Group,
 ) {

@@ -39,7 +39,7 @@ type shaWithReadCloser struct {
 	ReadCloser io.ReadCloser
 }
 
-func (c CatBlob) makeBlobWriter(u *repo_local.Local) interfaces.FuncIter[shaWithReadCloser] {
+func (c CatBlob) makeBlobWriter(u *repo_local.Repo) interfaces.FuncIter[shaWithReadCloser] {
 	if c.Utility.IsEmpty() {
 		return quiter.MakeSyncSerializer(
 			func(rc shaWithReadCloser) (err error) {
@@ -94,7 +94,7 @@ func (c CatBlob) makeBlobWriter(u *repo_local.Local) interfaces.FuncIter[shaWith
 }
 
 func (c CatBlob) Run(
-	u *repo_local.Local,
+	u *repo_local.Repo,
 	args ...string,
 ) (err error) {
 	blobWriter := c.makeBlobWriter(u)
@@ -117,7 +117,7 @@ func (c CatBlob) Run(
 }
 
 func (c CatBlob) copy(
-	u *repo_local.Local,
+	u *repo_local.Repo,
 	rc shaWithReadCloser,
 ) (err error) {
 	defer errors.DeferredCloser(&err, rc.ReadCloser)
@@ -143,7 +143,7 @@ func (c CatBlob) copy(
 }
 
 func (c CatBlob) blob(
-	u *repo_local.Local,
+	u *repo_local.Repo,
 	sh *sha.Sha,
 	blobWriter interfaces.FuncIter[shaWithReadCloser],
 ) (err error) {

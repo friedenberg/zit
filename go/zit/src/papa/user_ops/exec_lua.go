@@ -8,7 +8,7 @@ import (
 )
 
 type ExecLua struct {
-	*repo_local.Local
+	*repo_local.Repo
 }
 
 func (u ExecLua) Run(sk *sku.Transacted, args ...string) (err error) {
