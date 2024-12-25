@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -59,7 +59,7 @@ func (c Edit) DefaultGenres() ids.Genre {
 }
 
 func (c Edit) RunWithQuery(
-	u *env.Local,
+	u *repo_local.Local,
 	eqwk *query.Group,
 ) (err error) {
 	options := checkout_options.Options{
@@ -67,7 +67,7 @@ func (c Edit) RunWithQuery(
 	}
 
 	opEdit := user_ops.Checkout{
-		Local:     u,
+		Local:   u,
 		Options: options,
 		Edit:    true,
 	}

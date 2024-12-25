@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/alfred_sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type CatAlfred struct {
@@ -50,7 +50,7 @@ func (c CatAlfred) DefaultGenres() ids.Genre {
 }
 
 func (c CatAlfred) RunWithQuery(
-	u *env.Local,
+	u *repo_local.Local,
 	qg *query.Group,
 ) (err error) {
 	// this command does its own error handling
@@ -58,7 +58,7 @@ func (c CatAlfred) RunWithQuery(
 		err = nil
 	}()
 
-	wo := bufio.NewWriter(u.Out())
+	wo := bufio.NewWriter(u.GetOutFile())
 	defer errors.DeferredFlusher(&err, wo)
 
 	var aiw alfred.Writer
@@ -67,13 +67,13 @@ func (c CatAlfred) RunWithQuery(
 
 	switch c.Genre {
 	case genres.Type, genres.Tag:
-		if aiw, err = alfred.NewDebouncingWriter(u.Out()); err != nil {
+		if aiw, err = alfred.NewDebouncingWriter(u.GetOutFile()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 
 	default:
-		if aiw, err = alfred.NewWriter(u.Out(), itemPool); err != nil {
+		if aiw, err = alfred.NewWriter(u.GetOutFile(), itemPool); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

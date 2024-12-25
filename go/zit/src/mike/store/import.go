@@ -156,10 +156,10 @@ func (importer Importer) importLeafSku(
 func (c Importer) importBlobIfNecessary(
 	sk *sku.Transacted,
 ) (err error) {
-  if c.RemoteBlobStore == nil {
-    err = errors.Errorf("nil blob store")
-    return
-  }
+	if c.RemoteBlobStore == nil {
+		err = errors.Errorf("nil blob store")
+		return
+	}
 
 	blobSha := sk.GetBlobSha()
 

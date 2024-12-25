@@ -6,7 +6,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type FindMissing struct{}
@@ -23,7 +23,7 @@ func init() {
 }
 
 func (c FindMissing) Run(
-	u *env.Local,
+	u *repo_local.Local,
 	args ...string,
 ) (err error) {
 	var lookupStored map[sha.Bytes][]string

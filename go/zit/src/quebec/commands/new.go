@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -86,7 +86,7 @@ func init() {
 }
 
 func (c New) ValidateFlagsAndArgs(
-	u *env.Local,
+	u *repo_local.Local,
 	args ...string,
 ) (err error) {
 	if u.GetConfig().DryRun && len(args) == 0 {
@@ -99,7 +99,7 @@ func (c New) ValidateFlagsAndArgs(
 	return
 }
 
-func (c *New) Run(u *env.Local, args ...string) (err error) {
+func (c *New) Run(u *repo_local.Local, args ...string) (err error) {
 	if err = c.ValidateFlagsAndArgs(u, args...); err != nil {
 		err = errors.Wrap(err)
 		return
@@ -125,7 +125,7 @@ func (c *New) Run(u *env.Local, args ...string) (err error) {
 		}
 	} else if c.Shas {
 		opCreateFromShas := user_ops.CreateFromShas{
-			Local:   u,
+			Local: u,
 			Proto: c.Proto,
 		}
 
@@ -135,7 +135,7 @@ func (c *New) Run(u *env.Local, args ...string) (err error) {
 		}
 	} else {
 		opCreateFromPath := user_ops.CreateFromPaths{
-			Local:        u,
+			Local:      u,
 			TextParser: f,
 			Filter:     c.Filter,
 			Delete:     c.Delete,

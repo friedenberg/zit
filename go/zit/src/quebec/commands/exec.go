@@ -9,7 +9,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -25,7 +25,7 @@ func init() {
 	)
 }
 
-func (c Exec) Run(u *env.Local, args ...string) (err error) {
+func (c Exec) Run(u *repo_local.Local, args ...string) (err error) {
 	if len(args) == 0 {
 		err = errors.BadRequestf("needs at least Sku and possibly function name")
 		return
@@ -62,7 +62,7 @@ func (c Exec) Run(u *env.Local, args ...string) (err error) {
 }
 
 func (c Exec) runBash(
-	u *env.Local,
+	u *repo_local.Local,
 	tz *sku.Transacted,
 	args ...string,
 ) (err error) {

@@ -6,13 +6,13 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 	"github.com/google/shlex"
 )
 
 // TODO move to store_fs
 type EachBlob struct {
-	*env.Local
+	*repo_local.Local
 	Utility string
 }
 
@@ -55,9 +55,9 @@ func (c EachBlob) Run(
 	args = append(args, blob_store...)
 
 	cmd := exec.Command(args[0], args[1:]...)
-	cmd.Stdout = c.Out()
-	cmd.Stdin = c.In()
-	cmd.Stderr = c.Err()
+	cmd.Stdout = c.GetOutFile()
+	cmd.Stdin = c.GetInFile()
+	cmd.Stderr = c.GetErrFile()
 
 	if err = cmd.Start(); err != nil {
 		err = errors.Wrap(err)

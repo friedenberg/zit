@@ -15,7 +15,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/juliett/blob_store"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 	"golang.org/x/exp/maps"
 )
 
@@ -48,7 +48,7 @@ func init() {
 	)
 }
 
-func (c *FormatBlob) Run(u *env.Local, args ...string) (err error) {
+func (c *FormatBlob) Run(u *repo_local.Local, args ...string) (err error) {
 	if c.Stdin {
 		if err = c.FormatFromStdin(u, args...); err != nil {
 			err = errors.Wrap(err)
@@ -112,7 +112,7 @@ func (c *FormatBlob) Run(u *env.Local, args ...string) (err error) {
 	}
 
 	if _, err = f.WriteStringFormatWithMode(
-		u.Out(),
+		u.GetOutFile(),
 		object,
 		checkout_mode.BlobOnly,
 	); err != nil {
@@ -124,7 +124,7 @@ func (c *FormatBlob) Run(u *env.Local, args ...string) (err error) {
 }
 
 func (c *FormatBlob) FormatFromStdin(
-	u *env.Local,
+	u *repo_local.Local,
 	args ...string,
 ) (err error) {
 	formatId := "text"
@@ -168,13 +168,13 @@ func (c *FormatBlob) FormatFromStdin(
 	if wt, err = script_config.MakeWriterToWithStdin(
 		blobFormatter,
 		u.GetDirectoryLayout().MakeCommonEnv(),
-		u.In(),
+		u.GetInFile(),
 	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
 
-	if _, err = wt.WriteTo(u.Out()); err != nil {
+	if _, err = wt.WriteTo(u.GetOutFile()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -183,7 +183,7 @@ func (c *FormatBlob) FormatFromStdin(
 }
 
 func (c *FormatBlob) getSku(
-	u *env.Local,
+	u *repo_local.Local,
 	objectIdString string,
 ) (sk *sku.Transacted, err error) {
 	b := u.MakeQueryBuilder(ids.MakeGenre(genres.Zettel))
@@ -211,7 +211,7 @@ func (c *FormatBlob) getSku(
 }
 
 func (c *FormatBlob) getBlobFormatter(
-	u *env.Local,
+	u *repo_local.Local,
 	tipe ids.Type,
 	formatId string,
 ) (blobFormatter script_config.RemoteScript, err error) {

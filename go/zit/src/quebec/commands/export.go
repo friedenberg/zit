@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type Export struct {
@@ -45,7 +45,7 @@ func (c Export) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.InventoryList)
 }
 
-func (c Export) RunWithQuery(u *env.Local, qg *query.Group) (err error) {
+func (c Export) RunWithQuery(u *repo_local.Local, qg *query.Group) (err error) {
 	var list *sku.List
 
 	if list, err = u.MakeInventoryList(qg); err != nil {
@@ -65,7 +65,7 @@ func (c Export) RunWithQuery(u *env.Local, qg *query.Group) (err error) {
 	o := dir_layout.WriteOptions{
 		Age:             &ag,
 		CompressionType: c.CompressionType,
-		Writer:          u.Out(),
+		Writer:          u.GetOutFile(),
 	}
 
 	if wc, err = dir_layout.NewWriter(o); err != nil {

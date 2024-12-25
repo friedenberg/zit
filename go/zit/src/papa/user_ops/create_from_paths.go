@@ -10,11 +10,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type CreateFromPaths struct {
-	*env.Local
+	*repo_local.Local
 	sku.Proto
 	TextParser object_metadata.TextParser
 	Filter     script_value.ScriptValue

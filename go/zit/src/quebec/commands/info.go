@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/xdg"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type Info struct {
@@ -28,7 +28,7 @@ func init() {
 	)
 }
 
-func (c Info) Run(u *env.Local, args ...string) {
+func (c Info) Run(u *repo_local.Local, args ...string) {
 	if len(args) == 0 {
 		args = []string{"store-version"}
 	}
@@ -45,7 +45,7 @@ func (c Info) Run(u *env.Local, args ...string) {
 				XDG: &ecksDeeGee,
 			}
 
-			if _, err := dotenv.WriteTo(u.Out()); err != nil {
+			if _, err := dotenv.WriteTo(u.GetOutFile()); err != nil {
 				u.Context.Cancel(errors.Wrap(err))
 				return
 			}

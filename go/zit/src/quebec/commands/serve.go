@@ -5,7 +5,7 @@ import (
 	"net"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type Serve struct {
@@ -23,20 +23,20 @@ func init() {
 	)
 }
 
-func (c Serve) Run(u *env.Local, args ...string) {
-  var network, address string
+func (c Serve) Run(u *repo_local.Local, args ...string) {
+	var network, address string
 
 	switch len(args) {
 	case 0:
-    network = "tcp"
-    address = ":0"
+		network = "tcp"
+		address = ":0"
 
 	case 1:
-    network = args[0]
+		network = args[0]
 
 	default:
-    network = args[0]
-    address = args[1]
+		network = args[0]
+		address = args[1]
 	}
 
 	var listener net.Listener

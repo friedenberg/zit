@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type CatBlobShas struct{}
@@ -30,11 +30,11 @@ func (c CatBlobShas) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c CatBlobShas) Run(u *env.Local, _ ...string) (err error) {
+func (c CatBlobShas) Run(u *repo_local.Local, _ ...string) (err error) {
 	if err = u.GetDirectoryLayout().ReadAllShasForGenre(
 		genres.Blob,
 		func(s *sha.Sha) (err error) {
-			_, err = fmt.Fprintln(u.Out(), s)
+			_, err = fmt.Fprintln(u.GetOutFile(), s)
 			return
 		},
 	); err != nil {

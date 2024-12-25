@@ -8,13 +8,13 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type ReadOrganizeFile struct{}
 
 func (c ReadOrganizeFile) RunWithPath(
-	u *env.Local,
+	u *repo_local.Local,
 	p string,
 	repoId ids.RepoId,
 ) (ot *organize_text.Text, err error) {
@@ -40,7 +40,7 @@ func (c ReadOrganizeFile) RunWithPath(
 }
 
 func (c ReadOrganizeFile) Run(
-	u *env.Local,
+	u *repo_local.Local,
 	r io.Reader,
 	om organize_text.Metadata,
 ) (ot *organize_text.Text, err error) {

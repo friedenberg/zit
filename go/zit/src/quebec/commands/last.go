@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -46,7 +46,7 @@ func (c Last) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c Last) Run(u *env.Local, args ...string) (err error) {
+func (c Last) Run(u *repo_local.Local, args ...string) (err error) {
 	if len(args) != 0 {
 		ui.Err().Print("ignoring arguments")
 	}
@@ -65,7 +65,7 @@ func (c Last) Run(u *env.Local, args ...string) (err error) {
 	if c.Organize || c.Edit {
 		f = skus.Add
 	} else {
-		if f, err = u.MakeFormatFunc(c.Format, u.Out()); err != nil {
+		if f, err = u.MakeFormatFunc(c.Format, u.GetOutFile()); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
@@ -102,8 +102,8 @@ func (c Last) Run(u *env.Local, args ...string) (err error) {
 			Options: checkout_options.Options{
 				CheckoutMode: checkout_mode.MetadataAndBlob,
 			},
-			Local:  u,
-			Edit: true,
+			Local: u,
+			Edit:  true,
 		}
 
 		if _, err = opCheckout.Run(skus); err != nil {
@@ -116,7 +116,7 @@ func (c Last) Run(u *env.Local, args ...string) (err error) {
 }
 
 func (c Last) runWithInventoryList(
-	u *env.Local,
+	u *repo_local.Local,
 	f interfaces.FuncIter[*sku.Transacted],
 ) (err error) {
 	s := u.GetStore()

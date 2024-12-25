@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -39,7 +39,7 @@ func (c Diff) ModifyBuilder(
 }
 
 func (c Diff) RunWithQuery(
-	u *env.Local,
+	u *repo_local.Local,
 	qg *query.Group,
 ) (err error) {
 	o := checkout_options.TextFormatterOptions{

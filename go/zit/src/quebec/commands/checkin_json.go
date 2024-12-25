@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type CheckinJson struct{}
@@ -34,10 +34,10 @@ type TomlBookmark struct {
 }
 
 func (c CheckinJson) Run(
-	u *env.Local,
+	u *repo_local.Local,
 	args ...string,
 ) (err error) {
-	dec := json.NewDecoder(u.In())
+	dec := json.NewDecoder(u.GetInFile())
 
 	for {
 		var entry TomlBookmark

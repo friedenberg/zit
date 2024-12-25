@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type PeekZettelIds struct{}
@@ -24,7 +24,7 @@ func init() {
 	)
 }
 
-func (c PeekZettelIds) Run(store *env.Local, args ...string) (err error) {
+func (c PeekZettelIds) Run(store *repo_local.Local, args ...string) (err error) {
 	n := 0
 
 	if len(args) > 0 {

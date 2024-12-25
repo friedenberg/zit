@@ -12,11 +12,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type Checkout struct {
-	*env.Local
+	*repo_local.Local
 	Organize bool
 	checkout_options.Options
 	Open    bool
@@ -104,7 +104,7 @@ func (op Checkout) RunQuery(
 	if op.Utility != "" {
 		eachBlobOp := EachBlob{
 			Utility: op.Utility,
-			Local:     op.Local,
+			Local:   op.Local,
 		}
 
 		if err = eachBlobOp.Run(zsc); err != nil {

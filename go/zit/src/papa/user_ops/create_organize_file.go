@@ -5,12 +5,12 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 // TODO support using query results for organize population
 type CreateOrganizeFile struct {
-	*env.Local
+	*repo_local.Local
 	organize_text.Options
 }
 

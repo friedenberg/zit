@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type Deinit struct {
@@ -33,7 +33,7 @@ func init() {
 	)
 }
 
-func (c Deinit) Run(u *env.Local, args ...string) (err error) {
+func (c Deinit) Run(u *repo_local.Local, args ...string) (err error) {
 	if !c.Force && !c.getPermission(u) {
 		return
 	}
@@ -53,7 +53,7 @@ func (c Deinit) Run(u *env.Local, args ...string) (err error) {
 	return
 }
 
-func (c Deinit) getPermission(u *env.Local) (success bool) {
+func (c Deinit) getPermission(u *repo_local.Local) (success bool) {
 	var err error
 	ui.Err().Printf(
 		"are you sure you want to deinit in %q? (y/*)",

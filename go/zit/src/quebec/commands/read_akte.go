@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type ReadBlob struct{}
@@ -29,8 +29,8 @@ type readBlobEntry struct {
 	Blob string `json:"blob"`
 }
 
-func (c ReadBlob) Run(u *env.Local, args ...string) (err error) {
-	dec := json.NewDecoder(u.In())
+func (c ReadBlob) Run(u *repo_local.Local, args ...string) (err error) {
+	dec := json.NewDecoder(u.GetInFile())
 
 	for {
 		var entry readBlobEntry
@@ -58,7 +58,7 @@ func (c ReadBlob) Run(u *env.Local, args ...string) (err error) {
 	return
 }
 
-func (ReadBlob) readOneBlob(u *env.Local, entry readBlobEntry) (sh *sha.Sha, err error) {
+func (ReadBlob) readOneBlob(u *repo_local.Local, entry readBlobEntry) (sh *sha.Sha, err error) {
 	var aw sha.WriteCloser
 
 	if aw, err = u.GetDirectoryLayout().BlobWriter(); err != nil {

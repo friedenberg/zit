@@ -6,7 +6,8 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type Pull struct{}
@@ -32,8 +33,8 @@ func (c Pull) DefaultGenres() ids.Genre {
 }
 
 func (c Pull) RunWithRemoteAndQuery(
-	local *env.Local,
-	remote env.Env,
+	local *repo_local.Local,
+	remote repo.Repo,
 	qg *query.Group,
 ) {
 	if err := local.PullQueryGroupFromRemote(

@@ -3,7 +3,7 @@ package user_ops
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/editor"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type OpenEditor struct {
@@ -11,7 +11,7 @@ type OpenEditor struct {
 }
 
 func (c OpenEditor) Run(
-	u *env.Local,
+	u *repo_local.Local,
 	args ...string,
 ) (err error) {
 	var e editor.Editor

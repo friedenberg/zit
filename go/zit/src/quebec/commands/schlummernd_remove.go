@@ -5,7 +5,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type DormantRemove struct{}
@@ -21,7 +21,7 @@ func init() {
 	)
 }
 
-func (c DormantRemove) Run(u *env.Local, args ...string) (err error) {
+func (c DormantRemove) Run(u *repo_local.Local, args ...string) (err error) {
 	if err = u.Lock(); err != nil {
 		err = errors.Wrap(err)
 		return

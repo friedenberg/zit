@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type Reindex struct{}
@@ -20,11 +20,11 @@ func init() {
 	)
 }
 
-func (c Reindex) GetEnvInitializeOptions() env.Options {
-	return env.OptionsAllowConfigReadError
+func (c Reindex) GetEnvInitializeOptions() repo_local.Options {
+	return repo_local.OptionsAllowConfigReadError
 }
 
-func (c Reindex) Run(u *env.Local, args ...string) (err error) {
+func (c Reindex) Run(u *repo_local.Local, args ...string) (err error) {
 	if len(args) > 0 {
 		err = errors.Errorf("reindex does not support arguments")
 		return

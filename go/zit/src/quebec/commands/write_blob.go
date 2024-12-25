@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/script_value"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type WriteBlob struct {
@@ -48,7 +48,7 @@ type answer struct {
 	Path string
 }
 
-func (c WriteBlob) Run(u *env.Local, args ...string) {
+func (c WriteBlob) Run(u *repo_local.Local, args ...string) {
 	var failCount atomic.Uint32
 
 	sawStdin := false

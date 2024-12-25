@@ -7,11 +7,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type Clone struct {
-	env.BigBang
+	repo_local.BigBang
 }
 
 func init() {
@@ -19,7 +20,7 @@ func init() {
 		"clone",
 		func(f *flag.FlagSet) CommandWithRemoteAndQuery {
 			c := &Clone{
-				BigBang: env.BigBang{
+				BigBang: repo_local.BigBang{
 					Config:             immutable_config.Default(),
 					ExcludeDefaultType: true,
 				},
@@ -42,8 +43,8 @@ func (c Clone) DefaultGenres() ids.Genre {
 }
 
 func (c Clone) RunWithRemoteAndQuery(
-	local *env.Local,
-	remote env.Env,
+	local *repo_local.Local,
+	remote repo.Repo,
 	qg *query.Group,
 ) {
 	if err := local.Start(c.BigBang); err != nil {

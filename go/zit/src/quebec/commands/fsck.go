@@ -7,7 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type Fsck struct {
@@ -29,7 +29,7 @@ func init() {
 	)
 }
 
-func (c Fsck) Run(u *env.Local, args ...string) {
+func (c Fsck) Run(u *repo_local.Local, args ...string) {
 	p := u.PrinterTransacted()
 
 	if err := u.GetStore().QueryPrimitive(

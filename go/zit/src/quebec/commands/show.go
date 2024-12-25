@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type Show struct {
@@ -51,7 +51,7 @@ func (c Show) DefaultGenres() ids.Genre {
 }
 
 func (c Show) RunWithQuery(
-	u *env.Local,
+	u *repo_local.Local,
 	qg *query.Group,
 ) (err error) {
 	var f interfaces.FuncIter[*sku.Transacted]
@@ -60,7 +60,7 @@ func (c Show) RunWithQuery(
 		c.Format = "text"
 	}
 
-	if f, err = u.MakeFormatFunc(c.Format, u.Out()); err != nil {
+	if f, err = u.MakeFormatFunc(c.Format, u.GetOutFile()); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

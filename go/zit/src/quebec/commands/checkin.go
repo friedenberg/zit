@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -73,7 +73,7 @@ func (c *Checkin) ModifyBuilder(b *query.Builder) {
 }
 
 func (c Checkin) RunWithQuery(
-	u *env.Local,
+	u *repo_local.Local,
 	qg *query.Group,
 ) (err error) {
 	op := user_ops.Checkin{

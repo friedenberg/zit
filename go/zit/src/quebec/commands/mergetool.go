@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type Mergetool struct{}
@@ -37,7 +37,7 @@ func (c Mergetool) DefaultGenres() ids.Genre {
 }
 
 func (c Mergetool) RunWithQuery(
-	u *env.Local,
+	u *repo_local.Local,
 	qg *query.Group,
 ) (err error) {
 	conflicted := sku.MakeSkuTypeSetMutable()
@@ -108,7 +108,7 @@ func (c Mergetool) RunWithQuery(
 					return
 				}
 
-        return
+				return
 			},
 		); err != nil {
 			err = errors.Wrap(err)

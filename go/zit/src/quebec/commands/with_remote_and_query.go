@@ -8,14 +8,15 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
-	"code.linenisgreat.com/zit/go/zit/src/oscar/env_remote"
+	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/oscar/repo_remote"
 )
 
 type CommandWithRemoteAndQuery interface {
 	RunWithRemoteAndQuery(
-		local *env.Local,
-		remote env.Env,
+		local *repo_local.Local,
+		remote repo.Repo,
 		qg *query.Group,
 	)
 }
@@ -26,13 +27,13 @@ type commandWithRemoteAndQuery struct {
 
 	CommandWithRemoteAndQuery
 
-	remote env.Env
+	remote repo.Repo
 	sku.ExternalQueryOptions
 	*query.Group
 }
 
 func (c commandWithRemoteAndQuery) Complete(
-	u *env.Local,
+	u *repo_local.Local,
 	args ...string,
 ) (err error) {
 	var cgg CompletionGenresGetter
@@ -67,7 +68,7 @@ func (c commandWithRemoteAndQuery) Complete(
 }
 
 func (c commandWithRemoteAndQuery) Run(
-	local *env.Local,
+	local *repo_local.Local,
 	args ...string,
 ) {
 	if len(args) < 1 && c.TheirXDGDotenv == "" {
@@ -90,14 +91,14 @@ func (c commandWithRemoteAndQuery) Run(
 		}
 	}
 
-	var remote env.Env
+	var remote repo.Repo
 
 	{
 		var err error
 
 		if c.TheirXDGDotenv != "" {
 			if c.UseSocket {
-				if remote, err = env_remote.MakeRemoteHTTPFromXDGDotenvPath(
+				if remote, err = repo_remote.MakeRemoteHTTPFromXDGDotenvPath(
 					local.Context,
 					local.GetConfig(),
 					c.TheirXDGDotenv,
@@ -106,7 +107,7 @@ func (c commandWithRemoteAndQuery) Run(
 					return
 				}
 			} else {
-				if remote, err = env.MakeLocalFromConfigAndXDGDotenvPath(
+				if remote, err = repo_local.MakeLocalFromConfigAndXDGDotenvPath(
 					local.Context,
 					local.GetConfig(),
 					c.TheirXDGDotenv,

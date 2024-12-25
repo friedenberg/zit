@@ -18,12 +18,12 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/object_metadata"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 // TODO move to store_fs
 type Diff struct {
-	*env.Local
+	*repo_local.Local
 
 	object_metadata.TextFormatterFamily
 }
@@ -160,8 +160,8 @@ func (op Diff) Run(
 	)
 
 	cmd.ExtraFiles = []*os.File{rLeft, rRight}
-	cmd.Stdout = op.Out()
-	cmd.Stderr = op.Err()
+	cmd.Stdout = op.GetOutFile()
+	cmd.Stderr = op.GetErrFile()
 
 	wg.Do(
 		func() (err error) {

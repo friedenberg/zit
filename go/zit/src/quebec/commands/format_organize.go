@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -33,7 +33,7 @@ func init() {
 	)
 }
 
-func (c *FormatOrganize) Run(u *env.Local, args ...string) (err error) {
+func (c *FormatOrganize) Run(u *repo_local.Local, args ...string) (err error) {
 	c.Flags.Config = u.GetConfig()
 
 	if len(args) != 1 {

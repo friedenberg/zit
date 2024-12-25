@@ -8,19 +8,19 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type CommandWithQuery interface {
 	RunWithQuery(
-		store *env.Local,
+		store *repo_local.Local,
 		ids *query.Group,
 	) error
 }
 
 type CommandWithQuery2 interface {
 	RunWithQuery(
-		store *env.Local,
+		store *repo_local.Local,
 		ids *query.Group,
 	) Result
 }
@@ -36,7 +36,7 @@ type CompletionGenresGetter interface {
 }
 
 func (c commandWithQuery) Complete(
-	u *env.Local,
+	u *repo_local.Local,
 	args ...string,
 ) (err error) {
 	var cgg CompletionGenresGetter
@@ -70,7 +70,7 @@ func (c commandWithQuery) Complete(
 	return
 }
 
-func (c commandWithQuery) Run(u *env.Local, args ...string) (err error) {
+func (c commandWithQuery) Run(u *repo_local.Local, args ...string) (err error) {
 	if c.Group, err = u.MakeQueryGroup(
 		c.CommandWithQuery,
 		c.RepoId,

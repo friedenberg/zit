@@ -16,7 +16,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -67,7 +67,7 @@ func (c *Organize) CompletionGenres() ids.Genre {
 }
 
 func (c *Organize) RunWithQuery(
-	u *env.Local,
+	u *repo_local.Local,
 	qg *query.Group,
 ) (err error) {
 	u.ApplyToOrganizeOptions(&c.Options)
@@ -218,7 +218,7 @@ func (c *Organize) RunWithQuery(
 }
 
 func (c Organize) readFromVim(
-	u *env.Local,
+	u *repo_local.Local,
 	f string,
 	results *organize_text.Text,
 	qg *query.Group,

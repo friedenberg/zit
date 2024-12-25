@@ -11,7 +11,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 // Switch to External store
@@ -48,7 +48,7 @@ func init() {
 	)
 }
 
-func (c Import) Run(local *env.Local, args ...string) {
+func (c Import) Run(local *repo_local.Local, args ...string) {
 	if c.InventoryList == "" {
 		local.Context.Cancel(errors.BadRequestf("empty inventory list"))
 		return

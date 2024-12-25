@@ -4,19 +4,19 @@ import (
 	"flag"
 	"fmt"
 
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type Command interface {
-	Run(*env.Local, ...string) error
+	Run(*repo_local.Local, ...string) error
 }
 
 type CommandWithContext interface {
-	Run(*env.Local, ...string)
+	Run(*repo_local.Local, ...string)
 }
 
 type WithCompletion interface {
-	Complete(u *env.Local, args ...string) (err error)
+	Complete(u *repo_local.Local, args ...string) (err error)
 }
 
 type command struct {

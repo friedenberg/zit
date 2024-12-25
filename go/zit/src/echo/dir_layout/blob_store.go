@@ -207,9 +207,9 @@ func CopyBlobIfNecessary(
 	src BlobStore,
 	blobShaGetter interfaces.ShaGetter,
 ) (n int64, err error) {
-  if src == nil {
-    return
-  }
+	if src == nil {
+		return
+	}
 
 	blobSha := blobShaGetter.GetShaLike()
 
@@ -230,9 +230,9 @@ func CopyBlob(
 	src BlobStore,
 	blobSha interfaces.Sha,
 ) (n int64, err error) {
-  if src == nil {
-    return
-  }
+	if src == nil {
+		return
+	}
 
 	var rc sha.ReadCloser
 

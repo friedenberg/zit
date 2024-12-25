@@ -1,7 +1,6 @@
 package store
 
 import (
-	"flag"
 	"sync"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -61,7 +60,6 @@ type UIDelegate struct {
 }
 
 func (c *Store) Initialize(
-	flags *flag.FlagSet,
 	k *config.Compiled,
 	st dir_layout.DirLayout,
 	pmf object_inventory_format.Format,

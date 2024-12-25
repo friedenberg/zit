@@ -5,11 +5,11 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type Init struct {
-	env.BigBang
+	repo_local.BigBang
 }
 
 func init() {
@@ -17,7 +17,7 @@ func init() {
 		"init",
 		func(f *flag.FlagSet) Command {
 			c := &Init{
-				BigBang: env.BigBang{
+				BigBang: repo_local.BigBang{
 					Config: immutable_config.Default(),
 				},
 			}
@@ -29,7 +29,7 @@ func init() {
 	)
 }
 
-func (c Init) Run(u *env.Local, args ...string) (err error) {
+func (c Init) Run(u *repo_local.Local, args ...string) (err error) {
 	if err = u.Start(c.BigBang); err != nil {
 		err = errors.Wrap(err)
 		return

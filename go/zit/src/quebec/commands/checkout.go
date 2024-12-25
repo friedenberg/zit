@@ -9,7 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -52,11 +52,11 @@ func (c Checkout) ModifyBuilder(b *query.Builder) {
 }
 
 func (c Checkout) RunWithQuery(
-	u *env.Local,
+	u *repo_local.Local,
 	qg *query.Group,
 ) (err error) {
 	opCheckout := user_ops.Checkout{
-		Local:      u,
+		Local:    u,
 		Organize: c.Organize,
 		Options:  c.CheckoutOptions,
 	}

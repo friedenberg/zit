@@ -10,7 +10,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/mike/store"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type Revert struct {
@@ -51,7 +51,7 @@ func (c Revert) DefaultGenres() ids.Genre {
 }
 
 func (c Revert) RunWithQuery(
-	u *env.Local,
+	u *repo_local.Local,
 	ms *query.Group,
 ) (err error) {
 	f := func(rt store.RevertId) (err error) {
@@ -86,7 +86,7 @@ func (c Revert) RunWithQuery(
 }
 
 func (c Revert) runRevertFromQuery(
-	u *env.Local,
+	u *repo_local.Local,
 	eq *query.Group,
 	f interfaces.FuncIter[store.RevertId],
 ) (err error) {
@@ -107,7 +107,7 @@ func (c Revert) runRevertFromQuery(
 }
 
 func (c Revert) runRevertFromLast(
-	u *env.Local,
+	u *repo_local.Local,
 	f interfaces.FuncIter[store.RevertId],
 ) (err error) {
 	s := u.GetStore()

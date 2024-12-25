@@ -8,7 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 // TODO switch to returning result
@@ -63,15 +63,15 @@ func Run(
 
 	cmdArgs := cmd.Args()
 
-	var u *env.Local
+	var u *repo_local.Local
 
-	options := env.OptionsEmpty
+	options := repo_local.OptionsEmpty
 
-	if og, ok := cmd.Command.(env.OptionsGetter); ok {
+	if og, ok := cmd.Command.(repo_local.OptionsGetter); ok {
 		options = og.GetEnvironmentInitializeOptions()
 	}
 
-	if u, err = env.MakeLocal(
+	if u, err = repo_local.MakeLocal(
 		ctx,
 		cmd.FlagSet,
 		cliConfig,

@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/organize_text"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -70,7 +70,7 @@ func (c Clean) DefaultGenres() ids.Genre {
 }
 
 func (c Clean) shouldClean(
-	u *env.Local,
+	u *repo_local.Local,
 	co sku.SkuType,
 	eqwk *query.Group,
 ) bool {
@@ -115,7 +115,7 @@ func (c Clean) ModifyBuilder(b *query.Builder) {
 }
 
 func (c Clean) RunWithQuery(
-	u *env.Local,
+	u *repo_local.Local,
 	qg *query.Group,
 ) (err error) {
 	if c.organize {
@@ -159,7 +159,7 @@ func (c Clean) RunWithQuery(
 	return
 }
 
-func (c Clean) runOrganize(u *env.Local, qg *query.Group) (err error) {
+func (c Clean) runOrganize(u *repo_local.Local, qg *query.Group) (err error) {
 	opOrganize := user_ops.Organize{
 		Local: u,
 		Metadata: organize_text.Metadata{

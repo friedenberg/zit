@@ -12,7 +12,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type CheckinBlob struct {
@@ -42,7 +42,7 @@ func init() {
 	)
 }
 
-func (c CheckinBlob) Run(u *env.Local, args ...string) (err error) {
+func (c CheckinBlob) Run(u *repo_local.Local, args ...string) (err error) {
 	if len(args)%2 != 0 {
 		err = errors.Errorf(
 			"arguments must come in pairs of zettel id and blob path",

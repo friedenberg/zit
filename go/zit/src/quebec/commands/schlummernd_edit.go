@@ -13,7 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
-	"code.linenisgreat.com/zit/go/zit/src/november/env"
+	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 	"code.linenisgreat.com/zit/go/zit/src/papa/user_ops"
 )
 
@@ -30,7 +30,7 @@ func init() {
 	)
 }
 
-func (c DormantEdit) Run(u *env.Local, args ...string) (err error) {
+func (c DormantEdit) Run(u *repo_local.Local, args ...string) (err error) {
 	if len(args) > 0 {
 		ui.Err().Print("Command edit-konfig ignores passed in arguments.")
 	}
@@ -63,7 +63,7 @@ func (c DormantEdit) Run(u *env.Local, args ...string) (err error) {
 }
 
 func (c DormantEdit) editInVim(
-	u *env.Local,
+	u *repo_local.Local,
 ) (sh interfaces.Sha, err error) {
 	var p string
 
@@ -92,7 +92,7 @@ func (c DormantEdit) editInVim(
 }
 
 func (c DormantEdit) makeTempKonfigFile(
-	u *env.Local,
+	u *repo_local.Local,
 ) (p string, err error) {
 	var k *sku.Transacted
 
@@ -123,7 +123,7 @@ func (c DormantEdit) makeTempKonfigFile(
 }
 
 func (c DormantEdit) readTempKonfigFile(
-	u *env.Local,
+	u *repo_local.Local,
 	p string,
 ) (sh interfaces.Sha, err error) {
 	var f *os.File
