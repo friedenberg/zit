@@ -15,7 +15,7 @@ type Info struct {
 }
 
 func init() {
-	registerCommandWithoutRepo(
+	registerCommand(
 		"info",
 		func(f *flag.FlagSet) CommandWithEnv {
 			c := &Info{

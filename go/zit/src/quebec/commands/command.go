@@ -16,6 +16,10 @@ type Dependencies struct {
 	config_mutable_cli.Config
 }
 
+type CommandWithFlags interface {
+	SetFlagSet(*flag.FlagSet)
+}
+
 type CommandWithDependencies interface {
 	GetFlagSet() *flag.FlagSet
 	RunWithDependencies(Dependencies)
@@ -74,13 +78,6 @@ func registerCommand(
 	}
 }
 
-func registerCommandWithoutRepo(
-	n string,
-	makeFunc any,
-) {
-	registerCommand(n, makeFunc)
-}
-
 func registerCommandWithQuery(
 	n string,
 	makeFunc func(*flag.FlagSet) CommandWithQuery,
@@ -103,42 +100,16 @@ func registerCommandWithQuery(
 
 func registerCommandWithRemoteAndQuery(
 	n string,
-	makeFunc func(*flag.FlagSet) CommandWithRemoteAndQuery,
+	cwraq CommandWithRemoteAndQuery,
 ) {
 	registerCommand(
 		n,
 		func(f *flag.FlagSet) CommandWithRepo {
-			c := &commandWithRemoteAndQuery{}
+			c := &commandWithRemoteAndQuery{
+				CommandWithRemoteAndQuery: cwraq,
+			}
 
-			f.Var(&c.RepoId, "kasten", "none or Browser")
-			f.BoolVar(&c.ExcludeUntracked, "exclude-untracked", false, "")
-			f.BoolVar(&c.ExcludeRecognized, "exclude-recognized", false, "")
-			f.StringVar(&c.TheirXDGDotenv, "xdg-dotenv", "", "")
-			f.BoolVar(&c.UseSocket, "use-socket", false, "")
-
-			c.CommandWithRemoteAndQuery = makeFunc(f)
-
-			return c
-		},
-	)
-}
-
-func registerCommandWithRemoteAndQueryAndWithoutEnvironment(
-	n string,
-	makeFunc func(*flag.FlagSet) CommandWithRemoteAndQuery,
-) {
-	registerCommand(
-		n,
-		func(f *flag.FlagSet) CommandWithRepo {
-			c := &commandWithRemoteAndQuery{}
-
-			f.Var(&c.RepoId, "kasten", "none or Browser")
-			f.BoolVar(&c.ExcludeUntracked, "exclude-untracked", false, "")
-			f.BoolVar(&c.ExcludeRecognized, "exclude-recognized", false, "")
-			f.StringVar(&c.TheirXDGDotenv, "xdg-dotenv", "", "")
-			f.BoolVar(&c.UseSocket, "use-socket", false, "")
-
-			c.CommandWithRemoteAndQuery = makeFunc(f)
+			c.SetFlagSet(f)
 
 			return c
 		},

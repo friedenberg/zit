@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"flag"
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -30,6 +31,18 @@ type commandWithRemoteAndQuery struct {
 	remote repo.Repo
 	sku.ExternalQueryOptions
 	*query.Group
+}
+
+func (cmd *commandWithRemoteAndQuery) SetFlagSet(f *flag.FlagSet) {
+	f.Var(&cmd.RepoId, "kasten", "none or Browser")
+	f.BoolVar(&cmd.ExcludeUntracked, "exclude-untracked", false, "")
+	f.BoolVar(&cmd.ExcludeRecognized, "exclude-recognized", false, "")
+	f.StringVar(&cmd.TheirXDGDotenv, "xdg-dotenv", "", "")
+	f.BoolVar(&cmd.UseSocket, "use-socket", false, "")
+
+	if cwf, ok := cmd.CommandWithRemoteAndQuery.(CommandWithFlags); ok {
+		cwf.SetFlagSet(f)
+	}
 }
 
 func (c commandWithRemoteAndQuery) CompleteWithRepo(

@@ -16,21 +16,19 @@ type Clone struct {
 }
 
 func init() {
-	registerCommandWithRemoteAndQueryAndWithoutEnvironment(
+	registerCommandWithRemoteAndQuery(
 		"clone",
-		func(f *flag.FlagSet) CommandWithRemoteAndQuery {
-			c := &Clone{
-				BigBang: repo_local.BigBang{
-					Config:             immutable_config.Default(),
-					ExcludeDefaultType: true,
-				},
-			}
-
-			c.BigBang.AddToFlagSet(f)
-
-			return c
+		&Clone{
+			BigBang: repo_local.BigBang{
+				Config:             immutable_config.Default(),
+				ExcludeDefaultType: true,
+			},
 		},
 	)
+}
+
+func (cmd *Clone) SetFlagSet(f *flag.FlagSet) {
+	cmd.BigBang.AddToFlagSet(f)
 }
 
 func (c Clone) DefaultSigil() ids.Sigil {

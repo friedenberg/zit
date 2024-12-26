@@ -9,7 +9,7 @@ import (
 type Test struct{}
 
 func init() {
-	registerCommandWithoutRepo(
+	registerCommand(
 		"test",
 		func(f *flag.FlagSet) CommandWithRepo {
 			c := &Test{}

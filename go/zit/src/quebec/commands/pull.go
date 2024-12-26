@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"flag"
-
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -15,11 +13,7 @@ type Pull struct{}
 func init() {
 	registerCommandWithRemoteAndQuery(
 		"pull",
-		func(f *flag.FlagSet) CommandWithRemoteAndQuery {
-			c := &Pull{}
-
-			return c
-		},
+		&Pull{},
 	)
 }
 
