@@ -29,38 +29,42 @@ func init() {
 	)
 }
 
-func (c EditConfig) Run(u *repo_local.Repo, args ...string) (err error) {
+func (c EditConfig) RunWithRepo(u *repo_local.Repo, args ...string) {
 	if len(args) > 0 {
 		ui.Err().Print("Command edit-konfig ignores passed in arguments.")
 	}
 
 	var sk *sku.Transacted
 
-	if sk, err = c.editInVim(u); err != nil {
-		err = errors.Wrap(err)
+	{
+		var err error
+
+		if sk, err = c.editInVim(u); err != nil {
+			u.CancelWithError(err)
+			return
+		}
+	}
+
+	if err := u.Reset(); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 
-	if err = u.Reset(); err != nil {
-		err = errors.Wrap(err)
+	if err := u.Lock(); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 
-	if err = u.Lock(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = u.GetStore().CreateOrUpdate(
+	if err := u.GetStore().CreateOrUpdate(
 		sk,
 		object_mode.ModeLatest,
 	); err != nil {
-		err = errors.Wrap(err)
+		u.CancelWithError(err)
 		return
 	}
 
-	if err = u.Unlock(); err != nil {
-		err = errors.Wrap(err)
+	if err := u.Unlock(); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 

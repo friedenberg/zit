@@ -3,7 +3,6 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
@@ -22,22 +21,26 @@ func init() {
 	)
 }
 
-func (c FindMissing) Run(
+func (c FindMissing) RunWithRepo(
 	u *repo_local.Repo,
 	args ...string,
-) (err error) {
+) {
 	var lookupStored map[sha.Bytes][]string
 
-	if lookupStored, err = u.GetStore().MakeBlobShaBytesMap(); err != nil {
-		err = errors.Wrap(err)
-		return
+	{
+		var err error
+
+		if lookupStored, err = u.GetStore().MakeBlobShaBytesMap(); err != nil {
+			u.CancelWithError(err)
+			return
+		}
 	}
 
 	for _, shSt := range args {
 		var sh sha.Sha
 
-		if err = sh.Set(shSt); err != nil {
-			err = errors.Wrap(err)
+		if err := sh.Set(shSt); err != nil {
+			u.CancelWithError(err)
 			return
 		}
 

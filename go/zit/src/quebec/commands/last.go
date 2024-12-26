@@ -46,7 +46,7 @@ func (c Last) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c Last) Run(u *repo_local.Repo, args ...string) (err error) {
+func (c Last) RunWithRepo(u *repo_local.Repo, args ...string) {
 	if len(args) != 0 {
 		ui.Err().Print("ignoring arguments")
 	}
@@ -54,7 +54,7 @@ func (c Last) Run(u *repo_local.Repo, args ...string) (err error) {
 	if (c.Edit || c.Organize) && c.Format != "" {
 		ui.Err().Print("ignoring format")
 	} else if c.Edit && c.Organize {
-		err = errors.Errorf("cannot organize and edit at the same time")
+		u.CancelWithError(errors.Errorf("cannot organize and edit at the same time"))
 		return
 	}
 
@@ -65,16 +65,20 @@ func (c Last) Run(u *repo_local.Repo, args ...string) (err error) {
 	if c.Organize || c.Edit {
 		f = skus.Add
 	} else {
-		if f, err = u.MakeFormatFunc(c.Format, u.GetOutFile()); err != nil {
-			err = errors.Wrap(err)
-			return
+		{
+			var err error
+
+			if f, err = u.MakeFormatFunc(c.Format, u.GetOutFile()); err != nil {
+				u.CancelWithError(err)
+				return
+			}
 		}
 	}
 
 	f = quiter.MakeSyncSerializer(f)
 
-	if err = c.runWithInventoryList(u, f); err != nil {
-		err = errors.Wrap(err)
+	if err := c.runWithInventoryList(u, f); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 
@@ -88,13 +92,17 @@ func (c Last) Run(u *repo_local.Repo, args ...string) (err error) {
 
 		var results organize_text.OrganizeResults
 
-		if results, err = opOrganize.RunWithTransacted(nil, skus); err != nil {
-			err = errors.Wrap(err)
-			return
+		{
+			var err error
+
+			if results, err = opOrganize.RunWithTransacted(nil, skus); err != nil {
+				u.CancelWithError(err)
+				return
+			}
 		}
 
-		if _, err = u.LockAndCommitOrganizeResults(results); err != nil {
-			err = errors.Wrap(err)
+		if _, err := u.LockAndCommitOrganizeResults(results); err != nil {
+			u.CancelWithError(err)
 			return
 		}
 	} else if c.Edit {
@@ -106,8 +114,8 @@ func (c Last) Run(u *repo_local.Repo, args ...string) (err error) {
 			Edit: true,
 		}
 
-		if _, err = opCheckout.Run(skus); err != nil {
-			err = errors.Wrap(err)
+		if _, err := opCheckout.Run(skus); err != nil {
+			u.CancelWithError(err)
 			return
 		}
 	}

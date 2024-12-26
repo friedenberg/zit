@@ -15,7 +15,7 @@ type Serve struct {
 func init() {
 	registerCommand(
 		"serve",
-		func(f *flag.FlagSet) CommandWithContext {
+		func(f *flag.FlagSet) CommandWithRepo {
 			c := &Serve{}
 
 			return c
@@ -23,7 +23,7 @@ func init() {
 	)
 }
 
-func (c Serve) Run(u *repo_local.Repo, args ...string) {
+func (c Serve) RunWithRepo(u *repo_local.Repo, args ...string) {
 	var network, address string
 
 	switch len(args) {

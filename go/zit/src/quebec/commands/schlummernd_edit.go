@@ -30,32 +30,36 @@ func init() {
 	)
 }
 
-func (c DormantEdit) Run(u *repo_local.Repo, args ...string) (err error) {
+func (c DormantEdit) RunWithRepo(u *repo_local.Repo, args ...string) {
 	if len(args) > 0 {
 		ui.Err().Print("Command edit-konfig ignores passed in arguments.")
 	}
 
 	var sh interfaces.Sha
 
-	if sh, err = c.editInVim(u); err != nil {
-		err = errors.Wrap(err)
+	{
+		var err error
+
+		if sh, err = c.editInVim(u); err != nil {
+			u.CancelWithError(err)
+			return
+		}
+	}
+
+	if err := u.Reset(); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 
-	if err = u.Reset(); err != nil {
-		err = errors.Wrap(err)
+	if err := u.Lock(); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 
-	if err = u.Lock(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	defer u.Must(u.Unlock)
 
-	defer errors.Deferred(&err, u.Unlock)
-
-	if _, err = u.GetStore().UpdateKonfig(sh); err != nil {
-		err = errors.Wrap(err)
+	if _, err := u.GetStore().UpdateKonfig(sh); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 

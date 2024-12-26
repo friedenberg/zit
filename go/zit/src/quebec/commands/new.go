@@ -99,9 +99,9 @@ func (c New) ValidateFlagsAndArgs(
 	return
 }
 
-func (c *New) Run(u *repo_local.Repo, args ...string) (err error) {
-	if err = c.ValidateFlagsAndArgs(u, args...); err != nil {
-		err = errors.Wrap(err)
+func (c *New) RunWithRepo(u *repo_local.Repo, args ...string) {
+	if err := c.ValidateFlagsAndArgs(u, args...); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 
@@ -121,9 +121,13 @@ func (c *New) Run(u *repo_local.Repo, args ...string) (err error) {
 			Repo: u,
 		}
 
-		if zts, err = emptyOp.RunMany(c.Proto, c.Count); err != nil {
-			err = errors.Wrap(err)
-			return
+		{
+			var err error
+
+			if zts, err = emptyOp.RunMany(c.Proto, c.Count); err != nil {
+				u.CancelWithError(err)
+				return
+			}
 		}
 	} else if c.Shas {
 		opCreateFromShas := user_ops.CreateFromShas{
@@ -131,9 +135,13 @@ func (c *New) Run(u *repo_local.Repo, args ...string) (err error) {
 			Proto: c.Proto,
 		}
 
-		if zts, err = opCreateFromShas.Run(args...); err != nil {
-			err = errors.Wrap(err)
-			return
+		{
+			var err error
+
+			if zts, err = opCreateFromShas.Run(args...); err != nil {
+				u.CancelWithError(err)
+				return
+			}
 		}
 	} else {
 		opCreateFromPath := user_ops.CreateFromPaths{
@@ -144,9 +152,13 @@ func (c *New) Run(u *repo_local.Repo, args ...string) (err error) {
 			Proto:      c.Proto,
 		}
 
-		if zts, err = opCreateFromPath.Run(args...); err != nil {
-			err = errors.Wrap(err)
-			return
+		{
+			var err error
+
+			if zts, err = opCreateFromPath.Run(args...); err != nil {
+				u.CancelWithError(err)
+				return
+			}
 		}
 	}
 
@@ -163,8 +175,8 @@ func (c *New) Run(u *repo_local.Repo, args ...string) (err error) {
 			Edit: true,
 		}
 
-		if _, err = opCheckout.Run(zts); err != nil {
-			err = errors.Wrap(err)
+		if _, err := opCheckout.Run(zts); err != nil {
+			u.CancelWithError(err)
 			return
 		}
 	}
@@ -174,23 +186,27 @@ func (c *New) Run(u *repo_local.Repo, args ...string) (err error) {
 			Repo: u,
 		}
 
-		if err = opOrganize.Metadata.SetFromObjectMetadata(
+		if err := opOrganize.Metadata.SetFromObjectMetadata(
 			&c.Metadata,
 			ids.RepoId{},
 		); err != nil {
-			err = errors.Wrap(err)
+			u.CancelWithError(err)
 			return
 		}
 
 		var results organize_text.OrganizeResults
 
-		if results, err = opOrganize.RunWithTransacted(nil, zts); err != nil {
-			err = errors.Wrap(err)
-			return
+		{
+			var err error
+
+			if results, err = opOrganize.RunWithTransacted(nil, zts); err != nil {
+				u.CancelWithError(err)
+				return
+			}
 		}
 
-		if _, err = u.LockAndCommitOrganizeResults(results); err != nil {
-			err = errors.Wrap(err)
+		if _, err := u.LockAndCommitOrganizeResults(results); err != nil {
+			u.CancelWithError(err)
 			return
 		}
 	}

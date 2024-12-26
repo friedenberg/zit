@@ -17,7 +17,7 @@ type Fsck struct {
 func init() {
 	registerCommand(
 		"fsck",
-		func(f *flag.FlagSet) CommandWithContext {
+		func(f *flag.FlagSet) CommandWithRepo {
 			c := &Fsck{
 				Genres: ids.MakeGenre(genres.Tag, genres.Type, genres.Zettel),
 			}
@@ -29,7 +29,7 @@ func init() {
 	)
 }
 
-func (c Fsck) Run(u *repo_local.Repo, args ...string) {
+func (c Fsck) RunWithRepo(u *repo_local.Repo, args ...string) {
 	p := u.PrinterTransacted()
 
 	if err := u.GetStore().QueryPrimitive(

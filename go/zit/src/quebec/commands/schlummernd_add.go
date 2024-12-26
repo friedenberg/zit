@@ -3,7 +3,6 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/catgut"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
@@ -21,22 +20,20 @@ func init() {
 	)
 }
 
-func (c DormantAdd) Run(u *repo_local.Repo, args ...string) (err error) {
-	if err = u.Lock(); err != nil {
-		err = errors.Wrap(err)
+func (c DormantAdd) RunWithRepo(u *repo_local.Repo, args ...string) {
+	if err := u.Lock(); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 
 	for _, v := range args {
 		cs := catgut.MakeFromString(v)
 
-		if err = u.GetDormantIndex().AddDormantTag(cs); err != nil {
-			err = errors.Wrap(err)
+		if err := u.GetDormantIndex().AddDormantTag(cs); err != nil {
+			u.CancelWithError(err)
 			return
 		}
 	}
 
-	defer errors.Deferred(&err, u.Unlock)
-
-	return
+  u.Must(u.Unlock)
 }

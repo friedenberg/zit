@@ -24,29 +24,29 @@ func (c Reindex) GetEnvInitializeOptions() repo_local.Options {
 	return repo_local.OptionsAllowConfigReadError
 }
 
-func (c Reindex) Run(u *repo_local.Repo, args ...string) (err error) {
+func (c Reindex) RunWithRepo(u *repo_local.Repo, args ...string) {
 	if len(args) > 0 {
-		err = errors.Errorf("reindex does not support arguments")
+		u.CancelWithError(errors.Errorf("reindex does not support arguments"))
 		return
 	}
 
-	if err = u.Lock(); err != nil {
-		err = errors.Wrap(err)
+	if err := u.Lock(); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 
-	if err = u.GetConfig().Reset(); err != nil {
-		err = errors.Wrap(err)
+	if err := u.GetConfig().Reset(); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 
-	if err = u.GetStore().Reindex(); err != nil {
-		err = errors.Wrap(err)
+	if err := u.GetStore().Reindex(); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 
-	if err = u.Unlock(); err != nil {
-		err = errors.Wrap(err)
+	if err := u.Unlock(); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 

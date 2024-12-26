@@ -33,21 +33,21 @@ type TomlBookmark struct {
 	Url      string
 }
 
-func (c CheckinJson) Run(
+func (c CheckinJson) RunWithRepo(
 	u *repo_local.Repo,
 	args ...string,
-) (err error) {
+) {
 	dec := json.NewDecoder(u.GetInFile())
 
 	for {
 		var entry TomlBookmark
 
-		if err = dec.Decode(&entry); err != nil {
+		if err := dec.Decode(&entry); err != nil {
 			if errors.IsEOF(err) {
 				err = nil
 				break
 			} else {
-				err = errors.Wrap(err)
+				u.CancelWithError(err)
 				return
 			}
 		}

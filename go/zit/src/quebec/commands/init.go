@@ -3,7 +3,6 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
@@ -29,9 +28,9 @@ func init() {
 	)
 }
 
-func (c Init) Run(u *repo_local.Repo, args ...string) (err error) {
-	if err = u.Start(c.BigBang); err != nil {
-		err = errors.Wrap(err)
+func (c Init) RunWithRepo(u *repo_local.Repo, args ...string) {
+	if err := u.Start(c.BigBang); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 

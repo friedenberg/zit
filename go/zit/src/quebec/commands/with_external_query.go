@@ -3,7 +3,6 @@ package commands
 import (
 	"os"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
@@ -18,13 +17,6 @@ type CommandWithQuery interface {
 	) error
 }
 
-type CommandWithQuery2 interface {
-	RunWithQuery(
-		store *repo_local.Repo,
-		ids *query.Group,
-	) Result
-}
-
 type commandWithQuery struct {
 	CommandWithQuery
 	sku.ExternalQueryOptions
@@ -35,10 +27,10 @@ type CompletionGenresGetter interface {
 	CompletionGenres() ids.Genre
 }
 
-func (c commandWithQuery) Complete(
+func (c commandWithQuery) CompleteWithRepo(
 	u *repo_local.Repo,
 	args ...string,
-) (err error) {
+) {
 	var cgg CompletionGenresGetter
 	ok := false
 
@@ -47,46 +39,52 @@ func (c commandWithQuery) Complete(
 	}
 
 	w := sku_fmt.MakeWriterComplete(os.Stdout)
-	defer errors.DeferredCloser(&err, w)
+	defer u.Context.Closer(w)
 
 	b := u.MakeQueryBuilderExcludingHidden(cgg.CompletionGenres())
 
-	if c.Group, err = b.BuildQueryGroupWithRepoId(
-		c.RepoId,
-		c.ExternalQueryOptions,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	{
+		var err error
+
+		if c.Group, err = b.BuildQueryGroupWithRepoId(
+			c.RepoId,
+			c.ExternalQueryOptions,
+		); err != nil {
+			u.Context.CancelWithError(err)
+			return
+		}
 	}
 
-	if err = u.GetStore().QueryTransacted(
+	if err := u.GetStore().QueryTransacted(
 		c.Group,
 		w.WriteOneTransacted,
 	); err != nil {
-		err = errors.Wrap(err)
+		u.Context.CancelWithError(err)
 		return
 	}
-
-	return
 }
 
-func (c commandWithQuery) Run(u *repo_local.Repo, args ...string) (err error) {
-	if c.Group, err = u.MakeQueryGroup(
-		c.CommandWithQuery,
-		c.RepoId,
-		c.ExternalQueryOptions,
-		args...,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+func (c commandWithQuery) RunWithRepo(
+	u *repo_local.Repo,
+	args ...string,
+) {
+	{
+		var err error
+		if c.Group, err = u.MakeQueryGroup(
+			c.CommandWithQuery,
+			c.RepoId,
+			c.ExternalQueryOptions,
+			args...,
+		); err != nil {
+			u.Context.CancelWithError(err)
+			return
+		}
 	}
 
 	defer u.PrintMatchedDormantIfNecessary()
 
-	if err = c.RunWithQuery(u, c.Group); err != nil {
-		err = errors.Wrap(err)
+	if err := c.RunWithQuery(u, c.Group); err != nil {
+		u.Context.CancelWithError(err)
 		return
 	}
-
-	return
 }

@@ -32,7 +32,7 @@ type commandWithRemoteAndQuery struct {
 	*query.Group
 }
 
-func (c commandWithRemoteAndQuery) Complete(
+func (c commandWithRemoteAndQuery) CompleteWithRepo(
 	u *repo_local.Repo,
 	args ...string,
 ) (err error) {
@@ -67,7 +67,7 @@ func (c commandWithRemoteAndQuery) Complete(
 	return
 }
 
-func (c commandWithRemoteAndQuery) Run(
+func (c commandWithRemoteAndQuery) RunWithRepo(
 	local *repo_local.Repo,
 	args ...string,
 ) {

@@ -42,11 +42,11 @@ func init() {
 	)
 }
 
-func (c CheckinBlob) Run(u *repo_local.Repo, args ...string) (err error) {
+func (c CheckinBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 	if len(args)%2 != 0 {
-		err = errors.Errorf(
+		u.CancelWithError(errors.Errorf(
 			"arguments must come in pairs of zettel id and blob path",
-		)
+		))
 		return
 	}
 
@@ -62,9 +62,13 @@ func (c CheckinBlob) Run(u *repo_local.Repo, args ...string) (err error) {
 		hs := args[i*2]
 		ap := args[(i*2)+1]
 
-		if p.ZettelId, err = ids.MakeZettelId(hs); err != nil {
-			err = errors.Wrap(err)
-			return
+		{
+			var err error
+
+			if p.ZettelId, err = ids.MakeZettelId(hs); err != nil {
+				u.CancelWithError(err)
+				return
+			}
 		}
 
 		p.path = ap
@@ -75,20 +79,28 @@ func (c CheckinBlob) Run(u *repo_local.Repo, args ...string) (err error) {
 
 	// iterate through pairs and read current zettel
 	for i, p := range pairs {
-		if zettels[i], err = u.GetStore().ReadTransactedFromObjectId(
-			p.ZettelId,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
+		{
+			var err error
+
+			if zettels[i], err = u.GetStore().ReadTransactedFromObjectId(
+				p.ZettelId,
+			); err != nil {
+				u.CancelWithError(err)
+				return
+			}
 		}
 	}
 
 	for i, p := range pairs {
 		var ow sha.WriteCloser
 
-		if ow, err = u.GetRepoLayout().BlobWriter(); err != nil {
-			err = errors.Wrap(err)
-			return
+		{
+			var err error
+
+			if ow, err = u.GetRepoLayout().BlobWriter(); err != nil {
+				u.CancelWithError(err)
+				return
+			}
 		}
 
 		var as sha.Sha
@@ -99,28 +111,36 @@ func (c CheckinBlob) Run(u *repo_local.Repo, args ...string) (err error) {
 		case files.Exists(p.path):
 			var f *os.File
 
-			if f, err = files.Open(p.path); err != nil {
-				err = errors.Wrap(err)
+			{
+				var err error
+
+				if f, err = files.Open(p.path); err != nil {
+					u.CancelWithError(err)
+					return
+				}
+			}
+
+			defer u.Closer(f)
+
+			if _, err := io.Copy(ow, f); err != nil {
+				u.CancelWithError(err)
 				return
 			}
 
-			defer errors.DeferredCloser(&err, f)
-
-			if _, err = io.Copy(ow, f); err != nil {
-				err = errors.Wrap(err)
+			if err := ow.Close(); err != nil {
+				u.CancelWithError(err)
 				return
 			}
 
-			if err = ow.Close(); err != nil {
-				err = errors.Wrap(err)
-				return
-			}
+			{
+				var err error
 
-			if zettels[i], err = u.GetStore().ReadTransactedFromObjectId(
-				p.ZettelId,
-			); err != nil {
-				err = errors.Wrap(err)
-				return
+				if zettels[i], err = u.GetStore().ReadTransactedFromObjectId(
+					p.ZettelId,
+				); err != nil {
+					u.CancelWithError(err)
+					return
+				}
 			}
 
 			zettels[i].SetBlobSha(ow.GetShaLike())
@@ -129,7 +149,7 @@ func (c CheckinBlob) Run(u *repo_local.Repo, args ...string) (err error) {
 			zettels[i].SetBlobSha(&as)
 
 		default:
-			err = errors.Errorf("argument is neither sha nor path")
+			u.CancelWithError(errors.Errorf("argument is neither sha nor path"))
 			return
 		}
 
@@ -139,21 +159,21 @@ func (c CheckinBlob) Run(u *repo_local.Repo, args ...string) (err error) {
 		}
 	}
 
-	if err = u.Lock(); err != nil {
-		err = errors.Wrap(err)
+	if err := u.Lock(); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 
-	defer errors.Deferred(&err, u.Unlock)
+	defer u.Must(u.Unlock)
 
 	for _, z := range zettels {
-		if err = u.GetStore().CreateOrUpdate(
+		if err := u.GetStore().CreateOrUpdate(
 			z,
 			object_mode.Make(
 				object_mode.ModeMergeCheckedOut,
 			),
 		); err != nil {
-			err = errors.Wrap(err)
+			u.CancelWithError(err)
 			return
 		}
 	}

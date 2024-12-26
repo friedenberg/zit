@@ -13,7 +13,7 @@ func Run(
 	ctx errors.Context,
 	args ...string,
 ) (exitStatus int) {
-	var cmd Command2
+	var cmd CommandWithDependencies
 
 	if len(os.Args) < 1 {
 		ui.Log().Print("printing usage")
@@ -47,7 +47,7 @@ func Run(
 		return
 	}
 
-	exitStatus = cmd.Run(
+	exitStatus = cmd.RunWithDependencies(
 		Dependencies{
 			Context: ctx,
 			Config:  configCli,
@@ -56,4 +56,3 @@ func Run(
 
 	return
 }
-

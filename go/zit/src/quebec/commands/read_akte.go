@@ -29,17 +29,17 @@ type readBlobEntry struct {
 	Blob string `json:"blob"`
 }
 
-func (c ReadBlob) Run(u *repo_local.Repo, args ...string) (err error) {
+func (c ReadBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 	dec := json.NewDecoder(u.GetInFile())
 
 	for {
 		var entry readBlobEntry
 
-		if err = dec.Decode(&entry); err != nil {
+		if err := dec.Decode(&entry); err != nil {
 			if errors.IsEOF(err) {
 				err = nil
 			} else {
-				err = errors.Wrap(err)
+				u.CancelWithError(err)
 			}
 
 			return
@@ -47,9 +47,13 @@ func (c ReadBlob) Run(u *repo_local.Repo, args ...string) (err error) {
 
 		var sh *sha.Sha
 
-		if sh, err = c.readOneBlob(u, entry); err != nil {
-			err = errors.Wrap(err)
-			return
+		{
+			var err error
+
+			if sh, err = c.readOneBlob(u, entry); err != nil {
+				u.CancelWithError(err)
+				return
+			}
 		}
 
 		ui.Debug().Print(sh)

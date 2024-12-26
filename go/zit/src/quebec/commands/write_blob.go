@@ -27,7 +27,7 @@ type WriteBlob struct {
 func init() {
 	registerCommand(
 		"write-blob",
-		func(f *flag.FlagSet) CommandWithContext {
+		func(f *flag.FlagSet) CommandWithRepo {
 			c := &WriteBlob{}
 
 			f.BoolVar(&c.Check, "check", false, "only check if the object already exists")
@@ -48,7 +48,7 @@ type answer struct {
 	Path string
 }
 
-func (c WriteBlob) Run(u *repo_local.Repo, args ...string) {
+func (c WriteBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 	var failCount atomic.Uint32
 
 	sawStdin := false

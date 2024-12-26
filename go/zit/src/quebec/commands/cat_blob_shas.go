@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -30,15 +29,15 @@ func (c CatBlobShas) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c CatBlobShas) Run(u *repo_local.Repo, _ ...string) (err error) {
-	if err = u.GetRepoLayout().ReadAllShasForGenre(
+func (c CatBlobShas) RunWithRepo(u *repo_local.Repo, _ ...string) {
+  if err := u.GetRepoLayout().ReadAllShasForGenre(
 		genres.Blob,
 		func(s *sha.Sha) (err error) {
 			_, err = fmt.Fprintln(u.GetOutFile(), s)
 			return
 		},
 	); err != nil {
-		err = errors.Wrap(err)
+    u.CancelWithError(err)
 		return
 	}
 

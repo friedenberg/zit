@@ -93,23 +93,22 @@ func (c CatBlob) makeBlobWriter(u *repo_local.Repo) interfaces.FuncIter[shaWithR
 	}
 }
 
-func (c CatBlob) Run(
-	u *repo_local.Repo,
+func (c CatBlob) RunWithRepo(
+	repo *repo_local.Repo,
 	args ...string,
-) (err error) {
-	blobWriter := c.makeBlobWriter(u)
+) {
+	blobWriter := c.makeBlobWriter(repo)
 
 	for _, v := range args {
 		var sh sha.Sha
 
-		if err = sh.Set(v); err != nil {
-			err = errors.Wrap(err)
+		if err := sh.Set(v); err != nil {
+			repo.CancelWithError(err)
 			return
 		}
 
-		if err = c.blob(u, &sh, blobWriter); err != nil {
+		if err := c.blob(repo, &sh, blobWriter); err != nil {
 			ui.Err().Print(err)
-			err = nil
 		}
 	}
 

@@ -33,18 +33,18 @@ func init() {
 	)
 }
 
-func (c *FormatOrganize) Run(u *repo_local.Repo, args ...string) (err error) {
+func (c *FormatOrganize) RunWithRepo(u *repo_local.Repo, args ...string) {
 	c.Flags.Config = u.GetConfig()
 
 	if len(args) != 1 {
-		err = errors.Errorf("expected exactly one input argument")
+		u.CancelWithError(errors.Errorf("expected exactly one input argument"))
 		return
 	}
 
 	var fdee fd.FD
 
-	if err = fdee.Set(args[0]); err != nil {
-		err = errors.Wrap(err)
+	if err := fdee.Set(args[0]); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 
@@ -55,14 +55,18 @@ func (c *FormatOrganize) Run(u *repo_local.Repo, args ...string) (err error) {
 	} else {
 		var f *os.File
 
-		if f, err = files.Open(args[0]); err != nil {
-			err = errors.Wrap(err)
-			return
+		{
+			var err error
+
+			if f, err = files.Open(args[0]); err != nil {
+				u.CancelWithError(err)
+				return
+			}
 		}
 
 		r = f
 
-		defer errors.DeferredCloser(&err, f)
+		defer u.Closer(f)
 	}
 
 	var ot *organize_text.Text
@@ -71,13 +75,17 @@ func (c *FormatOrganize) Run(u *repo_local.Repo, args ...string) (err error) {
 
 	var repoId ids.RepoId
 
-	if ot, err = readOrganizeTextOp.Run(
-		u,
-		r,
-		organize_text.NewMetadata(repoId),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	{
+		var err error
+
+		if ot, err = readOrganizeTextOp.Run(
+			u,
+			r,
+			organize_text.NewMetadata(repoId),
+		); err != nil {
+			u.CancelWithError(err)
+			return
+		}
 	}
 
 	ot.Options = c.Flags.GetOptionsWithMetadata(
@@ -88,15 +96,13 @@ func (c *FormatOrganize) Run(u *repo_local.Repo, args ...string) (err error) {
 		ot.Metadata,
 	)
 
-	if err = ot.Refine(); err != nil {
-		err = errors.Wrap(err)
+	if err := ot.Refine(); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 
-	if _, err = ot.WriteTo(os.Stdout); err != nil {
-		err = errors.Wrap(err)
+	if _, err := ot.WriteTo(os.Stdout); err != nil {
+		u.CancelWithError(err)
 		return
 	}
-
-	return
 }

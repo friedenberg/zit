@@ -24,23 +24,30 @@ func init() {
 	)
 }
 
-func (c PeekZettelIds) Run(store *repo_local.Repo, args ...string) (err error) {
+func (c PeekZettelIds) RunWithRepo(repo *repo_local.Repo, args ...string) {
 	n := 0
 
 	if len(args) > 0 {
-		if n, err = strconv.Atoi(args[0]); err != nil {
-			err = errors.Errorf("expected int but got %s", args[0])
-			return
+		{
+			var err error
+
+			if n, err = strconv.Atoi(args[0]); err != nil {
+				repo.CancelWithError(errors.Errorf("expected int but got %s", args[0]))
+				return
+			}
 		}
 	}
 
 	var hs []*ids.ZettelId
 
-	if hs, err = store.GetStore().GetZettelIdIndex().PeekZettelIds(
-		n,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	{
+		var err error
+		if hs, err = repo.GetStore().GetZettelIdIndex().PeekZettelIds(
+			n,
+		); err != nil {
+			repo.CancelWithError(err)
+			return
+		}
 	}
 
 	sort.Slice(

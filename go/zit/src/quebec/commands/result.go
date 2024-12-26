@@ -12,9 +12,6 @@ type commandWithResult struct {
 	CommandWithRepo
 }
 
-func (cwr commandWithResult) Run(u *repo_local.Repo, args ...string) {
-	if err := cwr.CommandWithRepo.Run(u, args...); err != nil {
-		u.Context.Cancel(err)
-		return
-	}
+func (cwr commandWithResult) RunWithRepo(u *repo_local.Repo, args ...string) {
+	cwr.CommandWithRepo.RunWithRepo(u, args...)
 }

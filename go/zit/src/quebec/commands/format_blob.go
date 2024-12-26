@@ -48,10 +48,10 @@ func init() {
 	)
 }
 
-func (c *FormatBlob) Run(u *repo_local.Repo, args ...string) (err error) {
+func (c *FormatBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 	if c.Stdin {
-		if err = c.FormatFromStdin(u, args...); err != nil {
-			err = errors.Wrap(err)
+		if err := c.FormatFromStdin(u, args...); err != nil {
+			u.CancelWithError(err)
 			return
 		}
 
@@ -72,29 +72,37 @@ func (c *FormatBlob) Run(u *repo_local.Repo, args ...string) (err error) {
 		objectIdString = args[0]
 
 	default:
-		err = errors.Errorf(
+		u.CancelWithError(errors.Errorf(
 			"expected one or two input arguments, but got %d",
 			len(args),
-		)
+		))
 		return
 	}
 
 	var object *sku.Transacted
 
-	if object, err = c.getSku(u, objectIdString); err != nil {
-		err = errors.Wrap(err)
-		return
+	{
+		var err error
+
+		if object, err = c.getSku(u, objectIdString); err != nil {
+			u.CancelWithError(err)
+			return
+		}
 	}
 
 	tipe := object.GetType()
 
-	if blobFormatter, err = c.getBlobFormatter(
-		u,
-		tipe,
-		formatId,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	{
+		var err error
+
+		if blobFormatter, err = c.getBlobFormatter(
+			u,
+			tipe,
+			formatId,
+		); err != nil {
+			u.CancelWithError(err)
+			return
+		}
 	}
 
 	f := blob_store.MakeTextFormatterWithBlobFormatter(
@@ -106,17 +114,17 @@ func (c *FormatBlob) Run(u *repo_local.Repo, args ...string) (err error) {
 		blobFormatter,
 	)
 
-	if err = u.GetStore().TryFormatHook(object); err != nil {
-		err = errors.Wrap(err)
+	if err := u.GetStore().TryFormatHook(object); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 
-	if _, err = f.WriteStringFormatWithMode(
+	if _, err := f.WriteStringFormatWithMode(
 		u.GetOutFile(),
 		object,
 		checkout_mode.BlobOnly,
 	); err != nil {
-		err = errors.Wrap(err)
+		u.CancelWithError(err)
 		return
 	}
 

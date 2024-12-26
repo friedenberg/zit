@@ -19,9 +19,9 @@ func init() {
 	)
 }
 
-func (c Test) Run(
+func (c Test) RunWithRepo(
 	u *repo_local.Repo,
 	args ...string,
-) (err error) {
+) {
 	return
 }

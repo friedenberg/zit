@@ -11,7 +11,7 @@ import (
 )
 
 type commandWithRepo struct {
-	Command CommandWithContext
+	Command CommandWithRepo
 	*flag.FlagSet
 }
 
@@ -19,7 +19,7 @@ func (cmd commandWithRepo) GetFlagSet() *flag.FlagSet {
 	return cmd.FlagSet
 }
 
-func (cmd commandWithRepo) Run(
+func (cmd commandWithRepo) RunWithDependencies(
 	dependencies Dependencies,
 ) (exitStatus int) {
 	// TODO use options when making dirLayout
@@ -87,30 +87,27 @@ func (cmd commandWithRepo) Run(
 
 	switch {
 	case u.GetConfig().Complete:
-		var t WithCompletion
+		var t CommandCompletionWithRepo
 		haystack := any(cmd.Command)
 
 	LOOP:
 		for {
 			switch c := haystack.(type) {
-			case commandWithResult:
-				haystack = c.CommandWithRepo
-				continue LOOP
+			case *commandWithQuery:
+				t = c
+				break LOOP
 
-			case WithCompletion:
+			case CommandCompletionWithRepo:
 				t = c
 				break LOOP
 
 			default:
-				dependencies.Cancel(errors.BadRequestf("Command does not support completion"))
+				dependencies.Cancel(errors.BadRequestf("Command does not support completion: %T", c))
 				return
 			}
 		}
 
-		if err := t.Complete(u, cmdArgs...); err != nil {
-			dependencies.CancelWithError(err)
-			return
-		}
+		t.CompleteWithRepo(u, cmdArgs...)
 
 	default:
 
@@ -121,7 +118,7 @@ func (cmd commandWithRepo) Run(
 				// }
 			}()
 
-			cmd.Command.Run(u, cmdArgs...)
+			cmd.Command.RunWithRepo(u, cmdArgs...)
 		}()
 	}
 

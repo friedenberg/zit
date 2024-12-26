@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"path"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
@@ -33,20 +32,20 @@ func init() {
 	)
 }
 
-func (c Deinit) Run(u *repo_local.Repo, args ...string) (err error) {
+func (c Deinit) RunWithRepo(u *repo_local.Repo, args ...string) {
 	if !c.Force && !c.getPermission(u) {
 		return
 	}
 
 	base := path.Join(u.GetRepoLayout().Dir())
 
-	if err = files.SetAllowUserChangesRecursive(base); err != nil {
-		err = errors.Wrap(err)
+	if err := files.SetAllowUserChangesRecursive(base); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 
-	if err = u.GetRepoLayout().DeleteAll(base); err != nil {
-		err = errors.Wrap(err)
+  if err := u.GetRepoLayout().DeleteAll(base); err != nil {
+    u.CancelWithError(err)
 		return
 	}
 

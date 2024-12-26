@@ -28,7 +28,7 @@ type Import struct {
 func init() {
 	registerCommand(
 		"import",
-		func(f *flag.FlagSet) CommandWithContext {
+		func(f *flag.FlagSet) CommandWithRepo {
 			c := &Import{
 				StoreVersion:    immutable_config.CurrentStoreVersion,
 				CompressionType: immutable_config.CompressionTypeDefault,
@@ -48,7 +48,7 @@ func init() {
 	)
 }
 
-func (c Import) Run(local *repo_local.Repo, args ...string) {
+func (c Import) RunWithRepo(local *repo_local.Repo, args ...string) {
 	if c.InventoryList == "" {
 		local.Context.Cancel(errors.BadRequestf("empty inventory list"))
 		return
