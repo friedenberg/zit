@@ -266,6 +266,7 @@ func (c Organize) handleReadChangesError(err error) (tryAgain bool) {
 		return
 	}
 
+  // TODO move this to errors.Context
 	tryAgain = ui.Retry("reading changes failed", err)
 
 	return

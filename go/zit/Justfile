@@ -9,13 +9,16 @@ build-go: build-go-generate build-go-binary
 
 build: build-go
 
+test-go-vuln:
+  govulncheck ./...
+
 test-go-vet:
   go vet ./... || true
 
 test-go-unit:
   go test -v ./...
 
-test-go: test-go-vet test-go-unit
+test-go: test-go-vuln test-go-vet test-go-unit
 
 test-bats-generate:
   ./zz-tests_bats/migration/generate_fixture.bash
