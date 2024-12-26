@@ -3,7 +3,6 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -58,10 +57,7 @@ func (c Edit) DefaultGenres() ids.Genre {
 	)
 }
 
-func (c Edit) RunWithQuery(
-	u *repo_local.Repo,
-	eqwk *query.Group,
-) (err error) {
+func (c Edit) RunWithQuery(u *repo_local.Repo, eqwk *query.Group) {
 	options := checkout_options.Options{
 		CheckoutMode: c.CheckoutMode,
 	}
@@ -72,8 +68,8 @@ func (c Edit) RunWithQuery(
 		Edit:    true,
 	}
 
-	if _, err = opEdit.RunQuery(eqwk); err != nil {
-		err = errors.Wrap(err)
+  if _, err := opEdit.RunQuery(eqwk); err != nil {
+    u.CancelWithError(err)
 		return
 	}
 

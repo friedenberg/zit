@@ -49,17 +49,10 @@ func (c CatAlfred) DefaultGenres() ids.Genre {
 	)
 }
 
-func (c CatAlfred) RunWithQuery(
-	u *repo_local.Repo,
-	qg *query.Group,
-) (err error) {
+func (c CatAlfred) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 	// this command does its own error handling
-	defer func() {
-		err = nil
-	}()
-
 	wo := bufio.NewWriter(u.GetOutFile())
-	defer errors.DeferredFlusher(&err, wo)
+	defer u.Flusher(wo)
 
 	var aiw alfred.Writer
 
@@ -67,34 +60,46 @@ func (c CatAlfred) RunWithQuery(
 
 	switch c.Genre {
 	case genres.Type, genres.Tag:
-		if aiw, err = alfred.NewDebouncingWriter(u.GetOutFile()); err != nil {
-			err = errors.Wrap(err)
-			return
+		{
+			var err error
+
+			if aiw, err = alfred.NewDebouncingWriter(u.GetOutFile()); err != nil {
+				u.CancelWithError(err)
+				return
+			}
 		}
 
 	default:
-		if aiw, err = alfred.NewWriter(u.GetOutFile(), itemPool); err != nil {
-			err = errors.Wrap(err)
-			return
+		{
+			var err error
+
+			if aiw, err = alfred.NewWriter(u.GetOutFile(), itemPool); err != nil {
+				u.CancelWithError(err)
+				return
+			}
 		}
 	}
 
 	var aw *alfred_sku.Writer
 
-	if aw, err = alfred_sku.New(
-		wo,
-		u.GetStore().GetAbbrStore().GetAbbr(),
-		u.SkuFormatBoxTransactedNoColor(),
-		aiw,
-		itemPool,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
+	{
+		var err error
+
+		if aw, err = alfred_sku.New(
+			wo,
+			u.GetStore().GetAbbrStore().GetAbbr(),
+			u.SkuFormatBoxTransactedNoColor(),
+			aiw,
+			itemPool,
+		); err != nil {
+			u.CancelWithError(err)
+			return
+		}
 	}
 
-	defer errors.DeferredCloser(&err, aw)
+	defer u.Closer(aw)
 
-	if err = u.GetStore().QueryTransacted(
+	if err := u.GetStore().QueryTransacted(
 		qg,
 		func(object *sku.Transacted) (err error) {
 			switch c.Genre {

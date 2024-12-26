@@ -30,7 +30,7 @@ type CommandWithRepo interface {
 }
 
 type CommandWithQuery interface {
-	RunWithQuery(store *repo_local.Repo, ids *query.Group) error
+	RunWithQuery(store *repo_local.Repo, ids *query.Group)
 }
 
 type CommandCompletionWithRepo interface {

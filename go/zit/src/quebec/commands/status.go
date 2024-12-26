@@ -36,13 +36,10 @@ func (c Status) ModifyBuilder(
 		WithDefaultSigil(ids.SigilExternal)
 }
 
-func (c Status) RunWithQuery(
-	u *repo_local.Repo,
-	qg *query.Group,
-) (err error) {
+func (c Status) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 	pcol := u.PrinterCheckedOut(box_format.CheckedOutHeaderState{})
 
-	if err = u.GetStore().QuerySkuType(
+	if err := u.GetStore().QuerySkuType(
 		qg,
 		func(co sku.SkuType) (err error) {
 			if err = pcol(co); err != nil {
@@ -53,7 +50,7 @@ func (c Status) RunWithQuery(
 			return
 		},
 	); err != nil {
-		err = errors.Wrap(err)
+		u.CancelWithError(err)
 		return
 	}
 

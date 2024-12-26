@@ -38,10 +38,7 @@ func (c Diff) ModifyBuilder(
 	b.WithHidden(nil)
 }
 
-func (c Diff) RunWithQuery(
-	u *repo_local.Repo,
-	qg *query.Group,
-) (err error) {
+func (c Diff) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 	o := checkout_options.TextFormatterOptions{
 		DoNotWriteEmptyDescription: true,
 	}
@@ -56,7 +53,7 @@ func (c Diff) RunWithQuery(
 		),
 	}
 
-	if err = u.GetStore().QuerySkuType(
+	if err := u.GetStore().QuerySkuType(
 		qg,
 		func(co sku.SkuType) (err error) {
 			if err = opDiffFS.Run(co, o); err != nil {
@@ -67,7 +64,7 @@ func (c Diff) RunWithQuery(
 			return
 		},
 	); err != nil {
-		err = errors.Wrap(err)
+		u.CancelWithError(err)
 		return
 	}
 

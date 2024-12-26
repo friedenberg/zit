@@ -3,7 +3,6 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -72,10 +71,7 @@ func (c *Checkin) ModifyBuilder(b *query.Builder) {
 		WithRequireNonEmptyQuery()
 }
 
-func (c Checkin) RunWithQuery(
-	u *repo_local.Repo,
-	qg *query.Group,
-) (err error) {
+func (c Checkin) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 	op := user_ops.Checkin{
 		Delete:             c.Delete,
 		Organize:           c.Organize,
@@ -85,8 +81,8 @@ func (c Checkin) RunWithQuery(
 	}
 
 	// TODO add auto dot operator
-	if err = op.Run(u, qg); err != nil {
-		err = errors.Wrap(err)
+  if err := op.Run(u, qg); err != nil {
+    u.CancelWithError(err)
 		return
 	}
 

@@ -3,7 +3,6 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -51,18 +50,15 @@ func (c Checkout) ModifyBuilder(b *query.Builder) {
 		WithRequireNonEmptyQuery()
 }
 
-func (c Checkout) RunWithQuery(
-	u *repo_local.Repo,
-	qg *query.Group,
-) (err error) {
+func (c Checkout) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 	opCheckout := user_ops.Checkout{
 		Repo:     u,
 		Organize: c.Organize,
 		Options:  c.CheckoutOptions,
 	}
 
-	if _, err = opCheckout.RunQuery(qg); err != nil {
-		err = errors.Wrap(err)
+	if _, err := opCheckout.RunQuery(qg); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 

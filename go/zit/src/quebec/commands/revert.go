@@ -50,10 +50,7 @@ func (c Revert) DefaultGenres() ids.Genre {
 	)
 }
 
-func (c Revert) RunWithQuery(
-	u *repo_local.Repo,
-	ms *query.Group,
-) (err error) {
+func (c Revert) RunWithQuery(u *repo_local.Repo, ms *query.Group) {
 	f := func(rt store.RevertId) (err error) {
 		if err = u.GetStore().RevertTo(rt); err != nil {
 			err = errors.Wrap(err)
@@ -63,23 +60,25 @@ func (c Revert) RunWithQuery(
 		return
 	}
 
-	if err = u.Lock(); err != nil {
-		err = errors.Wrap(err)
+	if err := u.Lock(); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 
-	defer errors.Deferred(&err, u.Unlock)
+	defer u.Must(u.Unlock)
 
 	switch {
 	case c.Last:
-		err = c.runRevertFromLast(u, f)
+		if err := c.runRevertFromLast(u, f); err != nil {
+			u.CancelWithError(err)
+			return
+		}
 
 	default:
-		err = c.runRevertFromQuery(u, ms, f)
-	}
-
-	if err != nil {
-		return
+		if err := c.runRevertFromQuery(u, ms, f); err != nil {
+			u.CancelWithError(err)
+			return
+		}
 	}
 
 	return

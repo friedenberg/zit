@@ -117,22 +117,22 @@ func (c Clean) ModifyBuilder(b *query.Builder) {
 func (c Clean) RunWithQuery(
 	u *repo_local.Repo,
 	qg *query.Group,
-) (err error) {
+) {
 	if c.organize {
-		if err = c.runOrganize(u, qg); err != nil {
-			err = errors.Wrap(err)
+		if err := c.runOrganize(u, qg); err != nil {
+			u.CancelWithError(err)
 			return
 		}
 
 		return
 	}
 
-	if err = u.Lock(); err != nil {
-		err = errors.Wrap(err)
+	if err := u.Lock(); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 
-	if err = u.GetStore().QuerySkuType(
+	if err := u.GetStore().QuerySkuType(
 		qg,
 		func(co sku.SkuType) (err error) {
 			if !c.shouldClean(u, co, qg) {
@@ -147,14 +147,11 @@ func (c Clean) RunWithQuery(
 			return
 		},
 	); err != nil {
-		err = errors.Wrap(err)
+		u.CancelWithError(err)
 		return
 	}
 
-	if err = u.Unlock(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	u.Must(u.Unlock)
 
 	return
 }

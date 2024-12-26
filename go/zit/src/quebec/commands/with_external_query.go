@@ -76,8 +76,5 @@ func (c commandWithQuery) RunWithRepo(
 
 	defer u.PrintMatchedDormantIfNecessary()
 
-	if err := c.RunWithQuery(u, c.Group); err != nil {
-		u.Context.CancelWithError(err)
-		return
-	}
+	c.RunWithQuery(u, c.Group)
 }

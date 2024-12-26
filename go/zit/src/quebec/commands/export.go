@@ -45,18 +45,22 @@ func (c Export) DefaultGenres() ids.Genre {
 	return ids.MakeGenre(genres.InventoryList)
 }
 
-func (c Export) RunWithQuery(u *repo_local.Repo, qg *query.Group) (err error) {
+func (c Export) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 	var list *sku.List
 
-	if list, err = u.MakeInventoryList(qg); err != nil {
-		err = errors.Wrap(err)
-		return
+	{
+		var err error
+
+		if list, err = u.MakeInventoryList(qg); err != nil {
+			u.CancelWithError(err)
+			return
+		}
 	}
 
 	var ag age.Age
 
-	if err = ag.AddIdentity(c.AgeIdentity); err != nil {
-		err = errors.Wrapf(err, "age-identity: %q", &c.AgeIdentity)
+	if err := ag.AddIdentity(c.AgeIdentity); err != nil {
+		u.CancelWithError(errors.Wrapf(err, "age-identity: %q", &c.AgeIdentity))
 		return
 	}
 
@@ -68,15 +72,19 @@ func (c Export) RunWithQuery(u *repo_local.Repo, qg *query.Group) (err error) {
 		Writer:          u.GetOutFile(),
 	}
 
-	if wc, err = repo_layout.NewWriter(o); err != nil {
-		err = errors.Wrap(err)
-		return
+	{
+		var err error
+
+		if wc, err = repo_layout.NewWriter(o); err != nil {
+			u.CancelWithError(err)
+			return
+		}
 	}
 
-	defer errors.DeferredCloser(&err, wc)
+	defer u.Closer(wc)
 
 	bw := bufio.NewWriter(wc)
-	defer errors.DeferredFlusher(&err, bw)
+	defer u.Flusher(bw)
 
 	printer := u.MakePrinterBoxArchive(bw, u.GetConfig().PrintOptions.PrintTime)
 
@@ -90,8 +98,8 @@ func (c Export) RunWithQuery(u *repo_local.Repo, qg *query.Group) (err error) {
 			break
 		}
 
-		if err = printer(sk); err != nil {
-			err = errors.Wrap(err)
+		if err := printer(sk); err != nil {
+			u.CancelWithError(err)
 			return
 		}
 	}

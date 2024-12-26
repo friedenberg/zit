@@ -66,10 +66,7 @@ func (c *Organize) CompletionGenres() ids.Genre {
 	)
 }
 
-func (c *Organize) RunWithQuery(
-	u *repo_local.Repo,
-	qg *query.Group,
-) (err error) {
+func (c *Organize) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 	u.ApplyToOrganizeOptions(&c.Options)
 
 	createOrganizeFileOp := user_ops.CreateOrganizeFile{
@@ -89,7 +86,7 @@ func (c *Organize) RunWithQuery(
 	skus := sku.MakeSkuTypeSetMutable()
 	var l sync.RWMutex
 
-	if err = u.GetStore().QueryTransactedAsSkuType(
+	if err := u.GetStore().QueryTransactedAsSkuType(
 		qg,
 		func(co sku.SkuType) (err error) {
 			l.Lock()
@@ -98,7 +95,7 @@ func (c *Organize) RunWithQuery(
 			return skus.Add(co.Clone())
 		},
 	); err != nil {
-		err = errors.Wrap(err)
+		u.CancelWithError(err)
 		return
 	}
 
@@ -113,36 +110,48 @@ func (c *Organize) RunWithQuery(
 
 		var f *os.File
 
-		if f, err = files.TempFileWithPattern(
-			"*." + u.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
+		{
+			var err error
+
+			if f, err = files.TempFileWithPattern(
+				"*." + u.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
+			); err != nil {
+				u.CancelWithError(err)
+				return
+			}
 		}
 
-		defer errors.DeferredCloser(&err, f)
+		defer u.Closer(f)
 
-		if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(
-			f,
-		); err != nil {
-			err = errors.Wrap(err)
-			return
+		{
+			var err error
+
+			if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(
+				f,
+			); err != nil {
+				u.CancelWithError(err)
+				return
+			}
 		}
 
 		var organizeText *organize_text.Text
 
 		readOrganizeTextOp := user_ops.ReadOrganizeFile{}
 
-		if organizeText, err = readOrganizeTextOp.Run(
-			u,
-			os.Stdin,
-			organize_text.NewMetadata(qg.RepoId),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
+		{
+			var err error
+
+			if organizeText, err = readOrganizeTextOp.Run(
+				u,
+				os.Stdin,
+				organize_text.NewMetadata(qg.RepoId),
+			); err != nil {
+				u.CancelWithError(err)
+				return
+			}
 		}
 
-		if _, err = u.LockAndCommitOrganizeResults(
+		if _, err := u.LockAndCommitOrganizeResults(
 			organize_text.OrganizeResults{
 				Before:     createOrganizeFileResults,
 				After:      organizeText,
@@ -150,14 +159,14 @@ func (c *Organize) RunWithQuery(
 				QueryGroup: qg,
 			},
 		); err != nil {
-			err = errors.Wrap(err)
+			u.CancelWithError(err)
 			return
 		}
 
 	case organize_text_mode.ModeOutputOnly:
 		ui.Log().Print("generate organize file and write to stdout")
-		if _, err = createOrganizeFileOp.RunAndWrite(os.Stdout); err != nil {
-			err = errors.Wrap(err)
+		if _, err := createOrganizeFileOp.RunAndWrite(os.Stdout); err != nil {
+			u.CancelWithError(err)
 			return
 		}
 
@@ -169,35 +178,47 @@ func (c *Organize) RunWithQuery(
 
 		var f *os.File
 
-		if f, err = u.GetRepoLayout().TempLocal.FileTempWithTemplate(
-			"*." + u.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
+		{
+			var err error
+
+			if f, err = u.GetRepoLayout().TempLocal.FileTempWithTemplate(
+				"*." + u.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
+			); err != nil {
+				u.CancelWithError(err)
+				return
+			}
 		}
 
-		defer errors.DeferredCloser(&err, f)
+		defer u.Closer(f)
 
-		if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(
-			f,
-		); err != nil {
-			err = errors.Wrapf(err, "Organize File: %q", f.Name())
-			return
+		{
+			var err error
+
+			if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(
+				f,
+			); err != nil {
+				u.CancelWithError(errors.Wrapf(err, "Organize File: %q", f.Name()))
+				return
+			}
 		}
 
 		var organizeText *organize_text.Text
 
-		if organizeText, err = c.readFromVim(
-			u,
-			f.Name(),
-			createOrganizeFileResults,
-			qg,
-		); err != nil {
-			err = errors.Wrapf(err, "Organize File: %q", f.Name())
-			return
+		{
+			var err error
+
+			if organizeText, err = c.readFromVim(
+				u,
+				f.Name(),
+				createOrganizeFileResults,
+				qg,
+			); err != nil {
+				u.CancelWithError(errors.Wrapf(err, "Organize File: %q", f.Name()))
+				return
+			}
 		}
 
-		if _, err = u.LockAndCommitOrganizeResults(
+		if _, err := u.LockAndCommitOrganizeResults(
 			organize_text.OrganizeResults{
 				Before:     createOrganizeFileResults,
 				After:      organizeText,
@@ -205,12 +226,12 @@ func (c *Organize) RunWithQuery(
 				QueryGroup: qg,
 			},
 		); err != nil {
-			err = errors.Wrap(err)
+			u.CancelWithError(err)
 			return
 		}
 
 	default:
-		err = errors.Errorf("unknown mode")
+		u.CancelWithError(errors.Errorf("unknown mode"))
 		return
 	}
 
