@@ -49,8 +49,7 @@ func MakeRemoteHTTPFromXDGDotenvPath(
 
 	go func() {
 		if err := remote.Serve(remoteHTTP.unixSocket); err != nil {
-			remote.Cancel(errors.Wrap(err))
-			return
+			remote.CancelWithError(err)
 		}
 	}()
 
@@ -188,8 +187,7 @@ func (blobStore *HTTPBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
 			"/blobs",
 			strings.NewReader(sh.GetShaLike().GetShaString()),
 		); err != nil {
-			blobStore.remote.remote.Context.Cancel(errors.Wrap(err))
-			return
+			blobStore.remote.remote.CancelWithError(err)
 		}
 	}
 
@@ -199,8 +197,7 @@ func (blobStore *HTTPBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
 		var err error
 
 		if response, err = blobStore.remote.do(request); err != nil {
-			blobStore.remote.remote.Context.Cancel(errors.Wrap(err))
-			return
+			blobStore.remote.remote.CancelWithError(err)
 		}
 	}
 

@@ -3,7 +3,6 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
@@ -51,14 +50,6 @@ func (c Init) RunWithDependencies(
 		); err != nil {
 			dependencies.CancelWithError(err)
 		}
-	}
-
-	// TODO move to env
-	if _, err := debug.MakeContext(
-		dependencies.Context,
-		dependencies.Debug,
-	); err != nil {
-		dependencies.CancelWithError(err)
 	}
 
 	env := env.Make(

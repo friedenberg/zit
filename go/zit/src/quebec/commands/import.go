@@ -110,6 +110,6 @@ func (c Import) RunWithRepo(local *repo_local.Repo, args ...string) {
 			err = errors.Wrap(err)
 		}
 
-		local.Cancel(err)
+		local.CancelWithError(err)
 	}
 }

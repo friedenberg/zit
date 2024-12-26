@@ -41,7 +41,7 @@ func TestContextCancelled(t *testing.T) {
 		return nil
 	})
 
-	ctx.Cancel(nil)
+	ctx.cancel(nil)
 	ctx.ContinueOrPanicOnDone()
 
 	t.Errorf("expected to not get here")

@@ -15,7 +15,7 @@ var ErrContextCancelled = New("context cancelled")
 
 type Context struct {
 	context.Context
-	Cancel context.CancelCauseFunc
+	cancel context.CancelCauseFunc
 }
 
 func MakeContextDefault() Context {
@@ -27,12 +27,12 @@ func MakeContext(in context.Context) Context {
 
 	return Context{
 		Context: ctx,
-		Cancel:  cancel,
+		cancel:  cancel,
 	}
 }
 
 func (c Context) Cause() error {
-	if err := context.Cause(c); err != nil {
+	if err := context.Cause(c.Context); err != nil {
 		if Is(err, ErrContextCancelled) {
 			return nil
 		} else {
@@ -46,7 +46,7 @@ func (c Context) Cause() error {
 func (c Context) ContinueOrPanicOnDone() {
 	select {
 	default:
-	case <-c.Done():
+	case <-c.Context.Done():
 		panic(ErrContextCancelled)
 	}
 }
@@ -63,8 +63,25 @@ func (c Context) SetCancelOnSignals(
 	signal.Notify(ch, signals...)
 
 	go func() {
-		c.Cancel(Signal{Signal: <-ch})
+		c.cancel(Signal{Signal: <-ch})
 	}()
+}
+
+func (c Context) Run(f func(Context)) error {
+	func() {
+		defer c.cancel(ErrContextCancelled)
+		defer func() {
+			if r := recover(); r != nil {
+				if r != ErrContextCancelled {
+					panic(r)
+				}
+			}
+		}()
+
+		f(c)
+	}()
+
+	return c.Cause()
 }
 
 // Must executes a function even if the context has been cancelled. If the
@@ -75,7 +92,7 @@ func (c Context) Must(f func() error) {
 	defer c.ContinueOrPanicOnDone()
 
 	if err := f(); err != nil {
-		c.Cancel(WrapN(1, err))
+		c.cancel(WrapN(1, err))
 	}
 }
 
@@ -87,15 +104,20 @@ func (c Context) MustFlush(flusher Flusher) {
 	c.Must(flusher.Flush)
 }
 
+func (c Context) Cancel() {
+	defer c.ContinueOrPanicOnDone()
+	c.cancel(ErrContextCancelled)
+}
+
 func (c Context) CancelWithError(err error) {
 	defer c.ContinueOrPanicOnDone()
-	c.Cancel(WrapN(1, err))
+	c.cancel(WrapN(1, err))
 }
 
 func (c Context) CancelWithErrorAndFormat(err error, f string, values ...any) {
 	defer c.ContinueOrPanicOnDone()
-	c.Cancel(WrapN(1, err))
-	c.Cancel(
+	c.cancel(WrapN(1, err))
+	c.cancel(
 		&stackWrapError{
 			StackInfo: MustStackInfo(1),
 			error:     fmt.Errorf(f, values...),
@@ -106,10 +128,10 @@ func (c Context) CancelWithErrorAndFormat(err error, f string, values ...any) {
 
 func (c Context) CancelWithErrorf(f string, values ...any) {
 	defer c.ContinueOrPanicOnDone()
-	c.Cancel(WrapSkip(1, fmt.Errorf(f, values...)))
+	c.cancel(WrapSkip(1, fmt.Errorf(f, values...)))
 }
 
 func (c Context) CancelWithBadRequestf(f string, values ...any) {
 	defer c.ContinueOrPanicOnDone()
-	c.Cancel(&errBadRequest{xerrors.Errorf(f, values...)})
+	c.cancel(&errBadRequest{xerrors.Errorf(f, values...)})
 }

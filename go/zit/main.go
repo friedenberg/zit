@@ -14,22 +14,11 @@ func main() {
 
 	var exitStatus int
 
-	func() {
-		defer ctx.Cancel(errors.ErrContextCancelled)
-		defer func() {
-			if r := recover(); r != nil {
-				exitStatus = 1
-
-				if r != errors.ErrContextCancelled {
-					panic(r)
-				}
-			}
-		}()
-
-		commands.Run(ctx, os.Args...)
-	}()
-
-	if err := ctx.Cause(); err != nil {
+	if err := ctx.Run(
+		func(ctx errors.Context) {
+			commands.Run(ctx, os.Args...)
+		},
+	); err != nil {
 		var normalError errors.StackTracer
 		exitStatus = 1
 

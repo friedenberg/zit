@@ -3,7 +3,6 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
@@ -32,14 +31,6 @@ func (cmd commandWithRepo) RunWithDependencies(
 		); err != nil {
 			dependencies.CancelWithError(err)
 		}
-	}
-
-	// TODO move to env
-	if _, err := debug.MakeContext(
-		dependencies.Context,
-		dependencies.Debug,
-	); err != nil {
-		dependencies.CancelWithError(err)
 	}
 
 	env := env.Make(

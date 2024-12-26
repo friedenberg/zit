@@ -47,11 +47,6 @@ func Make(
 	kCli config_mutable_cli.Config,
 	dirLayout dir_layout.Layout,
 ) *Env {
-	// if _, err = debug.MakeContext(ctx, configCli.Debug); err != nil {
-	// 	ctx.Cancel(errors.Wrap(err))
-	// 	return
-	// }
-
 	e := &Env{
 		Context:   context,
 		in:        fd.MakeStd(os.Stdin),
@@ -60,6 +55,14 @@ func Make(
 		flags:     flags,
 		cliConfig: kCli,
 		Layout:    dirLayout,
+	}
+
+	{
+		var err error
+
+		if e.debug, err = debug.MakeContext(context, kCli.Debug); err != nil {
+			context.CancelWithError(err)
+		}
 	}
 
 	return e

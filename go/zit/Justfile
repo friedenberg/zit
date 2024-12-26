@@ -5,9 +5,9 @@ build-go-generate:
 build-go-binary:
   go build -o build/zit ./.
 
-build-go-all: build-go-generate build-go-binary
+build-go: build-go-generate build-go-binary
 
-build-all: build-go-all
+build: build-go
 
 test-go-vet:
   go vet ./... || true
@@ -15,25 +15,25 @@ test-go-vet:
 test-go-unit:
   go test -v ./...
 
-test-go-all: test-go-vet test-go-unit
+test-go: test-go-vet test-go-unit
 
 test-bats-generate:
   ./zz-tests_bats/migration/generate_fixture.bash
 
 bats_timeout := "10"
 
-test-bats *targets="zz-tests_bats/*.bats":
+test-bats-targets *targets="zz-tests_bats/*.bats":
   BATS_TEST_TIMEOUT="{{bats_timeout}}" bats --tap --jobs {{num_cpus()}} {{targets}}
 
-test-bats-integration: (test-bats "zz-tests_bats/*.bats")
-test-bats-migration: (test-bats "zz-tests_bats/migration/*.bats")
+test-bats-integration: (test-bats-targets "zz-tests_bats/*.bats")
+test-bats-migration: (test-bats-targets "zz-tests_bats/migration/*.bats")
 
-test-bats-all: test-bats-generate \
-    (test-bats "zz-tests_bats/*.bats" "zz-tests_bats/migration/*.bats")
+test-bats: test-bats-generate \
+    (test-bats-targets "zz-tests_bats/*.bats" "zz-tests_bats/migration/*.bats")
 
-test-all: test-go-all test-bats-all
+test: test-go test-bats
 
-build-and-test-all: build-all test-all
+build-and-test: build test
 
 git-add-and-commit *PATHS:
   #! /usr/bin/env fish
@@ -58,5 +58,5 @@ git-add-and-commit *PATHS:
   git push
   
 commit: \
-    build-and-test-all \
+    build-and-test \
     (git-add-and-commit "." "../../{zz-pandoc,zz-vim,zz-tests_bats}")

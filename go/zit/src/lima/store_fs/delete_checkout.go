@@ -63,7 +63,8 @@ func (c DeleteCheckout) Run(
 				return
 			}
 
-			// TODO determine why this state occurs
+			// Occurs when the file is top-level relative to Cwd, and so has no parent
+			// directory. This is a false-positive and should be ignored.
 			if dir == "." {
 				return
 			}
