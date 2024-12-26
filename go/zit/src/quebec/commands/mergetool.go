@@ -55,15 +55,9 @@ func (c Mergetool) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 		},
 	); err != nil {
 		u.CancelWithError(err)
-		return
 	}
 
-	if err := u.Lock(); err != nil {
-		u.CancelWithError(err)
-		return
-	}
-
-	defer u.Must(u.Unlock)
+	u.Must(u.Lock)
 
 	if conflicted.Len() == 0 {
 		// TODO-P2 return status 1 and use Err
@@ -72,63 +66,65 @@ func (c Mergetool) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 	}
 
 	for co := range conflicted.All() {
-		tm := sku.Conflicted{
-			CheckedOut: co.Clone(),
+		c.doOne(u, co)
+	}
+
+	u.Must(u.Unlock)
+}
+
+func (c Mergetool) doOne(u *repo_local.Repo, co *sku.CheckedOut) {
+	tm := sku.Conflicted{
+		CheckedOut: co.Clone(),
+	}
+
+	var conflict *fd.FD
+
+	{
+		var err error
+
+		if conflict, err = u.GetStore().GetStoreFS().GetConflictOrError(
+			co.GetSkuExternal(),
+		); err != nil {
+			u.CancelWithError(err)
+		}
+	}
+
+	var f *os.File
+
+	{
+		var err error
+
+		if f, err = files.Open(conflict.GetPath()); err != nil {
+			u.CancelWithError(err)
 		}
 
-		var conflict *fd.FD
+		defer u.MustClose(f)
+	}
 
-		{
-			var err error
+	br := bufio.NewReader(f)
 
-			if conflict, err = u.GetStore().GetStoreFS().GetConflictOrError(
-				co.GetSkuExternal(),
+	bs := u.GetStore().GetBlobStore().GetInventoryList()
+
+	if err := tm.ReadConflictMarker(
+		func(f interfaces.FuncIter[*sku.Transacted]) (err error) {
+			if err = bs.StreamInventoryListBlobSkusFromReader(
+				builtin_types.DefaultOrPanic(genres.InventoryList),
+				br,
+				f,
 			); err != nil {
-				u.CancelWithError(err)
+				err = errors.Wrap(err)
 				return
 			}
-		}
 
-		var f *os.File
-
-		{
-			var err error
-
-			if f, err = files.Open(conflict.GetPath()); err != nil {
-				u.CancelWithError(err)
-				return
-			}
-		}
-
-		defer u.Closer(f)
-
-		br := bufio.NewReader(f)
-
-		bs := u.GetStore().GetBlobStore().GetInventoryList()
-
-		if err := tm.ReadConflictMarker(
-			func(f interfaces.FuncIter[*sku.Transacted]) (err error) {
-				if err = bs.StreamInventoryListBlobSkusFromReader(
-					builtin_types.DefaultOrPanic(genres.InventoryList),
-					br,
-					f,
-				); err != nil {
-					err = errors.Wrap(err)
-					return
-				}
-
-				return
-			},
-		); err != nil {
-			u.CancelWithError(err)
 			return
-		}
+		},
+	); err != nil {
+		u.CancelWithError(err)
+	}
 
-		if err := u.GetStore().RunMergeTool(
-			tm,
-		); err != nil {
-			u.CancelWithError(err)
-			return
-		}
+	if err := u.GetStore().RunMergeTool(
+		tm,
+	); err != nil {
+		u.CancelWithError(err)
 	}
 }

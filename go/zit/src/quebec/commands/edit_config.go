@@ -41,34 +41,20 @@ func (c EditConfig) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 		if sk, err = c.editInVim(u); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 	}
 
-	if err := u.Reset(); err != nil {
-		u.CancelWithError(err)
-		return
-	}
-
-	if err := u.Lock(); err != nil {
-		u.CancelWithError(err)
-		return
-	}
+  u.Must(u.Reset)
+  u.Must(u.Lock)
 
 	if err := u.GetStore().CreateOrUpdate(
 		sk,
 		object_mode.ModeLatest,
 	); err != nil {
 		u.CancelWithError(err)
-		return
 	}
 
-	if err := u.Unlock(); err != nil {
-		u.CancelWithError(err)
-		return
-	}
-
-	return
+  u.Must(u.Unlock)
 }
 
 func (c EditConfig) editInVim(

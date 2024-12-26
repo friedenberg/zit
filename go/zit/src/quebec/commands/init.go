@@ -50,7 +50,6 @@ func (c Init) RunWithDependencies(
 			c.OverrideXDGWithCwd,
 		); err != nil {
 			dependencies.CancelWithError(err)
-			return
 		}
 	}
 
@@ -60,7 +59,6 @@ func (c Init) RunWithDependencies(
 		dependencies.Debug,
 	); err != nil {
 		dependencies.CancelWithError(err)
-		return
 	}
 
 	env := env.Make(
@@ -75,7 +73,6 @@ func (c Init) RunWithDependencies(
 			dependencies.Context,
 		); err != nil {
 			dependencies.CancelWithError(err)
-			return
 		}
 	}()
 
@@ -89,14 +86,12 @@ func (c Init) RunWithDependencies(
 			repo_local.OptionsEmpty,
 		); err != nil {
 			env.CancelWithError(err)
-			return
 		}
 
-		defer env.Flusher(repo)
+		defer env.MustFlush(repo)
 	}
 
 	if err := repo.Start(c.BigBang); err != nil {
 		env.CancelWithError(err)
-		return
 	}
 }

@@ -41,15 +41,11 @@ func (c Deinit) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 	if err := files.SetAllowUserChangesRecursive(base); err != nil {
 		u.CancelWithError(err)
-		return
 	}
 
 	if err := u.GetRepoLayout().DeleteAll(base); err != nil {
 		u.CancelWithError(err)
-		return
 	}
-
-	return
 }
 
 func (c Deinit) getPermission(u *repo_local.Repo) (success bool) {

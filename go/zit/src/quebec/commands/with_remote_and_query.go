@@ -74,7 +74,6 @@ func (c commandWithRemoteAndQuery) RunWithRepo(
 	if len(args) < 1 && c.TheirXDGDotenv == "" {
 		// TODO add info about remote options
 		local.CancelWithBadRequestf("Pulling requires a remote to be specified")
-		return
 	}
 
 	{
@@ -87,7 +86,6 @@ func (c commandWithRemoteAndQuery) RunWithRepo(
 			args...,
 		); err != nil {
 			local.CancelWithError(err)
-			return
 		}
 	}
 
@@ -106,7 +104,6 @@ func (c commandWithRemoteAndQuery) RunWithRepo(
 					c.TheirXDGDotenv,
 				); err != nil {
 					local.CancelWithError(err)
-					return
 				}
 			} else {
 				if remote, err = repo_local.MakeFromConfigAndXDGDotenvPath(
@@ -115,12 +112,10 @@ func (c commandWithRemoteAndQuery) RunWithRepo(
 					c.TheirXDGDotenv,
 				); err != nil {
 					local.CancelWithError(err)
-					return
 				}
 			}
 		} else {
 			local.CancelWithError(todo.Implement())
-			return
 		}
 	}
 

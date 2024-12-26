@@ -59,8 +59,5 @@ func (c Checkout) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 
 	if _, err := opCheckout.RunQuery(qg); err != nil {
 		u.CancelWithError(err)
-		return
 	}
-
-	return
 }

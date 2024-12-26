@@ -4,7 +4,6 @@ import (
 	"flag"
 	"net"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
@@ -45,15 +44,13 @@ func (c Serve) RunWithRepo(u *repo_local.Repo, args ...string) {
 		var err error
 
 		if listener, err = u.InitializeListener(network, address); err != nil {
-			u.Context.Cancel(errors.Wrap(err))
-			return
+			u.CancelWithError(err)
 		}
+
+		defer u.MustClose(listener)
 	}
 
-	defer u.Context.Closer(listener)
-
 	if err := u.Serve(listener); err != nil {
-		u.Context.Cancel(errors.Wrap(err))
-		return
+		u.CancelWithError(err)
 	}
 }

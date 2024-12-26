@@ -62,7 +62,6 @@ func (c Show) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 
 		if f, err = u.MakeFormatFunc(c.Format, u.GetOutFile()); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 	}
 
@@ -105,8 +104,5 @@ func (c Show) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 		quiter.MakeSyncSerializer(f),
 	); err != nil {
 		u.CancelWithError(err)
-		return
 	}
-
-	return
 }

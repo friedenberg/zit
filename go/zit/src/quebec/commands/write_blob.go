@@ -56,8 +56,7 @@ func (c WriteBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 	var ag age.Age
 
 	if err := ag.AddIdentity(c.AgeIdentity); err != nil {
-		u.Context.Cancel(errors.Wrapf(err, "age-identity: %q", &c.AgeIdentity))
-		return
+		u.CancelWithErrorAndFormat(err, "age-identity: %q", &c.AgeIdentity)
 	}
 
 	for _, p := range args {
@@ -100,11 +99,9 @@ func (c WriteBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 	fc := failCount.Load()
 
 	if fc > 0 {
-		u.Context.Cancel(errors.BadRequestf("untracked objects: %d", fc))
+		u.CancelWithBadRequestf("untracked objects: %d", fc)
 		return
 	}
-
-	return
 }
 
 func (c WriteBlob) doOne(

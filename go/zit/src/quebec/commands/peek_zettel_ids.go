@@ -32,7 +32,6 @@ func (c PeekZettelIds) RunWithRepo(repo *repo_local.Repo, args ...string) {
 
 			if n, err = strconv.Atoi(args[0]); err != nil {
 				repo.CancelWithErrorf("expected int but got %s", args[0])
-				return
 			}
 		}
 	}
@@ -45,7 +44,6 @@ func (c PeekZettelIds) RunWithRepo(repo *repo_local.Repo, args ...string) {
 			n,
 		); err != nil {
 			repo.CancelWithError(err)
-			return
 		}
 	}
 

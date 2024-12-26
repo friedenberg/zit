@@ -5,7 +5,6 @@ import (
 	"flag"
 	"io"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
@@ -53,15 +52,13 @@ func (c Export) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 
 		if list, err = u.MakeInventoryList(qg); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 	}
 
 	var ag age.Age
 
 	if err := ag.AddIdentity(c.AgeIdentity); err != nil {
-		u.CancelWithError(errors.Wrapf(err, "age-identity: %q", &c.AgeIdentity))
-		return
+		u.CancelWithErrorAndFormat(err, "age-identity: %q", &c.AgeIdentity)
 	}
 
 	var wc io.WriteCloser
@@ -77,14 +74,13 @@ func (c Export) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 
 		if wc, err = repo_layout.NewWriter(o); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 	}
 
-	defer u.Closer(wc)
+	defer u.MustClose(wc)
 
 	bw := bufio.NewWriter(wc)
-	defer u.Flusher(bw)
+	defer u.MustFlush(bw)
 
 	printer := u.MakePrinterBoxArchive(bw, u.GetConfig().PrintOptions.PrintTime)
 
@@ -100,9 +96,6 @@ func (c Export) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 
 		if err := printer(sk); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 	}
-
-	return
 }

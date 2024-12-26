@@ -26,26 +26,10 @@ func (c Reindex) GetEnvInitializeOptions() repo_local.Options {
 func (c Reindex) RunWithRepo(u *repo_local.Repo, args ...string) {
 	if len(args) > 0 {
 		u.CancelWithErrorf("reindex does not support arguments")
-		return
 	}
 
-	if err := u.Lock(); err != nil {
-		u.CancelWithError(err)
-		return
-	}
-
-	if err := u.GetConfig().Reset(); err != nil {
-		u.CancelWithError(err)
-		return
-	}
-
-	if err := u.GetStore().Reindex(); err != nil {
-		u.CancelWithError(err)
-		return
-	}
-
-	if err := u.Unlock(); err != nil {
-		u.CancelWithError(err)
-		return
-	}
+	u.Must(u.Lock)
+	u.Must(u.GetConfig().Reset)
+	u.Must(u.GetStore().Reindex)
+	u.Must(u.Unlock)
 }

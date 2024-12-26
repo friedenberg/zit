@@ -32,7 +32,7 @@ func (c commandWithQuery) CompleteWithRepo(
 	}
 
 	w := sku_fmt.MakeWriterComplete(os.Stdout)
-	defer u.Context.Closer(w)
+	defer u.MustClose(w)
 
 	b := u.MakeQueryBuilderExcludingHidden(cgg.CompletionGenres())
 
@@ -44,7 +44,6 @@ func (c commandWithQuery) CompleteWithRepo(
 			c.ExternalQueryOptions,
 		); err != nil {
 			u.Context.CancelWithError(err)
-			return
 		}
 	}
 
@@ -53,7 +52,6 @@ func (c commandWithQuery) CompleteWithRepo(
 		w.WriteOneTransacted,
 	); err != nil {
 		u.Context.CancelWithError(err)
-		return
 	}
 }
 
@@ -63,14 +61,14 @@ func (c commandWithQuery) RunWithRepo(
 ) {
 	{
 		var err error
+
 		if c.Group, err = u.MakeQueryGroup(
 			c.CommandWithQuery,
 			c.RepoId,
 			c.ExternalQueryOptions,
 			args...,
 		); err != nil {
-			u.Context.CancelWithError(err)
-			return
+			u.CancelWithError(err)
 		}
 	}
 

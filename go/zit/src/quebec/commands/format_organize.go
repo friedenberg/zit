@@ -37,14 +37,12 @@ func (c *FormatOrganize) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 	if len(args) != 1 {
 		u.CancelWithErrorf("expected exactly one input argument")
-		return
 	}
 
 	var fdee fd.FD
 
 	if err := fdee.Set(args[0]); err != nil {
 		u.CancelWithError(err)
-		return
 	}
 
 	var r io.Reader
@@ -59,13 +57,12 @@ func (c *FormatOrganize) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 			if f, err = files.Open(args[0]); err != nil {
 				u.CancelWithError(err)
-				return
 			}
 		}
 
 		r = f
 
-		defer u.Closer(f)
+		defer u.MustClose(f)
 	}
 
 	var ot *organize_text.Text
@@ -83,7 +80,6 @@ func (c *FormatOrganize) RunWithRepo(u *repo_local.Repo, args ...string) {
 			organize_text.NewMetadata(repoId),
 		); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 	}
 
@@ -97,11 +93,9 @@ func (c *FormatOrganize) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 	if err := ot.Refine(); err != nil {
 		u.CancelWithError(err)
-		return
 	}
 
 	if _, err := ot.WriteTo(os.Stdout); err != nil {
 		u.CancelWithError(err)
-		return
 	}
 }

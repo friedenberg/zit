@@ -4,7 +4,6 @@ import (
 	"flag"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -51,51 +50,41 @@ func (c Revert) DefaultGenres() ids.Genre {
 }
 
 func (c Revert) RunWithQuery(u *repo_local.Repo, ms *query.Group) {
-	f := func(rt store.RevertId) (err error) {
-		if err = u.GetStore().RevertTo(rt); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		return
-	}
-
-	if err := u.Lock(); err != nil {
-		u.CancelWithError(err)
-		return
-	}
-
-	defer u.Must(u.Unlock)
+	u.Must(u.Lock)
 
 	switch {
 	case c.Last:
-		if err := c.runRevertFromLast(u, f); err != nil {
+		if err := c.runRevertFromLast(u); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 
 	default:
-		if err := c.runRevertFromQuery(u, ms, f); err != nil {
+		if err := c.runRevertFromQuery(u, ms); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 	}
 
-	return
+	u.Must(u.Unlock)
 }
 
 func (c Revert) runRevertFromQuery(
 	u *repo_local.Repo,
 	eq *query.Group,
-	f interfaces.FuncIter[store.RevertId],
 ) (err error) {
 	if err = u.GetStore().QueryTransacted(
 		eq,
 		func(z *sku.Transacted) (err error) {
-			return f(store.RevertId{
+			rt := store.RevertId{
 				ObjectId: z.GetObjectId(),
 				Tai:      z.Metadata.Cache.ParentTai,
-			})
+			}
+
+			if err = u.GetStore().RevertTo(rt); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
 		},
 	); err != nil {
 		err = errors.Wrap(err)
@@ -107,7 +96,6 @@ func (c Revert) runRevertFromQuery(
 
 func (c Revert) runRevertFromLast(
 	u *repo_local.Repo,
-	f interfaces.FuncIter[store.RevertId],
 ) (err error) {
 	s := u.GetStore()
 
@@ -133,10 +121,17 @@ func (c Revert) runRevertFromLast(
 
 			defer sku.GetTransactedPool().Put(cachedSku)
 
-			return f(store.RevertId{
+			rt := store.RevertId{
 				ObjectId: cachedSku.GetObjectId(),
 				Tai:      cachedSku.Metadata.Cache.ParentTai,
-			})
+			}
+
+			if err = u.GetStore().RevertTo(rt); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
+
+			return
 		},
 	); err != nil {
 		err = errors.Wrap(err)

@@ -32,7 +32,6 @@ func (c FindMissing) RunWithRepo(
 
 		if lookupStored, err = u.GetStore().MakeBlobShaBytesMap(); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 	}
 
@@ -41,7 +40,6 @@ func (c FindMissing) RunWithRepo(
 
 		if err := sh.Set(shSt); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 
 		oids, ok := lookupStored[sh.GetBytes()]
@@ -52,6 +50,4 @@ func (c FindMissing) RunWithRepo(
 			ui.Out().Printf("%s (missing)", &sh)
 		}
 	}
-
-	return
 }

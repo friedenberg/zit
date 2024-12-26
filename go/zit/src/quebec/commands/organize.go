@@ -96,7 +96,6 @@ func (c *Organize) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 		},
 	); err != nil {
 		u.CancelWithError(err)
-		return
 	}
 
 	createOrganizeFileOp.Skus = skus
@@ -117,11 +116,10 @@ func (c *Organize) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 				"*." + u.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
 			); err != nil {
 				u.CancelWithError(err)
-				return
 			}
 		}
 
-		defer u.Closer(f)
+		defer u.MustClose(f)
 
 		{
 			var err error
@@ -130,7 +128,6 @@ func (c *Organize) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 				f,
 			); err != nil {
 				u.CancelWithError(err)
-				return
 			}
 		}
 
@@ -147,7 +144,6 @@ func (c *Organize) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 				organize_text.NewMetadata(qg.RepoId),
 			); err != nil {
 				u.CancelWithError(err)
-				return
 			}
 		}
 
@@ -160,14 +156,12 @@ func (c *Organize) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 			},
 		); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 
 	case organize_text_mode.ModeOutputOnly:
 		ui.Log().Print("generate organize file and write to stdout")
 		if _, err := createOrganizeFileOp.RunAndWrite(os.Stdout); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 
 	case organize_text_mode.ModeInteractive:
@@ -185,11 +179,10 @@ func (c *Organize) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 				"*." + u.GetConfig().GetFileExtensions().GetFileExtensionOrganize(),
 			); err != nil {
 				u.CancelWithError(err)
-				return
 			}
-		}
 
-		defer u.Closer(f)
+			defer u.MustClose(f)
+		}
 
 		{
 			var err error
@@ -197,8 +190,7 @@ func (c *Organize) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 			if createOrganizeFileResults, err = createOrganizeFileOp.RunAndWrite(
 				f,
 			); err != nil {
-				u.CancelWithError(errors.Wrapf(err, "Organize File: %q", f.Name()))
-				return
+				u.CancelWithErrorAndFormat(err, "Organize File: %q", f.Name())
 			}
 		}
 
@@ -213,8 +205,7 @@ func (c *Organize) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 				createOrganizeFileResults,
 				qg,
 			); err != nil {
-				u.CancelWithError(errors.Wrapf(err, "Organize File: %q", f.Name()))
-				return
+				u.CancelWithErrorAndFormat(err, "Organize File: %q", f.Name())
 			}
 		}
 
@@ -227,12 +218,10 @@ func (c *Organize) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 			},
 		); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 
 	default:
 		u.CancelWithErrorf("unknown mode")
-		return
 	}
 }
 

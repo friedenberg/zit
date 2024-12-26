@@ -3,7 +3,6 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
@@ -32,7 +31,6 @@ func (cmd commandWithRepo) RunWithDependencies(
 			dependencies.Debug,
 		); err != nil {
 			dependencies.CancelWithError(err)
-			return
 		}
 	}
 
@@ -42,7 +40,6 @@ func (cmd commandWithRepo) RunWithDependencies(
 		dependencies.Debug,
 	); err != nil {
 		dependencies.CancelWithError(err)
-		return
 	}
 
 	env := env.Make(
@@ -70,10 +67,9 @@ func (cmd commandWithRepo) RunWithDependencies(
 			options,
 		); err != nil {
 			dependencies.CancelWithError(err)
-			return
 		}
 
-		defer errors.DeferredFlusher(&err, u)
+		defer u.MustFlush(u)
 	}
 
 	defer func() {
@@ -81,7 +77,6 @@ func (cmd commandWithRepo) RunWithDependencies(
 			dependencies.Context,
 		); err != nil {
 			dependencies.CancelWithError(err)
-			return
 		}
 	}()
 
@@ -102,25 +97,16 @@ func (cmd commandWithRepo) RunWithDependencies(
 				break LOOP
 
 			default:
-				dependencies.Cancel(errors.BadRequestf("Command does not support completion: %T", c))
-				return
+				dependencies.CancelWithBadRequestf(
+					"Command does not support completion: %T",
+					c,
+				)
 			}
 		}
 
 		t.CompleteWithRepo(u, cmdArgs...)
 
 	default:
-
-		func() {
-			defer func() {
-				// if r := recover(); r != nil {
-				// 	result = ErrorResult{error: errors.Errorf("panicked: %s", r)}
-				// }
-			}()
-
-			cmd.Command.RunWithRepo(u, cmdArgs...)
-		}()
+		cmd.Command.RunWithRepo(u, cmdArgs...)
 	}
-
-	return
 }

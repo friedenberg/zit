@@ -81,10 +81,7 @@ func (c Checkin) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 	}
 
 	// TODO add auto dot operator
-  if err := op.Run(u, qg); err != nil {
-    u.CancelWithError(err)
-		return
+	if err := op.Run(u, qg); err != nil {
+		u.CancelWithError(err)
 	}
-
-	return
 }

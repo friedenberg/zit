@@ -30,7 +30,6 @@ func (cmd commandWithEnv) RunWithDependencies(
 			dependencies.Debug,
 		); err != nil {
 			dependencies.CancelWithError(err)
-			return
 		}
 	}
 
@@ -40,7 +39,6 @@ func (cmd commandWithEnv) RunWithDependencies(
 		dependencies.Debug,
 	); err != nil {
 		dependencies.CancelWithError(err)
-		return
 	}
 
 	env := env.Make(
@@ -57,11 +55,8 @@ func (cmd commandWithEnv) RunWithDependencies(
 			dependencies.Context,
 		); err != nil {
 			dependencies.CancelWithError(err)
-			return
 		}
 	}()
 
 	cmd.Command.RunWithEnv(env, cmdArgs...)
-
-	return
 }

@@ -51,7 +51,6 @@ func (c *FormatObject) RunWithRepo(u *repo_local.Repo, args ...string) {
 	if c.Stdin {
 		if err := c.FormatFromStdin(u, args...); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 
 		return
@@ -75,7 +74,6 @@ func (c *FormatObject) RunWithRepo(u *repo_local.Repo, args ...string) {
 			"expected one or two input arguments, but got %d",
 			len(args),
 		)
-		return
 	}
 
 	var object *sku.Transacted
@@ -85,7 +83,6 @@ func (c *FormatObject) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 		if object, err = c.getSku(u, objectIdString); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 	}
 
@@ -100,7 +97,6 @@ func (c *FormatObject) RunWithRepo(u *repo_local.Repo, args ...string) {
 			formatId,
 		); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 	}
 
@@ -115,7 +111,6 @@ func (c *FormatObject) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 	if err := u.GetStore().TryFormatHook(object); err != nil {
 		u.CancelWithError(err)
-		return
 	}
 
 	if _, err := f.WriteStringFormatWithMode(
@@ -124,10 +119,7 @@ func (c *FormatObject) RunWithRepo(u *repo_local.Repo, args ...string) {
 		c.CheckoutMode,
 	); err != nil {
 		u.CancelWithError(err)
-		return
 	}
-
-	return
 }
 
 func (c *FormatObject) FormatFromStdin(

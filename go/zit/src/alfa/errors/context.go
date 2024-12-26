@@ -43,15 +43,11 @@ func (c Context) Cause() error {
 	return nil
 }
 
-func (c Context) Heartbeat() {
+func (c Context) ContinueOrPanicOnDone() {
 	select {
 	default:
-		return
-
 	case <-c.Done():
-		if err := context.Cause(c); err != nil {
-			panic(ErrContextCancelled)
-		}
+		panic(ErrContextCancelled)
 	}
 }
 
@@ -71,33 +67,49 @@ func (c Context) SetCancelOnSignals(
 	}()
 }
 
+// Must executes a function even if the context has been cancelled. If the
+// function returns an error, Must cancels the context and offers a heartbeat to
+// panic. It is meant for defers that must be executed, like closing files,
+// flushing buffers, releasing locks.
 func (c Context) Must(f func() error) {
+	defer c.ContinueOrPanicOnDone()
+
 	if err := f(); err != nil {
 		c.Cancel(WrapN(1, err))
 	}
-
-	c.Heartbeat()
 }
 
-func (c Context) Closer(closer io.Closer) {
+func (c Context) MustClose(closer io.Closer) {
 	c.Must(closer.Close)
 }
 
-func (c Context) Flusher(flusher Flusher) {
+func (c Context) MustFlush(flusher Flusher) {
 	c.Must(flusher.Flush)
 }
 
 func (c Context) CancelWithError(err error) {
+	defer c.ContinueOrPanicOnDone()
 	c.Cancel(WrapN(1, err))
-	panic(ErrContextCancelled)
+}
+
+func (c Context) CancelWithErrorAndFormat(err error, f string, values ...any) {
+	defer c.ContinueOrPanicOnDone()
+	c.Cancel(WrapN(1, err))
+	c.Cancel(
+		&stackWrapError{
+			StackInfo: MustStackInfo(1),
+			error:     fmt.Errorf(f, values...),
+			next:      WrapSkip(1, err),
+		},
+	)
 }
 
 func (c Context) CancelWithErrorf(f string, values ...any) {
+	defer c.ContinueOrPanicOnDone()
 	c.Cancel(WrapSkip(1, fmt.Errorf(f, values...)))
-	panic(ErrContextCancelled)
 }
 
 func (c Context) CancelWithBadRequestf(f string, values ...any) {
+	defer c.ContinueOrPanicOnDone()
 	c.Cancel(&errBadRequest{xerrors.Errorf(f, values...)})
-	panic(ErrContextCancelled)
 }

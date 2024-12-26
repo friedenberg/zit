@@ -38,8 +38,5 @@ func (c CatBlobShas) RunWithRepo(u *repo_local.Repo, _ ...string) {
 		},
 	); err != nil {
 		u.CancelWithError(err)
-		return
 	}
-
-	return
 }

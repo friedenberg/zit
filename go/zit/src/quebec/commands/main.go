@@ -46,7 +46,6 @@ func Run(
 
 	if err := cmd.GetFlagSet().Parse(args); err != nil {
 		ctx.CancelWithError(err)
-		return
 	}
 
 	cmd.RunWithDependencies(

@@ -52,14 +52,11 @@ func (c ReadBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 			if sh, err = c.readOneBlob(u, entry); err != nil {
 				u.CancelWithError(err)
-				return
 			}
 		}
 
 		ui.Debug().Print(sh)
 	}
-
-	return
 }
 
 func (ReadBlob) readOneBlob(u *repo_local.Repo, entry readBlobEntry) (sh *sha.Sha, err error) {

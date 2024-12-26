@@ -21,17 +21,13 @@ func init() {
 }
 
 func (c DormantAdd) RunWithRepo(u *repo_local.Repo, args ...string) {
-	if err := u.Lock(); err != nil {
-		u.CancelWithError(err)
-		return
-	}
+	u.Must(u.Lock)
 
 	for _, v := range args {
 		cs := catgut.MakeFromString(v)
 
 		if err := u.GetDormantIndex().AddDormantTag(cs); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 	}
 

@@ -102,7 +102,6 @@ func (c New) ValidateFlagsAndArgs(
 func (c *New) RunWithRepo(u *repo_local.Repo, args ...string) {
 	if err := c.ValidateFlagsAndArgs(u, args...); err != nil {
 		u.CancelWithError(err)
-		return
 	}
 
 	cotfo := checkout_options.TextFormatterOptions{}
@@ -126,7 +125,6 @@ func (c *New) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 			if zts, err = emptyOp.RunMany(c.Proto, c.Count); err != nil {
 				u.CancelWithError(err)
-				return
 			}
 		}
 	} else if c.Shas {
@@ -140,7 +138,6 @@ func (c *New) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 			if zts, err = opCreateFromShas.Run(args...); err != nil {
 				u.CancelWithError(err)
-				return
 			}
 		}
 	} else {
@@ -157,7 +154,6 @@ func (c *New) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 			if zts, err = opCreateFromPath.Run(args...); err != nil {
 				u.CancelWithError(err)
-				return
 			}
 		}
 	}
@@ -177,7 +173,6 @@ func (c *New) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 		if _, err := opCheckout.Run(zts); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 	}
 
@@ -191,7 +186,6 @@ func (c *New) RunWithRepo(u *repo_local.Repo, args ...string) {
 			ids.RepoId{},
 		); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 
 		var results organize_text.OrganizeResults
@@ -201,15 +195,11 @@ func (c *New) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 			if results, err = opOrganize.RunWithTransacted(nil, zts); err != nil {
 				u.CancelWithError(err)
-				return
 			}
 		}
 
 		if _, err := u.LockAndCommitOrganizeResults(results); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 	}
-
-	return
 }

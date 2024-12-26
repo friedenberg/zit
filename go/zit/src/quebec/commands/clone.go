@@ -49,7 +49,6 @@ func (c Clone) RunWithRemoteAndQuery(
 ) {
 	if err := local.Start(c.BigBang); err != nil {
 		local.CancelWithError(err)
-		return
 	}
 
 	if err := local.PullQueryGroupFromRemote(
@@ -58,8 +57,5 @@ func (c Clone) RunWithRemoteAndQuery(
 		true,
 	); err != nil {
 		local.CancelWithError(err)
-		return
 	}
-
-	return
 }

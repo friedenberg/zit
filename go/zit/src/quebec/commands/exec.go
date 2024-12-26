@@ -28,7 +28,6 @@ func init() {
 func (c Exec) RunWithRepo(u *repo_local.Repo, args ...string) {
 	if len(args) == 0 {
 		u.CancelWithBadRequestf("needs at least Sku and possibly function name")
-		return
 	}
 
 	k, args := args[0], args[1:]
@@ -40,7 +39,6 @@ func (c Exec) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 		if sk, err = u.GetSkuFromString(k); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 	}
 
@@ -48,7 +46,6 @@ func (c Exec) RunWithRepo(u *repo_local.Repo, args ...string) {
 	case strings.HasPrefix(sk.GetType().String(), "bash"):
 		if err := c.runBash(u, sk, args...); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 
 	case strings.HasPrefix(sk.GetType().String(), "lua"):
@@ -57,12 +54,9 @@ func (c Exec) RunWithRepo(u *repo_local.Repo, args ...string) {
 		}
 
 		if err := execLuaOp.Run(sk, args...); err != nil {
-			err = errors.Wrap(err)
-			return
+			u.CancelWithError(err)
 		}
 	}
-
-	return
 }
 
 func (c Exec) runBash(

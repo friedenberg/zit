@@ -43,6 +43,5 @@ func (c Pull) RunWithRemoteAndQuery(
 		true,
 	); err != nil {
 		local.CancelWithError(err)
-		return
 	}
 }

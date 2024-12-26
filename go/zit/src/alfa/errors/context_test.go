@@ -42,7 +42,7 @@ func TestContextCancelled(t *testing.T) {
 	})
 
 	ctx.Cancel(nil)
-	ctx.Heartbeat()
+	ctx.ContinueOrPanicOnDone()
 
 	t.Errorf("expected to not get here")
 

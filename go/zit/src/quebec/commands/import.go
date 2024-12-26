@@ -50,15 +50,14 @@ func init() {
 
 func (c Import) RunWithRepo(local *repo_local.Repo, args ...string) {
 	if c.InventoryList == "" {
-		local.Context.Cancel(errors.BadRequestf("empty inventory list"))
+		local.CancelWithBadRequestf("empty inventory list")
 		return
 	}
 
 	var ag age.Age
 
 	if err := ag.AddIdentity(c.AgeIdentity); err != nil {
-		local.Context.Cancel(errors.Wrapf(err, "age-identity: %q", &c.AgeIdentity))
-		return
+		local.CancelWithErrorAndFormat(err, "age-identity: %q", &c.AgeIdentity)
 	}
 
 	bf := local.GetStore().GetInventoryListStore().FormatForVersion(c.StoreVersion)
@@ -76,11 +75,10 @@ func (c Import) RunWithRepo(local *repo_local.Repo, args ...string) {
 		var err error
 
 		if rc, err = repo_layout.NewFileReader(o); err != nil {
-			local.Context.Cancel(errors.Wrap(err))
-			return
+			local.CancelWithError(err)
 		}
 
-		defer local.Context.Closer(rc)
+		defer local.MustClose(rc)
 	}
 
 	list := sku.MakeList()
@@ -91,8 +89,7 @@ func (c Import) RunWithRepo(local *repo_local.Repo, args ...string) {
 		rc,
 		list,
 	); err != nil {
-		local.Context.Cancel(errors.Wrap(err))
-		return
+		local.CancelWithError(err)
 	}
 
 	importer := local.MakeImporter(c.PrintCopies)
@@ -113,8 +110,6 @@ func (c Import) RunWithRepo(local *repo_local.Repo, args ...string) {
 			err = errors.Wrap(err)
 		}
 
-		local.Context.Cancel(err)
-
-		return
+		local.Cancel(err)
 	}
 }

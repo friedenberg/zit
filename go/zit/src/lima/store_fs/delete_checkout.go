@@ -63,6 +63,11 @@ func (c DeleteCheckout) Run(
 				return
 			}
 
+			// TODO determine why this state occurs
+			if dir == "." {
+				return
+			}
+
 			dirs = append(dirs, dir)
 		}()
 

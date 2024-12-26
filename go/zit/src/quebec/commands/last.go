@@ -55,7 +55,6 @@ func (c Last) RunWithRepo(u *repo_local.Repo, args ...string) {
 		ui.Err().Print("ignoring format")
 	} else if c.Edit && c.Organize {
 		u.CancelWithErrorf("cannot organize and edit at the same time")
-		return
 	}
 
 	skus := sku.MakeTransactedMutableSet()
@@ -70,7 +69,6 @@ func (c Last) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 			if f, err = u.MakeFormatFunc(c.Format, u.GetOutFile()); err != nil {
 				u.CancelWithError(err)
-				return
 			}
 		}
 	}
@@ -79,7 +77,6 @@ func (c Last) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 	if err := c.runWithInventoryList(u, f); err != nil {
 		u.CancelWithError(err)
-		return
 	}
 
 	if c.Organize {
@@ -97,13 +94,11 @@ func (c Last) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 			if results, err = opOrganize.RunWithTransacted(nil, skus); err != nil {
 				u.CancelWithError(err)
-				return
 			}
 		}
 
 		if _, err := u.LockAndCommitOrganizeResults(results); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 	} else if c.Edit {
 		opCheckout := user_ops.Checkout{
@@ -116,11 +111,8 @@ func (c Last) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 		if _, err := opCheckout.Run(skus); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 	}
-
-	return
 }
 
 func (c Last) runWithInventoryList(

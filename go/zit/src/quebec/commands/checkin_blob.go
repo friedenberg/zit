@@ -44,10 +44,9 @@ func init() {
 
 func (c CheckinBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 	if len(args)%2 != 0 {
-		u.CancelWithError(errors.Errorf(
+		u.CancelWithErrorf(
 			"arguments must come in pairs of zettel id and blob path",
-		))
-		return
+		)
 	}
 
 	type externalBlobPair struct {
@@ -67,7 +66,6 @@ func (c CheckinBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 			if p.ZettelId, err = ids.MakeZettelId(hs); err != nil {
 				u.CancelWithError(err)
-				return
 			}
 		}
 
@@ -86,7 +84,6 @@ func (c CheckinBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 				p.ZettelId,
 			); err != nil {
 				u.CancelWithError(err)
-				return
 			}
 		}
 	}
@@ -99,7 +96,6 @@ func (c CheckinBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 			if ow, err = u.GetRepoLayout().BlobWriter(); err != nil {
 				u.CancelWithError(err)
-				return
 			}
 		}
 
@@ -116,20 +112,17 @@ func (c CheckinBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 				if f, err = files.Open(p.path); err != nil {
 					u.CancelWithError(err)
-					return
 				}
 			}
 
-			defer u.Closer(f)
+			defer u.MustClose(f)
 
 			if _, err := io.Copy(ow, f); err != nil {
 				u.CancelWithError(err)
-				return
 			}
 
 			if err := ow.Close(); err != nil {
 				u.CancelWithError(err)
-				return
 			}
 
 			{
@@ -139,7 +132,6 @@ func (c CheckinBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 					p.ZettelId,
 				); err != nil {
 					u.CancelWithError(err)
-					return
 				}
 			}
 
@@ -150,7 +142,6 @@ func (c CheckinBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 		default:
 			u.CancelWithError(errors.Errorf("argument is neither sha nor path"))
-			return
 		}
 
 		if c.NewTags.Len() > 0 {
@@ -161,7 +152,6 @@ func (c CheckinBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 
 	if err := u.Lock(); err != nil {
 		u.CancelWithError(err)
-		return
 	}
 
 	defer u.Must(u.Unlock)
@@ -174,9 +164,6 @@ func (c CheckinBlob) RunWithRepo(u *repo_local.Repo, args ...string) {
 			),
 		); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 	}
-
-	return
 }

@@ -121,16 +121,12 @@ func (c Clean) RunWithQuery(
 	if c.organize {
 		if err := c.runOrganize(u, qg); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 
 		return
 	}
 
-	if err := u.Lock(); err != nil {
-		u.CancelWithError(err)
-		return
-	}
+  u.Must(u.Lock)
 
 	if err := u.GetStore().QuerySkuType(
 		qg,
@@ -148,12 +144,9 @@ func (c Clean) RunWithQuery(
 		},
 	); err != nil {
 		u.CancelWithError(err)
-		return
 	}
 
 	u.Must(u.Unlock)
-
-	return
 }
 
 func (c Clean) runOrganize(u *repo_local.Repo, qg *query.Group) (err error) {

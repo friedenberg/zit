@@ -52,7 +52,7 @@ func (c CatAlfred) DefaultGenres() ids.Genre {
 func (c CatAlfred) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 	// this command does its own error handling
 	wo := bufio.NewWriter(u.GetOutFile())
-	defer u.Flusher(wo)
+	defer u.MustFlush(wo)
 
 	var aiw alfred.Writer
 
@@ -65,7 +65,6 @@ func (c CatAlfred) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 
 			if aiw, err = alfred.NewDebouncingWriter(u.GetOutFile()); err != nil {
 				u.CancelWithError(err)
-				return
 			}
 		}
 
@@ -75,7 +74,6 @@ func (c CatAlfred) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 
 			if aiw, err = alfred.NewWriter(u.GetOutFile(), itemPool); err != nil {
 				u.CancelWithError(err)
-				return
 			}
 		}
 	}
@@ -93,11 +91,10 @@ func (c CatAlfred) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 			itemPool,
 		); err != nil {
 			u.CancelWithError(err)
-			return
 		}
 	}
 
-	defer u.Closer(aw)
+	defer u.MustClose(aw)
 
 	if err := u.GetStore().QueryTransacted(
 		qg,
@@ -160,6 +157,4 @@ func (c CatAlfred) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 		err = nil
 		return
 	}
-
-	return
 }

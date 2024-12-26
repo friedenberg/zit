@@ -53,9 +53,6 @@ func (c Fsck) RunWithRepo(u *repo_local.Repo, args ...string) {
 			return
 		},
 	); err != nil {
-		u.Context.Cancel(errors.Wrap(err))
-		return
+		u.CancelWithError(err)
 	}
-
-	return
 }

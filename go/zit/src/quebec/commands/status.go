@@ -51,8 +51,5 @@ func (c Status) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 		},
 	); err != nil {
 		u.CancelWithError(err)
-		return
 	}
-
-	return
 }

@@ -45,8 +45,7 @@ func (c Info) RunWithEnv(e *env.Env, args ...string) {
 			}
 
 			if _, err := dotenv.WriteTo(e.GetOutFile()); err != nil {
-				e.Context.CancelWithError(err)
-				return
+				e.CancelWithError(err)
 			}
 		}
 	}

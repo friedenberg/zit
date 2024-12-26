@@ -48,12 +48,9 @@ func (c CheckinJson) RunWithRepo(
 				break
 			} else {
 				u.CancelWithError(err)
-				return
 			}
 		}
 
 		ui.Debug().Print(entry)
 	}
-
-	return
 }
