@@ -96,7 +96,7 @@ function run_zit_stderr_unified {
 }
 
 function run_zit_init {
-  run_zit init -yin <(cat_yin) -yang <(cat_yang) -lock-internal-files=false
+  run_zit init -yin <(cat_yin) -yang <(cat_yang) -lock-internal-files=false "$@"
   assert_success
 }
 

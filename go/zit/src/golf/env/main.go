@@ -7,6 +7,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
+	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
@@ -22,6 +23,8 @@ type Env struct {
 	flags *flag.FlagSet
 
 	dir_layout.Layout
+
+	debug *debug.Context
 
 	cliConfig config_mutable_cli.Config
 }
@@ -44,7 +47,12 @@ func Make(
 	kCli config_mutable_cli.Config,
 	dirLayout dir_layout.Layout,
 ) *Env {
-	return &Env{
+	// if _, err = debug.MakeContext(ctx, configCli.Debug); err != nil {
+	// 	ctx.Cancel(errors.Wrap(err))
+	// 	return
+	// }
+
+	e := &Env{
 		Context:   context,
 		in:        fd.MakeStd(os.Stdin),
 		out:       fd.MakeStd(os.Stdout),
@@ -53,6 +61,8 @@ func Make(
 		cliConfig: kCli,
 		Layout:    dirLayout,
 	}
+
+	return e
 }
 
 func (u *Env) GetIn() fd.Std {

@@ -13,6 +13,8 @@ type beforeXDG struct {
 	pid      int
 	dryRun   bool
 	debug    debug.Options
+
+	TempLocal, TempOS TemporaryFS
 }
 
 func (layout *beforeXDG) initialize(do debug.Options) (err error) {

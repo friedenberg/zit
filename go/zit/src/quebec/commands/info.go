@@ -4,11 +4,10 @@ import (
 	"flag"
 	"strings"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
-	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 )
 
 type Info struct {
@@ -16,9 +15,9 @@ type Info struct {
 }
 
 func init() {
-	registerCommandWithoutEnvironment(
+	registerCommandWithoutRepo(
 		"info",
-		func(f *flag.FlagSet) CommandWithContext {
+		func(f *flag.FlagSet) CommandWithEnv {
 			c := &Info{
 				Config: immutable_config.Default(),
 			}
@@ -28,7 +27,7 @@ func init() {
 	)
 }
 
-func (c Info) Run(u *repo_local.Repo, args ...string) {
+func (c Info) Run(e *env.Env, args ...string) {
 	if len(args) == 0 {
 		args = []string{"store-version"}
 	}
@@ -39,14 +38,14 @@ func (c Info) Run(u *repo_local.Repo, args ...string) {
 			ui.Out().Print(c.Config.GetStoreVersion())
 
 		case "xdg":
-			ecksDeeGee := u.GetDirLayout().GetXDG()
+			ecksDeeGee := e.GetDirLayout().GetXDG()
 
 			dotenv := xdg.Dotenv{
 				XDG: &ecksDeeGee,
 			}
 
-			if _, err := dotenv.WriteTo(u.GetOutFile()); err != nil {
-				u.Context.Cancel(errors.Wrap(err))
+			if _, err := dotenv.WriteTo(e.GetOutFile()); err != nil {
+				e.Context.CancelWithError(err)
 				return
 			}
 		}

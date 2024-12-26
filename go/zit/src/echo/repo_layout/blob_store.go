@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 )
 
 type blobStore struct {
@@ -20,7 +21,7 @@ type blobStore struct {
 	tempPath         string
 	age              *age.Age
 	immutable_config immutable_config.Config
-	TemporaryFS
+	dir_layout.TemporaryFS
 }
 
 func MakeBlobStoreFromHome(s Layout) (bs blobStore, err error) {

@@ -1,4 +1,4 @@
-package repo_layout
+package dir_layout
 
 import (
 	"context"
@@ -14,7 +14,7 @@ func (s Layout) ResetTempOnExit(ctx errors.Context) (err error) {
 	if errIn != nil || s.GetDebug().NoTempDirCleanup {
 		// ui.Err().Printf("temp dir: %q", s.DirTempLocal())
 	} else {
-		if err = os.RemoveAll(s.TempLocal.basePath); err != nil {
+		if err = os.RemoveAll(s.TempLocal.BasePath); err != nil {
 			err = errors.Wrapf(err, "failed to remove temp local")
 			return
 		}
@@ -24,11 +24,11 @@ func (s Layout) ResetTempOnExit(ctx errors.Context) (err error) {
 }
 
 type TemporaryFS struct {
-	basePath string
+	BasePath string
 }
 
 func (s TemporaryFS) DirTemp() (d string, err error) {
-	if d, err = os.MkdirTemp(s.basePath, ""); err != nil {
+	if d, err = os.MkdirTemp(s.BasePath, ""); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -46,7 +46,7 @@ func (s TemporaryFS) FileTemp() (f *os.File, err error) {
 }
 
 func (s TemporaryFS) FileTempWithTemplate(t string) (f *os.File, err error) {
-	if f, err = os.CreateTemp(s.basePath, t); err != nil {
+	if f, err = os.CreateTemp(s.BasePath, t); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

@@ -6,6 +6,7 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 )
 
 type Options struct {
@@ -42,7 +43,7 @@ type MoveOptions struct {
 	*age.Age
 	CompressionType immutable_config.CompressionType
 
-	TemporaryFS
+	dir_layout.TemporaryFS
 	ErrorOnAttemptedOverwrite bool
 	LockFile                  bool
 	FinalPath                 string

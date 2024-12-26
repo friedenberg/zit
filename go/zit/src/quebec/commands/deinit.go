@@ -18,7 +18,7 @@ type Deinit struct {
 func init() {
 	registerCommand(
 		"deinit",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithRepo {
 			c := &Deinit{}
 
 			f.BoolVar(

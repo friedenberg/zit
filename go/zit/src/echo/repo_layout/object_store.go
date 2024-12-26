@@ -8,6 +8,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/age"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 )
 
 type ObjectStore struct {
@@ -15,7 +16,7 @@ type ObjectStore struct {
 	age              *age.Age
 	immutable_config immutable_config.Config
 	interfaces.DirectoryPaths
-	TemporaryFS
+	dir_layout.TemporaryFS
 }
 
 func (s Layout) HasObject(

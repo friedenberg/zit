@@ -13,7 +13,7 @@ type DormantAdd struct{}
 func init() {
 	registerCommand(
 		"schlummernd-add",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithRepo {
 			c := &DormantAdd{}
 
 			return c

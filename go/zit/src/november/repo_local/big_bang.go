@@ -32,6 +32,7 @@ type BigBang struct {
 	immutable_config.Config
 	ExcludeDefaultType   bool
 	ExcludeDefaultConfig bool
+	OverrideXDGWithCwd   bool
 }
 
 func (e *BigBang) AddToFlagSet(f *flag.FlagSet) {
@@ -41,6 +42,7 @@ func (e *BigBang) AddToFlagSet(f *flag.FlagSet) {
 		"",
 	) // TODO-P3 move to Angeboren
 
+	f.BoolVar(&e.OverrideXDGWithCwd, "override-xdg-with-cwd", false, "")
 	f.StringVar(&e.Yin, "yin", "", "File containing list of zettel id left parts")
 	f.StringVar(&e.Yang, "yang", "", "File containing list of zettel id right parts")
 
@@ -49,6 +51,11 @@ func (e *BigBang) AddToFlagSet(f *flag.FlagSet) {
 
 func (u *Repo) Start(bb BigBang) (err error) {
 	s := u.GetRepoLayout()
+
+	if bb.OverrideXDGWithCwd {
+		d := path.Join(s.GetCwd(), ".zit")
+		mkdirAll(d)
+	}
 
 	mkdirAll(s.DirObjectId())
 	mkdirAll(s.DirCache())

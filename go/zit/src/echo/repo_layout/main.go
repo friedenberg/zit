@@ -2,7 +2,6 @@ package repo_layout
 
 import (
 	"encoding/gob"
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -34,8 +33,6 @@ type Layout struct {
 
 	CopyingBlobStore
 	ObjectStore
-
-	TempLocal, TempOS TemporaryFS
 }
 
 func Make(
@@ -78,18 +75,12 @@ func Make(
 	}
 
 	s.DirectoryPaths = dp
-	s.TempLocal.basePath = s.DirZit(fmt.Sprintf("tmp-%d", s.GetPid()))
 
 	// TODO add support for failing on pre-existing temp local
 	// if files.Exists(s.TempLocal.basePath) {
 	// 	err = MakeErrTempAlreadyExists(s.TempLocal.basePath)
 	// 	return
 	// }
-
-	if err = s.MakeDir(s.TempLocal.basePath); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
 
 	if !o.PermitNoZitDirectory {
 		if ok := files.Exists(s.DirZit()); !ok {
@@ -160,7 +151,7 @@ func Make(
 		age:              s.age,
 		immutable_config: s.immutable_config,
 		DirectoryPaths:   s.DirectoryPaths,
-		TemporaryFS:      s.TempLocal,
+		TemporaryFS:      s.GetDirLayout().TempLocal,
 	}
 
 	return
@@ -219,15 +210,6 @@ func (s *Layout) Age() *age.Age {
 
 func stringSliceJoin(s string, vs []string) []string {
 	return append([]string{s}, vs...)
-}
-
-func (s Layout) MakeDir(d string) (err error) {
-	if err = os.MkdirAll(d, os.ModeDir|0o755); err != nil {
-		err = errors.Wrapf(err, "Dir: %q", d)
-		return
-	}
-
-	return
 }
 
 func (s Layout) ResetCache() (err error) {

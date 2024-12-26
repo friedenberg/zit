@@ -20,72 +20,114 @@ type XDG struct {
 }
 
 type xdgInitElement struct {
-	defawlt string
-	envKey  string
-	out     *string
+	standard   string
+	overridden string
+	envKey     string
+	out        *string
 }
 
 func (x *XDG) GetInitElements() []xdgInitElement {
 	return []xdgInitElement{
 		{
-			defawlt: "$HOME/.local/share",
-			envKey:  "XDG_DATA_HOME",
-			out:     &x.Data,
+			standard:   "$HOME/.local/share",
+			overridden: "$HOME/local/share",
+			envKey:     "XDG_DATA_HOME",
+			out:        &x.Data,
 		},
 		{
-			defawlt: "$HOME/.config",
-			envKey:  "XDG_CONFIG_HOME",
-			out:     &x.Config,
+			standard:   "$HOME/.config",
+			overridden: "$HOME/config",
+			envKey:     "XDG_CONFIG_HOME",
+			out:        &x.Config,
 		},
 		{
-			defawlt: "$HOME/.local/state",
-			envKey:  "XDG_STATE_HOME",
-			out:     &x.State,
+			standard:   "$HOME/.local/state",
+			overridden: "$HOME/local/state",
+			envKey:     "XDG_STATE_HOME",
+			out:        &x.State,
 		},
 		{
-			defawlt: "$HOME/.cache",
-			envKey:  "XDG_CACHE_HOME",
-			out:     &x.Cache,
+			standard:   "$HOME/.cache",
+			overridden: "$HOME/cache",
+			envKey:     "XDG_CACHE_HOME",
+			out:        &x.Cache,
 		},
 		{
-			defawlt: "$HOME/.local/runtime",
-			envKey:  "XDG_RUNTIME_HOME",
-			out:     &x.Runtime,
+			standard:   "$HOME/.local/runtime",
+			overridden: "$HOME/local/runtime",
+			envKey:     "XDG_RUNTIME_HOME",
+			out:        &x.Runtime,
 		},
 	}
 }
 
 func (x *XDG) setDefaultOrEnv(
-	initElement xdgInitElement,
-) (err error) {
-	if v, ok := os.LookupEnv(initElement.envKey); ok {
-		*initElement.out = v
+	defaultValue string,
+	envKey string,
+) (out string, err error) {
+	if v, ok := os.LookupEnv(envKey); envKey != "" && ok {
+		out = v
 	} else {
-		*initElement.out = os.Expand(initElement.defawlt, func(v string) string {
-			switch v {
-			case "HOME":
-				return x.Home
+		out = os.Expand(
+			defaultValue,
+			func(v string) string {
+				switch v {
+				case "HOME":
+					return x.Home
 
-			default:
-				return os.Getenv(v)
-			}
-		})
+				default:
+					return os.Getenv(v)
+				}
+			},
+		)
 	}
 
 	if x.AddedPath != "" {
-		*initElement.out = filepath.Join(*initElement.out, x.AddedPath)
+		out = filepath.Join(out, x.AddedPath)
 	}
 
 	return
 }
 
-func (x *XDG) InitializeFromEnv(mkDir bool, addedPath string) (err error) {
+func (x *XDG) InitializeOverridden(
+	mkDir bool,
+	addedPath string,
+) (err error) {
 	x.AddedPath = addedPath
 
 	toInitialize := x.GetInitElements()
 
 	for _, ie := range toInitialize {
-		if err = x.setDefaultOrEnv(ie); err != nil {
+		if *ie.out, err = x.setDefaultOrEnv(
+			ie.overridden,
+			"",
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = os.MkdirAll(*ie.out, 0o700); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	return
+}
+
+func (x *XDG) InitializeStandardFromEnv(
+	mkDir bool,
+	addedPath string,
+) (err error) {
+	x.AddedPath = addedPath
+
+	toInitialize := x.GetInitElements()
+
+	for _, ie := range toInitialize {
+		if *ie.out, err = x.setDefaultOrEnv(
+			ie.standard,
+			ie.envKey,
+		); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

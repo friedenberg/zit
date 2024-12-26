@@ -13,9 +13,9 @@ type Init struct {
 }
 
 func init() {
-	registerCommandWithoutEnvironment(
+	registerCommandWithoutRepo(
 		"init",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithRepo {
 			c := &Init{
 				BigBang: repo_local.BigBang{
 					Config: immutable_config.Default(),

@@ -91,6 +91,13 @@ function init_and_with_another_age { # @test
 	assert_success
 }
 
+function init_with_non_xdg { # @test
+	skip
+	run_zit_init -override-xdg-with-cwd
+	run tree .zit
+	assert_output ''
+}
+
 # function init_and_init { ## @test
 # 	wd="$(mktemp -d)"
 # 	cd "$wd" || exit 1

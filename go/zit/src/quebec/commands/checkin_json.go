@@ -15,7 +15,7 @@ type CheckinJson struct{}
 func init() {
 	registerCommand(
 		"checkin-json",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithRepo {
 			c := &CheckinJson{}
 
 			return c

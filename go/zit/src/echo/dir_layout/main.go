@@ -1,11 +1,11 @@
 package dir_layout
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
@@ -20,7 +20,7 @@ const (
 type Layout struct {
 	beforeXDG
 
-	xdg xdg.XDG
+	xdg.XDG
 
 	sv immutable_config.StoreVersion
 }
@@ -61,12 +61,15 @@ func MakeWithHome(
 	if permitCwdXDGOverride && files.Exists(pathCwdXDGOverride) {
 		xdg.Home = pathCwdXDGOverride
 		addedPath = ""
-    ui.Debug().Printf("overridding xdg home: %q", xdg.Home)
-	}
-
-	if err = xdg.InitializeFromEnv(true, addedPath); err != nil {
-		err = errors.Wrap(err)
-		return
+		if err = xdg.InitializeOverridden(true, addedPath); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if err = xdg.InitializeStandardFromEnv(true, addedPath); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
 	if err = s.initializeXDG(xdg); err != nil {
@@ -95,11 +98,21 @@ func MakeWithXDG(
 }
 
 func (layout *Layout) initializeXDG(xdg xdg.XDG) (err error) {
-	layout.xdg = xdg
+	layout.XDG = xdg
 
 	if err = layout.sv.ReadFromFile(
 		layout.DataFileStoreVersion(),
 	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	layout.TempLocal.BasePath = filepath.Join(
+		layout.Cache,
+		fmt.Sprintf("tmp-%d", layout.GetPid()),
+	)
+
+	if err = layout.MakeDir(layout.TempLocal.BasePath); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -132,15 +145,15 @@ func (h Layout) GetStoreVersion() immutable_config.StoreVersion {
 }
 
 func (h Layout) DataFileStoreVersion() string {
-	return filepath.Join(h.xdg.Data, "version")
+	return filepath.Join(h.Data, "version")
 }
 
 func (h Layout) GetXDG() xdg.XDG {
-	return h.xdg
+	return h.XDG
 }
 
 func (h *Layout) SetXDG(x xdg.XDG) {
-	h.xdg = x
+	h.XDG = x
 }
 
 func (s Layout) AbsFromCwdOrSame(p string) (p1 string) {
@@ -183,4 +196,13 @@ func (h Layout) MakeCommonEnv() map[string]string {
 		// TODO determine if ZIT_DIR is kept
 		// "ZIT_DIR": h.Dir(),
 	}
+}
+
+func (s Layout) MakeDir(d string) (err error) {
+	if err = os.MkdirAll(d, os.ModeDir|0o755); err != nil {
+		err = errors.Wrapf(err, "Dir: %q", d)
+		return
+	}
+
+	return
 }

@@ -21,7 +21,7 @@ func (d Dotenv) setDefaultOrEnvFromMap(
 	if v, ok := env[initElement.envKey]; ok {
 		*initElement.out = v
 	} else {
-		*initElement.out = os.Expand(initElement.defawlt, func(v string) string {
+		*initElement.out = os.Expand(initElement.standard, func(v string) string {
 			switch v {
 			case "HOME":
 				return d.Home

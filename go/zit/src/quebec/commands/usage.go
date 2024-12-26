@@ -9,18 +9,18 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
-func (c command) PrintUsage(in error) (exitStatus int) {
+func PrintUsage(in error) (exitStatus int) {
 	if in != nil {
 		exitStatus = 1
 		ui.Err().Print(in)
 	}
 
-	ui.Err().Print("Usage for z:")
+	ui.Err().Print("Usage for zzt:")
 
 	fs := make([]flag.FlagSet, 0, len(Commands()))
 
 	for _, c := range Commands() {
-		fs = append(fs, *c.FlagSet)
+		fs = append(fs, *c.GetFlagSet())
 	}
 
 	sort.Slice(fs, func(i, j int) bool {
@@ -28,13 +28,13 @@ func (c command) PrintUsage(in error) (exitStatus int) {
 	})
 
 	for _, f := range fs {
-		c.PrintSubcommandUsage(f)
+		PrintSubcommandUsage(f)
 	}
 
 	return
 }
 
-func (c command) PrintSubcommandUsage(flags flag.FlagSet) {
+func PrintSubcommandUsage(flags flag.FlagSet) {
 	printTabbed := func(s string) {
 		ui.Err().Printf("  %s", s)
 	}

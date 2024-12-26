@@ -29,7 +29,7 @@ type FormatBlob struct {
 func init() {
 	registerCommand(
 		"format-blob",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithRepo {
 			c := &FormatBlob{}
 
 			f.BoolVar(&c.Stdin, "stdin", false, "Read object from stdin and use a Type directly")

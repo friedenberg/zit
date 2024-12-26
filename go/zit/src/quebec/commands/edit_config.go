@@ -21,7 +21,7 @@ type EditConfig struct{}
 func init() {
 	registerCommand(
 		"edit-config",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithRepo {
 			c := &EditConfig{}
 
 			return c

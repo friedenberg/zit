@@ -32,3 +32,16 @@ function info_xdg { # @test
 		XDG_RUNTIME_HOME=$BATS_TEST_TMPDIR/.xdg/runtime/zit
 	EOM
 }
+
+function info_non_xdg { # @test
+	mkdir .zit
+	run_zit_init_disable_age
+	run_zit info xdg
+	assert_output - <<-EOM
+		XDG_DATA_HOME=$BATS_TEST_TMPDIR/.zit/local/share
+		XDG_CONFIG_HOME=$BATS_TEST_TMPDIR/.zit/config
+		XDG_STATE_HOME=$BATS_TEST_TMPDIR/.zit/local/state
+		XDG_CACHE_HOME=$BATS_TEST_TMPDIR/.zit/cache
+		XDG_RUNTIME_HOME=$BATS_TEST_TMPDIR/.zit/local/runtime
+	EOM
+}

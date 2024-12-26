@@ -18,7 +18,7 @@ type Exec struct{}
 func init() {
 	registerCommand(
 		"exec",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithRepo {
 			c := &Exec{}
 			return c
 		},

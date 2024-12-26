@@ -23,7 +23,7 @@ type CatBlob struct {
 func init() {
 	registerCommand(
 		"cat-blob",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithRepo {
 			c := &CatBlob{}
 
 			f.Var(&c.Utility, "utility", "")

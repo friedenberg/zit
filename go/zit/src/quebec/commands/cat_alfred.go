@@ -17,7 +17,7 @@ import (
 
 type CatAlfred struct {
 	genres.Genre
-	Command
+	CommandWithRepo
 }
 
 func init() {

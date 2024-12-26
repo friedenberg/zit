@@ -14,7 +14,7 @@ type FindMissing struct{}
 func init() {
 	registerCommand(
 		"find-missing",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithRepo {
 			c := &FindMissing{}
 
 			return c

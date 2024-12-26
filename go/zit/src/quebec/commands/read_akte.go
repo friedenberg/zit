@@ -17,7 +17,7 @@ type ReadBlob struct{}
 func init() {
 	registerCommand(
 		"read-blob",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithRepo {
 			c := &ReadBlob{}
 
 			return c

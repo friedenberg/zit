@@ -21,7 +21,7 @@ type FormatOrganize struct {
 func init() {
 	registerCommand(
 		"format-organize",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithRepo {
 			c := &FormatOrganize{
 				Flags: organize_text.MakeFlags(),
 			}

@@ -16,7 +16,7 @@ type CatBlobShas struct{}
 func init() {
 	registerCommand(
 		"cat-blob-shas",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithRepo {
 			c := &CatBlobShas{}
 
 			return c

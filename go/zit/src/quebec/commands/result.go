@@ -9,11 +9,11 @@ type Result struct {
 }
 
 type commandWithResult struct {
-	Command
+	CommandWithRepo
 }
 
 func (cwr commandWithResult) Run(u *repo_local.Repo, args ...string) {
-	if err := cwr.Command.Run(u, args...); err != nil {
+	if err := cwr.CommandWithRepo.Run(u, args...); err != nil {
 		u.Context.Cancel(err)
 		return
 	}

@@ -27,7 +27,7 @@ type Last struct {
 func init() {
 	registerCommand(
 		"last",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithRepo {
 			c := &Last{}
 
 			f.Var(&c.RepoId, "kasten", "none or Browser")

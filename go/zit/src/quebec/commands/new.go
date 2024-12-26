@@ -32,7 +32,7 @@ type New struct {
 func init() {
 	registerCommand(
 		"new",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithRepo {
 			c := &New{}
 
 			f.Var(&c.RepoId, "kasten", "none or Browser")

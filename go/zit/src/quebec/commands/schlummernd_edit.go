@@ -22,7 +22,7 @@ type DormantEdit struct{}
 func init() {
 	registerCommand(
 		"schlummernd-edit",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithRepo {
 			c := &DormantEdit{}
 
 			return c

@@ -9,9 +9,9 @@ import (
 type Test struct{}
 
 func init() {
-	registerCommandWithoutEnvironment(
+	registerCommandWithoutRepo(
 		"test",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithRepo {
 			c := &Test{}
 
 			return c

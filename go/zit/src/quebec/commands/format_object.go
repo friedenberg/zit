@@ -29,7 +29,7 @@ type FormatObject struct {
 func init() {
 	registerCommand(
 		"format-object",
-		func(f *flag.FlagSet) Command {
+		func(f *flag.FlagSet) CommandWithRepo {
 			c := &FormatObject{
 				CheckoutMode: checkout_mode.BlobOnly,
 			}
