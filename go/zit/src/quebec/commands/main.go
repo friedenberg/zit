@@ -12,16 +12,16 @@ import (
 func Run(
 	ctx errors.Context,
 	args ...string,
-) (exitStatus int) {
+) {
 	var cmd CommandWithDependencies
 
 	if len(os.Args) < 1 {
 		ui.Log().Print("printing usage")
-		return PrintUsage(nil)
+		PrintUsage(nil)
 	}
 
 	if len(os.Args) == 1 {
-		return PrintUsage(errors.Errorf("No subcommand provided."))
+		PrintUsage(errors.Errorf("No subcommand provided."))
 	}
 
 	cmds := Commands()
@@ -30,9 +30,11 @@ func Run(
 	ok := false
 
 	if cmd, ok = cmds[specifiedSubcommand]; !ok {
-		return PrintUsage(
+		PrintUsage(
 			errors.BadRequestf("No subcommand '%s'", specifiedSubcommand),
 		)
+
+		return
 	}
 
 	args = os.Args[2:]
@@ -47,12 +49,10 @@ func Run(
 		return
 	}
 
-	exitStatus = cmd.RunWithDependencies(
+	cmd.RunWithDependencies(
 		Dependencies{
 			Context: ctx,
 			Config:  configCli,
 		},
 	)
-
-	return
 }

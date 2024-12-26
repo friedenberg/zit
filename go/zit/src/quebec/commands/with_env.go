@@ -19,7 +19,7 @@ func (cmd commandWithEnv) GetFlagSet() *flag.FlagSet {
 
 func (cmd commandWithEnv) RunWithDependencies(
 	dependencies Dependencies,
-) (exitStatus int) {
+) {
 	// TODO use options when making dirLayout
 	var dirLayout dir_layout.Layout
 

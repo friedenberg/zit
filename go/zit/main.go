@@ -28,7 +28,7 @@ func main() {
 			}
 		}()
 
-		exitStatus = commands.Run(ctx, os.Args...)
+		commands.Run(ctx, os.Args...)
 	}()
 
 	if err := context.Cause(ctx); err != nil {

@@ -52,11 +52,6 @@ func (e *BigBang) AddToFlagSet(f *flag.FlagSet) {
 func (u *Repo) Start(bb BigBang) (err error) {
 	s := u.GetRepoLayout()
 
-	if bb.OverrideXDGWithCwd {
-		d := path.Join(s.GetCwd(), ".zit")
-		mkdirAll(d)
-	}
-
 	mkdirAll(s.DirObjectId())
 	mkdirAll(s.DirCache())
 	mkdirAll(s.DirLostAndFound())

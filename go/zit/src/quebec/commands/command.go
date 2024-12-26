@@ -18,7 +18,7 @@ type Dependencies struct {
 
 type CommandWithDependencies interface {
 	GetFlagSet() *flag.FlagSet
-	RunWithDependencies(Dependencies) int
+	RunWithDependencies(Dependencies)
 }
 
 type CommandWithEnv interface {
@@ -54,6 +54,9 @@ func registerCommand(
 	}
 
 	switch mft := makeFunc.(type) {
+	case func(*flag.FlagSet) CommandWithDependencies:
+		commands[n] = mft(f)
+
 	case func(*flag.FlagSet) CommandWithEnv:
 		commands[n] = commandWithEnv{
 			Command: mft(f),
