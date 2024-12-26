@@ -31,6 +31,18 @@ func MakeContext(in context.Context) Context {
 	}
 }
 
+func (c Context) Cause() error {
+	if err := context.Cause(c); err != nil {
+		if Is(err, ErrContextCancelled) {
+			return nil
+		} else {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (c Context) Heartbeat() {
 	select {
 	default:

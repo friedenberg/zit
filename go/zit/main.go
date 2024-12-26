@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
@@ -10,14 +9,13 @@ import (
 )
 
 func main() {
-	ctx := errors.MakeContext(context.Background())
-	defer ctx.Cancel(nil)
-
+	ctx := errors.MakeContextDefault()
 	ctx.SetCancelOnSIGINT()
 
 	var exitStatus int
 
 	func() {
+		defer ctx.Cancel(errors.ErrContextCancelled)
 		defer func() {
 			if r := recover(); r != nil {
 				exitStatus = 1
@@ -31,7 +29,7 @@ func main() {
 		commands.Run(ctx, os.Args...)
 	}()
 
-	if err := context.Cause(ctx); err != nil {
+	if err := ctx.Cause(); err != nil {
 		var normalError errors.StackTracer
 		exitStatus = 1
 
