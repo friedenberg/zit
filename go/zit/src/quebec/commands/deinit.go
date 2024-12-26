@@ -44,8 +44,8 @@ func (c Deinit) RunWithRepo(u *repo_local.Repo, args ...string) {
 		return
 	}
 
-  if err := u.GetRepoLayout().DeleteAll(base); err != nil {
-    u.CancelWithError(err)
+	if err := u.GetRepoLayout().DeleteAll(base); err != nil {
+		u.CancelWithError(err)
 		return
 	}
 

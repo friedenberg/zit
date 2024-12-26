@@ -10,13 +10,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
-type CommandWithQuery interface {
-	RunWithQuery(
-		store *repo_local.Repo,
-		ids *query.Group,
-	) error
-}
-
 type commandWithQuery struct {
 	CommandWithQuery
 	sku.ExternalQueryOptions

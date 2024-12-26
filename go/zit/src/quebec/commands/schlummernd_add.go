@@ -35,5 +35,5 @@ func (c DormantAdd) RunWithRepo(u *repo_local.Repo, args ...string) {
 		}
 	}
 
-  u.Must(u.Unlock)
+	u.Must(u.Unlock)
 }

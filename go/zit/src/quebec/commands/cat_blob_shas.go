@@ -30,14 +30,14 @@ func (c CatBlobShas) CompletionGenres() ids.Genre {
 }
 
 func (c CatBlobShas) RunWithRepo(u *repo_local.Repo, _ ...string) {
-  if err := u.GetRepoLayout().ReadAllShasForGenre(
+	if err := u.GetRepoLayout().ReadAllShasForGenre(
 		genres.Blob,
 		func(s *sha.Sha) (err error) {
 			_, err = fmt.Fprintln(u.GetOutFile(), s)
 			return
 		},
 	); err != nil {
-    u.CancelWithError(err)
+		u.CancelWithError(err)
 		return
 	}
 

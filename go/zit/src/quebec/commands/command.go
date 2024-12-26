@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
+	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
@@ -20,12 +21,16 @@ type CommandWithDependencies interface {
 	RunWithDependencies(Dependencies) int
 }
 
+type CommandWithEnv interface {
+	RunWithEnv(*env.Env, ...string)
+}
+
 type CommandWithRepo interface {
 	RunWithRepo(*repo_local.Repo, ...string)
 }
 
-type CommandWithEnv interface {
-	RunWithEnv(*env.Env, ...string)
+type CommandWithQuery interface {
+	RunWithQuery(store *repo_local.Repo, ids *query.Group) error
 }
 
 type CommandCompletionWithRepo interface {
@@ -38,7 +43,7 @@ func Commands() map[string]CommandWithDependencies {
 	return commands
 }
 
-func _registerCommand(
+func registerCommand(
 	n string,
 	makeFunc any,
 ) {
@@ -66,22 +71,18 @@ func _registerCommand(
 	}
 }
 
-func registerCommand(n string, makeFunc any) {
-	_registerCommand(n, makeFunc)
-}
-
 func registerCommandWithoutRepo(
 	n string,
 	makeFunc any,
 ) {
-	_registerCommand(n, makeFunc)
+	registerCommand(n, makeFunc)
 }
 
 func registerCommandWithQuery(
 	n string,
 	makeFunc func(*flag.FlagSet) CommandWithQuery,
 ) {
-	_registerCommand(
+	registerCommand(
 		n,
 		func(f *flag.FlagSet) CommandWithRepo {
 			cweq := &commandWithQuery{}
@@ -101,7 +102,7 @@ func registerCommandWithRemoteAndQuery(
 	n string,
 	makeFunc func(*flag.FlagSet) CommandWithRemoteAndQuery,
 ) {
-	_registerCommand(
+	registerCommand(
 		n,
 		func(f *flag.FlagSet) CommandWithRepo {
 			c := &commandWithRemoteAndQuery{}
@@ -123,7 +124,7 @@ func registerCommandWithRemoteAndQueryAndWithoutEnvironment(
 	n string,
 	makeFunc func(*flag.FlagSet) CommandWithRemoteAndQuery,
 ) {
-	_registerCommand(
+	registerCommand(
 		n,
 		func(f *flag.FlagSet) CommandWithRepo {
 			c := &commandWithRemoteAndQuery{}
