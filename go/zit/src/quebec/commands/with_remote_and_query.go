@@ -73,7 +73,7 @@ func (c commandWithRemoteAndQuery) RunWithRepo(
 ) {
 	if len(args) < 1 && c.TheirXDGDotenv == "" {
 		// TODO add info about remote options
-		local.CancelWithError(errors.BadRequestf("Pulling requires a remote to be specified"))
+		local.CancelWithBadRequestf("Pulling requires a remote to be specified")
 		return
 	}
 

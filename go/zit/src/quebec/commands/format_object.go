@@ -71,10 +71,10 @@ func (c *FormatObject) RunWithRepo(u *repo_local.Repo, args ...string) {
 		objectIdString = args[0]
 
 	default:
-		u.CancelWithError(errors.Errorf(
+		u.CancelWithErrorf(
 			"expected one or two input arguments, but got %d",
 			len(args),
-		))
+		)
 		return
 	}
 

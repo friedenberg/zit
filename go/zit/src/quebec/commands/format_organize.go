@@ -5,7 +5,6 @@ import (
 	"io"
 	"os"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/echo/fd"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
@@ -37,7 +36,7 @@ func (c *FormatOrganize) RunWithRepo(u *repo_local.Repo, args ...string) {
 	c.Flags.Config = u.GetConfig()
 
 	if len(args) != 1 {
-		u.CancelWithError(errors.Errorf("expected exactly one input argument"))
+		u.CancelWithErrorf("expected exactly one input argument")
 		return
 	}
 

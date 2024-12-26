@@ -5,7 +5,6 @@ import (
 	"sort"
 	"strconv"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
@@ -32,7 +31,7 @@ func (c PeekZettelIds) RunWithRepo(repo *repo_local.Repo, args ...string) {
 			var err error
 
 			if n, err = strconv.Atoi(args[0]); err != nil {
-				repo.CancelWithError(errors.Errorf("expected int but got %s", args[0]))
+				repo.CancelWithErrorf("expected int but got %s", args[0])
 				return
 			}
 		}

@@ -50,6 +50,4 @@ func (c Info) RunWithEnv(e *env.Env, args ...string) {
 			}
 		}
 	}
-
-	return
 }

@@ -54,7 +54,7 @@ func (c Last) RunWithRepo(u *repo_local.Repo, args ...string) {
 	if (c.Edit || c.Organize) && c.Format != "" {
 		ui.Err().Print("ignoring format")
 	} else if c.Edit && c.Organize {
-		u.CancelWithError(errors.Errorf("cannot organize and edit at the same time"))
+		u.CancelWithErrorf("cannot organize and edit at the same time")
 		return
 	}
 

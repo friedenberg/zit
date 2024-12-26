@@ -3,7 +3,6 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
@@ -26,7 +25,7 @@ func (c Reindex) GetEnvInitializeOptions() repo_local.Options {
 
 func (c Reindex) RunWithRepo(u *repo_local.Repo, args ...string) {
 	if len(args) > 0 {
-		u.CancelWithError(errors.Errorf("reindex does not support arguments"))
+		u.CancelWithErrorf("reindex does not support arguments")
 		return
 	}
 
@@ -49,6 +48,4 @@ func (c Reindex) RunWithRepo(u *repo_local.Repo, args ...string) {
 		u.CancelWithError(err)
 		return
 	}
-
-	return
 }

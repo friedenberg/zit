@@ -27,7 +27,7 @@ func init() {
 
 func (c Exec) RunWithRepo(u *repo_local.Repo, args ...string) {
 	if len(args) == 0 {
-		u.CancelWithError(errors.BadRequestf("needs at least Sku and possibly function name"))
+		u.CancelWithBadRequestf("needs at least Sku and possibly function name")
 		return
 	}
 

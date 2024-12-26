@@ -2,10 +2,13 @@ package errors
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"golang.org/x/xerrors"
 )
 
 var ErrContextCancelled = New("context cancelled")
@@ -58,7 +61,7 @@ func (c Context) SetCancelOnSignals(
 
 func (c Context) Must(f func() error) {
 	if err := f(); err != nil {
-		c.Cancel(err)
+		c.Cancel(WrapN(1, err))
 	}
 
 	c.Heartbeat()
@@ -74,4 +77,15 @@ func (c Context) Flusher(flusher Flusher) {
 
 func (c Context) CancelWithError(err error) {
 	c.Cancel(WrapN(1, err))
+	panic(ErrContextCancelled)
+}
+
+func (c Context) CancelWithErrorf(f string, values ...any) {
+	c.Cancel(WrapSkip(1, fmt.Errorf(f, values...)))
+	panic(ErrContextCancelled)
+}
+
+func (c Context) CancelWithBadRequestf(f string, values ...any) {
+	c.Cancel(&errBadRequest{xerrors.Errorf(f, values...)})
+	panic(ErrContextCancelled)
 }

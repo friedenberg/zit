@@ -231,11 +231,9 @@ func (c *Organize) RunWithQuery(u *repo_local.Repo, qg *query.Group) {
 		}
 
 	default:
-		u.CancelWithError(errors.Errorf("unknown mode"))
+		u.CancelWithErrorf("unknown mode")
 		return
 	}
-
-	return
 }
 
 func (c Organize) readFromVim(
