@@ -25,7 +25,9 @@ type Layout struct {
 	sv immutable_config.StoreVersion
 }
 
-func MakeDefault(do debug.Options) (s Layout, err error) {
+func MakeDefault(
+	do debug.Options,
+) (s Layout, err error) {
 	var home string
 
 	if home, err = os.UserHomeDir(); err != nil {
@@ -34,6 +36,25 @@ func MakeDefault(do debug.Options) (s Layout, err error) {
 	}
 
 	if s, err = MakeWithHome(home, do, true); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func MakeDefaultAndInitialize(
+	do debug.Options,
+	overrideXDG bool,
+) (s Layout, err error) {
+	var home string
+
+	if home, err = os.UserHomeDir(); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	if s, err = MakeWithHomeAndInitialize(home, do, overrideXDG); err != nil {
 		err = errors.Wrap(err)
 		return
 	}
@@ -59,6 +80,45 @@ func MakeWithHome(
 	pathCwdXDGOverride := filepath.Join(s.cwd, ".zit")
 
 	if permitCwdXDGOverride && files.Exists(pathCwdXDGOverride) {
+		xdg.Home = pathCwdXDGOverride
+		addedPath = ""
+		if err = xdg.InitializeOverridden(true, addedPath); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	} else {
+		if err = xdg.InitializeStandardFromEnv(true, addedPath); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	if err = s.initializeXDG(xdg); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func MakeWithHomeAndInitialize(
+	home string,
+	do debug.Options,
+	cwdXDGOverride bool,
+) (s Layout, err error) {
+	xdg := xdg.XDG{
+		Home: home,
+	}
+
+	if err = s.beforeXDG.initialize(do); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	addedPath := "zit"
+	pathCwdXDGOverride := filepath.Join(s.cwd, ".zit")
+
+	if cwdXDGOverride {
 		xdg.Home = pathCwdXDGOverride
 		addedPath = ""
 		if err = xdg.InitializeOverridden(true, addedPath); err != nil {

@@ -92,10 +92,16 @@ function init_and_with_another_age { # @test
 }
 
 function init_with_non_xdg { # @test
-	skip
 	run_zit_init -override-xdg-with-cwd
 	run tree .zit
-	assert_output ''
+	assert_output
+
+	run_zit show +konfig,t
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
+		[konfig @d904d322213ed86cdc0eabd58d44f55385f9665280f6c03a01e396f22ba2333b !toml-config-v1]
+	EOM
 }
 
 # function init_and_init { ## @test

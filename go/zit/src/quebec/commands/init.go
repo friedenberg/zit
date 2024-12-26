@@ -40,18 +40,14 @@ func (c Init) GetFlagSet() *flag.FlagSet {
 func (c Init) RunWithDependencies(
 	dependencies Dependencies,
 ) {
-	if c.OverrideXDGWithCwd {
-		// TODO init dirLayout with XDG override
-	}
-
-	// TODO use options when making dirLayout
 	var dirLayout dir_layout.Layout
 
 	{
 		var err error
 
-		if dirLayout, err = dir_layout.MakeDefault(
+		if dirLayout, err = dir_layout.MakeDefaultAndInitialize(
 			dependencies.Debug,
+			c.OverrideXDGWithCwd,
 		); err != nil {
 			dependencies.CancelWithError(err)
 			return
