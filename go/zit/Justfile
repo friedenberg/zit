@@ -1,23 +1,39 @@
 
-timeout := "10"
-cmd_bats := "BATS_TEST_TIMEOUT=" + timeout + " bats --tap --jobs " + num_cpus()
+build-go-generate:
+  go generate ./...
 
-# run go generate and compile the go binary
-build:
-  make build/zit
+build-go-binary:
+  go build -o build/zit ./.
+
+build-go-all: build-go-generate build-go-binary
+
+build-all: build-go-all
+
+test-go-vet:
+  go vet ./... || true
+
+test-go-unit:
+  go test -v ./...
+
+test-go-all: test-go-vet test-go-unit
 
 test-bats-generate:
   ./zz-tests_bats/migration/generate_fixture.bash
 
+bats_timeout := "10"
+
 test-bats *targets="zz-tests_bats/*.bats":
-  {{cmd_bats}} {{targets}}
+  BATS_TEST_TIMEOUT="{{bats_timeout}}" bats --tap --jobs {{num_cpus()}} {{targets}}
 
-# generate bats test fixtures and run all bats tests
-test-all:
-  ./zz-tests_bats/migration/generate_fixture.bash
-  make build/tests_slower
+test-bats-integration: (test-bats "zz-tests_bats/*.bats")
+test-bats-migration: (test-bats "zz-tests_bats/migration/*.bats")
 
-build-and-test-all: build test-all
+test-bats-all: test-bats-generate \
+    (test-bats "zz-tests_bats/*.bats" "zz-tests_bats/migration/*.bats")
+
+test-all: test-go-all test-bats-all
+
+build-and-test-all: build-all test-all
 
 git-add-and-commit *PATHS:
   #! /usr/bin/env fish
@@ -41,5 +57,6 @@ git-add-and-commit *PATHS:
   echo "pushing..." >&2
   git push
   
-commit: build-and-test-all \
+commit: \
+    build-and-test-all \
     (git-add-and-commit "." "../../{zz-pandoc,zz-vim,zz-tests_bats}")
