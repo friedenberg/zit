@@ -38,19 +38,25 @@ func (c Serve) RunWithRepo(u *repo_local.Repo, args ...string) {
 		address = args[1]
 	}
 
-	var listener net.Listener
-
-	{
-		var err error
-
-		if listener, err = u.InitializeListener(network, address); err != nil {
+	if network == "-" {
+		if err := u.ServeStdio(); err != nil {
 			u.CancelWithError(err)
 		}
+	} else {
+		var listener net.Listener
 
-		defer u.MustClose(listener)
-	}
+		{
+			var err error
 
-	if err := u.Serve(listener); err != nil {
-		u.CancelWithError(err)
+			if listener, err = u.InitializeListener(network, address); err != nil {
+				u.CancelWithError(err)
+			}
+
+			defer u.MustClose(listener)
+		}
+
+		if err := u.Serve(listener); err != nil {
+			u.CancelWithError(err)
+		}
 	}
 }

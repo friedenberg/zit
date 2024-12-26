@@ -108,6 +108,7 @@ func (remote *HTTP) do(
 		err = errors.Errorf("failed to read response: %w", err)
 		return
 	}
+
 	return
 }
 

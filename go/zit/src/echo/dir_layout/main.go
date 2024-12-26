@@ -8,7 +8,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
 	"code.linenisgreat.com/zit/go/zit/src/delta/debug"
-	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/xdg"
 )
 
@@ -21,8 +20,6 @@ type Layout struct {
 	beforeXDG
 
 	xdg.XDG
-
-	sv immutable_config.StoreVersion
 }
 
 func MakeDefault(
@@ -160,13 +157,6 @@ func MakeWithXDG(
 func (layout *Layout) initializeXDG(xdg xdg.XDG) (err error) {
 	layout.XDG = xdg
 
-	if err = layout.sv.ReadFromFile(
-		layout.DataFileStoreVersion(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
 	layout.TempLocal.BasePath = filepath.Join(
 		layout.Cache,
 		fmt.Sprintf("tmp-%d", layout.GetPid()),
@@ -198,14 +188,6 @@ func (h Layout) GetExecPath() string {
 
 func (h Layout) GetCwd() string {
 	return h.cwd
-}
-
-func (h Layout) GetStoreVersion() immutable_config.StoreVersion {
-	return h.sv
-}
-
-func (h Layout) DataFileStoreVersion() string {
-	return filepath.Join(h.Data, "version")
 }
 
 func (h Layout) GetXDG() xdg.XDG {

@@ -21,6 +21,9 @@ type Getter interface {
 
 type Layout struct {
 	*env.Env
+
+	sv immutable_config.StoreVersion
+
 	basePath              string
 	readOnlyBlobStorePath string
 	lockSmith             interfaces.LockSmith
@@ -55,6 +58,13 @@ func Make(
 
 	s.basePath = o.BasePath
 	s.readOnlyBlobStorePath = o.GetReadOnlyBlobStorePath()
+
+	if err = s.sv.ReadFromFile(
+		s.DataFileStoreVersion(),
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
 
 	var dp directoryPaths
 
@@ -243,4 +253,8 @@ func (s Layout) ResetCache() (err error) {
 
 func (h Layout) DataFileStoreVersion() string {
 	return filepath.Join(h.GetXDG().Data, "version")
+}
+
+func (h Layout) GetStoreVersion() immutable_config.StoreVersion {
+	return h.sv
 }

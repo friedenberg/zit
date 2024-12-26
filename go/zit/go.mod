@@ -5,7 +5,7 @@ go 1.23.0
 require (
 	code.linenisgreat.com/chrest/go v0.0.0-20241211003220-dd8055c67b43
 	filippo.io/age v1.1.1
-	github.com/DataDog/zstd v1.5.5
+	github.com/DataDog/zstd v1.5.6
 	github.com/brandondube/tai v0.1.0
 	github.com/google/go-cmp v0.6.0
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510

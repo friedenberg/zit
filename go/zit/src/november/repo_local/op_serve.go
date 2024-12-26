@@ -2,6 +2,7 @@ package repo_local
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -32,11 +33,6 @@ func (env *Repo) InitializeListener(
 		}
 
 	case "tcp":
-		if _, err = strconv.Atoi(address); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
 		if listener, err = config.Listen(env.Context, network, address); err != nil {
 			err = errors.Wrap(err)
 			return
@@ -145,45 +141,133 @@ func (env *Repo) Serve(listener net.Listener) (err error) {
 	return
 }
 
-func (local *Repo) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	type MethodPath struct {
-		Method string
-		Path   string
+func (repo *Repo) ServeStdio() (err error) {
+	br := bufio.NewReader(repo.GetIn())
+	bw := bufio.NewWriter(repo.GetOut())
+
+	for {
+		repo.ContinueOrPanicOnDone()
+
+		var request *http.Request
+
+		if request, err = http.ReadRequest(br); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		response := repo.ServeRequest(
+			Request{
+				MethodPath: MethodPath{
+					Method: request.Method,
+					Path:   request.URL.Path,
+				},
+				Body: request.Body,
+			},
+		)
+
+		if _, err = fmt.Fprintf(
+			bw,
+			"HTTP/1.1 %d %s",
+			response.StatusCode,
+			http.StatusText(response.StatusCode),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if _, err = io.Copy(bw, response.Body); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = bw.Flush(); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
 	}
 
-	mp := MethodPath{Method: req.Method, Path: req.URL.Path}
-	ui.Log().Printf("serving: %s %s", mp.Method, mp.Path)
+	ui.Log().Print("shutdown complete")
 
-	switch mp {
+	return
+}
+
+type MethodPath struct {
+	Method string
+	Path   string
+}
+
+type Request struct {
+	MethodPath
+	Body io.ReadCloser
+}
+
+type Response struct {
+	StatusCode int
+	Body       io.ReadCloser
+}
+
+func (r *Response) ErrorWithStatus(status int, err error) {
+	r.StatusCode = status
+	r.Body = io.NopCloser(strings.NewReader(err.Error()))
+}
+
+func (r *Response) Error(err error) {
+	r.ErrorWithStatus(http.StatusInternalServerError, err)
+}
+
+func (local *Repo) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	request := Request{
+		MethodPath: MethodPath{Method: req.Method, Path: req.URL.Path},
+		Body:       req.Body,
+	}
+
+	response := local.ServeRequest(request)
+
+	if response.StatusCode == 0 {
+		response.StatusCode = http.StatusOK
+	}
+
+	w.WriteHeader(response.StatusCode)
+
+	if _, err := io.Copy(w, response.Body); err != nil {
+		local.CancelWithError(err)
+	}
+
+	if err := response.Body.Close(); err != nil {
+		local.CancelWithError(err)
+	}
+}
+
+func (local *Repo) ServeRequest(request Request) (response Response) {
+	ui.Log().Printf("serving: %s %s", request.Method, request.Path)
+
+	switch request.MethodPath {
 	case MethodPath{"HEAD", "/blobs"}, MethodPath{"GET", "/blobs"}:
 		var shString strings.Builder
 
-		if _, err := io.Copy(&shString, req.Body); err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			io.WriteString(w, err.Error())
+		if _, err := io.Copy(&shString, request.Body); err != nil {
+			response.ErrorWithStatus(http.StatusBadRequest, err)
 			return
 		}
 
 		var sh *sha.Sha
 
 		{
-
 			var err error
 
 			if sh, err = sha.MakeSha(shString.String()); err != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				io.WriteString(w, err.Error())
+				response.ErrorWithStatus(http.StatusBadRequest, err)
 				return
 			}
 		}
 
 		ui.Log().Printf("blob requested: %q", sh)
 
-		if mp.Method == "HEAD" {
+		if request.Method == "HEAD" {
 			if local.GetRepoLayout().HasBlob(sh) {
-				w.WriteHeader(http.StatusNoContent)
+				response.StatusCode = http.StatusNoContent
 			} else {
-				w.WriteHeader(http.StatusNotFound)
+				response.StatusCode = http.StatusNotFound
 			}
 		} else {
 			var rc sha.ReadCloser
@@ -192,30 +276,20 @@ func (local *Repo) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 				var err error
 
 				if rc, err = local.GetRepoLayout().BlobReader(sh); err != nil {
-					w.WriteHeader(http.StatusInternalServerError)
-					io.WriteString(w, err.Error())
+					response.Error(err)
 					return
 				}
 			}
 
-			if _, err := io.Copy(w, rc); err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				io.WriteString(w, err.Error())
-				return
-			}
-
-			if err := rc.Close(); err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				io.WriteString(w, err.Error())
-				return
-			}
+			response.Body = rc
 		}
 
 	case MethodPath{"GET", "/inventory_list"}:
 		var qgString strings.Builder
 
-		if _, err := io.Copy(&qgString, req.Body); err != nil {
-			panic(err)
+		if _, err := io.Copy(&qgString, request.Body); err != nil {
+			response.Error(err)
+			return
 		}
 
 		var qg *query.Group
@@ -229,7 +303,8 @@ func (local *Repo) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 				sku.ExternalQueryOptions{},
 				qgString.String(),
 			); err != nil {
-				panic(err)
+				response.Error(err)
+				return
 			}
 		}
 
@@ -239,13 +314,15 @@ func (local *Repo) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			var err error
 
 			if list, err = local.MakeInventoryList(qg); err != nil {
-				panic(err)
+				response.Error(err)
+				return
 			}
 		}
 
-		bw := bufio.NewWriter(w)
+		// TODO make this more performant by returning a proper reader
+		b := bytes.NewBuffer(nil)
 
-		printer := local.MakePrinterBoxArchive(bw, true)
+		printer := local.MakePrinterBoxArchive(b, true)
 
 		var sk *sku.Transacted
 		var hasMore bool
@@ -258,15 +335,16 @@ func (local *Repo) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			}
 
 			if err := printer(sk); err != nil {
-				panic(err)
+				response.Error(err)
+				return
 			}
 		}
 
-		if err := bw.Flush(); err != nil {
-			panic(err)
-		}
+		response.Body = io.NopCloser(b)
 
 	default:
-		w.WriteHeader(http.StatusNotFound)
+		response.StatusCode = http.StatusNotFound
 	}
+
+	return
 }
