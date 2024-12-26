@@ -151,7 +151,12 @@ func (repo *Repo) ServeStdio() (err error) {
 		var request *http.Request
 
 		if request, err = http.ReadRequest(br); err != nil {
-			err = errors.Wrap(err)
+			if errors.IsEOF(err) {
+				err = nil
+			} else {
+				err = errors.Wrap(err)
+			}
+
 			return
 		}
 
@@ -165,17 +170,19 @@ func (repo *Repo) ServeStdio() (err error) {
 			},
 		)
 
-		if _, err = fmt.Fprintf(
-			bw,
-			"HTTP/1.1 %d %s",
-			response.StatusCode,
-			http.StatusText(response.StatusCode),
-		); err != nil {
-			err = errors.Wrap(err)
-			return
+		if response.StatusCode == 0 {
+			response.StatusCode = http.StatusOK
 		}
 
-		if _, err = io.Copy(bw, response.Body); err != nil {
+		responseModified := &http.Response{
+			ProtoMajor: request.ProtoMajor,
+			ProtoMinor: request.ProtoMinor,
+			Request:    request,
+			StatusCode: response.StatusCode,
+			Body:       response.Body,
+		}
+
+		if err = responseModified.Write(bw); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
