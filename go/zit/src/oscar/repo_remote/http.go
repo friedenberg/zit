@@ -19,6 +19,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
+// TODO this should not be a compiled config
 func MakeRemoteHTTPFromXDGDotenvPath(
 	context errors.Context,
 	config *config.Compiled,

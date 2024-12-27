@@ -1,9 +1,10 @@
 package errors
 
 var (
-	ErrStopIteration = New("stop iteration")
-	ErrFalse         = New("false")
-	ErrTrue          = New("true")
+	ErrStopIteration  = New("stop iteration")
+	ErrFalse          = New("false")
+	ErrTrue           = New("true")
+	ErrNotImplemented = New("not implemented")
 )
 
 func MakeErrStopIteration() error {

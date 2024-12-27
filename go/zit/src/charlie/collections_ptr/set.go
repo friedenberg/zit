@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 )
 
 type Set[
@@ -103,7 +102,7 @@ func (s Set[T, TPtr]) Contains(e T) (ok bool) {
 func (s Set[T, TPtr]) EachKey(wf interfaces.FuncIterKey) (err error) {
 	for v := range s.E {
 		if err = wf(v); err != nil {
-			if errors.Is(err, quiter.MakeErrStopIteration()) {
+			if errors.Is(err, errors.MakeErrStopIteration()) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -129,7 +128,7 @@ func (s Set[T, TPtr]) AddPtr(v TPtr) (err error) {
 func (s Set[T, TPtr]) Each(wf interfaces.FuncIter[T]) (err error) {
 	for _, v := range s.E {
 		if err = wf(*v); err != nil {
-			if quiter.IsStopIteration(err) {
+			if errors.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -147,7 +146,7 @@ func (s Set[T, TPtr]) EachPtr(
 ) (err error) {
 	for _, v := range s.E {
 		if err = wf(v); err != nil {
-			if quiter.IsStopIteration(err) {
+			if errors.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

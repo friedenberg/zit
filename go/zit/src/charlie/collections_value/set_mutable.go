@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 )
 
 type MutableSet[
@@ -95,7 +94,7 @@ func (s MutableSet[T]) EachKey(
 ) (err error) {
 	for v := range s.E {
 		if err = wf(v); err != nil {
-			if quiter.IsStopIteration(err) {
+			if errors.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -113,7 +112,7 @@ func (s MutableSet[T]) Each(
 ) (err error) {
 	for _, v := range s.E {
 		if err = wf(v); err != nil {
-			if quiter.IsStopIteration(err) {
+			if errors.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

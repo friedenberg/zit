@@ -456,7 +456,7 @@ func (i *Index) readFrom(
 						<-openFileCh
 						continue
 
-					case quiter.IsStopIteration(err1):
+					case errors.IsStopIteration(err1):
 
 					default:
 						me.Add(err1)

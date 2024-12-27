@@ -69,7 +69,8 @@ function push_history_zettel_typ_etikett_no_conflicts { # @test
 	set_xdg "$BATS_TEST_TMPDIR"
 
 	run_zit push \
-		-xdg-dotenv <(print_their_xdg) \
+		-remote-type native-dotenv-xdg \
+		<(print_their_xdg) \
 		+zettel,typ,etikett
 
 	assert_success
@@ -117,7 +118,8 @@ function push_history_zettel_typ_etikett_yes_conflicts { # @test
 	set_xdg "$BATS_TEST_TMPDIR"
 
 	run_zit push \
-		-xdg-dotenv <(print_their_xdg) \
+		-remote-type native-dotenv-xdg \
+		<(print_their_xdg) \
 		+zettel,typ,etikett
 
 	assert_failure
@@ -173,7 +175,9 @@ function push_history_default { # @test
 
 	set_xdg "$BATS_TEST_TMPDIR"
 
-	run_zit push -xdg-dotenv <(print_their_xdg)
+	run_zit push \
+		-remote-type native-dotenv-xdg \
+		<(print_their_xdg)
 
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM

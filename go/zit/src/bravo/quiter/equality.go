@@ -5,6 +5,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
+// TODO refactor to use iterators
 func SetEquals[T any](
 	a, b interfaces.SetLike[T],
 ) bool {

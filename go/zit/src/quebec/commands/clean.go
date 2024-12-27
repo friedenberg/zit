@@ -126,7 +126,7 @@ func (c Clean) RunWithQuery(
 		return
 	}
 
-  u.Must(u.Lock)
+	u.Must(u.Lock)
 
 	if err := u.GetStore().QuerySkuType(
 		qg,

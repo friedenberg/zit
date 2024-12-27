@@ -91,7 +91,8 @@ function clone_history_zettel_typ_etikett { # @test
 	us="us"
 	set_xdg "$us"
 	run_clone_default_with \
-		-xdg-dotenv <(print_their_xdg) \
+		-remote-type native-dotenv-xdg \
+		<(print_their_xdg) \
 		+zettel,typ,etikett
 
 	assert_success
@@ -123,7 +124,9 @@ function clone_history_default { # @test
 
 	us="us"
 	set_xdg "$us"
-	run_clone_default_with -xdg-dotenv <(print_their_xdg)
+	run_clone_default_with \
+		-remote-type native-dotenv-xdg \
+		<(print_their_xdg)
 
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM

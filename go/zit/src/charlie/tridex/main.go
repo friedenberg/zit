@@ -8,7 +8,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
@@ -141,7 +140,7 @@ func (t *Tridex) EachString(f interfaces.FuncIter[string]) (err error) {
 	defer t.lock.Unlock()
 
 	if err = t.Root.Each(f, ""); err != nil {
-		if quiter.IsStopIteration(err) {
+		if errors.IsStopIteration(err) {
 			err = nil
 		} else {
 			err = errors.Wrap(err)

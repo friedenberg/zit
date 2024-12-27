@@ -19,7 +19,7 @@ func Chain[T any](e T, wfs ...interfaces.FuncIter[T]) (err error) {
 		case err == nil:
 			continue
 
-		case IsStopIteration(err):
+		case errors.IsStopIteration(err):
 			err = nil
 			return
 
@@ -59,7 +59,7 @@ func MakeChain[T any](wfs ...interfaces.FuncIter[T]) interfaces.FuncIter[T] {
 			case err == nil:
 				continue
 
-			case IsStopIteration(err):
+			case errors.IsStopIteration(err):
 				err = nil
 				return
 

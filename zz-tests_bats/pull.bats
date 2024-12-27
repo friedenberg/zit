@@ -5,7 +5,7 @@ setup() {
 
 	# for shellcheck SC2154
 	export output
-  export BATS_TEST_BODY=true
+	export BATS_TEST_BODY=true
 }
 
 teardown() {
@@ -84,7 +84,8 @@ function pull_history_zettel_typ_etikett_no_conflicts { # @test
 
 	run_zit_init_disable_age
 	run_zit pull \
-		-xdg-dotenv <(print_their_xdg) \
+		-remote-type native-dotenv-xdg \
+		<(print_their_xdg) \
 		+zettel,typ,etikett
 
 	assert_success
@@ -115,8 +116,8 @@ function pull_history_zettel_typ_etikett_no_conflicts_socket { # @test
 
 	run_zit_init_disable_age
 	run_zit pull \
-  -use-socket \
-		-xdg-dotenv <(print_their_xdg) \
+		-remote-type socket-unix \
+		<(print_their_xdg) \
 		+zettel,typ,etikett
 
 	assert_success
@@ -155,7 +156,8 @@ function pull_history_zettel_typ_etikett_yes_conflicts_remote_second { # @test
 	EOM
 
 	run_zit pull \
-		-xdg-dotenv <(print_their_xdg) \
+		-remote-type native-dotenv-xdg \
+		<(print_their_xdg) \
 		+zettel,typ,etikett
 
 	assert_failure
@@ -242,7 +244,8 @@ function pull_history_zettel_typ_etikett_yes_conflicts_remote_first { # @test
 	set_xdg "$BATS_TEST_TMPDIR"
 
 	run_zit pull \
-		-xdg-dotenv <(print_their_xdg) \
+		-remote-type native-dotenv-xdg \
+		<(print_their_xdg) \
 		+zettel,typ,etikett
 
 	assert_failure
@@ -307,7 +310,9 @@ function pull_history_default_no_conflict { # @test
 	set_xdg "$BATS_TEST_TMPDIR"
 
 	run_zit_init_disable_age
-	run_zit pull -xdg-dotenv <(print_their_xdg)
+	run_zit pull \
+		-remote-type native-dotenv-xdg \
+		<(print_their_xdg)
 
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM

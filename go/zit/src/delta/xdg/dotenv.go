@@ -15,13 +15,15 @@ type Dotenv struct {
 }
 
 func (d Dotenv) setDefaultOrEnvFromMap(
-	initElement xdgInitElement,
+	defawlt string,
+	envKey string,
+	out *string,
 	env map[string]string,
 ) (err error) {
-	if v, ok := env[initElement.envKey]; ok {
-		*initElement.out = v
+	if v, ok := env[envKey]; ok {
+		*out = v
 	} else {
-		*initElement.out = os.Expand(initElement.standard, func(v string) string {
+		*out = os.Expand(defawlt, func(v string) string {
 			switch v {
 			case "HOME":
 				return d.Home
@@ -74,7 +76,9 @@ func (d Dotenv) ReadFrom(r io.Reader) (n int64, err error) {
 
 	for _, ie := range toInitialize {
 		if err = d.setDefaultOrEnvFromMap(
-			ie,
+			ie.standard,
+			ie.envKey,
+			ie.out,
 			env,
 		); err != nil {
 			err = errors.Wrap(err)

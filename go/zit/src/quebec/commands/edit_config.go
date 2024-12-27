@@ -44,8 +44,8 @@ func (c EditConfig) RunWithRepo(u *repo_local.Repo, args ...string) {
 		}
 	}
 
-  u.Must(u.Reset)
-  u.Must(u.Lock)
+	u.Must(u.Reset)
+	u.Must(u.Lock)
 
 	if err := u.GetStore().CreateOrUpdate(
 		sk,
@@ -54,7 +54,7 @@ func (c EditConfig) RunWithRepo(u *repo_local.Repo, args ...string) {
 		u.CancelWithError(err)
 	}
 
-  u.Must(u.Unlock)
+	u.Must(u.Unlock)
 }
 
 func (c EditConfig) editInVim(

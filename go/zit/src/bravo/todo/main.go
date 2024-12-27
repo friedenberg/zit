@@ -5,8 +5,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
-var errNotImplemented = errors.New("not implemented")
-
 func Change(_ string) {
 	ui.TodoP1("start logging this")
 }
@@ -29,7 +27,7 @@ func Optimize() {
 
 func Implement() (err error) {
 	ui.TodoP1("start logging this")
-	return errors.WrapSkip(1, errNotImplemented)
+	return errors.WrapSkip(1, errors.ErrNotImplemented)
 }
 
 func Remove() {

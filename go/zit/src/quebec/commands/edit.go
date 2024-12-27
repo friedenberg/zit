@@ -68,7 +68,7 @@ func (c Edit) RunWithQuery(u *repo_local.Repo, eqwk *query.Group) {
 		Edit:    true,
 	}
 
-  if _, err := opEdit.RunQuery(eqwk); err != nil {
-    u.CancelWithError(err)
+	if _, err := opEdit.RunQuery(eqwk); err != nil {
+		u.CancelWithError(err)
 	}
 }

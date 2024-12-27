@@ -101,7 +101,7 @@ func (os *Objects) All() iter.Seq2[int, *obj] {
 func (os *Objects) Each(f interfaces.FuncIter[*obj]) (err error) {
 	for _, v := range *os {
 		if err = f(v); err != nil {
-			if quiter.IsStopIteration(err) {
+			if errors.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

@@ -141,7 +141,7 @@ func (h *Heap[T, TPtr]) PopError() (sk TPtr, err error) {
 	sk, ok = h.Pop()
 
 	if !ok {
-		err = quiter.MakeErrStopIteration()
+		err = errors.MakeErrStopIteration()
 	}
 
 	return
@@ -204,7 +204,7 @@ func (a *Heap[T, TPtr]) EachPtr(f interfaces.FuncIter[TPtr]) (err error) {
 
 	for _, s := range a.h.Elements {
 		if err = f(s); err != nil {
-			if quiter.IsStopIteration(err) {
+			if errors.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
@@ -223,7 +223,7 @@ func (a *Heap[T, TPtr]) Each(f interfaces.FuncIter[T]) (err error) {
 
 	for _, s := range a.h.Elements {
 		if err = f(*s); err != nil {
-			if quiter.IsStopIteration(err) {
+			if errors.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)

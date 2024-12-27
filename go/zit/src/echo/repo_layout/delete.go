@@ -21,12 +21,12 @@ func (s Layout) DeleteAll(p string) (err error) {
 }
 
 func (s Layout) Delete(p string) (err error) {
-  p = filepath.Clean(p)
+	p = filepath.Clean(p)
 
-  if p == "." {
-    err = errors.Errorf("invalid delete request: %q", p)
-    return
-  }
+	if p == "." {
+		err = errors.Errorf("invalid delete request: %q", p)
+		return
+	}
 
 	if s.IsDryRun() {
 		return

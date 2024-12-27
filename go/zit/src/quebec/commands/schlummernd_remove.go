@@ -21,7 +21,7 @@ func init() {
 }
 
 func (c DormantRemove) RunWithRepo(u *repo_local.Repo, args ...string) {
-  u.Must(u.Lock)
+	u.Must(u.Lock)
 
 	for _, v := range args {
 		cs := catgut.MakeFromString(v)
@@ -31,5 +31,5 @@ func (c DormantRemove) RunWithRepo(u *repo_local.Repo, args ...string) {
 		}
 	}
 
-  u.Must(u.Unlock)
+	u.Must(u.Unlock)
 }

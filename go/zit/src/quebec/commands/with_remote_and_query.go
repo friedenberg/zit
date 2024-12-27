@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
@@ -23,8 +22,7 @@ type CommandWithRemoteAndQuery interface {
 }
 
 type commandWithRemoteAndQuery struct {
-	TheirXDGDotenv string
-	UseSocket      bool
+	RemoteType repo.RemoteType
 
 	CommandWithRemoteAndQuery
 
@@ -35,10 +33,9 @@ type commandWithRemoteAndQuery struct {
 
 func (cmd *commandWithRemoteAndQuery) SetFlagSet(f *flag.FlagSet) {
 	f.Var(&cmd.RepoId, "kasten", "none or Browser")
+	f.Var(&cmd.RemoteType, "remote-type", "TODO")
 	f.BoolVar(&cmd.ExcludeUntracked, "exclude-untracked", false, "")
 	f.BoolVar(&cmd.ExcludeRecognized, "exclude-recognized", false, "")
-	f.StringVar(&cmd.TheirXDGDotenv, "xdg-dotenv", "", "")
-	f.BoolVar(&cmd.UseSocket, "use-socket", false, "")
 
 	if cwf, ok := cmd.CommandWithRemoteAndQuery.(CommandWithFlags); ok {
 		cwf.SetFlagSet(f)
@@ -84,9 +81,9 @@ func (c commandWithRemoteAndQuery) RunWithRepo(
 	local *repo_local.Repo,
 	args ...string,
 ) {
-	if len(args) < 1 && c.TheirXDGDotenv == "" {
+	if len(args) < 1 {
 		// TODO add info about remote options
-		local.CancelWithBadRequestf("Pulling requires a remote to be specified")
+		local.CancelWithBadRequestf("requires a remote to be specified")
 	}
 
 	{
@@ -96,7 +93,7 @@ func (c commandWithRemoteAndQuery) RunWithRepo(
 			c.CommandWithRemoteAndQuery,
 			c.RepoId,
 			c.ExternalQueryOptions,
-			args...,
+			args[1:]...,
 		); err != nil {
 			local.CancelWithError(err)
 		}
@@ -104,33 +101,49 @@ func (c commandWithRemoteAndQuery) RunWithRepo(
 
 	defer local.PrintMatchedDormantIfNecessary()
 
-	var remote repo.Repo
-
-	{
-		var err error
-
-		if c.TheirXDGDotenv != "" {
-			if c.UseSocket {
-				if remote, err = repo_remote.MakeRemoteHTTPFromXDGDotenvPath(
-					local.Context,
-					local.GetConfig(),
-					c.TheirXDGDotenv,
-				); err != nil {
-					local.CancelWithError(err)
-				}
-			} else {
-				if remote, err = repo_local.MakeFromConfigAndXDGDotenvPath(
-					local.Context,
-					local.GetConfig(),
-					c.TheirXDGDotenv,
-				); err != nil {
-					local.CancelWithError(err)
-				}
-			}
-		} else {
-			local.CancelWithError(todo.Implement())
-		}
-	}
+	remote := c.makeRemote(local, args[0])
 
 	c.RunWithRemoteAndQuery(local, remote, c.Group)
+}
+
+func (c commandWithRemoteAndQuery) makeRemote(
+	local *repo_local.Repo,
+	remoteArg string,
+) (remote repo.Repo) {
+	var err error
+
+	switch c.RemoteType {
+	case repo.RemoteTypeNativeDotenvXDG:
+		if remote, err = repo_local.MakeFromConfigAndXDGDotenvPath(
+			local.Context,
+			local.GetConfig(),
+			remoteArg,
+		); err != nil {
+			local.CancelWithErrorAndFormat(
+				err,
+				"RemoteType: %q, Remote: %q",
+				c.RemoteType,
+				remoteArg,
+			)
+		}
+
+	case repo.RemoteTypeSocketUnix:
+		if remote, err = repo_remote.MakeRemoteHTTPFromXDGDotenvPath(
+			local.Context,
+			local.GetConfig(),
+			remoteArg,
+		); err != nil {
+			local.CancelWithErrorAndFormat(
+				err,
+				"RemoteType: %q, Remote: %q",
+				c.RemoteType,
+				remoteArg,
+			)
+		}
+
+	default:
+		local.CancelWithNotImplemented()
+	}
+
+	return
 }

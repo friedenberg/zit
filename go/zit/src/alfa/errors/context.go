@@ -116,7 +116,6 @@ func (c Context) CancelWithError(err error) {
 
 func (c Context) CancelWithErrorAndFormat(err error, f string, values ...any) {
 	defer c.ContinueOrPanicOnDone()
-	c.cancel(WrapN(1, err))
 	c.cancel(
 		&stackWrapError{
 			StackInfo: MustStackInfo(1),
@@ -134,4 +133,9 @@ func (c Context) CancelWithErrorf(f string, values ...any) {
 func (c Context) CancelWithBadRequestf(f string, values ...any) {
 	defer c.ContinueOrPanicOnDone()
 	c.cancel(&errBadRequest{xerrors.Errorf(f, values...)})
+}
+
+func (c Context) CancelWithNotImplemented() {
+	defer c.ContinueOrPanicOnDone()
+	c.cancel(ErrNotImplemented)
 }

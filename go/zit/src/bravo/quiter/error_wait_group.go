@@ -7,6 +7,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 )
 
+// TODO combine with errors.Context
 type ErrorWaitGroup interface {
 	Do(interfaces.FuncError) bool
 	DoAfter(interfaces.FuncError)
@@ -61,7 +62,7 @@ func ErrorWaitGroupApply[T any](
 					return f(e)
 				},
 			) {
-				err = MakeErrStopIteration()
+				err = errors.MakeErrStopIteration()
 			}
 
 			return

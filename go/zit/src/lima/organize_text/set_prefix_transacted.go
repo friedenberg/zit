@@ -152,7 +152,7 @@ func (a PrefixSet) Each(
 		}
 
 		if err = f(e1, ssz); err != nil {
-			if quiter.IsStopIteration(err) {
+			if errors.IsStopIteration(err) {
 				err = nil
 			} else {
 				err = errors.Wrap(err)
