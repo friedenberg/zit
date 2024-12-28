@@ -21,8 +21,8 @@ func TestContextCancelled(t *testing.T) {
 					t.Log("recover")
 					didPanic = true
 
-					if r != ErrContextCancelled {
-						t.Errorf("expected recover to be %q", ErrContextCancelled)
+					if r != errContextCancelled {
+						t.Errorf("expected recover to be %q", errContextCancelled)
 					}
 				}
 			}()

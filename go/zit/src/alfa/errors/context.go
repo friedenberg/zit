@@ -12,7 +12,7 @@ import (
 	"golang.org/x/xerrors"
 )
 
-var ErrContextCancelled = New("context cancelled")
+var errContextCancelled = New("context cancelled")
 
 type Context struct {
 	context.Context
@@ -38,7 +38,7 @@ func MakeContext(in context.Context) *Context {
 
 func (c *Context) Cause() error {
 	if err := context.Cause(c.Context); err != nil {
-		if Is(err, ErrContextCancelled) {
+		if Is(err, errContextCancelled) {
 			return nil
 		} else {
 			return err
@@ -52,7 +52,7 @@ func (c *Context) ContinueOrPanicOnDone() {
 	select {
 	default:
 	case <-c.Done():
-		panic(ErrContextCancelled)
+		panic(errContextCancelled)
 	}
 }
 
@@ -74,10 +74,10 @@ func (c *Context) SetCancelOnSignals(
 
 func (c *Context) Run(f func(*Context)) error {
 	func() {
-		defer c.cancel(ErrContextCancelled)
+		defer c.cancel(errContextCancelled)
 		defer func() {
 			if r := recover(); r != nil {
-				if r != ErrContextCancelled {
+				if r != errContextCancelled {
 					panic(r)
 				}
 			}
@@ -116,6 +116,10 @@ func (c *Context) after(skip int, f func() error) {
 	)
 }
 
+// `After` runs a function after the context is complete (regardless of any
+// errors). `After`s are run in the reverse order of when they are called, like
+// defers but on a whole-program level.
+//
 //go:noinline
 func (c *Context) After(f func() error) {
 	c.after(1, f)
@@ -126,8 +130,8 @@ func (c *Context) AfterWithContext(f func(*Context) error) {
 	c.after(1, func() error { return f(c) })
 }
 
-// Must executes a function even if the context has been cancelled. If the
-// function returns an error, Must cancels the context and offers a heartbeat to
+// `Must` executes a function even if the context has been cancelled. If the
+// function returns an error, `Must` cancels the context and offers a heartbeat to
 // panic. It is meant for defers that must be executed, like closing files,
 // flushing buffers, releasing locks.
 func (c *Context) Must(f func() error) {
@@ -154,9 +158,10 @@ func (c *Context) MustFlush(flusher Flusher) {
 	c.Must(flusher.Flush)
 }
 
+// TODO make this private and part of the run method
 func (c *Context) Cancel() {
 	defer c.ContinueOrPanicOnDone()
-	c.cancel(ErrContextCancelled)
+	c.cancel(errContextCancelled)
 }
 
 func (c *Context) CancelWithError(err error) {

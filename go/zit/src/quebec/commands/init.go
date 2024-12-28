@@ -48,7 +48,5 @@ func (c Init) Run(
 		); err != nil {
 			repo.CancelWithError(err)
 		}
-
-		defer repo.MustFlush(repo)
 	}
 }

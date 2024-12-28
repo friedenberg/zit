@@ -73,8 +73,6 @@ func (c Clone) Run(
 		); err != nil {
 			local.CancelWithError(err)
 		}
-
-		defer local.MustFlush(local)
 	}
 
 	remote := c.MakeRemote(local.Env, c.GetFlagSet().Args()[0])

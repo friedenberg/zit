@@ -34,9 +34,6 @@ func (cmd commandWithRepo) Run(
 		options,
 	)
 
-	// TODO determine how to globalize certain cleanup operations like the below
-	defer repo.MustFlush(repo)
-
 	switch {
 	case repo.GetConfig().Complete:
 		t := cmd.getCommandCompletionWithRepo(dependencies)
