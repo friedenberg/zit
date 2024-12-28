@@ -11,8 +11,17 @@ teardown() {
 	rm_from_version "$version"
 }
 
+function complete_show { # @test
+	run_zit show -complete
+	assert_success
+	assert_output_unsorted --regexp - <<-EOM
+		one/dos.*Zettel: !md wow ok again
+		one/uno.*Zettel: !md wow the first
+	EOM
+}
+
 function complete_show_all { # @test
-	run_zit show -complete :
+	run_zit show -complete :z,t,b,e
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM
 		.*Bestandsaufnahme
