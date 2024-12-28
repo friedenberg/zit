@@ -15,7 +15,6 @@ teardown() {
 # bats file_tags=user_story:clone,user_story:repo,user_store:xdg,user_story:remote
 
 function bootstrap {
-	set_xdg "$1"
 	mkdir -p "$1"
 	pushd "$1" || exit 1
 	run_zit_init -override-xdg-with-cwd
@@ -58,6 +57,11 @@ function bootstrap {
 	popd || exit 1
 }
 
+function print_their_xdg() {
+	pushd "$1" >/dev/null || exit 1
+	zit info xdg
+}
+
 function run_clone_default_with() {
 	run_zit clone \
 		-yin <(cat_yin) \
@@ -83,21 +87,15 @@ function try_add_new_after_clone {
 }
 
 function clone_history_zettel_typ_etikett { # @test
-	skip
 	them="them"
 	bootstrap "$them"
 	assert_success
-
-	function print_their_xdg() (
-		set_xdg "$them"
-		zit info xdg
-	)
 
 	us="us"
 	set_xdg "$us"
 	run_clone_default_with \
 		-remote-type native-dotenv-xdg \
-		<(print_their_xdg) \
+		<(print_their_xdg them) \
 		+zettel,typ,etikett
 
 	assert_success
@@ -118,7 +116,6 @@ function clone_history_zettel_typ_etikett { # @test
 }
 
 function clone_history_zettel_typ_etikett_stdio { # @test
-	skip
 	them="them"
 	bootstrap "$them"
 	assert_success
@@ -131,7 +128,7 @@ function clone_history_zettel_typ_etikett_stdio { # @test
 		+zettel,typ,etikett
 
 	assert_success
-	assert_output - <<-EOM
+	assert_output_unsorted - <<-EOM
 		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
 		[konfig @ef6b910d71068d5cb0598abeaea21140b44da67a4a4a9eca6485e8a2906ca483 !toml-config-v1]
 		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
@@ -148,21 +145,15 @@ function clone_history_zettel_typ_etikett_stdio { # @test
 }
 
 function clone_history_default { # @test
-	skip
 	them="them"
 	bootstrap "$them"
 	assert_success
-
-	function print_their_xdg() (
-		set_xdg "$them"
-		zit info xdg
-	)
 
 	us="us"
 	set_xdg "$us"
 	run_clone_default_with \
 		-remote-type native-dotenv-xdg \
-		<(print_their_xdg)
+		<(print_their_xdg them)
 
 	assert_success
 	assert_output_unsorted --regexp - <<-EOM

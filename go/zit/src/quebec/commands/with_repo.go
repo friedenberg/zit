@@ -32,6 +32,7 @@ func (cmd commandWithRepo) RunWithDependencies(
 
 	{
 		var err error
+
 		if layout, err = dir_layout.MakeDefault(
 			dependencies.Debug,
 		); err != nil {

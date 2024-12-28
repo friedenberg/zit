@@ -106,14 +106,10 @@ function init_with_non_xdg { # @test
 }
 
 function non_repo_failure { # @test
-	skip
 	set_xdg "$BATS_TEST_TMPDIR"
-	run_zit show -verbose +konfig,t
+	run_zit show +konfig,t
 	assert_failure
-	assert_output_unsorted - <<-EOM
-		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
-		[konfig @d904d322213ed86cdc0eabd58d44f55385f9665280f6c03a01e396f22ba2333b !toml-config-v1]
-	EOM
+	assert_output 'not in a zit directory'
 }
 
 # function init_and_init { ## @test

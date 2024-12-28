@@ -106,9 +106,11 @@ func (x *XDG) InitializeOverridden(
 			return
 		}
 
-		if err = os.MkdirAll(*ie.out, 0o700); err != nil {
-			err = errors.Wrap(err)
-			return
+		if mkDir {
+			if err = os.MkdirAll(*ie.out, 0o700); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 	}
 
@@ -132,9 +134,11 @@ func (x *XDG) InitializeStandardFromEnv(
 			return
 		}
 
-		if err = os.MkdirAll(*ie.out, 0o700); err != nil {
-			err = errors.Wrap(err)
-			return
+		if mkDir {
+			if err = os.MkdirAll(*ie.out, 0o700); err != nil {
+				err = errors.Wrap(err)
+				return
+			}
 		}
 	}
 
@@ -142,7 +146,6 @@ func (x *XDG) InitializeStandardFromEnv(
 }
 
 func (x *XDG) InitializeFromDotenvFile(
-	mkDir bool,
 	addedPath string,
 	file string,
 ) (err error) {

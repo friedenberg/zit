@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
@@ -46,6 +45,7 @@ func (cmd *Clone) GetFlagSet() *flag.FlagSet {
 }
 
 func (cmd *Clone) SetFlagSet(f *flag.FlagSet) {
+	cmd.FlagSet = f
 	cmd.BigBang.AddToFlagSet(f)
 	cmd.ComponentRemote.SetFlagSet(f)
 	cmd.ComponentQuery.SetFlagSet(f)
@@ -81,7 +81,7 @@ func (c Clone) RunWithDependencies(
 
 	remote := c.MakeRemote(local.Env, c.GetFlagSet().Args()[0])
 
-	var qg *query.Group
+	qg := c.MakeQueryGroup(c, local, c.Args()[1:]...)
 
 	if err := local.PullQueryGroupFromRemote(
 		remote,

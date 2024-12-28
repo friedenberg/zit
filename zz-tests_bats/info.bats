@@ -34,8 +34,7 @@ function info_xdg { # @test
 }
 
 function info_non_xdg { # @test
-	mkdir .zit
-	run_zit_init_disable_age
+	run_zit_init -override-xdg-with-cwd
 	run_zit info xdg
 	assert_output - <<-EOM
 		XDG_DATA_HOME=$BATS_TEST_TMPDIR/.zit/local/share

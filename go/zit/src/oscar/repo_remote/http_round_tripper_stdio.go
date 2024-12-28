@@ -30,7 +30,7 @@ func (roundTripper *HTTPRoundTripperStdio) Initialize(
 	roundTripper.Args = []string{
 		"zit",
 		"serve",
-		"-verbose",
+		// "-verbose",
 		"-",
 	}
 

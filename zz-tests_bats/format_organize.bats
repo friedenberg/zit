@@ -206,6 +206,7 @@ function format_organize_with_fields_and_instructions { # @test
 
 # bats test_tags=user_story:external_ids
 function format_organize_untracked_fs_blob_with_spaces() { # @test
+	run_zit_init_disable_age
 	run_zit format-organize - <<-EOM
 
 		- ["test with spaces.txt"]
