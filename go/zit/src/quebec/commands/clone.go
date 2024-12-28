@@ -7,28 +7,48 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
-	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
 type Clone struct {
+	*flag.FlagSet
 	repo_local.BigBang
+	ComponentRemote
+	ComponentQuery
 }
 
+// TODO transition this to CommandWithDependencies instead of
+// CommandWithRemoteAndQuery
 func init() {
-	registerCommandWithRemoteAndQuery(
+	registerCommand(
 		"clone",
-		&Clone{
-			BigBang: repo_local.BigBang{
-				Config:             immutable_config.Default(),
-				ExcludeDefaultType: true,
-			},
+		func(f *flag.FlagSet) CommandWithDependencies {
+			c := &Clone{
+				BigBang: repo_local.BigBang{
+					Config:             immutable_config.Default(),
+					ExcludeDefaultType: true,
+				},
+			}
+
+			c.SetFlagSet(f)
+
+			return c
 		},
 	)
 }
 
+func (cmd *Clone) GetCommandWithDependencies() CommandWithDependencies {
+	return cmd
+}
+
+func (cmd *Clone) GetFlagSet() *flag.FlagSet {
+	return cmd.FlagSet
+}
+
 func (cmd *Clone) SetFlagSet(f *flag.FlagSet) {
 	cmd.BigBang.AddToFlagSet(f)
+	cmd.ComponentRemote.SetFlagSet(f)
+	cmd.ComponentQuery.SetFlagSet(f)
 }
 
 func (c Clone) DefaultSigil() ids.Sigil {
@@ -40,14 +60,28 @@ func (c Clone) DefaultGenres() ids.Genre {
 	// return ids.MakeGenre(genres.TrueGenre()...)
 }
 
-func (c Clone) RunWithRemoteAndQuery(
-	local *repo_local.Repo,
-	remote repo.Repo,
-	qg *query.Group,
+func (c Clone) RunWithDependencies(
+	dependencies Dependencies,
 ) {
-	if err := local.Start(c.BigBang); err != nil {
-		local.CancelWithError(err)
+	var local *repo_local.Repo
+
+	{
+		var err error
+
+		if local, err = c.BigBang.Start(
+			dependencies.Context,
+			dependencies.Config,
+		); err != nil {
+			local.CancelWithError(err)
+		}
+
+		defer dependencies.MustWithContext(local.GetDirLayout().ResetTempOnExit)
+		defer local.MustFlush(local)
 	}
+
+	remote := c.MakeRemote(local.Env, c.GetFlagSet().Args()[0])
+
+	var qg *query.Group
 
 	if err := local.PullQueryGroupFromRemote(
 		remote,

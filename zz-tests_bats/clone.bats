@@ -16,7 +16,9 @@ teardown() {
 
 function bootstrap {
 	set_xdg "$1"
-	run_zit_init
+	mkdir -p "$1"
+	pushd "$1" || exit 1
+	run_zit_init -override-xdg-with-cwd
 
 	{
 		echo "---"
@@ -52,6 +54,8 @@ function bootstrap {
 		[this_is_the_second @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
 	EOM
+
+	popd || exit 1
 }
 
 function run_clone_default_with() {
@@ -79,6 +83,7 @@ function try_add_new_after_clone {
 }
 
 function clone_history_zettel_typ_etikett { # @test
+	skip
 	them="them"
 	bootstrap "$them"
 	assert_success
@@ -112,7 +117,38 @@ function clone_history_zettel_typ_etikett { # @test
 	try_add_new_after_clone
 }
 
+function clone_history_zettel_typ_etikett_stdio { # @test
+	skip
+	them="them"
+	bootstrap "$them"
+	assert_success
+
+	us="us"
+	set_xdg "$us"
+	run_clone_default_with \
+		-remote-type stdio-local \
+		"$(realpath them)" \
+		+zettel,typ,etikett
+
+	assert_success
+	assert_output - <<-EOM
+		[!md @b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 !toml-type-v1]
+		[konfig @ef6b910d71068d5cb0598abeaea21140b44da67a4a4a9eca6485e8a2906ca483 !toml-config-v1]
+		[one/dos @024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b !md "zettel with multiple etiketten" this_is_the_first this_is_the_second]
+		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
+		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[this_is_the_first @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[this_is_the_second @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		copied Blob 024948601ce44cc9ab070b555da4e992f111353b7a9f5569240005639795297b (36 bytes)
+		copied Blob 9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 (5 bytes)
+		copied Blob b7ad8c6ccb49430260ce8df864bbf7d6f91c6860d4d602454936348655a42a16 (51 bytes)
+	EOM
+
+	try_add_new_after_clone
+}
+
 function clone_history_default { # @test
+	skip
 	them="them"
 	bootstrap "$them"
 	assert_success

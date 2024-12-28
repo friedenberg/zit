@@ -5,12 +5,10 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
-	"code.linenisgreat.com/zit/go/zit/src/oscar/repo_remote"
 )
 
 type CommandWithRemoteAndQuery interface {
@@ -22,13 +20,9 @@ type CommandWithRemoteAndQuery interface {
 }
 
 type commandWithRemoteAndQuery struct {
-	RemoteType repo.RemoteType
-
+	ComponentRemote
+	ComponentQuery
 	CommandWithRemoteAndQuery
-
-	remote repo.Repo
-	sku.ExternalQueryOptions
-	*query.Group
 }
 
 func (cmd *commandWithRemoteAndQuery) SetFlagSet(f *flag.FlagSet) {
@@ -57,8 +51,9 @@ func (c commandWithRemoteAndQuery) CompleteWithRepo(
 	defer errors.DeferredCloser(&err, w)
 
 	b := u.MakeQueryBuilderExcludingHidden(cgg.CompletionGenres())
+	var qg *query.Group
 
-	if c.Group, err = b.BuildQueryGroupWithRepoId(
+	if qg, err = b.BuildQueryGroupWithRepoId(
 		c.RepoId,
 		c.ExternalQueryOptions,
 	); err != nil {
@@ -67,7 +62,7 @@ func (c commandWithRemoteAndQuery) CompleteWithRepo(
 	}
 
 	if err = u.GetStore().QueryTransacted(
-		c.Group,
+		qg,
 		w.WriteOneTransacted,
 	); err != nil {
 		err = errors.Wrap(err)
@@ -86,64 +81,15 @@ func (c commandWithRemoteAndQuery) RunWithRepo(
 		local.CancelWithBadRequestf("requires a remote to be specified")
 	}
 
-	{
-		var err error
-
-		if c.Group, err = local.MakeQueryGroup(
-			c.CommandWithRemoteAndQuery,
-			c.RepoId,
-			c.ExternalQueryOptions,
-			args[1:]...,
-		); err != nil {
-			local.CancelWithError(err)
-		}
-	}
+	qg := c.MakeQueryGroup(
+		c.CommandWithRemoteAndQuery,
+		local,
+		args[1:]...,
+	)
 
 	defer local.PrintMatchedDormantIfNecessary()
 
-	remote := c.makeRemote(local, args[0])
+	remote := c.MakeRemote(local.Env, args[0])
 
-	c.RunWithRemoteAndQuery(local, remote, c.Group)
-}
-
-func (c commandWithRemoteAndQuery) makeRemote(
-	local *repo_local.Repo,
-	remoteArg string,
-) (remote repo.Repo) {
-	var err error
-
-	switch c.RemoteType {
-	case repo.RemoteTypeNativeDotenvXDG:
-		if remote, err = repo_local.MakeFromConfigAndXDGDotenvPath(
-			local.Context,
-			local.GetConfig(),
-			remoteArg,
-		); err != nil {
-			local.CancelWithErrorAndFormat(
-				err,
-				"RemoteType: %q, Remote: %q",
-				c.RemoteType,
-				remoteArg,
-			)
-		}
-
-	case repo.RemoteTypeSocketUnix:
-		if remote, err = repo_remote.MakeRemoteHTTPFromXDGDotenvPath(
-			local.Context,
-			local.GetConfig(),
-			remoteArg,
-		); err != nil {
-			local.CancelWithErrorAndFormat(
-				err,
-				"RemoteType: %q, Remote: %q",
-				c.RemoteType,
-				remoteArg,
-			)
-		}
-
-	default:
-		local.CancelWithNotImplemented()
-	}
-
-	return
+	c.RunWithRemoteAndQuery(local, remote, qg)
 }

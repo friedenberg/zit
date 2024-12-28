@@ -18,8 +18,11 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
+	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/builtin_types"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
+	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/golf/mutable_config_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/type_blobs"
@@ -49,7 +52,28 @@ func (e *BigBang) AddToFlagSet(f *flag.FlagSet) {
 	e.Config.AddToFlagSet(f)
 }
 
-func (u *Repo) Start(bb BigBang) (err error) {
+func (bb BigBang) Start(
+	context errors.Context,
+	config config_mutable_cli.Config,
+) (u *Repo, err error) {
+	var layout dir_layout.Layout
+
+	if layout, err = dir_layout.MakeDefaultAndInitialize(
+		config.Debug,
+		bb.OverrideXDGWithCwd,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	env := env.Make(
+		context,
+		config,
+		layout,
+	)
+
+	u = Make(env, OptionsEmpty)
+
 	s := u.GetRepoLayout()
 
 	mkdirAll(s.DirObjectId())

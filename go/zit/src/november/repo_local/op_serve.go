@@ -175,11 +175,13 @@ func (repo *Repo) ServeStdio() (err error) {
 		}
 
 		responseModified := &http.Response{
-			ProtoMajor: request.ProtoMajor,
-			ProtoMinor: request.ProtoMinor,
-			Request:    request,
-			StatusCode: response.StatusCode,
-			Body:       response.Body,
+			// ContentLength:    -1,
+			TransferEncoding: []string{"chunked"},
+			ProtoMajor:       request.ProtoMajor,
+			ProtoMinor:       request.ProtoMinor,
+			Request:          request,
+			StatusCode:       response.StatusCode,
+			Body:             response.Body,
 		}
 
 		if err = responseModified.Write(bw); err != nil {

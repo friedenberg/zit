@@ -79,12 +79,12 @@ func MakeWithHome(
 	if permitCwdXDGOverride && files.Exists(pathCwdXDGOverride) {
 		xdg.Home = pathCwdXDGOverride
 		addedPath = ""
-		if err = xdg.InitializeOverridden(true, addedPath); err != nil {
+		if err = xdg.InitializeOverridden(false, addedPath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}
 	} else {
-		if err = xdg.InitializeStandardFromEnv(true, addedPath); err != nil {
+		if err = xdg.InitializeStandardFromEnv(false, addedPath); err != nil {
 			err = errors.Wrap(err)
 			return
 		}

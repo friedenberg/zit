@@ -13,6 +13,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
+	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/golf/object_inventory_format"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
@@ -51,7 +52,7 @@ type Repo struct {
 
 func MakeFromConfigAndXDGDotenvPath(
 	context errors.Context,
-	config *config.Compiled,
+	config config_mutable_cli.Config,
 	xdgDotenvPath string,
 ) (local *Repo, err error) {
 	dotenv := xdg.Dotenv{
@@ -87,18 +88,14 @@ func MakeFromConfigAndXDGDotenvPath(
 
 	env := env.Make(
 		context,
-		nil,
-		config.Cli(),
+		config,
 		dirLayout,
 	)
 
-	if local, err = Make(
+	local = Make(
 		env,
 		OptionsEmpty,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	)
 
 	return
 }
@@ -106,15 +103,17 @@ func MakeFromConfigAndXDGDotenvPath(
 func Make(
 	env *env.Env,
 	options Options,
-) (u *Repo, err error) {
-	u = &Repo{
+) (repo *Repo) {
+	repo = &Repo{
 		Env:            env,
 		DormantCounter: query.MakeDormantCounter(),
 	}
 
-	u.config.Reset()
+	repo.config.Reset()
 
-	err = u.Initialize(options)
+	if err := repo.Initialize(options); err != nil {
+		env.CancelWithError(err)
+	}
 
 	return
 }

@@ -2,7 +2,6 @@ package repo_remote
 
 import (
 	"bufio"
-	"net"
 	"net/http"
 	"strings"
 
@@ -13,53 +12,18 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_blobs"
-	"code.linenisgreat.com/zit/go/zit/src/juliett/config"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
-// TODO this should not be a compiled config
-func MakeRemoteHTTPFromXDGDotenvPath(
-	context errors.Context,
-	config *config.Compiled,
-	xdgDotenvPath string,
-) (remoteHTTP *HTTP, err error) {
-	var remote *repo_local.Repo
-
-	if remote, err = repo_local.MakeFromConfigAndXDGDotenvPath(
-		context,
-		config,
-		xdgDotenvPath,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	remoteHTTP = &HTTP{
-		remote: remote,
-	}
-
-	if remoteHTTP.unixSocket, err = remote.InitializeUnixSocket(
-		net.ListenConfig{},
-		"",
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	go func() {
-		if err := remote.Serve(remoteHTTP.unixSocket); err != nil {
-			remote.CancelWithError(err)
-		}
-	}()
-
-	return
-}
+// type HTTPClient interface {
+// 	Do(req *http.Request) (*http.Response, error)
+// }
 
 type HTTP struct {
-	unixSocket repo_local.UnixSocket
-	remote     *repo_local.Repo
+	http.Client
+	remote *repo_local.Repo
 }
 
 func (remote *HTTP) GetRepo() repo.Repo {
@@ -80,39 +44,6 @@ func (remote *HTTP) MakeQueryGroup(
 	return
 }
 
-func (remote *HTTP) do(
-	request *http.Request,
-) (response *http.Response, err error) {
-	var conn net.Conn
-
-	if conn, err = net.Dial("unix", remote.unixSocket.Path); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	bw := bufio.NewWriter(conn)
-
-	if err = request.Write(bw); err != nil {
-		err = errors.Errorf("failed to write to socket: %w", err)
-		return
-	}
-
-	if err = bw.Flush(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if response, err = http.ReadResponse(
-		bufio.NewReader(conn),
-		request,
-	); err != nil {
-		err = errors.Errorf("failed to read response: %w", err)
-		return
-	}
-
-	return
-}
-
 func (remote *HTTP) MakeInventoryList(
 	qg *query.Group,
 ) (list *sku.List, err error) {
@@ -130,7 +61,7 @@ func (remote *HTTP) MakeInventoryList(
 
 	var response *http.Response
 
-	if response, err = remote.do(request); err != nil {
+	if response, err = remote.Do(request); err != nil {
 		err = errors.Errorf("failed to read response: %w", err)
 		return
 	}
@@ -198,7 +129,7 @@ func (blobStore *HTTPBlobStore) HasBlob(sh interfaces.Sha) (ok bool) {
 	{
 		var err error
 
-		if response, err = blobStore.remote.do(request); err != nil {
+		if response, err = blobStore.remote.Do(request); err != nil {
 			blobStore.remote.remote.CancelWithError(err)
 		}
 	}
@@ -230,7 +161,7 @@ func (blobStore *HTTPBlobStore) BlobReader(
 
 	var response *http.Response
 
-	if response, err = blobStore.remote.do(request); err != nil {
+	if response, err = blobStore.remote.Do(request); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

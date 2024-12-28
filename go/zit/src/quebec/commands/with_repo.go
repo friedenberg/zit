@@ -20,13 +20,19 @@ func (cmd commandWithRepo) GetFlagSet() *flag.FlagSet {
 func (cmd commandWithRepo) RunWithDependencies(
 	dependencies Dependencies,
 ) {
-	// TODO use options when making dirLayout
-	var dirLayout dir_layout.Layout
+	options := repo_local.OptionsEmpty
+
+	if og, ok := cmd.Command.(repo_local.OptionsGetter); ok {
+		options = og.GetEnvironmentInitializeOptions()
+	}
+
+	cmdArgs := cmd.Args()
+
+	var layout dir_layout.Layout
 
 	{
 		var err error
-
-		if dirLayout, err = dir_layout.MakeDefault(
+		if layout, err = dir_layout.MakeDefault(
 			dependencies.Debug,
 		); err != nil {
 			dependencies.CancelWithError(err)
@@ -35,69 +41,45 @@ func (cmd commandWithRepo) RunWithDependencies(
 
 	env := env.Make(
 		dependencies.Context,
-		cmd.GetFlagSet(),
 		dependencies.Config,
-		dirLayout,
+		layout,
 	)
 
-	cmdArgs := cmd.Args()
+	repo := repo_local.Make(env, options)
 
-	var u *repo_local.Repo
-
-	options := repo_local.OptionsEmpty
-
-	if og, ok := cmd.Command.(repo_local.OptionsGetter); ok {
-		options = og.GetEnvironmentInitializeOptions()
-	}
-
-	{
-		var err error
-
-		if u, err = repo_local.Make(
-			env,
-			options,
-		); err != nil {
-			dependencies.CancelWithError(err)
-		}
-
-		defer u.MustFlush(u)
-	}
-
-	defer func() {
-		if err := u.GetRepoLayout().ResetTempOnExit(
-			dependencies.Context,
-		); err != nil {
-			dependencies.CancelWithError(err)
-		}
-	}()
+	defer dependencies.MustWithContext(repo.GetDirLayout().ResetTempOnExit)
+	defer repo.MustFlush(repo)
 
 	switch {
-	case u.GetConfig().Complete:
-		var t CommandCompletionWithRepo
-		haystack := any(cmd.Command)
-
-	LOOP:
-		for {
-			switch c := haystack.(type) {
-			case *commandWithQuery:
-				t = c
-				break LOOP
-
-			case CommandCompletionWithRepo:
-				t = c
-				break LOOP
-
-			default:
-				dependencies.CancelWithBadRequestf(
-					"Command does not support completion: %T",
-					c,
-				)
-			}
-		}
-
-		t.CompleteWithRepo(u, cmdArgs...)
+	case repo.GetConfig().Complete:
+		t := cmd.getCommandCompletionWithRepo(dependencies)
+		t.CompleteWithRepo(repo, cmdArgs...)
 
 	default:
-		cmd.Command.RunWithRepo(u, cmdArgs...)
+		cmd.Command.RunWithRepo(repo, cmdArgs...)
+	}
+}
+
+func (cmd commandWithRepo) getCommandCompletionWithRepo(
+	dependencies Dependencies,
+) (t CommandCompletionWithRepo) {
+	haystack := any(cmd.Command)
+
+	for {
+		switch c := haystack.(type) {
+		case *commandWithQuery:
+			t = c
+			return
+
+		case CommandCompletionWithRepo:
+			t = c
+			return
+
+		default:
+			dependencies.CancelWithBadRequestf(
+				"Command does not support completion: %T",
+				c,
+			)
+		}
 	}
 }

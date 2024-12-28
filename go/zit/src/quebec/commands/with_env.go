@@ -34,20 +34,13 @@ func (cmd commandWithEnv) RunWithDependencies(
 
 	env := env.Make(
 		dependencies.Context,
-		cmd.GetFlagSet(),
 		dependencies.Config,
 		dirLayout,
 	)
 
 	cmdArgs := cmd.Args()
 
-	defer func() {
-		if err := env.GetDirLayout().ResetTempOnExit(
-			dependencies.Context,
-		); err != nil {
-			dependencies.CancelWithError(err)
-		}
-	}()
+	defer env.MustWithContext(env.GetDirLayout().ResetTempOnExit)
 
 	cmd.Command.RunWithEnv(env, cmdArgs...)
 }

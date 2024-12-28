@@ -84,6 +84,14 @@ func (c Context) Run(f func(Context)) error {
 	return c.Cause()
 }
 
+func (c Context) After(f func() error) {
+	defer c.ContinueOrPanicOnDone()
+
+	if err := f(); err != nil {
+		c.cancel(WrapN(1, err))
+	}
+}
+
 // Must executes a function even if the context has been cancelled. If the
 // function returns an error, Must cancels the context and offers a heartbeat to
 // panic. It is meant for defers that must be executed, like closing files,
@@ -92,6 +100,14 @@ func (c Context) Must(f func() error) {
 	defer c.ContinueOrPanicOnDone()
 
 	if err := f(); err != nil {
+		c.cancel(WrapN(1, err))
+	}
+}
+
+func (c Context) MustWithContext(f func(Context) error) {
+	defer c.ContinueOrPanicOnDone()
+
+	if err := f(c); err != nil {
 		c.cancel(WrapN(1, err))
 	}
 }

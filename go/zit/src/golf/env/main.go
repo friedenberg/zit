@@ -1,7 +1,6 @@
 package env
 
 import (
-	"flag"
 	"io"
 	"os"
 
@@ -19,8 +18,6 @@ type Env struct {
 	in  fd.Std
 	out fd.Std
 	err fd.Std
-
-	flags *flag.FlagSet
 
 	dir_layout.Layout
 
@@ -43,7 +40,6 @@ func MakeDefault(
 
 func Make(
 	context errors.Context,
-	flags *flag.FlagSet,
 	kCli config_mutable_cli.Config,
 	dirLayout dir_layout.Layout,
 ) *Env {
@@ -52,7 +48,6 @@ func Make(
 		in:        fd.MakeStd(os.Stdin),
 		out:       fd.MakeStd(os.Stdout),
 		err:       fd.MakeStd(os.Stderr),
-		flags:     flags,
 		cliConfig: kCli,
 		Layout:    dirLayout,
 	}
