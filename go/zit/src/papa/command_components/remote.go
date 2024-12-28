@@ -1,4 +1,4 @@
-package commands
+package command_components
 
 import (
 	"flag"
@@ -9,16 +9,16 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/oscar/repo_remote"
 )
 
-type ComponentRemote struct {
+type Remote struct {
 	RemoteType repo.RemoteType
 	remote     repo.Repo
 }
 
-func (cmd *ComponentRemote) SetFlagSet(f *flag.FlagSet) {
+func (cmd *Remote) SetFlagSet(f *flag.FlagSet) {
 	f.Var(&cmd.RemoteType, "remote-type", "TODO")
 }
 
-func (c ComponentRemote) MakeRemote(
+func (c Remote) MakeRemote(
 	env *env.Env,
 	remoteArg string,
 ) (remote repo.Repo) {

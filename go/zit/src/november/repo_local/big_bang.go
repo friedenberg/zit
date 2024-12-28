@@ -56,9 +56,9 @@ func (bb BigBang) Start(
 	context errors.Context,
 	config config_mutable_cli.Config,
 ) (u *Repo, err error) {
-	var layout dir_layout.Layout
+	var dirLayout dir_layout.Layout
 
-	if layout, err = dir_layout.MakeDefaultAndInitialize(
+	if dirLayout, err = dir_layout.MakeDefaultAndInitialize(
 		config.Debug,
 		bb.OverrideXDGWithCwd,
 	); err != nil {
@@ -69,62 +69,43 @@ func (bb BigBang) Start(
 	env := env.Make(
 		context,
 		config,
-		layout,
+		dirLayout,
 	)
 
 	u = Make(env, OptionsEmpty)
 
-	s := u.GetRepoLayout()
+	repoLayout := u.GetRepoLayout()
+	repoLayout.Initialize()
 
-	mkdirAll(s.DirObjectId())
-	mkdirAll(s.DirCache())
-	mkdirAll(s.DirLostAndFound())
-
-	if err = readAndTransferLines(
-		bb.Yin,
-		filepath.Join(s.DirObjectId(), "Yin"),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = readAndTransferLines(
-		bb.Yang,
-		filepath.Join(s.DirObjectId(), "Yang"),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	for _, g := range []genres.Genre{genres.Blob, genres.InventoryList} {
-		var d string
-
-		if d, err = s.DirObjectGenre(g); err != nil {
-			if genres.IsErrUnsupportedGenre(err) {
-				err = nil
-				continue
-			} else {
-				err = errors.Wrap(err)
-				return
-			}
+	{
+		if err = readAndTransferLines(
+			bb.Yin,
+			filepath.Join(repoLayout.DirObjectId(), "Yin"),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
 		}
 
-		mkdirAll(d)
+		if err = readAndTransferLines(
+			bb.Yang,
+			filepath.Join(repoLayout.DirObjectId(), "Yang"),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		if err = repoLayout.Age().AddIdentityOrGenerateIfNecessary(
+			bb.AgeIdentity,
+			repoLayout.FileAge(),
+		); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+
+		writeFile(repoLayout.FileConfigPermanent(), bb.Config)
+		writeFile(repoLayout.FileConfigMutable(), "")
+		writeFile(repoLayout.FileCacheDormant(), "")
 	}
-
-	if err = s.Age().AddIdentityOrGenerateIfNecessary(
-		bb.AgeIdentity,
-		s.FileAge(),
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	writeFile(s.FileConfigPermanent(), bb.Config)
-
-	writeFile(s.FileConfigMutable(), "")
-
-	writeFile(s.FileCacheDormant(), "")
 
 	if err = u.dormantIndex.Flush(
 		u.GetRepoLayout(),
@@ -135,15 +116,8 @@ func (bb BigBang) Start(
 		return
 	}
 
-	if err = u.Reset(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	if err = u.GetRepoLayout().ResetCache(); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	u.Must(u.Reset)
+	u.Must(repoLayout.ResetCache)
 
 	ui.TodoP2("determine if this should be an Einleitung option")
 	if err = bb.initDefaultTypeAndConfig(u); err != nil {
@@ -151,22 +125,9 @@ func (bb BigBang) Start(
 		return
 	}
 
-	{
-		if err = u.Lock(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = u.GetStore().ResetIndexes(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-
-		if err = u.Unlock(); err != nil {
-			err = errors.Wrap(err)
-			return
-		}
-	}
+	u.Must(u.Lock)
+	u.Must(u.GetStore().ResetIndexes)
+	u.Must(u.Unlock)
 
 	return
 }

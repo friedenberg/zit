@@ -23,7 +23,7 @@ func init() {
 }
 
 func (c Serve) RunWithRepo(u *repo_local.Repo, args ...string) {
-  // TODO switch network to be RemoteServeType
+	// TODO switch network to be RemoteServeType
 	var network, address string
 
 	switch len(args) {

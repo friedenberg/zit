@@ -4,16 +4,15 @@ import (
 	"os"
 
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
-	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/india/sku_fmt"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
 type commandWithQuery struct {
 	CommandWithQuery
-	sku.ExternalQueryOptions
-	*query.Group
+	command_components.QueryGroup
 }
 
 type CompletionGenresGetter interface {
@@ -36,10 +35,12 @@ func (c commandWithQuery) CompleteWithRepo(
 
 	b := u.MakeQueryBuilderExcludingHidden(cgg.CompletionGenres())
 
+	var qg *query.Group
+
 	{
 		var err error
 
-		if c.Group, err = b.BuildQueryGroupWithRepoId(
+		if qg, err = b.BuildQueryGroupWithRepoId(
 			c.RepoId,
 			c.ExternalQueryOptions,
 		); err != nil {
@@ -48,7 +49,7 @@ func (c commandWithQuery) CompleteWithRepo(
 	}
 
 	if err := u.GetStore().QueryTransacted(
-		c.Group,
+		qg,
 		w.WriteOneTransacted,
 	); err != nil {
 		u.Context.CancelWithError(err)
@@ -59,10 +60,12 @@ func (c commandWithQuery) RunWithRepo(
 	u *repo_local.Repo,
 	args ...string,
 ) {
+	var qg *query.Group
+
 	{
 		var err error
 
-		if c.Group, err = u.MakeQueryGroup(
+		if qg, err = u.MakeQueryGroup(
 			c.CommandWithQuery,
 			c.RepoId,
 			c.ExternalQueryOptions,
@@ -74,5 +77,5 @@ func (c commandWithQuery) RunWithRepo(
 
 	defer u.PrintMatchedDormantIfNecessary()
 
-	c.RunWithQuery(u, c.Group)
+	c.RunWithQuery(u, qg)
 }

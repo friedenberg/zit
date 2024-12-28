@@ -9,6 +9,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
 type CommandWithRemoteAndQuery interface {
@@ -20,8 +21,8 @@ type CommandWithRemoteAndQuery interface {
 }
 
 type commandWithRemoteAndQuery struct {
-	ComponentRemote
-	ComponentQuery
+	command_components.Remote
+	command_components.QueryGroup
 	CommandWithRemoteAndQuery
 }
 

@@ -240,10 +240,12 @@ func (h Layout) MakeCommonEnv() map[string]string {
 	}
 }
 
-func (s Layout) MakeDir(d string) (err error) {
-	if err = os.MkdirAll(d, os.ModeDir|0o755); err != nil {
-		err = errors.Wrapf(err, "Dir: %q", d)
-		return
+func (s Layout) MakeDir(ds ...string) (err error) {
+	for _, d := range ds {
+		if err = os.MkdirAll(d, os.ModeDir|0o755); err != nil {
+			err = errors.Wrapf(err, "Dir: %q", d)
+			return
+		}
 	}
 
 	return

@@ -1,4 +1,4 @@
-package commands
+package command_components
 
 import (
 	"flag"
@@ -8,17 +8,17 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
 )
 
-type ComponentQuery struct {
+type QueryGroup struct {
 	sku.ExternalQueryOptions
 }
 
-func (cmd *ComponentQuery) SetFlagSet(f *flag.FlagSet) {
+func (cmd *QueryGroup) SetFlagSet(f *flag.FlagSet) {
 	f.Var(&cmd.RepoId, "kasten", "none or Browser")
 	f.BoolVar(&cmd.ExcludeUntracked, "exclude-untracked", false, "")
 	f.BoolVar(&cmd.ExcludeRecognized, "exclude-recognized", false, "")
 }
 
-func (c ComponentQuery) MakeQueryGroup(
+func (c QueryGroup) MakeQueryGroup(
 	command any,
 	local *repo_local.Repo,
 	args ...string,

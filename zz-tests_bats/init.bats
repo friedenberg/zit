@@ -112,44 +112,41 @@ function non_repo_failure { # @test
 	assert_output 'not in a zit directory'
 }
 
-# function init_and_init { ## @test
-# 	wd="$(mktemp -d)"
-# 	cd "$wd" || exit 1
+function init_and_init { # @test
+	set_xdg "$BATS_TEST_TMPDIR"
+	run_zit_init -override-xdg-with-cwd
+	assert_success
 
-# 	run_zit_init
-# 	assert_success
+	{
+		echo "---"
+		echo "# wow"
+		echo "- tag"
+		echo "! md"
+		echo "---"
+		echo
+		echo "body"
+	} >to_add
 
-# 	{
-# 		echo "---"
-# 		echo "# wow"
-# 		echo "- tag"
-# 		echo "! md"
-# 		echo "---"
-# 		echo
-# 		echo "body"
-# 	} >to_add
+	run_zit new -edit=false to_add
+	assert_success
+	assert_output_unsorted - <<-EOM
+		[tag @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
+	EOM
 
-# 	run_zit new -edit=false to_add
-# 	assert_success
-# 	assert_output - <<-EOM
-# 		[-tag @48cae50776cad1ddf3e711579e64a1226ae188ddaa195f4eb8cf6d8f32774249]
-# 		[one/uno @37d3869e9b1711f009eabf69a2bf294cfd785f5b1c7463cba77d11d5f81f5e09 !md "wow"]
-# 	EOM
+	run_zit show one/uno
+	assert_success
+	assert_output - <<-EOM
+		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md "wow" tag]
+	EOM
 
-# 	run_zit show one/uno
-# 	assert_success
-# 	assert_output "$(cat to_add)"
+	run_zit init -lock-internal-files=false -override-xdg-with-cwd
+	assert_failure
+	assert_output --partial '.zit/local/share/age_identity: file exists'
 
-# 	run_zit init -yin <(cat_yin) -yang <(cat_yang)
-# 	assert_failure
-# 	assert_output --partial '.zit/Kennung/Yin: file exists'
-
-# 	run_zit init
-# 	assert_success
-# 	assert_output --partial '.zit/KonfigAngeboren already exists, not overwriting'
-# 	assert_output --partial '.zit/KonfigErworben already exists, not overwriting'
-
-# 	run zit show -format log :
-# 	assert_success
-# 	assert_output "$(cat to_add)"
-# }
+	run zit show :
+	assert_success
+	assert_output - <<-EOM
+		[one/uno @9e2ec912af5dff2a72300863864fc4da04e81999339d9fac5c7590ba8a3f4e11 !md tag] wow
+	EOM
+}

@@ -7,17 +7,16 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/immutable_config"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
 type Clone struct {
 	*flag.FlagSet
 	repo_local.BigBang
-	ComponentRemote
-	ComponentQuery
+	command_components.Remote
+	command_components.QueryGroup
 }
 
-// TODO transition this to CommandWithDependencies instead of
-// CommandWithRemoteAndQuery
 func init() {
 	registerCommand(
 		"clone",
@@ -47,8 +46,8 @@ func (cmd *Clone) GetFlagSet() *flag.FlagSet {
 func (cmd *Clone) SetFlagSet(f *flag.FlagSet) {
 	cmd.FlagSet = f
 	cmd.BigBang.AddToFlagSet(f)
-	cmd.ComponentRemote.SetFlagSet(f)
-	cmd.ComponentQuery.SetFlagSet(f)
+	cmd.Remote.SetFlagSet(f)
+	cmd.QueryGroup.SetFlagSet(f)
 }
 
 func (c Clone) DefaultSigil() ids.Sigil {
