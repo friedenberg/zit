@@ -3,21 +3,21 @@ package commands
 import (
 	"flag"
 
-	"code.linenisgreat.com/zit/go/zit/src/echo/dir_layout"
-	"code.linenisgreat.com/zit/go/zit/src/golf/env"
 	"code.linenisgreat.com/zit/go/zit/src/november/repo_local"
+	"code.linenisgreat.com/zit/go/zit/src/papa/command_components"
 )
 
 type commandWithRepo struct {
-	Command CommandWithRepo
 	*flag.FlagSet
+	command_components.RepoLocal
+	Command CommandWithRepo
 }
 
 func (cmd commandWithRepo) GetFlagSet() *flag.FlagSet {
 	return cmd.FlagSet
 }
 
-func (cmd commandWithRepo) RunWithDependencies(
+func (cmd commandWithRepo) Run(
 	dependencies Dependencies,
 ) {
 	options := repo_local.OptionsEmpty
@@ -28,26 +28,13 @@ func (cmd commandWithRepo) RunWithDependencies(
 
 	cmdArgs := cmd.Args()
 
-	var layout dir_layout.Layout
-
-	{
-		var err error
-
-		if layout, err = dir_layout.MakeDefault(
-			dependencies.Debug,
-		); err != nil {
-			dependencies.CancelWithError(err)
-		}
-	}
-
-	env := env.Make(
+	repo := cmd.MakeRepoLocal(
 		dependencies.Context,
 		dependencies.Config,
-		layout,
+		options,
 	)
 
-	repo := repo_local.Make(env, options)
-
+  // TODO determine how to globalize certain cleanup operations like the below
 	defer dependencies.MustWithContext(repo.GetDirLayout().ResetTempOnExit)
 	defer repo.MustFlush(repo)
 

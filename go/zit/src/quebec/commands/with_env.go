@@ -16,7 +16,7 @@ func (cmd commandWithEnv) GetFlagSet() *flag.FlagSet {
 	return cmd.FlagSet
 }
 
-func (cmd commandWithEnv) RunWithDependencies(
+func (cmd commandWithEnv) Run(
 	dependencies Dependencies,
 ) {
 	// TODO use options when making dirLayout

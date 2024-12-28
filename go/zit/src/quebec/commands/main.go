@@ -13,7 +13,7 @@ func Run(
 	ctx errors.Context,
 	args ...string,
 ) {
-	var cmd CommandWithDependencies
+	var cmd Command
 
 	if len(os.Args) < 1 {
 		ui.Log().Print("printing usage")
@@ -48,7 +48,7 @@ func Run(
 		ctx.CancelWithError(err)
 	}
 
-	cmd.RunWithDependencies(
+	cmd.Run(
 		Dependencies{
 			Context: ctx,
 			Config:  configCli,

@@ -20,7 +20,7 @@ type Clone struct {
 func init() {
 	registerCommand(
 		"clone",
-		func(f *flag.FlagSet) CommandWithDependencies {
+		func(f *flag.FlagSet) Command {
 			c := &Clone{
 				BigBang: repo_local.BigBang{
 					Config:             immutable_config.Default(),
@@ -35,7 +35,7 @@ func init() {
 	)
 }
 
-func (cmd *Clone) GetCommandWithDependencies() CommandWithDependencies {
+func (cmd *Clone) GetCommandWithDependencies() Command {
 	return cmd
 }
 
@@ -59,7 +59,7 @@ func (c Clone) DefaultGenres() ids.Genre {
 	// return ids.MakeGenre(genres.TrueGenre()...)
 }
 
-func (c Clone) RunWithDependencies(
+func (c Clone) Run(
 	dependencies Dependencies,
 ) {
 	var local *repo_local.Repo

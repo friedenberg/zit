@@ -20,9 +20,9 @@ type CommandWithFlags interface {
 	SetFlagSet(*flag.FlagSet)
 }
 
-type CommandWithDependencies interface {
+type Command interface {
 	GetFlagSet() *flag.FlagSet
-	RunWithDependencies(Dependencies)
+	Run(Dependencies)
 }
 
 type CommandWithEnv interface {
@@ -41,9 +41,9 @@ type CommandCompletionWithRepo interface {
 	CompleteWithRepo(u *repo_local.Repo, args ...string)
 }
 
-var commands = map[string]CommandWithDependencies{}
+var commands = map[string]Command{}
 
-func Commands() map[string]CommandWithDependencies {
+func Commands() map[string]Command {
 	return commands
 }
 
@@ -58,7 +58,7 @@ func registerCommand(
 	}
 
 	switch mft := makeFunc.(type) {
-	case func(*flag.FlagSet) CommandWithDependencies:
+	case func(*flag.FlagSet) Command:
 		commands[n] = mft(f)
 
 	case func(*flag.FlagSet) CommandWithEnv:

@@ -15,7 +15,7 @@ type Init struct {
 func init() {
 	registerCommand(
 		"init",
-		func(f *flag.FlagSet) CommandWithDependencies {
+		func(f *flag.FlagSet) Command {
 			c := &Init{
 				FlagSet: f,
 				BigBang: repo_local.BigBang{
@@ -34,7 +34,7 @@ func (c Init) GetFlagSet() *flag.FlagSet {
 	return c.FlagSet
 }
 
-func (c Init) RunWithDependencies(
+func (c Init) Run(
 	dependencies Dependencies,
 ) {
 	var repo *repo_local.Repo
