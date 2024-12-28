@@ -6,7 +6,7 @@ import (
 )
 
 func ErrorWaitGroupApply[T any](
-	wg ErrorWaitGroup,
+	wg errors.WaitGroup,
 	s interfaces.SetLike[T],
 	f interfaces.FuncIter[T],
 ) (d bool) {

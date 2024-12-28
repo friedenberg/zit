@@ -6,7 +6,12 @@ type Flusher interface {
 
 type Func func() error
 
-type ErrorWaitGroup interface {
+type FuncWithStackInfo struct {
+	Func
+	StackInfo
+}
+
+type WaitGroup interface {
 	Do(Func) bool
 	DoAfter(Func)
 	GetError() error

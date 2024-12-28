@@ -590,7 +590,7 @@ func (d *dirItems) addOneObject(
 func (d *dirItems) All(
 	f interfaces.FuncIter[*sku.FSItem],
 ) (err error) {
-	wg := quiter.MakeErrorWaitGroupParallel()
+	wg := errors.MakeWaitGroupParallel()
 
 	quiter.ErrorWaitGroupApply(wg, d.probablyCheckedOut, f)
 	quiter.ErrorWaitGroupApply(wg, d.definitelyNotCheckedOut, f)

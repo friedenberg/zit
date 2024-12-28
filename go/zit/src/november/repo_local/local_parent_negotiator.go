@@ -2,7 +2,6 @@ package repo_local
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
 	"code.linenisgreat.com/zit/go/zit/src/lima/repo"
 )
@@ -20,7 +19,7 @@ func (parentNegotiator ParentNegotiatorFirstAncestor) FindBestCommonAncestor(
 ) (ancestor *sku.Transacted, err error) {
 	var ancestorsLocal, ancestorsRemote []*sku.Transacted
 
-	wg := quiter.MakeErrorWaitGroupParallel()
+	wg := errors.MakeWaitGroupParallel()
 
 	wg.Do(
 		func() (err error) {

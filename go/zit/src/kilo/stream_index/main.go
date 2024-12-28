@@ -7,7 +7,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/pool"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -137,7 +136,7 @@ func (i *Index) flushAdded(
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	ui.Log().Print("flushing")
-	wg := quiter.MakeErrorWaitGroupParallel()
+	wg := errors.MakeWaitGroupParallel()
 
 	actualFlushCount := 0
 
@@ -190,7 +189,7 @@ func (i *Index) flushEverything(
 	printerHeader interfaces.FuncIter[string],
 ) (err error) {
 	ui.Log().Print("flushing")
-	wg := quiter.MakeErrorWaitGroupParallel()
+	wg := errors.MakeWaitGroupParallel()
 
 	for n := range i.pages {
 		wg.Do(i.pages[n].MakeFlush(true))

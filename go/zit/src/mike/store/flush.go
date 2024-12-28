@@ -82,7 +82,7 @@ func (c *Store) Flush(
 		return
 	}
 
-	wg := quiter.MakeErrorWaitGroupParallel()
+	wg := errors.MakeWaitGroupParallel()
 
 	if c.GetDirectoryLayout().GetLockSmith().IsAcquired() {
 		gob.Register(quiter.StringerKeyerPtr[ids.Type, *ids.Type]{}) // TODO check if can be removed

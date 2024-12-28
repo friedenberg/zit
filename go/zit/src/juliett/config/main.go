@@ -117,7 +117,7 @@ func (c *Compiled) Initialize(
 	c.immutable_config_private = dirLayout.GetConfig()
 	c.dormant = dormant
 
-	wg := quiter.MakeErrorWaitGroupParallel()
+	wg := errors.MakeWaitGroupParallel()
 	wg.Do(func() (err error) {
 		if err = c.loadMutableConfig(dirLayout, blobStore); err != nil {
 			if errors.IsNotExist(err) {

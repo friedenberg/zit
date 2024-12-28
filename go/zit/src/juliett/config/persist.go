@@ -6,7 +6,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_value"
@@ -216,7 +215,7 @@ func (kc *Compiled) Flush(
 		return
 	}
 
-	wg := quiter.MakeErrorWaitGroupParallel()
+	wg := errors.MakeWaitGroupParallel()
 	wg.Do(func() (err error) {
 		if err = kc.flushMutableConfig(dirLayout, blobStore, printerHeader); err != nil {
 			err = errors.Wrap(err)

@@ -3,7 +3,6 @@ package sha_probe_index
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/repo_layout"
 )
@@ -122,7 +121,7 @@ func (e *object_probe_index) PrintAll() (err error) {
 }
 
 func (e *object_probe_index) Flush() (err error) {
-	wg := quiter.MakeErrorWaitGroupParallel()
+	wg := errors.MakeWaitGroupParallel()
 
 	for i := range e.pages {
 		p := &e.pages[i]

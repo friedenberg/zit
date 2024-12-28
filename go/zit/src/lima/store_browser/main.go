@@ -107,7 +107,7 @@ func (s *Store) GetObjectIdsForString(
 }
 
 func (s *Store) Flush() (err error) {
-	wg := quiter.MakeErrorWaitGroupParallel()
+	wg := errors.MakeWaitGroupParallel()
 
 	wg.Do(s.flushUrls)
 

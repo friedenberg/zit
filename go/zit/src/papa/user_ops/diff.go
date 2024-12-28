@@ -10,7 +10,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/checkout_mode"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/todo"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/checkout_options"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/files"
@@ -60,7 +59,7 @@ func (op Diff) Run(
 		})
 	}
 
-	wg := quiter.MakeErrorWaitGroupParallel()
+	wg := errors.MakeWaitGroupParallel()
 
 	var mode checkout_mode.Mode
 
@@ -195,7 +194,7 @@ func (c Diff) makeDo(
 	w io.WriteCloser,
 	mf object_metadata.TextFormatter,
 	m object_metadata.TextFormatterContext,
-) interfaces.FuncError {
+) errors.Func {
 	return func() (err error) {
 		defer errors.DeferredCloser(&err, w)
 
@@ -217,7 +216,7 @@ func (c Diff) makeDoBlob(
 	w io.WriteCloser,
 	arf interfaces.BlobReaderFactory,
 	sh interfaces.Sha,
-) interfaces.FuncError {
+) errors.Func {
 	return func() (err error) {
 		defer errors.DeferredCloser(&err, w)
 
@@ -247,7 +246,7 @@ func (c Diff) makeDoBlob(
 func (c Diff) makeDoFD(
 	w io.WriteCloser,
 	fd *fd.FD,
-) interfaces.FuncError {
+) errors.Func {
 	return func() (err error) {
 		defer errors.DeferredCloser(&err, w)
 

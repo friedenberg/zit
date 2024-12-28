@@ -2,23 +2,23 @@ package errors
 
 import "sync"
 
-func MakeWaitGroupSerial() ErrorWaitGroup {
-	wg := &errorWaitGroupSerial{
+func MakeWaitGroupSerial() WaitGroup {
+	wg := &waitGroupSerial{
 		do:      make([]Func, 0),
-		doAfter: make([]FuncErrorWithStackInfo, 0),
+		doAfter: make([]FuncWithStackInfo, 0),
 	}
 
 	return wg
 }
 
-type errorWaitGroupSerial struct {
+type waitGroupSerial struct {
 	lock    sync.Mutex
 	do      []Func
-	doAfter []FuncErrorWithStackInfo
+	doAfter []FuncWithStackInfo
 	isDone  bool
 }
 
-func (wg *errorWaitGroupSerial) GetError() (err error) {
+func (wg *waitGroupSerial) GetError() (err error) {
 	wg.lock.Lock()
 	defer wg.lock.Unlock()
 
@@ -46,7 +46,7 @@ func (wg *errorWaitGroupSerial) GetError() (err error) {
 	return
 }
 
-func (wg *errorWaitGroupSerial) Do(f Func) (d bool) {
+func (wg *waitGroupSerial) Do(f Func) (d bool) {
 	wg.lock.Lock()
 	defer wg.lock.Unlock()
 
@@ -59,7 +59,7 @@ func (wg *errorWaitGroupSerial) Do(f Func) (d bool) {
 	return true
 }
 
-func (wg *errorWaitGroupSerial) DoAfter(f Func) {
+func (wg *waitGroupSerial) DoAfter(f Func) {
 	wg.lock.Lock()
 	defer wg.lock.Unlock()
 

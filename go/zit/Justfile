@@ -1,4 +1,9 @@
 
+update-go:
+  env GOPROXY=direct go get -u -t ./...
+
+update: update-go
+
 build-go-generate:
   go generate ./...
 
@@ -25,6 +30,7 @@ test-bats-generate:
 
 bats_timeout := "10"
 
+# runs specific bats test files, or a default of all in the `zz-tests_bats` dir.
 test-bats-targets *targets="zz-tests_bats/*.bats":
   BATS_TEST_TIMEOUT="{{bats_timeout}}" bats --tap --jobs {{num_cpus()}} {{targets}}
 

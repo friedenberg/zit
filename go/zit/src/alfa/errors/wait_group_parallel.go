@@ -2,32 +2,27 @@ package errors
 
 import "sync"
 
-func MakeWaitGroupParallel() ErrorWaitGroup {
-	wg := &errorWaitGroupParallel{
+func MakeWaitGroupParallel() WaitGroup {
+	wg := &waitGroupParallel{
 		lock:    &sync.Mutex{},
 		inner:   &sync.WaitGroup{},
 		err:     MakeMulti(),
-		doAfter: make([]FuncErrorWithStackInfo, 0),
+		doAfter: make([]FuncWithStackInfo, 0),
 	}
 
 	return wg
 }
 
-type FuncErrorWithStackInfo struct {
-	Func
-	StackInfo
-}
-
-type errorWaitGroupParallel struct {
+type waitGroupParallel struct {
 	lock    *sync.Mutex
 	inner   *sync.WaitGroup
 	err     Multi
-	doAfter []FuncErrorWithStackInfo
+	doAfter []FuncWithStackInfo
 
 	isDone bool
 }
 
-func (wg *errorWaitGroupParallel) GetError() (err error) {
+func (wg *waitGroupParallel) GetError() (err error) {
 	wg.wait()
 
 	defer func() {
@@ -47,7 +42,7 @@ func (wg *errorWaitGroupParallel) GetError() (err error) {
 	return
 }
 
-func (wg *errorWaitGroupParallel) Do(f Func) (d bool) {
+func (wg *waitGroupParallel) Do(f Func) (d bool) {
 	wg.lock.Lock()
 
 	if wg.isDone {
@@ -69,7 +64,7 @@ func (wg *errorWaitGroupParallel) Do(f Func) (d bool) {
 	return true
 }
 
-func (wg *errorWaitGroupParallel) DoAfter(f Func) {
+func (wg *waitGroupParallel) DoAfter(f Func) {
 	wg.lock.Lock()
 	defer wg.lock.Unlock()
 
@@ -77,14 +72,14 @@ func (wg *errorWaitGroupParallel) DoAfter(f Func) {
 
 	wg.doAfter = append(
 		wg.doAfter,
-		FuncErrorWithStackInfo{
+		FuncWithStackInfo{
 			Func:      f,
 			StackInfo: si,
 		},
 	)
 }
 
-func (wg *errorWaitGroupParallel) doneWith(si StackInfo, err error) {
+func (wg *waitGroupParallel) doneWith(si StackInfo, err error) {
 	wg.inner.Done()
 
 	if err != nil {
@@ -92,7 +87,7 @@ func (wg *errorWaitGroupParallel) doneWith(si StackInfo, err error) {
 	}
 }
 
-func (wg *errorWaitGroupParallel) wait() {
+func (wg *waitGroupParallel) wait() {
 	wg.inner.Wait()
 
 	wg.lock.Lock()

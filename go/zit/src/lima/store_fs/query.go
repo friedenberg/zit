@@ -6,7 +6,6 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/object_mode"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
@@ -19,7 +18,7 @@ func (s *Store) QueryCheckedOut(
 	qg *query.Group,
 	f interfaces.FuncIter[sku.SkuType],
 ) (err error) {
-	wg := quiter.MakeErrorWaitGroupParallel()
+	wg := errors.MakeWaitGroupParallel()
 
 	wg.Do(func() (err error) {
 		aco := s.makeFuncIterHydrateCheckedOutProbablyCheckedOut(

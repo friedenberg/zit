@@ -2,7 +2,6 @@ package repo_local
 
 import (
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
@@ -68,7 +67,7 @@ func (u *Repo) Unlock() (err error) {
 
 		u.GetStore().GetStreamIndex().SetNeedsFlushHistory(changes)
 
-		wg := quiter.MakeErrorWaitGroupParallel()
+		wg := errors.MakeWaitGroupParallel()
 		wg.Do(
 			func() error {
 				ui.Log().Print("will flush store second time")

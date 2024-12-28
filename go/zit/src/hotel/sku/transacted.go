@@ -5,7 +5,6 @@ import (
 
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/values"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/external_state"
 	"code.linenisgreat.com/zit/go/zit/src/delta/genres"
@@ -174,7 +173,7 @@ func (s *Transacted) makeShaCalcFunc(
 	f func(object_inventory_format.FormatGeneric, object_inventory_format.FormatterContext) (*sha.Sha, error),
 	of object_inventory_format.FormatGeneric,
 	sh *sha.Sha,
-) interfaces.FuncError {
+) errors.Func {
 	return func() (err error) {
 		var actual *sha.Sha
 
@@ -201,7 +200,7 @@ func (s *Transacted) calculateObjectSha(debug bool) (err error) {
 		f = object_inventory_format.GetShaForContextDebug
 	}
 
-	wg := quiter.MakeErrorWaitGroupParallel()
+	wg := errors.MakeWaitGroupParallel()
 
 	wg.Do(
 		s.makeShaCalcFunc(
