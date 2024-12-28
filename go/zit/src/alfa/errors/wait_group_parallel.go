@@ -1,26 +1,12 @@
-package quiter
+package errors
 
-import (
-	"sync"
+import "sync"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/alfa/interfaces"
-)
-
-type FuncError = interfaces.FuncError
-
-// TODO combine with errors.Context
-type ErrorWaitGroup interface {
-	Do(FuncError) bool
-	DoAfter(FuncError)
-	GetError() error
-}
-
-func MakeErrorWaitGroupParallel() ErrorWaitGroup {
+func MakeWaitGroupParallel() ErrorWaitGroup {
 	wg := &errorWaitGroupParallel{
 		lock:    &sync.Mutex{},
 		inner:   &sync.WaitGroup{},
-		err:     errors.MakeMulti(),
+		err:     MakeMulti(),
 		doAfter: make([]FuncErrorWithStackInfo, 0),
 	}
 
@@ -28,14 +14,14 @@ func MakeErrorWaitGroupParallel() ErrorWaitGroup {
 }
 
 type FuncErrorWithStackInfo struct {
-	FuncError
-	errors.StackInfo
+	Func
+	StackInfo
 }
 
 type errorWaitGroupParallel struct {
 	lock    *sync.Mutex
 	inner   *sync.WaitGroup
-	err     errors.Multi
+	err     Multi
 	doAfter []FuncErrorWithStackInfo
 
 	isDone bool
@@ -52,7 +38,7 @@ func (wg *errorWaitGroupParallel) GetError() (err error) {
 
 	for i := len(wg.doAfter) - 1; i >= 0; i-- {
 		doAfter := wg.doAfter[i]
-		err := doAfter.FuncError()
+		err := doAfter.Func()
 		if err != nil {
 			wg.err.Add(doAfter.Wrap(err))
 		}
@@ -61,7 +47,7 @@ func (wg *errorWaitGroupParallel) GetError() (err error) {
 	return
 }
 
-func (wg *errorWaitGroupParallel) Do(f FuncError) (d bool) {
+func (wg *errorWaitGroupParallel) Do(f Func) (d bool) {
 	wg.lock.Lock()
 
 	if wg.isDone {
@@ -73,7 +59,7 @@ func (wg *errorWaitGroupParallel) Do(f FuncError) (d bool) {
 
 	wg.inner.Add(1)
 
-	si, _ := errors.MakeStackInfo(1)
+	si, _ := MakeStackInfo(1)
 
 	go func() {
 		err := f()
@@ -83,22 +69,22 @@ func (wg *errorWaitGroupParallel) Do(f FuncError) (d bool) {
 	return true
 }
 
-func (wg *errorWaitGroupParallel) DoAfter(f FuncError) {
+func (wg *errorWaitGroupParallel) DoAfter(f Func) {
 	wg.lock.Lock()
 	defer wg.lock.Unlock()
 
-	si, _ := errors.MakeStackInfo(1)
+	si, _ := MakeStackInfo(1)
 
 	wg.doAfter = append(
 		wg.doAfter,
 		FuncErrorWithStackInfo{
-			FuncError: f,
+			Func:      f,
 			StackInfo: si,
 		},
 	)
 }
 
-func (wg *errorWaitGroupParallel) doneWith(si errors.StackInfo, err error) {
+func (wg *errorWaitGroupParallel) doneWith(si StackInfo, err error) {
 	wg.inner.Done()
 
 	if err != nil {

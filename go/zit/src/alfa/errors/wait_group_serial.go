@@ -1,14 +1,10 @@
-package quiter
+package errors
 
-import (
-	"sync"
+import "sync"
 
-	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-)
-
-func MakeErrorWaitGroupSerial() ErrorWaitGroup {
+func MakeWaitGroupSerial() ErrorWaitGroup {
 	wg := &errorWaitGroupSerial{
-		do:      make([]FuncError, 0),
+		do:      make([]Func, 0),
 		doAfter: make([]FuncErrorWithStackInfo, 0),
 	}
 
@@ -17,7 +13,7 @@ func MakeErrorWaitGroupSerial() ErrorWaitGroup {
 
 type errorWaitGroupSerial struct {
 	lock    sync.Mutex
-	do      []FuncError
+	do      []Func
 	doAfter []FuncErrorWithStackInfo
 	isDone  bool
 }
@@ -28,17 +24,21 @@ func (wg *errorWaitGroupSerial) GetError() (err error) {
 
 	wg.isDone = true
 
-	me := errors.MakeMulti()
+	me := MakeMulti()
 
 	for _, f := range wg.do {
 		if err = f(); err != nil {
-			me.Add(errors.Wrap(err))
+			me.Add(Wrap(err))
 			break
 		}
 	}
 
-	for _, doAfter := range wg.doAfter {
-		me.Add(doAfter.Wrap(doAfter.FuncError()))
+	for i := len(wg.doAfter) - 1; i >= 0; i-- {
+		doAfter := wg.doAfter[i]
+		err := doAfter.Func()
+		if err != nil {
+			me.Add(doAfter.Wrap(err))
+		}
 	}
 
 	err = me.GetError()
@@ -46,7 +46,7 @@ func (wg *errorWaitGroupSerial) GetError() (err error) {
 	return
 }
 
-func (wg *errorWaitGroupSerial) Do(f FuncError) (d bool) {
+func (wg *errorWaitGroupSerial) Do(f Func) (d bool) {
 	wg.lock.Lock()
 	defer wg.lock.Unlock()
 
@@ -59,7 +59,7 @@ func (wg *errorWaitGroupSerial) Do(f FuncError) (d bool) {
 	return true
 }
 
-func (wg *errorWaitGroupSerial) DoAfter(f FuncError) {
+func (wg *errorWaitGroupSerial) DoAfter(f Func) {
 	wg.lock.Lock()
 	defer wg.lock.Unlock()
 
