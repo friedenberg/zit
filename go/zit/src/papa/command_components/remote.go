@@ -40,7 +40,20 @@ func (c Remote) MakeRemote(
 		}
 
 	case repo.RemoteTypeStdioLocal:
-		if remote, err = repo_remote.MakeRemoteStdio(
+		if remote, err = repo_remote.MakeRemoteStdioLocal(
+			env,
+			remoteArg,
+		); err != nil {
+			env.CancelWithErrorAndFormat(
+				err,
+				"RemoteType: %q, Remote: %q",
+				c.RemoteType,
+				remoteArg,
+			)
+		}
+
+	case repo.RemoteTypeStdioSSH:
+		if remote, err = repo_remote.MakeRemoteStdioSSH(
 			env,
 			remoteArg,
 		); err != nil {

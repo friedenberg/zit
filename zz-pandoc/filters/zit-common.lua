@@ -1,8 +1,9 @@
-DirZit = os.getenv("ZIT_DIR")
+-- TODO switch to a socket or lua module that exposes the zit API
+-- DirZit = os.getenv("ZIT_DIR")
 
-if DirZit == nil then
-  error("expected ZIT_DIR env variable to be set")
-end
+-- if DirZit == nil then
+--   error("expected ZIT_DIR env variable to be set")
+-- end
 
 IsBinary = FORMAT:find("^markdown") == nil
 
@@ -16,7 +17,7 @@ end
 
 function FormatObjectImage(imgSrc, format)
   local objectID = Unescape(imgSrc)
-  return pandoc.pipe("zit", { "format-object", "-dir-zit", DirZit, objectID, format }, ""), objectID
+  return pandoc.pipe("zit", { "format-object", objectID, format }, ""), objectID
 end
 
 function ReplaceObjectImageWithTextIfNecessary(img)
@@ -63,7 +64,7 @@ function UnescapeIfSku(table, key)
 end
 
 return {
-  DirZit = DirZit,
+  -- DirZit = DirZit,
   IsBinary = IsBinary,
   Hex_to_char = Hex_to_char,
   Unescape = Unescape,

@@ -17,6 +17,7 @@ import (
 	"code.linenisgreat.com/zit/go/zit/src/delta/sha"
 	"code.linenisgreat.com/zit/go/zit/src/echo/ids"
 	"code.linenisgreat.com/zit/go/zit/src/hotel/sku"
+	"code.linenisgreat.com/zit/go/zit/src/india/inventory_list_blobs"
 	"code.linenisgreat.com/zit/go/zit/src/kilo/query"
 )
 
@@ -251,6 +252,7 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 	ui.Log().Printf("serving: %s %s", request.Method, request.Path)
 
 	switch request.MethodPath {
+	// TODO rename to blob
 	case MethodPath{"HEAD", "/blobs"}, MethodPath{"GET", "/blobs"}:
 		var shString strings.Builder
 
@@ -292,6 +294,10 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 
 			response.Body = rc
 		}
+
+		// 	case MethodPath{"GET", "/object"}:
+
+		// 	case MethodPath{"POST", "/object"}:
 
 	case MethodPath{"GET", "/inventory_list"}:
 		var qgString strings.Builder
@@ -350,6 +356,36 @@ func (local *Repo) ServeRequest(request Request) (response Response) {
 		}
 
 		response.Body = io.NopCloser(b)
+
+	case MethodPath{"POST", "/inventory_list"}:
+		bf := local.GetStore().GetInventoryListStore().FormatForVersion(
+			local.GetConfig().GetStoreVersion(),
+		)
+
+		list := sku.MakeList()
+
+		if err := inventory_list_blobs.ReadInventoryListBlob(
+			bf,
+			bufio.NewReader(request.Body),
+			list,
+		); err != nil {
+			local.CancelWithError(err)
+		}
+
+		importer := local.MakeImporter(false)
+
+		// importer.RemoteBlobStore = remote.GetBlobStore()
+		importer.ParentNegotiator = ParentNegotiatorFirstAncestor{
+			Local: local,
+			// Remote: remote,
+		}
+
+		if err := local.ImportList(
+			list,
+			importer,
+		); err != nil {
+			local.CancelWithError(err)
+		}
 
 	default:
 		response.StatusCode = http.StatusNotFound

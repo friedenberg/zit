@@ -1,7 +1,7 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nixpkgs-stable.url = "nixpkgs/release-24.11";
     utils.url = "github:numtide/flake-utils";
 
     go = {
@@ -15,7 +15,14 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-stable, utils, go, shell }:
+  outputs = {
+    self,
+    nixpkgs,
+    nixpkgs-stable,
+    utils,
+    go,
+    shell,
+  }:
     (utils.lib.eachDefaultSystem
       (system:
         let
@@ -28,23 +35,15 @@
             ];
           };
 
-          # The current default sdk for macOS fails to compile go projects, so we use a newer one for now.
-          # This has no effect on other platforms.
-          # callPackage = pkgs.darwin.apple_sdk_11_0.callPackage or pkgs.callPackage;
-
         in
         {
-          # packages.default = callPackage ./. {
-          #   inherit (gomod2nix.legacyPackages.${system}) buildGoApplication;
-          # };
-
           packages.default = pkgs.buildGoModule rec {
             enableParallelBuilding = true;
             doCheck = false;
             pname = "zit";
             version = "0.0.0";
             src = ./.;
-            vendorHash = "sha256-i+RNBc8Dl8rqgQDAQ32dtvFfvwJ/YA8TTOEWm0AdO0s=";
+            vendorHash = "sha256-kBa31IFXDkb1o0SO8EIuhvkvHFVqvOD3Tdn1JtP43Qc=";
           };
 
           devShells.default = pkgs.mkShell {

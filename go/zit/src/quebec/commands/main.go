@@ -1,46 +1,36 @@
 package commands
 
 import (
-	"os"
-
 	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
-	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 	"code.linenisgreat.com/zit/go/zit/src/foxtrot/config_mutable_cli"
 )
 
-// TODO switch to returning result
 func Run(
 	ctx *errors.Context,
 	args ...string,
 ) {
-	var cmd Command
-
-	if len(os.Args) < 1 {
-		ui.Log().Print("printing usage")
-		PrintUsage(nil)
-	}
-
-	if len(os.Args) == 1 {
-		PrintUsage(errors.Errorf("No subcommand provided."))
+	if len(args) <= 1 {
+		PrintUsage(
+			ctx,
+			errors.BadRequestf("No subcommand provided."),
+		)
 	}
 
 	cmds := Commands()
-	specifiedSubcommand := os.Args[1]
+	var cmd Command
+	var ok bool
 
-	ok := false
+	specifiedSubcommand := args[1]
 
 	if cmd, ok = cmds[specifiedSubcommand]; !ok {
 		PrintUsage(
+			ctx,
 			errors.BadRequestf("No subcommand '%s'", specifiedSubcommand),
 		)
-
-		return
 	}
 
-	args = os.Args[2:]
+	args = args[2:]
 
-	// TODO customize command flag parsing and env / dir layout creation based on
-	// type of command
 	configCli := config_mutable_cli.Default()
 	configCli.AddToFlags(cmd.GetFlagSet())
 

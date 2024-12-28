@@ -2,6 +2,7 @@ package repo_remote
 
 import (
 	"bufio"
+	"bytes"
 	"net/http"
 	"strings"
 
@@ -89,7 +90,68 @@ func (remoteHTTP *HTTP) PullQueryGroupFromRemote(
 	qg *query.Group,
 	printCopies bool,
 ) (err error) {
-	err = todo.Implement()
+	var list *sku.List
+
+	if list, err = remote.MakeInventoryList(qg); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	b := bytes.NewBuffer(nil)
+
+	printer := remoteHTTP.remote.MakePrinterBoxArchive(b, true)
+
+	var sk *sku.Transacted
+	var hasMore bool
+
+	for {
+		sk, hasMore = list.Pop()
+
+		if !hasMore {
+			break
+		}
+
+		if err = printer(sk); err != nil {
+			err = errors.Wrap(err)
+			return
+		}
+	}
+
+	var request *http.Request
+
+	if request, err = http.NewRequestWithContext(
+		remoteHTTP.remote.Context,
+		"POST",
+		"/inventory_list",
+		b,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	var response *http.Response
+
+	if response, err = remoteHTTP.Do(request); err != nil {
+		err = errors.Errorf("failed to read response: %w", err)
+		return
+	}
+
+	bf := remoteHTTP.remote.GetStore().GetInventoryListStore().FormatForVersion(
+		remoteHTTP.remote.GetConfig().GetStoreVersion(),
+	)
+
+	list = sku.MakeList()
+
+	if err = inventory_list_blobs.ReadInventoryListBlob(
+		bf,
+		bufio.NewReader(response.Body),
+		list,
+	); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
 	return
 }
 

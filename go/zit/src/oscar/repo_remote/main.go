@@ -50,7 +50,7 @@ func MakeRemoteHTTPFromXDGDotenvPath(
 	return
 }
 
-func MakeRemoteStdio(
+func MakeRemoteStdioLocal(
 	env *env.Env,
 	dir string,
 ) (remoteHTTP *HTTP, err error) {
@@ -67,7 +67,35 @@ func MakeRemoteStdio(
 
 	httpRoundTripper.Dir = dir
 
-	if err = httpRoundTripper.Initialize(remote); err != nil {
+	if err = httpRoundTripper.InitializeWithLocal(remote); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	remoteHTTP.Client.Transport = &httpRoundTripper
+
+	return
+}
+
+func MakeRemoteStdioSSH(
+	env *env.Env,
+	arg string,
+) (remoteHTTP *HTTP, err error) {
+	remote := repo_local.Make(
+		env,
+		repo_local.OptionsEmpty,
+	)
+
+	remoteHTTP = &HTTP{
+		remote: remote,
+	}
+
+	var httpRoundTripper HTTPRoundTripperStdio
+
+	if err = httpRoundTripper.InitializeWithSSH(
+		remote,
+		arg,
+	); err != nil {
 		err = errors.Wrap(err)
 		return
 	}

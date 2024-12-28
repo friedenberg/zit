@@ -15,7 +15,7 @@ function CodeBlock(el)
     return nil
   end
 
-  local data = pandoc.pipe("zit", { "format-object", "-dir-zit", common.DirZit, "-stdin", type }, el.text)
+  local data = pandoc.pipe("zit", { "format-object", "-stdin", type }, el.text)
 
   el.text = data
 

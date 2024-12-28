@@ -6,16 +6,16 @@ import (
 	"flag"
 	"sort"
 
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/ui"
 )
 
-func PrintUsage(in error) (exitStatus int) {
+func PrintUsage(ctx *errors.Context, in error) {
 	if in != nil {
-		exitStatus = 1
-		ui.Err().Print(in)
+		defer ctx.CancelWithError(in)
 	}
 
-	ui.Err().Print("Usage for zzt:")
+	ui.Err().Print("Usage for zit:")
 
 	fs := make([]flag.FlagSet, 0, len(Commands()))
 
@@ -28,15 +28,13 @@ func PrintUsage(in error) (exitStatus int) {
 	})
 
 	for _, f := range fs {
-		PrintSubcommandUsage(f)
+		ui.Err().Print(f.Name())
 	}
-
-	return
 }
 
 func PrintSubcommandUsage(flags flag.FlagSet) {
 	printTabbed := func(s string) {
-		ui.Err().Printf("  %s", s)
+		ui.Err().Print(s)
 	}
 
 	var b bytes.Buffer

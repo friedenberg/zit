@@ -17,7 +17,7 @@ type HTTPRoundTripperStdio struct {
 	HTTPRoundTripperBufio
 }
 
-func (roundTripper *HTTPRoundTripperStdio) Initialize(
+func (roundTripper *HTTPRoundTripperStdio) InitializeWithLocal(
 	remote *repo_local.Repo,
 ) (err error) {
 	if roundTripper.Path, err = exec.LookPath("zit"); err != nil {
@@ -34,6 +34,44 @@ func (roundTripper *HTTPRoundTripperStdio) Initialize(
 		"-",
 	}
 
+	if err = roundTripper.initialize(remote); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (roundTripper *HTTPRoundTripperStdio) InitializeWithSSH(
+	remote *repo_local.Repo,
+	arg string,
+) (err error) {
+	if roundTripper.Path, err = exec.LookPath("ssh"); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	roundTripper.Stderr = os.Stderr
+
+	roundTripper.Args = []string{
+		arg,
+		"zit",
+		"serve",
+		// "-verbose",
+		"-",
+	}
+
+	if err = roundTripper.initialize(remote); err != nil {
+		err = errors.Wrap(err)
+		return
+	}
+
+	return
+}
+
+func (roundTripper *HTTPRoundTripperStdio) initialize(
+	remote *repo_local.Repo,
+) (err error) {
 	if roundTripper.WriteCloser, err = roundTripper.StdinPipe(); err != nil {
 		err = errors.Wrap(err)
 		return
