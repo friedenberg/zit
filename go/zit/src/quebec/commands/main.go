@@ -10,7 +10,7 @@ import (
 
 // TODO switch to returning result
 func Run(
-	ctx errors.Context,
+	ctx *errors.Context,
 	args ...string,
 ) {
 	var cmd Command

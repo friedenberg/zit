@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	"golang.org/x/xerrors"
@@ -16,22 +17,26 @@ var ErrContextCancelled = New("context cancelled")
 type Context struct {
 	context.Context
 	cancel context.CancelCauseFunc
+
+	lock          sync.Mutex
+	doAfter       []FuncWithStackInfo
+	doAfterErrors []error // TODO expose and use
 }
 
-func MakeContextDefault() Context {
+func MakeContextDefault() *Context {
 	return MakeContext(context.Background())
 }
 
-func MakeContext(in context.Context) Context {
+func MakeContext(in context.Context) *Context {
 	ctx, cancel := context.WithCancelCause(in)
 
-	return Context{
+	return &Context{
 		Context: ctx,
 		cancel:  cancel,
 	}
 }
 
-func (c Context) Cause() error {
+func (c *Context) Cause() error {
 	if err := context.Cause(c.Context); err != nil {
 		if Is(err, ErrContextCancelled) {
 			return nil
@@ -43,19 +48,19 @@ func (c Context) Cause() error {
 	return nil
 }
 
-func (c Context) ContinueOrPanicOnDone() {
+func (c *Context) ContinueOrPanicOnDone() {
 	select {
 	default:
-	case <-c.Context.Done():
+	case <-c.Done():
 		panic(ErrContextCancelled)
 	}
 }
 
-func (c Context) SetCancelOnSIGINT() {
+func (c *Context) SetCancelOnSIGINT() {
 	c.SetCancelOnSignals(syscall.SIGINT)
 }
 
-func (c Context) SetCancelOnSignals(
+func (c *Context) SetCancelOnSignals(
 	signals ...os.Signal,
 ) {
 	ch := make(chan os.Signal, 1)
@@ -67,7 +72,7 @@ func (c Context) SetCancelOnSignals(
 	}()
 }
 
-func (c Context) Run(f func(Context)) error {
+func (c *Context) Run(f func(*Context)) error {
 	func() {
 		defer c.cancel(ErrContextCancelled)
 		defer func() {
@@ -81,22 +86,51 @@ func (c Context) Run(f func(Context)) error {
 		f(c)
 	}()
 
+	for i := len(c.doAfter) - 1; i >= 0; i-- {
+		doAfter := c.doAfter[i]
+		err := doAfter.Func()
+		if err != nil {
+			c.doAfterErrors = append(
+				c.doAfterErrors,
+				doAfter.Wrap(err),
+			)
+		}
+	}
+
 	return c.Cause()
 }
 
-func (c Context) After(f func() error) {
-	defer c.ContinueOrPanicOnDone()
+//go:noinline
+func (c *Context) after(skip int, f func() error) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
 
-	if err := f(); err != nil {
-		c.cancel(WrapN(1, err))
-	}
+	si, _ := MakeStackInfo(skip + 1)
+
+	c.doAfter = append(
+		c.doAfter,
+		FuncWithStackInfo{
+			Func:      f,
+			StackInfo: si,
+		},
+	)
+}
+
+//go:noinline
+func (c *Context) After(f func() error) {
+	c.after(1, f)
+}
+
+//go:noinline
+func (c *Context) AfterWithContext(f func(*Context) error) {
+	c.after(1, func() error { return f(c) })
 }
 
 // Must executes a function even if the context has been cancelled. If the
 // function returns an error, Must cancels the context and offers a heartbeat to
 // panic. It is meant for defers that must be executed, like closing files,
 // flushing buffers, releasing locks.
-func (c Context) Must(f func() error) {
+func (c *Context) Must(f func() error) {
 	defer c.ContinueOrPanicOnDone()
 
 	if err := f(); err != nil {
@@ -104,7 +138,7 @@ func (c Context) Must(f func() error) {
 	}
 }
 
-func (c Context) MustWithContext(f func(Context) error) {
+func (c *Context) MustWithContext(f func(*Context) error) {
 	defer c.ContinueOrPanicOnDone()
 
 	if err := f(c); err != nil {
@@ -112,25 +146,25 @@ func (c Context) MustWithContext(f func(Context) error) {
 	}
 }
 
-func (c Context) MustClose(closer io.Closer) {
+func (c *Context) MustClose(closer io.Closer) {
 	c.Must(closer.Close)
 }
 
-func (c Context) MustFlush(flusher Flusher) {
+func (c *Context) MustFlush(flusher Flusher) {
 	c.Must(flusher.Flush)
 }
 
-func (c Context) Cancel() {
+func (c *Context) Cancel() {
 	defer c.ContinueOrPanicOnDone()
 	c.cancel(ErrContextCancelled)
 }
 
-func (c Context) CancelWithError(err error) {
+func (c *Context) CancelWithError(err error) {
 	defer c.ContinueOrPanicOnDone()
 	c.cancel(WrapN(1, err))
 }
 
-func (c Context) CancelWithErrorAndFormat(err error, f string, values ...any) {
+func (c *Context) CancelWithErrorAndFormat(err error, f string, values ...any) {
 	defer c.ContinueOrPanicOnDone()
 	c.cancel(
 		&stackWrapError{
@@ -141,17 +175,17 @@ func (c Context) CancelWithErrorAndFormat(err error, f string, values ...any) {
 	)
 }
 
-func (c Context) CancelWithErrorf(f string, values ...any) {
+func (c *Context) CancelWithErrorf(f string, values ...any) {
 	defer c.ContinueOrPanicOnDone()
 	c.cancel(WrapSkip(1, fmt.Errorf(f, values...)))
 }
 
-func (c Context) CancelWithBadRequestf(f string, values ...any) {
+func (c *Context) CancelWithBadRequestf(f string, values ...any) {
 	defer c.ContinueOrPanicOnDone()
 	c.cancel(&errBadRequest{xerrors.Errorf(f, values...)})
 }
 
-func (c Context) CancelWithNotImplemented() {
+func (c *Context) CancelWithNotImplemented() {
 	defer c.ContinueOrPanicOnDone()
 	c.cancel(ErrNotImplemented)
 }

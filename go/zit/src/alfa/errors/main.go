@@ -43,6 +43,7 @@ func PanicIfError(err interface{}) {
 	}
 }
 
+//go:noinline
 func WrapSkip(
 	skip int,
 	in error,
@@ -73,6 +74,7 @@ func WrapSkip(
 
 const thisSkip = 1
 
+//go:noinline
 func Errorf(f string, values ...interface{}) (err error) {
 	err = WrapSkip(thisSkip, fmt.Errorf(f, values...))
 	return
@@ -89,6 +91,7 @@ func Wrap(in error) error {
 	return WrapSkip(thisSkip, in)
 }
 
+//go:noinline
 func Wrapf(in error, f string, values ...interface{}) error {
 	if in == nil {
 		return nil
@@ -101,6 +104,7 @@ func Wrapf(in error, f string, values ...interface{}) error {
 	}
 }
 
+//go:noinline
 func WrapExceptAsNil(in error, except ...error) (err error) {
 	if in == nil {
 		return
@@ -117,6 +121,7 @@ func WrapExceptAsNil(in error, except ...error) (err error) {
 	return
 }
 
+//go:noinline
 func WrapExcept(in error, except ...error) (err error) {
 	if in == nil {
 		return
@@ -135,6 +140,7 @@ func WrapExcept(in error, except ...error) (err error) {
 
 var errImplement = New("not implemented")
 
+//go:noinline
 func Implement() (err error) {
 	return WrapSkip(1, errImplement)
 }

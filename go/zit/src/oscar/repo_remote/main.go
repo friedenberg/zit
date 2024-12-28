@@ -11,7 +11,7 @@ import (
 
 // TODO this should not be a compiled config
 func MakeRemoteHTTPFromXDGDotenvPath(
-	context errors.Context,
+	context *errors.Context,
 	config config_mutable_cli.Config,
 	xdgDotenvPath string,
 ) (remoteHTTP *HTTP, err error) {

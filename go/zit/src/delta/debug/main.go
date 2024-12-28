@@ -16,7 +16,7 @@ type Context struct {
 }
 
 func MakeContext(
-	ctx errors.Context,
+	ctx *errors.Context,
 	options Options,
 ) (c *Context, err error) {
 	c = &Context{

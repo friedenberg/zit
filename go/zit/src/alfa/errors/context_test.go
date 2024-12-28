@@ -8,45 +8,56 @@ import (
 func TestContextCancelled(t *testing.T) {
 	ctx := MakeContext(context.Background())
 
-	didPanic := false
+	var must1, must2, after1 bool
 
-	var must1, must2 bool
+	if err := ctx.Run(
+		func(ctx *Context) {
+			didPanic := false
 
-	defer func() {
-		t.Log("defer1")
+			defer func() {
+				t.Log("defer1")
 
-		if r := recover(); r != nil {
-			t.Log("recover")
-			didPanic = true
+				if r := recover(); r != nil {
+					t.Log("recover")
+					didPanic = true
 
-			if r != ErrContextCancelled {
-				t.Errorf("expected recover to be %q", ErrContextCancelled)
+					if r != ErrContextCancelled {
+						t.Errorf("expected recover to be %q", ErrContextCancelled)
+					}
+				}
+			}()
+
+			defer ctx.Must(func() error {
+				t.Log("must1")
+				must1 = true
+				return nil
+			})
+
+			defer ctx.Must(func() error {
+				t.Log("must2")
+				must2 = true
+				return nil
+			})
+
+			ctx.After(func() error {
+				after1 = true
+				return nil
+			})
+
+			ctx.Cancel()
+			ctx.ContinueOrPanicOnDone()
+
+			t.Errorf("expected to not get here")
+
+			if !didPanic {
+				t.Errorf("expected to panic")
 			}
-		}
+		},
+	); err != nil {
+		t.Errorf("expected no error but got: %s", err)
+	}
 
-		if !must1 || !must2 {
-			t.Errorf("expected both must functions to execute")
-		}
-	}()
-
-	defer ctx.Must(func() error {
-		t.Log("must1")
-		must1 = true
-		return nil
-	})
-
-	defer ctx.Must(func() error {
-		t.Log("must2")
-		must2 = true
-		return nil
-	})
-
-	ctx.cancel(nil)
-	ctx.ContinueOrPanicOnDone()
-
-	t.Errorf("expected to not get here")
-
-	if !didPanic {
-		t.Errorf("expected to panic")
+	if !must1 || !must2 || !after1 {
+		t.Errorf("expected all must and after functions to execute")
 	}
 }

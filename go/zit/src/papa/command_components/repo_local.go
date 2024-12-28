@@ -16,21 +16,14 @@ func (cmd *RepoLocal) SetFlagSet(f *flag.FlagSet) {
 }
 
 func (c RepoLocal) MakeRepoLocal(
-	context errors.Context,
+	context *errors.Context,
 	config config_mutable_cli.Config,
 	options repo_local.Options,
 ) *repo_local.Repo {
-	var layout dir_layout.Layout
-
-	{
-		var err error
-
-		if layout, err = dir_layout.MakeDefault(
-			config.Debug,
-		); err != nil {
-			context.CancelWithError(err)
-		}
-	}
+	layout := dir_layout.MakeDefault(
+		context,
+		config.Debug,
+	)
 
 	env := env.Make(
 		context,

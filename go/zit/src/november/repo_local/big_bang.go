@@ -39,12 +39,7 @@ type BigBang struct {
 }
 
 func (e *BigBang) AddToFlagSet(f *flag.FlagSet) {
-	f.Var(
-		&e.AgeIdentity,
-		"age",
-		"",
-	) // TODO-P3 move to Angeboren
-
+	f.Var(&e.AgeIdentity, "age", "")
 	f.BoolVar(&e.OverrideXDGWithCwd, "override-xdg-with-cwd", false, "")
 	f.StringVar(&e.Yin, "yin", "", "File containing list of zettel id left parts")
 	f.StringVar(&e.Yang, "yang", "", "File containing list of zettel id right parts")
@@ -53,18 +48,14 @@ func (e *BigBang) AddToFlagSet(f *flag.FlagSet) {
 }
 
 func (bb BigBang) Start(
-	context errors.Context,
+	context *errors.Context,
 	config config_mutable_cli.Config,
 ) (u *Repo, err error) {
-	var dirLayout dir_layout.Layout
-
-	if dirLayout, err = dir_layout.MakeDefaultAndInitialize(
+	dirLayout := dir_layout.MakeDefaultAndInitialize(
+		context,
 		config.Debug,
 		bb.OverrideXDGWithCwd,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	)
 
 	env := env.Make(
 		context,

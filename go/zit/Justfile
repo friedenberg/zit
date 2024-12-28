@@ -1,4 +1,14 @@
 
+clean-go-cache:
+  go clean -cache
+
+clean-go-modcache:
+  go clean -modcache
+
+clean-go: clean-go-cache clean-go-modcache
+
+clean: clean-go
+
 update-go:
   env GOPROXY=direct go get -u -t ./...
 

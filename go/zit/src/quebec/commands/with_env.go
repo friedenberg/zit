@@ -20,17 +20,10 @@ func (cmd commandWithEnv) Run(
 	dependencies Dependencies,
 ) {
 	// TODO use options when making dirLayout
-	var dirLayout dir_layout.Layout
-
-	{
-		var err error
-
-		if dirLayout, err = dir_layout.MakeDefault(
-			dependencies.Debug,
-		); err != nil {
-			dependencies.CancelWithError(err)
-		}
-	}
+	dirLayout := dir_layout.MakeDefault(
+		dependencies.Context,
+		dependencies.Debug,
+	)
 
 	env := env.Make(
 		dependencies.Context,
@@ -40,7 +33,6 @@ func (cmd commandWithEnv) Run(
 
 	cmdArgs := cmd.Args()
 
-	defer env.MustWithContext(env.GetDirLayout().ResetTempOnExit)
 
 	cmd.Command.RunWithEnv(env, cmdArgs...)
 }

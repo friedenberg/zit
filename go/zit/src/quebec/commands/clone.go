@@ -74,7 +74,6 @@ func (c Clone) Run(
 			local.CancelWithError(err)
 		}
 
-		defer dependencies.MustWithContext(local.GetDirLayout().ResetTempOnExit)
 		defer local.MustFlush(local)
 	}
 

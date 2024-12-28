@@ -4,10 +4,18 @@ type Flusher interface {
 	Flush() error
 }
 
-type Func func() error
+type (
+	Func        func() error
+	FuncContext func(*Context) error
+)
 
 type FuncWithStackInfo struct {
 	Func
+	StackInfo
+}
+
+type WithStackInfo[T any] struct {
+	Contents T
 	StackInfo
 }
 

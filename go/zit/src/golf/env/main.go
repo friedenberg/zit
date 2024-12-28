@@ -13,7 +13,7 @@ import (
 )
 
 type Env struct {
-	errors.Context
+	*errors.Context
 
 	in  fd.Std
 	out fd.Std
@@ -39,7 +39,7 @@ func MakeDefault(
 }
 
 func Make(
-	context errors.Context,
+	context *errors.Context,
 	kCli config_mutable_cli.Config,
 	dirLayout dir_layout.Layout,
 ) *Env {

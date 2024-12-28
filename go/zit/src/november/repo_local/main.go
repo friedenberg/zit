@@ -50,7 +50,7 @@ type Repo struct {
 }
 
 func MakeFromConfigAndXDGDotenvPath(
-	context errors.Context,
+	context *errors.Context,
 	config config_mutable_cli.Config,
 	xdgDotenvPath string,
 ) (local *Repo, err error) {
@@ -75,15 +75,11 @@ func MakeFromConfigAndXDGDotenvPath(
 		return
 	}
 
-	var dirLayout dir_layout.Layout
-
-	if dirLayout, err = dir_layout.MakeWithXDG(
+	dirLayout := dir_layout.MakeWithXDG(
+		context,
 		config.Debug,
 		*dotenv.XDG,
-	); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
+	)
 
 	env := env.Make(
 		context,
@@ -113,6 +109,8 @@ func Make(
 	if err := repo.Initialize(options); err != nil {
 		env.CancelWithError(err)
 	}
+
+  repo.After(repo.Flush)
 
 	return
 }

@@ -12,7 +12,7 @@ import (
 )
 
 type Dependencies struct {
-	errors.Context
+	*errors.Context
 	config_mutable_cli.Config
 }
 

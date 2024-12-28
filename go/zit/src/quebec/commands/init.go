@@ -49,7 +49,6 @@ func (c Init) Run(
 			repo.CancelWithError(err)
 		}
 
-		defer dependencies.MustWithContext(repo.GetDirLayout().ResetTempOnExit)
 		defer repo.MustFlush(repo)
 	}
 }

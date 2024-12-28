@@ -7,24 +7,18 @@ import (
 
 func ErrorWaitGroupApply[T any](
 	wg errors.WaitGroup,
-	s interfaces.SetLike[T],
+	s interfaces.Collection[T],
 	f interfaces.FuncIter[T],
-) (d bool) {
-	if err := s.Each(
-		func(e T) (err error) {
-			if !wg.Do(
-				func() error {
-					return f(e)
-				},
-			) {
-				err = errors.MakeErrStopIteration()
-			}
-
-			return
-		},
-	); err != nil {
-		d = true
+) bool {
+	for e := range s.All() {
+		if !wg.Do(
+			func() error {
+				return f(e)
+			},
+		) {
+			return true
+		}
 	}
 
-	return
+	return false
 }

@@ -31,6 +31,7 @@ func MakeStackInfoFromFrame(frame runtime.Frame) (si StackInfo) {
 	return
 }
 
+//go:noinline
 func MustStackInfo(skip int) StackInfo {
 	si, ok := MakeStackInfo(skip + 1)
 
@@ -41,6 +42,7 @@ func MustStackInfo(skip int) StackInfo {
 	return si
 }
 
+//go:noinline
 func MakeStackInfo(skip int) (si StackInfo, ok bool) {
 	var pc uintptr
 	pc, _, _, ok = runtime.Caller(skip + 1) // 0 is self

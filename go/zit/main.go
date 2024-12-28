@@ -15,7 +15,7 @@ func main() {
 	var exitStatus int
 
 	if err := ctx.Run(
-		func(ctx errors.Context) {
+		func(ctx *errors.Context) {
 			commands.Run(ctx, os.Args...)
 		},
 	); err != nil {

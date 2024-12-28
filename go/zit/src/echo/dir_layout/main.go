@@ -17,60 +17,64 @@ const (
 )
 
 type Layout struct {
+	*errors.Context
 	beforeXDG
-
 	xdg.XDG
 }
 
 func MakeDefault(
+	context *errors.Context,
 	do debug.Options,
-) (s Layout, err error) {
+) Layout {
 	var home string
 
-	if home, err = os.UserHomeDir(); err != nil {
-		err = errors.Wrap(err)
-		return
+	{
+		var err error
+
+		if home, err = os.UserHomeDir(); err != nil {
+			context.CancelWithError(err)
+		}
 	}
 
-	if s, err = MakeWithHome(home, do, true); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
+	return MakeWithHome(context, home, do, true)
 }
 
 func MakeDefaultAndInitialize(
+	context *errors.Context,
 	do debug.Options,
 	overrideXDG bool,
-) (s Layout, err error) {
+) Layout {
 	var home string
 
-	if home, err = os.UserHomeDir(); err != nil {
-		err = errors.Wrap(err)
-		return
+	{
+		var err error
+		if home, err = os.UserHomeDir(); err != nil {
+			context.CancelWithError(err)
+		}
 	}
 
-	if s, err = MakeWithHomeAndInitialize(home, do, overrideXDG); err != nil {
-		err = errors.Wrap(err)
-		return
-	}
-
-	return
+	return MakeWithHomeAndInitialize(
+		context,
+		home,
+		do,
+		overrideXDG,
+	)
 }
 
 func MakeWithHome(
+	context *errors.Context,
 	home string,
 	do debug.Options,
 	permitCwdXDGOverride bool,
-) (s Layout, err error) {
+) (s Layout) {
+	s.Context = context
+
 	xdg := xdg.XDG{
 		Home: home,
 	}
 
-	if err = s.beforeXDG.initialize(do); err != nil {
-		err = errors.Wrap(err)
-		return
+	if err := s.beforeXDG.initialize(do); err != nil {
+		s.CancelWithError(err)
 	}
 
 	addedPath := "zit"
@@ -79,37 +83,38 @@ func MakeWithHome(
 	if permitCwdXDGOverride && files.Exists(pathCwdXDGOverride) {
 		xdg.Home = pathCwdXDGOverride
 		addedPath = ""
-		if err = xdg.InitializeOverridden(false, addedPath); err != nil {
-			err = errors.Wrap(err)
-			return
+		if err := xdg.InitializeOverridden(false, addedPath); err != nil {
+			s.CancelWithError(err)
 		}
 	} else {
-		if err = xdg.InitializeStandardFromEnv(false, addedPath); err != nil {
-			err = errors.Wrap(err)
-			return
+		if err := xdg.InitializeStandardFromEnv(false, addedPath); err != nil {
+			s.CancelWithError(err)
 		}
 	}
 
-	if err = s.initializeXDG(xdg); err != nil {
-		err = errors.Wrap(err)
-		return
+	if err := s.initializeXDG(xdg); err != nil {
+		s.CancelWithError(err)
 	}
+
+	s.AfterWithContext(s.resetTempOnExit)
 
 	return
 }
 
 func MakeWithHomeAndInitialize(
+	context *errors.Context,
 	home string,
 	do debug.Options,
 	cwdXDGOverride bool,
-) (s Layout, err error) {
+) (s Layout) {
+	s.Context = context
+
 	xdg := xdg.XDG{
 		Home: home,
 	}
 
-	if err = s.beforeXDG.initialize(do); err != nil {
-		err = errors.Wrap(err)
-		return
+	if err := s.beforeXDG.initialize(do); err != nil {
+		s.CancelWithError(err)
 	}
 
 	addedPath := "zit"
@@ -118,37 +123,37 @@ func MakeWithHomeAndInitialize(
 	if cwdXDGOverride {
 		xdg.Home = pathCwdXDGOverride
 		addedPath = ""
-		if err = xdg.InitializeOverridden(true, addedPath); err != nil {
-			err = errors.Wrap(err)
-			return
+		if err := xdg.InitializeOverridden(true, addedPath); err != nil {
+			s.CancelWithError(err)
 		}
 	} else {
-		if err = xdg.InitializeStandardFromEnv(true, addedPath); err != nil {
-			err = errors.Wrap(err)
-			return
+		if err := xdg.InitializeStandardFromEnv(true, addedPath); err != nil {
+			s.CancelWithError(err)
 		}
 	}
 
-	if err = s.initializeXDG(xdg); err != nil {
-		err = errors.Wrap(err)
-		return
+	if err := s.initializeXDG(xdg); err != nil {
+		s.CancelWithError(err)
 	}
+
+	s.AfterWithContext(s.resetTempOnExit)
 
 	return
 }
 
 func MakeWithXDG(
+	context *errors.Context,
 	do debug.Options,
 	xdg xdg.XDG,
-) (s Layout, err error) {
-	if err = s.beforeXDG.initialize(do); err != nil {
-		err = errors.Wrap(err)
-		return
+) (s Layout) {
+	s.Context = context
+
+  if err := s.beforeXDG.initialize(do); err != nil {
+    s.CancelWithError(err)
 	}
 
-	if err = s.initializeXDG(xdg); err != nil {
-		err = errors.Wrap(err)
-		return
+  if err := s.initializeXDG(xdg); err != nil {
+    s.CancelWithError(err)
 	}
 
 	return

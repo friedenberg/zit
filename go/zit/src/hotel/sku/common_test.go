@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"code.linenisgreat.com/zit/go/zit/src/alfa/errors"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/quiter"
 	"code.linenisgreat.com/zit/go/zit/src/bravo/test_logz"
 	"code.linenisgreat.com/zit/go/zit/src/charlie/collections_ptr"
@@ -192,17 +193,14 @@ func makeTestFSHome(
 ) repo_layout.Layout {
 	p := t.TempDir()
 
-	var dirLayout dir_layout.Layout
-
-	var err error
-
-	if dirLayout, err = dir_layout.MakeWithHome(
+	dirLayout := dir_layout.MakeWithHome(
+		errors.MakeContextDefault(),
 		p,
 		debug.Options{},
 		false,
-	); err != nil {
-		t.Fatalf("failed to make dir_layout.Primitive: %s", err)
-	}
+	)
+
+	var err error
 
 	f, err := repo_layout.Make(
 		env.MakeDefault(dirLayout),

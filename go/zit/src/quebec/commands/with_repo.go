@@ -35,7 +35,6 @@ func (cmd commandWithRepo) Run(
 	)
 
 	// TODO determine how to globalize certain cleanup operations like the below
-	defer dependencies.MustWithContext(repo.GetDirLayout().ResetTempOnExit)
 	defer repo.MustFlush(repo)
 
 	switch {
