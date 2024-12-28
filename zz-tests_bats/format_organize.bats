@@ -222,6 +222,7 @@ function format_organize_untracked_fs_blob_with_spaces() { # @test
 # TODO [anti/deb !task zz-inbox] fix `zit organize .`
 function format_organize_recognized_fs_blob_with_newlines() { # @test
 	skip
+	run_zit_init_disable_age
 	run_zit format-organize - <<-EOM
 		- [one/uno !pdf payee-x-heloc zz-inbox
 		                   "heloc-board/CO-OP Modified Clarity Comittment - letterhead.pdf"] CO-OP Modified Clarity Comittment - letterhead

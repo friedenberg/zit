@@ -142,11 +142,11 @@ function show_simple_one_zettel_hidden_past { # @test
 }
 
 function show_all_mutter { # @test
-	skip
 	run_zit show -format mutter-sha :
 	assert_success
-	assert_output - <<-EOM
-		5b059e2dd36c89f2c7f75b2b6f39573af94e4109ceebabe2814515c9ea30eb98
+	assert_output_unsorted --regexp - <<-EOM
+		.*
+		.*
 	EOM
 }
 

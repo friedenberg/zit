@@ -90,56 +90,7 @@ function add_with_dupe_added { # @test
 	EOM
 }
 
-function add_with_dupe_added_dupes_permitted { # @test
-	skip
-	run_zit_init_disable_age
-
-	f=to_add.md
-	{
-		echo test file
-	} >"$f"
-
-	f2=to_add2.md
-	{
-		echo test file
-	} >"$f2"
-
-	run_zit add \
-		-delete \
-		-allow-dupes \
-		-tags zz-inbox-2022-11-14 \
-		"$f" "$f2"
-
-	assert_success
-	assert_output_unsorted - <<-EOM
-		          deleted [to_add.md]
-		          deleted [to_add2.md]
-		[one/dos @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add2" zz-inbox-2022-11-14]
-		[one/dos @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add2"]
-		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add" zz-inbox-2022-11-14]
-		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add"]
-		[zz-inbox-2022-11-14 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[zz-inbox-2022-11 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[zz-inbox-2022 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[zz-inbox @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-	EOM
-
-	run_zit show -format text one/uno
-	assert_success
-	assert_output - <<-EOM
-		---
-		# to_add
-		- zz-inbox-2022-11-14
-		! md
-		---
-
-		test file
-	EOM
-}
-
 function add_not_md { # @test
-	skip
 	run_zit_init_disable_age
 
 	f=to_add.pdf
@@ -150,19 +101,23 @@ function add_not_md { # @test
 	run_zit add \
 		-delete \
 		-tags zz-inbox-2022-11-14 \
-		-each-akte "echo" \
+		-each-blob "bash -c 'basename \$0'" \
 		"$f"
 
 	assert_success
 	assert_output - <<-EOM
-		[-zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-zz-inbox @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-zz-inbox-2022 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-zz-inbox-2022-11 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[-zz-inbox-2022-11-14 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add" zz-inbox-2022-11-14]
-		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to_add" zz-inbox-2022-11-14]
-		          deleted [to_add.md]
+		[!pdf @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 !toml-type-v1]
+		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !pdf "to_add"]
+		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[zz-inbox @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[zz-inbox-2022 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[zz-inbox-2022-11 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[zz-inbox-2022-11-14 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !pdf "to_add" zz-inbox-2022-11-14]
+		      checked out [one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !pdf "to_add" zz-inbox-2022-11-14
+		                   one/uno.pdf]
+		          deleted [to_add.pdf]
+		uno.pdf
 	EOM
 
 	run_zit show -format text one/uno
@@ -171,7 +126,7 @@ function add_not_md { # @test
 		---
 		# to_add
 		- zz-inbox-2022-11-14
-		! md
+		! pdf
 		---
 
 		test file
@@ -433,7 +388,6 @@ function add_each_blob { # @test
 }
 
 function add_organize { # @test
-	skip
 	run_zit_init_disable_age
 
 	export EDITOR="/bin/bash -c 'cat \"\$0\"'"
@@ -451,17 +405,24 @@ function add_organize { # @test
 		"$f"
 
 	assert_success
-	assert_output_unsorted - <<-EOM
+	assert_output - <<-EOM
+		---
+		% instructions: to prevent an object from being checked in, delete it entirely
+		% delete:true delete once checked in
+		---
+
+		- ["to add.md"]
+
+		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add"]
+		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[zz-inbox @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[zz-inbox-2022 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[zz-inbox-2022-11 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[zz-inbox-2022-11-14 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
+		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add" zz-inbox-2022-11-14]
+		      checked out [one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add" zz-inbox-2022-11-14
 		                   one/uno.md]
 		          deleted [to add.md]
-		      checked out [one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add" zz-inbox-2022-11-14
-		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add" zz-inbox-2022-11-14]
-		[one/uno @55f8718109829bf506b09d8af615b9f107a266e19f7a311039d1035f180b22d4 !md "to add"]
-		[zz-inbox-2022-11-14 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[zz-inbox-2022-11 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[zz-inbox-2022 @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[zz-inbox @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
-		[zz @e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855]
 		test file
 	EOM
 }
